@@ -12,6 +12,7 @@
  * Translators:
  *		Humdinger
  *		Matthias
+ *		taos
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -39,6 +40,8 @@
 <li><a href="../uk/filetypes.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../zh_CN/filetypes.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../pt_PT/filetypes.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/filetypes.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/filetypes.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../en/filetypes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -58,7 +61,7 @@
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="specific-file" name="specific-file">Setzen des Dateityps einer bestimmten Datei</a></h2>
-<p>Man kann den Typ, das Icon und die verknüpfte Anwendung einer bestimmten Datei ändern. Dazu markiert man die Datei und ruft mittels Rechtsklick <span class="menu">Add-Ons | Filetype add-on</span> aus dem Kontextmenü auf.</p>
+<p>Man kann den Typ, das Icon und die verknüpfte Anwendung einer bestimmten Datei ändern. Dazu markiert man die Datei und ruft mittels Rechtsklick <span class="menu">Add-ons | Filetype</span> aus dem Kontextmenü auf.</p>
 <img src="images/filetypes-images/filetype-addon.png" alt="filetype-addon.png" />
 
 <h3>
@@ -66,8 +69,8 @@
 <a name="filetype" id="filetype">Der Dateityp</a></h3>
 <p>Im obigen Beispiel ist einer Datei der Typ "image/png" zugeordnet; sie wird von Haiku demnach als PNG-Datei erkannt. Sollte es sich tatsächlich jedoch um einen anderen Dateityp handeln, kann man diesen ändern, indem man entweder die korrekte MIME Signatur einträgt, oder auf einen der beiden Buttons unter dem Textfeld klickt:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">Select...</span></td><td> </td><td>zeigt eine hierarchische Liste von Dateitypen, in der man zu <tt>image | GIF Image</tt> gelangt.</td></tr>
-<tr><td><span class="button">Same as...</span></td><td> </td><td>öffnet einen Dialog zur Auswahl einer Datei, die bereits den entsprechenden MIME-Typ besitzt.</td></tr>
+<tr><td><span class="button">Auswählen...</span></td><td> </td><td>zeigt eine hierarchische Liste von Dateitypen, in der man zu <tt>image | GIF Image</tt> gelangt.</td></tr>
+<tr><td><span class="button">Gleicher wie...</span></td><td> </td><td>öffnet einen Dialog zur Auswahl einer Datei, die bereits den entsprechenden MIME-Typ besitzt.</td></tr>
 </table>
 
 <h3>
@@ -75,36 +78,36 @@
 <a id="preferred-app" name="preferred-app">Die bevorzugte Anwendung</a></h3>
 <p>Dieses Menü zeigt eine Liste aller Anwendungen, die mit diesem Dateityp etwas anfangen können. Aus ihr kann man das Programm wählen, das diese eine bestimmte Datei bei einem Doppelklick öffnen soll. So kann man z.B. die bevorzugte Anwendung einer HTML Datei vom Browser zu einem Texteditor ändern, solange man an ihr arbeitet. Jede andere HTML Datei wird weiterhin im Browser geöffnet, nur eben diese eine im Texteditor.</p>
 
-<p>Die <span class="menu">Default Application</span> ist die für diesen Dateityp global gesetzte Anwendung. Befindet sich die gewünschte Anwendung nicht in dem Menü, finden sich darunter wieder die beiden Buttons <span class="button">Select...</span> und <span class="button">Same As...</span>, mit denen man das gleiche machen kann wie schon unter "Der Dateityp" weiter oben beschrieben.</p>
+<p>Die <span class="menu">Bevorzugte Anwendung</span> ist die für diesen Dateityp global gesetzte Anwendung. Befindet sich die gewünschte Anwendung nicht in dem Menü, finden sich darunter wieder die beiden Buttons <span class="button">Auswählen...</span> und <span class="button">Gleiche wie...</span>, mit denen man das gleiche machen kann wie schon unter "Der Dateityp" weiter oben beschrieben.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="icon" name="icon">Das Icon</a></h3>
-<p>Icons werden normalerweise vom Systemstandard für diesen Dateityp geerbt. Darum muss man sich nicht wundern, wenn das Iconfeld oben rechts im Dialog leer ist. Besitzt eine Datei ein eigenes Icon, lässt es sich im <span class="app">Filetype Add-On</span> in das Iconfeld einer anderen Datei ziehen. Oder man doppelklickt in das Iconfeld und baut sich sein eigenes Symbol. Mehr über Icons und ihre Erstellung steht im Kapitel <a href="applications/icon-o-matic.html">Icon-O-Matic</a>.</p>
+<p>Icons werden normalerweise vom Systemstandard für diesen Dateityp geerbt. Darum muss man sich nicht wundern, wenn das Iconfeld oben rechts im Dialog leer ist. Besitzt eine Datei ein eigenes Icon, lässt es sich im <span class="app"><acronym title="Filetype">Dateitypen</acronym> Add-On</span> in das Iconfeld einer anderen Datei ziehen. Oder man doppelklickt in das Iconfeld und baut sich sein eigenes Symbol. Mehr über Icons und ihre Erstellung steht im Kapitel <a href="applications/icon-o-matic.html">Icon-O-Matic</a>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="settings-apps" name="settings-apps">Besondere Einstellungen für Anwendungen</a></h2>
-<p>Wird das <span class="app">Filetype Add-On</span> auf eine Anwendung angewandt, (hier: <span class="app">StyledEdit</span>), erscheint ein etwas anderer Dialog:</p>
+<p>Wird das <span class="app"><acronym title="Filetype">Dateitypen</acronym> Add-On</span> auf eine Anwendung angewandt, (hier: <span class="app"><acronym title="StyledEdit">Texteditor</acronym></span>), erscheint ein etwas anderer Dialog:</p>
 <img src="images/filetypes-images/filetype-addon-stylededit.png" alt="filetype-addon-stylededit.png" />
 <p>Ganz oben befindet sich statt des Standard MIME Kennzeichens die eindeutige Signatur der Anwendung. Mit ihr findet das System das Programm, wo immer es auch installiert wurde.</p>
 <p>Darunter finden sich eine Reihe von Optionen, die das Verhalten der Anwendung regeln:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Single Launch</span></td><td> </td><td>Pro ausführbarer Datei kann die Anwendung nur ein einziges mal laufen. Hat man zwei Kopien des Programms, können diese aber durchaus gleichzeitig ausgeführt werden.</td></tr>
-<tr><td><span class="menu">Multiple Launch</span></td><td> </td><td>Die Anwendung kann öfters gestartet werden und läuft dann praktisch mehrmals parallel.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Exclusive Launch</span></td><td> </td><td>Es kann wirklich nur eine einzige Anwendung mit dessen genauer Signatur auf einmal laufen.</td></tr>
-<tr><td><span class="menu">Args Only</span></td><td> </td><td>Zeigt an, dass die Anwendung nicht auf Messages reagiert.</td></tr>
-<tr><td><span class="menu">Background App</span></td><td> </td><td>Die Anwendung erscheint nicht im <a href="twitcher.html">Twitcher</a> oder der Liste laufender Programme in der Deskbar.</td></tr>
+<tr><td><span class="menu">Einzelausführung</span></td><td> </td><td>Pro ausführbarer Datei kann die Anwendung nur ein einziges mal laufen. Hat man zwei Kopien des Programms, können diese aber durchaus gleichzeitig ausgeführt werden.</td></tr>
+<tr><td><span class="menu">Mehrfache Ausführung</span></td><td> </td><td>Die Anwendung kann öfters gestartet werden und läuft dann praktisch mehrmals parallel.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Exklusive Ausführung</span></td><td> </td><td>Es kann wirklich nur eine einzige Anwendung mit dessen genauer Signatur auf einmal laufen.</td></tr>
+<tr><td><span class="menu">Nur Argumente</span></td><td> </td><td>Zeigt an, dass die Anwendung nicht auf Messages reagiert.</td></tr>
+<tr><td><span class="menu">Hintergrundanwendung</span></td><td> </td><td>Die Anwendung erscheint nicht im <a href="twitcher.html">Twitcher</a> oder der Liste laufender Programme in der Deskbar.</td></tr>
 </table>
-<p>Danach folgt eine Liste aller unterstützten Dateitypen. Typen können hinzugefügt (und auch entfernt) werden, wenn man meint die Anwendung käme mit ihnen klar. Als Folge erscheint das Programm im Menü bevorzugter Anwendungen oder in Trackers <span class="menu">Open with...</span> Kontextmenü bei einem Rechtsklick auf eine Datei dieses Typs.</p>
+<p>Danach folgt eine Liste aller unterstützten Dateitypen. Typen können hinzugefügt (und auch entfernt) werden, wenn man meint die Anwendung käme mit ihnen klar. Als Folge erscheint das Programm im Menü bevorzugter Anwendungen oder in Trackers <span class="menu">Öffnen mit...</span> Kontextmenü bei einem Rechtsklick auf eine Datei dieses Typs.</p>
 <p>Ganz unten folgen Informationen zu Version und Copyright. Wie die Signatur, werden auch diese Angaben vom Autor der Anwendung befüllt und sollten nicht verändert werden.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="filetypes-preferences" name="filetypes-preferences">Globale Einstellungen mit den FileTypes Preferences</a></h2>
-<p>Die <span class="app">FileTypes</span> Preferences beschäftigen sich nicht mit individuellen Dateien, sondern mit den globalen Einstellung von Dateitypen. Es lassen sich Standardicons und bevorzugte Anwendungen für ganze Dateitypen einstellen, oder Attribute hinzufügen, entfernen oder ändern. Es lassen sich sogar komplett eigene Dateitypen neu erstellen.</p>
-<p>Alle Dateitypen und ihre Konfiguration sind in <span class="path">/boot/home/config/settings/beos_mime/</span> gespeichert. Bevor man mit Experimenten anfängt, sollte man dieses Verzeichnis sichern...</p>
-<p>Mehr zu den <span class="app">FileTypes</span> Preferences steht im Workshop: <a href="workshop-filetypes+attributes.html">Dateitypen, Attribute, Index und Queries</a>.</p>
+<a id="filetypes-preferences" name="filetypes-preferences">Globale Einstellungen mit den <acronym title="FileTypes Preferences">Dateitypen Einstellungen</acronym></a></h2>
+<p>Die <span class="app"><acronym title="FileTypes">Dateitypen</acronym></span> <acronym title="Preferences">Einstellungen</acronym> beschäftigen sich nicht mit individuellen Dateien, sondern mit den globalen Einstellung von Dateitypen. Es lassen sich Standardicons und bevorzugte Anwendungen für ganze Dateitypen einstellen, oder Attribute hinzufügen, entfernen oder ändern. Es lassen sich sogar komplett eigene Dateitypen neu erstellen.</p>
+<p>Alle Dateitypen und ihre Konfiguration sind in <span class="path"><acronym title="/boot/home/config/settings/beos_mime/">/boot/Benutzer/Konfiguration/settings/beos_mime/</acronym></span> gespeichert. Bevor man mit Experimenten anfängt, sollte man dieses Verzeichnis sichern...</p>
+<p>Mehr zu den <span class="app"><acronym title="FileTypes">Dateitypen</acronym></span> <acronym title="Preferences">Einstellungen</acronym> steht im Workshop: <a href="workshop-filetypes+attributes.html">Dateitypen, Attribute, Index und Queries</a>.</p>
 
 </div>
 </div>

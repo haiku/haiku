@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,6 +12,7 @@
  * Translators:
  *		Matthias
  *		Humdinger
+ *		taos
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -39,6 +40,8 @@
 <li><a href="../../uk/preferences/e-mail.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/preferences/e-mail.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/preferences/e-mail.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/preferences/e-mail.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/preferences/e-mail.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/preferences/e-mail.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -55,6 +58,7 @@
 <tr class="heading"><td>Index</td></tr>
 <tr class="index"><td>
 	<a href="#creating">Neues E-Mail Konto anlegen</a><br />
+	<a href="#account-settings">Kontoeinstellungen</a><br />
 	<a href="#incoming">Einstellungen für eingehende Mails</a><br />
 	<a href="#outgoing">Einstellungen für ausgehende Mails</a><br />
 	<a href="#filters">Einstellungen für E-Mail Filter</a><br />
@@ -62,69 +66,78 @@
 </td></tr>
 </table>
 
-<h2><img src="../../images/prefs-images/e-mail-icon_64.png" alt="e-mail-icon_64.png" width="64" height="64" />E-Mail</h2>
+<h2><img src="../../images/prefs-images/e-mail-icon_64.png" alt="e-mail-icon_64.png" width="64" height="64" /><acronym title="E-Mail">E-Mail-Dienst</acronym></h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
-<tr><td>Ort:</td><td></td><td><span class="path">/boot/system/preferences/E-mail</span></td></tr>
-<tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/Mail/*</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu"><acronym title="Preferences">Einstellungen</acronym></span></td></tr>
+<tr><td>Ort:</td><td></td><td><span class="path"><acronym title="/boot/system/preferences/E-mail">/boot/System/preferences/E-Mail-Dienst</acronym></span></td></tr>
+<tr><td>Einstellungen:</td><td></td><td><span class="path"><acronym title="~/config/settings/Mail/*">~/Konfiguration/settings/Mail/*</acronym></span></td></tr>
 </table>
-<p>In Haiku wird der Empfang und Versand von E-Mails vom Mail Service (auch mail_daemon gennant) gehandhabt. Dieser Systemdienst kümmert sich darum, dass eingegangene Mails als Datei gespeichert werden und die Attribute zu dieser Datei aus den entsprechenden E-Mail Informationen befüllt werden. So können die E-Mails von jedem Programm oder vom Benutzer direkt verwendet werden und ein Wechsel des Mail-Programms ist jederzeit möglich.<br />
-Die Konfiguration des Mail-Verkehrs wird in den "E-Mail"-Einstellungen vorgenommen.</p>
+<p>In Haiku wird der Empfang und Versand von E-Mails vom Mail Service (auch mail_daemon genannt) gehandhabt. Dieser Systemdienst kümmert sich darum, dass eingegangene Mails als Datei gespeichert werden und die Attribute zu dieser Datei aus den entsprechenden E-Mail Informationen befüllt werden. So können die E-Mails von jedem Programm oder vom Benutzer direkt verwendet werden und ein Wechsel des Mail-Programms ist jederzeit möglich.<br />
+Die Konfiguration des Mail-Verkehrs wird in den <acronym title="&quot;E-Mail&quot;">E-Mail-Dienst</acronym>-Einstellungen vorgenommen.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="creating" name="creating">Neues E-Mail Konto anlegen</a></h2>
 <p>Im Folgenden werden die einzelnen Schritte erklärt, um ein neues E-Mail Konto anzulegen:<br />
-Im Programmfenster der E-Mail Eigenschaften als erstes unten auf <span class="button">Add</span> klicken, um ein neues, noch unbenanntes Mail-Konto anzulegen. Es folgt dieser Dialog:</p>
+Im Programmfenster der E-Mail Eigenschaften als erstes unten auf <span class="button">Hinzu</span> klicken, um ein neues, noch unbenanntes Mail-Konto anzulegen. Es folgt dieser Dialog:</p>
 <img src="../images/prefs-images/e-mail-new-account.png" alt="e-mail-new-account.png" />
-<p>Zuerst ist der <i>Account Type</i> festzulegen, also ob über dieses Konto nur empfangen wird (<span class="menu">Receive Mail Only</span>), E-Mails nur gesendet werden (<span class="menu">Send Mail Only</span>), oder - dies dürfte der Regelfall sein - beides (<span class="menu">Send and Receive Mail</span>). Danach ist der Konto-Typ festzulegen: <span class="menu">POP3</span> oder <span class="menu">IMAP</span>.</p>
-<p>Dann ist die verwendete E-Mail Adresse unter <i>E-mail Address</i> einzugeben, sowie der <i>Login Name</i> und das  <i>Password</i> für das Mail-Konto am Server. Der Kontoname unter <i>Account Name</i> bezeichnet das E-Mail Konto in der Liste aller Konten, der <i>Real Name</i> wird als Absender einer E-Mail angegeben.</p>
-<p>Haiku kennt einige der großen E-Mail Provider, so dass die notwendigen technischen Einstellungen wie IP-Adresse und Servername bereits automatisch ausgefüllt werden. Wenn das nicht möglich ist, oder die Daten angepasst werden müssen, kann man dazu wie nachfolgend beschrieben vorgehen.</p>
+<p>Zuerst ist der Konto-Typ festzulegen: <span class="menu">POP3</span> oder <span class="menu">IMAP</span>.</p>
+<p>Dann ist die verwendete <i>E-Mail-Adresse</i> einzugeben, sowie der <i>Login</i>-Name und das  <i>Passwort</i> für das Mail-Konto am Server. Der <i>Kontoname</i> bezeichnet das E-Mail Konto in der Liste aller Konten, der <i>Benutzername</i> wird als Absender einer E-Mail angegeben.</p>
+<p>Haiku kennt einige der großen E-Mail Provider, so dass die notwendigen technischen Einstellungen wie IP-Adresse und Servername bereits automatisch ausgefüllt werden. Wenn das nicht möglich ist, oder die Daten angepasst werden müssen, kann man dazu nach Klicken auf <span class="button">Weiter</span> wie nachfolgend beschrieben vorgehen.</p>
+<img src="../images/prefs-images/e-mail-new-account-2.png" alt="e-mail-new-account-2.png" />
+<p>Zunächst werden <i>Servername</i>, <i>Anmeldemethode</i> und <i>Verbindungsart</i> für eingehende E-Mail, darunter für ausgehende E-Mail angegeben. Die dazu nötigen Informationen sollten sich auf der Webseite des E-Mail Providers finden lassen.<br />
+Mehr Informationen zu den verschiedenen Einstellungen und weiteren Optionen im Folgenden.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="account-settings" name="account-settings">Kontoeinstellungen</a></h2>
+<p>Durch Auswählen eines Kontonamens in der Liste links können einige allgemeine Einstellungen vorgenommen werden:</p>
+<img src="../images/prefs-images/e-mail-settings.png" alt="e-mail-settings.png" />
+<p>Der <i>Kontoname</i> ist die Bezeichnung, unter der ein Konto beispielsweise in der Übersichtsliste aller Konten in den E-Mail-Dienst Einstellungen auftaucht. <i>Benutzername</i> ist der Absendername, den ein Empfänger beim Erhalt einer Nachricht sieht. Unter <i>E-Mail-Adresse</i> wird die Adresse angegeben, an die eine Antwort geschickt werden soll. Üblicherweise ist das die selbe Adresse, von der die E-Mail auch gesendet wurde.</p>
+<p>Soll ein E-Mail Konto nur zum Senden oder nur zum Empfangen von E-Mails genutzt werden, lässt sich dies durch Rechtsklick auf den Kontonamen in der Liste links einstellen. Durch Entfernen des Hakens vor Eingang beziehungsweise Ausgang lässt sich ein Konto auf eingehende beziehungsweise ausgehende E-Mail beschränken.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="incoming" name="incoming">Einstellungen für eingehende Mails</a></h2>
-<p>Mit einem Klick auf <span class="menu">Incoming</span> unter dem Kontonamen, lassen sich Einstellungen zum E-Mail Empfang vornehmen.</p>
+<p>Mit einem Klick auf <span class="menu">Eingang</span> unter dem Kontonamen, lassen sich Einstellungen zum E-Mail Empfang vornehmen.</p>
 <img src="../images/prefs-images/e-mail-in.png" alt="e-mail-in.png" />
-<p>Im Menü ganz oben stehen die Übertragungs-Protokolle <span class="menu">IMAP</span> und <span class="menu">POP3</span> zur Verfügung.</p>
-<p>Unter <span class="menu">Mail Server</span> ist die Adresse (IP-Adresse oder Servername) des Mail-Servers einzutragen. Sollte der Mail-Provider einen anderen, als den Standard-Port verlangen, ist dieser 
-mit einen Doppelpunkt getrennt nachzustellen. Beispielsweise: <tt>mail.provider.org:1400</tt>.</p>
-<p>Die vom Provider zugewiesene Kombination von Benutzerkennung und Passwort ist unter <i>Username</i>, respektive <i>Password</i> einzutragen. Falls nötig, kann die Art des Login unter <i>Login Type</i> von <span class="menu">Plain Text</span> auf <span class="menu">APOP</span> geändert werden.</p>
-<p>Bei Verwendung des <i>POP3</i>-Protokolls für eingehende E-Mails kann die Option <span class="menu">Leave mail on server</span> eingeschaltet werden, um die Mails nach dem Empfang auf dem Server zu belassen. So kann auch von einem anderen Computer aus auf die Mails zugegriffen werden. Mit <span class="menu">Remove mail from server when deleted</span> werden die E-Mails erst dann auf dem Server gelöscht, wenn sie auch auf dem Rechner entfernt werden.</p>
-<p>Sollte <i>IMAP</i> als Übertragungs-Protokoll verwendet werden, steht nur die Möglichkeit <span class="menu">Remove mail from server when deleted</span> zur Verfügung. Zusätzlich kann man noch ein Haupt-Postfach unter <span class="menu">Top Mailbox Folder</span> angeben, um nur von diesem Postfach und dessen Unterverzeichnissen die E-Mails zu synchronisieren.</p>
-<p>Die Art der Benachrichtigung bei neuen Mails wird unter <span class="menu">New Mail Notification</span> eingestellt. Das ist natürlich Geschmackssache; hier hilft nur ausprobieren.</p>
-<p>Der Speicherpfad für das lokale Postfach ist unter <i>Location</i> eingetragen (Standard ist <span class="path">/boot/home/mail/in/</span>) und kann jederzeit geändert werden. Dies ist sinnvoll, wenn man für jedes E-Mail Konto ein eigenes Unterverzeichnis verwenden möchte. Zwingend notwendig ist es aber nicht, denn über die "Queries" -  Haikus mächtige Suchfunktion - kann man gleiches erreichen.</p>
-<p>Zuletzt kann man angeben, ob E-Mail lediglich teilweise (bis zu einer bestimmten Größe) heruntergeladen werden - <span class="menu">Partially download messages</span>. Dadurch werden von Mails, die größer als der eingestellt Wert sind, nur die Kopfzeilen heruntergeladen. So kann man erstmal die Betreffzeile und Absender prüfen, bevor man den Rest der Nachricht plus eventuelle Anhänge runterlädt. Die Einstellung ist vor allem bei langsamen Netzwerkverbindungen sinnvoll.</p>
+<p>Erster Eintrag ist die <span class="menu">Mail-Server</span> Adresse für eingehende E-Mails. Falls ein Provider einen bestimmten Port beim Anmelden verlangt, wird dieser mit einem vorangestellten Doppelpunkt an die Adresse angehängt, wie zum Beispiel <tt>pop.dein-provider.org:1400</tt>.</p>
+<p>Anschließend werden die benötigten Anmeldeinformationen eingetragen: <i>Benutzername</i> und <i>Passwort</i> - falls nötig muss die <i>Anmeldemethode</i> von der Standardeinstellung <span class="menu">Klartext</span> auf <span class="menu">APOP</span> für die Authentifizierung umgestellt werden.</p>
+<p>Bei Verwendung des <i>POP3</i>-Protokolls für eingehende E-Mails kann die Option <span class="menu">E-Mails auf dem Server belassen</span> eingeschaltet werden. So kann auch von einem anderen Computer aus auf die Mails zugegriffen werden. Mit <span class="menu">Gelöschte E-Mails auch vom Server löschen</span> werden die E-Mails erst dann auf dem Server gelöscht, wenn sie auch auf dem Rechner entfernt werden.</p>
+<p>Sollte stattdessen <i>IMAP</i> als Übertragungsprotokoll verwendet werden, steht nur die Option <span class="menu">Gelöschte E-Mails auch vom Server löschen</span> zur Verfügung. Zusätzlich kann man noch <span class="menu">IMAP-Ordner</span> angeben, um nur von einem bestimmten Postfach und dessen Unterverzeichnissen die E-Mails zu synchronisieren.</p>
+<p>Außerdem kann man durch Aktivieren der Option <span class="menu">Nur Kopfzeilen herunterladen bei E-Mails über ... KB</span> bestimmen, dass E-Mails lediglich teilweise (bis zu einer bestimten Größe) heruntergeladen werden. Dadurch werden von Mails, die größer als der eingestellte Wert sind, nur die Kopfzeilen heruntergeladen. So kann man erstmal die Betreffzeile und Absender prüfen, bevor man den Rest der Nachricht plus eventuelle Anhänge runterlädt. Die Einstellung ist vor allem bei langsamen Netzwerkverbindungen sinnvoll.</p>
+<p>Der Speicherpfad für das lokale Postfach ist unter <i>Zielverzeichnis</i> eingetragen (Standard ist <span class="path"><acronym title="/boot/home/mail/in">/boot/Benutzer/mail/in/</acronym></span>) und kann jederzeit geändert werden. Dies ist sinnvoll, wenn man für jedes E-Mail Konto ein eigenes Unterverzeichnis verwenden möchte. Zwingend notwendig ist es aber nicht, denn über die "Queries" -  Haikus mächtige Suchfunktion - kann man gleiches erreichen.</p>
+
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="outgoing" name="outgoing">Einstellungen für ausgehende E-Mails</a></h2>
-<p>Unter <span class="menu">Outgoing</span> lassen sich für jedes Konto Einstellungen zum E-Mail Versand vornehmen.</p>
+<p>Unter <span class="menu">Ausgang</span> lassen sich für jedes Konto Einstellungen zum E-Mail Versand vornehmen.</p>
 <img src="../images/prefs-images/e-mail-out.png" alt="e-mail-out.png" />
-<p>Genauso wie bei eingehenden Mails kann der Speicherpfad für ausgehende E-Mails unter <i>Location</i> vom Standard <span class="path">/boot/home/mail/out/</span> in einen anderen geändert werden.</p>
-<p>Als nächstes ist der <i>SMTP Server</i> anzugeben. Hier kann wenn nötig auf gleiche Art ein spezieller Port angegeben werden: <tt>mail.provider.org:1200</tt>.</p>
-<p>Falls man sich am SMTP-Server mit Benutzernamen und Passwort anmelden muss, kann man diese angeben, wenn man den <i>Login Type</i> auf <span class="menu">ESMTP</span> stellt. Die andere Möglichkeit <span class="menu">POP3 before SMTP</span> ist für Provider, die festgelegt haben, dass man nur unmittelbar nach einem Post-Abholen auch Versenden kann.</p>
+<p>Als erstes ist die <i>SMTP-Server</i> Adresse anzugeben. Wie beim Mail-Server für eingehende E-Mails beschrieben, kann hier wenn nötig ein spezieller Port angegeben werden: <tt>mail.dein-provider.org:1200</tt>.</p>
+<p>Falls man sich am SMTP-Server mit Benutzernamen und Passwort anmelden muss, kann man diese angeben, wenn man die <i>Anmeldemethode</i> auf <span class="menu">ESMTP</span> stellt. Die andere Möglichkeit <span class="menu">POP3 vor SMTP</span> ist für Provider, die festgelegt haben, dass man nur unmittelbar nach einem Post-Abholen auch Versenden kann.</p>
+<p>Genauso wie bei eingehenden Mails kann der Speicherpfad für ausgehende E-Mails unter <i>Zielverzeichnis</i> vom Standard <span class="path"><acronym title="/boot/home/mail/out">/boot/Benutzer/mail/out/</acronym></span> in einen anderen geändert werden.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="filters" name="filters">Einstellungen für E-Mail Filter</a></h2>
-<p>Zur Filterung eingehender E-Mails ermöglicht ein Klick auf <span class="menu">E-Mail Filters</span> unter dem Kontonamen diverse Einstellungsmöglichkeiten. Es kann eine beliebige Anzahl an Filtern eingerichtet werden, die der Reihe nach abgearbeitet werden, wobei die Sortierreihenfolge durch Ziehen mit der Maus geändert werden kann.<br />
-Neben dem <span class="menu">R5 Daemon Filter</span>, der aus Gründen der Rückwärts-Kompatibilität noch vorhanden ist, gibt es unter <span class="menu">Incoming Mail Filters</span> noch zwei weitere.</p>
+<a id="filters" name="filters">Ankündigung neuer E-Mails und andere Filter</a></h2>
+<p>Benachrichtigungsmöglichkeiten bei neuen E-Mails und Methoden E-Mails zu sortieren und zu filtern finden sich unter dem jeweiligen Kontonamen in <span class="menu">E-Mail-Filter</span>. Eine beliebige Anzahl von Filtern kann erstellt werden, die dann der Reihe nach angewendet werden. Ihre Reihenfolge lässt sich durch Verschieben per Drag&amp;Drop an eine andere Position in der Liste verändern.<br />
+Zur Zeit gibt es drei <span class="menu">Filter für eingehende E-Mail</span>. Nach Hinzufügen eines Filters kann dieser in der Liste ausgewählt werden, um dessen Optionen ansehen und einstellen zu können.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Spam Filter</h3>
+Spamfilter (AGMS Bayesian)</h3>
 <img src="../images/prefs-images/e-mail-filter-spam.png" alt="e-mail-filter-spam.png" />
 <p>Spam-Filter verwenden Methoden der Statistik, um E-Mails zu klassifizieren. Jeder Mail wird dabei ein Wert zwischen 0 und 1 zugewiesen, wobei man selbst festlegt, ab welchem Wert eine Mail als Spam gilt. Der errechnete Wert kann, durch Setzen des entsprechenden Hakens, der Betreffzeile vorangestellt werden.<br /><br />
-Der Spam-Filter kann auch so eingestellt werden, dass er anhand eingehender E-Mails dazulernt und sich dadurch immer weiter verbessert. Ein gezieltes Training auf erkannte Spam-Mails und Mails, die fälschlicherweise als Spam kategorisiert wurden, kürzt den Lernprozess ab. Mehr dazu im Abschnitt zum Programm <span class="app">Mail</span> der Dokumentation.</p>
-<p>Zusammen mit dem folgenden Filter <span class="menu">Match Header</span> ist man in der Lage erkannte Spam-Mails automatisch aussortieren zu lassen.</p>
+Der Spam-Filter kann auch so eingestellt werden, dass er anhand eingehender E-Mails dazulernt und sich dadurch immer weiter verbessert. Ein gezieltes Training auf erkannte Spam-Mails und Mails, die fälschlicherweise als Spam kategorisiert wurden, kürzt den Lernprozess ab. Mehr dazu im Abschnitt zum Programm <span class="app"><acronym title="Mail">E-Mail</acronym></span> der Dokumentation.</p>
+<p>Zusammen mit einer <span class="menu">Filterregel</span> können erkannte Spam-Mails automatisch aussortiert werden.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Match Header</h3>
+Filterregel</h3>
 <img src="../images/prefs-images/e-mail-filter-header.png" alt="e-mail-filter-header.png" />
-<p>Dieser Filter vergleicht die Kopfzeilen einer Mail mit vorgegebenen Werten und führt entsprechende Aktionen aus.<br />
-Im ersten Textfeld gibt man die zu prüfende Kopfzeile an. Diese Werte möglich:</p>
+<p>Dieser Filter vergleicht die Kopfzeilen einer Mail mit vorgegebenen Werten und führt dann entsprechend die in der Filterregel festgelegte Aktion aus.<br />
+Im ersten Textfeld gibt man die zu prüfende Kopfzeile an. Möglich sind diese Werte:</p>
 <table summary="match header" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><span class="menu">Name</span></td><td style="width:5px;"> </td>
 		<td>der Name des Absenders</td></tr>
@@ -139,41 +152,71 @@ Im ersten Textfeld gibt man die zu prüfende Kopfzeile an. Diese Werte möglich:
 	<tr><td><span class="menu">Subject</span></td><td> </td>
 		<td>die Betreffzeile</td></tr>
 	<tr><td><span class="menu">Cc</span></td><td> </td>
-		<td>für Adressen, die unter CC: (Empfänger einer Mail-Kopie) eingetragen sind</td></tr>
+		<td>für Adressen, die unter CC: (Empfänger einer Mail-Kopie) eingetragen sind.</td></tr>
 	<tr><td><span class="menu">Account</span></td><td> </td>
 		<td>der Name des Mail-Kontos</td></tr>
 	<tr><td><span class="menu">Status</span></td><td> </td>
-		<td>der Status der E-Mail; normalerweise kann er "Read" (gelesen), "Replied" (geantwortet), "Sent" (gesendet), "Forwarded" (weitergeleitet) oder "New" (ungelesen) sein - eingehende Mails sind naturgemäß immer "New"</td></tr>
+		<td>der Status der E-Mail; normalerweise kann er "Read" (gelesen), "Replied" (geantwortet), "Sent" (gesendet), "Forwarded" (weitergeleitet) oder "New" (ungelesen) sein - eingehende Mails sind naturgemäß immer "New".</td></tr>
 	<tr><td><span class="menu">Priority</span></td><td> </td>
-		<td>der Marker über die Wichtigkeit der Mail (wird - wenn überhaupt - vom Versender vergeben)</td></tr>
+		<td>der Marker über die Wichtigkeit der Mail (wird - wenn überhaupt - vom Versender vergeben).</td></tr>
 	<tr><td><span class="menu">Thread</span></td><td> </td>
-		<td>grundsätzlich das gleiche wie die Betreffzeile, jedoch ohne eventuell vorangestelltes "Re:", "FW:", oder ähnliches</td></tr>
+		<td>grundsätzlich das gleiche wie die Betreffzeile, jedoch ohne eventuell vorangestelltes "Re:", "FW:", oder ähnliches.</td></tr>
 	<tr><td><span class="menu">Classification Group</span></td><td> </td>
-		<td>je nach dem, als was der Spam-Filter die Mail klassifiziert hat, ist dieser Wert entweder leer (wenn kein genauer Wert errechnet werden konnte), "Genuine" für erwünschte Mails oder "Spam"</td></tr>
-	<tr><td><span class="menu">Spam/Genuine Estimate</span></td><td> </td>
-		<td>der errechnete Wert des Spam-Filters für diese Mail; dieser Wert wird in wissenschaftlicher Schreibweise notiert, so steht zum Beispiel 1.065e-12 für 1,065/(10^12), also für "1,065 dividiert durch 10 hoch 12" - was ausgeschrieben 0,000000000001065 ergibt</td></tr>
+		<td>je nach dem, als was der Spam-Filter die Mail klassifiziert hat, ist dieser Wert entweder leer (wenn kein genauer Wert errechnet werden konnte), "Genuine" für erwünschte Mails oder "Spam".</td></tr>
+	<tr><td class="onelinetop"><span class="menu">Spam/Genuine Estimate</span></td><td> </td>
+		<td>der errechnete Wert des Spam-Filters für diese Mail; dieser Wert wird in wissenschaftlicher Schreibweise notiert, so steht zum Beispiel 1.065e-12 für 1,065/(10^12), also für "1,065 dividiert durch 10 hoch 12" - was ausgeschrieben 0,000000000001065 ergibt.</td></tr>
 </table>
 <p>Das zweite Textfeld ist für das Suchmuster. Hier können "reguläre Ausdrücke" - sogenannte <a href="http://de.wikipedia.org/wiki/Regul%C3%A4rer_Ausdruck" class="external free" title="Wikipedia: Reguläre Ausdrücke" rel="nofollow">Reguläre Ausdrücke</a> - verwendet werden. Damit erreicht man zwar eine sehr hohe Flexibilität bei den Suchmustern, unglücklicherweise sind reguläre Ausdrücke aber nicht leicht anzuwenden. Ein wenig Einarbeitung ist es aber wert und einfache reg_ex sind auch nicht <i>zu</i> schwer.</p>
 <p>Über das Menü darunter lässt sich eine Aktion ausführen, wenn das Suchmuster erkannt wurde. So kann der Status der Mail verändert, oder die Mail an sich verschoben oder direkt gelöscht werden.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Outgoing Mail Filters</h3>
-<p>Aktuell gibt es für ausgehende Mails nur einen Filter: <span class="cli">fortune</span>.<br />
+Ankündigung neuer E-Mails</h3>
+<img src="../images/prefs-images/e-mail-filter-notification.png" alt="e-mail-filter-notification.png" />
+<p>Wie man über den Eingang neuer Nachrichten informiert werden möchte, lässt sich als <span class="menu">Methode</span> unter mehreren Möglichkeiten auswählen, die sich auch kombinieren lassen:</p>
+<table summary="notofications" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><span class="menu">keine</span></td><td style="width:5px;"> </td>
+		<td>Keine Benachrichtigung</td></tr>
+	<tr><td><span class="menu">Tonsignal</span></td><td> </td>
+		<td>Spielt bei <i>jeder</i> neuen E-Mail die Klangdatei ab, die für das Ereignis "New E-mail" in den <a href="sounds.html">Klänge</a> Einstellungen ausgewählt wurde.</td></tr>
+	<tr><td><span class="menu">Hinweisfenster</span></td><td> </td>
+		<td>Blendet bei <i>jeder</i> neuen E-Mail ein Hinweisfenster ein.</td></tr>
+	<tr><td><span class="menu">Tastatur-LEDs</span></td><td> </td>
+		<td>Lässt einige LEDs wie zum Beispiel für die Feststelltaste aufleuchten.</td></tr>
+	<tr><td class="onelinetop"><span class="menu">Hinweisfenster (alle Konten)</span></td><td> </td>
+		<td>Zeigt <i>ein</i> Hinweisfenster für alle neuen E-Mails an.</td></tr>
+	<tr><td><span class="menu">Tonsignal (alle Konten)</span></td><td> </td>
+		<td>Spielt die Klangdatei für das Ereignis "New E-mail" aus den <a href="sounds.html">Klänge</a> Einstellungen <i>einmal</i> bei neuen E-Mails ab.</td></tr>
+	<tr><td><span class="menu">Statusfenster</span></td><td> </td>
+		<td>Zeigt das Statusfenster an.</td></tr>
+</table>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Filter für ausgehende E-Mail</h3>
+<p>Aktuell gibt es für ausgehende Mails nur einen Filter: <span class="cli">Fortune</span>.<br />
 Dieser Filter hängt an den E-Mail Text ein zufällig ausgesuchtes Zitat oder eine Text ähnlich einem Glückskeks. Wenn man diesen Filter vorher ausprobieren möchte, kann man den Befehl <span class="cli">fortune</span> auch direkt im Terminal eingeben.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="settings" name="settings">Der Mail Service</a></h2>
-<p>Nach der Konfiguration eingehender und ausgehender Mailserver, sowie eventuellen Filtern, muss dem Mail Service, der das ganze Holen und Senden erledigt, noch gesagt werden wie und wann das zu geschehen hat.</p>
+<a id="settings" name="settings">Der E-Mail-Dienst</a></h2>
+<p>Nach der Konfiguration eingehender und ausgehender Mailserver, sowie eventuellen Filtern, muss dem E-Mail-Dienst, der das ganze Holen und Senden erledigt, noch gesagt werden wie und wann das zu geschehen hat.</p>
 <img src="../images/prefs-images/e-mail-settings.png" alt="e-mail-settings.png" />
-<p>Mit <i>Mail Checking</i> legt man fest, in welchen Zeitabständen der Mailserver kontaktiert werden soll.<br />
-Wenn man seine Netzwerkverbindung über eine Wählverbindung aufbaut, ist es ratsam <span class="menu">Only When Dial-Up is Connected</span> und <span class="menu">Schedule Outgoing Mail When Dial-Up is Disconnected</span> auszuwählen, damit nur dann E-Mails abgefragt werden, wenn sowieso schon eine Netzwerkverbindung besteht und ausgehende Mails zurück gehalten werden, um keine unnötigen Einwähl-Entgelte zu verursachen.</p>
-<p>Der Mail Service kann entweder <span class="menu">Never</span> (nie), <span class="menu">While Sending</span> (während dem Versand), <span class="menu">While Sending and Receiving</span> (während dem Versenden und dem Empfangen) oder <span class="menu">Always</span> (immer) ein Statusfenster anzeigen.</p>
-<p>Nur wenn der mail_daemon schon während dem Hochfahren gestartet wird (<span class="menu">Start Mail Services on Startup</span>), werden E-Mails automatisch empfangen und versendet.</p>
+<p>Unter <i>E-Mail abfragen</i> legt man fest, in welchen Zeitabständen der Mailserver kontaktiert werden soll.<br />
+Wenn man seine Netzwerkverbindung über eine Wählverbindung aufbaut, ist es ratsam <span class="menu">Nur bei aktiver Einwahlverbindung</span> und <span class="menu">Versand aufschieben falls Einwahlverbindung nicht aktiv</span> auszuwählen, damit nur dann E-Mails abgefragt werden, wenn sowieso schon eine Netzwerkverbindung besteht und ausgehende Mails zurück gehalten werden, um keine unnötigen Einwähl-Entgelte zu verursachen.</p>
+<p>Der E-Mail-Dienst kann entweder <span class="menu">Nie</span>, <span class="menu">Beim Senden</span>, <span class="menu">Beim Senden und Empfangen</span> oder <span class="menu">Immer</span> ein Statusfenster anzeigen.</p>
+<p>Nur wenn der mail_daemon schon während dem Hochfahren gestartet wird (<span class="menu">Starte E-Mail-Dienst beim Systemstart</span>), werden E-Mails automatisch empfangen und versendet.</p>
 <img src="../images/prefs-images/e-mail-mailbox.png" alt="e-mail-mailbox.png" />
-<p><span class="menu">Edit Mailbox Menu...</span> öffnet das Verzeichnis <span class="path">~/config/Mail/Menu Links/</span>. Alle Ordner oder auch Queries(!) - beziehungsweise Verknüpfungen hierzu - erscheinen im Kontextmenü des Mail Service Icons in der Deskbar.</p>
-<p>Über dieses Kontextmenü kann man auch eine neue E-Mail verfassen (<span class="menu">Create New Message...</span>), sofort nach neuen E-Mails schauen (<span class="menu">Check For Mail Now</span>), oder die E-Mail Einstellungen aufrufen (<span class="menu">Edit Preferences...</span>).</p>
+<p><span class="menu">Mailbox-Menü bearbeiten...</span> öffnet das Verzeichnis <span class="path">~/Konfiguration/Mail/Menu Links/</span>. Alle Ordner oder auch Queries(!) - beziehungsweise Verknüpfungen hierzu - erscheinen im Kontextmenü des E-Mail-Dienst Icons in der Deskbar.</p>
+<p>Über dieses Kontextmenü kann man auch eine neue <span class="menu">Nachricht verfassen...</span>, sofort nach neuen E-Mails schauen (<span class="menu">E-Mails jetzt abrufen</span>), oder die E-Mail-Dienst <span class="menu">Einstellungen...</span> aufrufen.</p>
+<p>Hält man beim Aufrufen des Kontextmenüs <span class="key">SHIFT</span> gedrückt, erhält man Zugriff auf weitere Befehle:</p>
+<table summary="notofications" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><span class="menu">E-Mails nur abrufen für</span></td><td style="width:5px;"> </td>
+		<td>Öffnet ein Untermenü, um E-Mails nur für ein bestimmtes Konto abzurufen.</td></tr>
+	<tr><td><span class="menu">E-Mails senden</span></td><td> </td>
+		<td>Ermöglicht es E-Mails zu senden, ohne dabei auch neue Nachrichten abzurufen.</td></tr>
+	<tr><td><span class="menu">E-Mail-Dienst ausschalten</span></td><td> </td>
+		<td>Beendet die gesamte E-Mail-Infrastruktur (mail_daemon).</td></tr>
+</table>
 <p>Das Icon selbst zeigt an, ob sich im Posteingang ungelesene E-Mails (mit dem Status "New") befinden. Dann liegt ein kleiner Umschlag im Briefkasten.</p>
 
 </div>

@@ -4,13 +4,15 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		mt
+ *		satashun
+ *		Kentaro Ozeki
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -38,6 +40,8 @@
 <li><a href="../uk/contents.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../zh_CN/contents.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../pt_PT/contents.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/contents.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/contents.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../en/contents.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -47,11 +51,10 @@
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 <h1>Haiku ユーザーガイドへようこそ</h1>
 
-<p>以下に、Haiku の最も重要なi一面に関するドキュメントが見つかるでしょう。もちろん、ドキュメントの完成および拡張は持続的なプロセスです (アップデートされたページや翻訳は、<a href="http://www.haiku-os.org/docs/userguide/en/contents.html">オンラインバージョン</a>を見てください) 。エラーを見つけた場合、トピックを提案したい場合、または、もしかしてユーザー自身が貢献したい場合でも、<a href="http://www.freelists.org/list/haiku-doc">ドキュメンテーションメーリングリスト</a>で連絡をとってください。 翻訳に協力したい場合は、<a href="http://dev.haiku-os.org/wiki/i18n/UserGuide">i18n user guide wiki</a> で情報が得られます。</p>
+<p>以下に、Haiku の最も重要な一面に関するドキュメントが見つかるでしょう。もちろん、ドキュメントの完成および拡張は継続して行われます（アップデートされたページや翻訳は、<a href="http://www.haiku-os.org/docs/userguide/en/contents.html">オンラインバージョン</a>で参照してください）。エラーを見つけた場合、トピックを提案したい場合、あるいはユーザー自身が貢献したい場合でも、<a href="http://www.freelists.org/list/haiku-doc">ドキュメンテーションメーリングリスト</a>で連絡を取ってください。 翻訳に協力したい場合は、<a href="http://dev.haiku-os.org/wiki/i18n/UserGuide">i18n user guide wiki</a> で情報が得られます。</p>
 <p><br /></p>
 <table summary="contents" border="1" rules="rows" frame="void" cellpadding="10" cellspacing="0" style="border: dotted thin #e0e0e0">
 <!-- Excluded until it's further fleshed out
@@ -64,89 +67,91 @@
 		<li><a href="installation.html#transfer-data">Transfering data to/from a Haiku installation</a></li></ul></td>
 		<td valign="top">Step by step guides covering Haiku installation during the (pre-) alpha release phase.</td></tr>
 -->
-	<tr><td valign="top"><a href="bootloader.html">Boot Loader</a></td>
+	<tr><td valign="top"><a href="bootloader.html">ブートローダー</a></td>
 		<td valign="top">セーフブートオプションを設定して構成の問題を解決します。</td></tr>
-	<tr><td valign="top"><a href="filesystem-layout.html">Filesystem layout</a><ul>
-		<li><a href="filesystem-layout.html#system">The system folder</a></li>
-		<li><a href="filesystem-layout.html#common">The common folder</a></li>
-		<li><a href="filesystem-layout.html#home">The home folder</a></li></ul></td>
-		<td valign="top">ファイルシステム階層を理解し、重要なファイルとフォルダーの場所に親しみましょう。</td></tr>
-	<tr><td valign="top"><a href="gui.html">Haiku's GUI</a><ul>
-		<li><a href="gui.html#open-save-panel">Open and save panels</a><br />
-		<a href="gui.html#open-save-shortcuts">- Keyboard shortcuts</a><br />
-		<a href="gui.html#favorites-recent">- Favorites and recent folders</a></li>
-		<li><a href="gui.html#replicants">Replicants</a></li></ul></td>
+	<tr><td valign="top"><a href="filesystem-layout.html">ファイルシステム設計</a><ul>
+		<li><a href="filesystem-layout.html#system">システムフォルダー</a></li>
+		<li><a href="filesystem-layout.html#common">共有フォルダー</a></li>
+		<li><a href="filesystem-layout.html#home">ホームフォルダー</a></li></ul></td>
+		<td valign="top">ファイルシステム階層を理解し、重要なファイルとフォルダーの場所に慣れましょう。</td></tr>
+	<tr><td valign="top"><a href="gui.html">Haiku のグラフィカルユーザーインターフェース</a><ul>
+		<li><a href="gui.html#open-save-panel">開く＆保存パネル</a><br />
+		<a href="gui.html#open-save-shortcuts">- キーボードショートカット</a><br />
+		<a href="gui.html#favorites-recent">- お気に入りや最近のフォルダー</a></li>
+		<li><a href="gui.html#replicants">レプリカント</a></li></ul></td>
 		<td valign="top">グラフィカルユーザインタフェースの基本的要素について学習します。</td></tr>
-	<tr><td valign="top"><a href="workspaces.html">Workspaces</a><ul>
-		<li><a href="workspaces.html#applet">The Workspaces Applet</a></li>
-		<li><a href="workspaces.html#switching">Switching workspaces</a></li>
-		<li><a href="workspaces.html#moving">Moving windows between workspaces</a></li>
-		<li><a href="workspaces.html#special">Special functionality</a></li></ul></td>
+	<tr><td valign="top"><a href="workspaces.html">ワークスペース</a><ul>
+		<li><a href="workspaces.html#applet">ワークスペースアプレット</a></li>
+		<li><a href="workspaces.html#switching">ワークスペースの切り替え</a></li>
+		<li><a href="workspaces.html#moving">ワークスペース間のウィンドウ移動</a></li>
+		<li><a href="workspaces.html#special">特別な機能性</a></li></ul></td>
 		<td valign="top">整頓された作業環境のために仮想デスクトップを使用します。</td></tr>
 	<tr><td valign="top"><a href="twitcher.html">Twitcher</a></td>
 		<td valign="top">実行中のアプリケーションを切り替えます。</td></tr>
-	<tr><td valign="top"><a href="teammonitor.html">Team Monitor</a></td>
+	<tr><td valign="top"><a href="teammonitor.html">チームモニター</a></td>
 		<td valign="top">反応のないアプリケーションやシステムコンポーネントを強制終了します。</td></tr>
 	<tr><td valign="top"><a href="tracker.html">Tracker</a><ul>
-		<li><a href="tracker.html#mounting-volumes">Mounting volumes</a></li>
-		<li><a href="tracker.html#navigating">Navigating</a></li>
-		<li><a href="tracker.html#appearance">Appearance</a></li>
-		<li><a href="tracker.html#tracker-preferences">Tracker preferences</a></li>
-		<li><a href="tracker.html#working-with-files">Working with files</a></li>
-		<li><a href="tracker.html#transaction-status">Transaction status</a></li>
-		<li><a href="tracker-add-ons.html">Tracker Add-Ons</a></li></ul></td>
-		<td valign="top">ナビゲーション、ファイルとフォルダーの操作、および Haikuのファイルマネージャーの設定に関するすべてを学習します。</td></tr>
-	<tr><td valign="top"><a href="keyboard-shortcuts.html">Shortcuts and key combinations</a><ul>
-		<li><a href="keyboard-shortcuts.html#general">General shortcuts</a></li>
-		<li><a href="keyboard-shortcuts.html#tracker-navigation">Shortcuts for Tracker navigation</a></li>
-		<li><a href="keyboard-shortcuts.html#terminal">Shortcuts in Terminal</a></li>
-		<li><a href="keyboard-shortcuts.html#other-combos">Other key combinations</a></li></ul></td>
+		<li><a href="tracker.html#mounting-volumes">ボリュームのマウント</a></li>
+		<li><a href="tracker.html#navigating">ナビゲーション</a></li>
+		<li><a href="tracker.html#appearance">見た目</a></li>
+		<li><a href="tracker.html#tracker-preferences">Tracker 環境設定</a></li>
+		<li><a href="tracker.html#working-with-files">ファイル操作</a></li>
+		<li><a href="tracker.html#transaction-status">処理状況</a></li>
+		<li><a href="tracker-add-ons.html">Tracker アドオン</a></li></ul></td>
+		<td valign="top">ナビゲーション、ファイルとフォルダーの操作、および Haiku のファイルマネージャーの設定に関するすべてを学習します。</td></tr>
+	<tr><td valign="top"><a href="keyboard-shortcuts.html">ショートカットやキーの組み合わせ</a><ul>
+		<li><a href="keyboard-shortcuts.html#general">全般的なショートカット</a></li>
+		<li><a href="keyboard-shortcuts.html#tracker-navigation">Tracker ナビゲーションのショートカット</a></li>
+		<li><a href="keyboard-shortcuts.html#terminal">Terminal におけるショートカット</a></li>
+		<li><a href="keyboard-shortcuts.html#other-combos">他のキーの組み合わせ</a></li></ul></td>
 		<td valign="top">ワークフローをスピードアップするもっとも一般的なショートカット。</td></tr>
 	<tr><td valign="top"><a href="deskbar.html">Deskbar</a><ul>
-		<li><a href="deskbar.html#deskbar-menu">The Deskbar Menu</a></li>
-		<li><a href="deskbar.html#tray">The Tray</a></li>
-		<li><a href="deskbar.html#list-of-apps">The list of running programs</a></li></ul></td>
+		<li><a href="deskbar.html#deskbar-menu">Deskbar メニュー</a></li>
+		<li><a href="deskbar.html#tray">トレイ</a></li>
+		<li><a href="deskbar.html#list-of-apps">実行しているプログラムの一覧</a></li></ul></td>
 		<td valign="top">Haiku 版の「スタート」メニューとタスクバーの使い方と設定。</td></tr>
-	<tr><td valign="top"><a href="filetypes.html">Filetypes</a><ul>
-		<li><a href="filetypes.html#filetype">The File Type</a></li>
-		<li><a href="filetypes.html#preferred-app">The Preferred Application</a></li>
-		<li><a href="filetypes.html#icon">The Icon</a></li>
-		<li><a href="filetypes.html#settings-apps">Special settings for applications</a></li>
-		<li><a href="filetypes.html#filetypes-preferences">Global settings with the Filetypes Preferences</a></li></ul></td>
+	<tr><td valign="top"><a href="filetypes.html">ファイルタイプ</a><ul>
+		<li><a href="filetypes.html#filetype">ファイルタイプ</a></li>
+		<li><a href="filetypes.html#preferred-app">好きなアプリケーション</a></li>
+		<li><a href="filetypes.html#icon">アイコン</a></li>
+		<li><a href="filetypes.html#settings-apps">アプリケーションの特殊設定</a></li>
+		<li><a href="filetypes.html#filetypes-preferences">ファイルタイプ環境設定での全体的な設定</a></li></ul></td>
 		<td valign="top">デフォルトのアプリケーションの設定、ファイルタイプの変更、および独自のファイルタイプの作成。</td></tr>
-	<tr><td valign="top"><a href="attributes.html">Attributes</a><ul>
-		<li><a href="attributes.html#attributes-tracker">Attributes in Tracker</a></li>
-		<li><a href="attributes.html#attributes-terminal">Attributes in Terminal</a></li></ul></td>
-		<td valign="top">Haiku の主な特徴の 1 つは、あらゆる種類のデータを扱い、任意のファイルへ追加できることです。</td></tr>		
-	<tr><td valign="top"><a href="index.html">Index</a></td>
+	<tr><td valign="top"><a href="attributes.html">属性</a><ul>
+		<li><a href="attributes.html#attributes-tracker">Tracker における属性</a></li>
+		<li><a href="attributes.html#attributes-terminal">Terminal における属性</a></li></ul></td>
+		<td valign="top">Haiku の主な特徴のひとつは、あらゆる種類のデータを扱い、任意のファイルへ追加できることです。</td></tr>		
+	<tr><td valign="top"><a href="index.html">インデックス</a></td>
 		<td>属性を検索できるようにするためにインデックス付けをします。</td></tr>
-	<tr><td valign="top"><a href="queries.html">Queries</a><ul>
-		<li><a href="queries.html#find-window">The Find window</a></li>
-		<li><a href="queries.html#basic-query">Basic queries - "by Name"</a></li>
-		<li><a href="queries.html#adv-query">Advanced queries - "by Attribute"</a></li>
-		<li><a href="queries.html#more-adv-query">Even more advanced queries - "by Formula"</a></li>
-		<li><a href="queries.html#result-window">The result window</a></li>
-		<li><a href="queries.html#query-template">Query Templates</a></li>
+	<tr><td valign="top"><a href="queries.html">クエリ</a><ul>
+		<li><a href="queries.html#find-window">検索ウィンドウ</a></li>
+		<li><a href="queries.html#basic-query">基本クエリ　「名前による検索」</a></li>
+		<li><a href="queries.html#adv-query">発展クエリ　「属性による検索」</a></li>
+		<li><a href="queries.html#more-adv-query">さらに発展したクエリ「式による検索」</a></li>
+		<li><a href="queries.html#result-window">結果ウィンドウ</a></li>
+		<li><a href="queries.html#query-template">クエリテンプレート</a></li>
 </ul></td>
-		<td valign="top">Haiku の電光石火なクエリを使って、捜しものをすばやく見つけます。</td></tr>
-	<tr><td valign="top"><a href="workshop-filetypes+attributes.html">Workshop: Filetypes, Attributes, Index and Queries</a></td>
-		<td valign="top">Haiku の重要な特徴のいくつかの使い方を DVD の整理で学習します。</td></tr>
-	<tr><td valign="top"><a href="applications.html">Applications</a><ul>
-		<li><a href="applications.html#install">Installing applications</a></li>
-		<li><a href="applications.html#uninstall">Uninstalling applications</a></li>
-		<li><a href="applications.html#list-of-apps">Haiku's applications</a></li>
-		<li><a href="applications.html#cli-apps">Haiku's commandline applications</a></li>
-		<li><a href="applications.html#list-of-bundled-apps">Bundled applications</a></li></ul></td>
-		<td>一般的なアプリケーションのアンインストール/インストール方法と、Haiku 付属のアプリケーションの操作方法を学習します。</td></tr>
-	<tr><td valign="top"><a href="desktop-applets.html">Desktop Applets</a></td>
-		<td>デスクトップや Deskbarにインストールするシンプルなツール。</td></tr>
-	<tr><td valign="top"><a href="preferences.html">Preferences</a></td>
+		<td valign="top">Haiku のきわめて高速なクエリを使って、探しものを素早く見つけます。</td></tr>
+	<tr><td valign="top"><a href="workshop-filetypes+attributes.html">ワークショップ :  ファイルタイプ、属性、インデックス、クエリ</a></td>
+		<td valign="top">Haiku の重要な特徴のいくつかの使い方を DVD の整理を通じて学習します。</td></tr>
+	<tr><td valign="top"><a href="workshop-email.html">ワークショップ : メール管理</a></td>
+		<td valign="top">自分向けのステータスやクエリで Haiku のメールシステムの使い方を学習します。</td></tr>
+	<tr><td valign="top"><a href="applications.html">アプリケーション</a><ul>
+		<li><a href="applications.html#install">アプリケーションのインストール</a></li>
+		<li><a href="applications.html#uninstall">アプリケーションのアンインストール</a></li>
+		<li><a href="applications.html#list-of-apps">Haiku 付属のアプリケーション</a></li>
+		<li><a href="applications.html#cli-apps">Haiku 付属のコマンドラインアプリケーション</a></li>
+		<li><a href="applications.html#list-of-bundled-apps">同梱されているアプリケーション</a></li></ul></td>
+		<td>一般的なアプリケーションのアンインストール／インストール方法と、Haiku 付属のアプリケーションの操作方法を学習します。</td></tr>
+	<tr><td valign="top"><a href="desktop-applets.html">デスクトップアプレット</a></td>
+		<td>デスクトップや Deskbar にインストールするシンプルなツール。</td></tr>
+	<tr><td valign="top"><a href="preferences.html">環境設定</a></td>
 		<td>システムを設定または構成します。</td></tr>
 <!--
 	<tr><td valign="top"><a href="demos.html">Demos</a></td>
 		<td>Games and demo applications.</td></tr>
 -->
-	<tr><td valign="top"><a href="bash-scripting.html">Bash and Scripting</a></td>
+	<tr><td valign="top"><a href="bash-scripting.html">Bash とスクリプト処理</a></td>
 		<td>システムで使ういくつかの興味深いスクリプトと、シェル操作やスクリプティングに関するオンラインリソースについて学習します。</td></tr>
 </table>
 

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!--
+ *
+ * Copyright 2010-2011, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *		Szymon Barczak (Google Code-In student)
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>MediaPlayer</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/fi.png" alt="" /> Suomi</li>
+<li><a href="../../fr/applications/mediaplayer.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/mediaplayer.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/mediaplayer.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/mediaplayer.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/mediaplayer.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/mediaplayer.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/mediaplayer.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/mediaplayer.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/mediaplayer.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/mediaplayer.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../sk/applications/mediaplayer.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../en/applications/mediaplayer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="mail.html">Mail</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+::  <a href="midiplayer.html">MidiPlayer</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+
+<h2><img src="../../images/apps-images/mediaplayer-icon_64.png" alt="mediaplayer-icon_64.png" width="64" height="64" />MediaPlayer</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
+<tr><td>Location:</td><td></td><td><span class="path">/boot/system/apps/MediaPlayer</span></td></tr>
+<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/MediaPlayer</span></td></tr>
+</table>
+<p><br /></p>
+<p>MediaPlayer is the default player for all audio and video files. Thanks to it's <a href="http://www.ffmpeg.org/">ffmpeg</a> backend, a plethora of widely used formats are supported. Its simple interface has all the controls you'd expect:</p>
+<img src="../images/apps-images/mediaplayer.png" alt="mediaplayer.png" />
+<p>The slider of the progress bar allows you to quickly skim to a position, resting the mouse over it shows the current and remaining time of the clip. Clicking on the time display to the right of it, toggles between length, current and remaining time.<br />
+Below that you find the usual controls to skip to the previous track, play/pause, stop and jump to the next track. Then comes a volume control (clicking the speaker symbol toggles muting) and a VU meter.</p>
+
+<h2>Audio and video playback</h2>
+<p>Since there aren't any specific features for for audio playback, we'll go straight to video or general features.</p>
+<img src="../images/apps-images/mediaplayer-info.png" alt="mediaplayer-info.png" />
+<p>Available to all media is the <span class="menu">File info...</span> (<span class="key">ALT</span> <span class="key">I</span>). It shows information about the currently loaded file, like playing time or details of the audio/video track and its codec.</p>
+<p>Most of the often used commands from the menus are also available from a right-click context menu on the video area. Convenient when in full-screen mode.<br />
+Under <span class="menu">Video</span> you'll find options to zoom the window to various levels or force the aspect ratio to some standard values. Leaving the aspect ration to the default <span class="menu">Stream settings</span> should work best for correctly encoded files.</p>
+<p>MediaPlayer supports subtitles in <a href="http://en.wikipedia.org/wiki/SubRip">SRT</a> format. To have them show up under <span class="menu">Subtitles</span>, their filenames have to be identical to their video file, with a suffixed language name and ".srt" instead of the video's extension. For example:</p>
+<pre>MyMovie.avi
+MyMovie.Deutsch.srt
+MyMovie.English.srt
+MyMovie.Français.srt</pre>
+<p>Multiple audio tracks, most often used for several languages inside one video file, are available from the <span class="menu">Audio track</span> submenu. The <span class="menu">Video | Track</span> submenu offers the same when having multiple video streams available.</p>
+<p>You can toggle the <span class="menu">Full screen</span> mode (<span class="key">ALT</span> <span class="key">ENTER</span> or <span class="key">F</span> or a double left-click), hide MediaPlayer's window borders and controls with <span class="menu">Hide interface</span> (<span class="key">ALT</span> <span class="key">H</span> or a double right-click) or have it's window <span class="menu">Always on top</span> (<span class="key">ALT</span> <span class="key">A</span>).</p>
+
+<h2>Playlists</h2>
+<p><span class="menu">MediaPlayer | Playlist...</span> (<span class="key">ALT</span> <span class="key">P</span>) opens a window with the files currently queued up for playback. Double-clicking an entry starts playing it.</p>
+<img src="../images/apps-images/mediaplayer-playlist.png" alt="mediaplayer-playlist.png" />
+<p>You can add more files by dropping them into the list and rearrange their position via drag &amp; drop. From the <span class="menu">Edit</span> menu you can <span class="menu">Randomize</span> or <span class="menu">Remove</span> (<span class="key">DEL</span>) an entry from the list or delete the actual file with <span class="menu">Move to Trash</span> (<span class="key">ALT</span> <span class="key">T</span>).</p>
+<p>Of course, you can <span class="menu">Save</span> a playlist and later <span class="menu">Open</span> it again, or start it with simply double-clicking the playlist file.</p>
+
+<h2>Settings</h2>
+<p>There are several settings to fine-tune MediaPlayer's behavior:</p>
+<img src="../images/apps-images/mediaplayer-settings.png" alt="mediaplayer-settings.png" />
+<p>The first batch, <span class="menu">Play mode</span>, is pretty self-explaining. Start playback automatically, close windows when finished or play clips in a loop.</p>
+<p>Next are different <span class="menu">View options</span>.<br />
+You can opt to <span class="menu">Use hardware overlay if available</span>, which cuts down CPU usage but only works for one video window and needs a supporting video card driver.<br />
+You can <span class="menu">Scale movies smoothly</span> (when not in overlay mode) which uses very fast filtering to smooth over otherwise blocky pixels when zooming video or watching in full-screen mode.<br />
+<span class="menu">Scale controls in full-screen mode</span> if you prefer slightly bigger controls, maybe because you watch the screen from a bit farther away when in full-screen mode.<br />
+Then there are settings for <span class="menu">Subtitle size</span> and <span class="menu">Subtitle placement</span>. They can be shown at the <span class="menu">Bottom of video</span>, which will always have them overlayed over the picture. Or <span class="menu">Bottom of window</span>, which allows you to resize the window vertically and have the subtitles appear in the black bar at the bottom instead.</p>
+<p>The last setting determines the volume of clips whose windows are not currently active. You can have them all blaring at <span class="menu">Full volume</span>, at less confusing <span class="menu">Low volume</span> or quietly <span class="menu">Muted</span>.</p>
+
+<h2>Keyboard controls</h2>
+<p>MediaPlayer offers convenient key combinations to control playback without using the mouse.</p>
+<table summary="keycombos" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="key">Z</span></td><td style="width:15px;"></td><td>Skip to previous track</td></tr>
+<tr><td><span class="key">X</span></td><td></td><td>Play</td></tr>
+<tr><td><span class="key">C</span></td><td></td><td>Pause</td></tr>
+<tr><td><span class="key">V</span></td><td></td><td>Stop</td></tr>
+<tr><td><span class="key">B</span></td><td></td><td>Skip to next track</td></tr>
+</table>
+<p>These keys are assigned to the functions of the control buttons. They are always the bottom left letter keys on the keyboard, i.e. they are used independently of your current keymapping. The above keys correspond to a standard US-american keymap.</p>
+<table summary="keycombos" border="0" cellspacing="0" cellpadding="2">
+<tr><td align="right"><span class="key">→</span></td><td style="width:15px;"></td><td>Seek forwards</td></tr>
+<tr><td align="right"><span class="key">SHIFT</span> <span class="key">→</span></td><td></td><td>Jump forwards 10 seconds</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">→</span></td><td></td><td>Jump forwards 30 seconds</td></tr>
+<tr><td align="right"><span class="key">←</span></td><td></td><td>Seek backwards</td></tr>
+<tr><td align="right"><span class="key">SHIFT</span> <span class="key">←</span></td><td></td><td>Jump backwards 10 seconds</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">←</span></td><td></td><td>Jump backwards 30 seconds</td></tr>
+
+<tr><td align="right"><span class="key">↑</span></td><td></td><td>Increase volume</td></tr>
+<tr><td align="right"><span class="key">↓</span></td><td></td><td>Decrease volume</td></tr>
+
+<tr><td align="right"><span class="key">ALT</span> <span class="key">↑</span></td><td></td><td>Skip to previous Track</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">↓</span></td><td></td><td>Skip to next Track</td></tr>
+
+<tr><td align="right"><span class="key">Spacebar</span></td><td></td><td>Toggle play/pause</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>Toggle full-screen mode (also done by double left-clicking the video area)</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="mail.html">Mail</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+::  <a href="midiplayer.html">MidiPlayer</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

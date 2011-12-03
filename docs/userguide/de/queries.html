@@ -12,6 +12,7 @@
  * Translators:
  *		Humdinger
  *		Matthias
+ *		taos
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -39,6 +40,8 @@
 <li><a href="../uk/queries.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../zh_CN/queries.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../pt_PT/queries.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/queries.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/queries.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../en/queries.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -66,53 +69,54 @@
 
 <h1>Queries</h1>
 
-<p>Als "Query" bezeichnet man eine Dateisuche anhand ihrer Attribute. Sie kann im Tracker oder Terminal gestartet werden und wird in <span class="path">/boot/home/queries/</span> abgelegt. Dort gespeicherte Such-Abfragen werden standardmäßig nach sieben Tagen entfernt. Die gespeicherten Such-Abfragen sind jedoch keine statischen Ergebnislisten, sondern vielmehr die dabei verwendete Suchformel, die bei jedem weiteren Aufruf dieser Query für die erneute Suche benutzt wird.<br />
+<p>Als "Query" bezeichnet man eine Dateisuche anhand ihrer Attribute. Sie kann im Tracker oder Terminal gestartet werden und wird in <span class="path"><acronym title="/boot/home/queries/">/boot/Benutzer/queries/</acronym></span> abgelegt. Dort gespeicherte Such-Abfragen werden standardmäßig nach sieben Tagen entfernt. Die gespeicherten Such-Abfragen sind jedoch keine statischen Ergebnislisten, sondern vielmehr die dabei verwendete Suchformel, die bei jedem weiteren Aufruf dieser Query für die erneute Suche benutzt wird.<br />
 Eine gespeicherte Query muss man aber nicht doppelklicken, um an aktuelle Ergebnisse zu kommen. Mittels <a href="tracker.html#navigating">Trackernavigation</a> kann man sie wie jeden anderen Ordner über Untermenüs durchforsten.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="find-window" name="find-window">Das Suchfenster</a></h2>
-<p>Queries werden über das <span class="menu">Find...</span> Menü gestartet. Entweder von der Deskbar, einem Trackerfenster oder dem Desktop. Das Tastenkürzel ist <span class="key">ALT</span> <span class="key">F</span>. Das Suchfenster sieht folgendermaßen aus:</p>
+<p>Queries werden über das <span class="menu">Suchen..</span> Menü gestartet. Entweder von der Deskbar, einem Trackerfenster oder dem Desktop. Das Tastenkürzel ist <span class="key">ALT</span> <span class="key">F</span>. Das Suchfenster sieht folgendermaßen aus:</p>
 <img src="images/queries-images/basic-query.png" alt="basic-query.png" />
 <ol>
-<li><p>Hier lassen sich lassen sich kürzlich verwendete oder gespeicherte Queries auswählen und die aktuellen Parameter als <a href="#query-template">Query Template</a> speichern.</p></li>
-<li><p>Suchen lassen sich von allen Dateien und Ordnern (<span class="menu">All files and folders</span>) auf bestimmte Dateitypen einschränken.</p></li>
+<li><p>Hier lassen sich lassen sich kürzlich verwendete oder gespeicherte Queries auswählen und die aktuellen Parameter als <a href="#query-template">Query Vorlage</a> speichern.</p></li>
+<li><p>Suchen lassen sich von allen Dateien und Ordnern (<span class="menu">Alle Dateien und Ordner</span>) auf bestimmte Dateitypen einschränken.</p></li>
 <li>Auswahl der Suchmethode:<ul>
-    <li><span class="menu">by Name</span> - eine einfache Suche nach Datei- oder Odrnername.</li>
-    <li><span class="menu">by Attribute</span> - eine erweiterte Suche nach bestimmten Zeichen in einem oder mehreren Attributen.</li>
-    <li><span class="menu">by Formula</span> - ein noch fortgeschrittenere Suche, bei der komplexe Suchformeln sehr fein angepasst werden können.</li></ul></li>
+    <li><span class="menu">nach Name</span> - eine einfache Suche nach Datei- oder Ordnername.</li>
+    <li><span class="menu">nach Attribut</span> - eine erweiterte Suche nach bestimmten Zeichen in einem oder mehreren Attributen.</li>
+    <li><span class="menu">nach Formel</span> - ein noch fortgeschrittenere Suche, bei der komplexe Suchformeln sehr fein angepasst werden können.</li></ul></li>
 <li><p>Auswahl der zu durchsuchenden Datenträger.</p></li>
 <li><p>Eingabefeld des Suchbegriffs.</p></li>
 <li><p>Über einen Klick auf das Dreieck werden weitere Optionen aufgerufen.</p></li>
-<li><p>Wird die Option <span class="menu">Temporary</span> abgewählt, wird die Query nicht mehr automatisch nach sieben Tagen entfernt.</p></li>
-<li><p>Wird die Option <span class="menu">Include trash</span> aktiviert, wird der Papierkorb mit durchsucht.</p></li>
+<li><p>Wird die Option <span class="menu">Temporär</span> abgewählt, wird die Query nicht mehr automatisch nach sieben Tagen entfernt.</p></li>
+<li><p>Wird die Option <span class="menu">Einschließlich 
+Papierkorb</span> aktiviert, wird der Papierkorb mit durchsucht.</p></li>
 <li><p>Optionales Eingabefeld für den Dateinamen der Query, falls diese gespeichert werden soll.</p></li>
-<li><p>Eine Query lässt sich durch Drag &amp; Drop des Icons speichern. Geschieht dies mit der rechten Maustaste, kann sie auch als "Query Template" gespeichert werden.</p></li>
+<li><p>Eine Query lässt sich durch Drag &amp; Drop des Icons speichern. Geschieht dies mit der rechten Maustaste, kann sie auch als "Query-Vorlage" gespeichert werden.</p></li>
 </ol>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="basic-query" name="basic-query">Einfache Suche - "by Name"</a></h2>
-<p>Will man einfach nur alle Dateien und Ordner auf den eingehängten Datenträgern finden, die einem bestimmten Muster entsprechen, belässt man die Suchmethode einfach auf <span class="menu">by Name</span>, füllt das Suchfeld entsprechend aus und drückt <span class="key">RETURN</span>.</p>
+<a id="basic-query" name="basic-query">Einfache Suche - "nach Name"</a></h2>
+<p>Will man einfach nur alle Dateien und Ordner auf den eingehängten Datenträgern finden, die einem bestimmten Muster entsprechen, belässt man die Suchmethode einfach auf <span class="menu">nach Name</span>, füllt das Suchfeld entsprechend aus und drückt <span class="key">RETURN</span>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="adv-query" name="adv-query">Erweiterte Suche - "by Attribute"</a></h2>
+<a id="adv-query" name="adv-query">Erweiterte Suche - "nach Attribut"</a></h2>
 <p>Erweiterte Suchen sind durch Queries in den Attributen ausgewählter Dateitypen möglich. Das geht aber nur, wenn diese Attribute <a href="index.html">indiziert</a> sind.</p>
 <img src="images/queries-images/query-window.png" alt="query-window.png" />
-<p>Als erstes stellt man dazu den Dateityp von <span class="menu">All files and folders</span> auf, zum Beispiel, <span class="menu">Text | E-mail</span> und die Suchmethode auf <span class="menu">by Attribute</span>.</p>
-<p>Daraufhin erscheint links vom Eingabefeld ein Menü und darunter die Buttons <span class="button">Add</span> und <span class="button">Remove</span>. Aus dem Menü wählt man das zu durchsuchende Attribut. Mittels <span class="button">Add</span> und <span class="button">Remove</span> können noch weitere Attribute für die Suche verwendet werden, beziehungsweise auch wieder entfernt. Untereinander können die einzelnen Attributsuchen logisch mit AND/OR verknüpft werden.</p>
+<p>Als erstes stellt man dazu den Dateityp von <span class="menu">Alle Dateien und Ordner</span> auf, zum Beispiel, <span class="menu">Text | E-mail</span> und die Suchmethode auf <span class="menu">nach Attribut</span>.</p>
+<p>Daraufhin erscheint links vom Eingabefeld ein Menü und darunter die Buttons <span class="button">Hinzu</span> und <span class="button">Entfernen</span>. Aus dem Menü wählt man das zu durchsuchende Attribut. Mittels <span class="button">Hinzu</span> und <span class="button">Entfernen</span> können noch weitere Attribute für die Suche verwendet werden, beziehungsweise auch wieder entfernt. Untereinander können die einzelnen Attributsuchen logisch mit AND/OR verknüpft werden.</p>
 <p>Als Beispiel, eine Suche nach E-Mails:</p>
 <img src="images/queries-images/query-window-filled.png" alt="query-window-filled.png" />
-<p>So sieht das Find-Fenster aus wenn man nach allen E-Mails sucht, die einen Clara Botters in den letzten 2 Monaten geschickt hat und deren Betreff "vibraphone" oder "skepticality" enthielt.<br />
+<p>So sieht das Suchen-Fenster aus wenn man nach allen E-Mails sucht, die einen Clara Botters in den letzten 2 Monaten geschickt hat und deren Betreff "vibraphone" oder "skepticality" enthielt.<br />
 Wie man sieht, versteht die Suche nach zeitbasierten Attributen einige nützliche Begriffe: Neben dem "last 2 months", funktionieren auch "today", "yesterday", "Monday" oder "last Monday" (was Montag letzter Woche entspricht) oder "last 2 minutes/hours/days/weeks".<br />
 So lässt sich die Trefferzahl sehr gut einschränken.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="more-adv-query" name="more-adv-query">Noch fortgeschrittenere Suchen - "by Formula"</a></h2>
+<a id="more-adv-query" name="more-adv-query">Noch fortgeschrittenere Suchen - "nach Formel"</a></h2>
 <p>Die Formel einer Query von Hand einzugeben is eine wahre Herausforderung und eigentlich ziemlich unpraktisch. Trotzdem ist es manchmal nützlich.</p>
-<p>Nehmen wir mal obige Attribute-Query von Claras E-Mails. Hat man erst mal alle Suchbegriffe beisammen, schaltet man um zu <span class="menu">by Formula</span> und ist prompt überwältigt von diesem einzeiligen Query-Ausdruck:</p>
+<p>Nehmen wir mal obige Attribute-Query von Claras E-Mails. Hat man erst mal alle Suchbegriffe beisammen, schaltet man um zu <span class="menu">nach Formel</span> und ist prompt überwältigt von diesem einzeiligen Query-Ausdruck:</p>
 <img src="images/queries-images/formula-query.png" alt="formula-query.png" />
 <p>Hier noch mal als Text und zur besseren Lesbarkeit umgebrochen:</p>
 <pre>(((((MAIL:from=="*[cC][lL][aA][rR][aA] [bB][oO][tT][tT][eE][rR][sS]*")
@@ -123,7 +127,7 @@ So lässt sich die Trefferzahl sehr gut einschränken.</p>
 <p>Wozu das Ganze?</p>
 <ul>
 <li><p>Die Suchformel lässt sich in eine E-Mail oder Forumbeitrag kopieren oder im IRC erwähnen, damit sie von anderen benutzt oder verbessert werden kann.</p></li>
-<li><p>Mit dieser Methode lassen sich Queries entspannt im <span class="menu">Attribute</span> Modus konstruieren. Anschließend wechselt man in den  <span class="menu">Formula</span> Modus, um die Formel der so erstellten Query im Terminal oder einem Skript zu nutzen.</p></li>
+<li><p>Mit dieser Methode lassen sich Queries entspannt im <span class="menu">Attribut</span> Modus konstruieren. Anschließend wechselt man in den  <span class="menu">Formel</span> Modus, um die Formel der so erstellten Query im Terminal oder einem Skript zu nutzen.</p></li>
 <li><p>Eine Query lässt sich so fein anpassen, indem man zusätzliche Klammern setzt, in bestimmten Abschnitten auf Groß- und Kleinschreibung achtet oder einige logische Verknüpfungen verneint durch Ändern von "<tt>==</tt>" zu "<tt>!=</tt>" für ein NOT AND. Dazu benötigt man nur ein gewisses Basiswissen über <a href="http://de.wikipedia.org/wiki/Regul%C3%A4re_Ausdr%C3%BCcke" class="external free" title="Wikipedia: Reguläre Ausdrücke">Reguläre Ausdrücke</a> und ein klein wenig Programmier-Kenntnisse.</p></li>
 </ul>
 
@@ -135,19 +139,19 @@ So lässt sich die Trefferzahl sehr gut einschränken.</p>
 <p>Außer ihrem grauen Hintergrund, unterscheidet Ergebnisfenster nichts von jedem anderen Trackerfenster. Einige Dinge gehören erwähnt:</p>
 <ul>
 <li><p>Durch einen Doppelklick auf das Path Attribut, öffnet sich der Speicherort einer Datei oder eines Ordners.</p></li>
-<li><p>Mit <span class="menu">File | Edit Query</span> oder <span class="key">ALT</span> <span class="key">G</span> gelangt man zurück zum Find-Fenster, um die Query zu verändern.</p></li>
+<li><p>Mit <span class="menu">Datei | Query bearbeiten</span> oder <span class="key">ALT</span> <span class="key">G</span> gelangt man zurück zum Suchen-Fenster, um die Query zu verändern.</p></li>
 <li><p>Eine Query ist "live". Wenn im System also eine den Suchkriterien entsprechende Datei neu auftaucht oder verschwindet, schlägt sich diese Änderung sofort im Suchergebnis nieder.</p></li>
 </ul>
-<p>Für jeden Dateityp lässt sich für das Ergebnisfenster ein sinnvolles Attribut-Layout festlegen. Dazu öffent man einen Ordner, der Dateien des Dateityps enthält, für den man so eine Layout-Vorlage erstellen möchte. Hier richtet man sich die Ansicht der einzelnen Attributspalten so ein, wie man sie im Ergebnisfenster gern hätte und kopiert das Layout mit <span class="menu">Attributes | Copy Layout</span>.</p>
-<p>Jetzt öffnet man <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, legt einen neuen Ordner mit dem Namen <i>Gruppe/Dateityp</i> an, wobei dabei der Querstrich mit einem Unterstrich ersetzt wird, also zum Beispiel "audio_x-mp3". Diesen neuen Ordner öffnet man anschließend und fügt das vorher kopierte Layout mit <span class="menu">Attributes | Paste Layout</span> ein.</p>
+<p>Für jeden Dateityp lässt sich für das Ergebnisfenster ein sinnvolles Attribut-Layout festlegen. Dazu öffent man einen Ordner, der Dateien des Dateityps enthält, für den man so eine Layout-Vorlage erstellen möchte. Hier richtet man sich die Ansicht der einzelnen Attributspalten so ein, wie man sie im Ergebnisfenster gern hätte und kopiert das Layout mit <span class="menu">Attribute | Anordnung kopieren</span>.</p>
+<p>Jetzt öffnet man <span class="path"><acronym title="/boot/home/config/settings/Tracker/DefaultQueryTemplates">/boot/Benutzer/Konfiguration/settings/Tracker/DefaultQueryTemplates</acronym></span>, legt einen neuen Ordner mit dem Namen <i>Gruppe/Dateityp</i> an, wobei dabei der Querstrich mit einem Unterstrich ersetzt wird, also zum Beispiel "audio_x-mp3". Diesen neuen Ordner öffnet man anschließend und fügt das vorher kopierte Layout mit <span class="menu">Attribute | Anordnung einfügen</span> ein.</p>
 
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="query-template" name="query-template">Query Templates</a></h2>
+<a id="query-template" name="query-template">Query-Vorlagen</a></h2>
 <p>Beim Doppelklick einer gespeicherten Query erscheint sofort das Ergebnisfenster und die Dateisuche beginnt unverzüglich. Manchmal möchte man aber nicht mit <i>exakt</i> diesen Parametern suchen, sondern sie nur als Ausgangspunkt für eine etwas abgeänderte Formel benutzen.<br />
-Mit dem Menüpunkt <span class="menu">Save Query as Template</span> (siehe (1) im <a href="#find-window">Bild</a> weiter oben) oder durch Herausziehen des Icons (10) mit der rechten Maustaste lässt sich genau das erreichen. Ein Doppelklick darauf öffnet nicht gleich das Ergebnisfenster, sondern das Find-Fenster, in dem man schnell einen Suchbegriff anpassen oder Attribute hinzufügen oder entfernen kann.</p>
-<p>Egal wo Query Templates gespeichert wurden, sie erscheinen im Menü mit den kürzlich durchgeführten Queries im Find-Fenster.</p>
+Mit dem Menüpunkt <span class="menu">Query als Vorlage speichern</span> (siehe (1) im <a href="#find-window">Bild</a> weiter oben) oder durch Herausziehen des Icons (10) mit der rechten Maustaste lässt sich genau das erreichen. Ein Doppelklick darauf öffnet nicht gleich das Ergebnisfenster, sondern das Suchen-Fenster, in dem man schnell einen Suchbegriff anpassen oder Attribute hinzufügen oder entfernen kann.</p>
+<p>Egal wo Query-Vorlagen gespeichert wurden, sie erscheinen im Menü mit den kürzlich durchgeführten Queries im Suchen-Fenster.</p>
 </div>
 </div>
 

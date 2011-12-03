@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -39,6 +39,8 @@
 <li><a href="../jp/tracker.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../uk/tracker.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../pt_PT/tracker.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/tracker.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/tracker.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../en/tracker.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -119,17 +121,29 @@
 <img src="images/tracker-images/window-menu.png" alt="window-menu.png" />
 <p>文件浏览器窗口在 <span class="menu">窗口</span> 菜单中提供了三种不同的视图模式：</p>
 <ul>
-<li><p><b>图标视图</b> (<span class="key">ALT</span> <span class="key">1</span>) - 大图标，您可以从子菜单，或者使用 <span class="key">ALT</span> <span class="key">+</span>/<span class="key">ALT</span> <span class="key">-</span> 来放大/缩小图标尺寸。</p></li>
-<li><p><b>迷你视图</b> (<span class="key">ALT</span> <span class="key">2</span>) - 小图标。</p></li>
-<li><p><b>列表视图</b> (<span class="key">ALT</span> <span class="key">3</span>) - 文件的详细列表，并且允许您显示/隐藏可用的 <i>属性</i>。（详情查阅 <a href="attributes.html">属性</a>。）</p></li>
+<li><p><span class="menu">图标视图</span> (<span class="key">ALT</span> <span class="key">1</span>) - 大图标，您可以通过子菜单，或者使用 <span class="key">ALT</span> <span class="key">+</span>/<span class="key">ALT</span> <span class="key">-</span> 来放大/缩小图标尺寸。</p></li>
+<li><p><span class="menu">迷你视图</span>  (<span class="key">ALT</span> <span class="key">2</span>) - 小图标。</p></li>
+<li><p><span class="menu">列表视图</span> (<span class="key">ALT</span> <span class="key">3</span>) - 文件的详细列表，并且允许您显示/隐藏可用的 <i>属性</i>。（详情查阅 <a href="attributes.html">属性</a>。）</p></li>
 </ul>
 <p> <span class="menu">窗口</span>  菜单还提供了很多其他的功能：</p>
 <ul>
-<li><p><b>定义窗口</b> (<span class="key">ALT</span> <span class="key">Y</span>) - 调整窗口到合适尺寸。</p></li>
-<li><p><b>清除</b> (<span class="key">ALT</span> <span class="key">K</span>) - 所有图标对其到不可见网格。同时按下 <span class="key">SHIFT</span> ，菜单变为 <span class="menu">清除所有</span>，它将会按照字母顺序排列所有图标。</p></li>
-<li><p><b>选择...</b> (<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">A</span>) - 根据 <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression">正则表达式</a> 选择文件。</p></li>
-<li><p><b>关闭</b> (<span class="key">ALT</span> <span class="key">W</span>) - 关闭窗口。同时按下  <span class="key">SHIFT</span> ，菜单将会变为 <span class="menu">关闭所有</span> ，将会关闭所有文件浏览器窗口。</p></li>
-<li><p><b>在工作区中关闭所有</b> (<span class="key">ALT</span> <span class="key">Q</span>) ， 关闭当前工作区中的所有文件浏览器窗口。 如果通过文件夹点击时没有按下<span class="key">OPT</span> 按键，所有这些已打开的文件浏览器窗口将会混乱散布在工作区之中。</p></li>
+<li><p><span class="menu">调整窗口</span> (<span class="key">ALT</span> <span class="key">Y</span>) - 调整窗口到合适尺寸。</p></li>
+<li><p><span class="menu">排序方式...</span> - 仅用于图标或者迷你图标视图模式，一个子菜单提供了根据不同属性进行排序设置： </p>
+	<ul>
+        <li>
+<p><span class="menu">名称</span>，
+<span class="menu">真实名称</span>， <span class="menu">大小</span>， 
+<span class="menu">修改时间</span>， <span class="menu">创建时间</span>， <span class="menu">类型</span>，
+<span class="menu">位置</span>，
+<span class="menu">权限</span></p>
+        </li>
+	<li>
+<p><span class="menu">倒序排列</span> - 颠倒排列顺序</p></li>
+	<li _translation_id="4339"><p><span class="menu">清理</span> (<span class="key">ALT</span> <span class="key">K</span>) - 根据网格对其所有图标。 同时按下 <span class="key">SHIFT</span> 菜单就变成了 <span class="menu">清理所有</span> ，它将会根据上述的策略清理所有图标。</p></li>
+	</ul></li>
+<li><p><span class="menu">选择...</span>  (<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">A</span>) - 根据 <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression">正则表达式</a> 选择文件。</p></li>
+<li><p><span class="menu">关闭</span> (<span class="key">ALT</span> <span class="key">W</span>) - 关闭窗口。同时按下  <span class="key">SHIFT</span> ，菜单将会变为 <span class="menu">关闭所有</span> ，将会关闭所有文件浏览器窗口。</p></li>
+<li><p><span class="menu">在工作区中关闭所有</span>(<span class="key">ALT</span> <span class="key">Q</span>) ， 关闭当前工作区中的所有文件浏览器窗口。 如果通过文件夹点击时没有按下<span class="key">OPT</span> 按键，所有这些已打开的文件浏览器窗口将会混乱散布在工作区之中。</p></li>
 </ul>
 <p>有时候您可能希望重新排列图标，而不是使用 <span class="menu">保持对齐</span> 来排列所有（<span class="key">ALT</span> <span class="key">K</span>）。在这种情形下，您可以选中图标，然后将其拖拽到新的位置即可。在拖拽之时，需要按下 <span class="key">ALT</span> 按键。这样将会对其图标到隐藏网格。</p>
 <p>除了文件浏览器首选项，其他的功能都是不言自明的。</p>
@@ -140,15 +154,14 @@
 <p><span class="menu">窗口 | 首选项...</span> 打开一个提供多个设置的窗口，可能它们都不够明确，但是尝试之后将非常明朗。由于所有的设置都会实时生效，您能够即刻看到这些修改。
 <br />因此，以下将简明介绍这些不直白的设置：</p>
 <ul>
-<li><p><b>桌面</b> - 决定是否所有的挂载磁盘直接在显示于桌面或点击桌面上的磁盘图标之后的窗口中。</p></li>
-<li><p><b>窗口</b> - 您可以设置 <span class="menu">单窗口导航</span>，即双击文件夹之后不在新窗口中打开，而是在原窗口中显示内容，并替换其视图方式。如果点击时按下 <span class="key">OPT</span> 按键则与其不尽相同。如上所述，这是因为您将丢失每个窗口的位置和大小。 
+<li><p><span class="menu">桌面</span> - 决定是否所有的挂载磁盘直接在显示于桌面或点击桌面上的磁盘图标之后的窗口中。</p></li>
+<li><p><span class="menu">窗口</span> - 您可以设置 <span class="menu">单窗口导航</span>，即双击文件夹之后不在新窗口中打开，而是在原窗口中显示内容，并替换其视图方式。如果点击时按下 <span class="key">OPT</span> 按键则与其不尽相同。如上所述，这是因为您将丢失每个窗口的位置和大小。 
 <br /><br /></p>
 <img src="images/tracker-images/tracker-preferences-navigator.png" alt="tracker-preferences-navigator.png" />
 <p>在切换到文件浏览器的单窗口模式之前，由于您对这种方式可能比较熟悉，因此我们建议您首先尝试基于菜单的浏览，如果您习惯了这种方式，它可能会更有效率。另一方面，单窗口浏览提供了一个 <i>导航器</i> ，通过它，您可以输入，复制粘贴路径，并且使用返回，向前，向上等按钮。</p> 
 <p>当您希望输入时仅显示和输入字符串相匹配的文件或当前显示属性时，激活 <span class="menu">实时过滤</span> 将会过滤文件浏览器窗口中的内容。详情查阅 <a href="#type-ahead-filter">上述内容</a>。</p></li>
-<li><p><b>日期时间</b> - 设置日期和时间格式。</p></li>
-<li><p><b>垃圾箱</b> - 设置删除文件时的行为。</p></li>
-<li><p><b>容量图标</b> - 设置磁盘图标上剩余空间显示器的颜色。</p></li>
+<li><p><span class="menu">垃圾箱</span> - 设置删除文件时的行为。</p></li>
+<li><p><span class="menu">卷图标</span> - 设置磁盘图标上剩余空间显示器的颜色。</p></li>
 </ul>
 <p>并且，该面板和 <span class="app">文件浏览器</span> 一样可以从桌面栏的 <span class="menu">首选项</span> 中启动。</p>
 
@@ -158,12 +171,12 @@
 <p>在处理选中文件时，大部分的 <span class="menu">File</span> 菜单命令也可以通过右键菜单来提供。</p>
 <p>通常，这些命令是非常清晰的。</p>
 <ul>
-<li><p><b>查找...</b> - 查询文件或文件夹。详情查阅 <a href="queries.html">查询</a> 。</p></li>
-<li><p><b>新建</b> - 基于 <i>模板</i> 新建文件夹或其他文件。
+<li><p><span class="menu">查找...</span> - 查询文件或文件夹。详情查阅 <a href="queries.html">查询</a> 。</p></li>
+<li><p><span class="menu">新建</span> - 基于 <i>模板</i> 新建文件夹或其他文件。
 <br /><br /></p>
 <img src="images/tracker-images/new-menu.png" alt="new-menu.png" />
 <p>选择 <span class="menu">编辑模板...</span> 将打开 <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span> 文件夹。在其中创建文件将会在 <span class="menu">新建</span> 菜单中提供以该文件的其他属性为模板，其文件名为类型名的类型。这里，有一个文件类型为 <tt>text/plain</tt> 的 “Text” 文件。详情查阅 <a href="filetypes.html">文件类型</a> 。</p></li>
-<li><p><b>打开方式...</b> - 提供所有可以打开该类型文件的应用程序的子菜单。
+<li><p><span class="menu">打开方式...</span>- 提供所有可以打开该类型文件的应用程序的子菜单。
 <br /><br /></p>
 <img src="images/tracker-images/open-with.png" alt="open-with.png" />
 
@@ -171,15 +184,15 @@
 <br /><br />
 <img src="images/tracker-images/open-with-preferred.png" alt="open-with-preferred" />
 <p>在这里，您将会再次找出子菜单中的所用程序。通过选中其中之一，然后点击 <span class="button">打开并设为首选</span> 按钮，您将会修改该类型文件的首选程序，在这里为 <tt>text/plain</tt>。</p></li>
-<li><b>获取信息</b>
+<li><span class="menu">获取信息</span>
 <br /><br />
 <img src="images/tracker-images/get-info.png" alt="get-info" />
 <p>该面板显示选中文件的信息，而可以让您设置其默认应用，在展开部分面板后，为权限和拥有者。点击路径将会在文件浏览器中将其打开。</p></li>
-<li><p><b>重命名</b>，<b>复制</b>和<b>移动到垃圾箱</b> - 重命名，复制文件，或者将选中文件移动到垃圾箱。</p></li>
-<li><p><b>移动到</b>，<b>复制到</b>和<b>创建链接</b> - 让您使用子菜单导航方法移动，复制或者链接选中文件。调用菜单时，同时按下<span class="key">SHIFT</span> 键，将会提供一个选项已创建相对链接。</p></li>
-<li><p><b>剪切</b>，<b>复制</b>和<b>粘贴</b> - 让您使用剪贴板剪切，复制以及粘贴文件。在调用可以用于<b>复制/剪切更多</b>文件的菜单时，按下 <span class="key">SHIFT</span> 键，可能从其他目录中，您可以粘贴文件到其他地方。而且，按下 <span class="key">SHIFT</span> 键，您可以以链接的形式粘贴剪贴板中复制的文件。</p></li>
-<li><p><b>标识</b> - 将会找出之前没有文件类型的文件，并且为其设置类型，例如，使用 <span class="cli">wget</span> 获取了一些没有类型的文件。在调用菜单修改项目为 <b>强制标识</b> 时，按下 <span class="key">SHIFT</span> 键将会标识文件类型，并且修改之前错误的类型。</p></li>
-<li><p><b>附加组件</b> - 提供文件浏览器通用的和那些可以处理选中文件的附加组件。详情查阅 <a href="tracker-add-ons.html">文件浏览器附加组件</a> 。</p></li>
+<li><p><span class="menu">重命名</span>，<span class="menu">复制</span>和<span class="menu">移动到垃圾箱</span> - 重命名，复制文件，或者将选中文件移动到垃圾箱。</p></li>
+<li><p><span class="menu">移动到</span>，<span class="menu">复制到</span>和<span class="menu">创建链接</span> - 让您使用子菜单导航方法移动，复制或者链接选中文件。调用菜单时，同时按下<span class="key">SHIFT</span> 键，将会提供一个选项已创建相对链接。</p></li>
+<li><p><span class="menu">剪切</span>，<span class="menu">复制</span>和<span class="menu">粘贴</span> - 让您使用剪贴板剪切，复制以及粘贴文件。在调用可以用于 <span class="menu">复制/剪切更多</span> 文件的菜单时，按下 <span class="key">SHIFT</span> 键，可能从其他目录中，您可以粘贴文件到其他地方。而且，按下 <span class="key">SHIFT</span> 键，您可以以链接的形式粘贴剪贴板中复制的文件。</p></li>
+<li><p><span class="menu">标识</span> - 将会找出之前没有文件类型的文件，并且为其设置类型，例如，使用 <span class="cli">wget</span> 获取了一些没有类型的文件。在调用菜单修改项目为 <span class="menu">强制标识</span> 时，按下 <span class="key">SHIFT</span> 键将会标识文件类型，并且修改之前错误的类型。</p></li>
+<li><p><span class="menu">附加组件</span> - 提供文件浏览器通用的和那些可以处理选中文件的附加组件。详情查阅 <a href="tracker-add-ons.html">文件浏览器附加组件</a> 。</p></li>
 </ul>
 
 <h2>

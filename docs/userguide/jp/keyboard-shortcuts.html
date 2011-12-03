@@ -9,12 +9,16 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		satashun
+ *		Kentaro Ozeki
+ *		log-1
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Shortcuts and key combinations</title>
+	<title>ショートカットやキーの組み合わせ</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -36,6 +40,8 @@
 <li><a href="../uk/keyboard-shortcuts.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../zh_CN/keyboard-shortcuts.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../pt_PT/keyboard-shortcuts.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/keyboard-shortcuts.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/keyboard-shortcuts.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../en/keyboard-shortcuts.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -49,85 +55,84 @@
 <div>
 <div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
-<h1>Shortcuts and key combinations</h1>
+<h1>ショートカットやキーの組み合わせ</h1>
 
-<p>By default, Haiku's shortcut key, to invoke commands from menus for example, is not the usual <span class="key">CTRL</span> key, but <span class="key">ALT</span> instead. This has historical reasons, because the BeOS was inspired somewhat by MacOS. After you get used to it, it actually has advantages as e.g. <span class="key">ALT</span> <span class="key">C</span> and <span class="key">ALT</span> <span class="key">V</span> integrate seamlessly into the <acronym title="Bourne Again Shell">bash</acronym> shell of the Terminal, where <span class="key">CTRL</span> <span class="key">C</span> quits the running process.</p>
+<p>Haiku のショートカットキーは標準で、 例えばメニューからコマンドを起動するために、よく使われる <span class="key">CTRL</span> キーではなく <span class="key">ALT</span> キーを使用します。これには BeOS が少々 MacOS の影響を受けていたという歴史的な経緯があります。実際のところ、このキーに慣れると利点があります。例えば <span class="key">ALT</span> <span class="key">C</span> と <span class="key">ALT</span> <span class="key">V</span> は <acronym title="Bourne Again Shell">Bash</acronym> Terminal のシェルでもシームレスに統合されていて、Terminal では <span class="key">CTRL</span> <span class="key">C</span> を実行中のプロセスを終了するために利用できます。</p>
 <p>In any case, you can switch to the maybe more familiar <span class="key">CTRL</span> key in the <a href="preferences/keymap.html">Keymap</a> preferences. The user guide always describes the default configuration with the command key being <span class="key">ALT</span>.</p>
-<p>If you're in doubt which keys are the <span class="key">OPT</span> or <span class="key">MENU</span> keys on your particular keymap/keyboard-layout, again use the <a href="preferences/keymap.html">Keymap</a> preferences. There you can see what keystroke is sent when you press a key on your keyboard.</p>
+<p>もしあなたのキーマップ／キーボード配置でどのキーが <span class="key">OPT</span> か <span class="key">MENU</span> なのか疑問に思ったら再度 <a href="preferences/keymap.html">Keymap</a> 環境設定を利用してください。 キーボードであるキーを押した時、何のキーを打ったことになっているか確認することができます。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="general" name="general">General shortcuts</a></h2>
-<p>Here's a table of many of the most commonly used shortcuts that are always available, even if there isn't a corresponding menu:</p>
+<a id="general" name="general">全般的なショートカット</a></h2>
+<p>以下は、対応するメニューがない場合も常に利用可能となっている、最も共通して用いられるショートカットの多くが載っている表です。</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="key">ALT</span> <span class="key">Fx</span></td><td style="width:15px;"></td><td>Switches to <a href="workspaces.html">Workspace</a> X (<span class="key">Fx</span> is the function key corresponding to that workspace). Take the active window with you by adding <span class="key">SHIFT</span></td></tr>
-<tr><td class="onelinetop"><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">←</span> / <span class="key">→</span> / <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Navigates spatially the rows/columns of the available workspaces. Add <span class="key">SHIFT</span> to take the active window with you.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> + left mouse</td><td></td><td>Click and drag with left mouse button to move a window (see chapter <a href="gui.html#move-resize">GUI</a>).</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> + right mouse</td><td></td><td>Click and drag with right mouse button to resize a window (see chapter <a href="gui.html#move-resize">GUI</a>).</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span></td><td></td><td>Zooms a window to an alternative size (maximum size for most applications).</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span></td><td></td><td>Minimizes the active window.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">H</span></td><td></td><td>Hides (minimizes) all windows of the active application.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Pulls the active window to the front (only applicable with the mouse setting <a href="preferences/mouse.html">Focus Follows Mouse</a>).</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Sends the active window to the back. </td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">TAB</span></td><td></td><td>Hold down to bring up the <a href="twitcher.html">Twitcher</a>.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">DEL</span></td><td></td><td>Opens the <a href="teammonitor.html">Team Monitor</a>.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">ESC</span></td><td></td><td>Enters the menu bar (leave with <span class="key">ESC</span>).</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">C</span></td><td></td><td>Copies the selection to the  clipboard.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">X</span></td><td></td><td>Cuts the selection to the clipboard.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">V</span></td><td></td><td>Pastes the clipboard's contents.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">W</span></td><td></td><td>Closes the active window.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">Q</span></td><td></td><td>Quits an application.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">Fx</span></td><td style="width:15px;"></td><td>X 番目の <a href="workspaces.html">Workspace</a> （<span class="key">Fx</span>はワークスペースに対応しているファンクションキー）に切り替えます。 同時に <span class="key">SHIFT</span> を押すことでアクティブウィンドウも切り替え先に移動できます。</td></tr>
+<tr><td class="onelinetop"><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">←</span> / <span class="key">→</span> / <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>利用可能なワークスペースの行／列を空間的に切り替えます。同時に <span class="key">SHIFT</span> を押すことでアクティブウィンドウも切り替え先に移動できます。</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> + 左クリック</td><td></td><td>Click and drag with left mouse button to move a window (see chapter <a href="gui.html#move-resize">GUI</a>).</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> + 右クリック</td><td></td><td>Click and drag with right mouse button to resize a window (see chapter <a href="gui.html#move-resize">GUI</a>).</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span></td><td></td><td>ウィンドウを拡大します。（ほとんどのアプリケーションでは最大化されます）</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span></td><td></td><td>アクティブウィンドウを最小化します。</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">H</span></td><td></td><td>アクティブアプリケーションのすべてのウィンドウを隠します（最小化します）。</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">F</span></td><td></td><td>アクティブウィンドウを前面に持ってきます。（マウス設定が <a href="preferences/mouse.html">Focus Follows Mouse</a> の場合のみ利用できます）</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">B</span></td><td></td><td>アクティブウィンドウを背後に移動します。</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">TAB</span></td><td></td><td>押すと <a href="twitcher.html">Twitcher</a> を表示します。</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">DEL</span></td><td></td><td><a href="teammonitor.html">Team Monitor</a> を開きます。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">ESC</span></td><td></td><td>メニューバーを開きます。（ <span class="key">ESC</span> で閉じます）</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">C</span></td><td></td><td>クリップボードの内容をコピーします。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">X</span></td><td></td><td>クリップボードの内容を切り取ります。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">V</span></td><td></td><td>クリップボードの内容を貼り付けます。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">W</span></td><td></td><td>起動中のウィンドウを閉じます。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">Q</span></td><td></td><td>アプリケーションを終了します。</td></tr>
 <tr><td><span class="key">PRINT</span></td><td style="width:15px;"></td><td>Takes a screenshot with zero delay and launches the <a href="applications/screenshot.html">Screenshot</a> panel.</td></tr>
-<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">PRINT</span></td><td></td><td>Takes a screenshot silently (without opening the panel), while still respecting the last used settings.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">PRINT</span></td><td></td><td>Also takes a screenshot silently with the saved settings, but instead of saving it as a file, it's just copied to the clipboard.</td></tr>
+<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">PRINT</span></td><td></td><td>最後に用いた設定を引き継いで、静かに（パネルを開かずに）スクリーンショットを撮ります。</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">PRINT</span></td><td></td><td>同様に保存された設定で静かにスクリーンショットを撮りますが、それをファイルとして保存する代わりに、ただクリップボードにコピーします。</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="tracker-navigation" name="tracker-navigation">Shortcuts for Tracker navigation</a></h2>
-<p>Additionally to the general shortcuts, here are some more for navigating with Tracker:</p>
+<a id="tracker-navigation" name="tracker-navigation">Tracker ナビゲーションのショートカット</a></h2>
+<p>全般的なショートカットに加えて、Tracker のナビゲーションのためのショートカットもあります：</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:15px;"></td><td>Opens the parent folder.</td></tr>
-<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> or <span class="key">ENTER</span></td><td></td><td>Opens the selected folder.</td></tr>
-<tr><td><span class="key">OPT</span></td><td></td><td>Holding it while opening a folder will automatically close the parent folder. This also works when navigating with the mouse.</td></tr>
-<tr><td><span class="key">MENU</span></td><td></td><td>Opens the Deskbar menu (leave with <span class="key">ESC</span>).</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">Z</span></td><td></td><td>Undo last action. The undo history is only limited by the available memory. Note, this only works for actions on the file itself, changed attributes and permission settings can't be undone with this. Also, once a file is removed from <i>Trash</i> it's gone for good.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">SHIFT</span> <span class="key">Z</span></td><td></td><td>Redo the action you just reverted with <span class="key">ALT</span> <span class="key">Z</span>.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:15px;"></td><td>親フォルダーを開きます。</td></tr>
+<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> または <span class="key">ENTER</span></td><td></td><td>選択したフォルダを開きます。</td></tr>
+<tr><td><span class="key">OPT</span></td><td></td><td>フォルダを開く時に押し続けることで、親フォルダを閉じます。マウスによるナビゲーションの際も有効です。</td></tr>
+<tr><td><span class="key">MENU</span></td><td></td><td>Deskbar メニューを開きます。（ <span class="key">ESC</span> で閉じます）</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">Z</span></td><td></td><td>直前の動作を取り消します。取り消しの履歴は使用できるメモリにのみ制限されます。これはファイル自身への操作に対してのみ有効であり、属性やパーミッション設定の変更を取り消すことはできないので注意してください。また、<i>ゴミ箱</i>から消されたファイルは永久に失われます。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">SHIFT</span> <span class="key">Z</span></td><td></td><td>直前に <span class="key">ALT</span> <span class="key">Z</span> で取り消した動作をやり直します。</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="terminal" name="terminal">Shortcuts in Terminal</a></h2>
+<a id="terminal" name="terminal">Terminal におけるショートカット</a></h2>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td style="width:15px;"></td><td>Opens another Terminal session in a new window.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">T</span></td><td></td><td>Opens another Terminal session in a new tab.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">1</span>, <span class="key">2</span>, <span class="key">3</span> ...</td><td></td><td>Switches to the corresponding tab.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">TAB</span></td><td></td><td>Switches to the next Terminal window.</td></tr>
-<tr><td><span class="key">SHIFT</span> <span class="key">←</span> / <span class="key">→</span></td><td></td><td>Switches to the tab to the left/right.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">SHIFT</span> <span class="key">←</span> / <span class="key">→</span></td><td></td><td>Moves the current tab left/right.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">+</span> / <span class="key">-</span></td><td></td><td>Increase/Decrease font size.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>Enter/leave fullscreen mode.</td></tr>
-<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Scrolls the Terminal output up/down one line.</td></tr>
-<tr><td class="onelinetop"><span class="key"> SHIFT</span> <span class="key">Page↑</span> / <span class="key">Page↓</span></td><td></td><td> Scrolls the Terminal output up/down one page.</td></tr>
-<tr><td><span class="key">TAB</span></td><td></td><td>Tab-completion. After entering a few letters, press <span class="key">TAB</span> once to auto-complete a filename or path. If there is more than one match, it stops where the name starts to differ and you have to provide some more letters to further distinguish them. You can also press <span class="key">TAB</span> twice to have all matches listed.</td></tr>
-<tr><td><span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Moves up or down in a history of all previously entered commands.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">R</span></td><td></td><td>Bash history. All the commands you enter
-are stored in the file <span class="path">~/.bash_history</span>. Press <span class="key">CTRL</span> <span class="key">R</span> and start to enter a command and you'll be provided with the first match from the bash history. Keep pressing <span class="key">CTRL</span> <span class="key">R</span> until you find the right command line and press <span class="key">ENTER</span> to execute it.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">C</span></td><td></td><td>Stops the currently running command.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">D</span></td><td></td><td>Closes the current Terminal session.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td style="width:15px;"></td><td>新しいウィンドウでもう一つ別の Terminal セッションを開きます。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">T</span></td><td></td><td>新しいタブでもう一つ別の Terminal セッションを開きます。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">1</span>, <span class="key">2</span>, <span class="key">3</span> ...</td><td></td><td>対応するタブに切り替えます。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">TAB</span></td><td></td><td>Terminal の次のウィンドウに切り替えます。</td></tr>
+<tr><td><span class="key">SHIFT</span> <span class="key">←</span> / <span class="key">→</span></td><td></td><td>左／右のタブに切り替えます。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">SHIFT</span> <span class="key">←</span> / <span class="key">→</span></td><td></td><td>現在のタブを左／右に移動します。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">+</span> / <span class="key">-</span></td><td></td><td>フォントサイズを大きく／小さくします。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>全画面モードのオン／オフを切り替えます。</td></tr>
+<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Terminal の出力を1行上／下にスクロールします。</td></tr>
+<tr><td class="onelinetop"><span class="key"> SHIFT</span> <span class="key">Page↑</span> / <span class="key">Page↓</span></td><td></td><td>Terminal の出力を1ページ上／下にスクロールします。</td></tr>
+<tr><td><span class="key">TAB</span></td><td></td><td>タブ補完。 何文字か入力した後に <span class="key">TAB</span> を1回押すと、ファイル名やファイルパスを自動補完できます。 複数の候補がある場合は、それぞれの名前が変わる位置で補完が止まるので、絞り込むためにもう何文字か入力する必要があります。 <span class="key">TAB</span> を2回押してすべての候補を一覧表示することもできます。</td></tr>
+<tr><td><span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>以前に入力したすべてのコマンドの履歴を前／後に移動します。</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">R</span></td><td></td><td>Bash の履歴。入力したコマンドはすべてファイル <span class="path">~/.bash_history</span> に格納されます。 <span class="key">CTRL</span> <span class="key">R</span>を押して、コマンドを入力し始めると、 Bash の履歴中で最初に一致したものが表示されます。 <span class="key">CTRL</span> <span class="key">R</span>を繰り返し押して正しいコマンドラインを見つけたら、 <span class="key">ENTER</span> を押して実行してください。</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">C</span></td><td></td><td>現在実行中のコマンドを停止します。</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">D</span></td><td></td><td>現在の Terminal セッションを閉じます。</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="other-combos" name="other-combos">Other key combinations</a></h2>
-<p>You can add or remove items to/from a selection by holding down a modifier key while clicking on a entry (or file in case of Tracker).</p>
+<a id="other-combos" name="other-combos">他のキーの組み合わせ</a></h2>
+<p>項目（ Trackerの場合はファイル）をクリックしている間に修飾キーを押し続けることで、アイテムを選択領域で追加／削除できます。</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="key">SHIFT</span></td><td style="width:15px;"></td><td>This will select everything between the first selected item and the one you click on.</td></tr>
-<tr><td><span class="key">ALT</span></td><td></td><td>Adds or removes the item you're clicking on from the selection.</td></tr>
+<tr><td><span class="key">SHIFT</span></td><td style="width:15px;"></td><td>初めに選択された項目とあなたがクリックした項目の間の全項目を選択します。</td></tr>
+<tr><td><span class="key">ALT</span></td><td></td><td>選択領域であなたがクリックした項目を追加／削除します。</td></tr>
 </table>
-<p>In a Tracker window, if you just start typing, Tracker scrolls to and selects the file that best fits your incremental search. If there's no file starting with your typed letters, files that contain the search string anywhere in their name or other displayed attributes are selected. This search is <i>not</i> case-sensitive.<br />
-The letters you type appear at the bottom-left, where normally the number of items is listed. After a second it reverts back and you could start a new incremental search.<br />
-Instead of jumping to the first occurrence of your search string, Tracker can be configured to filter out all non-matching files. See the topic on <a href="tracker.html#tracker-preferences">type-ahead filtering</a>.</p>
+<p>Tracker ウインドウで文字を入力すると、 Tracker はスクロールしてインクリメンタルサーチに最もマッチするファイルを選択します。もし入力された文字で始まるファイルがなければ、ファイル名または属性のどこかに検索文字列を含むファイルが選択されます。大文字小文字は区別<i>されません</i>。<br />
+入力された文字列は左下（通常リスト中のアイテム数が表示される場所）に表示されます。表示は1秒後に元に戻り、新しいインクリメンタルサーチが開始できるようになります。<br />
+最初に検索文字列が現れる部分にジャンプする代わりに、一致しないファイルを除いて表示するよう設定することもできます。<a href="tracker.html#tracker-preferences">type-ahead filtering</a>のトピックを参照してください。</p>
 
 </div>
 </div>

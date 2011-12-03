@@ -40,6 +40,8 @@
 <li><a href="../uk/tracker-add-ons.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../zh_CN/tracker-add-ons.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../pt_PT/tracker-add-ons.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/tracker-add-ons.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/tracker-add-ons.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../en/tracker-add-ons.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -51,18 +53,19 @@
 
 <div id="content">
 <div>
+<div class="box-info">Översättningen av denna sida är inte komplett. Delar av innehållet kommer därför att visas på engelska.</div>
 
 <h1>Tracker-tillägg</h1>
 
 <p>Program kan installera tillägg som enkelt kan köras på urval av filer i Tracker. Endast de tillägg som kan hantera filtypen i urvalet av filer visas under <span class="menu">Add-Ons</span> i kontextmenyn och i Tracker-fönstrets <span class="menu">File</span>-meny. Vissa tillägg behöver inte nödvändigtvis någon fil och presenteras därför alltid i listan.</p>
 <p>Tracker-tillägg eller länkar till program som fungerar som tillägg, kan installeras på tre olika platser (se artikel om <a href="filesystem-layout.html">Filsystemets mappstruktur</a>):</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/system/add-ons/Tracker/</span></td><td>   </td><td>för de tillägg som kommer med systemet</td></tr>
+<tr><td><span class="path">/boot/system/add-ons/Tracker/</span></td><td>   </td><td>för de tillägg som kommer med systemet</td></tr>
 <tr><td><span class="path">/boot/common/add-ons/Tracker/</span></td><td>   </td><td>för tillägg åt samtliga användare</td></tr>
 <tr><td><span class="path">/boot/home/config/add-ons/Tracker/</span></td><td>   </td><td>för tillägg åt enskilda användare</td></tr>
 </table>
-<p>Ett tilläggs filnamn kan ges ett suffix bestående av streck och stor bokstav, vilket gör tillägget åtkomligt via ett snabbkommando.  Till exempel kan man köra <span class="app">Open Target Folder-T</span> genom att trycka <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">T</span>.<br />
-Man måste förstås se upp när man väljer bokstav så att snabbkommandot inte kolliderar med ett annat tilläggs snabbkommando. Du kan inte använda samma snabbkommando till flera tillägg.</p>
+<p>The file name of an add-on can be suffixed with a dash and capital letter, and is then available via keyboard shortcut. For example, <span class="app">Open Target Folder-O</span> opens with <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">O</span>.<br />
+Of course, you have to take care of possible shortcut collisions when deciding on a shortcut. You can't have the same for different add-ons.</p>
 
 <h2><a id="system-add-ons" name="system-add-ons">Haikus Tracker-tillägg</a></h2>
 <p>Dessa Tracker-tillägg kommer med varje Haiku installation:</p>

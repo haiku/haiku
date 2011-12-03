@@ -12,6 +12,7 @@
  * Translators:
  *		Matthias
  *		Humdinger
+ *		taos
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -39,6 +40,8 @@
 <li><a href="../../uk/preferences/datatranslations.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/preferences/datatranslations.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/preferences/datatranslations.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/preferences/datatranslations.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/preferences/datatranslations.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/preferences/datatranslations.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -51,38 +54,38 @@
 <div id="content">
 <div>
 
-<h2><img src="../../images/prefs-images/datatranslations-icon_64.png" alt="datatranslations-icon_64.png" width="64" height="64" />DataTranslations</h2>
+<h2><img src="../../images/prefs-images/datatranslations-icon_64.png" alt="datatranslations-icon_64.png" width="64" height="64" /><acronym title="DataTranslations">Datenkonvertierung</acronym></h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
-<tr><td>Ort:</td><td></td><td><span class="path">/boot/system/preferences/DataTranslations</span></td></tr>
-<tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/*</span> - Jeder Translator ("Übersetzer") hat hier eine Datei mit spezifischen Einstellungen.<br />
-<span class="path">~/config/settings/system/DataTranslations settings</span> - Speichert die Position des Programmfensters.</td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu"><acronym title="Preferences">Einstellungen</acronym></span></td></tr>
+<tr><td>Ort:</td><td></td><td><span class="path"><acronym title="/boot/system/preferences/DataTranslations">/boot/System/preferences/Datenkonvertierung</acronym></span></td></tr>
+<tr><td>Einstellungen:</td><td></td><td><span class="path"><acronym title="~/config/settings/*">~/Konfiguration/settings/*</acronym></span> - Jeder Translator ("Übersetzer") hat hier eine Datei mit spezifischen Einstellungen.<br />
+<span class="path"><acronym title="~/config/settings/system/DataTranslations settings">~/Konfiguration/settings/system/DataTranslations</acronym></span> - Speichert die Position des Programmfensters.</td></tr>
 </table>
-<p>Die Möglichkeit eines Programms, Daten in verschiedenen Dateiformaten abspeichern zu können, wird unter Haiku zentral durch sogenannte "Translatoren" - also Übersetzer - bereitgestellt. Die Einstellungen für  jeden Translator wird in DataTranslations vorgenommen.</p>
+<p>Die Möglichkeit eines Programms, Daten in verschiedenen Dateiformaten abspeichern zu können, wird unter Haiku zentral durch sogenannte "Translatoren" - also Übersetzer - bereitgestellt. Die Einstellungen für  jeden Translator wird in <acronym title="DataTranslations">Datenkonvertierung</acronym> vorgenommen.</p>
 <p><br /></p>
 <img src="../images/prefs-images/datatranslations.png" alt="datatranslations.png" />
-<p>Abhängig vom einzelnen Translator variiert der Umfang der Einstellungsmöglichkeiten. Es ist aber immer mindestens eine Schaltfläche <span class="button">Info...</span> vorhanden, die Auskunft über den Translator und dessen Speicherort angibt.<br />
+<p>Abhängig vom einzelnen Translator variiert der Umfang der Einstellungsmöglichkeiten. Es ist aber immer mindestens eine Schaltfläche <span class="button">Info</span> vorhanden, die Auskunft über den Translator und dessen Speicherort angibt.<br />
 Nachfolgend eine Tabelle der standardmäßig installierten Translatoren und ihrer wichtigsten Einstellungen.</p>
 <table summary="translators" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">BMP Images</span></td><td>24 bit Farbtiefe, unkomprimiert, keine Transparenz</td></tr>
-<tr><td><span class="menu">EXR Images</span></td><td><acronym title="Industrial Light &amp; Magic">ILM</acronym>-eigenes Format für HDR Bilder.</td></tr>
+<tr><td><span class="menu">BMP-Bilder</span></td><td>24 bit Farbtiefe, unkomprimiert, keine Transparenz</td></tr>
+<tr><td><span class="menu">EXR-Bilder</span></td><td><acronym title="Industrial Light &amp; Magic">ILM</acronym>-eigenes Format für HDR Bilder.</td></tr>
 <tr><td><span class="menu">GIF Images</span></td><td>8 bit Farbtiefe, verlustfreie Kompression, Transparenz<br />
 Über die Anzahl der zu verwendenden Farben kann die Dateigröße beeinflusst werden.<br />
 Die Transparenz wird entweder automatisch aus dem Alphakanal genommen, oder händisch über die Definition einer speziellen Farbe, die transparent dargestellt wird. </td></tr>
-<tr><td><span class="menu">JPEG2000 Images</span></td><td>24 bit Farbtiefe, komprimiert, keine Transparenz<br />
+<tr><td><span class="menu">JPEG2000-Bilder</span></td><td>24 bit Farbtiefe, komprimiert, keine Transparenz<br />
 Hier interessiert meist nur die eingestellte Ausgabequalität.</td></tr>
-<tr><td><span class="menu">JPEG Images</span></td><td>24 bit Farbtiefe, komprimiert, keine Transparenz<br />
+<tr><td><span class="menu">JPEG-Bilder</span></td><td>24 bit Farbtiefe, komprimiert, keine Transparenz<br />
 Neben der Ausgabequalität kann noch eine Kantenglättung eingestellt werden, die Kompressions-Artefakte mildert, aber gleichzeitig die Bildschärfe verringert.</td></tr>
-<tr><td><span class="menu">PCX Images</span></td><td>24 bit Farbtiefe, unkomprimiert, keine Transparenz; "PC Paintbrush Exchange"-Format</td></tr>
-<tr><td><span class="menu">PNG Images</span></td><td>32 bit Farbtiefe, verlustfreie Kompression, Transparenz</td></tr>
+<tr><td><span class="menu">PCX-Bilder</span></td><td>24 bit Farbtiefe, unkomprimiert, keine Transparenz; "PC Paintbrush Exchange"-Format</td></tr>
+<tr><td><span class="menu">PNG-Bild</span></td><td>32 bit Farbtiefe, verlustfreie Kompression, Transparenz</td></tr>
 <tr><td><span class="menu">PPM Images</span></td><td>24 bit Farbtiefe, unkomprimiert, keine Transparenz; "Portable PixMap"-Format</td></tr>
-<tr><td><span class="menu">RAW Images</span></td><td>bis zu 48 bit Farbtiefe, unkomprimiert, keine Transparenz</td></tr>
-<tr><td><span class="menu">RTF Text Files</span></td><td>formatierter Text</td></tr>
-<tr><td><span class="menu">SGI Images</span></td><td>24 bit Farbtiefe, optional verlustfreie Kompression, Transparenz</td></tr>
-<tr><td><span class="menu">StyledEdit Files</span></td><td>formatierter Text</td></tr>
-<tr><td><span class="menu">TGA Images</span></td><td>32 bit Farbtiefe, optional verlustfreie Komprimierung, Transparenz</td></tr>
-<tr><td><span class="menu">TIFF Images</span></td><td>24 bit Farbtiefe, optional verlustfreie Komprimierung, Ebenen, Transparenz</td></tr>
-<tr><td class="onelinetop"><span class="menu">WonderBrush Images</span></td><td>32 bit Farbtiefe, Ebenen, Transparenz; spezielles Dateiformat von WonderBrush</td></tr>
+<tr><td><span class="menu">RAW-Bilder</span></td><td>bis zu 48 bit Farbtiefe, unkomprimiert, keine Transparenz</td></tr>
+<tr><td><span class="menu">RTF-Textdateien</span></td><td>formatierter Text</td></tr>
+<tr><td><span class="menu">SGI-Bilder</span></td><td>24 bit Farbtiefe, optional verlustfreie Kompression, Transparenz</td></tr>
+<tr><td><span class="menu">StyledEdit-Dateien</span></td><td>formatierter Text</td></tr>
+<tr><td><span class="menu">TGA-Bilder</span></td><td>32 bit Farbtiefe, optional verlustfreie Komprimierung, Transparenz</td></tr>
+<tr><td><span class="menu">TIFF-Bilder</span></td><td>24 bit Farbtiefe, optional verlustfreie Komprimierung, Ebenen, Transparenz</td></tr>
+<tr><td class="onelinetop"><span class="menu">WonderBrush-Bilder</span></td><td>32 bit Farbtiefe, Ebenen, Transparenz; spezielles Dateiformat von WonderBrush</td></tr>
 </table>
 <p><br /></p>
 <div class="box-info">Welches Dateiformat für welche Art von Bildern das Beste ist, hängt von der weiteren Verwendung des Bilds und dem verwendeten Farbumfang ab. Screenshots, Grafiken, Schwarz-Weiß-Zeichnungen und Bilder mit wenigen verwendeten Farben oder sehr kleine Bilder, werden am besten als GIF (bis 256 Farben) oder PNG (Millionen Farben) gespeichert. JPEG würde hier nur Kompressionsartefakte produzieren ohne die Dateigröße zu reduzieren.</div>

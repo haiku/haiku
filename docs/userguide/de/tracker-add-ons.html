@@ -13,6 +13,7 @@
  *		Finest Bug
  *		Matthias
  *		Humdinger
+ *		taos
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -40,6 +41,8 @@
 <li><a href="../uk/tracker-add-ons.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../zh_CN/tracker-add-ons.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../pt_PT/tracker-add-ons.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/tracker-add-ons.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/tracker-add-ons.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../en/tracker-add-ons.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -54,28 +57,28 @@
 
 <h1>Tracker Add-Ons</h1>
 
-<p>Anwendungen können Add-Ons installieren, um im Tracker von einer Dateiauswahl aus aufgerufen werden zu können. Im Kontextmenü unter <span class="menu">Add-Ons</span> oder dem <span class="menu">File</span> Menü des Trackerfensters werden nur die Add-Ons angezeigt, die auch mit dem betreffenden Dateityp umgehen können. Add-Ons die auch ohne eine markierte Datei benutzt werdne können, werden immer angezeigt.</p>
-<p>Tracker Add-Ons, oder Verknüpfungen zu Programmen die auch als Add-Ons funktionieren, können an drei Orten installiert werden (siehe auch <a href="filesystem-layout.html">Dateisystem Layout</a>):</p>
+<p>Anwendungen können Add-Ons installieren, um im Tracker von einer Dateiauswahl aus aufgerufen werden zu können. Im Kontextmenü unter <span class="menu">Add-ons</span> oder dem <span class="menu"><acronym title="File">Datei</acronym></span> Menü des Trackerfensters werden nur die Add-Ons angezeigt, die auch mit dem betreffenden Dateityp umgehen können. Add-Ons, die auch ohne eine markierte Datei benutzt werden können, werden immer angezeigt.</p>
+<p>Tracker Add-Ons, oder Verknüpfungen zu Programmen, die auch als Add-Ons funktionieren, können an drei Orten installiert werden (siehe auch <a href="filesystem-layout.html">Dateisystem Layout</a>):</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/system/add-ons/Tracker/</span></td><td>   </td><td>Vom System mitgelieferte Add-Ons.</td></tr>
-<tr><td><span class="path">/boot/common/add-ons/Tracker/</span></td><td>   </td><td>Add-Ons die für jeden Benutzer verfügbar sind</td></tr>
-<tr><td><span class="path">/boot/home/config/add-ons/Tracker/</span></td><td>   </td><td>Add-Ons die nur für einen selbst verfügbar sind.</td></tr>
+<tr><td><span class="path"><acronym title="/boot/system/add-ons/Tracker/">/boot/System/add-ons/Tracker/</acronym></span></td><td>   </td><td>Vom System mitgelieferte Add-Ons.</td></tr>
+<tr><td><span class="path"><acronym title="/boot/common/add-ons/Tracker/">/boot/Allgemein/add-ons/Tracker/</acronym></span></td><td>   </td><td>Add-Ons, die für jeden Benutzer verfügbar sind</td></tr>
+<tr><td><span class="path"><acronym title="/boot/home/config/add-ons/Tracker/">/boot/Benutzer/Konfiguration/add-ons/Tracker/</acronym></span></td><td>   </td><td>Add-Ons, die nur für einen selbst verfügbar sind.</td></tr>
 </table>
-<p>Wenn der Dateiname eines Add-On mit einem Bindestrich und einem Buchstaben endet, kann das Add-On über diesen Buchstaben mit einer Tastenkombination aufgerufen werden, zum Beispiel: <span class="app">Open Target Folder-T</span> kann mit <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">T</span> gestartet werden.<br />
+<p>Wenn der Dateiname eines Add-On mit einem Bindestrich und einem Buchstaben endet, kann das Add-On über diesen Buchstaben mit einer Tastenkombination aufgerufen werden, zum Beispiel: <span class="app">Open Target Folder-O</span> kann mit <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">O</span> gestartet werden.<br />
 Da es keine zwei Add-On mit dem gleichen Kürzel geben kann, muss man bei der Vergabe des Buchstabens rücksichtsvoll vorgehen.</p>
 
 <h2><a id="system-add-ons" name="system-add-ons">Haikus Tracker Add-Ons</a></h2>
 <p>Die folgenden Tracker Add-Ons sind in jeder Haiku Installation enthalten:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="4"> 
-	<tr><td class="onelinetop"><b>Background</b><i>-B</i></td>
-		<td valign="top">Öffnet die Einstellung <a href="preferences/backgrounds.html">Background</a> zum Anpassen des Bildschirm- oder Ordnerhintergrunds. Wird dieses Add-On auf einer Bilddatei aufgerufen, ist dieses Bild im Einstellungsdialog bereits als mögliches Hintergrundbild vorausgewählt.</td></tr>
-	<tr><td class="onelinetop"><b>DiskUsage</b><i>-I</i></td>
-		<td valign="top">Startet <a href="applications/diskusage.html">DiskUsage</a> mit dem aktuellen Ordner als Basis.</td></tr>
+	<tr><td class="onelinetop"><b><acronym title="Background-B">Hintergründe</acronym></b></td>
+		<td valign="top">Öffnet die Einstellung <a href="preferences/backgrounds.html"><acronym title="Background">Hintergründe</acronym></a> zum Anpassen des Bildschirm- oder Ordnerhintergrunds. Wird dieses Add-On auf einer Bilddatei aufgerufen, ist dieses Bild im Einstellungsdialog bereits als mögliches Hintergrundbild vorausgewählt.</td></tr>
+	<tr><td class="onelinetop"><b><acronym title="DiskUsage-I">Datenträgerbelegung</acronym></b></td>
+		<td valign="top">Startet <a href="applications/diskusage.html"><acronym title="DiskUsage">Datenträgerbelegung</acronym></a> mit dem aktuellen Ordner als Basis.</td></tr>
 	<tr><td class="onelinetop"><b>FileType</b><i>-F</i></td>
-		<td valign="top">Der für diese Datei spezielle <a href="filetypes.html">FileType</a>-Dialog wird geöffnet. Wenn das Add-On nicht auf einer Datei aufgerufen wird, öffnen sich die Einstellungen für die globalen Dateitypen.</td></tr>
+		<td valign="top">Der für diese Datei spezielle <a href="filetypes.html"><acronym title="FileType">Dateitypen</acronym></a>-Dialog wird geöffnet. Wenn das Add-On nicht auf einer Datei aufgerufen wird, öffnen sich die Einstellungen für die globalen Dateitypen.</td></tr>
 	<tr><td class="onelinetop"><b>Open Target Folder</b><i>-O</i></td>
 		<td valign="top">Wird nur bei einer Verknüpfung angeboten und öffnet den Ordner, in dem die eigentliche Datei gespeichert ist.</td></tr>
-	<tr><td class="onelinetop"><b>TextSearch</b><i>-G</i></td>
+	<tr><td class="onelinetop"><b><acronym title="TextSearch-G">TextSearch</acronym></b></td>
 		<td valign="top">Öffnet die Anwendung <a href="applications/textsearch.html">TextSearch</a> um nach einem beliebigen Text innerhalb eines Ordners und dessen Unterordner zu suchen.</td></tr>
 	<tr><td class="onelinetop"><b>ZipOMatic</b><i>-Z</i></td>
 		<td valign="top">Eine Auswahl an Dateien wird zu einer ZIP-Datei zusammengepackt. Wenn dieses Add-On aufgerufen wird, ohne dass eine oder mehrere Dateien markiert sind, öffnet sich ein Dialogfeld, mit dem man per Ziehen und Ablegen von Dateien ein Archiv erstellen kann.</td></tr>

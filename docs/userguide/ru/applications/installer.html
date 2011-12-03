@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2009, Haiku. All rights reserved.
+ * Copyright 2009-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -40,6 +40,8 @@
 <li><a href="../../uk/applications/installer.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/applications/installer.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/applications/installer.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/installer.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/installer.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/applications/installer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -51,6 +53,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <h2><img src="../../images/apps-images/installer-icon_64.png" alt="installer-icon_64.png" width="64" height="64" />Установщик</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -64,11 +67,7 @@
 <ul>
 <li><p>Это приложение альфа-качества. Сделайте резервные копии, иначе поплатитесь!</p></li>
 <li><p>Установщику потребуется заранее подготовленный раздел. Возможно, вам придется воспользоваться <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> или чем-нибудь аналогичным. К счастью, приложение DriveSetup, входящее в состав Haiku по умолчанию, вполне справится с поставленной задачей.</p></li>
-<li><p>Haiku можно добавить вручную в загрузчик <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>. Вам нужно добавить в файл <span class="path">/boot/grub/menu.lst</span> примерно следующую строку:</p>
-<pre># Haiku on /dev/sda7
-title		Haiku
-rootnoverify	(hd0,6)
-chainloader	+1</pre></li>
+<li>Haiku can be added manually to the bootmanager <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>. How that is done exactly is available as an <a href="http://www.haiku-os.org/get-haiku/installation-guide">online guide</a>.</li>
 </ul>
 <p><br /><br /></p>
 <p>Как только вы нажмете <span class="button">Продолжить</span>, то увидите следующее окно:</p>
@@ -84,8 +83,7 @@ chainloader	+1</pre></li>
 <p>По окончании установки раздел автоматически помечается как загрузочный. Однако иногда случается, что другие операционные системы или программы для работы с разделами случайно переписывают загрузочный сектор вашего раздела с Haiku. В этом случае загрузите установочный CD-диск и запустите установщик. Выберите ваш раздел с Haiku в выпадающем списке <span class="menu">На диск: Пожалуйста, выберите раздел для установки</span> и выберите подменю <span class="menu">Записать загрузочный сектор</span> из меню Инструменты. Это снова сделает ваш раздел загрузочным.</p>
 <p>Еще одним пунктом меню <span class="menu">Инструменты</span> является <span class="menu">Менеджер загрузки</span>, позволяющий добавить меню выбора операционной системы на загрузочный сектор.<br />
 Однако его запуск не будет необходимым, если вы уже используете загрузочный менеджер, подобный Grub (в этом случае, вы сможете добавить Haiku в список загрузки вручную, как описано выше), или же если Haiku будет единственной операционной системой на вашем компьютере.</p>
-<p>На данный момент Менеджер загрузки еще недостаточно хорошо протестирован и имеет несколько ограничений, о которых он сообщит при необходимости: меню может быть установлено только на первый жесткий диск при наличии на нем 2 Кбайт свободного пространства после Главной Загрузочной Записи (MBR).</p>
-<p>Вам не стоит слишком беспокоиться по этому поводу: оригинальная запись MBR будет автоматически сохранена. А для того, чтобы убрать загрузочное меню, вам потребуется только снова загрузиться с инсталляционного компакт-диска, запустить Установщик (Installer) и снова обратиться к Менеджеру загрузки (Boot Manager), где вы сможете удалить или установить загрузочное меню.</p>
+
 
 </div>
 </div>

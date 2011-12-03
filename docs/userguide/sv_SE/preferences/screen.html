@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -38,6 +38,8 @@
 <li><a href="../../uk/preferences/screen.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/preferences/screen.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/preferences/screen.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/preferences/screen.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/preferences/screen.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/preferences/screen.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -49,6 +51,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Översättningen av denna sida är inte komplett. Delar av innehållet kommer därför att visas på engelska.</div>
 
 <h2><img src="../../images/prefs-images/screen-icon_64.png" alt="screen-icon_64.png" width="64" height="64" />Skärm</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
@@ -58,12 +61,14 @@
 <span class="path">~/config/settings/kernel/drivers/vesa</span> - Endast vid VESA-läge.<br />
 <span class="path">~/config/settings/Screen_data</span> - Lagrar panelens fönsterposition.</td></tr>
 </table>
-<p>Varje <a href="../workspaces.html">Arbetsyta</a> kan ha en egen upplösning och färgdjup.</p>
+<p>Each of your <a href="../workspaces.html">workspaces</a> can have its own resolution, color depth and refresh rate.</p>
 <img src="../images/prefs-images/screen.png" alt="screen.png" />
-<p>Högerspaltens översta meny låter dig välja om ändringarna skall gälla för alla arbetsytor, eller bara den aktiva arbetsytan. De andra två menyerna innehåller de upplösningar och färgdjup som ditt grafikkort stöder.</p>
+<p>The top menu specifies if your changes are applied only to the current or to all workspaces. Depending on your graphics card, the other menus contain all supported resolution, color depth and refresh rate settings.</p>
 <p>Genom att klicka på <span class="button">Använd</span> ändras grafikläget och en avisering frågar om du vill behålla ändringarna. Om du inte svarar på frågan kommer grafikläget efter 12 sekunder att återställas till föregående läge. Det är användbart I fall du inte kunde se aviseringen på grund av att din monitor inte klarade av de nya inställningarna.</p>
 <p>Till vänster kan du ange antalet arbetsytor och arrangera dom i rader och kolumner. Du kan också öppna panelen <a href="backgrounds.html">Bakgrunder</a>.</p>
 <p><span class="button">Återställ</span> återställer inställningarna till det läget som var innan du startade skärminställningarna.</p>
+<div class="box-info">While Haiku's VESA mode performs very well, you may experience some limitations. You may not be able to drive your widescreen display in its native resolution, resulting in a somewhat blurred picture. There may also be limitations with regard to available color depths and refresh rates.</div>
+<p>To the bottom left you can set the number of workspaces and arrange them in columns and rows and open the <a href="backgrounds.html">Backgrounds</a> preferences.</p>
 
 </div>
 </div>

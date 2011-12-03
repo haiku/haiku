@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Humdinger
+ *		taos
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -38,12 +39,14 @@
 <li><a href="../uk/gui.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../zh_CN/gui.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../pt_PT/gui.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/gui.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/gui.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../en/gui.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
  «  <a href="filesystem-layout.html">Dateisystem Layout</a> 
 ::  <a href="contents.html" class="uplink">Inhalt</a> 
-::  <a href="workspaces.html">Workspaces</a>  »
+::  <a href="workspaces.html"><acronym title="Workspaces">Arbeitsflächen</acronym></a>  »
 </span></div>
 </div>
 
@@ -101,21 +104,21 @@ Zum übergeordneten Verzeichnis gelangt man mit dem Pop-up Menü über der Datei
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="favorites-recent" name="favorites-recent">Favoriten und kürzlich verwendete Ordner</a></h3>
-<p>In Öffnen- und Speicherdialogen bietet das Menü <span class="menu">Favorites</span> kürzlich besuchte Ordner und bevorzugte Speicherorte, die man selbst einrichten kann. Wie durch den kleinen Pfeil erkennbar, lassen sich diese Orte auch als Ausgangspunkt zum weiteren Navigieren in der Hierarchie nutzen.</p>
+<p>In Öffnen- und Speicherdialogen bietet das Menü <span class="menu">Favoriten</span> kürzlich besuchte Ordner und bevorzugte Speicherorte, die man selbst einrichten kann. Wie durch den kleinen Pfeil erkennbar, lassen sich diese Orte auch als Ausgangspunkt zum weiteren Navigieren in der Hierarchie nutzen.</p>
 <img src="images/gui-images/favorites.png" alt="favorites.png" />
-<p>Um einen Favoriten hinzuzufügen, klickt man sich einfach zu seinem Ziel durch und wählt dann <span class="menu">Favorites | Add Current Folder</span>. Er erscheint von nun an in jedem Öffnen/Speichern Dialog. Möchte man ihn wieder entfernen, wählt man <span class="menu">Favorites | Configure Favorites...</span> und löscht den entsprechenden Eintrag.<br />
-Alle Favoriten befinden sich in <span class="path">/boot/home/config/settings/Tracker/Go/</span>. 
+<p>Um einen Favoriten hinzuzufügen, klickt man sich einfach zu seinem Ziel durch und wählt dann <span class="menu">Favoriten | Aktuellen Ordner hinzufügen</span>. Er erscheint von nun an in jedem Öffnen/Speichern Dialog. Möchte man ihn wieder entfernen, wählt man <span class="menu">Favoriten | Favoriten bearbeiten...</span> und löscht den entsprechenden Eintrag.<br />
+Alle Favoriten befinden sich in <span class="path"><acronym title="/boot/home/config/settings/Tracker/Go/">/boot/Benutzer/Konfiguration/settings/Tracker/Go/</acronym></span>. 
 Man kann Verknüpfungen zu Dateien und Ordnern also auch dort direkt anlegen und entfernen.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="replicants" name="replicants">Replikanten</a></h2>
-<p>Replikanten sind kleine autarke Module von Anwendungen, die in andere Programme integriert werden können. Sofern Deskbars Option <span class="menu">Show Replicants</span> aktiviert ist, erkennt man "replizierbare" Teile einer Anwendung durch ein kleines Symbol, normalerweise rechts unten:</p>
+<p>Replikanten sind kleine autarke Module von Anwendungen, die in andere Programme integriert werden können. Sofern Deskbars Option <span class="menu">Replikanten einblenden</span> aktiviert ist, erkennt man "replizierbare" Teile einer Anwendung durch ein kleines Symbol, normalerweise rechts unten:</p>
 <img src="../images/gui-images/replicant.png" alt="replicant.png" />
 <p>Das nächstgelegene Objekt, das Replikanten aufnehmen kann, ist der Desktop: Man lässt einfach das kleine Symbol per Drag&amp;Drop darauf fallen. Ab sofort ist es ein Teil des Desktops und die ursprüngliche Anwendung muss nicht mehr laufen damit es funktioniert.<br />
-Ein Rechtsklick auf ein Replikanten-Symbol öffnet ein Kontextmenü, um das <span class="menu">About</span> Fenster der ursprünglichen Anwendung anzuzeigen und zum Entfernen den Befehl <span class="menu">Remove Replicant</span>.</p>
-<div class="box-info">Sollte ein Replikant auf dem Desktop mal Schwierigkeiten machen und sich auch nicht mehr entfernen lassen, kann man die Datei <span class="path">~/config/settings/Tracker/tracker_shelf</span> löschen. Dadurch werden allerdings <i>alle</i> Replikanten vom Desktop entfernt.</div>
-<p>Beispiele replizierbarer Anwendungen sind die Anzeigen vom <a href="applications/activitymonitor.html">ActivityMonitor</a>, das <a href="workspaces.html">Workspaces Tool</a> oder <a href="applications/deskcalc.html">DeskCalc</a>.</p>
+Ein Rechtsklick auf ein Replikanten-Symbol öffnet ein Kontextmenü, um das <span class="menu">Über</span> Fenster der ursprünglichen Anwendung anzuzeigen und zum Entfernen den Befehl <span class="menu">Replikant entfernen</span>.</p>
+<div class="box-info">Sollte ein Replikant auf dem Desktop mal Schwierigkeiten machen und sich auch nicht mehr entfernen lassen, kann man die Datei <span class="path"><acronym title="~/config/settings/Tracker/tracker_shelf">~/Konfiguration/settings/Tracker/tracker_shelf</acronym></span> löschen. Dadurch werden allerdings <i>alle</i> Replikanten vom Desktop entfernt.</div>
+<p>Beispiele replizierbarer Anwendungen sind die Anzeigen vom <a href="applications/activitymonitor.html"><acronym title="ActivityMonitor">Systemmanager</acronym></a>, die <a href="workspaces.html"><acronym title="Workpaces Tool">Arbeitsflächen App</acronym></a> oder der <a href="applications/deskcalc.html"><acronym title="DeskCalc">Rechner</acronym></a>.</p>
 </div>
 </div>
 
@@ -123,7 +126,7 @@ Ein Rechtsklick auf ein Replikanten-Symbol öffnet ein Kontextmenü, um das <spa
 <div class="inner"><span>
  «  <a href="filesystem-layout.html">Dateisystem Layout</a> 
 ::  <a href="contents.html" class="uplink">Inhalt</a> 
-::  <a href="workspaces.html">Workspaces</a>  »
+::  <a href="workspaces.html"><acronym title="Workspaces">Arbeitsflächen</acronym></a>  »
 </span></div>
 </div>
 

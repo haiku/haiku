@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,6 +13,7 @@
  *		Finest Bug
  *		Matthias
  *		Humdinger
+ *		taos
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -40,6 +41,8 @@
 <li><a href="../../uk/preferences/screensaver.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/preferences/screensaver.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/preferences/screensaver.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/preferences/screensaver.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/preferences/screensaver.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/preferences/screensaver.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -51,33 +54,33 @@
 
 <div id="content">
 <div>
-<h2><img src="../../images/prefs-images/screensaver-icon_64.png" alt="screensaver-icon_64.png" width="64" height="64" />ScreenSaver</h2>
+<h2><img src="../../images/prefs-images/screensaver-icon_64.png" alt="screensaver-icon_64.png" width="64" height="64" /><acronym title="ScreenSaver">Bildschirmschoner</acronym></h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
-<tr><td>Ort:</td><td></td><td><span class="path">/boot/system/preferences/Screensaver</span></td></tr>
-<tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/ScreenSaver_settings</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu"><acronym title="Preferences">Einstellungen</acronym></span></td></tr>
+<tr><td>Ort:</td><td></td><td><span class="path"><acronym title="/boot/system/preferences/Screensaver">/boot/System/preferences/Bildschirmschoner</acronym></span></td></tr>
+<tr><td>Einstellungen:</td><td></td><td><span class="path"><acronym title="~/config/settings/ScreenSaver_settings">~/Konfiguration/settings/ScreenSaver_settings</acronym></span></td></tr>
 </table>
 
-<p>Das Fenster der ScreenSaver Einstellungen gliedert sich in zwei Reiter:</p>
+<p>Das Fenster der <acronym title="ScreenSaver">Bildschirmschoner</acronym> Einstellungen gliedert sich in zwei Reiter:</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="fade" id="fade">Fade</a></h2>
+<a name="fade" id="fade">Allgemein</a></h2>
 <img src="../images/prefs-images/screensaver-fade.png" alt="screensaver-fade.png" />
 <br />
 <p>Ganz oben wird der Bildschirmschoner aktiviert bzw. deaktiviert.<br />
 MIt dem Schieberegler darunter bestimmt man wie lange der Rechner ohne Benutzereingaben im Leerlauf verbringen darf, bis der Bildschirmschoner startet.</p>
-<p>Die nächsten beiden Schieberegler müssen erst aktiviert werden bevor sie benutzbar werden.<br />
+<p>Die nächsten beiden Schieberegler müssen erst aktiviert werden, bevor sie benutzbar werden.<br />
 Mit dem einen kann festgelegt werden wann der Bildschirm ausgeschaltet wird.<br />
 Mit dem anderen, wann ein Passwort benötigt wird um den Computer freizuschalten.</p>
-<p>Mit einem Klick in eine der Ecken des linken unteren Bildschirms kann dem System mitgeteilt werden, dass es den Bildschirmschoner sofort einschaltet wenn die Maus sich in der entsprechenden Ecke befindet. Im anderen Bildschirm wird die Ecke festgelegt in der der Bildschirmschoner geblockt wird. Um diese Funktion zu deaktivieren genügt ein Klick in die Mitte des jeweiligen Bildschirms.</p>
+<p>Mit einem Klick in eine der Ecken des linken unteren Bildschirms kann dem System mitgeteilt werden, dass es den Bildschirmschoner sofort einschaltet wenn die Maus sich in der entsprechenden Ecke befindet. Im anderen Bildschirm wird die Ecke festgelegt in der der Bildschirmschoner geblockt wird. Um diese Funktion zu deaktivieren, genügt ein Klick in die Mitte des jeweiligen Bildschirms.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="modules" id="modules">Modules</a></h2>
+<a name="screensavers" id="modules">Bildschirmschoner</a></h2>
 <img src="../images/prefs-images/screensaver-modules.png" alt="screensaver-modules.png" />
 <br />
-<p>Der zweite Reiter zeigt eine Liste aller installierten Bildschirmschoner mit ihren jeweiligen Einstellungen. Mittels <span class="button">Test</span> kann die aktuelle Einstellung getestet und per <span class="button">Add...</span> neue Bildschirmschoner hinzugefügt werden. Diese können auch einfach in die Liste hineingezogen werden, oder in den Ordner <span class="path">/boot/common/add-ons/screensavers/</span>, beziehungsweise <span class="path">/boot/home/config/add-ons/screensavers/</span> kopiert werden. Zum Unterschied zwischen diesen beiden Speicherorten siehe: <a href="../filesystem-layout.html">Dateisystem Layout</a>.</p>
+<p>Der zweite Reiter zeigt eine Liste aller installierten Bildschirmschoner mit ihren jeweiligen Einstellungen. Mittels <span class="button">Test</span> kann die aktuelle Einstellung getestet und per <span class="button">Hinzu...</span> neue Bildschirmschoner hinzugefügt werden. Diese können auch einfach in die Liste hineingezogen werden, oder in den Ordner <span class="path"><acronym title="/boot/common/add-ons/Screen Savers/">/boot/Allgemein/add-ons/Screen Savers/</acronym></span>, beziehungsweise <span class="path"><acronym title="/boot/home/config/add-ons/Screen Savers/">/boot/Benutzer/Konfiguration/add-ons/Screen Savers/</acronym></span> kopiert werden. Zum Unterschied zwischen diesen beiden Speicherorten siehe: <a href="../filesystem-layout.html">Dateisystem Layout</a>.</p>
 
 </div>
 </div>

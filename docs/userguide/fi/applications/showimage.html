@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2010-2011, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>ShowImage</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/fi.png" alt="" /> Suomi</li>
+<li><a href="../../fr/applications/showimage.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/showimage.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/showimage.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/showimage.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/showimage.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/showimage.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/showimage.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/showimage.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/showimage.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/showimage.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../sk/applications/showimage.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../en/applications/showimage.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="screenshot.html">Screenshot</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+::  <a href="soundrecorder.html">SoundRecorder</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+
+<h2><img src="../../images/apps-images/showimage-icon_64.png" alt="showimage-icon_64.png" width="64" height="64" />ShowImage</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><i>No entry, normally launched via
+double-clicking a supported file.</i></td></tr>
+<tr><td>Location:</td><td></td><td><span class="path">/boot/system/apps/ShowImage</span></td></tr>
+<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/ShowImage_settings</span></td></tr>
+</table>
+<p><br /></p>
+<p>ShowImage allows you to view images in all formats that are supported through <a href="../preferences/datatranslation.html">DataTranslators</a>. New formats are automatically recognized when their translator is added to the system. This has been done for Haiku's vector icon files, WonderBrush images or when WebP images became available, for example.<br />
+ShowImage provides minimal editing features to crop, rotate and flip images and to save them in another format.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Viewing</h2>
+<img src="../images/apps-images/showimage-view.jpg" alt="showimage-view.jpg" />
+<p>The <span class="menu">View</span> menu offers to start a <span class="menu">Slide show</span> of all images in a folder (or query result window) and set a <span class="menu">Slide delay</span> from 2 to 20 seconds.</p>
+<p>Other commands apply to the currently displayed image (without changing the size of the window):<br />
+<span class="menu">Original size</span> shows the image with a 100% zoom factor.<br />
+<span class="menu">Fit to window</span> shrinks the image back into the window fame, e.g. after having zoomed into it or after resizing the window.<br />
+<span class="menu">Zoom in</span> and <span class="menu">Zoom out</span> move into and out of the image in 10% steps. Zooming is also done with the mouse wheel; to pan an image bigger than the window, simply left-click and drag your mouse around.</p>
+<p>Two settings don't just apply to the currently displayed image and are remembered when browsing from one image to the next:<br />
+<span class="menu">High quality zooming</span> applies a very fast filter when zooming to reduce jagged lines and produce a smoother result.<br />
+<span class="menu">Stretch to window</span> will stretch smaller images to fill the current window frame.</p>
+<p>Then there's a <span class="menu">Full screen</span> mode with an option to <span class="menu">Show caption in full screen mode</span> which overlays the file name at the bottom of the image.</p>
+<p>Lastly, <span class="menu">Show tool bar</span> will show/hide the graphical controls:</p>
+<img src="../images/apps-images/showimage-toolbar.png" alt="showimage-toolbar.png" />
+<p>From left to right: Previous image, next image, start slide show (in full screen mode), selection mode, original size, fit to window, zoom in, zoom out.</p>
+<p>Most of the more often used commands are also available from a right-click context menu on the image. Convenient when in full-screen mode.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Browsing</h2>
+<img src="../images/apps-images/showimage-browse.jpg" alt="showimage-browse.jpg" />
+<p>After opening an image you can quickly browse through all the other images in its folder (or query result window) by pressing <span class="key">↑</span>/<span class="key">↓</span> or <span class="key">←</span>/<span class="key">→</span>. You can see the selection change accordingly in the Tracker window.</p>
+<p>There is a quick way to open the folder of the current image and even navigate to its parent and subfolders. It works just like with <a href="../tracker.html#drill-down">drill-down navigating</a> in Tracker by clicking in the info area in the status bar that shows size and format of the current image.</p>
+<p>Looking at the <span class="menu">Browse</span> menu, shows another type of browsing: Some image formats, like TIFF, can contain several pages in one file. Commands like <span class="menu">First page</span> and <span class="menu">Next page</span> let you navigate those pages.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Editing</h2>
+<img src="../images/apps-images/showimage-edit.jpg" alt="showimage-edit.jpg" />
+<p>The <span class="menu">Image</span> menu offers the few image manipulations necessary for an image viewer: rotating and flipping the image. Note however, that the actual image data won't be changed. Only an attribute is added to the file so it'll be shown rotated or flipped the next time you open it.</p>
+<p><span class="menu">Use as backgroud...</span> will open the <a href="../preferences/backgrounds.html">Backgrounds</a> preferences to set the current picture as image for your workspaces.</p>
+<p>Cropping is another feature that's needed sometimes. To define the frame to cut to, you can switch to <span class="menu">Selection mode</span> from the <span class="menu">Edit</span> menu and drag out a box with your left mouse button. If you don't want to change modes first, you can create this box in "normal mode" by simply holding <span class="key">CTRL</span> while left-click-dragging, which otherwise would just pan the image around.<br />
+<span class="menu">Clear selection</span> or <span class="key">ESC</span> will remove the selection box.</p>
+<p>The following chapter shows how to actually save the cropped area.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Saving and converting</h2>
+<p>To save or convert an image into any available format, you can invoke the normal <span class="menu">Save as...</span> item from the <span class="menu">File</span> menu, select the format and choose a file name.<br />
+Often quicker, especially when the Tracker window with the destination folder is already open, is using drag &amp; drop.</p>
+<img src="../images/apps-images/showimage-dnd.jpg" alt="showimage-dnd.jpg" />
+<p>This is also how the above mentioned cropping is finalized. Either select a frame as described above, or choose <span class="menu">Edit | Select all</span> for the whole image. Then drag &amp; drop the selection onto the Desktop or any Tracker window to create a new image clipping in the same format of the original image.</p>
+<p>To save in another file format, do the dragging with the right mouse button and choose a format from the context menu when dropping the image.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Keyboard shortcuts</h2>
+<p>Here's a list of the most useful shortcuts:</p>
+<table summary="keycombos" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="key">←</span> / <span class="key">↑</span></td><td style="width:15px;"></td><td>Previous image</td></tr>
+<tr><td><span class="key">→</span> / <span class="key">↓</span></td><td></td><td>Next image</td></tr>
+<tr><td><span class="key">DEL</span></td><td></td><td>Move to Trash</td></tr>
+<tr><td><span class="key">+</span></td><td></td><td>Zoom in</td></tr>
+<tr><td><span class="key">-</span></td><td></td><td>Zoom out</td></tr>
+<tr><td><span class="key">0</span></td><td></td><td>Original size (100% zoom)</td></tr>
+<tr><td><span class="key">1</span></td><td></td><td>Fit to window</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>Toggle full screen mode (also via doubleclick)</td></tr>
+<tr><td><span class="key">CTRL</span></td><td></td><td>While holding <span class="key">CTRL</span> you can create a selection frame without explicitly switching to selection mode.</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="screenshot.html">Screenshot</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+::  <a href="soundrecorder.html">SoundRecorder</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

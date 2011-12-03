@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -38,6 +38,8 @@
 <li><a href="../../jp/preferences/e-mail.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/preferences/e-mail.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../pt_PT/preferences/e-mail.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/preferences/e-mail.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/preferences/e-mail.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/preferences/e-mail.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -54,9 +56,10 @@
 <tr class="heading"><td>索引</td></tr>
 <tr class="index"><td>
 	<a href="#creating">新建邮箱账户</a><br />
-	<a href="#incoming">收件箱的设置</a><br />
-	<a href="#outgoing">发件箱的设置</a><br />
-	<a href="#filters">过滤器的设置</a><br />
+	<a href="#incoming">用户账户设置</a><br />
+	<a href="#outgoing">收件箱的设置</a><br />
+         <a href="#outgoing">发件箱的设置</a><br />
+	     <a href="#filters">过滤器的设置</a><br />
 	<a href="#settings">邮箱服务设置</a>
 </td></tr>
 </table>
@@ -77,39 +80,48 @@
 <p>让我们开始了解有关邮箱账户的设置过程。<br />
 您可以点击 <span class="button">Add</span> 按钮新建一个未命名账户。它将会打开一个用于填写有关您的账户信息的面板：</p>
 <img src="../images/prefs-images/e-mail-new-account.png" alt="e-mail-new-account.png" />
-<p>首先，声明<i>账户类型</i>：<span class="menu">Receive Mail Only</span> ，<span class="menu">Send Mail Only</span> ，或常用的 <span class="menu">Send and Receive Mail</span>。然后您需要设置如何接收邮件，<span class="menu">POP3</span> 或 <span class="menu">IMAP</span>。</p>
-<p>接下来，输入您的 <i>邮箱地址</i>，<i>登陆名</i> 和 <i>密码</i>；之后，给出您的 <i>账户名</i> 以及 <i>真实姓名</i>，它们将在Haiku中始终可见。</p>
-<p>如果您的账户来自于主要的电子邮箱提供商，Haiku已经知道了所有的技术细节，例如服务器IP地址，并且 下述信息已经被自动填写。如果不是这种情况，您只需要按照提示，填写邮箱账户的相应信息。</p>
+<p>首先，设置获取邮件的方式，通过 <span class="menu">POP3</span> 或者 <span class="menu">IMAP</span>。</p>
+<p>接下来，输入您的 <i>邮箱地址</i>，<i>登陆名</i> 和 <i>密码</i>；之后，给出您的 <i>账户名</i> 以及 <i>真实姓名</i>，它们将在 Haiku 中始终可见。</p>
+<p>如果您的账户来自于主要的电子邮箱提供商，Haiku 已经知道了所有的技术细节，例如服务器 IP 地址。反之，点击 <span class="button">下一步</span> 将会打开其他窗口，您需要手动输入这些信息：</p>
+<img src="../images/prefs-images/e-mail-new-account-2.png" alt="e-mail-new-account-2.png" />
+<p>首先您需要为接受邮件设置 <i>服务器名称</i>, <i>登陆类型</i> and <i>连接类型</i> ，之后是发送邮件的设置。您应该可以在您的邮箱提供商站点找到相关的信息。 <br />
+关于各种设置和附加选项的详细信息请参阅下文。</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="account-settings" name="account-settings">用户账户设置</a></h2>
+<p>通过选择左边列表中的账户名称，您可以修改一些基本设置：</p>
+<img src="../images/prefs-images/e-mail-settings.png" alt="e-mail-settings.png" />
+<p> <i>账户名称</i> 是用于在电子邮件首选项账户列表中显示的名称i。<i>真实名称</i> 是收件人收到您的邮件时看到的名称。<i>回复地址</i> 是某人回复您的邮件时使用的邮箱地址。通常它和您的发送邮箱地址相同。</p>
+<p>如果您希望使用一个邮箱账户仅用于发送或者接受邮件，您可以通过右键点击左侧列表中的邮箱账户，设置相应的选框来取消/激活该用法。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="incoming" name="incoming">收件箱的设置</a></h2>
-<p>点击您的账户名下的 <span class="menu">Incoming</span> 设置如何进行邮件的接收。</p>
+<p>点击您的账户名下的 <span class="menu">收件箱</span> 设置如何进行邮件的接收。</p>
 <img src="../images/prefs-images/e-mail-in.png" alt="e-mail-in.png" />
-<p>从弹出菜单中，选择您的提供商所使用的协议。目前支持的协议有 <span class="menu">IMAP</span> 和 <span class="menu">POP3</span> 。</p>
-<p>接下来是接收邮件的 <span class="menu">Mail Server</span> 地址。如果您的邮箱供应商需要登录特别端口，您需要将其添加到这里，并使用冒号隔开。例如：<tt>pop.your-provider.org:1400</tt> 。</p>
-<p>然后输入您的登录信息，<i>用户名</i> 及 <i>密码</i>，并且如果有必要，需要修改 <i>登录类型</i> ，从默认的 <span class="menu">Plain Text</span> 到 <span class="menu">APOP</span> 以便于认证。</p>
-<p>如果您使用 <i>POP3</i> 并且从不同的计算机上检索邮件，您可能需要激活 <span class="menu">Leave mail on server</span> 选项及本地的 <span class="menu">Remove mail from server when deleted</span> 。</p>
-<p>如果你你使用的是 <i>IMAP</i> ，您已经具有了本地的 <span class="menu">Remove mail from server when deleted</span> 选项。您可以指定 <span class="menu">Top Mailbox Folder</span> 和指定目录及其子目录同步。</p>
-<p> <span class="menu">New Mail Notification</span> 选项提供了不同方法来通知新邮件。您可以尝试不同的设置，找出最佳的选择。</p>
-<p>您可以修改收件箱的 <i>位置</i> （默认为：<span class="path">/boot/home/mail/in/</span>），如果您希望将不同账户的邮件放到各自的目录，它将非常有用。但是，查询也可以帮您处理的很好。</p>
-<p>在本页最后，您可以选择仅 <span class="menu">下载部分消息</span> ，即某些较大的消息的一部分。它将仅获取消息的头文，并且在查看部分消息及发件人之后，您可以选择是否要下载消息的其余部分及可能的附带文件。如果您的网速比较慢，它将非常有用。</p>
+<p>首先是用于接收邮件的 <span class="menu">邮件服务器</span> 地址。如果您的提供商要求您通过指定端口登陆，您可以将其添加到地址末端，以冒号隔开。例如， <tt>pop.your-provider.org:1400</tt>。</p>
+<p>然后输入您的登陆信息， <i>登录名称</i> 和 <i>密码</i>，并且如果有必要，修改默认的 <i>登陆类型</i>  <span class="menu">Plain text</span> 为 <span class="menu">APOP</span> 以便身份验证。</p>
+<p>如果您使用 <i>POP3</i> 并且从不同的计算机上检索邮件，您可能需要激活 <span class="menu">在服务器保留邮件</span> 选项及本地的 <span class="menu">删除时从服务器移除邮件</span> 。</p>
+<p>如果您使用的是 <i>IMAP</i> ，您已经具有了本地的 <span class="menu">删除时从服务器移除邮件</span> 选项。您可以指定 <span class="menu">IMAP 目录</span> 以用于和指定目录及其子目录同步。</p>
+<p>同时，您也可以指定仅 <span class="menu">下载部分消息</span>，大于某个存储空间的消息。这样将会仅下载消息头，而且您在查阅了标题和发送者之后，可以确定是否下载消息内容和附加内容。当您的网络连接速度比较慢是非常有用。 </p>
+<p>您可以修改收件箱的 <i>目标位置</i> （默认为：<span class="path">/boot/home/mail/in/</span>），如果您希望将不同账户的邮件放到各自的目录，它将非常有用。但是，查询也可以帮您处理的很好。</p>
+
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="outgoing" name="outgoing">发件箱的设置</a></h2>
-<p>点击您的账户名下面的 <span class="menu">Outgoing</span> 以设置邮件发送方式。</p>
+<p>点击您的账户名下面的 <span class="menu">发件箱</span> 以设置邮件发送方式。</p>
 <img src="../images/prefs-images/e-mail-out.png" alt="e-mail-out.png" />
-<p>与接收邮件类似，您可以修改您的发件箱的 <i>位置</i> （默认为：<span class="path">/boot/home/mail/out/</span>）。</p>
-<p>接下来是发送邮件的 <i>SMTP Server</i> 地址。与前面的接收服务器类似，如果需要，您可以使用指定端口，如：<tt>mail.your-provider.org:1200</tt> 。</p>
+<p>首先是发送邮件的 <i>SMTP 服务器</i> 地址。与前面的接收服务器类似，如果需要，您可以使用指定端口，如：<tt>mail.your-provider.org:1200</tt> 。</p>
 <p>如果您需要登录，您可以修改 <i>登录类型</i> 为 <span class="menu">ESMTP</span> ，然后输入上述的用户名和密码。其他类型用于需要您检查 <span class="menu">POP3 before SMTP</span> 邮件认证的供应商。</p>
+<p>与接收邮件类似，您可以修改发件箱的 <i>位置</i>（默认为：<span class="path">/boot/home/mail/out/</span>）。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="filters" name="filters">过滤器的设置</a></h2>
-<p>如果您希望过滤接收邮件，您需要点击账户名下的 <span class="menu">E-Mail Filters</span> 以设置自动排序。您可以添加任意数量的过滤器并加以应用。您也可以将其拖动重新排列位置。<br />
-
-除了用于向后兼容的 <span class="menu">R5 后台过滤器</span> ，还有两个其他的 <span class="menu">接收邮件过滤器</span> 可供添加。</p>
+<p>有关新邮件到达的通知，邮件排序和过滤的方法等内容位于账户名下的 <span class="menu">邮件过滤器</span>。您可以添加任意数量的过滤器，然后挨个使用，并且可以通过拖拽改变它们的位置。<br />
+目前，系统为您提供了三个 <span class="menu">收件箱过滤器</span> 。过滤器添加完成之后，您需要选中它，查看一下它的选项。</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -120,45 +132,66 @@
 您可以查看添加到邮件头部的排名。<br />
 
 同时，垃圾过滤器可以从所有的接收邮件中学习。当然，您必须检出被误认为垃圾邮件的负面邮件。您将会发现更多关于我们正在讨论的 <span class="app">Mail</span> 的信息。</p>
-<p>与下述的 <span class="menu">Match Header</span> 过滤器相结合，您将能够自动检出删除的垃圾邮件。 </p>
+<p>与下述的 <span class="menu">规则过滤器</span> 过滤器相结合，您将能够自动检出删除的垃圾邮件。 </p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-邮件头匹配</h3>
+规则过滤器</h3>
 <img src="../images/prefs-images/e-mail-filter-header.png" alt="e-mail-filter-header.png" />
-<p>过滤器将邮件头与搜索模式相匹配，并且当匹配时执行某些动作。<br />
-
-通过首个文本框，您可以指定所要校核的邮件头。有下列可选项：</p>
+<p>过滤器将邮件头与搜索模式相匹配，并且根据您设置的规则执行某些动作。<br />
+在第一个文本框内，您可以指定需要进行检查的邮件头。可选内容如下：</p>
 <table summary="match header" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><span class="menu">Name</span></td><td style="width:5px;"> </td>
+	<tr><td><span class="menu">名称</span></td><td style="width:5px;"> </td>
 		<td>发件人的名称</td></tr>
-	<tr><td><span class="menu">From</span></td><td> </td>
+	<tr><td><span class="menu">发件地址</span></td><td> </td>
 		<td>发件人邮箱地址</td></tr>
-	<tr><td><span class="menu">To</span></td><td> </td>
+	<tr><td><span class="menu">收件地址</span></td><td> </td>
 		<td>您的邮箱地址（由邮箱账户不同而不同）</td></tr>
-	<tr><td><span class="menu">Reply To</span></td><td> </td>
+	<tr><td><span class="menu">回复地址</span></td><td> </td>
 		<td>将要回复到的邮箱地址。</td></tr>
-	<tr><td><span class="menu">When</span></td><td> </td>
+	<tr><td><span class="menu">日期</span></td><td> </td>
 		<td>邮件接收的日期和时间。</td></tr>
-	<tr><td><span class="menu">Subject</span></td><td> </td>
+	<tr><td><span class="menu">主题</span></td><td> </td>
 		<td>主题</td></tr>
 	<tr><td><span class="menu">Cc</span></td><td> </td>
 		<td>抄送地址（Cc）</td></tr>
-	<tr><td><span class="menu">Account</span></td><td> </td>
+	<tr><td><span class="menu">账户</span></td><td> </td>
 		<td>邮箱账户名</td></tr>
-	<tr><td><span class="menu">Status</span></td><td> </td>
+	<tr><td><span class="menu">状态</span></td><td> </td>
 		<td>当前邮箱状态。通常为 "Read"，"Replied"，"Sent"，"Forwarded"，"New"，或者其他自定义的内容。但是，除非您在过滤器中做了修改，否则，当 Mail 服务获取邮件之后，它总是为 "New" 。</td></tr>
-	<tr><td><span class="menu">Priority</span></td><td> </td>
+	<tr><td><span class="menu">优先级</span></td><td> </td>
 		<td>由发件人的邮件程序设置（如，"urgent"）</td></tr>
 	<tr><td><span class="menu">Thread</span></td><td> </td>
 		<td>实质上与 "Subject" 相同，但是不附带如 "Re:" 或者  "Fwd:" 等内容。</td></tr>
 	<tr><td><span class="menu">Classification Group</span></td><td> </td>
 		<td>根据 垃圾邮件过滤器 对它的分类，可以为空（如果不确定）或者包含 "Genuine" 或 "Spam" 等。</td></tr>
-	<tr><td><span class="menu">Spam/Genuine Estimate</span></td><td> </td>
+	<tr><td class="onelinetop"><span class="menu">Spam/Genuine Estimate</span></td><td> </td>
 		<td>这是 垃圾邮件过滤器 赋给邮箱的估算数值。它们以科学记数法的形式表示，如 1.065e-12，其表达的意思为，1.065 除以 10 的 12次方，大小为 0.000000000001065 。</td></tr>
 </table>
 <p>第二个文本框放置您的搜索方式。它可以接受 <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression" rel="nofollow">正则表达式</a> ，这给了它巨大的灵活性，虽然可能会让事情变得复杂。仔细阅读有关内容，它非常值得，并且简单的搜索模式并没有 <i>那么</i> 复杂。</p>
 <p>通过其下的弹出菜单，您可以设置模式匹配时的动作。您可以移动或者删除邮件，设置 "Read" 或其他状态，或者设置执行回复的邮箱账户。</p>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+新邮件通知</h3>
+<img src="../images/prefs-images/e-mail-filter-notification.png" alt="e-mail-filter-notification.png" />
+<p>对于新邮件的通知，您有几种可供选择的方法。 在 <span class="menu">方法</span> 中，您可以找到多个选项可供选择：</p>
+<table summary="notofications" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><span class="menu">无</span></td><td style="width:5px;"> </td>
+		<td>没有通知</td></tr>
+	<tr><td><span class="menu">响铃</span></td><td> </td>
+		<td>为 <i>每个</i> 新邮件播放 <a href="sounds.html">声音</a> 首选项中“新邮件”事件的声音文件。</td></tr>
+	<tr><td><span class="menu">提醒</span></td><td> </td>
+		<td>为 <i>每个</i>新邮件显示一个提醒窗口。</td></tr>
+	<tr><td><span class="menu">键盘指示灯</span></td><td> </td>
+		<td>闪烁一些键盘指示灯，如， 大小写锁定 指示器。</td></tr>
+	<tr><td class="onelinetop"><span class="menu">中央警报</span></td><td> </td>
+		<td>为所有的新邮件显示 <i>一个</i> 提醒窗口。</td></tr>
+	<tr><td><span class="menu">中央响铃</span></td><td> </td>
+		<td>为新邮件播放 <i>一次</i> <a href="sounds.html">声音</a> 首选项中的“新邮件”事件的声音文件。</td></tr>
+	<tr><td><span class="menu">登陆窗口</span></td><td> </td>
+		<td>显示登陆窗口。</td></tr>
+</table>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -178,8 +211,17 @@
 <p> Mail 服务具有一个状态窗口，您可以将其设置为显示  <span class="menu">Never</span>，<span class="menu">While Sending</span>，<span class="menu">While Sending and Receiving</span> 或者 <span class="menu">Always</span> 。</p>
 <p>确保启用 <span class="menu">Start Mail Services on Startup</span> ，否则将会没有运行的 mail_daemon 来执行您的命令。</p>
 <img src="../images/prefs-images/e-mail-mailbox.png" alt="e-mail-mailbox.png" />
-<p><span class="menu">Edit Mailbox Menu...</span> 将会打开 <span class="path">/boot/home/config/Mail/Menu Links/</span> 目录。所有的目录或查询，以及放置于该目录中的链接将会呈现在 桌面栏托盘 中 Mail 服务 的邮箱图标的右键菜单中。 </p>
-<p>从该菜单中，您也可以 <span class="menu">Create New Message...</span>，<span class="menu">Check For Mail Now</span> 或者<span class="menu">Edit Preferences...</span> 。</p>
+<p><span class="menu">编辑邮箱菜单...</span> 将会打开 <span class="path">/boot/home/config/Mail/Menu Links/</span> 目录。所有的目录或查询，以及放置于该目录中的链接将会呈现在 桌面栏托盘 中 Mail 服务 的邮箱图标的右键菜单中。 </p>
+<p>从该菜单中，您也可以 <span class="menu">新建邮件...</span>，<span class="menu">马上查收邮件</span> 或者编辑 <span class="menu">首选项...</span> 。</p>
+<p>在打开右键菜单时按下 <span class="key">SHIFT</span> 按键，您将会获取附加的命令：</p>
+<table summary="notofications" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><span class="menu">仅检查邮件</span></td><td style="width:5px;"> </td>
+		<td>提供一个子菜单用于检查指定账户邮件。</td></tr>
+	<tr><td><span class="menu">发送挂起邮件</span></td><td> </td>
+		<td>允许您发送挂起邮件，而不进行新邮件的检查。</td></tr>
+	<tr><td><span class="menu">关闭邮件服务</span></td><td> </td>
+		<td>退出整个基本的邮件服务（mail_daemon）</td></tr>
+</table>
 <p>当其中有信封时，邮箱图标本身显示了是否有未读的消息（状态 "New"）。</p>
 
 </div>

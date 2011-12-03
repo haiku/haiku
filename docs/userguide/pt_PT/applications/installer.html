@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2009, Haiku. All rights reserved.
+ * Copyright 2009-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -36,6 +36,8 @@
 <li><a href="../../jp/applications/installer.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/applications/installer.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/applications/installer.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../fi/applications/installer.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/installer.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/applications/installer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -61,11 +63,7 @@ Upon launch it displays a start window with important information. It's not a mi
 <ul>
 <li><p>This is alpha-quality software. Make backups or suffer the consequences!</p></li>
 <li><p>The Installer needs a prepared partition. You may have to use a <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> or a similar tool until Haiku's DriveSetup is mature enough to handle this task.</p></li>
-<li><p>Haiku can be added manually to the bootmanager <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>. In short, you have add an entry to <span class="path">/boot/grub/menu.lst</span> of your Linux installation, similar to this:</p>
-<pre># Haiku on /dev/sda7
-title		Haiku
-rootnoverify	(hd0,6)
-chainloader	+1</pre></li>
+<li>Haiku can be added manually to the bootmanager <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>. How that is done exactly is available as an <a href="http://www.haiku-os.org/get-haiku/installation-guide">online guide</a>.</li>
 </ul>
 <p><br /><br /></p>
 <p>Once you acknowledged with <span class="button">Continue</span>, you're presented with the main window:</p>
@@ -79,11 +77,9 @@ The second pop-up menu specifies the target for the installation. This target pa
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tools" name="tools">Tools</a></h2>
 <p>At the end of the installation procedure, the partition is automatically made bootable. However, it can happen that some other operating system or partitioning tool (accidentally) overwrites the boot sector of your Haiku volume. In this case, boot your installation CD and start the Installer. Select your Haiku boot partition from the <span class="menu">Onto: Please choose target</span> menu and select <span class="menu">Write boot sector</span> from the <span class="menu">Tools</span> menu to make it bootable again.</p>
-<p>The other item in the <span class="menu">Tools</span> menu is the <span class="menu">Boot Manager</span> that puts a menu in the boot sector to choose what operating system to boot.<br />
-You don't need to run the <span class="app">Boot Manager</span> if you already use a bootmanager like Grub, in which case you have to add Haiku manually (see above), or Haiku runs exclusively on your machine.</p>
-<p>Boot Manager isn't yet tested very well and still has a few restrictions that it will complain about if they aren't met: the menu can only be installed on your first harddisk and there has to be a 2KiB space after the Master Boot Record (MBR).</p>
-<p>You don't have to worry too much, however, the original MBR is saved. In order to uninstall the boot menu, you'll just boot from the install CD again, run the Installer and invoke the Boot Manager once more.<br />
-The Boot Manager panel will guide you through installing or uninstalling the boot menu.</p>
+<p>The other item in the <span class="menu">Tools</span> menu is used to <span class="menu">Set up a boot menu</span> that puts a menu in the boot sector to choose what operating system to boot. See topic <a href="bootmanager.html">BootManager</a> for more information.<br />
+ You don't need to run the <span class="app">BootManager</span> if you already use a bootmanager like GRUB, in which case you have to add Haiku manually (see above), or Haiku runs exclusively on your machine.</p>
+
 
 </div>
 </div>

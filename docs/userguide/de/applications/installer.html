@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2009, Haiku. All rights reserved.
+ * Copyright 2009-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,6 +12,7 @@
  * Translators:
  *		Matthias
  *		Humdinger
+ *		taos
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -39,6 +40,8 @@
 <li><a href="../../uk/applications/installer.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/applications/installer.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/applications/installer.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/installer.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/installer.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/applications/installer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -53,8 +56,8 @@
 
 <h2><img src="../../images/apps-images/installer-icon_64.png" alt="installer-icon_64.png" width="64" height="64" />Installer</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
-<tr><td>Ort:</td><td></td><td><span class="path">/boot/system/apps/Installer</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu"><acronym title="Applications">Anwendungen</acronym></span></td></tr>
+<tr><td>Ort:</td><td></td><td><span class="path"><acronym title="/boot/system/apps/Installer">/boot/System/apps/Installer</acronym></span></td></tr>
 <tr><td>Einstellungen:</td><td></td><td><i>keine</i></td></tr>
 </table>
 <p><br /></p>
@@ -62,30 +65,24 @@
 Beim Start des Installer werden zunächst wichtige Informationen angezeigt. Es sind aber keine juristischen Formulierungen eines Endbenutzer-Lizenzvertrages (EULA), sondern tatsächlich wichtige Informationen, die lesenswert sind:</p>
 <ul>
 <li><p>Haiku ist noch im "Alpha"-Stadium. Es wird dringend angeraten, Sicherheitskopien von wichtigen Dateien zu machen; ein Datenverlust ist - obwohl nicht wahrscheinlich - nicht auszuschließen!</p></li>
-<li><p>Der Installer kann selbst noch keine neue Partition anlegen. Hierfür wird zusätzliche Software, wie die <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> benötigt. Erst wenn Haikus DriveSetup vollkommen sicher ist, wird es möglich sein, während der Installation die Partitionen zu ändern.</p></li>
-<li><p>Haiku kann zum Boot-Manager <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a> hinzugefügt werden. Hierzu ist in der Datei <span class="path">/boot/grub/menu.lst</span> ein weiterer Eintrag hinzuzufügen, der folgendermaßen aussieht (aber natürlich an die eigenen Gegebenheiten angepasst werden muss):</p>
-<pre># Haiku on /dev/sda7
-title		Haiku
-rootnoverify	(hd0,6)
-chainloader	+1</pre></li>
+<li><p>Der Installer kann selbst noch keine neue Partition anlegen. Hierfür wird zusätzliche Software, wie die <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> benötigt. Erst wenn Haikus <acronym title="DriveSetup">Datenträgerverwaltung</acronym> vollkommen sicher ist, wird es möglich sein, während der Installation die Partitionen zu ändern.</p></li>
+<li>Haiku kann zum Boot-Manager <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a> hinzugefügt werden. Wie das genau geht, wird in einer <a href="http://www.haiku-os.org/get-haiku/installation-guide">Online-Anleitung</a> (Englisch) beschrieben.</li>
 </ul>
 <p><br /><br /></p>
-<p>Nach Bestätigung der Informationen durch Drücken von <span class="button">Continue</span> erscheint dieses Fenster:</p>
+<p>Nach Bestätigung der Informationen durch Drücken von <span class="button">Weiter</span> erscheint dieses Fenster:</p>
 <img src="../images/apps-images/installer.png" alt="installer.png" />
 <p>Im ersten Auswahlmenü ist die Quelle der Installation zu wählen. Dies kann entweder ein bereits installiertes Haiku sein, oder ein explizites Installationsmedium, wie zum Beispiel die Haiku Alpha1-CD.<br />
 Das zweite Auswahlmenü bezeichnet das Ziel der Installation. Dieses Ziel, das bereits vor der dem Start von Installer existieren muss, wird durch die Installation vollständig überschrieben; eine nachträgliche Rettung von darin gespeicherten Daten ist nicht möglich.</p>
-<p>Durch einen Klick auf das Dreieck neben <i>Show Optional Packages</i> werden, so vorhanden, zusätzliche Programmpakete angeboten, die mitinstalliert werden können.</p>
-<p>Wie bereits erwähnt, wird die Zielpartition vollständig überschrieben. Man muss daher sicher sein, die richtige Partition gewählt zu haben. Über <span class="button">Setup partitions...</span> wird das Programm <a href="drivesetup.html">DriveSetup</a> aufgerufen, in dem man eine Übersicht über die Partitionen erhält.</p>
-<p>Mit Klick auf <span class="button">Begin</span> wird der eigentliche Installations-Prozess gestartet. Wie oben beschrieben, muss lediglich kopiert und nicht installiert werden. Wenn von einer bestehenden Haiku-Installation aus installiert wird, werden bis auf <span class="path">home/</span> and <span class="path">common/</span> alle Ordner übernommen und die Zielpartition startfähig gemacht.</p>
+<p>Durch einen Klick auf das Dreieck neben <i>Optionale Pakete einblenden</i> werden, so vorhanden, zusätzliche Programmpakete angeboten, die mitinstalliert werden können.</p>
+<p>Wie bereits erwähnt, wird die Zielpartition vollständig überschrieben. Man muss daher sicher sein, die richtige Partition gewählt zu haben. Über <span class="button">Partitionen einrichten...</span> wird das Programm <a href="drivesetup.html"><acronym title="DriveSetup">Datenträgerverwaltung</acronym></a> aufgerufen, in dem man eine Übersicht über die Partitionen erhält.</p>
+<p>Mit Klick auf <span class="button">Start</span> wird der eigentliche Installations-Prozess gestartet. Wie oben beschrieben, muss lediglich kopiert und nicht installiert werden. Wenn von einer bestehenden Haiku-Installation aus installiert wird, werden bis auf <span class="path"><acronym title="home/">Benutzer/</acronym></span> und <span class="path"><acronym title="common/">Allgemein/</acronym></span> alle Ordner übernommen und die Zielpartition startfähig gemacht.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tools" name="tools">Tools</a></h2>
-<p>Durch die Installation anderer Betriebssysteme kann es vorkommen, dass Haiku nicht mehr startfähig ist, weil der "Boot-Sektor" überschrieben wurde. In diesem Fall kann man von der Installations-CD booten und unter <span class="menu">Onto: Please choose target</span> die nicht mehr startfähige Haiku-Installation einstellen und aus dem <span class="menu">Tools</span> Menü mittels <span class="menu">Write boot sector</span> den vorherigen Zustand wieder herstellen.</p>
-<p>Daneben gibt es im <span class="menu">Tools</span> Menü noch den <span class="menu">Boot Manager</span>, der ein Menü in den Boot-Sektor schreibt, aus dem man das zu bootende Betriebssystem auswählen kann.<br />
-Der <span class="app">Boot Manager</span> wird nicht gebraucht, wenn man bereits einen Bootmanager wie Grub benutzt (siehe oben) oder Haiku als einziges Betriebssystem auf dem Rechner installiert ist.</p>
-<p>Der Boot Manager wurde noch nicht ausgiebig getestet und hat noch einige Beschränkungen, auf die er selbst hinweist, sollte man hineinlaufen: Das Bootmenü kann nur auf der ersten Festplatte installiert werden und nach dem Master Boot Record (MBR) muss noch mindestens 2 KiB Platz sein.</p>
-<p>Aber keine Sorge, der ursprüngliche MBR wird gesichert. Um das Bootmenü wieder zu entfernen, kann man von der Installations-CD booten, den Installer starten und nochmal den Boot Manager aufrufen.<br />
-Im Boot Manager wird man durch alle Schritte geführt, um das Bootmenü zu installieren oder zu deinstallieren.</p>
+<p>Durch die Installation anderer Betriebssysteme kann es vorkommen, dass Haiku nicht mehr startfähig ist, weil der "Boot-Sektor" überschrieben wurde. In diesem Fall kann man von der Installations-CD booten und unter <span class="menu">Nach: Bitte Ziellaufwerk auswählen</span> die nicht mehr startfähige Haiku-Installation einstellen und aus dem <span class="menu">Werkzeuge</span> Menü mittels <span class="menu">Bootsektor schreiben</span> den vorherigen Zustand wieder herstellen.</p>
+<p>Daneben kann im <span class="menu">Werkzeuge</span> Menü noch mit <span class="menu">Bootmenü einrichten</span> ein Menü in den Boot-Sektor geschrieben werden, aus dem das zu bootende Betriebssystem ausgewählt werden kann. Näheres dazu unter <a href="bootmanager.html"><acronym title="BootManager">Bootmanager</acronym></a>.<br />
+Der Haiku <span class="app"><acronym title="Boot Manager">Bootmanager</acronym></span> wird nicht gebraucht, wenn man bereits einen Bootmanager wie GRUB benutzt (siehe oben) oder Haiku als einziges Betriebssystem auf dem Rechner installiert ist.</p>
+
 
 </div>
 </div>

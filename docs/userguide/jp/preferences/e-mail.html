@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -38,6 +38,8 @@
 <li><a href="../../uk/preferences/e-mail.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/preferences/e-mail.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/preferences/e-mail.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/preferences/e-mail.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/preferences/e-mail.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/preferences/e-mail.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -49,23 +51,25 @@
 
 <div id="content">
 <div>
+<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>目次</td></tr>
+<tr class="heading"><td>インデックス</td></tr>
 <tr class="index"><td>
-	<a href="#creating">新しい電子メールアカウントの作成</a><br />
-	<a href="#incoming">受信の設定</a><br />
-	<a href="#outgoing">送信の設定</a><br />
-	<a href="#filters">電子メールフィルタの設定</a><br />
-	<a href="#settings">Mailサービスの設定</a>
+	<a href="#creating">Creating a new e-mail account</a><br />
+	<a href="#account-settings">Account settings</a><br />
+	<a href="#incoming">Setting up incoming e-mail</a><br />
+	<a href="#outgoing">Setting up outgoing e-mail</a><br />
+	<a href="#filters">Notifications and e-mail filters</a><br />
+	<a href="#settings">Setting up the Mail Service</a>
 </td></tr>
 </table>
 
 <h2><img src="../../images/prefs-images/e-mail-icon_64.png" alt="e-mail-icon_64.png" width="64" height="64" />電子メール</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbarメニュー:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
-<tr><td>場所:</td><td></td><td><span class="path">/boot/system/preferences/E-mail</span></td></tr>
-<tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/Mail/*</span></td></tr>
+<tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
+<tr><td>場所：</td><td></td><td><span class="path">/boot/system/preferences/E-mail</span></td></tr>
+<tr><td>設定ファイル：</td><td></td><td><span class="path">~/config/settings/Mail/*</span></td></tr>
 </table>
 <p>Haikuは、Mailサービス(mail_daemon)を通じ定期的に電子メールを取得して、メールごとに単一のテキストファイルに保存するシステムを提供します。システムはメールを解析して、差出人、宛先、題名、未読(既読)といった必要なすべてのヘッダ情報で属性を設定します。処理は直接あるいは各アプリケーションから要求できます。また、このシステムはすべてのデータと構成を保ちつつ電子メールクライアントを切り替えることを容易にします。<br />
 構成は電子メール設定パネルで行います。</p>
@@ -76,55 +80,64 @@
 <p>電子メールアカウントの設定手順を追っていきましょう。<br />
 新しく無名のアカウントを作るために、まず<span class="button">Add</span> ボタンをクリックします。すると、アカウント情報を入力するパネルが開きます:</p>
 <img src="../images/prefs-images/e-mail-new-account.png" alt="e-mail-new-account.png" />
-<p>初めに、 <i>Account Type</i>(アカウントの種類)を設定します。 <span class="menu">Receive Mail Only</span>(受信のみ)、 <span class="menu">Send Mail Only</span>(送信のみ)、最もよく使われる <span class="menu">Send and Receive Mail</span>(送受信)があります。 次に、メールを取得する方法として<span class="menu">POP3</span>か<span class="menu">IMAP</span>を選びます。</p>
+<p>First, you set how you get your mail, via <span class="menu">POP3</span> or <span class="menu">IMAP</span>.</p>
 <p>それから<i>E-mail Address</i>(電子メールアドレス)、 <i>Login Name</i>(ログイン名)、 <i>Password</i>(パスワード)を入力して、 Haiku内で用いられる<i>Account Name</i>(アカウント名)と<i>Real Name</i>(本名)も決めてください。</p>
-<p>メジャーな電子メールプロバイダを利用している場合、Haikuは既にサーバのIPアドレスのような技術項目をすべて保持しているので、他の情報は自動的に記入されます。それ以外の場合は、このガイドに従って先の電子メールアカウントの項目を埋めてください。</p>
+<p>If your account is from a major e-mail provider, Haiku already knows all technical details like server IP addresses. If that is not the case, clicking <span class="button">Next</span> will open another window to enter this information by hand:</p>
+<img src="../images/prefs-images/e-mail-new-account-2.png" alt="e-mail-new-account-2.png" />
+<p>You first set the <i>Server name</i>, <i>Login type</i> and <i>Connection type</i> for the incoming mail, below that for the outgoing mail. You should find the necessary information on your email provider's website.<br />
+See below for more info about the various settings and additional options.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="incoming" name="incoming">受信の設定</a></h2>
+<a id="account-settings" name="account-settings">Account settings</a></h2>
+<p>By selecting the name of an account in the left list, you can change some general settings:</p>
+<img src="../images/prefs-images/e-mail-settings.png" alt="e-mail-settings.png" />
+<p>The <i>Account name</i> is the name that's shown for example in the list of accounts in the E-mail preferences. <i>Real name</i> is the name someone sees when she gets mail from you. <i>Return address</i> is the email address that is used when someone replies to your mail. Normally that is the same address you've sent your email from.</p>
+<p>If you'd like to use an email account to only send or only receive email, you can de/activate that usage by right-clicking the account's name in the leftside list to set the checkmarks accordingly.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="incoming" name="incoming">More on setting up incoming e-mail</a></h2>
 <p>どのように電子メールを受信するか設定するには、アカウント名の下にある<span class="menu">Incoming</span>をクリックします。</p>
 <img src="../images/prefs-images/e-mail-in.png" alt="e-mail-in.png" />
-<p>ポップアップメニューからプロバイダーが利用するプロトコルを選びます。<span class="menu">IMAP</span>と<span class="menu">POP3</span>がサポートされています。</p>
-<p>次に受信するメールの<span class="menu">Mail Server</span>(メールサーバー)アドレスを設定します。もしプロバイダーが特別なポートにログインすることを要求する場合は、コロンで区切ってそのアドレスを追加してください。(例<tt>pop.your-provider.org:1400)</tt></p>
-<p>次に<i>Username</i>と<i>Password</i>を入力します。必要なら<i>Login Type</i>をデフォルトの<span class="menu">Plain Text</span>から認証付きの<span class="menu">APOP</span>に変更してください。</p>
+<p>First is the <span class="menu">Mail server</span> address for incoming mails. If your provider needs you to log into a specific port, you add that to the address, separated by a colon. For example, <tt>pop.your-provider.org:1400</tt>.</p>
+<p>Then you enter your login information, <i>Login name</i> and <i>Password</i>, and if necessary change the <i>Login type</i> from the default <span class="menu">Plain text</span> to <span class="menu">APOP</span> for authentication.</p>
 <p>もしあなたが<i>POP3</i>を使っていて、このアカウントのメールを複数のコンピューターで取得するなら、<span class="menu">Leave mail on server</span>オプションを有効にして、ローカルのみで<span class="menu">Remove mail from server when deleted</span>を行うとよいでしょう。</p>
-<p>もし代わりに<i>IMAP</i>を使っているならば、<span class="menu">Remove mail from server when deleted</span> locallyオプションが利用できます。また、同期するフォルダを<span class="menu">Top Mailbox Folder</span>(最上層の受信箱フォルダ)から指定したフォルダとそのサブフォルダに変更できます。</p>
-<p><span class="menu">New Mail Notification</span>はいくつかの新着メールの通知方法を提供します。設定を試して最適な方法を見つけましょう。</p>
-<p>アカウントによってメールを分けたい場合、受信箱の<i>Location</i>(場所)を変更することができます。(デフォルト: <span class="path">/boot/home/mail/in/</span>)
-クエリでも同様の整理が可能です。 </p>
-<p>最後に、指定したサイズより大きいメールについて、<span class="menu">Partially download messages</span>(部分的にメッセージをダウンロード)するよう設定することもできます。これはヘッダのみを取得するので、題名と差出人を見た後でメッセージの続きと有効な添付ファイルをダウンロードするか決めることができます。低速な接続回線を利用している場合に便利です。</p>
+<p>If you use <i>IMAP</i> instead, you have the option to <span class="menu">Remove mail from server when deleted</span> locally. You can specify <span class="menu">IMAP folders</span> to only synchronize with a specific folder and its subfolders.</p>
+<p>Also, you can opt to only <span class="menu">Partially download messages larger than</span> a certain size. This will only get the header and you can decide if you want to download the rest of the message plus possible attachments after seeing the subject and who sent it. Useful if you have a slow connection.</p>
+<p>You can change the <i>Destination</i> of your inbox (default: <span class="path">/boot/home/mail/in/</span>), which is useful if you'd like to separate the mails from different accounts into their own folders. However, queries let you sort things out just as well.</p>
+
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="outgoing" name="outgoing">送信の設定</a></h2>
+<a id="outgoing" name="outgoing">More on setting up outgoing e-mail</a></h2>
 <p>どのように電子メールを送信するか設定するには、アカウント名の下にある<span class="menu">Outgoing</span>をクリックします。</p>
 <img src="../images/prefs-images/e-mail-out.png" alt="e-mail-out.png" />
-<p>受信メールと同様に、送信箱の<i>Location</i>(場所)を変更できます。(デフォルト: <span class="path">/boot/home/mail/out/</span>)</p>
-<p>次に送信するメールの<i>SMTP Server</i>(SMTPサーバー)アドレスを設定します。送信サーバのと同様、必要に応じてポートを指定することができます。(例<tt>mail.your-provider.org:1200</tt>)</p>
+<p>First is the <i>SMTP server</i> address for outgoing mails. As with the incoming server before, you can use a specific port if needed, e.g. <tt>mail.your-provider.org:1200</tt>.</p>
 <p>ログインする必要があれば、<i>Login Type</i>(ログインの種類)を<span class="menu">ESMTP</span>に変更しユーザー名とパスワードを入力します。 もうひとつは、プロバイダーがメール確認時に認証のため<span class="menu">POP3 before SMTP</span>を要求する場合に用いられます。</p>
+<p>As with incoming mail, you can also change the <i>Destination</i> of your outbox (default: <span class="path">/boot/home/mail/out/</span>).</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="filters" name="filters">電子メールフィルタの設定</a></h2>
-<p>受信するメールにフィルタを適用するには、自動処理のためにアカウント名の下にある<span class="menu">E-Mail Filters</span>をクリックします。複数のフィルタを追加して順に適用できます。順番はそれらを新しい位置にドラッグ&amp;ドロップすることで並べ替えることができます。<br />
-後方互換を実現するための<span class="menu">R5 Daemon Filter</span>に加え、2つの異なった<span class="menu">Incoming Mail Filters</span>(受信メールフィルタ)が追加可能です。</p>
+<a id="filters" name="filters">Notifications and other e-mail filters</a></h2>
+<p>Notifications for newly arrived email and methods to sort and filter emails are found in <span class="menu">E-Mail filters</span> under an account's name. You can add any number of filters that are applied one after the other and rearrange them by drag&amp;dropping them to their new position.<br />
+Currently there are three <span class="menu">Incoming mail filters</span> you can add. After adding a filter, you have to select it to see its options.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Spamフィルタ</h3>
+Spam filter (AGMS Bayesian)</h3>
 <img src="../images/prefs-images/e-mail-filter-spam.png" alt="e-mail-filter-spam.png" />
 <p>スパムフィルタは不要なスパムの判定に統計的手法を利用します。メールには0から1の評価値が付与され、ユーザーはスパムと通常のメールとの境界値を決めることができます。<br />
 評価値を受信メールの題名の先頭に追加することが可能です。<br />
 また、スパムフィルタはすべての受信メールから学習することができます。もちろん、誤ってスパム判定されている偽陽性のメールを仕分けて、スパムフィルタに学習させなくてはいけません。<span class="app">Mail</span>(メール)アプリケーションについての説明で詳しく知ることができるでしょう。</p>
-<p><span class="menu">Match Header</span> (マッチヘッダ)フィルタと併用することで、検出されたスパムメールを自動的に整理できます。</p>
+<p>Together with the following <span class="menu">Rule filter</span>, you're able to automatically sort out detected spam mails.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-マッチヘッダ</h3>
+Rule filter</h3>
 <img src="../images/prefs-images/e-mail-filter-header.png" alt="e-mail-filter-header.png" />
-<p>このフィルタはヘッダと検索パターンを比較し、一致した際に処理を行います。<br />
-最初のテキストフィールドには対象のヘッダを指定します。以下のヘッダが指定できます:</p>
+<p>This filter compares the mail header to a search pattern and performs some action according to the rules you set up.<br />
+ With the first text field you specify which header to check against. These are available:</p>
 <table summary="match header" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><span class="menu">Name</span></td><td style="width:5px;"> </td>
 		<td>差出人の名前</td></tr>
@@ -150,11 +163,33 @@ Spamフィルタ</h3>
 		<td>基本的に"Subject"と同じですが、Re:やFwd:といった文字列が除かれます。</td></tr>
 	<tr><td><span class="menu">Classification Group</span>(分類グループ)</td><td> </td>
 		<td>スパムフィルタの判定に依存して、空白(不確かな場合)か、あるいは"Genue(本物)"か"Spam(スパム)"の文字列を含みます。</td></tr>
-	<tr><td><span class="menu">Spam/Genuine Estimate</span>(評価値)</td><td> </td>
+	<tr><td class="onelinetop"><span class="menu">Spam/Genuine Estimate</span>(評価値)</td><td> </td>
 		<td>これはスパムフィルタが電子メールに付加する評価の数値です。これは科学的な記法で表記され、例えば1.065e-12は1.065を10の12乗で割った0.000000000001065を意味します。</td></tr>
 </table>
 <p>2番目のテキストフィールドには検索パターンを入力します。ここでは<a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression" rel="nofollow">regular expression(正規表現)</a>が利用可能で、多少複雑になる場合があるものの高い柔軟性を提供しています。 リンク先を少し読めば、正規表現を利用する価値が充分にあり、また単純な検索パターンに関してはまったく複雑にならないことが分かるでしょう。</p>
 <p>その下のポップアップメニューで、パターンが一致した際の処理を選択します。メールの移動や削除、"Read(既読)"などメールのステータス変更、返信に用いる電子メールアドレスの設定ができます。</p>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+New mails notification</h3>
+<img src="../images/prefs-images/e-mail-filter-notification.png" alt="e-mail-filter-notification.png" />
+<p>There are several ways you can choose to be notified of newly arrived email. Under <span class="menu">Method</span> you find a number of options that can be combined as well:</p>
+<table summary="notofications" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><span class="menu">none</span></td><td style="width:5px;"> </td>
+		<td>No notification</td></tr>
+	<tr><td><span class="menu">Beep</span></td><td> </td>
+		<td>Plays the sound file of the "New E-mail" event set in the <a href="sounds.html">Sounds</a> preferences for <i>every</i> new email</td></tr>
+	<tr><td><span class="menu">Alert</span></td><td> </td>
+		<td>Shows an alert window for <i>every</i> new email</td></tr>
+	<tr><td><span class="menu">Keyboard LEDs</span></td><td> </td>
+		<td>Blinks some LEDs like the caps-lock indicator</td></tr>
+	<tr><td class="onelinetop"><span class="menu">Central alert</span></td><td> </td>
+		<td>Shows <i>one</i> alert window for all new mails</td></tr>
+	<tr><td><span class="menu">Central beep</span></td><td> </td>
+		<td>Plays the sound file of the "New E-mail" event set in the <a href="sounds.html">Sounds</a> preferences <i>once</i> for new mail</td></tr>
+	<tr><td><span class="menu">Log window</span></td><td> </td>
+		<td>Shows the log window</td></tr>
+</table>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -173,7 +208,16 @@ Spamフィルタ</h3>
 <p><span class="menu">Start Mail Services on Startup</span>が無効だと処理を実行するmail_daemonが起動していないので、有効であるかしっかり確かめてください。</p>
 <img src="../images/prefs-images/e-mail-mailbox.png" alt="e-mail-mailbox.png" />
 <p><span class="menu">Edit Mailbox Menu...</span>は<span class="path">/boot/home/config/Mail/Menu Links/</span>フォルダを開きます。この中に格納されたすべてのフォルダやクエリ、またそれらのリンクが、デスク箱トレイのMailサービスにあるメールボックスアイコンのコンテキストメニューに表示されます。</p>
-<p>メニューからは、<span class="menu">Create New Message...</span>、<span class="menu">Check For Mail Now</span> 、<span class="menu">Edit Preferences...</span>といった操作ができます。</p>
+<p>From that menu, you can also <span class="menu">Create new message...</span>, <span class="menu">Check for mail now</span> or edit <span class="menu">Preferences...</span>.</p>
+<p>If you hold down <span class="key">SHIFT</span> when invoking the context menu, you'll get additional commands:</p>
+<table summary="notofications" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><span class="menu">Check for mails only</span></td><td style="width:5px;"> </td>
+		<td>Offers a submenu to check only one specific account</td></tr>
+	<tr><td><span class="menu">Send pending mails</span></td><td> </td>
+		<td>Allows you to send pending mails without also checking for new mails</td></tr>
+	<tr><td><span class="menu">Shutdown mail services</span></td><td> </td>
+		<td>Quits the whole email infrastructure (mail_daemon)</td></tr>
+</table>
 <p>メール箱アイコンは、未読メッセージ("New(新規)"ステータス)がある場合に中に封筒マークを表示します。</p>
 
 </div>

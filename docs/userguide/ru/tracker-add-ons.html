@@ -40,6 +40,8 @@
 <li><a href="../uk/tracker-add-ons.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../zh_CN/tracker-add-ons.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../pt_PT/tracker-add-ons.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/tracker-add-ons.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/tracker-add-ons.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../en/tracker-add-ons.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -51,18 +53,19 @@
 
 <div id="content">
 <div>
+<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <h1>Дополнения для Tracker (Tracker add-ons)</h1>
 
 <p>Некоторые приложения устанавливают дополнения (<span class="menu">Add-ons</span>), и они могут быть легко вызваны для выбранных файлов в Tracker. В контекстном меню отображаются только те дополнения, которые применимы для выделенного файла (определяются по идентификатору типа), также их можно вызвать через меню File окна Tracker. Некоторые дополнения не обязательно нуждаются в файле для работы и присутствуют в меню всегда.</p>
 <p>Дополнения Tracker или ссылки на программы, которые могут действовать как дополнения, могут быть установлены в трех различных местоположениях (подробнее см. <a href="filesystem-layout.html">Иерархия файловой системы</a>):</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/system/add-ons/Tracker/</span></td><td>   </td><td>для дополнений, поставляемых с системой.</td></tr>
+<tr><td><span class="path">/boot/system/add-ons/Tracker/</span></td><td>   </td><td>для дополнений, поставляемых с системой.</td></tr>
 <tr><td><span class="path">/boot/common/add-ons/Tracker/</span></td><td>   </td><td>для дополнений, доступных всем пользователям.</td></tr>
 <tr><td><span class="path">/boot/home/config/add-ons/Tracker/</span></td><td>   </td><td>для дополнений, доступных только текущему пользователю.</td></tr>
 </table>
-<p>К имени файла дополнения может быть добавлено тире с заглавной буквой, и тогда оно станет доступно через горячие клавиши. Например, <span class="app">Open target folder-T (Открыть целевую папку)</span> откроется при нажатии <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">T</span>.<br />
-Конечно, вы должны позаботиться о возможных конфликтах, выбирая горячую клавишу. У разных дополнений они должны быть разными.</p>
+<p>The file name of an add-on can be suffixed with a dash and capital letter, and is then available via keyboard shortcut. For example, <span class="app">Open Target Folder-O</span> opens with <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">O</span>.<br />
+Of course, you have to take care of possible shortcut collisions when deciding on a shortcut. You can't have the same for different add-ons.</p>
 
 <h2><a id="system-add-ons" name="system-add-ons">Дополнения Tracker из Haiku</a></h2>
 <p>Следующие дополнения Tracker имеются в каждой установленной Haiku:</p>

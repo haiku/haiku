@@ -13,6 +13,7 @@
  *		Finest Bug
  *		Matthias
  *		Humdinger
+ *		taos
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -40,6 +41,8 @@
 <li><a href="../../uk/applications/terminal.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/applications/terminal.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/applications/terminal.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/terminal.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/terminal.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/applications/terminal.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -54,11 +57,11 @@
 
 <h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Terminal</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
-<tr><td>Ort:</td><td></td><td><span class="path">/boot/system/apps/Terminal</span></td></tr>
-<tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/Terminal</span><br />
-<span class="path">~/.profile</span> - ergänzen/ändern von Standardwerten, die in <span class="path">/boot/common/etc/profile</span> definiert sind<br />
-<span class="path">~/.inputrc</span> - ergänzen/ändern von Standardwerten, die in <span class="path">/boot/common/etc/inputrc</span> definiert sind</td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu"><acronym title="Applications">Anwendungen</acronym></span></td></tr>
+<tr><td>Ort:</td><td></td><td><span class="path"><acronym title="/boot/system/apps/Terminal">/boot/System/apps/Terminal</acronym></span></td></tr>
+<tr><td>Einstellungen:</td><td></td><td><span class="path"><acronym title="~/config/settings/Terminal">~/Konfiguration/settings/Terminal</acronym></span><br />
+<span class="path">~/.profile</span> - ergänzen/ändern von Standardwerten, die in <span class="path"><acronym title="/boot/common/etc/profile">/boot/Allgemein/etc/profile</acronym></span> definiert sind<br />
+<span class="path">~/.inputrc</span> - ergänzen/ändern von Standardwerten, die in <span class="path"><acronym title="/boot/common/etc/inputrc">/boot/Allgemein/etc/inputrc</acronym></span> definiert sind</td></tr>
 </table>
 <p><br /></p>
 <p>Das Terminal ist Haikus Schnittstelle zur Bash, der "Bourne Again Shell".</p>
@@ -74,8 +77,8 @@
 Als Standard, <tt>%1d: %p</tt>, zeigt ein Reiter den aktuellen Ordner und per <tt>:</tt> davon getrennt, den Namen des gerade laufenden Prozesses (oder <tt>--</tt> wenn nur die Bash selbst läuft, wahrscheinlich im Leerlauf wartend). Der obige Screenshot zeigt den ersten Reiter mit einer FTP-Sitzung im <span class="path">Desktop</span> Ordner und einen zweiten Reiter im Leerlauf im <span class="path">home</span> Ordner.<br />
 Mittels <span class="menu">Bearbeiten | Fenstertitel...</span> kann der Fenstertitel des Terminals auf ähnliche Weise definiert werden.</p>
 <p>Ein Rechtsklick auf einen Reiter öffnet ein Kontextmenü, um <span class="menu">Reiter schließen</span> oder <span class="menu">Andere Reiter schließen</span> oder wie durch Doppelklick <span class="menu">Reiter umbenennen...</span> zu können.</p>
-<p>Ein Terminal-Fenster kann wie jedes andere Programmfenster in seiner Größe verändert werden. Es sind auch vorgegebene Einstellungen unter <span class="menu">Settings | Window Size</span> vorhanden. Mittels <span class="key">ALT</span> <span class="key">RETURN</span> kann in den Vollbildmodus (und zurück) geschaltet werden.</p>
-<p>Geänderte Fenstergröße und Text-Kodierung werden nur behalten, wenn sie mit dem Menüpunkt <span class="menu">Settings | Save as default</span> als Voreinstellung gespeichert werden.</p>
+<p>Ein Terminal-Fenster kann wie jedes andere Programmfenster in seiner Größe verändert werden. Es sind auch vorgegebene Einstellungen unter <span class="menu">Einstellungen | Fenstergröße</span> vorhanden. Mittels <span class="key">ALT</span> <span class="key">RETURN</span> kann in den Vollbildmodus (und zurück) geschaltet werden.</p>
+<p>Geänderte Fenstergröße und Text-Kodierung werden nur behalten, wenn sie mit dem Menüpunkt <span class="menu">Einstellungen | Als Standard speichern</span> als Voreinstellung gespeichert werden.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="settings" name="settings">Einstellungen</a></h2>
@@ -96,7 +99,7 @@ Unterschiedliche Einstellungen lassen sich in getrennten Profilen speichern, die
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="customization" name="customization">Personalisierung der Bash</a></h2>
 <p>Da die Bash aus der Unix-Welt stammt, gibt es unzählige Möglichkeiten sie anzupassen. Zwei davon sind für den Anwender besonders interessant: <span class="cli">.profile</span> und <span class="cli">.inputrc</span><br />
-Werden diese beiden Dateien im <span class="path">home/</span> Verzeichnis angelegt, erweiteren oder ersetzen die Standardwerte, die in <span class="path">/boot/common/etc/</span> festgelegt sind, </p>
+Werden diese beiden Dateien im <span class="path"><acronym title="home/">Benutzer/</acronym></span> Verzeichnis angelegt, erweiteren oder ersetzen die Standardwerte, die in <span class="path"><acronym title="/boot/common/etc/">/boot/Allgemein/etc/</acronym></span> festgelegt sind, </p>
 
 <h3>.profile</h3>
 <p>Die Datei <span class="cli">.profile</span> wird jedes Mal geladen, wenn ein neues Terminal gestartet wird. Durch sie werden die verschiedensten Variablen und Verhalten innerhalb der Bash definiert. Im Internet findet man eine Unmenge an Dokumentation, die alle Möglichkeiten im Detail zeigt.</p>
@@ -117,11 +120,11 @@ Werden diese beiden Dateien im <span class="path">home/</span> Verzeichnis angel
 <a id="hints" name="hints">Tipps für das Arbeiten mit dem Terminal</a></h2>
 <ul><li><p>Wird eine Datei aus einem Tracker-Fenster ins Terminal gezogen, so wird der Pfad zu dieser Datei an der aktuellen Cursor-Position eingefügt. Wird sie mittels der rechten Maustaste hineingezogen, gibt es mehrere Möglichkeiten zur Auswahl:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Insert Path</span></td><td> </td><td>Fügt den Pfad zu dieser Datei ein.</td></tr>
-<tr><td><span class="menu">Change Directory</span></td><td> </td><td>Wechselt im Terminal zum Verzeichnis der Datei.</td></tr>
-<tr><td><span class="menu">Create Link Here</span></td><td> </td><td>Im aktuellen Verzeichnis des Terminals wird eine Verknüpfung zu dieser Datei erstellt.</td></tr>
-<tr><td><span class="menu">Move Here</span></td><td> </td><td>Verschiebt die Datei in das aktuelle Verzeichnis im Terminal.</td></tr>
-<tr><td><span class="menu">Copy Here</span></td><td> </td><td>Kopiert die Datei in das aktuelle Verzeichnis im Terminal.</td></tr>
+<tr><td><span class="menu">Pfad einfügen</span></td><td> </td><td>Fügt den Pfad zu dieser Datei ein.</td></tr>
+<tr><td><span class="menu">Zum Ordner wechseln</span></td><td> </td><td>Wechselt im Terminal zum Verzeichnis der Datei.</td></tr>
+<tr><td><span class="menu">Verknüpfung hier erstellen</span></td><td> </td><td>Im aktuellen Verzeichnis des Terminals wird eine Verknüpfung zu dieser Datei erstellt.</td></tr>
+<tr><td><span class="menu">Hierher verschieben</span></td><td> </td><td>Verschiebt die Datei in das aktuelle Verzeichnis im Terminal.</td></tr>
+<tr><td><span class="menu">Hierher kopieren</span></td><td> </td><td>Kopiert die Datei in das aktuelle Verzeichnis im Terminal.</td></tr>
 </table></li>
 <li><p>Vom Terminal aus kann auch jede Datei mit ihrem bevorzugten Programm gestartet werden. Der Befehl hierfür ist <span class="cli">open <i>[Dateiname]</i></span>. Dies funktioniert auch mit den Repräsentanten für das aktuelle ("<span class="cli">.</span>") und übergeordnete ("<span class="cli">..</span>") Verzeichnis. Um also ein Tracker-Fenster mit dem aktuellen Verzeichnis zu öffnen wäre dies einzugeben: </p>
 <pre class="terminal">open .</pre>

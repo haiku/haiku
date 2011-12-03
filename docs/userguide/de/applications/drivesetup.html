@@ -12,6 +12,7 @@
  * Translators:
  *		Matthias
  *		Humdinger
+ *		taos
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -39,6 +40,8 @@
 <li><a href="../../uk/applications/drivesetup.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/applications/drivesetup.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/applications/drivesetup.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/drivesetup.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/drivesetup.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/applications/drivesetup.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -51,33 +54,33 @@
 <div id="content">
 <div>
 
-<h2><img src="../../images/apps-images/drivesetup-icon_64.png" alt="drivesetup-icon_64.png" width="64" height="64" />DriveSetup</h2>
+<h2><img src="../../images/apps-images/drivesetup-icon_64.png" alt="drivesetup-icon_64.png" width="64" height="64" /><acronym title="DriveSetup">Datenträgerverwaltung</acronym></h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
-<tr><td>Ort:</td><td></td><td><span class="path">/boot/system/apps/DriveSetup</span></td></tr>
-<tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/DriveSetup</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu"><acronym title="Applications">Anwendungen</acronym></span></td></tr>
+<tr><td>Ort:</td><td></td><td><span class="path"><acronym title="/boot/system/apps/DriveSetup">/boot/System/apps/Datenträgerverwaltung</acronym></span></td></tr>
+<tr><td>Einstellungen:</td><td></td><td><span class="path"><acronym title="~/config/settings/DriveSetup">~/Konfiguration/settings/DriveSetup</acronym></span></td></tr>
 </table>
 <p><br /></p>
-<p>DriveSetup ist ein Programm zum Erstellen, Löschen und Initialisieren von Partitionen. Aktuell ist es noch nicht möglich, bestehende Partitionen zu verschieben oder in ihrer Größe zu verändern. Man benötigt also entweder Platz auf einem unpartitionierte Teil einer Disk (vielleicht ein USB Laufwerk oder eine zweite Festplatte) oder man muss auf externe Werkzeuge, wie der 
+<p><acronym title="DriveSetup">Datenträgerverwaltung</acronym> ist ein Programm zum Erstellen, Löschen und Initialisieren von Partitionen. Aktuell ist es noch nicht möglich, bestehende Partitionen zu verschieben oder in ihrer Größe zu verändern. Man benötigt also entweder Platz auf einem unpartitionierte Teil einer Disk (vielleicht ein USB Laufwerk oder eine zweite Festplatte) oder man muss auf externe Werkzeuge, wie der 
 <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> zurückgreifen.</p>
 <img src="../images/apps-images/drivesetup.png" alt="drivesetup.png" />
 <p>Oben ist die Partitionierung des unten ausgewählten Datenträgers graphisch dargestellt. Neben maximal vier Primären Partitionen, kann jede von ihnen eine Anzahl von erweiterten/logischen Partitionen enthalten. Über das + / - Symbol können derart "versteckte" Partitionen auf- und eingeklappt werden.</p>
 <p>Die ausgewählte Partition kann über die Befehle im Menü <span class="menu">Partition</span> oder mit der Tastenkombination <span class="key">ALT</span> <span class="key">M</span>, beziehungsweise <span class="key">ALT</span> <span class="key">U</span> in das System eingebunden oder ausgehängt werden.</p>
-<p>Mit <span class="menu">Partition | Delete</span> kann eine Partition auch komplett gelöscht werden.<br /></p>
+<p>Mit <span class="menu">Partition | Löschen</span> kann eine Partition auch komplett gelöscht werden.<br /></p>
 <div class="box-stop">Mit Partitionen zu arbeiten, insbesondere sie zu initialisieren, erstellen oder zu löschen ist höchst gefährlich. Ein unbedachter Klick, eine falsch ausgewählte Partition und gespeicherte Daten sind unwiederbringlich verloren! Es bietet sich an, sicherheitshalber alles zweimal zu überprüfen und eine aktuelle Sicherheitskopie wichtiger Daten parat zu haben.</div>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="creating" name="creating">Eine neue Partition erstellen</a></h2>
 <div class="box-info">Wenn man einen Datenträger mit nur einer Partition komplett ausfüllen möchte, beispielsweise bei einem USB-Stick oder einer Speicherkarte, kann man direkt mit <a href="#initializing">Initialisierung</a> anfangen.</div>
-<p>Wenn auf einem Datenträger ein unformatierter Bereich existiert, wie der Bereich <tt>&lt;empty&gt;</tt> im obigen Bild, kann man hierin mit <span class="menu">Partition | Create...</span> (<span class="key">ALT</span> <span class="key">C</span>) eine neue Partition anlegen.</p>
+<p>Wenn auf einem Datenträger ein unformatierter Bereich existiert, wie der Bereich <tt>&lt;leer&gt;</tt> im obigen Bild, kann man hierin mit <span class="menu">Partition | Anlegen...</span> (<span class="key">ALT</span> <span class="key">C</span>) eine neue Partition anlegen.</p>
 <img src="../images/apps-images/drivesetup-create.png" alt="drivesetup-create.png" />
 <p>Es erscheint ein Dialog um Partitionsgröße und -typ einzustellen. Für eine Haiku-Installation wäre <span class="menu">Be File System</span> zu wählen. Ebenso, wenn man all die interessanten Haiku Feature, wie Attribute und Queries, nutzen will. Man bedenke jedoch, dass andere Betriebssysteme auf so eine Partition eventuell nicht zugreifen können.</p>
-<p>Bei der Erstellung einer primären Partition - im Gegensatz zu einer erweiterten/logischen Partition innerhalb einer solchen Primärpartition - kann sie in diesem Dialogfeld noch mit <span class="menu">Active Partition</span> gekennzeichnet werden. Der Haken muss also gesetzt werden, um von solch einer Partition Haiku booten zu können.</p>
+<p>Bei der Erstellung einer primären Partition - im Gegensatz zu einer erweiterten/logischen Partition innerhalb einer solchen Primärpartition - kann sie in diesem Dialogfeld noch mit <span class="menu">Aktiv</span> gekennzeichnet werden. Der Haken muss also gesetzt werden, um von solch einer Partition Haiku booten zu können.</p>
 <p>Um eine neu angelegte Partition verwenden oder ins System einbinden zu können, muss sie zuerst mit einem Dateisystem initialisiert werden.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="initializing" name="initializing">Initialisierung einer Partition</a></h2>
-<p>Nur wenn eine Partition nicht ins System eingebunden ist, kann sie mit dem Menüpunkt <span class="menu">Partition | Initialize</span> initialisiert werden.</p>
+<p>Nur wenn eine Partition nicht ins System eingebunden ist, kann sie mit dem Menüpunkt <span class="menu">Partition | Initialisieren</span> initialisiert werden.</p>
 <img src="../images/apps-images/drivesetup-initialize.png" alt="drivesetup-initialize.png" />
 <p>Beim Initialisieren muss ein Name für diese Partition und die Blockgröße angegeben werden. Ein "Block" ist dabei der Speicherplatz in Byte, den eine Datei auf dem Datenträger mindestens belegt. Den vorgeschlagenen Wert von 2048 sollte man am besten beibehalten, außer man ist sicher, dass man wirklich einen anderen braucht.<br />
 Durch das Initialisieren gehen alle Daten auf dieser Partition unwiederbringlich verloren!</p>

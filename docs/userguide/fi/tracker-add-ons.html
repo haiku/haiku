@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Tracker Add-Ons</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/fi.png" alt="" /> Suomi</li>
+<li><a href="../fr/tracker-add-ons.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/tracker-add-ons.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/tracker-add-ons.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/tracker-add-ons.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/tracker-add-ons.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/tracker-add-ons.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/tracker-add-ons.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/tracker-add-ons.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/tracker-add-ons.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/tracker-add-ons.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../sk/tracker-add-ons.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../en/tracker-add-ons.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="tracker.html">Tracker</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="keyboard-shortcuts.html">Keyboard shortcuts</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+
+<h1>Tracker Add-Ons</h1>
+
+<p>Applications can install add-ons so they can be invoked easily on a selection of files from Tracker. Only the add-ons that can handle a specific filetype are presented under <span class="menu">Add-Ons</span> from the context menu or the <span class="menu">File</span> menu of a Tracker window. Some add-ons don't necessarily need a file to work on and are thus always present.</p>
+<p>Tracker Add-Ons, or links to applications that can act as add-ons, can be installed in three different locations (see topic <a href="filesystem-layout.html">Filesystem layout</a>):</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="path">/boot/system/add-ons/Tracker/</span></td><td>   </td><td> for system provided add-ons.</td></tr>
+<tr><td><span class="path">/boot/common/add-ons/Tracker/</span></td><td>   </td><td> for add-ons available to every user.</td></tr>
+<tr><td><span class="path">/boot/home/config/add-ons/Tracker/</span></td><td>   </td><td> for add-ons only available to yourself.</td></tr>
+</table>
+<p>The file name of an add-on can be suffixed with a dash and capital letter, and is then available via keyboard shortcut. For example, <span class="app">Open Target Folder-O</span> opens with <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">O</span>.<br />
+Of course, you have to take care of possible shortcut collisions when deciding on a shortcut. You can't have the same for different add-ons.</p>
+
+<h2><a id="system-add-ons" name="system-add-ons">Haiku's Tracker Add-Ons</a></h2>
+<p>These Tracker Add-Ons come with every Haiku installation:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="4"> 
+	<tr><td class="onelinetop"><b>Background</b><i>-B</i></td>
+		<td valign="top">Opens the <a href="preferences/backgrounds.html">Background</a> preferences to change the color or image of the Desktop or any folder. Invoked on an image file the Background panel is launched with that image already loaded as a potential background.</td></tr>
+	<tr><td class="onelinetop"><b>DiskUsage</b><i>-I</i></td>
+		<td valign="top">Starts the <a href="applications/diskusage.html">DiskUsage</a> application with the according folder as basis.</td></tr>
+	<tr><td class="onelinetop"><b>FileType</b><i>-F</i></td>
+		<td valign="top">Invoked on a file, opens its specific <a href="filetypes.html">FileType</a> panel, otherwise the general FileTypes preferences are launched.</td></tr>
+	<tr><td class="onelinetop"><b>Open Target Folder</b><i>-O</i></td>
+		<td valign="top">Can only be used on a linked file and opens the folder that file lives in.</td></tr>
+	<tr><td class="onelinetop"><b>TextSearch</b><i>-G</i></td>
+		<td valign="top">Starts the <a href="applications/textsearch.html">TextSearch</a> application to look for a string in the selected folder (and its subfolders).</td></tr>
+	<tr><td class="onelinetop"><b>ZipOMatic</b><i>-Z</i></td>
+		<td valign="top">A selection of files will be added to a zip archive, invoked without a selection opens a panel to create an archive via drag&amp;drop.</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="tracker.html">Tracker</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="keyboard-shortcuts.html">Keyboard shortcuts</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

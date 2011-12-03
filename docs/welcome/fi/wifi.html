@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 
+ *
+ * Copyright 2010-2011, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+* 		Matt Madia who wrote http://www.haiku-os.org/guides/wifi 
+ *		Humdinger <humdingerb@gmail.com>
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Wifi</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/fi.png" alt="" /> Suomi</li>
+<li><a href="../fr/wifi.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/wifi.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/wifi.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/wifi.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/wifi.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/wifi.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/wifi.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/wifi.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/wifi.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/wifi.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../sk/wifi.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../en/wifi.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+
+<span>
+   <a href="../welcome_fi.html" class="uplink">Welcome</a>
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+
+<h2>Wifi in Haiku</h2>
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="hardware" rel="nofollow" id="hardware">Expected supported hardware</a></h3>
+<p>All of FreeBSD 8 wlan drivers should be working. Any PCMCIA, CardBus, ExpressCard, USB or ISA based cards will not work. Only PCI, miniPCI, PCI-Express, miniPci-Express and PCI-X are supposed to work.<br />
+This includes:
+</p>
+<ul>
+<li><p><i>aironetwifi</i> supporting at least<br />
+Cisco Aironet 350 Series<br />
+Aironet PCI4500<br />
+Aironet PCI4800<br />
+</p></li>
+<li><p><i>atheroswifi</i> supporting almost every chipset outthere (though no AR9285 chips)</p></li>
+<li><p><i>broadcom43xx</i> supporting<br />
+BCM4301, BCM4306, BCM4307, BCM4309, BCM4311, BCM4312 and BCM4318
+</p></li>
+<li><p><i>ipw2100</i> supporting Intel Pro Wireless 2100 chips</p></li>
+<li><p><i>iprowifi2200</i> supporting Intel Pro Wireless<br />
+2200BG<br />
+2225BG<br />
+2915ABG
+</p></li>
+<li><p><i>iprowifi3945</i> supporting Intel Pro Wireless 3945 chips</p></li>
+<li><p><i>iprowifi4965</i> supporting Intel Pro Wireless 4965 chips</p></li>
+<li><p><i>marvell88w8335</i> supporting<br />
+Marvell Libertas 88W8310<br />
+Marvell Libertas 88W8335
+</p></li>
+<li><p><i>marvell88w8363</i> supporting the 88W8363 chips</p></li>
+<li><p><i>ralinkwifi</i> supporting<br />
+RT2560<br />
+RT2561S<br />
+RT2561<br />
+RT2661
+</p></li>
+<li><p>ralink2860 supporting Ralink RT2860</p></li>
+<li><p><i>wavelanwifi</i> supporting at least<br />
+3Com Airconnect<br />
+GLPRISM2 WaveLAN<br />
+Intersil Prism3<br />
+Intersil Prism2.5<br />
+Linksys WDT11<br />
+Netgear MA301<br />
+PRISM2STA WaveLAN<br />
+Siemens SpeedStream<br />
+SMC 2602W<br />
+Us Robotics 2415<br />
+Addtron AWA-100 PCI
+</p></li>
+</ul>
+<h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="connect" rel="nofollow" id="connect">Connecting to a wireless network</a></h3>
+<p>Besides of course unencrypted networks, Haiku has preliminary support for accessing wireless networks via <a href="#wep-notes" rel="nofollow">WEP encryption keys</a>. WEP is an early encryption method, although not the most secure.</p>
+<p>You can list available networks, join and leave them with the command <span class="cli">ifconfig</span> from Terminal:</p>
+<pre class="terminal">ifconfig [wifi_device_path] [list|join|leave] (key)</pre>
+<p>You can find your <tt>wifi_device_path</tt> in the <span class="app">Network</span> preferences applet, or by executing <span class="cli">ifconfig -a</span>.</p>
+<p>Below are a few examples of connecting to a wireless network named <i>wifitopia</i>. For these examples we are assuming your wifi network card is <tt>/dev/net/iprowifi3945/0</tt>.</p>
+<h4>Listing wireless networks:</h4>
+<pre class="terminal">ifconfig /dev/net/iprowifi3945/0 list</pre>
+<h4>Joining unsecured wireless network:</h4>
+<pre class="terminal">ifconfig /dev/net/iprowifi3945/0 join wifitopia</pre>
+<h4>Joining <a href="#wep-notes">WEP secured</a> wireless network: (ascii password)</h4>
+<pre class="terminal">ifconfig /dev/net/iprowifi3945/0 join wifitopia mypassword</pre>
+<h4>Joining <a href="#wep-notes">WEP secured</a> wireless network: (64-bit hex password)</h4>
+<pre class="terminal">ifconfig /dev/net/iprowifi3945/0 join wifitopia 0x4010FABEEF</pre>
+<h4>Leaving a wireless network:</h4>
+<pre class="terminal">ifconfig /dev/net/iprowifi3945/0 leave wifitopia</pre>
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="auto-connect" rel="nofollow" id="auto-connect">Automatically connecting to a wireless network</a></h3>
+<p>To make your system connect to a given SSID at each boot automatically, you can specify your wireless networks and passwords in <tt>/boot/common/settings/network/wireless_networks</tt> with the following format:</p>
+<pre>network wifitopia {
+   password mypassword
+}</pre>
+<p>If you don't create this configuration file, the system will connect to the first unencrypted network it finds.</p>
+<p><a name="wep-notes" rel="nofollow" id="wep-notes"><strong>WEP notes</strong></a></p>
+<ul>
+<li>64-bit WEP uses a 40-bit key, which means 5 text characters or 10 hex digits</li>
+<li>128-bit WEP uses a 104-bit key, which means 13 text characters or 26 hex digits</li>
+<li>hexadecimal digits = characters 0-9 and A through F (prepended with "0x" in <tt>ifconfig</tt>)</li>
+</ul>
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="wpa" rel="nofollow" id="wpa">WPA encryption</a></h3>
+<p><p>At the moment there is no WPA encryption available in Haiku, though there have been <a target="blank" href="http://haiku-os.org/blog/axeld/2010-10-13_wpa_encryption_progress">some efforts</a> bringing it significantly closer.</p></p>
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="install_script" rel="nofollow" id="install_script">install-wifi-firmwares.sh</a></h3>
+<p>To install the firmware for Intel ipw2100, Intel iprowifi2200/2225/2915, Broadcom 43xx &amp; Marvell 88W8335, you need to run</p>
+<pre class="terminal">install-wifi-firmwares.sh
+</pre>
+<p>The Intel ipw2100 and iprowifi22xx will install without an internet connection, as the licensing terms allow Haiku to distribute the original firmware archives. However, they do require acknowledgment by the end-user prior to their installation. The Broadcom 43xx and Marvell 88W8335 will require an active internet connection, as the files containing their respective firmwares cannot be distributed with Haiku.</p>
+<p>People building their own Haiku image can modify their <span class="cli">build/jam/UserBuildConfig</span> accordingly. Details for that and general updates on the wifi topic are found at the <a href="http://www.haiku-os.org/guides/wifi">online version of this document</a>.</p>
+<p>If you have to download the firmware, but don't have a working internet connection under Haiku, the online version offers a <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt" rel="nofollow">shell script</a>, which will create a zip file for you to extract to Haiku's <tt>/boot</tt>. After that you'll have all files needed by install-wifi-firmwares.sh.</p>
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+   <a href="../welcome_fi.html" class="uplink">Welcome</a>
+</span></div>
+</div>
+
+</body>
+</html>

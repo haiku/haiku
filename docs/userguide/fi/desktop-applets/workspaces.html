@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 
+ *
+ * Copyright 2009-2010, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Workspaces Applet</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/fi.png" alt="" /> Suomi</li>
+<li><a href="../../fr/desktop-applets/workspaces.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/desktop-applets/workspaces.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/desktop-applets/workspaces.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/desktop-applets/workspaces.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/desktop-applets/workspaces.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/desktop-applets/workspaces.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/desktop-applets/workspaces.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/desktop-applets/workspaces.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/desktop-applets/workspaces.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/desktop-applets/workspaces.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../sk/desktop-applets/workspaces.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../en/desktop-applets/workspaces.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="processcontroller.html">ProcessController</a> 
+::  <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<h1><img src="../../images/desktop-applets-images/workspaces-icon_64.png" alt="workspaces-icon_64.png" width="64" height="64" /><a name="applet" id="applet">Workspaces</a></h1>
+<table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Desktop Applets</span></td></tr>
+<tr><td>Location:</td><td></td><td><span class="path">/boot/system/apps/Workspaces</span></td></tr>
+<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/system/app_server/workspaces</span><br />
+<span class="path">~/config/settings/Workspaces_settings</span> - Stores the panel's window position.</td></tr>
+</table>
+<p><br /></p>
+<img src="../images/workspaces-images/workspaces.png" alt="workspaces.png" />
+<p>You find the Workspaces applet with the other <span class="menu">Desktop applets</span> in the Deskbar. It shows a miniature version of all workspaces. There are several options available from the context menu of the applet's window, which are all pretty self-explaining.<br />
+<span class="menu">Change workspace count...</span> will open the <a href="../preferences/screen.html">Screen</a> preferences where you set the number of workspaces and their arrangement (how many rows and columns).</p>
+<p>Since the applet is a <a href="../gui.html#replicants">Replicant</a>, you can resize the window as desired and then drag&amp;drop it by its handle onto the desktop (make sure <span class="menu">Show replicants</span> is activated in the Deskbar menu). Hold <span class="key">SHIFT</span> while resizing to keep your screen's aspect ratio.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="moving" name="moving">Moving windows between workspaces</a></h2>
+<p>To move a window, you grab it in the Workspaces applet and simply drag it to another workspace. This has the advantage, that you can move it without leaving your current desktop. Of course, that only works well when there aren't too many windows in a workspace and your target isn't obscured by other windows. Another possibility is to grab a window by its tab and just holding on to it while switching workspaces with <span class="key">ALT</span> <span class="key">Fx</span>.</p>
+<p>For more information on workspaces in general and more keyboard shortcuts, see topic <a href="../workspaces.html">Workspaces</a>.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="special" name="special">Special functionality</a></h2>
+<p>The Workspaces applet provides some additional functionality when clicking on a window while holding certain modifier keys:</p>
+<table summary="functionality-thru-modifiers" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="key">CTRL</span></td><td style="width:15px;"></td><td>Brings the window to the front.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">SHIFT</span></td><td></td><td>Minimizes the window.</td></tr>
+<tr><td><span class="key">OPT</span></td><td></td><td>Sends the window to the back.</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="processcontroller.html">ProcessController</a> 
+::  <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
+</span></div>
+</div>
+
+</body>
+</html>

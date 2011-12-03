@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -40,6 +40,8 @@
 <li><a href="../../uk/preferences/screen.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/preferences/screen.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/preferences/screen.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/preferences/screen.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/preferences/screen.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/preferences/screen.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -52,20 +54,22 @@
 <div id="content">
 <div>
 
-<h2><img src="../../images/prefs-images/screen-icon_64.png" alt="screen-icon_64.png" width="64" height="64" />Screen</h2>
+<h2><img src="../../images/prefs-images/screen-icon_64.png" alt="screen-icon_64.png" width="64" height="64" /><acronym title="Screen">Bildschirm</acronym></h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
-<tr><td>Ort:</td><td></td><td><span class="path">/boot/system/preferences/Screen</span></td></tr>
-<tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/system/app_server/workspaces</span><br />
-<span class="path">~/config/settings/kernel/drivers/vesa</span> - Nur im VESA Modus.<br />
-<span class="path">~/config/settings/Screen_data</span> - Speichert die Position des Programmfensters.</td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu"><acronym title="Preferences">Einstellungen</acronym></span></td></tr>
+<tr><td>Ort:</td><td></td><td><span class="path"><acronym title="/boot/system/preferences/Screen">/boot/System/preferences/Bildschirm</acronym></span></td></tr>
+<tr><td>Einstellungen:</td><td></td><td><span class="path"><acronym title="~/config/settings/system/app_server/workspaces">~/Konfiguration/settings/system/app_server/workspaces</acronym></span><br />
+<span class="path"><acronym title="~/config/settings/kernel/drivers/vesa">~/Konfiguration/settings/kernel/drivers/vesa</acronym></span> - Nur im VESA Modus.<br />
+<span class="path"><acronym title="~/config/settings/Screen_data">~/Konfiguration/settings/Screen_data</acronym></span> - Speichert die Position des Programmfensters.</td></tr>
 </table>
-<p>Jeder <a href="../workspaces.html">Workspace</a> kann seine eigene Bildschirmauflösung und Farbtiefe haben.</p>
+<p>Jede <a href="../workspaces.html">Arbeitsfläche</a> kann ihre eigene Bildschirmauflösung, Farbtiefe und Bildwiederholrate haben.</p>
 <img src="../images/prefs-images/screen.png" alt="screen.png" />
-<p>Im oberen Dropdown Menü kann ausgewählt werden, ob Änderungen nur den derzeitigen oder alle Workspaces betreffen. In den anderen beiden Dropdown Menüs können, abhängig von der Grafikkarte, alle unterstützten Bildschirmauflösungen und Farbtiefen gewählt werden.</p>
-<p>Nach einem Klick auf <span class="button">Apply</span> werden die Änderungen sofort übernommen, und es erscheint eine Alarmmeldung, ob die Einstellungen behalten werden oder rückgängig gemacht werden sollen. Falls nach 12 Sekunden keine Antwort erfolgt ist, werden alle Änderungen auf den vorherigen Stand zurückgesetzt. Hilfreich, falls der Monitor die gewählten Einstellungen nicht unterstützt, und die Alarmmeldung nicht sichtbar ist.</p>
-<p>Auf der linken Seite kann die Anzahl der Workspaces gewählt werden und diese in Spalten und Zeilen eingeteilt werden, sowie die  <a href="backgrounds.html">Hintergrund</a> Einstellungen geöffnet werden.</p>
-<p><span class="button">Revert</span> setzt alle Einstellungen auf die Werte zurück, die beim Starten der Bildschirmeinstellungen aktiv waren.</p>
+<p>Im oberen Dropdown Menü kann ausgewählt werden, ob Änderungen nur die derzeitige oder alle Arbeitsflächen betreffen. In den anderen beiden Dropdown Menüs können, abhängig von der Grafikkarte, alle unterstützten Bildschirmauflösungen, Farbtiefen und Bildwiederholraten gewählt werden.</p>
+<p>Nach einem Klick auf <span class="button">Anwenden</span> werden die Änderungen sofort übernommen, und es erscheint eine Alarmmeldung, ob die Einstellungen behalten werden oder rückgängig gemacht werden sollen. Falls nach 12 Sekunden keine Antwort erfolgt ist, werden alle Änderungen auf den vorherigen Stand zurückgesetzt. Hilfreich, falls der Monitor die gewählten Einstellungen nicht unterstützt, und die Alarmmeldung nicht sichtbar ist.</p>
+<p>Auf der linken Seite sind Hersteller und Modellbezeichnung sowie Auflösung in dpi (dots per inch) des angeschlossenen Bildschirms aufgeführt. Beim Berühren mit dem Mauszeiger wird der Name der Grafikkarte als Tooltip angezeigt, falls diese von einem Treiber unterstützt wird. Ansonsten wird auf "VESA" zurückgegriffen, eine Lösung, die mit fast jeder Hardware funktioniert.</p>
+<p><span class="button">Anfangswerte</span> setzt alle Einstellungen auf die Werte zurück, die beim Starten der Bildschirmeinstellungen aktiv waren.</p>
+<div class="box-info">Auch wenn Haikus VESA Modus recht leistungsfähig ist, gibt es mögliche Einschränkungen. Monitore im Breitbildformat können unter Umständen nicht in ihrer nativen Auflösung angesprochen werden, was zu einem etwas verzerrten und unscharfen Bild führt. Ebenso kann die Auswahl an verfügbaren Farbtiefen und Bildwiederholraten eingeschränkt sein.</div>
+<p>Links unten kann die Anzahl der Arbeitsflächen ausgewählt und diese in Spalten und Zeilen eingeteilt, sowie die EInstellungen für <a href="backgrounds.html">Hintergründe</a> geöffnet werden.</p>
 
 </div>
 </div>

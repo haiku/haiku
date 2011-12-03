@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2009, Haiku. All rights reserved.
+ * Copyright 2009-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -39,6 +39,8 @@
 <li><a href="../../uk/applications/installer.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/applications/installer.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/applications/installer.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/installer.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/installer.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/applications/installer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -50,6 +52,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">La traducción de esta página no está completa aún. Hasta que esté, las partes sin terminar vienen en su inglés original.</div>
 
 <h2><img src="../../images/apps-images/installer-icon_64.png" alt="installer-icon_64.png" width="64" height="64" />Installer</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -63,11 +66,7 @@ Una vez ejecutado, muestra una ventana inicial con información importante. No e
 <ul>
 <li><p>Este software está en calidad de Alpha. ¡Haga copias de seguridad o aténgase a las consecuencias!  </p></li>
 <li><p>Installer necesita una partición preparada. A lo mejor es necesario usar un <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> o una herramienta similar hasta que el Drive Setup de Haiku sea lo suficientemente maduro como para soportar esta tarea.</p></li>
-<li><p>Haiku puede ser añadido manualmente al gestor de arranque <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>. En resumen, hay que añadir una entrada a <span class="path">/boot/grub/menu.lst</span> de su instalación de linux, similar a ésta:</p>
-<pre># Haiku en /dev/sda7
-title		Haiku
-rootnoverify	(hd0,6)
-chainloader	+1</pre></li>
+<li>Haiku can be added manually to the bootmanager <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>. How that is done exactly is available as an <a href="http://www.haiku-os.org/get-haiku/installation-guide">online guide</a>.</li>
 </ul>
 <p><br /><br /></p>
 <p>Una vez admitido con <span class="button">Continue</span>, se le presenta la ventana principal:</p>
@@ -83,9 +82,7 @@ La segunda ventana emergente especifica el destino para la instalación. Esta pa
 <p>Al final de la instalación, la partición se hace automáticamente de arranque. Sin embargo, puede ocurrir que otro sistema operativo o herramienta de particionado sobreescriba (accidentalmente) el sector de arranque del volumen Haiku. En este caso, arranque el sistema con su CD de instalación e inicie a Installer. Seleccione su partición Haiku de inicio en el menú <span class="menu">Onto: Please Choose Target</span> (Dentro de&gt; por favor elija el objetivo) y haga clic en <span class="button">Write Boot Sector</span> (Escribir sector de arranque) para hacerlo "arrancable" de nuevo.</p>
 <p>El otro elemento en el menú <span class="menu">Tools</span> es el <span class="menu">Boot Manager</span> (administrador de arranque) que coloca un menú para elegir qué sistema operativo iniciar.<br />
 No se necesita correr al <span class="app">Boot Manager</span> si ya tiene un selector de arranque como Grub, en cuyo caso tiene que agregar a Haiku manualmente (vea arriba) o Haiku corre exclusivamente en su máquina.</p>
-<p>El administrador de arranque no ha sido muy bien probado y todavía tiene unas cuantas restricciones para quejarse si no se cumplen: el menú sólo puede instalarse en el primer disco duro y tiene que haber un espacio de 2KiB después del sector de inicio maestro (Master Boot Record, MBR en inglés).</p>
-<p>No tiene que preocuparse demasiado, pues se guarda el MBR original. Para desinstalar el menú de arranque, sólo tiene que iniciar el CD de instalación de nuevo, correr a Installer e invocar al Administrador de arranque Boot Manager una vez más.<br />
-El panel de Boot Manager le guiará en la instalación o desinstalación del menú de arranque.</p>
+
 
 </div>
 </div>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2009, Haiku. All rights reserved.
+ * Copyright 2009-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -39,6 +39,8 @@
 <li><a href="../../uk/applications/installer.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/applications/installer.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/applications/installer.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/installer.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/installer.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/applications/installer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -50,6 +52,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">La traduzione di questa pagina non è stata completata. Per questo motivo le parti non tradotte sono visibili in inglese.</div>
 
 <h2><img src="../../images/apps-images/installer-icon_64.png" alt="installer-icon_64.png" width="64" height="64" />L'Installer</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -63,11 +66,7 @@ Appena avviato, mostra in una finestra iniziale con importanti informazioni; que
 <ul>
 <li><p>Questo è un software in fase alpha. Raccomanda di effettuare un backup prima che sia troppo tardi.</p></li>
 <li><p>L'installazione necessita di una partizione già pronta. Per questo compito si raccomanda l'uso di <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> o di un'applicazione simile fino a che il DriveSetup di Haiku diventa abbastanza maturo da poter gestire questo lavoro.</p></li>
-<li><p>Haiku può essere aggiunto manualmente al bootmanager <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>. In poche parole, bisogna aggiungere a <span class="path">/boot/grub/menu.lst</span> dell'installazione di Linux già esistente, qualcosa come:</p>
-<pre># Haiku on /dev/sda7
-title		Haiku
-rootnoverify	(hd0,6)
-chainloader	+1</pre></li>
+<li>Haiku can be added manually to the bootmanager <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>. How that is done exactly is available as an <a href="http://www.haiku-os.org/get-haiku/installation-guide">online guide</a>.</li>
 </ul>
 <p><br /><br /></p>
 <p>Una volta che si è accettato con <span class="button">Continue</span>, viene aperta la finestra principale:</p>
@@ -83,9 +82,7 @@ Nel secondo menù a cascata è specificata la destinazione dell'installazione. Q
 <p>Dopo la procedura d'installazione, la partizione viene automaticamente resa avviabile. Tuttavia, può capitare che qualche altro sistema operativo o qualche applicazione di partizionamento sovrascriva (accidentalmente) il boot sector del volume di Haiku. In questo caso, avviare il CD di installazione e far partire l'Installer. Selezionare la propria partizione di boot di Haiku dal menù <span class="menu">Su: Scegli destinazione</span> e selezionare <span class="menu">Scrivi settore d'avvio</span> dal menù <span class="menu">Strumenti</span> per renderla nuovamente avviabile.</p>
 <p>L'altro elemento che si trova nel menù <span class="menu">Strumenti</span> è <span class="menu">Boot Manager</span> che crea un menù nel boot sector dal quale scegliere quale sistema operativo avviare.<br />
 Non c'è bisogno di eseguire <span class="app">Boot Manager</span> se Haiku è l'unico sistema installato sulla macchina oppure si sta già utilizzando un bootmanager come Grub, in questo caso bisognerebbe aggiungere manualmente Haiku (si veda sopra).</p>
-<p>Boot Manager non è stato ancora testato molto bene e necessita ancora di diversi requisiti che, se non sono soddisfatti, possono dare problemi: il menù può essere installato solo sul primo HardDisk e devono esserci 2KB di spazio libero dopo il Master Boot Record (MBR).</p>
-<p>Ad ogni modo, non è necessario preoccuparsi troppo, il MBR originale viene salvato. Per disinstallare il menù di boot, basta avviare nuovamente il CD d'installazione, far partire l'Installer e selezionare nuovamente il Boot Manager.<br />
-Il pannello del Boot Manager permetterà facilmente di installare o rimuovere il menù di boot.</p>
+
 
 </div>
 </div>
