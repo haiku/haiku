@@ -19,7 +19,7 @@ local sources =
 	des.c
 	FileConfigView.cpp
 	HaikuMailFormatFilter.cpp
-	mail_encoding.c
+	mail_encoding.cpp
 	mail_util.cpp
 	MailAttachment.cpp
 	MailComponent.cpp
