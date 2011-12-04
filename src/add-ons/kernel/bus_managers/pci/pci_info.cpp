@@ -13,7 +13,12 @@
 #include "pci.h"
 
 #define PCI_VERBOSE	1
+#ifdef __INTEL__
+// enabling it makes the pci bus_manager binary about 1MB
+// some other platforms have issues with floppy image size...
+// TODO: Move this define to BuildSetup?
 #define USE_PCI_HEADER 1
+#endif
 
 #if USE_PCI_HEADER
 #	include "pcihdr.h"
