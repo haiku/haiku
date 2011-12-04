@@ -2331,8 +2331,12 @@ TTextView::Reader::ParseMail(BMailContainer *container,
 			if (type.GetShortDescription(typeDescription) != B_OK)
 				strcpy(typeDescription, type.Type() ? type.Type() : B_EMPTY_STRING);
 
-			name = "\n<Enclosure: ";
-			name << enclosure->name << " (Type: " << typeDescription << ")>\n";
+			name = "\n<";
+			name.Append(B_TRANSLATE_COMMENT("Enclosure: %name% (Type: %type%)",
+				"Don't translate the variables %name% and %type%."));
+			name.Append(">\n");
+			name.ReplaceFirst("%name%", enclosure->name);
+			name.ReplaceFirst("%type%", typeDescription);
 
 			fView->GetSelection(&enclosure->text_start, &enclosure->text_end);
 			enclosure->text_start++;
