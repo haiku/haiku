@@ -14,6 +14,7 @@
 #include <malloc.h>
 #include <slab/Slab.h>
 #include <tracing.h>
+#include <util/list.h>
 #include <util/AutoLock.h>
 #include <vm/vm.h>
 
@@ -41,6 +42,7 @@ struct guarded_heap_page {
 	size_t				stack_trace_depth;
 	addr_t				stack_trace[GUARDED_HEAP_STACK_TRACE_DEPTH];
 #endif
+	list_link			free_list_link;
 };
 
 struct guarded_heap_area {
@@ -53,6 +55,7 @@ struct guarded_heap_area {
 	size_t				used_pages;
 	void*				protection_cookie;
 	mutex				lock;
+	struct list			free_list;
 	guarded_heap_page	pages[0];
 };
 
@@ -196,6 +199,8 @@ guarded_heap_page_allocate(guarded_heap_area& area, size_t startPageIndex,
 			page.alignment = alignment;
 		}
 
+		list_remove_item(&area.free_list, &page);
+
 		if (i == pagesNeeded - 1) {
 			page.flags |= GUARDED_HEAP_PAGE_FLAG_GUARD;
 			guarded_heap_page_protect(area, startPageIndex + i, 0);
@@ -234,6 +239,8 @@ guarded_heap_free_page(guarded_heap_area& area, size_t pageIndex,
 		GUARDED_HEAP_STACK_TRACE_DEPTH, 0, 3, STACK_TRACE_KERNEL);
 #endif
 
+	list_add_item(&area.free_list, &page);
+
 	guarded_heap_page_protect(area, pageIndex, 0);
 
 	T(Free(area.heap, (void*)(area.base + pageIndex * B_PAGE_SIZE)));
@@ -259,22 +266,33 @@ guarded_heap_area_allocate(guarded_heap_area& area, size_t size,
 	}
 
 	size_t pagesNeeded = (size + B_PAGE_SIZE - 1) / B_PAGE_SIZE + 1;
-	if (pagesNeeded > area.page_count) {
-		panic("huge allocation of %" B_PRIuSIZE " pages not supported",
-			pagesNeeded);
+	if (pagesNeeded > area.page_count - area.used_pages)
 		return NULL;
-	}
 
-	for (size_t i = 0; i <= area.page_count - pagesNeeded; i++) {
-		guarded_heap_page& page = area.pages[i];
-		if ((page.flags & GUARDED_HEAP_PAGE_FLAG_USED) != 0)
+	if (pagesNeeded > area.page_count)
+		return NULL;
+
+	// We use the free list this way so that the page that has been free for
+	// the longest time is allocated. This keeps immediate re-use (that may
+	// hide bugs) to a minimum.
+	guarded_heap_page* page
+		= (guarded_heap_page*)list_get_first_item(&area.free_list);
+
+	for (; page != NULL;
+		page = (guarded_heap_page*)list_get_next_item(&area.free_list, page)) {
+
+		if ((page->flags & GUARDED_HEAP_PAGE_FLAG_USED) != 0)
+			continue;
+
+		size_t pageIndex = page - area.pages;
+		if (pageIndex > area.page_count - pagesNeeded)
 			continue;
 
 		// Candidate, check if we have enough pages going forward
 		// (including the guard page).
 		bool candidate = true;
 		for (size_t j = 1; j < pagesNeeded; j++) {
-			if ((area.pages[i + j].flags & GUARDED_HEAP_PAGE_FLAG_USED)
+			if ((area.pages[pageIndex + j].flags & GUARDED_HEAP_PAGE_FLAG_USED)
 					!= 0) {
 				candidate = false;
 				break;
@@ -288,11 +306,11 @@ guarded_heap_area_allocate(guarded_heap_area& area, size_t size,
 			alignment = 1;
 
 		size_t offset = size & (B_PAGE_SIZE - 1);
-		void* result = (void*)((area.base + i * B_PAGE_SIZE
+		void* result = (void*)((area.base + pageIndex * B_PAGE_SIZE
 			+ (offset > 0 ? B_PAGE_SIZE - offset : 0)) & ~(alignment - 1));
 
-		guarded_heap_page_allocate(area, i, pagesNeeded, size, alignment,
-			result);
+		guarded_heap_page_allocate(area, pageIndex, pagesNeeded, size,
+			alignment, result);
 
 		area.used_pages += pagesNeeded;
 		grow = guarded_heap_pages_allocated(*area.heap, pagesNeeded);
@@ -327,6 +345,9 @@ guarded_heap_area_init(guarded_heap& heap, area_id id, void* baseAddress,
 	}
 
 	mutex_init(&area->lock, "guarded_heap_area_lock");
+
+	list_init_etc(&area->free_list,
+		offsetof(guarded_heap_page, free_list_link));
 
 	for (size_t i = 0; i < area->page_count; i++)
 		guarded_heap_free_page(*area, i, true);
