@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <arch/debug.h>
+#include <elf.h>
 #include <debug.h>
 #include <heap.h>
 #include <malloc.h>
@@ -23,6 +25,8 @@
 #define GUARDED_HEAP_PAGE_FLAG_GUARD	0x04
 #define GUARDED_HEAP_PAGE_FLAG_DEAD		0x08
 
+#define GUARDED_HEAP_STACK_TRACE_DEPTH	0
+
 
 struct guarded_heap;
 
@@ -32,6 +36,10 @@ struct guarded_heap_page {
 	void*				allocation_base;
 	size_t				alignment;
 	thread_id			thread;
+#if GUARDED_HEAP_STACK_TRACE_DEPTH > 0
+	size_t				stack_trace_depth;
+	addr_t				stack_trace[GUARDED_HEAP_STACK_TRACE_DEPTH];
+#endif
 };
 
 struct guarded_heap_area {
@@ -167,6 +175,11 @@ guarded_heap_page_allocate(guarded_heap_area& area, size_t startPageIndex,
 		page.flags = GUARDED_HEAP_PAGE_FLAG_USED;
 		if (i == 0) {
 			page.thread = find_thread(NULL);
+#if GUARDED_HEAP_STACK_TRACE_DEPTH > 0
+			page.stack_trace_depth = arch_debug_get_stack_trace(
+				page.stack_trace, GUARDED_HEAP_STACK_TRACE_DEPTH, 0, 4,
+				STACK_TRACE_KERNEL);
+#endif
 			page.allocation_size = allocationSize;
 			page.allocation_base = allocationBase;
 			page.alignment = alignment;
@@ -174,6 +187,9 @@ guarded_heap_page_allocate(guarded_heap_area& area, size_t startPageIndex,
 			firstPage = &page;
 		} else {
 			page.thread = firstPage->thread;
+#if GUARDED_HEAP_STACK_TRACE_DEPTH > 0
+			page.stack_trace_depth = 0;
+#endif
 			page.allocation_size = allocationSize;
 			page.allocation_base = allocationBase;
 			page.alignment = alignment;
@@ -211,6 +227,11 @@ guarded_heap_free_page(guarded_heap_area& area, size_t pageIndex,
 
 	page.allocation_size = 0;
 	page.thread = find_thread(NULL);
+
+#if GUARDED_HEAP_STACK_TRACE_DEPTH > 0
+	page.stack_trace_depth = arch_debug_get_stack_trace(page.stack_trace,
+		GUARDED_HEAP_STACK_TRACE_DEPTH, 0, 3, STACK_TRACE_KERNEL);
+#endif
 
 	guarded_heap_page_protect(area, pageIndex, 0);
 
@@ -565,6 +586,27 @@ dump_guarded_heap_page(int argc, char** argv)
 	kprintf("allocation base: %p\n", page.allocation_base);
 	kprintf("alignment: %" B_PRIuSIZE "\n", page.alignment);
 	kprintf("allocating thread: %" B_PRId32 "\n", page.thread);
+
+#if GUARDED_HEAP_STACK_TRACE_DEPTH > 0
+	kprintf("stack trace:\n");
+	for (size_t i = 0; i < page.stack_trace_depth; i++) {
+		addr_t address = page.stack_trace[i];
+
+		const char* symbol;
+		const char* imageName;
+		bool exactMatch;
+		addr_t baseAddress;
+
+		if (elf_debug_lookup_symbol_address(address, &baseAddress, &symbol,
+				&imageName, &exactMatch) == B_OK) {
+			kprintf("  %p  %s + 0x%lx (%s)%s\n", (void*)address, symbol,
+				address - baseAddress, imageName,
+				exactMatch ? "" : " (nearest)");
+		} else
+			kprintf("  %p\n", (void*)address);
+	}
+#endif
+
 	return 0;
 }
 
