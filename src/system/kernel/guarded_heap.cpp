@@ -364,15 +364,25 @@ guarded_heap_area_init(guarded_heap& heap, area_id id, void* baseAddress,
 static bool
 guarded_heap_area_create(guarded_heap& heap, uint32 flags)
 {
-	void* baseAddress = NULL;
-	area_id id = create_area("guarded_heap_area", &baseAddress,
-		B_ANY_KERNEL_ADDRESS, HEAP_GROW_SIZE, B_FULL_LOCK,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	for (size_t trySize = HEAP_GROW_SIZE; trySize >= 1 * 1024 * 1024;
+		trySize /= 2) {
 
-	if (id < 0)
-		return false;
+		void* baseAddress = NULL;
+		area_id id = create_area("guarded_heap_area", &baseAddress,
+			B_ANY_KERNEL_ADDRESS, trySize, B_FULL_LOCK,
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
-	return guarded_heap_area_init(heap, id, baseAddress, HEAP_GROW_SIZE, flags);
+		if (id < 0)
+			continue;
+
+		if (guarded_heap_area_init(heap, id, baseAddress, trySize, flags))
+			return true;
+
+		delete_area(id);
+	}
+
+	panic("failed to allocate a new heap area");
+	return false;
 }
 
 
