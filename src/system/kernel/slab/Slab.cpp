@@ -36,6 +36,9 @@
 #include "SmallObjectCache.h"
 
 
+#if !USE_GUARDED_HEAP_FOR_OBJECT_CACHE
+
+
 typedef DoublyLinkedList<ObjectCache> ObjectCacheList;
 
 typedef DoublyLinkedList<ObjectCache,
@@ -831,6 +834,7 @@ add_alloc_tracing_entry(ObjectCache* cache, uint32 flags, void* object)
 #endif
 }
 
+
 // #pragma mark -
 
 
@@ -1421,3 +1425,6 @@ slab_init_post_thread()
 
 
 RANGE_MARKER_FUNCTION_END(Slab)
+
+
+#endif	// !USE_GUARDED_HEAP_FOR_OBJECT_CACHE

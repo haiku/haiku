@@ -114,6 +114,10 @@
 #define USE_SLAB_ALLOCATOR_FOR_MALLOC	1
 	// Heap implementation based on the slab allocator (for production use).
 
+// Replace the object cache with the guarded heap to force debug features. Also
+// requires the use of the guarded heap for malloc.
+#define USE_GUARDED_HEAP_FOR_OBJECT_CACHE			0
+
 // Enables additional sanity checks in the slab allocator's memory manager.
 #define DEBUG_SLAB_MEMORY_MANAGER_PARANOID_CHECKS	0
 

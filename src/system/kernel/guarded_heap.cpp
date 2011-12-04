@@ -12,6 +12,7 @@
 #include <debug.h>
 #include <heap.h>
 #include <malloc.h>
+#include <slab/Slab.h>
 #include <tracing.h>
 #include <util/AutoLock.h>
 #include <vm/vm.h>
@@ -611,7 +612,7 @@ dump_guarded_heap_page(int argc, char** argv)
 }
 
 
-// #pragma mark - public API
+// #pragma mark - Malloc API
 
 
 status_t
@@ -716,6 +717,103 @@ realloc(void* address, size_t newSize)
 
 	return guarded_heap_realloc(address, newSize);
 }
+
+
+#if USE_GUARDED_HEAP_FOR_OBJECT_CACHE
+
+
+// #pragma mark - Slab API
+
+
+void
+request_memory_manager_maintenance()
+{
+}
+
+
+object_cache*
+create_object_cache(const char*, size_t objectSize, size_t, void*,
+	object_cache_constructor, object_cache_destructor)
+{
+	return (object_cache*)objectSize;
+}
+
+
+object_cache*
+create_object_cache_etc(const char*, size_t objectSize, size_t, size_t, size_t,
+	size_t, uint32, void*, object_cache_constructor, object_cache_destructor,
+	object_cache_reclaimer)
+{
+	return (object_cache*)objectSize;
+}
+
+
+void
+delete_object_cache(object_cache* cache)
+{
+}
+
+
+status_t
+object_cache_set_minimum_reserve(object_cache* cache, size_t objectCount)
+{
+	return B_OK;
+}
+
+
+void*
+object_cache_alloc(object_cache* cache, uint32 flags)
+{
+	return memalign_etc(0, (size_t)cache, flags);
+}
+
+
+void
+object_cache_free(object_cache* cache, void* object, uint32 flags)
+{
+	return free_etc(object, flags);
+}
+
+
+status_t
+object_cache_reserve(object_cache* cache, size_t objectCount, uint32 flags)
+{
+	return B_OK;
+}
+
+
+void
+object_cache_get_usage(object_cache* cache, size_t* _allocatedMemory)
+{
+	*_allocatedMemory = 0;
+}
+
+
+void
+slab_init(kernel_args* args)
+{
+}
+
+
+void
+slab_init_post_area()
+{
+}
+
+
+void
+slab_init_post_sem()
+{
+}
+
+
+void
+slab_init_post_thread()
+{
+}
+
+
+#endif	// USE_GUARDED_HEAP_FOR_OBJECT_CACHE
 
 
 #endif	// USE_GUARDED_HEAP_FOR_MALLOC
