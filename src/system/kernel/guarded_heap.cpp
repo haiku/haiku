@@ -585,9 +585,10 @@ dump_guarded_heap_page(int argc, char** argv)
 	guarded_heap_area* area = NULL;
 	for (guarded_heap_area* candidate = sGuardedHeap.areas; candidate != NULL;
 			candidate = candidate->next) {
-		if ((addr_t)address < candidate->base)
+
+		if (address < candidate->base)
 			continue;
-		if ((addr_t)address >= candidate->base + candidate->size)
+		if (address >= candidate->base + candidate->size)
 			continue;
 
 		area = candidate;
@@ -643,6 +644,131 @@ dump_guarded_heap_page(int argc, char** argv)
 }
 
 
+static int
+dump_guarded_heap_area(int argc, char** argv)
+{
+	if (argc != 2) {
+		print_debugger_command_usage(argv[0]);
+		return 0;
+	}
+
+	addr_t address = parse_expression(argv[1]);
+
+	// Find the area that contains this page.
+	guarded_heap_area* area = NULL;
+	for (guarded_heap_area* candidate = sGuardedHeap.areas; candidate != NULL;
+			candidate = candidate->next) {
+
+		if ((addr_t)candidate != address) {
+			if (address < candidate->base)
+				continue;
+			if (address >= candidate->base + candidate->size)
+				continue;
+		}
+
+		area = candidate;
+		break;
+	}
+
+	if (area == NULL) {
+		kprintf("didn't find area for address\n");
+		return 1;
+	}
+
+	kprintf("guarded heap area: %p\n", area);
+	kprintf("next heap area: %p\n", area->next);
+	kprintf("guarded heap: %p\n", area->heap);
+	kprintf("area id: %" B_PRId32 "\n", area->area);
+	kprintf("base: 0x%" B_PRIxADDR "\n", area->base);
+	kprintf("size: %" B_PRIuSIZE "\n", area->size);
+	kprintf("page count: %" B_PRIuSIZE "\n", area->page_count);
+	kprintf("used pages: %" B_PRIuSIZE "\n", area->used_pages);
+	kprintf("protection cookie: %p\n", area->protection_cookie);
+	kprintf("lock: %p\n", &area->lock);
+
+	size_t freeCount = 0;
+	void* item = list_get_first_item(&area->free_list);
+	while (item != NULL) {
+		freeCount++;
+
+		if ((((guarded_heap_page*)item)->flags & GUARDED_HEAP_PAGE_FLAG_USED)
+				!= 0) {
+			kprintf("free list broken, page %p not actually free\n", item);
+		}
+
+		item = list_get_next_item(&area->free_list, item);
+	}
+
+	kprintf("free_list: %p (%" B_PRIuSIZE " free)\n", &area->free_list,
+		freeCount);
+
+	freeCount = 0;
+	size_t runLength = 0;
+	size_t longestRun = 0;
+	for (size_t i = 0; i <= area->page_count; i++) {
+		guarded_heap_page& page = area->pages[i];
+		if (i == area->page_count
+			|| (page.flags & GUARDED_HEAP_PAGE_FLAG_USED) != 0) {
+			freeCount += runLength;
+			if (runLength > longestRun)
+				longestRun = runLength;
+			runLength = 0;
+			continue;
+		}
+
+		runLength = 1;
+		for (size_t j = 1; j < area->page_count - i; j++) {
+			if ((area->pages[i + j].flags & GUARDED_HEAP_PAGE_FLAG_USED) != 0)
+				break;
+
+			runLength++;
+		}
+
+		i += runLength - 1;
+	}
+
+	kprintf("longest free run: %" B_PRIuSIZE " (%" B_PRIuSIZE " free)\n",
+		longestRun, freeCount);
+
+	kprintf("pages: %p\n", area->pages);
+
+	return 0;
+}
+
+
+static int
+dump_guarded_heap(int argc, char** argv)
+{
+	guarded_heap* heap = &sGuardedHeap;
+	if (argc != 1) {
+		if (argc == 2)
+			heap = (guarded_heap*)parse_expression(argv[1]);
+		else {
+			print_debugger_command_usage(argv[0]);
+			return 0;
+		}
+	}
+
+	kprintf("guarded heap: %p\n", heap);
+	kprintf("rw lock: %p\n", &heap->lock);
+	kprintf("page count: %" B_PRIuSIZE "\n", heap->page_count);
+	kprintf("used pages: %" B_PRIuSIZE "\n", heap->used_pages);
+	kprintf("area creation counter: %" B_PRId32 "\n",
+		(int32)heap->area_creation_counter);
+
+	size_t areaCount = 0;
+	guarded_heap_area* area = heap->areas;
+	while (area != NULL) {
+		areaCount++;
+		area = area->next;
+	}
+
+	kprintf("areas: %p (%" B_PRIuSIZE ")\n", heap->areas, areaCount);
+
+	return 0;
+}
+
+
 // #pragma mark - Malloc API
 
 
@@ -689,9 +815,16 @@ heap_init_post_sem()
 		}
 	}
 
+	add_debugger_command("guarded_heap", &dump_guarded_heap,
+		"Dump info about the guarded heap");
+	add_debugger_command_etc("guarded_heap_area", &dump_guarded_heap_area,
+		"Dump info about a guarded heap area",
+		"<address>\nDump info about guarded heap area containing address.\n",
+		0);
 	add_debugger_command_etc("guarded_heap_page", &dump_guarded_heap_page,
 		"Dump info about a guarded heap page",
-		"<address>\nDump info about guarded heap page at address.\n", 0);
+		"<address>\nDump info about guarded heap page containing address.\n",
+		0);
 
 	return B_OK;
 }
