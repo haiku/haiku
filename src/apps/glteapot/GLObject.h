@@ -50,7 +50,7 @@ class GLObject {
 		void 			RotateWorldSpace(float rx, float ry);		
 		virtual void	MenuInvoked(BPoint point);
 		virtual void	DoDrawing(bool forID) {};
-		int				Solidity() const;			
+		int				Solidity() const;
 
 		float			x, y, z;
 		Quaternion		fRotation;
@@ -68,11 +68,13 @@ class GLObject {
 
 class TriangleObject : public GLObject {
 	public:
-							TriangleObject(ObjectView* ov, char* filename);
+							TriangleObject(ObjectView* ov);
 		virtual				~TriangleObject();		
+		status_t			InitCheck() const;	
 		virtual void		DoDrawing(bool forID);
-
+		
 	private:
+		status_t				fStatus;
 		BufferArray<point>		fPoints;
 		BufferArray<tri>		fTriangles;
 		BufferArray<quadStrip>	fQs;
