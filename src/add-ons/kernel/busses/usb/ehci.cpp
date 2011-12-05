@@ -770,7 +770,7 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 	addr_t bufferPhy;
 	if (fStack->AllocateChunk(&bufferLog, (void**)&bufferPhy, dataLength) < B_OK) {
 		TRACE_ERROR("unable to allocate itd buffer\n");
-		delete isoRequest;
+		delete[] isoRequest;
 		return B_NO_MEMORY;
 	}
 
@@ -836,7 +836,7 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 		TRACE_ERROR("failed to add pending isochronous transfer\n");
 		for (uint32 i = 0; i < itdIndex; i++)
 			FreeDescriptor(isoRequest[i]);
-		delete isoRequest;
+		delete[] isoRequest;
 		return result;
 	}
 
