@@ -466,11 +466,6 @@ AddFilesToHaikuImage common etc profile.d : $(profileFiles) ;
 #AddFilesToHaikuImage common etc bash_completion.d helpers
 #    : $(bashCompletionHelperFiles) ;
 
-local dataFiles = teapot.data ;
-dataFiles = $(dataFiles:G=data) ;
-SEARCH on $(dataFiles) = [ FDirName $(HAIKU_TOP) data system data ] ;
-AddFilesToHaikuImage system data : $(dataFiles) ;
-
 local fortuneFiles = [ Glob $(HAIKU_TOP)/data/system/data/fortunes
 	: [a-zA-Z0-9]* ] ;
 fortuneFiles = $(fortuneFiles:G=data!fortunes) ;
