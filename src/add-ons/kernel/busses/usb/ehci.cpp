@@ -109,6 +109,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		fPCIInfo(info),
 		fStack(stack),
 		fEnabledInterrupts(0),
+		fThreshold(0),
 		fPeriodicFrameListArea(-1),
 		fPeriodicFrameList(NULL),
 		fInterruptEntries(NULL),
@@ -136,6 +137,9 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		fPortSuspendChange(0),
 		fInterruptPollThread(-1)
 {
+	// Create a lock for the isochronous transfer list
+	mutex_init(&fIsochronousLock, "EHCI isochronous lock");
+
 	if (BusManager::InitCheck() < B_OK) {
 		TRACE_ERROR("bus manager failed to init\n");
 		return;
@@ -304,9 +308,6 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	fFinishThread = spawn_kernel_thread(FinishThread, "ehci finish thread",
 		B_NORMAL_PRIORITY, (void *)this);
 	resume_thread(fFinishThread);
-
-	// Create a lock for the isochronous transfer list
-	mutex_init(&fIsochronousLock, "EHCI isochronous lock");
 
 	// Create semaphore the isochronous finisher thread will wait for
 	fFinishIsochronousTransfersSem = create_sem(0,
