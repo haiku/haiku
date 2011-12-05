@@ -1500,9 +1500,24 @@ EHCI::FinishTransfers()
 							callbackStatus = B_DEV_CRC_ERROR;
 							reasons++;
 						}
+						if ((transfer->queue_head->endpoint_chars
+								& EHCI_QH_CHARS_EPS_HIGH) == 0) {
+							// For full-/lowspeed endpoints the unused ping
+							// state bit is used as another error bit, it is
+							// unspecific however.
+							if ((status & EHCI_QTD_STATUS_LS_ERR) != 0) {
+								callbackStatus = B_DEV_STALLED;
+								reasons++;
+							}
+						}
 
 						if (reasons > 1)
 							callbackStatus = B_DEV_MULTIPLE_ERRORS;
+						else if (reasons == 0) {
+							TRACE_ERROR("error counter counted down to zero "
+								"but none of the error bits are set\n");
+							callbackStatus = B_DEV_STALLED;
+						}
 					} else if (status & EHCI_QTD_STATUS_BABBLE) {
 						// there is a babble condition
 						callbackStatus = transfer->incoming ? B_DEV_FIFO_OVERRUN : B_DEV_FIFO_UNDERRUN;
