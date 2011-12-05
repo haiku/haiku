@@ -1,0 +1,33 @@
+1	lithuanian	x-vnd.Haiku-Shortcuts	843427514
+Error, NULL state description?\n	ShortcutsSpec		Klaida. Neapibrėžta būsena?\n
+OK	ShortcutsWindow		Gerai
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Sparčiųjų klavišų rinkinio įrašyti nepavyko.
+Cancel	ShortcutsWindow		Atsisakyti
+Append KeySet…	ShortcutsWindow		Įterpti sparčiųjų klavišų rinkinį…
+Control	ShortcutsSpec	Name for modifier on keyboard	Vald
+Key	ShortcutsWindow		Klavišas
+Open KeySet…	ShortcutsWindow		Atverti sparčiųjų klavišų rinkinį…
+Revert to saved	ShortcutsWindow		Grįžti prie įrašyto
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+(Choose application with file requester)	ShortcutsWindow		(Atverti programos parinkimo langą)
+Window	ShortcutsSpec	Name for modifier on keyboard	Win
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Sparčiųjų klavišų rinkinio atverti nepavyko!
+Save	ShortcutsWindow		Įrašyti
+Remove selected shortcut	ShortcutsWindow		Pašalinti pažymėtąjį klavišų derinį
+Add new shortcut	ShortcutsWindow		Pridėti naują klavišų derinį
+Save & apply	ShortcutsWindow		Įrašyti ir taikyti
+Append	ShortcutsWindow		Įterpti
+File	ShortcutsWindow		Failas
+Quit	ShortcutsWindow		Baigti darbą
+Don't save	ShortcutsWindow		Neįrašyti
+Multi	ShortcutsSpec		Multi
+Application	ShortcutsWindow		Programa
+Shift	ShortcutsSpec	Name for modifier on keyboard	Lyg2
+Save KeySet as…	ShortcutsWindow		Įrašyti sparčiųjų klavišų rinkinį kaip…
+Open	ShortcutsWindow		Atverti
+Really quit without saving your changes?	ShortcutsWindow		Ar tikrai baigti programos darbą neįrašius pakeitimų?
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Sparčiųjų klavišų rinkinio išanalizuoti nepavyko!
+Select	ShortcutsWindow		Pažymėti
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Sparčiųjų klavišų rinkinio įrašyti nepavyko!
+Oh no	ShortcutsWindow		O, ne!
+Shortcuts	System name		Spartieji klavišai

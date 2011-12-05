@@ -1,0 +1,13 @@
+1	lithuanian	x-vnd.Haiku-JPEG2000Translator	547915409
+Write	JPEG2000Translator		Rašymas
+JPEG2000 images	JPEG2000Translator		JPEG2000 paveikslai
+Output only codestream (.jpc)	JPEG2000Translator		Išvesti tik kodų srautą (.jpg)
+Write black-and-white images as RGB24	JPEG2000Translator		Rašyti juodai baltus paveikslus kaip 24 bitų spalvotus
+Output quality	JPEG2000Translator		Išvesties kokybė
+Read	JPEG2000Translator		Skaitymas
+©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nSukurta „JasPer“ bibliotekos pagrindu:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nKaip „vadovėlis“ naudotas „ImageMagick“ jp2 kodekas.\n\thttp://www.imagemagick.org/\n
+Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		„Be“ paveikslų formatas (JPEG2000 keitiklis)
+Low	JPEG2000Translator		Žema
+About	JPEG2000Translator		Apie
+High	JPEG2000Translator		Aukšta
+Read greyscale images as RGB32	JPEG2000Translator		Atverti pilkumo tonais užkoduotus paveikslus kaip 32 bitų spalvotus

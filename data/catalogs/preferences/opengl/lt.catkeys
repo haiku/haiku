@@ -14,12 +14,12 @@ GLU version:	InfoView		GLU versija:
 Model stack size:	Capabilities		Modelių dėklo dydis:
 Projection stack size:	Capabilities		Projekcijų dėklo dydis:
 Max. lights:	Capabilities		Daugiausia šviesos šaltinių:
-Max. 2D texture size:	Capabilities		Didžiausias 2D tekstūros dydis:
-Max. convolution:	Capabilities		Didž. susukimas:
+Max. 2D texture size:	Capabilities		Didžiausias dvimatės tekstūros dydis:
+Max. convolution:	Capabilities		Didžiausias susukimas:
 GLUT API version:	InfoView		GLUT API sąsajos versija:
 Texture stack size:	Capabilities		Tekstūrų dėklo dydis:
-Max. evaluators equation order:	Capabilities		Didž. lygčių skaičiuoklio eilė:
-Max. 3D texture size:	Capabilities		Didžiausias 3D tekstūros dydis:
+Max. evaluators equation order:	Capabilities		Didžiausia lygčių skaičiuoklio eilė:
+Max. 3D texture size:	Capabilities		Didžiausias trimatės tekstūros dydis:
 Capabilities	Capabilities		Galimybės
 Max. recommended index elements:	Capabilities		Daugiausia siūlomų sąvado dėmenų:
 Available	Extensions		Galimi

@@ -1,0 +1,11 @@
+1	lithuanian	x-vnd.Haiku-HPGSTranslator	885771575
+Based on HPGS (http://hpgs.berlios.de)	ConfigView		Sukurta HPGS (http://hpgs.berlios.de) pagrindu
+Version %d.%d.%d, %s	ConfigView		Versija %d.%d.%d, %s
+Error: Cannot process plot data %s\n	HPGSTranslator		Klaida: nepavyko apdoroti braižymo duomenų %s\n
+HPGS image	HPGSTranslator		HPGS paveikslas
+HPGSTranslator Settings	ConfigView		HPGS keitiklio nuostatos
+HPGS images	ConfigView		HPGS paveikslai
+HPGS images	HPGSTranslator		HPGS paveikslai
+no hpgs\n	HPGSTranslator		ne hpgs\n
+HPGS image translator	HPGSTranslator		HPGS paveikslų keitiklis
+Write error %s\n	HPGSTranslator		Rašymo klaida %s\n

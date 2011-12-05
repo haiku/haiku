@@ -118,7 +118,7 @@ Could not find search string.	ProbeView		Ieškotos sekos rasti nepavyko.
 16 bit unsigned value:	TypeEditors		16 bitų reikšmė be ženklo:
 Attribute offset: 	ProbeView		Poslinkis požymyje:
 View	ProbeView	This is the last menubar item 'File Edit Block View'	Rodymas
-Redo	ProbeView		Atstatyti
+Redo	ProbeView		Grąžinti
 File: 	ProbeView		Failas:
 32 bit unsigned pointer:	TypeEditors		32 bitų rodyklė be ženklo:
 of 	ProbeView		iš

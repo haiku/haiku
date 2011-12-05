@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-FileTypes	287296218
+1	lithuanian	x-vnd.Haiku-FileTypes	473999706
 Application types…	FileTypes Window		Programų tipai…
 Description:	Application Types Window		Aprašas:
 Args only	Application Type Window		Tik argumentai
@@ -98,53 +98,60 @@ New resource file…	FileTypes Window		Naujas išteklių failas…
 Cancel	New File Type Window		Atsisakyti
 Icon	FileTypes Window		Piktograma
 Extension:	Extension Window		Prievardis:
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Supertipo pašalinimas yra negrįžtamas.\nVisi bylų tipai priklausantys šiam supertipui bus prarastit!\n\nTikrai to norite? Visos grupės pašalinimui prispaudę „Shift“ klavišą spauskite „Pašalinti“.
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Supertipo pašalinimas yra negrįžtamas.\nKartu su juo bus pašalinti ir visi jam priklausantys failų tipai!\n\nAr tikrai norite jį pašalinti? Jeigu vis tiek norite pašalinti visą grupę, spustelėkite mygtuką „Pašalinti“, laikydami nuspaustą Lyg2 klavišą.
 Internal name:	FileTypes Window		Vidinis pavadinimas:
 Add	Attribute Window		Pridėti
-Close	Application Type Window		Uždaryti
-File recognition	FileTypes Window		Bylos atpažinimas
-Center	Attribute Window	Attribute column alignment in Tracker	Viduryje
-Golden master	Application Type Window		Aukso ruošinys
-Could not open \"%s\":\n%s	FileTypes		Neatidaromas „%s“:\n%s
-Alignment:	Attribute Window		Lygiavimas:
-Left	Attribute Window	Attribute column alignment in Tracker	Kairėn
+Close	Application Type Window		Užverti
+File recognition	FileTypes Window		Failo atpažinimas
+Remove uninstalled	Application Types Window		Pašalinti išdiegtas
+Center	Attribute Window	Attribute column alignment in Tracker	centrinė
+Golden master	Application Type Window		Galutinės ruošinys
+Could not open \"%s\":\n%s	FileTypes		Nepavyko atverti „%s“:\n%s
+Alignment:	Attribute Window		Lygiuotė:
+Left	Attribute Window	Attribute column alignment in Tracker	kairinė
 Cancel	Extension Window		Atsisakyti
+Path:	Application Types Window		Kelias:
 Application flags	Application Type Window		Programos žymos
 Cancel	Type List Window		Atsisakyti
+Move up	FileTypes Window		Pakelti
 Description	FileTypes Window		Aprašas
-Save request	Application Type Window		Išsaugoti užklausimą
+Save request	Application Type Window		Įrašyti užklausą
 Beta	Application Type Window		Beta
-None	FileTypes Window		Nieko
+None	FileTypes Window		Neparinkta
 Remove	FileTypes Window		Pašalinti
 Attribute name:	Attribute Window		Požymio pavadinimas:
-Extension	Extension Window		Plėtinys
+Extension	Extension Window		Prievardis
 Add type	New File Type Window		Pridėti tipą
 Internal name:	Attribute Window		Vidinis pavadinimas:
 Show in Tracker…	Application Types Window		Parodyti Pėdsekyje…
-Final	Application Type Window		Galutinis
+Final	Application Type Window		Galutinė
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Plotis:
-This file type already exists	New File Type Window		Toks bylų tipas jau yra
-Same as…	FileTypes Window		Toks kaip…
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	Vaizdavimas:
+This file type already exists	New File Type Window		Toks failų tipas jau yra
+Same as…	FileTypes Window		Ta pati, kaip…
 Exclusive launch	Application Type Window		Išskirtinė paleistis
-FileTypes	System name		BylųTipai
-Could not remove file type: %s\n	FileTypes Window		Nepašalinamas bylų tipas: %s\n
-Signature:	Application Types Window		Prierašas:
+%ld Application type%s could be removed.	Application Types Window		Pavyko pašalinti programų tipų: %ld.
+FileTypes	System name		Failų tipai
+Application types	Application Types Window		Programų tipai
+Could not remove file type: %s\n	FileTypes Window		Nepavyko pašalinti failų tipo: %s\n
+Signature:	Application Types Window		Identifikatorius:
 Gamma	Application Type Window		Gama
 Cancel	Preferred App Menu		Atsisakyti
 Cancel	FileTypes Window		Atsisakyti
-Select preferred application	FileTypes Window		Rinktis pageidautiną programą
+Select preferred application	FileTypes Window		Parinkite pageidautiną programą
+Right	Attribute Window	Attribute column alignment in Tracker	dešininė
 Default application	FileType Window		Numatytoji programa
 Long description:	Application Type Window		Ilgasis aprašas:
-FileTypes request	FileTypes Window		Bylų tipo užklausimas
-Version info	Application Type Window		Apie versiją
+FileTypes request	FileTypes Window		Failų tipų užklausa
+Version info	Application Type Window		Versijos savybės
 (from super type)	FileTypes Window		(iš supertipo)
 Version:	Application Types Window		Versija:
 Preferred application	FileTypes Window		Pageidautina programa
 Short description:	Application Type Window		Trumpasis aprašas:
-File could not be opened	Preferred App Menu		Neatidaroma byla
-Could not change file extensions	Extension Window		Nekeičiamas bylos plėtinys
-Edit icon…	Icon View		Taisyti ženkliuką…
-Same as…	FileType Window	The same TYPE as ...	Toks kaip…
-Save into resource file…	Application Type Window		Išsaugoti išteklių bylon…
-Visible	Attribute Window		Matomi
-Could not install file type	New File Type Window		Neįdiegiamas bylų tipas
+File could not be opened	Preferred App Menu		Failo atverti nepavyko
+Could not change file extensions	Extension Window		Failo prievardžio pakeisti nepavyko
+Edit icon…	Icon View		Taisyti piktogramą…
+Same as…	FileType Window	The same TYPE as ...	Tas pats, kaip…
+Save into resource file…	Application Type Window		Įrašyti į išteklių failą…
+Visible	Attribute Window		Matomas
+Could not install file type	New File Type Window		Failų tipo įdiegti nepavyko

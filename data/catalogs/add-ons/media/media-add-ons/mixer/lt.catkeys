@@ -1,0 +1,27 @@
+1	lithuanian	x-vnd.Haiku-mixer.media_addon	3450667169
+Input gain controls represent	AudioMixer		Įvesties stiprinimo valdikliai atspindi
+Linear interpolation	AudioMixer		linijinė interpoliacija
+Virtual output channels	AudioMixer		virtualius išvesties kanalus
+Refuse output format changes	AudioMixer		Neleisti išvesties formato keitimų
+Output mapping	AudioMixer		Išvesties susiejimas
+Allow input channel remapping	AudioMixer		Leisti įvesties kanalų persiejimą
+Resampling algorithm	AudioMixer		Garso elementų atrankos algoritmas
+Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Sumažinti maišiklio išvesties garsį 3 dB (kaip „BeOS R5“)
+Display balance control for stereo connections	AudioMixer		Rodyti balanso valdiklius stereofoninėms jungtims
+To output	AudioMixer		Į išvestį
+not connected	AudioMixer		neprijungta
+Refuse input format changes	AudioMixer		Neleisti įvesties formato keitimų
+Drop/repeat samples	AudioMixer		Praleisti / kartoti garso elementus
+Output channel sources	AudioMixer		Išvesties kanalo šaltiniai
+dB	AudioMixer		dB
+Gain controls	AudioMixer		Stiprinimo valdikliai
+Input mapping	AudioMixer		Įvesties susiejimas
+Mute	AudioMixer		Nutildyti
+Input channel destinations	AudioMixer		Įvesties kanalų paskirtys
+To master	AudioMixer		Į pagrindinį
+Master output	AudioMixer		Pagrindinė išvestis
+Setup	AudioMixer		Nuostatos
+Use non linear gain sliders (like BeOS R5)	AudioMixer		Naudoti nelinijinius stiprinimo šliaužiklius (kaip „BeOS R5“)
+Gain	AudioMixer		Stiprinimas
+Allow output channel remapping	AudioMixer		Leisti išvesties kanalų persiejimą
+Physical input channels	AudioMixer		fizinius įvesties kanalus

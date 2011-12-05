@@ -1,0 +1,4 @@
+1	lithuanian	x-vnd.Haiku-debug_server	1035915338
+OK	DebugServer		Gerai
+Debug	DebugServer		Derinti
+The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		Programa:\n\n%app\n\nsusidūrė su tęsti darbo neleidžiančia klaida. „Haiku“ nutrauks programos darbą ir apsitvarkys.

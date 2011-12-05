@@ -1,41 +1,61 @@
-1	lithuanian	x-vnd.Haiku-Mail	573736577
-Mail checking	Config Window		Tikrinamas paštas
-Settings	Config Window		Nustatymai
-Only when dial-up is connected	Config Window		Tik kai veikia tinklas
-While sending and receiving	Config Window		Siunčiant ir gaunant
+1	lithuanian	x-vnd.Haiku-Mail	2592587573
+Mail checking	Config Window		Pašto tikrinimas
+Settings	Config Window		Nuostatos
+Never	Config Window	show status window	niekada
+Only when dial-up is connected	Config Window		Tik esant prisijungus prie tinklo
+While sending and receiving	Config Window		siunčiant ir gaunant
 days	Config Window		d.
+Incoming	Config Window		Pašto gavimas
+Server name:	E-Mail		Serverio vardas:
 OK	Config Window		Gerai
-Start mail services on startup	Config Window		Start mail services on startup
+Start mail services on startup	Config Window		Paleisti el. pašto tarnybą įkeliant sistemą
+E-mail address:	E-Mail		El. pašto adresas:
 Account name:	E-Mail		Paskyros pavadinimas:
 Account name:	Config Views		Paskyros pavadinimas:
+Create new account	AutoConfigWindow		Naujos paskyros kūrimas
 OK	Config Views		Gerai
-The filter could not be moved. Deleting filter.	Config Views		Filtras nėra perkeliamas. Šalinamas filtras.
+The filter could not be moved. Deleting filter.	Config Views		Filtro perkelti nepavyko. Filtras šalinamas.
 Revert	Config Window		Atšaukti pakeitimus
+Login name:	E-Mail		Abonento vardas:
+Incoming	E-Mail		Pašto gavimas
+Password:	E-Mail		Slaptažodis:
 Accounts	Config Window		Paskyros
+Finish	AutoConfigWindow		Atlikta
 Remove	Config Window		Pašalinti
 Miscellaneous	Config Window		Kita
-Show connection status window:	Config Window		Rodyti prisijungimo būsenos langą:
-While sending	Config Window		Siunčiant
-Schedule outgoing mail when dial-up is disconnected	Config Window		Įtraukti darbų tvarkaraštin išsiunčiamą paštą, kai tinklas yra atjungtas
+Show connection status window:	Config Window		Rodyti ryšio būsenos langą:
+Server Name:	E-Mail		Serverio vardas:
+While sending	Config Window		siunčiant
+Schedule outgoing mail when dial-up is disconnected	Config Window		Kai prie tinklo neprisijungta, laiškų išsiuntimą įtraukti užduočių eilėn
 hours	Config Window		val.
+Enter a valid e-mail address.	AutoConfigWindow		Įveskite galiojantį elektroninio pašto adresą.
 Add	Config Window		Pridėti
-Account settings	AutoConfigWindow		Paskyros nustatymai
+Account settings	AutoConfigWindow		Paskyros nuostatos
 E-mail	System name		El. paštas
 never	Config Window	mail checking frequency	Niekada
-\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nPagrindiniai nustatymiai yra negrįžtami.\n\nKlaida išgaunant pagrindinius nustatymus:\n%s\n
-Real name:	Config Views		Tikrasis vardas:
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nAtšaukti bendrųjų nuostatų pakeitimų nepavyko.\n\nKlaida gaunant bendrąsias nuostatas:\n%s\n
+Real name:	Config Views		Asmenvardis:
+\t\t· Outgoing	Config Window		\t\t· Siuntimas
+Choose Protocol	E-Mail		Išsirinkite protokolą
 Return address:	Config Views		Atgalinis adresas:
-Edit mailbox menu…	Config Window		Taisyti pašto dėžutės meniu…
+Edit mailbox menu…	Config Window		Keisti pašto dėžutės meniu…
+Outgoing	E-Mail		Pašto siuntimas
+\t\t· E-mail filters	Config Window		\t\t· El. pašto filtrai
 Remove	Config Views		Pašalinti
-Check every	Config Window		Tikrinti visada
-Incoming mail filters	Config Views		Įeinančiųjų laiškų filtrai
-Account settings	Config Views		Paskyros nustatymai
+\t\t· Incoming	Config Window		\t\t· Gavimas
+Next	AutoConfigWindow		Toliau
+Check every	Config Window		Tikrinti kas
+Back	AutoConfigWindow		Atgal
+Incoming mail filters	Config Views		Gaunamų laiškų filtrai
+Account settings	Config Views		Paskyros nuostatos
 minutes	Config Window		min.
-Error retrieving general settings: %s\n	Config Window		Klaida išgaunant pagrindinius nustatymus: %s\n
-Real name:	E-Mail		Tikrasis vardas:
+Error retrieving general settings: %s\n	Config Window		Klaida gaunant bendrąsias nuostatas: %s\n
+Real name:	E-Mail		Asmenvardis:
 Apply	Config Window		Taikyti
-Always	Config Window		Visada
+Always	Config Window		visada
 OK	AutoConfigWindow		Gerai
 Add filter	Config Views		Pridėti filtrą
-Outgoing mail filters	Config Views		Išsiunčiamųjų laiškų filtrai
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nNauja paskyra kuriama „Pridėti“ mygtuku.\n\nPašalinama paskyra pasirinkus atitinkamą įrašą ir paspaudus „Pašalinti“ mygtuką.\n\nNustatymų keitimui pasirenkamas atitinkamas dėmuo iš sąrašo.
+Outgoing	Config Window		Pašto siuntimas
+Outgoing mail filters	Config Views		Siunčiamų laiškų filtrai
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nNaują paskyrą galite susikurti, spustelėję mygtuką „Pridėti“.\n\nEsamą paskyrą galite pašalinti, ją pasirinkę ir spustelėję mygtuką „Pašalinti“.\n\nJeigu norite keisti kažkurio paskyros nuostatas, išsirinkite ją sąraše.
+Error	Config Window		Klaida

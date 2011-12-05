@@ -3,7 +3,7 @@
 Stop	file:ZipOMaticWindow.cpp		Stabdyti
 Creating archive: %s	file:ZipOMaticWindow.cpp		Archyvo kūrimas: %s
 Continue	file:ZipOMaticWindow.cpp		Tęsti
-Preparing to archive	file:ZipperThread.cpp		Ruošiamasi archyvavimui
+Preparing to archive	file:ZipperThread.cpp		Ruošiamasi archyvuoti
 Drop files here.	file:ZipOMaticWindow.cpp		Archyvuotinus failus meskite čia.
 Filename: %s	file:ZipOMaticWindow.cpp		Failo vardas: %s
 Let them continue	file:ZipOMatic.cpp		Pratęsti

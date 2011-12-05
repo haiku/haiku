@@ -1,0 +1,9 @@
+1	lithuanian	x-vnd.Haiku-BMPTranslator	2497639570
+BMP images	BMPTranslator		BMP paveikslai
+BMPTranslator Settings	BMPTranslator		BMP keitiklio nuostatos
+BMP image (OS/2 format, %d bits)	BMPTranslator		BMP paveikslas (OS/2 formatas, %d b)
+BMP image translator	BMPView		BMP paveikslų keitiklis
+BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	BMP paveikslas („Windows“ formatas, %d b
+BMP Settings	BMPMain		BMP nuostatos
+Version %d.%d.%d, %s	BMPView		Versija %d.%d.%d, %s
+BMP image translator	BMPTranslator		BMP paveikslų keitiklis

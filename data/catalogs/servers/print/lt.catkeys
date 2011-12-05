@@ -1,21 +1,54 @@
-1	lithuanian	x-vnd.Be-PSRV	3878243268
-Undefined	ConfigWindow		Neapibrėžta
+1	lithuanian	x-vnd.Be-PSRV	1761631281
+Undefined	ConfigWindow		neapibrėžtos
+Return the number of available transports	PrintServerApp Scripting		Grąžinti prieinamų transportų skaičių
+Return the number of available printers	PrintServerApp Scripting		Grąžinti prieinamų spausdintuvų skaičių
+Get currently available ports/devices	Transport Scripting		Gauti duotuoju momentu prieinamas jungtis ir spausdintuvus
+Retrieve or select the active printer	PrintServerApp Scripting		Gauti arba keisti aktyvųjį spausdintuvą
 Cancel	PrintServerApp		Atsisakyti
-Page setup:	ConfigWindow		Puslapio nustatymai:
+Retrieve a specific printer	PrintServerApp Scripting		Gauti konkretų spausdintuvą
+Page %1 to %2	ConfigWindow		%1 – %2 puslapiai
+Get name of the printer add-on used for this printer	Printer Scripting		Gauti spausdinimo papildinio, naudojamo šiam spausdintuvui, pavadinimą
+Page setup:	ConfigWindow		Puslapio nuostatos:
 OK	ConfigWindow		Gerai
 Cancel	ConfigWindow		Atsisakyti
+Printer server	ConfigWindow		Spausdinimo serveris
+Page %1 to %2, %3 copies	ConfigWindow		%1 – %2 puslapiai, %3 kopijos (-ų)
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Spausdintuvas tokiu vardu jau yra, bet nerasta jo tvarkyklė. Ar jį pakeisti?
 Yes	PrintServerApp		Taip
-Would you like to set one up now?	PrintServerApp		Norite pasirinkti kokį dabar?
-Portrait	ConfigWindow		Stačiai
-All pages	ConfigWindow		Visus puslapius
-There is no default printer set up.	PrintServerApp		Nėra numatytojo spausdintuvo.
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	JAV „Ledger“
+Would you like to set one up now?	PrintServerApp		Ar norite jį pasirinkti dabar?
+A6	ConfigWindow	ISO 216 paper size	A6
+Portrait	ConfigWindow		stačias
+All pages	ConfigWindow		visi puslapiai
+There is no default printer set up.	PrintServerApp		Neparinktas numatytasis spausdintuvas.
+B5	ConfigWindow	ISO 216 paper size	B5
+A0	ConfigWindow	ISO 216 paper size	A0
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	JAV „Letter“
 Printer:	ConfigWindow		Spausdintuvas:
+A2	ConfigWindow	ISO 216 paper size	A2
 Select a printer	ConfigWindow		Pasirinkite spausdintuvą
-No	PrintServerApp		Nėra
-Landscape	ConfigWindow		Gulsčias
+Show configuration window	PrintServerApp Scripting		Rodyti nuostatų langą
+A4	ConfigWindow	ISO 216 paper size	A4
+Get comments about this printer	Printer Scripting		Gauti komentarą apie šį spausdintuvą
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Spausdintuvas tokiu vardu jau yra, bet juo pasinaudoti neįmanoma. Ar jį pakeisti?
+No	PrintServerApp		Ne
+Get the transport configuration for this printer	Printer Scripting		Gauti šio spausdintuvo transporto nuostatas
+Landscape	ConfigWindow		gulsčias
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	JAV „Legal“
 There are no printers set up.	PrintServerApp		Nėra nustatytų spausdintuvų.
+Get name of the transport add-on used for this printer	Printer Scripting		Gauti šio spausdintuvo transporto papildinio pavadinimą
+All pages, %1 copies	ConfigWindow		visi puslapiai, %1 kopijos (-ų)
+Delete a specific printer	PrintServerApp Scripting		Pašalinti konkretų spausdintuvą
+Create a new printer	PrintServerApp Scripting		Sukurti naują spausdintuvą
 OK	PrintServerApp		Gerai
-Print setup	ConfigWindow		Spausdinimo nustatymai
-Would you like to make @ the default printer?	PrintServerApp		Norite spausdintuvą @ padaryti numatytuoju?
-Page setup	ConfigWindow		Puslapio nustatymai
-Paper setup:	ConfigWindow		Popieriaus nustatymai:
+Print setup	ConfigWindow		Spausdinimo nuostatos
+A1	ConfigWindow	ISO 216 paper size	A1
+Retrieve a specific transport	PrintServerApp Scripting		Gauti konkretų transportą
+Get name of printer	Printer Scripting		Gauti spausdintuvo vardą
+A3	ConfigWindow	ISO 216 paper size	A3
+Get name of transport	Transport Scripting		Gauti transporto pavadinimą
+A5	ConfigWindow	ISO 216 paper size	A5
+Would you like to make @ the default printer?	PrintServerApp		Ar norite spausdintuvą „@“ skirti numatytuoju?
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	JAV „Tabloid“
+Page setup	ConfigWindow		Puslapio nuostatos
+Paper setup:	ConfigWindow		Popieriaus nuostatos:

@@ -2,7 +2,7 @@
 View	Mail		Rodymas
 %d - Date	Mail		%d – data
 Attach attributes:	Mail		Pridedamų failų požymių įtraukimas:
-Inconsistency occurred in the undo/redo buffer.	Mail		Nesutapimas atšaukti/atstatyti buferyje.
+Inconsistency occurred in the undo/redo buffer.	Mail		Nesutapimas atšaukti/grąžinti buferyje.
 An error occurred trying to save the attachment.	Mail		Bandant įrašyti laiško priedą, įvyko klaida.
 Copy to new	Mail		Kopijuoti į naujus
 Edit	Mail		Taisa

@@ -1,10 +1,10 @@
 1	lithuanian	x-vnd.Haiku-Media	1473363280
-Couldn't add volume control in Deskbar: %s\n	Media views		Nepavyko garso valdiklio pridėti į pranešimų sritį: %s\n
-Ready for use…	Media Window		Parengiama…
+Couldn't add volume control in Deskbar: %s\n	Media views		Nepavyko garso valdiklio patalpinti pranešimų srityje: %s\n
+Ready for use…	Media Window		Pasirengta naudojimui…
 Video input:	Media views		Vaizdo įvestis:
-Waiting for media_server to quit.	Media Window		Laikiama, kol įvairialypės terpės tarnyba baigs darbą.
+Waiting for media_server to quit.	Media Window		Laikiama, kol įvairialypės terpės tarnyba (media_server) baigs darbą.
 Cleaning up.	Media Window		Apsitvarkoma.
-Defaults	Media views		Numatytai
+Defaults	Media views		Numatytosios reikšmės
 Stopping media server…	Media Window		Stabdoma įvairialypės terpės tarnyba…
 Quit	Media Window		Baigti darbą
 OK	Media Window		Gerai
@@ -16,15 +16,15 @@ Could not connect to the media server.\nWould you like to start it ?	Media Windo
 Restart media services	Media views		Perleisti įvairialypės terpės tarnybas
 Couldn't remove volume control in Deskbar: %s\n	Media views		Nepavyko garso valdiklio pašalinti iš pranešimų srities: %s\n
 Media	System name		Įvairialypė terpė
-Telling media_addon_server to quit.	Media Window		Išjungiama įvairialypės terpės papildinių tarnyba.
+Telling media_addon_server to quit.	Media Window		Išjungiama įvairialypės terpės papildinių tarnyba (media_addon_server).
 Audio mixer	Media Window		Garsų maišiklis
-This hardware has no controls.	Media Window		Ši aparatinė įranga nederinama.
+This hardware has no controls.	Media Window		Ši aparatūra nederinama.
 Audio output:	Media views		Garso išvestis:
 Restarting media services\nStarting media server…\n	Media Window		Perleidžiamos įvairialypės terpės tarnybos\nPaleidžiama įvairialypės terpės tarnyba…\n
 Audio settings	Media Window		Garso nuostatos
 Start media server	Media Window		Paleisti įvairialypės terpės tarnybą
 Restarting media services\nShutting down media server\n	Media Window		Perleidžiamos įvairialypės terpės tarnybos\nIšjungiama įvairialypės terpės tarnyba\n
-<none>	Media views		<joks>
+<none>	Media views		<nėra>
 Channel:	Media views		Kanalas:
-Show volume control on Deskbar	Media views		Rodyti garso valdiklį pranešimų srityje
+Show volume control on Deskbar	Media views		Patalpinti garso valdiklį pranešimų srityje
 Audio input:	Media views		Garso įvestis:

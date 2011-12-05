@@ -30,7 +30,7 @@ Time	System name		Laikas
 America	Time		Amerika
 Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Laiko ir datos nuostatos. Autoriai:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\n© 2004-2008, Haiku.
 Reset	Time		Numatytai
-Synchronize at boot	Time		Sinchronizuoti įkrovos metu
+Synchronize at boot	Time		Sinchronizuoti įkeliant sistemą
 Received invalid time	Time		Gautas negalimas laikas
 Antarctica	Time		Antarktis
 The following error occured while synchronizing:r\n%s: %s	Time		Bandant sinchronizuoti, susidurta su šia klaida:\n%s: %s
