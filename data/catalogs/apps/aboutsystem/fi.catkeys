@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-About	2717523515
+1	finnish	x-vnd.Haiku-About	3434348710
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d mebitavua yhteensä
 %d MiB used (%d%%)	AboutView		%d mebitavua käytetty (%d%%)
@@ -20,7 +20,7 @@ Contributors:\n	AboutView		Avustajat:\n
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nKaikki oikeudet pidätetty.
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. Kaikki oikeudet pidätetty.
 Copyright © 1990-2003 Wada Laboratory, the University of Tokyo.	AboutView		Copyright © 1990-2003 Wada Laboratory, Tokion yliopisto.
-Copyright © 1991-2000 Silicon Graphics, Inc. SGI's Software FreeB license. All rights reserved.	AboutView		Copyright © 1991-2000 Silicon Graphics, Inc. SGI's Software FreeB license. Kaikki oikeudet pidätetty.
+Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Copyright © 1991-2000 Silicon Graphics, Inc. Kaikki oikeudet pidätetty.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. Kaikki oikeudet pidätetty.
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Copyright © 1994-2008 Xiph.Org. Kaikki oikeudet pidätetty.
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. Tämä ohjelmisto perustuu Independent JPEG Group-ryhmän työhön.
@@ -63,7 +63,7 @@ MIT license. All rights reserved.	AboutView		MIT-lisenssi. Kaikki oikeudet pidä
 Memory:	AboutView		Muisti:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (projektin perustaja)\n\n
 Past maintainers:\n	AboutView		Entiset ylläpitäjät:\n
-Portions of this software are copyright. Copyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		Osia tästä ohjelmistosta on copyright-suojattu. Copyright © 1996-2006 The FreeType Project. Kaikki oikeudet pidätetty.
+Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		Osia tästä ohjelmistosta on copyright-suojattu.\nCopyright © 1996-2006 The FreeType Project. Kaikki oikeudet pidätetty.
 Processor:	AboutView		Suoritin:
 Revision	AboutView		Korjausversio
 Source Code: 	AboutView		Lähdekoodi: 

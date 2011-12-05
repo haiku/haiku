@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Terminal	2763377662
+1	finnish	x-vnd.Haiku-Terminal	2059530645
 %app% settings	Terminal PrefWindow	window title	%app%-asetukset
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help tulosta tämä opaste\n -t, --title aseta ikkunan otsikko\n -f, --fullscreen aloita kokoruututilassa\n
 Abort	Terminal Shell		Keskeytä
@@ -55,7 +55,6 @@ OK	Terminal TermWindow		Valmis
 Page setup…	Terminal TermWindow		Sivuasetus...
 Paste	Terminal TermWindow		Liitä
 Print	Terminal TermWindow		Tulosta
-Print cancelled.	Terminal TermWindow		Tulostus peruttu.
 Quit	Terminal TermWindow		Poistu
 Really close?	Terminal TermWindow		Suljetaanko todella?
 Save	Terminal PrefWindow		Tallenna

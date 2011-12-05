@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-LaunchBox	3172696206
+1	finnish	x-vnd.Haiku-LaunchBox	3016105370
 Add button here	LaunchBox		Lisää painike tänne
 Auto-raise	LaunchBox		Automaattisesti päällimmäinen
 Bummer	LaunchBox		Valmis
@@ -8,7 +8,7 @@ Clone	LaunchBox		Klooni
 Close	LaunchBox		Sulje
 Description for '%3'	LaunchBox		Kohteen ’%3’ kuvaus
 Failed to launch '%1'.\n\nError:	LaunchBox		Sovelluksen ’%1’ käynnistys epäonnistui:\n\nVirhe:
-Failed to launch 'something',error in Pad data.	LaunchBox		Epäonnistuttiin käynnistämään ’jotakin’, virhe Alustatiedoissa.
+Failed to launch 'something', error in Pad data.	LaunchBox		’Jonkin’ käynnistäminen epäonnistui, virhe alustatiedoissa.
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Epäonnistuttiin lähettämään ’avaa kansio’-komento Seuraajalle.\n\nVirhe: 
 Horizontal layout	LaunchBox		Vaakasuora sijoittelu
 Icon size	LaunchBox		Kuvakekoko
