@@ -40,6 +40,53 @@ UTF8NextCharLen(const char *text)
 
 
 static inline uint32
+UTF8NextCharLen(const char *bytes, size_t length)
+{
+	if (bytes == NULL || length == 0 || bytes[0] == 0)
+		return 0;
+
+	if ((bytes[0] & 0x80) == 0) {
+		// A single ASCII char - or so...
+		return 1;
+	}
+
+	if (IsInsideGlyph(bytes[0])) {
+		// Not a proper multibyte start.
+		return 0;
+	}
+
+	// We already know that we have the upper two bits set due to the above
+	// two checks.
+	uint8 mask = 0x20;
+	size_t bytesExpected = 2;
+	while ((bytes[0] & mask) != 0) {
+		if (mask == 0x02) {
+			// Seven byte char - invalid.
+			return 0;
+		}
+
+		bytesExpected++;
+		mask >>= 1;
+	}
+
+	// There would need to be more bytes to satisfy the char.
+	if (bytesExpected > length)
+		return 0;
+
+	// We already know the first byte is fine, check the rest.
+	for (size_t i = 1; i < bytesExpected; i++) {
+		if (!IsInsideGlyph(bytes[i])) {
+			// The sequence is incomplete.
+			return 0;
+		}
+	}
+
+	// Puh, everything's fine.
+	return bytesExpected;
+}
+
+
+static inline uint32
 UTF8PreviousCharLen(const char *text, const char *limit)
 {
 	const char *ptr = text;
