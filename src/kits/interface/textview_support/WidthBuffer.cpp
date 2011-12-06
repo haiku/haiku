@@ -92,10 +92,10 @@ WidthBuffer::~WidthBuffer()
 	\return The space (in pixels) required to draw the given string.
 */
 float
-WidthBuffer::StringWidth(const char* inText, int32 fromOffset,
-	int32 length, const BFont* inStyle)
+WidthBuffer::StringWidth(const char* inText, int32 fromOffset, int32 length,
+	const BFont* inStyle)
 {
-	if (inText == NULL || length == 0)
+	if (inText == NULL || length <= 0)
 		return 0;
 
 	BAutolock _(fLock);
@@ -108,13 +108,13 @@ WidthBuffer::StringWidth(const char* inText, int32 fromOffset,
 	int32 numChars = 0;
 	int32 textLen = 0;
 
-	char* sourceText = (char*)inText + fromOffset;
+	const char* sourceText = inText + fromOffset;
 	const float fontSize = inStyle->Size();
 	float stringWidth = 0;
-	for (int32 charLen = 0;
-			sourceText < inText + length;
-			sourceText += charLen) {
-		charLen = UTF8NextCharLen(sourceText);
+
+	for (int32 charLen = 0; length > 0;
+			sourceText += charLen, length -= charLen) {
+		charLen = UTF8NextCharLen(sourceText, length);
 
 		// End of string, bail out
 		if (charLen <= 0)
@@ -152,7 +152,7 @@ WidthBuffer::StringWidth(const char* inText, int32 fromOffset,
 		free(text);
 	}
 
-	return stringWidth*  fontSize;
+	return stringWidth * fontSize;
 }
 
 
@@ -283,7 +283,7 @@ WidthBuffer::Hash(uint32 val)
 */
 float
 WidthBuffer::HashEscapements(const char* inText, int32 numChars, int32 textLen,
-		int32 tableIndex, const BFont* inStyle)
+	int32 tableIndex, const BFont* inStyle)
 {
 	ASSERT(inText != NULL);
 	ASSERT(numChars > 0);
@@ -300,6 +300,8 @@ WidthBuffer::HashEscapements(const char* inText, int32 numChars, int32 textLen,
 	const char* textEnd = inText + textLen;
 	// Insert the escapements into the hash table
 	do {
+		// Using this variant is safe as the handed in string is guaranteed to
+		// be 0 terminated.
 		const int32 charLen = UTF8NextCharLen(text);
 		if (charLen == 0)
 			break;
