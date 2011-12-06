@@ -4,5 +4,6 @@ UsePrivateSystemHeaders ;
 UsePrivateHeaders libroot shared ;
 
 MergeObject posix_malloc_debug.o :
+	#guarded_heap.cpp
 	heap.cpp
 ;
