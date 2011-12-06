@@ -144,8 +144,8 @@ ICUConverterManager::DropConverter(ICUConverterID id)
 		return B_NAME_NOT_FOUND;
 
 	fLRUConverters.Remove(iter->second);
-	fConverterMap.erase(iter);
 	iter->second->ReleaseReference();
+	fConverterMap.erase(iter);
 
 	return B_OK;
 }
