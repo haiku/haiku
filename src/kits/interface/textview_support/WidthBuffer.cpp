@@ -133,15 +133,21 @@ WidthBuffer::StringWidth(const char* inText, int32 fromOffset,
 			int32 offset = textLen;
 			textLen += charLen;
 			numChars++;
-			text = (char*)realloc(text, textLen);
-			for (int32 x = 0; x < charLen; x++)
-				text[offset + x] = sourceText[x];
+			char* newText = (char*)realloc(text, textLen + 1);
+			if (newText == NULL) {
+				free(text);
+				return 0;
+			}
+
+			text = newText;
+			memcpy(&text[offset], sourceText, charLen);
 		}
 	}
 
 	if (text != NULL) {
 		// We've found some characters which aren't yet in the hash table.
 		// Get their width via HashEscapements()
+		text[textLen] = 0;
 		stringWidth += HashEscapements(text, numChars, textLen, index, inStyle);
 		free(text);
 	}
