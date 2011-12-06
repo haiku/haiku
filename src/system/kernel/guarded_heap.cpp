@@ -333,7 +333,8 @@ guarded_heap_area_init(guarded_heap& heap, area_id id, void* baseAddress,
 	area->used_pages = 0;
 
 	size_t pagesNeeded = (sizeof(guarded_heap_area)
-		+ area->page_count * sizeof(guarded_heap_page)) / B_PAGE_SIZE;
+		+ area->page_count * sizeof(guarded_heap_page)
+		+ B_PAGE_SIZE - 1) / B_PAGE_SIZE;
 
 	area->page_count -= pagesNeeded;
 	area->size = area->page_count * B_PAGE_SIZE;
