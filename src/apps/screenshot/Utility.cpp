@@ -120,7 +120,7 @@ Utility::Save(BBitmap** screenshot, const char* fileName, uint32 imageType)
 	if (nodeInfo.InitCheck() != B_OK)
 		return B_ERROR;
 
-	nodeInfo.SetType(_GetMimeString(imageType));
+	nodeInfo.SetType(_GetMimeString(imageType).String());
 
 	return B_OK;
 }
@@ -187,10 +187,10 @@ Utility::MakeScreenshot(bool includeMouse, bool activeWindow,
 }
 
 
-const char*
+BString
 Utility::GetFileNameExtension(uint32 imageType) const
 {
-	BMimeType mimeType(_GetMimeString(imageType));
+	BMimeType mimeType(_GetMimeString(imageType).String());
 	BString extension("");
 
 	BMessage message;
@@ -203,11 +203,11 @@ Utility::GetFileNameExtension(uint32 imageType) const
 			extension.SetTo("");
 	}
 
-	return extension.String();
+	return extension;
 }
 
 
-const char*
+BString
 Utility::_GetMimeString(uint32 imageType) const
 {
 	const char *dummy = "";

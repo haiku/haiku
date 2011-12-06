@@ -8,6 +8,7 @@
 
 #include <Point.h>
 #include <Rect.h>
+#include <String.h>
 
 
 class BBitmap;
@@ -27,7 +28,7 @@ public:
 							uint32 imageType) const;
 			BBitmap*	MakeScreenshot(bool includeCursor, bool activeWindow,
 							bool includeBorder) const;
-			const char*	GetFileNameExtension(uint32 imageType) const;
+			BString		GetFileNameExtension(uint32 imageType) const;
 
 			BBitmap*	wholeScreen;
 			BBitmap*	cursorBitmap;
@@ -42,7 +43,7 @@ public:
 private:
 			void		_MakeTabSpaceTransparent(BBitmap* screenshot,
 							BRect frame) const;
-			const char*	_GetMimeString(uint32 imageType) const;
+			BString		_GetMimeString(uint32 imageType) const;
 };
 
 
