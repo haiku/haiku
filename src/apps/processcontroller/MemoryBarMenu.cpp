@@ -129,7 +129,7 @@ MemoryBarMenu::Pulse()
 			j++;
 		}
 
-		if (infos.team_info.team != fTeamList[j]) {
+		if (j == fTeamCount) {
 			// new team
 			team_info info;
 			j = 0;
