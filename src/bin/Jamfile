@@ -23,6 +23,7 @@ AddResources hey : hey.rdef ;
 AddResources mimeset : mimeset.rdef ;
 AddResources mountvolume : mountvolume.rdef ;
 AddResources notify : notify.rdef ;
+AddResources setmime : setmime.rdef ;
 AddResources urlwrapper : urlwrapper.rdef ;
 
 # standard commands that don't need any additional library
@@ -102,6 +103,7 @@ StdBinCommands
 	play.cpp
 	quit.cpp
 	roster.cpp
+	setmime.cpp
 	setversion.cpp
 	trash.cpp
 	version.cpp
