@@ -11,6 +11,7 @@
 #include <Locale.h>
 #include <LocaleRoster.h>
 #include <Message.h>
+#include <String.h>
 
 #include <getopt.h>
 #include <stdio.h>
@@ -21,7 +22,7 @@ extern const char *__progname;
 static const char *kProgramName = __progname;
 
 
-const char*
+BString
 preferred_language()
 {
 	BMessage preferredLanguages;
@@ -75,10 +76,10 @@ main(int argc, char **argv)
 	while ((c = getopt_long(argc, argv, "lcfh", longopts, NULL)) != -1) {
 		switch (c) {
 			case 'l':
-				printf("%s\n", preferred_language());
+				printf("%s\n", preferred_language().String());
 				break;
 			case 'c':
-				printf("%s.UTF-8\n", preferred_language());
+				printf("%s.UTF-8\n", preferred_language().String());
 				break;
 			case 'f':
 				print_formatting_conventions();
