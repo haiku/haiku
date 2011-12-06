@@ -194,10 +194,11 @@ BArchiveManager::ArchiverLeaving(const BArchiver* archiver, status_t err)
 		}
 	}
 
-	if (archiver == fCreator)
+	status_t result = fError;
+	if (archiver == fCreator) 
 		delete this;
 
-	return fError;
+	return result;
 }
 
 
@@ -366,8 +367,9 @@ BUnarchiveManager::UnarchiverLeaving(const BUnarchiver* unarchiver,
 		}
 	}
 
+	status_t result = fError;
 	delete this;
-	return fError;
+	return result;
 }
 
 
