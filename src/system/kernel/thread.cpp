@@ -2563,6 +2563,9 @@ wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout,
 			// middle of the cleanup.
 			acquire_sem(exitSem);
 			status = B_OK;
+
+			if (_returnCode != NULL)
+				*_returnCode = death.status;
 		}
 	}
 
