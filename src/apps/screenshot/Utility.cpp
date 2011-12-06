@@ -222,7 +222,8 @@ Utility::_GetMimeString(uint32 imageType) const
 		const translation_format* formats = NULL;
 		int32 numFormats;
 
-		if (roster->GetOutputFormats(x, &formats, &numFormats) == B_OK) {
+		if (roster->GetOutputFormats(translators[x], &formats, &numFormats)
+				== B_OK) {
 			for (int32 i = 0; i < numFormats; ++i) {
 				if (formats[i].type == imageType) {
 					delete [] translators;
