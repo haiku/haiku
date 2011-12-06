@@ -103,7 +103,6 @@ StdBinCommands
 	play.cpp
 	quit.cpp
 	roster.cpp
-	setmime.cpp
 	setversion.cpp
 	trash.cpp
 	version.cpp
@@ -151,6 +150,7 @@ StdBinCommands
 # standard commands that need libbe.so, libstdc++.so
 StdBinCommands
 	copyattr.cpp
+	setmime.cpp
 	xres.cpp
 	: be $(TARGET_LIBSTDC++) : $(haiku-utils_rsrc) ;
 
