@@ -193,6 +193,9 @@ static const Translation gTranslations[] =
 		"Michael Smirnov\n"
 		"Vladimir Vasilenko\n"
 	},
+	{ "sr",
+		"Nikola Miljković\n"
+	},
 	{ "es",
 		"Pedro Arregui\n"
 		"Zola Bridges\n"
