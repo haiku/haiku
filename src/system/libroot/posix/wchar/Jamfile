@@ -12,6 +12,7 @@ MergeObject posix_wchar.o :
 	mbrtowc.cpp
 	mbsinit.c
 	mbsrtowcs.cpp
+	mbstowcs.c
 	mbtowc.c
 	wcrtomb.cpp
 	wcswidth.c
