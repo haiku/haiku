@@ -39,8 +39,7 @@ typedef struct {
 
 /*
  * Haiku is always using UTF32 in wchars, other encodings can be handled
- * by converting to/from wchar by means of mbsrtowcs() or wcsrtombs().
- * TODO: define __STDC_ISO_10646__ accordingly in our compilers.
+ * by converting to/from wchar by means of mbrtowc() or wcrtomb().
  */
 
 
