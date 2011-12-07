@@ -898,6 +898,9 @@ BALMLayout::_CalculateMinSize()
 {
 	_UpdateAreaConstraints();
 
+	Right()->SetRange(0, 20000);
+	Bottom()->SetRange(0, 20000);
+
 	return fSolver->MinSize(Right(), Bottom());
 }
 
@@ -910,6 +913,9 @@ BALMLayout::_CalculateMaxSize()
 {
 	_UpdateAreaConstraints();
 
+	Right()->SetRange(0, 20000);
+	Bottom()->SetRange(0, 20000);
+
 	return fSolver->MaxSize(Right(), Bottom());
 }
 
@@ -921,6 +927,9 @@ BSize
 BALMLayout::_CalculatePreferredSize()
 {
 	_UpdateAreaConstraints();
+
+	Right()->SetRange(0, 20000);
+	Bottom()->SetRange(0, 20000);
 
 	fSolver->Solve();
 	if (fSolver->Result() != kOptimal) {
