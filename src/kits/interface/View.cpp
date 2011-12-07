@@ -999,7 +999,7 @@ BView::Hide()
 	}
 	fShowLevel++;
 
-	if (fShowLevel == 1 && fParent)
+	if (fShowLevel == 1)
 		_InvalidateParentLayout();
 }
 
@@ -1014,7 +1014,7 @@ BView::Show()
 		fOwner->fLink->Flush();
 	}
 
-	if (fShowLevel == 0 && fParent)
+	if (fShowLevel == 0)
 		_InvalidateParentLayout();
 }
 
@@ -4718,9 +4718,8 @@ BView::InvalidateLayout(bool descendants)
 
 	if (fLayoutData->fLayout)
 		fLayoutData->fLayout->InvalidateLayout(descendants);
-	else if (fParent) {
+	else
 		_InvalidateParentLayout();
-	}
 
 	if (fTopLevelView && fOwner)
 		fOwner->PostMessage(B_LAYOUT_WINDOW);
@@ -4963,7 +4962,7 @@ BView::_InvalidateParentLayout()
 		for (int32 i = 0; i < count; i++) {
 			fLayoutData->fLayoutItems.ItemAt(i)->Layout()->InvalidateLayout();
 		}
-	} else if (fParent) {
+	} else {
 		fParent->InvalidateLayout();
 	}
 }
