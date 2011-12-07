@@ -269,6 +269,77 @@ ICUCtypeData::MultibyteToWchar(wchar_t* wcOut, const char* mb, size_t mbLen,
 
 
 status_t
+ICUCtypeData::MultibyteStringToWchar(wchar_t* wcDest, size_t wcDestLength,
+	const char** mbSource, size_t mbSourceLength, mbstate_t* mbState,
+	size_t& lengthOut)
+{
+	ICUConverterRef converterRef;
+	status_t result = _GetConverterForMbState(mbState, converterRef);
+	if (result != B_OK) {
+		TRACE(("MultibyteStringToWchar(): couldn't get converter for ID %d -"
+			" %lx\n", mbState->converterID, result));
+		return result;
+	}
+
+	UConverter* converter = converterRef->Converter();
+
+	bool wcsIsTerminated = false;
+	const char* source = *mbSource;
+	const char* sourceEnd = source + mbSourceLength;
+	if (sourceEnd < source) {
+		// overflow, clamp to highest possible address
+		sourceEnd = (const char*)-1;
+	}
+
+	if (wcDest == NULL) {
+		// if there's no destination buffer, there's no length limit either
+		wcDestLength = (size_t)-1;
+	}
+
+	UErrorCode icuStatus = U_ZERO_ERROR;
+	size_t sourceLengthUsed = 0;
+	for (lengthOut = 0; lengthOut < wcDestLength; ++lengthOut) {
+		if (sourceLengthUsed >= mbSourceLength)
+			break;
+		UChar32 unicodeChar = ucnv_getNextUChar(converter, &source,
+			std::min(source + MB_LEN_MAX, sourceEnd), &icuStatus);
+		sourceLengthUsed = source - *mbSource;
+		TRACE(("l:%lu wl:%lu s:%p se:%p sl:%lu slu:%lu uchar:%x st:%x\n",
+			lengthOut, wcDestLength, source, sourceEnd, mbSourceLength,
+			sourceLengthUsed, unicodeChar, icuStatus));
+		if (!U_SUCCESS(icuStatus))
+			break;
+		if (wcDest != NULL)
+			*wcDest++ = unicodeChar;
+		if (unicodeChar == L'\0') {
+			if (wcDest != NULL)
+				wcsIsTerminated = true;
+			break;
+		}
+		icuStatus = U_ZERO_ERROR;
+	}
+
+	if (wcDest != NULL)
+		*mbSource = source;
+
+	if (!U_SUCCESS(icuStatus)) {
+		// conversion failed because of illegal character sequence
+		TRACE(("MultibyteStringToWchar(): illegal character sequence\n"));
+		ucnv_resetToUnicode(converter);
+		result = B_BAD_DATA;
+	} else if (wcsIsTerminated) {
+		// reset to initial state
+		_DropConverterFromMbState(mbState);
+		memset(mbState, 0, sizeof(mbstate_t));
+		*mbSource = NULL;
+	} else
+		mbState->count = 0;
+
+	return result;
+}
+
+
+status_t
 ICUCtypeData::WcharToMultibyte(char* mbOut, wchar_t wc, mbstate_t* mbState,
 	size_t& lengthOut)
 {

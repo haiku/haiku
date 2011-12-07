@@ -18,9 +18,6 @@ UsePrivateHeaders libroot ;
 SubDirCcFlags -D_GNU_SOURCE -DUSE_IN_LIBIO ;
 
 MergeObject posix_gnu_wcsmbs.o :
-	mbsnrtowcs.c
-	mbsrtowcs.c
-#	mbsrtowcs_l.c
 	wcpcpy.c
 	wcpncpy.c
 	wcscasecmp.c

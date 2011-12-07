@@ -44,6 +44,10 @@ public:
 	virtual status_t			MultibyteToWchar(wchar_t* wcOut, const char* mb,
 									size_t mbLength, mbstate_t* mbState,
 									size_t& lengthOut);
+	virtual status_t			MultibyteStringToWchar(wchar_t* wcDest,
+									size_t wcDestLength, const char** mbSource,
+									size_t mbSourceLength, mbstate_t* mbState,
+									size_t& lengthOut);
 	virtual status_t			WcharToMultibyte(char* mbOut, wchar_t wc,
 									mbstate_t* mbState, size_t& lengthOut);
 
