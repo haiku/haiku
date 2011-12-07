@@ -150,8 +150,8 @@ Array<Element>::Remove(int32 index, int32 count)
 	if (index < 0 || count < 0 || index + count > fSize) {
 #if DEBUG
 		char buffer[128];
-		snprintf(buffer, sizeof(buffer), "Array::Remove(): index: %d, "
-			"count: %d, size: %d", index, count, fSize);
+		snprintf(buffer, sizeof(buffer), "Array::Remove(): index: %ld, "
+			"count: %ld, size: %ld", index, count, fSize);
 		debugger(buffer);
 #endif
 		return false;
