@@ -271,6 +271,11 @@
 	\fn void BLayoutItem::Relayout(bool immediate = false)
 	\brief Relayout any children or onscreen data this item contains. Often
 		this request is forwarded to another object.
+
+	The default implementation of this method will likely be sufficient in
+	most cases. Assuming \c this->View() doesn't return \c NULL, the default
+	implementation calls Relayout() or Layout() on the value returned
+	by View().
 */
 
 

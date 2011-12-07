@@ -340,7 +340,7 @@ topLayout->AddItem(nestedLayoutWithView);
 		creates a new BLayoutContext and calls the DoLayout() method
 		of this BLayout and any BLayout s nested in this BLayout.
 	
-	If method also guarantees that the owner view of this layout (as returned
+	This method also guarantees that the owner view of this layout (as returned
 	by BLayout::Owner()) performs a layout as well (if it is suitable to do so).
 
 	\param force Force the LayoutItems.
@@ -381,14 +381,17 @@ topLayout->AddItem(nestedLayoutWithView);
 	(if there is one) and the BLayout this layout (or this BLayout&apos;s view)
 	resides in.
 
+	Although this method is virtual, you should not override it, override the
+	BLayout::LayoutInvalidated() hook instead.
+
 	This method should be called whenever the layout becomes invalid. This might
 	happen if the size constraints of an item in this layout change, this layout
 	is given more or less space than it previously had, or an object in this
 	layout has had its InvalidateLayout() method called.
 
-	\sa BView::InvalidateLayout(), BLayoutItem::InvalidateLayout()
+	\sa BView::InvalidateLayout(), BLayoutItem::InvalidateLayout(),
+		BLayout::LayoutInvalidated()
 */
-
 
 /*!
 	\fn bool BLayout::IsValid()
@@ -517,6 +520,14 @@ topLayout->AddItem(nestedLayoutWithView);
 	\fn void BLayout::DoLayout() = 0
 	\brief Implemented by derived classes to position and resize the items in
 		this layout.
+*/
+
+
+/*!
+	\fn void BLayout::LayoutInvalidated() = 0
+
+	Hook method called when this layout becomes invalid. This is a good place
+	to clear any caches your object might hold.
 */
 
 
