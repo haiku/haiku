@@ -99,7 +99,7 @@ Utility::Save(BBitmap** screenshot, const char* fileName, uint32 imageType)
 			fileNameString.SetTo(homePath.Path());
 			fileNameString << "/" << B_TRANSLATE_NOCOLLECT(sDefaultFileNameBase)
 				<< index++ << extension;
-			entry.SetTo(fileNameString.String());
+			entry.SetTo(fileNameString);
 		} while (entry.Exists());
 	}
 
@@ -120,7 +120,7 @@ Utility::Save(BBitmap** screenshot, const char* fileName, uint32 imageType)
 	if (nodeInfo.InitCheck() != B_OK)
 		return B_ERROR;
 
-	nodeInfo.SetType(_GetMimeString(imageType).String());
+	nodeInfo.SetType(_GetMimeString(imageType));
 
 	return B_OK;
 }
@@ -190,7 +190,7 @@ Utility::MakeScreenshot(bool includeMouse, bool activeWindow,
 BString
 Utility::GetFileNameExtension(uint32 imageType) const
 {
-	BMimeType mimeType(_GetMimeString(imageType).String());
+	BMimeType mimeType(_GetMimeString(imageType));
 	BString extension("");
 
 	BMessage message;
