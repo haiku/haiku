@@ -237,6 +237,7 @@ ICUCtypeData::MultibyteToWchar(wchar_t* wcOut, const char* mb, size_t mbLen,
 	if (!U_SUCCESS(icuStatus)) {
 		// conversion failed because of illegal character sequence
 		TRACE(("MultibyteToWchar(): illegal character sequence\n"));
+		ucnv_resetToUnicode(converter);
 		result = B_BAD_DATA;
 	} else 	if (targetLengthUsed == 0) {
 		TRACE(("MultibyteToWchar(): incomplete character (len=%lu)\n", mbLen));
@@ -295,6 +296,7 @@ ICUCtypeData::WcharToMultibyte(char* mbOut, wchar_t wc, mbstate_t* mbState,
 
 		// conversion failed because of illegal/unmappable character
 		TRACE(("MultibyteToWchar(): illegal character sequence\n"));
+		ucnv_resetFromUnicode(converter);
 		return B_BAD_DATA;
 	}
 
