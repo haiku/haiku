@@ -981,16 +981,16 @@ BView* instantiate_deskbar_item()
 
 	float height = 16;
 	float rowHeight = floor((height - 1) / rows);
-	if(rowHeight < 1)
+	if (rowHeight < 1)
 		rowHeight = 1;
 
 	float columnWidth = floor((rowHeight - 1) * aspectRatio) + 1;
 
 	float width = columnWidth * columns + 1;
-	if(width > 129)
+	if (width > 129)
 		width = 129;
 
-	return new WorkspacesView(BRect (0, 0, width, height), false);
+	return new WorkspacesView(BRect (0, 0, width - 1, height - 1), false);
 }
 
 
