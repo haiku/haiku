@@ -962,7 +962,35 @@ WorkspacesApp::ArgvReceived(int32 argc, char **argv)
 
 BView* instantiate_deskbar_item()
 {
-	return new WorkspacesView(BRect (0, 0, 75, 15), false);
+	// Calculate the correct size of the Deskbar replicant first
+	
+	BScreen screen;
+	float screenWidth = screen.Frame().Width();
+	float screenHeight = screen.Frame().Height();
+	float aspectRatio = screenWidth / screenHeight;
+	uint32 columns, rows;
+	BPrivate::get_workspaces_layout(&columns, &rows);
+
+	// ╔═╤═╕ A Deskbar replicant can be 16px tall and 129px wide at most.
+	// ║ │ │ We use 1px for the top and left borders (shown as double)
+	// ╟─┼─┤ and divide the remainder equally. However, we keep in mind
+	// ║ │ │ that the actual width and height of each workspace is smaller
+	// ╙─┴─┘ by 1px, because of bottom/right borders (shown as single).
+	// When calculating workspace width, we must ensure that the assumed
+	// actual workspace height is not negative. Zero is OK.
+
+	float height = 16;
+	float rowHeight = floor((height - 1) / rows);
+	if(rowHeight < 1)
+		rowHeight = 1;
+
+	float columnWidth = floor((rowHeight - 1) * aspectRatio) + 1;
+
+	float width = columnWidth * columns + 1;
+	if(width > 129)
+		width = 129;
+
+	return new WorkspacesView(BRect (0, 0, width, height), false);
 }
 
 
