@@ -12,6 +12,26 @@
 #include <video_configuration.h>
 
 
+// From the VESA DisplayPort spec
+// TODO: may want to move these into common code
+#define AUX_NATIVE_WRITE        0x8
+#define AUX_NATIVE_READ         0x9
+#define AUX_I2C_WRITE           0x0
+#define AUX_I2C_READ            0x1
+#define AUX_I2C_STATUS          0x2
+#define AUX_I2C_MOT             0x4
+
+#define AUX_NATIVE_REPLY_ACK    (0x0 << 4)
+#define AUX_NATIVE_REPLY_NACK   (0x1 << 4)
+#define AUX_NATIVE_REPLY_DEFER  (0x2 << 4)
+#define AUX_NATIVE_REPLY_MASK   (0x3 << 4)
+
+#define AUX_I2C_REPLY_ACK       (0x0 << 6)
+#define AUX_I2C_REPLY_NACK      (0x1 << 6)
+#define AUX_I2C_REPLY_DEFER     (0x2 << 6)
+#define AUX_I2C_REPLY_MASK      (0x3 << 6)
+
+
 // convert radeon connector to common connector type
 const int connector_convert_legacy[] = {
 	VIDEO_CONNECTOR_UNKNOWN,
@@ -60,6 +80,11 @@ const int connector_convert[] = {
 
 int dp_aux_speak(uint8 connectorIndex, uint8 *send, int sendBytes,
 	uint8 *recv, int recvBytes, uint8 delay, uint8 *ack);
+int dp_aux_write(uint32 connectorIndex, uint16 address, uint8 *send,
+	uint8 sendBytes, uint8 delay);
+int dp_aux_read(uint32 connectorIndex, uint16 address, uint8 *recv,
+	int recvBytes, uint8 delay);
+
 status_t gpio_probe();
 status_t connector_attach_gpio(uint32 id, uint8 hw_line);
 bool connector_read_edid(uint32 connector, edid1_info *edid);

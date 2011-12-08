@@ -70,13 +70,13 @@ dp_aux_speak(uint8 connectorIndex, uint8 *send, int sendBytes,
 	switch(args.v1.ucReplyStatus) {
 		case 1:
 			ERROR("%s: dp_aux_ch timeout!\n", __func__);
-			return B_ERROR;
+			return B_TIMED_OUT;
 		case 2:
 			ERROR("%s: dp_aux_ch flags not zero!\n", __func__);
-			return B_ERROR;
+			return B_BUSY;
 		case 3:
 			ERROR("%s: dp_aux_ch error!\n", __func__);
-			return B_ERROR;
+			return B_IO_ERROR;
 	}
 
 	int recvLength = args.v1.ucDataOutLen;
@@ -87,6 +87,85 @@ dp_aux_speak(uint8 connectorIndex, uint8 *send, int sendBytes,
 		memcpy(recv, base + 16, recvLength);
 
 	return recvLength;
+}
+
+
+int
+dp_aux_write(uint32 connectorIndex, uint16 address,
+	uint8 *send, uint8 sendBytes, uint8 delay)
+{
+	uint8 auxMessage[20];
+	int auxMessageBytes = sendBytes + 4;
+
+	if (sendBytes > 16)
+		return -1;
+
+	auxMessage[0] = address;
+	auxMessage[1] = address >> 8;
+	auxMessage[2] = AUX_NATIVE_WRITE << 4;
+	auxMessage[3] = (auxMessageBytes << 4) | (sendBytes - 1);
+	memcpy(&auxMessage[4], send, sendBytes);
+
+	int ret;
+	uint8 retry;
+	uint8 ack;
+	for (retry = 0; retry < 4; retry++) {
+
+		ret = dp_aux_speak(connectorIndex, auxMessage, auxMessageBytes,
+			NULL, 0, delay, &ack);
+
+		if (ret == B_BUSY)
+			continue;
+		else if (ret < B_OK)
+			return ret;
+
+		if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_ACK)
+			return sendBytes;
+		else if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_DEFER)
+			snooze(400);
+		else
+			return B_IO_ERROR;
+	}
+
+	return B_IO_ERROR;
+}
+
+
+int
+dp_aux_read(uint32 connectorIndex, uint16 address,
+	uint8 *recv, int recvBytes, uint8 delay)
+{
+	uint8 auxMessage[4];
+	int auxMessageBytes = 4;
+
+	auxMessage[0] = address;
+	auxMessage[1] = address >> 8;
+	auxMessage[2] = AUX_NATIVE_READ << 4;
+	auxMessage[3] = (auxMessageBytes << 4) | (recvBytes - 1);
+
+	int ret;
+	uint8 retry;
+	uint8 ack;
+	for (retry = 0; retry < 4; retry++) {
+		ret = dp_aux_speak(connectorIndex, auxMessage, auxMessageBytes,
+			recv, recvBytes, delay, &ack);
+
+		if (ret == B_BUSY)
+			continue;
+		else if (ret < B_OK)
+			return ret;
+
+		if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_ACK)
+			return ret;
+		else if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_DEFER)
+			snooze(400);
+		else if (ret == 0)
+			return -EPROTO;
+		else
+			return B_IO_ERROR;
+	}
+
+	return B_IO_ERROR;
 }
 
 
