@@ -254,8 +254,11 @@ private:
 class DwarfCompoundType : public CompoundType, public DwarfType {
 public:
 								DwarfCompoundType(DwarfTypeContext* typeContext,
-									const BString& name, DIECompoundType* entry);
+									const BString& name, DIECompoundType* entry,
+									compound_type_kind compoundKind);
 								~DwarfCompoundType();
+
+	virtual	compound_type_kind	CompoundKind() const;
 
 	virtual	int32				CountBaseTypes() const;
 	virtual	BaseType*			BaseTypeAt(int32 index) const;
@@ -290,6 +293,7 @@ private:
 									ValueLocation*& _location);
 
 private:
+			compound_type_kind	fCompoundKind;
 			DIECompoundType*	fEntry;
 			InheritanceList		fInheritances;
 			DataMemberList		fDataMembers;

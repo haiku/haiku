@@ -143,6 +143,7 @@ public:
 	virtual						~CompoundType();
 
 	virtual	type_kind			Kind() const;
+	virtual compound_type_kind	CompoundKind() const = 0;
 
 	virtual	int32				CountBaseTypes() const = 0;
 	virtual	BaseType*			BaseTypeAt(int32 index) const = 0;
