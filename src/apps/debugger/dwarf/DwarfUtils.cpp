@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,6 +9,7 @@
 #include <String.h>
 
 #include "CompilationUnit.h"
+#include "Dwarf.h"
 #include "DwarfFile.h"
 
 
@@ -59,9 +61,75 @@ DwarfUtils::GetFullDIEName(const DebugInfoEntry* entry, BString& _name)
 		}
 	}
 
-	// TODO: Get template and function parameters!
-
 	_name = name;
+
+	const DIESubprogram* subProgram = dynamic_cast<const DIESubprogram*>(
+		entry);
+	if (subProgram != NULL) {
+		// TODO: retrieve template parameters
+		_name += "(";
+		BString parameters;
+		DebugInfoEntryList::ConstIterator iterator
+			= subProgram->Parameters().GetIterator();
+
+		// this function is a class method, skip the first parameter
+		// as it supplies our 'this' pointer and shouldn't be visible
+		// in the signature
+		if (dynamic_cast<const DIECompoundType*>(subProgram->Parent()) != NULL)
+			iterator.Next();
+
+		while (iterator.HasNext()) {
+			const DIEFormalParameter* parameter
+				= dynamic_cast<DIEFormalParameter*>(iterator.Next());
+			if (parameter == NULL)
+				continue;
+
+			BString paramName;
+			BString modifier;
+			DIEType* type = parameter->GetType();
+			if (DIEModifiedType* modifiedType = dynamic_cast<DIEModifiedType*>(
+				type)) {
+				DIEType* baseType = type;
+				while ((modifiedType = dynamic_cast<DIEModifiedType*>(
+					baseType)) != NULL && modifiedType->GetType() != NULL) {
+					switch (modifiedType->Tag()) {
+						case DW_TAG_pointer_type:
+							modifier += "*";
+							break;
+						case DW_TAG_reference_type:
+							modifier += "&";
+							break;
+						case DW_TAG_const_type:
+							modifier += " const ";
+							break;
+						default:
+							break;
+					}
+
+					baseType = modifiedType->GetType();
+				}
+				type = baseType;
+			}
+
+			GetFullyQualifiedDIEName(type, paramName);
+			parameters += paramName;
+			if (modifier.Length() > 0) {
+				if (modifier[modifier.Length() - 1] == ' ')
+					modifier.Truncate(modifier.Length() - 1);
+				parameters += modifier;
+			}
+
+			if (iterator.HasNext())
+				parameters += ", ";
+		}
+
+		if (parameters.Length() > 0)
+			_name += parameters;
+		else
+			_name += "void";
+		_name += ")";
+	}
+
 }
 
 
