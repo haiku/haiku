@@ -42,6 +42,7 @@ DwarfUtils::GetDIEName(const DebugInfoEntry* entry, BString& _name)
 /*static*/ void
 DwarfUtils::GetFullDIEName(const DebugInfoEntry* entry, BString& _name)
 {
+	BString generatedName;
 	// If we don't seem to have a name but an abstract origin, return the
 	// origin's name.
 	const char* name = entry->Name();
@@ -61,13 +62,17 @@ DwarfUtils::GetFullDIEName(const DebugInfoEntry* entry, BString& _name)
 		}
 	}
 
-	_name = name;
+	// we found no name for this entry whatsoever, abort.
+	if (name == NULL)
+		return;
+
+	generatedName = name;
 
 	const DIESubprogram* subProgram = dynamic_cast<const DIESubprogram*>(
 		entry);
 	if (subProgram != NULL) {
 		// TODO: retrieve template parameters
-		_name += "(";
+		generatedName += "(";
 		BString parameters;
 		DebugInfoEntryList::ConstIterator iterator
 			= subProgram->Parameters().GetIterator();
@@ -81,8 +86,10 @@ DwarfUtils::GetFullDIEName(const DebugInfoEntry* entry, BString& _name)
 		while (iterator.HasNext()) {
 			const DIEFormalParameter* parameter
 				= dynamic_cast<DIEFormalParameter*>(iterator.Next());
-			if (parameter == NULL)
-				continue;
+			if (parameter == NULL) {
+				// this shouldn't happen
+				return;
+			}
 
 			BString paramName;
 			BString modifier;
@@ -124,12 +131,13 @@ DwarfUtils::GetFullDIEName(const DebugInfoEntry* entry, BString& _name)
 		}
 
 		if (parameters.Length() > 0)
-			_name += parameters;
+			generatedName += parameters;
 		else
-			_name += "void";
-		_name += ")";
+			generatedName += "void";
+		generatedName += ")";
 	}
 
+	_name = generatedName;
 }
 
 
