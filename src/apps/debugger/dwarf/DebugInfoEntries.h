@@ -1413,7 +1413,7 @@ private:
 			LocationDescription	fLocationDescription;
 			ConstantAttributeValue fValue;
 			DIEType*			fType;
-			DIEVariable*		fSpecification;
+			DebugInfoEntry*		fSpecification;
 			DIEVariable*		fAbstractOrigin;
 			uint64				fStartScope;
 };

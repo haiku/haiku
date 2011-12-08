@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -2169,6 +2170,12 @@ DIEVariable::AddAttribute_specification(uint16 attributeName,
 	const AttributeValue& value)
 {
 	fSpecification = dynamic_cast<DIEVariable*>(value.reference);
+	// in the case of static variables declared within a compound type,
+	// the specification may point to a member entry rather than
+	// a variable entry
+	if (fSpecification == NULL)
+		fSpecification = dynamic_cast<DIEMember*>(value.reference);
+
 	return fSpecification != NULL ? B_OK : B_BAD_DATA;
 }
 
