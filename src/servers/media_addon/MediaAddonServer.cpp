@@ -300,7 +300,7 @@ MediaAddonServer::ReadyToRun()
 	};
 
 	// when safemode, only B_SYSTEM_ADDONS_DIRECTORY is used
-	for (uint32 i = safeMode ? 4 : 0;
+	for (uint32 i = safeMode ? 2 : 0;
 			i < sizeof(directories) / sizeof(directory_which); i++) {
 		BDirectory directory;
 		node_ref nodeRef;
