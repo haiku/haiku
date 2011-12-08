@@ -70,13 +70,13 @@ dp_aux_speak(uint8 connectorIndex, uint8 *send, int sendBytes,
 	switch(args.v1.ucReplyStatus) {
 		case 1:
 			ERROR("%s: dp_aux_ch timeout!\n", __func__);
-			return -B_TIMED_OUT;
+			return B_ERROR;
 		case 2:
 			ERROR("%s: dp_aux_ch flags not zero!\n", __func__);
-			return -B_BUSY;
+			return B_ERROR;
 		case 3:
 			ERROR("%s: dp_aux_ch error!\n", __func__);
-			return -B_IO_ERROR;
+			return B_ERROR;
 	}
 
 	int recvLength = args.v1.ucDataOutLen;
