@@ -252,15 +252,15 @@ radeon_init_accelerant(int device)
 
 	radeon_init_bios(gInfo->rom);
 
-	// detect GPIO pins
+	// find GPIO pins from AtomBIOS
 	gpio_probe();
 
-	// detect physical connectors
-	status = detect_connectors();
+	// find physical card connectors from AtomBIOS
+	status = connector_probe();
 
 	if (status != B_OK) {
-		TRACE("%s: falling back to legacy connector detection.\n", __func__);
-		status = detect_connectors_legacy();
+		TRACE("%s: falling back to legacy connector probe.\n", __func__);
+		status = connector_probe_legacy();
 	}
 
 	if (status != B_OK) {

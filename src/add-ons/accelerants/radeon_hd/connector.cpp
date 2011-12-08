@@ -355,3 +355,399 @@ gpio_probe()
 
 	return B_OK;
 }
+
+
+union atom_supported_devices {
+	struct _ATOM_SUPPORTED_DEVICES_INFO info;
+	struct _ATOM_SUPPORTED_DEVICES_INFO_2 info_2;
+	struct _ATOM_SUPPORTED_DEVICES_INFO_2d1 info_2d1;
+};
+
+
+status_t
+connector_probe_legacy()
+{
+	int index = GetIndexIntoMasterTable(DATA, SupportedDevicesInfo);
+	uint8 tableMajor;
+	uint8 tableMinor;
+	uint16 tableSize;
+	uint16 tableOffset;
+
+	if (atom_parse_data_header(gAtomContext, index, &tableSize,
+		&tableMajor, &tableMinor, &tableOffset) != B_OK) {
+		ERROR("%s: unable to parse data header!\n", __func__);
+		return B_ERROR;
+	}
+
+	union atom_supported_devices *supportedDevices;
+	supportedDevices = (union atom_supported_devices *)
+		(gAtomContext->bios + tableOffset);
+
+	uint16 deviceSupport
+		= B_LENDIAN_TO_HOST_INT16(supportedDevices->info.usDeviceSupport);
+
+	uint32 maxDevice;
+
+	if (tableMajor > 1)
+		maxDevice = ATOM_MAX_SUPPORTED_DEVICE;
+	else
+		maxDevice = ATOM_MAX_SUPPORTED_DEVICE_INFO;
+
+	uint32 i;
+	uint32 connectorIndex = 0;
+	for (i = 0; i < maxDevice; i++) {
+
+		gConnector[connectorIndex]->valid = false;
+
+		// check if this connector is used
+		if ((deviceSupport & (1 << i)) == 0)
+			continue;
+
+		if (i == ATOM_DEVICE_CV_INDEX) {
+			TRACE("%s: skipping component video\n",
+				__func__);
+			continue;
+		}
+
+		ATOM_CONNECTOR_INFO_I2C ci
+			= supportedDevices->info.asConnInfo[i];
+
+		gConnector[connectorIndex]->type = connector_convert_legacy[
+			ci.sucConnectorInfo.sbfAccess.bfConnectorType];
+
+		if (gConnector[connectorIndex]->type == VIDEO_CONNECTOR_UNKNOWN) {
+			TRACE("%s: skipping unknown connector at %" B_PRId32
+				" of 0x%" B_PRIX8 "\n", __func__, i,
+				ci.sucConnectorInfo.sbfAccess.bfConnectorType);
+			continue;
+		}
+
+		// TODO: give tv unique connector ids
+
+		// Always set CRT1 and CRT2 as VGA, some cards incorrectly set
+		// VGA ports as DVI
+		if (i == ATOM_DEVICE_CRT1_INDEX || i == ATOM_DEVICE_CRT2_INDEX)
+			gConnector[connectorIndex]->type = VIDEO_CONNECTOR_VGA;
+
+		uint8 dac = ci.sucConnectorInfo.sbfAccess.bfAssociatedDAC;
+		uint32 encoderObject = encoder_object_lookup((1 << i), dac);
+		uint32 encoderID = (encoderObject & OBJECT_ID_MASK) >> OBJECT_ID_SHIFT;
+
+		gConnector[connectorIndex]->valid = true;
+		gConnector[connectorIndex]->encoder.flags = (1 << i);
+		gConnector[connectorIndex]->encoder.valid = true;
+		gConnector[connectorIndex]->encoder.objectID = encoderID;
+		gConnector[connectorIndex]->encoder.type
+			= encoder_type_lookup(encoderID, (1 << i));
+		gConnector[connectorIndex]->encoder.isExternal
+			= encoder_is_external(encoderID);
+
+		connector_attach_gpio(connectorIndex, ci.sucI2cId.ucAccess);
+
+		pll_limit_probe(&gConnector[connectorIndex]->encoder.pll);
+
+		connectorIndex++;
+	}
+
+	// TODO: combine shared connectors
+
+	for (i = 0; i < maxDevice; i++) {
+		if (gConnector[i]->valid == true) {
+			TRACE("%s: connector #%" B_PRId32 " is %s\n", __func__, i,
+				get_connector_name(gConnector[i]->type));
+		}
+	}
+
+	if (connectorIndex == 0) {
+		TRACE("%s: zero connectors found using legacy detection\n", __func__);
+		return B_ERROR;
+	}
+
+	return B_OK;
+}
+
+
+// r600+
+status_t
+connector_probe()
+{
+	int index = GetIndexIntoMasterTable(DATA, Object_Header);
+	uint8 tableMajor;
+	uint8 tableMinor;
+	uint16 tableSize;
+	uint16 tableOffset;
+
+	if (atom_parse_data_header(gAtomContext, index, &tableSize,
+		&tableMajor, &tableMinor, &tableOffset) != B_OK) {
+		ERROR("%s: ERROR: parsing data header failed!\n", __func__);
+		return B_ERROR;
+	}
+
+	if (tableMinor < 2) {
+		ERROR("%s: ERROR: table minor version unknown! "
+			"(%" B_PRIu8 ".%" B_PRIu8 ")\n", __func__, tableMajor, tableMinor);
+		return B_ERROR;
+	}
+
+	ATOM_CONNECTOR_OBJECT_TABLE *con_obj;
+	ATOM_ENCODER_OBJECT_TABLE *enc_obj;
+	ATOM_OBJECT_TABLE *router_obj;
+	ATOM_DISPLAY_OBJECT_PATH_TABLE *path_obj;
+	ATOM_OBJECT_HEADER *obj_header;
+
+	obj_header = (ATOM_OBJECT_HEADER *)(gAtomContext->bios + tableOffset);
+	path_obj = (ATOM_DISPLAY_OBJECT_PATH_TABLE *)
+		(gAtomContext->bios + tableOffset
+		+ B_LENDIAN_TO_HOST_INT16(obj_header->usDisplayPathTableOffset));
+	con_obj = (ATOM_CONNECTOR_OBJECT_TABLE *)
+		(gAtomContext->bios + tableOffset
+		+ B_LENDIAN_TO_HOST_INT16(obj_header->usConnectorObjectTableOffset));
+	enc_obj = (ATOM_ENCODER_OBJECT_TABLE *)
+		(gAtomContext->bios + tableOffset
+		+ B_LENDIAN_TO_HOST_INT16(obj_header->usEncoderObjectTableOffset));
+	router_obj = (ATOM_OBJECT_TABLE *)
+		(gAtomContext->bios + tableOffset
+		+ B_LENDIAN_TO_HOST_INT16(obj_header->usRouterObjectTableOffset));
+	int deviceSupport = B_LENDIAN_TO_HOST_INT16(obj_header->usDeviceSupport);
+
+	int pathSize = 0;
+	int32 i = 0;
+
+	TRACE("%s: found %" B_PRIu8 " potential display paths.\n", __func__,
+		path_obj->ucNumOfDispPath);
+
+	uint32 connectorIndex = 0;
+	for (i = 0; i < path_obj->ucNumOfDispPath; i++) {
+
+		if (connectorIndex >= ATOM_MAX_SUPPORTED_DEVICE)
+			continue;
+
+		uint8 *addr = (uint8*)path_obj->asDispPath;
+		ATOM_DISPLAY_OBJECT_PATH *path;
+		addr += pathSize;
+		path = (ATOM_DISPLAY_OBJECT_PATH *)addr;
+		pathSize += B_LENDIAN_TO_HOST_INT16(path->usSize);
+
+		uint32 connectorType;
+		uint16 connectorObjectID;
+		uint16 connectorFlags = B_LENDIAN_TO_HOST_INT16(path->usDeviceTag);
+
+		if ((deviceSupport & connectorFlags) != 0) {
+			uint8 con_obj_id = (B_LENDIAN_TO_HOST_INT16(path->usConnObjectId)
+				& OBJECT_ID_MASK) >> OBJECT_ID_SHIFT;
+
+			//uint8 con_obj_num
+			//	= (B_LENDIAN_TO_HOST_INT16(path->usConnObjectId)
+			//	& ENUM_ID_MASK) >> ENUM_ID_SHIFT;
+			//uint8 con_obj_type
+			//	= (B_LENDIAN_TO_HOST_INT16(path->usConnObjectId)
+			//	& OBJECT_TYPE_MASK) >> OBJECT_TYPE_SHIFT;
+
+			if (connectorFlags == ATOM_DEVICE_CV_SUPPORT) {
+				TRACE("%s: Path #%" B_PRId32 ": skipping component video.\n",
+					__func__, i);
+				continue;
+			}
+
+			uint16 igp_lane_info;
+			if (0)
+				ERROR("%s: TODO: IGP chip connector detection\n", __func__);
+			else {
+				igp_lane_info = 0;
+				connectorType = connector_convert[con_obj_id];
+				connectorObjectID = con_obj_id;
+			}
+
+			if (connectorType == VIDEO_CONNECTOR_UNKNOWN) {
+				ERROR("%s: Path #%" B_PRId32 ": skipping unknown connector.\n",
+					__func__, i);
+				continue;
+			}
+
+			int32 j;
+			for (j = 0; j < ((B_LENDIAN_TO_HOST_INT16(path->usSize) - 8) / 2);
+				j++) {
+				//uint16 grph_obj_id
+				//	= (B_LENDIAN_TO_HOST_INT16(path->usGraphicObjIds[j])
+				//	& OBJECT_ID_MASK) >> OBJECT_ID_SHIFT;
+				//uint8 grph_obj_num
+				//	= (B_LENDIAN_TO_HOST_INT16(path->usGraphicObjIds[j]) &
+				//	ENUM_ID_MASK) >> ENUM_ID_SHIFT;
+				uint8 grph_obj_type
+					= (B_LENDIAN_TO_HOST_INT16(path->usGraphicObjIds[j]) &
+					OBJECT_TYPE_MASK) >> OBJECT_TYPE_SHIFT;
+
+				if (grph_obj_type == GRAPH_OBJECT_TYPE_ENCODER) {
+					// Found an encoder
+					// TODO: it may be possible to have more then one encoder
+					int32 k;
+					for (k = 0; k < enc_obj->ucNumberOfObjects; k++) {
+						uint16 encoder_obj
+							= B_LENDIAN_TO_HOST_INT16(
+							enc_obj->asObjects[k].usObjectID);
+						if (B_LENDIAN_TO_HOST_INT16(path->usGraphicObjIds[j])
+							== encoder_obj) {
+							ATOM_COMMON_RECORD_HEADER *record
+								= (ATOM_COMMON_RECORD_HEADER *)
+								((uint16 *)gAtomContext->bios + tableOffset
+								+ B_LENDIAN_TO_HOST_INT16(
+								enc_obj->asObjects[k].usRecordOffset));
+							ATOM_ENCODER_CAP_RECORD *cap_record;
+							uint16 caps = 0;
+							while (record->ucRecordSize > 0
+								&& record->ucRecordType > 0
+								&& record->ucRecordType
+								<= ATOM_MAX_OBJECT_RECORD_NUMBER) {
+								switch (record->ucRecordType) {
+									case ATOM_ENCODER_CAP_RECORD_TYPE:
+										cap_record = (ATOM_ENCODER_CAP_RECORD *)
+											record;
+										caps = B_LENDIAN_TO_HOST_INT16(
+											cap_record->usEncoderCap);
+										break;
+								}
+								record = (ATOM_COMMON_RECORD_HEADER *)
+									((char *)record + record->ucRecordSize);
+							}
+
+							uint32 encoderID = (encoder_obj & OBJECT_ID_MASK)
+								>> OBJECT_ID_SHIFT;
+
+							uint32 encoderType = encoder_type_lookup(encoderID,
+								connectorFlags);
+
+							if (encoderType == VIDEO_ENCODER_NONE) {
+								ERROR("%s: Path #%" B_PRId32 ":"
+									"skipping unknown encoder.\n",
+									__func__, i);
+								continue;
+							}
+
+							// Set up encoder on connector if valid
+							TRACE("%s: Path #%" B_PRId32 ": Found encoder "
+								"%s\n", __func__, i,
+								get_encoder_name(encoderType));
+
+							gConnector[connectorIndex]->encoder.valid
+								= true;
+							gConnector[connectorIndex]->encoder.flags
+								= connectorFlags;
+							gConnector[connectorIndex]->encoder.objectID
+								= encoderID;
+							gConnector[connectorIndex]->encoder.type
+								= encoderType;
+							gConnector[connectorIndex]->encoder.isExternal
+								= encoder_is_external(encoderID);
+
+							pll_limit_probe(
+								&gConnector[connectorIndex]->encoder.pll);
+						}
+					}
+					// END if object is encoder
+				} else if (grph_obj_type == GRAPH_OBJECT_TYPE_ROUTER) {
+					ERROR("%s: TODO: Found router object?\n", __func__);
+				} // END if object is router
+			}
+
+			// Set up information buses such as ddc
+			if ((connectorFlags
+				& (ATOM_DEVICE_TV_SUPPORT | ATOM_DEVICE_CV_SUPPORT)) == 0) {
+				for (j = 0; j < con_obj->ucNumberOfObjects; j++) {
+					if (B_LENDIAN_TO_HOST_INT16(path->usConnObjectId)
+						== B_LENDIAN_TO_HOST_INT16(
+						con_obj->asObjects[j].usObjectID)) {
+						ATOM_COMMON_RECORD_HEADER *record
+							= (ATOM_COMMON_RECORD_HEADER*)(gAtomContext->bios
+							+ tableOffset + B_LENDIAN_TO_HOST_INT16(
+							con_obj->asObjects[j].usRecordOffset));
+						while (record->ucRecordSize > 0
+							&& record->ucRecordType > 0
+							&& record->ucRecordType
+								<= ATOM_MAX_OBJECT_RECORD_NUMBER) {
+							ATOM_I2C_RECORD *i2c_record;
+							ATOM_I2C_ID_CONFIG_ACCESS *i2c_config;
+							//ATOM_HPD_INT_RECORD *hpd_record;
+
+							switch (record->ucRecordType) {
+								case ATOM_I2C_RECORD_TYPE:
+									i2c_record
+										= (ATOM_I2C_RECORD *)record;
+									i2c_config
+										= (ATOM_I2C_ID_CONFIG_ACCESS *)
+										&i2c_record->sucI2cId;
+									// attach i2c gpio information for connector
+									connector_attach_gpio(connectorIndex,
+										i2c_config->ucAccess);
+									break;
+								case ATOM_HPD_INT_RECORD_TYPE:
+									// TODO: HPD (Hot Plug)
+									break;
+							}
+
+							// move to next record
+							record = (ATOM_COMMON_RECORD_HEADER *)
+								((char *)record + record->ucRecordSize);
+						}
+					}
+				}
+			}
+
+			// TODO: aux chan transactions
+
+			// record connector information
+			TRACE("%s: Path #%" B_PRId32 ": Found %s (0x%" B_PRIX32 ")\n",
+				__func__, i, get_connector_name(connectorType),
+				connectorType);
+
+			gConnector[connectorIndex]->valid = true;
+			gConnector[connectorIndex]->flags = connectorFlags;
+			gConnector[connectorIndex]->type = connectorType;
+			gConnector[connectorIndex]->objectID = connectorObjectID;
+
+			gConnector[connectorIndex]->encoder.isTV = false;
+			gConnector[connectorIndex]->encoder.isHDMI = false;
+
+			switch(connectorType) {
+				case VIDEO_CONNECTOR_COMPOSITE:
+				case VIDEO_CONNECTOR_SVIDEO:
+				case VIDEO_CONNECTOR_9DIN:
+					gConnector[connectorIndex]->encoder.isTV = true;
+					break;
+				case VIDEO_CONNECTOR_HDMIA:
+				case VIDEO_CONNECTOR_HDMIB:
+					gConnector[connectorIndex]->encoder.isHDMI = true;
+					break;
+			}
+
+			connectorIndex++;
+		} // END for each valid connector
+	} // end for each display path
+
+	return B_OK;
+}
+
+
+void
+debug_connectors()
+{
+	ERROR("Currently detected connectors=============\n");
+	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
+		if (gConnector[id]->valid == true) {
+			uint32 connectorType = gConnector[id]->type;
+			uint32 encoderType = gConnector[id]->encoder.type;
+			uint16 encoderID = gConnector[id]->encoder.objectID;
+			uint16 gpioID = gConnector[id]->gpioID;
+			ERROR("Connector #%" B_PRIu32 ")\n", id);
+			ERROR(" + connector:  %s\n", get_connector_name(connectorType));
+			ERROR(" + encoder:    %s\n", get_encoder_name(encoderType));
+			ERROR(" + encoder id: %" B_PRIu16 " (%s)\n", encoderID,
+				encoder_name_lookup(encoderID));
+			ERROR(" + gpio id:    %" B_PRIu16 "\n", gpioID);
+			ERROR(" + gpio valid: %s\n",
+				gGPIOInfo[gpioID]->valid ? "true" : "false");
+			ERROR(" + hw line:    0x%" B_PRIX32 "\n",
+				gGPIOInfo[gpioID]->hw_line);
+		}
+	}
+	ERROR("==========================================\n");
+}
