@@ -103,7 +103,7 @@ struct register_info {
 typedef struct {
 	bool	valid;
 
-	bool	hw_capable;
+	bool	hw_capable;	// can do hw assisted i2c
 	uint32	hw_line;
 
 	uint32	mask_scl_reg;

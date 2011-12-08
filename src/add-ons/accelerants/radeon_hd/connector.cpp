@@ -29,6 +29,67 @@
 #define ERROR(x...) _sPrintf("radeon_hd: " x)
 
 
+union aux_channel_transaction {
+	PROCESS_AUX_CHANNEL_TRANSACTION_PS_ALLOCATION v1;
+	PROCESS_AUX_CHANNEL_TRANSACTION_PARAMETERS_V2 v2;
+};
+
+
+int
+dp_aux_speak(uint8 connectorIndex, uint8 *send, int sendBytes,
+	uint8 *recv, int recvBytes, uint8 delay, uint8 *ack)
+{
+	uint32 gpioID = gConnector[connectorIndex]->gpioID;
+
+	if (gGPIOInfo[gpioID]->valid != true) {
+		ERROR("%s: cannot speak on invalid GPIO pin!\n", __func__);
+		return -B_IO_ERROR;
+	}
+
+	union aux_channel_transaction args;
+	int index = GetIndexIntoMasterTable(COMMAND, ProcessAuxChannelTransaction);
+
+	memset(&args, 0, sizeof(args));
+
+	unsigned char *base = (unsigned char *)gAtomContext->scratch;
+	memcpy(base, send, sendBytes);
+
+	args.v1.lpAuxRequest = 0;
+	args.v1.lpDataOut = 16;
+	args.v1.ucDataOutLen = 0;
+	args.v1.ucChannelID = gGPIOInfo[gpioID]->hw_line;
+	args.v1.ucDelay = delay / 10;
+
+	//if (ASIC_IS_DCE4(rdev))
+	//	args.v2.ucHPD_ID = chan->rec.hpd;
+
+	atom_execute_table(gAtomContext, index, (uint32*)&args);
+
+	*ack = args.v1.ucReplyStatus;
+
+	switch(args.v1.ucReplyStatus) {
+		case 1:
+			ERROR("%s: dp_aux_ch timeout!\n", __func__);
+			return -B_TIMED_OUT;
+		case 2:
+			ERROR("%s: dp_aux_ch flags not zero!\n", __func__);
+			return -B_BUSY;
+		case 3:
+			ERROR("%s: dp_aux_ch error!\n", __func__);
+			return -B_IO_ERROR;
+	}
+
+	int recvLength = args.v1.ucDataOutLen;
+	if (recvLength > recvBytes)
+		recvLength = recvBytes;
+
+	if (recv && recvBytes)
+		memcpy(recv, base + 16, recvLength);
+
+	return recvLength;
+}
+
+
 static void
 gpio_lock_i2c(void* cookie, bool lock)
 {
@@ -120,14 +181,14 @@ gpio_set_i2c_bit(void* cookie, int clock, int data)
 
 
 bool
-connector_read_edid(uint32 connector, edid1_info *edid)
+connector_read_edid(uint32 connectorIndex, edid1_info *edid)
 {
 	// ensure things are sane
-	uint32 gpioID = gConnector[connector]->gpioID;
+	uint32 gpioID = gConnector[connectorIndex]->gpioID;
 	if (gGPIOInfo[gpioID]->valid == false)
 		return false;
 
-	if (gConnector[connector]->type == VIDEO_CONNECTOR_LVDS) {
+	if (gConnector[connectorIndex]->type == VIDEO_CONNECTOR_LVDS) {
 		// we should call connector_read_edid_lvds at some point
 		ERROR("%s: LCD panel detected (LVDS), sending VESA EDID!\n",
 			__func__);
@@ -150,7 +211,7 @@ connector_read_edid(uint32 connector, edid1_info *edid)
 		return false;
 
 	TRACE("%s: found edid monitor on connector #%" B_PRId32 "\n",
-		__func__, connector);
+		__func__, connectorIndex);
 
 	return true;
 }
@@ -158,7 +219,7 @@ connector_read_edid(uint32 connector, edid1_info *edid)
 
 #if 0
 bool
-connector_read_edid_lvds(uint32 connector, edid1_info *edid)
+connector_read_edid_lvds(uint32 connectorIndex, edid1_info *edid)
 {
 	uint8 dceMajor;
 	uint8 dceMinor;
@@ -226,18 +287,18 @@ connector_read_edid_lvds(uint32 connector, edid1_info *edid)
 
 
 status_t
-connector_attach_gpio(uint32 id, uint8 hw_line)
+connector_attach_gpio(uint32 connectorIndex, uint8 hwLine)
 {
-	gConnector[id]->gpioID = 0;
+	gConnector[connectorIndex]->gpioID = 0;
 	for (uint32 i = 0; i < ATOM_MAX_SUPPORTED_DEVICE; i++) {
-		if (gGPIOInfo[i]->hw_line != hw_line)
+		if (gGPIOInfo[i]->hw_line != hwLine)
 			continue;
-		gConnector[id]->gpioID = i;
+		gConnector[connectorIndex]->gpioID = i;
 		return B_OK;
 	}
 
 	TRACE("%s: couldn't find GPIO for connector %" B_PRIu32 "\n",
-		__func__, id);
+		__func__, connectorIndex);
 	return B_ERROR;
 }
 
