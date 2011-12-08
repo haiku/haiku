@@ -667,6 +667,17 @@ BMenu::FrameResized(float new_width, float new_height)
 }
 
 
+void
+BMenu::InvalidateLayout()
+{
+	fUseCachedMenuLayout = false;
+	// This method exits for backwards compatibility reasons, it is used to
+	// invalidate the menu layout, but we also use call
+	// BView::InvalidateLayout() for good measure. Don't delete this method!
+	BView::InvalidateLayout(false);
+}
+
+
 // #pragma mark -
 
 

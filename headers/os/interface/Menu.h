@@ -78,6 +78,8 @@ public:
 	virtual	void				FrameMoved(BPoint newPosition);
 	virtual	void				FrameResized(float newWidth, float newHeight);
 
+			void				InvalidateLayout();
+
 	virtual void				MakeFocus(bool focus = true);
 
 			bool				AddItem(BMenuItem* item);
