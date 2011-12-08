@@ -12,6 +12,7 @@
 #include "accelerant.h"
 
 #include "bios.h"
+#include "connector.h"
 #include "display.h"
 #include "gpu.h"
 #include "pll.h"
@@ -252,7 +253,7 @@ radeon_init_accelerant(int device)
 	radeon_init_bios(gInfo->rom);
 
 	// detect GPIO pins
-	radeon_gpu_gpio_setup();
+	gpio_probe();
 
 	// detect physical connectors
 	status = detect_connectors();

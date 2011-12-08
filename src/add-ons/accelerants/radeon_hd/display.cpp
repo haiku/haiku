@@ -15,6 +15,7 @@
 #include "accelerant_protos.h"
 #include "accelerant.h"
 #include "bios.h"
+#include "connector.h"
 #include "display.h"
 
 #include <stdlib.h>
@@ -322,7 +323,7 @@ detect_connectors_legacy()
 		gConnector[connectorIndex]->encoder.isExternal
 			= encoder_is_external(encoderID);
 
-		radeon_gpu_i2c_attach(connectorIndex, ci.sucI2cId.ucAccess);
+		connector_attach_gpio(connectorIndex, ci.sucI2cId.ucAccess);
 
 		pll_limit_probe(&gConnector[connectorIndex]->encoder.pll);
 
@@ -558,7 +559,7 @@ detect_connectors()
 										= (ATOM_I2C_ID_CONFIG_ACCESS *)
 										&i2c_record->sucI2cId;
 									// attach i2c gpio information for connector
-									radeon_gpu_i2c_attach(connectorIndex,
+									connector_attach_gpio(connectorIndex,
 										i2c_config->ucAccess);
 									break;
 								case ATOM_HPD_INT_RECORD_TYPE:
@@ -625,7 +626,7 @@ detect_displays()
 		if (displayIndex >= MAX_DISPLAY)
 			continue;
 
-		if (radeon_gpu_read_edid(id, &gDisplay[displayIndex]->edid_info)) {
+		if (connector_read_edid(id, &gDisplay[displayIndex]->edid_info)) {
 
 			if (gConnector[id]->encoder.type == VIDEO_ENCODER_TVDAC
 				|| gConnector[id]->encoder.type == VIDEO_ENCODER_DAC) {
