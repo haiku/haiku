@@ -1836,15 +1836,17 @@ TRoster::_LoadRosterSettings(const char* path)
 	char* data = NULL;
 
 	if (!error) {
-		data = new(nothrow) char[size];
+		data = new(nothrow) char[size + 1];
 		error = data ? B_OK : B_NO_MEMORY;
 	}
 	if (!error) {
 		ssize_t bytes = file.Read(data, size);
 		error = bytes < 0 ? bytes : (bytes == size ? B_OK : B_FILE_ERROR);
 	}
-	if (!error)
+	if (!error) {
+		data[size] = 0;
 		error = stream.SetTo(std::string(data));
+	}
 
 	delete[] data;
 
