@@ -101,13 +101,13 @@ DwarfUtils::GetFullDIEName(const DebugInfoEntry* entry, BString& _name)
 					baseType)) != NULL && modifiedType->GetType() != NULL) {
 					switch (modifiedType->Tag()) {
 						case DW_TAG_pointer_type:
-							modifier += "*";
+							modifier.Prepend("*");
 							break;
 						case DW_TAG_reference_type:
-							modifier += "&";
+							modifier.Prepend("&");
 							break;
 						case DW_TAG_const_type:
-							modifier += " const ";
+							modifier.Prepend(" const ");
 							break;
 						default:
 							break;
@@ -119,12 +119,22 @@ DwarfUtils::GetFullDIEName(const DebugInfoEntry* entry, BString& _name)
 			}
 
 			GetFullyQualifiedDIEName(type, paramName);
-			parameters += paramName;
 			if (modifier.Length() > 0) {
 				if (modifier[modifier.Length() - 1] == ' ')
 					modifier.Truncate(modifier.Length() - 1);
-				parameters += modifier;
+
+				// if the modifier has a leading const, treat it
+				// as the degenerate case and prepend it to the
+				// type name since that's the more typically used
+				// representation in source
+				if (modifier[0] == ' ') {
+					paramName.Prepend("const ");
+					modifier.Remove(0, 7);
+				}
+				paramName += modifier;
 			}
+
+			parameters += paramName;
 
 			if (iterator.HasNext())
 				parameters += ", ";
