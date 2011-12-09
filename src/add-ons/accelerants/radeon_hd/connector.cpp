@@ -35,15 +35,13 @@ union aux_channel_transaction {
 };
 
 
-int
-dp_aux_speak(uint8 connectorIndex, uint8 *send, int sendBytes,
+static int
+dp_aux_speak(uint32 hwLine, uint8 *send, int sendBytes,
 	uint8 *recv, int recvBytes, uint8 delay, uint8 *ack)
 {
-	uint32 gpioID = gConnector[connectorIndex]->gpioID;
-
-	if (gGPIOInfo[gpioID]->valid != true) {
+	if (hwLine == 0) {
 		ERROR("%s: cannot speak on invalid GPIO pin!\n", __func__);
-		return -B_IO_ERROR;
+		return B_IO_ERROR;
 	}
 
 	union aux_channel_transaction args;
@@ -57,7 +55,7 @@ dp_aux_speak(uint8 connectorIndex, uint8 *send, int sendBytes,
 	args.v1.lpAuxRequest = 0;
 	args.v1.lpDataOut = 16;
 	args.v1.ucDataOutLen = 0;
-	args.v1.ucChannelID = gGPIOInfo[gpioID]->hw_line;
+	args.v1.ucChannelID = hwLine;
 	args.v1.ucDelay = delay / 10;
 
 	//if (ASIC_IS_DCE4(rdev))
@@ -91,7 +89,7 @@ dp_aux_speak(uint8 connectorIndex, uint8 *send, int sendBytes,
 
 
 int
-dp_aux_write(uint32 connectorIndex, uint16 address,
+dp_aux_write(uint32 hwLine, uint16 address,
 	uint8 *send, uint8 sendBytes, uint8 delay)
 {
 	uint8 auxMessage[20];
@@ -106,18 +104,16 @@ dp_aux_write(uint32 connectorIndex, uint16 address,
 	auxMessage[3] = (auxMessageBytes << 4) | (sendBytes - 1);
 	memcpy(&auxMessage[4], send, sendBytes);
 
-	int ret;
 	uint8 retry;
-	uint8 ack;
 	for (retry = 0; retry < 4; retry++) {
-
-		ret = dp_aux_speak(connectorIndex, auxMessage, auxMessageBytes,
+		uint8 ack;
+		int result = dp_aux_speak(hwLine, auxMessage, auxMessageBytes,
 			NULL, 0, delay, &ack);
 
-		if (ret == B_BUSY)
+		if (result == B_BUSY)
 			continue;
-		else if (ret < B_OK)
-			return ret;
+		else if (result < B_OK)
+			return result;
 
 		if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_ACK)
 			return sendBytes;
@@ -132,7 +128,7 @@ dp_aux_write(uint32 connectorIndex, uint16 address,
 
 
 int
-dp_aux_read(uint32 connectorIndex, uint16 address,
+dp_aux_read(uint32 hwLine, uint16 address,
 	uint8 *recv, int recvBytes, uint8 delay)
 {
 	uint8 auxMessage[4];
@@ -143,20 +139,19 @@ dp_aux_read(uint32 connectorIndex, uint16 address,
 	auxMessage[2] = AUX_NATIVE_READ << 4;
 	auxMessage[3] = (auxMessageBytes << 4) | (recvBytes - 1);
 
-	int ret;
 	uint8 retry;
-	uint8 ack;
 	for (retry = 0; retry < 4; retry++) {
-		ret = dp_aux_speak(connectorIndex, auxMessage, auxMessageBytes,
+		uint8 ack;
+		int result = dp_aux_speak(hwLine, auxMessage, auxMessageBytes,
 			recv, recvBytes, delay, &ack);
 
-		if (ret == B_BUSY)
+		if (result == B_BUSY)
 			continue;
-		else if (ret < B_OK)
-			return ret;
+		else if (result < B_OK)
+			return result;
 
 		if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_ACK)
-			return ret;
+			return result;
 		else if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_DEFER)
 			snooze(400);
 		else
@@ -164,6 +159,149 @@ dp_aux_read(uint32 connectorIndex, uint16 address,
 	}
 
 	return B_IO_ERROR;
+}
+
+
+status_t
+dp_aux_get_i2c_byte(uint32 hwLine, uint16 address, uint8* data, bool end)
+{
+	uint8 auxMessage[5];
+	int auxMessageBytes = 4; // 4 for read
+
+	/* Set up the command byte */
+	auxMessage[2] = AUX_I2C_READ << 4;
+	if (end == false)
+		auxMessage[2] |= AUX_I2C_MOT << 4;
+
+	auxMessage[0] = address;
+	auxMessage[1] = address >> 8;
+
+	auxMessage[3] = auxMessageBytes << 4;
+
+	int retry;
+	for (retry = 0; retry < 4; retry++) {
+		uint8 ack;
+		uint8 reply[2];
+		int replyBytes = 1;
+
+		int result = dp_aux_speak(hwLine, auxMessage, auxMessageBytes,
+			reply, replyBytes, 0, &ack);
+		if (result == B_BUSY)
+			continue;
+		else if (result < 0) {
+			ERROR("%s: aux_ch failed: %d\n", __func__, result);
+			return B_ERROR;
+		}
+
+		switch (ack & AUX_NATIVE_REPLY_MASK) {
+			case AUX_NATIVE_REPLY_ACK:
+				// I2C-over-AUX Reply field is only valid for AUX_ACK
+				break;
+			case AUX_NATIVE_REPLY_NACK:
+				TRACE("%s: aux_ch native nack\n", __func__);
+				return B_IO_ERROR;
+			case AUX_NATIVE_REPLY_DEFER:
+				TRACE("%s: aux_ch native defer\n", __func__);
+				snooze(400);
+				continue;
+			default:
+				TRACE("%s: aux_ch invalid native reply: 0x%02x\n",
+					__func__, ack);
+				return B_ERROR;
+		}
+
+		switch (ack & AUX_I2C_REPLY_MASK) {
+			case AUX_I2C_REPLY_ACK:
+				*data = reply[0];
+				return B_OK;
+			case AUX_I2C_REPLY_NACK:
+				TRACE("%s: aux_i2c nack\n", __func__);
+				return B_IO_ERROR;
+			case AUX_I2C_REPLY_DEFER:
+				TRACE("%s: aux_i2c defer\n", __func__);
+				snooze(400);
+				break;
+			default:
+				TRACE("%s: aux_i2c invalid native reply: 0x%02x\n",
+					__func__, ack);
+				return B_ERROR;
+		}
+	}
+
+	TRACE("%s: aux i2c too many retries, giving up.\n", __func__);
+	return B_ERROR;
+}
+
+
+status_t
+dp_aux_set_i2c_byte(uint32 hwLine, uint16 address, uint8* data, bool end)
+{
+	uint8 auxMessage[5];
+	int auxMessageBytes = 5; // 5 for write
+
+	/* Set up the command byte */
+	auxMessage[2] = AUX_I2C_WRITE << 4;
+	if (end == false)
+		auxMessage[2] |= AUX_I2C_MOT << 4;
+
+	auxMessage[0] = address;
+	auxMessage[1] = address >> 8;
+
+	auxMessage[3] = auxMessageBytes << 4;
+	auxMessage[4] = *data;
+
+	int retry;
+	for (retry = 0; retry < 4; retry++) {
+		uint8 ack;
+		uint8 reply[2];
+		int replyBytes = 1;
+
+		int result = dp_aux_speak(hwLine, auxMessage, auxMessageBytes,
+			reply, replyBytes, 0, &ack);
+		if (result == B_BUSY)
+			continue;
+		else if (result < 0) {
+			ERROR("%s: aux_ch failed: %d\n", __func__, result);
+			return B_ERROR;
+		}
+
+		switch (ack & AUX_NATIVE_REPLY_MASK) {
+			case AUX_NATIVE_REPLY_ACK:
+				// I2C-over-AUX Reply field is only valid for AUX_ACK
+				break;
+			case AUX_NATIVE_REPLY_NACK:
+				TRACE("%s: aux_ch native nack\n", __func__);
+				return B_IO_ERROR;
+			case AUX_NATIVE_REPLY_DEFER:
+				TRACE("%s: aux_ch native defer\n", __func__);
+				snooze(400);
+				continue;
+			default:
+				TRACE("%s: aux_ch invalid native reply: 0x%02x\n",
+					__func__, ack);
+				return B_ERROR;
+		}
+
+		switch (ack & AUX_I2C_REPLY_MASK) {
+			case AUX_I2C_REPLY_ACK:
+				// Success!
+				return B_OK;
+			case AUX_I2C_REPLY_NACK:
+				TRACE("%s: aux_i2c nack\n", __func__);
+				return B_IO_ERROR;
+			case AUX_I2C_REPLY_DEFER:
+				TRACE("%s: aux_i2c defer\n", __func__);
+				snooze(400);
+				break;
+			default:
+				TRACE("%s: aux_i2c invalid native reply: 0x%02x\n",
+					__func__, ack);
+				return B_ERROR;
+		}
+	}
+
+	TRACE("%s: aux i2c too many retries, giving up.\n", __func__);
+	return B_OK;
 }
 
 

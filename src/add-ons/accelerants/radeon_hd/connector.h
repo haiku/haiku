@@ -78,12 +78,15 @@ const int connector_convert[] = {
 };
 
 
-int dp_aux_speak(uint8 connectorIndex, uint8 *send, int sendBytes,
-	uint8 *recv, int recvBytes, uint8 delay, uint8 *ack);
-int dp_aux_write(uint32 connectorIndex, uint16 address, uint8 *send,
+int dp_aux_write(uint32 hwLine, uint16 address, uint8 *send,
 	uint8 sendBytes, uint8 delay);
-int dp_aux_read(uint32 connectorIndex, uint16 address, uint8 *recv,
+int dp_aux_read(uint32 hwLine, uint16 address, uint8 *recv,
 	int recvBytes, uint8 delay);
+status_t dp_aux_set_i2c_byte(uint32 hwLine, uint16 address,
+	uint8* data, bool end);
+status_t dp_aux_get_i2c_byte(uint32 hwLine, uint16 address,
+	uint8* data, bool end);
+
 
 status_t gpio_probe();
 status_t connector_attach_gpio(uint32 id, uint8 hw_line);
