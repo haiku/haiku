@@ -159,8 +159,6 @@ dp_aux_read(uint32 connectorIndex, uint16 address,
 			return ret;
 		else if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_DEFER)
 			snooze(400);
-		else if (ret == 0)
-			return -EPROTO;
 		else
 			return B_IO_ERROR;
 	}
