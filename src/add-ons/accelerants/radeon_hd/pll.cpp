@@ -342,7 +342,7 @@ pll_adjust(pll_info *pll, uint8 crtcID)
 	bool dpBridge = false;
 
 	if ((encoderFlags & (ATOM_DEVICE_LCD_SUPPORT | ATOM_DEVICE_DFP_SUPPORT))
-		|| encoder_is_dp_bridge(encoderID)) {
+		|| gConnector[connectorIndex]->encoder.isDPBridge) {
 		TRACE("%s: external DP bridge detected!\n", __func__);
 		dpBridge = true;
 	}
