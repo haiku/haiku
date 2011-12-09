@@ -7,16 +7,18 @@
  */
 
 
-#include "accelerant_protos.h"
-#include "accelerant.h"
-#include "bios.h"
-#include "display.h"
-#include "utility.h"
+#include "encoder.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+
+#include "accelerant.h"
+#include "accelerant_protos.h"
+#include "bios.h"
+#include "display.h"
+#include "utility.h"
 
 
 #define TRACE_ENCODER

@@ -7,9 +7,18 @@
  *		Alexander von Gluck, kallisti5@unixzen.com
  */
 
+#include "accelerant.h"
+
+#include <AGP.h>
+#include <Debug.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <syslog.h>
+#include <unistd.h>
 
 #include "accelerant_protos.h"
-#include "accelerant.h"
 
 #include "bios.h"
 #include "connector.h"
@@ -17,17 +26,6 @@
 #include "gpu.h"
 #include "pll.h"
 #include "utility.h"
-
-#include <Debug.h>
-
-#include <errno.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <syslog.h>
-
-#include <AGP.h>
 
 
 #undef TRACE

@@ -7,9 +7,9 @@
  */
 
 
-#include <Debug.h>
-
 #include "bios.h"
+
+#include <Debug.h>
 
 #include "accelerant.h"
 #include "accelerant_protos.h"

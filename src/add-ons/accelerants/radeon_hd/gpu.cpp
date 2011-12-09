@@ -8,13 +8,14 @@
  */
 
 
+#include "gpu.h"
+
+#include <Debug.h>
+
 #include "accelerant_protos.h"
 #include "accelerant.h"
 #include "bios.h"
-#include "gpu.h"
 #include "utility.h"
-
-#include <Debug.h>
 
 
 #undef TRACE

@@ -11,19 +11,20 @@
  */
 
 
-#include "accelerant_protos.h"
-#include "accelerant.h"
-#include "bios.h"
-#include "utility.h"
 #include "mode.h"
-#include "display.h"
-#include "pll.h"
 
+#include <create_display_modes.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
 
-#include <create_display_modes.h>
+#include "accelerant.h"
+#include "accelerant_protos.h"
+#include "bios.h"
+#include "display.h"
+#include "encoder.h"
+#include "pll.h"
+#include "utility.h"
 
 
 #define TRACE_MODE

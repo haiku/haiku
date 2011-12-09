@@ -11,6 +11,8 @@
 
 #include <video_configuration.h>
 
+#include "accelerant.h"
+
 
 status_t init_registers(register_info* reg, uint8 crtid);
 status_t detect_crt_ranges(uint32 crtid);

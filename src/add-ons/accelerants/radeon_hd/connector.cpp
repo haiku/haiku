@@ -7,14 +7,16 @@
  */
 
 
+#include "connector.h"
+
+#include <Debug.h>
+
 #include "accelerant_protos.h"
 #include "accelerant.h"
 #include "bios.h"
-#include "connector.h"
+#include "encoder.h"
 #include "gpu.h"
 #include "utility.h"
-
-#include <Debug.h>
 
 
 #undef TRACE

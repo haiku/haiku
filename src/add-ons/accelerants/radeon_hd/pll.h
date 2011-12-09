@@ -9,7 +9,7 @@
 #define RADEON_HD_PLL_H
 
 
-#include "accelerant.h"
+#include <SupportDefs.h>
 
 
 #define MAX_TOLERANCE 10

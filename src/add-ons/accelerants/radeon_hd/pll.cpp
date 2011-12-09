@@ -7,11 +7,6 @@
  */
 
 
-#include "accelerant_protos.h"
-#include "accelerant.h"
-#include "bios.h"
-#include "display.h"
-#include "utility.h"
 #include "pll.h"
 
 #include <stdio.h>
@@ -19,6 +14,12 @@
 #include <string.h>
 #include <math.h>
 
+#include "accelerant_protos.h"
+#include "accelerant.h"
+#include "bios.h"
+#include "display.h"
+#include "encoder.h"
+#include "utility.h"
 
 #define TRACE_PLL
 #ifdef TRACE_PLL

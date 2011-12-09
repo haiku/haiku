@@ -11,6 +11,8 @@
 
 #include <video_configuration.h>
 
+#include "accelerant.h"
+
 
 // From the VESA DisplayPort spec
 // TODO: may want to move these into common code

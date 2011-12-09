@@ -9,6 +9,9 @@
 #define RADEON_HD_ENCODER_H
 
 
+#include <SupportDefs.h>
+
+
 void encoder_assign_crtc(uint8 crtID);
 void encoder_apply_quirks(uint8 crtcID);
 void encoder_mode_set(uint8 id, uint32 pixelClock);

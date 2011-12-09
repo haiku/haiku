@@ -12,14 +12,16 @@
  */
 
 
-#include "accelerant_protos.h"
-#include "accelerant.h"
-#include "bios.h"
-#include "connector.h"
 #include "display.h"
 
 #include <stdlib.h>
 #include <string.h>
+
+#include "accelerant.h"
+#include "accelerant_protos.h"
+#include "bios.h"
+#include "connector.h"
+#include "encoder.h"
 
 
 #define TRACE_DISPLAY

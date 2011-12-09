@@ -10,15 +10,14 @@
 #define RADEON_HD_ACCELERANT_H
 
 
+#include <ByteOrder.h>
+#include <edid.h>
+
 #include "atom.h"
 #include "encoder.h"
 #include "mode.h"
-#include "radeon_hd.h"
 #include "pll.h"
-
-
-#include <ByteOrder.h>
-#include <edid.h>
+#include "radeon_hd.h"
 
 
 #define MAX_DISPLAY 2

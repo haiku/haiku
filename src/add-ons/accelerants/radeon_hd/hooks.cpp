@@ -8,8 +8,8 @@
  */
 
 
-#include "accelerant_protos.h"
 #include "accelerant.h"
+#include "accelerant_protos.h"
 
 
 extern "C" void *
