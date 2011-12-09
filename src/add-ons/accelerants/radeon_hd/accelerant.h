@@ -134,6 +134,7 @@ struct encoder_info {
 	uint32		type;
 	uint32		flags;
 	bool		isExternal;
+	bool		isDPBridge;
 	bool		isHDMI;
 	bool		isTV;
 	struct pll_info	pll;

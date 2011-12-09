@@ -914,6 +914,8 @@ connector_probe()
 								= encoderType;
 							gConnector[connectorIndex]->encoder.isExternal
 								= encoder_is_external(encoderID);
+							gConnector[connectorIndex]->encoder.isDPBridge
+								= encoder_is_dp_bridge(encoderID);
 
 							pll_limit_probe(
 								&gConnector[connectorIndex]->encoder.pll);
@@ -993,6 +995,12 @@ connector_probe()
 				case VIDEO_CONNECTOR_HDMIB:
 					gConnector[connectorIndex]->encoder.isHDMI = true;
 					break;
+			}
+
+			if (gConnector[connectorIndex]->encoder.isDPBridge == true) {
+				TRACE("%s: is bridge, performing bridge DDC setup\n", __func__);
+				encoder_external_setup(connectorIndex, 0,
+					EXTERNAL_ENCODER_ACTION_V3_DDC_SETUP);
 			}
 
 			connectorIndex++;

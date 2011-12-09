@@ -206,19 +206,20 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1:
 		case ENCODER_OBJECT_ID_INTERNAL_DAC2:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC2:
-			encoder_analog_setup(id, pixelClock, ATOM_ENABLE);
+			encoder_analog_setup(connectorIndex, pixelClock, ATOM_ENABLE);
 			if ((encoderFlags
 				& (ATOM_DEVICE_TV_SUPPORT | ATOM_DEVICE_CV_SUPPORT)) != 0) {
-				encoder_tv_setup(id, pixelClock, ATOM_ENABLE);
+				encoder_tv_setup(connectorIndex, pixelClock, ATOM_ENABLE);
 			} else {
-				encoder_tv_setup(id, pixelClock, ATOM_DISABLE);
+				encoder_tv_setup(connectorIndex, pixelClock, ATOM_DISABLE);
 			}
 			break;
 		case ENCODER_OBJECT_ID_INTERNAL_TMDS1:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_TMDS1:
 		case ENCODER_OBJECT_ID_INTERNAL_LVDS:
 		case ENCODER_OBJECT_ID_INTERNAL_LVTM1:
-			encoder_digital_setup(id, pixelClock, PANEL_ENCODER_ACTION_ENABLE);
+			encoder_digital_setup(connectorIndex, pixelClock,
+				PANEL_ENCODER_ACTION_ENABLE);
 			break;
 		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY:
 		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
@@ -228,7 +229,8 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 				//atombios_dig_transmitter_setup(encoder,
 				//	ATOM_TRANSMITTER_ACTION_DISABLE, 0, 0);
 					// TODO: Disable the dig transmitter
-				encoder_dig_setup(id, pixelClock, ATOM_ENCODER_CMD_SETUP);
+				encoder_dig_setup(connectorIndex, pixelClock,
+					ATOM_ENCODER_CMD_SETUP);
 					// Setup and enable the dig encoder
 
 				//atombios_dig_transmitter_setup(encoder,
@@ -238,11 +240,11 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 				//atombios_dig_transmitter_setup(encoder,
 				//	ATOM_TRANSMITTER_ACTION_DISABLE, 0, 0);
 					// Disable the dig transmitter
-				encoder_dig_setup(id, pixelClock, ATOM_DISABLE);
+				encoder_dig_setup(connectorIndex, pixelClock, ATOM_DISABLE);
 					// Disable the dig encoder
 
 				/* setup and enable the encoder and transmitter */
-				encoder_dig_setup(id, pixelClock, ATOM_ENABLE);
+				encoder_dig_setup(connectorIndex, pixelClock, ATOM_ENABLE);
 					// Setup and enable the dig encoder
 
 				//atombios_dig_transmitter_setup(encoder,
@@ -275,10 +277,10 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 		case ENCODER_OBJECT_ID_VT1623:
 		case ENCODER_OBJECT_ID_HDMI_SI1930:
 			if (info.dceMajor >= 4 && info.dceMinor >= 1) {
-				encoder_external_setup(id, pixelClock,
+				encoder_external_setup(connectorIndex, pixelClock,
 					EXTERNAL_ENCODER_ACTION_V3_ENCODER_SETUP);
 			} else {
-				encoder_external_setup(id, pixelClock,
+				encoder_external_setup(connectorIndex, pixelClock,
 					ATOM_ENABLE);
 			}
 			break;
@@ -291,9 +293,8 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 
 
 status_t
-encoder_tv_setup(uint8 id, uint32 pixelClock, int command)
+encoder_tv_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 {
-	uint32 connectorIndex = gDisplay[id]->connectorIndex;
 	uint16 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 
 	TV_ENCODER_CONTROL_PS_ALLOCATION args;
@@ -323,11 +324,9 @@ union lvds_encoder_control {
 
 
 status_t
-encoder_digital_setup(uint8 id, uint32 pixelClock, int command)
+encoder_digital_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 {
 	TRACE("%s\n", __func__);
-
-	uint32 connectorIndex = gDisplay[id]->connectorIndex;
 
 	union lvds_encoder_control args;
 	memset(&args, 0, sizeof(args));
@@ -455,11 +454,10 @@ union dig_encoder_control {
 
 
 status_t
-encoder_dig_setup(uint8 id, uint32 pixelClock, int command)
+encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 {
 	radeon_shared_info &info = *gInfo->shared_info;
 
-	uint32 connectorIndex = gDisplay[id]->connectorIndex;
 	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
 
 	union dig_encoder_control args;
@@ -612,7 +610,7 @@ union external_encoder_control {
 
 
 status_t
-encoder_external_setup(uint8 id, uint32 pixelClock, int command)
+encoder_external_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 {
 	TRACE("%s\n", __func__);
 
@@ -620,7 +618,6 @@ encoder_external_setup(uint8 id, uint32 pixelClock, int command)
 	union external_encoder_control args;
 	memset(&args, 0, sizeof(args));
 
-	uint32 connectorIndex = gDisplay[id]->connectorIndex;
 	int connectorObjectID
 		= (gConnector[connectorIndex]->objectID & OBJECT_ID_MASK)
 			>> OBJECT_ID_SHIFT;
@@ -764,11 +761,9 @@ encoder_external_setup(uint8 id, uint32 pixelClock, int command)
 
 
 status_t
-encoder_analog_setup(uint8 id, uint32 pixelClock, int command)
+encoder_analog_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 {
 	TRACE("%s\n", __func__);
-
-	uint32 connectorIndex = gDisplay[id]->connectorIndex;
 
 	int index = 0;
 	DAC_ENCODER_CONTROL_PS_ALLOCATION args;
@@ -797,7 +792,7 @@ encoder_analog_setup(uint8 id, uint32 pixelClock, int command)
 
 
 bool
-encoder_analog_load_detect(uint8 connectorIndex)
+encoder_analog_load_detect(uint32 connectorIndex)
 {
 	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
