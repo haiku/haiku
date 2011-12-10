@@ -316,8 +316,7 @@ gpio_lock_i2c(void* cookie, bool lock)
 
 	if (lock == true) {
 		// hw_capable and > DCE3
-		if (info->hw_capable == true
-			&& gInfo->shared_info->dceMajor >= 3) {
+		if (info->hw_capable == true && gInfo->shared_info->dceMajor >= 3) {
 			// Switch GPIO pads to ddc mode
 			buffer = Read32(OUT, info->mask_scl_reg);
 			buffer &= ~(1 << 16);
@@ -337,22 +336,23 @@ gpio_lock_i2c(void* cookie, bool lock)
 	buffer = Read32(OUT, info->en_sda_reg) & ~info->en_sda_mask;
 	Write32(OUT, info->en_sda_reg, buffer);
 
-	// mask GPIO pins for software use
+	// mask clock GPIO pins for software use
 	buffer = Read32(OUT, info->mask_scl_reg);
-	if (lock == true) {
+	if (lock == true)
 		buffer |= info->mask_scl_mask;
-	} else {
+	else
 		buffer &= ~info->mask_scl_mask;
-	}
+
 	Write32(OUT, info->mask_scl_reg, buffer);
 	Read32(OUT, info->mask_scl_reg);
 
+	// mask data GPIO pins for software use
 	buffer = Read32(OUT, info->mask_sda_reg);
-	if (lock == true) {
+	if (lock == true)
 		buffer |= info->mask_sda_mask;
-	} else {
+	else
 		buffer &= ~info->mask_sda_mask;
-	}
+
 	Write32(OUT, info->mask_sda_reg, buffer);
 	Read32(OUT, info->mask_sda_reg);
 }
@@ -363,10 +363,8 @@ gpio_get_i2c_bit(void* cookie, int* _clock, int* _data)
 {
 	gpio_info* info = (gpio_info*)cookie;
 
-	uint32 scl = Read32(OUT, info->y_scl_reg)
-		& info->y_scl_mask;
-	uint32 sda = Read32(OUT, info->y_sda_reg)
-		& info->y_sda_mask;
+	uint32 scl = Read32(OUT, info->y_scl_reg) & info->y_scl_mask;
+	uint32 sda = Read32(OUT, info->y_sda_reg) & info->y_sda_mask;
 
 	*_clock = scl != 0;
 	*_data = sda != 0;
@@ -380,14 +378,12 @@ gpio_set_i2c_bit(void* cookie, int clock, int data)
 {
 	gpio_info* info = (gpio_info*)cookie;
 
-	uint32 scl = Read32(OUT, info->en_scl_reg)
-		& ~info->en_scl_mask;
+	uint32 scl = Read32(OUT, info->en_scl_reg) & ~info->en_scl_mask;
 	scl |= clock ? 0 : info->en_scl_mask;
 	Write32(OUT, info->en_scl_reg, scl);
 	Read32(OUT, info->en_scl_reg);
 
-	uint32 sda = Read32(OUT, info->en_sda_reg)
-		& ~info->en_sda_mask;
+	uint32 sda = Read32(OUT, info->en_sda_reg) & ~info->en_sda_mask;
 	sda |= data ? 0 : info->en_sda_mask;
 	Write32(OUT, info->en_sda_reg, sda);
 	Read32(OUT, info->en_sda_reg);
@@ -575,8 +571,7 @@ gpio_probe()
 		}
 
 		// populate gpio information
-		gGPIOInfo[i]->hw_line
-			= gpio->sucI2cId.ucAccess;
+		gGPIOInfo[i]->hw_line = gpio->sucI2cId.ucAccess;
 		gGPIOInfo[i]->hw_capable
 			= (gpio->sucI2cId.sbfAccess.bfHW_Capable) ? true : false;
 
@@ -586,10 +581,8 @@ gpio_probe()
 			= B_LENDIAN_TO_HOST_INT16(gpio->usClkMaskRegisterIndex) * 4;
 		gGPIOInfo[i]->mask_sda_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usDataMaskRegisterIndex) * 4;
-		gGPIOInfo[i]->mask_scl_mask
-			= (1 << gpio->ucClkMaskShift);
-		gGPIOInfo[i]->mask_sda_mask
-			= (1 << gpio->ucDataMaskShift);
+		gGPIOInfo[i]->mask_scl_mask = 1 << gpio->ucClkMaskShift;
+		gGPIOInfo[i]->mask_sda_mask = 1 << gpio->ucDataMaskShift;
 
 		// GPIO output / write (A) enable
 		// 0 = GPIO input (Y); 1 = GPIO output (A);
@@ -597,33 +590,27 @@ gpio_probe()
 			= B_LENDIAN_TO_HOST_INT16(gpio->usClkEnRegisterIndex) * 4;
 		gGPIOInfo[i]->en_sda_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usDataEnRegisterIndex) * 4;
-		gGPIOInfo[i]->en_scl_mask
-			= (1 << gpio->ucClkEnShift);
-		gGPIOInfo[i]->en_sda_mask
-			= (1 << gpio->ucDataEnShift);
+		gGPIOInfo[i]->en_scl_mask = 1 << gpio->ucClkEnShift;
+		gGPIOInfo[i]->en_sda_mask = 1 << gpio->ucDataEnShift;
 
 		// GPIO output / write (A)
 		gGPIOInfo[i]->a_scl_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usClkA_RegisterIndex) * 4;
 		gGPIOInfo[i]->a_sda_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usDataA_RegisterIndex) * 4;
-		gGPIOInfo[i]->a_scl_mask
-			= (1 << gpio->ucClkA_Shift);
-		gGPIOInfo[i]->a_sda_mask
-			= (1 << gpio->ucDataA_Shift);
+		gGPIOInfo[i]->a_scl_mask = 1 << gpio->ucClkA_Shift;
+		gGPIOInfo[i]->a_sda_mask = 1 << gpio->ucDataA_Shift;
 
 		// GPIO input / read (Y)
 		gGPIOInfo[i]->y_scl_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usClkY_RegisterIndex) * 4;
 		gGPIOInfo[i]->y_sda_reg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usDataY_RegisterIndex) * 4;
-		gGPIOInfo[i]->y_scl_mask
-			= (1 << gpio->ucClkY_Shift);
-		gGPIOInfo[i]->y_sda_mask
-			= (1 << gpio->ucDataY_Shift);
+		gGPIOInfo[i]->y_scl_mask = 1 << gpio->ucClkY_Shift;
+		gGPIOInfo[i]->y_sda_mask = 1 << gpio->ucDataY_Shift;
 
 		// ensure data is valid
-		gGPIOInfo[i]->valid = (gGPIOInfo[i]->mask_scl_reg) ? true : false;
+		gGPIOInfo[i]->valid = gGPIOInfo[i]->mask_scl_reg ? true : false;
 
 		TRACE("%s: GPIO @ %" B_PRIu32 ", valid: %s, hw_line: 0x%" B_PRIX32 "\n",
 			__func__, i, gGPIOInfo[i]->valid ? "true" : "false",
