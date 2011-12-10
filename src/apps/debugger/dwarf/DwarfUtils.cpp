@@ -76,19 +76,24 @@ DwarfUtils::GetFullDIEName(const DebugInfoEntry* entry, BString& _name)
 		DebugInfoEntryList::ConstIterator iterator
 			= subProgram->Parameters().GetIterator();
 
-		// this function is a class method, skip the first parameter
-		// as it supplies our 'this' pointer and shouldn't be visible
-		// in the signature
-		if (dynamic_cast<const DIECompoundType*>(subProgram->Parent()) != NULL)
-			iterator.Next();
-
+		bool firstParameter = true;
 		while (iterator.HasNext()) {
+			DebugInfoEntry* parameterEntry = iterator.Next();
+			if (dynamic_cast<DIEUnspecifiedParameters*>(parameterEntry)
+				!= NULL) {
+				parameters += ", ...";
+				continue;
+			}
+
 			const DIEFormalParameter* parameter
-				= dynamic_cast<DIEFormalParameter*>(iterator.Next());
+				= dynamic_cast<DIEFormalParameter*>(parameterEntry);
 			if (parameter == NULL) {
 				// this shouldn't happen
 				return;
 			}
+
+			if (parameter->IsArtificial())
+				continue;
 
 			BString paramName;
 			BString modifier;
@@ -133,10 +138,12 @@ DwarfUtils::GetFullDIEName(const DebugInfoEntry* entry, BString& _name)
 				paramName += modifier;
 			}
 
-			parameters += paramName;
-
-			if (iterator.HasNext())
+			if (firstParameter)
+				firstParameter = false;
+			else
 				parameters += ", ";
+
+			parameters += paramName;
 		}
 
 		if (parameters.Length() > 0)
