@@ -31,12 +31,6 @@
 #define ERROR(x...) _sPrintf("radeon_hd: " x)
 
 
-union aux_channel_transaction {
-	PROCESS_AUX_CHANNEL_TRANSACTION_PS_ALLOCATION v1;
-	PROCESS_AUX_CHANNEL_TRANSACTION_PARAMETERS_V2 v2;
-};
-
-
 static int
 dp_aux_speak(uint32 hwLine, uint8* send, int sendBytes,
 	uint8* recv, int recvBytes, uint8 delay, uint8* ack)
@@ -46,13 +40,15 @@ dp_aux_speak(uint32 hwLine, uint8* send, int sendBytes,
 		return B_IO_ERROR;
 	}
 
-	union aux_channel_transaction args;
 	int index = GetIndexIntoMasterTable(COMMAND, ProcessAuxChannelTransaction);
 
+	// Build AtomBIOS Transaction
+	union auxChannelTransaction {
+		PROCESS_AUX_CHANNEL_TRANSACTION_PS_ALLOCATION v1;
+		PROCESS_AUX_CHANNEL_TRANSACTION_PARAMETERS_V2 v2;
+	};
+	union auxChannelTransaction args;
 	memset(&args, 0, sizeof(args));
-
-	unsigned char* base = (unsigned char*)gAtomContext->scratch;
-	memcpy(base, send, sendBytes);
 
 	args.v1.lpAuxRequest = 0;
 	args.v1.lpDataOut = 16;
@@ -62,6 +58,9 @@ dp_aux_speak(uint32 hwLine, uint8* send, int sendBytes,
 
 	//if (ASIC_IS_DCE4(rdev))
 	//	args.v2.ucHPD_ID = chan->rec.hpd;
+
+	unsigned char* base = (unsigned char*)gAtomContext->scratch;
+	memcpy(base, send, sendBytes);
 
 	atom_execute_table(gAtomContext, index, (uint32*)&args);
 
@@ -621,13 +620,6 @@ gpio_probe()
 }
 
 
-union atom_supported_devices {
-	struct _ATOM_SUPPORTED_DEVICES_INFO info;
-	struct _ATOM_SUPPORTED_DEVICES_INFO_2 info_2;
-	struct _ATOM_SUPPORTED_DEVICES_INFO_2d1 info_2d1;
-};
-
-
 status_t
 connector_probe_legacy()
 {
@@ -643,8 +635,13 @@ connector_probe_legacy()
 		return B_ERROR;
 	}
 
-	union atom_supported_devices* supportedDevices;
-	supportedDevices = (union atom_supported_devices*)
+	union atomSupportedDevices {
+		struct _ATOM_SUPPORTED_DEVICES_INFO info;
+		struct _ATOM_SUPPORTED_DEVICES_INFO_2 info_2;
+		struct _ATOM_SUPPORTED_DEVICES_INFO_2d1 info_2d1;
+	};
+	union atomSupportedDevices* supportedDevices;
+	supportedDevices = (union atomSupportedDevices*)
 		(gAtomContext->bios + tableOffset);
 
 	uint16 deviceSupport

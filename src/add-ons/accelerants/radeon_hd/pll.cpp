@@ -32,32 +32,30 @@ extern "C" void _sPrintf(const char* format, ...);
 #define ERROR(x...) _sPrintf("radeon_hd: " x)
 
 
-union firmware_info {
-	ATOM_FIRMWARE_INFO info;
-	ATOM_FIRMWARE_INFO_V1_2 info_12;
-	ATOM_FIRMWARE_INFO_V1_3 info_13;
-	ATOM_FIRMWARE_INFO_V1_4 info_14;
-	ATOM_FIRMWARE_INFO_V2_1 info_21;
-	ATOM_FIRMWARE_INFO_V2_2 info_22;
-};
-
-
 status_t
 pll_limit_probe(pll_info* pll)
 {
-	int index = GetIndexIntoMasterTable(DATA, FirmwareInfo);
 	uint8 tableMajor;
 	uint8 tableMinor;
 	uint16 tableOffset;
 
+	int index = GetIndexIntoMasterTable(DATA, FirmwareInfo);
 	if (atom_parse_data_header(gAtomContext, index, NULL,
 		&tableMajor, &tableMinor, &tableOffset) != B_OK) {
 		ERROR("%s: Couldn't parse data header\n", __func__);
 		return B_ERROR;
 	}
 
-	union firmware_info* firmwareInfo
-		= (union firmware_info*)(gAtomContext->bios + tableOffset);
+	union atomFirmwareInfo {
+		ATOM_FIRMWARE_INFO info;
+		ATOM_FIRMWARE_INFO_V1_2 info_12;
+		ATOM_FIRMWARE_INFO_V1_3 info_13;
+		ATOM_FIRMWARE_INFO_V1_4 info_14;
+		ATOM_FIRMWARE_INFO_V2_1 info_21;
+		ATOM_FIRMWARE_INFO_V2_2 info_22;
+	};
+	union atomFirmwareInfo* firmwareInfo
+		= (union atomFirmwareInfo*)(gAtomContext->bios + tableOffset);
 
 	/* pixel clock limits */
 	pll->referenceFreq
@@ -284,12 +282,6 @@ pll_compute(pll_info* pll)
 }
 
 
-union adjust_pixel_clock {
-	ADJUST_DISPLAY_PLL_PS_ALLOCATION v1;
-	ADJUST_DISPLAY_PLL_PS_ALLOCATION_V3 v3;
-};
-
-
 void
 pll_setup_flags(pll_info* pll, uint8 crtcID)
 {
@@ -350,19 +342,24 @@ pll_adjust(pll_info* pll, uint8 crtcID)
 
 
 	if (info.dceMajor >= 3) {
-		union adjust_pixel_clock args;
 
 		uint8 tableMajor;
 		uint8 tableMinor;
 
 		int index = GetIndexIntoMasterTable(COMMAND, AdjustDisplayPll);
-
 		if (atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor)
 			!= B_OK) {
 			return B_ERROR;
 		}
 
+		// Prepare arguments for AtomBIOS call
+		union adjustPixelClock {
+			ADJUST_DISPLAY_PLL_PS_ALLOCATION v1;
+			ADJUST_DISPLAY_PLL_PS_ALLOCATION_V3 v3;
+		};
+		union adjustPixelClock args;
 		memset(&args, 0, sizeof(args));
+
 		switch (tableMajor) {
 			case 1:
 				switch (tableMinor) {
@@ -471,16 +468,6 @@ pll_adjust(pll_info* pll, uint8 crtcID)
 }
 
 
-union set_pixel_clock {
-	SET_PIXEL_CLOCK_PS_ALLOCATION base;
-	PIXEL_CLOCK_PARAMETERS v1;
-	PIXEL_CLOCK_PARAMETERS_V2 v2;
-	PIXEL_CLOCK_PARAMETERS_V3 v3;
-	PIXEL_CLOCK_PARAMETERS_V5 v5;
-	PIXEL_CLOCK_PARAMETERS_V6 v6;
-};
-
-
 status_t
 pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 {
@@ -497,18 +484,27 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 	pll_compute(pll);
 		// compute dividers
 
-	int index = GetIndexIntoMasterTable(COMMAND, SetPixelClock);
-	union set_pixel_clock args;
-	memset(&args, 0, sizeof(args));
-
 	uint8 tableMajor;
 	uint8 tableMinor;
 
+	int index = GetIndexIntoMasterTable(COMMAND, SetPixelClock);
 	atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor);
 
 	uint32 bitsPerChannel = 8;
 		// TODO: Digital Depth, EDID 1.4+ on digital displays
 		// isn't in Haiku edid common code?
+
+	// Prepare arguments for AtomBIOS call
+	union setPixelClock {
+		SET_PIXEL_CLOCK_PS_ALLOCATION base;
+		PIXEL_CLOCK_PARAMETERS v1;
+		PIXEL_CLOCK_PARAMETERS_V2 v2;
+		PIXEL_CLOCK_PARAMETERS_V3 v3;
+		PIXEL_CLOCK_PARAMETERS_V5 v5;
+		PIXEL_CLOCK_PARAMETERS_V6 v6;
+	};
+	union setPixelClock args;
+	memset(&args, 0, sizeof(args));
 
 	switch (tableMinor) {
 		case 1:

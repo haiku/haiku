@@ -32,25 +32,16 @@ extern "C" void _sPrintf(const char* format, ...);
 #define ERROR(x...) _sPrintf("radeon_hd: " x)
 
 
-union crtc_source_param {
-	SELECT_CRTC_SOURCE_PS_ALLOCATION v1;
-	SELECT_CRTC_SOURCE_PARAMETERS_V2 v2;
-};
-
-
 void
 encoder_assign_crtc(uint8 crtcID)
 {
 	TRACE("%s\n", __func__);
+
 	int index = GetIndexIntoMasterTable(COMMAND, SelectCRTC_Source);
-	union crtc_source_param args;
 
 	// Table version
 	uint8 tableMajor;
 	uint8 tableMinor;
-
-	memset(&args, 0, sizeof(args));
-
 	if (atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor)
 		!= B_OK)
 		return;
@@ -58,6 +49,14 @@ encoder_assign_crtc(uint8 crtcID)
 	uint16 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	uint16 encoderID = gConnector[connectorIndex]->encoder.objectID;
 	uint16 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+
+	// Prepare AtomBIOS command arguments
+	union crtcSourceParam {
+		SELECT_CRTC_SOURCE_PS_ALLOCATION v1;
+		SELECT_CRTC_SOURCE_PARAMETERS_V2 v2;
+	};
+	union crtcSourceParam args;
+	memset(&args, 0, sizeof(args));
 
 	switch (tableMajor) {
 		case 1:
@@ -319,19 +318,10 @@ encoder_tv_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 }
 
 
-union lvds_encoder_control {
-	LVDS_ENCODER_CONTROL_PS_ALLOCATION    v1;
-	LVDS_ENCODER_CONTROL_PS_ALLOCATION_V2 v2;
-};
-
-
 status_t
 encoder_digital_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 {
 	TRACE("%s\n", __func__);
-
-	union lvds_encoder_control args;
-	memset(&args, 0, sizeof(args));
 
 	int index = 0;
 	uint16 encoderFlags = gConnector[connectorIndex]->encoder.flags;
@@ -361,6 +351,14 @@ encoder_digital_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 		ERROR("%s: cannot parse command table\n", __func__);
 		return B_ERROR;
 	}
+
+	// Prepare AtomBIOS command arguments
+	union lvdsEncoderControl {
+		LVDS_ENCODER_CONTROL_PS_ALLOCATION    v1;
+		LVDS_ENCODER_CONTROL_PS_ALLOCATION_V2 v2;
+	};
+	union lvdsEncoderControl args;
+	memset(&args, 0, sizeof(args));
 
 	switch (tableMajor) {
 	case 1:
@@ -447,30 +445,12 @@ encoder_digital_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 }
 
 
-union dig_encoder_control {
-	DIG_ENCODER_CONTROL_PS_ALLOCATION v1;
-	DIG_ENCODER_CONTROL_PARAMETERS_V2 v2;
-	DIG_ENCODER_CONTROL_PARAMETERS_V3 v3;
-	DIG_ENCODER_CONTROL_PARAMETERS_V4 v4;
-};
-
-
 status_t
 encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 {
 	radeon_shared_info &info = *gInfo->shared_info;
 
-	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
-
-	union dig_encoder_control args;
 	int index = 0;
-
-	// Table verson
-	uint8 tableMajor;
-	uint8 tableMinor;
-
-	memset(&args, 0, sizeof(args));
-
 	if (info.dceMajor > 4)
 		index = GetIndexIntoMasterTable(COMMAND, DIGxEncoderControl);
 	else {
@@ -480,14 +460,30 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 			index = GetIndexIntoMasterTable(COMMAND, DIG2EncoderControl);
 	}
 
+	// Table verson
+	uint8 tableMajor;
+	uint8 tableMinor;
+
 	if (atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor)
 		!= B_OK) {
 		ERROR("%s: cannot parse command table\n", __func__);
 		return B_ERROR;
 	}
 
+	// Prepare AtomBIOS command arguments
+	union digEncoderControl {
+		DIG_ENCODER_CONTROL_PS_ALLOCATION v1;
+		DIG_ENCODER_CONTROL_PARAMETERS_V2 v2;
+		DIG_ENCODER_CONTROL_PARAMETERS_V3 v3;
+		DIG_ENCODER_CONTROL_PARAMETERS_V4 v4;
+	};
+	union digEncoderControl args;
+	memset(&args, 0, sizeof(args));
+
 	args.v1.ucAction = command;
 	args.v1.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
+
+	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
 
 	#if 0
 	if (command == ATOM_ENCODER_CMD_SETUP_PANEL_MODE) {
@@ -605,33 +601,32 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 }
 
 
-union external_encoder_control {
-	EXTERNAL_ENCODER_CONTROL_PS_ALLOCATION v1;
-	EXTERNAL_ENCODER_CONTROL_PS_ALLOCATION_V3 v3;
-};
-
-
 status_t
 encoder_external_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 {
 	TRACE("%s\n", __func__);
 
-	int index = GetIndexIntoMasterTable(COMMAND, ExternalEncoderControl);
-	union external_encoder_control args;
-	memset(&args, 0, sizeof(args));
-
-	int connectorObjectID
-		= (gConnector[connectorIndex]->objectID & OBJECT_ID_MASK)
-			>> OBJECT_ID_SHIFT;
-
 	uint8 tableMajor;
 	uint8 tableMinor;
 
+	int index = GetIndexIntoMasterTable(COMMAND, ExternalEncoderControl);
 	if (atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor)
 		!= B_OK) {
 		ERROR("%s: Error parsing ExternalEncoderControl table\n", __func__);
 		return B_ERROR;
 	}
+
+	// Prepare AtomBIOS command arguments
+	union externalEncoderControl {
+		EXTERNAL_ENCODER_CONTROL_PS_ALLOCATION v1;
+		EXTERNAL_ENCODER_CONTROL_PS_ALLOCATION_V3 v3;
+	};
+	union externalEncoderControl args;
+	memset(&args, 0, sizeof(args));
+
+	int connectorObjectID
+		= (gConnector[connectorIndex]->objectID & OBJECT_ID_MASK)
+			>> OBJECT_ID_SHIFT;
 
 	switch (tableMajor) {
 		case 1:
