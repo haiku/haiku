@@ -67,7 +67,7 @@ dp_aux_speak(uint32 hwLine, uint8* send, int sendBytes,
 
 	*ack = args.v1.ucReplyStatus;
 
-	switch(args.v1.ucReplyStatus) {
+	switch (args.v1.ucReplyStatus) {
 		case 1:
 			ERROR("%s: dp_aux_ch timeout!\n", __func__);
 			return B_TIMED_OUT;
@@ -978,7 +978,7 @@ connector_probe()
 			gConnector[connectorIndex]->encoder.isTV = false;
 			gConnector[connectorIndex]->encoder.isHDMI = false;
 
-			switch(connectorType) {
+			switch (connectorType) {
 				case VIDEO_CONNECTOR_COMPOSITE:
 				case VIDEO_CONNECTOR_SVIDEO:
 				case VIDEO_CONNECTOR_9DIN:

@@ -1243,7 +1243,7 @@ encoder_object_lookup(uint32 encoderFlags, uint8 dacID)
 uint32
 encoder_type_lookup(uint32 encoderID, uint32 connectorFlags)
 {
-	switch(encoderID) {
+	switch (encoderID) {
 		case ENCODER_OBJECT_ID_INTERNAL_LVDS:
 		case ENCODER_OBJECT_ID_INTERNAL_TMDS1:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_TMDS1:

@@ -124,7 +124,7 @@ radeon_dpms_set(int mode)
 {
 	radeon_shared_info &info = *gInfo->shared_info;
 
-	switch(mode) {
+	switch (mode) {
 		case B_DPMS_ON:
 			TRACE("%s: ON\n", __func__);
 			for (uint8 id = 0; id < MAX_DISPLAY; id++) {

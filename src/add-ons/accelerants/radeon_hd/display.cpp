@@ -47,7 +47,7 @@ init_registers(register_info* regs, uint8 crtcID)
 		// Evergreen
 		uint32 offset = 0;
 
-		switch(crtcID) {
+		switch (crtcID) {
 			case 0:
 				offset = EVERGREEN_CRTC0_REGISTER_OFFSET;
 				regs->vgaControl = AVIVO_D1VGA_CONTROL;
@@ -111,7 +111,7 @@ init_registers(register_info* regs, uint8 crtcID)
 		// R700 series
 		uint32 offset = 0;
 
-		switch(crtcID) {
+		switch (crtcID) {
 			case 0:
 				offset = R600_CRTC0_REGISTER_OFFSET;
 				regs->vgaControl = AVIVO_D1VGA_CONTROL;
@@ -158,7 +158,7 @@ init_registers(register_info* regs, uint8 crtcID)
 		// Avivo+
 		uint32 offset = 0;
 
-		switch(crtcID) {
+		switch (crtcID) {
 			case 0:
 				offset = R600_CRTC0_REGISTER_OFFSET;
 				regs->vgaControl = AVIVO_D1VGA_CONTROL;
