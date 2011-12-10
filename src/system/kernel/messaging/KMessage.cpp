@@ -6,6 +6,8 @@
 
 #include <util/KMessage.h>
 
+#include <malloc.h>
+	// for memalign()
 #include <stdlib.h>
 #include <string.h>
 
@@ -37,6 +39,7 @@
 
 
 static const int32 kMessageReallocChunkSize = 64;
+static const size_t kMessageBufferAlignment = 4;
 
 const uint32 KMessage::kMessageHeaderMagic = 'kMsG';
 
@@ -46,14 +49,16 @@ const uint32 KMessage::kMessageHeaderMagic = 'kMsG';
 static inline int32
 _Align(int32 offset)
 {
-	return (offset + 3) & ~0x3;
+	return (offset + kMessageBufferAlignment - 1)
+		& ~(kMessageBufferAlignment - 1);
 }
 
 
 static inline void*
 _Align(void* address, int32 offset = 0)
 {
-	return (void*)(((addr_t)address + offset + 3) & ~0x3);
+	return (void*)(((addr_t)address + offset + kMessageBufferAlignment - 1)
+		& ~(kMessageBufferAlignment - 1));
 }
 
 
@@ -605,7 +610,8 @@ KMessage::ReceiveFrom(port_id fromPort, bigtime_t timeout,
 		return error;
 
 	// allocate a buffer
-	uint8* buffer = (uint8*)malloc(messageInfo->size);
+	uint8* buffer = (uint8*)memalign(kMessageBufferAlignment,
+		messageInfo->size);
 	if (!buffer)
 		return B_NO_MEMORY;
 
@@ -817,24 +823,29 @@ KMessage::_InitFromBuffer(bool sizeFromBuffer)
 		return B_BAD_DATA;
 
 	// clone the buffer, if requested
-	if ((fFlags & KMESSAGE_CLONE_BUFFER) != 0) {
+	if ((fFlags & KMESSAGE_CLONE_BUFFER) != 0 || _Align(fBuffer) != fBuffer) {
 		if (sizeFromBuffer) {
 			int32 size = fBufferCapacity;
 			memcpy(&size, &_Header()->size, 4);
 			fBufferCapacity = size;
 		}
 
-		void* buffer = malloc(fBufferCapacity);
+		void* buffer = memalign(kMessageBufferAlignment, fBufferCapacity);
 		if (buffer == NULL)
 			return B_NO_MEMORY;
 
 		memcpy(buffer, fBuffer, fBufferCapacity);
+
+		if ((fFlags & KMESSAGE_CLONE_BUFFER) == 0)
+			free(fBuffer);
+
 		fBuffer = buffer;
 		fFlags &= ~(uint32)(KMESSAGE_READ_ONLY | KMESSAGE_CLONE_BUFFER);
 	}
 
 	if (_Align(fBuffer) != fBuffer)
 		return B_BAD_DATA;
+
 	Header* header = _Header();
 
 	if (sizeFromBuffer)
@@ -952,7 +963,7 @@ KMessage::_AllocateSpace(int32 size, bool alignAddress, bool alignSize,
 	// reallocate if necessary
 	if (fBuffer == &fHeader) {
 		int32 newCapacity = _CapacityFor(newSize);
-		void* newBuffer = malloc(newCapacity);
+		void* newBuffer = memalign(kMessageBufferAlignment, newCapacity);
 		if (!newBuffer)
 			return B_NO_MEMORY;
 		fBuffer = newBuffer;
