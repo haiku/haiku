@@ -9,7 +9,6 @@
 #include <syscalls.h>
 #include <util/kernel_cpp.h>
 
-#include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -316,15 +315,6 @@ restart:
 	sAvailable -= size + sizeof(uint32);
 
 	return chunk->AllocatedAddress();
-}
-
-
-void *
-memalign(size_t alignment, size_t size)
-{
-	// pseudo alignment by just upping the size
-	size = (size + alignment - 1) & ~alignment;
-	return malloc(size);
 }
 
 
