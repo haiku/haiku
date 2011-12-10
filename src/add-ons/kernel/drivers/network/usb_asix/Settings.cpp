@@ -88,7 +88,7 @@ void usb_asix_trace(bool force, const char* func, const char *fmt, ...)
 	static char buffer[1024];
 	char *buf_ptr = buffer;
 	if (gLogFilePath == NULL) {
-		strncpy(buffer, prefix, sizeof(buffer) - 1);
+		strlcpy(buffer, prefix, sizeof(buffer));
 		buf_ptr += strlen(prefix);
 	}
 

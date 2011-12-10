@@ -478,7 +478,7 @@ Mixer::_CreateMIXControlGroup(multi_mix_control_info* MultiInfo, int32& index,
 	Controls[index].string		= Info.fNameId;
 	if (Info.fName != NULL)
 		strlcpy(Controls[index].name, Info.fName,
-								   sizeof(Controls[index].name) - 1);
+								   sizeof(Controls[index].name));
 	index++;
 
 	if (Info.fType & MIX_Mute) {
@@ -549,7 +549,8 @@ Mixer::_CreateMIXControlGroup(multi_mix_control_info* MultiInfo, int32& index,
 		Controls[index].flags		= B_MULTI_MIX_MUX;
 		Controls[index].parent		= groupIndex;
 		Controls[index].string		= S_null;
-		strlcpy(Controls[index].name, Info.fExName, sizeof(Controls[index].name));
+		strlcpy(Controls[index].name, Info.fExName,
+								sizeof(Controls[index].name));
 
 		TRACE("MUX:%#010x\n", Controls[index].id);
 		index++;

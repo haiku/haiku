@@ -35,7 +35,9 @@ void create_log()
 		return;
 
 	int flags = O_WRONLY | O_CREAT | ((gTruncateLogFile) ? O_TRUNC : 0);
-	close(open(gLogFilePath, flags, 0666));
+	int fd = open(gLogFilePath, flags, 0666);
+	if (fd > 0)
+		close(fd);
 
 	mutex_init(&gLogLock, DRIVER_NAME"-logging");
 }
@@ -91,7 +93,7 @@ void SiS19X_trace(bool force, const char* func, const char *fmt, ...)
 	static char buffer[1024];
 	char *buf_ptr = buffer;
 	if (gLogFilePath == NULL) {
-		strcpy(buffer, prefix);
+		strlcpy(buffer, prefix, sizeof(buffer));
 		buf_ptr += strlen(prefix);
 	}
 
@@ -120,8 +122,10 @@ void SiS19X_trace(bool force, const char* func, const char *fmt, ...)
 
 	mutex_lock(&gLogLock);
 	int fd = open(gLogFilePath, O_WRONLY | O_APPEND);
-	write(fd, buffer, strlen(buffer));
-	close(fd);
+	if (fd > 0) {
+		write(fd, buffer, strlen(buffer));
+		close(fd);
+	}
 	mutex_unlock(&gLogLock);
 }
 
