@@ -772,6 +772,7 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	# compatibility library
 	HOST_HAIKU_COMPATIBILITY_LIBS = libhaikucompat.a ;
 } else {
+	HOST_LINKFLAGS += -lm ;
 	HOST_LIBSTDC++ = stdc++ ;
 	HOST_LIBROOT = libroot_build_function_remapper.a libroot_build.so ;
 	HOST_STATIC_LIBROOT = libroot_build_function_remapper.a libroot_build.a ;
