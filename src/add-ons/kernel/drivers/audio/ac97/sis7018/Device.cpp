@@ -338,7 +338,7 @@ Device::_MultiGetDescription(multi_description *multiDescription)
 	Description.interface_minimum = B_CURRENT_INTERFACE_VERSION;
 
 	strncpy(Description.friendly_name, fInfo.Name(),
-									sizeof(Description.friendly_name));
+									sizeof(Description.friendly_name) - 1);
 
 	strncpy(Description.vendor_info, "Haiku.Inc.",
 									sizeof(Description.vendor_info));

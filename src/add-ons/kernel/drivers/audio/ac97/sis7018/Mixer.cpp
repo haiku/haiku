@@ -477,7 +477,8 @@ Mixer::_CreateMIXControlGroup(multi_mix_control_info* MultiInfo, int32& index,
 	Controls[index].parent		= parentIndex;
 	Controls[index].string		= Info.fNameId;
 	if (Info.fName != NULL)
-		strlcpy(Controls[index].name, Info.fName, sizeof(Controls[index].name));
+		strlcpy(Controls[index].name, Info.fName,
+								   sizeof(Controls[index].name) - 1);
 	index++;
 
 	if (Info.fType & MIX_Mute) {

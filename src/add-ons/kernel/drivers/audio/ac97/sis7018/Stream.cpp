@@ -10,6 +10,8 @@
 
 #include "Stream.h"
 
+#include <memory.h>
+
 #include "Device.h"
 #include "Registers.h"
 #include "Settings.h"
@@ -34,6 +36,7 @@ Stream::Stream(Device *device, bool isInput)
 	fFormat.format = B_FMT_16BIT;
 	fFormat.rate = B_SR_48000;
 	fFormat.cvsr = _DecodeRate(fFormat.rate);
+	memset(fFormat._reserved_, 0, sizeof(fFormat._reserved_));
 }
 
 
