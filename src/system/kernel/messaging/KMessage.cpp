@@ -36,6 +36,19 @@
 #endif
 
 
+#if !defined(HAIKU_TARGET_PLATFORM_HAIKU) || defined(_BOOT_MODE) \
+	|| defined(_LOADER_MODE)
+#	define MEMALIGN(alignment, size)	malloc(size)
+	// Built as part of a build tool or the boot or runtime loader.
+#else
+#	include <malloc.h>
+#	define MEMALIGN(alignment, size)	memalign(alignment, size)
+	// Built as part of the kernel or userland. Using memalign allows use of
+	// special heap implementations that might otherwise return unaligned
+	// buffers for debugging purposes.
+#endif
+
+
 static const int32 kMessageReallocChunkSize = 64;
 static const size_t kMessageBufferAlignment = 4;
 
@@ -608,7 +621,8 @@ KMessage::ReceiveFrom(port_id fromPort, bigtime_t timeout,
 		return error;
 
 	// allocate a buffer
-	uint8* buffer = (uint8*)malloc(_Align(messageInfo->size));
+	uint8* buffer = (uint8*)MEMALIGN(kMessageBufferAlignment,
+		messageInfo->size);
 	if (!buffer)
 		return B_NO_MEMORY;
 
@@ -827,7 +841,7 @@ KMessage::_InitFromBuffer(bool sizeFromBuffer)
 			fBufferCapacity = size;
 		}
 
-		void* buffer = malloc(_Align(fBufferCapacity));
+		void* buffer = MEMALIGN(kMessageBufferAlignment, fBufferCapacity);
 		if (buffer == NULL)
 			return B_NO_MEMORY;
 
@@ -961,7 +975,7 @@ KMessage::_AllocateSpace(int32 size, bool alignAddress, bool alignSize,
 	// reallocate if necessary
 	if (fBuffer == &fHeader) {
 		int32 newCapacity = _CapacityFor(newSize);
-		void* newBuffer = malloc(_Align(newCapacity));
+		void* newBuffer = MEMALIGN(kMessageBufferAlignment, newCapacity);
 		if (!newBuffer)
 			return B_NO_MEMORY;
 		fBuffer = newBuffer;
