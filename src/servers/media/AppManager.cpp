@@ -189,7 +189,7 @@ AppManager::_BigBrotherEntry(void* self)
 void
 AppManager::_BigBrother()
 {
-	status_t status;
+	status_t status = B_TIMED_OUT;
 	BMessage ping('PING');
 	BMessage reply;
 
@@ -197,6 +197,7 @@ AppManager::_BigBrother()
 		if (!Lock())
 			break;
 
+		bool startOver = false;
 		AppMap::iterator iterator = fMap.begin();
 		for (; iterator != fMap.end(); iterator++) {
 			reply.what = 0;
@@ -207,11 +208,15 @@ AppManager::_BigBrother()
 				Unlock();
 
 				_TeamDied(team);
-				continue;
+				startOver = true;
+				break;
 			}
 		}
-		Unlock();
 
+		if (startOver)
+			continue;
+
+		Unlock();
 		status = acquire_sem_etc(fQuit, 1, B_RELATIVE_TIMEOUT, 2000000);
 	} while (status == B_TIMED_OUT || status == B_INTERRUPTED);
 }
