@@ -8,6 +8,7 @@
 #include <boot/platform.h>
 #include <util/kernel_cpp.h>
 
+#include <malloc.h>
 #ifdef HEAP_TEST
 #	include <stdio.h>
 #endif
@@ -326,6 +327,15 @@ malloc(size_t size)
 
 	TRACE("malloc(%lu) -> %p\n", size, chunk->AllocatedAddress());
 	return chunk->AllocatedAddress();
+}
+
+
+void *
+memalign(size_t alignment, size_t size)
+{
+	// pseudo alignment by just upping the size
+	size = (size + alignment - 1) & ~(alignment - 1);
+	return malloc(size);
 }
 
 
