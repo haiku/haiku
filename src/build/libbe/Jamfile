@@ -5,6 +5,11 @@ USES_BE_API on libbe_build.so = true ;
 # locate the library
 MakeLocate libbe_build.so : $(HOST_BUILD_COMPATIBILITY_LIB_DIR) ;
 
+local osLibs ;
+if ! $(HOST_PLATFORM) in $(HAIKU_BEOS_COMPATIBLE_PLATFORMS) {
+	osLibs = m ;
+}
+
 BuildPlatformSharedLibrary libbe_build.so :
 	# no sources here
 	:
@@ -13,7 +18,7 @@ BuildPlatformSharedLibrary libbe_build.so :
 	<libbe_build>storage_kit.o
 	<libbe_build>support_kit.o
 
-	$(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
+	$(HOST_LIBSUPC++) $(HOST_LIBSTDC++) $(osLibs)
 ;
 
 SubInclude HAIKU_TOP src build libbe app ;
