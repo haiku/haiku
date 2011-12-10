@@ -176,12 +176,18 @@ DwarfUtils::GetFullyQualifiedDIEName(const DebugInfoEntry* entry,
 	}
 
 	_name.Truncate(0);
+	BString generatedName;
 
 	// Get the namespace, if any.
 	DebugInfoEntry* parent = entry->Parent();
 	while (parent != NULL) {
 		if (parent->IsNamespace()) {
-			GetFullyQualifiedDIEName(parent, _name);
+			BString parentName;
+			GetFullyQualifiedDIEName(parent, parentName);
+			if (parentName.Length() > 0) {
+				parentName += "::";
+				generatedName.Prepend(parentName);
+			}
 			break;
 		}
 
@@ -190,14 +196,12 @@ DwarfUtils::GetFullyQualifiedDIEName(const DebugInfoEntry* entry,
 
 	BString name;
 	GetFullDIEName(entry, name);
-
 	if (name.Length() == 0)
 		return;
 
-	if (_name.Length() > 0) {
-		_name << "::" << name;
-	} else
-		_name = name;
+	generatedName += name;
+
+	_name = generatedName;
 }
 
 
