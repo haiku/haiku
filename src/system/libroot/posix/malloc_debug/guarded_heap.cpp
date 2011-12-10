@@ -4,6 +4,7 @@
  */
 
 
+#include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -943,7 +944,7 @@ __init_heap_post_env(void)
 // #pragma mark - Public API
 
 
-extern "C" void *
+extern "C" void*
 sbrk_hook(long)
 {
 	debug_printf("sbrk not supported on malloc debug\n");
@@ -952,7 +953,7 @@ sbrk_hook(long)
 }
 
 
-void*
+extern "C" void*
 memalign(size_t alignment, size_t size)
 {
 	if (size == 0)
@@ -962,14 +963,14 @@ memalign(size_t alignment, size_t size)
 }
 
 
-void*
+extern "C" void*
 malloc(size_t size)
 {
 	return memalign(0, size);
 }
 
 
-void
+extern "C" void
 free(void* address)
 {
 	if (!guarded_heap_free(address))
@@ -977,7 +978,7 @@ free(void* address)
 }
 
 
-void*
+extern "C" void*
 realloc(void* address, size_t newSize)
 {
 	if (newSize == 0) {
@@ -992,10 +993,10 @@ realloc(void* address, size_t newSize)
 }
 
 
-void *
+extern "C" void*
 calloc(size_t numElements, size_t size)
 {
-	void *address = malloc(numElements * size);
+	void* address = malloc(numElements * size);
 	if (address != NULL)
 		memset(address, 0, numElements * size);
 
@@ -1003,7 +1004,7 @@ calloc(size_t numElements, size_t size)
 }
 
 
-extern "C" void *
+extern "C" void*
 valloc(size_t size)
 {
 	return memalign(B_PAGE_SIZE, size);
