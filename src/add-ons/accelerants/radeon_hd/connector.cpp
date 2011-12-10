@@ -534,7 +534,7 @@ gpio_probe()
 		return B_ERROR;
 	}
 
-	struct _ATOM_GPIO_I2C_INFO* i2c_info
+	struct _ATOM_GPIO_I2C_INFO* i2cInfo
 		= (struct _ATOM_GPIO_I2C_INFO*)(gAtomContext->bios + tableOffset);
 
 	uint32 numIndices = (tableSize - sizeof(ATOM_COMMON_TABLE_HEADER))
@@ -548,7 +548,7 @@ gpio_probe()
 	}
 
 	for (uint32 i = 0; i < numIndices; i++) {
-		ATOM_GPIO_I2C_ASSIGMENT* gpio = &i2c_info->asGPIO_Info[i];
+		ATOM_GPIO_I2C_ASSIGMENT* gpio = &i2cInfo->asGPIO_Info[i];
 
 		if (info.dceMajor >= 3) {
 			if (i == 4 && B_LENDIAN_TO_HOST_INT16(gpio->usClkMaskRegisterIndex)
@@ -753,53 +753,53 @@ connector_probe()
 		return B_ERROR;
 	}
 
-	ATOM_CONNECTOR_OBJECT_TABLE* con_obj;
-	ATOM_ENCODER_OBJECT_TABLE* enc_obj;
-	ATOM_OBJECT_TABLE* router_obj;
-	ATOM_DISPLAY_OBJECT_PATH_TABLE* path_obj;
-	ATOM_OBJECT_HEADER* obj_header;
+	ATOM_CONNECTOR_OBJECT_TABLE* connectorObject;
+	ATOM_ENCODER_OBJECT_TABLE* encoderObject;
+	ATOM_OBJECT_TABLE* routerObject;
+	ATOM_DISPLAY_OBJECT_PATH_TABLE* pathObject;
+	ATOM_OBJECT_HEADER* objectHeader;
 
-	obj_header = (ATOM_OBJECT_HEADER*)(gAtomContext->bios + tableOffset);
-	path_obj = (ATOM_DISPLAY_OBJECT_PATH_TABLE*)
+	objectHeader = (ATOM_OBJECT_HEADER*)(gAtomContext->bios + tableOffset);
+	pathObject = (ATOM_DISPLAY_OBJECT_PATH_TABLE*)
 		(gAtomContext->bios + tableOffset
-		+ B_LENDIAN_TO_HOST_INT16(obj_header->usDisplayPathTableOffset));
-	con_obj = (ATOM_CONNECTOR_OBJECT_TABLE*)
+		+ B_LENDIAN_TO_HOST_INT16(objectHeader->usDisplayPathTableOffset));
+	connectorObject = (ATOM_CONNECTOR_OBJECT_TABLE*)
 		(gAtomContext->bios + tableOffset
-		+ B_LENDIAN_TO_HOST_INT16(obj_header->usConnectorObjectTableOffset));
-	enc_obj = (ATOM_ENCODER_OBJECT_TABLE*)
+		+ B_LENDIAN_TO_HOST_INT16(objectHeader->usConnectorObjectTableOffset));
+	encoderObject = (ATOM_ENCODER_OBJECT_TABLE*)
 		(gAtomContext->bios + tableOffset
-		+ B_LENDIAN_TO_HOST_INT16(obj_header->usEncoderObjectTableOffset));
-	router_obj = (ATOM_OBJECT_TABLE*)
+		+ B_LENDIAN_TO_HOST_INT16(objectHeader->usEncoderObjectTableOffset));
+	routerObject = (ATOM_OBJECT_TABLE*)
 		(gAtomContext->bios + tableOffset
-		+ B_LENDIAN_TO_HOST_INT16(obj_header->usRouterObjectTableOffset));
-	int deviceSupport = B_LENDIAN_TO_HOST_INT16(obj_header->usDeviceSupport);
+		+ B_LENDIAN_TO_HOST_INT16(objectHeader->usRouterObjectTableOffset));
+	int deviceSupport = B_LENDIAN_TO_HOST_INT16(objectHeader->usDeviceSupport);
 
 	int pathSize = 0;
 	int32 i = 0;
 
 	TRACE("%s: found %" B_PRIu8 " potential display paths.\n", __func__,
-		path_obj->ucNumOfDispPath);
+		pathObject->ucNumOfDispPath);
 
 	uint32 connectorIndex = 0;
-	for (i = 0; i < path_obj->ucNumOfDispPath; i++) {
+	for (i = 0; i < pathObject->ucNumOfDispPath; i++) {
 
 		if (connectorIndex >= ATOM_MAX_SUPPORTED_DEVICE)
 			continue;
 
-		uint8* addr = (uint8*)path_obj->asDispPath;
+		uint8* address = (uint8*)pathObject->asDispPath;
 		ATOM_DISPLAY_OBJECT_PATH* path;
-		addr += pathSize;
-		path = (ATOM_DISPLAY_OBJECT_PATH*)addr;
+		address += pathSize;
+		path = (ATOM_DISPLAY_OBJECT_PATH*)address;
 		pathSize += B_LENDIAN_TO_HOST_INT16(path->usSize);
 
 		uint32 connectorType;
-		uint16 connectorObjectID;
 		uint16 connectorFlags = B_LENDIAN_TO_HOST_INT16(path->usDeviceTag);
 
 		if ((deviceSupport & connectorFlags) != 0) {
-			uint8 con_obj_id = (B_LENDIAN_TO_HOST_INT16(path->usConnObjectId)
-				& OBJECT_ID_MASK) >> OBJECT_ID_SHIFT;
 
+			uint16 connectorObjectID
+				= (B_LENDIAN_TO_HOST_INT16(path->usConnObjectId)
+					& OBJECT_ID_MASK) >> OBJECT_ID_SHIFT;
 			//uint8 con_obj_num
 			//	= (B_LENDIAN_TO_HOST_INT16(path->usConnObjectId)
 			//	& ENUM_ID_MASK) >> ENUM_ID_SHIFT;
@@ -816,16 +816,14 @@ connector_probe()
 			radeon_shared_info &info = *gInfo->shared_info;
 
 			uint16 igpLaneInfo;
-			if ((info.chipsetFlags & CHIP_IGP) != 0)
+			if ((info.chipsetFlags & CHIP_IGP) != 0) {
 				ERROR("%s: TODO: IGP chip connector detection\n", __func__);
 				// try non-IGP method for now
 				igpLaneInfo = 0;
-				connectorType = kConnectorConvert[con_obj_id];
-				connectorObjectID = con_obj_id;
-			else {
+				connectorType = kConnectorConvert[connectorObjectID];
+			} else {
 				igpLaneInfo = 0;
-				connectorType = kConnectorConvert[con_obj_id];
-				connectorObjectID = con_obj_id;
+				connectorType = kConnectorConvert[connectorObjectID];
 			}
 
 			if (connectorType == VIDEO_CONNECTOR_UNKNOWN) {
@@ -843,26 +841,26 @@ connector_probe()
 				//uint8 grph_obj_num
 				//	= (B_LENDIAN_TO_HOST_INT16(path->usGraphicObjIds[j]) &
 				//	ENUM_ID_MASK) >> ENUM_ID_SHIFT;
-				uint8 grph_obj_type
+				uint8 graphicObjectType
 					= (B_LENDIAN_TO_HOST_INT16(path->usGraphicObjIds[j]) &
 					OBJECT_TYPE_MASK) >> OBJECT_TYPE_SHIFT;
 
-				if (grph_obj_type == GRAPH_OBJECT_TYPE_ENCODER) {
+				if (graphicObjectType == GRAPH_OBJECT_TYPE_ENCODER) {
 					// Found an encoder
 					// TODO: it may be possible to have more then one encoder
 					int32 k;
-					for (k = 0; k < enc_obj->ucNumberOfObjects; k++) {
-						uint16 encoder_obj
+					for (k = 0; k < encoderObject->ucNumberOfObjects; k++) {
+						uint16 encoderObjectRaw
 							= B_LENDIAN_TO_HOST_INT16(
-							enc_obj->asObjects[k].usObjectID);
+							encoderObject->asObjects[k].usObjectID);
 						if (B_LENDIAN_TO_HOST_INT16(path->usGraphicObjIds[j])
-							== encoder_obj) {
+							== encoderObjectRaw) {
 							ATOM_COMMON_RECORD_HEADER* record
 								= (ATOM_COMMON_RECORD_HEADER*)
 								((uint16*)gAtomContext->bios + tableOffset
 								+ B_LENDIAN_TO_HOST_INT16(
-								enc_obj->asObjects[k].usRecordOffset));
-							ATOM_ENCODER_CAP_RECORD* cap_record;
+								encoderObject->asObjects[k].usRecordOffset));
+							ATOM_ENCODER_CAP_RECORD* capRecord;
 							uint16 caps = 0;
 							while (record->ucRecordSize > 0
 								&& record->ucRecordType > 0
@@ -870,18 +868,19 @@ connector_probe()
 								<= ATOM_MAX_OBJECT_RECORD_NUMBER) {
 								switch (record->ucRecordType) {
 									case ATOM_ENCODER_CAP_RECORD_TYPE:
-										cap_record = (ATOM_ENCODER_CAP_RECORD*)
+										capRecord = (ATOM_ENCODER_CAP_RECORD*)
 											record;
 										caps = B_LENDIAN_TO_HOST_INT16(
-											cap_record->usEncoderCap);
+											capRecord->usEncoderCap);
 										break;
 								}
 								record = (ATOM_COMMON_RECORD_HEADER*)
 									((char*)record + record->ucRecordSize);
 							}
 
-							uint32 encoderID = (encoder_obj & OBJECT_ID_MASK)
-								>> OBJECT_ID_SHIFT;
+							uint32 encoderID
+								= (encoderObjectRaw & OBJECT_ID_MASK)
+									>> OBJECT_ID_SHIFT;
 
 							uint32 encoderType = encoder_type_lookup(encoderID,
 								connectorFlags);
@@ -916,7 +915,7 @@ connector_probe()
 						}
 					}
 					// END if object is encoder
-				} else if (grph_obj_type == GRAPH_OBJECT_TYPE_ROUTER) {
+				} else if (graphicObjectType == GRAPH_OBJECT_TYPE_ROUTER) {
 					ERROR("%s: TODO: Found router object?\n", __func__);
 				} // END if object is router
 			}
@@ -924,32 +923,32 @@ connector_probe()
 			// Set up information buses such as ddc
 			if ((connectorFlags
 				& (ATOM_DEVICE_TV_SUPPORT | ATOM_DEVICE_CV_SUPPORT)) == 0) {
-				for (j = 0; j < con_obj->ucNumberOfObjects; j++) {
+				for (j = 0; j < connectorObject->ucNumberOfObjects; j++) {
 					if (B_LENDIAN_TO_HOST_INT16(path->usConnObjectId)
 						== B_LENDIAN_TO_HOST_INT16(
-						con_obj->asObjects[j].usObjectID)) {
+						connectorObject->asObjects[j].usObjectID)) {
 						ATOM_COMMON_RECORD_HEADER* record
 							= (ATOM_COMMON_RECORD_HEADER*)(gAtomContext->bios
 							+ tableOffset + B_LENDIAN_TO_HOST_INT16(
-							con_obj->asObjects[j].usRecordOffset));
+							connectorObject->asObjects[j].usRecordOffset));
 						while (record->ucRecordSize > 0
 							&& record->ucRecordType > 0
 							&& record->ucRecordType
 								<= ATOM_MAX_OBJECT_RECORD_NUMBER) {
-							ATOM_I2C_RECORD* i2c_record;
-							ATOM_I2C_ID_CONFIG_ACCESS* i2c_config;
+							ATOM_I2C_RECORD* i2cRecord;
+							ATOM_I2C_ID_CONFIG_ACCESS* i2cConfig;
 							//ATOM_HPD_INT_RECORD* hpd_record;
 
 							switch (record->ucRecordType) {
 								case ATOM_I2C_RECORD_TYPE:
-									i2c_record
+									i2cRecord
 										= (ATOM_I2C_RECORD*)record;
-									i2c_config
+									i2cConfig
 										= (ATOM_I2C_ID_CONFIG_ACCESS*)
-										&i2c_record->sucI2cId;
+										&i2cRecord->sucI2cId;
 									// attach i2c gpio information for connector
 									connector_attach_gpio(connectorIndex,
-										i2c_config->ucAccess);
+										i2cConfig->ucAccess);
 									break;
 								case ATOM_HPD_INT_RECORD_TYPE:
 									// TODO: HPD (Hot Plug)
