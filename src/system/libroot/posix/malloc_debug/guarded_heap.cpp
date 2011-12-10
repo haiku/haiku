@@ -890,6 +890,20 @@ heap_debug_get_allocation_info(void *address, size_t *size,
 // #pragma mark - Init
 
 
+static void
+init_after_fork()
+{
+	// The memory has actually been copied (or is in a copy on write state) but
+	// but the area ids have changed.
+	for (guarded_heap_area* area = sGuardedHeap.areas; area != NULL;
+			area = area->next) {
+		area->area = area_for(area);
+		if (area->area < 0)
+			panic("failed to find area for heap area %p after fork", area);
+	}
+}
+
+
 extern "C" status_t
 __init_heap(void)
 {
@@ -903,6 +917,13 @@ __init_heap(void)
 	action.sa_userdata = NULL;
 	sigemptyset(&action.sa_mask);
 	sigaction(SIGSEGV, &action, NULL);
+
+	atfork(&init_after_fork);
+		// Note: Needs malloc(). Hence we need to be fully initialized.
+		// TODO: We should actually also install a hook that is called before
+		// fork() is being executed. In a multithreaded app it would need to
+		// acquire *all* allocator locks, so that we don't fork() an
+		// inconsistent state.
 
 	return B_OK;
 }
