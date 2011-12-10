@@ -323,7 +323,7 @@ void *
 memalign(size_t alignment, size_t size)
 {
 	// pseudo alignment by just upping the size
-	size = (size + alignment - 1) & ~(alignment - 1);
+	size = (size + alignment - 1) & ~alignment;
 	return malloc(size);
 }
 
