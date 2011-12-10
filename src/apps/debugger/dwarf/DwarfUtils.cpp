@@ -71,7 +71,6 @@ DwarfUtils::GetFullDIEName(const DebugInfoEntry* entry, BString& _name)
 	const DIESubprogram* subProgram = dynamic_cast<const DIESubprogram*>(
 		entry);
 	if (subProgram != NULL) {
-		// TODO: retrieve template parameters
 		generatedName += "(";
 		BString parameters;
 		DebugInfoEntryList::ConstIterator iterator
