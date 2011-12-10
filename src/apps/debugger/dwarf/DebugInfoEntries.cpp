@@ -873,6 +873,15 @@ DIEFormalParameter::AddAttribute_abstract_origin(uint16 attributeName,
 
 
 status_t
+DIEFormalParameter::AddAttribute_artificial(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fArtificial = value.flag;
+	return B_OK;
+}
+
+
+status_t
 DIEFormalParameter::AddAttribute_const_value(uint16 attributeName,
 	const AttributeValue& value)
 {

@@ -558,8 +558,12 @@ public:
 			const ConstantAttributeValue* ConstValue() const
 									{ return &fValue; }
 
+			bool				IsArtificial() const { return fArtificial; }
+
 	virtual	status_t			AddAttribute_abstract_origin(
 									uint16 attributeName,
+									const AttributeValue& value);
+	virtual status_t			AddAttribute_artificial(uint16 attributeName,
 									const AttributeValue& value);
 	virtual	status_t			AddAttribute_const_value(uint16 attributeName,
 									const AttributeValue& value);
@@ -567,7 +571,6 @@ public:
 									const AttributeValue& value);
 
 // TODO:
-// DW_AT_artificial
 // DW_AT_default_value
 // DW_AT_endianity
 // DW_AT_is_optional
@@ -579,6 +582,7 @@ private:
 			DebugInfoEntry*		fAbstractOrigin;
 			DIEType*			fType;
 			ConstantAttributeValue fValue;
+			bool				fArtificial;
 };
 
 
