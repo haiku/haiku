@@ -836,11 +836,12 @@ KMessage::_InitFromBuffer(bool sizeFromBuffer)
 
 		memcpy(buffer, fBuffer, fBufferCapacity);
 
-		if ((fFlags & KMESSAGE_CLONE_BUFFER) == 0)
+		if ((fFlags & KMESSAGE_OWNS_BUFFER) != 0)
 			free(fBuffer);
 
 		fBuffer = buffer;
 		fFlags &= ~(uint32)(KMESSAGE_READ_ONLY | KMESSAGE_CLONE_BUFFER);
+		fFlags |= KMESSAGE_OWNS_BUFFER;
 	}
 
 	if (_Align(fBuffer) != fBuffer)
