@@ -26,7 +26,7 @@
 
 #define TRACE_DISPLAY
 #ifdef TRACE_DISPLAY
-extern "C" void _sPrintf(const char *format, ...);
+extern "C" void _sPrintf(const char* format, ...);
 #   define TRACE(x...) _sPrintf("radeon_hd: " x)
 #else
 #   define TRACE(x...) ;
@@ -217,12 +217,12 @@ init_registers(register_info* regs, uint8 crtcID)
 status_t
 detect_crt_ranges(uint32 crtid)
 {
-	edid1_info *edid = &gDisplay[crtid]->edid_info;
+	edid1_info* edid = &gDisplay[crtid]->edid_info;
 
 	// Scan each display EDID description for monitor ranges
 	for (uint32 index = 0; index < EDID1_NUM_DETAILED_MONITOR_DESC; index++) {
 
-		edid1_detailed_monitor *monitor
+		edid1_detailed_monitor* monitor
 			= &edid->detailed_monitor[index];
 
 		if (monitor->monitor_desc_type
@@ -411,7 +411,7 @@ display_crtc_blank(uint8 crtcID, int command)
 
 
 void
-display_crtc_scale(uint8 crtcID, display_mode *mode)
+display_crtc_scale(uint8 crtcID, display_mode* mode)
 {
 	TRACE("%s\n", __func__);
 	ENABLE_SCALER_PS_ALLOCATION args;
@@ -427,7 +427,7 @@ display_crtc_scale(uint8 crtcID, display_mode *mode)
 
 
 void
-display_crtc_fb_set(uint8 crtcID, display_mode *mode)
+display_crtc_fb_set(uint8 crtcID, display_mode* mode)
 {
 	radeon_shared_info &info = *gInfo->shared_info;
 	register_info* regs = gDisplay[crtcID]->regs;
@@ -583,7 +583,7 @@ display_crtc_fb_set(uint8 crtcID, display_mode *mode)
 
 
 void
-display_crtc_set(uint8 crtcID, display_mode *mode)
+display_crtc_set(uint8 crtcID, display_mode* mode)
 {
 	display_timing& displayTiming = mode->timing;
 
@@ -621,12 +621,12 @@ display_crtc_set(uint8 crtcID, display_mode *mode)
 	args.susModeMiscInfo.usAccess = B_HOST_TO_LENDIAN_INT16(misc);
 	args.ucCRTC = crtcID;
 
-	atom_execute_table(gAtomContext, index, (uint32 *)&args);
+	atom_execute_table(gAtomContext, index, (uint32*)&args);
 }
 
 
 void
-display_crtc_set_dtd(uint8 crtcID, display_mode *mode)
+display_crtc_set_dtd(uint8 crtcID, display_mode* mode)
 {
 	display_timing& displayTiming = mode->timing;
 

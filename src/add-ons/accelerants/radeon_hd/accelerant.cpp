@@ -38,10 +38,10 @@
 #endif
 
 
-struct accelerant_info *gInfo;
-display_info *gDisplay[MAX_DISPLAY];
-connector_info *gConnector[ATOM_MAX_SUPPORTED_DEVICE];
-gpio_info *gGPIOInfo[ATOM_MAX_SUPPORTED_DEVICE];
+struct accelerant_info* gInfo;
+display_info* gDisplay[MAX_DISPLAY];
+connector_info* gConnector[ATOM_MAX_SUPPORTED_DEVICE];
+gpio_info* gGPIOInfo[ATOM_MAX_SUPPORTED_DEVICE];
 
 
 class AreaCloner {
@@ -49,7 +49,7 @@ public:
 								AreaCloner();
 								~AreaCloner();
 
-			area_id				Clone(const char *name, void **_address,
+			area_id				Clone(const char* name, void** _address,
 									uint32 spec, uint32 protection,
 									area_id sourceArea);
 			status_t			InitCheck()
@@ -76,7 +76,7 @@ AreaCloner::~AreaCloner()
 
 
 area_id
-AreaCloner::Clone(const char *name, void **_address, uint32 spec,
+AreaCloner::Clone(const char* name, void** _address, uint32 spec,
 	uint32 protection, area_id sourceArea)
 {
 	fArea = clone_area(name, _address, spec, protection, sourceArea);
@@ -102,7 +102,7 @@ init_common(int device, bool isClone)
 {
 	// initialize global accelerant info structure
 
-	gInfo = (accelerant_info *)malloc(sizeof(accelerant_info));
+	gInfo = (accelerant_info*)malloc(sizeof(accelerant_info));
 
 	if (gInfo == NULL)
 		return B_NO_MEMORY;
@@ -111,12 +111,12 @@ init_common(int device, bool isClone)
 
 	// malloc memory for active display information
 	for (uint32 id = 0; id < MAX_DISPLAY; id++) {
-		gDisplay[id] = (display_info *)malloc(sizeof(display_info));
+		gDisplay[id] = (display_info*)malloc(sizeof(display_info));
 		if (gDisplay[id] == NULL)
 			return B_NO_MEMORY;
 		memset(gDisplay[id], 0, sizeof(display_info));
 
-		gDisplay[id]->regs = (register_info *)malloc(sizeof(register_info));
+		gDisplay[id]->regs = (register_info*)malloc(sizeof(register_info));
 		if (gDisplay[id]->regs == NULL)
 			return B_NO_MEMORY;
 		memset(gDisplay[id]->regs, 0, sizeof(register_info));
@@ -124,7 +124,7 @@ init_common(int device, bool isClone)
 
 	// malloc for possible physical card connectors
 	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
-		gConnector[id] = (connector_info *)malloc(sizeof(connector_info));
+		gConnector[id] = (connector_info*)malloc(sizeof(connector_info));
 
 		if (gConnector[id] == NULL)
 			return B_NO_MEMORY;
@@ -133,7 +133,7 @@ init_common(int device, bool isClone)
 
 	// malloc for card gpio pin information
 	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
-		gGPIOInfo[id] = (gpio_info *)malloc(sizeof(gpio_info));
+		gGPIOInfo[id] = (gpio_info*)malloc(sizeof(gpio_info));
 
 		if (gGPIOInfo[id] == NULL)
 			return B_NO_MEMORY;
@@ -159,7 +159,7 @@ init_common(int device, bool isClone)
 
 	AreaCloner sharedCloner;
 	gInfo->shared_info_area = sharedCloner.Clone("radeon hd shared info",
-		(void **)&gInfo->shared_info, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
+		(void**)&gInfo->shared_info, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 		data.shared_info_area);
 	status_t status = sharedCloner.InitCheck();
 	if (status < B_OK) {
@@ -170,7 +170,7 @@ init_common(int device, bool isClone)
 
 	AreaCloner regsCloner;
 	gInfo->regs_area = regsCloner.Clone("radeon hd regs",
-		(void **)&gInfo->regs, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
+		(void**)&gInfo->regs, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 		gInfo->shared_info->registers_area);
 	status = regsCloner.InitCheck();
 	if (status < B_OK) {
@@ -180,7 +180,7 @@ init_common(int device, bool isClone)
 	}
 
 	gInfo->rom_area = clone_area("radeon hd AtomBIOS",
-		(void **)&gInfo->rom, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
+		(void**)&gInfo->rom, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 		gInfo->shared_info->rom_area);
 
 	if (gInfo->rom_area < 0) {
@@ -312,7 +312,7 @@ radeon_uninit_accelerant(void)
 
 
 status_t
-radeon_get_accelerant_device_info(accelerant_device_info *di)
+radeon_get_accelerant_device_info(accelerant_device_info* di)
 {
 	radeon_shared_info &info = *gInfo->shared_info;
 

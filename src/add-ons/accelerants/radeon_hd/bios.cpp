@@ -25,7 +25,7 @@
 #endif
 
 
-atom_context *gAtomContext;
+atom_context* gAtomContext;
 
 
 void
@@ -133,7 +133,7 @@ radeon_init_bios(uint8* bios)
 	radeon_dump_bios();
 	#endif
 
-	struct card_info *atom_card_info
+	struct card_info* atom_card_info
 		= (card_info*)malloc(sizeof(card_info));
 
 	if (!atom_card_info)

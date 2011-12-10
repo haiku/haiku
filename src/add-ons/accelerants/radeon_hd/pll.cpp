@@ -23,7 +23,7 @@
 
 #define TRACE_PLL
 #ifdef TRACE_PLL
-extern "C" void _sPrintf(const char *format, ...);
+extern "C" void _sPrintf(const char* format, ...);
 #   define TRACE(x...) _sPrintf("radeon_hd: " x)
 #else
 #   define TRACE(x...) ;
@@ -43,7 +43,7 @@ union firmware_info {
 
 
 status_t
-pll_limit_probe(pll_info *pll)
+pll_limit_probe(pll_info* pll)
 {
 	int index = GetIndexIntoMasterTable(DATA, FirmwareInfo);
 	uint8 tableMajor;
@@ -56,8 +56,8 @@ pll_limit_probe(pll_info *pll)
 		return B_ERROR;
 	}
 
-	union firmware_info *firmwareInfo
-		= (union firmware_info *)(gAtomContext->bios + tableOffset);
+	union firmware_info* firmwareInfo
+		= (union firmware_info*)(gAtomContext->bios + tableOffset);
 
 	/* pixel clock limits */
 	pll->referenceFreq
@@ -124,7 +124,7 @@ pll_limit_probe(pll_info *pll)
 
 
 void
-pll_compute_post_divider(pll_info *pll)
+pll_compute_post_divider(pll_info* pll)
 {
 	if ((pll->flags & PLL_USE_POST_DIV) != 0) {
 		TRACE("%s: using AtomBIOS post divider\n", __func__);
@@ -168,7 +168,7 @@ pll_compute_post_divider(pll_info *pll)
 
 
 status_t
-pll_compute(pll_info *pll)
+pll_compute(pll_info* pll)
 {
 	pll_compute_post_divider(pll);
 
@@ -291,7 +291,7 @@ union adjust_pixel_clock {
 
 
 void
-pll_setup_flags(pll_info *pll, uint8 crtcID)
+pll_setup_flags(pll_info* pll, uint8 crtcID)
 {
 	radeon_shared_info &info = *gInfo->shared_info;
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
@@ -328,7 +328,7 @@ pll_setup_flags(pll_info *pll, uint8 crtcID)
 
 
 status_t
-pll_adjust(pll_info *pll, uint8 crtcID)
+pll_adjust(pll_info* pll, uint8 crtcID)
 {
 	// TODO: PLL flags
 	radeon_shared_info &info = *gInfo->shared_info;
@@ -485,7 +485,7 @@ status_t
 pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 {
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	pll_info *pll = &gConnector[connectorIndex]->encoder.pll;
+	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
 
 	pll->pixelClock = pixelClock;
 	pll->id = pllID;

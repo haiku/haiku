@@ -12,8 +12,8 @@
 #include "accelerant_protos.h"
 
 
-extern "C" void *
-get_accelerant_hook(uint32 feature, void *data)
+extern "C" void*
+get_accelerant_hook(uint32 feature, void* data)
 {
 	switch (feature) {
 		/* general */

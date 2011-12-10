@@ -40,7 +40,7 @@ radeon_accelerant_engine_count(void)
 
 status_t
 radeon_acquire_engine(uint32 capabilities, uint32 maxWait,
-	sync_token *syncToken, engine_token **_engineToken)
+	sync_token* syncToken, engine_token** _engineToken)
 {
 	TRACE("%s\n", __func__);
 	*_engineToken = &sEngineToken;
@@ -53,7 +53,7 @@ radeon_acquire_engine(uint32 capabilities, uint32 maxWait,
 
 
 status_t
-radeon_release_engine(engine_token *engineToken, sync_token *syncToken)
+radeon_release_engine(engine_token* engineToken, sync_token* syncToken)
 {
 	TRACE("%s\n", __func__);
 	if (syncToken != NULL)

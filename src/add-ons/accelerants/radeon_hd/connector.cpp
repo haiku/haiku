@@ -38,8 +38,8 @@ union aux_channel_transaction {
 
 
 static int
-dp_aux_speak(uint32 hwLine, uint8 *send, int sendBytes,
-	uint8 *recv, int recvBytes, uint8 delay, uint8 *ack)
+dp_aux_speak(uint32 hwLine, uint8* send, int sendBytes,
+	uint8* recv, int recvBytes, uint8 delay, uint8* ack)
 {
 	if (hwLine == 0) {
 		ERROR("%s: cannot speak on invalid GPIO pin!\n", __func__);
@@ -51,7 +51,7 @@ dp_aux_speak(uint32 hwLine, uint8 *send, int sendBytes,
 
 	memset(&args, 0, sizeof(args));
 
-	unsigned char *base = (unsigned char *)gAtomContext->scratch;
+	unsigned char* base = (unsigned char*)gAtomContext->scratch;
 	memcpy(base, send, sendBytes);
 
 	args.v1.lpAuxRequest = 0;
@@ -92,7 +92,7 @@ dp_aux_speak(uint32 hwLine, uint8 *send, int sendBytes,
 
 int
 dp_aux_write(uint32 hwLine, uint16 address,
-	uint8 *send, uint8 sendBytes, uint8 delay)
+	uint8* send, uint8 sendBytes, uint8 delay)
 {
 	uint8 auxMessage[20];
 	int auxMessageBytes = sendBytes + 4;
@@ -131,7 +131,7 @@ dp_aux_write(uint32 hwLine, uint16 address,
 
 int
 dp_aux_read(uint32 hwLine, uint16 address,
-	uint8 *recv, int recvBytes, uint8 delay)
+	uint8* recv, int recvBytes, uint8 delay)
 {
 	uint8 auxMessage[4];
 	int auxMessageBytes = 4;
@@ -310,15 +310,14 @@ dp_aux_set_i2c_byte(uint32 hwLine, uint16 address, uint8* data, bool end)
 static void
 gpio_lock_i2c(void* cookie, bool lock)
 {
-	gpio_info *info = (gpio_info*)cookie;
-	radeon_shared_info &sinfo = *gInfo->shared_info;
+	gpio_info* info = (gpio_info*)cookie;
 
 	uint32 buffer = 0;
 
 	if (lock == true) {
 		// hw_capable and > DCE3
 		if (info->hw_capable == true
-			&& sinfo.dceMajor >= 3) {
+			&& gInfo->shared_info->dceMajor >= 3) {
 			// Switch GPIO pads to ddc mode
 			buffer = Read32(OUT, info->mask_scl_reg);
 			buffer &= ~(1 << 16);
@@ -362,15 +361,15 @@ gpio_lock_i2c(void* cookie, bool lock)
 static status_t
 gpio_get_i2c_bit(void* cookie, int* _clock, int* _data)
 {
-	gpio_info *info = (gpio_info*)cookie;
+	gpio_info* info = (gpio_info*)cookie;
 
 	uint32 scl = Read32(OUT, info->y_scl_reg)
 		& info->y_scl_mask;
 	uint32 sda = Read32(OUT, info->y_sda_reg)
 		& info->y_sda_mask;
 
-	*_clock = (scl != 0);
-	*_data = (sda != 0);
+	*_clock = scl != 0;
+	*_data = sda != 0;
 
 	return B_OK;
 }
@@ -398,7 +397,7 @@ gpio_set_i2c_bit(void* cookie, int clock, int data)
 
 
 bool
-connector_read_edid(uint32 connectorIndex, edid1_info *edid)
+connector_read_edid(uint32 connectorIndex, edid1_info* edid)
 {
 	// ensure things are sane
 	uint32 gpioID = gConnector[connectorIndex]->gpioID;
@@ -436,7 +435,7 @@ connector_read_edid(uint32 connectorIndex, edid1_info *edid)
 
 #if 0
 bool
-connector_read_edid_lvds(uint32 connectorIndex, edid1_info *edid)
+connector_read_edid_lvds(uint32 connectorIndex, edid1_info* edid)
 {
 	uint8 dceMajor;
 	uint8 dceMinor;
@@ -445,7 +444,7 @@ connector_read_edid_lvds(uint32 connectorIndex, edid1_info *edid)
 
 	if (atom_parse_data_header(gAtomContexg, index, NULL,
 		&dceMajor, &dceMinor, &offset) == B_OK) {
-		lvdsInfo = (union lvds_info *)(gAtomContext->bios + offset);
+		lvdsInfo = (union lvds_info*)(gAtomContext->bios + offset);
 
 		display_timing timing;
 		// Pixel Clock
@@ -539,8 +538,8 @@ gpio_probe()
 		return B_ERROR;
 	}
 
-	struct _ATOM_GPIO_I2C_INFO *i2c_info
-		= (struct _ATOM_GPIO_I2C_INFO *)(gAtomContext->bios + tableOffset);
+	struct _ATOM_GPIO_I2C_INFO* i2c_info
+		= (struct _ATOM_GPIO_I2C_INFO*)(gAtomContext->bios + tableOffset);
 
 	uint32 numIndices = (tableSize - sizeof(ATOM_COMMON_TABLE_HEADER))
 		/ sizeof(ATOM_GPIO_I2C_ASSIGMENT);
@@ -553,7 +552,7 @@ gpio_probe()
 	}
 
 	for (uint32 i = 0; i < numIndices; i++) {
-		ATOM_GPIO_I2C_ASSIGMENT *gpio = &i2c_info->asGPIO_Info[i];
+		ATOM_GPIO_I2C_ASSIGMENT* gpio = &i2c_info->asGPIO_Info[i];
 
 		if (info.dceMajor >= 3) {
 			if (i == 4 && B_LENDIAN_TO_HOST_INT16(gpio->usClkMaskRegisterIndex)
@@ -657,8 +656,8 @@ connector_probe_legacy()
 		return B_ERROR;
 	}
 
-	union atom_supported_devices *supportedDevices;
-	supportedDevices = (union atom_supported_devices *)
+	union atom_supported_devices* supportedDevices;
+	supportedDevices = (union atom_supported_devices*)
 		(gAtomContext->bios + tableOffset);
 
 	uint16 deviceSupport
@@ -767,23 +766,23 @@ connector_probe()
 		return B_ERROR;
 	}
 
-	ATOM_CONNECTOR_OBJECT_TABLE *con_obj;
-	ATOM_ENCODER_OBJECT_TABLE *enc_obj;
-	ATOM_OBJECT_TABLE *router_obj;
-	ATOM_DISPLAY_OBJECT_PATH_TABLE *path_obj;
-	ATOM_OBJECT_HEADER *obj_header;
+	ATOM_CONNECTOR_OBJECT_TABLE* con_obj;
+	ATOM_ENCODER_OBJECT_TABLE* enc_obj;
+	ATOM_OBJECT_TABLE* router_obj;
+	ATOM_DISPLAY_OBJECT_PATH_TABLE* path_obj;
+	ATOM_OBJECT_HEADER* obj_header;
 
-	obj_header = (ATOM_OBJECT_HEADER *)(gAtomContext->bios + tableOffset);
-	path_obj = (ATOM_DISPLAY_OBJECT_PATH_TABLE *)
+	obj_header = (ATOM_OBJECT_HEADER*)(gAtomContext->bios + tableOffset);
+	path_obj = (ATOM_DISPLAY_OBJECT_PATH_TABLE*)
 		(gAtomContext->bios + tableOffset
 		+ B_LENDIAN_TO_HOST_INT16(obj_header->usDisplayPathTableOffset));
-	con_obj = (ATOM_CONNECTOR_OBJECT_TABLE *)
+	con_obj = (ATOM_CONNECTOR_OBJECT_TABLE*)
 		(gAtomContext->bios + tableOffset
 		+ B_LENDIAN_TO_HOST_INT16(obj_header->usConnectorObjectTableOffset));
-	enc_obj = (ATOM_ENCODER_OBJECT_TABLE *)
+	enc_obj = (ATOM_ENCODER_OBJECT_TABLE*)
 		(gAtomContext->bios + tableOffset
 		+ B_LENDIAN_TO_HOST_INT16(obj_header->usEncoderObjectTableOffset));
-	router_obj = (ATOM_OBJECT_TABLE *)
+	router_obj = (ATOM_OBJECT_TABLE*)
 		(gAtomContext->bios + tableOffset
 		+ B_LENDIAN_TO_HOST_INT16(obj_header->usRouterObjectTableOffset));
 	int deviceSupport = B_LENDIAN_TO_HOST_INT16(obj_header->usDeviceSupport);
@@ -800,10 +799,10 @@ connector_probe()
 		if (connectorIndex >= ATOM_MAX_SUPPORTED_DEVICE)
 			continue;
 
-		uint8 *addr = (uint8*)path_obj->asDispPath;
-		ATOM_DISPLAY_OBJECT_PATH *path;
+		uint8* addr = (uint8*)path_obj->asDispPath;
+		ATOM_DISPLAY_OBJECT_PATH* path;
 		addr += pathSize;
-		path = (ATOM_DISPLAY_OBJECT_PATH *)addr;
+		path = (ATOM_DISPLAY_OBJECT_PATH*)addr;
 		pathSize += B_LENDIAN_TO_HOST_INT16(path->usSize);
 
 		uint32 connectorType;
@@ -865,12 +864,12 @@ connector_probe()
 							enc_obj->asObjects[k].usObjectID);
 						if (B_LENDIAN_TO_HOST_INT16(path->usGraphicObjIds[j])
 							== encoder_obj) {
-							ATOM_COMMON_RECORD_HEADER *record
-								= (ATOM_COMMON_RECORD_HEADER *)
-								((uint16 *)gAtomContext->bios + tableOffset
+							ATOM_COMMON_RECORD_HEADER* record
+								= (ATOM_COMMON_RECORD_HEADER*)
+								((uint16*)gAtomContext->bios + tableOffset
 								+ B_LENDIAN_TO_HOST_INT16(
 								enc_obj->asObjects[k].usRecordOffset));
-							ATOM_ENCODER_CAP_RECORD *cap_record;
+							ATOM_ENCODER_CAP_RECORD* cap_record;
 							uint16 caps = 0;
 							while (record->ucRecordSize > 0
 								&& record->ucRecordType > 0
@@ -878,14 +877,14 @@ connector_probe()
 								<= ATOM_MAX_OBJECT_RECORD_NUMBER) {
 								switch (record->ucRecordType) {
 									case ATOM_ENCODER_CAP_RECORD_TYPE:
-										cap_record = (ATOM_ENCODER_CAP_RECORD *)
+										cap_record = (ATOM_ENCODER_CAP_RECORD*)
 											record;
 										caps = B_LENDIAN_TO_HOST_INT16(
 											cap_record->usEncoderCap);
 										break;
 								}
-								record = (ATOM_COMMON_RECORD_HEADER *)
-									((char *)record + record->ucRecordSize);
+								record = (ATOM_COMMON_RECORD_HEADER*)
+									((char*)record + record->ucRecordSize);
 							}
 
 							uint32 encoderID = (encoder_obj & OBJECT_ID_MASK)
@@ -936,7 +935,7 @@ connector_probe()
 					if (B_LENDIAN_TO_HOST_INT16(path->usConnObjectId)
 						== B_LENDIAN_TO_HOST_INT16(
 						con_obj->asObjects[j].usObjectID)) {
-						ATOM_COMMON_RECORD_HEADER *record
+						ATOM_COMMON_RECORD_HEADER* record
 							= (ATOM_COMMON_RECORD_HEADER*)(gAtomContext->bios
 							+ tableOffset + B_LENDIAN_TO_HOST_INT16(
 							con_obj->asObjects[j].usRecordOffset));
@@ -944,16 +943,16 @@ connector_probe()
 							&& record->ucRecordType > 0
 							&& record->ucRecordType
 								<= ATOM_MAX_OBJECT_RECORD_NUMBER) {
-							ATOM_I2C_RECORD *i2c_record;
-							ATOM_I2C_ID_CONFIG_ACCESS *i2c_config;
-							//ATOM_HPD_INT_RECORD *hpd_record;
+							ATOM_I2C_RECORD* i2c_record;
+							ATOM_I2C_ID_CONFIG_ACCESS* i2c_config;
+							//ATOM_HPD_INT_RECORD* hpd_record;
 
 							switch (record->ucRecordType) {
 								case ATOM_I2C_RECORD_TYPE:
 									i2c_record
-										= (ATOM_I2C_RECORD *)record;
+										= (ATOM_I2C_RECORD*)record;
 									i2c_config
-										= (ATOM_I2C_ID_CONFIG_ACCESS *)
+										= (ATOM_I2C_ID_CONFIG_ACCESS*)
 										&i2c_record->sucI2cId;
 									// attach i2c gpio information for connector
 									connector_attach_gpio(connectorIndex,
@@ -965,8 +964,8 @@ connector_probe()
 							}
 
 							// move to next record
-							record = (ATOM_COMMON_RECORD_HEADER *)
-								((char *)record + record->ucRecordSize);
+							record = (ATOM_COMMON_RECORD_HEADER*)
+								((char*)record + record->ucRecordSize);
 						}
 					}
 				}

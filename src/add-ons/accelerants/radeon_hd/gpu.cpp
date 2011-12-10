@@ -164,7 +164,7 @@ radeon_gpu_reset()
 
 
 void
-radeon_gpu_mc_halt(gpu_state *gpuState)
+radeon_gpu_mc_halt(gpu_state* gpuState)
 {
 	// Backup current memory controller state
 	gpuState->d1vgaControl = Read32(OUT, D1VGA_CONTROL);
@@ -189,7 +189,7 @@ radeon_gpu_mc_halt(gpu_state *gpuState)
 
 
 void
-radeon_gpu_mc_resume(gpu_state *gpuState)
+radeon_gpu_mc_resume(gpu_state* gpuState)
 {
 	Write32(OUT, D1GRPH_PRIMARY_SURFACE_ADDRESS, gInfo->fb.vramStart);
 	Write32(OUT, D1GRPH_SECONDARY_SURFACE_ADDRESS, gInfo->fb.vramStart);

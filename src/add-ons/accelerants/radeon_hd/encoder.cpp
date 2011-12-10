@@ -23,7 +23,7 @@
 
 #define TRACE_ENCODER
 #ifdef TRACE_ENCODER
-extern "C" void _sPrintf(const char *format, ...);
+extern "C" void _sPrintf(const char* format, ...);
 #   define TRACE(x...) _sPrintf("radeon_hd: " x)
 #else
 #   define TRACE(x...) ;
@@ -1115,7 +1115,7 @@ encoder_output_lock(bool lock)
 }
 
 
-static const char *encoder_name_matrix[36] = {
+static const char* encoder_name_matrix[36] = {
 	"NONE",
 	"Internal Radeon LVDS",
 	"Internal Radeon TMDS1",

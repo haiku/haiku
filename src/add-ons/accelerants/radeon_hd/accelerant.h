@@ -48,13 +48,13 @@ struct fb_info {
 
 
 struct accelerant_info {
-	vuint8			*regs;
+	vuint8*			regs;
 	area_id			regs_area;
 
-	radeon_shared_info *shared_info;
+	radeon_shared_info* shared_info;
 	area_id			shared_info_area;
 
-	display_mode	*mode_list;		// cloned list of standard display modes
+	display_mode*	mode_list;		// cloned list of standard display modes
 	area_id			mode_list_area;
 
 	uint8*			rom;
@@ -154,7 +154,7 @@ typedef struct {
 typedef struct {
 	bool			active;
 	uint32			connectorIndex; // matches connector id in connector_info
-	register_info	*regs;
+	register_info*	regs;
 	bool			found_ranges;
 	uint32			vfreq_max;
 	uint32			vfreq_min;
@@ -172,11 +172,11 @@ typedef struct {
 #define MC	0x5 // Memory controller calls
 
 
-extern accelerant_info *gInfo;
-extern atom_context *gAtomContext;
-extern display_info *gDisplay[MAX_DISPLAY];
-extern connector_info *gConnector[ATOM_MAX_SUPPORTED_DEVICE];
-extern gpio_info *gGPIOInfo[ATOM_MAX_SUPPORTED_DEVICE];
+extern accelerant_info* gInfo;
+extern atom_context* gAtomContext;
+extern display_info* gDisplay[MAX_DISPLAY];
+extern connector_info* gConnector[ATOM_MAX_SUPPORTED_DEVICE];
+extern gpio_info* gGPIOInfo[ATOM_MAX_SUPPORTED_DEVICE];
 
 
 // register access
@@ -184,7 +184,7 @@ extern gpio_info *gGPIOInfo[ATOM_MAX_SUPPORTED_DEVICE];
 inline uint32
 _read32(uint32 offset)
 {
-	return *(volatile uint32 *)(gInfo->regs + offset);
+	return *(volatile uint32*)(gInfo->regs + offset);
 }
 
 
