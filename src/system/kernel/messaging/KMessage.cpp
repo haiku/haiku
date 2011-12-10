@@ -6,8 +6,6 @@
 
 #include <util/KMessage.h>
 
-#include <malloc.h>
-	// for memalign()
 #include <stdlib.h>
 #include <string.h>
 
@@ -610,8 +608,7 @@ KMessage::ReceiveFrom(port_id fromPort, bigtime_t timeout,
 		return error;
 
 	// allocate a buffer
-	uint8* buffer = (uint8*)memalign(kMessageBufferAlignment,
-		messageInfo->size);
+	uint8* buffer = (uint8*)malloc(_Align(messageInfo->size));
 	if (!buffer)
 		return B_NO_MEMORY;
 
@@ -830,7 +827,7 @@ KMessage::_InitFromBuffer(bool sizeFromBuffer)
 			fBufferCapacity = size;
 		}
 
-		void* buffer = memalign(kMessageBufferAlignment, fBufferCapacity);
+		void* buffer = malloc(_Align(fBufferCapacity));
 		if (buffer == NULL)
 			return B_NO_MEMORY;
 
@@ -964,7 +961,7 @@ KMessage::_AllocateSpace(int32 size, bool alignAddress, bool alignSize,
 	// reallocate if necessary
 	if (fBuffer == &fHeader) {
 		int32 newCapacity = _CapacityFor(newSize);
-		void* newBuffer = memalign(kMessageBufferAlignment, newCapacity);
+		void* newBuffer = malloc(_Align(newCapacity));
 		if (!newBuffer)
 			return B_NO_MEMORY;
 		fBuffer = newBuffer;
