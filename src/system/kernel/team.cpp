@@ -4028,6 +4028,7 @@ _user_setsid(void)
 
 	// lock the team's current process group, parent, and the team itself
 	team->LockTeamParentAndProcessGroup();
+	BReference<ProcessGroup> oldGroupReference(team->group);
 	AutoLocker<ProcessGroup> oldGroupLocker(team->group, true);
 	TeamLocker parentLocker(team->parent, true);
 	TeamLocker teamLocker(team, true);
@@ -4037,7 +4038,6 @@ _user_setsid(void)
 		return B_NOT_ALLOWED;
 
 	// remove the team from the old and add it to the new process group
-	BReference<ProcessGroup> oldGroupReference(team->group);
 	remove_team_from_group(team);
 	group->Publish(session);
 	insert_team_into_group(group, team);
