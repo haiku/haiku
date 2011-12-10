@@ -1,6 +1,14 @@
-1	dutch; flemish	x-vnd.Haiku-CDPlayer	3757937427
+1	dutch; flemish	x-vnd.Haiku-CDPlayer	592310631
+CDPlayer	System name		CDPlayer
+CD	CDPlayer		CD
+Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		Schijf: %ld:%.2ld / %ld:%.2ld
+OK	CDPlayer		Ok
+Track %whichTrack%: %trackAt%	CDPlayer		Spoor %whichTrack%: %trackAt%
 Audio CD	CDPlayer		Audio-cd
 It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Het lijkt erop dat uw computer geen cd-station heeft, of dat er geen ondersteunende systeemsoftware voor aanwezig is. Sorry.
+Track: %ld:%.2ld / %ld:%.2ld	CDPlayer		Spoor: %ld:%.2ld / %ld:%.2ld
+Track: 88:88 / 88:88	CDPlayer		Spoor: 88:88 / 88:88
 Track: --:-- / --:--	CDPlayer		Track: --:-- / --:--
+Disc: 88:88 / 88:88	CDPlayer		Schijf: 88:88 / 88:88
 Disc: --:-- / --:--	CDPlayer		Schijf: --:-- / --:--
 CD drive is empty	CDPlayer		cd-station is leeg

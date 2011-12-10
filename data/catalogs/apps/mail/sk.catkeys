@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Be-MAIL	1835398254
+1	slovak	x-vnd.Be-MAIL	1864344734
 View	Mail		Zobraziť
 %d - Date	Mail		%d - Dátum
 Attach attributes:	Mail		Pripojiť atribúty:
@@ -15,6 +15,7 @@ helpful message	Mail		užitočná správa
 Colored quotes:	Mail		Zafarbené citácie:
 Subject:	Mail		Predmet:
 Reply to all	Mail		Odpovedať všetkým
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Príloha: %name% (Typ: %type%)
 Show icons & labels	Mail		Zobraziť ikony a menovky
 Remove attachment	Mail		Odstrániť prílohu
 Button bar:	Mail		Panel tlačidiel:

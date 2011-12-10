@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-CodyCam	3353004969
+1	dutch; flemish	x-vnd.Haiku-CodyCam	2416864674
 Capturing Image…	VideoConsumer.cpp		Beeld vastleggen...
 Every 30 seconds	CodyCam		Elke 30 seconden
 File name:	CodyCam		Bestandsnaam:
@@ -38,6 +38,7 @@ Every 8 hours	CodyCam		Elke 8 uur
 Rename failed	VideoConsumer.cpp		Hernoemen is mislukt
 Cannot start time source!	CodyCam		Kan tijdsbron niet starten!
 Cannot register the video window	CodyCam		Kan het videovenster niet registreren
+CodyCam	System name		CodyCam
 Every 24 hours	CodyCam		Elke 24 uur
 unknown command	SettingsHandler		onbekende opdracht
 Video settings	CodyCam		Video-instellingen

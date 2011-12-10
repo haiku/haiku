@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Be-MAIL	1835398254
+1	lithuanian	x-vnd.Be-MAIL	1864344734
 View	Mail		Rodymas
 %d - Date	Mail		%d – data
 Attach attributes:	Mail		Pridedamų failų požymių įtraukimas:
@@ -15,6 +15,7 @@ helpful message	Mail		naudingas pranešimas
 Colored quotes:	Mail		Spalvotos citatos:
 Subject:	Mail		Tema:
 Reply to all	Mail		Atsakyti visiems
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Priedas – %name% (tipas – %type%)
 Show icons & labels	Mail		Rodyti piktogramas ir tekstą
 Remove attachment	Mail		Šalinti priedą
 Button bar:	Mail		Mygtukų juosta:

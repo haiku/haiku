@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Terminal	1998056638
+1	belarusian	x-vnd.Haiku-Terminal	1294209621
 Not found.	Terminal TermWindow		Не знойдзена.
 Switch Terminals	Terminal TermWindow		Пераключыць Тэрміналы
 Change directory	Terminal TermView		Змяніць дырэкторыю
@@ -24,7 +24,6 @@ Really close?	Terminal TermWindow		Сапраўды закрыць?
 Copy	Terminal TermWindow		Капіяваць
 Window title:	Terminal TermWindow		Імя вакна:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Невядомая опцыя \"%s\"\n
-Print cancelled.	Terminal TermWindow		Друк адменены
 %app% settings	Terminal PrefWindow	window title	Наладкі %app% 
 Cancel	Terminal SetTitleWindow		Адмена
 Increase	Terminal TermWindow		Павялічыць

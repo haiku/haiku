@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.haiku-icon_o_matic	1817510175
+1	dutch; flemish	x-vnd.haiku-icon_o_matic	1966575707
 Select All	Icon-O-Matic-PathManipulator		Alles selecteren
 Add Style	Icon-O-Matic-AddStylesCmd		Stijl toevoegen
 Color (#%02x%02x%02x)	Style name after dropping a color		Kleur (#02x%02x%02x)
@@ -24,6 +24,7 @@ Duplicate	Icon-O-Matic-ShapesList		Dupliceren
 Linear	Icon-O-Matic-StyleTypes		Lineair
 Assign Path	Icon-O-Matic-AddPathsCmd		Pad toekennen
 Move	Icon-O-Matic-TransformationBoxStates		Verplaatsen
+Flip Control Points	Icon-O-Matic-FlipPointsCmd		Controlepunten omwisselen
 warning	Icon-O-Matic-SVGExport		waarschuwing
 Copy	Icon-O-Matic-Properties		Kopiëren
 OK	Icon-O-Matic-ColorPicker		Oké
@@ -49,12 +50,14 @@ Set 	Set (property name)		Instellen
 Cancel	Icon-O-Matic-SVGExport		Annuleren
 Add shape with style	Icon-O-Matic-Menu-Shape		Vorm met stijl toevoegen
 Remove Shape	Icon-O-Matic-RemoveShapesCmd		Vorm verwijderen
+Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Transformaties opnieuw instellen
 Multi Paste Properties	Icon-O-Matic-Properties		Eigenschappen van meervoudig plakken
 Undo	Icon-O-Matic-Main		Ongedaan maken
 Click on a shape above	Empty transformers list - 1st line		Klik op een vorm hierboven
 Add Shape	Icon-O-Matic-AddShapesCmd		Vorm toevoegen
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<niets om opnieuw te doen>
 Perspective	Transformation		Perspectief
+Move Transformer	Icon-O-Matic-MoveTransformersCmd		Transformator verplaatsen
 Opacity	Icon-O-Matic-PropertyNames		Opaciteit
 Add with path	Icon-O-Matic-ShapesList		Toevoegen met pad
 Gradient type	Icon-O-Matic-StyleTypes		Gradiënttype
@@ -63,6 +66,7 @@ Modify Control Point	Icon-O-Matic-ChangePointCmd		Controlepunt aanpassen
 Saving your document failed!	Icon-O-Matic-Exporter		Opslaan van uw document is mislukt!
 edit it's properties here.	Empty property list - 3rd line		pas hier diens eigenschappen aan.
 Split	Icon-O-Matic-PathManipulator		Splitsen
+Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Controlepunten benaderen
 Remove	Icon-O-Matic-StylesList		Verwijderen
 Add with path & style	Icon-O-Matic-ShapesList		Toevoegen met pad en stijl
 Rotate	Icon-O-Matic-TransformationBoxStates		Roteren
@@ -70,6 +74,7 @@ Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Verwijder Omzetter
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Pad-indices roteren
 Add Transformer	Icon-O-Matic-AddTransformersCmd		Omzetter toevoegen
 Remove	Icon-O-Matic-PathsList		Verwijderen
+Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Controlepunt benaderen
 Pick a color	Icon-O-Matic-ColorPicker		Kleur kiezen
 Quit	Icon-O-Matic-Menu-File		Afsluiten
 Export	Icon-O-Matic-Menu-File		Exporteren

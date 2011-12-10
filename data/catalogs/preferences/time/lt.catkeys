@@ -18,7 +18,7 @@ Local time (Windows compatible)	Time		Vietinis laikas (suderinama su „Windows�
 Message receiving failed	Time		Nepavyko gauti pranešimo
 Set time zone	Time		Pakeisti laiko zoną
 Waiting for answer failed	Time		Atsakymas negautas
-Hardware clock set to:	Time		Aparatinis šio įrenginio laikrodis rodo:
+Hardware clock set to:	Time		Aparatiniame šio įrenginio laikrodyje nustatytas:
 The following error occured while synchronizing:r\n%s	Time		Bandant sinchronizuoti, susidurta su šia klaida:\n%s
 Europe	Time		Europa
 Remove	Time		Pašalinti

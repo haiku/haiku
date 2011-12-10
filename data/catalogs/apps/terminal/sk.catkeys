@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Terminal	1998056638
+1	slovak	x-vnd.Haiku-Terminal	1294209621
 Not found.	Terminal TermWindow		Nenájdené.
 Switch Terminals	Terminal TermWindow		Prepnúť terminály
 Change directory	Terminal TermView		Zmeniť adresár
@@ -24,7 +24,6 @@ Really close?	Terminal TermWindow		Skutočne zatvoriť?
 Copy	Terminal TermWindow		Skopírovať
 Window title:	Terminal TermWindow		Titulok okna:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Nerozpoznaná voľba „%s“\n
-Print cancelled.	Terminal TermWindow		Tlačenie zrušené.
 %app% settings	Terminal PrefWindow	window title	%app% - nastavenia
 Cancel	Terminal SetTitleWindow		Zrušiť
 Increase	Terminal TermWindow		Zväčšiť

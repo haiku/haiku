@@ -1,6 +1,7 @@
-1	dutch; flemish	x-vnd.Haiku-CharacterMap	20061360
+1	dutch; flemish	x-vnd.Haiku-CharacterMap	2745781253
 Enclosed alphanumerics	UnicodeBlocks		Alfanumeriek omcirkeld
 Basic Latin	UnicodeBlocks		Basis-Latijns
+View	CharacterWindow		Beeld
 Latin-1 supplement	UnicodeBlocks		Latijns-1 (toevoeging)
 Hebrew	UnicodeBlocks		Hebreeuws
 Georgian supplement	UnicodeBlocks		Georgisch (toevoeging)
@@ -24,6 +25,7 @@ Ol Chiki	UnicodeBlocks		Ol Chiki
 Arabic	UnicodeBlocks		Arabisch
 Ethiopic extended	UnicodeBlocks		Ethiopisch (uitgebreid)
 Arrows	UnicodeBlocks		Pijlen
+Font	CharacterWindow		Lettertype
 Variation selectors supplement	UnicodeBlocks		Variatieselector (toevoegsel)
 Gujarati	UnicodeBlocks		Gujarati
 Cuneiform	UnicodeBlocks		Spijkerschrift
@@ -38,6 +40,7 @@ Tagbanwa	UnicodeBlocks		Tagbanwa
 Kanbun	UnicodeBlocks		Kanbun
 Syriac	UnicodeBlocks		Syrisch
 CJK compatibility ideographs Supplement	UnicodeBlocks		Uitwisselbare CJK-ideogrammen (toevoegsel)
+Musical symbols	UnicodeBlocks		Muzikale symbolen
 Hangul syllables	UnicodeBlocks		Hangul-lettergrepen
 Coptic	UnicodeBlocks		Koptisch
 Tai Le	UnicodeBlocks		Tai Le
@@ -86,6 +89,7 @@ Variation selectors	UnicodeBlocks		Variatietekens
 Linear B syllabary	UnicodeBlocks		Lineair B (syllabisch)
 Buginese	UnicodeBlocks		Buginees
 Bopomofo	UnicodeBlocks		Bopomofo
+Code	CharacterWindow		Code
 Lepcha	UnicodeBlocks		Lepcha
 Sinhala	UnicodeBlocks		Singalees
 Ancient Greek musical notation	UnicodeBlocks		Oud-Griekse muzieknotatie
@@ -99,6 +103,7 @@ Supplement punctuation	UnicodeBlocks		Toegevoegde interpunctie
 Unified Canadian Aboriginal syllabics	UnicodeBlocks		Verenigde Canadese inheemse syllabics 
 Ugaritic	UnicodeBlocks		Ugaritisch
 CJK symbols and punctuation	UnicodeBlocks		Symbolen en interpunctie in CJK
+File	CharacterWindow		Bestand
 Number forms	UnicodeBlocks		Cijfervormen
 Cherokee	UnicodeBlocks		Cherokee
 Tags	UnicodeBlocks		Tags
@@ -139,6 +144,7 @@ Thai	UnicodeBlocks		Thai
 Deseret	UnicodeBlocks		Deseret
 Tifinagh	UnicodeBlocks		Tifinagh
 Gurmukhi	UnicodeBlocks		Gurmukhi
+CharacterMap	System name		CharacterMap
 Lao	UnicodeBlocks		Laotiaans
 Gothic	UnicodeBlocks		Gotisch
 Limbu	UnicodeBlocks		Limbu
@@ -159,6 +165,7 @@ Ethiopic supplement	UnicodeBlocks		Ethiopisch (toevoegsel)
 Latin extended B	UnicodeBlocks		Latijns (uitgebreid) B
 Box drawing	UnicodeBlocks		Kadertekens
 Mathematical alphanumeric symbols	UnicodeBlocks		Wiskundige alfanumerische symbolen
+Copy character	CharacterView		Karakter kopiëren
 Greek and Coptic	UnicodeBlocks		Grieks en Koptisch
 Carian	UnicodeBlocks		Carian
 Georgian	UnicodeBlocks		Georgisch
@@ -168,6 +175,7 @@ CJK compatibility	UnicodeBlocks		CJK-uitwisselbaarheid
 Malayalam	UnicodeBlocks		Malayalam
 N'Ko	UnicodeBlocks		N'Ko
 Kannada	UnicodeBlocks		Kannada
+Copy as escaped byte string	CharacterView		Kopiëren als escaped byte string
 Phonetic extensions supplement	UnicodeBlocks		Fonetische uitbreidingen (toevoegsel)
 Domino tiles	UnicodeBlocks		Dominostenen
 Katakana phonetic extensions	UnicodeBlocks		Fonetische uitbreidingen in Katakana

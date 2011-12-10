@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-LaunchBox	3172696206
+1	belarusian	x-vnd.Haiku-LaunchBox	4192523522
 New	LaunchBox		Новы
 Set description…	LaunchBox		Прызначыць апісанне...
 Vertical layout	LaunchBox		Вертыкальная расстаноўка
@@ -24,7 +24,6 @@ Name Panel	LaunchBox		Назавіце Панель
 Add button here	LaunchBox		Дадайце кнопку тут
 Description for '%3'	LaunchBox		Апісанне для '%3'
 Settings	LaunchBox		Наладкі
-Failed to launch 'something',error in Pad data.	LaunchBox		Не удалося запусціць 'нешта', памылка у даных Падложкі.
 Pad %1	LaunchBox		Блокнот %1
 Close	LaunchBox		Закрыць
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Не ўдалося адаслаць Трэкеру каманду 'адкрыць каталог'.\n\nПамылка:

@@ -1,4 +1,5 @@
-1	dutch; flemish	x-vnd.Haiku-DriveSetup	568426562
+1	dutch; flemish	x-vnd.Haiku-DriveSetup	1209826930
+DriveSetup	System name		DriveSetup
 Delete	MainWindow		Verwijderen
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\nU zult alle gegevens op de geselecteerde partitie onherroepelijk kwijt zijn als u dit doet!
 Rescan	MainWindow		Opnieuw afzoeken

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	939953658
+1	russian	x-vnd.Haiku-libtracker	1305910161
 common	B_COMMON_DIRECTORY		Общие
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Большие значки
@@ -199,6 +199,7 @@ The selected item cannot be moved to the Trash. Would you like to delete it inst
 Invert	SelectionWindow		Инвертировать
 Save Query as template…	FindPanel		Сохранить запрос как шаблон…
 Find	FindPanel		Найти
+Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Переместить
 Get info	ContainerWindow		Информация
 Error creating link to \"%name\".	FSUtils		Ошибка при создании ссылки к \"%name\".
 Select	SelectionWindow		Выделить

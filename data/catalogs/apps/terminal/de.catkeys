@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Terminal	1998056638
+1	german	x-vnd.Haiku-Terminal	1294209621
 Not found.	Terminal TermWindow		Nicht gefunden.
 Switch Terminals	Terminal TermWindow		Terminals wechseln
 Change directory	Terminal TermView		Zum Ordner wechseln
@@ -24,7 +24,6 @@ Really close?	Terminal TermWindow		Wirklich schließen?
 Copy	Terminal TermWindow		Kopieren
 Window title:	Terminal TermWindow		Fenstertitel:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Unbekannte Option \"%s\"\n
-Print cancelled.	Terminal TermWindow		Drucken abgebrochen.
 %app% settings	Terminal PrefWindow	window title	%app%-Einstellungen
 Cancel	Terminal SetTitleWindow		Abbrechen
 Increase	Terminal TermWindow		Vergrößern

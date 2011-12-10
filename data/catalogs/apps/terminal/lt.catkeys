@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Terminal	1998056638
+1	lithuanian	x-vnd.Haiku-Terminal	1294209621
 Not found.	Terminal TermWindow		Nerasta.
 Switch Terminals	Terminal TermWindow		Pereiti į kitą terminalą
 Change directory	Terminal TermView		Keisti aplanką
@@ -24,7 +24,6 @@ Really close?	Terminal TermWindow		Ar tikrai užverti?
 Copy	Terminal TermWindow		Kopijuoti
 Window title:	Terminal TermWindow		Lango antraštė:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Nežinomas argumentas: „%s“\n
-Print cancelled.	Terminal TermWindow		Spausdinimo atsisakyta.
 %app% settings	Terminal PrefWindow	window title	Terminalo nuostatos
 Cancel	Terminal SetTitleWindow		Atsisakyti
 Increase	Terminal TermWindow		Padidinti

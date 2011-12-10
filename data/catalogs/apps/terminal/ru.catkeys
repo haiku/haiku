@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Terminal	1220615377
+1	russian	x-vnd.Haiku-Terminal	516768360
 Not found.	Terminal TermWindow		Текст не найден
 Switch Terminals	Terminal TermWindow		Переключить терминалы
 Change directory	Terminal TermView		Сменить каталог
@@ -24,7 +24,6 @@ Really close?	Terminal TermWindow		Действительно закрыть?
 Copy	Terminal TermWindow		Копировать
 Window title:	Terminal TermWindow		Заголовок окна:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Нераспознанная опция \"%s\"\n
-Print cancelled.	Terminal TermWindow		Печать отменена
 %app% settings	Terminal PrefWindow	window title	Настройки терминала
 Cancel	Terminal SetTitleWindow		Отмена
 Increase	Terminal TermWindow		Увеличить

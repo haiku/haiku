@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-LaunchBox	3172696206
+1	lithuanian	x-vnd.Haiku-LaunchBox	3016105370
 New	LaunchBox		Naujas
 Set description…	LaunchBox		Keisti aprašą…
 Vertical layout	LaunchBox		Išdėstyti stačiai
@@ -24,7 +24,7 @@ Name Panel	LaunchBox		Pavadinkite skydelį
 Add button here	LaunchBox		Pridėti mygtuką čia
 Description for '%3'	LaunchBox		Įveskite „%3“ aprašą:
 Settings	LaunchBox		Parinktys
-Failed to launch 'something',error in Pad data.	LaunchBox		Nepavyko paleisti „something“; pultelio duomenų klaida.
+Failed to launch 'something', error in Pad data.	LaunchBox		Nepavyko paleisti „something“ dėl klaidos pultelio duomenyse.
 Pad %1	LaunchBox		Pultelis Nr. %1
 Close	LaunchBox		Užverti
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Pėdsekiui nepavyko perduoti komandos „atverti aplanką“.\n\nKlaida:

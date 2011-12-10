@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-DiskProbe	2622062166
+1	dutch; flemish	x-vnd.Haiku-DiskProbe	2306672993
 File offset: 	ProbeView		Bestand-offset:
 %ld (native)	ProbeView		%ld (native)
 64 bit unsigned value:	TypeEditors		64-bit-unsigned-waarde:
@@ -15,6 +15,7 @@ Floating-point value:	TypeEditors		Zwevendekomma-waarde
 Attributes	ProbeView		Eigenschappen
 Device offset: 	ProbeView		Apparaat-offset:
 Selection	ProbeView		Selectie
+DiskProbe	System name		DiskProbe
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	wat voor: '%.4s'\n\n
 File	FileWindow		Bestand
 OK	DiskProbe		Oké
@@ -48,6 +49,7 @@ Number	TypeEditors	This is the type of editor	Getal
 Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Decimaal
 16 bit signed value:	TypeEditors		16-bit-signed-waarde:
 String editor	TypeEditors		Woord-editor
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	van 0x0
 64 bit signed offset:	TypeEditors		64-bit-signed-offset:
 Boolean editor	TypeEditors		Boolean-editor
 Copy	ProbeView		Kopiëren
@@ -57,6 +59,7 @@ Boolean value:	TypeEditors		Boolean-waarde:
 8 bit palette	TypeEditors		8-bit-palet
 Fit	ProbeView	Size of fonts, fits to available room	Aanpassen
 Probe device	OpenWindow		Apparaat afzoeken
+ (native)	ProbeView		(native)
 Unknown format	TypeEditors		Onbekend formaat
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadecimaal
 MIME type:	TypeEditors		MIME type:
@@ -64,6 +67,7 @@ Page setup…	ProbeView		Pagina-instellingen...
 New…	FileWindow		Nieuw...
 DiskProbe request	AttributeWindow		DiskProbe-aanvraag
 Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Kon afbeelding niet lezen
+BlockSize	ProbeView	A menu item, a shortened form from 'block size'. This is in the same menu windowthan 'Base' and 'Font size'	Blokgrootte
 Save changes before closing?	ProbeView		Wijzigingen opslaan voordat u afsluit?
 Type editor	AttributeWindow		Type-editor
 Native: 0x%0*Lx	ProbeView		Native: 0x%0*Lx
@@ -91,6 +95,7 @@ Native: %Ld (0x%0*Lx)	ProbeView		Native: %Ld (0x%0*Lx)
 32 bit unsigned value:	TypeEditors		32-bit-unsigned-waarde
 Message	TypeEditors	This is the type of view	Bericht
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Kon \"%s\" niet openen:\n%s
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Basis
 Image view	TypeEditors	Image means here a picture file, not a disk image.	Afbeelding-beeld
 Cancel	AttributeWindow		Annuleren
 Type editor not supported	ProbeView		Typebewerker niet ondersteund
@@ -112,6 +117,7 @@ Open device	FileWindow		Apparaat openen
 Could not find search string.	ProbeView		Kon zoekopdracht niet vinden
 16 bit unsigned value:	TypeEditors		16-bit-unsigned-waarde:
 Attribute offset: 	ProbeView		Eigenschap-offset:
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Beeld
 Redo	ProbeView		Opnieuw uitvoeren
 File: 	ProbeView		Bestand:
 32 bit unsigned pointer:	TypeEditors		32-bit-unsigned-pointer:

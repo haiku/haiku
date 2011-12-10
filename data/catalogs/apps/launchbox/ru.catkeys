@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-LaunchBox	3172696206
+1	russian	x-vnd.Haiku-LaunchBox	4192523522
 New	LaunchBox		Создать
 Set description…	LaunchBox		Изменить описание…
 Vertical layout	LaunchBox		Расположить вертикально
@@ -24,7 +24,6 @@ Name Panel	LaunchBox		Название панели
 Add button here	LaunchBox		Добавить кнопку
 Description for '%3'	LaunchBox		Описание для '%3'
 Settings	LaunchBox		Настройки
-Failed to launch 'something',error in Pad data.	LaunchBox		Не удалось запустить 'something', ошибка в данных панели.
 Pad %1	LaunchBox		Панель %1
 Close	LaunchBox		Закрыть
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Не удалось послать команду "открыть папку" в Tracker.\n\nОшибка:

@@ -1,7 +1,8 @@
-1	dutch; flemish	x-vnd.Haiku-ActivityMonitor	1437495034
+1	dutch; flemish	x-vnd.Haiku-ActivityMonitor	3704566709
 P-faults	DataSource		P-onderbrekingen
 Media nodes	DataSource		Media-eenheid
 Threads	DataSource		Threads
+MB	DataSource		MB
 Add graph	ActivityWindow		Voeg grafiek toe
 Teams	DataSource		Teams
 Hide legend	ActivityView		Verberg legenda
@@ -12,6 +13,7 @@ Used memory	DataSource		Gebruikt geheugen
 Cached memory	DataSource		Geheugen in cache
 Apps	DataSource		Toepassingen
 Show legend	ActivityView		Toon legenda
+Text clipboard	DataSource		Tekst klembord
 Settings	ActivityWindow		Instellingen
 Receiving	DataSource		Ontvangend
 Settings…	ActivityWindow		Instellingen...
@@ -19,18 +21,28 @@ Ports	DataSource		Poorten
 Page faults	DataSource		Page-onderbrekingen
 Sending	DataSource		Versturend
 Cache	DataSource		Cache
+%.1f faults/s	DataSource		%.1f fout(en)
 Update time interval:	SettingsWindow		Interval bijwerktijd:
+TX	DataSource	Shorter version for Sending	TX
 Quit	ActivityWindow		Afsluiten
 Block cache memory	DataSource		Geheugen blok-cache
 Remove graph	ActivityView		Verwijder grafiek
+%.1f MB	DataSource		%.1f MB
+%lld sec.	SettingsWindow		%lld sec.
+%lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		CPU-gebruik
+Raw clipboard	DataSource		Onbewerkt klembord
 Sems	DataSource		Semaforen
+ActivityMonitor	System name		ActivityMonitor
 Running applications	DataSource		Lopende toepassingen
 Semaphores	DataSource		Semaforen
 Block cache	DataSource		Blok-cache
 Swap space	DataSource		Swap-ruimte
 Swap	DataSource		Swap
 File	ActivityWindow		Bestand
+usage	DataSource		gebruik
 Additional items	ActivityView		Toegevoegde items
 Network receive	DataSource		Netwerk (ontvangst)
+%.1f KB/s	DataSource		%.1f KB/s
 Memory	DataSource		Geheugen
+RX	DataSource	Shorter version for Receiving.	RX

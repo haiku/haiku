@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-LaunchBox	3172696206
+1	slovak	x-vnd.Haiku-LaunchBox	3016105370
 New	LaunchBox		Nový
 Set description…	LaunchBox		Nastaviť popis…
 Vertical layout	LaunchBox		Zvislé rozloženie
@@ -24,7 +24,7 @@ Name Panel	LaunchBox		Panel Názov
 Add button here	LaunchBox		Pridať tlačidlo sem
 Description for '%3'	LaunchBox		Popis „%3“
 Settings	LaunchBox		Nastavenia
-Failed to launch 'something',error in Pad data.	LaunchBox		Nepodarilo sa spustiť „niečo“, chyba v dátach Oblasti.
+Failed to launch 'something', error in Pad data.	LaunchBox		Nepodarilo sa spustiť „niečo“, chyba v dátach Oblasti.
 Pad %1	LaunchBox		Oblasť %1
 Close	LaunchBox		Zatvoriť
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Nepodarilo sa poslať príkaz „otvoriť priečinok“ Trackeru.\n\nChyba: 

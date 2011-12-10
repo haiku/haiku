@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Terminal	191545666
+1	dutch; flemish	x-vnd.Haiku-Terminal	3782665945
 Not found.	Terminal TermWindow		Niet gevonden.
 Switch Terminals	Terminal TermWindow		Wissel van Terminal
 Change directory	Terminal TermView		Directory veranderen
@@ -24,7 +24,6 @@ Really close?	Terminal TermWindow		Bent u zeker dat u wilt sluiten?
 Copy	Terminal TermWindow		Kopiëren
 Window title:	Terminal TermWindow		Venstertitel:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Niet-herkende optie \"%s\"\n
-Print cancelled.	Terminal TermWindow		Afdrukken geannuleerd.
 Cancel	Terminal SetTitleWindow		Annuleren
 Increase	Terminal TermWindow		Vermeerderen
 Settings	Terminal TermWindow		Instellingen
