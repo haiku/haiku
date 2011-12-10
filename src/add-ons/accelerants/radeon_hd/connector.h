@@ -35,7 +35,7 @@
 
 
 // convert radeon connector to common connector type
-const int connector_convert_legacy[] = {
+const int kConnectorConvertLegacy[] = {
 	VIDEO_CONNECTOR_UNKNOWN,
 	VIDEO_CONNECTOR_VGA,
 	VIDEO_CONNECTOR_DVII,
@@ -54,7 +54,7 @@ const int connector_convert_legacy[] = {
 	VIDEO_CONNECTOR_DP
 };
 
-const int connector_convert[] = {
+const int kConnectorConvert[] = {
 	VIDEO_CONNECTOR_UNKNOWN,
 	VIDEO_CONNECTOR_DVII,
 	VIDEO_CONNECTOR_DVII,

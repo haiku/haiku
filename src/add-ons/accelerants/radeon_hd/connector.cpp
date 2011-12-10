@@ -676,7 +676,7 @@ connector_probe_legacy()
 		ATOM_CONNECTOR_INFO_I2C ci
 			= supportedDevices->info.asConnInfo[i];
 
-		gConnector[connectorIndex]->type = connector_convert_legacy[
+		gConnector[connectorIndex]->type = kConnectorConvertLegacy[
 			ci.sucConnectorInfo.sbfAccess.bfConnectorType];
 
 		if (gConnector[connectorIndex]->type == VIDEO_CONNECTOR_UNKNOWN) {
@@ -813,12 +813,18 @@ connector_probe()
 				continue;
 			}
 
-			uint16 igp_lane_info;
-			if (0)
+			radeon_shared_info &info = *gInfo->shared_info;
+
+			uint16 igpLaneInfo;
+			if ((info.chipsetFlags & CHIP_IGP) != 0)
 				ERROR("%s: TODO: IGP chip connector detection\n", __func__);
+				// try non-IGP method for now
+				igpLaneInfo = 0;
+				connectorType = kConnectorConvert[con_obj_id];
+				connectorObjectID = con_obj_id;
 			else {
-				igp_lane_info = 0;
-				connectorType = connector_convert[con_obj_id];
+				igpLaneInfo = 0;
+				connectorType = kConnectorConvert[con_obj_id];
 				connectorObjectID = con_obj_id;
 			}
 
