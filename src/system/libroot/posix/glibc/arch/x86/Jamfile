@@ -87,8 +87,8 @@ local genericSources =
 	w_j0.c w_j0f.c
 	w_j1.c w_j1f.c
 	w_jn.c w_jnf.c
-	w_lgamma.c w_lgammaf.c
-	w_lgamma_r.c w_lgammaf_r.c 
+	w_lgamma.c w_lgammaf.c w_lgammal.c
+	w_lgamma_r.c w_lgammaf_r.c w_lgammal_r.c
 	w_log.c w_logf.c w_logl.c
 	w_log10.c w_log10f.c w_log10l.c
 	w_log2.c w_log2f.c w_log2l.c
