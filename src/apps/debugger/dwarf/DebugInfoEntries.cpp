@@ -837,7 +837,8 @@ DIEEnumerationType::AddAttribute_specification(uint16 attributeName,
 DIEFormalParameter::DIEFormalParameter()
 	:
 	fAbstractOrigin(NULL),
-	fType(NULL)
+	fType(NULL),
+	fArtificial(false)
 {
 }
 
