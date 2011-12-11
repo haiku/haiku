@@ -1836,7 +1836,8 @@ DIESubprogram::DIESubprogram()
 	fReturnType(NULL),
 	fAddressClass(0),
 	fPrototyped(false),
-	fInline(DW_INL_not_inlined)
+	fInline(DW_INL_not_inlined),
+	fArtificial(false)
 {
 }
 
@@ -1881,6 +1882,12 @@ DIESubprogram::AddChild(DebugInfoEntry* child)
 			return B_OK;
 		case DW_TAG_lexical_block:
 			fBlocks.Add(child);
+			return B_OK;
+		case DW_TAG_template_type_parameter:
+			fTemplateTypeParameters.Add(child);
+			return B_OK;
+		case DW_TAG_template_value_parameter:
+			fTemplateValueParameters.Add(child);
 			return B_OK;
 		default:
 			return DIEDeclaredNamedBase::AddChild(child);
@@ -1986,6 +1993,15 @@ DIESubprogram::AddAttribute_frame_base(uint16 attributeName,
 	}
 
 	return B_BAD_DATA;
+}
+
+
+status_t
+DIESubprogram::AddAttribute_artificial(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fArtificial = value.flag;
+	return B_OK;
 }
 
 
