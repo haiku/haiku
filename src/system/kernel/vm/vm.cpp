@@ -2363,6 +2363,8 @@ vm_copy_on_write_area(VMCache* lowerCache,
 			}
 		}
 	} else {
+		ASSERT(lowerCache->WiredPagesCount() == 0);
+
 		// just change the protection of all areas
 		for (VMArea* tempArea = upperCache->areas; tempArea != NULL;
 				tempArea = tempArea->cache_next) {
