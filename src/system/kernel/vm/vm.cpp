@@ -55,6 +55,7 @@
 
 #include "VMAddressSpaceLocking.h"
 #include "VMAnonymousCache.h"
+#include "VMAnonymousNoSwapCache.h"
 #include "IORequest.h"
 
 
@@ -2300,7 +2301,8 @@ vm_copy_on_write_area(VMCache* lowerCache,
 
 	// create an anonymous cache
 	status_t status = VMCacheFactory::CreateAnonymousCache(upperCache, false, 0,
-		0, true, VM_PRIORITY_USER);
+		0, dynamic_cast<VMAnonymousNoSwapCache*>(lowerCache) == NULL,
+		VM_PRIORITY_USER);
 	if (status != B_OK)
 		return status;
 
