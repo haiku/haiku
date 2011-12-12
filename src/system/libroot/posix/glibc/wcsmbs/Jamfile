@@ -39,7 +39,6 @@ MergeObject posix_gnu_wcsmbs.o :
 	wcsnlen.c
 	wcspbrk.c
 	wcsrchr.c
-	wcsrtombs.c
 	wcsspn.c
 	wcsstr.c
 	wcstod.c

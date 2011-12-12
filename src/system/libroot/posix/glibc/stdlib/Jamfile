@@ -37,5 +37,4 @@ MergeObject posix_gnu_stdlib.o :
 	strtod.c
 	strtold.c
 	strtof.c
-	wcstombs.c
 ;
