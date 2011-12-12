@@ -31,11 +31,8 @@ __wcrtomb(char* s, wchar_t wc, mbstate_t* ps)
 		ps = &internalMbState;
 	}
 
-	if (s == NULL) {
-		char internalBuffer[MB_LEN_MAX];
-
-		return __wcrtomb(internalBuffer, L'\0', ps);
-	}
+	if (s == NULL)
+		wc = 0;
 
 	if (gLocaleBackend == NULL) {
 		/*
@@ -50,7 +47,8 @@ __wcrtomb(char* s, wchar_t wc, mbstate_t* ps)
 			return (size_t)-1;
 		}
 
-		*s = char(wc);
+		if (s != NULL)
+			*s = char(wc);
 
 		return 1;
 	}
