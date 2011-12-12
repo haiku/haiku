@@ -350,7 +350,7 @@ vesa_get_edid(edid1_info *info)
 
 	TRACE(("EDID1: %lx\n", regs.eax));
 	// %ah contains the error code
-	// %al determines wether or not the function is supported
+	// %al determines whether or not the function is supported
 	if (regs.eax != 0x4f)
 		return B_NOT_SUPPORTED;
 

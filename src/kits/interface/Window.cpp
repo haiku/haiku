@@ -3281,7 +3281,7 @@ BWindow::_DetermineTarget(BMessage* message, BHandler* target)
 
 		case B_PULSE:
 		case B_QUIT_REQUESTED:
-			// TODO: test wether R5 will let BView dispatch these messages
+			// TODO: test whether R5 will let BView dispatch these messages
 			return this;
 
 		case _MESSAGE_DROPPED_:

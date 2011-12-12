@@ -742,7 +742,7 @@ NodeMonitorService::NotifyStatChanged(dev_t device, ino_t node,
 	// ... for the volume
 	_GetInterestedVolumeListeners(device, B_WATCH_STAT,
 		interestedListeners, interestedListenerCount);
-	// ... for the node, depending on wether its an interim update or not
+	// ... for the node, depending on whether its an interim update or not
 	_GetInterestedMonitorListeners(device, node,
 		(statFields & B_STAT_INTERIM_UPDATE) != 0
 			? B_WATCH_INTERIM_STAT : B_WATCH_STAT,

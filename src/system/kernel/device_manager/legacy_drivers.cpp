@@ -1067,7 +1067,7 @@ DirectoryWatcher::EventOccurred(NotificationService& service,
 	const char *name = event->GetString("name", NULL);
 
 	if (opcode == B_ENTRY_MOVED) {
-		// Determine wether it's a move within, out of, or into one
+		// Determine whether it's a move within, out of, or into one
 		// of our watched directories.
 		ino_t from = event->GetInt64("from directory", -1);
 		ino_t to = event->GetInt64("to directory", -1);

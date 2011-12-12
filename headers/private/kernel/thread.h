@@ -198,8 +198,8 @@ thread_is_interrupted(Thread* thread, uint32 flags)
 }
 
 
-/*!	Checks wether the given thread is currently blocked (i.e. still waiting for
-	something).
+/*!	Checks whether the given thread is currently blocked (i.e. still waiting
+	for something).
 
 	If a stable answer is required, the caller must hold the scheduler lock.
 	Alternatively, if waiting is not interruptible and cannot time out, holding

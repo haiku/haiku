@@ -28,7 +28,7 @@ WonderBrushImage::SetTo(BPositionIO* stream)
 		return B_BAD_VALUE;
 
 	// try to load the stream as a BMessage and probe it
-	// to see wether it might be a WonderBrush image
+	// to see whether it might be a WonderBrush image
 	fArchive.MakeEmpty();
 	status_t status = fArchive.Unflatten(stream);
 	if (status < B_OK)

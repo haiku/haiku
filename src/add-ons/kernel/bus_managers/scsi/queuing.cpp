@@ -100,7 +100,7 @@ static void scsi_insert_new_request( scsi_device_info *device,
 	//   request are sorted monotically increasing
 	//
 	// the first exception should help if the queue is short (not sure
-	// wether this actually hurts if we have a long queue), the
+	// whether this actually hurts if we have a long queue), the
 	// second one maximizes monotonic ranges
 	last = first->prev;
 	

@@ -108,7 +108,8 @@ class EBML_DLL_API EbmlSemantic {
 		EbmlSemantic(bool aMandatory, bool aUnique, const EbmlCallbacks & aGetCallbacks)
 			:Mandatory(aMandatory), Unique(aUnique), GetCallbacks(aGetCallbacks) {}
 
-		bool Mandatory; ///< wether the element is mandatory in the context or not
+		bool Mandatory;
+			///< whether the element is mandatory in the context or not
 		bool Unique;
 		const EbmlCallbacks & GetCallbacks;
 };

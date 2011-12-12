@@ -99,13 +99,13 @@ class MATROSKA_DLL_API FileMatroska {
 	void SelectReadingTrack(Track * aTrack, bool select = true);
 
 	/*!
-	    \return wether the frame has been added or not
+	    \return whether the frame has been added or not
 	*/
 	bool AddFrame(Track * aTrack, const uint32 aTimecode, const binary *aFrame, const uint32 aFrameSize,
 		     const bool aKeyFrame = true, const bool aBFrame = false);
 
 	/*!
-	    \return wether the frame has been read or not
+	    \return whether the frame has been read or not
 	*/
 	bool ReadFrame(Track * & aTrack, uint32 & aTimecode, const binary * & aFrame, uint32 & aFrameSize,
 		     bool & aKeyFrame, bool & aBFrame);

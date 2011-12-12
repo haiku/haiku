@@ -97,7 +97,7 @@ BlockMap::~BlockMap()
 }
 
 
-/** Checks wether or not the construction of the BlockMap were successful.
+/** Checks whether or not the construction of the BlockMap were successful.
  */
 
 status_t

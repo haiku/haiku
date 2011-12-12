@@ -203,7 +203,7 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 #endif
 
 	// For level-triggered interrupts, we actually handle the return
-	// value (ie. B_HANDLED_INTERRUPT) to decide wether or not we
+	// value (ie. B_HANDLED_INTERRUPT) to decide whether or not we
 	// want to call another interrupt handler.
 	// For edge-triggered interrupts, however, we always need to call
 	// all handlers, as multiple interrupts cannot be identified. We

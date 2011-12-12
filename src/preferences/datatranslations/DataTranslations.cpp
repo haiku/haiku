@@ -64,7 +64,7 @@ DataTranslationsApplication::_InstallError(const char* name, status_t status)
 status_t
 DataTranslationsApplication::_Install(BDirectory& target, BEntry& entry)
 {
-	// Find out wether we need to copy it
+	// Find out whether we need to copy it
 	status_t status = entry.MoveTo(&target, NULL, true);
 	if (status == B_OK)
 		return B_OK;
@@ -145,7 +145,7 @@ DataTranslationsApplication::RefsReceived(BMessage* message)
 			// the original file will be replaced
 		}
 
-		// find out wether we need to copy it or not
+		// find out whether we need to copy it or not
 
 		status = _Install(target, entry);
 		if (status == B_OK) {
