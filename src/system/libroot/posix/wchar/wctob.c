@@ -13,7 +13,7 @@ __wctob(wint_t c)
 {
 	char internalBuffer[MB_LEN_MAX];
 
-	int32_t byteCount = wcrtomb(internalBuffer, c, NULL);
+	int32_t byteCount = __wcrtomb(internalBuffer, c, NULL);
 	if (byteCount != 1)
 		return EOF;
 

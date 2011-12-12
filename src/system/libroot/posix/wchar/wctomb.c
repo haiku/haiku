@@ -11,7 +11,7 @@ __wctomb(char* s, wchar_t wc)
 {
 	static mbstate_t internalMbState;
 
-	return wcrtomb(s, wc, &internalMbState);
+	return __wcrtomb(s, wc, &internalMbState);
 }
 
 

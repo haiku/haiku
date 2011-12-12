@@ -11,7 +11,7 @@ __mbstowcs(wchar_t* pwc, const char* s, size_t n)
 {
 	static mbstate_t internalMbState;
 
-	return mbsrtowcs(pwc, &s, n, &internalMbState);
+	return __mbsrtowcs(pwc, &s, n, &internalMbState);
 }
 
 

@@ -20,7 +20,7 @@ __btowc(int c)
 		return L'\0';
 
 	{
-		int byteCount = mbrtowc(&wc, &character, 1, &internalMbState);
+		int byteCount = __mbrtowc(&wc, &character, 1, &internalMbState);
 
 		if (byteCount != 1)
 			return WEOF;

@@ -14,7 +14,7 @@ __mbtowc(wchar_t* pwc, const char* s, size_t n)
 {
 	static mbstate_t internalMbState;
 
-	int result = mbrtowc(pwc, s, n, &internalMbState);
+	int result = __mbrtowc(pwc, s, n, &internalMbState);
 	if (result == -2) {
 		__set_errno(EILSEQ);
 		result = -1;

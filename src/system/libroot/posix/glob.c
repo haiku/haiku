@@ -85,9 +85,9 @@ static char sccsid[] = "@(#)glob.c	8.3 (Berkeley) 10/13/93";
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <wchar.h>
 
 #include <errno_private.h>
+#include <wchar_private.h>
 
 #ifndef __HAIKU__
 #	include "collate.h"
@@ -200,7 +200,7 @@ glob(const char *pattern, int flags, int (*errfunc)(const char *, int), glob_t *
 	if (flags & GLOB_NOESCAPE) {
 		memset(&mbs, 0, sizeof(mbs));
 		while (bufend - bufnext >= MB_CUR_MAX) {
-			clen = mbrtowc(&wc, patnext, MB_LEN_MAX, &mbs);
+			clen = __mbrtowc(&wc, patnext, MB_LEN_MAX, &mbs);
 			if (clen == (size_t)-1 || clen == (size_t)-2)
 				return (GLOB_NOMATCH);
 			else if (clen == 0)
@@ -220,7 +220,7 @@ glob(const char *pattern, int flags, int (*errfunc)(const char *, int), glob_t *
 				prot = M_PROTECT;
 			} else
 				prot = 0;
-			clen = mbrtowc(&wc, patnext, MB_LEN_MAX, &mbs);
+			clen = __mbrtowc(&wc, patnext, MB_LEN_MAX, &mbs);
 			if (clen == (size_t)-1 || clen == (size_t)-2)
 				return (GLOB_NOMATCH);
 			else if (clen == 0)
@@ -662,7 +662,7 @@ glob3(Char *pathbuf, Char *pathend, Char *pathend_last,
 		dc = pathend;
 		sc = dp->d_name;
 		while (dc < pathend_last) {
-			clen = mbrtowc(&wc, sc, MB_LEN_MAX, &mbs);
+			clen = __mbrtowc(&wc, sc, MB_LEN_MAX, &mbs);
 			if (clen == (size_t)-1 || clen == (size_t)-2) {
 				wc = *sc;
 				clen = 1;
@@ -893,7 +893,7 @@ g_Ctoc(const Char *str, char *buf, size_t len)
 
 	memset(&mbs, 0, sizeof(mbs));
 	while (len >= MB_CUR_MAX) {
-		clen = wcrtomb(buf, *str, &mbs);
+		clen = __wcrtomb(buf, *str, &mbs);
 		if (clen == (size_t)-1)
 			return (1);
 		if (*str == L'\0')
