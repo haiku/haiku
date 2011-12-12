@@ -50,6 +50,11 @@ public:
 									size_t& lengthOut);
 	virtual status_t			WcharToMultibyte(char* mbOut, wchar_t wc,
 									mbstate_t* mbState, size_t& lengthOut);
+	virtual status_t			WcharStringToMultibyte(char* mbDest,
+									size_t mbDestLength,
+									const wchar_t** wcSource,
+									size_t wcSourceLength, mbstate_t* mbState,
+									size_t& lengthOut);
 
 	virtual	const char*			GetLanginfo(int index);
 

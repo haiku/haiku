@@ -302,25 +302,21 @@ ICUCtypeData::MultibyteStringToWchar(wchar_t* wcDest, size_t wcDestLength,
 		if (sourceLengthUsed >= mbSourceLength)
 			break;
 		UChar32 unicodeChar = ucnv_getNextUChar(converter, &source,
-			std::min(source + MB_LEN_MAX, sourceEnd), &icuStatus);
+			std::min(source + MB_CUR_MAX, sourceEnd), &icuStatus);
 		sourceLengthUsed = source - *mbSource;
-		TRACE(("l:%lu wl:%lu s:%p se:%p sl:%lu slu:%lu uchar:%x st:%x\n",
-			lengthOut, wcDestLength, source, sourceEnd, mbSourceLength,
-			sourceLengthUsed, unicodeChar, icuStatus));
+		TRACE(("MultibyteStringToWchar() l:%lu wl:%lu s:%p se:%p sl:%lu slu:%lu"
+				" uchar:%x st:%x\n", lengthOut, wcDestLength, source, sourceEnd,
+			mbSourceLength, sourceLengthUsed, unicodeChar, icuStatus));
 		if (!U_SUCCESS(icuStatus))
 			break;
 		if (wcDest != NULL)
 			*wcDest++ = unicodeChar;
 		if (unicodeChar == L'\0') {
-			if (wcDest != NULL)
-				wcsIsTerminated = true;
+			wcsIsTerminated = true;
 			break;
 		}
 		icuStatus = U_ZERO_ERROR;
 	}
-
-	if (wcDest != NULL)
-		*mbSource = source;
 
 	if (!U_SUCCESS(icuStatus)) {
 		// conversion failed because of illegal character sequence
@@ -331,9 +327,13 @@ ICUCtypeData::MultibyteStringToWchar(wchar_t* wcDest, size_t wcDestLength,
 		// reset to initial state
 		_DropConverterFromMbState(mbState);
 		memset(mbState, 0, sizeof(mbstate_t));
-		*mbSource = NULL;
-	} else
+		if (wcDest != NULL)
+			*mbSource = NULL;
+	} else {
 		mbState->count = 0;
+		if (wcDest != NULL)
+			*mbSource = source;
+	}
 
 	return result;
 }
@@ -353,20 +353,40 @@ ICUCtypeData::WcharToMultibyte(char* mbOut, wchar_t wc, mbstate_t* mbState,
 
 	UConverter* converter = converterRef->Converter();
 
-	// do the conversion
+	// convert input from UTF-32 to UTF-16
+	UChar ucharBuffer[2];
+	size_t ucharLength;
+	if (U_IS_BMP(wc)) {
+		ucharBuffer[0] = wc;
+		ucharLength = 1;
+	} else {
+		ucharBuffer[0] = U16_LEAD(wc);
+		ucharBuffer[1] = U16_TRAIL(wc);
+		ucharLength = 2;
+	}
+
+	// do the actual conversion
 	UErrorCode icuStatus = U_ZERO_ERROR;
-	lengthOut = ucnv_fromUChars(converter, mbOut, MB_LEN_MAX, (UChar*)&wc,
-		1, &icuStatus);
+	size_t mbLength = mbOut == NULL ? 0 : MB_CUR_MAX;
+	lengthOut = ucnv_fromUChars(converter, mbOut, mbLength, ucharBuffer,
+		ucharLength, &icuStatus);
+	TRACE(("WcharToMultibyte() l:%lu mb:%p ml:%lu uchar:%x st:%x\n", lengthOut,
+		mbOut, mbLength, wc, icuStatus));
+
+	if (icuStatus == U_BUFFER_OVERFLOW_ERROR && mbOut == NULL) {
+		// we have no output buffer, so we ignore buffer overflows
+		icuStatus = U_ZERO_ERROR;
+	}
 
 	if (!U_SUCCESS(icuStatus)) {
 		if (icuStatus == U_ILLEGAL_ARGUMENT_ERROR) {
 			// bad converter (shouldn't really happen)
-			TRACE(("MultibyteToWchar(): bad converter\n"));
+			TRACE(("WcharToMultibyte(): bad converter\n"));
 			return B_BAD_VALUE;
 		}
 
 		// conversion failed because of illegal/unmappable character
-		TRACE(("MultibyteToWchar(): illegal character sequence\n"));
+		TRACE(("WcharToMultibyte(): illegal character sequence\n"));
 		ucnv_resetFromUnicode(converter);
 		return B_BAD_DATA;
 	}
@@ -378,6 +398,95 @@ ICUCtypeData::WcharToMultibyte(char* mbOut, wchar_t wc, mbstate_t* mbState,
 	}
 
 	return B_OK;
+}
+
+
+status_t
+ICUCtypeData::WcharStringToMultibyte(char* mbDest, size_t mbDestLength,
+	const wchar_t** wcSource, size_t wcSourceLength, mbstate_t* mbState,
+	size_t& lengthOut)
+{
+	ICUConverterRef converterRef;
+	status_t result = _GetConverterForMbState(mbState, converterRef);
+	if (result != B_OK) {
+		TRACE(("WcharStringToMultibyte(): couldn't get converter for ID %d "
+			"- %lx\n", mbState->converterID, result));
+		return result;
+	}
+
+	UConverter* converter = converterRef->Converter();
+
+	bool mbsIsTerminated = false;
+	const UChar32* source = (UChar32*)*wcSource;
+
+	UErrorCode icuStatus = U_ZERO_ERROR;
+	lengthOut = 0;
+	for (size_t sourceLengthUsed = 0; sourceLengthUsed < wcSourceLength;
+			++sourceLengthUsed, ++source) {
+		if (mbDest != NULL && lengthOut >= mbDestLength)
+			break;
+
+		// convert input from UTF-32 to UTF-16
+		UChar ucharBuffer[2];
+		size_t ucharLength;
+		if (U_IS_BMP(*source)) {
+			ucharBuffer[0] = *source;
+			ucharLength = 1;
+		} else {
+			ucharBuffer[0] = U16_LEAD(*source);
+			ucharBuffer[1] = U16_TRAIL(*source);
+			ucharLength = 2;
+		}
+
+		// do the actual conversion
+		size_t destLength = mbDest == NULL ? 0 : mbDestLength - lengthOut;
+		char buffer[MB_CUR_MAX];
+		size_t mbLength = ucnv_fromUChars(converter,
+			mbDest == NULL ? NULL : buffer, destLength, ucharBuffer,
+			ucharLength, &icuStatus);
+		TRACE(("WcharStringToMultibyte() l:%lu mb:%p ml:%lu s:%p ul:%lu slu:%lu"
+				" uchar:%x st:%x\n", mbLength, mbDest, destLength, source,
+			ucharLength, sourceLengthUsed, *source, icuStatus));
+
+		if (icuStatus == U_BUFFER_OVERFLOW_ERROR) {
+			// ignore buffer overflows ...
+ 			icuStatus = U_ZERO_ERROR;
+ 			// ... but stop if the output buffer has been exceeded
+ 			if (destLength > 0)
+ 				break;
+		} else if (mbDest != NULL)
+			memcpy(mbDest, buffer, mbLength);
+
+		if (!U_SUCCESS(icuStatus))
+			break;
+		if (mbDest != NULL)
+			mbDest += mbLength;
+		if (*source == L'\0') {
+			mbsIsTerminated = true;
+			break;
+		}
+		lengthOut += mbLength;
+		icuStatus = U_ZERO_ERROR;
+	}
+
+	if (!U_SUCCESS(icuStatus)) {
+		// conversion failed because of illegal character sequence
+		TRACE(("WcharStringToMultibyte(): illegal character sequence\n"));
+		ucnv_resetFromUnicode(converter);
+		result = B_BAD_DATA;
+	} else if (mbsIsTerminated) {
+		// reset to initial state
+		_DropConverterFromMbState(mbState);
+		memset(mbState, 0, sizeof(mbstate_t));
+		if (mbDest != NULL)
+			*wcSource = NULL;
+	} else {
+		mbState->count = 0;
+		if (mbDest != NULL)
+			*wcSource = (wchar_t*)source;
+	}
+
+	return result;
 }
 
 

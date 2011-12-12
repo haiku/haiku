@@ -184,6 +184,18 @@ ICULocaleBackend::WcharToMultibyte(char* mbOut, wchar_t wc, mbstate_t* mbState,
 }
 
 
+status_t
+ICULocaleBackend::WcharStringToMultibyte(char* mbDest, size_t mbDestLength,
+	const wchar_t** wcSource, size_t wcSourceLength, mbstate_t* mbState,
+	size_t& lengthOut)
+{
+	ErrnoMaintainer errnoMaintainer;
+
+	return fCtypeData.WcharStringToMultibyte(mbDest, mbDestLength, wcSource,
+		wcSourceLength, mbState, lengthOut);
+}
+
+
 const char*
 ICULocaleBackend::GetLanginfo(int index)
 {
