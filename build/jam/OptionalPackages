@@ -475,6 +475,9 @@ if [ IsOptionalHaikuImagePackageAdded CVS ] {
 
 # Development
 if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
+	AddFilesToHaikuImage system apps : Debugger ;
+	AddSymlinkToHaikuImage home config settings deskbar Applications
+		: /boot/system/apps/Debugger : Debugger ;
 	# autotools
 	if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
