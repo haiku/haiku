@@ -346,8 +346,6 @@ send_rpc_call(fs_nspace *ns, const struct sockaddr_in *addr, int32 prog,
 	}
 #endif
 
-	free(pending->buffer);
-
 	/* mmu_man */
 	if (call) /* if the call has been found and removed (atomic op), the sem hasn't been released */
 		SemaphorePoolPut(&ns->pendingCalls.fPool, pending->sem);
