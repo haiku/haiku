@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -22,6 +22,7 @@
 #include "InstructionInfo.h"
 #include "Jobs.h"
 #include "MessageCodes.h"
+#include "Register.h"
 #include "SourceCode.h"
 #include "SpecificImageDebugInfo.h"
 #include "StackTrace.h"
@@ -52,6 +53,7 @@ ThreadHandler::ThreadHandler(Thread* thread, Worker* worker,
 	fStepStatement(NULL),
 	fBreakpointAddress(0),
 	fPreviousInstructionPointer(0),
+	fPreviousFrameAddress(0),
 	fSingleStepping(false)
 {
 	fDebuggerInterface->AcquireReference();
@@ -294,16 +296,12 @@ ThreadHandler::HandleThreadAction(uint32 action)
 
 	// For "step out" just set a temporary breakpoint on the return address.
 	if (action == MSG_THREAD_STEP_OUT) {
-// TODO: That's OK in principle, but needs additional work with recursive
-// functions. We need to store some information that allows us to determine
-// whether we've actually stepped out of the current frame when we have hit
-// the breakpoint.
 		status_t error = _InstallTemporaryBreakpoint(frame->ReturnAddress());
 		if (error != B_OK) {
 			_StepFallback();
 			return;
 		}
-
+		fPreviousFrameAddress = frame->FrameAddress();
 		fStepMode = STEP_OUT;
 		_RunThread(frame->GetCpuState()->InstructionPointer());
 		return;
@@ -571,8 +569,25 @@ ThreadHandler::_HandleBreakpointHitStep(CpuState* cpuState)
 
 		case STEP_INTO:
 			// Should never happen -- we don't set a breakpoint in this case.
+			return false;
+
 		case STEP_OUT:
-			// That's the return address, so we're done.
+			{
+				// That's the return address, so we're done in theory,
+				// unless we're a recursive function. Check if we've actually
+				// exited the previous stack frame or not.
+				if (cpuState->StackFramePointer() <= fPreviousFrameAddress) {
+					status_t error = _InstallTemporaryBreakpoint(
+						cpuState->InstructionPointer());
+					if (error != B_OK)
+						_StepFallback();
+					else
+						_RunThread(cpuState->InstructionPointer());
+					return true;
+				}
+				fPreviousFrameAddress = 0;
+			}
+
 		default:
 			return false;
 	}
