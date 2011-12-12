@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef CPU_STATE_X86_H
@@ -47,6 +48,8 @@ public:
 	virtual						~CpuStateX86();
 
 	virtual	target_addr_t		InstructionPointer() const;
+	virtual	target_addr_t		StackFramePointer() const;
+	virtual	target_addr_t		StackPointer() const;
 	virtual	bool				GetRegisterValue(const Register* reg,
 									BVariant& _value) const;
 	virtual	bool				SetRegisterValue(const Register* reg,
