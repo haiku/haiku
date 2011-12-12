@@ -36,7 +36,7 @@
   module API and give a general impression of the workings of the USB stack.
   This document will not give information on the basics of writing drivers, or
   on how to use modules. Have a look elsewhere in this documentation for that.
-  This document also asumes a basic knowledge of the USB specification, and on
+  This document also assumes a basic knowledge of the USB specification, and on
   how you are supposed to interact with devices. See \ref usb_modules_resources
   for tutorials on the web if you are looking for a basic introduction on
   communication with the USB protocol.
