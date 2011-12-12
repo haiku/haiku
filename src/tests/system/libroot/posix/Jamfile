@@ -39,8 +39,11 @@ SimpleTest xsi_sem_test1 : xsi_sem_test1.cpp ;
 # wide character tests
 SimpleTest gnulib-test-btowc : gnulib-test-btowc.c ;
 SimpleTest gnulib-test-mbrtowc : gnulib-test-mbrtowc.c ;
+#SimpleTest gnulib-test-mbsnrtowcs : gnulib-test-mbsnrtowcs.c ;
 SimpleTest gnulib-test-mbsrtowcs : gnulib-test-mbsrtowcs.c ;
 SimpleTest gnulib-test-wcrtomb : gnulib-test-wcrtomb.c ;
+#SimpleTest gnulib-test-wcsnrtombs : gnulib-test-wcsnrtombs.c ;
+SimpleTest gnulib-test-wcsrtombs : gnulib-test-wcsrtombs.c ;
 SimpleTest mbtest : mbtest.c ;
 SimpleTest testmb : testmb.c ;
 SimpleTest tst-btowc : tst-btowc.c ;
