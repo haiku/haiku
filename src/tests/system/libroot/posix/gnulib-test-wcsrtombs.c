@@ -33,14 +33,7 @@ main (int argc, char *argv[])
 {
   int mode;
 
-  /* configure should already have checked that the locale is supported.  */
-  if (setlocale(LC_ALL, "") == NULL)
-    {
-	  fprintf(stderr, "unable to set standard locale\n");
-      return 1;
-	}
-
-  for (mode = '1'; mode <= '4'; ++mode)
+  for (mode = '0'; mode <= '4'; ++mode)
     {
       wchar_t input[10];
       size_t n;
@@ -56,6 +49,42 @@ main (int argc, char *argv[])
 
       switch (mode)
         {
+        case '0':
+          /* Locale encoding is POSIX  */
+          printf("POSIX ...\n");
+          {
+            const char original[] = "Buesser";
+
+            ret = mbstowcs (input, original, 10);
+            assert(ret == 7);
+
+            for (n = 0; n < 10; n++)
+              {
+                src = input;
+                ret = wcsrtombs (NULL, &src, n, NULL);
+                assert(ret == 7);
+                assert(src == input);
+
+                src = input;
+                ret = wcsrtombs (buf, &src, n, NULL);
+                assert(ret == (n <= 7 ? n : 7));
+                assert(src == (n <= 7 ? input + n : NULL));
+                assert(memcmp (buf, original, ret) == 0);
+                if (src == NULL)
+                  assert(buf[ret] == '\0');
+                assert(buf[ret + (src == NULL) + 0] == '_');
+                assert(buf[ret + (src == NULL) + 1] == '_');
+                assert(buf[ret + (src == NULL) + 2] == '_');
+              }
+
+            input[2] = 0xDEADBEEFul;
+			src = input;
+			ret = wcsrtombs(buf, &src, BUFSIZE, NULL);
+			assert(ret == (size_t)-1);
+			assert(src == input + 2);
+          }
+          break;
+
         case '1':
           /* Locale encoding is ISO-8859-1 or ISO-8859-15.  */
           printf("ISO8859-1 ...\n");
@@ -131,6 +160,12 @@ main (int argc, char *argv[])
                 assert(buf[ret + (src == NULL) + 1] == '_');
                 assert(buf[ret + (src == NULL) + 2] == '_');
               }
+
+            input[2] = 0xDEADBEEFul;
+			src = input;
+			ret = wcsrtombs(buf, &src, BUFSIZE, NULL);
+			assert(ret == (size_t)-1);
+			assert(src == input + 2);
           }
           break;
 

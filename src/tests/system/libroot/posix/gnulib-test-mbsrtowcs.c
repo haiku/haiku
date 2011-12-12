@@ -33,6 +33,62 @@ int main(int argc, char *argv[])
 	wchar_t wc;
 	size_t ret;
 	int mode;
+	wchar_t buf[BUFSIZE];
+	const char *src;
+	mbstate_t temp_state;
+
+	printf("POSIX ...\n");
+	{
+		char input[] = "Buesser";
+		char isoInput[] = "B\374\337er"; /* "Büßer" */
+
+		memset(&state, '\0', sizeof(mbstate_t));
+
+		{
+			size_t i;
+			for (i = 0; i < BUFSIZE; i++)
+				buf[i] = (wchar_t) 0xBADFACE;
+		}
+
+		wc = (wchar_t) 0xBADFACE;
+		ret = mbrtowc(&wc, input, 1, &state);
+		assert(ret == 1);
+		assert(wc == 'B');
+		assert(mbsinit (&state));
+		input[0] = '\0';
+
+		wc = (wchar_t) 0xBADFACE;
+		ret = mbrtowc(&wc, input + 1, 1, &state);
+		assert(ret == 1);
+		assert(wctob (wc) == (unsigned char) 'u');
+		assert(mbsinit (&state));
+		input[1] = '\0';
+
+		src = input + 2;
+		temp_state = state;
+		ret = mbsrtowcs(NULL, &src, BUFSIZE, &temp_state);
+		assert(ret == 5);
+		assert(src == input + 2);
+		assert(mbsinit (&state));
+
+		src = input + 2;
+		ret = mbsrtowcs(buf, &src, BUFSIZE, &state);
+		assert(ret == 5);
+		assert(src == NULL);
+		assert(wctob (buf[0]) == (unsigned char) 'e');
+		assert(buf[1] == 's');
+		assert(buf[2] == 's');
+		assert(buf[3] == 'e');
+		assert(buf[4] == 'r');
+		assert(buf[5] == 0);
+		assert(buf[6] == (wchar_t) 0xBADFACE);
+		assert(mbsinit (&state));
+
+		src = isoInput;
+		ret = mbsrtowcs(buf, &src, BUFSIZE, &state);
+		assert(ret == (size_t)-1);
+		assert(src == isoInput + 1);
+	}
 
 	/* configure should already have checked that the locale is supported.  */
 	if (setlocale(LC_ALL, "") == NULL) {
@@ -74,10 +130,6 @@ int main(int argc, char *argv[])
 	for (mode = '1'; mode <= '4'; ++mode) {
 		int unlimited;
 		for (unlimited = 0; unlimited < 2; unlimited++) {
-			wchar_t buf[BUFSIZE];
-			const char *src;
-			mbstate_t temp_state;
-
 			{
 				size_t i;
 				for (i = 0; i < BUFSIZE; i++)
@@ -141,6 +193,7 @@ int main(int argc, char *argv[])
 		    	printf("UTF-8 ...\n");
 				{
 					char input[] = "B\303\274\303\237er"; /* "Büßer" */
+					char isoInput[] = "B\374\337er"; /* "Büßer" */
 					memset(&state, '\0', sizeof(mbstate_t));
 
 					if (setlocale (LC_ALL, "en_US.UTF-8") == NULL) {
@@ -189,6 +242,11 @@ int main(int argc, char *argv[])
 					} else
 						assert(buf[2] == (wchar_t) 0xBADFACE);
 					assert(mbsinit (&state));
+
+					src = isoInput;
+					ret = mbsrtowcs(buf, &src, BUFSIZE, &state);
+					assert(ret == (size_t)-1);
+					assert(src == isoInput + 1);
 				}
 				break;
 
