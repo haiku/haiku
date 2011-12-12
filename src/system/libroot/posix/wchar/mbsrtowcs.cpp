@@ -42,31 +42,33 @@ __mbsnrtowcs(wchar_t* dst, const char** src, size_t nmc, size_t len,
 		 * values used in wint_t, we can just copy the bytes.
 		 */
 		size_t count = 0;
+		const char* srcEnd = *src + nmc;
 		if (dst == NULL) {
 			// only count number of required wide characters
-			for (const char* srcEnd = *src + nmc; *src < srcEnd;
-					++*src, ++count) {
-				if (*src < 0) {
+			const char* mbSrc = *src;
+			for (; mbSrc < srcEnd; ++mbSrc, ++count) {
+				if (*mbSrc < 0) {
 					// char is non-ASCII
 					__set_errno(EILSEQ);
-					return (size_t)-1;
+					count = (size_t)-1;
+					break;
 				}
-				if (**src == 0) {
+				if (*mbSrc == 0) {
 					memset(ps, 0, sizeof(mbstate_t));
-					*src = NULL;
 					break;
 				}
 			}
 		} else {
 			// "convert" the characters
-			for (; count < len; ++*src, ++count) {
-				if (*src < 0) {
+			for (; *src < srcEnd && count < len; ++*src, ++count) {
+				if (**src < 0) {
 					// char is non-ASCII
 					__set_errno(EILSEQ);
-					return (size_t)-1;
+					count = (size_t)-1;
+					break;
 				}
-				*dst++ = (wchar_t)*src;
-				if (*src == 0) {
+				*dst++ = (wchar_t)**src;
+				if (**src == 0) {
 					memset(ps, 0, sizeof(mbstate_t));
 					*src = NULL;
 					break;

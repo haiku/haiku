@@ -41,34 +41,36 @@ __wcsnrtombs(char* dst, const wchar_t** src, size_t nwc, size_t len,
 		/*
 		 * The POSIX locale is active. Since the POSIX locale only contains
 		 * chars 0-127 and those ASCII chars are compatible with the UTF32
-		 * values used in wint_t, we can just copy the bytes.
+		 * values used in wint_t, we can just copy the codepoint values.
 		 */
 		size_t count = 0;
+		const wchar_t* srcEnd = *src + nwc;
 		if (dst == NULL) {
 			// only count number of required wide characters
-			for (const wchar_t* srcEnd = *src + nwc; *src < srcEnd;
-					++*src, ++count) {
-				if (*src < 0) {
+			const wchar_t* wcSrc = *src;
+			for (; wcSrc < srcEnd; ++wcSrc, ++count) {
+				if (*wcSrc < 0) {
 					// char is non-ASCII
 					__set_errno(EILSEQ);
-					return (size_t)-1;
+					count = (size_t)-1;
+					break;
 				}
-				if (**src == 0) {
+				if (*wcSrc == 0) {
 					memset(ps, 0, sizeof(mbstate_t));
-					*src = NULL;
 					break;
 				}
 			}
 		} else {
 			// "convert" the characters
-			for (; count < len; ++*src, ++count) {
-				if (*src < 0) {
+			for (; *src < srcEnd && count < len; ++*src, ++count) {
+				if (**src < 0) {
 					// char is non-ASCII
 					__set_errno(EILSEQ);
-					return (size_t)-1;
+					count = (size_t)-1;
+					break;
 				}
-				*dst++ = (char)*src;
-				if (*src == 0) {
+				*dst++ = (char)**src;
+				if (**src == 0) {
 					memset(ps, 0, sizeof(mbstate_t));
 					*src = NULL;
 					break;
