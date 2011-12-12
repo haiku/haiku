@@ -224,8 +224,9 @@ usb_printer_device_added(usb_device newDevice, void **cookie)
 	device->notify = create_sem(0, "usb_printer callback notify");
 	if (device->notify < B_OK) {
 		mutex_destroy(&device->lock);
+		status_t result = device->notify;
 		free(device);
-		return device->notify;
+		return result;
 	}
 
 	mutex_lock(&gDeviceListLock);
