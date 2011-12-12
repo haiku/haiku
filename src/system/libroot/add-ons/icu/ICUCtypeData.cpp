@@ -7,6 +7,7 @@
 #include "ICUCtypeData.h"
 
 #include <langinfo.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <unicode/uchar.h>
@@ -303,12 +304,12 @@ ICUCtypeData::MultibyteStringToWchar(wchar_t* wcDest, size_t wcDestLength,
 			break;
 		UChar32 unicodeChar = ucnv_getNextUChar(converter, &source,
 			std::min(source + MB_CUR_MAX, sourceEnd), &icuStatus);
-		sourceLengthUsed = source - *mbSource;
 		TRACE(("MultibyteStringToWchar() l:%lu wl:%lu s:%p se:%p sl:%lu slu:%lu"
 				" uchar:%x st:%x\n", lengthOut, wcDestLength, source, sourceEnd,
 			mbSourceLength, sourceLengthUsed, unicodeChar, icuStatus));
 		if (!U_SUCCESS(icuStatus))
 			break;
+		sourceLengthUsed = source - *mbSource;
 		if (wcDest != NULL)
 			*wcDest++ = unicodeChar;
 		if (unicodeChar == L'\0') {
@@ -323,6 +324,8 @@ ICUCtypeData::MultibyteStringToWchar(wchar_t* wcDest, size_t wcDestLength,
 		TRACE(("MultibyteStringToWchar(): illegal character sequence\n"));
 		ucnv_resetToUnicode(converter);
 		result = B_BAD_DATA;
+		if (wcDest != NULL)
+			*mbSource = *mbSource + sourceLengthUsed;
 	} else if (wcsIsTerminated) {
 		// reset to initial state
 		_DropConverterFromMbState(mbState);
@@ -421,8 +424,8 @@ ICUCtypeData::WcharStringToMultibyte(char* mbDest, size_t mbDestLength,
 
 	UErrorCode icuStatus = U_ZERO_ERROR;
 	lengthOut = 0;
-	for (size_t sourceLengthUsed = 0; sourceLengthUsed < wcSourceLength;
-			++sourceLengthUsed, ++source) {
+	size_t sourceLengthUsed = 0;
+	for (; sourceLengthUsed < wcSourceLength; ++sourceLengthUsed, ++source) {
 		if (mbDest != NULL && lengthOut >= mbDestLength)
 			break;
 
@@ -474,6 +477,8 @@ ICUCtypeData::WcharStringToMultibyte(char* mbDest, size_t mbDestLength,
 		TRACE(("WcharStringToMultibyte(): illegal character sequence\n"));
 		ucnv_resetFromUnicode(converter);
 		result = B_BAD_DATA;
+		if (mbDest != NULL)
+			*wcSource = *wcSource + sourceLengthUsed;
 	} else if (mbsIsTerminated) {
 		// reset to initial state
 		_DropConverterFromMbState(mbState);
