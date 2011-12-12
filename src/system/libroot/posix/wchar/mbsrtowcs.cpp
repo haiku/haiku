@@ -27,7 +27,8 @@ extern "C" size_t
 __mbsnrtowcs(wchar_t* dst, const char** src, size_t nmc, size_t len,
 	mbstate_t* ps)
 {
-	TRACE(("mbsnrtowcs(%p, %p, %lu, %lu)\n", dst, *src, nmc, len));
+	TRACE(("mbsnrtowcs(%p, %p, %lu, %lu) - lb:%p\n", dst, *src, nmc, len,
+		gLocaleBackend));
 
 	if (ps == NULL) {
 		static mbstate_t internalMbState;
@@ -98,8 +99,9 @@ __mbsnrtowcs(wchar_t* dst, const char** src, size_t nmc, size_t len,
 }
 
 
-extern "C"
-B_DEFINE_WEAK_ALIAS(__mbsnrtowcs, mbsnrtowcs);
+// deactivated, as mbsnrtowcs() isn't publically available yet.
+//extern "C"
+//B_DEFINE_WEAK_ALIAS(__mbsnrtowcs, mbsnrtowcs);
 
 
 extern "C" size_t
@@ -110,7 +112,7 @@ __mbsrtowcs(wchar_t* dst, const char** src, size_t len, mbstate_t* ps)
 		ps = &internalMbState;
 	}
 
-	size_t srcLen = gLocaleBackend == NULL ? strlen(*src) : (size_t)-1;
+	size_t srcLen = gLocaleBackend == NULL ? strlen(*src) + 1 : (size_t)-1;
 
 	return __mbsnrtowcs(dst, src, srcLen, len, ps);
 }
