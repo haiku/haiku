@@ -104,7 +104,6 @@ delete_device(void * storage)
 	LOG(("delete_device: *storage:%p\n",storage));
 
 	free(storage);   // free the memory allocated in create_device 
-	atomic_add(&mpu_device->count,-1);
 		
 	return B_OK;
 }
