@@ -572,21 +572,27 @@ ThreadHandler::_HandleBreakpointHitStep(CpuState* cpuState)
 			return false;
 
 		case STEP_OUT:
-			{
-				// That's the return address, so we're done in theory,
-				// unless we're a recursive function. Check if we've actually
-				// exited the previous stack frame or not.
-				if (cpuState->StackFramePointer() <= fPreviousFrameAddress) {
-					status_t error = _InstallTemporaryBreakpoint(
-						cpuState->InstructionPointer());
-					if (error != B_OK)
-						_StepFallback();
-					else
-						_RunThread(cpuState->InstructionPointer());
-					return true;
-				}
-				fPreviousFrameAddress = 0;
+		{
+			// That's the return address, so we're done in theory,
+			// unless we're a recursive function. Check if we've actually
+			// exited the previous stack frame or not.
+			target_addr_t framePointer = cpuState->StackFramePointer();
+			bool hasExitedFrame = fDebuggerInterface->GetArchitecture()
+				->StackGrowthDirection() == STACK_GROWTH_DIRECTION_POSITIVE
+					? framePointer < fPreviousFrameAddress
+					: framePointer > fPreviousFrameAddress;
+
+			if (!hasExitedFrame) {
+				status_t error = _InstallTemporaryBreakpoint(
+					cpuState->InstructionPointer());
+				if (error != B_OK)
+					_StepFallback();
+				else
+					_RunThread(cpuState->InstructionPointer());
+				return true;
 			}
+			fPreviousFrameAddress = 0;
+		}
 
 		default:
 			return false;
