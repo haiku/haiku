@@ -1225,6 +1225,8 @@ public:
 			bool				IsPrototyped() const	{ return fPrototyped; }
 			uint8				Inline() const			{ return fInline; }
 			bool				IsArtificial() const	{ return fArtificial; }
+			uint8				CallingConvention() const
+										{ return fCallingConvention; }
 
 			DIEType*			ReturnType() const		{ return fReturnType; }
 
@@ -1255,6 +1257,9 @@ public:
 	virtual	status_t			AddAttribute_artificial(
 									uint16 attributeName,
 									const AttributeValue& value);
+	virtual status_t			AddAttribute_calling_convention(
+									uint16 attributeName,
+									const AttributeValue& value);
 
 protected:
 			DebugInfoEntryList	fParameters;
@@ -1273,9 +1278,9 @@ protected:
 			bool				fPrototyped;
 			uint8				fInline;
 			bool				fArtificial;
+			uint8				fCallingConvention;
 
 // TODO:
-// DW_AT_calling_convention
 // DW_AT_elemental
 // DW_AT_entry_pc
 // DW_AT_explicit

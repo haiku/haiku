@@ -1837,7 +1837,8 @@ DIESubprogram::DIESubprogram()
 	fAddressClass(0),
 	fPrototyped(false),
 	fInline(DW_INL_not_inlined),
-	fArtificial(false)
+	fArtificial(false),
+	fCallingConvention(DW_CC_normal)
 {
 }
 
@@ -2001,6 +2002,15 @@ DIESubprogram::AddAttribute_artificial(uint16 attributeName,
 	const AttributeValue& value)
 {
 	fArtificial = value.flag;
+	return B_OK;
+}
+
+
+status_t
+DIESubprogram::AddAttribute_calling_convention(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fCallingConvention = value.constant;
 	return B_OK;
 }
 
