@@ -185,13 +185,13 @@ encoder_pick_dig(uint8 crtcID)
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
 
-	// TODO: we assume link a for now
-	uint8 linkID = 0;
+	bool linkB = gConnector[connectorIndex]->encoder.linkEnumeration
+		== GRAPH_OBJECT_ENUM_ID2 ? true : false;
 
 	if (info.dceMajor >= 4) {
 		switch (info.chipsetID) {
 			case RADEON_PALM:
-				return linkID;
+				return linkB ? 1 : 0;
 			case RADEON_SUMO:
 			case RADEON_SUMO2:
 				// llano follows dce 3.2
@@ -200,11 +200,11 @@ encoder_pick_dig(uint8 crtcID)
 
 		switch (encoderID) {
 			case ENCODER_OBJECT_ID_INTERNAL_UNIPHY:
-				return linkID ? 1 : 0;
+				return linkB ? 1 : 0;
 			case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
-				return linkID ? 3 : 2;
+				return linkB ? 3 : 2;
 			case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
-				return linkID ? 5 : 4;
+				return linkB ? 5 : 4;
 		}
 		ERROR("%s: picking DIG encoder on non-DIG dce 4+ encoder!\n", __func__);
 	} else if ((info.dceMajor >= 3) && (info.dceMinor >= 2)) {

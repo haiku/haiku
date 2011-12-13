@@ -1009,6 +1009,8 @@ debug_connectors()
 			ERROR("   - id:           %" B_PRIu16 "\n", encoderID);
 			ERROR("   - type:         %s\n",
 				encoder_name_lookup(encoderID));
+			ERROR("   - enumeration:  %" B_PRIu32 "\n",
+				gConnector[id]->encoder.linkEnumeration);
 
 			bool attribute = false;
 			ERROR("   - attributes:\n");
