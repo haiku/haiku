@@ -481,7 +481,7 @@ ThreadHandler::_DoStepOver(CpuState* cpuState)
 
 	TRACE_CONTROL("  subroutine call -- installing breakpoint at address "
 		"%#llx\n", info.Address() + info.Size());
-
+	
 	if (_InstallTemporaryBreakpoint(info.Address() + info.Size()) != B_OK)
 		return false;
 
@@ -565,6 +565,10 @@ ThreadHandler::_HandleBreakpointHitStep(CpuState* cpuState)
 					_StepFallback();
 				return true;
 			}
+
+			// TODO: this needs to handle recursive cases properly as
+			// STEP_OUT does, we need to have exited the statement
+			// *and* be back in the call frame we started in. 
 			return false;
 
 		case STEP_INTO:
