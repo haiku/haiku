@@ -712,13 +712,6 @@ connector_probe_legacy()
 
 	// TODO: combine shared connectors
 
-	for (i = 0; i < maxDevice; i++) {
-		if (gConnector[i]->valid == true) {
-			TRACE("%s: connector #%" B_PRId32 " is %s\n", __func__, i,
-				get_connector_name(gConnector[i]->type));
-		}
-	}
-
 	if (connectorIndex == 0) {
 		TRACE("%s: zero connectors found using legacy detection\n", __func__);
 		return B_ERROR;
@@ -889,11 +882,7 @@ connector_probe()
 								continue;
 							}
 
-							// Set up encoder on connector if valid
-							TRACE("%s: Path #%" B_PRId32 ": Found encoder "
-								"%s\n", __func__, i,
-								get_encoder_name(encoderType));
-
+							// Set up found connector
 							gConnector[connectorIndex]->encoder.valid
 								= true;
 							gConnector[connectorIndex]->encoder.flags
@@ -962,11 +951,6 @@ connector_probe()
 
 			// TODO: aux chan transactions
 
-			// record connector information
-			TRACE("%s: Path #%" B_PRId32 ": Found %s (0x%" B_PRIX32 ")\n",
-				__func__, i, get_connector_name(connectorType),
-				connectorType);
-
 			gConnector[connectorIndex]->valid = true;
 			gConnector[connectorIndex]->flags = connectorFlags;
 			gConnector[connectorIndex]->type = connectorType;
@@ -1012,15 +996,24 @@ debug_connectors()
 			uint16 encoderID = gConnector[id]->encoder.objectID;
 			uint16 gpioID = gConnector[id]->gpioID;
 			ERROR("Connector #%" B_PRIu32 ")\n", id);
-			ERROR(" + connector:  %s\n", get_connector_name(connectorType));
-			ERROR(" + encoder:    %s\n", get_encoder_name(encoderType));
-			ERROR(" + encoder id: %" B_PRIu16 " (%s)\n", encoderID,
-				encoder_name_lookup(encoderID));
-			ERROR(" + gpio id:    %" B_PRIu16 "\n", gpioID);
-			ERROR(" + gpio valid: %s\n",
-				gGPIOInfo[gpioID]->valid ? "true" : "false");
-			ERROR(" + hw line:    0x%" B_PRIX32 "\n",
+			ERROR(" + connector:      %s\n", get_connector_name(connectorType));
+			ERROR(" + gpio table id:  %" B_PRIu16 "\n", gpioID);
+			ERROR(" + gpio hw pin:    0x%" B_PRIX32 "\n",
 				gGPIOInfo[gpioID]->hw_line);
+			ERROR(" + gpio valid:     %s\n",
+				gGPIOInfo[gpioID]->valid ? "true" : "false");
+			ERROR(" + encoder:        %s\n", get_encoder_name(encoderType));
+			ERROR("   - id:           %" B_PRIu16 "\n", encoderID);
+			ERROR("   - type:         %s\n",
+				encoder_name_lookup(encoderID));
+			ERROR("   - is external:  %s\n",
+				gConnector[id]->encoder.isExternal ? "true" : "false");
+			ERROR("   - is HDMI:      %s\n",
+				gConnector[id]->encoder.isHDMI ? "true" : "false");
+			ERROR("   - is TV:        %s\n",
+				gConnector[id]->encoder.isTV ? "true" : "false");
+			ERROR("   - is DP bridge: %s\n",
+				gConnector[id]->encoder.isDPBridge ? "true" : "false");
 		}
 	}
 	ERROR("==========================================\n");

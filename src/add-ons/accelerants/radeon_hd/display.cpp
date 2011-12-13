@@ -315,9 +315,9 @@ debug_displays()
 		if (gDisplay[id]->active) {
 			uint32 connectorType = gConnector[connectorIndex]->type;
 			uint32 encoderType = gConnector[connectorIndex]->encoder.type;
-			ERROR(" + connector: %s\n", get_connector_name(connectorType));
-			ERROR(" + encoder:   %s\n", get_encoder_name(encoderType));
-
+			ERROR(" + connector ID:   %" B_PRIu32 "\n", connectorIndex);
+			ERROR(" + connector type: %s\n", get_connector_name(connectorType));
+			ERROR(" + encoder type:   %s\n", get_encoder_name(encoderType));
 			ERROR(" + limits: Vert Min/Max: %" B_PRIu32 "/%" B_PRIu32"\n",
 				gDisplay[id]->vfreq_min, gDisplay[id]->vfreq_max);
 			ERROR(" + limits: Horz Min/Max: %" B_PRIu32 "/%" B_PRIu32"\n",
