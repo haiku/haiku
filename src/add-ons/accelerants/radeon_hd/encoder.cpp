@@ -1054,8 +1054,9 @@ void
 encoder_dpms_set(uint8 crtcID, uint8 encoderID, int mode)
 {
 	int index = 0;
-	DISPLAY_DEVICE_OUTPUT_CONTROL_PS_ALLOCATION args;
+	radeon_shared_info &info = *gInfo->shared_info;
 
+	DISPLAY_DEVICE_OUTPUT_CONTROL_PS_ALLOCATION args;
 	memset(&args, 0, sizeof(args));
 
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
@@ -1094,21 +1095,21 @@ encoder_dpms_set(uint8 crtcID, uint8 encoderID, int mode)
 			break;
 		case ENCODER_OBJECT_ID_INTERNAL_DAC1:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1:
-			// TODO: encoder dpms dce5 dac
-			// else...
-			/*
-			if (radeon_encoder->active_device & (ATOM_DEVICE_TV_SUPPORT))
+			if ((encoderFlags & ATOM_DEVICE_TV_SUPPORT) != 0)
 				index = GetIndexIntoMasterTable(COMMAND, TV1OutputControl);
-			else if (radeon_encoder->active_device & (ATOM_DEVICE_CV_SUPPORT))
+			else if ((encoderFlags & ATOM_DEVICE_CV_SUPPORT) != 0)
 				index = GetIndexIntoMasterTable(COMMAND, CV1OutputControl);
 			else
-			*/
-			index = GetIndexIntoMasterTable(COMMAND, DAC1OutputControl);
+				index = GetIndexIntoMasterTable(COMMAND, DAC1OutputControl);
 			break;
 		case ENCODER_OBJECT_ID_INTERNAL_DAC2:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC2:
-			// TODO: tv or CV encoder on DAC2
-			index = GetIndexIntoMasterTable(COMMAND, DAC2OutputControl);
+			if ((encoderFlags & ATOM_DEVICE_TV_SUPPORT) != 0)
+				index = GetIndexIntoMasterTable(COMMAND, TV1OutputControl);
+			else if ((encoderFlags & ATOM_DEVICE_CV_SUPPORT) != 0)
+				index = GetIndexIntoMasterTable(COMMAND, CV1OutputControl);
+			else
+				index = GetIndexIntoMasterTable(COMMAND, DAC2OutputControl);
 			break;
 	}
 
@@ -1116,22 +1117,26 @@ encoder_dpms_set(uint8 crtcID, uint8 encoderID, int mode)
 		case B_DPMS_ON:
 			args.ucAction = ATOM_ENABLE;
 			atom_execute_table(gAtomContext, index, (uint32*)&args);
-			if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
-				args.ucAction = ATOM_LCD_BLON;
-				atom_execute_table(gAtomContext, index, (uint32*)&args);
+			if (info.dceMajor < 5) {
+				if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
+					args.ucAction = ATOM_LCD_BLON;
+					atom_execute_table(gAtomContext, index, (uint32*)&args);
+				}
+				encoder_dpms_scratch(crtcID, true);
 			}
-			encoder_dpms_scratch(crtcID, true);
 			break;
 		case B_DPMS_STAND_BY:
 		case B_DPMS_SUSPEND:
 		case B_DPMS_OFF:
 			args.ucAction = ATOM_DISABLE;
 			atom_execute_table(gAtomContext, index, (uint32*)&args);
-			if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
-				args.ucAction = ATOM_LCD_BLOFF;
-				atom_execute_table(gAtomContext, index, (uint32*)&args);
+			if (info.dceMajor < 5) {
+				if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
+					args.ucAction = ATOM_LCD_BLOFF;
+					atom_execute_table(gAtomContext, index, (uint32*)&args);
+				}
+				encoder_dpms_scratch(crtcID, false);
 			}
-			encoder_dpms_scratch(crtcID, false);
 			break;
 	}
 }
