@@ -481,7 +481,7 @@ ThreadHandler::_DoStepOver(CpuState* cpuState)
 
 	TRACE_CONTROL("  subroutine call -- installing breakpoint at address "
 		"%#llx\n", info.Address() + info.Size());
-	
+
 	if (_InstallTemporaryBreakpoint(info.Address() + info.Size()) != B_OK)
 		return false;
 
