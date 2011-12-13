@@ -1006,14 +1006,27 @@ debug_connectors()
 			ERROR("   - id:           %" B_PRIu16 "\n", encoderID);
 			ERROR("   - type:         %s\n",
 				encoder_name_lookup(encoderID));
-			ERROR("   - is external:  %s\n",
-				gConnector[id]->encoder.isExternal ? "true" : "false");
-			ERROR("   - is HDMI:      %s\n",
-				gConnector[id]->encoder.isHDMI ? "true" : "false");
-			ERROR("   - is TV:        %s\n",
-				gConnector[id]->encoder.isTV ? "true" : "false");
-			ERROR("   - is DP bridge: %s\n",
-				gConnector[id]->encoder.isDPBridge ? "true" : "false");
+
+			bool attribute = false;
+			ERROR("   - attributes:\n");
+			if (gConnector[id]->encoder.isExternal == true) {
+				attribute = true;
+				ERROR("     * is external\n");
+			}
+			if (gConnector[id]->encoder.isHDMI == true) {
+				attribute = true;
+				ERROR("     * is HDMI\n");
+			}
+			if (gConnector[id]->encoder.isTV == true) {
+				attribute = true;
+				ERROR("     * is TV\n");
+			}
+			if (gConnector[id]->encoder.isDPBridge == true) {
+				attribute = true;
+				ERROR("     * is DisplayPort bridge\n");
+			}
+			if (attribute == false)
+				ERROR("     * no extra attributes\n");
 		}
 	}
 	ERROR("==========================================\n");
