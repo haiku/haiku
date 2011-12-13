@@ -132,6 +132,7 @@ struct encoder_info {
 	uint16		objectID;
 	uint32		type;
 	uint32		flags;
+	uint32		linkEnumeration; // ex. linkb == GRAPH_OBJECT_ENUM_ID2
 	bool		isExternal;
 	bool		isDPBridge;
 	bool		isHDMI;

@@ -891,6 +891,9 @@ connector_probe()
 								= encoderID;
 							gConnector[connectorIndex]->encoder.type
 								= encoderType;
+							gConnector[connectorIndex]->encoder.linkEnumeration
+								= (encoderObjectRaw & ENUM_ID_MASK)
+									>> ENUM_ID_SHIFT;
 							gConnector[connectorIndex]->encoder.isExternal
 								= encoder_is_external(encoderID);
 							gConnector[connectorIndex]->encoder.isDPBridge
