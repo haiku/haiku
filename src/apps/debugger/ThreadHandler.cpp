@@ -324,6 +324,7 @@ ThreadHandler::HandleThreadAction(uint32 action)
 		fStepMode = STEP_INTO;
 		_SingleStepThread(frame->GetCpuState()->InstructionPointer());
 	} else {
+		fPreviousFrameAddress = cpuState->StackFramePointer();
 		// step over
 		fStepMode = STEP_OVER;
 		if (!_DoStepOver(frame->GetCpuState()))
@@ -557,6 +558,18 @@ ThreadHandler::_HandleBreakpointHitStep(CpuState* cpuState)
 
 	switch (fStepMode) {
 		case STEP_OVER:
+		{
+			// If we're in the same frame we started in, keep executing.
+			if (cpuState->StackFramePointer() != fPreviousFrameAddress)
+			{
+				status_t error = _InstallTemporaryBreakpoint(
+					cpuState->InstructionPointer());
+				if (error != B_OK)
+					_StepFallback();
+				else
+					_RunThread(cpuState->InstructionPointer());
+				return true;
+			}
 			// If we're still in the statement, we continue single-stepping,
 			// otherwise we're done.
 			if (fStepStatement->ContainsAddress(
@@ -565,11 +578,9 @@ ThreadHandler::_HandleBreakpointHitStep(CpuState* cpuState)
 					_StepFallback();
 				return true;
 			}
-
-			// TODO: this needs to handle recursive cases properly as
-			// STEP_OUT does, we need to have exited the statement
-			// *and* be back in the call frame we started in. 
+			fPreviousFrameAddress = 0;
 			return false;
+		}
 
 		case STEP_INTO:
 			// Should never happen -- we don't set a breakpoint in this case.
