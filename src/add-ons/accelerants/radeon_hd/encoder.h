@@ -12,7 +12,9 @@
 #include <SupportDefs.h>
 
 
-void encoder_assign_crtc(uint8 crtID);
+void encoder_assign_crtc(uint8 crtcID);
+uint32 encoder_pick_dig(uint8 crtcID);
+
 void encoder_apply_quirks(uint8 crtcID);
 void encoder_mode_set(uint8 id, uint32 pixelClock);
 status_t encoder_analog_setup(uint32 connectorIndex,

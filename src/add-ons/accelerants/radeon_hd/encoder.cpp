@@ -113,30 +113,32 @@ encoder_assign_crtc(uint8 crtcID)
 						case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
 						case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
 						case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
-							ERROR("%s: DIG encoder not yet supported!\n",
-								__func__);
-							//dig = radeon_encoder->enc_priv;
-							//switch (dig->dig_encoder) {
-							//	case 0:
-							//		args.v2.ucEncoderID = ASIC_INT_DIG1_ENCODER_ID;
-							//		break;
-							//	case 1:
-							//		args.v2.ucEncoderID = ASIC_INT_DIG2_ENCODER_ID;
-							//		break;
-							//	case 2:
-							//		args.v2.ucEncoderID = ASIC_INT_DIG3_ENCODER_ID;
-							//		break;
-							//	case 3:
-							//		args.v2.ucEncoderID = ASIC_INT_DIG4_ENCODER_ID;
-							//		break;
-							//	case 4:
-							//		args.v2.ucEncoderID = ASIC_INT_DIG5_ENCODER_ID;
-							//		break;
-							//	case 5:
-							//		args.v2.ucEncoderID = ASIC_INT_DIG6_ENCODER_ID;
-							//		break;
-							//}
-							break;
+							switch (encoder_pick_dig(crtcID)) {
+								case 0:
+									args.v2.ucEncoderID
+										= ASIC_INT_DIG1_ENCODER_ID;
+									break;
+								case 1:
+									args.v2.ucEncoderID
+										= ASIC_INT_DIG2_ENCODER_ID;
+									break;
+								case 2:
+									args.v2.ucEncoderID
+										= ASIC_INT_DIG3_ENCODER_ID;
+									break;
+								case 3:
+									args.v2.ucEncoderID
+										= ASIC_INT_DIG4_ENCODER_ID;
+									break;
+								case 4:
+									args.v2.ucEncoderID
+										= ASIC_INT_DIG5_ENCODER_ID;
+									break;
+								case 5:
+									args.v2.ucEncoderID
+										= ASIC_INT_DIG6_ENCODER_ID;
+									break;
+							}
 						case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DVO1:
 							args.v2.ucEncoderID = ASIC_INT_DVO_ENCODER_ID;
 							break;
@@ -172,6 +174,49 @@ encoder_assign_crtc(uint8 crtcID)
 
 	// update crtc encoder scratch register @ scratch 3
 	encoder_crtc_scratch(crtcID);
+}
+
+
+uint32
+encoder_pick_dig(uint8 crtcID)
+{
+	TRACE("%s\n", __func__);
+	radeon_shared_info &info = *gInfo->shared_info;
+	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
+	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
+
+	// TODO: we assume link a for now
+	uint8 linkID = 0;
+
+	if (info.dceMajor >= 4) {
+		switch (info.chipsetID) {
+			case RADEON_PALM:
+				return linkID;
+			case RADEON_SUMO:
+			case RADEON_SUMO2:
+				// llano follows dce 3.2
+				return crtcID;
+		}
+
+		switch (encoderID) {
+			case ENCODER_OBJECT_ID_INTERNAL_UNIPHY:
+				return linkID ? 1 : 0;
+			case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
+				return linkID ? 3 : 2;
+			case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
+				return linkID ? 5 : 4;
+		}
+		ERROR("%s: picking DIG encoder on non-DIG dce 4+ encoder!\n", __func__);
+	} else if ((info.dceMajor >= 3) && (info.dceMinor >= 2)) {
+		// DCE 3.2 can drive any DIG encoder
+		return crtcID;
+	}
+
+	if (encoderID == ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA) {
+		// LVTMA can only be driven by DIG encoder 2
+		return 1;
+	}
+	return 0;
 }
 
 
