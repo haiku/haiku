@@ -16,6 +16,7 @@ Addon radeon_hd.accelerant :
 	connector.cpp
 	create_display_modes.cpp
 	display.cpp
+	displayport.cpp
 	encoder.cpp
 	engine.cpp
 	gpu.cpp

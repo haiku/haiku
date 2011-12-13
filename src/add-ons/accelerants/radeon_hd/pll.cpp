@@ -18,8 +18,10 @@
 #include "accelerant.h"
 #include "bios.h"
 #include "display.h"
+#include "displayport.h"
 #include "encoder.h"
 #include "utility.h"
+
 
 #define TRACE_PLL
 #ifdef TRACE_PLL
@@ -401,7 +403,7 @@ pll_adjust(pll_info* pll, uint8 crtcID)
 								|= DISPPLL_CONFIG_COHERENT_MODE;
 							/* 16200 or 27000 */
 							uint32 dpLinkSpeed
-								= encoder_get_dp_link_clock(connectorIndex);
+								= dp_get_link_clock(connectorIndex);
 							args.v3.sInput.usPixelClock
 								= B_LENDIAN_TO_HOST_INT16(dpLinkSpeed / 10);
 						} else if ((encoderFlags & ATOM_DEVICE_DFP_SUPPORT)
