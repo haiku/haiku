@@ -13,13 +13,13 @@
 #include <SupportDefs.h>
 
 
-int dp_aux_write(uint32 hwLine, uint16 address, uint8* send,
+int dp_aux_write(uint32 hwPin, uint16 address, uint8* send,
 	uint8 sendBytes, uint8 delay);
-int dp_aux_read(uint32 hwLine, uint16 address, uint8* recv,
+int dp_aux_read(uint32 hwPin, uint16 address, uint8* recv,
 	int recvBytes, uint8 delay);
-status_t dp_aux_set_i2c_byte(uint32 hwLine, uint16 address,
+status_t dp_aux_set_i2c_byte(uint32 hwPin, uint16 address,
 	uint8* data, bool end);
-status_t dp_aux_get_i2c_byte(uint32 hwLine, uint16 address,
+status_t dp_aux_get_i2c_byte(uint32 hwPin, uint16 address,
 	uint8* data, bool end);
 
 uint32 dp_get_link_clock(uint32 connectorIndex);

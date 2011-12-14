@@ -29,10 +29,10 @@
 
 
 static int
-dp_aux_speak(uint32 hwLine, uint8* send, int sendBytes,
+dp_aux_speak(uint32 hwPin, uint8* send, int sendBytes,
 	uint8* recv, int recvBytes, uint8 delay, uint8* ack)
 {
-	if (hwLine == 0) {
+	if (hwPin == 0) {
 		ERROR("%s: cannot speak on invalid GPIO pin!\n", __func__);
 		return B_IO_ERROR;
 	}
@@ -50,7 +50,7 @@ dp_aux_speak(uint32 hwLine, uint8* send, int sendBytes,
 	args.v1.lpAuxRequest = 0;
 	args.v1.lpDataOut = 16;
 	args.v1.ucDataOutLen = 0;
-	args.v1.ucChannelID = hwLine;
+	args.v1.ucChannelID = hwPin;
 	args.v1.ucDelay = delay / 10;
 
 	//if (ASIC_IS_DCE4(rdev))
@@ -87,7 +87,7 @@ dp_aux_speak(uint32 hwLine, uint8* send, int sendBytes,
 
 
 int
-dp_aux_write(uint32 hwLine, uint16 address,
+dp_aux_write(uint32 hwPin, uint16 address,
 	uint8* send, uint8 sendBytes, uint8 delay)
 {
 	uint8 auxMessage[20];
@@ -105,7 +105,7 @@ dp_aux_write(uint32 hwLine, uint16 address,
 	uint8 retry;
 	for (retry = 0; retry < 4; retry++) {
 		uint8 ack;
-		int result = dp_aux_speak(hwLine, auxMessage, auxMessageBytes,
+		int result = dp_aux_speak(hwPin, auxMessage, auxMessageBytes,
 			NULL, 0, delay, &ack);
 
 		if (result == B_BUSY)
@@ -126,7 +126,7 @@ dp_aux_write(uint32 hwLine, uint16 address,
 
 
 int
-dp_aux_read(uint32 hwLine, uint16 address,
+dp_aux_read(uint32 hwPin, uint16 address,
 	uint8* recv, int recvBytes, uint8 delay)
 {
 	uint8 auxMessage[4];
@@ -140,7 +140,7 @@ dp_aux_read(uint32 hwLine, uint16 address,
 	uint8 retry;
 	for (retry = 0; retry < 4; retry++) {
 		uint8 ack;
-		int result = dp_aux_speak(hwLine, auxMessage, auxMessageBytes,
+		int result = dp_aux_speak(hwPin, auxMessage, auxMessageBytes,
 			recv, recvBytes, delay, &ack);
 
 		if (result == B_BUSY)
@@ -161,7 +161,7 @@ dp_aux_read(uint32 hwLine, uint16 address,
 
 
 status_t
-dp_aux_get_i2c_byte(uint32 hwLine, uint16 address, uint8* data, bool end)
+dp_aux_get_i2c_byte(uint32 hwPin, uint16 address, uint8* data, bool end)
 {
 	uint8 auxMessage[5];
 	int auxMessageBytes = 4; // 4 for read
@@ -182,7 +182,7 @@ dp_aux_get_i2c_byte(uint32 hwLine, uint16 address, uint8* data, bool end)
 		uint8 reply[2];
 		int replyBytes = 1;
 
-		int result = dp_aux_speak(hwLine, auxMessage, auxMessageBytes,
+		int result = dp_aux_speak(hwPin, auxMessage, auxMessageBytes,
 			reply, replyBytes, 0, &ack);
 		if (result == B_BUSY)
 			continue;
@@ -232,7 +232,7 @@ dp_aux_get_i2c_byte(uint32 hwLine, uint16 address, uint8* data, bool end)
 
 
 status_t
-dp_aux_set_i2c_byte(uint32 hwLine, uint16 address, uint8* data, bool end)
+dp_aux_set_i2c_byte(uint32 hwPin, uint16 address, uint8* data, bool end)
 {
 	uint8 auxMessage[5];
 	int auxMessageBytes = 5; // 5 for write
@@ -254,7 +254,7 @@ dp_aux_set_i2c_byte(uint32 hwLine, uint16 address, uint8* data, bool end)
 		uint8 reply[2];
 		int replyBytes = 1;
 
-		int result = dp_aux_speak(hwLine, auxMessage, auxMessageBytes,
+		int result = dp_aux_speak(hwPin, auxMessage, auxMessageBytes,
 			reply, replyBytes, 0, &ack);
 		if (result == B_BUSY)
 			continue;

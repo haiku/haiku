@@ -102,28 +102,28 @@ struct register_info {
 typedef struct {
 	bool	valid;
 
-	bool	hw_capable;	// can do hw assisted i2c
-	uint32	hw_line;
+	uint32	hwPin;		// GPIO hardware pin on GPU
+	bool	hwCapable;	// can do hw assisted i2c
 
-	uint32	mask_scl_reg;
-	uint32	mask_sda_reg;
-	uint32	mask_scl_mask;
-	uint32	mask_sda_mask;
+	uint32	sclMaskReg;
+	uint32	sdaMaskReg;
+	uint32	sclMask;
+	uint32	sdaMask;
 
-	uint32	en_scl_reg;
-	uint32	en_sda_reg;
-	uint32	en_scl_mask;
-	uint32	en_sda_mask;
+	uint32	sclEnReg;
+	uint32	sdaEnReg;
+	uint32	sclEnMask;
+	uint32	sdaEnMask;
 
-	uint32	y_scl_reg;
-	uint32	y_sda_reg;
-	uint32	y_scl_mask;
-	uint32	y_sda_mask;
+	uint32	sclYReg;
+	uint32	sdaYReg;
+	uint32	sclYMask;
+	uint32	sdaYMask;
 
-	uint32	a_scl_reg;
-	uint32	a_sda_reg;
-	uint32	a_scl_mask;
-	uint32	a_sda_mask;
+	uint32	sclAReg;
+	uint32	sdaAReg;
+	uint32	sclAMask;
+	uint32	sdaAMask;
 } gpio_info;
 
 
