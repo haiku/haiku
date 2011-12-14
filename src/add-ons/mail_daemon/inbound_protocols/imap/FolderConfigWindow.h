@@ -3,8 +3,8 @@
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
  */
-#ifndef IMAP_FOLDER_CONFIG_H
-#define IMAP_FOLDER_CONFIG_H
+#ifndef FOLDER_CONFIG_WINDOW_H
+#define FOLDER_CONFIG_WINDOW_H
 
 
 #include <Button.h>
@@ -15,6 +15,7 @@
 #include <MailSettings.h>
 
 #include "Protocol.h"
+#include "Settings.h"
 
 
 class FolderConfigWindow : public BWindow {
@@ -28,14 +29,15 @@ private:
 			void				_LoadFolders();
 			void				_ApplyChanges();
 
+private:
+			const Settings		fSettings;
 			IMAP::Protocol		fProtocol;
 			BListView*			fFolderListView;
 			BButton*			fApplyButton;
-	const	BMessage			fSettings;
 			IMAP::FolderList	fFolderList;
 
 			BStringView*		fQuotaView;
 };
 
 
-#endif //IMAP_FOLDER_CONFIG_H
+#endif // FOLDER_CONFIG_WINDOW_H

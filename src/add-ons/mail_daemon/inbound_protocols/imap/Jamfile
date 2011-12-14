@@ -16,14 +16,16 @@ UseLibraryHeaders linprog alm ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
 local sources =
-	imap_config.cpp
-	IMAPInboundProtocol.cpp
-	IMAPRootInboundProtocol.cpp
-	IMAPFolderConfig.cpp
+#	IMAPInboundProtocol.cpp
+#	IMAPRootInboundProtocol.cpp
+	ConfigView.cpp
+	FolderConfigWindow.cpp
+	IMAPConnectionWorker.cpp
+	Settings.cpp
+
 	# imap_lib
 	Commands.cpp
 	Protocol.cpp
-	IMAPStorage.cpp
 	Response.cpp
 ;
 
@@ -40,12 +42,11 @@ Addon IMAP
 	:
 	$(sources)
 	:
-	be libmail.so localestub $(TARGET_NETWORK_LIBS) libalm.so
-		libshared.a [ TargetLibsupc++ ] [ TargetLibstdc++ ]
+	be libmail.so localestub $(TARGET_NETWORK_LIBS) libbnetapi.so
+	libalm.so libshared.a [ TargetLibsupc++ ] [ TargetLibstdc++ ]
 ;
 
-SEARCH on [ FGristFiles Commands.cpp IMAPMailbox.cpp
-		IMAPProtocol.cpp IMAPStorage.cpp Response.cpp ]
+SEARCH on [ FGristFiles Commands.cpp Protocol.cpp Response.cpp ]
 	= [ FDirName $(HAIKU_TOP) src add-ons mail_daemon inbound_protocols imap
 		imap_lib ] ;
 

@@ -246,25 +246,21 @@ public:
 
 class ListCommand : public Command, public Handler {
 public:
+								ListCommand(const char* prefix,
+									bool subscribedOnly);
+
 			BString				CommandString();
 			bool				HandleUntagged(Response& response);
 
 	const	StringList&			FolderList();
 
 private:
-			StringList			fFolders;
-};
-
-
-class ListSubscribedCommand : public Command, public Handler {
-public:
-			BString				CommandString();
-			bool				HandleUntagged(Response& response);
-
-	const	StringList&			FolderList();
+			const char*			_Command() const;
 
 private:
+			const char*			fPrefix;
 			StringList			fFolders;
+			bool				fSubscribedOnly;
 };
 
 

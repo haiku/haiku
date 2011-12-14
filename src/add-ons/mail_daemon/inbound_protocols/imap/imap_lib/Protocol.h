@@ -36,9 +36,9 @@ typedef BObjectList<Handler> HandlerList;
 typedef std::map<int32, Command*> CommandIDMap;
 
 
-class FolderInfo {
+class FolderEntry {
 public:
-	FolderInfo()
+	FolderEntry()
 		:
 		subscribed(false)
 	{
@@ -47,7 +47,7 @@ public:
 	BString	folder;
 	bool	subscribed;
 };
-typedef std::vector<FolderInfo> FolderList;
+typedef std::vector<FolderEntry> FolderList;
 
 
 class Protocol {

@@ -18,7 +18,7 @@
 #include <ProtocolConfigView.h>
 #include <MailPrivate.h>
 
-#include "IMAPFolderConfig.h"
+#include "FolderConfigWindow.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -28,11 +28,11 @@
 const uint32 kMsgOpenIMAPFolder = '&OIF';
 
 
-class IMAPConfig : public BMailProtocolConfigView {
+class ConfigView : public BMailProtocolConfigView {
 public:
-								IMAPConfig(MailAddonSettings& settings,
+								ConfigView(MailAddonSettings& settings,
 									BMailAccountSettings& accountSettings);
-	virtual						~IMAPConfig();
+	virtual						~ConfigView();
 	virtual	status_t			Archive(BMessage *into, bool deep = true) const;
 	virtual	void				GetPreferredSize(float *width, float *height);
 
@@ -40,13 +40,13 @@ public:
 	virtual void				AttachedToWindow();
 
 private:
-			BMailFileConfigView*	fFileView;
+			BMailFileConfigView* fFileView;
 			BButton*			fIMAPFolderButton;
 			MailAddonSettings&	fAddonSettings;
 };
 
 
-IMAPConfig::IMAPConfig(MailAddonSettings& settings,
+ConfigView::ConfigView(MailAddonSettings& settings,
 	BMailAccountSettings& accountSettings)
 	:
 	BMailProtocolConfigView(B_MAIL_PROTOCOL_HAS_USERNAME
@@ -93,13 +93,13 @@ IMAPConfig::IMAPConfig(MailAddonSettings& settings,
 }
 
 
-IMAPConfig::~IMAPConfig()
+ConfigView::~ConfigView()
 {
 }
 
 
 status_t
-IMAPConfig::Archive(BMessage *into, bool deep) const
+ConfigView::Archive(BMessage *into, bool deep) const
 {
 	fFileView->Archive(into, deep);
 	return BMailProtocolConfigView::Archive(into, deep);
@@ -107,7 +107,7 @@ IMAPConfig::Archive(BMessage *into, bool deep) const
 
 
 void
-IMAPConfig::GetPreferredSize(float *width, float *height)
+ConfigView::GetPreferredSize(float *width, float *height)
 {
 	BMailProtocolConfigView::GetPreferredSize(width,height);
 	*height -= 20;
@@ -115,7 +115,7 @@ IMAPConfig::GetPreferredSize(float *width, float *height)
 
 
 void
-IMAPConfig::MessageReceived(BMessage* message)
+ConfigView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgOpenIMAPFolder:
@@ -135,7 +135,7 @@ IMAPConfig::MessageReceived(BMessage* message)
 
 
 void
-IMAPConfig::AttachedToWindow()
+ConfigView::AttachedToWindow()
 {
 	fIMAPFolderButton->SetTarget(this);
 }
@@ -148,5 +148,5 @@ BView*
 instantiate_config_panel(MailAddonSettings& settings,
 	BMailAccountSettings& accountSettings)
 {
-	return new IMAPConfig(settings, accountSettings);
+	return new ConfigView(settings, accountSettings);
 }

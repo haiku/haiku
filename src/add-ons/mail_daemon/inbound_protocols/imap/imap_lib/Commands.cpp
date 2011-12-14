@@ -628,18 +628,33 @@ FlagsHandler::HandleUntagged(const BString& response)
 // #pragma mark -
 
 
+ListCommand::ListCommand(const char* prefix, bool subscribedOnly)
+	:
+	fPrefix(prefix),
+	fSubscribedOnly(subscribedOnly)
+{
+}
+
+
 BString
 ListCommand::CommandString()
 {
-	fFolders.clear();
-	return "LIST \"\" \"*\"";
+	BString command = _Command();
+	command += " \"\" \"";
+	if (fPrefix != NULL)
+		command << fPrefix << "%";
+	else
+		command += "*";
+	command += "\"";
+
+	return command;
 }
 
 
 bool
 ListCommand::HandleUntagged(Response& response)
 {
-	if (response.IsCommand("LIST") && response.IsStringAt(3)) {
+	if (response.IsCommand(_Command()) && response.IsStringAt(3)) {
 		fFolders.push_back(response.StringAt(3));
 		return true;
 	}
@@ -655,33 +670,10 @@ ListCommand::FolderList()
 }
 
 
-// #pragma mark -
-
-
-BString
-ListSubscribedCommand::CommandString()
+const char*
+ListCommand::_Command() const
 {
-	fFolders.clear();
-	return "LSUB \"\" \"*\"";
-}
-
-
-bool
-ListSubscribedCommand::HandleUntagged(Response& response)
-{
-	if (response.IsCommand("LSUB") && response.IsStringAt(3)) {
-		fFolders.push_back(response.StringAt(3));
-		return true;
-	}
-
-	return false;
-}
-
-
-const StringList&
-ListSubscribedCommand::FolderList()
-{
-	return fFolders;
+	return fSubscribedOnly ? "LSUB" : "LIST";
 }
 
 

@@ -5,7 +5,7 @@
  */
 
 
-#include "IMAPFolderConfig.h"
+#include "FolderConfigWindow.h"
 
 #include <Catalog.h>
 #include <ControlLook.h>
@@ -17,7 +17,7 @@
 #include <ALMGroup.h>
 #include <StringForSize.h>
 
-#include <crypt.h>
+#include "Settings.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -311,30 +311,15 @@ FolderConfigWindow::_LoadFolders()
 		B_TRANSLATE("Fetching IMAP folders, have patience..."));
 	status->Show();
 
-	BString server;
-	fSettings.FindString("server", &server);
-	int32 ssl;
-	fSettings.FindInt32("flavor", &ssl);
-	bool useSSL = false;
-	if (ssl == 1)
-		useSSL = true;
+	fProtocol.Connect(fSettings.ServerAddress(), fSettings.Username(),
+		fSettings.Password(), fSettings.UseSSL());
 
-	BString username;
-	fSettings.FindString("username", &username);
-
-	BString password;
-	char* passwd = get_passwd(&fSettings, "cpasswd");
-	if (passwd != NULL) {
-		password = passwd;
-		delete[] passwd;
-	}
-
-	fProtocol.Connect(server, username, password, useSSL);
+	// TODO: don't get all of them at once, but retrieve them level by level
 	fFolderList.clear();
 	fProtocol.GetFolders(fFolderList);
-	for (unsigned int i = 0; i < fFolderList.size(); i++) {
-		FolderInfo& info = fFolderList[i];
-		CheckBoxItem* item = new CheckBoxItem(info.folder, info.subscribed);
+	for (size_t i = 0; i < fFolderList.size(); i++) {
+		IMAP::FolderEntry& entry = fFolderList[i];
+		CheckBoxItem* item = new CheckBoxItem(entry.folder, entry.subscribed);
 		fFolderListView->AddItem(item);
 		item->SetListView(fFolderListView);
 	}
@@ -358,10 +343,10 @@ void
 FolderConfigWindow::_ApplyChanges()
 {
 	bool haveChanges = false;
-	for (unsigned int i = 0; i < fFolderList.size(); i++) {
-		FolderInfo& info = fFolderList[i];
+	for (size_t i = 0; i < fFolderList.size(); i++) {
+		IMAP::FolderEntry& entry = fFolderList[i];
 		CheckBoxItem* item = (CheckBoxItem*)fFolderListView->ItemAt(i);
-		if ((info.subscribed != item->Checked())) {
+		if (entry.subscribed != item->Checked()) {
 			haveChanges = true;
 			break;
 		}
@@ -373,13 +358,13 @@ FolderConfigWindow::_ApplyChanges()
 		"IMAP folders, have patience..."));
 	status->Show();
 
-	for (unsigned int i = 0; i < fFolderList.size(); i++) {
-		FolderInfo& info = fFolderList[i];
+	for (size_t i = 0; i < fFolderList.size(); i++) {
+		IMAP::FolderEntry& entry = fFolderList[i];
 		CheckBoxItem* item = (CheckBoxItem*)fFolderListView->ItemAt(i);
-		if (info.subscribed && !item->Checked())
-			fProtocol.UnsubscribeFolder(info.folder);
-		else if (!info.subscribed && item->Checked())
-			fProtocol.SubscribeFolder(info.folder);
+		if (entry.subscribed && !item->Checked())
+			fProtocol.UnsubscribeFolder(entry.folder);
+		else if (!entry.subscribed && item->Checked())
+			fProtocol.SubscribeFolder(entry.folder);
 	}
 
 	status->PostMessage(B_QUIT_REQUESTED);

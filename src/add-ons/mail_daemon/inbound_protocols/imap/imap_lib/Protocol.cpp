@@ -123,16 +123,16 @@ Protocol::GetFolders(FolderList& folders)
 		return status;
 
 	for (unsigned int i = 0; i < allFolders.size(); i++) {
-		FolderInfo info;
-		info.folder = allFolders[i];
+		FolderEntry entry;
+		entry.folder = allFolders[i];
 		for (unsigned int a = 0; a < subscribedFolders.size(); a++) {
 			if (allFolders[i] == subscribedFolders[a]
 				|| allFolders[i].ICompare("INBOX") == 0) {
-				info.subscribed = true;
+				entry.subscribed = true;
 				break;
 			}
 		}
-		folders.push_back(info);
+		folders.push_back(entry);
 	}
 
 	// you could be subscribed to a folder which not exist currently, add them:
@@ -147,10 +147,10 @@ Protocol::GetFolders(FolderList& folders)
 		if (isInlist)
 			continue;
 
-		FolderInfo info;
-		info.folder = subscribedFolders[a];
-		info.subscribed = true;
-		folders.push_back(info);
+		FolderEntry entry;
+		entry.folder = subscribedFolders[a];
+		entry.subscribed = true;
+		folders.push_back(entry);
 	}
 
 	return B_OK;
@@ -344,8 +344,11 @@ Protocol::_Disconnect()
 {
 	fOngoingCommands.clear();
 	fIsConnected = false;
+	delete fBufferedSocket;
+	fBufferedSocket = NULL;
 	delete fSocket;
 	fSocket = NULL;
+
 	return B_OK;
 }
 
@@ -353,12 +356,12 @@ Protocol::_Disconnect()
 status_t
 Protocol::_GetAllFolders(StringList& folders)
 {
-	ListCommand listCommand;
-	status_t status = ProcessCommand(listCommand);
+	ListCommand command(NULL, false);
+	status_t status = ProcessCommand(command);
 	if (status != B_OK)
 		return status;
 
-	folders = listCommand.FolderList();
+	folders = command.FolderList();
 	return status;
 }
 
@@ -366,12 +369,12 @@ Protocol::_GetAllFolders(StringList& folders)
 status_t
 Protocol::_GetSubscribedFolders(StringList& folders)
 {
-	ListSubscribedCommand listSubscribedCommand;
-	status_t status = ProcessCommand(listSubscribedCommand);
+	ListCommand command(NULL, true);
+	status_t status = ProcessCommand(command);
 	if (status != B_OK)
 		return status;
 
-	folders = listSubscribedCommand.FolderList();
+	folders = command.FolderList();
 	return status;
 }
 

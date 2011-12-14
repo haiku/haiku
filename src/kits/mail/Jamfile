@@ -31,7 +31,6 @@ local sources =
 	NodeMessage.cpp
 	numailkit.cpp
 	ProtocolConfigView.cpp
-	ServerConnection.cpp
 ;
 
 
