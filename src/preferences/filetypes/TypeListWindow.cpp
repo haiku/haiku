@@ -10,7 +10,7 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <ControlLook.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <ScrollView.h>
 
@@ -52,15 +52,12 @@ TypeListWindow::TypeListWindow(const char* currentType, uint32 what,
 	BScrollView* scrollView = new BScrollView("scrollview", fListView,
 		B_FRAME_EVENTS | B_WILL_DRAW, false, true);
 
-	SetLayout(new BGroupLayout(B_VERTICAL));
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, padding)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, padding)
+		.SetInsets(padding)
 		.Add(scrollView)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, padding)
+		.AddGroup(B_HORIZONTAL, padding)
 			.Add(button)
-			.Add(fSelectButton)
-		)
-		.SetInsets(padding, padding, padding, padding)
-	);
+			.Add(fSelectButton);
 
 	BAlignment buttonAlignment =
 		BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_VERTICAL_CENTER);

@@ -17,8 +17,6 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <ControlLook.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayoutBuilder.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuField.h>
@@ -205,15 +203,14 @@ ApplicationTypesWindow::ApplicationTypesWindow(const BMessage& settings)
 	fPathView->TextView()->SetExplicitAlignment(labelAlignment);
 	fPathView->LabelView()->SetExplicitAlignment(labelAlignment);
 
-	infoBox->AddChild(BGridLayoutBuilder(padding, padding)
+	BLayoutBuilder::Grid<>(infoBox, padding, padding)
+		.SetInsets(padding, padding * 2, padding, padding)
 		.Add(fNameView->LabelView(), 0, 0)
 		.Add(fNameView->TextView(), 1, 0, 2)
 		.Add(fSignatureView->LabelView(), 0, 1)
 		.Add(fSignatureView->TextView(), 1, 1, 2)
 		.Add(fPathView->LabelView(), 0, 2)
-		.Add(fPathView->TextView(), 1, 2, 2)
-		.SetInsets(padding, padding, padding, padding)
-		.View());
+		.Add(fPathView->TextView(), 1, 2, 2);
 
 	// "Version" group
 
@@ -231,13 +228,12 @@ ApplicationTypesWindow::ApplicationTypesWindow(const BMessage& settings)
 	fDescriptionView->SetLowColor(fDescriptionView->ViewColor());
 	fDescriptionView->MakeEditable(false);
 
-	versionBox->AddChild(BGridLayoutBuilder(padding, padding)
+	BLayoutBuilder::Grid<>(versionBox, padding, padding)
+		.SetInsets(padding, padding * 2, padding, padding)
 		.Add(fVersionView->LabelView(), 0, 0)
 		.Add(fVersionView->TextView(), 1, 0)
 		.Add(fDescriptionLabel->LabelView(), 0, 1)
-		.Add(fDescriptionView, 1, 1, 2, 2)
-		.SetInsets(padding, padding, padding, padding)
-		.View());
+		.Add(fDescriptionView, 1, 1, 2, 2);
 
 	// Launch and Tracker buttons
 

@@ -13,8 +13,6 @@
 #include <Catalog.h>
 #include <CheckBox.h>
 #include <ControlLook.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayoutBuilder.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuField.h>
@@ -254,7 +252,7 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 				.View())
 			)
 		.AddGroup(B_HORIZONTAL, padding)
-			.Add(BSpaceLayoutItem::CreateGlue())
+			.AddGlue()
 			.Add(cancelButton)
 			.Add(fAcceptButton);
 

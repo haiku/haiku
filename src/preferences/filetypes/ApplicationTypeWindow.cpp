@@ -20,8 +20,6 @@
 #include <CheckBox.h>
 #include <ControlLook.h>
 #include <File.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayoutBuilder.h>
 #include <GroupView.h>
 #include <LayoutBuilder.h>
 #include <ListView.h>
@@ -340,12 +338,11 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 	fBackgroundAppCheckBox = new BCheckBox("background",
 		B_TRANSLATE("Background app"), new BMessage(kMsgAppFlagsChanged));
 
-	flagsBox->AddChild(BGridLayoutBuilder(0, 0)
+	BLayoutBuilder::Grid<>(flagsBox, 0, 0)
+		.SetInsets(padding, padding * 2, padding, padding)
 		.Add(fSingleLaunchButton, 0, 0).Add(fArgsOnlyCheckBox, 1, 0)
 		.Add(fMultipleLaunchButton, 0, 1).Add(fBackgroundAppCheckBox, 1, 1)
-		.Add(fExclusiveLaunchButton, 0, 2)
-		.SetInsets(padding, padding / 2, padding, padding)
-		.View());
+		.Add(fExclusiveLaunchButton, 0, 2);
 	flagsBox->SetLabel(fFlagsCheckBox);
 
 	// "Icon" group
@@ -354,10 +351,9 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 	iconBox->SetLabel(B_TRANSLATE("Icon"));
 	fIconView = new IconView("icon");
 	fIconView->SetModificationMessage(new BMessage(kMsgIconChanged));
-	iconBox->AddChild(BGroupLayoutBuilder(B_HORIZONTAL)
-		.Add(fIconView)
-		.SetInsets(padding, padding, padding, padding)
-		.TopView());
+	BLayoutBuilder::Group<>(iconBox, B_HORIZONTAL)
+		.SetInsets(padding, padding * 2, padding, padding)
+		.Add(fIconView);
 
 	// "Supported Types" group
 
@@ -382,16 +378,16 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 	iconHolder->AddChild(fTypeIconView);
 	fTypeIconView->SetModificationMessage(new BMessage(kMsgTypeIconsChanged));
 
-	typeBox->AddChild(BGridLayoutBuilder(padding, padding)
+	BLayoutBuilder::Grid<>(typeBox, padding, padding)
+		.SetInsets(padding, padding * 2, padding, padding)
 		.Add(scrollView, 0, 0, 1, 4)
 		.Add(fAddTypeButton, 1, 0, 1, 2)
 		.Add(fRemoveTypeButton, 1, 2, 1, 2)
 		.Add(iconHolder, 2, 1, 1, 2)
-		.SetInsets(padding, padding / 2, padding, padding)
 		.SetColumnWeight(0, 3)
 		.SetColumnWeight(1, 2)
-		.SetColumnWeight(2, 1)
-		.View());
+		.SetColumnWeight(2, 1);
+
 	iconHolder->SetExplicitAlignment(
 		BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
 
@@ -456,7 +452,8 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 	fInternalVersionControl->TextView()->SetExplicitMinSize(
 		BSize(width, fInternalVersionControl->MinSize().height));
 
-	versionBox->AddChild(BGridLayoutBuilder(padding / 2, padding / 2)
+	BLayoutBuilder::Grid<>(versionBox, padding / 2, padding / 2)
+		.SetInsets(padding, padding * 2, padding, padding)
 		.Add(fMajorVersionControl->CreateLabelLayoutItem(), 0, 0)
 		.Add(fMajorVersionControl->CreateTextViewLayoutItem(), 1, 0)
 		.Add(fMiddleVersionControl, 2, 0, 2)
@@ -467,9 +464,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 		.Add(fShortDescriptionControl->CreateTextViewLayoutItem(), 1, 1, 10)
 		.Add(longLabel, 0, 2)
 		.Add(scrollView, 1, 2, 10, 3)
-		.SetInsets(padding, padding / 2, padding, padding)
-		.SetRowWeight(3, 3)
-		.View());
+		.SetRowWeight(3, 3);
 
 	// put it all together
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)

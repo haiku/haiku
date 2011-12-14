@@ -11,8 +11,7 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <ControlLook.h>
-#include <GroupLayout.h>
-#include <GridLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuBar.h>
 #include <MenuField.h>
@@ -94,9 +93,8 @@ NewFileTypeWindow::NewFileTypeWindow(FileTypesWindow* target,
 
 	float padding = be_control_look->DefaultItemSpacing();
 
-	SetLayout(new BGroupLayout(B_VERTICAL));
-	AddChild(BGridLayoutBuilder(padding, padding)
-		.SetInsets(padding, padding, padding, padding)
+	BLayoutBuilder::Grid<>(this, padding, padding)
+		.SetInsets(padding)
 		.Add(typesMenuLabel, 0, 0)
 		.Add(typesMenuField, 1, 0, 2)
 		.Add(fNameControl->CreateLabelLayoutItem(), 0, 1)
@@ -105,7 +103,7 @@ NewFileTypeWindow::NewFileTypeWindow(FileTypesWindow* target,
 		.Add(new BButton(B_TRANSLATE("Cancel"),
 			new BMessage(B_QUIT_REQUESTED)), 1, 2)
 		.Add(fAddButton, 2, 2)
-		.SetColumnWeight(0, 3));
+		.SetColumnWeight(0, 3);
 
 	BAlignment fullSize = BAlignment(B_ALIGN_USE_FULL_WIDTH,
 		B_ALIGN_USE_FULL_HEIGHT);
