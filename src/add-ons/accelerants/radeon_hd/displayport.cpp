@@ -160,6 +160,23 @@ dp_aux_read(uint32 hwPin, uint16 address,
 }
 
 
+static void
+dpcd_reg_write(uint32 hwPin, uint16 address, uint8 value)
+{
+	dp_aux_write(hwPin, address, &value, 1, 0);
+}
+
+
+static uint8
+dpcd_reg_read(uint32 hwPin, uint16 address)
+{
+	uint8 value = 0;
+	dp_aux_read(hwPin, address, &value, 1, 0);
+
+	return value;
+}
+
+
 status_t
 dp_aux_get_i2c_byte(uint32 hwPin, uint16 address, uint8* data, bool end)
 {
@@ -316,24 +333,104 @@ dp_get_link_clock(uint32 connectorIndex)
 }
 
 
-status_t
-dp_link_train(uint32 connectorIndex)
+void
+dp_setup_connectors()
 {
 	TRACE("%s\n", __func__);
+
+	for (uint32 index = 0; index < ATOM_MAX_SUPPORTED_DEVICE; index++) {
+		gDPInfo[index]->valid = false;
+		if (gConnector[index]->valid == false) {
+			gDPInfo[index]->dpConfig[0] = 0;
+			continue;
+		}
+
+		if (gConnector[index]->type != VIDEO_CONNECTOR_DP
+			&& gConnector[index]->type != VIDEO_CONNECTOR_EDP
+			&& gConnector[index]->encoder.isDPBridge == false) {
+			gDPInfo[index]->dpConfig[0] = 0;
+			continue;
+		}
+
+		uint32 gpioID = gConnector[index]->gpioID;
+		uint32 hwPin = gGPIOInfo[gpioID]->hwPin;
+
+		uint8 auxMessage[25];
+		int result;
+		int i;
+
+		result = dp_aux_read(hwPin, DP_DPCD_REV, auxMessage, 8, 0);
+		if (result > 0) {
+			memcpy(gDPInfo[index]->dpConfig, auxMessage, 8);
+			TRACE("%s: connector #%" B_PRIu32 " DP Config:\n", __func__, index);
+			for (i = 0; i < 8; i++)
+				TRACE("%s:    %02x\n", __func__, auxMessage[i]);
+
+			gDPInfo[index]->valid = true;
+		}
+	}
+}
+
+
+status_t
+dp_link_train(uint8 crtcID)
+{
+	TRACE("%s\n", __func__);
+
+	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
+	if (gDPInfo[connectorIndex]->valid != true) {
+		ERROR("%s: started on non-DisplayPort connector #%" B_PRIu32 "\n",
+			__func__, connectorIndex);
+		return B_ERROR;
+	}
 
 	int index = GetIndexIntoMasterTable(COMMAND, DPEncoderService);
 	// Table version
 	uint8 tableMajor;
 	uint8 tableMinor;
 
-	bool useDpencoder = true; // ??
+	bool dpUseEncoder = true;
 	if (atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor)
 		== B_OK) {
 		if (tableMinor > 1) {
-			useDpencoder = false;
+			// The AtomBIOS DPEncoderService greater then 1.1 can't program the
+			// training pattern properly.
+			dpUseEncoder = false;
 		}
 	}
 
-	// TODO: perform displayport training
-	return B_ERROR;
+	uint32 linkEnumeration
+		= gConnector[connectorIndex]->encoder.linkEnumeration;
+	uint32 gpioID = gConnector[connectorIndex]->gpioID;
+	uint32 hwPin = gGPIOInfo[gpioID]->hwPin;
+
+	uint32 dpEncoderID = 0;
+	if (encoder_pick_dig(crtcID) > 0)
+		dpEncoderID |= ATOM_DP_CONFIG_DIG2_ENCODER;
+	else
+		dpEncoderID |= ATOM_DP_CONFIG_DIG1_ENCODER;
+	if (linkEnumeration == GRAPH_OBJECT_ENUM_ID2)
+		dpEncoderID |= ATOM_DP_CONFIG_LINK_B;
+	else
+		dpEncoderID |= ATOM_DP_CONFIG_LINK_A;
+
+	//uint8 dpReadInterval = dpcd_reg_read(hwPin, DP_TRAINING_AUX_RD_INTERVAL);
+	uint8 dpMaxLanes = dpcd_reg_read(hwPin, DP_MAX_LANE_COUNT);
+
+	radeon_shared_info &info = *gInfo->shared_info;
+	bool dpTPS3Supported = false;
+	if (info.dceMajor >= 5 && (dpMaxLanes & DP_TPS3_SUPPORTED) != 0)
+		dpTPS3Supported = true;
+
+	// power up the DP sink
+	if (gDPInfo[connectorIndex]->dpConfig[0] >= 0x11)
+		dpcd_reg_write(hwPin, DP_SET_POWER, DP_SET_POWER_D0);
+
+	// possibly enable downspread on the sink
+	if (gDPInfo[connectorIndex]->dpConfig[3] & 0x1)
+		dpcd_reg_write(hwPin, DP_DOWNSPREAD_CTRL, DP_SPREAD_AMP_0_5);
+	else
+		dpcd_reg_write(hwPin, DP_DOWNSPREAD_CTRL, 0);
+
+	return B_OK;
 }

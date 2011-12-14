@@ -23,6 +23,7 @@ status_t dp_aux_get_i2c_byte(uint32 hwPin, uint16 address,
 	uint8* data, bool end);
 
 uint32 dp_get_link_clock(uint32 connectorIndex);
+void dp_setup_connectors();
 status_t dp_link_train(uint32 connectorIndex);
 
 

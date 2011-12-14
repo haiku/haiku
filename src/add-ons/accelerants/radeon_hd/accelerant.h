@@ -127,6 +127,17 @@ typedef struct {
 } gpio_info;
 
 
+typedef struct {
+	bool	valid;
+
+	uint8	dpConfig[8]; // DP configuration data
+	uint8	dpSinkType;
+	uint8	dpClock;
+	int		dpLaneCount;
+	bool	eDPOn;
+} dp_info;
+
+
 struct encoder_info {
 	bool		valid;
 	uint16		objectID;
@@ -178,6 +189,7 @@ extern atom_context* gAtomContext;
 extern display_info* gDisplay[MAX_DISPLAY];
 extern connector_info* gConnector[ATOM_MAX_SUPPORTED_DEVICE];
 extern gpio_info* gGPIOInfo[ATOM_MAX_SUPPORTED_DEVICE];
+extern dp_info* gDPInfo[ATOM_MAX_SUPPORTED_DEVICE];
 
 
 // register access
