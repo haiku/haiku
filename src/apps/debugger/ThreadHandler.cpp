@@ -559,7 +559,7 @@ ThreadHandler::_HandleBreakpointHitStep(CpuState* cpuState)
 	switch (fStepMode) {
 		case STEP_OVER:
 		{
-			// If we're in the same frame we started in, keep executing.
+			// If we're not in the same frame we started in, keep executing.
 			if (cpuState->StackFramePointer() != fPreviousFrameAddress)
 			{
 				status_t error = _InstallTemporaryBreakpoint(
