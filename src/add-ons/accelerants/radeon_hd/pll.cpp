@@ -492,7 +492,7 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 	int index = GetIndexIntoMasterTable(COMMAND, SetPixelClock);
 	atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor);
 
-	uint32 bitsPerChannel = 8;
+	uint32 bitsPerColor = 8;
 		// TODO: Digital Depth, EDID 1.4+ on digital displays
 		// isn't in Haiku edid common code?
 
@@ -558,7 +558,7 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 			args.v5.ucMiscInfo = 0; /* HDMI depth, etc. */
 			// if (ss_enabled && (ss->type & ATOM_EXTERNAL_SS_MASK))
 			//	args.v5.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_REF_DIV_SRC;
-			switch (bitsPerChannel) {
+			switch (bitsPerColor) {
 				case 8:
 				default:
 					args.v5.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_HDMI_24BPP;
@@ -584,7 +584,7 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 			args.v6.ucMiscInfo = 0; /* HDMI depth, etc. */
 			// if (ss_enabled && (ss->type & ATOM_EXTERNAL_SS_MASK))
 			//	args.v6.ucMiscInfo |= PIXEL_CLOCK_V6_MISC_REF_DIV_SRC;
-			switch (bitsPerChannel) {
+			switch (bitsPerColor) {
 				case 8:
 				default:
 					args.v6.ucMiscInfo |= PIXEL_CLOCK_V6_MISC_HDMI_24BPP;

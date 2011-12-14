@@ -9,8 +9,11 @@
 #define RADEON_HD_DISPLAYPORT_H
 
 
+#include <create_display_modes.h>
 #include <stdint.h>
 #include <SupportDefs.h>
+
+#include "displayport_reg.h"
 
 
 int dp_aux_write(uint32 hwPin, uint16 address, uint8* send,
@@ -23,8 +26,11 @@ status_t dp_aux_get_i2c_byte(uint32 hwPin, uint16 address,
 	uint8* data, bool end);
 
 uint32 dp_get_link_clock(uint32 connectorIndex);
+uint32 dp_get_link_clock_encode(uint32 dpLinkClock);
+uint32 dp_get_link_clock_decode(uint32 dpLinkClock);
+
 void dp_setup_connectors();
-status_t dp_link_train(uint32 connectorIndex);
+status_t dp_link_train(uint8 crtcID, display_mode* mode);
 
 
 #endif /* RADEON_HD_DISPLAYPORT_H */

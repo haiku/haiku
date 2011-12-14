@@ -713,6 +713,18 @@ connector_probe()
 }
 
 
+bool
+connector_is_dp(uint32 connectorIndex)
+{
+	if (gConnector[connectorIndex]->type == VIDEO_CONNECTOR_DP
+		|| gConnector[connectorIndex]->type != VIDEO_CONNECTOR_EDP
+		|| gConnector[connectorIndex]->encoder.isDPBridge == false) {
+		return true;
+	}
+	return false;
+}
+
+
 void
 debug_connectors()
 {

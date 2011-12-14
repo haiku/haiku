@@ -21,7 +21,9 @@
 #include "accelerant.h"
 #include "accelerant_protos.h"
 #include "bios.h"
+#include "connector.h"
 #include "display.h"
+#include "displayport.h"
 #include "encoder.h"
 #include "pll.h"
 #include "utility.h"
@@ -204,8 +206,23 @@ radeon_set_display_mode(display_mode* mode)
 		display_crtc_lock(id, ATOM_DISABLE);
 
 		// *** encoder commit
+
+		// handle DisplayPort link training
+		if (connector_is_dp(connectorIndex)) {
+			if (info.dceMajor >= 4)
+				encoder_dig_setup(connectorIndex,
+					ATOM_ENCODER_CMD_DP_VIDEO_OFF, 0);
+
+			dp_link_train(id, mode);
+
+			if (info.dceMajor >= 4)
+				encoder_dig_setup(connectorIndex,
+					ATOM_ENCODER_CMD_DP_VIDEO_ON, 0);
+		}
+
 		encoder_dpms_set(id, gConnector[connectorIndex]->encoder.objectID,
 			B_DPMS_ON);
+
 		encoder_output_lock(false);
 	}
 

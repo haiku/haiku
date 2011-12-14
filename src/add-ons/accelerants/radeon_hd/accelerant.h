@@ -130,10 +130,10 @@ typedef struct {
 typedef struct {
 	bool	valid;
 
-	uint8	dpConfig[8]; // DP configuration data
-	uint8	dpSinkType;
-	uint8	dpClock;
-	int		dpLaneCount;
+	uint8	config[8]; // DP configuration data
+	uint8	sinkType;
+	uint8	clock;
+	int		laneCount;
 	bool	eDPOn;
 } dp_info;
 

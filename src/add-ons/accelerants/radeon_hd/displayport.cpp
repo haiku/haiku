@@ -13,7 +13,7 @@
 
 #include "accelerant.h"
 #include "accelerant_protos.h"
-#include "displayport_reg.h"
+#include "connector.h"
 
 
 #undef TRACE
@@ -333,6 +333,58 @@ dp_get_link_clock(uint32 connectorIndex)
 }
 
 
+uint32
+dp_get_link_clock_encode(uint32 dpLinkClock)
+{
+	switch (dpLinkClock) {
+		case 270000:
+			return DP_LINK_BW_2_7;
+		case 540000:
+			return DP_LINK_BW_5_4;
+	}
+
+	return DP_LINK_BW_1_62;
+}
+
+
+uint32
+dp_get_link_clock_decode(uint32 dpLinkClock)
+{
+	switch (dpLinkClock) {
+		case DP_LINK_BW_2_7:
+			return 270000;
+		case DP_LINK_BW_5_4:
+			return 540000;
+	}
+	return 162000;
+}
+
+
+static uint32
+dp_get_lane_count(uint32 connectorIndex, uint32 pixelClock)
+{
+	// TODO: bpp hardcoded
+	uint32 bitsPerPixel = 32;
+
+	uint32 maxLaneCount = gDPInfo[connectorIndex]->config[DP_MAX_LANE_COUNT]
+		& DP_MAX_LANE_COUNT_MASK;
+
+	uint32 maxLinkRate = dp_get_link_clock_decode(
+			gDPInfo[connectorIndex]->config[DP_MAX_LINK_RATE]);
+
+	uint32 lane;
+	for (lane = 1; lane < maxLaneCount; lane <<= 1) {
+		uint32 maxDPPixelClock = (maxLinkRate * lane * 8) / bitsPerPixel;
+		if (pixelClock <= maxDPPixelClock)
+			break;
+	}
+	TRACE("%s: connector: %" B_PRIu32 ", lanes: %" B_PRIu32 "\n", __func__,
+		connectorIndex, lane);
+
+	return lane;
+}
+
+
 void
 dp_setup_connectors()
 {
@@ -341,14 +393,12 @@ dp_setup_connectors()
 	for (uint32 index = 0; index < ATOM_MAX_SUPPORTED_DEVICE; index++) {
 		gDPInfo[index]->valid = false;
 		if (gConnector[index]->valid == false) {
-			gDPInfo[index]->dpConfig[0] = 0;
+			gDPInfo[index]->config[0] = 0;
 			continue;
 		}
 
-		if (gConnector[index]->type != VIDEO_CONNECTOR_DP
-			&& gConnector[index]->type != VIDEO_CONNECTOR_EDP
-			&& gConnector[index]->encoder.isDPBridge == false) {
-			gDPInfo[index]->dpConfig[0] = 0;
+		if (connector_is_dp(index) == false) {
+			gDPInfo[index]->config[0] = 0;
 			continue;
 		}
 
@@ -357,23 +407,18 @@ dp_setup_connectors()
 
 		uint8 auxMessage[25];
 		int result;
-		int i;
 
 		result = dp_aux_read(hwPin, DP_DPCD_REV, auxMessage, 8, 0);
 		if (result > 0) {
-			memcpy(gDPInfo[index]->dpConfig, auxMessage, 8);
-			TRACE("%s: connector #%" B_PRIu32 " DP Config:\n", __func__, index);
-			for (i = 0; i < 8; i++)
-				TRACE("%s:    %02x\n", __func__, auxMessage[i]);
-
 			gDPInfo[index]->valid = true;
+			memcpy(gDPInfo[index]->config, auxMessage, 8);
 		}
 	}
 }
 
 
 status_t
-dp_link_train(uint8 crtcID)
+dp_link_train(uint8 crtcID, display_mode* mode)
 {
 	TRACE("%s\n", __func__);
 
@@ -383,6 +428,10 @@ dp_link_train(uint8 crtcID)
 			__func__, connectorIndex);
 		return B_ERROR;
 	}
+
+	gDPInfo[connectorIndex]->clock = dp_get_link_clock(connectorIndex);
+	gDPInfo[connectorIndex]->laneCount
+		= dp_get_lane_count(connectorIndex, mode->timing.pixel_clock);
 
 	int index = GetIndexIntoMasterTable(COMMAND, DPEncoderService);
 	// Table version
@@ -405,7 +454,7 @@ dp_link_train(uint8 crtcID)
 	uint32 hwPin = gGPIOInfo[gpioID]->hwPin;
 
 	uint32 dpEncoderID = 0;
-	if (encoder_pick_dig(crtcID) > 0)
+	if (encoder_pick_dig(connectorIndex) > 0)
 		dpEncoderID |= ATOM_DP_CONFIG_DIG2_ENCODER;
 	else
 		dpEncoderID |= ATOM_DP_CONFIG_DIG1_ENCODER;
@@ -415,22 +464,66 @@ dp_link_train(uint8 crtcID)
 		dpEncoderID |= ATOM_DP_CONFIG_LINK_A;
 
 	//uint8 dpReadInterval = dpcd_reg_read(hwPin, DP_TRAINING_AUX_RD_INTERVAL);
-	uint8 dpMaxLanes = dpcd_reg_read(hwPin, DP_MAX_LANE_COUNT);
+	uint8 sandbox = dpcd_reg_read(hwPin, DP_MAX_LANE_COUNT);
 
 	radeon_shared_info &info = *gInfo->shared_info;
 	bool dpTPS3Supported = false;
-	if (info.dceMajor >= 5 && (dpMaxLanes & DP_TPS3_SUPPORTED) != 0)
+	if (info.dceMajor >= 5 && (sandbox & DP_TPS3_SUPPORTED) != 0)
 		dpTPS3Supported = true;
 
-	// power up the DP sink
-	if (gDPInfo[connectorIndex]->dpConfig[0] >= 0x11)
+	// DisplayPort training initialization
+
+	// Power up the DP sink
+	if (gDPInfo[connectorIndex]->config[0] >= 0x11)
 		dpcd_reg_write(hwPin, DP_SET_POWER, DP_SET_POWER_D0);
 
-	// possibly enable downspread on the sink
-	if (gDPInfo[connectorIndex]->dpConfig[3] & 0x1)
+	// Possibly enable downspread on the sink
+	if ((gDPInfo[connectorIndex]->config[3] & 0x1) != 0)
 		dpcd_reg_write(hwPin, DP_DOWNSPREAD_CTRL, DP_SPREAD_AMP_0_5);
 	else
 		dpcd_reg_write(hwPin, DP_DOWNSPREAD_CTRL, 0);
+
+	encoder_dig_setup(connectorIndex, 0,
+		ATOM_ENCODER_CMD_SETUP_PANEL_MODE);
+
+	if (gDPInfo[connectorIndex]->config[0] >= 0x11)
+		sandbox |= DP_LANE_COUNT_ENHANCED_FRAME_EN;
+	dpcd_reg_write(hwPin, DP_LANE_COUNT_SET, sandbox);
+
+	// Set the link rate on the DP sink
+	sandbox = dp_get_link_clock_encode(gDPInfo[connectorIndex]->clock);
+	dpcd_reg_write(hwPin, DP_LINK_BW_SET, sandbox);
+
+	// Start link training on source
+	if (info.dceMajor >= 4 || !dpUseEncoder) {
+		encoder_dig_setup(connectorIndex, 0,
+			ATOM_ENCODER_CMD_DP_LINK_TRAINING_START);
+	} else {
+		ERROR("%s: TODO: cannot use AtomBIOS DPEncoderService on card!\n",
+			__func__);
+	}
+
+	/* disable the training pattern on the sink */
+	dpcd_reg_write(hwPin, DP_TRAINING_PATTERN_SET,
+		DP_TRAINING_PATTERN_DISABLE);
+
+	// TODO: dp_link_train_cr
+	// TODO: dp_link_train_ce
+
+	snooze(400);
+
+	/* disable the training pattern on the sink */
+	dpcd_reg_write(hwPin, DP_TRAINING_PATTERN_SET,
+		DP_TRAINING_PATTERN_DISABLE);
+
+	/* disable the training pattern on the source */
+	if (info.dceMajor >= 4 || !dpUseEncoder) {
+		encoder_dig_setup(connectorIndex, 0,
+			ATOM_ENCODER_CMD_DP_LINK_TRAINING_COMPLETE);
+	} else {
+		ERROR("%s: TODO: cannot use AtomBIOS DPEncoderService on card!\n",
+			__func__);
+	}
 
 	return B_OK;
 }

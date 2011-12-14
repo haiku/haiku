@@ -17,7 +17,9 @@
 #include "accelerant.h"
 #include "accelerant_protos.h"
 #include "bios.h"
+#include "connector.h"
 #include "display.h"
+#include "displayport.h"
 #include "utility.h"
 
 
@@ -113,7 +115,7 @@ encoder_assign_crtc(uint8 crtcID)
 						case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
 						case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
 						case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
-							switch (encoder_pick_dig(crtcID)) {
+							switch (encoder_pick_dig(connectorIndex)) {
 								case 0:
 									args.v2.ucEncoderID
 										= ASIC_INT_DIG1_ENCODER_ID;
@@ -178,12 +180,20 @@ encoder_assign_crtc(uint8 crtcID)
 
 
 uint32
-encoder_pick_dig(uint8 crtcID)
+encoder_pick_dig(uint32 connectorIndex)
 {
 	TRACE("%s\n", __func__);
 	radeon_shared_info &info = *gInfo->shared_info;
-	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
+
+	// obtain assigned CRT
+	uint32 crtcID;
+	for (crtcID = 0; crtcID < MAX_DISPLAY; crtcID++) {
+		if (gDisplay[crtcID]->active != true)
+			continue;
+		if (gDisplay[crtcID]->connectorIndex == connectorIndex)
+			break;
+	}
 
 	bool linkB = gConnector[connectorIndex]->encoder.linkEnumeration
 		== GRAPH_OBJECT_ENUM_ID2 ? true : false;
@@ -405,6 +415,9 @@ encoder_digital_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 	union lvdsEncoderControl args;
 	memset(&args, 0, sizeof(args));
 
+	TRACE("%s: table %" B_PRIu8 ".%" B_PRIu8 "\n", __func__,
+		tableMajor, tableMinor);
+
 	switch (tableMajor) {
 	case 1:
 	case 2:
@@ -499,10 +512,10 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 	if (info.dceMajor > 4)
 		index = GetIndexIntoMasterTable(COMMAND, DIGxEncoderControl);
 	else {
-		if (1) // TODO: pick dig encoder
-			index = GetIndexIntoMasterTable(COMMAND, DIG1EncoderControl);
-		else
+		if (encoder_pick_dig(connectorIndex))
 			index = GetIndexIntoMasterTable(COMMAND, DIG2EncoderControl);
+		else
+			index = GetIndexIntoMasterTable(COMMAND, DIG1EncoderControl);
 	}
 
 	// Table verson
@@ -525,124 +538,140 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 	union digEncoderControl args;
 	memset(&args, 0, sizeof(args));
 
-	args.v1.ucAction = command;
-	args.v1.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
-
 	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
+	bool isDPBridge = gConnector[connectorIndex]->encoder.isDPBridge;
+
+	bool linkB = gConnector[connectorIndex]->encoder.linkEnumeration
+		== GRAPH_OBJECT_ENUM_ID2 ? true : false;
+
+	// determine DP panel mode
+	uint32 panelMode;
+	if (info.dceMajor >= 4 && isDPBridge) {
+		if (encoderID == ENCODER_OBJECT_ID_NUTMEG)
+			panelMode = DP_PANEL_MODE_INTERNAL_DP1_MODE;
+		else {
+			// aka ENCODER_OBJECT_ID_TRAVIS or VIDEO_CONNECTOR_EDP
+			panelMode = DP_PANEL_MODE_INTERNAL_DP2_MODE;
+		}
+	} else
+		panelMode = DP_PANEL_MODE_EXTERNAL_DP_MODE;
 
 	#if 0
-	if (command == ATOM_ENCODER_CMD_SETUP_PANEL_MODE) {
-		if (info.dceMajor >= 4 && 0) // TODO: 0 == if DP bridge
-			args.v3.ucPanelMode = DP_PANEL_MODE_INTERNAL_DP1_MODE;
-		else
-			args.v3.ucPanelMode = DP_PANEL_MODE_EXTERNAL_DP_MODE;
-	} else {
-		args.v1.ucEncoderMode = display_get_encoder_mode(connectorIndex);
-
-	if (args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP
-		|| args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP_MST) {
-		args.v1.ucLaneNum = dp_lane_count;
-	} else if (pixelClock > 165000)
-		args.v1.ucLaneNum = 8;
-	else
-		args.v1.ucLaneNum = 4;
-
-	if (info.dceMajor >= 5) {
-		if (args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP
-			|| args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP_MST) {
-				if (dpClock == 270000) {
-					args.v1.ucConfig
-						|= ATOM_ENCODER_CONFIG_V4_DPLINKRATE_2_70GHZ;
-				} else if (dpClock == 540000) {
-					args.v1.ucConfig
-						|= ATOM_ENCODER_CONFIG_V4_DPLINKRATE_5_40GHZ;
-				}
-		}
-		args.v4.acConfig.ucDigSel = dig->dig_encoder;
-		switch (bpc) {
-			case 0:
-				args.v4.ucBitPerColor = PANEL_BPC_UNDEFINE;
-				break;
-			case 6:
-				args.v4.ucBitPerColor = PANEL_6BIT_PER_COLOR;
-				break;
-			case 8:
-			default:
-				args.v4.ucBitPerColor = PANEL_8BIT_PER_COLOR;
-				break;
-			case 10:
-				args.v4.ucBitPerColor = PANEL_10BIT_PER_COLOR;
-				break;
-			case 12:
-				args.v4.ucBitPerColor = PANEL_12BIT_PER_COLOR;
-				break;
-			case 16:
-				args.v4.ucBitPerColor = PANEL_16BIT_PER_COLOR;
-				break;
-		}
-
-		//if (hpdID == RADEON_HPD_NONE)
-		if (1)
-			args.v4.ucHPD_ID = 0;
-		else
-			args.v4.ucHPD_ID = hpd_id + 1;
-
-	} else if (info.dceMajor >= 4) {
-		if (args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP
-			&& dp_clock == 270000) {
-			args.v1.ucConfig |= ATOM_ENCODER_CONFIG_V3_DPLINKRATE_2_70GHZ;
-		}
-
-		args.v3.acConfig.ucDigSel = dig->dig_encoder;
-		switch (bpc) {
-			case 0:
-				args.v3.ucBitPerColor = PANEL_BPC_UNDEFINE;
-				break;
-			case 6:
-				args.v3.ucBitPerColor = PANEL_6BIT_PER_COLOR;
-				break;
-			case 8:
-			default:
-				args.v3.ucBitPerColor = PANEL_8BIT_PER_COLOR;
-				break;
-			case 10:
-				args.v3.ucBitPerColor = PANEL_10BIT_PER_COLOR;
-				break;
-			case 12:
-				args.v3.ucBitPerColor = PANEL_12BIT_PER_COLOR;
-				break;
-			case 16:
-				args.v3.ucBitPerColor = PANEL_16BIT_PER_COLOR;
-				break;
-		}
-
-	} else {
-		if (args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP
-			&& dp_clock == 270000) {
-			args.v1.ucConfig |= ATOM_ENCODER_CONFIG_DPLINKRATE_2_70GHZ;
-		}
-	#endif
-		switch (encoderID) {
-			case ENCODER_OBJECT_ID_INTERNAL_UNIPHY:
-				args.v1.ucConfig = ATOM_ENCODER_CONFIG_V2_TRANSMITTER1;
-				break;
-			case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
-			case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
-				args.v1.ucConfig = ATOM_ENCODER_CONFIG_V2_TRANSMITTER2;
-				break;
-			case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
-				args.v1.ucConfig = ATOM_ENCODER_CONFIG_V2_TRANSMITTER3;
-				break;
-		}
-	#if 0
-		if (dig->linkb)
-			args.v1.ucConfig |= ATOM_ENCODER_CONFIG_LINKB;
-		else
-			args.v1.ucConfig |= ATOM_ENCODER_CONFIG_LINKA;
+	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
+	if (gConnector[connectorIndex]->type == VIDEO_CONNECTOR_EDP) {
+		uint8 temp = dpcd_read_reg(hwPin, DP_EDP_CONFIGURATION_CAP);
+		if ((temp & 1) != 0)
+			panelMode = DP_PANEL_MODE_INTERNAL_DP2_MODE;
 	}
 	#endif
 
-	return atom_execute_table(gAtomContext, index, (uint32*)&args);
+	TRACE("%s: table %" B_PRIu8 ".%" B_PRIu8 "\n", __func__,
+		tableMajor, tableMinor);
+
+	uint32 dpClock = dp_get_link_clock(connectorIndex);
+	switch (tableMinor) {
+		case 1:
+			args.v1.ucAction = command;
+			args.v1.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
+
+			if (command == ATOM_ENCODER_CMD_SETUP_PANEL_MODE)
+				args.v3.ucPanelMode = panelMode;
+			else {
+				args.v1.ucEncoderMode
+					= display_get_encoder_mode(connectorIndex);
+			}
+
+			if ((args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP
+				|| args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP_MST)
+				&& dpClock == 270000) {
+				args.v1.ucConfig |= ATOM_ENCODER_CONFIG_DPLINKRATE_2_70GHZ;
+			}
+
+			switch (encoderID) {
+				case ENCODER_OBJECT_ID_INTERNAL_UNIPHY:
+					args.v1.ucConfig = ATOM_ENCODER_CONFIG_V2_TRANSMITTER1;
+					break;
+				case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
+				case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
+					args.v1.ucConfig = ATOM_ENCODER_CONFIG_V2_TRANSMITTER2;
+					break;
+				case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
+					args.v1.ucConfig = ATOM_ENCODER_CONFIG_V2_TRANSMITTER3;
+					break;
+			}
+
+			if (linkB)
+				args.v1.ucConfig |= ATOM_ENCODER_CONFIG_LINKB;
+			else
+				args.v1.ucConfig |= ATOM_ENCODER_CONFIG_LINKA;
+			break;
+		case 2:
+		case 3:
+			args.v1.ucAction = command;
+			args.v1.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
+
+			if (command == ATOM_ENCODER_CMD_SETUP_PANEL_MODE)
+				args.v3.ucPanelMode = panelMode;
+			else {
+				args.v3.ucEncoderMode
+					= display_get_encoder_mode(connectorIndex);
+			}
+
+			if (args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP
+				|| args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP_MST) {
+				args.v1.ucLaneNum = gDPInfo[connectorIndex]->laneCount;
+			} else if (pixelClock > 165000)
+				args.v1.ucLaneNum = 8;
+			else
+				args.v1.ucLaneNum = 4;
+
+			if ((args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP
+				|| args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP_MST)
+				&& dpClock == 270000) {
+				args.v1.ucConfig |= ATOM_ENCODER_CONFIG_DPLINKRATE_2_70GHZ;
+			}
+
+			args.v3.acConfig.ucDigSel = encoder_pick_dig(connectorIndex);
+
+			// TODO: get BPC
+			switch (8) {
+				case 0:
+					args.v4.ucBitPerColor = PANEL_BPC_UNDEFINE;
+					break;
+				case 6:
+					args.v4.ucBitPerColor = PANEL_6BIT_PER_COLOR;
+					break;
+				case 8:
+				default:
+					args.v4.ucBitPerColor = PANEL_8BIT_PER_COLOR;
+					break;
+				case 10:
+					args.v4.ucBitPerColor = PANEL_10BIT_PER_COLOR;
+					break;
+				case 12:
+					args.v4.ucBitPerColor = PANEL_12BIT_PER_COLOR;
+					break;
+				case 16:
+					args.v4.ucBitPerColor = PANEL_16BIT_PER_COLOR;
+					break;
+			}
+			break;
+		case 4:
+			args.v4.ucHPD_ID = 0;
+			ERROR("%s: tableMinor 4 TODO!\n", __func__);
+			break;
+	}
+
+	status_t result = atom_execute_table(gAtomContext, index, (uint32*)&args);
+
+	#if 0
+	if (gConnector[connectorIndex]->type == VIDEO_CONNECTOR_EDP
+		&& panelMode == DP_PANEL_MODE_INTERNAL_DP2_MODE) {
+		dpcd_write_reg(hwPin, DP_EDP_CONFIGURATION_SET, 1);
+	}
+	#endif
+
+	return result;
 }
 
 
@@ -673,6 +702,8 @@ encoder_external_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 		= (gConnector[connectorIndex]->objectID & OBJECT_ID_MASK)
 			>> OBJECT_ID_SHIFT;
 
+	TRACE("%s: table %" B_PRIu8 ".%" B_PRIu8 "\n", __func__,
+		tableMajor, tableMinor);
 	switch (tableMajor) {
 		case 1:
 			// no options needed on table 1.x
@@ -1053,7 +1084,7 @@ encoder_dpms_scratch(uint8 crtcID, bool power)
 void
 encoder_dpms_set(uint8 crtcID, uint8 encoderID, int mode)
 {
-	int index = 0;
+	int index = -1;
 	radeon_shared_info &info = *gInfo->shared_info;
 
 	DISPLAY_DEVICE_OUTPUT_CONTROL_PS_ALLOCATION args;
@@ -1116,28 +1147,24 @@ encoder_dpms_set(uint8 crtcID, uint8 encoderID, int mode)
 	switch (mode) {
 		case B_DPMS_ON:
 			args.ucAction = ATOM_ENABLE;
-			atom_execute_table(gAtomContext, index, (uint32*)&args);
-			if (info.dceMajor < 5) {
-				if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
-					args.ucAction = ATOM_LCD_BLON;
-					atom_execute_table(gAtomContext, index, (uint32*)&args);
-				}
-				encoder_dpms_scratch(crtcID, true);
-			}
 			break;
 		case B_DPMS_STAND_BY:
 		case B_DPMS_SUSPEND:
 		case B_DPMS_OFF:
 			args.ucAction = ATOM_DISABLE;
-			atom_execute_table(gAtomContext, index, (uint32*)&args);
-			if (info.dceMajor < 5) {
-				if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
-					args.ucAction = ATOM_LCD_BLOFF;
-					atom_execute_table(gAtomContext, index, (uint32*)&args);
-				}
-				encoder_dpms_scratch(crtcID, false);
-			}
 			break;
+	}
+
+	if (index >= 0) {
+		atom_execute_table(gAtomContext, index, (uint32*)&args);
+		if (info.dceMajor < 5) {
+			if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
+				args.ucAction = args.ucAction == ATOM_DISABLE
+					? ATOM_LCD_BLOFF : ATOM_LCD_BLON;
+				atom_execute_table(gAtomContext, index, (uint32*)&args);
+			}
+			encoder_dpms_scratch(crtcID, true);
+		}
 	}
 }
 
