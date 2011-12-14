@@ -71,7 +71,7 @@ SavePanel::SavePanel(const char* name,
 	if (!window || !window->Lock())
 		return;
 
-	window->SetTitle("Save Image");
+	window->SetTitle(B_TRANSLATE("Save Image"));
 
 	// add this instance as BHandler to the window's looper
 	window->AddHandler(this);
