@@ -319,12 +319,6 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 			break;
 		case ENCODER_OBJECT_ID_TRAVIS: // external DP -> LVDS encoder
 		case ENCODER_OBJECT_ID_NUTMEG: // external DP -> VGA encoder
-			ERROR("%s: Oh, you have a TRAVIS or NUTMEG DP external encoder..."
-				" what a pitty.\n", __func__);
-			// * PALM can have native LVDS / VGA, or have them wired via DP
-			//   This is an OEM choice on PALM chipsets
-			// * SUMO or SUMO2 *always* have LVDS or VGA connected through DP
-			// fallthrough
 		case ENCODER_OBJECT_ID_SI170B:
 		case ENCODER_OBJECT_ID_CH7303:
 		case ENCODER_OBJECT_ID_EXTERNAL_SDVOA:
