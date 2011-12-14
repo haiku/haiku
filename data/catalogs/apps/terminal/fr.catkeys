@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	2763377662
+1	french	x-vnd.Haiku-Terminal	2059530645
 %app% settings	Terminal PrefWindow	window title	Réglages du %app%
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help affiche cette aide\n -t, --title défini le titre de la fenêtre\n -f, --fullscreen démarre en plein écran\n
 Abort	Terminal Shell		Abandonner
@@ -55,7 +55,6 @@ OK	Terminal TermWindow		OK
 Page setup…	Terminal TermWindow		Mise en page…
 Paste	Terminal TermWindow		Coller
 Print	Terminal TermWindow		Imprimer
-Print cancelled.	Terminal TermWindow		Impression annulée
 Quit	Terminal TermWindow		Quitter
 Really close?	Terminal TermWindow		Êtes-vous sûr de vouloir fermer ?
 Save	Terminal PrefWindow		Enregistrer

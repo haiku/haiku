@@ -59,7 +59,7 @@ OK	InstallerApp		OK
 OK	InstallerWindow		OK
 Onto:	InstallerWindow		Vers :
 Performing installation.	InstallProgress		Installation en cours.
-Please choose target	InstallerWindow		Veuillez sélectionner la cible
+Please choose target	InstallerWindow		Veuillez sélectionner la destination
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Veuillez fermer les fenêtres du gestionnaire de démarrage et du gestionnaire de disques avant de quitter l'Installeur.
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Veuillez fermer la fenêtre du gestionnaire de démarrage avant de fermer la fenêtre d'Installation.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Veuillez fermer la fenêtre du Gestionnaire de Disques avant celle de l'Installeur
@@ -94,7 +94,7 @@ This is alpha-quality software! It means there is a high risk of losing importan
 Tools	InstallerWindow		Outils
 Try installing anyway	InstallProgress		Essayer d'installer quand même
 Unknown Type	InstallProgress	Partition content type	Type inconnu
-Welcome to the Haiku Installer!\n\n	InstallerApp		Bienvenue dans l'installation de Haiku !\n\n
+Welcome to the Haiku Installer!\n\n	InstallerApp		Bienvenue dans l'installateur Haiku !\n\n
 With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		Avec GRUB 2 la première partition logique a toujours le nombre « 5 », quel que soit le nombre de partitions primaires.\n\n
 With GRUB it's: (hdN,n)\n\n	InstallerApp		Avec GRUB c'est: (hdN,n)\n\n
 Write boot sector	InstallerWindow		Écrire le secteur d'amorce

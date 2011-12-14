@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-LaunchBox	2567299959
+1	french	x-vnd.Haiku-LaunchBox	3587127275
 Add button here	LaunchBox		Ajouter un bouton ici
 Auto-raise	LaunchBox		Faire apparaître automatiquement
 Bummer	LaunchBox		Zut
@@ -8,7 +8,6 @@ Clone	LaunchBox		Cloner
 Close	LaunchBox		Fermer
 Description for '%3'	LaunchBox		Description for « %3 »
 Failed to launch '%1'.\n\nError:	LaunchBox		Impossible de lancer « %1 ».\n\nErreur : 
-Failed to launch 'something',error in Pad data.	LaunchBox		Impossible de lancer « quelque chose », erreur dans les données du Pavé.
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Impossible d'envoyer « ouvrir le dossier » au Tracker.\n\nErreur : 
 Horizontal layout	LaunchBox		Disposition horizontale
 Icon size	LaunchBox		Taille d'icône
