@@ -13,6 +13,7 @@
 
 #include "accelerant.h"
 #include "accelerant_protos.h"
+#include "displayport_reg.h"
 
 
 #undef TRACE
