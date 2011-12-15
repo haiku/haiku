@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
 
 					src = input + 2;
 					ret = mbsrtowcs(buf, &src, unlimited ? BUFSIZE : 1, &state);
-					assert(ret == (unlimited ? 3 : 1));
+					assert(ret == (unlimited ? 3u : 1u));
 					assert(src == (unlimited ? NULL : input + 3));
 					assert(wctob (buf[0]) == (unsigned char) '\337');
 					if (unlimited) {
@@ -230,7 +230,7 @@ int main(int argc, char *argv[])
 
 					src = input + 2;
 					ret = mbsrtowcs(buf, &src, unlimited ? BUFSIZE : 2, &state);
-					assert(ret == (unlimited ? 4 : 2));
+					assert(ret == (unlimited ? 4u : 2u));
 					assert(src == (unlimited ? NULL : input + 5));
 					assert(wctob (buf[0]) == EOF);
 					assert(wctob (buf[1]) == EOF);
@@ -299,7 +299,7 @@ int main(int argc, char *argv[])
 
 					src = input + 4;
 					ret = mbsrtowcs(buf, &src, unlimited ? BUFSIZE : 2, &state);
-					assert(ret == (unlimited ? 3 : 2));
+					assert(ret == (unlimited ? 3u : 2u));
 					assert(src == (unlimited ? NULL : input + 7));
 					assert(wctob (buf[0]) == EOF);
 					assert(wctob (buf[1]) == EOF);
@@ -354,7 +354,7 @@ int main(int argc, char *argv[])
 
 					src = input + 2;
 					ret = mbsrtowcs(buf, &src, unlimited ? BUFSIZE : 2, &state);
-					assert(ret == (unlimited ? 4 : 2));
+					assert(ret == (unlimited ? 4u : 2u));
 					assert(src == (unlimited ? NULL : input + 7));
 					assert(wctob (buf[0]) == EOF);
 					assert(wctob (buf[1]) == EOF);
