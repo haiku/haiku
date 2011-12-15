@@ -5,6 +5,7 @@
 
 
 #include <StringList.h>
+#include <TypeConstants.h>
 
 #include <algorithm>
 
@@ -126,6 +127,14 @@ BStringList::Remove(const BString& string, bool ignoreCase)
 }
 
 
+void
+BStringList::Remove(const BStringList& list, bool ignoreCase)
+{
+	for (int32 i = 0; i < list.CountStrings(); i++)
+		Remove(list.StringAt(i), ignoreCase);
+}
+
+
 BString
 BStringList::Remove(int32 index)
 {
@@ -233,16 +242,16 @@ BStringList::IndexOf(const BString& string, bool ignoreCase) const
 		for (int32 i = 0; i < count; i++) {
 			BString element(StringAt(i));
 			if (length == element.Length() && string.ICompare(element) == 0)
-				return true;
+				return i;
 		}
 	} else {
 		for (int32 i = 0; i < count; i++) {
 			if (string == StringAt(i))
-				return true;
+				return i;
 		}
 	}
 
-	return false;
+	return -1;
 }
 
 
@@ -309,6 +318,76 @@ BStringList::operator==(const BStringList& other) const
 
 	return true;
 }
+
+
+bool
+BStringList::IsFixedSize() const
+{
+	return false;
+}
+
+
+type_code
+BStringList::TypeCode() const
+{
+	return B_STRING_LIST_TYPE;
+}
+
+
+
+bool
+BStringList::AllowsTypeCode(type_code code) const
+{
+	return code == B_STRING_LIST_TYPE;
+}
+
+
+ssize_t
+BStringList::FlattenedSize() const
+{
+	ssize_t size = 0;
+	for (int32 i = 0; i < CountStrings(); i++) {
+		const char* str = StringAt(i).String();
+		size += strlen(str) + 1;
+	}
+
+	return size;
+}
+
+
+status_t
+BStringList::Flatten(void* buffer, ssize_t size) const
+{
+	if (size < FlattenedSize())
+		return B_NO_MEMORY;
+		
+	for (int32 i = 0; i < CountStrings(); i++) {
+		const char* str = StringAt(i).String();
+		ssize_t storeSize = strlen(str) + 1;
+		memcpy(buffer, str, storeSize);
+		buffer = (void*)((const char*)buffer + storeSize);
+	}
+	
+	return B_OK;
+}
+
+
+status_t
+BStringList::Unflatten(type_code code, const void* buffer, ssize_t size)
+{
+	if (code != B_STRING_LIST_TYPE)
+		return B_ERROR;
+		
+	const char* str = (const char*)buffer;
+	for (off_t offset = 0; offset < size; offset ++) {
+		if (((int8*)buffer)[offset] == 0) {
+			Add(str);
+			str = (const char*)buffer + offset + 1;
+		}
+	}
+
+	return B_OK;
+}	
 
 
 void

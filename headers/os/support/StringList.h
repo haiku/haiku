@@ -7,11 +7,12 @@
 
 
 #include <BeBuild.h>
+#include <Flattenable.h>
 #include <List.h>
 #include <String.h>
 
 
-class BStringList {
+class BStringList : public BFlattenable {
 public:
 								BStringList(int32 count = 20);
 								BStringList(const BStringList& other);
@@ -24,6 +25,8 @@ public:
 			bool				Add(const BStringList& list);
 
 			bool				Remove(const BString& string,
+									bool ignoreCase = false);
+			void				Remove(const BStringList& list,
 									bool ignoreCase = false);
 			BString				Remove(int32 index);
 			bool				Remove(int32 index, int32 count);
@@ -58,6 +61,15 @@ public:
 			BStringList&		operator=(const BStringList& other);
 			bool				operator==(const BStringList& other) const;
 			bool				operator!=(const BStringList& other) const;
+
+	// BFlattenable
+	virtual	bool				IsFixedSize() const;
+	virtual	type_code			TypeCode() const;
+	virtual	bool				AllowsTypeCode(type_code code) const;
+	virtual	ssize_t				FlattenedSize() const;
+	virtual	status_t			Flatten(void* buffer, ssize_t size) const;
+	virtual	status_t			Unflatten(type_code code, const void* buffer,
+									ssize_t size);
 
 private:
 			void				_IncrementRefCounts() const;
