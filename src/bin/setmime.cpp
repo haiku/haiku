@@ -4,9 +4,12 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+#include <iomanip>
 #include <iostream>
 #include <map>
+#include <math.h>
 #include <set>
+#include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -41,7 +44,8 @@ const char* kUsageMessage = "# setmime:\n"
 	"#             [ -attrViewable <bool flag> ][ -attrEditable <bool flag> ]\n"
 	"#             [ -attrExtra <bool flag> ] ]\n"
 	"#          [ -miniIcon <256 hex bytes> ]\n"
-	"#          [ -largeIcon <1024 hex bytes> ] ... )\n"
+	"#          [ -largeIcon <1024 hex bytes> ]\n"
+	"#          [ -vectorIcon <icon hex bytes> ] ... )\n"
 	"#      | (-checkSniffRule <sniffRule>\n"
 	"#      | -includeApps)\n";
 
@@ -86,6 +90,7 @@ const char* kPreferredAppSig =	"-preferredAppSig";
 const char* kSniffRule		=	"-sniffRule";
 const char* kMiniIcon		=	"-miniIcon";
 const char* kLargeIcon		=	"-largeIcon";
+const char* kVectorIcon		=	"-vectorIcon";
 const char* kIncludeApps	=	"-includeApps";
 const char* kExtension		=	"-extension";
 const char* kAttribute		=	"-attribute";
@@ -142,7 +147,7 @@ struct CmdOption {
 	{ kSet,				CmdOption::kMode },
 	{ kForce,			CmdOption::kMode },
 	{ kRemove,			CmdOption::kMode },
-	{ kCheckSniffRule,	CmdOption::kMode },
+	{ kCheckSniffRule,	CmdOption::kMode, true },
 
 	{ kShort,			CmdOption::kOption, true },
 	{ kLong,			CmdOption::kOption, true },
@@ -151,6 +156,7 @@ struct CmdOption {
 	{ kSniffRule,		CmdOption::kOption, true },
 	{ kMiniIcon	,		CmdOption::kOption, true },
 	{ kLargeIcon,		CmdOption::kOption, true },
+	{ kVectorIcon,		CmdOption::kOption, true },
 	{ kIncludeApps,		CmdOption::kOption, false },
 	{ kExtension,		CmdOption::kOption, true, true },
 	{ kAttribute,		CmdOption::kAttrRoot, true, true },
@@ -177,6 +183,29 @@ const uint32 kOpModeUndefined = 0;
 
 // #pragma mark -
 
+class Error : public std::exception
+{
+			BString		fWhat;
+public:
+						Error(const char* what, ...);
+	virtual				~Error() throw() {}
+	virtual const char*	what() const throw() { return fWhat.String(); }
+};
+
+
+Error::Error(const char* what, ...)
+{
+	const int size = 1024;
+	va_list args;
+	va_start(args, what);
+	vsnprintf(fWhat.LockBuffer(size), size, what, args);
+	fWhat.UnlockBuffer();
+	va_end(args);
+}
+
+
+// #pragma mark -
+
 // encapsulate the single attribute params
 //
 struct MimeAttribute
@@ -195,10 +224,14 @@ struct MimeAttribute
 				MimeAttribute(TUserArgs& args);
 
 	status_t	InitCheck() { return fStatus; }
+
 	void		Dump();
-	void		SyncWith(TUserArgs& args);
+	void		SyncWith(TUserArgs& args) throw(Error);
 	void		StoreInto(BMessage* target);
 	const char*	UserArgValue(TUserArgs& map, const char* name);
+
+	bool		IsPrintableChar(char c)
+					{ return c >= ' ' && c < 127 && c != '\'' && c != '\\'; }
 };
 
 
@@ -216,19 +249,20 @@ MimeAttribute::MimeAttribute(BMessage& msg, int32 index)
 	struct attrEntry {
 		const char* name;
 		type_code	type;
+		bool		required;
 		void*		data;
 	} attrEntries[] = {
-		{ "attr:name",			B_STRING_TYPE,	&fName },
-		{ "attr:public_name",	B_STRING_TYPE,	&rawPublicName },
-		{ "attr:type",			B_INT32_TYPE,	&fType },
-		{ "attr:viewable",		B_BOOL_TYPE,	&fViewable },
-		{ "attr:editable",		B_BOOL_TYPE,	&fEditable },
-		{ "attr:extra",			B_BOOL_TYPE,	&fExtra },
-		{ "attr:width",			B_INT32_TYPE,	&fWidth },
-		{ "attr:alignment",		B_INT32_TYPE,	&fAlignment }
+		{ "attr:name",			B_STRING_TYPE,	true, &fName },
+		{ "attr:public_name",	B_STRING_TYPE,	true, &rawPublicName },
+		{ "attr:type",			B_INT32_TYPE,	true, &fType },
+		{ "attr:viewable",		B_BOOL_TYPE,	false, &fViewable },
+		{ "attr:editable",		B_BOOL_TYPE,	false, &fEditable },
+		{ "attr:extra",			B_BOOL_TYPE,	false, &fExtra },
+		{ "attr:width",			B_INT32_TYPE,	false, &fWidth },
+		{ "attr:alignment",		B_INT32_TYPE,	false, &fAlignment }
 	};
 
-	for (int i = 0; i < sizeof(attrEntries) / sizeof(attrEntries[0]); i++) {
+	for (size_t i = 0; i < sizeof(attrEntries) / sizeof(attrEntries[0]); i++) {
 		switch (attrEntries[i].type) {
 			case B_STRING_TYPE:
 				fStatus = msg.FindString(attrEntries[i].name, index,
@@ -244,11 +278,12 @@ MimeAttribute::MimeAttribute(BMessage& msg, int32 index)
 				break;
 		}
 
-		if (fStatus != B_OK)
+		if (attrEntries[i].required && fStatus != B_OK)
 			return;
 	}
 
 	fPublicName.CharacterEscape(rawPublicName, "\'", '\\');
+	fStatus = B_OK;
 }
 
 
@@ -259,7 +294,7 @@ MimeAttribute::MimeAttribute(TUserArgs& args)
 
 
 void
-MimeAttribute::SyncWith(TUserArgs& args)
+MimeAttribute::SyncWith(TUserArgs& args) throw(Error)
 {
 	const char* value = UserArgValue(args, kAttribute);
 	if (value != NULL)
@@ -272,10 +307,18 @@ MimeAttribute::SyncWith(TUserArgs& args)
 	value = UserArgValue(args, kAttrType);
 	if (value != NULL) {
 		fType = 0;
-		for (int i = 0; i < 4 && value[i] != '\0'; i++) {
-			fType <<= 8;
-			fType |= (value[i] != '\0' ? value[i] : ' ');
-		}
+		if (strlen(value) > 2 && value[0] == '0' && value[1] == 'x') {
+			stringstream ss;
+			ss << setbase(16) << value + 2;
+			ss >> fType;
+		} else if (strlen(value) == 4) {
+			for (int i = 0; i < 4 && value[i] != '\0'; i++) {
+				fType <<= 8;
+				fType |= (value[i] != '\0' ? value[i] : ' ');
+			}
+
+		} else
+			throw Error("Invalid data for %s", kAttrType);
 
 		fType = B_LENDIAN_TO_HOST_INT32(fType);
 	}
@@ -320,10 +363,19 @@ MimeAttribute::Dump()
 	cout << " \\" << endl << "\t" << kAttribute << " \"" << fName << "\" "
 				<< kAttrName << " \"" << fPublicName << "\"";
 
-	cout << " \\" << endl << "\t\t" << kAttrType << " '"
-				<< (char)((type >> 24) & 0xFF) << (char)((type >> 16) & 0xFF)
-				<< (char)((type >> 8) & 0xFF) << (char)(type & 0xFF) << "' "
-			<< " " << kAttrWidth << " " << fWidth
+	char c1 = (char)((type >> 24) & 0xFF);
+	char c2 = (char)((type >> 16) & 0xFF);
+	char c3 = (char)((type >> 8) & 0xFF);
+	char c4 = (char)(type & 0xFF);
+
+	cout << " \\" << endl << "\t\t" << kAttrType;
+	if (IsPrintableChar(c1) && IsPrintableChar(c2) &&
+		IsPrintableChar(c3) && IsPrintableChar(c4))
+		cout << " '" << c1 << c2 << c3 << c4 << "' ";
+	else
+		cout << "0x" << hex << type;
+
+	cout << " " << kAttrWidth << " " << fWidth
 			<< " " << kAttrAlignment << " " << alignment;
 
 	cout << " \\" << endl << "\t\t" << kAttrViewable << " " << fViewable
@@ -350,7 +402,7 @@ MimeAttribute::StoreInto(BMessage* target)
 		{ "attr:alignment",		B_INT32_TYPE,	&fAlignment }
 	};
 
-	for (int i = 0; i < sizeof(attrEntries) / sizeof(attrEntries[0]); i++) {
+	for (size_t i = 0; i < sizeof(attrEntries) / sizeof(attrEntries[0]); i++) {
 		switch (attrEntries[i].type) {
 			case B_STRING_TYPE:
 				fStatus = target->AddString(attrEntries[i].name,
@@ -390,15 +442,6 @@ MimeAttribute::UserArgValue(TUserArgs& map, const char* name)
 class MimeType : public BMimeType {
 
 public:
-	class Error : public std::exception
-	{
-				BString		fWhat;
-	public:
-							Error(const char* what, ...);
-		virtual				~Error() throw() {}
-		virtual const char*	what() const throw() { return fWhat.String(); }
-	};
-
 					MimeType(char** argv) throw (Error);
 					~MimeType();
 
@@ -409,8 +452,11 @@ private:
 	void			_SetTo(const char* mimetype) throw (Error);
 	void			_PurgeProperties();
 	void			_Init(char** argv) throw (Error);
+	void			_DumpIcon(uint8 *iconData, size_t iconSize);
 	void			_Dump(const char* mimetype) throw (Error);
 	void			_DoEdit() throw (Error);
+	void			_SetIcon(const char* iconData, int32 iconSize);
+
 	const char*		_UserArgValue(const char* name);
 
 	status_t		fStatus;
@@ -424,6 +470,8 @@ private:
 	BString			fSniffRule;
 	BBitmap*		fSmallIcon;
 	BBitmap*		fBigIcon;
+	uint8*			fVectorIcon;
+	size_t			fVectorIconSize;
 
 	map<uint32, BString>		fExtensions;
 	map<uint32, MimeAttribute>	fAttributes;
@@ -446,23 +494,14 @@ private:
 };
 
 
-MimeType::Error::Error(const char* what, ...)
-{
-	const int size = 1024;
-	va_list args;
-	va_start(args, what);
-	vsnprintf(fWhat.LockBuffer(size), size, what, args);
-	fWhat.UnlockBuffer();
-	va_end(args);
-}
-
-
 MimeType::MimeType(char** argv) throw (Error)
 		:
 		fStatus(B_NO_INIT),
 		fToolName(argv[0]),
 		fSmallIcon(NULL),
 		fBigIcon(NULL),
+		fVectorIcon(NULL),
+		fVectorIconSize(0),
 		fOpMode(kOpModeUndefined),
 		fDumpNormal(false),
 		fDumpRule(false),
@@ -474,6 +513,9 @@ MimeType::MimeType(char** argv) throw (Error)
 		fDoRemove(false),
 		fCheckSniffRule(false)
 {
+	fToolName = strrchr(argv[0], '/');
+	fToolName = fToolName == NULL ? argv[0] : fToolName + 1;
+
 	_Init(++argv);
 }
 
@@ -482,6 +524,7 @@ MimeType::~MimeType()
 {
 	delete fSmallIcon;
 	delete fBigIcon;
+	free(fVectorIcon);
 }
 
 
@@ -501,7 +544,7 @@ MimeType::_Init(char** argv) throw (Error)
 			if (Type() != NULL)
 				throw Error("mime signature already specified: '%s'", Type());
 
-			status_t s = SetTo(*arg);
+			SetTo(*arg);
 			continue;
 		}
 
@@ -523,7 +566,7 @@ MimeType::_Init(char** argv) throw (Error)
 					throw Error(kWrongModeMessage);
 				fOpMode = key;
 
-				if (I->second->fType != hash(kCheckSniffRule))
+				if (hash(I->second->fName) != hash(kCheckSniffRule))
 					break;
 				// else -> fallthrough, CheckRule works both as mode and Option
 			case CmdOption::kOption:
@@ -641,8 +684,74 @@ MimeType::_PurgeProperties()
 	delete fBigIcon;
 	fBigIcon = NULL;
 
+	fVectorIcon = NULL;
+	free(fVectorIcon);
+
 	fExtensions.clear();
 	fAttributes.clear();
+}
+
+
+void
+MimeType::_DumpIcon(uint8 *iconData, size_t iconSize)
+{
+	// bitmap icons ASCII art :)
+	int lineLimit = iconSize == B_MINI_ICON * B_MINI_ICON
+						? B_MINI_ICON : B_LARGE_ICON;
+
+	for (size_t i = 0; i < iconSize; i++) {
+		if (i % lineLimit == 0 && i != iconSize - 1)
+			cout << "\\" << endl;
+
+		cout << hex << setfill('0') << setw(2) << (uint16) iconData[i];
+	}
+}
+
+
+void
+MimeType::_SetIcon(const char* iconData, int32 iconSize)
+{
+	uint8* bits = NULL;
+	BRect rect(0, 0, iconSize - 1, iconSize - 1);
+
+	switch (iconSize) {
+		case B_MINI_ICON:
+			if (fSmallIcon == NULL)
+				fSmallIcon = new BBitmap(rect, B_COLOR_8_BIT);
+			bits = (uint8*) fSmallIcon->Bits();
+			break;
+		case B_LARGE_ICON:
+			if (fBigIcon == NULL)
+				fBigIcon = new BBitmap(rect, B_COLOR_8_BIT);
+			bits = (uint8*) fBigIcon->Bits();
+			break;
+		default:
+			if (iconSize >= 0)
+				break;
+			free(fVectorIcon);
+			fVectorIconSize = -iconSize;
+			bits = fVectorIcon = (uint8*) malloc(fVectorIconSize);
+			break;
+	}
+
+	if (bits == NULL)
+		throw Error("cannot create icon of size %d", iconSize);
+
+	size_t dataSize = iconSize < 0 ? -iconSize / 2 : iconSize * iconSize;
+
+	for (size_t i = 0; i < dataSize; i++) {
+		stringstream ss;
+		uint16 val;
+		ss << setbase(16) << iconData[i * 2] << iconData[i * 2 + 1];
+		ss >> val;
+		bits[i] = uint8(val & 0xff);
+	}
+
+	if (iconSize < 0)
+		SetIcon(fVectorIcon, dataSize);
+	else
+		SetIcon(iconSize == B_MINI_ICON ? fSmallIcon : fBigIcon,
+					(icon_size) iconSize);
 }
 
 
@@ -710,6 +819,9 @@ MimeType::_SetTo(const char* mimetype) throw (Error)
 		delete fBigIcon;
 		fBigIcon = NULL;
 	}
+
+	if (GetIcon(&fVectorIcon, &fVectorIconSize) != B_OK)
+		fVectorIcon = NULL;
 }
 
 
@@ -738,6 +850,12 @@ MimeType::_Dump(const char* mimetype) throw (Error)
 		&& _UserArgValue(kIncludeApps) == NULL)
 			return;
 
+	if (fDumpIcon && fSmallIcon == NULL && fBigIcon == NULL)
+		return;
+
+	if (fDumpRule && fSniffRule.IsEmpty())
+		return;
+
 	cout << fToolName << " -set " << mimetype;
 
 	if (fDumpNormal || fDumpAll) {
@@ -764,8 +882,22 @@ MimeType::_Dump(const char* mimetype) throw (Error)
 				i != fAttributes.end(); i++)
 			i->second.Dump();
 
-	if (fDumpIcon || fDumpAll)
-		cout << " \\" << endl << "Icon dumps are not yet implemented!";
+	if (fDumpIcon || fDumpAll) {
+		if (fSmallIcon != NULL && fSmallIcon->Bits() != NULL) {
+			cout << " \\" << endl << "\t" << kMiniIcon << " ";
+			_DumpIcon((uint8*) fSmallIcon->Bits(), fSmallIcon->BitsLength());
+		}
+
+		if (fBigIcon != NULL && fBigIcon->Bits() != NULL) {
+			cout << " \\" << endl << "\t" << kLargeIcon << " ";
+			_DumpIcon((uint8*) fBigIcon->Bits(), fBigIcon->BitsLength());
+		}
+
+	if (fVectorIcon != NULL && fVectorIcon != NULL) {
+			cout << " \\" << endl << "\t" << kVectorIcon << " ";
+			_DumpIcon((uint8*) fVectorIcon, fVectorIconSize);
+		}
+	}
 
 	cout << endl;
 }
@@ -821,6 +953,37 @@ MimeType::_DoEdit() throw (Error)
 		if (SetSnifferRule(value) != B_OK)
 			throw Error("cannot set %s to %s for '%s'",
 					kSniffRule, value, Type());
+
+	value = _UserArgValue(kMiniIcon);
+	if (value != NULL && (!fDoAdd || fSmallIcon == NULL)) {
+		int32 iconSize = strlen(value);
+		if (iconSize / 2 != B_MINI_ICON * B_MINI_ICON)
+			throw Error("cannot set %s for '%s'. Hex data size %d is invalid",
+					kMiniIcon, Type(), iconSize);
+
+		_SetIcon(value, B_MINI_ICON);
+	}
+
+	value = _UserArgValue(kLargeIcon);
+	if (value != NULL && (!fDoAdd || fBigIcon == NULL)) {
+		int32 iconSize = strlen(value);
+		if (iconSize / 2 != B_LARGE_ICON * B_LARGE_ICON)
+			throw Error("cannot set %s for '%s'. Hex data size %d is invalid",
+					kLargeIcon, Type(), iconSize);
+
+		_SetIcon(value, B_LARGE_ICON);
+	}
+
+	value = _UserArgValue(kVectorIcon);
+	if (value != NULL && (!fDoAdd || fVectorIcon == NULL)) {
+		int32 iconSize = strlen(value);
+		if ((iconSize % 2) != 0)
+			throw Error("cannot set %s for '%s'. Hex data size %d is invalid",
+					kVectorIcon, Type(), iconSize);
+
+		// vector icon size is negative intended
+		_SetIcon(value, -iconSize);
+	}
 
 	// handle extensions update
 	pair<TUserArgsI, TUserArgsI> exts
@@ -886,12 +1049,15 @@ MimeType::Process() throw (Error)
 	if (fCheckSniffRule) {
 		TUserArgsI I = fUserArguments.find(fOpMode);
 		if (I == fUserArguments.end())
-			throw Error("sniffer rule is empty");
+			throw Error("Sniffer rule is empty");
 
 		BString error;
 		status_t result = BMimeType::CheckSnifferRule(I->second, &error);
-		cerr <<  (result == B_OK ?
-					"sniffer rule is correct" : error.String()) << endl;
+		if (result == B_OK)
+			cerr << I->second << endl << "Sniffer rule is correct" << endl;
+		else
+			cerr <<  error.String() << endl;
+
 		return;
 	}
 
@@ -947,7 +1113,7 @@ main(int argc, char** argv)
 	try {
 
 		if (argc < 2)
-			throw MimeType::Error(kNeedArgMessage);
+			throw Error(kNeedArgMessage);
 
 		MimeType mimetype(argv);
 
