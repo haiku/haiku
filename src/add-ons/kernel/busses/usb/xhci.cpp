@@ -15,6 +15,8 @@
 #include <USB3.h>
 #include <KernelExport.h>
 
+#include <util/AutoLock.h>
+
 #define TRACE_USB
 #include "xhci.h"
 
@@ -67,7 +69,6 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 		fDcbaArea(-1),
 		fSpinlock(B_SPINLOCK_INITIALIZER),
 		fCmdCompSem(-1),
-		fCmdCompThread(-1),
 		fFinishTransfersSem(-1),
 		fFinishThread(-1),
 		fStopThreads(false),
@@ -75,6 +76,7 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 		fRootHubAddress(0),
 		fPortCount(0),
 		fSlotCount(0),
+		fScratchpadCount(0),
 		fEventIdx(0),
 		fCmdIdx(0),
 		fEventCcs(1),
@@ -99,13 +101,13 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 
 	// map the registers
 	uint32 offset = fPCIInfo->u.h0.base_registers[0] & (B_PAGE_SIZE - 1);
-	addr_t physicalAddress = fPCIInfo->u.h0.base_registers[0] - offset;
+	phys_addr_t physicalAddress = fPCIInfo->u.h0.base_registers[0] - offset;
 	size_t mapSize = (fPCIInfo->u.h0.base_register_sizes[0] + offset
 		+ B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 
-	TRACE("map physical memory 0x%08lx (base: 0x%08lx; offset: %lx); size: %ld\n",
-		fPCIInfo->u.h0.base_registers[0], physicalAddress, offset,
-		fPCIInfo->u.h0.base_register_sizes[0]);
+	TRACE("map physical memory 0x%08lx (base: 0x%08" B_PRIxPHYSADDR "; offset:"
+		" %lx); size: %ld\n", fPCIInfo->u.h0.base_registers[0],
+		physicalAddress, offset, fPCIInfo->u.h0.base_register_sizes[0]);
 
 	fRegisterArea = map_physical_memory("XHCI memory mapped registers",
 		physicalAddress, mapSize, B_ANY_KERNEL_BLOCK_ADDRESS,
@@ -191,11 +193,6 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 		B_NORMAL_PRIORITY, (void *)this);
 	resume_thread(fFinishThread);
 
-	// create command complete service thread
-	fCmdCompThread = spawn_kernel_thread(CmdCompThread, "xhci cmd complete thread",
-		B_NORMAL_PRIORITY, (void *)this);
-	resume_thread(fCmdCompThread);
-
 	// Install the interrupt handler
 	TRACE("installing interrupt handler\n");
 	install_io_interrupt_handler(fPCIInfo->u.h0.interrupt_line,
@@ -218,8 +215,9 @@ XHCI::~XHCI()
 	delete_sem(fFinishTransfersSem);
 	delete_area(fRegisterArea);
 	delete_area(fErstArea);
+	for (uint32 i = 0; i < fScratchpadCount; i++)
+		delete_area(fScratchpadArea[i]);
 	delete_area(fDcbaArea);
-	wait_for_thread(fCmdCompThread, &result);
 	wait_for_thread(fFinishThread, &result);
 	put_module(B_PCI_MODULE_NAME);
 }
@@ -240,29 +238,60 @@ XHCI::Start()
 	// read port count from capability register
 	uint32 capabilities = ReadCapReg32(XHCI_HCSPARAMS1);
 
-	uint8 portsCount = HCS_MAX_PORTS(capabilities);
-	if (portsCount == 0) {
-		TRACE_ERROR("Invalid number of ports: %u\n", portsCount);
+	fPortCount = HCS_MAX_PORTS(capabilities);
+	if (fPortCount == 0) {
+		TRACE_ERROR("Invalid number of ports: %u\n", fPortCount);
+		fPortCount = 0;
 		return B_ERROR;
 	}
-	fPortCount = portsCount;
 	fSlotCount = HCS_MAX_SLOTS(capabilities);
 	WriteOpReg(XHCI_CONFIG, fSlotCount);
 
-	void *dmaAddress;
-	fDcbaArea = fStack->AllocateArea((void **)&fDcba, &dmaAddress,
-		sizeof(uint64) * XHCI_MAX_SLOTS, "DCBA Area");
+	uint32 params2 = ReadCapReg32(XHCI_HCSPARAMS2);
+	fScratchpadCount = HCS_MAX_SC_BUFFERS(params2);
+	if (fScratchpadCount > XHCI_MAX_SCRATCHPADS) {
+		TRACE_ERROR("Invalid number of scratchpads: %u\n", fScratchpadCount);
+		return B_ERROR;
+	}
+
+	WriteOpReg(XHCI_DNCTRL, 0);
+
+	// allocate Device Context Base Address array
+	addr_t dmaAddress;
+	fDcbaArea = fStack->AllocateArea((void **)&fDcba, (void**)&dmaAddress,
+		sizeof(*fDcba), "DCBA Area");
 	if (fDcbaArea < B_OK) {
 		TRACE_ERROR("unable to create the DCBA area\n");
 		return B_ERROR;
 	}
-	memset(fDcba, 0, sizeof(uint64) * XHCI_MAX_SLOTS);
-	TRACE("setting DCBAAP\n");
-	WriteOpReg(XHCI_DCBAAP_LO, (uint32)dmaAddress);
-	WriteOpReg(XHCI_DCBAAP_HI, 0);
+	memset(fDcba, 0, sizeof(*fDcba));
+	memset(fScratchpadArea, 0, sizeof(fScratchpadArea));
+	memset(fScratchpad, 0, sizeof(fScratchpad));
 
-	fErstArea = fStack->AllocateArea((void **)&fErst, &dmaAddress,
-		(MAX_COMMANDS + MAX_EVENTS) * sizeof(xhci_trb)
+	// setting the first address to the scratchpad array address
+	fDcba->baseAddress[0] = dmaAddress
+		+ offsetof(struct xhci_device_context_array, scratchpad);
+
+	// fill up the scratchpad array with scratchpad pages
+	for (uint32 i = 0; i < fScratchpadCount; i++) {
+		addr_t scratchDmaAddress;
+		fScratchpadArea[i] = fStack->AllocateArea((void **)&fScratchpad[i],
+		(void**)&scratchDmaAddress, B_PAGE_SIZE, "Scratchpad Area");
+		if (fScratchpadArea[i] < B_OK) {
+			TRACE_ERROR("unable to create the scratchpad area\n");
+			return B_ERROR;
+		}
+		fDcba->scratchpad[i] = scratchDmaAddress;
+	}
+
+	TRACE("setting DCBAAP %lx\n", dmaAddress);
+	WriteOpReg(XHCI_DCBAAP_LO, (uint32)dmaAddress);
+	WriteOpReg(XHCI_DCBAAP_HI, /*(uint32)(dmaAddress >> 32)*/0);
+
+	// allocate Event Ring Segment Table
+	uint8 *addr;
+	fErstArea = fStack->AllocateArea((void **)&addr, (void**)&dmaAddress,
+		(XHCI_MAX_COMMANDS + XHCI_MAX_EVENTS) * sizeof(xhci_trb)
 		+ sizeof(xhci_erst_element),
 		"USB XHCI ERST CMD_RING and EVENT_RING Area");
 
@@ -271,16 +300,18 @@ XHCI::Start()
 		delete_area(fDcbaArea);
 		return B_ERROR;
 	}
-	memset(fErst, 0, (MAX_COMMANDS + MAX_EVENTS) * sizeof(xhci_trb)
+	fErst = (xhci_erst_element *)addr;
+	memset(fErst, 0, (XHCI_MAX_COMMANDS + XHCI_MAX_EVENTS) * sizeof(xhci_trb)
 		+ sizeof(xhci_erst_element));
 
-	fErst->rs_addr = (uint32)dmaAddress + sizeof(xhci_erst_element);
-	fErst->rs_size = MAX_EVENTS;
+	// fill with Event Ring Segment Base Address and Event Ring Segment Size
+	fErst->rs_addr = (uint64)(dmaAddress + sizeof(xhci_erst_element));
+	fErst->rs_size = XHCI_MAX_EVENTS;
 	fErst->rsvdz = 0;
 
-	uint32 addr = (uint32)fErst + sizeof(xhci_erst_element);
+	addr += sizeof(xhci_erst_element);
 	fEventRing = (xhci_trb *)addr;
-	addr += MAX_EVENTS * sizeof(xhci_trb);
+	addr += XHCI_MAX_EVENTS * sizeof(xhci_trb);
 	fCmdRing = (xhci_trb *)addr;
 
 	TRACE("setting ERST size\n");
@@ -288,26 +319,36 @@ XHCI::Start()
 
 	TRACE("setting ERDP addr = 0x%llx\n", fErst->rs_addr);
 	WriteRunReg32(XHCI_ERDP_LO(0), (uint32)fErst->rs_addr);
-	WriteRunReg32(XHCI_ERDP_HI(0), (uint32)(fErst->rs_addr >> 32));
+	WriteRunReg32(XHCI_ERDP_HI(0), /*(uint32)(fErst->rs_addr >> 32)*/0);
 
-	TRACE("setting ERST base addr = 0x%llx\n", (uint64)dmaAddress);
+	TRACE("setting ERST base addr = 0x%lx\n", dmaAddress);
 	WriteRunReg32(XHCI_ERSTBA_LO(0), (uint32)dmaAddress);
-	WriteRunReg32(XHCI_ERSTBA_HI(0), 0);
+	WriteRunReg32(XHCI_ERSTBA_HI(0), /*(uint32)(dmaAddress >> 32)*/0);
 
-	addr = fErst->rs_addr + MAX_EVENTS * sizeof(xhci_trb);
-	TRACE("setting CRCR addr = 0x%llx\n", (uint64)addr);
-	WriteOpReg(XHCI_CRCR_LO, addr | CRCR_RCS);
-	WriteOpReg(XHCI_CRCR_HI, 0);
+	dmaAddress += sizeof(xhci_erst_element) + XHCI_MAX_EVENTS * sizeof(xhci_trb);
+	TRACE("setting CRCR addr = 0x%lx\n", dmaAddress);
+	WriteOpReg(XHCI_CRCR_LO, (uint32)dmaAddress | CRCR_RCS);
+	WriteOpReg(XHCI_CRCR_HI, /*(uint32)(dmaAddress >> 32)*/0);
 	//link trb
-	fCmdRing[MAX_COMMANDS - 1].qwtrb0 = addr;
+	fCmdRing[XHCI_MAX_COMMANDS - 1].qwtrb0 = dmaAddress;
 
 	TRACE("setting interrupt rate\n");
-	WriteRunReg32(XHCI_IMOD(0), 160);//4000 irq/s
+	WriteRunReg32(XHCI_IMOD(0), 160); // 25000 irq/s
 
 	TRACE("enabling interrupt\n");
 	WriteRunReg32(XHCI_IMAN(0), ReadRunReg32(XHCI_IMAN(0)) | IMAN_INTR_ENA);
 
 	WriteOpReg(XHCI_CMD, CMD_RUN | CMD_EIE | CMD_HSEIE);
+
+	// wait for start up state
+	int32 tries = 100;
+	while ((ReadOpReg(XHCI_STS) & STS_HCH) != 0) {
+		snooze(1000);
+		if (tries-- < 0) {
+			TRACE_ERROR("start up timeout\n");
+			break;
+		}
+	}
 
 	fRootHubAddress = AllocateAddress();
 	fRootHub = new(std::nothrow) XHCIRootHub(RootObject(), fRootHubAddress);
@@ -324,8 +365,10 @@ XHCI::Start()
 	SetRootHub(fRootHub);
 
 	TRACE_ALWAYS("successfully started the controller\n");
+#ifdef TRACE_USB
 	TRACE("No-Op test\n");
-	QueueNoop();
+	Noop();
+#endif
 	return BusManager::Start();
 }
 
@@ -336,6 +379,11 @@ XHCI::SubmitTransfer(Transfer *transfer)
 	// short circuit the root hub
 	if (transfer->TransferPipe()->DeviceAddress() == fRootHubAddress)
 		return fRootHub->ProcessTransfer(this, transfer);
+
+	TRACE("SubmitTransfer()\n");
+	Pipe *pipe = transfer->TransferPipe();
+	if (pipe->Type() & USB_OBJECT_ISO_PIPE)
+		return B_UNSUPPORTED;
 
 	return B_OK;
 }
@@ -458,7 +506,7 @@ XHCI::GetPortStatus(uint8 index, usb_port_status *status)
 	TRACE("port status=0x%08lx\n", portStatus);
 
 	// build the status
-	switch(PS_SPEED_GET(portStatus)) {
+	switch (PS_SPEED_GET(portStatus)) {
 	case 3:
 		status->status |= PORT_STATUS_HIGH_SPEED;
 		break;
@@ -502,32 +550,30 @@ XHCI::SetPortFeature(uint8 index, uint16 feature)
 		return B_BAD_INDEX;
 
 	uint32 portRegister = XHCI_PORTSC(index);
-	uint32 portStatus = ReadOpReg(portRegister);
+	uint32 portStatus = ReadOpReg(portRegister) & ~PS_CLEAR;
 
 	switch (feature) {
 	case PORT_SUSPEND:
-		if ((portStatus & PS_PED ) == 0 || (portStatus & PS_PR)
+		if ((portStatus & PS_PED) == 0 || (portStatus & PS_PR)
 			|| (portStatus & PS_PLS_MASK) >= PS_XDEV_U3) {
 			TRACE_ERROR("USB core suspending device not in U0/U1/U2.\n");
 			return B_BAD_VALUE;
 		}
-		portStatus &= ~PS_CLEAR;
 		portStatus &= ~PS_PLS_MASK;
-		portStatus |= PS_LWS | PS_XDEV_U3;
-		WriteOpReg(portRegister, portStatus);
-		return B_OK;
+		WriteOpReg(portRegister, portStatus | PS_LWS | PS_XDEV_U3);
+		break;
 
 	case PORT_RESET:
-		portStatus &= ~PS_CLEAR;
 		WriteOpReg(portRegister, portStatus | PS_PR);
-		return B_OK;
+		break;
 
 	case PORT_POWER:
-		portStatus &= ~PS_CLEAR;
 		WriteOpReg(portRegister, portStatus | PS_PP);
-		return B_OK;
+		break;
+	default:
+		return B_BAD_VALUE;
 	}
-	return B_BAD_VALUE;
+	return B_OK;
 }
 
 
@@ -539,8 +585,7 @@ XHCI::ClearPortFeature(uint8 index, uint16 feature)
 		return B_BAD_INDEX;
 
 	uint32 portRegister = XHCI_PORTSC(index);
-	uint32 portStatus = ReadOpReg(portRegister);
-	portStatus &= ~PS_CLEAR;
+	uint32 portStatus = ReadOpReg(portRegister) & ~PS_CLEAR;
 
 	switch (feature) {
 	case PORT_SUSPEND:
@@ -550,7 +595,6 @@ XHCI::ClearPortFeature(uint8 index, uint16 feature)
 		if (portStatus & PS_XDEV_U3) {
 			if ((portStatus & PS_PED) == 0)
 				return B_BAD_VALUE;
-			portStatus &= ~PS_CLEAR;
 			portStatus &= ~PS_PLS_MASK;
 			WriteOpReg(portRegister, portStatus | PS_XDEV_U0 | PS_LWS);
 		}
@@ -598,20 +642,26 @@ XHCI::ControllerHalt()
 status_t
 XHCI::ControllerReset()
 {
-	WriteOpReg(XHCI_CMD, CMD_HCRST);
+	TRACE("ControllerReset() cmd: 0x%lx sts: 0x%lx\n", ReadOpReg(XHCI_CMD),
+		ReadOpReg(XHCI_STS));
+	WriteOpReg(XHCI_CMD, ReadOpReg(XHCI_CMD) | CMD_HCRST);
 
-	int32 tries = 100;
+	int32 tries = 250;
 	while (ReadOpReg(XHCI_CMD) & CMD_HCRST) {
 		snooze(1000);
-		if (tries-- < 0)
+		if (tries-- < 0) {
+			TRACE("ControllerReset() failed CMD_HCRST\n");
 			return B_ERROR;
+		}
 	}
 
-	tries = 100;
+	tries = 250;
 	while (ReadOpReg(XHCI_STS) & STS_CNR) {
 		snooze(1000);
-		if (tries-- < 0)
+		if (tries-- < 0) {
+			TRACE("ControllerReset() failed STS_CNR\n");
 			return B_ERROR;
+		}
 	}
 
 	return B_OK;
@@ -628,7 +678,7 @@ XHCI::InterruptHandler(void *data)
 int32
 XHCI::Interrupt()
 {
-	acquire_spinlock(&fSpinlock);
+	SpinLocker _(&fSpinlock);
 
 	uint32 status = ReadOpReg(XHCI_STS);
 	uint32 temp = ReadRunReg32(XHCI_IMAN(0));
@@ -637,7 +687,11 @@ XHCI::Interrupt()
 	TRACE("STS: %lx IRQ_PENDING: %lx\n", status, temp);
 
 	int32 result = B_HANDLED_INTERRUPT;
-	
+
+	if (status & STS_HCH) {
+		TRACE_ERROR("Host Controller halted\n");
+		return result;
+	}
 	if (status & STS_HSE) {
 		TRACE_ERROR("Host System Error\n");
 		return result;
@@ -649,19 +703,19 @@ XHCI::Interrupt()
 	uint16 i = fEventIdx;
 	uint8 j = fEventCcs;
 	uint8 t = 2;
-	
+
 	while (1) {
 		temp = fEventRing[i].dwtrb3;
 		uint8 k = (temp & TRB_3_CYCLE_BIT) ? 1 : 0;
 		if (j != k)
 			break;
 
-		uint8 event = TRB_TYPE_GET(temp);
+		uint8 event = TRB_3_TYPE_GET(temp);
 
 		TRACE("event[%u] = %u (0x%016llx 0x%08lx 0x%08lx)\n", i, event,
 			fEventRing[i].qwtrb0, fEventRing[i].dwtrb2, fEventRing[i].dwtrb3);
 		switch (event) {
-		case TRB_COMPLETION:
+		case TRB_TYPE_COMMAND_COMPLETION:
 			HandleCmdComplete(&fEventRing[i]);
 			result = B_INVOKE_SCHEDULER;
 			break;
@@ -671,7 +725,7 @@ XHCI::Interrupt()
 		}
 
 		i++;
-		if (i == MAX_EVENTS) {
+		if (i == XHCI_MAX_EVENTS) {
 			i = 0;
 			j ^= 1;
 			if (!--t)
@@ -686,9 +740,6 @@ XHCI::Interrupt()
 	addr |= ERST_EHB;
 	WriteRunReg32(XHCI_ERDP_LO(0), (uint32)addr);
 	WriteRunReg32(XHCI_ERDP_HI(0), (uint32)(addr >> 32));
-
-
-	release_spinlock(&fSpinlock);
 
 	return result;
 }
@@ -714,7 +765,7 @@ XHCI::QueueCommand(xhci_trb *trb)
 	j = fCmdCcs;
 
 	TRACE("command[%u] = %lx (0x%016llx, 0x%08lx, 0x%08lx)\n",
-		i, TRB_TYPE_GET(trb->dwtrb3),
+		i, TRB_3_TYPE_GET(trb->dwtrb3),
 		trb->qwtrb0, trb->dwtrb2, trb->dwtrb3);
 
 	fCmdRing[i].qwtrb0 = trb->qwtrb0;
@@ -728,15 +779,14 @@ XHCI::QueueCommand(xhci_trb *trb)
 	temp &= ~TRB_3_TC_BIT;
 	fCmdRing[i].dwtrb3 = temp;
 
-	fCmdAddr = fErst->rs_addr + (MAX_EVENTS + i) * sizeof(xhci_trb);
+	fCmdAddr = fErst->rs_addr + (XHCI_MAX_EVENTS + i) * sizeof(xhci_trb);
 
 	i++;
 
-	if (i == (MAX_COMMANDS - 1)) {
+	if (i == (XHCI_MAX_COMMANDS - 1)) {
+		temp = TRB_3_TYPE(TRB_TYPE_LINK) | TRB_3_TC_BIT;
 		if (j)
-			temp = TRB_3_CYCLE_BIT | TRB_TYPE(TRB_LINK);
-		else
-			temp = TRB_TYPE(TRB_LINK);
+			temp |= TRB_3_CYCLE_BIT;
 		fCmdRing[i].dwtrb3 = temp;
 
 		i = 0;
@@ -761,54 +811,176 @@ XHCI::HandleCmdComplete(xhci_trb *trb)
 }
 
 
-void
-XHCI::QueueNoop()
+status_t
+XHCI::DoCommand(xhci_trb *trb)
 {
-	xhci_trb trb;
-	uint32 temp;
+	if (!Lock())
+		return B_ERROR;
 
-	trb.qwtrb0 = 0;
-	trb.dwtrb2 = 0;
-	temp = TRB_TYPE(TRB_TR_NOOP);
-	trb.dwtrb3 = temp;
-	cpu_status state = disable_interrupts();
-	acquire_spinlock(&fSpinlock);
-	QueueCommand(&trb);
+	QueueCommand(trb);
 	Ring();
-	release_spinlock(&fSpinlock);
-	restore_interrupts(state);
+
+	if (acquire_sem(fCmdCompSem) < B_OK) {
+		Unlock();
+		return B_ERROR;
+	}
+	// eat up sems that have been released by multiple interrupts
+	int32 semCount = 0;
+	get_sem_count(fCmdCompSem, &semCount);
+	if (semCount > 0)
+		acquire_sem_etc(fCmdCompSem, semCount, B_RELATIVE_TIMEOUT, 0);
+
+	status_t status = B_OK;
+	TRACE("Command Complete\n");
+	if (TRB_2_COMP_CODE_GET(fCmdResult[0]) != COMP_SUCCESS) {
+		TRACE_ERROR("unsuccessful no-op command %ld\n",
+			TRB_2_COMP_CODE_GET(fCmdResult[0]));
+		status = B_IO_ERROR;
+	}
+
+	trb->dwtrb2 = fCmdResult[0];
+	trb->dwtrb3 = fCmdResult[1];
+
+	Unlock();
+	return status;
 }
 
 
-int32
-XHCI::CmdCompThread(void *data)
+status_t
+XHCI::Noop()
 {
-	((XHCI *)data)->CmdComplete();
+	xhci_trb trb;
+	trb.qwtrb0 = 0;
+	trb.dwtrb2 = 0;
+	trb.dwtrb3 = TRB_3_TYPE(TRB_TYPE_CMD_NOOP);
+
+	return DoCommand(&trb);
+}
+
+
+status_t
+XHCI::EnableSlot(uint8 *slot)
+{
+	xhci_trb trb;
+	trb.qwtrb0 = 0;
+	trb.dwtrb2 = 0;
+	trb.dwtrb3 = TRB_3_TYPE(TRB_TYPE_ENABLE_SLOT);
+
+	status_t status = DoCommand(&trb);
+	if (status != B_OK)
+		return status;
+
+	*slot = TRB_3_SLOT_GET(trb.dwtrb3);
 	return B_OK;
 }
 
 
-void
-XHCI::CmdComplete()
+status_t
+XHCI::DisableSlot(uint8 slot)
 {
-	while (!fStopThreads) {
-		if (acquire_sem(fCmdCompSem) < B_OK)
-			continue;
+	xhci_trb trb;
+	trb.qwtrb0 = 0;
+	trb.dwtrb2 = 0;
+	trb.dwtrb3 = TRB_3_TYPE(TRB_TYPE_DISABLE_SLOT) | TRB_3_SLOT(slot);
 
-		// eat up sems that have been released by multiple interrupts
-		int32 semCount = 0;
-		get_sem_count(fCmdCompSem, &semCount);
-		if (semCount > 0)
-			acquire_sem_etc(fCmdCompSem, semCount, B_RELATIVE_TIMEOUT, 0);
+	return DoCommand(&trb);
+}
 
-		TRACE("Command Complete\n");
-		if (COMP_CODE_GET(fCmdResult[0]) != COMP_SUCCESS) {
-			TRACE_ERROR("unsuccessful no-op command\n");
-			//continue;
-		}
-		snooze(1000000 * 5);
-		QueueNoop();
-	}
+
+status_t
+XHCI::SetAddress(uint64 inputContext, bool bsr, uint8 slot)
+{
+	xhci_trb trb;
+	trb.qwtrb0 = inputContext;
+	trb.dwtrb2 = 0;
+	trb.dwtrb3 = TRB_3_TYPE(TRB_TYPE_ADDRESS_DEVICE) | TRB_3_SLOT(slot);
+
+	if (bsr)
+		trb.dwtrb3 |= TRB_3_BSR_BIT;
+
+	return DoCommand(&trb);
+}
+
+
+status_t
+XHCI::ConfigureEndpoint(uint64 inputContext, bool deconfigure, uint8 slot)
+{
+	xhci_trb trb;
+	trb.qwtrb0 = inputContext;
+	trb.dwtrb2 = 0;
+	trb.dwtrb3 = TRB_3_TYPE(TRB_TYPE_CONFIGURE_ENDPOINT) | TRB_3_SLOT(slot);
+
+	if (deconfigure)
+		trb.dwtrb3 |= TRB_3_DCEP_BIT;
+
+	return DoCommand(&trb);
+}
+
+
+status_t
+XHCI::EvaluateContext(uint64 inputContext, uint8 slot)
+{
+	xhci_trb trb;
+	trb.qwtrb0 = inputContext;
+	trb.dwtrb2 = 0;
+	trb.dwtrb3 = TRB_3_TYPE(TRB_TYPE_EVALUATE_CONTEXT) | TRB_3_SLOT(slot);
+
+	return DoCommand(&trb);
+}
+
+
+status_t
+XHCI::ResetEndpoint(bool preserve, uint8 endpoint, uint8 slot)
+{
+	xhci_trb trb;
+	trb.qwtrb0 = 0;
+	trb.dwtrb2 = 0;
+	trb.dwtrb3 = TRB_3_TYPE(TRB_TYPE_RESET_ENDPOINT) | TRB_3_SLOT(slot)
+		| TRB_3_ENDPOINT(endpoint);
+	if (preserve)
+		trb.dwtrb3 |= TRB_3_PRSV_BIT;
+
+	return DoCommand(&trb);
+}
+
+
+status_t
+XHCI::StopEndpoint(bool suspend, uint8 endpoint, uint8 slot)
+{
+	xhci_trb trb;
+	trb.qwtrb0 = 0;
+	trb.dwtrb2 = 0;
+	trb.dwtrb3 = TRB_3_TYPE(TRB_TYPE_STOP_ENDPOINT) | TRB_3_SLOT(slot)
+		| TRB_3_ENDPOINT(endpoint);
+	if (suspend)
+		trb.dwtrb3 |= TRB_3_SUSPEND_ENDPOINT_BIT;
+
+	return DoCommand(&trb);
+}
+
+
+status_t
+XHCI::SetTRDequeue(uint64 dequeue, uint16 stream, uint8 endpoint, uint8 slot)
+{
+	xhci_trb trb;
+	trb.qwtrb0 = dequeue;
+	trb.dwtrb2 = TRB_2_STREAM(stream);
+	trb.dwtrb3 = TRB_3_TYPE(TRB_TYPE_SET_TR_DEQUEUE) | TRB_3_SLOT(slot)
+		| TRB_3_ENDPOINT(endpoint);
+
+	return DoCommand(&trb);
+}
+
+
+status_t
+XHCI::ResetDevice(uint8 slot)
+{
+	xhci_trb trb;
+	trb.qwtrb0 = 0;
+	trb.dwtrb2 = 0;
+	trb.dwtrb3 = TRB_3_TYPE(TRB_TYPE_RESET_DEVICE) | TRB_3_SLOT(slot);
+
+	return DoCommand(&trb);
 }
 
 

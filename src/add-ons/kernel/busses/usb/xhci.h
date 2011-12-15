@@ -14,43 +14,9 @@
 #include "xhci_hardware.h"
 
 
-#define MAX_EVENTS		(16 * 13)
-#define MAX_COMMANDS		(16 * 1)
-#define XHCI_MAX_SLOTS		256
-#define XHCI_MAX_PORTS		127
-
-
 struct pci_info;
 struct pci_module_info;
 class XHCIRootHub;
-
-
-struct xhci_trb {
-	uint64	qwtrb0;
-	uint32	dwtrb2;
-	uint32	dwtrb3;
-};
-
-
-struct xhci_segment {
-	xhci_trb *		trbs;
-	xhci_segment *	next;
-};
-
-
-struct xhci_ring {
-	xhci_segment *	first_seg;
-	xhci_trb *		enqueue;
-	xhci_trb *		dequeue;
-};
-
-
-// Section 6.5
-struct xhci_erst_element {
-	uint64	rs_addr;
-	uint32	rs_size;
-	uint32	rsvdz;
-} __attribute__((__aligned__(64)));
 
 
 class XHCI : public BusManager {
@@ -68,12 +34,12 @@ public:
 	static	status_t			AddTo(Stack *stack);
 
 			// Port operations for root hub
-			uint8				PortCount() { return fPortCount; };
+			uint8				PortCount() const { return fPortCount; }
 			status_t			GetPortStatus(uint8 index, usb_port_status *status);
 			status_t			SetPortFeature(uint8 index, uint16 feature);
 			status_t			ClearPortFeature(uint8 index, uint16 feature);
 
-	virtual	const char *		TypeName() const { return "xhci"; };
+	virtual	const char *		TypeName() const { return "xhci"; }
 
 private:
 			// Controller resets
@@ -91,14 +57,27 @@ private:
 			// Command
 			void				QueueCommand(xhci_trb *trb);
 			void				HandleCmdComplete(xhci_trb *trb);
-			
+			status_t			DoCommand(xhci_trb *trb);
 			//Doorbell
 			void				Ring();
 
-			//no-op
-			void				QueueNoop();
-	static	int32				CmdCompThread(void *data);
-			void				CmdComplete();
+			// Commands
+			status_t			Noop();
+			status_t			EnableSlot(uint8 *slot);
+			status_t			DisableSlot(uint8 slot);
+			status_t			SetAddress(uint64 inputContext, bool bsr,
+									uint8 slot);
+			status_t			ConfigureEndpoint(uint64 inputContext,
+									bool deconfigure, uint8 slot);
+			status_t			EvaluateContext(uint64 inputContext,
+									uint8 slot);
+			status_t			ResetEndpoint(bool preserve, uint8 endpoint,
+									uint8 slot);
+			status_t			StopEndpoint(bool suspend, uint8 endpoint,
+									uint8 slot);
+			status_t			SetTRDequeue(uint64 dequeue, uint16 stream,
+									uint8 endpoint, uint8 slot);
+			status_t			ResetDevice(uint8 slot);
 
 			// Operational register functions
 	inline	void				WriteOpReg(uint32 reg, uint32 value);
@@ -136,12 +115,11 @@ private:
 			uint32				fCmdResult[2];
 
 			area_id				fDcbaArea;
-			uint8 *				fDcba;
+			struct xhci_device_context_array * fDcba;
 
 			spinlock			fSpinlock;
 
 			sem_id				fCmdCompSem;
-			thread_id			fCmdCompThread;
 			sem_id				fFinishTransfersSem;
 			thread_id			fFinishThread;
 			bool				fStopThreads;
@@ -153,6 +131,11 @@ private:
 			// Port management
 			uint8				fPortCount;
 			uint8				fSlotCount;
+
+			// Scratchpad
+			uint8				fScratchpadCount;
+			area_id				fScratchpadArea[XHCI_MAX_SCRATCHPADS];
+			void *				fScratchpad[XHCI_MAX_SCRATCHPADS];
 
 			uint16				fEventIdx;
 			uint16				fCmdIdx;
