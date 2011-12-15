@@ -8,7 +8,7 @@
 
 #include <new>
 
-#include "ICUConverterManager.h"
+#include <unicode/ucnv.h>
 
 
 namespace BPrivate {
@@ -16,15 +16,16 @@ namespace Libroot {
 
 
 ICUThreadLocalStorageValue::ICUThreadLocalStorageValue()
-	: converterID(0)
+	: converter(NULL)
 {
+	charset[0] = '\0';
 }
 
 
 ICUThreadLocalStorageValue::~ICUThreadLocalStorageValue()
 {
-	if (converterID != 0)
-		ICUConverterManager::Instance()->DropConverter(converterID);
+	if (converter != NULL)
+		ucnv_close(converter);
 }
 
 

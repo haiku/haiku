@@ -49,7 +49,7 @@ public:
 
 private:
 			status_t			_GetConverterForMbState(mbstate_t* mbState,
-									ICUConverterRef& converterRefOut);
+									UConverter*& converterOut);
 
 			status_t			_DropConverterFromMbState(mbstate_t* mbState);
 

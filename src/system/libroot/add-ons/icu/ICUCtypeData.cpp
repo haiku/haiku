@@ -10,10 +10,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <algorithm>
+
 #include <unicode/uchar.h>
+
+#include <Debug.h>
 
 
 //#define TRACE_CTYPE
+#undef TRACE
 #ifdef TRACE_CTYPE
 #	include <OS.h>
 #	define TRACE(x) debug_printf x
@@ -58,12 +63,11 @@ ICUCtypeData::SetTo(const Locale& locale, const char* posixLocaleName)
 
 	UErrorCode icuStatus = U_ZERO_ERROR;
 
-	ICUConverterRef converterRef;
-	result = _GetConverter(converterRef);
+	UConverter* converter;
+	result = _GetConverter(converter);
 	if (result != B_OK)
 		return result;
 
-	UConverter* converter = converterRef->Converter();
 	ucnv_reset(converter);
 
 	fDataBridge->setMbCurMax(ucnv_getMaxCharSize(converter));
@@ -207,15 +211,13 @@ status_t
 ICUCtypeData::MultibyteToWchar(wchar_t* wcOut, const char* mb, size_t mbLen,
 	mbstate_t* mbState, size_t& lengthOut)
 {
-	ICUConverterRef converterRef;
-	status_t result = _GetConverterForMbState(mbState, converterRef);
+	UConverter* converter = NULL;
+	status_t result = _GetConverterForMbState(mbState, converter);
 	if (result != B_OK) {
-		TRACE(("MultibyteToWchar(): couldn't get converter for ID %d - %lx\n",
-			mbState->converterID, result));
+		TRACE(("MultibyteToWchar(): couldn't get converter for mbstate %p - "
+				"%lx\n", mbState, result));
 		return result;
 	}
-
-	UConverter* converter = converterRef->Converter();
 
 	// do the conversion
 	UErrorCode icuStatus = U_ZERO_ERROR;
@@ -233,8 +235,6 @@ ICUCtypeData::MultibyteToWchar(wchar_t* wcOut, const char* mb, size_t mbLen,
 		icuStatus = U_ZERO_ERROR;
 	}
 
-	UChar32 unicodeChar = 0xBADBEEF;
-
 	if (!U_SUCCESS(icuStatus)) {
 		// conversion failed because of illegal character sequence
 		TRACE(("MultibyteToWchar(): illegal character sequence\n"));
@@ -247,6 +247,7 @@ ICUCtypeData::MultibyteToWchar(wchar_t* wcOut, const char* mb, size_t mbLen,
 		mbState->count = sourceLengthUsed;
 		result = B_BAD_INDEX;
 	} else {
+		UChar32 unicodeChar = 0xBADBEEF;
 		U16_GET(targetBuffer, 0, 0, 2, unicodeChar);
 
 		if (unicodeChar == 0) {
@@ -274,15 +275,13 @@ ICUCtypeData::MultibyteStringToWchar(wchar_t* wcDest, size_t wcDestLength,
 	const char** mbSource, size_t mbSourceLength, mbstate_t* mbState,
 	size_t& lengthOut)
 {
-	ICUConverterRef converterRef;
-	status_t result = _GetConverterForMbState(mbState, converterRef);
+	UConverter* converter = NULL;
+	status_t result = _GetConverterForMbState(mbState, converter);
 	if (result != B_OK) {
-		TRACE(("MultibyteStringToWchar(): couldn't get converter for ID %d -"
-			" %lx\n", mbState->converterID, result));
+		TRACE(("MultibyteStringToWchar(): couldn't get converter for mbstate %p"
+				" - %lx\n", mbState, result));
 		return result;
 	}
-
-	UConverter* converter = converterRef->Converter();
 
 	bool wcsIsTerminated = false;
 	const char* source = *mbSource;
@@ -346,15 +345,13 @@ status_t
 ICUCtypeData::WcharToMultibyte(char* mbOut, wchar_t wc, mbstate_t* mbState,
 	size_t& lengthOut)
 {
-	ICUConverterRef converterRef;
-	status_t result = _GetConverterForMbState(mbState, converterRef);
+	UConverter* converter = NULL;
+	status_t result = _GetConverterForMbState(mbState, converter);
 	if (result != B_OK) {
-		TRACE(("WcharToMultibyte(): couldn't get converter for ID %d - %lx\n",
-			mbState->converterID, result));
+		TRACE(("WcharToMultibyte(): couldn't get converter for mbstate %p - "
+				"%lx\n", mbState, result));
 		return result;
 	}
-
-	UConverter* converter = converterRef->Converter();
 
 	// convert input from UTF-32 to UTF-16
 	UChar ucharBuffer[2];
@@ -409,15 +406,13 @@ ICUCtypeData::WcharStringToMultibyte(char* mbDest, size_t mbDestLength,
 	const wchar_t** wcSource, size_t wcSourceLength, mbstate_t* mbState,
 	size_t& lengthOut)
 {
-	ICUConverterRef converterRef;
-	status_t result = _GetConverterForMbState(mbState, converterRef);
+	UConverter* converter = NULL;
+	status_t result = _GetConverterForMbState(mbState, converter);
 	if (result != B_OK) {
-		TRACE(("WcharStringToMultibyte(): couldn't get converter for ID %d "
-			"- %lx\n", mbState->converterID, result));
+		TRACE(("WcharStringToMultibyte(): couldn't get converter for mbstate %p"
+			" - %lx\n", mbState, result));
 		return result;
 	}
-
-	UConverter* converter = converterRef->Converter();
 
 	bool mbsIsTerminated = false;
 	const UChar32* source = (UChar32*)*wcSource;
@@ -509,29 +504,45 @@ ICUCtypeData::GetLanginfo(int index)
 
 status_t
 ICUCtypeData::_GetConverterForMbState(mbstate_t* mbState,
-	ICUConverterRef& converterRefOut)
+	UConverter*& converterOut)
 {
-	ICUConverterRef converterRef;
-	status_t result = ICUConverterManager::Instance()->GetConverter(
-		mbState->converterID, converterRef);
-	if (result == B_OK) {
-		if (strcmp(converterRef->Charset(), fGivenCharset) == 0) {
-			converterRefOut = converterRef;
-			return B_OK;
-		}
-
-		// charset no longer matches the converter, we need to dump it and
-		// create a new one
-		_DropConverterFromMbState(mbState);
+	if (strcmp(mbState->charset, fGivenCharset) == 0
+			&& (char*)mbState->converter >= mbState->data
+			&& (char*)mbState->converter < mbState->data + 8) {
+		// charset matches and converter actually lives in *this* mbState,
+		// so we can use it (if the converter points to the outside, it means
+		// that the mbstate_t has been copied)
+		converterOut = (UConverter*)mbState->converter;
+		return B_OK;
 	}
 
-	// create a new converter for the current charset
-	result = ICUConverterManager::Instance()->CreateConverter(fGivenCharset,
-		converterRef, mbState->converterID);
+	// charset no longer matches the converter, we need to dump it and
+	// create a new one
+	_DropConverterFromMbState(mbState);
+
+	// create a new converter for the current charset ...
+	UConverter* icuConverter;
+	status_t result = _GetConverter(icuConverter);
 	if (result != B_OK)
 		return result;
 
-	converterRefOut = converterRef;
+	// ... and clone it into the mbstate
+	UErrorCode icuStatus = U_ZERO_ERROR;
+	int32_t bufferSize = sizeof(mbState->data);
+	UConverter* clone
+		= ucnv_safeClone(icuConverter, mbState->data, &bufferSize, &icuStatus);
+	if (clone == NULL || !U_SUCCESS(icuStatus))
+		return B_ERROR;
+
+	if ((char*)clone < mbState->data || (char*)clone >= mbState->data + 8) {
+		// buffer is too small (shouldn't happen according to ICU docs)
+		return B_NO_MEMORY;
+	}
+
+	strlcpy(mbState->charset, fGivenCharset, sizeof(mbState->charset));
+	mbState->converter = clone;
+
+	converterOut = clone;
 
 	return B_OK;
 }
@@ -540,8 +551,9 @@ ICUCtypeData::_GetConverterForMbState(mbstate_t* mbState,
 status_t
 ICUCtypeData::_DropConverterFromMbState(mbstate_t* mbState)
 {
-	ICUConverterManager::Instance()->DropConverter(mbState->converterID);
-	mbState->converterID = 0;
+	if (mbState->converter != NULL)
+		ucnv_close((UConverter*)mbState->converter);
+	memset(mbState, 0, sizeof(mbstate_t));
 
 	return B_OK;
 }

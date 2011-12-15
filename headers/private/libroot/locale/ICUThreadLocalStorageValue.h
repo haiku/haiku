@@ -8,6 +8,8 @@
 
 #include <pthread.h>
 
+#include <unicode/ucnv.h>
+
 #include <SupportDefs.h>
 
 
@@ -15,11 +17,9 @@ namespace BPrivate {
 namespace Libroot {
 
 
-typedef unsigned int ICUConverterID;
-
-
 struct ICUThreadLocalStorageValue {
-			ICUConverterID		converterID;
+			UConverter*			converter;
+			char				charset[64];
 
 								ICUThreadLocalStorageValue();
 								~ICUThreadLocalStorageValue();

@@ -8,12 +8,11 @@
 #include <pthread.h>
 
 #include <unicode/locid.h>
-#include <unicode/ucnv.h>
 #include <unicode/unistr.h>
 
 #include <SupportDefs.h>
 
-#include "ICUConverterManager.h"
+#include "ICUThreadLocalStorageValue.h"
 
 
 namespace BPrivate {
@@ -38,7 +37,7 @@ protected:
 									char* destination, int destinationSize,
 									const char* defaultValue = "");
 
-			status_t			_GetConverter(ICUConverterRef& converterRefOut);
+			status_t			_GetConverter(UConverter*& converterOut);
 
 	static	const uint16		skMaxPosixLocaleNameLen = 128;
 	static	const size_t		skLCBufSize = 16;
