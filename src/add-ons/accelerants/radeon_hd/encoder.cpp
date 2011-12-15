@@ -654,6 +654,8 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 			args.v4.ucHPD_ID = 0;
 			ERROR("%s: tableMinor 4 TODO!\n", __func__);
 			break;
+		default:
+			ERROR("%s: unknown tableMinor!\n", __func__);
 	}
 
 	status_t result = atom_execute_table(gAtomContext, index, (uint32*)&args);
