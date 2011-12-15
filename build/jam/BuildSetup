@@ -1363,6 +1363,9 @@ if $(HAIKU_NO_WERROR) != 1 {
 	EnableWerror src preferences ;
 	EnableWerror src servers ;
 	EnableWerror src system kernel ;
+	EnableWerror src system libroot add-ons ;
+	EnableWerror src system libroot posix locale ;
+	EnableWerror src system libroot posix wchar ;
 	EnableWerror src system runtime_loader ;
 }
 
