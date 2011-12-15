@@ -25,6 +25,7 @@ status_t dp_aux_set_i2c_byte(uint32 hwPin, uint16 address,
 status_t dp_aux_get_i2c_byte(uint32 hwPin, uint16 address,
 	uint8* data, bool end);
 
+uint32 dp_get_lane_count(uint32 connectorIndex, display_mode* mode);
 uint32 dp_get_link_clock(uint32 connectorIndex);
 uint32 dp_get_link_clock_encode(uint32 dpLinkClock);
 uint32 dp_get_link_clock_decode(uint32 dpLinkClock);

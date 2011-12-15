@@ -713,16 +713,15 @@ encoder_external_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 						= B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
 					args.v1.sDigEncoder.ucEncoderMode
 						= display_get_encoder_mode(connectorIndex);
-					#if 0
-					if (0) { // ENCODER_MODE_IS_DP(v1.sDigEncoder.ucEncoderMode)
-						if (dp_clock == 270000) {
+
+					if (connector_is_dp(connectorIndex)) {
+						if (gDPInfo[connectorIndex]->clock == 270000) {
 							args.v1.sDigEncoder.ucConfig
 								|= ATOM_ENCODER_CONFIG_DPLINKRATE_2_70GHZ;
 						}
-						args.v1.sDigEncoder.ucLaneNum = dp_lane_count;
+						args.v1.sDigEncoder.ucLaneNum
+							= gDPInfo[connectorIndex]->laneCount;
 					} else if (pixelClock > 165000) {
-					#endif
-					if (pixelClock > 165000) {
 						args.v1.sDigEncoder.ucLaneNum = 8;
 					} else {
 						args.v1.sDigEncoder.ucLaneNum = 4;
@@ -742,19 +741,17 @@ encoder_external_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 					args.v3.sExtEncoder.ucEncoderMode
 						= display_get_encoder_mode(connectorIndex);
 
-					#if 0
-					if (ENCODER_MODE_IS_DP(args.v3.sExtEncoder.ucEncoderMode)) {
-						if (dp_clock == 270000) {
+					if (connector_is_dp(connectorIndex)) {
+						if (gDPInfo[connectorIndex]->clock == 270000) {
 							args.v3.sExtEncoder.ucConfig
 								|=EXTERNAL_ENCODER_CONFIG_V3_DPLINKRATE_2_70GHZ;
-						} else if (dp_clock == 540000) {
+						} else if (gDPInfo[connectorIndex]->clock == 540000) {
 							args.v3.sExtEncoder.ucConfig
 								|=EXTERNAL_ENCODER_CONFIG_V3_DPLINKRATE_5_40GHZ;
 						}
-						args.v3.sExtEncoder.ucLaneNum = dp_lane_count;
+						args.v1.sDigEncoder.ucLaneNum
+							= gDPInfo[connectorIndex]->laneCount;
 					} else if (pixelClock > 165000) {
-					#endif
-					if (pixelClock > 165000) {
 						args.v3.sExtEncoder.ucLaneNum = 8;
 					} else {
 						args.v3.sExtEncoder.ucLaneNum = 4;

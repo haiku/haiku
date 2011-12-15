@@ -256,6 +256,12 @@ detect_displays()
 		if (displayIndex >= MAX_DISPLAY)
 			continue;
 
+		if (gConnector[id]->encoder.isDPBridge == true) {
+			// if this is a DisplayPort Bridge, setup ddc on bus
+			TRACE("%s: is bridge, performing bridge DDC setup\n", __func__);
+			encoder_external_setup(id, 0, EXTERNAL_ENCODER_ACTION_V3_DDC_SETUP);
+		}
+
 		if (connector_read_edid(id, &gDisplay[displayIndex]->edid_info)) {
 
 			if (gConnector[id]->encoder.type == VIDEO_ENCODER_TVDAC

@@ -699,12 +699,6 @@ connector_probe()
 					break;
 			}
 
-			if (gConnector[connectorIndex]->encoder.isDPBridge == true) {
-				TRACE("%s: is bridge, performing bridge DDC setup\n", __func__);
-				encoder_external_setup(connectorIndex, 0,
-					EXTERNAL_ENCODER_ACTION_V3_DDC_SETUP);
-			}
-
 			connectorIndex++;
 		} // END for each valid connector
 	} // end for each display path

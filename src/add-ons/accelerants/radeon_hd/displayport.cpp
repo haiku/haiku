@@ -14,6 +14,7 @@
 #include "accelerant.h"
 #include "accelerant_protos.h"
 #include "connector.h"
+#include "mode.h"
 
 
 #undef TRACE
@@ -360,11 +361,10 @@ dp_get_link_clock_decode(uint32 dpLinkClock)
 }
 
 
-static uint32
-dp_get_lane_count(uint32 connectorIndex, uint32 pixelClock)
+uint32
+dp_get_lane_count(uint32 connectorIndex, display_mode* mode)
 {
-	// TODO: bpp hardcoded
-	uint32 bitsPerPixel = 32;
+	uint32 bitsPerPixel = get_mode_bpp(mode);
 
 	uint32 maxLaneCount = gDPInfo[connectorIndex]->config[DP_MAX_LANE_COUNT]
 		& DP_MAX_LANE_COUNT_MASK;
@@ -375,7 +375,7 @@ dp_get_lane_count(uint32 connectorIndex, uint32 pixelClock)
 	uint32 lane;
 	for (lane = 1; lane < maxLaneCount; lane <<= 1) {
 		uint32 maxDPPixelClock = (maxLinkRate * lane * 8) / bitsPerPixel;
-		if (pixelClock <= maxDPPixelClock)
+		if (mode->timing.pixel_clock <= maxDPPixelClock)
 			break;
 	}
 	TRACE("%s: connector: %" B_PRIu32 ", lanes: %" B_PRIu32 "\n", __func__,
@@ -413,6 +413,8 @@ dp_setup_connectors()
 			gDPInfo[index]->valid = true;
 			memcpy(gDPInfo[index]->config, auxMessage, 8);
 		}
+
+		gDPInfo[index]->clock = dp_get_link_clock(index);
 	}
 }
 
@@ -428,10 +430,6 @@ dp_link_train(uint8 crtcID, display_mode* mode)
 			__func__, connectorIndex);
 		return B_ERROR;
 	}
-
-	gDPInfo[connectorIndex]->clock = dp_get_link_clock(connectorIndex);
-	gDPInfo[connectorIndex]->laneCount
-		= dp_get_lane_count(connectorIndex, mode->timing.pixel_clock);
 
 	int index = GetIndexIntoMasterTable(COMMAND, DPEncoderService);
 	// Table version

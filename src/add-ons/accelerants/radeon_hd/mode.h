@@ -33,6 +33,7 @@ status_t is_mode_sane(display_mode* mode);
 uint32 radeon_dpms_capabilities(void);
 uint32 radeon_dpms_mode(void);
 void radeon_dpms_set(int mode);
+uint32 get_mode_bpp(display_mode* mode);
 
 
 #endif /*RADEON_HD_MODE_H*/

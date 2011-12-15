@@ -37,6 +37,7 @@ extern "C" void _sPrintf(const char* format, ...);
 #	define TRACE(x...) ;
 #endif
 
+#define ERROR(x...) _sPrintf("radeon_hd: " x)
 
 status_t
 create_mode_list(void)
@@ -171,6 +172,11 @@ radeon_set_display_mode(display_mode* mode)
 			continue;
 
 		uint16 connectorIndex = gDisplay[id]->connectorIndex;
+
+		// Determine DP lanes if DP
+		if (connector_is_dp(connectorIndex))
+			gDPInfo[connectorIndex]->laneCount
+				= dp_get_lane_count(connectorIndex, mode);
 
 		// *** encoder prep
 		encoder_output_lock(true);
@@ -399,3 +405,23 @@ is_mode_sane(display_mode* mode)
 }
 
 
+uint32
+get_mode_bpp(display_mode* mode)
+{
+	// Get bitsPerPixel for given mode
+
+	switch (mode->space) {
+		case B_CMAP8:
+			return 8;
+		case B_RGB15_LITTLE:
+			return 15;
+		case B_RGB16_LITTLE:
+			return 16;
+		case B_RGB24_LITTLE:
+		case B_RGB32_LITTLE:
+			return 32;
+	}
+	ERROR("%s: Unknown colorspace for mode, guessing 32 bits per pixel\n",
+		__func__);
+	return 32;
+}
