@@ -32,7 +32,6 @@ local sources =
 	numailkit.cpp
 	ProtocolConfigView.cpp
 	ServerConnection.cpp
-	StringList.cpp
 ;
 
 

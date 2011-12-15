@@ -379,7 +379,7 @@ BStringList::Unflatten(type_code code, const void* buffer, ssize_t size)
 		return B_ERROR;
 		
 	const char* str = (const char*)buffer;
-	for (off_t offset = 0; offset < size; offset ++) {
+	for (off_t offset = 0; offset < size; offset++) {
 		if (((int8*)buffer)[offset] == 0) {
 			Add(str);
 			str = (const char*)buffer + offset + 1;
