@@ -394,7 +394,7 @@ while [ $# -gt 0 ] ; do
 				x86)	HAIKU_GCC_MACHINE=i586-pc-haiku;;
 				x86_64)	HAIKU_GCC_MACHINE=x86_64-pc-haiku; targetArch=x86_64;;
 				ppc)	HAIKU_GCC_MACHINE=powerpc-apple-haiku; targetArch=ppc;;
-				m68k)	HAIKU_GCC_MACHINE=m68k-unknown-haiku; targetArch=m86k;;
+				m68k)	HAIKU_GCC_MACHINE=m68k-unknown-haiku; targetArch=m68k;;
 				arm)	HAIKU_GCC_MACHINE=arm-unknown-haiku; targetArch=arm;;
 				mipsel)	HAIKU_GCC_MACHINE=mipsel-unknown-haiku; targetArch=mips;;
 				*)		echo "Unsupported target architecture: $2"
