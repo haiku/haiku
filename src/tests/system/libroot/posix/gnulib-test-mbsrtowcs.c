@@ -216,9 +216,6 @@ int main(int argc, char *argv[])
 					assert(!mbsinit (&state));
 					input[1] = '\0';
 
-// Copying mbstate_t doesn't really copy the ICU-converter's state, so this
-// doesn't work on Haiku.
-#ifndef __HAIKU__
 					src = input + 2;
 					temp_state = state;
 					ret = mbsrtowcs(NULL, &src, unlimited ? BUFSIZE : 2,
@@ -226,7 +223,6 @@ int main(int argc, char *argv[])
 					assert(ret == 4);
 					assert(src == input + 2);
 					assert(!mbsinit (&state));
-#endif
 
 					src = input + 2;
 					ret = mbsrtowcs(buf, &src, unlimited ? BUFSIZE : 2, &state);
@@ -285,9 +281,6 @@ int main(int argc, char *argv[])
 					assert(!mbsinit (&state));
 					input[3] = '\0';
 
-// Copying mbstate_t doesn't really copy the ICU-converter's state, so this
-// doesn't work on Haiku.
-#ifndef __HAIKU__
 					src = input + 4;
 					temp_state = state;
 					ret = mbsrtowcs(NULL, &src, unlimited ? BUFSIZE : 2,
@@ -295,7 +288,6 @@ int main(int argc, char *argv[])
 					assert(ret == 3);
 					assert(src == input + 4);
 					assert(!mbsinit (&state));
-#endif
 
 					src = input + 4;
 					ret = mbsrtowcs(buf, &src, unlimited ? BUFSIZE : 2, &state);
@@ -340,9 +332,6 @@ int main(int argc, char *argv[])
 					assert(!mbsinit (&state));
 					input[1] = '\0';
 
-// Copying mbstate_t doesn't really copy the ICU-converter's state, so this
-// doesn't work on Haiku.
-#ifndef __HAIKU__
 					src = input + 2;
 					temp_state = state;
 					ret = mbsrtowcs(NULL, &src, unlimited ? BUFSIZE : 2,
@@ -350,7 +339,6 @@ int main(int argc, char *argv[])
 					assert(ret == 4);
 					assert(src == input + 2);
 					assert(!mbsinit (&state));
-#endif
 
 					src = input + 2;
 					ret = mbsrtowcs(buf, &src, unlimited ? BUFSIZE : 2, &state);
