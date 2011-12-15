@@ -503,7 +503,7 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 	radeon_shared_info &info = *gInfo->shared_info;
 
 	int index = 0;
-	if (info.dceMajor > 4)
+	if (info.dceMajor >= 4)
 		index = GetIndexIntoMasterTable(COMMAND, DIGxEncoderControl);
 	else {
 		if (encoder_pick_dig(connectorIndex))
