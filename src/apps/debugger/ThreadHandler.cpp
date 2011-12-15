@@ -253,7 +253,7 @@ ThreadHandler::HandleThreadAction(uint32 action)
 
 	if (stackTrace == NULL && cpuState != NULL) {
 		if (fDebuggerInterface->GetArchitecture()->CreateStackTrace(
-				fThread->GetTeam(), this, cpuState, stackTrace) == B_OK) {
+				fThread->GetTeam(), this, cpuState, stackTrace, 1) == B_OK) {
 			stackTraceReference.SetTo(stackTrace, true);
 		}
 	}
@@ -324,7 +324,7 @@ ThreadHandler::HandleThreadAction(uint32 action)
 		fStepMode = STEP_INTO;
 		_SingleStepThread(frame->GetCpuState()->InstructionPointer());
 	} else {
-		fPreviousFrameAddress = cpuState->StackFramePointer();
+		fPreviousFrameAddress = frame->FrameAddress();
 		// step over
 		fStepMode = STEP_OVER;
 		if (!_DoStepOver(frame->GetCpuState()))
@@ -559,17 +559,32 @@ ThreadHandler::_HandleBreakpointHitStep(CpuState* cpuState)
 	switch (fStepMode) {
 		case STEP_OVER:
 		{
-			// If we're not in the same frame we started in, keep executing.
-			if (cpuState->StackFramePointer() != fPreviousFrameAddress)
-			{
-				status_t error = _InstallTemporaryBreakpoint(
-					cpuState->InstructionPointer());
-				if (error != B_OK)
-					_StepFallback();
-				else
-					_RunThread(cpuState->InstructionPointer());
-				return true;
+			StackTrace* stackTrace = fThread->GetStackTrace();
+			BReference<StackTrace> stackTraceReference(stackTrace);
+
+			if (stackTrace == NULL && cpuState != NULL) {
+				if (fDebuggerInterface->GetArchitecture()->CreateStackTrace(
+						fThread->GetTeam(), this, cpuState, stackTrace, 1)
+						== B_OK) {
+					stackTraceReference.SetTo(stackTrace, true);
+				}
 			}
+			if (stackTrace != NULL) {
+				StackFrame* frame = stackTrace->FrameAt(0);
+				// If we're not in the same frame we started in,
+				// keep executing.
+				if (frame != NULL && fPreviousFrameAddress
+						!= stackTrace->FrameAt(0)->FrameAddress()) {
+					status_t error = _InstallTemporaryBreakpoint(
+						cpuState->InstructionPointer());
+					if (error != B_OK)
+						_StepFallback();
+					else
+						_RunThread(cpuState->InstructionPointer());
+					return true;
+				}
+			}
+
 			// If we're still in the statement, we continue single-stepping,
 			// otherwise we're done.
 			if (fStepStatement->ContainsAddress(
@@ -635,7 +650,8 @@ ThreadHandler::_HandleSingleStepStep(CpuState* cpuState)
 
 			if (stackTrace == NULL && cpuState != NULL) {
 				if (fDebuggerInterface->GetArchitecture()->CreateStackTrace(
-						fThread->GetTeam(), this, cpuState, stackTrace) == B_OK) {
+						fThread->GetTeam(), this, cpuState, stackTrace, 1)
+						== B_OK) {
 					stackTraceReference.SetTo(stackTrace, true);
 				}
 			}
