@@ -368,10 +368,9 @@ ProcessController::MessageReceived(BMessage *message)
 		{
 			BPath terminalPath;
 			if (find_directory(B_SYSTEM_APPS_DIRECTORY, &terminalPath) == B_OK
-				&& terminalPath.Append("Deskbar") == B_OK) {
+				&& terminalPath.Append("Terminal") == B_OK) {
 				launch(kTerminalSig, terminalPath.Path());
 			}
-			launch(kTerminalSig, terminalPath.Path());
 			break;
 		}
 
