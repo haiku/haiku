@@ -100,7 +100,9 @@ public:
 			status_t			CreateStackTrace(Team* team,
 									ImageDebugInfoProvider* imageInfoProvider,
 									CpuState* cpuState,
-									StackTrace*& _stackTrace);
+									StackTrace*& _stackTrace,
+									int32 maxStackDepth = -1,
+									bool useExistingTrace = false);
 										// team is not locked
 
 protected:
