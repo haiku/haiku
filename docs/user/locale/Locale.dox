@@ -8,8 +8,8 @@
  *		Oliver Tappe, zooey@hirschkaefer.de.
  * 
  * Corresponds to:
- *		/trunk/headers/os/locale/Locale.h	 rev 42274
- *		/trunk/src/kits/locale/Locale.cpp	 rev 42274
+ *		/trunk/headers/os/locale/Locale.h	 rev 43095
+ *		/trunk/src/kits/locale/Locale.cpp	 rev 43095
  */
 
 
@@ -129,6 +129,8 @@
 		const BFormattingConventions& conventions)
 	\brief Sets the formatting convention for this locale.
 
+	If unable to lock the BLocale \a conventions is left untouched.
+
 	\param conventions The formatting convention to set.
 */
 
@@ -137,6 +139,8 @@
 	\fn void BLocale::SetCollator(const BCollator& newCollator)
 	\brief Set the collator for this locale.
 
+	If unable to lock the BLocale \a newCollator is left untouched.
+
 	\param newCollator The collator to set.
 */
 
@@ -144,6 +148,8 @@
 /*!
 	\fn void BLocale::SetLanguage(const BLanguage& newLanguage)
 	\brief Set the language for this locale.
+
+	If unable to lock the BLocale \a newLanguage is left untouched.
 
 	\param newLanguage The code of the language to set to locale to.
 */
@@ -207,15 +213,16 @@
 
 	\param string The string buffer to fill with the formatted date.
 	\param fieldPositions ???
-	\param fieldCount ???
+	\param fieldCount The number of fields.
 	\param time The time (in seconds since epoch) to format
 	\param style Specify the long format (with day name, full
 		month name) or the short format, 08/12/2010 or similar.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
-	\retval B_ERROR Unable to lock the BLocale or an error formatting the date.
+	\retval B_ERROR Unable to lock the BLocale.
 	\retval B_NO_MEMORY Ran out of memory while creating the DateFormat object.
+	\retval B_BAD_VALUE An error occurred while performing the date formatting.
 
 	\sa BLocale::FormatTime(BString* string, int*& fieldPositions,
 		int& fieldCount, time_t time, BTimeFormatStyle style) const
@@ -227,7 +234,7 @@
 		BDateFormatStyle style) const
 	\brief Get the type of each field in the date format of the locale.
 
-	This function is most often used in combination with FormatDate().
+	This method is most often used in combination with FormatDate().
 	FormatDate() gives you the offset of each field in a formatted string,
 	and GetDateFields() gives you the type of the field at a given offset.
 	With these informations, you can handle the formatted date string as
@@ -240,9 +247,9 @@
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
-	\retval B_ERROR Unable to lock the BLocale or an error getting the date
-		fields.
+	\retval B_ERROR Unable to lock the BLocale.
 	\retval B_NO_MEMORY Ran out of memory while creating the DateFormat object.
+	\retval B_BAD_VALUE An error occurred while getting the date fields.
 
 	\sa BLocale::GetTimeFields(BDateElement*& fields, int& fieldCount,
 		BTimeFormatStyle style) const
@@ -250,14 +257,22 @@
 
 
 /*!
-	\fn int BLocale::StartOfWeek() const
-	\brief Returns the number of the day used as start of week in this locale.
+	\fn status_t BLocale::GetStartOfWeek(BWeekday* startOfWeek) const
+	\brief Returns the day used as the start of week in this locale.
 
-	\returns a flag that indicates the day of the week that the week starts or
-		B_ERROR if there was an error.
-	\retval B_ERROR Unable to lock the BLocale.
-	\retval B_WEEK_START_SUNDAY If the beginning of the week starts on Sunday.
-	\retval B_WEEK_START_MONDAY If the beginning of the week starts on Monday.
+	Possible values for \a startOfWeek include:
+		- \c B_WEEKDAY_SUNDAY
+		- \c B_WEEKDAY_MONDAY
+		- \c B_WEEKDAY_TUESDAY
+		- \c B_WEEKDAY_WEDNESDAY
+		- \c B_WEEKDAY_THURSDAY
+		- \c B_WEEKDAY_FRIDAY
+		- \c B_WEEKDAY_SATURDAY
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \a startOfWeek is \c NULL.
+	\retval B_ERROR Unable to lock the BLocale or another error occurred.
 */
 
 
@@ -373,8 +388,9 @@
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
-	\retval B_ERROR Unable to lock the BLocale or an error formatting the time.
+	\retval B_ERROR Unable to lock the BLocale.
 	\retval B_NO_MEMORY Ran out of memory while creating the DateFormat object.
+	\retval B_BAD_VALUE An error occurred during time formatting.
 
 	\sa BLocale::FormatDate(BString* string, int*& fieldPositions,
 		int& fieldCount, time_t time, BDateFormatStyle style) const
@@ -386,10 +402,10 @@
 		BTimeFormatStyle style) const
 	\brief Get the type of each field in the time format of the locale.
 
-	This function is most often used in combination with FormatTime().
+	This method is used most often in combination with FormatTime().
 	FormatTime() gives you the offset of each field in a formatted string,
 	and GetTimeFields() gives you the type of the field at a given offset.
-	With these informations, you can handle the formatted date string as
+	With this information you can handle the formatted date string as
 	a list of fields that you can split and alter at will.
 
 	\param fields Pointer to the fields object.
@@ -398,9 +414,9 @@
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
-	\retval B_ERROR Unable to lock the BLocale or an error getting the time
-		fields.
+	\retval B_ERROR Unable to lock the BLocale.
 	\retval B_NO_MEMORY Ran out of memory while creating the DateFormat object.
+	\retval B_BAD_VALUE An error occurred while getting the time fields.
 
 	\sa BLocale::GetDateFields(BDateElement*& fields, int& fieldCount,
 		BDateFormatStyle style) const
@@ -417,8 +433,11 @@
 	\param maxSize The maximum of bytes to copy into \a string.
 	\param value The number that you want to get a formatted version of.
 
-	\returns The length of the string created or an error status code in
-	 	the case of an error.
+	\returns The length of the string created or an error status code.
+	\retval B_ERROR Unable to lock the BLocale.
+	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat
+		object.
+	\retval B_BAD_VALUE An error occurred while formatting the number.
 
 	\sa BLocale::FormatNumber(char* string, size_t maxSize,
 		int32 value) const
@@ -429,14 +448,18 @@
 
 /*!
 	\fn status_t BLocale::FormatNumber(BString* string, double value) const
-	\brief \brief Format the \c double \a value as a string and put the result
-		into \a string in the current locale.
+	\brief \brief Format the \c double \a value as a string and put the
+		result into \a string in the current locale.
 
 	\param string The string to put the formatted number into.
 	\param value The number that you want to get a formatted version of.
 
-	\returns The length of the string created or an error status code in
-	 	the case of an error.
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ERROR Unable to lock the BLocale.
+	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat
+		object.
+	\retval B_BAD_VALUE An error occurred while formatting the number.
 
 	\sa BLocale::FormatNumber(BString* string, int32 value) const
 	\sa BLocale::FormatMonetary(BString* string, double value) const
@@ -453,8 +476,11 @@
 	\param maxSize The maximum of bytes to copy into \a string.
 	\param value The number that you want to get a formatted version of.
 
-	\returns The length of the string created or an error status code in
-	 	the case of an error.
+	\returns The length of the string created or an error status code.
+	\retval B_ERROR Unable to lock the BLocale.
+	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat 
+		object.
+	\retval B_BAD_VALUE An error occurred while formatting the number.
 
 	\sa BLocale::FormatNumber(char* string, size_t maxSize,
 		double value) const
@@ -471,8 +497,12 @@
 	\param string The string to put the formatted number into.
 	\param value The number that you want to get a formatted version of.
 
-	\returns The length of the string created or an error status code in
-	 	the case of an error.
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ERROR Unable to lock the BLocale.
+	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat
+		object.
+	\retval B_BAD_VALUE An error occurred while formatting the number.
 
 	\sa BLocale::FormatNumber(BString* string, double value) const
 	\sa BLocale::FormatMonetary(BString* string, double value) const
@@ -485,18 +515,18 @@
 	\brief Format the \c double \a value as a monetary string and put the
 		result into \a string up to \a maxSize bytes in the current locale.
 
-	\param string The string to put the monetary formatted number into.
+	\param string The \a string to put the monetary formatted number into.
 	\param maxSize The maximum of bytes to copy into \a string.
-	\param value The number that you want to get a monetary formatted version
-		of.
+	\param value The number to format as a monetary \a value.
 
-	\returns The length of the string created or an error status code in
-	 	the case of an error.
+	\returns The length of the string created or an error status code.
+	\retval B_ERROR Unable to lock the BLocale.
+	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat
+		object.
+	\retval B_BAD_VALUE An error occurred while formatting the number.
 
-	\sa BLocale::FormatNumber(char* string, size_t maxSize,
-		double value) const
-	\sa BLocale::FormatNumber(char* string, size_t maxSize,
-		int32 value) const
+	\sa BLocale::FormatNumber(char* string, size_t maxSize, double value) const
+	\sa BLocale::FormatNumber(char* string, size_t maxSize, int32 value) const
 */
 
 
@@ -505,12 +535,15 @@
 	\brief \brief Format the \c double \a value as a monetary string and put
 		the result into \a string in the current locale.
 
-	\param string The string to put the monetary formatted number into.
-	\param value The number that you want to get a monetary formatted version
-		of.
+	\param string The \a string to put the monetary formatted number into.
+	\param value The number to format as a monetary \a value.
 
-	\returns The length of the string created or an error status code in
-	 	the case of an error.
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ERROR Unable to lock the BLocale.
+	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat
+		object.
+	\retval B_BAD_VALUE An error occurred while formatting the number.
 
 	\sa BLocale::FormatNumber(BString* string, double value) const
 	\sa BLocale::FormatNumber(BString* string, int32 value) const

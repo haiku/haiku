@@ -1,44 +1,44 @@
-1	slovak	x-vnd.Be-PRNT	2065133853
-%.2f KB	JobListView		%.2f KB
-1 pending job.	PrinterListView		1 úloha vo fronte
-<pick one>	AddPrinterDialog		<vyberte jednu>
-Add	AddPrinterDialog		Pridať
-Add printer	AddPrinterDialog		Pridať tlačiareň
-Add …	PrintersWindow		Pridať...
-Black	TestPageView		Čierna
-Blue	TestPageView		Modrá
-Cancel	AddPrinterDialog		Zrušiť
-Cancel job	PrintersWindow		Zrušiť úlohu
-Completed	JobListView		Hotovo
-Connected to:	AddPrinterDialog		Pripojené na:
-Cyan	TestPageView		Azúrová
-Default Printer	PrinterListView		Predvolená tlačiareň
-Driver: %driver%	PrinterListView		Ovládač: %driver%
-Failed	JobListView		Zlyhalo
-Green	TestPageView		Zelená
-Magenta	TestPageView		Purpurová
-Make default	PrintersWindow		Nastaviť ako predvolenú
-No pending jobs.	PrinterListView		Žiadne úlohy vo fronte.
-No printer found!	TransportMenu		Nebola nájdená žiadna tlačiareň!
-Print jobs for 	PrintersWindow		Tlačové úlohy pre
-Print jobs: No printer selected	PrintersWindow		Tlačové úlohy: Žiadna tlačiareň nie je vybraná
+1	slovak	x-vnd.Be-PRNT	2674539197
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Tlačiareň: %printer_name%\nOvládač:  %driver%\n
+Waiting	JobListView		Čaká sa
 Print test page	PrintersWindow		Vytlačiť testovaciu stránku
-Printer name:	AddPrinterDialog		Názov tlačiarene:
-Printer type:	AddPrinterDialog		Typ tlačiarne:
-Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Tlačiareň: %printer_name%\nOvládač: %driver%\n
+Test Page	TestPageView		Testovacia stránka
+Test Page	PrintersWindow		Testovacia stránka
+page	JobListView		strana
+Cancel	AddPrinterDialog		Zrušiť
+Add printer	AddPrinterDialog		Pridať tlačiareň
+Green	TestPageView		Zelená
 Printers	PrintersWindow		Tlačiarne
+Default Printer	PrinterListView		Predvolená tlačiareň
+Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
+No pending jobs.	PrinterListView		Žiadne úlohy vo fronte.
+pages	JobListView		strany
 Printers	System name		Tlačiarne
 Processing	JobListView		Prebieha spracovanie
 Red	TestPageView		Červená
-Remove	PrintersWindow		Odstrániť
+Printer name:	AddPrinterDialog		Názov tlačiarene:
+Driver: %driver%	PrinterListView		Ovládač: %driver%
+ pending jobs.	PrinterListView		 úloh vo fronte.
+Black	TestPageView		Čierna
 Restart job	PrintersWindow		Reštartovať úlohu
-Test Page	PrintersWindow		Testovacia stránka
-Test Page	TestPageView		Testovacia stránka
-Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
+Add	AddPrinterDialog		Pridať
+Make default	PrintersWindow		Nastaviť ako predvolenú
 Transport: %transport% %transport_address%	TestPageView		Transport: %transport% %transport_address%
-Unknown status	JobListView		Neznámy stav
-Waiting	JobListView		Čaká sa
+Cancel job	PrintersWindow		Zrušiť úlohu
 Yellow	TestPageView		Žltá
-page	JobListView		strana
-pages	JobListView		strany
-pending jobs.	PrinterListView		úlohy vo fronte
+Blue	TestPageView		Modrá
+1 pending job.	PrinterListView		1 úloha vo fronte.
+Remove	PrintersWindow		Odstrániť
+<pick one>	AddPrinterDialog		<vyberte jednu>
+Add …	PrintersWindow		Pridať …
+Print jobs for 	PrintersWindow		Tlačové úlohy pre 
+Failed	JobListView		Zlyhalo
+%.2f KB	JobListView		%.2f KB
+Magenta	TestPageView		Purpurová
+Completed	JobListView		Hotovo
+No printer found!	TransportMenu		Nebola nájdená žiadna tlačiareň!
+Print jobs: No printer selected	PrintersWindow		Tlačové úlohy: Žiadna tlačiareň nie je vybraná
+Cyan	TestPageView		Azúrová
+Unknown status	JobListView		Neznámy stav
+Connected to:	AddPrinterDialog		Pripojené na:
+Printer type:	AddPrinterDialog		Typ tlačiarne:

@@ -141,8 +141,8 @@ private:
 			BString				_TimeStatusString(float availableSpace,
 									float* _width);
 			BString				_ShortTimeRemainingString(const char* timeText);
-			BString				_FullTimeRemainingString(time_t finishTime,
-									const char* timeText);
+			BString				_FullTimeRemainingString(time_t now,
+									time_t finishTime, const char* timeText);
 
 			BStatusBar*			fStatusBar;
 			off_t				fTotalSize;

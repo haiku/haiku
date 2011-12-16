@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,6 +12,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Humdinger
+ *		taos
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -39,6 +40,8 @@
 <li><a href="../../uk/applications/list-cli-apps.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/applications/list-cli-apps.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/applications/list-cli-apps.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/list-cli-apps.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/list-cli-apps.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/applications/list-cli-apps.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 
@@ -54,10 +57,10 @@
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Liste aller Konsolenprogramme</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Ort:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
+<tr><td>Ort:</td><td style="width:15px;"></td><td><span class="path"><acronym title="/boot/system/bin">/boot/System/bin</acronym></span><br /><span class="path"><acronym title="/boot/common/bin">/boot/Allgemein/bin</acronym></span><br /><span class="path"><acronym title="~/config/bin">~/Konfiguration/bin</acronym></span></td></tr>
 </table>
 <p><br /></p>
-<p>Alle Konsolenprogramme, die mit Haiku geliefert werden, befinden sich entweder in <span class="path">/boot/system/bin</span> oder in <span class="path">/boot/common/bin</span>. Eigene oder zusätzlich installierte Konsolenprogramme kommen in <span class="path">~/config/bin</span>. Diese Orte sind alle Teil der PATH Variable und werden daher automatisch gefunden.<br />
+<p>Alle Konsolenprogramme, die mit Haiku geliefert werden, befinden sich entweder in <span class="path"><acronym title="/boot/system/bin">/boot/System/bin</acronym></span> oder in <span class="path"><acronym title="/boot/common/bin">/boot/Allgemein/bin</acronym></span>. Eigene oder zusätzlich installierte Konsolenprogramme kommen in <span class="path"><acronym title="~/config/bin">~/Konfiguration/bin</acronym></span>. Diese Orte sind alle Teil der PATH Variable und werden daher automatisch gefunden.<br />
 Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer kurzen Beschreibung. Mehr Information zur Benutzung erhält man durch das Aufrufen eines Befehls mit dem Parameter <tt>--help</tt>.</p>
 <p><br /></p>
 <p>Index:   <a href="#A">A – E</a>   ::   <a href="#F"> F – J </a>   ::   <a href="#K"> K – O </a>   ::   <a href="#P"> P – S </a>   ::   <a href="#T"> T – Z </a></p>
@@ -131,7 +134,7 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>fdinfo</tt></td><td> </td><td>Zeigt Informationen zu den vom System benutzten "File Descriptors" an.</td></tr>
 <tr><td><tt>ffm</tt></td><td> </td><td>Aktiviert den Modus "Focus follows mouse", bei dem immer das Fenster aktiv ist, über dem der Mauszeiger steht.</td></tr>
 <tr><td><tt>fgrep</tt></td><td> </td><td>Siehe <tt>grep</tt>.</td></tr>
-<tr><td><tt>filepanel</tt></td><td> </td><td>Öffnet einen Öffnen- oder Speicher-Dialog. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
+<tr><td><tt>filepanel</tt></td><td> </td><td>Öffnet einen Öffnen- oder Speicher-Dialog. <a href="cli-apps.html">(Haiku spezifisch)</a></td></tr>
 <tr><td><tt>find</tt></td><td> </td><td>Sucht nach Dateien in einer Verzeichnisstruktur.</td></tr>
 <tr><td><tt>finddir</tt></td><td> </td><td>Gibt besondere, vom System definierte, Verzeichnisse aus.</td></tr>
 <tr><td><tt>fmt</tt></td><td> </td><td>Formattiert Absätze einer Datei neu.</td></tr>
@@ -183,6 +186,7 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>listsem</tt></td><td> </td><td>Listet die Semaphoren, die von einem Team belegt sind.</td></tr>
 <tr><td><tt>listusb</tt></td><td> </td><td>Listet alle USB-Geräte auf.</td></tr>
 <tr><td><tt>ln</tt></td><td> </td><td>Erzeugt eine Verknüpfung zu einer Datei.</td></tr>
+<tr><td><tt>locale</tt></td><td> </td><td>Shows the set preferred language, its LC_CTYPE and the preferred formatting.</td></tr>
 <tr><td><tt>locate</tt></td><td> </td><td>Findet eine Datei.</td></tr>
 <tr><td><tt>logger</tt></td><td> </td><td>Sendet eine Nachricht zum System Log.</td></tr>
 <tr><td><tt>login</tt></td><td> </td><td>Startet eine Sitzung auf dem System.</td></tr>
@@ -319,7 +323,7 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>vdir</tt></td><td> </td><td>Zeigt Informationen zu Dateien.</td></tr>
 <tr><td><tt>version</tt></td><td> </td><td>Zeigt die Version einer Datei.</td></tr>
 <tr><td><tt>vmstat</tt></td><td> </td><td>Zeigt Informationen zum virtuellen Speicher.</td></tr>
-<tr><td><tt>waitfor</tt></td><td> </td><td>Wartes bis ein bestimmter Thread auftaucht. <a href="cli-apps.html">(Haiku spezifisch)</a></td></tr>
+<tr><td><tt>waitfor</tt></td><td> </td><td>Wartet bis ein bestimmter Thread auftaucht. <a href="cli-apps.html">(Haiku spezifisch)</a></td></tr>
 <tr><td><tt>watch</tt></td><td> </td><td>Führt ein Programm in regelmäßigen Abständen aus.</td></tr>
 <tr><td><tt>wc</tt></td><td> </td><td>Gibt die Anzahl von Absätzen, Wörtern und Buchstaben  (Bytes) einer Datei aus.</td></tr>
 <tr><td><tt>wget</tt></td><td> </td><td>Tool zum Download via HTTP, HTTPS oder FTP</td></tr>

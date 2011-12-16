@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include <errno.h>
 
+#include <errno_private.h>
+
 
 /* in hoard wrapper */
 extern void *(*sbrk_hook)(long);

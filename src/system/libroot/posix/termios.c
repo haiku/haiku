@@ -10,6 +10,8 @@
 #include <unistd.h>
 #include <errno.h>
 
+#include <errno_private.h>
+
 
 /*! get the attributes of the TTY device at fd */
 int
@@ -40,7 +42,7 @@ tcsetattr(int fd, int opt, const struct termios *termios)
 
 		default:
 			// no other valid options
-			errno = EINVAL;
+			__set_errno(EINVAL);
 			return -1;
 	}
 
@@ -74,7 +76,7 @@ tcflow(int fd, int action)
 			break;
 
 		default:
-			errno = EINVAL;
+			__set_errno(EINVAL);
 			return -1;
 	}
 
@@ -93,7 +95,7 @@ tcflush(int fd, int queueSelector)
 /*! send zero bits for the specified duration */
 int
 tcsendbreak(int fd, int duration)
-{	
+{
 	// Posix spec says this should take ~ 0.25 to 0.5 seconds.
 	// As the interpretation of the duration is undefined, we'll just ignore it
 	return ioctl(fd, TCSBRK, 0);
@@ -116,7 +118,7 @@ cfsetispeed(struct termios *termios, speed_t speed)
 	Note that errors from hardware device are detected only
 	until the tcsetattr() function is called */
 	if (speed > B230400 || (speed & CBAUD) != speed) {
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		return -1;
 	}
 
@@ -138,7 +140,7 @@ cfsetospeed(struct termios *termios, speed_t speed)
 {
 	/* Check for unaccepted speed values (see above) */
 	if (speed > B230400 || (speed & CBAUD) != speed) {
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		return -1;
 	}
 

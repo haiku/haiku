@@ -41,22 +41,21 @@ Transport::Transport(const PrinterData *printerData)
 	fDataStream(0),
 	fAbort(false)
 {
+	const directory_which paths[] = {
+		B_USER_ADDONS_DIRECTORY,
+		B_COMMON_ADDONS_DIRECTORY,
+		B_BEOS_ADDONS_DIRECTORY,
+	};
 	BPath path;
-
-	if (B_OK == find_directory(B_USER_ADDONS_DIRECTORY, &path)) {
+	for (uint32 i = 0; i < sizeof(paths) / sizeof(paths[0]); ++i) {
+		if (find_directory(paths[i], &path) != B_OK)
+			continue;
 		path.Append("Print/transport");
 		path.Append(printerData->GetTransport().c_str());
 		DBGMSG(("load_add_on: %s\n", path.Path()));
 		fImage = load_add_on(path.Path());
-	}
-
-	if (fImage < 0) {
-		if (B_OK == find_directory(B_BEOS_ADDONS_DIRECTORY, &path)) {
-			path.Append("Print/transport");
-			path.Append(printerData->GetTransport().c_str());
-			DBGMSG(("load_add_on: %s\n", path.Path()));
-			fImage = load_add_on(path.Path());
-		}
+		if (fImage >= 0)
+			break;
 	}
 
 	if (fImage < 0) {

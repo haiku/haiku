@@ -1,24 +1,22 @@
-1	lithuanian	x-vnd.Haiku-Mouse	104106491
-Click to activate	SettingsView		Išskirti spragtelėjimu
-Mouse type:	SettingsView		Pelės rūšis:
-Warp	SettingsView		Šokti
+1	lithuanian	x-vnd.Haiku-Mouse	180138463
+Mouse type:	SettingsView		Pelės tipas:
 2-Button	SettingsView		2 mygtukų
-Double-click test area	SettingsView		Vieta dvigubam spragtelėjimui bandyti
-Revert	MouseWindow		Grįžti
-...by Andrew Edward McCall	MouseApplication		...sukūrė Andrew Edward McCall'as
+Double-click test area	SettingsView		Vieta dvigubam spustelėjimui bandyti
+Revert	MouseWindow		Atšaukti pakeitimus
+...by Andrew Edward McCall	MouseApplication		…sukūrė Andrew Edward McCall'as
 Mouse acceleration	SettingsView		Pelės pagreitis
-Click to focus	SettingsView		Pažymėti spragtelėjimu
+Click to focus	SettingsView		aktyvinti spustelint
+Click to focus and raise	SettingsView		aktyvinti ir iškelti spustelint
 3-Button	SettingsView		3 mygtukų
-Mouse speed	SettingsView		Pelės greitumas
-Focus mode:	SettingsView		Išskyrimo būdas:
-Instant warp	SettingsView		Peršokti
-Dig Deal	MouseApplication		Puiku
+Mouse speed	SettingsView		Pelės greitis
+Focus mode:	SettingsView		Langų aktyvinimo būdas:
+Dig Deal	MouseApplication		Gerai
 1-Button	SettingsView		1 mygtuko
-Double-click speed	SettingsView		Dvigubo spragtelėjimo greitumas
+Double-click speed	SettingsView		Dvigubo spustelėjimo greitis
 Defaults	MouseWindow		Numatytai
-Focus follows mouse	SettingsView		Palei pelę
-Accept first click	SettingsView		Pirmu spragtelėjimu
-Fast	SettingsView		Greitai
-Normal	SettingsView		Vidutiniškai
-Mouse	MouseWindow		Pelė
-Slow	SettingsView		Lėtai
+Focus follows mouse	SettingsView		aktyvinti užvedant žymeklį
+Accept first click	SettingsView		Reaguoti į pirmąjį spustelėjimą
+Fast	SettingsView		Greitas
+Normal	SettingsView		Vidutiniškas
+Mouse	System name		Pelė
+Slow	SettingsView		Lėtas

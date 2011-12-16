@@ -33,18 +33,22 @@ BPackageResolvable::BPackageResolvable(const BPackageResolvableData& data)
 	:
 	fName(data.name),
 	fType(data.type),
-	fVersion(data.version)
+	fVersion(data.version),
+	fCompatibleVersion(data.compatibleVersion)
 {
 }
 
 
 BPackageResolvable::BPackageResolvable(const BString& name,
-	BPackageResolvableType type, const BPackageVersion& version)
+	BPackageResolvableType type, const BPackageVersion& version,
+	const BPackageVersion& compatibleVersion)
 	:
 	fName(name),
 	fType(type),
-	fVersion(version)
+	fVersion(version),
+	fCompatibleVersion(compatibleVersion)
 {
+	fName.ToLower();
 }
 
 
@@ -76,6 +80,13 @@ BPackageResolvable::Version() const
 }
 
 
+const BPackageVersion&
+BPackageResolvable::CompatibleVersion() const
+{
+	return fCompatibleVersion;
+}
+
+
 BString
 BPackageResolvable::ToString() const
 {
@@ -85,17 +96,23 @@ BPackageResolvable::ToString() const
 	if (fVersion.InitCheck() == B_OK)
 		string << '=' << fVersion.ToString();
 
+	if (fCompatibleVersion.InitCheck() == B_OK)
+		string << " compat>=" << fCompatibleVersion.ToString();
+
 	return string;
 }
 
 
 void
 BPackageResolvable::SetTo(const BString& name, BPackageResolvableType type,
-	const BPackageVersion& version)
+	const BPackageVersion& version, const BPackageVersion& compatibleVersion)
 {
 	fName = name;
 	fType = type;
 	fVersion = version;
+	fCompatibleVersion = compatibleVersion;
+
+	fName.ToLower();
 }
 
 
@@ -104,6 +121,7 @@ BPackageResolvable::Clear()
 {
 	fName.Truncate(0);
 	fVersion.Clear();
+	fCompatibleVersion.Clear();
 }
 
 

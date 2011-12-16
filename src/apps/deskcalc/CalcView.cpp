@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2011, Haiku, Inc. All rights reserved.
  * Copyright 1997, 1998 R3 Software Ltd. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
@@ -54,21 +54,36 @@ const float kDisplayScaleY					= 0.2f;
 
 static const bigtime_t kFlashOnOffInterval	= 100000;
 
-enum {
-	MSG_OPTIONS_AUTO_NUM_LOCK				= 'opan',
-	MSG_OPTIONS_AUDIO_FEEDBACK				= 'opaf',
-	MSG_OPTIONS_SHOW_KEYPAD					= 'opsk',
+static const float kMinimumWidthCompact		= 130.0f;
+static const float kMaximumWidthCompact		= 400.0f;
+static const float kMinimumHeightCompact	= 20.0f;
+static const float kMaximumHeightCompact	= 60.0f;
 
-	MSG_UNFLASH_KEY							= 'uflk'
-};
+// Basic mode size limits are defined in CalcView.h so
+// that they can be used by the CalcWindow constructor.
 
-// default calculator key pad layout
-const char *kDefaultKeypadDescription =
+static const float kMinimumWidthScientific	= 240.0f;
+static const float kMaximumWidthScientific	= 400.0f;
+static const float kMinimumHeightScientific	= 200.0f;
+static const float kMaximumHeightScientific	= 400.0f;
+
+// basic mode keypad layout (default)
+const char *kKeypadDescriptionBasic =
 	"7   8   9   (   )  \n"
 	"4   5   6   *   /  \n"
 	"1   2   3   +   -  \n"
 	"0   .   BS  =   C  \n";
 
+// scientific mode keypad layout
+const char *kKeypadDescriptionScientific =
+    "ln    sin   cos   tan   π    \n"
+    "log   asin  acos  atan  sqrt \n"
+    "exp   sinh  cosh  tanh  cbrt \n"
+    "!     ceil  floor E     ^    \n"
+    "7     8     9     (     )    \n"
+    "4     5     6     *     /    \n"
+    "1     2     3     +     -    \n"
+    "0     .     BS    =     C    \n";
 
 enum {
 	FLAGS_FLASH_KEY							= 1 << 0,
@@ -98,7 +113,7 @@ CalcView::CalcView(BRect frame, rgb_color rgbBaseColor, BMessage* settings)
 	:
 	BView(frame, "DeskCalc", B_FOLLOW_ALL_SIDES,
 		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
-	fColums(5),
+	fColumns(5),
 	fRows(4),
 
 	fBaseColor(rgbBaseColor),
@@ -107,7 +122,7 @@ CalcView::CalcView(BRect frame, rgb_color rgbBaseColor, BMessage* settings)
 	fWidth(1),
 	fHeight(1),
 
-	fKeypadDescription(strdup(kDefaultKeypadDescription)),
+	fKeypadDescription(strdup(kKeypadDescriptionBasic)),
 	fKeypad(NULL),
 
 #ifdef __HAIKU__
@@ -119,14 +134,13 @@ CalcView::CalcView(BRect frame, rgb_color rgbBaseColor, BMessage* settings)
 	fPopUpMenu(NULL),
 	fAutoNumlockItem(NULL),
 	fAudioFeedbackItem(NULL),
-	fShowKeypadItem(NULL),
-	fOptions(new CalcOptions()),
-	fShowKeypad(true)
+	fOptions(new CalcOptions())
 {
 	// create expression text view
 	fExpressionTextView = new ExpressionTextView(_ExpressionRect(), this);
 	AddChild(fExpressionTextView);
 
+	// read data from archive
 	_LoadSettings(settings);
 
 	// tell the app server not to erase our b/g
@@ -141,6 +155,7 @@ CalcView::CalcView(BRect frame, rgb_color rgbBaseColor, BMessage* settings)
 	// create pop-up menu system
 	_CreatePopUpMenu();
 
+	// Fetch the calc icon for compact view
 	_FetchAppIcon(fCalcIcon);
 }
 
@@ -148,7 +163,7 @@ CalcView::CalcView(BRect frame, rgb_color rgbBaseColor, BMessage* settings)
 CalcView::CalcView(BMessage* archive)
 	:
 	BView(archive),
-	fColums(5),
+	fColumns(5),
 	fRows(4),
 
 	fBaseColor((rgb_color){ 128, 128, 128, 255 }),
@@ -157,7 +172,7 @@ CalcView::CalcView(BMessage* archive)
 	fWidth(1),
 	fHeight(1),
 
-	fKeypadDescription(strdup(kDefaultKeypadDescription)),
+	fKeypadDescription(strdup(kKeypadDescriptionBasic)),
 	fKeypad(NULL),
 
 #ifdef __HAIKU__
@@ -169,9 +184,7 @@ CalcView::CalcView(BMessage* archive)
 	fPopUpMenu(NULL),
 	fAutoNumlockItem(NULL),
 	fAudioFeedbackItem(NULL),
-	fShowKeypadItem(NULL),
-	fOptions(new CalcOptions()),
-	fShowKeypad(true)
+	fOptions(new CalcOptions())
 {
 	// Do not restore the follow mode, in shelfs, we never follow.
 	SetResizingMode(B_FOLLOW_NONE);
@@ -182,12 +195,11 @@ CalcView::CalcView(BMessage* archive)
 
 	// read data from archive
 	_LoadSettings(archive);
-	// replicant means size and window limit dont need changes
-	fShowKeypad = fOptions->show_keypad;
 
 	// create pop-up menu system
 	_CreatePopUpMenu();
 
+	// Fetch the calc icon for compact view
 	_FetchAppIcon(fCalcIcon);
 }
 
@@ -209,8 +221,7 @@ CalcView::AttachedToWindow()
 	BRect frame(Frame());
 	FrameResized(frame.Width(), frame.Height());
 
-	fPopUpMenu->SetTargetForItems(this);
-	_ShowKeypad(fOptions->show_keypad);
+	SetKeypadMode(fOptions->keypad_mode);
 }
 
 
@@ -254,22 +265,6 @@ CalcView::MessageReceived(BMessage* message)
 				AboutRequested();
 				break;
 
-			case MSG_OPTIONS_AUTO_NUM_LOCK:
-				fOptions->auto_num_lock = !fOptions->auto_num_lock;
-				fAutoNumlockItem->SetMarked(fOptions->auto_num_lock);
-				break;
-
-			case MSG_OPTIONS_AUDIO_FEEDBACK:
-				fOptions->audio_feedback = !fOptions->audio_feedback;
-				fAudioFeedbackItem->SetMarked(fOptions->audio_feedback);
-				break;
-
-			case MSG_OPTIONS_SHOW_KEYPAD:
-				fOptions->show_keypad = !fOptions->show_keypad;
-				fShowKeypadItem->SetMarked(fOptions->show_keypad);
-				_ShowKeypad(fOptions->show_keypad);
-				break;
-
 			case MSG_UNFLASH_KEY:
 			{
 				int32 key;
@@ -299,7 +294,7 @@ CalcView::Draw(BRect updateRect)
 	SetHighColor(fBaseColor);
 	BRect expressionRect(_ExpressionRect());
 	if (updateRect.Intersects(expressionRect)) {
-		if (!fShowKeypad
+		if (fOptions->keypad_mode == KEYPAD_MODE_COMPACT
 			&& expressionRect.Height() >= fCalcIcon->Bounds().Height()) {
 			// render calc icon
 			expressionRect.left = fExpressionTextView->Frame().right + 2;
@@ -328,7 +323,7 @@ CalcView::Draw(BRect updateRect)
 		// render border around expression text view
 		expressionRect = fExpressionTextView->Frame();
 		expressionRect.InsetBy(-2, -2);
-		if (fShowKeypad && drawBackground) {
+		if (fOptions->keypad_mode != KEYPAD_MODE_COMPACT && drawBackground) {
 			expressionRect.InsetBy(-2, -2);
 			StrokeRect(expressionRect);
 			expressionRect.InsetBy(1, 1);
@@ -379,7 +374,7 @@ CalcView::Draw(BRect updateRect)
 		}
 	}
 
-	if (!fShowKeypad)
+	if (fOptions->keypad_mode == KEYPAD_MODE_COMPACT)
 		return;
 
 	// calculate grid sizes
@@ -392,7 +387,7 @@ CalcView::Draw(BRect updateRect)
 	}
 
 	float sizeDisp = keypadRect.top;
-	float sizeCol = (keypadRect.Width() + 1) / (float)fColums;
+	float sizeCol = (keypadRect.Width() + 1) / (float)fColumns;
 	float sizeRow = (keypadRect.Height() + 1) / (float)fRows;
 
 	if (!updateRect.Intersects(keypadRect))
@@ -403,7 +398,7 @@ CalcView::Draw(BRect updateRect)
 	if (be_control_look != NULL) {
 		CalcKey* key = fKeypad;
 		for (int row = 0; row < fRows; row++) {
-			for (int col = 0; col < fColums; col++) {
+			for (int col = 0; col < fColumns; col++) {
 				BRect frame;
 				frame.left = keypadRect.left + col * sizeCol;
 				frame.right = keypadRect.left + (col + 1) * sizeCol - 1;
@@ -445,13 +440,13 @@ CalcView::Draw(BRect updateRect)
 	FillRect(updateRect & keypadRect);
 
 	// render key main grid
-	BeginLineArray(((fColums + fRows) << 1) + 1);
+	BeginLineArray(((fColumns + fRows) << 1) + 1);
 
 	// render cols
 	AddLine(BPoint(0.0, sizeDisp),
 			BPoint(0.0, fHeight),
 			fLightColor);
-	for (int col = 1; col < fColums; col++) {
+	for (int col = 1; col < fColumns; col++) {
 		AddLine(BPoint(col * sizeCol - 1.0, sizeDisp),
 				BPoint(col * sizeCol - 1.0, fHeight),
 				fDarkColor);
@@ -459,8 +454,8 @@ CalcView::Draw(BRect updateRect)
 				BPoint(col * sizeCol, fHeight),
 				fLightColor);
 	}
-	AddLine(BPoint(fColums * sizeCol, sizeDisp),
-			BPoint(fColums * sizeCol, fHeight),
+	AddLine(BPoint(fColumns * sizeCol, sizeDisp),
+			BPoint(fColumns * sizeCol, fHeight),
 			fDarkColor);
 
 	// render rows
@@ -489,7 +484,7 @@ CalcView::Draw(BRect updateRect)
 							* (1.0 - kFontScaleY) * 0.5;
 	CalcKey* key = fKeypad;
 	for (int row = 0; row < fRows; row++) {
-		for (int col = 0; col < fColums; col++) {
+		for (int col = 0; col < fColumns; col++) {
 			float halfSymbolWidth = StringWidth(key->label) * 0.5f;
 			DrawString(key->label,
 				BPoint(col * sizeCol + halfSizeCol - halfSymbolWidth,
@@ -524,7 +519,7 @@ CalcView::MouseDown(BPoint point)
 		return;
 	}
 
-	if (!fShowKeypad) {
+	if (fOptions->keypad_mode == KEYPAD_MODE_COMPACT) {
 		if (fCalcIcon != NULL) {
 			BRect bounds(Bounds());
 			bounds.left = bounds.right - fCalcIcon->Bounds().Width();
@@ -538,7 +533,7 @@ CalcView::MouseDown(BPoint point)
 
 	// calculate grid sizes
 	float sizeDisp = fHeight * kDisplayScaleY;
-	float sizeCol = fWidth / (float)fColums;
+	float sizeCol = fWidth / (float)fColumns;
 	float sizeRow = (fHeight - sizeDisp) / (float)fRows;
 
 	// calculate location within grid
@@ -546,11 +541,11 @@ CalcView::MouseDown(BPoint point)
 	int gridRow = (int)floorf((point.y - sizeDisp) / sizeRow);
 
 	// check limits
-	if ((gridCol >= 0) && (gridCol < fColums)
+	if ((gridCol >= 0) && (gridCol < fColumns)
 		&& (gridRow >= 0) && (gridRow < fRows)) {
 
 		// process key press
-		int key = gridRow * fColums + gridCol;
+		int key = gridRow * fColumns + gridCol;
 		_FlashKey(key, FLAGS_MOUSE_DOWN);
 		_PressKey(key);
 
@@ -563,10 +558,10 @@ CalcView::MouseDown(BPoint point)
 void
 CalcView::MouseUp(BPoint point)
 {
-	if (!fShowKeypad)
+	if (fOptions->keypad_mode == KEYPAD_MODE_COMPACT)
 		return;
 
-	int keys = fRows * fColums;
+	int keys = fRows * fColumns;
 	for (int i = 0; i < keys; i++) {
 		if (fKeypad[i].flags & FLAGS_MOUSE_DOWN) {
 			_FlashKey(i, 0);
@@ -617,7 +612,7 @@ CalcView::KeyDown(const char* bytes, int32 numBytes)
 
 			default: {
 				// scan the keymap array for match
-				int keys = fRows * fColums;
+				int keys = fRows * fColumns;
 				for (int i = 0; i < keys; i++) {
 					if (fKeypad[i].keymap[0] == bytes[0]) {
 						_PressKey(i);
@@ -648,6 +643,14 @@ CalcView::MakeFocus(bool focused)
 
 
 void
+CalcView::ResizeTo(float width, float height)
+{
+	BView::ResizeTo(width, height);
+	FrameResized(width, height);
+}
+
+
+void
 CalcView::FrameResized(float width, float height)
 {
 	fWidth = width;
@@ -655,19 +658,18 @@ CalcView::FrameResized(float width, float height)
 
 	// layout expression text view
 	BRect frame = _ExpressionRect();
-	if (fShowKeypad)
-		frame.InsetBy(4, 4);
-	else
+	if (fOptions->keypad_mode == KEYPAD_MODE_COMPACT) {
 		frame.InsetBy(2, 2);
-
-	if (!fShowKeypad)
 		frame.right -= ceilf(fCalcIcon->Bounds().Width() * 1.5);
+	} else
+		frame.InsetBy(4, 4);
 
 	fExpressionTextView->MoveTo(frame.LeftTop());
 	fExpressionTextView->ResizeTo(frame.Width(), frame.Height());
 
 	// configure expression text view font size and color
-	float sizeDisp = fShowKeypad ? fHeight * kDisplayScaleY : fHeight;
+	float sizeDisp = fOptions->keypad_mode == KEYPAD_MODE_COMPACT
+					 ? fHeight : fHeight * kDisplayScaleY;
 	BFont font(be_bold_font);
 	font.SetSize(sizeDisp * kExpressionFontScaleY);
 	fExpressionTextView->SetFontAndColor(&font, B_FONT_ALL);
@@ -797,15 +799,15 @@ CalcView::_LoadSettings(BMessage* archive)
 	// record calculator description
 	const char* calcDesc;
 	if (archive->FindString("calcDesc", &calcDesc) < B_OK)
-		calcDesc = kDefaultKeypadDescription;
+		calcDesc = kKeypadDescriptionBasic;
 
 	// save calculator description for reference
 	free(fKeypadDescription);
 	fKeypadDescription = strdup(calcDesc);
 
 	// read grid dimensions
-	if (archive->FindInt16("cols", &fColums) < B_OK)
-		fColums = 5;
+	if (archive->FindInt16("cols", &fColumns) < B_OK)
+		fColumns = 5;
 	if (archive->FindInt16("rows", &fRows) < B_OK)
 		fRows = 4;
 
@@ -862,7 +864,7 @@ CalcView::SaveSettings(BMessage* archive) const
 
 	// record grid dimensions
 	if (ret == B_OK)
-		ret = archive->AddInt16("cols", fColums);
+		ret = archive->AddInt16("cols", fColumns);
 	if (ret == B_OK)
 		ret = archive->AddInt16("rows", fRows);
 
@@ -935,6 +937,97 @@ CalcView::FlashKey(const char* bytes, int32 numBytes)
 }
 
 
+void
+CalcView::ToggleAutoNumlock(void)
+{
+	fOptions->auto_num_lock = !fOptions->auto_num_lock;
+	fAutoNumlockItem->SetMarked(fOptions->auto_num_lock);
+}
+
+
+void
+CalcView::ToggleAudioFeedback(void)
+{
+	fOptions->audio_feedback = !fOptions->audio_feedback;
+	fAudioFeedbackItem->SetMarked(fOptions->audio_feedback);
+}
+
+void
+CalcView::SetKeypadMode(uint8 mode)
+{
+	if (fOptions->keypad_mode == mode)
+		return;
+
+	BWindow* window = Window();
+	if (window == NULL)
+		return;
+
+	fOptions->keypad_mode = mode;
+	_MarkKeypadItems(fOptions->keypad_mode);
+
+	float width = fWidth;
+	float height = fHeight;
+
+	switch (fOptions->keypad_mode) {
+		case KEYPAD_MODE_COMPACT:
+		{
+			if (window->Bounds() == Frame()) {
+				window->SetSizeLimits(kMinimumWidthCompact,
+									  kMaximumWidthCompact,
+									  kMinimumHeightCompact,
+									  kMaximumHeightCompact);
+				window->ResizeTo(width, height * kDisplayScaleY);
+			} else
+				ResizeTo(width, height * kDisplayScaleY);
+			break;
+		}
+
+		case KEYPAD_MODE_SCIENTIFIC:
+		{
+			free(fKeypadDescription);
+			fKeypadDescription = strdup(kKeypadDescriptionScientific);
+			fRows = 8;
+			_ParseCalcDesc(fKeypadDescription);
+
+			window->SetSizeLimits(kMinimumWidthScientific,
+								  kMaximumWidthScientific,
+								  kMinimumHeightScientific,
+								  kMaximumHeightScientific);
+			if (width < kMinimumWidthScientific)
+				width = kMinimumWidthScientific;
+			if (width > kMaximumWidthScientific)
+				width = kMaximumWidthScientific;
+			if (height < kMinimumHeightScientific)
+				height = kMinimumHeightScientific;
+			if (height > kMaximumHeightScientific)
+				height = kMaximumHeightScientific;
+			ResizeTo(width, height);
+			break;
+		}
+
+		default: // KEYPAD_MODE_BASIC is the default
+		{
+			free(fKeypadDescription);
+			fKeypadDescription = strdup(kKeypadDescriptionBasic);
+			fRows = 4;
+			_ParseCalcDesc(fKeypadDescription);
+
+			window->SetSizeLimits(kMinimumWidthBasic, kMaximumWidthBasic,
+								  kMinimumHeightBasic, kMaximumHeightBasic);
+			if (width < kMinimumWidthBasic)
+				width = kMinimumWidthBasic;
+			if (width > kMaximumWidthBasic)
+				width = kMaximumWidthBasic;
+			if (height < kMinimumHeightBasic)
+				height = kMinimumHeightBasic;
+			if (height > kMaximumHeightBasic)
+				height = kMaximumHeightBasic;
+			ResizeTo(width, height);
+		}
+	}
+}
+
+
 // #pragma mark -
 
 
@@ -942,7 +1035,7 @@ void
 CalcView::_ParseCalcDesc(const char* keypadDescription)
 {
 	// TODO: should calculate dimensions from desc here!
-	fKeypad = new CalcKey[fRows * fColums];
+	fKeypad = new CalcKey[fRows * fColumns];
 
 	// scan through calculator description and assemble keypad
 	CalcKey* key = fKeypad;
@@ -984,15 +1077,56 @@ CalcView::_ParseCalcDesc(const char* keypadDescription)
 void
 CalcView::_PressKey(int key)
 {
-	assert(key < (fRows * fColums));
+	assert(key < (fRows * fColumns));
 	assert(key >= 0);
 
-	// check for backspace
 	if (strcmp(fKeypad[key].label, "BS") == 0) {
+		// BS means backspace
 		fExpressionTextView->BackSpace();
 	} else if (strcmp(fKeypad[key].label, "C") == 0) {
 		// C means clear
 		fExpressionTextView->Clear();
+	} else if (strcmp(fKeypad[key].label, "acos") == 0
+		|| strcmp(fKeypad[key].label, "asin") == 0
+		|| strcmp(fKeypad[key].label, "atan") == 0
+		|| strcmp(fKeypad[key].label, "cbrt") == 0
+		|| strcmp(fKeypad[key].label, "ceil") == 0
+		|| strcmp(fKeypad[key].label, "cos") == 0
+		|| strcmp(fKeypad[key].label, "cosh") == 0
+		|| strcmp(fKeypad[key].label, "exp") == 0
+		|| strcmp(fKeypad[key].label, "floor") == 0
+		|| strcmp(fKeypad[key].label, "log") == 0
+		|| strcmp(fKeypad[key].label, "ln") == 0
+		|| strcmp(fKeypad[key].label, "sin") == 0
+		|| strcmp(fKeypad[key].label, "sinh") == 0
+		|| strcmp(fKeypad[key].label, "sqrt") == 0
+		|| strcmp(fKeypad[key].label, "tan") == 0
+		|| strcmp(fKeypad[key].label, "tanh") == 0) {
+		int32 labelLen = strlen(fKeypad[key].label);
+		int32 startSelection = 0;
+		int32 endSelection = 0;
+		fExpressionTextView->GetSelection(&startSelection, &endSelection);
+		if (endSelection > startSelection) {
+			// There is selected text, put it inbetween the parens
+			fExpressionTextView->Insert(startSelection, fKeypad[key].label,
+				labelLen);
+			fExpressionTextView->Insert(startSelection + labelLen, "(", 1);
+			fExpressionTextView->Insert(endSelection + labelLen + 1, ")", 1);
+			// Put the cursor after the ending paren
+			// Need to cast to BTextView because Select() is protected
+			// in the InputTextView class
+			static_cast<BTextView*>(fExpressionTextView)->Select(
+				endSelection + labelLen + 2, endSelection + labelLen + 2);
+		} else {
+			// There is no selected text, insert at the cursor location
+			fExpressionTextView->Insert(fKeypad[key].label);
+			fExpressionTextView->Insert("()");
+			// Put the cursor inside the parens so you can enter an argument
+			// Need to cast to BTextView because Select() is protected
+			// in the InputTextView class
+			static_cast<BTextView*>(fExpressionTextView)->Select(
+				endSelection + labelLen + 1, endSelection + labelLen + 1);
+		}
 	} else {
 		// check for evaluation order
 		if (fKeypad[key].code[0] == '\n') {
@@ -1019,7 +1153,7 @@ CalcView::_PressKey(const char* label)
 int32
 CalcView::_KeyForLabel(const char* label) const
 {
-	int keys = fRows * fColums;
+	int keys = fRows * fColumns;
 	for (int i = 0; i < keys; i++) {
 		if (strcmp(fKeypad[i].label, label) == 0) {
 			return i;
@@ -1032,7 +1166,7 @@ CalcView::_KeyForLabel(const char* label) const
 void
 CalcView::_FlashKey(int32 key, uint32 flashFlags)
 {
-	if (!fShowKeypad)
+	if (fOptions->keypad_mode == KEYPAD_MODE_COMPACT)
 		return;
 
 	if (flashFlags != 0)
@@ -1105,13 +1239,17 @@ CalcView::_CreatePopUpMenu()
 		new BMessage(MSG_OPTIONS_AUTO_NUM_LOCK));
 	fAudioFeedbackItem = new BMenuItem(B_TRANSLATE("Audio Feedback"),
 		new BMessage(MSG_OPTIONS_AUDIO_FEEDBACK));
-	fShowKeypadItem = new BMenuItem(B_TRANSLATE("Show keypad"),
-		new BMessage(MSG_OPTIONS_SHOW_KEYPAD));
+	fKeypadModeCompactItem = new BMenuItem(B_TRANSLATE("Compact"),
+		new BMessage(MSG_OPTIONS_KEYPAD_MODE_COMPACT), '0');
+	fKeypadModeBasicItem = new BMenuItem(B_TRANSLATE("Basic"),
+		new BMessage(MSG_OPTIONS_KEYPAD_MODE_BASIC), '1');
+	fKeypadModeScientificItem = new BMenuItem(B_TRANSLATE("Scientific"),
+		new BMessage(MSG_OPTIONS_KEYPAD_MODE_SCIENTIFIC), '2');
 
 	// apply current settings
 	fAutoNumlockItem->SetMarked(fOptions->auto_num_lock);
 	fAudioFeedbackItem->SetMarked(fOptions->audio_feedback);
-	fShowKeypadItem->SetMarked(fOptions->show_keypad);
+	_MarkKeypadItems(fOptions->keypad_mode);
 
 	// construct menu
 	fPopUpMenu = new BPopUpMenu("pop-up", false, false);
@@ -1120,7 +1258,10 @@ CalcView::_CreatePopUpMenu()
 // TODO: Enabled when we use beep events which can be configured in the Sounds
 // preflet.
 //	fPopUpMenu->AddItem(fAudioFeedbackItem);
-	fPopUpMenu->AddItem(fShowKeypadItem);
+	fPopUpMenu->AddSeparatorItem();
+	fPopUpMenu->AddItem(fKeypadModeCompactItem);
+	fPopUpMenu->AddItem(fKeypadModeBasicItem);
+	fPopUpMenu->AddItem(fKeypadModeScientificItem);
 }
 
 
@@ -1128,7 +1269,7 @@ BRect
 CalcView::_ExpressionRect() const
 {
 	BRect r(0.0, 0.0, fWidth, fHeight);
-	if (fShowKeypad) {
+	if (fOptions->keypad_mode != KEYPAD_MODE_COMPACT) {
 		r.bottom = floorf(fHeight * kDisplayScaleY) + 1;
 	}
 	return r;
@@ -1139,7 +1280,7 @@ BRect
 CalcView::_KeypadRect() const
 {
 	BRect r(0.0, 0.0, -1.0, -1.0);
-	if (fShowKeypad) {
+	if (fOptions->keypad_mode != KEYPAD_MODE_COMPACT) {
 		r.right = fWidth;
 		r.bottom = fHeight;
 		r.top = floorf(fHeight * kDisplayScaleY);
@@ -1149,26 +1290,25 @@ CalcView::_KeypadRect() const
 
 
 void
-CalcView::_ShowKeypad(bool show)
+CalcView::_MarkKeypadItems(uint8 keypad_mode)
 {
-	if (fShowKeypad == show)
-		return;
+	switch (keypad_mode) {
+		case KEYPAD_MODE_COMPACT:
+			fKeypadModeCompactItem->SetMarked(true);
+			fKeypadModeBasicItem->SetMarked(false);
+			fKeypadModeScientificItem->SetMarked(false);
+			break;
 
-	fShowKeypad = show;
-	if (fShowKeypadItem && fShowKeypadItem->IsMarked() ^ fShowKeypad)
-		fShowKeypadItem->SetMarked(fShowKeypad);
+		case KEYPAD_MODE_SCIENTIFIC:
+			fKeypadModeCompactItem->SetMarked(false);
+			fKeypadModeBasicItem->SetMarked(false);
+			fKeypadModeScientificItem->SetMarked(true);
+			break;
 
-	float height
-		= fShowKeypad ? fHeight / kDisplayScaleY : fHeight * kDisplayScaleY;
-
-	BWindow* window = Window();
-	if (window) {
-		if (window->Bounds() == Frame()) {
-			window->SetSizeLimits(100.0, 400.0,
-				fShowKeypad ? 100.0 : 20.0, fShowKeypad ? 400.0 : 60.0);
-			window->ResizeTo(fWidth, height);
-		} else
-			ResizeTo(fWidth, height);
+		default: // KEYPAD_MODE_BASIC is the default
+			fKeypadModeCompactItem->SetMarked(false);
+			fKeypadModeBasicItem->SetMarked(true);
+			fKeypadModeScientificItem->SetMarked(false);
 	}
 }
 

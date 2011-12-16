@@ -309,7 +309,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	
 	// check read-only features if mounting read-write
 	if (!IsReadOnly() && _UnsupportedReadOnlyFeatures(fSuperBlock) != 0)
-		return B_NOT_SUPPORTED;
+		return B_UNSUPPORTED;
 
 	// initialize short hands to the super block (to save byte swapping)
 	fBlockShift = fSuperBlock.BlockShift();
@@ -378,7 +378,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		} else {
 			// TODO: external journal
 			TRACE("Can not open an external journal.\n");
-			return B_NOT_SUPPORTED;
+			return B_UNSUPPORTED;
 		}
 	} else {
 		TRACE("Opening a fake journal (NoJournal).\n");
@@ -935,7 +935,7 @@ Volume::Identify(int fd, ext2_super_block* superBlock)
 	}
 
 	return _UnsupportedIncompatibleFeatures(*superBlock) == 0
-		? B_OK : B_NOT_SUPPORTED;
+		? B_OK : B_UNSUPPORTED;
 }
 
 

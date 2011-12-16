@@ -258,7 +258,7 @@ EbmlElement * EbmlElement::FindNextID(IOCallback & DataStream, const EbmlCallbac
 			}
 			if (PossibleId[0] & BitMask) {
 				// this is the last octet of the ID
-				// check wether that's the one we're looking for
+				// check whether that's the one we're looking for
 /*			if (PossibleID == ClassInfos.GlobalId) {
 					break;
 				} else {
@@ -529,7 +529,7 @@ EbmlElement *EbmlElement::CreateElementUsingContext(const EbmlId & aID, const Eb
 		return &Context.MasterElt->Create();
 	}
 
-	// check wether it's not part of an upper context
+	// check whether it's not part of an upper context
 	if (Context.UpTable != NULL) {
 		LowLevel++;
 		MaxLowerLevel++;

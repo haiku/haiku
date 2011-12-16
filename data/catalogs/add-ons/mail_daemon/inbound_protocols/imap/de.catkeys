@@ -1,9 +1,9 @@
 1	german	x-vnd.Haiku-IMAP	3892875357
-Apply	IMAPFolderConfig		Anwenden
 Destination:	imap_config		Zielverzeichnis:
-Failed to fetch available storage.	IMAPFolderConfig		Keine der vorhandenen Ablagen konnte übertragen werden.
+status	IMAPFolderConfig		Status
+Apply	IMAPFolderConfig		Anwenden
+IMAP Folders	imap_config		IMAP-Ordner
 Fetching IMAP folders, have patience...	IMAPFolderConfig		IMAP-Ordner werden angefordert. Bitte warten…
 IMAP Folders	IMAPFolderConfig		IMAP-Ordner
-IMAP Folders	imap_config		IMAP-Ordner
 Subcribe / Unsuscribe IMAP folders, have patience...	IMAPFolderConfig		IMAP-Ordner werden abonniert/abbestellt. Bitte warten…
-status	IMAPFolderConfig		Status
+Failed to fetch available storage.	IMAPFolderConfig		Keine der vorhandenen Ablagen konnte übertragen werden.

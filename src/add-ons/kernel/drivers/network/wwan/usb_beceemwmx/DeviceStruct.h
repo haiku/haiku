@@ -5,11 +5,12 @@
  *
  *	Based on GPL code developed by: Beceem Communications Pvt. Ltd
  */
-
 #ifndef _USB_BECEEM_DEVICE_STRUCT_
 #define _USB_BECEEM_DEVICE_STRUCT_
 
+
 #include "Driver.h"
+
 
 typedef struct FirmwareInfo
 {
@@ -154,27 +155,30 @@ typedef struct _VENDORCFG
 	/*
 	ARQ Enable ==> 0xddccbbaa
 		aa => 0x01 Enables ARQ
-		bb => 0x01 Disables the ARQ feature where MS combines ARQ FB and tranport
+		bb => 0x01 Disable the ARQ feature where MS combines ARQ FB and tranport
 		CID Bw Requests:
 		cc => 0x01 Enable ARQ FB BW req enh
 		dd => 0th bit Disable ARQ Cut thru for Ack Generation
-		dd => 1st bit enables handling of partial nacking of PDUs, and retxing */
+		dd => 1st bit enable handling of partial nacking of PDUs, and retxing */
 	uint32	m_u32ArqEnable;
 
 	/*
 	HARQ Enable ==> 0xddccbbaa
-		aa => 0x01 Enables HARQ on Transport;
-		bb => 0 bit Enables HARQ on Management
-		bb => 1 bit Enables Out of order delivery on non-ARQ Rx ERTPS HARQ connections
-		bb => 2 bit Enables Out of order delivery on all non-ARQ RX HARQ connections
-		dd => If set, used as the PDU purge timer on the non-ARQ Rx HARQ RT connections
-		ERTPS, RTPS, UGS
-		HARQ on Management only is NOT Permitted.
-		Eg. 0x0101 => Enables HARQ on Management and HARQ on Transport Connections
-		Eg. 0x0301 => Enables HARQ on Management and HARQ on Transport Connections
-					  Enables out of deliver on the non-ARQ rx ERTPS HARQ connections
-		Eg. 0x0501 => Enables HARQ on Management and HARQ on Transport Connections
-					  Enables out of deliver on the non-ARQ RX HARQ connections */
+		aa =>	0x01 Enable HARQ on Transport;
+		bb =>	0 bit Enable HARQ on Management
+		bb =>	1 bit Enable Out of order delivery on non-ARQ Rx ERTPS
+				HARQ connections
+		bb =>	2 bit Enable Out of order delivery on all non-ARQ RX
+				HARQ connections
+		dd =>	If set, used as the PDU purge timer on the non-ARQ Rx
+				HARQ RT connections ERTPS, RTPS, UGS and HARQ on Management
+				only is NOT Permitted.
+		Examples:
+		0x0101 	Enable HARQ on Management and HARQ on Transport Connections
+		0x0301 	Enable HARQ on Management and HARQ on Transport Connections
+				Enable out of deliver on the non-ARQ rx ERTPS HARQ connections
+		0x0501	Enable HARQ on Management and HARQ on Transport Connections
+				Enable out of deliver on the non-ARQ RX HARQ connections */
 	uint32	m_u32HarqEnable;
 
 	// EEPROM Param Location
@@ -230,7 +234,7 @@ typedef struct _VENDORCFG
 
 	/*
 	PhyParameter2
-		[16]	Set to 1 for accurate CINR measurement on noise limited scenarios
+		[16]	Set 1 for accurate CINR measurement on noise limited scenarios
 				If set to 1, note the BTS Link Adaptation tables may need change
 		[15:8]	Backoff in 0.25dBm steps in Transmit power to be
 				applied for an uncalibrated unit */
@@ -372,8 +376,8 @@ typedef struct _GPIO_LED_MAP
 //  TODO : figure out how to handle these linux wait typedefs
 //	wait_queue_head_t	notify_led_event;
 //	wait_queue_head_t	idleModeSyncEvent;
-	bool					notify_led_event;
-	bool					idleModeSyncEvent;
+	bool				notify_led_event;
+	bool				idleModeSyncEvent;
 //  TODO END : figure out how to handle these linux wait typedefs
 
 	struct task_struct	*led_cntrl_threadid;
@@ -453,27 +457,27 @@ typedef struct _FLASH_CS_INFO
 
 struct WIMAX_DEVICE
 {
-			VENDORCFG			vendorcfg;
+			VENDORCFG	vendorcfg;
 				// we memcpy the vendor cfg here
-			uint32        syscfgBefFw;
+			uint32		syscfgBefFw;
 				// SYS_CFG before firmware
-			bool                CPUFlashBoot;
+			bool		CPUFlashBoot;
 				// Reverse MIPS
-			uint32        deviceChipID;
+			uint32		deviceChipID;
 				// Beceem interface chip model
-volatile	bool				driverHalt;
+volatile	bool		driverHalt;
 				// gets set to true when driver is being shutdown
 volatile	uint32		driverState;
 				// Driver state, defined in Driver.h
-volatile	bool				driverDDRinit;
+volatile	bool		driverDDRinit;
 				// has the DDR memory been initialized?
-volatile	bool				driverFwPushed;
+volatile	bool		driverFwPushed;
 				// has the firmware been pushed to the device?
 
 
-			GPIO_LED_MAP		LEDMap;
+			GPIO_LED_MAP LEDMap;
 				// Map of LED's in GPIO
-			thread_id			LEDThreadID;
+			thread_id	LEDThreadID;
 				// Thread ID of LED state handler
 
 			uint32		nvmType;
@@ -485,19 +489,19 @@ volatile	bool				driverFwPushed;
 			uint32		nvmVerMinor;
 				// NVM Minor
 
-volatile	uint32			nvmFlashBaseAddr;
+volatile	uint32		nvmFlashBaseAddr;
 				// NVM Flash base address
-			unsigned long		nvmFlashCalStart;
+			unsigned long nvmFlashCalStart;
 				// NVM Flash calibrated start
-			unsigned long		nvmFlashCSStart;
+			unsigned long nvmFlashCSStart;
 				// NVM Flash CS start
-			PFLASH_CS_INFO		nvmFlashCSInfo;
+			PFLASH_CS_INFO nvmFlashCSInfo;
 				// NVM Flash CS info
-			unsigned long int	nvmFlashID;
+			unsigned long int nvmFlashID;
 				// ID of Flash chip
-volatile	bool				nvmFlashCSDone;
+volatile	bool		nvmFlashCSDone;
 				// Has CS been read yet?
-volatile	bool				nvmFlashRaw;
+volatile	bool		nvmFlashRaw;
 				// Do we need raw access at the moment?
 
 			uint32		nvmFlashMajor;
@@ -507,11 +511,11 @@ volatile	bool				nvmFlashRaw;
 
 			uint32		hwParamPtr;
 				// Pointer to the NVM Param section address
-			unsigned char		gpioInfo[32];
+			unsigned char gpioInfo[32];
 				// Stored GPIO information
 			uint32		gpioBitMap;
 				// GPIO LED bitmap
 };
 
-#endif // _USB_BECEEM_DEVICE_STRUCT_
 
+#endif // _USB_BECEEM_DEVICE_STRUCT_

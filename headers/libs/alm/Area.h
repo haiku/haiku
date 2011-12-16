@@ -103,8 +103,8 @@ public:
 
 			void				InvalidateSizeConstraints();
 
-			BRect				Frame();
-			BRect				ItemFrame();
+			BRect				Frame() const;
+			BRect				ItemFrame() const;
 
 private:
 								Area(BLayoutItem* item);
@@ -124,10 +124,10 @@ private:
 
 			LinearSpec*			fLS;
 
-			XTab*				fLeft;
-			XTab*				fRight;
-			YTab*				fTop;
-			YTab*				fBottom;
+			BReference<XTab>	fLeft;
+			BReference<XTab>	fRight;
+			BReference<YTab>	fTop;
+			BReference<YTab>	fBottom;
 
 			Row*				fRow;
 			Column*				fColumn;

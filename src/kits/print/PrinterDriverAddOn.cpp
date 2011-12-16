@@ -169,7 +169,7 @@ PrinterDriverAddOn::FindPathToDriver(const char* driver, BPath* path)
 	if (result == B_OK)
 		return B_OK;
 
-	result = ::TestForAddonExistence(driver, B_BEOS_ADDONS_DIRECTORY,
+	result = ::TestForAddonExistence(driver, B_SYSTEM_ADDONS_DIRECTORY,
 		kPrinterDriverFolderName, *path);
 	return result;
 }

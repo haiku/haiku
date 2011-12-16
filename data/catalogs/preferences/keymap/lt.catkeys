@@ -1,22 +1,31 @@
-1	lithuanian	x-vnd.Haiku-Keymap	4175672673
-Tilde trigger	Keymap window		Riestinis
-Grave trigger	Keymap window		Kairinis
+1	lithuanian	x-vnd.Haiku-Keymap	3895282621
+Caps Lock:	Modifier Keys window		Didžiosios raidės:
+OK	Modifier Keys window		Gerai
+Tilde trigger	Keymap window		Riestinis kirtis (tildė)
+Modifier Keys	Modifier Keys window		Valdymo klavišai
+Grave trigger	Keymap window		Kairinis kirtis (gravis)
 Select dead keys	Keymap window		Kombinaciniai klavišai
-Quit	Keymap window		Baigti
+Option:	Modifier Keys window		Alternatyva:
+Revert	Modifier Keys window		Atšaukti pakeitimus
+Quit	Keymap window		Baigti darbą
+Switch shortcut keys to Haiku mode	Keymap window		Naudoti „Haiku“ valdymo klavišus
 Circumflex trigger	Keymap window		Stogelis
-Diaeresis trigger	Keymap window		Trema
-Open…	Keymap window		Atidaryti…
-System:	Keymap window		Sisteminės:
-Switch shortcut keys	Keymap window		Derinių klavišai
-User:	Keymap window		Vartotojo:
-Switch shortcut keys to Haiku mode	Keymap window		Naudoti derinių klavišus kaip Haiku
-Keymap	Keymap window		Klaviatūros išdėstymas
-Sample and clipboard:	Keymap window		Pavyzdys ir iškarpa:
-Layout	Keymap window		Išdėstymas
-Switch shortcut keys to Windows/Linux mode	Keymap window		Naudoti derinių klavišus kaip Windows/Linux
-Revert	Keymap window		Grįžti
-Save as…	Keymap window		Išsaugoti kaip…
-File	Keymap window		Byla
+Cancel	Modifier Keys window		Atsisakyti
+Diaeresis trigger	Keymap window		Du taškai viršuje (umliautas)
+Open…	Keymap window		Atverti…
+System:	Keymap window		Sistemos išdėstymai:
+Switch shortcut keys	Keymap window		Sukeisti Valdymo ir Komandos klavišus
+Set Modifier Keys…	Keymap window		Keisti valdymo klavišus…
+User:	Keymap window		Naudotojo išdėstymai:
+Control:	Modifier Keys window		Valdymas:
+Sample and clipboard:	Keymap window		Vieta pabandymui:
+Layout	Keymap window		Klaviatūra
+Switch shortcut keys to Windows/Linux mode	Keymap window		Naudoti „Windows“ ir „Linux“ valdymo klavišus
+Revert	Keymap window		Atšaukti pakeitimus
+Save as…	Keymap window		Įrašyti kaip…
+File	Keymap window		Failas
 (Current)	Keymap window		(Esamas)
-Font	Keymap window		Rašmenys
-Acute trigger	Keymap window		Dešininis
+Font	Keymap window		Šriftas
+Keymap	System name		Klavišų išdėstymas
+Command:	Modifier Keys window		Komanda:
+Acute trigger	Keymap window		Dešininis kirtis (akūtas)

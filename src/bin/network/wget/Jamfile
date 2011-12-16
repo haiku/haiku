@@ -34,6 +34,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) src ] ;
 
 BinCommand wget :
 	build_info.c
+	c-ctype.c
 	cmpt.c
 	connect.c
 	convert.c

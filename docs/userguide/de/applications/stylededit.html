@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Humdinger
+ *		taos
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -38,6 +39,8 @@
 <li><a href="../../uk/applications/stylededit.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/applications/stylededit.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/applications/stylededit.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/stylededit.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/stylededit.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/applications/stylededit.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -52,12 +55,12 @@
 
 <h2><img src="../../images/apps-images/stylededit-icon_64.png" alt="stylededit-icon_64.png" width="64" height="64" />StyledEdit</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
-<tr><td>Ort:</td><td></td><td><span class="path">/boot/system/apps/StyledEdit</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu"><acronym title="Applications">Anwendungen</acronym></span></td></tr>
+<tr><td>Ort:</td><td></td><td><span class="path"><acronym title="/boot/system/apps/StyledEdit">/boot/System/apps/Texteditor</acronym></span></td></tr>
 <tr><td>Einstellungen:</td><td></td><td><i>keine</i></td></tr>
 </table>
 <p><br /></p>
-<p>StyledEdit heißt Haikus einfacher Texteditor. Obwohl er reine Textdateien schreibt, lassen sich gewisse Formatierungen mittels Dateiattributen verwenden, die dann unter StyledEdit dargestellt werden.</p>
+<p>Haikus einfacher <acronym title="StyledEdit">Texteditor</acronym> schreibt reine Textdateien. Dennoch lassen sich gewisse Formatierungen mittels Dateiattributen verwenden, die in Haikus <acronym title="StyledEdit">Texteditor</acronym> dargestellt werden.</p>
 <img src="../images/apps-images/stylededit.png" alt="stylededit.png" />
 <p>Falls es interessiert, so sehen diese zusätzlichen Attribute aus, wenn man sie im Terminal mit <span class="cli">listattr</span> anzeigt:</p>
 <pre class="terminal">~&gt; listattr /boot/home/Desktop/test.txt
@@ -71,10 +74,10 @@ MIME String         11  "BEOS:TYPE"
    Raw Data       1048  "styles"
 
 1071 bytes total in attributes.</pre>
-<p>Wie man sieht, sind sämtliche Möglichkeiten zur Formattierung von StyledEdits Menü vorhanden: Zeilenumbruch ("line wrapping (on/off)") und Ausrichtung ("alignment (left/center/right)"); beide in einem eigenen Attribut. In einem weiteren befindet sich Schriftart, Größe und Farbe jedes Zeichens.</p>
-<div class="box-info">Weil Attribute auf die Eigenschaften des BFS Dateisystems angewiesen sind, heißt das nicht nur, dass man unter anderen Betriebssystem ganz normale Textdateien vorfindet. Es bedeutet auch, dass die Formatiierungen verloren gehen, wenn man die Datei auf einer nicht-BFS Partition ablegt. Die oben erwähnten Attribute verschwinden dadurch und es bleibt eine einfache Textdatei.</div>
+<p>Wie man sieht, sind sämtliche Möglichkeiten zur Formatierung im Menü von <acronym title="StyledEdit">Texteditor</acronym> vorhanden: Zeilenumbruch ("line wrapping (on/off)") und Ausrichtung ("alignment (left/center/right)"); beide in einem eigenen Attribut. In einem weiteren befindet sich Schriftart, Größe und Farbe jedes Zeichens.</p>
+<div class="box-info">Weil Attribute auf die Eigenschaften des BFS Dateisystems angewiesen sind, heißt das nicht nur, dass man unter anderen Betriebssystem ganz normale Textdateien vorfindet. Es bedeutet auch, dass die Formatierungen verloren gehen, wenn man die Datei auf einer nicht-BFS Partition ablegt. Die oben erwähnten Attribute verschwinden dadurch und es bleibt eine einfache Textdatei.</div>
 <p>Auf alle Fälle ist es eine nette Idee, die Möglichkeit für bunten Text in unterschiedlichen Schriften und Größen zu haben, während es sich immer noch um eine reine Textdatei handelt. Damit ist zum Beispiel eine <span class="cli">ReadMe.txt</span> Datei von jeder Plattform aus in einer Konsole lesbar und hat immer noch ein bisschen Style, wenn man sie unter Haiku doppelklickt.</p>
-<p>Die eigentliche Bedienung von StyledEdit ist so einfach, dass sich eine Erklärung für jeden der banalen Menüpunkte erübrigt. Man schreibt einfach seinen Text runter, markiert die zu formatierenden Wörter und wählt die entsprechenden Einträge für Schrift, Größe und Farbe aus dem <span class="menu">Font</span> Menü. Zeilenumbruch und Ausrichtung aus dem <span class="menu">Document</span> Menü lassen sich nur auf die gesamte Datei anwenden.</p>
+<p>Die eigentliche Bedienung von <acronym title="StyledEdit">Texteditor</acronym> ist so einfach, dass sich eine Erklärung für jeden der banalen Menüpunkte erübrigt. Man schreibt einfach seinen Text runter, markiert die zu formatierenden Wörter und wählt die entsprechenden Einträge für Schrift, Größe und Farbe aus dem <span class="menu">Schrift</span> Menü. Zeilenumbruch und Ausrichtung aus dem <span class="menu">Dokument</span> Menü lassen sich nur auf die gesamte Datei anwenden.</p>
 
 </div>
 </div>

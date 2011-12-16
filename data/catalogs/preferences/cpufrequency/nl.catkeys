@@ -1,19 +1,19 @@
-1	dutch	x-vnd.Haiku-CPUFrequencyPref	3974849433
-CPU frequency status view	CPU Frequency View		Weergave CPU-frequentiestatus
-CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPUFrequency\n\tdoor Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
-Defaults	Pref Window		Standaardwaarden
-Dynamic performance	Status view		Dynamische prestaties
-Dynamic stepping	CPU Frequency View		Dynamisch opvoeren
-High performance	Status view		Hoge prestaties
-Install replicant into Deskbar	CPU Frequency View		Replicant in Deskbar installeren
-Integration time [ms]: 	CPU Frequency View		Integratietijd [ms]: 
-Launching the CPU frequency preflet failed.\n\nError: 	Status view		Starten van de CPU-frequentiepreflet is mislukt.\n\nFout:
-Low energy	Status view		Lage energie
+1	dutch; flemish	x-vnd.Haiku-CPUFrequencyPref	3974849433
 Ok	Status view		Oké
-Open Speedstep preferences…	Status view		Speedstep-voorkeuren openen…
-Quit	Status view		Afsluiten
-Revert	Pref Window		Herstellen
+CPU frequency status view	CPU Frequency View		Weergave CPU-frequentiestatus
 Set state	Status view		Toestand instellen
-Step up by CPU usage	Color Step View		Opvoeren door CPU-gebruik
+Defaults	Pref Window		Standaardwaarden
+Install replicant into Deskbar	CPU Frequency View		Replicant in Deskbar installeren
+Quit	Status view		Afsluiten
+High performance	Status view		Hoge prestaties
 Stepping policy	CPU Frequency View		Stapbeleid
+Dynamic performance	Status view		Dynamische prestaties
+Step up by CPU usage	Color Step View		Opvoeren door CPU-gebruik
+Dynamic stepping	CPU Frequency View		Dynamisch opvoeren
 Stepping policy: 	CPU Frequency View		Opvoerbeleid:
+Integration time [ms]: 	CPU Frequency View		Integratietijd [ms]: 
+Open Speedstep preferences…	Status view		Speedstep-voorkeuren openen…
+Revert	Pref Window		Herstellen
+Low energy	Status view		Lage energie
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Starten van de CPU-frequentiepreflet is mislukt.\n\nFout:
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPUFrequency\n\tdoor Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n

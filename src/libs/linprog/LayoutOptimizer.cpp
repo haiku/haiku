@@ -259,8 +259,21 @@ swap(Type& a, Type& b)
 
 // #pragma mark - algorithms
 
+#if 0
+static void
+print_system(double** a, int n, double* b)
+{
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			printf("%.1f ", a[i][j]);
+		}
+		printf("= %f\n", b[i]);
+	}
+}
+#endif
 
-bool
+
+static bool
 solve(double** a, int n, double* b)
 {
 	// index array for row permutation
@@ -312,6 +325,8 @@ solve(double** a, int n, double* b)
 		for (int j = i + 1; j < n; j++)
 			sum -= a[index][j] * b[j];
 
+		if (fuzzy_equals(a[index][i], 0))
+			return false;
 		b[i] = sum / a[index][i];
 	}
 
@@ -382,7 +397,7 @@ compute_dependencies(double** a, int m, int n,
 
 
 // remove_linearly_dependent_rows
-int
+static int
 remove_linearly_dependent_rows(double** A, double** temp,
 	bool* independentRows, int m, int n)
 {
@@ -411,7 +426,7 @@ remove_linearly_dependent_rows(double** A, double** temp,
 
 /*!	QR decomposition using Householder transformations.
 */
-bool
+static bool
 qr_decomposition(double** a, int m, int n, double* d, double** q)
 {
 	if (m < n)

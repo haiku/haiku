@@ -10,6 +10,7 @@
 
 #include <syscall_utils.h>
 
+#include <errno_private.h>
 #include <signal_defs.h>
 #include <syscalls.h>
 

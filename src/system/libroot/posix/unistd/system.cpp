@@ -11,8 +11,8 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include <errno_private.h>
 #include <syscall_utils.h>
-
 
 
 extern "C" int

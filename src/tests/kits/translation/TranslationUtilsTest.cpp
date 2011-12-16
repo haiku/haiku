@@ -357,7 +357,8 @@ TranslationUtilsTest::AddTranslationItemsTest()
 	BTranslatorRoster *proster = new BTranslatorRoster();
 	CPPUNIT_ASSERT(proster);
 	CPPUNIT_ASSERT(proster->AddTranslators(
-		"/boot/beos/system/add-ons/Translators/PPMTranslator") == B_OK);
+		"/boot/beos/system/add-ons/Translators/PPMTranslator"
+		) == B_OK);
 	CPPUNIT_ASSERT(BTranslationUtils::AddTranslationItems(pmenu,
 		B_TRANSLATOR_BITMAP, NULL, NULL, NULL, proster) == B_OK);
 	CPPUNIT_ASSERT(pmenu->CountItems() == 1);

@@ -314,6 +314,7 @@ WriterImplBase::WriterImplBase(BErrorOutput* errorOutput)
 	:
 	fErrorOutput(errorOutput),
 	fFileName(NULL),
+	fFlags(0),
 	fFD(-1),
 	fFinished(false),
 	fDataWriter(NULL)
@@ -326,20 +327,25 @@ WriterImplBase::~WriterImplBase()
 	if (fFD >= 0)
 		close(fFD);
 
-	if (!fFinished && fFileName != NULL)
+	if (!fFinished && fFileName != NULL
+		&& (fFlags & B_HPKG_WRITER_UPDATE_PACKAGE) == 0) {
 		unlink(fFileName);
+	}
 }
 
 
 status_t
-WriterImplBase::Init(const char* fileName, const char* type)
+WriterImplBase::Init(const char* fileName, const char* type, uint32 flags)
 {
 	if (fPackageStringCache.Init() != B_OK)
 		throw std::bad_alloc();
 
-	// open file
-	fFD = open(fileName, O_WRONLY | O_CREAT | O_TRUNC,
-		S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+	// open file (don't truncate in update mode)
+	int openMode = O_RDWR;
+	if ((flags & B_HPKG_WRITER_UPDATE_PACKAGE) == 0)
+		openMode |= O_CREAT | O_TRUNC;
+
+	fFD = open(fileName, openMode, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if (fFD < 0) {
 		fErrorOutput->PrintError("Failed to open %s file \"%s\": %s\n", type,
 			fileName, strerror(errno));
@@ -347,6 +353,7 @@ WriterImplBase::Init(const char* fileName, const char* type)
 	}
 
 	fFileName = fileName;
+	fFlags = flags;
 
 	return B_OK;
 }
@@ -410,25 +417,44 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 	RegisterPackageVersion(attributeList, packageInfo.Version());
 
 	// copyright list
-	const BObjectList<BString>& copyrightList = packageInfo.CopyrightList();
-	for (int i = 0; i < copyrightList.CountItems(); ++i) {
+	const BStringList& copyrightList = packageInfo.CopyrightList();
+	for (int i = 0; i < copyrightList.CountStrings(); ++i) {
 		PackageAttribute* copyright = new PackageAttribute(
 			B_HPKG_ATTRIBUTE_ID_PACKAGE_COPYRIGHT, B_HPKG_ATTRIBUTE_TYPE_STRING,
 			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-		copyright->string
-			= fPackageStringCache.Get(copyrightList.ItemAt(i)->String());
+		copyright->string = fPackageStringCache.Get(copyrightList.StringAt(i));
 		attributeList.Add(copyright);
 	}
 
 	// license list
-	const BObjectList<BString>& licenseList = packageInfo.LicenseList();
-	for (int i = 0; i < licenseList.CountItems(); ++i) {
+	const BStringList& licenseList = packageInfo.LicenseList();
+	for (int i = 0; i < licenseList.CountStrings(); ++i) {
 		PackageAttribute* license = new PackageAttribute(
 			B_HPKG_ATTRIBUTE_ID_PACKAGE_LICENSE, B_HPKG_ATTRIBUTE_TYPE_STRING,
 			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-		license->string
-			= fPackageStringCache.Get(licenseList.ItemAt(i)->String());
+		license->string = fPackageStringCache.Get(licenseList.StringAt(i));
 		attributeList.Add(license);
+	}
+
+	// URL list
+	const BStringList& urlList = packageInfo.URLList();
+	for (int i = 0; i < urlList.CountStrings(); ++i) {
+		PackageAttribute* url = new PackageAttribute(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_URL, B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+		url->string = fPackageStringCache.Get(urlList.StringAt(i));
+		attributeList.Add(url);
+	}
+
+	// source URL list
+	const BStringList& sourceURLList = packageInfo.SourceURLList();
+	for (int i = 0; i < sourceURLList.CountStrings(); ++i) {
+		PackageAttribute* url = new PackageAttribute(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_SOURCE_URL,
+			B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+		url->string = fPackageStringCache.Get(sourceURLList.StringAt(i));
+		attributeList.Add(url);
 	}
 
 	// provides list
@@ -437,6 +463,8 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 	for (int i = 0; i < providesList.CountItems(); ++i) {
 		BPackageResolvable* resolvable = providesList.ItemAt(i);
 		bool hasVersion = resolvable->Version().InitCheck() == B_OK;
+		bool hasCompatibleVersion
+			= resolvable->CompatibleVersion().InitCheck() == B_OK;
 
 		PackageAttribute* provides = new PackageAttribute(
 			B_HPKG_ATTRIBUTE_ID_PACKAGE_PROVIDES, B_HPKG_ATTRIBUTE_TYPE_STRING,
@@ -452,6 +480,12 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 
 		if (hasVersion)
 			RegisterPackageVersion(provides->children, resolvable->Version());
+
+		if (hasCompatibleVersion) {
+			RegisterPackageVersion(provides->children,
+				resolvable->CompatibleVersion(),
+				B_HPKG_ATTRIBUTE_ID_PACKAGE_PROVIDES_COMPATIBLE);
+		}
 	}
 
 	// requires list
@@ -471,13 +505,12 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 		packageInfo.FreshensList(), B_HPKG_ATTRIBUTE_ID_PACKAGE_FRESHENS);
 
 	// replaces list
-	const BObjectList<BString>& replacesList = packageInfo.ReplacesList();
-	for (int i = 0; i < replacesList.CountItems(); ++i) {
+	const BStringList& replacesList = packageInfo.ReplacesList();
+	for (int i = 0; i < replacesList.CountStrings(); ++i) {
 		PackageAttribute* replaces = new PackageAttribute(
 			B_HPKG_ATTRIBUTE_ID_PACKAGE_REPLACES, B_HPKG_ATTRIBUTE_TYPE_STRING,
 			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-		replaces->string
-			= fPackageStringCache.Get(replacesList.ItemAt(i)->String());
+		replaces->string = fPackageStringCache.Get(replacesList.StringAt(i));
 		attributeList.Add(replaces);
 	}
 
@@ -490,15 +523,26 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 			= fPackageStringCache.Get(packageInfo.Checksum().String());
 		attributeList.Add(checksum);
 	}
+
+	// install path (optional)
+	if (!packageInfo.InstallPath().IsEmpty()) {
+		PackageAttribute* installPath = new PackageAttribute(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_INSTALL_PATH,
+			B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+		installPath->string = fPackageStringCache.Get(
+			packageInfo.InstallPath().String());
+		attributeList.Add(installPath);
+	}
 }
 
 
 void
 WriterImplBase::RegisterPackageVersion(PackageAttributeList& attributeList,
-	const BPackageVersion& version)
+	const BPackageVersion& version, BHPKGAttributeID attributeID)
 {
 	PackageAttribute* versionMajor = new PackageAttribute(
-		B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MAJOR, B_HPKG_ATTRIBUTE_TYPE_STRING,
+		attributeID, B_HPKG_ATTRIBUTE_TYPE_STRING,
 		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
 	versionMajor->string = fPackageStringCache.Get(version.Major().String());
 	attributeList.Add(versionMajor);
@@ -521,6 +565,16 @@ WriterImplBase::RegisterPackageVersion(PackageAttributeList& attributeList,
 				= fPackageStringCache.Get(version.Micro().String());
 			versionMajor->children.Add(versionMicro);
 		}
+	}
+
+	if (!version.PreRelease().IsEmpty()) {
+		PackageAttribute* preRelease = new PackageAttribute(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_PRE_RELEASE,
+			B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+		preRelease->string
+			= fPackageStringCache.Get(version.PreRelease().String());
+		versionMajor->children.Add(preRelease);
 	}
 
 	if (version.Release() != 0) {

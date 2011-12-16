@@ -10,9 +10,8 @@
 
 #include <SupportDefs.h>
 #include <StorageDefs.h>
+#include <TypeConstants.h>
 
-
-static const uint32 B_MIME_STRING_TYPE = 'MIMS';
 
 enum icon_size {
 	B_LARGE_ICON	= 32,

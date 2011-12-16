@@ -1378,7 +1378,7 @@ copy_user_process_args(const char* const* userFlatArgs, size_t flatArgsSize,
 		return B_BAD_ADDRESS;
 
 	// allocate kernel memory
-	char** flatArgs = (char**)malloc(flatArgsSize);
+	char** flatArgs = (char**)malloc(_ALIGN(flatArgsSize));
 	if (flatArgs == NULL)
 		return B_NO_MEMORY;
 
@@ -1541,7 +1541,7 @@ team_create_thread_start_internal(void* args)
 	{
 		// find runtime_loader path
 		KPath runtimeLoaderPath;
-		err = find_directory(B_BEOS_SYSTEM_DIRECTORY, gBootDevice, false,
+		err = find_directory(B_SYSTEM_DIRECTORY, gBootDevice, false,
 			runtimeLoaderPath.LockBuffer(), runtimeLoaderPath.BufferSize());
 		if (err < B_OK) {
 			TRACE(("team_create_thread_start: find_directory() failed: %s\n",
@@ -4028,6 +4028,7 @@ _user_setsid(void)
 
 	// lock the team's current process group, parent, and the team itself
 	team->LockTeamParentAndProcessGroup();
+	BReference<ProcessGroup> oldGroupReference(team->group);
 	AutoLocker<ProcessGroup> oldGroupLocker(team->group, true);
 	TeamLocker parentLocker(team->parent, true);
 	TeamLocker teamLocker(team, true);

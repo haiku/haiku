@@ -1,24 +1,24 @@
-1	slovak	x-vnd.Haiku-DiskUsage	2324691237
-%a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
-%d file	Status View		%d súbor
-%d files	Status View		%d súborov
-9999.99 GB	Status View		9999.99 GB
-Created	Info Window		Vytvorené
-DiskUsage	System name		Využitie disku
-Free on %refName%	Scanner		Voľné na %refName%
-Get Info	Pie View		Získať informácie
+1	slovak	x-vnd.Haiku-DiskUsage	3399777733
+Scanning %refName%	Scanner		Prehľadáva sa %refName%
+Size	Info Window		Veľkosť
+Rescan	Pie View		Znovu preskúmať
+Rescan	Volume View		Znovu preskúmať
+Outdated view	Pie View		Neaktuálne zobrazenie
 Kind	Info Window		Druh
+file unavailable	Pie View		súbor nedostupný
+no supporting apps	Pie View		žiadne podporujúce aplikácie
+%d file	Status View		%d súbor
+Path	Info Window		Cesta
+Scan	Status View		Preskúmať
+9999.99 GB	Status View		9999.99 GB
+file unavailable	Status View		súbor nedostupný
+Get Info	Pie View		Získať informácie
+DiskUsage	System name		Využitie disku
+ in %d files	Info Window		 v %d súboroch
+%d files	Status View		%d súborov
+Created	Info Window		Vytvorené
 Modified	Info Window		Zmenené
 Open	Pie View		Otvoriť
 Open With	Pie View		Otvoriť pomocou
-Outdated view	Pie View		Neaktuálne zobrazenie
-Path	Info Window		Cesta
-Rescan	Pie View		Preskúmať znova
-Rescan	Volume View		Preskúmať znova
-Scan	Status View		Preskúmať
-Scanning %refName%	Scanner		Prehľadáva sa %refName%
-Size	Info Window		Veľkosť
-file unavailable	Pie View		súbor nedostupný
-file unavailable	Status View		súbor nedostupný
-in %d files	Info Window		v %d súboroch
-no supporting apps	Pie View		žiadne podporujúce aplikácie
+%a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
+Free on %refName%	Scanner		Voľné na %refName%

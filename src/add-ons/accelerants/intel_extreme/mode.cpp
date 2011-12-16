@@ -609,7 +609,7 @@ sanitize_display_mode(display_mode& mode)
 		gInfo->shared_info->pll_info.min_frequency,
 		gInfo->shared_info->pll_info.max_frequency,
 		// horizontal
-		{8, 16, 8160, 24, 504, 15, 8192},
+		{2, 0, 8160, 32, 8192, 0, 8192},
 		{1, 1, 4092, 2, 63, 1, 4096}
 	};
 

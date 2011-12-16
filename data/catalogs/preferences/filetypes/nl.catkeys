@@ -1,130 +1,142 @@
-1	dutch	x-vnd.Haiku-FileTypes	1686806636
-%1 application type	Application Type Window		%1 toepassingstype
-%s file type	FileType Window		%s bestandstype
-(from application)	FileTypes Window		(van de applicatie)
-(from super type)	FileTypes Window		(van een super type)
-Add	Attribute Window		Toevoegen
-Add	Extension Window		Toevoegen
-Add group	New File Type Window		Groep toevoegen
-Add icon…	Icon View		Icoon toevoegen…
-Add new group	New File Type Window		Nieuwe groep toevoegen
-Add type	New File Type Window		Voeg een type toe
-Add…	Application Type Window		Toevoegen…
-Add…	FileTypes Window		Toevoegen...
-Alignment:	Attribute Window		Uitlijning:
-Alpha	Application Type Window		Alfa
-Application flags	Application Type Window		Toepassingsvlaggen
-Application type	Application Type Window		Toepassingstype
+1	dutch; flemish	x-vnd.Haiku-FileTypes	1624004105
 Application types…	FileTypes Window		Toepassingstypes...
+Description:	Application Types Window		Beschrijving:
 Args only	Application Type Window		Alleen argumenten
-Attribute	Attribute Window		Attribuut
-Attribute name:	Attribute Window		Atrribuutnaam:
-Background app	Application Type Window		Achtergrondtoepassing
-Beta	Application Type Window		Bèta
-Cancel	Application Type Window		Annuleren
-Cancel	Attribute Window		Annuleren
-Cancel	Extension Window		Annuleren
-Cancel	FileTypes Window		Annuleren
-Cancel	New File Type Window		Annuleren
-Cancel	Preferred App Menu		Annuleren
-Cancel	Type List Window		Annuleren
-Center	Attribute Window	Attribute column alignment in Tracker	Centreren
-Choose type	Type List Window		Kies type
-Close	Application Type Window		Sluit
-Could not change attributes	Attribute Window		Kon attributen niet veranderen
-Could not change file extensions	Extension Window		Kon bestandsextensies niet veranderen
-Could not install file type	New File Type Window		Kon bestandstype niet installeren
-Could not open \"%s\":\n%s	FileTypes		Kon \"%s\":\n%s niet openen
-Could not open file	FileType Window		Kon bestand niet openen
-Could not remove file type: %s\n	FileTypes Window		Kon bestandstype %s\n niet verwijderen.
-Could not retrieve application signature	Preferred App Menu		Kon de applicatie-handtekening niet verkrijgen
-Could not retrieve preferred application of this file	Preferred App Menu		Kon de voorkeurstoepassing van dit bestand niet verkrijgen
-Could not set preferred application	FileTypes Window		Kon de gekozen toepassing niet instellen
-Default application	FileType Window		Standaardtoepassing
-Description	FileTypes Window		Beschrijving
-Description:	FileTypes Window		Beschrijving:
-Development	Application Type Window		Ontwikkeling
-Display as:	Attribute Window	Tracker offers different display modes for attributes.	Toon als:
-Do you want to save the changes?	Application Type Window		Wilt u de veranderingen opslaan?
-Done	Attribute Window		Klaar
-Done	Extension Window		Klaar
-Done	Type List Window		Klaar
-Edit icon…	Icon View		Icoon aanpassen...
-Editable	Attribute Window	If Tracker allows to edit this attribute.	Aanpasbaar
-Exclusive launch	Application Type Window		Exclusieve lancering
-Extension	Extension Window		Extensie
-Extension:	Extension Window		Extensie:
-Extensions:	FileTypes Window		Extensies:
-Extra attributes	FileTypes Window		Extra attributen
-File	Application Type Window		Bestand
-File	FileTypes Window		Bestand
-File could not be opened	Preferred App Menu		Bestand kon niet geopend worden
-File recognition	FileTypes Window		Bestandsherkenning
-File type	FileType Window		Bestandstype
-FileTypes	FileTypes		BestandsTypen
-FileTypes request	FileTypes		BestandsTypen-verzoek
-FileTypes request	FileTypes Window		BestandsTypen-aanvraag
-FileTypes request	Preferred App Menu		BestandsTypen-verzoek
-Final	Application Type Window		Laatste
-Gamma	Application Type Window		Gamma
-Golden master	Application Type Window		Golden master
-Group name:	New File Type Window		Groepnaam:
-Group:	New File Type Window		Groep:
-Icon	Application Type Window		Icoon
-Icon	FileType Window		Icoon
-Icon	FileTypes Window		Icoon
-Internal name:	Attribute Window		Interne naam:
-Internal name:	FileTypes Window		Interne naam:
-Internal name:	New File Type Window		Interne naam:
-Left	Attribute Window	Attribute column alignment in Tracker	Links
-Long description:	Application Type Window		Lange omschrijving:
-Multiple files from \"%s\" file type	FileType Window		Meerdere bestanden van \"%s\" bestandstype
-Multiple launch	Application Type Window		Meervoudige opstart
-New file type	New File Type Window		Nieuw bestandstype
-New resource file…	FileTypes Window		Nieuw bronbestand...
-None	FileTypes Window		Geen
-OK	FileTypes		Oké
-Open file	FileTypes		Open Bestand
-Open…	FileTypes Window		Open...
-Preferred application	FileType Window		Voorkeurstoepassing
-Preferred application	FileTypes Window		Voorkeurstoepassing
-Quit	FileTypes Window		Sluiten
-Quit, don't save	Application Type Window		Afsluiten zonder opslaan
 Recognition rule is not valid:\n\n	FileTypes Window		Herkenningsregel is niet geldig:\n\n
+Add group	New File Type Window		Groep toevoegen
 Remove	Application Type Window		Verwijderen
-Remove	FileTypes Window		Verwijderen
-Remove icon	Icon View		Icoon verwijderen
-Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Verwijderen van een bestandstype is onomkeerbaar.\nWeet u zeker dat u het wilt verwijderen?
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Het verwijderen van een supertype kan niet ongedaan gemaakt worden.\nAlle bestandstypes die toebehoren aan dit supertype zullen verloren gaan!\n\nBent u zeker dat u dit wilt doen? Om de hele groep te verwijderen, druk de Shift-toets in en klik op \"Remove\".
-Right	Attribute Window	Attribute column alignment in Tracker	Rechts
-Rule:	FileTypes Window		Regel:
-Same as…	FileTypes Window		Zelfde als...
-Save	Application Type Window		Opslaan
-Save into resource file…	Application Type Window		Sla op in bronbestand...
-Save request	Application Type Window		Verzoek bewaren
-Select preferred application	FileType Window		Selecteer voorkeurstoepassing
-Select preferred application	FileTypes Window		Selecteer voorkeurstoepassing
-Select same preferred application as	FileType Window		Selecteer dezelfde voorkeurstoepassing als
-Select same preferred application as	FileTypes Window		Selecteer dezelfde voorkeurstoepassing als
 Select same type as	FileType Window		Selecteer dezelfde soort als
-Select…	FileType Window		Selecteer…
-Select…	FileTypes Window		Selecteer...
-Set Preferred Application	Preferred App Menu		Voorkeurstoepassing instellen
-Settings	FileTypes Window		Instellingen
-Short description:	Application Type Window		Korte omschrijving:
-Show icons in list	FileTypes Window		Toon iconen in de lijst
-Show recognition rule	FileTypes Window		Toon herkenningsregel
-Signature:	Application Type Window		Onderschrift:
-Single launch	Application Type Window		Enkelvoudige opstart
-Special:	Attribute Window		Speciaal:
+Remove icon	Icon View		Icoon verwijderen
 Supported types	Application Type Window		Ondersteunde soorten
-The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		De toepassing \"%s\" ondersteunt dit bestandstype niet.\nBent u zeker dat u het toch wilt instellen?
-This file type already exists	New File Type Window		Dit bestandstype bestaat al
+Show icons in list	FileTypes Window		Toon iconen in de lijst
 Type name:	FileTypes Window		Type naam:
-Type:	Attribute Window		Type:
-Version info	Application Type Window		Versie-info
+Internal name:	New File Type Window		Interne naam:
+Choose type	Type List Window		Kies type
+New file type	New File Type Window		Nieuw bestandstype
+Rule:	FileTypes Window		Regel:
+Add icon…	Icon View		Icoon toevoegen…
+Multiple files from \"%s\" file type	FileType Window		Meerdere bestanden van \"%s\" bestandstype
+Do you want to save the changes?	Application Type Window		Wilt u de veranderingen opslaan?
+File type	FileType Window		Bestandstype
+Could not change attributes	Attribute Window		Kon attributen niet veranderen
+Could not retrieve preferred application of this file	Preferred App Menu		Kon de voorkeurstoepassing van dit bestand niet verkrijgen
+Beta	Application Types Window		Bèta
+Extensions:	FileTypes Window		Extensies:
+Select same preferred application as	FileTypes Window		Selecteer dezelfde voorkeurstoepassing als
+Save	Application Type Window		Opslaan
+Could not retrieve application signature	Preferred App Menu		Kon de applicatie-handtekening niet verkrijgen
+Add	Extension Window		Toevoegen
+Select same preferred application as	FileType Window		Selecteer dezelfde voorkeurstoepassing als
+Cancel	Attribute Window		Annuleren
+Icon	Application Type Window		Icoon
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Verwijderen van een bestandstype is onomkeerbaar.\nWeet u zeker dat u het wilt verwijderen?
+Editable	Attribute Window	If Tracker allows to edit this attribute.	Aanpasbaar
+Multiple launch	Application Type Window		Meervoudige opstart
+(from application)	FileTypes Window		(van de applicatie)
+Could not set preferred application	FileTypes Window		Kon de gekozen toepassing niet instellen
+Group:	New File Type Window		Groep:
+%1 application type	Application Type Window		%1 toepassingstype
+Done	Extension Window		Klaar
+Application type	Application Type Window		Toepassingstype
+Done	Type List Window		Klaar
+Attribute	Attribute Window		Attribuut
+Show recognition rule	FileTypes Window		Toon herkenningsregel
+FileTypes request	Preferred App Menu		BestandsTypen-verzoek
+Could not open file	FileType Window		Kon bestand niet openen
+Description:	FileTypes Window		Beschrijving:
+File	FileTypes Window		Bestand
+Group name:	New File Type Window		Groepnaam:
+Preferred application	FileType Window		Voorkeurstoepassing
+File	Application Type Window		Bestand
 Version:	Application Type Window		Versie:
-Visible	Attribute Window		Zichtbaar
-Width:	Attribute Window	Default column width in Tracker for this attribute.	Breedte:
+Select…	FileTypes Window		Selecteer...
+FileTypes request	FileTypes		BestandsTypen-verzoek
+Open…	FileTypes Window		Open...
+Select…	FileType Window		Selecteer…
+Same as…	FileType Window	The same APPLICATION as ...	Zelfde als...
+FileTypes	FileTypes		BestandsTypen
+OK	FileTypes		Oké
+Extra attributes	FileTypes Window		Extra attributen
+Development	Application Type Window		Ontwikkeling
+Icon	FileType Window		Icoon
+Final	Application Types Window		Laatste
+Development	Application Types Window		Ontwikkeling
+Open file	FileTypes		Open Bestand
+Special:	Attribute Window		Speciaal:
+Alpha	Application Type Window		Alfa
+Add…	FileTypes Window		Toevoegen...
+Signature:	Application Type Window		Onderschrift:
+Quit, don't save	Application Type Window		Afsluiten zonder opslaan
+Add…	Application Type Window		Toevoegen…
 [Multiple files] file types	FileType Window		[Meerdere bestanden] Bestandstypen
+Gamma	Application Types Window		Gamma
+Quit	FileTypes Window		Sluiten
+Select preferred application	FileType Window		Selecteer voorkeurstoepassing
+Single launch	Application Type Window		Enkelvoudige opstart
+Golden master	Application Types Window		Golden master
+%s file type	FileType Window		%s bestandstype
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		De toepassing \"%s\" ondersteunt dit bestandstype niet.\nBent u zeker dat u het toch wilt instellen?
+Type:	Attribute Window		Type:
+Done	Attribute Window		Klaar
+Set Preferred Application	Preferred App Menu		Voorkeurstoepassing instellen
 no icon	FileTypes Window		geen icoon
+Alpha	Application Types Window		Alfa
+Background app	Application Type Window		Achtergrondtoepassing
+Add new group	New File Type Window		Nieuwe groep toevoegen
+Cancel	Application Type Window		Annuleren
+Settings	FileTypes Window		Instellingen
+New resource file…	FileTypes Window		Nieuw bronbestand...
+Cancel	New File Type Window		Annuleren
+Icon	FileTypes Window		Icoon
+Extension:	Extension Window		Extensie:
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Het verwijderen van een supertype kan niet ongedaan gemaakt worden.\nAlle bestandstypes die toebehoren aan dit supertype zullen verloren gaan!\n\nBent u zeker dat u dit wilt doen? Om de hele groep te verwijderen, druk de Shift-toets in en klik op \"Remove\".
+Internal name:	FileTypes Window		Interne naam:
+Add	Attribute Window		Toevoegen
+Close	Application Type Window		Sluit
+File recognition	FileTypes Window		Bestandsherkenning
+Center	Attribute Window	Attribute column alignment in Tracker	Centreren
+Golden master	Application Type Window		Golden master
+Could not open \"%s\":\n%s	FileTypes		Kon \"%s\":\n%s niet openen
+Alignment:	Attribute Window		Uitlijning:
+Left	Attribute Window	Attribute column alignment in Tracker	Links
+Cancel	Extension Window		Annuleren
+Application flags	Application Type Window		Toepassingsvlaggen
+Cancel	Type List Window		Annuleren
+Description	FileTypes Window		Beschrijving
+Save request	Application Type Window		Verzoek bewaren
+Beta	Application Type Window		Bèta
+None	FileTypes Window		Geen
+Remove	FileTypes Window		Verwijderen
+Attribute name:	Attribute Window		Atrribuutnaam:
+Extension	Extension Window		Extensie
+Add type	New File Type Window		Voeg een type toe
+Internal name:	Attribute Window		Interne naam:
+Final	Application Type Window		Laatste
+Width:	Attribute Window	Default column width in Tracker for this attribute.	Breedte:
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	Toon als:
+This file type already exists	New File Type Window		Dit bestandstype bestaat al
+Same as…	FileTypes Window		Zelfde als...
+Exclusive launch	Application Type Window		Exclusieve lancering
+FileTypes	System name		BestandsTypen
+Could not remove file type: %s\n	FileTypes Window		Kon bestandstype %s\n niet verwijderen.
+Signature:	Application Types Window		Onderschrift:
+Gamma	Application Type Window		Gamma
+Cancel	Preferred App Menu		Annuleren
+Cancel	FileTypes Window		Annuleren
+Select preferred application	FileTypes Window		Selecteer voorkeurstoepassing
+Right	Attribute Window	Attribute column alignment in Tracker	Rechts
+Default application	FileType Window		Standaardtoepassing
+Long description:	Application Type Window		Lange omschrijving:
+FileTypes request	FileTypes Window		BestandsTypen-aanvraag
+Version info	Application Type Window		Versie-info
+(from super type)	FileTypes Window		(van een super type)
+Version:	Application Types Window		Versie:
+Preferred application	FileTypes Window		Voorkeurstoepassing
+Short description:	Application Type Window		Korte omschrijving:
+File could not be opened	Preferred App Menu		Bestand kon niet geopend worden
+Could not change file extensions	Extension Window		Kon bestandsextensies niet veranderen
+Edit icon…	Icon View		Icoon aanpassen...
+Same as…	FileType Window	The same TYPE as ...	Zelfde als...
+Save into resource file…	Application Type Window		Sla op in bronbestand...
+Visible	Attribute Window		Zichtbaar
+Could not install file type	New File Type Window		Kon bestandstype niet installeren

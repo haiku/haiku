@@ -8,6 +8,7 @@
 
 #include <ObjectList.h>
 #include <String.h>
+#include <StringList.h>
 
 #include <package/PackageArchitecture.h>
 #include <package/PackageFlags.h>
@@ -18,6 +19,7 @@
 
 
 class BEntry;
+class BFile;
 
 
 namespace BPackageKit {
@@ -44,6 +46,9 @@ public:
 			status_t			ReadFromConfigFile(
 									const BEntry& packageInfoEntry,
 									ParseErrorListener* listener = NULL);
+			status_t			ReadFromConfigFile(
+									BFile& packageInfoFile,
+									ParseErrorListener* listener = NULL);
 			status_t			ReadFromConfigString(
 									const BString& packageInfoString,
 									ParseErrorListener* listener = NULL);
@@ -56,6 +61,7 @@ public:
 			const BString&		Vendor() const;
 			const BString&		Packager() const;
 			const BString&		Checksum() const;
+			const BString&		InstallPath() const;
 
 			uint32				Flags() const;
 
@@ -63,8 +69,10 @@ public:
 
 			const BPackageVersion&	Version() const;
 
-			const BObjectList<BString>&	CopyrightList() const;
-			const BObjectList<BString>&	LicenseList() const;
+			const BStringList&	CopyrightList() const;
+			const BStringList&	LicenseList() const;
+			const BStringList&	URLList() const;
+			const BStringList&	SourceURLList() const;
 
 			const BObjectList<BPackageResolvable>&	ProvidesList() const;
 			const BObjectList<BPackageResolvableExpression>&
@@ -75,7 +83,7 @@ public:
 								ConflictsList() const;
 			const BObjectList<BPackageResolvableExpression>&
 								FreshensList() const;
-			const BObjectList<BString>&	ReplacesList() const;
+			const BStringList&	ReplacesList() const;
 
 			void				SetName(const BString& name);
 			void				SetSummary(const BString& summary);
@@ -83,6 +91,7 @@ public:
 			void				SetVendor(const BString& vendor);
 			void				SetPackager(const BString& packager);
 			void				SetChecksum(const BString& checksum);
+			void				SetInstallPath(const BString& installPath);
 
 			void				SetFlags(uint32 flags);
 
@@ -96,6 +105,12 @@ public:
 
 			void				ClearLicenseList();
 			status_t			AddLicense(const BString& license);
+
+			void				ClearURLList();
+			status_t			AddURL(const BString& url);
+
+			void				ClearSourceURLList();
+			status_t			AddSourceURL(const BString& url);
 
 			void				ClearProvidesList();
 			status_t			AddProvides(const BPackageResolvable& provides);
@@ -130,6 +145,7 @@ public:
 
 private:
 			class Parser;
+			friend class Parser;
 
 private:
 			BString				fName;
@@ -144,8 +160,10 @@ private:
 
 			BPackageVersion		fVersion;
 
-			BObjectList<BString>	fCopyrightList;
-			BObjectList<BString>	fLicenseList;
+			BStringList			fCopyrightList;
+			BStringList			fLicenseList;
+			BStringList			fURLList;
+			BStringList			fSourceURLList;
 
 			BObjectList<BPackageResolvable>	fProvidesList;
 
@@ -156,9 +174,10 @@ private:
 
 			BObjectList<BPackageResolvableExpression>	fFreshensList;
 
-			BObjectList<BString>	fReplacesList;
+			BStringList			fReplacesList;
 
 			BString				fChecksum;
+			BString				fInstallPath;
 };
 
 

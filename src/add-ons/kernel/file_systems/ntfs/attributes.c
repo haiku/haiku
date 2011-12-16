@@ -285,11 +285,12 @@ fs_create_attrib(fs_volume *_vol, fs_vnode *_node, const char* name,
 				strerror(result));
 			goto exit;
 		}
-		if (ntfs_non_resident_attr_record_add(ni, AT_DATA, uname, ulen, 0, 32,
-			0) < 0) {
+		//if (ntfs_non_resident_attr_record_add(ni, AT_DATA, uname, ulen, 0, 32,
+		//	0) < 0) {
+		if (ntfs_attr_add(ni, AT_DATA, uname, ulen, NULL, 0) < 0) {
 			result = errno;
-			ERROR("%s - ntfs_non_resident_attr_record_add: %s\n",
-				__FUNCTION__, strerror(result));
+			//ERROR("%s - ntfs_non_resident_attr_record_add: %s\n",
+			ERROR("%s - ntfs_attr_add: %s\n",				__FUNCTION__, strerror(result));
 			goto exit;
 		}
 		na = ntfs_attr_open(ni, AT_DATA, uname, ulen);

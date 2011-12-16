@@ -1,16 +1,16 @@
 1	belarusian	x-vnd.Haiku-TIFFTranslator	292291870
 LZW	TIFFView		LZW
-None	TIFFView		Адсутнічае
-RLE (Packbits)	TIFFView		RLE (Packbits)
-TIFF Image Translator	TIFFView		Канвертар выяваў TIFF
-TIFF Library:	TIFFView		Бібліятэка TIFF:
-TIFF Settings	TIFFMain		Наладкі TIFF
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: немагчыма пераключыць каталог\n
 TIFF image	TIFFTranslator		Выява TIFF
-TIFF image translator	TIFFTranslator		Канвертар выяваў TIFF
+TIFF Library:	TIFFView		Бібліятэка TIFF:
+TIFF Image Translator	TIFFView		Канвертар выяваў TIFF
+None	TIFFView		Адсутнічае
 TIFF images	TIFFTranslator		Выявы TIFF
 TIFFTranslator Settings	TIFFTranslator		Наладкі канвертара выяваў TIFF
-Use Compression:	TIFFView		Запакаваць:
-Version %d.%d.%d %s	TIFFView		Версія %d.%d.%d %s
-ZIP (Deflate)	TIFFView		ZIP (Deflate)
-identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: немагчыма пераключыць каталог\n
+TIFF image translator	TIFFTranslator		Канвертар выяваў TIFF
+RLE (Packbits)	TIFFView		RLE (Packbits)
+TIFF Settings	TIFFMain		Наладкі TIFF
 identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: некарэктны індэкс дакументу\n
+ZIP (Deflate)	TIFFView		ZIP (Deflate)
+Version %d.%d.%d %s	TIFFView		Версія %d.%d.%d %s
+Use Compression:	TIFFView		Запакаваць:

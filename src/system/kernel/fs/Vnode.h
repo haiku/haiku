@@ -28,6 +28,7 @@ struct vnode : fs_vnode, DoublyLinkedListLinkImpl<vnode> {
 			VMCache*			cache;
 			struct fs_mount*	mount;
 			struct vnode*		covered_by;
+			struct vnode*		covers;
 			struct advisory_locking* advisory_locking;
 			struct file_descriptor* mandatory_locked_by;
 			list_link			unused_link;
@@ -51,6 +52,14 @@ public:
 	inline	bool				IsHot() const;
 	inline	void				SetHot(bool hot);
 
+	// setter requires sVnodeLock write-locked, getter is lockless
+	inline	bool				IsCovered() const;
+	inline	void				SetCovered(bool covered);
+
+	// setter requires sVnodeLock write-locked, getter is lockless
+	inline	bool				IsCovering() const;
+	inline	void				SetCovering(bool covering);
+
 	inline	uint32				Type() const;
 	inline	void				SetType(uint32 type);
 
@@ -67,6 +76,8 @@ private:
 	static	const uint32		kFlagsUnpublished	= 0x00000010;
 	static	const uint32		kFlagsUnused		= 0x00000020;
 	static	const uint32		kFlagsHot			= 0x00000040;
+	static	const uint32		kFlagsCovered		= 0x00000080;
+	static	const uint32		kFlagsCovering		= 0x00000100;
 	static	const uint32		kFlagsType			= 0xfffff000;
 
 	static	const uint32		kBucketCount		 = 32;
@@ -181,6 +192,40 @@ vnode::SetHot(bool hot)
 		atomic_or(&fFlags, kFlagsHot);
 	else
 		atomic_and(&fFlags, ~kFlagsHot);
+}
+
+
+bool
+vnode::IsCovered() const
+{
+	return (fFlags & kFlagsCovered) != 0;
+}
+
+
+void
+vnode::SetCovered(bool covered)
+{
+	if (covered)
+		atomic_or(&fFlags, kFlagsCovered);
+	else
+		atomic_and(&fFlags, ~kFlagsCovered);
+}
+
+
+bool
+vnode::IsCovering() const
+{
+	return (fFlags & kFlagsCovering) != 0;
+}
+
+
+void
+vnode::SetCovering(bool covering)
+{
+	if (covering)
+		atomic_or(&fFlags, kFlagsCovering);
+	else
+		atomic_and(&fFlags, ~kFlagsCovering);
 }
 
 

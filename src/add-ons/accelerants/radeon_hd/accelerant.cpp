@@ -7,26 +7,26 @@
  *		Alexander von Gluck, kallisti5@unixzen.com
  */
 
-
-#include "accelerant_protos.h"
 #include "accelerant.h"
 
-#include "bios.h"
-#include "display.h"
-#include "gpu.h"
-#include "pll.h"
-#include "utility.h"
-
+#include <AGP.h>
 #include <Debug.h>
-
 #include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
 #include <syslog.h>
+#include <unistd.h>
 
-#include <AGP.h>
+#include "accelerant_protos.h"
+
+#include "bios.h"
+#include "connector.h"
+#include "display.h"
+#include "displayport.h"
+#include "gpu.h"
+#include "pll.h"
+#include "utility.h"
 
 
 #undef TRACE
@@ -39,10 +39,11 @@
 #endif
 
 
-struct accelerant_info *gInfo;
-display_info *gDisplay[MAX_DISPLAY];
-connector_info *gConnector[ATOM_MAX_SUPPORTED_DEVICE];
-gpio_info *gGPIOInfo[ATOM_MAX_SUPPORTED_DEVICE];
+struct accelerant_info* gInfo;
+display_info* gDisplay[MAX_DISPLAY];
+connector_info* gConnector[ATOM_MAX_SUPPORTED_DEVICE];
+gpio_info* gGPIOInfo[ATOM_MAX_SUPPORTED_DEVICE];
+dp_info* gDPInfo[ATOM_MAX_SUPPORTED_DEVICE];
 
 
 class AreaCloner {
@@ -50,7 +51,7 @@ public:
 								AreaCloner();
 								~AreaCloner();
 
-			area_id				Clone(const char *name, void **_address,
+			area_id				Clone(const char* name, void** _address,
 									uint32 spec, uint32 protection,
 									area_id sourceArea);
 			status_t			InitCheck()
@@ -77,7 +78,7 @@ AreaCloner::~AreaCloner()
 
 
 area_id
-AreaCloner::Clone(const char *name, void **_address, uint32 spec,
+AreaCloner::Clone(const char* name, void** _address, uint32 spec,
 	uint32 protection, area_id sourceArea)
 {
 	fArea = clone_area(name, _address, spec, protection, sourceArea);
@@ -103,7 +104,7 @@ init_common(int device, bool isClone)
 {
 	// initialize global accelerant info structure
 
-	gInfo = (accelerant_info *)malloc(sizeof(accelerant_info));
+	gInfo = (accelerant_info*)malloc(sizeof(accelerant_info));
 
 	if (gInfo == NULL)
 		return B_NO_MEMORY;
@@ -112,12 +113,12 @@ init_common(int device, bool isClone)
 
 	// malloc memory for active display information
 	for (uint32 id = 0; id < MAX_DISPLAY; id++) {
-		gDisplay[id] = (display_info *)malloc(sizeof(display_info));
+		gDisplay[id] = (display_info*)malloc(sizeof(display_info));
 		if (gDisplay[id] == NULL)
 			return B_NO_MEMORY;
 		memset(gDisplay[id], 0, sizeof(display_info));
 
-		gDisplay[id]->regs = (register_info *)malloc(sizeof(register_info));
+		gDisplay[id]->regs = (register_info*)malloc(sizeof(register_info));
 		if (gDisplay[id]->regs == NULL)
 			return B_NO_MEMORY;
 		memset(gDisplay[id]->regs, 0, sizeof(register_info));
@@ -125,7 +126,7 @@ init_common(int device, bool isClone)
 
 	// malloc for possible physical card connectors
 	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
-		gConnector[id] = (connector_info *)malloc(sizeof(connector_info));
+		gConnector[id] = (connector_info*)malloc(sizeof(connector_info));
 
 		if (gConnector[id] == NULL)
 			return B_NO_MEMORY;
@@ -134,11 +135,21 @@ init_common(int device, bool isClone)
 
 	// malloc for card gpio pin information
 	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
-		gGPIOInfo[id] = (gpio_info *)malloc(sizeof(gpio_info));
+		gGPIOInfo[id] = (gpio_info*)malloc(sizeof(gpio_info));
 
 		if (gGPIOInfo[id] == NULL)
 			return B_NO_MEMORY;
 		memset(gGPIOInfo[id], 0, sizeof(gpio_info));
+	}
+
+	// malloc for card DP information
+	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
+		gDPInfo[id] = (dp_info*)malloc(sizeof(dp_info));
+
+		if (gDPInfo[id] == NULL)
+			return B_NO_MEMORY;
+		memset(gDPInfo[id], 0, sizeof(dp_info));
+		gDPInfo[id]->valid = false;
 	}
 
 	gInfo->is_clone = isClone;
@@ -160,7 +171,7 @@ init_common(int device, bool isClone)
 
 	AreaCloner sharedCloner;
 	gInfo->shared_info_area = sharedCloner.Clone("radeon hd shared info",
-		(void **)&gInfo->shared_info, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
+		(void**)&gInfo->shared_info, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 		data.shared_info_area);
 	status_t status = sharedCloner.InitCheck();
 	if (status < B_OK) {
@@ -171,7 +182,7 @@ init_common(int device, bool isClone)
 
 	AreaCloner regsCloner;
 	gInfo->regs_area = regsCloner.Clone("radeon hd regs",
-		(void **)&gInfo->regs, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
+		(void**)&gInfo->regs, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 		gInfo->shared_info->registers_area);
 	status = regsCloner.InitCheck();
 	if (status < B_OK) {
@@ -181,7 +192,7 @@ init_common(int device, bool isClone)
 	}
 
 	gInfo->rom_area = clone_area("radeon hd AtomBIOS",
-		(void **)&gInfo->rom, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
+		(void**)&gInfo->rom, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 		gInfo->shared_info->rom_area);
 
 	if (gInfo->rom_area < 0) {
@@ -251,11 +262,17 @@ radeon_init_accelerant(int device)
 
 	radeon_init_bios(gInfo->rom);
 
-	// detect GPIO pins
-	radeon_gpu_gpio_setup();
+	// find GPIO pins from AtomBIOS
+	gpio_probe();
 
-	// detect physical connectors
-	status = detect_connectors();
+	// find physical card connectors from AtomBIOS
+	status = connector_probe();
+
+	if (status != B_OK) {
+		TRACE("%s: falling back to legacy connector probe.\n", __func__);
+		status = connector_probe_legacy();
+	}
+
 	if (status != B_OK) {
 		TRACE("%s: couldn't detect supported connectors!\n", __func__);
 		return status;
@@ -263,6 +280,9 @@ radeon_init_accelerant(int device)
 
 	// print found connectors
 	debug_connectors();
+
+	// setup link on any DisplayPort connectors
+	dp_setup_connectors();
 
 	// detect attached displays
 	status = detect_displays();
@@ -307,14 +327,24 @@ radeon_uninit_accelerant(void)
 
 
 status_t
-radeon_get_accelerant_device_info(accelerant_device_info *di)
+radeon_get_accelerant_device_info(accelerant_device_info* di)
 {
+	radeon_shared_info &info = *gInfo->shared_info;
+
 	di->version = B_ACCELERANT_VERSION;
-	strcpy(di->name, gInfo->shared_info->device_identifier);
+	strcpy(di->name, info.deviceName);
 
 	char chipset[32];
-	sprintf(chipset, "r%X", gInfo->shared_info->device_chipset);
+	sprintf(chipset, "%s", gInfo->shared_info->chipsetName);
 	strcpy(di->chipset, chipset);
+
+	// add flags onto chipset name
+	if ((info.chipsetFlags & CHIP_IGP) != 0)
+		strcat(di->chipset, " IGP");
+	if ((info.chipsetFlags & CHIP_MOBILE) != 0)
+		strcat(di->chipset, " Mobile");
+	if ((info.chipsetFlags & CHIP_APU) != 0)
+		strcat(di->chipset, " APU");
 
 	strcpy(di->serial_no, "None" );
 

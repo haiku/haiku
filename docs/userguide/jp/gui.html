@@ -9,12 +9,15 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Kentaro Ozeki
+ *		log-1
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Haiku's GUI</title>
+	<title>Haiku の GUI</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -36,10 +39,12 @@
 <li><a href="../uk/gui.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../zh_CN/gui.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../pt_PT/gui.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/gui.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/gui.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../en/gui.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="filesystem-layout.html">Filesystem layout</a> 
+ «  <a href="filesystem-layout.html">ファイルシステムの設計</a> 
 ::  <a href="contents.html" class="uplink">目次</a> 
 ::  <a href="workspaces.html">Workspaces</a>  »
 </span></div>
@@ -47,79 +52,78 @@
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
-<h1>Haiku's GUI</h1>
+<h1>Haiku の GUI</h1>
 
-<p>Haiku's graphical user interface is an integral part of the system. Unlike Unix-based operating systems, there's no separate window manager and booting just into a command line shell is not possible. Haiku's focus being on the desktop user, this is just not considered necessary.</p>
-<p>As you probably have experience with other graphical environments, let's skip over the standards like menus, right-click context menus, drag&amp;drop etc. Let's have a look at the few unique aspects of Haiku's GUI instead.</p>
+<p>Haiku のグラフィカルユーザインタフェースはシステムと統合されています。 Unix ベースのオペレーティングシステムとは異なり、独立したウインドウマネージャを持っていないので、コンソールモードで直接ブートすることはできません。Haiku はデスクトップユーザに主眼を置いているので、ただ単純にコンソールモードは必要でないと考えられています。</p>
+<p>おそらく他のグラフィカルな環境で使ったことがあると思われる、メニュー、右クリックでのコンテキストメニュー、ドラッグ＆ドロップといった標準的な動作はスキップして、代わりに Haiku の GUI に特有のものをいくつか見てみましょう。</p>
 <img src="images/gui-images/gui.png" alt="gui.png" />
-<p>There are only a few things in Haiku's GUI that aren't obvious and deserve an explanation.</p>
+<p> Haiku の GUI に関して、分かりにくく説明を必要とする部分はごくわずかです。</p>
 <ol>
-<li><p>The Deskbar is Haiku's "Start" menu and taskbar, if you will. See topic <a href="deskbar.html">Deskbar</a>.</p></li>
-<li>The yellow tab offers more than just a program's name or a document's filename:
-<ul><li>You can move it by holding the <span class="key">SHIFT</span> key while dragging it to another position, enabling you to stack a number of windows and conveniently access them by their named tab.</li>
-<li>You minimize a window with a double-click on its tab (or with <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span>). A such hidden window can be accessed by its entry in the <a href="deskbar.html">Deskbar</a> or the <a href="twitcher.html">Twitcher</a>.</li>
-<li>You can send a window to the back with a right-click on its tab (or its border).</li></ul></li>
-<li><p>The close button.</p></li>
-<li><p>The "zoom" button (or <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). In most applications, this will expand a window to maximum size. It doesn't have to, however. Tracker windows, for example, will resize to best fit the contents.</p></li>
-<li><p>The resize corner. Dragging anywhere else on a window's border will move the window.</p></li>
+<li><p>Deskbar は Haiku の「スタート」メニューとタスクバーです。トピック <a href="deskbar.html">Deskbar</a> を参照してください。</p></li>
+<li>黄色いタブは単にプログラム名やドキュメントのファイル名を表示する以上の働きをします:
+<ul><li> <span class="key">SHIFT</span> キーを押しながらドラッグすると、タブを別の位置に移動できます。これにより、多くのウインドウを積み重ねても、名前つきタブによって簡単にウインドウにアクセスできるようになります。</li>
+<li>ウインドウのタブをダブルクリックすることでウインドウを最小化できます。 <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span> で同様の操作が可能です。最小化したウインドウは <a href="deskbar.html">Deskbar</a> や <a href="twitcher.html">Twitcher</a> 内のそれぞれの項目からアクセスできます。</li>
+<li>タブ（またはウインドウの枠）を右クリックして、ウインドウを最背面に送ることができます。</li></ul></li>
+<li><p>「閉じる」ボタン。</p></li>
+<li><p>「ズーム」ボタン （または <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span> ）。ほとんどのアプリケーションではウインドウを最大化します。しかし必ずしもそうなるわけではなく、例えば、 Tracker のウインドウでは、ウィンドウの内容の表示に最適なサイズにリサイズします。</p></li>
+<li><p>リサイズコーナー。ここ以外のウインドウ枠をドラッグするとウインドウが移動します。</p></li>
 </ol>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="move-resize" name="move-resize">A quick way to move or resize windows</a></h2>
-<p>Moving and resizing windows is a large part of interacting with several concurrently running applications. Instead of aiming at the small yellow title tab or the even tinier window border, there's a more convenient way to move a window. Also, additionally to its small size, the resize corner has another limitation: It only allows resizing at and in the direction of the lower right corner.</p>
-<p>To address these issues, Haiku provides a neat solution using the window management key combo <span class="key">CTRL</span> <span class="key">ALT</span> and the mouse. See also chapter <a href="keyboard-shortcuts.html#general">Shortcuts and key combinations</a> for more shortcuts concerning window management.</p>
+<a id="move-resize" name="move-resize">素早くウィンドウを移動またはリサイズする方法</a></h2>
+<p>ウィンドウの移動やリサイズは同時に実行している複数のアプリケーションを取り扱う操作の大部分を占めます。黄色の小さいタイトルタブや、もっと細いウィンドウの枠を使う代わりに、より簡単にウィンドウを動かす方法があります。 また、リサイズコーナーは小さい上に、右下の角からその方向にしかリサイズできないという制約があります。</p>
+<p>こうした問題に対処するために、 Haiku は <span class="key">CTRL</span> <span class="key">ALT</span> （ウィンドウを管理するキーの組み合わせ）とマウスを使った素晴らしい解決策を提供しています。ウィンドウ管理に関連するもっと多くのショートカットについては<a href="keyboard-shortcuts.html#general">ショートカットやキーの組み合わせ</a>の章も参照してください。</p>
 <img src="images/gui-images/resizing.png" alt="resizing.png" />
-<p>Holding down <span class="key">CTRL</span> <span class="key">ALT</span> will highlight the window borders nearest to the mouse pointer. Move the mouse in the direction of another border to change the target. Click and dragging with the <i>right mouse button</i> will resize the window along the highlighted border(s).</p>
-<p>Hold down <span class="key">CTRL</span> <span class="key">ALT</span> and click and drag with the <i>left mouse button</i> anywhere in a window to move it around. A quick click with the <i>right mouse button</i> sends it to the back.</p>
+<p><span class="key">CTRL</span> <span class="key">ALT</span> を押し続けるとマウスポインタに最も近いウィンドウの枠がハイライトされます。対象を変更するにはマウスを他の枠の方向に動かします。<i>右マウスボタン</i>でクリックしてドラッグすると、ハイライトされた枠に沿ってウィンドウをリサイズできます。</p>
+<p><span class="key">CTRL</span> <span class="key">ALT</span> を押しながら<i>左マウスボタン</i>でウィンドウの任意の場所をクリックしてドラッグすると、 ウィンドウを動かすことができます。元の位置に戻すには、<i>右マウスボタン</i>で素早くクリックします。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="open-save-panel" name="open-save-panel">Open and save panels</a></h2>
-<p>When opening or saving a file from any application, a panel like this opens:</p>
+<a id="open-save-panel" name="open-save-panel">読込・保存パネル</a></h2>
+<p>どのようなアプリケーションでも、ファイルを開いたり保存したりする際は以下のようなパネルが開きます：</p>
 <img src="images/gui-images/open-save.png" alt="open-save.png" />
-<p>It has all the usual things: A list of files of the current folder to choose from, in case of a save panel, a text field to enter a filename and a pop-up menu for different file formats and their settings.<br />
-You can enter parent folders with the pop-up menu above the file listing.</p>
-<p>If you already have a Tracker window with the location for a file open, you can simply drag either any file or the folder-representation (i.e. the symbol to the far right in its menu bar) into the panel. This changes the panel to that new location.</p>
+<p>パネルは一般的な要素をすべて備えています：現在のフォルダ下のファイル選択リスト、保存パネルではファイル名を入力するテキストフィールドと、異なるファイル形式のためのポップアップメニュー、そしてその設定です。<br />
+ファイル選択リストの上にあるポップアップメニューで親フォルダに移動できます。</p>
+<p>ファイルを開く場所の Tracker ウインドウをすでに開いていれば、そのファイルやフォルダ表現（ Tracker メニューバーの右端のフォルダアイコン）をパネルにドラッグすることができます。これによって、その新しい場所にパネルを変更できます。</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="open-save-shortcuts" name="open-save-shortcuts">Keyboard shortcuts</a></h3>
-<p>Many shortcuts in open and save panels are the same used in Tracker. Besides the commands that are also available through the <span class="menu">File</span> menu, there are a few not that obvious:</p>
+<a id="open-save-shortcuts" name="open-save-shortcuts">キーボードショートカット</a></h3>
+<p>Tracker で利用されるショートカットの多くが、読込パネルと保存パネルでも利用できます。<span class="menu">ファイル</span>メニューを使っても利用できるコマンドに加えて、いくつか分かりにくいコマンドがあります：</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td> Creates a new folder.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">E</span></td><td></td><td> Lets you rename the selected entry.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:24px;"></td><td> Moves into the parent folder.</td></tr>
-<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> or <span class="key">ENTER</span></td><td></td><td> Moves into the selected folder.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td></td><td> Takes you to your Desktop.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td></td><td> Takes you to your Home folder.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td>新しいフォルダを作成します。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">E</span></td><td></td><td>選択した項目の名前を変更することができます。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:24px;"></td><td>親フォルダに移動します。</td></tr>
+<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> または <span class="key">ENTER</span></td><td></td><td>選択したフォルダに移動します。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td></td><td>Desktop に移動します。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td></td><td>ホームフォルダに移動します。</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="favorites-recent" name="favorites-recent">Favorites and recent folders</a></h3>
-<p>The <span class="menu">Favorites</span> menu in open and save panels provides recently visited folders and favorite locations that you can set up yourself. As indicated by the little arrow, you can also use these locations to navigate further down the hierarchy via submenus.</p>
+<a id="favorites-recent" name="favorites-recent">Favorites および Recent フォルダ</a></h3>
+<p>読込パネルと保存パネルにある <span class="menu">Favorites</span> メニューは、最近訪れたフォルダと、独自に設定できるお気に入りの場所を利用できるようにします。小さな矢印で示されているように、これらの場所からサブメニューを通じてさらに下の階層に移ることができます。</p>
 <img src="images/gui-images/favorites.png" alt="favorites.png" />
-<p>To add a Favorite, you simply navigate to your destination and choose <span class="menu">Favorites | Add current folder</span>. From now on it will appear in every open/save panel. To remove a Favorite, choose <span class="menu">Favorites | Configure favorites...</span> and delete its entry.<br />
-All Favorites are kept in <span class="path">/boot/home/config/settings/Tracker/Go/</span>. So you might as well add and remove links to files and folders there directly.</p>
+<p>お気に入りを追加するには、目的地へ移動して、 <span class="menu">Favorites | Add current folder</span> を選択します。すべての Open / Save パネルにそれが表示されるようになります。お気に入りを削除するためには、 <span class="menu">Favorites | Configure favorites...</span> を選んで、その項目を削除してください。<br />
+お気に入りはすべて <span class="path">/boot/home/config/settings/Tracker/Go/</span> に保持されているので、そこに直接ファイルやフォルダへのリンクを追加または削除しても同様です。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="replicants" name="replicants">Replicants</a></h2>
-<p>Replicants are small self-contained parts of applications that can be integrated into other programs. Provided Deskbar's option to <span class="menu">Show replicants</span> is activated, you'll recognize a replicantable part of an application by its small handle, normally in the bottom right corner:</p>
+<a id="replicants" name="replicants">Replicant</a></h2>
+<p>Replicant は、アプリケーションに内蔵されている、他のプログラムと統合可能な部分です。 Deskbar の <span class="menu">Show replicants</span> がオンの状態のとき、アプリケーションの Replicant 化可能な部分は通常、右下にある小さなハンドルによって見分けることができます：</p>
 <img src="../images/gui-images/replicant.png" alt="replicant.png" />
-<p>The most prominent place that accepts Replicants is the Desktop: You simply drag &amp; drop the little handle onto it. From now on it's part of the Desktop and the Replicant's originating app doesn't have to be started for it to work.<br />
-A right-click on a Replicant handle offers a context menu to show the originating app's <span class="menu">About</span> window and to <span class="menu">Remove replicant</span>.</p>
-<div class="box-info">Should you experience difficulties with a Replicant on the Desktop and just can't get rid of it, delete <span class="path">~/config/settings/Tracker/tracker_shelf</span>. Unfortunately, this will remove <i>all</i> Replicants from the Desktop.</div>
-<p>Examples for replicatable applications are the graphs of the <a href="applications/activitymonitor.html">ActivityMonitor</a>, the <a href="workspaces.html">Workspaces applet</a> or <a href="applications/deskcalc.html">DeskCalc</a>.</p>
+<p>Replicant に対応する場所で最も目立つのはデスクトップです： 小さいハンドルをそこにドラッグ＆ドロップするだけで、それをデスクトップの一部にできます。レプリカント元のアプリケーションは、動作のために起動する必要はありません。
+Replicant ハンドル上で右クリックすると、元のアプリケーションの <span class="menu">About</span> ウインドウと <span class="menu">Remove replicant</span> へのコンテキストメニューを表示します。</p>
+<div class="box-info">万が一デスクトップ上の Replicant に問題が生じて取り除くことができなくなった場合は、 <span class="path">~/config/settings/Tracker/tracker_shelf</span> を削除してください。残念ながら、この操作では<i>すべての</i> Replicant をデスクトップ上から取り除くことになります。</div>
+<p>Replicant 化可能なアプリケーションの例として、 <a href="applications/activitymonitor.html">ActivityMonitor</a> のグラフ、 <a href="workspaces.html">Workspaces applet</a> や <a href="applications/deskcalc.html">DeskCalc</a> があります。</p>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="filesystem-layout.html">Filesystem layout</a> 
+ «  <a href="filesystem-layout.html">ファイルシステムの設計</a> 
 ::  <a href="contents.html" class="uplink">目次</a> 
 ::  <a href="workspaces.html">Workspaces</a>  »
 </span></div>

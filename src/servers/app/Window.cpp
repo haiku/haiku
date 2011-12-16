@@ -1579,7 +1579,7 @@ Window::SubsetWorkspaces() const
 }
 
 
-/*!	Returns wether or not a window is in the subset workspace list with the
+/*!	Returns whether or not a window is in the subset workspace list with the
 	specified \a index.
 	See SubsetWorkspaces().
 */

@@ -41,6 +41,9 @@ public:
 
 	virtual	void				DetachedFromWindow();
 
+			void				LoadSettings(const BMessage& settings);
+			status_t			SaveSettings(BMessage& settings);
+
 private:
 	// TreeTableListener
 	virtual	void				TreeTableNodeExpandedChanged(TreeTable* table,

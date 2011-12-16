@@ -1,50 +1,46 @@
 /*
- * Copyright 2005-2008, Mikael Eiman.
- * Copyright 2005-2008, Michael Davidson.
+ * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2008-2009, Pier Luigi Fiorini. All Rights Reserved.
+ * Copyright 2004-2008, Michael Davidson. All Rights Reserved.
+ * Copyright 2004-2007, Mikael Eiman. All Rights Reserved.
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *              Mikael Eiman <mikael@eiman.tv>
- *              Michael Davidson <slaad@bong.com.au>
  */
-
-#ifndef APPGROUPVIEW_H
-#define APPGROUPVIEW_H
+#ifndef _APP_GROUP_VIEW_H
+#define _APP_GROUP_VIEW_H
 
 #include <vector>
 
+#include <GroupView.h>
 #include <String.h>
-#include <View.h>
+
+class BGroupView;
 
 class NotificationWindow;
 class NotificationView;
 
-typedef std::vector<NotificationView *> infoview_t;
+typedef std::vector<NotificationView*> infoview_t;
 
-class AppGroupView : public BView {
-	public:
-							AppGroupView(NotificationWindow *win, const char *label);
-							~AppGroupView(void);
-	
-		// Hooks
-		void				AttachedToWindow(void);
-		void				Draw(BRect bounds);
-		void				MouseDown(BPoint point);
-		void				GetPreferredSize(float *width, float *height);
-		void				MessageReceived(BMessage *msg);
- 	
-		// Public
-		void				AddInfo(NotificationView *view);
-		void				ResizeViews(void);
-		bool				HasChildren(void);
-	
-	private:
-		BString				fLabel;
-		NotificationWindow			*fParent;
-		infoview_t			fInfo;
-		bool				fCollapsed;
-		BRect				fCloseRect;
-		BRect				fCollapseRect;
+class AppGroupView : public BGroupView {
+public:
+								AppGroupView(NotificationWindow* win, const char* label);
+
+	virtual	void				MouseDown(BPoint point);
+	virtual	void				MessageReceived(BMessage* msg);
+			void				Draw(BRect updateRect);
+
+			bool				HasChildren();
+
+			void				AddInfo(NotificationView* view);
+
+private:
+			void				_ResizeViews();
+
+			BString				fLabel;
+			NotificationWindow*	fParent;
+			infoview_t			fInfo;
+			bool				fCollapsed;
+			BRect				fCloseRect;
+			BRect				fCollapseRect;
 };
 
-#endif
+#endif	// _APP_GROUP_VIEW_H

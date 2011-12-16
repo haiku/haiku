@@ -1,0 +1,52 @@
+1	croatian	x-vnd.Be-PSRV	19228396
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Pisač sa ovim imenom već postoji, ali se ne može koristiti! Zamijeniti?
+
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Pisač sa tim imenom već postoji,alii ne mogu naći upravljačke programe!Zamijeniti?
+A0	ConfigWindow	ISO 216 paper size	A0
+A1	ConfigWindow	ISO 216 paper size	A1
+A2	ConfigWindow	ISO 216 paper size	A2
+A3	ConfigWindow	ISO 216 paper size	A3
+A4	ConfigWindow	ISO 216 paper size	A4
+A5	ConfigWindow	ISO 216 paper size	A5
+A6	ConfigWindow	ISO 216 paper size	A6
+All pages	ConfigWindow		Sve stranice
+All pages, %1 copies	ConfigWindow		Sve stranice, %1 kopija
+B5	ConfigWindow	ISO 216 paper size	B5
+Cancel	ConfigWindow		Poništi
+Cancel	PrintServerApp		Poništi
+Create a new printer	PrintServerApp Scripting		Napravi novi pisač
+Delete a specific printer	PrintServerApp Scripting		Obriši određeni pisač
+Get comments about this printer	Printer Scripting		Uzmi komentare o ovom pisaču
+Get currently available ports/devices	Transport Scripting		Uzmi trenutno dostupne portove/uređaje
+Get name of printer	Printer Scripting		Uzmi ime pisača
+Get name of the printer add-on used for this printer	Printer Scripting		Uzmi ime dodatka koji se koristi za ovaj pisač
+Get name of the transport add-on used for this printer	Printer Scripting		Uzmi ime transportnog dodatzka koji se koristi za ovaj pisač
+Get name of transport	Transport Scripting		Uzmi ime transporta
+Get the transport configuration for this printer	Printer Scripting		Uzmi transportne konfiguracije za ovaj poslužitelj
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	Pismo
+No	PrintServerApp		Ne
+OK	ConfigWindow		U redu
+OK	PrintServerApp		U redu
+Page %1 to %2	ConfigWindow		Stranica %1 do %2
+Page setup	ConfigWindow		Postavka stranice
+Page setup:	ConfigWindow		Postavka stranice:
+Paper setup:	ConfigWindow		Postavka papira:
+Portrait	ConfigWindow		Portret
+Print setup	ConfigWindow		Postavke ispisa
+Printer server	ConfigWindow		Poslužitelj pisača
+Printer:	ConfigWindow		Pisač:
+Retrieve a specific printer	PrintServerApp Scripting		Preuzmi određeni pisač
+Retrieve a specific transport	PrintServerApp Scripting		Uzmi specifični transport
+Retrieve or select the active printer	PrintServerApp Scripting		Odaberi aktivni pisač
+Return the number of available printers	PrintServerApp Scripting		Vrati broj dostupnih pisača
+Return the number of available transports	PrintServerApp Scripting		Vrati broj dostupnih transporta
+Select a printer	ConfigWindow		Odaber pisač:
+Show configuration window	PrintServerApp Scripting		Prikaži konfiguracijski prozor
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid
+There are no printers set up.	PrintServerApp		Nema postavljenih pisača:
+There is no default printer set up.	PrintServerApp		Nema postavljenog zadanog pisača.
+Undefined	ConfigWindow		Nedefinirano
+Would you like to make @ the default printer?	PrintServerApp		Da li želite napraviti @ zadanim pisačem?
+Would you like to set one up now?	PrintServerApp		Da li želite postaviti jednu sad?
+Yes	PrintServerApp		Da

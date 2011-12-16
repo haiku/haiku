@@ -19,6 +19,7 @@ class FunctionInstance;
 class Image;
 class StackFrame;
 class Team;
+class TeamUISettings;
 class Thread;
 class TypeComponentPath;
 class UserBreakpoint;
@@ -39,12 +40,19 @@ class UserInterface : public BReferenceable {
 public:
 	virtual						~UserInterface();
 
+	virtual const char*			ID() const = 0;
+
 	virtual	status_t			Init(Team* team,
 									UserInterfaceListener* listener) = 0;
 	virtual	void				Show() = 0;
 	virtual	void				Terminate() = 0;
 									// shut down the UI *now* -- no more user
 									// feedback
+
+	virtual status_t			LoadSettings(const TeamUISettings* settings)
+									= 0;
+	virtual status_t			SaveSettings(TeamUISettings*& settings)
+									const = 0;
 
 	virtual	void				NotifyUser(const char* title,
 									const char* message,

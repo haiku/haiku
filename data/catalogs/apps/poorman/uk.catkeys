@@ -1,5 +1,6 @@
-1	ukrainian	x-vnd.Haiku.PoorMan	3385036930
+1	ukrainian	x-vnd.Haiku.PoorMan	412131821
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Стандартна веб директорія була створена в \"/boot/home/public_html.\"\n Перевірте чи присутній файл HTML під назвою \"index.html\" в цій директорії.
+About PoorMan…	PoorMan		Про PoorMan…
 Advanced	PoorMan		Розширені
 Cancel	PoorMan		Відмінити
 Cannot start the server	PoorMan		Не вдалося запустити сервер
@@ -10,8 +11,11 @@ Console Logging	PoorMan		Консоль реєстрації
 Controls	PoorMan		Органи управління
 Copy	PoorMan		Копіювати
 Create	PoorMan		Створити
+Create PoorMan log	PoorMan		Створити логи PoorMan
+Create log file	PoorMan		Очистити логфайл 
 Default	PoorMan		По замовчуванню
 Dir Created	PoorMan		Створити директорію
+Directory: 	PoorMan		Каталог:
 Directory: (none)	PoorMan		Директорія: (жодна)
 Done	PoorMan		Виконано
 Edit	PoorMan		Редагувати
@@ -30,19 +34,24 @@ Logging view	PoorMan		Перегляд реєстрації
 Max. simultaneous connections:	PoorMan		Максимально одночасних підключень:
 OK	PoorMan		Гаразд
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Будь-ласка виберіть директорію щоб опублікувати в інтернеті.\n\nPoorMan може створити директорію по замовчуванню \"public_html\" у вашій домашній директорії.\nАбо ви вибере одну з своїх власних директорій.
+PoorMan	Application name		PoorMan
 PoorMan settings	PoorMan		Настройки PoorMan
 Quit	PoorMan		Вийти
 Run server	PoorMan		Запустити сервер
+Save console as…	PoorMan		Зберегти консоль як…
+Save console selections as…	PoorMan		Зберегти вибране консолі як…
 Save log console	PoorMan		Зберегти лог консолі
 Save log console selection	PoorMan		Зберегти логи вибраної консолі
 Select	PoorMan		Вибрати
 Select all	PoorMan		Вибрати все
 Select web folder	PoorMan		Зберегти веб каталог
 Send file listing if there's no start page	PoorMan		Відправити список файлів, якщо немає домашньої сторінки
+Settings…	PoorMan		Налаштування…
 Shutting down.	PoorMan		Вимкнути
 Shutting down.\n	PoorMan		Вимкнути.\n
 Site	PoorMan		Сайт
 Start page:	PoorMan		Запустити сторінку:
+Starting up... 	PoorMan		Запускаєтся…
 Status: Running	PoorMan		Стан: Запущений
 Status: Stopped	PoorMan		Статус: Зупинено
 Web folder:	PoorMan		Інтернет папка

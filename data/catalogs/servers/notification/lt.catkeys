@@ -1,0 +1,8 @@
+1	lithuanian	x-vnd.Haiku-notification_server	906000487
+Couldn't start filter monitor. Live filter changes disabled.	NotificationWindow		Nepavyko paleisti filtrų stebėtuvo. Į filtrų pakeitimus nebus reaguojama.
+Couldn't start display settings monitor.\nLive filter changes disabled.	NotificationWindow		Nepavyko paleisti ekrano nuostatų stebėtuvo.\nĮ filtrų pakeitimus nebus reaguojama.
+Darn.	NotificationWindow		Po velnių!
+Warning	NotificationWindow		Įspėjimas
+OK	NotificationWindow		Gerai
+Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Nepavyko paleisti bendrųjų nuostatų stebėtuvo.\nĮ filtrų pakeitimus nebus reaguojama.
+Notification	NotificationWindow		Pranešimas

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2011, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Gerard Stanczak (Google Code-In student)
+ *		Humdinger <humdingerb@gmail.com>
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>MidiPlayer</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/fi.png" alt="" /> Suomi</li>
+<li><a href="../../fr/applications/midiplayer.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/midiplayer.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/midiplayer.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/midiplayer.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/midiplayer.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/midiplayer.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/midiplayer.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/midiplayer.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/midiplayer.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/midiplayer.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../sk/applications/midiplayer.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../en/applications/midiplayer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="mediaplayer.html">MediaPlayer</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+::  <a href="packageinstaller.html">PackageInstaller</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+
+<h2><img src="../../images/apps-images/midiplayer-icon_64.png" alt="midiplayer-icon_64.png" width="64" height="64" />MidiPlayer</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
+<tr><td>Location:</td><td></td><td><span class="path">/boot/system/apps/MidiPlayer</span></td></tr>
+<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/MidiPlayerSettings</span></td></tr>
+</table>
+<p><br /></p>
+<p>As the name suggests, MidiPlayer is used to playback midi music files. Midi files are special, as they don't contain the actual digitized and in some way encoded music, but only a description of it: Hold this note for that long with this volume and use instrument X for it.<br />
+While this keeps file sizes pretty small, it also follows that depending on the instrument library (the so-called "SoundFont") the results can differ hugely. Also, these SoundFonts tend to be quite large, increasingly so with the number and quality of the instrument samples.</p>
+<div class="box-info"><p>Haiku doesn't come with a SoundFont installed, because they are so large and only few people generally need one. Most of those who do, already have high quality or custom SoundFonts. To be able to at least hear <i>something</i> you can install a free one from an optional package. In Terminal, enter: <tt>installoptionalpackage TimGMSoundFont</tt></p>
+<p>To use any other SoundFont, create a link to it in <tt>/boot/system/data/synth</tt> and name it <tt>big_synth.sy</tt>.</p></div>
+<img src="../images/apps-images/midiplayer.png" alt="midiplayer.png" />
+<p>MidiPlayer's interface is very simple. Just double-click or drag &amp; drop a midi file and playback starts. You control the volume with the slider and add reverb effects from the <span class="menu">Reverb</span> pop-up menu. Activating the scope will show a visualization in form of an oscilloscope running at the top.</p>
+
+</div>
+</div>
+<!--
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="mediaplayer.html">MediaPlayer</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+::  <a href="packageinstaller.html">PackageInstaller</a>  »
+</span></div>
+</div>
+-->
+</body>
+</html>

@@ -1,4 +1,4 @@
-## Haiku Generic Jamfile v1.0 ##
+## Haiku Generic Jamfile v1.0.1 ##
 
 ## Fill in this file to specify the project being created, and the referenced
 ## Jamfile-engine will do all of the hard work for you.  This handles both
@@ -16,6 +16,10 @@ NAME =  ;
 #	STATIC:	Static library archive
 #	DRIVER: Kernel Driver
 TYPE =  ;
+
+# Specify the application MIME signature, if you plan to use localization
+# 	features. String format x-vnd.<VendorName>-<AppName> is recommended.
+APP_MIME_SIG =  ;
 
 # Specify the source files to use
 #	Full paths or paths relative to the Jamfile can be included.
@@ -36,6 +40,9 @@ RSRCS =  ;
 #	-	if your library follows the naming pattern of:
 #		libXXX.so or libXXX.a you can simply specify XXX
 #		library: libbe.so entry: be
+#
+#	-	for localization support add following libs:
+#		locale localestub
 #		
 #	- 	if your library does not follow the standard library
 #		naming scheme you need to specify the path to the library
@@ -64,6 +71,13 @@ LOCAL_INCLUDE_PATHS =  ;
 # Specify the level of optimization that you desire
 #	NONE, SOME, FULL
 OPTIMIZE =  ;
+
+# Specify the codes for languages you are going to support in this 
+# 	application. The default "en" one must be provided too. "jam catkeys"
+# 	will recreate only locales/en.catkeys file. Use it as template for
+# 	creating other languages catkeys. All localization files must be
+# 	placed in "locales" sub-directory.
+LOCALES =  ;
 
 # Specify any preprocessor symbols to be defined.  The symbols will not
 #	have their values set automatically; you must supply the value (if any)

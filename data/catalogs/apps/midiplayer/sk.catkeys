@@ -1,19 +1,19 @@
 1	slovak	x-vnd.Haiku-MidiPlayer	4180509704
-Cavern	Main Window		Jaskyňa
-Closet	Main Window		Skriňa
-Could not load song	Main Window		Nepodarilo sa načítať pieseň
-Drop MIDI file here	Scope View		Sem pretiahnite súbor MIDI
-Dungeon	Main Window		Temnica
-Garage	Main Window		Garáž
-Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku Prehrávač MIDI 1.0.0 beta\n\nTento malý program\nvie prehrávať tisíce\npodradne znejúcich piesní
-Igor's lab	Main Window		Igorovo laboratórium
+None	Main Window		Žiadna
 Live input:	Main Window		Živý vstup:
-MidiPlayer	System name		Prehrávač MIDI
-None	Main Window		Žiadne
+Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku Prehrávač MIDI 1.0.0 beta\n\nTento malý program\nvie prehrávať tisíce\npodradne znejúcich piesní
+Stop	Main Window		Zastaviť
+Cavern	Main Window		Jaskyňa
+Volume:	Main Window		Hlasitosť:
+Reverb:	Main Window		Ozvena:
 OK	Main Window		OK
 Off	Main Window		Vypnúť
+Dungeon	Main Window		Temnica
 Play	Main Window		Prehrať
-Reverb:	Main Window		Ozvena:
+Garage	Main Window		Garáž
+Closet	Main Window		Skriňa
+MidiPlayer	System name		Prehrávač MIDI
+Drop MIDI file here	Scope View		Sem pretiahnite súbor MIDI
+Igor's lab	Main Window		Igorovo laboratórium
 Scope	Main Window		Rozsah
-Stop	Main Window		Zastaviť
-Volume:	Main Window		Hlasitosť:
+Could not load song	Main Window		Nepodarilo sa načítať pieseň

@@ -5,14 +5,14 @@ resource app_name_catalog_entry "x-vnd.Haiku-DeskCalc:System name:DeskCalc";
 
 resource app_version {
 	major  = 2,
-	middle = 1,
+	middle = 2,
 	minor  = 0,
 
 	variety = B_APPV_ALPHA,
 	internal = 1,
 
 	short_info = "DeskCalc",
-	long_info = "DeskCalc ©2006-2009 Haiku, Inc."
+	long_info = "DeskCalc ©2006-2011 Haiku, Inc."
 };
 
 resource app_flags B_SINGLE_LAUNCH;

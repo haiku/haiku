@@ -11,6 +11,7 @@
 #include <KernelExport.h>
 #include <PCI.h>
 #include <OS.h>
+#include <directories.h>
 #include <driver_settings.h>
 #include <malloc.h>
 #include <stdlib.h> // for strtoXX
@@ -142,7 +143,7 @@ static void dumprom (void *rom, size_t size, pci_info pcii)
 	char fname[64];
 
 	/* determine the romfile name: we need split-up per card in the system */
-	sprintf (fname, "/boot/home/" DRIVER_PREFIX "." DEVICE_FORMAT ".rom",
+	sprintf (fname, kUserDirectory "/" DRIVER_PREFIX "." DEVICE_FORMAT ".rom",
 		pcii.vendor_id, pcii.device_id, pcii.bus, pcii.device, pcii.function);
 
 	fd = open (fname, O_WRONLY | O_CREAT, 0666);

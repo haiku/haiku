@@ -1,12 +1,12 @@
 1	german	x-vnd.Haiku-Fonts	4164233892
-Bold font:	Font view		Fett:
-Defaults	Main window		Standardwerte
-Fixed font:	Font view		Feste Breite:
-Fonts	System name		Schriftarten
-Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Schriftarten\n\tCopyright 2004-2005, Haiku.\n\n
-Menu font:	Font view		Menü:
-OK	main		OK
 Plain font:	Font view		Normal:
+Defaults	Main window		Standardwerte
+OK	main		OK
+Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Schriftarten\n\tCopyright 2004-2005, Haiku.\n\n
 Revert	Main window		Anfangswerte
 Size:	Font Selection view		Größe:
+Menu font:	Font view		Menü:
+Fixed font:	Font view		Feste Breite:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Franz jagt im komplett verwahrlosten Taxi quer durch Bayern.
+Bold font:	Font view		Fett:
+Fonts	System name		Schriftarten

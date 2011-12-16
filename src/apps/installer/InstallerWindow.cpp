@@ -435,6 +435,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 				"been found that are suitable for installation. Please set "
 				"up partitions and initialize at least one partition with the "
 				"Be File System."), B_TRANSLATE("OK")))->Go();
+			break;
 		}
 		case MSG_STATUS_MESSAGE:
 		{

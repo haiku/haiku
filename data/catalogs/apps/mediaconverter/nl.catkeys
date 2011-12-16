@@ -1,0 +1,36 @@
+1	dutch; flemish	x-vnd.Haiku-MediaConverter	2584540201
+No audio	Audio codecs list		Geen audio
+Error	MediaConverter		Fout
+Error loading a file	MediaConverter		Fout bij het laden van een bestand
+File Error	MediaConverter-FileInfo		Bestandsfout
+Open…	Menu		Openen ...
+Start [ms]: 	MediaConverter		Start [ms]:
+Output format	MediaConverter		Uitvoerformaat
+End   [ms]: 	MediaConverter		Einde [ms]:
+MediaConverter	System name		MediaConverter
+No video	Video codecs list		Geen video
+Duration:	MediaConverter-FileInfo		Duur:
+OK	MediaConverter		OK
+Low	MediaConverter		Laag
+OK	MediaConverter-FileInfo		OK
+ seconds	MediaFileInfo		seconden
+Source files	MediaConverter		Bronbestanden
+Cancelling	MediaConverter		Annuleren
+%d byte 	MediaFileInfo		%d byte
+Error loading files	MediaConverter		Fout bij het laden van bestanden
+Cancel	MediaConverter		Annuleren
+None available	Video codecs		Geen beschikbaar
+Continue	MediaConverter		Voortzetten
+Encoder parameters	MediaConverter-EncoderWindow		Parameters van de encoder
+%d bit 	MediaFileInfo		%d bit
+Video quality not supported	MediaConverter		Videokwaliteit niet ondersteund
+File details	MediaConverter		Bestandsdetails
+Select	MediaConverter		Selecteren
+Quit	Menu		Afsluiten
+Preview	MediaConverter		Voorbeeld
+File format:	MediaConverter		Bestandsformaat:
+None available	Audio codecs		Geen beschikbaar
+High	MediaConverter		Hoog
+Audio encoding:	MediaConverter		Audiocodering:
+Audio quality not supported	MediaConverter		Geluidskwaliteit wordt niet ondersteund
+File	Menu		Bestand

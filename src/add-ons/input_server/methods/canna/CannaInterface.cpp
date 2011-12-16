@@ -1,12 +1,10 @@
-//
-//	CannaInterface.cpp
-//	canna library wrapper
+/*
+ * Copyright 2011 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 1999 M.Kawamura
+ */
 
-//	This is a part of...
-//	CannaIM
-//	version 1.0
-//	(c) 1999 M.Kawamura
-//
 
 #include "CannaInterface.h"
 #include <UTF8.h>
@@ -30,19 +28,19 @@ void
 CannaInterface::InitializeCanna()
 {
 	char **warn;
-	
+
 	context_id = 0; //context id is now fixed to zero.
 #ifdef DEBUG
 	SERIAL_PRINT(( "CannaInterface:Setting basepath to %s.\n", basePath ));
 #endif
-	
+
 	setBasePath( basePath );
-	
+
 	jrKanjiControl(context_id, KC_INITIALIZE, (char *)&warn);
 #ifdef DEBUG
 	SERIAL_PRINT(( "CannaInterface:Canna Initialize result = %x.\n", warn ));
 #endif
-	
+
     if (warn)
     {
 		canna_enabled = false;
@@ -55,12 +53,12 @@ CannaInterface::InitializeCanna()
 	jrKanjiControl( context_id, KC_SETMODEINFOSTYLE, (char *)(int32) 0);
 
 	jrKanjiControl(context_id, KC_SETHEXINPUTSTYLE, (char *)(int32) 1);
-	
+
 	jrKanjiControl( context_id, KC_SETUNDEFKEYFUNCTION, (char *)(int32) kc_through );
 
 	jrKanjiStatusWithValue	ks;
 	uchar buf[CONVERT_BUFFER_SIZE];
-	
+
 	ks.val = CANNA_MODE_HenkanMode;
 	ks.buffer = buf;
 	ks.bytes_buffer = CONVERT_BUFFER_SIZE;
@@ -104,10 +102,10 @@ status_t CannaInterface::InitCheck()
 uint32 CannaInterface::KeyIn( char ch, uint32 mod, int32 key )
 {
 	int inkey;
-		
+
 	inkey = ConvertSpecial( ch, mod, key );
 #ifdef DEBUG
-SERIAL_PRINT(( "CannaInterface: KeyIn() returned from ConvertSpecial. inkey = 0x%x\n", inkey )); 
+SERIAL_PRINT(( "CannaInterface: KeyIn() returned from ConvertSpecial. inkey = 0x%x\n", inkey ));
 #endif
 	if ( convert_arrowkey && kanji_status.gline.length != 0 )
 		inkey = ConvertArrowKey( inkey );
@@ -122,18 +120,18 @@ SERIAL_PRINT(( "CannaInterface: KeyIn() returned from ConvertSpecial. inkey = 0x
 		strcpy( previousUTF, mikakuteiUTF );
 		hadMikakuteiStr = true;
 	}
-*/	
+*/
 #ifdef DEBUG
-SERIAL_PRINT(( "CannaInterface: Calling jrKanjiString()...\n" )); 
+SERIAL_PRINT(( "CannaInterface: Calling jrKanjiString()...\n" ));
 #endif
 	kakuteiLen = jrKanjiString(context_id, inkey, kakuteiStr, CONVERT_BUFFER_SIZE, &kanji_status);
 #ifdef DEBUG
-SERIAL_PRINT(( "kakL = %d, mikL = %d, glineL = %d, info = 0x%x\n", kakuteiLen, kanji_status.length, kanji_status.gline.length, kanji_status.info )); 
+SERIAL_PRINT(( "kakL = %d, mikL = %d, glineL = %d, info = 0x%x\n", kakuteiLen, kanji_status.length, kanji_status.gline.length, kanji_status.info ));
 #endif
 	//return UpdateKanjiStatus();
 	uint32 result = UpdateKanjiStatus();
 #ifdef DEBUG
-SERIAL_PRINT(( "CannaInterface: KeyIn() returning 0x%x.\n", result )); 
+SERIAL_PRINT(( "CannaInterface: KeyIn() returning 0x%x.\n", result ));
 #endif
 	return result;
 }
@@ -142,7 +140,7 @@ uint32 CannaInterface::UpdateKanjiStatus()
 {
 	uint32 result = 0;
 #ifdef DEBUG
-SERIAL_PRINT(( "CannaInterface: Entering UpdateKanjiStatus()...\n" )); 
+SERIAL_PRINT(( "CannaInterface: Entering UpdateKanjiStatus()...\n" ));
 #endif
 
 	if ( hadGuideLine && kanji_status.gline.length == 0 )
@@ -150,13 +148,13 @@ SERIAL_PRINT(( "CannaInterface: Entering UpdateKanjiStatus()...\n" ));
 		result |= GUIDELINE_DISAPPEARED;
 		hadGuideLine = false;
 	}
-	
+
 	if ( kanji_status.length == -1 )
 	{
 		result |= MIKAKUTEI_NO_CHANGE;
 		return result;
 	}
-		
+
 	if ( kanji_status.info & KanjiThroughInfo )
 	{
 		result |= THROUGH_INPUT;
@@ -172,7 +170,7 @@ SERIAL_PRINT(( "CannaInterface: Entering UpdateKanjiStatus()...\n" ));
 		jrKanjiControl( context_id, KC_SETMODEINFOSTYLE, (char *)(int32) 0);
 		result |= MODE_CHANGED;
 	}
-	
+
 	if ( !hadMikakuteiStr && (kanji_status.length != 0 || kakuteiLen != 0 ))
 	{
 		//ClearPrevious();
@@ -207,7 +205,7 @@ SERIAL_PRINT(( "CannaInterface: Entering UpdateKanjiStatus()...\n" ));
 
 		result |= MIKAKUTEI_EXISTS;
 	}
-	
+
 	//when mikakutei string is deleted and become empty
 	if ( hadMikakuteiStr && kanji_status.length == 0 && kakuteiLen == 0 )
 		result |= MIKAKUTEI_BECOME_EMPTY;
@@ -219,13 +217,13 @@ SERIAL_PRINT(( "CannaInterface: Entering UpdateKanjiStatus()...\n" ));
 
 	if ( hadGuideLine && (kanji_status.info & KanjiGLineInfo) )
 		result |= GUIDELINE_CHANGED;
-	
+
 	if ( !hadGuideLine && kanji_status.gline.length != 0 )
 	{
 		result |= GUIDELINE_APPEARED;
 		hadGuideLine = true;
 	}
-	
+
 	// calculate revpos, revlen
 	if ( kanji_status.revLen == 0 )
 	{
@@ -239,7 +237,7 @@ SERIAL_PRINT(( "CannaInterface: Entering UpdateKanjiStatus()...\n" ));
 		convert_to_utf8( B_EUC_CONVERSION, (const char*)kanji_status.echoStr, &length,
 						mikakuteiUTF, &revBegin, &state );
 		revBegin += kakuteiUTFLen;
-	
+
 		length = kanji_status.revPos + kanji_status.revLen;
 		revEnd = CONVERT_BUFFER_SIZE * 2;
 		convert_to_utf8( B_EUC_CONVERSION, (const char*)kanji_status.echoStr, &length,
@@ -247,7 +245,7 @@ SERIAL_PRINT(( "CannaInterface: Entering UpdateKanjiStatus()...\n" ));
 		revEnd += kakuteiUTFLen;
 	}
 #ifdef DEBUG
-SERIAL_PRINT(( "CannaInterface: UpdateKanjiStatus() returning 0x%x.\n", result )); 
+SERIAL_PRINT(( "CannaInterface: UpdateKanjiStatus() returning 0x%x.\n", result ));
 #endif
 	return result;
 }
@@ -269,7 +267,7 @@ int
 CannaInterface::ConvertSpecial(char ch, uint32 mod, int32 key)
 {
 #ifdef DEBUG
-SERIAL_PRINT(( "CannaInterface: ConvertSpecial ch = 0x%x, mod = 0x%x, key = 0x%x\n", ch, mod, key )); 
+SERIAL_PRINT(( "CannaInterface: ConvertSpecial ch = 0x%x, mod = 0x%x, key = 0x%x\n", ch, mod, key ));
 #endif
 	if (mod & B_CONTROL_KEY) {
 		// if control key is held down, do not convert special key
@@ -372,7 +370,7 @@ void CannaInterface::GetModified( int32* from, int32* to, char** string )
 {
 	int32 i, previousLen;
 	previousLen = strlen( previousUTF );
-	
+
 	for( i = 0 ;
 		mikakuteiUTF[i] == previousUTF[i]
 		&& mikakuteiUTF[i] != '\0'
@@ -380,12 +378,12 @@ void CannaInterface::GetModified( int32* from, int32* to, char** string )
 		i++ ) {}
 
 	*from = i;
-	
+
 	if ( mikakuteiUTFLen > previousLen )
 		*to = mikakuteiUTFLen;
 	else
 		*to = previousLen;
-		
+
 	*string = &mikakuteiUTF[ i ];
 }
 
@@ -393,7 +391,7 @@ int32 CannaInterface::ForceKakutei()
 {
 	if ( !canna_enabled )
 		return 0;
-		
+
 	jrKanjiStatusWithValue	ks;
 	ks.val = 0;
 	ks.buffer = (unsigned char *)kakuteiStr;
@@ -409,14 +407,14 @@ bool CannaInterface::ReadSetting(char *path, BFont *aFont)
 	BFile preffile( INLINE_SETTING_FILE, B_READ_ONLY );
 	if ( preffile.InitCheck() != B_NO_ERROR )
 		return false;
-	
+
 	if ( pref.Unflatten( &preffile ) != B_OK )
 		return false;
-	
+
 	font_family	fontfamily;
 	float size;
 	char *string;
-	
+
 	underline_color = FindColorData( &pref, "underline" );
 	highlight_color = FindColorData( &pref, "highlight" );
 	selection_color = FindColorData( &pref, "selection" );
@@ -427,7 +425,7 @@ bool CannaInterface::ReadSetting(char *path, BFont *aFont)
 	pref.FindFloat( "size", &size );
 	pref.FindBool( "arrow", &convert_arrowkey );
 
-	aFont->SetFamilyAndStyle( fontfamily, NULL ); 
+	aFont->SetFamilyAndStyle( fontfamily, NULL );
 	aFont->SetSize( size );
 	return true;
 }
@@ -442,7 +440,7 @@ rgb_color CannaInterface::FindColorData( BMessage *msg, char *name )
 	return result;
 }
 */
-		
+
 bool CannaInterface::HasRev()
 {
 	if ( kanji_status.revLen == 0 )
@@ -462,17 +460,17 @@ CannaInterface::GenerateKouhoString()
 	int32 state;
 	bool noindex, sizelimit, partialhighlight;
 #ifdef DEBUG
-SERIAL_PRINT(( "CannaInterface: GenerateKouhoStr() revPos = %d, revLen = %d, mode = %d\n", revposition, kanji_status.gline.revLen, current_mode )); 
+SERIAL_PRINT(( "CannaInterface: GenerateKouhoStr() revPos = %d, revLen = %d, mode = %d\n", revposition, kanji_status.gline.revLen, current_mode ));
 #endif
-	
+
 	noindex = sizelimit = partialhighlight = false;
-	
+
 	kouhoUTFLen = KOUHO_WINDOW_MAXCHAR * 2;
 	convert_to_utf8( B_EUC_CONVERSION, (const char*)kanji_status.gline.line, &length,
 					kouhoUTF, &kouhoUTFLen, &state );
 	kouhoUTF[ kouhoUTFLen ] = '\0';
 
-		
+
 	//find gline revpos by converting to UTF8
 	if ( kanji_status.gline.revLen == 0 )
 		kouhoRevLine = -1;
@@ -483,8 +481,8 @@ SERIAL_PRINT(( "CannaInterface: GenerateKouhoStr() revPos = %d, revLen = %d, mod
 					kouhoUTF, &revposUTF, &state );
 			//then, count full-spaces before revpos
 		kouhoRevLine = 0;
-		
-		if ( current_mode == CANNA_MODE_TourokuMode 
+
+		if ( current_mode == CANNA_MODE_TourokuMode
 			|| ( kanji_status.gline.length != 0 && current_mode != CANNA_MODE_KigoMode
 			&& 		current_mode != CANNA_MODE_IchiranMode
 			&&		current_mode != CANNA_MODE_YesNoMode
@@ -511,7 +509,7 @@ SERIAL_PRINT(( "CannaInterface: GenerateKouhoStr() revPos = %d, revLen = %d, mod
 		{
 			for ( long i = 0; i < revposUTF ; i++ )
 			{
-				if ( (uint8)kouhoUTF[ i ] == 0xe3 
+				if ( (uint8)kouhoUTF[ i ] == 0xe3
 					&& (uint8)kouhoUTF[ i + 1 ] == 0x80
 					&& (uint8)kouhoUTF[ i + 2 ] == 0x80 )
 						kouhoRevLine++;
@@ -520,7 +518,7 @@ SERIAL_PRINT(( "CannaInterface: GenerateKouhoStr() revPos = %d, revLen = %d, mod
 
 	}
 //printf("KouhoRevLine = %d\n", kouhoRevLine );
-		
+
 	// setup title string
 	switch ( current_mode )
 	{
@@ -588,7 +586,7 @@ SERIAL_PRINT(( "CannaInterface: GenerateKouhoStr() revPos = %d, revLen = %d, mod
 		//setup info string according to current mode
 		char* index;
 		int32 len;
-		
+
 		if (current_mode == CANNA_MODE_IchiranMode
 			|| current_mode == CANNA_MODE_ExtendMode
 			|| (current_mode == CANNA_MODE_TourokuHinshiMode
@@ -632,7 +630,7 @@ SERIAL_PRINT(( "CannaInterface: GenerateKouhoStr() revPos = %d, revLen = %d, mod
 			kouhoUTFLen = strlen(kouhoUTF);
 		}
 /*
-		if ( current_mode == CANNA_MODE_TourokuMode 
+		if ( current_mode == CANNA_MODE_TourokuMode
 			|| ( kanji_status.gline.length != 0 && ( current_mode == CANNA_MODE_TankouhoMode
 			|| 		current_mode == CANNA_MODE_TankouhoMode
 			||		current_mode == CANNA_MODE_AdjustBunsetsuMode )))
@@ -644,7 +642,7 @@ SERIAL_PRINT(( "CannaInterface: GenerateKouhoStr() revPos = %d, revLen = %d, mod
 					*index = '\x0a';
 			}
 		}
-*/	
+*/
 		if ( current_mode == CANNA_MODE_IchiranMode
 			|| current_mode == CANNA_MODE_RussianMode
 			|| current_mode == CANNA_MODE_LineMode
@@ -662,7 +660,7 @@ SERIAL_PRINT(( "CannaInterface: GenerateKouhoStr() revPos = %d, revLen = %d, mod
 			while ( ( *index  >= '0' && *index <= '9' ) || *index == '/' )
 				index--;
 			strcat( infoUTF, index );
-		
+
 			//remove excess spaces before number display
 			while ( *index == ' ' )
 				*index-- = '\0';
@@ -690,14 +688,14 @@ uint32 CannaInterface::ChangeMode( int32 mode )
 	ksv.buffer = (unsigned char *)kakuteiStr;
 	ksv.bytes_buffer = CONVERT_BUFFER_SIZE;
 	ksv.val = mode;
-	
+
 	jrKanjiControl( context_id, KC_CHANGEMODE, (char *)&ksv );
 	kakuteiLen = ksv.val;
 #ifdef DEBUG
 		SERIAL_PRINT(( "CannaInterface: ChangeMode returned kakuteiLen = %d\n", kakuteiLen ));
 		SERIAL_PRINT(( "CannaInterface: ChangeMode mikakuteiLen = %d\n", kanji_status.length ));
 #endif
-	
+
 	return UpdateKanjiStatus();
 }
 
@@ -712,7 +710,7 @@ uint32 CannaInterface::Kakutei()
 	ksv.ks = &kanji_status;
 	ksv.buffer = (unsigned char *)kakuteiStr;
 	ksv.bytes_buffer = CONVERT_BUFFER_SIZE;
-	
+
 	jrKanjiControl( context_id, KC_KAKUTEI, (char *)&ksv );
 	kakuteiLen = ksv.val;
 #ifdef DEBUG
@@ -751,13 +749,13 @@ CannaInterface::GetRevStartPositionInChar()
 {
 	int32 charNum;
 	charNum = 0;
-	
+
 	if ( mikakuteiUTFLen == 0 )
 		return 0;
 #ifdef DEBUG
 SERIAL_PRINT(( "CannaInterface: GetRevStartPos revBegin = %d\n", revBegin ));
 #endif
-		
+
 	for ( int32 i = 0 ; i < mikakuteiUTFLen ; i += UTF8CharLen( mikakuteiUTF[i] ) )
 	{
 

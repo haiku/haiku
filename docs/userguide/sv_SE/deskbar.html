@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -38,12 +38,14 @@
 <li><a href="../uk/deskbar.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../zh_CN/deskbar.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../pt_PT/deskbar.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/deskbar.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/deskbar.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../en/deskbar.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
  «  <a href="tracker-add-ons.html">Tracker-tillägg</a> 
 ::  <a href="contents.html" class="uplink">Innehållsförteckning</a> 
-::  <a href="filetypes.html">Filetypes</a>  »
+::  <a href="filetypes.html">Filetyper</a>  »
 </span></div>
 </div>
 
@@ -63,7 +65,7 @@
 <h1>Deskbar</h1>
 
 <p>Deskbar är den lilla panelen som som standard är placerad i det övre högra hörnet på skärmen. Det är Haiku's version av Windows aktivitetsfält med startknappen. Deskbar innehåller en meny från vilken du kan starta program och inställningar, ett verktygsfält med en klocka och längst ner en lista över de program som är aktiva.</p>
-<img src="../images/deskbar-images/positions.png" alt="positions" />
+<img src="images/deskbar-images/positions.png" alt="positions" />
 <p>Du kan flytta Deskbar till vilket hörn som helst, eller placera det som en list överst eller underst på Skrivbordet. Du flyttar Deskbar genom att greppa vid den knottriga fältet bredvid verktygsfältet och sedan dra och släppa Deskbar på dess nya position. Du kan också fälla ihop Deskbar till en mer kompakt utformning genom att dra det knottriga fältet och släppa det på Deskbar's meny.</p>
 
 <h2>
@@ -87,26 +89,27 @@
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>Deskbar's inställningar</h3>
 <img src="images/deskbar-images/configure.png" alt="configure.png" />
 <ul>
-<li><p><b>Menu</b><br />
-Here you can set the number of recent documents, folders and applications that are shown in their menu in the Deskbar, or if you want to see them at all.<br />
-The button <span class="button">Edit menu...</span> opens the folder <span class="path">/boot/home/config/be/</span>. In it you'll find the files and folders that appear in the Deskbar, by default these are <span class="menu">Applications</span>, <span class="menu">Demos</span>, <span class="menu">Deskbar applets</span>, and <span class="menu">Preferences</span>.<br />
-You can delete or add entries like links to applications, documents or even queries by simply copying/deleting them to/from this folder.</p>
-<p>It's even easier to simply drag a file, folder or saved query and drop it where you want it into the Deskbar.</p></li>
+<li><p><b>Meny</b><br />
+Här kan du ange hur många senaste dokument, appar och program som skall visas i Deskbar's meny, eller om du inte vill se dom över huvud taget.<br />
+Knappen <span class="button">Redigera meny...</span> öppnar mappen <span class="path">/boot/home/config/be/</span>. I den hittar du filerna och mapparna som syns i Deskbar; <span class="menu">Program</span>, <span class="menu">Exempelprogram</span>, <span class="menu">Skrivbordsprogram</span>, och <span class="menu">Inställningar</span>.<br />
+Du kan ta bort eller lägga till länkar till program, dokument eller till och med sökningar genom att kopiera/ta bort dom från denna mapp.</p>
+<p>Det är till och med enklare att dra en fil, mapp eller en sparad sökning och släppa den där du vill ha den i Deskbar.</p></li>
 <li><p><b>Window</b></p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="menu">Always on top</span></td><td> </td><td>The Deskbar always stays above all other windows.</td></tr>
-<tr><td><span class="menu">Auto raise</span></td><td> </td><td>The Deskbar pops to the front if the mouse pointer touches it.</td></tr>
+<tr><td><span class="menu">Auto-raise</span></td><td> </td><td>The Deskbar pops to the front if the mouse pointer touches it.</td></tr>
+<tr><td><span class="menu">Auto-hide</span></td><td> </td><td>The Deskbar is reduced to only a few pixels and only pops up if the mouse pointer touches them.</td></tr>
 </table></li>
-<li><p><b>Applications</b></p>
+<li><p><b>Program</b></p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Sort running applications</span></td><td> </td><td>Sorts the list of running programs alphabetically.</td></tr>
-<tr><td><span class="menu">Tracker always first</span></td><td> </td><td>Even if you sort alphabetically, the Tracker entry always stays first in the list.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Show application expander</span></td><td> </td><td>Provides a small widget to show/hide all windows of a program directly under its entry in the Deskbar.</td></tr>
-<tr><td><span class="menu">Expand new applications</span></td><td> </td><td>Newly launched programs have their windows automatically expanded under their entry in the Deskbar.</td></tr>
+<tr><td><span class="menu">Sortera aktiva program</span></td><td> </td><td>Sorterar listan över aktiva program i alfabetisk ordning.</td></tr>
+<tr><td><span class="menu">Visa Tracker först</span></td><td> </td><td>Även om du sorterar efter alfabetet så kommer Tracker att vara först i listan.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Visa program-expanderare</span></td><td> </td><td>Visar en pil som kan visa/gömma alla fönster som tillhör ett program.</td></tr>
+<tr><td><span class="menu">Expandera nya program</span></td><td> </td><td>Visar ett programs alla fönster vid start.</td></tr>
 </table></li>
-<li><p><b>Clock</b></p>
+<li><p><b>Klocka</b></p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Show seconds</span></td><td> </td><td>Adds the display of seconds to the clock.</td></tr>
+<tr><td><span class="menu">Visa sekunder</span></td><td> </td><td>Lägger till sekunder i klockan.</td></tr>
 </table></li>
 </ul>
 
@@ -114,15 +117,15 @@ You can delete or add entries like links to applications, documents or even quer
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tray" name="tray">Verktygsfältet</a></h2>
 <img src="images/deskbar-images/calendar.png" alt="calendar.png" />
-<p>Among other things, the tray is housing the clock. Hover the mouse over it to display the date in a tooltip. Left-click it to show a calendar. Right-click it to hide/show the clock or launch the <a href="preferences/time.html">Time</a> preferences to set it.</p>
+<p>Bland mycket annat innehåller verktygsfältet klockan. För musen över den för att visa dagens datum, eller klicka för att visa en kalender. Höger-klicka för att gömma/visa klockan eller starta <a href="preferences/time.html">Tid</a> där tiden kan ändras.</p>
 <p>Any program can install an icon in the tray to provide an interface to the user. The email system, for instance, shows a different symbol when there's unread mail and offers a context menu to e.g. create or check for new mail. <span class="app">ProcessController</span> is another example that uses its icon in the tray to provide information (CPU/memory usage) and to offer a context menu.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="list-of-apps" name="list-of-apps">Listan över aktiva program</a></h2>
 <img src="images/deskbar-images/list-of-apps.png" alt="list-of-apps.png" />
-<p>You can change to a specific running application by clicking on its entry in the Deskbar and choosing (one of) its windows, from the submenu. By right-clicking you can minimize or close a window or the entire application.</p>
-<p>If you activated Expanders in the Deskbar settings, you can expand/collapse the list of windows directly under an application's entry.</p>
+<p>Du kan växla till ett aktivt program genom att klicka på dess fält i Deskbar och i menyn välja (en av) dess fönster. Genom att höger-klicka kan du minimera eller stänga ett fönster, eller hela programmet.</p>
+<p>Om du har aktiverat visning av program-expanderare i Deskbars inställningar, kan du expandera/kollapsera listan över programmens fönster.</p>
 <p>In front of every application's windows is a symbol providing info on its state. A bright symbol means a window is visible, a dark one that it's minimized. Three lines in front of a symbol shows that it's not on the current workspace.</p>
 
 </div>
@@ -132,7 +135,7 @@ You can delete or add entries like links to applications, documents or even quer
 <div class="inner"><span>
  «  <a href="tracker-add-ons.html">Tracker-tillägg</a> 
 ::  <a href="contents.html" class="uplink">Innehållsförteckning</a> 
-::  <a href="filetypes.html">Filetypes</a>  »
+::  <a href="filetypes.html">Filetyper</a>  »
 </span></div>
 </div>
 

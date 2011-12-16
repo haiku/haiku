@@ -66,7 +66,7 @@ TODO:
 *defines a block in memory
 */
 struct memblock {
-        const char      name[16]; // the name will be used for debugging etc later perhapse...
+        const char      name[16]; // the name will be used for debugging etc later perhaps...
         addr_t    start; // start of the block
         addr_t    end; // end of the block
 	uint32	  flags; // which flags should be applied (device/normal etc..)

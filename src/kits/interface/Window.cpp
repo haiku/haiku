@@ -1187,16 +1187,6 @@ FrameMoved(origin);
 		{
 			BView* view = dynamic_cast<BView*>(target);
 
-			// Close an eventually opened menu
-			// unless the target is the menu itself
-			BMenu* menu = dynamic_cast<BMenu*>(fFocus);
-			MenuPrivate privMenu(menu);
-			if (menu != NULL && menu != view
-				&& privMenu.State() != MENU_STATE_CLOSED) {
-				privMenu.QuitTracking();
-				return;
-			}
-
 			if (view != NULL) {
 				BPoint where;
 				msg->FindPoint("be:view_where", &where);
@@ -2079,7 +2069,7 @@ BWindow::DecoratorFrame() const
 {
 	BRect decoratorFrame(Frame());
 	BRect tabRect(0, 0, 0, 0);
-	
+
 	float borderWidth = 5.0;
 
 	BMessage settings;
@@ -2088,9 +2078,10 @@ BWindow::DecoratorFrame() const
 		settings.FindFloat("border width", &borderWidth);
 	} else {
 		// probably no-border window look
-		if (fLook == B_NO_BORDER_WINDOW_LOOK) {
-			borderWidth = 0.0;
-		}
+		if (fLook == B_NO_BORDER_WINDOW_LOOK)
+			borderWidth = 0.f;
+		else if (fLook == B_BORDERED_WINDOW_LOOK)
+			borderWidth = 1.f;
 		// else use fall-back values from above
 	}
 
@@ -2105,7 +2096,7 @@ BWindow::DecoratorFrame() const
 		decoratorFrame.right += borderWidth;
 		decoratorFrame.bottom += borderWidth;
 	}
-	
+
 	return decoratorFrame;
 }
 
@@ -3290,7 +3281,7 @@ BWindow::_DetermineTarget(BMessage* message, BHandler* target)
 
 		case B_PULSE:
 		case B_QUIT_REQUESTED:
-			// TODO: test wether R5 will let BView dispatch these messages
+			// TODO: test whether R5 will let BView dispatch these messages
 			return this;
 
 		case _MESSAGE_DROPPED_:

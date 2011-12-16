@@ -58,6 +58,8 @@ static char sccsid[] = "@(#)merge.c	8.2 (Berkeley) 2/14/94";
 #include <stdlib.h>
 #include <string.h>
 
+#include <errno_private.h>
+
 static void setup(u_char *, u_char *, size_t, size_t, int (*)());
 static void insertionsort(u_char *, size_t, size_t, int (*)());
 
@@ -116,7 +118,7 @@ mergesort(void *base, size_t nmemb, size_t size, int (*cmp)(void const *, void c
 	u_char **p1;
 
 	if (size < PSIZE / 2) {		/* Pointers must fit into 2 * size. */
-//		errno = EINVAL;
+//		__set_errno(EINVAL);
 		return (-1);
 	}
 

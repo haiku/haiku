@@ -6,14 +6,10 @@ if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 	SubDirC++Flags -fmultiple-symbol-spaces ;
 }
 
-Addon ESDSink.media_addon :
+Addon esound_sink.media_addon :
 	ESDEndpoint.cpp
 	ESDSinkAddOn.cpp
 	ESDSinkNode.cpp
 	: be media network $(TARGET_LIBSUPC++)
 ;
-
-#Package haiku-multi_audio-cvs
-#	: hmulti_audio.media_addon
-#	: boot home config add-ons media ;
 

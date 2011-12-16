@@ -1,85 +1,85 @@
-1	dutch	x-vnd.Haiku-Bluetooth	2090488075
-#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Ongeldige naam
-#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Ongeldige naam
-#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Ongeldige naam
-#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Ongeldige naam
-(reserved)	DeviceClass		(gereserveerd)
-1-17% utilized	DeviceClass		1-17% in gebruik
-17-33% utilized	DeviceClass		17-33% in gebruik
-33-50% utilized	DeviceClass		33-50% in gebruik
-50-67% utilized	DeviceClass		50-67% in gebruik
-67-83% utilized	DeviceClass		67-83% in gebruik
-83-99% utilized	DeviceClass		83-99% in gebruik
-Audio	DeviceClass		Audio
-Audio/Video	DeviceClass		Audio/Video
-Camcorder	DeviceClass		Camcorder
-Camera	DeviceClass		Camera
-Capturing	DeviceClass		Bezig met vastleggen
-Car audio	DeviceClass		Auto-audio
-Card reader	DeviceClass		Kaartlezer
-Cellular	DeviceClass		Cellulair
-Combo keyboard/pointing device	DeviceClass		Combinatie toetsenbord/aanwijzer
-Common ISDN access	DeviceClass		Normale ISDN-toegang
-Computer	DeviceClass		Computer
-Controller	DeviceClass		Controller
-Cordless	DeviceClass		Draadloos
-Desktop workstation	DeviceClass		Bureaublad-werkstation
-Device conforms to the headset profile	DeviceClass		Apparaat voldoet aan profiel van headset
-Digitizer tablet	DeviceClass		Tekentablet
+1	dutch; flemish	x-vnd.Haiku-Bluetooth	2090488075
 Display	DeviceClass		Weergave
-Doll/Action figure	DeviceClass		Pop/Actiefiguur
-Fully available	DeviceClass		Volledig beschikbaar
+Capturing	DeviceClass		Bezig met vastleggen
+Printer	DeviceClass		Printer
+Uncategorized	DeviceClass		Niet gecategoriseerd
+1-17% utilized	DeviceClass		1-17% in gebruik
+Positioning	DeviceClass		Plaatsen
+Rendering	DeviceClass		Renderen
+Phone	DeviceClass		Telefoon
+17-33% utilized	DeviceClass		17-33% in gebruik
+#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Ongeldige naam
+Combo keyboard/pointing device	DeviceClass		Combinatie toetsenbord/aanwijzer
+Controller	DeviceClass		Controller
+No service available	DeviceClass		Geen service beschikbaar
+Wearable	DeviceClass	A wearable computer	Draagbare
+Handheld	DeviceClass		Handheld
+Invalid device class!\n	DeviceClass		Ongeldige apparaatklasse!\n
+Computer	DeviceClass		Computer
+Cellular	DeviceClass		Cellulair
+Microphone	DeviceClass		Microfoon
+Unknown (reserved) minor device class	DeviceClass		Onbekende (gereserveerde) klasse voor kleiner apparaat
+Cordless	DeviceClass		Draadloos
+Common ISDN access	DeviceClass		Normale ISDN-toegang
+83-99% utilized	DeviceClass		83-99% in gebruik
+Scanner	DeviceClass		Scanner
 Game	DeviceClass		Spel
 Gamepad	DeviceClass		Gamepad
-Gaming/Toy	DeviceClass		Gamen/Speelgoed
+(reserved)	DeviceClass		(gereserveerd)
+Desktop workstation	DeviceClass		Bureaublad-werkstation
+Audio/Video	DeviceClass		Audio/Video
 Glasses	DeviceClass		Bril
-Handheld	DeviceClass		Handheld
-Hands-free	DeviceClass		Handsfree
-Headphones	DeviceClass		Hoofdtelefoon
-Helmet	DeviceClass		Helm
-HiFi audio device	DeviceClass		HiFi-audio-apparaat
-Imaging	DeviceClass		Beeldvorming
-Information	DeviceClass		Informatie
-Invalid device class!\n	DeviceClass		Ongeldige apparaatklasse!\n
-Joystick	DeviceClass		Joystick
 Keyboard	DeviceClass		Toetsenbord
-LAN access	DeviceClass		LAN-toegang
-Laptop	DeviceClass		Laptop
-Loudspeaker	DeviceClass		Luidspreker
+Camera	DeviceClass		Camera
 Major class: 	DeviceClass		Grotere klasse:
-Microphone	DeviceClass		Microfoon
-Minor class: 	DeviceClass		Kleinere klasse:
-Miscellaneous	DeviceClass		Gevarieerd
-Networking	DeviceClass		Netwerken
-No service available	DeviceClass		Geen service beschikbaar
-Not implemented	RemoteDevice		Niet geïmplementeerd
-Object transfer	DeviceClass		Objectoverdracht
-Pager	DeviceClass	A small radio device to receive short text messages	Pager
-Palm	DeviceClass	A palm-held device	Palmtop
-Peripheral	DeviceClass		Randapparaat
-Phone	DeviceClass		Telefoon
-Pointing device	DeviceClass		Aanwijzer
-Portable audio	DeviceClass		Draagbare audio
-Positioning	DeviceClass		Plaatsen
-Printer	DeviceClass		Printer
-Remote control	DeviceClass		Afstandsbediening
-Rendering	DeviceClass		Renderen
-Robot	DeviceClass		Robot
-SIM card reader	DeviceClass		SIM-kaartlezer
-Scanner	DeviceClass		Scanner
-Server	DeviceClass		Server
-Service classes: 	DeviceClass		Service-klassen:
+50-67% utilized	DeviceClass		50-67% in gebruik
+Card reader	DeviceClass		Kaartlezer
 Set-top box	DeviceClass		Settopbox
+Helmet	DeviceClass		Helm
+Laptop	DeviceClass		Laptop
+Car audio	DeviceClass		Auto-audio
+SIM card reader	DeviceClass		SIM-kaartlezer
+Headphones	DeviceClass		Hoofdtelefoon
+Information	DeviceClass		Informatie
+Remote control	DeviceClass		Afstandsbediening
+Service classes: 	DeviceClass		Service-klassen:
+Pager	DeviceClass	A small radio device to receive short text messages	Pager
+Object transfer	DeviceClass		Objectoverdracht
+Gaming/Toy	DeviceClass		Gamen/Speelgoed
+Audio	DeviceClass		Audio
+Robot	DeviceClass		Robot
+Camcorder	DeviceClass		Camcorder
+Digitizer tablet	DeviceClass		Tekentablet
+Loudspeaker	DeviceClass		Luidspreker
+Joystick	DeviceClass		Joystick
+LAN access	DeviceClass		LAN-toegang
+Wrist watch	DeviceClass		Horloge
+Minor class: 	DeviceClass		Kleinere klasse:
+Networking	DeviceClass		Netwerken
+Portable audio	DeviceClass		Draagbare audio
+Device conforms to the headset profile	DeviceClass		Apparaat voldoet aan profiel van headset
+Hands-free	DeviceClass		Handsfree
+#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Ongeldige naam
+Vehicle	DeviceClass		Voertuig
+Palm	DeviceClass	A palm-held device	Palmtop
+Video display and loudspeaker	DeviceClass		Videoscherm en luidspreker
+Peripheral	DeviceClass		Randapparaat
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Ongeldige naam
+Wired modem or voice gateway	DeviceClass		Bedraad modem of stemgateway
+Unspecified	DeviceClass		Niet gespecificeerd
+Fully available	DeviceClass		Volledig beschikbaar
+67-83% utilized	DeviceClass		67-83% in gebruik
+Not implemented	RemoteDevice		Niet geïmplementeerd
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Ongeldige naam
+Server	DeviceClass		Server
+Video camera	DeviceClass		Videocamera
+HiFi audio device	DeviceClass		HiFi-audio-apparaat
 Smart phone	DeviceClass		Smartphone
 Telephony	DeviceClass		Telefonie
-Uncategorized	DeviceClass		Niet gecategoriseerd
-Unknown (reserved) minor device class	DeviceClass		Onbekende (gereserveerde) klasse voor kleiner apparaat
-Unspecified	DeviceClass		Niet gespecificeerd
+Doll/Action figure	DeviceClass		Pop/Actiefiguur
 VCR	DeviceClass		Videorecorder
-Vehicle	DeviceClass		Voertuig
-Video camera	DeviceClass		Videocamera
-Video display and loudspeaker	DeviceClass		Videoscherm en luidspreker
 Video monitor	DeviceClass		Videomonitor
-Wearable	DeviceClass	A wearable computer	Draagbare
-Wired modem or voice gateway	DeviceClass		Bedraad modem of stemgateway
-Wrist watch	DeviceClass		Horloge
+Pointing device	DeviceClass		Aanwijzer
+Miscellaneous	DeviceClass		Gevarieerd
+33-50% utilized	DeviceClass		33-50% in gebruik
+Imaging	DeviceClass		Beeldvorming

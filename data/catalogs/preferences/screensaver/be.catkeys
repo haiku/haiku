@@ -1,29 +1,29 @@
 1	belarusian	x-vnd.Haiku-ScreenSaver	215605989
-30 seconds	ScreenSaver		30 секунд
-Add…	ScreenSaver		Дадаць...
-Blackness	ScreenSaver		Чарната
-Cancel	ScreenSaver		Адмена
-Confirm password:	ScreenSaver		Пацвердзіце пароль:
 Could not load screen saver	ScreenSaver		Не ўдалося загрузіць захавальнік экрана
-Display Power Management Signaling not available	ScreenSaver		Кіраванне сілкаваннем дысплэя (DPMS) не падтрымліваецца
-Don't fade when	ScreenSaver		Не марнець, калі
-Done	ScreenSaver		Гатова
-Enable screensaver	ScreenSaver		Уключыць захавальнік
-Fade now when	ScreenSaver		Марнець адразу ж, калі
-General	ScreenSaver		Агульныя
-No options available	ScreenSaver		Ніякія опцыі недаступныя
-OK	ScreenSaver		ОК
-Password Window	ScreenSaver		Вакно Пароля
-Password lock	ScreenSaver		Ахова паролем
-Password:	ScreenSaver		Пароль:
-Passwords don't match. Please try again.	ScreenSaver		Паролі не супадаюць
-Password…	ScreenSaver		Пароль...
-ScreenSaver	System name		Захавальнік Экрана
-Screensaver settings	ScreenSaver		Наладкі захавальніка
-Screensavers	ScreenSaver		Захавальнікі экрана
+30 seconds	ScreenSaver		30 секунд
 Start screensaver	ScreenSaver		Запусціць захавальнік
-Test	ScreenSaver		Тэст
-Turn off screen	ScreenSaver		Выключыць экран
-Use custom password	ScreenSaver		Карыстацца асаблівым паролем
-Use network password	ScreenSaver		Карыстацца сеткавым паролем
+Password…	ScreenSaver		Пароль...
+Password:	ScreenSaver		Пароль:
+Password lock	ScreenSaver		Ахова паролем
+Add…	ScreenSaver		Дадаць...
+Screensavers	ScreenSaver		Захавальнікі экрана
 mouse is here	ScreenSaver		мыш тут
+Display Power Management Signaling not available	ScreenSaver		Кіраванне сілкаваннем дысплэя (DPMS) не падтрымліваецца
+ScreenSaver	System name		Захавальнік Экрана
+Test	ScreenSaver		Тэст
+General	ScreenSaver		Агульныя
+Enable screensaver	ScreenSaver		Уключыць захавальнік
+Cancel	ScreenSaver		Адмена
+Turn off screen	ScreenSaver		Выключыць экран
+No options available	ScreenSaver		Ніякія опцыі недаступныя
+Password Window	ScreenSaver		Вакно Пароля
+Fade now when	ScreenSaver		Марнець адразу ж, калі
+Screensaver settings	ScreenSaver		Наладкі захавальніка
+Passwords don't match. Please try again.	ScreenSaver		Паролі не супадаюць
+OK	ScreenSaver		ОК
+Don't fade when	ScreenSaver		Не марнець, калі
+Blackness	ScreenSaver		Чарната
+Use custom password	ScreenSaver		Карыстацца асаблівым паролем
+Done	ScreenSaver		Гатова
+Confirm password:	ScreenSaver		Пацвердзіце пароль:
+Use network password	ScreenSaver		Карыстацца сеткавым паролем

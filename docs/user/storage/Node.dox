@@ -1,0 +1,634 @@
+/*
+ * Copyright 2002-2011, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder, tylerdauwalder@users.sf.net
+ *		John Scipione, jscipione@gmail.com
+ *		Ingo Weinhold, bonefish@users.sf.net
+ * Corresponds to:
+ *		/trunk/headers/os/app/Node.h		 rev 42803
+ *		/trunk/src/kits/app/Node.cpp		 rev 42803
+ */
+
+
+/*!
+	\file Node.h
+	\brief Provides the BNode class and node_ref structure.
+*/
+
+
+/*!
+	\struct node_ref
+	\brief Reference structure to a particular vnode on a device.
+*/
+
+
+/*!
+	\fn node_ref::node_ref()
+	\brief Creates an uninitialized node_ref object.
+*/
+
+
+/*!
+	\fn node_ref::node_ref(const node_ref &ref)
+	\brief Creates a copy of the given node_ref object.
+
+	\param ref the node_ref to be copied.
+*/
+
+
+/*!
+	\fn bool node_ref::operator==(const node_ref &ref) const
+	\brief Tests whether this node_ref and the supplied one are equal.
+
+	\param ref the node_ref to be compared with.
+
+	\return \c true, if the objects are equal, \c false otherwise.
+*/
+
+
+/*!
+	\fn bool node_ref::operator!=(const node_ref &ref) const
+	\brief Tests whether this node_ref and the supplied one are not equal.
+
+	\param ref the node_ref to be compared with.
+
+	\return \c true, if the objects are \b not equal, \c false otherwise.
+*/
+
+
+/*!
+	\fn node_ref& node_ref::operator=(const node_ref &ref)
+	\brief Makes this node ref a copy of the supplied one.
+
+	\param ref the node_ref to be copied.
+
+	\return a reference to this object.
+*/
+
+
+/*!
+	\class BNode
+	\ingroup storage
+	\brief A BNode represents a chunk of data in the filesystem.
+
+	The BNode class provides an interface for manipulating the data and
+	attributes belonging to filesystem entries. The BNode is unaware of the
+	name that refers to it in the filesystem (i.e. its entry), instead, a
+	BNode is concerned solely with the entry's data and attributes.
+*/
+
+
+/*!
+	\var BNode::fFd
+	File descriptor for the given node.
+*/
+
+
+/*!
+	\var BNode::fAttrFd
+	File descriptor for the attribute directory of the node. Initialized lazily.
+*/
+
+
+/*!
+	\var BNode::fCStatus
+	The object's initialization status.
+*/
+
+
+/*!
+	\fn BNode::BNode()
+	\brief Creates an uninitialized BNode object.
+*/
+
+
+/*!
+	\fn BNode::BNode(const entry_ref *ref)
+	\brief Creates a BNode object and initializes it to the specified
+		entry_ref.
+
+	\param ref the entry_ref referring to the entry.
+*/
+
+
+/*!
+	\fn BNode::BNode(const BEntry *entry)
+	\brief Creates a BNode object and initializes it to the specified
+		filesystem entry.
+
+	\param entry the BEntry representing the entry.
+*/
+
+
+/*!
+	\fn BNode::BNode(const char *path)
+	\brief Creates a BNode object and initializes it to the entry referred
+		to by the specified path.
+
+	\param path the path referring to the entry.
+*/
+
+
+/*!
+	\fn BNode::BNode(const BDirectory *dir, const char *path)
+	\brief Creates a BNode object and initializes it to the entry referred
+		to by the specified path rooted in the specified directory.
+
+	\param dir the BDirectory, relative to which the entry's path name is
+		given.
+	\param path the entry's path name relative to \a dir.
+*/
+
+
+/*!
+	\fn BNode::BNode(const BNode &node)
+	\brief Creates a copy of the given BNode.
+
+	\param node the BNode to be copied.
+*/
+
+
+/*!
+	\fn BNode::~BNode()
+	\brief Frees all resources associated with the BNode.
+*/
+
+
+/*!
+	\fn status_t BNode::InitCheck() const
+	\brief Checks whether the object has been properly initialized or not.
+	
+	\returns B_OK if the object has been properly initialized, or an error
+		code otherwise.
+*/
+
+
+/*!
+	\fn status_t BNode::GetStat(struct stat *st) const
+	\brief Fills in the given stat structure with the <tt>stat()</tt>
+		information for this object.
+
+	\param st a pointer to a stat structure to be filled in.
+
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE: \c NULL \a st.
+*/
+
+
+/*!
+	\fn int BNode::Dup()
+	\brief Gets the POSIX file descriptor referred to by this node.
+
+	Remember to call close() on the file descriptor when you're through
+	with it.
+
+	\returns a valid file descriptor, or -1 if something went wrong.
+*/
+
+
+/*!
+	\name Assignment Methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BNode& BNode::operator=(const BNode &node)
+	\brief Initializes the object as a copy of the \a node.
+
+	\param node the BNode to be copied.
+
+	\returns a reference to this BNode object.
+*/
+
+
+/*!
+	\fn status_t BNode::SetTo(const entry_ref *ref)
+	\brief Initializes the object to the specified entry_ref.
+
+	\param ref the entry_ref referring to the entry.
+
+	\retval B_OK: Everything went fine.
+	\retval B_BAD_VALUE: \c NULL \a ref.
+	\retval B_ENTRY_NOT_FOUND: The entry could not be found.
+	\retval B_BUSY: The entry is locked.
+*/
+
+
+/*!
+	\fn status_t BNode::SetTo(const BEntry *entry)
+	\brief Initializes the object to the specified filesystem \a entry.
+
+	\param entry the BEntry representing the entry.
+
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a entry.
+	\retval B_ENTRY_NOT_FOUND The entry could not be found.
+	\retval B_BUSY The entry is locked.
+*/
+
+
+/*!
+	\fn status_t BNode::SetTo(const BDirectory *dir, const char *path)
+	\brief Initializes the object to the entry referred by the
+		specified \a path relative to the the specified directory.
+
+	\param dir the base BDirectory.
+	\param path the entry's path name relative to \a dir
+
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a entry.
+	\retval B_ENTRY_NOT_FOUND The entry could not be found.
+	\retval B_BUSY The entry is locked.
+*/
+
+
+/*!
+	\fn void BNode::Unset()
+	\brief Returns the object to an uninitialized state.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Locking Methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BNode::Lock()
+	\brief Attains an exclusive lock on the data referred to by this node
+		so that it may not be modified by any other objects or methods.
+
+	\retval B_OK Everything went fine.
+	\retval B_FILE_ERROR The object is not initialized.
+	\retval B_BUSY The node is already locked.
+*/
+
+
+/*!
+	\fn status_t BNode::Unlock()
+	\brief Unlocks the date referred to by this node.
+
+	\retval B_OK Everything went fine.
+	\retval B_FILE_ERROR The object is not initialized.
+	\retval B_BAD_VALUE The node is not locked.
+*/
+
+
+/*!
+	\fn status_t BNode::Sync()
+	\brief Immediately performs any pending disk actions on the node.
+
+	\retval B_OK Everything went fine.
+	\retval B_FILE_ERROR Something went wrong.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Attribute Methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn ssize_t BNode::WriteAttr(const char *attr, type_code type,
+								 off_t offset, const void *buffer, size_t len)
+	\brief Writes data from a buffer to an attribute.
+
+	Write \a len bytes of data from \a buffer to the attribute specified
+	by \a name after erasing any data that existed previously. The type
+	specified by \a type \em is remembered, and may be queried with
+	GetAttrInfo(). The value of \a offset is currently ignored.
+
+	\param attr the name of the attribute.
+	\param type the type of the attribute.
+	\param offset the index at which to write the data (currently ignored).
+	\param buffer the buffer containing the data to be written.
+	\param len the number of bytes to be written.
+
+	\returns the number of bytes actually written.
+	\retval B_BAD_VALUE \a attr or \a buffer is \c NULL.
+	\retval B_FILE_ERROR The object is not initialized or the node it refers to
+		is read only.
+	\retval B_NOT_ALLOWED The node resides on a read only volume.
+	\retval B_DEVICE_FULL Insufficient disk space.
+	\retval B_NO_MEMORY Insufficient memory to complete the operation.
+*/
+
+
+/*!
+	\fn ssize_t BNode::ReadAttr(const char *attr, type_code type,
+								off_t offset, void *buffer, size_t len) const
+	\brief Reads data from an attribute into \a buffer.
+
+	Reads \a len bytes of data from the attribute given by \a name into
+	\a buffer. \a type and \a offset are currently ignored.
+
+	\param attr the name of the attribute.
+	\param type the type of the attribute (currently ignored).
+	\param offset the index from which to read the data (currently ignored).
+	\param buffer the buffer for the data to be read.
+	\param len the number of bytes to be read.
+
+	\returns the number of bytes actually read
+	\retval B_BAD_VALUE \a attr or \a buffer is \c NULL.
+	\retval B_FILE_ERROR The object is not initialized.
+	\retval B_ENTRY_NOT_FOUND The node has no attribute \a attr.
+*/
+
+
+/*!
+	\fn status_t BNode::RemoveAttr(const char *name)
+	\brief Deletes the attribute given by \a name.
+
+	\param name the name of the attribute to remove.
+
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \a name is \c NULL.
+	\retval B_FILE_ERROR The object is not initialized or the node it
+		refers to read only.
+	\retval B_ENTRY_NOT_FOUND The node has no attribute \a name.
+	\retval B_NOT_ALLOWED The node resides on a read only volume.
+*/
+
+
+/*!
+	\fn status_t BNode::RenameAttr(const char *oldname, const char *newname)
+	\brief Moves the attribute given by \a oldname to \a newname.
+
+	If \a newname already exists, the data is clobbered.
+
+	\param oldname the name of the attribute to be renamed.
+	\param newname the new name for the attribute.
+
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \a oldname or \a newname is \c NULL.
+	\retval B_FILE_ERROR The object is not initialized or the node it
+		refers to is read only.
+	\retval B_ENTRY_NOT_FOUND The node has no attribute \a oldname.
+	\retval B_NOT_ALLOWED The node resides on a read only volume.
+*/
+
+
+/*!
+	\fn status_t BNode::GetAttrInfo(const char *name,
+									struct attr_info *info) const
+	\brief Fills in the pre-allocated attr_info struct pointed to by \a info
+		with information about the attribute specified by \a name.
+
+	\param name the name of the attribute
+	\param info the attr_info structure to be filled in
+
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \a name is \c NULL.
+	\retval B_FILE_ERROR The object is not initialized.
+	\retval B_ENTRY_NOT_FOUND The node has no attribute \a name.
+*/
+
+
+/*!
+	\fn status_t BNode::GetNextAttrName(char *buffer)
+	\brief Copies the name of the attribute into \c buffer and then advances
+		the pointer to the next attribute.
+
+	The name of the node is first copied into \a buffer, which should be at
+	least \c B_ATTR_NAME_LENGTH characters long. The copied node name is
+	\c NUL terminated. Once the name is copied the attribute list pointer
+	is advanced to the next attribute in the list. When GetNextAttrName()
+	reaches the end of the list it returns \c B_ENTRY_NOT_FOUND.
+
+	\param buffer A buffer to copy the name of the attribute into.
+
+	\retval B_OK The Attribute name was copied and there are more attribute
+		names to copy.
+	\retval B_BAD_VALUE passed in \a buffer is \c NULL.
+	\retval B_FILE_ERROR The object is not initialized.
+	\retval B_ENTRY_NOT_FOUND There are no more attributes, the last attribute
+		name has already been copied.
+*/
+
+
+/*!
+	\fn status_t BNode::RewindAttrs()
+	\brief Resets the object's attribute pointer to the first attribute in the
+		list.
+
+	\retval B_OK Everything went fine.
+	\retval B_FILE_ERROR Some other error occurred.
+*/
+
+
+/*!
+	\fn status_t BNode::WriteAttrString(const char *name, const BString *data)
+	\brief Writes the specified string to the specified attribute, clobbering
+		any previous data.
+
+	\param name the name of the attribute.
+	\param data the BString to be written to the attribute.
+
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a name or \a data
+	\retval B_FILE_ERROR The object is not initialized or the node it refers to
+		is read only.
+	\retval B_NOT_ALLOWED The node resides on a read only volume.
+	\retval B_DEVICE_FULL Insufficient disk space.
+	\retval B_NO_MEMORY Insufficient memory to complete the operation.
+*/
+
+
+/*!
+	\fn status_t BNode::ReadAttrString(const char *name, BString *result) const
+	\brief Reads the data of the specified attribute into the pre-allocated
+		\a result.
+
+	\param name the name of the attribute.
+	\param result the BString to be set to the value of the attribute.
+
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \a name or \a result is \c NULL.
+	\retval B_FILE_ERROR The object is not initialized.
+	\retval B_ENTRY_NOT_FOUND The node has no attribute \a attr.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Comparison Methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn bool BNode::operator==(const BNode &node) const
+	\brief Tests whether this and the supplied BNode object are equal.
+
+	Two BNode objects are said to be equal if they're set to the same node,
+	or if they're both \c B_NO_INIT.
+
+	\param node the BNode to be compared with.
+
+	\return \c true, if the BNode objects are equal, \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BNode::operator!=(const BNode &node) const
+	\brief Tests whether this and the supplied BNode object are not equal.
+
+	Two BNode objects are said to be equal if they're set to the same node,
+	or if they're both \c B_NO_INIT.
+
+	\param node the BNode to be compared with
+
+	\return \c false, if the BNode objects are equal, \c true otherwise.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Private Methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BNode::set_fd(int fd)
+	\brief Sets the node's file descriptor.
+
+	Used by each implementation (i.e. BNode, BFile, BDirectory, etc.) to set
+	the node's file descriptor. This allows each subclass to use the various
+	file-type specific system calls for opening file descriptors.
+
+	\note This method calls close_fd() to close previously opened FDs. Thus
+		derived classes should take care to first call set_fd() and set
+		class specific resources freed in their close_fd() version
+		thereafter.
+
+	\param fd the file descriptor this BNode should be set to (may be -1).
+
+	\returns \c B_OK if everything went fine, or an error code if something
+		went wrong.
+*/
+
+
+/*!
+	\fn void BNode::close_fd()
+	\brief Closes the node's file descriptor(s).
+
+	To be implemented by subclasses to close the file descriptor using the
+	proper system call for the given file-type. This implementation calls
+	_kern_close(fFd) and also _kern_close(fAttrDir) if necessary.
+*/
+
+
+/*!
+	\fn void BNode::set_status(status_t newStatus)
+	\brief Sets the BNode's status.
+
+	To be used by derived classes instead of accessing the BNode's private
+	\c fCStatus member directly.
+
+	\param newStatus the new value for the status variable.
+*/
+
+
+/*!
+	\fn status_t BNode::_SetTo(int fd, const char *path, bool traverse)
+	\brief Initializes the BNode's file descriptor to the node referred to
+		 by the given FD and path combo.
+
+	\a path must either be \c NULL, an absolute or a relative path.
+	In the first case, \a fd must not be \c NULL; the node it refers to will
+	be opened. If absolute, \a fd is ignored. If relative and \a fd is >= 0,
+	it will be reckoned off the directory identified by \a fd, otherwise off
+	the current working directory.
+
+	The method will first try to open the node with read and write permission.
+	If that fails due to a read-only FS or because the user has no write
+	permission for the node, it will re-try opening the node read-only.
+
+	The \a fCStatus member will be set to the return value of this method.
+
+	\param fd Either a directory FD or a value < 0. In the latter case \a path
+		   must be specified.
+	\param path Either \a NULL in which case \a fd must be given, absolute, or
+		   relative to the directory specified by \a fd (if given) or to the
+		   current working directory.
+	\param traverse If the node identified by \a fd and \a path is a symlink
+		   and \a traverse is \c true, the symlink will be resolved recursively.
+
+	\returns \c B_OK if everything went fine, or an error code if something
+		went wrong.
+*/
+
+
+/*!
+	\fn status_t BNode::_SetTo(const entry_ref *ref, bool traverse)
+	\brief Initializes the BNode's file descriptor to the node referred to
+		 by the given entry_ref.
+
+	The method will first try to open the node with read and write permission.
+	If that fails due to a read-only FS or because the user has no write
+	permission for the node, it will re-try opening the node read-only.
+
+	The \a fCStatus member will be set to the return value of this method.
+
+	\param ref An entry_ref identifying the node to be opened.
+	\param traverse If the node identified by \a ref is a symlink and
+		\a traverse is \c true, the symlink will be resolved recursively.
+
+	\returns \c B_OK if everything went fine, or an error code if something
+		went wrong.
+*/
+
+
+/*!
+	\fn status_t BNode::set_stat(struct stat &st, uint32 what)
+	\brief Modifies a certain setting for this node based on \a what and the
+		corresponding value in \a st.
+
+	Inherited from and called by BStatable.
+
+	\param st a stat structure containing the value to be set.
+	\param what specifies what setting to be modified.
+
+	\returns \c B_OK if everything went fine, or an error code if something
+		went wrong.
+*/
+
+
+/*!
+	\fn status_t BNode::InitAttrDir()
+	\brief Verifies that the BNode has been properly initialized, and then
+		(if necessary) opens the attribute directory on the node's file
+		descriptor, storing it in fAttrDir.
+
+	\returns \c B_OK if everything went fine, or an error code if something
+		went wrong.
+*/
+
+
+//! @}

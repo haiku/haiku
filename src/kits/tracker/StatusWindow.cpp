@@ -42,6 +42,7 @@ All rights reserved.
 #include <Catalog.h>
 #include <ControlLook.h>
 #include <Debug.h>
+#include <DurationFormat.h>
 #include <Locale.h>
 #include <MessageFilter.h>
 #include <StringView.h>
@@ -775,24 +776,17 @@ BStatusView::_TimeStatusString(float availableSpace, float* _width)
 	time_t now = (time_t)real_time_clock();
 	time_t finishTime = (time_t)(now + secondsRemaining);
 
-	tm _time;
-	tm* time = localtime_r(&finishTime, &_time);
-	int32 year = time->tm_year + 1900;
-
 	char timeText[32];
-	// TODO: Localization of time string...
-	if (now < finishTime - kSecondsPerDay) {
-		// process is going to take more than a day!
-		snprintf(timeText, sizeof(timeText), "%0*d:%0*d %0*d/%0*d/%ld",
-			2, time->tm_hour, 2, time->tm_min,
-			2, time->tm_mon + 1, 2, time->tm_mday, year);
+	const BLocale* locale = BLocale::Default();
+	if (finishTime - now > kSecondsPerDay) {
+		locale->FormatDateTime(timeText, sizeof(timeText), finishTime,
+			B_MEDIUM_DATE_FORMAT, B_MEDIUM_TIME_FORMAT);
 	} else {
-		snprintf(timeText, sizeof(timeText), "%0*d:%0*d",
-			2, time->tm_hour, 2, time->tm_min);
+		locale->FormatTime(timeText, sizeof(timeText), finishTime,
+			B_MEDIUM_TIME_FORMAT);
 	}
 
-	finishTime -= now;
-	BString string(_FullTimeRemainingString(finishTime, timeText));
+	BString string(_FullTimeRemainingString(now, finishTime, timeText));
 	*_width = StringWidth(string.String());
 	if (*_width > availableSpace) {
 		string.SetTo(_ShortTimeRemainingString(timeText));
@@ -817,28 +811,18 @@ BStatusView::_ShortTimeRemainingString(const char* timeText)
 
 
 BString
-BStatusView::_FullTimeRemainingString(time_t finishTime, const char* timeText)
+BStatusView::_FullTimeRemainingString(time_t now, time_t finishTime,
+	const char* timeText)
 {
+	BDurationFormat formatter;
 	BString buffer;
-	char finishStr[32];
-	if (finishTime > kSecondsPerDay) {
-		buffer.SetTo(B_TRANSLATE("(Finish: %time - Over %finishtime "
-			"days left)"));
-		snprintf(finishStr, sizeof(finishStr), "%ld",
-			finishTime / kSecondsPerDay);
-	} else if (finishTime > 60 * 60) {
-		buffer.SetTo(B_TRANSLATE("(Finish: %time - Over %finishtime "
-			"hours left)"));
-		snprintf(finishStr, sizeof(finishStr), "%ld",
-			finishTime / (60 * 60));
-	} else if (finishTime > 60) {
-		buffer.SetTo(B_TRANSLATE("(Finish: %time - %finishtime minutes "
-			"left)"));
-		snprintf(finishStr, sizeof(finishStr), "%ld", finishTime / 60);
+	BString finishStr;
+	if (finishTime - now > 60 * 60) {
+		buffer.SetTo(B_TRANSLATE("(Finish: %time - Over %finishtime left)"));
+		formatter.Format(now * 1000000LL, finishTime * 1000000LL, &finishStr);
 	} else {
-		buffer.SetTo(B_TRANSLATE("(Finish: %time - %finishtime seconds "
-			"left)"));
-		snprintf(finishStr, sizeof(finishStr), "%ld", finishTime);
+		buffer.SetTo(B_TRANSLATE("(Finish: %time - %finishtime left)"));
+		formatter.Format(now * 1000000LL, finishTime * 1000000LL, &finishStr);
 	}
 
 	buffer.ReplaceFirst("%time", timeText);

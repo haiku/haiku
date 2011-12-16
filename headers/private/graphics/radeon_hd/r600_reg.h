@@ -183,4 +183,10 @@
 #define R600_HDMI_CONFIG1                 0x7600
 #define R600_HDMI_CONFIG2                 0x7a00
 
+/* Thermal information */
+#define	R600_CG_THERMAL_STATUS			0x7F4
+#define		R600_ASIC_T(x)				((x) << 0)
+#define		R600_ASIC_T_MASK			0x1FF
+#define		R600_ASIC_T_SHIFT			0
+
 #endif

@@ -713,7 +713,7 @@ ScreenshotWindow::_FindValidFileName(const char* name)
 	if (orgPath == NULL)
 		return baseName;
 
-	fExtension = BString(fUtility.GetFileNameExtension(fImageFileType));
+	fExtension = fUtility.GetFileNameExtension(fImageFileType);
 
 	BPath outputPath = orgPath;
 	BString fileName;

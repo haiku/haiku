@@ -14,8 +14,8 @@ public:
 							NotificationServer();
 	virtual					~NotificationServer();
 
+	virtual	void			ReadyToRun();
 	virtual	void			MessageReceived(BMessage* message);
-	virtual	bool			QuitRequested();
 
 	virtual	status_t		GetSupportedSuites(BMessage* msg);
 	virtual	BHandler*		ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec,

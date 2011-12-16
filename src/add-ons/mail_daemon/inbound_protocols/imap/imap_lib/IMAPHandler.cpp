@@ -7,7 +7,7 @@
 
 #include "IMAPHandler.h"
 
-#include <stdlib.h> // for atoi
+#include <stdlib.h>
 
 #include <AutoDeleter.h>
 
@@ -17,12 +17,11 @@
 
 
 #define DEBUG_IMAP_HANDLER
-
 #ifdef DEBUG_IMAP_HANDLER
-#include <stdio.h>
-#define TRACE(x...) printf(x)
+#	include <stdio.h>
+#	define TRACE(x...) printf(x)
 #else
-#define TRACE(x...) /* nothing */
+#	define TRACE(x...) ;
 #endif
 
 
@@ -31,7 +30,6 @@ using namespace BPrivate;
 
 IMAPCommand::~IMAPCommand()
 {
-
 }
 
 
@@ -48,14 +46,15 @@ IMAPMailboxCommand::IMAPMailboxCommand(IMAPMailbox& mailbox)
 	fStorage(mailbox.GetStorage()),
 	fConnectionReader(mailbox.GetConnectionReader())
 {
-	
 }
 
 
 IMAPMailboxCommand::~IMAPMailboxCommand()
 {
-	
 }
+
+
+// #pragma mark -
 
 
 MailboxSelectHandler::MailboxSelectHandler(IMAPMailbox& mailbox)
@@ -66,7 +65,6 @@ MailboxSelectHandler::MailboxSelectHandler(IMAPMailbox& mailbox)
 	fNextUID(-1),
 	fUIDValidity(-1)
 {
-
 }
 
 
@@ -105,11 +103,13 @@ MailboxSelectHandler::Handle(const BString& response)
 }
 
 
+// #pragma mark -
+
+
 CapabilityHandler::CapabilityHandler()
 	:
 	fCapabilities("")
 {
-	
 }
 
 
@@ -139,7 +139,7 @@ CapabilityHandler::Capabilities()
 }
 
 
-// FetchHandler
+// #pragma mark -
 
 
 FetchMinMessageCommand::FetchMinMessageCommand(IMAPMailbox& mailbox,
@@ -152,7 +152,6 @@ FetchMinMessageCommand::FetchMinMessageCommand(IMAPMailbox& mailbox,
 	fMinMessageList(list),
 	fData(data)
 {
-
 }
 
 
@@ -167,7 +166,6 @@ FetchMinMessageCommand::FetchMinMessageCommand(IMAPMailbox& mailbox,
 	fMinMessageList(list),
 	fData(data)
 {
-
 }
 
 
@@ -255,6 +253,9 @@ FetchMinMessageCommand::ExtractFlags(const BString& response)
 }
 
 
+// #pragma mark -
+
+
 FetchMessageListCommand::FetchMessageListCommand(IMAPMailbox& mailbox,
 	MinMessageList* list, int32 nextId)
 	:
@@ -263,7 +264,6 @@ FetchMessageListCommand::FetchMessageListCommand(IMAPMailbox& mailbox,
 	fMinMessageList(list),
 	fNextId(nextId)
 {
-	
 }
 
 
@@ -294,6 +294,9 @@ FetchMessageListCommand::Handle(const BString& response)
 }
 
 
+// #pragma mark -
+
+
 FetchMessageCommand::FetchMessageCommand(IMAPMailbox& mailbox, int32 message,
 	BPositionIO* data, int32 fetchBodyLimit)
 	:
@@ -304,7 +307,6 @@ FetchMessageCommand::FetchMessageCommand(IMAPMailbox& mailbox, int32 message,
 	fOutData(data),
 	fFetchBodyLimit(fetchBodyLimit)
 {
-
 }
 
 
@@ -431,6 +433,9 @@ FetchMessageCommand::Handle(const BString& response)
 }
 
 
+// #pragma mark -
+
+
 FetchBodyCommand::FetchBodyCommand(IMAPMailbox& mailbox, int32 message,
 	BPositionIO* data)
 	:
@@ -439,7 +444,6 @@ FetchBodyCommand::FetchBodyCommand(IMAPMailbox& mailbox, int32 message,
 	fMessage(message),
 	fOutData(data)
 {
-	
 }
 
 
@@ -502,6 +506,9 @@ FetchBodyCommand::Handle(const BString& response)
 }
 
 
+// #pragma mark -
+
+
 SetFlagsCommand::SetFlagsCommand(IMAPMailbox& mailbox, int32 message,
 	int32 flags)
 	:
@@ -552,6 +559,9 @@ SetFlagsCommand::GenerateFlagList(int32 flags)
 }
 
 
+// #pragma mark -
+
+
 AppendCommand::AppendCommand(IMAPMailbox& mailbox, BPositionIO& message,
 	off_t size, int32 flags, time_t time)
 	:
@@ -562,7 +572,6 @@ AppendCommand::AppendCommand(IMAPMailbox& mailbox, BPositionIO& message,
 	fFlags(flags),
 	fTime(time)
 {
-
 }
 
 
@@ -607,12 +616,15 @@ AppendCommand::Handle(const BString& response)
 }
 
 
+// #pragma mark -
+
+
 ExistsHandler::ExistsHandler(IMAPMailbox& mailbox)
 	:
 	IMAPMailboxCommand(mailbox)
 {
-
 }
+
 
 bool
 ExistsHandler::Handle(const BString& response)
@@ -647,12 +659,15 @@ ExistsHandler::Handle(const BString& response)
 }
 
 
+// #pragma mark -
+
+
 ExpungeCommmand::ExpungeCommmand(IMAPMailbox& mailbox)
 	:
 	IMAPMailboxCommand(mailbox)
 {
-
 }
+
 
 BString
 ExpungeCommmand::Command()
@@ -668,12 +683,15 @@ ExpungeCommmand::Handle(const BString& response)
 }
 
 
+// #pragma mark -
+
+
 ExpungeHandler::ExpungeHandler(IMAPMailbox& mailbox)
 	:
 	IMAPMailboxCommand(mailbox)
 {
-
 }
+
 
 bool
 ExpungeHandler::Handle(const BString& response)
@@ -703,11 +721,13 @@ ExpungeHandler::Handle(const BString& response)
 }
 
 
+// #pragma mark -
+
+
 FlagsHandler::FlagsHandler(IMAPMailbox& mailbox)
 	:
 	IMAPMailboxCommand(mailbox)
 {
-	
 }
 
 
@@ -729,6 +749,9 @@ FlagsHandler::Handle(const BString& response)
 
 	return true;
 }
+
+
+// #pragma mark -
 
 
 BString
@@ -783,6 +806,9 @@ ListCommand::ParseList(const char* command, const BString& response,
 }
 
 
+// #pragma mark -
+
+
 BString
 ListSubscribedCommand::Command()
 {
@@ -805,11 +831,13 @@ ListSubscribedCommand::FolderList()
 }
 
 
+// #pragma mark -
+
+
 SubscribeCommand::SubscribeCommand(const char* mailboxName)
 	:
 	fMailboxName(mailboxName)
 {
-
 }
 
 
@@ -830,11 +858,13 @@ SubscribeCommand::Handle(const BString& response)
 }
 
 
+// #pragma mark -
+
+
 UnsubscribeCommand::UnsubscribeCommand(const char* mailboxName)
 	:
 	fMailboxName(mailboxName)
 {
-
 }
 
 
@@ -855,15 +885,15 @@ UnsubscribeCommand::Handle(const BString& response)
 }
 
 
+// #pragma mark -
+
 
 GetQuotaCommand::GetQuotaCommand(const char* mailboxName)
 	:
 	fMailboxName(mailboxName),
-
-	fUsedStorage(-1),
-	fTotalStorage(-1)
+	fUsedStorage(0),
+	fTotalStorage(0)
 {
-
 }
 
 
@@ -885,23 +915,21 @@ GetQuotaCommand::Handle(const BString& response)
 
 	BString data = IMAPParser::ExtractBetweenBrackets(response, "(", ")");
 	IMAPParser::RemovePrimitiveFromLeft(data);
-	fUsedStorage = IMAPParser::RemoveIntegerFromLeft(data);
-	fUsedStorage *= 1024;
-	fTotalStorage = IMAPParser::RemoveIntegerFromLeft(data);
-	fTotalStorage *= 1024;
+	fUsedStorage = (uint64)IMAPParser::RemoveIntegerFromLeft(data) * 1024;
+	fTotalStorage = (uint64)IMAPParser::RemoveIntegerFromLeft(data) * 1024;
 
 	return true;
 }
 
 
-double
+uint64
 GetQuotaCommand::UsedStorage()
 {
 	return fUsedStorage;
 }
 
 
-double
+uint64
 GetQuotaCommand::TotalStorage()
 {
 	return fTotalStorage;

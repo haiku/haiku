@@ -23,6 +23,5 @@ MergeObject posix_gnu_locale.o :
 	lc-messages.c
 	lc-monetary.c
 	lc-numeric.c
-	mb_cur_max.c
 	xlocale.c
 ;

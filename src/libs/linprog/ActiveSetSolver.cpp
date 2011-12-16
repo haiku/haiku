@@ -125,7 +125,7 @@ EquationSystem::SwapRow(int32 i, int32 j)
 
 
 bool
-EquationSystem::GaussJordan()
+EquationSystem::GaussianElimination()
 {
 	// basic solve
 	for (int i = 0; i < fRows; i++) {
@@ -158,8 +158,21 @@ EquationSystem::GaussJordan()
 			SwapRow(i, swapRow);
 
 		// normalize
-		GaussJordan(i);
+		_EliminateColumn(i, i + 1, fRows - 1);
 	}
+	return true;
+}
+
+
+bool
+EquationSystem::GaussJordan()
+{
+	if (!GaussianElimination())
+		return false;
+
+	for (int32 i = fRows - 1; i >= 0; i--)
+		_EliminateColumn(i, 0, i - 1);
+
 	return true;
 }
 
@@ -167,25 +180,7 @@ EquationSystem::GaussJordan()
 void
 EquationSystem::GaussJordan(int32 i)
 {
-	double value = fMatrix[fRowIndices[i]][fColumnIndices[i]];
-	for (int j = 0; j < fColumns; j++)
-		fMatrix[fRowIndices[i]][fColumnIndices[j]] /= value;
-	fB[i] /= value;
-
-	for (int r = 0; r < fRows; r++) {
-		if (r == i)
-			continue;
-		double q = -fMatrix[fRowIndices[r]][fColumnIndices[i]];
-		// don't need to do nothing, since matrix is typically sparse this
-		// should save some work
-		if (fuzzy_equals(q, 0))
-			continue;
-		for (int c = 0; c < fColumns; c++)
-			fMatrix[fRowIndices[r]][fColumnIndices[c]]
-				+= fMatrix[fRowIndices[i]][fColumnIndices[c]] * q;
-
-		fB[r] += fB[i] * q;
-	}
+	_EliminateColumn(i, 0, fRows - 1);
 }
 
 
@@ -271,6 +266,33 @@ EquationSystem::Print()
 }
 
 
+void
+EquationSystem::_EliminateColumn(int32 column, int32 startRow, int32 endRow)
+{
+	double value = fMatrix[fRowIndices[column]][fColumnIndices[column]];
+	if (value != 1.) {
+		for (int j = column; j < fColumns; j++)
+			fMatrix[fRowIndices[column]][fColumnIndices[j]] /= value;
+		fB[column] /= value;
+	}
+
+	for (int r = startRow; r < endRow + 1; r++) {
+		if (r == column)
+			continue;
+		double q = -fMatrix[fRowIndices[r]][fColumnIndices[column]];
+		// don't need to do anything, since matrix is typically sparse this
+		// should save some work
+		if (fuzzy_equals(q, 0))
+			continue;
+		for (int c = column; c < fColumns; c++)
+			fMatrix[fRowIndices[r]][fColumnIndices[c]]
+				+= fMatrix[fRowIndices[column]][fColumnIndices[c]] * q;
+
+		fB[r] += fB[column] * q;
+	}
+}
+
+
 ActiveSetSolver::ActiveSetSolver(LinearSpec* linearSpec)
 	:
 	QPSolverInterface(linearSpec),
@@ -293,7 +315,7 @@ Solving Inequalities and Proving Farkas's Lemma Made Easy
 David Avis and Bohdan Kaluzny
 The American Mathematical Monthly
 Vol. 111, No. 2 (Feb., 2004), pp. 152-157 */
-bool
+static bool
 solve(EquationSystem& system)
 {
 	// basic solve
@@ -392,7 +414,7 @@ ActiveSetSolver::Solve()
 
 	double results[nVariables + nConstraints];
 	system.Results(results, nVariables + nConstraints);
-	printf("base system solved\n");
+	TRACE("base system solved\n");
 
 	LayoutOptimizer optimizer(fConstraints, nVariables);
 	optimizer.Solve(results);

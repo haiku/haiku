@@ -100,6 +100,7 @@ private:
 			Statement*			fStepStatement;
 			target_addr_t		fBreakpointAddress;
 			target_addr_t		fPreviousInstructionPointer;
+			target_addr_t		fPreviousFrameAddress;
 			bool				fSingleStepping;
 
 public:

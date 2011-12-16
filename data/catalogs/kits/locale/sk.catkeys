@@ -1,34 +1,34 @@
-1	slovak	system	180647795
-%.2f TiB	StringForSize		%.2f TiB
-%3.2f GiB	StringForSize		%3.2f GiB
-%3.2f KiB	StringForSize		%3.2f KiB
-%3.2f MiB	StringForSize		%3.2f MiB
-%d bytes	StringForSize		%d bajtov
-<empty>	Menu		<prázdne>
-About %app%	AboutMenuItem		O aplikácii %app%
-About %app…	Dragger		O aplikácii %app…
-About…	AboutWindow		O aplikácii...
-Blue:	ColorControl		Modrá:
-Can't delete this replicant from its original application. Life goes on.	Dragger		Nemožno zmazať tohto replikanta z jeho pôvodnej aplikácie. C'est la vie.
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nemožno vytvoriť replikanta pre „%description“.\n%error
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nemožno nájsť aplikáciu pre replikanta. Nebol dodaný žiaden podpis aplikácie.\n%error
+1	slovak	x-vnd.Haiku-libbe	180647795
 Close	AboutWindow		Zatvoriť
-Copy	TextView		Kopírovať
-Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
+%3.2f GiB	StringForSize		%3.2f GiB
+Written by:	AboutWindow		Napísal:
+About %app%	AboutMenuItem		O aplikácii %app%
 Cut	TextView		Vystrihnúť
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nemožno vytvoriť replikanta pre „%description“.\n%error
+Copy	TextView		Kopírovať
+%3.2f KiB	StringForSize		%3.2f KiB
+%d bytes	StringForSize		%d bajtov
+About…	AboutWindow		O aplikácii…
 Error	PrintJob		Chyba
-Error	ZombieReplicantView		Chyba
-Green:	ColorControl		Zelená:
 No Pages to print!	PrintJob		Žiadne strany na tlačenie!
 OK	Dragger		OK
 OK	PrintJob		OK
-OK	ZombieReplicantView		OK
-Paste	TextView		Vložiť
-Print Server is not responding.	PrintJob		Tlačový server neodpovedá
-Red:	ColorControl		Červená:
-Redo	TextView		Opakovať
+Green:	ColorControl		Zelená:
 Remove replicant	Dragger		Odstrániť replikanta
+OK	ZombieReplicantView		OK
+Print Server is not responding.	PrintJob		Tlačový server neodpovedá.
+Paste	TextView		Vložiť
+Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
+%.2f TiB	StringForSize		%.2f TiB
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nemožno nájsť aplikáciu pre replikanta. Nebol dodaný žiaden podpis aplikácie.\n%error
+Redo	TextView		Opakovať
+<empty>	Menu		<prázdne>
 Select All	TextView		Vybrať všetko
-Undo	TextView		Späť
 Warning	Dragger		Upozornenie
-Written by:	AboutWindow		Napísal:
+Undo	TextView		Späť
+Red:	ColorControl		Červená:
+%3.2f MiB	StringForSize		%3.2f MiB
+About %app…	Dragger		O aplikácii %app…
+Error	ZombieReplicantView		Chyba
+Blue:	ColorControl		Modrá:
+Can't delete this replicant from its original application. Life goes on.	Dragger		Nemožno zmazať tohto replikanta z jeho pôvodnej aplikácie. C'est la vie.

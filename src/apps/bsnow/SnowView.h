@@ -5,9 +5,9 @@
 #include <Bitmap.h>
 #include <Dragger.h>
 #include <List.h>
+#include <MessageRunner.h>
 #include <OS.h>
 #include <View.h>
-#include <MessageRunner.h>
 
 #include "Flakes.h"
 
@@ -25,9 +25,6 @@
 #define WIND_MAX_DURATION 10000000
 #define FALLEN_HEIGHT 30
 #define INVALIDATOR_THREAD_NAME "You're Neo? I'm the Snow Maker!"
-
-#define MSG_DRAG_ME "Drag me on your desktop..."
-#define MSG_CLICK_ME "Click me to remove BSnow..."
 
 
 typedef struct flake {

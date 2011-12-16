@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Oliver Tappe, zooey@hirschkaefer.de.
+ * Copyright 2010-2011, Oliver Tappe, zooey@hirschkaefer.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _ICU_TIME_DATA_H
@@ -21,7 +21,8 @@ namespace Libroot {
 class ICUTimeData : public ICUCategoryData {
 	typedef	ICUCategoryData		inherited;
 public:
-								ICUTimeData(struct lc_time_t& lcTimeInfo);
+								ICUTimeData(pthread_key_t tlsKey,
+									struct lc_time_t& lcTimeInfo);
 								~ICUTimeData();
 
 			void				Initialize(LocaleTimeDataBridge* dataBridge);

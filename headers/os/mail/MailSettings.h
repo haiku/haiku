@@ -28,15 +28,6 @@ typedef enum {
 } b_mail_status_window_option;
 
 
-typedef enum {
-	B_MAIL_STATUS_LOOK_TITLED                = 0,
-	B_MAIL_STATUS_LOOK_NORMAL_BORDER         = 1,
-	B_MAIL_STATUS_LOOK_FLOATING              = 2,
-	B_MAIL_STATUS_LOOK_THIN_BORDER           = 3,
-	B_MAIL_STATUS_LOOK_NO_BORDER             = 4
-} b_mail_status_window_look;
-
-
 class BMailSettings {
 public:
 								BMailSettings();

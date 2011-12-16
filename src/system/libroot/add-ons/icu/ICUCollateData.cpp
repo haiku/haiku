@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Oliver Tappe, zooey@hirschkaefer.de.
+ * Copyright 2010-2011, Oliver Tappe, zooey@hirschkaefer.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -15,8 +15,9 @@ namespace BPrivate {
 namespace Libroot {
 
 
-ICUCollateData::ICUCollateData()
+ICUCollateData::ICUCollateData(pthread_key_t tlsKey)
 	:
+	inherited(tlsKey),
 	fCollator(NULL)
 {
 }
@@ -150,8 +151,13 @@ ICUCollateData::_ToUnicodeString(const char* in, UnicodeString& out)
 	if (inLen == 0)
 		return B_OK;
 
+	UConverter* converter;
+	status_t result = _GetConverter(converter);
+	if (result != B_OK)
+		return result;
+
 	UErrorCode icuStatus = U_ZERO_ERROR;
-	int32_t outLen = ucnv_toUChars(fConverter, NULL, 0, in, inLen, &icuStatus);
+	int32_t outLen = ucnv_toUChars(converter, NULL, 0, in, inLen, &icuStatus);
 	if (icuStatus != U_BUFFER_OVERFLOW_ERROR)
 		return B_BAD_VALUE;
 	if (outLen < 0)
@@ -162,7 +168,7 @@ ICUCollateData::_ToUnicodeString(const char* in, UnicodeString& out)
 	UChar* outBuf = out.getBuffer(outLen + 1);
 	icuStatus = U_ZERO_ERROR;
 	outLen
-		= ucnv_toUChars(fConverter, outBuf, outLen + 1, in, inLen, &icuStatus);
+		= ucnv_toUChars(converter, outBuf, outLen + 1, in, inLen, &icuStatus);
 	if (!U_SUCCESS(icuStatus)) {
 		out.releaseBuffer(0);
 		return B_BAD_VALUE;

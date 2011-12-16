@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2005-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -16,6 +16,7 @@
 #include <unistd.h>
 #include <utime.h>
 #include <sys/stat.h>
+#include <sys/time.h>
 
 #include <map>
 #include <string>
@@ -26,6 +27,7 @@
 
 #include "fs_descriptors.h"
 #include "NodeRef.h"
+#include "remapped_functions.h"
 
 #if defined(HAIKU_HOST_PLATFORM_FREEBSD)
 #	include "fs_freebsd.h"
@@ -41,12 +43,26 @@ using namespace BPrivate;
 #	define haiku_host_platform_write	haiku_freebsd_write
 #	define haiku_host_platform_readv	haiku_freebsd_readv
 #	define haiku_host_platform_writev	haiku_freebsd_writev
+#	define HAIKU_HOST_STAT_ATIM(x)		((x).st_atimespec)
+#	define HAIKU_HOST_STAT_MTIM(x)		((x).st_mtimespec)
 #else
 #	define haiku_host_platform_read		read
 #	define haiku_host_platform_write	write
 #	define haiku_host_platform_readv	readv
 #	define haiku_host_platform_writev	writev
+#	define HAIKU_HOST_STAT_ATIM(x)		((x).st_atim)
+#	define HAIKU_HOST_STAT_MTIM(x)		((x).st_mtim)
 #endif
+
+#define RETURN_AND_SET_ERRNO(err)			\
+	do {									\
+		__typeof(err) __result = (err);		\
+		if (__result < 0) {					\
+			errno = __result;				\
+			return -1;						\
+		}									\
+		return __result;					\
+	} while (0)
 
 
 static status_t get_path(dev_t device, ino_t node, const char *name,
@@ -130,17 +146,17 @@ normalize_dir_path(string path, NodeRef ref, string &normalizedPath)
 	status_t error = find_dir_entry(path.c_str(), ref, name, true)				;
 	if (error != B_OK)
 		return error;
-		
+
 	// recurse to get the parent dir path, if found
 	error = normalize_dir_path(path, parentRef, normalizedPath);
 	if (error != 0)
 		return error;
 
-	// construct the normalizedPath		
+	// construct the normalizedPath
 	if (normalizedPath.length() > 1) // don't append "/", if parent is root
 		normalizedPath += '/';
 	normalizedPath += name;
-	
+
 	return 0;
 }
 
@@ -152,7 +168,7 @@ normalize_dir_path(const char *path, string &normalizedPath)
 	struct stat st;
 	if (stat(path, &st) < 0)
 		return errno;
-		
+
 	return normalize_dir_path(path, NodeRef(st), normalizedPath);
 }
 
@@ -162,7 +178,7 @@ normalize_entry_path(const char *path, string &normalizedPath)
 {
 	const char *dirPath = NULL;
 	const char *leafName = NULL;
-	
+
 	string dirPathString;
 	if (const char *lastSlash = strrchr(path, '/')) {
 		// found a slash: decompose into dir path and leaf name
@@ -184,7 +200,7 @@ normalize_entry_path(const char *path, string &normalizedPath)
 	// catch special case: no leaf, or leaf is a directory
 	if (!leafName || strcmp(leafName, ".") == 0 || strcmp(leafName, "..") == 0)
 		return normalize_dir_path(path, normalizedPath);
-	
+
 	// normalize the dir path
 	status_t error = normalize_dir_path(dirPath, normalizedPath);
 	if (error != B_OK)
@@ -222,7 +238,7 @@ get_path(const NodeRef *ref, const char *name, string &path)
 		DirPathMap::iterator it = sDirPathMap.find(*ref);
 		if (it == sDirPathMap.end())
 			return B_ENTRY_NOT_FOUND;
-	
+
 		path = it->second;
 
 		// stat the path to check, if it is still valid
@@ -250,7 +266,7 @@ get_path(const NodeRef *ref, const char *name, string &path)
 		path += '/';
 		path += name;
 	}
-	
+
 	return B_OK;
 }
 
@@ -272,7 +288,7 @@ BPrivate::get_path(int fd, const char *name, string &path)
 			return error;
 
 		return ::get_path(&ref, name, path);
-	
+
 	} else	// no descriptor or absolute path
 		return ::get_path((NodeRef*)NULL, name, path);
 }
@@ -284,7 +300,7 @@ get_path(dev_t device, ino_t directory, const char *name, string &path)
 	NodeRef ref;
 	ref.device = device;
 	ref.node = directory;
-	
+
 	return get_path(&ref, name, path);
 }
 
@@ -315,7 +331,7 @@ _kern_entry_ref_to_path(dev_t device, ino_t node, const char *leaf,
 	// copy it back to the user buffer
 	if (strlcpy(userPath, path.c_str(), pathLength) >= pathLength)
 		return B_BUFFER_OVERFLOW;
-	
+
 	return B_OK;
 }
 
@@ -334,8 +350,8 @@ _kern_create_dir(int fd, const char *path, int perms)
 
 	// mkdir
 	if (mkdir(realPath.c_str(), perms) < 0)
-		return errno;	
-	
+		return errno;
+
 	return B_OK;
 }
 
@@ -352,8 +368,8 @@ _kern_create_dir_entry_ref(dev_t device, ino_t node, const char *name,
 
 	// mkdir
 	if (mkdir(realPath.c_str(), perms) < 0)
-		return errno;	
-	
+		return errno;
+
 	return B_OK;
 }
 
@@ -382,7 +398,7 @@ open_dir(const char *path)
 	NodeRef ref(st);
 	add_dir_path(path, ref);
 
-	// create descriptor	
+	// create descriptor
 	DirectoryDescriptor *descriptor = new DirectoryDescriptor(dir, ref);
 	return add_descriptor(descriptor);
 }
@@ -443,7 +459,7 @@ _kern_open_parent_dir(int fd, char *name, size_t nameLength)
 		return B_BUFFER_OVERFLOW;
 
 	// open the parent directory
-				
+
 	return open_dir(realPath.c_str());
 }
 
@@ -455,7 +471,7 @@ _kern_read_dir(int fd, struct dirent *buffer, size_t bufferSize,
 	if (maxCount <= 0)
 		return B_BAD_VALUE;
 
-	// get the descriptor	
+	// get the descriptor
 	DirectoryDescriptor *descriptor
 		= dynamic_cast<DirectoryDescriptor*>(get_descriptor(fd));
 	if (!descriptor)
@@ -484,7 +500,7 @@ _kern_read_dir(int fd, struct dirent *buffer, size_t bufferSize,
 status_t
 _kern_rewind_dir(int fd)
 {
-	// get the descriptor	
+	// get the descriptor
 	DirectoryDescriptor *descriptor
 		= dynamic_cast<DirectoryDescriptor*>(get_descriptor(fd));
 	if (!descriptor)
@@ -523,7 +539,7 @@ open_file(const char *path, int openMode, int perms)
 		status_t error = normalize_entry_path(path, normalizedPath);
 		if (error != B_OK)
 			return error;
-		
+
 		descriptor = new SymlinkDescriptor(normalizedPath.c_str());
 	} else {
 		// open the file
@@ -534,11 +550,11 @@ open_file(const char *path, int openMode, int perms)
 
 		descriptor = new FileDescriptor(newFD);
 	}
-	
+
 	// cache path, if this is a directory
 	if (exists && S_ISDIR(st.st_mode))
 		add_dir_path(path, NodeRef(st));
-	
+
 	return add_descriptor(descriptor);
 }
 
@@ -603,7 +619,7 @@ _kern_read(int fd, off_t pos, void *buffer, size_t bufferSize)
 		if (result < 0)
 			return errno;
 	}
-	
+
 	// read
 	ssize_t bytesRead = haiku_host_platform_read(descriptor->fd, buffer,
 		bufferSize);
@@ -629,7 +645,7 @@ _kern_write(int fd, off_t pos, const void *buffer, size_t bufferSize)
 		if (result < 0)
 			return errno;
 	}
-	
+
 	// read
 	ssize_t bytesWritten = haiku_host_platform_write(descriptor->fd, buffer,
 		bufferSize);
@@ -706,10 +722,10 @@ _kern_read_stat(int fd, const char *path, bool traverseLink,
 		Descriptor *descriptor = get_descriptor(fd);
 		if (!descriptor)
 			return B_FILE_ERROR;
-	
+
 		return descriptor->GetStat(traverseLink, st);
 	}
-			
+
 	return B_OK;
 }
 
@@ -734,7 +750,7 @@ _kern_write_stat(int fd, const char *path, bool traverseLink,
 			return errno;
 
 		isSymlink = S_ISLNK(tmpStat.st_mode);
-			
+
 	} else {
 		Descriptor *descriptor = get_descriptor(fd);
 		if (!descriptor)
@@ -743,17 +759,17 @@ _kern_write_stat(int fd, const char *path, bool traverseLink,
 		if (FileDescriptor *fileFD
 				= dynamic_cast<FileDescriptor*>(descriptor)) {
 			realFD = fileFD->fd;
-		
+
 		} else if (dynamic_cast<DirectoryDescriptor*>(descriptor)) {
 			error = get_path(fd, NULL, realPath);
 			if (error != B_OK)
 				return error;
-		
+
 		} else if (SymlinkDescriptor *linkFD
 				= dynamic_cast<SymlinkDescriptor*>(descriptor)) {
 			realPath = linkFD->path;
 			isSymlink = true;
-		
+
 		} else
 			return B_FILE_ERROR;
 	}
@@ -762,23 +778,23 @@ _kern_write_stat(int fd, const char *path, bool traverseLink,
 	// available functions traverse symlinks.
 	if (isSymlink && !traverseLink)
 		return B_ERROR;
-	
+
 	if (realFD >= 0) {
 		if (statMask & B_STAT_MODE) {
 			if (fchmod(realFD, st->st_mode) < 0)
 				return errno;
 		}
-			
+
 		if (statMask & B_STAT_UID) {
 			if (fchown(realFD, st->st_uid, (gid_t)-1) < 0)
 				return errno;
 		}
-			
+
 		if (statMask & B_STAT_GID) {
 			if (fchown(realFD, (uid_t)-1, st->st_gid) < 0)
 				return errno;
 		}
-		
+
 		if (statMask & B_STAT_SIZE) {
 			if (ftruncate(realFD, st->st_size) < 0)
 				return errno;
@@ -790,25 +806,25 @@ _kern_write_stat(int fd, const char *path, bool traverseLink,
 				| B_STAT_CREATION_TIME | B_STAT_CHANGE_TIME)) {
 			return B_ERROR;
 		}
-		
+
 		return 0;
-	
+
 	} else {
 		if (statMask & B_STAT_MODE) {
 			if (chmod(realPath.c_str(), st->st_mode) < 0)
 				return errno;
 		}
-			
+
 		if (statMask & B_STAT_UID) {
 			if (chown(realPath.c_str(), st->st_uid, (gid_t)-1) < 0)
 				return errno;
 		}
-			
+
 		if (statMask & B_STAT_GID) {
 			if (chown(realPath.c_str(), (uid_t)-1, st->st_gid) < 0)
 				return errno;
 		}
-		
+
 		if (statMask & B_STAT_SIZE) {
 			if (truncate(realPath.c_str(), st->st_size) < 0)
 				return errno;
@@ -822,18 +838,18 @@ _kern_write_stat(int fd, const char *path, bool traverseLink,
 				if (stat(realPath.c_str(), &oldStat) < 0)
 					return errno;
 			}
-				
+
 			utimbuf buffer;
 			buffer.actime = (statMask & B_STAT_ACCESS_TIME) ? st->st_atime : oldStat.st_atime;
 			buffer.modtime = (statMask & B_STAT_MODIFICATION_TIME) ? st->st_mtime : oldStat.st_mtime;
 			if (utime(realPath.c_str(), &buffer) < 0)
 				return errno;
 		}
-				
-		// not supported	
+
+		// not supported
 		if (statMask & (B_STAT_CREATION_TIME | B_STAT_CHANGE_TIME))
 			return B_ERROR;
-	}	
+	}
 
 	return B_OK;
 }
@@ -863,22 +879,21 @@ _kern_create_symlink(int fd, const char *path, const char *toPath, int mode)
 status_t
 _kern_read_link(int fd, const char *path, char *buffer, size_t *_bufferSize)
 {
-	// get the descriptor
-	SymlinkDescriptor *descriptor
-		= dynamic_cast<SymlinkDescriptor*>(get_descriptor(fd));
-	if (!descriptor)
-		return B_FILE_ERROR;
+	// get the path
+	string realPath;
+	status_t error = get_path(fd, path, realPath);
+	if (error != B_OK)
+		return error;
 
 	// readlink
-	ssize_t bytesRead = readlink(descriptor->path.c_str(), buffer,
-		*_bufferSize);
+	ssize_t bytesRead = readlink(realPath.c_str(), buffer, *_bufferSize);
 	if (bytesRead < 0)
 		return errno;
 
 	if (*_bufferSize > 0) {
 		if ((size_t)bytesRead == *_bufferSize)
 			bytesRead--;
-	
+
 		buffer[bytesRead] = '\0';
 	}
 
@@ -918,7 +933,7 @@ _kern_rename(int oldDir, const char *oldPath, int newDir, const char *newPath)
 	error = get_path(newDir, newPath, realNewPath);
 	if (error != B_OK)
 		return error;
-		
+
 	// rename
 	if (rename(realOldPath.c_str(), realNewPath.c_str()) < 0)
 		return errno;
@@ -954,7 +969,7 @@ read_pos(int fd, off_t pos, void *buffer, size_t bufferSize)
 	off_t result = lseek(fd, pos, SEEK_SET);
 	if (result < 0)
 		return errno;
-	
+
 	// read
 	ssize_t bytesRead = haiku_host_platform_read(fd, buffer, bufferSize);
 	if (bytesRead < 0) {
@@ -969,12 +984,25 @@ read_pos(int fd, off_t pos, void *buffer, size_t bufferSize)
 ssize_t
 write_pos(int fd, off_t pos, const void *buffer, size_t bufferSize)
 {
+	// If this is an attribute descriptor, let it do the job.
+	AttributeDescriptor* descriptor
+		= dynamic_cast<AttributeDescriptor*>(get_descriptor(fd));
+	if (descriptor != NULL) {
+		status_t error = descriptor->Write(pos, buffer, bufferSize);
+		if (error != B_OK) {
+			errno = error;
+			return -1;
+		}
+
+		return bufferSize;
+	}
+
 	// seek
 	off_t result = lseek(fd, pos, SEEK_SET);
 	if (result < 0)
 		return errno;
 
-	// read
+	// write
 	ssize_t bytesWritten = haiku_host_platform_write(fd, buffer, bufferSize);
 	if (bytesWritten < 0) {
 		errno = bytesWritten;
@@ -992,7 +1020,7 @@ readv_pos(int fd, off_t pos, const struct iovec *vec, size_t count)
 	off_t result = lseek(fd, pos, SEEK_SET);
 	if (result < 0)
 		return errno;
-	
+
 	// read
 	ssize_t bytesRead = haiku_host_platform_readv(fd, vec, count);
 	if (bytesRead < 0) {
@@ -1011,7 +1039,7 @@ writev_pos(int fd, off_t pos, const struct iovec *vec, size_t count)
 	off_t result = lseek(fd, pos, SEEK_SET);
 	if (result < 0)
 		return errno;
-	
+
 	// read
 	ssize_t bytesWritten = haiku_host_platform_writev(fd, vec, count);
 	if (bytesWritten < 0) {
@@ -1020,4 +1048,370 @@ writev_pos(int fd, off_t pos, const struct iovec *vec, size_t count)
 	}
 
 	return bytesWritten;
+}
+
+
+// #pragma mark -
+
+
+int
+_haiku_build_fchmod(int fd, mode_t mode)
+{
+	return _haiku_build_fchmodat(fd, NULL, mode, AT_SYMLINK_NOFOLLOW);
+}
+
+
+int
+_haiku_build_fchmodat(int fd, const char* path, mode_t mode, int flag)
+{
+	if (fd >= 0 && fd != AT_FDCWD && get_descriptor(fd) == NULL)
+		return fchmodat(fd, path, mode, flag);
+
+	struct stat st;
+	st.st_mode = mode;
+
+	RETURN_AND_SET_ERRNO(_kern_write_stat(fd, path,
+		(flag & AT_SYMLINK_NOFOLLOW) == 0, &st, sizeof(st), B_STAT_MODE));
+}
+
+
+int
+_haiku_build_fstat(int fd, struct stat* st)
+{
+	return _haiku_build_fstatat(fd, NULL, st, AT_SYMLINK_NOFOLLOW);
+}
+
+
+int
+_haiku_build_fstatat(int fd, const char* path, struct stat* st, int flag)
+{
+	if (fd >= 0 && fd != AT_FDCWD && get_descriptor(fd) == NULL)
+		return fstatat(fd, path, st, flag);
+
+	RETURN_AND_SET_ERRNO(_kern_read_stat(fd, path,
+		(flag & AT_SYMLINK_NOFOLLOW) == 0, st, sizeof(*st)));
+}
+
+
+int
+_haiku_build_mkdirat(int fd, const char* path, mode_t mode)
+{
+	if (fd >= 0 && fd != AT_FDCWD && get_descriptor(fd) == NULL)
+		return mkdirat(fd, path, mode);
+
+	RETURN_AND_SET_ERRNO(_kern_create_dir(fd, path, mode));
+}
+
+
+int
+_haiku_build_mkfifoat(int fd, const char* path, mode_t mode)
+{
+	return mkfifoat(fd, path, mode);
+
+	// TODO: Handle non-system FDs.
+}
+
+
+int
+_haiku_build_utimensat(int fd, const char* path, const struct timespec times[2],
+	int flag)
+{
+	if (fd >= 0 && fd != AT_FDCWD && get_descriptor(fd) == NULL)
+		return utimensat(fd, path, times, flag);
+
+	struct stat stat;
+	status_t status;
+	uint32 mask = 0;
+
+	// Init the stat time fields to the current time, if at least one time is
+	// supposed to be set to it.
+	if (times == NULL || times[0].tv_nsec == UTIME_NOW
+		|| times[1].tv_nsec == UTIME_NOW) {
+		timeval now;
+		gettimeofday(&now, NULL);
+		HAIKU_HOST_STAT_ATIM(stat).tv_sec
+			= HAIKU_HOST_STAT_MTIM(stat).tv_sec = now.tv_sec;
+		HAIKU_HOST_STAT_ATIM(stat).tv_nsec
+			= HAIKU_HOST_STAT_MTIM(stat).tv_nsec = now.tv_usec * 1000;
+	}
+
+	if (times != NULL) {
+		// access time
+		if (times[0].tv_nsec != UTIME_OMIT) {
+			mask |= B_STAT_ACCESS_TIME;
+
+			if (times[0].tv_nsec != UTIME_NOW) {
+				if (times[0].tv_nsec < 0 || times[0].tv_nsec > 999999999)
+					RETURN_AND_SET_ERRNO(EINVAL);
+			}
+
+			HAIKU_HOST_STAT_ATIM(stat) = times[0];
+		}
+
+		// modified time
+		if (times[1].tv_nsec != UTIME_OMIT) {
+			mask |= B_STAT_MODIFICATION_TIME;
+
+			if (times[1].tv_nsec != UTIME_NOW) {
+				if (times[1].tv_nsec < 0 || times[1].tv_nsec > 999999999)
+					RETURN_AND_SET_ERRNO(EINVAL);
+			}
+
+			HAIKU_HOST_STAT_MTIM(stat) = times[1];
+		}
+	} else
+		mask |= B_STAT_ACCESS_TIME | B_STAT_MODIFICATION_TIME;
+
+	// set the times -- as per spec we even need to do this, if both have
+	// UTIME_OMIT set
+	status = _kern_write_stat(fd, path, (flag & AT_SYMLINK_NOFOLLOW) == 0,
+		&stat, sizeof(struct stat), mask);
+
+	RETURN_AND_SET_ERRNO(status);
+}
+
+
+int
+_haiku_build_futimens(int fd, const struct timespec times[2])
+{
+	return _haiku_build_utimensat(fd, NULL, times, AT_SYMLINK_NOFOLLOW);
+}
+
+
+int
+_haiku_build_faccessat(int fd, const char* path, int accessMode, int flag)
+{
+	if (fd >= 0 && fd != AT_FDCWD && get_descriptor(fd) == NULL)
+		return faccessat(fd, path, accessMode, flag);
+
+	// stat the file
+	struct stat st;
+	status_t error = _kern_read_stat(fd, path, false, &st, sizeof(st));
+	if (error != B_OK)
+		RETURN_AND_SET_ERRNO(error);
+
+	// get the current user
+	uid_t uid = (flag & AT_EACCESS) != 0 ? geteuid() : getuid();
+
+	int fileMode = 0;
+
+	if (uid == 0) {
+		// user is root
+		// root has always read/write permission, but at least one of the
+		// X bits must be set for execute permission
+		fileMode = R_OK | W_OK;
+		if ((st.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)) != 0)
+			fileMode |= X_OK;
+	} else if (st.st_uid == uid) {
+		// user is node owner
+		if ((st.st_mode & S_IRUSR) != 0)
+			fileMode |= R_OK;
+		if ((st.st_mode & S_IWUSR) != 0)
+			fileMode |= W_OK;
+		if ((st.st_mode & S_IXUSR) != 0)
+			fileMode |= X_OK;
+	} else if (st.st_gid == ((flag & AT_EACCESS) != 0 ? getegid() : getgid())) {
+		// user is in owning group
+		if ((st.st_mode & S_IRGRP) != 0)
+			fileMode |= R_OK;
+		if ((st.st_mode & S_IWGRP) != 0)
+			fileMode |= W_OK;
+		if ((st.st_mode & S_IXGRP) != 0)
+			fileMode |= X_OK;
+	} else {
+		// user is one of the others
+		if ((st.st_mode & S_IROTH) != 0)
+			fileMode |= R_OK;
+		if ((st.st_mode & S_IWOTH) != 0)
+			fileMode |= W_OK;
+		if ((st.st_mode & S_IXOTH) != 0)
+			fileMode |= X_OK;
+	}
+
+	if ((accessMode & ~fileMode) != 0)
+		RETURN_AND_SET_ERRNO(EACCES);
+
+	return 0;
+}
+
+
+int
+_haiku_build_fchdir(int fd)
+{
+	if (is_unknown_or_system_descriptor(fd))
+		return fchdir(fd);
+
+	RETURN_AND_SET_ERRNO(B_FILE_ERROR);
+}
+
+
+int
+_haiku_build_close(int fd)
+{
+	if (get_descriptor(fd) == NULL)
+		return close(fd);
+
+	RETURN_AND_SET_ERRNO(_kern_close(fd));
+}
+
+
+int
+_haiku_build_dup(int fd)
+{
+	if (get_descriptor(fd) == NULL)
+		return close(fd);
+
+	RETURN_AND_SET_ERRNO(_kern_dup(fd));
+}
+
+
+int
+_haiku_build_dup2(int fd1, int fd2)
+{
+	if (is_unknown_or_system_descriptor(fd1))
+		return dup2(fd1, fd2);
+
+	// TODO: Handle non-system FDs.
+	RETURN_AND_SET_ERRNO(B_NOT_SUPPORTED);
+}
+
+
+int
+_haiku_build_linkat(int toFD, const char* toPath, int pathFD, const char* path,
+	int flag)
+{
+	return linkat(toFD, toPath, pathFD, path, flag);
+
+	// TODO: Handle non-system FDs.
+}
+
+
+int
+_haiku_build_unlinkat(int fd, const char* path, int flag)
+{
+	if (fd >= 0 && fd != AT_FDCWD && get_descriptor(fd) == NULL)
+		return unlinkat(fd, path, flag);
+
+	RETURN_AND_SET_ERRNO(_kern_unlink(fd, path));
+}
+
+
+ssize_t
+_haiku_build_readlinkat(int fd, const char* path, char* buffer,
+	size_t bufferSize)
+{
+	if (fd >= 0 && fd != AT_FDCWD && get_descriptor(fd) == NULL)
+		return readlinkat(fd, path, buffer, bufferSize);
+
+	status_t error = _kern_read_link(fd, path, buffer, &bufferSize);
+	if (error != B_OK)
+		RETURN_AND_SET_ERRNO(error);
+
+	return bufferSize;
+}
+
+
+int
+_haiku_build_symlinkat(const char* toPath, int fd, const char* symlinkPath)
+{
+	if (fd >= 0 && fd != AT_FDCWD && get_descriptor(fd) == NULL)
+		return symlinkat(toPath, fd, symlinkPath);
+
+	RETURN_AND_SET_ERRNO(_kern_create_symlink(fd, symlinkPath, toPath,
+		S_IRWXU | S_IRWXG | S_IRWXO));
+}
+
+
+int
+_haiku_build_ftruncate(int fd, off_t newSize)
+{
+	if (fd >= 0 && fd != AT_FDCWD && get_descriptor(fd) == NULL)
+		return ftruncate(fd, newSize);
+
+	struct stat st;
+	st.st_size = newSize;
+
+	RETURN_AND_SET_ERRNO(_kern_write_stat(fd, NULL, false, &st, sizeof(st),
+		B_STAT_SIZE));
+}
+
+
+int
+_haiku_build_fchown(int fd, uid_t owner, gid_t group)
+{
+	return _haiku_build_fchownat(fd, NULL, owner, group, AT_SYMLINK_NOFOLLOW);
+}
+
+
+int
+_haiku_build_fchownat(int fd, const char* path, uid_t owner, gid_t group,
+	int flag)
+{
+	if (fd >= 0 && fd != AT_FDCWD && get_descriptor(fd) == NULL)
+		return fchownat(fd, path, owner, group, flag);
+
+	struct stat st;
+	st.st_uid = owner;
+	st.st_gid = group;
+
+	RETURN_AND_SET_ERRNO(_kern_write_stat(fd, path,
+		(flag & AT_SYMLINK_NOFOLLOW) == 0, &st, sizeof(st),
+		B_STAT_UID | B_STAT_GID));
+}
+
+
+int
+_haiku_build_mknodat(int fd, const char* name, mode_t mode, dev_t dev)
+{
+	return mknodat(fd, name, mode, dev);
+
+	// TODO: Handle non-system FDs.
+}
+
+
+int
+_haiku_build_creat(const char* path, mode_t mode)
+{
+	return _haiku_build_open(path, O_WRONLY | O_CREAT | O_TRUNC, mode);
+}
+
+
+int
+_haiku_build_open(const char* path, int openMode, mode_t permissions)
+{
+	return _haiku_build_openat(AT_FDCWD, path, openMode, permissions);
+}
+
+
+int
+_haiku_build_openat(int fd, const char* path, int openMode, mode_t permissions)
+{
+	// adapt the permissions as required by POSIX
+	mode_t mask = umask(0);
+	umask(mask);
+	permissions &= ~mask;
+
+	RETURN_AND_SET_ERRNO(_kern_open(fd, path, openMode, permissions));
+}
+
+
+int
+_haiku_build_fcntl(int fd, int op, int argument)
+{
+	if (is_unknown_or_system_descriptor(fd))
+		return fcntl(fd, op, argument);
+
+	RETURN_AND_SET_ERRNO(B_NOT_SUPPORTED);
+}
+
+
+int
+_haiku_build_renameat(int fromFD, const char* from, int toFD, const char* to)
+{
+	if ((fromFD >= 0 && fromFD != AT_FDCWD && get_descriptor(fromFD) == NULL)
+		|| (toFD >= 0 && toFD != AT_FDCWD && get_descriptor(toFD) == NULL)) {
+		return renameat(fromFD, from, toFD, to);
+	}
+
+	RETURN_AND_SET_ERRNO(_kern_rename(fromFD, from, toFD, to));
 }

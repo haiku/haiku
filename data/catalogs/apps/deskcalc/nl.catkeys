@@ -1,4 +1,7 @@
-1	dutch	x-vnd.Haiku-DeskCalc	1432606073
-Audio Feedback	CalcView		Geluidsfeedback
+1	dutch; flemish	x-vnd.Haiku-DeskCalc	1916192649
+Compact	CalcView		Compact
+Scientific	CalcView		Wetenschappelijk
+DeskCalc	System name		DeskCalc
+Basic	CalcView		Eenvoudig
 Enable Num Lock on startup	CalcView		Opstarten met Num Lock aan
-Show keypad	CalcView		Toetsenweergave
+Audio Feedback	CalcView		Geluidsfeedback

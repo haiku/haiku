@@ -109,6 +109,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		fPCIInfo(info),
 		fStack(stack),
 		fEnabledInterrupts(0),
+		fThreshold(0),
 		fPeriodicFrameListArea(-1),
 		fPeriodicFrameList(NULL),
 		fInterruptEntries(NULL),
@@ -136,6 +137,9 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		fPortSuspendChange(0),
 		fInterruptPollThread(-1)
 {
+	// Create a lock for the isochronous transfer list
+	mutex_init(&fIsochronousLock, "EHCI isochronous lock");
+
 	if (BusManager::InitCheck() < B_OK) {
 		TRACE_ERROR("bus manager failed to init\n");
 		return;
@@ -304,9 +308,6 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	fFinishThread = spawn_kernel_thread(FinishThread, "ehci finish thread",
 		B_NORMAL_PRIORITY, (void *)this);
 	resume_thread(fFinishThread);
-
-	// Create a lock for the isochronous transfer list
-	mutex_init(&fIsochronousLock, "EHCI isochronous lock");
 
 	// Create semaphore the isochronous finisher thread will wait for
 	fFinishIsochronousTransfersSem = create_sem(0,
@@ -582,7 +583,7 @@ EHCI::Start()
 			TRACE("frame list size 256\n");
 			break;
 		default:
-			TRACE("unknown frame list size\n");
+			TRACE_ALWAYS("unknown frame list size\n");
 	}
 
 	bool running = false;
@@ -599,7 +600,7 @@ EHCI::Start()
 	}
 
 	if (!running) {
-		TRACE("host controller didn't start\n");
+		TRACE_ERROR("host controller didn't start\n");
 		return B_ERROR;
 	}
 
@@ -770,7 +771,7 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 	addr_t bufferPhy;
 	if (fStack->AllocateChunk(&bufferLog, (void**)&bufferPhy, dataLength) < B_OK) {
 		TRACE_ERROR("unable to allocate itd buffer\n");
-		delete isoRequest;
+		delete[] isoRequest;
 		return B_NO_MEMORY;
 	}
 
@@ -836,7 +837,7 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 		TRACE_ERROR("failed to add pending isochronous transfer\n");
 		for (uint32 i = 0; i < itdIndex; i++)
 			FreeDescriptor(isoRequest[i]);
-		delete isoRequest;
+		delete[] isoRequest;
 		return result;
 	}
 
@@ -1500,9 +1501,24 @@ EHCI::FinishTransfers()
 							callbackStatus = B_DEV_CRC_ERROR;
 							reasons++;
 						}
+						if ((transfer->queue_head->endpoint_chars
+								& EHCI_QH_CHARS_EPS_HIGH) == 0) {
+							// For full-/lowspeed endpoints the unused ping
+							// state bit is used as another error bit, it is
+							// unspecific however.
+							if ((status & EHCI_QTD_STATUS_LS_ERR) != 0) {
+								callbackStatus = B_DEV_STALLED;
+								reasons++;
+							}
+						}
 
 						if (reasons > 1)
 							callbackStatus = B_DEV_MULTIPLE_ERRORS;
+						else if (reasons == 0) {
+							TRACE_ERROR("error counter counted down to zero "
+								"but none of the error bits are set\n");
+							callbackStatus = B_DEV_STALLED;
+						}
 					} else if (status & EHCI_QTD_STATUS_BABBLE) {
 						// there is a babble condition
 						callbackStatus = transfer->incoming ? B_DEV_FIFO_OVERRUN : B_DEV_FIFO_UNDERRUN;

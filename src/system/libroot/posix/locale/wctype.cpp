@@ -8,6 +8,8 @@
 #include <string.h>
 #include <wctype.h>
 
+#include <errno_private.h>
+
 #include "LocaleBackend.h"
 
 
@@ -187,7 +189,7 @@ towctrans(wint_t wc, wctrans_t transition)
 	status_t status = gLocaleBackend->ToWCTrans(wc, transition, result);
 
 	if (status != B_OK)
-		errno = EINVAL;
+		__set_errno(EINVAL);
 
 	return result;
 }
@@ -204,7 +206,7 @@ wctrans(const char *charClass)
 			return _ISupper;
 	}
 
-	errno = EINVAL;
+	__set_errno(EINVAL);
 	return 0;
 }
 

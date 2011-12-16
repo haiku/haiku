@@ -28,6 +28,7 @@
 #	undef _KERNEL_MODE
 #endif
 
+#include <directories.h>
 #include <driver_settings.h>
 #include <FindDirectory.h>
 #include <OS.h>
@@ -52,7 +53,7 @@
 #include <fcntl.h>
 #include <ctype.h>
 
-#ifndef HAIKU_TARGET_PLATFORM_HAIKU
+#ifndef B_BUFFER_OVERFLOW
 #	define B_BUFFER_OVERFLOW B_ERROR
 #endif
 
@@ -763,9 +764,7 @@ load_driver_settings(const char *driverName)
 		char path[B_FILE_NAME_LENGTH + 64];
 
 #ifdef _BOOT_MODE
-		// TODO: for now the boot loader does not support find_directory()
-		//		(it might get a simplified version of it)
-		strcpy(path, "/boot/home/config/settings");
+		strcpy(path, kUserSettingsDirectory);
 #else
 		// TODO: use B_COMMON_SETTINGS_DIRECTORY instead!
 		if (find_directory(B_USER_SETTINGS_DIRECTORY, -1, false, path,

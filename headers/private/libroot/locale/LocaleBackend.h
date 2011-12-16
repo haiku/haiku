@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Oliver Tappe, zooey@hirschkaefer.de.
+ * Copyright 2010-2011, Oliver Tappe, zooey@hirschkaefer.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _LOCALE_BACKEND_H
@@ -31,6 +31,8 @@ struct LocaleCtypeDataBridge {
 	const int*				posixToUpperMap;
 
 	LocaleCtypeDataBridge();
+
+	void setMbCurMax(unsigned short mbCurMax);
 };
 
 
@@ -120,6 +122,21 @@ public:
 	virtual	int					IsWCType(wint_t wc, wctype_t charClass) = 0;
 	virtual	status_t			ToWCTrans(wint_t wc, wctrans_t transition,
 									wint_t& result) = 0;
+
+	virtual status_t			MultibyteToWchar(wchar_t* wcOut, const char* mb,
+									size_t mbLength, mbstate_t* mbState,
+									size_t& lengthOut) = 0;
+	virtual status_t			MultibyteStringToWchar(wchar_t* wcDest,
+									size_t wcDestLength, const char** mbSource,
+									size_t mbSourceLength, mbstate_t* mbState,
+									size_t& lengthOut) = 0;
+	virtual status_t			WcharToMultibyte(char* mbOut, wchar_t wc,
+									mbstate_t* mbState, size_t& lengthOut) = 0;
+	virtual status_t			WcharStringToMultibyte(char* mbDest,
+									size_t mbDestLength,
+									const wchar_t** wcSource,
+									size_t wcSourceLength, mbstate_t* mbState,
+									size_t& lengthOut) = 0;
 
 	virtual	const char*			GetLanginfo(int index) = 0;
 

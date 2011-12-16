@@ -1,13 +1,13 @@
-1	dutch	system	1624661606
-%.2f TiB	StringForSize		%.2f TiB
+1	dutch; flemish	x-vnd.Haiku-libbe	1624661606
+Close	AboutWindow		Sluiten
 %3.2f GiB	StringForSize		%3.2f GiB
+Written by:	AboutWindow		Door:
 %3.2f KiB	StringForSize		%3.2f KiB
-%3.2f MiB	StringForSize		%3.2f MiB
 %d bytes	StringForSize		%d bytes
 About…	AboutWindow		Over...
-Blue:	ColorControl		Blauw:
-Close	AboutWindow		Sluiten
-Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
 Green:	ColorControl		Groen:
+Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
+%.2f TiB	StringForSize		%.2f TiB
 Red:	ColorControl		Rood:
-Written by:	AboutWindow		Door:
+%3.2f MiB	StringForSize		%3.2f MiB
+Blue:	ColorControl		Blauw:

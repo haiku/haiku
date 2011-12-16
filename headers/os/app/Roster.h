@@ -13,7 +13,6 @@
 class BFile;
 class BMimeType;
 class BNodeInfo;
-class BNotification;
 
 
 struct app_info {
@@ -116,10 +115,6 @@ class BRoster {
 					const char *appSig = 0) const;
 		void AddToRecentFolders(const entry_ref *folder,
 					const char *appSig = 0) const;
-
-		// notifications
-		status_t Notify(const BNotification& notification,
-					bigtime_t timeout = -1) const;
 
 		// private/reserved stuff starts here
 		class Private;

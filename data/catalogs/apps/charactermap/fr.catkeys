@@ -1,8 +1,9 @@
-1	french	x-vnd.Haiku-CharacterMap	1451954922
+1	french	x-vnd.Haiku-CharacterMap	1545664922
 Aegean numbers	UnicodeBlocks		Nombres égéens
 Alphabetic presentation forms	UnicodeBlocks		Formes de présentation alphabétiques
 Ancient Greek musical notation	UnicodeBlocks		Musique grecque ancienne
 Ancient Greek numbers	UnicodeBlocks		Nombres grecs anciens
+Ancient smbols	UnicodeBlocks		Symboles anciens
 Arabic	UnicodeBlocks		Arabe
 Arabic presentation forms A	UnicodeBlocks		Formes A de présentation arabes
 Arabic presentation forms B	UnicodeBlocks		Formes B de présentation arabes
@@ -42,6 +43,8 @@ Combining diacritical marks supplement	UnicodeBlocks		Supplément aux marques di
 Combining half marks	UnicodeBlocks		Demi-signes combinatoires
 Control pictures	UnicodeBlocks		Pictogrammes de commande
 Coptic	UnicodeBlocks		Copte
+Copy as escaped byte string	CharacterView		Copier une chaîne avec échappement
+Copy character	CharacterView		Copier un caractère
 Counting rod numerals	UnicodeBlocks		Chiffres-bâtonnets chinois
 Cuneiform	UnicodeBlocks		Cunéiforme
 Cuneiform numbers and punctuation	UnicodeBlocks		Nombres et ponctuation cunéiformes
@@ -117,7 +120,6 @@ Miscellaneous symbols and arrows	UnicodeBlocks		Divers symboles et flèches
 Miscellaneous technical	UnicodeBlocks		Signes techniques divers
 Modifier tone letters	UnicodeBlocks		Lettres modificatives de ton
 Mongolian	UnicodeBlocks		Mongol
-Muscial symbols	UnicodeBlocks		Symboles musciaux
 Myanmar	UnicodeBlocks		Myanmar (Birman)
 N'Ko	UnicodeBlocks		N'Ko
 New Tai Lue	UnicodeBlocks		Nouveau taï lü

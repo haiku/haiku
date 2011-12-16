@@ -49,8 +49,8 @@ All rights reserved.
 #include "BarApp.h"
 #include "BarMenuTitle.h"
 #include "BarView.h"
-#include "BeMenu.h"
-#include "DeskBarUtils.h"
+#include "DeskbarMenu.h"
+#include "DeskbarUtils.h"
 #include "ExpandoMenuBar.h"
 #include "ResourceSet.h"
 #include "ShowHideMenuItem.h"
@@ -59,7 +59,7 @@ All rights reserved.
 #include "WindowMenu.h"
 #include "WindowMenuItem.h"
 
-const float kDefaultBeMenuWidth = 50.0f;
+const float kDefaultDeskbarMenuWidth = 50.0f;
 const float kSepItemWidth = 5.0f;
 
 const uint32 kMinimizeTeam = 'mntm';
@@ -82,7 +82,7 @@ TExpandoMenuBar::TExpandoMenuBar(TBarView* bar, BRect frame, const char* name,
 	fIsScrolling(false),
 	fShowTeamExpander(static_cast<TBarApp*>(be_app)->Settings()->superExpando),
 	fExpandNewTeams(static_cast<TBarApp*>(be_app)->Settings()->expandNewTeams),
-	fBeMenuWidth(kDefaultBeMenuWidth),
+	fDeskbarMenuWidth(kDefaultDeskbarMenuWidth),
 	fBarView(bar),
 	fFirstApp(0),
 	fPreviousDragTargetItem(NULL),
@@ -111,24 +111,25 @@ TExpandoMenuBar::AttachedToWindow()
 	float width = fVertical ? Frame().Width() : sMinimumWindowWidth;
 	float height = -1.0f;
 
-	// top or bottom mode, add be menu and sep for menubar tracking consistency
+	// top or bottom mode, add deskbar menu and sep for menubar tracking
+	// consistency
 	if (!fVertical) {
-		TBeMenu* beMenu = new TBeMenu(fBarView);
-		TBarWindow::SetBeMenu(beMenu);
+		TDeskbarMenu* beMenu = new TDeskbarMenu(fBarView);
+		TBarWindow::SetDeskbarMenu(beMenu);
 		const BBitmap* logoBitmap = AppResSet()->FindBitmap(B_MESSAGE_TYPE,
 			R_LeafLogoBitmap);
 		if (logoBitmap != NULL)
-			fBeMenuWidth = logoBitmap->Bounds().Width() + 16;
-		fBeMenuItem = new TBarMenuTitle(fBeMenuWidth, Frame().Height(),
+			fDeskbarMenuWidth = logoBitmap->Bounds().Width() + 16;
+		fDeskbarMenuItem = new TBarMenuTitle(fDeskbarMenuWidth, Frame().Height(),
 			logoBitmap, beMenu, true);
-		AddItem(fBeMenuItem);
+		AddItem(fDeskbarMenuItem);
 
 		fSeparatorItem = new TTeamMenuItem(kSepItemWidth, height, fVertical);
 		AddItem(fSeparatorItem);
 		fSeparatorItem->SetEnabled(false);
 		fFirstApp = 2;
 	} else {
-		fBeMenuItem = NULL;
+		fDeskbarMenuItem = NULL;
 		fSeparatorItem = NULL;
 	}
 
@@ -438,21 +439,21 @@ TExpandoMenuBar::MouseUp(BPoint where)
 
 
 bool
-TExpandoMenuBar::InBeMenu(BPoint loc) const
+TExpandoMenuBar::InDeskbarMenu(BPoint loc) const
 {
 	if (!fVertical) {
-		if (fBeMenuItem && fBeMenuItem->Frame().Contains(loc))
+		if (fDeskbarMenuItem && fDeskbarMenuItem->Frame().Contains(loc))
 			return true;
 	} else {
 		TBarWindow* window = dynamic_cast<TBarWindow*>(Window());
 		if (window) {
-			if (TBeMenu* bemenu = window->BeMenu()) {
-				bool inBeMenu = false;
+			if (TDeskbarMenu* bemenu = window->DeskbarMenu()) {
+				bool inDeskbarMenu = false;
 				if (bemenu->LockLooper()) {
-					inBeMenu = bemenu->Frame().Contains(loc);
+					inDeskbarMenu = bemenu->Frame().Contains(loc);
 					bemenu->UnlockLooper();
 				}
-				return inBeMenu;
+				return inDeskbarMenu;
 			}
 		}
 	}
@@ -617,8 +618,8 @@ TExpandoMenuBar::CheckItemSizes(int32 delta)
 		//   - The Be Menu
 		//   - The little separator item
 		fullWidth = fullWidth - (sMinimumWindowWidth * 2)
-			+ (fBeMenuWidth + kSepItemWidth);
-		width -= (fBeMenuWidth + kSepItemWidth);
+			+ (fDeskbarMenuWidth + kSepItemWidth);
+		width -= (fDeskbarMenuWidth + kSepItemWidth);
 		count -= 2;
 	}
 
@@ -787,7 +788,8 @@ TExpandoMenuBar::monitor_team_windows(void* arg)
 										((1 << current_workspace())
 											& wInfo->workspaces) != 0);
 
-									if (strcmp(wInfo->name, item->Label()) != 0)
+									if (strcasecmp(wInfo->name,
+										item->FullTitle()) != 0)
 										item->SetLabel(wInfo->name);
 
 									if (item->ChangedState())

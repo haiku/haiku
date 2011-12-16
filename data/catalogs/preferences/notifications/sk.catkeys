@@ -1,52 +1,50 @@
-1	slovak	x-vnd.Haiku-Notifications	3818404871
-Above icon	DisplayView		Nad ikonou
-Allowed	NotificationView		Povolené
+1	slovak	x-vnd.Haiku-Notifications	3631903554
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Vyskytla sa chyba pri ukladaní nastavení.\nJe možné, že vám dochádza miesto na disku.
-Application	NotificationView		Aplikácia
-Applications	NotificationView		Aplikácie
-Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Nie je možné zapnúť oznámenia pri štarte, pravdepodobne nemáte oprávnenie na zápis do adresára nastavení zavádzania systému.
-Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Nie je možné uložiť nastavenia, pravdepodobne nemáte oprávnenie na zápis do adresára nastavení zavádzania systému.
-Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Nie je možné zapnúť uložiť nastavenia, pravdepodobne nemáte oprávnenie na zápis do adresára nastavení zavádzania systému alebo je disk plný.
-Cannot disable notifications because the server can't be reached.	GeneralView		Nie je možné vypnúť oznamy, pretože server nebolo možné kontaktovať.
-Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Oznámenia nemožno zapnúť, pretože server nebol nájdený.\nTo znamená, že vaša inštalácia InfoPopper nebola úspešne dokončená.
-Disable notifications	GeneralView		Vypnúť oznamy
-Display	PrefletView		Displej
-Enable notifications	GeneralView		Zapnúť upozornenia
-Enable notifications at startup	GeneralView		Zapnúť oznamy pri štarte
-Enabled	NotificationView		Zapnuté
-Error	NotificationView		Chyba
-Events are not notified	GeneralView		Udalosti sa neoznamujú
-Events are notified	GeneralView		Udalosti sa oznamujú
-General	PrefletView		Všeobecné
-Hide notifications from screen after	GeneralView		Skryť oznamy z obrazovky po
-Icon size:	DisplayView		Veľkosť ikony:
-Important	NotificationView		Dôležité
-Information	NotificationView		Informácia
-Large icon	DisplayView		Veľká ikona
-Last Received	NotificationView		Posledný prijatý
-Mini icon	DisplayView		Mini ikona
-No	NotificationView		Nie
 Notifications	GeneralView		Oznamy
-Notifications	NotificationView		Oznamy
-Notifications	System name		Oznamy
-Notifications cannot be stopped, because the server can't be reached.	GeneralView		Oznámenia nemožno zastaviť, pretože server nebolo možné kontaktovať.
-OK	DisplayView		OK
-OK	GeneralView		OK
-OK	NotificationView		OK
-Progress	NotificationView		Priebeh
+seconds of inactivity	GeneralView		sekundách nečinnosti
 Revert	PrefletWin		Vrátiť
-Right of icon	DisplayView		Vpravo od ikony
+Mini icon	DisplayView		Mini ikona
+Enable notifications	GeneralView		Zapnúť upozornenia
+Error	NotificationView		Chyba
+OK	GeneralView		OK
+Events are not notified	GeneralView		Udalosti sa neoznamujú
 Save	PrefletWin		Uložiť
+Type	NotificationView		Typ
+Notifications cannot be stopped, because the server can't be reached.	GeneralView		Oznámenia nemožno zastaviť, pretože server nebolo možné kontaktovať.
+Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Oznámenia nemožno zapnúť, pretože server nebol nájdený.\nTo znamená, že vaša inštalácia InfoPopper nebola úspešne dokončená.
+OK	NotificationView		OK
+Important	NotificationView		Dôležité
+Cannot disable notifications because the server can't be reached.	GeneralView		Nie je možné vypnúť oznamy, pretože server nebolo možné kontaktovať.
+Progress	NotificationView		Priebeh
+Last Received	NotificationView		Posledný prijatý
+General	PrefletView		Všeobecné
+Display	PrefletView		Displej
+Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Nie je možné zapnúť oznámenia pri štarte, pravdepodobne nemáte oprávnenie na zápis do adresára nastavení zavádzania systému.
 Search:	NotificationView		Hľadať:
-The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Server oznámení nemožno nájsť. To znamená, že vaša inštalácia InfoPopper nebola úspešne dokončená.
 The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		The notifications server cannot be found.\nMožná príčina je, že inštalácia nebola vykonaná správne
+Allowed	NotificationView		Povolené
+Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Nie je možné zapnúť uložiť nastavenia, pravdepodobne nemáte oprávnenie na zápis do adresára nastavení zavádzania systému alebo je disk plný.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	DisplayView		Vyskytol sa problém pri ukladaní nastavení.\nJe možné, že nemáte oprávnenie na zápis do adresára nastavení.
+Yes	NotificationView		Áno
+Large icon	DisplayView		Veľká ikona
+Icon size:	DisplayView		Veľkosť ikony:
+Hide notifications from screen after	GeneralView		Skryť oznamy z obrazovky po
+Disable notifications	GeneralView		Vypnúť oznamy
+Notifications	System name		Oznamy
+Notifications	NotificationView		Oznamy
+No	NotificationView		Nie
+Title	NotificationView		Nadpis
+Information	NotificationView		Informácia
+Window width:	DisplayView		Šírka okna:
+Application	NotificationView		Aplikácia
+Enabled	NotificationView		Zapnuté
+OK	DisplayView		OK
+Unknown	NotificationView		Neznáme
+Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Nie je možné uložiť nastavenia, pravdepodobne nemáte oprávnenie na zápis do adresára nastavení zavádzania systému.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Vyskytol sa problém pri ukladaní nastavení.\nJe možné, že nemáte oprávnenie na zápis do adresára nastavení.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Vyskytol sa problém pri ukladaní nastavení.\nJe možné, že nemáte oprávnenie na zápis do adresára nastavení.
-Title	NotificationView		Nadpis
-Title position:	DisplayView		Pozícia nadpisu
-Type	NotificationView		Typ
-Unknown	NotificationView		Neznáme
-Window width:	DisplayView		Šírka okna:
-Yes	NotificationView		Áno
-seconds of inactivity	GeneralView		sekundách nečinnosti
+Enable notifications at startup	GeneralView		Zapnúť oznamy pri štarte
+Notifications	PrefletView		Oznámenia
+The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Server oznámení nemožno nájsť. To znamená, že vaša inštalácia InfoPopper nebola úspešne dokončená.
+Applications	NotificationView		Aplikácie
+Events are notified	GeneralView		Udalosti sa oznamujú

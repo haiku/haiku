@@ -1,0 +1,8 @@
+1	croatian	x-vnd.Haiku-EXRTranslator	2941548748
+Based on OpenEXR (http://www.openexr.com)	ConfigView		Bazirano na OpenEXR-u (http://www.openexr.com)
+EXR Images	ConfigView		EXR slike
+EXR Images	EXRTranslator		EXR slike
+EXR Settings	main		EXR postavke
+EXR image	EXRTranslator		EXR slika
+EXR image translator	EXRTranslator		EXR prevoditelj slika
+Version %d.%d.%d, %s	ConfigView		Verzija %d.%d.%d, %s

@@ -657,6 +657,12 @@ vm86_do_int(struct vm86_state *state, uint8 vec)
 	} while (emuState == 0);
 	thread->fault_callback = NULL;
 
+	// We might have clobbered %fs, so we need to restore the CPU dependent
+	// TLS context that we may have overwritten. Note that we can't simply
+	// restore %fs to its previous value as we might not run on the same CPU
+	// anymore.
+	x86_set_tls_context(thread);
+
 	return emuState < 0 ? B_BAD_DATA : ret;
 }
 

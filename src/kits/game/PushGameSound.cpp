@@ -15,9 +15,13 @@
 #include "GSUtility.h"
 
 
-BPushGameSound::BPushGameSound(size_t inBufferFrameCount, const gs_audio_format *format,
-			size_t inBufferCount, BGameSoundDevice *device)
- 	:	BStreamingGameSound(inBufferFrameCount, format, inBufferCount, device)
+BPushGameSound::BPushGameSound(size_t inBufferFrameCount,
+	const gs_audio_format *format, size_t inBufferCount,
+	BGameSoundDevice *device)
+ 	:
+	BStreamingGameSound(inBufferFrameCount, format, inBufferCount, device),
+	fLockPos(0),
+	fPlayPos(0)
 {
 	fPageLocked = new BList;
 
@@ -137,8 +141,8 @@ BPushGameSound::SetParameters(size_t inBufferFrameCount,
 
 
 status_t
-BPushGameSound::SetStreamHook(void (*hook)(void * inCookie, void * inBuffer, size_t inByteCount, BStreamingGameSound * me),
-							  void * cookie)
+BPushGameSound::SetStreamHook(void (*hook)(void * inCookie, void * inBuffer,
+	size_t inByteCount, BStreamingGameSound * me), void * cookie)
 {
 	return B_UNSUPPORTED;
 }
@@ -153,7 +157,8 @@ BPushGameSound::FillBuffer(void *inBuffer, size_t inByteCount)
 		return;
 	
 	if (fPlayPos + bytes > fBufferSize) {
-		size_t remainder = fPlayPos + bytes - fBufferSize;
+		size_t remainder = fBufferSize - fPlayPos;
+			// Space left in buffer
 		char * buffer = (char*)inBuffer;
 		
 		// fill the buffer with the samples left at the end of our buffer

@@ -115,7 +115,7 @@ main(int argc, char **argv)
 {
 	// Make sure we have the minimum number of arguments.
 	if (argc < 2)
-		usage();	
+		usage();
 
 	// Which volume do we make the query on?
 	// Default to the current volume.
@@ -169,7 +169,7 @@ main(int argc, char **argv)
 			fprintf(stderr, "%s: volume containing %s is not query-enabled\n", kProgramName, volumePath);
 		else
 			perform_query(volume, argv[optind]);
-	} else {	
+	} else {
 		// Okay, we want to query all the disks -- so iterate over
 		// them, one by one, running the query.
 		BVolumeRoster volumeRoster;

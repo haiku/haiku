@@ -1,0 +1,37 @@
+SubDir HAIKU_TOP src system boot platform cfe ;
+
+SubDirC++Flags -D_BOOT_MODE -fno-rtti ;
+
+UsePrivateHeaders [ FDirName graphics common ] ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
+
+KernelMergeObject boot_platform_cfe.o :
+	console.cpp
+	debug.cpp
+	devices.cpp
+	Handle.cpp
+	heap.cpp
+	menu.cpp
+	mmu.cpp
+	#network.cpp
+	#real_time_clock.cpp
+	start.cpp
+	support.cpp
+	video.cpp
+
+	cfe.cpp
+	#cfe_devices.cpp
+
+	:
+	:
+	boot_platform_generic.a
+	boot_platform_cfe_$(TARGET_ARCH).a
+;
+
+SEARCH on [ FGristFiles $(genericPlatformSources) ]
+	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
+#SEARCH on [ FGristFiles cfe.cpp cfe_devices.cpp ]
+#	= [ FDirName $(HAIKU_TOP) src system kernel platform cfe ] ;
+
+SubInclude HAIKU_TOP src system boot platform cfe arch ;

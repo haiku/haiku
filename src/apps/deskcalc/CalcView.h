@@ -13,6 +13,20 @@
 
 #include <View.h>
 
+enum {
+	MSG_OPTIONS_AUTO_NUM_LOCK				= 'oanl',
+	MSG_OPTIONS_AUDIO_FEEDBACK				= 'oafb',
+	MSG_OPTIONS_KEYPAD_MODE_COMPACT			= 'okmc',
+	MSG_OPTIONS_KEYPAD_MODE_BASIC			= 'okmb',
+	MSG_OPTIONS_KEYPAD_MODE_SCIENTIFIC		= 'okms',
+	MSG_UNFLASH_KEY							= 'uflk'
+};
+
+static const float kMinimumWidthBasic		= 130.0f;
+static const float kMaximumWidthBasic		= 400.0f;
+static const float kMinimumHeightBasic		= 130.0f;
+static const float kMaximumHeightBasic		= 400.0f;
+
 class BString;
 class BMenuItem;
 class BPopUpMenu;
@@ -42,6 +56,7 @@ class CalcView : public BView {
 	virtual	void				MouseUp(BPoint point);
 	virtual	void				KeyDown(const char* bytes, int32 numBytes);
 	virtual	void				MakeFocus(bool focused = true);
+	virtual void				ResizeTo(float width, float height);
 	virtual	void				FrameResized(float width, float height);
 
 			// Present about box for view (replicant).
@@ -62,9 +77,21 @@ class CalcView : public BView {
 			// Save current settings
 			status_t			SaveSettings(BMessage* archive) const;
 
+			// Evaluate the expression
 			void				Evaluate();
 
+			// Flash the key on the keypad
 			void				FlashKey(const char* bytes, int32 numBytes);
+
+			// Toggle whether or not the Num Lock key starts on
+			void				ToggleAutoNumlock(void);
+
+			// Toggle whether or not to provide audio feedback
+			// (option currently disabled)
+			void				ToggleAudioFeedback(void);
+
+			// Set the keypad mode
+			void				SetKeypadMode(uint8 mode);
 
  private:
 			void				_ParseCalcDesc(const char* keypadDescription);
@@ -82,13 +109,14 @@ class CalcView : public BView {
 			BRect				_ExpressionRect() const;
 			BRect				_KeypadRect() const;
 
-			void				_ShowKeypad(bool show);
+			void				_MarkKeypadItems(uint8 mode);
+
 			void				_FetchAppIcon(BBitmap* into);
 
 			status_t			_LoadSettings(BMessage* archive);
 
 			// grid dimensions
-			int16				fColums;
+			int16				fColumns;
 			int16				fRows;
 
 			// color scheme
@@ -119,11 +147,12 @@ class CalcView : public BView {
 			BPopUpMenu*			fPopUpMenu;
 			BMenuItem*			fAutoNumlockItem;
 			BMenuItem*			fAudioFeedbackItem;
-			BMenuItem*			fShowKeypadItem;
+			BMenuItem*			fKeypadModeCompactItem;
+			BMenuItem*			fKeypadModeBasicItem;
+			BMenuItem*			fKeypadModeScientificItem;
 
 			// calculator options.
 			CalcOptions*		fOptions;
-			bool				fShowKeypad;
 };
 
 #endif // _CALC_VIEW_H

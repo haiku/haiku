@@ -1,16 +1,16 @@
-1	dutch	x-vnd.Haiku-Sounds	145262565
-<none>	HEventList		<geen>
-<none>	HWindow		<geen>
-About Sounds	SoundsHApp		Over Geluiden
-Event	HEventList		Gebeurtenis
+1	dutch; flemish	x-vnd.Haiku-Sounds	145262565
 No such file or directory	HEventList		Geen dergelijk bestand of map
+OK	SoundsHApp		Oké
+Sound File:	HWindow		Geluidsbestand:
 OK	HEventList		Oké
 OK	HWindow		Oké
-OK	SoundsHApp		Oké
+This is not an audio file.	HWindow		Dit is geen geluidsbestand.
+Stop	HWindow		Stop
+About Sounds	SoundsHApp		Over Geluiden
+Sound	HEventList		Geluid
+Event	HEventList		Gebeurtenis
+<none>	HEventList		<geen>
+Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Geluiden\n Tot u gebracht door:\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n Oorspronkelijk een werk van Atsushi Takamatsu.\nAuteursrecht ©2003-2006 Haiku
+<none>	HWindow		<geen>
 Other…	HWindow		Andere...
 Play	HWindow		Afspelen
-Sound	HEventList		Geluid
-Sound File:	HWindow		Geluidsbestand:
-Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Geluiden\n Tot u gebracht door:\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n Oorspronkelijk een werk van Atsushi Takamatsu.\nAuteursrecht ©2003-2006 Haiku
-Stop	HWindow		Stop
-This is not an audio file.	HWindow		Dit is geen geluidsbestand.

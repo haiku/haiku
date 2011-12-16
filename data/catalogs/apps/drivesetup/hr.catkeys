@@ -1,0 +1,63 @@
+1	croatian	x-vnd.Haiku-DriveSetup	3242584583
+%ld MiB	Support		%ld MiB
+<empty>	DiskView		<prazno>
+<empty>	PartitionList		<prazno>
+Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Jeste li sigurni da želite obrisati odabranu particiju?\n\nSvi podaci na particiji biti će nepovratno izgubljeni ako to učinite!
+Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Jeste li sigurni da želite inicijalizirati particiju \"%s\"? Biti ćete ponovno upitani prije nego što promjene budu zapisane na disk.
+Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Jeste li sigurni da želite inicijalizirati particiju? Biti ćete ponovno upitani prije nego što promjene budu zapisane na disk.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Jeste li sigurni da želite sada zapisati promjene na disk?\n\nSvi podaci na disku %s biti će nepovratno izgubljeni ako to učinite! 
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Jeste li sigurni da želite sada zapisati promjene na disk?\n\nSvi podaci na particiji %s biti će nepovratno izgubljeni ako to učinite! 
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		jeste li sigurni da želite sada zapisati promjene na disk?\n\nSvi podaci biti će nepovratno izgubljeni ako to učinite!  
+Cancel	CreateParamsPanel		Otkaži
+Cancel	InitParamsPanel		Otkaži
+Cancel	MainWindow		Otkaži
+Cannot delete the selected partition.	MainWindow		ne mogu obrisati odabranu particiju.
+Continue	MainWindow		Nastavi
+Could not aquire partitioning information.	MainWindow		Nisam mogao dobiti informacije o particioniranju.
+Could not delete the selected partition.	MainWindow		Nisam mogao obrisati odabranu particiju.
+Could not mount partition %s.	MainWindow		ne mogu montirati particiju %s.
+Could not unmount partition %s.	MainWindow		Ne mogu odmontirati particiju %s.
+Create	CreateParamsPanel		Napravi
+Create…	MainWindow		Napravi...
+Creation of the partition has failed.	MainWindow		Stvaranje particije nije uspjelo.
+Delete	MainWindow		Izbriši
+Delete partition	MainWindow		Izbriši particiju
+Device	DiskView		Uređaj
+Device	PartitionList		Uređaj
+Disk	MainWindow		Disk
+Disk system \"%s\"\" not found!	MainWindow		Sustav diska \"%s\"\" nije nađen!
+Eject	MainWindow		Izbaci
+End: %ld MB	Support		Kraj: %ld MB
+Error: 	MainWindow	in any error alert	Greška:
+Failed to delete the partition. No changes have been written to disk.	MainWindow		Neuspjelo brisanje particije.Promjene neće biti zapisane na disk.
+Failed to initialize the partition %s!\n	MainWindow		Neuspjela inicijalizacija particije %s!\n
+Failed to initialize the partition. No changes have been written to disk.	MainWindow		Neuspjelo inicijaliziranje.Promjene neće biti zapisane na disk.
+File system	PartitionList		Datotečni sustav
+Format (not implemented)	MainWindow		Format (nije primjenjeno)
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Neuspjela inicijalizacija particije %s.(Ništa nije zapisano na disk.) 
+Initialize	InitParamsPanel		Inicijaliziraj
+Initialize	MainWindow		Inicijaliziraj
+Mount	MainWindow		Montiraj
+Mount all	MainWindow		Montiraj sve
+Mounted at	PartitionList		Montirano na
+OK	MainWindow		U redu
+Parameters	PartitionList		Parametri
+Partition	MainWindow		Particija
+Partition %ld	DiskView		Particija %ld
+Partition name:	CreateParamsPanel		Ime particije:
+Partition size	CreateParamsPanel		Veličina particije
+Partition type:	CreateParamsPanel		Vrsta particije:
+Select a partition from the list below.	DiskView		Odaberite particiju sa donje liste.
+Size	PartitionList		Veličina
+The currently selected partition is not empty.	MainWindow		Trenutno odabrana particija nije prazna.
+The partition %s has been successfully initialized.\n	MainWindow		Particija %s je uspješno inicijalizirana.\n
+The partition %s is already mounted.	MainWindow		Particija %s je već montirana.
+The partition %s is already unmounted.	MainWindow		Particija %s je već odmontirana.
+The partition %s is currently mounted.	MainWindow		Particija %s je trenutno montirana.
+The selected disk is read-only.	MainWindow		Odabrani disk je samo za čitanje.
+There was an error preparing the disk for modifications.	MainWindow		Došlo je do greške pri pripremanju diska za promjene.
+Unable to find the selected partition by ID.	MainWindow		Nije moguće naći odabranu particiju pomoću ID-a.
+Unmount	MainWindow		Odmontiraj
+Volume name	PartitionList		Ime particije
+Write changes	MainWindow		Zapiši promjene
+You need to select a partition entry from the list.	MainWindow		Morate odabrati unos particije sa liste.

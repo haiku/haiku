@@ -443,11 +443,7 @@ main(int argc, char **argv)
 			refresh = 0;
 		}
 	}
-	if (iters < 0) {
-		printf("Starting: infinite intervals of %d second%s each\n", 
-			   interval,
-			   (interval == 1) ? "" : "s");
-	} else {
+	if (iters >= 0) { 
 		printf("Starting: %d interval%s of %d second%s each\n", iters, 
 			   (iters == 1) ? "" : "s", interval,
 			   (interval == 1) ? "" : "s");
@@ -456,8 +452,21 @@ main(int argc, char **argv)
 	signal(SIGWINCH, winch_handler);
 	
 	then = system_time();
+	if (iters < 0) {
+		// You will only have to wait half a second for the first iteration.
+		uinterval = 1 * 1000000 / 2;
+		baseline = gather(NULL, &busy, 0, refresh);
+		elapsed = system_time() - then;
+		if (elapsed < uinterval) {
+			snooze(uinterval - elapsed);
+			elapsed = uinterval;
+		}
+		then = system_time();
+		baseline = gather(&baseline, &busy, elapsed, refresh);
+	} else
+		baseline = gather(NULL, &busy, 0, refresh);
+
 	uinterval = interval * 1000000;
-	baseline = gather(NULL, &busy, 0, refresh);
 	for (i = 0; iters < 0 || i < iters; i++) {
 		elapsed = system_time() - then;
 		if (elapsed < uinterval) {

@@ -8,9 +8,12 @@
  */
 
 
-#include "Encoding.h"
 #include "PrefHandler.h"
-#include "TermConst.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 #include <Catalog.h>
 #include <Directory.h>
@@ -24,10 +27,9 @@
 #include <NodeInfo.h>
 #include <Path.h>
 
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
+#include "PrefHandler.h"
+#include "TermConst.h"
+
 
 /*
  * Startup preference settings.

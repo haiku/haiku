@@ -99,7 +99,7 @@ Utility::Save(BBitmap** screenshot, const char* fileName, uint32 imageType)
 			fileNameString.SetTo(homePath.Path());
 			fileNameString << "/" << B_TRANSLATE_NOCOLLECT(sDefaultFileNameBase)
 				<< index++ << extension;
-			entry.SetTo(fileNameString.String());
+			entry.SetTo(fileNameString);
 		} while (entry.Exists());
 	}
 
@@ -187,7 +187,7 @@ Utility::MakeScreenshot(bool includeMouse, bool activeWindow,
 }
 
 
-const char*
+BString
 Utility::GetFileNameExtension(uint32 imageType) const
 {
 	BMimeType mimeType(_GetMimeString(imageType));
@@ -203,11 +203,11 @@ Utility::GetFileNameExtension(uint32 imageType) const
 			extension.SetTo("");
 	}
 
-	return extension.String();
+	return extension;
 }
 
 
-const char*
+BString
 Utility::_GetMimeString(uint32 imageType) const
 {
 	const char *dummy = "";
@@ -222,7 +222,8 @@ Utility::_GetMimeString(uint32 imageType) const
 		const translation_format* formats = NULL;
 		int32 numFormats;
 
-		if (roster->GetOutputFormats(x, &formats, &numFormats) == B_OK) {
+		if (roster->GetOutputFormats(translators[x], &formats, &numFormats)
+				== B_OK) {
 			for (int32 i = 0; i < numFormats; ++i) {
 				if (formats[i].type == imageType) {
 					delete [] translators;

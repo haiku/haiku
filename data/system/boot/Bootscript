@@ -164,6 +164,11 @@ if [ "$SAFEMODE" != "yes" ]; then
 	launch $SERVERS/notification_server ""
 fi
 
+# Launch Power Daemon
+if [ "$SAFEMODE" != "yes" ]; then
+	launch $SERVERS/power_daemon ""
+fi
+
 # Check for daylight saving time
 launch system/bin/dstcheck
 

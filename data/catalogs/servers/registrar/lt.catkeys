@@ -1,0 +1,23 @@
+1	lithuanian	x-vnd.haiku-registrar	2599857937
+Restart system	ShutdownProcess		Paleisti sistemą iš naujo
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Gali būti, jog programą „%appName%“ blokuoja modalinis langas.
+OK	ShutdownProcess		Gerai
+System is shut down	ShutdownProcess		Sistema išjungta
+It's now safe to turn off the computer.	ShutdownProcess		Dabar saugiai galite išjungti kompiuterį.
+Cancel	ShutdownProcess		Atsisakyti
+Do you really want to shut down the system?	ShutdownProcess		Ar tikrai norite išjungti sistemą?
+Asking other processes to quit.	ShutdownProcess		Užbaigiamas procesų darbas.
+Asking \"%appName%\" to quit.	ShutdownProcess		Užbaigiamas programos „%appName%“ darbas.
+%action%?	ShutdownProcess		%action%?
+Shutdown aborted	ShutdownProcess		Sistemos išjungimas nutrauktas
+Restarting…	ShutdownProcess		Perleidžiama…
+Asking background applications to quit.	ShutdownProcess		Užbaigiamas foninių programų darbas.
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Programa „%appName%“ nutraukė sistemos išjungimą.
+Tidying things up a bit.	ShutdownProcess		Apsitvarkoma.
+Do you really want to restart the system?	ShutdownProcess		Ar tikrai norite paleisti sistemą iš naujo?
+Shutdown status	ShutdownProcess		Išjungimo būsena
+Cancel shutdown	ShutdownProcess		Nutraukti išjungimą
+Kill application	ShutdownProcess		Nutraukti programos darbą
+Shut down	ShutdownProcess		Išjungti
+Restart	ShutdownProcess		Paleisti iš naujo
+Shutting down…	ShutdownProcess		Išjungiama…

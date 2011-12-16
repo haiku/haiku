@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Haiku Inc. All Rights Reserved.
+ * Copyright 2010-2011, Haiku Inc. All Rights Reserved.
  * Copyright 2010 Clemens Zeidler. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -11,18 +11,10 @@
 #include "SupportDefs.h"
 
 
-class AbstractConnection {
-public:
-	virtual						~AbstractConnection();
+namespace BPrivate {
 
-	virtual status_t			Connect(const char* server, uint32 port) = 0;
-	virtual status_t			Disconnect() = 0;
 
-	virtual status_t			WaitForData(bigtime_t timeout) = 0;
-
-	virtual int32				Read(char* buffer, uint32 nBytes) = 0;
-	virtual int32				Write(const char* buffer, uint32 nBytes) = 0;
-};
+class AbstractConnection;
 
 
 class ServerConnection {
@@ -39,11 +31,18 @@ public:
 
 			status_t			WaitForData(bigtime_t timeout);
 
-			int32				Read(char* buffer, uint32 nBytes);
-			int32				Write(const char* buffer, uint32 nBytes);
+			ssize_t				Read(char* buffer, uint32 length);
+			ssize_t				Write(const char* buffer, uint32 length);
 
 private:
 			AbstractConnection*	fConnection;
 };
+
+
+}	// namespace BPrivate
+
+
+using BPrivate::ServerConnection;
+
 
 #endif // SERVER_CONNECTION_H

@@ -1,0 +1,50 @@
+1	lithuanian	x-vnd.Haiku-Notifications	3631903554
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Įrašant nuostatas, įvyko klaida.\nGali būti, jog diske nepakanka laisvos vietos.
+Notifications	GeneralView		Pranešimai
+seconds of inactivity	GeneralView		sek. pasyvumo
+Revert	PrefletWin		Atšaukti pakeitimus
+Mini icon	DisplayView		mažos piktogramos
+Enable notifications	GeneralView		Įjungti pranešimus
+Error	NotificationView		Klaida
+OK	GeneralView		Gerai
+Events are not notified	GeneralView		Apie įvykius nepranešama
+Save	PrefletWin		Įrašyti
+Type	NotificationView		Tipas
+Notifications cannot be stopped, because the server can't be reached.	GeneralView		Pranešimų tarnybos sustabdyti nepavyko, nes ji nepasiekiama.
+Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Nepavyko įgalinti pranešimų, nes pranešimų tarnyba nerasta.\nTai reiškia, jog pranešimų tarnyba nebuvo sėkmingai įdiegta.
+OK	NotificationView		Gerai
+Important	NotificationView		Svarbu
+Cannot disable notifications because the server can't be reached.	GeneralView		Pranešimų išjungti nepavyko, nes pranešimų tarnyba nepasiekiama.
+Progress	NotificationView		Eiga
+Last Received	NotificationView		Paskiausiai gautas
+General	PrefletView		Bendrosios
+Display	PrefletView		Išvaizda
+Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Nustatyti, kad pranešimai būtų įjungiami įkeliant sistemą, nepavyko. Gali būti, jog Jums trūksta rašymo į paleisties nuostatų aplanką teisių.
+Search:	NotificationView		Ieškoti:
+The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		Pranešimų tarnyba nerasta.\nGali būti, jog ji nebuvo sėkmingai įdiegta.
+Allowed	NotificationView		Leidžiama
+Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Nuostatų įrašyti nepavyko. Gali būti, jog Jums trūksta rašymo į nuostatų aplanką teisių arba diske nepakanka laisvos vietos.
+There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	DisplayView		Įrašant nuostatas, įvyko klaida.\nGali būti, jog Jums trūksta rašymo į nuostatų aplanką teisių.
+Yes	NotificationView		Taip
+Large icon	DisplayView		didelės piktogramos
+Icon size:	DisplayView		Piktogramų dydis:
+Hide notifications from screen after	GeneralView		Pašalinti pranešimus iš ekrano po
+Disable notifications	GeneralView		Išjungti pranešimus
+Notifications	System name		Pranešimai
+Notifications	NotificationView		Pranešimai
+No	NotificationView		Ne
+Title	NotificationView		Antraštė
+Information	NotificationView		Informacija
+Window width:	DisplayView		Lango plotis:
+Application	NotificationView		Programa
+Enabled	NotificationView		Įjungta
+OK	DisplayView		Gerai
+Unknown	NotificationView		Nežinoma
+Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Nuostatų įrašyti nepavyko. Gali būti, jog Jums trūksta rašymo į paleisties nuostatų aplanką teisių.
+There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Įrašant nuostatas, įvyko klaida.\nGali būti, jog Jums trūksta rašymo į nuostatų aplanką teisių.
+There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Įrašant nuostatas, įvyko klaida.\nGali būti, jog Jums trūksta rašymo į nuostatų aplanką teisių.
+Enable notifications at startup	GeneralView		Įjungti pranešimus sistemos paleisties metu
+Notifications	PrefletView		Pranešimai
+The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Pranešimų tarnyba nerasta. Tai reiškia, jog ji nebuvo sėkmingai įdiegta.
+Applications	NotificationView		Programos
+Events are notified	GeneralView		Apie įvykius pranešama

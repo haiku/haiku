@@ -1,4 +1,4 @@
-1	korean	system	2677153267
+1	korean	x-vnd.Haiku-libbe	2677153267
 %.2f TiB	StringForSize		%.2f 테라 이진 바이트
 %3.2f GiB	StringForSize		%3.2f 기가 이진 바이트
 %3.2f KiB	StringForSize		%3.2f 킬로 이진 바이트

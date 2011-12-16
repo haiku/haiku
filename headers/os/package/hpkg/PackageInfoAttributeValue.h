@@ -23,6 +23,7 @@ struct BPackageVersionData {
 			const char*			major;
 			const char*			minor;
 			const char*			micro;
+			const char*			preRelease;
 			uint8				release;
 };
 
@@ -31,7 +32,9 @@ struct BPackageResolvableData {
 			BPackageResolvableType	type;
 			const char*			name;
 			bool				haveVersion;
+			bool				haveCompatibleVersion;
 			BPackageVersionData	version;
+			BPackageVersionData	compatibleVersion;
 };
 
 

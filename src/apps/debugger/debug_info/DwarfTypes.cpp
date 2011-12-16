@@ -532,9 +532,11 @@ DwarfPrimitiveType::TypeConstant() const
 
 
 DwarfCompoundType::DwarfCompoundType(DwarfTypeContext* typeContext,
-	const BString& name, DIECompoundType* entry)
+	const BString& name, DIECompoundType* entry,
+	compound_type_kind compoundKind)
 	:
 	DwarfType(typeContext, name, entry),
+	fCompoundKind(compoundKind),
 	fEntry(entry)
 {
 }
@@ -548,6 +550,13 @@ DwarfCompoundType::~DwarfCompoundType()
 	}
 	for (int32 i = 0; DwarfDataMember* member = fDataMembers.ItemAt(i); i++)
 		member->ReleaseReference();
+}
+
+
+compound_type_kind
+DwarfCompoundType::CompoundKind() const
+{
+	return fCompoundKind;
 }
 
 

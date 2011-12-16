@@ -8,5 +8,5 @@ UseHeaders [ FDirName os interface ] ;
 
 Application DrawingModes :
 	DrawingModes.cpp
-	: be
+	: $(TARGET_LIBSTDC++) be
 ;

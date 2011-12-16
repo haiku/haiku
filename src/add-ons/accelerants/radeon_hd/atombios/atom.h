@@ -28,9 +28,10 @@
 #include "atombios.h"
 #include "ObjectID.h"
 
+#include <ByteOrder.h>
+#include <kernel/OS.h>
 #include <String.h>
 #include <SupportDefs.h>
-#include <ByteOrder.h>
 
 
 struct card_info {

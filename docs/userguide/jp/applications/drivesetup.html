@@ -9,6 +9,8 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		hiromu1996
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -36,6 +38,8 @@
 <li><a href="../../uk/applications/drivesetup.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/applications/drivesetup.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/applications/drivesetup.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/drivesetup.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/drivesetup.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/applications/drivesetup.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -47,38 +51,36 @@
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 <h2><img src="../../images/apps-images/drivesetup-icon_64.png" alt="drivesetup-icon_64.png" width="64" height="64" />DriveSetup</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbarメニュー:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
-<tr><td>場所:</td><td></td><td><span class="path">/boot/system/apps/DriveSetup</span></td></tr>
-<tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/DriveSetup</span></td></tr>
+<tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><span class="menu">アプリケーション (Applications)</span></td></tr>
+<tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/DriveSetup</span></td></tr>
+<tr><td>設定ファイル：</td><td></td><td><span class="path">~/config/settings/DriveSetup</span></td></tr>
 </table>
 <p><br /></p>
-<p>DriveSetup is a tool to create, delete and initialize partitions. At this time it can't resize or move existing partitions, so that you'll either need an unpartitioned volume (perhaps an external USB drive or another harddisk) or do the initial setup with a tool like the <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> to provide the space for another partition.</p>
+<p>DriveSetupはパーティションの作成、削除、初期化をするツールです。このツールでは既存のパーティションのリサイズや移動はできないので、パーティションが作成されていないディスク(外部USBドライブや別のハードディスクなど)を用意するか、<a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a>のようなツールで初期化をする必要があるでしょう。</p>
 <img src="../images/apps-images/drivesetup.png" alt="drivesetup.png" />
-<p>At the top is a graphical representation of all partitions inside the device chosen in the list below it. Besides a maximum of 4 primary partitions, each of those can contain a number of extended/logical partitions. You may have to expand such a list with the +/- widget that appears in that case in front of that device to see the details of every logical partition.</p>
-<p>You can select a partition from the list and mount and unmount them with the commands in the <span class="menu">Partition</span> menu or by pressing <span class="key">ALT</span> <span class="key">M</span> or <span class="key">ALT</span> <span class="key">U</span>.</p>
-<p>You can also completely delete a partition with <span class="menu">Partition | Delete</span>.<br />
-Which brings us to this:</p>
-<div class="box-stop">Dealing with creating/deleting/initializing partitions is very dangerous business. Always check twice to be sure you're working with the right one and always keep an up-to-date backup of your data in case something goes wrong!</div>
+<p>一番上の図は、下のリストで選択されたデバイスのパーティションの分割状態を表しています。それぞれのデバイスは4つまでのプライマリパーティションに分割でき、それぞれがいくつかの拡張パーティションや論理パーティションを格納することができます。論理パーティションの詳細を見るためには、+/-ボタンでリストを展開する必要があるかもしれません。</p>
+<p>リストからパーティションを選択して、<span class="key">ALT</span> <span class="key">M</span> / <span class="key">ALT</span> <span class="key">U</span>を押すか、<span class="menu">パーティション</span>メニューから操作することで、マウント/アンマウントを行うことができます。</p>
+<p><span class="menu">パーティション | 削除</span>からパーティションの削除もできます。<br /></p>
+<div class="box-stop">パーティションの作成・削除・初期化は非常に危険です。万が一に備えて最新のバックアップを行なっているかと操作しているパーティションが適切なものかどうかを、必ず確認してください。</div>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="creating" name="creating">Creating a new partition</a></h2>
-<div class="box-info">If you plan to use the entire drive as one partition, e.g. a USB stick or a Compact Flash card, you can skip the creation of a partition and proceed right to <a href="#initializing">Initializing</a>.</div>
-<p>When you found unformatted space on a drive, like the above <tt>&lt;empty&gt;</tt>, you can create a new partition in this space with <span class="menu">Partition | Create...</span>(<span class="key">ALT</span> <span class="key">C</span>).</p>
+<a id="creating" name="creating">新しいパーティションを作成する</a></h2>
+<div class="box-info">もし、(USBフラッシュメモリやコンパクトフラッシュnを利用するなどして)ディスクに1つのパーティションしか作らないならば<a href="#initializing">Initializing</a>までスキップしてください。</div>
+<p>上の画像のように<tt>&lt;empty&gt;</tt>となっている未フォーマットのスペースがあれば、<span class="menu">パーティション | 新規作成...</span>もしくは<span class="key">ALT</span> <span class="key">C</span>のショートカットで、パーティションを作成できます。</p>
 <img src="../images/apps-images/drivesetup-create.png" alt="drivesetup-create.png" />
-<p>You're prompted with this dialog that lets you adjust the partition size and type. Choose <span class="menu">Be File System</span> if you want to use the partition for an Haiku installation or if you want to use all the interesting Haiku features with it, like attributes and queries. Note, that other operating systems might not be able to access such a partition.</p>
-<p>If you have created a primary partition instead of just another extended/logical partition within one, the above dialog also displays an <span class="menu">Active partition</span> checkbox. You'll have to check that, if you'll use that partition to boot a Haiku installation.</p>
-<p>Before you can use, or even mount the newly created partition, it has to be initialized with a filesystem.</p>
+<p>ダイアログでパーティションのサイズとタイプを調節してください。パーティションをHaikuのインストールに用いる、またはHaikuの特徴的な属性値やクエリーを使用したい場合は、<span class="menu">Be File System</span>をパーティションタイプに設定してください。また、<span class="menu">Be File System</span>のパーティションは他のOSからアクセス出来ないことにご注意ください。</p>
+<p>もし、拡張パーティションや論理パーティションと一緒にプライマリパーティションをひとつのディスクに作成した時、ダイアログに<span class="menu">Active partition</span>というチェックボックスが現れます。パーティションをHaikuのブートディスクとして利用するにはチェックしてください。</p>
+<p>新しく作られたパーティションを使用する前に、ファイルシステムを初期化する必要があります。</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="initializing" name="initializing">Initializing a partition</a></h2>
-<p>Only unmounted partitions can be initialized by using the <span class="menu">Partition | Initialize</span> menu.</p>
+<a id="initializing" name="initializing">パーティションの初期化</a></h2>
+<p>アンマウントされたパーティションを<span class="menu">パーティション | 初期化</span>から初期化することができます。</p>
 <img src="../images/apps-images/drivesetup-initialize.png" alt="drivesetup-initialize.png" />
-<p>Here you set the name for the partition and it's blocksize. 2048 bytes per block are recommended, but you can choose larger or smaller sizes if you have these very specific needs.<br />
-Initializing will destroy all data on that partition!</p>
+<p>ダイアログにパーティションの名前とブロックサイズを入力してください。ブロックサイズは2048が推奨されますが、特別な必要性があるならより大きなサイズにもより小さなサイズにも設定することができます。<br />
+初期化することでパーティションのすべてのデータが消されるので、注意してください！</p>
 
 </div>
 </div>

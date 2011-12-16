@@ -24,6 +24,18 @@ enum {
 };
 
 
+// package attribute IDs
+enum BHPKGPackageSectionID {
+	B_HPKG_SECTION_HEADER					= 0,
+	B_HPKG_SECTION_HEAP						= 1,
+	B_HPKG_SECTION_PACKAGE_TOC				= 2,
+	B_HPKG_SECTION_PACKAGE_ATTRIBUTES		= 3,
+	B_HPKG_SECTION_REPOSITORY_INFO			= 4,
+	//
+	B_HPKG_SECTION_ENUM_COUNT
+};
+
+
 // attribute types
 enum {
 	// types
@@ -110,6 +122,11 @@ enum BHPKGAttributeID {
 	B_HPKG_ATTRIBUTE_ID_PACKAGE_REPLACES			= 37,
 	B_HPKG_ATTRIBUTE_ID_PACKAGE_RESOLVABLE_OPERATOR	= 38,
 	B_HPKG_ATTRIBUTE_ID_PACKAGE_CHECKSUM			= 39,
+	B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_PRE_RELEASE	= 40,
+	B_HPKG_ATTRIBUTE_ID_PACKAGE_PROVIDES_COMPATIBLE	= 41,
+	B_HPKG_ATTRIBUTE_ID_PACKAGE_URL					= 42,
+	B_HPKG_ATTRIBUTE_ID_PACKAGE_SOURCE_URL			= 43,
+	B_HPKG_ATTRIBUTE_ID_PACKAGE_INSTALL_PATH		= 44,
 	//
 	B_HPKG_ATTRIBUTE_ID_ENUM_COUNT,
 };
@@ -138,6 +155,17 @@ enum {
 	B_HPKG_DEFAULT_SYMLINK_PERMISSIONS		= 0777,
 	B_HPKG_DEFAULT_DATA_COMPRESSION			= B_HPKG_COMPRESSION_NONE,
 	B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB		= 64 * 1024
+};
+
+
+// Writer Init() flags
+enum {
+	B_HPKG_WRITER_UPDATE_PACKAGE	= 0x01,
+		// update the package (don't truncate)
+	B_HPKG_WRITER_FORCE_ADD			= 0x02,
+		// when updating a pre-existing entry, don't fail, but replace the
+		// entry, if possible (directories will be merged, but won't replace a
+		// non-directory)
 };
 
 

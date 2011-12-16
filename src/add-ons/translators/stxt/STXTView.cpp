@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2002-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -13,9 +13,14 @@
 #include "STXTView.h"
 #include "STXTTranslator.h"
 
+#include <Catalog.h>
 #include <StringView.h>
 
 #include <stdio.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "STXTView"
 
 
 STXTView::STXTView(const BRect &frame, const char *name, uint32 resizeMode,
@@ -30,7 +35,8 @@ STXTView::STXTView(const BRect &frame, const char *name, uint32 resizeMode,
 	float height = fontHeight.descent + fontHeight.ascent + fontHeight.leading;
 
 	BRect rect(10, 10, 200, 10 + height);
-	BStringView *stringView = new BStringView(rect, "title", "StyledEdit files translator");
+	BStringView *stringView = new BStringView(rect, "title",
+		B_TRANSLATE("StyledEdit files translator"));
 	stringView->SetFont(be_bold_font);
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
@@ -55,7 +61,8 @@ STXTView::STXTView(const BRect &frame, const char *name, uint32 resizeMode,
 	height = fontHeight.descent + fontHeight.ascent + fontHeight.leading;
 
 	rect.OffsetBy(0, height + 5);
-	stringView = new BStringView(rect, "Copyright", B_UTF8_COPYRIGHT "2002-2006 Haiku Inc.");
+	stringView = new BStringView(rect, "Copyright",
+		B_UTF8_COPYRIGHT "2002-2006 Haiku Inc.");
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
 

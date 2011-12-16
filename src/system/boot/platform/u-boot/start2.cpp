@@ -17,6 +17,7 @@
 #include <boot/heap.h>
 #include <boot/stage2.h>
 #include <arch/cpu.h>
+#include <platform_arch.h>
 
 #include <string.h>
 
@@ -49,7 +50,7 @@ extern "C" void dump_uimage(struct image_header *image);
 
 extern struct image_header *gUImage;
 extern uboot_arm_gd *gUBootGlobalData;
-extern uint8 gUBootOS;
+extern uint32 gUBootOS;
 
 
 register volatile uboot_arm_gd *gGD asm ("r8");
@@ -86,10 +87,7 @@ abort(void)
 extern "C" void
 platform_start_kernel(void)
 {
-	static struct kernel_args *args = &gKernelArgs;
-		// something goes wrong when we pass &gKernelArgs directly
-		// to the assembler inline below - might be a bug in GCC
-		// or I don't see something important...
+	addr_t kernelEntry = gKernelArgs.kernel_image.elf_header.e_entry;
 	addr_t stackTop
 		= gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size;
 
@@ -101,22 +99,9 @@ platform_start_kernel(void)
 	dprintf("kernel entry at %lx\n",
 		gKernelArgs.kernel_image.elf_header.e_entry);
 
-	asm("MOV sp, %[adr]"::[adr] "r" (stackTop));
-	asm("MOV r0, %[args]"::[args] "r" (args));
-	asm("MOV r1, #0"::);
-	asm("MOV pc, %[entry]"::[entry] "r"
-		(gKernelArgs.kernel_image.elf_header.e_entry));
+	status_t error = arch_start_kernel(&gKernelArgs, kernelEntry,
+		stackTop);
 
-/*	asm("movl	%0, %%eax;	"			// move stack out of way
-		"movl	%%eax, %%esp; "
-		: : "m" (stackTop));
-	asm("pushl  $0x0; "					// we're the BSP cpu (0)
-		"pushl 	%0;	"					// kernel args
-		"pushl 	$0x0;"					// dummy retval for call to main
-		"pushl 	%1;	"					// this is the start address
-		"ret;		"					// jump.
-		: : "g" (args), "g" (gKernelArgs.kernel_image.elf_header.e_entry));
-*/
 	panic("kernel returned!\n");
 }
 
@@ -166,7 +151,8 @@ start_raw(int argc, const char **argv)
 
 	// if we get passed a uimage, try to find the second blob
 	if (gUImage != NULL
-		&& image_multi_getimg(gUImage, 1, (uint32*)&args.platform.boot_tgz_data,
+		&& image_multi_getimg(gUImage, 1,
+			(uint32*)&args.platform.boot_tgz_data,
 			&args.platform.boot_tgz_size)) {
 		dprintf("Found boot tgz @ %p, %" B_PRIu32 " bytes\n",
 			args.platform.boot_tgz_data, args.platform.boot_tgz_size);

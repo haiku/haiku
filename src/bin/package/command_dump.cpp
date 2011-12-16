@@ -34,6 +34,43 @@ struct PackageContentDumpHandler : BLowLevelPackageContentHandler {
 	{
 	}
 
+	virtual status_t HandleSectionStart(BHPKGPackageSectionID sectionID,
+		bool& _handleSection)
+	{
+		const char* sectionName;
+
+		switch (sectionID) {
+			case B_HPKG_SECTION_HEADER:
+				sectionName = "header";
+				break;
+			case B_HPKG_SECTION_HEAP:
+				sectionName = "heap";
+				break;
+			case B_HPKG_SECTION_PACKAGE_TOC:
+				sectionName = "TOC";
+				break;
+			case B_HPKG_SECTION_PACKAGE_ATTRIBUTES:
+				sectionName = "package attributes";
+				break;
+			case B_HPKG_SECTION_REPOSITORY_INFO:
+				sectionName = "repository info";
+				break;
+			default:
+				sectionName = "<unknown section>";
+				break;
+		}
+
+		printf("\n====  SECTION: %s ====\n", sectionName);
+
+		_handleSection = true;
+		return B_OK;
+	}
+
+	virtual status_t HandleSectionEnd(BHPKGPackageSectionID sectionID)
+	{
+		return B_OK;
+	}
+
 	virtual status_t HandleAttribute(BHPKGAttributeID attributeID,
 		const BPackageAttributeValue& value, void* parentToken, void*& _token)
 	{
@@ -50,7 +87,7 @@ struct PackageContentDumpHandler : BLowLevelPackageContentHandler {
 	}
 
 	virtual status_t HandleAttributeDone(BHPKGAttributeID attributeID,
-		const BPackageAttributeValue& value, void* token)
+		const BPackageAttributeValue& value, void* parentToken, void* token)
 	{
 		if (fErrorOccurred)
 			return B_OK;
@@ -74,10 +111,12 @@ private:
 	{
 		switch (value.type) {
 			case B_HPKG_ATTRIBUTE_TYPE_INT:
-				printf("%lld (%#llx)", value.signedInt, value.signedInt);
+				printf("%lld (%#llx)", (long long)value.signedInt,
+					(long long)value.signedInt);
 				break;
 			case B_HPKG_ATTRIBUTE_TYPE_UINT:
-				printf("%llu (%#llx)", value.unsignedInt, value.unsignedInt);
+				printf("%llu (%#llx)", (unsigned long long)value.unsignedInt,
+					(unsigned long long)value.unsignedInt);
 				break;
 			case B_HPKG_ATTRIBUTE_TYPE_STRING:
 				printf("\"%s\"", value.string);
@@ -85,12 +124,14 @@ private:
 			case B_HPKG_ATTRIBUTE_TYPE_RAW:
 				switch (value.encoding) {
 					case B_HPKG_ATTRIBUTE_ENCODING_RAW_INLINE:
-						printf("data: size: %llu, inline", value.data.size);
+						printf("data: size: %llu, inline",
+							(unsigned long long)value.data.size);
 						// TODO: Print the data bytes!
 						break;
 					case B_HPKG_ATTRIBUTE_ENCODING_RAW_HEAP:
 						printf("data: size: %llu, offset: %llu",
-							value.data.size, value.data.offset);
+							(unsigned long long)value.data.size,
+							(unsigned long long)value.data.offset);
 						break;
 					default:
 						break;

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -39,6 +39,8 @@
 <li><a href="../../uk/preferences/e-mail.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/preferences/e-mail.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/preferences/e-mail.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/preferences/e-mail.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/preferences/e-mail.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/preferences/e-mail.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -50,15 +52,17 @@
 
 <div id="content">
 <div>
+<div class="box-info">Cette page n'est pas encore entièrement traduite. Les parties non encore traduites seront en anglais.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Index</td></tr>
 <tr class="index"><td>
-	<a href="#creating">Créer un nouveau compte e-mail</a><br />
-	<a href="#incoming">Configurer la réception des e-mails</a><br />
-	<a href="#outgoing">Configurer l'envoi des e-mails</a><br />
-	<a href="#filters">Configurer les filtres</a><br />
-	<a href="#settings">Configurer le service de messagerie</a>
+	<a href="#creating">Creating a new e-mail account</a><br />
+	<a href="#account-settings">Account settings</a><br />
+	<a href="#incoming">Setting up incoming e-mail</a><br />
+	<a href="#outgoing">Setting up outgoing e-mail</a><br />
+	<a href="#filters">Notifications and e-mail filters</a><br />
+	<a href="#settings">Setting up the Mail Service</a>
 </td></tr>
 </table>
 
@@ -74,60 +78,68 @@ Les paramètres de configuration peuvent être réglés dans le panneau de préf
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="creating" name="creating">Créer un nouveau compte e-mail account</a></h2>
+<a id="creating" name="creating">Créer un nouveau compte de messagerie</a></h2>
 <p>Voyons le processus de configuration d’un compte email.<br />
 Cliquez sur le bouton <span class="button">Add</span> pour créer un nouveau compte sans nom. Ceci ouvre un panneau vous permettant d’entrer vos informations de compte :</p>
 <img src="../images/prefs-images/e-mail-new-account.png" alt="e-mail-new-account.png" />
-<p>Configurez tout d’abord l’<i>Account Type</i> (type de compte) qui peut être <span class="menu">Receive Mail Only</span> (Réception seule), <span class="menu">Send Mail Only</span> (Envoi seul), ou plus souvent, <span class="menu">Send and Receive Mail</span> (Envoi et réception). Indiquez ensuite le type de votre serveur de courrier, <span class="menu">POP3</span> ou <span class="menu">IMAP</span>.</p>
+<p>Commencez par choisir entre les protocoles <span class="menu">POP3</span> ou <span class="menu">IMAP</span> pour accéder a votre serveur de messagerie.</p>
 <p>Indiquez ensuite votre <i>E-mail Address</i> (Adresse email), <i>Login Name</i> (Nom d’utilisateur) et <i>Password</i> (Mot de passe), donnez un nom à votre compte dans le champ <i>Account Name</i> et votre <i>Real Name</i> (Nom réel).</p>
-<p>Les fournisseurs d’email majeurs sont connus de Haiku, ce qui permet de remplir automatiquement certains paramètres comme celui des adresses IP de serveurs. Si ce n’est pas le cas, entrez manuellement les informations sur votre compte email.</p>
+<p>If your account is from a major e-mail provider, Haiku already knows all technical details like server IP addresses. If that is not the case, clicking <span class="button">Next</span> will open another window to enter this information by hand:</p>
+<img src="../images/prefs-images/e-mail-new-account-2.png" alt="e-mail-new-account-2.png" />
+<p>You first set the <i>Server name</i>, <i>Login type</i> and <i>Connection type</i> for the incoming mail, below that for the outgoing mail. You should find the necessary information on your email provider's website.<br />
+See below for more info about the various settings and additional options.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="incoming" name="incoming">
-Configurer la réception des e-mails</a></h2>
+<a id="account-settings" name="account-settings">Réglages du compte</a></h2>
+<p>By selecting the name of an account in the left list, you can change some general settings:</p>
+<img src="../images/prefs-images/e-mail-settings.png" alt="e-mail-settings.png" />
+<p>The <i>Account name</i> is the name that's shown for example in the list of accounts in the E-mail preferences. <i>Real name</i> is the name someone sees when she gets mail from you. <i>Return address</i> is the email address that is used when someone replies to your mail. Normally that is the same address you've sent your email from.</p>
+<p>If you'd like to use an email account to only send or only receive email, you can de/activate that usage by right-clicking the account's name in the leftside list to set the checkmarks accordingly.</p>
+
+<h2>
+
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="incoming" name="incoming">Détail des réglages pour la réception des e-mails</a></h2>
 <p>Cliquez sur <span class="menu">Incoming</span> sous le nom de votre compte pour configurer la réception des emails.</p>
 <img src="../images/prefs-images/e-mail-in.png" alt="e-mail-in.png" />
-<p>Via le menu déroulant vous pouvez choisir le protocole utilisé par votre fournisseur. <span class="menu">IMAP</span> et <span class="menu">POP3</span> sont supportés.</p>
-<p>Le champ suivant <span class="menu">Mail Server</span> doit contenir l’adresse du serveur de réception des messages. Si votre fournisseur utilise un port non standard, indiquez-le après l'adresse, séparé par un deux-points.
-Par exemple, <tt>pop.votre-fournisseur.org:1400</tt>.</p>
-<p>Entrez ensuite vos informations de connexion, <i>Username</i> (nom d’utilisateur) et <i>Password</i> (mot de passe), et si nécessaire modifiez le <i>Login Type</i> (type d’authentification) de <span class="menu">Plain Text</span> (En clair, par défaut) à <span class="menu">APOP</span>.</p>
+<p>First is the <span class="menu">Mail server</span> address for incoming mails. If your provider needs you to log into a specific port, you add that to the address, separated by a colon. For example, <tt>pop.your-provider.org:1400</tt>.</p>
+<p>Then you enter your login information, <i>Login name</i> and <i>Password</i>, and if necessary change the <i>Login type</i> from the default <span class="menu">Plain text</span> to <span class="menu">APOP</span> for authentication.</p>
 <p>Si vous utilisez le protocol <i>POP3</i> et récupérez vos emails depuis plusieurs ordinateurs, vous pourrez activer les options <span class="menu">Leave mail on server</span> (Laisser les messages sur les serveur) et <span class="menu">Remove mail from server when deleted</span> (Supprimer les emails du serveur lorsqu’ils sont supprimés localement).</p>
-<p>Si vous utilisez <i>IMAP</i>, vous aurez seulement l’option <span class="menu">Remove mail from server when deleted</span>. Vous pouvez spécifier un dossier <span class="menu">Top Mailbox Folder</span>pour synchroniser seulement un dossier précis (et ses sous-dossiers).</p>
-<p><span class="menu">New Mail Notification</span> (Notification de nouveau message) offre plusieurs méthodes pour vous avertir de l’arrivée d’un nouveau message. Choisissez celle qui vous satisfait le plus.</p>
-<p>Vous pouvez changer l’emplacement (<i>Location</i>) de votre boîte de réception (par défaut : <span class="path">/boot/home/mail/in/</span>), ce qui vous permet de séparer les mails de plusieurs compte. Vous pouvez toutefois utiliser les requêtes pour cette tâche.</p>
-<p>Enfin, vous pouvez chosir de télécharger partiellement les messages qui dont la taille dépasse une certaine limite via l’option <span class="menu">Partially download messages</span>
-Si un message entre dans cette catégorie, seule sont en-tête sera téléchargée. Vous pourrez demander le téléchargement complet après avoir vérifié l’objet de l’email et son expéditeur. Utile si vous avez une connexion bas débit.</p>
+<p>If you use <i>IMAP</i> instead, you have the option to <span class="menu">Remove mail from server when deleted</span> locally. You can specify <span class="menu">IMAP folders</span> to only synchronize with a specific folder and its subfolders.</p>
+<p>Also, you can opt to only <span class="menu">Partially download messages larger than</span> a certain size. This will only get the header and you can decide if you want to download the rest of the message plus possible attachments after seeing the subject and who sent it. Useful if you have a slow connection.</p>
+<p>Vous pouvez changer l’emplacement (<i>Destination</i>) de votre boîte de réception (par défaut : <span class="path">/boot/home/mail/in/</span>), ce qui vous permet de séparer les mails de plusieurs compte dans des dossiers différents. Néanmoins, les requêtes pourraient s’acquitter de cette tâche.</p>
+
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="outgoing" name="outgoing">Configurer l'envoi des e-mails</a></h2>
+<a id="outgoing" name="outgoing">Détail des réglages pour l'envoi des e-mails</a></h2>
 <p>Cliquez sur <span class="menu">Outgoing</span> pour régler les paramètres d’envoi des emails.</p>
 <img src="../images/prefs-images/e-mail-out.png" alt="e-mail-out.png" />
-<p>De même que pour les messages entrants, vous pouvez changer l’emplacement (<i>Location</i>) de votre boîte d’envoi (par défaut : <span class="path">/boot/home/mail/out/</span>).</p>
-<p>Vient ensuite l’adresse du serveur SMTP (<i>SMTP Server</i>) utilisée pour les messages sortants.
-Tout comme l’adresse d’envoi, vous pouvez utiliser un port spécial si nécessaire, par exemple <tt>mail.votre-fournisseur.org:1200</tt>.</p>
+<p>First is the <i>SMTP server</i> address for outgoing mails. As with the incoming server before, you can use a specific port if needed, e.g. <tt>mail.your-provider.org:1200</tt>.</p>
 <p>Si le serveur d’envoi nécessite une authentification, réglez <i>Login Type</i> à <span class="menu">ESMTP</span> et entrez votre nom d’utilisateur et mot de passe. L’autre méthode d’authentification (<span class="menu">POP3 before SMTP</span>, POP3 avant SMTP) est également utilisée par certains fournisseurs d’email.</p>
+<p>As with incoming mail, you can also change the <i>Destination</i> of your outbox (default: <span class="path">/boot/home/mail/out/</span>).</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="filters" name="filters">Configurer les filtres de réception</a></h2>
-<p>Si vous voulez appliquer des filtres à vos message entrants, cliquez sur <span class="menu">E-Mail Filters</span>. Vous pouvez ajouter autant de filtres que vous voulez, qui seront appliqués les uns après les autres. Vous pouvez les réarranger par glisser-déposer. En dehors du filtre <span class="menu">R5 Daemon Filter</span> qui est utilisé pour assurer la compatibilité ascendante, deux autres filtres de messages entrants (<span class="menu">Incoming Mail Filters</span> peuvent être ajoutés).</p>
+<a id="filters" name="filters">Notifications et autres filtres de réceptions</a></h2>
+<p>Notifications for newly arrived email and methods to sort and filter emails are found in <span class="menu">E-Mail filters</span> under an account's name. You can add any number of filters that are applied one after the other and rearrange them by drag&amp;dropping them to their new position.<br />
+Currently there are three <span class="menu">Incoming mail filters</span> you can add. After adding a filter, you have to select it to see its options.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Filtre anti-pourriel</h3>
+Spam filter (AGMS Bayesian)</h3>
 <img src="../images/prefs-images/e-mail-filter-spam.png" alt="e-mail-filter-spam.png" />
 <p>Le filtre anti-pourriel utilise des méthodes statistiques pour identifier un email comme étant indésirable. Il attribue à chaque message une valeur entre 0 et 1 et vous permet de choisir dans quel intervalle un mail sera considéré comme légitime ou bien pourriel.<br />
 L’option <span class="button">Add spam rating to start of Subject</span> permet d’ajouter cette « note » au début du sujet des messages reçus.<br />
 Le filtre anti-pourriel peut aussi apprendre de lui-même à reconnaître les messages, via l’option <span class="button">Learn from all incoming E-mail</span>. Bien sûr, pour cela vous devrez lui signaler ses erreurs (messages légitimes marqués comme pourriels). Vous en saurez plus sur ce sujet lorsque nous aborderons l’application <span class="app">Mail</span>.</p>
-<p>En combinant ce filtre et celui nommé <span class="menu">Match Header</span> (Analyse d’en-tête), vous devriez pouvoir vous débarrasser automatiquement des pourriels détectés.</p>
+<p>En combinant ce filtre et celui nommé <span class="menu">Rule filter</span> (Règle de filtrage), vous devriez pouvoir vous débarrasser automatiquement des pourriels détectés.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Match Header</h3>
+Inspection des entêtes</h3>
 <img src="../images/prefs-images/e-mail-filter-header.png" alt="e-mail-filter-header.png" />
-<p>Ce filtre effectue une action quand une entête correspond au modèle recherché.<br />
+<p>Ce filtre effectue l'action spécifiée dans la règle, quand l'entête du mail correspond au modèle recherché.<br />
 Dans la première zone de texte, vous indiquez quel attribut de l'entête vous souhaitez examiner.
 Vous avez le choix entre :</p>
 <table summary="match header" border="0" cellpadding="2" cellspacing="0"> 
@@ -155,12 +167,34 @@ Vous avez le choix entre :</p>
 		<td>Objet du premier message de la conversation. Correspond au « Subject », mais sans les indicateurs « Re: » ou « Fwd: »</td></tr>
 	<tr><td><span class="menu">Classification Group</span></td><td> </td>
 		<td>Ce champ indiquera « Genuine » ou « Spam » selon si le filtre anti-pourriel a considéré l’e-mail comme étant légitime ou pourriel. Il sera vide en cas d’incertitude.</td></tr>
-	<tr><td><span class="menu">Spam/Genuine Estimate</span></td><td> </td>
+	<tr><td class="onelinetop"><span class="menu">Spam/Genuine Estimate</span></td><td> </td>
 		<td>Estimation numérique que le filtre anti-pourriel a affecté au message. Ces nombres sont affichés en notation scientifique :  1.065e-12 correspond à 1.065 divisé par 10 exposant 12, ce qui dans ce cas est égal à 0.000000000001065.</td></tr>
 </table>
 <p>Le second champ de texte permet d’entrer un « motif » de recherche. Il accepte les 
 <a href="http://fr.wikipedia.org/wiki/Expression_régulière" class="external free" title="http://fr.wikipedia.org/wiki/Expression_régulière" rel="nofollow">expressions régulières</a> qui permettent une grande flexibilité, mais qui sont légèrement plus compliquées à utiliser. Apprenez à les utiliser, celà vous sera utile; les expressions régulières simples ne sont pas <i>trop</i> difficiles à comprendre.</p>
 <p>Avec la liste déroulante en dessous, vous affectez une action lorsque le motif est reconnu. Vous pouvez déplacer ou supprimer un mail, modifier son statut, ou encore définir le compte e-mail avec lequel vous répondrez.</p>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+Notification des nouveaux mails</h3>
+<img src="../images/prefs-images/e-mail-filter-notification.png" alt="e-mail-filter-notification.png" />
+<p>There are several ways you can choose to be notified of newly arrived email. Under <span class="menu">Method</span> you find a number of options that can be combined as well:</p>
+<table summary="notofications" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><span class="menu">none</span></td><td style="width:5px;"> </td>
+		<td>Aucune notification</td></tr>
+	<tr><td><span class="menu">Beep</span></td><td> </td>
+		<td>Joue le fichier son associé à l'événement "New E-mail" ("Nouveau mail") défini dans les préférences <a href="sounds.html">Sons</a> à <i>chaque</i> nouveau mail</td></tr>
+	<tr><td><span class="menu">Alert</span></td><td> </td>
+		<td>Affiche une fenêtre d'alerte pour <i>chaque</i> nouvel e-mail</td></tr>
+	<tr><td><span class="menu">Keyboard LEDs</span></td><td> </td>
+		<td>Clignotement de quelques LED, comme l'indicateur le verrouillage des majuscules</td></tr>
+	<tr><td class="onelinetop"><span class="menu">Central alert</span></td><td> </td>
+		<td>Affiche <i>une</i> fenêtre d'alerte pour l'ensemble des nouveaux mails</td></tr>
+	<tr><td><span class="menu">Central beep</span></td><td> </td>
+		<td>Plays the sound file of the "New E-mail" event set in the <a href="sounds.html">Sounds</a> preferences <i>once</i> for new mail</td></tr>
+	<tr><td><span class="menu">Log window</span></td><td> </td>
+		<td>Shows the log window</td></tr>
+</table>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -179,7 +213,16 @@ Configurer les filtres d'envoi</h3>
 <img src="../images/prefs-images/e-mail-mailbox.png" alt="e-mail-mailbox.png" />
 <p><span class="menu">Edit Mailbox Menu...</span> ouvre le dossier <span class="path">/boot/home/config/Mail/Menu Links/</span>.
 Tous les dossiers ou requêtes placés dans ce dossier apparaîtront dans le menu contextuel de l’icône en forme de boîte aux lettres affichée par le Mail Service dans le cartouche de la Deskbar.</p>
-<p>À partir de ce menu, vous pouvez aussi créer un nouveau message (<span class="menu">Create New Message...</span>), vérifier les nouveaux messages (<span class="menu">Check For Mail Now</span>) ou régler les préférences (<span class="menu">Edit Preferences...</span>).</p>
+<p>À partir de ce menu, vous pouvez aussi créer un nouveau message (<span class="menu">Create new message…</span>), vérifier les nouveaux messages (<span class="menu">Check for mail now</span>) ou régler les préférences (<span class="menu">Preferences…</span>).</p>
+<p>Si vous maintenez enfoncé la touche <span class="key">Maj</span> pendant que vous invoquez le menu contextuel, vous obtenez plus de commandes :</p>
+<table summary="notofications" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><span class="menu">Check for mails only</span></td><td style="width:5px;"> </td>
+		<td>Offre un sous-menu pour ne vérifier l'arrivé de courriers que sur le seul compte spécifié</td></tr>
+	<tr><td><span class="menu">Send pending mails</span></td><td> </td>
+		<td>Permet d'envoyer les mails en attente sans vérifier l'arrivé de nouveaux courriers</td></tr>
+	<tr><td><span class="menu">Shutdown mail services</span></td><td> </td>
+		<td>Arrête tout le système de messagerie (mail_daemon)</td></tr>
+</table>
 <p>L’icône elle-même indique si des messages sont non lus (statut « New ») en affichant une enveloppe dans la boîte.</p>
 
 </div>

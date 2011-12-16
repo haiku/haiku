@@ -374,7 +374,9 @@ DwarfTypeFactory::_CreateTypeInternal(const BString& name,
 		case DW_TAG_union_type:
 		case DW_TAG_interface_type:
 			return _CreateCompoundType(name,
-				dynamic_cast<DIECompoundType*>(typeEntry), _type);
+				dynamic_cast<DIECompoundType*>(typeEntry),
+				(compound_type_kind)dwarf_tag_to_subtype_kind(
+					typeEntry->Tag()), _type);
 
 		case DW_TAG_base_type:
 			return _CreatePrimitiveType(name,
@@ -451,14 +453,14 @@ DwarfTypeFactory::_CreateTypeInternal(const BString& name,
 
 status_t
 DwarfTypeFactory::_CreateCompoundType(const BString& name,
-	DIECompoundType* typeEntry, DwarfType*& _type)
+	DIECompoundType* typeEntry, compound_type_kind compoundKind, DwarfType*& _type)
 {
-	TRACE_LOCALS("DwarfTypeFactory::_CreateCompoundType(\"%s\", %p)\n",
-		name.String(), typeEntry);
+	TRACE_LOCALS("DwarfTypeFactory::_CreateCompoundType(\"%s\", %p, %d)\n",
+		name.String(), typeEntry, compoundKind);
 
 	// create the type
 	DwarfCompoundType* type = new(std::nothrow) DwarfCompoundType(fTypeContext,
-		name, typeEntry);
+		name, typeEntry, compoundKind);
 	if (type == NULL)
 		return B_NO_MEMORY;
 	BReference<DwarfCompoundType> typeReference(type, true);

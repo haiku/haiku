@@ -4,7 +4,11 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <Catalog.h>
+#include <IconUtils.h>
+#include <MailDaemon.h>
+#include <Roster.h>
 
 #include "Notifier.h"
 
@@ -14,12 +18,17 @@
 
 
 DefaultNotifier::DefaultNotifier(const char* accountName, bool inbound,
-	ErrorLogWindow* errorWindow, MailStatusWindow* statusWindow)
+	ErrorLogWindow* errorWindow, uint32& showMode)
 	:
 	fAccountName(accountName),
 	fIsInbound(inbound),
 	fErrorWindow(errorWindow),
-	fStatusWindow(statusWindow)
+	fNotification(B_PROGRESS_NOTIFICATION),
+	fShowMode(showMode),
+	fTotalItems(0),
+	fItemsDone(0),
+	fTotalSize(0),
+	fSizeDone(0)
 {
 	BString desc;
 	if (fIsInbound == true)
@@ -28,27 +37,32 @@ DefaultNotifier::DefaultNotifier(const char* accountName, bool inbound,
 		desc << B_TRANSLATE("Sending mail for %name");
     desc.ReplaceFirst("%name", fAccountName);
 
-	fStatusWindow->Lock();
-	fStatusView = fStatusWindow->NewStatusView(desc, fIsInbound != false);
-	fStatusWindow->Unlock();
+	BString identifier;
+	identifier << accountName << inbound;
+		// Two windows for each acocunt : one for sending and the other for
+		// receiving mails
+	fNotification.SetMessageID(identifier);
+	fNotification.SetGroup(B_TRANSLATE("Mail status"));
+	fNotification.SetTitle(desc);
+
+	app_info info;
+	be_roster->GetAppInfo(B_MAIL_DAEMON_SIGNATURE, &info);
+	BBitmap icon(BRect(0, 0, 32, 32), B_RGBA32);
+	BNode node(&info.ref);
+	BIconUtils::GetVectorIcon(&node, "BEOS:ICON", &icon);
+	fNotification.SetIcon(&icon);
 }
 
 
 DefaultNotifier::~DefaultNotifier()
 {
-	fStatusWindow->Lock();
-    if (fStatusView->Window())
-		fStatusWindow->RemoveView(fStatusView);
-	delete fStatusView;
-	fStatusWindow->Unlock();
 }
 
 
 MailNotifier*
 DefaultNotifier::Clone()
 {
-	return new DefaultNotifier(fAccountName, fIsInbound, fErrorWindow,
-		fStatusWindow);
+	return new DefaultNotifier(fAccountName, fIsInbound, fErrorWindow, fShowMode);
 }
 
 
@@ -69,38 +83,65 @@ DefaultNotifier::ShowMessage(const char* message)
 void
 DefaultNotifier::SetTotalItems(int32 items)
 {
-	fStatusView->SetTotalItems(items);
+	fTotalItems = items;
+	BString progress;
+	progress << fItemsDone << "/" << fTotalItems;
+	fNotification.SetContent(progress);
 }
 
 
 void
 DefaultNotifier::SetTotalItemsSize(int32 size)
 {
-	fStatusView->SetMaximum(size);
+	fTotalSize = size;
+	fNotification.SetProgress(fSizeDone / (float)fTotalSize);
 }
 
 
 void
 DefaultNotifier::ReportProgress(int bytes, int messages, const char* message)
 {
-	if (bytes != 0)
-		fStatusView->AddProgress(bytes);
+	fSizeDone += bytes;
+	if (fTotalSize > 0)
+		fNotification.SetProgress(fSizeDone / (float)fTotalSize);
+	else if (fTotalItems > 0) {
+		// No size information available
+		// Report progress in terms of message count instead
+		
+		fNotification.SetProgress(fItemsDone / (float)fTotalItems);
+	} else {
+		// No message count information either
+		// TODO we should use a B_INFORMATION_NOTIFICATION here, but it is not
+		// possible to change the BNotification type after creating it...
+		fNotification.SetProgress(0);
+	}
 
-	for (int i = 0; i < messages; i++)
-		fStatusView->AddItem();
+	fItemsDone += messages;
 
-	if (message != NULL)
-		fStatusView->SetMessage(message);
+	BString progress;
 
-	if (fStatusView->ItemsNow() == fStatusView->CountTotalItems())
-		fStatusView->Reset();
+	progress << message << "\t";
+
+	if (fTotalItems > 0)
+		progress << fItemsDone << "/" << fTotalItems;
+
+	fNotification.SetContent(progress);
+
+	int timeout = 0; // Default timeout
+	if (fItemsDone == fTotalItems && fTotalItems != 0)
+		timeout = 1; // We're done, make the window go away faster
+
+	if ((!fIsInbound && fShowMode | B_MAIL_SHOW_STATUS_WINDOW_WHEN_SENDING)
+		|| (fIsInbound && fShowMode | B_MAIL_SHOW_STATUS_WINDOW_WHEN_ACTIVE))
+		fNotification.Send(timeout);
 }
 
 
 void
 DefaultNotifier::ResetProgress(const char* message)
 {
-	fStatusView->Reset();
+	fNotification.SetProgress(0);
 	if (message != NULL)
-		fStatusView->SetMessage(message);
+		fNotification.SetTitle(message);
+	fNotification.Send(0);
 }

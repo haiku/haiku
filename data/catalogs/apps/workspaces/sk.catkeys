@@ -1,13 +1,15 @@
-1	slovak	x-vnd.Be-WORK	3592128290
-About Workspaces…	Workspaces		O Pracovných plochách
-Always on top	Workspaces		Vždy na vrchu
-Auto-raise	Workspaces		Automaticky aktivovať
-Change workspace count…	Workspaces		Zmeniť počet pracovných plôch...
+1	slovak	x-vnd.Be-WORK	2548258861
 Invalid argument: %s\n	Workspaces		Neplatný argument: %s\n
-OK	Workspaces		OK
 Quit	Workspaces		Ukončiť
-Show window border	Workspaces		Zobraziť okraj okna
-Show window tab	Workspaces		Zobraziť záložku okna
-Usage: %s [options] [workspace]\nwhere \"options\" is one of:\n  --notitle\t\ttitle bar removed.  border and resize kept.\n  --noborder\t\ttitle, border, and resize removed.\n  --avoidfocus\t\tprevents the window from being the target of keyboard events.\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen corner\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Použitie: %s [voľby] [plocha]\n, kde „voľby“ sú jedným z:\n --notitle\t\tOdstránený titulný pruh. Okraj a zmena veľkosti ponechané.\n --noborder\t\tOdstránený titulný pruh, okraj a zmena veľkosti.\n --avoidfocus\t\tZabraňuje oknu, aby bolo cieľom udalostí z klávesnice.\n --alwaysontop\t\tUdržiava okno na vrchu.\n --notmovable\t\tOkno nie je možné presúvať.\n --autoraise\t\tAutomaticky aktivovať okno pracovnej plochy, keď je na okraji obrazovky.\n --help\t\tZobraziť tohto Pomocníka a skončiť.\na „plocha“ je číslo Pracovnej plochy, na ktorú sa prepnúť (0-31)\n
 Workspaces	System name		Pracovné plochy
+Change workspace count…	Workspaces		Zmeniť počet pracovných plôch…
+Remove replicant	Workspaces		Odstrániť replikanta
+About Workspaces…	Workspaces		O Pracovných plochách…
 Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Pracovné plochy\nnapísali %1 a %2.\n\nCopyright %3, Haiku.\n\nPosielanie okien do pozadia pomocou klávesu Option. Presúvanie okien do popredia pomocou klávesu Control.\n
+Show window border	Workspaces		Zobraziť okraj okna
+Auto-raise	Workspaces		Automaticky aktivovať
+OK	Workspaces		OK
+Always on top	Workspaces		Vždy na vrchu
+Live in the Deskbar	Workspaces		Prebývať v Paneli
+Show window tab	Workspaces		Zobraziť záložku okna
+Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Použitie: %s [voľby] [pracovná_plocha]\nkde „voľby“ sú:\n  --notitle\t \t odstránený titulný pruh, ponechaný okraj a zmena veľkosti\n  --noborder\t \t odstránený titulný pruh, okraj a zmena veľkosti\n  --avoidfocus\t \t zabráni, aby bolo okno cieľom udalostí klávesnice\n  --alwaysontop\t \t bude udržiavať okno na vrchu\n  --notmovable\t \t oknom nemožno pohybovať\n  --autoraise\t \t automaticky presunúť okno na vrch pracovnej plochy keď je na okraji obrazovky\n  --help\t \t vypísať tohto pomocníka a skončiť\na „pracovná_plocha“ je číslo Pracovnej plochy, na ktorú sa má prepnúť (0-31)\n

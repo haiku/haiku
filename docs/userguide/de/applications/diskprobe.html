@@ -12,6 +12,7 @@
  * Translators:
  *		Matthias
  *		Humdinger
+ *		taos
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -39,6 +40,8 @@
 <li><a href="../../uk/applications/diskprobe.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/applications/diskprobe.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/applications/diskprobe.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/diskprobe.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/diskprobe.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/applications/diskprobe.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -51,23 +54,23 @@
 <div id="content">
 <div>
 
-<h2><img src="../../images/apps-images/diskprobe-icon_64.png" alt="diskprobe-icon_64.png" width="64" height="64" />DiskProbe</h2>
+<h2><img src="../../images/apps-images/diskprobe-icon_64.png" alt="diskprobe-icon_64.png" width="64" height="64" /><acronym title="DiskProbe">Hex-Editor</acronym></h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
-<tr><td>Ort:</td><td></td><td><span class="path">/boot/system/apps/DiskProbe</span></td></tr>
-<tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/DiskProbe_data</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu"><acronym title="Applications">Anwendungen</acronym></span></td></tr>
+<tr><td>Ort:</td><td></td><td><span class="path"><acronym title="/boot/system/apps/DiskProbe">/boot/System/apps/Hex-Editor</acronym></span></td></tr>
+<tr><td>Einstellungen:</td><td></td><td><span class="path"><acronym title="~/config/settings/DiskProbe_data">~/Konfiguration/settings/DiskProbe_data</acronym></span></td></tr>
 </table>
 <p><br /></p>
-<p>DiskProbe ist ein HEX-Editor zum Anzeigen und Bearbeiten von Daten in Dateien oder auch direkt auf dem Datenträger. Es ist ein Tool, das wirklich auf unterster Ebene ansetzt. Dadurch kann eine unbedachte Änderung natürlich viel zerstören!</p>
-<div class="box-warning">Man sollte mit DiskProbe immer mit einer Kopie der zu ändernden Datei arbeiten und besondere Vorsicht walten lassen, wenn man direkt in einer Partition Daten ändert!</div>
-<p>Beim Start von DiskProbe wählt man zuerst, ob mit einer Datei oder einer Partition gearbeitet werden soll. Danach erscheint dieses Programmfenster:</p>
+<p>Der <acronym title="DiskProbe">Hex-Editor</acronym> dient zum Anzeigen und Bearbeiten von Daten in Dateien oder auch direkt auf dem Datenträger. Es ist ein Tool, das wirklich auf unterster Ebene ansetzt. Dadurch kann eine unbedachte Änderung natürlich viel zerstören!</p>
+<div class="box-warning">Man sollte mit <acronym title="DiskProbe">Hex-Editor</acronym> immer mit einer Kopie der zu ändernden Datei arbeiten und besondere Vorsicht walten lassen, wenn man direkt in einer Partition Daten ändert!</div>
+<p>Beim Start von <acronym title="DiskProbe">Hex-Editor</acronym> wählt man zuerst, ob mit einer Datei oder einer Partition gearbeitet werden soll. Danach erscheint dieses Programmfenster:</p>
 <p><img id="diskprobe" src="../images/apps-images/diskprobe.png" alt="diskprobe.png" /></p>
-<p>Es wird immer ein Datenblock angezeigt, dessen Größe über <span class="menu">View | BlockSize</span> angepasst werden kann. Am linken Rand ist der Abstand zum Blockbeginn zu sehen, in der Mitte die Daten als HEX-Werte und rechts dasselbe als ASCII-Zeichen.<br />
+<p>Es wird immer ein Datenblock angezeigt, dessen Größe über <span class="menu">Ansicht | Blockgröße</span> angepasst werden kann. Am linken Rand ist der Abstand zum Blockbeginn zu sehen, in der Mitte die Daten als HEX-Werte und rechts dasselbe als ASCII-Zeichen.<br />
 Von Datenblock zu Datenblock kann mit dem Schieberegler, oder durch <span class="key">ALT</span> <span class="key">←</span> und <span class="key">ALT</span> <span class="key">→</span> gesprungen werden. Zwischen HEX- und ASCII-Spalte wird mit <span class="key">TAB</span> gewechselt.</p>
-<p>Das Menü <span class="menu">Block | Selection</span> zeigt die momentane Auswahl nicht nur in beiden Endian-Formaten (und in HEX oder Dezimal, je nach Einstellung mit <span class="menu">View | Base</span>), es interpretiert die Auswahl auch als anspringbaren Block-Offset. Es erscheint ausgegraut, falls diese Position außerhalb der Datei oder des Datenträgers liegt.<br />
+<p>Das Menü <span class="menu">Block | Auswahl</span> zeigt die momentane Auswahl nicht nur in beiden Endian-Formaten (und in HEX oder Dezimal, je nach Einstellung mit <span class="menu">Ansicht | Basis</span>), es interpretiert die Auswahl auch als anspringbaren Block-Offset. Es erscheint ausgegraut, falls diese Position außerhalb der Datei oder des Datenträgers liegt.<br />
 Dieses Feature ist besonders hilfreich beim Untersuchen von Dateisystemen, weil diese oft Zeiger auf andere Blöcke enthalten.</p>
-<p>Wenn die bearbeitete Datei Attribute enthält, kann über das <span class="menu">Attributes</span> Menü ein spezielles DiskProbe-Fenster geöffnet werden. Als Beispiel, hier das Copyright-Attribut der Anwendung <span class="app">AboutSystem</span>:</p><p><img id="diskprobe-attribute" src="../images/apps-images/diskprobe-about-attr.png" alt="diskprobe-about-attr.png" /></p>
-<p>Je nach Art von Attribut, erhält man neben dem <i>Raw Editor</i> unterschiedliche Editor-Reiter. So gibt es einen Editor für Text, MIME-Typen und einen Betrachter für das Icon.</p>
+<p>Wenn die bearbeitete Datei Attribute enthält, kann über das Menü <span class="menu">Attribute</span> ein spezielles DiskProbe-Fenster geöffnet werden. Als Beispiel, hier das Copyright-Attribut der Anwendung <span class="app"><acronym title="AboutSystem">Über Haiku</acronym></span>:</p><p><img id="diskprobe-attribute" src="../images/apps-images/diskprobe-about-attr.png" alt="diskprobe-about-attr.png" /></p>
+<p>Je nach Art von Attribut, erhält man neben dem <i>Raw-Editor</i> unterschiedliche Editor-Reiter. So gibt es einen Editor für Text, MIME-Typen und einen Betrachter für das Icon.</p>
 </div>
 </div>
 

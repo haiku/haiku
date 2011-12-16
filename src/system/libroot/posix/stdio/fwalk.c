@@ -40,6 +40,9 @@ static char rcsid[] = "$OpenBSD: fwalk.c,v 1.3 2001/07/09 06:57:44 deraadt Exp $
 
 #include <errno.h>
 #include <stdio.h>
+
+#include <errno_private.h>
+
 #include "local.h"
 #include "glue.h"
 

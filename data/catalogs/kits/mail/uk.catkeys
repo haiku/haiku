@@ -5,6 +5,6 @@ Login type:	ProtocolConfigView		Тип логування:
 Mail server:	ProtocolConfigView		Поштовий сервер:
 Partially download messages larger than	ProtocolConfigView		Завантажувати частково повідомлення більші ніж
 Password:	ProtocolConfigView		Гасло:
-Remove mail from server when deleted	ProtocolConfigView		Видалити пошту з серверу після знищення
+Remove mail from server when deleted	ProtocolConfigView		Видалити пошту з серверу після зкачування
 Select…	MailKit		Вибрати…
 Username:	ProtocolConfigView		Користувач:

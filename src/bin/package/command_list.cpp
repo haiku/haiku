@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include <package/hpkg/PackageContentHandler.h>
 #include <package/hpkg/PackageEntry.h>
@@ -44,7 +45,7 @@ struct PackageContentListHandler : BPackageContentHandler {
 
 		// name and size
 		printf("%-*s", indentation < 32 ? 32 - indentation : 0, entry->Name());
-		printf("  %8llu", entry->Data().UncompressedSize());
+		printf("  %8llu", (unsigned long long)entry->Data().UncompressedSize());
 
 		// time
 		struct tm* time = localtime(&entry->ModifiedTime().tv_sec);
@@ -88,7 +89,8 @@ struct PackageContentListHandler : BPackageContentHandler {
 		int indentation = fLevel * 2;
 		printf("%*s<", indentation, "");
 		printf("%-*s  %8llu", indentation < 31 ? 31 - indentation : 0,
-			attribute->Name(), attribute->Data().UncompressedSize());
+			attribute->Name(),
+			(unsigned long long)attribute->Data().UncompressedSize());
 
 		uint32 type = attribute->Type();
 		if (isprint(type & 0xff) && isprint((type >> 8) & 0xff)
@@ -96,7 +98,7 @@ struct PackageContentListHandler : BPackageContentHandler {
 			printf("  '%c%c%c%c'", int(type >> 24), int((type >> 16) & 0xff),
 				int((type >> 8) & 0xff), int(type & 0xff));
 		} else
-			printf("  %#lx", type);
+			printf("  %#" B_PRIx32, type);
 
 		printf(">\n");
 		return B_OK;
@@ -149,9 +151,9 @@ struct PackageContentListHandler : BPackageContentHandler {
 				break;
 
 			case B_PACKAGE_INFO_VERSION:
-				printf("\tversion: %s.%s.%s-%d\n", value.version.major,
-					value.version.minor, value.version.micro,
-					value.version.release);
+				printf("\tversion: ");
+				_PrintPackageVersion(value.version);
+				printf("\n");
 				break;
 
 			case B_PACKAGE_INFO_COPYRIGHTS:
@@ -162,11 +164,24 @@ struct PackageContentListHandler : BPackageContentHandler {
 				printf("\tlicense: %s\n", value.string);
 				break;
 
+			case B_PACKAGE_INFO_URLS:
+				printf("\tURL: %s\n", value.string);
+				break;
+
+			case B_PACKAGE_INFO_SOURCE_URLS:
+				printf("\tsource URL: %s\n", value.string);
+				break;
+
 			case B_PACKAGE_INFO_PROVIDES:
 				printf("\tprovides: %s", value.resolvable.name);
 				if (value.resolvable.haveVersion) {
 					printf(" = ");
 					_PrintPackageVersion(value.resolvable.version);
+				}
+				if (value.resolvable.haveCompatibleVersion) {
+					printf(" (compatible >= ");
+					_PrintPackageVersion(value.resolvable.compatibleVersion);
+					printf(")");
 				}
 				printf("\n");
 				break;
@@ -215,6 +230,10 @@ struct PackageContentListHandler : BPackageContentHandler {
 				printf("\treplaces: %s\n", value.string);
 				break;
 
+			case B_PACKAGE_INFO_INSTALL_PATH:
+				printf("\tinstall path: %s\n", value.string);
+				break;
+
 			default:
 				printf(
 					"*** Invalid package attribute section: unexpected "
@@ -251,6 +270,8 @@ private:
 			printf(".%s", version.minor);
 		if (version.micro != NULL && version.micro[0] != '\0')
 			printf(".%s", version.micro);
+		if (version.preRelease != NULL && version.preRelease[0] != '\0')
+			printf("-%s", version.preRelease);
 		if (version.release > 0)
 			printf("-%d", version.release);
 	}

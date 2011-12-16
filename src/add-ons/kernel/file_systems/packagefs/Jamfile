@@ -3,29 +3,56 @@ SubDir HAIKU_TOP src add-ons kernel file_systems packagefs ;
 
 UseLibraryHeaders zlib ;
 UsePrivateKernelHeaders ;
-UsePrivateHeaders shared ;
-
-DEFINES += B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT ;
-	# TODO: Remove when it is complete!
+UsePrivateHeaders shared storage ;
 
 
 HAIKU_PACKAGE_FS_SOURCES =
+	AttributeCookie.cpp
+	AttributeDirectoryCookie.cpp
+	AttributeIndex.cpp
+	AutoPackageAttributes.cpp
 	BlockBufferCacheKernel.cpp
 	DebugSupport.cpp
+	Dependency.cpp
 	Directory.cpp
+	EmptyAttributeDirectoryCookie.cpp
 	GlobalFactory.cpp
+	Index.cpp
+	IndexedAttributeOwner.cpp
 	kernel_interface.cpp
-	LeafNode.cpp
+	LastModifiedIndex.cpp
+	NameIndex.cpp
 	Node.cpp
+	NodeListener.cpp
+	OldUnpackingNodeAttributes.cpp
+	Query.cpp
 	Package.cpp
 	PackageDirectory.cpp
 	PackageDomain.cpp
 	PackageFile.cpp
+	PackageFSRoot.cpp
 	PackageLeafNode.cpp
+	PackageLinkDirectory.cpp
+	PackageLinksDirectory.cpp
+	PackageLinksListener.cpp
+	PackageLinkSymlink.cpp
 	PackageNode.cpp
 	PackageNodeAttribute.cpp
 	PackageSymlink.cpp
+	Resolvable.cpp
+	ResolvableFamily.cpp
+	SizeIndex.cpp
+	UnpackingAttributeCookie.cpp
+	UnpackingAttributeDirectoryCookie.cpp
+	UnpackingDirectory.cpp
+	UnpackingLeafNode.cpp
+	UnpackingNode.cpp
+	Version.cpp
 	Volume.cpp
+;
+
+HAIKU_PACKAGE_FS_SHARED_SOURCES =
+	QueryParserUtils.cpp
 ;
 
 HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES =
@@ -35,6 +62,7 @@ HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES =
 	DataOutput.cpp
 	DataReader.cpp
 	ErrorOutput.cpp
+	FDDataReader.cpp
 	PackageContentHandler.cpp
 	PackageData.cpp
 	PackageDataReader.cpp
@@ -49,16 +77,28 @@ HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES =
 ;
 
 
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
+local libSharedSources =
+	NaturalCompare.cpp
+;
 
 
 KernelAddon packagefs
 	:
 	$(HAIKU_PACKAGE_FS_SOURCES)
+	$(HAIKU_PACKAGE_FS_SHARED_SOURCES)
 	$(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES)
+	$(libSharedSources)
 
 	: $(HAIKU_STATIC_LIBSUPC++) libz.a
 ;
+
+
+SEARCH on [ FGristFiles $(HAIKU_PACKAGE_FS_SHARED_SOURCES) ]
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
+SEARCH on [ FGristFiles $(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES) ]
+	+= [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
+SEARCH on [ FGristFiles $(libSharedSources) ]
+	+= [ FDirName $(HAIKU_TOP) src kits shared ] ;
 
 
 HaikuSubInclude userland ;

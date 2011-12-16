@@ -68,16 +68,14 @@ BALMLayout::~BALMLayout()
  *
  * @return the new x-tab
  */
-XTab*
+BReference<XTab>
 BALMLayout::AddXTab()
 {
-	XTab* tab = new(std::nothrow) XTab(fSolver);
+	BReference<XTab> tab(new(std::nothrow) XTab(this), true);
 	if (!tab)
 		return NULL;
-	if (!fSolver->AddVariable(tab)) {
-		delete tab;
+	if (!fSolver->AddVariable(tab))
 		return NULL;
-	}
 
 	fXTabList.AddItem(tab);
 	return tab;
@@ -89,16 +87,14 @@ BALMLayout::AddXTab()
  *
  * @return the new y-tab
  */
-YTab*
+BReference<YTab>
 BALMLayout::AddYTab()
 {
-	YTab* tab = new(std::nothrow) YTab(fSolver);
-	if (!tab)
+	BReference<YTab> tab(new(std::nothrow) YTab(this), true);
+	if (tab.Get() == NULL)
 		return NULL;
-	if (!fSolver->AddVariable(tab)) {
-		delete tab;
+	if (!fSolver->AddVariable(tab))
 		return NULL;
-	}
 
 	fYTabList.AddItem(tab);
 	return tab;
@@ -133,6 +129,45 @@ BALMLayout::YTabAt(int32 index) const
 }
 
 
+int
+CompareXTabFunc(const XTab* tab1, const XTab* tab2)
+{
+	if (tab1->Value() < tab2->Value())
+		return -1;
+	else if (tab1->Value() == tab2->Value())
+		return 0;
+	return 1;
+}
+
+
+int
+CompareYTabFunc(const YTab* tab1, const YTab* tab2)
+{
+	if (tab1->Value() < tab2->Value())
+		return -1;
+	else if (tab1->Value() == tab2->Value())
+		return 0;
+	return 1;
+}
+
+
+
+const XTabList&
+BALMLayout::OrderedXTabs()
+{
+	fXTabList.SortItems(CompareXTabFunc);
+	return fXTabList;
+}
+
+
+const YTabList&
+BALMLayout::OrderedYTabs()
+{
+	fYTabList.SortItems(CompareYTabFunc);
+	return fYTabList;
+}
+
+
 /**
  * Adds a new row to the specification that is glued to the given y-tabs.
  *
@@ -141,11 +176,13 @@ BALMLayout::YTabAt(int32 index) const
  * @return the new row
  */
 Row*
-BALMLayout::AddRow(YTab* top, YTab* bottom)
+BALMLayout::AddRow(YTab* _top, YTab* _bottom)
 {
-	if (top == NULL)
+	BReference<YTab> top = _top;
+	BReference<YTab> bottom = _bottom;
+	if (_top == NULL)
 		top = AddYTab();
-	if (bottom == NULL)
+	if (_bottom == NULL)
 		bottom = AddYTab();
 	return new(std::nothrow) Row(fSolver, top, bottom);
 }
@@ -159,11 +196,13 @@ BALMLayout::AddRow(YTab* top, YTab* bottom)
  * @return the new column
  */
 Column*
-BALMLayout::AddColumn(XTab* left, XTab* right)
+BALMLayout::AddColumn(XTab* _left, XTab* _right)
 {
-	if (left == NULL)
+	BReference<XTab> left = _left;
+	BReference<XTab> right = _right;
+	if (_left == NULL)
 		left = AddXTab();
-	if (right == NULL)
+	if (_right == NULL)
 		right = AddXTab();
 	return new(std::nothrow) Column(fSolver, left, right);
 }
@@ -319,13 +358,13 @@ void
 BALMLayout::BuildLayout(GroupItem& item, XTab* left, YTab* top, XTab* right,
 	YTab* bottom)
 {
-	if (!left)
+	if (left == NULL)
 		left = Left();
-	if (!top)
+	if (top == NULL)
 		top = Top();
-	if (!right)
+	if (right == NULL)
 		right = Right();
-	if (!bottom)
+	if (bottom == NULL)
 		bottom = Bottom();
 
 	_ParseGroupItem(item, left, top, right, bottom);
@@ -333,8 +372,8 @@ BALMLayout::BuildLayout(GroupItem& item, XTab* left, YTab* top, XTab* right,
 
 
 void
-BALMLayout::_ParseGroupItem(GroupItem& item, XTab* left, YTab* top, XTab* right,
-	YTab* bottom)
+BALMLayout::_ParseGroupItem(GroupItem& item, BReference<XTab> left,
+	BReference<YTab> top, BReference<XTab> right, BReference<YTab> bottom)
 {
 	if (item.LayoutItem())
 		AddItem(item.LayoutItem(), left, top, right, bottom);
@@ -346,14 +385,14 @@ BALMLayout::_ParseGroupItem(GroupItem& item, XTab* left, YTab* top, XTab* right,
 			GroupItem& current = const_cast<GroupItem&>(
 				item.GroupItems()[i]);
 			if (item.Orientation() == B_HORIZONTAL) {
-				XTab* r = (i == item.GroupItems().size() - 1) ? right
+				BReference<XTab> r = (i == item.GroupItems().size() - 1) ? right
 					: AddXTab();
 				_ParseGroupItem(current, left, top, r, bottom);
 				left = r;
 			}
 			else {
-				YTab* b = (i == item.GroupItems().size() - 1) ? bottom
-					: AddYTab();
+				BReference<YTab> b = (i == item.GroupItems().size() - 1)
+					? bottom : AddYTab();
 				_ParseGroupItem(current, left, top, right, b);
 				top = b;
 			}
@@ -510,12 +549,14 @@ BALMLayout::AddItem(int32 index, BLayoutItem* item)
 
 
 Area*
-BALMLayout::AddItem(BLayoutItem* item, XTab* left, YTab* top, XTab* right,
-	YTab* bottom)
+BALMLayout::AddItem(BLayoutItem* item, XTab* left, YTab* top, XTab* _right,
+	YTab* _bottom)
 {
-	if (!right)
+	BReference<XTab> right = _right;
+	if (right.Get() == NULL)
 		right = AddXTab();
-	if (!bottom)
+	BReference<YTab> bottom = _bottom;
+	if (bottom.Get() == NULL)
 		bottom = AddYTab();
 
 	// Area is added int ItemAdded
@@ -551,14 +592,15 @@ BALMLayout::AddItem(BLayoutItem* item, Row* row, Column* column)
 
 
 Area*
-BALMLayout::AddItemToRight(BLayoutItem* item, XTab* right, YTab* top,
+BALMLayout::AddItemToRight(BLayoutItem* item, XTab* _right, YTab* top,
 	YTab* bottom)
 {
 	if (fCurrentArea == NULL)
 		return NULL;
 
 	XTab* left = fCurrentArea->Right();
-	if (!right)
+	BReference<XTab> right = _right;
+	if (_right == NULL)
 		right = AddXTab();
 	if (!top)
 		top = fCurrentArea->Top();
@@ -570,13 +612,14 @@ BALMLayout::AddItemToRight(BLayoutItem* item, XTab* right, YTab* top,
 
 
 Area*
-BALMLayout::AddItemToLeft(BLayoutItem* item, XTab* left, YTab* top,
+BALMLayout::AddItemToLeft(BLayoutItem* item, XTab* _left, YTab* top,
 	YTab* bottom)
 {
 	if (fCurrentArea == NULL)
 		return NULL;
 
-	if (!left)
+	BReference<XTab> left = _left;
+	if (_left == NULL)
 		left = AddXTab();
 	XTab* right = fCurrentArea->Left();
 	if (!top)
@@ -589,7 +632,7 @@ BALMLayout::AddItemToLeft(BLayoutItem* item, XTab* left, YTab* top,
 
 
 Area*
-BALMLayout::AddItemToTop(BLayoutItem* item, YTab* top, XTab* left, XTab* right)
+BALMLayout::AddItemToTop(BLayoutItem* item, YTab* _top, XTab* left, XTab* right)
 {
 	if (fCurrentArea == NULL)
 		return NULL;
@@ -598,7 +641,8 @@ BALMLayout::AddItemToTop(BLayoutItem* item, YTab* top, XTab* left, XTab* right)
 		left = fCurrentArea->Left();
 	if (!right)
 		right = fCurrentArea->Right();
-	if (!top)
+	BReference<YTab> top = _top;
+	if (_top == NULL)
 		top = AddYTab();
 	YTab* bottom = fCurrentArea->Top();
 
@@ -607,7 +651,7 @@ BALMLayout::AddItemToTop(BLayoutItem* item, YTab* top, XTab* left, XTab* right)
 
 
 Area*
-BALMLayout::AddItemToBottom(BLayoutItem* item, YTab* bottom, XTab* left,
+BALMLayout::AddItemToBottom(BLayoutItem* item, YTab* _bottom, XTab* left,
 	XTab* right)
 {
 	if (fCurrentArea == NULL)
@@ -618,7 +662,8 @@ BALMLayout::AddItemToBottom(BLayoutItem* item, YTab* bottom, XTab* left,
 	if (!right)
 		right = fCurrentArea->Right();
 	YTab* top = fCurrentArea->Bottom();
-	if (!bottom)
+	BReference<YTab> bottom = _bottom;
+	if (_bottom == NULL)
 		bottom = AddYTab();
 
 	return AddItem(item, left, top, right, bottom);
@@ -852,6 +897,9 @@ BALMLayout::_CalculateMinSize()
 {
 	_UpdateAreaConstraints();
 
+	Right()->SetRange(0, 20000);
+	Bottom()->SetRange(0, 20000);
+
 	return fSolver->MinSize(Right(), Bottom());
 }
 
@@ -864,6 +912,9 @@ BALMLayout::_CalculateMaxSize()
 {
 	_UpdateAreaConstraints();
 
+	Right()->SetRange(0, 20000);
+	Bottom()->SetRange(0, 20000);
+
 	return fSolver->MaxSize(Right(), Bottom());
 }
 
@@ -875,6 +926,9 @@ BSize
 BALMLayout::_CalculatePreferredSize()
 {
 	_UpdateAreaConstraints();
+
+	Right()->SetRange(0, 20000);
+	Bottom()->SetRange(0, 20000);
 
 	fSolver->Solve();
 	if (fSolver->Result() != kOptimal) {

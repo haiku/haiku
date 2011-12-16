@@ -94,17 +94,30 @@ Architecture::InitRegisterRules(CfaContext& context) const
 status_t
 Architecture::CreateStackTrace(Team* team,
 	ImageDebugInfoProvider* imageInfoProvider, CpuState* cpuState,
-	StackTrace*& _stackTrace)
+	StackTrace*& _stackTrace, int32 maxStackDepth, bool useExistingTrace)
 {
 	BReference<CpuState> cpuStateReference(cpuState);
 
-	// create the object
-	StackTrace* stackTrace = new(std::nothrow) StackTrace;
-	if (stackTrace == NULL)
-		return B_NO_MEMORY;
-	ObjectDeleter<StackTrace> stackTraceDeleter(stackTrace);
-
+	StackTrace* stackTrace = NULL;
+	ObjectDeleter<StackTrace> stackTraceDeleter;
 	StackFrame* frame = NULL;
+
+	if (useExistingTrace)
+		stackTrace = _stackTrace;
+	else {
+		// create the object
+		stackTrace = new(std::nothrow) StackTrace;
+		if (stackTrace == NULL)
+			return B_NO_MEMORY;
+		stackTraceDeleter.SetTo(stackTrace);
+	}
+
+	// if we're passed an already existing partial stack trace,
+	// attempt to continue building it from where it left off.
+	if (stackTrace->CountFrames() > 0) {
+		frame = stackTrace->FrameAt(stackTrace->CountFrames() - 1);
+		cpuState = frame->GetCpuState();
+	}
 
 	while (cpuState != NULL) {
 		// get the instruction pointer
@@ -169,11 +182,15 @@ Architecture::CreateStackTrace(Team* team,
 		previousFrame->SetImage(image);
 		previousFrame->SetFunction(function);
 
-		if (!stackTrace->AddFrame(previousFrame))
+		if (!stackTrace->AddFrame(previousFrame)) {
+			delete previousFrame;
 			return B_NO_MEMORY;
+		}
 
 		frame = previousFrame;
 		cpuState = previousCpuState;
+		if (--maxStackDepth == 0)
+			break;
 	}
 
 	stackTraceDeleter.Detach();

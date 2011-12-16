@@ -1,27 +1,27 @@
 1	belarusian	x-vnd.Haiku.TV	1995288111
-Always on top	MainWin		Заўседы ў фокусе
+TV	MainWin		Тэлевізар
 Channel	MainWin		Канал
-DVB - Digital Video Broadcasting TV	MainWin		DVB - Лічбавае тэлебачанне
-Debug	MainWin		Адладка
-Error, connecting to interface failed:\n\n	MainWin		Памылка, далучыцца да інтэрфейсу не ўдалося:\n\n
-Error, interface is busy:\n\n	MainWin		Памылка, інтэрфейс заняты:\n\n
-Full screen	MainWin		Поўны экран
+Settings…	MainWin		Наладкі...
 Interface	MainWin		Інтэрфейс
 Keep aspect ratio	MainWin		Захоўваць суадносіны бакоў
-Next channel	MainWin		Наступны канал
-No border	MainWin		Няма мяжы
-No menu	MainWin		Няма меню
-None	MainWin		Няма
-OK	MainWin		ОК
 Previous channel	MainWin		Папярэдні канал
-Quit	MainWin		Выйсці
-Scale to native size	MainWin		Расцягнуць да роднага памеру
 Settings	MainWin		Наладкі
-Settings…	MainWin		Наладкі...
-TV	MainWin		Тэлевізар
 TV	System name		Тэлевізар
-force 544 x 576, display aspect 4:3	MainWin		прымусовыя 544 x 576 (4:3)
-force 704 x 576, display aspect 4:3	MainWin		прымусовыя 704 x 576 (4:3)
-force 720 x 576, display aspect 4:3	MainWin		прымусовыя 544 x 576 (4:3)
-pixel aspect ratio	MainWin		суадносіны бакоў для пікселяў
+No border	MainWin		Няма мяжы
+Always on top	MainWin		Заўседы ў фокусе
+OK	MainWin		ОК
+Quit	MainWin		Выйсці
+Full screen	MainWin		Поўны экран
+Debug	MainWin		Адладка
+Scale to native size	MainWin		Расцягнуць да роднага памеру
 unknown	MainWin		невядома
+Next channel	MainWin		Наступны канал
+Error, interface is busy:\n\n	MainWin		Памылка, інтэрфейс заняты:\n\n
+None	MainWin		Няма
+force 704 x 576, display aspect 4:3	MainWin		прымусовыя 704 x 576 (4:3)
+DVB - Digital Video Broadcasting TV	MainWin		DVB - Лічбавае тэлебачанне
+force 544 x 576, display aspect 4:3	MainWin		прымусовыя 544 x 576 (4:3)
+pixel aspect ratio	MainWin		суадносіны бакоў для пікселяў
+No menu	MainWin		Няма меню
+Error, connecting to interface failed:\n\n	MainWin		Памылка, далучыцца да інтэрфейсу не ўдалося:\n\n
+force 720 x 576, display aspect 4:3	MainWin		прымусовыя 544 x 576 (4:3)

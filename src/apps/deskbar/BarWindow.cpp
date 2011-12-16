@@ -52,7 +52,7 @@ All rights reserved.
 #include "BarApp.h"
 #include "BarMenuBar.h"
 #include "BarView.h"
-#include "BeMenu.h"
+#include "DeskbarMenu.h"
 #include "PublicCommands.h"
 #include "StatusView.h"
 #include "tracker_private.h"
@@ -80,7 +80,7 @@ extern "C" void
 	BMenuBar_StartMenuBar_Hack(BMenuBar*, int32, bool, bool, BRect*);
 
 
-TBeMenu* TBarWindow::sBeMenu = NULL;
+TDeskbarMenu* TBarWindow::sDeskbarMenu = NULL;
 
 
 TBarWindow::TBarWindow()
@@ -118,18 +118,18 @@ TBarWindow::MenusBeginning()
 	if (entry.InitCheck() == B_OK && entry.IsDirectory()) {
 		//	need the entry_ref to the actual item
 		entry.GetRef(&ref);
-		//	set the nav directory to the be folder
-		sBeMenu->SetNavDir(&ref);
+		//	set the nav directory to the deskbar folder
+		sDeskbarMenu->SetNavDir(&ref);
 	} else if (!entry.Exists()) {
-		//	the Be folder does not exist
+		//	the deskbar folder does not exist
 		//	create one now
 		BDirectory dir;
 		if (entry.GetParent(&dir) == B_OK) {
-			BDirectory bedir;
-			dir.CreateDirectory("be", &bedir);
-			if (bedir.GetEntry(&entry) == B_OK
+			BDirectory deskbarDir;
+			dir.CreateDirectory("deskbar", &deskbarDir);
+			if (deskbarDir.GetEntry(&entry) == B_OK
 				&& entry.GetRef(&ref) == B_OK)
-				sBeMenu->SetNavDir(&ref);
+				sDeskbarMenu->SetNavDir(&ref);
 		}
 	} else {
 		//	this really should never happen
@@ -137,8 +137,8 @@ TBarWindow::MenusBeginning()
 		return;
 	}
 
-	sBeMenu->NeedsToRebuild();
-	sBeMenu->ResetTargets();
+	sDeskbarMenu->NeedsToRebuild();
+	sDeskbarMenu->ResetTargets();
 
 	fBarView->SetEventMask(0);
 		// This works around a BeOS bug - the menu is quit with every
@@ -153,10 +153,10 @@ TBarWindow::MenusEnded()
 {
 	BWindow::MenusEnded();
 
-	if (sBeMenu->LockLooper()) {
+	if (sDeskbarMenu->LockLooper()) {
 		// TODO: is this ok?
-		sBeMenu->RemoveItems(0, sBeMenu->CountItems(), true);
-		sBeMenu->UnlockLooper();
+		sDeskbarMenu->RemoveItems(0, sDeskbarMenu->CountItems(), true);
+		sDeskbarMenu->UnlockLooper();
 	}
 
 	fBarView->UpdateEventMask();
@@ -273,21 +273,21 @@ TBarWindow::ScreenChanged(BRect size, color_space depth)
 
 
 void
-TBarWindow::SetBeMenu(TBeMenu* menu)
+TBarWindow::SetDeskbarMenu(TDeskbarMenu* menu)
 {
-	sBeMenu = menu;
+	sDeskbarMenu = menu;
 }
 
 
-TBeMenu*
-TBarWindow::BeMenu()
+TDeskbarMenu*
+TBarWindow::DeskbarMenu()
 {
-	return sBeMenu;
+	return sDeskbarMenu;
 }
 
 
 void
-TBarWindow::ShowBeMenu()
+TBarWindow::ShowDeskbarMenu()
 {
 	BMenuBar* menuBar = fBarView->BarMenuBar();
 	if (menuBar == NULL)
@@ -518,7 +518,7 @@ TBarWindow::CountItems(BMessage* message)
 void
 TBarWindow::AddItem(BMessage* message)
 {
-	DeskbarShelf shelf;
+	DeskbarShelf shelf = B_DESKBAR_TRAY; 
 	entry_ref ref;
 	int32 id = 999;
 	BMessage reply;
@@ -527,24 +527,17 @@ TBarWindow::AddItem(BMessage* message)
 	BMessage archivedView;
 	if (message->FindMessage("view", &archivedView) == B_OK) {
 #if SHELF_AWARE
-		if (message->FindInt32("shelf", (int32*)&shelf) != B_OK)
+		message->FindInt32("shelf", &shelf);
 #endif
-			shelf = B_DESKBAR_TRAY;
-
 		BMessage* archive = new BMessage(archivedView);
 		err = fBarView->AddItem(archive, shelf, &id);
 		if (err < B_OK)
 			delete archive;
 	} else if (message->FindRef("addon", &ref) == B_OK) {
-		//	exposing the name of the view here is not so great
-		TReplicantTray* tray
-			= dynamic_cast<TReplicantTray*>(FindView("Status"));
-		if (tray) {
-			// Force this into the deskbar even if the security code is wrong
-			// This is OK because the user specifically asked for this replicant
-			BEntry entry(&ref);
-			err = tray->LoadAddOn(&entry, &id, true);
-		}
+		BEntry entry(&ref);
+		err = entry.InitCheck();
+		if (err == B_OK)
+			err = fBarView->AddItem(&entry, shelf, &id);
 	}
 
 	if (err == B_OK)

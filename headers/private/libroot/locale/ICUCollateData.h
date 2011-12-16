@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Oliver Tappe, zooey@hirschkaefer.de.
+ * Copyright 2010-2011, Oliver Tappe, zooey@hirschkaefer.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _ICU_COLLATE_DATA_H
@@ -19,7 +19,7 @@ class ICUCollateData : public ICUCategoryData {
 	typedef	ICUCategoryData		inherited;
 
 public:
-								ICUCollateData();
+								ICUCollateData(pthread_key_t tlsKey);
 	virtual						~ICUCollateData();
 
 	virtual	status_t			SetTo(const Locale& locale,

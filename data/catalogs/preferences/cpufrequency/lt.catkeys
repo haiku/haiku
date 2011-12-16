@@ -1,20 +1,20 @@
-1	lithuanian	x-vnd.Haiku-CPUFrequencyPref	4060072235
+1	lithuanian	x-vnd.Haiku-CPUFrequencyPref	3079996868
 Ok	Status view		Gerai
-CPU frequency status view	CPU Frequency View		CP dažnio rodyklė
-Set state	Status view		Pasirinkti
+CPU frequency status view	CPU Frequency View		Centrinio procesoriaus dažnio indikatorius
+Set state	Status view		Pasirinkta būsena
 Defaults	Pref Window		Numatytai
-Install replicant into Deskbar	CPU Frequency View		Įdėti ženkliuką  Deskbar'an
-Quit	Status view		Baigti
+Install replicant into Deskbar	CPU Frequency View		Patalpinti indikatorių pranešimų srityje
+Quit	Status view		Baigti darbą
 High performance	Status view		Didelis našumas
-Stepping policy	CPU Frequency View		Žingsniavimo tvarka
+Stepping policy	CPU Frequency View		Centrinio procesoriaus veiksena
 Dynamic performance	Status view		Prisitaikantis našumas
-Step up by CPU usage	Color Step View		Daugiau centrinio procesoriaus našumo:
+Step up by CPU usage	Color Step View		Našumo keitimo žingsnis
 Dynamic stepping	CPU Frequency View		Prisitaikančio našumo derinimas
-Stepping policy: 	CPU Frequency View		Žingsniavimas:
-Integration time [ms]: 	CPU Frequency View		Atsistatymo laikas [ms]:
-Open Speedstep preferences…	Status view		CP dažnio nustatymai…
-Revert	Pref Window		Grįžti
+Stepping policy: 	CPU Frequency View		Centrinio procesoriaus veiksena: 
+Integration time [ms]: 	CPU Frequency View		Integravimosi laikas [ms]: 
+Open Speedstep preferences…	Status view		CP dažnio nuostatos…
+Revert	Pref Window		Atšaukti pakeitimus
 Low energy	Status view		Energijos taupymas
-Launching the CPU frequency preflet failed.\n\nError: 	Status view		Nepavyko paleisti „CP dažnio“.\n\nKlaida:
-CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CP dažnis\n\tsukurtas  Clemens'o Zeidler'io\n\tCopyright 2009, Haiku, Inc.\n
-CPU Frequency	Main window		CP dažnis
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Nepavyko atverti Centrinio procesoriaus dažnio nuostatų lango.\n\nKlaida: 
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Centrinio procesoriaus dažnis\n\tsukurtas Clemens'o Zeidler'io\n\t© 2009, Haiku, Inc.\n
+CPUFrequency	System name		Centrinio procesoriaus dažnis

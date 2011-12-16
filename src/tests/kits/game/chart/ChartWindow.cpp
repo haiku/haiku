@@ -16,6 +16,7 @@
 #include <Box.h>
 #include <Button.h>
 #include <ByteOrder.h>
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <Directory.h>
 #include <Entry.h>
@@ -37,6 +38,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ChartWindow"
 
 /* pseudo-random generator parameters (not very good ones,
    but good enough for what we do here). */
@@ -487,25 +491,30 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	h += INSTANT_LOAD+H_BORDER;
 
 		/* camera animation popup */
-		menu = new BPopUpMenu("Off");
-		item = new BMenuItem("Off", new BMessage(ANIM_OFF_MSG));
+		menu = new BPopUpMenu(B_TRANSLATE("Off"));
+		item = new BMenuItem(B_TRANSLATE("Off"), new BMessage(ANIM_OFF_MSG));
 		item->SetTarget(this);
 		menu->AddItem(item);
-		item = new BMenuItem("Slow rotation", new BMessage(ANIM_SLOW_ROT_MSG));
+		item = new BMenuItem(B_TRANSLATE("Slow rotation"),
+			new BMessage(ANIM_SLOW_ROT_MSG));
 		item->SetTarget(this);
 		menu->AddItem(item);
-		item = new BMenuItem("Slow motion", new BMessage(ANIM_SLOW_MOVE_MSG));
+		item = new BMenuItem(B_TRANSLATE("Slow motion"),
+			new BMessage(ANIM_SLOW_MOVE_MSG));
 		item->SetTarget(this);
 		menu->AddItem(item);
-		item = new BMenuItem("Fast motion", new BMessage(ANIM_FAST_MOVE_MSG));
+		item = new BMenuItem(B_TRANSLATE("Fast motion"),
+			new BMessage(ANIM_FAST_MOVE_MSG));
 		item->SetTarget(this);
 		menu->AddItem(item);
-		item = new BMenuItem("Free motion", new BMessage(ANIM_FREE_MOVE_MSG));
+		item = new BMenuItem(B_TRANSLATE("Free motion"),
+			new BMessage(ANIM_FREE_MOVE_MSG));
 		item->SetTarget(this);
 		menu->AddItem(item);
 
-		r.Set(h, v, h+ANIM_LABEL+ANIM_POPUP-1, v + (TOP_LEFT_LIMIT - 1 - 2*V_BORDER));
-		popup = new BMenuField(r, "", "Animation:", menu);
+		r.Set(h, v, h+ANIM_LABEL+ANIM_POPUP-1, v +
+			(TOP_LEFT_LIMIT - 1 - 2*V_BORDER));
+		popup = new BMenuField(r, "", B_TRANSLATE("Animation:"), menu);
 		popup->SetFont(&font);
 		popup->MenuBar()->SetFont(&font);
 		popup->Menu()->SetFont(&font);
@@ -513,27 +522,32 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		popup->SetDivider(popup->StringWidth(popup->Label()) + 4.0f);
 		fTopView->AddChild(popup);
 
-	h += ANIM_LABEL + ANIM_POPUP + popup->StringWidth("Slow rotation");
+	h += ANIM_LABEL + ANIM_POPUP +
+		 popup->StringWidth(B_TRANSLATE("Slow rotation"));
 
 		/* display mode popup */
-		menu = new BPopUpMenu("Off");
-		item = new BMenuItem("Off", new BMessage(DISP_OFF_MSG));
+		menu = new BPopUpMenu(B_TRANSLATE("Off"));
+		item = new BMenuItem(B_TRANSLATE("Off"), new BMessage(DISP_OFF_MSG));
 		item->SetTarget(this);
 		menu->AddItem(item);
-		item = new BMenuItem("LineArray", new BMessage(DISP_LINE_MSG));
+		item = new BMenuItem(B_TRANSLATE("LineArray"),
+			new BMessage(DISP_LINE_MSG));
 		item->SetTarget(this);
 		item->SetEnabled(false);
 		menu->AddItem(item);
-		item = new BMenuItem("DrawBitmap", new BMessage(DISP_BITMAP_MSG));
+		item = new BMenuItem(B_TRANSLATE("DrawBitmap"),
+			new BMessage(DISP_BITMAP_MSG));
 		item->SetTarget(this);
 		menu->AddItem(item);
-		item = new BMenuItem("DirectWindow", new BMessage(DISP_DIRECT_MSG));
+		item = new BMenuItem(B_TRANSLATE("DirectWindow"),
+			new BMessage(DISP_DIRECT_MSG));
 		item->SetTarget(this);
 		item->SetEnabled(BDirectWindow::SupportsWindowMode());
 		menu->AddItem(item);
 
-		r.Set(h, v, h+DISP_LABEL+DISP_POPUP-1, v + (TOP_LEFT_LIMIT - 1 - 2*V_BORDER));
-		popup = new BMenuField(r, "", "Display:", menu);
+		r.Set(h, v, h+DISP_LABEL+DISP_POPUP-1, v +
+			(TOP_LEFT_LIMIT - 1 - 2*V_BORDER));
+		popup = new BMenuField(r, "", B_TRANSLATE("Display:"), menu);
 		popup->SetFont(&font);
 		popup->MenuBar()->SetFont(&font);
 		popup->Menu()->SetFont(&font);
@@ -541,7 +555,8 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		popup->SetDivider(popup->StringWidth(popup->Label()) + 4.0f);
 		fTopView->AddChild(popup);
 
-	h += DISP_LABEL + DISP_POPUP + popup->StringWidth("DirectWindow") + H_BORDER;
+	h += DISP_LABEL + DISP_POPUP +
+		popup->StringWidth(B_TRANSLATE("DirectWindow")) + H_BORDER;
 
 		/* create the offwindow (invisible) button on the left side.
 		   this will be used to record the content of the Picture
@@ -589,19 +604,22 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	h += BUTTON_WIDTH+H_BORDER;
 
 		/* starfield type popup */
-		menu = new BPopUpMenu("Chaos");
-		item = new BMenuItem("Chaos", new BMessage(SPACE_CHAOS_MSG));
+		menu = new BPopUpMenu(B_TRANSLATE("Chaos"));
+		item = new BMenuItem(B_TRANSLATE("Chaos"),
+			new BMessage(SPACE_CHAOS_MSG));
 		item->SetTarget(this);
 		menu->AddItem(item);
-		item = new BMenuItem("Amas", new BMessage(SPACE_AMAS_MSG));
+		item = new BMenuItem(B_TRANSLATE("Amas"), new BMessage(SPACE_AMAS_MSG));
 		item->SetTarget(this);
 		menu->AddItem(item);
-		item = new BMenuItem("Spiral", new BMessage(SPACE_SPIRAL_MSG));
+		item = new BMenuItem(B_TRANSLATE("Spiral"),
+			new BMessage(SPACE_SPIRAL_MSG));
 		item->SetTarget(this);
 		menu->AddItem(item);
 
-		r.Set(h, v, h+SPACE_LABEL+SPACE_POPUP-1, v + (TOP_LEFT_LIMIT - 1 - 2*V_BORDER));
-		popup = new BMenuField(r, "", "Space:", menu);
+		r.Set(h, v, h+SPACE_LABEL+SPACE_POPUP-1, v +
+			(TOP_LEFT_LIMIT - 1 - 2*V_BORDER));
+		popup = new BMenuField(r, "", B_TRANSLATE("Space:"), menu);
 		popup->SetFont(&font);
 		popup->MenuBar()->SetFont(&font);
 		popup->Menu()->SetFont(&font);
@@ -626,7 +644,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2, v+STATUS_BOX-1);
 		fStatusBox = new BBox(r);
 		fStatusBox->SetFont(&boldFont);
-		fStatusBox->SetLabel("Status");
+		fStatusBox->SetLabel(B_TRANSLATE("Status"));
 		fLeftView->AddChild(fStatusBox);
 		float boxWidth, boxHeight;
 		fStatusBox->GetPreferredSize(&boxWidth, &boxHeight);
@@ -636,8 +654,9 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		v = BOX_V_OFFSET;
 
 			/* frames per second title string */
-			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+STATUS_LABEL-1);
-			string = new BStringView(r, "", "Frames/s");
+			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1,
+				v+STATUS_LABEL-1);
+			string = new BStringView(r, "", B_TRANSLATE("Frames/s"));
 			string->SetFont(&font);
 			string->SetAlignment(B_ALIGN_CENTER);
 			fStatusBox->AddChild(string);
@@ -645,7 +664,8 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		v += STATUS_LABEL+STATUS_OFFSET;
 
 			/* frames per second display string */
-			r.Set(h-1, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET, v+STATUS_EDIT-1);
+			r.Set(h-1, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET,
+				v+STATUS_EDIT-1);
 			fFramesView = new BStringView(r, "", "0.0");
 			fFramesView->SetAlignment(B_ALIGN_RIGHT);
 			fFramesView->SetFont(be_bold_font);
@@ -656,8 +676,9 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		v += STATUS_EDIT+STATUS_OFFSET;
 
 			/* CPU load pourcentage title string */
-			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+STATUS_LABEL-1);
-			string = new BStringView(r, "", "CPU load");
+			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1,
+				v+STATUS_LABEL-1);
+			string = new BStringView(r, "", B_TRANSLATE("CPU load"));
 			string->SetAlignment(B_ALIGN_CENTER);
 			string->SetFont(&font);
 			fStatusBox->AddChild(string);
@@ -665,7 +686,8 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		v += STATUS_LABEL+STATUS_OFFSET;
 
 			/* CPU load pourcentage display string */
-			r.Set(h-1, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET, v+STATUS_EDIT-1);
+			r.Set(h-1, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET,
+				v+STATUS_EDIT-1);
 			fCpuLoadView = new BStringView(r, "", "0.0");
 			fCpuLoadView->SetAlignment(B_ALIGN_RIGHT);
 			fCpuLoadView->SetFont(be_bold_font);
@@ -679,7 +701,8 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 
 		/* Fullscreen mode check box */
 		r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-1, v+FULL_SCREEN-1);
-		full_screen = new BCheckBox(r, "", "Full screen", new BMessage(FULL_SCREEN_MSG));
+		full_screen = new BCheckBox(r, "", B_TRANSLATE("Full screen"),
+			new BMessage(FULL_SCREEN_MSG));
 		full_screen->SetTarget(this);
 		full_screen->SetFont(&font);
 		full_screen->ResizeToPreferred();
@@ -695,7 +718,8 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 
 		/* Automatic demonstration activation button */
 		r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-1, v+AUTO_DEMO-1);
-		button = new BButton(r, "", "Auto demo", new BMessage(AUTO_DEMO_MSG));
+		button = new BButton(r, "", B_TRANSLATE("Auto demo"),
+			new BMessage(AUTO_DEMO_MSG));
 		button->SetTarget(this);
 		button->ResizeToPreferred();
 		button->GetPreferredSize(&width, &height);
@@ -708,7 +732,8 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 
 		/* Enabling second thread check box */
 		r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-1, v+SECOND_THREAD-1);
-		check_box = new BCheckBox(r, "", "2 threads", new BMessage(SECOND_THREAD_MSG));
+		check_box = new BCheckBox(r, "", B_TRANSLATE("2 threads"),
+			new BMessage(SECOND_THREAD_MSG));
 		check_box->SetTarget(this);
 		check_box->SetFont(&font);
 		check_box->ResizeToPreferred();
@@ -721,7 +746,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		/* Star color selection box */
 		r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2, v+COLORS_BOX-1);
 		fColorsBox = new BBox(r);
-		fColorsBox->SetLabel("Colors");
+		fColorsBox->SetLabel(B_TRANSLATE("Colors"));
 		fColorsBox->SetFont(&boldFont);
 		fLeftView->AddChild(fColorsBox);
 
@@ -729,8 +754,10 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		v = BOX_V_OFFSET;
 
 			/* star color red check box */
-			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
-			check_box = new BCheckBox(r, "", "Red", new BMessage(COLORS_RED_MSG));
+			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1,
+				v+COLORS_LABEL-1);
+			check_box = new BCheckBox(r, "", B_TRANSLATE("Red"),
+				new BMessage(COLORS_RED_MSG));
 			check_box->SetFont(&font);
 			check_box->ResizeToPreferred();
 			fColorsBox->AddChild(check_box);
@@ -738,8 +765,10 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		v += COLORS_LABEL+COLORS_OFFSET;
 
 			/* star color green check box */
-			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
-			check_box = new BCheckBox(r, "", "Green", new BMessage(COLORS_GREEN_MSG));
+			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1,
+				v+COLORS_LABEL-1);
+			check_box = new BCheckBox(r, "", B_TRANSLATE("Green"),
+				new BMessage(COLORS_GREEN_MSG));
 			check_box->SetValue(1);
 			check_box->SetFont(&font);
 			check_box->ResizeToPreferred();
@@ -748,8 +777,10 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		v += COLORS_LABEL+COLORS_OFFSET;
 
 			/* star color blue check box */
-			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
-			check_box = new BCheckBox(r, "", "Blue", new BMessage(COLORS_BLUE_MSG));
+			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1,
+				v+COLORS_LABEL-1);
+			check_box = new BCheckBox(r, "", B_TRANSLATE("Blue"),
+				new BMessage(COLORS_BLUE_MSG));
 			check_box->SetValue(1);
 			check_box->SetFont(&font);
 			check_box->ResizeToPreferred();
@@ -758,8 +789,10 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		v += COLORS_LABEL+COLORS_OFFSET;
 
 			/* star color yellow check box */
-			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
-			check_box = new BCheckBox(r, "", "Yellow", new BMessage(COLORS_YELLOW_MSG));
+			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1,
+				v+COLORS_LABEL-1);
+			check_box = new BCheckBox(r, "", B_TRANSLATE("Yellow"),
+				new BMessage(COLORS_YELLOW_MSG));
 			check_box->SetValue(1);
 			check_box->SetFont(&font);
 			check_box->ResizeToPreferred();
@@ -768,8 +801,10 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		v += COLORS_LABEL+COLORS_OFFSET;
 
 			/* star color orange check box */
-			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
-			check_box = new BCheckBox(r, "", "Orange", new BMessage(COLORS_ORANGE_MSG));
+			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1,
+				v+COLORS_LABEL-1);
+			check_box = new BCheckBox(r, "", B_TRANSLATE("Orange"),
+				new BMessage(COLORS_ORANGE_MSG));
 			check_box->SetFont(&font);
 			check_box->ResizeToPreferred();
 			fColorsBox->AddChild(check_box);
@@ -777,8 +812,10 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		v += COLORS_LABEL+COLORS_OFFSET;
 
 			/* star color pink check box */
-			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
-			check_box = new BCheckBox(r, "", "Pink", new BMessage(COLORS_PINK_MSG));
+			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1,
+				v+COLORS_LABEL-1);
+			check_box = new BCheckBox(r, "", B_TRANSLATE("Pink"),
+				new BMessage(COLORS_PINK_MSG));
 			check_box->SetFont(&font);
 			check_box->ResizeToPreferred();
 			fColorsBox->AddChild(check_box);
@@ -786,8 +823,10 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		v += COLORS_LABEL+COLORS_OFFSET;
 
 			/* star color white check box */
-			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
-			check_box = new BCheckBox(r, "", "White", new BMessage(COLORS_WHITE_MSG));
+			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1,
+				v+COLORS_LABEL-1);
+			check_box = new BCheckBox(r, "", B_TRANSLATE("White"),
+				new BMessage(COLORS_WHITE_MSG));
 			check_box->SetFont(&font);
 			check_box->ResizeToPreferred();
 			fColorsBox->AddChild(check_box);
@@ -800,15 +839,17 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2, v+SPECIAL_BOX-1);
 		fSpecialBox = new BBox(r);
 		fSpecialBox->SetFont(&boldFont);
-		fSpecialBox->SetLabel("Special");
+		fSpecialBox->SetLabel(B_TRANSLATE("Special"));
 		fLeftView->AddChild(fSpecialBox);
 
 		h = BOX_H_OFFSET;
 		v = BOX_V_OFFSET;
 
 			/* no special radio button */
-			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
-			radio = new BRadioButton(r, "", "None", new BMessage(SPECIAL_NONE_MSG));
+			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1,
+				v+COLORS_LABEL-1);
+			radio = new BRadioButton(r, "", B_TRANSLATE("None"),
+				new BMessage(SPECIAL_NONE_MSG));
 			radio->SetValue(1);
 			radio->SetFont(&font);
 			radio->ResizeToPreferred();
@@ -817,8 +858,10 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		v += COLORS_LABEL+COLORS_OFFSET;
 
 			/* comet special animation radio button */
-			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
-			radio = new BRadioButton(r, "", "Comet", new BMessage(SPECIAL_COMET_MSG));
+			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1,
+				v+COLORS_LABEL-1);
+			radio = new BRadioButton(r, "", B_TRANSLATE("Comet"),
+				new BMessage(SPECIAL_COMET_MSG));
 			radio->SetFont(&font);
 			radio->ResizeToPreferred();
 			fSpecialBox->AddChild(radio);
@@ -826,8 +869,10 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		v += COLORS_LABEL+COLORS_OFFSET;
 
 			/* novas special animation radio button */
-			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
-			radio = new BRadioButton(r, "", "Novas", new BMessage(SPECIAL_NOVAS_MSG));
+			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1,
+				v+COLORS_LABEL-1);
+			radio = new BRadioButton(r, "", B_TRANSLATE("Novas"),
+				new BMessage(SPECIAL_NOVAS_MSG));
 			radio->SetFont(&font);
 			radio->ResizeToPreferred();
 			fSpecialBox->AddChild(radio);
@@ -835,8 +880,10 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		v += COLORS_LABEL+COLORS_OFFSET;
 
 			/* space batle special animation radio button (not implemented) */
-			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
-			radio = new BRadioButton(r, "", "Battle", new BMessage(SPECIAL_BATTLE_MSG));
+			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1,
+				v+COLORS_LABEL-1);
+			radio = new BRadioButton(r, "", B_TRANSLATE("Battle"),
+				new BMessage(SPECIAL_BATTLE_MSG));
 			radio->SetEnabled(false);
 			radio->SetFont(&font);
 			radio->ResizeToPreferred();
@@ -1152,10 +1199,10 @@ ChartWindow::OpenColorPalette(BPoint here)
 	BRect frame;
 	BPoint point;
 
-	BWindow *window = GetAppWindow("Space color");
+	BWindow *window = GetAppWindow(B_TRANSLATE("Space color"));
 	if (window == NULL) {
 		frame.Set(here.x, here.y, here.x + 199.0, here.y + 99.0);
-		window = new BWindow(frame, "Space color",
+		window = new BWindow(frame, B_TRANSLATE("Space color"),
 							 B_FLOATING_WINDOW_LOOK,
 							 B_FLOATING_APP_WINDOW_FEEL,
 							 B_NOT_ZOOMABLE | B_WILL_ACCEPT_FIRST_CLICK | B_NOT_RESIZABLE);
@@ -1179,10 +1226,11 @@ ChartWindow::OpenColorPalette(BPoint here)
 void
 ChartWindow::OpenStarDensity(BPoint here)
 {
-	BWindow	*window = GetAppWindow("Star density");
+	BWindow	*window = GetAppWindow(B_TRANSLATE("Star density"));
 	if (window == NULL) {
-		BRect frame(here.x, here.y, here.x + STAR_DENSITY_H-1, here.y + STAR_DENSITY_V-1);
-		window = new BWindow(frame, "Star density",
+		BRect frame(here.x, here.y, here.x + STAR_DENSITY_H-1,
+			here.y + STAR_DENSITY_V-1);
+		window = new BWindow(frame, B_TRANSLATE("Star density"),
 							 B_FLOATING_WINDOW_LOOK,
 							 B_FLOATING_APP_WINDOW_FEEL,
 							 B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_WILL_ACCEPT_FIRST_CLICK);
@@ -1193,7 +1241,8 @@ ChartWindow::OpenStarDensity(BPoint here)
 		slider->SetTarget(NULL, this);
 		slider->SetValue(fCurrentSettings.star_density);
 		slider->SetModificationMessage(new BMessage(STAR_DENSITY_MSG));
-		slider->SetLimitLabels(" 5% (low)", "(high) 100% ");
+		slider->SetLimitLabels(B_TRANSLATE(" 5% (low)"),
+			B_TRANSLATE("(high) 100% "));
 		slider->ResizeToPreferred();
 		window->ResizeTo(slider->Bounds().Width(), slider->Bounds().Height());
 		window->AddChild(slider);
@@ -1208,10 +1257,11 @@ ChartWindow::OpenStarDensity(BPoint here)
 void
 ChartWindow::OpenRefresh(BPoint here)
 {
-	BWindow *window = GetAppWindow("Refresh rate");
+	BWindow *window = GetAppWindow(B_TRANSLATE("Refresh rate"));
 	if (window == NULL) {
-		BRect frame(here.x, here.y, here.x + REFRESH_RATE_H-1, here.y + REFRESH_RATE_V-1);
-		window = new BWindow(frame, "Refresh rate",
+		BRect frame(here.x, here.y, here.x + REFRESH_RATE_H-1,
+			here.y + REFRESH_RATE_V-1);
+		window = new BWindow(frame, B_TRANSLATE("Refresh rate"),
 							 B_FLOATING_WINDOW_LOOK,
 							 B_FLOATING_APP_WINDOW_FEEL,
 							 B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_WILL_ACCEPT_FIRST_CLICK);
@@ -1222,7 +1272,8 @@ ChartWindow::OpenRefresh(BPoint here)
 		slider->SetValue((int32)(1000 * log(fCurrentSettings.refresh_rate / REFRESH_RATE_MIN) /
 						log(REFRESH_RATE_MAX/REFRESH_RATE_MIN)));
 		slider->SetModificationMessage(new BMessage(REFRESH_RATE_MSG));
-		slider->SetLimitLabels(" 0.6 f/s  (logarythmic scale)", "600.0 f/s");
+		slider->SetLimitLabels(B_TRANSLATE(" 0.6 f/s  (logarythmic scale)"),
+			B_TRANSLATE("600.0 f/s"));
 		slider->ResizeToPreferred();
 		window->ResizeTo(slider->Bounds().Width(), slider->Bounds().Height());
 		window->AddChild(slider);

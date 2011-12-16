@@ -244,7 +244,9 @@
 #define __STDC_IEC_559_COMPLEX__	1
 
 /* wchar_t uses ISO 10646-1 (2nd ed., published 2000-09-15) / Unicode 3.1.  */
+#ifndef __STDC_ISO_10646__
 #define __STDC_ISO_10646__		200009L
+#endif
 
 /* This macro indicates that the installed library is the GNU C Library.
    For historic reasons the value now is 6 and this will stay from now

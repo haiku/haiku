@@ -1,0 +1,10 @@
+1	lithuanian	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
+Kill application	Team monitor		Nutraukti darbą
+Quit application	Team monitor		Užbaigti darbą
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Pasirinkite vykdomą programą iš sąrašo ir spustelėkite  „Užbaigti darbą“ (gražiuoju) arba „Nutraukti darbą“ (priverstinai), kad jos darbas būtų baigtas.\n\nPalaikykite nuspaustus Vald+Alt+Šal klavišus %ld sek., jeigu norite kompiuterį paleisti iš naujo.
+If the application will not quit you may have to kill it.	Team monitor		Jeigu programa neužbaigs darbo pati, Jums gali tekti jį nutraukti priverstinai.
+Force reboot	Team monitor		Perleisti kompiuterį priverstinai
+Team monitor	Team monitor		Užduočių tvarkytuvas
+(This team is a system component)	Team monitor		(Ši užduotis yra sistemos komponentas)
+Restart the desktop	Team monitor		Perleisti darbalaukį
+Cancel	Team monitor		Atsisakyti

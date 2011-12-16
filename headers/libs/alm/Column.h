@@ -33,8 +33,8 @@ private:
 								Column(LinearSpec* ls, XTab* left, XTab* right);
 
 			LinearSpec*			fLS;
-			XTab*				fLeft;
-			XTab*				fRight;
+			BReference<XTab>	fLeft;
+			BReference<XTab>	fRight;
 
 			//! managed by RowColumnManager
 			Constraint*			fPrefSizeConstraint;

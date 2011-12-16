@@ -1,77 +1,77 @@
 1	german	x-vnd.Haiku-DriveSetup	1209826930
-%ld MiB	Support		%ld MiB
-<empty>	DiskView		<leer>
-<empty>	PartitionList		<leer>
-Active	PartitionList		Aktiv
-Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sollen die gewählte Partition wirklich gelöscht werden?\n\nAlle dort vorhandenen Daten gehen dabei unwiderruflich verloren!
-Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Soll die Partition \"%s\" wirklich initialisiert werden?\nDie Änderungen werden erst auf den Datenträger geschrieben, wenn sie nochmals bestätigt werden.
-Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Soll die Partition wirklich initialisiert werden?\nDie Änderungen werden erst auf den Datenträger geschrieben, wenn sie nochmals bestätigt werden.
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf dem Medium \"%s\" gehen dabei unwiderruflich verloren!
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf der Partition \"%s\" gehen dabei unwiderruflich verloren!
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf der Partition gehen dabei unwiderruflich verloren!
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf dem gewählten Datenträger gehen dabei unwiderruflich verloren!
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Soll die Änderungen jetzt auf den Datenträger geschrieben werden?\n\nAlle Daten auf der gewählten Partition gehen dabei unwiderruflich verloren!
-Cancel	CreateParamsPanel		Abbrechen
-Cancel	InitParamsPanel		Abbrechen
-Cancel	MainWindow		Abbrechen
-Cannot delete the selected partition.	MainWindow		Gewählte Partition konnte nicht gelöscht werden.
-Continue	MainWindow		Weiter
-Could not aquire partitioning information.	MainWindow		Partitionierungsinformationen konnten nicht ermittelt werden.
-Could not delete the selected partition.	MainWindow		Die gewählte Partition konnte nicht gelöscht werden.
-Could not mount partition %s.	MainWindow		Die Partition \"%s\" konnte nicht eingehangen werden.
-Could not unmount partition %s.	MainWindow		Partition \"%s\" konnte nicht ausgehangen werden.
-Create	CreateParamsPanel		Anlegen
-Create…	MainWindow		Anlegen…
-Creation of the partition has failed.	MainWindow		Anlegen der Parition schlug fehl.
+DriveSetup	System name		Datenträgerverwaltung
 Delete	MainWindow		Löschen
-Delete partition	MainWindow		Partition löschen
-Device	DiskView		Gerät
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Soll die Änderungen jetzt auf den Datenträger geschrieben werden?\n\nAlle Daten auf der gewählten Partition gehen dabei unwiderruflich verloren!
+Rescan	MainWindow		Aktualisieren
+OK	MainWindow		OK
+Could not aquire partitioning information.	MainWindow		Partitionierungsinformationen konnten nicht ermittelt werden.
+There's no space on the partition where a child partition could be created.	MainWindow		Es gibt keinen Platz auf der Partition, in der eine Tochterpartition angelegt werden könnte.
+%ld MiB	Support		%ld MiB
+<empty>	PartitionList		<leer>
+Unable to find the selected partition by ID.	MainWindow		Die ausgewählte Partition konnte anhand ihrer ID nicht gefunden werden.
+Select a partition from the list below.	DiskView		Bitte eine Partition aus der unten stehenden Liste wählen.
+No disk devices have been recognized.	DiskView		Es wurden keine Datenträger erkannt.
+The selected disk is read-only.	MainWindow		Vom ausgewählten Datenträger ist schreibgeschützt.
+Partition name:	CreateParamsPanel		Partitionsname:
+Initialize	InitParamsPanel		Initialisieren
+Could not mount partition %s.	MainWindow		Die Partition \"%s\" konnte nicht eingehangen werden.
+The partition %s is already unmounted.	MainWindow		Die Partition \"%s\" ist bereits ausgehangen.
+Failed to initialize the partition. No changes have been written to disk.	MainWindow		Die Initialisierung der Partition ist fehlgeschlagen. Der Datenträger blieb unverändert.
+Failed to delete the partition. No changes have been written to disk.	MainWindow		Das Löschen der Partition ist fehlgeschlagen. Der Datenträger blieb unverändert.
+Partition type:	CreateParamsPanel		Partitionstyp:
+Could not delete the selected partition.	MainWindow		Die gewählte Partition konnte nicht gelöscht werden.
+Initialize	MainWindow		Initialisieren
+Error: 	MainWindow	in any error alert	Fehler: 
+Partition %ld	DiskView		Partition %ld
+The partition %s has been successfully initialized.\n	MainWindow		Die Partition %s wurde erfolgreich initialisiert.\n
+<empty>	DiskView		<leer>
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisierung der Partition \"%s\" fehlgeschlagen. Der Datenträger blieb unverändert.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf der Partition gehen dabei unwiderruflich verloren!
+Mounted at	PartitionList		Eingehangen als
+Failed to initialize the partition %s!\n	MainWindow		Initialisierung der Partition \"%s\" fehlgeschlagen!\n
+There was an error acquiring the partition row.	MainWindow		Es ist ein interner Fehler aufgetreten.
+You need to select a partition entry from the list.	MainWindow		Bitte einen Partitionseintrag aus der Liste wählen.
+Format (not implemented)	MainWindow		Formatieren (nicht implementiert)
+The currently selected partition does not have a parent partition.	MainWindow		Die ausgewählte Partition hat keine übergeordnete Partition.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf dem gewählten Datenträger gehen dabei unwiderruflich verloren!
+Offset: %ld MB	Support		Versatz: %ld MiB
+Write changes	MainWindow		Änderungen schreiben
+There was an error preparing the disk for modifications.	MainWindow		Beim Vorbereiten der Änderungen trat ein interner Fehler auf.
+The partition %s is already mounted.	MainWindow		Die Partition \"%s\" ist bereits eingehangen.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf dem Medium \"%s\" gehen dabei unwiderruflich verloren!
+Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sollen die gewählte Partition wirklich gelöscht werden?\n\nAlle dort vorhandenen Daten gehen dabei unwiderruflich verloren!
+Create…	MainWindow		Anlegen…
+Disk system \"%s\"\" not found!	MainWindow		Medienschema \"%s\"\" nicht gefunden!
+Could not unmount partition %s.	MainWindow		Partition \"%s\" konnte nicht ausgehangen werden.
+Mount	MainWindow		Einhängen
+Create	CreateParamsPanel		Anlegen
 Device	PartitionList		Gerät
 Disk	MainWindow		Datenträger
-Disk system \"%s\"\" not found!	MainWindow		Medienschema \"%s\"\" nicht gefunden!
-DriveSetup	System name		Datenträgerverwaltung
-Eject	MainWindow		Auswerfen
-End: %ld MB	Support		Ende: %ld MiB
-Error: 	MainWindow	in any error alert	Fehler: 
-Failed to delete the partition. No changes have been written to disk.	MainWindow		Das Löschen der Partition ist fehlgeschlagen. Der Datenträger blieb unverändert.
-Failed to initialize the partition %s!\n	MainWindow		Initialisierung der Partition \"%s\" fehlgeschlagen!\n
-Failed to initialize the partition. No changes have been written to disk.	MainWindow		Die Initialisierung der Partition ist fehlgeschlagen. Der Datenträger blieb unverändert.
-File system	PartitionList		Dateisystem
-Format (not implemented)	MainWindow		Formatieren (nicht implementiert)
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisierung der Partition \"%s\" fehlgeschlagen. Der Datenträger blieb unverändert.
-Initialize	InitParamsPanel		Initialisieren
-Initialize	MainWindow		Initialisieren
-Mount	MainWindow		Einhängen
-Mount all	MainWindow		Alle einhängen
-Mounted at	PartitionList		Eingehangen als
-No disk devices have been recognized.	DiskView		Es wurden keine Datenträger erkannt.
-OK	MainWindow		OK
-Offset: %ld MB	Support		Versatz: %ld MiB
-Parameters	PartitionList		Parameter
-Partition	MainWindow		Partition
-Partition %ld	DiskView		Partition %ld
-Partition name:	CreateParamsPanel		Partitionsname:
-Partition size	CreateParamsPanel		Partitionsgröße:
-Partition type:	CreateParamsPanel		Partitionstyp:
-Rescan	MainWindow		Aktualisieren
-Select a partition from the list below.	DiskView		Bitte eine Partition aus der unten stehenden Liste wählen.
-Size	PartitionList		Größe
-Surface test (not implemented)	MainWindow		Oberflächentest (nicht implementiert)
-The currently selected partition does not have a parent partition.	MainWindow		Die ausgewählte Partition hat keine übergeordnete Partition.
-The currently selected partition is not empty.	MainWindow		Die gewählte Partition ist nicht leer.
-The partition %s has been successfully initialized.\n	MainWindow		Die Partition %s wurde erfolgreich initialisiert.\n
-The partition %s is already mounted.	MainWindow		Die Partition \"%s\" ist bereits eingehangen.
-The partition %s is already unmounted.	MainWindow		Die Partition \"%s\" ist bereits ausgehangen.
-The partition %s is currently mounted.	MainWindow		Die Partition \"%s\" ist momentan eingehangen.
-The selected disk is read-only.	MainWindow		Vom ausgewählten Datenträger ist schreibgeschützt.
-The selected partition does not contain a partitioning system.	MainWindow		Die ausgewählte Partition enthält kein Partitionierungssystem.
-There was an error acquiring the partition row.	MainWindow		Es ist ein interner Fehler aufgetreten.
-There was an error preparing the disk for modifications.	MainWindow		Beim Vorbereiten der Änderungen trat ein interner Fehler auf.
-There's no space on the partition where a child partition could be created.	MainWindow		Es gibt keinen Platz auf der Partition, in der eine Tochterpartition angelegt werden könnte.
-Unable to find the selected partition by ID.	MainWindow		Die ausgewählte Partition konnte anhand ihrer ID nicht gefunden werden.
-Unmount	MainWindow		Aushängen
-Validation of the given creation parameters failed.	MainWindow		Die Überprüfung der zum Anlegen angegebenen Parameter ist fehlgeschlagen.
-Validation of the given initialization parameters failed.	MainWindow		Die Überprüfung der zum Initialisieren angegebenen Parameter ist fehlgeschlagen.
+Device	DiskView		Gerät
+Active	PartitionList		Aktiv
 Volume name	PartitionList		Datenträgername
-Write changes	MainWindow		Änderungen schreiben
-You need to select a partition entry from the list.	MainWindow		Bitte einen Partitionseintrag aus der Liste wählen.
+Continue	MainWindow		Weiter
+Cannot delete the selected partition.	MainWindow		Gewählte Partition konnte nicht gelöscht werden.
+Mount all	MainWindow		Alle einhängen
+Cancel	MainWindow		Abbrechen
+Delete partition	MainWindow		Partition löschen
+End: %ld MB	Support		Ende: %ld MiB
+Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Soll die Partition \"%s\" wirklich initialisiert werden?\nDie Änderungen werden erst auf den Datenträger geschrieben, wenn sie nochmals bestätigt werden.
+Eject	MainWindow		Auswerfen
+Partition	MainWindow		Partition
+File system	PartitionList		Dateisystem
+Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Soll die Partition wirklich initialisiert werden?\nDie Änderungen werden erst auf den Datenträger geschrieben, wenn sie nochmals bestätigt werden.
+Validation of the given creation parameters failed.	MainWindow		Die Überprüfung der zum Anlegen angegebenen Parameter ist fehlgeschlagen.
+Size	PartitionList		Größe
+Validation of the given initialization parameters failed.	MainWindow		Die Überprüfung der zum Initialisieren angegebenen Parameter ist fehlgeschlagen.
+The selected partition does not contain a partitioning system.	MainWindow		Die ausgewählte Partition enthält kein Partitionierungssystem.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf der Partition \"%s\" gehen dabei unwiderruflich verloren!
+The partition %s is currently mounted.	MainWindow		Die Partition \"%s\" ist momentan eingehangen.
+Partition size	CreateParamsPanel		Partitionsgröße:
+Surface test (not implemented)	MainWindow		Oberflächentest (nicht implementiert)
+Cancel	InitParamsPanel		Abbrechen
+Cancel	CreateParamsPanel		Abbrechen
+Parameters	PartitionList		Parameter
+Creation of the partition has failed.	MainWindow		Anlegen der Parition schlug fehl.
+The currently selected partition is not empty.	MainWindow		Die gewählte Partition ist nicht leer.
+Unmount	MainWindow		Aushängen

@@ -98,7 +98,8 @@ EXRTranslator::DerivedIdentify(BPositionIO *stream,
 			outInfo->quality = EXR_IN_QUALITY;
 			outInfo->capability = EXR_IN_CAPABILITY;
 			strcpy(outInfo->MIME, "image/exr");
-			strcpy(outInfo->name, B_TRANSLATE("EXR image"));
+			strlcpy(outInfo->name, B_TRANSLATE("EXR image"),
+				sizeof(outInfo->name));
 		}
 	} catch (const std::exception &e) {
 		return B_NO_TRANSLATOR;

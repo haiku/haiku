@@ -1471,6 +1471,9 @@
 #define B_UINT8_TYPE					FSSH_B_UINT8_TYPE
 #define B_VECTOR_ICON_TYPE				FSSH_B_VECTOR_ICON_TYPE
 #define B_ASCII_TYPE					FSSH_B_ASCII_TYPE
+#define B_XATTR_TYPE					FSSH_B_XATTR_TYPE
+#define B_NETWORK_ADDRESS_TYPE			FSSH_B_NETWORK_ADDRESS_TYPE
+#define B_MIME_STRING_TYPE				FSSH_B_MIME_STRING_TYPE
 
 //----- System-wide MIME types for handling URL's ------------------------------
 

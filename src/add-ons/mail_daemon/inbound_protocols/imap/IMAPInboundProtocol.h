@@ -42,9 +42,6 @@ private:
 class IMAPInboundProtocol;
 
 
-int32 watch_mailbox(void* data);
-
-
 /*! Just wait for a IDLE (watching) IMAP response in this thread. */
 class IMAPMailboxThread {
 public:
@@ -57,11 +54,11 @@ public:
 			status_t			StopWatchingMailbox();
 
 private:
+	static	status_t			_WatchThreadFunction(void* data);
 			void				_Watch();
 
-	friend	int32 watch_mailbox(void* data);
-
-			IMAPInboundProtocol&	fProtocol;
+private:
+			IMAPInboundProtocol& fProtocol;
 			IMAPMailbox&		fIMAPMailbox;
 
 			BLocker				fLock;

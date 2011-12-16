@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -30,6 +30,8 @@
 #include "CpuState.h"
 #include "DisassembledCode.h"
 #include "FileSourceCode.h"
+#include "GUISettingsUtils.h"
+#include "GUITeamUISettings.h"
 #include "Image.h"
 #include "ImageDebugInfo.h"
 #include "InspectorWindow.h"
@@ -106,7 +108,8 @@ TeamWindow::TeamWindow(::Team* team, UserInterfaceListener* listener)
 	fRunButton(NULL),
 	fStepOverButton(NULL),
 	fStepIntoButton(NULL),
-	fStepOutButton(NULL)
+	fStepOutButton(NULL),
+	fSourceLocatePanel(NULL)
 {
 	fTeam->Lock();
 	BString name = fTeam->Name();
@@ -137,6 +140,8 @@ TeamWindow::~TeamWindow()
 	_SetActiveStackTrace(NULL);
 	_SetActiveImage(NULL);
 	_SetActiveThread(NULL);
+
+	delete fSourceLocatePanel;
 }
 
 
@@ -218,8 +223,11 @@ TeamWindow::MessageReceived(BMessage* message)
 			try {
 				fInspectorWindow = InspectorWindow::Create(fTeam, fListener,
 					this);
-				if (fInspectorWindow != NULL)
+				if (fInspectorWindow != NULL) {
+					BMessage settings;
+					fInspectorWindow->LoadSettings(fUISettings);
 					fInspectorWindow->Show();
+				}
            	} catch (...) {
            		// TODO: notify user
            	}
@@ -227,7 +235,9 @@ TeamWindow::MessageReceived(BMessage* message)
 		}
 		case MSG_INSPECTOR_WINDOW_CLOSED:
 		{
+			_SaveInspectorSettings(CurrentMessage());
 			fInspectorWindow = NULL;
+
 		}
 		case B_REFS_RECEIVED:
 		{
@@ -242,13 +252,15 @@ TeamWindow::MessageReceived(BMessage* message)
 				&& fActiveFunction->GetFunctionDebugInfo()
 					->SourceFile() != NULL && fActiveSourceCode != NULL
 				&& fActiveSourceCode->GetSourceFile() == NULL) {
-				BFilePanel* panel = NULL;
 				try {
-					panel = new BFilePanel(B_OPEN_PANEL,
-						new BMessenger(this));
-					panel->Show();
+					if (fSourceLocatePanel == NULL) {
+						fSourceLocatePanel = new BFilePanel(B_OPEN_PANEL,
+							new BMessenger(this));
+					}
+					fSourceLocatePanel->Show();
 				} catch (...) {
-					delete panel;
+					delete fSourceLocatePanel;
+					fSourceLocatePanel = NULL;
 				}
 			}
 			break;
@@ -330,7 +342,147 @@ TeamWindow::MessageReceived(BMessage* message)
 bool
 TeamWindow::QuitRequested()
 {
-	return fListener->UserInterfaceQuitRequested();
+	fListener->UserInterfaceQuitRequested();
+
+	return false;
+}
+
+
+status_t
+TeamWindow::LoadSettings(const GUITeamUISettings* settings)
+{
+	AutoLocker<BWindow> lock(this);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
+	BMessage teamWindowSettings;
+	// no settings stored yet
+	if (settings->Settings("teamWindow", teamWindowSettings) != B_OK)
+		return B_OK;
+
+	BRect frame;
+	if (teamWindowSettings.FindRect("frame", &frame) == B_OK) {
+		ResizeTo(frame.Width(), frame.Height());
+		MoveTo(frame.left, frame.top);
+	}
+
+	BMessage archive;
+	if (teamWindowSettings.FindMessage("sourceSplit", &archive) == B_OK)
+		GUISettingsUtils::UnarchiveSplitView(archive, fSourceSplitView);
+
+	if (teamWindowSettings.FindMessage("functionSplit", &archive) == B_OK)
+		GUISettingsUtils::UnarchiveSplitView(archive, fFunctionSplitView);
+
+	if (teamWindowSettings.FindMessage("imageSplit", &archive) == B_OK)
+		GUISettingsUtils::UnarchiveSplitView(archive, fImageSplitView);
+
+	if (teamWindowSettings.FindMessage("threadSplit", &archive) == B_OK)
+		GUISettingsUtils::UnarchiveSplitView(archive, fThreadSplitView);
+
+	if (teamWindowSettings.FindMessage("imageListView", &archive) == B_OK)
+		fImageListView->LoadSettings(archive);
+
+	if (teamWindowSettings.FindMessage("imageFunctionsView", &archive) == B_OK)
+		fImageFunctionsView->LoadSettings(archive);
+
+	if (teamWindowSettings.FindMessage("threadListView", &archive) == B_OK)
+		fThreadListView->LoadSettings(archive);
+
+	if (teamWindowSettings.FindMessage("variablesView", &archive) == B_OK)
+		fVariablesView->LoadSettings(archive);
+
+	if (teamWindowSettings.FindMessage("registersView", &archive) == B_OK)
+		fRegistersView->LoadSettings(archive);
+
+	if (teamWindowSettings.FindMessage("stackTraceView", &archive) == B_OK)
+		fStackTraceView->LoadSettings(archive);
+
+	if (teamWindowSettings.FindMessage("breakpointsView", &archive) == B_OK)
+		fBreakpointsView->LoadSettings(archive);
+
+	fUISettings = *settings;
+
+	return B_OK;
+}
+
+
+status_t
+TeamWindow::SaveSettings(GUITeamUISettings* settings)
+{
+	AutoLocker<BWindow> lock(this);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
+	BMessage inspectorSettings;
+	if (fUISettings.Settings("inspectorWindow", inspectorSettings) == B_OK) {
+		if (!settings->AddSettings("inspectorWindow", inspectorSettings))
+			return B_NO_MEMORY;
+	}
+
+	BMessage archive;
+	BMessage teamWindowSettings;
+	if (teamWindowSettings.AddRect("frame", Frame()) != B_OK)
+		return B_NO_MEMORY;
+
+	if (GUISettingsUtils::ArchiveSplitView(archive, fSourceSplitView) != B_OK)
+		return B_NO_MEMORY;
+	if (teamWindowSettings.AddMessage("sourceSplit", &archive) != B_OK)
+		return B_NO_MEMORY;
+
+	if (GUISettingsUtils::ArchiveSplitView(archive, fFunctionSplitView) != B_OK)
+		return B_NO_MEMORY;
+	if (teamWindowSettings.AddMessage("functionSplit", &archive) != B_OK)
+		return B_NO_MEMORY;
+
+	if (GUISettingsUtils::ArchiveSplitView(archive, fImageSplitView) != B_OK)
+		return B_NO_MEMORY;
+	if (teamWindowSettings.AddMessage("imageSplit", &archive))
+		return B_NO_MEMORY;
+
+	if (GUISettingsUtils::ArchiveSplitView(archive, fThreadSplitView) != B_OK)
+		return B_NO_MEMORY;
+	if (teamWindowSettings.AddMessage("threadSplit", &archive))
+		return B_NO_MEMORY;
+
+	if (fImageListView->SaveSettings(archive) != B_OK)
+		return B_NO_MEMORY;
+	if (teamWindowSettings.AddMessage("imageListView", &archive))
+		return B_NO_MEMORY;
+
+	if (fImageFunctionsView->SaveSettings(archive) != B_OK)
+		return B_NO_MEMORY;
+	if (teamWindowSettings.AddMessage("imageFunctionsView", &archive))
+		return B_NO_MEMORY;
+
+	if (fThreadListView->SaveSettings(archive) != B_OK)
+		return B_NO_MEMORY;
+	if (teamWindowSettings.AddMessage("threadListView", &archive))
+		return B_NO_MEMORY;
+
+	if (fVariablesView->SaveSettings(archive) != B_OK)
+		return B_NO_MEMORY;
+	if (teamWindowSettings.AddMessage("variablesView", &archive))
+		return B_NO_MEMORY;
+
+	if (fRegistersView->SaveSettings(archive) != B_OK)
+		return B_NO_MEMORY;
+	if (teamWindowSettings.AddMessage("registersView", &archive))
+		return B_NO_MEMORY;
+
+	if (fStackTraceView->SaveSettings(archive) != B_OK)
+		return B_NO_MEMORY;
+	if (teamWindowSettings.AddMessage("stackTraceView", &archive))
+		return B_NO_MEMORY;
+
+	if (fBreakpointsView->SaveSettings(archive) != B_OK)
+		return B_NO_MEMORY;
+	if (teamWindowSettings.AddMessage("breakpointsView", &archive))
+		return B_NO_MEMORY;
+
+	if (!settings->AddSettings("teamWindow", teamWindowSettings))
+		return B_NO_MEMORY;
+
+	return B_OK;
 }
 
 
@@ -477,6 +629,7 @@ TeamWindow::_Init()
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.Add(fMenuBar = new BMenuBar("Menu"))
 		.AddSplit(B_VERTICAL, 3.0f)
+			.GetSplitView(&fFunctionSplitView)
 			.SetInsets(4.0f, 4.0f, 4.0f, 4.0f)
 			.Add(fTabView = new BTabView("tab view"), 0.4f)
 			.AddGroup(B_VERTICAL, 4.0f)
@@ -491,6 +644,7 @@ TeamWindow::_Init()
 					"source path",
 					"Source path unavailable."), 4.0f)
 				.AddSplit(B_HORIZONTAL, 3.0f)
+					.GetSplitView(&fSourceSplitView)
 					.Add(sourceScrollView = new BScrollView("source scroll",
 						NULL, 0, true, true), 3.0f)
 					.Add(fLocalsTabView = new BTabView("locals view"))
@@ -506,6 +660,7 @@ TeamWindow::_Init()
 	threadGroup->SetName("Threads");
 	fTabView->AddTab(threadGroup);
 	BLayoutBuilder::Split<>(threadGroup)
+		.GetSplitView(&fThreadSplitView)
 		.Add(fThreadListView = ThreadListView::Create(fTeam, this))
 		.Add(fStackTraceView = StackTraceView::Create(this));
 
@@ -514,6 +669,7 @@ TeamWindow::_Init()
 	imagesGroup->SetName("Images");
 	fTabView->AddTab(imagesGroup);
 	BLayoutBuilder::Split<>(imagesGroup)
+		.GetSplitView(&fImageSplitView)
 		.Add(fImageListView = ImageListView::Create(fTeam, this))
 		.Add(fImageFunctionsView = ImageFunctionsView::Create(this));
 
@@ -1028,6 +1184,7 @@ TeamWindow::_HandleSourceCodeChanged()
 	SourceCode* sourceCode = fActiveFunction->GetFunction()->GetSourceCode();
 	LocatableFile* sourceFile = NULL;
 	BString sourceText;
+	BString truncatedText;
 	if (sourceCode == NULL)
 		sourceCode = fActiveFunction->GetSourceCode();
 
@@ -1041,7 +1198,12 @@ TeamWindow::_HandleSourceCodeChanged()
 		&& sourceFile != NULL) {
 		sourceText.Prepend("Click to locate source file '");
 		sourceText += "'";
-		fSourcePathView->SetText(sourceText.String());
+		truncatedText = sourceText;
+		fSourcePathView->TruncateString(&truncatedText, B_TRUNCATE_MIDDLE,
+			fSourcePathView->Bounds().Width());
+		if (sourceText != truncatedText)
+			fSourcePathView->SetToolTip(sourceText.String());
+		fSourcePathView->SetText(truncatedText.String());
 	} else if (sourceFile != NULL) {
 		sourceText.Prepend("File: ");
 		fSourcePathView->SetText(sourceText.String());
@@ -1080,4 +1242,14 @@ TeamWindow::_HandleResolveMissingSourceFile(entry_ref& locatedPath)
 			fListener->FunctionSourceCodeRequested(fActiveFunction);
 		}
 	}
+}
+
+
+status_t
+TeamWindow::_SaveInspectorSettings(const BMessage* settings)
+{
+	if (fUISettings.AddSettings("inspectorWindow", *settings) != B_OK)
+		return B_NO_MEMORY;
+
+	return B_OK;
 }

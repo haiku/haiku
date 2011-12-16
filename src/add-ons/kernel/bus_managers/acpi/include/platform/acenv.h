@@ -173,7 +173,8 @@
  * no debug output.
  */
 #if (defined ACPI_BIN_APP)   || \
-    (defined ACPI_SRC_APP)
+    (defined ACPI_SRC_APP)   || \
+    (defined ACPI_XTRACT_APP)
 #define ACPI_APPLICATION
 #define ACPI_SINGLE_THREADED
 #endif

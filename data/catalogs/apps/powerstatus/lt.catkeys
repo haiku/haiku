@@ -1,0 +1,48 @@
+1	lithuanian	x-vnd.Haiku-PowerStatus	3419486861
+Design capacity low warning: 	PowerStatus		Numatytasis įspėjimas apie sumažėjusią talpą: 
+Show percent	PowerStatus		Rodyti procentais
+Design capacity: 	PowerStatus		Numatytoji talpa: 
+ mW	PowerStatus		 mW
+Type: 	PowerStatus		Tipas: 
+non-rechargeable	PowerStatus		neįkraunama
+Empty battery slot	PowerStatus		Baterijos lizdas tuščias
+ mV	PowerStatus		 mV
+Run in window	PowerStatus		Paleisti lange
+About	PowerStatus		Apie programą
+PowerStatus	System name		Maitinimo būsena
+PowerStatus	PowerStatus		Maitinimo būsena
+ mWh	PowerStatus		 mWh
+Battery info…	PowerStatus		Baterijos savybės…
+Damaged battery	PowerStatus		Baterija pažeista
+Show time	PowerStatus		Rodyti laiką
+Last full charge: 	PowerStatus		Paskiausioji pilna įkrova: 
+Battery unused	PowerStatus		Baterija nenaudojama
+Extended battery info	PowerStatus		Išsamesni baterijos duomenys
+ mA	PowerStatus		 mA
+Current rate: 	PowerStatus		Dabartinė vertė: 
+discharging	PowerStatus		iškraunama
+Show text label	PowerStatus		Rodyti etiketę
+About…	PowerStatus		Apie programą…
+Model number: 	PowerStatus		Modelio numeris: 
+Install in Deskbar	PowerStatus		Patalpinti pranešimų srityje
+ mAh	PowerStatus		 mAh
+Capacity: 	PowerStatus		Talpa: 
+Battery discharging	PowerStatus		Baterija iškraunama
+Serial number: 	PowerStatus		Serijinis numeris: 
+Capacity granularity 1: 	PowerStatus		Talpos detalizavimas 1: 
+OK	PowerStatus		Gerai
+OEM info: 	PowerStatus		OĮG informacija: 
+Design voltage: 	PowerStatus		Numatytoji įtampa: 
+PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		Maitinimo būsena\nautoriai: Axel Dörfler, Clemens Zeidler\n© 2006, Haiku, Inc.\n
+Battery charging	PowerStatus		Baterija įkraunama
+Design capacity warning: 	PowerStatus		Numatytasis įspėjimas apie talpą: 
+Battery info	PowerStatus		Baterijos savybės
+Quit	PowerStatus		Baigti darbą
+rechargeable	PowerStatus		įkraunama
+charging	PowerStatus		įkraunama
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Šią programą galite paleisti atskirame lange arba patalpinti pranešimų srityje.
+Power status box	PowerStatus		Maitinimo būsena
+Show status icon	PowerStatus		Rodyti būsenos piktogramą
+Capacity granularity 2: 	PowerStatus		Talpos detalizavimas 2: 
+Technology: 	PowerStatus		Technologija: 
+no battery	PowerStatus		be baterijos

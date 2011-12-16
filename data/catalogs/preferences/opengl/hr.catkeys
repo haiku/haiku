@@ -1,0 +1,19 @@
+1	croatian	x-vnd.Haiku-OpenGL	69309664
+Auxiliary buffer(s):	Capabilities		Pomoćna međumemorija(e):
+Available	Extensions		Dostupno
+Capabilities	Capabilities		Mogućnosti
+Extensions	Extensions		Proširenja
+GLU version:	InfoView		 GLU verzija
+GLUT API version:	InfoView		GLUT API verzija:
+Information	InfoView		Informacija
+Max. 2D texture size:	Capabilities		Najveća 2D veličina teksture:
+Max. 3D texture size:	Capabilities		Najveća 3D tekstura:
+Max. convolution:	Capabilities		Maksimalni skup:
+Max. lights:	Capabilities		Max. svijetla:
+Max. recommended index elements:	Capabilities		Maksimalni preporučeni elementi indeksa:
+Max. recommended vertex elements:	Capabilities		Max. dozvoljeni broj vertex elemenata:
+Max. texture units:	Capabilities		Max. veličine tekskture:
+OpenGL	System name		OpenGL
+OpenGL version:	InfoView		 OpenGL verzija
+Renderer name:	InfoView		Ime renderera:
+Vendor name:	InfoView		Naziv proizvođaća:

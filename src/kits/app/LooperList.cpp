@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku.
+ * Copyright 2001-2011, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -184,6 +184,14 @@ BLooperList::LooperForPort(port_id port)
 		looper = i->looper;
 
 	return looper;
+}
+
+
+void
+BLooperList::InitAfterFork()
+{
+	// We need to reinitialize the locker to get a new semaphore
+	new (&fLock) BLocker("BLooperList lock");
 }
 
 

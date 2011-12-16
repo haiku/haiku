@@ -1,0 +1,52 @@
+1	lithuanian	x-vnd.Haiku-Screen	2033930135
+yes	Screen		taip
+Use laptop panel:	Screen		Naudoti skreitinuko ekraną:
+15 bits/pixel, 32768 colors	Screen		15 bitų spalvos, iš viso 32768
+/other…	Screen		/kitas…
+16 bits/pixel, 65536 colors	Screen		16 bitų spalvos, iš viso 65536
+Revert	Screen		Atšaukti pakeitimus
+Swap displays:	Screen		Sukeisti ekranus:
+Combine displays:	Screen		Sujungti ekranus:
+Done	Screen		Atlikta
+Set background…	Screen		Pakeisti foną…
+Undo	Screen		Grąžinti
+if needed	Screen		jeigu reikia
+Screen preferences by the Haiku team	Screen		Ekrano nuostatos, sukurtos „Haiku“ komandos
+Screen	System name		Ekranas
+OK	Screen		Gerai
+Workspaces	Screen		Darbalaukiai
+The screen mode could not be set:\n\t%s\n	Screen		Ekrano veiksenos pakeisti nepavyko:\n\t%s\n
+no	Screen		ne
+Could not write VESA mode settings file:\n\t	Screen		Nepavyko įrašyti VESA veiksenos nuostatų failo:\n\t
+Type or use the left and right arrow keys.	Screen		Surinkite reikšmę, arba naudokitės rodyklių kairėn ir dešinėn klavišais.
+Warning	Screen		Įspėjimas
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Eilučių dažnis:\t%lu - %lu kHz\nKadrų dažnis:\t%lu - %lu Hz\n\nDidžiausias galimas taškų dažnis:\t%g MHz
+Keep	Screen		Palikti
+Unknown mode	Screen		Nežinoma veiksena
+disable	Screen		nejungti
+Columns:	Screen		Stulpeliai:
+All workspaces	Screen		Visi darbalaukiai
+always	Screen		visuomet
+32 bits/pixel, 16 Million colors	Screen		32 bitų spalvos, iš viso virš 16 milijonų
+Current workspace	Screen		Šis darbalaukis
+About	Screen		Apie
+24 bits/pixel, 16 Million colors	Screen		24 bitų spalvos, iš viso virš 16 milijonų
+horizontally	Screen		horizontaliai
+Other…	Screen		Kitas…
+Cancel	Screen		Atsisakyti
+bits/pixel	Screen		bitų
+Settings will revert in %seconds seconds.	Screen		Už %seconds sek. bus grąžintos ankstesnės nuostatos.
+Refresh rate:	Screen		Kadrų dažnis:
+Hz	Screen		Hz
+Do you wish to keep these settings?	Screen		Ar norite palikti šias nuostatas?
+Rows:	Screen		Eilutės:
+vertically	Screen		vertikaliai
+Resolution:	Screen		Skiriamoji geba:
+Screen	Screen		Ekranas
+%.1f Hz	Screen		%.1f Hz
+8 bits/pixel, 256 colors	Screen		8 bitų, iš viso 256
+Apply	Screen		Taikyti
+Refresh rate	Screen		Kadrų dažnis
+%sSerial no.: %s	Screen		%sSerijinis numeris: %s
+Colors:	Screen		Spalvos:
+Video format:	Screen		Vaizdo formatas:

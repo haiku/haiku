@@ -13,6 +13,7 @@
 #include <OS.h>
 
 #include <AutoDeleter.h>
+#include <errno_private.h>
 #include <posix/realtime_sem_defs.h>
 #include <syscall_utils.h>
 #include <syscalls.h>
@@ -22,7 +23,7 @@ sem_t*
 sem_open(const char* name, int openFlags,...)
 {
 	if (name == NULL) {
-		errno = B_BAD_VALUE;
+		__set_errno(B_BAD_VALUE);
 		return SEM_FAILED;
 	}
 
@@ -46,7 +47,7 @@ sem_open(const char* name, int openFlags,...)
 	// structure, otherwise we will delete it later.
 	sem_t* sem = (sem_t*)malloc(sizeof(sem_t));
 	if (sem == NULL) {
-		errno = B_NO_MEMORY;
+		__set_errno(B_NO_MEMORY);
 		return SEM_FAILED;
 	}
 	MemoryDeleter semDeleter(sem);
@@ -56,7 +57,7 @@ sem_open(const char* name, int openFlags,...)
 	status_t error = _kern_realtime_sem_open(name, openFlags, mode, semCount,
 		sem, &usedSem);
 	if (error != B_OK) {
-		errno = error;
+		__set_errno(error);
 		return SEM_FAILED;
 	}
 

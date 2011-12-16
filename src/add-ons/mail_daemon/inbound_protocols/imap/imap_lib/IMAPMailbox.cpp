@@ -12,12 +12,11 @@
 
 
 #define DEBUG_IMAP_MAILBOX
-
 #ifdef DEBUG_IMAP_MAILBOX
-#include <stdio.h>
-#define TRACE(x...) printf(x)
+#	include <stdio.h>
+#	define TRACE(x...) printf(x)
 #else
-#define TRACE(x...) /* nothing */
+#	define TRACE(x...) ;
 #endif
 
 
@@ -26,6 +25,9 @@ MinMessage::MinMessage()
 	uid = 0;
 	flags = 0;
 }
+
+
+// #pragma mark -
 
 
 IMAPMailbox::IMAPMailbox(IMAPStorage& storage)
@@ -130,9 +132,9 @@ IMAPMailbox::StartWatchingMailbox(sem_id startedSem)
 	bigtime_t timeout = 1000 * 1000 * 60 * 29; // 29 min
 	status_t status;
 	while (true) {
-		int32 commandId = NextCommandId();
+		int32 commandID = NextCommandID();
 		TRACE("IDLE ...\n");
-		status = SendCommand("IDLE", commandId);
+		status = SendCommand("IDLE", commandID);
 		if (firstIDLE) {
 			release_sem(startedSem);
 			firstIDLE = false;
@@ -140,7 +142,7 @@ IMAPMailbox::StartWatchingMailbox(sem_id startedSem)
 		if (status != B_OK)
 			break;
 
-		status = HandleResponse(commandId, timeout, false);
+		status = HandleResponse(commandID, timeout, false);
 		ProcessAfterQuacks(kIMAP4ClientTimeout);
 
 		if (atomic_get(&fWatching) == 0)

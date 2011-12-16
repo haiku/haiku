@@ -327,7 +327,7 @@ HOST_GCC_OBJCOPY=`gcc -print-prog-name=objcopy`
 SFDISK_BINARY=sfdisk
 HOST_SFDISK=$SFDISK_BINARY
 
-haikuRequiredLegacyGCCVersion="2.95.3-haiku-100818"
+haikuRequiredLegacyGCCVersion="2.95.3-haiku-111122"
 export haikuRequiredLegacyGCCVersion
 	# version of legacy gcc required to build haiku
 
@@ -394,7 +394,7 @@ while [ $# -gt 0 ] ; do
 				x86)	HAIKU_GCC_MACHINE=i586-pc-haiku;;
 				x86_64)	HAIKU_GCC_MACHINE=x86_64-pc-haiku; targetArch=x86_64;;
 				ppc)	HAIKU_GCC_MACHINE=powerpc-apple-haiku; targetArch=ppc;;
-				m68k)	HAIKU_GCC_MACHINE=m68k-unknown-haiku; targetArch=m86k;;
+				m68k)	HAIKU_GCC_MACHINE=m68k-unknown-haiku; targetArch=m68k;;
 				arm)	HAIKU_GCC_MACHINE=arm-unknown-haiku; targetArch=arm;;
 				mipsel)	HAIKU_GCC_MACHINE=mipsel-unknown-haiku; targetArch=mips;;
 				*)		echo "Unsupported target architecture: $2"
@@ -463,30 +463,6 @@ case "${platform}" in
 	*)		echo Unsupported platform: ${platform}
 			exit 1 ;;
 esac
-
-# check yasm version
-if [ $targetArch = "x86" ]; then
-	$HAIKU_YASM --version > /dev/null || {
-		echo "The yasm assembler version 0.7.0 or later must be installed."
-		echo "Download from: http://www.tortall.net/projects/yasm/wiki/Download"
-		exit 1
-	}
-
-	set -- $($HAIKU_YASM --version | head -n 1)
-	versionOK=0
-	case $2 in
-		0.[0-6].*)		;;
-		*)				versionOK=1 ;;
-	esac
-versionOK=1
-
-	if [ $versionOK = 0 ]; then
-		echo "The yasm assembler version 0.7.0 or later must be installed."
-		echo "The installed version is $2."
-		echo "Download from: http://www.tortall.net/projects/yasm/wiki/Download"
-		exit 1
-	fi
-fi
 
 # check common locations for sfdisk
 for sfdiskDir in /sbin /usr/sbin /usr/local/sbin ; do

@@ -9,6 +9,9 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		hiromu1996
+ *		log-1
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -36,6 +39,8 @@
 <li><a href="../../uk/applications/diskusage.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/applications/diskusage.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/applications/diskusage.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/diskusage.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/diskusage.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/applications/diskusage.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -47,30 +52,29 @@
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 <h2><img src="../../images/apps-images/diskusage-icon_64.png" alt="diskusage-icon_64.png" width="64" height="64" />DiskUsage</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbarメニュー:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
-<tr><td>場所:</td><td></td><td><span class="path">/boot/system/apps/DiskUsage</span></td></tr>
-<tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/DiskUsage</span></td></tr>
+<tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><span class="menu">アプリケーション (Applications)</span></td></tr>
+<tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/DiskUsage</span></td></tr>
+<tr><td>設定ファイル：</td><td></td><td><span class="path">~/config/settings/DiskUsage</span></td></tr>
 </table>
 <p><br /></p>
-<p>DiskUsage shows graphically how the space on your volumes is utilized.<br />
-A useful tool to answer the question, "<i>Where has all my disk space gone?</i>".</p>
+<p>DiskUsageはディスクの容量がどのように使われているのかをグラフィカルに表示します。<br />
+<i>「ディスク容量がどこに費やされているの?」</i>といったことがわかる便利なツールです。</p>
 <p><img id="diskusage" src="../images/apps-images/diskusage.png" alt="diskusage.png" /></p>
-<p>The concentric circles represent different levels in the file system hierarchy. Above, the circle in the center represents the <span class="path">/boot/home/</span> folder. Each segment of the ring immediately outside that circle is a file or folder under <span class="path">/boot/home/</span>. Every segment farther outside brings you one level deeper in the file hierarchy. You may have to resize the window to accommodate very deep folders.</p>
-<p>Above the graphic is a pop-up menu that lets you switch between all mounted volumes. Before the disk usage of a volume can be displayed, it has to be scanned. As this can take a while for larger disks, you can examine another volume while that scan is done in the background.</p>
+<p>同心円のそれぞれがファイルシステムの階層を表しています。上記のように、一番中心の円が<span class="path">/boot/home/</span>フォルダーを、そのすぐ外側の円形のブロックが<span class="path">/boot/home/</span>以下のファイルやフォルダを示しています。ファイルシステムの階層が深くなるごとに円形のブロックが外側に追加されていくので、深い階層のフォルダの情報を見るためにはウィンドウサイズを変更する必要があるかもしれません。</p>
+<p>図の上に、マウントされている中からディスクを切り替えるポップアップメニューがあります。ディスクの使用量を表示するにはスキャンが必要ですが、バックグラウンドでディスクをスキャンがしている間に、他のディスクについて見るということも可能です。</p>
 <div class="box-info"><ul>
-<li>If the graphical representation of a file or folder comprises less than about 2° of a circle, it is excluded from the display.</li>
-<li>The number of files that's reported for a folder includes files in subfolders too. A folder counts as a file.</li>
-<li>DiskUsage ignores symbolic links.</li>
+<li>図で角度が2゜に満たないサイズのファイルやフォルダは表示されません。</li>
+<li>フォルダ内のファイルの数には、サブフォルダ内のファイルの数も含まれていて、フォルダもファイルと同じように数えられます。</li>
+<li>使用量にはシンボリックリンクは含まれません。</li>
 </ul></div>
-<p>As you move the mouse over a segment, information about that file or folder appears in the status bar at the bottom.</p>
-<p>Right-clicking a segment offers a context menu to <span class="menu">Get Info</span>, <span class="menu">Open</span> (with Tracker), <span class="menu">Open With</span> another suitable application or <span class="menu">Rescan</span> that particular folder.<br />
-Left-clicking a segment makes that file/folder the center circle.<br />
-Left-clicking the center circle moves you up one level.</p>
-<p>You can drag files and folders from DiskUsage to other applications or to the Desktop or other Tracker windows for copying. Vice versa, dropped volumes and folders on DiskUsage's window will zoom directly to them, making them the new center circle.</p>
+<p>マウスをあるブロックの上に重ねると、ポインタの下の部分のファイルやフォルダの情報が一番下のステータスバーに表示されます。</p>
+<p>右クリックでコンテキストメニューが表示され、それぞれ<span class="menu">情報を表示</span>・<span class="menu">開く</span>・<span class="menu">アプリケーションで開く</span>・<span class="menu">再スキャン</span>となっています。<br />
+左クリックで、そのファイルやフォルダを中心に持ってくることができます。<br />
+中心の円で左クリックをすると、表示されている階層がひとつ上がります。</p>
+<p>ドラッグすることで、ファイルとフォルダをDiskUsageから他のアプリケーションやデスクトップ、Trackerにコピーすることができます。同様に、ディスクやフォルダをDiskUsageのウィンドウにドロップすることでそこの使用量が中心に表示されます。</p>
 
 </div>
 </div>

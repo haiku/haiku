@@ -1,6 +1,9 @@
 SubDir HAIKU_TOP src system libroot posix string ;
 
-UsePrivateHeaders [ FDirName libroot locale ] ;
+UsePrivateHeaders 
+	[ FDirName libroot ] 
+	[ FDirName libroot locale ] 
+;
 
 MergeObject posix_string.o :
 	bcmp.c

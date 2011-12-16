@@ -280,14 +280,15 @@ Identify(	/*	required	*/
 		outInfo->type = PPM_TYPE;
 		outInfo->quality = 0.3;		/* no alpha, etc */
 		outInfo->capability = 0.8;	/* we're pretty good at PPM reading, though */
-		strcpy(outInfo->name, B_TRANSLATE("PPM image"));
+		strlcpy(outInfo->name, B_TRANSLATE("PPM image"), sizeof(outInfo->name));
 		strcpy(outInfo->MIME, "image/x-portable-pixmap");
 	}
 	else {
 		outInfo->type = B_TRANSLATOR_BITMAP;
 		outInfo->quality = 0.4;		/* B_TRANSLATOR_BITMAP can do alpha, at least */
 		outInfo->capability = 0.8;	/* and we might not know many variations thereof */
-		strcpy(outInfo->name, B_TRANSLATE("Be Bitmap Format (PPMTranslator)"));
+		strlcpy(outInfo->name, B_TRANSLATE("Be Bitmap Format (PPMTranslator)"),
+			sizeof(outInfo->name));
 		strcpy(outInfo->MIME, "image/x-be-bitmap");	/* this is the MIME type of B_TRANSLATOR_BITMAP */
 	}
 	return B_OK;

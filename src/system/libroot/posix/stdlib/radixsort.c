@@ -55,6 +55,8 @@ static char sccsid[] = "@(#)radixsort.c	8.2 (Berkeley) 4/28/95";
 #include <stdlib.h>
 #include <errno.h>
 
+#include <errno_private.h>
+
 typedef struct {
 	const u_char **sa;
 	int sn, si;
@@ -80,7 +82,7 @@ static void r_sort_b(u_char const **, u_char const **, int, int, u_char const *,
 		endch = tab[endch];					\
 		tr = tab;						\
 		if (endch != 0 && endch != 255) {			\
-			/* errno = EINVAL; */				\
+			/* __set_errno(EINVAL); */				\
 			return (-1);					\
 		}							\
 	}								\
@@ -299,7 +301,7 @@ void
 simplesort(u_char const **a, int n, int b, u_char const *tr, u_int endch)	/* insertion sort */
 {
 	u_char ch;
-	u_char const **ak; 
+	u_char const **ak;
 	u_char const **ai;
 	u_char const  *s;
 	u_char const  *t;

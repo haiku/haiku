@@ -38,8 +38,7 @@
 status_t
 watch_volume(dev_t volume, uint32 flags, BMessenger target)
 {
-	if ((flags | B_WATCH_NAME) == 0 && (flags | B_WATCH_STAT)
-		&& (flags | B_WATCH_ATTR))
+	if ((flags & (B_WATCH_NAME | B_WATCH_STAT | B_WATCH_ATTR)) == 0)
 		return B_BAD_VALUE;
 
 	flags |= B_WATCH_VOLUME;

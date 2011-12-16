@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -41,12 +41,14 @@
 <li><a href="../uk/applications.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../zh_CN/applications.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../pt_PT/applications.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/applications.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/applications.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../en/applications.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
  «  <a href="workshop-filetypes+attributes.html">Workshop</a> 
 ::  <a href="contents.html" class="uplink">Inhalt</a> 
-::  <a href="desktop-applets.html">Desktop Applets</a>  »
+::  <a href="desktop-applets.html"><acronym title="Desktop applets">Desktop-Apps</acronym></a>  »
 </span></div>
 </div>
 
@@ -63,10 +65,10 @@
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="install" name="install">Anwendungen installieren</a></h2>
 <p>Haiku Software kommt immer als Archiv. Meist ist es ein ZIP, einige alte BeOS Pakete kommen auch mal in Software Valet's PKG Format. Software Valet konnte automatisch Installationsskripte ausführen, so dass man nach dem Doppelklicken nur noch einen Zielordner angeben musste und alles weitere von selbst ging.<br />
-Handelt es sich um ein ZIP Archiv, öffnet ein Doppelklick den <span class="app">Expander</span> wo man ebenfalls den Zielordner angeben kann und es anschließend entpackt. Wie im Kapitel <a href="filesystem-layout.html">Dateisystem Layout</a> beschrieben, ist das Ziel entweder:</p>
+Handelt es sich um ein ZIP Archiv, öffnet ein Doppelklick den <span class="app"><acronym title="Expander">Entpacker</acronym></span> wo man ebenfalls den Zielordner angeben kann und es anschließend entpackt. Wie im Kapitel <a href="filesystem-layout.html">Dateisystem Layout</a> beschrieben, ist das Ziel entweder:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/common/apps/</span></td><td>   </td><td>für Anwendungen auf die alle Benutzer Zugriff haben sollen</td></tr>
-<tr><td><span class="path">/boot/home/apps/</span></td><td>   </td><td>für Anwendungen auf die man nur selbst Zugriff haben soll</td></tr>
+<tr><td><span class="path"><acronym title="/boot/common/apps/">/boot/Allgemein/apps/</acronym></span></td><td>   </td><td>für Anwendungen auf die alle Benutzer Zugriff haben sollen</td></tr>
+<tr><td><span class="path"><acronym title="/boot/home/apps/">/boot/Benutzer/apps/</acronym></span></td><td>   </td><td>für Anwendungen auf die man nur selbst Zugriff haben soll</td></tr>
 </table>
 <p>Dieser Unterschied wird natürlich erst relevant, sobald Haiku ein Mehrbenutzersystem geworden ist.</p>
 <p>Ist das Archiv entpackt, sollte man einen Blick in das neue Verzeichnis werfen. Oft enthält es ReadMe Dateien oder andere interessante Informationen.</p>
@@ -80,57 +82,59 @@ In den Kapiteln <a href="deskbar.html">Deskbar</a> und <a href="desktop-applets/
 <a id="uninstall" name="uninstall">Anwendungen deinstallieren</a></h2>
 <p>Geschah die Installation durch ein Installationsskript stehen die Chancen gut, dass auch ein entsprechendes De-Installationsskript existiert. In diesem Fall ist es wieder mit einem einfachen Doppelklick auf das Skript getan.<br />
 Andernfalls löscht man einfach den Ordner der Anwendung.</p>
-<p>Dadurch bleiben allerdings eventuelle Konfigurationsdateien im <span class="path">~/config/settings</span> Ordner übrig. Das kann natürlich auch gewollt sein, um die Einstellungen nicht zu verlieren, falls man das Programm zukünftig nochmal installieren möchte. Falls die Installation über die erwähnten "<span class="cli">drag [filename] here...</span>" Ordner ablief, bleiben die Dateien dort auch übrig.</p>
+<p>Dadurch bleiben allerdings eventuelle Konfigurationsdateien im <span class="path"><acronym title="~/config/settings">~/Konfiguration/settings</acronym></span> Ordner übrig. Das kann natürlich auch gewollt sein, um die Einstellungen nicht zu verlieren, falls man das Programm zukünftig nochmal installieren möchte. Falls die Installation über die erwähnten "<span class="cli">drag [filename] here...</span>" Ordner ablief, bleiben die Dateien dort auch übrig.</p>
 <p>Eine Möglichkeit um schnell alle zu einer Anwendung gehörenden Dateien zu finden, ist eine Query nach einem signifikanten Teil des Anwendungsnamens zu starten. Dadurch gelangt man an die Anwendung selbst, ihren Installationsordner und ihre Konfigurationsdateien, sowie mögliche Verknüpfungen in der Deskbar etc. Jetzt muss man nur noch alle relevanten Dateien auswählen und löschen.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="list-of-apps" name="list-of-apps">Haikus Anwendungen</a></h2>
-<p>Mit Haiku werden einige meist kleine, aber nützliche Anwendungen geliefert. Sie liegen alle in <span class="path">/boot/system/apps/</span> oder <span class="path">/boot/common/apps/</span>. Anwendungen die normalerweise nicht per Doppelklick auf eine Datendatei gestartet werden (wie z.B. ShowImage für Bilder) befinden sich im <span class="menu">Applications</span> Menü der Deskbar.</p>
+<p>Mit Haiku werden einige meist kleine, aber nützliche Anwendungen geliefert. Sie liegen alle in <span class="path"><acronym title="/boot/system/apps/">/boot/System/apps/</acronym></span> oder <span class="path"><acronym title="/boot/common/apps/">/boot/Allgemein/apps/</acronym></span>. Anwendungen, die normalerweise nicht per Doppelklick auf eine Datendatei gestartet werden (wie z.B. <acronym title="ShowImage">Bildbetrachter</acronym> für Bilddateien), befinden sich im Menü <span class="menu"><acronym title="Applications">Anwendungen</acronym></span> der Deskbar.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td style="width:24px;"><img src="../images/apps-images/activitymonitor-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/activitymonitor.html">ActivityMonitor</a></td><td style="width:10px;"> </td>
-		<td valign="top">Ein Programm zur Anzeige unterschiedlicher Systemressourcen wie CPU Auslastung oder Speicherverbrauch.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/cdplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/cdplayer.html">CDPlayer</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/activitymonitor-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/activitymonitor.html"><acronym title="ActivityMonitor">Systemmonitor</acronym></a></td><td style="width:10px;"> </td>
+		<td valign="top">Ein Programm zur Anzeige unterschiedlicher Systemressourcen wie CPU-Auslastung oder Speicherverbrauch.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/bootmanager-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bootmanager.html"><acronym title="BootManager">Bootmanager</acronym></a></td><td> </td>
+		<td valign="top">Ein Tool zum Installieren eines Bootmenüs im MBR (Master Boot Record) eines Laufwerks.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/cdplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/cdplayer.html"><acronym title="CDPlayer">CD-Player</acronym></a></td><td> </td>
 		<td valign="top">Ein Player für Audio CDs.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/charactermap-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/charactermap.html">CharacterMap</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/charactermap-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/charactermap.html"><acronym title="CharacterMap">Zeichentabelle</acronym></a></td><td> </td>
 		<td valign="top">Ein Programm zum Anzeigen einer Unicode Zeichentabelle.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/codycam-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/codycam.html">CodyCam</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/codycam-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/codycam.html"><acronym title="CodyCam">Webcam</acronym></a></td><td> </td>
 		<td valign="top">Ein Programm zum kontinuierlichen Speichern von Bilder einer Webcam auf einen Server.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/deskcalc-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/deskcalc.html">DeskCalc</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/deskcalc-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/deskcalc.html"><acronym title="DeskCalc">Rechner</acronym></a></td><td> </td>
 		<td valign="top">Ein Taschenrechner.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/diskprobe-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/diskprobe.html">DiskProbe</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/diskprobe-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/diskprobe.html"><acronym title="DiskProbe">Hex-Editor</acronym></a></td><td> </td>
 		<td valign="top">Ein HEX-Editor für Dateien und Datenträger.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/diskusage-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/diskusage.html">DiskUsage</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/diskusage-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/diskusage.html"><acronym title="DiskUsage">Datenträgerbelegung</acronym></a></td><td> </td>
 		<td valign="top">Ein Programm zur Darstellung der Datenträgerbelegung.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/drivesetup-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/drivesetup.html">DriveSetup</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/drivesetup-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/drivesetup.html"><acronym title="DriveSetup">Datenträgerverwaltung</acronym></a></td><td> </td>
 		<td valign="top">Ein Tool zur Partitionierung von Laufwerken.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/expander-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/expander.html">Expander</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/expander-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/expander.html"><acronym title="Expander">Entpacker</acronym></a></td><td> </td>
 		<td valign="top">Ein Entpacker verbreiteter Archive.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/icon-o-matic-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/icon-o-matic.html">Icon-O-Matic</a></td><td> </td>
 		<td valign="top">Ein Programm zur Erstellung von Haiku Vektoricons.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/installer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/installer.html">Installer</a></td><td> </td>
 		<td valign="top">Das Programm um Haiku auf eine Partition zu installieren.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/magnify-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/magnify.html">Magnify</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/magnify-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/magnify.html"><acronym title="Magnify">Lupe</acronym></a></td><td> </td>
 		<td valign="top">Das Programm zeigt einen vergrößerten Bereich rund um den Mauszeiger.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/mail-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mail.html">Mail</a></td><td> </td>
-		<td valign="top"><span style="color:silver">Ein Email Programm. [<i>fehlt noch</i>]</span></td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/mediaplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mediaplayer.html">MediaPlayer</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/mail-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mail.html"><acronym title="Mail">E-Mail</acronym></a></td><td> </td>
+		<td valign="top">Ein Email Programm. </td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/mediaplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mediaplayer.html"><acronym title="MediaPlayer">Media-Player</acronym></a></td><td> </td>
 		<td valign="top">Ein Player für alle unterstützten Audio/Video Dateien.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/midiplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/midiplayer.html">MidiPlayer</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/midiplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/midiplayer.html"><acronym title="MidiPlayer">Midi-Player</acronym></a></td><td> </td>
 		<td valign="top">Ein Player für MIDI Dateien.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/packageinstaller-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/packageinstaller.html">PackageInstaller</a></td><td> </td>
-		<td valign="top"><span style="color:silver">Ein Tool zum Installieren von BeOS Paketen im PKG Format. [<i>fehlt noch</i>]</span></td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/people-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/people.html">People</a></td><td> </td>
+		<td valign="top">Ein Tool zum Installieren von BeOS Paketen im PKG Format.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/people-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/people.html"><acronym title="People">Kontakte</acronym></a></td><td> </td>
 		<td valign="top">Ein Kontakt Manager.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/poorman-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/poorman.html">PoorMan</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/poorman-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/poorman.html"><acronym title="PoorMan">Webserver</acronym></a></td><td> </td>
 		<td valign="top">Ein einfacher Webserver.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/screenshot-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/screenshot.html">Screenshot</a></td><td> </td>
 		<td valign="top">Ein Tool um Screenshots aufzunehmen.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/showimage-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/showimage.html">ShowImage</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/showimage-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/showimage.html"><acronym title="ShowImage">Bildbetrachter</acronym></a></td><td> </td>
 		<td valign="top">Ein einfacher Bildbetrachter.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/soundrecorder-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/soundrecorder.html">SoundRecorder</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/soundrecorder-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/soundrecorder.html"><acronym title="SoundRecorder">Audiorekorder</acronym></a></td><td> </td>
 		<td valign="top"><span style="color:silver">Ein Programm zur Audioaufnahme von Line-In oder Mikrophon.[<i>fehlt noch</i>]</span></td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/stylededit-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/stylededit.html">StyledEdit</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/stylededit-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/stylededit.html"><acronym title="StyledEdit">Texteditor</acronym></a></td><td> </td>
 		<td valign="top">Ein einfacher Texteditor.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/terminal-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/terminal.html">Terminal</a></td><td> </td>
 		<td valign="top">Zugang zur bash.</td></tr>
@@ -177,7 +181,7 @@ Andernfalls löscht man einfach den Ordner der Anwendung.</p>
 <div class="inner"><span>
  «  <a href="workshop-filetypes+attributes.html">Workshop</a> 
 ::  <a href="contents.html" class="uplink">Inhalt</a> 
-::  <a href="desktop-applets.html">Desktop Applets</a>  »
+::  <a href="desktop-applets.html"><acronym title="Desktop applets">Desktop-Apps</acronym></a>  »
 </span></div>
 </div>
 

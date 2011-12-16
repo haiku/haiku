@@ -1,13 +1,16 @@
-1	german	x-vnd.Haiku-SMTP	1052586247
-. The server said:\n	smtp		. Servermeldung:\n
-. The server says:\n	smtp		. Servermeldung:\n
-: Connection refused or host not found.	smtp		: Verbindung abgelehnt oder Host nicht gefunden.
-Connecting to server…	smtp		Mit Server verbinden…
-Destination:	ConfigView		Zielverzeichnis:
-ESMTP	ConfigView		ESMTP
-Error while logging in to %serv	smtp		Fehler beim Anmelden an %serv
-Error while opening connection to %serv	smtp		Fehler beim Verbinden mit %serv
-None	ConfigView		Keine
-POP3 authentication failed. The server said:\n	smtp		POP3-Authentifizierung fehlgeschlagen. Servermeldung:\n
-POP3 before SMTP	ConfigView		POP3 vor SMTP
+1	german	x-vnd.Haiku-SMTP	2740407895
 SMTP server:	ConfigView		SMTP-Server:
+STARTTLS	ConfigView		STARTTLS
+Error while logging in to %serv	smtp		Fehler beim Anmelden an %serv
+Unencrypted	ConfigView		Unverschlüsselt
+. The server says:\n	smtp		. Servermeldung:\n
+ESMTP	ConfigView		ESMTP
+Connecting to server…	smtp		Mit Server verbinden…
+Error while opening connection to %serv	smtp		Fehler beim Verbinden mit %serv
+POP3 authentication failed. The server said:\n	smtp		POP3-Authentifizierung fehlgeschlagen. Servermeldung:\n
+Destination:	ConfigView		Zielverzeichnis:
+: Connection refused or host not found.	smtp		: Verbindung abgelehnt oder Host nicht gefunden.
+None	ConfigView		Keine
+POP3 before SMTP	ConfigView		POP3 vor SMTP
+SSL	ConfigView		SSL
+. The server said:\n	smtp		. Servermeldung:\n

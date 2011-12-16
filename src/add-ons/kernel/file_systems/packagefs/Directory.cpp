@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -7,6 +7,8 @@
 #include "Directory.h"
 
 #include "DebugSupport.h"
+#include "UnpackingAttributeCookie.h"
+#include "UnpackingAttributeDirectoryCookie.h"
 #include "Utils.h"
 
 
@@ -29,64 +31,20 @@ Directory::~Directory()
 
 
 status_t
-Directory::Init(Directory* parent, const char* name)
+Directory::Init(Directory* parent, const char* name, uint32 flags)
 {
-	status_t error = fChildTable.Init();
+	status_t error = Node::Init(parent, name, flags);
 	if (error != B_OK)
 		return error;
 
-	return Node::Init(parent, name);
-}
-
-
-status_t
-Directory::VFSInit(dev_t deviceID)
-{
-	return B_OK;
-}
-
-
-void
-Directory::VFSUninit()
-{
+	return fChildTable.Init();
 }
 
 
 mode_t
 Directory::Mode() const
 {
-	if (PackageDirectory* packageDirectory = fPackageDirectories.Head())
-		return packageDirectory->Mode();
 	return S_IFDIR | S_IRUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
-}
-
-
-uid_t
-Directory::UserID() const
-{
-	if (PackageDirectory* packageDirectory = fPackageDirectories.Head())
-		return packageDirectory->UserID();
-	return 0;
-}
-
-
-gid_t
-Directory::GroupID() const
-{
-	if (PackageDirectory* packageDirectory = fPackageDirectories.Head())
-		return packageDirectory->GroupID();
-	return 0;
-}
-
-
-timespec
-Directory::ModifiedTime() const
-{
-	if (PackageDirectory* packageDirectory = fPackageDirectories.Head())
-		return packageDirectory->ModifiedTime();
-
-	timespec time = { 0, 0 };
-	return time;
 }
 
 
@@ -94,59 +52,6 @@ off_t
 Directory::FileSize() const
 {
 	return 0;
-}
-
-
-status_t
-Directory::AddPackageNode(PackageNode* packageNode)
-{
-	if (!S_ISDIR(packageNode->Mode()))
-		return B_BAD_VALUE;
-
-	PackageDirectory* packageDirectory
-		= dynamic_cast<PackageDirectory*>(packageNode);
-
-	PackageDirectory* other = fPackageDirectories.Head();
-	bool isNewest = other == NULL
-		|| packageDirectory->ModifiedTime() > other->ModifiedTime();
-
-	if (isNewest)
-		fPackageDirectories.Insert(other, packageDirectory);
-	else
-		fPackageDirectories.Add(packageDirectory);
-
-	return B_OK;
-}
-
-
-void
-Directory::RemovePackageNode(PackageNode* packageNode)
-{
-	bool isNewest = packageNode == fPackageDirectories.Head();
-	fPackageDirectories.Remove(dynamic_cast<PackageDirectory*>(packageNode));
-
-	// when removing the newest node, we need to find the next node (the list
-	// is not sorted)
-	PackageDirectory* newestNode = fPackageDirectories.Head();
-	if (isNewest && newestNode != NULL) {
-		PackageDirectoryList::Iterator it = fPackageDirectories.GetIterator();
-		it.Next();
-			// skip the first one
-		while (PackageDirectory* otherNode = it.Next()) {
-			if (otherNode->ModifiedTime() > newestNode->ModifiedTime())
-				newestNode = otherNode;
-		}
-
-		fPackageDirectories.Remove(newestNode);
-		fPackageDirectories.Insert(fPackageDirectories.Head(), newestNode);
-	}
-}
-
-
-PackageNode*
-Directory::GetPackageNode()
-{
-	return fPackageDirectories.Head();
 }
 
 
@@ -159,6 +64,13 @@ Directory::Read(off_t offset, void* buffer, size_t* bufferSize)
 
 status_t
 Directory::Read(io_request* request)
+{
+	return B_IS_A_DIRECTORY;
+}
+
+
+status_t
+Directory::ReadSymlink(void* buffer, size_t* bufferSize)
 {
 	return B_IS_A_DIRECTORY;
 }
@@ -209,19 +121,4 @@ void
 Directory::RemoveDirectoryIterator(DirectoryIterator* iterator)
 {
 	fIterators.Remove(iterator);
-}
-
-
-RootDirectory::RootDirectory(ino_t id, const timespec& modifiedTime)
-	:
-	Directory(id),
-	fModifiedTime(modifiedTime)
-{
-}
-
-
-timespec
-RootDirectory::ModifiedTime() const
-{
-	return fModifiedTime;
 }

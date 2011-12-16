@@ -9,7 +9,7 @@
 #include <new>
 
 #include <UrlRequest.h>
-#include <UrlHttpProtocol.h>
+#include <UrlProtocolHttp.h>
 #include <Debug.h>
 
 
@@ -136,7 +136,7 @@ BUrlRequest::Identify()
 	fUrlProtocol = NULL;
 	
 	if (fUrl.Protocol() == "http") {
-		fUrlProtocol = new(std::nothrow) BUrlHttpProtocol(fUrl, fListener, fContext, &fResult);
+		fUrlProtocol = new(std::nothrow) BUrlProtocolHttp(fUrl, fListener, fContext, &fResult);
 		fReady = true;
 		return B_OK;
 	}

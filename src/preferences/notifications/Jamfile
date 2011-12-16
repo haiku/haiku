@@ -12,8 +12,6 @@ Application Notifications :
 	GeneralView.cpp
 	DisplayView.cpp
 	NotificationsView.cpp
-	IconRule.cpp
-	IconItem.cpp
 	: be translation libcolumnlistview.a libnotification.a $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
 	: Notifications.rdef
 ;

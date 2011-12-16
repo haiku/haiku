@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,6 +9,7 @@
 #include <String.h>
 
 #include "CompilationUnit.h"
+#include "Dwarf.h"
 #include "DwarfFile.h"
 
 
@@ -40,6 +42,7 @@ DwarfUtils::GetDIEName(const DebugInfoEntry* entry, BString& _name)
 /*static*/ void
 DwarfUtils::GetFullDIEName(const DebugInfoEntry* entry, BString& _name)
 {
+	BString generatedName;
 	// If we don't seem to have a name but an abstract origin, return the
 	// origin's name.
 	const char* name = entry->Name();
@@ -59,9 +62,98 @@ DwarfUtils::GetFullDIEName(const DebugInfoEntry* entry, BString& _name)
 		}
 	}
 
-	// TODO: Get template and function parameters!
+	// we found no name for this entry whatsoever, abort.
+	if (name == NULL)
+		return;
 
-	_name = name;
+	generatedName = name;
+
+	const DIESubprogram* subProgram = dynamic_cast<const DIESubprogram*>(
+		entry);
+	if (subProgram != NULL) {
+		generatedName += "(";
+		BString parameters;
+		DebugInfoEntryList::ConstIterator iterator
+			= subProgram->Parameters().GetIterator();
+
+		bool firstParameter = true;
+		while (iterator.HasNext()) {
+			DebugInfoEntry* parameterEntry = iterator.Next();
+			if (dynamic_cast<DIEUnspecifiedParameters*>(parameterEntry)
+				!= NULL) {
+				parameters += ", ...";
+				continue;
+			}
+
+			const DIEFormalParameter* parameter
+				= dynamic_cast<DIEFormalParameter*>(parameterEntry);
+			if (parameter == NULL) {
+				// this shouldn't happen
+				return;
+			}
+
+			if (parameter->IsArtificial())
+				continue;
+
+			BString paramName;
+			BString modifier;
+			DIEType* type = parameter->GetType();
+			if (DIEModifiedType* modifiedType = dynamic_cast<DIEModifiedType*>(
+				type)) {
+				DIEType* baseType = type;
+				while ((modifiedType = dynamic_cast<DIEModifiedType*>(
+					baseType)) != NULL && modifiedType->GetType() != NULL) {
+					switch (modifiedType->Tag()) {
+						case DW_TAG_pointer_type:
+							modifier.Prepend("*");
+							break;
+						case DW_TAG_reference_type:
+							modifier.Prepend("&");
+							break;
+						case DW_TAG_const_type:
+							modifier.Prepend(" const ");
+							break;
+						default:
+							break;
+					}
+
+					baseType = modifiedType->GetType();
+				}
+				type = baseType;
+			}
+
+			GetFullyQualifiedDIEName(type, paramName);
+			if (modifier.Length() > 0) {
+				if (modifier[modifier.Length() - 1] == ' ')
+					modifier.Truncate(modifier.Length() - 1);
+
+				// if the modifier has a leading const, treat it
+				// as the degenerate case and prepend it to the
+				// type name since that's the more typically used
+				// representation in source
+				if (modifier[0] == ' ') {
+					paramName.Prepend("const ");
+					modifier.Remove(0, 7);
+				}
+				paramName += modifier;
+			}
+
+			if (firstParameter)
+				firstParameter = false;
+			else
+				parameters += ", ";
+
+			parameters += paramName;
+		}
+
+		if (parameters.Length() > 0)
+			generatedName += parameters;
+		else
+			generatedName += "void";
+		generatedName += ")";
+	}
+
+	_name = generatedName;
 }
 
 
@@ -84,12 +176,18 @@ DwarfUtils::GetFullyQualifiedDIEName(const DebugInfoEntry* entry,
 	}
 
 	_name.Truncate(0);
+	BString generatedName;
 
 	// Get the namespace, if any.
 	DebugInfoEntry* parent = entry->Parent();
 	while (parent != NULL) {
 		if (parent->IsNamespace()) {
-			GetFullyQualifiedDIEName(parent, _name);
+			BString parentName;
+			GetFullyQualifiedDIEName(parent, parentName);
+			if (parentName.Length() > 0) {
+				parentName += "::";
+				generatedName.Prepend(parentName);
+			}
 			break;
 		}
 
@@ -98,14 +196,12 @@ DwarfUtils::GetFullyQualifiedDIEName(const DebugInfoEntry* entry,
 
 	BString name;
 	GetFullDIEName(entry, name);
-
 	if (name.Length() == 0)
 		return;
 
-	if (_name.Length() > 0) {
-		_name << "::" << name;
-	} else
-		_name = name;
+	generatedName += name;
+
+	_name = generatedName;
 }
 
 

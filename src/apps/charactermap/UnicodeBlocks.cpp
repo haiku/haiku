@@ -207,7 +207,7 @@ const struct unicode_block_entry kUnicodeBlocks[] = {
 		 0x012400, 0x01247f, false, kNoBlock},
 	{B_TRANSLATE("Byzantine musical symbols"),
 		 0x01d000, 0x01d0ff, false, kNoBlock},
-	{B_TRANSLATE("Muscial symbols"), 0x01d100, 0x01d1ff, false, kNoBlock},
+	{B_TRANSLATE("Musical symbols"), 0x01d100, 0x01d1ff, false, kNoBlock},
 	{B_TRANSLATE("Ancient Greek musical notation"),
 		 0x01d200, 0x01d24f, false, kNoBlock},
 	{B_TRANSLATE("Tai Xuan Jing symbols"),

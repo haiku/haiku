@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Terminal	2225488941
+1	swedish	x-vnd.Haiku-Terminal	2763377662
 %app% settings	Terminal PrefWindow	window title	%app% inställningar
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help visa denna hjälp\n -t, --title ange fönstertitel\n -f, --fullscreen starta helskärmsläge\n
 Abort	Terminal Shell		Avbryt
@@ -36,6 +36,7 @@ Find previous	Terminal TermWindow		Sök föregående
 Find…	Terminal TermWindow		Sök...
 Font:	Terminal AppearancePrefView		Typsnitt:
 Full screen	Terminal TermWindow		Helskärm
+Green on Black	Terminal colors schema		Grönt på svart
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nUpphovsrätt 2001-2009 Haiku, Inc.\nUpphovsrätt (C) 1999 Kazuho Okui and Takashi Murai.\n\nHantering: %s [OPTION] [SHELL]\n
 Increase	Terminal TermWindow		Öka
 Insert path	Terminal TermView		Lägg till sökväg

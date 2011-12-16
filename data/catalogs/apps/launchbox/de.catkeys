@@ -1,34 +1,33 @@
-1	german	x-vnd.Haiku-LaunchBox	1440389990
-Add button here	LaunchBox		Feld hier einfügen
-Auto-raise	LaunchBox		Automatisch nach vorn holen
-Bummer	LaunchBox		Mist
-Cancel	LaunchBox		Abbrechen
-Clear button	LaunchBox		Feld leeren
-Clone	LaunchBox		Duplizieren
-Close	LaunchBox		Schließen
-Description for '%3'	LaunchBox		Beschreibung für '%3'
-Failed to launch '%1'.\n\nError: 	LaunchBox		'%1' konnte nicht gestartet werden.\n\nFehler:
-Failed to launch 'something',error in Pad data.	LaunchBox		Start von 'something' fehlgeschlagen, Fehler in den Daten des Blocks.
-Failed to launch application with signature '%2'.\n\nError: 	LaunchBox		Die Anwendung mit der Signatur '%2' konnte nicht gestartet werden.\n\nFehler:
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Senden des 'open folder' Kommandos zu Tracker fehlgeschlagen.\n\nFehler:
-Horizontal layout	LaunchBox		Horizontale Anordnung
-Icon size	LaunchBox		Icongröße
-Ignore double-click	LaunchBox		Doppelklick ignorieren
-LaunchBox	System name		LaunchBox
-Name Panel	LaunchBox		Namenspanel
+1	german	x-vnd.Haiku-LaunchBox	4192523522
 New	LaunchBox		Neu
-OK	LaunchBox		OK
-Pad	LaunchBox		Block
-Pad %1	LaunchBox		Block %1
-Pad 1	LaunchBox		Block 1
-Quit	LaunchBox		Beenden
-Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Wirklich diesen Block schließen?\n(Der Block wird nicht gespeichert.)
-Remove button	LaunchBox		Feld entfernen
 Set description…	LaunchBox		Beschreibung ändern...
-Settings	LaunchBox		EInstellungen
+Vertical layout	LaunchBox		Vertikale Anordnung
+OK	LaunchBox		OK
+Pad 1	LaunchBox		Block 1
+last chance	LaunchBox		letzte Chance
+Quit	LaunchBox		Beenden
+Clear button	LaunchBox		Feld leeren
+LaunchBox	System name		LaunchBox
+Ignore double-click	LaunchBox		Doppelklick ignorieren
+Auto-raise	LaunchBox		Automatisch nach vorn holen
 Show on all workspaces	LaunchBox		Auf allen Arbeitsflächen anzeigen
 Show window border	LaunchBox		Fensterrahmen anzeigen
-Vertical layout	LaunchBox		Vertikale Anordnung
+Pad	LaunchBox		Block
+Icon size	LaunchBox		Icongröße
+Bummer	LaunchBox		Mist
+Cancel	LaunchBox		Abbrechen
+Remove button	LaunchBox		Feld entfernen
+Horizontal layout	LaunchBox		Horizontale Anordnung
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nDie Anwendung mit der Signatur "%2" konnte nicht gestartet werden.\n\nFehler:
+Failed to launch '%1'.\n\nError:	LaunchBox		'%1' konnte nicht gestartet werden.\n\nFehler:
+Name Panel	LaunchBox		Namenspanel
+Add button here	LaunchBox		Feld hier einfügen
+Description for '%3'	LaunchBox		Beschreibung für '%3'
+Settings	LaunchBox		EInstellungen
+Pad %1	LaunchBox		Block %1
+Close	LaunchBox		Schließen
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Senden des 'open folder' Kommandos zu Tracker fehlgeschlagen.\n\nFehler:
 You can drag an icon here.	LaunchBox		Hier kann ein Icon hingezogen werden.
-last chance	LaunchBox		letzte Chance
+Clone	LaunchBox		Duplizieren
 launch popup	LaunchBox		starte popup
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Wirklich diesen Block schließen?\n(Der Block wird nicht gespeichert.)

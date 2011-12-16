@@ -1,45 +1,47 @@
-1	german	x-vnd.Be-TSKB	4265681964
-<Be folder is empty>	BeMenu		<Be-Ordner ist leer>
-About this system	BeMenu		Über dieses System
-Always on top	PreferencesWindow		Immer im Vordergrund
-Applications	B_USER_DESKBAR_DIRECTORY/Applications		Anwendungen
-Applications	PreferencesWindow		Anwendungen
-Auto-hide	PreferencesWindow		Automatisch ausblenden
-Auto-raise	PreferencesWindow		Automatisch nach vorn holen
-Change time…	TimeView		Uhrzeit ändern…
-Clock	PreferencesWindow		Uhr
-Close all	WindowMenu		Alle schließen
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demos
-Deskbar	System name		Deskbar
-Deskbar preferences	PreferencesWindow		Deskbar-Einstellungen
-Deskbar preferences…	BeMenu		Deskbar-Einstellungen…
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Desktop-Apps
+1	german	x-vnd.Be-TSKB	107564593
+Power off	DeskbarMenu		Ausschalten
 Edit menu…	PreferencesWindow		Menü bearbeiten…
-Expand new applications	PreferencesWindow		Neue Anwendungen aufklappen
-Find…	BeMenu		Suchen…
-Hide all	WindowMenu		Alle ausblenden
-Hide time	TimeView		Uhrzeit ausblenden
-Menu	PreferencesWindow		Menü
-Mount	BeMenu		Einhängen
-No windows	WindowMenu		Keine Fenster
-Power off	BeMenu		Ausschalten
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Einstellungen
-Quit application	WindowMenu		Anwendung beenden
-Recent applications	BeMenu		Letzte Anwendungen
-Recent applications:	PreferencesWindow		Letzte Anwendungen:
-Recent documents	BeMenu		Letzte Dokumente
+Suspend	DeskbarMenu		Ruhezustand
+Applications	PreferencesWindow		Anwendungen
+About Haiku	DeskbarMenu		Über Haiku
 Recent documents:	PreferencesWindow		Letzte Dokumente:
-Recent folders	BeMenu		Letzte Ordner
-Recent folders:	PreferencesWindow		Letzte Ordner:
-Restart Tracker	BeMenu		Tracker neu starten
-Restart system	BeMenu		Neustarten
-Show Time	Tray		Uhrzeit einblenden
-Show all	WindowMenu		Alle einblenden
-Show application expander	PreferencesWindow		Expander anzeigen
-Show calendar…	TimeView		Kalender anzeigen…
-Show replicants	BeMenu		Replikanten einblenden
-Show seconds	PreferencesWindow		Sekunden anzeigen
-Shutdown…	BeMenu		Herunterfahren...
+Recent applications	DeskbarMenu		Letzte Anwendungen
 Sort running applications	PreferencesWindow		Laufende Anwendungen sortieren
-Tracker always first	PreferencesWindow		Tracker immer zuerst
+Change time…	TimeView		Uhrzeit ändern…
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Anwendungen
+Find…	DeskbarMenu		Suchen…
 Window	PreferencesWindow		Fenster
+Menu	PreferencesWindow		Menü
+Recent documents	DeskbarMenu		Letzte Dokumente
+Show seconds	PreferencesWindow		Sekunden anzeigen
+Auto-hide	PreferencesWindow		Automatisch ausblenden
+Always on top	PreferencesWindow		Immer im Vordergrund
+<Deskbar folder is empty>	DeskbarMenu		<Deskbar-Ordner ist leer>
+Show all	WindowMenu		Alle einblenden
+No windows	WindowMenu		Keine Fenster
+Deskbar	System name		Deskbar
+Restart system	DeskbarMenu		Neustarten
+Auto-raise	PreferencesWindow		Automatisch nach vorn holen
+Hide time	TimeView		Uhrzeit ausblenden
+Recent folders:	PreferencesWindow		Letzte Ordner:
+Show application expander	PreferencesWindow		Expander anzeigen
+Restart Tracker	DeskbarMenu		Tracker neu starten
+Close all	WindowMenu		Alle schließen
+Deskbar preferences	PreferencesWindow		Deskbar-Einstellungen
+Mount	DeskbarMenu		Einhängen
+Recent applications:	PreferencesWindow		Letzte Anwendungen:
+Shutdown…	DeskbarMenu		Herunterfahren…
+Tracker always first	PreferencesWindow		Tracker immer zuerst
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Einstellungen
+Recent folders	DeskbarMenu		Letzte Ordner
+About this system	DeskbarMenu		Über dieses System
+Show calendar…	TimeView		Kalender anzeigen…
+Deskbar preferences…	DeskbarMenu		Deskbar-Einstellungen…
+Show Time	Tray		Uhrzeit einblenden
+Expand new applications	PreferencesWindow		Neue Anwendungen aufklappen
+Show replicants	DeskbarMenu		Replikanten einblenden
+Clock	PreferencesWindow		Uhr
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demos
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Desktop-Apps
+Hide all	WindowMenu		Alle ausblenden
+Quit application	WindowMenu		Anwendung beenden

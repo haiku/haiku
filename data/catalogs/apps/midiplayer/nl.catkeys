@@ -1,18 +1,19 @@
-1	dutch	x-vnd.Haiku-MidiPlayer	3885957623
-Cavern	Main Window		Grot
-Closet	Main Window		WC
-Could not load song	Main Window		Nummer kon niet geladen worden
-Drop MIDI file here	Scope View		Sleep MIDI-bestand hierheen
-Dungeon	Main Window		Kerker
-Garage	Main Window		Garage
-Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku's MidiPlayer 1.0.0 beta\n\nMiniscuul proggie\nspeelt voor u uit duizenden\ngoedkope deuntjes
-Igor's lab	Main Window		Igor's lab
-Live input:	Main Window		Live input:
+1	dutch; flemish	x-vnd.Haiku-MidiPlayer	4180509704
 None	Main Window		Geen
+Live input:	Main Window		Live input:
+Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku's MidiPlayer 1.0.0 beta\n\nMiniscuul proggie\nspeelt voor u uit duizenden\ngoedkope deuntjes
+Stop	Main Window		Stop
+Cavern	Main Window		Grot
+Volume:	Main Window		Volume:
+Reverb:	Main Window		Galm:
 OK	Main Window		Oké
 Off	Main Window		Uit
+Dungeon	Main Window		Kerker
 Play	Main Window		Afspelen
-Reverb:	Main Window		Galm:
+Garage	Main Window		Garage
+Closet	Main Window		WC
+MidiPlayer	System name		MidiPlayer
+Drop MIDI file here	Scope View		Sleep MIDI-bestand hierheen
+Igor's lab	Main Window		Igor's lab
 Scope	Main Window		Scoop
-Stop	Main Window		Stop
-Volume:	Main Window		Volume:
+Could not load song	Main Window		Nummer kon niet geladen worden

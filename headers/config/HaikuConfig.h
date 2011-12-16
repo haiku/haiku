@@ -9,6 +9,7 @@
 /* Determine the architecture and define macros for some fundamental
    properties:
    __HAIKU_ARCH					- short name of the architecture (used in paths)
+   __HAIKU_ARCH_ABI				- name of ABI (as in package architecture)
    __HAIKU_ARCH_<arch>			- defined to 1 for the respective architecture
    __HAIKU_ARCH_BITS			- defined to 32/64 on 32/64 bit architectures
    								  (defaults to 32)
@@ -19,25 +20,35 @@
 */
 #ifdef __INTEL__
 #	define __HAIKU_ARCH					x86
+#	if __GNUC__ == 2
+#		define __HAIKU_ARCH_ABI			"x86_gcc2"
+#	else
+#		define __HAIKU_ARCH_ABI			"x86"
+#	endif
 #	define __HAIKU_ARCH_X86				1
 #	define __HAIKU_ARCH_PHYSICAL_BITS	64
 #elif __x86_64__
 #	define __HAIKU_ARCH					x86_64
+#	define __HAIKU_ARCH_ABI				"x86_64"
 #	define __HAIKU_ARCH_X86_64			1
 #	define __HAIKU_ARCH_BITS			64
 #elif __POWERPC__
 #	define __HAIKU_ARCH					ppc
+#	define __HAIKU_ARCH_ABI				"ppc"
 #	define __HAIKU_ARCH_PPC				1
 #	define __HAIKU_BIG_ENDIAN			1
 #elif __M68K__
 #	define __HAIKU_ARCH					m68k
+#	define __HAIKU_ARCH_ABI				"m68k"
 #	define __HAIKU_ARCH_M68K			1
 #	define __HAIKU_BIG_ENDIAN			1
 #elif __MIPSEL__
 #	define __HAIKU_ARCH					mipsel
+#	define __HAIKU_ARCH_ABI				"mipsel"
 #	define __HAIKU_ARCH_MIPSEL			1
 #elif __ARM__
 #	define __HAIKU_ARCH					arm
+#	define __HAIKU_ARCH_ABI				"arm"
 #	define __HAIKU_ARCH_ARM				1
 #else
 #	error Unsupported architecture!

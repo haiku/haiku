@@ -1,34 +1,34 @@
-1	german	system	180647795
-%.2f TiB	StringForSize		%.2f TiB
-%3.2f GiB	StringForSize		%3.2f GiB
-%3.2f KiB	StringForSize		%3.2f KiB
-%3.2f MiB	StringForSize		%3.2f MiB
-%d bytes	StringForSize		%d Bytes
-<empty>	Menu		<leer>
-About %app%	AboutMenuItem		Über %app%
-About %app…	Dragger		Über %app...
-About…	AboutWindow		Über...
-Blue:	ColorControl		Blau:
-Can't delete this replicant from its original application. Life goes on.	Dragger		Dieser Replikant kann nicht von seinem Ursprungsprogramm entfernt werden. Das Leben geht weiter.
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Replikant für \"%description\" konnte nicht erstellt werden.\n%error
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Das Ursprungsprogramm für den Replikanten konnte nicht gefunden werden, da keine Programm-Signatur zur Verfügung steht.\n%error
+1	german	x-vnd.Haiku-libbe	180647795
 Close	AboutWindow		Schließen
-Copy	TextView		Kopieren
-Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
+%3.2f GiB	StringForSize		%3.2f GiB
+Written by:	AboutWindow		Von:
+About %app%	AboutMenuItem		Über %app%
 Cut	TextView		Ausschneiden
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Replikant für \"%description\" konnte nicht erstellt werden.\n%error
+Copy	TextView		Kopieren
+%3.2f KiB	StringForSize		%3.2f KiB
+%d bytes	StringForSize		%d Bytes
+About…	AboutWindow		Über...
 Error	PrintJob		Fehler
-Error	ZombieReplicantView		Fehler
-Green:	ColorControl		Grün:
 No Pages to print!	PrintJob		Keine Seiten zu drucken!
 OK	Dragger		OK
 OK	PrintJob		OK
-OK	ZombieReplicantView		OK
-Paste	TextView		Einfügen
-Print Server is not responding.	PrintJob		Drucker-Server reagiert nicht.
-Red:	ColorControl		Rot:
-Redo	TextView		Wiederholen
+Green:	ColorControl		Grün:
 Remove replicant	Dragger		Replikant entfernen
+OK	ZombieReplicantView		OK
+Print Server is not responding.	PrintJob		Drucker-Server reagiert nicht.
+Paste	TextView		Einfügen
+Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
+%.2f TiB	StringForSize		%.2f TiB
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Das Ursprungsprogramm für den Replikanten konnte nicht gefunden werden, da keine Programm-Signatur zur Verfügung steht.\n%error
+Redo	TextView		Wiederholen
+<empty>	Menu		<leer>
 Select All	TextView		Alles auswählen
-Undo	TextView		Rückgängig
 Warning	Dragger		Warnung
-Written by:	AboutWindow		Von:
+Undo	TextView		Rückgängig
+Red:	ColorControl		Rot:
+%3.2f MiB	StringForSize		%3.2f MiB
+About %app…	Dragger		Über %app...
+Error	ZombieReplicantView		Fehler
+Blue:	ColorControl		Blau:
+Can't delete this replicant from its original application. Life goes on.	Dragger		Dieser Replikant kann nicht von seinem Ursprungsprogramm entfernt werden. Das Leben geht weiter.

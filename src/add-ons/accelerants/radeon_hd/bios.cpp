@@ -7,9 +7,9 @@
  */
 
 
-#include <Debug.h>
-
 #include "bios.h"
+
+#include <Debug.h>
 
 #include "accelerant.h"
 #include "accelerant_protos.h"
@@ -25,7 +25,7 @@
 #endif
 
 
-atom_context *gAtomContext;
+atom_context* gAtomContext;
 
 
 void
@@ -36,7 +36,7 @@ radeon_bios_init_scratch()
 	uint32 biosScratch2;
 	uint32 biosScratch6;
 
-	if (info.device_chipset >= RADEON_R600) {
+	if (info.chipsetID >= RADEON_R600) {
 		biosScratch2 = Read32(OUT, R600_BIOS_2_SCRATCH);
 		biosScratch6 = Read32(OUT, R600_BIOS_6_SCRATCH);
 	} else {
@@ -49,7 +49,7 @@ radeon_bios_init_scratch()
 	biosScratch6 |= ATOM_S6_ACC_BLOCK_DISPLAY_SWITCH;
 		// bios shouldn't handle mode switching
 
-	if (info.device_chipset >= RADEON_R600) {
+	if (info.chipsetID >= RADEON_R600) {
 		Write32(OUT, R600_BIOS_2_SCRATCH, biosScratch2);
 		Write32(OUT, R600_BIOS_6_SCRATCH, biosScratch6);
 	} else {
@@ -67,7 +67,7 @@ radeon_bios_isposted()
 	radeon_shared_info &info = *gInfo->shared_info;
 	uint32 reg;
 
-	if (info.device_chipset == (RADEON_R1000 | 0x50)) {
+	if (info.chipsetID == RADEON_PALM) {
 		// palms
 		reg = Read32(OUT, EVERGREEN_CRTC_CONTROL
 			+ EVERGREEN_CRTC0_REGISTER_OFFSET)
@@ -75,7 +75,7 @@ radeon_bios_isposted()
 			+ EVERGREEN_CRTC1_REGISTER_OFFSET);
 		if ((reg & EVERGREEN_CRTC_MASTER_EN) != 0)
 			return true;
-	} else if (info.device_chipset >= RADEON_R1000) {
+	} else if (info.chipsetID >= RADEON_CEDAR) {
 		// evergreen or higher
 		reg = Read32(OUT, EVERGREEN_CRTC_CONTROL
 				+ EVERGREEN_CRTC0_REGISTER_OFFSET)
@@ -91,14 +91,29 @@ radeon_bios_isposted()
 				+ EVERGREEN_CRTC5_REGISTER_OFFSET);
 		if ((reg & EVERGREEN_CRTC_MASTER_EN) != 0)
 			return true;
-	} else if (info.device_chipset > RADEON_R580) {
+	} else if (info.chipsetID >= RADEON_RS600) {
 		// avivio through r700
-		reg = Read32(OUT, AVIVO_D1CRTC_CONTROL) |
-			Read32(OUT, AVIVO_D2CRTC_CONTROL);
+		reg = Read32(OUT, AVIVO_D1CRTC_CONTROL)
+			| Read32(OUT, AVIVO_D2CRTC_CONTROL);
 		if ((reg & AVIVO_CRTC_EN) != 0) {
 			return true;
 		}
+	} else {
+		// early cards
+		reg = Read32(OUT, RADEON_CRTC_GEN_CNTL)
+			| Read32(OUT, RADEON_CRTC2_GEN_CNTL);
+		if ((reg & RADEON_CRTC_EN) != 0)
+			return true;
 	}
+
+	// also check memory size incase crt controlers are disabled
+	if (info.chipsetID >= RADEON_R600)
+		reg = Read32(OUT, R600_CONFIG_MEMSIZE);
+	else
+		reg = Read32(OUT, RADEON_CONFIG_MEMSIZE);
+
+	if (reg)
+		return true;
 
 	return false;
 }
@@ -118,7 +133,7 @@ radeon_init_bios(uint8* bios)
 	radeon_dump_bios();
 	#endif
 
-	struct card_info *atom_card_info
+	struct card_info* atom_card_info
 		= (card_info*)malloc(sizeof(card_info));
 
 	if (!atom_card_info)
@@ -181,7 +196,7 @@ radeon_dump_bios()
 	FILE* fp;
 	char filename[255];
 	sprintf(filename, "/boot/common/cache/tmp/radeon_hd_bios_1002_%" B_PRIx32
-		"_%" B_PRIu32 ".bin", info.device_id, info.device_index);
+		"_%" B_PRIu32 ".bin", info.pciID, info.deviceIndex);
 
 	fp = fopen(filename, "wb");
 	if (fp == NULL) {

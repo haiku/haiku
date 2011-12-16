@@ -4,29 +4,46 @@
  */
 
 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
 #include <OS.h>
 #include <image.h>
 #include <Entry.h>
 #include <Query.h>
 #include <Path.h>
+#include <String.h>
 #include <Volume.h>
 #include <fs_info.h>
-
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 
 
 extern const char* __progname;
 
 
+static status_t
+launch_registrar(const char* registrarPath)
+{
+	const char* args[] = { registrarPath, NULL };
+	thread_id thread = load_image(1, args, (const char**)environ);
+	if (thread < B_OK) {
+		fprintf(stderr, "%s: Could not start the registrar: %s\n",
+			__progname, strerror(thread));
+		return (status_t)thread;
+	}
+
+	return resume_thread(thread);
+}
+
+
 int
-main()
+main(int argc, char* argv[])
 {
 	team_info teamInfo;
 	int32 cookie = 0;
 	while (get_next_team_info(&cookie, &teamInfo) == B_OK) {
-		if (!strncmp(teamInfo.args, "/boot/beos/", 11)) {
+		if (!strncmp(teamInfo.args, "/boot/beos/", 11)
+			|| !strncmp(teamInfo.args, "/boot/system/", 13)) {
 			// this is a system component and not worth to investigate
 			continue;
 		}
@@ -75,18 +92,18 @@ main()
 
 		if (!strncmp(currentPath.Path(), registrarPath, generatedPath - registrarPath)) {
 			// gotcha!
-			const char* args[] = { registrarPath, NULL };
-			thread_id thread = load_image(1, args, (const char**)environ);
-			if (thread < B_OK) {
-				fprintf(stderr, "%s: Could not start the registrar: %s\n",
-					__progname, strerror(thread));
-				return -1;
-			}
-
-			resume_thread(thread);
-			return 0;
+			if (launch_registrar(registrarPath) == B_OK)
+				return 0;
 		}
 	}
+
+	// As a fallback (maybe the volume does not support queries for example)
+	// try to find the test_registrar in the current folder...
+	BString registrarPath(argv[0]);
+	registrarPath.RemoveLast(__progname);
+	registrarPath.Append("test_registrar");
+	if (launch_registrar(registrarPath.String()) == B_OK)
+		return 0;
 
 	fprintf(stderr, "%s: Could not find the Haiku Registrar.\n"
 		"    (This tool only works when used in the Haiku tree, but maybe\n"
@@ -94,4 +111,3 @@ main()
 		__progname);
 	return -1;
 }
-

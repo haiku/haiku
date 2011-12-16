@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	3486294898
+1	finnish	x-vnd.Haiku-libtracker	360023500
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 %Ld B	WidgetAttributeText		%Ld tavua
 %Ld bytes	WidgetAttributeText		%Ld tavua
@@ -7,10 +7,8 @@
 %num items	CountView		%num kohdetta
 (%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed / %TotalSize, %BytesPerSecond/s)
 (%bytes bytes)	InfoWindow		(%bytes tavua)
-(Finish: %time - %finishtime minutes left)	StatusWindow		(Loppuminen: %time - %finishtime minuuttia jäljellä)
-(Finish: %time - %finishtime seconds left)	StatusWindow		(Loppuminen: %time - %finishtime sekuntia jäljellä)
-(Finish: %time - Over %finishtime days left)	StatusWindow		(Loppuminen: %time - Yli %finishtime päivää jäljellä)
-(Finish: %time - Over %finishtime hours left)	StatusWindow		(Loppuminen: %time - Yli %finishtime tuntia jäljellä)
+(Finish: %time - %finishtime left)	StatusWindow		(Loppuu: %time - %finishtime jäljellä)
+(Finish: %time - Over %finishtime left)	StatusWindow		(Loppuu: %time - Yli %finistime jäljellä)
 (Finish: %time)	StatusWindow		(Loppuu klo: %time)
 1 item	CountView		1 kohde
 32 x 32	ContainerWindow		32 x 32
@@ -111,7 +109,6 @@ Disk mount settings	AutoMounterSettings		Levyn liittämisasetukset
 Disk mounting during boot	AutoMounterSettings		Levyn liittäminen alkulatauksen aikana
 Disks	DirMenu		Levyt
 Disks	Model		Levyt
-Do it	FSUtils		Tee se
 Does not handle file	OpenWithWindow		Ei käsittele tiedostoa
 Don't automount	AutoMounterSettings		Älä liitä automaattisesti
 Don't move files to Trash	SettingsView		Älä siirrä tiedostoja roskakoriin
@@ -170,12 +167,12 @@ Icon view	DeskWindow		Kuvakenäkymä
 Icon view	VolumeWindow		Kuvakenäkymä
 Identify	ContainerWindow		Tunnista
 Identify	InfoWindow		Tunnista
-If you %ifYouDoAction the common folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the common folder anyway, hold down the Shift key and click \"Do it\".	FSUtils		Jos suoritat toiminnon ’%ifYouDoAction’ yhteisessä kansiossa, Haiku ei ehkä käyttäydy oikein! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat toiminnon ’%toDoAction’ yhteisessä kansiossa, pidä alhaalla vaihtonäppäintä ja napsauta painiketta ”Tee se”.
-If you %ifYouDoAction the config folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"Do it\".	FSUtils		Jos suoritat config-kansiolle toiminnon ’%ifYouDoAction’, Haiku ei ehkä toimi oikein! Oletko varma, että haluat tehdä tämän? Jos silti haluat tehdä config-kansiolle toiminnon ’%toDoAction’, napsauta ”Tee se”.
-If you %ifYouDoAction the home folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the home folder anyway, hold down the Shift key and click \"Do it\".	FSUtils		Jos suoritat toiminnon ’%ifYouDoAction’ kotikansiossa, Haiku ei ehkä käyttäydy oikein! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat toiminnon ’%toDoAction’ kotikansiossa, pidä alhaalla vaihtonäppäintä ja napsauta painiketta ”Tee se”.
-If you %ifYouDoAction the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"Do it\".	FSUtils		Jos suoritat mime-asetuksille toiminnon ’%ifYouDoAction’, Haiku ei ehkä toimi oikein! Oletko varma, että haluat tehdä tämän? Jos silti haluat tehdä mime-asetuksille toiminnon ’%toDoAction’, napsaut ”Tee se”.
-If you %ifYouDoAction the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"Do it\".	FSUtils		Jos suoritat asetuskansiolle toiminnon ’%YouDoAction’, Haiku ei ehkä toimi oikein! Oletko varma, että haluat tehdä tämän? Jos silti haluat tehdä asetuskansiolle toiminnon ’%toDoAction’, napsauta ”Tee se”.
-If you %ifYouDoAction the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		Jos suoritat järjestelmäkansiolle tai sen sisällölle toiminnon ’%ifYouDoAction’, et kykene alkulataamaan Haikua! Oletko varma, että haluat tehdä tämän? Jos silti haluat tehdä järjestelmäkansiolle tai sen sisällölle toiminnon ’%toDoAction’, pidä vaihtonäppäin alhaalla ja napsauta ”Tee se”.
+If you %ifYouDoAction the common folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Jos teet toiminnon %ifYouDoAction yhteiskansiolle, %osName ei ehkä toimi enää oikein! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat tehdä toiminnon %toDoAction yhteiskansiolle, pidä vaihtonäppäin alhaalla ja napsauta painiketta \"%toConfirmAction\".
+If you %ifYouDoAction the config folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"%toConfirmAction\".	FSUtils		Jos teet toiminnon %ifYouDoAction konfigurointikansiolle, %osName ei ehkä toimi enää oikein! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat tehdä toiminnon %toDoAction konfigurointikansiolle, napsauta painiketta \"%toConfirmAction\".
+If you %ifYouDoAction the home folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Jos teet toiminnon %ifYouDoAction kotikansiolle, %osName ei ehkä toimi enää oikein! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat tehdä toiminnon %toDoAction kotikansiolle, pidä vaihtonäppäin alhaalla ja napsauta painiketta \"%toConfirmAction\".
+If you %ifYouDoAction the mime settings, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"%toConfirmAction\".	FSUtils		Jos teet toiminnon %ifYouDoAction mime-asetuksille, %osName ei ehkä toimi enää oikein! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat tehdä toiminnon %toDoAction mime-asetuksille, napsauta painiketta \"%toConfirmAction\".
+If you %ifYouDoAction the settings folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"%toConfirmAction\".	FSUtils		Jos teet toiminnon %ifYouDoAction asetuskansiolle, %osName ei ehkä toimi enää oikein! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat tehdä toiminnon %toDoAction asetuskansiolle, napsauta painiketta \"%toConfirmAction\".
+If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Jos teet toiminnon %ifYouDoAction järjestelmäkansiolle tai sen sisällölle, %osName ei ehkä alkulataa enää oikein! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat tehdä toiminnon %toDoAction järjestelmäkansiolle tai sen sisällölle, pidä vaihtonäppäin alhaalla ja napsauta painiketta \"%toConfirmAction\".
 Ignore case	SelectionWindow		Ohita kirjainkoko
 Include trash	FindPanel		Sisällytä roskakori
 Increase size	ContainerWindow		Kasvata kokoa
@@ -215,6 +212,7 @@ Mount all disks now	AutoMounterSettings		Liitä kaikki levyt nyt
 Mount server error	AutoMounterSettings		Liittämispalvelinvirhe
 Mount settings…	SettingsView		Liittämisasetukset...
 Mount settings…	VolumeWindow		Liittämisasetukset...
+Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Siirrä
 Move	PoseView		Siirrä
 Move here	ContainerWindow		Siirrä tänne
 Move to	ContainerWindow		Siirrä kohteeseen
@@ -293,6 +291,8 @@ Recent folders	ContainerWindow		Nykyiset kansiot
 Recent folders	FavoritesMenu		Äskettäiset kansiot
 Relation	OpenWithWindow		Suhde
 Remove	FindPanel		Poista
+Rename	InfoWindow	Button label, 'Rename' (en), 'Umbenennen' (de)	Nimeä uudelleen
+Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	Nimeä uudelleen
 Replace	FSUtils		Korvaa
 Replace	FilePanelPriv		Korvaa
 Replace all	FSUtils		Korvaa kaikki
@@ -432,8 +432,8 @@ less than	FindPanel		vähemmän kuin
 link	FSUtils	filename link	linkki
 matches regular expression	SelectionWindow		täsmää säännöllisen lausekkeen kanssa
 matches wildcard expression	SelectionWindow		täsmää jokerilausekkeeseen
-move	FSUtils	As in 'If you move ...'	siirrä
-move	FSUtils	As in 'To move ...'	siirrä
+move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	siirrä
+move	FSUtils	As in 'to move this folder...' (en) Um diesen Ordner zu verschieben...' (de)	siirrä
 moving	FSUtils		siirretään
 multiple disks	FindPanel		useita levyjä
 no items	CountView		ei kohteita
@@ -442,10 +442,10 @@ of %items	StatusWindow		/ %items
 optional	/boot/optional		valinnainen
 parent folder	NavMenu		Ylemmän tason kansio
 preferences	B_PREFERENCES_DIRECTORY		asetukset
-rename	InfoWindow	As in 'If you rename ...'	nimeä uudelleen
-rename	InfoWindow	As in 'To rename ...'	nimeä uudelleen
-rename	TextWidget	As in 'If you rename ...'	nimeä uudelleen
-rename	TextWidget	As in 'To rename ...'	nimeä uudelleen
+rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	nimeä uudelleen
+rename	InfoWindow	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	nimeä uudelleen
+rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	nimeä uudelleen
+rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	nimeä uudelleen
 save text	FilePanelPriv		tallenna teksti
 starts with	FindPanel		alkaa kohteella
 starts with	SelectionWindow		alkaa kohteella

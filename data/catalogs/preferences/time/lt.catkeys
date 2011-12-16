@@ -1,0 +1,44 @@
+1	lithuanian	x-vnd.Haiku-Time	3493650184
+GMT (UNIX compatible)	Time		Pasaulinis (Grinvičo) laikas (suderinama su UNIX)
+OK	Time		Gerai
+Asia	Time		Azija
+\nNow: 	Time		\nDabar: 
+Africa	Time		Afrika
+Stop	Time		Stabdyti
+Could not contact server	Time		Nepavyko susisiekti su serveriu
+Australia	Time		Australija
+Preview time:	Time		Laikas, kuris bus rodomas:
+Synchronize	Time		Sinchronizuoti
+Revert	Time		Atšaukti pakeitimus
+Pacific	Time		Ramusis vandenynas
+Add	Time		Pridėti
+Date and time	Time		Data ir laikas
+about	Time		Apie
+Local time (Windows compatible)	Time		Vietinis laikas (suderinama su „Windows“)
+Message receiving failed	Time		Nepavyko gauti pranešimo
+Set time zone	Time		Pakeisti laiko zoną
+Waiting for answer failed	Time		Atsakymas negautas
+Hardware clock set to:	Time		Aparatiniame šio įrenginio laikrodyje nustatytas:
+The following error occured while synchronizing:r\n%s	Time		Bandant sinchronizuoti, susidurta su šia klaida:\n%s
+Europe	Time		Europa
+Remove	Time		Pašalinti
+Time	Time		Laikas
+Indian	Time		Indijos vandenynas
+Sending request failed	Time		Užklausos išsiųsti nepavyko
+Arctic	Time		Arktis
+Time	System name		Laikas
+America	Time		Amerika
+Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Laiko ir datos nuostatos. Autoriai:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\n© 2004-2008, Haiku.
+Reset	Time		Numatytai
+Synchronize at boot	Time		Sinchronizuoti įkeliant sistemą
+Received invalid time	Time		Gautas negalimas laikas
+Antarctica	Time		Antarktis
+The following error occured while synchronizing:r\n%s: %s	Time		Bandant sinchronizuoti, susidurta su šia klaida:\n%s: %s
+<Other>	Time		<Kita>
+Current time:	Time		Dabartinis laikas:
+Try all servers	Time		Bandyti visus serverius
+Time zone	Time		Laiko zona
+Could not create socket	Time		Nepavyko sukurti lizdo
+Synchronize again	Time		Sinchronizuoti vėl
+Network time	Time		Sinchronizavimas
+Atlantic	Time		Atlanto vandenynas

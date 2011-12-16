@@ -1,0 +1,4 @@
+1	lithuanian	x-vnd.Haiku-SystemLogger	57960782
+%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nŠi tarnyba surenka visus sistemos pranešimus ir juos surašo į bendrą žurnalo failą – %s.\n\n
+OK	SyslogDaemon		Gerai
+Syslog Daemon	SyslogDaemon		Sistemos žurnalo tarnyba

@@ -1,34 +1,34 @@
-1	russian	system	180647795
-%.2f TiB	StringForSize		%.2f Тбайт
-%3.2f GiB	StringForSize		%3.2f Гбайт
-%3.2f KiB	StringForSize		%3.2f Кбайт
-%3.2f MiB	StringForSize		%3.2f Мбайт
-%d bytes	StringForSize		%d байт
-<empty>	Menu		<пусто>
-About %app%	AboutMenuItem		О программе…
-About %app…	Dragger		О программе…
-About…	AboutWindow		О программе…
-Blue:	ColorControl		Синий:
-Can't delete this replicant from its original application. Life goes on.	Dragger		Не удалось удалить этот репликант из его изначальное приложения. Жизнь продолжается.
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Невозможно удалить репликант \"%description\".\n%error
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Не удалось найти приложение этого репликанта. Не указана сигнатура приложения.\n%error
+1	russian	x-vnd.Haiku-libbe	180647795
 Close	AboutWindow		Закрыть
-Copy	TextView		Копировать
-Copyright © %years% Haiku, Inc.	AboutWindow		Все права защищены © %years% Haiku, Inc.
+%3.2f GiB	StringForSize		%3.2f Гбайт
+Written by:	AboutWindow		Разработан:
+About %app%	AboutMenuItem		О программе…
 Cut	TextView		Вырезать
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Невозможно удалить репликант \"%description\".\n%error
+Copy	TextView		Копировать
+%3.2f KiB	StringForSize		%3.2f Кбайт
+%d bytes	StringForSize		%d байт
+About…	AboutWindow		О программе…
 Error	PrintJob		Ошибка
-Error	ZombieReplicantView		Ошибка
-Green:	ColorControl		Зеленый:
 No Pages to print!	PrintJob		Нет страниц для печати
 OK	Dragger		ОК
 OK	PrintJob		ОК
-OK	ZombieReplicantView		ОК
-Paste	TextView		Вставить
-Print Server is not responding.	PrintJob		Сервер печати не отвечает.
-Red:	ColorControl		Красный:
-Redo	TextView		Повторить
+Green:	ColorControl		Зеленый:
 Remove replicant	Dragger		Удалить репликант
+OK	ZombieReplicantView		ОК
+Print Server is not responding.	PrintJob		Сервер печати не отвечает.
+Paste	TextView		Вставить
+Copyright © %years% Haiku, Inc.	AboutWindow		Все права защищены © %years% Haiku, Inc.
+%.2f TiB	StringForSize		%.2f Тбайт
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Не удалось найти приложение этого репликанта. Не указана сигнатура приложения.\n%error
+Redo	TextView		Повторить
+<empty>	Menu		<пусто>
 Select All	TextView		Выделить все
-Undo	TextView		Отменить
 Warning	Dragger		Внимание
-Written by:	AboutWindow		Разработан:
+Undo	TextView		Отменить
+Red:	ColorControl		Красный:
+%3.2f MiB	StringForSize		%3.2f Мбайт
+About %app…	Dragger		О программе…
+Error	ZombieReplicantView		Ошибка
+Blue:	ColorControl		Синий:
+Can't delete this replicant from its original application. Life goes on.	Dragger		Не удалось удалить этот репликант из его изначальное приложения. Жизнь продолжается.

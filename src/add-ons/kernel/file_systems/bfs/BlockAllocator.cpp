@@ -1048,7 +1048,7 @@ BlockAllocator::Free(Transaction& transaction, block_run run)
 	CHECK_ALLOCATION_GROUP(group);
 
 #ifdef DEBUG
-	if (CheckBlockRun(run, NULL, NULL, false) != B_OK) {
+	if (CheckBlockRun(run, NULL, false) != B_OK) {
 		DEBUGGER(("CheckBlockRun() reports allocated blocks (which were just "
 			"freed)\n"));
 	}

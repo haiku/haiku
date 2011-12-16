@@ -119,12 +119,11 @@ status_t ESDSinkAddOn::GetFlavorAt(
 		return B_BAD_INDEX;
 	}
 		
-	ESDEndpoint *device = (ESDEndpoint *) fDevices.ItemAt(n);
+	//ESDEndpoint *device = (ESDEndpoint *) fDevices.ItemAt(n);
 		
 	flavor_info * infos = new flavor_info[1];
 	ESDSinkNode::GetFlavor(&infos[0], n);
 //	infos[0].name = device->MD.friendly_name;
-	infos[0].name = "ESounD Out";
 	(*out_info) = infos;
 	return B_OK;
 }
@@ -136,16 +135,20 @@ BMediaNode * ESDSinkAddOn::InstantiateNodeFor(
 {
 	CALLED();
 		
+	BString name = "ESounD Sink";
 #ifdef MULTI_SAVE
-	if(fSettings.FindMessage(device->MD.friendly_name, config)==B_OK) {
-		fSettings.RemoveData(device->MD.friendly_name);
+	ESDEndpoint *device = (ESDEndpoint *) fDevices.ItemAt(info->internal_id);
+	if (device)
+		device->GetFriendlyName(name);
+	if(fSettings.FindMessage(name.String(), config)==B_OK) {
+		fSettings.RemoveData(name.String());
 	}
 #endif
 	
 	
 	ESDSinkNode * node
 		= new ESDSinkNode(this,
-						  "ESounD Sink",
+						  (char *)name.String(),
 						  config);
 	if (node == 0) {
 		*out_error = B_NO_MEMORY;
@@ -161,7 +164,8 @@ ESDSinkAddOn::GetConfigurationFor(BMediaNode * your_node, BMessage * into_messag
 {
 	CALLED();
 #ifdef MULTI_SAVE
-		into_message = new BMessage();
+		if (!into_message)
+			into_message = new BMessage();
 		ESDSinkNode * node = dynamic_cast<ESDSinkNode*>(your_node);
 		if (node == 0) {
 			fprintf(stderr,"<- B_BAD_TYPE\n");
@@ -173,13 +177,15 @@ ESDSinkAddOn::GetConfigurationFor(BMediaNode * your_node, BMessage * into_messag
 		return B_OK;
 #endif	
 	// currently never called by the media kit. Seems it is not implemented.
-
+#if 0
 	ESDSinkNode * node = dynamic_cast<ESDSinkNode*>(your_node);
 	if (node == 0) {
 		fprintf(stderr,"<- B_BAD_TYPE\n");
 		return B_BAD_TYPE;
 	}
 	return node->GetConfigurationFor(into_message);
+#endif
+	return B_ERROR;
 }
 
 #if 0

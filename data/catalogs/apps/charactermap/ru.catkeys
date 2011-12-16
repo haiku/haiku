@@ -1,27 +1,27 @@
 1	russian	x-vnd.Haiku-CharacterMap	2052089202
-Arabic	UnicodeBlocks		Арабский
-Armenian	UnicodeBlocks		Армянский
-CJK compatibility ideographs Supplement	UnicodeBlocks		Дополнение CJK совместимых иероглифов
-CJK strokes	UnicodeBlocks		Черты Иероглифов Восточной Азии 
-CharacterMap	System name		Карта символов
-Clear	CharacterWindow		Очистить
-Code	CharacterWindow		Код
-Coptic	UnicodeBlocks		Коптский
-File	CharacterWindow		Файл
-Filter:	CharacterWindow		Фильтр:
-Font	CharacterWindow		Шрифт
-Font size:	CharacterWindow		Размер шрифта:
-General punctuation	UnicodeBlocks		Знаки пунктуации
-Georgian supplement	UnicodeBlocks		Грузинские дополнения
-Hanunoo	UnicodeBlocks		Хануноо
-Hebrew	UnicodeBlocks		Иврит
-Khmer	UnicodeBlocks		Кхмерский
-Mathematical operators	UnicodeBlocks		Математические операторы
-Miscellaneous technical	UnicodeBlocks		Прочие технические
-Number forms	UnicodeBlocks		Формы чисел
-Old italic	UnicodeBlocks		Этрусский алфавит
-Quit	CharacterWindow		Выход
-Show private blocks	CharacterWindow		Отображать частные блоки
-Tai Le	UnicodeBlocks		Тай Лы
-Vertical forms	UnicodeBlocks		Вертикальные формы
 View	CharacterWindow		Вид
+Hebrew	UnicodeBlocks		Иврит
+Georgian supplement	UnicodeBlocks		Грузинские дополнения
+Khmer	UnicodeBlocks		Кхмерский
+Hanunoo	UnicodeBlocks		Хануноо
+Armenian	UnicodeBlocks		Армянский
+Mathematical operators	UnicodeBlocks		Математические операторы
+General punctuation	UnicodeBlocks		Знаки пунктуации
+Miscellaneous technical	UnicodeBlocks		Прочие технические
+Vertical forms	UnicodeBlocks		Вертикальные формы
+Arabic	UnicodeBlocks		Арабский
+Font	CharacterWindow		Шрифт
+CJK compatibility ideographs Supplement	UnicodeBlocks		Дополнение CJK совместимых иероглифов
+Coptic	UnicodeBlocks		Коптский
+Tai Le	UnicodeBlocks		Тай Лы
+CJK strokes	UnicodeBlocks		Черты Иероглифов Восточной Азии 
+Old italic	UnicodeBlocks		Этрусский алфавит
+Clear	CharacterWindow		Очистить
+Font size:	CharacterWindow		Размер шрифта:
+Filter:	CharacterWindow		Фильтр:
+Code	CharacterWindow		Код
+File	CharacterWindow		Файл
+Number forms	UnicodeBlocks		Формы чисел
+Quit	CharacterWindow		Выход
+CharacterMap	System name		Карта символов
+Show private blocks	CharacterWindow		Отображать частные блоки

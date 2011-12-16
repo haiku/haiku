@@ -19,12 +19,12 @@
 class BMessage;
 class NotificationReceived;
 
-typedef std::map<BString, NotificationReceived*> notify_t;
+typedef std::map<BString, NotificationReceived*> notification_t;
 
 class AppUsage : public BFlattenable {
 public:
 										AppUsage();
-										AppUsage(entry_ref ref, const char* name,
+										AppUsage(const char* name,
 											bool allow = true);
 										~AppUsage();
 
@@ -36,7 +36,6 @@ public:
 	virtual	status_t					Unflatten(type_code code, const void* buffer,
 											ssize_t numBytes);
 
-			entry_ref					Ref();
 			const char*					Name();
 			bool						Allowed(const char* title, notification_type type);
 			bool						Allowed();
@@ -45,10 +44,9 @@ public:
 			void						AddNotification(NotificationReceived* notification);
 
 private:
-			entry_ref					fRef;
 			BString						fName;
 			bool						fAllow;
-			notify_t					fNotifications;
+			notification_t				fNotifications;
 };
 
 #endif	// _APP_USAGE_H

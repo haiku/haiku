@@ -1,27 +1,27 @@
 1	russian	x-vnd.Haiku-OpenGL	209187778
-Attributes stack size:	Capabilities		Размер стека атрибутов:
-Auxiliary buffer(s):	Capabilities		Вспомогательных буферов:
-Available	Extensions		Доступно
-Capabilities	Capabilities		Возможности
-Extensions	Extensions		Расширения
-GLU version:	InfoView		Версия GLU:
-GLUT API version:	InfoView		Версия GLUT API:
-Information	InfoView		Информация
 List stack size:	Capabilities		Размер стека списка:
-Max. 2D texture size:	Capabilities		Максимальный размер 2D текстур:
-Max. 3D texture size:	Capabilities		Максимальный размер 3D текстуры:
+Information	InfoView		Информация
 Max. clipping planes:	Capabilities		Максимальное количество отсечений:
-Max. convolution:	Capabilities		Максимальный оборот:
-Max. evaluators equation order:	Capabilities		Максимальный оценочный блок команд:
-Max. lights:	Capabilities		Максимальное количество источников света:
-Max. recommended index elements:	Capabilities		Максимальное рекомендованное количество индексов:
-Max. recommended vertex elements:	Capabilities		Максимальное рекомендованное количество вершин:
 Max. texture units:	Capabilities		Максимальное количество текстурных блоков:
-Model stack size:	Capabilities		Размер стека модели:
+Renderer name:	InfoView		Название рендера:
+Vendor name:	InfoView		Имя поставщика:
+Attributes stack size:	Capabilities		Размер стека атрибутов:
+OpenGL version:	InfoView		Версия OpenGL:
 Name stack size:	Capabilities		Размер стекового имени:
 OpenGL	System name		OpenGL
-OpenGL version:	InfoView		Версия OpenGL:
+Auxiliary buffer(s):	Capabilities		Вспомогательных буферов:
+Max. recommended vertex elements:	Capabilities		Максимальное рекомендованное количество вершин:
+GLU version:	InfoView		Версия GLU:
+Model stack size:	Capabilities		Размер стека модели:
 Projection stack size:	Capabilities		Размер стека проекции:
-Renderer name:	InfoView		Название рендера:
+Max. lights:	Capabilities		Максимальное количество источников света:
+Max. 2D texture size:	Capabilities		Максимальный размер 2D текстур:
+Max. convolution:	Capabilities		Максимальный оборот:
+GLUT API version:	InfoView		Версия GLUT API:
 Texture stack size:	Capabilities		Размер стека текстуры:
-Vendor name:	InfoView		Имя поставщика:
+Max. evaluators equation order:	Capabilities		Максимальный оценочный блок команд:
+Max. 3D texture size:	Capabilities		Максимальный размер 3D текстуры:
+Capabilities	Capabilities		Возможности
+Max. recommended index elements:	Capabilities		Максимальное рекомендованное количество индексов:
+Available	Extensions		Доступно
+Extensions	Extensions		Расширения

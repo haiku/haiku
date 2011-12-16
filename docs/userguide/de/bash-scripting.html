@@ -41,6 +41,8 @@
 <li><a href="../uk/bash-scripting.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../zh_CN/bash-scripting.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../pt_PT/bash-scripting.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/bash-scripting.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/bash-scripting.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../en/bash-scripting.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -82,7 +84,7 @@ Falls sie noch nicht existieren, muss man die benötigten Dateien selbst anlegen
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="userbootscript" name="userbootscript">Das UserBootscript</a></h3>
-<p><span class="path">/boot/home/config/boot/UserBootscript</span> wird ausgeführt, nachdem das System komplett hochgefahren wurde. Man kann zum Beispiel einige Programme aufrufen, die dann nach jedem Hochfahren automatisch gestartet werden:</p>
+<p><span class="path"><acronym title="/boot/home/config/boot/UserBootscript">/boot/Benutzer/Konfiguration/boot/UserBootscript</acronym></span> wird ausgeführt, nachdem das System komplett hochgefahren wurde. Man kann zum Beispiel einige Programme aufrufen, die dann nach jedem Hochfahren automatisch gestartet werden:</p>
 <pre># Start LaunchBox
 /boot/system/apps/LaunchBox &amp;
 
@@ -90,17 +92,17 @@ Falls sie noch nicht existieren, muss man die benötigten Dateien selbst anlegen
 /boot/system/apps/Workspaces &amp;</pre>
 <p>Das "<tt>&amp;</tt>" am Ende jedes Befehls ist wichtig, um ihn im Hintergrund zu starten. Anderenfalls wird das Skript solange anhalten, bis der Befehl beendet ist (in diesem Fall, bis das ausgeführte Programm geschlossen wurde).</p>
 
-<p>Eine einfache Alternative zum oben genannten ist es, die Anwendungen, die nach dem Hochfahren gestartet werden sollen, im Verzeichnis <span class="path">/boot/home/config/boot/launch</span> zu verlinken. Am einfachsten klickt man dazu mit der rechten Maustaste auf die entsprechende Anwendung, geht auf <span class="menu">Create Link</span> und <a href="tracker.html#navigating">navigiert</a> dann zum oben genannten Verzeichnis.</p>
+<p>Eine einfache Alternative zum oben genannten ist es, die Anwendungen, die nach dem Hochfahren gestartet werden sollen, im Verzeichnis <span class="path"><acronym title="/boot/home/config/boot/launch">/boot/Benutzer/Konfiguration/boot/launch</acronym></span> zu verlinken. Am einfachsten klickt man dazu mit der rechten Maustaste auf die entsprechende Anwendung, geht auf <span class="menu"><acronym title="Create Link">Verknüpfung erstellen</acronym></span> und <a href="tracker.html#navigating">navigiert</a> dann zum oben genannten Verzeichnis.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="usershutdownscript" name="usershutdownscript">Das UserShutdownScript</a></h3>
-<p><span class="path">/boot/home/config/boot/UserShutdownScript</span> wird direkt vor dem Herunterfahren ausgeführt. Das Runterfahren wird abgebrochen, falls das Skript einen anderen Rückgabewert als "0" zurück liefert.</p>
+<p><span class="path"><acronym title="/boot/home/config/boot/UserShutdownScript">/boot/Benutzer/Konfiguration/boot/UserShutdownScript</acronym></span> wird direkt vor dem Herunterfahren ausgeführt. Das Runterfahren wird abgebrochen, falls das Skript einen anderen Rückgabewert als "0" zurück liefert.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="usershutdownfinishscript" name="usershutdownfinishscript">Das UserShutdownFinishScript</a></h3>
-<p><span class="path">/boot/home/config/boot/UserShutdownFinishScript</span> wird beim Herunterfahren als letztes ausgeführt. Es gilt jedoch zu beachten, das zum Zeitpunkt, an dem dieses Skript ausgeführt wird, viele Systemkomponenten schon nicht mehr laufen.</p>
+<p><span class="path"><acronym title="/boot/home/config/boot/UserShutdownFinishScript">/boot/Benutzer/Konfiguration/boot/UserShutdownFinishScript</acronym></span> wird beim Herunterfahren als letztes ausgeführt. Es gilt jedoch zu beachten, das zum Zeitpunkt, an dem dieses Skript ausgeführt wird, viele Systemkomponenten schon nicht mehr laufen.</p>
 
 </div>
 </div>

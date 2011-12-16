@@ -208,7 +208,12 @@ APRView::LoadSettings()
 bool
 APRView::IsDefaultable()
 {
-	return fCurrentSet != fDefaultSet;
+	for (int32 i = 0; i < color_description_count(); i++) {
+		color_which which = get_color_description(i)->which;
+		if (fCurrentSet.GetColor(which) != fDefaultSet.GetColor(which))
+			return true;
+	}
+	return false;
 }
 
 

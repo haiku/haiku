@@ -90,15 +90,15 @@ class BHashMapCatalog: public BCatalogAddOn {
 		// implementation for editor-interface
 		virtual status_t ReadFromFile(const char *path = NULL)
 			{return B_NOT_SUPPORTED;}
-		virtual status_t ReadFromAttribute(entry_ref *appOrAddOnRef)
+		virtual status_t ReadFromAttribute(const entry_ref &appOrAddOnRef)
 			{return B_NOT_SUPPORTED;}
-		virtual status_t ReadFromResource(entry_ref *appOrAddOnRef)
+		virtual status_t ReadFromResource(const entry_ref &appOrAddOnRef)
 			{return B_NOT_SUPPORTED;}
 		virtual status_t WriteToFile(const char *path = NULL)
 			{return B_NOT_SUPPORTED;}
-		virtual status_t WriteToAttribute(entry_ref *appOrAddOnRef)
+		virtual status_t WriteToAttribute(const entry_ref &appOrAddOnRef)
 			{return B_NOT_SUPPORTED;}
-		virtual status_t WriteToResource(entry_ref *appOrAddOnRef)
+		virtual status_t WriteToResource(const entry_ref &appOrAddOnRef)
 			{return B_NOT_SUPPORTED;}
 
 		void UpdateFingerprint();

@@ -266,7 +266,7 @@ GetEdidFromBIOS(edid1_raw& edidRaw)
 
 	status = vm86_do_int(&vmState, 0x10);
 	if (status == B_OK) {
-		// AH contains the error code, and AL determines wether or not the
+		// AH contains the error code, and AL determines whether or not the
 		// function is supported.
 		if (vmState.regs.eax != 0x4f)
 			status = B_NOT_SUPPORTED;

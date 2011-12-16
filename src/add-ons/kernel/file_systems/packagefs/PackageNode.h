@@ -12,14 +12,16 @@
 
 #include <util/SinglyLinkedList.h>
 
+#include "IndexedAttributeOwner.h"
 #include "PackageNodeAttribute.h"
 
 
+class AttributeIndexer;
 class Package;
 class PackageDirectory;
 
 
-class PackageNode : public BReferenceable,
+class PackageNode : public BReferenceable, public IndexedAttributeOwner,
 	public SinglyLinkedListLinkImpl<PackageNode> {
 public:
 								PackageNode(Package* package, mode_t mode);
@@ -59,6 +61,10 @@ public:
 
 			PackageNodeAttribute* FindAttribute(const char* name) const;
 
+	virtual	void				UnsetIndexCookie(void* attributeCookie);
+
+	inline	void*				IndexCookieForAttribute(const char* name) const;
+
 protected:
 			Package*			fPackage;
 			PackageDirectory*	fParent;
@@ -69,6 +75,14 @@ protected:
 			timespec			fModifiedTime;
 			PackageNodeAttributeList fAttributes;
 };
+
+
+void*
+PackageNode::IndexCookieForAttribute(const char* name) const
+{
+	PackageNodeAttribute* attribute = FindAttribute(name);
+	return attribute != NULL ? attribute->IndexCookie() : NULL;
+}
 
 
 typedef SinglyLinkedList<PackageNode> PackageNodeList;

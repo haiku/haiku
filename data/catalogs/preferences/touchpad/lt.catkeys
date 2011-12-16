@@ -1,10 +1,20 @@
-1	lithuanian	x-vnd.Haiku-Touchpad	4054922715
+1	lithuanian	x-vnd.Haiku-Touchpad	607725922
+Scrolling	TouchpadPrefView		Slinkimas
+Touchpad	System name		Jutiklinis kilimėlis
+Revert	TouchpadPrefView		Atšaukti pakeitimus
+Tapping	TouchpadPrefView		Tapšnojimas
+Please confirm	TouchpadPrefView		Patvirtinkite
+Two finger scrolling	TouchpadPrefView		Slinkimas dviem pirštais
 Defaults	TouchpadPrefView		Numatytai
-Fast	TouchpadPrefView		Greitai
+Slow	TouchpadPrefView		Mažas
+Vertical	TouchpadPrefView		Vertikalus greitis
 High	TouchpadPrefView		Didelis
-Horizontal scrolling	TouchpadPrefView		Horizontalusis slinkinimas
-Off	TouchpadPrefView		Išjungta
-Revert	TouchpadPrefView		Grįžti
-Scrolling	TouchpadPrefView		Slinkinimas
-Slow	TouchpadPrefView		Lėtai
-Two finger scrolling	TouchpadPrefView		Dvipirštis slinkinimas
+Horizontal scrolling	TouchpadPrefView		Horizontalusis slinkimas
+Fast	TouchpadPrefView		Didelis
+OK	TouchpadPrefView		Gerai
+Acceleration	TouchpadPrefView		Pagreitis
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Parinkta slinkimo erdvė yra labai didelė ir gali apsunkinti įprastą naudojimąsi pele. Ar tikrai norite ją tokią palikti?
+Horizontal	TouchpadPrefView		Horizontalus greitis
+Off	TouchpadPrefView		Išjungtas
+Sensitivity	TouchpadPrefView		Jautrumas
+Cancel	TouchpadPrefView		Atsisakyti

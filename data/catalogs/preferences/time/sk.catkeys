@@ -1,36 +1,44 @@
-1	slovak	x-vnd.Haiku-Time	453699369
-<Other>	Time		<Iné>
-Add	Time		Pridať
-Could not contact server	Time		Nepodarilo sa kontaktovať server
-Could not create socket	Time		Nepodarilo sa vytvoriť socket
-Current time:	Time		Aktuálny čas:
-Date and time	Time		Dátum a čas
-Etc	Time		Etc
-GMT	Time		GMT
-Hardware clock set to:	Time		Hardvérové hodiny nastavené na:
-Local time	Time		Lokálny čas
-Message receiving failed	Time		Prijatie správy zlyhalo
-Network time	Time		Čas v sieti
+1	slovak	x-vnd.Haiku-Time	3493650184
+GMT (UNIX compatible)	Time		GMT (kompatibilné s Unixom)
 OK	Time		OK
-Preview time:	Time		Náhľad času:
-Received invalid time	Time		Prijatý neplatný čas
-Remove	Time		Odstrániť
-Reset	Time		Obnoviť
-Revert	Time		Vrátiť
-Sending request failed	Time		Odoslanie požiadavky zlyhalo
-Set time zone	Time		Nastaviť časové pásmo
+Asia	Time		Ázia
+\nNow: 	Time		\nTeraz: 
+Africa	Time		Afrika
 Stop	Time		Zastaviť
+Could not contact server	Time		Nepodarilo sa kontaktovať server
+Australia	Time		Austrália
+Preview time:	Time		Náhľad času:
 Synchronize	Time		Synchronizovať
-Synchronize again	Time		Synchronizovať znova
-Synchronize at boot	Time		Synchronizovať pri štarte
-The following error occured while synchronizing:r\n%s	Time		Počas synchronizácie sa vyskytla nasledovná chyba:r\n%s
-The following error occured while synchronizing:r\n%s: %s	Time		Počas synchronizácie sa vyskytla nasledovná chyba:r\n%s
-This setting controls how Haiku will display your time based on how\ntime is measured in the computer's hardware clock. Windows is usually\nset to local time, meaning the hardware clock is measured in the same\ntime as the configured time zone. When this is set to GMT it means the\nhardware clock is measured based on GMT and Haiku will adjust the time\nit shows based on the configured time zone.	Time		Táto voľba ovláda ako bude Haiku zobrazovať váš čas na základe toho ako váš čas merajú\nhodiny vášho hardvéru. Windows je zvyčajne nastavený na lokálny čas, čo znamená,\nže hardvérové hodiny merajú v čase nastaveného časového pásma. Keď sú nastavené\nna GMT, znamená to, že hardvérové hodiny merajú na základe GMT a Haiku prispôsobí\nzobrazovaný čas podľa nastaveného časového pásma.
-Time	System name		Čas
-Time	Time		Čas
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Dátum a čas, napísali:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
-Time zone	Time		Časové pásmo
-Try all servers	Time		Skúsiť všetky servery
-Waiting for answer failed	Time		Čakanie na odpoveď zlyhalo
-\nNow: 	Time		\nTeraz:
+Revert	Time		Vrátiť
+Pacific	Time		Pacifik
+Add	Time		Pridať
+Date and time	Time		Dátum a čas
 about	Time		O aplikácii
+Local time (Windows compatible)	Time		Miestny čas (kompatibilné s Windows)
+Message receiving failed	Time		Prijatie správy zlyhalo
+Set time zone	Time		Nastaviť časové pásmo
+Waiting for answer failed	Time		Čakanie na odpoveď zlyhalo
+Hardware clock set to:	Time		Hardvérové hodiny nastavené na:
+The following error occured while synchronizing:r\n%s	Time		Počas synchronizácie sa vyskytla nasledovná chyba:r\n%s
+Europe	Time		Európa
+Remove	Time		Odstrániť
+Time	Time		Čas
+Indian	Time		Indický
+Sending request failed	Time		Odoslanie požiadavky zlyhalo
+Arctic	Time		Arktída
+Time	System name		Čas
+America	Time		Amerika
+Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Dátum a čas, napísali:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
+Reset	Time		Obnoviť
+Synchronize at boot	Time		Synchronizovať pri štarte
+Received invalid time	Time		Prijatý neplatný čas
+Antarctica	Time		Antarktída
+The following error occured while synchronizing:r\n%s: %s	Time		Počas synchronizácie sa vyskytla nasledovná chyba:r\n%s: %s
+<Other>	Time		<Iné>
+Current time:	Time		Aktuálny čas:
+Try all servers	Time		Skúsiť všetky servery
+Time zone	Time		Časové pásmo
+Could not create socket	Time		Nepodarilo sa vytvoriť socket
+Synchronize again	Time		Synchronizovať znova
+Network time	Time		Čas v sieti
+Atlantic	Time		Atlantik

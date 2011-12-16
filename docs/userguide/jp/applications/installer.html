@@ -4,11 +4,14 @@
 <head>
 <!-- 
  *
- * Copyright 2009, Haiku. All rights reserved.
+ * Copyright 2009-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		hiromu1996
+ *		log-1
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -36,6 +39,8 @@
 <li><a href="../../uk/applications/installer.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/applications/installer.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/applications/installer.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/installer.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/installer.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/applications/installer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -51,39 +56,33 @@
 
 <h2><img src="../../images/apps-images/installer-icon_64.png" alt="installer-icon_64.png" width="64" height="64" />Installer</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbarメニュー:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
-<tr><td>場所:</td><td></td><td><span class="path">/boot/system/apps/Installer</span></td></tr>
-<tr><td>設定ファイル:</td><td></td><td><i>なし</i></td></tr>
+<tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><span class="menu">アプリケーション (Applications)</span></td></tr>
+<tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/Installer</span></td></tr>
+<tr><td>設定ファイル：</td><td></td><td><i>なし</i></td></tr>
 </table>
 <p><br /></p>
-<p>The Installer is used to copy Haiku onto another volume.<br />
-Upon launch it displays a start window with important information. It's not a mindless EULA you're used to click away in the blink of an eye, it states:</p>
+<p>InstallerはHaikuを別のボリュームにコピーするのに使用します。<br />
+起動と共にウィンドウに注意事項が表示されるので、よくお読みください。 </p>
 <ul>
-<li><p>This is alpha-quality software. Make backups or suffer the consequences!</p></li>
-<li><p>The Installer needs a prepared partition. You may have to use a <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> or a similar tool until Haiku's DriveSetup is mature enough to handle this task.</p></li>
-<li><p>Haiku can be added manually to the bootmanager <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>. In short, you have add an entry to <span class="path">/boot/grub/menu.lst</span> of your Linux installation, similar to this:</p>
-<pre># Haiku on /dev/sda7
-title		Haiku
-rootnoverify	(hd0,6)
-chainloader	+1</pre></li>
+<li><p>まだ開発途中のソフトウェアです。バックアップを取っておくか、あとから苦しむことになるか・・・</p></li>
+<li><p>Installerを使用する前にパーティションを作成しておく必要があります。パーティション編集には、HaikuのDriveSetupが安定するまで<a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> のようなツールを使ったほうがいいかもしれません。</p></li>
+<li>Haikuは<a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>ブートマネージャーに手動で設定することができます。詳しくは<a href="http://www.haiku-os.org/get-haiku/installation-guide">online guide</a>をご覧ください。</li>
 </ul>
 <p><br /><br /></p>
-<p>Once you acknowledged with <span class="button">Continue</span>, you're presented with the main window:</p>
+<p>注意事項に同意して<span class="button">続ける</span>を押すと、以下のようなメインウィンドウが表示されます:</p>
 <img src="../images/apps-images/installer.png" alt="installer.png" />
-<p>In the first pop-up menu you choose the source for the installation. It can be a currently installed Haiku or can come from an install CD or USB drive, etc.<br />
-The second pop-up menu specifies the target for the installation. This target partition/volume will be completely overwritten and has to be set aside beforehand by a partitioning tool like GParted.</p>
+<p>1つ目のポップアップメニューで、Haikuのインストール元を指定します。例えば、すでにHaikuがインストールされたディスクや、インストールCD/USBドライブなどが当てはまります。<br />
+2つ目のポップアップメニューで、インストール先を指定します。これは完全に上書きされます。また、あらかじめGPartedのようなパーティショニングツールでパーティションを作っておく必要があります。</p>
 <p>Clicking the little expander widget will <i>Show optional packages</i>, if available, that you can choose to install in addition to the basic Haiku.</p>
-<p>You should do a last check if you really picked the right target before starting the installation process. Click on <span class="button">Setup partitions...</span> to open <a href="drivesetup.html">DriveSetup</a> and have a look at the naming and layout of the available volumes and partitions.</p>
-<p><span class="button">Begin</span> starts the installation procedure, which basically copies everything but the <span class="path">home/</span> and <span class="path">common/</span> folder onto the target volume and makes it bootable.</p>
+<p>インストールプロセスを開始する前に、正しいインストール先が選択されているか、最終確認をしてください。<span class="button">Setup partitions...</span>をクリックすると<a href="drivesetup.html">DriveSetup</a>が開きます。</p>
+<p><span class="button">開始</span> を押すと、インストールプロセスが開始します。このプロセスでは基本的に<span class="path">home/</span>と<span class="path">common/</span>以外のファイルをインストール先にコピーされます。そして、インストール先のボリュームを起動可能に設定します。</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="tools" name="tools">Tools</a></h2>
-<p>At the end of the installation procedure, the partition is automatically made bootable. However, it can happen that some other operating system or partitioning tool (accidentally) overwrites the boot sector of your Haiku volume. In this case, boot your installation CD and start the Installer. Select your Haiku boot partition from the <span class="menu">Onto: Please choose target</span> menu and select <span class="menu">Write boot sector</span> from the <span class="menu">Tools</span> menu to make it bootable again.</p>
-<p>The other item in the <span class="menu">Tools</span> menu is the <span class="menu">Boot Manager</span> that puts a menu in the boot sector to choose what operating system to boot.<br />
-You don't need to run the <span class="app">Boot Manager</span> if you already use a bootmanager like Grub, in which case you have to add Haiku manually (see above), or Haiku runs exclusively on your machine.</p>
-<p>Boot Manager isn't yet tested very well and still has a few restrictions that it will complain about if they aren't met: the menu can only be installed on your first harddisk and there has to be a 2KiB space after the Master Boot Record (MBR).</p>
-<p>You don't have to worry too much, however, the original MBR is saved. In order to uninstall the boot menu, you'll just boot from the install CD again, run the Installer and invoke the Boot Manager once more.<br />
-The Boot Manager panel will guide you through installing or uninstalling the boot menu.</p>
+<a id="tools" name="tools">ツール</a></h2>
+<p>インストールが完了すると、パーティションは自動的に起動可能に設定されます。ですが、他のオペレーティングシステムやパーティショニングツールがパーティションのブートセクタを書き換えてしまうことがあるかもしれません。その際はインストールCDから起動して、Installerの<span class="menu">インストール先: インストール先の選択</span>の部分でHaikuのパーティションを選択した後に、<span class="menu">ツール</span>の<span class="menu">ブートセクターを書き込む</span>からパーティションを起動可能に再設定してください。</p>
+<p><span class="menu">ツール</span>の他のメニューは<span class="menu">ブートセクターの設定</span>で、起動するオペレーティングシステムの選択をするメニューをブートセクタに書き込むために使われています。詳しくは、<a href="bootmanager.html">BootManager</a>をお読みください。<br />
+もし既にGRUBのようなブートマネージャーを利用して手動でHaikuのエントリを追加した場合や、Haikuしかそのマシンで実行しない場合は、<span class="app">BootManager</span>を使用する必要はありません。</p>
+
 
 </div>
 </div>

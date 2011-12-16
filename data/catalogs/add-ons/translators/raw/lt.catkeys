@@ -1,0 +1,9 @@
+1	lithuanian	x-vnd.Haiku-RAWTranslator	1938728039
+RAWTranslator Settings	ConfigView		RAW keitiklio nuostatos
+Version %d.%d.%d, %s	ConfigView		Versija %d.%d.%d, %s
+RAW Images	ConfigView		RAW paveikslai
+RAW image translator	RAWTranslator		RAW paveikslų keitiklis
+RAW Settings	RAWTranslator main		RAW nuostatos
+RAW images	RAWTranslator		RAW paveikslai
+%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	„%s“ RAW paveikslas
+Based on Dave Coffin's dcraw 8.63	ConfigView		Sukurta Dave'o Coffin'o „dcraw 8.63“ pagrindu

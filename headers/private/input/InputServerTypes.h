@@ -23,6 +23,7 @@
 #define IS_GET_MOUSE_MAP 				'Igmm'
 #define IS_SET_MOUSE_MAP 				'Ismm'
 #define IS_GET_KEYBOARD_ID 				'Igid'
+#define IS_SET_KEYBOARD_ID 				'Isid'
 #define IS_GET_CLICK_SPEED 				'Igcs'
 #define IS_SET_CLICK_SPEED 				'Iscs'
 #define IS_GET_KEY_REPEAT_RATE 			'Igrr'

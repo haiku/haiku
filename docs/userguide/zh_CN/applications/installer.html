@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2009, Haiku. All rights reserved.
+ * Copyright 2009-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -38,6 +38,8 @@
 <li><a href="../../jp/applications/installer.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/applications/installer.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../pt_PT/applications/installer.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/installer.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/installer.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/applications/installer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -62,11 +64,7 @@
 <ul>
 <li><p>这是测试质量的软件。一定要做好备份，否则要遭受无法预计的后果。</p></li>
 <li><p>安装器需要一个预备的分区。在Haiku的驱动安装器足够成熟来处理这个任务，否则您可能需要使用 <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> 或者一个类似的工具。</p></li>
-<li><p>Haiku可是手动添加到 <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a> 启动管理器。简单来说，您可以在您的安装的Linux中的 <span class="path">/boot/grub/menu.lst</span> 中添加一个入口， 类似于：</p>
-<pre># Haiku on /dev/sda7
-title		Haiku
-rootnoverify	(hd0,6)
-chainloader	+1</pre></li>
+<li>Haiku可以手动添加到 <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a> 启动管理器。具体的操作方法，请查阅 <a href="http://www.haiku-os.org/get-haiku/installation-guide">在线手册</a>。</li>
 </ul>
 <p><br /><br /></p>
 <p>如果您确认了<span class="button">Continue</span>，则会出现如下的主窗口：</p>
@@ -82,9 +80,7 @@ chainloader	+1</pre></li>
 <p>在安装进程的结尾，目标分区会自动的设置为可启动分区。然而，也有可能发生一些情况，其他的操作系统或者分区工具覆盖了您的Haiku磁卷的引导扇区。遇到这种情况，从您的安装光盘启动，然后打开安装器 。在 <span class="menu">Onto: Please choose target</span> 菜单中选择您的Haiku启动分区，然后从 <span class="menu">Tools</span> 菜单中选择 <span class="menu">Write boot sector</span> 来恢复分区的可引导扇区。</p>
 <p>在 <span class="menu">Tools</span> 菜单中的 另一个项目是 <span class="menu">Boot Manager</span> ，它在启动扇区中放置了系统列表用于选择启动的操作系统。<br />
 如果您经常使用启动管理器，或者Haiku是机器上唯一的操作系统系统，您不就需要运行 <span class="app">Boot Manager</span>。如果您使用了Grub启动管理器，您就需要手动的添加Haiku（参看上文）。</p>
-<p>Boot Manager 还没有经过完善的测试，仍然具有一些限制：启动菜单必须安装在您的第一个硬盘，并且在主引导记录（MBR）之后必须具有2Kib的存储空间。否则，它将无法正常的工作。</p>
-<p>您不需要对此过于担心，原始的主引导记录已经做了保存。如果您希望卸载引导菜单，您只需要再次从安装光盘启动，运行安装器，然后再次调用启动管理器。<br />
-启动管理器面板会指导您完成引导菜单的安装和卸载。</p>
+
 
 </div>
 </div>

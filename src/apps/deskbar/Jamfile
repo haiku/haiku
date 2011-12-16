@@ -24,8 +24,8 @@ Application Deskbar :
 	BarMenuTitle.cpp
 	BarView.cpp
 	BarWindow.cpp
-	BeMenu.cpp
-	DeskBarUtils.cpp
+	DeskbarMenu.cpp
+	DeskbarUtils.cpp
 	ExpandoMenuBar.cpp
 	PreferencesWindow.cpp
 	ShowHideMenuItem.cpp
@@ -46,7 +46,7 @@ DoCatalogs Deskbar :
 	x-vnd.Be-TSKB
 	:
 	BarWindow.cpp
-	BeMenu.cpp
+	DeskbarMenu.cpp
 	LocalizedFolders.h
 	PreferencesWindow.cpp
 	StatusView.cpp

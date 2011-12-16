@@ -70,6 +70,7 @@ private:
 
 			status_t			_CreateCompoundType(const BString& name,
 									DIECompoundType* typeEntry,
+									compound_type_kind compoundKind,
 									DwarfType*& _type);
 			status_t			_CreatePrimitiveType(const BString& name,
 									DIEBaseType* typeEntry,

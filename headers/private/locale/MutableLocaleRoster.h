@@ -48,10 +48,9 @@ public:
 
 			status_t			GetSystemCatalog(BCatalogAddOn** catalog) const;
 
-			BCatalogAddOn*		LoadCatalog(const char* signature,
+			BCatalogAddOn*		LoadCatalog(const entry_ref& catalogOwner,
 									const char* language = NULL,
 									int32 fingerprint = 0) const;
-			BCatalogAddOn*		LoadEmbeddedCatalog(entry_ref* appOrAddOnRef);
 			status_t			UnloadCatalog(BCatalogAddOn* addOn);
 
 			BCatalogAddOn*		CreateCatalog(const char* type,
@@ -60,7 +59,7 @@ public:
 };
 
 
-typedef BCatalogAddOn* (*InstantiateCatalogFunc)(const char* name,
+typedef BCatalogAddOn* (*InstantiateCatalogFunc)(const entry_ref& catalogOwner,
 	const char* language, uint32 fingerprint);
 
 typedef BCatalogAddOn* (*CreateCatalogFunc)(const char* name,
@@ -77,7 +76,6 @@ typedef status_t (*GetAvailableLanguagesFunc)(BMessage*, const char*,
  */
 struct CatalogAddOnInfo {
 			InstantiateCatalogFunc 			fInstantiateFunc;
-			InstantiateEmbeddedCatalogFunc	fInstantiateEmbeddedFunc;
 			CreateCatalogFunc				fCreateFunc;
 			GetAvailableLanguagesFunc 		fLanguagesFunc;
 

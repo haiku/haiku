@@ -307,7 +307,7 @@ class BContainerWindow : public BWindow {
 
 class WindowStateNodeOpener {
 	// this class manages opening and closing the proper node for
-	// state restoring / saving; the constructor knows how to decide wether
+	// state restoring / saving; the constructor knows how to decide whether
 	// to use a special directory for root, etc.
 	// setter calls used when no attributes can be read from a node and defaults
 	// are to be substituted

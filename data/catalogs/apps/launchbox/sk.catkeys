@@ -1,34 +1,34 @@
-1	slovak	x-vnd.Haiku-LaunchBox	1440389990
-Add button here	LaunchBox		Pridať tlačidlo sem
-Auto-raise	LaunchBox		Automaticky aktivovať
-Bummer	LaunchBox		Škoda
-Cancel	LaunchBox		Zrušiť
-Clear button	LaunchBox		Tlačidlo Vyčistiť
-Clone	LaunchBox		Klonovať
-Close	LaunchBox		Zatvoriť
-Description for '%3'	LaunchBox		Popis „%3“
-Failed to launch '%1'.\n\nError: 	LaunchBox		Nepodarilo sa spustiť „%1“.\n\nChyba:
-Failed to launch 'something',error in Pad data.	LaunchBox		Nepodarilo sa spustiť „niečo“, chyba v dátach Oblasti.
-Failed to launch application with signature '%2'.\n\nError: 	LaunchBox		Nepodarilo sa spustiť aplikáciu so signatúrou „%2“.\n\nChyba:
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Nepodarilo sa poslať príkaz „otvoriť priečinok“ Trackeru.\n\nChyba:
-Horizontal layout	LaunchBox		Vodorovné rozloženie
-Icon size	LaunchBox		Veľkosť ikon
-Ignore double-click	LaunchBox		Ignorovať dvojité kliknutie
-LaunchBox	System name		Spúšťač
-Name Panel	LaunchBox		Panel Názov
+1	slovak	x-vnd.Haiku-LaunchBox	3016105370
 New	LaunchBox		Nový
+Set description…	LaunchBox		Nastaviť popis…
+Vertical layout	LaunchBox		Zvislé rozloženie
 OK	LaunchBox		OK
-Pad	LaunchBox		Oblasť
-Pad %1	LaunchBox		Oblasť %1
 Pad 1	LaunchBox		Oblasť 1
+last chance	LaunchBox		posledná šanca
 Quit	LaunchBox		Ukončiť
-Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Skutočne zatvoriť túto oblasť?\n(Oblasť nebude zapamätaná.)
-Remove button	LaunchBox		Tlačidlo Odstrániť
-Set description…	LaunchBox		Nastaviť popis...
-Settings	LaunchBox		Nastavenia
+Clear button	LaunchBox		Tlačidlo Vyčistiť
+LaunchBox	System name		Spúšťač
+Ignore double-click	LaunchBox		Ignorovať dvojité kliknutie
+Auto-raise	LaunchBox		Automaticky aktivovať
 Show on all workspaces	LaunchBox		Zobrazovať na všetkých pracovných plochách
 Show window border	LaunchBox		Zobrazovať okraj okna
-Vertical layout	LaunchBox		Zvislé rozloženie
+Pad	LaunchBox		Oblasť
+Icon size	LaunchBox		Veľkosť ikon
+Bummer	LaunchBox		Škoda
+Cancel	LaunchBox		Zrušiť
+Remove button	LaunchBox		Tlačidlo Odstrániť
+Horizontal layout	LaunchBox		Vodorovné rozloženie
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nNepodarilo sa spustiť aplikáciu so signatúrou „%2“.\n\nChyba:
+Failed to launch '%1'.\n\nError:	LaunchBox		Nepodarilo sa spustiť „%1“.\n\nChyba:
+Name Panel	LaunchBox		Panel Názov
+Add button here	LaunchBox		Pridať tlačidlo sem
+Description for '%3'	LaunchBox		Popis „%3“
+Settings	LaunchBox		Nastavenia
+Failed to launch 'something', error in Pad data.	LaunchBox		Nepodarilo sa spustiť „niečo“, chyba v dátach Oblasti.
+Pad %1	LaunchBox		Oblasť %1
+Close	LaunchBox		Zatvoriť
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Nepodarilo sa poslať príkaz „otvoriť priečinok“ Trackeru.\n\nChyba: 
 You can drag an icon here.	LaunchBox		Sem môžete pretiahnuť ikonu.
-last chance	LaunchBox		posledná šanca
+Clone	LaunchBox		Klonovať
 launch popup	LaunchBox		vyskakovacie okno spustenia
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Skutočne zatvoriť túto oblasť?\n(Oblasť nebude zapamätaná.)

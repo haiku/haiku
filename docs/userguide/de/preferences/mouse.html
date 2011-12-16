@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,6 +12,7 @@
  * Translators:
  *		Matthias
  *		Humdinger
+ *		taos
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -39,6 +40,8 @@
 <li><a href="../../uk/preferences/mouse.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/preferences/mouse.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/preferences/mouse.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/preferences/mouse.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/preferences/mouse.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/preferences/mouse.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -51,23 +54,24 @@
 <div id="content">
 <div>
 
-<h2><img src="../../images/prefs-images/mouse-icon_64.png" alt="mouse-icon_64.png" width="64" height="64" />Mouse</h2>
+<h2><img src="../../images/prefs-images/mouse-icon_64.png" alt="mouse-icon_64.png" width="64" height="64" /><acronym title="Mouse">Maus</acronym></h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
-<tr><td>Ort:</td><td></td><td><span class="path">/boot/system/preferences/Mouse</span></td></tr>
-<tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/Mouse_settings</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu"><acronym title="Preferences">Einstellungen</acronym></span></td></tr>
+<tr><td>Ort:</td><td></td><td><span class="path"><acronym title="/boot/system/preferences/Mouse">/boot/System/preferences/Maus</acronym></span></td></tr>
+<tr><td>Einstellungen:</td><td></td><td><span class="path"><acronym title="~/config/settings/Mouse_settings">~/Konfiguration/settings/Mouse_settings</acronym></span></td></tr>
 </table>
 <p><br /></p>
 <img src="../images/prefs-images/mouse.png" alt="mouse.png" />
-<p>Im Auswahlmenü links kann die Art der Maus, respektive deren Tastenzahl, ausgewählt werden. Insbesondere für 1-Tasten Mäuse interessant: der Rechtsklick kann mit <span class="key">STRG</span>-Linksklick und ein Klick auf die mittlere Taste mit <span class="key">STRG</span> <span class="key">ALT</span>-Linksklick erzeugt werden. Der mittlere Klick kann bei 2-Tasten Mäuse auch mit einen Klick auf beide Tasten erreicht werden.</p>
+<p>Im Auswahlmenü links kann die Art der Maus, respektive deren Tastenzahl, ausgewählt werden. Insbesondere für 1-Tasten Mäuse interessant: der Rechtsklick kann mit <span class="key">STRG</span>-Linksklick und ein Klick auf die mittlere Taste mit <span class="key">STRG</span> <span class="key">ALT</span>-Linksklick erzeugt werden.</p>
 <p>Die Tastenbelegung kann über das Markieren der entsprechenden Taste und dem dazugehörigen Auswahlmenü geändert werden.</p>
-<p>Über die Schieberegler rechts kann die Doppelklick-Geschwindigkeit, die Geschwindigkeit des Mauszeigers und seine Beschleunigung eingestellt werden.</p>
-<p><span class="menu">Focus follows mouse</span> bewirkt, dass ein Programmfenster nicht angeklickt wird, um es zu Aktivieren. Hierfür gibt es drei Möglichkeiten:</p>
+<p>Über die Schieberegler rechts kann die Doppelklick-Geschwindigkeit, die Geschwindigkeit des Mauszeigers und seine Beschleunigung eingestellt werden. Im Testfeld unter der Mausgrafik kann die Doppelklick-Geschwindigkeit getestet werden: Wird ein Wort durch Doppelklick nicht markiert, ist die entsprechende Geschwindigkeit zu hoch eingestellt (oder man muss halt lernen schneller zu klicken...).</p>
+<p>Im Auswahlmenü <span class="menu">Modus</span> wird bestimmt, wie Programmfenster auf Klicks reagieren. Hierfür gibt es drei Möglichkeiten:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Enabled</span></td><td> </td><td>Das Fenster, über dem sich der Mauszeiger befindet wird Aktiviert, ohne das gesamte Fenster in den Vordergrund zu bringen.</td></tr>
-<tr><td><span class="menu">Warping</span></td><td> </td><td>Der Mauszeiger gleitet automatisch zu einem über die Deskbar oder dem "<a href="../twitcher.html">Twitcher</a>" ausgewählten Fenster.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Instant-Warping</span></td><td> </td><td>Im Gegensatz zu "Warping" springt hier der Mauszeiger zum Aktivierten Fenster.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Klicken aktiviert und bringt nach vorn</span></td><td width="15px"> </td><td>Das Fenster wird durch Klicken aktiviert und ganz nach vorn geholt. Dies ist die Standardeinstellung.</td></tr>
+<tr><td><span class="menu">Klicken aktiviert Fenster</span></td><td> </td><td>Beim Klicken auf ein Fenster wird dieses nur aktiviert, aber nicht automatisch in den Vordergrund geholt. Dies gelingt entweder durch Klicken auf den Fensterreiter beziehungsweise -rahmen oder durch Klicken irgendwo im Fenster, während die <a href="../gui.html#move-resize">Fenstermanagement-Tasten</a> <span class="key">STRG</span> <span class="key">ALT</span> gehalten werden.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Ohne Klicken aktivieren</span></td><td></td><td>Das Fenster unter dem Mauszeiger wird automatisch aktiviert. Um es in den Vordergrund zu holen, geht man vor wie bei <span class="menu">Klicken aktiviert Fenster</span> beschrieben.</td></tr>
 </table>
+<p>Die Option <span class="menu">Auf ersten Klick reagieren</span> vermeidet, ein Fenster erst aktivieren zu müssen, bevor eine Schaltfläche gedrückt oder ein Menü geöffnet werden kann. Allerdings besteht dann Gefahr, aus Versehen beispielsweise statt des Fensterreiters den "Schließen"-Button zu treffen und ein Programm ungewollt zu beenden. Andererseits kann damit der Arbeitsfluss deutlich beschleunigt werden.</p>
 <p>Alle Einstellungen werden sofort im System übernommen.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="button">Standardwerte</span></td><td> </td><td>setzt alles auf Standardwerte zurück.</td></tr>

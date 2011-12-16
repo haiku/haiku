@@ -19,9 +19,6 @@ void free_matrix(double** matrix);
 void copy_matrix(const double* const* A, double** B, int m, int n);
 void zero_matrix(double** A, int m, int n);
 int compute_dependencies(double** a, int m, int n, bool* independent);
-int remove_linearly_dependent_rows(double** A, double** temp,
-	bool* independentRows, int m, int n);
-bool solve(double** a, int n, double* b);
 
 
 class LayoutOptimizer {

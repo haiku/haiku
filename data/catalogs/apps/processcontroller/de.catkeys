@@ -1,48 +1,48 @@
 1	german	x-vnd.Haiku-ProcessController	2887520383
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	
-About ProcessController…	ProcessController		Über Systemmanager...
-Cancel	ProcessController		Abbrechen
-Custom priority	ProcessController		Anwendungsspezifische Priorität
-Damned!	ProcessController		Herrje!
-Debug this thread!	ProcessController		Diesen Thread debuggen!
-Debug thread	ProcessController		Debug Thread
-Display priority	ProcessController		Anzeigen-Priorität
-Do you really want to kill the team \"%s\"?	ProcessController		Soll das Team \"%s\" wirklich beendet werden?
-Error saving file	ProcessController		Fehler beim Speichern der Datei
-Gone teams…	ProcessController		Verlorene Teams...
-Idle priority	ProcessController		Leerlauf-Priorität
-Info	ProcessController		Info
-Install in Deskbar	ProcessController		In Deskbar installieren
-Kill this thread!	ProcessController		Diesen Thread beenden!
-Live in the Deskbar	ProcessController		In der Deskbar laufen
-Low priority	ProcessController		Niedrige Priorität
-Lowest active priority	ProcessController		Niedrigste aktive Priorität
 Memory usage	ProcessController		Speicherverbrauch
-New Terminal	ProcessController		Neues Terminal
-Normal priority	ProcessController		Normale Priorität
-OK	ProcessController		OK
-Ok!	ProcessController		OK
-Please confirm	ProcessController		Bitte bestätigen
-ProcessController	System name		Systemmanager
-ProcessController is already installed in Deskbar.	ProcessController		Der Systemmanager ist bereits in der Deskbar installiert.
-Processor %d	ProcessController		Prozessor %d
-Quit an application	ProcessController		Anwendung beenden
-Quit application	ProcessController		Anwendung beenden
-Real-time display priority	ProcessController		Echtzeit-Anzeigen-Priorität
-Real-time priority	ProcessController		Echtzeit-Priorität
+Do you really want to kill the team \"%s\"?	ProcessController		Soll das Team \"%s\" wirklich beendet werden?
+Idle priority	ProcessController		Leerlauf-Priorität
 Restart Deskbar	ProcessController		Deskbar neu starten
-Restart Tracker	ProcessController		Tracker neu starten
-Run in window	ProcessController		Im Fenster ausführen
-System resources & caches…	ProcessController		Systemressourcen & Cache
-That's no Fun!	ProcessController		Nicht lustig!
-This is the last active processor...\nYou can't turn it off!	ProcessController		Dies ist der letzte aktive Prozessor...\nEr kann nicht abgeschaltet werden!
+Custom priority	ProcessController		Anwendungsspezifische Priorität
+Debug thread	ProcessController		Debug Thread
 This team is already gone…	ProcessController		Dieses Team existiert nicht mehr...
+Error saving file	ProcessController		Fehler beim Speichern der Datei
+Real-time priority	ProcessController		Echtzeit-Priorität
+Your setting file could not be saved!\n(%s)	ProcessController		Die Einstellungsdatei konnte nicht gespeichert werden.\n(%s)
 This thread is already gone…	ProcessController		Dieser Thread existiert nicht mehr...
+Cancel	ProcessController		Abbrechen
+Display priority	ProcessController		Anzeigen-Priorität
+Run in window	ProcessController		Im Fenster ausführen
+Processor %d	ProcessController		Prozessor %d
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+ProcessController is already installed in Deskbar.	ProcessController		Der Systemmanager ist bereits in der Deskbar installiert.
+This is the last active processor...\nYou can't turn it off!	ProcessController		Dies ist der letzte aktive Prozessor...\nEr kann nicht abgeschaltet werden!
+Info	ProcessController		Info
+Quit application	ProcessController		Anwendung beenden
+Low priority	ProcessController		Niedrige Priorität
+What do you want to do with the thread \"%s\"?	ProcessController		Was soll mit dem Thread \"%s\" geschehen?
+Gone teams…	ProcessController		Verlorene Teams...
+Lowest active priority	ProcessController		Niedrigste aktive Priorität
+Restart Tracker	ProcessController		Tracker neu starten
+Live in the Deskbar	ProcessController		In der Deskbar laufen
+Kill this thread!	ProcessController		Diesen Thread beenden!
+Debug this thread!	ProcessController		Diesen Thread debuggen!
+Normal priority	ProcessController		Normale Priorität
+New Terminal	ProcessController		Neues Terminal
+Urgent priority	ProcessController		Hohe Priorität
+About ProcessController…	ProcessController		Über Systemmanager...
+Ok!	ProcessController		OK
+Quit an application	ProcessController		Anwendung beenden
+Install in Deskbar	ProcessController		In Deskbar installieren
 Threads and CPU usage	ProcessController		Threads und CPU-Last
 Urgent display priority	ProcessController		Hohe Anzeigen-Priorität
-Urgent priority	ProcessController		Hohe Priorität
+OK	ProcessController		OK
+Damned!	ProcessController		Herrje!
 Usage: %s [-deskbar]\n	ProcessController		Gebrauch: %s [-deskbar]\n
-What do you want to do with the thread \"%s\"?	ProcessController		Was soll mit dem Thread \"%s\" geschehen?
+ProcessController	System name		Systemmanager
+Real-time display priority	ProcessController		Echtzeit-Anzeigen-Priorität
+Please confirm	ProcessController		Bitte bestätigen
 Yes, kill this team!	ProcessController		Ja, dieses Team beenden!
+System resources & caches…	ProcessController		Systemressourcen & Cache
+That's no Fun!	ProcessController		Nicht lustig!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Der Systemmanager kann im Fenster ausgeführt oder in der Deskbar installiert werden.
-Your setting file could not be saved!\n(%s)	ProcessController		Die Einstellungsdatei konnte nicht gespeichert werden.\n(%s)

@@ -82,6 +82,25 @@
 #	define KDEBUG_ONLY(x)				/* nothing */
 #endif
 
+
+// Macros for for placing marker functions. They can be used to mark the
+// beginning and end of code sections (e.g. used in the slab code).
+#define RANGE_MARKER_FUNCTION(functionName) \
+	void functionName() {}
+#define RANGE_MARKER_FUNCTION_BEGIN(scope) \
+	RANGE_MARKER_FUNCTION(scope##_begin)
+#define RANGE_MARKER_FUNCTION_END(scope) \
+	RANGE_MARKER_FUNCTION(scope##_end)
+
+#define RANGE_MARKER_FUNCTION_PROTOTYPE(functionName) \
+	void functionName();
+#define RANGE_MARKER_FUNCTION_PROTOTYPES(scope)		\
+	RANGE_MARKER_FUNCTION_PROTOTYPE(scope##_begin)	\
+	RANGE_MARKER_FUNCTION_PROTOTYPE(scope##_end)
+#define RANGE_MARKER_FUNCTION_ADDRESS_RANGE(scope) \
+	(addr_t)&scope##_begin, (addr_t)&scope##_end
+
+
 // command return value
 #define B_KDEBUG_ERROR			4
 #define B_KDEBUG_RESTART_PIPE	5

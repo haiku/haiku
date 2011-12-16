@@ -1,12 +1,12 @@
 /*
  * Copyright 2011, Haiku inc.
- * Distributed under the terms of the MIT Licence.
+ * Distributed under the terms of the MIT License.
  *
  * Documentation by:
- *  John Scipione <jscipione@gmail.com>
+ *		John Scipione <jscipione@gmail.com>
  * Corresponds to:
- *  /trunk/headers/os/interface/Alert.h	 rev 42274
- *  /trunk/src/kits/interface/Alert.cpp	 rev 42274
+ *		/trunk/headers/os/interface/Alert.h	 rev 42274
+ *		/trunk/src/kits/interface/Alert.cpp	 rev 42274
  */
 
 
@@ -77,6 +77,7 @@
 /*!
 	\class BAlert
 	\ingroup interface
+	\ingroup libbe
 	\brief The BAlert class defines a modal alert dialog which displays a short
 		message and provides a set of labeled buttons that allow the user to
 		respond.

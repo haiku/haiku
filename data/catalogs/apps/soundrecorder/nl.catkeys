@@ -1,37 +1,35 @@
-1	dutch	x-vnd.Haiku-SoundRecorder	1948114706
-Cannot connect to media server	RecorderWindow		Kan geen verbinding maken met mediaserver
-Cannot connect to the selected sound input	RecorderWindow		Kan geen verbinding maken met de geselecteerde geluidsinput
-Cannot find an unused name to use for the new recording	RecorderWindow		Kan geen ongebruikte naam vinden voor de nieuwe opname
+1	dutch; flemish	x-vnd.Haiku-SoundRecorder	4015960867
+Loop	RecorderWindow		Herhalen
 Cannot find default audio hardware	RecorderWindow		Kan de standaard-hardware voor geluid niet vinden
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Kan het tijdelijke bestand van de nieuwe opname niet vinden.
-Cannot get the file to play	RecorderWindow		Bestand afspelen lukt niet
-Cannot open the temporary file created to hold the new recording	RecorderWindow		Kan het tijdelijke bestand van de nieuwe opname niet openen.
-Cannot recognize this file as a media file	RecorderWindow		Kan dit bestand niet herkennen als mediabestand
-Cannot record a sound that long	RecorderWindow		Geluid van die lengte kan niet opgenomen worden
-Channels: 	RecorderWindow		Kanalen:
-Compression:	RecorderWindow		Compressie:
-Drop files here	SoundListView		Sleep bestanden hierheen
-Duration:	RecorderWindow		Tijdsduur:
-File info	RecorderWindow		Bestandsinfo
-File name:	RecorderWindow		Bestandsnaam:
-Format: 	RecorderWindow		Bestandsformaat:
-Forward	RecorderWindow		Vooruit
-Input	RecorderWindow		Input
-Input:	RecorderWindow		Input:
-Invalid audio files	RecorderWindow		Ongeldige geluidsbestanden
-Loop	RecorderWindow		Herhalen
-None	RecorderWindow		Geen
-None of the files appear to be audio files	RecorderWindow		Geen van de bestanden lijkt een geluidsbestand te zijn
 Nothing to play	RecorderWindow		Niets om af te spelen
-OK	RecorderWindow		Oké
-Play	RecorderWindow		Afspelen
-Record	RecorderWindow		Opnemen
-Rewind	RecorderWindow		Terug
-Sample rate: 	RecorderWindow		Sample-waarde:
-Sample size: 	RecorderWindow		Sample-grootte:
-Save	RecorderWindow		Opslaan
 Some of the files don't appear to be audio files	RecorderWindow		Sommige bestanden lijken geen geluidsbestanden te zijn
-Sound List	RecorderWindow		Geluidlijst
+File info	RecorderWindow		Bestandsinfo
+Drop files here	SoundListView		Sleep bestanden hierheen
+Input	RecorderWindow		Input
 Stop	RecorderWindow		Stop
-bits	RecorderWindow		bits
-seconds	RecorderWindow		seconden
+Sound List	RecorderWindow		Geluidlijst
+Rewind	RecorderWindow		Terug
+Invalid audio files	RecorderWindow		Ongeldige geluidsbestanden
+OK	RecorderWindow		Oké
+Cannot open the temporary file created to hold the new recording	RecorderWindow		Kan het tijdelijke bestand van de nieuwe opname niet openen.
+None of the files appear to be audio files	RecorderWindow		Geen van de bestanden lijkt een geluidsbestand te zijn
+Input:	RecorderWindow		Input:
+Forward	RecorderWindow		Vooruit
+Play	RecorderWindow		Afspelen
+None	RecorderWindow		Geen
+Record	RecorderWindow		Opnemen
+Sample size: 	RecorderWindow		Sample-grootte:
+Cannot recognize this file as a media file	RecorderWindow		Kan dit bestand niet herkennen als mediabestand
+Format: 	RecorderWindow		Bestandsformaat:
+Cannot connect to the selected sound input	RecorderWindow		Kan geen verbinding maken met de geselecteerde geluidsinput
+Cannot get the file to play	RecorderWindow		Bestand afspelen lukt niet
+Cannot record a sound that long	RecorderWindow		Geluid van die lengte kan niet opgenomen worden
+Duration:	RecorderWindow		Tijdsduur:
+Compression:	RecorderWindow		Compressie:
+Cannot find an unused name to use for the new recording	RecorderWindow		Kan geen ongebruikte naam vinden voor de nieuwe opname
+Channels: 	RecorderWindow		Kanalen:
+Save	RecorderWindow		Opslaan
+Sample rate: 	RecorderWindow		Sample-waarde:
+Cannot connect to media server	RecorderWindow		Kan geen verbinding maken met mediaserver
+File name:	RecorderWindow		Bestandsnaam:

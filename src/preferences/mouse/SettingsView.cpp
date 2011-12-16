@@ -68,7 +68,7 @@ focus_follows_mouse_mode_to_index(mode_focus_follows_mouse mode)
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "SettingsView"
 
-SettingsView::SettingsView(MouseSettings &settings)
+SettingsView::SettingsView(MouseSettings& settings)
 	: BBox("main_view"),
 	fSettings(settings)
 {
@@ -81,9 +81,9 @@ SettingsView::SettingsView(MouseSettings &settings)
 	fTypeMenu->AddItem(new BMenuItem(B_TRANSLATE("3-Button"),
 		new BMessage(kMsgMouseType)));
 
-	BMenuField *fTypeField = new BMenuField(B_TRANSLATE("Mouse type:"),
+	BMenuField* typeField = new BMenuField(B_TRANSLATE("Mouse type:"),
 		fTypeMenu);
-	fTypeField->SetAlignment(B_ALIGN_RIGHT);
+	typeField->SetAlignment(B_ALIGN_RIGHT);
 
 	// Create the "Double-click speed slider...
 	fClickSpeedSlider = new BSlider("double_click_speed",
@@ -115,9 +115,9 @@ SettingsView::SettingsView(MouseSettings &settings)
 	fMouseView = new MouseView(fSettings);
 
 	// Create the "Double-click test area" text box...
-	BTextControl *fDoubleClick = new BTextControl(NULL,
+	BTextControl* doubleClickTextControl = new BTextControl(NULL,
 		B_TRANSLATE("Double-click test area"), NULL);
-	fDoubleClick->SetAlignment(B_ALIGN_LEFT, B_ALIGN_CENTER);
+	doubleClickTextControl->SetAlignment(B_ALIGN_LEFT, B_ALIGN_CENTER);
 
 	// Add the "Mouse focus mode" pop up menu
 	fFocusMenu = new BPopUpMenu(B_TRANSLATE("Click to focus and raise"));
@@ -129,16 +129,16 @@ SettingsView::SettingsView(MouseSettings &settings)
 										B_FOCUS_FOLLOWS_MOUSE};
 
 	for (int i = 0; i < 3; i++) {
-		BMessage *message = new BMessage(kMsgMouseFocusMode);
+		BMessage* message = new BMessage(kMsgMouseFocusMode);
 		message->AddInt32("mode", focusModes[i]);
 
 		fFocusMenu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(focusLabels[i]),
 			message));
 	}
 
-	BMenuField *fFocusField = new BMenuField(B_TRANSLATE("Focus mode:"),
+	BMenuField* focusField = new BMenuField(B_TRANSLATE("Focus mode:"),
 		fFocusMenu);
-	fFocusField->SetAlignment(B_ALIGN_RIGHT);
+	focusField->SetAlignment(B_ALIGN_RIGHT);
 
 	// Add the "Focus follows mouse mode" pop up menu
 	fFocusFollowsMouseMenu = new BPopUpMenu(B_TRANSLATE("Normal"));
@@ -150,7 +150,7 @@ SettingsView::SettingsView(MouseSettings &settings)
 			B_INSTANT_WARP_FOCUS_FOLLOWS_MOUSE};
 
 	for (int i = 0; i < 3; i++) {
-		BMessage *message = new BMessage(kMsgFollowsMouseMode);
+		BMessage* message = new BMessage(kMsgFollowsMouseMode);
 		message->AddInt32("mode_focus_follows_mouse",
 			focusFollowsMouseModes[i]);
 
@@ -158,9 +158,9 @@ SettingsView::SettingsView(MouseSettings &settings)
 			B_TRANSLATE_NOCOLLECT(focusFollowsMouseLabels[i]), message));
 	}
 
-	BMenuField *fFocusFollowsMouseField = new BMenuField(
+	BMenuField* focusFollowsMouseField = new BMenuField(
 		"Focus follows mouse mode:", fFocusFollowsMouseMenu);
-	fFocusFollowsMouseField->SetAlignment(B_ALIGN_RIGHT);
+	focusFollowsMouseField->SetAlignment(B_ALIGN_RIGHT);
 
 	// Add the "Click-through" check box
 	fAcceptFirstClickBox = new BCheckBox(B_TRANSLATE("Accept first click"),
@@ -185,7 +185,7 @@ SettingsView::SettingsView(MouseSettings &settings)
 			.AddGroup(B_VERTICAL, 10, 1)
 				.AddGroup(B_HORIZONTAL, 10)
 					.AddGlue()
-					.Add(fTypeField)
+					.Add(typeField)
 					.AddGlue()
 				.End()
 				.AddGlue()
@@ -195,7 +195,7 @@ SettingsView::SettingsView(MouseSettings &settings)
 					.AddGlue()
 				)
 				.AddGlue()
-				.Add(fDoubleClick)
+				.Add(doubleClickTextControl)
 			.End()
 			.Add(hdivider)
 			.AddGroup(B_VERTICAL, 5, 3)
@@ -212,11 +212,10 @@ SettingsView::SettingsView(MouseSettings &settings)
 		.End()
 		.Add(vdivider)
 		.AddGroup(B_HORIZONTAL, 10)
-			.Add(fFocusField)
+			.Add(focusField)
 			.AddGlue()
 			.AddGroup(B_VERTICAL, 0)
 				.Add(fAcceptFirstClickBox)
-				//.Add(fFocusFollowsMouseField)
 			.End()
 		.End()
 		.SetInsets(5, 5, 5, 5)
@@ -234,6 +233,8 @@ void
 SettingsView::AttachedToWindow()
 {
 	UpdateFromSettings();
+
+
 }
 
 
@@ -266,7 +267,7 @@ SettingsView::UpdateFromSettings()
 		// slow = 0, fast = 262144
 	fAccelerationSlider->SetValue(value);
 
-	BMenuItem *item = fTypeMenu->ItemAt(fSettings.MouseType() - 1);
+	BMenuItem* item = fTypeMenu->ItemAt(fSettings.MouseType() - 1);
 	if (item != NULL)
 		item->SetMarked(true);
 

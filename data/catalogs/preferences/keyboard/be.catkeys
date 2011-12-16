@@ -1,14 +1,14 @@
 1	belarusian	x-vnd.Haiku-Keyboard	1711838804
+Written by Andrew Edward McCall	KeyboardApplication		Праграма распрацавана Andrew Edward McCall
+Typing test area	KeyboardView		Месца праверкі набору тэкста.
 Defaults	KeyboardWindow		Прадвызначаныя
-Delay until key repeat	KeyboardView		Затрымка паўтора сімвала
-Fast	KeyboardView		Хутка
 Key repeat rate	KeyboardView		Хуткасць паўтору сімвала
-Keyboard	System name		Клавіятура
-Long	KeyboardView		Доўгі
-OK	KeyboardApplication		ОК
 Revert	KeyboardWindow		Вярнуць
-Short	KeyboardView		Кароткі
+Delay until key repeat	KeyboardView		Затрымка паўтора сімвала
+Keyboard	System name		Клавіятура
+OK	KeyboardApplication		ОК
+Fast	KeyboardView		Хутка
 Slow	KeyboardView		Павольна
 Something has gone wrong!	KeyboardApplication		Нешта пайшло не так!
-Typing test area	KeyboardView		Месца праверкі набору тэкста.
-Written by Andrew Edward McCall	KeyboardApplication		Праграма распрацавана Andrew Edward McCall
+Long	KeyboardView		Доўгі
+Short	KeyboardView		Кароткі

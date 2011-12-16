@@ -115,6 +115,9 @@ JoystickProtocolHandler::JoystickProtocolHandler(HIDReport &report)
 JoystickProtocolHandler::~JoystickProtocolHandler()
 {
 	free(fCurrentValues.data);
+	free(fAxis);
+	free(fHats);
+	free(fButtons);
 }
 
 

@@ -11,6 +11,8 @@ SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc iconv ;
 
+UsePrivateHeaders libroot ;
+
 # For now, all wide character functions are disabled,
 # obprintf() is also disabled, because we don't have
 # obstack functionality

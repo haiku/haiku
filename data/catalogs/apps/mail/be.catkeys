@@ -1,160 +1,161 @@
-1	belarusian	x-vnd.Be-MAIL	2276629278
+1	belarusian	x-vnd.Be-MAIL	1835398254
+View	Mail		Агляд
 %d - Date	Mail		%d - Дата
-%e - E-mail address	Mail		%e - адрас электроннай пошты
-%e wrote:\\n	Mail		%e напісаў:\\n
-%n - Full name	Mail		%n - Поўнае імя
-(Address unavailable)	Mail		(Адрэс невядомы)
-(Date unavailable)	Mail		(Дата невядома)
-(Name unavailable)	Mail		(Імя невядома)
-<none>	Mail		<няма>
-Account from mail	Mail		Акаунт з паведамлення
-Account:	Mail		Акаунт:
-Accounts…	Mail		Акаунты…
-Add	Mail		Дадаць
-Add enclosure…	Mail		Дадаць укладанне…
-Add signature	Mail		Дадаць подпіс
-An error occurred trying to open this signature.	Mail		Памылка. Немагчыма адкрыць гэты подпіс.
-An error occurred trying to save the attachment.	Mail		Немагчыма захаваць гэтае ўкладанне.
-An error occurred trying to save this signature.	Mail		Падчас захавання гэтага подпісу адбылася памылка.
 Attach attributes:	Mail		Атрыбуты ўкладання:
-Attachments:	Mail		Укладанні: 
-Auto signature:	Mail		Аута-подпіс:
+Inconsistency occurred in the undo/redo buffer.	Mail		Неадпаведнасць ў чарзе аперацый паўтора/адмены
+An error occurred trying to save the attachment.	Mail		Немагчыма захаваць гэтае ўкладанне.
+Copy to new	Mail		Капіраваць як новае
+Edit	Mail		Правіць
+Print	Mail		Друкаваць
+<none>	Mail		<няма>
+New mail message	Mail		Новае паведамленне
 Automatic	Mail		Аўтаматычна
 Automatically mark mail as read:	Mail		Аўтаматычна пазначаць паведамленні як прачытаныя:
-Bcc:	Mail		Bcc:
-Beginner	Mail		Спрошчаны
-Button bar:	Mail		Панэль кнопак:
-Cancel	Mail		Адмяніць
-Cc:	Mail		Cc:
-Check spelling	Mail		Праверыць правапіс
-Close	Mail		Закрыць
-Close and 	Mail		Закрыць ды
-Colored quotes:	Mail		Каляровыя цытаты:
-Copy	Mail		Капіяваць
-Copy link location	Mail		Капіраваць спасылку
-Copy to new	Mail		Капіраваць як новае
-Couldn't open this signature. Sorry.	Mail		Немагчыма адкрыць гэта подпіс. Выбачайце.
-Cut	Mail		Выразаць
-Date:	Mail		Дата:
-Decoding:	Mail		Кадаванне:
-Default account:	Mail		Прадвызначаны акаунт:
-Delete	Mail		Выдаліць
-Discard	Mail		Адхіліць
-Do you wish to save this message as a draft before closing?	Mail		Жадаеце захаваць паведамленне ў чарнавіках да таго як закрыеце яго?
-Do you wish to send this message before closing?	Mail		Жадаеце даслаць гэтае паведамленне да таго як закрыеце яго?
-Don't save	Mail		Не захоўваць
-E-mail draft could not be saved!	Mail		Немагчыма захаваць паведмаленне ў чарнавіках!
-Edit	Mail		Правіць
-Edit queries…	Mail		Праўка запытаў…
-Edit signatures…	Mail		Праўка подпісаў…
-Encoding:	Mail		Кадоўка:
-Expert	Mail		Поўны
-File	Mail		Файл
-Find	Mail		Шукаць
-Find again	Mail		Шукаць далей
-Find…	Mail		Знайсці…
-Font:	Mail		Шрыфт:
-Forward	Mail		Пераслаць
-Forward without attachments	Mail		Пераслаць без укладанняў
-From:	Mail		Ад:
-Hide	Mail		Схаваць
-Include file attributes in attachments	Mail		Захоўваць файлавыя атрыбуты ўкладанняў
-Inconsistency occurred in the undo/redo buffer.	Mail		Неадпаведнасць ў чарзе аперацый паўтора/адмены
-Initial spell check mode:	Mail		Пачатковы рэжым праверкі правапісу:
-Leave as '%s'	Mail		Пакінуць як '%s'
-Leave as New	Mail		Пакінуць як Новае
-Leave same	Mail		Пакінуць так
-Mail	System name		Пошта
-Mail couldn't find its dictionary.	Mail		Немагчыма знайсці слоўнік.
-Mail preferences	Mail		Наладкі Пошты
-Mailing	Mail		Ліставанне
-Message	Mail		Паведамленне
-Move to trash	Mail		Выкінуць у сметніцу
-Need Tracker to move items to trash	Mail		Дзеля таго каб выкінуць элементы ў сметніцу патрэбен Tracker
-New	Mail		Новае
-New mail message	Mail		Новае паведамленне
-Next	Mail		Наступнае
-Next message	Mail		Наступнае паведамленне
-No file attributes, just plain data	Mail		Без аттрыбутаў файла, проста даныя
-No matches	Mail		Няма супадзенняў
-None	Mail		Ні водзін
-OK	Mail		ОК
-Off	Mail		Адключыць
-On	Mail		Уключыць
-Only files can be added as attachments.	Mail		Можна ўкладаць толькі файлы.
-Open	Mail		Адкрыць
-Open attachment	Mail		Адкрыць укладанне
-Open draft	Mail		Адкрыць чарнавік
-Open this link	Mail		Адкрыць спасылку
-Page setup…	Mail		Устаноўкі старонкі…
-Paste	Mail		Уставіць
-Preferences…	Mail		Наладкі…
-Previous	Mail		Папярэдняе
-Previous message	Mail		Папярэдняе паведамленне
-Print	Mail		Друкаваць
-Print…	Mail		Друкаваць…
-Put your favorite e-mail queries and query templates in this folder.	Mail		Скапіюйце запыты электроннай пошты і шаблоны такіх запытаў у гэтую папку.
-Queries	Mail		Запыты
-Quit	Mail		Выйсці
-Quote	Mail		Цытата
-Random	Mail		Выпадковы
-Read 	Mail		Чытаць
-Really delete this signature? This cannot be undone.	Mail		Сапраўды жадаеце знішчыць подпіс? Гэтую аперацыю немагчыма адмяніць.
-Redo	Mail		Паўтор
-Remove attachment	Mail		Выдаліць укладанне
-Remove enclosure	Mail		Выдаліць укладанне
-Remove quote	Mail		Выдаліць цытату
-Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Выдаленне укладанняў з перасланых паведамленняў часова не функцыянуе.\nКалі ласка не карыстайцеся гэтай магчымасьцю.
-Reply	Mail		Адказаць
-Reply account:	Mail		Акаунт для адказаў:
-Reply preamble:	Mail		Прэамбула адказу:
-Reply to all	Mail		Адкзаць усім
-Reply to sender	Mail		Адказаць адпраўніку
-Resend	Mail		Даслаць наноў
-Revert	Mail		Вярнуць
-Save	Mail		Захаваць
-Save address	Mail		Захаваць адрас
-Save as draft	Mail		Захаваць у чарнавіках
-Save attachment…	Mail		Захаваць укладанне…
-Save changes to this signature?	Mail		Захаваць змены подпісу?
-Select all	Mail		Пазначыць ўсё
-Send	Mail		Даслаць
-Send message	Mail		Даслаць паведамленне
-Set to %s	Mail		Паставіць у %s
-Set to Saved	Mail		Пазначыць як захаванае
-Set to…	Mail		Прызначыць да…
-Show header	Mail		Паказаць загалоўкі
-Show icons & labels	Mail		Паказваць значкі і подпісы
-Show icons only	Mail		Паказваць толькі значкі
-Show raw message	Mail		Паказаць зыходны тэкст паведамлення
-Signature	Mail		Подпіс
-Signature:	Mail		Подпіс:
-Signatures	Mail		Подпісы
-Size:	Mail		Памер:
-Sorry	Mail		Прабачце
-Sorry, could not find an application that supports the 'Person' data type.	Mail		Выбачайце, але мне не ўдалося знайсці праграму якая можа працаваць с дадзенымі тыпу 'Person'.
-Start now	Mail		Запусціць
-Subject:	Mail		Тэма:
-Text wrapping:	Mail		Афармоўка тэксту:
-The mail_daemon could not be started:\n\t	Mail		Сервер mail_daemon ня можа быць запушчаны:\n\t
-The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Сервіс mail_daemon не актыўны. Паведамленне будзе пастаўлена ў чаргу і дасланае пасля таго як гэты сервіс будзе запушчаны наноў.
-There is no installed handler for URL links.	Mail		Апрацоўшчык URL спасылак не ўсталяваны.
-Title:	Mail		Загаловак:
-To:	Mail		Каму:
-Trash	Mail		Сметніца
-Undo	Mail		Вярнуць
-Unread	Mail		Не прачытанае
-Use default account	Mail		Ужываць прадвызначаны акаунт
-User interface	Mail		Інтэрфейс карыстача
-View	Mail		Агляд
-Warn unencodable:	Mail		Правяраць кадоўку:
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваша паведамленне месціць %ld літар якія адсутнічаюць у выбранай кадоўцы. Нягледзячы на гэта вы маеце магчымасць Даслаць яго (у такім разе адсутныя літары будуць заменены на больш стасуючыя), ці Адмяніць перасылку ды вярнуцца і правіць гэтае паведамленне далей. Магчыма іншая кадоўка дапаможа даслаць паведамленне ў зыходным выглядзе.
-\\n - Newline	Mail		\\n - Новы радок
-draft	B_USER_DIRECTORY/mail/draft		чарнавік
 helpful message	Mail		Карыснае паведамленне
-in	B_USER_DIRECTORY/mail/in		ў
-mail	B_USER_DIRECTORY/mail		пошта
-out	B_USER_DIRECTORY/mail/out		выхад
-queries	B_USER_DIRECTORY/mail/queries		запыты
-sent	B_USER_DIRECTORY/mail/sent		дасланае
+Colored quotes:	Mail		Каляровыя цытаты:
+Subject:	Mail		Тэма:
+Reply to all	Mail		Адкзаць усім
+Show icons & labels	Mail		Паказваць значкі і подпісы
+Remove attachment	Mail		Выдаліць укладанне
+Button bar:	Mail		Панэль кнопак:
 spam	B_USER_DIRECTORY/mail/spam		смецце
+Beginner	Mail		Спрошчаны
+Don't save	Mail		Не захоўваць
+Expert	Mail		Поўны
+Reply account:	Mail		Акаунт для адказаў:
+Discard	Mail		Адхіліць
+Message	Mail		Паведамленне
+Reply to sender	Mail		Адказаць адпраўніку
+There is no installed handler for URL links.	Mail		Апрацоўшчык URL спасылак не ўсталяваны.
+Signature	Mail		Подпіс
+Find again	Mail		Шукаць далей
+Bcc:	Mail		Bcc:
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваша паведамленне месціць %ld літар якія адсутнічаюць у выбранай кадоўцы. Нягледзячы на гэта вы маеце магчымасць Даслаць яго (у такім разе адсутныя літары будуць заменены на больш стасуючыя), ці Адмяніць перасылку ды вярнуцца і правіць гэтае паведамленне далей. Магчыма іншая кадоўка дапаможа даслаць паведамленне ў зыходным выглядзе.
+Signature:	Mail		Подпіс:
+Save changes to this signature?	Mail		Захаваць змены подпісу?
+Cc:	Mail		Cc:
+Off	Mail		Адключыць
+Find	Mail		Шукаць
+Preferences…	Mail		Наладкі…
+Undo	Mail		Вярнуць
+Date:	Mail		Дата:
+Leave as New	Mail		Пакінуць як Новае
+An error occurred trying to open this signature.	Mail		Памылка. Немагчыма адкрыць гэты подпіс.
+No file attributes, just plain data	Mail		Без аттрыбутаў файла, проста даныя
+Edit queries…	Mail		Праўка запытаў…
+queries	B_USER_DIRECTORY/mail/queries		запыты
+Paste	Mail		Уставіць
+in	B_USER_DIRECTORY/mail/in		ў
+Save attachment…	Mail		Захаваць укладанне…
+Include file attributes in attachments	Mail		Захоўваць файлавыя атрыбуты ўкладанняў
+OK	Mail		ОК
+Send	Mail		Даслаць
+Show icons only	Mail		Паказваць толькі значкі
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Выдаленне укладанняў з перасланых паведамленняў часова не функцыянуе.\nКалі ласка не карыстайцеся гэтай магчымасьцю.
+Hide	Mail		Схаваць
+Forward without attachments	Mail		Пераслаць без укладанняў
+Previous	Mail		Папярэдняе
+Redo	Mail		Паўтор
+Add enclosure…	Mail		Дадаць укладанне…
+Mail	System name		Пошта
+Print…	Mail		Друкаваць…
+Warn unencodable:	Mail		Правяраць кадоўку:
+Quit	Mail		Выйсці
+%n - Full name	Mail		%n - Поўнае імя
+ Read 	Mail		Чытаць
+Trash	Mail		Сметніца
+Default account:	Mail		Прадвызначаны акаунт:
+Size:	Mail		Памер:
+Account from mail	Mail		Акаунт з паведамлення
+Edit signatures…	Mail		Праўка подпісаў…
+New	Mail		Новае
+Attachments: 	Mail		Укладаньні
+On	Mail		Уключыць
+Set to %s	Mail		Паставіць у %s
+Forward	Mail		Пераслаць
+E-mail draft could not be saved!	Mail		Немагчыма захаваць паведмаленне ў чарнавіках!
+%e wrote:\\n	Mail		%e напісаў:\\n
+To:	Mail		Каму:
+Only files can be added as attachments.	Mail		Можна ўкладаць толькі файлы.
+Previous message	Mail		Папярэдняе паведамленне
+Attachments:	Mail		Укладанні: 
+Title:	Mail		Загаловак:
+Find…	Mail		Знайсці…
+Accounts…	Mail		Акаунты…
+Mail preferences	Mail		Наладкі Пошты
+Initial spell check mode:	Mail		Пачатковы рэжым праверкі правапісу:
+Leave same	Mail		Пакінуць так
+Page setup…	Mail		Устаноўкі старонкі…
+Text wrapping:	Mail		Афармоўка тэксту:
+Revert	Mail		Вярнуць
+File	Mail		Файл
+mail	B_USER_DIRECTORY/mail		пошта
+None	Mail		Ні водзін
+(Name unavailable)	Mail		(Імя невядома)
+Copy link location	Mail		Капіраваць спасылку
+out	B_USER_DIRECTORY/mail/out		выхад
+Show header	Mail		Паказаць загалоўкі
+%e - E-mail address	Mail		%e - адрас электроннай пошты
+Resend	Mail		Даслаць наноў
+Show raw message	Mail		Паказаць зыходны тэкст паведамлення
+\\n - Newline	Mail		\\n - Новы радок
+Start now	Mail		Запусціць
+Close	Mail		Закрыць
+No matches	Mail		Няма супадзенняў
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Сервіс mail_daemon не актыўны. Паведамленне будзе пастаўлена ў чаргу і дасланае пасля таго як гэты сервіс будзе запушчаны наноў.
+Really delete this signature? This cannot be undone.	Mail		Сапраўды жадаеце знішчыць подпіс? Гэтую аперацыю немагчыма адмяніць.
+Open	Mail		Адкрыць
+draft	B_USER_DIRECTORY/mail/draft		чарнавік
+Quote	Mail		Цытата
+Add	Mail		Дадаць
+Next message	Mail		Наступнае паведамленне
+User interface	Mail		Інтэрфейс карыстача
+Cancel	Mail		Адмяніць
+Send message	Mail		Даслаць паведамленне
+Remove enclosure	Mail		Выдаліць укладанне
+Account:	Mail		Акаунт:
+Decoding:	Mail		Кадаванне:
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Выбачайце, але мне не ўдалося знайсці праграму якая можа працаваць с дадзенымі тыпу 'Person'.
+Do you wish to send this message before closing?	Mail		Жадаеце даслаць гэтае паведамленне да таго як закрыеце яго?
+Delete	Mail		Выдаліць
+Leave as '%s'	Mail		Пакінуць як '%s'
+Copy	Mail		Капіяваць
+Mail couldn't find its dictionary.	Mail		Немагчыма знайсці слоўнік.
+Reply preamble:	Mail		Прэамбула адказу:
+Signatures	Mail		Подпісы
+Next	Mail		Наступнае
+Set to…	Mail		Прызначыць да…
+Use default account	Mail		Ужываць прадвызначаны акаунт
+Sorry	Mail		Прабачце
+Encoding:	Mail		Кадоўка:
+Font:	Mail		Шрыфт:
+(Address unavailable)	Mail		(Адрэс невядомы)
+Save address	Mail		Захаваць адрас
+Queries	Mail		Запыты
+Do you wish to save this message as a draft before closing?	Mail		Жадаеце захаваць паведамленне ў чарнавіках да таго як закрыеце яго?
+Save	Mail		Захаваць
+Random	Mail		Выпадковы
+Close and 	Mail		Закрыць ды
+Save as draft	Mail		Захаваць у чарнавіках
+The mail_daemon could not be started:\n\t	Mail		Сервер mail_daemon ня можа быць запушчаны:\n\t
+Open attachment	Mail		Адкрыць укладанне
+sent	B_USER_DIRECTORY/mail/sent		дасланае
+(Date unavailable)	Mail		(Дата невядома)
+Put your favorite e-mail queries and query templates in this folder.	Mail		Скапіюйце запыты электроннай пошты і шаблоны такіх запытаў у гэтую папку.
+Reply	Mail		Адказаць
+From:	Mail		Ад:
+Couldn't open this signature. Sorry.	Mail		Немагчыма адкрыць гэта подпіс. Выбачайце.
+Open draft	Mail		Адкрыць чарнавік
+Cut	Mail		Выразаць
+Check spelling	Mail		Праверыць правапіс
+Set to Saved	Mail		Пазначыць як захаванае
+Open this link	Mail		Адкрыць спасылку
+Auto signature:	Mail		Аута-подпіс:
+Add signature	Mail		Дадаць подпіс
+Need Tracker to move items to trash	Mail		Дзеля таго каб выкінуць элементы ў сметніцу патрэбен Tracker
+Mailing	Mail		Ліставанне
+Unread	Mail		Не прачытанае
+Remove quote	Mail		Выдаліць цытату
+Move to trash	Mail		Выкінуць у сметніцу
+Select all	Mail		Пазначыць ўсё
+An error occurred trying to save this signature.	Mail		Падчас захавання гэтага подпісу адбылася памылка.

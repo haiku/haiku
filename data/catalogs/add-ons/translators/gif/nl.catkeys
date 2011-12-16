@@ -1,0 +1,15 @@
+1	dutch; flemish	x-vnd.Haiku-GIFTranslator	829368084
+Websafe	GIFView		Websafe
+Write interlaced images	GIFView		Schrijf interlaced afbeelding
+Optimal	GIFView		Optimaal
+Greyscale	GIFView		Grijswaarde
+Be Bitmap Format (GIFTranslator)	GIFTranslator		Be Bitmap Formaat (GIFVertaler)
+GIF image	GIFTranslator		GIF afbeelding
+Write transparent images	GIFView		Schrijf transparante afbeeldingen
+Palette	GIFView		Kleurenpalet
+Use RGB color	GIFView		Gebruik RGB kleur
+Use dithering	GIFView		Gebruik dithering
+GIF Settings	GIFTranslator		GIF instellingen
+BeOS system	GIFView		BeOS systeem
+Automatic (from alpha channel)	GIFView		Automatisch (van alpha kanaal)
+Colors	GIFView		Kleuren

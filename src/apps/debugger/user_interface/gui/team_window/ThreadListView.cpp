@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -15,6 +16,7 @@
 #include <ObjectList.h>
 #include <ToolTip.h>
 
+#include "GUISettingsUtils.h"
 #include "table/TableColumns.h"
 
 
@@ -304,6 +306,34 @@ ThreadListView::MessageReceived(BMessage* message)
 			break;
 	}
 }
+
+
+void
+ThreadListView::LoadSettings(const BMessage& settings)
+{
+	BMessage tableSettings;
+	if (settings.FindMessage("threadsTable", &tableSettings) == B_OK) {
+		GUISettingsUtils::UnarchiveTableSettings(tableSettings,
+			fThreadsTable);
+	}
+}
+
+
+status_t
+ThreadListView::SaveSettings(BMessage& settings)
+{
+	settings.MakeEmpty();
+
+	BMessage tableSettings;
+	status_t result = GUISettingsUtils::ArchiveTableSettings(tableSettings,
+		fThreadsTable);
+	if (result == B_OK)
+		result = settings.AddMessage("threadsTable", &tableSettings);
+
+	return result;
+}
+
+
 
 
 void

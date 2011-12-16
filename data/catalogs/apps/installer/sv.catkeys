@@ -10,7 +10,7 @@
 ???	InstallerWindow	Unknown currently copied item	???
 ???	InstallerWindow	Unknown partition name	???
 Abort	InstallerWindow		Avbryt
-Additional disk space required: %s	InstallerWindow		Ytterligare diskutrymme behövs: %s
+Additional disk space required: %s	InstallerWindow		Ytterligare diskutrymme som behövs: %s
 Additional disk space required: 0.0 KiB	InstallerWindow		Ytterligare nödvändigt diskutrymme: 0.0 KiB
 Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		Eventuellt så måste du redigera en annan fil för att se startmenyn:\n\n
 All hard disks start with \"hd\".\n	InstallerApp		Alla hårddiskar börjar med \"hd\".\n
@@ -25,7 +25,7 @@ Boot sector successfully written.	InstallProgress		Skrivning av startsektorn lyc
 BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Starthanteraren, konfigurationsprogrammet för Haikus startmeny, kunde inte startas.
 Cancel	InstallProgress		Avbryt
 Cancel	InstallerWindow		Avbryt
-Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Välj den disk du vill installera till från menyn. Klicka sedan på \"Starta\".
+Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Välj den disk du vill installera till. Klicka sedan på Starta.
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Välj käll- och måldisk från menyn. Klicka sedan på \"Starta\".
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Välj källdisk från menyn. Klicka sedan på \"Starta\".
 Collecting copy information.	InstallProgress		Förbereder inför kopiering.
@@ -45,7 +45,7 @@ Install anyway	InstallProgress		Installera ändå
 Install from:	InstallerWindow		Installera från:
 Install progress:  	InstallerWindow		Installationsförlopp:  
 Installation canceled.	InstallProgress		Installationen avbröts.
-Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Installationen är klar. Startsektorn har skrivits till '%s'. Klicka på Avsluta för att lämna installationsprogrammet eller välj en ny volym att installera på.
+Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Installationen är klar. Startsektorn har skrivits på volymen %s. Klicka på Avsluta för att lämna installationsprogrammet eller välj en ny volym att installera på.
 Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Installationen är klar. Startsektorn har skrivits till '%s'. Klicka på Starta om för att starta om datorn, eller välj en ny volym att utföra en till installation.
 Installer	System name		Installerare
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installerare\n\tskriven av Jérôme Duval och Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
@@ -89,7 +89,7 @@ The disk can't be mounted. Please choose a different disk.	InstallProgress		Disk
 The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		Den första logiska partitionen har alltid nummer \"4\", oavsett antalet primära partitioner.\n\n
 The mount point could not be retrieved.	InstallProgress		Monteringspunkten kunde inte hämtas
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Partitionen kan inte monteras. Var god välj en annan partition.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Volymen du har valt som mål är ej tom. Är du säker på att du vill installera?\n\nObs: Mappen 'system' skapas som en ren kopia från installationskällan, övriga mappar blir sammansatta. Filer som existerar på både källvolymen och det valda målet skrivs över med versionen från källan.
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Volymen du har valt som mål är ej tom. Är du säker på att du vill installera?\n\nObservera: Systemmappen skapas som en ren kopia från installationskällan medan övriga mappar blir sammanslagna. Filer som existerar på både källvolymen och det valda målet skrivs över med versionen från källanvolymen.
 This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Detta är ett program i alfa (ej fullt testad) version! Med det menas att det finns en stor risk för att viktig data kan gå förlorad. Ta backup ofta! Kom ihåg att du har blivit varnad...\n\n\n
 Tools	InstallerWindow		Verktyg
 Try installing anyway	InstallProgress		Försök installera ändå

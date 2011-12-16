@@ -72,10 +72,10 @@ BackgroundsView::BackgroundsView()
 {
 	SetBorder(B_NO_BORDER);
 
-	fPreview = new BBox("preview");
-	fPreview->SetLabel(B_TRANSLATE("Preview"));
+	fPreviewBox = new BBox("preview");
+	fPreviewBox->SetLabel(B_TRANSLATE("Preview"));
 
-	fPreView = new PreView();
+	fPreview = new Preview();
 
 	fTopLeft = new FramePart(FRAME_TOP_LEFT);
 	fTop = new FramePart(FRAME_TOP);
@@ -111,7 +111,7 @@ BackgroundsView::BackgroundsView()
 					.Add(fTop, 1, 0)
 					.Add(fTopRight, 2, 0)
 					.Add(fLeft, 0, 1)
-					.Add(fPreView, 1, 1)
+					.Add(fPreview, 1, 1)
 					.Add(fRight, 2, 1)
 					.Add(fBottomLeft, 0, 2)
 					.Add(fBottom, 1, 2)
@@ -129,7 +129,7 @@ BackgroundsView::BackgroundsView()
 		.AddGlue()
 		.View();
 
-	fPreview->AddChild(view);
+	fPreviewBox->AddChild(view);
 
 	BBox* rightbox = new BBox("rightbox");
 
@@ -227,7 +227,7 @@ BackgroundsView::BackgroundsView()
 	view = BLayoutBuilder::Group<>()
 		.AddGroup(B_VERTICAL, 10)
 			.AddGroup(B_HORIZONTAL, 10)
-				.Add(fPreview)
+				.Add(fPreviewBox)
 				.Add(rightbox)
 				.End()
 			.AddGroup(B_HORIZONTAL, 0)
@@ -306,8 +306,8 @@ BackgroundsView::MessageReceived(BMessage* msg)
 		case kMsgUpdatePreviewPlacement:
 		{
 			BString xstring, ystring;
-			xstring << (int)fPreView->fPoint.x;
-			ystring << (int)fPreView->fPoint.y;
+			xstring << (int)fPreview->fPoint.x;
+			ystring << (int)fPreview->fPoint.y;
 			fXPlacementText->SetText(xstring.String());
 			fYPlacementText->SetText(ystring.String());
 			_UpdatePreview();
@@ -865,7 +865,7 @@ BackgroundsView::_UpdatePreview()
 	fXPlacementText->TextView()->MakeEditable(textEnabled);
 	fYPlacementText->TextView()->MakeEditable(textEnabled);
 
-	fPreView->ClearViewBitmap();
+	fPreview->ClearViewBitmap();
 
 	int32 index = ((BGImageMenuItem*)fImageMenu->FindMarked())->ImageIndex();
 	if (index >= 0) {
@@ -877,22 +877,22 @@ BackgroundsView::_UpdatePreview()
 						atoi(fYPlacementText->Text())),
 					fIconLabelOutline->Value() == B_CONTROL_ON, 0, 0);
 			if (info->fMode == BackgroundImage::kAtOffset) {
-				fPreView->SetEnabled(true);
-				fPreView->fPoint.x = atoi(fXPlacementText->Text());
-				fPreView->fPoint.y = atoi(fYPlacementText->Text());
+				fPreview->SetEnabled(true);
+				fPreview->fPoint.x = atoi(fXPlacementText->Text());
+				fPreview->fPoint.y = atoi(fYPlacementText->Text());
 			} else
-				fPreView->SetEnabled(false);
+				fPreview->SetEnabled(false);
 
-			fPreView->fImageBounds = BRect(bitmap->Bounds());
-			fCurrent->Show(info, fPreView);
+			fPreview->fImageBounds = BRect(bitmap->Bounds());
+			fCurrent->Show(info, fPreview);
 
 			delete info;
 		}
 	} else
-		fPreView->SetEnabled(false);
+		fPreview->SetEnabled(false);
 
-	fPreView->SetViewColor(fPicker->ValueAsColor());
-	fPreView->Invalidate();
+	fPreview->SetViewColor(fPicker->ValueAsColor());
+	fPreview->Invalidate();
 }
 
 
@@ -1144,7 +1144,7 @@ BackgroundsView::FoundPositionSetting()
 //	#pragma mark -
 
 
-PreView::PreView()
+Preview::Preview()
 	:
 	BControl("PreView", NULL, NULL, B_WILL_DRAW | B_SUBPIXEL_PRECISE)
 {
@@ -1159,7 +1159,7 @@ PreView::PreView()
 
 
 void
-PreView::AttachedToWindow()
+Preview::AttachedToWindow()
 {
 	rgb_color color = ViewColor();
 	BControl::AttachedToWindow();
@@ -1168,7 +1168,7 @@ PreView::AttachedToWindow()
 
 
 void
-PreView::MouseDown(BPoint point)
+Preview::MouseDown(BPoint point)
 {
 	if (IsEnabled() && Bounds().Contains(point)) {
 		uint32 buttons;
@@ -1190,7 +1190,7 @@ PreView::MouseDown(BPoint point)
 
 
 void
-PreView::MouseUp(BPoint point)
+Preview::MouseUp(BPoint point)
 {
 	if (IsTracking()) {
 		SetTracking(false);
@@ -1201,7 +1201,7 @@ PreView::MouseUp(BPoint point)
 
 
 void
-PreView::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
+Preview::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
 {
 	if (!IsTracking()) {
 		BCursor cursor(IsEnabled()

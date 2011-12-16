@@ -985,7 +985,7 @@ _user_rewind_dir(int fd)
 	if (descriptor->ops->fd_rewind_dir)
 		status = descriptor->ops->fd_rewind_dir(descriptor);
 	else
-		status = B_NOT_SUPPORTED;
+		status = B_UNSUPPORTED;
 
 	put_fd(descriptor);
 	return status;
@@ -1258,7 +1258,7 @@ _kern_read_dir(int fd, struct dirent* buffer, size_t bufferSize,
 		if (retval >= 0)
 			retval = count;
 	} else
-		retval = B_NOT_SUPPORTED;
+		retval = B_UNSUPPORTED;
 
 	put_fd(descriptor);
 	return retval;
@@ -1280,7 +1280,7 @@ _kern_rewind_dir(int fd)
 	if (descriptor->ops->fd_rewind_dir)
 		status = descriptor->ops->fd_rewind_dir(descriptor);
 	else
-		status = B_NOT_SUPPORTED;
+		status = B_UNSUPPORTED;
 
 	put_fd(descriptor);
 	return status;

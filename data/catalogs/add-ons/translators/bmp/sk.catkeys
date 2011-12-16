@@ -1,9 +1,9 @@
 1	slovak	x-vnd.Haiku-BMPTranslator	2497639570
-BMP Settings	BMPMain		Nastavenia MBP
-BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	Obrázok BMP (formát MS, %d bitov)
-BMP image (OS/2 format, %d bits)	BMPTranslator		Obrázok BMP (formát OS/2, %d bitov)
-BMP image translator	BMPTranslator		Prekladač obrázkov BMP
-BMP image translator	BMPView		Prekladač obrázkov BMP
 BMP images	BMPTranslator		Obrázky BMP
 BMPTranslator Settings	BMPTranslator		Nastavenia BMPTranslator
+BMP image (OS/2 format, %d bits)	BMPTranslator		Obrázok BMP (formát OS/2, %d bitov)
+BMP image translator	BMPView		Prekladač obrázkov BMP
+BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	Obrázok BMP (formát MS, %d bitov
+BMP Settings	BMPMain		Nastavenia BMP
 Version %d.%d.%d, %s	BMPView		Verzia %d.%d.%d, %s
+BMP image translator	BMPTranslator		Prekladač obrázkov BMP

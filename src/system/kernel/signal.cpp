@@ -2324,7 +2324,7 @@ _user_set_signal_stack(const stack_t* newUserStack, stack_t* oldUserStack)
 		return B_BAD_ADDRESS;
 
 	if (thread->signal_stack_enabled) {
-		// determine wether or not the user thread is currently
+		// determine whether or not the user thread is currently
 		// on the active signal stack
 		onStack = arch_on_signal_stack(thread);
 	}

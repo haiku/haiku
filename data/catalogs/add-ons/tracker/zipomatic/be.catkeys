@@ -1,18 +1,18 @@
 1	belarusian	x-vnd.haiku.zip-o-matic	2207848100
-%ld files added.	file:ZipOMaticWindow.cpp		Дабаўлена %ld файл(а/аў).
 1 file added.	file:ZipOMaticWindow.cpp		Дабаўлены адзін файл.
-Archive	file:ZipperThread.cpp		Архіў
-Archive created OK	file:ZipOMaticWindow.cpp		Архіў быў створаны паспяхова
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Насамрэч жадаеце спыніць стварэнне гэтага архіву?
-Continue	file:ZipOMaticWindow.cpp		Працягваць
+Stop	file:ZipOMaticWindow.cpp		Спыніць
 Creating archive: %s	file:ZipOMaticWindow.cpp		Стварыць архіў: %s
-Do you want to stop them?	file:ZipOMatic.cpp		Жадаеце іх спыніць?
+Continue	file:ZipOMaticWindow.cpp		Працягваць
+Preparing to archive	file:ZipperThread.cpp		Падрыхтоўка да архівацыі
 Drop files here.	file:ZipOMaticWindow.cpp		Кіньце файлы сюды
-Error creating archive	file:ZipOMaticWindow.cpp		Памылка падчас стварэння архіву
 Filename: %s	file:ZipOMaticWindow.cpp		Імя файла: %s
 Let them continue	file:ZipOMatic.cpp		Дазволіць ім працягваць
-Preparing to archive	file:ZipperThread.cpp		Падрыхтоўка да архівацыі
-Stop	file:ZipOMaticWindow.cpp		Спыніць
-Stop them	file:ZipOMatic.cpp		Спыніць іх
+Do you want to stop them?	file:ZipOMatic.cpp		Жадаеце іх спыніць?
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Насамрэч жадаеце спыніць стварэнне гэтага архіву?
+%ld files added.	file:ZipOMaticWindow.cpp		Дабаўлена %ld файл(а/аў).
 Stopped	file:ZipOMaticWindow.cpp		Спынена
+Archive	file:ZipperThread.cpp		Архіў
+Error creating archive	file:ZipOMaticWindow.cpp		Памылка падчас стварэння архіву
 You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Зараз працуюць %ld копіяў праграмы Zip-O-Matic.\n\n
+Archive created OK	file:ZipOMaticWindow.cpp		Архіў быў створаны паспяхова
+Stop them	file:ZipOMatic.cpp		Спыніць іх

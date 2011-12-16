@@ -1,48 +1,48 @@
 1	belarusian	x-vnd.Haiku-ActivityMonitor	3704566709
-%.1f KB/s	DataSource		%.1f КБ/сек
-%.1f MB	DataSource		%.1f МБ
-%.1f faults/s	DataSource		%.1f памылак/сек
-%lld ms	SettingsWindow		%lld м.сек
-%lld sec.	SettingsWindow		%lld сек.
-ActivityMonitor	System name		МаніторАктыўнасці
-Add graph	ActivityWindow		Дадаць графік
-Additional items	ActivityView		Дадатковыя элементы
-Apps	DataSource		Праграмы
-Block cache	DataSource		Блокавы кэш
-Block cache memory	DataSource		Памяць блокавага кэшу
-CPU	DataSource		ЦП
-CPU usage	DataSource		Выкарыстанне ЦП
-CPU usage (combined)	DataSource		Выкарыстанне ЦП (камбінавана)
-Cache	DataSource		Кэш
-Cached memory	DataSource		Кэшаваная памяць
-File	ActivityWindow		Файл
-Hide legend	ActivityView		Схаваць легенду
-MB	DataSource		МБ
-Media nodes	DataSource		Медыя узлы
-Memory	DataSource		Памяць
-Network receive	DataSource		Атрыманне па сетцы
-Network send	DataSource		Адпраўка па сетцы
 P-faults	DataSource		Памылкі старонак памяці
-Page faults	DataSource		Памылкі старонак памяці
-Ports	DataSource		Парты
-Quit	ActivityWindow		Выйсці
-RX	DataSource	Shorter version for Receiving.	Атрым.
-Raw clipboard	DataSource		Агульны буфер
+Media nodes	DataSource		Медыя узлы
+Threads	DataSource		Патокі
+MB	DataSource		МБ
+Add graph	ActivityWindow		Дадаць графік
+Teams	DataSource		Групы
+Hide legend	ActivityView		Схаваць легенду
+Network send	DataSource		Адпраўка па сетцы
+CPU usage (combined)	DataSource		Выкарыстанне ЦП (камбінавана)
+CPU	DataSource		ЦП
+Used memory	DataSource		Ужытая памяць
+Cached memory	DataSource		Кэшаваная памяць
+Apps	DataSource		Праграмы
+Show legend	ActivityView		Паказаць легенду
+Text clipboard	DataSource		Тэкставы буфер
+Settings	ActivityWindow		Наладкі
 Receiving	DataSource		Атрыманне
+Settings…	ActivityWindow		Наладкі…
+Ports	DataSource		Парты
+Page faults	DataSource		Памылкі старонак памяці
+Sending	DataSource		Адпраўка
+Cache	DataSource		Кэш
+%.1f faults/s	DataSource		%.1f памылак/сек
+Update time interval:	SettingsWindow		Інтэрвал часу абнаўлення:
+TX	DataSource	Shorter version for Sending	Адпр.
+Quit	ActivityWindow		Выйсці
+Block cache memory	DataSource		Памяць блокавага кэшу
 Remove graph	ActivityView		Выдаліць графік
+%.1f MB	DataSource		%.1f МБ
+%lld sec.	SettingsWindow		%lld сек.
+%lld ms	SettingsWindow		%lld м.сек
+CPU usage	DataSource		Выкарыстанне ЦП
+Raw clipboard	DataSource		Агульны буфер
+Sems	DataSource		Семафоры
+ActivityMonitor	System name		МаніторАктыўнасці
 Running applications	DataSource		Запушчаныя праграмы
 Semaphores	DataSource		Семафоры
-Sems	DataSource		Семафоры
-Sending	DataSource		Адпраўка
-Settings	ActivityWindow		Наладкі
-Settings…	ActivityWindow		Наладкі…
-Show legend	ActivityView		Паказаць легенду
-Swap	DataSource		Своп
+Block cache	DataSource		Блокавы кэш
 Swap space	DataSource		Прастора свопу
-TX	DataSource	Shorter version for Sending	Адпр.
-Teams	DataSource		Групы
-Text clipboard	DataSource		Тэкставы буфер
-Threads	DataSource		Патокі
-Update time interval:	SettingsWindow		Інтэрвал часу абнаўлення:
-Used memory	DataSource		Ужытая памяць
+Swap	DataSource		Своп
+File	ActivityWindow		Файл
 usage	DataSource		выкарыстанне
+Additional items	ActivityView		Дадатковыя элементы
+Network receive	DataSource		Атрыманне па сетцы
+%.1f KB/s	DataSource		%.1f КБ/сек
+Memory	DataSource		Памяць
+RX	DataSource	Shorter version for Receiving.	Атрым.

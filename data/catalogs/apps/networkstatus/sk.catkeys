@@ -1,22 +1,22 @@
 1	slovak	x-vnd.Haiku-NetworkStatus	853756860
-%ifaceName information:\n	NetworkStatusView		Informácie %ifaceName:\n
-<no wireless networks found>	NetworkStatusView		<nenájdené žiadne bezdrôtové siete>
-Address	NetworkStatusView		Adresa
-Broadcast	NetworkStatusView		Broadcast
-Configuring	NetworkStatusView		Nastavuje sa
-Could not join wireless network:\n	NetworkStatusView		Nebolo možné pridať sa do bezdrôtovej siete:\n
-Install in Deskbar	NetworkStatus		Nainštalovať do Panelu
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		Spustenie nastavenia siete zlyhalo.\n\nChyba:
-Netmask	NetworkStatusView		Maska siete
-NetworkStatus	System name		Stav siete
 NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Voľby aplikácie StavSiete:\n\t--deskbar\tautomaticky pridať replikanta na Panel\n\t--help\t\tvypísať tieto informácie a skončiť\n
-NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		NetworkStatus\n\tnapísali %1 a Hugo Santos\n\t%2, Haiku, Inc.\n
-No link	NetworkStatusView		Bez spojenia
-No stateful configuration	NetworkStatusView		Bez stavovej konfigurácie
-OK	NetworkStatusView		OK
-Open network preferences…	NetworkStatusView		Otvoriť nastavenia siete...
-Quit	NetworkStatusView		Ukončiť
-Ready	NetworkStatusView		Pripravené
-Run in window	NetworkStatus		Spustiť v okne
-Unknown	NetworkStatusView		Neznáme
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		StavSiete môžete spustiť buď v okne alebo ho nainštalovať do Panelu.
+<no wireless networks found>	NetworkStatusView		<nenájdené žiadne bezdrôtové siete>
+Run in window	NetworkStatus		Spustiť v okne
+No link	NetworkStatusView		Bez spojenia
+Install in Deskbar	NetworkStatus		Nainštalovať do Panelu
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Spustenie nastavenia siete zlyhalo.\n\nChyba: 
+NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		NetworkStatus\n\tnapísali %1 a Hugo Santos\n\t%2, Haiku, Inc.\n
+Netmask	NetworkStatusView		Maska siete
+Broadcast	NetworkStatusView		Broadcast
+Unknown	NetworkStatusView		Neznáme
+Ready	NetworkStatusView		Pripravené
+No stateful configuration	NetworkStatusView		Bez stavovej konfigurácie
+%ifaceName information:\n	NetworkStatusView		Informácie %ifaceName:\n
+Configuring	NetworkStatusView		Nastavuje sa
+Address	NetworkStatusView		Adresa
+OK	NetworkStatusView		OK
+NetworkStatus	System name		Stav siete
+Open network preferences…	NetworkStatusView		Otvoriť nastavenia siete…
+Could not join wireless network:\n	NetworkStatusView		Nebolo možné pridať sa do bezdrôtovej siete:\n
+Quit	NetworkStatusView		Ukončiť

@@ -1,6 +1,6 @@
 /*
  * Copyright 2008, Zhao Shuai, upczhsh@163.com.
- * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -843,6 +843,13 @@ VMAnonymousCache::Merge(VMCache* _source)
 		_MergePagesSmallerSource(source);
 	else
 		_MergePagesSmallerConsumer(source);
+}
+
+
+void
+VMAnonymousCache::DeleteObject()
+{
+	object_cache_delete(gAnonymousCacheObjectCache, this);
 }
 
 

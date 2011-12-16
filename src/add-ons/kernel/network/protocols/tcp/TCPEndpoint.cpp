@@ -1703,7 +1703,11 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 
 	bool notify = false;
 
-	if ((buffer->size > 0 || (segment.flags & TCP_FLAG_FINISH) != 0)
+	// The buffer may be freed if its data is added to the queue, so cache
+	// the size as we still need it later.
+	uint32 bufferSize = buffer->size;
+
+	if ((bufferSize > 0 || (segment.flags & TCP_FLAG_FINISH) != 0)
 		&& _ShouldReceive())
 		notify = _AddData(segment, buffer);
 	else {
@@ -1757,7 +1761,7 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 	if (notify)
 		_NotifyReader();
 
-	if (buffer->size > 0 || (segment.flags & TCP_FLAG_SYNCHRONIZE) != 0)
+	if (bufferSize > 0 || (segment.flags & TCP_FLAG_SYNCHRONIZE) != 0)
 		action |= ACKNOWLEDGE;
 
 	_UpdateTimestamps(segment, segmentLength);

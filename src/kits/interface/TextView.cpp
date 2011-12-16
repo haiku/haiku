@@ -4168,8 +4168,8 @@ BTextView::_StyledWidth(int32 fromOffset, int32 length, float* outAscent,
 
 	// iterate through the style runs
 	const BFont *font = NULL;
-	int32 numChars;
-	while ((numChars = fStyles->Iterate(fromOffset, length, fInline, &font,
+	int32 numBytes;
+	while ((numBytes = fStyles->Iterate(fromOffset, length, fInline, &font,
 			NULL, &ascent, &descent)) != 0) {
 		maxAscent = max_c(ascent, maxAscent);
 		maxDescent = max_c(descent, maxDescent);
@@ -4178,18 +4178,18 @@ BTextView::_StyledWidth(int32 fromOffset, int32 length, float* outAscent,
 		// Use _BWidthBuffer_ if possible
 		if (BPrivate::gWidthBuffer != NULL) {
 			result += BPrivate::gWidthBuffer->StringWidth(*fText, fromOffset,
-				numChars, font);
+				numBytes, font);
 		} else {
 #endif
-			const char* text = fText->GetString(fromOffset, &numChars);
-			result += font->StringWidth(text, numChars);
+			const char* text = fText->GetString(fromOffset, &numBytes);
+			result += font->StringWidth(text, numBytes);
 
 #if USE_WIDTHBUFFER
 		}
 #endif
 
-		fromOffset += numChars;
-		length -= numChars;
+		fromOffset += numBytes;
+		length -= numBytes;
 	}
 
 	if (outAscent != NULL)

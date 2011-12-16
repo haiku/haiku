@@ -1,116 +1,118 @@
-1	dutch	x-vnd.Haiku-Installer	637181806
+1	dutch; flemish	x-vnd.Haiku-Installer	1384722558
+So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Voeg dus achter de andere menu-onderdelen aan de onderkant van het bestand iets soortgelijks als dit toe:
+Are you sure you want to abort the installation and restart the system?	InstallerWindow		Bent u zeker dat u de installatie wilt afbreken en het systeem wilt herstarten?
+\t}\n\n	InstallerApp		\t}\n\n
+Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tdoor Jérôme Duval en Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
+Newer versions of GRUB use an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Nieuwere versies van GRUB gebruiken een extra configuratiebestand om zelfbepaalde onderdelen aan het bootmenu toe te kunnen voegen. Om deze bovenaan toe te voegen, moet u een bestand maken/aanpassen door uw favoriete editor op de volgende manier vanuit Terminal op te starten:
+Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Hier moet u de regel \"GRUB_HIDDEN_TIMEOUT=0\"deactiveren door er een \"#\" voor te plaatsen, zodat het bootmenu ook echt getoond wordt. 
+Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Installatie is afgerond. De opstartsector werd naar '%s' geschreven. Klik op Afsluiten om de Installer te verlaten of kies een nieuwe gegevensdrager als doel voor nog een installatie.
+Quit	InstallerApp		Afsluiten
+Additional disk space required: 0.0 KiB	InstallerWindow		Meer schijfruimte vereist: 0.0 KiB
+With GRUB it's: (hdN,n)\n\n	InstallerApp		Met GRUB is het: (hdN,n)\n\n
+\tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
+Stop	InstallerWindow	In alert after pressing Stop	Stop
+Install progress:  	InstallerWindow		Voortgang installatie:  
+Starting Installation.	InstallProgress		Installatie wordt gestart.
+This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Dit is software van alfakwaliteit! Dat betekent dat er een hoog risico is om belangrijke data te verliezen. Maak geregeld back-ups! U bent gewaarschuwd.\n\n\n
+Are you sure you want to abort the installation?	InstallerWindow		Bent u zeker dat u de installatie wilt stoppen?
+Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Bent u zeker dat u op de huidige opstartschijf wilt installeren? Als u doorgaat zal Installer uw computer moeten heropstarten.
+Quit Boot Manager	InstallerWindow		Boot Manager afsluiten
+Stop	InstallerWindow		Stop
+\t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
+\tchainloader\t\t+1\n\n	InstallerApp		\tchainloader\t\t+1\n\n
+OK	InstallerApp		Oké
+Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Kies bron- en doelschijf in de pop-up-menu's. Klik daarna \"Begin\".
+\t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku op /dev/sda7\n
+Install from:	InstallerWindow		Installeer vanaf:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld van %2ld
+IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		BELANGRIJKE INFORMATIE VOORDAT HAIKU GEÏNSTALLEERD WORDT\n\n
+Continue	InstallerWindow	In alert after pressing Stop	Doorgaan
+Write boot sector to '%s'	InstallerWindow		Schrijf opstartsector naar '%s'
+2.1) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
+Collecting copy information.	InstallProgress		Verzamelt kopie-informatie.
+Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Kies de bronschijf in de pop-up-menu's. Klik daarna \"Begin\".
+Quit Boot Manager and DriveSetup	InstallerWindow		Boot Manager en DriveSetup afsluiten
+Quit	InstallerWindow		Afsluiten
+Welcome to the Haiku Installer!\n\n	InstallerApp		Welkom bij Haiku's Installer!\n\n
+Boot sector successfully written.	InstallProgress		Schrijven opstartsector geslaagd.
+Performing installation.	InstallProgress		Uitvoering installatie.
+scanning…	InstallerWindow		Scant…
+Set up boot menu	InstallerWindow		Boot-menu opzetten
+The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		De eerste logische partitie heeft altijd het nummer \"4\", ongeacht het aantal primaire partities.\n\n
+GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		GRUB's schema voor naamgeving is nog steeds: (hdN,n)\n\n
+\tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <uw favoriete editor> /boot/grub/menu.lst\n\n
+Abort	InstallerWindow		Afbreken
+Finishing Installation.	InstallProgress		Installatie wordt beëindigd.
+\tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <uw favoriete editor> /etc/default/grub\n\n
+README	InstallerApp		LEESMIJ
+The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		De doelschijf heeft mogelijk niet genoeg ruimte. Probeer een andere schijf te kiezen, of kies ervoor om geen optionele items te installeren.
+Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Sluit alstublieft de vensters van Boot Manager en DriveSetup, voordat u het Installer-venster sluit.
+Scanning for disks…	InstallerWindow		Zoekt naar schijven…
+2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
+The disk can't be mounted. Please choose a different disk.	InstallProgress		De schijf kan niet betrokken worden. Kies alstublieft een andere schijf.
+?? of ??	InstallerWindow	Unknown progress	?? van ??
+\tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenu-item \"Haiku Alpha\" {\n
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Start het DriveSetup-programma om partities te maken\nin aanwezige harde schijven en andere media.\nPartities kunnen worden geïnitialiseerd\nmet het Be File System, dat nodig is\nvoor een Haiku-opstartpartitie.
+Show optional packages	InstallerWindow		Toon optionele paketten
+No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Er zijn geen partities gevonden die geschikt zijn voor de installatie. Creëer alstublieft partities en initialiseer tenminste één partitie met het Be File System.
+Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		Hiernaast moet u ook nog een ander bestand bewerken, zodat het bootmenu zichtbaar wordt:\n\n
+Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Kies de schijf waarop u wilt installeren uit het pop-up-menu. Klik daarna op \"Begin\".
+Unknown Type	InstallProgress	Partition content type	Onbekend Type
+<none>	InstallerWindow	No partition available	<geen>
+\t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
+You'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\n	InstallerApp		U zult opmerken dat GRUB een andere naamgevingsstrategie voor harde schijven gebruikt dan Linux.\n\n
+\"n\" is the partition number, also starting with \"0\".\n	InstallerApp		\"n\" is het partitienummer, ook beginnend met \"0\".\n
+Installation canceled.	InstallProgress		Installatie geannuleerd.
+Installer	System name		Installatieprogramma
+You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		U kunt de inhoud van een schijf niet op zichzelf installeren. Kies alstublieft een andere schijf.
+???	InstallerWindow	Unknown currently copied item	???
+\"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\" is het partitienummer, dat voor GRUB2 begint met \"1\"\n
+Quit DriveSetup	InstallerWindow		DriveSetup afsluiten
+\"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\" is het hardeschijf-nummer, beginnend met \"0\".\n
+Hide optional packages	InstallerWindow		Optionele paketten niet tonen
+Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Sluit alstublieft het DriveSetup-venster voordat u het Installer-venster sluit.
+Restart system	InstallerWindow		Herstart systeem
+OK	InstallerWindow		Oké
+Set up partitions…	InstallerWindow		Instellen van partities…
+The partition can't be mounted. Please choose a different partition.	InstallProgress		De partitie kan niet worden betrokken. Kies alstublieft een andere partitie.
+Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Boot Manager is bezig...\n\nSluit Boot Manager om verder te gaan met de installatie.
+Install anyway	InstallProgress		Toch installeren
+An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Er heeft zich een fout voorgedaan en de installatie werd niet afgemaakt:\n\nFout:  %s
+\trootnoverify\t\t(hd0,6)\n	InstallerApp		\trootnoverify\t\t(hd0,6)\n
+Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Klik op de Begin-knop om van  '%1s' naar '%2s' te installeren.
+Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		DriveSetup is actief…\n\nSluit DriveSetup om door te gaan met de installatie.
+Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Veel plezier en erg bedankt voor het uitproberen van Haiku! We hopen dat u het leuk vindt!
+OK	InstallProgress		Oké
+Please choose target	InstallerWindow		Kies alstublieft een doel
+???	InstallerWindow	Unknown partition name	???
 1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1) Als u Haiku gaat installeren op echte hardware (dat wil zeggen: niet in een emulator), is het aan te raden om alvast een hardeschijf-partitie te hebben voorbereid. Installer en DriveSetup zijn geschikt om bestaande partities te initialiseren met Haiku's eigen bestandssysteem, maar het kan zijn dat de opties waarmee de daadwerkelijke partitie-lay-out gewijzigd kunnen worden nog niet getest zijn op een groot en gevarieerd genoeg aantal computerconfiguraties, en daarom raden we u niet aan dit te gebruiken.\n
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2) Installer zal de Haiku-partitie het vermogen geven om zelf op te starten, maar neemt geen stappen om Haiku in een bestaand opstartmenu te integreren. Als u GRUB al hebt geïnstalleerd, kunt u Haiku aan diens opstartmenu toevoegen. Hoe u dit doet, hangt af van welke GRUB-versie u gebruikt; dit verschilt.\n\n\n
-2.1) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
-2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" documentation, there is a link on the Desktop.\n\n	InstallerApp		3) Wanneer je Haiku voor het eerst succesvol start, zorg er dan voor dat u onze \"Welkom\" documentatie leest, er staat een link op het bureaublad.\n\n
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" documentation, there is a link on the Desktop.\n\n	InstallerApp		3) Wanneer u Haiku voor het eerst met succes start, zorgt u er dan voor om onze \"Welkom\" documentatie te lezen; er staat een link op het bureaublad.\n\n
-<none>	InstallerWindow	No partition available	<geen>
-?? of ??	InstallerWindow	Unknown progress	?? van ??
-???	InstallerWindow	Unknown currently copied item	???
-???	InstallerWindow	Unknown partition name	???
-Additional disk space required: %s	InstallerWindow		Benodigde aanvullende schijfruimte: %s
-Additional disk space required: 0.0 KiB	InstallerWindow		Meer schijfruimte vereist: 0.0 KiB
-Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		Hiernaast moet u ook nog een ander bestand bewerken, zodat het bootmenu zichtbaar wordt:\n\n
-All hard disks start with \"hd\".\n	InstallerApp		Alle harde schijven beginnen met \"hd\".\n
-An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Er heeft zich een fout voorgedaan en de installatie werd niet afgemaakt:\n\nFout:  %s
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		Bent u zeker dat u de installatie wilt afbreken en het systeem wilt herstarten?
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Bent u zeker dat u op de huidige opstartschijf wilt installeren? Als u doorgaat zal Installer uw computer moeten heropstarten.
-Are you sure you want to to stop the installation?	InstallerWindow		Bent u zeker dat u de installatie wilt stoppen?
 Begin	InstallerWindow		Begin
-Boot sector not written because of an internal error.	InstallProgress		De Boot sector werd niet geschreven vanwege een interne fout.
-Boot sector successfully written.	InstallProgress		Schrijven opstartsector geslaagd.
-Cancel	InstallProgress		Annuleren
-Cancel	InstallerWindow		Annuleren
-Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Kies de schijf waarop u wilt installeren uit het pop-up-menu. Klik daarna op \"Begin\".
-Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Kies bron- en doelschijf in de pop-up-menu's. Klik daarna \"Begin\".
-Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Kies de bronschijf in de pop-up-menu's. Klik daarna \"Begin\".
-Collecting copy information.	InstallProgress		Verzamelt kopie-informatie.
-Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Configureer uw /boot/grub/menu.lst door uw favoriete editor te starten vanaf een Terminal, op deze manier:\n\n
-Continue	InstallerApp		Doorgaan
-Continue	InstallerWindow	In alert after pressing Stop	Doorgaan
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, het programma om schijfpartities mee te configureren, kon niet gestart worden.
 Finally, you have to update the boot menu by entering:\n\n	InstallerApp		Ten slotte moet u het boot-menu bijwerken door het volgende te in te voeren:\n\n
-Finishing Installation.	InstallProgress		Installatie wordt beëindigd.
-GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		GRUB's schema voor naamgeving is nog steeds: (hdN,n)\n\n
-Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Veel plezier en erg bedankt om Haiku te proberen! We hopen dat u het leuk vindt!
-Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Veel plezier en erg bedankt voor het uitproberen van Haiku! We hopen dat u het leuk vindt!
-Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Hier moet u de regel \"GRUB_HIDDEN_TIMEOUT=0\"deactiveren door er een \"#\" voor te plaatsen, zodat het bootmenu ook echt getoond wordt. 
-Hide optional packages	InstallerWindow		Optionele paketten niet tonen
-IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		BELANGRIJKE INFORMATIE VOORDAT HAIKU GEÏNSTALLEERD WORDT\n\n
 If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		Als u nog geen partitie hebt gemaakt, herstart dan uw computer, maak de partitie aan met welke software u maar wilt, en start opnieuw in Haiku om verder te gaan met de installatie. U kan bijvoorbeeld de GParted Live-CD gebruiken, daarmee kan u ook het formaat van bestaande partities aanpassen om ruimte vrij te maken.\n\n\n
-Install anyway	InstallProgress		Toch installeren
-Install from:	InstallerWindow		Installeer vanaf:
-Install progress:  	InstallerWindow		Voortgang installatie:  
-Installation canceled.	InstallProgress		Installatie geannuleerd.
-Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Installatie is afgerond. De opstartsector werd naar '%s' geschreven. Klik op Afsluiten om de Installer te verlaten of kies een nieuwe gegevensdrager als doel voor nog een installatie.
-Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tdoor Jérôme Duval en Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Start het DriveSetup-programma om partities te maken\nin aanwezige harde schijven en andere media.\nPartities kunnen worden geïnitialiseerd\nmet het Be File System, dat nodig is\nvoor een Haiku-opstartpartitie.
-NOTE: While the naming strategy for hard disks is still as described under 2.1) the naming scheme for partitions has changed.\n\n	InstallerApp		NB: Terwijl de naamgevingsstrategie voor harde schijven nog steeds zo is als beschreven onder 2.1) is het benamingsschema voor partities veranderd.\n\n
-Newer versions of GRUB use an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Nieuwere versies van GRUB gebruiken een extra configuratiebestand om zelfbepaalde onderdelen aan het bootmenu toe te kunnen voegen. Om deze bovenaan toe te voegen, moet u een bestand maken/aanpassen door uw favoriete editor op de volgende manier vanuit Terminal op te starten:
-No optional packages available.	PackagesView		Geen optionele paketten beschikbaar.
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Er zijn geen partities gevonden die geschikt zijn voor de installatie. Creëer alstublieft partities en initialiseer tenminste één partitie met het Be File System.
-OK	InstallProgress		Oké
-OK	InstallerApp		Oké
-OK	InstallerWindow		Oké
-Onto:	InstallerWindow		Naar:
-Performing installation.	InstallProgress		Uitvoering installatie.
-Please choose target	InstallerWindow		Kies alstublieft een doel
-Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Sluit alstublieft de vensters van Boot Manager en DriveSetup, voordat u het Installer-venster sluit.
-Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Sluit alstublieft het venster van Boot Manager voordat u het Installer-venster sluit.
-Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Sluit alstublieft het DriveSetup-venster voordat u het Installer-venster sluit.
-Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Klik op de Begin-knop om van  '%1s' naar '%2s' te installeren.
-Quit	InstallerApp		Afsluiten
-Quit	InstallerWindow		Afsluiten
-Quit Boot Manager	InstallerWindow		Boot Manager afsluiten
-Quit Boot Manager and DriveSetup	InstallerWindow		Boot Manager en DriveSetup afsluiten
-Quit DriveSetup	InstallerWindow		DriveSetup afsluiten
-README	InstallerApp		LEESMIJ
-Restart system	InstallerWindow		Herstart systeem
-Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Boot Manager en DriveSetup zijn bezig...\n\nSluit beide applicaties om verder te gaan met de installatie
-Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Boot Manager is bezig...\n\nSluit Boot Manager om verder te gaan met de installatie.
-Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		DriveSetup is actief…\n\nSluit DriveSetup om door te gaan met de installatie.
-Scanning for disks…	InstallerWindow		Zoekt naar schijven…
-Set up boot menu	InstallerWindow		Boot-menu opzetten
-Set up partitions…	InstallerWindow		Instellen van partities…
-Show optional packages	InstallerWindow		Toon optionele paketten
-So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Voeg dus achter de andere menu-onderdelen aan de onderkant van het bestand iets soortgelijks als dit toe:
-So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		Dus voeg onder de kop die niet bewerkt mag worden, iets soortgelijks toe:\n\n
-Starting Installation.	InstallProgress		Installatie wordt gestart.
-Stop	InstallerWindow		Stop
-Stop	InstallerWindow	In alert after pressing Stop	Stop
-The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		De doelschijf heeft mogelijk niet genoeg ruimte. Probeer een andere schijf te kiezen, of kies ervoor om geen optionele items te installeren.
-The disk can't be mounted. Please choose a different disk.	InstallProgress		De schijf kan niet betrokken worden. Kies alstublieft een andere schijf.
-The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		De eerste logische partitie heeft altijd het nummer \"4\", ongeacht het aantal primaire partities.\n\n
-The mount point could not be retrieved.	InstallProgress		Het betrekpunt kon niet worden opgehaald.
-The partition can't be mounted. Please choose a different partition.	InstallProgress		De partitie kan niet worden betrokken. Kies alstublieft een andere partitie.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		De doelgegevensdrager is niet leeg. Bent u zeker dat u toch wilt installeren?\n\nLet op: De map 'system' zal een volledige kopie zijn van de brongegevensdrager. Alle andere mappen zullen worden samengevoegd, terwijl bestanden en links die bestaan op zowel bron- als doelgegevensdrager overschreven zullen worden door de versie van de brongegevensdrager.
-This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Dit is software van alfakwaliteit! Dat betekent dat er een hoog risico is om belangrijke data te verliezen. Maak geregeld back-ups! U bent gewaarschuwd.\n\n\n
-Tools	InstallerWindow		Gereedschap
-Try installing anyway	InstallProgress		Probeer toch te installeren
-Unknown Type	InstallProgress	Partition content type	Onbekend Type
-Welcome to the Haiku Installer!\n\n	InstallerApp		Welkom bij Haiku's Installer!\n\n
 With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		Met GRUB 2 heeft de eerste logische partitie altijd het nummer \"5\", ongeacht het aantal primaire partities.\n\n
-With GRUB it's: (hdN,n)\n\n	InstallerApp		Met GRUB is het: (hdN,n)\n\n
 Write boot sector	InstallerWindow		Schrijf opstartsector
-Write boot sector to '%s'	InstallerWindow		Schrijf opstartsector naar '%s'
+Cancel	InstallerWindow		Annuleren
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, het programma om schijfpartities mee te configureren, kon niet gestart worden.
+No optional packages available.	PackagesView		Geen optionele paketten beschikbaar.
+All hard disks start with \"hd\".\n	InstallerApp		Alle harde schijven beginnen met \"hd\".\n
+Continue	InstallerApp		Doorgaan
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" documentation, there is a link on the Desktop.\n\n	InstallerApp		3) Wanneer u Haiku voor het eerst met succes start, zorgt u er dan voor om onze \"Welkom\" documentatie te lezen; er staat een link op het bureaublad.\n\n
+BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		BootManager, de toepassing van de Haiku opstartmenu configureren, kon niet worden gestart.
+Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Configureer uw /boot/grub/menu.lst door uw favoriete editor te starten vanaf een Terminal, op deze manier:\n\n
+Boot sector not written because of an internal error.	InstallProgress		De Boot sector werd niet geschreven vanwege een interne fout.
+Additional disk space required: %s	InstallerWindow		Benodigde aanvullende schijfruimte: %s
+NOTE: While the naming strategy for hard disks is still as described under 2.1) the naming scheme for partitions has changed.\n\n	InstallerApp		NB: Terwijl de naamgevingsstrategie voor harde schijven nog steeds zo is als beschreven onder 2.1) is het benamingsschema voor partities veranderd.\n\n
+Cancel	InstallProgress		Annuleren
+Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Boot Manager en DriveSetup zijn bezig...\n\nSluit beide applicaties om verder te gaan met de installatie
+Try installing anyway	InstallProgress		Probeer toch te installeren
+So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		Dus voeg onder de kop die niet bewerkt mag worden, iets soortgelijks toe:\n\n
+Are you sure you want to to stop the installation?	InstallerWindow		Bent u zeker dat u de installatie wilt stoppen?
+Onto:	InstallerWindow		Naar:
+Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Sluit alstublieft het venster van Boot Manager voordat u het Installer-venster sluit.
+Tools	InstallerWindow		Gereedschap
+The mount point could not be retrieved.	InstallProgress		Het betrekpunt kon niet worden opgehaald.
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		De doelgegevensdrager is niet leeg. Bent u zeker dat u toch wilt installeren?\n\nLet op: De map 'system' zal een volledige kopie zijn van de brongegevensdrager. Alle andere mappen zullen worden samengevoegd, terwijl bestanden en links die bestaan op zowel bron- als doelgegevensdrager overschreven zullen worden door de versie van de brongegevensdrager.
 You can see the correct partition in GParted for example.\n\n\n	InstallerApp		U kunt de juiste partitie in bijvoorbeeld GParted zien.\n\n\n
-You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		U kunt de inhoud van een schijf niet op zichzelf installeren. Kies alstublieft een andere schijf.
-You'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\n	InstallerApp		U zult opmerken dat GRUB een andere naamgevingsstrategie voor harde schijven gebruikt dan Linux.\n\n
-\"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\" is het hardeschijf-nummer, beginnend met \"0\".\n
-\"n\" is the partition number, also starting with \"0\".\n	InstallerApp		\"n\" is het partitienummer, ook beginnend met \"0\".\n
-\"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\" is het partitienummer, dat voor GRUB2 begint met \"1\"\n
-\t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku op /dev/sda7\n
-\t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
-\t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
-\tchainloader\t\t+1\n\n	InstallerApp		\tchainloader\t\t+1\n\n
-\tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenu-item \"Haiku Alpha\" {\n
-\trootnoverify\t\t(hd0,6)\n	InstallerApp		\trootnoverify\t\t(hd0,6)\n
-\tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <uw favoriete editor> /boot/grub/menu.lst\n\n
-\tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <uw favoriete editor> /etc/default/grub\n\n
-\tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsudo <uw favoriete tekstbewerker> /etc/grub.d/40_custom\n\n
-\tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 \ttitle\t\t\t\tHaiku\n	InstallerApp		\ttitle\t\t\t\tHaiku\n
-\t}\n\n	InstallerApp		\t}\n\n
-scanning…	InstallerWindow		Scant…
+\tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsudo <uw favoriete tekstbewerker> /etc/grub.d/40_custom\n\n

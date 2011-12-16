@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <Catalog.h>
 #include <Bitmap.h>
 #include <Font.h>
 #include <Message.h>
@@ -21,6 +22,8 @@
 
 #include "messages.h"
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "FontDemoView"
 
 FontDemoView::FontDemoView(BRect rect)
 	: BView(rect, "FontDemoView", B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS),
@@ -36,7 +39,8 @@ FontDemoView::FontDemoView(BRect rect)
 	fShapes(NULL)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
-	SetString("Haiku, Inc.");
+	BString setStr = B_TRANSLATE("Haiku, Inc.");
+	SetString(setStr);
 	SetFontSize(fFontSize);
 	SetAntialiasing(true);
 

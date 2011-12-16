@@ -1,6 +1,7 @@
-1	swedish	x-vnd.Haiku-TGATranslator	2221210336
+1	swedish	x-vnd.Haiku-TGATranslator	4159874267
 Ignore TGA alpha channel	TGAView		Ignorera TGA-alfakanal
 Save with RLE Compression	TGAView		Spara med RLE komprimering
+TGA Image Translator	TGAView		TGA bildöversättare
 TGA Settings	TGAMain		TGA inställningar
 TGA image translator	TGATranslator		TGA-bildöversättare
 TGA images	TGATranslator		TGA-bilder

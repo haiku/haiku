@@ -6,27 +6,19 @@
 #ifndef _PREFLET_VIEW_H
 #define _PREFLET_VIEW_H
 
-#include <View.h>
+#include <TabView.h>
 
 class BIconRule;
 
 class SettingsHost;
 
-class PrefletView : public BView {
+class PrefletView : public BTabView {
 public:
 						PrefletView(SettingsHost* host);
 
-	virtual	void		AttachedToWindow();
-	virtual	void		MessageReceived(BMessage* message);
-
-			void		Select(int32 index);
 			BView*		CurrentPage();
 			int32		CountPages() const;
 			BView*		PageAt(int32 index);
-
-private:
-			BIconRule*	fRule;
-			BView*		fPagesView;
 };
 
 #endif // PREFLETVIEW_H

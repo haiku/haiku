@@ -1,0 +1,9 @@
+1	dutch; flemish	x-vnd.Haiku-RAWTranslator	1938728039
+RAWTranslator Settings	ConfigView		RAWTranslator Instellingen
+Version %d.%d.%d, %s	ConfigView		Versie %d.%d.%d, %s
+RAW Images	ConfigView		RAW Afbeeldingen
+RAW image translator	RAWTranslator		RAW afbeelding vertaler
+RAW Settings	RAWTranslator main		RAW Instellingen
+RAW images	RAWTranslator		RAW afbeeldingen
+%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	%s RAW afbeelding
+Based on Dave Coffin's dcraw 8.63	ConfigView		Gebaseerd op Dave Coffin's dcraw 8.63

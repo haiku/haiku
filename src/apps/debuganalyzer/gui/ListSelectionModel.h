@@ -8,9 +8,8 @@
 
 #include <SupportDefs.h>
 
+#include <Array.h>
 #include <ObjectList.h>
-
-#include "../debugger/util/Array.h"
 
 
 class ListSelectionModel {

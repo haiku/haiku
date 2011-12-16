@@ -3,11 +3,14 @@
  * Distributed under the terms of the MIT License.
  */
 
-/*!	\file InterfaceDefs.h
+/*!
+	\file InterfaceDefs.h
 	\brief Defines standard interface definitions for controls.
 */
 
-/*!	\enum border_style
+
+/*!
+	\enum border_style
 	Collection of flags that determine the border style drawn around a BBox.
 */
 
@@ -32,12 +35,15 @@
 	No border.
 */
 
-/*!	\enum orientation
+
+/*!
+	\enum orientation
 Orientation flag sets the layout to either horizontal or vertical
 	alignment.
 */
 
-/*!	\var orientation B_HORIZONTAL
+/*!
+	\var orientation B_HORIZONTAL
 	Horizontal alignment
 */
 
@@ -45,21 +51,132 @@ Orientation flag sets the layout to either horizontal or vertical
 	Vertical alignment
 */
 
-/*!	\enum button_width
+
+/*!
+	\enum button_width
 	Collection of flags that determine how wide to draw the buttons in a
 	BAlert dialog.
 */
 
-/*!	\var button_width B_WIDTH_AS_USUAL
+/*!
+	\var button_width B_WIDTH_AS_USUAL
 	Set the width of each button based on the standard width.
 */
 
-/*!	\var button_width B_WIDTH_FROM_WIDEST
+/*!
+	\var button_width B_WIDTH_FROM_WIDEST
 	Set the width of each button based on the width of the widest button.
 */
 
-/*!	\var button_width B_WIDTH_FROM_LABEL
+/*!
+	\var button_width B_WIDTH_FROM_LABEL
 	Set the width of each button to accomidate the width of the button's
 	label.
 */
 
+
+///// Keyboard related functions
+
+
+/*!
+	\fn uint32 modifiers()
+	\brief Gets a bitmap of each modifier key pressed down and each active
+		keyboard lock.
+
+	Test the bitmap returned using a bit mask composed of the following
+	modifier key constants:
+		- \c B_CAPS_LOCK
+		- \c B_COMMAND_KEY
+		- \c B_CONTROL_KEY
+		- \c B_MENU_KEY
+		- \c B_NUM_LOCK
+		- \c B_OPTION_KEY
+		- \c B_SCROLL_LOCK
+		- \c B_SHIFT_KEY
+
+	You may use a bit mask of 0 to test that no modifier keys are pressed.
+	If it is important to know if the left or right modifier key is pressed
+	down you can use the following additional constants:
+		- \c B_LEFT_SHIFT_KEY
+		- \c B_RIGHT_SHIFT_KEY
+		- \c B_LEFT_CONTROL_KEY
+		- \c B_RIGHT_CONTROL_KEY
+		- \c B_LEFT_OPTION_KEY
+		- \c B_RIGHT_OPTION_KEY
+		- \c B_LEFT_COMMAND_KEY
+		- \c B_RIGHT_COMMAND_KEY
+
+	\returns A bitmap containing each active modifier keys and locks.
+*/
+
+
+/*!
+	\fn status_t get_key_info(key_info* info)
+	\brief Fills out the key_info struct with the current state of the
+		keyboard.
+
+	\param info The key_info struct to fill out.
+
+	\retval B_OK Everything went fine.
+	\retval B_ERROR There was an error retrieving the key_info struct.
+*/
+
+
+/*!
+	\fn void get_key_map(key_map** _map, char** _keyBuffer)
+	\brief Provides a copy of the system keymap.
+
+	\attention You must free \a _map and \a _keyBuffer when you are done
+		with them.
+
+	\param _map A pointer to the system keymap structure.
+	\param _keyBuffer A pointer containing the UTF-8 character encodings.
+*/
+
+
+/*!
+	\fn status_t get_keyboard_id(uint16* _id)
+	\brief Fills out \a _id with the id of the currently attached keyboard.
+
+	\retval B_OK Everything went fine.
+	\retval B_ERROR There was an error retrieving the keyboard id.
+*/
+
+
+/*!
+	\fn status_t get_modifier_key(uint32 modifier, uint32 *key)
+	\brief Gets the code of the requested \a modifier key from the
+		system keymap.
+
+	\param modifier The modifier key to get from the system keymap.
+	\param key A pointer to an int32 to store the key code.
+
+	\retval B_OK Everything went fine.
+	\retval B_ERROR There was an error retrieving the modifier key.
+*/
+
+
+/*!
+	\fn void set_modifier_key(uint32 modifier, uint32 key)
+	\brief Set the \a modifier \a key to the specified code in the
+		system keymap.
+
+	\param modifier The modifier key to set in the system keymap.
+	\param key The key code to set the modifier key to.
+*/
+
+
+/*!
+	\fn void set_keyboard_locks(uint32 modifiers)
+	\brief Set the keyboard locks.
+
+	Pass in a bit mask containing the following constants:
+		- \c B_CAPS_LOCK
+		- \c B_NUM_LOCK
+		- \c B_SCROLL_LOCK
+
+	The constants present in the bit mask will turn the lock on, those
+	absent will turn the lock off. Pass 0 in to turn off all locks.
+
+	\param modifiers A bitmap of lock keys to set.
+*/

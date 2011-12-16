@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <stdio.h>
 
+#include <errno_private.h>
 #include <syscalls.h>
 #include <syscall_utils.h>
 

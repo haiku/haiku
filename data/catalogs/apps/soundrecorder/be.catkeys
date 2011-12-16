@@ -1,38 +1,45 @@
-1	belarusian	x-vnd.Haiku-SoundRecorder	2122042546
-Cannot connect to media server	RecorderWindow		Немагчыма далучыцца да медыясервера
-Cannot connect to the selected sound input	RecorderWindow		Немагчыма далучыцца да выбранага гукавага ўваходу
-Cannot find an unused name to use for the new recording	RecorderWindow		Немагчыма знайсці неязанятае імя для новага запісу
+1	belarusian	x-vnd.Haiku-SoundRecorder	2149017672
+Loop	RecorderWindow		Зацыкліць
 Cannot find default audio hardware	RecorderWindow		Немагчыма знайсці стандартную аўдыё апаратуру
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Немагчыма знайсці часовы файл, створаны для захавання новага запісу
-Cannot get the file to play	RecorderWindow		Немагчыма прайграць файл
-Cannot open the temporary file created to hold the new recording	RecorderWindow		Немагчыма адкрыць часовы файл, створаны для захавання новага запісу
-Cannot recognize this file as a media file	RecorderWindow		Немагчыма знайсці медыя даныя ў гэтым файле
-Cannot record a sound that long	RecorderWindow		Немагчыма запісываць так доўга
-Channels: 	RecorderWindow		Каналы:
-Compression:	RecorderWindow		Сціск:
-Drop files here	SoundListView		Кідайце файлы сюды
-Duration:	RecorderWindow		Працягласць:
-File info	RecorderWindow		Інфа пра файл
-File name:	RecorderWindow		Імя файла:
-Format: 	RecorderWindow		Фармат:
-Forward	RecorderWindow		Уперад
-Input	RecorderWindow		Уваход
-Input:	RecorderWindow		Уваход:
-Invalid audio files	RecorderWindow		Няправільныя аўдыё файлы
-Loop	RecorderWindow		Зацыкліць
-None	RecorderWindow		Няма
-None of the files appear to be audio files	RecorderWindow		Ні адзін з файлаў не месціць аўдыё даных
+Sample size:	RecorderWindow		Памер сэмплу:
 Nothing to play	RecorderWindow		Няма чаго іграць
-OK	RecorderWindow		ОК
-Play	RecorderWindow		Іграць
-Record	RecorderWindow		Запіс
-Rewind	RecorderWindow		Назад
-Sample rate: 	RecorderWindow		Частата дыскрэтызацыі
-Sample size: 	RecorderWindow		Памер сэмплу:
-Save	RecorderWindow		Захаваць
+Duration: 	RecorderWindow		Працягласць:
 Some of the files don't appear to be audio files	RecorderWindow		Некаторыя з файлаў не падобныя да аўдыё файлаў
-Sound List	RecorderWindow		Спіс Гуку
-SoundRecorder	System name		Гуказапіс
+File info	RecorderWindow		Інфа пра файл
+Drop files here	SoundListView		Кідайце файлы сюды
+Input	RecorderWindow		Уваход
 Stop	RecorderWindow		Стоп
-bits	RecorderWindow		бітаў
-seconds	RecorderWindow		секунд
+Format:	RecorderWindow		Фармат:
+Sound List	RecorderWindow		Спіс Гуку
+Compression: 	RecorderWindow		Сцiск:
+Rewind	RecorderWindow		Назад
+Sample rate:	RecorderWindow		Частата сэмплаў:
+Invalid audio files	RecorderWindow		Няправільныя аўдыё файлы
+ seconds	RecorderWindow		 секунды
+OK	RecorderWindow		ОК
+Cannot open the temporary file created to hold the new recording	RecorderWindow		Немагчыма адкрыць часовы файл, створаны для захавання новага запісу
+None of the files appear to be audio files	RecorderWindow		Ні адзін з файлаў не месціць аўдыё даных
+Input:	RecorderWindow		Уваход:
+Forward	RecorderWindow		Уперад
+Play	RecorderWindow		Іграць
+SoundRecorder	System name		Гуказапіс
+Channels:	RecorderWindow		Каналы:
+ bits	RecorderWindow		 бітаў
+None	RecorderWindow		Няма
+Record	RecorderWindow		Запіс
+Sample size: 	RecorderWindow		Памер сэмплу:
+Cannot recognize this file as a media file	RecorderWindow		Немагчыма знайсці медыя даныя ў гэтым файле
+Format: 	RecorderWindow		Фармат:
+File name: 	RecorderWindow		Iмя файла:
+Cannot connect to the selected sound input	RecorderWindow		Немагчыма далучыцца да выбранага гукавага ўваходу
+Cannot get the file to play	RecorderWindow		Немагчыма прайграць файл
+Cannot record a sound that long	RecorderWindow		Немагчыма запісываць так доўга
+Duration:	RecorderWindow		Працягласць:
+Compression:	RecorderWindow		Сціск:
+Cannot find an unused name to use for the new recording	RecorderWindow		Немагчыма знайсці неязанятае імя для новага запісу
+Channels: 	RecorderWindow		Каналы:
+Save	RecorderWindow		Захаваць
+Sample rate: 	RecorderWindow		Частата дыскрэтызацыі
+Cannot connect to media server	RecorderWindow		Немагчыма далучыцца да медыясервера
+File name:	RecorderWindow		Імя файла:

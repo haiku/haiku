@@ -1,5 +1,7 @@
-1	belarusian	x-vnd.Haiku-DeskCalc	2547506672
-Audio Feedback	CalcView		Аўдыё Водгук
+1	belarusian	x-vnd.Haiku-DeskCalc	1916192649
+Compact	CalcView		Кампактны
+Scientific	CalcView		Навуковы
 DeskCalc	System name		Калькулятар
+Basic	CalcView		Просты
 Enable Num Lock on startup	CalcView		Уключаць Num Lock пры запуску
-Show keypad	CalcView		Паказваць клавіятуру
+Audio Feedback	CalcView		Аўдыё Водгук

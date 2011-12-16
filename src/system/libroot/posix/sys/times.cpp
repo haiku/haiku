@@ -12,6 +12,7 @@
 
 #include <symbol_versioning.h>
 
+#include <errno_private.h>
 #include <time_private.h>
 #include <times_private.h>
 
@@ -24,7 +25,7 @@ times_common(struct tms* buffer, bigtime_t microSecondsPerClock)
 
 	if ((err = get_team_usage_info(B_CURRENT_TEAM, RUSAGE_SELF, &info))
 			!= B_OK) {
-		errno = err;
+		__set_errno(err);
 		return -1;
 	}
 
@@ -33,7 +34,7 @@ times_common(struct tms* buffer, bigtime_t microSecondsPerClock)
 
 	if ((err = get_team_usage_info(B_CURRENT_TEAM, RUSAGE_CHILDREN, &info))
 			!= B_OK) {
-		errno = err;
+		__set_errno(err);
 		return -1;
 	}
 

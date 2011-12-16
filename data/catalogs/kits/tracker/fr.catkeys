@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	228844460
+1	french	x-vnd.Haiku-libtracker	1977470516
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 %Ld B	WidgetAttributeText		%Ld o
 %Ld bytes	WidgetAttributeText		%Ld octets
@@ -7,10 +7,6 @@
 %num items	CountView		%num éléments
 (%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed sur %TotalSize, %BytesPerSecond/s)
 (%bytes bytes)	InfoWindow		(%bytes octets)
-(Finish: %time - %finishtime minutes left)	StatusWindow		(Fin : %time - il reste %finishtime minutes)
-(Finish: %time - %finishtime seconds left)	StatusWindow		(Fin : %time - Il reste %finishtime secondes)
-(Finish: %time - Over %finishtime days left)	StatusWindow		(Fin : %time - il reste plus de %finishtime jours)
-(Finish: %time - Over %finishtime hours left)	StatusWindow		(Fin : %time - Il reste plus de %finishtime heures)
 (Finish: %time)	StatusWindow		(Fin : %time)
 1 item	CountView		1 élément
 32 x 32	ContainerWindow		32 x 32
@@ -109,7 +105,6 @@ Disk mount settings	AutoMounterSettings		Réglages des montages de disques
 Disk mounting during boot	AutoMounterSettings		Montage des disques au démarrage
 Disks	DirMenu		Disques
 Disks	Model		Disques
-Do it	FSUtils		Le faire
 Does not handle file	OpenWithWindow		Ne gère pas le fichier
 Don't automount	AutoMounterSettings		Ne pas monter automatiquement
 Don't move files to Trash	SettingsView		Ne pas envoyer les fichiers vers la corbeille
@@ -168,12 +163,6 @@ Icon view	DeskWindow		Vue en icônes
 Icon view	VolumeWindow		Vue en icônes
 Identify	ContainerWindow		Identifier
 Identify	InfoWindow		Identifier
-If you %ifYouDoAction the common folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the common folder anyway, hold down the Shift key and click \"Do it\".	FSUtils		Si vous %ifYouDoAction le dossier commun, Haiku pourrait ne plus fonctionner correctement ! Veuillez cliquer sur « Le faire » en pressant la touche majuscule , si vous êtes sûr de vouloir %toDoAction% le dossier commun.
-If you %ifYouDoAction the config folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"Do it\".	FSUtils		Si vous %ifYouDoAction le dossier des préférences, Haiku pourrait ne plus fonctionner correctement ! Veuillez cliquer sur « Le faire », si vous êtes sûr de vouloir %toDoAction% le dossier des préférences.
-If you %ifYouDoAction the home folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the home folder anyway, hold down the Shift key and click \"Do it\".	FSUtils		Si vous %ifYouDoAction votre dossier personnel, Haiku pourrait ne plus fonctionner correctement ! Veuillez cliquer sur « Le faire » en pressant la touche majuscule , si vous êtes sûr de vouloir %toDoAction% votre dossier personnel.
-If you %ifYouDoAction the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"Do it\".	FSUtils		Si vous %ifYouDoAction les réglages MIME, Haiku pourrait ne plus fonctionner correctement ! Veuillez cliquer sur « Le faire », si vous êtes sûr de vouloir %toDoAction% les réglages MIME.
-If you %ifYouDoAction the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"Do it\".	FSUtils		Si vous %ifYouDoAction le dossier des réglages, Haiku pourrait ne plus fonctionner correctement ! Veuillez cliquer sur « Le faire », si vous êtes sûr de vouloir %toDoAction% le dossier des réglages.
-If you %ifYouDoAction the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		Si vous %ifYouDoAction le dossier du système, Haiku ne démarrera plus ! Veuillez cliquer sur « Le faire », si vous êtes sûr de vouloir %toDoAction% le dossier du système.
 Ignore case	SelectionWindow		Ignorer la casse
 Include trash	FindPanel		Inclure la corbeille
 Increase size	ContainerWindow		Augmenter la taille
@@ -429,8 +418,6 @@ less than	FindPanel		inférieur à
 link	FSUtils	filename link	lien
 matches regular expression	SelectionWindow		correspond à l'expression régulière
 matches wildcard expression	SelectionWindow		correspond à l'expression générique
-move	FSUtils	As in 'If you move ...'	déplacez
-move	FSUtils	As in 'To move ...'	déplacer
 moving	FSUtils		déplacement
 multiple disks	FindPanel		disques multiples
 no items	CountView		aucun élément
@@ -439,10 +426,6 @@ of %items	StatusWindow		de %items
 optional	/boot/optional		optionnel
 parent folder	NavMenu		dossier parent
 preferences	B_PREFERENCES_DIRECTORY		préférences
-rename	InfoWindow	As in 'If you rename ...'	renommez
-rename	InfoWindow	As in 'To rename ...'	renommer
-rename	TextWidget	As in 'If you rename ...'	renommez
-rename	TextWidget	As in 'To rename ...'	renommer
 save text	FilePanelPriv		Sauvegarder le texte
 starts with	FindPanel		commence par
 starts with	SelectionWindow		commence par

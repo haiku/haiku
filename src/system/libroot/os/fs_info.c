@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the Haiku License.
 */
@@ -10,13 +10,14 @@
 #include <fcntl.h>
 #include <errno.h>
 
+#include <errno_private.h>
 #include <syscalls.h>
 
 
 #define RETURN_AND_SET_ERRNO(status) \
 	{ \
 		if (status < 0) { \
-			errno = status; \
+			__set_errno(status); \
 			return -1; \
 		} \
 		return status; \

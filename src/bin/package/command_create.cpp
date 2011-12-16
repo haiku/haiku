@@ -1,16 +1,17 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
 
 
-#include <dirent.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <Entry.h>
 
@@ -19,6 +20,8 @@
 #include <package/hpkg/PackageWriter.h>
 
 #include "package.h"
+#include "PackageWriterListener.h"
+#include "PackageWritingUtils.h"
 #include "StandardErrorOutput.h"
 
 
@@ -26,78 +29,13 @@ using BPackageKit::BHPKG::BPackageWriterListener;
 using BPackageKit::BHPKG::BPackageWriter;
 
 
-class PackageWriterListener	: public BPackageWriterListener {
-public:
-	PackageWriterListener(bool verbose, bool quiet)
-		: fVerbose(verbose), fQuiet(quiet)
-	{
-	}
-
-	virtual void PrintErrorVarArgs(const char* format, va_list args)
-	{
-		vfprintf(stderr, format, args);
-	}
-
-	virtual void OnEntryAdded(const char* path)
-	{
-		if (fQuiet || !fVerbose)
-			return;
-
-		printf("\t%s\n", path);
-	}
-
-	virtual void OnTOCSizeInfo(uint64 uncompressedStringsSize,
-		uint64 uncompressedMainSize, uint64 uncompressedTOCSize)
-	{
-		if (fQuiet || !fVerbose)
-			return;
-
-		printf("----- TOC Info -----------------------------------\n");
-		printf("cached strings size:     %10llu (uncompressed)\n",
-			uncompressedStringsSize);
-		printf("TOC main size:           %10llu (uncompressed)\n",
-			uncompressedMainSize);
-		printf("total TOC size:          %10llu (uncompressed)\n",
-			uncompressedTOCSize);
-	}
-
-	virtual void OnPackageAttributesSizeInfo(uint32 stringCount,
-		uint32 uncompressedSize)
-	{
-		if (fQuiet || !fVerbose)
-			return;
-
-		printf("----- Package Attribute Info ---------------------\n");
-		printf("string count:            %10lu\n", stringCount);
-		printf("package attributes size: %10lu (uncompressed)\n",
-			uncompressedSize);
-	}
-
-	virtual void OnPackageSizeInfo(uint32 headerSize, uint64 heapSize,
-		uint64 tocSize, uint32 packageAttributesSize, uint64 totalSize)
-	{
-		if (fQuiet)
-			return;
-
-		printf("----- Package Info ----------------\n");
-		printf("header size:             %10lu\n", headerSize);
-		printf("heap size:               %10llu\n", heapSize);
-		printf("TOC size:                %10llu\n", tocSize);
-		printf("package attributes size: %10lu\n", packageAttributesSize);
-		printf("total size:              %10llu\n", totalSize);
-		printf("-----------------------------------\n");
-	}
-
-private:
-	bool fVerbose;
-	bool fQuiet;
-};
-
-
 int
 command_create(int argc, const char* const* argv)
 {
 	const char* changeToDirectory = NULL;
+	const char* packageInfoFileName = NULL;
+	const char* installPath = NULL;
+	bool isBuildPackage = false;
 	bool quiet = false;
 	bool verbose = false;
 
@@ -110,17 +48,30 @@ command_create(int argc, const char* const* argv)
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "+C:hqv", sLongOptions, NULL);
+		int c = getopt_long(argc, (char**)argv, "+bC:hi:I:qv", sLongOptions,
+			NULL);
 		if (c == -1)
 			break;
 
 		switch (c) {
+			case 'b':
+				isBuildPackage = true;
+				break;
+
 			case 'C':
 				changeToDirectory = optarg;
 				break;
 
 			case 'h':
 				print_usage_and_exit(false);
+				break;
+
+			case 'i':
+				packageInfoFileName = optarg;
+				break;
+
+			case 'I':
+				installPath = optarg;
 				break;
 
 			case 'q':
@@ -143,6 +94,13 @@ command_create(int argc, const char* const* argv)
 
 	const char* packageFileName = argv[optind++];
 
+	// -I is only allowed when -b is given
+	if (installPath != NULL && !isBuildPackage) {
+		fprintf(stderr, "Error: \"-I\" is only allowed when \"-b\" is "
+			"given.\n");
+		return 1;
+	}
+
 	// create package
 	PackageWriterListener listener(verbose, quiet);
 	BPackageWriter packageWriter(&listener);
@@ -150,31 +108,53 @@ command_create(int argc, const char* const* argv)
 	if (result != B_OK)
 		return 1;
 
+	// If a package info file has been specified explicitly, open it.
+	int packageInfoFD = -1;
+	if (packageInfoFileName != NULL) {
+		packageInfoFD = open(packageInfoFileName, O_RDONLY);
+		if (packageInfoFD < 0) {
+			fprintf(stderr, "Error: Failed to open package info file \"%s\": "
+				"%s\n", packageInfoFileName, strerror(errno));
+			return 1;
+		}
+	}
+
 	// change directory, if requested
 	if (changeToDirectory != NULL) {
 		if (chdir(changeToDirectory) != 0) {
 			listener.PrintError(
 				"Error: Failed to change the current working directory to "
 				"\"%s\": %s\n", changeToDirectory, strerror(errno));
+			return 1;
 		}
 	}
 
-	// add all files of current directory
-	DIR* dir = opendir(".");
-	if (dir == NULL) {
-		listener.PrintError("Error: Failed to opendir '.': %s\n",
-			strerror(errno));
-		return 1;
-	}
-	while (dirent* entry = readdir(dir)) {
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
-			continue;
+	if (isBuildPackage)
+		packageWriter.SetCheckLicenses(false);
 
-		result = packageWriter.AddEntry(entry->d_name);
-		if (result != B_OK)
+	// set install path, if specified
+	if (installPath != NULL) {
+		result = packageWriter.SetInstallPath(installPath);
+		if (result != B_OK) {
+			fprintf(stderr, "Error: Failed to set the package install path: "
+				"%s\n", strerror(result));
 			return 1;
+		}
 	}
-	closedir(dir);
+
+	// add all files of the current directory, save for the .PackageInfo
+	if (!isBuildPackage) {
+		if (add_current_directory_entries(packageWriter, listener, true)
+				!= B_OK) {
+			return 1;
+		}
+	}
+
+	// add the .PackageInfo
+	result = packageWriter.AddEntry(B_HPKG_PACKAGE_INFO_FILE_NAME,
+		packageInfoFD);
+	if (result != B_OK)
+		return 1;
 
 	// write the package
 	result = packageWriter.Finish();

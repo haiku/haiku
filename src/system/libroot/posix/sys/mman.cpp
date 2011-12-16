@@ -12,6 +12,7 @@
 
 #include <OS.h>
 
+#include <errno_private.h>
 #include <syscall_utils.h>
 #include <syscalls.h>
 #include <vm_defs.h>
@@ -90,7 +91,7 @@ mmap(void* address, size_t length, int protection, int flags, int fd,
 {
 	// offset and length must be page-aligned
 	if (length == 0 || offset % B_PAGE_SIZE != 0) {
-		errno = B_BAD_VALUE;
+		__set_errno(B_BAD_VALUE);
 		return MAP_FAILED;
 	}
 
@@ -98,13 +99,13 @@ mmap(void* address, size_t length, int protection, int flags, int fd,
 	if ((flags & MAP_ANONYMOUS) != 0) {
 		fd = -1;
 	} else if (fd < 0) {
-		errno = EBADF;
+		__set_errno(EBADF);
 		return MAP_FAILED;
 	}
 
 	// either MAP_SHARED or MAP_PRIVATE must be specified
 	if (((flags & MAP_SHARED) != 0) == ((flags & MAP_PRIVATE) != 0)) {
-		errno = B_BAD_VALUE;
+		__set_errno(B_BAD_VALUE);
 		return MAP_FAILED;
 	}
 
@@ -128,7 +129,7 @@ mmap(void* address, size_t length, int protection, int flags, int fd,
 	area_id area = _kern_map_file("mmap area", &address, addressSpec,
 		length, areaProtection, mapping, true, fd, offset);
 	if (area < 0) {
-		errno = area;
+		__set_errno(area);
 		return MAP_FAILED;
 	}
 

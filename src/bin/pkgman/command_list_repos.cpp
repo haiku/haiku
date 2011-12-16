@@ -82,14 +82,14 @@ command_list_repos(int argc, const char* const* argv)
 	if (argc != optind)
 		print_command_usage_and_exit(true);
 
-	BObjectList<BString> repositoryNames(20, true);
+	BStringList repositoryNames(20);
 	BPackageRoster roster;
 	status_t result = roster.GetRepositoryNames(repositoryNames);
 	if (result != B_OK)
 		DIE(result, "can't collect repository names");
 
-	for (int i = 0; i < repositoryNames.CountItems(); ++i) {
-		const BString& repoName = *(repositoryNames.ItemAt(i));
+	for (int i = 0; i < repositoryNames.CountStrings(); ++i) {
+		const BString& repoName = repositoryNames.StringAt(i);
 		BRepositoryConfig repoConfig;
 		result = roster.GetRepositoryConfig(repoName, &repoConfig);
 		if (result != B_OK) {
@@ -116,7 +116,7 @@ command_list_repos(int argc, const char* const* argv)
 					repoCache.Info().Summary().String());
 				printf("\t\tarch:      %s\n", BPackageInfo::kArchitectureNames[
 						repoCache.Info().Architecture()]);
-				printf("\t\tpkg-count: %lu\n", repoCache.PackageCount());
+				printf("\t\tpkg-count: %lu\n", repoCache.CountPackages());
 				printf("\t\torig-url:  %s\n",
 					repoCache.Info().OriginalBaseURL().String());
 				printf("\t\torig-prio: %u\n", repoCache.Info().Priority());

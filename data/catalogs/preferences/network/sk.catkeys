@@ -1,21 +1,21 @@
 1	slovak	x-vnd.Haiku-Network	2324385456
-<no wireless networks found>	EthernetSettingsView		<nenájdené žiadne bezdrôtové siete>
-Adapter:	EthernetSettingsView		Adaptér:
-Apply	EthernetSettingsView		Použiť
-Auto-configuring failed: 	EthernetSettingsView		Automatická konfigurácia sa nepodarila:
 Choose automatically	EthernetSettingsView		Zvoliť automaticky
-DHCP	EthernetSettingsView		DHCP
-DNS #1:	EthernetSettingsView		DNS č.1:
-DNS #2:	EthernetSettingsView		DNS č.2:
-Disabled	EthernetSettingsView		Vypnuté
-Domain:	EthernetSettingsView		Doména:
 Gateway:	EthernetSettingsView		Brána:
-IP address:	EthernetSettingsView		IP adresa:
-Mode:	EthernetSettingsView		Režim:
 Netmask:	EthernetSettingsView		Maska siete:
-Network	System name		Sieť
-Network:	EthernetSettingsView		Sieť:
+DHCP	EthernetSettingsView		DHCP
+DNS #2:	EthernetSettingsView		DNS č.2:
+Apply	EthernetSettingsView		Použiť
 OK	EthernetSettingsView		OK
+DNS #1:	EthernetSettingsView		DNS č.1:
+IP address:	EthernetSettingsView		IP adresa:
+Adapter:	EthernetSettingsView		Adaptér:
+Domain:	EthernetSettingsView		Doména:
 Revert	EthernetSettingsView		Vrátiť
-Static	EthernetSettingsView		Statická
+<no wireless networks found>	EthernetSettingsView		<nenájdené žiadne bezdrôtové siete>
+Network	System name		Sieť
+Mode:	EthernetSettingsView		Režim:
+Network:	EthernetSettingsView		Sieť:
 The net_server needs to run for the auto configuration!	EthernetSettingsView		Aby bola možná automatická konfigurácia, musí bežať net_server!
+Disabled	EthernetSettingsView		Vypnuté
+Auto-configuring failed: 	EthernetSettingsView		Automatická konfigurácia sa nepodarila: 
+Static	EthernetSettingsView		Statická

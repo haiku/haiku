@@ -11,6 +11,8 @@
 
 #include "accelerant.h"
 
+#include <video_configuration.h>
+
 
 #define HDP_REG_COHERENCY_FLUSH_CNTL 0x54A0
 #define HDP_NONSURFACE_BASE			0x2C04
@@ -169,14 +171,11 @@
 
 
 status_t radeon_gpu_reset();
-void radeon_gpu_mc_halt();
-void radeon_gpu_mc_resume();
+void radeon_gpu_mc_halt(struct gpu_state *gpuState);
+void radeon_gpu_mc_resume(struct gpu_state *gpuState);
 uint32 radeon_gpu_mc_idlecheck();
 status_t radeon_gpu_mc_setup();
 status_t radeon_gpu_irq_setup();
-status_t radeon_gpu_gpio_setup();
-status_t radeon_gpu_i2c_attach(uint32 id, uint8 hw_line);
-bool radeon_gpu_read_edid(uint32 connector, edid1_info *edid);
 
 
 #endif

@@ -1291,11 +1291,12 @@ TRACE(("haiku_child_wait_internal(): B_DEBUGGER_MESSAGE_HANDED_OVER: causing "
 			thread->reprocess_event
 				= (reprocessEvent >= 0 ? reprocessEvent : 0);
 	} else {
+		thread_id originThread = event->data.origin.thread;
 		xfree(event);
 
 		// continue the thread
-		if (event->data.origin.thread >= 0) {
-			haiku_continue_thread(teamDebugInfo, event->data.origin.thread,
+		if (originThread >= 0) {
+			haiku_continue_thread(teamDebugInfo, originThread,
 				B_THREAD_DEBUG_HANDLE_EVENT, false);
 		}
 

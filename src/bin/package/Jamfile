@@ -2,15 +2,15 @@ SubDir HAIKU_TOP src bin package ;
 
 UsePrivateHeaders kernel shared ;
 
-DEFINES += B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT ;
-	# TODO: Remove when it is complete!
-
 BinCommand package :
+	command_add.cpp
 	command_create.cpp
 	command_dump.cpp
 	command_extract.cpp
 	command_list.cpp
 	package.cpp
+	PackageWriterListener.cpp
+	PackageWritingUtils.cpp
 	StandardErrorOutput.cpp
 
 	:

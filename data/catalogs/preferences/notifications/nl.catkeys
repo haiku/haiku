@@ -1,49 +1,48 @@
-1	dutch	x-vnd.Haiku-Notifications	2465029992
-Above icon	DisplayView		Boven icoon
-Allowed	NotificationView		Toegestaan
+1	dutch; flemish	x-vnd.Haiku-Notifications	2551345558
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Er ontstond een fout tijdens het opslaan van de voorkeuren.\nHet is mogelijk dat uw schijfruimte opraakt.
-Application	NotificationView		Toepassing
-Applications	NotificationView		Toepassingen
-Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Kan Aankondigingen niet aanzetten bij het opstarten, u hebt waarschijnlijk geen toestemming om te schrijven naar het directory van de bootinstellingen.
-Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Kan voorkeuren niet opslaan, u hebt waarschijnlijk geen schrijftoegang naar het directory voor de opstartinstellingen.
-Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Kan voorkeuren niet opslaan, u hebt mogelijk geen schrijftoegang naar het instellingen-directory, of de schijf is vol.
-Cannot disable notifications because the server can't be reached.	GeneralView		Kan aankondigingen niet aanzetten omdat de server niet bereikt kan worden.
-Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Kan aankondigingen niet aanzetten omdat de server niet gevonden kan worden.\nDit betekent dat uw InfoPopper-installatie niet succesvol werd afgerond.
-Disable notifications	GeneralView		Aankondigingen uitzetten
-Enable notifications	GeneralView		Aankondigingen aanzetten
-Enable notifications at startup	GeneralView		Aankondigingen aanzetten bij opstarten
-Enabled	NotificationView		Aangezet
-Error	NotificationView		Fout
-Events are not notified	GeneralView		Gebeurtenissen worden niet aangekondigd
-Events are notified	GeneralView		Gebeutenissen worden aangekondigd
-General	PrefletView		Algemeen
-Hide notifications from screen after	GeneralView		Aankondigingen uit beeld halen na
-Icon size:	DisplayView		Icoongrootte:
-Important	NotificationView		Belangrijk
-Information	NotificationView		Informatie
-Large icon	DisplayView		Groot icoon
-Last Received	NotificationView		Laatst ontvangen
-Mini icon	DisplayView		Mini-icoon
 Notifications	GeneralView		Aankondigingen
-Notifications	NotificationView		Aankondigingen
-Notifications cannot be stopped, because the server can't be reached.	GeneralView		Aankondigingen kan niet worden gestopt, omdat de server niet bereikt kan worden.
-OK	DisplayView		Oké
-OK	GeneralView		Oké
-OK	NotificationView		Oké
-Progress	NotificationView		Voortgang
+seconds of inactivity	GeneralView		seconden inactief
 Revert	PrefletWin		Herstellen
-Right of icon	DisplayView		Rechts naast icoon
+Mini icon	DisplayView		Mini-icoon
+Enable notifications	GeneralView		Aankondigingen aanzetten
+Error	NotificationView		Fout
+OK	GeneralView		Oké
+Events are not notified	GeneralView		Gebeurtenissen worden niet aangekondigd
 Save	PrefletWin		Opslaan
+Type	NotificationView		Soort
+Notifications cannot be stopped, because the server can't be reached.	GeneralView		Aankondigingen kan niet worden gestopt, omdat de server niet bereikt kan worden.
+Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Kan aankondigingen niet aanzetten omdat de server niet gevonden kan worden.\nDit betekent dat uw InfoPopper-installatie niet succesvol werd afgerond.
+OK	NotificationView		Oké
+Important	NotificationView		Belangrijk
+Cannot disable notifications because the server can't be reached.	GeneralView		Kan aankondigingen niet aanzetten omdat de server niet bereikt kan worden.
+Progress	NotificationView		Voortgang
+Last Received	NotificationView		Laatst ontvangen
+General	PrefletView		Algemeen
+Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Kan Aankondigingen niet aanzetten bij het opstarten, u hebt waarschijnlijk geen toestemming om te schrijven naar het directory van de bootinstellingen.
 Search:	NotificationView		Zoek:
-The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		De aankondigingen-server kon niet gevonden worden, dit betekent dat uw InfoPopper-installatie niet succesvol werd afgerond.
 The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		De aankondigingen-server kon niet gevonden worden.\nEen mogelijke oorzaak is een installatie die niet correct werd uitgevoerd
+Allowed	NotificationView		Toegestaan
+Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Kan voorkeuren niet opslaan, u hebt mogelijk geen schrijftoegang naar het instellingen-directory, of de schijf is vol.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	DisplayView		Er was een probleem bij het opslaan van de voorkeuren.\nHet is mogelijk dat u geen schrijftoegang hebt naar het directory van de instellingen.
+Yes	NotificationView		Ja
+Large icon	DisplayView		Groot icoon
+Icon size:	DisplayView		Icoongrootte:
+Hide notifications from screen after	GeneralView		Aankondigingen uit beeld halen na
+Disable notifications	GeneralView		Aankondigingen uitzetten
+Notifications	System name		Aankondigingen
+Notifications	NotificationView		Aankondigingen
+Title	NotificationView		Titel
+Information	NotificationView		Informatie
+Window width:	DisplayView		Vensterbreedte:
+Application	NotificationView		Toepassing
+Enabled	NotificationView		Aangezet
+OK	DisplayView		Oké
+Unknown	NotificationView		Onbekend
+Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Kan voorkeuren niet opslaan, u hebt waarschijnlijk geen schrijftoegang naar het directory voor de opstartinstellingen.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Er was een probleem bij het opslaan van de voorkeuren.\nHet is mogelijk dat u geen schrijftoegang hebt naar het directory voor de instellingen.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Er was een probleem bij het opslaan van de voorkeuren.\nHet is mogelijk dat u geen schrijftoegang hebt naar het directory voor de instellingen.
-Title	NotificationView		Titel
-Title position:	DisplayView		Positie van de titel:
-Type	NotificationView		Soort
-Unknown	NotificationView		Onbekend
-Window width:	DisplayView		Vensterbreedte:
-Yes	NotificationView		Ja
-seconds of inactivity	GeneralView		seconden inactief
+Enable notifications at startup	GeneralView		Aankondigingen aanzetten bij opstarten
+Notifications	PrefletView		Aankondigingen
+The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		De aankondigingen-server kon niet gevonden worden, dit betekent dat uw InfoPopper-installatie niet succesvol werd afgerond.
+Applications	NotificationView		Toepassingen
+Events are notified	GeneralView		Gebeutenissen worden aangekondigd

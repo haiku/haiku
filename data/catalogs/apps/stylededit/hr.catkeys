@@ -1,0 +1,75 @@
+1	croatian	x-vnd.Haiku-StyledEdit	703931634
+???	LoadAlert		??
+Align	Menus		Poredaj
+Black	Menus		Crna
+Blue	Menus		Plava
+Bold	Menus		Podebljano
+Can't undo	Menus		Nemoguće vratiti korak nazad
+Cancel	FindandReplaceWindow		Otkaži
+Cancel	QuitAlert		Poništi
+Cancel	RevertToSavedAlert		Otkaži
+Cancel	SaveAlert		Otkaži
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nemoguće obrnuti, datoteka nije pronađena: \"%s\".
+Case-sensitive	FindandReplaceWindow		Osjetljivo na veličinu slova
+Center	Menus		Centar
+Characters:	Statistics		Znakovi:
+Close	Menus		Zatvori
+Color	Menus		Boja
+Copy	Menus		Kopiraj
+Cut	Menus		Isjeci
+Cyan	Menus		Svijetlo plava
+Default	Open_and_SaveAsPanel		Zadano
+Document	Menus		Dokument
+Document statistics	Statistics		Statistike dokumenta
+Don't save	QuitAlert		Nemoj spremiti
+Don't save	SaveAlert		Nemoj spremiti
+Edit	Menus		Uredi
+Encoding	Open_and_SaveAsPanel		Enkodiranje
+Error loading \"%s\":\n\t%s	LoadAlert		Greška pri učitavanju \"%s\":\n%s
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Greška pri učitavanju \"%s\":\n\tNepodržani format
+Error saving \"%s\":\n%s	SaveAlert		Greška pri spremanju \"%s\":\n%s
+File	Menus		Datoteka
+Find	FindandReplaceWindow		Pronađi
+Find again	Menus		Pronađi opet
+Find selection	Menus		Nađi označeno
+Find:	FindandReplaceWindow		Pronađi:
+Find…	Menus		Pronađi...
+Font	Menus		Font
+Green	Menus		Zeleno
+Italic	Menus		Italik
+Left	Menus		Lijevo
+Lines:	Statistics		Linije:
+Magenta	Menus		Magenta
+New	Menus		Novo
+OK	LoadAlert		U redu
+OK	RevertToSavedAlert		U redu
+OK	SaveAlert		U redu
+OK	Statistics		U redu
+Open…	Menus		Otvori...
+Page setup…	Menus		Postavke stranice...
+Paste	Menus		Zalijepi
+Print…	Menus		Ispis...
+Quit	Menus		Izađi
+Red	Menus		Crvena 
+Replace	FindandReplaceWindow		Zamijeni
+Replace all	FindandReplaceWindow		Zamjeni sve
+Replace in all windows	FindandReplaceWindow		Zamjeni u svim prozorima
+Replace next	Menus		Zamijeni slijedeće
+Replace with:	FindandReplaceWindow		Zamjeni sa:
+Replace…	Menus		Zamjeni...
+Revert to saved…	Menus		Vrati na spremnjeno...
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Vrati na zadnju verziju \"%ss\"?
+Right	Menus		Desno
+Save	Menus		Spremi
+Save	QuitAlert		Spremi
+Save	SaveAlert		Spremi
+Save as…	Menus		Spremi kao...
+Save changes to the document \"%s\"? 	QuitAlert		Spremi izmjene u dokument \"%s\"?
+Search backwards	FindandReplaceWindow		Traži unazad
+Size	Menus		Veličina
+Statistics…	Menus		Statistike...
+StyledEdit	System name		StyleEdit
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Ova datoteka je označena kao samo za čitanje. Spremiti izmjene u dokument \"%s\"?
+Untitled 	StyledEditWindow		Neimenovano
+Words:	Statistics		Riječi
+Yellow	Menus		Žuto

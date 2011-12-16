@@ -1,25 +1,25 @@
 1	german	x-vnd.Haiku-Backgrounds	3513602073
-All workspaces	Main View		Alle Arbeitsflächen
-Apply	Main View		Anwenden
 Backgrounds	System name		Hintergründe
-Center	Main View		Zentriert
-Current workspace	Main View		Aktuelle Arbeitsfläche
+X:	Main View		X:
+Resolution: 	Image Filepanel		Auflösung:
+pick one	Main View		Auswählen
 Default	Main View		Standard
-Default folder	Main View		Vorgabeordner
-Folder: 	Main View		Ordner:
-Icon label outline	Main View		Icon-Textkontur
-Image:	Main View		Bild:
+Center	Main View		Zentriert
 Manual	Main View		Manuell
-None	Main View		Keiner
-Other folder…	Main View		Anderer Ordner…
+Default folder	Main View		Vorgabeordner
+Revert	Main View		Anfangswerte
+None	Main View		Kein
+All workspaces	Main View		Alle Arbeitsflächen
+Icon label outline	Main View		Icon-Textkontur
 Other…	Main View		Anderer…
+Current workspace	Main View		Aktuelle Arbeitsfläche
+Folder: 	Main View		Ordner:
+Apply	Main View		Anwenden
+Other folder…	Main View		Anderer Ordner…
+Y:	Main View		Y:
+Tile	Main View		Gekachelt
+Select	Main View		Auswählen
+Scale to fit	Main View		Passend skaliert
 Placement:	Main View		Platzierung:
 Preview	Main View		Vorschau
-Resolution: 	Image Filepanel		Auflösung:
-Revert	Main View		Anfangswerte
-Scale to fit	Main View		Passend skaliert
-Select	Main View		Auswählen
-Tile	Main View		Gekachelt
-X:	Main View		X:
-Y:	Main View		Y:
-pick one	Main View		Auswählen
+Image:	Main View		Bild:

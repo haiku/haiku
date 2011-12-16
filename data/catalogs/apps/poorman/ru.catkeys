@@ -1,61 +1,60 @@
-1	russian	x-vnd.Haiku.PoorMan	412131821
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Папка по умолчанию была создана в /boot/home/public_html.\nУбедитесь, что в этой папке есть HTML файл с именем index.html.
-About PoorMan…	PoorMan		О программе…
+1	russian	x-vnd.Haiku-PoorMan	995747556
+Website location	PoorMan		Расположение сайта
+Error Server	PoorMan		Ошибка сервера
+Settings…	PoorMan		Настройки…
+Create PoorMan log	PoorMan		Создать log PoorMan
+Shutting down.\n	PoorMan		Выключение.\n
+Hits: %lu	PoorMan		Посещений: %lu
+Web folder:	PoorMan		Веб-папка:
+Default	PoorMan		По умолчанию
+Save log console selection	PoorMan		Сохранить выделенную часть лога консоли
+Run server	PoorMan		Запустиь сервер
+PoorMan settings	PoorMan		Настройки PoorMan
+Clear hit counter	PoorMan		Очистить счетчик посещений
+Copy	PoorMan		Копировать
+Max. simultaneous connections:	PoorMan		Максимум одновременных соединений:
+Start page:	PoorMan		Начальная страница:
+done.\n	PoorMan		готово.\n
+Create	PoorMan		Создать
+Shutting down.	PoorMan		Выключение.
+Website options	PoorMan		Настройки сайта
+File Name	PoorMan		Имя файла
+Clear console log	PoorMan		Очистить лог консоли
 Advanced	PoorMan		Дополнительно
+OK	PoorMan		ОК
+Status: Stopped	PoorMan		Статус: остановлен
+Dir Created	PoorMan		Создана директория
+Quit	PoorMan		Выход
+Hits: 0	PoorMan		Посещений: 0
+Save log console	PoorMan		Сохранить лог консоли
+Edit	PoorMan		Изменить
+Directory: (none)	PoorMan		Директория: (отсутствует)
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Пожалуйста, выберите папку для публикации.\n\nPoorMan может создать папку по умолчанию public_html в вашей домашней папке.\nИли вы можете выбрать любую другую папку.
+Log To Console	PoorMan		Выводить лог в консоль
+Status: Running	PoorMan		Статус: работает
+connections	PoorMan		соединения
+Controls	PoorMan		Управление
+Send file listing if there's no start page	PoorMan		Отобразить список файлов, если нет стартовой страницы
+Error Dir	PoorMan		Ошибка директории
+Select all	PoorMan		Выделить всё
+File	PoorMan		Файл
+Save console selections as…	PoorMan		Сохранить выделение консоли как…
+File logging	PoorMan		Логирование в файл
+Select web folder	PoorMan		Выбрать папку для публикации
+Logging view	PoorMan		Окно логирования
+Logging	PoorMan		Логирование
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Папка по умолчанию была создана в /boot/home/public_html.\nУбедитесь, что в этой папке есть HTML файл с именем index.html.
+Clear log file	PoorMan		Очистить лог файл
+Log file name:	PoorMan		Имя лог файла:
+Directory: 	PoorMan		Директория: 
+Log To File	PoorMan		Сохранять лог в файл
+Done	PoorMan		Готово
+Create log file	PoorMan		Создать лог файл…
+Starting up... 	PoorMan		Запуск... 
+Site	PoorMan		Сайт
 Cancel	PoorMan		Отмена
 Cannot start the server	PoorMan		Не удалось запустить сервер
-Clear console log	PoorMan		Очистить лог консоли
-Clear hit counter	PoorMan		Очистить счетчик посещений
-Clear log file	PoorMan		Очистить лог файл
-Console Logging	PoorMan		Логирование в консоль
-Controls	PoorMan		Управление
-Copy	PoorMan		Копировать
-Create	PoorMan		Создать
-Create PoorMan log	PoorMan		Создать log PoorMan
-Create log file	PoorMan		Создать лог файл…
-Default	PoorMan		По умолчанию
-Dir Created	PoorMan		Создана директория
-Directory: 	PoorMan		Директория: 
-Directory: (none)	PoorMan		Директория: (отсутствует)
-Done	PoorMan		Готово
-Edit	PoorMan		Изменить
-Error Dir	PoorMan		Ошибка директории
-Error Server	PoorMan		Ошибка сервера
-File	PoorMan		Файл
-File Name	PoorMan		Имя файла
-File logging	PoorMan		Логирование в файл
-Hits: %lu	PoorMan		Посещений: %lu
-Hits: 0	PoorMan		Посещений: 0
-Log To Console	PoorMan		Выводить лог в консоль
-Log To File	PoorMan		Сохранять лог в файл
-Log file name:	PoorMan		Имя лог файла:
-Logging	PoorMan		Логирование
-Logging view	PoorMan		Окно логирования
-Max. simultaneous connections:	PoorMan		Максимум одновременных соединений:
-OK	PoorMan		ОК
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Пожалуйста, выберите папку для публикации.\n\nPoorMan может создать папку по умолчанию public_html в вашей домашней папке.\nИли вы можете выбрать любую другую папку.
-PoorMan	System name		Вебсервер
-PoorMan settings	PoorMan		Настройки PoorMan
-Quit	PoorMan		Выход
-Run server	PoorMan		Запустиь сервер
-Save console as…	PoorMan		Сохранить содержимое консоли как…
-Save console selections as…	PoorMan		Сохранить выделение консоли как…
-Save log console	PoorMan		Сохранить лог консоли
-Save log console selection	PoorMan		Сохранить выделенную часть лога консоли
 Select	PoorMan		Выбрать
-Select all	PoorMan		Выделить всё
-Select web folder	PoorMan		Выбрать папку для публикации
-Send file listing if there's no start page	PoorMan		Отобразить список файлов, если нет стартовой страницы
-Settings…	PoorMan		Настройки…
-Shutting down.	PoorMan		Выключение.
-Shutting down.\n	PoorMan		Выключение.\n
-Site	PoorMan		Сайт
-Start page:	PoorMan		Начальная страница:
-Starting up... 	PoorMan		Запуск... 
-Status: Running	PoorMan		Статус: работает
-Status: Stopped	PoorMan		Статус: остановлен
-Web folder:	PoorMan		Веб-папка:
-Website location	PoorMan		Расположение сайта
-Website options	PoorMan		Настройки сайта
-connections	PoorMan		соединения
-done.\n	PoorMan		готово.\n
+Save console as…	PoorMan		Сохранить содержимое консоли как…
+PoorMan	System name		Вебсервер
+Console Logging	PoorMan		Логирование в консоль

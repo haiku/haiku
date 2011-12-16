@@ -1,0 +1,9 @@
+1	dutch; flemish	x-vnd.Haiku-SpamFilter	1975155212
+or empty e-mail	SpamFilterConfig		of een lege e-mail
+Spam Filter (AGMS Bayesian)	SpamFilter		Spam Filter (AGMS Bayesian)
+Genuine below and uncertain above:	SpamFilterConfig		Echte e-mail beneden en onzeker boven:
+Spam above:	SpamFilterConfig		Spam boven:
+Add spam rating to start of subject	SpamFilterConfig		Spamwaarde toevoegen aan het begin van het onderwerp
+Learn from all incoming e-mail	SpamFilterConfig		Leer van alle inkomende e-mails
+Sorry, unable to launch the spamdbm program to let you edit the server settings.	SpamFilterConfig		Sorry, niet mogelijk om spamdbm te starten om u serverinstellingen te laten veranderen
+Close	SpamFilterConfig		Sluiten

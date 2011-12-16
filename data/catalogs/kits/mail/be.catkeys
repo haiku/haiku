@@ -1,10 +1,10 @@
 1	belarusian	x-vnd.Haiku-libmail	161731481
-Connection type:	ProtocolConfigView		Тып злучэння:
-Leave mail on server	ProtocolConfigView		Пакідаць паведамленні на серверы
-Login type:	ProtocolConfigView		Тып уваходу:
-Mail server:	ProtocolConfigView		Сервер пошты:
 Partially download messages larger than	ProtocolConfigView		Часткова спампоўваць паведамленні большыя за
 Password:	ProtocolConfigView		Пароль:
 Remove mail from server when deleted	ProtocolConfigView		Выдаляць паведамленні з сервера
+Mail server:	ProtocolConfigView		Сервер пошты:
 Select…	MailKit		Абраць…
+Connection type:	ProtocolConfigView		Тып злучэння:
+Leave mail on server	ProtocolConfigView		Пакідаць паведамленні на серверы
 Username:	ProtocolConfigView		Імя карыстальніка:
+Login type:	ProtocolConfigView		Тып уваходу:

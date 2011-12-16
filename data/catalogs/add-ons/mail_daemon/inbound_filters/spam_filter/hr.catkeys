@@ -1,0 +1,7 @@
+1	croatian	x-vnd.Haiku-SpamFilter	8723064
+Close	SpamFilterConfig		Zatvori
+Genuine below and uncertain above:	SpamFilterConfig		Orginalni ispod i nesigurni iznad:
+Learn from all incoming e-mail	SpamFilterConfig		Uči iz sve dolazne elektroničke pošte 
+Sorry, unable to launch the spamdbm program to let you edit the server settings.	SpamFilterConfig		Žao nam je, nemože se pokrenuti spamdbm program da vam omogući uređivanje postavki poslužitelja.
+
+Spam above:	SpamFilterConfig		Spam iznad:

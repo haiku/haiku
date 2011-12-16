@@ -1,0 +1,52 @@
+1	croatian	x-vnd.Haiku-Devices	1632551742
+ACPI Information	DeviceACPI		ACPI informacija
+ACPI bus	Device		ACPI bus
+CD-ROM	DeviceSCSI		CD-ROM
+Card Reader	DeviceSCSI		Čitač kartica
+Category	DevicesView		Kategorija
+Communications	DeviceSCSI		Komunikacije
+Computer	Device		Računalo
+Computer	DevicesView		Računalo
+Connection	DevicesView		Veza
+Detailed	DevicesView		Detaljno
+Device	Device		Uređaj
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Ime uređaja\t\t\t\t: %Ime%\nProizvođač\t\t\t: %Proizvođač%\nKorišteni upravljački program\t\t\t\t: %Korišteni upravljački program%\nPutanje uređaja\t: %Putanje uređaja%
+Device name	Device		Ime uređaja
+Device name	DeviceACPI		Ime uređaja
+Device name	DevicePCI		Ime uređaja
+Device name	DeviceSCSI		Ime uređaja
+Device name:	Device		Ime uređaja:
+Device paths	Device		Putanje uređaja
+Device paths	DevicePCI		Putanje uređaja
+Devices	DevicesView		Uređaji
+Devices	System name		Uređaji
+Disk Drive	DeviceSCSI		Pogon diska
+Driver used	Device		Korišteni upravljački program
+Driver used	DevicePCI		Korišteni upravljački program
+Generate system information	DevicesView		Generirajte informaciju o sustavu
+ISA bus	Device		ISA bus
+ISA bus	DevicesView		ISA bus
+Manufacturer	Device		Proizvođač
+Manufacturer	DevicePCI		Proizvođač
+Manufacturer	DeviceSCSI		Proizvođač
+Manufacturer:	Device		Proizvođač:
+Name	PropertyList		Ime
+None	Device		Nijedan
+Not implemented	DeviceACPI		Nije primjenjen
+Not implemented	DevicePCI		Nije primjenjen
+Optical Drive	DeviceSCSI		Optički pogon
+Order by:	DevicesView		Poredaj po:
+Other	DeviceSCSI		Ostalo
+PCI Information	DevicePCI		PCI informacija
+PCI bus	DevicesView		PCI bus
+Printer	DeviceSCSI		Pisač
+Processor	Device		Procesor
+Processor	DeviceSCSI		Procesor
+RBC	DeviceSCSI		RBC
+Refresh devices	DevicesView		Osvježi uređaje
+Report compatibility	DevicesView		Prijavi kompatibilnost
+Unknown	DevicePCI		Nepoznato
+Unknown device	Device		Nepoznati uređaj
+Unknown device	DevicesView		Nepoznati uređaj
+Value	PropertyList		Vrijednost
+unknown	Device		nepoznato

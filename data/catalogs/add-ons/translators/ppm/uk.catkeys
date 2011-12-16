@@ -1,4 +1,5 @@
-1	ukrainian	x-vnd.Haiku-PPMTranslator	3767812004
+1	ukrainian	x-vnd.Haiku-PPMTranslator	2886727868
+Based on PPMTranslator sample code	PPMTranslator		На основі зразка коду Перетворювача PPM
 Be Bitmap Format (PPMTranslator)	PPMTranslator		Формат Be Bitmap (Перетворювач PPM)
 Bitmap 1 bit	PPMTranslator		Bitmap 1 біт
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 біт
@@ -6,18 +7,25 @@ CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 біт
 CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 біт
 Grayscale 8 bits	PPMTranslator		8 бітні сірі
 Input Color Space	PPMTranslator		Вхідна палета кольорів
+None	PPMTranslator		Жоден
 OK	PPMMain		Гаразд
 PPM Image Translator	PPMTranslator		Перетворювач зображень PPM
 PPM Settings	PPMMain		Настройки PPM
 PPM image	PPMTranslator		Зображення PPM
 PPMTranslator Settings	PPMTranslator		Настройка Перетворювача PPM
+RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 біт
 RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 біт (big-endian)
 RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 біт
+RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 біт (big-endian)
 RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 біт
+RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 біт (big-endian)
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 біт
+RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 біт (big-endian)
 RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 біт
 RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 bits (big-endian)
 Sample code copyright 1999, Be Incorporated	PPMTranslator		Приклад коду copyright 1999, Be Incorporated
 Something is wrong with the PPMTranslator!	PPMMain		Негаразди з Перетворювачем PPM!
 System palette 8 bits	PPMTranslator		Системна палета 8 біт
+Version %d.%d.%d %s	PPMTranslator		Версія %d.%d.%d %s
 Write ASCII	PPMTranslator		Записати в  ASCII
+bits/space	PPMTranslator		біт/простір

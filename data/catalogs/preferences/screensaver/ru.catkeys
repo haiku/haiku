@@ -1,29 +1,29 @@
 1	russian	x-vnd.Haiku-ScreenSaver	215605989
-30 seconds	ScreenSaver		30 секунд
-Add…	ScreenSaver		Добавить…
-Blackness	ScreenSaver		Пустой экран
-Cancel	ScreenSaver		Отмена
-Confirm password:	ScreenSaver		Подтверждение пароля:
 Could not load screen saver	ScreenSaver		Не удалось загрузить заставку
-Display Power Management Signaling not available	ScreenSaver		Недоступна DPMS (система сигналов управления энергопотреблением монитора)
-Don't fade when	ScreenSaver		Не включать заставку, когда
-Done	ScreenSaver		Готово
-Enable screensaver	ScreenSaver		Включить хранитель экрана
-Fade now when	ScreenSaver		Включать заставку, когда
-General	ScreenSaver		Общие
-No options available	ScreenSaver		Нет доступных настроек
-OK	ScreenSaver		ОК
-Password Window	ScreenSaver		Окно пароля
-Password lock	ScreenSaver		Требовать пароль через 
-Password:	ScreenSaver		Пароль:
-Passwords don't match. Please try again.	ScreenSaver		Пароли не совпадают. Пожалуйста, попробуйте еще раз.
-Password…	ScreenSaver		Пароль…
-ScreenSaver	System name		Хранитель экрана
-Screensaver settings	ScreenSaver		Настройки заставки
-Screensavers	ScreenSaver		Заставки
+30 seconds	ScreenSaver		30 секунд
 Start screensaver	ScreenSaver		Запускать заставку через
-Test	ScreenSaver		Просмотр
-Turn off screen	ScreenSaver		Выключать экран через 
-Use custom password	ScreenSaver		Использовать выбранный пароль
-Use network password	ScreenSaver		Использовать сетевой пароль
+Password…	ScreenSaver		Пароль…
+Password:	ScreenSaver		Пароль:
+Password lock	ScreenSaver		Требовать пароль через 
+Add…	ScreenSaver		Добавить…
+Screensavers	ScreenSaver		Заставки
 mouse is here	ScreenSaver		мышь находится здесь
+Display Power Management Signaling not available	ScreenSaver		Недоступна DPMS (система сигналов управления энергопотреблением монитора)
+ScreenSaver	System name		Хранитель экрана
+Test	ScreenSaver		Просмотр
+General	ScreenSaver		Общие
+Enable screensaver	ScreenSaver		Включить хранитель экрана
+Cancel	ScreenSaver		Отмена
+Turn off screen	ScreenSaver		Выключать экран через 
+No options available	ScreenSaver		Нет доступных настроек
+Password Window	ScreenSaver		Окно пароля
+Fade now when	ScreenSaver		Включать заставку, когда
+Screensaver settings	ScreenSaver		Настройки заставки
+Passwords don't match. Please try again.	ScreenSaver		Пароли не совпадают. Пожалуйста, попробуйте еще раз.
+OK	ScreenSaver		ОК
+Don't fade when	ScreenSaver		Не включать заставку, когда
+Blackness	ScreenSaver		Пустой экран
+Use custom password	ScreenSaver		Использовать выбранный пароль
+Done	ScreenSaver		Готово
+Confirm password:	ScreenSaver		Подтверждение пароля:
+Use network password	ScreenSaver		Использовать сетевой пароль

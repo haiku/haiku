@@ -52,7 +52,7 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bzip2
 	query quit
 	rc readlink ReadOnlyBootPrompt reindex release renice rlog rm rmattr
 	rmindex rmdir roster route
-	safemode screen_blanker screenmode screenshot sdiff setdecor settype
+	safemode screen_blanker screenmode screenshot sdiff setdecor setmime settype
 	setversion setvolume seq sha1sum shar shred shuf shutdown sleep sort
 	spamdbm
 	split stat strace stty su sum sync sysinfo
@@ -69,7 +69,7 @@ SYSTEM_APPS = AboutSystem ActivityMonitor $(X86_ONLY)BootManager CharacterMap
 	Icon-O-Matic Installer LaunchBox Magnify Mail MediaConverter MediaPlayer
 	MidiPlayer NetworkStatus PackageInstaller People PoorMan PowerStatus
 	ProcessController Screenshot ShowImage SoundRecorder StyledEdit Terminal
-	TextSearch TV Workspaces
+	TextSearch TV WebWatch Workspaces
 ;
 SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations
 	<preference>Deskbar E-mail FileTypes Fonts Keyboard Keymap Locale Media
@@ -104,7 +104,7 @@ PRIVATE_SYSTEM_LIBS =
 ;
 SYSTEM_SERVERS = app_server cddb_daemon debug_server input_server mail_daemon
 	media_addon_server media_server midi_server mount_server net_server
-	notification_server print_server print_addon_server registrar syslog_daemon
+	notification_server power_daemon print_server print_addon_server registrar syslog_daemon
 ;
 
 SYSTEM_NETWORK_DEVICES = ethernet loopback ;
@@ -183,10 +183,10 @@ SYSTEM_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)atheros813x
 	$(X86_ONLY)iprowifi4965 $(X86_ONLY)marvell88w8363 $(X86_ONLY)marvell88w8335
 	$(X86_ONLY)ralink2860 $(X86_ONLY)ralinkwifi $(X86_ONLY)wavelanwifi
 
-	# WiMAX drivers
-	$(GPL_ONLY)usb_beceemwmx
+	# WWAN drivers
+	#$(GPL_ONLY)usb_beceemwmx
 ;
-#SYSTEM_ADD_ONS_DRIVERS_POWER = $(X86_ONLY)acpi_button ;
+SYSTEM_ADD_ONS_DRIVERS_POWER = $(X86_ONLY)acpi_button ;
 SYSTEM_ADD_ONS_BUS_MANAGERS =  $(ATA_ONLY)ata pci $(X86_ONLY)ps2 $(X86_ONLY)isa
 	$(IDE_ONLY)ide scsi config_manager agp_gart usb firewire $(X86_ONLY)acpi
 ;
@@ -234,7 +234,7 @@ AddFilesToHaikuImage system add-ons kernel busses usb
 	: <usb>uhci <usb>ohci <usb>ehci ;
 AddFilesToHaikuImage system add-ons kernel console : vga_text ;
 AddFilesToHaikuImage system add-ons kernel debugger
-	: <kdebug>demangle $(X86_ONLY)<kdebug>disasm
+	: <kdebug>demangle $(X86_ONLY)<kdebug>disasm <kdebug>hangman
 	  <kdebug>invalidate_on_exit <kdebug>usb_keyboard <kdebug>run_on_exit ;
 AddFilesToHaikuImage system add-ons kernel file_systems
 	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
@@ -273,7 +273,7 @@ AddDriversToHaikuImage input		: ps2_hid usb_hid wacom ;
 AddDriversToHaikuImage misc			: <driver>poke <driver>mem ;
 AddDriversToHaikuImage net			: $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
 AddDriversToHaikuImage ports		: usb_serial ;
-#AddDriversToHaikuImage power		: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
+AddDriversToHaikuImage power		: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
 
 # kernel
 AddFilesToHaikuImage system : <revisioned>kernel_$(TARGET_ARCH) ;
@@ -360,8 +360,9 @@ AddDirectoryToHaikuImage home mail draft ;
 AddDirectoryToHaikuImage home mail in ;
 AddDirectoryToHaikuImage home mail out ;
 
+AddSymlinkToHaikuImage home config : settings/deskbar : be ;
 # Deskbar Application links
-AddDirectoryToHaikuImage home config be Applications ;
+AddDirectoryToHaikuImage home config settings deskbar Applications ;
 DESKBAR_APPLICATIONS = ActivityMonitor CharacterMap CodyCam CDPlayer DeskCalc
 	Devices DiskProbe DriveSetup DiskUsage Expander Icon-O-Matic Installer
 	Magnify	Mail MediaConverter MediaPlayer MidiPlayer People PoorMan
@@ -369,32 +370,33 @@ DESKBAR_APPLICATIONS = ActivityMonitor CharacterMap CodyCam CDPlayer DeskCalc
 ;
 local linkTarget ;
 for linkTarget in $(DESKBAR_APPLICATIONS) {
-	AddSymlinkToHaikuImage home config be Applications
+	AddSymlinkToHaikuImage home config settings deskbar Applications
 		: /boot/system/apps/$(linkTarget) : $(linkTarget) ;
 }
 
 # Deskbar Desktop applets links
-AddDirectoryToHaikuImage home config be Desktop\ applets ;
+AddDirectoryToHaikuImage home config settings deskbar Desktop\ applets ;
 DESKBAR_DESKTOP_APPLETS = LaunchBox NetworkStatus PowerStatus ProcessController
 	Workspaces
 ;
 for linkTarget in $(DESKBAR_DESKTOP_APPLETS) {
-	AddSymlinkToHaikuImage home config be Desktop\ applets
+	AddSymlinkToHaikuImage home config settings deskbar Desktop\ applets
 		: /boot/system/apps/$(linkTarget) : $(linkTarget) ;
 }
 
 # Deskbar Preferences links
-AddDirectoryToHaikuImage home config be Preferences ;
+AddDirectoryToHaikuImage home config settings deskbar Preferences ;
 DESKBAR_PREFERENCES = $(SYSTEM_PREFERENCES:B) ;
 for linkTarget in $(DESKBAR_PREFERENCES) {
-	AddSymlinkToHaikuImage home config be Preferences
-		: /boot/system/preferences/$(linkTarget) : $(linkTarget) ;
+	AddSymlinkToHaikuImage home config settings deskbar Preferences
+		: /boot/system/preferences/$(linkTarget)
+		: $(linkTarget) ;
 }
 
 # Deskbar Demo links
-AddDirectoryToHaikuImage home config be Demos ;
+AddDirectoryToHaikuImage home config settings deskbar Demos ;
 for linkTarget in $(SYSTEM_DEMOS) {
-	AddSymlinkToHaikuImage home config be Demos
+	AddSymlinkToHaikuImage home config settings deskbar Demos
 		: /boot/system/demos/$(linkTarget) : $(linkTarget) ;
 }
 
@@ -464,11 +466,6 @@ AddFilesToHaikuImage common etc profile.d : $(profileFiles) ;
 #AddFilesToHaikuImage common etc bash_completion.d helpers
 #    : $(bashCompletionHelperFiles) ;
 
-local dataFiles = teapot.data ;
-dataFiles = $(dataFiles:G=data) ;
-SEARCH on $(dataFiles) = [ FDirName $(HAIKU_TOP) data system data ] ;
-AddFilesToHaikuImage system data : $(dataFiles) ;
-
 local fortuneFiles = [ Glob $(HAIKU_TOP)/data/system/data/fortunes
 	: [a-zA-Z0-9]* ] ;
 fortuneFiles = $(fortuneFiles:G=data!fortunes) ;
@@ -499,10 +496,54 @@ AddSymlinkToHaikuImage system data Keymaps : Swedish : Finnish ;
 AddSymlinkToHaikuImage system data Keymaps : Slovene : Croatian ;
 AddSymlinkToHaikuImage system data Keymaps : US-International : Brazilian ;
 
+# Copy keyboard layout files to the image one-by-one.
 local keyboardLayoutsDir
 	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts ] ;
-local keyboardLayouts = [ Glob $(keyboardLayoutsDir) : [^.]* ] ;
-AddFilesToHaikuImage system data KeyboardLayouts : $(keyboardLayouts) ;
+local keyboardLayoutFiles =
+	"Generic 104-key"
+	"Generic 105-key International"
+	"Kinesis Advantage"
+	"Kinesis Ergo Elan International"
+	"TypeMatrix 2030" ;
+keyboardLayoutFiles = $(keyboardLayoutFiles:G=keyboard-layout) ;
+SEARCH on $(keyboardLayoutFiles) = $(keyboardLayoutsDir) ;
+AddFilesToHaikuImage system data KeyboardLayouts
+	: $(keyboardLayoutFiles) ;
+
+# Add Apple Aluminum keyboard layout files to the image in an Apple Aluminum
+# subdirectory. The subdirectory is turned into a submenu in the Layout menu
+# of the Keymap preference app.
+local appleAluminumDir
+	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts
+		Apple\ Aluminum ] ;
+local appleAluminumFiles =
+	"Apple Aluminium Extended International"
+	"Apple Aluminium International"
+	"Apple Aluminum (US)"
+	"Apple Aluminum Extended (US)" ;
+appleAluminumFiles = $(appleAluminumFiles:G=keyboard-layout) ;
+SEARCH on $(appleAluminumFiles) = $(appleAluminumDir) ;
+AddFilesToHaikuImage system data KeyboardLayouts Apple\ Aluminum
+	: $(appleAluminumFiles) ;
+
+# Add ThinkPad keyboard layout files to the image in a ThinkPad
+# subdirectory. The subdirectory is turned into a submenu in the Layout menu
+# of the Keymap preference app.
+local thinkpadDir
+	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts ThinkPad ] ;
+local thinkPadFiles =
+	"ThinkPad (US)"
+	"ThinkPad International"
+	"ThinkPad T400s (US)"
+	"ThinkPad T400s International"
+	"ThinkPad X1 (US)"
+	"ThinkPad X1 International"
+	"ThinkPad X100e (US)"
+	"ThinkPad X100e International" ;
+thinkPadFiles = $(thinkPadFiles:G=keyboard-layout) ;
+SEARCH on $(thinkPadFiles) = $(thinkpadDir) ;
+AddFilesToHaikuImage system data KeyboardLayouts ThinkPad
+	: $(thinkPadFiles) ;
 
 local driverSettingsFiles = <driver-settings>kernel ;
 SEARCH on $(driverSettingsFiles)

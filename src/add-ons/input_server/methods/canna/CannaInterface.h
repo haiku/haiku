@@ -1,12 +1,10 @@
-//
-//	CannaInterface.h
-//	canna library wrapper
+/*
+ * Copyright 2011 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 1999 M.Kawamura
+ */
 
-//	This is a part of...
-//	CannaIM
-//	version 1.0
-//	(c) 1999 M.Kawamura
-//
 
 #ifndef _CANNA_INTERFACE_H
 #define _CANNA_INTERFACE_H
@@ -60,7 +58,7 @@ private:
 	uint32				UpdateKanjiStatus();
 	void				InitializeCanna();
 
-	
+
 public:
 						CannaInterface( char *basepath );
 						~CannaInterface();

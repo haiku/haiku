@@ -7,7 +7,6 @@
 
 #include <tracing.h>
 
-#include <stdarg.h>
 #include <stdlib.h>
 
 #include <algorithm>
@@ -21,12 +20,6 @@
 #include <thread.h>
 #include <util/AutoLock.h>
 #include <vm/vm.h>
-
-
-struct tracing_stack_trace {
-	int32	depth;
-	addr_t	return_addresses[0];
-};
 
 
 #if ENABLE_TRACING
@@ -65,6 +58,26 @@ static const size_t kMaxTracingEntryByteSize
 	= ((1 << 13) - 1) * sizeof(trace_entry);
 
 
+struct TraceOutputPrint {
+	TraceOutputPrint(TraceOutput& output)
+		:
+		fOutput(output)
+	{
+	}
+
+	void operator()(const char* format,...) const
+	{
+		va_list args;
+		va_start(args, format);
+		fOutput.PrintArgs(format, args);
+		va_end(args);
+	}
+
+private:
+	TraceOutput&	fOutput;
+};
+
+
 class TracingMetaData {
 public:
 	static	status_t			Create(TracingMetaData*& _metaData);
@@ -86,6 +99,8 @@ public:
 			trace_entry*		PreviousEntry(trace_entry* entry);
 
 			trace_entry*		AllocateEntry(size_t size, uint16 flags);
+
+			bool				IsInBuffer(void* address, size_t size);
 
 private:
 			bool				_FreeFirstEntry();
@@ -116,6 +131,33 @@ static bool sTracingDataRecovered = false;
 
 
 // #pragma mark -
+
+
+template<typename Print>
+static void
+print_stack_trace(struct tracing_stack_trace* stackTrace,
+	const Print& print)
+{
+	if (stackTrace == NULL || stackTrace->depth <= 0)
+		return;
+
+	for (int32 i = 0; i < stackTrace->depth; i++) {
+		addr_t address = stackTrace->return_addresses[i];
+
+		const char* symbol;
+		const char* imageName;
+		bool exactMatch;
+		addr_t baseAddress;
+
+		if (elf_debug_lookup_symbol_address(address, &baseAddress, &symbol,
+				&imageName, &exactMatch) == B_OK) {
+			print("  %p  %s + 0x%lx (%s)%s\n", (void*)address, symbol,
+				address - baseAddress, imageName,
+				exactMatch ? "" : " (nearest)");
+		} else
+			print("  %p\n", (void*)address);
+	}
+}
 
 
 // #pragma mark - TracingMetaData
@@ -242,6 +284,25 @@ TracingMetaData::AllocateEntry(size_t size, uint16 flags)
 		fAfterLastEntry, fFirstEntry, fEntries));
 
 	return entry;
+}
+
+
+bool
+TracingMetaData::IsInBuffer(void* address, size_t size)
+{
+	if (fEntries == 0)
+		return false;
+
+	addr_t start = (addr_t)address;
+	addr_t end = start + size;
+
+	if (start < (addr_t)fBuffer || end > (addr_t)(fBuffer + kBufferSize))
+		return false;
+
+	if (fFirstEntry > fAfterLastEntry)
+		return start >= (addr_t)fFirstEntry || end <= (addr_t)fAfterLastEntry;
+
+	return start >= (addr_t)fFirstEntry && end <= (addr_t)fAfterLastEntry;
 }
 
 
@@ -455,8 +516,8 @@ bool
 TracingMetaData::_InitPreviousTracingData()
 {
 	// TODO: ATM re-attaching the previous tracing buffer doesn't work very
-	// well. The entries should checked more thoroughly for validity -- e.g. the
-	// pointers to the entries' vtable pointers could be invalid, which can
+	// well. The entries should be checked more thoroughly for validity -- e.g.
+	// the pointers to the entries' vtable pointers could be invalid, which can
 	// make the "traced" command quite unusable. The validity of the entries
 	// could be checked in a safe environment (i.e. with a fault handler) with
 	// typeid() and call of a virtual function.
@@ -624,20 +685,14 @@ TraceOutput::Clear()
 
 
 void
-TraceOutput::Print(const char* format,...)
+TraceOutput::PrintArgs(const char* format, va_list args)
 {
 #if ENABLE_TRACING
 	if (IsFull())
 		return;
 
-	if (fSize < fCapacity) {
-		va_list args;
-		va_start(args, format);
-		size_t length = vsnprintf(fBuffer + fSize, fCapacity - fSize, format,
-			args);
-		fSize += std::min(length, fCapacity - fSize - 1);
-		va_end(args);
-	}
+	size_t length = vsnprintf(fBuffer + fSize, fCapacity - fSize, format, args);
+	fSize += std::min(length, fCapacity - fSize - 1);
 #endif
 }
 
@@ -646,6 +701,7 @@ void
 TraceOutput::PrintStackTrace(tracing_stack_trace* stackTrace)
 {
 #if ENABLE_TRACING
+	print_stack_trace(stackTrace, TraceOutputPrint(*this));
 	if (stackTrace == NULL || stackTrace->depth <= 0)
 		return;
 
@@ -737,17 +793,6 @@ TraceEntry::operator new(size_t size, const std::nothrow_t&) throw()
 //	#pragma mark -
 
 
-AbstractTraceEntry::AbstractTraceEntry()
-{
-	Thread* thread = thread_get_current_thread();
-	if (thread != NULL) {
-		fThread = thread->id;
-		if (thread->team)
-			fTeam = thread->team->id;
-	}
-	fTime = system_time();
-}
-
 AbstractTraceEntry::~AbstractTraceEntry()
 {
 }
@@ -774,6 +819,38 @@ AbstractTraceEntry::Dump(TraceOutput& out)
 void
 AbstractTraceEntry::AddDump(TraceOutput& out)
 {
+}
+
+
+void
+AbstractTraceEntry::_Init()
+{
+	Thread* thread = thread_get_current_thread();
+	if (thread != NULL) {
+		fThread = thread->id;
+		if (thread->team)
+			fTeam = thread->team->id;
+	}
+	fTime = system_time();
+}
+
+
+//	#pragma mark - AbstractTraceEntryWithStackTrace
+
+
+
+AbstractTraceEntryWithStackTrace::AbstractTraceEntryWithStackTrace(
+	size_t stackTraceDepth, size_t skipFrames, bool kernelOnly)
+{
+	fStackTrace = capture_tracing_stack_trace(stackTraceDepth, skipFrames + 1,
+		kernelOnly);
+}
+
+
+void
+AbstractTraceEntryWithStackTrace::DumpStackTrace(TraceOutput& out)
+{
+	out.PrintStackTrace(fStackTrace);
 }
 
 
@@ -1595,6 +1672,39 @@ capture_tracing_stack_trace(int32 maxCount, int32 skipFrames, bool kernelOnly)
 }
 
 
+addr_t
+tracing_find_caller_in_stack_trace(struct tracing_stack_trace* stackTrace,
+	const addr_t excludeRanges[], uint32 excludeRangeCount)
+{
+	for (int32 i = 0; i < stackTrace->depth; i++) {
+		addr_t returnAddress = stackTrace->return_addresses[i];
+
+		bool inRange = false;
+		for (uint32 j = 0; j < excludeRangeCount; j++) {
+			if (returnAddress >= excludeRanges[j * 2 + 0]
+				&& returnAddress < excludeRanges[j * 2 + 1]) {
+				inRange = true;
+				break;
+			}
+		}
+
+		if (!inRange)
+			return returnAddress;
+	}
+
+	return 0;
+}
+
+
+void
+tracing_print_stack_trace(struct tracing_stack_trace* stackTrace)
+{
+#if ENABLE_TRACING
+	print_stack_trace(stackTrace, kprintf);
+#endif
+}
+
+
 int
 dump_tracing(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 {
@@ -1603,6 +1713,33 @@ dump_tracing(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 #else
 	return 0;
 #endif
+}
+
+
+bool
+tracing_is_entry_valid(AbstractTraceEntry* candidate, bigtime_t entryTime)
+{
+#if ENABLE_TRACING
+	if (!sTracingMetaData->IsInBuffer(candidate, sizeof(*candidate)))
+		return false;
+
+	if (entryTime < 0)
+		return true;
+
+	TraceEntryIterator iterator;
+	while (TraceEntry* entry = iterator.Next()) {
+		AbstractTraceEntry* abstract = dynamic_cast<AbstractTraceEntry*>(entry);
+		if (abstract == NULL)
+			continue;
+
+		if (abstract != candidate && abstract->Time() > entryTime)
+			return false;
+
+		return candidate->Time() == entryTime;
+	}
+#endif
+
+	return false;
 }
 
 

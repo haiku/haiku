@@ -18,9 +18,8 @@
 
 #include "ObjectView.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-
+#include <Application.h>
+#include <Catalog.h>
 #include <Cursor.h>
 #include <InterfaceKit.h>
 #include <FindDirectory.h>
@@ -29,8 +28,8 @@
 #include "GLObject.h"
 #include "ResScroll.h"
 
-#define teapotData "teapot.data"
-char teapotPath[PATH_MAX];
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ObjectView"
 
 float displayScale = 1.0;
 float depthOfView = 30.0;
@@ -50,6 +49,9 @@ float red[3] = {1.0, 0.0, 0.0};
 
 float* bgColor = black;
 
+const char *kNoResourceError = B_TRANSLATE("The Teapot 3D model was "
+									"not found in application resources. "
+									"Please repair the program installation.");
 
 struct light {
 	float *ambient;
@@ -166,12 +168,18 @@ ObjectView::ObjectView(BRect rect, const char *name, ulong resizingMode,
 	quittingSem = create_sem(1, "quitting sem");
 	drawEvent = create_sem(0, "draw event");
 
-	char findDir[PATH_MAX];
-	find_directory(B_SYSTEM_DATA_DIRECTORY, -1, true, findDir, PATH_MAX);
-	sprintf(teapotPath, "%s/%s", findDir, teapotData);
-	fObjListLock.Lock();
-	fObjects.AddItem(new TriangleObject(this, teapotPath));
-	fObjListLock.Unlock();
+	TriangleObject *Tri = new TriangleObject(this);
+	if (Tri->InitCheck() == B_OK) {
+		fObjListLock.Lock();
+		fObjects.AddItem(Tri);
+		fObjListLock.Unlock();
+	} else {
+		BAlert *NoResourceAlert	= new BAlert(B_TRANSLATE("Error"),
+						kNoResourceError, B_TRANSLATE("OK"), NULL, NULL,
+						B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_STOP_ALERT);
+		NoResourceAlert->Go();
+		delete Tri;
+	}
 }
 
 
@@ -304,12 +312,23 @@ ObjectView::MessageReceived(BMessage* msg)
 			fForceRedraw = true;
 			setEvent(drawEvent);
 			break;
-		case kMsgAddModel:
-			fObjListLock.Lock();
-			fObjects.AddItem(new TriangleObject(this, teapotPath));
-			fObjListLock.Unlock();
+		case kMsgAddModel: 
+		{
+			TriangleObject *Tri = new TriangleObject(this);
+			if (Tri->InitCheck() == B_OK) {
+				fObjListLock.Lock();
+				fObjects.AddItem(Tri);
+				fObjListLock.Unlock();
+			} else {
+				BAlert *NoResourceAlert	= new BAlert(B_TRANSLATE("Error"),
+						kNoResourceError, B_TRANSLATE("OK"), NULL, NULL,
+						B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_STOP_ALERT);
+				NoResourceAlert->Go();
+				delete Tri;
+			}
 			setEvent(drawEvent);
 			break;
+		}
 		case kMsgLights:
 		{
 			msg->FindPointer("source", reinterpret_cast<void**>(&item));

@@ -279,6 +279,7 @@ struct btrfs_extent_data {
 		return B_LENDIAN_TO_HOST_INT64(generation); }
 	uint64 MemoryBytes() const {
 		return B_LENDIAN_TO_HOST_INT64(memory_size); }
+	uint8 Compression() const { return compression; }
 	uint8 Type() const { return type; }
 	uint64 DiskOffset() const {
 		return B_LENDIAN_TO_HOST_INT64(disk_offset); }
@@ -309,6 +310,10 @@ struct btrfs_extent_data {
 #define BTRFS_KEY_TYPE_INODE_REF		12
 #define BTRFS_KEY_TYPE_ROOT_ITEM		132
 #define BTRFS_KEY_TYPE_XATTR_ITEM		24
+
+#define BTRFS_EXTENT_COMPRESS_NONE		0
+#define BTRFS_EXTENT_COMPRESS_ZLIB		1
+#define BTRFS_EXTENT_COMPRESS_LZO		2
 
 #define BTRFS_EXTENT_DATA_INLINE		0
 #define BTRFS_EXTENT_DATA_REGULAR		1

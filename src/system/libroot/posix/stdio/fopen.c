@@ -41,6 +41,8 @@
 #include <stdio.h>
 #include <errno.h>
 
+#include <errno_private.h>
+
 #include "local.h"
 
 FILE *
@@ -63,7 +65,7 @@ fopen(file, mode)
 	if ((f = open(file, oflags, DEFFILEMODE)) < 0) {
 		fp->_flags = 0;			/* release */
 /* XXX - temporary hack */
-		errno = f;
+		__set_errno(f);
 		return (NULL);
 	}
 	fp->_file = f;

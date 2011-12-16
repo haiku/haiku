@@ -16,21 +16,20 @@ public:
 
 protected:
 	virtual Decorator*			_AllocateDecorator(DesktopSettings& settings,
-									BRect rect, window_look look, uint32 flags);
+									BRect rect);
 };
 
 
 class MacDecorator: public Decorator {
 public:
 								MacDecorator(DesktopSettings& settings,
-									BRect frame, window_look look,
-									uint32 flags);
+									BRect frame);
 	virtual						~MacDecorator();
 
 			void				Draw(BRect updateRect);
 			void				Draw();
 
-	virtual	Region				RegionAt(BPoint where) const;
+	virtual	Region				RegionAt(BPoint where, int32& tab) const;
 
 protected:
 			void				_DoLayout();
@@ -43,8 +42,8 @@ protected:
 			void				_DrawZoom(BRect r);
 			void				_DrawMinimize(BRect r);
 
-			void				_SetTitle(const char* string,
-	 								BRegion* updateRegion = NULL);
+			void				_SetTitle(Tab* tab, const char* string,
+									BRegion* updateRegion = NULL);
 
 			void				_FontsChanged(DesktopSettings& settings,
 									BRegion* updateRegion);
@@ -59,6 +58,11 @@ protected:
 
 			void				_GetFootprint(BRegion *region);
 
+			// TODO
+			Tab*				_AllocateNewTab();
+			bool				_AddTab(DesktopSettings&, long int, BRegion*);
+			bool				_RemoveTab(long int, BRegion*);
+			bool				_MoveTab(long int, long int, bool, BRegion*);
 private:
 			void				_UpdateFont(DesktopSettings& settings);
 			void				_DrawBlendedRect(DrawingEngine* engine,

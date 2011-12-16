@@ -143,8 +143,14 @@ status_t	vfs_create_special_node(const char *path, fs_vnode *subVnode,
 				struct vnode **_createdVnode);
 
 /* service call for the node monitor */
-status_t	resolve_mount_point_to_volume_root(dev_t mountID, ino_t nodeID,
+status_t	vfs_resolve_vnode_to_covering_vnode(dev_t mountID, ino_t nodeID,
 				dev_t *resolvedMountID, ino_t *resolvedNodeID);
+
+/* service calls for private file systems */
+status_t	vfs_get_mount_point(dev_t mountID, dev_t* _mountPointMountID,
+				ino_t* _mountPointNodeID);
+status_t	vfs_bind_mount_directory(dev_t mountID, ino_t nodeID,
+				dev_t coveredMountID, ino_t coveredNodeID);
 
 /* calls the syscall dispatcher should use for user file I/O */
 dev_t		_user_mount(const char *path, const char *device,

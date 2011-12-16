@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,7 +8,6 @@
 
 #include <dirent.h>
 
-#include <algorithm>
 #include <new>
 
 #include <fs_info.h>
@@ -18,15 +17,15 @@
 
 #include <AutoDeleter.h>
 
+#include "AttributeCookie.h"
+#include "AttributeDirectoryCookie.h"
 #include "DebugSupport.h"
 #include "Directory.h"
 #include "GlobalFactory.h"
-#include "LeafNode.h"
+#include "Query.h"
+#include "PackageFSRoot.h"
+#include "Utils.h"
 #include "Volume.h"
-
-
-using BPackageKit::BHPKG::BBufferDataReader;
-using BPackageKit::BHPKG::BFDDataReader;
 
 
 static const uint32 kOptimalIOSize = 64 * 1024;
@@ -46,21 +45,6 @@ is_user_in_group(gid_t gid)
 	}
 
 	return (gid == getegid());
-}
-
-
-static bool
-set_dirent_name(struct dirent* buffer, size_t bufferSize, const char* name,
-	size_t nameLen)
-{
-	size_t length = (buffer->d_name + nameLen + 1) - (char*)buffer;
-	if (length > bufferSize)
-		return false;
-
-	memcpy(buffer->d_name, name, nameLen);
-	buffer->d_name[nameLen] = '\0';
-	buffer->d_reclen = length;
-	return true;
 }
 
 
@@ -117,14 +101,17 @@ packagefs_mount(fs_volume* fsVolume, const char* device, uint32 flags,
 		RETURN_ERROR(B_NO_MEMORY);
 	ObjectDeleter<Volume> volumeDeleter(volume);
 
+	// Initialize the fs_volume now already, so it is mostly usable in during
+	// mounting.
+	fsVolume->private_volume = volumeDeleter.Detach();
+	fsVolume->ops = &gPackageFSVolumeOps;
+
 	status_t error = volume->Mount(parameters);
 	if (error != B_OK)
 		return error;
 
 	// set return values
 	*_rootID = volume->RootDirectory()->ID();
-	fsVolume->private_volume = volumeDeleter.Detach();
-	fsVolume->ops = &gPackageFSVolumeOps;
 
 	return B_OK;
 }
@@ -151,7 +138,8 @@ packagefs_read_fs_info(fs_volume* fsVolume, struct fs_info* info)
 
 	FUNCTION("volume: %p, info: %p\n", volume, info);
 
-	info->flags = B_FS_IS_READONLY;
+	info->flags = B_FS_IS_PERSISTENT | B_FS_IS_READONLY | B_FS_HAS_MIME
+		| B_FS_HAS_ATTR | B_FS_HAS_QUERY | B_FS_SUPPORTS_NODE_MONITORING;
 	info->block_size = 4096;
 	info->io_size = kOptimalIOSize;
 	info->total_blocks = info->free_blocks = 1;
@@ -202,6 +190,22 @@ packagefs_lookup(fs_volume* fsVolume, fs_vnode* fsDir, const char* entryName,
 	// get the vnode reference
 	*_vnid = node->ID();
 	RETURN_ERROR(volume->GetVNode(*_vnid, node));
+}
+
+
+static status_t
+packagefs_get_vnode_name(fs_volume* fsVolume, fs_vnode* fsNode, char* buffer,
+	size_t bufferSize)
+{
+	Node* node = (Node*)fsNode->private_node;
+
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), %p, %zu\n",
+		fsVolume->private_volume, node, node->ID(), buffer, bufferSize);
+
+	if (strlcpy(buffer, node->Name(), bufferSize) >= bufferSize)
+		return B_BUFFER_OVERFLOW;
+
+	return B_OK;
 }
 
 
@@ -295,17 +299,7 @@ packagefs_read_symlink(fs_volume* fsVolume, fs_vnode* fsNode, char* buffer,
 	if (!S_ISLNK(node->Mode()))
 		return B_BAD_VALUE;
 
-	const char* linkPath = dynamic_cast<LeafNode*>(node)->SymlinkPath();
-	if (linkPath == NULL) {
-		*_bufferSize = 0;
-		return B_OK;
-	}
-
-	size_t toCopy = std::min(strlen(linkPath), *_bufferSize);
-	memcpy(buffer, linkPath, toCopy);
-	*_bufferSize = toCopy;
-
-	return B_OK;
+	return node->ReadSymlink(buffer, _bufferSize);
 }
 
 
@@ -627,7 +621,7 @@ packagefs_read_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie,
 
 		// fill in the entry name -- checks whether the entry fits into the
 		// buffer
-		if (!set_dirent_name(buffer, bufferSize, name, strlen(name))) {
+		if (!set_dirent_name(buffer, bufferSize, name)) {
 			if (count == 0)
 				RETURN_ERROR(B_BUFFER_OVERFLOW);
 			break;
@@ -672,50 +666,6 @@ packagefs_rewind_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
 // #pragma mark - Attribute Directories
 
 
-struct AttributeDirectoryCookie {
-	Node*					node;
-	PackageNode*			packageNode;
-	PackageNodeAttribute*	attribute;
-
-	AttributeDirectoryCookie(Node* node)
-		:
-		node(node),
-		packageNode(node->GetPackageNode()),
-		attribute(NULL)
-	{
-		if (packageNode != NULL) {
-			packageNode->AcquireReference();
-			attribute = packageNode->Attributes().Head();
-		}
-	}
-
-	~AttributeDirectoryCookie()
-	{
-		if (packageNode != NULL)
-			packageNode->ReleaseReference();
-	}
-
-	PackageNodeAttribute* Current() const
-	{
-		return attribute;
-	}
-
-	void Next()
-	{
-		if (attribute == NULL)
-			return;
-
-		attribute = packageNode->Attributes().GetNext(attribute);
-	}
-
-	void Rewind()
-	{
-		if (packageNode != NULL)
-			attribute = packageNode->Attributes().Head();
-	}
-};
-
-
 status_t
 packagefs_open_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void** _cookie)
 {
@@ -731,10 +681,10 @@ packagefs_open_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void** _cookie)
 
 	// create a cookie
 	NodeReadLocker nodeLocker(node);
-	AttributeDirectoryCookie* cookie
-		= new(std::nothrow) AttributeDirectoryCookie(node);
-	if (cookie == NULL)
-		RETURN_ERROR(B_NO_MEMORY);
+	AttributeDirectoryCookie* cookie;
+	error = node->OpenAttributeDirectory(cookie);
+	if (error != B_OK)
+		RETURN_ERROR(error);
 
 	*_cookie = cookie;
 	return B_OK;
@@ -744,7 +694,8 @@ packagefs_open_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void** _cookie)
 status_t
 packagefs_close_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
 {
-	return B_OK;
+	AttributeDirectoryCookie* cookie = (AttributeDirectoryCookie*)_cookie;
+	return cookie->Close();
 }
 
 
@@ -780,53 +731,7 @@ packagefs_read_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie,
 	TOUCH(volume);
 	TOUCH(node);
 
-	uint32 maxCount = *_count;
-	uint32 count = 0;
-
-	dirent* previousEntry = NULL;
-
-	while (PackageNodeAttribute* attribute = cookie->Current()) {
-		// don't read more entries than requested
-		if (count >= maxCount)
-			break;
-
-		// align the buffer for subsequent entries
-		if (count > 0) {
-			addr_t offset = (addr_t)buffer % 8;
-			if (offset > 0) {
-				offset = 8 - offset;
-				if (bufferSize <= offset)
-					break;
-
-				previousEntry->d_reclen += offset;
-				buffer = (dirent*)((addr_t)buffer + offset);
-				bufferSize -= offset;
-			}
-		}
-
-		// fill in the entry name -- checks whether the entry fits into the
-		// buffer
-		const char* name = attribute->Name();
-		if (!set_dirent_name(buffer, bufferSize, name, strlen(name))) {
-			if (count == 0)
-				RETURN_ERROR(B_BUFFER_OVERFLOW);
-			break;
-		}
-
-		// fill in the other data
-		buffer->d_dev = volume->ID();
-		buffer->d_ino = node->ID();
-
-		count++;
-		previousEntry = buffer;
-		bufferSize -= buffer->d_reclen;
-		buffer = (dirent*)((addr_t)buffer + buffer->d_reclen);
-
-		cookie->Next();
-	}
-
-	*_count = count;
-	return B_OK;
+	return cookie->Read(volume->ID(), node->ID(), buffer, bufferSize, _count);
 }
 
 
@@ -842,39 +747,11 @@ packagefs_rewind_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
 	TOUCH(volume);
 	TOUCH(node);
 
-	cookie->Rewind();
-
-	return B_OK;
+	return cookie->Rewind();
 }
 
 
 // #pragma mark - Attribute Operations
-
-
-struct AttributeCookie {
-	PackageNode*			packageNode;
-	Package*				package;
-	PackageNodeAttribute*	attribute;
-	int						openMode;
-
-	AttributeCookie(PackageNode* packageNode, PackageNodeAttribute* attribute,
-		int openMode)
-		:
-		packageNode(packageNode),
-		package(packageNode->GetPackage()),
-		attribute(attribute),
-		openMode(openMode)
-	{
-		packageNode->AcquireReference();
-		package->AcquireReference();
-	}
-
-	~AttributeCookie()
-	{
-		packageNode->ReleaseReference();
-		package->ReleaseReference();
-	}
-};
 
 
 status_t
@@ -898,21 +775,12 @@ packagefs_open_attr(fs_volume* fsVolume, fs_vnode* fsNode, const char* name,
 	if (error != B_OK)
 		return error;
 
-	// get the package node and the respectively named attribute
-	PackageNode* packageNode = node->GetPackageNode();
-	PackageNodeAttribute* attribute = packageNode != NULL
-		? packageNode->FindAttribute(name) : NULL;
-	if (attribute == NULL)
-		return B_ENTRY_NOT_FOUND;
-
-	// allocate the cookie
-	AttributeCookie* cookie = new(std::nothrow) AttributeCookie(packageNode,
-		attribute, openMode);
-	if (cookie == NULL)
-		RETURN_ERROR(B_NO_MEMORY);
+	AttributeCookie* cookie;
+	error = node->OpenAttribute(name, openMode, cookie);
+	if (error != B_OK)
+		return error;
 
 	*_cookie = cookie;
-
 	return B_OK;
 }
 
@@ -920,7 +788,8 @@ packagefs_open_attr(fs_volume* fsVolume, fs_vnode* fsNode, const char* name,
 status_t
 packagefs_close_attr(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
 {
-	return B_OK;
+	AttributeCookie* cookie = (AttributeCookie*)_cookie;
+	RETURN_ERROR(cookie->Close());
 }
 
 
@@ -942,38 +811,6 @@ packagefs_free_attr_cookie(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
 }
 
 
-static status_t
-read_package_data(const BPackageData& data, BDataReader* dataReader, off_t offset,
-	void* buffer, size_t* bufferSize)
-{
-	// create a BPackageDataReader
-	BPackageDataReader* reader;
-	status_t error = GlobalFactory::Default()->CreatePackageDataReader(
-		dataReader, data, reader);
-	if (error != B_OK)
-		RETURN_ERROR(error);
-	ObjectDeleter<BPackageDataReader> readerDeleter(reader);
-
-	// check the offset
-	if (offset < 0 || (uint64)offset > data.UncompressedSize())
-		return B_BAD_VALUE;
-
-	// clamp the size
-	size_t toRead = std::min((uint64)*bufferSize,
-		data.UncompressedSize() - offset);
-
-	// read
-	if (toRead > 0) {
-		status_t error = reader->ReadData(offset, buffer, toRead);
-		if (error != B_OK)
-			RETURN_ERROR(error);
-	}
-
-	*bufferSize = toRead;
-	return B_OK;
-}
-
-
 status_t
 packagefs_read_attr(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie,
 	off_t offset, void* buffer, size_t* bufferSize)
@@ -987,21 +824,7 @@ packagefs_read_attr(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie,
 	TOUCH(volume);
 	TOUCH(node);
 
-	const BPackageData& data = cookie->attribute->Data();
-	if (data.IsEncodedInline()) {
-		// inline data
-		BBufferDataReader dataReader(data.InlineData(), data.CompressedSize());
-		return read_package_data(data, &dataReader, offset, buffer, bufferSize);
-	}
-
-	// data not inline -- open the package
-	int fd = cookie->package->Open();
-	if (fd < 0)
-		RETURN_ERROR(fd);
-	PackageCloser packageCloser(cookie->package);
-
-	BFDDataReader dataReader(fd);
-	return read_package_data(data, &dataReader, offset, buffer, bufferSize);
+	return cookie->ReadAttribute(offset, buffer, bufferSize);
 }
 
 
@@ -1018,10 +841,227 @@ packagefs_read_attr_stat(fs_volume* fsVolume, fs_vnode* fsNode,
 	TOUCH(volume);
 	TOUCH(node);
 
-	st->st_size = cookie->attribute->Data().UncompressedSize();
-	st->st_type = cookie->attribute->Type();
+	return cookie->ReadAttributeStat(st);
+}
+
+
+// #pragma mark - index directory & index operations
+
+
+// NOTE: We don't do any locking in the index dir hooks, since once mounted
+// the index directory is immutable.
+
+
+status_t
+packagefs_open_index_dir(fs_volume* fsVolume, void** _cookie)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+
+	FUNCTION("volume: %p\n", volume);
+
+	IndexDirIterator* iterator = new(std::nothrow) IndexDirIterator(
+		volume->GetIndexDirIterator());
+	if (iterator == NULL)
+		return B_NO_MEMORY;
+
+	*_cookie = iterator;
+	return B_OK;
+}
+
+
+status_t
+packagefs_close_index_dir(fs_volume* fsVolume, void* cookie)
+{
+	return B_OK;
+}
+
+
+status_t
+packagefs_free_index_dir_cookie(fs_volume* fsVolume, void* cookie)
+{
+	FUNCTION("volume: %p, cookie: %p\n", fsVolume->private_volume, cookie);
+
+	delete (IndexDirIterator*)cookie;
+	return B_OK;
+}
+
+
+status_t
+packagefs_read_index_dir(fs_volume* fsVolume, void* cookie,
+	struct dirent* buffer, size_t bufferSize, uint32* _num)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+
+	FUNCTION("volume: %p, cookie: %p, buffer: %p, bufferSize: %zu, num: %"
+		B_PRIu32 "\n", volume, cookie, buffer, bufferSize, *_num);
+
+	IndexDirIterator* iterator = (IndexDirIterator*)cookie;
+
+	if (*_num == 0)
+		return B_BAD_VALUE;
+
+	IndexDirIterator previousIterator = *iterator;
+
+	// get the next index
+	Index* index = iterator->Next();
+	if (index == NULL) {
+		*_num = 0;
+		return B_OK;
+	}
+
+	// fill in the entry
+	if (!set_dirent_name(buffer, bufferSize, index->Name())) {
+		*iterator = previousIterator;
+		return B_BUFFER_OVERFLOW;
+	}
+
+	buffer->d_dev = volume->ID();
+	buffer->d_ino = 0;
+
+	*_num = 1;
+	return B_OK;
+}
+
+
+status_t
+packagefs_rewind_index_dir(fs_volume* fsVolume, void* cookie)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+
+	FUNCTION("volume: %p, cookie: %p\n", volume, cookie);
+
+	IndexDirIterator* iterator = (IndexDirIterator*)cookie;
+	*iterator = volume->GetIndexDirIterator();
 
 	return B_OK;
+}
+
+
+status_t
+packagefs_create_index(fs_volume* fsVolume, const char* name, uint32 type,
+	uint32 flags)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+packagefs_remove_index(fs_volume* fsVolume, const char* name)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+packagefs_read_index_stat(fs_volume* fsVolume, const char* name,
+	struct stat* stat)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+
+	FUNCTION("volume: %p, name: \"%s\", stat: %p\n", volume, name, stat);
+
+	Index* index = volume->FindIndex(name);
+	if (index == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	VolumeReadLocker volumeReadLocker(volume);
+
+	memset(stat, 0, sizeof(*stat));
+		// TODO: st_mtime, st_crtime, st_uid, st_gid are made available to
+		// userland, so we should make an attempt to fill in values that make
+		// sense.
+
+	stat->st_type = index->Type();
+	stat->st_size = index->CountEntries();
+
+	return B_OK;
+}
+
+
+// #pragma mark - query operations
+
+
+status_t
+packagefs_open_query(fs_volume* fsVolume, const char* queryString, uint32 flags,
+	port_id port, uint32 token, void** _cookie)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+
+	FUNCTION("volume: %p, query: \"%s\", flags: %#" B_PRIx32 ", port: %"
+		B_PRId32 ", token: %" B_PRIu32 "\n", volume, queryString, flags, port,
+		token);
+
+	VolumeWriteLocker volumeWriteLocker(volume);
+
+	Query* query;
+	status_t error = Query::Create(volume, queryString, flags, port, token,
+		query);
+	if (error != B_OK)
+		return error;
+
+	*_cookie = query;
+	return B_OK;
+}
+
+
+status_t
+packagefs_close_query(fs_volume* fsVolume, void* cookie)
+{
+	FUNCTION_START();
+	return B_OK;
+}
+
+
+status_t
+packagefs_free_query_cookie(fs_volume* fsVolume, void* cookie)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Query* query = (Query*)cookie;
+
+	FUNCTION("volume: %p, query: %p\n", volume, query);
+
+	VolumeWriteLocker volumeWriteLocker(volume);
+
+	delete query;
+
+	return B_OK;
+}
+
+
+status_t
+packagefs_read_query(fs_volume* fsVolume, void* cookie, struct dirent* buffer,
+	size_t bufferSize, uint32* _num)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Query* query = (Query*)cookie;
+
+	FUNCTION("volume: %p, query: %p\n", volume, query);
+
+	VolumeWriteLocker volumeWriteLocker(volume);
+
+	status_t error = query->GetNextEntry(buffer, bufferSize);
+	if (error == B_OK)
+		*_num = 1;
+	else if (error == B_ENTRY_NOT_FOUND)
+		*_num = 0;
+	else
+		return error;
+
+	return B_OK;
+}
+
+
+status_t
+packagefs_rewind_query(fs_volume* fsVolume, void* cookie)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Query* query = (Query*)cookie;
+
+	FUNCTION("volume: %p, query: %p\n", volume, query);
+
+	VolumeWriteLocker volumeWriteLocker(volume);
+
+	return query->Rewind();
 }
 
 
@@ -1044,12 +1084,21 @@ packagefs_std_ops(int32 op, ...)
 				return error;
 			}
 
+			error = PackageFSRoot::GlobalInit();
+			if (error != B_OK) {
+				ERROR("Failed to init PackageFSRoot\n");
+				GlobalFactory::DeleteDefault();
+				exit_debugging();
+				return error;
+			}
+
 			return B_OK;
 		}
 
 		case B_MODULE_UNINIT:
 		{
 			PRINT("package_std_ops(): B_MODULE_UNINIT\n");
+			PackageFSRoot::GlobalUninit();
 			GlobalFactory::DeleteDefault();
 			exit_debugging();
 			return B_OK;
@@ -1089,10 +1138,26 @@ fs_volume_ops gPackageFSVolumeOps = {
 	NULL,	// write_fs_info,
 	NULL,	// sync,
 
-	&packagefs_get_vnode
+	&packagefs_get_vnode,
 
-	// TODO: index operations
-	// TODO: query operations
+	// index directory
+	&packagefs_open_index_dir,
+	&packagefs_close_index_dir,
+	&packagefs_free_index_dir_cookie,
+	&packagefs_read_index_dir,
+	&packagefs_rewind_index_dir,
+
+	&packagefs_create_index,
+	&packagefs_remove_index,
+	&packagefs_read_index_stat,
+
+	// query operations
+	&packagefs_open_query,
+	&packagefs_close_query,
+	&packagefs_free_query_cookie,
+	&packagefs_read_query,
+	&packagefs_rewind_query,
+
 	// TODO: FS layer operations
 };
 
@@ -1100,7 +1165,7 @@ fs_volume_ops gPackageFSVolumeOps = {
 fs_vnode_ops gPackageFSVnodeOps = {
 	// vnode operations
 	&packagefs_lookup,
-	NULL,	// get_vnode_name,
+	&packagefs_get_vnode_name,
 	&packagefs_put_vnode,
 	&packagefs_put_vnode,	// remove_vnode -- same as put_vnode
 

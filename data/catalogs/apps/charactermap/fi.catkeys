@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-CharacterMap	4082916013
+1	finnish	x-vnd.Haiku-CharacterMap	2745781253
 Aegean numbers	UnicodeBlocks		Aegean-numerot
 Alphabetic presentation forms	UnicodeBlocks		Aakkosellinen esitysmuoto
 Ancient Greek musical notation	UnicodeBlocks		Antiikin kreikan nuottikirjoitus 
@@ -33,7 +33,7 @@ CJK unified ideographs extension A	UnicodeBlocks		CJK-yhtenäinen ideogrammilaaj
 CJK unified ideographs extension B	UnicodeBlocks		CJK-yhdistetty ideograafinen laajennus B
 Carian	UnicodeBlocks		Carian
 Cham	UnicodeBlocks		Cham
-CharacterMap	System name		Merkkikartta
+CharacterMap	System name		Merkkitaulukot
 Cherokee	UnicodeBlocks		Cherokee
 Clear	CharacterWindow		Nollaa
 Code	CharacterWindow		Koodi
@@ -120,7 +120,7 @@ Miscellaneous symbols and arrows	UnicodeBlocks		Sekalaiset symbolit ja nuolet
 Miscellaneous technical	UnicodeBlocks		Sekalaiset tekniset
 Modifier tone letters	UnicodeBlocks		Määretoonikirjaimet
 Mongolian	UnicodeBlocks		Mongolian kieli
-Muscial symbols	UnicodeBlocks		Musikaaliset symbolit
+Musical symbols	UnicodeBlocks		Musiikkisymbolit
 Myanmar	UnicodeBlocks		Burman kieli
 N'Ko	UnicodeBlocks		N'Ko-kieli
 New Tai Lue	UnicodeBlocks		Uusi Tai Lue

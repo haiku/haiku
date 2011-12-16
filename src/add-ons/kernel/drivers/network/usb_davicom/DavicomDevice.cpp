@@ -118,6 +118,8 @@ DavicomDevice::DavicomDevice(usb_device device, DeviceInfo& deviceInfo)
 {
 	fDeviceInfo = deviceInfo;
 
+	memset(&fMACAddress, 0, sizeof(fMACAddress));
+
 	fNotifyReadSem = create_sem(0, DRIVER_NAME"_notify_read");
 	if (fNotifyReadSem < B_OK) {
 		TRACE_ALWAYS("Error of creating read notify semaphore:%#010x\n",

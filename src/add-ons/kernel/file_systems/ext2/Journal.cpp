@@ -773,7 +773,7 @@ Journal::_CheckFeatures(JournalSuperBlock* superblock)
 			& ~JOURNAL_KNOWN_READ_ONLY_COMPATIBLE_FEATURES) != 0
 		|| (superblock->IncompatibleFeatures()
 			& ~JOURNAL_KNOWN_INCOMPATIBLE_FEATURES) != 0)
-		return B_NOT_SUPPORTED;
+		return B_UNSUPPORTED;
 
 	return B_OK;
 }

@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -836,7 +837,8 @@ DIEEnumerationType::AddAttribute_specification(uint16 attributeName,
 DIEFormalParameter::DIEFormalParameter()
 	:
 	fAbstractOrigin(NULL),
-	fType(NULL)
+	fType(NULL),
+	fArtificial(false)
 {
 }
 
@@ -867,6 +869,15 @@ DIEFormalParameter::AddAttribute_abstract_origin(uint16 attributeName,
 	const AttributeValue& value)
 {
 	fAbstractOrigin = value.reference;
+	return B_OK;
+}
+
+
+status_t
+DIEFormalParameter::AddAttribute_artificial(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fArtificial = value.flag;
 	return B_OK;
 }
 
@@ -1825,7 +1836,9 @@ DIESubprogram::DIESubprogram()
 	fReturnType(NULL),
 	fAddressClass(0),
 	fPrototyped(false),
-	fInline(DW_INL_not_inlined)
+	fInline(DW_INL_not_inlined),
+	fArtificial(false),
+	fCallingConvention(DW_CC_normal)
 {
 }
 
@@ -1870,6 +1883,12 @@ DIESubprogram::AddChild(DebugInfoEntry* child)
 			return B_OK;
 		case DW_TAG_lexical_block:
 			fBlocks.Add(child);
+			return B_OK;
+		case DW_TAG_template_type_parameter:
+			fTemplateTypeParameters.Add(child);
+			return B_OK;
+		case DW_TAG_template_value_parameter:
+			fTemplateValueParameters.Add(child);
 			return B_OK;
 		default:
 			return DIEDeclaredNamedBase::AddChild(child);
@@ -1975,6 +1994,24 @@ DIESubprogram::AddAttribute_frame_base(uint16 attributeName,
 	}
 
 	return B_BAD_DATA;
+}
+
+
+status_t
+DIESubprogram::AddAttribute_artificial(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fArtificial = value.flag;
+	return B_OK;
+}
+
+
+status_t
+DIESubprogram::AddAttribute_calling_convention(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fCallingConvention = value.constant;
+	return B_OK;
 }
 
 
@@ -2169,6 +2206,12 @@ DIEVariable::AddAttribute_specification(uint16 attributeName,
 	const AttributeValue& value)
 {
 	fSpecification = dynamic_cast<DIEVariable*>(value.reference);
+	// in the case of static variables declared within a compound type,
+	// the specification may point to a member entry rather than
+	// a variable entry
+	if (fSpecification == NULL)
+		fSpecification = dynamic_cast<DIEMember*>(value.reference);
+
 	return fSpecification != NULL ? B_OK : B_BAD_DATA;
 }
 

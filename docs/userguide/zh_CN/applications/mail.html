@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -38,38 +38,163 @@
 <li><a href="../../jp/applications/mail.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/applications/mail.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../pt_PT/applications/mail.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/mail.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/mail.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/applications/mail.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="magnify.html">放大镜</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">应用程序</a> 
-::  <a href="mediaplayer.html">媒体播放器</a>  »
+ «  <a href="magnify.html">放大镜</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">应用程序</a> 
+::  <a href="mediaplayer.html">媒体播放器</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
+<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>索引</td></tr>
+<tr class="index"><td><a href="#reading">阅读邮件</a><br />
+	<a href="#creating">新建邮件</a><br />
+	<a href="#preferences">首选项</a></td></tr>
+</table>
 
 <h2><img src="../../images/apps-images/mail-icon_64.png" alt="mail-icon_64.png" width="64" height="64" />电子邮箱</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>桌面栏：</td><td style="width:15px;"></td><td><span class="menu">应用程序</span></td></tr>
 <tr><td>位置：</td><td></td><td><span class="path">/boot/system/apps/Mail</span></td></tr>
-<tr><td>设置：</td><td></td><td><span class="path">~/config/settings/Mail/BeMail Settings</span></td></tr>
+<tr><td>设置：</td><td></td><td><span class="path">~/config/settings/Mail/</span><br />
+<span class="path">~/config/settings/Mail/Menu Links/</span> - 这里的内容出现在电子邮箱的上下文菜单<br />
+<span class="path">~/config/settings/Mail/signatures/</span> - 署名的保存位置<br />
+<span class="path">~/config/settings/Mail/status/</span> - 自定义状态的保存位置</td></tr>
 </table>
 <p><br /></p>
-<p>暂时没有相关文档可供参考。如果您愿意编写相关文档，您可以在 <a href="http://www.freelists.org/list/haiku-doc">文档邮件列表</a>中发布公告来避免工作的重复。</p>
+<p>电子邮箱是 Haiku 默认的邮件查看器和编辑器。它与实际的邮件获取和发送没有任何关系，而后者通常由 mail_demon 完成，并且可以通过 <a href="../preferences/e-mail.html">电子邮箱</a> 首选项进行配置。</p>
+<p>本文是 电子邮件 程序总的使用概览。更多使用信息，请参考 <a href="../workshop-email.html">邮件管理操作练习</a>.</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="reading" name="reading">阅读邮件</a></h2>
+<p>双击邮件文件，在电子邮件程序中打开。其界面非常简单：</p>
+<img src="../images/apps-images/mail-read.png" alt="email-read.png" /> 
+<p>顶部是菜单和可选工具栏，中间是有关邮件的属性部分（发件人，收件人，主题，日期），最下面是邮件主体部分。如果邮件为空或者出现陌生字符，则从弹出菜单中 <span class="menu">编码方式</span> 修改字体编码。</p>
+<p>如果邮件存在附加文件，它们位于邮件的末尾。右键点击，打开弹出菜单，然后选择 <span class="menu">保存附加文件...</span> 或 <span class="menu">打开附加文件</span>。您也可以直接将其拖拽至桌面或者其他文件浏览器窗口。 </p>
+<p>多数的菜单和工具栏项目都很容易理解，因此我们主要关注高亮部分。</p>
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>文件</h3>
+<p>当您关闭新建邮件窗口时，其状态通常会从“新邮件”切换为“已读邮件”。但是您也可以从 <span class="menu">关闭并...</span> 子菜单中设置其他状态。在哪里，您也可以通过 <span class="menu">设置为...</span> 选项创建自定义状态，然后保存到 <span class="path">~/config/settings/Mail/status/</span> 。</p>
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>编辑</h3>
+<p>这里，您能够看到一个条目，用以打开电子邮件 <span class="menu">首选项...</span> （<a href="#preferences">如下</a>）以及用于管理您的 <span class="menu">账户...</span> 的快捷方式，它们将会打开 <a href="../preferences/e-mail.html">电子邮件</a> 首选项面板。</p>
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>视图</h3>
+<p>您只需要用到以下这两个选项：</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">显示邮件头</span></td><td class="onelinetop"><span class="key">ALT</span> <span class="key">H</span></td><td style="width:10px;"></td><td>显示完整的邮件头，方便查找，如跟踪邮件的路径。</td></tr>
+<tr><td class="onelinetop"><span class="menu">显示邮件内容</span></td><td></td><td></td><td>显示邮件原生状态，例如所有的控制字符，并且不显示电子邮件的引用或链接的颜色。</td></tr>
+</table>
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>消息</h3>
+<p>回复邮件有多个选型，它们可能需要一些说明。</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">回复</span></td><td><span class="key">ALT</span> <span class="key">R</span></td><td style="width:10px;"></td><td>该选项将会根据标准回复给发送邮件的服务器。备注：如果是邮件列表，则通常回复到邮件列表，<i>并非</i> 只回复给该邮件的发送者。</td></tr>
+<tr><td class="onelinetop"><span class="menu">回复发件人</span></td><td><span class="key">OPT</span> <span class="key">ALT</span> <span class="key">R</span></td><td></td><td>该选项将会直接发送，并且仅将回复发送给 “发件人” 属性中列出的联系人。</td></tr>
+<tr><td><span class="menu">回复所有人</span></td><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">R</span></td><td></td><td>该选项回复给原始的发送人以及该邮件所有的抄送人（cc'ed）。</td></tr>
+</table>
+<div class="box-info">如果在回复邮件之前，您标记了其中某一段，那么在您的回复邮件中将仅引用标记的内容。这样可以避免过度引用，而且所有人都会对此比较反感。</div>
+<p>The items to <span class="menu">Forward</span>, <span class="menu">Resend</span> and <span class="menu">Copy to new</span> are again pretty self-explaining.</p>
+<p>When you've opened an email from a Tracker or query result window, <span class="menu">Previous message</span> and <span class="menu">Next message</span> will move to the previous/next email in the list.</p>
+<p><span class="menu">Save address</span> collects all email addresses from the header and the actual email body in a submenu. Choosing an address will open the <a href="people.html">People</a> application in order to save the contact information.</p>
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>查询</h3>
+<p>该功能还无法工作，但是其目的在于，它将会显示所有与当前打开邮件相关的邮件，如所有来自同一发件人或者具有相同主题/线索的邮件。</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="creating" name="creating">新建邮件</a></h2>
+<p>A new email is created by invoking the <span class="menu">New mail message</span> menu or the corresponding icon from the tool bar of an open email. Or you just start the Mail application or choose <span class="menu">Create new message...</span> from the context menu of the mailbox icon in the Deskbar.</p>
+<img src="../images/apps-images/mail-write.png" alt="email-write.png" /> 
+<p>The window is pretty similar to the one when reading mails. The menu and tool bar items are slightly different and the text boxes have to be filled with the recipient's email address, subject and so on, of course.</p>
+<p><span class="menu">Cc</span> is short for the anachronistic term "<i>carbon copy</i>" and results in copies of your mail being sent to the listed people. The difference to just listing a buch of addresses in the "To" field is, that you don't directly address the cc'ed people, thereby signaling that you probably don't expect an answer of them.<br />
+<span class="menu">Bcc</span> means "<i>blind carbon copy</i>" which does practically the same as "Cc", but hides the recipients from each other.</p>
+<p>You can enter several recipients by separating their addresses with a comma.
+<span class="menu">To</span>, <span class="menu">CC</span>, and <span class="menu">BCC</span> are pop-up menus. They contain all email addresses on your system found by a query for <a href="people.html">People</a> files. Their "Group" attribute will sort them in corresponding submenus.</p>
+<p>Again, we'll focus on the more interesting features in the menus.</p>
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>文件</h3>
+<p>With <span class="menu">Save as draft</span> you can store your work so far and come back to it later. To load it again, choose it from the <span class="menu">Open draft</span> submenu that will list the result of a query for all mails with the status "Draft".</p>
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>编辑</h3>
+<p><span class="menu">Quote</span> and <span class="menu">Remove quote</span> or their respective shortcuts <span class="key">ALT</span> <span class="key">←</span> / <span class="key">→</span> are used to add/remove a level of quoting by adjusting the number of "&gt;" symbols in front of quoted lines. Just select some text in all the lines you want un/quoted and invoke the menu item.</p>
+
+<img src="../images/apps-images/mail-spellcheck.png" alt="email-spellcheck.png" /> 
+
+<p><span class="menu">Check spelling</span> currently only offers corrections of English texts by marking wrong or unknown words red and showing them in italic.
+Right-clicking such a word opens a context menu offering suggestions to correct the word or to <span class="menu">Add</span> it to the accepted vocabulary.</p>
+<p>Then, there are again the items to open Mail's <span class="menu">Preferences...</span> (<a href="#preferences">see below</a>) and a shortcut to managing your <span class="menu">Accounts...</span>, which will open the <a href="../preferences/e-mail.html">E-mail</a> preference panel.</p>
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>消息</h3>
+<p>With <span class="menu">Add signature</span> you can add predefined texts to the end of your mail. From its submenu you can choose a specific or <span class="menu">Random</span> one.</p>
+
+<img src="../images/apps-images/mail-signature.png" alt="email-signature.png" /> 
+
+<p>You create new or edit existing signatures with <span class="menu">Edit signatures...</span>, which will open a window where you enter the text itself and the title of your new sig. Signatures should be saved in <span class="path">~/config/settings/Mail/sigantures</span>.</p>
+<p>Use <span class="menu">Add enclosure...</span> and <span class="menu">Remove enclosure</span> to add/remove files as attachments. You can also drag &amp; drop files from a Tracker window. Be careful though to drop those in the header section (To/From/Subject area at the top) or they'll get pasted into the email body if they are text files.</p>
+
+<img src="../images/apps-images/mail-attachments.png" alt="email-attachments.png" /> 
+
+<p>附属文件列在邮件头下面。您可以通过右键菜单选中文件，然后按下 <span class="key">DEL</span> 将其删除。</p>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>查询</h3>
+<p>这一功能还未实现，但是其用于保存查询，它将会显示与当前打开邮件相关的所有邮件，例如具有相同的收件人，或者相同的主题/线索。</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="preferences" name="preferences">首选项</a></h2>
+<img src="../images/apps-images/mail-preferences.png" alt="email-preferences.png" /> 
+<p>电子邮件首选项分为两个部分：</p>
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>用户界面</h3>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">按钮栏</span></td><td style="width:10px;"></td><td>该选项用于显示图标下的标签或者完全隐藏工具栏。</td></tr>
+<tr><td><span class="menu">字体</span></td><td></td><td>设置用于邮件文本的字体类型。</td></tr>
+<tr><td><span class="menu">大小</span></td><td></td><td>设置字体大小。</td></tr>
+<tr><td><span class="menu">色彩引用</span></td><td></td><td>设置不同级别引用的颜色。</td></tr>
+<tr><td class="onelinetop"><span class="menu">初始化拼写检查</span></td><td></td><td>开启或关闭启动时的拼写检查。</td></tr>
+<tr><td class="onelinetop"><span class="menu">自动标记邮件为已读</span></td><td></td><td>如果您关闭状态为“新邮件”的邮件，它将会自动标记为“已读邮件”</td></tr>
+</table>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>邮件相关</h3>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">默认账户</span></td><td style="width:10px;"></td><td>如果您有多个邮件账户，该选项将会指定新建邮件时所用的默认账户。</td></tr>
+<tr><td><span class="menu">回复账户</span></td><td></td><td>在回复邮件时，您可以上述弹出菜单中的 <span class="menu">使用默认账户</span>，或者使用 <span class="menu">邮件指定账户</span>，也就是使用接收该邮件的账户。</td></tr>
+<tr><td><span class="menu">回复序文</span></td><td></td><td>This is inserted before the quoted text in your reply. You can use various variables from the pop-up menu next to the text field. Example: "<i>Hello %n!\n\nOn %d you wrote:\n</i>" produces this:
+<pre>Hello Dr. Hawking!
+
+On Mon, 18 Jan 1998 02:55:16 +0800 you wrote:
+&gt; so thanks again for the inspiration concerning the cosmological constant.
+&gt; ...and the rest of the quoted text following...</pre></td></tr>
+<tr><td><span class="menu">自动署名</span></td><td></td><td>在邮件结尾自动添加署名。</td></tr>
+<tr><td><span class="menu">编码方式</span></td><td></td><td>设置默认编码类型。</td></tr>
+<tr><td class="onelinetop"><span class="menu">编码警告</span></td><td></td><td>如果您的邮件包含不能够被当前设置编码类型所识别的字符，您可以开启该警告。这样在发送之前，您将能够修改编码类型。否则，未识别的字符将会被方形符号所替代。</td></tr>
+<tr><td><span class="menu">文本换行</span></td><td></td><td>每隔76个字符进行换行，以使邮件易于阅读。</td></tr>
+<tr><td><span class="menu">附加属性</span></td><td></td><td>您可以选择将附属文件的 BFS 属性随其一同发送。对于其他的 Haiku 用户来说，这很方便，因为他们会收到“完整”的文件（如 MP3 文件的艺术家，专辑，标题等属性），但是也会带来给他人带来不便（甚至让人生疑），他们会对附带的 “BeOS Attributes” 文件产生疑问。<br />
+当然您最好不要将属性与附件一同发送，切记在发送之前将它们打包（zip），否则您将会去掉相应的 BFS 属性。</td></tr>
+</table>
 
 </div>
 </div>
 
-<!--
+
 <div class="nav">
 <div class="inner"><span>
- «  <a href="magnify.html">放大镜</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">应用程序</a> 
-::  <a href="mediaplayer.html">媒体播放器</a>  »
+ «  <a href="magnify.html">放大镜</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">应用程序</a> 
+::  <a href="mediaplayer.html">媒体播放器</a>  »
 </span></div>
 </div>
--->
+
 </body>
 </html>

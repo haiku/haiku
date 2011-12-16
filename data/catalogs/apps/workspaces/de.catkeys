@@ -1,13 +1,13 @@
-1	german	x-vnd.Be-WORK	3592128290
-About Workspaces…	Workspaces		Über Arbeitsflächen...
-Always on top	Workspaces		Immer im Vordergrund
-Auto-raise	Workspaces		Automatisch nach vorn holen
-Change workspace count…	Workspaces		Anzahl der Arbeitsflächen ändern...
+1	german	x-vnd.Be-WORK	3605116195
 Invalid argument: %s\n	Workspaces		Ungültiger Parameter: %s\n
-OK	Workspaces		OK
 Quit	Workspaces		Beenden
-Show window border	Workspaces		Fensterrahmen anzeigen
-Show window tab	Workspaces		Fensterreiter anzeigen
-Usage: %s [options] [workspace]\nwhere \"options\" is one of:\n  --notitle\t\ttitle bar removed.  border and resize kept.\n  --noborder\t\ttitle, border, and resize removed.\n  --avoidfocus\t\tprevents the window from being the target of keyboard events.\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen corner\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Gebrauch: %s [options] [workspace]\n\"options\" ist eines von:\n --notitle\t\Fenster ohne Titelreiter. aber mit Rahmen.\n --noborder\t\tFenster ohne Titelreiter und Rahmen.\n --avoidfocus\t\tFenster kann nicht aktiv werden oder Ziel für Tastatureingaben werden.\n --alwaysontop\t\tFenster ist immer im Vordergrund.\n --notmovable\t\tFenster kann nicht verschoben werden.\n --autoraise\t\tFenster kommt automatisch in den Vordergrund, wenn es am Bildschirmrand ist und sich die Maus darüber befindet.\n --help\t\tZeigt diesen Hilfetext.\nund \"workspace\" ist die Nummer der Arbeitsfläche zu dem gewechselt werden soll. (0-31)\n
 Workspaces	System name		Arbeitsflächen
+Change workspace count…	Workspaces		Anzahl der Arbeitsflächen ändern...
+About Workspaces…	Workspaces		Über Arbeitsflächen...
 Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Workspaces\nvon %1 und %2.\n\nCopyright %3, Haiku.\n\nDie OPT-Taste schickt Fenster in den Hintergrund. Die STRG-Taste holt sie in den Vordergrund.\n
+Show window border	Workspaces		Fensterrahmen anzeigen
+Auto-raise	Workspaces		Automatisch nach vorn holen
+OK	Workspaces		OK
+Always on top	Workspaces		Immer im Vordergrund
+Show window tab	Workspaces		Fensterreiter anzeigen
+Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Gebrauch: %s [Optionen] [Arbeitsfläche]\nmögliche \"Optionen\" sind:\n  --notitle\t\tFenster ohne Titelreiter, aber mit Rahmen.\n  --noborder\t\tFenster ohne Titelreiter und Rahmen.\n  --avoidfocus\t\tFenster kann nicht aktiv oder Ziel für Tastatureingaben werden.\n  --alwaysontop\t\tFenster ist immer im Vordergrund.\n  --notmovable\t\tFenster kann nicht verschoben werden.\n  --autoraise\t\tFenster kommt automatisch in den Vordergrund, wenn es am Bildschirmrand ist und sich die Maus darüber befindet.\n  --help\t\tZeigt diesen Hilfetext an.\nund \"Arbeitsfläche\" ist die Nummer (0-31) der Arbeitsfläche, zu der gewechselt werden soll.\n

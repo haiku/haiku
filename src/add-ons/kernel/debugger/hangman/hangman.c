@@ -5,6 +5,7 @@
 #	include <debug.h>
 #endif
 
+#include <directories.h>
 #include <OS.h>
 #include <image.h>
 #include <ctype.h>
@@ -26,7 +27,7 @@
 #define MAX_FAILS_BEFORE_BSOD 0
 
 #ifdef __HAIKU__
-#	define FORTUNE_FILE "/boot/system/data/fortunes/Fortunes"
+#	define FORTUNE_FILE kSystemDataDirectory "/fortunes/Fortunes"
 #else
 #	define FORTUNE_FILE "/etc/fortunes/default"
 #endif

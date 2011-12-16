@@ -53,7 +53,7 @@ class TTeamMenu : public BMenu {
 		void	DrawBackground(BRect update);
 
 	private:
-		static int CompareByName( const void* first, const void* second);
+		static int CompareByName(const void* first, const void* second);
 };
 
 #endif /* TEAMMENU_H */

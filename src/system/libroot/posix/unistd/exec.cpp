@@ -17,6 +17,8 @@
 #include <umask.h>
 #include <unistd.h>
 
+#include <errno_private.h>
+
 
 static int
 count_arguments(va_list list, const char *arg, char ***_env)
@@ -59,7 +61,7 @@ do_exec(const char *path, char * const args[], char * const environment[],
 	char **newArgs = NULL;
 
 	if (path == NULL) {
-		errno = B_BAD_VALUE;
+		__set_errno(B_BAD_VALUE);
 		return -1;
 	}
 
@@ -72,7 +74,7 @@ do_exec(const char *path, char * const args[], char * const environment[],
 
 	if (argCount == 0) {
 		// we need some more info on what to do...
-		errno = B_BAD_VALUE;
+		__set_errno(B_BAD_VALUE);
 		return -1;
 	}
 
@@ -83,7 +85,7 @@ do_exec(const char *path, char * const args[], char * const environment[],
 			strcpy(invoker, "/bin/sh");
 			status = B_OK;
 		} else {
-			errno = status;
+			__set_errno(status);
 			return -1;
 		}
 	}
@@ -91,7 +93,7 @@ do_exec(const char *path, char * const args[], char * const environment[],
 	if (invoker[0] != '\0') {
 		status = __parse_invoke_line(invoker, &newArgs, &args, &argCount, path);
 		if (status < B_OK) {
-			errno = status;
+			__set_errno(status);
 			return -1;
 		}
 
@@ -104,13 +106,13 @@ do_exec(const char *path, char * const args[], char * const environment[],
 		environment, envCount, &flatArgs, &flatArgsSize);
 
 	if (status == B_OK) {
-		errno = _kern_exec(path, flatArgs, flatArgsSize, argCount, envCount,
-			__gUmask);
+		__set_errno(_kern_exec(path, flatArgs, flatArgsSize, argCount, envCount,
+			__gUmask));
 			// if this call returns, something definitely went wrong
 
 		free(flatArgs);
 	} else
-		errno = status;
+		__set_errno(status);
 
 	free(newArgs);
 	return -1;
@@ -146,7 +148,7 @@ execvp(const char *file, char* const* argv)
 	// get the PATH
 	const char* paths = getenv("PATH");
 	if (paths == NULL) {
-		errno = B_ENTRY_NOT_FOUND;
+		__set_errno(B_ENTRY_NOT_FOUND);
 		return -1;
 	}
 
@@ -185,7 +187,7 @@ execvp(const char *file, char* const* argv)
 			return do_exec(path, argv, environ, true);
 	}
 
-	errno = B_ENTRY_NOT_FOUND;
+	__set_errno(B_ENTRY_NOT_FOUND);
 	return -1;
 }
 

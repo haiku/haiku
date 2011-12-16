@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009 Haiku Inc. All rights reserved.
+ * Copyright 2011 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 1999 M.Kawamura
@@ -181,7 +181,7 @@ CannaLooper::MessageReceived(BMessage* msg)
 			panel->Go();
 			break;
 		}
-	
+
 		case RELOAD_INIT_FILE:
 			_ForceKakutei();
 			fCanna->Reset();
@@ -425,7 +425,7 @@ CannaLooper::_HandleMethodActivated(bool active)
 {
 	if (active) {
 		if (!fPaletteWindow) {
-			// first time input method activated 
+			// first time input method activated
 			float x = gSettings.palette_loc.x;
 			float y = gSettings.palette_loc.y;
 			BRect frame(x, y, x + 114, y + 44);
@@ -448,8 +448,8 @@ CannaLooper::_HandleMethodActivated(bool active)
 		fOwner->SetMenu(NULL, this);
 	}
 }
-	
-			
+
+
 void
 CannaLooper::_ForceKakutei()
 {

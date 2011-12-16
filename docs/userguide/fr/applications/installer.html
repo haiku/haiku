@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2009, Haiku. All rights reserved.
+ * Copyright 2009-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -38,6 +38,8 @@
 <li><a href="../../uk/applications/installer.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/applications/installer.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/applications/installer.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/installer.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/installer.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/applications/installer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -62,12 +64,8 @@ Au lancement, il affiche une fenêtre de démarrage qui contient des  renseignem
 <ul>
 <li><p>Ce logiciel en version alpha n'étant pas exempt de défaut, faites des sauvegardes ou vous devrez en assumer les conséquences !</p></li>
 <li><p>Vous devez préparer une partition avant d'utiliser Installer. Vous pouvez utiliser <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> ou tout autre outil comparable jusqu'à ce que DriveSetup, l'outil d'Haiku, soit assez mature pour effectuer cette tâche.</p></li>
-<li><p>Haïku peut être ajouté manuellement au gestionnaire d'amorçage <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>.
-En résumé, vous devez ajouter une entrée dans <span class="path">/boot/grub/menu.lst</span> de votre installation Linux, comme ceci :</p>
-<pre># Haiku on /dev/sda7
-title		Haiku
-rootnoverify	(hd0,6)
-chainloader	+1</pre></li>
+<li>Haïku peut être ajouté manuellement au gestionnaire d'amorçage <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>.
+Un <a href="http://www.haiku-os.org/get-haiku/installation-guide">guide d'installation</a> en ligne détaille la procédure à suivre.</li>
 </ul>
 <p><br /><br /></p>
 <p>Une fois que vous avez accepté avec <span class="button">Continue</span>, vous arrivez dans la fenêtre principale :</p>
@@ -82,11 +80,9 @@ Vous verrez ainsi le nom et l'emplacement des volumes et partitions disponibles.
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tools" name="tools">Outils</a></h2>
 <p>Bien que la partition soit automatiquement rendu amorçable à la fin de la procédure d'installation, il peut arriver que certains autres systèmes d'exploitation ou outil de partitionnement remplacent (accidentellement) le secteur d'amorce de votre volume Haïku. Dans ce cas, amorcez votre système à partir de votre CD d'installation et démarrez Installer. Sélectionnez la partition Haiku que vous voulez rendre à nouveau amorçable dans la liste déroulante <span class="menu">Onto: Please Choose Target</span> puis sélectionnez <span class="menu">Write Boot Sector</span> dans le menu <span class="menu">Tools</span>.</p>
-<p>L'autre élément du menu <span class="menu">Tools</span> (outils) est le <span class="menu">Boot Manager</span> (gestionnaire de démarrage) qui insère  un menu dans le secteur d'amorce pour choisir le système d'exploitation à démarrer.<br />
-Vous n'avez pas besoin d'installer le <span class="app">Boot Manager</span> si vous utilisez déjà un gestionnaire d'amorçage comme GRUB, dans ce cas, vous devez ajouter manuellement Haiku (voir ci-dessus), ou si seul Haiku fonctionne sur votre machine.</p>
-<p>Le gestionnaire de démarrage n'est pas encore très bien testé et souffre encore de quelques restrictions dont il pourrait se plaindre si certaines conditions ne sont pas remplies : le menu ne peut être installé que sur votre premier disque dur et il doit y avoir un espace 2Kio après le Master Boot Record (MBR).</p>
-<p>Cependant, ne vous inquiétez pas trop, le MBR est sauvegardé. Pour désinstaller le menu de démarrage, il vous suffit de démarrer à nouveau, depuis le CD d'installation, exécuter le programme d'installation et d'invoquer à nouveau le gestionnaire de démarrage.<br />
-Le panneau de configuration du Gestionnaire de démarrage vous guidera à travers l'installation ou la désinstallation du menu de démarrage.</p>
+<p>L'autre élément <span class="menu">Set up a boot menu</span> du menu <span class="menu">Tools</span> (outils) sert à installer un menu dans le secteur d'amorce afin de choisir le système d'exploitation à démarrer. Consulter le sujet qui parle du <a href="bootmanager.html">Gestionnaire d'amorçage</a> pour plus d'information.<br />
+Vous n'avez pas besoin d'installer de Gestionnaire d'amorçage (<span class="app">Boot Manager</span>) si vous utilisez déjà un gestionnaire d'amorçage comme GRUB, dans ce cas, vous devez ajouter manuellement Haiku (voir ci-dessus), ou si seul Haiku fonctionne sur votre machine.</p>
+
 
 </div>
 </div>

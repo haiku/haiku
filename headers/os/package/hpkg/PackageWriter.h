@@ -43,13 +43,14 @@ public:
 
 class BPackageWriter {
 public:
-public:
 								BPackageWriter(
 									BPackageWriterListener* listener);
 								~BPackageWriter();
 
-			status_t			Init(const char* fileName);
-			status_t			AddEntry(const char* fileName);
+			status_t			Init(const char* fileName, uint32 flags = 0);
+			status_t			SetInstallPath(const char* installPath);
+			void				SetCheckLicenses(bool checkLicenses);
+			status_t			AddEntry(const char* fileName, int fd = -1);
 			status_t			Finish();
 
 private:

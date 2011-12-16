@@ -14,7 +14,11 @@
 #include <vm/vm.h>
 #include <vm/VMAddressSpace.h>
 
+#include "MemoryManager.h"
 #include "slab_private.h"
+
+
+RANGE_MARKER_FUNCTION_BEGIN(SlabObjectCache)
 
 
 static void
@@ -137,6 +141,7 @@ ObjectCache::InitSlab(slab* slab, void* pages, size_t byteCount, uint32 flags)
 
 	CREATE_PARANOIA_CHECK_SET(slab, "slab");
 
+
 	for (size_t i = 0; i < slab->size; i++) {
 		status_t status = B_OK;
 		if (constructor)
@@ -194,7 +199,7 @@ void
 ObjectCache::ReturnObjectToSlab(slab* source, void* object, uint32 flags)
 {
 	if (source == NULL) {
-		panic("object_cache: free'd object has no slab");
+		panic("object_cache: free'd object %p has no slab", object);
 		return;
 	}
 
@@ -205,7 +210,7 @@ ObjectCache::ReturnObjectToSlab(slab* source, void* object, uint32 flags)
 	if (object < objectsStart
 		|| object >= objectsStart + source->size * object_size
 		|| ((uint8*)object - objectsStart) % object_size != 0) {
-		panic("object_cache: tried to free invalid object pointer");
+		panic("object_cache: tried to free invalid object pointer %p", object);
 		return;
 	}
 #endif // KDEBUG
@@ -238,3 +243,80 @@ ObjectCache::ReturnObjectToSlab(slab* source, void* object, uint32 flags)
 		partial.Add(source);
 	}
 }
+
+
+void*
+ObjectCache::ObjectAtIndex(slab* source, int32 index) const
+{
+	return (uint8*)source->pages + source->offset + index * object_size;
+}
+
+
+#if PARANOID_KERNEL_FREE
+
+bool
+ObjectCache::AssertObjectNotFreed(void* object)
+{
+	MutexLocker locker(lock);
+
+	slab* source = ObjectSlab(object);
+	if (!partial.Contains(source) && !full.Contains(source)) {
+		panic("object_cache: to be freed object %p: slab not part of cache!",
+			object);
+		return false;
+	}
+
+	object_link* link = object_to_link(object, object_size);
+	for (object_link* freeLink = source->free; freeLink != NULL;
+			freeLink = freeLink->next) {
+		if (freeLink == link) {
+			panic("object_cache: double free of %p (slab %p, cache %p)",
+				object, source, this);
+			return false;
+		}
+	}
+
+	return true;
+}
+
+#endif // PARANOID_KERNEL_FREE
+
+
+#if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
+
+status_t
+ObjectCache::AllocateTrackingInfos(slab* slab, size_t byteCount, uint32 flags)
+{
+	void* pages;
+	size_t objectCount = byteCount / object_size;
+	status_t result = MemoryManager::AllocateRaw(
+		objectCount * sizeof(AllocationTrackingInfo), flags, pages);
+	if (result == B_OK) {
+		slab->tracking = (AllocationTrackingInfo*)pages;
+		for (size_t i = 0; i < objectCount; i++)
+			slab->tracking[i].Clear();
+	}
+
+	return result;
+}
+
+
+void
+ObjectCache::FreeTrackingInfos(slab* slab, uint32 flags)
+{
+	MemoryManager::FreeRawOrReturnCache(slab->tracking, flags);
+}
+
+
+AllocationTrackingInfo*
+ObjectCache::TrackingInfoFor(void* object) const
+{
+	slab* objectSlab = ObjectSlab(object);
+	return &objectSlab->tracking[((addr_t)object - objectSlab->offset
+		- (addr_t)objectSlab->pages) / object_size];
+}
+
+#endif // SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
+
+
+RANGE_MARKER_FUNCTION_END(SlabObjectCache)

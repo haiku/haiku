@@ -36,6 +36,9 @@
 
 #include <stdio.h>
 #include <errno.h>
+
+#include <errno_private.h>
+
 #include "local.h"
 
 /*
@@ -59,7 +62,7 @@ __swbuf(c, fp)
 	 */
 	fp->_w = fp->_lbfsize;
 	if (cantwrite(fp)) {
-		errno = EBADF;
+		__set_errno(EBADF);
 		return (EOF);
 	}
 	c = (unsigned char)c;

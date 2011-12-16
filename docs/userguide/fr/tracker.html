@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -39,6 +39,8 @@
 <li><a href="../uk/tracker.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../zh_CN/tracker.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../pt_PT/tracker.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/tracker.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/tracker.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../en/tracker.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -50,6 +52,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Cette page n'est pas encore entièrement traduite. Les parties non encore traduites seront en anglais.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -120,20 +123,25 @@ Ce filtrage lors de la frappe est défini dans les <a href="#tracker-preferences
 <img src="images/tracker-images/window-menu.png" alt="window-menu.png" />
 <p>Les fenêtres du Tracker offrent trois modes d'affichage différent à partir du menu <span class="menu">Window</span> :</p>
 <ul>
-<li><p><b>Icon View</b> (Vue par icônes, <span class="key">ALT</span> <span class="key">1</span>) - Grandes icônes, vous pouvez modifier la taille à partir du sous-menu ou bien agrandir/réduire leur taille avec <span class="key">ALT</span> <span class="key">+</span>/<span class="key">ALT</span> <span class="key">-</span>.</p></li>
-<li><p><b>Mini Icon View</b> (Vue miniature, <span class="key">ALT</span> <span class="key">2</span>) - Petites icônes.</p></li>
-<li><p><b>List View</b> (Vue par liste, <span class="key">ALT</span> <span class="key">3</span>) - Une vue détaillée de vos fichiers vous permettant d’afficher ou masquer les différents <i>attributs</i> (Voyez le sujet <a href="attributes.html">Attributs</a>).</p></li>
+<li><p><span class="menu">Icon View</span> (Vue par icônes, <span class="key">ALT</span> <span class="key">1</span>) - Grandes icônes, vous pouvez modifier la taille à partir du sous-menu ou bien agrandir/réduire leur taille avec <span class="key">ALT</span> <span class="key">+</span>/<span class="key">ALT</span> <span class="key">-</span>.</p></li>
+<li><p><span class="menu">Mini Icon View</span> (Vue miniature, <span class="key">ALT</span> <span class="key">2</span>) - Petites icônes.</p></li>
+<li><p><span class="menu">List View</span> (Vue par liste, <span class="key">ALT</span> <span class="key">3</span>) - Une vue détaillée de vos fichiers vous permettant d’afficher ou masquer les différents <i>attributs</i> (Voyez le sujet sur les <a href="attributes.html">Attributs</a>).</p></li>
 </ul>
 <p>Le menu <span class="menu">Window</span> offre de nombreuses autres fonctions :</p>
 <ul>
-<li><p><b>Resize Window</b> (Redimensionner la fenêtre, <span class="key">CMD</span> <span class="key">Y</span>) - Redimensionne la fenêtre à sa taille optimale.</p></li>
-<li><p><b>Clean Up</b> (Ranger, <span class="key">CMD</span> <span class="key">K</span>) - Aligne toutes les icônes sur une grille invisible. Si vous maintenez la touche <span class="key">MAJ</span>enfoncée, le menu devient <span class="menu">Clean Up All</span> (Tout ranger), ce qui en plus, triera toutes les icônes par ordre alphabétique.</p></li>
-<li><p><b>Select...</b> (Sélectionner…, <span class="key">CMD</span> <span class="key">MAJ</span> <span class="key">A</span>) - Sélectionne les fichiers selon une <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="http://en.wikipedia.org/wiki/Regular expression">expression régulière</a>.</p></li>
-<li><p><b>Close</b> (Fermer, <span class="key">CMD</span> <span class="key">W</span>) - Ferme la fenêtre. 
+<li><p><span class="menu">Resize Window</span> (Redimensionner la fenêtre, <span class="key">Alt</span> <span class="key">Y</span>) - Redimensionne la fenêtre à sa taille optimale.</p></li>
+<li><p><span class="menu">Arrange by...</span> - Only available in Icon or Mini icon view, a submenu allows to set the sorting order to various properties:</p>
+	<ul>
+	<li><p><span class="menu">Name</span>, <span class="menu">Real name</span>, <span class="menu">Size</span>, <span class="menu">Modified</span>, <span class="menu">Created</span>, <span class="menu">Kind</span>, <span class="menu">Location</span>, <span class="menu">Permissions</span></p></li>
+	<li><p><span class="menu">Reverse order</span> - Inverts the sorting order</p></li>
+	<li _translation_id="4339"><p><span class="menu">Clean up</span> (<span class="key">ALT</span> <span class="key">K</span>) - Aligns all icons to an invisible grid. Hold down <span class="key">SHIFT</span> and the menu becomes <span class="menu">Clean up all</span> which additionally sorts all icons according to the above selected criterium.</p></li>
+	</ul></li>
+<li><p><span class="menu">Select…</span> (Sélectionner…, <span class="key">ALT</span> <span class="key">MAJ</span> <span class="key">A</span>) - Sélectionne les fichiers selon une <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="http://en.wikipedia.org/wiki/Regular expression">expression régulière</a>.</p></li>
+<li><p><span class="menu">Close</span> (Fermer, <span class="key">ALT</span> <span class="key">W</span>) - Ferme la fenêtre. 
 Si vous maintenez la touche <span class="key">MAJ</span> enfoncée, le menu deviendra <span class="menu">Close All</span>, ce qui fermera toutes les fenêtres du Tracker.</p></li>
-<li><p><b>Close All in Workspace</b> (Tout fermer dans l’espace courant<span class="key">CMD</span> <span class="key">Q</span>) - Ferme toutes les fenêtres Tracker ouvertes dans l’espace de travail courant. Ce raccourci est utile si vous avez oublier de maintenir la touche <span class="key">CTRL</span> enfoncée lors de votre navigation à travers des dossiers et que toutes ces fenêtre Tracker encore ouvertes polluent votre espace de travail.</p></li>
+<li><p><span class="menu">Close All in Workspace</span> (Tout fermer dans l’espace courant<span class="key">ALT</span> <span class="key">Q</span>) - Ferme toutes les fenêtres Tracker ouvertes dans l’espace de travail courant. Ce raccourci est utile si vous avez oublier de maintenir la touche <span class="key">CTRL</span> enfoncée lors de votre navigation à travers des dossiers et que toutes ces fenêtre Tracker encore ouvertes polluent votre espace de travail.</p></li>
 </ul>
-<p>Il se peut que vous vouliez réorganiser certaines icônes sans faire un nettoyage complet via <span class="menu">Clean Up</span> (<span class="key">CMD</span> <span class="key">K</span>). Dans ce cas, sélectionnez ces icônes et déplacez les à leur nouvel emplacement. Avant de les déposer, maintenez <span class="key">CMD</span> enfoncé. Ceci alignera les icônes sur un grille invisible.</p>
+<p>Il se peut que vous vouliez réorganiser certaines icônes sans faire un nettoyage complet via <span class="menu">Clean Up</span> (<span class="key">ALT</span> <span class="key">K</span>). Dans ce cas, sélectionnez ces icônes et déplacez les à leur nouvel emplacement. Avant de les déposer, maintenez <span class="key">ALT</span> enfoncé. Ceci alignera les icônes sur un grille invisible.</p>
 <p>Les fonctions suivantes étant relativement simples à comprendre, passons aux préférences du Tracker.</p>
 
 <h3>
@@ -142,14 +150,14 @@ Si vous maintenez la touche <span class="key">MAJ</span> enfoncée, le menu devi
 <p><span class="menu">Window | Preferences...</span> affiche un panneau qui offre un certain nombre de réglages qui, s’ils ne sont pas évidents au premiers coup d’œil, deviennent clairs après quelques explications. Tout changement sera appliqué directement, vous pourrez donc tester simplement diverses options.
 <br />Voici les quelques réglages qui peuvent vous paraître obscurs :</p>
 <ul>
-<li><p><b>Desktop</b> (Bureau) - Indique si les disques montés apparaîtront sur le Bureau ou dans une fenêtre accessible via une icône Disks du Bureau.</p></li>
-<li><p><b>Windows</b> (Fenêtres) - Vous pouvez choisir la navigation dans une fenêtre unique (<span class="menu">Single Window Navigation</span>), un double-clique sur un dossier ouvre alors ce dernier dans la fenêtre de son dossier parent plutôt que dans une nouvelle fenêtre. Ce n’est pas tout à fait la même chose que ce qui ce passe lors d’un double clic avec la touche <span class="key">OPT</span> enfoncée en mode normal : Vous perdez la position et la taille enregistrée de la fenêtre.
+<li><p><span class="menu">Desktop</span> (Bureau) - Indique si les disques montés apparaîtront sur le Bureau ou dans une fenêtre accessible via une icône Disks du Bureau.</p></li>
+<li><p><span class="menu">Windows</span> - You can set <span class="menu">Single window navigation</span>, i.e. a double-clicked folder doesn't open in its own window, but inside the already open window instead, replacing the view of it's parent folder. This is not the same as clicking while holding the <span class="key">OPT</span> key, as described above, because you'll lose the per window saved position and size.
 <br /><br /></p>
 <img src="images/tracker-images/tracker-preferences-navigator.png" alt="tracker-preferences-navigator.png" />
-<p>Avant de passer le Tracker en mode navigation dans une fenêtre unique, parce que cette méthode vous semble plus familière, nous vous recommandons d’essayer la navigation par menu, qui peut être bien plus rapide après que vous vous y soyez habitué. Néanmoins, la navigation dans une fenêtre unique offre un <i>Navigateur</i> où vous pouvez entrer ou copier-coller un chemin de fichier et utiliser des boutons «Précédent», «Suivant» et «Niveau supérieur». Voir <a href="#type-ahead-filter">au-dessus</a>.</p></li>
-<li><p><b>Date and Time</b> (Date et heure) - Règle le format de la date et de l'heure.</p></li>
-<li><p><b>Trash</b> (Corbeille) - Définit le comportement lors d’une suppression de fichier.</p></li>
-<li><p><b>Volume Icons</b> (Icônes de volume) - Réglez la couleur d’un éventuel indicateur d’espace libre qui peut être affiché sur chaque icône de disque.</p></li>
+<p>Before you switch Tracker to Single Window Navigation mode, because that may feel more familiar to you, we recommend giving the menu based browsing a try first, as that may actually work much faster for you after getting used to. On the other hand, single window browsing offers a <i>Navigator</i> where you can enter or copy &amp; paste a path name and use back, forward and up buttons.</p> 
+<p>Activating <span class="menu">Type-ahead filtering</span> will filter the contents of a Tracker window while you type to only display the files matching your string in their name or any currently displayed attribute. See <a href="#type-ahead-filter">above</a>.</p></li>
+<li><p><span class="menu">Trash</span> (Corbeille) - Définit le comportement lors d’une suppression de fichier.</p></li>
+<li><p><span class="menu">Volume Icons</span> (Icônes de volume) - Réglez la couleur d’un éventuel indicateur d’espace libre qui peut être affiché sur chaque icône de disque.</p></li>
 </ul>
 <p>Ce panneau est également accessible depuis le menu <span class="menu">Preferences</span> de la Deskbar sous le nom <span class="app">Tracker</span>.</p>
 
@@ -159,30 +167,28 @@ Si vous maintenez la touche <span class="key">MAJ</span> enfoncée, le menu devi
 <p>Quand un fichier est sélectionné, le menu <span class="menu">File</span> présente les mêmes commandes que le menu contextuel affiché lors d’un clic droit sur ce fichier.</p>
 <p>Comme d'habitude, les commandes sont assez claires.</p>
 <ul>
-<li><p><b>Find...</b> (Rechercher) - Trouve un fichier ou un dossier. Voyez le sujet <a href="queries.html">Requêtes</a> pour plus d’informations.</p></li>
-<li><p><b>New</b> (Nouveau) - Crée un nouveau dossier ou un fichier basé sur un <i>modèle</i>.
-<br /><br />
+<li><p><span class="menu">Find...</span> (Rechercher) - Trouve un fichier ou un dossier. Voyez le sujet <a href="queries.html">Requêtes</a> pour plus d’informations.</p></li>
+<li><p><span class="menu">New</span> (Nouveau) - Crée un nouveau dossier ou un fichier basé sur un <i>modèle</i>.
+<br /><br /></p>
 <img src="images/tracker-images/new-menu.png" alt="new-menu.png" />
-</p>
 <p>L’option <span class="menu">Edit Templates...</span> permet d’ouvrir le dossier <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span>. 
 En ajoutant un fichier dans ce dossier, vous rajouterez une option dans le menu <span class="menu">New</span>. Ici, nous avons rajouté un fichier nommé “Text” avec le type de fichier <tt>text/plain</tt>. Voyez <a href="filetypes.html">Types de fichiers</a>  pour plus d’informations.</p></li>
-<li><p><b>Open With...</b> (Ouvrir avec…) - Ce sous-menu indique toutes les applications qui gèrent ce type de fichier.
-<br /><br />
+<li><p><span class="menu">Open With...</span> (Ouvrir avec…) - Ce sous-menu indique toutes les applications qui gèrent ce type de fichier.
+<br /><br /></p>
 <img src="images/tracker-images/open-with.png" alt="open-with.png" />
-</p>
-<p>L’application préférée, qui est utilisée pour ouvrir le fichier lors d’un double-clic, est indiquée par une coche. Ce sous-menu liste d’abord les applications qui gère le type de fichier exact, <tt>text/plain</tt> dans le cas d’un fichier texte simple. Ensuite viennent les applications qui peuvent gérer le super-type de fichier en général, ici <tt>text/*</tt>. Enfin, sont listées les applications qui peuvent gérer tout fichier. Si vous ne cliquez pas dans le menu mais directement sur l’entrée <span class="menu">Open With...</span>, ce panneau s’ouvre :</p>
+<p>L’application préférée, qui est utilisée pour ouvrir le fichier lors d’un double-clic, est indiquée par une coche. Ce sous-menu liste d’abord les applications qui gèrent le type exact du fichier, qui dans ce cas est un fichier de texte simple <tt>text/plain</tt>. Ensuite viennent les applications qui peuvent gérer le type générique, ici <tt>text/*</tt>. Enfin, sont listées les applications qui peuvent gérer tout les fichiers. Si vous ne cliquez pas dans le menu mais directement sur l’entrée <span class="menu">Open With...</span>, ce panneau s’ouvre :</p>
 <br /><br />
 <img src="images/tracker-images/open-with-preferred.png" alt="open-with-preferred" />
 <p>Vous y trouvez à nouveau les programmes listés dans le sous-menu. En en sélectionnant un et en choisissant le bouton <span class="button">Open and Make Preferred</span> vous changerez l’application utilisée pour tous les fichiers du même type, ici <tt>text/plain</tt>.</p></li>
-<li><b>Get Info</b>
+<li><span class="menu">Get info</span>
 <br /><br />
 <img src="images/tracker-images/get-info.png" alt="get-info" />
-<p>Ce panneau affiche des informations sur le fichier sélectionné et vous permet de définir l’application par défaut et, après un clic sur le triangle, les permission et le propriétaire du fichier. Un clic sur le chemin d’accès (<i>Location</i>) l’ouvrira dans une nouvelle fenêtre Tracker.</p></li>
-<li><p><b>Edit Name</b> (Renommer), <b>Duplicate</b> (Dupliquer) et <b>Move to Trash</b> (Déplacer vers la corbeille) - permettent respectivement de renommer, dupliquer ou supprimer le(s) fichier(s) sélectionné(s).</p></li>
-<li><p><b>Move to</b> (Déplacer), <b>Copy to</b> (Copier vers) et <b>Create Link</b> (Créer un lien) - vous permettent de déplacer, copier ou créer un lien vers le(s) fichier(s) sélectionné(s) en utilisant la méthode de navigation par sous-menus. EN maintenant <span class="key">MAJ</span> enfoncée lors de l’ouverture du menu, vous obtiendrez une option pour créer un lien relatif.</p></li>
-<li><p><b>Cut</b> (Couper), <b>Copy</b> (Copier) et <b>Paste</b> (Coller) - vous permettent de manipuler des fichiers en utilisant le presse-papiers. En maintenant la touche <span class="key">MAJ</span> enfoncée lors de l’ouverture du menu, vous pourrez <b>Copy/Cut more</b> (copier/coller plus de) fichiers, par exemple d’un autre dossier, que vous pourrez coller ailleurs plus tard. De plus, maintenir <span class="key">MAJ</span> vous permettra de coller les fichiers copiés en tant que liens.</p></li>
-<li><p><b>Identify</b> (Identifier) - tentera de détecter le type du fichier si il n’est pas connu, par exemple si vous avez transféré un fichier avec <span class="cli">wget</span> qui ne réalise pas cette opération lui-même. Si vous maintenez <span class="key">MAJ</span> lors de l’ouverture du menu, l’option deviendra <b>Force Identify</b> (Forcer l’identification) qui corrigera le type assigné s’il était incorrect.</p></li>
-<li><p><b>Add-Ons</b> (Extensions) - vous permet d’accéder aux extensions génériques du Tracker, et à celles qui peuvent gérer le(s) fichier(s) sélectionné(s). Consultez <a href="tracker-add-ons.html">Extensions du Tracker</a> pour plus d’informations.</p></li>
+<p>Ce panneau affiche des informations sur le fichier sélectionné et vous permet de définir l’application par défaut, et si vous développer les <i>Permissions</i>, les droits d'accès et le propriétaire du fichier. Un clic sur le chemin d’accès (<i>Location</i>) l’ouvrira dans une nouvelle fenêtre Tracker.</p></li>
+<li><p><span class="menu">Edit Name</span> (Renommer), <span class="menu">Duplicate</span> (Dupliquer) et <span class="menu">Move to Trash</span> (Déplacer vers la corbeille) - permettent respectivement de renommer, dupliquer ou supprimer le(s) fichier(s) sélectionné(s).</p></li>
+<li><p><span class="menu">Move to</span> (Déplacer), <span class="menu">Copy to</span> (Copier vers) et <span class="menu">Create Link</span> (Créer un lien) - vous permettent de déplacer, copier ou créer un lien vers le(s) fichier(s) sélectionné(s) en utilisant la méthode de navigation par sous-menus. EN maintenant <span class="key">MAJ</span> enfoncée lors de l’ouverture du menu, vous obtiendrez une option pour créer un lien relatif.</p></li>
+<li><p><span class="menu">Cut</span> (Couper), <span class="menu">Copy</span> (Copier) et <span class="menu">Paste</span> (Coller) - vous permettent de manipuler des fichiers en utilisant le presse-papiers. En maintenant la touche <span class="key">MAJ</span> enfoncée lors de l’ouverture du menu, vous pourrez <span>Copy/Cut more</span> (copier/coller plus de) fichiers, par exemple d’un autre dossier, que vous pourrez coller ailleurs plus tard. De plus, maintenir <span class="key">MAJ</span> vous permettra de coller les fichiers copiés en tant que liens.</p></li>
+<li><p><span class="menu">Identify</span> (Identifier) - tentera de détecter le type du fichier si il n’est pas connu, par exemple si vous avez transféré un fichier avec <span class="cli">wget</span> qui ne réalise pas cette opération lui-même. Si vous maintenez <span class="key">MAJ</span> lors de l’ouverture du menu, l’option deviendra <span class="menu">Force Identify</span> (Forcer l’identification) qui corrigera le type assigné s’il était incorrect.</p></li>
+<li><p><span class="menu">Add-Ons</span> (Extensions) - vous permet d’accéder aux extensions génériques du Tracker, et à celles qui peuvent gérer le(s) fichier(s) sélectionné(s). Consultez <a href="tracker-add-ons.html">Extensions du Tracker</a> pour plus d’informations.</p></li>
 </ul>
 
 <h2>

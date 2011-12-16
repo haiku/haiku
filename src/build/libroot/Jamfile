@@ -9,18 +9,28 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers build os interface ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers build os storage ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
 
-UsePrivateBuildHeaders kernel ;
+UsePrivateBuildHeaders kernel system ;
 
 {
 	local defines = [ FDefines
 		HAIKU_BUILD_ATTRIBUTES_DIR="\\\"$(HAIKU_BUILD_ATTRIBUTES_DIR)\\\""
+		_HAIKU_BUILD_DONT_REMAP_FD_FUNCTIONS=1
 	] ;
 	SubDirCcFlags $(defines) ;
 	SubDirC++Flags $(defines) ;
-}
 
-DEFINES += KMESSAGE_CONTAINER_ONLY ;
-ObjectC++Flags KMessage.cpp : $(HOST_BE_API_C++FLAGS) ;
+	defines = [ FDefines
+		HAIKU_BUILD_GENERATED_DIRECTORY="\\\"$(HAIKU_OUTPUT_DIR)\\\""
+	] ;
+	ObjectC++Flags find_directory.cpp : $(defines) ;
+
+	defines = [ FDefines BUILDING_HAIKU_ERROR_MAPPER=1 ] ;
+	ObjectC++Flags errors.cpp : $(defines) ;
+
+	defines = [ FDefines KMESSAGE_CONTAINER_ONLY=1 ] ;
+	ObjectC++Flags KMessage.cpp : $(defines) ;
+
+}
 
 # locate the library
 MakeLocate libroot_build.so : $(HOST_BUILD_COMPATIBILITY_LIB_DIR) ;
@@ -44,6 +54,7 @@ local librootSources =
 	atomic.cpp
 	byteorder.cpp
 	errors.cpp
+	find_directory.cpp
 	fs.cpp
 	fs_attr.cpp
 	fs_descriptors.cpp
@@ -53,11 +64,15 @@ local librootSources =
 
 	$(hostPlatformSources)
 
+	driver_settings.cpp
+
 	$(strlSources)
 	strnlen.c
 
 	KMessage.cpp
 ;
+
+USES_BE_API on [ FGristFiles $(librootSources:S=$(SUFOBJ)) ] = true ;
 
 BuildPlatformSharedLibrary libroot_build.so :
 	$(librootSources)
@@ -70,6 +85,14 @@ BuildPlatformStaticLibrary libroot_build.a :
 	[ FGristFiles $(librootSources:S=$(SUFOBJ)) ]
 ;
 
+USES_BE_API on [ FGristFiles function_remapper$(SUFOBJ) ] = true ;
+
+BuildPlatformStaticLibraryPIC libroot_build_function_remapper.a :
+	function_remapper.cpp
+;
+
+SEARCH on [ FGristFiles driver_settings.cpp ]
+	= [ FDirName $(HAIKU_TOP) src system libroot os ] ;
 SEARCH on [ FGristFiles $(strlSources) strnlen.c ]
 	= [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
 SEARCH on [ FGristFiles KMessage.cpp ]

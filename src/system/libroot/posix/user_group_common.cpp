@@ -15,6 +15,7 @@
 
 #include <new>
 
+#include <errno_private.h>
 #include <libroot_private.h>
 #include <locks.h>
 #include <RegistrarDefs.h>

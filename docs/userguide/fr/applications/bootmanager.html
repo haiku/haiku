@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2011, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Loïc
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Gestionnaire d'amorçage</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guide de l’utilisateur</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/fr.png" alt="" /> Français</li>
+<li><a href="../../de/applications/bootmanager.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/bootmanager.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/bootmanager.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/bootmanager.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/bootmanager.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/bootmanager.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/bootmanager.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/bootmanager.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/bootmanager.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/bootmanager.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/bootmanager.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../en/applications/bootmanager.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="activitymonitor.html">ActivityMonitor</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+::  <a href="cdplayer.html">CDPlayer</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/bootmanager-icon_64.png" alt="bootmanager-icon_64.png" width="64" height="64" />Gestionnaire d'amorçage</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar :</td><td style="width:15px;"></td><td><i>Pas d'entrée, normalement le démarrage se fait à partir du menu <span class="menu">Outil</span> de l'Installeur</i></td></tr>
+<tr><td>Localisation :</td><td></td><td><span class="path">/boot/system/apps/BootManager</span></td></tr>
+<tr><td>Réglages :</td><td></td><td><i>aucun</i><br />Par défaut les MBR sont sauvegardés dans <span class="path">~/config/settings/bootman/</span></td></tr>
+</table>
+<p><br /></p>
+<p>Si vous n'ajoutez pas la partition Haiku à un gestionnaire d'amorçage existants comme  GRUB, BootManager peut installer dans le Master Boot Record (MBR) un petit menu de démarrage qui ressemble à ceci :</p>
+<img src="../images/apps-images/bootmenu.png" alt="bootmenu.png" />
+<div class="box-info">Le Gestionnaire d'amorçage n'est pas encore très bien testé et souffre aussi de quelques restrictions qui se rappelleront à vous si elle ne sont pas remplies : le menu ne peut être installé que sur le premier disque dur et ce dernier doit comporter un espace libre de 2Kio après le Master Boot Record (MBR).</div>
+<p>Le Gestionnaire d'amorçage vous guide durant la procédure d'installation du menu d'amorçage.</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="1-drives" id="1-drives">Choisir le disque de destination</a></h2>
+<img src="../images/apps-images/bootmanager-1.png" alt="bootmanager-1.png" />
+<p>Pour commencer, le Gestionnaire d'amorçage vous propose de choisir le volume à partir duquel vous aller effectuer l'installation. Si un menu d'amorçage est déjà présent sur le disque, Le bouton <span class="button">Uninstall</span> (Désinstaller) devient utilisable, vous permettant de restaurer un MBR préalablement sauvegardé, et ainsi ôter ce menu d'amorçage.<br />
+Autrement, choisissez <span class="button">Install</span> (Installer) pour continuer.</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="2-backup" id="2-backup">Sauvegarde du Master Boot Record (MBR)</a></h2>
+<p>Dans le cas où quelque chose tournerai mal ou que vous souhaitez supprimer le nouveau menu de démarrage, le Master Boot Record (MBR) est maintenant sauvegardé. Ceci est évidemment une étape très importante. Assurez-vous, par exemple, de ne pas écraser accidentellement un MBR sauvegardé lors d'une expérimentation précédente !</p>
+<img src="../images/apps-images/bootmanager-2.png" alt="bootmanager-2.png" /> 
+<img src="../images/apps-images/bootmanager-3.png" alt="bootmanager-3.png" />
+<p>Il suffit de sélectionner une destination pour le fichier de sauvegarde du"<tt>MBR</tt>" ou de laisser le chemin par défaut. Après avoir cliqué sur Suivant (<span class="button">Next</span>) un message vous confirmera si la sauvegarde a réussi.</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="3-menu" id="3-menu">Configurer le menu d'amorçage</a></h2>
+<img src="../images/apps-images/bootmanager-4.png" alt="bootmanager-4.png" /> 
+<img src="../images/apps-images/bootmanager-5.png" alt="bootmanager-5.png" />
+<p>Ensuite, vous voyez apparaître une liste de toutes les partitions du disque de destination. Vous choisissez celle que vous voulez voir apparaître dans le menu en les cochant. Les zones de texte vous permettent de renommer les entrées.</p>
+<p>Après cela, choisissez dans la liste déroulante la partition à partir de laquelle le système démarrera par défaut, et réglez le délai avec le curseur au dessous.
+Ici, « immédiatement » va passer le menu de démarrage, "Jamais" va simplement s'arrêter sur le menu. Vous pouvez remplacer le paramètre de délai en maintenant la touche <span class="key">ALT</span> enfoncée pendant le démarrage.</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="4-mbr" id="4-mbr">Écrire le menu d'amorçage</a></h2>
+<img src="../images/apps-images/bootmanager-6.png" alt="bootmanager-6.png" /> 
+<img src="../images/apps-images/bootmanager-7.png" alt="bootmanager-7.png" />
+<p>Avant que le menu de démarrage ne soit est écrit sur le MBR, vous aurez un résumé de votre configuration avant d'avoir une dernière chance d'annuler l'opération. Vous n'avez pas d'inquiétude à avoir aussi longtemps que vous gardez en sureté une sauvegarde de votre MBR, puisque vous pourrez facilement annuler les changements. Si les choses tournaient mal, vous pouvez toujours démarrer depuis un CD d'installation Haiku ou une clé USB et restaurer la sauvegarde de votre MBR avec BootManager.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="activitymonitor.html">ActivityMonitor</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+::  <a href="cdplayer.html">CDPlayer</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

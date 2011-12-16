@@ -864,7 +864,7 @@ ext2_link(fs_volume* volume, fs_vnode* dir, const char* name, fs_vnode* node)
 {
 	// TODO
 
-	return B_NOT_SUPPORTED;
+	return B_UNSUPPORTED;
 }
 
 

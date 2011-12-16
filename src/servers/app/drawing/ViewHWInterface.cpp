@@ -104,6 +104,7 @@ run_app_thread(void* cookie)
 	if (BApplication* app = (BApplication*)cookie) {
 		app->Lock();
 		app->Run();
+		delete app;
 	}
 	return 0;
 }
@@ -420,7 +421,6 @@ ViewHWInterface::~ViewHWInterface()
 
 	be_app->Lock();
 	be_app->Quit();
-	delete be_app;
 }
 
 

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -38,6 +38,8 @@
 <li><a href="../../jp/preferences/screen.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/preferences/screen.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../pt_PT/preferences/screen.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/preferences/screen.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/preferences/screen.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/preferences/screen.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -58,12 +60,14 @@
 <span class="path">~/config/settings/kernel/drivers/vesa</span> - 只存在于运行在VESA模式下。<br />
 <span class="path">~/config/settings/Screen_data</span> - 保存了面板的窗口位置。</td></tr>
 </table>
-<p>您的每个<a href="../workspaces.html">工作区</a>都可以有各自的分辨率和色彩深度。</p>
+<p>您的每个<a href="../workspaces.html">工作区</a>都可以有各自的分辨率，色彩深度，和刷新率。</p>
 <img src="../images/prefs-images/screen.png" alt="screen.png" />
-<p>顶部的菜单用于指定所作修改仅用于当前工作区，或者用于所有工作区。依赖于您的显卡，另外的两个菜单包括了所有支持的分辨率和色彩深度设置。</p>
+<p>顶部的菜单用于指定所作修改仅用于当前工作区，或者用于所有工作区。根据您的显卡不同，另外的两个菜单包括了所有支持的分辨率，色彩深度和刷新率设置。</p>
 <p>在点击了 <span class="button">Apply</span> 之后，显示模式就被修改，然后出现一个警告，询问您报错或者放弃修改。如果您不回答该警告，在12秒之后，显示模式将会恢复到先前的设置。如果您的显示器不支持该设置，那么您可能不会看到该警告。</p>
 <p>在左边，您可以设置工作取得数量，并且对它们进行排列，然后打开<a href="backgrounds.html">背景</a>首选项。</p>
-<p><span class="button">Revert</span> 返回到您启动显示器首选项之前的设置状态。</p>
+<p><span class="button">恢复</span> 返回到您启动显示器首选项之前的设置状态。</p>
+<div class="box-info">尽管 Haiku 的 VESA 模式运行的很好，但您会受到一些限制。您可能无法在原生分辨率下进行宽屏显示，而这通常会造成图像模糊。对于可用的颜色深度和刷新率也会有所限制。</div>
+<p>在左下角，您可以设置工作区的数量，并且对他们的排布进行修改，还可以打开 <a href="backgrounds.html">背景</a> 首选项。</p>
 
 </div>
 </div>

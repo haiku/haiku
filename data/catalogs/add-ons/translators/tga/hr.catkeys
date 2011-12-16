@@ -1,0 +1,13 @@
+1	croatian	x-vnd.Haiku-TGATranslator	3031470051
+Ignore TGA alpha channel	TGAView		Ignoriraj TGA alfa kanal
+Save with RLE Compression	TGAView		Spremi sa RLE kompresijom
+TGA Image Translator	TGAView		TGA prevoditelj slika
+TGA Settings	TGAMain		TGA postavke
+TGA image translator	TGATranslator		TGA prevoditelj slika
+TGA images	TGATranslator		TGA slike
+TGATranslator Settings	TGATranslator		TGATranlsator postavke
+Targa image (%d bits RLE gray)	TGATranslator		Targa slika (%d sivi RLE bitovi)
+Targa image (%d bits gray)	TGATranslator		Targa slika (%d sivi bitovi)
+Targa image (%d bits truecolor)	TGATranslator		Targa slika (%d bita prava boja)
+Version %d.%d.%d %s	TGAView		Verzija %d.%d.%d %s
+Written by the Haiku Translation Kit Team	TGAView		Napisao Haiku Translation Kit Tim

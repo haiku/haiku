@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2006-2011, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef MAIN_WINDOW_H
@@ -72,8 +72,6 @@ private:
 			float				fBorderDist;
 			BPoint				fScreenPosition;
 				// not really the position, 0...1 = left...right
-
-			BRect				fNamePanelFrame;
 
 			bool				fAutoRaise;
 			bool				fShowOnAllWorkspaces;

@@ -1,0 +1,68 @@
+1	lithuanian	x-vnd.Haiku-MediaConverter	296071315
+Video using parameters form settings	MediaConverter		Vaizdo įrašui naudojami nurodyti parametrai
+Video encoding:	MediaConverter		Vaizdo kodavimas:
+No audio	Audio codecs list		Be garso takelio
+Error	MediaConverter		Klaida
+Error loading a file	MediaConverter		Klaida įkeliant failą
+File Error	MediaConverter-FileInfo		Failo klaida
+Open…	Menu		Atverti…
+Start [ms]: 	MediaConverter		Pradžia [ms]:
+Output file '%filename' created	MediaConverter		Sukurtas išvesties failas „%filename“
+Output format	MediaConverter		Išvesties formatas
+%.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz, stereo, %lld kadrai (-ų)
+End   [ms]: 	MediaConverter		Pabaiga [ms]:
+MediaConverter	System name		Medijos keitiklis
+No video	Video codecs list		Be vaizdo takelio
+Duration:	MediaConverter-FileInfo		Trukmė:
+OK	MediaConverter		Gerai
+Error writing audio frame %Ld	MediaConverter		Klaida rašant %Ld–ąjį garso takelio kadrą
+Error converting '%filename'	MediaConverter		Klaida konvertuojant „%filename“
+Low	MediaConverter		Žema
+Conversion completed	MediaConverter		Konvertavimas baigtas
+Audio:	MediaConverter-FileInfo		Garso takelis:
+OK	MediaConverter-FileInfo		Gerai
+ seconds	MediaFileInfo		 sek.
+Source files	MediaConverter		Pirminiai failai
+Cancelling	MediaConverter		Nutraukiama
+%d byte 	MediaFileInfo		%d baitas
+Error loading files	MediaConverter		Klaida įkeliant failus
+Cancel	MediaConverter		Atsisakyti
+None available	Video codecs		Nepasiekiama
+Conversion cancelled	MediaConverter		Konvertavimas nutrauktas
+No file selected	MediaConverter-FileInfo		Nepažymėtas joks failas
+Error writing video frame %Ld	MediaConverter		Klaida rašant %Ld-ąjį vaizdo takelio kadrą
+Select this folder	MediaConverter		Rinktis šį aplanką
+Continue	MediaConverter		Tęsti
+Encoder parameters	MediaConverter-EncoderWindow		Kodavimo parametrai
+Video:	MediaConverter-FileInfo		Vaizdo takelis:
+%u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u×%u, %.2f k/s, %Ld kadrų
+%d bit 	MediaFileInfo		%d bitų
+Error creating '%filename'	MediaConverter		Klaida kuriant „%filename“
+Video quality not supported	MediaConverter		Nepalaikomas vaizdo takelio kokybės lygmuo
+Cancelling…	MediaConverter		Nutraukiama…
+File details	MediaConverter		Failo savybės
+Select	MediaConverter		Rinktis
+Writing video track: %ld%% complete	MediaConverter		Rašomas vaizdo takelis: atlikta %ld%%
+Quit	Menu		Baigti darbą
+Preview	MediaConverter		Peržiūrėti
+File format:	MediaConverter		Failo formatas:
+None available	Audio codecs		Nepasiekiama
+MediaConverter+:SaveDirectory	MediaConverter		Medijos keitiklis: parinkite paskirties aplanką
+Error read audio frame %Ld	MediaConverter		Klaida skaitant %Ld–ąjį garso takelio kadrą
+%.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz, %ld kanalai (-ų), %lld kadrai (-ų)
+Error launching: %strError%	MediaConverter		Klaida paleidžiant: %strError%
+High	MediaConverter		Aukšta
+The file was not recognized as a supported media file:	MediaConverter		Šis failas nebuvo atpažintas kaip palaikomo formato failas:
+Drop media files onto this window	MediaConverter		Numeskite vaizdo ir/ar garso failus ant šio lango
+Audio encoding:	MediaConverter		Garso takelio kodavimas:
+Audio quality not supported	MediaConverter		Nepalaikomas garso takelio kokybės lygmuo
+File	Menu		Failas
+Convert	MediaConverter		Konvertuoti
+Writing audio track: %ld%% complete	MediaConverter		Rašomas garso takelis: atlikta %ld%%
+Video quality: %3d%%	MediaConverter		Vaizdo takelio kokybė: %3d%%
+Output folder	MediaConverter		Paskirties aplankas
+Audio quality: %3d%%	MediaConverter		Garso takelio kokybė: %3d%%
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Skaitant failo informaciją įvyko klaida.\n\nKlaida:
+Error read video frame %Ld	MediaConverter		Klaida skaitant %Ld–ąjį vaizdo takelio kadrą
+%amountOfFiles files were not recognized as supported media files:	MediaConverter		Šie %amountOfFiles failai (-ų) nebuvo atpažinti kaip palaikomo formato failai:
+%.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz, mono, %lld kadrai (-ų)

@@ -28,22 +28,31 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
+
 #include <KernelExport.h>
+
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
+
+#include <directories.h>
 #include <OS.h>
+
 #include "debug.h"
 #include "auvia.h"
 
+
 #if DEBUG > 0
-static const char * logfile="/boot/home/auvia.log";
+static const char *logfile = kCommonLogDirectory "/auvia.log";
 static sem_id loglock;
 #endif
+
 
 void debug_printf(const char *text,...);
 void log_printf(const char *text,...);
 void log_create(void);
+
 
 void debug_printf(const char *text,...)
 {
@@ -57,6 +66,7 @@ void debug_printf(const char *text,...)
 	dprintf(DRIVER_NAME ": %s",buf);
 }
 
+
 void log_create()
 {
 #if DEBUG > 0
@@ -67,6 +77,7 @@ void log_create()
 	close(fd);
 #endif
 }
+
 
 void log_printf(const char *text,...)
 {
@@ -92,4 +103,3 @@ void log_printf(const char *text,...)
 	#endif
 #endif
 }
-

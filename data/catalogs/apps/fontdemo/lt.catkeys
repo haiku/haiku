@@ -1,0 +1,22 @@
+1	lithuanian	x-vnd.Haiku-FontDemo	1769653414
+Outline:	ControlView		Apvadas:
+Size: 50	ControlView		Dydis: 50
+Stop cycling	ControlView		Nebekeisti šriftų
+Shear: 90	ControlView		Pasvirimas: 90
+Spacing: 0	ControlView		Protarpiai: 0
+Haiku, Inc.	FontDemoView		Haiku, Inc.
+Rotation: %d	ControlView		Pasukimas: %d
+Shear: %d	ControlView		Pasvirimas: %d
+Spacing: %d	ControlView		Protarpiai: %d
+Cycle fonts	ControlView		Cikliškai keisti šriftus
+Font:	ControlView		Šriftas:
+Rotation: 0	ControlView		Pasukimas: 0
+Drawing mode:	ControlView		Piešimo būdas:
+FontDemo	FontDemo		Šriftų demonstracija
+Haiku, Inc.	ControlView		Haiku, Inc.
+Controls	FontDemo		Valdikliai
+Outline: %d	ControlView		Apvadas: %d
+Text:	ControlView		Tekstas:
+Antialiased text	ControlView		Glodinti tekstą
+Bounding boxes	ControlView		Rodyti simbolių ribas
+Size: %d	ControlView		Dydis: %d

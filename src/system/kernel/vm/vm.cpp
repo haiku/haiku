@@ -55,6 +55,7 @@
 
 #include "VMAddressSpaceLocking.h"
 #include "VMAnonymousCache.h"
+#include "VMAnonymousNoSwapCache.h"
 #include "IORequest.h"
 
 
@@ -447,6 +448,26 @@ lookup_area(VMAddressSpace* addressSpace, area_id id)
 }
 
 
+static status_t
+allocate_area_page_protections(VMArea* area)
+{
+	// In the page protections we store only the three user protections,
+	// so we use 4 bits per page.
+	uint32 bytes = (area->Size() / B_PAGE_SIZE + 1) / 2;
+	area->page_protections = (uint8*)malloc_etc(bytes,
+		HEAP_DONT_LOCK_KERNEL_SPACE);
+	if (area->page_protections == NULL)
+		return B_NO_MEMORY;
+
+	// init the page protections for all pages to that of the area
+	uint32 areaProtection = area->protection
+		& (B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA);
+	memset(area->page_protections, areaProtection | (areaProtection << 4),
+		bytes);
+	return B_OK;
+}
+
+
 static inline void
 set_area_page_protection(VMArea* area, addr_t pageAddress, uint32 protection)
 {
@@ -472,6 +493,17 @@ get_area_page_protection(VMArea* area, addr_t pageAddress)
 		protection &= 0x0f;
 	else
 		protection >>= 4;
+
+	// If this is a kernel area we translate the user flags to kernel flags.
+	if (area->address_space == VMAddressSpace::Kernel()) {
+		uint32 kernelProtection = 0;
+		if ((protection & B_READ_AREA) != 0)
+			kernelProtection |= B_KERNEL_READ_AREA;
+		if ((protection & B_WRITE_AREA) != 0)
+			kernelProtection |= B_KERNEL_WRITE_AREA;
+
+		return kernelProtection;
+	}
 
 	return protection | B_KERNEL_READ_AREA
 		| (protection & B_WRITE_AREA ? B_KERNEL_WRITE_AREA : 0);
@@ -618,7 +650,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 
 		// If no one else uses the area's cache, we can resize it, too.
 		if (cache->areas == area && area->cache_next == NULL
-			&& list_is_empty(&cache->consumers)
+			&& cache->consumers.IsEmpty()
 			&& cache->type == CACHE_TYPE_RAM) {
 			// Since VMCache::Resize() can temporarily drop the lock, we must
 			// unlock all lower caches to prevent locking order inversion.
@@ -973,6 +1005,95 @@ wait_if_address_range_is_wired(VMAddressSpace* addressSpace, addr_t base,
 	}
 
 	return false;
+}
+
+
+/*!	Prepares an area to be used for vm_set_kernel_area_debug_protection().
+	It must be called in a situation where the kernel address space may be
+	locked.
+*/
+status_t
+vm_prepare_kernel_area_debug_protection(area_id id, void** cookie)
+{
+	AddressSpaceReadLocker locker;
+	VMArea* area;
+	status_t status = locker.SetFromArea(id, area);
+	if (status != B_OK)
+		return status;
+
+	if (area->page_protections == NULL) {
+		status = allocate_area_page_protections(area);
+		if (status != B_OK)
+			return status;
+	}
+
+	*cookie = (void*)area;
+	return B_OK;
+}
+
+
+/*!	This is a debug helper function that can only be used with very specific
+	use cases.
+	Sets protection for the given address range to the protection specified.
+	If \a protection is 0 then the involved pages will be marked non-present
+	in the translation map to cause a fault on access. The pages aren't
+	actually unmapped however so that they can be marked present again with
+	additional calls to this function. For this to work the area must be
+	fully locked in memory so that the pages aren't otherwise touched.
+	This function does not lock the kernel address space and needs to be
+	supplied with a \a cookie retrieved from a successful call to
+	vm_prepare_kernel_area_debug_protection().
+*/
+status_t
+vm_set_kernel_area_debug_protection(void* cookie, void* _address, size_t size,
+	uint32 protection)
+{
+	// check address range
+	addr_t address = (addr_t)_address;
+	size = PAGE_ALIGN(size);
+
+	if ((address % B_PAGE_SIZE) != 0
+		|| (addr_t)address + size < (addr_t)address
+		|| !IS_KERNEL_ADDRESS(address)
+		|| !IS_KERNEL_ADDRESS((addr_t)address + size)) {
+		return B_BAD_VALUE;
+	}
+
+	// Translate the kernel protection to user protection as we only store that.
+	if ((protection & B_KERNEL_READ_AREA) != 0)
+		protection |= B_READ_AREA;
+	if ((protection & B_KERNEL_WRITE_AREA) != 0)
+		protection |= B_WRITE_AREA;
+
+	VMAddressSpace* addressSpace = VMAddressSpace::GetKernel();
+	VMTranslationMap* map = addressSpace->TranslationMap();
+	VMArea* area = (VMArea*)cookie;
+
+	addr_t offset = address - area->Base();
+	if (area->Size() - offset < size) {
+		panic("protect range not fully within supplied area");
+		return B_BAD_VALUE;
+	}
+
+	if (area->page_protections == NULL) {
+		panic("area has no page protections");
+		return B_BAD_VALUE;
+	}
+
+	// Invalidate the mapping entries so any access to them will fault or
+	// restore the mapping entries unchanged so that lookup will success again.
+	map->Lock();
+	map->DebugMarkRangePresent(address, address + size, protection != 0);
+	map->Unlock();
+
+	// And set the proper page protections so that the fault case will actually
+	// fail and not simply try to map a new page.
+	for (addr_t pageAddress = address; pageAddress < address + size;
+			pageAddress += B_PAGE_SIZE) {
+		set_area_page_protection(area, pageAddress, protection);
+	}
+
+	return B_OK;
 }
 
 
@@ -2180,7 +2301,8 @@ vm_copy_on_write_area(VMCache* lowerCache,
 
 	// create an anonymous cache
 	status_t status = VMCacheFactory::CreateAnonymousCache(upperCache, false, 0,
-		0, true, VM_PRIORITY_USER);
+		0, dynamic_cast<VMAnonymousNoSwapCache*>(lowerCache) == NULL,
+		VM_PRIORITY_USER);
 	if (status != B_OK)
 		return status;
 
@@ -2241,6 +2363,8 @@ vm_copy_on_write_area(VMCache* lowerCache,
 			}
 		}
 	} else {
+		ASSERT(lowerCache->WiredPagesCount() == 0);
+
 		// just change the protection of all areas
 		for (VMArea* tempArea = upperCache->areas; tempArea != NULL;
 				tempArea = tempArea->cache_next) {
@@ -2442,7 +2566,7 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 		// Make sure the area (respectively, if we're going to call
 		// vm_copy_on_write_area(), all areas of the cache) doesn't have any
 		// wired ranges.
-		if (!isWritable && becomesWritable && !list_is_empty(&cache->consumers)) {
+		if (!isWritable && becomesWritable && !cache->consumers.IsEmpty()) {
 			for (VMArea* otherArea = cache->areas; otherArea != NULL;
 					otherArea = otherArea->cache_next) {
 				if (wait_if_area_is_wired(otherArea, &locker, &cacheLocker)) {
@@ -2490,7 +2614,7 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 	} else if (!isWritable && becomesWritable) {
 		// !writable -> writable
 
-		if (!list_is_empty(&cache->consumers)) {
+		if (!cache->consumers.IsEmpty()) {
 			// There are consumers -- we have to insert a new cache. Fortunately
 			// vm_copy_on_write_area() does everything that's needed.
 			changePageProtection = false;
@@ -2885,9 +3009,8 @@ dump_cache_tree_recursively(VMCache* cache, int level,
 		kprintf("%p\n", cache);
 
 	// recursively print its consumers
-	VMCache* consumer = NULL;
-	while ((consumer = (VMCache*)list_get_next_item(&cache->consumers,
-			consumer)) != NULL) {
+	for (VMCache::ConsumerList::Iterator it = cache->consumers.GetIterator();
+			VMCache* consumer = it.Next();) {
 		dump_cache_tree_recursively(consumer, level + 1, highlightCache);
 	}
 }
@@ -2947,9 +3070,8 @@ update_cache_info_recursively(VMCache* cache, cache_info& info)
 		info.committed += cache->committed_size;
 
 	// recurse
-	VMCache* consumer = NULL;
-	while ((consumer = (VMCache*)list_get_next_item(&cache->consumers,
-			consumer)) != NULL) {
+	for (VMCache::ConsumerList::Iterator it = cache->consumers.GetIterator();
+			VMCache* consumer = it.Next();) {
 		update_cache_info_recursively(consumer, info);
 	}
 }
@@ -3012,9 +3134,8 @@ dump_caches_recursively(VMCache* cache, cache_info& info, int level)
 	kputs("\n");
 
 	// recurse
-	VMCache* consumer = NULL;
-	while ((consumer = (VMCache*)list_get_next_item(&cache->consumers,
-			consumer)) != NULL) {
+	for (VMCache::ConsumerList::Iterator it = cache->consumers.GetIterator();
+			VMCache* consumer = it.Next();) {
 		dump_caches_recursively(consumer, info, level + 1);
 	}
 }
@@ -3667,6 +3788,9 @@ vm_init(kernel_args* args)
 	vm_page_init_num_pages(args);
 	sAvailableMemory = vm_page_num_pages() * B_PAGE_SIZE;
 
+	slab_init(args);
+
+#if USE_DEBUG_HEAP_FOR_MALLOC || USE_GUARDED_HEAP_FOR_MALLOC
 	size_t heapSize = INITIAL_HEAP_SIZE;
 	// try to accomodate low memory systems
 	while (heapSize > sAvailableMemory / 8)
@@ -3674,9 +3798,6 @@ vm_init(kernel_args* args)
 	if (heapSize < 1024 * 1024)
 		panic("vm_init: go buy some RAM please.");
 
-	slab_init(args);
-
-#if	!USE_SLAB_ALLOCATOR_FOR_MALLOC
 	// map in the new heap and initialize it
 	addr_t heapBase = vm_allocate_early(args, heapSize, heapSize,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0);
@@ -3687,7 +3808,7 @@ vm_init(kernel_args* args)
 	// initialize the free page list and physical page mapper
 	vm_page_init(args);
 
-	// initialize the hash table that stores the pages mapped to caches
+	// initialize the cache allocators
 	vm_cache_init(args);
 
 	{
@@ -3699,7 +3820,7 @@ vm_init(kernel_args* args)
 	VMAddressSpace::Init();
 	reserve_boot_loader_ranges(args);
 
-#if !USE_SLAB_ALLOCATOR_FOR_MALLOC
+#if USE_DEBUG_HEAP_FOR_MALLOC || USE_GUARDED_HEAP_FOR_MALLOC
 	heap_init_post_area();
 #endif
 
@@ -3712,7 +3833,7 @@ vm_init(kernel_args* args)
 
 	// allocate areas to represent stuff that already exists
 
-#if	!USE_SLAB_ALLOCATOR_FOR_MALLOC
+#if USE_DEBUG_HEAP_FOR_MALLOC || USE_GUARDED_HEAP_FOR_MALLOC
 	address = (void*)ROUNDDOWN(heapBase, B_PAGE_SIZE);
 	create_area("kernel heap", &address, B_EXACT_ADDRESS, heapSize,
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
@@ -3738,6 +3859,15 @@ vm_init(kernel_args* args)
 
 	void* lastPage = (void*)ROUNDDOWN(~(addr_t)0, B_PAGE_SIZE);
 	vm_block_address_range("overflow protection", lastPage, B_PAGE_SIZE);
+
+#if PARANOID_KERNEL_MALLOC
+	vm_block_address_range("uninitialized heap memory",
+		(void *)ROUNDDOWN(0xcccccccc, B_PAGE_SIZE), B_PAGE_SIZE * 64);
+#endif
+#if PARANOID_KERNEL_FREE
+	vm_block_address_range("freed heap memory",
+		(void *)ROUNDDOWN(0xdeadbeef, B_PAGE_SIZE), B_PAGE_SIZE * 64);
+#endif
 
 	// create the object cache for the page mappings
 	gPageMappingsObjectCache = create_object_cache_etc("page mappings",
@@ -3811,7 +3941,7 @@ vm_init_post_sem(kernel_args* args)
 
 	slab_init_post_sem();
 
-#if	!USE_SLAB_ALLOCATOR_FOR_MALLOC
+#if USE_DEBUG_HEAP_FOR_MALLOC || USE_GUARDED_HEAP_FOR_MALLOC
 	heap_init_post_sem();
 #endif
 
@@ -6135,21 +6265,22 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 			if ((area->protection & B_KERNEL_AREA) != 0)
 				return B_NOT_ALLOWED;
 
-			AreaCacheLocker cacheLocker(area);
-
-			if (wait_if_area_is_wired(area, &locker, &cacheLocker)) {
-				restart = true;
-				break;
-			}
-
-			cacheLocker.Unlock();
-
 			// TODO: For (shared) mapped files we should check whether the new
 			// protections are compatible with the file permissions. We don't
 			// have a way to do that yet, though.
 
 			addr_t offset = currentAddress - area->Base();
 			size_t rangeSize = min_c(area->Size() - offset, sizeLeft);
+
+			AreaCacheLocker cacheLocker(area);
+
+			if (wait_if_area_range_is_wired(area, currentAddress, rangeSize,
+					&locker, &cacheLocker)) {
+				restart = true;
+				break;
+			}
+
+			cacheLocker.Unlock();
 
 			currentAddress += rangeSize;
 			sizeLeft -= rangeSize;
@@ -6176,18 +6307,9 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 			if (area->protection == protection)
 				continue;
 
-			// In the page protections we store only the three user protections,
-			// so we use 4 bits per page.
-			uint32 bytes = (area->Size() / B_PAGE_SIZE + 1) / 2;
-			area->page_protections = (uint8*)malloc(bytes);
-			if (area->page_protections == NULL)
-				return B_NO_MEMORY;
-
-			// init the page protections for all pages to that of the area
-			uint32 areaProtection = area->protection
-				& (B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA);
-			memset(area->page_protections,
-				areaProtection | (areaProtection << 4), bytes);
+			status_t status = allocate_area_page_protections(area);
+			if (status != B_OK)
+				return status;
 		}
 
 		// We need to lock the complete cache chain, since we potentially unmap

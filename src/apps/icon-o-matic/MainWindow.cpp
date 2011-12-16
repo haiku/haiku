@@ -126,9 +126,9 @@ MainWindow::MainWindow(BRect frame, IconEditorApp* app,
 
 MainWindow::~MainWindow()
 {
-	delete fState;
-
 	SetIcon(NULL);
+
+	delete fState;
 
 	// Make sure there are no listeners attached to the document anymore.
 	while (BView* child = ChildAt(0L)) {

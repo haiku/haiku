@@ -45,7 +45,7 @@ private:
 			void	_DrawWindow(DrawingEngine* drawingEngine,
 						const BRect& workspaceFrame, const BRect& screenFrame,
 						::Window* window, BPoint windowPosition,
-						BRegion& backgroundRegion, bool active);
+						BRegion& backgroundRegion, bool workspaceActive);
 			void	_DrawWorkspace(DrawingEngine* drawingEngine,
 						BRegion& redraw, int32 index);
 

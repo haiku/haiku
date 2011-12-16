@@ -51,11 +51,15 @@ protected:
 				uint64			heapOffset;
 				uint64			heapSize;
 
-				AttributeHandlerContext(BErrorOutput* errorOutput,
-					BPackageContentHandler* packageContentHandler);
+				BHPKGPackageSectionID	section;
 
 				AttributeHandlerContext(BErrorOutput* errorOutput,
-					BLowLevelPackageContentHandler* lowLevelHandler);
+					BPackageContentHandler* packageContentHandler,
+					BHPKGPackageSectionID section);
+
+				AttributeHandlerContext(BErrorOutput* errorOutput,
+					BLowLevelPackageContentHandler* lowLevelHandler,
+					BHPKGPackageSectionID section);
 
 				void ErrorOccurred();
 			};
@@ -145,7 +149,8 @@ protected:
 			struct LowLevelAttributeHandler : AttributeHandler {
 				LowLevelAttributeHandler();
 				LowLevelAttributeHandler(uint8 id,
-					const BPackageAttributeValue& value, void* token);
+					const BPackageAttributeValue& value, void* parentToken,
+					void* token);
 
 				virtual status_t HandleAttribute(
 					AttributeHandlerContext* context, uint8 id,
@@ -153,6 +158,7 @@ protected:
 				virtual status_t Delete(AttributeHandlerContext* context);
 
 			private:
+				void*			fParentToken;
 				void*			fToken;
 				uint8			fID;
 				AttributeValue	fValue;
@@ -198,7 +204,8 @@ protected:
 									AttributeHandlerContext* context,
 									AttributeHandler* rootAttributeHandler);
 			status_t			ParseAttributeTree(
-									AttributeHandlerContext* context);
+									AttributeHandlerContext* context,
+									bool& _sectionHandled);
 
 	virtual	status_t			ReadAttributeValue(uint8 type, uint8 encoding,
 									AttributeValue& _value);
@@ -223,6 +230,9 @@ protected:
 			SectionInfo			fPackageAttributesSection;
 
 private:
+			status_t			_ParseAttributeTree(
+									AttributeHandlerContext* context);
+
 	template<typename Type>
 	inline	status_t			_Read(Type& _value);
 

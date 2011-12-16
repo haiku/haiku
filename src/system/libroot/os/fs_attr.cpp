@@ -12,6 +12,7 @@
 #include <stdlib.h>
 
 #include <dirent_private.h>
+#include <errno_private.h>
 #include <syscalls.h>
 #include <syscall_utils.h>
 
@@ -27,7 +28,7 @@ open_attr_dir(int file, const char *path, bool traverse)
 
 	int fd = _kern_open_attr_dir(file, path, traverse);
 	if (fd < 0) {
-		errno = fd;
+		__set_errno(fd);
 		return NULL;
 	}
 

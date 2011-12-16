@@ -6,6 +6,7 @@
 #define _NOTIFICATION_H
 
 
+#include <Archivable.h>
 #include <Entry.h>
 #include <List.h>
 #include <String.h>
@@ -22,15 +23,21 @@ enum notification_type {
 class BBitmap;
 
 
-class BNotification {
+class BNotification : public BArchivable {
 public:
 								BNotification(notification_type type);
-								~BNotification();
+								BNotification(BMessage* archive);
+	virtual						~BNotification();
+
+			status_t			InitCheck() const;
+
+	static	BArchivable*		Instantiate(BMessage* archive);
+	virtual	status_t			Archive(BMessage* archive, bool deep = true) const;
 
 			notification_type	Type() const;
 
-			const char*			Application() const;
-			void				SetApplication(const BString& app);
+			const char*			Group() const;
+			void				SetGroup(const BString& group);
 
 			const char*			Title() const;
 			void				SetTitle(const BString& title);
@@ -61,9 +68,13 @@ public:
 			const BBitmap*		Icon() const;
 			status_t			SetIcon(const BBitmap* icon);
 
+			status_t			Send(bigtime_t timeout = -1);
+
 private:
+			status_t			fInitStatus;
+
 			notification_type	fType;
-			BString				fAppName;
+			BString				fGroup;
 			BString				fTitle;
 			BString				fContent;
 			BString				fID;

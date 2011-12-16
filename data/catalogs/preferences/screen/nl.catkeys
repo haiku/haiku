@@ -1,49 +1,50 @@
-1	dutch	x-vnd.Haiku-Screen	3064825000
-%.1f Hz	Screen		%.1f Hz
-%sSerial no.: %s	Screen		%sSerienummer: %s
-/other…	Screen		/anders...
-15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 kleuren
-16 bits/pixel, 65536 colors	Screen		16 bits/pixel, 65536 kleuren
-24 bits/pixel, 16 Million colors	Screen		24 bits/pixel, 16 miljoen kleuren
-32 bits/pixel, 16 Million colors	Screen		32 bits/pixel, 16 miljoen kleuren
-8 bits/pixel, 256 colors	Screen		8 bits/pixel, 256 kleuren
-About	Screen		Over
-All workspaces	Screen		Alle werkplekken
-Apply	Screen		Toepassen
-Cancel	Screen		Annuleren
-Colors:	Screen		Kleuren:
-Columns:	Screen		Kolommen:
-Combine displays:	Screen		Displays combineren:
-Could not write VESA mode settings file:\n\t	Screen		Kon instellingenbestand voor de VESA-modus niet instellen:\n\t
-Current workspace	Screen		Huidige werkplek
-Do you wish to keep these settings?	Screen		Wilt u deze instellingen behouden?
-Done	Screen		Klaar
-Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Horizontale frequentie:\t%lu - %lu kHz\nVerticale frequentie:\t%lu - %lu Hz\n\nMaximale pixelklok:\t%g MHz
-Hz	Screen		Hz
-Keep	Screen		Behouden
-OK	Screen		Oké
-Other…	Screen		Anders...
-Refresh rate	Screen		verversingssnelheid
-Refresh rate:	Screen		Verversingssnelheid:
-Resolution:	Screen		Resolutie:
-Revert	Screen		Omkeren
-Rows:	Screen		Rijen:
-Screen	Screen		Scherm
-Screen preferences by the Haiku team	Screen		Schermvoorkeuren door het Haiku-team
-Set background…	Screen		Achtergrond instellen...
-Settings will revert in %seconds seconds.	Screen		Terug naar instellingen na %seconds seconden.
-Swap displays:	Screen		Diplays omwisselen:
-The screen mode could not be set:\n\t%s\n	Screen		De schermmodus kon niet worden ingesteld:\n\t%s\n
-Type or use the left and right arrow keys.	Screen		Typen of links/rechts-pijltoetsen gebruiken.
-Undo	Screen		Ongedaan maken
-Unknown mode	Screen		Onbekende modus
-Use laptop panel:	Screen		Gebruik laptopscherm:
-Workspaces	Screen		Werkplekken
-always	Screen		altijd
-bits/pixel	Screen		bits/pixel
-disable	Screen		uitschakelen
-horizontally	Screen		horizontaal
-if needed	Screen		indien nodig
-no	Screen		nee
-vertically	Screen		verticaal
+1	dutch; flemish	x-vnd.Haiku-Screen	3440722853
 yes	Screen		ja
+Use laptop panel:	Screen		Gebruik laptopscherm:
+15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 kleuren
+/other…	Screen		/anders...
+16 bits/pixel, 65536 colors	Screen		16 bits/pixel, 65536 kleuren
+Revert	Screen		Omkeren
+Swap displays:	Screen		Diplays omwisselen:
+Combine displays:	Screen		Displays combineren:
+Done	Screen		Klaar
+Set background…	Screen		Achtergrond instellen...
+Undo	Screen		Ongedaan maken
+if needed	Screen		indien nodig
+Screen preferences by the Haiku team	Screen		Schermvoorkeuren door het Haiku-team
+Screen	System name		Scherm
+OK	Screen		Oké
+Workspaces	Screen		Werkplekken
+The screen mode could not be set:\n\t%s\n	Screen		De schermmodus kon niet worden ingesteld:\n\t%s\n
+no	Screen		nee
+Could not write VESA mode settings file:\n\t	Screen		Kon instellingenbestand voor de VESA-modus niet instellen:\n\t
+Type or use the left and right arrow keys.	Screen		Typen of links/rechts-pijltoetsen gebruiken.
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Horizontale frequentie:\t%lu - %lu kHz\nVerticale frequentie:\t%lu - %lu Hz\n\nMaximale pixelklok:\t%g MHz
+Keep	Screen		Behouden
+Unknown mode	Screen		Onbekende modus
+disable	Screen		uitschakelen
+Columns:	Screen		Kolommen:
+All workspaces	Screen		Alle werkplekken
+always	Screen		altijd
+32 bits/pixel, 16 Million colors	Screen		32 bits/pixel, 16 miljoen kleuren
+Current workspace	Screen		Huidige werkplek
+About	Screen		Over
+24 bits/pixel, 16 Million colors	Screen		24 bits/pixel, 16 miljoen kleuren
+horizontally	Screen		horizontaal
+Other…	Screen		Anders...
+Cancel	Screen		Annuleren
+bits/pixel	Screen		bits/pixel
+Settings will revert in %seconds seconds.	Screen		Terug naar instellingen na %seconds seconden.
+Refresh rate:	Screen		Verversingssnelheid:
+Hz	Screen		Hz
+Do you wish to keep these settings?	Screen		Wilt u deze instellingen behouden?
+Rows:	Screen		Rijen:
+vertically	Screen		verticaal
+Resolution:	Screen		Resolutie:
+Screen	Screen		Scherm
+%.1f Hz	Screen		%.1f Hz
+8 bits/pixel, 256 colors	Screen		8 bits/pixel, 256 kleuren
+Apply	Screen		Toepassen
+Refresh rate	Screen		verversingssnelheid
+%sSerial no.: %s	Screen		%sSerienummer: %s
+Colors:	Screen		Kleuren:

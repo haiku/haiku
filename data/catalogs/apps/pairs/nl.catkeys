@@ -1,12 +1,12 @@
-1	dutch	x-vnd.Haiku-Pairs	1126884905
-Beginner (4x4)	PairsWindow		Beginner (4x4)
+1	dutch; flemish	x-vnd.Haiku-Pairs	1126884905
 Expert (8x8)	PairsWindow		Expert (8x8)
-Game	PairsWindow		Spel
-Intermediate (6x6)	PairsWindow		Gevorderde (6x6)
-New	PairsWindow		Nieuw
-New game	PairsWindow		Nieuw spel
-OK	PairsView		Oké
-Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Pairs heeft niet genoeg vector-iconen gevonden op uw systeem; het heeft er minstens %d nodig.
-Quit	PairsWindow		Afsluiten
+Beginner (4x4)	PairsWindow		Beginner (4x4)
 Quit game	PairsWindow		Spel afsluiten
+Game	PairsWindow		Spel
 Size	PairsWindow		Grootte
+New	PairsWindow		Nieuw
+OK	PairsView		Oké
+Intermediate (6x6)	PairsWindow		Gevorderde (6x6)
+Quit	PairsWindow		Afsluiten
+New game	PairsWindow		Nieuw spel
+Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Pairs heeft niet genoeg vector-iconen gevonden op uw systeem; het heeft er minstens %d nodig.

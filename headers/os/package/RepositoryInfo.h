@@ -8,7 +8,7 @@
 
 #include <Archivable.h>
 #include <Entry.h>
-#include <ObjectList.h>
+#include <StringList.h>
 #include <String.h>
 
 #include <package/PackageArchitecture.h>
@@ -38,8 +38,8 @@ public:
 			const BString&		Summary() const;
 			uint8				Priority() const;
 			BPackageArchitecture	Architecture() const;
-			const BObjectList<BString>&	LicenseNames() const;
-			const BObjectList<BString>&	LicenseTexts() const;
+			const BStringList&	LicenseNames() const;
+			const BStringList&	LicenseTexts() const;
 
 			void				SetName(const BString& name);
 			void				SetOriginalBaseURL(const BString& url);
@@ -75,8 +75,8 @@ private:
 			BString				fSummary;
 			uint8				fPriority;
 			BPackageArchitecture	fArchitecture;
-			BObjectList<BString>	fLicenseNames;
-			BObjectList<BString>	fLicenseTexts;
+			BStringList			fLicenseNames;
+			BStringList			fLicenseTexts;
 };
 
 

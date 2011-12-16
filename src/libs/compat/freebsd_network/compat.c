@@ -362,6 +362,8 @@ device_delete_child(device_t parent, device_t child)
 
 	if (parent != NULL)
 		list_remove_item(&parent->children, child);
+	else
+		list_remove_item(&sRootDevices, child);
 
 	// We differentiate from the FreeBSD logic here - it will first delete
 	// the children, and will then detach the device.

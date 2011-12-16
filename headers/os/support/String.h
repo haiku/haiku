@@ -30,6 +30,9 @@ public:
 								int32 charCount) const;
 			bool			IsEmpty() const;
 
+			uint32			HashValue() const;
+	static	uint32			HashValue(const char* string);
+
 			// Assignment
 			BString&		operator=(const BString& string);
 			BString&		operator=(const char* string);
@@ -318,9 +321,20 @@ public:
 			BString&		operator<<(float value);
 			BString&		operator<<(double value);
 
+public:
+			class Private;
+			friend class Private;
+
 private:
-	class PosVect;
-	friend class BStringRef;
+			class PosVect;
+			friend class BStringRef;
+
+			enum PrivateDataTag {
+				PRIVATE_DATA
+			};
+
+private:
+							BString(char* privateData, PrivateDataTag tag);
 
 			// Management
 			status_t		_MakeWritable();
@@ -413,6 +427,13 @@ BString::String() const
 	if (!fPrivateData)
 		return "";
 	return fPrivateData;
+}
+
+
+inline uint32
+BString::HashValue() const
+{
+	return HashValue(String());
 }
 
 

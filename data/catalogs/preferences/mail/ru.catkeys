@@ -1,44 +1,60 @@
-1	russian	x-vnd.Haiku-Mail	458432473
-Account name:	Config Views		Имя аккаунта:
-Account name:	E-Mail		Имя аккаунта:
-Account settings	Config Views		Настройки аккаунта
-Accounts	Config Window		Аккаунты
-Add	Config Window		Добавить
-Add filter	Config Views		Добавить фильтр
-Always	Config Window		Всегда
-Apply	Config Window		Применить
-Check every	Config Window		Проверять каждые
-Choose Protocol	E-Mail		Выберите протокол
-E-mail	System name		Почта
-E-mail address:	E-Mail		E-mail адрес:
-Edit mailbox menu…	Config Window		Изменить меню…
-Error	Config Window		Ошибка
-Error retrieving general settings: %s\n	Config Window		Возникла ошибка при получении общих настроек: %s\n
-Incoming mail filters	Config Views		Фильтры входящей почты
-Login name:	E-Mail		Имя пользователя:
+1	russian	x-vnd.Haiku-Mail	3957822883
 Mail checking	Config Window		Проверка почты
-Miscellaneous	Config Window		Разное
-OK	Config Views		ОК
-OK	Config Window		ОК
-Only when dial-up is connected	Config Window		Только при наличии связи
-Outgoing mail filters	Config Views		Фильтры исходящей почты
-Password:	E-Mail		Пароль:
-Real name:	Config Views		Настоящее имя:
-Real name:	E-Mail		Настоящее имя:
-Remove	Config Views		Удалить
-Remove	Config Window		Удалить
-Return address:	Config Views		Обратный адрес:
-Revert	Config Window		Вернуть
-Schedule outgoing mail when dial-up is disconnected	Config Window		Ставить в очередь исходящую почту пока отсутствует подключение
-Server Name:	E-Mail		Адрес сервера:
 Settings	Config Window		Настройки
-Show connection status window:	Config Window		Отображать окно статуса соединения:
-Start mail services on startup	Config Window		Запускать почтовые службы при загрузке
-The filter could not be moved. Deleting filter.	Config Views		Фильтр не может быть перемещен. Удаление фильтра.
-While sending	Config Window		во время отправки
+Never	Config Window	show status window	никогда
+Only when dial-up is connected	Config Window		Только при наличии связи
 While sending and receiving	Config Window		во время отправки и получения
-\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nНевозможно получить общие настройки.\n\nВозникла ошибка при получении общих настроек:\n%s\n
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nДля создания аккаунта нажмите кнопку Добавить.\n\nДля удаления выберите нужный аккаунт и нажмите кнопку Удалить.\n\nИзменить настройки аккаунта можно просто выбрав нужный из списка.
 days	Config Window		дней
+Incoming	Config Window		Входящие
+OK	Config Window		ОК
+Start mail services on startup	Config Window		Запускать почтовые службы при загрузке
+E-mail address:	E-Mail		E-mail адрес:
+Account name:	E-Mail		Имя аккаунта:
+Account name:	Config Views		Имя аккаунта:
+Create new account	AutoConfigWindow		Создать новый аккаунт
+OK	Config Views		ОК
+The filter could not be moved. Deleting filter.	Config Views		Фильтр не может быть перемещен. Удаление фильтра.
+Revert	Config Window		Вернуть
+Login name:	E-Mail		Имя пользователя:
+Incoming	E-Mail		Входящие
+Password:	E-Mail		Пароль:
+Accounts	Config Window		Аккаунты
+Finish	AutoConfigWindow		Завершить
+Remove	Config Window		Удалить
+Miscellaneous	Config Window		Разное
+Show connection status window:	Config Window		Отображать окно статуса соединения:
+Server Name:	E-Mail		Адрес сервера:
+While sending	Config Window		во время отправки
+Schedule outgoing mail when dial-up is disconnected	Config Window		Ставить в очередь исходящую почту пока отсутствует подключение
 hours	Config Window		часов
+Enter a valid e-mail address.	AutoConfigWindow		Введите действительный почтовый адрес
+Add	Config Window		Добавить
+Account settings	AutoConfigWindow		Настройки аккаунта
+E-mail	System name		Почта
+never	Config Window	mail checking frequency	никогда
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nНевозможно получить общие настройки.\n\nВозникла ошибка при получении общих настроек:\n%s\n
+Real name:	Config Views		Настоящее имя:
+\t\t· Outgoing	Config Window		\t\t· Исходящие
+Choose Protocol	E-Mail		Выберите протокол
+Return address:	Config Views		Обратный адрес:
+Edit mailbox menu…	Config Window		Изменить меню…
+Outgoing	E-Mail		Исходящие
+\t\t· E-mail filters	Config Window		\t\t· Фильтры
+Remove	Config Views		Удалить
+\t\t· Incoming	Config Window		\t\t· Входящие
+Next	AutoConfigWindow		Вперед
+Check every	Config Window		Проверять каждые
+Back	AutoConfigWindow		Назад
+Incoming mail filters	Config Views		Фильтры входящей почты
+Account settings	Config Views		Настройки аккаунта
 minutes	Config Window		минут
+Error retrieving general settings: %s\n	Config Window		Возникла ошибка при получении общих настроек: %s\n
+Real name:	E-Mail		Настоящее имя:
+Apply	Config Window		Применить
+Always	Config Window		Всегда
+OK	AutoConfigWindow		ОК
+Add filter	Config Views		Добавить фильтр
+Outgoing	Config Window		Исходящие
+Outgoing mail filters	Config Views		Фильтры исходящей почты
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nДля создания аккаунта нажмите кнопку Добавить.\n\nДля удаления выберите нужный аккаунт и нажмите кнопку Удалить.\n\nИзменить настройки аккаунта можно просто выбрав нужный из списка.
+Error	Config Window		Ошибка

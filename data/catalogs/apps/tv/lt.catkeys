@@ -1,0 +1,27 @@
+1	lithuanian	x-vnd.Haiku.TV	1995288111
+TV	MainWin		TV
+Channel	MainWin		Kanalas
+Settings…	MainWin		Nuostatos…
+Interface	MainWin		Sąsaja
+Keep aspect ratio	MainWin		Išlaikyti proporciją
+Previous channel	MainWin		Ankstesnis kanalas
+Settings	MainWin		Nuostatos
+TV	System name		TV
+No border	MainWin		Nerodyti rėmelio
+Always on top	MainWin		Visuomet viršuje
+OK	MainWin		Gerai
+Quit	MainWin		Baigti darbą
+Full screen	MainWin		Visas ekranas
+Debug	MainWin		Derinimas
+Scale to native size	MainWin		Grąžinti originalų dydį
+unknown	MainWin		nežinomas
+Next channel	MainWin		Kitas kanalas
+Error, interface is busy:\n\n	MainWin		Klaida, sąsaja yra užimta:\n\n
+None	MainWin		Joks
+force 704 x 576, display aspect 4:3	MainWin		Skiriamoji geba 704×576, proporcija 4:3
+DVB - Digital Video Broadcasting TV	MainWin		DVB - Skaitmeninė televizija
+force 544 x 576, display aspect 4:3	MainWin		Skiriamoji geba 544×576, proporcija 4:3
+pixel aspect ratio	MainWin		Taško proporcija
+No menu	MainWin		Nerodyti meniu
+Error, connecting to interface failed:\n\n	MainWin		Klaida, nepavyko prisijungti prie sąsajos:\n\n
+force 720 x 576, display aspect 4:3	MainWin		Skiriamoji geba 720×576, proporcija 4:3

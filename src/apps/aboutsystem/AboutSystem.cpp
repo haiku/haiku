@@ -136,6 +136,8 @@ static const Translation gTranslations[] =
 		"Atharva Lath\n"
 	},
 	{ "hr",
+		"Ivica Koli\n"
+		"Zlatko Sehanović\n"
 		"zvacet\n"
 	},
 	{ "hu",
@@ -163,6 +165,8 @@ static const Translation gTranslations[] =
 	},
 	{ "lt",
 		"Algirdas Buckus\n"
+		"Simonas Kazlauskas\n"
+		"Rimas Kudelis\n"
 	},
 	{ "pl",
 		"Szymon Barczak\n"
@@ -188,6 +192,9 @@ static const Translation gTranslations[] =
 		"Reznikov Sergei (Diver)\n"
 		"Michael Smirnov\n"
 		"Vladimir Vasilenko\n"
+	},
+	{ "sr",
+		"Nikola Miljković\n"
 	},
 	{ "es",
 		"Pedro Arregui\n"
@@ -989,6 +996,7 @@ AboutView::_CreateCreditsView()
 		"Michael Pfeiffer\n"
 		"François Revol\n"
 		"Philippe Saint-Pierre\n"
+		"John Scipione\n"
 		"Andrej Spielmann\n"
 		"Jonas Sundström\n"
 		"Oliver Tappe\n"
@@ -1126,7 +1134,6 @@ AboutView::_CreateCreditsView()
 		"Thomas Roell\n"
 		"Rafael Romo\n"
 		"Ralf Schülke\n"
-		"John Scipione\n"
 		"Reznikov Sergei\n"
 		"Zousar Shaker\n"
 		"Caitlin Shaw\n"
@@ -1225,6 +1232,8 @@ AboutView::_CreateCreditsView()
 
 	BPath mitPath;
 	_GetLicensePath("MIT", mitPath);
+	BPath lgplPath;
+	_GetLicensePath("GNU LGPL v2.1", lgplPath);
 
 	font.SetSize(be_bold_font->Size() + 4);
 	font.SetFace(B_BOLD_FACE);
@@ -1236,14 +1245,18 @@ AboutView::_CreateCreditsView()
 		"respective license.]\n\n"));
 
 	// Haiku license
-	BString haikuLicense = B_TRANSLATE_COMMENT("The code that is unique to Haiku, "
-		"especially the kernel and all code that applications may link "
-		"against, is distributed under the terms of the %MIT license%. "
+	BString haikuLicense = B_TRANSLATE_COMMENT("The code that is unique to "
+		"Haiku, especially the kernel and all code that applications may link "
+		"against, is distributed under the terms of the <MIT license>. "
 		"Some system libraries contain third party code distributed under the "
-		"LGPL license. You can find the copyrights to third party code below.\n"
-		"\n", "%MIT license% isn't a variable and has to be translated.");
-	int32 licensePart1 = haikuLicense.FindFirst("%");
-	int32 licensePart2 = haikuLicense.FindLast("%");
+		"<LGPL license>. You can find the copyrights to third party code below."
+		"\n\n", "<MIT license> and <LGPL license> aren't variables and can be "
+		"translated. However, please, don't remove < and > as they're needed "
+		"as placeholders for proper hypertext functionality.");
+	int32 licensePart1 = haikuLicense.FindFirst("<");
+	int32 licensePart2 = haikuLicense.FindFirst(">");
+	int32 licensePart3 = haikuLicense.FindLast("<");
+	int32 licensePart4 = haikuLicense.FindLast(">");
 	BString part;
 	haikuLicense.CopyInto(part, 0, licensePart1);
 	fCreditsView->Insert(part);
@@ -1254,8 +1267,18 @@ AboutView::_CreateCreditsView()
 	fCreditsView->InsertHyperText(part, new OpenFileAction(mitPath.Path()));
 
 	part.Truncate(0);
-	haikuLicense.CopyInto(part, licensePart2 + 1, haikuLicense.Length() - 1
+	haikuLicense.CopyInto(part, licensePart2 + 1, licensePart3 - 1
 		- licensePart2);
+	fCreditsView->Insert(part);
+
+	part.Truncate(0);
+	haikuLicense.CopyInto(part, licensePart3 + 1, licensePart4 - 1
+		- licensePart3);
+	fCreditsView->InsertHyperText(part, new OpenFileAction(lgplPath.Path()));
+
+	part.Truncate(0);
+	haikuLicense.CopyInto(part, licensePart4 + 1, haikuLicense.Length() - 1
+		- licensePart4);
 	fCreditsView->Insert(part);
 
 	// GNU copyrights
@@ -1280,8 +1303,10 @@ AboutView::_CreateCreditsView()
 		"telnetd, traceroute\n"
 		COPYRIGHT_STRING "1994-2008 The FreeBSD Project. "
 		"All rights reserved."),
+		StringVector("BSD (2-clause)", "BSD (3-clause)", "BSD (4-clause)",
+			NULL),
+		StringVector(),
 		"http://www.freebsd.org");
-			// TODO: License!
 
 	// NetBSD copyrights
 	AddCopyrightEntry("The NetBSD Project",
@@ -1318,7 +1343,8 @@ AboutView::_CreateCreditsView()
 
 	// FreeType copyrights
 	_AddPackageCredit(PackageCredit("FreeType2")
-		.SetCopyright(B_TRANSLATE("Portions of this software are copyright. "
+		.SetCopyright(B_TRANSLATE("Portions of this software are under "
+			"copyright.\n"
 			COPYRIGHT_STRING "1996-2006 "
 			"The FreeType Project. All rights reserved."))
 		.SetLicense("FTL")
@@ -1334,8 +1360,7 @@ AboutView::_CreateCreditsView()
 	// SGI's GLU implementation copyrights
 	_AddPackageCredit(PackageCredit("GLU")
 		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "1991-2000 "
-			"Silicon Graphics, Inc. SGI's Software FreeB license. "
-			"All rights reserved."))
+			"Silicon Graphics, Inc. All rights reserved."))
 		.SetLicense("SGI Free B")
 		.SetURL("http://www.sgi.com/products/software/opengl"));
 
@@ -1368,8 +1393,9 @@ AboutView::_CreateCreditsView()
 			COPYRIGHT_STRING "2006-2009 Daisuke SUZUKI.",
 			COPYRIGHT_STRING "2006-2009 Project Vine.",
 			B_TRANSLATE("MIT license. All rights reserved."),
-			NULL));
-			// TODO: License!
+			NULL)
+		.SetLicense("BSD (3-clause)")
+		.SetURL("http://vlgothic.dicey.org/"));
 
 	// expat copyrights
 	_AddPackageCredit(PackageCredit("expat")
@@ -1425,13 +1451,14 @@ AboutView::_CreateCreditsView()
 	_AddPackageCredit(PackageCredit("atftp")
 		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2000 Jean-Pierre "
 			"ervbefeL and Remi Lefebvre."))
-		.SetLicense("GNU GPL v2"));
-			// TODO: URL!
+		.SetLicense("GNU GPL v2")
+		.SetURL("http://freecode.com/projects/atftp"));
 
 	// Netcat copyrights
 	_AddPackageCredit(PackageCredit("Netcat")
-		.SetCopyright(COPYRIGHT_STRING "1996 Hobbit."));
-			// TODO: License!
+		.SetCopyright(COPYRIGHT_STRING "1996 Hobbit.")
+		.SetLicense("Public Domain")
+		.SetURL("http://nc110.sourceforge.net/"));
 
 	// acpica copyrights
 	_AddPackageCredit(PackageCredit("acpica")
@@ -1482,8 +1509,8 @@ AboutView::_CreateCreditsView()
 
 	// CannaIM copyrights
 	_AddPackageCredit(PackageCredit("CannaIM")
-		.SetCopyright(COPYRIGHT_STRING "1999 Masao Kawamura."));
-			// TODO: License!
+		.SetCopyright(COPYRIGHT_STRING "1999 Masao Kawamura.")
+		.SetLicense("MIT"));
 
 	// libxml2, libxslt, libexslt copyrights
 	_AddPackageCredit(PackageCredit("libxml2, libxslt")
@@ -1554,7 +1581,6 @@ AboutView::_CreateCreditsView()
 			"Vivek Mohan. All rights reserved."))
 		.SetLicense(B_TRANSLATE("BSD (2-clause)"))
 		.SetURL("http://udis86.sourceforge.net"));
-			// TODO: License! - Project website refers to BSD License
 #endif
 
 #ifdef __INTEL__

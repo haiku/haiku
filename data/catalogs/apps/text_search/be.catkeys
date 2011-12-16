@@ -1,33 +1,33 @@
 1	belarusian	x-vnd.Haiku.TextSearch	1180598828
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME не змог адкрыць адзін ці некалькі каталогаў.
 %s: Not enough room to escape the filename.	Grepper		%s: Не хапае месца для перадання імя файла.
-%s: There was a problem running grep.	Grepper		%s: Праблема з запускам grep.
-Actions	GrepWindow		Дзеянні
-Cancel	GrepWindow		Адмена
-Case-sensitive	GrepWindow		З улікам рэгістру
-Close	GrepWindow		Закрыць
-Copy text to clipboard	GrepWindow		Капіяваць у буфер
-Encoding	GrepWindow		Кадоўка
-Escape search text	GrepWindow		Перадаць тэкст пошуку
-File	GrepWindow		Файл
-Follow symbolic links	GrepWindow		Прытрымлівацца сімвалічных спасылак
-History	GrepWindow		Гісторыя
-Look in sub-folders	GrepWindow		Глядзець у даччыных каталогах
-New window	GrepWindow		Новае вакно
-OK	GrepWindow		ОК
-Open files in Pe	GrepWindow		Адкрыць файлы ў Pe
-Open selection	GrepWindow		Адкрыць выдзяленне
-Please select the files you wish to have selected for you in Tracker.	GrepWindow		Калі ласка, выберыце файлы, якія вы жадалі б мець пазначанымі ў Трэкеры
-Please select the files you wish to keep searching.	GrepWindow		Калі ласка, выберыце файлы, якія жадаеце шукаць далей.
-Quit	GrepWindow		Выйсці
-Search	GrepWindow		Пошук
-Select all	GrepWindow		Выбраць усё
-Set target…	GrepWindow		Прызначыць цэль...
-Settings	GrepWindow		Наладкі
-Show files in Tracker	GrepWindow		Паказаць файлы ў Трэкеры
-Show lines	GrepWindow		Паказаць радкі
-Skip folders starting with a dot	GrepWindow		Прапускаць каталогі, якія пачынаюцца з кропкі
-Text files only	GrepWindow		Толькі тэкставыя файлы
-TextSearch	GrepWindow		Пошук Тэксту
-The unselected files will be removed from the list.	GrepWindow		Нявыбраныя файлы будуць выдалены са спісу.
 Trim to selection	GrepWindow		Накласці на выдзяленне
+Follow symbolic links	GrepWindow		Прытрымлівацца сімвалічных спасылак
+Close	GrepWindow		Закрыць
+Cancel	GrepWindow		Адмена
+The unselected files will be removed from the list.	GrepWindow		Нявыбраныя файлы будуць выдалены са спісу.
+Set target…	GrepWindow		Прызначыць цэль...
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Калі ласка, выберыце файлы, якія вы жадалі б мець пазначанымі ў Трэкеры
+Open files in Pe	GrepWindow		Адкрыць файлы ў Pe
+Copy text to clipboard	GrepWindow		Капіяваць у буфер
+Settings	GrepWindow		Наладкі
+Select all	GrepWindow		Выбраць усё
+OK	GrepWindow		ОК
+Skip folders starting with a dot	GrepWindow		Прапускаць каталогі, якія пачынаюцца з кропкі
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME не змог адкрыць адзін ці некалькі каталогаў.
+Escape search text	GrepWindow		Перадаць тэкст пошуку
+Search	GrepWindow		Пошук
+Open selection	GrepWindow		Адкрыць выдзяленне
+Look in sub-folders	GrepWindow		Глядзець у даччыных каталогах
+Actions	GrepWindow		Дзеянні
+File	GrepWindow		Файл
+Encoding	GrepWindow		Кадоўка
+History	GrepWindow		Гісторыя
+%s: There was a problem running grep.	Grepper		%s: Праблема з запускам grep.
+New window	GrepWindow		Новае вакно
+Please select the files you wish to keep searching.	GrepWindow		Калі ласка, выберыце файлы, якія жадаеце шукаць далей.
+TextSearch	GrepWindow		Пошук Тэксту
+Quit	GrepWindow		Выйсці
+Show files in Tracker	GrepWindow		Паказаць файлы ў Трэкеры
+Case-sensitive	GrepWindow		З улікам рэгістру
+Text files only	GrepWindow		Толькі тэкставыя файлы
+Show lines	GrepWindow		Паказаць радкі

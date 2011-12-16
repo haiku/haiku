@@ -29,12 +29,6 @@
 
 #include <ctype.h>
 #include <errno.h>
-#ifndef errno
-extern int errno;
-#endif
-#ifndef __set_errno
-# define __set_errno(Val) errno = (Val)
-#endif
 
 #ifdef HAVE_LIMITS_H
 # include <limits.h>
@@ -532,7 +526,7 @@ noconv:
 
   return 0L;
 }
-
+
 /* External user entry point.  */
 
 #if _LIBC - 0 == 0

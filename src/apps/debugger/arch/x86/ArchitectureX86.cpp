@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -177,6 +178,13 @@ ArchitectureX86::Init()
 		return B_NO_MEMORY;
 
 	return B_OK;
+}
+
+
+int32
+ArchitectureX86::StackGrowthDirection() const
+{
+	return STACK_GROWTH_DIRECTION_NEGATIVE;
 }
 
 

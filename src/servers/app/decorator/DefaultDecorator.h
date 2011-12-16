@@ -186,14 +186,16 @@ private:
 			void				_CalculateTabsRegion();
 protected:
 	static	const rgb_color		kFrameColors[4];
-	static	const rgb_color		kFocusFrameColors[2];
-	static	const rgb_color		kNonFocusFrameColors[2];
+
+			const rgb_color		kFocusFrameColor;
 
 			const rgb_color		kFocusTabColor;
 			const rgb_color		kFocusTabColorLight;
 			const rgb_color		kFocusTabColorBevel;
 			const rgb_color		kFocusTabColorShadow;
 			const rgb_color		kFocusTextColor;
+
+			const rgb_color		kNonFocusFrameColor;
 
 			const rgb_color		kNonFocusTabColor;
 			const rgb_color		kNonFocusTabColorLight;

@@ -367,7 +367,7 @@ IconRenderer::_Render(const BRect& r)
 			continue;
 
 		// add the style either with global transformation or with
-		// the shapes transformation, depending on wether there
+		// the shapes transformation, depending on whether there
 		// is a gradient and its settings
 		Gradient* gradient = style->Gradient();
 		bool styleAdded = false;

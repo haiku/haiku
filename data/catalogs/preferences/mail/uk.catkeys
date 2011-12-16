@@ -51,9 +51,9 @@ While sending	Config Window		Поки відправляється
 While sending and receiving	Config Window		При відправці і отриманні
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nОсновні налаштування неможливо повернути.\n\nПомилка при відновленні налаштувань:\n%s\n
 \n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nСтворіть новий аккаунт натиснувши кнопку Додати .\n\nВидаліть аккаунт при допомозі кнопки Видалити на вибраному пункті\n\nВиберіть пункт зі списку при необхідності змініть його налаштувань.
-\t\t· E-mail filters	Config Window		\t\t· поштовий фільтр
+\t\t· E-mail filters	Config Window		\t\t· поштові фільтри
 \t\t· Incoming	Config Window		\t\t· Вхідні
-\t\t· Outgoing	Config Window		\t\t· Вхідні
+\t\t· Outgoing	Config Window		\t\t· Вихідні
 days	Config Window		днів
 hours	Config Window		годин
 minutes	Config Window		хвилин

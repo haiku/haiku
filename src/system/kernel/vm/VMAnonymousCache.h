@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -63,6 +63,9 @@ public:
 									off_t offset);
 
 	virtual	void				Merge(VMCache* source);
+
+protected:
+	virtual	void				DeleteObject();
 
 private:
 			class WriteCallback;

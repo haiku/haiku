@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -38,6 +38,8 @@
 <li><a href="../../jp/preferences/mouse.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/preferences/mouse.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../pt_PT/preferences/mouse.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/preferences/mouse.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/preferences/mouse.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/preferences/mouse.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -58,15 +60,16 @@
 </table>
 <p><br /></p>
 <img src="../images/prefs-images/mouse.png" alt="mouse.png" />
-<p>设置鼠标类型：单键，双键或者三键鼠标。您可以通过左键点击的同时按下 <span class="key">CTRL</span> 来模拟第二个鼠标键（右键）。至于第三个鼠标键（中间键），它等同于 <span class="key">CTRL</span> <span class="key">ALT</span> 联合左键点击。中间点击也可以使用同时按下左右键来模拟。对于笔记本电脑，通常不需要使用第三个鼠标键。</p>
+<p>首先设置鼠标类型：单键，双键或者三键鼠标。您可以通过左键点击的同时按下 <span class="key">CTRL</span> 来模拟第二个鼠标键（右键）。至于第三个鼠标键（中间键），它等同于 <span class="key">CTRL</span> <span class="key">ALT</span> 联合左键点击。</p>
 <p>您可以通过点击在鼠标按钮，从弹出菜单中选择它们的新功能来对其进行重新排序。</p>
-<p>使用右边的滑动条，您可以调整双击的速度，鼠标的移动速度和加速度。</p>
-<p><span class="menu">Focus follows mouse</span> 意味着，您无须点击窗口来对其进行激活。它具有三种模式：</p>
+<p>使用右边的滑动条，您可以调整双击的速度，鼠标的移动速度和加速度。鼠标图形的下侧区域是测试区域，用于测试双击速度是否适合您的要求：如果双击字符并没有选中它，那么速度设置就太快了（或者您需要适应快速的点击...</p>
+<p>系统提供了三种 <span class="menu">聚焦模式</span> 来确定窗口对鼠标点击的反馈：</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Enabled</span></td><td> </td><td>鼠标指针下的窗口总是自动激活，但是不会自动弹出。</td></tr>
-<tr><td><span class="menu">Warping</span></td><td> </td><td>从桌面栏或者<a href="../twitcher.html">任务切换器</a>中选中的窗口将会平滑的获取鼠标指针。</td></tr>
-<tr><td class="onelinetop"><span class="menu">Instant-Warping</span></td><td> </td><td>从桌面栏或者任务切换器中选中的窗口将会立即自动获取鼠标指针，</td></tr>
+<tr><td class="onelinetop"><span class="menu">点击聚焦并置顶</span></td><td width="15px"> </td><td>系统默认设置：点击窗口，窗口会获取焦点，并自动提升到顶层。</td></tr>
+<tr><td><span class="menu">点击聚焦</span></td><td> </td><td>点击窗口仅让其获取焦点，但是并不自动提升。若希望实现提升，则必须点击其标题标签或者边框，或者点击其他地方的同时按下 <a href="../gui.html#move-resize">窗口管理按键</a> <span class="key">CTRL</span> <span class="key">ALT</span>.</td></tr>
+<tr><td class="onelinetop"><span class="menu">鼠标跟随</span></td><td></td><td>鼠标指针下的窗口自动获取焦点。窗口提升方法请参考 <span class="menu">点击聚焦模式</span>。</td></tr>
 </table>
+<p>激活 <span class="menu">接受首次点击</span> 将会让您避免在触发按钮或菜单等控件时必须聚焦非活动窗口。 这样就必须忍受无意关闭窗口的风险，例如在点击标签时，无意点击到了关闭按钮。但是另一方面，它会相应加快您的工作速度。</p>
 <p>所有的设置将会被立即应用。</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="button">默认</span></td><td> </td><td>设置所有内容为默认值。</td></tr>

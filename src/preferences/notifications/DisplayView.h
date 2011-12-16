@@ -28,8 +28,6 @@ private:
 			BTextControl*	fWindowWidth;
 			BMenu*			fIconSize;
 			BMenuField*		fIconSizeField;
-			BMenu*			fTitlePosition;
-			BMenuField*		fTitlePositionField;
 
 };
 

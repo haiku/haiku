@@ -1,29 +1,29 @@
 1	german	x-vnd.Haiku-ScreenSaver	215605989
-30 seconds	ScreenSaver		30 Sekunden
-Add…	ScreenSaver		Hinzu...
-Blackness	ScreenSaver		Schwarzer Bildschirm
-Cancel	ScreenSaver		Abbrechen
-Confirm password:	ScreenSaver		Passwort bestätigen:
 Could not load screen saver	ScreenSaver		Bildschirmschoner konnte nicht geladen werden.
-Display Power Management Signaling not available	ScreenSaver		Stromsparfunktionen nicht verfügbar
-Don't fade when	ScreenSaver		Nicht starten, wenn
-Done	ScreenSaver		Fertig
-Enable screensaver	ScreenSaver		Bildschirmschoner aktivieren
-Fade now when	ScreenSaver		Sofort starten, wenn
-General	ScreenSaver		Allgemein
-No options available	ScreenSaver		Keine Optionen verfügbar
-OK	ScreenSaver		OK
-Password Window	ScreenSaver		Passwort-Fenster
-Password lock	ScreenSaver		Passwortsperre
-Password:	ScreenSaver		Passwort:
-Passwords don't match. Please try again.	ScreenSaver		Die Passwörter stimmen nicht überein. Bitte nochmal versuchen.
-Password…	ScreenSaver		Passwort...
-ScreenSaver	System name		Bildschirmschoner
-Screensaver settings	ScreenSaver		Bildschirmschoner-Einstellungen
-Screensavers	ScreenSaver		Bildschirmschoner
+30 seconds	ScreenSaver		30 Sekunden
 Start screensaver	ScreenSaver		Bildschirmschoner starten
-Test	ScreenSaver		Test
-Turn off screen	ScreenSaver		Bildschirm ausschalten
-Use custom password	ScreenSaver		Benutzerdefiniertes Passwort
-Use network password	ScreenSaver		Netzwerkpasswort
+Password…	ScreenSaver		Passwort...
+Password:	ScreenSaver		Passwort:
+Password lock	ScreenSaver		Passwortsperre
+Add…	ScreenSaver		Hinzu...
+Screensavers	ScreenSaver		Bildschirmschoner
 mouse is here	ScreenSaver		Maus in diesem Eck
+Display Power Management Signaling not available	ScreenSaver		Stromsparfunktionen nicht verfügbar
+ScreenSaver	System name		Bildschirmschoner
+Test	ScreenSaver		Test
+General	ScreenSaver		Allgemein
+Enable screensaver	ScreenSaver		Bildschirmschoner aktivieren
+Cancel	ScreenSaver		Abbrechen
+Turn off screen	ScreenSaver		Bildschirm ausschalten
+No options available	ScreenSaver		Keine Optionen verfügbar
+Password Window	ScreenSaver		Passwort-Fenster
+Fade now when	ScreenSaver		Sofort starten, wenn
+Screensaver settings	ScreenSaver		Bildschirmschoner-Einstellungen
+Passwords don't match. Please try again.	ScreenSaver		Die Passwörter stimmen nicht überein. Bitte nochmal versuchen.
+OK	ScreenSaver		OK
+Don't fade when	ScreenSaver		Nicht starten, wenn
+Blackness	ScreenSaver		Schwarzer Bildschirm
+Use custom password	ScreenSaver		Benutzerdefiniertes Passwort
+Done	ScreenSaver		Fertig
+Confirm password:	ScreenSaver		Passwort bestätigen:
+Use network password	ScreenSaver		Netzwerkpasswort

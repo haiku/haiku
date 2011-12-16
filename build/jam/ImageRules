@@ -672,6 +672,8 @@ rule AddSymlinkToHaikuImage directoryTokens : linkTarget : linkName
 {
 	# AddSymlinkToHaikuImage <directory> : <link target> [ : <link name> ] ;
 
+	linkTarget = $(linkTarget:J=/) ;
+
 	AddSymlinkToContainer $(HAIKU_IMAGE_CONTAINER_NAME) : $(directoryTokens)
 		: $(linkTarget) : $(linkName) ;
 }
@@ -917,7 +919,8 @@ rule AddExpanderRuleToHaikuImage mimetype : extension : list : extract
 		Exit "Invalid expander rule specification passed to AddExpanderRule." ;
 	}
 
-	local entry = "\\\"$(mimetype)\\\"\\\t$(extension)\\\t\\\"$(list)\\\"\\\t\\\"$(extract)\\\"" ;
+	local entry
+		= "\\\"$(mimetype)\\\"\\\t$(extension)\\\t\\\"$(list)\\\"\\\t\\\"$(extract)\\\"" ;
 	AddEntryToHaikuImageExpanderRuleFile <haiku-image>expander.rules
 		: $(entry) ;
 }

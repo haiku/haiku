@@ -85,7 +85,7 @@ class FavoritesMenu : public BSlowMenu {
 		int32 fIndex;
 		int32 fSectionItemCount;
 		bool fAddedSeparatorForSection;
-			// keeps track wether a separator will be needed before the
+			// keeps track whether a separator will be needed before the
 			// next inserted item
 		BMessage fItems;
 

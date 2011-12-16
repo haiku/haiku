@@ -29,6 +29,8 @@
 #include <Application.h>
 #include <Beep.h>
 #include <Catalog.h>
+#include <CharacterSet.h>
+#include <CharacterSetRoster.h>
 #include <Clipboard.h>
 #include <Debug.h>
 #include <Directory.h>
@@ -48,9 +50,9 @@
 #include <ScrollView.h>
 #include <String.h>
 #include <StringView.h>
+#include <UTF8.h>
 #include <Window.h>
 
-#include "Encoding.h"
 #include "InlineInput.h"
 #include "Shell.h"
 #include "ShellParameters.h"
@@ -59,6 +61,8 @@
 #include "TerminalCharClassifier.h"
 #include "VTkeymap.h"
 
+
+using namespace BPrivate ; // BCharacterSet stuff
 
 // defined in VTKeyTbl.c
 extern int function_keycode_table[];
@@ -608,7 +612,10 @@ TermView::_InitObject(const ShellParameters& shellParameters)
 
 	// set the shell parameters' encoding
 	ShellParameters modifiedShellParameters(shellParameters);
-	modifiedShellParameters.SetEncoding(EncodingAsShortString(fEncoding));
+	
+	const BCharacterSet* charset
+		= BCharacterSetRoster::GetCharacterSetByConversionID(fEncoding);
+	modifiedShellParameters.SetEncoding(!charset ? charset->GetName() : "UTF-8");
 
 	error = fShell->Open(fRows, fColumns, modifiedShellParameters);
 
@@ -1552,7 +1559,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 	if (numBytes > 1) {
 		if (fEncoding != M_UTF8) {
 			char destBuffer[16];
-			int32 destLen;
+			int32 destLen = sizeof(destBuffer);
 			long state = 0;
 			convert_from_utf8(fEncoding, bytes, &numBytes, destBuffer,
 				&destLen, &state, '?');

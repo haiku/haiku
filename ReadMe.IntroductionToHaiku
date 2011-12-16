@@ -1,0 +1,122 @@
+Greetings.
+
+This document is intended to serve as an introduction to the Haiku project.
+As such, this is only the tip of the iceberg.
+
+Haiku project website
+---------------------
+http://www.haiku-os.org
+
+This is the main website for the Haiku project. It contains news posts from
+the project, blog posts (from developers, Google Summer of Code participants,
+and other frequent contributors), forums, and a vast collection of information.
+
+
+Development tracker
+-------------------
+http://dev.haiku-os.org/
+
+This is the Haiku project's development tracker.
+ * Bug reports
+ * Browse the source
+ * Review changesets
+ * Development related wiki (limited write access)
+
+
+{OpenGrok
+---------
+http://haiku.it.su.se:8180/source
+
+Graciously provided by <name>.
+This allows you to quickly and easily search Haiku's source code.
+
+
+Coding Guidelines
+------------------
+http://www.haiku-os.org/development/coding-guidelines
+
+The Haiku project takes pride in code quality. Both in terms of implementing
+the correct code, as well as ensuring the code is written in a consistent
+style. Learning and utilizing the coding guidelines is essential to
+contributing code to Haiku.
+
+
+Haiku API documentation
+-----------------------
+http://api.haiku-os.org
+Old BeBook API: http://www.haiku-os.org/legacy-docs/bebook
+
+This is the current (and in-progress) documentation for Haiku's API. As Haiku
+was formed on the idea of implementing binary compatibility with BeOS R5, the
+BeBook is fairly accurate. Contributions to Haiku's API book are encouraged.
+
+
+Learning to Program with Haiku
+------------------------------
+http://www.haiku-os.org/development/learning_to_program_with_haiku
+
+A developer, DarkWyrm has published a book that is " aimed at people who want
+to be able to write simple programs to get stuff done, but never had anyone
+around teach them". He has chosen to distribute the PDF versions of the book
+under a Creative Commons license for noncommercial purposes.
+
+
+Programming with Haiku
+----------------------
+http://www.haiku-os.org/tags/programmingwithhaiku
+
+Another series from Darkwyrm. It is "aimed at current codemonkeys who want to
+break into development for Haiku. Here begins a new series of programming
+lessons aimed at people who already have a basic grasp on C++: Programming with
+Haiku."
+
+
+ohloh
+-----
+http://www.ohloh.net/p/haiku
+
+"Ohloh is a free public directory of open source software and people." On
+there, you can view detailed reports and analysis of Haiku (and other open
+source software projects).
+
+
+Haiku Translation Assistant (HTA)
+---------------------------------
+http://hta.polytect.org/
+
+This is the current solution to assisting people in translating Haiku's
+on screen text to other languages. Consult the [haiku-i18n] mailing list
+for additional information: http://www.freelists.org/list/haiku-i18n
+
+Note: HTA is starting to be replaced by a Pootle based implementation.
+      That next-generation tool is http://i18n.haiku-os.org/pootle
+
+
+Haiku User Guide Translation
+----------------------------
+http://i18n.haiku-os.org/userguide/
+
+Similar to HTA, this site is for coordinating the efforts of translating Haiku's
+User Guide and Welcome page to other spoken languages. Subscribe to the
+[haiku-doc] mailing list: http://www.freelists.org/list/haiku-doc
+
+
+HaikuPorts
+----------
+http://ports.haiku-files.org
+http://ports-space.haiku-files.org
+
+"HaikuPorts is a centralized collection of software ported to the Haiku
+platform." If you are interested in porting software to Haiku, then this
+is the site for you!
+
+
+Haikuware
+---------
+http://www.haikuware.com
+
+Haikuware is a website, which provides direct downloads for Haiku software.
+In addition to comments on application pages there are blogs and forums.
+Haikuware also holds a recurring Thank You Award and helps fund development
+through bounty programs.
+

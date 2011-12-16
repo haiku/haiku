@@ -15,4 +15,12 @@ Server debug_server
 	libbe.so	# Haiku libbe
 	libdebug.so
 	$(TARGET_LIBSTDC++)
+	$(HAIKU_LOCALE_LIBS)
 ;
+
+DoCatalogs debug_server :
+	x-vnd.Haiku-debug_server
+	:
+	DebugServer.cpp
+;
+

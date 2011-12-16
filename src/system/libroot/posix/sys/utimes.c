@@ -11,6 +11,7 @@
 
 #include <NodeMonitor.h>
 
+#include <errno_private.h>
 #include <syscalls.h>
 #include <syscall_utils.h>
 

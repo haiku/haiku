@@ -1,14 +1,14 @@
 1	slovak	x-vnd.Haiku-Pairs	1981673050
 %app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\tnapísal Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nDokončili ste hru pomocou %num% kliknutí.\n
-Beginner (4x4)	PairsWindow		Začiatočník (4x4)
 Expert (8x8)	PairsWindow		Expert (8x8)
-Game	PairsWindow		Hra
-Intermediate (6x6)	PairsWindow		Pokročilý (6x6)
-New	PairsWindow		Nová
-New game	PairsWindow		Nová hra
-OK	PairsView		OK
-Pairs	System name		Dvojice
-Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Dvojice nenašli dosť vektorových ikon vo vašom systéme, potrebujú aspoň %d ikon.
-Quit	PairsWindow		Ukončiť
+Beginner (4x4)	PairsWindow		Začiatočník (4x4)
 Quit game	PairsWindow		Ukončiť hru
+Game	PairsWindow		Hra
 Size	PairsWindow		Veľkosť
+New	PairsWindow		Nová
+OK	PairsView		OK
+Intermediate (6x6)	PairsWindow		Pokročilý (6x6)
+Quit	PairsWindow		Ukončiť
+Pairs	System name		Dvojice
+New game	PairsWindow		Nová hra
+Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Dvojice nenašli dosť vektorových ikon vo vašom systéme, potrebujú aspoň %d ikon.

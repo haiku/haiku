@@ -1,48 +1,48 @@
-1	german	x-vnd.Haiku-PowerStatus	2178654445
-About	PowerStatus		über
-About…	PowerStatus		Über…
-Battery charging	PowerStatus		Akku wird geladen
-Battery discharging	PowerStatus		Akku wird entladen
-Battery info	PowerStatus		Akku-Infos
-Battery info…	PowerStatus		Akku-Infos…
-Battery unused	PowerStatus		Akku unbenutzt
-Capacity granularity 1: 	PowerStatus		Kapazitätsgenauigkeit 1:
-Capacity granularity 2: 	PowerStatus		Kapazitätsgenauigkeit 2:
-Capacity: 	PowerStatus		Kapazität:
-Current rate: 	PowerStatus		Aktueller Wert:
-Damaged battery	PowerStatus		Akku defekt
+1	german	x-vnd.Haiku-PowerStatus	3419486861
 Design capacity low warning: 	PowerStatus		Kapazitätswarnung (Herstellerangabe):
-Design capacity warning: 	PowerStatus		Kapazitätswarnung (lt. Hersteller):
-Design capacity: 	PowerStatus		Kapazität (lt. Hersteller):
-Design voltage: 	PowerStatus		Spannung (lt. Hersteller):
-Empty battery slot	PowerStatus		Akkufach ist leer
-Extended battery info	PowerStatus		Erweiterte Akku-Infos
-Install in Deskbar	PowerStatus		In Deskbar installieren
-Last full charge: 	PowerStatus		Letzte vollständige Ladung:
-Model number: 	PowerStatus		Modellnummer:
-OEM info: 	PowerStatus		OEM-Info:
-OK	PowerStatus		OK
-Power status box	PowerStatus		Energie-Status-Box
-PowerStatus	PowerStatus		Akku-Anzeige
-PowerStatus	System name		Akku-Anzeige
-PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		Akku-Anzeige\nvon Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
-Quit	PowerStatus		Beenden
-Run in window	PowerStatus		Im Fenster ausführen
-Serial number: 	PowerStatus		Seriennummer:
 Show percent	PowerStatus		Prozent anzeigen
-Show status icon	PowerStatus		Statusicon anzeigen
-Show text label	PowerStatus		Beschriftung anzeigen
-Show time	PowerStatus		Zeit anzeigen
-Technology: 	PowerStatus		Technologie:
+Design capacity: 	PowerStatus		Kapazität (lt. Hersteller):
+ mW	PowerStatus		mW
 Type: 	PowerStatus		Typ:
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Die Akku-Anzeige kann im Fenster dargestellt oder in der Deskbar installiert werden.
-charging	PowerStatus		wird geladen
-discharging	PowerStatus		wird entladen
-mA	PowerStatus		mA
-mAh	PowerStatus		mAh
-mV	PowerStatus		mV
-mW	PowerStatus		mW
-mWh	PowerStatus		mWh
-no battery	PowerStatus		kein Akku
 non-rechargeable	PowerStatus		nicht aufladbar
+Empty battery slot	PowerStatus		Akkufach ist leer
+ mV	PowerStatus		mV
+Run in window	PowerStatus		Im Fenster ausführen
+About	PowerStatus		über
+PowerStatus	System name		Akku-Anzeige
+PowerStatus	PowerStatus		Akku-Anzeige
+ mWh	PowerStatus		mWh
+Battery info…	PowerStatus		Akku-Infos…
+Damaged battery	PowerStatus		Akku defekt
+Show time	PowerStatus		Zeit anzeigen
+Last full charge: 	PowerStatus		Letzte vollständige Ladung:
+Battery unused	PowerStatus		Akku unbenutzt
+Extended battery info	PowerStatus		Erweiterte Akku-Infos
+ mA	PowerStatus		 mA
+Current rate: 	PowerStatus		Aktueller Wert:
+discharging	PowerStatus		wird entladen
+Show text label	PowerStatus		Beschriftung anzeigen
+About…	PowerStatus		Über…
+Model number: 	PowerStatus		Modellnummer:
+Install in Deskbar	PowerStatus		In Deskbar installieren
+ mAh	PowerStatus		 mAh
+Capacity: 	PowerStatus		Kapazität:
+Battery discharging	PowerStatus		Akku wird entladen
+Serial number: 	PowerStatus		Seriennummer:
+Capacity granularity 1: 	PowerStatus		Kapazitätsgenauigkeit 1:
+OK	PowerStatus		OK
+OEM info: 	PowerStatus		OEM-Info:
+Design voltage: 	PowerStatus		Spannung (lt. Hersteller):
+PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		Akku-Anzeige\nvon Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
+Battery charging	PowerStatus		Akku wird geladen
+Design capacity warning: 	PowerStatus		Kapazitätswarnung (lt. Hersteller):
+Battery info	PowerStatus		Akku-Infos
+Quit	PowerStatus		Beenden
 rechargeable	PowerStatus		wiederaufladbar
+charging	PowerStatus		wird geladen
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Die Akku-Anzeige kann im Fenster dargestellt oder in der Deskbar installiert werden.
+Power status box	PowerStatus		Energie-Status-Box
+Show status icon	PowerStatus		Statusicon anzeigen
+Capacity granularity 2: 	PowerStatus		Kapazitätsgenauigkeit 2:
+Technology: 	PowerStatus		Technologie:
+no battery	PowerStatus		kein Akku

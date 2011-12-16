@@ -1,18 +1,19 @@
-1	german	x-vnd.Haiku-DataTranslations	3820343452
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Es exististiert bereits ein Objekt mit dem Namen '%name' im Translator-Ordner! Soll der bereits vorhandene Translator überschrieben werden?
-Cancel	DataTranslations		Abbrechen
-Could not install %s:\n%s	DataTranslations		Kann %s nicht installieren:\n%s
+1	german	x-vnd.Haiku-DataTranslations	458105477
 DataTranslations	System name		Datenkonvertierung
-DataTranslations - Error	DataTranslations		Datenkonvertierung - Fehler
-DataTranslations - Note	DataTranslations		Datenkonvertierung - Notiz
-Info	DataTranslations		Info
-Info:	DataTranslations		Info:
+Cancel	DataTranslations		Abbrechen
 Name:	DataTranslations		Name:
 Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPfad:\n%s\n
-OK	DataTranslations		OK
-Overwrite	DataTranslations		Überschreiben
-Path:	DataTranslations		Pfad:
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Das Objekt '%name' scheint kein Translator zu sein und kann daher nicht installiert werden.
-The new translator has been installed successfully.	DataTranslations		Der neue Translator wurde erfolgreich installiert.
+Could not install %s:\n%s	DataTranslations		Kann %s nicht installieren:\n%s
 Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Dieses Fenster dient zum Festlegen von Standardwerten für die verschiedenen Translatoren. Sie werden benutzt falls in einer Anwendung keine eigenen Einstellungen vorgenommen wurden.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Es exististiert bereits ein Objekt mit dem Namen '%name' im Translator-Ordner! Soll der bereits vorhandene Translator überschrieben werden?
+DataTranslations - Note	DataTranslations		Datenkonvertierung - Notiz
+Overwrite	DataTranslations		Überschreiben
+Info:	DataTranslations		Info:
+Info	DataTranslations		Info
+Path:	DataTranslations		Pfad:
+The new translator has been installed successfully.	DataTranslations		Der neue Translator wurde erfolgreich installiert.
+DataTranslations - Error	DataTranslations		Datenkonvertierung - Fehler
+Ok	DataTranslations		OK
+OK	DataTranslations		OK
 Version:	DataTranslations		Version:

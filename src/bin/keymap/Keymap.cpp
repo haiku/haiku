@@ -796,7 +796,7 @@ Keymap::_SaveSourceText(FILE* file)
 
 	int bytes = fprintf(file, "#!/bin/keymap -s\n"
 		"#\n"
-		"#\tRaw key numbering for 101 keyboard...\n");
+		"#\tRaw key numbering for 102-key keyboard...\n");
 
 #if (defined(__BEOS__) || defined(__HAIKU__))
 	if (runs != NULL) {
@@ -807,25 +807,25 @@ Keymap::_SaveSourceText(FILE* file)
 	}
 #endif
 
-	bytes += fprintf(file, "#                                                                                        [sys]       [brk]\n"
-		"#                                                                                         0x7e        0x7f\n"
-		"# [esc]       [ f1] [ f2] [ f3] [ f4] [ f5] [ f6] [ f7] [ f8] [ f9] [f10] [f11] [f12]    [prn] [scr] [pau]\n"
-		"#  0x01        0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d     0x0e  0x0f  0x10     K E Y P A D   K E Y S\n"
+	bytes += fprintf(file, "#                                                                                          [sys]       [brk]\n"
+		"#                                                                                           0x7e        0x7f\n"
+		"# [esc]   [ f1] [ f2] [ f3] [ f4]    [ f5] [ f6] [ f7] [ f8]    [ f9] [f10] [f11] [f12]    [prn] [scr] [pau]\n"
+		"#  0x01    0x02  0x03  0x04  0x05     0x06  0x07  0x08  0x09     0x0a  0x0b  0x0c  0x0d     0x0e  0x0f  0x10     K E Y P A D   K E Y S\n"
 		"#\n"
-		"# [ ` ] [ 1 ] [ 2 ] [ 3 ] [ 4 ] [ 5 ] [ 6 ] [ 7 ] [ 8 ] [ 9 ] [ 0 ] [ - ] [ = ] [bck]    [ins] [hme] [pup]    [num] [ / ] [ * ] [ - ]\n"
-		"#  0x11  0x12  0x13  0x14  0x15  0x16  0x17  0x18  0x19  0x1a  0x1b  0x1c  0x1d  0x1e     0x1f  0x20  0x21     0x22  0x23  0x24  0x25\n"
+		"# [ ` ] [ 1 ] [ 2 ] [ 3 ] [ 4 ] [ 5 ] [ 6 ] [ 7 ] [ 8 ] [ 9 ] [ 0 ] [ - ] [ = ] [ bck ]    [ins] [hme] [pup]    [num] [ / ] [ * ] [ - ]\n"
+		"#  0x11  0x12  0x13  0x14  0x15  0x16  0x17  0x18  0x19  0x1a  0x1b  0x1c  0x1d   0x1e      0x1f  0x20  0x21     0x22  0x23  0x24  0x25\n"
 		"#\n"
-		"# [tab] [ q ] [ w ] [ e ] [ r ] [ t ] [ y ] [ u ] [ i ] [ o ] [ p ] [ [ ] [ ] ] [ \\ ]    [del] [end] [pdn]    [ 7 ] [ 8 ] [ 9 ] [ + ]\n"
-		"#  0x26  0x27  0x28  0x29  0x2a  0x2b  0x2c  0x2d  0x2e  0x2f  0x30  0x31  0x32  0x33     0x34  0x35  0x36     0x37  0x38  0x39  0x3a\n"
+		"# [ tab ] [ q ] [ w ] [ e ] [ r ] [ t ] [ y ] [ u ] [ i ] [ o ] [ p ] [ [ ] [ ] ] [ \\ ]    [del] [end] [pdn]    [ 7 ] [ 8 ] [ 9 ] [ + ]\n"
+		"#   0x26   0x27  0x28  0x29  0x2a  0x2b  0x2c  0x2d  0x2e  0x2f  0x30  0x31  0x32  0x33     0x34  0x35  0x36     0x37  0x38  0x39  0x3a\n"
 		"#\n"
-		"# [cap] [ a ] [ s ] [ d ] [ f ] [ g ] [ h ] [ j ] [ k ] [ l ] [ ; ] [ ' ] [  enter  ]                         [ 4 ] [ 5 ] [ 6 ]\n"
-		"#  0x3b  0x3c  0x3d  0x3e  0x3f  0x40  0x41  0x42  0x43  0x44  0x45  0x46     0x47                             0x48  0x49  0x4a\n"
+		"# [ caps ] [ a ] [ s ] [ d ] [ f ] [ g ] [ h ] [ j ] [ k ] [ l ] [ ; ] [ ' ]  [ enter ]                         [ 4 ] [ 5 ] [ 6 ]\n"
+		"#   0x3b    0x3c  0x3d  0x3e  0x3f  0x40  0x41  0x42  0x43  0x44  0x45  0x46     0x47                            0x48  0x49  0x4a\n"
 		"#\n"
-		"# [shift]     [ z ] [ x ] [ c ] [ v ] [ b ] [ n ] [ m ] [ , ] [ . ] [ / ]     [shift]          [ up]          [ 1 ] [ 2 ] [ 3 ] [ent]\n"
-		"#   0x4b       0x4c  0x4d  0x4e  0x4f  0x50  0x51  0x52  0x53  0x54  0x55       0x56            0x57           0x58  0x59  0x5a  0x5b\n"
+		"# [shft] [ \\ ] [ z ] [ x ] [ c ] [ v ] [ b ] [ n ] [ m ] [ , ] [ . ] [ / ]    [ shift ]          [ up]          [ 1 ] [ 2 ] [ 3 ] [ent]\n"
+		"#  0x4b   0x69  0x4c  0x4d  0x4e  0x4f  0x50  0x51  0x52  0x53  0x54  0x55       0x56             0x57           0x58  0x59  0x5a  0x5b\n"
 		"#\n"
-		"# [ctr]             [cmd]             [  space  ]             [cmd]             [ctr]    [lft] [dwn] [rgt]    [ 0 ] [ . ]\n"
-		"#  0x5c              0x5d                 0x5e                 0x5f              0x60     0x61  0x62  0x63     0x64  0x65\n");
+		"# [ ctrl ]          [ cmd ]             [ space ]             [ cmd ]          [ ctrl ]    [lft] [dwn] [rgt]    [ 0 ] [ . ]\n"
+		"#   0x5c              0x5d                 0x5e                 0x5f             0x60       0x61  0x62  0x63     0x64  0x65\n");
 
 #if (defined(__BEOS__) || defined(__HAIKU__))
 	if (runs != NULL) {
@@ -836,6 +836,7 @@ Keymap::_SaveSourceText(FILE* file)
 #endif
 
 	bytes += fprintf(file, "#\n"
+		"#\tNOTE: Key 0x69 does not exist on US keyboards\n"
 		"#\tNOTE: On a Microsoft Natural Keyboard:\n"
 		"#\t\t\tleft option  = 0x66\n"
 		"#\t\t\tright option = 0x67\n"

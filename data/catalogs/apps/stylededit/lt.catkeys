@@ -1,57 +1,80 @@
-1	lithuanian	x-vnd.Haiku-StyledEdit	2271525877
-???	LoadAlert		???
-Align	Menus		Lygiuoti
-Black	Menus		Juoda
-Blue	Menus		Mėlyna
-Can't undo	Menus		Neatšaukiama
-Cancel	FindandReplaceWindow		Atsisakyti
-Cancel	QuitAlert		Atsisakyti
-Cancel	RevertToSavedAlert		Atsisakyti
-Cancel	SaveAlert		Atsisakyti
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Negrįžtama, byla nerasta: „%s“.
-Case-sensitive	FindandReplaceWindow		Paisyti registro
-Center	Menus		Viduryje
-Color	Menus		Spalva
-Cyan	Menus		Žydra
-Default	Open_and_SaveAsPanel		Numatytai
-Document	Menus		Tekstas
-Don't save	QuitAlert		Neišsaugoti
-Don't save	SaveAlert		Neišsaugoti
-Encoding	Open_and_SaveAsPanel		Koduotė
-Error loading \"%s\":\n\t%s	LoadAlert		Klaida įkeliant „%s“:\n\t%s
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Įkėlimo klaida „%s“:\n\tNepalaikomas formatas
-Error saving \"%s\":\n%s	SaveAlert		Klaida išsaugojant „%s“:\n%s
-Find	FindandReplaceWindow		Rasti
-Find again	Menus		Rasti dar
-Find selection	Menus		Rasti žymėtą
-Find:	FindandReplaceWindow		Rasti:
-Find…	Menus		Rasti…
-Font	Menus		Rašmenys
-Green	Menus		Žalia
-Left	Menus		Kairėn
-Magenta	Menus		Purpurinė
-New	Menus		Naują
+1	lithuanian	x-vnd.Haiku-StyledEdit	1508367857
+StyledEdit	System name		Rašyklė
+Paste	Menus		Įdėti
 OK	LoadAlert		Gerai
-OK	RevertToSavedAlert		Gerai
-OK	SaveAlert		Gerai
-Open…	Menus		Atidaryti…
-Red	Menus		Raudona
-Replace	FindandReplaceWindow		Pakeisti
-Replace all	FindandReplaceWindow		Keisti viską
-Replace in all windows	FindandReplaceWindow		Keisti visuose languose
-Replace with:	FindandReplaceWindow		Keisti į:
-Replace…	Menus		Pakeisti…
-Revert to saved…	Menus		Grįžti prie išsaugoto…
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Grįžti prie paskutinės versijos „%s“? 
-Right	Menus		Dešinėn
-Save	Menus		Išsaugoti
-Save	QuitAlert		Išsaugoti
-Save	SaveAlert		Išsaugoti
-Save changes to the document \"%s\"? 	QuitAlert		Išsaugoti dokumento „%s“ pakeitimus? 
+File	Menus		Failas
+???	LoadAlert		???
+Lines:	Statistics		Eilučių:
+Italic	Menus		Kursyvas
+Left	Menus		Kairinė
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Grįžti prie paskutinės „%s“ versijos? 
 Search backwards	FindandReplaceWindow		Ieškoti viršun
 Size	Menus		Dydis
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Byla žymėta tik skaitymui. Išsaugoti dokumento „%s“ keitimus? 
-Untitled 	StyledEditWindow		Bevardis 
-Wrap lines	Menus		Eilučių perkėlimas
-Wrap-around search	FindandReplaceWindow		Grįžtant pradžion
+Save	QuitAlert		Įrašyti
+Page setup…	Menus		Puslapio nuostatos…
+Print…	Menus		Spausdinti…
+Can't undo	Menus		Atšaukti negalima
+Save	Menus		Įrašyti
+Replace with:	FindandReplaceWindow		Keisti į:
+Cancel	SaveAlert		Atsisakyti
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Negrįžtama, failas nerastas: „%s“.
+Case-sensitive	FindandReplaceWindow		Paisyti raidžių registro
+Green	Menus		Žalia
+Revert to saved…	Menus		Grįžti prie įrašyto…
 Yellow	Menus		Geltona
+Replace in all windows	FindandReplaceWindow		Keisti visuose languose
+Wrap lines	Menus		Laužyti eilutes
+Quit	Menus		Baigti darbą
+Document statistics	Statistics		Dokumento statistika
+Cancel	RevertToSavedAlert		Atsisakyti
+Document	Menus		Dokumentas
+Save changes to the document \"%s\"? 	QuitAlert		Įrašyti dokumento „%s“ pakeitimus? 
+Edit	Menus		Taisa
+Font	Menus		Šriftas
+Replace all	FindandReplaceWindow		Pakeisti visus
+Statistics…	Menus		Statistika…
+Default	Open_and_SaveAsPanel		Numatytai
+Replace next	Menus		Pakeisti kitą
+Cancel	FindandReplaceWindow		Atsisakyti
+Close	Menus		Užverti
+Save	SaveAlert		Įrašyti
+Words:	Statistics		Žodžių:
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Nepavyko įkelti „%s“:\n\tNepalaikomas failo formatas
+OK	RevertToSavedAlert		Gerai
+Don't save	QuitAlert		Neįrašyti
+Align	Menus		Lygiuotė
+Color	Menus		Spalva
+Red	Menus		Raudona
+Open…	Menus		Atverti…
+Center	Menus		Centrinė
+Blue	Menus		Mėlyna
+Cyan	Menus		Žydra
+OK	Statistics		Gerai
+Magenta	Menus		Purpurinė
+New	Menus		Naujas
+Wrap-around search	FindandReplaceWindow		Tęsti paiešką nuo dokumento pradžios
+Bold	Menus		Pastorintas
+Find selection	Menus		Ieškoti pažymėto teksto
+Find:	FindandReplaceWindow		Ieškoti:
+Error saving \"%s\":\n%s	SaveAlert		Klaida įrašant „%s“:\n%s
+Copy	Menus		Kopijuoti
+Cut	Menus		Iškirpti
+Replace	FindandReplaceWindow		Pakeisti
+Find again	Menus		Ieškoti kito
+Cancel	QuitAlert		Atsisakyti
+Find…	Menus		Ieškoti…
+Select all	Menus		Pažymėti viską
+Don't save	SaveAlert		Neįrašyti
+Error loading \"%s\":\n\t%s	LoadAlert		Klaida įkeliant „%s“:\n\t%s
+Undo typing	QuitAlert		Atšaukti
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Failas skirtas tik skaitymui. Išsaugoti dokumento „%s“ pakeitimus?
+Black	Menus		Juoda
+Untitled 	StyledEditWindow		Bevardis 
+OK	SaveAlert		Gerai
+Find	FindandReplaceWindow		Ieškoti
+Encoding	Open_and_SaveAsPanel		Koduotė
+Characters:	Statistics		Simbolių:
+Save as…	Menus		Įrašyti kaip…
+Redo typing	QuitAlert		Grąžinti
+Replace…	Menus		Pakeisti…
+Right	Menus		Dešininė

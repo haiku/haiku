@@ -103,8 +103,7 @@ delete_device(void * storage)
 	LOG(("device->addrport= 0x%x count= %ld\n",mpu_device->addrport, mpu_device->count));
 	LOG(("delete_device: *storage:%p\n",storage));
 
-	free(storage);   // free the memory allocated in create_device 
-	atomic_add(&mpu_device->count,-1);
+	free(mpu_device);   // free the memory allocated in create_device 
 		
 	return B_OK;
 }

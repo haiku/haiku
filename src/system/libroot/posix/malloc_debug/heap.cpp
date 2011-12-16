@@ -19,6 +19,7 @@
 #include <errno.h>
 #include <sys/mman.h>
 
+#include <errno_private.h>
 #include <locks.h>
 #include <syscalls.h>
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 - 2009, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2006 - 2011, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -20,6 +20,7 @@
 
 #include "support.h"
 
+#include "App.h"
 #include "LaunchButton.h"
 #include "NamePanel.h"
 #include "PadView.h"
@@ -36,7 +37,6 @@ MainWindow::MainWindow(const char* name, BRect frame, bool addDefaultButtons)
 		B_ALL_WORKSPACES),
 	fSettings(new BMessage('sett')),
 	fPadView(new PadView("pad view")),
-	fNamePanelFrame(-1000.0, -1000.0, -800.0, -900.0),
 	fAutoRaise(false),
 	fShowOnAllWorkspaces(true)
 {
@@ -65,7 +65,6 @@ MainWindow::MainWindow(const char* name, BRect frame, BMessage* settings)
 		B_ALL_WORKSPACES),
 	fSettings(settings),
 	fPadView(new PadView("pad view")),
-	fNamePanelFrame(-1000.0, -1000.0, -900.0, -900.0),
 	fAutoRaise(false),
 	fShowOnAllWorkspaces(true)
 {
@@ -167,7 +166,7 @@ MainWindow::MessageReceived(BMessage* message)
 					errorMessage = "";
 				}
 			} else if (!launchedByRef) {
-				errorMessage = B_TRANSLATE("Failed to launch 'something',"
+				errorMessage = B_TRANSLATE("Failed to launch 'something', "
 					"error in Pad data.");
 			}
 			if (errorMessage.Length() > 0) {
@@ -206,17 +205,52 @@ MainWindow::MessageReceived(BMessage* message)
 				if (message->FindString("name", &name) >= B_OK) {
 					// message comes from a previous name panel
 					button->SetDescription(name);
-					message->FindRect("frame", &fNamePanelFrame);
+					BRect namePanelFrame;
+					if (message->FindRect("frame", &namePanelFrame) == B_OK) {
+						((App*)be_app)->SetNamePanelSize(
+							namePanelFrame.Size());
+					}
 				} else {
 					// message comes from pad view
 					entry_ref* ref = button->Ref();
 					if (ref) {
 						BString helper(B_TRANSLATE("Description for '%3'"));
 						helper.ReplaceFirst("%3", ref->name);
-						make_sure_frame_is_on_screen(fNamePanelFrame, this);
-						new NamePanel(helper.String(), button->Description(),
-							this, this, new BMessage(*message),
-							fNamePanelFrame);
+						// Place the name panel besides the pad, but give it
+						// the user configured size.
+						BPoint origin = B_ORIGIN;
+						BSize size = ((App*)be_app)->NamePanelSize();
+						NamePanel* panel = new NamePanel(helper.String(),
+							button->Description(), this, this,
+							new BMessage(*message), size);
+						panel->Layout(true);
+						size = panel->Frame().Size();
+						BScreen screen(this);
+						BPoint mousePos;
+						uint32 buttons;
+						fPadView->GetMouse(&mousePos, &buttons, false);
+						fPadView->ConvertToScreen(&mousePos);
+						if (fPadView->Orientation() == B_HORIZONTAL) {
+							// Place above or below the pad
+							origin.x = mousePos.x - size.width / 2;
+							if (screen.Frame().bottom - Frame().bottom
+									> size.height + 20) {
+								origin.y = Frame().bottom + 10;
+							} else {
+								origin.y = Frame().top - 10 - size.height;
+							}
+						} else {
+							// Place left or right of the pad
+							origin.y = mousePos.y - size.height / 2;
+							if (screen.Frame().right - Frame().right
+									> size.width + 20) {
+								origin.x = Frame().right + 10;
+							} else {
+								origin.x = Frame().left - 10 - size.width;
+							}
+						}
+						panel->MoveTo(origin);
+						panel->Show();
 					}
 				}
 			}
@@ -344,14 +378,6 @@ MainWindow::LoadSettings(const BMessage* message)
 		}
 	}
 
-	// restore name panel frame
-	if (message->FindRect("name panel frame", &frame) == B_OK) {
-		if (frame.IsValid()) {
-			make_sure_frame_is_on_screen(frame, this);
-			fNamePanelFrame = frame;
-		}
-	}
-
 	// restore window look
 	window_look look;
 	if (message->FindInt32("window look", (int32*)&look) == B_OK)
@@ -429,13 +455,9 @@ MainWindow::SaveSettings(BMessage* message)
 	if (message->ReplaceFloat("border distance", fBorderDist) != B_OK)
 		message->AddFloat("border distance", fBorderDist);
 
-	// store window frame
+	// store window frame and look
 	if (message->ReplaceRect("window frame", Frame()) != B_OK)
 		message->AddRect("window frame", Frame());
-
-	// store name panel frame
-	if (message->ReplaceRect("name panel frame", fNamePanelFrame) != B_OK)
-		message->AddRect("name panel frame", fNamePanelFrame);
 
 	if (message->ReplaceInt32("window look", Look()) != B_OK)
 		message->AddInt32("window look", Look());

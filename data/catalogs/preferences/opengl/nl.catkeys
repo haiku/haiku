@@ -1,26 +1,26 @@
-1	dutch	x-vnd.Haiku-OpenGL	899836772
-Attributes stack size:	Capabilities		Stackgrootte-kenmerken:
-Auxiliary buffer(s):	Capabilities		Hulpbuffer(s):
-Available	Extensions		Beschikbaar
-Capabilities	Capabilities		Mogelijkheden
-Extensions	Extensions		Extenties
-GLU version:	InfoView		GLU versie:
-GLUT API version:	InfoView		GLUT API-versie:
-Information	InfoView		Informatie
+1	dutch; flemish	x-vnd.Haiku-OpenGL	899836772
 List stack size:	Capabilities		Lijst stackgrootte:
-Max. 2D texture size:	Capabilities		Max. 2D textuurgrootte:
-Max. 3D texture size:	Capabilities		Max. 3D-textuurgrootte:
+Information	InfoView		Informatie
 Max. clipping planes:	Capabilities		Max. clippingvlakken:
-Max. convolution:	Capabilities		Max. draaiing:
-Max. evaluators equation order:	Capabilities		Max. vergelijkingsevaluatie-volgorde:
-Max. lights:	Capabilities		Max. lichten:
-Max. recommended index elements:	Capabilities		Max. aanbevolen index-elementen:
-Max. recommended vertex elements:	Capabilities		Max. aanbevolen vertex-elementen:
 Max. texture units:	Capabilities		Max. textuurunits:
-Model stack size:	Capabilities		Model-stackgrootte:
-Name stack size:	Capabilities		Naam stackgrootte:
-OpenGL version:	InfoView		OpenGL-versie:
-Projection stack size:	Capabilities		Projectie-stackgrootte:
 Renderer name:	InfoView		Renderernaam:
-Texture stack size:	Capabilities		Textuurstackgrootte:
 Vendor name:	InfoView		Vendor-naam:
+Attributes stack size:	Capabilities		Stackgrootte-kenmerken:
+OpenGL version:	InfoView		OpenGL-versie:
+Name stack size:	Capabilities		Naam stackgrootte:
+Auxiliary buffer(s):	Capabilities		Hulpbuffer(s):
+Max. recommended vertex elements:	Capabilities		Max. aanbevolen vertex-elementen:
+GLU version:	InfoView		GLU versie:
+Model stack size:	Capabilities		Model-stackgrootte:
+Projection stack size:	Capabilities		Projectie-stackgrootte:
+Max. lights:	Capabilities		Max. lichten:
+Max. 2D texture size:	Capabilities		Max. 2D textuurgrootte:
+Max. convolution:	Capabilities		Max. draaiing:
+GLUT API version:	InfoView		GLUT API-versie:
+Texture stack size:	Capabilities		Textuurstackgrootte:
+Max. evaluators equation order:	Capabilities		Max. vergelijkingsevaluatie-volgorde:
+Max. 3D texture size:	Capabilities		Max. 3D-textuurgrootte:
+Capabilities	Capabilities		Mogelijkheden
+Max. recommended index elements:	Capabilities		Max. aanbevolen index-elementen:
+Available	Extensions		Beschikbaar
+Extensions	Extensions		Extenties

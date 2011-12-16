@@ -331,17 +331,26 @@ ModeList::AddModes(const display_mode* modes, uint32 count)
 bool
 ModeList::CreateColorSpaces(const color_space* spaces, uint32 count)
 {
-	uint32 modeCount = fCount;
+	uint32 baseModeCount = fCount;
+	size_t baseModesSize = baseModeCount * sizeof(display_mode);
+	display_mode* baseModes = (display_mode*)malloc(baseModesSize);
+	if (baseModes == NULL)
+		return false;
+
+	memcpy(baseModes, fModes, baseModesSize);
 
 	for (uint32 i = 0; i < count; i++) {
-		if (i > 0 && !AddModes(fModes, modeCount))
+		if (i > 0 && !AddModes(baseModes, baseModeCount)) {
+			free(baseModes);
 			return false;
+		}
 
-		for (uint32 j = 0; j < modeCount; j++) {
-			fModes[j + fCount - modeCount].space = spaces[i];
+		for (uint32 j = 0; j < baseModeCount; j++) {
+			fModes[j + fCount - baseModeCount].space = spaces[i];
 		}
 	}
 
+	free(baseModes);
 	return true;
 }
 

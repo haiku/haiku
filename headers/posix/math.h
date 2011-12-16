@@ -234,7 +234,7 @@ extern long double	fmal(long double x, long double y, long double z);
 extern long double	fmaxl(long double x, long double y);
 extern long double	fminl(long double x, long double y);
 extern long double	fmodl(long double x, long double y);
-extern long double	frexpl(long double num, int *exp);
+extern long double	frexpl(long double num, int *_exponent);
 extern long double	hypotl(long double x, long double y);
 extern int			ilogbl(long double x);
 extern long double	ldexpl(long double x, int exponent);
@@ -269,7 +269,6 @@ extern long double	tgammal(long double x);
 extern long double	truncl(long double x);
 
 /* some BSD non-ANSI or POSIX math functions */
-extern double		gamma_r(double x, int *y);
 extern double		j0(double x);
 extern double		j1(double x);
 extern double		jn(int x, double y);
@@ -293,7 +292,6 @@ extern float		jnf(int x, float y);
 extern float		y0f(float x);
 extern float		y1f(float x);
 extern float		ynf(int x, float y);
-extern float		gammaf_r(float x, int *y);
 extern float		lgammaf_r(float x, int *y);
 
 

@@ -39,7 +39,7 @@ extern bool gTraceFlow;
 	"Returns:%#010x\n", result);
 
 
-#define STATISTICS	1
+#define STATISTICS	0
 
 struct Statistics {
 					Statistics();

@@ -1,0 +1,42 @@
+1	croatian	x-vnd.Be-PRNT	2992007972
+%.2f KB	JobListView		%.2f KB
+1 pending job.	PrinterListView		1 zadatak na čekanju.
+<pick one>	AddPrinterDialog		<odaberi jedan>
+Add	AddPrinterDialog		Dodaj
+Add printer	AddPrinterDialog		Dodaj pisač
+Add …	PrintersWindow		Dodaj ...
+Black	TestPageView		Crna
+Blue	TestPageView		Plava
+Cancel	AddPrinterDialog		Otkaži
+Cancel job	PrintersWindow		Otkaži zadatak
+Completed	JobListView		Završeno
+Connected to:	AddPrinterDialog		Spojen na:
+Cyan	TestPageView		Svijetlo plava
+Default Printer	PrinterListView		Zadani pisač
+Driver: %driver%	PrinterListView		Upravljački program: %upravljački program%
+Failed	JobListView		Neuspjelo
+Green	TestPageView		Zelena
+Magenta	TestPageView		Magenta
+Make default	PrintersWindow		Napravi zadano
+No pending jobs.	PrinterListView		Nema zadataka na čekanju.
+No printer found!	TransportMenu		Nijedan pisač nije nađen!
+Print jobs for 	PrintersWindow		Ispiši zadatke za
+Print jobs: No printer selected	PrintersWindow		Zadaci za ispisivanje: Nema odabranog pisača
+Print test page	PrintersWindow		Ispiši test stranicu
+Printer name:	AddPrinterDialog		Ime pisača:
+Printer type:	AddPrinterDialog		Tip pisača:
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Pisač: %ime_pisača%\nUpravljački program: %upravljački program%\n
+Printers	PrintersWindow		Pisači
+Printers	System name		Pisači
+Processing	JobListView		Procesiranje
+Red	TestPageView		Crvena
+Remove	PrintersWindow		Ukloni
+Restart job	PrintersWindow		Ponovno pokreni zadatak
+Test Page	PrintersWindow		Test stranica
+Test Page	TestPageView		Test stranica
+Unknown status	JobListView		Nepoznat status
+Waiting	JobListView		Čekanje
+Yellow	TestPageView		Žuta
+page	JobListView		stranica
+pages	JobListView		stranice
+pending jobs.	PrinterListView		zadaci na čekanju.

@@ -1,34 +1,42 @@
-1	russian	x-vnd.Haiku-Time	2447986513
-<Other>	Time		<Другой>
-Add	Time		Добавить
-Could not contact server	Time		Ну удалось связаться с сервером
-Could not create socket	Time		Не удалось создать сокет
-Current time:	Time		Текущее время:
-Date and time	Time		Дата и время
-GMT	Time		GMT
-Hardware clock set to:	Time		Часы настроены на:
-Local time	Time		Местное время
-Message receiving failed	Time		Не удалось получить данные
-Network time	Time		Синхронизация времени
+1	russian	x-vnd.Haiku-Time	2106196689
 OK	Time		ОК
-Preview time:	Time		Предварительное время:
-Received invalid time	Time		Получено неверное время
-Remove	Time		Удалить
-Reset	Time		Сбросить
-Revert	Time		Вернуть
-Sending request failed	Time		Не удалось отправить запрос
-Set time zone	Time		Установить часовой пояс
-Stop	Time		Остановить
-Synchronize	Time		Синхронизировать
-Synchronize again	Time		Синхронизировать снова
-Synchronize at boot	Time		Синхронизировать при загрузке
-The following error occured while synchronizing:r\n%s	Time		При синхронизации произошла следующая ошибка:r\n%s
-The following error occured while synchronizing:r\n%s: %s	Time		При синхронизации произошла следующая ошибка:r\n%s: %s
-Time	System name		Время
-Time	Time		Время
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date, разработал:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
-Time zone	Time		Часовой пояс
-Try all servers	Time		Пробовать все сервера
-Waiting for answer failed	Time		Истекло время ожидания
+Asia	Time		Азия
 \nNow: 	Time		\nСейчас: 
+Africa	Time		Африка
+Stop	Time		Остановить
+Could not contact server	Time		Ну удалось связаться с сервером
+Australia	Time		Австралия
+Preview time:	Time		Предварительное время:
+Synchronize	Time		Синхронизировать
+Revert	Time		Вернуть
+Pacific	Time		Тихий океан
+Add	Time		Добавить
+Date and time	Time		Дата и время
 about	Time		о программе
+Message receiving failed	Time		Не удалось получить данные
+Set time zone	Time		Установить часовой пояс
+Waiting for answer failed	Time		Истекло время ожидания
+Hardware clock set to:	Time		Часы настроены на:
+The following error occured while synchronizing:r\n%s	Time		При синхронизации произошла следующая ошибка:r\n%s
+Europe	Time		Европа
+Remove	Time		Удалить
+Time	Time		Время
+Indian	Time		Индийский океан
+Sending request failed	Time		Не удалось отправить запрос
+Arctic	Time		Арктика
+Time	System name		Время
+America	Time		Америка
+Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date, разработал:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
+Reset	Time		Сбросить
+Synchronize at boot	Time		Синхронизировать при загрузке
+Received invalid time	Time		Получено неверное время
+Antarctica	Time		Антарктида
+The following error occured while synchronizing:r\n%s: %s	Time		При синхронизации произошла следующая ошибка:r\n%s: %s
+<Other>	Time		<Другой>
+Current time:	Time		Текущее время:
+Try all servers	Time		Пробовать все сервера
+Time zone	Time		Часовой пояс
+Could not create socket	Time		Не удалось создать сокет
+Synchronize again	Time		Синхронизировать снова
+Network time	Time		Синхронизация времени
+Atlantic	Time		Атлантика

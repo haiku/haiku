@@ -1,0 +1,48 @@
+1	lithuanian	x-vnd.Haiku-ProcessController	2887520383
+Memory usage	ProcessController		Atminties naudojimas
+Do you really want to kill the team \"%s\"?	ProcessController		Ar tikrai norite nutraukti užduoties „%s“ darbą?
+Idle priority	ProcessController		Nulinis prioritetas
+Restart Deskbar	ProcessController		Perleisti Užduočių juostą
+Custom priority	ProcessController		Parinktinis prioritetas
+Debug thread	ProcessController		Derinti giją
+This team is already gone…	ProcessController		Šios užduoties jau nebėra…
+Error saving file	ProcessController		Klaida įrašant failą
+Real-time priority	ProcessController		Tikralaikis prioritetas
+Your setting file could not be saved!\n(%s)	ProcessController		Nepavyko įrašyti Jūsų nuostatų failo!\n(%s)
+This thread is already gone…	ProcessController		Šios gijos jau nebėra…
+Cancel	ProcessController		Atsisakyti
+Display priority	ProcessController		Rodymo prioritetas
+Run in window	ProcessController		Paleisti lange
+Processor %d	ProcessController		%d–asis procesorius
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		© 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+ProcessController is already installed in Deskbar.	ProcessController		Procesų valdiklis jau patalpintas pranešimų srityje.
+This is the last active processor...\nYou can't turn it off!	ProcessController		Tai yra paskutinis aktyvus procesorius…\nJo išjungti negalima!
+Info	ProcessController		Informacija
+Quit application	ProcessController		Užbaigti programos darbą
+Low priority	ProcessController		Žemas prioritetas
+What do you want to do with the thread \"%s\"?	ProcessController		Ką norite daryti su „%s“ gija?
+Gone teams…	ProcessController		Užbaigtos užduotys…
+Lowest active priority	ProcessController		Žemiausias aktyvus prioritetas
+Restart Tracker	ProcessController		Perleisti Pėdsekį
+Live in the Deskbar	ProcessController		Patalpinti pranešimų srityje
+Kill this thread!	ProcessController		Nutraukti šios gijos darbą!
+Debug this thread!	ProcessController		Derinti šią giją!
+Normal priority	ProcessController		Įprastinis prioritetas
+New Terminal	ProcessController		Naujas terminalas
+Urgent priority	ProcessController		Aukštas prioritetas
+About ProcessController…	ProcessController		Apie Procesų valdiklį…
+Ok!	ProcessController		Gerai!
+Quit an application	ProcessController		Baigti programos darbą
+Install in Deskbar	ProcessController		Patalpinti pranešimų srityje
+Threads and CPU usage	ProcessController		Gijos ir procesoriaus naudojimas
+Urgent display priority	ProcessController		Skubaus rodymo prioritetas
+OK	ProcessController		Gerai
+Damned!	ProcessController		Po velnių!
+Usage: %s [-deskbar]\n	ProcessController		Naudojimas: %s [-deskbar]\n
+ProcessController	System name		Procesų valdiklis
+Real-time display priority	ProcessController		Tikralaikio rodymo prioritetas
+Please confirm	ProcessController		Prašome patvirtinti
+Yes, kill this team!	ProcessController		Taip, nutraukti šios užduoties darbą!
+System resources & caches…	ProcessController		Sistemos ištekliai ir podėliai…
+That's no Fun!	ProcessController		Visai nejuokinga!
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Šią programą galite paleisti atskirame lange arba patalpinti pranešimų srityje.

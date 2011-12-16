@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Oliver Tappe, zooey@hirschkaefer.de.
+ * Copyright 2010-2011, Oliver Tappe, zooey@hirschkaefer.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -12,6 +12,12 @@
 
 namespace BPrivate {
 namespace Libroot {
+
+
+ICUMessagesData::ICUMessagesData(pthread_key_t tlsKey)
+	: inherited(tlsKey)
+{
+}
 
 
 void

@@ -17,13 +17,15 @@
 #include <crypt.h>
 
 
+const uint32 kMsgStartWatching = '&StW';
+
+
 DispatcherIMAPListener::DispatcherIMAPListener(MailProtocol& protocol,
 	IMAPStorage& storage)
 	:
 	fProtocol(protocol),
 	fStorage(storage)
 {
-
 }
 
 
@@ -74,15 +76,7 @@ DispatcherIMAPListener::FetchEnd()
 }
 
 
-const uint32 kMsgStartWatching = '&StW';
-
-
-int32
-watch_mailbox(void* data)
-{
-	((IMAPMailboxThread*)data)->_Watch();
-	return B_OK;
-}
+// #pragma mark -
 
 
 IMAPMailboxThread::IMAPMailboxThread(IMAPInboundProtocol& protocol,
@@ -122,7 +116,7 @@ IMAPMailboxThread::SyncAndStartWatchingMailbox()
 		BAutolock autolock(fLock);
 		if (fIsWatching)
 			return B_OK;
-		fThread = spawn_thread(watch_mailbox, "IMAPMailboxThread",
+		fThread = spawn_thread(_WatchThreadFunction, "IMAPMailboxThread",
 			B_LOW_PRIORITY, this);
 		if (resume_thread(fThread) != B_OK) {
 			fThread = -1;
@@ -159,6 +153,15 @@ IMAPMailboxThread::StopWatchingMailbox()
 }
 
 
+/*static*/ status_t
+IMAPMailboxThread::_WatchThreadFunction(void* data)
+{
+	((IMAPMailboxThread*)data)->_Watch();
+	return B_OK;
+}
+
+
+
 void
 IMAPMailboxThread::_Watch()
 {
@@ -181,7 +184,6 @@ MailboxWatcher::MailboxWatcher(IMAPInboundProtocol* protocol)
 	:
 	fProtocol(protocol)
 {
-
 }
 
 
@@ -223,7 +225,7 @@ MailboxWatcher::MessageReceived(BMessage* message)
 
 				fProtocol->AppendMessage(ref);
 				break;
-		
+
 			case B_ENTRY_REMOVED:
 				message->FindInt32("device", &nref.device);
 				message->FindInt64("node", &nref.node);

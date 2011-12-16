@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2011, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Pengphei Han
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>引导管理器</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>用户指南</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/zh_CN.png" alt="" />  中文 ［中文］</li>
+<li><a href="../../fr/applications/bootmanager.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/bootmanager.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/bootmanager.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/bootmanager.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/bootmanager.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/bootmanager.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/bootmanager.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/bootmanager.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../pt_PT/applications/bootmanager.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/bootmanager.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/bootmanager.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../en/applications/bootmanager.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="activitymonitor.html">系统监视器</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">应用程序</a> 
+::  <a href="cdplayer.html">CD播放器</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/bootmanager-icon_64.png" alt="bootmanager-icon_64.png" width="64" height="64" />引导管理器</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>桌面栏：</td><td style="width:15px;"></td><td><i>没有程序入口，通常从安装器的 <span class="menu">工具</span> 菜单启动。</i></td></tr>
+<tr><td>位置：</td><td></td><td><span class="path">/boot/system/apps/BootManager</span></td></tr>
+<tr><td>设置：</td><td></td><td><i>无</i><br />MBR 备份文件默认保存在 <span class="path">~/config/settings/bootman/</span></td></tr>
+</table>
+<p><br /></p>
+<p>如果您没有将 Haiku 分区添加到已存在的引导管理器，如 GRUB，引导管理器可以在主引导记录中安装一个小的引导菜单，如下所示：</p>
+<img src="../images/apps-images/bootmenu.png" alt="bootmenu.png" />
+<div class="box-info">引导管理器还未进行严格的测试，仍然有一些限制，它需要满足一些条件：菜单仅能够安装在您的第一个磁盘，并且在主引导记录之后必须有 2KiB 的空间。</div>
+<p>引导管理器引导将您完成引导菜单的安装过程。</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="1-drives" id="1-drives">选择目标驱动</a></h2>
+<img src="../images/apps-images/bootmanager-1.png" alt="bootmanager-1.png" />
+<p>引导菜单启动后，会出现一个包含所有可用驱动器列表，您可以选择自己希望启动的系统。如果驱动中已经具有引导菜单， <span class="button">卸载</span> 按钮将激活，它将会引导您恢复之前备份的主引导记录，这样将会再次移除引导菜单。<br />
+反之，选择 <span class="button">安装</span> 继续安装。</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="2-backup" id="2-backup">备份主引导记录 (MBR)</a></h2>
+<p>如果发生了错误，或者您希望再次移除引导菜单，现在可以保存主引导记录。这是一个非常重要的步骤，但是请确保您没有覆盖其他的主引导记录，如一些早期尝试时生成的主引导记录文件。</p>
+<img src="../images/apps-images/bootmanager-2.png" alt="bootmanager-2.png" /> 
+<img src="../images/apps-images/bootmanager-3.png" alt="bootmanager-3.png" />
+<p>只需要选择一个备份 "<tt>MBR</tt>" 文件的目录，或者使用默认路径。在点击 <span class="button">下一步</span> 之后，如果备份成功，您将会得到确认信息。</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="3-menu" id="3-menu">配置引导菜单</a></h2>
+<img src="../images/apps-images/bootmanager-4.png" alt="bootmanager-4.png" /> 
+<img src="../images/apps-images/bootmanager-5.png" alt="bootmanager-5.png" />
+<p>接下来，您将会看到目标驱动中的所有分区列表。通过设置检查标记，您可以决定哪个条目可以进入引导菜单，其中的文本框允许您重命名该条目。</p>
+<p>之后，从弹出菜单中选择默认的引导分区，并通过滑块控件设置延时。此处， "<i>立刻</i>" 将会完全跳过引导菜单， "<i>从不</i>" 将会在引导菜单时停止。您可以在引导时按下  <span class="key">ALT</span> 按键重新调整延时设置。</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="4-mbr" id="4-mbr">写入引导菜单</a></h2>
+<img src="../images/apps-images/bootmanager-6.png" alt="bootmanager-6.png" /> 
+<img src="../images/apps-images/bootmanager-7.png" alt="bootmanager-7.png" />
+<p>在引导菜单写入主引导记录之前，您将会看到有关配置信息的统计，并且是最后一次取消操作的机会。但是别太担心，如果您确保了主引导记录备份的安全，您可以很容易的恢复修改。万一出现差错，您可以通过 Haiku 引导光盘或者 USB 启动盘进行引导，然后通过引导管理器恢复主引导记录。</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="activitymonitor.html">系统监视器</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">应用程序</a> 
+::  <a href="cdplayer.html">CD播放器</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

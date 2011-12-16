@@ -1,0 +1,3 @@
+resource app_signature "application/x-vnd.haiku.setmime";
+
+resource app_flags B_MULTIPLE_LAUNCH | B_BACKGROUND_APP;

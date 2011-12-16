@@ -1,0 +1,15 @@
+1	dutch; flemish	x-vnd.Haiku-MatchHeader	1205906732
+<Choose action>	ConfigView		<Kies actie>
+has	ConfigView		Heeft
+Move to	ConfigView		Verplaats naar
+Then	ConfigView		Dan
+value (use REGEX: in from of regular expressions like *spam*)	ConfigView		waarde (gebruik REGEX: in vorm van normale uitdrukking zoals *spam*)
+this field is based on the action	ConfigView		dit veld is gebaseerd op de actie
+Delete message	ConfigView		Bericht verwijderen
+Rule filter	RuleFilter		Regelfilter
+<Choose account>	ConfigView		<Kies account>
+Set flags to	ConfigView		Markeer als
+Set as read	ConfigView		Als gelezen markeren
+Reply with	ConfigView		Antwoord met
+If	ConfigView		Als
+header (e.g. Subject)	ConfigView		rubiek (m.a.w. onderwerp)

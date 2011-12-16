@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010 Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2011 Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _STDLIB_H_
@@ -13,9 +13,8 @@
 #include <sys/types.h>
 #include <wchar_t.h>
 
-
 #define RAND_MAX      0x7fffffff
-#define MB_CUR_MAX    1
+#define MB_CUR_MAX    (__ctype_get_mb_cur_max())
 
 #define EXIT_SUCCESS  0
 #define EXIT_FAILURE  1
@@ -179,6 +178,9 @@ extern int		posix_openpt(int openFlags);
 extern int		grantpt(int masterFD);
 extern char*	ptsname(int masterFD);
 extern int		unlockpt(int masterFD);
+
+/* internal accessor to value for MB_CUR_MAX */
+extern unsigned short __ctype_get_mb_cur_max(void);
 
 #ifdef __cplusplus
 } /* extern "C" */

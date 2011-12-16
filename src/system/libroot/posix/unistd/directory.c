@@ -8,18 +8,19 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <errno_private.h>
 #include <syscalls.h>
 #include <syscall_utils.h>
 
 
-int 
+int
 chdir(const char *path)
 {
 	RETURN_AND_SET_ERRNO(_kern_setcwd(-1, path));
 }
 
 
-int 
+int
 fchdir(int fd)
 {
 	RETURN_AND_SET_ERRNO(_kern_setcwd(fd, NULL));
@@ -35,7 +36,7 @@ getcwd(char *buffer, size_t size)
 	if (buffer == NULL) {
 		buffer = malloc(size = PATH_MAX);
 		if (buffer == NULL) {
-			errno = B_NO_MEMORY;
+			__set_errno(B_NO_MEMORY);
 			return NULL;
 		}
 
@@ -47,7 +48,7 @@ getcwd(char *buffer, size_t size)
 		if (allocated)
 			free(buffer);
 
-		errno = status;
+		__set_errno(status);
 		return NULL;
 	}
 	return buffer;

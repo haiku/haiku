@@ -139,7 +139,7 @@ main(int argc, char **argv)
 			BEntry entry(outputFile.String());
 			entry_ref eref;
 			entry.GetRef(&eref);
-			res = targetCatalog.WriteToAttribute(&eref);
+			res = targetCatalog.WriteToAttribute(eref);
 			if (res != B_OK) {
 				fprintf(stderr,
 					"couldn't write target-attribute to %s - error: %s\n",
@@ -152,7 +152,7 @@ main(int argc, char **argv)
 			BEntry entry(outputFile.String());
 			entry_ref eref;
 			entry.GetRef(&eref);
-			res = targetCatalog.WriteToResource(&eref);
+			res = targetCatalog.WriteToResource(eref);
 			if (res != B_OK) {
 				fprintf(stderr,
 					"couldn't write target-resource to %s - error: %s\n",

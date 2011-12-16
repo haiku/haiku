@@ -38,6 +38,9 @@
 //#include <limits.h>
 #include <stdlib.h>
 
+#include <errno_private.h>
+
+
 #define UQUAD_MAX 0xffffffffffffffffULL
 /*
  * Convert a string to an unsigned quad integer.
@@ -66,7 +69,7 @@ strtouq(nptr, endptr, base)
 	if (c == '-') {
 		neg = 1;
 		c = *s++;
-	} else { 
+	} else {
 		neg = 0;
 		if (c == '+')
 			c = *s++;
@@ -96,7 +99,7 @@ strtouq(nptr, endptr, base)
 		if (acc > cutoff || (acc == cutoff && c > cutlim)) {
 			any = -1;
 			acc = UQUAD_MAX;
-			errno = ERANGE;
+			__set_errno(ERANGE);
 		} else {
 			any = 1;
 			acc *= (uint64)base;

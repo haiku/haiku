@@ -38,6 +38,8 @@
 <li><a href="../../uk/applications/webpositive.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/applications/webpositive.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/applications/webpositive.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/webpositive.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/webpositive.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/applications/webpositive.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -63,7 +65,7 @@
 Then comes the locator field to enter a site's URL.<br />
 Below this navigating bar appear the webpages. You can open many pages in parallel by loading them into their own tab.<br />
 At the bottom of the window is a status bar, showing the URL of the site being loaded or of the link the mouse pointer is hovering over. While a page is being loaded, a progress bar appears to the right.</p>
-<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Settings</h2>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Impostazioni</h2>
 <p>From the <span class="menu">Window</span> menu you can open a <span class="menu">Settings</span> panel to configure a few essentials of WebPositive.</p>
 <img src="../images/apps-images/webpositive-settings.png" alt="webpositive-settings.png" />
 <p>The first tab deals with general settings: What file or URL serves as a <span class="menu">Start page</span>, what's used as a <span class="menu">Search page</span>, what <span class="menu">Download folder</span> is used for stuff you get from the net.<br />
@@ -71,7 +73,7 @@ Two pop-up menus let you decide what page to load - if any - when opening a new 
 Via the following checkboxes you can avoid showing the tab bar when there's only one page open anyway. WebPositive's interface can be told to automatically hide in full screen mode, and the mouse pointer can be automatically hidden whenever it's not moved for a while.<br />
 Finally, you can decide to include the "Home" button in the navigation bar and set the number of days the browser remembers the sites you have visited in its history.</p>
 <p>In the second tab you can choose the fonts used for standard, serif, non-serif and monospaced fonts and set their default sizes.</p>
-<p>The last tab is used to configure a proxy server.</p>
+<p>L'ultima tab viene usata per configurare un server proxy.</p>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Browsing</h2>
 <p>If you have used any browser before, WebPositive shouldn't provide too many surprises. Instead of going through every menu item and feature, let's have a look at just a few points.</p>
 <ul>
@@ -87,7 +89,7 @@ Strings not recognized as URLs will get looked up with Google, so the locator fi
 <li><p><span class="menu">Edit | Find</span> shows a find bar at the bottom to start an in-page search. Matches are highlighted in the page.</p></li>
 </ul>
 <div class="box-info">After a while you may experience web pages being loaded slower and slower. Not really a bug in the truest sense, it's more an effect of a deficient handling of cookies. Either way, until that is fixed you'll have to manually intervene: Have a look at <span class="path">~/config/settings/WebPositive/Cookies.curl</span>. This file stores cookies from webpages and slowly grows while surfing the web. Once it's a few dozen kilobytes in size, it starts to slow down browsing. Just delete the file at that point to start with a clean slate.</div>
-<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Bookmarks</h2>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Segnalibri</h2>
 <p>WebPositive's bookmarks are managed as files and folders in <tt>~/config/settings/WebPositive/Bookmarks/</tt>. Adding a bookmark will create a new file there. You can quickly open the folder with <span class="menu">Manage Bookmarks...</span>.</p>
 <img src="../images/apps-images/webpositive-bookmarks.png" alt="webpositive-bookmarks" />
 <p>You can change a bookmark's URL, name, title and enter keywords just like with any other file with attributes. Just make sure you have all their columns displayed via Tracker's <span class="menu">Attributes</span> menu, then select a file, press <span class="key">ALT</span> <span class="key">E</span> and start editing the attribute; change attribute columns with <span class="key">TAB</span>.<br />You can sort bookmarks into different folders you create yourself.</p>

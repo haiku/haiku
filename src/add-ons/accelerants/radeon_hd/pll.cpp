@@ -7,11 +7,6 @@
  */
 
 
-#include "accelerant_protos.h"
-#include "accelerant.h"
-#include "bios.h"
-#include "display.h"
-#include "utility.h"
 #include "pll.h"
 
 #include <stdio.h>
@@ -19,10 +14,18 @@
 #include <string.h>
 #include <math.h>
 
+#include "accelerant_protos.h"
+#include "accelerant.h"
+#include "bios.h"
+#include "display.h"
+#include "displayport.h"
+#include "encoder.h"
+#include "utility.h"
+
 
 #define TRACE_PLL
 #ifdef TRACE_PLL
-extern "C" void _sPrintf(const char *format, ...);
+extern "C" void _sPrintf(const char* format, ...);
 #   define TRACE(x...) _sPrintf("radeon_hd: " x)
 #else
 #   define TRACE(x...) ;
@@ -31,32 +34,30 @@ extern "C" void _sPrintf(const char *format, ...);
 #define ERROR(x...) _sPrintf("radeon_hd: " x)
 
 
-union firmware_info {
-	ATOM_FIRMWARE_INFO info;
-	ATOM_FIRMWARE_INFO_V1_2 info_12;
-	ATOM_FIRMWARE_INFO_V1_3 info_13;
-	ATOM_FIRMWARE_INFO_V1_4 info_14;
-	ATOM_FIRMWARE_INFO_V2_1 info_21;
-	ATOM_FIRMWARE_INFO_V2_2 info_22;
-};
-
-
 status_t
-pll_limit_probe(pll_info *pll)
+pll_limit_probe(pll_info* pll)
 {
-	int index = GetIndexIntoMasterTable(DATA, FirmwareInfo);
 	uint8 tableMajor;
 	uint8 tableMinor;
 	uint16 tableOffset;
 
+	int index = GetIndexIntoMasterTable(DATA, FirmwareInfo);
 	if (atom_parse_data_header(gAtomContext, index, NULL,
 		&tableMajor, &tableMinor, &tableOffset) != B_OK) {
 		ERROR("%s: Couldn't parse data header\n", __func__);
 		return B_ERROR;
 	}
 
-	union firmware_info *firmwareInfo
-		= (union firmware_info *)(gAtomContext->bios + tableOffset);
+	union atomFirmwareInfo {
+		ATOM_FIRMWARE_INFO info;
+		ATOM_FIRMWARE_INFO_V1_2 info_12;
+		ATOM_FIRMWARE_INFO_V1_3 info_13;
+		ATOM_FIRMWARE_INFO_V1_4 info_14;
+		ATOM_FIRMWARE_INFO_V2_1 info_21;
+		ATOM_FIRMWARE_INFO_V2_2 info_22;
+	};
+	union atomFirmwareInfo* firmwareInfo
+		= (union atomFirmwareInfo*)(gAtomContext->bios + tableOffset);
 
 	/* pixel clock limits */
 	pll->referenceFreq
@@ -123,7 +124,7 @@ pll_limit_probe(pll_info *pll)
 
 
 void
-pll_compute_post_divider(pll_info *pll)
+pll_compute_post_divider(pll_info* pll)
 {
 	if ((pll->flags & PLL_USE_POST_DIV) != 0) {
 		TRACE("%s: using AtomBIOS post divider\n", __func__);
@@ -167,7 +168,7 @@ pll_compute_post_divider(pll_info *pll)
 
 
 status_t
-pll_compute(pll_info *pll)
+pll_compute(pll_info* pll)
 {
 	pll_compute_post_divider(pll);
 
@@ -283,14 +284,8 @@ pll_compute(pll_info *pll)
 }
 
 
-union adjust_pixel_clock {
-	ADJUST_DISPLAY_PLL_PS_ALLOCATION v1;
-	ADJUST_DISPLAY_PLL_PS_ALLOCATION_V3 v3;
-};
-
-
 void
-pll_setup_flags(pll_info *pll, uint8 crtcID)
+pll_setup_flags(pll_info* pll, uint8 crtcID)
 {
 	radeon_shared_info &info = *gInfo->shared_info;
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
@@ -303,7 +298,7 @@ pll_setup_flags(pll_info *pll, uint8 crtcID)
 		pll->flags |= PLL_PREFER_LOW_REF_DIV;
 
 
-	if (info.device_chipset < RADEON_R700)
+	if (info.chipsetID < RADEON_RV770)
 		pll->flags |= PLL_PREFER_MINM_OVER_MAXP;
 
 
@@ -327,7 +322,7 @@ pll_setup_flags(pll_info *pll, uint8 crtcID)
 
 
 status_t
-pll_adjust(pll_info *pll, uint8 crtcID)
+pll_adjust(pll_info* pll, uint8 crtcID)
 {
 	// TODO: PLL flags
 	radeon_shared_info &info = *gInfo->shared_info;
@@ -338,21 +333,35 @@ pll_adjust(pll_info *pll, uint8 crtcID)
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
 	uint32 encoderMode = display_get_encoder_mode(connectorIndex);
+	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+	bool dpBridge = false;
 
-	if (info.device_chipset >= (RADEON_R600 | 0x20)) {
-		union adjust_pixel_clock args;
+	if ((encoderFlags & (ATOM_DEVICE_LCD_SUPPORT | ATOM_DEVICE_DFP_SUPPORT))
+		|| gConnector[connectorIndex]->encoder.isDPBridge) {
+		TRACE("%s: external DP bridge detected!\n", __func__);
+		dpBridge = true;
+	}
+
+
+	if (info.dceMajor >= 3) {
 
 		uint8 tableMajor;
 		uint8 tableMinor;
 
 		int index = GetIndexIntoMasterTable(COMMAND, AdjustDisplayPll);
-
 		if (atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor)
 			!= B_OK) {
 			return B_ERROR;
 		}
 
+		// Prepare arguments for AtomBIOS call
+		union adjustPixelClock {
+			ADJUST_DISPLAY_PLL_PS_ALLOCATION v1;
+			ADJUST_DISPLAY_PLL_PS_ALLOCATION_V3 v3;
+		};
+		union adjustPixelClock args;
 		memset(&args, 0, sizeof(args));
+
 		switch (tableMajor) {
 			case 1:
 				switch (tableMinor) {
@@ -385,13 +394,44 @@ pll_adjust(pll_info *pll, uint8 crtcID)
 							args.v3.sInput.ucDispPllConfig
 								|= DISPPLL_CONFIG_SS_ENABLE;
 						}
-						// TODO: if ATOM_DEVICE_DFP_SUPPORT
-						// TODO: display port DP
 
-						// TODO: is DP?
-						args.v3.sInput.ucExtTransmitterID = 0;
+						// Handle DP adjustments
+						if (encoderMode == ATOM_ENCODER_MODE_DP
+							|| encoderMode == ATOM_ENCODER_MODE_DP_MST) {
+							TRACE("%s: encoderMode is DP\n", __func__);
+							args.v3.sInput.ucDispPllConfig
+								|= DISPPLL_CONFIG_COHERENT_MODE;
+							/* 16200 or 27000 */
+							uint32 dpLinkSpeed
+								= dp_get_link_clock(connectorIndex);
+							args.v3.sInput.usPixelClock
+								= B_LENDIAN_TO_HOST_INT16(dpLinkSpeed / 10);
+						} else if ((encoderFlags & ATOM_DEVICE_DFP_SUPPORT)
+							!= 0) {
+							TRACE("%s: encoderFlags are DFP but not DP mode.\n",
+								__func__);
+							#if 0
+							if (encoderMode == ATOM_ENCODER_MODE_HDMI) {
+								/* deep color support */
+								args.v3.sInput.usPixelClock =
+									cpu_to_le16((mode->clock * bpc / 8) / 10);
+							}
+							#endif
+							if (pixelClock > 165000) {
+								args.v3.sInput.ucDispPllConfig
+									|= DISPPLL_CONFIG_DUAL_LINK;
+							}
+							if (1) {	// dig coherent mode?
+								args.v3.sInput.ucDispPllConfig
+									|= DISPPLL_CONFIG_COHERENT_MODE;
+							}
+						}
+
+						args.v3.sInput.ucExtTransmitterID
+							= dpBridge ? encoderID : 0;
 
 						atom_execute_table(gAtomContext, index, (uint32*)&args);
+
 						// get returned adjusted clock
 						pll->pixelClock
 							= B_LENDIAN_TO_HOST_INT32(
@@ -430,21 +470,11 @@ pll_adjust(pll_info *pll, uint8 crtcID)
 }
 
 
-union set_pixel_clock {
-	SET_PIXEL_CLOCK_PS_ALLOCATION base;
-	PIXEL_CLOCK_PARAMETERS v1;
-	PIXEL_CLOCK_PARAMETERS_V2 v2;
-	PIXEL_CLOCK_PARAMETERS_V3 v3;
-	PIXEL_CLOCK_PARAMETERS_V5 v5;
-	PIXEL_CLOCK_PARAMETERS_V6 v6;
-};
-
-
 status_t
 pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 {
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	pll_info *pll = &gConnector[connectorIndex]->encoder.pll;
+	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
 
 	pll->pixelClock = pixelClock;
 	pll->id = pllID;
@@ -456,18 +486,27 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 	pll_compute(pll);
 		// compute dividers
 
-	int index = GetIndexIntoMasterTable(COMMAND, SetPixelClock);
-	union set_pixel_clock args;
-	memset(&args, 0, sizeof(args));
-
 	uint8 tableMajor;
 	uint8 tableMinor;
 
+	int index = GetIndexIntoMasterTable(COMMAND, SetPixelClock);
 	atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor);
 
-	uint32 bitsPerChannel = 8;
+	uint32 bitsPerColor = 8;
 		// TODO: Digital Depth, EDID 1.4+ on digital displays
 		// isn't in Haiku edid common code?
+
+	// Prepare arguments for AtomBIOS call
+	union setPixelClock {
+		SET_PIXEL_CLOCK_PS_ALLOCATION base;
+		PIXEL_CLOCK_PARAMETERS v1;
+		PIXEL_CLOCK_PARAMETERS_V2 v2;
+		PIXEL_CLOCK_PARAMETERS_V3 v3;
+		PIXEL_CLOCK_PARAMETERS_V5 v5;
+		PIXEL_CLOCK_PARAMETERS_V6 v6;
+	};
+	union setPixelClock args;
+	memset(&args, 0, sizeof(args));
 
 	switch (tableMinor) {
 		case 1:
@@ -519,7 +558,7 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 			args.v5.ucMiscInfo = 0; /* HDMI depth, etc. */
 			// if (ss_enabled && (ss->type & ATOM_EXTERNAL_SS_MASK))
 			//	args.v5.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_REF_DIV_SRC;
-			switch (bitsPerChannel) {
+			switch (bitsPerColor) {
 				case 8:
 				default:
 					args.v5.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_HDMI_24BPP;
@@ -545,7 +584,7 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 			args.v6.ucMiscInfo = 0; /* HDMI depth, etc. */
 			// if (ss_enabled && (ss->type & ATOM_EXTERNAL_SS_MASK))
 			//	args.v6.ucMiscInfo |= PIXEL_CLOCK_V6_MISC_REF_DIV_SRC;
-			switch (bitsPerChannel) {
+			switch (bitsPerColor) {
 				case 8:
 				default:
 					args.v6.ucMiscInfo |= PIXEL_CLOCK_V6_MISC_HDMI_24BPP;

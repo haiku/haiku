@@ -245,15 +245,22 @@ FileMap::_Add(file_io_vec* vecs, size_t vecCount, off_t& lastOffset)
 			if (lastExtent->disk.offset + lastExtent->disk.length
 					== vecs[i].offset
 				|| (lastExtent->disk.offset == -1 && vecs[i].offset == -1)) {
+
 				lastExtent->disk.length += vecs[i].length;
 				offset += vecs[i].length;
-				start--;
+
 				_MakeSpace(fCount - 1);
+				if (fCount == CACHED_FILE_EXTENTS) {
+					// We moved the indirect array into the direct one, making
+					// lastExtent a stale pointer, re-get it.
+					lastExtent = ExtentAt(start - 1);
+				}
+
 				continue;
 			}
 		}
 
-		file_extent* extent = ExtentAt(start + i);
+		file_extent* extent = ExtentAt(start++);
 		extent->offset = offset;
 		extent->disk = vecs[i];
 

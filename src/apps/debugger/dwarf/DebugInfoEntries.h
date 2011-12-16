@@ -558,8 +558,12 @@ public:
 			const ConstantAttributeValue* ConstValue() const
 									{ return &fValue; }
 
+			bool				IsArtificial() const { return fArtificial; }
+
 	virtual	status_t			AddAttribute_abstract_origin(
 									uint16 attributeName,
+									const AttributeValue& value);
+	virtual status_t			AddAttribute_artificial(uint16 attributeName,
 									const AttributeValue& value);
 	virtual	status_t			AddAttribute_const_value(uint16 attributeName,
 									const AttributeValue& value);
@@ -567,7 +571,6 @@ public:
 									const AttributeValue& value);
 
 // TODO:
-// DW_AT_artificial
 // DW_AT_default_value
 // DW_AT_endianity
 // DW_AT_is_optional
@@ -579,6 +582,7 @@ private:
 			DebugInfoEntry*		fAbstractOrigin;
 			DIEType*			fType;
 			ConstantAttributeValue fValue;
+			bool				fArtificial;
 };
 
 
@@ -1213,9 +1217,18 @@ public:
 			const DebugInfoEntryList Parameters() const	{ return fParameters; }
 			const DebugInfoEntryList Variables() const	{ return fVariables; }
 			const DebugInfoEntryList Blocks() const		{ return fBlocks; }
+			const DebugInfoEntryList TemplateTypeParameters() const
+										{ return fTemplateTypeParameters; }
+			const DebugInfoEntryList TemplateValueParameters() const
+										{ return fTemplateValueParameters; }
 
 			bool				IsPrototyped() const	{ return fPrototyped; }
 			uint8				Inline() const			{ return fInline; }
+			bool				IsArtificial() const	{ return fArtificial; }
+			uint8				CallingConvention() const
+										{ return fCallingConvention; }
+
+			DIEType*			ReturnType() const		{ return fReturnType; }
 
 	virtual	status_t			AddChild(DebugInfoEntry* child);
 
@@ -1241,11 +1254,19 @@ public:
 	virtual	status_t			AddAttribute_frame_base(
 									uint16 attributeName,
 									const AttributeValue& value);
+	virtual	status_t			AddAttribute_artificial(
+									uint16 attributeName,
+									const AttributeValue& value);
+	virtual status_t			AddAttribute_calling_convention(
+									uint16 attributeName,
+									const AttributeValue& value);
 
 protected:
 			DebugInfoEntryList	fParameters;
 			DebugInfoEntryList	fVariables;
 			DebugInfoEntryList	fBlocks;
+			DebugInfoEntryList	fTemplateTypeParameters;
+			DebugInfoEntryList	fTemplateValueParameters;
 			target_addr_t		fLowPC;
 			target_addr_t		fHighPC;
 			off_t				fAddressRangesOffset;
@@ -1256,10 +1277,10 @@ protected:
 			uint8				fAddressClass;
 			bool				fPrototyped;
 			uint8				fInline;
+			bool				fArtificial;
+			uint8				fCallingConvention;
 
 // TODO:
-// DW_AT_artificial
-// DW_AT_calling_convention
 // DW_AT_elemental
 // DW_AT_entry_pc
 // DW_AT_explicit
@@ -1413,7 +1434,7 @@ private:
 			LocationDescription	fLocationDescription;
 			ConstantAttributeValue fValue;
 			DIEType*			fType;
-			DIEVariable*		fSpecification;
+			DebugInfoEntry*		fSpecification;
 			DIEVariable*		fAbstractOrigin;
 			uint64				fStartScope;
 };

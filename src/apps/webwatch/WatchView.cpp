@@ -68,7 +68,7 @@ WatchView::WatchView(BMessage* message)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-__declspec(dllexport) WatchView* WatchView::Instantiate(BMessage* archive)
+WatchView* WatchView::Instantiate(BMessage* archive)
 {
 	if (validate_instantiation(archive, REPLICANT_CLASS)) 
 	{

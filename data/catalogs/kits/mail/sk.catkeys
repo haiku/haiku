@@ -1,10 +1,10 @@
 1	slovak	x-vnd.Haiku-libmail	161731481
-Connection type:	ProtocolConfigView		Typ pripojenia:
-Leave mail on server	ProtocolConfigView		Ponechať poštu na serveri
-Login type:	ProtocolConfigView		Typ prihlásenia:
-Mail server:	ProtocolConfigView		Poštový server:
 Partially download messages larger than	ProtocolConfigView		Čiastočne stiahnuť správy väčšie ako
 Password:	ProtocolConfigView		Heslo:
 Remove mail from server when deleted	ProtocolConfigView		Odstrániť poštu zo servera pri zmazaní
-Select…	MailKit		Vybrať...
+Mail server:	ProtocolConfigView		Poštový server:
+Select…	MailKit		Vybrať…
+Connection type:	ProtocolConfigView		Typ pripojenia:
+Leave mail on server	ProtocolConfigView		Ponechať poštu na serveri
 Username:	ProtocolConfigView		Používateľské meno:
+Login type:	ProtocolConfigView		Typ prihlásenia:

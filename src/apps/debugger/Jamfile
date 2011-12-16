@@ -19,6 +19,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) settings generic ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) types ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface cli ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui inspector_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui model ] ;
@@ -140,8 +141,11 @@ Application Debugger :
 
 	# settings
 	BreakpointSetting.cpp
-	TeamSettings.cpp
+	GUITeamUISettings.cpp
 	SettingsManager.cpp
+	TeamSettings.cpp
+	TeamUISettings.cpp
+	TeamUISettingsFactory.cpp
 
 	# settings/generic
 	Setting.cpp
@@ -168,6 +172,9 @@ Application Debugger :
 	# user_interface/gui
 	GraphicalUserInterface.cpp
 
+	# user_interface/cli
+	CommandLineUserInterface.cpp
+
 	# user_interface/gui/model
 	VariablesViewState.cpp
 	VariablesViewStateHistory.cpp
@@ -193,8 +200,10 @@ Application Debugger :
 	VariablesView.cpp
 
 	# user_interface/gui/util
+	GUISettingsUtils.cpp
 	SettingsMenu.cpp
 	TargetAddressTableColumn.cpp
+
 
 	# user_interface/gui/value
 	TableCellBoolRenderer.cpp

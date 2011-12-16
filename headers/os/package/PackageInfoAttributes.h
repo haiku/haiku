@@ -16,7 +16,7 @@ enum BPackageInfoAttributeID {
 	B_PACKAGE_INFO_VENDOR,		// e.g. "Haiku Project"
 	B_PACKAGE_INFO_PACKAGER,	// e-mail address preferred
 	B_PACKAGE_INFO_ARCHITECTURE,
-	B_PACKAGE_INFO_VERSION,		// <major>[.<minor>[.<micro>]]
+	B_PACKAGE_INFO_VERSION,		// <major>[.<minor>[.<micro>]][-<pre>]-<release>
 	B_PACKAGE_INFO_COPYRIGHTS,	// list
 	B_PACKAGE_INFO_LICENSES,	// list
 	B_PACKAGE_INFO_PROVIDES,	// list of resolvables this package provides,
@@ -34,7 +34,11 @@ enum BPackageInfoAttributeID {
 	B_PACKAGE_INFO_REPLACES,	// list of resolvables that this package
 								// will replace (upon update)
 	B_PACKAGE_INFO_FLAGS,
+	B_PACKAGE_INFO_URLS,		// list
+	B_PACKAGE_INFO_SOURCE_URLS,	// list
 	B_PACKAGE_INFO_CHECKSUM,	// sha256-checksum
+	B_PACKAGE_INFO_INSTALL_PATH, // package install path; only for package
+								// building
 	//
 	B_PACKAGE_INFO_ENUM_COUNT,
 };

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>DataTranslations</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/fi.png" alt="" /> Suomi</li>
+<li><a href="../../fr/preferences/datatranslations.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/preferences/datatranslations.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/preferences/datatranslations.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/preferences/datatranslations.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/preferences/datatranslations.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/preferences/datatranslations.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/preferences/datatranslations.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/preferences/datatranslations.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/preferences/datatranslations.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/preferences/datatranslations.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../sk/preferences/datatranslations.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../en/preferences/datatranslations.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="backgrounds.html">Backgrounds</a> 
+::  <a href="../preferences.html" class="uplink">Preferences</a> 
+::  <a href="deskbar.html">Deskbar</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+
+<h2><img src="../../images/prefs-images/datatranslations-icon_64.png" alt="datatranslations-icon_64.png" width="64" height="64" />DataTranslations</h2>
+<table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
+<tr><td>Location:</td><td></td><td><span class="path">/boot/system/preferences/DataTranslations</span></td></tr>
+<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/*</span> - Every Translator creates its own settings file here after you've changes its defaults.<br />
+<span class="path">~/config/settings/system/DataTranslations settings</span> - Stores the panel's window position.</td></tr>
+</table>
+<p>Every application has the ability to open and save every file format for which there's a Translator installed. The settings for these Translators are configured in the DataTranslations preferences.</p>
+<p><br /></p>
+<img src="../images/prefs-images/datatranslations.png" alt="datatranslations.png" />
+<p>Depending on its capabilities, each Translator offers different settings. At least you'll get an <span class="button">Info...</span> button that opens a window with the credits and the installation path.<br />
+The following table gives an overview of the default Translators and their most useful options.</p>
+<table summary="translators" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">BMP images</span></td><td>24bit, uncompressed, no transparency</td></tr>
+<tr><td><span class="menu">EXR images</span></td><td><acronym title="Industrial Light &amp; Magic">ILM</acronym>'s high dynamic-range (HDR) format</td></tr>
+<tr><td><span class="menu">GIF images</span></td><td>8bit, lossless compression, transparency<br />
+You can reduce the filesize by limiting the number of used colors and the palette.<br />
+You can write images with transparency, either by automatically using the alpha channel or by setting the RGB value that will be transparent by hand.</td></tr>
+<tr><td><span class="menu">JPEG2000 images</span></td><td>24bit, compressed, no transparency<br />
+Here, you normally only care about the output quality.</td></tr>
+<tr><td><span class="menu">JPEG images</span></td><td>24bit, compressed, no transparency<br />
+Besides the output quality you can also set a smoothing that will lessen compression artefacts but can blur the picture a little.</td></tr>
+<tr><td><span class="menu">PCX images</span></td><td>24bit, uncompressed, no transparency, PC Paintbrush Exchange format</td></tr>
+<tr><td><span class="menu">PNG images</span></td><td>32bit, lossless compression, transparency</td></tr>
+<tr><td><span class="menu">PPM images</span></td><td>24bit, uncompressed, no transparency, Portable PixMap format</td></tr>
+<tr><td><span class="menu">RAW images</span></td><td>up to 48bit, uncompressed, no transparency</td></tr>
+<tr><td><span class="menu">RTF text files</span></td><td>Formatted text</td></tr>
+<tr><td><span class="menu">SGI images</span></td><td>24bit, optional lossless compression, transparency</td></tr>
+<tr><td><span class="menu">StyledEdit files</span></td><td>Formatted text</td></tr>
+<tr><td><span class="menu">TGA images</span></td><td>32bit, optional lossless compression, transparency</td></tr>
+<tr><td><span class="menu">TIFF images</span></td><td>24bit, optional lossless compression, layers, transparency</td></tr>
+<tr><td class="onelinetop"><span class="menu">WonderBrush images</span></td><td>32bit, layers, transparency, vector/pixel data</td></tr>
+</table>
+<p><br /></p>
+<div class="box-info">Screenshots, charts, black&amp;white drawings and other images with few used colors, as well as small pictures are best saved as GIF (up to 256 colors) or PNG (millions of colors). JPEG, for example, introduces compression artefacts without gain in smaller filesize.</div>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="backgrounds.html">Backgrounds</a> 
+::  <a href="../preferences.html" class="uplink">Preferences</a> 
+::  <a href="deskbar.html">Deskbar</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

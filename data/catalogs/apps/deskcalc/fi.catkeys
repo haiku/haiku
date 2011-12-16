@@ -1,5 +1,7 @@
-1	finnish	x-vnd.Haiku-DeskCalc	2547506672
+1	finnish	x-vnd.Haiku-DeskCalc	1916192649
 Audio Feedback	CalcView		Äänipalaute
+Basic	CalcView		Peruslaskin
+Compact	CalcView		Taskulaskin
 DeskCalc	System name		Työpöytälaskin
 Enable Num Lock on startup	CalcView		Ota käyttöön ”Num Lock”-asetukset käynnistettäessä
-Show keypad	CalcView		Näytä näppäimistö
+Scientific	CalcView		Tieteislaskin

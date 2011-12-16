@@ -1,27 +1,27 @@
 1	slovak	x-vnd.Haiku-OpenGL	209187778
-Attributes stack size:	Capabilities		Veľkosť zásobníka atribútov:
-Auxiliary buffer(s):	Capabilities		Pomocné buffre:
-Available	Extensions		Dostupné
-Capabilities	Capabilities		Schopnosti
-Extensions	Extensions		Rozšírenia
-GLU version:	InfoView		Verzia GLU:
-GLUT API version:	InfoView		Verzia GLUT API:
-Information	InfoView		Informácie
 List stack size:	Capabilities		Veľkosť zásobníka zoznamu:
-Max. 2D texture size:	Capabilities		Max. veľkosť 2D textúry:
-Max. 3D texture size:	Capabilities		Max. veľkosť 3D textúry:
+Information	InfoView		Informácie
 Max. clipping planes:	Capabilities		Max. orezávacích rovín:
-Max. convolution:	Capabilities		Max. konvolúcia:
-Max. evaluators equation order:	Capabilities		Max. rád rovnice vyhodnocovačov:
-Max. lights:	Capabilities		Max. svetiel:
-Max. recommended index elements:	Capabilities		Max. odporúčaných indexových prvkov:
-Max. recommended vertex elements:	Capabilities		Max. odporúčaných prvkov vrcholov:
 Max. texture units:	Capabilities		Max. textúrových jednotiek:
-Model stack size:	Capabilities		Veľkosť zásobníka modelu:
+Renderer name:	InfoView		Názov vykresľovača:
+Vendor name:	InfoView		Dodávateľ:
+Attributes stack size:	Capabilities		Veľkosť zásobníka atribútov:
+OpenGL version:	InfoView		Verzia OpenGL:
 Name stack size:	Capabilities		Veľkosť zásobníka názvov:
 OpenGL	System name		OpenGL
-OpenGL version:	InfoView		Verzia OpenGL:
+Auxiliary buffer(s):	Capabilities		Pomocné buffre:
+Max. recommended vertex elements:	Capabilities		Max. odporúčaných prvkov vrcholov:
+GLU version:	InfoView		Verzia GLU:
+Model stack size:	Capabilities		Veľkosť zásobníka modelu:
 Projection stack size:	Capabilities		Veľkosť zásobníka projekcie:
-Renderer name:	InfoView		Názov vykresľovača:
+Max. lights:	Capabilities		Max. svetiel:
+Max. 2D texture size:	Capabilities		Max. veľkosť 2D textúry:
+Max. convolution:	Capabilities		Max. konvolúcia:
+GLUT API version:	InfoView		Verzia GLUT API:
 Texture stack size:	Capabilities		Veľkosť zásobníka textúr:
-Vendor name:	InfoView		Dodávateľ:
+Max. evaluators equation order:	Capabilities		Max. rád rovnice vyhodnocovačov:
+Max. 3D texture size:	Capabilities		Max. veľkosť 3D textúry:
+Capabilities	Capabilities		Schopnosti
+Max. recommended index elements:	Capabilities		Max. odporúčaných indexových prvkov:
+Available	Extensions		Dostupné
+Extensions	Extensions		Rozšírenia

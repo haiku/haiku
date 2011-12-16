@@ -6,8 +6,8 @@
  *		John Scipione, jscipione@gmail.com
  * 
  * Corresponds to:
- *		/trunk/headers/os/app/Application.h	 rev 42274
- *		/trunk/src/kits/app/Application.cpp	 rev 42274
+ *		/trunk/headers/os/app/Application.h	 rev 42794
+ *		/trunk/src/kits/app/Application.cpp	 rev 42794
  */
 
 
@@ -20,6 +20,7 @@
 /*!
 	\class BApplication
 	\ingroup app
+	\ingroup libbe
 	\brief A container object for an application.
 
 	A BApplication establishes a connection between the application and the

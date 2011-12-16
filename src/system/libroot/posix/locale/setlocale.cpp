@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <ErrnoMaintainer.h>
+
 #include "LocaleBackend.h"
 
 
@@ -67,6 +69,8 @@ GetLocalesFromEnvironment(int category, const char** locales)
 extern "C" char*
 setlocale(int category, const char* locale)
 {
+	BPrivate::ErrnoMaintainer errnoMaintainer;
+
 	if (category < 0 || category > LC_LAST)
 		return NULL;
 

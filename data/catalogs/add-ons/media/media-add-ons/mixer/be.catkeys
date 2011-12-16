@@ -1,0 +1,27 @@
+1	belarusian	x-vnd.Haiku-mixer.media_addon	3450667169
+Input gain controls represent	AudioMixer		Уваходныя рэгулятары узмацнення
+Linear interpolation	AudioMixer		Линейная iнтэрпаляцыя
+Virtual output channels	AudioMixer		Вiртуальныя выхадныя каналы
+Refuse output format changes	AudioMixer		Адмовіць змяняць выхадны фармат
+Output mapping	AudioMixer		Мапа вывадаў
+Allow input channel remapping	AudioMixer		Дазволiць перапрызначэнне ўваходнага канала
+Resampling algorithm	AudioMixer		Алгарытм рэсэмплінгу
+Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Аслабiць выхад мiксеру на 3дБ(як у BeOS R5)
+Display balance control for stereo connections	AudioMixer		Паказать рэгулятар балансу для стэрэа злучэнняў
+To output	AudioMixer		Выхад
+not connected	AudioMixer		Ня злучана
+Refuse input format changes	AudioMixer		Адмова змен ўваходнага фармату
+Drop/repeat samples	AudioMixer		Прапусцiць/паўтарыць сэмплы
+Output channel sources	AudioMixer		Крыніцы выхаднога каналу
+dB	AudioMixer		дБ
+Gain controls	AudioMixer		Рэгулятары ўзмацнення
+Input mapping	AudioMixer		Перапрызначенне ўваходаў
+Mute	AudioMixer		Сцішыць
+Input channel destinations	AudioMixer		Назначэнне ўваходных каналаў
+To master	AudioMixer		Да асноўнага
+Master output	AudioMixer		Асноўны выхад
+Setup	AudioMixer		Наладкі
+Use non linear gain sliders (like BeOS R5)	AudioMixer		Нелінейнае кіраванне гукам (як у BeOS R5)
+Gain	AudioMixer		Узмацненне
+Allow output channel remapping	AudioMixer		Дазволiць перапрызначэнне выхаднога каналу
+Physical input channels	AudioMixer		Фiзiчныя ўваходныя каналы

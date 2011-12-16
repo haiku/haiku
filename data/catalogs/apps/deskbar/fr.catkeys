@@ -1,8 +1,8 @@
-1	french	x-vnd.Be-TSKB	2472557472
-<Be folder is empty>	BeMenu		<Le dossier Be est vide>
+1	french	x-vnd.Be-TSKB	1662766351
 Always on top	PreferencesWindow		Toujours au dessus
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Applications
 Applications	PreferencesWindow		Applications
+Auto-hide	PreferencesWindow		Masquer automatiquement
 Auto-raise	PreferencesWindow		Rehausser automatiquement
 Change time…	TimeView		Régler l'horloge…
 Clock	PreferencesWindow		Horloge
@@ -10,34 +10,23 @@ Close all	WindowMenu		Tout fermer
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Démos
 Deskbar	System name		Deskbar
 Deskbar preferences	PreferencesWindow		Réglages de la Deskbar
-Deskbar preferences…	BeMenu		Réglages de la Deskbar…
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Gadgets
 Edit menu…	PreferencesWindow		Éditer le menu…
 Expand new applications	PreferencesWindow		Développer les nouvelles applications
-Find…	BeMenu		Rechercher…
 Hide all	WindowMenu		Tout cacher
 Hide time	TimeView		Cacher l'heure
 Menu	PreferencesWindow		Menu
-Mount	BeMenu		Monter
 No windows	WindowMenu		Pas de fenêtres
-Power off	BeMenu		Éteindre 
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Préférences
 Quit application	WindowMenu		Quitter l'application
-Recent applications	BeMenu		Applications récentes
 Recent applications:	PreferencesWindow		Applications récentes :
-Recent documents	BeMenu		Documents récents
 Recent documents:	PreferencesWindow		Documents récents :
-Recent folders	BeMenu		Dossiers récents
 Recent folders:	PreferencesWindow		Dossiers récents :
-Restart Tracker	BeMenu		Redémarrer le Tracker
-Restart system	BeMenu		Redémarrer le système
 Show Time	Tray		Montrer l'heure
 Show all	WindowMenu		Montrer tout
 Show application expander	PreferencesWindow		Montrer le dérouleur d'application
 Show calendar…	TimeView		Montrer le calendrier…
-Show replicants	BeMenu		Montrer les réplicants
 Show seconds	PreferencesWindow		Montrer les secondes
-Shutdown…	BeMenu		Arrêter…
 Sort running applications	PreferencesWindow		Trier les applications lancées
 Tracker always first	PreferencesWindow		Lister le Tracker en premier
 Window	PreferencesWindow		Fenêtre

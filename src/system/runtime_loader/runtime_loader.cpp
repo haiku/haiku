@@ -13,6 +13,8 @@
 #include <syscalls.h>
 #include <user_runtime.h>
 
+#include <directories.h>
+
 #include <string.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -53,28 +55,28 @@ search_path_for_type(image_type type)
 
 	switch (type) {
 		case B_APP_IMAGE:
-			return "/boot/home/config/bin"
+			return kUserBinDirectory
 						// TODO: Remove!
-				":/boot/common/bin"
-				":/bin"
-				":/boot/apps"
-				":/boot/preferences"
-				":/boot/system/apps"
-				":/boot/system/preferences"
-				":/boot/develop/tools/gnupro/bin";
+				":" kCommonBinDirectory
+				":" kGlobalBinDirectory
+				":" kAppsDirectory
+				":" kPreferencesDirectory
+				":" kSystemAppsDirectory
+				":" kSystemPreferencesDirectory
+				":" kCommonDevelopToolsBinDirectory;
 
 		case B_LIBRARY_IMAGE:
-			return "%A/lib"
-				":/boot/home/config/lib"
+			return kAppLocalLibDirectory
+				":" kUserLibDirectory
 					// TODO: Remove!
-				":/boot/common/lib:/boot/system/lib";
+				":" kCommonLibDirectory
+				":" kSystemLibDirectory;
 
 		case B_ADD_ON_IMAGE:
-			return "%A/add-ons"
-				":/boot/home/config/add-ons"
+			return kAppLocalAddonsDirectory
+				":" kUserAddonsDirectory
 					// TODO: Remove!
-				":/boot/common/add-ons"
-				":/boot/system/add-ons";
+				":" kSystemAddonsDirectory;
 
 		default:
 			return NULL;
@@ -397,13 +399,6 @@ runtime_loader(void *_args)
 
 		for (i = 0; i < gProgramArgs->env_count; i++)
 			gProgramArgs->env[i] += relocationOffset;
-	}
-
-	if (!strcmp(gProgramArgs->program_path, "/boot/system/runtime_loader")) {
-		// TODO: this is a (temporary) work-around for bug #2273 which causes
-		// the cache's mutex to be locked twice when starting the runtime_loader
-		// itself.
-		return 1;
 	}
 
 #if DEBUG_RLD

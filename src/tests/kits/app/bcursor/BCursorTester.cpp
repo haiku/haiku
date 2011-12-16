@@ -1,27 +1,27 @@
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 //	BCursorTester.cpp
 //
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
-// Standard Includes -----------------------------------------------------------
+// Standard Includes ----------------------------------------------------------
 
-// System Includes -------------------------------------------------------------
+// System Includes ------------------------------------------------------------
 #include <Application.h>
 #include <Cursor.h>
 #include <Message.h>
 
 #define CHK	CPPUNIT_ASSERT
 
-// Project Includes ------------------------------------------------------------
+// Project Includes -----------------------------------------------------------
 
-// Local Includes --------------------------------------------------------------
+// Local Includes -------------------------------------------------------------
 #include "BCursorTester.h"
 
-// Local Defines ---------------------------------------------------------------
+// Local Defines --------------------------------------------------------------
 
-// Globals ---------------------------------------------------------------------
+// Globals --------------------------------------------------------------------
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 /*
 	BCursor(const void *cursorData)
@@ -174,49 +174,6 @@ void BCursorTester::Archive2()
   CHK(cur.Archive(&msg) == B_OK);
 }
 
-/*
-	status_t Perform(perform_code d, void* arg)
-	@case 1
-	@results		return B_OK
- */
-void BCursorTester::Perform1()
-{
-  BApplication app("application/x-vnd.cursortest");
-  char data[68];
-  int i;
-
-  data[0] = 16;
-  data[1] = 1;
-  data[2] = 0;
-  data[3] = 0;
-  for (i=4; i<68; i++)
-    data[i] = 1;
-
-  BCursor cur(data);
-  CHK(cur.Perform(0,NULL) == B_OK);
-}
-
-/*
-	status_t Perform(perform_code d, void* arg)
-	@case 2
-	@results		return B_OK
- */
-void BCursorTester::Perform2()
-{
-  BApplication app("application/x-vnd.cursortest");
-  char data[68];
-  int i;
-
-  data[0] = 16;
-  data[1] = 1;
-  data[2] = 0;
-  data[3] = 0;
-  for (i=4; i<68; i++)
-    data[i] = 1;
-
-  BCursor cur(data);
-  CHK(cur.Perform(0,&i) == B_OK);
-}
 
 Test* BCursorTester::Suite()
 {
@@ -231,11 +188,7 @@ Test* BCursorTester::Suite()
 	ADD_TEST4(BCursor, SuiteOfTests, BCursorTester, Instantiate2);
 	ADD_TEST4(BCursor, SuiteOfTests, BCursorTester, Archive1);
 	ADD_TEST4(BCursor, SuiteOfTests, BCursorTester, Archive2);
-	ADD_TEST4(BCursor, SuiteOfTests, BCursorTester, Perform1);
-	ADD_TEST4(BCursor, SuiteOfTests, BCursorTester, Perform2);
 
 	return SuiteOfTests;
 }
-
-
 

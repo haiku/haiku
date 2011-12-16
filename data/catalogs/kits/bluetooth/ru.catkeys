@@ -1,88 +1,88 @@
 1	russian	x-vnd.Haiku-Bluetooth	3550394259
-#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed# Неправильное имя
-#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Неправильное имя
-#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Неправильное имя
-#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady# Неправильное имя
-(reserved)	DeviceClass		(зарезервировано)
-1-17% utilized	DeviceClass		Использовано 1-17%
-17-33% utilized	DeviceClass		Использовано 17-33%
-33-50% utilized	DeviceClass		Использовано 33-50%
-50-67% utilized	DeviceClass		Использовано 50-67%
-67-83% utilized	DeviceClass		Использовано 67-83%
-83-99% utilized	DeviceClass		Использовано 83-99%
-Audio	DeviceClass		Аудио
-Audio/Video	DeviceClass		Аудио/Видео
-Camcorder	DeviceClass		Видеокамера
-Camera	DeviceClass		Камера
-Capturing	DeviceClass		Захват
-Car audio	DeviceClass		Автомобильная аудиосистема
-Card reader	DeviceClass		Картридер
-Cellular	DeviceClass		Сотовый
-Combo keyboard/pointing device	DeviceClass		Клавиатура\указывающее устройство
-Common ISDN access	DeviceClass		Общий доступ ISDN
-Computer	DeviceClass		Компьютер
-Controller	DeviceClass		Контроллер
-Cordless	DeviceClass		Беспроводной
-Desktop workstation	DeviceClass		Настольная рабочая станция
-Device conforms to the headset profile	DeviceClass		Устройство соответствует профилю гарнитуры
-Digitizer tablet	DeviceClass		Графический планшет
 Display	DeviceClass		Дисплей
-Doll/Action figure	DeviceClass		Кукла/Игрушечная фигурка
-Fully available	DeviceClass		Полностью доступно
+Capturing	DeviceClass		Захват
+Printer	DeviceClass		Принтер
+Uncategorized	DeviceClass		Без категории
+1-17% utilized	DeviceClass		Использовано 1-17%
+Positioning	DeviceClass		Позиционирование
+Rendering	DeviceClass		Рендеринг
+Phone	DeviceClass		Телефон
+17-33% utilized	DeviceClass		Использовано 17-33%
+#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady# Неправильное имя
+Combo keyboard/pointing device	DeviceClass		Клавиатура\указывающее устройство
+Controller	DeviceClass		Контроллер
+No service available	DeviceClass		Сервисы не найдены
+Wearable	DeviceClass	A wearable computer	Переносной
+Handheld	DeviceClass		Портативный
+Invalid device class!\n	DeviceClass		Неверный класс устройства!\n
+Sensing device	DeviceClass		Сенсорное устройство
+Computer	DeviceClass		Компьютер
+Cellular	DeviceClass		Сотовый
+Microphone	DeviceClass		Микрофон
+Unknown (reserved) minor device class	DeviceClass		Неизвестный (зарезервированый) минимальный класс устройства
+Cordless	DeviceClass		Беспроводной
+Common ISDN access	DeviceClass		Общий доступ ISDN
+83-99% utilized	DeviceClass		Использовано 83-99%
+Scanner	DeviceClass		Сканер
 Game	DeviceClass		Игра
 Gamepad	DeviceClass		Геймпад
-Gaming/Toy	DeviceClass		Игрушка
+(reserved)	DeviceClass		(зарезервировано)
+Desktop workstation	DeviceClass		Настольная рабочая станция
+Audio/Video	DeviceClass		Аудио/Видео
 Glasses	DeviceClass		Очки
-Handheld	DeviceClass		Портативный
-Hands-free	DeviceClass		Hands-free гарнитура
-Headphones	DeviceClass		Наушники
-Helmet	DeviceClass		Шлем
-HiFi audio device	DeviceClass		HiFi аудио устройство
-Imaging	DeviceClass		Обработка изображений
-Information	DeviceClass		Информация
-Invalid device class!\n	DeviceClass		Неверный класс устройства!\n
-Jacket	DeviceClass		Куртка
-Joystick	DeviceClass		Джойстик
 Keyboard	DeviceClass		Клавиатура
-LAN access	DeviceClass		Доступ к ЛВС
-Laptop	DeviceClass		Ноутбук
-Loudspeaker	DeviceClass		Громкоговоритель
+Camera	DeviceClass		Камера
 Major class: 	DeviceClass		Основной класс:
-Microphone	DeviceClass		Микрофон
-Minor class: 	DeviceClass		Малый класс: 
-Miscellaneous	DeviceClass		Разное
-Networking	DeviceClass		Сеть
-No service available	DeviceClass		Сервисы не найдены
-Not implemented	RemoteDevice		Не реализовано
-Object transfer	DeviceClass		Передача объекта
-Pager	DeviceClass	A small radio device to receive short text messages	Пейджер
-Palm	DeviceClass	A palm-held device	Наладонник
-Peripheral	DeviceClass		Периферия
-Phone	DeviceClass		Телефон
-Pointing device	DeviceClass		Указывающее устройство
-Portable audio	DeviceClass		Портативное аудио
-Positioning	DeviceClass		Позиционирование
-Printer	DeviceClass		Принтер
-Remote control	DeviceClass		Удаленное управление
-Rendering	DeviceClass		Рендеринг
-Robot	DeviceClass		Робот
-SIM card reader	DeviceClass		Считыватель SIM-карт
-Scanner	DeviceClass		Сканер
-Sensing device	DeviceClass		Сенсорное устройство
-Server	DeviceClass		Сервер
-Service classes: 	DeviceClass		Служебные классы: 
+50-67% utilized	DeviceClass		Использовано 50-67%
+Card reader	DeviceClass		Картридер
 Set-top box	DeviceClass		Телеприставка
+Helmet	DeviceClass		Шлем
+Laptop	DeviceClass		Ноутбук
+Car audio	DeviceClass		Автомобильная аудиосистема
+SIM card reader	DeviceClass		Считыватель SIM-карт
+Headphones	DeviceClass		Наушники
+Information	DeviceClass		Информация
+Remote control	DeviceClass		Удаленное управление
+Service classes: 	DeviceClass		Служебные классы: 
+Pager	DeviceClass	A small radio device to receive short text messages	Пейджер
+Object transfer	DeviceClass		Передача объекта
+Gaming/Toy	DeviceClass		Игрушка
+Audio	DeviceClass		Аудио
+Robot	DeviceClass		Робот
+Camcorder	DeviceClass		Видеокамера
+Digitizer tablet	DeviceClass		Графический планшет
+Loudspeaker	DeviceClass		Громкоговоритель
+Joystick	DeviceClass		Джойстик
+LAN access	DeviceClass		Доступ к ЛВС
+Wrist watch	DeviceClass		Наручные часы
+Minor class: 	DeviceClass		Малый класс: 
+Networking	DeviceClass		Сеть
+Portable audio	DeviceClass		Портативное аудио
+Device conforms to the headset profile	DeviceClass		Устройство соответствует профилю гарнитуры
+Hands-free	DeviceClass		Hands-free гарнитура
+#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed# Неправильное имя
+Vehicle	DeviceClass		Автомобиль
+Palm	DeviceClass	A palm-held device	Наладонник
+Video display and loudspeaker	DeviceClass		Дисплей и громкоговоритель
+Peripheral	DeviceClass		Периферия
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Неправильное имя
+Wired modem or voice gateway	DeviceClass		Проводной модем или голосовой шлюз
+Jacket	DeviceClass		Куртка
+Unspecified	DeviceClass		Неуказанно
+Fully available	DeviceClass		Полностью доступно
+67-83% utilized	DeviceClass		Использовано 67-83%
+Not implemented	RemoteDevice		Не реализовано
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Неправильное имя
+Server	DeviceClass		Сервер
+Video conferencing	DeviceClass		Видеоконференцсвязь
+Video camera	DeviceClass		Видеокамера
+HiFi audio device	DeviceClass		HiFi аудио устройство
 Smart phone	DeviceClass		Смартфон
 Telephony	DeviceClass		Телефония
-Uncategorized	DeviceClass		Без категории
-Unknown (reserved) minor device class	DeviceClass		Неизвестный (зарезервированый) минимальный класс устройства
-Unspecified	DeviceClass		Неуказанно
+Doll/Action figure	DeviceClass		Кукла/Игрушечная фигурка
 VCR	DeviceClass		Видеомагнитофон
-Vehicle	DeviceClass		Автомобиль
-Video camera	DeviceClass		Видеокамера
-Video conferencing	DeviceClass		Видеоконференцсвязь
-Video display and loudspeaker	DeviceClass		Дисплей и громкоговоритель
 Video monitor	DeviceClass		Видеомонитор
-Wearable	DeviceClass	A wearable computer	Переносной
-Wired modem or voice gateway	DeviceClass		Проводной модем или голосовой шлюз
-Wrist watch	DeviceClass		Наручные часы
+Pointing device	DeviceClass		Указывающее устройство
+Miscellaneous	DeviceClass		Разное
+33-50% utilized	DeviceClass		Использовано 33-50%
+Imaging	DeviceClass		Обработка изображений

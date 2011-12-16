@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Oliver Tappe, zooey@hirschkaefer.de.
+ * Copyright 2010-2011, Oliver Tappe, zooey@hirschkaefer.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _ICU_LOCALECONV_DATA_H
@@ -21,6 +21,8 @@ class ICULocaleconvData : public ICUCategoryData {
 	typedef	ICUCategoryData		inherited;
 
 protected:
+								ICULocaleconvData(pthread_key_t tlsKey);
+
 			status_t			_SetLocaleconvEntry(
 									const DecimalFormatSymbols* formatSymbols,
 									char* destination, FormatSymbol symbol,

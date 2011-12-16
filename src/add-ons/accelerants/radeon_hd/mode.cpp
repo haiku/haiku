@@ -11,29 +11,33 @@
  */
 
 
-#include "accelerant_protos.h"
-#include "accelerant.h"
-#include "bios.h"
-#include "utility.h"
 #include "mode.h"
-#include "display.h"
-#include "pll.h"
 
+#include <create_display_modes.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
 
-#include <create_display_modes.h>
+#include "accelerant.h"
+#include "accelerant_protos.h"
+#include "bios.h"
+#include "connector.h"
+#include "display.h"
+#include "displayport.h"
+#include "encoder.h"
+#include "pll.h"
+#include "utility.h"
 
 
 #define TRACE_MODE
 #ifdef TRACE_MODE
-extern "C" void _sPrintf(const char *format, ...);
+extern "C" void _sPrintf(const char* format, ...);
 #	define TRACE(x...) _sPrintf("radeon_hd: " x)
 #else
 #	define TRACE(x...) ;
 #endif
 
+#define ERROR(x...) _sPrintf("radeon_hd: " x)
 
 status_t
 create_mode_list(void)
@@ -70,7 +74,7 @@ radeon_accelerant_mode_count(void)
 
 
 status_t
-radeon_get_mode_list(display_mode *modeList)
+radeon_get_mode_list(display_mode* modeList)
 {
 	TRACE("%s\n", __func__);
 	memcpy(modeList, gInfo->mode_list,
@@ -123,7 +127,7 @@ radeon_dpms_set(int mode)
 {
 	radeon_shared_info &info = *gInfo->shared_info;
 
-	switch(mode) {
+	switch (mode) {
 		case B_DPMS_ON:
 			TRACE("%s: ON\n", __func__);
 			for (uint8 id = 0; id < MAX_DISPLAY; id++) {
@@ -158,7 +162,7 @@ radeon_dpms_set(int mode)
 
 
 status_t
-radeon_set_display_mode(display_mode *mode)
+radeon_set_display_mode(display_mode* mode)
 {
 	radeon_shared_info &info = *gInfo->shared_info;
 
@@ -168,6 +172,11 @@ radeon_set_display_mode(display_mode *mode)
 			continue;
 
 		uint16 connectorIndex = gDisplay[id]->connectorIndex;
+
+		// Determine DP lanes if DP
+		if (connector_is_dp(connectorIndex))
+			gDPInfo[connectorIndex]->laneCount
+				= dp_get_lane_count(connectorIndex, mode);
 
 		// *** encoder prep
 		encoder_output_lock(true);
@@ -203,8 +212,23 @@ radeon_set_display_mode(display_mode *mode)
 		display_crtc_lock(id, ATOM_DISABLE);
 
 		// *** encoder commit
+
+		// handle DisplayPort link training
+		if (connector_is_dp(connectorIndex)) {
+			if (info.dceMajor >= 4)
+				encoder_dig_setup(connectorIndex,
+					ATOM_ENCODER_CMD_DP_VIDEO_OFF, 0);
+
+			dp_link_train(id, mode);
+
+			if (info.dceMajor >= 4)
+				encoder_dig_setup(connectorIndex,
+					ATOM_ENCODER_CMD_DP_VIDEO_ON, 0);
+		}
+
 		encoder_dpms_set(id, gConnector[connectorIndex]->encoder.objectID,
 			B_DPMS_ON);
+
 		encoder_output_lock(false);
 	}
 
@@ -231,7 +255,7 @@ radeon_set_display_mode(display_mode *mode)
 
 
 status_t
-radeon_get_display_mode(display_mode *_currentMode)
+radeon_get_display_mode(display_mode* _currentMode)
 {
 	TRACE("%s\n", __func__);
 
@@ -241,7 +265,7 @@ radeon_get_display_mode(display_mode *_currentMode)
 
 
 status_t
-radeon_get_frame_buffer_config(frame_buffer_config *config)
+radeon_get_frame_buffer_config(frame_buffer_config* config)
 {
 	TRACE("%s\n", __func__);
 
@@ -255,14 +279,14 @@ radeon_get_frame_buffer_config(frame_buffer_config *config)
 
 
 status_t
-radeon_get_pixel_clock_limits(display_mode *mode, uint32 *_low, uint32 *_high)
+radeon_get_pixel_clock_limits(display_mode* mode, uint32* _low, uint32* _high)
 {
 	TRACE("%s\n", __func__);
 
 	if (_low != NULL) {
 		// lower limit of about 48Hz vertical refresh
 		uint32 totalClocks = (uint32)mode->timing.h_total
-			*(uint32)mode->timing.v_total;
+			* (uint32)mode->timing.v_total;
 		uint32 low = (totalClocks * 48L) / 1000L;
 
 		if (low < PLL_MIN_DEFAULT)
@@ -283,7 +307,7 @@ radeon_get_pixel_clock_limits(display_mode *mode, uint32 *_low, uint32 *_high)
 
 
 bool
-is_mode_supported(display_mode *mode)
+is_mode_supported(display_mode* mode)
 {
 	bool sane = true;
 
@@ -332,7 +356,7 @@ is_mode_supported(display_mode *mode)
  * A quick sanity check of the provided display_mode
  */
 status_t
-is_mode_sane(display_mode *mode)
+is_mode_sane(display_mode* mode)
 {
 	// horizontal timing
 	// validate h_sync_start is less then h_sync_end
@@ -381,3 +405,23 @@ is_mode_sane(display_mode *mode)
 }
 
 
+uint32
+get_mode_bpp(display_mode* mode)
+{
+	// Get bitsPerPixel for given mode
+
+	switch (mode->space) {
+		case B_CMAP8:
+			return 8;
+		case B_RGB15_LITTLE:
+			return 15;
+		case B_RGB16_LITTLE:
+			return 16;
+		case B_RGB24_LITTLE:
+		case B_RGB32_LITTLE:
+			return 32;
+	}
+	ERROR("%s: Unknown colorspace for mode, guessing 32 bits per pixel\n",
+		__func__);
+	return 32;
+}

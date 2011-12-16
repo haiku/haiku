@@ -34,39 +34,39 @@ public:
 	
 	menu_layout Layout() const;
 
-	void ItemMarked(BMenuItem *item);
-	void CacheFontInfo();
+			void	ItemMarked(BMenuItem *item);
+			void	CacheFontInfo();
 	
-	float FontHeight() const;
-	float Ascent() const;
-	BRect Padding() const;
-	void GetItemMargins(float *, float *, float *, float *) const;
+			float	FontHeight() const;
+			float	Ascent() const;
+			BRect	Padding() const;
+			void	GetItemMargins(float *, float *, float *, float *) const;
 
-	static bool IsAltCommandKey();
-
-	int State(BMenuItem **item = NULL) const;
+			int		State(BMenuItem **item = NULL) const;
 	
-	void Install(BWindow *window);
-	void Uninstall();
-	void SetSuper(BMenu *menu);
-	void SetSuperItem(BMenuItem *item);
-	void InvokeItem(BMenuItem *item, bool now = false);	
-	void QuitTracking(bool thisMenuOnly = true);
+			void	Install(BWindow *window);
+			void	Uninstall();
+			void	SetSuper(BMenu *menu);
+			void	SetSuperItem(BMenuItem *item);
+			void	InvokeItem(BMenuItem *item, bool now = false);	
+			void	QuitTracking(bool thisMenuOnly = true);
 	
 	static	status_t	CreateBitmaps();
 	static	void		DeleteBitmaps();
 
-	static const BBitmap *MenuItemCommand();
-	static const BBitmap *MenuItemControl();
-	static const BBitmap *MenuItemOption();
-	static const BBitmap *MenuItemShift();
+	static	const	BBitmap *MenuItemShift();
+	static	const	BBitmap *MenuItemControl();
+	static	const	BBitmap *MenuItemOption();
+	static	const	BBitmap *MenuItemCommand();
+	static	const	BBitmap *MenuItemMenu();
 private:
-	BMenu *fMenu;	
+	BMenu *fMenu;
 
-	static BBitmap *sMenuItemAlt;
+	static BBitmap *sMenuItemShift;
 	static BBitmap *sMenuItemControl;
 	static BBitmap *sMenuItemOption;
-	static BBitmap *sMenuItemShift;
+	static BBitmap *sMenuItemAlt;
+	static BBitmap *sMenuItemMenu;
 
 };
 

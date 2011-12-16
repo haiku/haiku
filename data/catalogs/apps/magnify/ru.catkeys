@@ -1,29 +1,27 @@
-1	russian	x-vnd.Haiku-Magnify	3748875992
-%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize пикселей на пиксель
-Add a crosshair	Magnify-Main		Добавить перекрестье
+1	russian	x-vnd.Haiku-Magnify	2227745383
+no clip msg\n	In console, when clipboard is empty after clicking Copy image		буфер обмена пуст\n
+Make square	Magnify-Main		Сделать квадрат
 Copy image	Magnify-Main		Копировать изображение
-Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Копировать/сохранить:\n копировать - копирует видимое изображение в буфер обмена\n сохранить - спрашивает пользователя в какой файл сохранить текущее изображение\n
-Decrease pixel size	Magnify-Main		Уменьшить размер пикселя
-Decrease window size	Magnify-Main		Уменьшить размер окна
-Freeze/Unfreeze image	Magnify-Main		Заморозить/разморозить изображение
+Magnify help	Magnify-Help		Справка по увеличителю
+usage: magnify [size] (magnify size * size pixels)\n	Console		использование: magnify [размер] (размер увеличителя * размер пикселей)\n
+Stick coordinates	Magnify-Main		Зафиксировать координаты
+Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Информация:\n скрыть/показать информацию - скрывает/показывает все эти новые функции\n примечание: при отображении, появится красная клетка\n которая означает какие rgb значения пикселя будут отображены\n добавить/удалить перекрестье - 2 перекрестья могут быть добавлены (или удалены)\n для того, чтобы помочь выровнять местоположение объектов.\n Перекрестье отображается в виде синей клетки и синих линий.\n скрыть/показать стеку - скрывает/показывает сетку, которая разделяет каждый пиксель\n
+Hide/Show grid	Magnify-Main		Скрыть/показать сетку
+magnify: size must be a multiple of 4\n	Console		увеличитель: размер должен кратным 4\n
 General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		Основное:\n 32 x 32 - числа в верхнем левом углу отображают\n число видимых пикселей (ширина x высота)\n 8 пикселей на пиксель - отображает число\n пикселей используемых для увеличения пикселя\n R:152 G:52 B:10 - значения RGB для \n пикселя под красной клеткой\n
 Help	Magnify-Main		Помощь
-Hide/Show grid	Magnify-Main		Скрыть/показать сетку
-Hide/Show info	Magnify-Main		Скрыть/показать информацию
-Increase pixel size	Magnify-Main		Увеличить размер пикселя
-Increase window size	Magnify-Main		Увеличить размер окна
-Info	Magnify-Main		Информация
-Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Информация:\n скрыть/показать информацию - скрывает/показывает все эти новые функции\n примечание: при отображении, появится красная клетка\n которая означает какие rgb значения пикселя будут отображены\n добавить/удалить перекрестье - 2 перекрестья могут быть добавлены (или удалены)\n для того, чтобы помочь выровнять местоположение объектов.\n Перекрестье отображается в виде синей клетки и синих линий.\n скрыть/показать стеку - скрывает/показывает сетку, которая разделяет каждый пиксель\n
-Magnify	System name		Увеличитель
-Magnify help	Magnify-Help		Справка по увеличителю
-Make square	Magnify-Main		Сделать квадрат
-Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Навигация:\n стрелки - перемещают текущее выделение (rgb индикатор или перекрестье)\n на 1 пиксель за раз\n option+стрелки - перемещают расположение на 1 пиксель за раз\n x отмечает текущее выделение - текущее выделение отмечен внутри буквой 'x'\n
-Remove a crosshair	Magnify-Main		Удалить перекрестье
-Save image	Magnify-Main		Сохранить изображение
 Sizing/Resizing:\n  make square - sets the width and the height to the larger\n    of the two making a square image\n  increase/decrease window size - grows or shrinks the window\n    size by 4 pixels.\n    note: this window can also be resized to any size via the\n      resizing region of the window\n  increase/decrease pixel size - increases or decreases the number\n    of pixels used to magnify a 'real' pixel. Range is 1 to 16.\n	Magnify-Help		Масштаб/изменение размера:\n в виде квадрата - делает ширину или высоту окна равной стороне, наибольшей из двух, создавая квадрат\n увеличить/уменьшить размер окна - увеличивает или уменьшает размер окна\n на 4 пикселя.\n примечание: размер этого окна можно делать любым с помощью\n края масштабирования окна\n увеличить/уменьшить размер пикселя - увеличит или уменьшить количество пикселей\n используемых для увеличения 'настоящего' пикселя. Диапазон от 1 до 16.\n
-Stick coordinates	Magnify-Main		Зафиксировать координаты
-freeze - freezes/unfreezes magnification of whatever the\n    cursor is currently over\n	Magnify-Help		 заморозить - заморозить/разморозить увеличение области\n над которой в данный момент находится курсор\n
-magnify: size must be a multiple of 4\n	Console		увеличитель: размер должен кратным 4\n
-no clip msg\n	In console, when clipboard is empty after clicking Copy image		буфер обмена пуст\n
-size must be > 4 and a multiple of 4\n	Console		 размер должен быть > 4 и кратным 4\n
-usage: magnify [size] (magnify size * size pixels)\n	Console		использование: magnify [размер] (размер увеличителя * размер пикселей)\n
+Decrease pixel size	Magnify-Main		Уменьшить размер пикселя
+Magnify	System name		Увеличитель
+%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize пикселей на пиксель
+Info	Magnify-Main		Информация
+Remove a crosshair	Magnify-Main		Удалить перекрестье
+Freeze/Unfreeze image	Magnify-Main		Заморозить/разморозить изображение
+Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Копировать/сохранить:\n копировать - копирует видимое изображение в буфер обмена\n сохранить - спрашивает пользователя в какой файл сохранить текущее изображение\n
+Hide/Show info	Magnify-Main		Скрыть/показать информацию
+Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Навигация:\n стрелки - перемещают текущее выделение (rgb индикатор или перекрестье)\n на 1 пиксель за раз\n option+стрелки - перемещают расположение на 1 пиксель за раз\n x отмечает текущее выделение - текущее выделение отмечен внутри буквой 'x'\n
+Save image	Magnify-Main		Сохранить изображение
+Increase window size	Magnify-Main		Увеличить размер окна
+Decrease window size	Magnify-Main		Уменьшить размер окна
+Increase pixel size	Magnify-Main		Увеличить размер пикселя
+Add a crosshair	Magnify-Main		Добавить перекрестье

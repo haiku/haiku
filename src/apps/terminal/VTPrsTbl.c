@@ -1008,6 +1008,331 @@ CASE_PRINT_GR,
 CASE_PRINT_GR,
 };
 
+// #pragma mark WinCP table (Windows cp1252, cp1251, koi-8r etc.)
+int gWinCPGroundTable[] =
+{
+/*	NUL		SOH		STX		ETX	*/
+CASE_IGNORE,
+CASE_IGNORE,
+CASE_IGNORE,
+CASE_IGNORE,
+/*	EOT		ENQ		ACK		BEL	*/
+CASE_IGNORE,
+CASE_IGNORE,
+CASE_IGNORE,
+CASE_BELL,
+/*	BS		HT		NL		VT	*/
+CASE_BS,
+CASE_TAB,
+CASE_LF,
+CASE_LF, /*CASE_UP,*/
+/*	NP		CR		SO		SI	*/
+CASE_LF, /*CASE_IGNORE,*/
+CASE_CR,
+CASE_SO,
+CASE_SI,
+/*	DLE		DC1		DC2		DC3	*/
+CASE_IGNORE,
+CASE_IGNORE,
+CASE_IGNORE,
+CASE_IGNORE,
+/*	DC4		NAK		SYN		ETB	*/
+CASE_IGNORE,
+CASE_IGNORE,
+CASE_IGNORE,
+CASE_IGNORE,
+/*	CAN		EM		SUB		ESC	*/
+CASE_IGNORE,
+CASE_IGNORE,
+CASE_IGNORE,
+CASE_ESC,
+/*	FS		GS		RS		US	*/
+CASE_IGNORE,
+CASE_IGNORE,
+CASE_IGNORE,
+CASE_IGNORE,
+/*	SP		!		"		#	*/
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+/*	$		%		&		'	*/
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+/*	(		)		*		+	*/
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+/*	,		-		.		/	*/
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+/*	0		1		2		3	*/
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+/*	4		5		6		7	*/
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+/*	8		9		:		;	*/
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+/*	<		=		>		?	*/
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT, 
+/*	@		A		B		C	*/
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+/*	D		E		F		G	*/
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+/*	H		I		J		K	*/
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+/*	L		M		N		O	*/
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+/*	P		Q		R		S	*/
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+/*	T		U		V		W	*/
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+/*	X		Y		Z		[	*/
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+/*	\		]		^		_	*/
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+/*	`		a		b		c	*/
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+/*	d		e		f		g	*/
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+/*	h		i		j		k	*/
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+/*	l		m		n		o	*/
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+/*	p		q		r		s	*/
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+/*	t		u		v		w	*/
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+/*	x		y		z		{	*/
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+/*	|		}		~		DEL	*/
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT,
+CASE_PRINT, //TODO???
+/*      0x80            0x81            0x82            0x83    */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      0x84            0x85            0x86            0x87    */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      0x88            0x89            0x8a            0x8b    */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      0x8c            0x8d            0x8e            0x8f    */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      0x90            0x91            0x92            0x93    */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      0x94            0x95            0x96            0x97    */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      0x99            0x99            0x9a            0x9b    */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      0x9c            0x9d            0x9e            0x9f    */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      nobreakspace    exclamdown      cent            sterling        */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      currency        yen             brokenbar       section         */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      diaeresis       copyright       ordfeminine     guillemotleft   */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      notsign         hyphen          registered      macron          */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      degree          plusminus       twosuperior     threesuperior   */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      acute           mu              paragraph       periodcentered  */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      cedilla         onesuperior     masculine       guillemotright  */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      onequarter      onehalf         threequarters   questiondown    */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      Agrave          Aacute          Acircumflex     Atilde          */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      Adiaeresis      Aring           AE              Ccedilla        */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      Egrave          Eacute          Ecircumflex     Ediaeresis      */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      Igrave          Iacute          Icircumflex     Idiaeresis      */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      Eth             Ntilde          Ograve          Oacute          */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      Ocircumflex     Otilde          Odiaeresis      multiply        */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      Ooblique        Ugrave          Uacute          Ucircumflex     */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      Udiaeresis      Yacute          Thorn           ssharp          */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      agrave          aacute          acircumflex     atilde          */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      adiaeresis      aring           ae              ccedilla        */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      egrave          eacute          ecircumflex     ediaeresis      */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      igrave          iacute          icircumflex     idiaeresis      */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      eth             ntilde          ograve          oacute          */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      ocircumflex     otilde          odiaeresis      division        */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      oslash          ugrave          uacute          ucircumflex     */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+/*      udiaeresis      yacute          thorn           ydiaeresis      */
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+CASE_PRINT_GR,
+};
+
 // #pragma mark ESC [ - CSI table
 int gCsiTable[] =
 {

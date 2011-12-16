@@ -9,6 +9,7 @@
 #ifndef _PHYSICAL_MEMORY_ALLOCATOR_H_
 #define _PHYSICAL_MEMORY_ALLOCATOR_H_
 
+#include <condition_variable.h>
 #include <SupportDefs.h>
 #include <lock.h>
 
@@ -57,6 +58,9 @@ private:
 		size_t						*fArrayLength;
 		size_t						*fArrayOffset;
 		uint8						**fArray;
+
+		ConditionVariable			fNoMemoryCondition;
+		uint32						fMemoryWaitersCount;
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		uint32						fDebugBase;

@@ -53,8 +53,8 @@ UnitTestLib libapptest.so
 		ReadWriteTester.cpp
 
 		# BCursor
-#		BCursorTester.cpp
-#		CursorTest.cpp
+		BCursorTester.cpp
+		CursorTest.cpp
 
 		# BHandler
 		HandlerTest.cpp

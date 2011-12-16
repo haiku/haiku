@@ -1,6 +1,7 @@
-1	finnish	x-vnd.Haiku-TGATranslator	2221210336
+1	finnish	x-vnd.Haiku-TGATranslator	4159874267
 Ignore TGA alpha channel	TGAView		Ohita TGA-alfakanava
 Save with RLE Compression	TGAView		Tallenna RLE-tiivistyksellä
+TGA Image Translator	TGAView		TGA-kuvamuunnin
 TGA Settings	TGAMain		TGA-asetukset
 TGA image translator	TGATranslator		TGA-kuvamuunnin
 TGA images	TGATranslator		TGA-kuvat

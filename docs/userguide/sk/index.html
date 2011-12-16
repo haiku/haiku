@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Index</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/sk.png" alt="" /> Slovenčina</li>
+<li><a href="../fr/index.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/index.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/index.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/index.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/index.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/index.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/index.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/index.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/index.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/index.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/index.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../en/index.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="attributes.html">Attributes</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="queries.html">Queries</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+
+<h1>Index</h1>
+
+<p><a href="attributes.html">Attributes</a> and <a href="queries.html">Queries</a> are key features of Haiku. While attributes are useful on their own, to display additional information on a file, for a query on them, they need to be indexed. It puts them into a lookup table, which in turn makes queries lightning fast.<br />
+The index is part of the filesystem and is kept for every volume/partition separately.</p>
+
+<h2>
+Indexing commands in Terminal</h2> 
+<p>There are several commands to manage the index:</p>
+<ul> 
+<li><b>lsindex</b> - Displays the indexed attributes on the current volume/partition.<br />
+These are the attributes that are indexed by default:</li>
+</ul>
+<pre class="terminal"> ~ -&gt;lsindex 
+BEOS:APP_SIG 
+MAIL:account 
+MAIL:cc 
+MAIL:chain 
+MAIL:draft 
+MAIL:flags 
+MAIL:from 
+MAIL:name 
+MAIL:pending_chain 
+MAIL:priority 
+MAIL:reply 
+MAIL:status 
+MAIL:subject 
+MAIL:thread 
+MAIL:to 
+MAIL:when 
+META:address 
+META:city 
+META:company 
+META:country 
+META:email 
+META:fax 
+META:group 
+META:hphone 
+META:name 
+META:nickname 
+META:state 
+META:url 
+META:wphone 
+META:zip 
+_signature 
+_status 
+_trk/qrylastchange 
+_trk/recentQuery 
+be:deskbar_item_status 
+last_modified 
+name 
+size 
+</pre>
+<ul>
+<li><b>mkindex</b> - Adds an attribute to the index of a volume/partition. </li>
+</ul>
+<pre>Usage: mkindex [options] &lt;attribute&gt; 
+Creates a new index for the specified attribute. 
+ 
+  -d, --volume=PATH     a path on the volume to which the index will be added, 
+                        defaults to current volume. 
+  -t, --type=TYPE       the type of the attribute being indexed.  One of "int", 
+                        "llong", "string", "float", or "double". 
+                        Defaults to "string". 
+      --copy-from       path to volume to copy the indexes from. 
+  -v, --verbose         print information about the index being created 
+
+</pre>
+<p>Only <b>new</b> files with that attribute come automatically into the index!<br />
+Existing files have to be added manually by copying them and deleting the originals after that. Alternatively you can use the command <span class="cli">reindex</span>. 
+</p>
+<ul>
+<li><b>reindex</b> - Puts the attributes of existing files into the newly created index of a volume/partition. </li>
+</ul>
+<pre>Usage: reindex [-rvf] attr &lt;list of filenames and/or directories&gt; 
+  -r    enter directories recursively
+  -v    verbose output
+  -f    create/update all indices from the source volume,
+        "attr" is the path to the source volume
+
+</pre>
+<ul>
+<li><b>rmindex</b> - Removes an attribute from the index of a volume/partition.</li>
+</ul>
+<pre>Usage: rmindex [OPTION]... INDEX_NAME 
+ 
+Removes the index named INDEX_NAME from a disk volume.  Once this has been 
+done, it will no longer be possible to use the query system to search for 
+files with the INDEX_NAME attribute. 
+ 
+  -d, --volume=PATH     a path on the volume from which the index will be 
+                         removed 
+  -h, --help            display this help and exit 
+  -p, --pattern         INDEX_NAME is a pattern 
+  -v, --verbose         print information about the index being removed 
+ 
+INDEX_NAME is the name of a file attribute. 
+ 
+If no volume is specified, the volume of the current directory is assumed.</pre>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="attributes.html">Attributes</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="queries.html">Queries</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

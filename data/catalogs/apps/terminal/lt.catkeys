@@ -1,17 +1,102 @@
-1	lithuanian	x-vnd.Haiku-Terminal	2261470953
-Change directory	Terminal TermView		Keisti aplanką
-Copy	Terminal TermWindow		Kopijuoti
-Copy here	Terminal TermView		Kopijuoti čia
-Font:	Terminal AppearancePrefView		Rašmenys:
-Match case	Terminal FindWindow		Skirti lygius a<>A
-New Terminal	Terminal TermWindow		Naują terminalą
+1	lithuanian	x-vnd.Haiku-Terminal	1294209621
 Not found.	Terminal TermWindow		Nerasta.
-OK	Terminal PrefWindow		Gerai
+Switch Terminals	Terminal TermWindow		Pereiti į kitą terminalą
+Change directory	Terminal TermView		Keisti aplanką
 OK	Terminal TermWindow		Gerai
-Quit	Terminal TermWindow		Baigti
-Save to file…	Terminal PrefWindow		Išsaugoti bylon…
-Select all	Terminal TermWindow		Žymėti viską
-Switch Terminals	Terminal TermWindow		Perjugti terminalus
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminalas nepaleidžia apvalkalo. Apgailėtina.
-Text size	Terminal TermWindow		Rašmenų dydis
+New Terminal	Terminal TermWindow		Naujas langas
+Terminal couldn't start the shell. Sorry.	Terminal TermApp		Apgailestaujame, terminalui nepavyko paleisti apvalkalo.
+Text size	Terminal TermWindow		Šrifto dydis
+Match case	Terminal FindWindow		Paisyti raidžių registro
+Quit	Terminal TermWindow		Baigti darbą
 Use default shell	Terminal Shell		Naudoti numatytąjį apvalkalą
+Confirm exit if active programs exist	Terminal AppearancePrefView		Prašyti darbo baigimo patvirtinimo, jeigu yra vykdomų programų
+The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Aktyvios kortelės antraštės šablonas. Galite naudoti šiuos vietaženklius:\n
+Select all	Terminal TermWindow		Pažymėti viską
+Close tab	Terminal TermWindow		Užverti kortelę
+Custom	Terminal colors schema		Pasirinktinė
+Save to file…	Terminal PrefWindow		Įrašyti į failą…
+OK	Terminal PrefWindow		Gerai
+Black on White	Terminal colors schema		Juodas tekstas baltame fone
+Window title:	Terminal AppearancePrefView		Lango antraštė:
+Font:	Terminal AppearancePrefView		Šriftas:
+Copy here	Terminal TermView		Kopijuoti čia
+Really close?	Terminal TermWindow		Ar tikrai užverti?
+Copy	Terminal TermWindow		Kopijuoti
+Window title:	Terminal TermWindow		Lango antraštė:
+Unrecognized option \"%s\"\n	Terminal arguments parsing		Nežinomas argumentas: „%s“\n
+%app% settings	Terminal PrefWindow	window title	Terminalo nuostatos
+Cancel	Terminal SetTitleWindow		Atsisakyti
+Increase	Terminal TermWindow		Padidinti
+Settings	Terminal TermWindow		Nuostatos
+Window size	Terminal TermWindow		Lango dydis
+Selected text	Terminal AppearancePrefView		Pažymėto teksto
+Find	Terminal FindWindow		Ieškoti
+Appearance	Terminal PrefWindow		Išvaizda
+Tab title:	Terminal AppearancePrefView		Kortelės antraštė:
+The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Langų antraščių šablonas. Galite naudoti šiuos vietaženklius:\n
+Color schema:	Terminal AppearancePrefView		Spalvų schema:
+OK	Terminal SetTitleWindow		Gerai
+Background	Terminal AppearancePrefView		Fono
+Use selection	Terminal FindWindow		Ieškoti pažymėto teksto
+Green on Black	Terminal colors schema		Žalias tekstas juodame fone
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Užduotis „%1“ dar vykdoma.\nUžvėrus kortelę, jos darbas bus nutrauktas.
+Size:	Terminal AppearancePrefView		Šrifto dydis:
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Nepavyko įvykdyti „%command“:\n\t%error
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		  -h,     --help               Išvesti šį pranešimą\n  -t,     --title              nurodyti lango antraštę\n  -f,     --fullscreen         paleisti visame ekrane\n
+Full screen	Terminal TermWindow		Visame ekrane
+Window title…	Terminal TermWindow		Lango antraštė…
+Page setup…	Terminal TermWindow		Puslapio nuostatos…
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Šios užduotys dar vykdomos:\n\n\t%1\n\nUžvėrus langą, jų darbas bus nutraktas.
+Insert path	Terminal TermView		Įterpti kelią
+Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		„Haiku“ terminalas\n© 2001–2009 Haiku, Inc.\n© 1999 Kazuho Okui ir Takashi Murai.\n\nNaudojimas: %s [ARGUMENTAS] [APVALKALAS]\n
+No search string was entered.	Terminal TermWindow		Neįvestas ieškotinas tekstas.
+Don't save	Terminal PrefWindow		Neįrašyti
+Set window title	Terminal TermWindow		Keisti lango antraštę
+Terminal	System name		Terminalas
+Close other tabs	Terminal TermWindow		Užverti kitas korteles
+Match word	Terminal FindWindow		Atitikti visą žodį
+Nothing is selected.	Terminal TermWindow		Nėra pažymėto teksto.
+Text not found.	Terminal TermWindow		Ieškotas tekstas nerastas.
+Find…	Terminal TermWindow		Ieškoti…
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Užduotis „%1“ dar vykdoma.\nUžvėrus langą, jos darbas bus nutrauktas.
+Move here	Terminal TermView		Perkelti čia
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tAktyvioje kortelėje vydomos aktyvios užduoties veikiamasis \t\t\taplankas. Taip pat galima nurodyti didžiausią kelio komponenčių\n\t\t\tskaičių. Pavyzdžiui, „%2d“ reikš ne daugiau kaip dvi komponentes.\n\t%i\t-\tLango eilės numeris.\n\t%p\t-\tAktyvioje kortelėje vykdomos aktyvios užduoties pavadinimas.\n\t%t\t-\tAktyvios kortelės antraštė.\n\t%%\t-\tSimbolis „%“.
+White on Black	Terminal colors schema		Baltas tekstas juodame fone
+Error!	Terminal getString		Klaida!
+New tab	Terminal TermWindow		Nauja kortelė
+The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Kortelių antraščių šablonas. Galite naudoti šiuos vietaženklius:\n
+Selected background	Terminal AppearancePrefView		Pažymėto teksto fono
+Decrease	Terminal TermWindow		Pamažinti
+Create link here	Terminal TermView		Kurti nuorodą čia
+Close	Terminal TermWindow		Užverti
+Text	Terminal AppearancePrefView		Teksto
+Clear all	Terminal TermWindow		Išvalyti viską
+Text encoding	Terminal TermWindow		Teksto koduotė
+size	Terminal TermView		dydis
+Close window	Terminal TermWindow		Užverti langą
+Save as default	Terminal TermWindow		Įrašyti kaip numatytąsias
+Set tab title	Terminal TermWindow		Keisti kortelės antraštę
+Settings…	Terminal TermWindow		Nuostatos…
+Abort	Terminal Shell		Nutraukti
+Edit	Terminal TermWindow		Taisa
+Color:	Terminal AppearancePrefView		Spalva:
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Lango antraštės šablonas. Galite naudoti šiuos vietaženklius:\n
+Print	Terminal TermWindow		Spausdinti
+Use text:	Terminal FindWindow		Ieškoti teksto:
+Cancel	Terminal TermWindow		Atsisakyti
+OK	Terminal TermApp		Gerai
+Find failed	Terminal TermWindow		Paieška nepavyko
+Search forward	Terminal FindWindow		Ieškoti žemyn
+Edit tab title…	Terminal TermWindow		Keisti kortelės antraštę…
+Find previous	Terminal TermWindow		Ieškoti ankstesnio
+Tab title:	Terminal TermWindow		Kortelės antraštė:
+Find next	Terminal TermWindow		Ieškoti kito
+Close active tab	Terminal TermWindow		Užverti aktyvią kortelę
+Paste	Terminal TermWindow		Įdėti
+Save changes to this settings panel?	Terminal PrefWindow		Ar norite įrašyti pakeistas nuostatas?
+Cancel	Terminal PrefWindow		Atsisakyti
+Shell 	Terminal TermWindow		Apvalkalas
+Save	Terminal PrefWindow		Įrašyti
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tKortelėje vydomos aktyvios užduoties veikiamasis aplankas.\n\t\t\tTaip pat galima nurodyti didžiausią kelio komponenčių skaičių.\n\t\t\tPavyzdžiui, „%2d“ reikš ne daugiau kaip dvi komponentes.\n\t%i\t-\tKortelės eilės numeris.\n\t%p\t-\tKortelėje vykdomos aktyvios užduoties pavadinimas.\n\t%%\t-\tSimbolis „%“.
+Cancel	Terminal TermView		Atsisakyti
+Use default	Terminal SetTitleWindow		Grąžinti numatytąją

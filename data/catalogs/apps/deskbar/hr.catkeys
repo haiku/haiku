@@ -1,0 +1,41 @@
+1	croatian	x-vnd.Be-TSKB	3912946945
+<Be folder is empty>	BeMenu		<Be mapa je prazna>
+About Haiku	BeMenu		O Haiku
+About this system	BeMenu		O ovom sustavu
+Always on top	PreferencesWindow		Uvijek na vrhu
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programi
+Applications	PreferencesWindow		Programi
+Auto-hide	PreferencesWindow		Samoskrivanje
+Auto-raise	PreferencesWindow		Samopodizanje
+Change time…	TimeView		Promijeni vrijeme...
+Clock	PreferencesWindow		Sat
+Close all	WindowMenu		Zatvori sve
+Deskbar	System name		Deskbar
+Deskbar preferences	PreferencesWindow		Deskbar osobitosti
+Edit menu…	PreferencesWindow		Uredi izbornik...
+Expand new applications	PreferencesWindow		Proširi nove programe
+Find…	BeMenu		Nađi...
+Hide all	WindowMenu		Sakrij sve
+Hide time	TimeView		Sakrij vrijeme
+Menu	PreferencesWindow		Izbornik
+Mount	BeMenu		Montiraj
+No windows	WindowMenu		Bez prozora
+Power off	BeMenu		Iskjluči
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Osobitosti
+Quit application	WindowMenu		Zatvori program
+Recent applications	BeMenu		Nedavni programi
+Recent applications:	PreferencesWindow		Nedavni programi:
+Recent documents	BeMenu		Nedavni dokumenti
+Recent documents:	PreferencesWindow		Nedavni dokumenti:
+Recent folders	BeMenu		Nedavne mape
+Recent folders:	PreferencesWindow		Nedavne mape:
+Restart system	BeMenu		Ponovno pokreni sustav
+Show Time	Tray		Pokaži vrijeme
+Show all	WindowMenu		Pokaži sve
+Show application expander	PreferencesWindow		Pokaži proširivač programa
+Show calendar…	TimeView		Pokaži kalendar...
+Show seconds	PreferencesWindow		Pokaži sekunde
+Shutdown…	BeMenu		Isključi...
+Sort running applications	PreferencesWindow		Sortitiraj pokrenute programe
+Suspend	BeMenu		Suspendiraj
+Window	PreferencesWindow		Prozor

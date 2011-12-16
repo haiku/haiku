@@ -1,8 +1,8 @@
 1	belarusian	x-vnd.Haiku-InstalledPackages	4131220089
-InstalledPackages	System name		Усталяваныя пакункі
 No package selected.	UninstallView		Пакункі не выбраныя.
-OK	UninstallView		ОК
-Package description	UninstallView		Апісанне пакунку
 Remove	UninstallView		Выдаліць
+Package description	UninstallView		Апісанне пакунку
+InstalledPackages	System name		Усталяваныя пакункі
 The package you selected has been successfully removed from your system.	UninstallView		Выбраны пакунак паспяхова выдалены з вашай сістэмы.
+OK	UninstallView		ОК
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Выбраны пакунак не выдалены з вашай сістэмы. Магчыма, дадзеная інфармацыя неправільная.

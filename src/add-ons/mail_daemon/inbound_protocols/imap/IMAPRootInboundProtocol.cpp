@@ -16,7 +16,6 @@ IMAPRootInboundProtocol::IMAPRootInboundProtocol(BMailAccountSettings* settings)
 	:
 	IMAPInboundProtocol(settings, "INBOX")
 {
-
 }
 
 
@@ -177,6 +176,9 @@ IMAPRootInboundProtocol::_FindThreadFor(const entry_ref& ref)
 	}
 	return NULL;
 }
+
+
+// #pragma mark -
 
 
 InboundProtocol*

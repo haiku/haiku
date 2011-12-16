@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,6 +12,8 @@
  * Translators:
  *		Rodastahm Islamov
  *		Diver
+ *		Alex11223
+ *		Emalf Tallefer
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -39,6 +41,8 @@
 <li><a href="../uk/tracker.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../zh_CN/tracker.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../pt_PT/tracker.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/tracker.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/tracker.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../en/tracker.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -50,6 +54,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -66,22 +71,22 @@
 
 <h1>Tracker</h1>
 
-<p>Файловый менеджер Tracker (далее просто Tracker) позволяет создавать новые файлы и папки, а также копировать. удалять, переименовывать, искать и открывать уже существующие.</p>
-<p>Являясь таким же приложением, как и другие (Рабочий стол с иконками, по сути, является простым окном, развернутым на весь экран), его окна отображают в панели задач Deskbar. Самый простой способ закрыть и перезагрузить повисший Tracker (или панель задач Deskbar) - это вызвать <a href="teammonitor.html">Монитор процессов</a>.</p>
+<p>Файловый менеджер Tracker (далее просто Tracker) позволяет создавать новые файлы и папки, а также копировать, удалять, переименовывать, искать и открывать уже существующие.</p>
+<p>Being an application like any other (the Desktop with its icons is really just a fullscreen window in the background), Tracker appears with its windows in the Deskbar and can be quit and restarted. The easiest way to quit and restart a crashed or frozen Tracker (or a wayward Deskbar) is to call the <a href="teammonitor.html">Team Monitor</a>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="mounting-volumes" name="mounting-volumes">Подключение дисков</a></h2>
-<p>Для того, чтобы получить доступ к жёстком диску, CD-диску, USB-диску и т.д., вам сначала нужно смонтировать раздел. Это можно сделать, щелкнув правой кнопкой мыши на рабочем столе и выбрав нужный раздел из меню <span class="menu">Подключить</span>. Меню  <span class="menu">Подключить</span>, также можно найти в панели задач Deskbar.</p>
+<p>Для того, чтобы получить доступ к жёстком диску, CD-диску, USB-диску и т.д., вам сначала нужно смонтировать раздел. Это можно сделать, щелкнув правой кнопкой мыши на рабочем столе и выбрав нужный раздел из меню <span class="menu">Подключить</span>. Меню  <span class="menu">Подключить</span> также можно найти в панели задач Deskbar.</p>
 <img src="images/tracker-images/mount-settings.png" alt="drill-down.png" />
 <p>Для того, чтобы после каждой перезагрузки не монтировать снова все вручную, существуют <span class="menu">Настройки подключения дисков</span>.<br />
 Эти настройки позволяют автоматически смонтировать любое устройство хранения при подключении и настроить монтирование при загрузке системы всех дисков, которые были смонтированы ранее.</p>
-<div class="box-warning">Перед тем как отключить жёсткий диск или USB-диск, убедитесь в том, что вы успешно его отмонтировали. Это гарантирует сохранность данных. Иначе вы можете потерять данные, либо повредить диск!</div>
+<div class="box-warning">Перед тем как отключить жёсткий диск или USB-диск, убедитесь в том, что Вы успешно его отмонтировали. Это гарантирует сохранность данных. Иначе Вы можете потерять данные, либо повредить диск!</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="navigating" name="navigating">Навигация</a></h2>
-<p>По умолчанию при двойном щелчке по папке Tracker откроет её в новом окне. Это может привести к тому, что весь ваш рабочий стол будет заполнен окнами. <br />
+<p>По умолчанию при двойном щелчке по папке Tracker откроет её в новом окне. Это может привести к тому, что весь Ваш рабочий стол будет заполнен окнами. <br />
 Этого можно избежать, удерживая клавишу <span class="key">OPT</span>, которая автоматически закрывает родительское окно.<br />
 Это также работает при навигации при помощи клавиатуры . Для более детального изучения следует обратиться к теме <a href="keyboard-shortcuts.html">Горячие клавиши</a>.</p>
 <p>Перемещение по папкам является одной из главных целей Tracker. Ряд уникальных особенностей Tracker помогут делать это более эффективно.</p>
@@ -91,8 +96,8 @@
 <p>Вместо того, чтобы каждый раз дважды щелкать по папке, чтобы перейти на уровень ниже, есть более эффективное решение:</p>
 <img src="images/tracker-images/drill-down.png" alt="drill-down.png" />
 <!-- screenshot needs updating to show /boot/system/documentation -->
-<p>Щелкните правой кнопкой мыши по папке, и в самом верху контекстного меню вы найдете подменю текущей папки, которое позволит Вам перемещаться вниз по уровню. Просто перемещайтесь вниз по иерархии, пока не найдете нужную папку или файл. Как только вы найдете его, просто щелкните по нему, чтобы открыть. Изображение выше иллюстрирует содержание папки <span class="path">/boot/system/documentation/</span>.<br />
-Если вы будете переносить файл подобным образом, то он переместится туда, куда вы его положите.<br /><br /></p>
+<p>Щелкните правой кнопкой мыши по папке, и в самом верху контекстного меню Вы найдете подменю текущей папки, которое позволит Вам перемещаться вниз по уровню. Просто перемещайтесь вниз по иерархии, пока не найдете нужную папку или файл. Как только Вы найдете его, просто щелкните по нему, чтобы открыть. Изображение выше иллюстрирует содержание папки <span class="path">/boot/home/config/</span>.<br />
+Если Вы будете переносить файл подобным образом, то он переместится туда, куда Вы его положите.<br /><br /></p>
 <p>Подобный метод можно использовать в любом окне Tracker:</p>
 <img src="images/tracker-images/window-drill-down.png" alt="window-drill-down.png" />
 <p>Щелкните в область в левом нижнем углу, где отображаете количество элементов в списке, и вы увидите подменю местоположения уровнем выше. С помощью него вы также можете передвигаться по папкам.</p>
@@ -109,7 +114,7 @@
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="type-ahead-filter" name="type-ahead-filter">Фильтрация файлов и папок по названию</a></h3>
 <p>Вместо того, чтобы перемещаться к файлам или папкам по названию, можно отфильтровать их по названию. Это позволит значительно увеличить точность поиска, особенно в папках с большим количеством файлов. Используя клавиши <span class="key">SHIFT</span> <span class="key">SPACE</span> в качестве разделителя, вы сможете отфильтровать по нескольким параметрам.<br />
-В отличие от перемещения по названию, фильтрация будет действовать пока вы не нажмете клавишу <span class="key">ESC</span>, либо не закроете окно (или не покинете папку, если вы используете Открывать папки в одном окне).<br />
+В отличие от перемещения по названию, фильтрация будет действовать пока вы не нажмете клавишу <span class="key">ESC</span>, либо не закроете окно (или не покинете папку, если вы используете опцию Открывать папки в одном окне).<br />
 Эту опцию вы можете активировать в <a href="#tracker-preferences.html">настройках Tracker</a>.</p>
 
 <h2>
@@ -118,17 +123,22 @@
 <img src="images/tracker-images/window-menu.png" alt="window-menu.png" />
 <p>Tracker предлагает три различных режима просмотра при помощи меню <span class="menu">Окно</span>:</p>
 <ul>
-<li><p><b>Большие значки</b> (<span class="key">ALT</span> <span class="key">1</span>) - Большие иконки, размер которых вы можете изменять в меню или при помощи сочетания клавиш <span class="key">ALT</span> <span class="key">+</span>/<span class="key">ALT</span> <span class="key">-</span>.</p></li>
-<li><p><b>Мелкие значки</b> (<span class="key">ALT</span> <span class="key">2</span>) - название говорит само за себя.</p></li>
-<li><p><b>Список</b> (<span class="key">ALT</span> <span class="key">3</span>) - Подробный список позволяет отобразить/скрыть доступные <i>атрибуты</i> файлов. (Смотрите тему <a href="attributes.html">Атрибуты</a>.)</p></li>
+<li><p><span class="menu">Icon view</span> (<span class="key">ALT</span> <span class="key">1</span>) - Big icons, you can change the size from the submenu or in/decrease their size with <span class="key">ALT</span> <span class="key">+</span>/<span class="key">-</span>.</p></li>
+<li><p><span class="menu">Mini icon view</span> (<span class="key">ALT</span> <span class="key">2</span>) - Small icons.</p></li>
+<li><p><span class="menu">List view</span> (<span class="key">ALT</span> <span class="key">3</span>) - A detailed list of your files enabling you to show/hide available <i>attributes</i>. (See topic <a href="attributes.html">Attributes</a>.)</p></li>
 </ul>
 <p>Меню <span class="menu">Окно</span> также предоставляет ряд других функций:</p>
 <ul>
-<li><p><b>Подогнать размер окна</b> (<span class="key">ALT</span> <span class="key">Y</span>) - Подогнать окно по размеру.</p></li>
-<li><p><b>Выстроить</b> (<span class="key">ALT</span> <span class="key">K</span>) - Уровнять иконки по невидимой сетке. Если удерживать клавишу <span class="key">SHIFT</span>, тогда меню будет носить название <span class="menu">Выстроить все</span> - это значит, что помимо уравнивания иконок по сетке, они также отсортируются в алфавитном порядке.</p></li>
-<li><p><b>Выбрать...</b> (<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">A</span>) - Выбрать файлы согласно <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="http://en.wikipedia.org/wiki/Regular expression">регулярному выражению</a>.</p></li>
-<li><p><b>Закрыть</b> (<span class="key">ALT</span> <span class="key">W</span>) - Закрыть текущее окно. Если удерживать клавишу <span class="key">SHIFT</span>, тогда меню будет носить название <span class="menu">Закрыть все</span>, это означает, что все окна Tracker будут закрыты.</p></li>
-<li><p><b>Закрыть всё на этом столе</b> (<span class="key">ALT</span> <span class="key">Q</span>) - Закрыть все окна Tracker, находящиеся на текущем рабочем столе. Очень удобно в том случае, когда вы забывали нажать клавишу <span class="key">OPT</span> переходя по папкам, тем самым открыв огромное количество окон.</p></li>
+<li><p><span class="menu">Resize window</span> (<span class="key">ALT</span> <span class="key">Y</span>) - Resizes the window to its ideal size.</p></li>
+<li><p><span class="menu">Arrange by...</span> - Only available in Icon or Mini icon view, a submenu allows to set the sorting order to various properties:</p>
+	<ul>
+	<li><p><span class="menu">Name</span>, <span class="menu">Real name</span>, <span class="menu">Size</span>, <span class="menu">Modified</span>, <span class="menu">Created</span>, <span class="menu">Kind</span>, <span class="menu">Location</span>, <span class="menu">Permissions</span></p></li>
+	<li><p><span class="menu">Reverse order</span> - Inverts the sorting order</p></li>
+	<li _translation_id="4339"><p><span class="menu">Clean up</span> (<span class="key">ALT</span> <span class="key">K</span>) - Aligns all icons to an invisible grid. Hold down <span class="key">SHIFT</span> and the menu becomes <span class="menu">Clean up all</span> which additionally sorts all icons according to the above selected criterium.</p></li>
+	</ul></li>
+<li><p><span class="menu">Select...</span> (<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">A</span>) - Select files according to a <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression">regular expression</a>.</p></li>
+<li><p><span class="menu">Close</span> (<span class="key">ALT</span> <span class="key">W</span>) - Closes the window. Hold down <span class="key">SHIFT</span> and the menu becomes <span class="menu">Close all</span> which closes every Tracker window.</p></li>
+<li><p><span class="menu">Close all in workspace</span> (<span class="key">ALT</span> <span class="key">Q</span>) - Closes every Tracker window in the current workspace. A useful shortcut if you forgot to hold the <span class="key">OPT</span> key while clicking through folders and all those still open Tracker windows clutter your workspace.</p></li>
 </ul>
 <p>Бывают случаи, когда вам нужно перенести несколько иконок без выравнивания всех по сетке при помощи <span class="menu">Выстроить</span> (<span class="key">ALT</span> <span class="key">K</span>).В этом случае выберите нужные иконки и перед тем, как перенести их на новое место, нажмите и удерживайте клавишу <span class="key">ALT</span>. После того, как вы отпустите их, они выровняются по сетке.</p>
 <p>Остальные функции говорят сами за себя.</p>
@@ -139,48 +149,45 @@
 <p>Меню  <span class="menu">Окно | Настройки...</span> открывает окно, которое предлагает ряд настроек. Все настройки применяются в реальном времени, таким образом все изменения будут сразу же видны. 
 <br />Перейдем к описанию настроек:</p>
 <ul>
-<li><p><b>Рабочий стол</b> - Настройка для отображения подключенных дисков на рабочем столе. Предлагает отобразить все разделы отдельно, либо поместить иконку с изображением диска на рабочем столе, после нажатия на которой отобразится окно с разделами.</p></li>
-<li><p><b>Окна (Windows)</b> - Вы можете включить <span class="menu">Показывать папки в одном окне</span>, т.е. при двойном щелчке по папке она не будет открыта в новом окне, а будет открыта в текущем. Это не то же самое, как при навигации с удержанием клавиши <span class="key">OPT</span>, как описано выше, т.к. вы потеряете сохраненные позиции и размер окна.
+<li><p><span class="menu">Desktop</span> - Decide if all mounted disks appear directly on the Desktop or in a window after clicking a single Disk icon sitting on the Desktop.</p></li>
+<li><p><span class="menu">Windows</span> - You can set <span class="menu">Single window navigation</span>, i.e. a double-clicked folder doesn't open in its own window, but inside the already open window instead, replacing the view of it's parent folder. This is not the same as clicking while holding the <span class="key">OPT</span> key, as described above, because you'll lose the per window saved position and size.
 <br /><br /></p>
 <img src="images/tracker-images/tracker-preferences-navigator.png" alt="tracker-preferences-navigator.png" />
-
-<p>Перед тем, как вы переключите Tracker в режим отображения папок в одном окне, рекомендуется попробовать перемещение по папкам при помощи ниспадающих меню, т.к. это намного удобнее и быстрее. С другой стороны, при использовании единого окна появится <i>Панель навигации</i>, в нее вы сможете копировать и вставлять адреса каталогов, а также использовать кнопки навигации назад, вперед, вверх.</p>
-<p>О <span class="menu">Фильтрации файлов при наборе</span> вы можете прочитать <a href="#type-ahead-filter">выше</a>.</p></li>
-<li><p><b>Дата и время</b> - Позволяет указать формат даты и времени.</p></li>
-<li><p><b>Корзина</b> - Позволяет определить поведение при удалении файлов в корзину.</p></li>
-<li><p><b>Значки дисков</b> - Установить индикатор свободного места на иконки разделов.</p></li>
+<p>Before you switch Tracker to Single Window Navigation mode, because that may feel more familiar to you, we recommend giving the menu based browsing a try first, as that may actually work much faster for you after getting used to. On the other hand, single window browsing offers a <i>Navigator</i> where you can enter or copy &amp; paste a path name and use back, forward and up buttons.</p> 
+<p>Activating <span class="menu">Type-ahead filtering</span> will filter the contents of a Tracker window while you type to only display the files matching your string in their name or any currently displayed attribute. See <a href="#type-ahead-filter">above</a>.</p></li>
+<li><p><span class="menu">Trash</span> - Set the behavior when deleting a file.</p></li>
+<li><p><span class="menu">Volume icons</span> - Set the color of an optional indicator of free space that's shown besides a disk's icon.</p></li>
 </ul>
 <p>Это окно настроек также доступно из меню <span class="app">Tracker</span> в меню <span class="menu">Настройки</span> панели задач Deskbar.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="working-with-files" name="working-with-files">Работа с файлами</a></h2>
-<p>Если выделить файл и щелкнуть правой кнопкной мыши, то появится контекстное меню с командами. Также эти команды можно найти в меню <span class="menu">Файл</span>.</p>
+<p>Если выделить файл и щелкнуть правой кнопкой мыши, то появится контекстное меню с командами. Также эти команды можно найти в меню <span class="menu">Файл</span>.</p>
 <p>Названия команд, как обычно, достаточно понятны.</p>
 <ul>
-<li><p><b>Найти...</b> - Найти файл или папку. Для более подробного изучения следует обратиться к теме <a href="queries.html">Запросы</a>.</p></li>
-<li><p><b>Создать</b> - Создать новую папку или любой файл по заданному <i>шаблону</i>.
-<br /><br />
+<li><p><span class="menu">Find...</span> - Find a file or folder. See topic <a href="queries.html">Query</a> for more info.</p></li>
+<li><p><span class="menu">New</span> - Create a new folder or any other file based on a <i>template</i>.
+<br /><br /></p>
 <img src="images/tracker-images/new-menu.png" alt="new-menu.png" />
-</p>
-<p>При выборе пункта меню <span class="menu">Изменить шаблоны...</span>, откроется папка <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span>. Создание файла в этой папку предполагает создание файла определенного типа, название файла и другие атрибуты. Этот файл будет служить шаблоном и будет доступен в меню <span class="menu">Создать</span>. На изображении выше показан пример: файл с именем "Text" и типом <tt>text/plain</tt>. Для более подробного изучения следует обратиться к теме <a href="filetypes.html">Типы файлов</a> .</p></li>
-<li><p><b>Открыть в...</b> - Подменю предлагает все приложения, с помощью которых можно открыть этот файл. 
-<br /><br />
+<p>Choosing <span class="menu">Edit templates...</span> opens the folder <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span>. Creating a file in that folder will offer its filetype with the file's name and other attributes as template in the <span class="menu">New</span> menu. Here, there's a file "Text" with the filetype <tt>text/plain</tt>. See topic <a href="filetypes.html">Filetypes</a> for more info.</p></li>
+<li><p><span class="menu">Open with...</span> - A submenu offers all applications that can handle this filetype.
+<br /><br /></p>
 <img src="images/tracker-images/open-with.png" alt="open-with.png" />
-</p>
-<p>Галочкой отмечено предпочтительное приложение, т.е. при двойном щелчке по файлу он будет открыт при помощи этого приложения. В этом подменю, первыми расположены приложения, которые точно могут обрабатывать этот тип файлов, в нашем случае это текстовый файл, типа <tt>text/plain</tt>. Далее идут все приложения, которые могут обрабатывать этот супер-тип, в нашем случае это <tt>text/*</tt>. Последние приложения в списке - это приложения, которые могут открыть любой файл. Если вы не станете выбирать приложения из списка, а щелкните по пункту меню <span class="menu">Открыть в...</span>, то откроется следующий диалог:</p>
+
+<p>The preferred application that would open the file when double-clicked, is checkmarked. This submenu lists first those applications that can handle the exact filetype, in this case it's a text file, the type <tt>text/plain</tt>. Next come all applications that can handle that supertype in general, here <tt>text/*</tt>. Last in the list are those that can deal with any file. If you don't click on an app in the submenu, but on the <span class="menu">Open with...</span> entry instead, a panel opens:</p>
 <br /><br />
 <img src="images/tracker-images/open-with-preferred.png" alt="open-with-preferred" />
-<p>Здесь вы обнаружите те же программы, которые были предложены в подменю. Выбрав одно из них и нажав кнопку <span class="button">Открыть и сделать предпочтительным</span>, вы измените предпочтительное приложение для данного типа файлов, в нашем случае для <tt>text/plain</tt>.</p></li>
-<li><b>Свойства (Get info) </b>
+<p>Here you'll again find the programs that were listed in the submenu. By selecting one and clicking the <span class="button">Open and make preferred</span> button, you changed the preferred application for every file of that filetype, here <tt>text/plain</tt>.</p></li>
+<li><span class="menu">Get info</span>
 <br /><br />
 <img src="images/tracker-images/get-info.png" alt="get-info" />
-<p>Это окно отображает информацию о выбранном файле, позволяет установить предпочтительное приложение, а также права доступа.</p></li>
-<li><p><b>Переименовать</b>, <b>Дублировать</b> и <b>В корзину</b> - позволяют переименовать или дублировать файл(ы) или перенести в корзину.</p></li>
-<li><p><b>Переместить в</b>, <b>Скопировать в</b> and <b>Создать ссылку</b> - позволяют переместить, скопировать или создать ссылку для выделенных файлов, выбрав место назначения, используя ниспадающие подменю. При удержании клавиши <span class="key">SHIFT</span> при вызове меню также будет доступна опция создания относительной ссылки.</p></li>
-<li><p><b>Вырезать</b>, <b>Скопировать</b> and <b>Вставить</b> - позволяют вырезать, скопировать или вставить файл или папку используя буфер обмена. Удерживая клавишу <span class="key">SHIFT</span> при вызове меню вы можете <b>Скопировать/Вырезать еще</b> файлов, возможно, из другой папки, которую впоследствии вы можете вставить куда-нибудь ещё. Также, удерживая клавишу <span class="key">SHIFT</span> вы можете вставить скопированные файлы в буфер обмена как ссылки.</p></li>
-<li><p><b>Опознать</b> - позволяет определить тип файлов. Например вы скачали файл при помощи <span class="cli">wget</span>, который не устанавливает тип файла. Удерживая клавишу <span class="key">SHIFT</span> при вызове меню, можно изменить опцию на <b>Опознать принудительно</b>, что позволит идентифицировать тип файла и исправить его, если он был ложным.</p></li>
-<li><p><b>Дополнения</b> - предлагает воспользоваться дополнениями для Tracker. Для более подробного изучения следует обратиться к теме <a href="tracker-add-ons.html">Дополнения для Tracker</a>.</p></li>
+<p>The panel presents info on the selected file and lets you set the default application and, after you expanded that part of the panel, permissions and owner. Clicking on the path will open it in a Tracker window.</p></li>
+<li><p><span class="menu">Edit name</span>, <span class="menu">Duplicate</span> and <span class="menu">Move to trash</span> - lets you rename or duplicate a file or put the selected file(s) to the trash.</p></li>
+<li><p><span class="menu">Move to</span>, <span class="menu">Copy to</span> and <span class="menu">Create link</span> - lets you move, copy or link the selected file(s) using the submenu navigating method. Holding <span class="key">SHIFT</span> while invoking the menu offers the option to create a relative link.</p></li>
+<li><p><span class="menu">Cut</span>, <span class="menu">Copy</span> and <span class="menu">Paste</span> - lets you cut, copy and paste files using the clipboard. By holding <span class="key">SHIFT</span> while invoking the menu you can <span class="menu">Copy/Cut more</span> files, maybe from another folder that you can paste somewhere else later. Also, while holding <span class="key">SHIFT</span> you can paste the copied files in the clipboard as links.</p></li>
+<li><p><span class="menu">Identify</span> - will sniff out and set the type of files if they didn't have one before, e.g. if you transferred a file with <span class="cli">wget</span> which doesn't set a filetype itself. Holding <span class="key">SHIFT</span> while invoking the menu changes the item to <span class="menu">Force identify</span> which identifies the filetype and corrects it if it was false before.</p></li>
+<li><p><span class="menu">Add-Ons</span> - offers you every generic Tracker add-on and those that can handle the selected file(s). See topic <a href="tracker-add-ons.html">Tracker Add-ons</a> for more information.</p></li>
 </ul>
 
 <h2>

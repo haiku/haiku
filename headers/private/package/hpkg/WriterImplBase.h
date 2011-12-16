@@ -147,14 +147,17 @@ protected:
 			typedef DoublyLinkedList<PackageAttribute> PackageAttributeList;
 
 protected:
-			status_t			Init(const char* fileName, const char* type);
+			status_t			Init(const char* fileName, const char* type,
+									uint32 flags);
 
 			void				RegisterPackageInfo(
 									PackageAttributeList& attributeList,
 									const BPackageInfo& packageInfo);
 			void				RegisterPackageVersion(
 									PackageAttributeList& attributeList,
-									const BPackageVersion& version);
+									const BPackageVersion& version,
+									BHPKGAttributeID attributeID
+										= kDefaultVersionAttributeID);
 			void				RegisterPackageResolvableExpressionList(
 									PackageAttributeList& attributeList,
 									const BObjectList<
@@ -186,6 +189,7 @@ protected:
 									off_t offset);
 
 	inline	int					FD() const;
+	inline	uint32				Flags() const;
 
 	inline	const PackageAttributeList&	PackageAttributes() const;
 	inline	PackageAttributeList&	PackageAttributes();
@@ -199,12 +203,17 @@ protected:
 	inline	void				SetFinished(bool finished);
 
 private:
+	static const BHPKGAttributeID kDefaultVersionAttributeID
+		= B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MAJOR;
+
+private:
 			void				_WritePackageAttributes(
 									const PackageAttributeList& attributes);
 
 private:
 			BErrorOutput*		fErrorOutput;
 			const char*			fFileName;
+			uint32				fFlags;
 			int					fFD;
 			bool				fFinished;
 
@@ -257,6 +266,13 @@ inline int
 WriterImplBase::FD() const
 {
 	return fFD;
+}
+
+
+inline uint32
+WriterImplBase::Flags() const
+{
+	return fFlags;
 }
 
 

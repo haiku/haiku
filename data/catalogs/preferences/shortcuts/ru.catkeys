@@ -1,27 +1,27 @@
 1	russian	x-vnd.Haiku-Shortcuts	3228410154
-(Choose application with file requester)	ShortcutsWindow		(Выбрать программу)
-Add new shortcut	ShortcutsWindow		Добавить горячую клавишу
-Append	ShortcutsWindow		Совместить
-Append KeySet…	ShortcutsWindow		Добавить список горячих клавиш…
-Application	ShortcutsWindow		Приложение
-Cancel	ShortcutsWindow		Отмена
-Don't save	ShortcutsWindow		Не сохранять
-File	ShortcutsWindow		Файл
-Key	ShortcutsWindow		Клавиша
 OK	ShortcutsWindow		ОК
-Oh no	ShortcutsWindow		О нет
-Open	ShortcutsWindow		Открыть
-Open KeySet…	ShortcutsWindow		Открыть список горячих клавиш…
-Quit	ShortcutsWindow		Выход
-Really quit without saving your changes?	ShortcutsWindow		Сохранить изменения перед выходом?
-Remove selected shortcut	ShortcutsWindow		Удалить выделенную горячую клавишу
-Revert to saved	ShortcutsWindow		Вернуться к сохраненной версии
-Save	ShortcutsWindow		Сохранить
-Save & apply	ShortcutsWindow		Применить
-Save KeySet as…	ShortcutsWindow		Сохранить список как…
-Select	ShortcutsWindow		Выбрать
-Shortcuts	System name		Горячие клавиши
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Не удалось открыть список горячих клавиш!
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Не удалось прочитать файл списка горячих клавиш!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Не удалось сохранить ваш файл список горячих клавиш!
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Не удалось сохранить список горячих клавиш.
+Cancel	ShortcutsWindow		Отмена
+Append KeySet…	ShortcutsWindow		Добавить список горячих клавиш…
+Key	ShortcutsWindow		Клавиша
+Open KeySet…	ShortcutsWindow		Открыть список горячих клавиш…
+Revert to saved	ShortcutsWindow		Вернуться к сохраненной версии
+(Choose application with file requester)	ShortcutsWindow		(Выбрать программу)
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Не удалось открыть список горячих клавиш!
+Save	ShortcutsWindow		Сохранить
+Remove selected shortcut	ShortcutsWindow		Удалить выделенную горячую клавишу
+Add new shortcut	ShortcutsWindow		Добавить горячую клавишу
+Save & apply	ShortcutsWindow		Применить
+Append	ShortcutsWindow		Совместить
+File	ShortcutsWindow		Файл
+Quit	ShortcutsWindow		Выход
+Don't save	ShortcutsWindow		Не сохранять
+Application	ShortcutsWindow		Приложение
+Save KeySet as…	ShortcutsWindow		Сохранить список как…
+Open	ShortcutsWindow		Открыть
+Really quit without saving your changes?	ShortcutsWindow		Сохранить изменения перед выходом?
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Не удалось прочитать файл списка горячих клавиш!
+Select	ShortcutsWindow		Выбрать
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Не удалось сохранить ваш файл список горячих клавиш!
+Oh no	ShortcutsWindow		О нет
+Shortcuts	System name		Горячие клавиши

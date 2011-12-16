@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Keymap</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/sk.png" alt="" /> Slovenčina</li>
+<li><a href="../../fr/preferences/keymap.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/preferences/keymap.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/preferences/keymap.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/preferences/keymap.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/preferences/keymap.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/preferences/keymap.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/preferences/keymap.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/preferences/keymap.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/preferences/keymap.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/preferences/keymap.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/preferences/keymap.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../en/preferences/keymap.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="keyboard.html">Keyboard</a> 
+::  <a href="../preferences.html" class="uplink">Preferences</a> 
+::  <a href="locale.html">Locale</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+
+<h2><img src="../../images/prefs-images/keymap-icon_64.png" alt="keymap-icon_64.png" width="64" height="64" />Keymap</h2>
+<table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
+<tr><td>Location:</td><td></td><td><span class="path">/boot/system/preferences/Keymap</span></td></tr>
+<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/Keymap/*</span> - Location of user modified keymaps.<br />
+<span class="path">~/config/settings/Key_map</span></td></tr>
+</table>
+<p><br /></p>
+<img src="../images/prefs-images/keymap.png" alt="keymap.png" />
+<p>To the right, the Keymap window shows a representation of your keyboard. When you press a key, the corresponding key is darkened and the assigned symbol is entered into the <i>Sample and Clipboard</i> text field at the bottom. From there you can also copy and paste it into a document.<br />
+Thus, the Keymap preferences are not only for configuring your local keymap, but are also useful when looking for a special symbol used in other languages. For example, you can switch the keymap to "French", find the "ç" and copy it into your mail to François. (Though you'll find the "cedil" also in other keymaps...)</p>
+<p>Pressing modifier keys like <span class="key">SHIFT</span>, <span class="key">CONTROL</span> or <span class="key">OPTION</span> changes the displayed keyboard accordingly.</p>
+<p>Then there are the keys that are marked with a blue background. These keys are called <i>Dead Keys</i> that can change the key you press after that. If you click on such a blue key with your mouse, those changeable keys light up yellow. Click again and everything's back to normal. Examples are é, ñ, ó or ë.</p>
+<p>Below the keyboard representation are two more options:</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Select dead keys</span></td><td> </td><td>for setting the above mentioned blue keys.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Switch shortcut key...</span></td><td> </td><td>for using the shortcut key in Windows/Linux mode, i.e. <span class="key">CONTROL</span> (normally <span class="key">CTRL</span>) or Haiku mode, i.e. <span class="key">COMMAND</span> (normally <span class="key">ALT</span>).</td></tr>
+</table>
+<p>The lists on the left offer the available pre-configured keymaps of the system, and below that, if available, user-defined maps. You can change a keymap via drag&amp;drop in the keyboard representation: a left-click-drag copies a key, a right-click-drag exchanges the two keys.<br />
+When you're done you can save the result from the menu <span class="menu">File | Save...</span>. Your modified map will only appear in the user-defined list if it's stored in <span class="path">~/config/settings/Keymap/</span>. Otherwise you'll have to manually load it via <span class="menu">File | Open...</span>.</p>
+<p>To better match the Keymap panel to your physical keyboard, there are several different settings available from the <span class="menu">Layout</span> menu.</p>
+<p>The font used in the keyboard representation is set from the <span class="menu">Font</span> menu. Note, that it may or may not contain all symbols for a specific keymap.</p>
+<p>Finally, there's a <span class="button">Revert</span> button to bring back the settings that were active when you started the Keymap preferences.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="advanced-keymapping" name="advanced-keymapping">Advanced keymap manipulation</a></h2>
+<p>There's another method to customize your keymap besides the Keymap preference panel. It involves editing a text file containing loads of hex values, which may appear daunting on first sight, but isn't really that impossible to grasp.</p>
+<p>You can dump the current keymap with a command in Terminal:</p>
+<pre class="terminal">keymap -d &gt; MyKeymap</pre>
+<p>The generated text file can then be opened in a text editor. Make sure to use a fixed font in that editor or you'll never grok that file...<br />
+At the beginning of that file, you'll find a legend of a stylized keyboard with the hex value corresponding to each key. Below that are the actual assignments of every value. You can do all the customizing that's also available from the Keymap preference panel, and then some. If you happen to have some special keys on your keyboard, you may be able to activate them. That is, use them as ordinary keys or like an option or control key. You won't be able to, for example, have your multimedia keys de/increase the volume or start some application. For this you can use e.g. <a href="http://www.haikuware.com/directory/view-details/utilities/desktop-accessories/spicykeys" class="noprinturl">SpicyKeys</a>.</p>
+<p>When you're finished, you'll save the file and have your system load the modified keymap with this command:</p>
+<pre class="terminal">keymap -s &lt; MyKeymap</pre>
+<p>If you'd like to import this keymap into the Keymap panel, you have to compile it first to a binary format:</p>
+<pre class="terminal">keymap -c &lt; MyKeymap</pre>
+<p>This will produce a file <span class="cli">keymap.out</span> which you can load into Keymap via its <span class="menu">Open...</span> menu. By the way, the keymap command is able to load this binary format as well: <span class="cli">keymap -l &lt; keymap.out</span></p>
+<p>This is the dumped file (the rightmost keys of the stylized keyboard are cut-off for a nicer display on this page):</p>
+
+<pre>#!/bin/keymap -s
+#
+#	Raw key numbering for 101 keyboard...
+#                                                                                    
+#                                                                                    
+# [esc]       [ f1] [ f2] [ f3] [ f4] [ f5] [ f6] [ f7] [ f8] [ f9] [f10] [f11] [f12]
+#  0x01        0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d
+#
+# [ ` ] [ 1 ] [ 2 ] [ 3 ] [ 4 ] [ 5 ] [ 6 ] [ 7 ] [ 8 ] [ 9 ] [ 0 ] [ - ] [ = ] [bck]
+#  0x11  0x12  0x13  0x14  0x15  0x16  0x17  0x18  0x19  0x1a  0x1b  0x1c  0x1d  0x1e
+#
+# [tab] [ q ] [ w ] [ e ] [ r ] [ t ] [ y ] [ u ] [ i ] [ o ] [ p ] [ [ ] [ ] ] [ \ ]
+#  0x26  0x27  0x28  0x29  0x2a  0x2b  0x2c  0x2d  0x2e  0x2f  0x30  0x31  0x32  0x33
+#
+# [cap] [ a ] [ s ] [ d ] [ f ] [ g ] [ h ] [ j ] [ k ] [ l ] [ ; ] [ ' ] [  enter  ]
+#  0x3b  0x3c  0x3d  0x3e  0x3f  0x40  0x41  0x42  0x43  0x44  0x45  0x46     0x47   
+#
+# [shift]     [ z ] [ x ] [ c ] [ v ] [ b ] [ n ] [ m ] [ , ] [ . ] [ / ]     [shift]
+#   0x4b       0x4c  0x4d  0x4e  0x4f  0x50  0x51  0x52  0x53  0x54  0x55       0x56 
+#
+# [ctr]             [cmd]             [  space  ]             [cmd]             [ctr]
+#  0x5c              0x5d                 0x5e                 0x5f              0x60
+#
+#	NOTE: On a Microsoft Natural Keyboard:
+#			left option  = 0x66
+#			right option = 0x67
+#			menu key     = 0x68
+#	NOTE: On an Apple Extended Keyboard:
+#			left option  = 0x66
+#			right option = 0x67
+#			keypad '='   = 0x6a
+#			power key    = 0x6b
+Version = 3
+CapsLock = 0x3b
+ScrollLock = 0x0f
+NumLock = 0x22
+LShift = 0x4b
+RShift = 0x56
+LCommand = 0x5d
+RCommand = 0x60
+LControl = 0x5c
+RControl = 0x00
+LOption = 0x66
+ROption = 0x5f
+Menu = 0x68
+#
+# Lock settings
+# To set NumLock, do the following:
+#   LockSettings = NumLock
+#
+# To set everything, do the following:
+#   LockSettings = CapsLock NumLock ScrollLock
+#
+LockSettings = 
+# Legend:
+#   n = Normal
+#   s = Shift
+#   c = Control
+#   C = CapsLock
+#   o = Option
+# Key      n        s        c        o        os       C        Cs       Co       Cos     
+Key 0x00 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x01 = 0x1b     0x1b     0x1b     0x1b     0x1b     0x1b     0x1b     0x1b     0x1b     
+Key 0x02 = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x03 = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x04 = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x05 = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x06 = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x07 = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x08 = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x09 = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x0a = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x0b = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x0c = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x0d = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x0e = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x0f = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x10 = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x11 = '^'      0xc2b0   ''       ' '      ''       '^'      0xc2b0   ' '      ''       
+Key 0x12 = '1'      '!'      ''       ' '      ''       '!'      '1'      ' '      ''       
+Key 0x13 = '2'      '"'      ''       0xc2b2   ''       '"'      '2'      0xc2b2   ''       
+Key 0x14 = '3'      0xc2a7   ''       0xc2b3   ''       0xc2a7   '3'      0xc2b3   ''       
+Key 0x15 = '4'      '$'      ''       ' '      ''       '$'      '4'      ' '      ''       
+Key 0x16 = '5'      '%'      ''       ' '      ''       '%'      '5'      ' '      ''       
+Key 0x17 = '6'      '&amp;'      ''       ' '      ''       '&amp;'      '6'      ' '      ''       
+Key 0x18 = '7'      '/'      ''       '{'      ''       '/'      '7'      '{'      ''       
+Key 0x19 = '8'      '('      ''       '['      ''       '('      '8'      '['      ''       
+Key 0x1a = '9'      ')'      ''       ']'      ''       ')'      '9'      ']'      ''       
+Key 0x1b = '0'      '='      ''       '}'      ''       '='      '0'      '}'      ''       
+Key 0x1c = 0xc39f   '?'      ''       '\\'     ''       '?'      0xc39f   '\\'     ''       
+Key 0x1d = 0xc2b4   '`'      ''       ' '      ''       0xc2b4   '`'      ' '      ''       
+Key 0x1e = 0x08     0x08     0x08     0x08     0x08     0x08     0x08     0x08     0x08     
+Key 0x1f = 0x05     0x05     0x05     0x05     0x05     0x05     0x05     0x05     0x05     
+Key 0x20 = 0x01     0x01     0x01     0x01     0x01     0x01     0x01     0x01     0x01     
+Key 0x21 = 0x0b     0x0b     0x0b     0x0b     0x0b     0x0b     0x0b     0x0b     0x0b     
+Key 0x22 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x23 = '/'      '/'      '/'      '/'      '/'      '/'      '/'      '/'      '/'      
+Key 0x24 = '*'      '*'      '*'      '*'      '*'      '*'      '*'      '*'      '*'      
+Key 0x25 = '-'      '-'      '-'      '-'      '-'      '-'      '-'      '-'      '-'      
+Key 0x26 = 0x09     0x09     0x09     0x09     0x09     0x09     0x09     0x09     0x09     
+Key 0x27 = 'q'      'Q'      0x11     '@'      ''       'Q'      'q'      '@'      ''       
+Key 0x28 = 'w'      'W'      0x17     ' '      ''       'W'      'w'      ' '      ''       
+Key 0x29 = 'e'      'E'      0x05     0xe282ac ''       'E'      'e'      0xe282ac ''       
+Key 0x2a = 'r'      'R'      0x12     ' '      ''       'R'      'r'      ' '      ''       
+Key 0x2b = 't'      'T'      0x14     ' '      ''       'T'      't'      ' '      ''       
+Key 0x2c = 'z'      'Z'      0x1a     ' '      ''       'Z'      'z'      ' '      ''       
+Key 0x2d = 'u'      'U'      0x15     ' '      ''       'U'      'u'      ' '      ''       
+Key 0x2e = 'i'      'I'      0x09     ' '      ''       'I'      'i'      ' '      ''       
+Key 0x2f = 'o'      'O'      0x0f     ' '      ''       'O'      'o'      ' '      ''       
+Key 0x30 = 'p'      'P'      0x10     ' '      ''       'P'      'p'      ' '      ''       
+Key 0x31 = 0xc3bc   0xc39c   0x1b     ' '      ''       0xc39c   0xc3bc   ' '      ''       
+Key 0x32 = ' '      '*'      0x1d     '~'      ''       '*'      ' '      '~'      ''       
+Key 0x33 = '#'      '\''     0x1c     ' '      ''       '\''     '#'      ' '      ''       
+Key 0x34 = 0x7f     0x7f     0x7f     0x7f     0x7f     0x7f     0x7f     0x7f     0x7f     
+Key 0x35 = 0x04     0x04     0x04     0x04     0x04     0x04     0x04     0x04     0x04     
+Key 0x36 = 0x0c     0x0c     0x0c     0x0c     0x0c     0x0c     0x0c     0x0c     0x0c     
+Key 0x37 = 0x01     '7'      0x01     0x01     '7'      0x01     '7'      0x01     '7'      
+Key 0x38 = 0x1e     '8'      0x1e     0x1e     '8'      0x1e     '8'      0x1e     '8'      
+Key 0x39 = 0x0b     '9'      0x0b     0x0b     '9'      0x0b     '9'      0x0b     '9'      
+Key 0x3a = ' '      ' '      ' '      ' '      ' '      ' '      ' '      ' '      ' '      
+Key 0x3b = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x3c = 'a'      'A'      0x01     ' '      ''       'A'      'a'      ' '      ''       
+Key 0x3d = 's'      'S'      0x13     ' '      ''       'S'      's'      ' '      ''       
+Key 0x3e = 'd'      'D'      0x04     ' '      ''       'D'      'd'      ' '      ''       
+Key 0x3f = 'f'      'F'      0x06     ' '      ''       'F'      'f'      ' '      ''       
+Key 0x40 = 'g'      'G'      0x07     ' '      ''       'G'      'g'      ' '      ''       
+Key 0x41 = 'h'      'H'      0x08     ' '      ''       'H'      'h'      ' '      ''       
+Key 0x42 = 'j'      'J'      0x0a     ' '      ''       'J'      'j'      ' '      ''       
+Key 0x43 = 'k'      'K'      0x0b     ' '      ''       'K'      'k'      ' '      ''       
+Key 0x44 = 'l'      'L'      0x0c     ' '      ''       'L'      'l'      ' '      ''       
+Key 0x45 = 0xc3b6   0xc396   ''       ' '      ''       0xc396   0xc3b6   ' '      ''       
+Key 0x46 = 0xc3a4   0xc384   ''       ' '      ''       0xc384   0xc3a4   ' '      ''       
+Key 0x47 = 0x0a     0x0a     0x0a     0x0a     0x0a     0x0a     0x0a     0x0a     0x0a     
+Key 0x48 = 0x1c     '4'      0x1c     0x1c     '4'      0x1c     '4'      0x1c     '4'      
+Key 0x49 = ''       '5'      ''       ''       '5'      ''       '5'      ''       '5'      
+Key 0x4a = 0x1d     '6'      0x1d     0x1d     '6'      0x1d     '6'      0x1d     '6'      
+Key 0x4b = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x4c = 'y'      'Y'      0x19     ' '      ''       'Y'      'y'      ' '      ''       
+Key 0x4d = 'x'      'X'      0x18     ' '      ''       'X'      'x'      ' '      ''       
+Key 0x4e = 'c'      'C'      0x03     ' '      ''       'C'      'c'      ' '      ''       
+Key 0x4f = 'v'      'V'      0x16     ' '      ''       'V'      'v'      ' '      ''       
+Key 0x50 = 'b'      'B'      0x02     ' '      ''       'B'      'b'      ' '      ''       
+Key 0x51 = 'n'      'N'      0x0e     ' '      ''       'N'      'n'      ' '      ''       
+Key 0x52 = 'm'      'M'      0x0d     0xc2b5   ''       'M'      'm'      0xc2b5   ''       
+Key 0x53 = ','      ';'      ','      ' '      ''       ';'      ','      ' '      ''       
+Key 0x54 = '.'      ':'      '.'      ' '      ''       ':'      '.'      ' '      ''       
+Key 0x55 = '-'      '_'      ''       ' '      ''       '-'      '_'      ' '      ''       
+Key 0x56 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x57 = 0x1e     0x1e     0x1e     0x1e     0x1e     0x1e     0x1e     0x1e     0x1e     
+Key 0x58 = 0x04     '1'      0x04     0x04     '1'      0x04     '1'      0x04     '1'      
+Key 0x59 = 0x1f     '2'      0x1f     0x1f     '2'      0x1f     '2'      0x1f     '2'      
+Key 0x5a = 0x0c     '3'      0x0c     0x0c     '3'      0x0c     '3'      0x0c     '3'      
+Key 0x5b = 0x0a     0x0a     0x0a     0x0a     0x0a     0x0a     0x0a     0x0a     0x0a     
+Key 0x5c = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x5d = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x5e = ' '      ' '      0x00     ' '      ' '      ' '      ' '      ' '      ' '      
+Key 0x5f = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x60 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x61 = 0x1c     0x1c     0x1c     0x1c     0x1c     0x1c     0x1c     0x1c     0x1c     
+Key 0x62 = 0x1f     0x1f     0x1f     0x1f     0x1f     0x1f     0x1f     0x1f     0x1f     
+Key 0x63 = 0x1d     0x1d     0x1d     0x1d     0x1d     0x1d     0x1d     0x1d     0x1d     
+Key 0x64 = 0x05     '0'      0x05     0x05     '0'      0x05     '0'      0x05     '0'      
+Key 0x65 = 0x7f     ','      0x7f     0x7f     ','      0x7f     ','      0x7f     ','      
+Key 0x66 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x67 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x68 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x69 = '&lt;'      '&gt;'      ''       '|'      ''       '&lt;'      '&gt;'      '|'      ''       
+Key 0x6a = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x6b = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x6c = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x6d = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x6e = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x6f = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x70 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x71 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x72 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x73 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x74 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x75 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x76 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x77 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x78 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x79 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x7a = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x7b = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x7c = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x7d = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x7e = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x7f = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Acute ' '       = 0xc2b4   
+Acute 'A'       = 0xc381   
+Acute 'E'       = 0xc389   
+Acute 'I'       = 0xc38d   
+Acute 'O'       = 0xc393   
+Acute 'U'       = 0xc39a   
+Acute 'Y'       = 0xc39d   
+Acute 'a'       = 0xc3a1   
+Acute 'e'       = 0xc3a9   
+Acute 'i'       = 0xc3ad   
+Acute 'o'       = 0xc3b3   
+Acute 'u'       = 0xc3ba   
+Acute 'y'       = 0xc3bd   
+Acute ''        = ''       
+Acute ''        = ''       
+Acute ''        = ''       
+AcuteTab = Normal Shift Option Option-Shift CapsLock CapsLock-Shift CapsLock-Option CapsLock-Option-Shift 
+Grave ' '       = '`'      
+Grave 'A'       = 0xc380   
+Grave 'E'       = 0xc388   
+Grave 'I'       = 0xc38c   
+Grave 'O'       = 0xc392   
+Grave 'U'       = 0xc399   
+Grave 'a'       = 0xc3a0   
+Grave 'e'       = 0xc3a8   
+Grave 'i'       = 0xc3ac   
+Grave 'o'       = 0xc3b2   
+Grave 'u'       = 0xc3b9   
+Grave ''        = ''       
+Grave ''        = ''       
+Grave ''        = ''       
+Grave ''        = ''       
+Grave ''        = ''       
+GraveTab = Normal Shift Option Option-Shift CapsLock CapsLock-Shift CapsLock-Option CapsLock-Option-Shift 
+Circumflex ' '       = '^'      
+Circumflex 'A'       = 0xc382   
+Circumflex 'E'       = 0xc38a   
+Circumflex 'I'       = 0xc38e   
+Circumflex 'O'       = 0xc394   
+Circumflex 'U'       = 0xc39b   
+Circumflex 'a'       = 0xc3a2   
+Circumflex 'e'       = 0xc3aa   
+Circumflex 'i'       = 0xc3ae   
+Circumflex 'o'       = 0xc3b4   
+Circumflex 'u'       = 0xc3bb   
+Circumflex ''        = ''       
+Circumflex ''        = ''       
+Circumflex ''        = ''       
+Circumflex ''        = ''       
+Circumflex ''        = ''       
+CircumflexTab = Normal Shift Option Option-Shift CapsLock CapsLock-Shift CapsLock-Option CapsLock-Option-Shift 
+Diaeresis ' '       = 0xc2a8   
+Diaeresis 'A'       = 0xc384   
+Diaeresis 'E'       = 0xc38b   
+Diaeresis 'I'       = 0xc38f   
+Diaeresis 'O'       = 0xc396   
+Diaeresis 'U'       = 0xc39c   
+Diaeresis 'Y'       = 0xc5b8   
+Diaeresis 'a'       = 0xc3a4   
+Diaeresis 'e'       = 0xc3ab   
+Diaeresis 'i'       = 0xc3af   
+Diaeresis 'o'       = 0xc3b6   
+Diaeresis 'u'       = 0xc3bc   
+Diaeresis 'y'       = 0xc3bf   
+Diaeresis ''        = ''       
+Diaeresis ''        = ''       
+Diaeresis ''        = ''       
+DiaeresisTab = Normal Shift Option Option-Shift CapsLock CapsLock-Shift CapsLock-Option CapsLock-Option-Shift 
+Tilde ' '       = '~'      
+Tilde 'A'       = 0xc383   
+Tilde 'O'       = 0xc395   
+Tilde 'N'       = 0xc391   
+Tilde 'a'       = 0xc3a3   
+Tilde 'o'       = 0xc3b5   
+Tilde 'n'       = 0xc3b1   
+Tilde ''        = ''       
+Tilde ''        = ''       
+Tilde ''        = ''       
+Tilde ''        = ''       
+Tilde ''        = ''       
+Tilde ''        = ''       
+Tilde ''        = ''       
+Tilde ''        = ''       
+Tilde ''        = ''       
+TildeTab = Normal Shift Option Option-Shift CapsLock CapsLock-Shift CapsLock-Option CapsLock-Option-Shift </pre>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="keyboard.html">Keyboard</a> 
+::  <a href="../preferences.html" class="uplink">Preferences</a> 
+::  <a href="locale.html">Locale</a>  »
+</span></div>
+</div>
+
+
+</body>
+</html>

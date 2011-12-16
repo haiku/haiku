@@ -45,9 +45,10 @@ struct radeon_info {
 	struct radeon_shared_info* shared_info;
 	area_id			shared_area;
 
-	const char*		device_identifier;
-	uint32			device_id;
-	uint16			device_chipset;
+	uint32			pciID;
+	const char*		deviceName;
+	uint16			chipsetID;
+	const char*		chipsetName;
 	uint32			chipsetFlags;
 	uint8			dceMajor;
 	uint8			dceMinor;

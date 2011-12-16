@@ -175,9 +175,9 @@ BDeskWindow::Init(const BMessage *)
 
 	// watch add-on directories so that we can track the addons with
 	// corresponding shortcuts
-	WatchAddOnDir(B_BEOS_ADDONS_DIRECTORY, this);
 	WatchAddOnDir(B_USER_ADDONS_DIRECTORY, this);
 	WatchAddOnDir(B_COMMON_ADDONS_DIRECTORY, this);
+	WatchAddOnDir(B_SYSTEM_ADDONS_DIRECTORY, this);
 
 	_inherited::Init();
 }

@@ -12,12 +12,6 @@
 // Messages
 const uint32 kNotificationMessage		= 'nssm';
 
-// Notification layout
-enum infoview_layout {
-	TitleAboveIcon = 0,
-	AllTextRightOfIcon = 1
-};
-
 // Settings constants
 extern const char* kSettingsDirectory;
 extern const char* kFiltersSettings;
@@ -40,6 +34,5 @@ extern const char* kLayoutName;
 // Display default settings
 const float kDefaultWidth				= 300.0f;
 const icon_size kDefaultIconSize		= B_LARGE_ICON;
-const infoview_layout kDefaultLayout	= TitleAboveIcon;
 
 #endif	// _NOTIFICATIONS_H

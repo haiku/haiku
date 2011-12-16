@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
@@ -38,21 +38,25 @@ static const size_t kScratchBufferSize = 64 * 1024;
 
 
 ReaderImplBase::AttributeHandlerContext::AttributeHandlerContext(
-	BErrorOutput* errorOutput, BPackageContentHandler* packageContentHandler)
+	BErrorOutput* errorOutput, BPackageContentHandler* packageContentHandler,
+	BHPKGPackageSectionID section)
 	:
 	errorOutput(errorOutput),
 	packageContentHandler(packageContentHandler),
-	hasLowLevelHandler(false)
+	hasLowLevelHandler(false),
+	section(section)
 {
 }
 
 
 ReaderImplBase::AttributeHandlerContext::AttributeHandlerContext(
-	BErrorOutput* errorOutput, BLowLevelPackageContentHandler* lowLevelHandler)
+	BErrorOutput* errorOutput, BLowLevelPackageContentHandler* lowLevelHandler,
+	BHPKGPackageSectionID section)
 	:
 	errorOutput(errorOutput),
 	lowLevelHandler(lowLevelHandler),
-	hasLowLevelHandler(true)
+	hasLowLevelHandler(true),
+	section(section)
 {
 }
 
@@ -127,6 +131,10 @@ ReaderImplBase::PackageVersionAttributeHandler::HandleAttribute(
 			fPackageVersionData.micro = value.string;
 			break;
 
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_PRE_RELEASE:
+			fPackageVersionData.preRelease = value.string;
+			break;
+
 		case B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_RELEASE:
 			fPackageVersionData.release = value.unsignedInt;
 			break;
@@ -190,6 +198,19 @@ ReaderImplBase::PackageResolvableAttributeHandler::HandleAttribute(
 					= new(std::nothrow) PackageVersionAttributeHandler(
 						fPackageInfoValue,
 						fPackageInfoValue.resolvable.version, false);
+				if (*_handler == NULL)
+					return B_NO_MEMORY;
+			}
+			break;
+
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_PROVIDES_COMPATIBLE:
+			fPackageInfoValue.resolvable.haveCompatibleVersion = true;
+			fPackageInfoValue.resolvable.compatibleVersion.major = value.string;
+			if (_handler != NULL) {
+				*_handler
+					= new(std::nothrow) PackageVersionAttributeHandler(
+						fPackageInfoValue,
+						fPackageInfoValue.resolvable.compatibleVersion, false);
 				if (*_handler == NULL)
 					return B_NO_MEMORY;
 			}
@@ -359,6 +380,14 @@ ReaderImplBase::PackageAttributeHandler::HandleAttribute(
 				value.string);
 			break;
 
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_URL:
+			fPackageInfoValue.SetTo(B_PACKAGE_INFO_URLS, value.string);
+			break;
+
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_SOURCE_URL:
+			fPackageInfoValue.SetTo(B_PACKAGE_INFO_SOURCE_URLS, value.string);
+			break;
+
 		case B_HPKG_ATTRIBUTE_ID_PACKAGE_PROVIDES:
 			fPackageInfoValue.resolvable.name = value.string;
 			fPackageInfoValue.attributeID = B_PACKAGE_INFO_PROVIDES;
@@ -412,6 +441,10 @@ ReaderImplBase::PackageAttributeHandler::HandleAttribute(
 			fPackageInfoValue.SetTo(B_PACKAGE_INFO_CHECKSUM, value.string);
 			break;
 
+		case B_HPKG_ATTRIBUTE_ID_PACKAGE_INSTALL_PATH:
+			fPackageInfoValue.SetTo(B_PACKAGE_INFO_INSTALL_PATH, value.string);
+			break;
+
 		default:
 			context->errorOutput->PrintError(
 				"Error: Invalid package attribute section: unexpected "
@@ -438,6 +471,7 @@ ReaderImplBase::PackageAttributeHandler::HandleAttribute(
 
 ReaderImplBase::LowLevelAttributeHandler::LowLevelAttributeHandler()
 	:
+	fParentToken(NULL),
 	fToken(NULL),
 	fID(B_HPKG_ATTRIBUTE_ID_ENUM_COUNT)
 {
@@ -445,8 +479,9 @@ ReaderImplBase::LowLevelAttributeHandler::LowLevelAttributeHandler()
 
 
 ReaderImplBase::LowLevelAttributeHandler::LowLevelAttributeHandler(uint8 id,
-	const BPackageAttributeValue& value, void* token)
+	const BPackageAttributeValue& value, void* parentToken, void* token)
 	:
+	fParentToken(NULL),
 	fToken(token),
 	fID(id),
 	fValue(value)
@@ -469,10 +504,10 @@ ReaderImplBase::LowLevelAttributeHandler::HandleAttribute(
 	// create a subhandler for the attribute, if it has children
 	if (_handler != NULL) {
 		*_handler = new(std::nothrow) LowLevelAttributeHandler(id, value,
-			token);
+			fToken, token);
 		if (*_handler == NULL) {
 			context->lowLevelHandler->HandleAttributeDone((BHPKGAttributeID)id,
-				value, token);
+				value, fToken, token);
 			return B_NO_MEMORY;
 		}
 		return B_OK;
@@ -480,7 +515,7 @@ ReaderImplBase::LowLevelAttributeHandler::HandleAttribute(
 
 	// no children -- just call the done hook
 	return context->lowLevelHandler->HandleAttributeDone((BHPKGAttributeID)id,
-		value, token);
+		value, fToken, token);
 }
 
 
@@ -491,7 +526,7 @@ ReaderImplBase::LowLevelAttributeHandler::Delete(
 	status_t error = B_OK;
 	if (fID != B_HPKG_ATTRIBUTE_ID_ENUM_COUNT) {
 		error = context->lowLevelHandler->HandleAttributeDone(
-			(BHPKGAttributeID)fID, fValue, fToken);
+			(BHPKGAttributeID)fID, fValue, fParentToken, fToken);
 	}
 
 	delete this;
@@ -569,7 +604,12 @@ ReaderImplBase::CheckCompression(const SectionInfo& section) const
 status_t
 ReaderImplBase::ParseStrings()
 {
-	// allocate table
+	// allocate table, if there are any strings
+	if (fCurrentSection->stringsCount == 0) {
+		fCurrentSection->currentOffset += fCurrentSection->stringsLength;
+		return B_OK;
+	}
+
 	fCurrentSection->strings
 		= new(std::nothrow) char*[fCurrentSection->stringsCount];
 	if (fCurrentSection->strings == NULL) {
@@ -637,8 +677,9 @@ ReaderImplBase::ParsePackageAttributesSection(
 	ClearAttributeHandlerStack();
 	PushAttributeHandler(rootAttributeHandler);
 
-	status_t error = ParseAttributeTree(context);
-	if (error == B_OK) {
+	bool sectionHandled;
+	status_t error = ParseAttributeTree(context, sectionHandled);
+	if (error == B_OK && sectionHandled) {
 		if (fPackageAttributesSection.currentOffset
 				< fPackageAttributesSection.uncompressedLength) {
 			fErrorOutput->PrintError("Error: %llu excess byte(s) in package "
@@ -666,7 +707,38 @@ ReaderImplBase::ParsePackageAttributesSection(
 
 
 status_t
-ReaderImplBase::ParseAttributeTree(AttributeHandlerContext* context)
+ReaderImplBase::ParseAttributeTree(AttributeHandlerContext* context,
+	bool& _sectionHandled)
+{
+	if (context->hasLowLevelHandler) {
+		bool handleSection = false;
+		status_t error = context->lowLevelHandler->HandleSectionStart(
+			context->section, handleSection);
+		if (error != B_OK)
+			return error;
+
+		if (!handleSection) {
+			_sectionHandled = false;
+			return B_OK;
+		}
+	}
+
+	status_t error = _ParseAttributeTree(context);
+
+	if (context->hasLowLevelHandler) {
+		status_t endError = context->lowLevelHandler->HandleSectionEnd(
+			context->section);
+		if (error == B_OK)
+			error = endError;
+	}
+
+	_sectionHandled = true;
+	return error;
+}
+
+
+status_t
+ReaderImplBase::_ParseAttributeTree(AttributeHandlerContext* context)
 {
 	int level = 0;
 
@@ -964,7 +1036,8 @@ ReaderImplBase::ReadCompressedBuffer(const SectionInfo& section)
 
 			while (compressedSize > 0) {
 				// read compressed buffer
-				size_t toRead = std::min(compressedSize, fScratchBufferSize);
+				size_t toRead = std::min((size_t)compressedSize,
+					fScratchBufferSize);
 				error = ReadBuffer(offset, fScratchBuffer, toRead);
 				if (error != B_OK)
 					return error;
@@ -993,7 +1066,11 @@ ReaderImplBase::ReadCompressedBuffer(const SectionInfo& section)
 		}
 
 		default:
+		{
+			fErrorOutput->PrintError("Error: Invalid compression type: %u\n",
+				section.compression);
 			return B_BAD_DATA;
+		}
 	}
 }
 

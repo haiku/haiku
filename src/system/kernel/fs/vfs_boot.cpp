@@ -16,6 +16,7 @@
 #include <OS.h>
 
 #include <boot/kernel_args.h>
+#include <directories.h>
 #include <disk_device_manager/KDiskDevice.h>
 #include <disk_device_manager/KDiskDeviceManager.h>
 #include <disk_device_manager/KPartitionVisitor.h>
@@ -45,11 +46,11 @@ static struct {
 	const char *path;
 	const char *target;
 } sPredefinedLinks[] = {
-	{"/system", "/boot/system"},
-	{"/bin", "/boot/system/bin"},
-	{"/etc", "/boot/common/etc"},
-	{"/var", "/boot/common/var"},
-	{"/tmp", "/boot/common/cache/tmp"},
+	{ kGlobalSystemDirectory,	kSystemDirectory },
+	{ kGlobalBinDirectory,		kSystemBinDirectory },
+	{ kGlobalEtcDirectory,		kCommonEtcDirectory },
+	{ kGlobalTempDirectory,		kCommonTempDirectory },
+	{ kGlobalVarDirectory,		kCommonVarDirectory },
 	{NULL}
 };
 

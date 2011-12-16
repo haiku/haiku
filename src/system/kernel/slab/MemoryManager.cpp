@@ -58,6 +58,9 @@ MemoryManager::AllocationEntry* MemoryManager::sAllocationEntryDontWait;
 bool MemoryManager::sMaintenanceNeeded;
 
 
+RANGE_MARKER_FUNCTION_BEGIN(SlabMemoryManager)
+
+
 // #pragma mark - kernel tracing
 
 
@@ -67,9 +70,12 @@ bool MemoryManager::sMaintenanceNeeded;
 //namespace SlabMemoryManagerCacheTracing {
 struct MemoryManager::Tracing {
 
-class MemoryManagerTraceEntry : public AbstractTraceEntry {
+class MemoryManagerTraceEntry
+	: public TRACE_ENTRY_SELECTOR(SLAB_MEMORY_MANAGER_TRACING_STACK_TRACE) {
 public:
 	MemoryManagerTraceEntry()
+		:
+		TraceEntryBase(SLAB_MEMORY_MANAGER_TRACING_STACK_TRACE, 0, true)
 	{
 	}
 };
@@ -592,7 +598,14 @@ MemoryManager::Free(void* pages, uint32 flags)
 /*static*/ status_t
 MemoryManager::AllocateRaw(size_t size, uint32 flags, void*& _pages)
 {
+#if SLAB_MEMORY_MANAGER_TRACING
+#if SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
+	AbstractTraceEntryWithStackTrace* traceEntry = T(AllocateRaw(size, flags));
+	size += sizeof(AllocationTrackingInfo);
+#else
 	T(AllocateRaw(size, flags));
+#endif
+#endif
 
 	size = ROUNDUP(size, SLAB_CHUNK_SIZE_SMALL);
 
@@ -617,7 +630,16 @@ MemoryManager::AllocateRaw(size_t size, uint32 flags, void*& _pages)
 					? CREATE_AREA_DONT_WAIT : 0)
 				| CREATE_AREA_DONT_CLEAR,
 			&virtualRestrictions, &physicalRestrictions, &_pages);
-		return area >= 0 ? B_OK : area;
+
+		status_t result = area >= 0 ? B_OK : area;
+		if (result == B_OK) {
+			fill_allocated_block(_pages, size);
+#if SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
+			_AddTrackingInfo(_pages, size, traceEntry);
+#endif
+		}
+
+		return result;
 	}
 
 	// determine chunk size (small or medium)
@@ -655,6 +677,11 @@ MemoryManager::AllocateRaw(size_t size, uint32 flags, void*& _pages)
 
 	chunk->reference = (addr_t)chunkAddress + size - 1;
 	_pages = (void*)chunkAddress;
+
+	fill_allocated_block(_pages, size);
+#if SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
+	_AddTrackingInfo(_pages, size, traceEntry);
+#endif
 
 	TRACE("MemoryManager::AllocateRaw() done: %p (meta chunk: %d, chunk %d)\n",
 		_pages, int(metaChunk - area->metaChunks),
@@ -836,6 +863,77 @@ MemoryManager::PerformMaintenance()
 				sMaintenanceNeeded = true;
 		}
 	}
+}
+
+
+#if SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
+
+/*static*/ bool
+MemoryManager::AnalyzeAllocationCallers(AllocationTrackingCallback& callback)
+{
+	for (AreaTable::Iterator it = sAreaTable.GetIterator();
+			Area* area = it.Next();) {
+		for (int32 i = 0; i < SLAB_META_CHUNKS_PER_AREA; i++) {
+			MetaChunk* metaChunk = area->metaChunks + i;
+			if (metaChunk->chunkSize == 0)
+				continue;
+
+			for (uint32 k = 0; k < metaChunk->chunkCount; k++) {
+				Chunk* chunk = metaChunk->chunks + k;
+
+				// skip free chunks
+				if (_IsChunkFree(metaChunk, chunk))
+					continue;
+
+				addr_t reference = chunk->reference;
+				if ((reference & 1) == 0 || reference == 1)
+					continue;
+
+				addr_t chunkAddress = _ChunkAddress(metaChunk, chunk);
+				size_t size = reference - chunkAddress + 1;
+
+				if (!callback.ProcessTrackingInfo(
+						_TrackingInfoFor((void*)chunkAddress, size),
+						(void*)chunkAddress, size)) {
+					return false;
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
+#endif	// SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
+
+
+/*static*/ ObjectCache*
+MemoryManager::DebugObjectCacheForAddress(void* address)
+{
+	// get the area
+	addr_t areaBase = _AreaBaseAddressForAddress((addr_t)address);
+	Area* area = sAreaTable.Lookup(areaBase);
+
+	if (area == NULL)
+		return NULL;
+
+	MetaChunk* metaChunk = &area->metaChunks[
+		((addr_t)address % SLAB_AREA_SIZE) / SLAB_CHUNK_SIZE_LARGE];
+
+	// get the chunk
+	if (metaChunk->chunkSize == 0)
+		return NULL;
+	if ((addr_t)address < metaChunk->chunkBase)
+		return NULL;
+
+	uint16 chunkIndex = _ChunkIndexForAddress(metaChunk, (addr_t)address);
+	Chunk* chunk = &metaChunk->chunks[chunkIndex];
+
+	addr_t reference = chunk->reference;
+	if ((reference & 1) == 0)
+		return (ObjectCache*)reference;
+
+	return NULL;
 }
 
 
@@ -1953,3 +2051,18 @@ MemoryManager::_DumpAreas(int argc, char** argv)
 
 	return 0;
 }
+
+
+#if SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
+
+void
+MemoryManager::_AddTrackingInfo(void* allocation, size_t size,
+	AbstractTraceEntryWithStackTrace* traceEntry)
+{
+	_TrackingInfoFor(allocation, size)->Init(traceEntry);
+}
+
+#endif // SLAB_MEMORY_MANAGER_ALLOCATION_TRACKING
+
+
+RANGE_MARKER_FUNCTION_END(SlabMemoryManager)

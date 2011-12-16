@@ -359,6 +359,9 @@ public:
 	inline Element* GetPrevious(Element* element) const;
 	inline Element* GetNext(Element* element) const;
 
+	inline bool Contains(Element* element) const;
+		// O(n)!
+
 	inline int32 Count() const;
 		// O(n)!
 
@@ -616,6 +619,20 @@ DOUBLY_LINKED_LIST_CLASS_NAME::GetNext(Element* element) const
 		result = sGetLink(element)->next;
 	return result;
 }
+
+
+DOUBLY_LINKED_LIST_TEMPLATE_LIST
+bool
+DOUBLY_LINKED_LIST_CLASS_NAME::Contains(Element* _element) const
+{
+	for (Element* element = First(); element; element = GetNext(element)) {
+		if (element == _element)
+			return true;
+	}
+
+	return false;
+}
+
 
 // Count
 DOUBLY_LINKED_LIST_TEMPLATE_LIST

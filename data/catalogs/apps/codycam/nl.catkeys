@@ -1,92 +1,93 @@
-1	dutch	x-vnd.Haiku.CodyCam	3353004969
-Can't find an available connection to the video window	CodyCam		Kan geen beschikbare verbinding naar het videovenster vinden
-Cannot connect the video source to the video window	CodyCam		Kan videobron niet met videovenster verbinden
-Cannot create a video window	CodyCam		Kan geen videovenster maken
-Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Kan geen videobron vinden. U hebt een webcam nodig om CodyCam te kunnen gebruiken.
+1	dutch; flemish	x-vnd.Haiku-CodyCam	2416864674
+Capturing Image…	VideoConsumer.cpp		Beeld vastleggen...
+Every 30 seconds	CodyCam		Elke 30 seconden
+File name:	CodyCam		Bestandsnaam:
+Last Capture: 	VideoConsumer.cpp		Laatst vastgelegd:
+Server login failed	VideoConsumer.cpp		Server-login is mislukt
+Remote host has closed the connection.\n	FtpClient		Host-op-afstand heeft de verbinding verbroken.\n
+Login:	CodyCam		Inloggen:
+Format:	CodyCam		Format:
+Every 2 hours	CodyCam		Elke 2 uur
+Closing the window\n	VideoConsumer.cpp		Het venster sluiten\n
+login ID expected	CodyCam		login ID verwacht
+Rate:	CodyCam		Snelheid:
+JPEG image	CodyCam		JPEG-afbeelding
+Capture Rate Menu	CodyCam		Menu beeldsnelheid
+File %s # unterminated quote at end of file\n	SettingsHandler		Bestand %s # niet-afgesloten aanhalingsteken aan het eind van bestand\n
+Password:	CodyCam		Wachtwoord:
+Passive FTP	CodyCam		Passieve FTP
+destination directory expected	CodyCam		doelmap verwacht
+password	CodyCam		wachtwoord
+Directory:	CodyCam		Map:
+Every minute	CodyCam		Elke minuut
+read: %ld\n	SftpClient		lees: %ld\n
+Waiting…	CodyCam		Bezig met wachten...
+Logging in…	VideoConsumer.cpp		Inloggen...
+Server:	CodyCam		Server:
+server address expected	CodyCam		serveradres verwacht
+Error creating output file	VideoConsumer.cpp		Fout bij het maken van het uitvoer-bestand
+unrecognized upload client specified	CodyCam		onbekende uploadclient gespecificeerd
+File %s ; Line %ld # unterminated quote\n	SettingsHandler		Bestand %s ; Regel %ld # niet-afgesloten aanhalingsteken\n
+Output	CodyCam		Uitvoer
+Every 15 minutes	CodyCam		Elke 15 minuten
 Cannot find an available video stream	CodyCam		Kan geen beschikbare videostream vinden
-Cannot find the media roster	CodyCam		Kan medianaamlijst niet vinden
+Can't find an available connection to the video window	CodyCam		Kan geen beschikbare verbinding naar het videovenster vinden
+Transmitting…	VideoConsumer.cpp		Verzenden...
 Cannot get a time source	CodyCam		Kan geen tijdsbron krijgen
+Every 8 hours	CodyCam		Elke 8 uur
+Rename failed	VideoConsumer.cpp		Hernoemen is mislukt
+Cannot start time source!	CodyCam		Kan tijdsbron niet starten!
 Cannot register the video window	CodyCam		Kan het videovenster niet registreren
-Cannot seek time source!	CodyCam		Kan geen tijdsbron zoeken!
+CodyCam	System name		CodyCam
+Every 24 hours	CodyCam		Elke 24 uur
+unknown command	SettingsHandler		onbekende opdracht
+Video settings	CodyCam		Video-instellingen
+Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Kan geen videobron vinden. U hebt een webcam nodig om CodyCam te kunnen gebruiken.
+still image filename expected	CodyCam		bestandsnaam van afbeelding verwacht
+invalid upload client %ld\n	VideoConsumer.cpp		ongeldige uploadclient %ld\n
+Every 15 seconds	CodyCam		Elke 15 seconden
+Error writing output file	VideoConsumer.cpp		Fout bij het maken van het uitvoerbestand
+image file format expected	CodyCam		bestandsformaat van afbeelding verwacht
 Cannot set the time source for the video source	CodyCam		Kan de tijdsbron voor de videobron niet instellen
+Type:	CodyCam		Type:
 Cannot set the time source for the video window	CodyCam		Kan de tijdsbron voor het videovenster niet instellen
+Stop video	CodyCam		Stop video
+Locking the window\n	VideoConsumer.cpp		Venster afsluiten
+File %s; Line %ld # %s	SettingsHandler		Bestand %s; Regel %ld # %s
+Couldn't find requested directory on server	VideoConsumer.cpp		Kan opgegeven map op server niet vinden
+Renaming…	VideoConsumer.cpp		Hernoemen...
+Local	CodyCam		Lokaal
+Error setting type of output file	VideoConsumer.cpp		Fout bij het instellen van het type uitvoerbestand
+upload client name expected	CodyCam		naam van uploadclient verwacht
+SFTP	CodyCam		SFTP
+Connected…	VideoConsumer.cpp		Verbonden...
+PASS <suppressed>  (real password sent)\n	FtpClient		PASS <onderdrukt> (echt wachtwoord verstuurd)\n
+Every 5 minutes	CodyCam		Elke 5 minuten
+read: %d\n	SftpClient		lees: %d\n
+OK	CodyCam		Oké
+Capture controls	CodyCam		Besturing voor het vastleggen
+Every hour	CodyCam		Elk uur
+Cannot connect the video source to the video window	CodyCam		Kan videobron niet met videovenster verbinden
+capture rate expected	CodyCam		beeldsnelheid verwacht
+Error getting initial latency for the capture node	CodyCam		Fout bij het verkrijgen van de initiële latentie voor het vastlegpunt
+Send to…	CodyCam		Versturen naar...
+on or off expected	Settings	Do not translate 'on' and 'off'	on of off verwacht
+Quit	CodyCam		Afsluiten
+cmd: '%s'\n	FtpClient		cmd: '%s'\n
+Never	CodyCam		Nooit
+Cannot create a video window	CodyCam		Kan geen videovenster maken
+Every 10 minutes	CodyCam		Elke 10 minuten
 Cannot start the video source	CodyCam		Kan videobron niet starten
 Cannot start the video window	CodyCam		Kan videovenster niet starten
-Cannot start time source!	CodyCam		Kan tijdsbron niet starten!
-Capture Rate Menu	CodyCam		Menu beeldsnelheid
-Capture controls	CodyCam		Besturing voor het vastleggen
-Capturing Image…	VideoConsumer.cpp		Beeld vastleggen...
-Closing the window\n	VideoConsumer.cpp		Het venster sluiten\n
-Connected…	VideoConsumer.cpp		Verbonden...
-Couldn't find requested directory on server	VideoConsumer.cpp		Kan opgegeven map op server niet vinden
-Directory:	CodyCam		Map:
-Error creating output file	VideoConsumer.cpp		Fout bij het maken van het uitvoer-bestand
-Error getting initial latency for the capture node	CodyCam		Fout bij het verkrijgen van de initiële latentie voor het vastlegpunt
-Error setting type of output file	VideoConsumer.cpp		Fout bij het instellen van het type uitvoerbestand
-Error writing output file	VideoConsumer.cpp		Fout bij het maken van het uitvoerbestand
-Every 10 minutes	CodyCam		Elke 10 minuten
-Every 15 minutes	CodyCam		Elke 15 minuten
-Every 15 seconds	CodyCam		Elke 15 seconden
-Every 2 hours	CodyCam		Elke 2 uur
-Every 24 hours	CodyCam		Elke 24 uur
-Every 30 minutes	CodyCam		Elke 30 minuten
-Every 30 seconds	CodyCam		Elke 30 seconden
-Every 4 hours	CodyCam		Elke 4 uur
-Every 5 minutes	CodyCam		Elke 5 minuten
-Every 8 hours	CodyCam		Elke 8 uur
-Every hour	CodyCam		Elk uur
-Every minute	CodyCam		Elke minuut
-FTP	CodyCam		FTP
-File	CodyCam		Bestand
-File %s # unterminated quote at end of file\n	SettingsHandler		Bestand %s # niet-afgesloten aanhalingsteken aan het eind van bestand\n
-File %s ; Line %ld # unterminated quote\n	SettingsHandler		Bestand %s ; Regel %ld # niet-afgesloten aanhalingsteken\n
-File %s; Line %ld # %s	SettingsHandler		Bestand %s; Regel %ld # %s
-File name:	CodyCam		Bestandsnaam:
-File transmission failed	VideoConsumer.cpp		Bestandsoverdracht is mislukt
-Format:	CodyCam		Format:
-Image Format Menu	CodyCam		Beeldformaat Menu
-JPEG image	CodyCam		JPEG-afbeelding
-Last Capture: 	VideoConsumer.cpp		Laatst vastgelegd:
-Local	CodyCam		Lokaal
-Locking the window\n	VideoConsumer.cpp		Venster afsluiten
-Logging in…	VideoConsumer.cpp		Inloggen...
-Login:	CodyCam		Inloggen:
-Never	CodyCam		Nooit
-OK	CodyCam		Oké
-Output	CodyCam		Uitvoer
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <onderdrukt> (echt wachtwoord verstuurd)\n
-Passive FTP	CodyCam		Passieve FTP
-Password:	CodyCam		Wachtwoord:
-Quit	CodyCam		Afsluiten
-Rate:	CodyCam		Snelheid:
-Remote host has closed the connection.\n	FtpClient		Host-op-afstand heeft de verbinding verbroken.\n
-Rename failed	VideoConsumer.cpp		Hernoemen is mislukt
-Renaming…	VideoConsumer.cpp		Hernoemen...
-SFTP	CodyCam		SFTP
-Send to…	CodyCam		Versturen naar...
-Server login failed	VideoConsumer.cpp		Server-login is mislukt
-Server:	CodyCam		Server:
-Start video	CodyCam		Start video
-Stop video	CodyCam		Stop video
-Transmitting…	VideoConsumer.cpp		Verzenden...
-Type:	CodyCam		Type:
-Video settings	CodyCam		Video-instellingen
-Waiting…	CodyCam		Bezig met wachten...
-capture rate expected	CodyCam		beeldsnelheid verwacht
-cmd: '%s'\n	FtpClient		cmd: '%s'\n
-destination directory expected	CodyCam		doelmap verwacht
-image file format expected	CodyCam		bestandsformaat van afbeelding verwacht
-invalid upload client %ld\n	VideoConsumer.cpp		ongeldige uploadclient %ld\n
-login ID expected	CodyCam		login ID verwacht
-on or off expected	Settings	Do not translate 'on' and 'off'	on of off verwacht
-password	CodyCam		wachtwoord
 password expected	CodyCam		wachtwoord verwacht
-read: %d\n	SftpClient		lees: %d\n
-read: %ld\n	SftpClient		lees: %ld\n
 reply: %d, %d\n	FtpClient		antwoord: %d, %d\n
+Cannot find the media roster	CodyCam		Kan medianaamlijst niet vinden
+Every 4 hours	CodyCam		Elke 4 uur
+FTP	CodyCam		FTP
+File transmission failed	VideoConsumer.cpp		Bestandsoverdracht is mislukt
+Cannot seek time source!	CodyCam		Kan geen tijdsbron zoeken!
+File	CodyCam		Bestand
+Image Format Menu	CodyCam		Beeldformaat Menu
+Every 30 minutes	CodyCam		Elke 30 minuten
 reply: '%s'\n	SftpClient		antwoord: '%s'\n
-server address expected	CodyCam		serveradres verwacht
-still image filename expected	CodyCam		bestandsnaam van afbeelding verwacht
-unknown command	SettingsHandler		onbekende opdracht
-unrecognized upload client specified	CodyCam		onbekende uploadclient gespecificeerd
-upload client name expected	CodyCam		naam van uploadclient verwacht
+Start video	CodyCam		Start video

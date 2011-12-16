@@ -16,6 +16,7 @@ class BButton;
 class BMenuField;
 class BMessenger;
 class BTextControl;
+class GUITeamUISettings;
 class MemoryView;
 class Team;
 class UserInterfaceListener;
@@ -39,8 +40,19 @@ public:
 
 	virtual void				MemoryBlockRetrieved(TeamMemoryBlock* block);
 
+			status_t			LoadSettings(
+									const GUITeamUISettings& settings);
+			status_t			SaveSettings(
+									BMessage& settings);
 private:
 	void						_Init();
+
+	void						_LoadMenuFieldMode(BMenuField* field,
+									const char* name,
+									const BMessage& settings);
+	status_t					_SaveMenuFieldMode(BMenuField* field,
+									const char* name,
+									BMessage& settings);
 
 private:
 	UserInterfaceListener*		fListener;

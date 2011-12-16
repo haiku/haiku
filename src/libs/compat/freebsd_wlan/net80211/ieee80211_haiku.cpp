@@ -385,9 +385,9 @@ wlan_if_l2com_alloc(void* data)
 	struct ifnet* ifp = (struct ifnet*)data;
 
 	ifp->if_l2com = _kernel_malloc(sizeof(struct ieee80211com), M_ZERO);
-	((struct ieee80211com*)(ifp->if_l2com))->ic_ifp = ifp;
 	if (ifp->if_l2com == NULL)
 		return B_NO_MEMORY;
+	((struct ieee80211com*)(ifp->if_l2com))->ic_ifp = ifp;
 	return B_OK;
 }
 

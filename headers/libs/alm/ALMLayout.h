@@ -35,12 +35,16 @@ public:
 									BALMLayout* friendLayout = NULL);
 	virtual						~BALMLayout();
 
-			XTab*				AddXTab();
-			YTab*				AddYTab();
+			BReference<XTab>	AddXTab();
+			BReference<YTab>	AddYTab();
+
 			int32				CountXTabs() const;
 			int32				CountYTabs() const;
 			XTab*				XTabAt(int32 index) const;
 			YTab*				YTabAt(int32 index) const;
+			/*! Order the tab list and return a reference to the list. */
+	const	XTabList&			OrderedXTabs();
+	const	YTabList&			OrderedYTabs();
 
 			Row*				AddRow(YTab* top, YTab* bottom);
 			Column*				AddColumn(XTab* left, XTab* right);
@@ -104,6 +108,7 @@ public:
 									YTab* bottom = NULL);
 	virtual	Area*				AddItem(BLayoutItem* item, Row* row,
 									Column* column);
+									
 	virtual	Area*				AddItemToRight(BLayoutItem* item,
 									XTab* right = NULL, YTab* top = NULL,
 									YTab* bottom = NULL);
@@ -130,6 +135,9 @@ protected:
 	virtual	void				DoLayout();
 
 private:
+	friend class XTab;
+	friend class YTab;
+
 			/*! Add a view without initialize the Area. */
 			BLayoutItem*		_CreateLayoutItem(BView* view);
 
@@ -139,16 +147,18 @@ private:
 			BSize				_CalculateMaxSize();
 			BSize				_CalculatePreferredSize();
 
-			void				_ParseGroupItem(GroupItem& item, XTab* left,
-									YTab* top, XTab* right, YTab* bottom);
+			void				_ParseGroupItem(GroupItem& item,
+									BReference<XTab> left, BReference<YTab> top,
+									BReference<XTab> right,
+									BReference<YTab> bottom);
 
 			LinearSpec*			fSolver;
 			LinearSpec			fOwnSolver;
 
-			XTab*				fLeft;
-			XTab*				fRight;
-			YTab*				fTop;
-			YTab*				fBottom;
+			BReference<XTab>	fLeft;
+			BReference<XTab>	fRight;
+			BReference<YTab>	fTop;
+			BReference<YTab>	fBottom;
 			BSize				fMinSize;
 			BSize				fMaxSize;
 			BSize				fPreferredSize;

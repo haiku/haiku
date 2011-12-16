@@ -30,7 +30,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <time.h>
-#include <wchar.h>
+
+#include <errno_private.h>
+#include <wchar_private.h>
 
 
 /*
@@ -66,13 +68,13 @@ wcsftime(wchar_t *wcs, size_t maxsize, const wchar_t *format,
 	 */
 	mbs = initial;
 	formatp = format;
-	sflen = wcsrtombs(NULL, &formatp, 0, &mbs);
+	sflen = __wcsrtombs(NULL, &formatp, 0, &mbs);
 	if (sflen == (size_t)-1)
 		goto error;
 	if ((sformat = malloc(sflen + 1)) == NULL)
 		goto error;
 	mbs = initial;
-	wcsrtombs(sformat, &formatp, sflen + 1, &mbs);
+	__wcsrtombs(sformat, &formatp, sflen + 1, &mbs);
 
 	/*
 	 * Allocate memory for longest multibyte sequence that will fit
@@ -82,7 +84,7 @@ wcsftime(wchar_t *wcs, size_t maxsize, const wchar_t *format,
 	 */
 	if (SIZE_MAX / MB_CUR_MAX <= maxsize) {
 		/* maxsize is prepostorously large - avoid int. overflow. */
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		goto error;
 	}
 	if ((dst = malloc(maxsize * MB_CUR_MAX)) == NULL)
@@ -91,7 +93,7 @@ wcsftime(wchar_t *wcs, size_t maxsize, const wchar_t *format,
 		goto error;
 	dstp = dst;
 	mbs = initial;
-	n = mbsrtowcs(wcs, &dstp, maxsize, &mbs);
+	n = __mbsrtowcs(wcs, &dstp, maxsize, &mbs);
 	if (n == (size_t)-2 || n == (size_t)-1 || dstp != NULL)
 		goto error;
 
@@ -104,7 +106,7 @@ error:
 	sverrno = errno;
 	free(sformat);
 	free(dst);
-	errno = sverrno;
+	__set_errno(sverrno);
 
 	return 0;
 }

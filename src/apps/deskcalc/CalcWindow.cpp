@@ -19,6 +19,7 @@
 #include <Dragger.h>
 #include <Screen.h>
 
+#include "CalcOptions.h"
 #include "CalcView.h"
 
 
@@ -36,7 +37,9 @@ CalcWindow::CalcWindow(BRect frame, BMessage* settings)
 	BScreen screen(this);
 	rgb_color baseColor = screen.DesktopColor();
 
-	SetSizeLimits(100.0, 400.0, 100.0, 400.0);
+	// Size Limits are defined in CalcView.h
+	SetSizeLimits(kMinimumWidthBasic, kMaximumWidthBasic,
+				  kMinimumHeightBasic, kMaximumHeightBasic);
 
 	frame.OffsetTo(B_ORIGIN);
 	fCalcView = new CalcView(frame, baseColor, settings);
@@ -57,11 +60,50 @@ CalcWindow::CalcWindow(BRect frame, BMessage* settings)
 		SetFrame(rect);
 	else
 		SetFrame(frame, true);
+
+	// Add shortcut keys to menu options
+	AddShortcut('0', B_COMMAND_KEY,
+		new BMessage(MSG_OPTIONS_KEYPAD_MODE_COMPACT));
+	AddShortcut('1', B_COMMAND_KEY,
+		new BMessage(MSG_OPTIONS_KEYPAD_MODE_BASIC));
+	AddShortcut('2', B_COMMAND_KEY,
+		new BMessage(MSG_OPTIONS_KEYPAD_MODE_SCIENTIFIC));
 }
 
 
 CalcWindow::~CalcWindow()
 {
+}
+
+
+void
+CalcWindow::MessageReceived(BMessage* msg)
+{
+	switch (msg->what) {
+		case MSG_OPTIONS_AUTO_NUM_LOCK:
+			fCalcView->ToggleAutoNumlock();
+			break;
+
+		case MSG_OPTIONS_AUDIO_FEEDBACK:
+			fCalcView->ToggleAudioFeedback();
+			break;
+
+		case MSG_OPTIONS_KEYPAD_MODE_COMPACT:
+			fCalcView->SetKeypadMode(KEYPAD_MODE_COMPACT);
+			break;
+
+		case MSG_OPTIONS_KEYPAD_MODE_BASIC:
+			fCalcView->SetKeypadMode(KEYPAD_MODE_BASIC);
+			break;
+
+		case MSG_OPTIONS_KEYPAD_MODE_SCIENTIFIC:
+			fCalcView->SetKeypadMode(KEYPAD_MODE_SCIENTIFIC);
+			break;
+
+		default:
+			BWindow::MessageReceived(msg);
+			break;
+	}
 }
 
 

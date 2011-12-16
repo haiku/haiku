@@ -1,0 +1,29 @@
+1	lithuanian	x-vnd.Haiku-Magnify	283320408
+no clip msg\n	In console, when clipboard is empty after clicking Copy image		iškarpinė tuščia\n
+Make square	Magnify-Main		Transformuoti į kvadratą
+Copy image	Magnify-Main		Kopijuoti paveikslą
+Magnify help	Magnify-Help		Didintuvo atmintinė
+usage: magnify [size] (magnify size * size pixels)\n	Console		Naudojimas: magnify [dydis]\n
+Stick coordinates	Magnify-Main		Fiksuoti koordinates
+Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Informacija:\nRodyti / slėpti informaciją – parodo arba paslepia visas šias naujas ypatybes\npastaba: kai informacija rodoma, padidintame vaizde atsiranda raudonas\nkvadratas, nurodantis, kurio taško RŽM reikšmės rodomos\nPridėti / pašalinti kryžmę – padidintame vaizde galima papildomai pridėti\nir pašalinti iki dviejų kryžmių, padedančių lygiuoti objektus\nKryžmės yra vaizduojamos kaip mėlyni kvadratai su iš jų einančiomis\nmėlynomis linijomis.\nRodyti / slėpti tinklelį – įjungia arba išjungia tinklelį, skiriantį visus taškus\nvieną nuo kito\n
+  freeze - freezes/unfreezes magnification of whatever the\n    cursor is currently over\n	Magnify-Help		Užfiksuoti / atlaisvinti vaizdą – užfiksuoja didintuve rodomą\nvaizdą arba panaikina šį fiksavimą\n
+Hide/Show grid	Magnify-Main		Rodyti / slėpti tinklelį
+magnify: size must be a multiple of 4\n	Console		didintuvas: dydis turi būti skaičiaus 4 kartotinis\n
+General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		Bendra informacija:\n32×32 – viršuje, kairėje esantys skaičiai nurodo, matomą\npadidintų taškų skaičių (plotis × aukštis)\nmastelis 8:1 – nurodo, kiek kartų padidinamas vaizdas.\nR:152 Ž:52 M:10 – raudonai apibraukto taško spalva\n(aprašyta raudonos, žalios ir mėlynos spalvos intensyvumu)\n
+Help	Magnify-Main		Žinynas
+Sizing/Resizing:\n  make square - sets the width and the height to the larger\n    of the two making a square image\n  increase/decrease window size - grows or shrinks the window\n    size by 4 pixels.\n    note: this window can also be resized to any size via the\n      resizing region of the window\n  increase/decrease pixel size - increases or decreases the number\n    of pixels used to magnify a 'real' pixel. Range is 1 to 16.\n	Magnify-Help		Dydis ir mastelis:\nTransformuoti į kvadratą – sulygina padidinto vaizdo aukštį ir\nplotį, iki didesniosios iš šių reikšmių\nPadidinti / sumažinti langą – keičia lango dydį 4 padidintais taškais\npastaba: lango dydį taip pat galite keisti įprastu būdu – traukdami\napatinį dešinįjį lango kampą\nPadidinti / sumažinti mastelį – keičia taško didinimo koeficientą.\nŠis koeficientas gali būti nuo 1 iki 16.\n
+Decrease pixel size	Magnify-Main		Sumažinti mastelį
+Magnify	System name		Didintuvas
+%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width×%height, mastelis %pixelSize:1
+Info	Magnify-Main		Informacija
+Remove a crosshair	Magnify-Main		Pašalinti kryžmę
+Freeze/Unfreeze image	Magnify-Main		Užfiksuoti / atlaisvinti vaizdą
+Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Vaizdo kopijavimas ir įrašymas:\nKopijuoti – nukopijuos rodomą vaizdą į iškarpinę\nĮrašyti – paklaus failo vardo ir tą failą įrašys paveikslėlį\n
+Hide/Show info	Magnify-Main		Rodyti / slėpti informaciją
+Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Navigavimas:\nrodyklių klavišais galite perkelti pažymėtą priemonę (spalvos\nindikatorių arba kryžmę) per vieną tašką. Pažymėtąją priemonę\nindikuoja kvadrate esantis kryžiukas (x)\noption+rodyklių klavišų kombinacija galite per vieną tašką perkelti\npelės žymeklį\n
+Save image	Magnify-Main		Įrašyti paveikslą
+Increase window size	Magnify-Main		Padidinti langą
+Decrease window size	Magnify-Main		Sumažinti langą
+Increase pixel size	Magnify-Main		Padidinti mastelį
+  size must be > 4 and a multiple of 4\n	Console		dydis turi būti didesnis už 4 skaičiaus 4 kartotinis\n
+Add a crosshair	Magnify-Main		Pridėti kryžmę

@@ -39,6 +39,8 @@
 #define B_HAIKU_ABI_GCC_2_BEOS			0x00020001
 #define B_HAIKU_ABI_GCC_2_HAIKU			0x00020002
 
+#define B_HAIKU_ABI_NAME				__HAIKU_ARCH_ABI
+
 #if __GNUC__ == 2
 #	define B_HAIKU_ABI					B_HAIKU_ABI_GCC_2_HAIKU
 #elif __GNUC__ == 4
@@ -77,5 +79,9 @@
 
 #define B_DEFINE_SYMBOL_VERSION(function, versionedSymbol)	\
 	__asm__(".symver " function "," versionedSymbol)
+
+#define B_DEFINE_WEAK_ALIAS(name, alias_name)	\
+	__typeof(name) alias_name __attribute__((weak, alias(#name)))
+
 
 #endif	/* _BE_BUILD_H */

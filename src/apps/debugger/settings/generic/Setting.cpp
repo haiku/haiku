@@ -34,6 +34,23 @@ BoolSetting::DefaultValue() const
 }
 
 
+// #pragma mark - FloatSetting
+
+
+setting_type
+FloatSetting::Type() const
+{
+	return SETTING_TYPE_FLOAT;
+}
+
+
+BVariant
+FloatSetting::DefaultValue() const
+{
+	return DefaultFloatValue();
+}
+
+
 // #pragma mark - SettingsOption
 
 
@@ -68,6 +85,22 @@ setting_type
 RangeSetting::Type() const
 {
 	return SETTING_TYPE_RANGE;
+}
+
+
+// #pragma mark - RectSetting
+
+setting_type
+RectSetting::Type() const
+{
+	return SETTING_TYPE_RECT;
+}
+
+
+BVariant
+RectSetting::DefaultValue() const
+{
+	return DefaultRectValue();
 }
 
 
@@ -110,6 +143,25 @@ BoolSettingImpl::BoolSettingImpl(const BString& id, const BString& name,
 
 bool
 BoolSettingImpl::DefaultBoolValue() const
+{
+	return fDefaultValue;
+}
+
+
+// #pragma mark - FloatSettingImpl
+
+
+FloatSettingImpl::FloatSettingImpl(const BString& id, const BString& name,
+	float defaultValue)
+	:
+	AbstractSetting(id, name),
+	fDefaultValue(defaultValue)
+{
+}
+
+
+float
+FloatSettingImpl::DefaultFloatValue() const
 {
 	return fDefaultValue;
 }
@@ -262,4 +314,23 @@ BVariant
 RangeSettingImpl::UpperBound() const
 {
 	return fUpperBound;
+}
+
+
+// #pragma mark - RectSettingImpl
+
+
+RectSettingImpl::RectSettingImpl(const BString& id, const BString& name,
+	const BRect& defaultValue)
+	:
+	AbstractSetting(id, name),
+	fDefaultValue(defaultValue)
+{
+}
+
+
+BRect
+RectSettingImpl::DefaultRectValue() const
+{
+	return fDefaultValue;
 }

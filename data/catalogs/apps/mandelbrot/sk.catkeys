@@ -1,10 +1,10 @@
 1	slovak	x-vnd.Haiku-Mandelbrot	3766380907
 File	Mandelbrot		Súbor
-Iterations	Mandelbrot		Iterácie
-Mandelbrot	System name		Mandelbrot
-Palette	Mandelbrot		Paleta
-Palette 1	Mandelbrot		Paleta 1
-Palette 2	Mandelbrot		Paleta 2
 Palette 3	Mandelbrot		Paleta 3
-Palette 4	Mandelbrot		Paleta 4
 Quit	Mandelbrot		Ukončiť
+Palette 2	Mandelbrot		Paleta 2
+Palette 4	Mandelbrot		Paleta 4
+Palette	Mandelbrot		Paleta
+Mandelbrot	System name		Mandelbrot
+Palette 1	Mandelbrot		Paleta 1
+Iterations	Mandelbrot		Iterácie

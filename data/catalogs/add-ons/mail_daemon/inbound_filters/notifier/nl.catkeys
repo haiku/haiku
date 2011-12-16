@@ -1,0 +1,16 @@
+1	dutch; flemish	x-vnd.Haiku-NewMailNotification	3624191291
+%num new message	filter		%num nieuw bericht
+%num new messages	filter		%num nieuwe berichten
+Keyboard LEDs	ConfigView		Toetsenbords LED's
+You have %num new messages for %name.	filter		U heeft %num nieuwe berichten voor %name.
+You have %num new message for %name.	filter		U heeft %num nieuw bericht voor %name.
+Log window	ConfigView		Logvenster
+Central beep	ConfigView		Centraal geluidssignaal
+Beep	ConfigView		Geluidssignaal
+Method:	ConfigView		Methode:
+Central alert	ConfigView		Centraal signaal
+Alert	ConfigView		Signaal
+none	ConfigView		geen
+New messages	filter		Nieuwe bericht
+New mails notification	ConfigView		Nieuwe e-mails notificatie
+OK	filter		OK

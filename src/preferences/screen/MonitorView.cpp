@@ -173,6 +173,7 @@ MonitorView::MessageReceived(BMessage* message)
 				fDesktopColor = color;
 				Invalidate();
 			}
+			break;
 		}
 
 		default:

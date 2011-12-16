@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Workshop: Filetypes, Attributes, Index and Queries</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/fi.png" alt="" /> Suomi</li>
+<li><a href="../fr/workshop-filetypes+attributes.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/workshop-filetypes+attributes.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/workshop-filetypes+attributes.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/workshop-filetypes+attributes.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/workshop-filetypes+attributes.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/workshop-filetypes+attributes.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/workshop-filetypes+attributes.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/workshop-filetypes+attributes.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/workshop-filetypes+attributes.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/workshop-filetypes+attributes.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../sk/workshop-filetypes+attributes.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../en/workshop-filetypes+attributes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="queries.html">Queries</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="applications.html">Applications</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td>
+	<a href="#preparations">Preparations</a><br />
+	<a href="#custom-filetype">Creating a custom filetype</a><br />
+	<a href="#icon">Icon</a><br />
+        <a href="#file-recognition">File recognition</a><br />
+	<a href="#description">Description</a><br />
+	<a href="#pref_app">Preferred Application</a><br />
+	<a href="#extra_attribute">Extra Attributes</a><br />
+	<a href="#indexing">Indexing</a><br />
+	<a href="#filling-data">Filling in the data</a><br />
+	<a href="#query-db">Querying the database</a>
+</td></tr>
+</table>
+
+<h1>Workshop: Filetypes, Attributes, Index and Queries</h1>
+
+<p>This is a workshop to show the use of <a href="attributes.html">Attributes</a>, <a href="queries.html">Queries</a>, the <a href="index.html">Index</a> and custom <a href="filetypes.html">Filetypes</a>. As an example, we build a database to keep track of our DVD library.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="preparations" name="preparations">Preparations</a></h2>
+<p>Let's first decide what filetype and attributes would serve our needs. Originally, I wanted to use a Bookmark file with a link to the movie's IMdB page, but Haiku doesn't have a "bookmarkable" browser like BeOS' <span class="app">NetPositive</span> at the moment, so I came up with this: The file itself will be a JPEG image for the movie cover.<br />
+To that we add a couple of attributes. Here we have to decide if we want to query it later (then we have to add it to the index) and if so, what type of attribute it should be. Numbers (int, float) can be evaluated differently than text (&lt;/=/&gt; vs. is/contains/starts with).</p>
+<p>Here are the attributes I'd like to see for my DVDs:</p>
+<ul>
+<li>Movie title</li>
+<li>Genre</li>
+<li>URL to e.g. IMdB</li>
+<li>Director/Cast</li>
+<li>Plot</li>
+<li>My rating from 1 to 10</li>
+<li>Coordinates in my shelf, e.g. A2, B3, so I find the DVD also in Real Life :)</li>
+<li>If so, who's borrowed the disk...</li>
+</ul>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="custom-filetype" name="custom-filetype">Creating a custom filetype</a></h2>
+<p>Start the <span class="app">Filetypes</span> preferences, and click on the <span class="button">Add...</span> button below the hierarchical list on the left. A small dialog opens and you specify in which MIME Group your new filetype will reside. You can also create a completely new group. Let's put it into "<i>applications</i>" and set the "Internal Name" to <i>DVDdb</i>.</p>
+<img src="images/workshop-filetypes+attributes-images/filetypes-new-file-type.png" alt="filetypes-new-file-type.png" />
+<p>Now, a panel for your new DVDdb filetype opens:</p>
+<img src="images/workshop-filetypes+attributes-images/filetypes-dvddb.png" alt="filetypes-dvddb.png" />
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="icon" name="icon">Icon</a></h3>
+<p>Double-click the icon well to open  <a href="applications/icon-o-matic.html">Icon-O-Matic</a> to design an icon for your filetype. You can also drag&amp;drop an icon from the icon well of another type, maybe as starting point for a modified version.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="file-recognition" name="file-recognition">File Recognition</a></h3>
+<p>You can add suffixes like .txt, .jpg, .mp3 to recognize files by their extention. Useful when working with files from systems without MIME typing. We don't need that for our example.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="description" name="description">Description</a></h3>
+<ul>
+<li><i>Type name</i> - Appears e.g. in the Attribute menu of Tracker windows and the "Kind" attribute of a file.</li>
+<li><i>Description</i> - A bit more detailed description.</li>
+</ul>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="pref_app" name="pref_app">Preferred Application</a></h3>
+<p>This pop-up menu shows a list of all applications that can handle this particular filetype. From here you can choose which program should open this specific file when it's double-clicked.</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="button">Select...</span></td><td> </td><td>opens a file dialog where you choose the application to open with this filetype. Here, we set <span class="app">ShowImage</span> to display the DVD's cover.</td></tr>
+<tr><td class="onelinetop"><span class="button">Same as...</span></td><td> </td><td>opens a file dialog where you choose any file that already has the preferred application set that you're looking for.</td></tr>
+</table>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="extra_attribute" name="extra_attribute">Extra Attributes</a></h3>
+<p>Here we enter all the custom attributes we decided on in our preparations. Clicking the <span class="button">Add...</span> button opens a panel:</p>
+<img src="images/workshop-filetypes+attributes-images/filetype-extra-attribute.png" alt="filetype-extra-attribute.png" />
+<ul>
+<li><p><i>Attribute name</i> - Appears e.g. as the column heading in Tracker windows.</p></li>
+<li><p><i>Internal name</i> - Is used for indexing and querying the attribute.</p></li>
+<li><i>Type</i> - Defines the value the attribute can hold and therefore how it can be queried.
+    <ul>
+    <li><span class="menu">String</span> for normal text</li>
+    <li><span class="menu">Boolean</span> for binary data: 0 or 1</li>
+    <li><span class="menu">Integer</span> for integer numbers with different ranges:
+        <ul>
+        <li><span class="menu">8 bit</span>: ± 255</li>
+        <li><span class="menu">16 bit</span>: ± 65,535</li>
+        <li><span class="menu">32 bit</span>: ± 4,294,967,295</li>
+        <li><span class="menu">64 bit</span>: ± 18,446,744,073,709,551,615</li>
+        </ul>
+    </li>
+    <li><span class="menu">Float</span> for floatingpoint numbers, single precision</li>
+    <li><span class="menu">Double</span> for floatingpoint numbers, double precision</li>
+    <li><span class="menu">Time</span> for time and date format</li>
+    </ul>
+</li>
+</ul>
+<ul>
+<li><i>Visible</i> - This checkbox determines if the attribute is visible in a Tracker window at all. Since the Tracker will be the interface to our DVD database, we check it and define its appearance with:<ul>
+    <li><span class="menu">Display as</span> - Leave on "Default". In the future more option will become available, e.g. a bar or stars for a rating etc.</li>
+    <li><span class="menu">Editable</span> - Determines if the attribute shall be editable in Tracker.</li>
+    <li><span class="menu">Width</span> - The default width of that attributes column in a Tracker window.</li>
+    <li><span class="menu">Alignment</span> - The attribute can be displayed left, center, or right aligned.</li>
+</ul></li></ul>
+<p>Now, insert all the info for our attributes:</p>
+<table summary="DVDdb Attributes" cellpadding="10" border="1">
+<tr><th>Internal Name</th><th>Attribute type</th><th>indexed?</th><th>Description</th></tr>
+<tr><td>DVDdb:title</td>	<td>text</td>		<td>yes</td>	<td>Movie title</td></tr>
+<tr><td>DVDdb:genre</td>	<td>text</td>		<td>yes</td>	<td>Genre</td></tr>
+<tr><td>DVDdb:url</td>		<td>text</td>		<td>no</td>	<td>URL</td></tr>
+<tr><td>DVDdb:cast</td>		<td>text</td>		<td>yes</td>	<td>Director/Cast</td></tr>
+<tr><td>DVDdb:plot</td>		<td>text</td>		<td>no</td>	<td>Plot</td></tr>
+<tr><td>DVDdb:rating</td>	<td>int-32</td>		<td>yes</td>	<td>Rating 1 to 10</td></tr>
+<tr><td>DVDdb:coord</td>	<td>text</td>		<td>no</td>	<td>Shelf</td></tr>
+<tr><td>DVDdb:lent</td>		<td>text</td>		<td>yes</td>	<td>Lent to</td></tr>
+</table>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="indexing" name="indexing">Indexing</a></h2>
+<p>Before we start entering data in our little DVD database, we should add certain attributes to the <a href="index.html">Index</a>. Only indexed attributes can use Haiku's fast <a href="queries.html">Queries</a>.<br />
+So, what will we be searching in the future? We probably won't ask "What's in the B4 coordinate in my shelf?" or "Does the IMdB URL or the plot of the movie contain the word 'pope-shenooda'?".</p>
+<p>This leaves these attributes:</p>
+<table summary="Attribute Type" cellpadding="10" border="1">
+<tr><th>Internal Name</th><th>Attribute type</th></tr>
+<tr><td>DVDdb:title</td><td>text</td></tr>
+<tr><td>DVDdb:genre</td><td>text</td></tr>
+<tr><td>DVDdb:cast</td><td>text</td></tr>
+<tr><td>DVDdb:rating</td><td>int-32</td></tr>
+</table>
+
+<p>To index them, we open a Terminal and simply add one attribute after the other:</p>
+<pre class="terminal">mkindex -t string DVDdb:title
+mkindex -t string DVDdb:genre
+mkindex -t string DVDdb:cast
+mkindex -t int DVDdb:rating</pre>
+<p>The <span class="cli">-t</span> option defines the type of attribute, which is "string" for all but the rating, which is an integer number.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="filling-data" name="filling-data">Filling in the data</a></h2>
+<p>Now, everything's set and we can begin putting some data into our base.<br />
+Since our basic file is a cover image, we go to some online resource like IMdB, look for our first movie and save the cover or movie poster in a new folder where we want to keep our DVDdb files.</p>
+<p>Opening that folder we see a typical Tracker window with one JPEG in it. Right-clicking it, we change its filetype to <tt>application/DVDdb</tt> with the <span class="app">Filetype Addon</span>. There's more info on this in the <a href="filetypes.html">Filetypes</a> document.</p>
+<p>Now, we activate all our DVDdb attributes from the <span class="menu">Attributes</span> menu of the Tracker window and rearrange the columns to our taste:</p>
+<img src="images/workshop-filetypes+attributes-images/filetypes-dvddb-empty.png" alt="filetypes-dvddb-empty.png" />
+<p>By clicking on a yet empty attribute (or pressing <span class="key">ALT</span> <span class="key">E</span>) we enter editing mode and fill each attribute. With <span class="key">TAB</span> and <span class="key">SHIFT</span> <span class="key">TAB</span> you can navigate between attributes.</p>
+<p>In our example, we usually start with a downloaded JPG cover and change its type to applications/DVDdb. There's another elegant way to produce a file to work with. Just copy an empty file of our filetype to <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span> and rename it to DVDdb.</p>
+<p>Right-clicking into a Tracker window, you'll find a new entry under <span class="menu">New...</span> besides the default "New folder".</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="query-db" name="query-db">Querying the database</a></h2>
+<p>Several hours of grunt work later, we have a nice little database that you can query to find all your Christina Ricci movies that have a 7+ rating...  :)</p>
+<p>You can assign a sensible attribute layout for query results of a specific filetype.<br />
+Open the folder containing your DVDdb files and arrange the attributes how you'd like to have query results presented. Copy this layout with <span class="menu">Attributes | Copy layout</span>.</p>
+<p>Open <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, create a new folder and rename it to <i>group/filetype</i>, replacing slashes with underscores; in our case "applications_DVDdb".</p>
+<p>Open the new folder and paste in the layout with <span class="menu">Attributes | Paste layout</span>. Voilà:</p>
+<img src="images/workshop-filetypes+attributes-images/query-dvddb.png" alt="query-dvddb.png" />
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="queries.html">Queries</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="applications.html">Applications</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

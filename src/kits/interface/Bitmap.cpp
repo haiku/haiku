@@ -554,7 +554,7 @@ BBitmap::Bounds() const
 /*!	\brief Returns the bitmap's creating flags.
 
 	This method informs about which flags have been used to create the
-	bitmap. It would for example tell you wether this is an overlay
+	bitmap. It would for example tell you whether this is an overlay
 	bitmap. If bitmap creation succeeded, all flags are fulfilled.
 
 	\return The bitmap's creation flags.

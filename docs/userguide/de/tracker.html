@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,6 +12,7 @@
  * Translators:
  *		Matthias
  *		Humdinger
+ *		taos
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -39,10 +40,12 @@
 <li><a href="../uk/tracker.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../zh_CN/tracker.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../pt_PT/tracker.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/tracker.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/tracker.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../en/tracker.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="teammonitor.html">Team Monitor</a> 
+ «  <a href="teammonitor.html"><acronym title="Team Monitor">Teammonitor</acronym></a> 
 ::  <a href="contents.html" class="uplink">Inhalt</a> 
 ::  <a href="tracker-add-ons.html">Tracker Add-Ons</a>  »
 </span></div>
@@ -67,16 +70,16 @@
 <h1>Tracker</h1>
 
 <p>Der Tracker ist die graphische Oberfläche zu den gespeicherten Dateien. Alle Dateioperationen (Dateien und Ordner anlegen oder löschen, kopieren, verschieben, oder ausführen) können hier vorgenommen werden.</p>
-<p>Der Tracker ist genauso eine Anwendung, wie alle anderen. Deshalb wird er auch in der Deskbar mit allen geöffneten Fenstern gelistet. Da der Arbeitsplatz mit den Icons auch "nur" ein Trackerfenster im Vollbild-Modus ist, macht sich es sich hier im Besonderen bemerkbar, sollte der Tracker einmal einfrieren. Am leichtesten kann er (und die Deskbar) über den <a href="teammonitor.html">Team Monitor</a> reaktiviert werden.</p>
+<p>Der Tracker ist genauso eine Anwendung, wie alle anderen. Deshalb wird er auch in der Deskbar mit allen geöffneten Fenstern gelistet. Da der Arbeitsplatz mit den Icons auch "nur" ein Trackerfenster im Vollbild-Modus ist, macht sich es sich hier im Besonderen bemerkbar, sollte der Tracker einmal einfrieren. Am leichtesten kann er (und die Deskbar) über den <a href="teammonitor.html"><acronym title="Team Monitor">Teammonitor</acronym></a> reaktiviert werden.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="mounting-volumes" name="mounting-volumes">Einbinden von Datenträgern</a></h2>
-<p>Um einen Datenträger (sei es eine Festplatte oder Partition, eine CD oder USB-Stick) unter Haiku verwenden zu können, muss dieser erst in das System eingebunden werden. Über einen Rechtsklick auf den Arbeitsplatz oder einem bereits eingebundenen Datenträger kann der Menüpunkt <span class="menu">Mount</span> aufgerufen werden. Dieser Punkt <span class="menu">Mount</span> findet sich auch in der Deskbar.</p>
+<p>Um einen Datenträger (sei es eine Festplatte oder Partition, eine CD oder USB-Stick) unter Haiku verwenden zu können, muss dieser erst in das System eingebunden werden. Über einen Rechtsklick auf den Arbeitsplatz oder einem bereits eingebundenen Datenträger kann der Menüpunkt <span class="menu">Einhängen</span> aufgerufen werden. Dieser Punkt <span class="menu">Einhängen</span> findet sich auch in der Deskbar.</p>
 <img src="images/tracker-images/mount-settings.png" alt="drill-down.png" />
-<p>Über <span class="menu">Settings</span> können Einstellungen vorgenommen werden, ob und welche Datenträger bei einem Systemstart eingebunden werden<br />
+<p>Es können <span class="menu">Einstellungen</span> vorgenommen werden, ob und welche Datenträger bei einem Systemstart eingebunden werden<br />
 Im obigen Bild beispielsweise werden automatisch alle Datenträger eingebunden, die während dem Betrieb hinzugefügt werden (beispielsweise eine CD oder ein USB-Stick) und während dem Systemstart nur die Datenträger, die beim letzten Mal eingebunden waren.</p>
-<div class="box-warning">Bevor man einen Datenträger, wie zum Beispiel einen USB-Stick, vom Computer trennt, sollte man ihn unbedingt vorher über "unmount" im System abmelden. Nur so wird sichergestellt, dass alle Dateioperationen auf diesem Datenträger vollständig abgeschlossen wurden. Anderenfalls ist ein Datenverlust nicht auszuschließen!</div>
+<div class="box-warning">Bevor man einen Datenträger, wie zum Beispiel einen USB-Stick, vom Computer trennt, sollte man ihn unbedingt vorher über "Aushängen" im System abmelden. Nur so wird sichergestellt, dass alle Dateioperationen auf diesem Datenträger vollständig abgeschlossen wurden. Anderenfalls ist ein Datenverlust nicht auszuschließen!</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -91,7 +94,7 @@ Dies gilt auch bei der Navigation über die Tastatur. Mehr hierzu unter <a href=
 <p>Anstatt jeden Unterordner über einen Doppelklick aufrufen zu müssen, kann man im Tracker sehr einfach durch die Ordnerstruktur navigieren:</p>
 <img src="images/tracker-images/drill-down.png" alt="drill-down.png" />
 <!-- screenshot needs updating to show /boot/system/documentation -->
-<p>Wird ein Ordner, oder ein Datenträger mit der rechten Maustaste angeklickt, so ist der erste Eintrag im Kontextmenü dieser Ordner, beziehungsweise Datenträger selbst. Man kann nun sehr einfach über das aufklappende Untermenü in der Ordnerstruktur bis zum Zielverzeichnis, respektive der gewünschten Datei navigieren und über einen Klick öffnen. Das obige Bild zeigt beispielsweise den Inhalt des Ordners <span class="path">/boot/home/config/</span>.<br />
+<p>Wird ein Ordner, oder ein Datenträger mit der rechten Maustaste angeklickt, so ist der erste Eintrag im Kontextmenü dieser Ordner, beziehungsweise Datenträger selbst. Man kann nun sehr einfach über das aufklappende Untermenü in der Ordnerstruktur bis zum Zielverzeichnis, respektive der gewünschten Datei navigieren und über einen Klick öffnen. Das obige Bild zeigt beispielsweise den Inhalt des Ordners <span class="path"><acronym title="/boot/home/config/">/boot/Benutzer/Konfiguration</acronym></span>.<br />
 Wenn man bei dieser Art der Navigation zusätzlich noch einen Datei zieht, wird sie an den Ort verschoben (innerhalb des gleichen Datenträgers) oder kopiert (auf einen anderen Datenträger) über dem man sie los lässt.</p>
 <p>Eine ähnliche Navigationsmethode steht in jedem Tracker-Fenster zur Verfügung:</p>
 <img src="images/tracker-images/window-drill-down.png" alt="window-drill-down.png" />
@@ -116,70 +119,74 @@ Dieses "type-ahead" filtern wird in den <a href="#tracker-preferences.html">Trac
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="appearance" name="appearance">Aussehen</a></h2>
 <img src="images/tracker-images/window-menu.png" alt="window-menu.png" />
-<p>Im Menü <span class="menu">Window</span> können drei verschiedene Ansichten für das Tracker-Fenster eingestellt werden:</p>
+<p>Im Menü <span class="menu">Fenster</span> können drei verschiedene Ansichten für das Tracker-Fenster eingestellt werden:</p>
 <ul>
-<li><p><b>Icon View</b> (<span class="key">ALT</span> <span class="key">1</span>) - Große Icons; die Größe kann im dazugehörigen Untermenü oder über die Tastenkombination <span class="key">ALT</span> <span class="key">+</span> / <span class="key">ALT</span> <span class="key">-</span> eingestellt werden.</p></li>
-<li><p><b>Mini Icon View</b> (<span class="key">ALT</span> <span class="key">2</span>) - Kleine Icons.</p></li>
-<li><p><b>List View</b> (<span class="key">ALT</span> <span class="key">3</span>) - Eine detaillierte Liste der Dateien; hier ist es möglich die unterschiedlichen <i>Attribute</i> zu den Dateien anzeigen zu lassen. (mehr dazu im Abschnitt <a href="attributes.html">Attributes</a>.)</p></li>
+<li><p><span class="menu">Icon-Ansicht</span> (<span class="key">ALT</span> <span class="key">1</span>) - Große Icons; die Größe kann im dazugehörigen Untermenü oder über die Tastenkombination <span class="key">ALT</span> <span class="key">+</span>/<span class="key">-</span> eingestellt werden.</p></li>
+<li><p><span class="menu">Mini-Icon-Ansicht</span> (<span class="key">ALT</span> <span class="key">2</span>) - Kleine Icons.</p></li>
+<li><p><span class="menu">Listenansicht</span> (<span class="key">ALT</span> <span class="key">3</span>) - Eine detaillierte Liste der Dateien; hier ist es möglich die unterschiedlichen <i>Attribute</i> zu den Dateien anzeigen zu lassen. (Mehr dazu im Abschnitt <a href="attributes.html">Attribute</a>.)</p></li>
 </ul>
-<p>Das <span class="menu">Window</span>-Menü hat noch weitere Einträge:</p>
+<p>Das <span class="menu">Fenster</span>-Menü hat noch weitere Einträge:</p>
 <ul>
-<li><p><b>Resize Window</b> (<span class="key">ALT</span> <span class="key">Y</span>) - Ändert die Fenstergröße auf einen sinnvollen Wert.</p></li>
-<li><p><b>Clean Up</b> (<span class="key">ALT</span> <span class="key">K</span>) - Die Icons werden an einem unsichtbaren Raster ausgerichtet; bei zusätzlichem Drücken von <span class="key">SHIFT</span> ändert sich der Menüpunkt zu <span class="menu">Clean Up All</span> und die Icons werden zusätzlich noch alphabetisch sortiert.</p></li>
-<li><p><b>Select...</b> (<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">A</span>) - Wählt Dateien anhand einer <a href="http://de.wikipedia.org/wiki/Regul%C3%A4re_Ausdr%C3%BCcke" class="external free" title="Wikipedia: Regulärer Ausdruck">Regulärer Ausdruck</a> aus.</p></li>
-<li><p><b>Close</b> (<span class="key">ALT</span> <span class="key">W</span>) - Schließt das Tracker-Fenster; bei zusätzlichem Drücken von <span class="key">SHIFT</span>  ändert sich der Menüpunkt zu <span class="menu">Close All</span> und alle Tracker-Fenster in allen Workspaces werden geschlossen.</p></li>
-<li><p><b>Close All in Workspace</b> (<span class="key">ALT</span> <span class="key">Q</span>) - Schließt alle Tracker-Fenster im akutellen Workspace; hilfreich, wenn man die Taste <span class="key">OPT</span> nicht drückte, als man durch die Verzeichnisse navigierte und nun der gesamte Arbeitsplatz voll von Tracker-Fenstern ist.</p></li>
+<li><p><span class="menu">Optimale Größe</span> (<span class="key">ALT</span> <span class="key">Y</span>) - Ändert die Fenstergröße auf einen sinnvollen Wert.</p></li>
+<li><p><span class="menu">Arrange by...</span> - Nur in der Icon und Mini-Icon Ansicht nutzbar, gestattet es über ein Untermenü die Icons nach diversen Eigenschaften zu sortieren:</p>
+	<ul>
+	<li><p><span class="menu">Name</span>, <span class="menu">Real name</span>, <span class="menu">Size</span>, <span class="menu">Modified</span>, <span class="menu">Created</span>, <span class="menu">Kind</span>, <span class="menu">Location</span>, <span class="menu">Permissions</span></p></li>
+	<li><p><span class="menu">Reverse order</span> - Kehrt die Sortierreihenfolge um.</p></li>
+	<li _translation_id="4339"><p><span class="menu">Clean up</span> (<span class="key">ALT</span> <span class="key">K</span>) -Die Icons werden an einem unsichtbaren Raster ausgerichtet; bei zusätzlichem Drücken von <span class="key">SHIFT</span> ändert sich der Menüpunkt zu <span class="menu">Clean up all</span> und die Icons werden zusätzlich noch nach oben gewähltem Kriterium sortiert.</p></li>
+	</ul></li>
+<li><p><span class="menu">Auswählen...</span> (<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">A</span>) - Wählt Dateien anhand einer <a href="http://de.wikipedia.org/wiki/Regul%C3%A4re_Ausdr%C3%BCcke" class="external free" title="Wikipedia: Regulärer Ausdruck">Regulärer Ausdruck</a> aus.</p></li>
+<li><p><span class="menu">Schließen</span> (<span class="key">ALT</span> <span class="key">W</span>) - Schließt das Tracker-Fenster; bei zusätzlichem Drücken von <span class="key">SHIFT</span>  ändert sich der Menüpunkt zu <span class="menu">Alle schließen</span> und alle Tracker-Fenster auf allen Arbeitsflächen werden geschlossen.</p></li>
+<li><p><span class="menu">Alle auf dieser Arbeitsfläche schließen</span> (<span class="key">ALT</span> <span class="key">Q</span>) - Schließt alle Tracker-Fenster auf der aktuellen Arbeitsfläche; hilfreich, wenn man die Taste <span class="key">OPT</span> nicht drückte, als man durch die Verzeichnisse navigierte und nun der gesamte Arbeitsplatz voll von Tracker-Fenstern ist.</p></li>
 </ul>
-<p>Wenn man nicht alle Icons mittels <span class="menu">Clean Up</span> (<span class="key">ALT</span> <span class="key">K</span>) neu ausrichten möchte, sondern nur einige, dann kann man diese markieren und sie - beigedrückter <span class="key">ALT</span>-Taste verschieben. Sie werden dann am Raster ausgerichtet.</p>
-<p>Die restlichen Unterpunkte sind hinreichend selbsterklärend. Genauer soll jedoch auf den Punkt Einstellunge ("Preferences") eingegangen werden:</p>
+<p>Wenn man nicht alle Icons mittels <span class="menu">Icons ausrichten</span> (<span class="key">ALT</span> <span class="key">K</span>) neu ausrichten möchte, sondern nur einige, dann kann man diese markieren und sie - beigedrückter <span class="key">ALT</span>-Taste verschieben. Sie werden dann am Raster ausgerichtet.</p>
+<p>Die restlichen Unterpunkte sind hinreichend selbsterklärend. Genauer soll jedoch auf den Punkt "Einstellungen" eingegangen werden:</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tracker-preferences" name="tracker-preferences">Tracker Einstellungen</a></h3>
-<p>Über <span class="menu">Window | Preferences...</span> wird ein Fenster geöffnet, dessen zahlreiche Einstellungen sich stellenweise nicht sofort erschließen. Da jedoch alle Einstellungen direkt angewendet werden, kann man die Änderungen sofort erkennen.<br />Hier eine kurze Erklärung zu den nicht ganz offensichtlichen Einstellungen:</p>
+<p>Über <span class="menu">Fenster | Einstellungen...</span> wird ein Fenster geöffnet, dessen zahlreiche Einstellungen sich stellenweise nicht sofort erschließen. Da jedoch alle Einstellungen direkt angewendet werden, kann man die Änderungen sofort erkennen.<br />Hier eine kurze Erklärung zu den nicht ganz offensichtlichen Einstellungen:</p>
 <ul>
-<li><p><b>Desktop</b> - Hier kann ausgewählt werden, ob jedes eingebundene Laufwerk für sich am Arbeitsplatz angezeigt wird, oder alle zusammen in einem Tracker-Fenster, das mit dem Icon "Disks" repräsentiert wird.</p></li>
-<li><p><b>Windows</b> - Wenn man <span class="menu">Single window navigation</span> markiert, wird jeder geöffnete Ordner im gleichen Fenster, statt in seinem eigenen angezeigt. Diese Einstellung unterscheidet sich zu der oben erwähnten Möglichkeit, einen Ordner bei gedrückter <span class="key">OPT</span>-Taste zu öffnen, da hier die individuellen Einstellungen zu Anzeige und Position des Fensters verloren gehen.
+<li><p><span class="menu">Desktop</span> - Hier kann ausgewählt werden, ob jedes eingebundene Laufwerk für sich am Arbeitsplatz angezeigt wird, oder alle zusammen in einem Tracker-Fenster, das mit dem Icon "Datenträger" repräsentiert wird.</p></li>
+<li><p><span class="menu">Fenster</span> - Wenn man <span class="menu">Einzelfenster-Modus</span> markiert, wird jeder geöffnete Ordner im gleichen Fenster, statt in seinem eigenen angezeigt. Diese Einstellung unterscheidet sich zu der oben erwähnten Möglichkeit, einen Ordner bei gedrückter <span class="key">OPT</span>-Taste zu öffnen, da hier die individuellen Einstellungen zu Anzeige und Position des Fensters verloren gehen.
 <br /><br />
 <img src="images/tracker-images/tracker-preferences-navigator.png" alt="tracker-preferences-navigator.png" />
 </p>
 <p>Auch wenn die Ein-Fenster-Navigation sich vielleicht vertrauter anfühlt, sollte man der ursprünglichen Navigation von Haiku eine Chance geben, da es durchaus sein kann, dass man hiermit schneller navigiert. Andererseits bietet nur diese Einstellung die Möglichkeit, einen <i>Navigator</i> einzublenden, in dem man per Symbol "vor" und "zurück", sowie ein Verzeichnis höher gehen und einen neuen Verzeichnispfad hineinkopieren kann.</p>
-<p>Anstatt zu den Dateien zu springen während man lostippt, gibt es mit <span class="menu">Type-ahead filtering</span> auch noch die Möglichkeit alle Dateien rauszufiltern, die die eingegebene Zeichenfolge nicht enthalten, siehe <a href="#type-ahead-filter">weiter oben</a>.</p></li>
-<li><p><b>Date and Time</b> - Einstellung des Datumsformats für die Tracker-Fenster.</p></li>
-<li><p><b>Trash</b> - Die Verhaltensweise beim Löschen einer Datei kann hier eingestellt werden.</p></li>
-<li><p><b>Volume Icons</b> - Die Farbe des optionalen Füllstandsanzeigers bei den eingebundenen Datenträger kann hier eingestellt werden.</p></li>
+<p>Anstatt zu den Dateien zu springen während man lostippt, gibt es mit <span class="menu">Filtern während der Eingabe</span> auch noch die Möglichkeit alle Dateien rauszufiltern, die die eingegebene Zeichenfolge nicht enthalten, siehe <a href="#type-ahead-filter">weiter oben</a>.</p></li>
+<li><p><span class="menu">Papierkorb</span> - Die Verhaltensweise beim Löschen einer Datei kann hier eingestellt werden.</p></li>
+<li><p><span class="menu">Datenträger-Icons</span> - Die Farbe des optionalen Füllstandsanzeigers bei den eingebundenen Datenträger kann hier eingestellt werden.</p></li>
 </ul>
-<p>Dieses Einstellungs-Fenster kann auch mittels <span class="app">Tracker</span> aus den <span class="menu">Preferences</span> der Deskbar aufgerufen werden.</p>
+<p>Dieses Einstellungs-Fenster kann auch mittels <span class="app">Tracker</span> aus den <span class="menu">Einstellungen</span> der Deskbar aufgerufen werden.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="working-with-files" name="working-with-files">Arbeiten mit Dateien</a></h2>
-<p>Das Kontextmenü zu einer Datei entspricht in weiten Teilen dem Menü <span class="menu">File</span>.</p>
+<p>Das Kontextmenü zu einer Datei entspricht in weiten Teilen dem <span class="menu">Datei</span> Menü.</p>
 <p>Die Menüpunkte sind im Großen und Ganzen selbsterklärend.</p>
 <ul>
-<li><p><b>Find...</b> - Suche nach einer Datei oder einem Ordner (siehe hierzu näheres unter: <a href="queries.html">Query</a>).</p></li>
-<li><p><b>New</b> - Erstellt einen neuen Ordner oder eine neue Datei basierend auf einer Vorlage ("<i>template</i>").
+<li><p><span class="menu">Suchen...</span> - Suche nach einer Datei oder einem Ordner (siehe hierzu näheres unter: <a href="queries.html">Query</a>).</p></li>
+<li><p><span class="menu">Neu</span> - Erstellt einen neuen Ordner oder eine neue Datei basierend auf einer Vorlage.
 <br /><br />
 <img src="images/tracker-images/new-menu.png" alt="new-menu.png" />
 </p>
-<p>Wählt man <span class="menu">Edit Templates...</span> aus, öffnet sich der Ordner <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span>. Wird in diesem Verzeichnis eine Datei angelegt, wird diese - zusammen mit ihrem Dateityp und sämtlichen Attributen - als Vorlage im Menü <span class="menu">New</span> angezeigt. In diesem Beispiel die Datei "Text" mit dem Dateityp <tt>text/plain</tt>. Unter <a href="filetypes.html">Filetypes</a> wird näher auf die Dateitypen eingegangen.</p></li>
-<li><p><b>Open With...</b> - Ein Untermenü mit allen Anwendungen, die diese Datei - besser: diesen Dateityp - öffen können.
+<p>Wählt man <span class="menu">Vorlagen bearbeiten...</span> aus, öffnet sich der Ordner <span class="path"><acronym title="/boot/home/config/settings/Tracker/Tracker New Templates">/boot/Benutzer/Konfiguration/settings/Tracker/Tracker Neu-Vorlage</acronym></span>. Wird in diesem Verzeichnis eine Datei angelegt, wird diese - zusammen mit ihrem Dateityp und sämtlichen Attributen - als Vorlage im Menü <span class="menu">Neu</span> angezeigt. In diesem Beispiel die Datei "Text" mit dem Dateityp <tt>text/plain</tt>. Näher wird darauf unter <a href="filetypes.html"><acronym title="Filetypes">Dateitypen</acronym></a> eingegangen.</p></li>
+<li><p><span class="menu">Öffnen mit...</span> - Ein Untermenü mit allen Anwendungen, die diese Datei - besser: diesen Dateityp - öffen können.
 <br /><br />
 <img src="images/tracker-images/open-with.png" alt="open-with.png" />
 </p>
-<p>Die Anwendung, die diese Datei auch öffen würde, wenn man sie doppelt anklickt, ist mit einem Häckchen versehen. Des weitern werden alle Programme gelistet, die diesen Dateityp öffnen können, hier wäre das <tt>text/plain</tt>. Danach werden die Anwendungen aufgelistet, die den "supertype" - hier wäre das <tt>text/*</tt> - öffnen. Ganz unten in der Liste sind alle die Programme, die jede Art von Dateityp öffnen können. Wenn man nicht auf eines der gelisteten Programme klickt, sondern auf den Eintrag <span class="menu">Open With...</span> direkt, dann öffnet sich folgendes Fenster: </p>
+<p>Die Anwendung, die diese Datei auch öffen würde, wenn man sie doppelt anklickt, ist mit einem Häckchen versehen. Desweiteren werden alle Programme gelistet, die diesen Dateityp öffnen können, hier wäre das <tt>text/plain</tt>. Danach werden die Anwendungen aufgelistet, die den "supertype" - hier wäre das <tt>text/*</tt> - öffnen. Ganz unten in der Liste sind alle die Programme, die jede Art von Dateityp öffnen können. Wenn man nicht auf eines der gelisteten Programme klickt, sondern auf den Eintrag <span class="menu">Öffnen mit...</span> direkt, dann öffnet sich folgendes Fenster: </p>
 <br /><br />
 <img src="images/tracker-images/open-with-preferred.png" alt="open-with-preferred" />
-<p>Hier werden nochmals alle Programme aufgelistet, die bereits im Untermenü zu sehen waren, jedoch mit zusätzlichen Informationen. Wenn man ein Programm auswählt und auf <span class="button">Open and Make Preferred</span> klickt, kann man gleichzeitig die bevorzugte Anwendung für diesen Dateityp, hier <tt>text/plain</tt> setzen.</p></li>
-<li><b>Get Info</b>
+<p>Hier werden nochmals alle Programme aufgelistet, die bereits im Untermenü zu sehen waren, jedoch mit zusätzlichen Informationen. Wenn man ein Programm auswählt und auf <span class="button">Öffnen und zur Bevorzugten machen</span> klickt, kann man gleichzeitig die bevorzugte Anwendung für diesen Dateityp, hier <tt>text/plain</tt> setzen.</p></li>
+<li><span class="menu">Datei-Info</span>
 <br /><br />
 <img src="images/tracker-images/get-info.png" alt="get-info" />
-<p>In dem sich öffnenden Fenster werden Informationen zu der ausgewählten Datei angezeigt. Ein Klick auf den Dateipfad öffnet ein Trackerfenster. Es besteht hier auch die Möglichkeit, für diese Datei die bevorzugte Anwendung auszuwählen und - wenn das kleine Dreieck geklickt wird - im Weiteren die Dateirechte und den Besitzer der Datei festlegen. (Hinweis: bis Haiku ein Mehr-Benutzer-System ist, "gehören" alle Dateien dem Benutzer "baron"; wer das ist, und warum ihm alle Dateien gehören, erschließt sich nach der Lektüre der "BeOS Bible" von Scott Hacker.)</p></li>
-<li><p><b>Edit Name</b>, <b>Duplicate</b> and <b>Move to Trash</b> - Hiermit wird der Dateiname geändert, die Datei wird dupliziert oder in den Papierkorb verschoben.</p></li>
-<li><p><b>Move to</b>, <b>Copy to</b> and <b>Create Link</b> - Über die Navigation durch Untermenüs wird die Datei zum Ziel verschoben, kopiert oder dort ein Verweis zu der Datei erzeugt. Wenn man gleichzeitig <span class="key">SHIFT</span> drück, kann man einen relativen Verweis anlegen.</p></li>
-<li><p><b>Cut</b>, <b>Copy</b> and <b>Paste</b> - Die Datei wird mittels Zwischenablage ausgeschnitten, kopiert oder eingefügt. Wenn gleichzeitig <span class="key">SHIFT</span> gedrückt wird, beim Aufrufen dieses Menüpunktes, können per <b>Copy/Cut more</b> mehrere Dateien in die Zwischenablage kopiert / ausgeschnitten werden; bei Drücken von <span class="key">SHIFT</span> wird die Datei bei der entsprechenden Auswahl nicht eingefügt, sondern lediglich ein Verweis dazu.</p></li>
-<li><p><b>Identify</b> - Hiermit wird der Dateityp einer Datei festgestellt. So wird beispielsweise einer mittels <span class="cli">wget</span> in das Dateisystem kopierten Datei nicht automatisch ein Dateityp zugeordnet. Hält man <span class="key">SHIFT</span> beim Aufruf des Kontextmenüs, ändert sich dieser Eintrag zu <b>Force Identify</b>, das den Dateityp erkennt und setzt, auch wenn schon eine Bezeichnung besteht.</p></li>
-<li><p><b>Add-Ons</b> - Öffnet ein Untermenü mit allen für diesen Dateityp zutreffenden <a href="tracker-add-ons.html">Tracker Add-ons</a>.</p></li>
+<p>In dem sich öffnenden Fenster werden Informationen zu der ausgewählten Datei angezeigt. Ein Klick auf den Dateipfad öffnet ein Trackerfenster. Es besteht hier auch die Möglichkeit, für diese Datei die bevorzugte Anwendung auszuwählen und - wenn das kleine Dreieck neben Berechtigungen geklickt wird - im Weiteren die Dateirechte und den Besitzer der Datei festlegen. (Hinweis: bis Haiku ein Mehr-Benutzer-System ist, "gehören" alle Dateien dem Benutzer "baron"; wer das ist, und warum ihm alle Dateien gehören, erschließt sich nach der Lektüre der "BeOS Bible" von Scott Hacker.)</p></li>
+<li><p><span class="menu">Umbenennen</span>, <span class="menu">Duplizieren</span> and <span class="menu">In Papierkorb verschieben</span> - Hiermit wird der Dateiname geändert, die Datei wird dupliziert oder in den Papierkorb verschoben.</p></li>
+<li><p><span class="menu">Verschieben nach</span>, <span class="menu">Kopieren nach</span> and <span class="menu">Verknüpfung erstellen</span> - Über die Navigation durch Untermenüs wird die Datei zum Ziel verschoben, kopiert oder dort ein Verweis zu der Datei erzeugt. Wenn man gleichzeitig <span class="key">SHIFT</span> drück, kann man einen relativen Verweis anlegen.</p></li>
+<li><p><span class="menu">Ausschneiden</span>, <span class="menu">Kopieren</span> and <span class="menu">Einfügen</span> - Die Datei wird mittels Zwischenablage ausgeschnitten, kopiert oder eingefügt. Wenn gleichzeitig <span class="key">SHIFT</span> gedrückt wird, beim Aufrufen dieses Menüpunktes, können per <span class="menu">Mehr kopieren/ausschneiden</span> mehrere Dateien in die Zwischenablage kopiert / ausgeschnitten werden; bei Drücken von <span class="key">SHIFT</span> wird die Datei bei der entsprechenden Auswahl nicht eingefügt, sondern lediglich ein Verweis dazu.</p></li>
+<li><p><span class="menu">Identifizieren</span> - Hiermit wird der Dateityp einer Datei festgestellt. So wird beispielsweise einer mittels <span class="cli">wget</span> in das Dateisystem kopierten Datei nicht automatisch ein Dateityp zugeordnet. Hält man <span class="key">SHIFT</span> beim Aufruf des Kontextmenüs, ändert sich dieser Eintrag zu <span class="menu">Identifizierung erzwingen</span>, das den Dateityp erkennt und setzt, auch wenn schon eine Bezeichnung besteht.</p></li>
+<li><p><span class="menu">Add-ons</span> - Öffnet ein Untermenü mit allen für diesen Dateityp zutreffenden <a href="tracker-add-ons.html">Tracker Add-ons</a>.</p></li>
 </ul>
 
 <h2>
@@ -194,7 +201,7 @@ Dieses "type-ahead" filtern wird in den <a href="#tracker-preferences.html">Trac
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="teammonitor.html">Team Monitor</a> 
+ «  <a href="teammonitor.html"><acronym title="Team Monitor">Teammonitor</acronym></a> 
 ::  <a href="contents.html" class="uplink">Inhalt</a> 
 ::  <a href="tracker-add-ons.html">Tracker Add-Ons</a>  »
 </span></div>

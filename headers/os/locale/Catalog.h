@@ -20,7 +20,7 @@ struct entry_ref;
 class BCatalog {
 public:
 								BCatalog();
-								BCatalog(const char* signature,
+								BCatalog(const entry_ref& catalogOwner,
 									const char* language = NULL,
 									uint32 fingerprint = 0);
 	virtual						~BCatalog();
@@ -42,7 +42,7 @@ public:
 			status_t			GetLanguage(BString* language);
 			status_t			GetFingerprint(uint32* fingerprint);
 
-			status_t			SetCatalog(const char* signature,
+			status_t			SetCatalog(const entry_ref& catalogOwner,
 									uint32 fingerprint);
 
 			status_t			InitCheck() const;
@@ -305,11 +305,15 @@ public:
 	virtual	status_t			SetData(uint32 id, BMessage* msg);
 
 	virtual	status_t			ReadFromFile(const char* path = NULL);
-	virtual	status_t			ReadFromAttribute(entry_ref* appOrAddOnRef);
-	virtual	status_t			ReadFromResource(entry_ref* appOrAddOnRef);
+	virtual	status_t			ReadFromAttribute(
+									const entry_ref& appOrAddOnRef);
+	virtual	status_t			ReadFromResource(
+									const entry_ref& appOrAddOnRef);
 	virtual	status_t			WriteToFile(const char* path = NULL);
-	virtual	status_t			WriteToAttribute(entry_ref* appOrAddOnRef);
-	virtual	status_t			WriteToResource(entry_ref* appOrAddOnRef);
+	virtual	status_t			WriteToAttribute(
+									const entry_ref& appOrAddOnRef);
+	virtual	status_t			WriteToResource(
+									const entry_ref& appOrAddOnRef);
 
 	virtual	void				MakeEmpty();
 	virtual	int32				CountItems() const;
@@ -439,8 +443,9 @@ BCatalogAddOn::Next()
 }
 
 inline const char *
-BCatalogAddOn::MarkForTranslation(const char *str, const char *ctx,
-	const char *cmt)
+BCatalogAddOn::MarkForTranslation(const char *str,
+	const char * /*ctx __attribute__ ((unused))*/,
+	const char * /*cmt __attribute__ ((unused))*/)
 {
 	return str;
 }
@@ -475,11 +480,15 @@ public:
 			status_t			SetData(uint32 id, BMessage* msg);
 
 			status_t			ReadFromFile(const char* path = NULL);
-			status_t			ReadFromAttribute(entry_ref* appOrAddOnRef);
-			status_t			ReadFromResource(entry_ref* appOrAddOnRef);
+			status_t			ReadFromAttribute(
+									const entry_ref& appOrAddOnRef);
+			status_t			ReadFromResource(
+									const entry_ref& appOrAddOnRef);
 			status_t			WriteToFile(const char* path = NULL);
-			status_t			WriteToAttribute(entry_ref* appOrAddOnRef);
-			status_t			WriteToResource(entry_ref* appOrAddOnRef);
+			status_t			WriteToAttribute(
+									const entry_ref& appOrAddOnRef);
+			status_t			WriteToResource(
+									const entry_ref& appOrAddOnRef);
 
 			void				MakeEmpty();
 

@@ -9,7 +9,7 @@
 
 #include <Alert.h>
 #include <Application.h>
-#include <Autolock.h>
+#include <AutoLocker.h>
 #include <Button.h>
 #include <ControlLook.h>
 #include <LayoutBuilder.h>
@@ -19,6 +19,7 @@
 #include <ExpressionParser.h>
 
 #include "Architecture.h"
+#include "GUITeamUISettings.h"
 #include "MemoryView.h"
 #include "MessageCodes.h"
 #include "Team.h"
@@ -265,7 +266,10 @@ InspectorWindow::MessageReceived(BMessage* msg)
 bool
 InspectorWindow::QuitRequested()
 {
-	BMessenger(fTarget).SendMessage(MSG_INSPECTOR_WINDOW_CLOSED);
+	BMessage settings(MSG_INSPECTOR_WINDOW_CLOSED);
+	SaveSettings(settings);
+
+	BMessenger(fTarget).SendMessage(&settings);
 	return true;
 }
 
@@ -273,11 +277,101 @@ InspectorWindow::QuitRequested()
 void
 InspectorWindow::MemoryBlockRetrieved(TeamMemoryBlock* block)
 {
-	BAutolock lock(this);
+	AutoLocker<BLooper> lock(this);
 	if (lock.IsLocked()) {
 		fCurrentBlock = block;
 		fMemoryView->SetTargetAddress(block, fCurrentAddress);
 		fPreviousBlockButton->SetEnabled(true);
 		fNextBlockButton->SetEnabled(true);
 	}
+}
+
+
+status_t
+InspectorWindow::LoadSettings(const GUITeamUISettings& settings)
+{
+	AutoLocker<BLooper> lock(this);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
+	BMessage inspectorSettings;
+	if (settings.Settings("inspectorWindow", inspectorSettings) == B_OK)
+		return B_OK;
+
+	BRect frameRect;
+	if (inspectorSettings.FindRect("frame", &frameRect) == B_OK) {
+		ResizeTo(frameRect.Width(), frameRect.Height());
+		MoveTo(frameRect.left, frameRect.top);
+	}
+
+	_LoadMenuFieldMode(fHexMode, "Hex", inspectorSettings);
+	_LoadMenuFieldMode(fEndianMode, "Endian", inspectorSettings);
+	_LoadMenuFieldMode(fTextMode, "Text", inspectorSettings);
+
+	return B_OK;
+}
+
+
+status_t
+InspectorWindow::SaveSettings(BMessage& settings)
+{
+	AutoLocker<BLooper> lock(this);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
+	settings.MakeEmpty();
+
+	status_t error = settings.AddRect("frame", Frame());
+	if (error != B_OK)
+		return error;
+
+	error = _SaveMenuFieldMode(fHexMode, "Hex", settings);
+	if (error != B_OK)
+		return error;
+
+	error = _SaveMenuFieldMode(fEndianMode, "Endian", settings);
+	if (error != B_OK)
+		return error;
+
+	error = _SaveMenuFieldMode(fTextMode, "Text", settings);
+	if (error != B_OK)
+		return error;
+
+	return B_OK;
+}
+
+
+void
+InspectorWindow::_LoadMenuFieldMode(BMenuField* field, const char* name,
+	const BMessage& settings)
+{
+	BString fieldName;
+	int32 mode;
+	fieldName.SetToFormat("%sMode", name);
+	if (settings.FindInt32(fieldName.String(), &mode) == B_OK) {
+		BMenu* menu = field->Menu();
+		for (int32 i = 0; i < menu->CountItems(); i++) {
+			BInvoker* item = menu->ItemAt(i);
+			if (item->Message()->FindInt32("mode") == mode) {
+				item->Invoke();
+				break;
+			}
+		}
+	}
+}
+
+
+status_t
+InspectorWindow::_SaveMenuFieldMode(BMenuField* field, const char* name,
+	BMessage& settings)
+{
+	BMenuItem* item = field->Menu()->FindMarked();
+	if (item && item->Message()) {
+		int32 mode = item->Message()->FindInt32("mode");
+		BString fieldName;
+		fieldName.SetToFormat("%sMode", name);
+		return settings.AddInt32(fieldName.String(), mode);
+	}
+
+	return B_OK;
 }

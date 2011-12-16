@@ -1,14 +1,18 @@
-1	lithuanian	x-vnd.haiku.zip-o-matic	3034623778
-Archive	file:ZipperThread.cpp		Archyvas
-Archive created OK	file:ZipOMaticWindow.cpp		Archyvas sėkmingai sukurtas.
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Ar tikrai norite nutraukti archyvo kūrimą?
-Continue	file:ZipOMaticWindow.cpp		Tęsti
-Creating archive: %s	file:ZipOMaticWindow.cpp		Archyvo kūrimas: %s
-Do you want to stop them?	file:ZipOMatic.cpp		Nutraukti kūrimą?
-Error creating archive	file:ZipOMaticWindow.cpp		Klaida kuriant archyvą.
-Let them continue	file:ZipOMatic.cpp		Pratęsti
-Preparing to archive	file:ZipperThread.cpp		Ruošiamasi archyvavimui
+1	lithuanian	x-vnd.haiku.zip-o-matic	2207848100
+1 file added.	file:ZipOMaticWindow.cpp		Pridėtas 1 failas
 Stop	file:ZipOMaticWindow.cpp		Stabdyti
-Stop them	file:ZipOMatic.cpp		Sustabdyti vykdymą
+Creating archive: %s	file:ZipOMaticWindow.cpp		Archyvo kūrimas: %s
+Continue	file:ZipOMaticWindow.cpp		Tęsti
+Preparing to archive	file:ZipperThread.cpp		Ruošiamasi archyvuoti
+Drop files here.	file:ZipOMaticWindow.cpp		Archyvuotinus failus meskite čia.
+Filename: %s	file:ZipOMaticWindow.cpp		Failo vardas: %s
+Let them continue	file:ZipOMatic.cpp		Pratęsti
+Do you want to stop them?	file:ZipOMatic.cpp		Nutraukti kūrimą?
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Ar tikrai norite nutraukti archyvo kūrimą?
+%ld files added.	file:ZipOMaticWindow.cpp		Pridėta failų: %ld.
 Stopped	file:ZipOMaticWindow.cpp		Sustabdyta
+Archive	file:ZipperThread.cpp		Archyvas
+Error creating archive	file:ZipOMaticWindow.cpp		Klaida kuriant archyvą.
 You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Paleista Zip-O-Matic procesų: %ld.\n\n
+Archive created OK	file:ZipOMaticWindow.cpp		Archyvas sėkmingai sukurtas.
+Stop them	file:ZipOMatic.cpp		Sustabdyti vykdymą

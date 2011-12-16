@@ -687,7 +687,7 @@ NodeMonitorService::NotifyEntryMoved(dev_t device, ino_t fromDirectory,
 	// If node is a mount point, we need to resolve it to the mounted
 	// volume's root node.
 	dev_t nodeDevice = device;
-	resolve_mount_point_to_volume_root(device, node, &nodeDevice, &node);
+	vfs_resolve_vnode_to_covering_vnode(device, node, &nodeDevice, &node);
 
 	RecursiveLocker locker(fRecursiveLock);
 
@@ -742,7 +742,7 @@ NodeMonitorService::NotifyStatChanged(dev_t device, ino_t node,
 	// ... for the volume
 	_GetInterestedVolumeListeners(device, B_WATCH_STAT,
 		interestedListeners, interestedListenerCount);
-	// ... for the node, depending on wether its an interim update or not
+	// ... for the node, depending on whether its an interim update or not
 	_GetInterestedMonitorListeners(device, node,
 		(statFields & B_STAT_INTERIM_UPDATE) != 0
 			? B_WATCH_INTERIM_STAT : B_WATCH_STAT,

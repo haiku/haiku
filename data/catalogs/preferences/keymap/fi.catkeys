@@ -1,19 +1,28 @@
-1	finnish	x-vnd.Haiku-Keymap	1259868356
+1	finnish	x-vnd.Haiku-Keymap	3895282621
 (Current)	Keymap window		(Nykyinen)
 Acute trigger	Keymap window		Akuuttiaksenttiliipaisin
+Cancel	Modifier Keys window		Peru
+Caps Lock:	Modifier Keys window		Caps Lock-painike:
 Circumflex trigger	Keymap window		Sirkumfleksiliipaisin
+Command:	Modifier Keys window		Komento:
+Control:	Modifier Keys window		Control-painike:
 Diaeresis trigger	Keymap window		Treemaliipaisin
 File	Keymap window		Tiedosto
 Font	Keymap window		Kirjasin
 Grave trigger	Keymap window		Gravisliipaisin
-Keymap	System name		Näppäinkartta-asetukset
+Keymap	System name		Näppäinkuvausasetukset
 Layout	Keymap window		Ulkoasu
+Modifier Keys	Modifier Keys window		Muokkauspainikkeet
+OK	Modifier Keys window		Valmis
 Open…	Keymap window		Avaa…
+Option:	Modifier Keys window		Valitsin:
 Quit	Keymap window		Poistu
 Revert	Keymap window		Palauta
+Revert	Modifier Keys window		Palauta
 Sample and clipboard:	Keymap window		Näyte ja leikepöytä:
 Save as…	Keymap window		Tallenna nimellä…
 Select dead keys	Keymap window		Valitse kuolleet näppäimet
+Set Modifier Keys…	Keymap window		Aseta muokkausnäppäimet...
 Switch shortcut keys	Keymap window		Vaihda pikanäppäimiä
 Switch shortcut keys to Haiku mode	Keymap window		Vaihda pikanäppäimet Haiku-tilaan
 Switch shortcut keys to Windows/Linux mode	Keymap window		Vaihda pikanäppäimet Windows/Linux -tilaan

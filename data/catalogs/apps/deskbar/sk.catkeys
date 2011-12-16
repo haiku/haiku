@@ -1,45 +1,47 @@
-1	slovak	x-vnd.Be-TSKB	4265681964
-<Be folder is empty>	BeMenu		<pričinok Be je prázdny>
-About this system	BeMenu		O tomto systéme
-Always on top	PreferencesWindow		Vždy na vrchu
-Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplikácie
+1	slovak	x-vnd.Be-TSKB	107564593
+Power off	DeskbarMenu		Vypnúť
+Edit menu…	PreferencesWindow		Upraviť menu…
+Suspend	DeskbarMenu		Režim spánku
 Applications	PreferencesWindow		Aplikácie
-Auto-hide	PreferencesWindow		Automaticky skrývať
-Auto-raise	PreferencesWindow		Automaticky aktivovať
-Change time…	TimeView		Zmeniť čas...
-Clock	PreferencesWindow		Hodiny
-Close all	WindowMenu		Zatvoriť všetky
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demá
-Deskbar	System name		Panel
-Deskbar preferences	PreferencesWindow		Nastavenia Panelu
-Deskbar preferences…	BeMenu		Nastavenia Panelu...
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Aplety plochy
-Edit menu…	PreferencesWindow		Upraviť menu...
-Expand new applications	PreferencesWindow		Výsuvný zoznam nových aplikácií
-Find…	BeMenu		Nájsť...
-Hide all	WindowMenu		Skryť všetky
-Hide time	TimeView		Skryť čas
-Menu	PreferencesWindow		Menu
-Mount	BeMenu		Pripojiť
-No windows	WindowMenu		Žiadne okná
-Power off	BeMenu		Vypnúť
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Nastavenia
-Quit application	WindowMenu		Ukončiť aplikáciu
-Recent applications	BeMenu		Nedávne aplikácie
-Recent applications:	PreferencesWindow		Nedávne aplikácie:
-Recent documents	BeMenu		Nedávne dokumenty
+About Haiku	DeskbarMenu		O Haiku
 Recent documents:	PreferencesWindow		Nedávne dokumenty:
-Recent folders	BeMenu		Nedávne priečinky
-Recent folders:	PreferencesWindow		Nedávne priečinky:
-Restart Tracker	BeMenu		Reštartovať Tracker
-Restart system	BeMenu		Reštartovať systém
-Show Time	Tray		Zobraziť čas
-Show all	WindowMenu		Zobraziť všetky
-Show application expander	PreferencesWindow		Zobraziť výsuvný zoznam aplikácií
-Show calendar…	TimeView		Zobraziť kalendár...
-Show replicants	BeMenu		Zobraziť replikantov
-Show seconds	PreferencesWindow		Zobraziť sekundy
-Shutdown…	BeMenu		Vypnúť...
+Recent applications	DeskbarMenu		Nedávne aplikácie
 Sort running applications	PreferencesWindow		Zoradiť bežiace aplikácie
-Tracker always first	PreferencesWindow		Tracker vždy prvý
+Change time…	TimeView		Zmeniť čas…
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplikácie
+Find…	DeskbarMenu		Nájsť…
 Window	PreferencesWindow		Okno
+Menu	PreferencesWindow		Menu
+Recent documents	DeskbarMenu		Nedávne dokumenty
+Show seconds	PreferencesWindow		Zobraziť sekundy
+Auto-hide	PreferencesWindow		Automaticky skrývať
+Always on top	PreferencesWindow		Vždy na vrchu
+<Deskbar folder is empty>	DeskbarMenu		<priečinok Panel je prázdny>
+Show all	WindowMenu		Zobraziť všetky
+No windows	WindowMenu		Žiadne okná
+Deskbar	System name		Panel
+Restart system	DeskbarMenu		Reštartovať systém
+Auto-raise	PreferencesWindow		Automaticky aktivovať
+Hide time	TimeView		Skryť čas
+Recent folders:	PreferencesWindow		Nedávne priečinky:
+Show application expander	PreferencesWindow		Zobraziť výsuvný zoznam aplikácií
+Restart Tracker	DeskbarMenu		Reštartovať Tracker
+Close all	WindowMenu		Zatvoriť všetky
+Deskbar preferences	PreferencesWindow		Nastavenia Panelu
+Mount	DeskbarMenu		Pripojiť
+Recent applications:	PreferencesWindow		Nedávne aplikácie:
+Shutdown…	DeskbarMenu		Vypnúť…
+Tracker always first	PreferencesWindow		Tracker vždy prvý
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Nastavenia
+Recent folders	DeskbarMenu		Nedávne priečinky
+About this system	DeskbarMenu		O tomto systéme
+Show calendar…	TimeView		Zobraziť kalendár…
+Deskbar preferences…	DeskbarMenu		Nastavenia Panelu…
+Show Time	Tray		Zobraziť čas
+Expand new applications	PreferencesWindow		Výsuvný zoznam nových aplikácií
+Show replicants	DeskbarMenu		Zobraziť replikantov
+Clock	PreferencesWindow		Hodiny
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demá
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Aplety plochy
+Hide all	WindowMenu		Skryť všetky
+Quit application	WindowMenu		Ukončiť aplikáciu

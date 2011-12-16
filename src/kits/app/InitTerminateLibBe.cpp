@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2011, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,8 +12,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <LooperList.h>
 #include <MessagePrivate.h>
 #include <RosterPrivate.h>
+#include <TokenSpace.h>
 
 
 // debugging
@@ -28,6 +30,8 @@ initialize_forked_child()
 	DBG(OUT("initialize_forked_child()\n"));
 
 	BMessage::Private::StaticReInitForkedChild();
+	BPrivate::gLooperList.InitAfterFork();
+	BPrivate::gDefaultTokens.InitAfterFork();
 
 	DBG(OUT("initialize_forked_child() done\n"));
 }

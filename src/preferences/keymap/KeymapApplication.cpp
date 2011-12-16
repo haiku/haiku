@@ -7,11 +7,14 @@
  *		Jérôme Duval
  */
 
+
 #include "KeymapApplication.h"
 
 
 KeymapApplication::KeymapApplication()
-	: BApplication("application/x-vnd.Haiku-Keymap")
+	:
+	BApplication("application/x-vnd.Haiku-Keymap"),
+	fModifierKeysWindow(NULL)
 {
 	// create the window
 	fWindow = new KeymapWindow();
@@ -22,7 +25,31 @@ KeymapApplication::KeymapApplication()
 void
 KeymapApplication::MessageReceived(BMessage* message)
 {
+	switch (message->what) {
+		case kMsgShowModifierKeysWindow:
+			_ShowModifierKeysWindow();
+			break;
+		case kMsgCloseModifierKeysWindow:
+			fModifierKeysWindow = NULL;
+			break;
+		case kMsgUpdateModifiers:
+			fWindow->PostMessage(message);
+			break;
+	}
+
 	BApplication::MessageReceived(message);
+}
+
+
+void
+KeymapApplication::_ShowModifierKeysWindow()
+{
+	if (fModifierKeysWindow)
+		fModifierKeysWindow->Activate();
+	else {
+		fModifierKeysWindow = new ModifierKeysWindow();
+		fModifierKeysWindow->Show();
+	}
 }
 
 

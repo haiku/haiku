@@ -1,38 +1,46 @@
-1	lithuanian	x-vnd.Be-TSKB	3232664655
-<Be folder is empty>	BeMenu		<Meniu aplankas tuščias>
-Always on top	PreferencesWindow		Visuomet viršuje
-Applications	PreferencesWindow		Programos
-Auto-raise	PreferencesWindow		Automatiškai iškilti
-Change time…	TimeView		Keisti laiką…
-Clock	PreferencesWindow		Laikrodis
-Close all	WindowMenu		Užverti visus
-Deskbar preferences	PreferencesWindow		Užduočių juostos parinktys
-Deskbar preferences…	BeMenu		Užduočių juostos parinktys…
+1	lithuanian	x-vnd.Be-TSKB	2311697004
+Power off	DeskbarMenu		Išjungti
 Edit menu…	PreferencesWindow		Taisyti meniu…
-Expand new applications	PreferencesWindow		Išskleisti paleidžiamas programas
-Find…	BeMenu		Ieškoti…
-Hide all	WindowMenu		Slėpti visus
-Hide time	TimeView		Nerodyti laikrodžio
-Menu	PreferencesWindow		Meniu
-Mount	BeMenu		Prijungti diską
-No windows	WindowMenu		Langų nėra
-Power off	BeMenu		Išjungti
-Quit application	WindowMenu		Užbaigti programos darbą
-Recent applications	BeMenu		Paskiausiai leistos programos
-Recent applications:	PreferencesWindow		Paskiausios programos:
-Recent documents	BeMenu		Paskiausiai atverti dokumentai
+Suspend	DeskbarMenu		Pristabdyti
+Applications	PreferencesWindow		Programos
+About Haiku	DeskbarMenu		Apie „Haiku“
 Recent documents:	PreferencesWindow		Paskiausi dokumentai:
-Recent folders	BeMenu		Paskiausiai lankyti aplankai
-Recent folders:	PreferencesWindow		Paskiausi aplankai:
-Restart Tracker	BeMenu		Perleisti „Tracker“
-Restart system	BeMenu		Perleisti
-Show Time	Tray		Rodyti laikrodį
-Show all	WindowMenu		Rodyti visus
-Show application expander	PreferencesWindow		Rodyti programų skleistuką
-Show calendar…	TimeView		Rodyti kalendorių…
-Show replicants	BeMenu		Rodyti integravimo rankenėles
-Show seconds	PreferencesWindow		Rodyti sekundes
-Shutdown…	BeMenu		Kompiuterio išjungimas…
+Recent applications	DeskbarMenu		Paskiausiai leistos programos
 Sort running applications	PreferencesWindow		Rikiuoti paleistas programas
-Tracker always first	PreferencesWindow		„Tracker“ rikiuoti pradžioje
+Change time…	TimeView		Keisti laiką…
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programos
+Find…	DeskbarMenu		Ieškoti…
 Window	PreferencesWindow		Langas
+Menu	PreferencesWindow		Meniu
+Recent documents	DeskbarMenu		Paskiausiai atverti dokumentai
+Show seconds	PreferencesWindow		Rodyti sekundes
+Auto-hide	PreferencesWindow		Automatiškai slėpti
+Always on top	PreferencesWindow		Visuomet viršuje
+Show all	WindowMenu		Rodyti visus
+No windows	WindowMenu		Langų nėra
+Deskbar	System name		Užduočių juosta
+Restart system	DeskbarMenu		Paleisti iš naujo
+Auto-raise	PreferencesWindow		Automatiškai iškilti
+Hide time	TimeView		Nerodyti laikrodžio
+Recent folders:	PreferencesWindow		Paskiausi aplankai:
+Show application expander	PreferencesWindow		Rodyti programų skleistuką
+Restart Tracker	DeskbarMenu		Perleisti Pėdsekį
+Close all	WindowMenu		Užverti visus
+Deskbar preferences	PreferencesWindow		Užduočių juostos nuostatos
+Mount	DeskbarMenu		Prijungti diską
+Recent applications:	PreferencesWindow		Paskiausios programos:
+Shutdown…	DeskbarMenu		Kompiuterio išjungimas…
+Tracker always first	PreferencesWindow		Pėdsekį rikiuoti pradžioje
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Nuostatos
+Recent folders	DeskbarMenu		Paskiausiai lankyti aplankai
+About this system	DeskbarMenu		Apie šią sistemą
+Show calendar…	TimeView		Rodyti kalendorių…
+Deskbar preferences…	DeskbarMenu		Užduočių juostos nuostatos…
+Show Time	Tray		Rodyti laikrodį
+Expand new applications	PreferencesWindow		Išskleisti paleidžiamas programas
+Show replicants	DeskbarMenu		Rodyti replikavimo rankenėles
+Clock	PreferencesWindow		Laikrodis
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Pavyzdžiai
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Pagalbinės programėlės
+Hide all	WindowMenu		Slėpti visus
+Quit application	WindowMenu		Užbaigti programos darbą

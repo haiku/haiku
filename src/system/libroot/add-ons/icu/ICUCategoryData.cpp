@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Oliver Tappe, zooey@hirschkaefer.de.
+ * Copyright 2010-2011, Oliver Tappe, zooey@hirschkaefer.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -15,9 +15,9 @@ namespace BPrivate {
 namespace Libroot {
 
 
-ICUCategoryData::ICUCategoryData()
+ICUCategoryData::ICUCategoryData(pthread_key_t tlsKey)
 	:
-	fConverter(NULL)
+	fThreadLocalStorageKey(tlsKey)
 {
 	*fPosixLocaleName = '\0';
 	*fGivenCharset = '\0';
@@ -26,34 +26,6 @@ ICUCategoryData::ICUCategoryData()
 
 ICUCategoryData::~ICUCategoryData()
 {
-	if (fConverter)
-		ucnv_close(fConverter);
-}
-
-
-status_t
-ICUCategoryData::_SetupConverter()
-{
-	if (fConverter != NULL) {
-		ucnv_close(fConverter);
-		fConverter = NULL;
-	}
-
-	UErrorCode icuStatus = U_ZERO_ERROR;
-	fConverter = ucnv_open(fGivenCharset, &icuStatus);
-	if (fConverter == NULL)
-		return B_NAME_NOT_FOUND;
-
-	icuStatus = U_ZERO_ERROR;
-	ucnv_setToUCallBack(fConverter, UCNV_TO_U_CALLBACK_STOP, NULL, NULL,
-		NULL, &icuStatus);
-	icuStatus = U_ZERO_ERROR;
-	ucnv_setFromUCallBack(fConverter, UCNV_FROM_U_CALLBACK_STOP, NULL, NULL,
-		NULL, &icuStatus);
-	if (!U_SUCCESS(icuStatus))
-		return B_ERROR;
-
-	return B_OK;
 }
 
 
@@ -105,11 +77,14 @@ ICUCategoryData::_ConvertUnicodeStringToLocaleconvEntry(
 	const UnicodeString& string, char* destination, int destinationSize,
 	const char* defaultValue)
 {
-	status_t result = B_OK;
-	UErrorCode icuStatus = U_ZERO_ERROR;
+	UConverter* converter;
+	status_t result = _GetConverter(converter);
+	if (result != B_OK)
+		return result;
 
-	ucnv_fromUChars(fConverter, destination, destinationSize,
-		string.getBuffer(), string.length(), &icuStatus);
+	UErrorCode icuStatus = U_ZERO_ERROR;
+	ucnv_fromUChars(converter, destination, destinationSize, string.getBuffer(),
+		string.length(), &icuStatus);
 	if (!U_SUCCESS(icuStatus)) {
 		switch (icuStatus) {
 			case U_BUFFER_OVERFLOW_ERROR:
@@ -128,6 +103,66 @@ ICUCategoryData::_ConvertUnicodeStringToLocaleconvEntry(
 	}
 
 	return result;
+}
+
+
+status_t
+ICUCategoryData::_GetConverter(UConverter*& converterOut)
+{
+	// we use different converters per thread to avoid concurrent accesses
+	ICUThreadLocalStorageValue* tlsValue = NULL;
+	status_t result = ICUThreadLocalStorageValue::GetInstanceForKey(
+		fThreadLocalStorageKey, tlsValue);
+	if (result != B_OK)
+		return result;
+
+	if (tlsValue->converter != NULL) {
+		if (strcmp(tlsValue->charset, fGivenCharset) == 0) {
+			converterOut = tlsValue->converter;
+			return B_OK;
+		}
+
+		// charset no longer matches the converter, we need to dump it and
+		// create a new one
+		ucnv_close(tlsValue->converter);
+	}
+
+	// create a new converter for the current charset
+	UErrorCode icuStatus = U_ZERO_ERROR;
+	UConverter* icuConverter = ucnv_open(fGivenCharset, &icuStatus);
+	if (icuConverter == NULL)
+		return B_NAME_NOT_FOUND;
+
+	// setup the new converter to stop upon any errors
+	icuStatus = U_ZERO_ERROR;
+	ucnv_setToUCallBack(icuConverter, UCNV_TO_U_CALLBACK_STOP, NULL, NULL, NULL,
+		&icuStatus);
+	if (!U_SUCCESS(icuStatus)) {
+		ucnv_close(icuConverter);
+		return B_ERROR;
+	}
+	icuStatus = U_ZERO_ERROR;
+	ucnv_setFromUCallBack(icuConverter, UCNV_FROM_U_CALLBACK_STOP, NULL, NULL,
+		NULL, &icuStatus);
+	if (!U_SUCCESS(icuStatus)) {
+		ucnv_close(icuConverter);
+		return B_ERROR;
+	}
+
+	tlsValue->converter = icuConverter;
+	strlcpy(tlsValue->charset, fGivenCharset, sizeof(tlsValue->charset));
+
+	converterOut = icuConverter;
+
+	return B_OK;
+}
+
+
+status_t
+ICUCategoryData::_SetupConverter()
+{
+	UConverter* converter;
+	return _GetConverter(converter);
 }
 
 

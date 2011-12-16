@@ -883,19 +883,17 @@ SATGroup::RemoveWindow(SATWindow* window, bool stayBelowMouse)
 	if (!fSATWindowList.RemoveItem(window))
 		return false;
 
-	WindowArea* area = window->GetWindowArea();
-	if (area)
+	// We need the area a little bit longer because the area could hold the
+	// last reference to the group.
+	BReference<WindowArea> area = window->GetWindowArea();
+	if (area.Get() != NULL)
 		area->_RemoveWindow(window);
-
-	int32 windowCount = CountItems();
 
 	window->RemovedFromGroup(this, stayBelowMouse);
 
-	if (windowCount >= 2)
+	if (CountItems() >= 2)
 		WindowAt(0)->DoGroupLayout();
 
-	// Do nothing after removing the window from the group because this
-	// could have released the last reference and destroyed ourself.
 	return true;
 }
 

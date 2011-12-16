@@ -1,48 +1,48 @@
 1	german	x-vnd.Haiku-ActivityMonitor	3704566709
-%.1f KB/s	DataSource		%.1f KiB/s
-%.1f MB	DataSource		%.1f MiB
-%.1f faults/s	DataSource		%.1f Fehler/s
-%lld ms	SettingsWindow		%lld ms
-%lld sec.	SettingsWindow		%lld Sek.
-ActivityMonitor	System name		Systemmonitor
-Add graph	ActivityWindow		Graphen hinzufügen
-Additional items	ActivityView		Zusätzliche Elemente
-Apps	DataSource		Apps
-Block cache	DataSource		Block-Cache
-Block cache memory	DataSource		Block-Cache-Speicher
-CPU	DataSource		CPU
-CPU usage	DataSource		CPU-Auslastung
-CPU usage (combined)	DataSource		CPU-Auslastung (alle)
-Cache	DataSource		Cache
-Cached memory	DataSource		Gecachter Speicher
-File	ActivityWindow		Datei
-Hide legend	ActivityView		Legende ausblenden
-MB	DataSource		MiB
-Media nodes	DataSource		Media-Nodes
-Memory	DataSource		Speicher
-Network receive	DataSource		Netzwerk empfangen
-Network send	DataSource		Netzwerk senden
 P-faults	DataSource		Seitenfehler
-Page faults	DataSource		Seitenfehler
-Ports	DataSource		Ports
-Quit	ActivityWindow		Beenden
-RX	DataSource	Shorter version for Receiving.	Empfangen
-Raw clipboard	DataSource		Raw-Ablage
+Media nodes	DataSource		Media-Nodes
+Threads	DataSource		Threads
+MB	DataSource		MiB
+Add graph	ActivityWindow		Graphen hinzufügen
+Teams	DataSource		Teams
+Hide legend	ActivityView		Legende ausblenden
+Network send	DataSource		Netzwerk senden
+CPU usage (combined)	DataSource		CPU-Auslastung (alle)
+CPU	DataSource		CPU
+Used memory	DataSource		Benutzter Speicher
+Cached memory	DataSource		Gecachter Speicher
+Apps	DataSource		Apps
+Show legend	ActivityView		Legende anzeigen
+Text clipboard	DataSource		Text-Ablage
+Settings	ActivityWindow		Einstellungen
 Receiving	DataSource		Empfangen
+Settings…	ActivityWindow		Einstellungen...
+Ports	DataSource		Ports
+Page faults	DataSource		Seitenfehler
+Sending	DataSource		Senden
+Cache	DataSource		Cache
+%.1f faults/s	DataSource		%.1f Fehler/s
+Update time interval:	SettingsWindow		Aktualisierungsintervall:
+TX	DataSource	Shorter version for Sending	Senden
+Quit	ActivityWindow		Beenden
+Block cache memory	DataSource		Block-Cache-Speicher
 Remove graph	ActivityView		Graph entfernen
+%.1f MB	DataSource		%.1f MiB
+%lld sec.	SettingsWindow		%lld Sek.
+%lld ms	SettingsWindow		%lld ms
+CPU usage	DataSource		CPU-Auslastung
+Raw clipboard	DataSource		Raw-Ablage
+Sems	DataSource		Sems
+ActivityMonitor	System name		Systemmonitor
 Running applications	DataSource		Laufende Anwendungen
 Semaphores	DataSource		Semaphoren
-Sems	DataSource		Sems
-Sending	DataSource		Senden
-Settings	ActivityWindow		Einstellungen
-Settings…	ActivityWindow		Einstellungen...
-Show legend	ActivityView		Legende anzeigen
-Swap	DataSource		Auslagerung
+Block cache	DataSource		Block-Cache
 Swap space	DataSource		Auslagerungsspeicher
-TX	DataSource	Shorter version for Sending	Senden
-Teams	DataSource		Teams
-Text clipboard	DataSource		Text-Ablage
-Threads	DataSource		Threads
-Update time interval:	SettingsWindow		Aktualisierungsintervall:
-Used memory	DataSource		Benutzter Speicher
+Swap	DataSource		Auslagerung
+File	ActivityWindow		Datei
 usage	DataSource		Last
+Additional items	ActivityView		Zusätzliche Elemente
+Network receive	DataSource		Netzwerk empfangen
+%.1f KB/s	DataSource		%.1f KiB/s
+Memory	DataSource		Speicher
+RX	DataSource	Shorter version for Receiving.	Empfangen

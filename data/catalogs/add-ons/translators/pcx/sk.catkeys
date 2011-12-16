@@ -1,8 +1,8 @@
 1	slovak	x-vnd.Haiku-PCXTranslator	1002061545
-PCX %lu bit image	PCXTranslator		%lu-bitový obrázok PCX
 PCX Settings	main		Nastavenia PCX
+PCX translator	PCXTranslator		Prekladač PCX
+Version %d.%d.%d, %s	ConfigView		Verzia %d.%d.%d, %s
+PCXTranslator Settings	ConfigView		Nastavenia PCXTranslator
+PCX %lu bit image	PCXTranslator		%lu-bitový obrázok PCX
 PCX images	ConfigView		Obrázky PCX
 PCX images	PCXTranslator		Obrázok PCX
-PCX translator	PCXTranslator		Prekladač PCX
-PCXTranslator Settings	ConfigView		Nastavenia PCXTranslator
-Version %d.%d.%d, %s	ConfigView		Verzia %d.%d.%d, %s

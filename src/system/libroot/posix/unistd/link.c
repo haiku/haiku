@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <unistd.h>
 
+#include <errno_private.h>
 #include <syscalls.h>
 #include <syscall_utils.h>
 
@@ -24,7 +25,7 @@ readlinkat(int fd, const char *path, char *buffer, size_t bufferSize)
 	size_t linkLen = bufferSize;
 	status_t status = _kern_read_link(fd, path, buffer, &linkLen);
 	if (status < B_OK) {
-		errno = status;
+		__set_errno(status);
 		return -1;
 	}
 

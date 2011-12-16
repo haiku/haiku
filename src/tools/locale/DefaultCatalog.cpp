@@ -12,6 +12,7 @@
 #include <new>
 #include <syslog.h>
 
+#include <AppFileInfo.h>
 #include <Application.h>
 #include <DataIO.h>
 #include <Directory.h>
@@ -60,15 +61,15 @@ static int16 kCatArchiveVersion = 1;
 	InitCheck() will be B_OK if catalog could be loaded successfully, it will
 	give an appropriate error-code otherwise.
 */
-DefaultCatalog::DefaultCatalog(const char *signature, const char *language,
-	uint32 fingerprint)
+DefaultCatalog::DefaultCatalog(const entry_ref &catalogOwner,
+	const char *language, uint32 fingerprint)
 	:
-	BHashMapCatalog(signature, language, fingerprint)
+	BHashMapCatalog("", language, fingerprint)
 {
 	fInitCheck = B_NOT_SUPPORTED;
 	fprintf(stderr,
 		"trying to load default-catalog(sig=%s, lang=%s) results in %s",
-		signature, language, strerror(fInitCheck));
+		"", language, strerror(fInitCheck));
 }
 
 
@@ -81,7 +82,7 @@ DefaultCatalog::DefaultCatalog(entry_ref *appOrAddOnRef)
 	:
 	BHashMapCatalog("", "", 0)
 {
-	fInitCheck = ReadFromResource(appOrAddOnRef);
+	fInitCheck = ReadFromResource(*appOrAddOnRef);
 	// fprintf(stderr,
 	//	"trying to load embedded catalog from resources results in %s",
 	//	strerror(fInitCheck));
@@ -104,6 +105,14 @@ DefaultCatalog::DefaultCatalog(const char *path, const char *signature,
 
 DefaultCatalog::~DefaultCatalog()
 {
+}
+
+
+void
+DefaultCatalog::SetSignature(const entry_ref &catalogOwner)
+{
+	// Not allowed for the build-tool version.
+	return;
 }
 
 
@@ -171,14 +180,14 @@ DefaultCatalog::ReadFromFile(const char *path)
 	future...
 */
 status_t
-DefaultCatalog::ReadFromAttribute(entry_ref *appOrAddOnRef)
+DefaultCatalog::ReadFromAttribute(const entry_ref &appOrAddOnRef)
 {
 	return B_NOT_SUPPORTED;
 }
 
 
 status_t
-DefaultCatalog::ReadFromResource(entry_ref *appOrAddOnRef)
+DefaultCatalog::ReadFromResource(const entry_ref &appOrAddOnRef)
 {
 	return B_NOT_SUPPORTED;
 }
@@ -220,14 +229,14 @@ DefaultCatalog::WriteToFile(const char *path)
 	future...
 */
 status_t
-DefaultCatalog::WriteToAttribute(entry_ref *appOrAddOnRef)
+DefaultCatalog::WriteToAttribute(const entry_ref &appOrAddOnRef)
 {
 	return B_NOT_SUPPORTED;
 }
 
 
 status_t
-DefaultCatalog::WriteToResource(entry_ref *appOrAddOnRef)
+DefaultCatalog::WriteToResource(const entry_ref &appOrAddOnRef)
 {
 	return B_NOT_SUPPORTED;
 }
@@ -389,23 +398,11 @@ DefaultCatalog::Unflatten(BDataIO *dataIO)
 
 
 BCatalogAddOn *
-DefaultCatalog::Instantiate(const char *signature, const char *language,
+DefaultCatalog::Instantiate(const entry_ref &catalogOwner, const char *language,
 	uint32 fingerprint)
 {
 	DefaultCatalog *catalog
-		= new(std::nothrow) DefaultCatalog(signature, language, fingerprint);
-	if (catalog && catalog->InitCheck() != B_OK) {
-		delete catalog;
-		return NULL;
-	}
-	return catalog;
-}
-
-
-BCatalogAddOn *
-DefaultCatalog::InstantiateEmbedded(entry_ref *appOrAddOnRef)
-{
-	DefaultCatalog *catalog = new(std::nothrow) DefaultCatalog(appOrAddOnRef);
+		= new(std::nothrow) DefaultCatalog(catalogOwner, language, fingerprint);
 	if (catalog && catalog->InitCheck() != B_OK) {
 		delete catalog;
 		return NULL;

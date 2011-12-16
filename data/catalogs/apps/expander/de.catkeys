@@ -1,49 +1,49 @@
-1	german	x-vnd.Haiku-Expander	187676748
-Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Soll das Entpacken wirklich abgebrochen werden? Die entpackten Dateien sind eventuell nicht vollständig.
-Automatically expand files	ExpanderPreferences		Archiv automatisch entpacken
-Automatically show contents listing	ExpanderPreferences		Dateiliste automatisch anzeigen
-Cancel	ExpanderPreferences		Abbrechen
-Cancel	ExpanderWindow		Abbrechen
-Close	ExpanderMenu		Schließen
-Close window when done expanding	ExpanderPreferences		Fenster nach dem Entpacken schließen
-Continue	ExpanderWindow		Fortsetzen
-Creating listing for '%s'	ExpanderWindow		Dateiliste für '%s' wird erstellt
-Destination	ExpanderWindow		Ziel
-Destination folder:	ExpanderPreferences		Zielordner:
-Error when expanding archive	ExpanderWindow		Fehler beim Entpacken
+1	german	x-vnd.Haiku-Expander	2537908460
 Expand	ExpanderMenu		Entpacken
-Expand	ExpanderWindow		Entpacken
-Expander	System name		Entpacker
-Expander settings	ExpanderPreferences		Entpacker-Einstellungen
-Expander: Choose destination	DirectoryFilePanel		Entpacker: Zielordner wählen
+Close window when done expanding	ExpanderPreferences		Fenster nach dem Entpacken schließen
+Set destination…	ExpanderMenu		Ziel wählen…
+Use:	ExpanderPreferences		Benutzerdefiniert:
+File expanded	ExpanderWindow		Archiv wurde entpackt
+The destination is read only.	ExpanderWindow		Das Ziel ist schreibgeschützt.
 Expander: Open	ExpanderWindow		Entpacker: Öffnen
+ is not supported	ExpanderWindow		wird nicht unterstützt
+Expander settings	ExpanderPreferences		Entpacker-Einstellungen
+Select current	DirectoryFilePanel		Aktuellen wählen
+Source	ExpanderWindow		Quelle
+Error when expanding archive	ExpanderWindow		Fehler beim Entpacken
+Hide contents	ExpanderWindow		Inhalt verbergen
+Cancel	ExpanderWindow		Abbrechen
+Automatically expand files	ExpanderPreferences		Archiv automatisch entpacken
+Creating listing for '%s'	ExpanderWindow		Dateiliste für '%s' wird erstellt
+Continue	ExpanderWindow		Fortsetzen
+The destination folder does not exist.	ExpanderWindow		Der Zielordner existiert nicht.
+Cancel	ExpanderPreferences		Abbrechen
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Soll das Entpacken wirklich abgebrochen werden? Die entpackten Dateien sind eventuell nicht vollständig.
+Select	DirectoryFilePanel		Auswählen
+Destination folder:	ExpanderPreferences		Zielordner:
+Same directory as source (archive) file	ExpanderPreferences		Gleicher Ordner wie Quelldatei
 Expanding '%s'	ExpanderWindow		'%s' wird entpackt
 Expansion:	ExpanderPreferences		Entpacken:
-File	ExpanderMenu		Datei
-File expanded	ExpanderWindow		Archiv wurde entpackt
-Hide contents	ExpanderWindow		Inhalt verbergen
-Leave destination folder path empty	ExpanderPreferences		Keinen Zielordner vorgeben
-OK	ExpanderPreferences		OK
-Open destination folder after extraction	ExpanderPreferences		Zielordner nach dem Entpacken öffnen
-Other:	ExpanderPreferences		Allgemeines:
-Same directory as source (archive) file	ExpanderPreferences		Gleicher Ordner wie Quelldatei
-Select	DirectoryFilePanel		Auswählen
-Select	ExpanderPreferences		Auwählen
-Select '%s'	DirectoryFilePanel		'%s' wählen
-Select current	DirectoryFilePanel		Aktuellen wählen
-Set destination…	ExpanderMenu		Ziel wählen…
-Set source…	ExpanderMenu		Quelle wählen…
 Settings	ExpanderMenu		Einstellungen
 Settings…	ExpanderMenu		Einstellungen…
-Show contents	ExpanderMenu		Inhalt zeigen
+Expander: Choose destination	DirectoryFilePanel		Entpacker: Zielordner wählen
+Select	ExpanderPreferences		Auwählen
 Show contents	ExpanderWindow		Inhalt zeigen
-Source	ExpanderWindow		Quelle
-Stop	ExpanderMenu		Stopp
-Stop	ExpanderWindow		Stopp
-The destination folder does not exist.	ExpanderWindow		Der Zielordner existiert nicht.
-The destination is not a folder.	ExpanderWindow		Das Ziel ist kein Ordner.
-The destination is read only.	ExpanderWindow		Das Ziel ist schreibgeschützt.
-The file doesn't exist	ExpanderWindow		Die Datei existiert nicht
+Automatically show contents listing	ExpanderPreferences		Dateiliste automatisch anzeigen
+OK	ExpanderPreferences		OK
+Leave destination folder path empty	ExpanderPreferences		Keinen Zielordner vorgeben
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Der Ordner wurde entweder verschoben, umbenannt oder wird nicht unterstützt.
-Use:	ExpanderPreferences		Benutzerdefiniert:
-is not supported	ExpanderWindow		wird nicht unterstützt
+The file doesn't exist	ExpanderWindow		Die Datei existiert nicht
+Stop	ExpanderMenu		Stopp
+File	ExpanderMenu		Datei
+Other:	ExpanderPreferences		Allgemeines:
+Expander	System name		Entpacker
+Expand	ExpanderWindow		Entpacken
+Close	ExpanderMenu		Schließen
+The destination is not a folder.	ExpanderWindow		Das Ziel ist kein Ordner.
+Open destination folder after extraction	ExpanderPreferences		Zielordner nach dem Entpacken öffnen
+Set source…	ExpanderMenu		Quelle wählen…
+Select '%s'	DirectoryFilePanel		'%s' wählen
+Show contents	ExpanderMenu		Inhalt zeigen
+Stop	ExpanderWindow		Stopp
+Destination	ExpanderWindow		Ziel

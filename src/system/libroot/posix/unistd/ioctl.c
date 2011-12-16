@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -9,10 +9,12 @@
 #include <stdarg.h>
 #include <errno.h>
 
+#include <errno_private.h>
+
 
 #define RETURN_AND_SET_ERRNO(err) \
 	if (err < 0) { \
-		errno = err; \
+		__set_errno(err); \
 		return -1; \
 	} \
 	return err;

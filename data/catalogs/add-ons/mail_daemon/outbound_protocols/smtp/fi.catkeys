@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-SMTP	1052586247
+1	finnish	x-vnd.Haiku-SMTP	2740407895
 . The server said:\n	smtp		. Palvelin sanoi:\n
 . The server says:\n	smtp		. Palvelin sanoo:\n
 : Connection refused or host not found.	smtp		: Yhteys torjuttiin tai tietokonetta ei löytynyt.
@@ -11,3 +11,6 @@ None	ConfigView		Ei mitään
 POP3 authentication failed. The server said:\n	smtp		POP3-todennus epäonnistui. Palvelin sanoi:\n
 POP3 before SMTP	ConfigView		POP3-yhteyskäytäntö ennen SMTP-yhteyskäytäntöä
 SMTP server:	ConfigView		SMTP-palvelin:
+SSL	ConfigView		SSL
+STARTTLS	ConfigView		STARTTLS
+Unencrypted	ConfigView		Salaamaton

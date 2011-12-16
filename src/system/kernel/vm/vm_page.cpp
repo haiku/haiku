@@ -23,6 +23,7 @@
 #include <block_cache.h>
 #include <boot/kernel_args.h>
 #include <condition_variable.h>
+#include <elf.h>
 #include <heap.h>
 #include <kernel.h>
 #include <low_resource_manager.h>
@@ -141,6 +142,32 @@ static page_num_t sNextPageUsagePageCount;
 #endif
 
 
+#if VM_PAGE_ALLOCATION_TRACKING_AVAILABLE
+
+struct caller_info {
+	addr_t		caller;
+	size_t		count;
+};
+
+static const int32 kCallerInfoTableSize = 1024;
+static caller_info sCallerInfoTable[kCallerInfoTableSize];
+static int32 sCallerInfoCount = 0;
+
+static caller_info* get_caller_info(addr_t caller);
+
+
+RANGE_MARKER_FUNCTION_PROTOTYPES(vm_page)
+
+static const addr_t kVMPageCodeAddressRange[] = {
+	RANGE_MARKER_FUNCTION_ADDRESS_RANGE(vm_page)
+};
+
+#endif
+
+
+RANGE_MARKER_FUNCTION_BEGIN(vm_page)
+
+
 struct page_stats {
 	int32	totalFreePages;
 	int32	unsatisfiedReservations;
@@ -235,139 +262,158 @@ static DaemonCondition sPageDaemonCondition;
 namespace PageAllocationTracing {
 
 class ReservePages : public AbstractTraceEntry {
-	public:
-		ReservePages(uint32 count)
-			:
-			fCount(count)
-		{
-			Initialized();
-		}
+public:
+	ReservePages(uint32 count)
+		:
+		fCount(count)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("page reserve:   %lu", fCount);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("page reserve:   %lu", fCount);
+	}
 
-	private:
-		uint32		fCount;
+private:
+	uint32		fCount;
 };
 
 
 class UnreservePages : public AbstractTraceEntry {
-	public:
-		UnreservePages(uint32 count)
-			:
-			fCount(count)
-		{
-			Initialized();
-		}
+public:
+	UnreservePages(uint32 count)
+		:
+		fCount(count)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("page unreserve: %lu", fCount);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("page unreserve: %lu", fCount);
+	}
 
-	private:
-		uint32		fCount;
+private:
+	uint32		fCount;
 };
 
 
-class AllocatePage : public AbstractTraceEntry {
-	public:
-		AllocatePage()
-		{
-			Initialized();
-		}
+class AllocatePage
+	: public TRACE_ENTRY_SELECTOR(PAGE_ALLOCATION_TRACING_STACK_TRACE) {
+public:
+	AllocatePage(page_num_t pageNumber)
+		:
+		TraceEntryBase(PAGE_ALLOCATION_TRACING_STACK_TRACE, 0, true),
+		fPageNumber(pageNumber)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("page alloc");
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("page alloc: %#" B_PRIxPHYSADDR, fPageNumber);
+	}
+
+private:
+	page_num_t	fPageNumber;
 };
 
 
-class AllocatePageRun : public AbstractTraceEntry {
-	public:
-		AllocatePageRun(uint32 length)
-			:
-			fLength(length)
-		{
-			Initialized();
-		}
+class AllocatePageRun
+	: public TRACE_ENTRY_SELECTOR(PAGE_ALLOCATION_TRACING_STACK_TRACE) {
+public:
+	AllocatePageRun(page_num_t startPage, uint32 length)
+		:
+		TraceEntryBase(PAGE_ALLOCATION_TRACING_STACK_TRACE, 0, true),
+		fStartPage(startPage),
+		fLength(length)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("page alloc run: length: %ld", fLength);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("page alloc run: start %#" B_PRIxPHYSADDR " length: %"
+			B_PRIu32, fStartPage, fLength);
+	}
 
-	private:
-		uint32		fLength;
+private:
+	page_num_t	fStartPage;
+	uint32		fLength;
 };
 
 
-class FreePage : public AbstractTraceEntry {
-	public:
-		FreePage()
-		{
-			Initialized();
-		}
+class FreePage
+	: public TRACE_ENTRY_SELECTOR(PAGE_ALLOCATION_TRACING_STACK_TRACE) {
+public:
+	FreePage(page_num_t pageNumber)
+		:
+		TraceEntryBase(PAGE_ALLOCATION_TRACING_STACK_TRACE, 0, true),
+		fPageNumber(pageNumber)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("page free");
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("page free: %#" B_PRIxPHYSADDR, fPageNumber);
+	}
+
+private:
+	page_num_t	fPageNumber;
 };
 
 
 class ScrubbingPages : public AbstractTraceEntry {
-	public:
-		ScrubbingPages(uint32 count)
-			:
-			fCount(count)
-		{
-			Initialized();
-		}
+public:
+	ScrubbingPages(uint32 count)
+		:
+		fCount(count)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("page scrubbing: %lu", fCount);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("page scrubbing: %lu", fCount);
+	}
 
-	private:
-		uint32		fCount;
+private:
+	uint32		fCount;
 };
 
 
 class ScrubbedPages : public AbstractTraceEntry {
-	public:
-		ScrubbedPages(uint32 count)
-			:
-			fCount(count)
-		{
-			Initialized();
-		}
+public:
+	ScrubbedPages(uint32 count)
+		:
+		fCount(count)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("page scrubbed:  %lu", fCount);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("page scrubbed:  %lu", fCount);
+	}
 
-	private:
-		uint32		fCount;
+private:
+	uint32		fCount;
 };
 
 
 class StolenPage : public AbstractTraceEntry {
-	public:
-		StolenPage()
-		{
-			Initialized();
-		}
+public:
+	StolenPage()
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("page stolen");
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("page stolen");
+	}
 };
 
 }	// namespace PageAllocationTracing
@@ -553,6 +599,165 @@ class SetPageState : public AbstractTraceEntry {
 #else
 #	define TPS(x)
 #endif	// PAGE_STATE_TRACING
+
+
+#if VM_PAGE_ALLOCATION_TRACKING_AVAILABLE
+
+namespace BKernel {
+
+class AllocationTrackingCallback {
+public:
+	virtual						~AllocationTrackingCallback();
+
+	virtual	bool				ProcessTrackingInfo(
+									AllocationTrackingInfo* info,
+									page_num_t pageNumber) = 0;
+};
+
+}
+
+using BKernel::AllocationTrackingCallback;
+
+
+class AllocationCollectorCallback : public AllocationTrackingCallback {
+public:
+	AllocationCollectorCallback(bool resetInfos)
+		:
+		fResetInfos(resetInfos)
+	{
+	}
+
+	virtual bool ProcessTrackingInfo(AllocationTrackingInfo* info,
+		page_num_t pageNumber)
+	{
+		if (!info->IsInitialized())
+			return true;
+
+		addr_t caller = 0;
+		AbstractTraceEntryWithStackTrace* traceEntry = info->TraceEntry();
+
+		if (traceEntry != NULL && info->IsTraceEntryValid()) {
+			caller = tracing_find_caller_in_stack_trace(
+				traceEntry->StackTrace(), kVMPageCodeAddressRange, 1);
+		}
+
+		caller_info* callerInfo = get_caller_info(caller);
+		if (callerInfo == NULL) {
+			kprintf("out of space for caller infos\n");
+			return false;
+		}
+
+		callerInfo->count++;
+
+		if (fResetInfos)
+			info->Clear();
+
+		return true;
+	}
+
+private:
+	bool	fResetInfos;
+};
+
+
+class AllocationInfoPrinterCallback : public AllocationTrackingCallback {
+public:
+	AllocationInfoPrinterCallback(bool printStackTrace, page_num_t pageFilter,
+		team_id teamFilter, thread_id threadFilter)
+		:
+		fPrintStackTrace(printStackTrace),
+		fPageFilter(pageFilter),
+		fTeamFilter(teamFilter),
+		fThreadFilter(threadFilter)
+	{
+	}
+
+	virtual bool ProcessTrackingInfo(AllocationTrackingInfo* info,
+		page_num_t pageNumber)
+	{
+		if (!info->IsInitialized())
+			return true;
+
+		if (fPageFilter != 0 && pageNumber != fPageFilter)
+			return true;
+
+		AbstractTraceEntryWithStackTrace* traceEntry = info->TraceEntry();
+		if (traceEntry != NULL && !info->IsTraceEntryValid())
+			traceEntry = NULL;
+
+		if (traceEntry != NULL) {
+			if (fTeamFilter != -1 && traceEntry->TeamID() != fTeamFilter)
+				return true;
+			if (fThreadFilter != -1 && traceEntry->ThreadID() != fThreadFilter)
+				return true;
+		} else {
+			// we need the info if we have filters set
+			if (fTeamFilter != -1 || fThreadFilter != -1)
+				return true;
+		}
+
+		kprintf("page number %#" B_PRIxPHYSADDR, pageNumber);
+
+		if (traceEntry != NULL) {
+			kprintf(", team: %" B_PRId32 ", thread %" B_PRId32
+				", time %" B_PRId64 "\n", traceEntry->TeamID(),
+				traceEntry->ThreadID(), traceEntry->Time());
+
+			if (fPrintStackTrace)
+				tracing_print_stack_trace(traceEntry->StackTrace());
+		} else
+			kprintf("\n");
+
+		return true;
+	}
+
+private:
+	bool		fPrintStackTrace;
+	page_num_t	fPageFilter;
+	team_id		fTeamFilter; 
+	thread_id	fThreadFilter;
+};
+
+
+class AllocationDetailPrinterCallback : public AllocationTrackingCallback {
+public:
+	AllocationDetailPrinterCallback(addr_t caller)
+		:
+		fCaller(caller)
+	{
+	}
+
+	virtual bool ProcessTrackingInfo(AllocationTrackingInfo* info,
+		page_num_t pageNumber)
+	{
+		if (!info->IsInitialized())
+			return true;
+
+		addr_t caller = 0;
+		AbstractTraceEntryWithStackTrace* traceEntry = info->TraceEntry();
+		if (traceEntry != NULL && !info->IsTraceEntryValid())
+			traceEntry = NULL;
+
+		if (traceEntry != NULL) {
+			caller = tracing_find_caller_in_stack_trace(
+				traceEntry->StackTrace(), kVMPageCodeAddressRange, 1);
+		}
+
+		if (caller != fCaller)
+			return true;
+
+		kprintf("page %#" B_PRIxPHYSADDR "\n", pageNumber);
+		if (traceEntry != NULL)
+			tracing_print_stack_trace(traceEntry->StackTrace());
+
+		return true;
+	}
+
+private:
+	addr_t	fCaller;
+};
+
+#endif	// VM_PAGE_ALLOCATION_TRACKING_AVAILABLE
 
 
 static int
@@ -947,6 +1152,171 @@ dump_page_stats(int argc, char **argv)
 }
 
 
+#if VM_PAGE_ALLOCATION_TRACKING_AVAILABLE
+
+static caller_info*
+get_caller_info(addr_t caller)
+{
+	// find the caller info
+	for (int32 i = 0; i < sCallerInfoCount; i++) {
+		if (caller == sCallerInfoTable[i].caller)
+			return &sCallerInfoTable[i];
+	}
+
+	// not found, add a new entry, if there are free slots
+	if (sCallerInfoCount >= kCallerInfoTableSize)
+		return NULL;
+
+	caller_info* info = &sCallerInfoTable[sCallerInfoCount++];
+	info->caller = caller;
+	info->count = 0;
+
+	return info;
+}
+
+
+static int
+caller_info_compare_count(const void* _a, const void* _b)
+{
+	const caller_info* a = (const caller_info*)_a;
+	const caller_info* b = (const caller_info*)_b;
+	return (int)(b->count - a->count);
+}
+
+
+static int
+dump_page_allocations_per_caller(int argc, char** argv)
+{
+	bool resetAllocationInfos = false;
+	bool printDetails = false;
+	addr_t caller = 0;
+
+	for (int32 i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "-d") == 0) {
+			uint64 callerAddress;
+			if (++i >= argc
+				|| !evaluate_debug_expression(argv[i], &callerAddress, true)) {
+				print_debugger_command_usage(argv[0]);
+				return 0;
+			}
+
+			caller = callerAddress;
+			printDetails = true;
+		} else if (strcmp(argv[i], "-r") == 0) {
+			resetAllocationInfos = true;
+		} else {
+			print_debugger_command_usage(argv[0]);
+			return 0;
+		}
+	}
+
+	sCallerInfoCount = 0;
+
+	AllocationCollectorCallback collectorCallback(resetAllocationInfos);
+	AllocationDetailPrinterCallback detailsCallback(caller);
+	AllocationTrackingCallback& callback = printDetails
+		? (AllocationTrackingCallback&)detailsCallback
+		: (AllocationTrackingCallback&)collectorCallback;
+
+	for (page_num_t i = 0; i < sNumPages; i++)
+		callback.ProcessTrackingInfo(&sPages[i].allocation_tracking_info, i);
+
+	if (printDetails)
+		return 0;
+
+	// sort the array
+	qsort(sCallerInfoTable, sCallerInfoCount, sizeof(caller_info),
+		&caller_info_compare_count);
+
+	kprintf("%" B_PRId32 " different callers\n\n", sCallerInfoCount);
+
+	size_t totalAllocationCount = 0;
+
+	kprintf("     count      caller\n");
+	kprintf("----------------------------------\n");
+	for (int32 i = 0; i < sCallerInfoCount; i++) {
+		caller_info& info = sCallerInfoTable[i];
+		kprintf("%10" B_PRIuSIZE "  %p", info.count, (void*)info.caller);
+
+		const char* symbol;
+		const char* imageName;
+		bool exactMatch;
+		addr_t baseAddress;
+
+		if (elf_debug_lookup_symbol_address(info.caller, &baseAddress, &symbol,
+				&imageName, &exactMatch) == B_OK) {
+			kprintf("  %s + %#" B_PRIxADDR " (%s)%s\n", symbol,
+				info.caller - baseAddress, imageName,
+				exactMatch ? "" : " (nearest)");
+		} else
+			kprintf("\n");
+
+		totalAllocationCount += info.count;
+	}
+
+	kprintf("\ntotal page allocations: %" B_PRIuSIZE "\n",
+		totalAllocationCount);
+
+	return 0;
+}
+
+
+static int
+dump_page_allocation_infos(int argc, char** argv)
+{
+	page_num_t pageFilter = 0;
+	team_id teamFilter = -1;
+	thread_id threadFilter = -1;
+	bool printStackTraces = false;
+
+	for (int32 i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "--stacktrace") == 0)
+			printStackTraces = true;
+		else if (strcmp(argv[i], "-p") == 0) {
+			uint64 pageNumber;
+			if (++i >= argc
+				|| !evaluate_debug_expression(argv[i], &pageNumber, true)) {
+				print_debugger_command_usage(argv[0]);
+				return 0;
+			}
+
+			pageFilter = pageNumber;
+		} else if (strcmp(argv[i], "--team") == 0) {
+			uint64 team;
+			if (++i >= argc
+				|| !evaluate_debug_expression(argv[i], &team, true)) {
+				print_debugger_command_usage(argv[0]);
+				return 0;
+			}
+
+			teamFilter = team;
+		} else if (strcmp(argv[i], "--thread") == 0) {
+			uint64 thread;
+			if (++i >= argc
+				|| !evaluate_debug_expression(argv[i], &thread, true)) {
+				print_debugger_command_usage(argv[0]);
+				return 0;
+			}
+
+			threadFilter = thread;
+		} else {
+			print_debugger_command_usage(argv[0]);
+			return 0;
+		}
+	}
+
+	AllocationInfoPrinterCallback callback(printStackTraces, pageFilter,
+		teamFilter, threadFilter);
+
+	for (page_num_t i = 0; i < sNumPages; i++)
+		callback.ProcessTrackingInfo(&sPages[i].allocation_tracking_info, i);
+
+	return 0;
+}
+
+#endif	// VM_PAGE_ALLOCATION_TRACKING_AVAILABLE
+
+
 #ifdef TRACK_PAGE_USAGE_STATS
 
 static void
@@ -1157,7 +1527,11 @@ free_page(vm_page* page, bool clear)
 	if (fromQueue != NULL)
 		fromQueue->RemoveUnlocked(page);
 
-	TA(FreePage());
+	TA(FreePage(page->physical_page_number));
+
+#if VM_PAGE_ALLOCATION_TRACKING_AVAILABLE
+	page->allocation_tracking_info.Clear();	
+#endif
 
 	ReadLocker locker(sFreePageQueuesLock);
 
@@ -1350,7 +1724,7 @@ mark_page_range_in_use(page_num_t startPage, page_num_t length, bool wired)
 				VMPageQueue& queue = page->State() == PAGE_STATE_FREE
 					? sFreePageQueue : sClearPageQueue;
 				queue.Remove(page);
-				page->SetState(wired ? PAGE_STATE_UNUSED : PAGE_STATE_UNUSED);
+				page->SetState(wired ? PAGE_STATE_WIRED : PAGE_STATE_UNUSED);
 				page->busy = false;
 				atomic_add(&sUnreservedFreePages, -1);
 				DEBUG_PAGE_ACCESS_END(page);
@@ -2250,7 +2624,7 @@ idle_scan_active_pages(page_stats& pageStats)
 		if (cache == NULL)
 			continue;
 
-		if (cache == NULL || page->State() != PAGE_STATE_ACTIVE) {
+		if (page->State() != PAGE_STATE_ACTIVE) {
 			// page is no longer in the cache or in this queue
 			cache->ReleaseRefAndUnlock();
 			continue;
@@ -2856,23 +3230,28 @@ vm_page_init_num_pages(kernel_args *args)
 	sNonExistingPages = 0;
 	sIgnoredPages = args->ignored_physical_memory / B_PAGE_SIZE;
 
-	for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
+	for (uint32 i = 1; i < args->num_physical_memory_ranges; i++) {
 		page_num_t start = args->physical_memory_range[i].start / B_PAGE_SIZE;
 		if (start > physicalPagesEnd)
 			sNonExistingPages += start - physicalPagesEnd;
 		physicalPagesEnd = start
 			+ args->physical_memory_range[i].size / B_PAGE_SIZE;
+
+#ifdef LIMIT_AVAILABLE_MEMORY
+		page_num_t available
+			= physicalPagesEnd - sPhysicalPageOffset - sNonExistingPages;
+		if (available > LIMIT_AVAILABLE_MEMORY * (1024 * 1024 / B_PAGE_SIZE)) {
+			physicalPagesEnd = sPhysicalPageOffset + sNonExistingPages
+				+ LIMIT_AVAILABLE_MEMORY * (1024 * 1024 / B_PAGE_SIZE);
+			break;
+		}
+#endif
 	}
 
 	TRACE(("first phys page = %#" B_PRIxPHYSADDR ", end %#" B_PRIxPHYSADDR "\n",
 		sPhysicalPageOffset, physicalPagesEnd));
 
 	sNumPages = physicalPagesEnd - sPhysicalPageOffset;
-
-#ifdef LIMIT_AVAILABLE_MEMORY
-	if (sNumPages > LIMIT_AVAILABLE_MEMORY * (1024 * 1024 / B_PAGE_SIZE))
-		sNumPages = LIMIT_AVAILABLE_MEMORY * (1024 * 1024 / B_PAGE_SIZE);
-#endif
 }
 
 
@@ -2903,6 +3282,10 @@ vm_page_init(kernel_args *args)
 	for (uint32 i = 0; i < sNumPages; i++) {
 		sPages[i].Init(sPhysicalPageOffset + i);
 		sFreePageQueue.Append(&sPages[i]);
+
+#if VM_PAGE_ALLOCATION_TRACKING_AVAILABLE
+		sPages[i].allocation_tracking_info.Clear();
+#endif
 	}
 
 	sUnreservedFreePages = sNumPages;
@@ -2986,6 +3369,32 @@ vm_page_init_post_area(kernel_args *args)
 		"\n"
 		"Dumps statistics about page usage counts.\n",
 		B_KDEBUG_DONT_PARSE_ARGUMENTS);
+#endif
+
+#if VM_PAGE_ALLOCATION_TRACKING_AVAILABLE
+	add_debugger_command_etc("page_allocations_per_caller",
+		&dump_page_allocations_per_caller,
+		"Dump current page allocations summed up per caller",
+		"[ -d <caller> ] [ -r ]\n"
+		"The current allocations will by summed up by caller (their count)\n"
+		"printed in decreasing order by count.\n"
+		"If \"-d\" is given, each allocation for caller <caller> is printed\n"
+		"including the respective stack trace.\n"
+		"If \"-r\" is given, the allocation infos are reset after gathering\n"
+		"the information, so the next command invocation will only show the\n"
+		"allocations made after the reset.\n", 0);
+	add_debugger_command_etc("page_allocation_infos",
+		&dump_page_allocation_infos,
+		"Dump current page allocations",
+		"[ --stacktrace ] [ -p <page number> ] [ --team <team ID> ] "
+		"[ --thread <thread ID> ]\n"
+		"The current allocations filtered by optional values will be printed.\n"
+		"The optional \"-p\" page number filters for a specific page,\n"
+		"with \"--team\" and \"--thread\" allocations by specific teams\n"
+		"and/or threads can be filtered (these only work if a corresponding\n"
+		"tracing entry is still available).\n"
+		"If \"--stacktrace\" is given, then stack traces of the allocation\n"
+		"callers are printed, where available\n", 0);
 #endif
 
 	return B_OK;
@@ -3119,8 +3528,6 @@ vm_page_allocate_page(vm_page_reservation* reservation, uint32 flags)
 		otherQueue = &sClearPageQueue;
 	}
 
-	TA(AllocatePage());
-
 	ReadLocker locker(sFreePageQueuesLock);
 
 	vm_page* page = queue->RemoveHeadUnlocked();
@@ -3171,6 +3578,13 @@ vm_page_allocate_page(vm_page_reservation* reservation, uint32 flags)
 	// page was requested
 	if ((flags & VM_PAGE_ALLOC_CLEAR) != 0 && oldPageState != PAGE_STATE_CLEAR)
 		clear_page(page);
+
+#if VM_PAGE_ALLOCATION_TRACKING_AVAILABLE
+	page->allocation_tracking_info.Init(
+		TA(AllocatePage(page->physical_page_number)));
+#else
+	TA(AllocatePage(page->physical_page_number));
+#endif
 
 	return page;
 }
@@ -3224,8 +3638,6 @@ allocate_page_run(page_num_t start, page_num_t length, uint32 flags,
 	ASSERT(pageState != PAGE_STATE_FREE);
 	ASSERT(pageState != PAGE_STATE_CLEAR);
 	ASSERT(start + length <= sNumPages);
-
-	TA(AllocatePageRun(length));
 
 	// Pull the free/clear pages out of their respective queues. Cached pages
 	// are allocated later.
@@ -3350,6 +3762,16 @@ allocate_page_run(page_num_t start, page_num_t length, uint32 flags,
 
 	// Note: We don't unreserve the pages since we pulled them out of the
 	// free/clear queues without adjusting sUnreservedFreePages.
+
+#if VM_PAGE_ALLOCATION_TRACKING_AVAILABLE
+	AbstractTraceEntryWithStackTrace* traceEntry
+		= TA(AllocatePageRun(start, length));
+
+	for (page_num_t i = start; i < start + length; i++)
+		sPages[i].allocation_tracking_info.Init(traceEntry);
+#else
+	TA(AllocatePageRun(start, length));
+#endif
 
 	return length;
 }
@@ -3636,13 +4058,11 @@ vm_page_num_unused_pages(void)
 void
 vm_page_get_stats(system_info *info)
 {
-	// Get free pages count -- not really exact, since we don't know how many
-	// of the reserved pages have already been allocated, but good citizens
-	// unreserve chunk-wise as they are allocating the pages, if they have
-	// reserved a larger quantity.
-	int32 free = sUnreservedFreePages;
-	if (free < 0)
-		free = 0;
+	// Note: there's no locking protecting any of the queues or counters here,
+	// so we run the risk of getting bogus values when evaluating them
+	// throughout this function. As these stats are for informational purposes
+	// only, it is not really worth introducing such locking. Therefore we just
+	// ensure that we don't under- or overflow any of the values.
 
 	// The pages used for the block cache buffers. Those should not be counted
 	// as used but as cached pages.
@@ -3650,10 +4070,33 @@ vm_page_get_stats(system_info *info)
 	// can't really be freed in a low memory situation.
 	page_num_t blockCachePages = block_cache_used_memory() / B_PAGE_SIZE;
 
-	info->max_pages = sNumPages - sNonExistingPages;
-	info->used_pages = gMappedPagesCount - blockCachePages;
-	info->cached_pages = info->max_pages >= free + info->used_pages
-		? info->max_pages - free - info->used_pages : 0;
+	// Non-temporary modified pages are special as they represent pages that
+	// can be written back, so they could be freed if necessary, for us
+	// basically making them into cached pages with a higher overhead. The
+	// modified queue count is therefore split into temporary and non-temporary
+	// counts that are then added to the corresponding number.
+	page_num_t modifiedNonTemporaryPages
+		= (sModifiedPageQueue.Count() - sModifiedTemporaryPages);
+
+	info->max_pages = vm_page_num_pages();
+	info->cached_pages = sCachedPageQueue.Count() + modifiedNonTemporaryPages
+		+ blockCachePages;
+
+	// max_pages is composed of:
+	//	active + inactive + unused + wired + modified + cached + free + clear
+	// So taking out the cached (including modified non-temporary), free and
+	// clear ones leaves us with all used pages.
+	int32 subtractPages = info->cached_pages + sFreePageQueue.Count()
+		+ sClearPageQueue.Count();
+	info->used_pages = subtractPages > info->max_pages
+		? 0 : info->max_pages - subtractPages;
+
+	if (info->used_pages + info->cached_pages > info->max_pages) {
+		// Something was shuffled around while we were summing up the counts.
+		// Make the values sane, preferring the worse case of more used pages.
+		info->cached_pages = info->max_pages - info->used_pages;
+	}
+
 	info->page_faults = vm_num_page_faults();
 	info->ignored_pages = sIgnoredPages;
 
@@ -3671,3 +4114,6 @@ vm_page_max_address()
 {
 	return ((phys_addr_t)sPhysicalPageOffset + sNumPages) * B_PAGE_SIZE - 1;
 }
+
+
+RANGE_MARKER_FUNCTION_END(vm_page)

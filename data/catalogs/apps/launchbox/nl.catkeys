@@ -1,28 +1,30 @@
-1	dutch	x-vnd.Haiku-LaunchBox	1713579432
-Add button here	LaunchBox		Voeg hier knop toe
-Auto-raise	LaunchBox		Automatisch bovenop
-Bummer	LaunchBox		Pech hebben
-Cancel	LaunchBox		Annuleren
-Clear button	LaunchBox		Knop leegmaken
-Clone	LaunchBox		Kloon
-Close	LaunchBox		Sluiten
-Failed to launch 'something',error in Pad data.	LaunchBox		Starten van 'something' is mislukt, fout in Pad-data.
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		'Open map'-commando kon niet naar Tracker gestuurd worden.\n\nError: 
-Horizontal layout	LaunchBox		Horizontale lay-out
-Icon size	LaunchBox		Icoongrootte
-Ignore double-click	LaunchBox		Negeer dubbelklik
-Name Panel	LaunchBox		Naampaneel
+1	dutch; flemish	x-vnd.Haiku-LaunchBox	2160711892
 New	LaunchBox		Nieuw
-OK	LaunchBox		Oké
-Pad	LaunchBox		Balk
-Pad 1	LaunchBox		Balk 1
-Quit	LaunchBox		Afsluiten
-Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Deze balk echt sluiten?\n(De balk wordt niet onthouden.)
-Remove button	LaunchBox		Knop verwijderen
 Set description…	LaunchBox		Naamgeving...
+Vertical layout	LaunchBox		Verticale lay-out
+OK	LaunchBox		Oké
+Pad 1	LaunchBox		Balk 1
+last chance	LaunchBox		laatste kans
+Quit	LaunchBox		Afsluiten
+Clear button	LaunchBox		Knop leegmaken
+Ignore double-click	LaunchBox		Negeer dubbelklik
+Auto-raise	LaunchBox		Automatisch bovenop
 Show on all workspaces	LaunchBox		Toon in alle werkplekken
 Show window border	LaunchBox		Toon vensterrand
-Vertical layout	LaunchBox		Verticale lay-out
+Pad	LaunchBox		Balk
+Icon size	LaunchBox		Icoongrootte
+Bummer	LaunchBox		Pech hebben
+Cancel	LaunchBox		Annuleren
+Remove button	LaunchBox		Knop verwijderen
+Horizontal layout	LaunchBox		Horizontale lay-out
+Failed to launch '%1'.\n\nError:	LaunchBox		zie vorige
+Name Panel	LaunchBox		Naampaneel
+Add button here	LaunchBox		Voeg hier knop toe
+Description for '%3'	LaunchBox		Beschrijving voor '%3'
+Settings	LaunchBox		Instellingen
+Close	LaunchBox		Sluiten
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		'Open map'-commando kon niet naar Tracker gestuurd worden.\n\nError: 
 You can drag an icon here.	LaunchBox		Hierheen kunt u een icoon slepen.
-last chance	LaunchBox		laatste kans
+Clone	LaunchBox		Kloon
 launch popup	LaunchBox		Pop-up starten
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Deze balk echt sluiten?\n(De balk wordt niet onthouden.)

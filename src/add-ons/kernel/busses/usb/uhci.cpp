@@ -399,6 +399,9 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 		fRootHubAddress(0),
 		fPortResetChange(0)
 {
+	// Create a lock for the isochronous transfer list
+	mutex_init(&fIsochronousLock, "UHCI isochronous lock");
+
 	if (!fInitOK) {
 		TRACE_ERROR("bus manager failed to init\n");
 		return;
@@ -532,9 +535,6 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	fCleanupThread = spawn_kernel_thread(CleanupThread,
 		"uhci cleanup thread", B_NORMAL_PRIORITY, (void *)this);
 	resume_thread(fCleanupThread);
-
-	// Create a lock for the isochronous transfer list
-	mutex_init(&fIsochronousLock, "UHCI isochronous lock");
 
 	// Create semaphore the isochronous finisher thread will wait for
 	fFinishIsochronousTransfersSem = create_sem(0,

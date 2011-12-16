@@ -237,6 +237,7 @@ typedef struct ehci_qtd {
 #define EHCI_QTD_STATUS_MISSED	(1 << 2)	// Missed Micro-Frame
 #define EHCI_QTD_STATUS_SPLIT	(1 << 1)	// Split Transaction State
 #define EHCI_QTD_STATUS_PING	(1 << 0)	// Ping State
+#define EHCI_QTD_STATUS_LS_ERR	(1 << 0)	// Full-/Lowspeed Error
 #define EHCI_QTD_PAGE_MASK		0xfffff000
 
 

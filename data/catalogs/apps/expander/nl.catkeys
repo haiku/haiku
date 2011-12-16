@@ -1,32 +1,49 @@
-1	dutch	x-vnd.Haiku-Expander	1989232919
-Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Bent u zeker dat u het uitpakken van het archief wilt stoppen? De uitgepakte items zijn mogelijk niet compleet.
-Cancel	ExpanderWindow		Annuleren
-Close	ExpanderMenu		Sluiten
-Continue	ExpanderWindow		Doorgaan
-Destination	ExpanderWindow		Doel
-Error when expanding archive	ExpanderWindow		Fout tijdens uitpakken archief
+1	dutch; flemish	x-vnd.Haiku-Expander	2537908460
 Expand	ExpanderMenu		Uitpakken
-Expand	ExpanderWindow		Uitpakken
-Expander: Choose destination	DirectoryFilePanel		Expander: Kies doel
-Expander: Open	ExpanderWindow		Expander: Openen
-File	ExpanderMenu		Bestand
-File expanded	ExpanderWindow		Bestand uitgepakt
-Hide contents	ExpanderWindow		Inhoud verbergen
-Select	DirectoryFilePanel		Selecteren
-Select '%s'	DirectoryFilePanel		Selecteer '%s'
-Select current	DirectoryFilePanel		Huidige selecteren
+Close window when done expanding	ExpanderPreferences		Sluit dit venster wanneer het uitpakken klaar is
 Set destination…	ExpanderMenu		Bepaal doel…
-Set source…	ExpanderMenu		Bron bepalen…
+Use:	ExpanderPreferences		Gebruik:
+File expanded	ExpanderWindow		Bestand uitgepakt
+The destination is read only.	ExpanderWindow		Het doel is alleen-lezen.
+Expander: Open	ExpanderWindow		Expander: Openen
+ is not supported	ExpanderWindow		is niet ondersteund
+Expander settings	ExpanderPreferences		Expander-instellingen
+Select current	DirectoryFilePanel		Huidige selecteren
+Source	ExpanderWindow		Bron
+Error when expanding archive	ExpanderWindow		Fout tijdens uitpakken archief
+Hide contents	ExpanderWindow		Inhoud verbergen
+Cancel	ExpanderWindow		Annuleren
+Automatically expand files	ExpanderPreferences		Bestanden automatisch uitpakken
+Creating listing for '%s'	ExpanderWindow		Creëren van een overzicht voor '%s'
+Continue	ExpanderWindow		Doorgaan
+The destination folder does not exist.	ExpanderWindow		De doelmap bestaat niet.
+Cancel	ExpanderPreferences		Annuleren
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Bent u zeker dat u het uitpakken van het archief wilt stoppen? De uitgepakte items zijn mogelijk niet compleet.
+Select	DirectoryFilePanel		Selecteren
+Destination folder:	ExpanderPreferences		Doelmap:
+Same directory as source (archive) file	ExpanderPreferences		Dezelfde map als het bronbestand (archief)
+Expanding '%s'	ExpanderWindow		Bezig met het uitpakken van '%s'
+Expansion:	ExpanderPreferences		Uitpakken:
 Settings	ExpanderMenu		Instellingen
 Settings…	ExpanderMenu		Instellingen…
-Show contents	ExpanderMenu		Toon inhoud
+Expander: Choose destination	DirectoryFilePanel		Expander: Kies doel
+Select	ExpanderPreferences		Selecteren
 Show contents	ExpanderWindow		Toon inhoud
-Source	ExpanderWindow		Bron
-Stop	ExpanderMenu		Stoppen
-Stop	ExpanderWindow		Stop
-The destination folder does not exist.	ExpanderWindow		De doelmap bestaat niet.
-The destination is not a folder.	ExpanderWindow		Het doel is geen map.
-The destination is read only.	ExpanderWindow		Het doel is alleen-lezen.
-The file doesn't exist	ExpanderWindow		Het bestand bestaat niet
+Automatically show contents listing	ExpanderPreferences		Automatisch een lijst met inhoud weergeven
+OK	ExpanderPreferences		Ok
+Leave destination folder path empty	ExpanderPreferences		Laat doelmap pad leeg
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		De map werd verplaatst, hernoemd of niet\nondersteund.
-is not supported	ExpanderWindow		wordt niet ondersteund
+The file doesn't exist	ExpanderWindow		Het bestand bestaat niet
+Stop	ExpanderMenu		Stoppen
+File	ExpanderMenu		Bestand
+Other:	ExpanderPreferences		Andere:
+Expander	System name		Expander
+Expand	ExpanderWindow		Uitpakken
+Close	ExpanderMenu		Sluiten
+The destination is not a folder.	ExpanderWindow		Het doel is geen map.
+Open destination folder after extraction	ExpanderPreferences		Open doelmap na het uitpakken
+Set source…	ExpanderMenu		Bron bepalen…
+Select '%s'	DirectoryFilePanel		Selecteer '%s'
+Show contents	ExpanderMenu		Toon inhoud
+Stop	ExpanderWindow		Stop
+Destination	ExpanderWindow		Doel

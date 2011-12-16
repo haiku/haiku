@@ -12,6 +12,10 @@ local localetools =
 	<build>collectcatkeys
 ;
 
+# Due to the use of STL fstream open() mapping the function names via macro
+# name doesn't work.
+DEFINES += _HAIKU_BUILD_DONT_REMAP_FD_FUNCTIONS ;
+
 USES_BE_API on $(localetools) = true ;
 
 UseLibraryHeaders icu ;

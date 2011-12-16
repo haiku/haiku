@@ -10,6 +10,8 @@
 #include <E-mail.h>
 
 
+#define B_MAIL_DAEMON_SIGNATURE "application/x-vnd.Be-POST"
+
 const uint32 kMsgCheckAndSend = 'mbth';
 const uint32 kMsgCheckMessage = 'mnow';
 const uint32 kMsgSendMessages = 'msnd';
@@ -20,6 +22,9 @@ const uint32 kMsgCountNewMessages = 'mnum';
 const uint32 kMsgMarkMessageAsRead = 'mmar';
 const uint32 kMsgFetchBody = 'mfeb';
 const uint32 kMsgBodyFetched = 'mbfe';
+
+
+class BMessenger;
 
 
 class BMailDaemon {

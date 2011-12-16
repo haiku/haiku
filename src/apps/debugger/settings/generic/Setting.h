@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef SETTING_H
@@ -15,8 +16,10 @@
 
 enum setting_type {
 	SETTING_TYPE_BOOL,
+	SETTING_TYPE_FLOAT,
 	SETTING_TYPE_OPTIONS,
-	SETTING_TYPE_RANGE
+	SETTING_TYPE_RANGE,
+	SETTING_TYPE_RECT
 };
 
 
@@ -39,6 +42,16 @@ public:
 	virtual	BVariant			DefaultValue() const;
 
 	virtual	bool				DefaultBoolValue() const = 0;
+};
+
+
+class FloatSetting : public virtual Setting {
+public:
+	virtual	setting_type		Type() const;
+
+	virtual	BVariant			DefaultValue() const;
+
+	virtual	float				DefaultFloatValue() const = 0;
 };
 
 
@@ -74,6 +87,16 @@ public:
 };
 
 
+class RectSetting : public virtual Setting {
+public:
+	virtual	setting_type		Type() const;
+
+	virtual	BVariant			DefaultValue() const;
+
+	virtual	BRect				DefaultRectValue() const = 0;
+};
+
+
 class AbstractSetting : public virtual Setting {
 public:
 								AbstractSetting(const BString& id,
@@ -97,6 +120,18 @@ public:
 
 private:
 			bool				fDefaultValue;
+};
+
+
+class FloatSettingImpl : public AbstractSetting, public FloatSetting {
+public:
+								FloatSettingImpl(const BString& id,
+									const BString& name, float defaultValue);
+
+	virtual	float				DefaultFloatValue() const;
+
+private:
+			float				fDefaultValue;
 };
 
 
@@ -146,6 +181,19 @@ private:
 			BVariant			fLowerBound;
 			BVariant			fUpperBound;
 			BVariant			fDefaultValue;
+};
+
+
+class RectSettingImpl : public AbstractSetting, public RectSetting {
+public:
+								RectSettingImpl(const BString& id,
+									const BString& name,
+									const BRect& defaultValue);
+
+	virtual	BRect				DefaultRectValue() const;
+
+private:
+			BRect				fDefaultValue;
 };
 
 

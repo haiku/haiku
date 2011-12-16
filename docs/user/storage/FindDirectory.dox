@@ -13,8 +13,8 @@
 /*!
 	\file FindDirectory.h
 	\ingroup storage
-	\brief Provides the find_dirctory function.
-	
+	\brief Provides the find_directory function.
+
 	Haiku provides a set of directories for applications to use. These can be
 	accessed using the find_directory function. It is very important to use the
 	function at runtime and not hardcode the path, as it may change in future
@@ -25,6 +25,7 @@
 	Note this function can be accessed from C code, to make it easy to use also
 	in ported applications.
 */
+
 
 /*!
 	\enum directory_which
@@ -44,6 +45,7 @@
 	directories for application settings, since each user may want different
 	settings.
 */
+
 
 /*!
 	\var directory_which B_DESKTOP_DIRECTORY
@@ -162,6 +164,7 @@
 	\var directory_which B_UTILITIES_DIRECTORY
 */
 
+
 /*!
 	\fn status_t find_directory(directory_which which, dev_t volume, bool createIt, char* pathString, int32 length)
 	\brief C interface to find_directory
@@ -170,6 +173,7 @@
 	on \a volume. Creates the directory if it doesn't exists and \a creqteIt is
 	set.
 */
+
 
 /*!
 	\fn status_t find_directory(directory_which which, BPath* path, bool createIt = false, BVolume* volume = NULL)

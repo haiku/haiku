@@ -595,6 +595,26 @@ read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 			return B_OK;
 		}
 
+		// Verify that the device is really present...
+		uint16 deviceID = pci->read_pci_config(pciAddress.bus,
+			pciAddress.device, pciAddress.function, PCI_device_id, 2);
+		if (deviceID == 0xffff) {
+			// Not present or disabled.
+			TRACE("device not present\n");
+			return B_OK;
+		}
+
+		// ... and that it really is a PCI bridge we support.
+		uint8 baseClass = pci->read_pci_config(pciAddress.bus,
+			pciAddress.device, pciAddress.function, PCI_class_base, 1);
+		uint8 subClass = pci->read_pci_config(pciAddress.bus,
+			pciAddress.device, pciAddress.function, PCI_class_sub, 1);
+		if (baseClass != PCI_bridge || subClass != PCI_pci) {
+			// Not a bridge or an unsupported one.
+			TRACE("not a PCI bridge\n");
+			return B_OK;
+		}
+
 		uint8 headerType = pci->read_pci_config(pciAddress.bus,
 			pciAddress.device, pciAddress.function, PCI_header_type, 1);
 
@@ -605,8 +625,8 @@ read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 				break;
 
 			default:
-				// Simply not a bridge or not present at all.
-				TRACE("not a PCI bridge (0x%02x)\n", headerType);
+				// Unsupported header type.
+				TRACE("unsupported header type (0x%02x)\n", headerType);
 				return B_OK;
 		}
 
@@ -625,6 +645,11 @@ read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 			dprintf("invalid secondary bus %u on primary bus %u,"
 				" can't configure irq routing of devices below\n",
 				secondaryBus, currentBus);
+			// TODO: Maybe we want to just return B_OK anyway so that we don't
+			// fail this step. We ensure that we matched all devices at the
+			// end of preparation, so we'd detect missing child devices anyway
+			// and it would not cause us to fail for empty misconfigured busses
+			// that we don't actually care about.
 			return B_ERROR;
 		}
 

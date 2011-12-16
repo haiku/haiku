@@ -11,6 +11,7 @@
 
 
 #include "radeon_hd.h"
+#include "sensors.h"
 
 #include "AreaKeeper.h"
 #include "driver.h"
@@ -35,6 +36,53 @@
 #endif
 
 #define ERROR(x...) dprintf("radeon_hd: " x)
+
+
+static const char radeon_chip_name[][16] = {
+	"R420",
+	"R423",
+	"RV410",
+	"RS400",
+	"RS480",
+	"RS600",
+	"RS690",
+	"RS740",
+	"RV515",
+	"R520",
+	"RV530",
+	"RV560",
+	"RV570",
+	"R580",
+	"R600",
+	"RV610",
+	"RV630",
+	"RV670",
+	"RV620",
+	"RV635",
+	"RS780",
+	"RS880",
+	"RV770",
+	"RV730",
+	"RV710",
+	"RV740",
+	"Cedar",
+	"Redwood",
+	"Juniper",
+	"Cypress",
+	"Hemlock",
+	"Palm",
+	"Sumo",
+	"Sumo2",
+	"Caicos",
+	"Turks",
+	"Barts",
+	"Cayman",
+	"Antilles",
+	"Lombok",
+	"Thames",
+	"Tahiti",
+	"New Zealand"
+};
 
 
 //	#pragma mark -
@@ -114,7 +162,7 @@ mapAtomBIOS(radeon_info &info, uint32 romBase, uint32 romSize)
 }
 
 
-status_t
+static status_t
 radeon_hd_getbios(radeon_info &info)
 {
 	TRACE("card(%ld): %s: called\n", info.id, __func__);
@@ -193,7 +241,7 @@ radeon_hd_getbios(radeon_info &info)
 }
 
 
-status_t
+static status_t
 radeon_hd_getbios_ni(radeon_info &info)
 {
 	TRACE("card(%ld): %s: called\n", info.id, __func__);
@@ -233,7 +281,7 @@ radeon_hd_getbios_ni(radeon_info &info)
 
 	status_t result = B_OK;
 	if (romBase == 0 || romSize == 0) {
-		ERROR("%s: No AtomBIOS found at PCI ROM BAR\n", __func__);
+		ERROR("%s: No AtomBIOS location found at PCI ROM BAR\n", __func__);
 		result = B_ERROR;
 	} else {
 		result = mapAtomBIOS(info, romBase, romSize);
@@ -261,7 +309,7 @@ radeon_hd_getbios_ni(radeon_info &info)
 }
 
 
-status_t
+static status_t
 radeon_hd_getbios_r700(radeon_info &info)
 {
 	TRACE("card(%ld): %s: called\n", info.id, __func__);
@@ -305,7 +353,7 @@ radeon_hd_getbios_r700(radeon_info &info)
 
 	status_t result = B_OK;
 	if (romBase == 0 || romSize == 0) {
-		ERROR("%s: No AtomBIOS found at PCI ROM BAR\n", __func__);
+		ERROR("%s: No AtomBIOS location found at PCI ROM BAR\n", __func__);
 		result = B_ERROR;
 	} else {
 		result = mapAtomBIOS(info, romBase, romSize);
@@ -334,7 +382,7 @@ radeon_hd_getbios_r700(radeon_info &info)
 }
 
 
-status_t
+static status_t
 radeon_hd_getbios_r600(radeon_info &info)
 {
 	TRACE("card(%ld): %s: called\n", info.id, __func__);
@@ -404,7 +452,7 @@ radeon_hd_getbios_r600(radeon_info &info)
 
 	status_t result = B_OK;
 	if (romBase == 0 || romSize == 0) {
-		ERROR("%s: No AtomBIOS found at PCI ROM BAR\n", __func__);
+		ERROR("%s: No AtomBIOS location found at PCI ROM BAR\n", __func__);
 		result = B_ERROR;
 	} else {
 		result = mapAtomBIOS(info, romBase, romSize);
@@ -443,14 +491,87 @@ radeon_hd_getbios_r600(radeon_info &info)
 }
 
 
+static status_t
+radeon_hd_getbios_avivo(radeon_info &info)
+{
+	TRACE("card(%ld): %s: called\n", info.id, __func__);
+	uint32 sepromControl = read32(info.registers + RADEON_SEPROM_CNTL1);
+	uint32 viphControl = read32(info.registers + RADEON_VIPH_CONTROL);
+	uint32 busControl = read32(info.registers + RV370_BUS_CNTL);
+	uint32 d1vgaControl = read32(info.registers + AVIVO_D1VGA_CONTROL);
+	uint32 d2vgaControl = read32(info.registers + AVIVO_D2VGA_CONTROL);
+	uint32 vgaRenderControl
+		= read32(info.registers + AVIVO_VGA_RENDER_CONTROL);
+	uint32 gpioPadA = read32(info.registers + RADEON_GPIOPAD_A);
+	uint32 gpioPadEN = read32(info.registers + RADEON_GPIOPAD_EN);
+	uint32 gpioPadMask = read32(info.registers + RADEON_GPIOPAD_MASK);
+
+	write32(info.registers + RADEON_SEPROM_CNTL1,
+		((sepromControl & ~RADEON_SCK_PRESCALE_MASK)
+		| (0xc << RADEON_SCK_PRESCALE_SHIFT)));
+	write32(info.registers + RADEON_GPIOPAD_A, 0);
+	write32(info.registers + RADEON_GPIOPAD_EN, 0);
+	write32(info.registers + RADEON_GPIOPAD_MASK, 0);
+
+	// disable VIP
+	write32(info.registers + RADEON_VIPH_CONTROL,
+		(viphControl & ~RADEON_VIPH_EN));
+
+	// enable the ROM
+	write32(info.registers + RV370_BUS_CNTL,
+		(busControl & ~RV370_BUS_BIOS_DIS_ROM));
+
+	// disable VGA
+	write32(info.registers + AVIVO_D1VGA_CONTROL,
+		(d1vgaControl & ~(AVIVO_DVGA_CONTROL_MODE_ENABLE
+		| AVIVO_DVGA_CONTROL_TIMING_SELECT)));
+	write32(info.registers + AVIVO_D2VGA_CONTROL,
+		(d2vgaControl & ~(AVIVO_DVGA_CONTROL_MODE_ENABLE
+		| AVIVO_DVGA_CONTROL_TIMING_SELECT)));
+	write32(info.registers + AVIVO_VGA_RENDER_CONTROL,
+		(vgaRenderControl & ~AVIVO_VGA_VSTATUS_CNTL_MASK));
+
+	uint32 romBase = info.pci->u.h0.rom_base;
+	uint32 romSize = info.pci->u.h0.rom_size;
+
+	status_t result = B_OK;
+	if (romBase == 0 || romSize == 0) {
+		ERROR("%s: No AtomBIOS location found at PCI ROM BAR\n", __func__);
+		result = B_ERROR;
+	} else {
+		result = mapAtomBIOS(info, romBase, romSize);
+	}
+
+	if (result == B_OK) {
+		ERROR("%s: AtomBIOS found using disabled method at 0x%" B_PRIX32
+			" [size: 0x%" B_PRIX32 "]\n", __func__, romBase, romSize);
+		info.shared_info->rom_phys = romBase;
+		info.shared_info->rom_size = romSize;
+	}
+
+	// restore registers
+	write32(info.registers + RADEON_SEPROM_CNTL1, sepromControl);
+	write32(info.registers + RADEON_VIPH_CONTROL, viphControl);
+	write32(info.registers + RV370_BUS_CNTL, busControl);
+	write32(info.registers + AVIVO_D1VGA_CONTROL, d1vgaControl);
+	write32(info.registers + AVIVO_D2VGA_CONTROL, d2vgaControl);
+	write32(info.registers + AVIVO_VGA_RENDER_CONTROL, vgaRenderControl);
+	write32(info.registers + RADEON_GPIOPAD_A, gpioPadA);
+	write32(info.registers + RADEON_GPIOPAD_EN, gpioPadEN);
+	write32(info.registers + RADEON_GPIOPAD_MASK, gpioPadMask);
+
+	return result;
+}
+
+
 status_t
 radeon_hd_init(radeon_info &info)
 {
 	TRACE("card(%ld): %s: called\n", info.id, __func__);
 
 	ERROR("%s: card(%ld): "
-		"Radeon r%" B_PRIX16 " 1002:%" B_PRIX32 "\n",
-		__func__, info.id, info.device_chipset, info.device_id);
+		"Radeon %s 1002:%" B_PRIX32 "\n", __func__, info.id,
+		radeon_chip_name[info.chipsetID], info.pciID);
 
 	// *** Map shared info
 	AreaKeeper sharedCreator;
@@ -481,20 +602,52 @@ radeon_hd_init(radeon_info &info)
 	mmioMapper.Detach();
 
 	// *** Populate frame buffer information
-	if (info.shared_info->device_chipset >= RADEON_R1000) {
-		// Evergreen+ has memory stored in MB
-		info.shared_info->graphics_memory_size
-			= read32(info.registers + CONFIG_MEMSIZE) * 1024;
-	} else {
+	if (info.chipsetID >= RADEON_CEDAR) {
+		if ((info.chipsetFlags & CHIP_APU) != 0
+			|| (info.chipsetFlags & CHIP_IGP) != 0) {
+			// Evergreen+ fusion in bytes
+			info.shared_info->graphics_memory_size
+				= read32(info.registers + CONFIG_MEMSIZE) / 1024;
+		} else {
+			// Evergreen+ has memory stored in MB
+			info.shared_info->graphics_memory_size
+				= read32(info.registers + CONFIG_MEMSIZE) * 1024;
+		}
+	} else if (info.chipsetID >= RADEON_R600) {
 		// R600-R700 has memory stored in bytes
 		info.shared_info->graphics_memory_size
 			= read32(info.registers + CONFIG_MEMSIZE) / 1024;
+	} else {
+		// R420 - R600 cards
+		// older cards use RADEON_CONFIG_MEMSIZE vs CONFIG_MEMSIZE
+		if ((info.chipsetFlags & CHIP_IGP) != 0) {
+			// NB_TOM holds amount of ram stolen for GPU
+			uint32 tom = read32(info.registers + RADEON_NB_TOM);
+			info.shared_info->graphics_memory_size
+				= (((tom >> 16) - (tom & 0xffff) + 1) << 16);
+			write32(info.registers + RADEON_CONFIG_MEMSIZE,
+				info.shared_info->graphics_memory_size);
+		} else {
+			info.shared_info->graphics_memory_size
+				= read32(info.registers + RADEON_CONFIG_MEMSIZE);
+			if (info.shared_info->graphics_memory_size == 0) {
+				// known bug if video memory == 8MB
+				info.shared_info->graphics_memory_size = 8192;
+				write32(info.registers + RADEON_CONFIG_MEMSIZE,
+					info.shared_info->graphics_memory_size * 1024);
+			}
+		}
 	}
 
 	uint32 barSize = info.pci->u.h0.base_register_sizes[PCI_BAR_FB] / 1024;
 
 	// if graphics memory is larger then PCI bar, just map bar
-	if (info.shared_info->graphics_memory_size > barSize) {
+	if (info.shared_info->graphics_memory_size == 0) {
+		// we can recover as we have PCI FB bar, but this should be fixed
+		ERROR("%s: Error: found 0MB video ram, using PCI bar size...\n",
+			__func__);
+		info.shared_info->frame_buffer_size = barSize;
+	} else if (info.shared_info->graphics_memory_size > barSize) {
 		TRACE("%s: shrinking frame buffer to PCI bar...\n",
 			__func__);
 		info.shared_info->frame_buffer_size = barSize;
@@ -531,14 +684,16 @@ radeon_hd_init(radeon_info &info)
 		= info.pci->u.h0.base_registers[PCI_BAR_FB];
 
 	// Pass common information to accelerant
-	info.shared_info->device_index = info.id;
-	info.shared_info->device_id = info.device_id;
-	info.shared_info->device_chipset = info.device_chipset;
+	info.shared_info->deviceIndex = info.id;
+	info.shared_info->pciID = info.pciID;
+	info.shared_info->chipsetID = info.chipsetID;
 	info.shared_info->chipsetFlags = info.chipsetFlags;
 	info.shared_info->dceMajor = info.dceMajor;
 	info.shared_info->dceMinor = info.dceMinor;
 	info.shared_info->registers_area = info.registers_area;
-	strcpy(info.shared_info->device_identifier, info.device_identifier);
+	strcpy(info.shared_info->deviceName, info.deviceName);
+	strcpy(info.shared_info->chipsetName,
+		radeon_chip_name[info.chipsetID]);
 
 	// *** AtomBIOS mapping
 	// First we try an active bios read
@@ -546,12 +701,15 @@ radeon_hd_init(radeon_info &info)
 
 	if (biosStatus != B_OK) {
 		// If the active read fails, we try a disabled read
-		if (info.device_chipset >= (RADEON_R1000 | 0x20))
+		if (info.chipsetID >= RADEON_CAICOS)
 			biosStatus = radeon_hd_getbios_ni(info);
-		else if (info.device_chipset >= RADEON_R700)
+		else if (info.chipsetID >= RADEON_RV770)
 			biosStatus = radeon_hd_getbios_r700(info);
-		else if (info.device_chipset >= RADEON_R600)
+		else if (info.chipsetID >= RADEON_R600)
 			biosStatus = radeon_hd_getbios_r600(info);
+		else if (info.chipsetID >= RADEON_RS600)
+			biosStatus = radeon_hd_getbios_avivo(info);
+		// else legacy_read_disabled_bios
 	}
 
 	if (biosStatus != B_OK) {
@@ -607,6 +765,10 @@ radeon_hd_init(radeon_info &info)
 	}
 
 	TRACE("card(%ld): %s completed successfully!\n", info.id, __func__);
+
+	TRACE("card(%ld): GPU thermal status: %" B_PRId32 "C\n", info.id,
+		radeon_thermal_query(info) / 1000);
+
 	return B_OK;
 }
 

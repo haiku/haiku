@@ -1,48 +1,48 @@
-1	slovak	x-vnd.Haiku-PowerStatus	2178654445
-About	PowerStatus		O aplikácii
-About…	PowerStatus		O aplikácii...
-Battery charging	PowerStatus		Batéria sa nabíja
-Battery discharging	PowerStatus		Batéria sa vybíja
-Battery info	PowerStatus		Info o batérii
-Battery info…	PowerStatus		Info o batérii...
-Battery unused	PowerStatus		Batéria nepoužitá
-Capacity granularity 1: 	PowerStatus		Granularita kapacity 1:
-Capacity granularity 2: 	PowerStatus		Granularita kapacity 2:
-Capacity: 	PowerStatus		Kapacita:
-Current rate: 	PowerStatus		Prúd:
-Damaged battery	PowerStatus		Poškodená batéria
-Design capacity low warning: 	PowerStatus		Upozornenie na nízku navrhnutú kapacitu:
-Design capacity warning: 	PowerStatus		Upozornenie navrhnutej kapacity:
-Design capacity: 	PowerStatus		Navrhnutá kapacita:
-Design voltage: 	PowerStatus		Návrhové napätie:
-Empty battery slot	PowerStatus		Prázdne miesto na batériu
-Extended battery info	PowerStatus		Rozšírené info o batérii
-Install in Deskbar	PowerStatus		Nainštalovať do Panelu
-Last full charge: 	PowerStatus		Naposledy celkom nabitá:
-Model number: 	PowerStatus		Číslo modelu:
-OEM info: 	PowerStatus		Info OEM:
-OK	PowerStatus		OK
-Power status box	PowerStatus		Okno stavu napájania
-PowerStatus	PowerStatus		PowerStatus
-PowerStatus	System name		PowerStatus
-PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\nnapísal Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
-Quit	PowerStatus		Ukončiť
-Run in window	PowerStatus		Spúšťať v okne
-Serial number: 	PowerStatus		Sériové číslo:
+1	slovak	x-vnd.Haiku-PowerStatus	3419486861
+Design capacity low warning: 	PowerStatus		Upozornenie na nízku navrhnutú kapacitu: 
 Show percent	PowerStatus		Zobrazovať percentá
-Show status icon	PowerStatus		Zobrazovať stavovú ikonu
-Show text label	PowerStatus		Zobraziť textové návestie
-Show time	PowerStatus		Zobraziť čas
-Technology: 	PowerStatus		Technológia:
-Type: 	PowerStatus		Typ:
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		PowerStatus môžete spúšťať v okne alebo ho nainštalovať do Panelu.
-charging	PowerStatus		nabíja sa
-discharging	PowerStatus		vybíja sa
-mA	PowerStatus		mA
-mAh	PowerStatus		mAh
-mV	PowerStatus		mV
-mW	PowerStatus		mW
-mWh	PowerStatus		mWh
-no battery	PowerStatus		bez batérie
+Design capacity: 	PowerStatus		Navrhnutá kapacita: 
+ mW	PowerStatus		 mW
+Type: 	PowerStatus		Typ: 
 non-rechargeable	PowerStatus		nedobíjateľná
+Empty battery slot	PowerStatus		Prázdne miesto na batériu
+ mV	PowerStatus		 mV
+Run in window	PowerStatus		Spúšťať v okne
+About	PowerStatus		O aplikácii
+PowerStatus	System name		PowerStatus
+PowerStatus	PowerStatus		PowerStatus
+ mWh	PowerStatus		 mWh
+Battery info…	PowerStatus		Info o batérii…
+Damaged battery	PowerStatus		Poškodená batéria
+Show time	PowerStatus		Zobraziť čas
+Last full charge: 	PowerStatus		Naposledy celkom nabitá: 
+Battery unused	PowerStatus		Batéria nepoužitá
+Extended battery info	PowerStatus		Rozšírené info o batérii
+ mA	PowerStatus		 mA
+Current rate: 	PowerStatus		Prúd: 
+discharging	PowerStatus		vybíja sa
+Show text label	PowerStatus		Zobraziť textové návestie
+About…	PowerStatus		O aplikácii…
+Model number: 	PowerStatus		Číslo modelu: 
+Install in Deskbar	PowerStatus		Nainštalovať do Panelu
+ mAh	PowerStatus		 mAh
+Capacity: 	PowerStatus		Kapacita: 
+Battery discharging	PowerStatus		Batéria sa vybíja
+Serial number: 	PowerStatus		Sériové číslo: 
+Capacity granularity 1: 	PowerStatus		Granularita kapacity 1: 
+OK	PowerStatus		OK
+OEM info: 	PowerStatus		Info OEM: 
+Design voltage: 	PowerStatus		Návrhové napätie: 
+PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\nnapísal Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
+Battery charging	PowerStatus		Batéria sa nabíja
+Design capacity warning: 	PowerStatus		Upozornenie navrhnutej kapacity: 
+Battery info	PowerStatus		Info o batérii
+Quit	PowerStatus		Ukončiť
 rechargeable	PowerStatus		dobíjateľná
+charging	PowerStatus		nabíja sa
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		PowerStatus môžete spúšťať v okne alebo ho nainštalovať do Panelu.
+Power status box	PowerStatus		Okno stavu napájania
+Show status icon	PowerStatus		Zobrazovať stavovú ikonu
+Capacity granularity 2: 	PowerStatus		Granularita kapacity 2: 
+Technology: 	PowerStatus		Technológia: 
+no battery	PowerStatus		bez batérie

@@ -1,26 +1,23 @@
-1	german	x-vnd.Be-POST	1358359182
-%.1f / %.1f kb (%d / %d messages)	StatusWindow		%.1f / %.1f KiB (%d / %d Nachrichten)
-%d / %d messages	StatusWindow		%d / %d Nachrichten
-%num new message	DeskbarView		%num neue Nachricht
-%num new message for %name\n	MailDaemon		%num neue Nachricht für %name\n
-%num new message.	MailDaemon		%num neue Nachricht.
-%num new messages	DeskbarView		%num neue Nachrichten
-%num new messages for %name\n	MailDaemon		%num neue Nachrichten für %name\n
-%num new messages.	MailDaemon		%num neue Nachrichten.
-<no accounts>	DeskbarView		<keine Konten>
-Check for mail now	DeskbarView		E-Mails jetzt abrufen
-Check for mails only	DeskbarView		E-Mails nur abrufen für
-Check mail now	StatusWindow		E-Mails jetzt abrufen
-Create new message…	DeskbarView		Nachricht verfassen…
+1	german	x-vnd.Be-POST	2300302075
 Fetching mail for %name	Notifier		E-Mails für %name abrufen
-Mail Status	MailDaemon		E-Mail-Status
-Mail daemon status log	MailDaemon		E-Mail-Dienst Statusmeldungen
-New Messages	MailDaemon		Neue Nachrichten
-No new messages	DeskbarView		Keine neuen Nachrichten
-No new messages	MailDaemon		Keine neuen Nachrichten
-No new messages.	MailDaemon		Keine neuen Nachrichten.
-No new messages.	StatusWindow		Keine neuen Nachrichten.
-Preferences…	DeskbarView		Einstellungen…
+Check for mails only	DeskbarView		E-Mails nur abrufen für
 Send pending mails	DeskbarView		E-Mails senden
-Sending mail for %name	Notifier		E-Mails von %name senden
+New Messages	MailDaemon		Neue Nachrichten
+<no accounts>	DeskbarView		<keine Konten>
+%num new messages	DeskbarView		%num neue Nachrichten
+Mail status	MailDaemon		E-Mail-Status
 Shutdown mail services	DeskbarView		E-Mail-Dienst ausschalten
+%num new message	DeskbarView		%num neue Nachricht
+Sending mail for %name	Notifier		E-Mails von %name senden
+Preferences…	DeskbarView		Einstellungen…
+%num new messages.	MailDaemon		%num neue Nachrichten.
+%num new message.	MailDaemon		%num neue Nachricht.
+Create new message…	DeskbarView		Nachricht verfassen…
+%num new message for %name\n	MailDaemon		%num neue Nachricht für %name\n
+No new messages	MailDaemon		Keine neuen Nachrichten
+Check for mail now	DeskbarView		E-Mails jetzt abrufen
+No new messages	DeskbarView		Keine neuen Nachrichten
+%num new messages for %name\n	MailDaemon		%num neue Nachrichten für %name\n
+Mail daemon status log	MailDaemon		E-Mail-Dienst Statusmeldungen
+No new messages.	MailDaemon		Keine neuen Nachrichten.
+Mail status	Notifier		Email-Status

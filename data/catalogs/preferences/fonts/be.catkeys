@@ -1,12 +1,12 @@
 1	belarusian	x-vnd.Haiku-Fonts	4164233892
-Bold font:	Font view		Тлусты шрыфт:
-Defaults	Main window		Прадвызначаныя
-Fixed font:	Font view		Роўнашырокі шрыфт:
-Fonts	System name		Шрыфты
-Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Fonts\n\tCopyright 2004-2005, Haiku.\n\n
-Menu font:	Font view		Шрыфт меню:
-OK	main		Так
 Plain font:	Font view		Просты шрыфт:
+Defaults	Main window		Прадвызначаныя
+OK	main		Так
+Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Fonts\n\tCopyright 2004-2005, Haiku.\n\n
 Revert	Main window		Вярнуць
 Size:	Font Selection view		Памер:
+Menu font:	Font view		Шрыфт меню:
+Fixed font:	Font view		Роўнашырокі шрыфт:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	У рудога вераб’я ў сховішчы пад фатэлем ляжаць нейкія гаючыя зёлкі.
+Bold font:	Font view		Тлусты шрыфт:
+Fonts	System name		Шрыфты

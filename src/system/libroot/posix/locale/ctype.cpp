@@ -26,6 +26,20 @@
 #undef toupper
 
 
+extern "C"
+{
+
+
+unsigned short int __ctype_mb_cur_max = 1;
+
+
+unsigned short
+__ctype_get_mb_cur_max()
+{
+	return __ctype_mb_cur_max;
+}
+
+
 int
 isalnum(int c)
 {
@@ -179,4 +193,7 @@ toupper(int c)
 		return __ctype_toupper[c];
 
 	return c;
+}
+
+
 }

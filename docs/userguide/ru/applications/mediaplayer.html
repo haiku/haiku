@@ -39,6 +39,8 @@
 <li><a href="../../uk/applications/mediaplayer.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/applications/mediaplayer.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/applications/mediaplayer.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/mediaplayer.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/mediaplayer.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/applications/mediaplayer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -59,7 +61,7 @@
 <tr><td>Настройки хранятся по адресу:	</td><td></td><td><span class="path">~/config/settings/MediaPlayer</span></td></tr>
 </table>
 <p><br /></p>
-<p>Медиаплеер - приложение для воспроизведения видео и аудио файлов. Спасибо команде <a href="http://www.ffmpeg.org/">ffmpeg</a>  благодаря им проигрыватель поддерживает большинство форматов . Графический интерфейс медиа- проигрывателя довольно прост:</p>
+<p>Медиаплеер - приложение для воспроизведения видео и аудио файлов. Спасибо команде <a href="http://www.ffmpeg.org/">ffmpeg</a>,  благодаря им проигрыватель поддерживает большинство форматов . Графический интерфейс медиаплеера довольно прост:</p>
 <img src="../images/apps-images/mediaplayer.png" alt="mediaplayer.png" />
 <p>Шкала прогресса позволяет быстро перейти к определённому моменту. Если удерживать некоторе время курсор мыши над этой шкалой, то появится подсказка отображающая сколько времени прошло с начала воспроизведения и сколько осталось до конца. Справа от шкалы находится время оставшееся до 
 конца воспроизведения, однако сделать так чтоб вместо него отображалось время прошедшее с начала проигрывания, или длину клипа. Для этого просто щёлкните по этому месту.<br />
@@ -69,21 +71,21 @@
 <p>Поскольку нет каких-либо особенностей, которые следовало бы описать, при воспроизведении аудио-файлов. То перейдём к описанию основных особенностей при воспроизведении видео-файлов.</p>
 <img src="../images/apps-images/mediaplayer-info.png" alt="mediaplayer-info.png" />
 <p>Для всех медиа-файлов доступен пункт меню <span class="menu">Информация о файле…</span> (также можно вызвать использовав сочетание клавиш <span class="key">ALT</span> <span class="key">I</span>). В вызываемом этим пунктом меню окне отображается информация о продолжительности и кодеках.</p>
-<p>Most of the often used commands from the menus are also available from a right-click context menu on the video area. Convenient when in full-screen mode.<br />
-Under <span class="menu">Video</span> you'll find options to zoom the window to various levels or force the aspect ratio to some standard values. Leaving the aspect ration to the default <span class="menu">Stream settings</span> should work best for correctly encoded files.</p>
-<p>MediaPlayer supports subtitles in <a href="http://en.wikipedia.org/wiki/SubRip">SRT</a> format. To have them show up under <span class="menu">Subtitles</span>, their filenames have to be identical to their video file, with a suffixed language name and ".srt" instead of the video's extension. For example:</p>
-<pre>MyMovie.avi
-MyMovie.Deutsch.srt
-MyMovie.English.srt
-MyMovie.Français.srt</pre>
-<p>Multiple audio tracks, most often used for several languages inside one video file, are available from the <span class="menu">Audio track</span> submenu. The <span class="menu">Video | Track</span> submenu offers the same when having multiple video streams available.</p>
-<p>You can toggle the <span class="menu">Full screen</span> mode (<span class="key">ALT</span> <span class="key">ENTER</span> or <span class="key">F</span> or a double left-click), hide MediaPlayer's window borders and controls with <span class="menu">Hide interface</span> (<span class="key">ALT</span> <span class="key">H</span> or a double right-click) or have it's window <span class="menu">Always on top</span> (<span class="key">ALT</span> <span class="key">A</span>).</p>
+<p>Большинство наиболее часто используемых команд находятся в контекстном меню, которое вызывается щелчком правой кнопки мыши по любой видео области. Удобно использовать в полноэкранном режиме.<br />
+В меню <span class="menu">Видео</span>  вы найдёте полезные опции, такие как выбор соотношения сторон. Чтобы сбросить настройки соотношения сторон выберите пункт <span class="menu">Настройки потока</span>.</p>
+<p>Медиаплеер поддерживает субтитры в формате <a href="http://en.wikipedia.org/wiki/SubRip">SRT</a>. Для того чтобы включить отображение <span class="menu">Субтитров</span>, они должны находиться в одной папке с видео файлом и иметь точно такое же имя файла с суффиксом языка и расширением ".srt". Например, следующим образом:</p>
+<pre>Мой Фильм.avi
+Мой фильм.Немецкий.srt
+Мой фильм.Английский.srt
+Мой фильм.Русский.srt</pre>
+<p>Звуковые дорожки можно переключать при помощи пункта меню <span class="menu">Аудио дорожка</span>. Пункт <span class="menu">Дорожка</span> в меню <span class="menu">Видео</span> позволяет переключать видео дорожки.</p>
+<p>При помощи пункта меню <span class="menu">На весь экран</span> вы переведёте Медиаплеер в полноэкранный режим (либо при помощи сочетания клавиш <span class="key">ALT</span> <span class="key">ENTER</span> или  <span class="key">F</span>, а также дважды кликнув левой кнопкой мыши по области видео). Спрятать границы окна и другие элементы интерфейса при помощи пункта меню <span class="menu">Скрыть интерфейс</span> (либо при помощи сочетания клавиш <span class="key">ALT</span> <span class="key">H</span> или дважды щёлкнув правой кнопкой мыши по области видео). Включив функцию <span class="menu">Всегда сверху</span>, окно Медиаплеера будет отображаться поверх всех окон (также можно активировать при помощи сочетания клавиш <span class="key">ALT</span> <span class="key">A</span>).</p>
 
 <h2>Список воспроизведения</h2>
-<p><span class="menu">MediaPlayer | Playlist...</span> (<span class="key">ALT</span> <span class="key">P</span>) opens a window with the files currently queued up for playback. Double-clicking an entry starts playing it.</p>
+<p>Пункт <span class="menu">Плейлист...</span> в меню <span class="menu">Медиаплеер</span> (либо при помощи сочетания клавиш <span class="key">ALT</span> <span class="key">P</span>) - открывает окно с плейлистом. Двойной щелчок левой кнопкой мыши по любому элементу списка запустит воспроизведение.</p>
 <img src="../images/apps-images/mediaplayer-playlist.png" alt="mediaplayer-playlist.png" />
 <p>You can add more files by dropping them into the list and rearrange their position via drag &amp; drop. From the <span class="menu">Edit</span> menu you can <span class="menu">Randomize</span> or <span class="menu">Remove</span> (<span class="key">DEL</span>) an entry from the list or delete the actual file with <span class="menu">Move to Trash</span> (<span class="key">ALT</span> <span class="key">T</span>).</p>
-<p>Of course, you can <span class="menu">Save</span> a playlist and later <span class="menu">Open</span> it again, or start it with simply double-clicking the playlist file.</p>
+<p>И конечно же вы можете <span class="menu">Сохранить</span> плейлист и позже <span class="menu">Открыть</span> его снова, либо дважды щёлкнуть левой кнопкой мыши по файлу плейлиста в Tracker.</p>
 
 <h2>Настройки</h2>
 <p>Рассмотрим параметры для настройки МедиаПлеера:</p>

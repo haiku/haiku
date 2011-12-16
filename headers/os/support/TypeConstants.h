@@ -52,6 +52,7 @@ enum {
 	B_SIZE_T_TYPE					= 'SIZT',
 	B_SSIZE_T_TYPE					= 'SSZT',
 	B_STRING_TYPE					= 'CSTR',
+	B_STRING_LIST_TYPE				= 'STRL',
 	B_TIME_TYPE						= 'TIME',
 	B_UINT16_TYPE					= 'USHT',
 	B_UINT32_TYPE					= 'ULNG',
@@ -60,6 +61,7 @@ enum {
 	B_VECTOR_ICON_TYPE				= 'VICN',
 	B_XATTR_TYPE					= 'XATR',
 	B_NETWORK_ADDRESS_TYPE			= 'NWAD',
+	B_MIME_STRING_TYPE				= 'MIMS',
 
 	// deprecated, do not use
 	B_ASCII_TYPE					= 'TEXT'	// use B_STRING_TYPE instead

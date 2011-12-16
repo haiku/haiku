@@ -157,6 +157,8 @@ typedef	u_int32_t ULong;
 #include <errno.h>
 #include <ctype.h>
 
+#include <errno_private.h>
+
 #ifdef Bad_float_h
 #undef __STDC__
 #ifdef IEEE_BIG_ENDIAN
@@ -1306,7 +1308,7 @@ strtod(const char * __restrict s00, char ** __restrict se)
 		if ( (e1 &= ~15) ) {
 			if (e1 > DBL_MAX_10_EXP) {
  ovfl:
-				errno = ERANGE;
+				__set_errno(ERANGE);
 				rv = HUGE_VAL;
 				goto ret;
 			}
@@ -1348,7 +1350,7 @@ strtod(const char * __restrict s00, char ** __restrict se)
 				if (!rv) {
  undfl:
 					rv = 0.;
-					errno = ERANGE;
+					__set_errno(ERANGE);
 					goto ret;
 					}
 				word0(rv) = Tiny0;

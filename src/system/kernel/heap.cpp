@@ -32,7 +32,7 @@
 #endif
 
 
-#if USE_SLAB_ALLOCATOR_FOR_MALLOC
+#if !USE_DEBUG_HEAP_FOR_MALLOC
 #	undef KERNEL_HEAP_LEAK_CHECK
 #endif
 
@@ -146,7 +146,7 @@ typedef SinglyLinkedList<DeferredFreeListEntry> DeferredFreeList;
 typedef SinglyLinkedList<DeferredDeletable> DeferredDeletableList;
 
 
-#if !USE_SLAB_ALLOCATOR_FOR_MALLOC
+#if USE_DEBUG_HEAP_FOR_MALLOC
 
 #define VIP_HEAP_SIZE	1024 * 1024
 
@@ -198,7 +198,7 @@ static sem_id sHeapGrowSem = -1;
 static sem_id sHeapGrownNotify = -1;
 static bool sAddGrowHeap = false;
 
-#endif	// !USE_SLAB_ALLOCATOR_FOR_MALLOC
+#endif	// USE_DEBUG_HEAP_FOR_MALLOC
 
 static DeferredFreeList sDeferredFreeList;
 static DeferredDeletableList sDeferredDeletableList;
@@ -376,7 +376,7 @@ dump_allocator(heap_allocator *heap, bool areas, bool bins)
 static int
 dump_heap_list(int argc, char **argv)
 {
-#if !USE_SLAB_ALLOCATOR_FOR_MALLOC
+#if USE_DEBUG_HEAP_FOR_MALLOC
 	if (argc == 2 && strcmp(argv[1], "grow") == 0) {
 		// only dump dedicated grow heap info
 		kprintf("dedicated grow heap:\n");
@@ -400,7 +400,7 @@ dump_heap_list(int argc, char **argv)
 	}
 
 	if (heapAddress == 0) {
-#if !USE_SLAB_ALLOCATOR_FOR_MALLOC
+#if USE_DEBUG_HEAP_FOR_MALLOC
 		// dump default kernel heaps
 		for (uint32 i = 0; i < sHeapCount; i++)
 			dump_allocator(sHeaps[i], !stats, !stats);
@@ -434,7 +434,7 @@ dump_allocations(int argc, char **argv)
 
 	size_t totalSize = 0;
 	uint32 totalCount = 0;
-#if !USE_SLAB_ALLOCATOR_FOR_MALLOC
+#if USE_DEBUG_HEAP_FOR_MALLOC
 	for (uint32 heapIndex = 0; heapIndex < sHeapCount; heapIndex++) {
 		heap_allocator *heap = sHeaps[heapIndex];
 		if (heapAddress != 0)
@@ -729,7 +729,7 @@ analyze_allocation_callers(heap_allocator *heap)
 					caller_info *callerInfo = get_caller_info(info->caller);
 					if (callerInfo == NULL) {
 						kprintf("out of space for caller infos\n");
-						return 0;
+						return false;
 					}
 
 					callerInfo->count++;
@@ -1764,7 +1764,7 @@ heap_set_get_caller(heap_allocator* heap, addr_t (*getCaller)())
 #endif
 
 
-#if !USE_SLAB_ALLOCATOR_FOR_MALLOC
+#if USE_DEBUG_HEAP_FOR_MALLOC
 
 
 static status_t
@@ -1993,7 +1993,7 @@ heap_grow_thread(void *)
 }
 
 
-#endif	// !USE_SLAB_ALLOCATOR_FOR_MALLOC
+#endif	// USE_DEBUG_HEAP_FOR_MALLOC
 
 
 static void
@@ -2025,7 +2025,7 @@ deferred_deleter(void *arg, int iteration)
 //	#pragma mark -
 
 
-#if !USE_SLAB_ALLOCATOR_FOR_MALLOC
+#if USE_DEBUG_HEAP_FOR_MALLOC
 
 
 status_t
@@ -2137,15 +2137,6 @@ heap_init_post_area()
 status_t
 heap_init_post_sem()
 {
-#if PARANOID_KERNEL_MALLOC
-	vm_block_address_range("uninitialized heap memory",
-		(void *)ROUNDDOWN(0xcccccccc, B_PAGE_SIZE), B_PAGE_SIZE * 64);
-#endif
-#if PARANOID_KERNEL_FREE
-	vm_block_address_range("freed heap memory",
-		(void *)ROUNDDOWN(0xdeadbeef, B_PAGE_SIZE), B_PAGE_SIZE * 64);
-#endif
-
 	sHeapGrowSem = create_sem(0, "heap_grow_sem");
 	if (sHeapGrowSem < 0) {
 		panic("heap_init_post_sem(): failed to create heap grow sem\n");
@@ -2162,13 +2153,13 @@ heap_init_post_sem()
 }
 
 
-#endif	// !USE_SLAB_ALLOCATOR_FOR_MALLOC
+#endif	// USE_DEBUG_HEAP_FOR_MALLOC
 
 
 status_t
 heap_init_post_thread()
 {
-#if	!USE_SLAB_ALLOCATOR_FOR_MALLOC
+#if	USE_DEBUG_HEAP_FOR_MALLOC
 	sHeapGrowThread = spawn_kernel_thread(heap_grow_thread, "heap grower",
 		B_URGENT_PRIORITY, NULL);
 	if (sHeapGrowThread < 0) {
@@ -2202,7 +2193,7 @@ heap_init_post_thread()
 
 	resume_thread(sHeapGrowThread);
 
-#else	// !USE_SLAB_ALLOCATOR_FOR_MALLOC
+#else	// USE_DEBUG_HEAP_FOR_MALLOC
 
 	// set up some debug commands
 	add_debugger_command_etc("heap", &dump_heap_list,
@@ -2211,13 +2202,13 @@ heap_init_post_thread()
 		"Dump infos about the specified kernel heap. If \"stats\" is given\n"
 		"as the argument, currently only the heap count is printed.\n", 0);
 #if !KERNEL_HEAP_LEAK_CHECK
-	add_debugger_command_etc("allocations", &dump_allocations,
+	add_debugger_command_etc("heap_allocations", &dump_allocations,
 		"Dump current heap allocations",
 		"[\"stats\"] <heap>\n"
 		"If the optional argument \"stats\" is specified, only the allocation\n"
 		"counts and no individual allocations are printed.\n", 0);
 #endif	// KERNEL_HEAP_LEAK_CHECK
-#endif	// USE_SLAB_ALLOCATOR_FOR_MALLOC
+#endif	// !USE_DEBUG_HEAP_FOR_MALLOC
 
 	// run the deferred deleter roughly once a second
 	if (register_kernel_daemon(deferred_deleter, NULL, 10) != B_OK)
@@ -2230,7 +2221,7 @@ heap_init_post_thread()
 //	#pragma mark - Public API
 
 
-#if !USE_SLAB_ALLOCATOR_FOR_MALLOC
+#if USE_DEBUG_HEAP_FOR_MALLOC
 
 
 void *
@@ -2481,7 +2472,7 @@ realloc(void *address, size_t newSize)
 }
 
 
-#endif	// !USE_SLAB_ALLOCATOR_FOR_MALLOC
+#endif	// USE_DEBUG_HEAP_FOR_MALLOC
 
 
 void *

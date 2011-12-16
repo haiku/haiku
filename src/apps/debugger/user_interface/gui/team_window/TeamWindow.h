@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TEAM_WINDOW_H
@@ -12,6 +12,7 @@
 
 #include "BreakpointsView.h"
 #include "Function.h"
+#include "GUITeamUISettings.h"
 #include "ImageFunctionsView.h"
 #include "ImageListView.h"
 #include "SourceView.h"
@@ -23,7 +24,9 @@
 
 
 class BButton;
+class BFilePanel;
 class BMenuBar;
+class BSplitView;
 class BStringView;
 class BTabView;
 class Image;
@@ -54,6 +57,12 @@ public:
 									BHandler* handler);
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
+
+			status_t			LoadSettings(
+									const GUITeamUISettings* settings);
+			status_t			SaveSettings(
+									GUITeamUISettings* settings);
+
 
 private:
 	enum ActiveSourceObject {
@@ -135,6 +144,8 @@ private:
 			void				_HandleResolveMissingSourceFile(entry_ref&
 									locatedPath);
 
+			status_t			_SaveInspectorSettings(
+									const BMessage* settings);
 private:
 			::Team*				fTeam;
 			::Thread*			fActiveThread;
@@ -162,7 +173,13 @@ private:
 			BButton*			fStepOutButton;
 			BMenuBar*			fMenuBar;
 			BStringView*		fSourcePathView;
+			BSplitView*			fFunctionSplitView;
+			BSplitView*			fSourceSplitView;
+			BSplitView*			fImageSplitView;
+			BSplitView*			fThreadSplitView;
 			InspectorWindow*	fInspectorWindow;
+			GUITeamUISettings	fUISettings;
+			BFilePanel*			fSourceLocatePanel;
 };
 
 

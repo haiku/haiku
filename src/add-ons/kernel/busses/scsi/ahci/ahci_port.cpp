@@ -659,6 +659,13 @@ AHCIPort::ScsiSynchronizeCache(scsi_ccb *request)
 	//TRACE("AHCIPort::ScsiSynchronizeCache port %d\n", fIndex);
 
 	sata_request *sreq = new(std::nothrow) sata_request(request);
+	if (sreq == NULL) {
+		TRACE("out of memory when allocating sync request\n");
+		request->subsys_status = SCSI_REQ_ABORTED;
+		gSCSI->finished(request, 1);
+		return;
+	}
+
 	sreq->set_ata_cmd(fUse48BitCommands ? 0xea : 0xe7); // Flush Cache
 	ExecuteSataRequest(sreq);
 }
@@ -716,6 +723,11 @@ AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 lba, size_t sectorCount,
 
 	ASSERT(request->data_length == sectorCount * 512);
 	sata_request *sreq = new(std::nothrow) sata_request(request);
+	if (sreq == NULL) {
+		TRACE("out of memory when allocating read/write request\n");
+		request->subsys_status = SCSI_REQ_ABORTED;
+		gSCSI->finished(request, 1);
+	}
 
 	if (fUse48BitCommands) {
 		if (sectorCount > 65536) {
@@ -858,6 +870,13 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 //		TRACE("AHCIPort::ScsiExecuteRequest ATAPI: port %d, opcode 0x%02x, length %u\n", fIndex, request->cdb[0], request->cdb_length);
 
 		sata_request *sreq = new(std::nothrow) sata_request(request);
+		if (sreq == NULL) {
+			TRACE("out of memory when allocating atapi request\n");
+			request->subsys_status = SCSI_REQ_ABORTED;
+			gSCSI->finished(request, 1);
+			return;
+		}
+
 		sreq->set_atapi_cmd(request->data_length);
 //		uint8 *data = (uint8*) sreq->ccb()->cdb;
 //		for (int i = 0; i < 16; i += 8) {

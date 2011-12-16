@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef ARCHITECTURE_H
@@ -31,6 +32,12 @@ class Team;
 class TeamMemory;
 
 
+enum {
+	STACK_GROWTH_DIRECTION_POSITIVE = 0,
+	STACK_GROWTH_DIRECTION_NEGATIVE
+};
+
+
 class Architecture : public BReferenceable {
 public:
 								Architecture(TeamMemory* teamMemory,
@@ -43,6 +50,8 @@ public:
 
 	inline	bool				IsBigEndian() const		{ return fBigEndian; }
 	inline	bool				IsHostEndian() const;
+
+	virtual int32				StackGrowthDirection() const = 0;
 
 	virtual	int32				CountRegisters() const = 0;
 	virtual	const Register*		Registers() const = 0;
@@ -91,7 +100,9 @@ public:
 			status_t			CreateStackTrace(Team* team,
 									ImageDebugInfoProvider* imageInfoProvider,
 									CpuState* cpuState,
-									StackTrace*& _stackTrace);
+									StackTrace*& _stackTrace,
+									int32 maxStackDepth = -1,
+									bool useExistingTrace = false);
 										// team is not locked
 
 protected:

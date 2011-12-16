@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef VOLUME_H
@@ -14,21 +14,37 @@
 #include <util/DoublyLinkedList.h>
 #include <util/KMessage.h>
 
+#include "Index.h"
 #include "Node.h"
+#include "NodeListener.h"
 #include "PackageDomain.h"
+#include "PackageLinksListener.h"
+#include "Query.h"
 
 
 class Directory;
-class Node;
+class PackageFSRoot;
+class UnpackingNode;
+
+typedef IndexHashTable::Iterator IndexDirIterator;
 
 
-class Volume {
+enum MountType {
+	MOUNT_TYPE_SYSTEM,
+	MOUNT_TYPE_COMMON,
+	MOUNT_TYPE_HOME,
+	MOUNT_TYPE_CUSTOM
+};
+
+
+class Volume : public DoublyLinkedListLinkImpl<Volume>,
+	private PackageLinksListener {
 public:
 								Volume(fs_volume* fsVolume);
 								~Volume();
 
-	inline	bool				ReadLock();
-	inline	void				ReadUnlock();
+	inline	bool				ReadLock() const;
+	inline	void				ReadUnlock() const;
 	inline	bool				WriteLock();
 	inline	void				WriteUnlock();
 
@@ -36,11 +52,41 @@ public:
 			dev_t				ID() const			{ return fFSVolume->id; }
 			Directory*			RootDirectory() const { return fRootDirectory; }
 
+			::MountType			MountType() const	{ return fMountType; }
+
+			void				SetPackageFSRoot(::PackageFSRoot* root)
+									{ fPackageFSRoot = root; }
+			::PackageFSRoot*	PackageFSRoot() const
+									{ return fPackageFSRoot; }
+
+			dev_t				MountPointDeviceID() const
+									{ return fMountPoint.deviceID; }
+			ino_t				MountPointNodeID() const
+									{ return fMountPoint.nodeID; }
+
 			status_t			Mount(const char* parameterString);
 			void				Unmount();
 
 			Node*				FindNode(ino_t nodeID) const
 									{ return fNodes.Lookup(nodeID); }
+
+			// node listeners -- volume must be write-locked
+			void				AddNodeListener(NodeListener* listener,
+									Node* node);
+			void				RemoveNodeListener(NodeListener* listener);
+
+			// query support -- volume must be write-locked
+			void				AddQuery(Query* query);
+			void				RemoveQuery(Query* query);
+			void				UpdateLiveQueries(Node* node,
+									const char* attribute, int32 type,
+									const void* oldKey, size_t oldLength,
+									const void* newKey, size_t newLength);
+
+			Index*				FindIndex(const char* name) const
+									{ return fIndices.Lookup(name); }
+			IndexDirIterator	GetIndexDirIterator() const
+									{ return fIndices.GetIterator(); }
 
 			// VFS wrappers
 			status_t			GetVNode(ino_t nodeID, Node*& _node);
@@ -51,12 +97,21 @@ public:
 			status_t			AddPackageDomain(const char* path);
 
 private:
+	// PackageLinksListener
+	virtual	void				PackageLinkNodeAdded(Node* node);
+	virtual	void				PackageLinkNodeRemoved(Node* node);
+	virtual	void				PackageLinkNodeChanged(Node* node,
+									uint32 statFields,
+									const OldNodeAttributes& oldAttributes);
+
+private:
 			struct Job;
 			struct AddPackageDomainJob;
 			struct DomainDirectoryEventJob;
 			struct PackageLoaderErrorOutput;
 			struct PackageLoaderContentHandler;
 			struct DomainDirectoryListener;
+			struct ShineThroughDirectory;
 
 			friend struct AddPackageDomainJob;
 			friend struct DomainDirectoryEventJob;
@@ -76,6 +131,7 @@ private:
 			status_t			_AddInitialPackageDomain(const char* path);
 			status_t			_AddPackageDomain(PackageDomain* domain,
 									bool notify);
+			void				_RemovePackageDomain(PackageDomain* domain);
 			status_t			_LoadPackage(Package* package);
 
 			status_t			_AddPackageContent(Package* package,
@@ -96,10 +152,13 @@ private:
 									PackageNode* packageNode, Node* node,
 									bool notify);
 
-			status_t			_CreateNode(mode_t mode, Directory* parent,
-									const char* name, Node*& _node);
+			status_t			_CreateUnpackingNode(mode_t mode,
+									Directory* parent, const char* name,
+									UnpackingNode*& _node);
 									// does *not* return a reference
 			void				_RemoveNode(Node* node);
+			void				_RemoveNodeAndVNode(Node* node);
+									// caller must hold a reference
 
 			void				_DomainListenerEventOccurred(
 									PackageDomain* domain,
@@ -118,14 +177,44 @@ private:
 									ino_t nodeID, const char* fromName,
 									const char* name, bool notify);
 
+			status_t			_InitMountType(const char* mountType);
+			status_t			_CreateShineThroughDirectory(Directory* parent,
+									const char* name, Directory*& _directory);
+			status_t			_CreateShineThroughDirectories(
+									const char* shineThroughSetting);
+			status_t			_PublishShineThroughDirectories();
+
+			status_t			_AddPackageLinksDirectory();
+			void				_RemovePackageLinksDirectory();
+			void				_AddPackageLinksNode(Node* node);
+			void				_RemovePackageLinksNode(Node* node);
+
+	inline	Volume*				_SystemVolumeIfNotSelf() const;
+
+			void				_NotifyNodeAdded(Node* node);
+			void				_NotifyNodeRemoved(Node* node);
+			void				_NotifyNodeChanged(Node* node,
+									uint32 statFields,
+									const OldNodeAttributes& oldAttributes);
+
 private:
-			rw_lock				fLock;
+	mutable	rw_lock				fLock;
 			fs_volume*			fFSVolume;
 			Directory*			fRootDirectory;
+			::PackageFSRoot*	fPackageFSRoot;
+			::MountType			fMountType;
 			thread_id			fPackageLoader;
 			PackageDomainList	fPackageDomains;
 
+			struct {
+				dev_t			deviceID;
+				ino_t			nodeID;
+			} fMountPoint;
+
 			NodeIDHashTable		fNodes;
+			NodeListenerHashTable fNodeListeners;
+			QueryList			fQueries;
+			IndexHashTable		fIndices;
 
 			JobList				fJobQueue;
 			mutex				fJobQueueLock;
@@ -138,14 +227,14 @@ private:
 
 
 bool
-Volume::ReadLock()
+Volume::ReadLock() const
 {
 	return rw_lock_read_lock(&fLock) == B_OK;
 }
 
 
 void
-Volume::ReadUnlock()
+Volume::ReadUnlock() const
 {
 	rw_lock_read_unlock(&fLock);
 }
@@ -165,7 +254,8 @@ Volume::WriteUnlock()
 }
 
 
-typedef AutoLocker<Volume, AutoLockerReadLocking<Volume> > VolumeReadLocker;
+typedef AutoLocker<const Volume, AutoLockerReadLocking<const Volume> >
+	VolumeReadLocker;
 typedef AutoLocker<Volume, AutoLockerWriteLocking<Volume> > VolumeWriteLocker;
 
 

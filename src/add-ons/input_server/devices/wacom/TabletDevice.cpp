@@ -10,6 +10,7 @@
  *		Frans van Nispen	<frans@xentronix.com>
  *		Stefan Werner		<stefan@keindesign.de>
  *		Hiroyuki Tsutsumi	<???>
+ *		Jeroen Oortwijn		<oortwijn@gmail.com>
  */
 
 #include <stdio.h>
@@ -238,6 +239,21 @@ TabletDevice::DetectDevice(const DeviceReader* reader)
 		case 0xD4:	// Wacom Bamboo 4x5 (from Linux Wacom Project)
 			SetDevice(14720.0, 9200.0, DEVICE_BAMBOO_PT);
 			break;
+		case 0xD6:	// Wacom Bamboo CTH-460/K (from Linux Wacom Project)
+			SetDevice(14720.0, 9200.0, DEVICE_BAMBOO_PT);
+			break;
+		case 0xD7:	// Wacom Bamboo CTH-461/S (from Linux Wacom Project)
+			SetDevice(14720.0, 9200.0, DEVICE_BAMBOO_PT);
+			break;
+		case 0xD8:	// Wacom Bamboo CTH-661/S1 (from Linux Wacom Project)
+			SetDevice(21648.0, 13530.0, DEVICE_BAMBOO_PT);
+			break;
+		case 0xDA:	// Wacom Bamboo CTH-461/L (from Linux Wacom Project)
+			SetDevice(14720.0, 9200.0, DEVICE_BAMBOO_PT);
+			break;
+		case 0xDB:	// Wacom Bamboo CTH-661 (from Linux Wacom Project)
+			SetDevice(21648.0, 13530.0, DEVICE_BAMBOO_PT);
+			break;
 		default:
 			status = B_BAD_VALUE;
 			break;
@@ -294,7 +310,7 @@ TabletDevice::ReadData(const uchar* data, int dataBytes, bool& hasContact,
 			xPos = data[3] << 8 | data[2];
 			yPos = data[5] << 8 | data[4];
 
-			hasContact = (data[1] & 0x80);		
+			hasContact = (data[1] & 0x80);
 
 			uint16 pressureData = data[7] << 8 | data[6];
 			pressure = (float)pressureData / 511.0;
@@ -322,17 +338,17 @@ TabletDevice::ReadData(const uchar* data, int dataBytes, bool& hasContact,
 			if (dataBytes < 20) {	// ignore touch-packets
 				xPos = data[3] << 8 | data[2];
 				yPos = data[5] << 8 | data[4];
-	
-				hasContact = (data[1] & 0x10) && (data[1] & 0x20);		
-	
+
+				hasContact = (data[1] & 0x10) && (data[1] & 0x20);
+
 				uint16 pressureData = data[7] << 8 | data[6];
 				pressure = (float)pressureData / 1023.0;
 				eraser = (data[1] & 0x08);
-	
+
 				firstButton = (data[1] & 0x01);
 				secondButton = (data[1] & 0x02);
 				thirdButton = (data[1] & 0x04);
-	
+
 				break;
 			}
 		}
@@ -392,7 +408,7 @@ TabletDevice::ReadData(const uchar* data, int dataBytes, bool& hasContact,
 			hasContact = ( data[1] & 0x20);
 			xPos = data[2] << 8 | data[3];
 			yPos = data[5] << 8 | data[6];
-			firstButton = (data[4] & 0x08);				
+			firstButton = (data[4] & 0x08);
 			secondButton = (data[4] & 0x10);
 			thirdButton = (data[4] & 0x20);
 			uint16 pressureData = (data[4] & 0x04) >> 2 | (data[7] & 0x7f) << 1;
@@ -402,15 +418,15 @@ TabletDevice::ReadData(const uchar* data, int dataBytes, bool& hasContact,
 		case DEVICE_VOLITO: {
 			eraser = 0;
 			thirdButton = 0;
-						
+
 			xPos = data[3] << 8 | data[2];
 			yPos = data[5] << 8 | data[4];
 
-			hasContact = (data[1] & 0x80);		
+			hasContact = (data[1] & 0x80);
 
 			firstButton = (data[1] & 0x01) == 1;
 			secondButton = data[1] & 0x04;
-			
+
 			uint16 pressureData = data[7] << 8 | data[6];
 			pressure = (float)pressureData / 511.0;
 
@@ -421,13 +437,13 @@ TabletDevice::ReadData(const uchar* data, int dataBytes, bool& hasContact,
 				pressure = 0.0;
 				secondButton = data[1] & 0x02;
 			}
-			
+
 			break;
 		}
 		case DEVICE_PENSTATION: {
 			xPos = data[3] << 8 | data[2];
 			yPos = data[5] << 8 | data[4];
-			hasContact = (data[1] & 0x10);		
+			hasContact = (data[1] & 0x10);
 			uint16 pressureData = data[7] << 8 | data[6];
 			pressure = (float)pressureData / 511.0;
 			firstButton = (data[1] & 0x01);
@@ -459,7 +475,7 @@ TabletDevice::SetStatus(uint32 mode, uint32 buttons, float x, float y,
 			what = B_MOUSE_DOWN;
 		else if (buttons < fButtons)
 			what = B_MOUSE_UP;
-	
+
 
 #if DEBUG
 	float tabletX = x;
@@ -467,10 +483,10 @@ TabletDevice::SetStatus(uint32 mode, uint32 buttons, float x, float y,
 #endif
 		x /= fMaxX;
 		y /= fMaxY;
-	
+
 		float deltaX = 0.0;
 		float deltaY = 0.0;
-	
+
 		float absDeltaX = 0.0;
 		float absDeltaY = 0.0;
 
@@ -494,13 +510,13 @@ fParent->LogString() << "tilt x: " << tiltX << ", tilt y: " << tiltY << "\n\n";
 			if (absDeltaY < fJitterY)
 				y = fPosY;
 		}
-	
+
 		// only do send message if something changed
 		if (x != fPosX || y != fPosY || fButtons != buttons || pressure != fPressure
 			|| fEraser != eraser || fTiltX != tiltX || fTiltY != tiltY) {
-	
+
 			bigtime_t now = system_time();
-	
+
 			// common fields for any mouse message
 			BMessage* event = new BMessage(what);
 			event->AddInt64("when", now);
@@ -563,7 +579,7 @@ event->AddFloat("tablet y", tabletY);
 			status_t ret = fParent->EnqueueMessage(event);
 			if (ret < B_OK)
 				PRINT(("EnqueueMessage(): %s\n", strerror(ret)));
-	
+
 			// apply values to members
 			fPosX = x;
 			fPosY = y;
@@ -574,7 +590,7 @@ event->AddFloat("tablet y", tabletY);
 			fTiltX = tiltX;
 			fTiltY = tiltY;
 		}
-	
+
 		// separate wheel changed message
 		if (fWheelX != wheelX || fWheelY != wheelY) {
 			BMessage* event = new BMessage(B_MOUSE_WHEEL_CHANGED);
@@ -815,6 +831,21 @@ TabletDevice::_GetName(uint16 productID, const char** name) const
 			break;
 		case 0xD4:
 			*name = "Wacom Bamboo 4x5\" USB";
+			break;
+		case 0xD6:
+			*name = "Wacom Bamboo (CTH-460/K)";
+			break;
+		case 0xD7:
+			*name = "Wacom Bamboo (CTH-461/S)";
+			break;
+		case 0xD8:
+			*name = "Wacom Bamboo (CTH-661/S1)";
+			break;
+		case 0xDA:
+			*name = "Wacom Bamboo (CTH-461/L)";
+			break;
+		case 0xDB:
+			*name = "Wacom Bamboo (CTH-661)";
 			break;
 
 		default:

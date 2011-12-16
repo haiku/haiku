@@ -114,7 +114,7 @@ class TBarView : public BView {
 		bool DragOverride();
 		bool InvokeItem(const char* signature);
 
-		void HandleBeMenu(BMessage* targetmessage);
+		void HandleDeskbarMenu(BMessage* targetmessage);
 
 		status_t ItemInfo(int32 id, const char** name, DeskbarShelf* shelf);
 		status_t ItemInfo(const char* name, int32* id, DeskbarShelf* shelf);
@@ -125,6 +125,7 @@ class TBarView : public BView {
 		int32 CountItems(DeskbarShelf shelf);
 
 		status_t AddItem(BMessage* archive, DeskbarShelf shelf, int32* id);
+		status_t AddItem(BEntry* entry, DeskbarShelf shelf, int32* id);
 
 		void RemoveItem(int32 id);
 		void RemoveItem(const char* name, DeskbarShelf shelf);
@@ -141,16 +142,20 @@ class TBarView : public BView {
 		TExpandoMenuBar* ExpandoMenuBar() const;
 		TBarMenuBar* BarMenuBar() const;
 		TDragRegion* DragRegion() const { return fDragRegion; }
-			
+		void AddExpandedItem(const char* signature);
+
 	private:
-		friend class TBeMenu;
+		friend class TDeskbarMenu;
 		friend class PreferencesWindow;
 
 		status_t SendDragMessage(const char* signature, entry_ref* ref = NULL);
 
-		void PlaceBeMenu();
+		void PlaceDeskbarMenu();
 		void PlaceTray(bool vertSwap, bool leftSwap, BRect screenFrame);
 		void PlaceApplicationBar(BRect screenFrame);
+		void SaveExpandedItems();
+		void RemoveExpandedItems();
+		void ExpandItems();
 
 		TBarMenuBar* fBarMenuBar;
 		TExpandoMenuBar* fExpando;
@@ -177,6 +182,7 @@ class TBarView : public BView {
 		uint32 fMaxRecentApps;
 
 		TTeamMenuItem* fLastDragItem;
+		BList fExpandedItems;
 };
 
 

@@ -18,16 +18,27 @@
 #include <Entry.h>
 #include <Locale.h>
 
+#include "ModifierKeysWindow.h"
+
+
+static const uint32 kMsgShowModifierKeysWindow = 'smkw';
+static const uint32 kMsgCloseModifierKeysWindow = 'hmkw';
+static const uint32 kMsgUpdateModifiers = 'upmd';
+
 
 class KeymapApplication : public BApplication {
-	public:
+public:
 		KeymapApplication();
 
-		void MessageReceived(BMessage* message);
-		bool UseKeymap(BEntry* keymap);
+		void					MessageReceived(BMessage* message);
+		bool					UseKeymap(BEntry* keymap);
 
-	private:
-		KeymapWindow* fWindow;
+protected:
+		void					_ShowModifierKeysWindow();
+
+private:
+		KeymapWindow*			fWindow;
+		ModifierKeysWindow*		fModifierKeysWindow;
 };
 
 #endif // KEYMAP_APPLICATION_H

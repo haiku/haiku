@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -36,6 +36,8 @@
 <li><a href="../../jp/preferences/mouse.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/preferences/mouse.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../zh_CN/preferences/mouse.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../fi/preferences/mouse.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/preferences/mouse.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../../en/preferences/mouse.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -57,15 +59,16 @@
 </table>
 <p><br /></p>
 <img src="../images/prefs-images/mouse.png" alt="mouse.png" />
-<p>Set your type of mouse: 1, 2 or 3 button mouse. You can simulate the 2nd (=right) mouse button by holding down <span class="key">CTRL</span> while left-clicking. For the 3rd (=middle) mouse button, it's <span class="key">CTRL</span> <span class="key">ALT</span> and a left-click. A middle-click is also simulated by clicking left and right button together. Useful for notebooks, which mostly don't have a 3rd button.</p>
+<p>First you set your type of mouse: 1, 2 or 3 button mouse. You can simulate the 2nd (=right) mouse button by holding down <span class="key">CTRL</span> while left-clicking. For the 3rd (=middle) mouse button, it's <span class="key">CTRL</span> <span class="key">ALT</span> and a left-click.</p>
 <p>You can rearrange the mouse buttons by clicking on them and choosing their new meaning from the pop-up menu.</p>
-<p>With the sliders to the right, you adjust double-click speed, mouse speed and acceleration.</p>
-<p><span class="menu">Focus follows mouse</span> means, that you don't have to click into a window to activate it. There are three modes:</p>
+<p>With the sliders to the right, you adjust double-click speed, mouse speed and acceleration. The test area below the mouse graphics can be used to check if the double-click speed meets your taste: if double-clicking a word doesn't select it, it's set too fast (or you'll have to get used to clicking quicker....</p>
+<p>There are three <span class="menu">Focus modes</span> that determine how windows react to clicks:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Enabled</span></td><td> </td><td>The window under the mouse pointer is always activated automatically, but doesn't pop to the front.</td></tr>
-<tr><td><span class="menu">Warping</span></td><td> </td><td>Choosing a window from Deskbar or the <a href="../twitcher.html">Twitcher</a> will have the mouse pointer glide smoothly toward it.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Instant-Warping</span></td><td> </td><td>Choosing a window from Deskbar or the Twitcher will have the mouse pointer jump instantly toward it.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Click to focus and raise</span></td><td width="15px"> </td><td>This is the default setting: you click a window and it gets focus and is raised to the top.</td></tr>
+<tr><td><span class="menu">Click to focus</span></td><td> </td><td>Clicking a window only gives it the focus, but won't raise it automatically. To do that, you'd have to either click on its title tab or border or click anywhere while holding the <a href="../gui.html#move-resize">window management keys</a> <span class="key">CTRL</span> <span class="key">ALT</span>.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Focus follows mouse</span></td><td></td><td>The window under the mouse pointer automatically gets the focus. Actually raising it, is done as described in the <span class="menu">Click to focus mode.</span></td></tr>
 </table>
+<p>Activating <span class="menu">Accept first click</span> relieves you of having to first put the focus on an inactive window in order to trigger widgets like a button or menu. This bears the risk of unintentionally closing a window, for example, by accidentally hitting the close button when aiming for the window tab. On the other hand it speeds up your workflow considerably.</p>
 <p>All settings are immediately applied.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="button">Defaults</span></td><td> </td><td>resets everything to default values.</td></tr>

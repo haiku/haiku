@@ -30,22 +30,40 @@ BPackageWriter::~BPackageWriter()
 
 
 status_t
-BPackageWriter::Init(const char* fileName)
+BPackageWriter::Init(const char* fileName, uint32 flags)
 {
 	if (fImpl == NULL)
 		return B_NO_MEMORY;
 
-	return fImpl->Init(fileName);
+	return fImpl->Init(fileName, flags);
 }
 
 
 status_t
-BPackageWriter::AddEntry(const char* fileName)
+BPackageWriter::SetInstallPath(const char* installPath)
 {
 	if (fImpl == NULL)
 		return B_NO_INIT;
 
-	return fImpl->AddEntry(fileName);
+	return fImpl->SetInstallPath(installPath);
+}
+
+
+void
+BPackageWriter::SetCheckLicenses(bool checkLicenses)
+{
+	if (fImpl != NULL)
+		fImpl->SetCheckLicenses(checkLicenses);
+}
+
+
+status_t
+BPackageWriter::AddEntry(const char* fileName, int fd)
+{
+	if (fImpl == NULL)
+		return B_NO_INIT;
+
+	return fImpl->AddEntry(fileName, fd);
 }
 
 

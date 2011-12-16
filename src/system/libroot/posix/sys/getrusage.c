@@ -8,6 +8,8 @@
 #include <sys/resource.h>
 #include <errno.h>
 
+#include <errno_private.h>
+
 
 int
 getrusage(int who, struct rusage *rusage)
@@ -15,7 +17,7 @@ getrusage(int who, struct rusage *rusage)
 	team_usage_info info;
 
 	if (get_team_usage_info(B_CURRENT_TEAM, who, &info) != B_OK) {
-		errno = B_BAD_VALUE;
+		__set_errno(B_BAD_VALUE);
 		return -1;
 	}
 

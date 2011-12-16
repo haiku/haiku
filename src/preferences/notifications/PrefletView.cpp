@@ -16,7 +16,6 @@
 
 #include "SettingsHost.h"
 #include "PrefletView.h"
-#include "IconRule.h"
 #include "GeneralView.h"
 #include "DisplayView.h"
 #include "NotificationsView.h"
@@ -31,111 +30,44 @@ const int32 kPageSelected = '_LCH';
 
 PrefletView::PrefletView(SettingsHost* host)
 	:
-	BView("pages", B_WILL_DRAW)
+	BTabView("pages")
 {
-	// Page selector
-	fRule = new BIconRule("icon_rule");
-	fRule->SetSelectionMessage(new BMessage(kPageSelected));
-	fRule->AddIcon(B_TRANSLATE("General"), NULL);
-	fRule->AddIcon(B_TRANSLATE("Display"), NULL);
-	//fRule->AddIcon(B_TRANSLATE("Notifications"), NULL);
-
-	// View for card layout
-	fPagesView = new BView("pages", B_WILL_DRAW);
-
 	// Pages
 	GeneralView* general = new GeneralView(host);
 	DisplayView* display = new DisplayView(host);
 	NotificationsView* apps = new NotificationsView();
 
-	// Calculate inset
-	float inset = ceilf(be_plain_font->Size() * 0.7f);
+	// Page selector
+	BTab* tab = new BTab();
+	AddTab(general, tab);
+	tab->SetLabel(B_TRANSLATE("General"));
 
-	// Build the layout
-	SetLayout(new BGroupLayout(B_VERTICAL));
+	tab = new BTab();
+	AddTab(display, tab);
+	tab->SetLabel(B_TRANSLATE("Display"));
 
-	// Card layout for pages
-	BCardLayout* layout = new BCardLayout();
-	fPagesView->SetLayout(layout);
-	layout->AddView(general);
-	layout->AddView(display);
-	layout->AddView(apps);
-
-	// Add childs
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, inset)
-		.Add(fRule)
-		.Add(fPagesView)
-	);
-
-	// Select the first view
-	Select(0);
-}
-
-
-void
-PrefletView::AttachedToWindow()
-{
-	fRule->SetTarget(this);
-}
-
-
-void
-PrefletView::MessageReceived(BMessage* message)
-{
-	switch (message->what) {
-		case kPageSelected:
-		{
-			int32 index = B_ERROR;
-			if (message->FindInt32("index", &index) != B_OK)
-				return;
-
-			Select(index);
-			break;
-		}
-		default:
-			BView::MessageReceived(message);
-	}
-}
-
-
-void
-PrefletView::Select(int32 index)
-{
-	BCardLayout* layout
-		= dynamic_cast<BCardLayout*>(fPagesView->GetLayout());
-	if (layout)
-		layout->SetVisibleItem(index);
+	tab = new BTab();
+	AddTab(apps, tab);
+	tab->SetLabel(B_TRANSLATE("Notifications"));
 }
 
 
 BView*
 PrefletView::CurrentPage()
 {
-	BCardLayout* layout
-		= dynamic_cast<BCardLayout*>(fPagesView->GetLayout());
-	if (layout)
-		return layout->VisibleItem()->View();
-	return NULL;
+	return PageAt(FocusTab());
 }
 
 
 int32
 PrefletView::CountPages() const
 {
-	BCardLayout* layout
-		= dynamic_cast<BCardLayout*>(fPagesView->GetLayout());
-	if (layout)
-		return layout->CountItems();
-	return 0;
+	return 3;
 }
 
 
 BView*
 PrefletView::PageAt(int32 index)
 {
-	BCardLayout* layout
-		= dynamic_cast<BCardLayout*>(fPagesView->GetLayout());
-	if (layout)
-		return layout->ItemAt(index)->View();
-	return NULL;
+	return TabAt(index)->View();
 }

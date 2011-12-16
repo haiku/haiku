@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <Catalog.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <FindDirectory.h>
@@ -17,13 +18,16 @@
 #include "LoginApp.h"
 #include "DesktopWindow.h"
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Desktop Window"
+
 const window_feel kPrivateDesktopWindowFeel = window_feel(1024);
 const window_look kPrivateDesktopWindowLook = window_look(4);
 	// this is a mirror of an app server private values
 
 
 DesktopWindow::DesktopWindow(BRect frame, bool editMode)
-	: BWindow(frame, "Desktop", 
+	: BWindow(frame, B_TRANSLATE("Desktop"), 
 		kPrivateDesktopWindowLook, 
 		kPrivateDesktopWindowFeel, 
 		B_NOT_MOVABLE | B_NOT_CLOSABLE | B_NOT_ZOOMABLE
@@ -71,7 +75,9 @@ DesktopWindow::QuitRequested()
 {
 	status_t err;
 	err = fDesktopShelf->Save();
-	printf("error %s\n", strerror(err));
+	printf(B_TRANSLATE_COMMENT("error %s\n",
+		"A return message from fDesktopShelf->Save(). It can be \"B_OK\""),
+		strerror(err));
 	return BWindow::QuitRequested();
 }
 

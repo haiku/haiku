@@ -52,9 +52,9 @@ TGAView::TGAView(const char *name, uint32 flags, TranslatorSettings *settings)
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ViewColor());
 
- 	fTitle = new BStringView("title", "TGA Image Translator");
+ 	fTitle = new BStringView("title", B_TRANSLATE("TGA Image Translator"));
  	fTitle->SetFont(be_bold_font);
- 
+
  	char detail[100];
  	sprintf(detail, B_TRANSLATE("Version %d.%d.%d %s"),
  		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(TGA_TRANSLATOR_VERSION)),
@@ -64,22 +64,22 @@ TGAView::TGAView(const char *name, uint32 flags, TranslatorSettings *settings)
  	fDetail = new BStringView("detail", detail);
  	fWrittenBy = new BStringView("writtenby",
  		B_TRANSLATE("Written by the Haiku Translation Kit Team"));
- 
+
  	fpchkIgnoreAlpha = new BCheckBox(B_TRANSLATE("Ignore TGA alpha channel"),
 		new BMessage(CHANGE_IGNORE_ALPHA));
  	int32 val = (fSettings->SetGetBool(TGA_SETTING_IGNORE_ALPHA)) ? 1 : 0;
  	fpchkIgnoreAlpha->SetValue(val);
  	fpchkIgnoreAlpha->SetViewColor(ViewColor());
- 	
+
  	fpchkRLE = new BCheckBox(B_TRANSLATE("Save with RLE Compression"),
 		new BMessage(CHANGE_RLE));
  	val = (fSettings->SetGetBool(TGA_SETTING_RLE)) ? 1 : 0;
  	fpchkRLE->SetValue(val);
  	fpchkRLE->SetViewColor(ViewColor());
- 
+
  	// Build the layout
  	SetLayout(new BGroupLayout(B_HORIZONTAL));
- 
+
  	AddChild(BGroupLayoutBuilder(B_VERTICAL, 7)
  		.Add(fTitle)
  		.Add(fDetail)
@@ -91,10 +91,11 @@ TGAView::TGAView(const char *name, uint32 flags, TranslatorSettings *settings)
  		.AddGlue()
  		.SetInsets(5, 5, 5, 5)
  	);
- 
+
  	BFont font;
  	GetFont(&font);
- 	SetExplicitPreferredSize(BSize((font.Size() * 333)/12, (font.Size() * 200)/12));
+ 	SetExplicitPreferredSize(BSize((font.Size() * 333)/12,
+ 		(font.Size() * 200)/12));
 }
 
 

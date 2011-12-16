@@ -12,6 +12,9 @@
 #include "slab_private.h"
 
 
+RANGE_MARKER_FUNCTION_BEGIN(SlabSmallObjectCache)
+
+
 static inline slab *
 slab_in_pages(const void *pages, size_t slab_size)
 {
@@ -73,8 +76,14 @@ SmallObjectCache::CreateSlab(uint32 flags)
 	if (error != B_OK)
 		return NULL;
 
-	return InitSlab(slab_in_pages(pages, slab_size), pages,
-		slab_size - sizeof(slab), flags);
+	slab* newSlab = slab_in_pages(pages, slab_size);
+	size_t byteCount = slab_size - sizeof(slab);
+	if (AllocateTrackingInfos(newSlab, byteCount, flags) != B_OK) {
+		MemoryManager::Free(pages, flags);
+		return NULL;
+	}
+		
+	return InitSlab(newSlab, pages, byteCount, flags);
 }
 
 
@@ -84,6 +93,7 @@ SmallObjectCache::ReturnSlab(slab* slab, uint32 flags)
 	UninitSlab(slab);
 
 	Unlock();
+	FreeTrackingInfos(slab, flags);
 	MemoryManager::Free(slab->pages, flags);
 	Lock();
 }
@@ -94,3 +104,6 @@ SmallObjectCache::ObjectSlab(void* object) const
 {
 	return slab_in_pages(lower_boundary(object, slab_size), slab_size);
 }
+
+
+RANGE_MARKER_FUNCTION_END(SlabSmallObjectCache)

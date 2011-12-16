@@ -156,6 +156,9 @@ main(int argc, char *argv[])
 #else
 #define IPSECOPT
 #endif
+
+	crlf = 1;
+
 	while ((ch = getopt(argc, argv,
 			    "468EKLNS:X:acde:fFk:l:n:rs:uxy" IPSECOPT)) != -1)
 #undef IPSECOPT

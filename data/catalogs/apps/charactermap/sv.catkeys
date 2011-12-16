@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-CharacterMap	2426642683
+1	swedish	x-vnd.Haiku-CharacterMap	4082916013
 Aegean numbers	UnicodeBlocks		Egeiska siffror
 Alphabetic presentation forms	UnicodeBlocks		Alfabetiska presentationsformer
 Ancient Greek musical notation	UnicodeBlocks		Gammelgrekiska noter
@@ -43,6 +43,7 @@ Combining diacritical marks supplement	UnicodeBlocks		Kombinerade diakritiska te
 Combining half marks	UnicodeBlocks		Kombinerade halvmarkörer
 Control pictures	UnicodeBlocks		Kontrollbilder
 Coptic	UnicodeBlocks		Koptisk
+Copy as escaped byte string	CharacterView		Kopiera som kodad byte-sträng
 Copy character	CharacterView		Kopiera tecken
 Counting rod numerals	UnicodeBlocks		Räknestavssiffror
 Cuneiform	UnicodeBlocks		Kilskrift

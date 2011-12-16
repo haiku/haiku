@@ -2703,6 +2703,7 @@ ls( httpd_conn* hc )
 	poorman_log(logString, true, hc->client_addr.sa_in.sin_addr.s_addr, RED);
 //	syslog( LOG_ERR, "opendir %.80s - %m", hc->expnfilename );
 	httpd_send_err( hc, 404, err404title, "", err404form, hc->encodedurl );
+	free(de);
 	return -1;
 	}
 
@@ -2758,6 +2759,7 @@ ls( httpd_conn* hc )
 		    hc, 500, err500title, "", err500form, hc->encodedurl );
 		httpd_write_response( hc );
 		closedir( dirp );
+		free(de);
 		return  -1;
 		}
 
@@ -2942,10 +2944,11 @@ ls( httpd_conn* hc )
 	closedir( dirp );
 	httpd_send_err(
 	    hc, 501, err501title, "", err501form, httpd_method_str( hc->method ) );
+	free(de);
 	return -1;
 	}
-
-    return 0;
+	free(de);
+	return 0;
     }
 
 #endif /* GENERATE_INDEXES */

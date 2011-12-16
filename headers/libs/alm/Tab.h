@@ -6,6 +6,7 @@
 #define	X_TAB_H
 
 
+#include <Referenceable.h>
 #include "LinearSpec.h"
 #include "Variable.h"
 
@@ -13,34 +14,37 @@
 namespace BALM {
 
 
+class BALMLayout;
+
+
 /**
  * Vertical grid line (x-tab).
  */
-class XTab : public Variable {
-protected:
-	XTab(LinearSpec* ls)
-		:
-		Variable(ls)
-	{
-		
-	}
-
+class XTab : public Variable, public BReferenceable {
 public:
+	virtual						~XTab();
+
 	friend	class				BALMLayout;
+
+protected:
+								XTab(BALMLayout* layout);
+
+private:
+			BALMLayout*			fALMLayout;
 };
 
 
-class YTab : public Variable {
-protected:
-	YTab(LinearSpec* ls)
-		:
-		Variable(ls)
-	{
-		
-	}
-
+class YTab : public Variable, public BReferenceable {
 public:
+	virtual						~YTab();
+
 	friend	class				BALMLayout;
+
+protected:
+								YTab(BALMLayout* layout);
+
+private:
+			BALMLayout*			fALMLayout;
 };
 
 

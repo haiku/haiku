@@ -52,6 +52,9 @@ enum descriptor_types {
 	DT_VALID_8,				// long page table descriptor
 };
 
+#define M68K_PE_DT_MASK	0x00000003
+#define DT_MASK	M68K_PE_DT_MASK
+
 #if 0
 /* This is the normal layout of the descriptors, as per documentation.
  * When page size > 256, several bits are unused in the LSB of page

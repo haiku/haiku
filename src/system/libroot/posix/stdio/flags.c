@@ -39,8 +39,9 @@
 //#include <sys/file.h>
 #include <stdio.h>
 #include <errno.h>
-
 #include <fcntl.h>
+
+#include <errno_private.h>
 
 #include "local.h"
 
@@ -77,7 +78,7 @@ __sflags(mode, optr)
 		break;
 
 	default:	/* illegal mode */
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		return (0);
 	}
 

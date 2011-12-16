@@ -1,77 +1,77 @@
-1	dutch	x-vnd.Haiku-StyledEdit	2071192997
+1	dutch; flemish	x-vnd.Haiku-StyledEdit	2071192997
+Paste	Menus		Plakken
+OK	LoadAlert		Oké
+File	Menus		Bestand
 ???	LoadAlert		???
-Align	Menus		Uitlijnen
-Black	Menus		Zwart
-Blue	Menus		Blauw
-Bold	Menus		Vet
+Lines:	Statistics		Regels:
+Italic	Menus		Cursief
+Left	Menus		Links
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Herstellen naar laatste versie van \"%s\"? 
+Search backwards	FindandReplaceWindow		Achteruit zoeken
+Size	Menus		Grootte
+Save	QuitAlert		Opslaan
+Page setup…	Menus		Pagina-configuratie...
+Print…	Menus		Afdrukken...
 Can't undo	Menus		Kan niet ongedaan maken
-Cancel	FindandReplaceWindow		Annuleren
-Cancel	QuitAlert		Annuleren
-Cancel	RevertToSavedAlert		Annuleren
+Save	Menus		Opslaan
+Replace with:	FindandReplaceWindow		Vervangen door:
 Cancel	SaveAlert		Annuleren
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan niet herstellen, het bestand \"%s\" werd niet gevonden.
 Case-sensitive	FindandReplaceWindow		Hoofdlettergevoelig
-Center	Menus		Centreren
-Characters:	Statistics		Karakters:
-Close	Menus		Sluiten
-Color	Menus		Kleur
-Cut	Menus		Knippen
-Cyan	Menus		Cyaan
-Default	Open_and_SaveAsPanel		Standaard
-Document	Menus		Document
-Document statistics	Statistics		Documentstatistieken
-Don't save	QuitAlert		Niet opslaan
-Don't save	SaveAlert		Niet opslaan
-Edit	Menus		Bewerken
-Encoding	Open_and_SaveAsPanel		Codering
-Error loading \"%s\":\n\t%s	LoadAlert		Fout bij het laden van \"%s\":\n\t%s
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Fout bij 't laden van \"%s\":\n\tNiet-ondersteund formaat
-Error saving \"%s\":\n%s	SaveAlert		Fout bij opslaan van \"%s\":\n%s
-File	Menus		Bestand
-Find	FindandReplaceWindow		Zoeken
-Find again	Menus		Opnieuw zoeken
-Find selection	Menus		Selectie vinden
-Find:	FindandReplaceWindow		Vind:
-Find…	Menus		Zoeken...
-Font	Menus		Lettertype
 Green	Menus		Groen
-Italic	Menus		Cursief
-Left	Menus		Links
-Lines:	Statistics		Regels:
+Revert to saved…	Menus		Herstel naar opgeslagen...
+Yellow	Menus		Geel
+Replace in all windows	FindandReplaceWindow		Vervang in alle vensters
+Wrap lines	Menus		Regels afbreken
+Quit	Menus		Sluiten
+Document statistics	Statistics		Documentstatistieken
+Cancel	RevertToSavedAlert		Annuleren
+Document	Menus		Document
+Save changes to the document \"%s\"? 	QuitAlert		Veranderingen aan het document \"%s\" opslaan? 
+Edit	Menus		Bewerken
+Font	Menus		Lettertype
+Replace all	FindandReplaceWindow		Alles vervangen
+Statistics…	Menus		Statistieken...
+Default	Open_and_SaveAsPanel		Standaard
+Cancel	FindandReplaceWindow		Annuleren
+Close	Menus		Sluiten
+Save	SaveAlert		Opslaan
+Words:	Statistics		Woorden:
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Fout bij 't laden van \"%s\":\n\tNiet-ondersteund formaat
+OK	RevertToSavedAlert		Oké
+Don't save	QuitAlert		Niet opslaan
+Align	Menus		Uitlijnen
+Color	Menus		Kleur
+Red	Menus		Rood
+Open…	Menus		Openen…
+Center	Menus		Centreren
+Blue	Menus		Blauw
+Cyan	Menus		Cyaan
+OK	Statistics		Oké
 Magenta	Menus		Magenta
 New	Menus		Nieuw
-OK	LoadAlert		Oké
-OK	RevertToSavedAlert		Oké
-OK	SaveAlert		Oké
-OK	Statistics		Oké
-Open…	Menus		Openen…
-Page setup…	Menus		Pagina-configuratie...
-Paste	Menus		Plakken
-Print…	Menus		Afdrukken...
-Quit	Menus		Sluiten
-Red	Menus		Rood
-Redo typing	QuitAlert		Opnieuw typen
-Replace	FindandReplaceWindow		Vervangen
-Replace all	FindandReplaceWindow		Alles vervangen
-Replace in all windows	FindandReplaceWindow		Vervang in alle vensters
-Replace with:	FindandReplaceWindow		Vervangen door:
-Replace…	Menus		Vervangen...
-Revert to saved…	Menus		Herstel naar opgeslagen...
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Herstellen naar laatste versie van \"%s\"? 
-Right	Menus		Rechts
-Save	Menus		Opslaan
-Save	QuitAlert		Opslaan
-Save	SaveAlert		Opslaan
-Save as…	Menus		Opslaan als...
-Save changes to the document \"%s\"? 	QuitAlert		Veranderingen aan het document \"%s\" opslaan? 
-Search backwards	FindandReplaceWindow		Achteruit zoeken
-Select all	Menus		Alles selecteren
-Size	Menus		Grootte
-Statistics…	Menus		Statistieken...
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Dit bestand is Alleen-Lezen. Wijzigingen aan het document opslaan \"%s\"? 
-Undo typing	QuitAlert		Typen ongedaan maken
-Untitled 	StyledEditWindow		Naamloos
-Words:	Statistics		Woorden:
-Wrap lines	Menus		Regels afbreken
 Wrap-around search	FindandReplaceWindow		Rondgaand zoeken
-Yellow	Menus		Geel
+Bold	Menus		Vet
+Find selection	Menus		Selectie vinden
+Find:	FindandReplaceWindow		Vind:
+Error saving \"%s\":\n%s	SaveAlert		Fout bij opslaan van \"%s\":\n%s
+Cut	Menus		Knippen
+Replace	FindandReplaceWindow		Vervangen
+Find again	Menus		Opnieuw zoeken
+Cancel	QuitAlert		Annuleren
+Find…	Menus		Zoeken...
+Select all	Menus		Alles selecteren
+Don't save	SaveAlert		Niet opslaan
+Error loading \"%s\":\n\t%s	LoadAlert		Fout bij het laden van \"%s\":\n\t%s
+Undo typing	QuitAlert		Typen ongedaan maken
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Dit bestand is Alleen-Lezen. Wijzigingen aan het document opslaan \"%s\"? 
+Black	Menus		Zwart
+Untitled 	StyledEditWindow		Naamloos
+OK	SaveAlert		Oké
+Find	FindandReplaceWindow		Zoeken
+Encoding	Open_and_SaveAsPanel		Codering
+Characters:	Statistics		Karakters:
+Save as…	Menus		Opslaan als...
+Redo typing	QuitAlert		Opnieuw typen
+Replace…	Menus		Vervangen...
+Right	Menus		Rechts

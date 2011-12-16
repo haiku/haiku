@@ -18,7 +18,6 @@
 
 class TDateEdit;
 class TTimeEdit;
-class BRadioButton;
 class TAnalogClock;
 
 
@@ -37,26 +36,18 @@ public:
 	virtual	void 				MessageReceived(BMessage* message);
 
 			bool				CheckCanRevert();
-			bool				GetUseGmtTime();
 
 private:
 			void 				_InitView();
-			void 				_ReadRTCSettings();
-			void				_WriteRTCSettings();
-			void				_UpdateGmtSettings();
 			void 				_UpdateDateTime(BMessage* message);
 			void				_Revert();
 			time_t				_PrefletUptime() const;
 
-			BRadioButton*		fLocalTime;
-			BRadioButton*		fGmtTime;
 			TDateEdit*			fDateEdit;
 			TTimeEdit*			fTimeEdit;
 			BCalendarView*		fCalendarView;
 			TAnalogClock*		fClock;
 
-			bool				fUseGmtTime;
-			bool				fOldUseGmtTime;
 			bool				fInitialized;
 
 			time_t				fTimeAtStart;

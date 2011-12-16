@@ -1,6 +1,7 @@
-1	finnish	x-vnd.Be-TSKB	4265681964
-<Be folder is empty>	BeMenu		<Be-kansio on tyhjä>
-About this system	BeMenu		Tästä järjestelmästä
+1	finnish	x-vnd.Be-TSKB	107564593
+<Deskbar folder is empty>	DeskbarMenu		<Työpöytäpalkkikansio on tyhjä>
+About Haiku	DeskbarMenu		Haikusta...
+About this system	DeskbarMenu		Tästä järjestelmästä
 Always on top	PreferencesWindow		Aina päällimmäisenä
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Sovellukset
 Applications	PreferencesWindow		Sovellukset
@@ -12,34 +13,35 @@ Close all	WindowMenu		Sulje kaikki
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Esittelyohjelmat
 Deskbar	System name		Työpöytäpalkki
 Deskbar preferences	PreferencesWindow		Työpöytäpalkin asetukset
-Deskbar preferences…	BeMenu		Työpöytäpalkin asetukset...
+Deskbar preferences…	DeskbarMenu		Työpöytäpalkkiasetukset...
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Työpöytäappletit
 Edit menu…	PreferencesWindow		Muokkaa valikkoa...
 Expand new applications	PreferencesWindow		Laajenna uudet sovellukset
-Find…	BeMenu		Etsi...
+Find…	DeskbarMenu		Etsi...
 Hide all	WindowMenu		Piilota kaikki
 Hide time	TimeView		Piilota aika
 Menu	PreferencesWindow		Valikko
-Mount	BeMenu		Liitä
+Mount	DeskbarMenu		Liitä
 No windows	WindowMenu		Ei ikkunoita
-Power off	BeMenu		Katkaise virta
+Power off	DeskbarMenu		Sammuta virta
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Asetusohjelmat
 Quit application	WindowMenu		Poistu sovelluksesta
-Recent applications	BeMenu		Äskettäiset sovellukset
+Recent applications	DeskbarMenu		Äskettäiset sovellukset
 Recent applications:	PreferencesWindow		Äskettäiset sovellukset:
-Recent documents	BeMenu		Äskettäiset asiakirjat
+Recent documents	DeskbarMenu		Äskettäiset asiakirjat
 Recent documents:	PreferencesWindow		Äskettäiset asiakirjat:
-Recent folders	BeMenu		Äskettäiset kansiot
+Recent folders	DeskbarMenu		Äskettäiset kansiot
 Recent folders:	PreferencesWindow		Äskettäiset kansiot:
-Restart Tracker	BeMenu		Käynnistä seuraaja uudelleen
-Restart system	BeMenu		Käynnistä järjestelmä uudelleen
+Restart Tracker	DeskbarMenu		Käynnistä Seuraaja uudelleen
+Restart system	DeskbarMenu		Käynnistä järjestelmä uudelleen
 Show Time	Tray		Näytä aika
 Show all	WindowMenu		Näytä kaikki
 Show application expander	PreferencesWindow		Näytä sovelluslaajentaja
 Show calendar…	TimeView		Näytä kalenteri...
-Show replicants	BeMenu		Näytä replikantit
+Show replicants	DeskbarMenu		Näytä replikantit
 Show seconds	PreferencesWindow		Näytä sekunnit
-Shutdown…	BeMenu		Sulje järjestelmä...
+Shutdown…	DeskbarMenu		Sammuttaminen...
 Sort running applications	PreferencesWindow		Lajittele suoritettavat sovellukset
+Suspend	DeskbarMenu		Keskeytystila
 Tracker always first	PreferencesWindow		Seuraaja aina ensimmäisenä
 Window	PreferencesWindow		Ikkuna

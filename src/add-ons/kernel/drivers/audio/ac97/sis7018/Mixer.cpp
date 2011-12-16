@@ -477,7 +477,8 @@ Mixer::_CreateMIXControlGroup(multi_mix_control_info* MultiInfo, int32& index,
 	Controls[index].parent		= parentIndex;
 	Controls[index].string		= Info.fNameId;
 	if (Info.fName != NULL)
-		strncpy(Controls[index].name, Info.fName, sizeof(Controls[index].name));
+		strlcpy(Controls[index].name, Info.fName,
+								   sizeof(Controls[index].name));
 	index++;
 
 	if (Info.fType & MIX_Mute) {
@@ -499,7 +500,7 @@ Mixer::_CreateMIXControlGroup(multi_mix_control_info* MultiInfo, int32& index,
 		Controls[index].parent	= groupIndex;
 		Controls[index].string	= Info.fExNameId;
 		if (Info.fExName != NULL)
-			strncpy(Controls[index].name, Info.fExName,
+			strlcpy(Controls[index].name, Info.fExName,
 								sizeof(Controls[index].name));
 
 		TRACE("Enable:%#010x\n", Controls[index].id);
@@ -534,7 +535,7 @@ Mixer::_CreateMIXControlGroup(multi_mix_control_info* MultiInfo, int32& index,
 		Controls[index].parent	= groupIndex;
 		Controls[index].string	= Info.fExNameId;
 		if (Info.fExName != NULL)
-			strncpy(Controls[index].name, Info.fExName,
+			strlcpy(Controls[index].name, Info.fExName,
 								sizeof(Controls[index].name));
 
 		TRACE("Boost:%#010x\n", Controls[index].id);
@@ -548,7 +549,8 @@ Mixer::_CreateMIXControlGroup(multi_mix_control_info* MultiInfo, int32& index,
 		Controls[index].flags		= B_MULTI_MIX_MUX;
 		Controls[index].parent		= groupIndex;
 		Controls[index].string		= S_null;
-		strncpy(Controls[index].name, Info.fExName, sizeof(Controls[index].name));
+		strlcpy(Controls[index].name, Info.fExName,
+								sizeof(Controls[index].name));
 
 		TRACE("MUX:%#010x\n", Controls[index].id);
 		index++;
@@ -602,7 +604,7 @@ Mixer::ListMixControls(multi_mix_control_info* Info)
 	Controls[index].flags		= B_MULTI_MIX_GROUP;
 	Controls[index].parent		= 0;
 	Controls[index].string		= S_null;
-	strncpy(Controls[index].name, "Record", sizeof(Controls[index].name));
+	strlcpy(Controls[index].name, "Record", sizeof(Controls[index].name));
 	index++;
 
 	for (size_t i = 0; i < _countof(RecordControls); i++) {

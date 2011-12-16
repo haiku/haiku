@@ -10,7 +10,7 @@
 
 
 netcat=netcat
-report_site=haikuware.com
+report_site=fake.haikuware.com
 report_cgi=http://haikuware.com/hwreport.php
 
 do_notify ()
@@ -199,12 +199,35 @@ check_usb ()
 	echo "</dl>"
 }
 
+check_dmidecode () {
+	which dmidecode >/dev/null 2>&1 || return
+
+	# make sure /dev/mem is published
+	ls -l /dev/misc/mem > /dev/null
+
+	echo "<h2>DMIdecode output</h2>"
+	echo "<i>The output of dmidecode gives exact vendor and device identification.</i>"
+
+	echo "<h3><tt>dmidecode</tt></h3>"
+	echo "<i>(full output, stripped from the machine UUID)</i><br />"
+	echo "<textarea style='font-family: monospace' rows='10' cols='80' name='dmidecode_output' id='dmidecode_output' readonly='readonly'>"
+	dmidecode | grep -v 'UUID:'
+	echo "</textarea>"
+	
+	dmidecode_bios_vendor="$(dmidecode -s bios-vendor)"
+	dmidecode_bios_version="$(dmidecode -s bios-version)"
+	dmidecode_bios_release_date="$(dmidecode -s bios-release-date)"
+	dmidecode_system_manufacturer="$(dmidecode -s system-manufacturer)"
+	dmidecode_system_product_name="$(dmidecode -s system-product-name)"
+	dmidecode_system_version="$(dmidecode -s system-version)"
+}
+
 check_machine ()
 {
 	echo "<h2>Machine</h2>"
-	echo "Vendor: <input type='text' name='machine_vendor' id='machine_vendor' placeholder='Lenovo,HP,Asus...' />"
+	echo "Vendor: <input type='text' name='machine_vendor' id='machine_vendor' placeholder='Lenovo,HP,Asus...' value='$dmidecode_system_manufacturer'/>"
 	echo "<br />"
-	echo "Model: <input type='text' name='machine_model' id='machine_model' placeholder='T510,l4500r...' />"
+	echo "Model: <input type='text' name='machine_model' id='machine_model' placeholder='T510,l4500r...' value='$dmidecode_system_product_name' />"
 	echo "<br />"
 	echo "Specification page: <input type='url' name='machine_url' id='machine_url' placeholder='url of the model page on the vendor website' />"
 	echo "<br />"
@@ -302,19 +325,22 @@ check_all ()
 	do_notify 0.1 "Checking for PCI hardware..."
 	check_pci
 	
-	do_notify 0.3 "Checking for USB hardware..."
+	do_notify 0.2 "Checking for USB hardware..."
 	check_usb
 	
-	do_notify 0.5 "Checking for Haiku version..." 
-	check_haiku
-
-	do_notify 0.6 "Checking for utility outputs..." 
+	do_notify 0.3 "Checking for utility outputs..." 
 	check_utils
 
-	do_notify 0.8 "Dumping syslog output..." 
+	do_notify 0.7 "Dumping syslog output..." 
 	check_syslog
 
+	do_notify 0.8 "Checking machine infos..." 
+	check_dmidecode
 	check_machine
+
+	do_notify 0.9 "Checking for Haiku version..." 
+	check_haiku
+
 	check_sender
 
 	do_notify 1.0 "Done!" --timeout 3

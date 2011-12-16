@@ -31,7 +31,7 @@ class KeymapListItem;
 class KeymapWindow : public BWindow {
 public:
 								KeymapWindow();
-								~KeymapWindow();
+	virtual						~KeymapWindow();
 
 	virtual	bool				QuitRequested();
 	virtual void				MessageReceived(BMessage* message);
@@ -40,7 +40,11 @@ protected:
 			BMenuBar*			_CreateMenu();
 			BView*				_CreateMapLists();
 			void				_AddKeyboardLayouts(BMenu* menu);
+			void				_AddKeyboardLayoutMenu(BMenu* menu,
+									BDirectory directory);
 			status_t			_SetKeyboardLayout(const char* path);
+			void				_MarkKeyboardLayoutItem(const char* path,
+									BMenu* menu);
 
 			void				_UpdateSwitchShortcutButton();
 			void				_UpdateButtons();
@@ -64,7 +68,8 @@ protected:
 			status_t			_GetSettings(BFile& file, int mode) const;
 			status_t			_LoadSettings(BRect& frame,
 									BString& keyboardLayout);
-			status_t			_SaveSettings() const;
+			status_t			_SaveSettings();
+			BPath				_GetMarkedKeyboardLayoutPath(BMenu* menu);
 
 private:
 			BListView*			fSystemListView;

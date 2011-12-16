@@ -40,6 +40,8 @@
 <li><a href="../uk/workshop-filetypes+attributes.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../zh_CN/workshop-filetypes+attributes.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../pt_PT/workshop-filetypes+attributes.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/workshop-filetypes+attributes.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/workshop-filetypes+attributes.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../en/workshop-filetypes+attributes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -71,7 +73,7 @@
 
 <h1>Workshop: Dateitypen, Attribute, Index und Queries</h1>
 
-<p>In diesem Workshop wird gezeigt, wie sinnvoll <a href="attributes.html">Attributes</a>, <a href="queries.html">Queries</a>, der <a href="index.html">Index</a> und eigene <a href="filetypes.html">Filetypes</a> sein können. Als Beispiel werden wir eine DVD-Datenbank erstellen.</p>
+<p>In diesem Workshop wird gezeigt, wie sinnvoll <a href="attributes.html">Attribute</a>, <a href="queries.html">Queries</a>, der <a href="index.html">Index</a> und eigene <a href="filetypes.html"><acronym title="Filetypes">Dateitypen</acronym></a> sein können. Als Beispiel werden wir eine DVD-Datenbank erstellen.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -93,7 +95,7 @@ An dieses Bild hängen wir eine Reihe von Attributen. Hier müssen wir uns entsc
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="custom-filetype" name="custom-filetype">Erstellung eines eigenen Dateityps</a></h2>
-<p>In <span class="app">Filetypes</span> klicken wir auf <span class="button">Add...</span> unterhalb der hierarchischen Liste der Dateitypen. In dem dann öffnenden Dialogfenster legen wir fest, zu welcher MIME-Gruppe der neue Dateityp gehört oder ob es sich um eine gänzlich neue Gruppe handelt. Unser Dateityp soll die interne Bezeichnung ("Internal Name") <i>DVDdb</i> bekommen und unter "<i>applications</i>" abgelegt werden.</p>
+<p>In <span class="app"><acronym title="FileTypes">Dateitypen</acronym></span> klicken wir auf <span class="button">Hinzu...</span> unterhalb der hierarchischen Liste der Dateitypen. In dem dann öffnenden Dialogfenster legen wir fest, zu welcher MIME-Gruppe der neue Dateityp gehört oder ob es sich um eine gänzlich neue Gruppe handelt. Unser Dateityp soll die interne Bezeichnung ("Interner Name") <i>DVDdb</i> bekommen und unter "<i>applications</i>" abgelegt werden.</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-new-file-type.png" alt="filetypes-new-file-type.png" />
 <p>Jetzt öffnet sich ein neues Fenster für den neu angelegten Dateityp DVDdb:</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-dvddb.png" alt="filetypes-dvddb.png" />
@@ -106,14 +108,14 @@ An dieses Bild hängen wir eine Reihe von Attributen. Hier müssen wir uns entsc
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="file-recognition" name="file-recognition">Dateierkennung</a></h3>
-<p>Unter "File Recognitions" können Dateiendungen eingegeben werden, die typisch für diesen Dateityp sind. Da wir in unserem Beispiel dies nicht benötigen, wird es außer Acht gelassen.</p>
+<p>Unter "Dateierkennung" können Dateiendungen eingegeben werden, die typisch für diesen Dateityp sind. Da wir in unserem Beispiel dies nicht benötigen, wird es außer Acht gelassen.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="description" name="description">Beschreibung</a></h3>
 <ul>
-<li><i>Type Name</i> - Erscheint unter anderem im Attribut-Menü eines Tracker-Fensters.</li>
-<li><i>Description</i> - eine etwas ausführlichere Beschreibung</li>
+<li><i>Typname</i> - Erscheint unter anderem im Attribut-Menü eines Tracker-Fensters.</li>
+<li><i>Beschreibung</i> - eine etwas ausführlichere Beschreibung</li>
 </ul>
 
 <h3>
@@ -121,19 +123,19 @@ An dieses Bild hängen wir eine Reihe von Attributen. Hier müssen wir uns entsc
 <a id="pref_app" name="pref_app">Bevorzugte Anwendung</a></h3>
 <p>Dieses Auswahlmenü zeigt alle Anwendungen, die diesen Dateityp verwenden können. Hier kann ausgewählt werden, welches Programm gestartet wird, wenn eine Datei diesen Typs doppelt angeklickt wird.</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="button">Select...</span></td><td> </td><td>öffnet ein Dialogfenster zur Auswahl der Anwendung; in unserem Beispiel wählen wir <span class="app">ShowImage</span> um das DVD-Cover anzuzeigen.</td></tr>
-<tr><td class="onelinetop"><span class="button">Same as...</span></td><td> </td><td>öffnet ein Dialogfenster, in dem man eine Datei auswählen kann, die bereits die bevorzugte Anwendung verwendet, die auch hier verwendet werden soll.</td></tr>
+<tr><td><span class="button">Auswählen...</span></td><td> </td><td>öffnet ein Dialogfenster zur Auswahl der Anwendung; in unserem Beispiel wählen wir <span class="app"><acronym title="ShowImage">Bildbetrachter</acronym></span> um das DVD-Cover anzuzeigen.</td></tr>
+<tr><td class="onelinetop"><span class="button">Gleicher wie...</span></td><td> </td><td>öffnet ein Dialogfenster, in dem man eine Datei auswählen kann, die bereits die bevorzugte Anwendung verwendet, die auch hier verwendet werden soll.</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="extra_attribute" name="extra_attribute">Zusätzliche Attribute</a></h3>
-<p>Unter "Extra Attributes" geben wir alle zusätzlichen Attribute ein, die wir oben festgelegt haben. Ein Klick auf <span class="button">Add...</span> öffnet dieses Fenster:</p>
+<p>Unter "Extra Attribute" geben wir alle zusätzlichen Attribute ein, die wir oben festgelegt haben. Ein Klick auf <span class="button">Hinzu...</span> öffnet dieses Fenster:</p>
 <img src="images/workshop-filetypes+attributes-images/filetype-extra-attribute.png" alt="filetype-extra-attribute.png" />
 <ul>
-<li><p><i>Attribute Name</i> - Erscheint als Spaltenkopf im Tracker-Fenster</p></li>
-<li><p><i>Internal Name</i> - Wird für die Indizierung und Suche verwendet.</p></li>
-<li><i>Type</i> - Beschreibt die Art des Attributs und entsprechend wie es gesucht werden kann.
+<li><p><i>Attributname</i> - Erscheint als Spaltenkopf im Tracker-Fenster</p></li>
+<li><p><i>Interner Name</i> - Wird für die Indizierung und Suche verwendet.</p></li>
+<li><i>Typ</i> - Beschreibt die Art des Attributs und entsprechend wie es gesucht werden kann.
     <ul>
     <li><span class="menu">String</span> - normaler Text</li>
     <li><span class="menu">Boolean</span> - für die binären Werte 0 und 1</li>
@@ -152,15 +154,15 @@ An dieses Bild hängen wir eine Reihe von Attributen. Hier müssen wir uns entsc
 </li>
 </ul>
 <ul>
-<li><i>Visible</i> - Nur wenn diese Option markiert ist, kann das Attribut im Tracker gesehen / angezeigt werden; da unsere DVD-Datenbank angezeigt werden soll, setzten wir das Kreuz mit diesen Einstellungen:<ul>
-    <li><span class="menu">Display As</span> - auf "Default" (Standard) belassen. Zukünftig sind hier weitere Möglichkeiten wie Fortschrittsbalken oder Sterne geplant</li>
-    <li><span class="menu">Editable</span> - hiermit kann das Attribut direkt im Tracker ergänzt werden</li>
-    <li><span class="menu">Width</span> - die Breite der Spalte des Attributs im Tracker-Fenster</li>
-    <li><span class="menu">Alignment</span> - die Ausrichtung des Attribut-Wertes in der Spalte im Tracker: linksbündig, zentriert oder rechtsbündig</li>
+<li><i>Sichtbar</i> - Nur wenn diese Option markiert ist, kann das Attribut im Tracker gesehen / angezeigt werden; da unsere DVD-Datenbank angezeigt werden soll, setzten wir das Kreuz mit diesen Einstellungen:<ul>
+    <li><span class="menu">Anzeigen als</span> - auf "Default" (Standard) belassen. Zukünftig sind hier weitere Möglichkeiten wie Fortschrittsbalken oder Sterne geplant</li>
+    <li><span class="menu">Editierbar</span> - hiermit kann das Attribut direkt im Tracker ergänzt werden</li>
+    <li><span class="menu">Breite</span> - die Breite der Spalte des Attributs im Tracker-Fenster</li>
+    <li><span class="menu">Ausrichtung</span> - die Ausrichtung des Attribut-Wertes in der Spalte im Tracker: linksbündig, zentriert oder rechtsbündig</li>
 </ul></li></ul>
 <p>Jetzt müssen diese Werte für die Attribute eingegeben werden:</p>
 <table summary="DVDdb Attributes" cellpadding="10" border="1">
-<tr><th>Internal Name</th><th>Attribute type</th><th>indexed?</th><th>Description</th></tr>
+<tr><th>Interner Name</th><th>Attributtyp</th><th>indexed?</th><th>Beschreibung</th></tr>
 <tr><td>DVDdb:title</td>	<td>text</td>		<td>yes</td>	<td>Film-Titel</td></tr>
 <tr><td>DVDdb:genre</td>	<td>text</td>		<td>yes</td>	<td>Genre</td></tr>
 <tr><td>DVDdb:url</td>		<td>text</td>		<td>no</td>	<td>URL</td></tr>
@@ -177,7 +179,7 @@ An dieses Bild hängen wir eine Reihe von Attributen. Hier müssen wir uns entsc
 <p>Bevor wir unsere DVD-Datenbank mit Daten befüllen, müssen wir noch einige Attribute in den <a href="index.html">Index</a> aufnehmen. Nur so stehen sie für die Suche in Haiku, den <a href="queries.html">Queries</a> zur Verfügung.<br />Um mit Scott Hacker, dem Autor der BeOS-Bible zu sprechen: "Es können so viele Attribute wie nur gewünscht in den Index aufgenommen werden, Doch man sollte es nicht übertreiben." - eine sinnvolle Auswahl sollte also getroffen werden.</p>
 <p>Wir nehmen diese Attribute in den Index auf:</p>
 <table summary="Attribute Type" cellpadding="10" border="1">
-<tr><th>Internal Name</th><th>Attribute type</th></tr>
+<tr><th>Interner Name</th><th>Attributtyp</th></tr>
 <tr><td>DVDdb:title</td><td>text</td></tr>
 <tr><td>DVDdb:genre</td><td>text</td></tr>
 <tr><td>DVDdb:cast</td><td>text</td></tr>
@@ -196,21 +198,21 @@ mkindex -t int DVDdb:rating</pre>
 <a id="filling-data" name="filling-data">Daten eingeben</a></h2>
 <p>Nachdem nun alles vorbereitet ist, können wir damit beginnen, die Datenbank zu befüllen.<br />
 Da jeder Eintrag eine Bilddatei mit dem DVD-Cover sein soll, speichern wir zu jedem Film, den wir in die Datenbank (einem Ordner) aufnehmen eine dazugehörige JPEG-Datei.</p>
-<p>Wenn wir den Ordner öffnen, sehen wird ein ganz normales Tracker-Fenster mit einer Bild-Datei darin. Mit einem Rechtsklick auf diese Datei und der Auswahl <span class="app">Add On | FileType</span> setzen wir nun den Dateityp dieses Bildes auf <tt>application/DVDdb</tt>. Näheres zu den Dateitypen hier: <a href="filetypes.html">Filetypes</a> </p>
-<p>Jetzt aktivieren wir alle DVDdb-Attribute aus dem Menü <span class="menu">Attributes</span> und sortieren sie nach unseren Vorlieben:</p>
+<p>Wenn wir den Ordner öffnen, sehen wird ein ganz normales Tracker-Fenster mit einer Bild-Datei darin. Mit einem Rechtsklick auf diese Datei und der Auswahl <span class="app">Add-ons | FileType</span> setzen wir nun den Dateityp dieses Bildes auf <tt>application/DVDdb</tt>. Näheres zu den Dateitypen hier: <a href="filetypes.html"><acronym title="Filetypes">Dateitypen</acronym></a> </p>
+<p>Jetzt aktivieren wir alle DVDdb-Attribute aus dem Menü <span class="menu">Attribute</span> und sortieren sie nach unseren Vorlieben:</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-dvddb-empty.png" alt="filetypes-dvddb-empty.png" />
 <p>Mit einem Klick auf ein leeres Attribut (oder <span class="key">ALT</span> <span class="key">E</span>) können wir die entsprechenden Werte eingeben. Mittels <span class="key">TAB</span> und <span class="key">SHIFT</span> <span class="key">TAB</span> können wir von Attribut zu Attribut springen.</p>
-<p>Um einen neuen Eintrag anzulegen kopieren wir entweder ein neues Bild in das Verzeichnis, oder wir verwenden den Menüpunkt "File | New..." indem wir eine leere Datei mit dem Dateityp "applications/DVDdb" und dem Dateinamen "DVDdb" im Ordner <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span> anlegen.</p>
-<p>Jetzt befindet sich bei eine Rechtsklick im Trackerfenster unter <span class="menu">New...</span> ein neuer Eintrag neben dem standardmäßigen "New folder".</p>
+<p>Um einen neuen Eintrag anzulegen kopieren wir entweder ein neues Bild in das Verzeichnis, oder wir verwenden den Menüpunkt "Datei | Neu..." indem wir eine leere Datei mit dem Dateityp "applications/DVDdb" und dem Dateinamen "DVDdb" im Ordner <span class="path"><acronym title="/boot/home/config/settings/Tracker/Tracker New Templates">/boot/Benutzer/Konfiguration/settings/Tracker/Tracker Neu-Vorlagen</acronym></span> anlegen.</p>
+<p>Jetzt befindet sich bei eine Rechtsklick im Trackerfenster unter <span class="menu">Neu...</span> ein neuer Eintrag neben dem standardmäßigen "Neuer Ordner".</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="query-db" name="query-db">Suchanfragen</a></h2>
 <p>Nach mehreren Stunden stupidem Befüllen der Attribute haben wir nun eine kleine Datenbank, in der wir nach Herzenslust suchen können. Zum Beispiel nach allen Filmen mit Christina Ricci, die wir mit "7" oder besser bewertet haben.</p>
 <p>Für die Suchergebnisse kann man ebenfalls eine sinnvolles Layout der Attribute festlegen.<br />
-Nachdem die Spalten im DVDdb-Ordner so eingestellt wurden, wie sie für das Suchergebnis sinnvoll sind, kopiert man diese mittels <span class="menu">Attributes | Copy Layout</span>.</p>
-<p>Darauf hin ist in <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span> ein neuer Ordner anzulegen, der nach <i>group/filetype</i> benannt wird, wobei der Schrägstrich durch einen Unterstrich zu ersetzten ist; in unserem Fall also "applications_DVDdb".</p>
-<p>Öffne den neuen Ordner und kopiere das Attibute-Layout mit <span class="menu">Attributes | Paste Layout</span>. Voilà:</p>
+Nachdem die Spalten im DVDdb-Ordner so eingestellt wurden, wie sie für das Suchergebnis sinnvoll sind, kopiert man diese mittels <span class="menu">Attribute | Anordnung kopieren</span>.</p>
+<p>Darauf hin ist in <span class="path"><acronym title="/boot/home/config/settings/Tracker/DefaultQueryTemplates">/boot/Benutzer/Konfiguration/settings/Tracker/DefaultQueryTemplates</acronym></span> ein neuer Ordner anzulegen, der nach <i>group/filetype</i> benannt wird, wobei der Schrägstrich durch einen Unterstrich zu ersetzten ist; in unserem Fall also "applications_DVDdb".</p>
+<p>Öffne den neuen Ordner und kopiere das Attibute-Layout mit <span class="menu">Attribute | Anordnung einfügen</span>. Voilà:</p>
 <img src="images/workshop-filetypes+attributes-images/query-dvddb.png" alt="query-dvddb.png" />
 
 </div>

@@ -10,6 +10,7 @@
 
 #include <compat/sys/stat.h>
 
+#include <errno_private.h>
 #include <syscalls.h>
 #include <symbol_versioning.h>
 #include <syscall_utils.h>

@@ -1,18 +1,19 @@
-1	slovak	x-vnd.Haiku-DataTranslations	3820343452
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Položka „%name“ už existuje v priečinku Translators! Má sa existujúci prekladač prepísať?
-Cancel	DataTranslations		Zrušiť
-Could not install %s:\n%s	DataTranslations		Nebolo možné nainštalovať %s:\n%s
+1	slovak	x-vnd.Haiku-DataTranslations	458105477
 DataTranslations	System name		Preklad dát
-DataTranslations - Error	DataTranslations		Preklad dát - chyba
-DataTranslations - Note	DataTranslations		Preklad dát - poznámka
-Info	DataTranslations		Info
-Info:	DataTranslations		Info:
+Cancel	DataTranslations		Zrušiť
 Name:	DataTranslations		Názov:
-Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Názov: %s \nVerzia: %ld.%ld.%ld\n\nInfo:\n%s\n\nCesta:\n%s\n	
-OK	DataTranslations		OK
-Overwrite	DataTranslations		Prepísať
-Path:	DataTranslations		Cesta:
+Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Názov: %s \nVerzia: %ld.%ld.%ld\n\nInfo:\n%s\n\nCesta:\n%s\n
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Zdá sa, že položka „%name“ nie je prekladač a nebude nainštalovaná.
-The new translator has been installed successfully.	DataTranslations		Nový prekladač bol úspešne nainštalovaný.
+Could not install %s:\n%s	DataTranslations		Nebolo možné nainštalovať %s:\n%s
 Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Tento ovládací panel použite na nastavenie predvolených hodnôt prekladačov, ktoré sa použijú, keď aplikácia neuvedie žiadne iné nastavenia.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Položka „%name“ už existuje v priečinku Translators! Má sa existujúci prekladač prepísať?
+DataTranslations - Note	DataTranslations		Preklad dát - poznámka
+Overwrite	DataTranslations		Prepísať
+Info:	DataTranslations		Info:
+Info	DataTranslations		Info
+Path:	DataTranslations		Cesta:
+The new translator has been installed successfully.	DataTranslations		Nový prekladač bol úspešne nainštalovaný.
+DataTranslations - Error	DataTranslations		Preklad dát - chyba
+Ok	DataTranslations		OK
+OK	DataTranslations		OK
 Version:	DataTranslations		Verzia:

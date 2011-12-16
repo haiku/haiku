@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src add-ons kernel drivers graphics neomagic ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+UsePrivateSystemHeaders ;
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics neomagic ] ;
 
@@ -12,7 +13,7 @@ KernelAddon neomagic :
 Package haiku-neomagic-cvs :
 	README.html UPDATE.html ;
 Package haiku-neomagic-cvs :
-	neomagic : 
+	neomagic :
 	boot home config add-ons kernel drivers bin ;
 PackageDriverSymLink haiku-neomagic-cvs : graphics neomagic ;
 Package haiku-neomagic-cvs :

@@ -96,8 +96,12 @@ public:
 
 
 menu_info BMenu::sMenuInfo;
-bool BMenu::sAltAsCommandKey;
 
+uint32 BMenu::sShiftKey;
+uint32 BMenu::sControlKey;
+uint32 BMenu::sOptionKey;
+uint32 BMenu::sCommandKey;
+uint32 BMenu::sMenuKey;
 
 static property_info sPropList[] = {
 	{ "Enabled", { B_GET_PROPERTY, 0 },
@@ -381,8 +385,12 @@ BMenu::AttachedToWindow()
 {
 	BView::AttachedToWindow();
 
-	_GetIsAltCommandKey(sAltAsCommandKey);
-		
+	_GetShiftKey(sShiftKey);
+	_GetControlKey(sControlKey);
+	_GetCommandKey(sCommandKey);
+	_GetOptionKey(sOptionKey);
+	_GetMenuKey(sMenuKey);
+
 	fAttachAborted = _AddDynamicItems();
 
 	if (!fAttachAborted) {
@@ -2680,25 +2688,72 @@ BMenu::_IsStickyMode() const
 
 
 void
-BMenu::_GetIsAltCommandKey(bool &value) const
+BMenu::_GetShiftKey(uint32 &value) const
 {
 	// TODO: Move into init_interface_kit().
-	// Currently we can't do that, as get_key_map() blocks forever
+	// Currently we can't do that, as get_modifier_key() blocks forever
 	// when called on input_server initialization, since it tries
 	// to send a synchronous message to itself (input_server is
 	// a BApplication)
 
-	bool altAsCommand = true;
-	key_map* keys = NULL;
-	char* chars = NULL;
-	get_key_map(&keys, &chars);
-	if (keys == NULL || keys->left_command_key != 0x5d
-		|| keys->left_control_key != 0x5c)
-		altAsCommand = false;
-	free(chars);
-	free(keys);
+	if (get_modifier_key(B_LEFT_SHIFT_KEY, &value) != B_OK)
+		value = 0x4b;
+}
 
-	value = altAsCommand;
+
+void
+BMenu::_GetControlKey(uint32 &value) const
+{
+	// TODO: Move into init_interface_kit().
+	// Currently we can't do that, as get_modifier_key() blocks forever
+	// when called on input_server initialization, since it tries
+	// to send a synchronous message to itself (input_server is
+	// a BApplication)
+
+	if (get_modifier_key(B_LEFT_CONTROL_KEY, &value) != B_OK)
+		value = 0x5c;
+}
+
+
+void
+BMenu::_GetCommandKey(uint32 &value) const
+{
+	// TODO: Move into init_interface_kit().
+	// Currently we can't do that, as get_modifier_key() blocks forever
+	// when called on input_server initialization, since it tries
+	// to send a synchronous message to itself (input_server is
+	// a BApplication)
+
+	if (get_modifier_key(B_LEFT_COMMAND_KEY, &value) != B_OK)
+		value = 0x66;
+}
+
+
+void
+BMenu::_GetOptionKey(uint32 &value) const
+{
+	// TODO: Move into init_interface_kit().
+	// Currently we can't do that, as get_modifier_key() blocks forever
+	// when called on input_server initialization, since it tries
+	// to send a synchronous message to itself (input_server is
+	// a BApplication)
+
+	if (get_modifier_key(B_LEFT_OPTION_KEY, &value) != B_OK)
+		value = 0x5d;
+}
+
+
+void
+BMenu::_GetMenuKey(uint32 &value) const
+{
+	// TODO: Move into init_interface_kit().
+	// Currently we can't do that, as get_modifier_key() blocks forever
+	// when called on input_server initialization, since it tries
+	// to send a synchronous message to itself (input_server is
+	// a BApplication)
+
+	if (get_modifier_key(B_MENU_KEY, &value) != B_OK)
+		value = 0x68;
 }
 
 

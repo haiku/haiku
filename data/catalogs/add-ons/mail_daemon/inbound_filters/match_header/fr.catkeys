@@ -1,0 +1,8 @@
+1	french	x-vnd.Haiku-MatchHeader	3652092583
+<Choose account>	ConfigView		<choisir un compte>
+<Choose action>	ConfigView		<choisir une action>
+If	ConfigView		Si
+Move to	ConfigView		Déplacer vers
+Set as read	ConfigView		Marquer comme lu
+Then	ConfigView		Alors
+header (e.g. Subject)	ConfigView		entête (ex. Sujet)

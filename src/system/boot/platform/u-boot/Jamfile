@@ -11,7 +11,7 @@ UsePrivateHeaders [ FDirName storage ] ;
 
 # TODO: move this to arch/arm !
 
-UsePrivateHeaders [ FDirName kernel arch arm board $(TARGET_BOOT_BOARD) ] ;
+UsePrivateHeaders [ FDirName kernel arch $(TARGET_ARCH) board $(TARGET_BOOT_BOARD) ] ;
 
 {
 	local defines = _BOOT_MODE ;
@@ -27,8 +27,8 @@ local uImageFakeOS = "netbsd" ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
-KernelMergeObject boot_platform_u-boot.o :
-	shell.S
+# First build the non arch dependent parts
+KernelMergeObject boot_platform_u-boot_common.o :
 	start2.cpp
 	debug.cpp
 	console.cpp
@@ -47,10 +47,12 @@ KernelMergeObject boot_platform_u-boot.o :
 	: boot_platform_generic.a
 ;
 
-# include board-specific defs
-SubInclude HAIKU_TOP src system boot platform $(TARGET_BOOT_PLATFORM) board ;
-# reset SubDir
-SubDir HAIKU_TOP src system boot platform u-boot ;
+KernelMergeObject boot_platform_u-boot.o :
+	: :
+	# must come first to have _start_* at correct locations
+	boot_platform_u-boot_$(TARGET_ARCH).o
+	boot_platform_u-boot_common.o
+;
 
 # bootable flash image
 rule BuildUBootFlashImage image : haikuLoader : uboot_image
@@ -126,7 +128,7 @@ actions BuildUImageScript1
 {
 	rm -f $(<) $(<).txt
 	echo '$(SCRIPTCONTENT)' > $(<).txt
-	mkimage -A arm -O $(FAKEOS) -T script -C none -n $(SCRIPTNAME) \
+	mkimage -A $(TARGET_ARCH) -O $(FAKEOS) -T script -C none -n $(SCRIPTNAME) \
 		-d $(<).txt $(<)
 	rm -f $(<).txt
 }
@@ -177,13 +179,13 @@ actions BuildUBootSDImage1
 
 # uimage targets
 BuildUImage haiku_loader.ub : haiku_loader :
-	-A arm -O $(uImageFakeOS) -T kernel -C none
+	-A $(TARGET_ARCH) -O $(uImageFakeOS) -T kernel -C none
 	-a $(HAIKU_BOARD_LOADER_BASE) -e $(HAIKU_BOARD_LOADER_ENTRY_RAW)
 		-n 'haiku_loader' ;
 
 local tgzArchive = haiku-floppyboot.tgz ;
 BuildUImage haiku_loader_nbsd.ub : haiku_loader $(tgzArchive) :
-	-A arm -O $(uImageFakeOS) -T multi -C none
+	-A $(TARGET_ARCH) -O $(uImageFakeOS) -T multi -C none
 	-a $(HAIKU_BOARD_LOADER_BASE) -e $(HAIKU_BOARD_LOADER_ENTRY_NBSD)
 		-n 'haiku_loader' ;
 
@@ -205,29 +207,29 @@ if $(HAIKU_BOARD_UBOOT_IMAGE) && $(HAIKU_BOARD_UBOOT_IMAGE_URL) {
 # flash image targets
 BuildUBootFlashImage haiku-$(HAIKU_BOOT_BOARD)_flash_image_raw.img : haiku_loader :
 	$(ubootFile) ;
-NotFile haiku-arm-image ;
-Depends haiku-arm-image : haiku-$(HAIKU_BOOT_BOARD)_flash_image_raw.img ;
+NotFile haiku-flash-image ;
+Depends haiku-flash-image : haiku-$(HAIKU_BOOT_BOARD)_flash_image_raw.img ;
 
 #BuildUBootFlashImage haiku-$(HAIKU_BOOT_BOARD)_flash_image_elf.img : boot_loader_u-boot :
 #	$(ubootFile) ;
-#NotFile haiku-arm-elf-image ;
-#Depends haiku-arm-elf-image : haiku-$(HAIKU_BOOT_BOARD)_flash_image_elf.img ;
+#NotFile haiku-flash-elf-image ;
+#Depends haiku-flash-elf-image : haiku-$(HAIKU_BOOT_BOARD)_flash_image_elf.img ;
 
 BuildUBootFlashImage haiku-$(HAIKU_BOOT_BOARD)_flash_image_uimage.img : haiku_loader.ub :
 	$(ubootFile) ;
-NotFile haiku-arm-uimage ;
-Depends haiku-arm-uimage : haiku-$(HAIKU_BOOT_BOARD)_flash_image_uimage.img ;
+NotFile haiku-flash-uimage ;
+Depends haiku-flash-uimage : haiku-$(HAIKU_BOOT_BOARD)_flash_image_uimage.img ;
 
 # SD/mmc image targets
 BuildUBootSDImage haiku-$(HAIKU_BOOT_BOARD).mmc : $(HAIKU_BOARD_SDIMAGE_FILES) ;
-NotFile haiku-arm-mmc ;
-Depends haiku-arm-mmc : haiku-$(HAIKU_BOOT_BOARD).mmc ;
+NotFile haiku-mmc-image ;
+Depends haiku-mmc-image : haiku-$(HAIKU_BOOT_BOARD).mmc ;
 
-SEARCH on [ FGristFiles shell.S ]
-	= [ FDirName $(HAIKU_TOP) src system boot platform $(TARGET_BOOT_PLATFORM) arch $(TARGET_ARCH) ] ;
 SEARCH on [ FGristFiles $(genericPlatformSources) ]
 	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
 
 # Tell the build system to where stage1.bin can be found, so it can be used
 # elsewhere.
 SEARCH on stage1.bin = $(SUBDIR) ;
+
+SubInclude HAIKU_TOP src system boot platform u-boot arch ;

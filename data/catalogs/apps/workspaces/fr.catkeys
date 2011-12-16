@@ -1,4 +1,4 @@
-1	french	x-vnd.Be-WORK	3592128290
+1	french	x-vnd.Be-WORK	932379173
 About Workspaces…	Workspaces		À propos de Bureaux…
 Always on top	Workspaces		Toujours au dessus
 Auto-raise	Workspaces		Auto-montée
@@ -8,6 +8,5 @@ OK	Workspaces		OK
 Quit	Workspaces		Quitter
 Show window border	Workspaces		Montrer la bordure de fenêtre
 Show window tab	Workspaces		Afficher l'onglet de la fenêtre
-Usage: %s [options] [workspace]\nwhere \"options\" is one of:\n  --notitle\t\ttitle bar removed.  border and resize kept.\n  --noborder\t\ttitle, border, and resize removed.\n  --avoidfocus\t\tprevents the window from being the target of keyboard events.\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen corner\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Utilisation : %s [options] [zones]\noù « options » peut être :\n --notitle\t\tsans titre. le cadre et le redimensionnement sont conservés.\n --noborder\t\tsans titre, cadre ni redimensionnement.\n --avoidfocus\t\tprotège la fenêtre contre les événements du clavier.\n --alwaysontop\t\tconserve fenêtre au dessus\n --notmovable\t\tprotège la fenêtre contre les déplacements\n --autoraise\t\tmontre automatiquement la fenêtre des Bureaux quand le curseur est au coin de l'écran\n --help\t\taffiche ce message d'aide et sort\net où « zones » est le nombre de bureaux virtuels (0-31)\n
 Workspaces	System name		Bureaux
 Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Bureaux\nécrit par %1 et %2.\n\nCopyright %3, Haiku.\n\nEnvoyez les fenêtre à l'arrière-plan avec la touche Option. Envoyez les fenêtres au premier plan avec la touche Contrôle.\n

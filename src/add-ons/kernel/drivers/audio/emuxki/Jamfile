@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src add-ons kernel drivers audio emuxki ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+UsePrivateSystemHeaders ;
 UsePrivateHeaders media ;
 
 KernelAddon emuxki :

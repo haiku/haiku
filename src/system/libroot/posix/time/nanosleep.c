@@ -8,6 +8,7 @@
 
 #include <errno.h>
 
+#include <errno_private.h>
 #include <syscall_utils.h>
 
 

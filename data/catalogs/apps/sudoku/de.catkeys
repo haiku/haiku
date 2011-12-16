@@ -1,34 +1,34 @@
 1	german	x-vnd.Haiku-Sudoku	2463385585
-Abort	ProgressWindow		Abbrechen
-Advanced	SudokuWindow		Fortgeschritten
-Blank	SudokuWindow		Leer
-Copy	SudokuWindow		Kopieren
-Could not open \"%s\":\n%s\n	SudokuWindow		\"%s\" konnte nicht geöffnet werden:\n%s\n
-Could not set Sudoku:\n%s\n	SudokuWindow		Sudoku konnte nicht erstellt werden:\n%s\n
-Creating solvable field	SudokuGenerator		Lösbare Felder werden erstellt
-Easy	SudokuWindow		Einfach
-Export as…	SudokuWindow		Exportieren als...
-File	SudokuWindow		Datei
-HTML	SudokuWindow		HTML
-Hard	SudokuWindow		Schwer
-Help	SudokuWindow		Hilfe
-Mark invalid values	SudokuWindow		Falsche Zahlen markieren
-Mark valid hints	SudokuWindow		Gültige Zahlen hervorheben
-New	SudokuWindow		Neu
-OK	SudokuWindow		OK
-Open file…	SudokuWindow		Datei öffnen...
-Progress monitor	ProgressWindow		Fortschrittsanzeige
-Quit	SudokuWindow		Beenden
-Redo	SudokuWindow		Wiederholen
 Restore snapshot	SudokuWindow		Spielstand wiederherstellen
-Searching for removable values	SudokuGenerator		Suche nach entfernbaren Werten läuft
-Snapshot current	SudokuWindow		Spielstand merken
-Solve	SudokuWindow		Auflösen
-Solve single field	SudokuWindow		Ein Feld lösen
-Start again	SudokuWindow		Von vorn beginnen
+Could not set Sudoku:\n%s\n	SudokuWindow		Sudoku konnte nicht erstellt werden:\n%s\n
+Export as…	SudokuWindow		Exportieren als...
+OK	SudokuWindow		OK
+New	SudokuWindow		Neu
+Abort	ProgressWindow		Abbrechen
 Sudoku	System name		Sudoku
+Could not open \"%s\":\n%s\n	SudokuWindow		\"%s\" konnte nicht geöffnet werden:\n%s\n
+Easy	SudokuWindow		Einfach
+Open file…	SudokuWindow		Datei öffnen...
+Solve single field	SudokuWindow		Ein Feld lösen
+Solve	SudokuWindow		Auflösen
+Redo	SudokuWindow		Wiederholen
+File	SudokuWindow		Datei
+Advanced	SudokuWindow		Fortgeschritten
+Start again	SudokuWindow		Von vorn beginnen
+HTML	SudokuWindow		HTML
 Sudoku request	SudokuWindow		Sudoku Anfrage
+Copy	SudokuWindow		Kopieren
+Mark valid hints	SudokuWindow		Gültige Zahlen hervorheben
 Sudoku solved - congratulations!\n	SudokuWindow		Sudoku gelöst - Glückwunsch!\n
+Hard	SudokuWindow		Schwer
+Snapshot current	SudokuWindow		Spielstand merken
 Text	SudokuWindow		Text
-Undo	SudokuWindow		Rückgängig
+Creating solvable field	SudokuGenerator		Lösbare Felder werden erstellt
 View	SudokuWindow		Ansicht
+Progress monitor	ProgressWindow		Fortschrittsanzeige
+Mark invalid values	SudokuWindow		Falsche Zahlen markieren
+Blank	SudokuWindow		Leer
+Help	SudokuWindow		Hilfe
+Searching for removable values	SudokuGenerator		Suche nach entfernbaren Werten läuft
+Undo	SudokuWindow		Rückgängig
+Quit	SudokuWindow		Beenden

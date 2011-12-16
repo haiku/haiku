@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Oliver Tappe, zooey@hirschkaefer.de.
+ * Copyright 2010-2011, Oliver Tappe, zooey@hirschkaefer.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -15,8 +15,9 @@ namespace BPrivate {
 namespace Libroot {
 
 
-ICUNumericData::ICUNumericData(struct lconv& localeConv)
+ICUNumericData::ICUNumericData(pthread_key_t tlsKey, struct lconv& localeConv)
 	:
+	inherited(tlsKey),
 	fLocaleConv(localeConv),
 	fDataBridge(NULL)
 {

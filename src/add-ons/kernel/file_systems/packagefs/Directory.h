@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DIRECTORY_H
@@ -7,7 +7,6 @@
 
 
 #include "Node.h"
-#include "PackageDirectory.h"
 
 
 struct DirectoryIterator : DoublyLinkedListLinkImpl<DirectoryIterator> {
@@ -28,25 +27,17 @@ public:
 								Directory(ino_t id);
 	virtual						~Directory();
 
-	virtual	status_t			Init(Directory* parent, const char* name);
-
-	virtual	status_t			VFSInit(dev_t deviceID);
-	virtual	void				VFSUninit();
+	virtual	status_t			Init(Directory* parent, const char* name,
+									uint32 flags);
 
 	virtual	mode_t				Mode() const;
-	virtual	uid_t				UserID() const;
-	virtual	gid_t				GroupID() const;
-	virtual	timespec			ModifiedTime() const;
 	virtual	off_t				FileSize() const;
-
-	virtual	status_t			AddPackageNode(PackageNode* packageNode);
-	virtual	void				RemovePackageNode(PackageNode* packageNode);
-
-	virtual	PackageNode*		GetPackageNode();
 
 	virtual	status_t			Read(off_t offset, void* buffer,
 									size_t* bufferSize);
 	virtual	status_t			Read(io_request* request);
+
+	virtual	status_t			ReadSymlink(void* buffer, size_t* bufferSize);
 
 			void				AddChild(Node* node);
 			void				RemoveChild(Node* node);
@@ -63,7 +54,6 @@ public:
 private:
 			NodeNameHashTable	fChildTable;
 			NodeList			fChildList;
-			PackageDirectoryList fPackageDirectories;
 			DirectoryIteratorList fIterators;
 };
 
@@ -80,18 +70,6 @@ Directory::NextChild(Node* node) const
 {
 	return fChildList.GetNext(node);
 }
-
-
-class RootDirectory : public Directory {
-public:
-								RootDirectory(ino_t id,
-									const timespec& modifiedTime);
-
-	virtual	timespec			ModifiedTime() const;
-
-private:
-			timespec			fModifiedTime;
-};
 
 
 #endif	// DIRECTORY_H

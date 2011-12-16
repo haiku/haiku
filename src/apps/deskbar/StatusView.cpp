@@ -66,7 +66,7 @@ All rights reserved.
 
 #include "icons_logo.h"
 #include "BarApp.h"
-#include "DeskBarUtils.h"
+#include "DeskbarUtils.h"
 #include "ResourceSet.h"
 #include "StatusView.h"
 #include "StatusViewShelf.h"
@@ -83,11 +83,8 @@ using std::max;
 
 const char* const kInstantiateItemCFunctionName = "instantiate_deskbar_item";
 const char* const kInstantiateEntryCFunctionName = "instantiate_deskbar_entry";
-const char* const kDeskbarSecurityCodeFile = "Deskbar_security_code";
-const char* const kDeskbarSecurityCodeAttr = "be:deskbar_security_code";
-const char* const kStatusPredicate = "be:deskbar_item_status";
-const char* const kEnabledPredicate = "be:deskbar_item_status = enabled";
-const char* const kDisabledPredicate = "be:deskbar_item_status = disabled";
+const char* const kReplicantSettingsFile = "Deskbar_replicants";
+const char* const kReplicantPathField = "replicant_path";
 
 float sMinimumWindowWidth = kGutter + kMinimumTrayWidth + kDragRegionWidth;
 
@@ -331,7 +328,6 @@ TReplicantTray::MessageReceived(BMessage* message)
 
 #ifdef DB_ADDONS
 		case B_NODE_MONITOR:
-		case B_QUERY_UPDATE:
 			HandleEntryUpdate(message);
 			break;
 #endif
@@ -410,53 +406,41 @@ TReplicantTray::InitAddOnSupport()
 {
 	// list to maintain refs to each rep added/deleted
 	fItemList = new BList();
-	bool haveKey = false;
 	BPath path;
 
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, true) == B_OK) {
-		path.Append(kDeskbarSecurityCodeFile);
+		path.Append(kReplicantSettingsFile);
 
 		BFile file(path.Path(), B_READ_ONLY);
-		if (file.InitCheck() == B_OK
-			&& file.Read(&fDeskbarSecurityCode, sizeof(fDeskbarSecurityCode))
-				== sizeof(fDeskbarSecurityCode))
-			haveKey = true;
-	}
-	if (!haveKey) {
-		// create the security code
-		bigtime_t real = real_time_clock_usecs();
-		bigtime_t boot = system_time();
-		// two computers would have to have exactly matching clocks, and launch
-		// Deskbar at the exact same time into the bootsequence in order for
-		// their security-ID to be identical
-		fDeskbarSecurityCode = ((real & 0xffffffffULL) << 32)
-			| (boot & 0xffffffffULL);
-
-	if (find_directory (B_USER_SETTINGS_DIRECTORY, &path, true) == B_OK) {
-			path.Append(kDeskbarSecurityCodeFile);
-			BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE
-				| B_ERASE_FILE);
-			if (file.InitCheck() == B_OK)
-				file.Write(&fDeskbarSecurityCode, sizeof(fDeskbarSecurityCode));
+		if (file.InitCheck() == B_OK) {
+			status_t result;
+			BEntry entry;
+			int32 id;
+			BString path;
+			if (fAddOnSettings.Unflatten(&file) == B_OK) {
+				for (int32 i = 0; fAddOnSettings.FindString(kReplicantPathField, 
+					i, &path) == B_OK; i++) {
+					if (entry.SetTo(path.String()) == B_OK && entry.Exists()) {
+						result = LoadAddOn(&entry, &id, false);
+					} else 
+						result = B_ENTRY_NOT_FOUND;
+					
+					if (result != B_OK) {
+						fAddOnSettings.RemoveData(kReplicantPathField, i);
+						--i;
+					}
+				}
+			}
 		}
 	}
-
-	// for each volume currently mounted index the volume with our indices
-	BVolumeRoster roster;
-	BVolume volume;
-	while (roster.GetNextVolume(&volume) == B_OK) {
-		fs_create_index(volume.Device(), kStatusPredicate, B_STRING_TYPE, 0);
-		RunAddOnQuery(&volume, kEnabledPredicate);
-	}
-
-	// we also watch for volumes mounted and unmounted
-	watch_node(NULL, B_WATCH_MOUNT | B_WATCH_ATTR, this, Window());
 }
 
 
 void
 TReplicantTray::DeleteAddOnSupport()
 {
+	_SaveSettings();
+	
 	for (int32 i = fItemList->CountItems(); i-- > 0 ;) {
 		DeskbarItemInfo* item = (DeskbarItemInfo*)fItemList->RemoveItem(i);
 		if (item) {
@@ -470,47 +454,6 @@ TReplicantTray::DeleteAddOnSupport()
 
 	// stop the volume mount/unmount watch
 	stop_watching(this, Window());
-}
-
-
-void
-TReplicantTray::RunAddOnQuery(BVolume* volume, const char* predicate)
-{
-	// Since the new BFS supports querying for attributes without
-	// an index, we only run the query if the index exists (for
-	// newly mounted devices only - the Deskbar will automatically
-	// create an index for every device mounted at startup).
-	index_info info;
-	if (!volume->KnowsQuery()
-		|| fs_stat_index(volume->Device(), kStatusPredicate, &info) != 0)
-		return;
-
-	// run a new query on a specific volume and make it live
-	BQuery query;
-	query.SetVolume(volume);
-	query.SetPredicate(predicate);
-	query.Fetch();
-
-	int32 id;
-	BEntry entry;
-	while (query.GetNextEntry(&entry) == B_OK) {
-		// scan any entries returned
-		// attempt to load them as add-ons
-		// collisions are handled in LoadAddOn
-		LoadAddOn(&entry, &id);
-	}
-}
-
-
-bool
-TReplicantTray::IsAddOn(entry_ref& ref)
-{
-	BFile file(&ref, B_READ_ONLY);
-
-	char status[64];
-	ssize_t size = file.ReadAttr(kStatusPredicate, B_STRING_TYPE, 0, &status,
-		sizeof(status));
-	return size > 0;
 }
 
 
@@ -565,61 +508,6 @@ TReplicantTray::HandleEntryUpdate(BMessage* message)
 
 	BPath path;
 	switch (opcode) {
-		case B_ENTRY_CREATED:
-		{
-			// entry was just listed, matches live query
-			const char* name;
-			ino_t directory;
-			dev_t device;
-			// received when an app adds a ref to the
-			// Deskbar add-ons folder
-			if (message->FindString("name", &name) == B_OK
-				&& message->FindInt64("directory", &directory) == B_OK
-				&& message->FindInt32("device", &device) == B_OK) {
-				entry_ref ref(device, directory, name);
-				// see if this item has the attribute
-				// that we expect
-				if (IsAddOn(ref)) {
-					int32 id;
-					BEntry entry(&ref);
-					LoadAddOn(&entry, &id);
-				}
-			}
-			break;
-		}
-
-		case B_ATTR_CHANGED:
-		{
-			// from node watch on individual items
-			// (node_watch added in LoadAddOn)
-			node_ref nodeRef;
-			if (message->FindInt32("device", &(nodeRef.device)) == B_OK
-				&& message->FindInt64("node", &(nodeRef.node)) == B_OK) {
-				// get the add-on this is for
-				DeskbarItemInfo* item = DeskbarItemFor(nodeRef);
-				if (item == NULL)
-					break;
-
-				BFile file(&item->entryRef, B_READ_ONLY);
-
-				char status[255];
-				ssize_t size = file.ReadAttr(kStatusPredicate,
-					B_STRING_TYPE, 0, status, sizeof(status) - 1);
-				status[sizeof(status) - 1] = '\0';
-
-				// attribute was removed
-				if (size == B_ENTRY_NOT_FOUND) {
-					// cleans up and removes node_watch
-					UnloadAddOn(&nodeRef, NULL, true, false);
-				} else if (!strcmp(status, "enable")) {
-					int32 id;
-					BEntry entry(&item->entryRef, true);
-					LoadAddOn(&entry, &id);
-				}
-			}
-			break;
-		}
-
 		case B_ENTRY_MOVED:
 		{
 			entry_ref ref;
@@ -663,32 +551,6 @@ TReplicantTray::HandleEntryUpdate(BMessage* message)
 			}
 			break;
 		}
-
-		case B_DEVICE_MOUNTED:
-		{
-			// run a new query on the new device
-			dev_t device;
-			if (message->FindInt32("new device", &device) != B_OK)
-				break;
-
-			BVolume volume(device);
-			RunAddOnQuery(&volume, kEnabledPredicate);
-			break;
-		}
-
-		case B_DEVICE_UNMOUNTED:
-		{
-			// remove all items associated with the device
-			// unmounted
-			// contrary to what the BeBook says, the item is called "device",
-			// not "new device" like it is for B_DEVICE_MOUNTED
-			dev_t device;
-			if (message->FindInt32("device", &device) != B_OK)
-				break;
-
-			UnloadAddOn(NULL, &device, false, true);
-			break;
-		}
 	}
 }
 
@@ -698,7 +560,7 @@ TReplicantTray::HandleEntryUpdate(BMessage* message)
 	primary function is the Instantiate function
 */
 status_t
-TReplicantTray::LoadAddOn(BEntry* entry, int32* id, bool force)
+TReplicantTray::LoadAddOn(BEntry* entry, int32* id, bool addToSettings)
 {
 	if (!entry)
 		return B_ERROR;
@@ -710,21 +572,6 @@ TReplicantTray::LoadAddOn(BEntry* entry, int32* id, bool force)
 		return B_ERROR;
 
 	BNode node(entry);
-	if (!force) {
-		status_t error = node.InitCheck();
-		if (error != B_OK)
-			return error;
-
-		uint64 deskbarID;
-		ssize_t size = node.ReadAttr(kDeskbarSecurityCodeAttr, B_UINT64_TYPE,
-			0, &deskbarID, sizeof(fDeskbarSecurityCode));
-		if (size != sizeof(fDeskbarSecurityCode)
-			|| deskbarID != fDeskbarSecurityCode) {
-			// no code or code doesn't match
-			return B_ERROR;
-		}
-	}
-
 	BPath path;
 	status_t status = entry->GetPath(&path);
 	if (status < B_OK)
@@ -770,9 +617,11 @@ TReplicantTray::LoadAddOn(BEntry* entry, int32* id, bool force)
 	AddIcon(data, id, &ref);
 		// add the rep; adds info to list
 
-	node.WriteAttr(kDeskbarSecurityCodeAttr, B_UINT64_TYPE, 0,
-		&fDeskbarSecurityCode, sizeof(fDeskbarSecurityCode));
-
+	if (addToSettings) {
+		fAddOnSettings.AddString(kReplicantPathField, path.Path());
+		_SaveSettings();
+	}
+	
 	return B_OK;
 }
 
@@ -840,8 +689,19 @@ TReplicantTray::RemoveItem(int32 id)
 
 	// attribute was added via Deskbar API (AddItem(entry_ref*, int32*)
 	if (item->isAddOn) {
+		BPath path(&item->entryRef);
+		BString storedPath;
+		for (int32 i = 0; 
+			fAddOnSettings.FindString(kReplicantPathField, i, &storedPath)
+				== B_OK; i++) {
+			if (storedPath == path.Path()) {
+				fAddOnSettings.RemoveData(kReplicantPathField, i);
+				break;
+			}
+		}
+		_SaveSettings();
+				
 		BNode node(&item->entryRef);
-		node.RemoveAttr(kStatusPredicate);
 		watch_node(&item->nodeRef, B_STOP_WATCHING, this, Window());
 	}
 
@@ -1339,6 +1199,24 @@ void
 TReplicantTray::SetMultiRow(bool state)
 {
 	fMultiRowMode = state;
+}
+
+
+status_t
+TReplicantTray::_SaveSettings()
+{
+	status_t result;
+	BPath path;
+	if ((result = find_directory(B_USER_SETTINGS_DIRECTORY, &path, true))
+		 == B_OK) {
+		path.Append(kReplicantSettingsFile);
+
+		BFile file(path.Path(), B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
+		if ((result = file.InitCheck()) == B_OK) 
+			result = fAddOnSettings.Flatten(&file);
+	}
+	
+	return result;
 }
 
 

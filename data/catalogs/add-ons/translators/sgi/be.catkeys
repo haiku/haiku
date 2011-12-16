@@ -1,13 +1,13 @@
 1	belarusian	x-vnd.Haiku-SGITranslator	2222378389
-None	SGIView		Ня трэба
-RLE	SGIView		RLE
-SGI Settings	SGIMain		Наладкі SGI
-SGI image	SGITranslator		Выява SGI
-SGI image translator	SGITranslator		Канвертар выяваў SGI
-SGI image translator	SGIView		Канвертар выяваў SGI
-SGI images	SGITranslator		Выявы SGI
-SGITranslator Settings	SGITranslator		Наладкі канвертара SGI
 Use compression:	SGIView		Сціскваць:
 Version %d.%d.%d %s	SGIView		Version %d.%d.%d %s
+SGITranslator Settings	SGITranslator		Наладкі канвертара SGI
+None	SGIView		Ня трэба
+SGI images	SGITranslator		Выявы SGI
+SGI image translator	SGITranslator		Канвертар выяваў SGI
+SGI image	SGITranslator		Выява SGI
+RLE	SGIView		RLE
+SGI Settings	SGIMain		Наладкі SGI
 \n\nbased on GIMP SGI plugin v1.5:\n	SGIView		\n\nгрунтуецца на SGI дадатку версіі 1.5 да GIMP:\n
 written by:\n	SGIView		распрацаваны:\n
+SGI image translator	SGIView		Канвертар выяваў SGI

@@ -28,6 +28,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+//#define DEBUG 4
 #include <MediaDefs.h>
 #include <MediaNode.h>
 #include <MediaAddOn.h>
@@ -57,15 +58,6 @@
 
 #include <stdio.h>
 #include <string.h>
-
-const char * multi_string[] =
-{
-	"NAME IS ATTACHED",
-	"Output", "Input", "Setup", "Tone Control", "Extended Setup", "Enhanced Setup", "Master",
-	"Beep", "Phone", "Mic", "Line", "CD", "Video", "Aux", "Wave", "Gain", "Level", "Volume",
-	"Mute", "Enable", "Stereo Mix", "Mono Mix", "Output Stereo Mix", "Output Mono Mix", "Output Bass",
-	"Output Treble", "Output 3D Center", "Output 3D Depth" 
-};
 
 
 // -------------------------------------------------------- //
@@ -133,8 +125,9 @@ ESDSinkNode::ESDSinkNode(BMediaAddOn *addon, char* name, BMessage * config)
 		config->FindString("hostname", &fHostname);
 	}
 	if (fHostname.Length() < 1)
-		fHostname = "192.168.0.1";
+		fHostname = "172.20.109.151";//"192.168.0.2";
 	fPort = ESD_DEFAULT_PORT;
+	fEnabled = false;
 	
 	fDevice = new ESDEndpoint();
 	/*
@@ -241,7 +234,7 @@ void ESDSinkNode::NodeRegistered(void)
 	}
 	
 #ifdef PRINTING
-	PRINT(("apply configuration in : %ld\n", system_time() - start));
+	PRINT(("apply configuration in : %lld\n", system_time() - start));
 #endif
 }
 
@@ -266,6 +259,7 @@ status_t ESDSinkNode::AcceptFormat(
 				const media_destination & dest,
 				media_format * format)
 {
+	status_t err;
 	CALLED();
 	
 	if(fInput.destination != dest) {
@@ -310,6 +304,10 @@ status_t ESDSinkNode::AcceptFormat(
 		return B_MEDIA_BAD_FORMAT;
 	}*/
 	//AddRequirements(format);
+	
+	// start connecting here
+	err = fDevice->Connect(fHostname.String(), fPort);
+	
 	return B_OK;	
 }
 
@@ -322,7 +320,7 @@ status_t ESDSinkNode::GetNextInput(
 	if ((*cookie < 1) && (*cookie >= 0)) {
 		*out_input = fInput;
 		*cookie += 1;
-		PRINT(("input.format : %u\n", fInput.format.u.raw_audio.format));
+		PRINT(("input.format : %lu\n", fInput.format.u.raw_audio.format));
 		return B_OK;
 	} else
 		return B_BAD_INDEX;
@@ -431,6 +429,7 @@ status_t ESDSinkNode::Connected(
 				const media_format & with_format,
 				media_input * out_input)
 {
+	status_t err;
 	CALLED();
 	
 	if(fInput.destination != where) {
@@ -440,12 +439,15 @@ status_t ESDSinkNode::Connected(
 	
 	// 
 	if (fDevice) {
-		if (fDevice->Connect(fHostname.String(), fPort) >= 0) {
-			fDevice->SetCommand();
-			//fDevice->GetServerInfo();
-			fDevice->SetFormat(ESD_FMT, 2);
-			fInitCheckStatus = fDevice->SendDefaultCommand();
-		}
+		err = fDevice->WaitForConnect();
+		if (err < B_OK)
+			return err;
+		fDevice->SetCommand();
+		//fDevice->GetServerInfo();
+		fDevice->SetFormat(ESD_FMT, 2);
+		err = fDevice->SendDefaultCommand();
+		if (err < B_OK)
+			return err;
 	}
 	// use one buffer length latency
 	fInternalLatency = with_format.u.raw_audio.buffer_size * 10000 / 2
@@ -483,6 +485,8 @@ void ESDSinkNode::Disconnected(
 	fInput.source = media_source::null;
 	fInput.format = fPreferredFormat;
 	//GetFormat(&channel->fInput.format);
+	if (fDevice)
+		fDevice->Disconnect();
 }
 
 	/* The notification comes from the upstream producer, so he's already cool with */
@@ -957,7 +961,7 @@ status_t ESDSinkNode::HandleDataStatus(
 						bool realTimeEvent)
 {
 	CALLED();
-	PRINT(("ESDSinkNode::HandleDataStatus status:%li, lateness:%li\n", event->data, lateness));
+	PRINT(("ESDSinkNode::HandleDataStatus status:%li, lateness:%lli\n", event->data, lateness));
 	switch(event->data) {
 		case B_DATA_NOT_AVAILABLE:
 			break;
@@ -1093,8 +1097,11 @@ ESDSinkNode::GetParameterValue(int32 id, bigtime_t* last_change, void* value, si
 	//PRINT(("id : %i\n", id));
 	switch (id) {
 		case PARAM_ENABLED:
-			// XXX
-			break;
+			if (*ioSize < sizeof(bool))
+				return B_NO_MEMORY;
+			*(bool *)value = fEnabled;
+			*ioSize = sizeof(bool);
+			return B_OK;
 		case PARAM_HOST:
 		{
 			BString s = fDevice->Host();
@@ -1129,7 +1136,7 @@ void
 ESDSinkNode::SetParameterValue(int32 id, bigtime_t performance_time, const void* value, size_t size)
 {
 	CALLED();
-	PRINT(("id : %i, performance_time : %lld, size : %i\n", id, performance_time, size));
+	PRINT(("id : %li, performance_time : %lld, size : %li\n", id, performance_time, size));
 	BParameter *parameter = NULL;
 	for(int32 i=0; i<fWeb->CountParameters(); i++) {
 		parameter = fWeb->ParameterAt(i);
@@ -1138,11 +1145,15 @@ ESDSinkNode::SetParameterValue(int32 id, bigtime_t performance_time, const void*
 	}
 	switch (id) {
 		case PARAM_ENABLED:
-			break;
+			if (size != sizeof(bool))
+				return;
+			fEnabled = *(bool *)value;
+			return;
 		case PARAM_HOST:
 		{
 			fprintf(stderr, "set HOST: %s\n", (const char *)value);
 			fHostname = (const char *)value;
+#if 0
 			if (fDevice && fDevice->Connected()) {
 				if (fDevice->Connect(fHostname.String(), fPort) >= 0) {
 					fDevice->SetCommand();
@@ -1151,12 +1162,14 @@ ESDSinkNode::SetParameterValue(int32 id, bigtime_t performance_time, const void*
 					fInitCheckStatus = fDevice->SendDefaultCommand();
 				}
 			}
+#endif
 			return;
 		}
 		case PARAM_PORT:
 		{
 			fprintf(stderr, "set PORT: %s\n", (const char *)value);
 			fPort = atoi((const char *)value);
+#if 0
 			if (fDevice && fDevice->Connected()) {
 				if (fDevice->Connect(fHostname.String(), fPort) >= 0) {
 					fDevice->SetCommand();
@@ -1165,6 +1178,7 @@ ESDSinkNode::SetParameterValue(int32 id, bigtime_t performance_time, const void*
 					fInitCheckStatus = fDevice->SendDefaultCommand();
 				}
 			}
+#endif
 			return;
 		}
 		default:
@@ -1177,25 +1191,6 @@ ESDSinkNode::MakeParameterWeb()
 {
 	CALLED();
 	BParameterWeb* web = new BParameterWeb;
-#if 0	
-	PRINT(("MMCI.control_count : %i\n", fDevice->MMCI.control_count));
-	multi_mix_control		*MMC = fDevice->MMCI.controls;
-	
-	for(int i=0; i<fDevice->MMCI.control_count; i++) {
-		if(MMC[i].flags & B_MULTI_MIX_GROUP && MMC[i].parent == 0) {
-				PRINT(("NEW_GROUP\n"));
-				int32 nb = 0;
-				const char* childName;
-				if(MMC[i].string != S_null)
-					childName = multi_string[MMC[i].string];
-				else
-					childName = MMC[i].name;
-				BParameterGroup *child = web->MakeGroup(childName);
-				ProcessGroup(child, i, nb);
-		}
-	}
-#endif		
-	int id = 0;
 	BParameterGroup *group = web->MakeGroup("Server");
 	BParameter *p;
 	// XXX: use B_MEDIA_UNKNOWN_TYPE or _NO_TYPE ?
@@ -1207,93 +1202,7 @@ ESDSinkNode::MakeParameterWeb()
 #endif
 	return web;
 }
-#if 0
-void 
-ESDSinkNode::ProcessGroup(BParameterGroup *group, int32 index, int32 &nbParameters)
-{
-	CALLED();
-	multi_mix_control		*parent = &fDevice->MMCI.controls[index];
-	multi_mix_control		*MMC = fDevice->MMCI.controls;
-	for(int32 i=0; i<fDevice->MMCI.control_count; i++) {
-		if(MMC[i].parent != parent->id)
-			continue;
-			
-		const char* childName;
-		if(MMC[i].string != S_null)
-			childName = multi_string[MMC[i].string];
-		else
-			childName = MMC[i].name;
-			
-		if(MMC[i].flags & B_MULTI_MIX_GROUP) {
-			PRINT(("NEW_GROUP\n"));
-			int32 nb = 1;
-			BParameterGroup *child = group->MakeGroup(childName);
-			child->MakeNullParameter(MMC[i].id, B_MEDIA_RAW_AUDIO, childName, B_WEB_BUFFER_OUTPUT);
-			ProcessGroup(child, i, nb);
-		} else if(MMC[i].flags & B_MULTI_MIX_MUX) {
-			PRINT(("NEW_MUX\n"));
-			BDiscreteParameter *parameter = 
-				group->MakeDiscreteParameter(100 + MMC[i].id, B_MEDIA_RAW_AUDIO, childName, B_INPUT_MUX);
-			if(nbParameters>0) {
-				(group->ParameterAt(nbParameters - 1))->AddOutput(group->ParameterAt(nbParameters));
-				nbParameters++;
-			}
-			ProcessMux(parameter, i);
-		} else if(MMC[i].flags & B_MULTI_MIX_GAIN) {
-			PRINT(("NEW_GAIN\n"));
-			group->MakeContinuousParameter(100 + MMC[i].id, B_MEDIA_RAW_AUDIO, "", B_MASTER_GAIN, 
-				"dB", MMC[i].gain.min_gain, MMC[i].gain.max_gain, MMC[i].gain.granularity);
-			
-			if(i+1 <fDevice->MMCI.control_count && MMC[i+1].master == MMC[i].id && MMC[i+1].flags & B_MULTI_MIX_GAIN) {
-				group->ParameterAt(nbParameters)->SetChannelCount(
-					group->ParameterAt(nbParameters)->CountChannels() + 1);
-				i++;
-			}
-			
-			PRINT(("nb parameters : %d\n", nbParameters));
-			if (nbParameters > 0) {
-				(group->ParameterAt(nbParameters - 1))->AddOutput(group->ParameterAt(nbParameters));
-				nbParameters++;
-			}
-		} else if(MMC[i].flags & B_MULTI_MIX_ENABLE) {
-			PRINT(("NEW_ENABLE\n"));
-			if(MMC[i].string == S_MUTE)
-				group->MakeDiscreteParameter(100 + MMC[i].id, B_MEDIA_RAW_AUDIO, childName, B_MUTE);
-			else
-				group->MakeDiscreteParameter(100 + MMC[i].id, B_MEDIA_RAW_AUDIO, childName, B_ENABLE);
-			if(nbParameters>0) {
-				(group->ParameterAt(nbParameters - 1))->AddOutput(group->ParameterAt(nbParameters));
-				nbParameters++;
-			}
-		}
-	}
-}
 
-void 
-ESDSinkNode::ProcessMux(BDiscreteParameter *parameter, int32 index)
-{
-	CALLED();
-	multi_mix_control		*parent = &fDevice->MMCI.controls[index];
-	multi_mix_control		*MMC = fDevice->MMCI.controls;
-	int32 	itemIndex = 0;
-	for(int32 i=0; i<fDevice->MMCI.control_count; i++) {
-		if(MMC[i].parent != parent->id)
-			continue;
-			
-		const char* childName;
-		if(MMC[i].string != S_null)
-			childName = multi_string[MMC[i].string];
-		else
-			childName = MMC[i].name;	
-			
-		if(MMC[i].flags & B_MULTI_MIX_MUX_VALUE) {
-			PRINT(("NEW_MUX_VALUE\n"));
-			parameter->AddItem(itemIndex, childName);
-			itemIndex++;
-		}
-	}
-}
-#endif
 // -------------------------------------------------------- //
 // ESDSinkNode specific functions
 // -------------------------------------------------------- //
@@ -1309,6 +1218,9 @@ ESDSinkNode::GetConfigurationFor(BMessage * into_message)
 	bigtime_t last_change;
 	status_t err;
 	
+	if (!into_message)
+		return B_BAD_VALUE;
+	
 	buffer = malloc(size);
 	
 	for(int32 i=0; i<fWeb->CountParameters(); i++) {
@@ -1317,7 +1229,7 @@ ESDSinkNode::GetConfigurationFor(BMessage * into_message)
 			&& parameter->Type() != BParameter::B_DISCRETE_PARAMETER)
 			continue;
 			
-		PRINT(("getting parameter %i\n", parameter->ID()));
+		PRINT(("getting parameter %li\n", parameter->ID()));
 		size = 128;
 		while((err = GetParameterValue(parameter->ID(), &last_change, buffer, &size))==B_NO_MEMORY) {
 			size += 128;
@@ -1329,7 +1241,7 @@ ESDSinkNode::GetConfigurationFor(BMessage * into_message)
 			into_message->AddInt32("parameterID", parameter->ID());
 			into_message->AddData("parameterData", B_RAW_TYPE, buffer, size, false);
 		} else {
-			PRINT(("parameter err : %s\n", strerror(err)));
+			PRINT(("parameter %li err : %s\n", parameter->ID(), strerror(err)));
 		}
 	}
 	

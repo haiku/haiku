@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,6 +12,7 @@
  * Translators:
  *		Humdinger
  *		Matthias
+ *		taos
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -39,6 +40,8 @@
 <li><a href="../uk/contents.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../zh_CN/contents.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../pt_PT/contents.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/contents.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/contents.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
 <li><a href="../en/contents.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -67,9 +70,9 @@
 	<tr><td valign="top"><a href="bootloader.html">Boot Loader</a></td>
 		<td valign="top">Besondere Boot-Optionen, um Konfigurationsprobleme zu lösen.</td></tr>
 	<tr><td valign="top"><a href="filesystem-layout.html">Dateisystem Layout</a><ul>
-		<li><a href="filesystem-layout.html#system">Der System Ordner</a></li>
-		<li><a href="filesystem-layout.html#common">Der allgemeine Ordnner</a></li>
-		<li><a href="filesystem-layout.html#home">Der Home Ordner</a></li></ul></td>
+		<li><a href="filesystem-layout.html#system">Der <acronym title="system">System</acronym> Ordner</a></li>
+		<li><a href="filesystem-layout.html#common">Der <acronym title="common">Allgemein</acronym> Ordner</a></li>
+		<li><a href="filesystem-layout.html#home">Der <acronym title="home">Benutzer</acronym> Ordner</a></li></ul></td>
 		<td valign="top">Die Dateisystem Hierarchie und die wichtigsten Dateien und Ordner.</td></tr>
 	<tr><td valign="top"><a href="gui.html">Haikus Benutzeroberfläche</a><ul>
 		<li><a href="gui.html#open-save-panel">Dialoge zum Öffnen und Speichern</a><br />
@@ -77,15 +80,15 @@
 		<a href="gui.html#favorites-recent">- Favoriten und kürzlich verwendete Ordner</a></li>
 		<li><a href="gui.html#replicants">Replikanten</a></li></ul></td>
 		<td valign="top">Die grundlegenden Elemente der grafischen Benutzeroberfläche</td></tr>
-	<tr><td valign="top"><a href="workspaces.html">Workspaces</a><ul>
-		<li><a href="workspaces.html#applet">Das Workspaces Programmfenster</a></li>
-		<li><a href="workspaces.html#switching">Vom Wechseln der Workspaces</a></li>
-		<li><a href="workspaces.html#moving">Programme zwischen Workspaces verschieben</a></li>
+	<tr><td valign="top"><a href="workspaces.html"><acronym title="Workspaces">Arbeitsflächen</acronym></a><ul>
+		<li><a href="workspaces.html#applet">Das <acronym title="Workspaces">Arbeitsflächen</acronym> Programmfenster</a></li>
+		<li><a href="workspaces.html#switching">Vom Wechseln der <acronym title="Workspaces">Arbeitsflächen</acronym></a></li>
+		<li><a href="workspaces.html#moving">Programme zwischen <acronym title="Workspaces">Arbeitsflächen</acronym> verschieben</a></li>
 		<li><a href="workspaces.html#special">Spezielle Funktionen</a></li></ul></td>
 		<td valign="top">Virtuelle Desktops für eine aufgeräumte Arbeitsumgebung.</td></tr>
 	<tr><td valign="top"><a href="twitcher.html">Twitcher</a></td>
 		<td valign="top">Zwischen laufenden Programme wechseln.</td></tr>
-	<tr><td valign="top"><a href="teammonitor.html">Team Monitor</a></td>
+	<tr><td valign="top"><a href="teammonitor.html"><acronym title="Team Monitor">Teammonitor</acronym></a></td>
 		<td valign="top">Beenden nicht reagierender Anwendungen oder Systemkomponenten.</td></tr>
 	<tr><td valign="top"><a href="tracker.html">Tracker</a><ul>
 		<li><a href="tracker.html#mounting-volumes">Einbinden von Datenträgern</a></li>
@@ -112,7 +115,7 @@
 		<li><a href="filetypes.html#preferred-app">Die bevorzugte Anwendung</a></li>
 		<li><a href="filetypes.html#icon">Das Icon</a></li>
 		<li><a href="filetypes.html#settings-apps">Besondere Einstellungen für Anwendungen</a></li>
-		<li><a href="filetypes.html#filetypes-preferences">Globale Einstellungen mit den Filetypes Preferences</a></li></ul></td>
+		<li><a href="filetypes.html#filetypes-preferences">Globale Einstellungen mit den <acronym title="FileTypes Preferences">Dateitypen Einstellungen</acronym></a></li></ul></td>
 		<td valign="top">Setzen von Standardanwendungen, Ändern und Anlegen von eigenen Dateitypen.</td></tr>
 	<tr><td valign="top"><a href="attributes.html">Attribute</a><ul>
 		<li><a href="attributes.html#attributes-tracker">Attribute im Tracker</a></li>
@@ -122,15 +125,17 @@
 		<td>Indizieren von Attributen für die spätere Suche.</td></tr>
 	<tr><td valign="top"><a href="queries.html">Queries</a><ul>
 		<li><a href="queries.html#find-window">Das Suchfenster</a></li>
-		<li><a href="queries.html#basic-query">Einfache Suche - "by Name"</a></li>
-		<li><a href="queries.html#adv-query">Erweiterte Suche - "by Attribute"</a></li>
-		<li><a href="queries.html#more-adv-query">Noch fortgeschrittenere Suchen - "by Formula"</a></li>
+		<li><a href="queries.html#basic-query">Einfache Suche - "nach Name"</a></li>
+		<li><a href="queries.html#adv-query">Erweiterte Suche - "nach Attribut"</a></li>
+		<li><a href="queries.html#more-adv-query">Noch fortgeschrittenere Suchen - "nach Formel"</a></li>
 		<li><a href="queries.html#result-window">Das Ergebnisfenster</a></li>
-		<li><a href="queries.html#query-template">Query Templates</a></li>
+		<li><a href="queries.html#query-template">Query Vorlagen</a></li>
 </ul></td>
 		<td valign="top">Blitzschnelle Suchen mit Haikus Queries.</td></tr>
-	<tr><td valign="top"><a href="workshop-filetypes+attributes.html">Workshop: Filetypes, Attributes, Index und Queries</a></td>
+	<tr><td valign="top"><a href="workshop-filetypes+attributes.html">Workshop: Dateitypen, Attribute, Index und Queries</a></td>
 		<td valign="top">Haikus besondere Fähigkeiten, erklärt anhand einer einfachen DVD-Verwaltung.</td></tr>
+	<tr><td valign="top"><a href="workshop-email.html">Workshop: Haikus E-mail System</a></td>
+		<td valign="top">E-Mail-Verwaltung mit eigenen Status und Queries</td></tr>
 	<tr><td valign="top"><a href="applications.html">Anwendungen</a><ul>
 		<li><a href="applications.html#install">Anwendungen installieren</a></li>
 		<li><a href="applications.html#uninstall">Anwendungen deinstallieren</a></li>
@@ -138,7 +143,7 @@
 		<li><a href="applications.html#cli-apps">Haikus Konsolenprogramme</a></li>
 		<li><a href="applications.html#list-of-bundled-apps">Zusätzlich installierte Anwendungen</a></li></ul></td>
 		<td>Grundsätzliches zu Installation und Deinstallation von Programmen und eine Vorstellung aller mitgelieferten Anwendungen.</td></tr>
-	<tr><td valign="top"><a href="desktop-applets.html">Desktop Applets</a></td>
+	<tr><td valign="top"><a href="desktop-applets.html"><acronym title="Desktop Applets">Desktop-Apps</acronym></a></td>
 		<td>Einfache Werkzeuge für Desktop und Deskbar.</td></tr>
 	<tr><td valign="top"><a href="preferences.html">Einstellungen</a></td>
 		<td>Konfiguration und Einstellungen des Systems.</td></tr>

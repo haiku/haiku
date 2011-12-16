@@ -117,7 +117,7 @@ public:
 	void DealWithClock(bool);
 
 #ifdef DB_ADDONS
-	status_t LoadAddOn(BEntry* entry, int32* id, bool force = false);
+	status_t LoadAddOn(BEntry* entry, int32* id, bool addToSettings = true);
 #endif
 
 private:
@@ -129,9 +129,7 @@ private:
 #ifdef DB_ADDONS
 	void InitAddOnSupport();
 	void DeleteAddOnSupport();
-	void RunAddOnQuery(BVolume* volume, const char* predicated);
 
-	bool IsAddOn(entry_ref &ref);
 	DeskbarItemInfo* DeskbarItemFor(node_ref &nodeRef);
 	DeskbarItemInfo* DeskbarItemFor(int32 id);
 	bool NodeExists(node_ref &nodeRef);
@@ -148,6 +146,8 @@ private:
 	BPoint LocationForReplicant(int32 index, float width);
 	BShelf* Shelf() const;
 
+	status_t _SaveSettings();
+
 	friend class TReplicantShelf;
 
 	TTimeView* fClock;
@@ -162,7 +162,7 @@ private:
 	bool fAlignmentSupport;
 #ifdef DB_ADDONS
 	BList* fItemList;
-	uint64 fDeskbarSecurityCode;
+	BMessage fAddOnSettings;
 #endif
 
 };

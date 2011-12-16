@@ -166,8 +166,8 @@ screen_errors(status_t status)
 ScreenWindow::ScreenWindow(ScreenSettings* settings)
 	:
 	BWindow(settings->WindowFrame(), B_TRANSLATE_SYSTEM_NAME("Screen"),
-		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS,
-		B_ALL_WORKSPACES),
+		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
+		| B_AUTO_UPDATE_SIZE_LIMITS, B_ALL_WORKSPACES),
 	fIsVesa(false),
 	fBootWorkspaceApplied(false),
 	fScreenMode(this),
@@ -482,7 +482,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 		.SetInsets(10, 10, 10, 10)
 		.AddGroup(B_HORIZONTAL, 10.0)
 			.AddGroup(B_VERTICAL)
-				.AddStrut(controlsBox->TopBorderOffset() - 1)
+				.AddStrut(floor(controlsBox->TopBorderOffset() / 16) - 1)
 				.Add(screenBox)
 			.End()
 			.Add(controlsBox)

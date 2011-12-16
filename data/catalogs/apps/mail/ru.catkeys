@@ -1,160 +1,159 @@
-1	russian	x-vnd.Be-MAIL	2276629278
+1	russian	x-vnd.Be-MAIL	1350013868
+View	Mail		Вид
 %d - Date	Mail		%d - Дата
-%e - E-mail address	Mail		%e - E-mail адрес
-%e wrote:\\n	Mail		%e написал:\\n
-%n - Full name	Mail		%n - Полное имя
-(Address unavailable)	Mail		(Адрес недоступен)
-(Date unavailable)	Mail		(Дата недоступна)
-(Name unavailable)	Mail		(Имя недоступно)
-<none>	Mail		<пусто>
-Account from mail	Mail		Использовать аккаунт из письма
-Account:	Mail		Аккаунт:
-Accounts…	Mail		Аккаунты…
-Add	Mail		Добавить
-Add enclosure…	Mail		Добавить вложение…
-Add signature	Mail		Добавить подпись
-An error occurred trying to open this signature.	Mail		Возникла ошибка при попытке открытия этой подписи.
-An error occurred trying to save the attachment.	Mail		Произошла ошибка при попытке сохранить вложение.
-An error occurred trying to save this signature.	Mail		Произошла ошибка при попытке сохранить эту подпись.
 Attach attributes:	Mail		Прикрепление атрибутов:
-Attachments:	Mail		Вложения: 
-Auto signature:	Mail		Автоподпись:
+Inconsistency occurred in the undo/redo buffer.	Mail		Произошло несоответствие в буфере отмены/повтора.
+An error occurred trying to save the attachment.	Mail		Произошла ошибка при попытке сохранить вложение.
+Copy to new	Mail		Копировать в новое
+Edit	Mail		Изменить
+Print	Mail		Печать
+<none>	Mail		<пусто>
+New mail message	Mail		Новое сообщение
 Automatic	Mail		Автоматическая
 Automatically mark mail as read:	Mail		Автоматически помечать письмо как прочитанное:
-Bcc:	Mail		Скрытая копия:
-Beginner	Mail		Новичок
-Button bar:	Mail		Панель кнопок:
-Cancel	Mail		Отмена
-Cc:	Mail		Копия:
-Check spelling	Mail		Проверять орфографию
-Close	Mail		Закрыть
-Close and 	Mail		Закрыть и 
-Colored quotes:	Mail		Цветные кавычки:
-Copy	Mail		Копия
-Copy link location	Mail		Копировать адрес ссылки
-Copy to new	Mail		Копировать в новое
-Couldn't open this signature. Sorry.	Mail		Невозможно открыть эту подпись. Извините.
-Cut	Mail		Вырезать
-Date:	Mail		Дата:
-Decoding:	Mail		Кодировка:
-Default account:	Mail		Аккаунт по умолчанию:
-Delete	Mail		Удалить
-Discard	Mail		Сбросить
-Do you wish to save this message as a draft before closing?	Mail		Сохранить это сообщение как черновик?
-Do you wish to send this message before closing?	Mail		Хотите отправить это сообщение перед закрытием?
-Don't save	Mail		Не сохранять
-E-mail draft could not be saved!	Mail		Черновик не может быть сохранен!
-Edit	Mail		Изменить
-Edit queries…	Mail		Изменить запросы…
-Edit signatures…	Mail		Изменить подписи…
-Encoding:	Mail		Кодировка:
-Expert	Mail		Эксперт
-File	Mail		Файл
-Find	Mail		Найти
-Find again	Mail		Найти далее
-Find…	Mail		Найти…
-Font:	Mail		Шрифт:
-Forward	Mail		Переслать
-Forward without attachments	Mail		Переслать без вложений
-From:	Mail		От:
-Hide	Mail		Скрыть
-Include file attributes in attachments	Mail		Добавлять атрибуты файла во вложение
-Inconsistency occurred in the undo/redo buffer.	Mail		Произошло несоответствие в буфере отмены/повтора.
-Initial spell check mode:	Mail		Начальный режим проверки орфографии:
-Leave as '%s'	Mail		Оставить как '%s'
-Leave as New	Mail		Оставить как новое
-Leave same	Mail		Оставить
-Mail	System name		Почта
-Mail couldn't find its dictionary.	Mail		Невозможно найти файл словаря.
-Mail preferences	Mail		Настройки почты
-Mailing	Mail		Отправка
-Message	Mail		Сообщение
-Move to trash	Mail		Переместить в корзину
-Need Tracker to move items to trash	Mail		Для перемещение объектов в корзину требуется запущенный Tracker
-New	Mail		Новое
-New mail message	Mail		Новое сообщение
-Next	Mail		Следущее
-Next message	Mail		Следующее сообщение
-No file attributes, just plain data	Mail		Без атрибутов, только данные
-No matches	Mail		Нет совпадений
-None	Mail		Нет
-OK	Mail		ОК
-Off	Mail		Выключить
-On	Mail		Включить
-Only files can be added as attachments.	Mail		Только файлы могут быть добавлены как вложения.
-Open	Mail		Открыть
-Open attachment	Mail		Открыть вложение
-Open draft	Mail		Открыть черновик
-Open this link	Mail		Открыть эту ссылку
-Page setup…	Mail		Настройка печати…
-Paste	Mail		Вставить
-Preferences…	Mail		Настройки…
-Previous	Mail		Предыдущее
-Previous message	Mail		Предыдущее письмо
-Print	Mail		Печать
-Print…	Mail		Печать…
-Put your favorite e-mail queries and query templates in this folder.	Mail		Перенесите в эту папку ваши почтовые запросы.
-Queries	Mail		Запросы
-Quit	Mail		Выход
-Quote	Mail		Цитата
-Random	Mail		Случайная
-Read 	Mail		 Читать 
-Really delete this signature? This cannot be undone.	Mail		Действительно удалить эту подпись? Эту операцию будет невозможно  отменить.
-Redo	Mail		Повторить
-Remove attachment	Mail		Удалить вложение
-Remove enclosure	Mail		Удалить вложения
-Remove quote	Mail		Удалить цитату
-Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Удаление вложений из пересланного письма еще не реализовано!\nЭта функция еще не работает.
-Reply	Mail		Ответить
-Reply account:	Mail		Ответить, используя акканут:
-Reply preamble:	Mail		Ответное вступление:
-Reply to all	Mail		Ответить всем
-Reply to sender	Mail		Ответить отправителю
-Resend	Mail		Переслать
-Revert	Mail		Вернуть
-Save	Mail		Сохранить
-Save address	Mail		Сохранить адрес
-Save as draft	Mail		Сохранить как черновик
-Save attachment…	Mail		Сохранить вложение…
-Save changes to this signature?	Mail		Сохранить изменения в этой подписи?
-Select all	Mail		Выделить все
-Send	Mail		Отправить
-Send message	Mail		Послать сообщение
-Set to %s	Mail		Установить как %s
-Set to Saved	Mail		Послать в сохраненные
-Set to…	Mail		Установить в…
-Show header	Mail		Показать заголовок
-Show icons & labels	Mail		Отображать иконки и надписи
-Show icons only	Mail		Отображать только иконки
-Show raw message	Mail		Показать письмо в необработанном виде
-Signature	Mail		Подпись
-Signature:	Mail		Подпись:
-Signatures	Mail		Подписи
-Size:	Mail		Размер:
-Sorry	Mail		Извините
-Sorry, could not find an application that supports the 'Person' data type.	Mail		Извините, не удалось найти приложение поддерживающее тип файлов 'Персона'.
-Start now	Mail		Запустить сейчас
-Subject:	Mail		Тема:
-Text wrapping:	Mail		Перенос строк:
-The mail_daemon could not be started:\n\t	Mail		Невозможно запустить mail_daemon:\n\t
-The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Не запущен mail_daemon. Сообщение поставлено в очередь и будет отправлено как только mail_daemon будет запущен.
-There is no installed handler for URL links.	Mail		Не выбрано приложение для открытия ссылок.
-Title:	Mail		Заголовок:
-To:	Mail		Кому:
-Trash	Mail		Корзина
-Undo	Mail		Отменить
-Unread	Mail		Непрочитанные
-Use default account	Mail		Использовать аккаунт по умолчанию
-User interface	Mail		Интерфейс пользователя
-View	Mail		Вид
-Warn unencodable:	Mail		Предупреждать о невозможности декодировать:
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основной текст содержит %ld некодируемых символов. Возможно, другая кодировка подойдет лучше? Нажмите /\"Отправить/\" чтобы все равно отправить письмо (некодиуемые символы будут заменены на кодируемые), или нажмите /\"Отмена/\" и попробуйте исправить их вручную.
-\\n - Newline	Mail		\\n - Новая строка
-draft	B_USER_DIRECTORY/mail/draft		Черновики
 helpful message	Mail		полезное сообщение
-in	B_USER_DIRECTORY/mail/in		Входящие
-mail	B_USER_DIRECTORY/mail		Почта
-out	B_USER_DIRECTORY/mail/out		Исходящие
-queries	B_USER_DIRECTORY/mail/queries		Запросы
-sent	B_USER_DIRECTORY/mail/sent		Отправленные
+Colored quotes:	Mail		Цветные кавычки:
+Subject:	Mail		Тема:
+Reply to all	Mail		Ответить всем
+Show icons & labels	Mail		Отображать иконки и надписи
+Remove attachment	Mail		Удалить вложение
+Button bar:	Mail		Панель кнопок:
 spam	B_USER_DIRECTORY/mail/spam		Спам
+Beginner	Mail		Новичок
+Don't save	Mail		Не сохранять
+Expert	Mail		Эксперт
+Reply account:	Mail		Ответить, используя акканут:
+Discard	Mail		Сбросить
+Message	Mail		Сообщение
+Reply to sender	Mail		Ответить отправителю
+There is no installed handler for URL links.	Mail		Не выбрано приложение для открытия ссылок.
+Signature	Mail		Подпись
+Find again	Mail		Найти далее
+Bcc:	Mail		Скрытая копия:
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основной текст содержит %ld некодируемых символов. Возможно, другая кодировка подойдет лучше? Нажмите /\"Отправить/\" чтобы все равно отправить письмо (некодиуемые символы будут заменены на кодируемые), или нажмите /\"Отмена/\" и попробуйте исправить их вручную.
+Signature:	Mail		Подпись:
+Save changes to this signature?	Mail		Сохранить изменения в этой подписи?
+Cc:	Mail		Копия:
+Off	Mail		Выключить
+Find	Mail		Найти
+Preferences…	Mail		Настройки…
+Undo	Mail		Отменить
+Date:	Mail		Дата:
+Leave as New	Mail		Оставить как новое
+An error occurred trying to open this signature.	Mail		Возникла ошибка при попытке открытия этой подписи.
+No file attributes, just plain data	Mail		Без атрибутов, только данные
+Edit queries…	Mail		Изменить запросы…
+queries	B_USER_DIRECTORY/mail/queries		Запросы
+Paste	Mail		Вставить
+in	B_USER_DIRECTORY/mail/in		Входящие
+Save attachment…	Mail		Сохранить вложение…
+Include file attributes in attachments	Mail		Добавлять атрибуты файла во вложение
+OK	Mail		ОК
+Send	Mail		Отправить
+Show icons only	Mail		Отображать только иконки
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Удаление вложений из пересланного письма еще не реализовано!\nЭта функция еще не работает.
+Hide	Mail		Скрыть
+Forward without attachments	Mail		Переслать без вложений
+Previous	Mail		Предыдущее
+Redo	Mail		Повторить
+Add enclosure…	Mail		Добавить вложение…
+Mail	System name		Почта
+Print…	Mail		Печать…
+Warn unencodable:	Mail		Предупреждать о невозможности декодировать:
+Quit	Mail		Выход
+%n - Full name	Mail		%n - Полное имя
+Trash	Mail		Корзина
+Default account:	Mail		Аккаунт по умолчанию:
+Size:	Mail		Размер:
+Account from mail	Mail		Использовать аккаунт из письма
+Edit signatures…	Mail		Изменить подписи…
+New	Mail		Новое
+On	Mail		Включить
+Set to %s	Mail		Установить как %s
+Forward	Mail		Переслать
+E-mail draft could not be saved!	Mail		Черновик не может быть сохранен!
+%e wrote:\\n	Mail		%e написал:\\n
+To:	Mail		Кому:
+Only files can be added as attachments.	Mail		Только файлы могут быть добавлены как вложения.
+Previous message	Mail		Предыдущее письмо
+Attachments:	Mail		Вложения: 
+Title:	Mail		Заголовок:
+Find…	Mail		Найти…
+Accounts…	Mail		Аккаунты…
+Mail preferences	Mail		Настройки почты
+Initial spell check mode:	Mail		Начальный режим проверки орфографии:
+Leave same	Mail		Оставить
+Page setup…	Mail		Настройка печати…
+Text wrapping:	Mail		Перенос строк:
+Revert	Mail		Вернуть
+File	Mail		Файл
+mail	B_USER_DIRECTORY/mail		Почта
+None	Mail		Нет
+(Name unavailable)	Mail		(Имя недоступно)
+Copy link location	Mail		Копировать адрес ссылки
+out	B_USER_DIRECTORY/mail/out		Исходящие
+Show header	Mail		Показать заголовок
+%e - E-mail address	Mail		%e - E-mail адрес
+Resend	Mail		Переслать
+Show raw message	Mail		Показать письмо в необработанном виде
+\\n - Newline	Mail		\\n - Новая строка
+Start now	Mail		Запустить сейчас
+Close	Mail		Закрыть
+No matches	Mail		Нет совпадений
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Не запущен mail_daemon. Сообщение поставлено в очередь и будет отправлено как только mail_daemon будет запущен.
+Really delete this signature? This cannot be undone.	Mail		Действительно удалить эту подпись? Эту операцию будет невозможно  отменить.
+Open	Mail		Открыть
+draft	B_USER_DIRECTORY/mail/draft		Черновики
+Quote	Mail		Цитата
+Add	Mail		Добавить
+Next message	Mail		Следующее сообщение
+User interface	Mail		Интерфейс пользователя
+Cancel	Mail		Отмена
+Send message	Mail		Послать сообщение
+Remove enclosure	Mail		Удалить вложения
+Account:	Mail		Аккаунт:
+Decoding:	Mail		Кодировка:
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Извините, не удалось найти приложение поддерживающее тип файлов 'Персона'.
+Do you wish to send this message before closing?	Mail		Хотите отправить это сообщение перед закрытием?
+Delete	Mail		Удалить
+Leave as '%s'	Mail		Оставить как '%s'
+Copy	Mail		Копия
+Mail couldn't find its dictionary.	Mail		Невозможно найти файл словаря.
+Reply preamble:	Mail		Ответное вступление:
+Signatures	Mail		Подписи
+Next	Mail		Следущее
+Set to…	Mail		Установить в…
+Use default account	Mail		Использовать аккаунт по умолчанию
+Sorry	Mail		Извините
+Encoding:	Mail		Кодировка:
+Font:	Mail		Шрифт:
+(Address unavailable)	Mail		(Адрес недоступен)
+Save address	Mail		Сохранить адрес
+Queries	Mail		Запросы
+Do you wish to save this message as a draft before closing?	Mail		Сохранить это сообщение как черновик?
+Save	Mail		Сохранить
+Random	Mail		Случайная
+Close and 	Mail		Закрыть и 
+Save as draft	Mail		Сохранить как черновик
+The mail_daemon could not be started:\n\t	Mail		Невозможно запустить mail_daemon:\n\t
+Open attachment	Mail		Открыть вложение
+sent	B_USER_DIRECTORY/mail/sent		Отправленные
+(Date unavailable)	Mail		(Дата недоступна)
+Put your favorite e-mail queries and query templates in this folder.	Mail		Перенесите в эту папку ваши почтовые запросы.
+Reply	Mail		Ответить
+From:	Mail		От:
+Couldn't open this signature. Sorry.	Mail		Невозможно открыть эту подпись. Извините.
+Open draft	Mail		Открыть черновик
+Cut	Mail		Вырезать
+Check spelling	Mail		Проверять орфографию
+Set to Saved	Mail		Послать в сохраненные
+Open this link	Mail		Открыть эту ссылку
+Auto signature:	Mail		Автоподпись:
+Add signature	Mail		Добавить подпись
+Need Tracker to move items to trash	Mail		Для перемещение объектов в корзину требуется запущенный Tracker
+Mailing	Mail		Отправка
+Unread	Mail		Непрочитанные
+Remove quote	Mail		Удалить цитату
+Move to trash	Mail		Переместить в корзину
+Select all	Mail		Выделить все
+An error occurred trying to save this signature.	Mail		Произошла ошибка при попытке сохранить эту подпись.

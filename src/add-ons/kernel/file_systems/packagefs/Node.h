@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef NODE_H
@@ -17,8 +17,25 @@
 #include <util/OpenHashTable.h>
 
 
+class AttributeCookie;
+class AttributeDirectoryCookie;
+class AttributeIndexer;
 class Directory;
 class PackageNode;
+
+
+// node flags
+enum {
+	NODE_FLAG_KEEP_NAME		= 0x01,
+		// Init(): Take over ownership of the given name (i.e. free in
+		// destructor).
+	NODE_FLAG_CONST_NAME	= 0x02,
+		// Init(): The given name is a constant that won't go away during the
+		// lifetime of the object. No need to copy.
+	NODE_FLAG_OWNS_NAME		= NODE_FLAG_KEEP_NAME,
+	NODE_FLAG_KNOWN_TO_VFS	= 0x04,
+		// internal flag
+};
 
 
 class Node : public BReferenceable, public DoublyLinkedListLinkImpl<Node> {
@@ -40,25 +57,41 @@ public:
 			Node*&				IDHashTableNext()
 									{ return fIDHashTableNext; }
 
-	virtual	status_t			Init(Directory* parent, const char* name);
+	virtual	status_t			Init(Directory* parent, const char* name,
+									uint32 flags);
+									// If specified to keep the name, it does
+									// so also on error.
 
-	virtual	status_t			VFSInit(dev_t deviceID) = 0;
-	virtual	void				VFSUninit() = 0;
+	virtual	status_t			VFSInit(dev_t deviceID);
+									// base class version must be called on
+									// success
+	virtual	void				VFSUninit();
+									// base class version must be called
+	inline	bool				IsKnownToVFS() const;
+
+			void				SetID(ino_t id);
+			void				SetParent(Directory* parent);
 
 	virtual	mode_t				Mode() const = 0;
-	virtual	uid_t				UserID() const = 0;
-	virtual	gid_t				GroupID() const = 0;
+	virtual	uid_t				UserID() const;
+	virtual	gid_t				GroupID() const;
 	virtual	timespec			ModifiedTime() const = 0;
 	virtual	off_t				FileSize() const = 0;
-
-	virtual	status_t			AddPackageNode(PackageNode* packageNode) = 0;
-	virtual	void				RemovePackageNode(PackageNode* packageNode) = 0;
-
-	virtual	PackageNode*		GetPackageNode() = 0;
 
 	virtual	status_t			Read(off_t offset, void* buffer,
 									size_t* bufferSize) = 0;
 	virtual	status_t			Read(io_request* request) = 0;
+
+	virtual	status_t			ReadSymlink(void* buffer,
+									size_t* bufferSize) = 0;
+
+	virtual	status_t			OpenAttributeDirectory(
+									AttributeDirectoryCookie*& _cookie);
+	virtual	status_t			OpenAttribute(const char* name, int openMode,
+									AttributeCookie*& _cookie);
+
+	virtual	status_t			IndexAttribute(AttributeIndexer* indexer);
+	virtual	void*				IndexCookieForAttribute(const char* name) const;
 
 protected:
 			rw_lock				fLock;
@@ -67,9 +100,7 @@ protected:
 			char*				fName;
 			Node*				fNameHashTableNext;
 			Node*				fIDHashTableNext;
-			mode_t				fMode;
-			uid_t				fUserID;
-			gid_t				fGroupID;
+			uint32				fFlags;
 };
 
 
@@ -99,6 +130,16 @@ Node::WriteUnlock()
 {
 	rw_lock_write_unlock(&fLock);
 }
+
+
+bool
+Node::IsKnownToVFS() const
+{
+	return (fFlags & NODE_FLAG_KNOWN_TO_VFS) != 0;
+}
+
+
+// #pragma mark -
 
 
 struct NodeNameHashDefinition {

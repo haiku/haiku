@@ -1,0 +1,29 @@
+1	croatian	x-vnd.Haiku.TextSearch	2098016430
+%s: Not enough room to escape the filename.	Grepper		%s: Nedovoljno prostora za izbjegavanje imena datoteke.
+%s: There was a problem running grep.	Grepper		%s: Dogodio se problem dok je grep radio.
+Cancel	GrepWindow		Odustani
+Case-sensitive	GrepWindow		Osjetljivost na slova
+Close	GrepWindow		Zatvori
+Escape search text	GrepWindow		Ugasi search tekst
+File	GrepWindow		Datoteka
+Follow symbolic links	GrepWindow		Slijedi simboličke poveznice
+History	GrepWindow		Povijest
+Look in sub-folders	GrepWindow		Pogledaj u podmape
+New window	GrepWindow		Novi prozor
+OK	GrepWindow		Uredu
+Open files in Pe	GrepWindow		Otvori datoteke u Pe
+Open selection	GrepWindow		Otvori lokaciju
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Označi datoteke koje želiš selektovati za Tracker
+Please select the files you wish to keep searching.	GrepWindow		Odaberite datoteke koje želite nastaviti tražiti.
+Quit	GrepWindow		Isključi
+Search	GrepWindow		Traži
+Select all	GrepWindow		Odaberi sve
+Set target…	GrepWindow		Postavi metu...
+Settings	GrepWindow		Postavke
+Show files in Tracker	GrepWindow		Prikaži datoteke u Tracker-u
+Show lines	GrepWindow		Pokaži retke
+Skip folders starting with a dot	GrepWindow		Preskoči mape koje počinju sa točkom
+Text files only	GrepWindow		Samo tekstualne datoteke
+TextSearch	GrepWindow		TextSearch
+The unselected files will be removed from the list.	GrepWindow		Neizabrane datoteke će biti uklonjene sa liste.
+Trim to selection	GrepWindow		Skrati odabir

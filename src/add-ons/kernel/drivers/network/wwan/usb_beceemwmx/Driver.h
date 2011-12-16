@@ -26,15 +26,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <directories.h>
 #include <util/kernel_cpp.h>
 
 
 #define DRIVER_NAME	"usb_beceemwmx"
 #define MAX_DEVICES	8
 
-#define FIRM_BIN		"/boot/system/data/firmware/macxvi200/macxvi200.bin"
+#define FIRM_BIN	\
+	kSystemDataDirectory "/firmware/macxvi200/macxvi200.bin"
 	// location on file system of device firmware
-#define FIRM_CFG		"/boot/system/data/firmware/macxvi200/macxvi.cfg"
+#define FIRM_CFG	\
+	kSystemDataDirectory "/firmware/macxvi200/macxvi.cfg"
 	// location on file system of vendor configuration
 
 #define SYS_CFG			0x0F000C00
@@ -97,6 +100,7 @@
 #define STATE_IDLECONT	0x40	// IDLEMODE_CONTINUE
 #define STATE_IDLEEXIT	0x80	// IDLEMODE_EXIT
 #define STATE_HALT		0x00	// SHUTDOWN_EXIT
+
 
 const uint8 kInvalidRequest = 0xff;
 

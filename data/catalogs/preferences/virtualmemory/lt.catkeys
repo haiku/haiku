@@ -1,18 +1,20 @@
-1	lithuanian	x-vnd.Haiku-VirtualMemory	2137942259
-%Ld B	SettingsWindow		%Ld B
-Changes will take effect on restart!	SettingsWindow		Pakeitimai įsigalios perkrovus sistemą!
-Current swap file size: 	SettingsWindow		Esamos mainų bylos dydis: 
-Defaults	SettingsWindow		Numatytai
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Virtualiosios atminties išjungimas sąlygos nepageidaujamą įtaką sistemos stabilumui, kai įprasta atmintis bus užpildyta.\nVirtualioji atmintis neįtakos sistemos našumo kolei bus laisvos įprastos atminties.\n\nAr tikrai norite ją išjungti?
-Enable virtual memory	SettingsWindow		Įjungti virtualiąją atmintį
-GB	SettingsWindow		GiB
-KB	SettingsWindow		KiB
-Keep enabled	SettingsWindow		Palikti įjungtą
-MB	SettingsWindow		MiB
-OK	VirtualMemoryApp		Gerai
-Physical memory: 	SettingsWindow		Įprastoji atmintis: 
-Requested swap file size:	SettingsWindow		Reikalingas mainų bylos dydis:
-Revert	SettingsWindow		Grįžti
+1	lithuanian	x-vnd.Haiku-VirtualMemory	688347876
 Turn off	SettingsWindow		Išjungti
-Use volume:	SettingsWindow		Laikmenoje:
-VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualiojiAtmintis\n\tparašyta Axel'io Dörfler'io\n\tCopyright 2005, Haiku.\n
+GB	SettingsWindow		GB
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Virtualiosios atminties išjungimas gali turėti neigiamos įtakos sistemos stabilumui, kai fizinė atmintis visiškai užsipildys.\nVirtualioji atmintis neįtakoja sistemos našumo tol, kol yra laisvos fizinės atminties.\n\nAr tikrai norite išjungti virtualiąją atmintį?
+Requested swap file size:	SettingsWindow		Reikalingas sukeitimų failo dydis:
+Physical memory: 	SettingsWindow		Fizinė atmintis: 
+Changes will take effect on restart!	SettingsWindow		Kad pakeitimai įsigaliotų, reikia paleisti sistemą iš naujo!
+Defaults	SettingsWindow		Numatytai
+KB	SettingsWindow		KB
+Use volume:	SettingsWindow		Naudoti kaupiklį:
+Insufficient space for a swap file.	SettingsWindow		Sukeitimų failui nepakanka vietos.
+Keep enabled	SettingsWindow		Palikti įjungtą
+Revert	SettingsWindow		Atšaukti pakeitimus
+VirtualMemory	System name		Virtualioji atmintis
+Current swap file size: 	SettingsWindow		Esamo sukeitimų failo dydis: 
+OK	VirtualMemoryApp		Gerai
+VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Virtualioji atmintis\n\tparašyta Axel'io Dörfler'io\n\t© 2005, Haiku.\n
+Enable virtual memory	SettingsWindow		Įjungti virtualiąją atmintį
+MB	SettingsWindow		MB
+%Ld B	SettingsWindow		%Ld B

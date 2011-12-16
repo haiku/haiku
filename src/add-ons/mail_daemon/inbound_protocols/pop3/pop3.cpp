@@ -48,6 +48,16 @@
 #define B_TRANSLATE_CONTEXT "pop3"
 
 
+static void NotHere(BStringList &that, BStringList &otherList,
+	BStringList *results)
+{
+	for (int32 i = 0; i < otherList.CountStrings(); i++) {
+		if (!that.HasString(otherList.StringAt(i)))
+			results->Add(otherList.StringAt(i));
+	}
+}
+
+
 #define POP3_RETRIEVAL_TIMEOUT 60000000
 #define CRLF	"\r\n"
 
@@ -159,9 +169,9 @@ POP3Protocol::SyncMessages()
 	}
 
 	BStringList toDownload;
-	fManifest.NotHere(fUniqueIDs, &toDownload);
+	NotHere(fManifest, fUniqueIDs, &toDownload);
 
-	int32 numMessages = toDownload.CountItems();
+	int32 numMessages = toDownload.CountStrings();
 	if (numMessages == 0) {
 		CheckForDeletedMessages();
 		ResetProgress();
@@ -169,11 +179,11 @@ POP3Protocol::SyncMessages()
 	}
 
 	ResetProgress();
-	SetTotalItems(toDownload.CountItems());
+	SetTotalItems(toDownload.CountStrings());
 
-	printf("POP3: Messages to download: %i\n", (int)toDownload.CountItems());
-	for (int32 i = 0; i < toDownload.CountItems(); i++) {
-		const char* uid = toDownload.ItemAt(i);
+	printf("POP3: Messages to download: %i\n", (int)toDownload.CountStrings());
+	for (int32 i = 0; i < toDownload.CountStrings(); i++) {
+		const char* uid = toDownload.StringAt(i);
 		int32 toRetrieve = fUniqueIDs.IndexOf(uid);
 
 		if (toRetrieve < 0) {
@@ -236,7 +246,7 @@ POP3Protocol::SyncMessages()
 		file.WriteAttr("MAIL:size", B_INT32_TYPE, 0, &size, sizeof(int32));
 
 		// save manifest in case we get disturbed
-		fManifest += uid;
+		fManifest.Add(uid);
 		_WriteManifest();
 	}
 
@@ -560,17 +570,17 @@ POP3Protocol::CheckForDeletedMessages()
 	{
 		//---Delete things from the manifest no longer on the server
 		BStringList temp;
-		fManifest.NotThere(fUniqueIDs, &temp);
-		fManifest -= temp;
+		NotHere(fUniqueIDs, fManifest, &temp);
+		fManifest.Remove(temp);
 	}
 
 	if (!fSettings.FindBool("delete_remote_when_local")
-		|| fManifest.CountItems() == 0)
+		|| fManifest.CountStrings() == 0)
 		return;
 
-	BStringList to_delete;
+	BStringList toDelete;
 
-	BStringList query_contents;
+	BStringList queryContents;
 	BVolumeRoster volumes;
 	BVolume volume;
 
@@ -588,20 +598,20 @@ POP3Protocol::CheckForDeletedMessages()
 		BString uid;
 		while (fido.GetNextRef(&entry) == B_OK) {
 			BNode(&entry).ReadAttrString("MAIL:unique_id", &uid);
-			query_contents.AddItem(uid.String());
+			queryContents.Add(uid);
 		}
 	}
-	query_contents.NotHere(fManifest, &to_delete);
+	NotHere(queryContents, fManifest, &toDelete);
 
-	for (int32 i = 0; i < to_delete.CountItems(); i++) {
-		printf("delete mail on server uid %s\n", to_delete[i]);
-		Delete(fUniqueIDs.IndexOf(to_delete[i]));
+	for (int32 i = 0; i < toDelete.CountStrings(); i++) {
+		printf("delete mail on server uid %s\n", toDelete.StringAt(i).String());
+		Delete(fUniqueIDs.IndexOf(toDelete.StringAt(i)));
 	}
 
 	//*(unique_ids) -= to_delete; --- This line causes bad things to
 	// happen (POP3 client uses the wrong indices to retrieve
 	// messages).  Without it, bad things don't happen.
-	fManifest -= to_delete;
+	fManifest.Remove(toDelete);
 }
 
 
@@ -982,14 +992,14 @@ POP3Protocol::_UniqueIDs()
 		return ret;
 
 	BString result;
-	int32 uid_offset;
+	int32 uidOffset;
 	while (ReceiveLine(result) > 0) {
 		if (result.ByteAt(0) == '.')
 			break;
 
-		uid_offset = result.FindFirst(' ') + 1;
-		result.Remove(0,uid_offset);
-		fUniqueIDs.AddItem(result.String());
+		uidOffset = result.FindFirst(' ') + 1;
+		result.Remove(0, uidOffset);
+		fUniqueIDs.Add(result);
 	}
 
 	if (SendCommand("LIST" CRLF) != B_OK)
