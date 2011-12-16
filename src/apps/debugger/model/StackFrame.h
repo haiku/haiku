@@ -55,7 +55,7 @@ public:
 			target_addr_t		InstructionPointer() const
 									{ return fInstructionPointer; }
 
-			CpuState*			GetPreviousCpuState() const
+			CpuState*			PreviousCpuState() const
 									{ return fPreviousCpuState; }
 			void				SetPreviousCpuState(CpuState* state);
 

@@ -116,7 +116,7 @@ Architecture::CreateStackTrace(Team* team,
 	// attempt to continue building it from where it left off.
 	if (stackTrace->CountFrames() > 0) {
 		nextFrame = stackTrace->FrameAt(stackTrace->CountFrames() - 1);
-		cpuState = nextFrame->GetPreviousCpuState();
+		cpuState = nextFrame->PreviousCpuState();
 	}
 
 	while (cpuState != NULL) {
