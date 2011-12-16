@@ -481,7 +481,7 @@ dp_link_train(uint8 crtcID, display_mode* mode)
 	else
 		dpcd_reg_write(hwPin, DP_DOWNSPREAD_CTRL, 0);
 
-	encoder_dig_setup(connectorIndex, 0,
+	encoder_dig_setup(connectorIndex, mode->timing.pixel_clock,
 		ATOM_ENCODER_CMD_SETUP_PANEL_MODE);
 
 	if (gDPInfo[connectorIndex]->config[0] >= 0x11)
@@ -494,7 +494,7 @@ dp_link_train(uint8 crtcID, display_mode* mode)
 
 	// Start link training on source
 	if (info.dceMajor >= 4 || !dpUseEncoder) {
-		encoder_dig_setup(connectorIndex, 0,
+		encoder_dig_setup(connectorIndex, mode->timing.pixel_clock,
 			ATOM_ENCODER_CMD_DP_LINK_TRAINING_START);
 	} else {
 		ERROR("%s: TODO: cannot use AtomBIOS DPEncoderService on card!\n",
@@ -516,7 +516,7 @@ dp_link_train(uint8 crtcID, display_mode* mode)
 
 	/* disable the training pattern on the source */
 	if (info.dceMajor >= 4 || !dpUseEncoder) {
-		encoder_dig_setup(connectorIndex, 0,
+		encoder_dig_setup(connectorIndex, mode->timing.pixel_clock,
 			ATOM_ENCODER_CMD_DP_LINK_TRAINING_COMPLETE);
 	} else {
 		ERROR("%s: TODO: cannot use AtomBIOS DPEncoderService on card!\n",
