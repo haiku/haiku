@@ -183,6 +183,7 @@ static const Translation gTranslations[] =
 	{ "ro",
 		"Victor Carbune\n"
 		"Florentina Mușat\n"
+		"Dragos Serban\n"
 	},
 	{ "ru",
 		"Tatyana Fursic (iceid)\n"
