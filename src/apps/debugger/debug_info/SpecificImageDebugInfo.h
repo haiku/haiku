@@ -53,7 +53,7 @@ public:
 	virtual	status_t			CreateFrame(Image* image,
 									FunctionInstance* functionInstance,
 									CpuState* cpuState,
-									StackFrame*& _previousFrame,
+									StackFrame*& _Frame,
 									CpuState*& _previousCpuState) = 0;
 										// returns reference to previous frame
 										// and CPU state; returned CPU state

@@ -100,7 +100,7 @@ Architecture::CreateStackTrace(Team* team,
 
 	StackTrace* stackTrace = NULL;
 	ObjectDeleter<StackTrace> stackTraceDeleter;
-	StackFrame* frame = NULL;
+	StackFrame* nextFrame = NULL;
 
 	if (useExistingTrace)
 		stackTrace = _stackTrace;
@@ -115,8 +115,8 @@ Architecture::CreateStackTrace(Team* team,
 	// if we're passed an already existing partial stack trace,
 	// attempt to continue building it from where it left off.
 	if (stackTrace->CountFrames() > 0) {
-		frame = stackTrace->FrameAt(stackTrace->CountFrames() - 1);
-		cpuState = frame->GetCpuState();
+		nextFrame = stackTrace->FrameAt(stackTrace->CountFrames() - 1);
+		cpuState = nextFrame->GetPreviousCpuState();
 	}
 
 	while (cpuState != NULL) {
@@ -152,42 +152,42 @@ Architecture::CreateStackTrace(Team* team,
 
 		// If the CPU state's instruction pointer is actually the return address
 		// of the next frame, we let the architecture fix that.
-		if (frame != NULL
-			&& frame->ReturnAddress() == cpuState->InstructionPointer()) {
-			UpdateStackFrameCpuState(frame, image,
+		if (nextFrame != NULL
+			&& nextFrame->ReturnAddress() == cpuState->InstructionPointer()) {
+			UpdateStackFrameCpuState(nextFrame, image,
 				functionDebugInfo, cpuState);
 		}
 
 		// create the frame using the debug info
-		StackFrame* previousFrame = NULL;
+		StackFrame* frame = NULL;
 		CpuState* previousCpuState = NULL;
 		if (function != NULL) {
 			status_t error = functionDebugInfo->GetSpecificImageDebugInfo()
-				->CreateFrame(image, function, cpuState, previousFrame,
+				->CreateFrame(image, function, cpuState, frame,
 					previousCpuState);
 			if (error != B_OK && error != B_UNSUPPORTED)
 				break;
 		}
 
 		// If we have no frame yet, let the architecture create it.
-		if (previousFrame == NULL) {
+		if (frame == NULL) {
 			status_t error = CreateStackFrame(image, functionDebugInfo,
-				cpuState, frame == NULL, previousFrame, previousCpuState);
+				cpuState, nextFrame == NULL, frame, previousCpuState);
 			if (error != B_OK)
 				break;
 		}
 
 		cpuStateReference.SetTo(previousCpuState, true);
 
-		previousFrame->SetImage(image);
-		previousFrame->SetFunction(function);
+		frame->SetImage(image);
+		frame->SetFunction(function);
 
-		if (!stackTrace->AddFrame(previousFrame)) {
-			delete previousFrame;
+		if (!stackTrace->AddFrame(frame)) {
+			delete frame;
 			return B_NO_MEMORY;
 		}
 
-		frame = previousFrame;
+		frame = nextFrame;
 		cpuState = previousCpuState;
 		if (--maxStackDepth == 0)
 			break;
