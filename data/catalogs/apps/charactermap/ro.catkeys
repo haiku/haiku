@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-CharacterMap	1000631522
+1	romanian	x-vnd.Haiku-CharacterMap	1545664922
 Aegean numbers	UnicodeBlocks		Numere egeene
 Alphabetic presentation forms	UnicodeBlocks		Forme de prezentare alfabetică
 Ancient Greek musical notation	UnicodeBlocks		Notație muzicală greaca veche
@@ -43,6 +43,8 @@ Combining diacritical marks supplement	UnicodeBlocks		Supliment de combinare sem
 Combining half marks	UnicodeBlocks		Combinare jumătăți de semne 
 Control pictures	UnicodeBlocks		Imagine de control
 Coptic	UnicodeBlocks		Coptic
+Copy as escaped byte string	CharacterView		Copiază ca șir de octete escapat
+Copy character	CharacterView		Copiază caracterul
 Counting rod numerals	UnicodeBlocks		Numărare cu bețișoare
 Cuneiform	UnicodeBlocks		Cuneiform
 Cuneiform numbers and punctuation	UnicodeBlocks		Numere și punctuație cuneiforme
@@ -60,6 +62,7 @@ Enclosed CJK letters and months	UnicodeBlocks		Litere și luni CJK încercuite
 Enclosed alphanumerics	UnicodeBlocks		Alfanumerice încercuite
 Ethiopic	UnicodeBlocks		Etiopic
 Ethiopic extended	UnicodeBlocks		Etiopic extins
+Ethiopic supplement	UnicodeBlocks		Supliment etiopic
 File	CharacterWindow		Fișier
 Filter:	CharacterWindow		Filtru:
 Font	CharacterWindow		Font
@@ -117,7 +120,6 @@ Miscellaneous symbols and arrows	UnicodeBlocks		Simboluri și săgeți diverse
 Miscellaneous technical	UnicodeBlocks		Diverse din tehnică
 Modifier tone letters	UnicodeBlocks		Litere de modificare a tonului
 Mongolian	UnicodeBlocks		Mongolian
-Muscial symbols	UnicodeBlocks		Simboluri muzicale
 Myanmar	UnicodeBlocks		Myanmar
 N'Ko	UnicodeBlocks		N'Ko
 New Tai Lue	UnicodeBlocks		Tai Lue nou

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-DriveSetup	568426562
+1	romanian	x-vnd.Haiku-DriveSetup	1209826930
 %ld MiB	Support		%ld MiB
 <empty>	DiskView		<liber>
 <empty>	PartitionList		<liber>
@@ -29,6 +29,7 @@ Device	DiskView		Dispozitiv
 Device	PartitionList		Dispozitiv
 Disk	MainWindow		Disc
 Disk system \"%s\"\" not found!	MainWindow		Sistemul de disc „%s\”\” nu a fost găsit!
+DriveSetup	System name		ConfigurareDiscuri
 Eject	MainWindow		Scoate
 End: %ld MB	Support		Final: %ld MiB
 Error: 	MainWindow	in any error alert	Eroare:

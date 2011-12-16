@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Be-WORK	576959994
+1	romanian	x-vnd.Be-WORK	932379173
 About Workspaces…	Workspaces		Despre Spații de lucru...
 Always on top	Workspaces		Întotdeauna deasupra
 Auto-raise	Workspaces		Auto-lansare
@@ -7,5 +7,6 @@ Invalid argument: %s\n	Workspaces		Argument nevalid: %s\n
 OK	Workspaces		OK
 Quit	Workspaces		Părăsește
 Show window border	Workspaces		Afișează margine fereastră
-Usage: %s [options] [workspace]\nwhere \"options\" is one of:\n  --notitle\t\ttitle bar removed.  border and resize kept.\n  --noborder\t\ttitle, border, and resize removed.\n  --avoidfocus\t\tprevents the window from being the target of keyboard events.\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen corner\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Utilizare: %s [options] [workspace]\nunde „options” este una din:\n --notitle\t\tbara de titlu eliminată. margine și redimensionare păstrate.\n --noborder\t\ttitlu, margine, și redimensionare eliminate.\n --avoidfocus\t\tprotejează fereastra împotriva evenimentelor de tastatură.\n --alwaysontop\t\tpăstrează fereastra deasupra\n --notmovable\t\tfereastra nu poate fi mutată împrejur\n --autoraise\t\tauto-lansează fereastra spațiului de lucru atunci când se află în colțul ecranului\n --help\t\tafișează acest ajutor și închide\nși „workspace” este numărul de spații de lucru între care se poate comuta (0-31)\n
+Show window tab	Workspaces		Afișează tab-ul ferestrei
+Workspaces	System name		Spații de lucru
 Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Spații de lucru\nscris de %1, și %2.\n\nDrepturi de autor %3, Haiku.\n\nTrimiteți ferestre în spate utilizând tasta Opțiuni. Mutați ferestre în față utilizând tasta Control.\n

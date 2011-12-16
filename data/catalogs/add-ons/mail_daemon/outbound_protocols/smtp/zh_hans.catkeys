@@ -1,0 +1,16 @@
+1	simplified_chinese	x-vnd.Haiku-SMTP	2740407895
+. The server said:\n	smtp		。服务器回复：\n
+. The server says:\n	smtp		。服务器回复：\n
+: Connection refused or host not found.	smtp		：连接被拒绝，或者未发现主机。
+Connecting to server…	smtp		连接到服务器...
+Destination:	ConfigView		目标：
+ESMTP	ConfigView		ESMTP
+Error while logging in to %serv	smtp		登陆服务器 %serv 失败
+Error while opening connection to %serv	smtp		连接服务器 %serv 失败
+None	ConfigView		无
+POP3 authentication failed. The server said:\n	smtp		POP3 认证失败。服务器回复：\n
+POP3 before SMTP	ConfigView		POP3 位于 SMTP 之前
+SMTP server:	ConfigView		SMTP 服务器：
+SSL	ConfigView		SSL
+STARTTLS	ConfigView		STARTTLS
+Unencrypted	ConfigView		未加密

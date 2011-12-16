@@ -1,0 +1,10 @@
+1	romanian	x-vnd.Haiku-libmail	161731481
+Connection type:	ProtocolConfigView		Tip de conexiune:
+Leave mail on server	ProtocolConfigView		Lasă mailul pe server
+Login type:	ProtocolConfigView		Tip de autentificare:
+Mail server:	ProtocolConfigView		Server mail:
+Partially download messages larger than	ProtocolConfigView		Descarcă parțial mesajele mai mari decât
+Password:	ProtocolConfigView		Parolă:
+Remove mail from server when deleted	ProtocolConfigView		Elimină mailul de pe server când este șters
+Select…	MailKit		Selectează...
+Username:	ProtocolConfigView		Nume de utilizator:

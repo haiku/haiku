@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-About	3666374321
+1	simplified_chinese	x-vnd.Haiku-About	867678185
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		总计%d MiB
 %d MiB used (%d%%)	AboutView		已用 %d MiB (%d%%)
@@ -19,7 +19,6 @@ Contributors:\n	AboutView		贡献者：\n
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		版权 © 1987-1988 Digital Equipment Corporation，Maynard, Massachusetts。\n版权所有。
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		版权 © 1990-2002 Info-ZIP。版权所有。
 Copyright © 1990-2003 Wada Laboratory, the University of Tokyo.	AboutView		版权 © 1990-2003 Wada Laboratory，the University of Tokyo。
-Copyright © 1991-2000 Silicon Graphics, Inc. SGI's Software FreeB license. All rights reserved.	AboutView		版权 © 1991-2000 Silicon Graphics, Inc。 SGI's Software FreeB 协议。版权所有。
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		版权 © 1994-1997 Mark Kilgard。版权所有。
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		版权 © 1994-2008 Xiph.Org。版权所有。
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		版权 © 1994-2009, Thomas G. Lane, Guido Vollbeding。本软件基于 Independent JPEG Group 的部分工作。
@@ -61,7 +60,6 @@ MIT (no promotion)	AboutView		MIT（无附加条款）
 Memory:	AboutView		内存状态：
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (项目创始人)\n\n
 Past maintainers:\n	AboutView		先前维护人员：\n
-Portions of this software are copyright. Copyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		软件部分受版权保护。版权 © 1996-2006 The FreeType Project。版权所有。
 Processor:	AboutView		处理器：
 Revision	AboutView		发行版本
 Source Code: 	AboutView		源码： 
@@ -69,7 +67,8 @@ The BeGeistert team\n	AboutView		BeGeistert 小组 \n
 The Haiku-Ports team\n	AboutView		 Haiku-Ports 小组\n
 The Haikuware team and their bounty program\n	AboutView		 Haikuware 小组及其维护程序\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		奥克兰大学与 Christof Lutteroth\n\n
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku™ and the HAIKU logo® are (registered) trademarks of Haiku, Inc.\n\n	AboutView		Haiku 源代码版权是 Haiku, Inc 和源码中声明的贡献者所拥有的财产。Haiku™ 和 HAIKU logo® 是 Haiku, Inc 的（注册）商标。\n\n
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Haiku 特别相关的代码，尤其是内核及与之紧密关联的所有应用程序的代码，它们都在 <MIT 协议> 条款下发布。一些包含第三方代码的系统库则在 <LGPL 协议> 下发布。您可以在下述的第三方代码版权中找到这些协议。\n\n
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Haiku 代码的版权是 Haiku, Inc. ，或代码中注明的原作者的财产。Haiku® 和 Haiku logo® 是Haiku, Inc.的注册商标。\n\n
 Time running:	AboutView		运行时间：
 Translations:\n	AboutView		翻译：\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (和他的 NewOS 内核)\n

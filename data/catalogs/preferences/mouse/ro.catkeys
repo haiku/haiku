@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Mouse	3904912604
+1	romanian	x-vnd.Haiku-Mouse	1033564338
 ...by Andrew Edward McCall	MouseApplication		...de Andrew Edward McCall
 1-Button	SettingsView		1-buton
 2-Button	SettingsView		2-Butoane
@@ -14,6 +14,7 @@ Fast	SettingsView		Rapid
 Focus follows mouse	SettingsView		Focalizarea urmărește mausul
 Focus mode:	SettingsView		Mod focalizare:
 Instant warp	SettingsView		Încadrare instantă
+Mouse	System name		Maus
 Mouse acceleration	SettingsView		Accelerare mouse
 Mouse speed	SettingsView		Viteză mouse
 Mouse type:	SettingsView		Tip mouse:

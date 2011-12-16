@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-About	282658629
+1	romanian	x-vnd.Haiku-About	2840857586
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d MiB total
 %d MiB used (%d%%)	AboutView		%d MiB utilizați (%d%%)
@@ -6,6 +6,7 @@
 %ld Processors:	AboutView		%ld procesoare:
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB total, %inaccessible MiB inaccesibil
 ... and the many people making donations!\n\n	AboutView		... și tuturor celor care donează!\n\n
+2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 de Andy Ritger bazat pe Formula generalizată a cronometrării
 About this system	AboutWindow		Despre acest sistem
 AboutSystem	System name		DespreSistem
 BSD (2-clause)	AboutView		BSD (Clauza 2)
@@ -19,7 +20,6 @@ Contributors:\n	AboutView		Contribuitori:\n
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Drepturi de autor © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nToate drepturile rezervate.
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Drepturi de autor © 1990-2002 Info-ZIP. Toate drepturile rezervate.
 Copyright © 1990-2003 Wada Laboratory, the University of Tokyo.	AboutView		Drepturi de autor © 1990-2003 Laboratorul Wada, Universitatea din Tokyo.
-Copyright © 1991-2000 Silicon Graphics, Inc. SGI's Software FreeB license. All rights reserved.	AboutView		Drepturi de autor © 1991-2000 Silicon Graphics, Inc. Licența SGI Software FreeB. Toate drepturile rezervate.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Drepturi de autor © 1994-1997 Mark Kilgard. Toate drepturile rezervate.
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Drepturi de autor © 1994-2008 Xiph.Org. Toate drepturile rezervate.
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Drepturi de autor © 1994-2009, Thomas G. Lane, Guido Vollbeding. Acest program se bazează pe munca Grupului Independent JPEG.
@@ -62,7 +62,6 @@ MIT license. All rights reserved.	AboutView		Licență MIT. Toate drepturile rez
 Memory:	AboutView		Memorie:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fondator proiect)\n\n
 Past maintainers:\n	AboutView		Responsabili anteriori:\n
-Portions of this software are copyright. Copyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		O parte din acest program are drepturi de autor. Drepturi de autor © 1996-2006 Proiectul FreeType. Toate drepturile rezervate.
 Processor:	AboutView		Procesor:
 Revision	AboutView		Revizie
 Source Code: 	AboutView		Cod sursă:
@@ -70,7 +69,8 @@ The BeGeistert team\n	AboutView		Echipa BeGeistert\n
 The Haiku-Ports team\n	AboutView		Echipa Haiku-Ports\n
 The Haikuware team and their bounty program\n	AboutView		Echipa Haikuware și programul lor de recompense\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Universitatea Auckland și Christof Lutteroth\n\n
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku™ and the HAIKU logo® are (registered) trademarks of Haiku, Inc.\n\n	AboutView		Drepturile de autor ale codului Haiku sunt proprietăți ale Haiku, Inc. sau ale autorilor respectivi când este notat în mod special în sursă. Haiku™ și sigla® Haiku sunt mărci (înregistrate) ale Haiku, Inc.\n\n
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Codul unic Haiku, în special nucleul și tot codul la care aplicațiile pot face legături, este distribuit sub termenii <licenței MIT>. Unele librării de sistem pot conține cod de la părți terțe distribuit prin <licența LGPL>. Puteți găsi drepturile de autor ale codului părților terțe mai jos.\n\n
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Drepturile de autor ale codului Haiku reprezintă proprietatea a Haiku, Inc. sau a respectivilor autori, atunci când este notat explicit în sursă. Haiku® şi logo-ul HAIKU® sunt mărci înregistrate ale Haiku, Inc.\n\n
 Time running:	AboutView		Rulează de:
 Translations:\n	AboutView		Traduceri:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (și nucleul său NewOS)\n

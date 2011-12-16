@@ -1,17 +1,28 @@
-1	romanian	x-vnd.Haiku-Keymap	749384872
+1	romanian	x-vnd.Haiku-Keymap	3895282621
 (Current)	Keymap window		(Curent)
+Acute trigger	Keymap window		Declanșator ascuțit
+Cancel	Modifier Keys window		Anulare
+Caps Lock:	Modifier Keys window		Caps Lock:
 Circumflex trigger	Keymap window		Declanșator circumflex
+Command:	Modifier Keys window		Comandă:
+Control:	Modifier Keys window		Control:
 Diaeresis trigger	Keymap window		Declanșator tremă
 File	Keymap window		Fișier
 Font	Keymap window		Font
 Grave trigger	Keymap window		Declanșator grav
+Keymap	System name		HartăTaste
 Layout	Keymap window		Aranjament
+Modifier Keys	Modifier Keys window		Taste Modificatoare
+OK	Modifier Keys window		OK
 Open…	Keymap window		Deschide…
+Option:	Modifier Keys window		Opțiune:
 Quit	Keymap window		Părăsește
 Revert	Keymap window		Revenire
+Revert	Modifier Keys window		Revenire
 Sample and clipboard:	Keymap window		Mostră și clipboard:
 Save as…	Keymap window		Salvează ca…
 Select dead keys	Keymap window		Selectează chei moarte
+Set Modifier Keys…	Keymap window		Setare taste modificatoare...
 Switch shortcut keys	Keymap window		Schimbă scurtături
 Switch shortcut keys to Haiku mode	Keymap window		Schimbă scurtăturile la modul Haiku
 Switch shortcut keys to Windows/Linux mode	Keymap window		Schimbă scurtăturile la modul Windows/Linux

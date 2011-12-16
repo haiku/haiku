@@ -1,0 +1,8 @@
+1	romanian	x-vnd.Haiku-notification_server	906000487
+Couldn't start display settings monitor.\nLive filter changes disabled.	NotificationWindow		Nu s-a putut porni monitorul de configurări ale afișajului.\nModificările directe ale filtrului sunt dezactivate.
+Couldn't start filter monitor. Live filter changes disabled.	NotificationWindow		Nu s-a putut porni monitorul de filtru. Modificările directe ale filtrului sunt dezactivate.
+Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Nu s-a putut porni monitorul de configurări generale.\nModificările directe ale filtrului sunt dezactivate.
+Darn.	NotificationWindow		Aiurea.
+Notification	NotificationWindow		Notificare
+OK	NotificationWindow		OK
+Warning	NotificationWindow		Avertisment

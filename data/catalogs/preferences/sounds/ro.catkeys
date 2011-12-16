@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Sounds	4287885569
+1	romanian	x-vnd.Haiku-Sounds	3924145958
 <none>	HEventList		<nimic>
 <none>	HWindow		<nimic>
 About Sounds	SoundsHApp		Despre Sunete
@@ -11,5 +11,7 @@ Other…	HWindow		Altele...
 Play	HWindow		Redă
 Sound	HEventList		Sunet
 Sound File:	HWindow		Fișier de sunet:
+Sounds	System name		Sunete
+Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sunete\n Furnizat de :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n Lucrare originală de la Atsushi Takamatsu.\nDrepturi de autor ©2003-2006 Haiku 
 Stop	HWindow		Oprește
 This is not an audio file.	HWindow		Acesta nu este un fișier audio.

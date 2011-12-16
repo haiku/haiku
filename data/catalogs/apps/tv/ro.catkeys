@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku.TV	2971561976
+1	romanian	x-vnd.Haiku.TV	1995288111
 Always on top	MainWin		Întotdeauna deasupra
 Channel	MainWin		Canal
 DVB - Digital Video Broadcasting TV	MainWin		DVB - Difuzare Video Digital TV
@@ -19,6 +19,7 @@ Scale to native size	MainWin		Scalează la dimensiunea nativă
 Settings	MainWin		Configurări
 Settings…	MainWin		Configurări...
 TV	MainWin		Televizor
+TV	System name		TV
 force 544 x 576, display aspect 4:3	MainWin		forțează 544 x 576, aspect afișare 4:3
 force 704 x 576, display aspect 4:3	MainWin		forțează 704 x 576, aspect afișare 4:3
 force 720 x 576, display aspect 4:3	MainWin		forțează 720 x 576, aspect afișare 4:3

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-StyledEdit	3472082864
+1	romanian	x-vnd.Haiku-StyledEdit	1799001682
 ???	LoadAlert		???
 Align	Menus		Aliniază
 Black	Menus		Negru
@@ -9,6 +9,7 @@ Cancel	FindandReplaceWindow		Anulează
 Cancel	QuitAlert		Anulează
 Cancel	RevertToSavedAlert		Anulează
 Cancel	SaveAlert		Anulează
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nu se poate reveni, nu s-a găsit fișierul: „%s”.
 Case-sensitive	FindandReplaceWindow		Sensibil la majuscule
 Center	Menus		Centru
 Characters:	Statistics		Caractere:
@@ -24,6 +25,10 @@ Don't save	QuitAlert		Nu salva
 Don't save	SaveAlert		Nu salva
 Edit	Menus		Editează
 Encoding	Open_and_SaveAsPanel		Codare
+Error loading \"%s\":\n\t%s	LoadAlert		Eroare la încărcarea lui „%s”:\n\t%s
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Eroare la încărcarea lui „%s":\n\tFormat nesuportat
+Error saving \"%s\":\n%s	SaveAlert		Eroare la salvarea lui „%s”:\n%s
+File	Menus		Fișier
 Find	FindandReplaceWindow		Găsește
 Find again	Menus		Găsește din nou
 Find selection	Menus		Găsește selecție
@@ -41,6 +46,7 @@ OK	RevertToSavedAlert		OK
 OK	SaveAlert		OK
 OK	Statistics		OK
 Open…	Menus		Deschide...
+Page setup…	Menus		Configurări pagină...
 Paste	Menus		Lipește
 Print…	Menus		Tipărește...
 Quit	Menus		Părăsește
@@ -49,6 +55,7 @@ Redo typing	QuitAlert		Repetă tastarea
 Replace	FindandReplaceWindow		Înlocuiește
 Replace all	FindandReplaceWindow		Înlocuiește tot
 Replace in all windows	FindandReplaceWindow		Înlocuiește în toate ferestrele
+Replace next	Menus		Înlocuiește următorul
 Replace with:	FindandReplaceWindow		Înlocuiește cu:
 Replace…	Menus		Înlocuiește...
 Revert to saved…	Menus		Revenire la salvat...
@@ -57,10 +64,13 @@ Save	Menus		Salvează
 Save	QuitAlert		Salvează
 Save	SaveAlert		Salvează
 Save as…	Menus		Salvează ca...
+Save changes to the document \"%s\"? 	QuitAlert		Se salvează modificările la documentul „%s”?
 Search backwards	FindandReplaceWindow		Caută înapoi 
 Select all	Menus		Selectează tot
 Size	Menus		Dimensiune
 Statistics…	Menus		Statistici...
+StyledEdit	System name		EditorText
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Acest fișier este marcat ca fiind protejat la scriere. Salvați modificările la documentul „%s”?
 Undo typing	QuitAlert		Refă tastarea
 Untitled 	StyledEditWindow		Fără titlu
 Words:	Statistics		Cuvinte:

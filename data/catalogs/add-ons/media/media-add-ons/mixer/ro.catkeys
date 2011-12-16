@@ -1,0 +1,27 @@
+1	romanian	x-vnd.Haiku-mixer.media_addon	3450667169
+Allow input channel remapping	AudioMixer		Permite recartarea canalului de intrare
+Allow output channel remapping	AudioMixer		Permite recartarea canalului de ieșire
+Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Atenuează ieșire mixaj cu 3dB (precum BeOS R5)
+Display balance control for stereo connections	AudioMixer		Afișează control de echilibru pentru conexiuni stereo
+Drop/repeat samples	AudioMixer		Abandonează/repetă eșantioane
+Gain	AudioMixer		Amplificare
+Gain controls	AudioMixer		Controluri de amplificare
+Input channel destinations	AudioMixer		Destinații canal de intrare
+Input gain controls represent	AudioMixer		Reprezentare controluri de amplificare de intrare
+Input mapping	AudioMixer		Cartare intrare
+Linear interpolation	AudioMixer		Interpolare liniară
+Master output	AudioMixer		Ieșire principală
+Mute	AudioMixer		Mut
+Output channel sources	AudioMixer		Surse canal de ieșire
+Output mapping	AudioMixer		Cartare ieșire
+Physical input channels	AudioMixer		Canale de intrare fizice
+Refuse input format changes	AudioMixer		Refuză schimbări de format de intrare
+Refuse output format changes	AudioMixer		Refuză schimbări de format de ieșire
+Resampling algorithm	AudioMixer		Algoritm de reeșantionare
+Setup	AudioMixer		Configurare
+To master	AudioMixer		Spre principal
+To output	AudioMixer		Spre ieșire
+Use non linear gain sliders (like BeOS R5)	AudioMixer		Folosește glisoare de amplificare neliniare (precum BeOS R5)
+Virtual output channels	AudioMixer		Canale de ieșire virtuale
+dB	AudioMixer		dB
+not connected	AudioMixer		neconectat

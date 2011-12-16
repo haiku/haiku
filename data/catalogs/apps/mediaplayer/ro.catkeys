@@ -1,4 +1,5 @@
-1	romanian	x-vnd.Haiku-MediaPlayer	3380857113
+1	romanian	x-vnd.Haiku-MediaPlayer	138551800
+%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% a întâlnit o eroare internă. Fișierul nu a putut fi deschis.
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (American)
 100% scale	MediaPlayer-Main		scală 100%
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.31 : 1 (Cinemascop)
@@ -24,12 +25,15 @@ Bottom of video	MediaPlayer-SettingsWindow		Baza video
 Cancel	MediaPlayer-SettingsWindow		Anulează
 Close	MediaPlayer-Main		Închide
 Close	MediaPlayer-PlaylistWindow		Închide
+Close window after playing audio	MediaPlayer-SettingsWindow		Închide fereastra după redarea audio
+Close window after playing video	MediaPlayer-SettingsWindow		Închide fereastra după redarea video
 Copy Entries	MediaPlayer-CopyPLItemsCmd		Copiază intrări
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Copiază intrare
 Drop files to play	MediaPlayer-Main		Plasați fișiere pentru a le reda
 Edit	MediaPlayer-PlaylistWindow		Editează
 Error: 	MediaPlayer-Main		Eroare:
 Error: 	MediaPlayer-RemovePLItemsCmd		Eroare:
+File Info	MediaPlayer-InfoWin		Informații fișier
 File info…	MediaPlayer-Main		Informații fișier...
 Full screen	MediaPlayer-Main		Ecran complet
 Full volume	MediaPlayer-SettingsWindow		Volum complet
@@ -44,12 +48,16 @@ Internal error (out of memory). Saving the playlist failed.	MediaPlayer-Playlist
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Se pare că serverul media nu rulează.\nDoriți să îl porniți?
 Large	MediaPlayer-SettingsWindow		Larg
 Lock Peaks	MediaPlayer-PeakView		Blochează vârfuri
+Loop audio	MediaPlayer-SettingsWindow		Repetă audio
+Loop video	MediaPlayer-SettingsWindow		Repetă video
 Low volume	MediaPlayer-SettingsWindow		Volum redus
+MediaPlayer	System name		PlayerMedia
 MediaPlayer settings	MediaPlayer-SettingsWindow		Configurări MediaPlayer
 Medium	MediaPlayer-SettingsWindow		Mediu
 Move Entries	MediaPlayer-MovePLItemsCmd		Mută intrări
 Move Entry	MediaPlayer-MovePLItemsCmd		Mută intrare
 Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Eroare de mutare la gunoi
+Move file to Trash	MediaPlayer-PlaylistWindow		Mută fișierul la Gunoi
 Mute	MediaPlayer-Main		Mut
 Muted	MediaPlayer-SettingsWindow		Mut
 New player…	MediaPlayer-Main		Player nou...
@@ -80,6 +88,7 @@ Randomize	MediaPlayer-PlaylistWindow		Amestecă aleator
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Amestecă aleator intrările
 Rating	MediaPlayer-Main		Apreciere
 Redo	MediaPlayer-PlaylistWindow		Repetă
+Remove	MediaPlayer-PlaylistWindow		Elimină
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Elimină intrări
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Elimină intrările la gunoi
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Elimină intrare
@@ -92,7 +101,9 @@ Save as…	MediaPlayer-PlaylistWindow		Salvează ca...
 Save error	MediaPlayer-PlaylistWindow		Eroare la salvare
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Salvarea listei de redare a eșuat.\n\nEroare:
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Salvarea listei de redare a eșuat:\n\nEroare:
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Scalează controalele în modul ecran complet
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Scalează filme lin (modul fără suprapunere)
+Select all	MediaPlayer-PlaylistWindow		Selectează tot
 Settings…	MediaPlayer-Main		Configurări...
 Skip to the next track.	MediaPlayer-Main		Mergi la pista următoare.
 Skip to the previous track.	MediaPlayer-Main		Mergi la pista precedentă.
@@ -103,7 +114,10 @@ Start playing.	MediaPlayer-Main		Începe redarea
 Stop	MediaPlayer-Main		Oprește
 Stop playing.	MediaPlayer-Main		Oprește redarea.
 Stream settings	MediaPlayer-Main		Configurări flux
+Subtitle placement:	MediaPlayer-SettingsWindow		Amplasare subtitrare:
+Subtitle size:	MediaPlayer-SettingsWindow		Dimensiune subtitrare:
 Subtitles	MediaPlayer-Main		Subtitrări
+The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Fișierul„%filename” nu s-a putut deschide.\n\n
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Nu există niciun decodor instalat pentru a gestiona formatul fișierului, sau decodorul întâmpină probleme cu versiunea specifică a formatului.
 Toggle mute.	MediaPlayer-Main		Comută pe mut.
 Toggle pause/play.	MediaPlayer-Main		Comută pornit/oprit.
@@ -118,5 +132,6 @@ Video	MediaPlayer-Main		Video
 Video track	MediaPlayer-Main		Pistă video
 View options	MediaPlayer-SettingsWindow		Opțiuni vizualizare
 Volume	MediaPlayer-Main		Volum
+Volume of background clips	MediaPlayer-SettingsWindow		Volumul clipurilor din fundal
 none	Audio track menu		nimic
 none	Subtitles menu		nimic

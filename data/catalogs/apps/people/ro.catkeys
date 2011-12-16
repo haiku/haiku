@@ -1,29 +1,38 @@
-1	romanian	x-vnd.Be-PEPL	2887183035
+1	romanian	x-vnd.Be-PEPL	2993050801
+%name% picture	People		Imagine %name%
 Address	People		Adresă
 Cancel	People		Anulează
 City	People		Oraș
 Close	People		Închide
 Company	People		Companie
+Configure attributes	People		Configurează atribute
 Contact information for a person.	Long mimetype description		Informațiile de contact pentru o persoană.
 Contact name	People		Nume de contact
 Copy	People		Copiază
+Could not create %s.	People		Nu s-a putut crea %s.
 Country	People		Țară
 Cut	People		Taie
+Drop an image here,\nor use the contextual menu.	People		Plasează o imagine aici,\nsau utilizează meniul contextual.
 E-mail	People		Email
 Edit	People		Editează
+Error	People		Eroare
 Fax	People		Fax
 File	People		Fișier
 Group	People		Grup
 Home phone	People		Telefon de acasă
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Lansarea preferinței TipuriFișier pentru a configura atributele aplicației Oameni a eșuat.\n\nEroare:
+Load image…	People		Încarcă imagine...
 Name	People		Nume
 New person	People		Persoană nouă
 New person…	People		Persoană nouă...
 Nickname	People		Pseudonim
 OK	People		OK
 Paste	People		Lipește
+People	System name		Oameni
 Person	Short mimetype description		Persoană
 Quit	People		Părăsește
 Redo	People		Repetă
+Remove image	People		Elimină imaginea
 Revert	People		Revenire
 Save	People		Salvează
 Save as…	People		Salvează ca...
@@ -31,8 +40,10 @@ Save changes before quitting?	People		Salvați modificările înainte de părăs
 Select all	People		Selectează tot
 Sorry	People		Îmi pare rău
 State	People		Stare
+The file '%name%' could not be written.	People		Nu a putut fi scris fișierul „%name%”.
 URL	People		Adresă URL
 Undo	People		Refă
+Unnamed person	People		Persoană fără nume
 Work phone	People		Telefon de serviciu
 Zip	People		Cod poștal
 none	Groups list		nimic

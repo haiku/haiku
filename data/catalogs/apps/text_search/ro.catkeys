@@ -1,4 +1,7 @@
-1	romanian	x-vnd.Haiku.TextSearch	3116320782
+1	romanian	x-vnd.Haiku.TextSearch	1180598828
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME nu a putut deschide unul sau mai multe dosare.
+%s: Not enough room to escape the filename.	Grepper		%s: Nu există spațiu suficient pentru a tasta numele de fișier.
+%s: There was a problem running grep.	Grepper		%s: A existat o problemă la rularea grep.
 Actions	GrepWindow		Acțiuni
 Cancel	GrepWindow		Anulează
 Case-sensitive	GrepWindow		Sensibil la majuscule

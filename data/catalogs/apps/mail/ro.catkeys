@@ -1,7 +1,12 @@
-1	romanian	x-vnd.Be-MAIL	1344287101
+1	romanian	x-vnd.Be-MAIL	2276629278
 %d - Date	Mail		%d - Dată
 %e - E-mail address	Mail		%e - Adresă email
+%e wrote:\\n	Mail		%e a scris:\\n
 %n - Full name	Mail		%n - Nume complet
+(Address unavailable)	Mail		(Adresă indisponibilă)
+(Date unavailable)	Mail		(Dată indisponibilă)
+(Name unavailable)	Mail		(Nume indisponibil)
+<none>	Mail		<nimic>
 Account from mail	Mail		Cont de la mail
 Account:	Mail		Cont:
 Accounts…	Mail		Conturi...
@@ -14,6 +19,7 @@ An error occurred trying to save this signature.	Mail		A apărut o eroare când 
 Attach attributes:	Mail		Atașează atribute:
 Attachments:	Mail		Atașamente:
 Auto signature:	Mail		Semnătură auto:
+Automatic	Mail		Automat
 Automatically mark mail as read:	Mail		Marchează automat mailul ca citit:
 Bcc:	Mail		Bcc:
 Beginner	Mail		Începător
@@ -29,6 +35,7 @@ Copy link location	Mail		Copiază locația legăturii
 Copy to new	Mail		Copiază la nou
 Couldn't open this signature. Sorry.	Mail		Nu s-a putut deschide acestă semnătură. Îmi pare rău.
 Cut	Mail		Taie
+Date:	Mail		Dată:
 Decoding:	Mail		Decodare:
 Default account:	Mail		Cont implicit:
 Delete	Mail		Șterge
@@ -57,6 +64,7 @@ Initial spell check mode:	Mail		Mod de corectare ortografică inițială:
 Leave as '%s'	Mail		Menține ca „%s”
 Leave as New	Mail		Menține ca nou
 Leave same	Mail		Menține la fel
+Mail	System name		Email
 Mail couldn't find its dictionary.	Mail		Mail nu a putut găsi dicționarul.
 Mail preferences	Mail		Preferințe email
 Mailing	Mail		Poștă electronică
@@ -68,8 +76,11 @@ New mail message	Mail		Mesaj email nou
 Next	Mail		Următorul
 Next message	Mail		Mesajul următor
 No file attributes, just plain data	Mail		Nu există atribute de fișier, doar date simple
+No matches	Mail		Niciun rezultat
 None	Mail		Nimic
 OK	Mail		Bine
+Off	Mail		Oprit
+On	Mail		Pornit
 Only files can be added as attachments.	Mail		Numai fișierele pot fi adăugate ca atașamente.
 Open	Mail		Deschide
 Open attachment	Mail		Deschide atașament
@@ -82,6 +93,7 @@ Previous	Mail		Precedent
 Previous message	Mail		Mesajul precedent
 Print	Mail		Tipărește
 Print…	Mail		Tipărește
+Put your favorite e-mail queries and query templates in this folder.	Mail		Plasați interogările de email și șabloanele de interogări preferate în acest dosar.
 Queries	Mail		Interogări
 Quit	Mail		Părăsește
 Quote	Mail		Citat
@@ -138,3 +150,11 @@ View	Mail		Vizualizare
 Warn unencodable:	Mail		Avertisment care nu se poate coda:
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Textul dumneavoastră principal conține caractere %ld care nu se pot coda. Este posibil ca un set diferit de caractere să funcționeze mai bine? Apăsați pe Trimite pentru a fi trimis oricum (un caracter de substituție va fi utilizat în locul celor care nu se pot coda), sau alegeți Anulează pentru a merge înapoi să îl reparați.
 \\n - Newline	Mail		\\n - Linie nouă
+draft	B_USER_DIRECTORY/mail/draft		ciornă
+helpful message	Mail		mesaj ajutător
+in	B_USER_DIRECTORY/mail/in		primit
+mail	B_USER_DIRECTORY/mail		email
+out	B_USER_DIRECTORY/mail/out		plecare
+queries	B_USER_DIRECTORY/mail/queries		interogări
+sent	B_USER_DIRECTORY/mail/sent		trimis
+spam	B_USER_DIRECTORY/mail/spam		spam

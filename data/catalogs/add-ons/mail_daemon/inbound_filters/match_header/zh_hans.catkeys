@@ -1,0 +1,14 @@
+1	simplified_chinese	x-vnd.Haiku-MatchHeader	2292311232
+<Choose account>	ConfigView		<选择账户>
+<Choose action>	ConfigView		<选择动作>
+Delete message	ConfigView		删除消息
+If	ConfigView		如果
+Move to	ConfigView		移动到
+Rule filter	RuleFilter		过滤规则
+Set as read	ConfigView		设为读取
+Set flags to	ConfigView		设置标志为
+Then	ConfigView		然后
+has	ConfigView		具有
+header (e.g. Subject)	ConfigView		邮件头（如 主题）
+this field is based on the action	ConfigView		该域基于动作
+value (use REGEX: in from of regular expressions like *spam*)	ConfigView		值（使用 REGEX：利用正则表达式，如 *spam*）

@@ -1,0 +1,16 @@
+1	romanian	x-vnd.Haiku-NewMailNotification	3624191291
+%num new message	filter		%num mesaj nou
+%num new messages	filter		%num mesaje noi
+Alert	ConfigView		Alertă
+Beep	ConfigView		Bip
+Central alert	ConfigView		Alertă centrală
+Central beep	ConfigView		Bip central
+Keyboard LEDs	ConfigView		LEDuri tastatură
+Log window	ConfigView		Fereastră istoric
+Method:	ConfigView		Metodă:
+New mails notification	ConfigView		Înștiințare mailuri noi
+New messages	filter		Mesaje noi
+OK	filter		OK
+You have %num new message for %name.	filter		Ai %num mesaj nou pentru %name.
+You have %num new messages for %name.	filter		Ai %num mesaje noi pentru %name. 
+none	ConfigView		nimic

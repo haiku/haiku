@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-CharacterMap	2137207616
+1	simplified_chinese	x-vnd.Haiku-CharacterMap	1545664922
 Aegean numbers	UnicodeBlocks		爱琴海数字
 Alphabetic presentation forms	UnicodeBlocks		字母表现形式
 Ancient Greek musical notation	UnicodeBlocks		古希腊音乐符号
@@ -43,6 +43,8 @@ Combining diacritical marks supplement	UnicodeBlocks		组合变音符号扩展
 Combining half marks	UnicodeBlocks		组合半形符号
 Control pictures	UnicodeBlocks		控制图形
 Coptic	UnicodeBlocks		科普特语
+Copy as escaped byte string	CharacterView		复制为退格字节字符串
+Copy character	CharacterView		复制字符
 Counting rod numerals	UnicodeBlocks		算筹数字
 Cuneiform	UnicodeBlocks		楔形文字
 Cuneiform numbers and punctuation	UnicodeBlocks		楔形文数字和标点
@@ -118,7 +120,6 @@ Miscellaneous symbols and arrows	UnicodeBlocks		其他符号和箭头
 Miscellaneous technical	UnicodeBlocks		混合专用符号
 Modifier tone letters	UnicodeBlocks		声调修饰字母
 Mongolian	UnicodeBlocks		蒙古语
-Muscial symbols	UnicodeBlocks		音乐符号
 Myanmar	UnicodeBlocks		缅甸文
 N'Ko	UnicodeBlocks		N'Ko
 New Tai Lue	UnicodeBlocks		新傣仂语

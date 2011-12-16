@@ -1,25 +1,39 @@
-1	romanian	x-vnd.Haiku-Mail	3859628432
+1	romanian	x-vnd.Haiku-Mail	3957822883
 Account name:	Config Views		Nume cont:
 Account name:	E-Mail		Nume cont:
+Account settings	AutoConfigWindow		Configurări cont
 Account settings	Config Views		Configurări cont
 Accounts	Config Window		Conturi
 Add	Config Window		Adaugă
 Add filter	Config Views		Adaugă filtru
 Always	Config Window		Întotdeauna
 Apply	Config Window		Aplică
+Back	AutoConfigWindow		Înapoi
 Check every	Config Window		Verifică la fiecare
 Choose Protocol	E-Mail		Alege protocol
+Create new account	AutoConfigWindow		Creează un cont nou
+E-mail	System name		Email
 E-mail address:	E-Mail		Adresă email:
 Edit mailbox menu…	Config Window		Editează meniul cutiei cu mail
+Enter a valid e-mail address.	AutoConfigWindow		Introdu o adresă de email validă.
 Error	Config Window		Eroare
 Error retrieving general settings: %s\n	Config Window		Eroare la obținerea configurărilor generale: %s\n
+Finish	AutoConfigWindow		Termină
+Incoming	Config Window		De primire
+Incoming	E-Mail		De primire
 Incoming mail filters	Config Views		Filtre mailuri de intrare
 Login name:	E-Mail		Nume de autentificare:
 Mail checking	Config Window		Verificare mail
 Miscellaneous	Config Window		Diverse
+Never	Config Window	show status window	Niciodată
+Next	AutoConfigWindow		Înainte
+OK	AutoConfigWindow		OK
 OK	Config Views		Bine
 OK	Config Window		Bine
 Only when dial-up is connected	Config Window		Doar atunci când linia comutată este conectată
+Outgoing	Config Window		De plecare
+Outgoing	E-Mail		De plecare
+Outgoing mail filters	Config Views		Filtre mail de plecare
 Password:	E-Mail		Parolă:
 Real name:	Config Views		Nume real:
 Real name:	E-Mail		Nume real:
@@ -36,6 +50,11 @@ The filter could not be moved. Deleting filter.	Config Views		Filtrul nu a putut
 While sending	Config Window		În timp ce se trimite
 While sending and receiving	Config Window		În timp ce se trimite și se recepționează
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nConfigurările generale nu au putut fi inversate.\n\nEroare la obținerea configurărilor generale:\n%s\n
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nCrează un cont cu butonul Adaugă.\n\nElimină contul selectat cu butonul Elimină.\n\nSelectează un element din listă pentru a schimba configurările acestuia.
+\t\t· E-mail filters	Config Window		\t\t· Filtre email
+\t\t· Incoming	Config Window		\t\t· De primire
+\t\t· Outgoing	Config Window		\t\t· De plecare
 days	Config Window		zile
 hours	Config Window		ore
 minutes	Config Window		minute
+never	Config Window	mail checking frequency	niciodată

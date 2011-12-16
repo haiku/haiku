@@ -1,0 +1,24 @@
+1	romanian	x-vnd.Haiku-DiskUsage	2324691237
+%a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
+%d file	Status View		fișierul %d
+%d files	Status View		%d fișiere
+9999.99 GB	Status View		9999.99 GB
+Created	Info Window		Creat
+DiskUsage	System name		UtilizareDisc
+Free on %refName%	Scanner		Liber pe %refName%
+Get Info	Pie View		Obține informații
+Kind	Info Window		Tip
+Modified	Info Window		Modificat
+Open	Pie View		Deschide
+Open With	Pie View		Deschide cu
+Outdated view	Pie View		Vizualizare depășită
+Path	Info Window		Cale
+Rescan	Pie View		Rescanează
+Rescan	Volume View		Rescanează
+Scan	Status View		Scanează
+Scanning %refName%	Scanner		Se scanează %refName%
+Size	Info Window		Dimensiune
+file unavailable	Pie View		fișier indisponibil
+file unavailable	Status View		fișier indisponibil
+in %d files	Info Window		în %d fișiere
+no supporting apps	Pie View		fără aplicații compatibile

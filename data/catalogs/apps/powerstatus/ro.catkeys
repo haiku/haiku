@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-PowerStatus	1327927202
+1	romanian	x-vnd.Haiku-PowerStatus	2178654445
 About	PowerStatus		despre
 About…	PowerStatus		Despre...
 Battery charging	PowerStatus		Se încarcă bateria
@@ -10,6 +10,7 @@ Capacity granularity 1: 	PowerStatus		Capacitate de granulozitate 1:
 Capacity granularity 2: 	PowerStatus		Capacitate de granulozitate 2:
 Capacity: 	PowerStatus		Capacitate:
 Current rate: 	PowerStatus		Cotă curentă:
+Damaged battery	PowerStatus		Baterie deteriorată
 Design capacity low warning: 	PowerStatus		Avertisment de capacitate redusă model:
 Design capacity warning: 	PowerStatus		Avertisment capacitate model:
 Design capacity: 	PowerStatus		Capacitate model:
@@ -22,6 +23,9 @@ Model number: 	PowerStatus		Numărul modelului:
 OEM info: 	PowerStatus		Info OEM:
 OK	PowerStatus		OK
 Power status box	PowerStatus		Casetă stare consum
+PowerStatus	PowerStatus		StareConsum
+PowerStatus	System name		StareConsum
+PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		StareConsum\nscris de AxelDörfler, Clemens Zeidler\nDrepturi de autor 2006, Haiku, Inc.\n
 Quit	PowerStatus		Părăsește
 Run in window	PowerStatus		Rulează în fereastră
 Serial number: 	PowerStatus		Număr de serie:

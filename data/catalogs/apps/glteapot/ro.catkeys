@@ -1,0 +1,22 @@
+1	romanian	x-vnd.Haiku-GLTeapot	2878465056
+Add a teapot	TeapotWindow		Adaugă un ceainic
+Blue	TeapotWindow		Albastru
+FPS display	TeapotWindow		Afișaj FPS
+File	TeapotWindow		Fișier
+Filled polygons	TeapotWindow		Poligoane completate
+Fog	TeapotWindow		Ceață
+GLTeapot	System name		CeainicGL
+Gouraud shading	TeapotWindow		Umbrire Gouraud
+Green	TeapotWindow		Verde
+Lighting	TeapotWindow		Iluminare
+Lights	TeapotWindow		Lumini
+Lower left	TeapotWindow		Stânga jos
+Off	TeapotWindow		Oprit
+Options	TeapotWindow		Opțiuni
+Perspective	TeapotWindow		Perspectivă
+Quit	TeapotWindow		Părăsește
+Red	TeapotWindow		Roșu
+Right	TeapotWindow		Dreapta
+Upper center	TeapotWindow		Centru sus
+White	TeapotWindow		Alb
+Yellow	TeapotWindow		Galben

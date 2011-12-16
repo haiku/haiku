@@ -1,4 +1,7 @@
-1	romanian	x-vnd.Haiku-Pulse	628764229
+1	romanian	x-vnd.Haiku-Pulse	2324471783
+%.2f GHz	NormalPulseView		%.2f GHz
+%ld MHz	NormalPulseView		%ld MHz
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nDe David Ramsey și Arve Hjønnevåg\nRevizuit de Daniel Switkin\n
 About Pulse…	CPUButton		Despre Puls...
 About Pulse…	PulseView		Despre Puls...
 Active color	ConfigView		Culoare activă
@@ -10,11 +13,15 @@ Deskbar menu	CPUButton		Meniul barei de desktop
 Deskbar mode	MiniPulseView		Mod bară de desktop
 Deskbar mode	NormalPulseView		Mod bară de desktop
 Deskbar mode	PrefsWindow		Mod bară de desktop
+Error	PulseApp		Eroare
 Fade colors	ConfigView		Culori translucide
 Frame color	ConfigView		Culoare cadru
 Idle color	ConfigView		Culoare în așteptare
 Info	CPUButton		Info
 Info	DeskbarPulseView		Info
+Info	PulseApp		Detalii
+Info	PulseView		Detalii
+Installing in Deskbar failed\n%s	PulseApp		Instalarea pe Deskbar a eșuat\n%s
 Mini mode	DeskbarPulseView		Mod mini
 Mini mode	NormalPulseView		Mod mini
 Mini mode	PrefsWindow		Mod mini
@@ -27,10 +34,13 @@ OK	PrefsWindow		OK
 OK	PulseApp		OK
 OK	PulseView		OK
 Pulse	NormalPulseView		Puls
+Pulse	PulseApp		Puls
+Pulse	System name		Puls
 Pulse settings	PulseWindow		Configurări Puls
 Quit	DeskbarPulseView		Părăsește
 Quit	MiniPulseView		Părăsește
 Remove replicant	CPUButton		Elimină replicant
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Eliminarea de pe Deskbar a eșuat.\n%s
 Settings…	PulseView		Configurări...
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Utilizare: Puls [--mini] [-w lățime] [--width=lățime]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
 Width of icon:	ConfigView		Lățimea pictogramei:

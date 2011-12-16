@@ -1,36 +1,32 @@
-1	romanian	x-vnd.Be-TSKB	3366899523
-<Be folder is empty>	BeMenu		<Dosarul Be este vid>
+1	romanian	x-vnd.Be-TSKB	1662766351
 Always on top	PreferencesWindow		Întotdeauna deasupra
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplicații
 Applications	PreferencesWindow		Aplicații
+Auto-hide	PreferencesWindow		Ascundere automată
 Auto-raise	PreferencesWindow		Auto-montează
 Change time…	TimeView		Modifică oră...
 Clock	PreferencesWindow		Ceas
 Close all	WindowMenu		Închide tot
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demo-uri
+Deskbar	System name		Deskbar
+Deskbar preferences	PreferencesWindow		Preferințe Deskbar
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Miniaplicații desktop
 Edit menu…	PreferencesWindow		Editează meniu...
 Expand new applications	PreferencesWindow		Extinde aplicații noi
-Find…	BeMenu		Găsește...
 Hide all	WindowMenu		Ascunde tot
 Hide time	TimeView		Ascunde oră
 Menu	PreferencesWindow		Meniu
-Mount	BeMenu		Montează
 No windows	WindowMenu		Fără ferestre
-Power off	BeMenu		Oprește
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Preferințe
 Quit application	WindowMenu		Părăsește aplicația
-Recent applications	BeMenu		Aplicații recente
 Recent applications:	PreferencesWindow		Aplicații recente:
-Recent documents	BeMenu		Documente recente
 Recent documents:	PreferencesWindow		Documente recente:
-Recent folders	BeMenu		Dosare recente
 Recent folders:	PreferencesWindow		Dosare recente:
-Restart Tracker	BeMenu		Repornește Tracker
-Restart system	BeMenu		Repornește sistem
 Show Time	Tray		Afișează ora
 Show all	WindowMenu		Afișează tot
 Show application expander	PreferencesWindow		Afișează extensorul de aplicație
 Show calendar…	TimeView		Afișează calendar...
-Show replicants	BeMenu		Afișează replicanți
 Show seconds	PreferencesWindow		Afișează secundele
-Shutdown…	BeMenu		Oprește...
 Sort running applications	PreferencesWindow		Sortează aplicațiile pornite
 Tracker always first	PreferencesWindow		Trackerul întotdeauna primul
 Window	PreferencesWindow		Fereastră

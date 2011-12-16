@@ -1,6 +1,7 @@
-1	simplified_chinese	x-vnd.Haiku-TGATranslator	2221210336
+1	simplified_chinese	x-vnd.Haiku-TGATranslator	4159874267
 Ignore TGA alpha channel	TGAView		忽略 TGA 测试频道
 Save with RLE Compression	TGAView		以 RLE 压缩保存
+TGA Image Translator	TGAView		TGA 图像转换器
 TGA Settings	TGAMain		TGA 设置
 TGA image translator	TGATranslator		TGA 图像转换器
 TGA images	TGATranslator		TGA 图像

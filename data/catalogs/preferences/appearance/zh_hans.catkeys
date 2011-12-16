@@ -1,8 +1,10 @@
-1	simplified_chinese	x-vnd.Haiku-Appearance	3187486915
+1	simplified_chinese	x-vnd.Haiku-Appearance	432716834
+About	DecorSettingsView		关于
 Antialiasing	APRWindow		抗锯齿
 Antialiasing menu	AntialiasingSettingsView		抗锯齿菜单
 Antialiasing type:	AntialiasingSettingsView		抗锯齿类型:
 Appearance	System name		外观
+Choose Decorator	DecorSettingsView		选择装饰
 Colors	APRWindow		颜色
 Control background	Colors tab		控件背景
 Control border	Colors tab		控件边界
@@ -23,6 +25,7 @@ Menu item text	Colors tab		菜单项文本
 Monospaced fonts only	AntialiasingSettingsView		仅等宽字体
 Navigation base	Colors tab		快速导航
 Navigation pulse	Colors tab		导航引导
+OK	DecorSettingsView		确定
 Off	AntialiasingSettingsView		关闭
 On	AntialiasingSettingsView		开启
 Panel background	Colors tab		面板背景
@@ -39,5 +42,7 @@ Subpixel based anti-aliasing in combination with glyph hinting is not available 
 Success	Colors tab		成功
 Tooltip background	Colors tab		工具提示背景
 Tooltip text	Colors tab		提示文本
+Window Decorator	APRWindow		窗口装饰
+Window Decorator:	DecorSettingsView		窗口装饰：
 Window tab	Colors tab		窗口选项
 Window tab text	Colors tab		窗口标签文本

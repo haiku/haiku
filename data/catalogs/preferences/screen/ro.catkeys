@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Screen	954862017
+1	romanian	x-vnd.Haiku-Screen	2033930135
 %.1f Hz	Screen		%.1f Hz
 %sSerial no.: %s	Screen		%sNr. serie: %s
 /other…	Screen		/altele...
@@ -29,6 +29,7 @@ Resolution:	Screen		Rezoluție:
 Revert	Screen		Revenire
 Rows:	Screen		Rânduri:
 Screen	Screen		Ecran
+Screen	System name		Ecran
 Screen preferences by the Haiku team	Screen		Preferințe de ecran de echipa Haiku
 Set background…	Screen		Configurează fundal...
 Settings will revert in %seconds seconds.	Screen		Configurările vor reveni în %seconds secunde.
@@ -39,6 +40,7 @@ Undo	Screen		Refă
 Unknown mode	Screen		Mod necunoscut
 Use laptop panel:	Screen		Utilizează panou laptop:
 Video format:	Screen		Format video:
+Warning	Screen		Avertisment
 Workspaces	Screen		Spații de lucru
 always	Screen		întotdeauna
 bits/pixel	Screen		biți/pixel

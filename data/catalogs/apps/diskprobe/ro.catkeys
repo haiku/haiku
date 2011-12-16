@@ -1,16 +1,22 @@
-1	romanian	x-vnd.Haiku-DiskProbe	2962997473
+1	romanian	x-vnd.Haiku-DiskProbe	3441574721
 %ld (native)	ProbeView		%ld (nativ)
 (native)	ProbeView		(nativ)
 15 bit	TypeEditors		15 bit
-16 bit	TypeEditors		16 bit
+16 bit	TypeEditors		16 biți
 16 bit signed value:	TypeEditors		valoare întreagă 16 bit:
-32 bit	TypeEditors		32 bit
+16 bit unsigned value:	TypeEditors		valoare pozitivă 16 biți:
+32 bit	TypeEditors		32 biți
+32 bit signed value:	TypeEditors		valoare 32 biți:
 32 bit size or status:	TypeEditors		stare sau dimensiune 32 bit:
+32 bit unsigned pointer:	TypeEditors		indicator pozitiv 32 biți:
 32 bit unsigned size:	TypeEditors		dimensiune naturală 32 bit:
+32 bit unsigned value:	TypeEditors		valoare pozitivă 32 biți:
 64 bit signed offset:	TypeEditors		decalaj întreg 64 bit:
 64 bit signed value:	TypeEditors		valoare întreagă 64 bit:
+64 bit unsigned value:	TypeEditors		valoare pozitivă 64 biți:
 8 bit palette	TypeEditors		paletă de 8 bit
-8 bit signed value:	TypeEditors		valoare întreagă 8 bit:
+8 bit signed value:	TypeEditors		valoare pozitivă 8 biți:
+8 bit unsigned value:	TypeEditors		valoare pozitivă 8 biți:
 Add	ProbeView		Adaugă
 Attribute	AttributeWindow		Atribut
 Attribute	ProbeView		Atribut
@@ -19,10 +25,12 @@ Attribute type: 	ProbeView		Tip atribut:
 Attribute: 	ProbeView		Atribut:
 Attributes	ProbeView		Atribute
 Back	ProbeView		Înapoi
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Bază
 Block	ProbeView		Bloc
 Block %Ld (0x%Lx)	ProbeView		Bloc %Ld (0x%Lx)
 Block 0x%Lx	ProbeView		Bloc 0x%Lx
 Block: 	ProbeView		Bloc:
+BlockSize	ProbeView	A menu item, a shortened form from 'block size'. This is in the same menu windowthan 'Base' and 'Font size'	DimensiuneBloc
 Bookmarks	ProbeView		Semne de carte
 Boolean	TypeEditors	This is the type of editor	Logic
 Boolean editor	TypeEditors		Editor logic
@@ -44,6 +52,7 @@ Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it i
 Device	ProbeView		Dispozitiv
 Device offset: 	ProbeView		Decalaj dispozitiv:
 Device: 	ProbeView		Dispozitiv:
+DiskProbe	System name		TestareDisc
 DiskProbe request	AttributeWindow		Cerere TestareDisc
 DiskProbe request	DiskProbe		Cerere TestareDisc
 DiskProbe request	ProbeView		Cerere TestareDisc
@@ -116,6 +125,9 @@ Type editor not supported	ProbeView		Editorul de tip nu este suportat
 Undo	ProbeView		Refă
 Unknown format	TypeEditors		Format necunoscut
 Unknown type	TypeEditors		Tip necunoscut
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Vizualizare
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Scrierea în fișier a eșuat.\n%s\n\nToate modificările vor fi pierdute atunci când închideți.
 none	ProbeView	No attributes	nimic
 of 	ProbeView		de
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	din 0x0
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	ce: „%.4s”\n\n

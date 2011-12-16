@@ -1,8 +1,9 @@
-1	romanian	x-vnd.Haiku-Keyboard	1078858058
+1	romanian	x-vnd.Haiku-Keyboard	1711838804
 Defaults	KeyboardWindow		Implicite
 Delay until key repeat	KeyboardView		Întârziere până la repetarea tastei
 Fast	KeyboardView		Rapid
 Key repeat rate	KeyboardView		Rata de repetare a tastei
+Keyboard	System name		Tastatură
 Long	KeyboardView		Lung
 OK	KeyboardApplication		Bine
 Revert	KeyboardWindow		Revenire

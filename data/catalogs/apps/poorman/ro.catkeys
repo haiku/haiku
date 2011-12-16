@@ -1,4 +1,5 @@
-1	romanian	x-vnd.Haiku.PoorMan	3048263345
+1	romanian	x-vnd.Haiku.PoorMan	412131821
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Un dosar web implicit a fost creat la „/boot/home/public_html.”\nAsigură-te că există un fișier HTML cu numele „index.html” în acel dosar.
 About PoorMan…	PoorMan		Despre PoorMan...
 Advanced	PoorMan		Avansat
 Cancel	PoorMan		Anulează
@@ -23,6 +24,7 @@ Error Server	PoorMan		Server de erori
 File	PoorMan		Fișier
 File Name	PoorMan		Nume fișier
 File logging	PoorMan		Înregistrare fișier
+Hits: %lu	PoorMan		Vizite: %lu
 Hits: 0	PoorMan		Vizite: 0
 Log To Console	PoorMan		Înregistrare la consolă
 Log To File	PoorMan		Înregistrare la fișier
@@ -31,6 +33,8 @@ Logging	PoorMan		Înregistrare
 Logging view	PoorMan		Vizualizare înregistrare
 Max. simultaneous connections:	PoorMan		Numărul max. de conexiuni simultane:
 OK	PoorMan		OK
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Alege dosarul de publicat pe web.\n\nPoorMan poate crea unul implicit „public_html” în dosarul personal.\nSau poți selecta unul din dosarele tale.
+PoorMan	System name		PoorMan
 PoorMan settings	PoorMan		Configurări PoorMan
 Quit	PoorMan		Părăsește
 Run server	PoorMan		Pornește server
@@ -44,6 +48,7 @@ Select web folder	PoorMan		Selectează dosar web
 Send file listing if there's no start page	PoorMan		Trimite lista de fișiere dacă nu există o pagină de pornire
 Settings…	PoorMan		Configurări
 Shutting down.	PoorMan		Se oprește.
+Shutting down.\n	PoorMan		Se oprește.\n
 Site	PoorMan		Site
 Start page:	PoorMan		Pagină de pornire:
 Starting up... 	PoorMan		Se pornește...
@@ -53,3 +58,4 @@ Web folder:	PoorMan		Dosar web:
 Website location	PoorMan		Locația site-ului web
 Website options	PoorMan		Opțiuni site web
 connections	PoorMan		conexiuni
+done.\n	PoorMan		gata.\n

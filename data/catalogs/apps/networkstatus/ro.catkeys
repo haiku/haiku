@@ -1,9 +1,16 @@
-1	romanian	x-vnd.Haiku-NetworkStatus	2460883397
+1	romanian	x-vnd.Haiku-NetworkStatus	853756860
+%ifaceName information:\n	NetworkStatusView		Informații despre %ifaceName:\n
+<no wireless networks found>	NetworkStatusView		<nu s-au găsit rețele fără fir>
 Address	NetworkStatusView		Adresă
 Broadcast	NetworkStatusView		Bandă largă
 Configuring	NetworkStatusView		Se configurează
+Could not join wireless network:\n	NetworkStatusView		Nu s-a putut face legătura la rețeaua fără fir:\n
 Install in Deskbar	NetworkStatus		Instalează în bara de desktop
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Lansarea prefletului de rețea a eșuat.\n\nEroare:
 Netmask	NetworkStatusView		Mască de rețea
+NetworkStatus	System name		StareRețea
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Opțiuni StareRețea:\n\t--deskbar\tadaugă automat o copie pe Deskbar\n\t--help\t\ttipărește aceste informații și părăsește\n
+NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		StareRețea\n\tScris de %1 și Hugo Santos\n\t%2, Haiku, Inc.\n
 No link	NetworkStatusView		Nicio legătură
 No stateful configuration	NetworkStatusView		Nicio configurație de stare
 OK	NetworkStatusView		Bine
@@ -12,4 +19,4 @@ Quit	NetworkStatusView		Părăsește
 Ready	NetworkStatusView		Gata
 Run in window	NetworkStatus		Rulează în fereastră
 Unknown	NetworkStatusView		Necunoscut
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Puteți rula StareRețea într-o fereastră sau să-l instalați în bara de desktop.
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Poți rula StareRețea într-o fereastră sau să-l instalezi în Deskbar.

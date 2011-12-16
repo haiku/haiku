@@ -1,17 +1,18 @@
-1	romanian	x-vnd.haiku.zip-o-matic	829498916
+1	romanian	x-vnd.haiku.zip-o-matic	2207848100
 %ld files added.	file:ZipOMaticWindow.cpp		%ld fișiere adăugate.
 1 file added.	file:ZipOMaticWindow.cpp		1 fișier adăugat.
 Archive	file:ZipperThread.cpp		Arhivă
-Archive created OK	file:ZipOMaticWindow.cpp		Arhivă creată OK
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Doriți să opriți crearea acestei arhive?
+Archive created OK	file:ZipOMaticWindow.cpp		Arhivă creată cu succes
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Dorești să oprești crearea acestei arhive?
 Continue	file:ZipOMaticWindow.cpp		Continuă
 Creating archive: %s	file:ZipOMaticWindow.cpp		Se creează arhiva: %s
-Do you want to stop them?	file:ZipOMatic.cpp		Doriți să le opriți?
+Do you want to stop them?	file:ZipOMatic.cpp		Dorești să le oprești?
+Drop files here.	file:ZipOMaticWindow.cpp		Plasează fișiere aici.
 Error creating archive	file:ZipOMaticWindow.cpp		Eroare la crearea arhivei
 Filename: %s	file:ZipOMaticWindow.cpp		Nume fișier: %s
-Let them continue	file:ZipOMatic.cpp		Lăsați să continue
+Let them continue	file:ZipOMatic.cpp		Lasă-le să continue
 Preparing to archive	file:ZipperThread.cpp		Se pregătește de arhivare
 Stop	file:ZipOMaticWindow.cpp		Oprește
-Stop them	file:ZipOMatic.cpp		Opriți
+Stop them	file:ZipOMatic.cpp		Oprește-le
 Stopped	file:ZipOMaticWindow.cpp		Oprit
 You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Aveți %ld Zip-O-Matic pornite.\n\n

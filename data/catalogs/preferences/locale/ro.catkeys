@@ -1,25 +1,31 @@
-1	romanian	x-vnd.Haiku-Locale	2295953467
+1	romanian	x-vnd.Haiku-Locale	1488345554
 12 hour	TimeFormatSettings		12 ore
 24 hour	TimeFormatSettings		24 de ore
 Available languages	Locale Preflet Window		Limbi disponibile
+Cancel	Locale Preflet Window		Anulează
 Currency	TimeFormatSettings		Valută
 Date	TimeFormatSettings		Dată
 Defaults	Locale Preflet Window		Implicite
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Deskbar și Tracker trebuie repornite pentru ca această modificare să aibă efect. Dorești să le repornești acum?
 Formatting	Locale Preflet Window		Formatare
 Full format:	TimeFormatSettings		Format complet:
 Language	Locale Preflet Window		Limbă
 Locale	Locale Preflet		Local
 Locale	Locale Preflet Window		Local
+Locale	System name		Localizare
 Long format:	TimeFormatSettings		Format lung:
 Medium format:	TimeFormatSettings		Format mediu:
 Negative:	TimeFormatSettings		Negativ:
 Numbers	TimeFormatSettings		Numere
 OK	Locale Preflet Window		Bine
+Options	Locale Preflet Window		Opțiuni
 Positive:	TimeFormatSettings		Pozitiv:
 Preferred languages	Locale Preflet Window		Limbă preferată
+Restart	Locale Preflet Window		Repornește
 Revert	Locale Preflet Window		Revenire
 Short format:	TimeFormatSettings		Format scurt:
 Time	TimeFormatSettings		Oră
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Traduce numele dosarului și al aplicației din Deskbar și Tracker.
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Nu s-au putut găsi limbile disponibile! Nu puteți utiliza acest preflet!
 Use month/day-names from preferred language	TimeFormatSettings		Utilizează nume-lună/zi pentru limba preferată
 already chosen	LanguageListView		deja ales

@@ -1,8 +1,11 @@
-1	romanian	x-vnd.Haiku-Appearance	3187486915
+1	romanian	x-vnd.Haiku-Appearance	168322075
+About	DecorSettingsView		Despre
+About Decorator	DecorSettingsView		Despre Decorator
 Antialiasing	APRWindow		Anti-alias
 Antialiasing menu	AntialiasingSettingsView		Meniu anticrenelare
 Antialiasing type:	AntialiasingSettingsView		Tip de anti-alias:
 Appearance	System name		Aspect
+Choose Decorator	DecorSettingsView		Alege decorator
 Colors	APRWindow		Culori
 Control background	Colors tab		Fundalul controlului   
 Control border	Colors tab		Margine de control
@@ -15,6 +18,7 @@ Failure	Colors tab		Eşec
 Glyph hinting:	AntialiasingSettingsView		Indiciu glyph:
 Grayscale	AntialiasingSettingsView		Scală de gri
 Hinting menu	AntialiasingSettingsView		Meniu de sugestii
+Inactive window border	Colors tab		Margine fereastră inactivă
 Inactive window tab	Colors tab		Fereastră tab inactivă
 Inactive window tab text	Colors tab		Text de fereastră tab inactivă
 LCD subpixel	AntialiasingSettingsView		Subpixel LCD
@@ -23,6 +27,7 @@ Menu item text	Colors tab		Text de element meniu
 Monospaced fonts only	AntialiasingSettingsView		Doar fonturi monospațiate
 Navigation base	Colors tab		Bază de navigare
 Navigation pulse	Colors tab		Puls de navigare
+OK	DecorSettingsView		OK
 Off	AntialiasingSettingsView		Oprit
 On	AntialiasingSettingsView		Pornit
 Panel background	Colors tab		Fundalul panoului
@@ -39,5 +44,8 @@ Subpixel based anti-aliasing in combination with glyph hinting is not available 
 Success	Colors tab		Succes
 Tooltip background	Colors tab		Fundalul indiciului
 Tooltip text	Colors tab		Text de indiciu
+Window Decorator	APRWindow		Decorator fereastră
+Window Decorator:	DecorSettingsView		Decorator fereastră:
+Window border	Colors tab		Margine fereastră
 Window tab	Colors tab		Tab de fereastră
 Window tab text	Colors tab		Text fereastră tab

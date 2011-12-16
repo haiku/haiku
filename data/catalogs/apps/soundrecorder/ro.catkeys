@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-SoundRecorder	1948114706
+1	romanian	x-vnd.Haiku-SoundRecorder	2122042546
 Cannot connect to media server	RecorderWindow		Nu se poate conecta la serverul media
 Cannot connect to the selected sound input	RecorderWindow		Nu se poate conecta la intrarea de sunet selectată
 Cannot find an unused name to use for the new recording	RecorderWindow		Nu se poate găsi un nume neutilizat pentru înregistrarea nouă
@@ -32,6 +32,7 @@ Sample size: 	RecorderWindow		Dimensiune mostră:
 Save	RecorderWindow		Salvează
 Some of the files don't appear to be audio files	RecorderWindow		Unele fișiere nu par a fi niște fișiere audio
 Sound List	RecorderWindow		Listă de sunet
+SoundRecorder	System name		InregistrareSunet
 Stop	RecorderWindow		Oprește
 bits	RecorderWindow		biți
 seconds	RecorderWindow		secunde

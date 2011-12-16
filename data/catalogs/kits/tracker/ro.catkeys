@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	1141294788
+1	romanian	x-vnd.Haiku-libtracker	3430048979
 1 item	CountView		1 element
 32 x 32	ContainerWindow		32 x 32
 32 x 32	DeskWindow		32 x 32
@@ -79,7 +79,6 @@ Disk mount settings	AutoMounterSettings		Configurări montare disc
 Disk mounting during boot	AutoMounterSettings		Montare de disc în timpul pornirii sistemului
 Disks	DirMenu		Discuri
 Disks	Model		Discuri
-Do it	FSUtils		Realizează
 Does not handle file	OpenWithWindow		Nu gestionează fișierul
 Don't automount	AutoMounterSettings		Nu automonta
 Don't move files to Trash	SettingsView		Nu muta fișierele la gunoi

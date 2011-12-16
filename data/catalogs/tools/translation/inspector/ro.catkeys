@@ -1,5 +1,7 @@
-1	romanian	x.vnd.OBOS-Inspector	3342712756
+1	romanian	x.vnd.OBOS-Inspector	2075781936
+Active Translators	ImageWindow		Traducători activi
 Active Translators	InspectorApp		Traducători activi
+Bummer	ImageWindow		Bine
 File	ImageWindow		Fișier
 First Page	ImageWindow		Prima pagină
 Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Imagine: %1\nSpațiu culoare: %2 (%3)\nDimensiuni: %4 x %5\nBiți pe rând: %6\nTotal biți : %7\n\nInfo identificare:\nȘir ID: %8\nTip MIME: %9\nTip: „%10” (%11)\nID traducător: %12\nGrup: „%13” (%14)\nCalitate: %15\nCapacitate: %16\n\nInfo extensie:\n
@@ -9,6 +11,8 @@ Last Page	ImageWindow		Ultima pagină
 Next Page	ImageWindow		Pagina următoare
 No image available to save.	ImageWindow		Nu este disponibilă nicio imagine de salvat.
 Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Număr de documete: %1\n\nTraducător utilizat:\nNume: %2\nInfo: %3\nVersiune: %4\n
+OK	ImageView		OK
+OK	ImageWindow		OK
 Open...	ImageWindow		Deschide...
 Previous Page	ImageWindow		Pagina anterioară
 Quit	ImageWindow		Părăsește
@@ -19,6 +23,7 @@ Sorry, unable to load the image.	ImageView		Îmi pare rău, nu s-a putut încăr
 Sorry, unable to write the image file.	ImageView		Îmi pare rău, nu s-a putut scrie fișierul imagine.
 System Translators	ActiveTranslatorsWindow		Traducători de sistem
 Unknown	ImageView		Necunoscut
+User Translators	ActiveTranslatorsWindow		Traducători ai utilizatorului
 View	ImageWindow		Vizualizare
 Window	ImageWindow		Fereastră
 \nInput Formats:	ImageView		\nFormate de intrare:

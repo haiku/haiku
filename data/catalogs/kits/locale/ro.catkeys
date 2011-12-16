@@ -1,13 +1,34 @@
-1	romanian	x-vnd.Haiku-libbe	1624661606
+1	romanian	system	180647795
 %.2f TiB	StringForSize		%.2f TiB
 %3.2f GiB	StringForSize		%3.2f GiB
 %3.2f KiB	StringForSize		%3.2f KiB
 %3.2f MiB	StringForSize		%3.2f MiB
 %d bytes	StringForSize		%d octeți
+<empty>	Menu		<liber>
+About %app%	AboutMenuItem		Despre %app%
+About %app…	Dragger		Despre %app...
 About…	AboutWindow		Despre...
 Blue:	ColorControl		Albastru:
+Can't delete this replicant from its original application. Life goes on.	Dragger		Nu se poate șterge această copie din locația originală. Viața merge mai departe.
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nu se poate crea copie pentru „%description”.\n%error
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nu se poate găsi aplicația pentru copie. Nu a fost furnizată nicio semnătură de aplicație.\n%error
 Close	AboutWindow		Închide
+Copy	TextView		Copiază
 Copyright © %years% Haiku, Inc.	AboutWindow		Drepturi de autor © %years% Haiku, Inc.
+Cut	TextView		Taie
+Error	PrintJob		Eroare
+Error	ZombieReplicantView		Eroare
 Green:	ColorControl		Verde:
+No Pages to print!	PrintJob		Nu sunt pagini de imprimat!
+OK	Dragger		OK
+OK	PrintJob		OK
+OK	ZombieReplicantView		OK
+Paste	TextView		Lipește
+Print Server is not responding.	PrintJob		Serverul de imprimare nu răspunde.
 Red:	ColorControl		Roșu:
+Redo	TextView		Repetă
+Remove replicant	Dragger		Elimină copie
+Select All	TextView		Selectează tot
+Undo	TextView		Refă
+Warning	Dragger		Avertisment
 Written by:	AboutWindow		Scris de:
