@@ -47,7 +47,7 @@ switch $(HAIKU_BUILD_PROFILE) {
 		HAIKU_STRIP_DEBUG_FROM_OPTIONAL_PACKAGES = 1 ;
 
 		AddOptionalHaikuImagePackages Pe Nano Vision P7zip XZ-Utils ;
-		AddOptionalHaikuImagePackages Development Subversion OpenSSH OpenSSL ;
+		AddOptionalHaikuImagePackages Development Git OpenSSH OpenSSL ;
 	}
 }
 
