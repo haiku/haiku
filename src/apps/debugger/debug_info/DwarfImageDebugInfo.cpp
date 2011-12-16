@@ -495,7 +495,7 @@ DwarfImageDebugInfo::GetAddressSectionType(target_addr_t address)
 status_t
 DwarfImageDebugInfo::CreateFrame(Image* image,
 	FunctionInstance* functionInstance, CpuState* cpuState,
-	StackFrame*& _previousFrame, CpuState*& _previousCpuState)
+	StackFrame*& _frame, CpuState*& _previousCpuState)
 {
 	DwarfFunctionDebugInfo* function = dynamic_cast<DwarfFunctionDebugInfo*>(
 		functionInstance->GetFunctionDebugInfo());
@@ -634,8 +634,10 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 		instructionPointer, functionInstance->Address() - fRelocationDelta,
 		subprogramEntry->Variables(), subprogramEntry->Blocks());
 
-	_previousFrame = frameReference.Detach();
+	_frame = frameReference.Detach();
 	_previousCpuState = previousCpuStateReference.Detach();
+
+	frame->SetPreviousCpuState(_previousCpuState);
 
 	return B_OK;
 }

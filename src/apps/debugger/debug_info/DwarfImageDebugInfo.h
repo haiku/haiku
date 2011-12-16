@@ -61,7 +61,7 @@ public:
 	virtual	status_t			CreateFrame(Image* image,
 									FunctionInstance* functionInstance,
 									CpuState* cpuState,
-									StackFrame*& _previousFrame,
+									StackFrame*& _frame,
 									CpuState*& _previousCpuState);
 	virtual	status_t			GetStatement(FunctionDebugInfo* function,
 									target_addr_t address,

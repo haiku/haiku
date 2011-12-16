@@ -265,7 +265,7 @@ ArchitectureX86::CreateCpuState(const void* cpuStateData, size_t size,
 
 status_t
 ArchitectureX86::CreateStackFrame(Image* image, FunctionDebugInfo* function,
-	CpuState* _cpuState, bool isTopFrame, StackFrame*& _previousFrame,
+	CpuState* _cpuState, bool isTopFrame, StackFrame*& _frame,
 	CpuState*& _previousCpuState)
 {
 	CpuStateX86* cpuState = dynamic_cast<CpuStateX86*>(_cpuState);
@@ -382,11 +382,12 @@ ArchitectureX86::CreateStackFrame(Image* image, FunctionDebugInfo* function,
 		previousCpuState->SetIntRegister(X86_REGISTER_EBP,
 			previousFramePointer);
 		previousCpuState->SetIntRegister(X86_REGISTER_EIP, returnAddress);
+		frame->SetPreviousCpuState(previousCpuState);
 	}
 
 	frame->SetReturnAddress(returnAddress);
 
-	_previousFrame = frameReference.Detach();
+	_frame = frameReference.Detach();
 	_previousCpuState = previousCpuState;
 	return B_OK;
 }
