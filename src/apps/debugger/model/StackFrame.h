@@ -55,6 +55,10 @@ public:
 			target_addr_t		InstructionPointer() const
 									{ return fInstructionPointer; }
 
+			CpuState*			GetPreviousCpuState() const
+									{ return fPreviousCpuState; }
+			void				SetPreviousCpuState(CpuState* state);
+
 			target_addr_t		ReturnAddress() const { return fReturnAddress; }
 			void				SetReturnAddress(target_addr_t address);
 
@@ -89,6 +93,7 @@ private:
 private:
 			stack_frame_type	fType;
 			CpuState*			fCpuState;
+			CpuState*			fPreviousCpuState;
 			target_addr_t		fFrameAddress;
 			target_addr_t		fInstructionPointer;
 			target_addr_t		fReturnAddress;

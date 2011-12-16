@@ -25,6 +25,7 @@ StackFrame::StackFrame(stack_frame_type type, CpuState* cpuState,
 	:
 	fType(type),
 	fCpuState(cpuState),
+	fPreviousCpuState(NULL),
 	fFrameAddress(frameAddress),
 	fInstructionPointer(instructionPointer),
 	fReturnAddress(0),
@@ -49,6 +50,7 @@ StackFrame::~StackFrame()
 
 	SetImage(NULL);
 	SetFunction(NULL);
+	SetPreviousCpuState(NULL);
 
 	fDebugInfo->ReleaseReference();
 	fCpuState->ReleaseReference();
@@ -79,6 +81,18 @@ StackFrame::Init()
 	return B_OK;
 }
 
+
+void
+StackFrame::SetPreviousCpuState(CpuState* state)
+{
+	if (fPreviousCpuState != NULL)
+		fPreviousCpuState->ReleaseReference();
+
+	fPreviousCpuState = state;
+
+	if (fPreviousCpuState != NULL)
+		fPreviousCpuState->AcquireReference();
+}
 
 void
 StackFrame::SetReturnAddress(target_addr_t address)
