@@ -37,6 +37,8 @@ extern "C" void _sPrintf(const char* format, ...);
 status_t
 pll_limit_probe(pll_info* pll)
 {
+	radeon_shared_info &info = *gInfo->shared_info;
+
 	uint8 tableMajor;
 	uint8 tableMinor;
 	uint16 tableOffset;
@@ -113,6 +115,12 @@ pll_limit_probe(pll_info* pll)
 		firmwareInfo->info.usMinPixelClockPLL_Input) * 10;
 	pll->pllInMax = B_LENDIAN_TO_HOST_INT16(
 		firmwareInfo->info.usMaxPixelClockPLL_Input) * 10;
+
+	if (info.dceMajor >= 4) {
+		pll->dpExternalClock = B_LENDIAN_TO_HOST_INT16(
+			firmwareInfo->info_21.usUniphyDPModeExtClkFreq);
+	} else
+		pll->dpExternalClock = 0;
 
 	TRACE("%s: referenceFreq: %" B_PRIu16 "; pllOutMin: %" B_PRIu16 "; "
 		" pllOutMax: %" B_PRIu16 "; pllInMin: %" B_PRIu16 ";"

@@ -282,60 +282,46 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
 			if (info.dceMajor >= 4) {
-				//atombios_dig_transmitter_setup(encoder,
-				//	ATOM_TRANSMITTER_ACTION_DISABLE, 0, 0);
-					// TODO: Disable the dig transmitter
+				// Disable DIG transmitter
+				transmitter_dig_setup(connectorIndex, pixelClock, 0, 0,
+					ATOM_TRANSMITTER_ACTION_DISABLE);
+				// Setup DIG encoder
 				encoder_dig_setup(connectorIndex, pixelClock,
 					ATOM_ENCODER_CMD_SETUP);
-					// Setup and enable the dig encoder
-
-				//atombios_dig_transmitter_setup(encoder,
-				//	ATOM_TRANSMITTER_ACTION_ENABLE, 0, 0);
-					// TODO: Enable the dig transmitter
+				// Enable DIG transmitter
+				transmitter_dig_setup(connectorIndex, pixelClock, 0, 0,
+					ATOM_TRANSMITTER_ACTION_ENABLE);
 			} else {
-				//atombios_dig_transmitter_setup(encoder,
-				//	ATOM_TRANSMITTER_ACTION_DISABLE, 0, 0);
-					// Disable the dig transmitter
+				// Disable DIG transmitter
+				transmitter_dig_setup(connectorIndex, pixelClock, 0, 0,
+					ATOM_TRANSMITTER_ACTION_DISABLE);
+				// Disable DIG encoder
 				encoder_dig_setup(connectorIndex, pixelClock, ATOM_DISABLE);
-					// Disable the dig encoder
-
-				/* setup and enable the encoder and transmitter */
+				// Enable the DIG encoder
 				encoder_dig_setup(connectorIndex, pixelClock, ATOM_ENABLE);
-					// Setup and enable the dig encoder
 
-				//atombios_dig_transmitter_setup(encoder,
-				//	ATOM_TRANSMITTER_ACTION_SETUP, 0, 0);
-				//atombios_dig_transmitter_setup(encoder,
-				//	ATOM_TRANSMITTER_ACTION_ENABLE, 0, 0);
-					// TODO: Setup and Enable the dig transmitter
+				// Setup and enable DIG transmitter
+				transmitter_dig_setup(connectorIndex, pixelClock, 0, 0,
+					ATOM_TRANSMITTER_ACTION_SETUP);
+				transmitter_dig_setup(connectorIndex, pixelClock, 0, 0,
+					ATOM_TRANSMITTER_ACTION_ENABLE);
 			}
-
-			TRACE("%s: TODO for DIG encoder setup\n", __func__);
 			break;
 		case ENCODER_OBJECT_ID_INTERNAL_DDI:
 		case ENCODER_OBJECT_ID_INTERNAL_DVO1:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DVO1:
 			TRACE("%s: TODO for DVO encoder setup\n", __func__);
 			break;
-		case ENCODER_OBJECT_ID_TRAVIS: // external DP -> LVDS encoder
-		case ENCODER_OBJECT_ID_NUTMEG: // external DP -> VGA encoder
-		case ENCODER_OBJECT_ID_SI170B:
-		case ENCODER_OBJECT_ID_CH7303:
-		case ENCODER_OBJECT_ID_EXTERNAL_SDVOA:
-		case ENCODER_OBJECT_ID_EXTERNAL_SDVOB:
-		case ENCODER_OBJECT_ID_TITFP513:
-		case ENCODER_OBJECT_ID_VT1623:
-		case ENCODER_OBJECT_ID_HDMI_SI1930:
-			if (info.dceMajor >= 4 && info.dceMinor >= 1) {
-				encoder_external_setup(connectorIndex, pixelClock,
-					EXTERNAL_ENCODER_ACTION_V3_ENCODER_SETUP);
-			} else {
-				encoder_external_setup(connectorIndex, pixelClock,
-					ATOM_ENABLE);
-			}
-			break;
-		default:
-			TRACE("%s: TODO for unknown encoder setup!\n", __func__);
+	}
+
+	if (gConnector[connectorIndex]->encoder.isExternal == true) {
+		if (info.dceMajor >= 4 && info.dceMinor >= 1) {
+			encoder_external_setup(connectorIndex, pixelClock,
+				EXTERNAL_ENCODER_ACTION_V3_ENCODER_SETUP);
+		} else {
+			encoder_external_setup(connectorIndex, pixelClock,
+				ATOM_ENABLE);
+		}
 	}
 
 	encoder_apply_quirks(id);
@@ -947,6 +933,349 @@ encoder_analog_load_detect(uint32 connectorIndex)
 
 	}
 	return false;
+}
+
+
+status_t
+transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
+	uint8 laneNumber, uint8 laneSet, int command)
+{
+
+	uint16 encoderID = gConnector[connectorIndex]->encoder.objectID;
+	int index;
+	switch (encoderID) {
+		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DVO1:
+			index = GetIndexIntoMasterTable(COMMAND, DVOOutputControl);
+			break;
+		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY:
+		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
+		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
+			index = GetIndexIntoMasterTable(COMMAND, UNIPHYTransmitterControl);
+			break;
+		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
+			index = GetIndexIntoMasterTable(COMMAND, LVTMATransmitterControl);
+			break;
+		default:
+			ERROR("%s: called on non-dig encoder!\n", __func__);
+			return B_ERROR;
+	}
+
+	uint8 tableMajor;
+	uint8 tableMinor;
+
+	if (atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor)
+		!= B_OK)
+		return B_ERROR;
+
+	// Prepare AtomBIOS arguments
+	union digTransmitterControl {
+		DIG_TRANSMITTER_CONTROL_PS_ALLOCATION v1;
+		DIG_TRANSMITTER_CONTROL_PARAMETERS_V2 v2;
+		DIG_TRANSMITTER_CONTROL_PARAMETERS_V3 v3;
+		DIG_TRANSMITTER_CONTROL_PARAMETERS_V4 v4;
+	};
+	union digTransmitterControl args;
+	memset(&args, 0, sizeof(args));
+
+	int connectorObjectID
+		= (gConnector[connectorIndex]->objectID & OBJECT_ID_MASK)
+			>> OBJECT_ID_SHIFT;
+	uint32 encoderObjectID = gConnector[connectorIndex]->encoder.objectID;
+	uint32 digEncoderID = encoder_pick_dig(connectorIndex);
+
+	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
+
+	bool isDP = connector_is_dp(connectorIndex);
+	bool linkB = gConnector[connectorIndex]->encoder.linkEnumeration
+		== GRAPH_OBJECT_ENUM_ID2 ? true : false;
+
+	uint8 dpClock = 0;
+	int dpLaneCount = 0;
+	if (gDPInfo[connectorIndex]->valid == true) {
+		dpClock = gDPInfo[connectorIndex]->clock;
+		dpLaneCount = gDPInfo[connectorIndex]->laneCount;
+	}
+
+	switch (tableMajor) {
+		case 1:
+			switch (tableMinor) {
+				case 1:
+					args.v1.ucAction = command;
+					if (command == ATOM_TRANSMITTER_ACTION_INIT) {
+						args.v1.usInitInfo
+							= B_HOST_TO_LENDIAN_INT16(connectorObjectID);
+					} else if (command
+						== ATOM_TRANSMITTER_ACTION_SETUP_VSEMPH) {
+						args.v1.asMode.ucLaneSel = laneNumber;
+						args.v1.asMode.ucLaneSet = laneSet;
+					} else {
+						if (isDP) {
+							args.v1.usPixelClock
+								= B_HOST_TO_LENDIAN_INT16(dpClock / 10);
+						} else if (pixelClock > 165000) {
+							args.v1.usPixelClock = B_HOST_TO_LENDIAN_INT16(
+								(pixelClock / 2) / 10);
+						} else {
+							args.v1.usPixelClock
+								= B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
+						}
+					}
+
+					args.v1.ucConfig = ATOM_TRANSMITTER_CONFIG_CLKSRC_PPLL;
+
+					if (digEncoderID > 0) {
+						args.v1.ucConfig
+							|= ATOM_TRANSMITTER_CONFIG_DIG2_ENCODER;
+					} else {
+						args.v1.ucConfig
+							|= ATOM_TRANSMITTER_CONFIG_DIG1_ENCODER;
+					}
+
+					// TODO: IGP DIG Transmitter setup
+					#if 0
+					if ((rdev->flags & RADEON_IS_IGP) && (encoderObjectID
+						== ENCODER_OBJECT_ID_INTERNAL_UNIPHY)) {
+						if (is_dp || (radeon_encoder->pixel_clock <= 165000)) {
+							if (igp_lane_info & 0x1)
+								args.v1.ucConfig
+									|= ATOM_TRANSMITTER_CONFIG_LANE_0_3;
+							else if (igp_lane_info & 0x2)
+								args.v1.ucConfig
+									|= ATOM_TRANSMITTER_CONFIG_LANE_4_7;
+							else if (igp_lane_info & 0x4)
+								args.v1.ucConfig
+									|= ATOM_TRANSMITTER_CONFIG_LANE_8_11;
+							else if (igp_lane_info & 0x8)
+								args.v1.ucConfig
+									|= ATOM_TRANSMITTER_CONFIG_LANE_12_15;
+						} else {
+							if (igp_lane_info & 0x3)
+								args.v1.ucConfig
+									|= ATOM_TRANSMITTER_CONFIG_LANE_0_7;
+							else if (igp_lane_info & 0xc)
+								args.v1.ucConfig
+									|= ATOM_TRANSMITTER_CONFIG_LANE_8_15;
+						}
+					}
+					#endif
+
+					if (linkB == true)
+						args.v1.ucConfig |= ATOM_TRANSMITTER_CONFIG_LINKB;
+					else
+						args.v1.ucConfig |= ATOM_TRANSMITTER_CONFIG_LINKA;
+
+					if (isDP)
+						args.v1.ucConfig |= ATOM_TRANSMITTER_CONFIG_COHERENT;
+					else if ((gConnector[connectorIndex]->encoder.flags
+						& ATOM_DEVICE_DFP_SUPPORT) != 0) {
+						if (1) {
+							// if coherentMode, i've only ever seen it true
+							args.v1.ucConfig
+								|= ATOM_TRANSMITTER_CONFIG_COHERENT;
+						}
+						if (pixelClock > 165000) {
+							args.v1.ucConfig
+								|= ATOM_TRANSMITTER_CONFIG_8LANE_LINK;
+						}
+					}
+					break;
+				case 2:
+					args.v2.ucAction = command;
+					if (command == ATOM_TRANSMITTER_ACTION_INIT) {
+						args.v2.usInitInfo
+							= B_HOST_TO_LENDIAN_INT16(connectorObjectID);
+					} else if (command
+						== ATOM_TRANSMITTER_ACTION_SETUP_VSEMPH) {
+						args.v2.asMode.ucLaneSel = laneNumber;
+						args.v2.asMode.ucLaneSet = laneSet;
+					} else {
+						if (isDP) {
+							args.v2.usPixelClock
+								= B_HOST_TO_LENDIAN_INT16(dpClock / 10);
+						} else if (pixelClock > 165000) {
+							args.v2.usPixelClock = B_HOST_TO_LENDIAN_INT16(
+								(pixelClock / 2) / 10);
+						} else {
+							args.v2.usPixelClock
+								= B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
+						}
+					}
+					args.v2.acConfig.ucEncoderSel = digEncoderID;
+					if (linkB)
+						args.v2.acConfig.ucLinkSel = 1;
+
+					switch (encoderObjectID) {
+						case ENCODER_OBJECT_ID_INTERNAL_UNIPHY:
+							args.v2.acConfig.ucTransmitterSel = 0;
+							break;
+						case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
+							args.v2.acConfig.ucTransmitterSel = 1;
+							break;
+						case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
+							args.v2.acConfig.ucTransmitterSel = 2;
+							break;
+					}
+
+					if (isDP) {
+						args.v2.acConfig.fCoherentMode = 1;
+						args.v2.acConfig.fDPConnector = 1;
+					} else if ((gConnector[connectorIndex]->encoder.flags
+						& ATOM_DEVICE_DFP_SUPPORT) != 0) {
+						if (1) {
+							// if coherentMode, i've only ever seen it true
+							args.v2.acConfig.fCoherentMode = 1;
+						}
+
+						if (pixelClock > 165000)
+							args.v2.acConfig.fDualLinkConnector = 1;
+					}
+					break;
+				case 3:
+					args.v3.ucAction = command;
+					if (command == ATOM_TRANSMITTER_ACTION_INIT) {
+						args.v3.usInitInfo
+							= B_HOST_TO_LENDIAN_INT16(connectorObjectID);
+					} else if (command
+						== ATOM_TRANSMITTER_ACTION_SETUP_VSEMPH) {
+						args.v3.asMode.ucLaneSel = laneNumber;
+						args.v3.asMode.ucLaneSet = laneSet;
+					} else {
+						if (isDP) {
+							args.v3.usPixelClock
+								= B_HOST_TO_LENDIAN_INT16(dpClock / 10);
+						} else if (pixelClock > 165000) {
+							args.v3.usPixelClock = B_HOST_TO_LENDIAN_INT16(
+								(pixelClock / 2) / 10);
+						} else {
+							args.v3.usPixelClock
+								= B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
+						}
+					}
+
+					if (isDP)
+						args.v3.ucLaneNum = dpLaneCount;
+					else if (pixelClock > 165000)
+						args.v3.ucLaneNum = 8;
+					else
+						args.v3.ucLaneNum = 4;
+
+					if (linkB == true)
+						args.v3.acConfig.ucLinkSel = 1;
+					if (digEncoderID & 1)
+						args.v3.acConfig.ucEncoderSel = 1;
+
+					// Select the PLL for the PHY
+					// DP PHY to be clocked from external src if possible
+					if (isDP && pll->dpExternalClock) {
+						// use external clock source
+						args.v3.acConfig.ucRefClkSource = 2;
+					} else
+						args.v3.acConfig.ucRefClkSource = pll->id;
+
+					switch (encoderObjectID) {
+						case ENCODER_OBJECT_ID_INTERNAL_UNIPHY:
+							args.v3.acConfig.ucTransmitterSel = 0;
+							break;
+						case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
+							args.v3.acConfig.ucTransmitterSel = 1;
+							break;
+						case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
+							args.v3.acConfig.ucTransmitterSel = 2;
+							break;
+					}
+
+					if (isDP)
+						args.v3.acConfig.fCoherentMode = 1;
+					else if ((gConnector[connectorIndex]->encoder.flags
+						& ATOM_DEVICE_DFP_SUPPORT) != 0) {
+						if (1) {
+							// if coherentMode, i've only ever seen it true
+							args.v3.acConfig.fCoherentMode = 1;
+						}
+						if (pixelClock > 165000)
+							args.v3.acConfig.fDualLinkConnector = 1;
+					}
+					break;
+				case 4:
+					args.v4.ucAction = command;
+					if (command == ATOM_TRANSMITTER_ACTION_INIT) {
+						args.v4.usInitInfo
+							= B_HOST_TO_LENDIAN_INT16(connectorObjectID);
+					} else if (command
+						== ATOM_TRANSMITTER_ACTION_SETUP_VSEMPH) {
+						args.v4.asMode.ucLaneSel = laneNumber;
+						args.v4.asMode.ucLaneSet = laneSet;
+					} else {
+						if (isDP) {
+							args.v4.usPixelClock
+								= B_HOST_TO_LENDIAN_INT16(dpClock / 10);
+						} else if (pixelClock > 165000) {
+							args.v4.usPixelClock = B_HOST_TO_LENDIAN_INT16(
+								(pixelClock / 2) / 10);
+						} else {
+							args.v4.usPixelClock
+								= B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
+						}
+					}
+
+					if (isDP)
+						args.v4.ucLaneNum = dpLaneCount;
+					else if (pixelClock > 165000)
+						args.v4.ucLaneNum = 8;
+					else
+						args.v4.ucLaneNum = 4;
+
+					if (linkB == true)
+						args.v4.acConfig.ucLinkSel = 1;
+					if (digEncoderID & 1)
+						args.v4.acConfig.ucEncoderSel = 1;
+
+					// Select the PLL for the PHY
+					// DP PHY to be clocked from external src if possible
+					if (isDP) {
+						if (pll->dpExternalClock > 0) {
+							args.v4.acConfig.ucRefClkSource
+								= ENCODER_REFCLK_SRC_EXTCLK;
+						} else {
+							args.v4.acConfig.ucRefClkSource
+								= ENCODER_REFCLK_SRC_DCPLL;
+						}
+					} else
+						args.v4.acConfig.ucRefClkSource = pll->id;
+
+					switch (encoderObjectID) {
+						case ENCODER_OBJECT_ID_INTERNAL_UNIPHY:
+							args.v4.acConfig.ucTransmitterSel = 0;
+							break;
+						case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
+							args.v4.acConfig.ucTransmitterSel = 1;
+							break;
+						case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
+							args.v4.acConfig.ucTransmitterSel = 2;
+							break;
+					}
+
+					if (isDP)
+						args.v4.acConfig.fCoherentMode = 1;
+					else if ((gConnector[connectorIndex]->encoder.flags
+						& ATOM_DEVICE_DFP_SUPPORT) != 0) {
+						if (1) {
+							// if coherentMode, i've only ever seen it true
+							args.v4.acConfig.fCoherentMode = 1;
+						}
+						if (pixelClock > 165000)
+							args.v4.acConfig.fDualLinkConnector = 1;
+					}
+					break;
+				default:
+					ERROR("%s: unknown table version\n", __func__);
+			}
+			break;
+		default:
+			ERROR("%s: unknown table version\n", __func__);
+	}
+
+	return atom_execute_table(gAtomContext, index, (uint32*)&args);
 }
 
 

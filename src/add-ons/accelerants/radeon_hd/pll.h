@@ -48,6 +48,9 @@ struct pll_info {
 	/* pixel clock to be programmed (kHz)*/
 	uint32 pixelClock;
 
+	/* external DisplayPort clock freq */
+	uint32 dpExternalClock;
+
 	/* flags for the current clock */
 	uint32 flags;
 
