@@ -608,10 +608,12 @@ POP3Protocol::CheckForDeletedMessages()
 		Delete(fUniqueIDs.IndexOf(toDelete.StringAt(i)));
 	}
 
-	//*(unique_ids) -= to_delete; --- This line causes bad things to
-	// happen (POP3 client uses the wrong indices to retrieve
-	// messages).  Without it, bad things don't happen.
+	// Don't remove ids from fUniqueIDs, the indices have to stay the same when
+	// retrieving new messages.
 	fManifest.Remove(toDelete);
+
+	// TODO: at some point the purged manifest should be written to disk
+	// otherwise it will grow forever
 }
 
 
