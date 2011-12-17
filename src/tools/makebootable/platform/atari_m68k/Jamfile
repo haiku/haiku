@@ -9,4 +9,4 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin makebootable platform
 #AddFileDataResource <build>makebootable : RAWT:666:BootCode : stage1.bin ;
 
 #BuildPlatformMain <build>makebootable : makebootable.cpp : $(HOST_LIBBE) ;
-BuildPlatformMain <build>makebootable : makebootable.cpp ;
+BuildPlatformMain <build>makebootable : makebootable.cpp : $(HOST_LIBSTDC++) ;
