@@ -109,6 +109,7 @@ FindPanel::FindPanel(BRect rect)
 		sPreviousFind.String(), new BMessage(M_FIND_STRING_CHANGED),
 		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 
+	fTextControl->SetModificationMessage(new BMessage(M_FIND_STRING_CHANGED));
 	fTextControl->SetText(sPreviousFind.String());
 	fTextControl->MakeFocus();
 	AddChild(fTextControl);
