@@ -1,15 +1,17 @@
 /*
- * Copyright 2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Ingo Weinhold, ingo_weinhold@gmx.de
+ * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
+ *
  * Distributed under the terms of the MIT License.
  */
 
 
 #include <StringList.h>
-#include <TypeConstants.h>
 
 #include <algorithm>
 
 #include <StringPrivate.h>
+#include <TypeConstants.h>
 
 
 static int
@@ -127,11 +129,15 @@ BStringList::Remove(const BString& string, bool ignoreCase)
 }
 
 
-void
+bool
 BStringList::Remove(const BStringList& list, bool ignoreCase)
 {
-	for (int32 i = 0; i < list.CountStrings(); i++)
-		Remove(list.StringAt(i), ignoreCase);
+	bool removedAnything = false;
+	int32 stringCount = list.CountStrings();
+	for (int32 i = 0; i < stringCount; i++)
+		removedAnything |= Remove(list.StringAt(i), ignoreCase);
+
+	return removedAnything;
 }
 
 
@@ -346,28 +352,30 @@ ssize_t
 BStringList::FlattenedSize() const
 {
 	ssize_t size = 0;
-	for (int32 i = 0; i < CountStrings(); i++) {
-		const char* str = StringAt(i).String();
-		size += strlen(str) + 1;
-	}
+	int32 stringCount = CountStrings();
+	for (int32 i = 0; i < stringCount; i++)
+		size += StringAt(i).Length() + 1;
 
 	return size;
 }
 
 
 status_t
-BStringList::Flatten(void* buffer, ssize_t size) const
+BStringList::Flatten(void* buf, ssize_t size) const
 {
+	const char* buffer = (const char*)buf;
+
 	if (size < FlattenedSize())
 		return B_NO_MEMORY;
 		
-	for (int32 i = 0; i < CountStrings(); i++) {
-		const char* str = StringAt(i).String();
-		ssize_t storeSize = strlen(str) + 1;
-		memcpy(buffer, str, storeSize);
-		buffer = (void*)((const char*)buffer + storeSize);
+	int32 stringCount = CountStrings();
+	for (int32 i = 0; i < stringCount; i++) {
+		BString item = StringAt(i);
+		ssize_t storeSize = item.Length() + 1;
+		memcpy((void*)buffer, (const void*)item.String(), storeSize);
+		buffer += storeSize;
 	}
-	
+
 	return B_OK;
 }
 
@@ -377,13 +385,21 @@ BStringList::Unflatten(type_code code, const void* buffer, ssize_t size)
 {
 	if (code != B_STRING_LIST_TYPE)
 		return B_ERROR;
-		
-	const char* str = (const char*)buffer;
-	for (off_t offset = 0; offset < size; offset++) {
-		if (((int8*)buffer)[offset] == 0) {
-			Add(str);
-			str = (const char*)buffer + offset + 1;
-		}
+	const char* bufferStart = (const char*)buffer;
+
+	MakeEmpty();
+
+	off_t offset = 0;
+	while (offset < size) {
+		const char* cstring = bufferStart + offset;
+		size_t restSize = size - offset;
+		size_t read = strnlen(cstring, restSize);
+		if (read == restSize)
+			return B_BAD_VALUE;
+
+		if (!Add(cstring))
+			return B_NO_MEMORY;
+		offset += read + 1;
 	}
 
 	return B_OK;

@@ -26,7 +26,7 @@ public:
 
 			bool				Remove(const BString& string,
 									bool ignoreCase = false);
-			void				Remove(const BStringList& list,
+			bool				Remove(const BStringList& list,
 									bool ignoreCase = false);
 			BString				Remove(int32 index);
 			bool				Remove(int32 index, int32 count);
