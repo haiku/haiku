@@ -897,3 +897,15 @@ void BScrollView::_ReservedScrollView2() {}
 void BScrollView::_ReservedScrollView3() {}
 void BScrollView::_ReservedScrollView4() {}
 
+
+#if __GNUC__ == 2
+
+
+extern "C" void
+InvalidateLayout__11BScrollViewb(BScrollView* view)
+{
+	view->Perform(PERFORM_CODE_LAYOUT_CHANGED, NULL);
+}
+
+
+#endif

@@ -1510,3 +1510,15 @@ BMenuField::MenuBarLayoutItem::Instantiate(BMessage* from)
 	return NULL;
 }
 
+
+#if __GNUC__ == 2
+
+
+extern "C" void
+InvalidateLayout__10BMenuFieldb(BMenuField* field)
+{
+	field->Perform(PERFORM_CODE_LAYOUT_CHANGED, NULL);
+}
+
+
+#endif

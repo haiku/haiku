@@ -453,3 +453,15 @@ BStringView::_ValidatePreferredSize()
 	return fPreferredSize;
 }
 
+
+#if __GNUC__ == 2
+
+
+extern "C" void
+InvalidateLayout__11BStringViewb(BView* view)
+{
+	view->Perform(PERFORM_CODE_LAYOUT_CHANGED, NULL);
+}
+
+
+#endif

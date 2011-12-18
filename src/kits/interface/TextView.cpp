@@ -5635,3 +5635,16 @@ BTextView::TextTrackState::SimulateMouseMovement(BTextView *textView)
 	textView->GetMouse(&where, &buttons);
 	textView->_PerformMouseMoved(where, B_INSIDE_VIEW);
 }
+
+
+#if __GNUC__ == 2
+
+
+extern "C" void
+InvalidateLayout__9BTextViewb(BTextView* view)
+{
+	view->Perform(PERFORM_CODE_LAYOUT_CHANGED, NULL);
+}
+
+
+#endif
