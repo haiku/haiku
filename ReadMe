@@ -158,7 +158,7 @@ http://www.haiku-os.org/guides/building/gcc-hybrid
 Configure options
 -----------------
 
-The various runtime options for configure are documented in it's onscreen help
+The various runtime options for configure are documented in its onscreen help
 
   ./configure --help
 
@@ -246,7 +246,7 @@ partition in your bootmanager and try to boot Haiku like any other OS you
 have installed. To include a new partition in the Haiku bootmanager run this
 in a Terminal:
 
-  bootman
+  BootManager
 
 On Emulated Hardware
 --------------------
