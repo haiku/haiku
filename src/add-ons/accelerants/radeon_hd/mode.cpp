@@ -180,8 +180,7 @@ radeon_set_display_mode(display_mode* mode)
 
 		// *** encoder prep
 		encoder_output_lock(true);
-		encoder_dpms_set(id, gConnector[connectorIndex]->encoder.objectID,
-			B_DPMS_OFF);
+		encoder_dpms_set(id, B_DPMS_OFF);
 		encoder_assign_crtc(id);
 
 		// *** CRT controler prep
@@ -226,9 +225,7 @@ radeon_set_display_mode(display_mode* mode)
 					ATOM_ENCODER_CMD_DP_VIDEO_ON, 0);
 		}
 
-		encoder_dpms_set(id, gConnector[connectorIndex]->encoder.objectID,
-			B_DPMS_ON);
-
+		encoder_dpms_set(id, B_DPMS_ON);
 		encoder_output_lock(false);
 	}
 

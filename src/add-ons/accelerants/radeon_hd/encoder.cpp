@@ -1331,8 +1331,6 @@ encoder_crtc_scratch(uint8 crtcID)
 void
 encoder_dpms_scratch(uint8 crtcID, bool power)
 {
-	TRACE("%s: power: %s\n", __func__, power ? "true" : "false");
-
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 
@@ -1404,8 +1402,10 @@ encoder_dpms_scratch(uint8 crtcID, bool power)
 
 
 void
-encoder_dpms_set(uint8 crtcID, uint8 encoderID, int mode)
+encoder_dpms_set(uint8 crtcID, int mode)
 {
+	TRACE("%s: power: %s\n", __func__, mode == B_DPMS_ON ? "true" : "false");
+
 	int index = -1;
 	radeon_shared_info &info = *gInfo->shared_info;
 
@@ -1414,6 +1414,7 @@ encoder_dpms_set(uint8 crtcID, uint8 encoderID, int mode)
 
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+	uint16 encoderID = gConnector[connectorIndex]->encoder.objectID;
 
 	switch (encoderID) {
 		case ENCODER_OBJECT_ID_INTERNAL_TMDS1:
@@ -1424,7 +1425,8 @@ encoder_dpms_set(uint8 crtcID, uint8 encoderID, int mode)
 		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
 		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
-			ERROR("%s: TODO DIG DPMS set\n", __func__);
+			encoder_dpms_set_dig(crtcID, mode);
+			// We don't call OutputControl on DIG
 			return;
 		case ENCODER_OBJECT_ID_INTERNAL_DVO1:
 		case ENCODER_OBJECT_ID_INTERNAL_DDI:
@@ -1487,6 +1489,75 @@ encoder_dpms_set(uint8 crtcID, uint8 encoderID, int mode)
 			}
 			encoder_dpms_scratch(crtcID, true);
 		}
+	}
+}
+
+
+void
+encoder_dpms_set_dig(uint8 crtcID, int mode)
+{
+	TRACE("%s: power: %s\n", __func__, mode == B_DPMS_ON ? "true" : "false");
+
+	radeon_shared_info &info = *gInfo->shared_info;
+	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
+	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
+
+	switch (mode) {
+		case B_DPMS_ON:
+			if (info.chipsetID == RADEON_RV710
+				|| info.chipsetID == RADEON_RV730) {
+				transmitter_dig_setup(connectorIndex, pll->pixelClock, 0, 0,
+					ATOM_TRANSMITTER_ACTION_ENABLE);
+			} else {
+				transmitter_dig_setup(connectorIndex, pll->pixelClock, 0, 0,
+					ATOM_TRANSMITTER_ACTION_ENABLE_OUTPUT);
+			}
+			if (connector_is_dp(connectorIndex)) {
+				if (gConnector[connectorIndex]->type == VIDEO_CONNECTOR_EDP) {
+					ERROR("%s: TODO, edp_panel_power for this card!\n",
+						__func__);
+					// atombios_set_edp_panel_power(connector,
+					//	ATOM_TRANSMITTER_ACTION_POWER_ON);
+				}
+				if (info.dceMajor >= 4) {
+					encoder_dig_setup(connectorIndex, pll->pixelClock,
+						ATOM_ENCODER_CMD_DP_VIDEO_OFF);
+				}
+				// TODO: dp link train here
+				//radeon_dp_link_train(encoder, connector);
+				if (info.dceMajor >= 4) {
+					encoder_dig_setup(connectorIndex, pll->pixelClock,
+						ATOM_ENCODER_CMD_DP_VIDEO_ON);
+				}
+			}
+			if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
+				transmitter_dig_setup(connectorIndex, pll->pixelClock,
+					0, 0, ATOM_TRANSMITTER_ACTION_LCD_BLON);
+			}
+			break;
+		case B_DPMS_STAND_BY:
+		case B_DPMS_SUSPEND:
+		case B_DPMS_OFF:
+			transmitter_dig_setup(connectorIndex, pll->pixelClock, 0, 0,
+				ATOM_TRANSMITTER_ACTION_DISABLE_OUTPUT);
+			if (connector_is_dp(connectorIndex)) {
+				if (info.dceMajor >= 4) {
+					encoder_dig_setup(connectorIndex, pll->pixelClock,
+						ATOM_ENCODER_CMD_DP_VIDEO_OFF);
+					#if 0
+					if (connector->connector_type == DRM_MODE_CONNECTOR_eDP) {
+						atombios_set_edp_panel_power(connector,
+							ATOM_TRANSMITTER_ACTION_POWER_OFF);
+						radeon_dig_connector->edp_on = false;
+					#endif
+				}
+			}
+			if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
+				transmitter_dig_setup(connectorIndex, pll->pixelClock,
+					0, 0, ATOM_TRANSMITTER_ACTION_LCD_BLOFF);
+			}
+			break;
 	}
 }
 
