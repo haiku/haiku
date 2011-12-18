@@ -523,9 +523,9 @@ BMenu::KeyDown(const char* bytes, int32 numBytes)
 			else {
 				if (fSelected && fSelected->Submenu()) {
 					fSelected->Submenu()->_SetStickyMode(true);
-						// fix me: this shouldn't be needed but dynamic menus 
-						// aren't getting it set correctly when keyboard 
-						// navigating, which aborts the attach 
+						// fix me: this shouldn't be needed but dynamic menus
+						// aren't getting it set correctly when keyboard
+						// navigating, which aborts the attach
 					fState = MENU_STATE_KEY_TO_SUBMENU;
 					_SelectItem(fSelected, true, true, true);
 				} else if (dynamic_cast<BMenuBar*>(Supermenu())) {
@@ -1508,8 +1508,8 @@ BMenu::_Show(bool selectFirstItem, bool keyDown)
 	if (window->Lock()) {
 		bool addAborted = false;
 		if (keyDown)
-			addAborted = _AddDynamicItems(keyDown);	
-		
+			addAborted = _AddDynamicItems(keyDown);
+
 		if (addAborted) {
 			if (ourWindow)
 				window->Quit();
@@ -1518,7 +1518,7 @@ BMenu::_Show(bool selectFirstItem, bool keyDown)
 			return false;
 		}
 		fAttachAborted = false;
-		
+
 		window->AttachMenu(this);
 
 		if (ItemAt(0) != NULL) {
@@ -1739,7 +1739,7 @@ BMenu::_Track(int* action, long start)
 
 	if (action != NULL)
 		*action = fState;
-		
+
 	// keyboard Enter will set this
 	if (fChosenItem != NULL)
 		item = fChosenItem;
@@ -1751,7 +1751,7 @@ BMenu::_Track(int* action, long start)
 		_SelectItem(NULL);
 		UnlockLooper();
 	}
-	
+
 	// delete the menu window recycled for all the child menus
 	_DeleteMenuWindow();
 
@@ -2882,7 +2882,7 @@ BMenu::_AddDynamicItems(bool keyDown)
 			}
 		} while (AddDynamicItem(B_PROCESSING));
 	}
-	
+
 	return addAborted;
 }
 
@@ -2981,3 +2981,16 @@ get_menu_info(menu_info* info)
 
 	return status;
 }
+
+
+#if __GNUC__ == 2
+
+
+extern "C" void
+InvalidateLayout__5BMenub(BMenu* menu)
+{
+	menu->InvalidateLayout();
+}
+
+
+#endif
