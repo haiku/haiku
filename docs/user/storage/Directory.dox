@@ -1,0 +1,600 @@
+/*
+ * Copyright 2011 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ *		Ingo Weinhold, bonefish@users.sf.net
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		John Scipione, jscipione@gmail.com
+ * Corresponds to:
+ *		headers/os/storage/Directory.h  hrev43528
+ *		src/kits/storage/Directory.cpp  hrev43528
+ */
+
+
+/*!
+	\file Directory.h
+	\brief Provides the BDirectory class.
+*/
+
+
+/*!
+	\class BDirectory
+	\ingroup storage
+	\ingroup libbe
+	\brief Class that represents a directory in the file system.
+*/
+
+
+/*!
+	\fn BDirectory::BDirectory()
+	\brief Creates an uninitialized BDirectory object.
+*/
+
+
+/*!
+	\fn BDirectory::BDirectory(const BDirectory& dir)
+	\brief Creates a copy of the supplied BDirectory object.
+
+	\param dir The BDirectory object to be copied.
+*/
+
+
+/*!
+	\fn BDirectory::BDirectory(const entry_ref* ref)
+	\brief Creates a BDirectory and initializes it to the directory referred
+		to by the supplied entry_ref.
+
+	\param ref The entry_ref that refers to the directory.
+*/
+
+
+/*!
+	\fn BDirectory::BDirectory(const node_ref* nref)
+	\brief Creates a BDirectory and initializes it to the directory referred
+		to by the supplied node_ref.
+
+	\param nref The node_ref that refers to the directory.
+*/
+
+
+/*!
+	\fn BDirectory::BDirectory(const BEntry* entry)
+	\brief Creates a BDirectory and initializes it to the directory referred
+		to by the supplied BEntry.
+
+	\param entry The BEntry that refers to the directory.
+*/
+
+
+/*!
+	\fn BDirectory::BDirectory(const char* path)
+	\brief Creates a BDirectory and initializes it to the directory referred
+		to by the supplied \a path name.
+
+	\param path The \a path name of the directory.
+*/
+
+
+/*!
+	\fn BDirectory::BDirectory(const BDirectory* dir, const char* path)
+	\brief Creates a BDirectory and initializes it to the directory referred
+		to by the supplied path name relative to the specified BDirectory.
+
+	\param dir The base BDirectory object.
+	\param path The \a path of the directory relative to \a dir
+*/
+
+
+/*!
+	\fn BDirectory::~BDirectory()
+	\brief Destroys the BDirectory object.
+
+	If the BDirectory is properly initialized, the directory's file descriptor
+	is closed.
+*/
+
+
+/*!
+	\fn status_t BDirectory::SetTo(const entry_ref* ref)
+	\brief Re-initializes the BDirectory to the directory referred to by the
+		supplied entry_ref.
+
+	\param ref The entry_ref referring to the directory.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a ref.
+	\retval B_ENTRY_NOT_FOUND Directory not found.
+	\retval B_PERMISSION_DENIED Directory permissions didn't allow operation.
+	\retval B_NO_MEMORY Insufficient memory for operation.
+	\retval B_LINK_LIMIT Indicates a cyclic loop within the file system.
+	\retval B_BUSY A node was busy.
+	\retval B_FILE_ERROR A general file error.
+	\retval B_NO_MORE_FDS The application has run out of file descriptors.
+*/
+
+
+/*!
+	\fn status_t BDirectory::SetTo(const node_ref* nref)
+	\brief Re-initializes the BDirectory to the directory referred to by the
+		supplied node_ref.
+
+	\param nref The node_ref referring to the directory.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a nref.
+	\retval B_ENTRY_NOT_FOUND Directory not found.
+	\retval B_PERMISSION_DENIED Directory permissions didn't allow operation.
+	\retval B_NO_MEMORY Insufficient memory for operation.
+	\retval B_LINK_LIMIT Indicates a cyclic loop within the file system.
+	\retval B_BUSY A node was busy.
+	\retval B_FILE_ERROR A general file error.
+	\retval B_NO_MORE_FDS The application has run out of file descriptors.
+*/
+
+
+/*!
+	\fn status_t BDirectory::SetTo(const BEntry* entry)
+	\brief Re-initializes the BDirectory to the directory referred to by the
+		supplied BEntry.
+
+	\param entry The BEntry referring to the directory.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a entry.
+	\retval B_ENTRY_NOT_FOUND Directory not found.
+	\retval B_PERMISSION_DENIED Directory permissions didn't allow operation.
+	\retval B_NO_MEMORY Insufficient memory for operation.
+	\retval B_LINK_LIMIT Indicates a cyclic loop within the file system.
+	\retval B_BUSY A node was busy.
+	\retval B_FILE_ERROR A general file error.
+	\retval B_NO_MORE_FDS The application has run out of file descriptors.
+*/
+
+
+/*!
+	\fn status_t BDirectory::SetTo(const char* path)
+	\brief Re-initializes the BDirectory to the directory referred to by the
+		supplied path name.
+
+	\param path The directory's \a path name.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a path.
+	\retval B_ENTRY_NOT_FOUND Directory not found.
+	\retval B_PERMISSION_DENIED Directory permissions didn't allow operation.
+	\retval B_NO_MEMORY Insufficient memory for operation.
+	\retval B_NAME_TOO_LONG The supplied path name (\a path) is too long.
+	\retval B_LINK_LIMIT Indicates a cyclic loop within the file system.
+	\retval B_BUSY A node was busy.
+	\retval B_FILE_ERROR A general file error.
+	\retval B_NO_MORE_FDS The application has run out of file descriptors.
+	\retval B_NOT_A_DIRECTORY \a path includes a non-directory.
+*/
+
+
+/*!
+	\fn status_t BDirectory::SetTo(const BDirectory* dir, const char* path)
+	\brief Re-initializes the BDirectory to the directory referred to by the
+		supplied path name relative to the specified BDirectory.
+
+	\param dir The base directory.
+	\param path The directory path name relative to \a dir.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a dir or \a path, or \a path is absolute.
+	\retval B_ENTRY_NOT_FOUND Directory not found.
+	\retval B_PERMISSION_DENIED Directory permissions didn't allow operation.
+	\retval B_NO_MEMORY Insufficient memory for operation.
+	\retval B_NAME_TOO_LONG The supplied path name (\a path) is too long.
+	\retval B_LINK_LIMIT Indicates a cyclic loop within the file system.
+	\retval B_BUSY A node was busy.
+	\retval B_FILE_ERROR A general file error.
+	\retval B_NO_MORE_FDS The application has run out of file descriptors.
+	\retval B_NOT_A_DIRECTORY \a path includes a non-directory.
+*/
+
+
+/*!
+	\fn status_t BDirectory::GetEntry(BEntry* entry) const
+	\brief Gets a BEntry object referring to the directory. If the
+		initialization of \a entry fails, it is Unset().
+
+	\param entry A pointer to the \a entry that will refer to the directory.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a entry.
+	\retval B_ENTRY_NOT_FOUND Directory not found.
+	\retval B_PERMISSION_DENIED Directory permissions didn't allow operation.
+	\retval B_NO_MEMORY Insufficient memory for operation.
+	\retval B_LINK_LIMIT Indicates a cyclic loop within the file system.
+	\retval B_BUSY A node was busy.
+	\retval B_FILE_ERROR A general file error.
+	\retval B_NO_MORE_FDS The application has run out of file descriptors.
+*/
+
+
+/*!
+	\fn bool BDirectory::IsRootDirectory() const
+	\brief Returns whether the directory is the root directory of a volume.
+
+	\returns \c true if the BDirectory is properly initialized and represents
+		a root directory of a volume, \c false otherwise.
+*/
+
+
+/*!
+	\fn status_t BDirectory::FindEntry(const char* path, BEntry* entry,
+		bool traverse) const
+	\brief Finds an entry referred to by a path relative to the directory
+		represented by this BDirectory.
+
+	\a path may represent an absolute path. If the BDirectory is not properly
+	initialized then the entry is relative to the current directory. If the
+	entry couldn't be found, \a entry is Unset().
+
+	\note The functionality of this method differs from
+		BEntry::SetTo(BDirectory *, const char *, bool) in that it doesn't
+		require the entry to exist, whereas this method does.
+
+	\param path The entry's \a path name. May be relative to this directory
+		or an absolute path.
+	\param entry A pointer to a BEntry to be initialized with the found entry.
+	\param traverse Whether or not to follow a symbolic link.
+
+	\returns A status code.
+	\retval B_OK: Everything went fine.
+	\retval B_BAD_VALUE: \c NULL \a path or \a entry.
+	\retval B_ENTRY_NOT_FOUND: Entry not found.
+	\retval B_PERMISSION_DENIED: Directory permissions didn't allow operation.
+	\retval B_NO_MEMORY: Insufficient memory for operation.
+	\retval B_NAME_TOO_LONG: The supplied path name (\a path) is too long.
+	\retval B_LINK_LIMIT: Indicates a cyclic loop within the file system.
+	\retval B_BUSY: A node was busy.
+	\retval B_FILE_ERROR: A general file error.
+	\retval B_NO_MORE_FDS: The application has run out of file descriptors.
+	\retval B_NOT_A_DIRECTORY: \a path includes a non-directory.
+
+	\sa BEntry::SetTo(BDirectory *, const char *, bool)
+*/
+
+
+/*!
+	\fn bool BDirectory::Contains(const char* path, int32 nodeFlags) const
+	\brief Returns whether or not this directory or any of its subdirectories
+		at any level contain the entry referred to by the supplied path name.
+
+	Only entries that match the node flavor specified by \a nodeFlags are
+	considered.
+
+	If the BDirectory is not properly initialized, the method returns \c false.
+	A non-absolute path is considered relative to the current directory.
+
+	\note R5's implementation always returns \c true given an absolute path
+		or an unitialized directory. This implementation is not compatible
+		with that behavior. Instead it converts the path into a BEntry and
+		passes it to the other version of Contains().
+
+	\param path The entry's \a path name. May be relative to this directory
+		or may be an absolute \a path.
+	\param nodeFlags Any of the following:
+		- \c B_FILE_NODE: The entry must be a file.
+		- \c B_DIRECTORY_NODE: The entry must be a directory.
+		- \c B_SYMLINK_NODE: The entry must be a symbolic link.
+		- \c B_ANY_NODE: The entry may be of any kind.
+
+	\returns \c true if the entry exists and its kind does match \a nodeFlags
+		and the BDirectory is properly initialized and does contain the entry
+		at any level, \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BDirectory::Contains(const BEntry* entry, int32 nodeFlags) const
+	\brief Returns whether or not this directory or any of its subdirectories
+		at any level contain the entry referred to by the supplied BEntry.
+	
+	Only entries that match the node flavor specified by \a nodeFlags are
+	considered.
+
+	\note If the paths are identical, this method returns \c true to stay
+		consistent with BeOS 5.
+
+	\param entry a BEntry referring to the entry
+	\param nodeFlags Any of the following:
+		- \c B_FILE_NODE: The entry must be a file.
+		- \c B_DIRECTORY_NODE: The entry must be a directory.
+		- \c B_SYMLINK_NODE: The entry must be a symbolic link.
+		- \c B_ANY_NODE: The entry may be of any kind.
+
+	\returns \c true if the BDirectory is properly initialized and the
+		entry of the matching kind was found, \c false otherwise.
+*/
+
+
+/*!
+	\fn status_t BDirectory::GetStatFor(const char* path, struct stat* st) const
+	\brief Returns the stat structure of the entry referred to by the supplied
+		path name.
+
+	\param path The entry's path name. May be relative to this directory or
+		   absolute, or \c NULL to get the directories stat info.
+	\param st A pointer to the stat structure to be filled in by this method.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a st.
+	\retval B_ENTRY_NOT_FOUND Entry not found.
+	\retval B_PERMISSION_DENIED Directory permissions didn't allow operation.
+	\retval B_NO_MEMORY Insufficient memory for operation.
+	\retval B_NAME_TOO_LONG The supplied path name (\a path) is too long.
+	\retval B_LINK_LIMIT Indicates a cyclic loop within the file system.
+	\retval B_BUSY A node was busy.
+	\retval B_FILE_ERROR A general file error.
+	\retval B_NO_MORE_FDS The application has run out of file descriptors.
+	\retval B_NOT_A_DIRECTORY \a path includes a non-directory.
+*/
+
+
+/*!
+	\fn status_t BDirectory::GetNextEntry(BEntry* entry, bool traverse)
+	\brief Returns the next entry as a BEntry object.
+
+	Unlike GetNextDirents() this method ignores "." and "..".
+
+	\note The iterator used by this method is the same one used by
+		GetNextRef(), GetNextDirents(), Rewind() and CountEntries().
+
+	\param entry A pointer to a BEntry to be initialized to the found entry
+	\param traverse Specifies whether or not to follow a symbolic link.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a entry.
+	\retval B_ENTRY_NOT_FOUND No more entries found.
+	\retval B_PERMISSION_DENIED Directory permissions didn't allow operation.
+	\retval B_NO_MEMORY Insufficient memory for operation.
+	\retval B_LINK_LIMIT Indicates a cyclic loop within the file system.
+	\retval B_BUSY A node was busy.
+	\retval B_FILE_ERROR A general file error.
+	\retval B_NO_MORE_FDS The application has run out of file descriptors.
+*/
+
+
+/*!
+	\fn status_t BDirectory::GetNextRef(entry_ref* ref)
+	\brief Returns the BDirectory's next entry as an entry_ref.
+
+	Unlike GetNextDirents() this method ignores "." and "..".
+
+	\note The iterator used be this method is the same one used by
+		GetNextEntry(), GetNextDirents(), Rewind() and CountEntries().
+
+	\param ref A pointer to an entry_ref to be filled in with the data
+		from the found entry.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a ref.
+	\retval B_ENTRY_NOT_FOUND No more entries found.
+	\retval B_PERMISSION_DENIED Directory permissions didn't allow operation.
+	\retval B_NO_MEMORY Insufficient memory for operation.
+	\retval B_LINK_LIMIT Indicates a cyclic loop within the file system.
+	\retval B_BUSY A node was busy.
+	\retval B_FILE_ERROR A general file error.
+	\retval B_NO_MORE_FDS The application has run out of file descriptors.
+*/
+
+
+/*!
+	\fn int32 BDirectory::GetNextDirents(dirent* buf, size_t bufSize, int32 count)
+	\brief Returns the next entries of the BDirectory object as a pointer
+		to dirent structures.
+
+	Unlike GetNextEntry() and GetNextRef(), this method returns also
+	the entries "." and "..".
+
+	\note The iterator used by this method is the same one used by
+		GetNextEntry(), GetNextRef(), Rewind() and CountEntries().
+
+	\param buf A pointer to a buffer filled with dirent structures containing
+		the found entries.
+	\param bufSize The size of \a buf.
+	\param count The maximum number of entries to be returned.
+
+	\returns The number of dirent structures stored in the buffer, 0 when
+		there are no more entries to be returned or a status code on error.
+	\retval B_BAD_VALUE \c NULL \a buf.
+	\retval B_PERMISSION_DENIED Directory permissions didn't allow operation.
+	\retval B_NO_MEMORY Insufficient memory for operation.
+	\retval B_NAME_TOO_LONG The entry's name is too long for the buffer.
+	\retval B_LINK_LIMIT Indicates a cyclic loop within the file system.
+	\retval B_BUSY A node was busy.
+	\retval B_FILE_ERROR A general file error.
+	\retval B_NO_MORE_FDS The application has run out of file descriptors.
+*/
+
+
+/*!
+	\fn status_t BDirectory::Rewind()
+	\brief Rewinds the directory iterator.
+
+	\returns A status code.
+	\retval B_OK: Everything went fine.
+	\retval B_PERMISSION_DENIED: Directory permissions didn't allow operation.
+	\retval B_NO_MEMORY: Insufficient memory for operation.
+	\retval B_LINK_LIMIT: Indicates a cyclic loop within the file system.
+	\retval B_BUSY: A node was busy.
+	\retval B_FILE_ERROR: A general file error.
+	\retval B_NO_MORE_FDS: The application has run out of file descriptors.
+
+	\sa BDirectory::GetNextEntry()
+	\sa BDirectory::GetNextRef()
+	\sa BDirectory::GetNextDirents()
+	\sa BDirectory::CountEntries()
+*/
+
+
+/*!
+	\fn int32 BDirectory::CountEntries()
+	\brief Returns the number of entries in this directory.
+
+	CountEntries() uses the directory iterator also used by GetNextEntry(),
+	GetNextRef() and GetNextDirents(). It does a Rewind(), iterates through
+	the entries and Rewind()s again. The entries "." and ".." are not counted.
+
+	\returns The number of entries in the directory (not counting "." and
+		"..") or a status code on error.
+	\retval B_PERMISSION_DENIED Directory permissions didn't allow operation.
+	\retval B_NO_MEMORY Insufficient memory for operation.
+	\retval B_LINK_LIMIT Indicates a cyclic loop within the file system.
+	\retval B_BUSY A node was busy.
+	\retval B_FILE_ERROR A general file error.
+	\retval B_NO_MORE_FDS The application has run out of file descriptors.
+
+	\sa BDirectory::GetNextEntry()
+	\sa BDirectory::GetNextRef()
+	\sa BDirectory::GetNextDirents()
+	\sa BDirectory::Rewind()
+*/
+
+
+/*!
+	\fn status_t BDirectory::CreateDirectory(const char* path, BDirectory* dir)
+	\brief Creates a new directory.
+
+	If an entry with the supplied name already exists this method returns
+	an error status code.
+
+	\param path The new path name of the directory. May be a relative
+		path to this directory or an absolute path.
+	\param dir A pointer to a BDirectory to be initialized to the newly
+		created directory. May be \c NULL.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a path.
+	\retval B_ENTRY_NOT_FOUND \a path does not refer to a possible entry.
+	\retval B_PERMISSION_DENIED Directory permissions didn't allow operation.
+	\retval B_NO_MEMORY Insufficient memory for operation.
+	\retval B_LINK_LIMIT Indicates a cyclic loop within the file system.
+	\retval B_BUSY A node was busy.
+	\retval B_FILE_ERROR A general file error.
+	\retval B_FILE_EXISTS An entry with that name does already exist.
+	\retval B_NO_MORE_FDS The application has run out of file descriptors.
+*/
+
+
+/*!
+	\fn status_t BDirectory::CreateFile(const char* path, BFile* file,
+		bool failIfExists)
+	\brief Creates a new file.
+
+	If a file with the supplied name does already exist, the method fails,
+	unless it is passed \c false to \a failIfExists -- in that case the file
+	is truncated to zero size. The new BFile will operate in \c B_READ_WRITE
+	mode.
+
+	\param path The new file's path name. May be relative to this
+		directory or an absolute path.
+	\param file A pointer to a BFile to be initialized to the newly
+		created file. May be \c NULL.
+	\param failIfExists Whether or not to fail if the file already exists.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a path.
+	\retval B_ENTRY_NOT_FOUND \a path does not refer to a possible entry.
+	\retval B_PERMISSION_DENIED Directory permissions didn't allow operation.
+	\retval B_NO_MEMORY Insufficient memory for operation.
+	\retval B_LINK_LIMIT Indicates a cyclic loop within the file system.
+	\retval B_BUSY A node was busy.
+	\retval B_FILE_ERROR A general file error.
+	\retval B_FILE_EXISTS A file with that name does already exist and
+		\c true has been passed for \a failIfExists.
+	\retval B_IS_A_DIRECTORY A directory with the supplied name already
+		exists.
+	\retval B_NO_MORE_FDS The application has run out of file descriptors.
+*/
+
+
+/*!
+	\fn status_t BDirectory::CreateSymLink(const char* path,
+		const char* linkToPath, BSymLink* link)
+	\brief Creates a new symbolic link.
+
+	This method fails if an entry with the supplied name already exists.
+
+	\param path the new symbolic link's path name. May be relative to this
+		   directory or absolute.
+	\param linkToPath the path the symbolic link shall point to.
+	\param link a pointer to a BSymLink to be initialized to the newly
+		   created symbolic link. May be \c NULL.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a path or \a linkToPath.
+	\retval B_ENTRY_NOT_FOUND \a path does not refer to a possible entry.
+	\retval B_PERMISSION_DENIED Directory permissions didn't allow operation.
+	\retval B_NO_MEMORY Insufficient memory for operation.
+	\retval B_LINK_LIMIT Indicates a cyclic loop within the file system.
+	\retval B_BUSY A node was busy.
+	\retval B_FILE_ERROR A general file error.
+	\retval B_FILE_EXISTS An entry with that name does already exist.
+	\retval B_NO_MORE_FDS The application has run out of file descriptors.
+*/
+
+
+/*!
+	\fn BDirectory& BDirectory::operator=(const BDirectory& dir)
+	\brief Assigns another BDirectory to this BDirectory.
+
+	If the passed in BDirectory object is uninitialized, the returned object
+	will be too. Otherwise it will refer to the same directory, unless an
+	error occurs.
+
+	\param dir The original BDirectory object.
+
+	\returns A reference to this BDirectory object.
+*/
+
+
+/*!
+	\fn int BDirectory::get_fd() const
+	\brief Returns the file descriptor of the BDirectory object.
+
+	This method should be used instead of accessing the private \c fDirFd
+	member directly.
+
+	\returns the file descriptor, or -1 if not properly initialized.
+*/
+
+
+/*!
+	\fn status_t create_directory(const char* path, mode_t mode)
+	\brief Creates all missing directories along a given path.
+
+	\param path The directory path name.
+	\param mode A permission specification, which shall be used for the
+		   newly created directories.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a path.
+	\retval B_ENTRY_NOT_FOUND \a path does not refer to a possible entry.
+	\retval B_PERMISSION_DENIED Directory permissions didn't allow operation.
+	\retval B_NO_MEMORY Insufficient memory for operation.
+	\retval B_LINK_LIMIT Indicates a cyclic loop within the file system.
+	\retval B_BUSY A node was busy.
+	\retval B_FILE_ERROR A general file error.
+	\retval B_NOT_A_DIRECTORY An entry other than a directory with that name
+		already exists.
+	\retval B_NO_MORE_FDS The application has run out of file descriptors.
+*/
