@@ -9,8 +9,8 @@ Empty battery slot	PowerStatus		Prázdne miesto na batériu
  mV	PowerStatus		 mV
 Run in window	PowerStatus		Spúšťať v okne
 About	PowerStatus		O aplikácii
-PowerStatus	System name		PowerStatus
-PowerStatus	PowerStatus		PowerStatus
+PowerStatus	System name		Stav napájania
+PowerStatus	PowerStatus		Stav napájania
  mWh	PowerStatus		 mWh
 Battery info…	PowerStatus		Info o batérii…
 Damaged battery	PowerStatus		Poškodená batéria
@@ -33,14 +33,14 @@ Capacity granularity 1: 	PowerStatus		Granularita kapacity 1:
 OK	PowerStatus		OK
 OEM info: 	PowerStatus		Info OEM: 
 Design voltage: 	PowerStatus		Návrhové napätie: 
-PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\nnapísal Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
+PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		Stav napájania\nnapísal Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
 Battery charging	PowerStatus		Batéria sa nabíja
 Design capacity warning: 	PowerStatus		Upozornenie navrhnutej kapacity: 
 Battery info	PowerStatus		Info o batérii
 Quit	PowerStatus		Ukončiť
 rechargeable	PowerStatus		dobíjateľná
 charging	PowerStatus		nabíja sa
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		PowerStatus môžete spúšťať v okne alebo ho nainštalovať do Panelu.
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Stav napájania môžete spúšťať v okne alebo ho nainštalovať do Panelu.
 Power status box	PowerStatus		Okno stavu napájania
 Show status icon	PowerStatus		Zobrazovať stavovú ikonu
 Capacity granularity 2: 	PowerStatus		Granularita kapacity 2: 

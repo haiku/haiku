@@ -1,61 +1,60 @@
-1	romanian	x-vnd.Haiku.PoorMan	412131821
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Un dosar web implicit a fost creat la „/boot/home/public_html.”\nAsigură-te că există un fișier HTML cu numele „index.html” în acel dosar.
-About PoorMan…	PoorMan		Despre PoorMan...
+1	romanian	x-vnd.Haiku-PoorMan	995747556
+Website location	PoorMan		Locația site-ului web
+Error Server	PoorMan		Server de erori
+Settings…	PoorMan		Configurări
+Create PoorMan log	PoorMan		Creează istoric PoorMan
+Shutting down.\n	PoorMan		Se oprește.\n
+Hits: %lu	PoorMan		Vizite: %lu
+Web folder:	PoorMan		Dosar web:
+Default	PoorMan		Implicit
+Save log console selection	PoorMan		Salvează selecția consolei de istoric
+Run server	PoorMan		Pornește server
+PoorMan settings	PoorMan		Configurări PoorMan
+Clear hit counter	PoorMan		Eliberează contorul de vizite
+Copy	PoorMan		Copiază
+Max. simultaneous connections:	PoorMan		Numărul max. de conexiuni simultane:
+Start page:	PoorMan		Pagină de pornire:
+done.\n	PoorMan		gata.\n
+Create	PoorMan		Creează
+Shutting down.	PoorMan		Se oprește.
+Website options	PoorMan		Opțiuni site web
+File Name	PoorMan		Nume fișier
+Clear console log	PoorMan		Eliberează istoricul consolei
 Advanced	PoorMan		Avansat
+OK	PoorMan		OK
+Status: Stopped	PoorMan		Stare: oprit
+Dir Created	PoorMan		Dosar creat
+Quit	PoorMan		Părăsește
+Hits: 0	PoorMan		Vizite: 0
+Save log console	PoorMan		Salvează consolă istoric
+Edit	PoorMan		Editează
+Directory: (none)	PoorMan		Dosar: (nimic)
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Alege dosarul de publicat pe web.\n\nPoorMan poate crea unul implicit „public_html” în dosarul personal.\nSau poți selecta unul din dosarele tale.
+Log To Console	PoorMan		Înregistrare la consolă
+Status: Running	PoorMan		Stare: pornit
+connections	PoorMan		conexiuni
+Controls	PoorMan		Controale
+Send file listing if there's no start page	PoorMan		Trimite lista de fișiere dacă nu există o pagină de pornire
+Error Dir	PoorMan		Dosar de eroare
+Select all	PoorMan		Selectează tot
+File	PoorMan		Fișier
+Save console selections as…	PoorMan		Salvează selecțiile consolei ca...
+File logging	PoorMan		Înregistrare fișier
+Select web folder	PoorMan		Selectează dosar web
+Logging view	PoorMan		Vizualizare înregistrare
+Logging	PoorMan		Înregistrare
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Un dosar web implicit a fost creat la „/boot/home/public_html.”\nAsigură-te că există un fișier HTML cu numele „index.html” în acel dosar.
+Clear log file	PoorMan		Eliberează fișierul istoric
+Log file name:	PoorMan		Nume fișier istoric:
+Directory: 	PoorMan		Dosar:
+Log To File	PoorMan		Înregistrare la fișier
+Done	PoorMan		Gata
+Create log file	PoorMan		Creează fișier istoric
+Starting up... 	PoorMan		Se pornește...
+Site	PoorMan		Site
 Cancel	PoorMan		Anulează
 Cannot start the server	PoorMan		Nu se poate porni serverul
-Clear console log	PoorMan		Eliberează istoricul consolei
-Clear hit counter	PoorMan		Eliberează contorul de vizite
-Clear log file	PoorMan		Eliberează fișierul istoric
-Console Logging	PoorMan		Înregistrare consolă
-Controls	PoorMan		Controale
-Copy	PoorMan		Copiază
-Create	PoorMan		Creează
-Create PoorMan log	PoorMan		Creează istoric PoorMan
-Create log file	PoorMan		Creează fișier istoric
-Default	PoorMan		Implicit
-Dir Created	PoorMan		Dosar creat
-Directory: 	PoorMan		Dosar:
-Directory: (none)	PoorMan		Dosar: (nimic)
-Done	PoorMan		Gata
-Edit	PoorMan		Editează
-Error Dir	PoorMan		Dosar de eroare
-Error Server	PoorMan		Server de erori
-File	PoorMan		Fișier
-File Name	PoorMan		Nume fișier
-File logging	PoorMan		Înregistrare fișier
-Hits: %lu	PoorMan		Vizite: %lu
-Hits: 0	PoorMan		Vizite: 0
-Log To Console	PoorMan		Înregistrare la consolă
-Log To File	PoorMan		Înregistrare la fișier
-Log file name:	PoorMan		Nume fișier istoric:
-Logging	PoorMan		Înregistrare
-Logging view	PoorMan		Vizualizare înregistrare
-Max. simultaneous connections:	PoorMan		Numărul max. de conexiuni simultane:
-OK	PoorMan		OK
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Alege dosarul de publicat pe web.\n\nPoorMan poate crea unul implicit „public_html” în dosarul personal.\nSau poți selecta unul din dosarele tale.
-PoorMan	System name		PoorMan
-PoorMan settings	PoorMan		Configurări PoorMan
-Quit	PoorMan		Părăsește
-Run server	PoorMan		Pornește server
-Save console as…	PoorMan		Salvează consolă ca...
-Save console selections as…	PoorMan		Salvează selecțiile consolei ca...
-Save log console	PoorMan		Salvează consolă istoric
-Save log console selection	PoorMan		Salvează selecția consolei de istoric
 Select	PoorMan		Selectează
-Select all	PoorMan		Selectează tot
-Select web folder	PoorMan		Selectează dosar web
-Send file listing if there's no start page	PoorMan		Trimite lista de fișiere dacă nu există o pagină de pornire
-Settings…	PoorMan		Configurări
-Shutting down.	PoorMan		Se oprește.
-Shutting down.\n	PoorMan		Se oprește.\n
-Site	PoorMan		Site
-Start page:	PoorMan		Pagină de pornire:
-Starting up... 	PoorMan		Se pornește...
-Status: Running	PoorMan		Stare: pornit
-Status: Stopped	PoorMan		Stare: oprit
-Web folder:	PoorMan		Dosar web:
-Website location	PoorMan		Locația site-ului web
-Website options	PoorMan		Opțiuni site web
-connections	PoorMan		conexiuni
-done.\n	PoorMan		gata.\n
+Save console as…	PoorMan		Salvează consolă ca...
+PoorMan	System name		PoorMan
+Console Logging	PoorMan		Înregistrare consolă

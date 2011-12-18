@@ -1,52 +1,52 @@
 1	romanian	x-vnd.Haiku-ShowImage	2010609106
-Browse	Menus		Navighează
-Cancel	ClosePrompt		Anulează
-Clear selection	Menus		Eliberează selecție
-Close	ClosePrompt		Închide
-Close	Menus		Închide
-Close document	ClosePrompt		Închide document
-Copy	Menus		Copiază
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nu s-a putut încărca imaginea! Fișierul sau un traducător de imagine nu există pentru aceasta.
-DPI:	PrintOptionsWindow		DPI:
-Edit	Menus		Editează
+Use as background…	Menus		Utilizează ca fundal...
 File	Menus		Fișier
-First page	Menus		Prima pagină
-Fit image to page	PrintOptionsWindow		Potrivește imagine la pagină
-Fit to window	Menus		Potrivește la fereastră
-Flip left to right	Menus		Inversează stânga cu dreapta
-Flip top to bottom	Menus		Inversează sus cu jos
+Slide delay	Menus		Întârziere imagine
+Selection mode	Menus		Mod de selectare
+Zoom in	Menus		Mărește
+Page setup…	Menus		Configurare pagină...
+Print…	Menus		Tipărește...
+OK	SaveToFile		OK
+Previous page	Menus		Pagina anterioară
+View	Menus		Vizualizează
 Full screen	Menus		Ecran complet
 Go to page	Menus		Mergi la pagina
-Height: 	PrintOptionsWindow		Înălțime:
-High-quality zooming	Menus		Focalizare de înaltă calitate
-Image	Menus		Imagine
-Job setup	PrintOptionsWindow		Configurare sarcină
-Last page	Menus		Ultima pagină
-Next file	Menus		Fișierul următor
-Next page	Menus		Pagina următoare
-OK	Alerts		OK
-OK	SaveToFile		OK
-Open…	Menus		Deschide...
-Original size	Menus		Dimensiune originală
-Page setup…	Menus		Configurare pagină...
-Previous file	Menus		Fișier anterior
-Previous page	Menus		Pagina anterioară
-Print…	Menus		Tipărește...
-Progress monitor	ProgressWindow		Monitor de progres
-Quit	Menus		Părăsește
-Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionează la (în 1/72 țoli):
-Rotate clockwise	Menus		Rotește în sens orar
-Rotate counterclockwise	Menus		Rotește în sens anti-orar
-Save as…	Menus		Salvează ca...
-Select all	Menus		Selectează tot
-Selection mode	Menus		Mod de selectare
-Show caption in full screen mode	Menus		Afișează legendă în modul ecran complet
-Slide delay	Menus		Întârziere imagine
-Slide show	Menus		Succesiune imagini
-Stretch to window	Menus		Întinde la fereastră
-Undo	Menus		Refă
-Use as background…	Menus		Utilizează ca fundal...
-View	Menus		Vizualizează
-Width:	PrintOptionsWindow		Lățime:
-Zoom in	Menus		Mărește
 Zoom out	Menus		Micșorează
+Quit	Menus		Părăsește
+Rotate counterclockwise	Menus		Rotește în sens anti-orar
+High-quality zooming	Menus		Focalizare de înaltă calitate
+Browse	Menus		Navighează
+Edit	Menus		Editează
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nu s-a putut încărca imaginea! Fișierul sau un traducător de imagine nu există pentru aceasta.
+First page	Menus		Prima pagină
+Close	Menus		Închide
+Close	ClosePrompt		Închide
+Undo	Menus		Refă
+Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionează la (în 1/72 țoli):
+Flip left to right	Menus		Inversează stânga cu dreapta
+Show caption in full screen mode	Menus		Afișează legendă în modul ecran complet
+DPI:	PrintOptionsWindow		DPI:
+Open…	Menus		Deschide...
+Next file	Menus		Fișierul următor
+Clear selection	Menus		Eliberează selecție
+Close document	ClosePrompt		Închide document
+Height: 	PrintOptionsWindow		Înălțime:
+Cancel	ClosePrompt		Anulează
+Fit to window	Menus		Potrivește la fereastră
+Copy	Menus		Copiază
+Progress monitor	ProgressWindow		Monitor de progres
+Last page	Menus		Ultima pagină
+Stretch to window	Menus		Întinde la fereastră
+Previous file	Menus		Fișier anterior
+Slide show	Menus		Succesiune imagini
+Fit image to page	PrintOptionsWindow		Potrivește imagine la pagină
+Flip top to bottom	Menus		Inversează sus cu jos
+Select all	Menus		Selectează tot
+Width:	PrintOptionsWindow		Lățime:
+Image	Menus		Imagine
+OK	Alerts		OK
+Rotate clockwise	Menus		Rotește în sens orar
+Job setup	PrintOptionsWindow		Configurare sarcină
+Original size	Menus		Dimensiune originală
+Next page	Menus		Pagina următoare
+Save as…	Menus		Salvează ca...

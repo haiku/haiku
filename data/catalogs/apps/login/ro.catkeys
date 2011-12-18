@@ -1,21 +1,21 @@
 1	romanian	x-vnd.Haiku-Login	1678631300
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tLansați în modul de editare raft pentru a permite personalizarea dektopului.\n
---nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tNu face fereastra modală\n
-Desktop	Desktop Window		Desktop
-Error	Login App		Eroare
 Error: %1	Login App		Eroare: %1
-Halt	Login View		Oprește
 Hide password	Login View		Ascunde parola
-Info	Login App		Info
+Desktop	Desktop Window		Desktop
 Invalid login!	Login View		Login invalid!
-Login application for Haiku\nUsage:\n	Login App		Aplicație de login pentru Haiku\nUtilizare:\n
-Login:	Login View		Login:
-OK	Login App		OK
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tLansați în modul de editare raft pentru a permite personalizarea dektopului.\n
 OK	Login View		OK
-Password:	Login View		Parolă:
-Reboot	Login View		Restartează
-Unimplemented	Login App		Neimplementat
-ValidateLogin: %s\n	Login App	A message returned from the ValidateLogin function. It can be \"B_OK\".	ValidareLogin: %s\n
-Welcome to Haiku	Login Window		Bine ai venit în Haiku
-You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Alt-Q).	Login App		Poți personaliza desktopul din spatele aplicației de Login dând drumul replicanților pe el.\n\nCând ai terminat ieși din aplicație (Alt-Q).
 error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	eroare %s\n
+Login:	Login View		Login:
+Error	Login App		Eroare
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Alt-Q).	Login App		Poți personaliza desktopul din spatele aplicației de Login dând drumul replicanților pe el.\n\nCând ai terminat ieși din aplicație (Alt-Q).
+Unimplemented	Login App		Neimplementat
+Welcome to Haiku	Login Window		Bine ai venit în Haiku
+Reboot	Login View		Restartează
+Login application for Haiku\nUsage:\n	Login App		Aplicație de login pentru Haiku\nUtilizare:\n
+Info	Login App		Info
+Halt	Login View		Oprește
+ValidateLogin: %s\n	Login App	A message returned from the ValidateLogin function. It can be \"B_OK\".	ValidareLogin: %s\n
+Password:	Login View		Parolă:
+OK	Login App		OK
+--nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tNu face fereastra modală\n

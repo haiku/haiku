@@ -1,27 +1,27 @@
 1	romanian	x-vnd.Haiku.TV	1995288111
-Always on top	MainWin		Întotdeauna deasupra
+TV	MainWin		Televizor
 Channel	MainWin		Canal
-DVB - Digital Video Broadcasting TV	MainWin		DVB - Difuzare Video Digital TV
-Debug	MainWin		Depanare
-Error, connecting to interface failed:\n\n	MainWin		Eroare, conectarea la interfață a eșuat:\n\n
-Error, interface is busy:\n\n	MainWin		Eroare, interfața este ocupată:\n\n
-Full screen	MainWin		Ecran complet
+Settings…	MainWin		Configurări...
 Interface	MainWin		Interfață
 Keep aspect ratio	MainWin		Păstrează proporție aspect
-Next channel	MainWin		Canalul următor
-No border	MainWin		Fără margine
-No menu	MainWin		Fără meniu
-None	MainWin		Nimic
-OK	MainWin		OK
 Previous channel	MainWin		Canalul precedent
-Quit	MainWin		Părăsește
-Scale to native size	MainWin		Scalează la dimensiunea nativă
 Settings	MainWin		Configurări
-Settings…	MainWin		Configurări...
-TV	MainWin		Televizor
 TV	System name		TV
-force 544 x 576, display aspect 4:3	MainWin		forțează 544 x 576, aspect afișare 4:3
-force 704 x 576, display aspect 4:3	MainWin		forțează 704 x 576, aspect afișare 4:3
-force 720 x 576, display aspect 4:3	MainWin		forțează 720 x 576, aspect afișare 4:3
-pixel aspect ratio	MainWin		proporție aspect pixel
+No border	MainWin		Fără margine
+Always on top	MainWin		Întotdeauna deasupra
+OK	MainWin		OK
+Quit	MainWin		Părăsește
+Full screen	MainWin		Ecran complet
+Debug	MainWin		Depanare
+Scale to native size	MainWin		Scalează la dimensiunea nativă
 unknown	MainWin		Necunoscut
+Next channel	MainWin		Canalul următor
+Error, interface is busy:\n\n	MainWin		Eroare, interfața este ocupată:\n\n
+None	MainWin		Nimic
+force 704 x 576, display aspect 4:3	MainWin		forțează 704 x 576, aspect afișare 4:3
+DVB - Digital Video Broadcasting TV	MainWin		DVB - Difuzare Video Digital TV
+force 544 x 576, display aspect 4:3	MainWin		forțează 544 x 576, aspect afișare 4:3
+pixel aspect ratio	MainWin		proporție aspect pixel
+No menu	MainWin		Fără meniu
+Error, connecting to interface failed:\n\n	MainWin		Eroare, conectarea la interfață a eșuat:\n\n
+force 720 x 576, display aspect 4:3	MainWin		forțează 720 x 576, aspect afișare 4:3

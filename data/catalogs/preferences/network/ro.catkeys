@@ -1,21 +1,21 @@
 1	romanian	x-vnd.Haiku-Network	2324385456
-<no wireless networks found>	EthernetSettingsView		<nu s-a găsit o rețea fără fir>
-Adapter:	EthernetSettingsView		Adaptor:
-Apply	EthernetSettingsView		Aplică
-Auto-configuring failed: 	EthernetSettingsView		Configurarea automată a eșuat: 
 Choose automatically	EthernetSettingsView		Alege automat
-DHCP	EthernetSettingsView		DHCP
-DNS #1:	EthernetSettingsView		DNS #1:
-DNS #2:	EthernetSettingsView		DNS #2:
-Disabled	EthernetSettingsView		Dezactivat
-Domain:	EthernetSettingsView		Domeniu:
 Gateway:	EthernetSettingsView		Gateway:
-IP address:	EthernetSettingsView		Adresă IP:
-Mode:	EthernetSettingsView		Mod:
 Netmask:	EthernetSettingsView		Mască rețea:
-Network	System name		Rețea
-Network:	EthernetSettingsView		Rețea:
+DHCP	EthernetSettingsView		DHCP
+DNS #2:	EthernetSettingsView		DNS #2:
+Apply	EthernetSettingsView		Aplică
 OK	EthernetSettingsView		OK
+DNS #1:	EthernetSettingsView		DNS #1:
+IP address:	EthernetSettingsView		Adresă IP:
+Adapter:	EthernetSettingsView		Adaptor:
+Domain:	EthernetSettingsView		Domeniu:
 Revert	EthernetSettingsView		Revenire
-Static	EthernetSettingsView		Statică
+<no wireless networks found>	EthernetSettingsView		<nu s-a găsit o rețea fără fir>
+Network	System name		Rețea
+Mode:	EthernetSettingsView		Mod:
+Network:	EthernetSettingsView		Rețea:
 The net_server needs to run for the auto configuration!	EthernetSettingsView		net_server trebuie să ruleze pentru configurarea automată!
+Disabled	EthernetSettingsView		Dezactivat
+Auto-configuring failed: 	EthernetSettingsView		Configurarea automată a eșuat: 
+Static	EthernetSettingsView		Statică

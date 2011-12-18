@@ -1,42 +1,40 @@
-1	romanian	x-vnd.Be.ChartDemo	819116577
-(high) 100% 	ChartWindow		(înalt) 100%
-0.6 f/s  (logarythmic scale)	ChartWindow		0.6 c/s (scală logaritmică)
-2 threads	ChartWindow		2 fire procesare
-5% (low)	ChartWindow		5% (jos)
-600.0 f/s	ChartWindow		600.0 c/s
-Amas	ChartWindow		Amas
-Animation:	ChartWindow		Animaţie:
-Auto demo	ChartWindow		Demo automat
-Battle	ChartWindow		Bătălie
-Blue	ChartWindow		Albastru
-CPU load	ChartWindow		Folosire procesor
-Chaos	ChartWindow		Haos
-Chart	System name		Grafic
-Colors	ChartWindow		Culori
+1	romanian	x-vnd.Be.ChartDemo	557376150
+Slow rotation	ChartWindow		Rotaţie lentă
+Pink	ChartWindow		Roz
 Comet	ChartWindow		Cometă
 DirectWindow	ChartWindow		DirectWindow
-Display:	ChartWindow		Afişaj:
-DrawBitmap	ChartWindow		DrawBitmap
-Fast motion	ChartWindow		Mişcare rapidă
-Frames/s	ChartWindow		Cadre/s
-Free motion	ChartWindow		Mişcare liberă
-Full screen	ChartWindow		Ecran complet
-Green	ChartWindow		Verde
-LineArray	ChartWindow		VectorLiniar
-None	ChartWindow		Nimic
-Novas	ChartWindow		Nove
-Off	ChartWindow		Dezactivat
 Orange	ChartWindow		Portocaliu
-Pink	ChartWindow		Roz
-Red	ChartWindow		Roşu
 Refresh rate	ChartWindow		Rata de împrospătare
-Slow motion	ChartWindow		Mişcare lentă
-Slow rotation	ChartWindow		Rotaţie lentă
-Space color	ChartWindow		Culoare spaţiu
-Space:	ChartWindow		Spaţiu:
-Special	ChartWindow		Special
-Spiral	ChartWindow		Spirală
-Star density	ChartWindow		Densitate stelară
-Status	ChartWindow		Statut
-White	ChartWindow		Alb
+Blue	ChartWindow		Albastru
+Colors	ChartWindow		Culori
+Novas	ChartWindow		Nove
+LineArray	ChartWindow		VectorLiniar
+Free motion	ChartWindow		Mişcare liberă
+(high) 100% 	ChartWindow		(înalt) 100%
+Green	ChartWindow		Verde
+Amas	ChartWindow		Amas
+2 threads	ChartWindow		2 fire procesare
 Yellow	ChartWindow		Galben
+Off	ChartWindow		Dezactivat
+Chaos	ChartWindow		Haos
+Full screen	ChartWindow		Ecran complet
+Spiral	ChartWindow		Spirală
+Slow motion	ChartWindow		Mişcare lentă
+Fast motion	ChartWindow		Mişcare rapidă
+Special	ChartWindow		Special
+Status	ChartWindow		Statut
+Star density	ChartWindow		Densitate stelară
+600.0 f/s	ChartWindow		600.0 c/s
+Display:	ChartWindow		Afişaj:
+Space color	ChartWindow		Culoare spaţiu
+White	ChartWindow		Alb
+Chart	System name		Grafic
+Animation:	ChartWindow		Animaţie:
+Frames/s	ChartWindow		Cadre/s
+Auto demo	ChartWindow		Demo automat
+CPU load	ChartWindow		Folosire procesor
+DrawBitmap	ChartWindow		DrawBitmap
+Red	ChartWindow		Roşu
+None	ChartWindow		Nimic
+Battle	ChartWindow		Bătălie
+Space:	ChartWindow		Spaţiu:

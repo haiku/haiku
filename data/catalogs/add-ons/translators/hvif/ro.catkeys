@@ -1,8 +1,8 @@
 1	romanian	x-vnd.Haiku-HVIFTranslator	813066125
-HVIF Settings	HVIFMain		Configurări HVIF
 HVIF icons	HVIFTranslator		Pictograme HVIF
-HVIFTranslator Settings	HVIFTranslator		Configurări TraducătorHVIF
-Native Haiku icon format translator	HVIFView		Traducător format pictograme Haiku native
-Native Haiku vector icon translator	HVIFTranslator		Traducător pictograme vectoriale Haiku native
 Render size:	HVIFView		Dimensiune de randat:
+HVIFTranslator Settings	HVIFTranslator		Configurări TraducătorHVIF
+Native Haiku vector icon translator	HVIFTranslator		Traducător pictograme vectoriale Haiku native
+Native Haiku icon format translator	HVIFView		Traducător format pictograme Haiku native
+HVIF Settings	HVIFMain		Configurări HVIF
 Version %d.%d.%d, %s	HVIFView		Versiune %d.%d.%d, %s

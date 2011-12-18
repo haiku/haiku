@@ -1,79 +1,79 @@
 1	romanian	x-vnd.Haiku-StyledEdit	1799001682
+StyledEdit	System name		EditorText
+Paste	Menus		Lipește
+OK	LoadAlert		OK
+File	Menus		Fișier
 ???	LoadAlert		???
-Align	Menus		Aliniază
-Black	Menus		Negru
-Blue	Menus		Albastru
-Bold	Menus		Aldin
+Lines:	Statistics		Linii:
+Italic	Menus		Cursiv
+Left	Menus		Stânga
+Search backwards	FindandReplaceWindow		Caută înapoi 
+Size	Menus		Dimensiune
+Save	QuitAlert		Salvează
+Page setup…	Menus		Configurări pagină...
+Print…	Menus		Tipărește...
 Can't undo	Menus		Nu se poate reface
-Cancel	FindandReplaceWindow		Anulează
-Cancel	QuitAlert		Anulează
-Cancel	RevertToSavedAlert		Anulează
+Save	Menus		Salvează
+Replace with:	FindandReplaceWindow		Înlocuiește cu:
 Cancel	SaveAlert		Anulează
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nu se poate reveni, nu s-a găsit fișierul: „%s”.
 Case-sensitive	FindandReplaceWindow		Sensibil la majuscule
-Center	Menus		Centru
-Characters:	Statistics		Caractere:
-Close	Menus		Închide
-Color	Menus		Culoare
-Copy	Menus		Copiază
-Cut	Menus		Taie
-Cyan	Menus		Cyan
-Default	Open_and_SaveAsPanel		Implicit
-Document	Menus		Document
-Document statistics	Statistics		Statistici document
-Don't save	QuitAlert		Nu salva
-Don't save	SaveAlert		Nu salva
-Edit	Menus		Editează
-Encoding	Open_and_SaveAsPanel		Codare
-Error loading \"%s\":\n\t%s	LoadAlert		Eroare la încărcarea lui „%s”:\n\t%s
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Eroare la încărcarea lui „%s":\n\tFormat nesuportat
-Error saving \"%s\":\n%s	SaveAlert		Eroare la salvarea lui „%s”:\n%s
-File	Menus		Fișier
-Find	FindandReplaceWindow		Găsește
-Find again	Menus		Găsește din nou
-Find selection	Menus		Găsește selecție
-Find:	FindandReplaceWindow		Găsește:
-Find…	Menus		Găsește...
-Font	Menus		Font
 Green	Menus		Verde
-Italic	Menus		Cursiv
-Left	Menus		Stânga
-Lines:	Statistics		Linii:
+Revert to saved…	Menus		Revenire la salvat...
+Yellow	Menus		Galben
+Replace in all windows	FindandReplaceWindow		Înlocuiește în toate ferestrele
+Wrap lines	Menus		Încadrează linii
+Quit	Menus		Părăsește
+Document statistics	Statistics		Statistici document
+Cancel	RevertToSavedAlert		Anulează
+Document	Menus		Document
+Save changes to the document \"%s\"? 	QuitAlert		Se salvează modificările la documentul „%s”?
+Edit	Menus		Editează
+Font	Menus		Font
+Replace all	FindandReplaceWindow		Înlocuiește tot
+Statistics…	Menus		Statistici...
+Default	Open_and_SaveAsPanel		Implicit
+Replace next	Menus		Înlocuiește următorul
+Cancel	FindandReplaceWindow		Anulează
+Close	Menus		Închide
+Save	SaveAlert		Salvează
+Words:	Statistics		Cuvinte:
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Eroare la încărcarea lui „%s":\n\tFormat nesuportat
+OK	RevertToSavedAlert		OK
+Don't save	QuitAlert		Nu salva
+Align	Menus		Aliniază
+Color	Menus		Culoare
+Red	Menus		Roșu
+Open…	Menus		Deschide...
+Center	Menus		Centru
+Blue	Menus		Albastru
+Cyan	Menus		Cyan
+OK	Statistics		OK
 Magenta	Menus		Magenta
 New	Menus		Nou
-OK	LoadAlert		OK
-OK	RevertToSavedAlert		OK
-OK	SaveAlert		OK
-OK	Statistics		OK
-Open…	Menus		Deschide...
-Page setup…	Menus		Configurări pagină...
-Paste	Menus		Lipește
-Print…	Menus		Tipărește...
-Quit	Menus		Părăsește
-Red	Menus		Roșu
-Redo typing	QuitAlert		Repetă tastarea
-Replace	FindandReplaceWindow		Înlocuiește
-Replace all	FindandReplaceWindow		Înlocuiește tot
-Replace in all windows	FindandReplaceWindow		Înlocuiește în toate ferestrele
-Replace next	Menus		Înlocuiește următorul
-Replace with:	FindandReplaceWindow		Înlocuiește cu:
-Replace…	Menus		Înlocuiește...
-Revert to saved…	Menus		Revenire la salvat...
-Right	Menus		Dreapta
-Save	Menus		Salvează
-Save	QuitAlert		Salvează
-Save	SaveAlert		Salvează
-Save as…	Menus		Salvează ca...
-Save changes to the document \"%s\"? 	QuitAlert		Se salvează modificările la documentul „%s”?
-Search backwards	FindandReplaceWindow		Caută înapoi 
-Select all	Menus		Selectează tot
-Size	Menus		Dimensiune
-Statistics…	Menus		Statistici...
-StyledEdit	System name		EditorText
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Acest fișier este marcat ca fiind protejat la scriere. Salvați modificările la documentul „%s”?
-Undo typing	QuitAlert		Refă tastarea
-Untitled 	StyledEditWindow		Fără titlu
-Words:	Statistics		Cuvinte:
-Wrap lines	Menus		Încadrează linii
 Wrap-around search	FindandReplaceWindow		Căutare încadrează împrejur
-Yellow	Menus		Galben
+Bold	Menus		Aldin
+Find selection	Menus		Găsește selecție
+Find:	FindandReplaceWindow		Găsește:
+Error saving \"%s\":\n%s	SaveAlert		Eroare la salvarea lui „%s”:\n%s
+Copy	Menus		Copiază
+Cut	Menus		Taie
+Replace	FindandReplaceWindow		Înlocuiește
+Find again	Menus		Găsește din nou
+Cancel	QuitAlert		Anulează
+Find…	Menus		Găsește...
+Select all	Menus		Selectează tot
+Don't save	SaveAlert		Nu salva
+Error loading \"%s\":\n\t%s	LoadAlert		Eroare la încărcarea lui „%s”:\n\t%s
+Undo typing	QuitAlert		Refă tastarea
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Acest fișier este marcat ca fiind protejat la scriere. Salvați modificările la documentul „%s”?
+Black	Menus		Negru
+Untitled 	StyledEditWindow		Fără titlu
+OK	SaveAlert		OK
+Find	FindandReplaceWindow		Găsește
+Encoding	Open_and_SaveAsPanel		Codare
+Characters:	Statistics		Caractere:
+Save as…	Menus		Salvează ca...
+Redo typing	QuitAlert		Repetă tastarea
+Replace…	Menus		Înlocuiește...
+Right	Menus		Dreapta

@@ -1,12 +1,12 @@
 1	romanian	x-vnd.Be-WORK	932379173
-About Workspaces…	Workspaces		Despre Spații de lucru...
-Always on top	Workspaces		Întotdeauna deasupra
-Auto-raise	Workspaces		Auto-lansare
-Change workspace count…	Workspaces		Modifică numărul de spații de lucru...
 Invalid argument: %s\n	Workspaces		Argument nevalid: %s\n
-OK	Workspaces		OK
 Quit	Workspaces		Părăsește
-Show window border	Workspaces		Afișează margine fereastră
-Show window tab	Workspaces		Afișează tab-ul ferestrei
 Workspaces	System name		Spații de lucru
+Change workspace count…	Workspaces		Modifică numărul de spații de lucru...
+About Workspaces…	Workspaces		Despre Spații de lucru...
 Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Spații de lucru\nscris de %1, și %2.\n\nDrepturi de autor %3, Haiku.\n\nTrimiteți ferestre în spate utilizând tasta Opțiuni. Mutați ferestre în față utilizând tasta Control.\n
+Show window border	Workspaces		Afișează margine fereastră
+Auto-raise	Workspaces		Auto-lansare
+OK	Workspaces		OK
+Always on top	Workspaces		Întotdeauna deasupra
+Show window tab	Workspaces		Afișează tab-ul ferestrei

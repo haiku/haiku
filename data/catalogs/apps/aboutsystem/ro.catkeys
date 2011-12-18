@@ -1,83 +1,83 @@
 1	romanian	x-vnd.Haiku-About	2840857586
-%.2f GHz	AboutView		%.2f GHz
-%d MiB total	AboutView		%d MiB total
-%d MiB used (%d%%)	AboutView		%d MiB utilizați (%d%%)
-%ld MHz	AboutView		%ld MHz
-%ld Processors:	AboutView		%ld procesoare:
-%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB total, %inaccessible MiB inaccesibil
-... and the many people making donations!\n\n	AboutView		... și tuturor celor care donează!\n\n
-2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 de Andy Ritger bazat pe Formula generalizată a cronometrării
-About this system	AboutWindow		Despre acest sistem
-AboutSystem	System name		DespreSistem
-BSD (2-clause)	AboutView		BSD (Clauza 2)
-BSD (3-clause)	AboutView		BSD (Clauza 3)
+Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Drepturi de autor © 1999-2010 de autorii pentru Gutenprint. Toate drepturile rezervate.
+Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (și nucleul său NewOS)\n
 BSD (4-clause)	AboutView		BSD (Clauza 4)
+%ld Processors:	AboutView		%ld procesoare:
+Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Drepturi de autor © 2000 Jean-Pierre ervbefeL și Remi Lefebvre.
+Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Drepturi de autor © 1996-2005 Julian R Seward. Toate drepturile rezervate.
+%d MiB total	AboutView		%d MiB total
+Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fondator proiect)\n\n
+The Haiku-Ports team\n	AboutView		Echipa Haiku-Ports\n
+Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Drepturi de autor © 1998-2003 Daniel Veillard. Toate drepturile rezervate.
+%d MiB used (%d%%)	AboutView		%d MiB utilizați (%d%%)
+Website, marketing & documentation:\n	AboutView		Site web, marketing & documentație:\n
+AboutSystem	System name		DespreSistem
+MIT (no promotion)	AboutView		MIT (fără promovare)
+Copyright © 2003 Peter Hanappe and others.	AboutView		Drepturi de autor © 2003 Peter Hanappe și alții.
+Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Drepturi de autor © 1994-1997 Mark Kilgard. Toate drepturile rezervate.
+Revision	AboutView		Revizie
+Copyright © 2002-2005 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Drepturi de autor © 2002-2005 Industrial Light & Magic, o divizie a Lucas Digital Ltd. LLC.
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. și echipei sale de dezvoltatori, pentru că au creat BeOS!\n\n
+Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Drepturi de autor © 1999-2000 Y.Takagi. Toate drepturile rezervate.
+Source Code: 	AboutView		Cod sursă:
+Processor:	AboutView		Procesor:
+Kernel:	AboutView		Nucleu:
+BSD (3-clause)	AboutView		BSD (Clauza 3)
+Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Drepturi de autor © 2001-2002 Thomas Broyer, Charlie Bozeman și Daniel Veillard. Toate drepturile rezervate.
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Drepturile de autor ale codului Haiku reprezintă proprietatea a Haiku, Inc. sau a respectivilor autori, atunci când este notat explicit în sursă. Haiku® şi logo-ul HAIKU® sunt mărci înregistrate ale Haiku, Inc.\n\n
+Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Drepturi de autor © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nToate drepturile rezervate.
+%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB total, %inaccessible MiB inaccesibil
+Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Drepturi de autor © 2000-2007 Fabrice Bellard, et al.
+Contributors:\n	AboutView		Contribuitori:\n
+Unknown	AboutView		Necunoscut
+Copyright © 2001-2003 Expat maintainers.	AboutView		Drepturi de autor © 2001-2003 Întreținătorii Expat.
+Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Drepturi de autor  © 1999-2006 Brian Paul. Proiectul Mesa3D. Toate drepturile rezervate.
+Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Drepturi de autor © 2002-2004 Vivek Mohan. Toate drepturile rezervate.
+... and the many people making donations!\n\n	AboutView		... și tuturor celor care donează!\n\n
+\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… și probabil unii pe care am uitat să îi menționăm (scuze!)\n\n
+%.2f GHz	AboutView		%.2f GHz
+Memory:	AboutView		Memorie:
+Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Drepturi de autor © 1996-1997 Jeff Prosise. Toate drepturile rezervate.
+Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Drepturi de autor © 1994-2009, Thomas G. Lane, Guido Vollbeding. Acest program se bazează pe munca Grupului Independent JPEG.
+Past maintainers:\n	AboutView		Responsabili anteriori:\n
+\n\nSpecial thanks to:\n	AboutView		\n\nMulțumiri speciale pentru:\n
+Licenses: 	AboutView		Licențe: 
+Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Drepturi de autor © 1995-2004 Jean-loup Gailly și Mark Adler.
+Google & their Google Summer of Code program\n	AboutView		Google & programul Google Summer of Code\n
+Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Drepturi de autor © 2002-2003 Steve Lhomme. Toate drepturile rezervate.
+\nCopyrights\n\n	AboutView		\nDrepturi de autor\n\n
+Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Drepturi de autor © 2007-2009 Marvell Semiconductor, Inc. Toate drepturile rezervate.
+Current maintainers:\n	AboutView		Responsabili curenți:\n
+Copyright © 2006-2007 Intel Corporation. All rights reserved.	AboutView		Drepturi de autor © 2006-2007 Corporația Intel. Toate drepturile rezervate.
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Codul unic Haiku, în special nucleul și tot codul la care aplicațiile pot face legături, este distribuit sub termenii <licenței MIT>. Unele librării de sistem pot conține cod de la părți terțe distribuit prin <licența LGPL>. Puteți găsi drepturile de autor ale codului părților terțe mai jos.\n\n
+Time running:	AboutView		Rulează de:
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Conține programe dezvoltate de Fundația NetBSD, Inc. și contribuitorii acesteia:\nftp, tput\nDrepturi de autor © 1996-2008 Fundația NetBSD, Inc. Toate drepturile rezervate.
 Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Conține programe de la Proiectul FreeBSD, publicate sub licența BSD:\ncal, ftpd, ping, telnet, telnetd, traceroute\nDrepturi de autor © 1994-2008 Proiectul FreeBSD. Toate drepturile rezervate.
-Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Conține programe din Proiectul GNU, eliberate sub licențele GPL și LGPL:\nBiblioteca C GNU, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nDrepturi de autor © Fundația Free Software.
-Contributors:\n	AboutView		Contribuitori:\n
-Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Drepturi de autor © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nToate drepturile rezervate.
-Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Drepturi de autor © 1990-2002 Info-ZIP. Toate drepturile rezervate.
-Copyright © 1990-2003 Wada Laboratory, the University of Tokyo.	AboutView		Drepturi de autor © 1990-2003 Laboratorul Wada, Universitatea din Tokyo.
-Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Drepturi de autor © 1994-1997 Mark Kilgard. Toate drepturile rezervate.
-Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Drepturi de autor © 1994-2008 Xiph.Org. Toate drepturile rezervate.
-Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Drepturi de autor © 1994-2009, Thomas G. Lane, Guido Vollbeding. Acest program se bazează pe munca Grupului Independent JPEG.
-Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Drepturi de autor © 1995, 1998-2001 Jef Poskanzer. Toate drepturile rezervate.
-Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Drepturi de autor © 1995-2001 Lars Düning. Toate drepturile rezervate.
-Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Drepturi de autor © 1995-2004 Jean-loup Gailly și Mark Adler.
-Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Drepturi de autor © 1996-1997 Jeff Prosise. Toate drepturile rezervate.
-Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Drepturi de autor © 1996-2005 Julian R Seward. Toate drepturile rezervate.
-Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		Drepturi de autor © 1997-2006 PDFlib GmbH și Thomas Merz. Toate drepturile rezervate.\nPDFlib și sigla PDFlib sunt mărci înregistrate ale PDFlib GmbH.
-Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Drepturi de autor © 1998-2000 Thai Open Source Software Center Ltd și Clark Cooper.
-Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Drepturi de autor © 1998-2003 Daniel Veillard. Toate drepturile rezervate.
-Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Drepturi de autor © 1999-2000 Y.Takagi. Toate drepturile rezervate.
-Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Drepturi de autor  © 1999-2006 Brian Paul. Proiectul Mesa3D. Toate drepturile rezervate.
-Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Drepturi de autor © 1999-2007 Michael C. Ring. Toate drepturile rezervate.
-Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Drepturi de autor © 1999-2010 de autorii pentru Gutenprint. Toate drepturile rezervate.
-Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Drepturi de autor © 2000 Jean-Pierre ervbefeL și Remi Lefebvre.
-Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Drepturi de autor © 2000-2007 Fabrice Bellard, et al.
-Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Drepturi de autor © 2001-2002 Thomas Broyer, Charlie Bozeman și Daniel Veillard. Toate drepturile rezervate.
-Copyright © 2001-2003 Expat maintainers.	AboutView		Drepturi de autor © 2001-2003 Întreținătorii Expat.
-Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Drepturi de autor © 2002-2003 Steve Lhomme. Toate drepturile rezervate.
-Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Drepturi de autor © 2002-2004 Vivek Mohan. Toate drepturile rezervate.
-Copyright © 2002-2005 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Drepturi de autor © 2002-2005 Industrial Light & Magic, o divizie a Lucas Digital Ltd. LLC.
-Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Drepturi de autor © 2002-2006 Maxim Shemanarev (McSeem).
-Copyright © 2002-2008 Alexander L. Roshal. All rights reserved.	AboutView		Drepturi de autor © 2002-2008 Alexander L. Roshal. Toate drepturile rezervate.
-Copyright © 2003 Peter Hanappe and others.	AboutView		Drepturi de autor © 2003 Peter Hanappe și alții.
-Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Drepturi de autor © 2003-2006 Corporația Intel. Toate drepturile rezervate.
-Copyright © 2004-2005 Intel Corporation. All rights reserved.	AboutView		Drepturi de autor © 2004-2005 Corporația Intel. Toate drepturile rezervate.
-Copyright © 2006-2007 Intel Corporation. All rights reserved.	AboutView		Drepturi de autor © 2006-2007 Corporația Intel. Toate drepturile rezervate.
-Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Drepturi de autor © 2007 Corporația Ralink Technology. Toate drepturile rezervate.
-Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Drepturi de autor © 2007-2009 Marvell Semiconductor, Inc. Toate drepturile rezervate.
-Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Drepturi de autor © 2010-2011 Google Inc. Toate drepturile rezervate.
-Current maintainers:\n	AboutView		Responsabili curenți:\n
-GCC %d Hybrid	AboutView		GCC %d Hibrid
-Google & their Google Summer of Code program\n	AboutView		Google & programul Google Summer of Code\n
-Kernel:	AboutView		Nucleu:
-License: 	AboutView		Licență:
-Licenses: 	AboutView		Licențe: 
-MIT (no promotion)	AboutView		MIT (fără promovare)
-MIT license. All rights reserved.	AboutView		Licență MIT. Toate drepturile rezervate.
-Memory:	AboutView		Memorie:
-Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fondator proiect)\n\n
-Past maintainers:\n	AboutView		Responsabili anteriori:\n
-Processor:	AboutView		Procesor:
-Revision	AboutView		Revizie
-Source Code: 	AboutView		Cod sursă:
-The BeGeistert team\n	AboutView		Echipa BeGeistert\n
-The Haiku-Ports team\n	AboutView		Echipa Haiku-Ports\n
 The Haikuware team and their bounty program\n	AboutView		Echipa Haikuware și programul lor de recompense\n
-The University of Auckland and Christof Lutteroth\n\n	AboutView		Universitatea Auckland și Christof Lutteroth\n\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Codul unic Haiku, în special nucleul și tot codul la care aplicațiile pot face legături, este distribuit sub termenii <licenței MIT>. Unele librării de sistem pot conține cod de la părți terțe distribuit prin <licența LGPL>. Puteți găsi drepturile de autor ale codului părților terțe mai jos.\n\n
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Drepturile de autor ale codului Haiku reprezintă proprietatea a Haiku, Inc. sau a respectivilor autori, atunci când este notat explicit în sursă. Haiku® şi logo-ul HAIKU® sunt mărci înregistrate ale Haiku, Inc.\n\n
-Time running:	AboutView		Rulează de:
-Translations:\n	AboutView		Traduceri:\n
-Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (și nucleul său NewOS)\n
-Unknown	AboutView		Necunoscut
+Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Drepturi de autor © 1995, 1998-2001 Jef Poskanzer. Toate drepturile rezervate.
+Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Drepturi de autor © 2010-2011 Google Inc. Toate drepturile rezervate.
+About this system	AboutWindow		Despre acest sistem
+BSD (2-clause)	AboutView		BSD (Clauza 2)
 Version:	AboutView		Versiune:
-Website, marketing & documentation:\n	AboutView		Site web, marketing & documentație:\n
+Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Drepturi de autor © 1994-2008 Xiph.Org. Toate drepturile rezervate.
+Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Drepturi de autor © 1998-2000 Thai Open Source Software Center Ltd și Clark Cooper.
+Copyright © 2004-2005 Intel Corporation. All rights reserved.	AboutView		Drepturi de autor © 2004-2005 Corporația Intel. Toate drepturile rezervate.
+Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Drepturi de autor © 2002-2006 Maxim Shemanarev (McSeem).
+Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Drepturi de autor © 1999-2007 Michael C. Ring. Toate drepturile rezervate.
+The BeGeistert team\n	AboutView		Echipa BeGeistert\n
+The University of Auckland and Christof Lutteroth\n\n	AboutView		Universitatea Auckland și Christof Lutteroth\n\n
+Copyright © 1990-2003 Wada Laboratory, the University of Tokyo.	AboutView		Drepturi de autor © 1990-2003 Laboratorul Wada, Universitatea din Tokyo.
+Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Drepturi de autor © 1995-2001 Lars Düning. Toate drepturile rezervate.
+Copyright © 2002-2008 Alexander L. Roshal. All rights reserved.	AboutView		Drepturi de autor © 2002-2008 Alexander L. Roshal. Toate drepturile rezervate.
+Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Drepturi de autor © 2003-2006 Corporația Intel. Toate drepturile rezervate.
+%ld MHz	AboutView		%ld MHz
+Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		Drepturi de autor © 1997-2006 PDFlib GmbH și Thomas Merz. Toate drepturile rezervate.\nPDFlib și sigla PDFlib sunt mărci înregistrate ale PDFlib GmbH.
+Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Conține programe din Proiectul GNU, eliberate sub licențele GPL și LGPL:\nBiblioteca C GNU, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nDrepturi de autor © Fundația Free Software.
+MIT license. All rights reserved.	AboutView		Licență MIT. Toate drepturile rezervate.
 [Click a license name to read the respective license.]\n\n	AboutView		[Click pe un nume pentru a citi respectiva licență.]\n\n
-\nCopyrights\n\n	AboutView		\nDrepturi de autor\n\n
-\n\nSpecial thanks to:\n	AboutView		\n\nMulțumiri speciale pentru:\n
-\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… și probabil unii pe care am uitat să îi menționăm (scuze!)\n\n
+Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Drepturi de autor © 2007 Corporația Ralink Technology. Toate drepturile rezervate.
+Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Drepturi de autor © 1990-2002 Info-ZIP. Toate drepturile rezervate.
+License: 	AboutView		Licență:
+2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 de Andy Ritger bazat pe Formula generalizată a cronometrării
+GCC %d Hybrid	AboutView		GCC %d Hibrid
+Translations:\n	AboutView		Traduceri:\n

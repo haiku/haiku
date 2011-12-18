@@ -1,19 +1,19 @@
 1	romanian	x-vnd.Haiku-MidiPlayer	4180509704
-Cavern	Main Window		Cavernă
-Closet	Main Window		Dulap
-Could not load song	Main Window		Nu s-a putut încărca melodia
-Drop MIDI file here	Scope View		Plasați fișier MIDI aici
-Dungeon	Main Window		Donjon
-Garage	Main Window		Garaj
-Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	MIDI Player Haiku 1.0.0 beta\n\nAcest program micuț\npoate reda mii de\nmelodii cu sunete amuzante
-Igor's lab	Main Window		Laboratorul lui Igor
-Live input:	Main Window		Intrare directă:
-MidiPlayer	System name		PlayerMidi
 None	Main Window		Nimic
+Live input:	Main Window		Intrare directă:
+Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	MIDI Player Haiku 1.0.0 beta\n\nAcest program micuț\npoate reda mii de\nmelodii cu sunete amuzante
+Stop	Main Window		Oprește
+Cavern	Main Window		Cavernă
+Volume:	Main Window		Volum:
+Reverb:	Main Window		Reflectă:
 OK	Main Window		OK
 Off	Main Window		Oprit
+Dungeon	Main Window		Donjon
 Play	Main Window		Redă
-Reverb:	Main Window		Reflectă:
+Garage	Main Window		Garaj
+Closet	Main Window		Dulap
+MidiPlayer	System name		PlayerMidi
+Drop MIDI file here	Scope View		Plasați fișier MIDI aici
+Igor's lab	Main Window		Laboratorul lui Igor
 Scope	Main Window		Gamă
-Stop	Main Window		Oprește
-Volume:	Main Window		Volum:
+Could not load song	Main Window		Nu s-a putut încărca melodia

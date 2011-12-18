@@ -1,29 +1,27 @@
-1	romanian	x-vnd.Haiku-Magnify	3748875992
-%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize pixels/pixel
-Add a crosshair	Magnify-Main		Adaugă un reticul
+1	romanian	x-vnd.Haiku-Magnify	2227745383
+no clip msg\n	In console, when clipboard is empty after clicking Copy image		niciun clip msg\n
+Make square	Magnify-Main		Alcătuiește pătrat
 Copy image	Magnify-Main		Copiază imagine
-Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Copiază/Salvează:\n copiază - copiază imaginea curentă la clipboard\n salvează - anunță utilizatorul pentru salvarea unui fișier și scrie\nbiții imaginii\n
-Decrease pixel size	Magnify-Main		Micșorează dimensiune pixel
-Decrease window size	Magnify-Main		Micșorează dimensiune fereastră
-Freeze/Unfreeze image	Magnify-Main		Îngheață/Dezgheață imagine
+Magnify help	Magnify-Help		Ajutor lupă
+usage: magnify [size] (magnify size * size pixels)\n	Console		utilizare: 
+Stick coordinates	Magnify-Main		Lipește coordonate
+Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Info:\n ascunde/afișează info - ascunde/afișează toate caracteristicile noi\n notă: la afișare, un pătrat roșu va apărea ceea ce semnifică\nvalorile rgb ale pixelului care vor fi afișate\n adaugă/elimină încrucișări - 2 încrucișări pot fi adăugate (sau eliminate)\n pentru a ajuta în alinierea și plasarea obiectelor.\nÎncrucișările sunt reprezentate de pătrate și linii albastre.\n ascunde/afișează grila - ascunde/afișează grila care separă fiecare pixel\n
+Hide/Show grid	Magnify-Main		Ascunde/Afișează grilă
+magnify: size must be a multiple of 4\n	Console		lupă: dimensiunea trebuie să fie multiplu de 4\n
 General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		General:\n 32 x 32 - numerele din stânga sus sunt numărul de pixeli\nvizibili (lățime x înălțime) 8 pixeli/pixel - reprezintă numărul de pixeli care sunt utilizați\n pentru a mări un pixel\n R:152 G:52 B:10 - valorile RGB pentru pixelul de sub\n pătratul roșu\n
 Help	Magnify-Main		Ajutor
-Hide/Show grid	Magnify-Main		Ascunde/Afișează grilă
-Hide/Show info	Magnify-Main		Ascunde/Afișează info
-Increase pixel size	Magnify-Main		Mărește dimensiune pixel
-Increase window size	Magnify-Main		Mărește dimensiune fereastră
-Info	Magnify-Main		Info
-Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Info:\n ascunde/afișează info - ascunde/afișează toate caracteristicile noi\n notă: la afișare, un pătrat roșu va apărea ceea ce semnifică\nvalorile rgb ale pixelului care vor fi afișate\n adaugă/elimină încrucișări - 2 încrucișări pot fi adăugate (sau eliminate)\n pentru a ajuta în alinierea și plasarea obiectelor.\nÎncrucișările sunt reprezentate de pătrate și linii albastre.\n ascunde/afișează grila - ascunde/afișează grila care separă fiecare pixel\n
-Magnify	System name		Lupă
-Magnify help	Magnify-Help		Ajutor lupă
-Make square	Magnify-Main		Alcătuiește pătrat
-Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Navigare:\ntaste cu săgeți - mută selecția curentă (indicator rgb sau reticul)\n în jur de 1 pixel o dată\n opțiune-tastă cu săgeată - mută locația mausului cu 1 pixel o dată\n x marchează selecția - selecția curentă conține un „x”\n
-Remove a crosshair	Magnify-Main		Elimină un reticul
-Save image	Magnify-Main		Salvează imagine
 Sizing/Resizing:\n  make square - sets the width and the height to the larger\n    of the two making a square image\n  increase/decrease window size - grows or shrinks the window\n    size by 4 pixels.\n    note: this window can also be resized to any size via the\n      resizing region of the window\n  increase/decrease pixel size - increases or decreases the number\n    of pixels used to magnify a 'real' pixel. Range is 1 to 16.\n	Magnify-Help		Dimensionare/Redimensionare:\nalcătuiește pătrat - configură lățimea și înălțimea la cea mai largă\n dintre ele alcătuind o imagine pătrată\n mărește/micșorează dimensiunea ferestrei - mărește sau micșorează dimensiunea\nferestrei cu 4 pixeli.\nnotă: această fereastră poate fi de asemenea redimensionată la orice mărime prin regiunea\nde redimensionare a ferestrei\nmărește/micșorează dimensiunea pixelului - mărește sau micșorează numărul\ndepixeli utilizați pentru a mări un pixel „real”. Intervalul este de la 1 la 16.\n
-Stick coordinates	Magnify-Main		Lipește coordonate
-freeze - freezes/unfreezes magnification of whatever the\n    cursor is currently over\n	Magnify-Help		îngheață - îngheață/dezgheață procesul de mărire a oricărui obiect\ncare se află sub cursor\n
-magnify: size must be a multiple of 4\n	Console		lupă: dimensiunea trebuie să fie multiplu de 4\n
-no clip msg\n	In console, when clipboard is empty after clicking Copy image		niciun clip msg\n
-size must be > 4 and a multiple of 4\n	Console		dimensiunea trebuie să fie > 4 și un multiplu de 4\n
-usage: magnify [size] (magnify size * size pixels)\n	Console		utilizare: 
+Decrease pixel size	Magnify-Main		Micșorează dimensiune pixel
+Magnify	System name		Lupă
+%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize pixels/pixel
+Info	Magnify-Main		Info
+Remove a crosshair	Magnify-Main		Elimină un reticul
+Freeze/Unfreeze image	Magnify-Main		Îngheață/Dezgheață imagine
+Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Copiază/Salvează:\n copiază - copiază imaginea curentă la clipboard\n salvează - anunță utilizatorul pentru salvarea unui fișier și scrie\nbiții imaginii\n
+Hide/Show info	Magnify-Main		Ascunde/Afișează info
+Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Navigare:\ntaste cu săgeți - mută selecția curentă (indicator rgb sau reticul)\n în jur de 1 pixel o dată\n opțiune-tastă cu săgeată - mută locația mausului cu 1 pixel o dată\n x marchează selecția - selecția curentă conține un „x”\n
+Save image	Magnify-Main		Salvează imagine
+Increase window size	Magnify-Main		Mărește dimensiune fereastră
+Decrease window size	Magnify-Main		Micșorează dimensiune fereastră
+Increase pixel size	Magnify-Main		Mărește dimensiune pixel
+Add a crosshair	Magnify-Main		Adaugă un reticul

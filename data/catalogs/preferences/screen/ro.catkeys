@@ -1,52 +1,52 @@
 1	romanian	x-vnd.Haiku-Screen	2033930135
-%.1f Hz	Screen		%.1f Hz
-%sSerial no.: %s	Screen		%sNr. serie: %s
-/other…	Screen		/altele...
-15 bits/pixel, 32768 colors	Screen		15 biți/pixel, 32768 culori
-16 bits/pixel, 65536 colors	Screen		16 biți/pixel, 65536 culori
-24 bits/pixel, 16 Million colors	Screen		24 biți/pixel, 16 Milioane de culori
-32 bits/pixel, 16 Million colors	Screen		32  biți/pixel, 16 Milioane de culori
-8 bits/pixel, 256 colors	Screen		8 biți/pixel, 256 de culori
-About	Screen		Despre
-All workspaces	Screen		Toate spațiile de lucru
-Apply	Screen		Aplică
-Cancel	Screen		Anulează
-Colors:	Screen		Culori:
-Columns:	Screen		Coloane:
-Combine displays:	Screen		Combină afișări:
-Could not write VESA mode settings file:\n\t	Screen		Nu s-a putut scrie fișierul de configurări ale modului VESA:\n\t
-Current workspace	Screen		Spațiul de lucru curent
-Do you wish to keep these settings?	Screen		Doriți să păstrați aceste configurări?
-Done	Screen		Gata
-Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Frecvență orizontală:\t%lu - %lu kHz\nFrecvență verticală:t%lu - %lu Hz\n\nCeas de pixel maxim\t%g MHz
-Hz	Screen		Hz
-Keep	Screen		Păstrează
-OK	Screen		OK
-Other…	Screen		Altele...
-Refresh rate	Screen		cotă de reîmprospătare
-Refresh rate:	Screen		Cotă de împrospătare:
-Resolution:	Screen		Rezoluție:
-Revert	Screen		Revenire
-Rows:	Screen		Rânduri:
-Screen	Screen		Ecran
-Screen	System name		Ecran
-Screen preferences by the Haiku team	Screen		Preferințe de ecran de echipa Haiku
-Set background…	Screen		Configurează fundal...
-Settings will revert in %seconds seconds.	Screen		Configurările vor reveni în %seconds secunde.
-Swap displays:	Screen		Interschimbă afișări:
-The screen mode could not be set:\n\t%s\n	Screen		Modul de ecran nu a putut fi configurat:\n\t%s\n
-Type or use the left and right arrow keys.	Screen		Tastați sau utilizați tastele cu săgeată la stânga și la dreapta.
-Undo	Screen		Refă
-Unknown mode	Screen		Mod necunoscut
-Use laptop panel:	Screen		Utilizează panou laptop:
-Video format:	Screen		Format video:
-Warning	Screen		Avertisment
-Workspaces	Screen		Spații de lucru
-always	Screen		întotdeauna
-bits/pixel	Screen		biți/pixel
-disable	Screen		dezactivează
-horizontally	Screen		orizontal
-if needed	Screen		dacă este nevoie
-no	Screen		nu
-vertically	Screen		vertical
 yes	Screen		da
+Use laptop panel:	Screen		Utilizează panou laptop:
+15 bits/pixel, 32768 colors	Screen		15 biți/pixel, 32768 culori
+/other…	Screen		/altele...
+16 bits/pixel, 65536 colors	Screen		16 biți/pixel, 65536 culori
+Revert	Screen		Revenire
+Swap displays:	Screen		Interschimbă afișări:
+Combine displays:	Screen		Combină afișări:
+Done	Screen		Gata
+Set background…	Screen		Configurează fundal...
+Undo	Screen		Refă
+if needed	Screen		dacă este nevoie
+Screen preferences by the Haiku team	Screen		Preferințe de ecran de echipa Haiku
+Screen	System name		Ecran
+OK	Screen		OK
+Workspaces	Screen		Spații de lucru
+The screen mode could not be set:\n\t%s\n	Screen		Modul de ecran nu a putut fi configurat:\n\t%s\n
+no	Screen		nu
+Could not write VESA mode settings file:\n\t	Screen		Nu s-a putut scrie fișierul de configurări ale modului VESA:\n\t
+Type or use the left and right arrow keys.	Screen		Tastați sau utilizați tastele cu săgeată la stânga și la dreapta.
+Warning	Screen		Avertisment
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Frecvență orizontală:\t%lu - %lu kHz\nFrecvență verticală:t%lu - %lu Hz\n\nCeas de pixel maxim\t%g MHz
+Keep	Screen		Păstrează
+Unknown mode	Screen		Mod necunoscut
+disable	Screen		dezactivează
+Columns:	Screen		Coloane:
+All workspaces	Screen		Toate spațiile de lucru
+always	Screen		întotdeauna
+32 bits/pixel, 16 Million colors	Screen		32  biți/pixel, 16 Milioane de culori
+Current workspace	Screen		Spațiul de lucru curent
+About	Screen		Despre
+24 bits/pixel, 16 Million colors	Screen		24 biți/pixel, 16 Milioane de culori
+horizontally	Screen		orizontal
+Other…	Screen		Altele...
+Cancel	Screen		Anulează
+bits/pixel	Screen		biți/pixel
+Settings will revert in %seconds seconds.	Screen		Configurările vor reveni în %seconds secunde.
+Refresh rate:	Screen		Cotă de împrospătare:
+Hz	Screen		Hz
+Do you wish to keep these settings?	Screen		Doriți să păstrați aceste configurări?
+Rows:	Screen		Rânduri:
+vertically	Screen		vertical
+Resolution:	Screen		Rezoluție:
+Screen	Screen		Ecran
+%.1f Hz	Screen		%.1f Hz
+8 bits/pixel, 256 colors	Screen		8 biți/pixel, 256 de culori
+Apply	Screen		Aplică
+Refresh rate	Screen		cotă de reîmprospătare
+%sSerial no.: %s	Screen		%sNr. serie: %s
+Colors:	Screen		Culori:
+Video format:	Screen		Format video:

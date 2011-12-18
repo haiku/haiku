@@ -1,200 +1,200 @@
 1	romanian	x-vnd.haiku-icon_o_matic	2326864078
-<modify path>	Icon-O-Matic-PathCmd		<schimbă calea>
-<nothing to redo>	Icon-O-Matic-Menu-Edit		<nimic de repetat>
-<nothing to undo>	Icon-O-Matic-Menu-Edit		<nimic de refăcut>
-<unavailable>	Icon-O-Matic-StyleTypes		<indisponibil>
-<unkown property>	Icon-O-Matic-PropertyNames		<proprietate necunoscută>
-Add	Icon-O-Matic-PathsList		Adaugă
-Add	Icon-O-Matic-StylesList		Adaugă
-Add	Icon-O-Matic-TransformersList		Adaugă
-Add Control Point	Icon-O-Matic-AddPointCmd		Adaugă punct de control
-Add Path	Icon-O-Matic-AddPathsCmd		Adaugă cale
-Add Paths	Icon-O-Matic-AddPathsCmd		Adaugă căi
-Add Shape	Icon-O-Matic-AddShapesCmd		Adaugă formă
-Add Shapes	Icon-O-Matic-AddShapesCmd		Adaugă forme
+Select All	Icon-O-Matic-PathManipulator		Selectează tot
 Add Style	Icon-O-Matic-AddStylesCmd		Adaugă stil
-Add Styles	Icon-O-Matic-AddStylesCmd		Adaugă stil
-Add Transformer	Icon-O-Matic-AddTransformersCmd		Adaugă transformator
-Add Transformers	Icon-O-Matic-AddTransformersCmd		Adaugă transformatori
-Add circle	Icon-O-Matic-PathsList		Adaugă cerc
-Add empty	Icon-O-Matic-ShapesList		Adaugă liber
-Add rect	Icon-O-Matic-PathsList		Adaugă dreptunghi
-Add shape with path	Icon-O-Matic-Menu-Shape		Adaugă formă cu cale
-Add shape with path & style	Icon-O-Matic-Menu-Shape		Adaugă formă cu cale & stil
-Add shape with style	Icon-O-Matic-Menu-Shape		Adaugă formă cu stil
-Add with path	Icon-O-Matic-ShapesList		Adaugă cu cale
-Add with path & style	Icon-O-Matic-ShapesList		Adaugă cu cale & stil
-Add with style	Icon-O-Matic-ShapesList		Adaugă cu stil
-All	Icon-O-Matic-Properties		Tot
-Append…	Icon-O-Matic-Menu-File		Adaugă...
-Assign Path	Icon-O-Matic-AddPathsCmd		Atribuie cale
-Assign Paths	Icon-O-Matic-AddPathsCmd		Atribuie căi
-Assign Style	Icon-O-Matic-AssignStyleCmd		Atribuie stil
-BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Atribut BEOS:ICON
-Bleep!	Exporter - Continue in error dialog		Semnal!
-Bummer	Cancel button - error alert		Bine
-Cancel	Icon-O-Matic-ColorPicker		Anulează
-Cancel	Icon-O-Matic-Menu-Settings		Anulează
-Cancel	Icon-O-Matic-SVGExport		Anulează
-Caps	Icon-O-Matic-PropertyNames		Acoperire
-Change Color	Icon-O-Matic-SetColorCmd		Schimbă culoarea
-Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Curăță cale
-Clean up	Icon-O-Matic-PathsList		Curăță
-Click on a shape above	Empty transformers list - 1st line		Dați clic pe o formă de mai sus
-Click on an object in	Empty property list - 1st line		Dați clic pe un obiect în
-Close	Icon-O-Matic-Menu-File		Închide
-Closed	Icon-O-Matic-PropertyNames		Închis
-Color	Icon-O-Matic-PropertyNames		Culoare
-Color	Icon-O-Matic-StyleTypes		Culoare
-Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Culoare (#%02x%02x%02x)
 Color (#%02x%02x%02x)	Style name after dropping a color		Culoare (#%02x%02x%02x)
-Conic	Icon-O-Matic-StyleTypes		Conic
-Contour	Transformation		Contur
-Copy	Icon-O-Matic-Properties		Copiază
-Detect Orient.	Icon-O-Matic-PropertyNames		Detectează orientarea
-Diamond	Icon-O-Matic-StyleTypes		Diamant
-Discard	Icon-O-Matic-Menu-Settings		Ignoră
-Duplicate	Icon-O-Matic-PathsList		Duplicat
-Duplicate	Icon-O-Matic-ShapesList		Duplicat
-Duplicate	Icon-O-Matic-StylesList		Duplicat
-Edit	Icon-O-Matic-Menus		Editează
-Edit Gradient	Icon-O-Matic-SetGradientCmd		Editează degrade
-Error: 	Icon-O-Matic-Exporter		Eroare:
-Error: 	Icon-O-Matic-Main		Eroare:
-Export	Icon-O-Matic-Menu-File		Exportă
-Export Icon	Dialog title		Exportă pictogramă
-Export as…	Icon-O-Matic-Menu-File		Exportă ca...
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		A eșuat deschiderea fișierului „%s” ca document SVG.\n\nEroare: %s
-File	Icon-O-Matic-Menus		Fișier
-Flip	Icon-O-Matic-PathManipulator		Inversează
-Flip Control Point	Icon-O-Matic-FlipPointsCmd		Inversează punct de control
-Flip Control Points	Icon-O-Matic-FlipPointsCmd		Inversează puncte de control
-Format	Icon-O-Matic-SavePanel		Format
-Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Îngheață formă
-Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Îngheață forme
-Freeze transformation	Icon-O-Matic-ShapesList		Îngheață transformare
-Gradient	Icon-O-Matic-StyleTypes		Degrade
-Gradient type	Icon-O-Matic-StyleTypes		Tip degrade
-HVIF Source Code	Icon-O-Matic-SavePanel		Cod sursă HVIF
-Height	Icon-O-Matic-PropertyNames		Înălțime
-Icon-O-Matic	System name		Icon-O-Matic
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		S-ar putea că Icon-O-Matic nu a interpretat toate datele de la SVG atunci când a fost încărcat. Prin suprascrierea fișierului original, această informație ar fi pierdută acum.
-Insert Control Point	Icon-O-Matic-InsertPointCmd		Inserează punct de control
-Invert selection	Icon-O-Matic-Properties		Inversează selecția
-Joins	Icon-O-Matic-PropertyNames		Legături
-Linear	Icon-O-Matic-StyleTypes		Liniar
-META:ICON Attribute	Icon-O-Matic-SavePanel		Atribut META:ICON
-Max LOD	Icon-O-Matic-PropertyNames		LOD max
-Min LOD	Icon-O-Matic-PropertyNames		LOD min
-Miter Limit	Icon-O-Matic-PropertyNames		Limită miter
-Modify Control Point	Icon-O-Matic-ChangePointCmd		Modifică punct de control
-Move	Icon-O-Matic-TransformationBoxStates		Mută
-Move Path	Icon-O-Matic-MovePathsCmd		Mută cale
-Move Paths	Icon-O-Matic-MovePathsCmd		Mută căi
-Move Pivot	Icon-O-Matic-TransformationBoxStates		Mută pivot
+Add	Icon-O-Matic-StylesList		Adaugă
 Move Shape	Icon-O-Matic-MoveShapesCommand		Mută formă
-Move Shapes	Icon-O-Matic-MoveShapesCommand		Mută forme
-Move Style	Icon-O-Matic-MoveStylesCmd		Mută stil
-Move Styles	Icon-O-Matic-MoveStylesCmd		Mută stiluri
-Move Transformer	Icon-O-Matic-MoveTransformersCmd		Mută transformator
-Move Transformers	Icon-O-Matic-MoveTransformersCmd		Mută transformatori
-Multi Paste Properties	Icon-O-Matic-Properties		Proprietăți multi lipire
-Multi Set 	Multi Set (property name)		Configurare multi
-Multi paste	Icon-O-Matic-Properties		Lipire multi
-Name	Icon-O-Matic-PropertyNames		Nume
-New	Icon-O-Matic-Menu-File		Nou
-No	Icon-O-Matic-StyledTextImport		Nu
-None	Icon-O-Matic-Properties		Nimic
-Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Apasă punctul de control
-Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Apasă puncte de control
-OK	Icon-O-Matic-ColorPicker		OK
-OK	Icon-O-Matic-SVGImport		OK
-Off	Icon-O-Matic-Menu-Settings		Oprit
-Opacity	Icon-O-Matic-PropertyNames		Opacitate
 Opening the document failed!	Icon-O-Matic-Main		Deschiderea documentului a eșuat!
+Reset transformation	Icon-O-Matic-ShapesList		Resetează transformare
+Move Paths	Icon-O-Matic-MovePathsCmd		Mută căi
+None	Icon-O-Matic-Properties		Nimic
+New	Icon-O-Matic-Menu-File		Nou
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		S-ar putea că Icon-O-Matic nu a interpretat toate datele de la SVG atunci când a fost încărcat. Prin suprascrierea fișierului original, această informație ar fi pierdută acum.
+Paste Properties	Icon-O-Matic-Properties		Lipește proprietăți
+Stroke	Transformation		Trăsătură
+Save Icon	Dialog title		Salvează pictogramă
+Closed	Icon-O-Matic-PropertyNames		Închis
+Remove Path	Icon-O-Matic-RemovePathsCmd		Elimină cale
+Add shape with path	Icon-O-Matic-Menu-Shape		Adaugă formă cu cale
+Select	Icon-O-Matic-Properties		Selectează
+Height	Icon-O-Matic-PropertyNames		Înălțime
+Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Elimină transformatori
+Width	Icon-O-Matic-PropertyNames		Lățime
+Transformation	Icon-O-Matic-TransformationBoxStates		Transformare
+Duplicate	Icon-O-Matic-ShapesList		Duplicat
+<unkown property>	Icon-O-Matic-PropertyNames		<proprietate necunoscută>
+Linear	Icon-O-Matic-StyleTypes		Liniar
+Assign Path	Icon-O-Matic-AddPathsCmd		Atribuie cale
+Move	Icon-O-Matic-TransformationBoxStates		Mută
+Flip Control Points	Icon-O-Matic-FlipPointsCmd		Inversează puncte de control
+warning	Icon-O-Matic-SVGExport		avertisment
+Copy	Icon-O-Matic-Properties		Copiază
+Miter Limit	Icon-O-Matic-PropertyNames		Limită miter
+OK	Icon-O-Matic-ColorPicker		OK
+Remove Control Point	Icon-O-Matic-RemovePointsCmd		Elimină punctul de control
+Bleep!	Exporter - Continue in error dialog		Semnal!
+Add circle	Icon-O-Matic-PathsList		Adaugă cerc
+Shorten	Icon-O-Matic-PropertyNames		Scurtează
+bad news	Title of error alert		vești rele
+Remove Paths	Icon-O-Matic-RemovePathsCmd		Elimină căi
+Scale Y	Icon-O-Matic-PropertyNames		Scară Y
+Add Control Point	Icon-O-Matic-AddPointCmd		Adaugă punct de control
+Untitled	Icon-O-Matic-Main		Fără titlu
+Multi Set 	Multi Set (property name)		Configurare multi
+any of the other lists to	Empty property list - 2nd line		oricare din celelalte liste la
+Save as…	Icon-O-Matic-Menu-File		Salvează ca...
+Change Color	Icon-O-Matic-SetColorCmd		Schimbă culoarea
+Style	Icon-O-Matic-Menus		Stil
+<modify path>	Icon-O-Matic-PathCmd		<schimbă calea>
 Opening the icon failed!	Icon-O-Matic-Main		Deschiderea pictogramei a eșuat!
+Error: 	Icon-O-Matic-Main		Eroare:
+Rotate indices backwards	Icon-O-Matic-PathsList		Rotește indicii înapoi
+Name	Icon-O-Matic-PropertyNames		Nume
+bad news	Icon-O-Matic-Exporter		vești rele
+<nothing to undo>	Icon-O-Matic-Menu-Edit		<nimic de refăcut>
+Off	Icon-O-Matic-Menu-Settings		Oprit
+Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Îngheață formă
+PNG Set	Icon-O-Matic-SavePanel		Configurare PNG
+Joins	Icon-O-Matic-PropertyNames		Legături
+Remove Style	Icon-O-Matic-RemoveStylesCmd		Elimină stil
+Scale X	Icon-O-Matic-PropertyNames		Scară X
+Set 	Set (property name)		Configurează
+Cancel	Icon-O-Matic-SVGExport		Anulează
+Add shape with style	Icon-O-Matic-Menu-Shape		Adaugă formă cu stil
+Remove Shape	Icon-O-Matic-RemoveShapesCmd		Elimină formă
+Reverse	Icon-O-Matic-PathsList		Inversează
+HVIF Source Code	Icon-O-Matic-SavePanel		Cod sursă HVIF
+Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Restabilește transformări
+All	Icon-O-Matic-Properties		Tot
+Multi Paste Properties	Icon-O-Matic-Properties		Proprietăți multi lipire
+Undo	Icon-O-Matic-Main		Refă
+Click on a shape above	Empty transformers list - 1st line		Dați clic pe o formă de mai sus
+Add Shape	Icon-O-Matic-AddShapesCmd		Adaugă formă
+Contour	Transformation		Contur
+<nothing to redo>	Icon-O-Matic-Menu-Edit		<nimic de repetat>
+Perspective	Transformation		Perspectivă
+Move Transformer	Icon-O-Matic-MoveTransformersCmd		Mută transformator
+Opacity	Icon-O-Matic-PropertyNames		Opacitate
+Add with path	Icon-O-Matic-ShapesList		Adaugă cu cale
+Gradient type	Icon-O-Matic-StyleTypes		Tip degrade
+Icon-O-Matic	System name		Icon-O-Matic
+Cancel	Icon-O-Matic-Menu-Settings		Anulează
+Modify Control Point	Icon-O-Matic-ChangePointCmd		Modifică punct de control
+Saving your document failed!	Icon-O-Matic-Exporter		Salvarea documentului dumneavoastră a eșuat!
+edit it's properties here.	Empty property list - 3rd line		editează proprietățile acestuia aici.
+Split	Icon-O-Matic-PathManipulator		Separă
+Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Apasă puncte de control
+Remove	Icon-O-Matic-StylesList		Elimină
+Add with path & style	Icon-O-Matic-ShapesList		Adaugă cu cale & stil
+META:ICON Attribute	Icon-O-Matic-SavePanel		Atribut META:ICON
+Translation Y	Icon-O-Matic-PropertyNames		Traducere Y
+Rotate	Icon-O-Matic-TransformationBoxStates		Rotește
+Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Elimină transformator
+Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Rotește calea indicilor
+Add Transformer	Icon-O-Matic-AddTransformersCmd		Adaugă transformator
+Remove	Icon-O-Matic-PathsList		Elimină
+Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Apasă punctul de control
+Pick a color	Icon-O-Matic-ColorPicker		Alegeți o culoare
+Quit	Icon-O-Matic-Menu-File		Părăsește
+Export	Icon-O-Matic-Menu-File		Exportă
+No	Icon-O-Matic-StyledTextImport		Nu
+Save changes to current icon?	Icon-O-Matic-Menu-Settings		Se salvează modificările la pictograma curentă?
+Rotate indices forwards	Icon-O-Matic-PathsList		Rotește indicii înainte
+Unassign Path	Icon-O-Matic-UnassignPathCmd		Înlătură atribuire cale
+load error	Icon-O-Matic-SVGImport		eroare de încărcare
+Move Shapes	Icon-O-Matic-MoveShapesCommand		Mută forme
+Remove Styles	Icon-O-Matic-RemoveStylesCmd		Elimină stiluri
+The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		Textul pe care încercați să îl importați este destul de lung, sunteți sigur?
+Add	Icon-O-Matic-TransformersList		Adaugă
+Export Icon	Dialog title		Exportă pictogramă
+Color	Icon-O-Matic-StyleTypes		Culoare
+Settings…	Icon-O-Matic-SavePanel		Configurări...
+Remove	Icon-O-Matic-PathManipulator		Elimină
+Radial	Icon-O-Matic-StyleTypes		Radial
+Perspective	Icon-O-Matic-TransformersList		Perspectivă
+Add shape with path & style	Icon-O-Matic-Menu-Shape		Adaugă formă cu cale & stil
+Gradient	Icon-O-Matic-StyleTypes		Degrade
+Min LOD	Icon-O-Matic-PropertyNames		LOD min
+BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Atribut BEOS:ICON
+Invert selection	Icon-O-Matic-Properties		Inversează selecția
+Export as…	Icon-O-Matic-Menu-File		Exportă ca...
+Transformation	Transformation		Transformare
+Click on an object in	Empty property list - 1st line		Dați clic pe un obiect în
+Move Transformers	Icon-O-Matic-MoveTransformersCmd		Mută transformatori
+Move Styles	Icon-O-Matic-MoveStylesCmd		Mută stiluri
+Reset transformation	Icon-O-Matic-StylesList		Restabilește transformări
+Max LOD	Icon-O-Matic-PropertyNames		LOD max
+Transformer	Icon-O-Matic-Menus		Transformator
+Flip	Icon-O-Matic-PathManipulator		Inversează
+Conic	Icon-O-Matic-StyleTypes		Conic
+Split Control Points	Icon-O-Matic-SplitPointsCmd		Separă puncte de control
+Save	Icon-O-Matic-Menu-Settings		Salvează
+Add empty	Icon-O-Matic-ShapesList		Adaugă liber
+Close	Icon-O-Matic-Menu-File		Închide
+Cancel	Icon-O-Matic-ColorPicker		Anulează
+Paste	Icon-O-Matic-Properties		Lipește
+Shape	Icon-O-Matic-Menus		Formă
+Translation X	Icon-O-Matic-PropertyNames		Traducere X
+Properties	Icon-O-Matic-Menus		Proprietăți
+Move Pivot	Icon-O-Matic-TransformationBoxStates		Mută pivot
+Path	Icon-O-Matic-Menus		Cale
+Freeze transformation	Icon-O-Matic-ShapesList		Îngheață transformare
+File	Icon-O-Matic-Menus		Fișier
+Error: 	Icon-O-Matic-Exporter		Eroare:
+Add Transformers	Icon-O-Matic-AddTransformersCmd		Adaugă transformatori
+Diamond	Icon-O-Matic-StyleTypes		Diamant
+Path	Icon-O-Matic-PropertyNames		Cale
+Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		A eșuat deschiderea fișierului „%s” ca document SVG.\n\nEroare: %s
+Discard	Icon-O-Matic-Menu-Settings		Ignoră
+Swatches	Icon-O-Matic-Menus		Eșantioane
+<unavailable>	Icon-O-Matic-StyleTypes		<indisponibil>
+Rotation	Icon-O-Matic-PropertyNames		Rotație
+Add with style	Icon-O-Matic-ShapesList		Adaugă cu stil
+Add	Icon-O-Matic-PathsList		Adaugă
+Add Shapes	Icon-O-Matic-AddShapesCmd		Adaugă forme
+Move Style	Icon-O-Matic-MoveStylesCmd		Mută stil
+Bummer	Cancel button - error alert		Bine
+Snap to grid	Icon-O-Matic-Menu-Settings		Cuplare la grilaj
+Remove	Icon-O-Matic-ShapesList		Elimină
+Yes	Icon-O-Matic-StyledTextImport		Da
+Transformation	Icon-O-Matic-TransformersList		Transformare
+Add Styles	Icon-O-Matic-AddStylesCmd		Adaugă stil
+Remove Control Points	Icon-O-Matic-RemovePointsCmd		Elimină puncte de control
+Format	Icon-O-Matic-SavePanel		Format
+Add rect	Icon-O-Matic-PathsList		Adaugă dreptunghi
+Edit	Icon-O-Matic-Menus		Editează
+Duplicate	Icon-O-Matic-StylesList		Duplicat
+Caps	Icon-O-Matic-PropertyNames		Acoperire
+Transform	Icon-O-Matic-PathManipulator		Transformă
+Add Paths	Icon-O-Matic-AddPathsCmd		Adaugă căi
+Style type	Icon-O-Matic-StyleTypes		Tip de stil
+too big	Icon-O-Matic-StyledTextImport		prea mare
+Assign Style	Icon-O-Matic-AssignStyleCmd		Atribuie stil
+Add Path	Icon-O-Matic-AddPathsCmd		Adaugă cale
+Color	Icon-O-Matic-PropertyNames		Culoare
+Insert Control Point	Icon-O-Matic-InsertPointCmd		Inserează punct de control
+Flip Control Point	Icon-O-Matic-FlipPointsCmd		Inversează punct de control
+Redo	Icon-O-Matic-Main		Repetă
+Assign Paths	Icon-O-Matic-AddPathsCmd		Atribuie căi
+OK	Icon-O-Matic-SVGImport		OK
+Multi paste	Icon-O-Matic-Properties		Lipire multi
+to attach transformers.	Empty transformers list - 2nd line		pentru a atașa transformatorii.
+Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Restabilește transformări
+Reverse Path	Icon-O-Matic-ReversePathCmd		Cale inversă
+Scale	Icon-O-Matic-TransformationBoxStates		Scală
+Duplicate	Icon-O-Matic-PathsList		Duplicat
+Save	Icon-O-Matic-Menu-File		Salvează
+Append…	Icon-O-Matic-Menu-File		Adaugă...
+Move Path	Icon-O-Matic-MovePathsCmd		Mută cale
+Overwrite	Icon-O-Matic-SVGExport		Suprascrie
+Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Îngheață forme
+Split Control Point	Icon-O-Matic-SplitPointsCmd		Separă punct de control
 Open…	Icon-O-Matic-Menu-File		Deschide...
 Options	Icon-O-Matic-Menus		Opțiuni
-Overwrite	Icon-O-Matic-SVGExport		Suprascrie
-PNG Set	Icon-O-Matic-SavePanel		Configurare PNG
-Paste	Icon-O-Matic-Properties		Lipește
-Paste Properties	Icon-O-Matic-Properties		Lipește proprietăți
-Path	Icon-O-Matic-Menus		Cale
-Path	Icon-O-Matic-PropertyNames		Cale
-Perspective	Icon-O-Matic-TransformersList		Perspectivă
-Perspective	Transformation		Perspectivă
-Pick a color	Icon-O-Matic-ColorPicker		Alegeți o culoare
-Properties	Icon-O-Matic-Menus		Proprietăți
-Quit	Icon-O-Matic-Menu-File		Părăsește
-Radial	Icon-O-Matic-StyleTypes		Radial
-Redo	Icon-O-Matic-Main		Repetă
-Remove	Icon-O-Matic-PathManipulator		Elimină
-Remove	Icon-O-Matic-PathsList		Elimină
-Remove	Icon-O-Matic-ShapesList		Elimină
-Remove	Icon-O-Matic-StylesList		Elimină
-Remove Control Point	Icon-O-Matic-RemovePointsCmd		Elimină punctul de control
-Remove Control Points	Icon-O-Matic-RemovePointsCmd		Elimină puncte de control
-Remove Path	Icon-O-Matic-RemovePathsCmd		Elimină cale
-Remove Paths	Icon-O-Matic-RemovePathsCmd		Elimină căi
-Remove Shape	Icon-O-Matic-RemoveShapesCmd		Elimină formă
-Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Elimină forme
-Remove Style	Icon-O-Matic-RemoveStylesCmd		Elimină stil
-Remove Styles	Icon-O-Matic-RemoveStylesCmd		Elimină stiluri
-Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Elimină transformator
-Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Elimină transformatori
-Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Restabilește transformări
-Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Restabilește transformări
-Reset transformation	Icon-O-Matic-ShapesList		Resetează transformare
-Reset transformation	Icon-O-Matic-StylesList		Restabilește transformări
-Reverse	Icon-O-Matic-PathsList		Inversează
-Reverse Path	Icon-O-Matic-ReversePathCmd		Cale inversă
-Rotate	Icon-O-Matic-TransformationBoxStates		Rotește
-Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Rotește calea indicilor
-Rotate indices backwards	Icon-O-Matic-PathsList		Rotește indicii înapoi
-Rotate indices forwards	Icon-O-Matic-PathsList		Rotește indicii înainte
-Rotation	Icon-O-Matic-PropertyNames		Rotație
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Culoare (#%02x%02x%02x)
+Edit Gradient	Icon-O-Matic-SetGradientCmd		Editează degrade
+Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Curăță cale
 Rounding	Icon-O-Matic-PropertyNames		Înconjurare
-Save	Icon-O-Matic-Menu-File		Salvează
-Save	Icon-O-Matic-Menu-Settings		Salvează
-Save Icon	Dialog title		Salvează pictogramă
-Save as…	Icon-O-Matic-Menu-File		Salvează ca...
-Save changes to current icon?	Icon-O-Matic-Menu-Settings		Se salvează modificările la pictograma curentă?
-Saving your document failed!	Icon-O-Matic-Exporter		Salvarea documentului dumneavoastră a eșuat!
-Scale	Icon-O-Matic-TransformationBoxStates		Scală
-Scale X	Icon-O-Matic-PropertyNames		Scară X
-Scale Y	Icon-O-Matic-PropertyNames		Scară Y
-Select	Icon-O-Matic-Properties		Selectează
-Select All	Icon-O-Matic-PathManipulator		Selectează tot
-Set 	Set (property name)		Configurează
-Settings…	Icon-O-Matic-SavePanel		Configurări...
-Shape	Icon-O-Matic-Menus		Formă
-Shorten	Icon-O-Matic-PropertyNames		Scurtează
-Snap to grid	Icon-O-Matic-Menu-Settings		Cuplare la grilaj
-Split	Icon-O-Matic-PathManipulator		Separă
-Split Control Point	Icon-O-Matic-SplitPointsCmd		Separă punct de control
-Split Control Points	Icon-O-Matic-SplitPointsCmd		Separă puncte de control
-Stroke	Transformation		Trăsătură
-Style	Icon-O-Matic-Menus		Stil
-Style type	Icon-O-Matic-StyleTypes		Tip de stil
-Swatches	Icon-O-Matic-Menus		Eșantioane
-The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		Textul pe care încercați să îl importați este destul de lung, sunteți sigur?
-Transform	Icon-O-Matic-PathManipulator		Transformă
-Transformation	Icon-O-Matic-TransformationBoxStates		Transformare
-Transformation	Icon-O-Matic-TransformersList		Transformare
-Transformation	Transformation		Transformare
-Transformer	Icon-O-Matic-Menus		Transformator
-Translation X	Icon-O-Matic-PropertyNames		Traducere X
-Translation Y	Icon-O-Matic-PropertyNames		Traducere Y
-Unassign Path	Icon-O-Matic-UnassignPathCmd		Înlătură atribuire cale
-Undo	Icon-O-Matic-Main		Refă
-Untitled	Icon-O-Matic-Main		Fără titlu
-Width	Icon-O-Matic-PropertyNames		Lățime
-Yes	Icon-O-Matic-StyledTextImport		Da
-any of the other lists to	Empty property list - 2nd line		oricare din celelalte liste la
-bad news	Icon-O-Matic-Exporter		vești rele
-bad news	Title of error alert		vești rele
-edit it's properties here.	Empty property list - 3rd line		editează proprietățile acestuia aici.
-load error	Icon-O-Matic-SVGImport		eroare de încărcare
-to attach transformers.	Empty transformers list - 2nd line		pentru a atașa transformatorii.
-too big	Icon-O-Matic-StyledTextImport		prea mare
-warning	Icon-O-Matic-SVGExport		avertisment
+Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Elimină forme
+Clean up	Icon-O-Matic-PathsList		Curăță
+Detect Orient.	Icon-O-Matic-PropertyNames		Detectează orientarea

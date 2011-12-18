@@ -1,15 +1,15 @@
 1	romanian	x-vnd.Haiku-MatchHeader	1205906732
-<Choose account>	ConfigView		<Selectează contul>
 <Choose action>	ConfigView		<Selectează acțiunea>
-Delete message	ConfigView		Șterge mesajul
-If	ConfigView		Dacă
-Move to	ConfigView		Mută la
-Reply with	ConfigView		Răspunde cu
-Rule filter	RuleFilter		Filtru de reguli
-Set as read	ConfigView		Marchează ca citit
-Set flags to	ConfigView		Stabilește indicatorii la
-Then	ConfigView		Atunci
 has	ConfigView		are
-header (e.g. Subject)	ConfigView		antet (ex. Subiect)
-this field is based on the action	ConfigView		acest câmp este bazat pe acțiunea
+Move to	ConfigView		Mută la
+Then	ConfigView		Atunci
 value (use REGEX: in from of regular expressions like *spam*)	ConfigView		valoare (folosește REGEX: expresii obișnuite precum *spam*)
+this field is based on the action	ConfigView		acest câmp este bazat pe acțiunea
+Delete message	ConfigView		Șterge mesajul
+Rule filter	RuleFilter		Filtru de reguli
+<Choose account>	ConfigView		<Selectează contul>
+Set flags to	ConfigView		Stabilește indicatorii la
+Set as read	ConfigView		Marchează ca citit
+Reply with	ConfigView		Răspunde cu
+If	ConfigView		Dacă
+header (e.g. Subject)	ConfigView		antet (ex. Subiect)

@@ -1,27 +1,27 @@
 1	romanian	x-vnd.Haiku-OpenGL	209187778
-Attributes stack size:	Capabilities		Dimensiunea stivei de atribute:
-Auxiliary buffer(s):	Capabilities		Amortizor(oare) auxiliar(e):
-Available	Extensions		Disponibil
-Capabilities	Capabilities		Capacități
-Extensions	Extensions		Extensii
-GLU version:	InfoView		Versiune GLU:
-GLUT API version:	InfoView		Versiune GLUT API:
-Information	InfoView		Informații
 List stack size:	Capabilities		Dimensiunea stivei de liste:
-Max. 2D texture size:	Capabilities		Dimensiunea max. de textură 2D:
-Max. 3D texture size:	Capabilities		Dimensiunea max. de textură 3D:
+Information	InfoView		Informații
 Max. clipping planes:	Capabilities		Numărul max. de planuri de tăiere:
-Max. convolution:	Capabilities		Convoluție max.:
-Max. evaluators equation order:	Capabilities		Ordinul max. de evaluatori de ecuație:
-Max. lights:	Capabilities		Numărul max. de lumini:
-Max. recommended index elements:	Capabilities		Numărul max. recomandat de elemente index:
-Max. recommended vertex elements:	Capabilities		Numărul max. recomandat de elemente de zenit:
 Max. texture units:	Capabilities		Numărul max. de unități de textură:
-Model stack size:	Capabilities		Dimensiunea stivei de modele:
+Renderer name:	InfoView		Nume randor:
+Vendor name:	InfoView		Nume vânzător:
+Attributes stack size:	Capabilities		Dimensiunea stivei de atribute:
+OpenGL version:	InfoView		Versiune OpenGL:
 Name stack size:	Capabilities		Dimensiunea stivei de nume:
 OpenGL	System name		OpenGL
-OpenGL version:	InfoView		Versiune OpenGL:
+Auxiliary buffer(s):	Capabilities		Amortizor(oare) auxiliar(e):
+Max. recommended vertex elements:	Capabilities		Numărul max. recomandat de elemente de zenit:
+GLU version:	InfoView		Versiune GLU:
+Model stack size:	Capabilities		Dimensiunea stivei de modele:
 Projection stack size:	Capabilities		Dimensiunea stivei de proiecții:
-Renderer name:	InfoView		Nume randor:
+Max. lights:	Capabilities		Numărul max. de lumini:
+Max. 2D texture size:	Capabilities		Dimensiunea max. de textură 2D:
+Max. convolution:	Capabilities		Convoluție max.:
+GLUT API version:	InfoView		Versiune GLUT API:
 Texture stack size:	Capabilities		Dimensiunea stivei de texturi:
-Vendor name:	InfoView		Nume vânzător:
+Max. evaluators equation order:	Capabilities		Ordinul max. de evaluatori de ecuație:
+Max. 3D texture size:	Capabilities		Dimensiunea max. de textură 3D:
+Capabilities	Capabilities		Capacități
+Max. recommended index elements:	Capabilities		Numărul max. recomandat de elemente index:
+Available	Extensions		Disponibil
+Extensions	Extensions		Extensii

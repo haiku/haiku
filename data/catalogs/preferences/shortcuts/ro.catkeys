@@ -1,52 +1,52 @@
 1	romanian	x-vnd.Haiku-Shortcuts	621368175
-(Choose application with file requester)	ShortcutsWindow		(Selectează aplicație cu solicitantul de fișier)
-*Beep	ShortcutsWindow		*Bip
-*InsertString \"Your Text Here\"	ShortcutsWindow		*InsereazăȘir "Textul dumneavoastră aici"
-*LaunchHandler text/html	ShortcutsWindow		*OperatorLansare text/html
-*MouseButton 1	ShortcutsWindow		*ButonMaus 1
-*MouseDown	ShortcutsWindow		*MausJos
-*MouseUp	ShortcutsWindow		*MauSus
-*MoveMouse +20 +0	ShortcutsWindow		*MutăMaus +20 +0
-*MoveMouseTo 50% 50%	ShortcutsWindow		*MutăMausLa 50% 50%
-*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi "*MutăMausLa 100% 0" "*ButonMaus 1"
-*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*TrimiteMesaj application/x-vnd.Be-TRAK 'Tfnd'
-Add new shortcut	ShortcutsWindow		Adaugă scurtătură nouă
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
-Append	ShortcutsWindow		Adaugă
-Append KeySet…	ShortcutsWindow		Adăugare set de taste...
-Application	ShortcutsWindow		Aplicație
-Beep	ShortcutsSpec		Bip
-Cancel	ShortcutsWindow		Anulează
-Control	ShortcutsSpec	Name for modifier on keyboard	Control
-Don't save	ShortcutsWindow		Nu salva
 Error, NULL state description?\n	ShortcutsSpec		Eroare, descriere stare NULL?\n
-File	ShortcutsWindow		Fișier
-InsertString	ShortcutsSpec		InsereazăȘir
-Key	ShortcutsWindow		Tastă
-LaunchHandler	ShortcutsSpec		OperatorLansare
-MouseButton	ShortcutsSpec		ButonMaus
-MouseDown	ShortcutsSpec		MausJos
-MouseUp	ShortcutsSpec		MausSus
 MoveMouse	ShortcutsSpec		MutăMaus
-MoveMouseTo	ShortcutsSpec		MutăMausLa
-Multi	ShortcutsSpec		Multi
 OK	ShortcutsWindow		OK
-Oh no	ShortcutsWindow		Oh nu
-Open	ShortcutsWindow		Deschide
-Open KeySet…	ShortcutsWindow		Deschide set de taste...
-Quit	ShortcutsWindow		Părăsește
-Really quit without saving your changes?	ShortcutsWindow		Sigur doriți să închideți fără a salva modificările?
-Remove selected shortcut	ShortcutsWindow		Elimină scurtătura selectată
-Revert to saved	ShortcutsWindow		Revenire la salvat
-Save	ShortcutsWindow		Salvează
-Save & apply	ShortcutsWindow		Salvează & aplică
-Save KeySet as…	ShortcutsWindow		Salvează set de taste ca...
-Select	ShortcutsWindow		Selectează
-SendMessage	ShortcutsSpec		TrimiteMesaj
-Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
-Shortcuts	System name		Scurtături
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Scurtături nu a putut deschide fișierul dumneavoastră set de taste!
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Scurtături nu a putut analiza fișierul dumneavoastră set de taste!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Scurtături nu a putut salva fișierul dumneavoastră set de taste!
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Scurtături nu a putut să salveze setul de taste.
+Cancel	ShortcutsWindow		Anulează
+InsertString	ShortcutsSpec		InsereazăȘir
+Append KeySet…	ShortcutsWindow		Adăugare set de taste...
+Control	ShortcutsSpec	Name for modifier on keyboard	Control
+Key	ShortcutsWindow		Tastă
+Open KeySet…	ShortcutsWindow		Deschide set de taste...
+MouseUp	ShortcutsSpec		MausSus
+Revert to saved	ShortcutsWindow		Revenire la salvat
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InsereazăȘir "Textul dumneavoastră aici"
+*MouseUp	ShortcutsWindow		*MauSus
+(Choose application with file requester)	ShortcutsWindow		(Selectează aplicație cu solicitantul de fișier)
 Window	ShortcutsSpec	Name for modifier on keyboard	Fereastră
+*LaunchHandler text/html	ShortcutsWindow		*OperatorLansare text/html
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Scurtături nu a putut deschide fișierul dumneavoastră set de taste!
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi "*MutăMausLa 100% 0" "*ButonMaus 1"
+SendMessage	ShortcutsSpec		TrimiteMesaj
+MoveMouseTo	ShortcutsSpec		MutăMausLa
+Save	ShortcutsWindow		Salvează
+*MouseButton 1	ShortcutsWindow		*ButonMaus 1
+*MoveMouse +20 +0	ShortcutsWindow		*MutăMaus +20 +0
+MouseDown	ShortcutsSpec		MausJos
+Remove selected shortcut	ShortcutsWindow		Elimină scurtătura selectată
+MouseButton	ShortcutsSpec		ButonMaus
+Add new shortcut	ShortcutsWindow		Adaugă scurtătură nouă
+Save & apply	ShortcutsWindow		Salvează & aplică
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*TrimiteMesaj application/x-vnd.Be-TRAK 'Tfnd'
+Append	ShortcutsWindow		Adaugă
+File	ShortcutsWindow		Fișier
+Beep	ShortcutsSpec		Bip
+Quit	ShortcutsWindow		Părăsește
+*MouseDown	ShortcutsWindow		*MausJos
+Don't save	ShortcutsWindow		Nu salva
+Multi	ShortcutsSpec		Multi
+Application	ShortcutsWindow		Aplicație
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+*Beep	ShortcutsWindow		*Bip
+*MoveMouseTo 50% 50%	ShortcutsWindow		*MutăMausLa 50% 50%
+Save KeySet as…	ShortcutsWindow		Salvează set de taste ca...
+Open	ShortcutsWindow		Deschide
+Really quit without saving your changes?	ShortcutsWindow		Sigur doriți să închideți fără a salva modificările?
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Scurtături nu a putut analiza fișierul dumneavoastră set de taste!
+Select	ShortcutsWindow		Selectează
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Scurtături nu a putut salva fișierul dumneavoastră set de taste!
+Oh no	ShortcutsWindow		Oh nu
+LaunchHandler	ShortcutsSpec		OperatorLansare
+Shortcuts	System name		Scurtături

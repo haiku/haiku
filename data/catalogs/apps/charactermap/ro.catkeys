@@ -1,180 +1,180 @@
 1	romanian	x-vnd.Haiku-CharacterMap	1545664922
-Aegean numbers	UnicodeBlocks		Numere egeene
-Alphabetic presentation forms	UnicodeBlocks		Forme de prezentare alfabetică
-Ancient Greek musical notation	UnicodeBlocks		Notație muzicală greaca veche
-Ancient Greek numbers	UnicodeBlocks		Numere greacă veche
-Ancient smbols	UnicodeBlocks		Simboluri antice
-Arabic	UnicodeBlocks		Arabic
-Arabic presentation forms A	UnicodeBlocks		Forme de prezentare arabică A
-Arabic presentation forms B	UnicodeBlocks		Forme de prezentare arabică B
-Arabic supplement	UnicodeBlocks		Supliment arabic
-Armenian	UnicodeBlocks		Armeniană
-Arrows	UnicodeBlocks		Săgeți
-Balinese	UnicodeBlocks		Balineză
-Basic Latin	UnicodeBlocks		Latină de bază
-Bengali	UnicodeBlocks		Bengali
-Block elements	UnicodeBlocks		Blochează elemente
-Bopomofo	UnicodeBlocks		Bopomofo
-Bopomofo extended	UnicodeBlocks		Bopomofo extins
-Box drawing	UnicodeBlocks		Casetă de desenare
-Braille patterns	UnicodeBlocks		Modele Braille
-Buginese	UnicodeBlocks		Bugineză
-Buhid	UnicodeBlocks		Buhid
-Byzantine musical symbols	UnicodeBlocks		Simboluri muzicale bizantine
-CJK compatibility	UnicodeBlocks		Compatibilitate CJK
-CJK compatibility forms	UnicodeBlocks		Forme de compatibilitate CJK
-CJK compatibility ideographs	UnicodeBlocks		Ideografuri de compatibilitate CJK
-CJK compatibility ideographs Supplement	UnicodeBlocks		Supliment de ideografuri de compatibilitate CJK
-CJK radicals supplement	UnicodeBlocks		Supliment radicali CJK
-CJK strokes	UnicodeBlocks		Linii CJK
-CJK symbols and punctuation	UnicodeBlocks		Simboluri și punctuație CJK
-CJK unified ideographs	UnicodeBlocks		Ideografuri unificate CJK
-CJK unified ideographs extension A	UnicodeBlocks		Ideografuri unificate CJK extensie A
-CJK unified ideographs extension B	UnicodeBlocks		Ideografuri unificate CJK extensie B
-Carian	UnicodeBlocks		Carian
-Cham	UnicodeBlocks		Cham
-CharacterMap	System name		HartăCaractere
-Cherokee	UnicodeBlocks		Cherokee
-Clear	CharacterWindow		Eliberează
-Code	CharacterWindow		Cod
-Combining diacritical marks	UnicodeBlocks		Combinare semne diacritice
-Combining diacritical marks for symbols	UnicodeBlocks		Combinare semne diacritice pentru simboluri
-Combining diacritical marks supplement	UnicodeBlocks		Supliment de combinare semne diacritice
-Combining half marks	UnicodeBlocks		Combinare jumătăți de semne 
-Control pictures	UnicodeBlocks		Imagine de control
-Coptic	UnicodeBlocks		Coptic
-Copy as escaped byte string	CharacterView		Copiază ca șir de octete escapat
-Copy character	CharacterView		Copiază caracterul
-Counting rod numerals	UnicodeBlocks		Numărare cu bețișoare
-Cuneiform	UnicodeBlocks		Cuneiform
-Cuneiform numbers and punctuation	UnicodeBlocks		Numere și punctuație cuneiforme
-Currency symbols	UnicodeBlocks		Simboluri valutare
-Cypriot syllabary	UnicodeBlocks		Silabar cipriot
-Cyrillic	UnicodeBlocks		Chirilic
-Cyrillic extended A	UnicodeBlocks		Chirilic extins A
-Cyrillic extended B	UnicodeBlocks		Chirilic extins B
-Cyrillic supplement	UnicodeBlocks		Supliment chirilic
-Deseret	UnicodeBlocks		Deseret
-Devanagari	UnicodeBlocks		Devanagari
-Dingbats	UnicodeBlocks		Simboluri grafice
-Domino tiles	UnicodeBlocks		Mozaic Domino
-Enclosed CJK letters and months	UnicodeBlocks		Litere și luni CJK încercuite
 Enclosed alphanumerics	UnicodeBlocks		Alfanumerice încercuite
-Ethiopic	UnicodeBlocks		Etiopic
-Ethiopic extended	UnicodeBlocks		Etiopic extins
-Ethiopic supplement	UnicodeBlocks		Supliment etiopic
-File	CharacterWindow		Fișier
-Filter:	CharacterWindow		Filtru:
-Font	CharacterWindow		Font
-Font size:	CharacterWindow		Mărime font:
-General punctuation	UnicodeBlocks		Punctuație generală
-Geometric shapes	UnicodeBlocks		Forme geometrice
-Georgian	UnicodeBlocks		Georgian
-Georgian supplement	UnicodeBlocks		Supliment georgian
-Glagotic	UnicodeBlocks		Glagotic
-Gothic	UnicodeBlocks		Gotic
-Greek and Coptic	UnicodeBlocks		Greacă și coptic
-Greek extended	UnicodeBlocks		Greacă extinsă
-Gujarati	UnicodeBlocks		Gujarati
-Gurmukhi	UnicodeBlocks		Gurmukhi
-Halfwidth and fullwidth forms	UnicodeBlocks		Forme înjumătățite și întregi
-Hangul Jamo	UnicodeBlocks		Hangul Jamo
-Hangul compatibility Jamo	UnicodeBlocks		Hangul compatibilitate Jamo
-Hangul syllables	UnicodeBlocks		Silabe Hangul
-Hanunoo	UnicodeBlocks		Hanunoo
-Hebrew	UnicodeBlocks		Ebraică
-Hiragana	UnicodeBlocks		Hiragana
-IPA extensions	UnicodeBlocks		Extensii IPA
-Ideographic description characters	UnicodeBlocks		Caractere de descriere ideografice
-Kanbun	UnicodeBlocks		Kanbun
-Kangxi radicals	UnicodeBlocks		Radicali Kangxi
-Kannada	UnicodeBlocks		Kannada
-Katakana	UnicodeBlocks		Katakana
-Katakana phonetic extensions	UnicodeBlocks		Extensii fonetice Katakana
-Kayah Li	UnicodeBlocks		Kayah Li
-Kharoshthi	UnicodeBlocks		Kharoshthi
-Khmer	UnicodeBlocks		Khmer
-Khmer symbols	UnicodeBlocks		Simboluri khmer
-Lao	UnicodeBlocks		Lao
-Latin extended A	UnicodeBlocks		Latină extinsă A
-Latin extended B	UnicodeBlocks		Latină extinsă B
-Latin extended C	UnicodeBlocks		Latină extinsă C
-Latin extended D	UnicodeBlocks		Latină extinsă D
-Latin extended additional	UnicodeBlocks		Latină extinsă adițională
-Latin-1 supplement	UnicodeBlocks		Supliment latină-1
-Lepcha	UnicodeBlocks		Lepcha
-Letterlike symbols	UnicodeBlocks		Simboluri asemănătoare cu literele
-Limbu	UnicodeBlocks		Limbu
-Linear B ideograms	UnicodeBlocks		Ideograme Liniare B
-Linear B syllabary	UnicodeBlocks		Silabar liniar B
-Lycian	UnicodeBlocks		Lycian
-Lydian	UnicodeBlocks		Lydian
-Mahjong tiles	UnicodeBlocks		Mozaic Mahjong
-Malayalam	UnicodeBlocks		Malayalam
-Mathematical alphanumeric symbols	UnicodeBlocks		Simboluri alfanumerice matematice
-Mathematical operators	UnicodeBlocks		Operatori matematici
-Miscellaneous mathematical symbols A	UnicodeBlocks		Simboluri matematice A diverse
-Miscellaneous mathematical symbols B	UnicodeBlocks		Simboluri matematice diverse B
-Miscellaneous symbols	UnicodeBlocks		Simboluri diverse
-Miscellaneous symbols and arrows	UnicodeBlocks		Simboluri și săgeți diverse
-Miscellaneous technical	UnicodeBlocks		Diverse din tehnică
-Modifier tone letters	UnicodeBlocks		Litere de modificare a tonului
-Mongolian	UnicodeBlocks		Mongolian
-Myanmar	UnicodeBlocks		Myanmar
-N'Ko	UnicodeBlocks		N'Ko
-New Tai Lue	UnicodeBlocks		Tai Lue nou
-Number forms	UnicodeBlocks		Forme de numere
-Ogham	UnicodeBlocks		Ogam
-Ol Chiki	UnicodeBlocks		Ol Chiki
-Old Persian	UnicodeBlocks		Persiană veche
-Old italic	UnicodeBlocks		Italic vechi
-Optical character recognition	UnicodeBlocks		Recunoaștere caractere optice
-Oriya	UnicodeBlocks		Oriya
-Osmanya	UnicodeBlocks		Osmanya
-Phags-pa	UnicodeBlocks		Phags-pa
-Phaistos disc	UnicodeBlocks		Disc Phaistos
-Phoenician	UnicodeBlocks		Fenician
-Phonetic extensions	UnicodeBlocks		Extensii fonetice
-Phonetic extensions supplement	UnicodeBlocks		Supliment extensii fonetice
-Private use area	UnicodeBlocks		Zonă de utilizare personală
-Quit	CharacterWindow		Părăsește
-Rejang	UnicodeBlocks		Rejang
-Runic	UnicodeBlocks		Runic
-Saurashtra	UnicodeBlocks		Saurashtra
-Shavian	UnicodeBlocks		Shavian
-Show private blocks	CharacterWindow		Afișează blocurile personale
-Sinhala	UnicodeBlocks		Sinhala
-Small form variants	UnicodeBlocks		Variante de forme mici
-Spacing modifier letters	UnicodeBlocks		Litere ce modifică spațiul
-Specials	UnicodeBlocks		Speciale
-Sundanese	UnicodeBlocks		Sudaneză
-Superscripts and subscripts	UnicodeBlocks		Superscripturi și subscripturi
-Supplement punctuation	UnicodeBlocks		Supliment de punctuație
-Supplemental arrows A	UnicodeBlocks		Săgeți suplimentare A
-Supplemental arrows B	UnicodeBlocks		Săgeți suplimentare B
-Supplemental mathematical operators	UnicodeBlocks		Operatori matematici suplimentari
-Supplementary private use area A	UnicodeBlocks		Zonă suplimentară A pentru utilizare personală
-Supplementary private use area B	UnicodeBlocks		Zonă suplimentară B pentru utilizare personală
-Syloti Nagri	UnicodeBlocks		Syloti Nagri
-Syriac	UnicodeBlocks		Syriac
-Tagalog	UnicodeBlocks		Tagalog
-Tagbanwa	UnicodeBlocks		Tagbanwa
-Tags	UnicodeBlocks		Etichete
-Tai Le	UnicodeBlocks		Tai Le
-Tai Xuan Jing symbols	UnicodeBlocks		Simboluri Tai Xuan Jing
-Tamil	UnicodeBlocks		Tamil
-Telugu	UnicodeBlocks		Telugu
-Thaana	UnicodeBlocks		Thaana
-Thai	UnicodeBlocks		Thailandeză
-Tibetan	UnicodeBlocks		Tibetană
-Tifinagh	UnicodeBlocks		Tifinagh
-Ugaritic	UnicodeBlocks		Ugaritic
-Unified Canadian Aboriginal syllabics	UnicodeBlocks		Silabe aborigene canadiene unificate
-Vai	UnicodeBlocks		Vai
-Variation selectors	UnicodeBlocks		Selectori de variație
-Variation selectors supplement	UnicodeBlocks		Supliment selectori de variație
-Vertical forms	UnicodeBlocks		Forme verticale
+Basic Latin	UnicodeBlocks		Latină de bază
 View	CharacterWindow		Vizualizare
+Latin-1 supplement	UnicodeBlocks		Supliment latină-1
+Hebrew	UnicodeBlocks		Ebraică
+Georgian supplement	UnicodeBlocks		Supliment georgian
+CJK unified ideographs	UnicodeBlocks		Ideografuri unificate CJK
+Modifier tone letters	UnicodeBlocks		Litere de modificare a tonului
+Khmer	UnicodeBlocks		Khmer
+Supplementary private use area A	UnicodeBlocks		Zonă suplimentară A pentru utilizare personală
+Hanunoo	UnicodeBlocks		Hanunoo
+Latin extended additional	UnicodeBlocks		Latină extinsă adițională
+Arabic presentation forms A	UnicodeBlocks		Forme de prezentare arabică A
+Greek extended	UnicodeBlocks		Greacă extinsă
+Linear B ideograms	UnicodeBlocks		Ideograme Liniare B
+Devanagari	UnicodeBlocks		Devanagari
+Armenian	UnicodeBlocks		Armeniană
+Glagotic	UnicodeBlocks		Glagotic
+Mathematical operators	UnicodeBlocks		Operatori matematici
+General punctuation	UnicodeBlocks		Punctuație generală
+Miscellaneous technical	UnicodeBlocks		Diverse din tehnică
+Vertical forms	UnicodeBlocks		Forme verticale
+Ol Chiki	UnicodeBlocks		Ol Chiki
+Arabic	UnicodeBlocks		Arabic
+Ethiopic extended	UnicodeBlocks		Etiopic extins
+Arrows	UnicodeBlocks		Săgeți
+Font	CharacterWindow		Font
+Variation selectors supplement	UnicodeBlocks		Supliment selectori de variație
+Gujarati	UnicodeBlocks		Gujarati
+Cuneiform	UnicodeBlocks		Cuneiform
+CJK radicals supplement	UnicodeBlocks		Supliment radicali CJK
+Balinese	UnicodeBlocks		Balineză
+Cham	UnicodeBlocks		Cham
+Specials	UnicodeBlocks		Speciale
+CJK compatibility ideographs	UnicodeBlocks		Ideografuri de compatibilitate CJK
+Phonetic extensions	UnicodeBlocks		Extensii fonetice
+Khmer symbols	UnicodeBlocks		Simboluri khmer
+Tagbanwa	UnicodeBlocks		Tagbanwa
+Kanbun	UnicodeBlocks		Kanbun
+Syriac	UnicodeBlocks		Syriac
+CJK compatibility ideographs Supplement	UnicodeBlocks		Supliment de ideografuri de compatibilitate CJK
+Hangul syllables	UnicodeBlocks		Silabe Hangul
+Coptic	UnicodeBlocks		Coptic
+Tai Le	UnicodeBlocks		Tai Le
+Mahjong tiles	UnicodeBlocks		Mozaic Mahjong
+Spacing modifier letters	UnicodeBlocks		Litere ce modifică spațiul
+Aegean numbers	UnicodeBlocks		Numere egeene
+CJK strokes	UnicodeBlocks		Linii CJK
+Old italic	UnicodeBlocks		Italic vechi
+Supplemental arrows B	UnicodeBlocks		Săgeți suplimentare B
+Cyrillic extended A	UnicodeBlocks		Chirilic extins A
+Kharoshthi	UnicodeBlocks		Kharoshthi
+Combining half marks	UnicodeBlocks		Combinare jumătăți de semne 
+Cyrillic	UnicodeBlocks		Chirilic
+Katakana	UnicodeBlocks		Katakana
+Block elements	UnicodeBlocks		Blochează elemente
+Clear	CharacterWindow		Eliberează
+Sundanese	UnicodeBlocks		Sudaneză
+Miscellaneous mathematical symbols A	UnicodeBlocks		Simboluri matematice A diverse
+Cyrillic supplement	UnicodeBlocks		Supliment chirilic
+Small form variants	UnicodeBlocks		Variante de forme mici
+IPA extensions	UnicodeBlocks		Extensii IPA
+Thaana	UnicodeBlocks		Thaana
+Ogham	UnicodeBlocks		Ogam
+Combining diacritical marks for symbols	UnicodeBlocks		Combinare semne diacritice pentru simboluri
+Syloti Nagri	UnicodeBlocks		Syloti Nagri
+Arabic supplement	UnicodeBlocks		Supliment arabic
+Latin extended C	UnicodeBlocks		Latină extinsă C
+Ancient smbols	UnicodeBlocks		Simboluri antice
+Bopomofo extended	UnicodeBlocks		Bopomofo extins
+Lycian	UnicodeBlocks		Lycian
+Font size:	CharacterWindow		Mărime font:
+Osmanya	UnicodeBlocks		Osmanya
+Ethiopic	UnicodeBlocks		Etiopic
+Bengali	UnicodeBlocks		Bengali
+Supplementary private use area B	UnicodeBlocks		Zonă suplimentară B pentru utilizare personală
+CJK unified ideographs extension A	UnicodeBlocks		Ideografuri unificate CJK extensie A
+Filter:	CharacterWindow		Filtru:
+Hangul compatibility Jamo	UnicodeBlocks		Hangul compatibilitate Jamo
+Ideographic description characters	UnicodeBlocks		Caractere de descriere ideografice
+Arabic presentation forms B	UnicodeBlocks		Forme de prezentare arabică B
+CJK compatibility forms	UnicodeBlocks		Forme de compatibilitate CJK
+Hiragana	UnicodeBlocks		Hiragana
+Tagalog	UnicodeBlocks		Tagalog
+Control pictures	UnicodeBlocks		Imagine de control
+Variation selectors	UnicodeBlocks		Selectori de variație
+Linear B syllabary	UnicodeBlocks		Silabar liniar B
+Buginese	UnicodeBlocks		Bugineză
+Bopomofo	UnicodeBlocks		Bopomofo
+Code	CharacterWindow		Cod
+Lepcha	UnicodeBlocks		Lepcha
+Sinhala	UnicodeBlocks		Sinhala
+Ancient Greek musical notation	UnicodeBlocks		Notație muzicală greaca veche
+Geometric shapes	UnicodeBlocks		Forme geometrice
+Letterlike symbols	UnicodeBlocks		Simboluri asemănătoare cu literele
+Hangul Jamo	UnicodeBlocks		Hangul Jamo
+Tamil	UnicodeBlocks		Tamil
+Currency symbols	UnicodeBlocks		Simboluri valutare
+Combining diacritical marks	UnicodeBlocks		Combinare semne diacritice
+Supplement punctuation	UnicodeBlocks		Supliment de punctuație
+Unified Canadian Aboriginal syllabics	UnicodeBlocks		Silabe aborigene canadiene unificate
+Ugaritic	UnicodeBlocks		Ugaritic
+CJK symbols and punctuation	UnicodeBlocks		Simboluri și punctuație CJK
+File	CharacterWindow		Fișier
+Number forms	UnicodeBlocks		Forme de numere
+Cherokee	UnicodeBlocks		Cherokee
+Tags	UnicodeBlocks		Etichete
+Cypriot syllabary	UnicodeBlocks		Silabar cipriot
+Counting rod numerals	UnicodeBlocks		Numărare cu bețișoare
+Latin extended A	UnicodeBlocks		Latină extinsă A
+Miscellaneous symbols	UnicodeBlocks		Simboluri diverse
+Saurashtra	UnicodeBlocks		Saurashtra
+Optical character recognition	UnicodeBlocks		Recunoaștere caractere optice
+Old Persian	UnicodeBlocks		Persiană veche
+Combining diacritical marks supplement	UnicodeBlocks		Supliment de combinare semne diacritice
+Myanmar	UnicodeBlocks		Myanmar
+Latin extended D	UnicodeBlocks		Latină extinsă D
+Byzantine musical symbols	UnicodeBlocks		Simboluri muzicale bizantine
+Oriya	UnicodeBlocks		Oriya
+Tibetan	UnicodeBlocks		Tibetană
+Ancient Greek numbers	UnicodeBlocks		Numere greacă veche
+Vai	UnicodeBlocks		Vai
 Yi Radicals	UnicodeBlocks		Radicali Yi
+Cyrillic extended B	UnicodeBlocks		Chirilic extins B
+Quit	CharacterWindow		Părăsește
+Braille patterns	UnicodeBlocks		Modele Braille
+New Tai Lue	UnicodeBlocks		Tai Lue nou
+Runic	UnicodeBlocks		Runic
+Miscellaneous mathematical symbols B	UnicodeBlocks		Simboluri matematice diverse B
+Cuneiform numbers and punctuation	UnicodeBlocks		Numere și punctuație cuneiforme
+Private use area	UnicodeBlocks		Zonă de utilizare personală
+CJK unified ideographs extension B	UnicodeBlocks		Ideografuri unificate CJK extensie B
+Phags-pa	UnicodeBlocks		Phags-pa
+Kangxi radicals	UnicodeBlocks		Radicali Kangxi
+Dingbats	UnicodeBlocks		Simboluri grafice
+Tai Xuan Jing symbols	UnicodeBlocks		Simboluri Tai Xuan Jing
 Yi syllables	UnicodeBlocks		Silabe Yi
+Buhid	UnicodeBlocks		Buhid
+Telugu	UnicodeBlocks		Telugu
+Superscripts and subscripts	UnicodeBlocks		Superscripturi și subscripturi
+Thai	UnicodeBlocks		Thailandeză
+Deseret	UnicodeBlocks		Deseret
+Tifinagh	UnicodeBlocks		Tifinagh
+Gurmukhi	UnicodeBlocks		Gurmukhi
+CharacterMap	System name		HartăCaractere
+Lao	UnicodeBlocks		Lao
+Gothic	UnicodeBlocks		Gotic
+Limbu	UnicodeBlocks		Limbu
+Rejang	UnicodeBlocks		Rejang
+Show private blocks	CharacterWindow		Afișează blocurile personale
+Phoenician	UnicodeBlocks		Fenician
+Mongolian	UnicodeBlocks		Mongolian
+Supplemental arrows A	UnicodeBlocks		Săgeți suplimentare A
+Miscellaneous symbols and arrows	UnicodeBlocks		Simboluri și săgeți diverse
 Yijing hexagram symbols	UnicodeBlocks		Simboluri hexagram Yijing
+Supplemental mathematical operators	UnicodeBlocks		Operatori matematici suplimentari
+Enclosed CJK letters and months	UnicodeBlocks		Litere și luni CJK încercuite
+Kayah Li	UnicodeBlocks		Kayah Li
+Alphabetic presentation forms	UnicodeBlocks		Forme de prezentare alfabetică
+Halfwidth and fullwidth forms	UnicodeBlocks		Forme înjumătățite și întregi
+Lydian	UnicodeBlocks		Lydian
+Ethiopic supplement	UnicodeBlocks		Supliment etiopic
+Latin extended B	UnicodeBlocks		Latină extinsă B
+Box drawing	UnicodeBlocks		Casetă de desenare
+Mathematical alphanumeric symbols	UnicodeBlocks		Simboluri alfanumerice matematice
+Copy character	CharacterView		Copiază caracterul
+Greek and Coptic	UnicodeBlocks		Greacă și coptic
+Carian	UnicodeBlocks		Carian
+Georgian	UnicodeBlocks		Georgian
+Phaistos disc	UnicodeBlocks		Disc Phaistos
+Shavian	UnicodeBlocks		Shavian
+CJK compatibility	UnicodeBlocks		Compatibilitate CJK
+Malayalam	UnicodeBlocks		Malayalam
+N'Ko	UnicodeBlocks		N'Ko
+Kannada	UnicodeBlocks		Kannada
+Copy as escaped byte string	CharacterView		Copiază ca șir de octete escapat
+Phonetic extensions supplement	UnicodeBlocks		Supliment extensii fonetice
+Domino tiles	UnicodeBlocks		Mozaic Domino
+Katakana phonetic extensions	UnicodeBlocks		Extensii fonetice Katakana

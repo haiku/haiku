@@ -1,38 +1,36 @@
-1	romanian	x-vnd.Haiku-SoundRecorder	2122042546
-Cannot connect to media server	RecorderWindow		Nu se poate conecta la serverul media
-Cannot connect to the selected sound input	RecorderWindow		Nu se poate conecta la intrarea de sunet selectată
-Cannot find an unused name to use for the new recording	RecorderWindow		Nu se poate găsi un nume neutilizat pentru înregistrarea nouă
+1	romanian	x-vnd.Haiku-SoundRecorder	4189888707
+Loop	RecorderWindow		Buclă
 Cannot find default audio hardware	RecorderWindow		Nu se poate găsi harware-ul audio implicit
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Nu se poate găsi fișierul temporar creat pentru a păstra înregistrarea nouă
-Cannot get the file to play	RecorderWindow		Nu se poate reda fișierul
-Cannot open the temporary file created to hold the new recording	RecorderWindow		Nu se poate deschide fișierul temporar creat pentru a păstra înregistrarea nouă
-Cannot recognize this file as a media file	RecorderWindow		Nu se poate recunoaște acest fișier ca fiind un fișier media
-Cannot record a sound that long	RecorderWindow		Nu se poate înregistra un sunet atât de lung
-Channels: 	RecorderWindow		Canale:
-Compression:	RecorderWindow		Compresie:
-Drop files here	SoundListView		Plasați fișiere aici
-Duration:	RecorderWindow		Durată:
-File info	RecorderWindow		Info fișier
-File name:	RecorderWindow		Nume de fișier:
-Format: 	RecorderWindow		Format:
-Forward	RecorderWindow		Înainte
-Input	RecorderWindow		Intrare
-Input:	RecorderWindow		Intrare:
-Invalid audio files	RecorderWindow		Fișiere audio nevalide
-Loop	RecorderWindow		Buclă
-None	RecorderWindow		Nimic
-None of the files appear to be audio files	RecorderWindow		Niciunul dintre fișiere nu pare a fi din fișierele audio 
 Nothing to play	RecorderWindow		Nimic de redat
-OK	RecorderWindow		Bine
-Play	RecorderWindow		Redă
-Record	RecorderWindow		Înregistrează
-Rewind	RecorderWindow		Derulează înapoi
-Sample rate: 	RecorderWindow		Rată monstră:
-Sample size: 	RecorderWindow		Dimensiune mostră:
-Save	RecorderWindow		Salvează
 Some of the files don't appear to be audio files	RecorderWindow		Unele fișiere nu par a fi niște fișiere audio
-Sound List	RecorderWindow		Listă de sunet
-SoundRecorder	System name		InregistrareSunet
+File info	RecorderWindow		Info fișier
+Drop files here	SoundListView		Plasați fișiere aici
+Input	RecorderWindow		Intrare
 Stop	RecorderWindow		Oprește
-bits	RecorderWindow		biți
-seconds	RecorderWindow		secunde
+Sound List	RecorderWindow		Listă de sunet
+Rewind	RecorderWindow		Derulează înapoi
+Invalid audio files	RecorderWindow		Fișiere audio nevalide
+OK	RecorderWindow		Bine
+Cannot open the temporary file created to hold the new recording	RecorderWindow		Nu se poate deschide fișierul temporar creat pentru a păstra înregistrarea nouă
+None of the files appear to be audio files	RecorderWindow		Niciunul dintre fișiere nu pare a fi din fișierele audio 
+Input:	RecorderWindow		Intrare:
+Forward	RecorderWindow		Înainte
+Play	RecorderWindow		Redă
+SoundRecorder	System name		InregistrareSunet
+None	RecorderWindow		Nimic
+Record	RecorderWindow		Înregistrează
+Sample size: 	RecorderWindow		Dimensiune mostră:
+Cannot recognize this file as a media file	RecorderWindow		Nu se poate recunoaște acest fișier ca fiind un fișier media
+Format: 	RecorderWindow		Format:
+Cannot connect to the selected sound input	RecorderWindow		Nu se poate conecta la intrarea de sunet selectată
+Cannot get the file to play	RecorderWindow		Nu se poate reda fișierul
+Cannot record a sound that long	RecorderWindow		Nu se poate înregistra un sunet atât de lung
+Duration:	RecorderWindow		Durată:
+Compression:	RecorderWindow		Compresie:
+Cannot find an unused name to use for the new recording	RecorderWindow		Nu se poate găsi un nume neutilizat pentru înregistrarea nouă
+Channels: 	RecorderWindow		Canale:
+Save	RecorderWindow		Salvează
+Sample rate: 	RecorderWindow		Rată monstră:
+Cannot connect to media server	RecorderWindow		Nu se poate conecta la serverul media
+File name:	RecorderWindow		Nume de fișier:

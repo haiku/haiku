@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-MAIL	1835398254
+1	german	x-vnd.Be-MAIL	1864344734
 View	Mail		Ansicht
 %d - Date	Mail		%d - Datum
 Attach attributes:	Mail		Attribute von Anhängen:
@@ -15,6 +15,7 @@ helpful message	Mail		Tipp
 Colored quotes:	Mail		Farbige Zitate:
 Subject:	Mail		Betreff:
 Reply to all	Mail		Allen antworten
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Anhang: %name% (Typ: %type%)
 Show icons & labels	Mail		Icons und Beschriftung anzeigen
 Remove attachment	Mail		Anhang entfernen
 Button bar:	Mail		Werkzeugleiste:
@@ -112,7 +113,7 @@ Next message	Mail		Nächste Nachricht
 User interface	Mail		Programmoberfläche
 Cancel	Mail		Abbrechen
 Send message	Mail		Nachricht senden
-Remove enclosure	Mail		Anhang löschen
+Remove enclosure	Mail		Anhang entfernen
 Account:	Mail		Konto:
 Decoding:	Mail		Kodierung:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Es konnte leider keine Anwendung gefunden werden, die den Datentyp 'Person' unterstützt.
@@ -151,7 +152,7 @@ Check spelling	Mail		Rechtschreibung prüfen
 Set to Saved	Mail		Status setzen: Saved
 Open this link	Mail		Link öffnen
 Auto signature:	Mail		Automatische Signatur:
-Add signature	Mail		Signatur hinzufügen
+Add signature	Mail		Signatur anhängen
 Need Tracker to move items to trash	Mail		Um Nachrichten in den Papierkorb zu verschieben, muss Tracker laufen.
 Mailing	Mail		Nachrichten
 Unread	Mail		Ungelesen

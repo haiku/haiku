@@ -1,50 +1,50 @@
 1	romanian	x-vnd.Haiku-Notifications	3631903554
-Allowed	NotificationView		Permis
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		A apărut o eroare la salvarea preferințelor.\nEste posibil să fi rămas fără spațiu pe disc.
-Application	NotificationView		Aplicație
-Applications	NotificationView		Aplicații
-Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Nu se pot activa înștiințările la pornire, probabil că nu aveți drepturi de scriere în dosarul de configurări pentru pornirea sistemului.
-Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Nu se pot salva preferințele, probabil că nu ai acces pentru scriere în dosarul de configurări pentru pornirea sistemului.
-Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Nu se pot salva preferințele, probabil că nu ai acces pentru scrierea în dosarul de configurări sau discul este plin.
-Cannot disable notifications because the server can't be reached.	GeneralView		Nu se pot dezactiva înștiințările deoarece serverul nu poate fi contactat.
-Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Nu se pot activa înștiințările deoarece serverul nu poate fi găsit.\nÎnseamnă că instalarea InfoPopper nu a fost completată cu succes.
-Disable notifications	GeneralView		Dezactivează înștiințări
-Display	PrefletView		Afișare
-Enable notifications	GeneralView		Activează înștiințări
-Enable notifications at startup	GeneralView		Activează înștiințări la pornire
-Enabled	NotificationView		Activat
-Error	NotificationView		Eroare
-Events are not notified	GeneralView		Evenimentele nu sunt înștiințate
-Events are notified	GeneralView		Evenimentele sunt înștiințate
-General	PrefletView		General
-Hide notifications from screen after	GeneralView		Ascunde înștiințările de pe ecran după
-Icon size:	DisplayView		Dimensiune pictogramă:
-Important	NotificationView		Important
-Information	NotificationView		Informații
-Large icon	DisplayView		Pictogramă largă
-Last Received	NotificationView		Ultima primită
-Mini icon	DisplayView		Mini pictogramă
-No	NotificationView		Nu
 Notifications	GeneralView		Înștiințări
-Notifications	NotificationView		Înștiințări
-Notifications	PrefletView		Înștiințări
-Notifications	System name		Înștiințări
-Notifications cannot be stopped, because the server can't be reached.	GeneralView		Înștiințările nu pot fi oprite, deoarece serverul nu poate fi contactat.
-OK	DisplayView		Bine
-OK	GeneralView		OK
-OK	NotificationView		OK
-Progress	NotificationView		Progres
+seconds of inactivity	GeneralView		secunde de inactivitate
 Revert	PrefletWin		Revenire
+Mini icon	DisplayView		Mini pictogramă
+Enable notifications	GeneralView		Activează înștiințări
+Error	NotificationView		Eroare
+OK	GeneralView		OK
+Events are not notified	GeneralView		Evenimentele nu sunt înștiințate
 Save	PrefletWin		Salvează
+Type	NotificationView		Tip
+Notifications cannot be stopped, because the server can't be reached.	GeneralView		Înștiințările nu pot fi oprite, deoarece serverul nu poate fi contactat.
+Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Nu se pot activa înștiințările deoarece serverul nu poate fi găsit.\nÎnseamnă că instalarea InfoPopper nu a fost completată cu succes.
+OK	NotificationView		OK
+Important	NotificationView		Important
+Cannot disable notifications because the server can't be reached.	GeneralView		Nu se pot dezactiva înștiințările deoarece serverul nu poate fi contactat.
+Progress	NotificationView		Progres
+Last Received	NotificationView		Ultima primită
+General	PrefletView		General
+Display	PrefletView		Afișare
+Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Nu se pot activa înștiințările la pornire, probabil că nu aveți drepturi de scriere în dosarul de configurări pentru pornirea sistemului.
 Search:	NotificationView		Caută:
-The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Serverul de înștiințări nu poate fi găsit, înseamnă că instalarea dumneavoastră InfoPopper nu a fost completată cu succes.
 The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		Serverul de înștiințări nu poate fi găsit.\nO cauză posibilă este o instalare care nu s-a realizat corect
+Allowed	NotificationView		Permis
+Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Nu se pot salva preferințele, probabil că nu ai acces pentru scrierea în dosarul de configurări sau discul este plin.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	DisplayView		A existat o problemă la salvarea preferințelor.\nEste posibil să nu ai acces pentru scriere în dosarul de configurări.
+Yes	NotificationView		Da
+Large icon	DisplayView		Pictogramă largă
+Icon size:	DisplayView		Dimensiune pictogramă:
+Hide notifications from screen after	GeneralView		Ascunde înștiințările de pe ecran după
+Disable notifications	GeneralView		Dezactivează înștiințări
+Notifications	System name		Înștiințări
+Notifications	NotificationView		Înștiințări
+No	NotificationView		Nu
+Title	NotificationView		Titlu
+Information	NotificationView		Informații
+Window width:	DisplayView		Lățime fereastră:
+Application	NotificationView		Aplicație
+Enabled	NotificationView		Activat
+OK	DisplayView		Bine
+Unknown	NotificationView		Necunoscut
+Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Nu se pot salva preferințele, probabil că nu ai acces pentru scriere în dosarul de configurări pentru pornirea sistemului.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		A existat o problemă la salvarea preferințelor.\nEste posibil să nu ai acces de scriere în dosarul de configurări.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		A existat o problemă la salvarea preferințelor.\nEste posibil să nu ai acces de scriere în dosarul de configurări.
-Title	NotificationView		Titlu
-Type	NotificationView		Tip
-Unknown	NotificationView		Necunoscut
-Window width:	DisplayView		Lățime fereastră:
-Yes	NotificationView		Da
-seconds of inactivity	GeneralView		secunde de inactivitate
+Enable notifications at startup	GeneralView		Activează înștiințări la pornire
+Notifications	PrefletView		Înștiințări
+The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Serverul de înștiințări nu poate fi găsit, înseamnă că instalarea dumneavoastră InfoPopper nu a fost completată cu succes.
+Applications	NotificationView		Aplicații
+Events are notified	GeneralView		Evenimentele sunt înștiințate

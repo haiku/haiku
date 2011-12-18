@@ -1,95 +1,95 @@
 1	romanian	x-vnd.Haiku-Devices	865240481
-ACPI Information	DeviceACPI		Informații ACPI
-ACPI Processor Namespace '%2'	DeviceACPI		Spațiu de nume procesor ACPI „%2”
-ACPI System Bus	DeviceACPI		Magistrală de sistem ACPI
-ACPI System Indicator	DeviceACPI		Indicator de sistem ACPI
-ACPI Thermal Zone	DeviceACPI		Zonă termală ACPI
-ACPI bus	Device		Magistrală ACPI
-ACPI bus	DevicesView		Magistrală ACPI
-ACPI controller	Device		Controler ACPI
-ACPI node '%1'	DeviceACPI		Nod ACPI „%1”
-Array	DeviceSCSI		Vector
-Basic information	DevicesView		Informații de bază
-Bridge	Device		Punte
-Bridge	DeviceSCSI		Punte
-Bus	DevicesView		Magistrală
-Bus Information	Device		Infomații magistrală
-CD-ROM	DeviceSCSI		CD-ROM
-Card Reader	DeviceSCSI		Cititor de carduri
-Category	DevicesView		Categorie
-Changer	DeviceSCSI		Schimbător
-Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Detalii clasă:\t\t\t\t: %classInfo%
-Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Detalii clasă:\t\t\t\t: %classInfo%
-Class info	DevicePCI		Detalii clasă
-Communication controller	Device		Controler de comunicație
-Communications	DeviceSCSI		Comunicații
-Computer	Device		Calculator
-Computer	DevicesView		Calculator
-Connection	DevicesView		Conexiune
-Detailed	DevicesView		Detaliat
-Device	Device		Dispozitiv
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Nume dispozitiv\t\t\t\t: %Name%\nProducător\t\t\t: %Manufacturer%\nDriver utilizat\t\t\t\t: %DriverUsed%\nCăi dispozitiv\t: %DevicePaths%
-Device class	DeviceSCSI		Clasă de dispozitive
-Device name	Device		Nume dispozitiv
-Device name	DeviceACPI		Nume dispozitiv
-Device name	DevicePCI		Nume dispozitiv
-Device name	DeviceSCSI		Nume dispozitiv
-Device name:	Device		Nume dispozitiv:
-Device paths	Device		Căi dispozitiv
-Device paths	DevicePCI		Căi dispozitiv
-Devices	DevicesView		Dispozitive
-Devices	System name		Dispozitive
-Disk Drive	DeviceSCSI		Unitate disc
-Display controller	Device		Controler de afișare
-Docking station	Device		Stație de andocare
-Driver used	Device		Driver utilizat
-Driver used	DevicePCI		Driver utilizat
-Enclosure	DeviceSCSI		Încadrare
-Encryption controller	Device		Controler de criptare
-Generate system information	DevicesView		Generează informații de sistem
-Generic system peripheral	Device		Periferic generic de sistem
-Graphics Peripheral	DeviceSCSI		Periferic grafică
-ISA bus	Device		Magistrală ISA
-ISA bus	DevicesView		Magistrală ISA
-Input device controller	Device		Controler dispozitiv de intrare
-Intelligent controller	Device		Controler inteligent
-Manufacturer	Device		Producător
-Manufacturer	DeviceACPI		Producător
-Manufacturer	DevicePCI		Producător
 Manufacturer	DeviceSCSI		Producător
-Manufacturer:	Device		Producător:
-Mass storage controller	Device		Controler de stocare
-Memory controller	Device		Controler de memorie
-Multimedia controller	Device		Controler multimedia
-Name	PropertyList		Nume
-Network controller	Device		Controler de rețea
-None	Device		Nimic
-Not implemented	DeviceACPI		Nu este implementat
-Not implemented	DevicePCI		Nu este implementat
-Optical Drive	DeviceSCSI		Unitate optică
 Order by:	DevicesView		Ordonează după:
-Other	DeviceSCSI		Altele
-PCI Information	DevicePCI		Informații PCI
-PCI bus	Device		Magistrală PCI
-PCI bus	DevicesView		Magistrală PCI
+ACPI controller	Device		Controler ACPI
+Memory controller	Device		Controler de memorie
+Driver used	DevicePCI		Driver utilizat
+CD-ROM	DeviceSCSI		CD-ROM
+ISA bus	Device		Magistrală ISA
+ACPI bus	Device		Magistrală ACPI
+ISA bus	DevicesView		Magistrală ISA
+Docking station	Device		Stație de andocare
+Computer	Device		Calculator
+Unknown device	Device		Dispozitiv necunoscut
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Detalii clasă:\t\t\t\t: %classInfo%
+Processor	DeviceSCSI		Procesor
+RBC	DeviceSCSI		RBC
+Detailed	DevicesView		Detaliat
+Category	DevicesView		Categorie
+Quit	DevicesView		Părăsește
+Device paths	Device		Căi dispozitiv
+Scanner	DeviceSCSI		Scanner
 Printer	DeviceSCSI		Imprimantă
 Processor	Device		Procesor
-Processor	DeviceSCSI		Procesor
-Quit	DevicesView		Părăsește
-RBC	DeviceSCSI		RBC
-Refresh devices	DevicesView		Reîmprospătează dispozitive
-Report compatibility	DevicesView		Raportează compatibilitate
-SCSI Information	DeviceSCSI		Informații SCSI
-Satellite communications controller	Device		Controler de comunicații prin satelit
-Scanner	DeviceSCSI		Scanner
-Serial bus controller	Device		Controler de magistrală serială
-Signal processing controller	Device		Controler de procesare a semnalului
-Tape Drive	DeviceSCSI		Unitate bandă magnetică
-Unclassified device	Device		Dispozitiv neclasificat
-Unknown	DevicePCI		Necunoscut
-Unknown device	Device		Dispozitiv necunoscut
-Unknown device	DevicesView		Dispozitiv necunoscut
-Value	PropertyList		Valoare
-Wireless controller	Device		Controler fără fir
-Worm	DeviceSCSI		Vierme
+Optical Drive	DeviceSCSI		Unitate optică
+ACPI Processor Namespace '%2'	DeviceACPI		Spațiu de nume procesor ACPI „%2”
+Bridge	DeviceSCSI		Punte
 unknown	Device		necunoscut
+ACPI Information	DeviceACPI		Informații ACPI
+Generic system peripheral	Device		Periferic generic de sistem
+Not implemented	DevicePCI		Nu este implementat
+Disk Drive	DeviceSCSI		Unitate disc
+Not implemented	DeviceACPI		Nu este implementat
+Device name	DevicePCI		Nume dispozitiv
+Display controller	Device		Controler de afișare
+Mass storage controller	Device		Controler de stocare
+Input device controller	Device		Controler dispozitiv de intrare
+Network controller	Device		Controler de rețea
+Device class	DeviceSCSI		Clasă de dispozitive
+Device name	DeviceACPI		Nume dispozitiv
+Driver used	Device		Driver utilizat
+Other	DeviceSCSI		Altele
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Nume dispozitiv\t\t\t\t: %Name%\nProducător\t\t\t: %Manufacturer%\nDriver utilizat\t\t\t\t: %DriverUsed%\nCăi dispozitiv\t: %DevicePaths%
+ACPI Thermal Zone	DeviceACPI		Zonă termală ACPI
+Communications	DeviceSCSI		Comunicații
+Bus	DevicesView		Magistrală
+Communication controller	Device		Controler de comunicație
+Manufacturer	DeviceACPI		Producător
+PCI bus	Device		Magistrală PCI
+ACPI System Indicator	DeviceACPI		Indicator de sistem ACPI
+None	Device		Nimic
+PCI bus	DevicesView		Magistrală PCI
+Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Detalii clasă:\t\t\t\t: %classInfo%
+Basic information	DevicesView		Informații de bază
+PCI Information	DevicePCI		Informații PCI
+Manufacturer:	Device		Producător:
+ACPI bus	DevicesView		Magistrală ACPI
+Changer	DeviceSCSI		Schimbător
+ACPI System Bus	DeviceACPI		Magistrală de sistem ACPI
+Devices	System name		Dispozitive
+Worm	DeviceSCSI		Vierme
+Multimedia controller	Device		Controler multimedia
+Unknown	DevicePCI		Necunoscut
+Device name:	Device		Nume dispozitiv:
+Computer	DevicesView		Calculator
+Value	PropertyList		Valoare
+Report compatibility	DevicesView		Raportează compatibilitate
+Device	Device		Dispozitiv
+Signal processing controller	Device		Controler de procesare a semnalului
+Serial bus controller	Device		Controler de magistrală serială
+Wireless controller	Device		Controler fără fir
+ACPI node '%1'	DeviceACPI		Nod ACPI „%1”
+Device name	Device		Nume dispozitiv
+Manufacturer	Device		Producător
+Name	PropertyList		Nume
+Manufacturer	DevicePCI		Producător
+Intelligent controller	Device		Controler inteligent
+Satellite communications controller	Device		Controler de comunicații prin satelit
+SCSI Information	DeviceSCSI		Informații SCSI
+Enclosure	DeviceSCSI		Încadrare
+Array	DeviceSCSI		Vector
+Bridge	Device		Punte
+Refresh devices	DevicesView		Reîmprospătează dispozitive
+Unknown device	DevicesView		Dispozitiv necunoscut
+Graphics Peripheral	DeviceSCSI		Periferic grafică
+Tape Drive	DeviceSCSI		Unitate bandă magnetică
+Bus Information	Device		Infomații magistrală
+Connection	DevicesView		Conexiune
+Generate system information	DevicesView		Generează informații de sistem
+Encryption controller	Device		Controler de criptare
+Unclassified device	Device		Dispozitiv neclasificat
+Device name	DeviceSCSI		Nume dispozitiv
+Card Reader	DeviceSCSI		Cititor de carduri
+Class info	DevicePCI		Detalii clasă
+Device paths	DevicePCI		Căi dispozitiv
+Devices	DevicesView		Dispozitive

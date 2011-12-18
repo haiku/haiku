@@ -1,23 +1,23 @@
 1	romanian	x-vnd.Be-POST	2300302075
-%num new message	DeskbarView		%num de mesaje noi
-%num new message for %name\n	MailDaemon		%num mesaj nou pentru %name\n
-%num new message.	MailDaemon		%num mesaj nou.
-%num new messages	DeskbarView		%num mesaje noi
-%num new messages for %name\n	MailDaemon		%num mesaje noi pentru %name\n
-%num new messages.	MailDaemon		%num mesaje noi.
-<no accounts>	DeskbarView		<fără conturi>
-Check for mail now	DeskbarView		Verifică email acum
-Check for mails only	DeskbarView		Verifică doar pentru emailuri
-Create new message…	DeskbarView		Creează mesaj nou...
 Fetching mail for %name	Notifier		Se primește emailul pentru %name
-Mail daemon status log	MailDaemon		Istoricul stării serviciului de email
-Mail status	MailDaemon		Stare email
-Mail status	Notifier		Stare mail
-New Messages	MailDaemon		Mesaje noi
-No new messages	DeskbarView		Nu sunt mesaje noi
-No new messages	MailDaemon		Nu sunt mesaje noi
-No new messages.	MailDaemon		Nu sunt mesaje noi.
-Preferences…	DeskbarView		Preferințe...
+Check for mails only	DeskbarView		Verifică doar pentru emailuri
 Send pending mails	DeskbarView		Trimite emailurile în așteptare
-Sending mail for %name	Notifier		Se trimite emailul pentru %name
+New Messages	MailDaemon		Mesaje noi
+<no accounts>	DeskbarView		<fără conturi>
+%num new messages	DeskbarView		%num mesaje noi
+Mail status	MailDaemon		Stare email
 Shutdown mail services	DeskbarView		Oprește serviciile de email
+%num new message	DeskbarView		%num de mesaje noi
+Sending mail for %name	Notifier		Se trimite emailul pentru %name
+Preferences…	DeskbarView		Preferințe...
+%num new messages.	MailDaemon		%num mesaje noi.
+%num new message.	MailDaemon		%num mesaj nou.
+Create new message…	DeskbarView		Creează mesaj nou...
+%num new message for %name\n	MailDaemon		%num mesaj nou pentru %name\n
+No new messages	MailDaemon		Nu sunt mesaje noi
+Check for mail now	DeskbarView		Verifică email acum
+No new messages	DeskbarView		Nu sunt mesaje noi
+%num new messages for %name\n	MailDaemon		%num mesaje noi pentru %name\n
+Mail daemon status log	MailDaemon		Istoricul stării serviciului de email
+No new messages.	MailDaemon		Nu sunt mesaje noi.
+Mail status	Notifier		Stare mail

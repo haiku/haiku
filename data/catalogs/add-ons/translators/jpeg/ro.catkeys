@@ -1,21 +1,21 @@
 1	romanian	x-vnd.Haiku-JPEGTranslator	965709535
-About	JPEGTranslator		Despre
-Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Format imagine Be (TraducătorJPEG)
-High	JPEGTranslator		Sus
-JPEG Library Error: %s\n	be_jerror		Eroare bibliotecă JPEG: %s\n
-JPEG Library Warning: %s\n	be_jerror		Avertisment bibliotecă JPEG: %s\n
+Output quality	JPEGTranslator		Calitatea rezultatului
 JPEG images	JPEGTranslator		Imagini JPEG
+Prevent colors 'washing out'	JPEGTranslator		Previne „spălarea” culorilor
+JPEG Library Error: %s\n	be_jerror		Eroare bibliotecă JPEG: %s\n
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Utilizează codul CMYK cu 0 pentru acoperire 100% cu cerneală
+About	JPEGTranslator		Despre
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBazat pe biblioteca IJG © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\ncu patch de asistență pentru codare „fără pierderi” de Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nCu câteva rutine de conversie a spațiului de culoare de Magnus Hellman\n\thttp://www.bebits.com/app/802\n
 Low	JPEGTranslator		Jos
 Make file smaller (sligthtly worse quality)	JPEGTranslator		Micșorează fișierul (calitate mai scăzută)
 None	JPEGTranslator		Nimic
-Output quality	JPEGTranslator		Calitatea rezultatului
-Output smoothing strength	JPEGTranslator		Produce putere de netezire
-Prevent colors 'washing out'	JPEGTranslator		Previne „spălarea” culorilor
-Read	JPEGTranslator		Citește
-Read greyscale images as RGB32	JPEGTranslator		Citește imaginile cu scală de gri ca RGB32
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Format imagine Be (TraducătorJPEG)
 Show warning messages	JPEGTranslator		Afișează mesajele de avertisment
-Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Utilizează codul CMYK cu 0 pentru acoperire 100% cu cerneală
-Use progressive compression	JPEGTranslator		Utilizează compresie progresivă
+Output smoothing strength	JPEGTranslator		Produce putere de netezire
+High	JPEGTranslator		Sus
 Write	JPEGTranslator		Scrie
 Write black-and-white images as RGB24	JPEGTranslator		Scrie imaginile alb-negru ca RGB24
-©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBazat pe biblioteca IJG © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\ncu patch de asistență pentru codare „fără pierderi” de Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nCu câteva rutine de conversie a spațiului de culoare de Magnus Hellman\n\thttp://www.bebits.com/app/802\n
+Read greyscale images as RGB32	JPEGTranslator		Citește imaginile cu scală de gri ca RGB32
+Read	JPEGTranslator		Citește
+JPEG Library Warning: %s\n	be_jerror		Avertisment bibliotecă JPEG: %s\n
+Use progressive compression	JPEGTranslator		Utilizează compresie progresivă

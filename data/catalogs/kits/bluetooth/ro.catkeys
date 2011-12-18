@@ -1,88 +1,88 @@
 1	romanian	x-vnd.Haiku-Bluetooth	3550394259
-#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Nume nevalid
-#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Nume nevalid
-#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Nume nevalid
-#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Nume nevalid
-(reserved)	DeviceClass		(rezervat)
-1-17% utilized	DeviceClass		Utilizat 1-17%
-17-33% utilized	DeviceClass		Utilizat 17-33%
-33-50% utilized	DeviceClass		Utilizat 33-50%
-50-67% utilized	DeviceClass		Utilizat 50-67%
-67-83% utilized	DeviceClass		Utilizat 67-83%
-83-99% utilized	DeviceClass		Utilizat 83-99%
-Audio	DeviceClass		Audio
-Audio/Video	DeviceClass		Audio/Video
-Camcorder	DeviceClass		Cameră video
-Camera	DeviceClass		Cameră
-Capturing	DeviceClass		Captură
-Car audio	DeviceClass		Car audio
-Card reader	DeviceClass		Cititor de card
-Cellular	DeviceClass		Telefon mobil
-Combo keyboard/pointing device	DeviceClass		Combinație tastatură/dispozitiv de indicare
-Common ISDN access	DeviceClass		Acces ISDN comun
-Computer	DeviceClass		Calculator
-Controller	DeviceClass		Controler
-Cordless	DeviceClass		Fără fir
-Desktop workstation	DeviceClass		Desktop stație de lucru
-Device conforms to the headset profile	DeviceClass		Dispozitivul este în conformitate cu profilul căștilor
-Digitizer tablet	DeviceClass		Tabletă digitală
 Display	DeviceClass		Afișare
-Doll/Action figure	DeviceClass		Figură păpușă/acțiune
-Fully available	DeviceClass		Complet disponibil
+Capturing	DeviceClass		Captură
+Printer	DeviceClass		Imprimantă
+Uncategorized	DeviceClass		Necategorisit
+1-17% utilized	DeviceClass		Utilizat 1-17%
+Positioning	DeviceClass		Poziționare
+Rendering	DeviceClass		Redare
+Phone	DeviceClass		Telefon
+17-33% utilized	DeviceClass		Utilizat 17-33%
+#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Nume nevalid
+Combo keyboard/pointing device	DeviceClass		Combinație tastatură/dispozitiv de indicare
+Controller	DeviceClass		Controler
+No service available	DeviceClass		Niciun serviciu disponibil
+Wearable	DeviceClass	A wearable computer	Portabil                             
+Handheld	DeviceClass		Calculator de buzunar
+Invalid device class!\n	DeviceClass		Clasă de dispozitive nevalidă!\n
+Sensing device	DeviceClass		Dispozitiv de identificare
+Computer	DeviceClass		Calculator
+Cellular	DeviceClass		Telefon mobil
+Microphone	DeviceClass		Microfon
+Unknown (reserved) minor device class	DeviceClass		Clasă minoră de dispozitive necunoscută (rezervată)
+Cordless	DeviceClass		Fără fir
+Common ISDN access	DeviceClass		Acces ISDN comun
+83-99% utilized	DeviceClass		Utilizat 83-99%
+Scanner	DeviceClass		Scaner
 Game	DeviceClass		Joc
 Gamepad	DeviceClass		Dispozitiv gamepad
-Gaming/Toy	DeviceClass		Jocuri/Jucărie
+(reserved)	DeviceClass		(rezervat)
+Desktop workstation	DeviceClass		Desktop stație de lucru
+Audio/Video	DeviceClass		Audio/Video
 Glasses	DeviceClass		Ochelari
-Handheld	DeviceClass		Calculator de buzunar
-Hands-free	DeviceClass		Mâini libere
-Headphones	DeviceClass		Căști
-Helmet	DeviceClass		Cască
-HiFi audio device	DeviceClass		Dispozitiv audio HiFi
-Imaging	DeviceClass		Imaginare
-Information	DeviceClass		Informație
-Invalid device class!\n	DeviceClass		Clasă de dispozitive nevalidă!\n
-Jacket	DeviceClass		Jachetă
-Joystick	DeviceClass		Joystick
 Keyboard	DeviceClass		Tastatură
-LAN access	DeviceClass		Acces LAN
-Laptop	DeviceClass		Laptop
-Loudspeaker	DeviceClass		Difuzor
+Camera	DeviceClass		Cameră
 Major class: 	DeviceClass		Clasă majoră:
-Microphone	DeviceClass		Microfon
-Minor class: 	DeviceClass		Clasă minoră:
-Miscellaneous	DeviceClass		Diverse
-Networking	DeviceClass		Rețelistică
-No service available	DeviceClass		Niciun serviciu disponibil
-Not implemented	RemoteDevice		Nu este implementat
-Object transfer	DeviceClass		Transfer de obiect
-Pager	DeviceClass	A small radio device to receive short text messages	Pager
-Palm	DeviceClass	A palm-held device	Palmă
-Peripheral	DeviceClass		Periferic
-Phone	DeviceClass		Telefon
-Pointing device	DeviceClass		Dispozitiv de indicare
-Portable audio	DeviceClass		Audio portabil
-Positioning	DeviceClass		Poziționare
-Printer	DeviceClass		Imprimantă
-Remote control	DeviceClass		Telecomandă
-Rendering	DeviceClass		Redare
-Robot	DeviceClass		Robot
-SIM card reader	DeviceClass		Cititor de card SIM
-Scanner	DeviceClass		Scaner
-Sensing device	DeviceClass		Dispozitiv de identificare
-Server	DeviceClass		Server
-Service classes: 	DeviceClass		Clase de serviciu:
+50-67% utilized	DeviceClass		Utilizat 50-67%
+Card reader	DeviceClass		Cititor de card
 Set-top box	DeviceClass		Casetă set-top
+Helmet	DeviceClass		Cască
+Laptop	DeviceClass		Laptop
+Car audio	DeviceClass		Car audio
+SIM card reader	DeviceClass		Cititor de card SIM
+Headphones	DeviceClass		Căști
+Information	DeviceClass		Informație
+Remote control	DeviceClass		Telecomandă
+Service classes: 	DeviceClass		Clase de serviciu:
+Pager	DeviceClass	A small radio device to receive short text messages	Pager
+Object transfer	DeviceClass		Transfer de obiect
+Gaming/Toy	DeviceClass		Jocuri/Jucărie
+Audio	DeviceClass		Audio
+Robot	DeviceClass		Robot
+Camcorder	DeviceClass		Cameră video
+Digitizer tablet	DeviceClass		Tabletă digitală
+Loudspeaker	DeviceClass		Difuzor
+Joystick	DeviceClass		Joystick
+LAN access	DeviceClass		Acces LAN
+Wrist watch	DeviceClass		Ceas de mână
+Minor class: 	DeviceClass		Clasă minoră:
+Networking	DeviceClass		Rețelistică
+Portable audio	DeviceClass		Audio portabil
+Device conforms to the headset profile	DeviceClass		Dispozitivul este în conformitate cu profilul căștilor
+Hands-free	DeviceClass		Mâini libere
+#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Nume nevalid
+Vehicle	DeviceClass		Vehicul
+Palm	DeviceClass	A palm-held device	Palmă
+Video display and loudspeaker	DeviceClass		Afișare video și difuzor
+Peripheral	DeviceClass		Periferic
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Nume nevalid
+Wired modem or voice gateway	DeviceClass		Modem cu fir sau gateway cu voce
+Jacket	DeviceClass		Jachetă
+Unspecified	DeviceClass		Nespecificat
+Fully available	DeviceClass		Complet disponibil
+67-83% utilized	DeviceClass		Utilizat 67-83%
+Not implemented	RemoteDevice		Nu este implementat
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Nume nevalid
+Server	DeviceClass		Server
+Video conferencing	DeviceClass		Conferință video
+Video camera	DeviceClass		Cameră video
+HiFi audio device	DeviceClass		Dispozitiv audio HiFi
 Smart phone	DeviceClass		Telefon inteligent
 Telephony	DeviceClass		Telefonie
-Uncategorized	DeviceClass		Necategorisit
-Unknown (reserved) minor device class	DeviceClass		Clasă minoră de dispozitive necunoscută (rezervată)
-Unspecified	DeviceClass		Nespecificat
+Doll/Action figure	DeviceClass		Figură păpușă/acțiune
 VCR	DeviceClass		VCR
-Vehicle	DeviceClass		Vehicul
-Video camera	DeviceClass		Cameră video
-Video conferencing	DeviceClass		Conferință video
-Video display and loudspeaker	DeviceClass		Afișare video și difuzor
 Video monitor	DeviceClass		Monitor video
-Wearable	DeviceClass	A wearable computer	Portabil                             
-Wired modem or voice gateway	DeviceClass		Modem cu fir sau gateway cu voce
-Wrist watch	DeviceClass		Ceas de mână
+Pointing device	DeviceClass		Dispozitiv de indicare
+Miscellaneous	DeviceClass		Diverse
+33-50% utilized	DeviceClass		Utilizat 33-50%
+Imaging	DeviceClass		Imaginare

@@ -1,48 +1,43 @@
-1	romanian	x-vnd.Haiku-PowerStatus	2178654445
-About	PowerStatus		despre
-About…	PowerStatus		Despre...
-Battery charging	PowerStatus		Se încarcă bateria
-Battery discharging	PowerStatus		Se descarcă bateria
-Battery info	PowerStatus		Info baterie
-Battery info…	PowerStatus		Info baterie...
-Battery unused	PowerStatus		Baterie neutilizată
-Capacity granularity 1: 	PowerStatus		Capacitate de granulozitate 1:
-Capacity granularity 2: 	PowerStatus		Capacitate de granulozitate 2:
-Capacity: 	PowerStatus		Capacitate:
-Current rate: 	PowerStatus		Cotă curentă:
-Damaged battery	PowerStatus		Baterie deteriorată
+1	romanian	x-vnd.Haiku-PowerStatus	751886234
 Design capacity low warning: 	PowerStatus		Avertisment de capacitate redusă model:
-Design capacity warning: 	PowerStatus		Avertisment capacitate model:
-Design capacity: 	PowerStatus		Capacitate model:
-Design voltage: 	PowerStatus		Voltaj model:
-Empty battery slot	PowerStatus		Fantă liberă de baterie
-Extended battery info	PowerStatus		Info extins baterie
-Install in Deskbar	PowerStatus		Instalează pe bara de desktop
-Last full charge: 	PowerStatus		Ultima încărcate completă:
-Model number: 	PowerStatus		Numărul modelului:
-OEM info: 	PowerStatus		Info OEM:
-OK	PowerStatus		OK
-Power status box	PowerStatus		Casetă stare consum
-PowerStatus	PowerStatus		StareConsum
-PowerStatus	System name		StareConsum
-PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		StareConsum\nscris de AxelDörfler, Clemens Zeidler\nDrepturi de autor 2006, Haiku, Inc.\n
-Quit	PowerStatus		Părăsește
-Run in window	PowerStatus		Rulează în fereastră
-Serial number: 	PowerStatus		Număr de serie:
 Show percent	PowerStatus		Afișează procentaj
-Show status icon	PowerStatus		Afișează pictogramă de stare
-Show text label	PowerStatus		Afișează etichetă text
-Show time	PowerStatus		Afișează oră
-Technology: 	PowerStatus		Tehnologie:
+Design capacity: 	PowerStatus		Capacitate model:
 Type: 	PowerStatus		Tip:
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Puteți să rulați StareConsum într-o ferestră sau să îl instalați pe bara de desktop.
-charging	PowerStatus		se încarcă
-discharging	PowerStatus		se descarcă
-mA	PowerStatus		mA
-mAh	PowerStatus		mAh
-mV	PowerStatus		mV
-mW	PowerStatus		mW
-mWh	PowerStatus		mWh
-no battery	PowerStatus		fără baterie
 non-rechargeable	PowerStatus		nu este reîncărcabilă
+Empty battery slot	PowerStatus		Fantă liberă de baterie
+Run in window	PowerStatus		Rulează în fereastră
+About	PowerStatus		despre
+PowerStatus	System name		StareConsum
+PowerStatus	PowerStatus		StareConsum
+Battery info…	PowerStatus		Info baterie...
+Damaged battery	PowerStatus		Baterie deteriorată
+Show time	PowerStatus		Afișează oră
+Last full charge: 	PowerStatus		Ultima încărcate completă:
+Battery unused	PowerStatus		Baterie neutilizată
+Extended battery info	PowerStatus		Info extins baterie
+Current rate: 	PowerStatus		Cotă curentă:
+discharging	PowerStatus		se descarcă
+Show text label	PowerStatus		Afișează etichetă text
+About…	PowerStatus		Despre...
+Model number: 	PowerStatus		Numărul modelului:
+Install in Deskbar	PowerStatus		Instalează pe bara de desktop
+Capacity: 	PowerStatus		Capacitate:
+Battery discharging	PowerStatus		Se descarcă bateria
+Serial number: 	PowerStatus		Număr de serie:
+Capacity granularity 1: 	PowerStatus		Capacitate de granulozitate 1:
+OK	PowerStatus		OK
+OEM info: 	PowerStatus		Info OEM:
+Design voltage: 	PowerStatus		Voltaj model:
+PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		StareConsum\nscris de AxelDörfler, Clemens Zeidler\nDrepturi de autor 2006, Haiku, Inc.\n
+Battery charging	PowerStatus		Se încarcă bateria
+Design capacity warning: 	PowerStatus		Avertisment capacitate model:
+Battery info	PowerStatus		Info baterie
+Quit	PowerStatus		Părăsește
 rechargeable	PowerStatus		reîncărcabilă
+charging	PowerStatus		se încarcă
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Puteți să rulați StareConsum într-o ferestră sau să îl instalați pe bara de desktop.
+Power status box	PowerStatus		Casetă stare consum
+Show status icon	PowerStatus		Afișează pictogramă de stare
+Capacity granularity 2: 	PowerStatus		Capacitate de granulozitate 2:
+Technology: 	PowerStatus		Tehnologie:
+no battery	PowerStatus		fără baterie

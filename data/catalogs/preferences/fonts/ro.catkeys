@@ -1,12 +1,12 @@
 1	romanian	x-vnd.Haiku-Fonts	4164233892
-Bold font:	Font view		Font îngroșat:
-Defaults	Main window		Implicite
-Fixed font:	Font view		Font fix:
-Fonts	System name		Fonturi
-Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Fonturi\n\tDrepturi de autor 2004-2005, Haiku.\n\n
-Menu font:	Font view		Font meniu:
-OK	main		Bine
 Plain font:	Font view		Font simplu:
+Defaults	Main window		Implicite
+OK	main		Bine
+Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Fonturi\n\tDrepturi de autor 2004-2005, Haiku.\n\n
 Revert	Main window		Revenire
 Size:	Font Selection view		Mărime
+Menu font:	Font view		Font meniu:
+Fixed font:	Font view		Font fix:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Gheorghe, obezul, a reuşit să obţină jucându-se un flux în Quebec de o mie kilowaţioră.
+Bold font:	Font view		Font îngroșat:
+Fonts	System name		Fonturi

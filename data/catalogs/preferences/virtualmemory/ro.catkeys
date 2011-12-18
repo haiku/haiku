@@ -1,20 +1,20 @@
 1	romanian	x-vnd.Haiku-VirtualMemory	688347876
-%Ld B	SettingsWindow		%Ld B
-Changes will take effect on restart!	SettingsWindow		Modificările vor avea efect după repornire!
-Current swap file size: 	SettingsWindow		Dimensiunea fișierului swap curent:
-Defaults	SettingsWindow		Implicite
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Dezactivarea memoriei virtuale va avea efecte nedorite asupra stabilității sistemului odată ce memoria este utilizată.\nMemoria virtuală nu afectează perfomanța sistemului până la atingerea acestui punct.\n\nSigur doriți să o opriți?
-Enable virtual memory	SettingsWindow		Activează memoria virtuală
-GB	SettingsWindow		GB
-Insufficient space for a swap file.	SettingsWindow		Spațiu insuficient pentru un fișier swap.
-KB	SettingsWindow		KB
-Keep enabled	SettingsWindow		Menține activat
-MB	SettingsWindow		MB
-OK	VirtualMemoryApp		OK
-Physical memory: 	SettingsWindow		Memorie fizică:
-Requested swap file size:	SettingsWindow		Dimensiunea fișierului swap cerut:
-Revert	SettingsWindow		Revenire
 Turn off	SettingsWindow		Oprește
+GB	SettingsWindow		GB
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Dezactivarea memoriei virtuale va avea efecte nedorite asupra stabilității sistemului odată ce memoria este utilizată.\nMemoria virtuală nu afectează perfomanța sistemului până la atingerea acestui punct.\n\nSigur doriți să o opriți?
+Requested swap file size:	SettingsWindow		Dimensiunea fișierului swap cerut:
+Physical memory: 	SettingsWindow		Memorie fizică:
+Changes will take effect on restart!	SettingsWindow		Modificările vor avea efect după repornire!
+Defaults	SettingsWindow		Implicite
+KB	SettingsWindow		KB
 Use volume:	SettingsWindow		Utilizează volum:
+Insufficient space for a swap file.	SettingsWindow		Spațiu insuficient pentru un fișier swap.
+Keep enabled	SettingsWindow		Menține activat
+Revert	SettingsWindow		Revenire
 VirtualMemory	System name		MemorieVirtuală
+Current swap file size: 	SettingsWindow		Dimensiunea fișierului swap curent:
+OK	VirtualMemoryApp		OK
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		MemorieVirtuală\n\tscris de Axel Dörfler\n\tCopyright 2005, Haiku.\n
+Enable virtual memory	SettingsWindow		Activează memoria virtuală
+MB	SettingsWindow		MB
+%Ld B	SettingsWindow		%Ld B

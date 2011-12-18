@@ -1,33 +1,33 @@
 1	romanian	x-vnd.Haiku.TextSearch	1180598828
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME nu a putut deschide unul sau mai multe dosare.
 %s: Not enough room to escape the filename.	Grepper		%s: Nu există spațiu suficient pentru a tasta numele de fișier.
-%s: There was a problem running grep.	Grepper		%s: A existat o problemă la rularea grep.
-Actions	GrepWindow		Acțiuni
-Cancel	GrepWindow		Anulează
-Case-sensitive	GrepWindow		Sensibil la majuscule
-Close	GrepWindow		Închide
-Copy text to clipboard	GrepWindow		Copiază text la clipboard
-Encoding	GrepWindow		Codare
-Escape search text	GrepWindow		Tastați textul de căutat
-File	GrepWindow		Fișier
-Follow symbolic links	GrepWindow		Urmărește legăturile simbolice
-History	GrepWindow		Istoric
-Look in sub-folders	GrepWindow		Caută în subdosare
-New window	GrepWindow		Fereastră nouă
-OK	GrepWindow		OK
-Open files in Pe	GrepWindow		Deschide fișiere în Pe
-Open selection	GrepWindow		Deschide selecție
-Please select the files you wish to have selected for you in Tracker.	GrepWindow		Selectați fișierele pe care le doriți selectate pentru dumneavoastră în Tracker.
-Please select the files you wish to keep searching.	GrepWindow		Selectați fișierele pe care doriți să le căutați în continuare.
-Quit	GrepWindow		Părăsește
-Search	GrepWindow		Caută
-Select all	GrepWindow		Selectează tot
-Set target…	GrepWindow		Configurează destinație...
-Settings	GrepWindow		Configurări
-Show files in Tracker	GrepWindow		Afișează fișiere în Agentul de urmărire
-Show lines	GrepWindow		Afișează linii
-Skip folders starting with a dot	GrepWindow		Omite dosarele care încep cu un punct
-Text files only	GrepWindow		Numai fișiere text
-TextSearch	GrepWindow		CăutareText
-The unselected files will be removed from the list.	GrepWindow		Fișierele neselectate vor fi eliminate din listă.
 Trim to selection	GrepWindow		Potrivește la selecție
+Follow symbolic links	GrepWindow		Urmărește legăturile simbolice
+Close	GrepWindow		Închide
+Cancel	GrepWindow		Anulează
+The unselected files will be removed from the list.	GrepWindow		Fișierele neselectate vor fi eliminate din listă.
+Set target…	GrepWindow		Configurează destinație...
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Selectați fișierele pe care le doriți selectate pentru dumneavoastră în Tracker.
+Open files in Pe	GrepWindow		Deschide fișiere în Pe
+Copy text to clipboard	GrepWindow		Copiază text la clipboard
+Settings	GrepWindow		Configurări
+Select all	GrepWindow		Selectează tot
+OK	GrepWindow		OK
+Skip folders starting with a dot	GrepWindow		Omite dosarele care încep cu un punct
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME nu a putut deschide unul sau mai multe dosare.
+Escape search text	GrepWindow		Tastați textul de căutat
+Search	GrepWindow		Caută
+Open selection	GrepWindow		Deschide selecție
+Look in sub-folders	GrepWindow		Caută în subdosare
+Actions	GrepWindow		Acțiuni
+File	GrepWindow		Fișier
+Encoding	GrepWindow		Codare
+History	GrepWindow		Istoric
+%s: There was a problem running grep.	Grepper		%s: A existat o problemă la rularea grep.
+New window	GrepWindow		Fereastră nouă
+Please select the files you wish to keep searching.	GrepWindow		Selectați fișierele pe care doriți să le căutați în continuare.
+TextSearch	GrepWindow		CăutareText
+Quit	GrepWindow		Părăsește
+Show files in Tracker	GrepWindow		Afișează fișiere în Agentul de urmărire
+Case-sensitive	GrepWindow		Sensibil la majuscule
+Text files only	GrepWindow		Numai fișiere text
+Show lines	GrepWindow		Afișează linii

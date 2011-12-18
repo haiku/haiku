@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-LaunchBox	4192523522
+1	german	x-vnd.Haiku-LaunchBox	3016105370
 New	LaunchBox		Neu
 Set description…	LaunchBox		Beschreibung ändern...
 Vertical layout	LaunchBox		Vertikale Anordnung
@@ -24,6 +24,7 @@ Name Panel	LaunchBox		Namenspanel
 Add button here	LaunchBox		Feld hier einfügen
 Description for '%3'	LaunchBox		Beschreibung für '%3'
 Settings	LaunchBox		EInstellungen
+Failed to launch 'something', error in Pad data.	LaunchBox		Start von 'irgendwas' fehlgeschlagen, Fehler in den Daten des Blocks.
 Pad %1	LaunchBox		Block %1
 Close	LaunchBox		Schließen
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Senden des 'open folder' Kommandos zu Tracker fehlgeschlagen.\n\nFehler:

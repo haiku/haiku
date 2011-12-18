@@ -1,51 +1,51 @@
 1	romanian	x-vnd.Haiku-Appearance	168322075
-About	DecorSettingsView		Despre
-About Decorator	DecorSettingsView		Despre Decorator
-Antialiasing	APRWindow		Anti-alias
-Antialiasing menu	AntialiasingSettingsView		Meniu anticrenelare
-Antialiasing type:	AntialiasingSettingsView		Tip de anti-alias:
-Appearance	System name		Aspect
-Choose Decorator	DecorSettingsView		Alege decorator
-Colors	APRWindow		Culori
-Control background	Colors tab		Fundalul controlului   
-Control border	Colors tab		Margine de control
 Control highlight	Colors tab		Punct principal de control
-Control text	Colors tab		Text de control
-Defaults	APRWindow		Implicite
-Document background	Colors tab		Fundalul documentului
-Document text	Colors tab		Document text
-Failure	Colors tab		Eşec
-Glyph hinting:	AntialiasingSettingsView		Indiciu glyph:
-Grayscale	AntialiasingSettingsView		Scală de gri
-Hinting menu	AntialiasingSettingsView		Meniu de sugestii
-Inactive window border	Colors tab		Margine fereastră inactivă
-Inactive window tab	Colors tab		Fereastră tab inactivă
-Inactive window tab text	Colors tab		Text de fereastră tab inactivă
-LCD subpixel	AntialiasingSettingsView		Subpixel LCD
-Menu background	Colors tab		Fundalul meniului
-Menu item text	Colors tab		Text de element meniu
-Monospaced fonts only	AntialiasingSettingsView		Doar fonturi monospațiate
-Navigation base	Colors tab		Bază de navigare
-Navigation pulse	Colors tab		Puls de navigare
-OK	DecorSettingsView		OK
-Off	AntialiasingSettingsView		Oprit
-On	AntialiasingSettingsView		Pornit
-Panel background	Colors tab		Fundalul panoului
-Panel text	Colors tab		Text de panou
-Reduce colored edges filter strength:	AntialiasingSettingsView		Reduce intensitatea filtrului marginilor colorate:
-Revert	APRWindow		Revenire
-Selected menu item background	Colors tab		Fundalul elementului de meniu selectat
-Selected menu item border	Colors tab		Marginea elementului de meniu selectat
-Selected menu item text	Colors tab		Textul elementului de meniu selectat
+Control border	Colors tab		Margine de control
+Antialiasing type:	AntialiasingSettingsView		Tip de anti-alias:
 Shadow	Colors tab		Umbră
+On	AntialiasingSettingsView		Pornit
+Defaults	APRWindow		Implicite
+Grayscale	AntialiasingSettingsView		Scală de gri
 Shine	Colors tab		Strălucire
-Strong	AntialiasingSettingsView		Îngroșat
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Anti-aliasul pe bază de subpixel în combinație cu indiciul glyph nu este diponibilă în această versiune compilată Haiku pentru a evita problemele posibile de încălcare a proprietății intelectuale. Pentru a face disponibilă această caracteristică, trebuie să construiți o altă variantă Haiku și să activați anumite opțiuni în antetul de configurație libfreetype.
+About	DecorSettingsView		Despre
+Off	AntialiasingSettingsView		Oprit
+Choose Decorator	DecorSettingsView		Alege decorator
 Success	Colors tab		Succes
-Tooltip background	Colors tab		Fundalul indiciului
-Tooltip text	Colors tab		Text de indiciu
+Inactive window tab text	Colors tab		Text de fereastră tab inactivă
+About Decorator	DecorSettingsView		Despre Decorator
+Failure	Colors tab		Eşec
+Hinting menu	AntialiasingSettingsView		Meniu de sugestii
 Window Decorator	APRWindow		Decorator fereastră
 Window Decorator:	DecorSettingsView		Decorator fereastră:
-Window border	Colors tab		Margine fereastră
+Document background	Colors tab		Fundalul documentului
+Revert	APRWindow		Revenire
 Window tab	Colors tab		Tab de fereastră
+Tooltip background	Colors tab		Fundalul indiciului
+Selected menu item background	Colors tab		Fundalul elementului de meniu selectat
+Antialiasing	APRWindow		Anti-alias
+Navigation base	Colors tab		Bază de navigare
+Window border	Colors tab		Margine fereastră
 Window tab text	Colors tab		Text fereastră tab
+Document text	Colors tab		Document text
+Navigation pulse	Colors tab		Puls de navigare
+Selected menu item text	Colors tab		Textul elementului de meniu selectat
+Menu background	Colors tab		Fundalul meniului
+OK	DecorSettingsView		OK
+Panel background	Colors tab		Fundalul panoului
+Colors	APRWindow		Culori
+Control background	Colors tab		Fundalul controlului   
+Inactive window tab	Colors tab		Fereastră tab inactivă
+Appearance	System name		Aspect
+Reduce colored edges filter strength:	AntialiasingSettingsView		Reduce intensitatea filtrului marginilor colorate:
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Anti-aliasul pe bază de subpixel în combinație cu indiciul glyph nu este diponibilă în această versiune compilată Haiku pentru a evita problemele posibile de încălcare a proprietății intelectuale. Pentru a face disponibilă această caracteristică, trebuie să construiți o altă variantă Haiku și să activați anumite opțiuni în antetul de configurație libfreetype.
+Control text	Colors tab		Text de control
+Tooltip text	Colors tab		Text de indiciu
+Inactive window border	Colors tab		Margine fereastră inactivă
+Menu item text	Colors tab		Text de element meniu
+LCD subpixel	AntialiasingSettingsView		Subpixel LCD
+Selected menu item border	Colors tab		Marginea elementului de meniu selectat
+Strong	AntialiasingSettingsView		Îngroșat
+Panel text	Colors tab		Text de panou
+Monospaced fonts only	AntialiasingSettingsView		Doar fonturi monospațiate
+Antialiasing menu	AntialiasingSettingsView		Meniu anticrenelare
+Glyph hinting:	AntialiasingSettingsView		Indiciu glyph:

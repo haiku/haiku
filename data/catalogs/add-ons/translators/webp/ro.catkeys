@@ -1,7 +1,7 @@
 1	romanian	x-vnd.Haiku-WebPTranslator	1423533669
 WebP Images	ConfigView		Imagini WebP
+WebP images	WebPTranslator		Imagini WebP
+WebPTranslator Settings	ConfigView		Configurări TraducătorWebP
 WebP Settings	main		Configurări WebP
 WebP image	WebPTranslator		Imagine WebP
 WebP image translator	WebPTranslator		Traducător imagine WebP
-WebP images	WebPTranslator		Imagini WebP
-WebPTranslator Settings	ConfigView		Configurări TraducătorWebP

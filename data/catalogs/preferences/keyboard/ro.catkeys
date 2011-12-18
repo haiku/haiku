@@ -1,14 +1,14 @@
 1	romanian	x-vnd.Haiku-Keyboard	1711838804
+Written by Andrew Edward McCall	KeyboardApplication		Scris de Andrew Edward McCall
+Typing test area	KeyboardView		Zonă de testare a tastării
 Defaults	KeyboardWindow		Implicite
-Delay until key repeat	KeyboardView		Întârziere până la repetarea tastei
-Fast	KeyboardView		Rapid
 Key repeat rate	KeyboardView		Rata de repetare a tastei
-Keyboard	System name		Tastatură
-Long	KeyboardView		Lung
-OK	KeyboardApplication		Bine
 Revert	KeyboardWindow		Revenire
-Short	KeyboardView		Scurt
+Delay until key repeat	KeyboardView		Întârziere până la repetarea tastei
+Keyboard	System name		Tastatură
+OK	KeyboardApplication		Bine
+Fast	KeyboardView		Rapid
 Slow	KeyboardView		Lent
 Something has gone wrong!	KeyboardApplication		Ceva nu a mers bine!
-Typing test area	KeyboardView		Zonă de testare a tastării
-Written by Andrew Edward McCall	KeyboardApplication		Scris de Andrew Edward McCall
+Long	KeyboardView		Lung
+Short	KeyboardView		Scurt

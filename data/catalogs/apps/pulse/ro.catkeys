@@ -1,48 +1,48 @@
 1	romanian	x-vnd.Haiku-Pulse	2324471783
-%.2f GHz	NormalPulseView		%.2f GHz
-%ld MHz	NormalPulseView		%ld MHz
-%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nDe David Ramsey și Arve Hjønnevåg\nRevizuit de Daniel Switkin\n
-About Pulse…	CPUButton		Despre Puls...
-About Pulse…	PulseView		Despre Puls...
-Active color	ConfigView		Culoare activă
-Bar colors	ConfigView		Culori bară
-CPU progress bar	NormalPulseView		Bara de progres a procesorului
-Defaults	PrefsWindow		Implicite
-Deskbar	CPUButton		Bară de desktop
-Deskbar menu	CPUButton		Meniul barei de desktop
-Deskbar mode	MiniPulseView		Mod bară de desktop
-Deskbar mode	NormalPulseView		Mod bară de desktop
-Deskbar mode	PrefsWindow		Mod bară de desktop
-Error	PulseApp		Eroare
-Fade colors	ConfigView		Culori translucide
-Frame color	ConfigView		Culoare cadru
-Idle color	ConfigView		Culoare în așteptare
-Info	CPUButton		Info
-Info	DeskbarPulseView		Info
-Info	PulseApp		Detalii
-Info	PulseView		Detalii
-Installing in Deskbar failed\n%s	PulseApp		Instalarea pe Deskbar a eșuat\n%s
-Mini mode	DeskbarPulseView		Mod mini
-Mini mode	NormalPulseView		Mod mini
-Mini mode	PrefsWindow		Mod mini
-Normal mode	DeskbarPulseView		Mod normal
-Normal mode	MiniPulseView		Mod normal
-Normal mode	PrefsWindow		Mod normal
-OK	CPUButton		OK
-OK	DeskbarPulseView		OK
 OK	PrefsWindow		OK
-OK	PulseApp		OK
-OK	PulseView		OK
-Pulse	NormalPulseView		Puls
-Pulse	PulseApp		Puls
-Pulse	System name		Puls
-Pulse settings	PulseWindow		Configurări Puls
 Quit	DeskbarPulseView		Părăsește
-Quit	MiniPulseView		Părăsește
+Mini mode	DeskbarPulseView		Mod mini
 Remove replicant	CPUButton		Elimină replicant
-Removing from Deskbar failed.\n%s	DeskbarPulseView		Eliminarea de pe Deskbar a eșuat.\n%s
-Settings…	PulseView		Configurări...
+Active color	ConfigView		Culoare activă
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Utilizare: Puls [--mini] [-w lățime] [--width=lățime]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
+Fade colors	ConfigView		Culori translucide
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nDe David Ramsey și Arve Hjønnevåg\nRevizuit de Daniel Switkin\n
+OK	DeskbarPulseView		OK
+Deskbar mode	PrefsWindow		Mod bară de desktop
+%.2f GHz	NormalPulseView		%.2f GHz
+Normal mode	PrefsWindow		Mod normal
+Defaults	PrefsWindow		Implicite
+Normal mode	MiniPulseView		Mod normal
+Error	PulseApp		Eroare
+Info	PulseView		Detalii
+Deskbar	CPUButton		Bară de desktop
+Frame color	ConfigView		Culoare cadru
+Mini mode	PrefsWindow		Mod mini
+OK	PulseApp		OK
+Bar colors	ConfigView		Culori bară
+Settings…	PulseView		Configurări...
+You can't disable the last active CPU.	PulseView		Nu puteți dezactiva ultimul procesor activ.
+Info	PulseApp		Detalii
+Info	CPUButton		Info
+OK	PulseView		OK
+Deskbar menu	CPUButton		Meniul barei de desktop
+About Pulse…	PulseView		Despre Puls...
+Deskbar mode	MiniPulseView		Mod bară de desktop
+Quit	MiniPulseView		Părăsește
+Pulse	System name		Puls
+Pulse	NormalPulseView		Puls
+%ld MHz	NormalPulseView		%ld MHz
+Deskbar mode	NormalPulseView		Mod bară de desktop
+Pulse	PulseApp		Puls
 Width of icon:	ConfigView		Lățimea pictogramei:
 You can't disable the last active CPU.	CPUButton		Nu puteți dezactiva ultimul procesor activ.
-You can't disable the last active CPU.	PulseView		Nu puteți dezactiva ultimul procesor activ.
+Normal mode	DeskbarPulseView		Mod normal
+OK	CPUButton		OK
+About Pulse…	CPUButton		Despre Puls...
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Eliminarea de pe Deskbar a eșuat.\n%s
+Mini mode	NormalPulseView		Mod mini
+Info	DeskbarPulseView		Info
+Pulse settings	PulseWindow		Configurări Puls
+Idle color	ConfigView		Culoare în așteptare
+Installing in Deskbar failed\n%s	PulseApp		Instalarea pe Deskbar a eșuat\n%s
+CPU progress bar	NormalPulseView		Bara de progres a procesorului

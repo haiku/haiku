@@ -47,7 +47,7 @@ Change Color	Icon-O-Matic-SetColorCmd		Изменить цвет
 Style	Icon-O-Matic-Menus		Стиль
 <modify path>	Icon-O-Matic-PathCmd		<изменить путь>
 Opening the icon failed!	Icon-O-Matic-Main		Не удалось открыть значок!
-Error: 	Icon-O-Matic-Main		Ошибка:
+Error: 	Icon-O-Matic-Main		Ошибка: 
 Rotate indices backwards	Icon-O-Matic-PathsList		Переместить начало контура назад
 Name	Icon-O-Matic-PropertyNames		Название
 bad news	Icon-O-Matic-Exporter		плохие новости

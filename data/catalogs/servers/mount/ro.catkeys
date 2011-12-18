@@ -1,17 +1,17 @@
 1	romanian	x-vnd.Haiku-mount_server	1422362183
-Cancel	AutoMounter		Anulează
-Could not unmount disk \"%s\":\n\t%s	AutoMounter		Nu s-a putut demonta discul „%s”:\n\t%s
-Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Nu s-a putut demonta discul „%s”:\n\t%s\n\nAr trebui fortață demontarea?\n\nNotă: Dacă o aplicație scrie pe volum, demontarea acestuia se finalizează cu pierderea de date.\n
-Error mounting volume:\n\n%s	AutoMounter		Eroare la montarea volumului:\n\n%s
-Force unmount	AutoMounter		Forțează demontarea
-It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Este recomandat să montați toate volumele Haiku adiționale în mod protejat la scriere. Acest lucru va preveni pierderea neintenționată de date din cauza erorilor din Haiku.
-Mount error	AutoMounter		Eroare de montare
 Mount read-only	AutoMounter		Montează protejat la scriere
-Mount read/write	AutoMounter		Montează citire/scriere
+Error mounting volume:\n\n%s	AutoMounter		Eroare la montarea volumului:\n\n%s
+Unmount error	AutoMounter		Eroare de demontare
 Mount warning	AutoMounter		Avertisment de montare
+Mount read/write	AutoMounter		Montează citire/scriere
 Mounting volume '%s'\n\n	AutoMounter		Se montează volumul „%s”\n\n
+Cancel	AutoMounter		Anulează
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Nu s-a putut demonta discul „%s”:\n\t%s\n\nAr trebui fortață demontarea?\n\nNotă: Dacă o aplicație scrie pe volum, demontarea acestuia se finalizează cu pierderea de date.\n
+Could not unmount disk \"%s\":\n\t%s	AutoMounter		Nu s-a putut demonta discul „%s”:\n\t%s
 Mounting volume <unnamed volume>\n\n	AutoMounter		Se montează volumul <volum fără nume>\n\n
 OK	AutoMounter		OK
-Previous volumes mounted.	AutoMounter		Volume anterioare montate.
 The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Sistemul de fișiere de pe acest volum nu este sistemul de fișiere Haiku. Este foarte recomandat să îl montați în mod protejat la scriere. Acest lucru va preveni pierderea neintenționată de date din cauza erorilor din Haiku.
-Unmount error	AutoMounter		Eroare de demontare
+Previous volumes mounted.	AutoMounter		Volume anterioare montate.
+Mount error	AutoMounter		Eroare de montare
+It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Este recomandat să montați toate volumele Haiku adiționale în mod protejat la scriere. Acest lucru va preveni pierderea neintenționată de date din cauza erorilor din Haiku.
+Force unmount	AutoMounter		Forțează demontarea

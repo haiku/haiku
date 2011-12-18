@@ -1,44 +1,44 @@
 1	romanian	x-vnd.Haiku-Time	3493650184
-<Other>	Time		<Altele>
-Add	Time		Adaugă
-Africa	Time		Africa
-America	Time		America
-Antarctica	Time		Antarctica
-Arctic	Time		Arctic
-Asia	Time		Asia
-Atlantic	Time		Atlantic
-Australia	Time		Australia
-Could not contact server	Time		Nu s-a putut contacta serverul
-Could not create socket	Time		Nu s-a putut crea socketul
-Current time:	Time		Oră curentă:
-Date and time	Time		Dată și oră
-Europe	Time		Europa
 GMT (UNIX compatible)	Time		GMT (compatibil cu UNIX)
-Hardware clock set to:	Time		Ceasul hardware stabilit la:
-Indian	Time		Indian
+OK	Time		OK
+Asia	Time		Asia
+\nNow: 	Time		\nAcum:
+Africa	Time		Africa
+Stop	Time		Oprește
+Could not contact server	Time		Nu s-a putut contacta serverul
+Australia	Time		Australia
+Preview time:	Time		Previzualizare oră:
+Synchronize	Time		Sincronizează
+Revert	Time		Inversează
+Pacific	Time		Pacific
+Add	Time		Adaugă
+Date and time	Time		Dată și oră
+about	Time		despre
 Local time (Windows compatible)	Time		Ora locală (compatibil cu Windows)
 Message receiving failed	Time		Primirea mesajului a eșuat
-Network time	Time		Oră rețea
-OK	Time		OK
-Pacific	Time		Pacific
-Preview time:	Time		Previzualizare oră:
-Received invalid time	Time		S-a primit o oră invalidă
-Remove	Time		Elimină
-Reset	Time		Resetează
-Revert	Time		Inversează
-Sending request failed	Time		Trimiterea cererii a eșuat
 Set time zone	Time		Configurează fusul orar
-Stop	Time		Oprește
-Synchronize	Time		Sincronizează
-Synchronize again	Time		Sincronizează din nou
-Synchronize at boot	Time		Sincronizează la pornirea sistemului
-The following error occured while synchronizing:r\n%s	Time		Următoarea eroare a apărut în timpul sincronizării:r\n%s
-The following error occured while synchronizing:r\n%s: %s	Time		Următoarea eroare a apărut în timpul sincronizării:r\n%s: %s
-Time	System name		Oră
-Time	Time		Oră
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Oră & Dată, scris de:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nDrepturi de autor 2004-2008, Haiku.
-Time zone	Time		Fus orar
-Try all servers	Time		Încearcă toate serverele
 Waiting for answer failed	Time		Așteptarea pentru răspuns a eșuat
-\nNow: 	Time		\nAcum:
-about	Time		despre
+Hardware clock set to:	Time		Ceasul hardware stabilit la:
+The following error occured while synchronizing:r\n%s	Time		Următoarea eroare a apărut în timpul sincronizării:r\n%s
+Europe	Time		Europa
+Remove	Time		Elimină
+Time	Time		Oră
+Indian	Time		Indian
+Sending request failed	Time		Trimiterea cererii a eșuat
+Arctic	Time		Arctic
+Time	System name		Oră
+America	Time		America
+Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Oră & Dată, scris de:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nDrepturi de autor 2004-2008, Haiku.
+Reset	Time		Resetează
+Synchronize at boot	Time		Sincronizează la pornirea sistemului
+Received invalid time	Time		S-a primit o oră invalidă
+Antarctica	Time		Antarctica
+The following error occured while synchronizing:r\n%s: %s	Time		Următoarea eroare a apărut în timpul sincronizării:r\n%s: %s
+<Other>	Time		<Altele>
+Current time:	Time		Oră curentă:
+Try all servers	Time		Încearcă toate serverele
+Time zone	Time		Fus orar
+Could not create socket	Time		Nu s-a putut crea socketul
+Synchronize again	Time		Sincronizează din nou
+Network time	Time		Oră rețea
+Atlantic	Time		Atlantic

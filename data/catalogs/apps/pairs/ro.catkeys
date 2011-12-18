@@ -1,14 +1,14 @@
 1	romanian	x-vnd.Haiku-Pairs	1981673050
 %app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\tscris de Ralf Schülke\n\tDrepturi de autor 2008-2010, Haiku Inc.\n\nAți completat jocul în %num% clicuri.\n
-Beginner (4x4)	PairsWindow		Începător (4x4)
 Expert (8x8)	PairsWindow		Avansat (8x8)
-Game	PairsWindow		Joc
-Intermediate (6x6)	PairsWindow		Mediu (6x6)
-New	PairsWindow		Nou
-New game	PairsWindow		Joc nou
-OK	PairsView		OK
-Pairs	System name		Perechi
-Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Perechi nu a găsit suficiente pictograme vectoriale în sistem; are nevoie de cel puțin %d.
-Quit	PairsWindow		Închide
+Beginner (4x4)	PairsWindow		Începător (4x4)
 Quit game	PairsWindow		Închide jocul
+Game	PairsWindow		Joc
 Size	PairsWindow		Dimensiune
+New	PairsWindow		Nou
+OK	PairsView		OK
+Intermediate (6x6)	PairsWindow		Mediu (6x6)
+Quit	PairsWindow		Închide
+Pairs	System name		Perechi
+New game	PairsWindow		Joc nou
+Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Perechi nu a găsit suficiente pictograme vectoriale în sistem; are nevoie de cel puțin %d.

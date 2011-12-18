@@ -1,8 +1,8 @@
 1	romanian	x-vnd.Haiku-InstalledPackages	4131220089
-InstalledPackages	System name		PacheteInstalate
 No package selected.	UninstallView		Niciun pachet selectat.
-OK	UninstallView		OK
-Package description	UninstallView		Descriere pachet
 Remove	UninstallView		Elimină
+Package description	UninstallView		Descriere pachet
+InstalledPackages	System name		PacheteInstalate
 The package you selected has been successfully removed from your system.	UninstallView		Pachetul pe care l-ați selectat a fost eliminat cu succes din sistemul dumneavoastră.
+OK	UninstallView		OK
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Pachetul selectat nu a fost eliminat din sistemul dumneavoastră. Fișierul cu informații ale pachetului instalat s-ar putea să fi fost deteriorat.

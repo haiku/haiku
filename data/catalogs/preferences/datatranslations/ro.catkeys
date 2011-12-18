@@ -1,18 +1,18 @@
 1	romanian	x-vnd.Haiku-DataTranslations	3820343452
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Un element cu numele „%name” există deja în dosarul Traducători! Se va suprascrie traducătorul existent?
-Cancel	DataTranslations		Anulează
-Could not install %s:\n%s	DataTranslations		Nu s-a putut instala %s:\n%s
 DataTranslations	System name		TraduceriDate
-DataTranslations - Error	DataTranslations		TraduceriDate - Eroare
-DataTranslations - Note	DataTranslations		TraduceriDate - Notă
-Info	DataTranslations		info
-Info:	DataTranslations		Info:
+Cancel	DataTranslations		Anulează
 Name:	DataTranslations		Nume:
 Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Nume: %s \nVersiune: %ld.%ld.%ld\n\nDetalii:\n%s\n\nCale:\n%s\n
-OK	DataTranslations		OK
-Overwrite	DataTranslations		Suprascrie
-Path:	DataTranslations		Cale:
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Elementul „%name” nu pare a fi un Traducător și nu va fi instalat.
-The new translator has been installed successfully.	DataTranslations		Traducătorul nou a fost instalat cu succes.
+Could not install %s:\n%s	DataTranslations		Nu s-a putut instala %s:\n%s
 Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Utilizați acest panou de control pentru a configura valorile implicite pentru traducători, pentru a fi utilizate atunci când nu se specifică alte configurări de către o aplicație.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Un element cu numele „%name” există deja în dosarul Traducători! Se va suprascrie traducătorul existent?
+DataTranslations - Note	DataTranslations		TraduceriDate - Notă
+Overwrite	DataTranslations		Suprascrie
+Info:	DataTranslations		Info:
+Info	DataTranslations		info
+Path:	DataTranslations		Cale:
+The new translator has been installed successfully.	DataTranslations		Traducătorul nou a fost instalat cu succes.
+DataTranslations - Error	DataTranslations		TraduceriDate - Eroare
+OK	DataTranslations		OK
 Version:	DataTranslations		Versiune:

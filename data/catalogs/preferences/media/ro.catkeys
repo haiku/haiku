@@ -1,29 +1,29 @@
 1	romanian	x-vnd.Haiku-Media	850876587
-<none>	Media views		<nimic>
-Audio input:	Media views		Intrare audio:
-Audio mixer	Media Window		Mixaj audio
-Audio output:	Media views		Ieșire audio:
-Audio settings	Media Window		Configurări audio
-Channel:	Media views		Canal:
-Cleaning up.	Media Window		Se curăță.
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Nu s-a putut conecta la serverul media.\nDoriți să îl porniți?
 Couldn't add volume control in Deskbar: %s\n	Media views		Nu s-a putut adăuga controlul de volum pe bara de desktop: %s\n
-Couldn't remove volume control in Deskbar: %s\n	Media views		Nu s-a putut elimina controlul de volum de pe bara de desktop: %s\n
-Defaults	Media views		Implicite
-Media	System name		Media
-OK	Media Window		OK
-Quit	Media Window		Părăsește
 Ready for use…	Media Window		Gata de utilizat...
-Restart media services	Media views		Restartează servicii media
-Restarting media services\nShutting down media server\n	Media Window		Se restartează serviciile media\nSe oprește serverul media\n
-Restarting media services\nStarting media server…\n	Media Window		Se repornesc serviciile media\nSe pornește serverul media...\n
-Show volume control on Deskbar	Media views		Afișează controlul volumului în Deskbar
-Start media server	Media Window		Pornește server media
-Starting media server…	Media Window		Se pornește serverul media...
-Stopping media server…	Media Window		Se oprește serverul media...
-Telling media_addon_server to quit.	Media Window		Se transmite lui media_addon_server să se închidă.
-This hardware has no controls.	Media Window		Acest hardware nu are controale.
 Video input:	Media views		Intrare video:
-Video output:	Media views		Ieșire video:
-Video settings	Media Window		Configurări video
 Waiting for media_server to quit.	Media Window		Se așteaptă ca media_server să se închidă.
+Cleaning up.	Media Window		Se curăță.
+Defaults	Media views		Implicite
+Stopping media server…	Media Window		Se oprește serverul media...
+Quit	Media Window		Părăsește
+OK	Media Window		OK
+Starting media server…	Media Window		Se pornește serverul media...
+Video settings	Media Window		Configurări video
+Video output:	Media views		Ieșire video:
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Nu s-a putut conecta la serverul media.\nDoriți să îl porniți?
+Restart media services	Media views		Restartează servicii media
+Couldn't remove volume control in Deskbar: %s\n	Media views		Nu s-a putut elimina controlul de volum de pe bara de desktop: %s\n
+Media	System name		Media
+Telling media_addon_server to quit.	Media Window		Se transmite lui media_addon_server să se închidă.
+Audio mixer	Media Window		Mixaj audio
+This hardware has no controls.	Media Window		Acest hardware nu are controale.
+Audio output:	Media views		Ieșire audio:
+Restarting media services\nStarting media server…\n	Media Window		Se repornesc serviciile media\nSe pornește serverul media...\n
+Audio settings	Media Window		Configurări audio
+Start media server	Media Window		Pornește server media
+Restarting media services\nShutting down media server\n	Media Window		Se restartează serviciile media\nSe oprește serverul media\n
+<none>	Media views		<nimic>
+Channel:	Media views		Canal:
+Show volume control on Deskbar	Media views		Afișează controlul volumului în Deskbar
+Audio input:	Media views		Intrare audio:
