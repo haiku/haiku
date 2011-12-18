@@ -3,6 +3,23 @@ Greetings.
 This document is intended to serve as an introduction to the Haiku project.
 As such, this is only the tip of the iceberg.
 
+
+About the Haiku project
+-----------------------
+The Haiku project is comprised of numerous volunteers spread across the globe.
+While Haiku supports localization efforts, the primary language is English.
+The project is mindful of the language barrier for non-English speakers. To
+note, the native language of the majority of contributors is not English.
+
+
+Design goals
+------------
+If the ideology of the Haiku project were to be explained in a few short words,
+it would be something like this. The software shall have sensible defaults with
+minimal configuration required. The code shall adhere to the coding guidelines
+and implement the functionality in best possible manner.
+
+
 Haiku project website
 ---------------------
 http://www.haiku-os.org
@@ -10,6 +27,19 @@ http://www.haiku-os.org
 This is the main website for the Haiku project. It contains news posts from
 the project, blog posts (from developers, Google Summer of Code participants,
 and other frequent contributors), forums, and a vast collection of information.
+
+
+Communication
+-------------
+http://www.haiku-os.org/community/ml
+http://www.haiku-os.org/community/ml/etiquette
+
+The primary means of communication are through mailing lists and are generally
+hosted by FreeLists. In addition to the mailing lists (ML), numerous users and
+contributors frequent IRC (irc.freenode.net#haiku). There is also BeShare, an
+online chat and file sharing application.
+ * http://haikuware.com/directory/view-details/internet-network/chat-irc/beshare
+ * http://dev.osdrawer.net/projects/beshare
 
 
 Development tracker
