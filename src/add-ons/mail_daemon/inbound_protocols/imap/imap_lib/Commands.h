@@ -258,6 +258,7 @@ private:
 			const char*			_Command() const;
 
 private:
+			RFC3501Encoding		fEncoding;
 			const char*			fPrefix;
 			StringList			fFolders;
 			bool				fSubscribedOnly;

@@ -642,7 +642,7 @@ ListCommand::CommandString()
 	BString command = _Command();
 	command += " \"\" \"";
 	if (fPrefix != NULL)
-		command << fPrefix << "%";
+		command << fEncoding.Encode(fPrefix) << "%";
 	else
 		command += "*";
 	command += "\"";
@@ -655,7 +655,15 @@ bool
 ListCommand::HandleUntagged(Response& response)
 {
 	if (response.IsCommand(_Command()) && response.IsStringAt(3)) {
-		fFolders.push_back(response.StringAt(3));
+		BString folder = response.StringAt(3);
+		try {
+			fFolders.push_back(fEncoding.Decode(folder));
+		} catch (ParseException& exception) {
+			// Decoding failed, just add the plain text
+			fprintf(stderr, "Decoding \"%s\" failed: %s\n", folder.String(),
+				exception.Message());
+			fFolders.push_back(folder);
+		}
 		return true;
 	}
 

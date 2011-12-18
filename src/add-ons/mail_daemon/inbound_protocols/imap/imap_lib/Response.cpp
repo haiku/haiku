@@ -20,6 +20,123 @@
 namespace IMAP {
 
 
+// Note, the following alphabet is a modified base64; the '/' is replaced by
+// a ',' here.
+static const char kBase64Alphabet[64] = {
+  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+  'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+  'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+  'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+  '+', ','
+};
+static char kInverseBase64Alphabet[128];
+static bool kInverseBase64Initialized = false;
+
+
+RFC3501Encoding::RFC3501Encoding()
+{
+	if (!kInverseBase64Initialized) {
+		// This is not thread safe, but it's not harmful
+		for (size_t i = 0; i < sizeof(kBase64Alphabet); i++)
+			kInverseBase64Alphabet[kBase64Alphabet[i]] = i + 1;
+		kInverseBase64Initialized = true;
+	}
+}
+
+
+RFC3501Encoding::~RFC3501Encoding()
+{
+}
+
+
+BString
+RFC3501Encoding::Encode(const BString& clearText) const
+{
+	// TODO!
+	return clearText;
+}
+
+
+BString
+RFC3501Encoding::Decode(const BString& encodedText) const
+{
+	int32 end = encodedText.Length();
+	BString buffer;
+	for (int32 i = 0; i < end; i++) {
+		uint8 c = (uint8)encodedText.ByteAt(i);
+		if (c == '&') {
+			if (i < end - 1 && encodedText.ByteAt(i + 1) == '-') {
+				// just add an ampersand
+				buffer += '&';
+			} else {
+				// base64 encoded chunk
+				uint32 value = 0;
+				int32 bitsRead = 0;
+				while (true) {
+					if (++i >= end)
+						throw ParseException("Malformed base64!");
+
+					c = encodedText.ByteAt(i);
+					if (c == '-') {
+						if (value != 0 || bitsRead >= 6)
+							throw ParseException("Base64 encoding ends early!");
+						break;
+					}
+					if (c >= 128)
+						throw ParseException("Malformed base64!");
+					int32 sextet = kInverseBase64Alphabet[c] - 1;
+					if (sextet >= 0) {
+						bitsRead += 6;
+						if (bitsRead < 16) {
+							value += sextet << (16 - bitsRead);
+						} else {
+							bitsRead -= 16;
+							value += sextet >> bitsRead;
+							_ToUTF8(buffer, value);
+
+							// Move on to next character
+							value = (sextet << (16 - bitsRead)) & 0xffff;
+						}
+					} else {
+						buffer += c;
+						if (value != 0 || bitsRead >= 6)
+							throw ParseException("Malformed base64!");
+						break;
+					}
+				}
+			}
+		} else
+			buffer += c;
+	}
+	return buffer;
+}
+
+
+void
+RFC3501Encoding::_ToUTF8(BString& string, uint32 c) const
+{
+	if (c < 0x80)
+		string += (char)c;
+	else if (c < 0x800) {
+		string += 0xc0 | (c >> 6);
+		string += 0x80 | (c & 0x3f);
+	} else if (c < 0x10000) {
+		string += 0xe0 | (c >> 12);
+		string += 0x80 | ((c >> 6) & 0x3f);
+		string += 0x80 | (c & 0x3f);
+	} else if (c <= 0x10ffff) {
+		string += 0xf0 | (c >> 18);
+		string += 0x80 | ((c >> 12) & 0x3f);
+		string += 0x80 | ((c >> 6) & 0x3f);
+		string += 0x80 | (c & 0x3f);
+	}
+}
+
+
+// #pragma mark -
+
+
 ArgumentList::ArgumentList()
 	:
 	BObjectList<Argument>(5, true)

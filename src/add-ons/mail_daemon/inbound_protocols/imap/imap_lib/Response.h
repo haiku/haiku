@@ -20,6 +20,19 @@ class Argument;
 class Response;
 
 
+class RFC3501Encoding {
+public:
+								RFC3501Encoding();
+								~RFC3501Encoding();
+
+			BString				Encode(const BString& clearText) const;
+			BString				Decode(const BString& encodedText) const;
+
+private:
+			void				_ToUTF8(BString& string, uint32 c) const;
+};
+
+
 class ArgumentList : public BObjectList<Argument> {
 public:
 								ArgumentList();
