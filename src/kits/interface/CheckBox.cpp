@@ -628,9 +628,12 @@ BCheckBox::operator=(const BCheckBox &)
 
 
 extern "C" void
-InvalidateLayout__9BCheckBoxb(BCheckBox* box)
+InvalidateLayout__9BCheckBoxb(BCheckBox* box, bool descendants)
 {
-	box->Perform(PERFORM_CODE_LAYOUT_CHANGED, NULL);
+	perform_data_layout_invalidated data;
+	data.descendants = descendants;
+
+	box->Perform(PERFORM_CODE_LAYOUT_INVALIDATED, &data);	
 }
 
 

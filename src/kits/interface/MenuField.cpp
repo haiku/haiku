@@ -1515,9 +1515,12 @@ BMenuField::MenuBarLayoutItem::Instantiate(BMessage* from)
 
 
 extern "C" void
-InvalidateLayout__10BMenuFieldb(BMenuField* field)
+InvalidateLayout__10BMenuFieldb(BMenuField* field, bool descendants)
 {
-	field->Perform(PERFORM_CODE_LAYOUT_CHANGED, NULL);
+	perform_data_layout_invalidated data;
+	data.descendants = descendants;
+
+	field->Perform(PERFORM_CODE_LAYOUT_INVALIDATED, &data);
 }
 
 

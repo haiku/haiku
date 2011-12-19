@@ -5641,9 +5641,12 @@ BTextView::TextTrackState::SimulateMouseMovement(BTextView *textView)
 
 
 extern "C" void
-InvalidateLayout__9BTextViewb(BTextView* view)
+InvalidateLayout__9BTextViewb(BTextView* view, bool descendants)
 {
-	view->Perform(PERFORM_CODE_LAYOUT_CHANGED, NULL);
+	perform_data_layout_invalidated data;
+	data.descendants = descendants;
+
+	view->Perform(PERFORM_CODE_LAYOUT_INVALIDATED, &data);
 }
 
 

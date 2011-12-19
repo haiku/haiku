@@ -902,9 +902,12 @@ void BScrollView::_ReservedScrollView4() {}
 
 
 extern "C" void
-InvalidateLayout__11BScrollViewb(BScrollView* view)
+InvalidateLayout__11BScrollViewb(BScrollView* view, bool descendants)
 {
-	view->Perform(PERFORM_CODE_LAYOUT_CHANGED, NULL);
+	perform_data_layout_invalidated data;
+	data.descendants = descendants;
+
+	view->Perform(PERFORM_CODE_LAYOUT_INVALIDATED, &data);
 }
 
 

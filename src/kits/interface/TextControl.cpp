@@ -1485,9 +1485,12 @@ BTextControl::TextViewLayoutItem::Instantiate(BMessage* from)
 
 
 extern "C" void
-InvalidateLayout__12BTextControlb(BView* view)
+InvalidateLayout__12BTextControlb(BView* view, bool descendants)
 {
-	view->Perform(PERFORM_CODE_LAYOUT_CHANGED, NULL);
+	perform_data_layout_invalidated data;
+	data.descendants = descendants;
+
+	view->Perform(PERFORM_CODE_LAYOUT_INVALIDATED, &data);
 }
 
 

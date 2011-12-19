@@ -458,9 +458,12 @@ BStringView::_ValidatePreferredSize()
 
 
 extern "C" void
-InvalidateLayout__11BStringViewb(BView* view)
+InvalidateLayout__11BStringViewb(BView* view, bool descendants)
 {
-	view->Perform(PERFORM_CODE_LAYOUT_CHANGED, NULL);
+	perform_data_layout_invalidated data;
+	data.descendants = descendants;
+
+	view->Perform(PERFORM_CODE_LAYOUT_INVALIDATED, &data);
 }
 
 

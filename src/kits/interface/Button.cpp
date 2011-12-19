@@ -786,9 +786,12 @@ BButton::_DrawFocusLine(float x, float y, float width, bool visible)
 
 
 extern "C" void
-InvalidateLayout__7BButtonb(BView* view)
+InvalidateLayout__7BButtonb(BView* view, bool descendants)
 {
-	view->Perform(PERFORM_CODE_LAYOUT_CHANGED, NULL);
+	perform_data_layout_invalidated data;
+	data.descendants = descendants;
+
+	view->Perform(PERFORM_CODE_LAYOUT_INVALIDATED, &data);
 }
 
 
