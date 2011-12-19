@@ -680,7 +680,7 @@ TContentView::MessageReceived(BMessage *msg)
 		{
 			BFont *font;
 			msg->FindPointer("font", (void **)&font);
-			fTextView->SetFontAndColor(0, LONG_MAX, font);
+			fTextView->UpdateFont(font);
 			fTextView->Invalidate(Bounds());
 			break;
 		}
@@ -916,6 +916,21 @@ TTextView::~TTextView()
 		free(fYankBuffer);
 
 	delete_sem(fStopSem);
+}
+
+
+void
+TTextView::UpdateFont(const BFont* newFont)
+{
+	fFont = *newFont;
+
+	// update the text run array safely with new font
+	text_run_array *runArray = RunArray(0, LONG_MAX);
+	for (int i = 0; i < runArray->count; i++)
+		runArray->runs[i].font = *newFont;
+
+	SetRunArray(0, LONG_MAX, runArray);
+	FreeRunArray(runArray);
 }
 
 

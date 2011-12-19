@@ -177,6 +177,7 @@ class TTextView : public BTextView {
 
 		void AddQuote(int32 start, int32 finish);
 		void RemoveQuote(int32 start, int32 finish);
+		void UpdateFont(const BFont* newFont);
 
 		void	WindowActivated(bool flag);
 		void	Undo(BClipboard *clipboard);
