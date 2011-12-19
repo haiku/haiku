@@ -241,8 +241,8 @@ BEntry entry("/boot/home/fido");
 	\brief Returns the result of the most recent construction or SetTo() call.
 
 	\returns A status code.
-	\retval \c B_OK Success
-	\retval \c B_NO_INIT The object has been Unset() or is uninitialized.
+	\retval B_OK Success
+	\retval B_NO_INIT The object has been Unset() or is uninitialized.
 */
 
 
@@ -378,7 +378,7 @@ if (err != B_ENTRY_NOT_FOUND)
 
 	\returns A status code.
 	\retval B_OK Success
-	\retval B_ENTRY_NOT_FOUND - Attempted to get the parent of the root
+	\retval B_ENTRY_NOT_FOUND Attempted to get the parent of the root
 		directory.
 */
 
@@ -394,7 +394,7 @@ if (err != B_ENTRY_NOT_FOUND)
 
 	\returns A status code.
 	\retval B_OK Success
-	\retval B_ENTRY_NOT_FOUND - Attempted to get the parent of the root
+	\retval B_ENTRY_NOT_FOUND Attempted to get the parent of the root
 		directory.
 */
 

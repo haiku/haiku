@@ -23,7 +23,7 @@
 	\class BDirectory
 	\ingroup storage
 	\ingroup libbe
-	\brief Represents a directory in the file system.
+	\brief A directory in the file system.
 */
 
 
@@ -250,17 +250,17 @@
 	\param traverse Whether or not to follow a symbolic link.
 
 	\returns A status code.
-	\retval B_OK: Everything went fine.
-	\retval B_BAD_VALUE: \c NULL \a path or \a entry.
-	\retval B_ENTRY_NOT_FOUND: Entry not found.
-	\retval B_PERMISSION_DENIED: Directory permissions didn't allow operation.
-	\retval B_NO_MEMORY: Insufficient memory for operation.
-	\retval B_NAME_TOO_LONG: The supplied path name (\a path) is too long.
-	\retval B_LINK_LIMIT: Indicates a cyclic loop within the file system.
-	\retval B_BUSY: A node was busy.
-	\retval B_FILE_ERROR: A general file error.
-	\retval B_NO_MORE_FDS: The application has run out of file descriptors.
-	\retval B_NOT_A_DIRECTORY: \a path includes a non-directory.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a path or \a entry.
+	\retval B_ENTRY_NOT_FOUND Entry not found.
+	\retval B_PERMISSION_DENIED Directory permissions didn't allow operation.
+	\retval B_NO_MEMORY Insufficient memory for operation.
+	\retval B_NAME_TOO_LONG The supplied path name (\a path) is too long.
+	\retval B_LINK_LIMIT Indicates a cyclic loop within the file system.
+	\retval B_BUSY A node was busy.
+	\retval B_FILE_ERROR A general file error.
+	\retval B_NO_MORE_FDS The application has run out of file descriptors.
+	\retval B_NOT_A_DIRECTORY \a path includes a non-directory.
 
 	\sa BEntry::SetTo(BDirectory *, const char *, bool)
 */
