@@ -1,0 +1,617 @@
+/*
+ * Copyright 2011 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ *		Simon Cusack, scusack@users.sf.net
+ *		John Scipione, jscipione@gmail.com
+ * Corresponds to:
+ *		headers/os/storage/Entry.h  hrev43528
+ *		src/kits/storage/Entry.cpp  hrev43528
+ */
+
+
+/*!
+	\file Entry.h
+	Provides the BEntry class and entry_ref implementations.
+*/
+
+
+/*!
+	\struct entry_ref
+	\brief A filesystem entry represented as a name in a concrete directory.
+
+	entry_refs may refer to pre-existing (concrete) files, as well as
+	non-existing (abstract) files. However, the parent directory of the file
+	\b must exist.
+
+	The result of this dichotomy is a blending of the persistence gained by
+	referring to entries with a reference to their internal filesystem node and
+	the flexibility gained by referring to entries by name.
+
+	For example, if the directory in which the entry resides (or a directory
+	further up in the hierarchy) is moved or renamed, the entry_ref will still
+	refer to the correct file (whereas a pathname to the previous location of
+	the file would now be invalid).
+
+	On the other hand, say that the entry_ref refers to a concrete file. If the
+	file itself is renamed, the entry_ref now refers to an abstract file with
+	the old name (the upside in this case is that abstract entries may be
+	represented by entry_refs without preallocating an internal filesystem node
+	for them).
+*/
+
+
+/*!
+	\fn entry_ref::entry_ref()
+	\brief Creates an uninitialized entry_ref object.
+*/
+
+
+/*!
+	\fn entry_ref::entry_ref(dev_t dev, ino_t dir, const char* name)
+	\brief Creates an entry_ref object initialized to the given file name in
+		the given directory on the given device.
+
+	\a name may refer to either a pre-existing file in the given directory, or
+	a non-existent file. No explicit checking is done to verify validity of the
+	given arguments, but later use of the entry_ref will fail if \p dev is not
+	a valid device or \a dir is a not a directory on \p dev.
+
+	\param dev the device on which the entry's parent directory resides
+	\param dir the directory in which the entry resides
+	\param name the leaf name of the entry, which is not required to exist
+*/
+
+
+/*!
+	\fn entry_ref::entry_ref(const entry_ref& ref)
+	\brief Returns a copy of the passed in entry_ref object.
+
+	\param ref A reference to an entry_ref to copy.
+*/
+
+
+/*!
+	\fn entry_ref::~entry_ref()
+	\brief Destroys the object and frees the storage allocated for the leaf
+		name, if necessary.
+*/
+
+
+/*!
+	\fn status_t entry_ref::set_name(const char* name)
+	\brief Set the entry_ref's leaf name, freeing the storage allocated for any
+		previous name and then making a copy of the new name.
+
+	\param name Pointer to a null-terminated string containing the new name for
+		the entry. May be \c NULL.
+*/
+
+
+/*!
+	\fn bool entry_ref::operator==(const entry_ref& ref) const
+	\brief Compares the entry_ref object with the passed in entry_ref,
+		returning \c true if they are equal.
+
+	\returns \c true if he entry_refs are equal, \c false otherwise.
+*/
+
+
+/*!
+	\fn bool entry_ref::operator!=(const entry_ref& ref) const
+	\brief Compares the entry_ref object with the passed in entry_ref,
+		returning \c true if they are NOT equal.
+
+	\returns \c true if the entry_refs are NOT equal, \c false otherwise.
+*/
+
+
+/*!
+	\fn entry_ref& entry_ref::operator=(const entry_ref& ref)
+	\brief Makes the entry_ref object a copy of the passed in entry_ref.
+
+	\param ref The entry_ref to copy.
+
+	\returns A pointer to the resulting entry_ref copy.
+*/
+
+
+/*!
+	\var dev_t entry_ref::device
+	\brief The device id of the storage device on which the entry resides
+
+*/
+
+
+/*!
+	\var ino_t entry_ref::directory
+	\brief The inode number of the directory in which the entry resides
+*/
+
+
+/*!
+	\var char *entry_ref::name
+	\brief The leaf name of the entry
+*/
+
+
+/*!
+	\class BEntry
+	\ingroup storage
+	\ingroup libbe
+	\brief A location in the filesystem.
+
+	The BEntry class defines objects that represent "locations" in the file
+	system hierarchy. Each location (or entry) is given as a name within a
+	directory. For example, if you create a BEntry like this:
+
+\code
+BEntry entry("/boot/home/fido");
+\endcode
+
+	the resulting BEntry object represents the location of the file \c fido
+	within the <tt>/boot/home</tt> directory.
+*/
+
+
+/*!
+	\fn BEntry::BEntry()
+	\brief Creates an uninitialized BEntry object.
+
+	Should be followed by a call to one of the SetTo() methods, or an
+	assignment.
+		- SetTo(const BDirectory*, const char*, bool)
+		- SetTo(const entry_ref*, bool)
+		- SetTo(const char*, bool)
+		- operator=(const BEntry&)
+*/
+
+
+/*!
+	\fn BEntry::BEntry(const BDirectory* dir, const char* path, bool traverse)
+	\brief Creates a BEntry initialized to the given directory and path
+		combination.
+
+	If traverse is \c true and \a path refers to a symlink, the BEntry will
+	refer to the linked file; if \c false, the BEntry will refer to the
+	symlink itself.
+
+	\param dir The base directory in which the \a path resides.
+	\param path Relative path based off of \a dir.
+	\param traverse Whether or not to traverse symbolic links.
+
+	\see BEntry::SetTo(const BDirectory*, const char *, bool)
+*/
+
+
+/*!
+	\fn BEntry::BEntry(const entry_ref* ref, bool traverse)
+	\brief Creates a BEntry for the file referred to by the passed in
+		entry_ref.
+
+	If traverse is \c true and \a ref refers to a symlink, the BEntry
+	will refer to the linked file; if \c false, the BEntry will refer
+	to the symlink itself.
+
+	\param ref The entry_ref referring to the given file.
+	\param traverse Whether or not symlinks are to be traversed.
+
+	\sa BEntry::SetTo(const entry_ref*, bool)
+*/
+
+
+/*!
+	\fn BEntry::BEntry(const char* path, bool traverse)
+	\brief Creates a BEntry initialized to the given path.
+
+	If \a path is relative, it will be reckoned off the current working
+	directory. If \a path refers to a symlink and traverse is \c true, the
+	BEntry will refer to the linked file. If traverse is \c false, the
+	BEntry will refer to the symlink itself.
+
+	\param path The path of the file.
+	\param traverse Whether or not symlinks are to be traversed.
+
+	\sa BEntry::SetTo(const char*, bool)
+*/
+
+
+/*!
+	\fn BEntry::BEntry(const BEntry& entry)
+	\brief Creates a copy of the given BEntry.
+
+	\param entry the entry to be copied
+
+	\sa operator=(const BEntry&)
+*/
+
+
+/*!
+	\fn BEntry::~BEntry()
+	\brief Frees all of the allocated resources of the BEntry.
+
+	\sa Unset()
+*/
+
+
+/*!
+	\fn status_t BEntry::InitCheck() const
+	\brief Returns the result of the most recent construction or SetTo() call.
+
+	\returns A status code.
+	\retval \c B_OK Success
+	\retval \c B_NO_INIT The object has been Unset() or is uninitialized.
+*/
+
+
+/*!
+	\fn bool BEntry::Exists() const
+	\brief Returns whether or not the entry exists in the filesystem.
+
+	\returns \c true if the entry exists, \c false if the entry does not exist.
+*/
+
+
+/*!
+	\fn status_t BEntry::GetStat(struct stat *result) const
+	\brief Fills in a stat structure for the entry.
+
+	The information is copied into the \c stat structure pointed to
+	by \a result.
+
+	\note The BStatable object does not cache the stat structure -- each time
+		you call GetStat() fresh stat information is retrieved.
+
+	\param result A pointer to a pre-allocated structure into which the stat
+		information is copied.
+
+	\returns \c B_OK on success, or an error code on failure.
+*/
+
+
+/*!
+	\fn status_t BEntry::SetTo(const BDirectory* dir, const char* path,
+		bool traverse)
+	\brief Reinitializes the BEntry to the path or directory path combination,
+		resolving symlinks if traverse is \c true.
+
+	\param dir The base directory in which the \a path resides.
+	\param path Relative path based off of \a dir.
+	\param traverse Whether or not to traverse symbolic links.
+
+	\returns \c B_OK on success, or an error code on failure.
+*/
+
+
+/*!
+	\fn status_t BEntry::SetTo(const entry_ref* ref, bool traverse)
+	\brief Reinitializes the BEntry to the passed in entry_ref object
+		resolving symlinks if traverse is \c true.
+
+	\param ref The entry_ref referring to the given file.
+	\param traverse Whether or not symlinks are to be traversed.
+
+	\returns \c B_OK on success, or an error code on failure.
+
+	\sa BEntry::BEntry(const entry_ref* ref, bool traverse)
+*/
+
+
+/*!
+	\fn status_t BEntry::SetTo(const char* path, bool traverse)
+	\brief Reinitializes the BEntry object to the path, resolving symlinks if
+		traverse is \c true.
+
+	\param path The path of the file.
+	\param traverse Whether or not symlinks are to be traversed.
+
+	\returns \c B_OK on success, or an error code on failure.
+
+	\sa BEntry::BEntry(const char* path, bool traverse)
+*/
+
+
+/*!
+	void BEntry::Unset()
+	\brief Reinitializes the BEntry to an uninitialized BEntry object
+*/
+
+
+/*!
+	\fn status_t BEntry::GetRef(entry_ref* ref) const
+	\brief Gets an entry_ref structure for the BEntry.
+
+	\param ref A pointer to a preallocated entry_ref object into which the
+		result is copied.
+
+	\returns \c B_OK on success, or an error code on failure.
+*/
+
+
+/*!
+	\fn status_t BEntry::GetPath(BPath* path) const
+	\brief Gets the path for the BEntry.
+
+	\param path A pointer to a pre-allocated BPath object into which the
+		result is copied.
+
+	\returns \c B_OK on success, or an error code on failure.
+*/
+
+
+/*!
+	\fn status_t BEntry::GetParent(BEntry* entry) const
+	\brief Gets the parent of the BEntry as a BEntry.
+
+	If the function fails, the argument is Unset(). Destructive calls to
+	GetParent() are allowed, i.e.:
+
+\code
+BEntry entry("/boot/home/fido");
+status_t err;
+char name[B_FILE_NAME_LENGTH];
+
+// Spit out the path components backwards, one at a time.
+do {
+	entry.GetName(name);
+	printf("> %s\n", name);
+} while ((err=entry.GetParent(&entry)) == B_OK);
+
+// Complain for reasons other than reaching the top.
+if (err != B_ENTRY_NOT_FOUND)
+	printf(">> Error: %s\n", strerror(err));
+\endcode
+
+	will output:
+
+\code
+> fido
+> home
+> boot
+> .
+\endcode
+
+	\param entry A pointer to a pre-allocated BEntry object into which the
+		result is stored.
+
+	\returns A status code.
+	\retval B_OK Success
+	\retval B_ENTRY_NOT_FOUND - Attempted to get the parent of the root
+		directory.
+*/
+
+
+/*!
+	\fn status_t BEntry::GetParent(BDirectory* dir) const
+	\brief Gets the parent of the BEntry as a BDirectory.
+
+	If the function fails, the argument is Unset().
+
+	\param dir A pointer to a pre-allocated BDirectory object into which the
+		result is copied.
+
+	\returns A status code.
+	\retval B_OK Success
+	\retval B_ENTRY_NOT_FOUND - Attempted to get the parent of the root
+		directory.
+*/
+
+
+/*!
+	\fn status_t BEntry::GetName(char* buffer) const
+	\brief Gets the name of the leaf of the BEntry object.
+
+	\c buffer must be pre-allocated and of sufficient length to hold the
+	entire string. A length of \c B_FILE_NAME_LENGTH is recommended.
+
+	\param buffer A pointer to a pre-allocated string into which the result
+		is copied.
+
+	\returns \c B_OK on success, or an error code on failure.
+*/
+
+
+/*!
+	\fn status_t BEntry::Rename(const char* path, bool clobber)
+	\brief Renames the BEntry to \a path replacing an existing entry
+		if \a clobber is \c true.
+
+	\note The BEntry object must refer to an existing file, if it is abstract,
+		this method will fail.
+
+	\param path A pointer to a string containing the new name for the entry.
+		It may be an absolute or relative path. If it is a relative path the
+		entry is renamed within its current directory.
+	\param clobber If \c false and a file with the name given by \c path
+		already exists, the method will fail. If \c true and such a file
+		exists, it will be overwritten.
+
+	\returns A status code.
+	\retval B_OK Success
+	\retval B_ENTRY_EXISTS The new location already exists and \c clobber
+		is \c false.
+	\retval B_ENTRY_NOT_FOUND Attempted to rename an abstract entry.
+*/
+
+
+/*!
+	\fn status_t BEntry::MoveTo(BDirectory* dir, const char* path,
+		bool clobber)
+	\brief Moves the BEntry to directory or directory and path combination,
+		replacing an existing entry if clobber is true.
+
+	\note The BEntry object must refer to an existing file, if it is abstract,
+		this method will fail.
+
+	\param dir A pointer to a pre-allocated BDirectory into which the entry
+		should be moved.
+	\param path (optional) new leaf name for the entry. May be a simple leaf
+		or a relative path; either way, \c path is reckoned off of \c dir. If
+		\c NULL, the entry retains its previous leaf name.
+	\param clobber If \c false and an entry already exists at the specified
+		destination, the method will fail. If \c true and such an entry exists,
+		it will be overwritten.
+
+	\returns A status code.
+	\retval B_OK Success
+	\retval B_ENTRY_EXISTS The new location already exists and \c clobber
+		is \c false.
+	\retval B_ENTRY_NOT_FOUND Attempted to rename an abstract entry.
+*/
+
+
+/*!
+	\fn status_t BEntry::Remove()
+	\brief Removes the entry from the file system.
+
+	\note If any file descriptors are open on the file when Remove() is called
+	the chunk of data they refer to will continue to exist until all such file
+	descriptors are closed. The BEntry object, however, becomes abstract and
+	no longer refers to any actual data in the filesystem.
+
+	\returns \c B_OK on success, or an error code on failure.
+*/
+
+
+/*!
+	\fn bool BEntry::operator==(const BEntry& item) const
+	\brief Returns \c true if the BEntry and \a item refer to the same entry
+		or if they are both uninitialized.
+
+	\retval true Both BEntry objects refer to the same entry or they are
+		both uninitialized.
+	\retval false The BEntry objects refer to different entries.
+*/
+
+
+/*!
+	\fn bool BEntry::operator!=(const BEntry& item) const
+	\brief Returns false if the BEntry and \c item refer to the same entry or
+		if they are both uninitialized.
+
+	\retval true The BEntry objects refer to different entries.
+	\retval false Both BEntry objects refer to the same entry or they are
+		both uninitialized.
+*/
+
+
+/*!
+	\fn BEntry& BEntry::operator=(const BEntry& item)
+	\brief Reinitializes the BEntry to be a copy of \a item.
+
+	\returns A pointer to the copy.
+*/
+
+
+/*!
+	\fn status_t BEntry::set_stat(struct stat& st, uint32 what)
+	\brief Updates the BEntry with the data from the stat structure according
+		to the \a what mask.
+
+	\param st The stat structure to set.
+	\param what A mask
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_FILE_ERROR There was an error writing to the BEntry object.
+*/
+
+
+/*!
+	\fn status_t BEntry::_SetTo(int dirFD, const char* path, bool traverse)
+	\brief Sets the entry to point to the entry specified by the path \a path
+	relative to the given directory.
+
+	If \a traverse is \c true and the given entry is a symbolic link, the
+	object is recursively set to point to the entry pointed to by the symlink.
+
+	If \a path is an absolute path, \a dirFD is ignored.
+
+	If \a dirFD is -1, \a path is considered relative to the current directory
+	(unless it is an absolute path).
+
+	The ownership of the file descriptor \a dirFD is transferred to the
+	method, regardless of whether it succeeds or fails. The caller must not
+	close the FD afterwards.
+
+	\param dirFD File descriptor of a directory relative to which path is to
+		be considered. May be -1 if the current directory shall be considered.
+	\param path Pointer to a path relative to the given directory.
+	\param traverse If \c true and the given entry is a symbolic link, the
+		object is recursively set to point to the entry linked to by the
+		symbolic link.
+
+	\returns \c B_OK on success, or an error code on failure.
+*/
+
+
+/*!
+	\fn status_t BEntry::_SetName(const char* name)
+	\brief Handles string allocation, deallocation, and copying for the
+		leaf name of the entry.
+
+	\param name The leaf \a name of the entry.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \a name is \c NULL.
+	\retval B_NO_MEMORY Ran out of memory trying to allocate \a name.
+*/
+
+
+/*!
+	\fn status_t BEntry::_Rename(BEntry& target, bool clobber)
+	\brief Renames the entry referred to by this object to the location
+		specified by \a target.
+
+	If an entry exists at the target location, the method fails, unless
+	\a clobber is \c true, in which case that entry is overwritten (doesn't
+	work for non-empty directories, though).
+
+	If the operation was successful, this entry is made a clone of the
+	supplied one and the supplied one is uninitialized.
+
+	\param target The entry specifying the target location.
+	\param clobber If \c true, the an entry existing at the target location
+		   will be overwritten.
+
+	\return \c B_OK, if everything went fine, another error code otherwise.
+*/
+
+
+/*!
+	\fn void BEntry::_Dump(const char* name)
+	\brief Debugging function, dumps the given entry to stdout.
+
+	\param name A pointer to a string to be printed along with the dump for
+		identification purposes.
+*/
+
+
+/*!
+	\fn status_t get_ref_for_path(const char* path, entry_ref* ref)
+	\brief Returns an entry_ref for a given path.
+
+	\param path The path name referring to the entry.
+	\param ref The entry_ref structure to be filled in.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a path or \a ref.
+	\retval B_ENTRY_NOT_FOUND A (non-leaf) path component does not exist.
+	\retval B_NO_MEMORY Insufficient memory for successful completion.
+*/
+
+
+/*!
+	\fn bool operator<(const entry_ref& a, const entry_ref& b)
+	\brief Returns whether an entry is less than another.
+
+	The components are compared in order \c device, \c directory, \c name.
+	A \c NULL \c name is less than any non-<tt>NULL</tt> name.
+
+	\retval true a < b
+	\retval false a >= b
+*/

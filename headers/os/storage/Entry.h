@@ -88,7 +88,7 @@ private:
 	virtual	void				_PennyEntry5();
 	virtual	void				_PennyEntry6();
 
-	/*! BEntry implementation of BStatable::set_stat() */
+	// BEntry implementation of BStatable::set_stat()
 	virtual	status_t			set_stat(struct stat& stat, uint32 what);
 			status_t			_SetTo(int dir, const char* path,
 									bool traverse);
