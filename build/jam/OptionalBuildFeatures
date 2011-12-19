@@ -67,10 +67,10 @@ if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 {
 		HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.8.1-ppc-2011-12-19.zip ;
 	} else if $(HAIKU_GCC_VERSION[1]) = 2 {
 		icu_package = $(HAIKU_ICU_GCC_2_PACKAGE) ;
-		HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.8.1-x86-gcc2-2011-12-19.zip ;
+		HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.8.1.1-x86-gcc2-2011-12-20.zip ;
 	} else {
 		icu_package = $(HAIKU_ICU_GCC_4_PACKAGE) ;
-		HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.8.1-x86-gcc4-2011-12-19.zip ;
+		HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.8.1.1-x86-gcc4-2011-12-20.zip ;
 	}
 	local zipFile = [ DownloadFile $(icu_package)
 		: $(baseURL)/$(icu_package) ] ;
