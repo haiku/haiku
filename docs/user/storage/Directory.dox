@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Haiku Inc. All rights reserved.
+ * Copyright 2011 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,7 +23,7 @@
 	\class BDirectory
 	\ingroup storage
 	\ingroup libbe
-	\brief Class that represents a directory in the file system.
+	\brief Represents a directory in the file system.
 */
 
 
@@ -427,13 +427,13 @@
 	\brief Rewinds the directory iterator.
 
 	\returns A status code.
-	\retval B_OK: Everything went fine.
-	\retval B_PERMISSION_DENIED: Directory permissions didn't allow operation.
-	\retval B_NO_MEMORY: Insufficient memory for operation.
-	\retval B_LINK_LIMIT: Indicates a cyclic loop within the file system.
-	\retval B_BUSY: A node was busy.
-	\retval B_FILE_ERROR: A general file error.
-	\retval B_NO_MORE_FDS: The application has run out of file descriptors.
+	\retval B_OK Everything went fine.
+	\retval B_PERMISSION_DENIED Directory permissions didn't allow operation.
+	\retval B_NO_MEMORY Insufficient memory for operation.
+	\retval B_LINK_LIMIT Indicates a cyclic loop within the file system.
+	\retval B_BUSY A node was busy.
+	\retval B_FILE_ERROR A general file error.
+	\retval B_NO_MORE_FDS The application has run out of file descriptors.
 
 	\sa BDirectory::GetNextEntry()
 	\sa BDirectory::GetNextRef()
