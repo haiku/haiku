@@ -36,6 +36,8 @@ void encoder_crtc_scratch(uint8 crtcID);
 void encoder_dpms_scratch(uint8 crtcID, bool power);
 void encoder_dpms_set(uint8 crtcID, int mode);
 void encoder_dpms_set_dig(uint8 crtcID, int mode);
+void encoder_dpms_set_external(uint8 crtcID, int mode);
+
 const char* encoder_name_lookup(uint32 encoderID);
 uint32 encoder_object_lookup(uint32 encoderFlags, uint8 dacID);
 uint32 encoder_type_lookup(uint32 encoderID, uint32 connectorFlags);

@@ -1490,6 +1490,15 @@ encoder_dpms_set(uint8 crtcID, int mode)
 			encoder_dpms_scratch(crtcID, true);
 		}
 	}
+
+	/* TODO: I feel as though what is below may be incorrect...
+	 * AMD: the ext encoder will only show up in conjunction with an internal
+	 * encoder, the pipeline generally looks like crtc -> dvo -> ext encoder
+	 * or crtc -> uniphy -> ext encoder
+	 */
+
+	if (encoder_is_external(encoderID))
+		encoder_dpms_set_external(crtcID, mode);
 }
 
 
@@ -1556,6 +1565,44 @@ encoder_dpms_set_dig(uint8 crtcID, int mode)
 			if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
 				transmitter_dig_setup(connectorIndex, pll->pixelClock,
 					0, 0, ATOM_TRANSMITTER_ACTION_LCD_BLOFF);
+			}
+			break;
+	}
+}
+
+
+void
+encoder_dpms_set_external(uint8 crtcID, int mode)
+{
+	TRACE("%s: power: %s\n", __func__, mode == B_DPMS_ON ? "true" : "false");
+
+	radeon_shared_info &info = *gInfo->shared_info;
+	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
+	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
+
+	switch (mode) {
+		case B_DPMS_ON:
+			if ((info.chipsetFlags & CHIP_APU) != 0) {
+				encoder_external_setup(connectorIndex, pll->pixelClock,
+					EXTERNAL_ENCODER_ACTION_V3_ENABLE_OUTPUT);
+				encoder_external_setup(connectorIndex, pll->pixelClock,
+					EXTERNAL_ENCODER_ACTION_V3_ENCODER_BLANKING_OFF);
+			} else {
+				encoder_external_setup(connectorIndex, pll->pixelClock,
+					ATOM_ENABLE);
+			}
+			break;
+		case B_DPMS_STAND_BY:
+		case B_DPMS_SUSPEND:
+		case B_DPMS_OFF:
+			if ((info.chipsetFlags & CHIP_APU) != 0) {
+				encoder_external_setup(connectorIndex, pll->pixelClock,
+					EXTERNAL_ENCODER_ACTION_V3_ENCODER_BLANKING);
+				encoder_external_setup(connectorIndex, pll->pixelClock,
+					EXTERNAL_ENCODER_ACTION_V3_DISABLE_OUTPUT);
+			} else {
+				encoder_external_setup(connectorIndex, pll->pixelClock,
+					ATOM_DISABLE);
 			}
 			break;
 	}
