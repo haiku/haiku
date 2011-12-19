@@ -32,6 +32,8 @@
 		- The \ref app is the starting point for developing applications
 			and includes classes for messaging and for interacting with
 			the rest of the system.
+		- The \ref game provides classes for producing game sounds and
+			working with full screen apps.
 		- The \ref interface is used to create responsive and attractive
 			graphical user interfaces building on the messaging facilities
 			provided by the Application Kit.
@@ -95,6 +97,11 @@
 		- BCursor
 		- BPropertyInfo
 		- BRoster
+
+
+	\defgroup game Game Kit
+	\brief The Game Kit provides classes for producing game sounds and
+		working with full screen apps.
 
 
 	\defgroup interface Interface Kit

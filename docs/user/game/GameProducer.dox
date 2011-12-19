@@ -1,0 +1,302 @@
+/*
+ * Copyright 2002-2010 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Christopher ML Zumwalt May, zummy@users.sf.net
+ *		Omri Barak
+ * Proofreaders:
+ *		John Scipione, jscipione@gmail.com
+ * Corresponds to:
+ *		src/kits/game/GameProducer.h    rev 43514
+ *		src/kits/game/GameProducer.cpp  rev 43514
+ */
+
+
+/*!
+	\file GameProducer.h
+	\brief Provides the GameProducer class.
+*/
+
+
+/*!
+	\class GameProducer
+	\ingroup game
+	\ingroup libbe
+	\brief A MediaKit producer node which mixes sound from the GameKit
+		and sends them to the audio mixer.
+*/
+
+
+/*!
+	\fn GameProducer::GameProducer(GameSoundBuffer * object,
+		const gs_audio_format * format);
+	\brief Initializes the GameProducer with the passed in GameSoundBuffer
+		and gs_audio_format.
+
+	\param object The GameSoundBuffer to 'sync' the GameProducer with.
+	\param format The gs_audio_format to set the GameProducer's format.
+*/
+
+
+/*!
+	\fn GameProducer::~GameProducer()
+	\brief Destroys the GameProducer object and stops the BMediaEventLooper
+		thread.
+*/
+
+
+/*!
+	\fn BMediaAddOn* GameProducer::AddOn(int32 *internal_id) const
+	\brief Unimplemented.
+*/
+
+
+/*!
+	\fn status_t GameProducer::FormatSuggestionRequested(media_type type,
+		int32 quality, media_format* format)
+	\brief Checks if a certain media format works with the GameProducer.
+
+	\warning Only supports raw audio at this point.
+
+	\param type The media format being tested.
+	\param quality The quality of the media -- Not used in the method.
+	\param format The media format to send through.
+
+	\returns A status code.
+	\retval B_OK \a type is supported.
+	\retval B_BAD_VALUE No \a format was received.
+	\retval B_MEDIA_BAD_FORMAT The \a format is not supported.
+*/
+
+
+/*!
+	\fn status_t GameProducer::FormatProposal(const media_source& output,
+		media_format* format)
+	\brief Attempts to change the media format.
+
+	\warning Only supports raw audio and wildcard audio types.
+
+	\param output The source that the media outputs to.
+	\param format The type of media being proposed.
+
+	\returns A status code.
+	\retval B_OK The \a format is supported.
+	\retval B_MEDIA_BAD_SOURCE The \a output doesn't match the current
+		output source.
+	\retval B_MEDIA_BAD_FORMAT The \a format is not supported.
+
+*/
+
+
+/*!
+	\fn status_t GameProducer::FormatChangeRequested(const media_source& source,
+		const media_destination& destination, media_format* io_format,
+		int32* _deprecated_)
+	\brief We don't support any other formats, so we just reject any format changes.
+
+	\attention This method is deprecated.
+
+	\param source The output source.
+	\param destination The media's destination.
+	\param io_format The format of the media
+	\param _deprecated_ This method is deprecated.
+
+	\returns B_ERROR as this function is deprecated, it has been removed, and
+		now only returns \a B_ERROR.
+*/
+
+
+/*!
+	\fn status_t GameProducer::GetNextOutput(int32* cookie,
+		media_output* out_output)
+	\brief Gets the next output cookie.
+
+	Cookie can only be zero, as GameProducer supports one output.
+
+	\param cookie The output cookie value.
+	\param out_output The output that the cookie represents.
+
+	\returns A status code.
+	\retval B_OK The cookie was successfully incremented.
+	\retval B_BAD_INDEX The cookie is not equal to zero.
+*/
+
+
+/*!
+	\fn status_t GameProducer::DisposeOutputCookie(int32 cookie)
+	\brief Does nothing because the cookie has no use as of yet.
+
+	\param cookie The cookie index.
+
+	\return Always returns B_OK.
+*/
+
+
+/*!
+	\fn status_t GameProducer::SetBufferGroup(const media_source& for_source,
+		BBufferGroup* newGroup)
+	\brief Changes the buffer group from the current one, to the specified one.
+
+	\param for_source The output source. Can't be equivalent to the current
+		output source.
+	\param newGroup The new BBufferGroup to assign the buffer group to.
+
+	\returns A status code.
+	\retval B_OK The change has succeeded.
+	\retval B_MEDIA_BAD_SOURCE \a for_source is equal to the current output source.
+	\retval B_BAD_VALUE The new BBufferGroup's buffer list returns an error.
+*/
+
+
+/*!
+	\fn status_t GameProducer::GetLatency(bigtime_t* out_latency)
+	\brief Gets the total latency, including internal downstream plus scheduling.
+
+	\param out_latency Gets set to the current latency.
+
+	\returns B_OK.
+*/
+
+
+/*!
+	\fn status_t GameProducer::PrepareToConnect(const media_source& what,
+		const media_destination& where, media_format* format,
+		media_source* out_source, char* out_name)
+	\brief Confirms that the media format and wild cards are valid.
+
+	\param what The media source to output to.
+	\param where The destination for the connection.
+	\param format The format to finish specializing.
+	\param out_source The output source that the method retrieves.
+	\param out_name The variable that holds the output name.
+
+	\returns A status code.
+	\retval B_OK The connection preparations have finished.
+	\retval B_MEDIA_BAD_SOURCE The \a output doesn't match the current output source.
+	\retval B_MEDIA_ALREADY_CONNECTED The GameProducer is already connected.
+	\retval B_MEDIA_BAD_FORMAT The \a format is not supported.
+
+*/
+
+
+/*!
+	\fn void GameProducer::Connect(status_t error, const media_source& source,
+	     const media_destination& destination, const media_format& format, char* io_name)
+	\brief Connects to the output device.
+
+	\param error The variable that holds an error, should one arise.
+	\param source The output source to connect to.
+	\param destination The media destination, that is connected to.
+	\param format The variable that holds the format type.
+	\param io_name The variable that holds the output name.
+*/
+
+
+/*!
+	\fn void GameProducer::Disconnect(const media_source& what, const media_destination& where)
+	\brief Disconnects from the output device.
+
+	\param what The media destination.
+	\param where The media's output source.
+*/
+
+
+/*!
+	\fn void GameProducer::LateNoticeReceived(const media_source& what,
+		bigtime_t how_much, bigtime_t performance_time)
+	\brief Attempts to catch up to the buffer.
+
+	\param what The media output source.
+	\param how_much The amount of 'lateness'.
+	\param performance_time Unused.
+*/
+
+
+/*!
+	\fn void GameProducer::EnableOutput(const media_source& what,
+		bool enabled, int32* _deprecated_)
+	\brief Enable or disable an output.
+
+	\attention This method is deprecated.
+
+	\param what The media output source.
+	\param enabled Sets the output to enabled or disabled.
+	\param _deprecated_ This method is deprecated.
+*/
+
+
+/*!
+	\fn status_t GameProducer::SetPlayRate(int32 numer, int32 denom)
+	\brief Play rates are not supported, returns \c B_ERROR.
+
+	\param numer The top part of the fraction.
+	\param denom The bottom part of the fraction.
+
+	\return Always returns \c B_ERROR since play rates aren't supported.
+*/
+
+
+/*!
+	\fn status_t GameProducer::HandleMessage(int32 message, const void* data,
+		size_t size)
+	\brief Private messages are not supported, returns \c B_ERROR.
+
+	\param message The message to be sent.
+	\param data The data to be sent.
+	\param size The size of the message.
+
+	\returns Always returns \c B_ERROR since private messages aren't supported.
+*/
+
+
+/*!
+	\fn void GameProducer::AdditionalBufferRequested(
+		const media_source& source,
+		media_buffer_id prev_buffer, bigtime_t prev_time,
+		const media_seek_tag* prev_tag)
+	\brief Offline modes are not supported for now, does nothing.
+
+	\param source The media output source.
+	\param prev_buffer The previous buffer.
+	\param prev_time The previous buffer time.
+	\param prev_tag The previous buffer delimiter.
+*/
+
+
+/*!
+	\fn void GameProducer::LatencyChanged(const media_source& source,
+		const media_destination& destination, bigtime_t new_latency,
+		uint32 flags)
+	\brief Sets the event latency in the case that the latency changed.
+
+	\param source The media output source.
+	\param destination The connected output destination.
+	\param new_latency The new amount of latency.
+	\param flags Unused.
+*/
+
+
+/*!
+	\fn void GameProducer::NodeRegistered()
+	\brief Handles when an output source node is registered.
+*/
+
+
+/*!
+	\fn void GameProducer::SetRunMode(run_mode mode)
+	\brief Offline mode is not supported.
+
+	\param mode The mode of running.
+*/
+
+
+/*!
+	\fn void GameProducer::HandleEvent(const media_timed_event* event, bigtime_t lateness,
+		bool realTimeEvent)
+	\brief Handles when an event is triggered.
+
+	\param event The type of event.
+	\param lateness Unused.
+	\param realTimeEvent Unused.
+*/

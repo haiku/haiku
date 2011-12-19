@@ -601,6 +601,7 @@ WARN_LOGFILE           =
 INPUT                  = . \
                          app \
                          drivers \
+						 game \
                          interface \
                          keyboard \
                          locale \
@@ -619,7 +620,8 @@ INPUT                  = . \
                          ../../headers/os/midi2 \
                          ../../headers/os/storage \
                          ../../headers/os/support \
-                         ../../headers/posix/syslog.h
+                         ../../headers/posix/syslog.h \
+                         ../../src/kits/game/GameProducer.h
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is
