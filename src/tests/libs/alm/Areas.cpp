@@ -25,9 +25,9 @@ public:
 		SetLayout(layout);
 
 		// create extra tabs
-		YTab* y1 = layout->AddYTab();
-		YTab* y2 = layout->AddYTab();
-		YTab* y3 = layout->AddYTab();
+		BReference<YTab> y1 = layout->AddYTab();
+		BReference<YTab> y2 = layout->AddYTab();
+		BReference<YTab> y3 = layout->AddYTab();
 
 		Area* a1 = layout->AddView(button1, layout->Left(), layout->Top(), 
 			layout->Right(), y1);

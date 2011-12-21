@@ -40,10 +40,10 @@ public:
 		layout->SetInset(5.);
 
 		// create extra tabs
-		XTab* x1 = layout->AddXTab();
-		XTab* x2 = layout->AddXTab();
-		YTab* y1 = layout->AddYTab();
-		YTab* y2 = layout->AddYTab();
+		BReference<XTab> x1 = layout->AddXTab();
+		BReference<XTab> x2 = layout->AddXTab();
+		BReference<YTab> y1 = layout->AddYTab();
+		BReference<YTab> y2 = layout->AddYTab();
 
 		layout->AddView(button1, layout->Left(), layout->Top(), x2,
 			y1);
