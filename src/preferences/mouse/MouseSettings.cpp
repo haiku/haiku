@@ -168,7 +168,7 @@ MouseSettings::Dump()
 	printf("mouse mode:\t%s\n", mode);
 
 	char *focus_follows_mouse_mode = "unknown";
-	switch (fMode) {
+	switch (fFocusFollowsMouseMode) {
 		case B_NORMAL_FOCUS_FOLLOWS_MOUSE:
 			focus_follows_mouse_mode = "normal";
 			break;
