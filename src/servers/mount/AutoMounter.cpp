@@ -808,7 +808,7 @@ AutoMounter::_ReadSettings()
 	BMessage message('stng');
 	status_t result = message.Unflatten(buffer);
 	if (result != B_OK) {
-		PRINT(("error %s unflattening automounter settings, size %d\n",
+		PRINT(("error %s unflattening automounter settings, size %" B_PRIdSSIZE "\n",
 			strerror(result), settingsSize));
 		delete [] buffer;
 		return;
