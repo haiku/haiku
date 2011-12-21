@@ -286,7 +286,7 @@ midi_usb_write_callback(void* cookie, status_t status,
 {
 	usbmidi_device_info* midiDevice = (usbmidi_device_info*)cookie;
 #ifdef DEBUG
-	usb_midi_event_packet* pkt = data;
+	usb_midi_event_packet* pkt = (usb_midi_event_packet*)data;
 #endif
 
 	assert(cookie != NULL);
