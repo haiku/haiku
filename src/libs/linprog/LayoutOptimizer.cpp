@@ -7,6 +7,7 @@
 
 #include "LayoutOptimizer.h"
 
+#include <algorithm>
 #include <new>
 #include <stdio.h>
 #include <string.h>
@@ -25,6 +26,8 @@
 #define TRACE_ERROR(format...)	fprintf(stderr, format)
 
 using std::nothrow;
+using std::swap;
+using std::max;
 
 
 /*!	\class BPrivate::Layout::LayoutOptimizer
@@ -244,16 +247,6 @@ multiply_optimization_matrix_matrix(const double* const* A, int m, int n,
 			B[i][k] = 2 * A[i][k] - A[i - 1][k] - A[i + 1][k];
 		B[m - 1][k] = A[m - 1][k] - A[m - 2][k];
 	}
-}
-
-
-template<typename Type>
-static inline void
-swap(Type& a, Type& b)
-{
-	Type c = a;
-	a = b;
-	b = c;
 }
 
 
@@ -579,7 +572,7 @@ LayoutOptimizer::SetConstraints(const ConstraintList& list, int32 variableCount)
 	// create G
 	transpose_matrix(fSoftConstraints, fTemp1, constraintCount, fVariableCount);
 	multiply_matrices(fTemp1, fSoftConstraints, fG, fVariableCount,
-		constraintCount, constraintCount);
+		constraintCount, fVariableCount);
 
 	// create d
 	multiply_matrix_vector(fTemp1, rightSide, fVariableCount, constraintCount,
@@ -645,8 +638,9 @@ LayoutOptimizer::_Init(int32 variableCount, int32 nConstraints)
 {
 	fVariableCount = variableCount;
 
-	fTemp1 = allocate_matrix(nConstraints, nConstraints);
-	fTemp2 = allocate_matrix(nConstraints, nConstraints);
+	int32 maxExtend = max(variableCount, nConstraints);
+	fTemp1 = allocate_matrix(maxExtend, maxExtend);
+	fTemp2 = allocate_matrix(maxExtend, maxExtend);
 	fZtrans = allocate_matrix(nConstraints, fVariableCount);
 	fSoftConstraints = allocate_matrix(nConstraints, fVariableCount);
 	fQ = allocate_matrix(nConstraints, fVariableCount);
