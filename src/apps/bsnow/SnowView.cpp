@@ -62,7 +62,7 @@ filter_result msgfilter(BMessage *message, BHandler **target, BMessageFilter *fi
 	case 'NMDN':
 		break;
 	default:
-		printf("For: 0x%08lx: %s\n", *target, (*target)->Name());
+		printf("For: %p: %s\n", *target, (*target)->Name());
 		message->PrintToStream();
 	}
 	return B_DISPATCH_MESSAGE;
