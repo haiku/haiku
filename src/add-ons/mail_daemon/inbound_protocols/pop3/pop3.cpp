@@ -321,14 +321,14 @@ POP3Protocol::DeleteMessage(const entry_ref& ref)
 	if (error < B_OK)
 		return error;
 
-#if DEBUG
-	printf("DeleteMessage: ID is %d\n", (int)unique_ids->IndexOf(uid));
-		// What should we use for int32 instead of %d?
-#endif
 	char uidString[256];
 	BNode node(&ref);
 	if (node.ReadAttr("MAIL:unique_id", B_STRING_TYPE, 0, uidString, 256) < 0)
 		return B_ERROR;
+	#if DEBUG
+	printf("DeleteMessage: ID is %d\n", (int)fUniqueIDs.IndexOf(uidString));
+		// What should we use for int32 instead of %d?
+	#endif
 	Delete(fUniqueIDs.IndexOf(uidString));
 
 	Disconnect();
