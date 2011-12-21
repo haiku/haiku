@@ -352,8 +352,8 @@ ssize_t
 BStringList::FlattenedSize() const
 {
 	ssize_t size = 0;
-	int32 stringCount = CountStrings();
-	for (int32 i = 0; i < stringCount; i++)
+	int32 count = CountStrings();
+	for (int32 i = 0; i < count; i++)
 		size += StringAt(i).Length() + 1;
 
 	return size;
@@ -368,8 +368,8 @@ BStringList::Flatten(void* buf, ssize_t size) const
 	if (size < FlattenedSize())
 		return B_NO_MEMORY;
 		
-	int32 stringCount = CountStrings();
-	for (int32 i = 0; i < stringCount; i++) {
+	int32 count = CountStrings();
+	for (int32 i = 0; i < count; i++) {
 		BString item = StringAt(i);
 		ssize_t storeSize = item.Length() + 1;
 		memcpy((void*)buffer, (const void*)item.String(), storeSize);
@@ -391,13 +391,13 @@ BStringList::Unflatten(type_code code, const void* buffer, ssize_t size)
 
 	off_t offset = 0;
 	while (offset < size) {
-		const char* cstring = bufferStart + offset;
+		const char* string = bufferStart + offset;
 		size_t restSize = size - offset;
-		size_t read = strnlen(cstring, restSize);
+		size_t read = strnlen(string, restSize);
 		if (read == restSize)
 			return B_BAD_VALUE;
 
-		if (!Add(cstring))
+		if (!Add(string))
 			return B_NO_MEMORY;
 		offset += read + 1;
 	}
