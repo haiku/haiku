@@ -465,11 +465,6 @@ BSplitLayout::SetItemWeight(BLayoutItem* item, float weight)
 bool
 BSplitLayout::IsCollapsible(int32 index) const
 {
-	if (index < 0)
-		index = 0;
-	if (index > CountItems())
-		index = CountItems() - 1;
-
 	return _ItemLayoutInfo(ItemAt(index))->isCollapsible;
 }
 
@@ -491,11 +486,6 @@ BSplitLayout::SetCollapsible(int32 index, bool collapsible)
 void
 BSplitLayout::SetCollapsible(int32 first, int32 last, bool collapsible)
 {
-	if (first < 0)
-		first = 0;
-	if (last < 0 || last > CountItems())
-		last = CountItems() - 1;
-
 	for (int32 i = first; i <= last; i++)
 		_ItemLayoutInfo(ItemAt(i))->isCollapsible = collapsible;
 }
@@ -504,11 +494,6 @@ BSplitLayout::SetCollapsible(int32 first, int32 last, bool collapsible)
 bool
 BSplitLayout::IsItemCollapsed(int32 index) const
 {
-	if (index < 0)
-		index = 0;
-	if (index > CountItems())
-		index = CountItems() - 1;
-
 	return _ItemLayoutInfo(ItemAt(index))->isVisible;
 }
 
@@ -516,11 +501,6 @@ BSplitLayout::IsItemCollapsed(int32 index) const
 void
 BSplitLayout::SetItemCollapsed(int32 index, bool collapsed)
 {
-	if (index < 0)
-		index = 0;
-	if (index > CountItems())
-		index = CountItems() - 1;
-
 	ItemAt(index)->SetVisible(collapsed);
 
 	InvalidateLayout(true);
