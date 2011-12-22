@@ -45,6 +45,9 @@ SubTitlesSRT::SubTitlesSRT(BFile* file, const char* name)
 		switch (state) {
 			case EXPECT_SEQUENCE_NUMBER:
 			{
+				if (line.IsEmpty())
+					continue;
+
 				line.Trim();
 				int32 sequenceNumber = atoi(line.String());
 				if (sequenceNumber != lastSequenceNumber + 1) {
@@ -106,7 +109,7 @@ SubTitlesSRT::SubTitlesSRT(BFile* file, const char* name)
 			}
 
 			case EXPECT_TEXT:
-				if (line.Length() == 0) {
+				if (line.IsEmpty()) {
 					int32 index = _IndexFor(subTitle.startTime);
 					SubTitle* clone = new(std::nothrow) SubTitle(subTitle);
 					if (clone == NULL || !fSubTitles.AddItem(clone, index)) {
