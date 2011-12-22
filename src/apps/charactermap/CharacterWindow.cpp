@@ -15,7 +15,7 @@
 #include <Catalog.h>
 #include <File.h>
 #include <FindDirectory.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <ListView.h>
 #include <Menu.h>
 #include <MenuBar.h>
@@ -25,7 +25,6 @@
 #include <Roster.h>
 #include <ScrollView.h>
 #include <Slider.h>
-#include <SplitLayoutBuilder.h>
 #include <StringView.h>
 #include <TextControl.h>
 #include <UnicodeChar.h>
@@ -137,9 +136,6 @@ CharacterWindow::CharacterWindow()
 	}
 
 	// create GUI
-
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
 	BMenuBar* menuBar = new BMenuBar("menu");
 
 	fFilterControl = new BTextControl(B_TRANSLATE("Filter:"), NULL, NULL);
@@ -205,21 +201,23 @@ CharacterWindow::CharacterWindow()
 	fCodeView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
 		fCodeView->PreferredSize().Height()));
 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL)
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.Add(menuBar)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)//BSplitLayoutBuilder()
-			.Add(BGroupLayoutBuilder(B_VERTICAL, 10)
-				.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
+		.AddGroup(B_HORIZONTAL, 10)
+			.SetInsets(10)
+			.AddGroup(B_VERTICAL, 10)
+				.AddGroup(B_HORIZONTAL, 10)
 					.Add(fFilterControl)
-					.Add(clearButton))
-				.Add(unicodeScroller))
-			.Add(BGroupLayoutBuilder(B_VERTICAL, 10)
+					.Add(clearButton)
+				.End()
+				.Add(unicodeScroller)
+			.End()
+			.AddGroup(B_VERTICAL, 10)
 				.Add(characterScroller)
 				.Add(fFontSizeSlider)
-				.Add(BGroupLayoutBuilder(B_HORIZONTAL, 0)
+				.AddGroup(B_HORIZONTAL, 0)
 					.Add(fGlyphView)
-					.Add(fCodeView)))
-			.SetInsets(10, 10, 10, 10)));
+					.Add(fCodeView);
 
 	// Add menu
 

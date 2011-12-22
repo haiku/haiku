@@ -16,8 +16,7 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <CheckBox.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <OptionPopUp.h>
 #include <SpaceLayoutItem.h>
@@ -139,61 +138,56 @@ SettingsWindow::SettingsWindow(BRect frame)
 
 
 	// Build the layout
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
-		.Add(BGroupLayoutBuilder(settingsLayout)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.AddGroup(settingsLayout)
+			.SetInsets(5, 5, 15, 5)
 			.Add(playModeLabel)
-			.Add(BGroupLayoutBuilder(B_HORIZONTAL, 0)
-				.Add(BSpaceLayoutItem::CreateHorizontalStrut(10))
-				.Add(BGroupLayoutBuilder(B_VERTICAL, 0)
+			.AddGroup(B_HORIZONTAL, 0)
+				.AddStrut(10)
+				.AddGroup(B_VERTICAL, 0)
 					.Add(fAutostartCB)
-					.Add(BGridLayoutBuilder(5, 0)
+					.AddGrid(5, 0)
 						.Add(BSpaceLayoutItem::CreateHorizontalStrut(10), 0, 0)
 						.Add(fCloseWindowMoviesCB, 1, 0)
 						.Add(BSpaceLayoutItem::CreateHorizontalStrut(10), 0, 1)
 						.Add(fCloseWindowSoundsCB, 1, 1)
-					)
+					.End()
 					.Add(fLoopMoviesCB)
 					.Add(fLoopSoundsCB)
-				)
-			)
-			.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
+				.End()
+			.End()
+			.AddStrut(5)
 
 			.Add(viewOptionsLabel)
-			.Add(BGroupLayoutBuilder(B_HORIZONTAL, 0)
-				.Add(BSpaceLayoutItem::CreateHorizontalStrut(10))
-				.Add(BGroupLayoutBuilder(B_VERTICAL, 0)
+			.AddGroup(B_HORIZONTAL, 0)
+				.AddStrut(10)
+				.AddGroup(B_VERTICAL, 0)
 					.Add(fUseOverlaysCB)
 					.Add(fScaleBilinearCB)
 					.Add(fScaleFullscreenControlsCB)
 					.Add(fSubtitleSizeOP)
 					.Add(fSubtitlePlacementOP)
-				)
-			)
-			.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
+				.End()
+			.End()
+			.AddStrut(5)
 
 			.Add(bgMoviesModeLabel)
-			.Add(BGroupLayoutBuilder(B_HORIZONTAL, 0)
-				.Add(BSpaceLayoutItem::CreateHorizontalStrut(10))
-				.Add(BGroupLayoutBuilder(B_VERTICAL, 0)
+			.AddGroup(B_HORIZONTAL, 0)
+				.AddStrut(10)
+				.AddGroup(B_VERTICAL, 0)
 					.Add(fFullVolumeBGMoviesRB)
 					.Add(fHalfVolumeBGMoviesRB)
 					.Add(fMutedVolumeBGMoviesRB)
-				)
-			)
-			.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
-
-			.SetInsets(5, 5, 15, 5)
-		)
-		.Add(BGroupLayoutBuilder(buttonLayout)
+				.End()
+			.End()
+			.AddStrut(5)
+		.End()
+		.AddGroup(buttonLayout)
+			.SetInsets(5)
 			.Add(fRevertB)
 			.AddGlue()
 			.Add(cancelButton)
-			.Add(okButton)
-			.SetInsets(5, 5, 5, 5)
-		)
-	);
+			.Add(okButton);
 }
 
 

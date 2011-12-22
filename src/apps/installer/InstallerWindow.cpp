@@ -19,8 +19,7 @@
 #include <ControlLook.h>
 #include <Directory.h>
 #include <FindDirectory.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <LayoutUtils.h>
 #include <Locale.h>
 #include <MenuBar.h>
@@ -248,13 +247,12 @@ InstallerWindow::InstallerWindow()
 
 	float spacing = be_control_look->DefaultItemSpacing();
 
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.Add(mainMenu)
 		.Add(logoGroup)
 		.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
-		.Add(BGroupLayoutBuilder(B_VERTICAL, spacing)
-			.Add(BGridLayoutBuilder(0, spacing)
+		.AddGroup(B_VERTICAL, spacing)
+			.AddGrid(new BGridView(0.0f, spacing))
 				.Add(fSrcMenuField->CreateLabelLayoutItem(), 0, 0)
 				.Add(fSrcMenuField->CreateMenuBarLayoutItem(), 1, 0)
 				.Add(fDestMenuField->CreateLabelLayoutItem(), 0, 1)
@@ -266,16 +264,13 @@ InstallerWindow::InstallerWindow()
 				.Add(packagesScrollView, 0, 4, 2)
 				.Add(fProgressBar, 0, 5, 2)
 				.Add(fSizeView, 0, 6, 2)
-			)
+			.End()
 
-			.Add(BGroupLayoutBuilder(B_HORIZONTAL, spacing)
+			.AddGroup(B_HORIZONTAL, spacing)
+				.SetInsets(spacing)
 				.Add(fLaunchDriveSetupButton)
 				.AddGlue()
-				.Add(fBeginButton)
-			)
-			.SetInsets(spacing, spacing, spacing, spacing)
-		)
-	);
+				.Add(fBeginButton);
 
 	// Make the optional packages and progress bar invisible on start
 	fPackagesLayoutItem = layout_item_for(packagesScrollView);

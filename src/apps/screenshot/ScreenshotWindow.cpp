@@ -26,8 +26,7 @@
 #include <File.h>
 #include <FilePanel.h>
 #include <FindDirectory.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <Menu.h>
 #include <MenuField.h>
@@ -195,36 +194,33 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 	const float kLabelSpacing = be_control_look->DefaultLabelSpacing();
 
 	fPreview = new PreviewView();
-	
-	BGridLayout* gridLayout = BGridLayoutBuilder(0.0, kSpacing / 2)
-		.Add(fDelayControl->CreateLabelLayoutItem(), 0, 0)
-		.Add(fDelayControl->CreateTextViewLayoutItem(), 1, 0)
-		.Add(BSpaceLayoutItem::CreateHorizontalStrut(kLabelSpacing), 2, 0)
-		.Add(seconds, 3, 0)	
-		.Add(fNameControl->CreateLabelLayoutItem(), 0, 1)
-		.Add(fNameControl->CreateTextViewLayoutItem(), 1, 1, 3, 1)
-		.Add(menuLocation->CreateLabelLayoutItem(), 0, 2)
-		.Add(menuLocation->CreateMenuBarLayoutItem(), 1, 2, 3, 1)
-		.Add(menuFormat->CreateLabelLayoutItem(), 0, 3)
-		.Add(menuFormat->CreateMenuBarLayoutItem(), 1, 3, 3, 1);
-	
-	gridLayout->SetMinColumnWidth(1,
-		menuFormat->StringWidth("SomethingLongHere"));
 
-	SetLayout(new BGroupLayout(B_HORIZONTAL, 0));
-
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, kSpacing)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(kSpacing)
+		.AddGroup(B_HORIZONTAL, kSpacing)
 			.Add(fPreview)
 			.AddGroup(B_VERTICAL, 0)
 				.Add(fActiveWindow)
 				.Add(fWindowBorder)
 				.Add(fShowCursor)
 				.AddStrut(kSpacing)
-				.Add(gridLayout)
+				.AddGrid(0.0, kSpacing/2)
+					.Add(fDelayControl->CreateLabelLayoutItem(), 0, 0)
+					.Add(fDelayControl->CreateTextViewLayoutItem(), 1, 0)
+					.Add(BSpaceLayoutItem::CreateHorizontalStrut(kLabelSpacing),
+						2, 0)
+					.Add(seconds, 3, 0)
+					.Add(fNameControl->CreateLabelLayoutItem(), 0, 1)
+					.Add(fNameControl->CreateTextViewLayoutItem(), 1, 1, 3, 1)
+					.Add(menuLocation->CreateLabelLayoutItem(), 0, 2)
+					.Add(menuLocation->CreateMenuBarLayoutItem(), 1, 2, 3, 1)
+					.Add(menuFormat->CreateLabelLayoutItem(), 0, 3)
+					.Add(menuFormat->CreateMenuBarLayoutItem(), 1, 3, 3, 1)
+				.End()
 				.Add(showSettings)
 				.AddGlue()
-				.End())
+			.End()
+		.End()
 		.AddStrut(kSpacing)
 		.Add(divider)
 		.AddStrut(kSpacing)
@@ -234,10 +230,7 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 			.Add(new BButton("", B_TRANSLATE("New screenshot"),
 				new BMessage(kNewScreenshot)))
 			.AddGlue()
-			.Add(saveScreenshot)
-			.End()
-		.SetInsets(kSpacing, kSpacing, kSpacing, kSpacing)
-	);
+			.Add(saveScreenshot);
 
 	saveScreenshot->MakeDefault(true);
 

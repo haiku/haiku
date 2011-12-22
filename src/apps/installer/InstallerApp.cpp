@@ -8,7 +8,7 @@
 
 #include <Alert.h>
 #include <Button.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <ScrollView.h>
 #include <TextView.h>
@@ -244,16 +244,13 @@ InstallerApp::ReadyToRun()
 		B_MODAL_WINDOW, B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE
 			| B_AUTO_UPDATE_SIZE_LIMITS);
 
-	fEULAWindow->SetLayout(new BGroupLayout(B_HORIZONTAL));
-	fEULAWindow->AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
+	BLayoutBuilder::Group<>(fEULAWindow, B_VERTICAL, 10)
+		.SetInsets(10)
 		.Add(scrollView)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
+		.AddGroup(B_HORIZONTAL, 10)
 			.AddGlue()
 			.Add(cancelButton)
-			.Add(continueButton)
-		)
-		.SetInsets(10, 10, 10, 10)
-	);
+			.Add(continueButton);
 
 	fEULAWindow->CenterOnScreen();
 	fEULAWindow->Show();
