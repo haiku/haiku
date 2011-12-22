@@ -17,117 +17,115 @@ BKeyStore::~BKeyStore()
 }
 
 
-// #pragma mark - Passwords
+// #pragma mark - Key handling
 
 
 status_t
-BKeyStore::GetPassword(BPasswordType type, const char* identifier,
-	BKey& password)
+BKeyStore::GetKey(BKeyType type, BKeyPurpose purpose, const char* identifier,
+	BKey& key)
 {
-	return GetPassword(NULL, type, identifier, NULL, true, password);
+	return GetKey(NULL, type, purpose, identifier, NULL, true, key);
 }
 
 
 status_t
-BKeyStore::GetPassword(BPasswordType type, const char* identifier,
-	const char* secondaryIdentifier, BKey& password)
+BKeyStore::GetKey(BKeyType type, BKeyPurpose purpose, const char* identifier,
+	const char* secondaryIdentifier, BKey& key)
 {
-	return GetPassword(NULL, type, identifier, secondaryIdentifier, true,
-		password);
+	return GetKey(NULL, type, purpose, identifier, secondaryIdentifier, true,
+		key);
 }
 
 
 status_t
-BKeyStore::GetPassword(BPasswordType type, const char* identifier,
+BKeyStore::GetKey(BKeyType type, BKeyPurpose purpose, const char* identifier,
 	const char* secondaryIdentifier, bool secondaryIdentifierOptional,
-	BKey& password)
+	BKey& key)
 {
-	return GetPassword(NULL, type, identifier, secondaryIdentifier,
-		secondaryIdentifierOptional, password);
+	return GetKey(NULL, type, purpose, identifier, secondaryIdentifier,
+		secondaryIdentifierOptional, key);
 }
 
 
 status_t
-BKeyStore::GetPassword(const char* keyring, BPasswordType type,
-	const char* identifier, BKey& password)
+BKeyStore::GetKey(const char* keyring, BKeyType type, BKeyPurpose purpose,
+	const char* identifier, BKey& key)
 {
-	return GetPassword(keyring, type, identifier, NULL, true, password);
+	return GetKey(keyring, type, purpose, identifier, NULL, true, key);
 }
 
 
 status_t
-BKeyStore::GetPassword(const char* keyring, BPasswordType type,
+BKeyStore::GetKey(const char* keyring, BKeyType type, BKeyPurpose purpose,
+	const char* identifier, const char* secondaryIdentifier, BKey& key)
+{
+	return GetKey(keyring, type, purpose, identifier, secondaryIdentifier, true,
+		key);
+}
+
+
+status_t
+BKeyStore::GetKey(const char* keyring, BKeyType type, BKeyPurpose purpose,
 	const char* identifier, const char* secondaryIdentifier,
-	BKey& password)
-{
-	return GetPassword(keyring, type, identifier, secondaryIdentifier, true,
-		password);
-}
-
-
-status_t
-BKeyStore::GetPassword(const char* keyring, BPasswordType type,
-	const char* identifier, const char* secondaryIdentifier,
-	bool secondaryIdentifierOptional, BKey& password)
+	bool secondaryIdentifierOptional, BKey& key)
 {
 	return B_ERROR;
 }
 
 
 status_t
-BKeyStore::RegisterPassword(const BKey& password)
+BKeyStore::RegisterKey(const BKey& key)
 {
-	return RegisterPassword(NULL, password);
+	return RegisterKey(NULL, key);
 }
 
 
 status_t
-BKeyStore::RegisterPassword(const char* keyring, const BKey& password)
-{
-	return B_ERROR;
-}
-
-
-status_t
-BKeyStore::UnregisterPassword(const BKey& password)
-{
-	return UnregisterPassword(NULL, password);
-}
-
-
-status_t
-BKeyStore::UnregisterPassword(const char* keyring, const BKey& password)
+BKeyStore::RegisterKey(const char* keyring, const BKey& key)
 {
 	return B_ERROR;
 }
 
 
 status_t
-BKeyStore::GetNextPassword(uint32& cookie, BKey& password)
+BKeyStore::UnregisterKey(const BKey& key)
 {
-	return GetNextPassword(NULL, cookie, password);
+	return UnregisterKey(NULL, key);
 }
 
 
 status_t
-BKeyStore::GetNextPassword(BPasswordType type, uint32& cookie,
-	BKey& password)
-{
-	return GetNextPassword(NULL, type, cookie, password);
-}
-
-
-status_t
-BKeyStore::GetNextPassword(const char* keyring, uint32& cookie,
-	BKey& password)
+BKeyStore::UnregisterKey(const char* keyring, const BKey& key)
 {
 	return B_ERROR;
 }
 
 
 status_t
-BKeyStore::GetNextPassword(const char* keyring,
-	BPasswordType type, uint32& cookie, BKey& password)
+BKeyStore::GetNextKey(uint32& cookie, BKey& key)
+{
+	return GetNextKey(NULL, cookie, key);
+}
+
+
+status_t
+BKeyStore::GetNextKey(BKeyType type, BKeyPurpose purpose, uint32& cookie,
+	BKey& key)
+{
+	return GetNextKey(NULL, type, purpose, cookie, key);
+}
+
+
+status_t
+BKeyStore::GetNextKey(const char* keyring, uint32& cookie, BKey& key)
+{
+	return B_ERROR;
+}
+
+
+status_t
+BKeyStore::GetNextKey(const char* keyring, BKeyType type, BKeyPurpose purpose,
+	uint32& cookie, BKey& key)
 {
 	return B_ERROR;
 }
@@ -137,7 +135,7 @@ BKeyStore::GetNextPassword(const char* keyring,
 
 
 status_t
-BKeyStore::RegisterKeyring(const char* keyring, const BKey& password)
+BKeyStore::RegisterKeyring(const char* keyring, const BKey& key)
 {
 	return B_ERROR;
 }
@@ -157,18 +155,18 @@ BKeyStore::GetNextKeyring(uint32& cookie, BString& keyring)
 }
 
 
-// #pragma mark - Master password
+// #pragma mark - Master key
 
 
 status_t
-BKeyStore::SetMasterPassword(const BKey& password)
+BKeyStore::SetMasterKey(const BKey& key)
 {
 	return B_ERROR;
 }
 
 
 status_t
-BKeyStore::RemoveMasterPassword()
+BKeyStore::RemoveMasterKey()
 {
 	return B_ERROR;
 }
@@ -219,11 +217,30 @@ BKeyStore::RevokeMasterAccess()
 }
 
 
+
+// #pragma mark - Applications
+
+
+status_t
+BKeyStore::GetNextApplication(const BKey& key, uint32& cookie,
+	BString& signature) const
+{
+	return B_ERROR;
+}
+
+
+status_t
+BKeyStore::RemoveApplication(const BKey& key, const char* signature)
+{
+	return B_ERROR;
+}
+
+
 // #pragma mark - Service functions
 
 
 status_t
-BKeyStore::GeneratePassword(BKey& password, size_t length, uint32 flags)
+BKeyStore::GeneratePassword(BPasswordKey& password, size_t length, uint32 flags)
 {
 	return B_ERROR;
 }

@@ -12,44 +12,46 @@
 #include <String.h>
 
 
-enum BPasswordType {
-	B_WEB_PASSWORD,
-	B_NETWORK_PASSWORD,
-	B_VOLUME_PASSWORD,
-	B_GENERIC_PASSWORD
+enum BKeyPurpose {
+	B_KEY_PURPOSE_ANY,
+	B_KEY_PURPOSE_GENERIC,
+	B_KEY_PURPOSE_WEB,
+	B_KEY_PURPOSE_NETWORK,
+	B_KEY_PURPOSE_VOLUME
+};
+
+
+enum BKeyType {
+	B_KEY_TYPE_ANY,
+	B_KEY_TYPE_GENERIC,
+	B_KEY_TYPE_PASSWORD,
+	B_KEY_TYPE_CERTIFICATE
 };
 
 
 class BKey {
 public:
 								BKey();
-								BKey(BPasswordType type,
+								BKey(BKeyPurpose purpose,
 									const char* identifier,
-									const char* password);
-								BKey(BPasswordType type,
-									const char* identifier,
-									const char* secondaryIdentifier,
-									const char* password);
+									const char* secondaryIdentifier = NULL,
+									const uint8* data = NULL,
+									size_t length = 0);
 								BKey(BKey& other);
 	virtual						~BKey();
 
+	virtual	BKeyType			Type() const { return B_KEY_TYPE_GENERIC; };
+
 			void				Unset();
 
-			status_t			SetTo(BPasswordType type,
+			status_t			SetTo(BKeyPurpose purpose,
 									const char* identifier,
-									const char* password);
-			status_t			SetTo(BPasswordType type,
-									const char* identifier,
-									const char* secondaryIdentifier,
-									const char* password);
+									const char* secondaryIdentifier = NULL,
+									const uint8* data = NULL,
+									size_t length = 0);
 
-			status_t			SetPassword(const char* password);
-			const char*			Password() const;
-
-			status_t			SetKey(const uint8* data, size_t length);
-			size_t				KeyLength() const;
-			status_t			GetKey(uint8* buffer,
-									size_t bufferLength) const;
+			void				SetPurpose(BKeyPurpose purpose);
+			BKeyPurpose			Purpose() const;
 
 			void				SetIdentifier(const char* identifier);
 			const char*			Identifier() const;
@@ -57,20 +59,14 @@ public:
 			void				SetSecondaryIdentifier(const char* identifier);
 			const char*			SecondaryIdentifier() const;
 
-			void				SetType(BPasswordType type);
-			BPasswordType		Type() const;
-
-			void				SetData(const BMessage& data);
-			const BMessage&		Data() const;
+			status_t			SetData(const uint8* data, size_t length);
+			size_t				DataLength() const;
+			const uint8*		Data() const;
+			status_t			GetData(uint8* buffer, size_t bufferSize) const;
 
 			const char*			Owner() const;
 			bigtime_t			CreationTime() const;
 			bool				IsRegistered() const;
-
-// TODO: move to BKeyStore
-			status_t			GetNextApplication(uint32& cookie,
-									BString& signature) const;
-			status_t			RemoveApplication(const char* signature);
 
 			BKey&				operator=(const BKey& other);
 
@@ -78,16 +74,35 @@ public:
 			bool				operator!=(const BKey& other) const;
 
 private:
-	mutable	BMallocIO			fPassword;
+			BKeyPurpose			fPurpose;
 			BString				fIdentifier;
 			BString				fSecondaryIdentifier;
 			BString				fOwner;
-			BMessage			fData;
 			bigtime_t			fCreationTime;
-			BPasswordType		fType;
+	mutable	BMallocIO			fData;
 			BObjectList<BString> fApplications;
 			bool				fRegistered;
 };
 
+
+class BPasswordKey : public BKey {
+public:
+								BPasswordKey();
+								BPasswordKey(const char* password,
+									BKeyPurpose purpose, const char* identifier,
+									const char* secondaryIdentifier = NULL);
+								BPasswordKey(BPasswordKey& other);
+	virtual						~BPasswordKey();
+
+	virtual	BKeyType			Type() const { return B_KEY_TYPE_PASSWORD; };
+
+			status_t			SetTo(const char* password,
+									BKeyPurpose purpose,
+									const char* identifier,
+									const char* secondaryIdentifier = NULL);
+
+			status_t			SetPassword(const char* password);
+			const char*			Password() const;
+};
 
 #endif	// _KEY_H

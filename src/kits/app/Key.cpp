@@ -22,7 +22,7 @@ CompareLists(BObjectList<BString> a, BObjectList<BString> b)
 }
 
 
-// #pragma mark -
+// #pragma mark - Generic BKey
 
 
 BKey::BKey()
@@ -30,17 +30,10 @@ BKey::BKey()
 }
 
 
-BKey::BKey(BPasswordType type, const char* identifier,
-	const char* password)
+BKey::BKey(BKeyPurpose purpose, const char* identifier,
+	const char* secondaryIdentifier, const uint8* data, size_t length)
 {
-	SetTo(type, identifier, NULL, password);
-}
-
-
-BKey::BKey(BPasswordType type, const char* identifier,
-	const char* secondaryIdentifier, const char* password)
-{
-	SetTo(type, identifier, secondaryIdentifier, password);
+	SetTo(purpose, identifier, secondaryIdentifier, data, length);
 }
 
 
@@ -55,65 +48,27 @@ BKey::~BKey()
 
 
 status_t
-BKey::SetTo(BPasswordType type, const char* identifier,
-	const char* password)
+BKey::SetTo(BKeyPurpose purpose, const char* identifier,
+	const char* secondaryIdentifier, const uint8* data, size_t length)
 {
-	return SetTo(type, identifier, NULL, password);
-}
-
-
-status_t
-BKey::SetTo(BPasswordType type, const char* identifier,
-	const char* secondaryIdentifier, const char* password)
-{
-	SetType(type);
+	SetPurpose(purpose);
 	SetIdentifier(identifier);
 	SetSecondaryIdentifier(secondaryIdentifier);
-	return SetPassword(password);
+	return SetData(data, length);
 }
 
 
-status_t
-BKey::SetPassword(const char* password)
+void
+BKey::SetPurpose(BKeyPurpose purpose)
 {
-	return SetKey((const uint8*)password, strlen(password) + 1);
+	fPurpose = purpose;
 }
 
 
-const char*
-BKey::Password() const
+BKeyPurpose
+BKey::Purpose() const
 {
-	return (const char*)fPassword.Buffer();
-}
-
-
-status_t
-BKey::SetKey(const uint8* data, size_t length)
-{
-	fPassword.SetSize(0);
-	ssize_t bytesWritten = fPassword.WriteAt(0, data, length);
-	if (bytesWritten < 0)
-		return (status_t)bytesWritten;
-
-	return (size_t)bytesWritten == length ? B_OK : B_NO_MEMORY;
-}
-
-
-size_t
-BKey::KeyLength() const
-{
-	return fPassword.BufferLength();
-}
-
-
-status_t
-BKey::GetKey(uint8* buffer, size_t bufferLength) const
-{
-	ssize_t bytesRead = fPassword.ReadAt(0, buffer, bufferLength);
-	if (bytesRead < 0)
-		return (status_t)bytesRead;
-
-	return B_OK;
+	return fPurpose;
 }
 
 
@@ -145,32 +100,42 @@ BKey::SecondaryIdentifier() const
 }
 
 
-void
-BKey::SetType(BPasswordType type)
+status_t
+BKey::SetData(const uint8* data, size_t length)
 {
-	fType = type;
+	fData.SetSize(0);
+	ssize_t bytesWritten = fData.WriteAt(0, data, length);
+	if (bytesWritten < 0)
+		return (status_t)bytesWritten;
+
+	return (size_t)bytesWritten == length ? B_OK : B_NO_MEMORY;
 }
 
 
-BPasswordType
-BKey::Type() const
+size_t
+BKey::DataLength() const
 {
-	return fType;
+	return fData.BufferLength();
 }
 
 
-void
-BKey::SetData(const BMessage& data)
-{
-	fData = data;
-}
-
-
-const BMessage&
+const uint8*
 BKey::Data() const
 {
-	return fData;
+	return (const uint8*)fData.Buffer();
 }
+
+
+status_t
+BKey::GetData(uint8* buffer, size_t bufferSize) const
+{
+	ssize_t bytesRead = fData.ReadAt(0, buffer, bufferSize);
+	if (bytesRead < 0)
+		return (status_t)bytesRead;
+
+	return B_OK;
+}
+
 
 
 const char*
@@ -194,6 +159,8 @@ BKey::IsRegistered() const
 }
 
 
+#if 0
+// To be moved to BKeyStore
 status_t
 BKey::GetNextApplication(uint32& cookie, BString& signature) const
 {
@@ -215,16 +182,17 @@ BKey::RemoveApplication(const char* signature)
 			return B_OK;
 		}
 	}
+
 	return B_ENTRY_NOT_FOUND;
 }
+#endif
 
 
 BKey&
 BKey::operator=(const BKey& other)
 {
-	SetKey((const uint8*)other.Password(), other.KeyLength());
-	SetType(other.Type());
-	SetData(other.Data());
+	SetPurpose(other.Purpose());
+	SetData((const uint8*)other.Data(), other.DataLength());
 
 	fIdentifier = other.fIdentifier;
 	fSecondaryIdentifier = other.fSecondaryIdentifier;
@@ -240,13 +208,13 @@ BKey::operator=(const BKey& other)
 bool
 BKey::operator==(const BKey& other) const
 {
-	return KeyLength() == other.KeyLength()
+	return Type() == other.Type()
+		&& DataLength() == other.DataLength()
+		&& Purpose() == other.Purpose()
+		&& fOwner == other.fOwner
 		&& fIdentifier == other.fIdentifier
 		&& fSecondaryIdentifier == other.fSecondaryIdentifier
-		&& !memcmp(Password(), other.Password(), KeyLength())
-		&& fOwner == other.fOwner
-		&& Data().HasSameData(other.Data())
-		&& Type() == other.Type()
+		&& memcmp(Data(), other.Data(), DataLength()) == 0
 		&& CompareLists(fApplications, other.fApplications);
 }
 
@@ -255,4 +223,54 @@ bool
 BKey::operator!=(const BKey& other) const
 {
 	return !(*this == other);
+}
+
+
+// #pragma mark - BPasswordKey
+
+
+BPasswordKey::BPasswordKey()
+{
+}
+
+
+BPasswordKey::BPasswordKey(const char* password, BKeyPurpose purpose,
+	const char* identifier, const char* secondaryIdentifier)
+	:
+	BKey(purpose, identifier, secondaryIdentifier, (const uint8*)password,
+		strlen(password) + 1)
+{
+}
+
+
+BPasswordKey::BPasswordKey(BPasswordKey& other)
+{
+}
+
+
+BPasswordKey::~BPasswordKey()
+{
+}
+
+
+status_t
+BPasswordKey::SetTo(const char* password, BKeyPurpose purpose,
+	const char* identifier, const char* secondaryIdentifier)
+{
+	return BKey::SetTo(purpose, identifier, secondaryIdentifier,
+		(const uint8*)password, strlen(password) + 1);
+}
+
+
+status_t
+BPasswordKey::SetPassword(const char* password)
+{
+	return SetData((const uint8*)password, strlen(password) + 1);
+}
+
+
+const char*
+BPasswordKey::Password() const
+{
+	return (const char*)Data();
 }

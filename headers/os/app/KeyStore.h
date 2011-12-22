@@ -16,46 +16,46 @@ public:
 
 // TODO: -> GetNextPassword() - there can always be more than one key
 // with the same identifier/secondaryIdentifier (ie. different username)
-			status_t			GetPassword(BPasswordType type,
+			status_t			GetKey(BKeyType type, BKeyPurpose purpose,
 									const char* identifier, BKey& key);
-			status_t			GetPassword(BPasswordType type,
+			status_t			GetKey(BKeyType type, BKeyPurpose purpose,
 									const char* identifier,
 									const char* secondaryIdentifier, BKey& key);
-			status_t			GetPassword(BPasswordType type,
+			status_t			GetKey(BKeyType type, BKeyPurpose purpose,
 									const char* identifier,
 									const char* secondaryIdentifier,
 									bool secondaryIdentifierOptional,
 									BKey& key);
 
-			status_t			GetPassword(const char* keyring,
-									BPasswordType type,
+			status_t			GetKey(const char* keyring,
+									BKeyType type, BKeyPurpose purpose,
 									const char* identifier, BKey& key);
-			status_t			GetPassword(const char* keyring,
-									BPasswordType type,
+			status_t			GetKey(const char* keyring,
+									BKeyType type, BKeyPurpose purpose,
 									const char* identifier,
 									const char* secondaryIdentifier, BKey& key);
-			status_t			GetPassword(const char* keyring,
-									BPasswordType type,
+			status_t			GetKey(const char* keyring,
+									BKeyType type, BKeyPurpose purpose,
 									const char* identifier,
 									const char* secondaryIdentifier,
 									bool secondaryIdentifierOptional,
 									BKey& key);
 
-			status_t			RegisterPassword(const BKey& key);
-			status_t			RegisterPassword(const char* keyring,
+			status_t			RegisterKey(const BKey& key);
+			status_t			RegisterKey(const char* keyring,
 									const BKey& key);
-			status_t			UnregisterPassword(const BKey& key);
-			status_t			UnregisterPassword(const char* keyring,
+			status_t			UnregisterKey(const BKey& key);
+			status_t			UnregisterKey(const char* keyring,
 									const BKey& key);
 
-			status_t			GetNextPassword(uint32& cookie, BKey& key);
-			status_t			GetNextPassword(BPasswordType type,
+			status_t			GetNextKey(uint32& cookie, BKey& key);
+			status_t			GetNextKey(BKeyType type, BKeyPurpose purpose,
 									uint32& cookie, BKey& key);
-			status_t			GetNextPassword(const char* keyring,
+			status_t			GetNextKey(const char* keyring,
 									uint32& cookie, BKey& key);
-			status_t			GetNextPassword(const char* keyring,
-									BPasswordType type, uint32& cookie,
-									BKey& key);
+			status_t			GetNextKey(const char* keyring,
+									BKeyType type, BKeyPurpose purpose,
+									uint32& cookie, BKey& key);
 
 			// Keyrings
 
@@ -68,8 +68,8 @@ public:
 
 			// Master key
 
-			status_t			SetMasterPassword(const BKey& key);
-			status_t			RemoveMasterPassword();
+			status_t			SetMasterKey(const BKey& key);
+			status_t			RemoveMasterKey();
 
 			status_t			AddKeyringToMaster(const char* keyring);
 			status_t			RemoveKeyringFromMaster(const char* keyring);
@@ -83,11 +83,18 @@ public:
 			status_t			RevokeAccess(const char* keyring);
 			status_t			RevokeMasterAccess();
 
+			// Applications
+
+			status_t			GetNextApplication(const BKey& key,
+									uint32& cookie, BString& signature) const;
+			status_t			RemoveApplication(const BKey& key,
+									const char* signature);
+
 			// Service functions
 
-			status_t			GeneratePassword(BKey& key, size_t length,
-									uint32 flags);
-			float				PasswordStrength(const char* key);
+			status_t			GeneratePassword(BPasswordKey& password,
+									size_t length, uint32 flags);
+			float				PasswordStrength(const char* password);
 };
 
 
