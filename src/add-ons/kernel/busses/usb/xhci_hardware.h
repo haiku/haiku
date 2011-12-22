@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Jian Chiang <j.jian.chiang@gmail.com>
+ *		Jérôme Duval <jerome.duval@gmail.com>
  */
 #ifndef XHCI_HARDWARE_H
 #define XHCI_HARDWARE_H
@@ -91,6 +92,14 @@
 
 #define XHCI_LEGCTLSTS			0x04
 #define XHCI_LEGCTLSTS_DISABLE_SMI	((0x3 << 1) + (0xff << 5) + (0x7 << 17))
+
+#define XHCI_SUPPORTED_PROTOCOLS_CAPID	0x02
+#define XHCI_SUPPORTED_PROTOCOLS_0_MINOR(x)	(((x) >> 16) & 0xff)
+#define XHCI_SUPPORTED_PROTOCOLS_0_MAJOR(x)	(((x) >> 24) & 0xff)
+
+#define XHCI_SUPPORTED_PROTOCOLS_1_COUNT(x)	(((x) >> 8) & 0xff)
+#define XHCI_SUPPORTED_PROTOCOLS_1_OFFSET(x)	(((x) >> 0) & 0xff)
+
 
 
 // Port status Registers
@@ -244,9 +253,12 @@
 
 #define XHCI_MAX_EVENTS		(16 * 13)
 #define XHCI_MAX_COMMANDS		(16 * 1)
-#define XHCI_MAX_SLOTS		256
+#define XHCI_MAX_SLOTS		255
 #define XHCI_MAX_PORTS		127
+#define XHCI_MAX_ENDPOINTS	32
 #define XHCI_MAX_SCRATCHPADS	32
+#define XHCI_MAX_DEVICES	128
+#define XHCI_MAX_TRANSFERS	4
 
 
 struct xhci_trb {
@@ -283,6 +295,108 @@ struct xhci_device_context_array {
 		uint64 padding;
 	} __attribute__((__aligned__(64)));
 	uint64	scratchpad[XHCI_MAX_SCRATCHPADS];
+};
+
+
+struct xhci_slot_ctx {
+	uint32	dwslot0;
+	uint32	dwslot1;
+	uint32	dwslot2;
+	uint32	dwslot3;
+	uint32	reserved[4];
+};
+
+#define SLOT_0_ROUTE(x)					((x) & 0xFFFFF)
+#define SLOT_0_ROUTE_GET(x)				((x) & 0xFFFFF)
+#define SLOT_0_SPEED(x)					(((x) & 0xF) << 20)
+#define SLOT_0_SPEED_GET(x)				(((x) >> 20) & 0xF)
+#define SLOT_0_MTT_BIT					(1U << 25)
+#define SLOT_0_HUB_BIT					(1U << 26)
+#define SLOT_0_NUM_ENTRIES(x)			(((x) & 0x1F) << 27)
+#define SLOT_0_NUM_ENTRIES_GET(x)		(((x) >> 27) & 0x1F)
+
+#define SLOT_1_MAX_EXIT_LATENCY(x)		((x) & 0xFFFF)
+#define SLOT_1_MAX_EXIT_LATENCY_GET(x)	((x) & 0xFFFF)
+#define SLOT_1_RH_PORT(x)				(((x) & 0xFF) << 16)
+#define SLOT_1_RH_PORT_GET(x)			(((x) >> 16) & 0xFF)
+#define SLOT_1_NUM_PORTS(x)				(((x) & 0xFF) << 24)
+#define SLOT_1_NUM_PORTS_GET(x)			(((x) >> 24) & 0xFF)
+
+#define SLOT_2_TT_HUB_SLOT(x)			((x) & 0xFF)
+#define SLOT_2_TT_HUB_SLOT(x)			((x) & 0xFF)
+#define SLOT_2_PORT_NUM(x)				(((x) & 0xFF) << 8)
+#define SLOT_2_PORT_NUM_GET(x)			(((x) >> 8) & 0xFF)
+#define SLOT_2_TT_TIME(x)				(((x) & 0x3) << 16)
+#define SLOT_2_TT_TIME_GET(x)			(((x) >> 16) & 0x3)
+#define SLOT_2_IRQ_TARGET(x)				(((x) & 0x1F) << 27)
+#define SLOT_2_IRQ_TARGET_GET(x)			(((x) >> 27) & 0x1f)
+
+#define SLOT_3_DEVICE_ADDRESS(x)		((x) & 0xFF)
+#define SLOT_3_DEVICE_ADDRESS_GET(x)	((x) & 0xFF)
+#define SLOT_3_SLOT_STATE(x)			(((x) & 0x1F) << 27)
+#define SLOT_3_SLOT_STATE_GET(x)		(((x) >> 27) & 0x1F)
+
+
+struct xhci_endpoint_ctx {
+	uint32	dwendpoint0;
+	uint32	dwendpoint1;
+	uint64	qwendpoint2;
+	uint32	dwendpoint4;
+	uint32	reserved[3];
+};
+
+
+#define ENDPOINT_0_STATE(x)					((x) & 0x3)
+#define ENDPOINT_0_STATE_GET(x)				((x) & 0x3)
+#define ENDPOINT_0_MULT(x)				(((x) & 0x3) << 8)
+#define ENDPOINT_0_MULT_GET(x)			(((x) >> 8) & 0x3)
+#define ENDPOINT_0_MAXPSTREAMS(x)				(((x) & 0x1F) << 10)
+#define ENDPOINT_0_MAXPSTREAMS_GET(x)			(((x) >> 10) & 0x1F)
+#define ENDPOINT_0_LSA_BIT					(1U << 15)
+#define ENDPOINT_0_INTERVAL(x)				(((x) & 0xFF) << 16)
+#define ENDPOINT_0_INTERVAL_GET(x)			(((x) >> 16) & 0xFF)
+
+#define ENDPOINT_1_CERR(x)				(((x) & 0x3) << 1)
+#define ENDPOINT_1_CERR_GET(x)			(((x) >> 1) & 0x3)
+#define ENDPOINT_1_EPTYPE(x)			(((x) & 0x7) << 3)
+#define ENDPOINT_1_EPTYPE_GET(x)		(((x) >> 3) & 0x7)
+#define ENDPOINT_1_HID_BIT					(1U << 7)
+#define ENDPOINT_1_MAXBURST(x)			(((x) & 0xFF) << 8)
+#define ENDPOINT_1_MAXBURST_GET(x)		(((x) >> 8) & 0xFF)
+#define ENDPOINT_1_MAXPACKETSIZE(x)			(((x) & 0xFFFF) << 16)
+#define ENDPOINT_1_MAXPACKETSIZE_GET(x)		(((x) >> 16) & 0xFFFF)
+
+#define ENDPOINT_2_DCS_BIT					(1U << 0)
+
+#define ENDPOINT_4_AVGTRBLENGTH(x)			((x) & 0xFFFF)
+#define ENDPOINT_4_AVGTRBLENGTH_GET(x)		((x) & 0xFFFF)
+#define ENDPOINT_4_MAXESITPAYLOAD(x)		(((x) & 0xFFFF) << 16)
+#define ENDPOINT_4_MAXESITPAYLOAD_GET(x)	(((x) >> 16) & 0xFFFF)
+
+
+struct xhci_stream_ctx {
+	uint64	qwstream0;
+	uint32	reserved[2];
+};
+
+
+struct xhci_input_ctx {
+	uint32	dropFlags;
+	uint32	addFlags;
+	uint32	reserved[6];
+};
+
+
+struct xhci_input_device_ctx {
+	struct xhci_input_ctx input;
+	struct xhci_slot_ctx slot;
+	struct xhci_endpoint_ctx endpoints[XHCI_MAX_ENDPOINTS - 1];
+};
+
+
+struct xhci_device_ctx {
+	struct xhci_slot_ctx slot;
+	struct xhci_endpoint_ctx endpoints[XHCI_MAX_ENDPOINTS - 1];
 };
 
 

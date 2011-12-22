@@ -7,6 +7,7 @@
  *		Niels S. Reedijk
  */
 
+
 #include "usb_private.h"
 
 #include <stdio.h>
@@ -128,7 +129,7 @@ Hub::UpdatePortStatus(uint8 index)
 	// get the current port status
 	size_t actualLength = 0;
 	status_t result = DefaultPipe()->SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_IN,
-		USB_REQUEST_GET_STATUS, 0, index + 1, sizeof(usb_port_status), 
+		USB_REQUEST_GET_STATUS, 0, index + 1, sizeof(usb_port_status),
 		(void *)&fPortStatus[index], sizeof(usb_port_status), &actualLength);
 
 	if (result < B_OK || actualLength < sizeof(usb_port_status)) {
@@ -247,9 +248,11 @@ Hub::Explore(change_item **changeList)
 					}
 
 					usb_speed speed = USB_SPEED_FULLSPEED;
-					if (fPortStatus[i].status & PORT_STATUS_LOW_SPEED)
+					if (fDeviceDescriptor.usb_version == 0x300)
+						speed = USB_SPEED_SUPER;
+					else if (fPortStatus[i].status & PORT_STATUS_LOW_SPEED)
 						speed = USB_SPEED_LOWSPEED;
-					if (fPortStatus[i].status & PORT_STATUS_HIGH_SPEED)
+					else if (fPortStatus[i].status & PORT_STATUS_HIGH_SPEED)
 						speed = USB_SPEED_HIGHSPEED;
 
 					// either let the device inherit our addresses (if we are
@@ -258,7 +261,7 @@ Hub::Explore(change_item **changeList)
 					// transaction translator for the device.
 					int8 hubAddress = HubAddress();
 					uint8 hubPort = HubPort();
-					if (Speed() == USB_SPEED_HIGHSPEED) {
+					if (Speed() == USB_SPEED_HIGHSPEED || fDeviceDescriptor.usb_version == 0x300) {
 						hubAddress = DeviceAddress();
 						hubPort = i + 1;
 					}

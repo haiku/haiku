@@ -8,7 +8,6 @@
  */
 
 
-#define TRACE_USB
 #include "xhci.h"
 
 #define USB_MODULE_NAME "xhci roothub"

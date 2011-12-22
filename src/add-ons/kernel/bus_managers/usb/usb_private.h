@@ -91,7 +91,8 @@ typedef enum {
 	USB_SPEED_FULLSPEED,
 	USB_SPEED_HIGHSPEED,
 	USB_SPEED_SUPER,
-	USB_SPEED_MAX = USB_SPEED_SUPER
+	USB_SPEED_WIRELESS,
+	USB_SPEED_MAX = USB_SPEED_WIRELESS
 } usb_speed;
 
 
@@ -201,10 +202,10 @@ virtual	status_t						InitCheck();
 		int8							AllocateAddress();
 		void							FreeAddress(int8 address);
 
-		Device *						AllocateDevice(Hub *parent,
+virtual	Device *						AllocateDevice(Hub *parent,
 											int8 hubAddress, uint8 hubPort,
 											usb_speed speed);
-		void							FreeDevice(Device *device);
+virtual void							FreeDevice(Device *device);
 
 virtual	status_t						Start();
 virtual	status_t						Stop();

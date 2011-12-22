@@ -7,6 +7,7 @@
  * Authors:
  *		Michael Lotz <mmlr@mlotz.ch>
  * 		Jian Chiang <j.jian.chiang@gmail.com>
+ *		Jérôme Duval <jerome.duval@gmail.com>
  */
 
 
@@ -198,6 +199,10 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 	install_io_interrupt_handler(fPCIInfo->u.h0.interrupt_line,
 		InterruptHandler, (void *)this, 0);
 
+	memset(fPortSpeeds, 0, sizeof(fPortSpeeds));
+	memset(fPortSlots, 0, sizeof(fPortSlots));
+	memset(fDevices, 0, sizeof(fDevices));
+
 	fInitOK = true;
 	TRACE("XHCI host controller driver constructed\n");
 }
@@ -247,12 +252,45 @@ XHCI::Start()
 	fSlotCount = HCS_MAX_SLOTS(capabilities);
 	WriteOpReg(XHCI_CONFIG, fSlotCount);
 
+	// find out which protocol is used for each port
+	uint8 portFound = 0;
+	uint32 cparams = ReadCapReg32(XHCI_HCCPARAMS);
+	uint32 eec = 0xffffffff;
+	uint32 eecp = HCS0_XECP(cparams) << 2;
+	for (; eecp != 0 && XECP_NEXT(eec) && portFound < fPortCount;
+		eecp += XECP_NEXT(eec) << 2) {
+		eec = ReadCapReg32(eecp);
+		if (XECP_ID(eec) != XHCI_SUPPORTED_PROTOCOLS_CAPID)
+			continue;
+		if (XHCI_SUPPORTED_PROTOCOLS_0_MAJOR(eec) > 3)
+			continue;
+		uint32 temp = ReadCapReg32(eecp + 8);
+		uint32 offset = XHCI_SUPPORTED_PROTOCOLS_1_OFFSET(temp);
+		uint32 count = XHCI_SUPPORTED_PROTOCOLS_1_COUNT(temp);
+		if (offset == 0 || count == 0)
+			continue;
+		offset--;
+		for (uint32 i = offset; i < offset + count; i++) {
+			if (XHCI_SUPPORTED_PROTOCOLS_0_MAJOR(eec) == 0x3)
+				fPortSpeeds[i] = USB_SPEED_SUPER;
+			else
+				fPortSpeeds[i] = USB_SPEED_HIGHSPEED;
+			TRACE("speed for port %ld is %s\n", i,
+				fPortSpeeds[i] == USB_SPEED_SUPER ? "super" : "high");
+		}
+		portFound += count;
+	}
+
 	uint32 params2 = ReadCapReg32(XHCI_HCSPARAMS2);
 	fScratchpadCount = HCS_MAX_SC_BUFFERS(params2);
 	if (fScratchpadCount > XHCI_MAX_SCRATCHPADS) {
 		TRACE_ERROR("Invalid number of scratchpads: %u\n", fScratchpadCount);
 		return B_ERROR;
 	}
+
+	uint32 params3 = ReadCapReg32(XHCI_HCSPARAMS3);
+	fExitLatMax = HCS_U1_DEVICE_LATENCY(params3)
+		+ HCS_U2_DEVICE_LATENCY(params3);
 
 	WriteOpReg(XHCI_DNCTRL, 0);
 
@@ -495,6 +533,272 @@ XHCI::AddTo(Stack *stack)
 }
 
 
+Device *
+XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
+	usb_speed speed)
+{
+	TRACE("AllocateDevice hubAddress %d hubPort %d speed %d\n", hubAddress,
+		hubPort, speed);
+	GetPortSpeed(hubPort - 1, &speed);
+	TRACE("speed %d\n", speed);
+
+	uint8 slot = XHCI_MAX_SLOTS;
+	if (EnableSlot(&slot) != B_OK) {
+		TRACE_ERROR("AllocateDevice() failed enable slot\n");
+		return NULL;
+	}
+
+	if (slot > fSlotCount) {
+		TRACE_ERROR("AllocateDevice() bad slot\n");
+		return NULL;
+	}
+
+	if (fDevices[slot].state != XHCI_STATE_DISABLED) {
+		TRACE_ERROR("AllocateDevice() slot already used\n");
+		return NULL;
+	}
+
+	struct xhci_device *device = &fDevices[slot];
+	memset(device, 0, sizeof(struct xhci_device));
+	device->state = XHCI_STATE_ENABLED;
+
+	device->input_ctx_area = fStack->AllocateArea((void **)&device->input_ctx,
+		(void**)&device->input_ctx_addr, sizeof(*device->input_ctx), "XHCI input context");
+	if (device->input_ctx_area < B_OK) {
+		TRACE_ERROR("unable to create a input context area\n");
+		return NULL;
+	}
+
+	device->input_ctx->input.dropFlags = 0;
+	device->input_ctx->input.addFlags = 3;
+
+	uint32 route = 0;
+	uint8 routePort = hubPort;
+	uint8 rhPort = 0;
+	for (Device *hubDevice = parent; hubDevice != RootObject();
+		hubDevice = (Device *)hubDevice->Parent()) {
+		route *= 16;
+		if (hubPort > 15)
+			route += 15;
+		else
+			route += routePort;
+		rhPort = routePort;
+		routePort = hubDevice->HubPort();
+	}
+
+	device->input_ctx->slot.dwslot0 = SLOT_0_NUM_ENTRIES(1) | SLOT_0_ROUTE(route);
+	// add the speed
+	switch (speed) {
+	case USB_SPEED_LOWSPEED:
+		device->input_ctx->slot.dwslot0 |= SLOT_0_SPEED(2);
+		break;
+	case USB_SPEED_HIGHSPEED:
+		device->input_ctx->slot.dwslot0 |= SLOT_0_SPEED(3);
+		break;
+	case USB_SPEED_FULLSPEED:
+		device->input_ctx->slot.dwslot0 |= SLOT_0_SPEED(1);
+		break;
+	case USB_SPEED_SUPER:
+		device->input_ctx->slot.dwslot0 |= SLOT_0_SPEED(4);
+		break;
+	default:
+		TRACE_ERROR("unknown usb speed\n");
+		break;
+	}
+
+	device->input_ctx->slot.dwslot1 = SLOT_1_RH_PORT(rhPort);
+	device->input_ctx->slot.dwslot2 = SLOT_2_IRQ_TARGET(0);
+	if (0)
+		device->input_ctx->slot.dwslot2 |= SLOT_2_PORT_NUM(hubPort);
+	device->input_ctx->slot.dwslot3 = SLOT_3_SLOT_STATE(0) | SLOT_3_DEVICE_ADDRESS(0);
+
+	TRACE("slot 0x%lx 0x%lx 0x%lx 0x%lx\n", device->input_ctx->slot.dwslot0,
+		device->input_ctx->slot.dwslot1, device->input_ctx->slot.dwslot2,
+		device->input_ctx->slot.dwslot3);
+
+	device->device_ctx_area = fStack->AllocateArea((void **)&device->device_ctx,
+		(void**)&device->device_ctx_addr, sizeof(*device->device_ctx), "XHCI device context");
+	if (device->device_ctx_area < B_OK) {
+		TRACE_ERROR("unable to create a device context area\n");
+		delete_area(device->input_ctx_area);
+		return NULL;
+	}
+
+	device->trb_area = fStack->AllocateArea((void **)&device->trbs,
+		(void**)&device->trb_addr, sizeof(*device->trbs), "XHCI endpoint trbs");
+	if (device->trb_area < B_OK) {
+		TRACE_ERROR("unable to create a device trbs area\n");
+		delete_area(device->input_ctx_area);
+		delete_area(device->device_ctx_area);
+		return NULL;
+	}
+
+	for (uint32 i = 0; i < XHCI_MAX_ENDPOINTS; i++) {
+		struct xhci_trb *linkTrb = &(*device->trbs)[i][XHCI_MAX_TRANSFERS - 1];
+		linkTrb->qwtrb0 = device->trb_addr + i * sizeof(device->trbs[0]);
+		linkTrb->dwtrb2 = TRB_2_IRQ(0);
+		linkTrb->dwtrb3 = TRB_3_CYCLE_BIT | TRB_3_TYPE(TRB_TYPE_LINK);
+	}
+
+	// set up slot pointer to device context
+	fDcba->baseAddress[slot] = device->device_ctx_addr;
+
+	size_t maxPacketSize;
+	switch (speed) {
+	case USB_SPEED_LOWSPEED:
+	case USB_SPEED_FULLSPEED:
+		maxPacketSize = 8;
+		break;
+	case USB_SPEED_HIGHSPEED:
+		maxPacketSize = 64;
+		break;
+	default:
+		maxPacketSize = 512;
+		break;
+	}
+
+	// configure the Control endpoint 0 (type 4)
+	if (ConfigureEndpoint(slot, 0, 4, device->trb_addr, 0, 1, 1, 0,
+		maxPacketSize, maxPacketSize) != B_OK) {
+		TRACE_ERROR("unable to configure default control endpoint\n");
+		return NULL;
+	}
+
+	if (SetAddress(device->input_ctx_addr, 1, slot) != B_OK) {
+		TRACE_ERROR("unable to set address\n");
+		return NULL;
+	}
+
+	uint8 deviceAddress = SLOT_3_DEVICE_ADDRESS(device->input_ctx->slot.dwslot3);
+
+	TRACE("deviceAddress 0x%x\n", deviceAddress);
+
+	// Create a temporary pipe with the new address
+	ControlPipe pipe(parent);
+	pipe.InitCommon(deviceAddress, 0, speed, Pipe::Default, 8, 0, hubAddress,
+		hubPort);
+
+	// Get the device descriptor
+	// Just retrieve the first 8 bytes of the descriptor -> minimum supported
+	// size of any device. It is enough because it includes the device type.
+
+	size_t actualLength = 0;
+	usb_device_descriptor deviceDescriptor;
+
+	TRACE("getting the device descriptor\n");
+	pipe.SendRequest(
+		USB_REQTYPE_DEVICE_IN | USB_REQTYPE_STANDARD,		// type
+		USB_REQUEST_GET_DESCRIPTOR,							// request
+		USB_DESCRIPTOR_DEVICE << 8,							// value
+		0,													// index
+		8,													// length
+		(void *)&deviceDescriptor,							// buffer
+		8,													// buffer length
+		&actualLength);										// actual length
+
+	if (actualLength != 8) {
+		TRACE_ERROR("error while getting the device descriptor\n");
+		FreeAddress(deviceAddress);
+		return NULL;
+	}
+
+	TRACE("creating new device\n");
+	Device *deviceObject = new(std::nothrow) Device(parent, hubAddress, hubPort,
+		deviceDescriptor, deviceAddress, speed, false);
+	if (!deviceObject) {
+		TRACE_ERROR("no memory to allocate device\n");
+		return NULL;
+	}
+	fPortSlots[hubPort] = slot;
+	TRACE("AllocateDevice() port %d slot %d\n", hubPort, slot);
+	return deviceObject;
+}
+
+
+void
+XHCI::FreeDevice(Device *device)
+{
+	uint8 slot = fPortSlots[device->HubPort()];
+	TRACE("FreeDevice() port %d slot %d\n", device->HubPort(), slot);
+	DisableSlot(slot);
+	fDcba->baseAddress[slot] = 0;
+	fPortSlots[device->HubPort()] = 0;
+	delete_area(fDevices[slot].trb_area);
+	delete_area(fDevices[slot].input_ctx_area);
+	delete_area(fDevices[slot].device_ctx_area);
+	fDevices[slot].state = XHCI_STATE_DISABLED;
+	delete device;
+}
+
+
+status_t
+XHCI::ConfigureEndpoint(uint8 slot, uint8 number, uint8 type, uint64 ringAddr, uint16 interval,
+	uint8 maxPacketCount, uint8 mult, uint8 fpsShift, uint16 maxPacketSize,
+	uint16 maxFrameSize)
+{
+	struct xhci_device *device = &fDevices[slot];
+	struct xhci_endpoint_ctx *endpoint = &device->input_ctx->endpoints[number];
+
+	if (mult == 0 || maxPacketCount == 0)
+		return B_BAD_VALUE;
+
+	maxPacketCount--;
+
+	endpoint->dwendpoint0 = ENDPOINT_0_STATE(0) | ENDPOINT_0_MAXPSTREAMS(0);
+	// add mult for isochronous and interrupt types
+	// add interval
+	endpoint->dwendpoint1 = ENDPOINT_1_EPTYPE(type)
+		| ENDPOINT_1_MAXBURST(maxPacketCount)
+		| ENDPOINT_1_MAXPACKETSIZE(maxPacketSize)
+		| ENDPOINT_1_CERR(3);
+	endpoint->qwendpoint2 = ENDPOINT_2_DCS_BIT | ringAddr;
+	// 8 for Control endpoint
+	switch (type) {
+	case 4:
+		endpoint->dwendpoint4 =	ENDPOINT_4_AVGTRBLENGTH(8);
+		break;
+	case 1:
+	case 3:
+	case 5:
+	case 7:
+		endpoint->dwendpoint4 =	ENDPOINT_4_AVGTRBLENGTH(maxFrameSize)
+			| ENDPOINT_4_MAXESITPAYLOAD(maxFrameSize);
+		break;
+	}
+
+	TRACE("endpoint 0x%lx 0x%lx 0x%llx 0x%lx\n", endpoint->dwendpoint0,
+		endpoint->dwendpoint1, endpoint->qwendpoint2, endpoint->dwendpoint4);
+
+	return B_OK;
+}
+
+
+status_t
+XHCI::GetPortSpeed(uint8 index, usb_speed *speed)
+{
+	if (fPortSpeeds[index] == USB_SPEED_SUPER)
+		*speed = USB_SPEED_SUPER;
+	else {
+		uint32 portStatus = ReadOpReg(XHCI_PORTSC(index));
+
+		switch (PS_SPEED_GET(portStatus)) {
+		case 3:
+			*speed = USB_SPEED_HIGHSPEED;
+			break;
+		case 2:
+			*speed = USB_SPEED_LOWSPEED;
+			break;
+		case 1:
+			*speed = USB_SPEED_FULLSPEED;
+			break;
+		default:
+			*speed = USB_SPEED_SUPER;
+		}
+	}
+	return B_OK;
+}
+
+
 status_t
 XHCI::GetPortStatus(uint8 index, usb_port_status *status)
 {
@@ -503,7 +807,7 @@ XHCI::GetPortStatus(uint8 index, usb_port_status *status)
 
 	status->status = status->change = 0;
 	uint32 portStatus = ReadOpReg(XHCI_PORTSC(index));
-	TRACE("port status=0x%08lx\n", portStatus);
+	//TRACE("port status=0x%08lx\n", portStatus);
 
 	// build the status
 	switch (PS_SPEED_GET(portStatus)) {
@@ -525,8 +829,12 @@ XHCI::GetPortStatus(uint8 index, usb_port_status *status)
 		status->status |= PORT_STATUS_OVER_CURRENT;
 	if (portStatus & PS_PR)
 		status->status |= PORT_STATUS_RESET;
-	if (portStatus & PS_PP)
-		status->status |= PORT_STATUS_POWER;
+	if (portStatus & PS_PP) {
+		if (fPortSpeeds[index] == USB_SPEED_SUPER)
+			status->status |= PORT_STATUS_SS_POWER;
+		else
+			status->status |= PORT_STATUS_POWER;
+	}
 
 	// build the change
 	if (portStatus & PS_CSC)
@@ -537,6 +845,13 @@ XHCI::GetPortStatus(uint8 index, usb_port_status *status)
 		status->change |= PORT_STATUS_OVER_CURRENT;
 	if (portStatus & PS_PRC)
 		status->change |= PORT_STATUS_RESET;
+
+	if (fPortSpeeds[index] == USB_SPEED_SUPER) {
+		if (portStatus & PS_PLC)
+			status->change |= PORT_LINK_STATE;
+		if (portStatus & PS_WRC)
+			status->change |= PORT_BH_PORT_RESET;
+	}
 
 	return B_OK;
 }
@@ -573,6 +888,7 @@ XHCI::SetPortFeature(uint8 index, uint16 feature)
 	default:
 		return B_BAD_VALUE;
 	}
+	ReadOpReg(portRegister);
 	return B_OK;
 }
 
@@ -598,28 +914,31 @@ XHCI::ClearPortFeature(uint8 index, uint16 feature)
 			portStatus &= ~PS_PLS_MASK;
 			WriteOpReg(portRegister, portStatus | PS_XDEV_U0 | PS_LWS);
 		}
-		return B_OK;
+		break;
 	case PORT_ENABLE:
 		WriteOpReg(portRegister, portStatus | PS_PED);
-		return B_OK;
+		break;
 	case PORT_POWER:
 		WriteOpReg(portRegister, portStatus & ~PS_PP);
-		return B_OK;
+		break;
 	case C_PORT_CONNECTION:
 		WriteOpReg(portRegister, portStatus | PS_CSC);
-		return B_OK;
+		break;
 	case C_PORT_ENABLE:
 		WriteOpReg(portRegister, portStatus | PS_PEC);
-		return B_OK;
+		break;
 	case C_PORT_OVER_CURRENT:
 		WriteOpReg(portRegister, portStatus | PS_OCC);
-		return B_OK;
+		break;
 	case C_PORT_RESET:
 		WriteOpReg(portRegister, portStatus | PS_PRC);
-		return B_OK;
+		break;
+	default:
+		return B_BAD_VALUE;
 	}
 
-	return B_BAD_VALUE;
+	ReadOpReg(portRegister);
+	return B_OK;
 }
 
 
