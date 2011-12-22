@@ -3,6 +3,8 @@ SubDir HAIKU_TOP src kits textencoding ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
+AddResources libtextencoding.so : libtextencoding.rdef ;
+
 UsePrivateHeaders textencoding ;
 UseLibraryHeaders iconv ;
 
@@ -11,8 +13,15 @@ SharedLibrary libtextencoding.so :
 	CharacterSetRoster.cpp
 	character_sets.cpp
 	utf8_conversions.cpp
-	: be libiconv.a $(TARGET_LIBSUPC++) ;
+	: be libiconv.a $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS) ;
 
 Package haiku-maildaemon-cvs :
 	libtextencoding.so :
 	boot beos system lib ;
+
+DoCatalogs libtextencoding.so :
+	x-vnd.Haiku-libtextencoding
+	:
+	character_sets.cpp
+;
+
