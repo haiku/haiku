@@ -1057,6 +1057,7 @@ AboutView::_CreateCreditsView()
 	fCreditsView->Insert(
 		"Andrea Anzani\n"
 		"Sean Bartell\n"
+		"Hannah Boneß\n"
 		"Andre Braga\n"
 		"Michael Bulash\n"
 		"Bruce Cameron\n"
