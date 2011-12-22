@@ -233,7 +233,7 @@ CannaLooper::_HandleKeyDown(BMessage* msg)
 	}
 
 	SERIAL_PRINT(("CannaLooper: HandleKeyDown() calling "
-		"CannaInterface::KeyIn()...\n", result));
+		"CannaInterface::KeyIn()...\n"));
 
 	uint32 result = fCanna->KeyIn(character, modifier, key);
 
