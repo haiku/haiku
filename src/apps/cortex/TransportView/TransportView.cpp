@@ -1057,7 +1057,7 @@ void TransportView::_updateRunMode() {
 	
 	BMenu* menu = m_runModeView->Menu();
 	uint32 runMode = m_group->runMode() - 1; // real run mode starts at 1
-	ASSERT(menu->CountItems() > runMode);
+	ASSERT((uint32)menu->CountItems() > runMode);
 	menu->ItemAt(runMode)->SetMarked(true);
 }
 

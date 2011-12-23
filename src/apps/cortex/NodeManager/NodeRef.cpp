@@ -1719,7 +1719,7 @@ status_t NodeRef::_setRunMode(
 			node(), m);
 		if(err < B_OK) {
 			PRINT((
-				"NodeRef('%s')::_setRunMode(): SetRunModeNode(%ld) failed: %s\n",
+				"NodeRef('%s')::_setRunMode(): SetRunModeNode(%d) failed: %s\n",
 				name(), m, strerror(err)));
 		}
 	}
