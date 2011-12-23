@@ -16,6 +16,9 @@ UseLibraryHeaders zlib ;
 TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
 	: -Wall -Wmissing-prototypes -Wsign-compare -Wpointer-arith ] ;
 
+# Some targets in this subdir fail to build with DEBUG=1
+DEBUG = 0 ;
+
 SubDirCcFlags $(HAIKU_FFMPEG_GCC_EXTRA_FLAGS) ;
 SubDirCcFlags $(HAIKU_FFMPEG_DEFINES) ;
 SubDirC++Flags $(HAIKU_FFMPEG_DEFINES) ;
