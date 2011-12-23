@@ -961,12 +961,12 @@ if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				KeymapSwitcher-1.2.6-x86-gcc4-2011-11-07.zip
-				: $(baseURL)/KeymapSwitcher-1.2.6-x86-gcc4-2011-11-07.zip ;
+				KeymapSwitcher-1.2.6-x86-gcc4-2011-12-23.zip
+				: $(baseURL)/KeymapSwitcher-1.2.6-x86-gcc4-2011-12-23.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				KeymapSwitcher-1.2.6-x86-gcc2-2011-11-07.zip
-				: $(baseURL)/KeymapSwitcher-1.2.6-x86-gcc2-2011-11-07.zip ;
+				KeymapSwitcher-1.2.6-x86-gcc2-2011-12-23.zip
+				: $(baseURL)/KeymapSwitcher-1.2.6-x86-gcc2-2011-12-23.zip ;
 		}
 		AddSymlinkToHaikuImage home config settings deskbar Preferences
 			: /boot/common/bin/KeymapSwitcher ;
@@ -1650,12 +1650,12 @@ if [ IsOptionalHaikuImagePackageAdded Vim ] {
 		Echo "No optional package Vim available for $(TARGET_ARCH)" ;
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
-			InstallOptionalHaikuImagePackage vim-7.3-r1a3-x86-gcc4-2011-05-26.zip
-				:  $(baseURL)/vim-7.3-r1a3-x86-gcc4-2011-05-26.zip
+			InstallOptionalHaikuImagePackage vim-7.3-x86-gcc4-2011-12-23.zip
+				:  $(baseURL)/vim-7.3-x86-gcc4-2011-12-23.zip
 				: : true ;
 		} else {
-			InstallOptionalHaikuImagePackage vim-7.3-r1a3-x86-gcc2-2011-05-26.zip
-				:  $(baseURL)/vim-7.3-r1a3-x86-gcc2-2011-05-26.zip
+			InstallOptionalHaikuImagePackage vim-7.3-x86-gcc2-2011-12-23.zip
+				:  $(baseURL)/vim-7.3-x86-gcc2-2011-12-23.zip
 				: : true ;
 		}
 		AddSymlinkToHaikuImage home config settings deskbar Applications
