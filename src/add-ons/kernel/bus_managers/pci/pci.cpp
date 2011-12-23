@@ -94,7 +94,8 @@ pci_reserve_device(uchar virtualBus, uchar device, uchar function,
 	status_t status;
 	uint8 bus;
 	int domain;
-	TRACE(("pci_reserve_device(%d, %d, %d, %s)\n", virtualBus, device, function, driverName));
+	TRACE(("pci_reserve_device(%d, %d, %d, %s)\n", virtualBus, device, function,
+		driverName));
 
 	/*
 	 * we add 2 nodes to the PCI devices, one with constant attributes,
@@ -178,7 +179,8 @@ err1:
 	gDeviceManager->put_node(pci);
 err0:
 	gDeviceManager->put_node(root);
-	TRACE(("pci_reserve_device for driver %s failed: %s\n", driverName, strerror(status)));
+	TRACE(("pci_reserve_device for driver %s failed: %s\n", driverName,
+		strerror(status)));
 	return status;
 }
 
@@ -190,7 +192,8 @@ pci_unreserve_device(uchar virtualBus, uchar device, uchar function,
 	status_t status;
 	uint8 bus;
 	int domain;
-	TRACE(("pci_unreserve_device(%d, %d, %d, %s)\n", virtualBus, device, function, driverName));
+	TRACE(("pci_unreserve_device(%d, %d, %d, %s)\n", virtualBus, device,
+		function, driverName));
 
 	if (gPCI->ResolveVirtualBus(virtualBus, &domain, &bus) != B_OK)
 		return B_ERROR;
@@ -274,7 +277,8 @@ err1:
 	gDeviceManager->put_node(pci);
 err0:
 	gDeviceManager->put_node(root);
-	TRACE(("pci_unreserve_device for driver %s failed: %s\n", driverName, strerror(status)));
+	TRACE(("pci_unreserve_device for driver %s failed: %s\n", driverName,
+		strerror(status)));
 	return status;
 }
 
