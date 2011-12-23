@@ -4,6 +4,8 @@
  */
 
 #include <KernelExport.h>
+#include <driver_settings.h>
+#include <string.h>
 #include "pci_irq.h"
 #include "pci_bios.h"
 #include "pci_private.h"
@@ -211,11 +213,32 @@ pci_controller_init(void)
 	bool search_mech1 = true;
 	bool search_mech2 = true;
 	bool search_bios = true;
+	void *config = NULL;
 	status_t status;
 
 	status = pci_x86_irq_init();
 	if (status != B_OK)
 		return status;
+
+	config = load_driver_settings("pci");
+	if (config) {
+		const char *mech = get_driver_parameter(config, "mechanism",
+			NULL, NULL);
+		if (mech) {
+			search_mech1 = search_mech2 = search_bios = false;
+			if (strcmp(mech, "1") == 0)
+				search_mech1 = true;
+			else if (strcmp(mech, "2") == 0)
+				search_mech2 = true;
+			else if (strcmp(mech, "bios") == 0)
+				search_bios = true;
+			else
+				panic("Unknown pci config mechanism setting %s\n", mech);
+		}
+		unload_driver_settings(config);
+	}
+
+	// TODO: check safemode "don't call the BIOS" setting and unset search_bios!
 
 	// PCI configuration mechanism 1 is the preferred one.
 	// If it doesn't work, try mechanism 2.
