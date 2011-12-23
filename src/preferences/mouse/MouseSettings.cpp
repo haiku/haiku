@@ -153,7 +153,7 @@ MouseSettings::Dump()
 	printf("accel factor:\t%ld\n", fSettings.accel.accel_factor);
 	printf("speed:\t\t%ld\n", fSettings.accel.speed);
 
-	char *mode = "unknown";
+	const char *mode = "unknown";
 	switch (fMode) {
 		case B_NORMAL_MOUSE:
 			mode = "click to focus and raise";
@@ -167,7 +167,7 @@ MouseSettings::Dump()
 	}
 	printf("mouse mode:\t%s\n", mode);
 
-	char *focus_follows_mouse_mode = "unknown";
+	const char *focus_follows_mouse_mode = "unknown";
 	switch (fFocusFollowsMouseMode) {
 		case B_NORMAL_FOCUS_FOLLOWS_MOUSE:
 			focus_follows_mouse_mode = "normal";
