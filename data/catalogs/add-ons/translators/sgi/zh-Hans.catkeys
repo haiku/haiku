@@ -1,0 +1,13 @@
+1	simplified_chinese	x-vnd.Haiku-SGITranslator	2222378389
+None	SGIView		无
+RLE	SGIView		RLE
+SGI Settings	SGIMain		SGI 设置
+SGI image	SGITranslator		SGI 图像
+SGI image translator	SGITranslator		SGI 图像转换器
+SGI image translator	SGIView		SGI 图像转换器
+SGI images	SGITranslator		SGI 图像
+SGITranslator Settings	SGITranslator		SGI转换器设置
+Use compression:	SGIView		使用压缩：
+Version %d.%d.%d %s	SGIView		版本 %d.%d.%d %s
+\n\nbased on GIMP SGI plugin v1.5:\n	SGIView		\n\n基于 GIMP SGI 插件 v1.5：\n
+written by:\n	SGIView		编写者：\n

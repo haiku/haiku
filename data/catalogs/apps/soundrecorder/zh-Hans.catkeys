@@ -1,0 +1,38 @@
+1	simplified_chinese	x-vnd.Haiku-SoundRecorder	2122042546
+Cannot connect to media server	RecorderWindow		无法连接到媒体服务组件
+Cannot connect to the selected sound input	RecorderWindow		无法连接到选中声音输入
+Cannot find an unused name to use for the new recording	RecorderWindow		未找到用于新记录的未使用文件名。
+Cannot find default audio hardware	RecorderWindow		未发现默认音频设备
+Cannot find the temporary file created to hold the new recording	RecorderWindow		未找到存储新记录的临时文件
+Cannot get the file to play	RecorderWindow		无法播放文件
+Cannot open the temporary file created to hold the new recording	RecorderWindow		无法打开用于存储新记录的临时文件
+Cannot recognize this file as a media file	RecorderWindow		无法识别该文件为音频文件
+Cannot record a sound that long	RecorderWindow		无法进行长时间的记录
+Channels: 	RecorderWindow		频道：
+Compression:	RecorderWindow		压缩：
+Drop files here	SoundListView		在这里放置文件
+Duration:	RecorderWindow		音长：
+File info	RecorderWindow		文件信息
+File name:	RecorderWindow		文件名：
+Format: 	RecorderWindow		格式：
+Forward	RecorderWindow		向前
+Input	RecorderWindow		输入
+Input:	RecorderWindow		输入：
+Invalid audio files	RecorderWindow		无效音频文件
+Loop	RecorderWindow		循环
+None	RecorderWindow		无
+None of the files appear to be audio files	RecorderWindow		所有文件都不是音频文件
+Nothing to play	RecorderWindow		无播放文件
+OK	RecorderWindow		确定
+Play	RecorderWindow		播放
+Record	RecorderWindow		录音
+Rewind	RecorderWindow		倒回
+Sample rate: 	RecorderWindow		比率示例：
+Sample size: 	RecorderWindow		大小示例：
+Save	RecorderWindow		保存
+Some of the files don't appear to be audio files	RecorderWindow		其中的一些文件不是音频文件
+Sound List	RecorderWindow		声音列表
+SoundRecorder	System name		录音器
+Stop	RecorderWindow		停止
+bits	RecorderWindow		位
+seconds	RecorderWindow		秒

@@ -1,0 +1,16 @@
+1	simplified_chinese	x-vnd.Haiku-TGATranslator	4159874267
+Ignore TGA alpha channel	TGAView		忽略 TGA 测试频道
+Save with RLE Compression	TGAView		以 RLE 压缩保存
+TGA Image Translator	TGAView		TGA 图像转换器
+TGA Settings	TGAMain		TGA 设置
+TGA image translator	TGATranslator		TGA 图像转换器
+TGA images	TGATranslator		TGA 图像
+TGATranslator Settings	TGATranslator		TGA转换器设置
+Targa image (%d bits RLE colormap)	TGATranslator		Targa 图像（%d 为 RLE 色图）
+Targa image (%d bits RLE gray)	TGATranslator		Targa 图像（%d 位 RLE 灰度）
+Targa image (%d bits RLE truecolor)	TGATranslator		Targa 图像（%d 位 RLE 真彩）
+Targa image (%d bits colormap)	TGATranslator		Targa 图像（%d 位色图）
+Targa image (%d bits gray)	TGATranslator		Targa 图像（%d 位灰度）
+Targa image (%d bits truecolor)	TGATranslator		Targa 图像（%d 位真彩）
+Version %d.%d.%d %s	TGAView		版本 %d.%d.%d %s
+Written by the Haiku Translation Kit Team	TGAView		由 Haiku Translation Kit Team 编写

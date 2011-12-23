@@ -1,0 +1,57 @@
+1	simplified_chinese	x-vnd.Haiku-PackageInstaller	2709408798
+%.1f GiB	PackageView		%.1f GiB
+%.1f KiB	PackageView		%.1f KiB
+%.1f MiB	PackageView		%1f MiB
+%llu bytes	PackageView		%lly 字节
+(%s free)	PackageView		（%s 自由）
+Abort	PackageInfo		终止
+Abort	PackageInstall		终止
+Abort	PackageView		终止
+Accept	PackageTextViewer		接受
+All existing files will be replaced?	PackageView		替换所有存在文件吗？
+All existing files will be skipped?	PackageView		所有已存在的文件将被跳过？
+Ask again	PackageView		再次询问
+Continue	PackageInfo		继续
+Continue	PackageInstall		继续
+Continue	PackageTextViewer		继续
+Decline	PackageTextViewer		递减
+Disclaimer	PackageTextViewer		责任声明
+Do you want to remember this decision for the rest of this installation?\n	PackageView		您是否希望记住该决定以完成余下安装进度？\n
+Done	PackageInstall		完成
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		错误（%s）！无法打开 \"%s\"。\n
+Error while installing the package\n	PackageView		安装软件包时出错\n
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		错误！\"%s\" 不是有效路径。\n
+Finishing installation	PackageInstall		安装结束
+Image not loaded correctly	PackageImageViewer		图像加载失败
+Install	PackageView		安装
+Install to:	PackageView		安装到：
+Installation progress	PackageView		安装进度
+Installation type:	PackageView		安装类型
+Installing files and folders	PackageInstall		安装文件和目录
+Installing package	PackageStatus		安装包
+No installation type selected	PackageView		未选中安装类型
+No package available.	PackageInfo		无可用包。
+No package selected.	PackageInfo		未选择安装包。
+OK	PackageView		确认
+Other…	PackageView		其他...
+Package installer	PackageView		包安装器
+PackageInstaller	System name		包安装器
+Preparing package	PackageInstall		准备安装包
+Replace	PackageView		替换
+Replace all	PackageView		替换所有
+Running post-installation scripts	PackageInstall		运行预安装脚本
+Skip	PackageView		跳过
+Skip all	PackageView		跳过所有
+Stop	PackageStatus		停止
+The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		'%s' 项目已经存在于给定路径。\n是替换为包中的目录，还是跳过？
+The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		'%s' 文件已经存在于给定路径。\n是替换为包中的文件，还是跳过？
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		给定包可能已经安装到系统。您确定要卸载已存在的包，然后继续安装吗？
+The installation of the package has been aborted.	PackageView		该包的安装已经取消。
+The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		'%s' 项目已经存在于给定路径。\n是替换为包中的项目，还是跳过？
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		无法读取包文件。\n产生的原因之一可能是所需文件不是有效的 BeOS .pkg 包。
+The package you requested has been successfully installed on your system.	PackageView		您所需要的包已经成功的安装到系统。
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		所需包安转到系统失败。目标包文件可能出现错误。详情请咨询该包的发布者。
+The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		'%s' 脚本已经存在于给定路径。\n是替换为包中的脚本，还是跳过？
+The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		'%s' 符号连接已经存在于给定路径。\n是替换为包中的链接，还是跳过？
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		包文件大小不匹配。该包在创建之后可能已经损坏或被修改。是否继续？
+none	PackageView		无

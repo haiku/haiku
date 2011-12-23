@@ -1,0 +1,33 @@
+1	simplified_chinese	x-vnd.Haiku-LaunchBox	4192523522
+Add button here	LaunchBox		在此处添加按钮
+Auto-raise	LaunchBox		自动提升
+Bummer	LaunchBox		无效
+Cancel	LaunchBox		取消
+Clear button	LaunchBox		清除按钮
+Clone	LaunchBox		复制
+Close	LaunchBox		关闭
+Description for '%3'	LaunchBox		描述 '%3'
+Failed to launch '%1'.\n\nError:	LaunchBox		启动 '%1' 失败。\n\n错误：
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		发送 'open folder' 命令到 Tracker 失败。\n\n错误：
+Horizontal layout	LaunchBox		水平层
+Icon size	LaunchBox		图标尺寸
+Ignore double-click	LaunchBox		忽略双击
+LaunchBox	System name		启动栏
+Name Panel	LaunchBox		命名面板
+New	LaunchBox		新建
+OK	LaunchBox		确定
+Pad	LaunchBox		面板
+Pad %1	LaunchBox		面板 %1
+Pad 1	LaunchBox		面板 1
+Quit	LaunchBox		退出
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		确定关闭该面板？\n（该面板将不被保存。）
+Remove button	LaunchBox		删除按钮
+Set description…	LaunchBox		设置描述...
+Settings	LaunchBox		设置
+Show on all workspaces	LaunchBox		在所有工作区显示
+Show window border	LaunchBox		显示窗口边界
+Vertical layout	LaunchBox		竖直层
+You can drag an icon here.	LaunchBox		您可以将图标拖动至此处。
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		使用署名 '%2' 启动应用程序失败。\n\n错误：
+last chance	LaunchBox		最后机会
+launch popup	LaunchBox		载入弹出菜单

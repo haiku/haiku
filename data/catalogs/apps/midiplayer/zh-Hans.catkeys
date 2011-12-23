@@ -1,0 +1,19 @@
+1	simplified_chinese	x-vnd.Haiku-MidiPlayer	4180509704
+Cavern	Main Window		洞穴
+Closet	Main Window		密室
+Could not load song	Main Window		无法载入音乐文件
+Drop MIDI file here	Scope View		把 MIDI 文件放在此处
+Dungeon	Main Window		古墓
+Garage	Main Window		车库
+Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku MIDI播放器 1.0.0 beta\n\n娇小且轻灵\n功能强大真无双\n美妙歌曲扬
+Igor's lab	Main Window		伊戈尔的实验室
+Live input:	Main Window		保持输入：
+MidiPlayer	System name		Midi播放器
+None	Main Window		无
+OK	Main Window		确定
+Off	Main Window		关闭
+Play	Main Window		播放
+Reverb:	Main Window		混音：
+Scope	Main Window		显示范围
+Stop	Main Window		停止
+Volume:	Main Window		声音：

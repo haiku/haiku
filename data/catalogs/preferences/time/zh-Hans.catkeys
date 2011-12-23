@@ -1,0 +1,44 @@
+1	simplified_chinese	x-vnd.Haiku-Time	3493650184
+<Other>	Time		<其他>
+Add	Time		添加
+Africa	Time		非洲
+America	Time		美洲
+Antarctica	Time		南极
+Arctic	Time		北极
+Asia	Time		亚洲
+Atlantic	Time		大西洋
+Australia	Time		澳大利亚
+Could not contact server	Time		无法连接服务器
+Could not create socket	Time		无法创建套接字
+Current time:	Time		当前时间：
+Date and time	Time		日期时间
+Europe	Time		欧洲
+GMT (UNIX compatible)	Time		GMT（UNIX 兼容）
+Hardware clock set to:	Time		硬件时钟设置为：
+Indian	Time		印度洋
+Local time (Windows compatible)	Time		本地时间（Windows 兼容）
+Message receiving failed	Time		消息接收失败
+Network time	Time		网络时间
+OK	Time		确定
+Pacific	Time		太平洋
+Preview time:	Time		时间预览：
+Received invalid time	Time		接收时间无效
+Remove	Time		移除
+Reset	Time		重置
+Revert	Time		恢复
+Sending request failed	Time		发送请求失败
+Set time zone	Time		设置时区
+Stop	Time		停止
+Synchronize	Time		同步
+Synchronize again	Time		再次同步
+Synchronize at boot	Time		启动时同步
+The following error occured while synchronizing:r\n%s	Time		时间同步时发生如下错误：r\n%s
+The following error occured while synchronizing:r\n%s: %s	Time		同步时间时发生如下错误：r\n%s：%s
+Time	System name		时间
+Time	Time		时间
+Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		日期时间，编写者：\n\n\tAndrew Edward McCall \n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\n版权 2004-2008, Haiku, Inc.
+Time zone	Time		时区
+Try all servers	Time		尝试所有服务器
+Waiting for answer failed	Time		等待回复失败
+\nNow: 	Time		\n现在时间：
+about	Time		关于

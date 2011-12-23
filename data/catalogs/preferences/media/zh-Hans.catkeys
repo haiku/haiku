@@ -1,0 +1,30 @@
+1	simplified_chinese	x-vnd.Haiku-Media	1473363280
+<none>	Media views		<无>
+Audio input:	Media views		音频输入：
+Audio mixer	Media Window		音频混合器
+Audio output:	Media views		音频输出：
+Audio settings	Media Window		音频设置
+Channel:	Media views		频道：
+Cleaning up.	Media Window		清除。
+Could not connect to the media server.\nWould you like to start it ?	Media Window		链接 media server 失败.\n是否重新启动 ?
+Couldn't add volume control in Deskbar: %s\n	Media views		无法添加音量控件到桌面栏：%s\n
+Couldn't remove volume control in Deskbar: %s\n	Media views		无法移除桌面栏中的音量控件：%s\n
+Defaults	Media views		默认
+Done shutting down.	Media Window		已关闭。
+Media	System name		多媒体
+OK	Media Window		确定
+Quit	Media Window		退出
+Ready for use…	Media Window		准备使用…
+Restart media services	Media views		重启多媒体服务
+Restarting media services\nShutting down media server\n	Media Window		重启多媒体服务\n 关闭 media server\n
+Restarting media services\nStarting media server…\n	Media Window		重启多媒体服务\n正在启动 media server…\n
+Show volume control on Deskbar	Media views		在桌面栏中显示声音控制
+Start media server	Media Window		启动 media server
+Starting media server…	Media Window		启动 media server…
+Stopping media server…	Media Window		暂停 media server…
+Telling media_addon_server to quit.	Media Window		控制 media_addon_server 退出程序。
+This hardware has no controls.	Media Window		硬件控制失败。
+Video input:	Media views		视频输入:
+Video output:	Media views		视频输出：
+Video settings	Media Window		视频设置
+Waiting for media_server to quit.	Media Window		等待 media_server 退出。

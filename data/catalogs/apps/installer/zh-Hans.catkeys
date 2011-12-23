@@ -1,0 +1,120 @@
+1	simplified_chinese	x-vnd.Haiku-Installer	3852628561
+%1ld of %2ld	InstallerWindow	number of files copied	%1ld来源于%2ld
+1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1）如果您将安装 Haiku 到真实硬件（而不是虚拟机），强烈建议您预备一个硬盘分区。系统安装器和磁盘管理器将初始化已有分区为 Haiku 原生文件系统，但是修改实际分区布局的选项还未在各种配置的计算机上进行大规模的测试，因此我们建议您不要使用它。
+2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2）系统安装器能够实现 Haiku 分区的启动，但是并不能够将 Haiku 集成到已有的引导菜单。如果您安装了 GRUB，您可以添加 Haiku 到其引导菜单。对于不同的 GRUB 版本，所要执行的操作将不尽相同。
+2.1) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
+2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" documentation, there is a link on the Desktop.\n\n	InstallerApp		3）在首次成功进入 Haiku 时，请一定要阅读我们的 \"Welcome\" 文档，在桌面上有它的链接。\n\n
+<none>	InstallerWindow	No partition available	<无>
+?? of ??	InstallerWindow	Unknown progress	??来源于??
+???	InstallerWindow	Unknown currently copied item	???
+???	InstallerWindow	Unknown partition name	???
+Abort	InstallerWindow		取消
+Additional disk space required: %s	InstallerWindow		需要额外磁盘空间：%s
+Additional disk space required: 0.0 KiB	InstallerWindow		需要额外磁盘空间：0.0 KiB
+Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		此外，您必须编辑其他文件以显示引导菜单：\n\n
+All hard disks start with \"hd\".\n	InstallerApp		所有硬盘的起始字符为：\"hd\"。\n
+An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		发生意外错误，系统安装未完成：\n\nError：%s
+Are you sure you want to abort the installation and restart the system?	InstallerWindow		您是否确定终止安装，重新启动系统？
+Are you sure you want to abort the installation?	InstallerWindow		您确定要取消安装吗？
+Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		您确定安装 Haiku 到当前引导磁盘？如果您继续安装，系统安装器将会重启您的计算机。
+Are you sure you want to to stop the installation?	InstallerWindow		您是否确定终止安装过程？
+Begin	InstallerWindow		开始
+Boot sector not written because of an internal error.	InstallProgress		由于内部错误，引导扇区未写入。
+Boot sector successfully written.	InstallProgress		引导扇区写入成功。
+BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		引导管理器，用于配置 Haiku 引导菜单，无法启动。
+Cancel	InstallProgress		取消
+Cancel	InstallerWindow		取消
+Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		从弹出菜单中选择希望安装的磁盘。然后点击\"开始\"。
+Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		从弹出菜单中选择源磁盘和目标磁盘。然后点击\"开始\"。
+Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		从弹出菜单中选择源磁盘。然后点击\"开始\"。
+Collecting copy information.	InstallProgress		收集复制信息。
+Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		从终端中启动偏好的编辑器，配置您的 /boot/grub/menu.lst，如下：
+Continue	InstallerApp		继续
+Continue	InstallerWindow	In alert after pressing Stop	继续
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		磁盘管理器可用于配置磁盘分区，当前其无法启动。
+Finally, you have to update the boot menu by entering:\n\n	InstallerApp		最后，您需要更新引导菜单，请输入：\n\n
+Finishing Installation.	InstallProgress		完成安装。
+GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		GRUB 的命名策略仍然是：(hdN,n)\n\n
+Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		非常感谢您能够使用 Haiku！使用愉快，我们希望您能够喜欢它。
+Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		如下，您需要添加 \"#\" 到 \"GRUB_HIDDEN_TIMEOUT=0\" 的行首以注释掉该行，从而显示实际的引导菜单。\n\n
+Hide optional packages	InstallerWindow		隐藏附加软件包
+IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		安装必读\n\n
+If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		如果您没有创建分区，仅需要重启，使用您感觉友好的工具创建分区，然后重启进入 Haiku 以继续执行安装。例如，您可以使用 GParted Live-CD，它也可以调整已有分区大小以腾出空间。
+Install anyway	InstallProgress		继续安装
+Install from:	InstallerWindow		安装源：
+Install progress:  	InstallerWindow		安装进度：
+Installation canceled.	InstallProgress		安装已取消。
+Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		系统安装完成。引导扇区已经写入到 '%s'。按下“退出”关闭系统安装器或者另选分区重复安装操作。
+Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		安装完成.引导扇区已经写入 '%s'.按下重启系统按钮重启计算机或者选择新目标卷执行安装.
+Installer	System name		系统安装器
+Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		系统安装器\n\t编写者：Jérôme Duval 和 Stephan Aßmus \n\t版权所有 2005-2001 Haiku, Inc.\n\n
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		启动磁盘管理器为\n可用硬盘和其他媒介进行分区。\n分区可以初始化为 Be 文件系统以作为 Haiku 引导分区。
+NOTE: While the naming strategy for hard disks is still as described under 2.1) the naming scheme for partitions has changed.\n\n	InstallerApp		备注：由于硬盘的命名策略仍然如 2.1) 所述，因此分区的方案已经发生了改变。
+Newer versions of GRUB use an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		新的 GRUB 版本使用附加的配置文件以添加自定义条目到引导菜单。如果希望将它们放置在前面，您必须从终端中启动偏好编辑器以创建/编辑文件，如下所示：\n\n
+No optional packages available.	PackagesView		无可用附加软件包。
+No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		未发现可用于安装的分区。请设置分区，并至少将一个分区初始化为 Be 文件系统。
+OK	InstallProgress		确定
+OK	InstallerApp		确定
+OK	InstallerWindow		确定
+Onto:	InstallerWindow		安装到：
+Performing installation.	InstallProgress		执行安装。
+Please choose target	InstallerWindow		请选择目标
+Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		请在关闭系统安装器之前关闭引导管理器和磁盘管理器。
+Please close the Boot Manager window before closing the Installer window.	InstallerWindow		在关闭系统安装器之前请关闭引导管理器。
+Please close the DriveSetup window before closing the Installer window.	InstallerWindow		请在关闭系统安装器前关闭磁盘管理器。
+Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		按下 “开始”，从 '%1s' 安装到 '%2s'。 
+Quit	InstallerApp		退出
+Quit	InstallerWindow		退出
+Quit Boot Manager	InstallerWindow		退出引导管理器
+Quit Boot Manager and DriveSetup	InstallerWindow		退出引导管理器和磁盘管理器
+Quit DriveSetup	InstallerWindow		退出磁盘管理器
+README	InstallerApp		README
+Restart	InstallerWindow		重启系统
+Restart system	InstallerWindow		重启系统
+Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		引导管理器和磁盘管理器运行中...\n请关闭这两个程序以继续安装。
+Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		引导管理器运行中...\n\n请关闭引导管理器以继续安装。
+Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		磁盘管理器运行中...\n\n请关闭磁盘管理器以继续安装。
+Scanning for disks…	InstallerWindow		扫描磁盘...
+Set up boot menu	InstallerWindow		设置引导菜单
+Set up partitions…	InstallerWindow		设置分区...
+Show optional packages	InstallerWindow		显示附加软件包
+So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		在接近文件末尾，其他菜单条目之后，添加类似于下面的内容：\n\n
+So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		所以，在不需要编辑的头部下面，添加类似于以下行的内容：
+Starting Installation.	InstallProgress		启动安装
+Stop	InstallerWindow		停止
+Stop	InstallerWindow	In alert after pressing Stop	暂停
+The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		目标磁盘可能没有足够的空间。尝试选择其他的磁盘或者选择不安装附加项目。
+The disk can't be mounted. Please choose a different disk.	InstallProgress		磁盘无法挂载。请选择其他磁盘。
+The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		首个逻辑分区的编号总是 \"4\"，
+The mount point could not be retrieved.	InstallProgress		挂载点无法恢复。
+The partition can't be mounted. Please choose a different partition.	InstallProgress		分区无法挂载。请选择其他分区。
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		目标卷不为空。您确定必须进行安装吗？\n\n注意：从源卷拷贝的 'system' 文件夹为空，所有其他的文件夹将被合并，反之，源卷和目标卷中的所有文件和链接将会被源卷版本所覆盖。
+This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		这是 测试版本 软件！因此会有很高的丢失数据风险。请经常进行数据的备份！这是我们的善意提醒。
+Tools	InstallerWindow		工具
+Try installing anyway	InstallProgress		尝试继续安装
+Unknown Type	InstallProgress	Partition content type	未知类型
+Welcome to the Haiku Installer!\n\n	InstallerApp		欢迎使用 Haiku 系统安装器!\n\n
+With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		对于 GRUB2 ，首个逻辑分区编号总是 \"5\"，它和其他主分区编号没有任何关系。
+With GRUB it's: (hdN,n)\n\n	InstallerApp		使用 GRUB，如下：(hdN,n)\n\n
+Write boot sector	InstallerWindow		写入引导扇区
+Write boot sector to '%s'	InstallerWindow		引导扇区写入到 '%s'
+You can see the correct partition in GParted for example.\n\n\n	InstallerApp		例如，您可以在 GParted 中查看正确的分区。\n\n\n
+You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		您无法将磁盘内容进行自我安装。请选择其他磁盘。
+You'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\n	InstallerApp		您将会注意到，GRUB 使用了不同于 Linux 的硬盘命名方式。
+\"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\" 是硬盘编号，以 \"0\" 开始。\n
+\"n\" is the partition number, also starting with \"0\".\n	InstallerApp		\"n\" 是分区编号，也从 \"0\" 开始。\n
+\"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\" 是分区编号，对于 GRUB 2 ，则以 \"1\" 开始。\n
+\t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku on /dev/sda7\n
+\t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
+\t\tset root=(hd0,7)\n	InstallerApp		\t\t set root=(hd0,7)\n
+\tchainloader\t\t+1\n\n	InstallerApp		\tchainloader\t\t+1\n\n
+\tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
+\trootnoverify\t\t(hd0,6)\n	InstallerApp		\trootnoverify\t\t(hd0,6)\n
+\tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <偏好文本编辑器> /boot/grub/menu.lst\n\n 
+\tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <偏好文本编辑器> /etc/default/grub\n\n
+\tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsudo <偏好文本编辑器> /etc/grub.d/40_custom\n\n
+\tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
+\ttitle\t\t\t\tHaiku\n	InstallerApp		\ttitle\t\t\t\tHaiku\n
+\t}\n\n	InstallerApp		\t}\n\n
+scanning…	InstallerWindow		扫描...

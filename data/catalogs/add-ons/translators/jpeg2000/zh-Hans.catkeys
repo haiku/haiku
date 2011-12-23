@@ -1,0 +1,13 @@
+1	simplified_chinese	x-vnd.Haiku-JPEG2000Translator	547915409
+About	JPEG2000Translator		关于
+Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Be 位图格式（JPEG2000 转换器）
+High	JPEG2000Translator		高
+JPEG2000 images	JPEG2000Translator		JPEG2000 图像
+Low	JPEG2000Translator		低
+Output only codestream (.jpc)	JPEG2000Translator		输出仅 (.jpc)
+Output quality	JPEG2000Translator		输出质量
+Read	JPEG2000Translator		读取
+Read greyscale images as RGB32	JPEG2000Translator		以 RGB32 格式读取灰度图像
+Write	JPEG2000Translator		写入
+Write black-and-white images as RGB24	JPEG2000Translator		以 RGB24 格式写入黑白图像
+©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\n基于 JasPer library:\n© 1999-2000, Image Power, Inc. 与\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick 的 jp2 解码器作为 \"指南\"。\n\thttp://www.imagemagick.org/\n

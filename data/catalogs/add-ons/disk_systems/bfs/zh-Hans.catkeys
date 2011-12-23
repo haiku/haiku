@@ -1,0 +1,8 @@
+1	simplified_chinese	application/x-vnd.Haiku-BFSAddOn	1074880496
+1024 (Mostly small files)	BFS_Initialize_Parameter		1024（小文件使用）
+2048 (Recommended)	BFS_Initialize_Parameter		2048（推荐使用）
+8192 (Mostly large files)	BFS_Initialize_Parameter		8192（大文件使用）
+Blocksize:	BFS_Initialize_Parameter		块大小：
+Disabling query support may speed up certain file system operations, but should only be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		禁用查询支持可能会加速某些文件系统操作，但是除非确定不再使用查询，否则应该启用。\n任何用于引导 Haiku 的卷必须启用查询支持。
+Enable query support	BFS_Initialize_Parameter		启用查询支持
+Name:	BFS_Initialize_Parameter		名称：

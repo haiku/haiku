@@ -1,0 +1,9 @@
+1	simplified_chinese	x-vnd.Haiku-IMAP	3892875357
+Apply	IMAPFolderConfig		应用
+Destination:	imap_config		目标位置：
+Failed to fetch available storage.	IMAPFolderConfig		获取可用存储失败
+Fetching IMAP folders, have patience...	IMAPFolderConfig		获取 IMAP 目录，请耐心等待...
+IMAP Folders	IMAPFolderConfig		IMAP 目录
+IMAP Folders	imap_config		IMAP 目录
+Subcribe / Unsuscribe IMAP folders, have patience...	IMAPFolderConfig		注册/注销 IMAP 目录，请耐心等待...
+status	IMAPFolderConfig		状态

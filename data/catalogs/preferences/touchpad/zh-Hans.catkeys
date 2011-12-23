@@ -1,0 +1,20 @@
+1	simplified_chinese	x-vnd.Haiku-Touchpad	607725922
+Acceleration	TouchpadPrefView		加速
+Cancel	TouchpadPrefView		取消
+Defaults	TouchpadPrefView		默认
+Fast	TouchpadPrefView		快速
+High	TouchpadPrefView		高
+Horizontal	TouchpadPrefView		横轴
+Horizontal scrolling	TouchpadPrefView		水平滚动
+OK	TouchpadPrefView		确定
+Off	TouchpadPrefView		关闭
+Please confirm	TouchpadPrefView		请确认
+Revert	TouchpadPrefView		恢复
+Scrolling	TouchpadPrefView		滚动
+Sensitivity	TouchpadPrefView		敏感度
+Slow	TouchpadPrefView		慢速
+Tapping	TouchpadPrefView		轻敲
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		新的滚动区域太大，可能影响鼠标操作。您确定要进行修改吗？
+Touchpad	System name		触摸板
+Two finger scrolling	TouchpadPrefView		双指滚动
+Vertical	TouchpadPrefView		纵轴

@@ -1,0 +1,48 @@
+1	simplified_chinese	x-vnd.Haiku-ProcessController	2887520383
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		版权所有 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+About ProcessController…	ProcessController		关于进程控制器…
+Cancel	ProcessController		取消
+Custom priority	ProcessController		自定义优先级
+Damned!	ProcessController		该死的！
+Debug this thread!	ProcessController		调试此线程！
+Debug thread	ProcessController		调试线程
+Display priority	ProcessController		显示优先级
+Do you really want to kill the team \"%s\"?	ProcessController		您确定要杀死该组 \"%s\"?
+Error saving file	ProcessController		保存文件错误
+Gone teams…	ProcessController		已退出的组...
+Idle priority	ProcessController		空闲优先级
+Info	ProcessController		信息
+Install in Deskbar	ProcessController		安装到桌面栏
+Kill this thread!	ProcessController		杀死该线程！
+Live in the Deskbar	ProcessController		停靠于桌面栏
+Low priority	ProcessController		低优先级
+Lowest active priority	ProcessController		最低激活优先级
+Memory usage	ProcessController		内存使用
+New Terminal	ProcessController		新建终端
+Normal priority	ProcessController		常规优先级
+OK	ProcessController		确定
+Ok!	ProcessController		确定！
+Please confirm	ProcessController		请确认
+ProcessController	System name		进程控制器
+ProcessController is already installed in Deskbar.	ProcessController		进程控制器已安装至桌面栏.
+Processor %d	ProcessController		处理器 %d
+Quit an application	ProcessController		退出程序
+Quit application	ProcessController		退出程序
+Real-time display priority	ProcessController		实时显示优先级
+Real-time priority	ProcessController		实时优先级
+Restart Deskbar	ProcessController		重启桌面栏
+Restart Tracker	ProcessController		重启 Tracker
+Run in window	ProcessController		在窗口中运行
+System resources & caches…	ProcessController		系统资源与缓存...
+That's no Fun!	ProcessController		不好玩的！
+This is the last active processor...\nYou can't turn it off!	ProcessController		这是最后的活动进程...\n您不能够将其关闭！
+This team is already gone…	ProcessController		该组已经结束...
+This thread is already gone…	ProcessController		该线程已经结束...
+Threads and CPU usage	ProcessController		线程和CPU使用
+Urgent display priority	ProcessController		紧急现实优先级
+Urgent priority	ProcessController		紧急优先级
+Usage: %s [-deskbar]\n	ProcessController		用法: %s [-deskbar]\n
+What do you want to do with the thread \"%s\"?	ProcessController		您希望如何处理该线程 \"%s\"?
+Yes, kill this team!	ProcessController		是的，杀死该组！
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		您可以在窗口中运行进程控制器或者将其安装到桌面栏。
+Your setting file could not be saved!\n(%s)	ProcessController		您的设置文件无法保存！\n（%s）

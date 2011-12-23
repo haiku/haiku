@@ -1,0 +1,32 @@
+1	simplified_chinese	x-vnd.Be-TSKB	1662766351
+Always on top	PreferencesWindow		置顶
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		应用程序
+Applications	PreferencesWindow		应用程序
+Auto-hide	PreferencesWindow		自动隐藏
+Auto-raise	PreferencesWindow		自动
+Change time…	TimeView		修改时间...
+Clock	PreferencesWindow		时钟
+Close all	WindowMenu		关闭所有
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		演示程序
+Deskbar	System name		桌面栏
+Deskbar preferences	PreferencesWindow		桌面栏首选项
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		桌面插件
+Edit menu…	PreferencesWindow		编辑菜单
+Expand new applications	PreferencesWindow		展开新程序
+Hide all	WindowMenu		隐藏所有
+Hide time	TimeView		隐藏时间
+Menu	PreferencesWindow		菜单
+No windows	WindowMenu		无窗口
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		系统设置
+Quit application	WindowMenu		退出程序
+Recent applications:	PreferencesWindow		最近程序：
+Recent documents:	PreferencesWindow		最近文档：
+Recent folders:	PreferencesWindow		最近文件夹：
+Show Time	Tray		显示时间
+Show all	WindowMenu		显示所有
+Show application expander	PreferencesWindow		显示程序扩展
+Show calendar…	TimeView		显示日历...
+Show seconds	PreferencesWindow		显示秒钟
+Sort running applications	PreferencesWindow		运行程序排序
+Tracker always first	PreferencesWindow		文件浏览器置顶
+Window	PreferencesWindow		窗口

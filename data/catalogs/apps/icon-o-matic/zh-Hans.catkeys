@@ -1,0 +1,200 @@
+1	simplified_chinese	x-vnd.haiku-icon_o_matic	2326864078
+<modify path>	Icon-O-Matic-PathCmd		<修改路径>
+<nothing to redo>	Icon-O-Matic-Menu-Edit		<无恢复内容>
+<nothing to undo>	Icon-O-Matic-Menu-Edit		<无撤销任务>
+<unavailable>	Icon-O-Matic-StyleTypes		<不可用>
+<unkown property>	Icon-O-Matic-PropertyNames		<未知属性>
+Add	Icon-O-Matic-PathsList		添加
+Add	Icon-O-Matic-StylesList		添加
+Add	Icon-O-Matic-TransformersList		添加
+Add Control Point	Icon-O-Matic-AddPointCmd		添加控制点
+Add Path	Icon-O-Matic-AddPathsCmd		添加路径
+Add Paths	Icon-O-Matic-AddPathsCmd		添加路径
+Add Shape	Icon-O-Matic-AddShapesCmd		添加模型
+Add Shapes	Icon-O-Matic-AddShapesCmd		添加模型
+Add Style	Icon-O-Matic-AddStylesCmd		添加样式
+Add Styles	Icon-O-Matic-AddStylesCmd		添加样式
+Add Transformer	Icon-O-Matic-AddTransformersCmd		添加转换
+Add Transformers	Icon-O-Matic-AddTransformersCmd		添加转换器
+Add circle	Icon-O-Matic-PathsList		添加圆形
+Add empty	Icon-O-Matic-ShapesList		添加空白
+Add rect	Icon-O-Matic-PathsList		添加矩形
+Add shape with path	Icon-O-Matic-Menu-Shape		添加模型（包含路径）
+Add shape with path & style	Icon-O-Matic-Menu-Shape		添加模型包含路径与样式
+Add shape with style	Icon-O-Matic-Menu-Shape		添加模型（包含样式）
+Add with path	Icon-O-Matic-ShapesList		添加路径
+Add with path & style	Icon-O-Matic-ShapesList		添加路径与样式
+Add with style	Icon-O-Matic-ShapesList		添加包含样式
+All	Icon-O-Matic-Properties		全部
+Append…	Icon-O-Matic-Menu-File		附加...
+Assign Path	Icon-O-Matic-AddPathsCmd		指定路径
+Assign Paths	Icon-O-Matic-AddPathsCmd		指定路径
+Assign Style	Icon-O-Matic-AssignStyleCmd		指定样式
+BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON 属性
+Bleep!	Exporter - Continue in error dialog		警告!
+Bummer	Cancel button - error alert		Bummer
+Cancel	Icon-O-Matic-ColorPicker		取消
+Cancel	Icon-O-Matic-Menu-Settings		取消
+Cancel	Icon-O-Matic-SVGExport		取消
+Caps	Icon-O-Matic-PropertyNames		大写
+Change Color	Icon-O-Matic-SetColorCmd		修改颜色
+Clean Up Path	Icon-O-Matic-CleanUpPathCmd		清理路径
+Clean up	Icon-O-Matic-PathsList		清理
+Click on a shape above	Empty transformers list - 1st line		点击上述模型
+Click on an object in	Empty property list - 1st line		点击对象
+Close	Icon-O-Matic-Menu-File		关闭
+Closed	Icon-O-Matic-PropertyNames		关闭
+Color	Icon-O-Matic-PropertyNames		颜色
+Color	Icon-O-Matic-StyleTypes		颜色
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		颜色(#%02x%02x%02x)
+Color (#%02x%02x%02x)	Style name after dropping a color		颜色(#%02x%02x%02x)
+Conic	Icon-O-Matic-StyleTypes		圆锥线
+Contour	Transformation		轮廓
+Copy	Icon-O-Matic-Properties		复制
+Detect Orient.	Icon-O-Matic-PropertyNames		删除格式
+Diamond	Icon-O-Matic-StyleTypes		菱形
+Discard	Icon-O-Matic-Menu-Settings		放弃
+Duplicate	Icon-O-Matic-PathsList		副本
+Duplicate	Icon-O-Matic-ShapesList		副本
+Duplicate	Icon-O-Matic-StylesList		副本
+Edit	Icon-O-Matic-Menus		编辑
+Edit Gradient	Icon-O-Matic-SetGradientCmd		编辑渐变
+Error: 	Icon-O-Matic-Exporter		错误：
+Error: 	Icon-O-Matic-Main		错误：
+Export	Icon-O-Matic-Menu-File		导出
+Export Icon	Dialog title		导出图标
+Export as…	Icon-O-Matic-Menu-File		导出为...
+Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		无法以 SVG 格式打开 '%s' 。\n\n错误：%s
+File	Icon-O-Matic-Menus		文件
+Flip	Icon-O-Matic-PathManipulator		翻转
+Flip Control Point	Icon-O-Matic-FlipPointsCmd		翻转控制点
+Flip Control Points	Icon-O-Matic-FlipPointsCmd		翻转控制点
+Format	Icon-O-Matic-SavePanel		格式
+Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		冻结模型
+Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		冻结模型
+Freeze transformation	Icon-O-Matic-ShapesList		冻结转换
+Gradient	Icon-O-Matic-StyleTypes		渐变
+Gradient type	Icon-O-Matic-StyleTypes		渐变类型
+HVIF Source Code	Icon-O-Matic-SavePanel		HVIF 源码
+Height	Icon-O-Matic-PropertyNames		高度
+Icon-O-Matic	System name		图标套件
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		数据加载时，图标套件 并未从 SVG 中解析所有数据。覆盖原文件，将不会再显示该信息。
+Insert Control Point	Icon-O-Matic-InsertPointCmd		插入控制点
+Invert selection	Icon-O-Matic-Properties		反向选择
+Joins	Icon-O-Matic-PropertyNames		连接
+Linear	Icon-O-Matic-StyleTypes		线性
+META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON 属性
+Max LOD	Icon-O-Matic-PropertyNames		最大层次细节
+Min LOD	Icon-O-Matic-PropertyNames		最小层次细节
+Miter Limit	Icon-O-Matic-PropertyNames		尖角限量
+Modify Control Point	Icon-O-Matic-ChangePointCmd		修改控制点
+Move	Icon-O-Matic-TransformationBoxStates		移动
+Move Path	Icon-O-Matic-MovePathsCmd		移动路径
+Move Paths	Icon-O-Matic-MovePathsCmd		移动路径
+Move Pivot	Icon-O-Matic-TransformationBoxStates		移动中心
+Move Shape	Icon-O-Matic-MoveShapesCommand		移动模型
+Move Shapes	Icon-O-Matic-MoveShapesCommand		移动模型
+Move Style	Icon-O-Matic-MoveStylesCmd		移动样式
+Move Styles	Icon-O-Matic-MoveStylesCmd		移动样式
+Move Transformer	Icon-O-Matic-MoveTransformersCmd		移动转换
+Move Transformers	Icon-O-Matic-MoveTransformersCmd		移动转换器
+Multi Paste Properties	Icon-O-Matic-Properties		批量粘贴属性
+Multi Set 	Multi Set (property name)		批量设置
+Multi paste	Icon-O-Matic-Properties		批量粘贴
+Name	Icon-O-Matic-PropertyNames		名称
+New	Icon-O-Matic-Menu-File		新建
+No	Icon-O-Matic-StyledTextImport		否
+None	Icon-O-Matic-Properties		无
+Nudge Control Point	Icon-O-Matic-NudgePointsCommand		微移控制点
+Nudge Control Points	Icon-O-Matic-NudgePointsCommand		微移控制点
+OK	Icon-O-Matic-ColorPicker		确定
+OK	Icon-O-Matic-SVGImport		确定
+Off	Icon-O-Matic-Menu-Settings		关闭
+Opacity	Icon-O-Matic-PropertyNames		透明度
+Opening the document failed!	Icon-O-Matic-Main		打开文档失败！
+Opening the icon failed!	Icon-O-Matic-Main		打开图标失败！
+Open…	Icon-O-Matic-Menu-File		打开...
+Options	Icon-O-Matic-Menus		选项
+Overwrite	Icon-O-Matic-SVGExport		覆盖
+PNG Set	Icon-O-Matic-SavePanel		PNG 设置
+Paste	Icon-O-Matic-Properties		粘贴
+Paste Properties	Icon-O-Matic-Properties		粘贴属性
+Path	Icon-O-Matic-Menus		路径
+Path	Icon-O-Matic-PropertyNames		路径
+Perspective	Icon-O-Matic-TransformersList		透视
+Perspective	Transformation		透视
+Pick a color	Icon-O-Matic-ColorPicker		选择颜色
+Properties	Icon-O-Matic-Menus		属性
+Quit	Icon-O-Matic-Menu-File		退出
+Radial	Icon-O-Matic-StyleTypes		射线
+Redo	Icon-O-Matic-Main		恢复
+Remove	Icon-O-Matic-PathManipulator		删除
+Remove	Icon-O-Matic-PathsList		删除
+Remove	Icon-O-Matic-ShapesList		删除
+Remove	Icon-O-Matic-StylesList		删除
+Remove Control Point	Icon-O-Matic-RemovePointsCmd		删除控制点
+Remove Control Points	Icon-O-Matic-RemovePointsCmd		删除控制点
+Remove Path	Icon-O-Matic-RemovePathsCmd		删除路径
+Remove Paths	Icon-O-Matic-RemovePathsCmd		删除路径
+Remove Shape	Icon-O-Matic-RemoveShapesCmd		删除模型
+Remove Shapes	Icon-O-Matic-RemoveShapesCmd		删除模型
+Remove Style	Icon-O-Matic-RemoveStylesCmd		删除样式
+Remove Styles	Icon-O-Matic-RemoveStylesCmd		删除样式
+Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		删除转换器
+Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		删除转换器
+Reset Transformation	Icon-O-Matic-ResetTransformationCmd		重置转换
+Reset Transformations	Icon-O-Matic-ResetTransformationCmd		重置转换
+Reset transformation	Icon-O-Matic-ShapesList		重设转换
+Reset transformation	Icon-O-Matic-StylesList		重置转换
+Reverse	Icon-O-Matic-PathsList		撤销
+Reverse Path	Icon-O-Matic-ReversePathCmd		反向路径
+Rotate	Icon-O-Matic-TransformationBoxStates		旋转
+Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		旋转路径索引
+Rotate indices backwards	Icon-O-Matic-PathsList		逆时针旋转
+Rotate indices forwards	Icon-O-Matic-PathsList		顺时针旋转
+Rotation	Icon-O-Matic-PropertyNames		旋转
+Rounding	Icon-O-Matic-PropertyNames		倒角
+Save	Icon-O-Matic-Menu-File		保存
+Save	Icon-O-Matic-Menu-Settings		保存
+Save Icon	Dialog title		保存图标
+Save as…	Icon-O-Matic-Menu-File		保存为...
+Save changes to current icon?	Icon-O-Matic-Menu-Settings		保存修改到当前图标？
+Saving your document failed!	Icon-O-Matic-Exporter		文档保存失败！
+Scale	Icon-O-Matic-TransformationBoxStates		比例
+Scale X	Icon-O-Matic-PropertyNames		比例 X
+Scale Y	Icon-O-Matic-PropertyNames		比例 Y
+Select	Icon-O-Matic-Properties		选择
+Select All	Icon-O-Matic-PathManipulator		全选
+Set 	Set (property name)		设置
+Settings…	Icon-O-Matic-SavePanel		设置...
+Shape	Icon-O-Matic-Menus		模型
+Shorten	Icon-O-Matic-PropertyNames		缩短
+Snap to grid	Icon-O-Matic-Menu-Settings		对齐网格
+Split	Icon-O-Matic-PathManipulator		分割
+Split Control Point	Icon-O-Matic-SplitPointsCmd		分割控制点
+Split Control Points	Icon-O-Matic-SplitPointsCmd		分割控制点
+Stroke	Transformation		描边
+Style	Icon-O-Matic-Menus		样式
+Style type	Icon-O-Matic-StyleTypes		样式类型
+Swatches	Icon-O-Matic-Menus		调色板
+The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		导入文件太长，是否确定？
+Transform	Icon-O-Matic-PathManipulator		转换
+Transformation	Icon-O-Matic-TransformationBoxStates		转换
+Transformation	Icon-O-Matic-TransformersList		转换
+Transformation	Transformation		转换
+Transformer	Icon-O-Matic-Menus		转换器
+Translation X	Icon-O-Matic-PropertyNames		平移 X
+Translation Y	Icon-O-Matic-PropertyNames		平移 Y
+Unassign Path	Icon-O-Matic-UnassignPathCmd		取消路径
+Undo	Icon-O-Matic-Main		撤销
+Untitled	Icon-O-Matic-Main		未命名
+Width	Icon-O-Matic-PropertyNames		宽度
+Yes	Icon-O-Matic-StyledTextImport		是
+any of the other lists to	Empty property list - 2nd line		任何其他列表为
+bad news	Icon-O-Matic-Exporter		坏消息
+bad news	Title of error alert		坏消息
+edit it's properties here.	Empty property list - 3rd line		编辑其属性
+load error	Icon-O-Matic-SVGImport		加载错误
+to attach transformers.	Empty transformers list - 2nd line		以附加转换器。
+too big	Icon-O-Matic-StyledTextImport		太大
+warning	Icon-O-Matic-SVGExport		警告

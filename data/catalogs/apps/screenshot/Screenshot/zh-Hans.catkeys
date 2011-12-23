@@ -1,0 +1,26 @@
+1	simplified_chinese	x-vnd.haiku-screenshot	1697748405
+Artwork folder	ScreenshotWindow		插图文件夹
+Cancel	ScreenshotWindow		取消
+Capture active window	ScreenshotWindow		捕捉活动窗口
+Choose folder	ScreenshotWindow		选择文件夹
+Choose folder...	ScreenshotWindow		选择文件夹...
+Copy to clipboard	ScreenshotWindow		复制到剪贴板
+Delay:	ScreenshotWindow		延迟：
+Desktop	ScreenshotWindow		桌面
+Home folder	ScreenshotWindow		主文件夹
+Include mouse pointer	ScreenshotWindow		包含鼠标指针
+Include window border	ScreenshotWindow		包含窗体边框
+Name:	ScreenshotWindow		名称：
+New screenshot	ScreenshotWindow		新建屏幕截图
+Please select	ScreenshotWindow		请选择
+Save	ScreenshotWindow		保存
+Save as:	ScreenshotWindow		保存为：
+Save in:	ScreenshotWindow		保存到：
+Screenshot	System name		屏幕截图
+Select	ScreenshotWindow		选择
+Settings…	ScreenshotWindow		设置...
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		该文件已经存在。\n您确定希望覆盖它吗？
+Translator Settings	ScreenshotWindow		转换器设置
+overwrite	ScreenshotWindow		覆盖
+screenshot	Screenshot	Base filename of screenshot files	屏幕截图
+seconds	ScreenshotWindow		秒

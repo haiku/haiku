@@ -1,0 +1,49 @@
+1	simplified_chinese	x-vnd.Be-PEPL	2993050801
+%name% picture	People		%name% 照片
+Address	People		地址
+Cancel	People		取消
+City	People		城市
+Close	People		关闭
+Company	People		公司
+Configure attributes	People		配置属性
+Contact information for a person.	Long mimetype description		联系方式。
+Contact name	People		联系人姓名
+Copy	People		复制
+Could not create %s.	People		无法创建 %s。
+Country	People		国家
+Cut	People		剪切
+Drop an image here,\nor use the contextual menu.	People		向这里拖动图像，\n或者使用上下文菜单。
+E-mail	People		电子邮箱
+Edit	People		编辑
+Error	People		错误
+Fax	People		传真
+File	People		文件
+Group	People		联系组
+Home phone	People		家庭电话
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		启用文件类型首选项配置 Person 属性失败。\n\n错误：
+Load image…	People		载入图像...
+Name	People		名字
+New person	People		新建联系人
+New person…	People		新建联系人...
+Nickname	People		昵称
+OK	People		确定
+Paste	People		粘贴
+People	System name		联系人
+Person	Short mimetype description		联系人
+Quit	People		退出
+Redo	People		重复
+Remove image	People		删除图像
+Revert	People		恢复
+Save	People		保存
+Save as…	People		保存为...
+Save changes before quitting?	People		退出前保存更改？
+Select all	People		全选
+Sorry	People		对不起
+State	People		州
+The file '%name%' could not be written.	People		文件 '%name%' 无法写入。
+URL	People		网址
+Undo	People		取消
+Unnamed person	People		未命名联系人
+Work phone	People		工作电话
+Zip	People		邮政编码
+none	Groups list		无

@@ -1,0 +1,52 @@
+1	simplified_chinese	x-vnd.Haiku-Shortcuts	621368175
+(Choose application with file requester)	ShortcutsWindow		（使用文件查询选取应用程序）
+*Beep	ShortcutsWindow		*提示音
+*InsertString \"Your Text Here\"	ShortcutsWindow		*插入字符串 \"在此处写入文本\"
+*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
+*MouseButton 1	ShortcutsWindow		*MouseButton 1
+*MouseDown	ShortcutsWindow		*MouseDown
+*MouseUp	ShortcutsWindow		*MouseUp
+*MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
+*MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 5o%
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \'*MoveMouseTo 100% 0\" \"*MouseButton 1\"
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage 应用程序/x-vnd.Be-TARK 'Tfnd'
+Add new shortcut	ShortcutsWindow		添加快捷键
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt 
+Append	ShortcutsWindow		添加
+Append KeySet…	ShortcutsWindow		添加按键设置...  
+Application	ShortcutsWindow		应用程序
+Beep	ShortcutsSpec		提示音
+Cancel	ShortcutsWindow		取消
+Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
+Don't save	ShortcutsWindow		不保存
+Error, NULL state description?\n	ShortcutsSpec		错误，无效状态描述？\n
+File	ShortcutsWindow		文件
+InsertString	ShortcutsSpec		插入字符串
+Key	ShortcutsWindow		按键
+LaunchHandler	ShortcutsSpec		启动处理
+MouseButton	ShortcutsSpec		MouseButton
+MouseDown	ShortcutsSpec		MouseDown
+MouseUp	ShortcutsSpec		MouseUp
+MoveMouse	ShortcutsSpec		鼠标移动
+MoveMouseTo	ShortcutsSpec		MoveMouseTo
+Multi	ShortcutsSpec		多
+OK	ShortcutsWindow		确定
+Oh no	ShortcutsWindow		Oh no
+Open	ShortcutsWindow		打开
+Open KeySet…	ShortcutsWindow		打开按键设置...  
+Quit	ShortcutsWindow		退出
+Really quit without saving your changes?	ShortcutsWindow		退出，不保存您的修改
+Remove selected shortcut	ShortcutsWindow		删除选定快捷键  
+Revert to saved	ShortcutsWindow		取消保存  
+Save	ShortcutsWindow		保存
+Save & apply	ShortcutsWindow		保存并应用
+Save KeySet as…	ShortcutsWindow		保存按键设置…
+Select	ShortcutsWindow		选择
+SendMessage	ShortcutsSpec		SendMessage
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift 
+Shortcuts	System name		快捷键
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		无法打开您的按键设置文件！
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		无法解析您的按键设置文件！
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		无法保存您的按键设置文件！
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		无法保存您的按键设置。
+Window	ShortcutsSpec	Name for modifier on keyboard	Window

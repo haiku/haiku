@@ -1,0 +1,22 @@
+1	simplified_chinese	x-vnd.Haiku-Keymap	1259868356
+(Current)	Keymap window		（当前）
+Acute trigger	Keymap window		触发尖重音符
+Circumflex trigger	Keymap window		触发音调符号
+Diaeresis trigger	Keymap window		触发分音符号
+File	Keymap window		文件
+Font	Keymap window		字体
+Grave trigger	Keymap window		触发雕刻字符
+Keymap	System name		键盘映射
+Layout	Keymap window		布局
+Open…	Keymap window		打开..
+Quit	Keymap window		退出
+Revert	Keymap window		取消
+Sample and clipboard:	Keymap window		示例和剪贴板：
+Save as…	Keymap window		保存为...
+Select dead keys	Keymap window		选择废键：
+Switch shortcut keys	Keymap window		切换快捷键
+Switch shortcut keys to Haiku mode	Keymap window		切换快捷键为Haiku模式
+Switch shortcut keys to Windows/Linux mode	Keymap window		切换快捷键为 Windows/Linux 模式
+System:	Keymap window		系统：
+Tilde trigger	Keymap window		触发颚化字符
+User:	Keymap window		用户：
