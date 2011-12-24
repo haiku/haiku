@@ -762,7 +762,9 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 		export HAIKU_IGNORE_USER_BUILD_CONFIG=1
 		export HAIKU_ADD_OPTIONAL_PACKAGES=$(OPTIONAL_PACKAGES)
 		export HAIKU_PRIMARY_GCC=$(HAIKU_GCC_VERSION[1])
-		$(JAM:E=jam) -q $(COMMAND_LINE) ;
+		# NOTE: depending on when InvokeSubJam is called, you may end up with
+		# 2 * n - 1 jobs in total.
+		$(JAM:E=jam) -q -j$(JAMJOBS) $(COMMAND_LINE) ;
 	}
 
 	local otherAlternativeSystemLibsZip
