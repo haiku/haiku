@@ -22,7 +22,7 @@
 
 
 const uint8 kInvalidRequest = 0xff;
-const char* const kVersion = "ver.0.9.1";
+const char* const kVersion = "ver.0.10.1";
 extern usb_module_info *gUSBModule;
 
 

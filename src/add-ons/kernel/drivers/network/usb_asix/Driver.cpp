@@ -35,33 +35,38 @@ mutex gDriverLock;
 // IMPORTANT: keep entries sorted by ids to let the
 // binary search lookup procedure work correctly !!!
 DeviceInfo gSupportedDevices[] = {
-	{ { { 0x0411, 0x003d } }, DeviceInfo::AX88172, "Melco LUA-U2-KTX" },
-	{ { { 0x04bb, 0x0930 } }, DeviceInfo::AX88178, "I/O Data ETG-US2" },
-	{ { { 0x04f1, 0x3008 } }, DeviceInfo::AX88172, "JVC MP-PRX1" },
-	{ { { 0x050d, 0x5055 } }, DeviceInfo::AX88178, "Belkin F5D5055" },
-	{ { { 0x0557, 0x2009 } }, DeviceInfo::AX88172, "ATEN UC-210T" },
-	{ { { 0x05ac, 0x1402 } }, DeviceInfo::AX88772, "Apple A1277" },
-	{ { { 0x077b, 0x2226 } }, DeviceInfo::AX88172, "LinkSys USB 2.0" },
-	{ { { 0x07aa, 0x0017 } }, DeviceInfo::AX88172, "Corega USB2TX" },
-	{ { { 0x07b8, 0x420a } }, DeviceInfo::AX88172, "ABOCOM UF200" },
-	{ { { 0x07d1, 0x3c05 } }, DeviceInfo::AX88772, "D-Link DUB-E100 rev.B1" },
-	{ { { 0x0846, 0x1040 } }, DeviceInfo::AX88172, "NetGear USB 2.0 Ethernet" },
-	{ { { 0x086e, 0x1920 } }, DeviceInfo::AX88172, "System TALKS SGC-X2UL" },
-	{ { { 0x08dd, 0x90ff } }, DeviceInfo::AX88172, "Billionton USB2AR" },
-	{ { { 0x0b95, 0x1720 } }, DeviceInfo::AX88172, "ASIX 88172 10/100" },
-	{ { { 0x0b95, 0x1780 } }, DeviceInfo::AX88178, "ASIX 88178 10/100/1000" },
-	{ { { 0x0b95, 0x7720 } }, DeviceInfo::AX88772, "ASIX 88772 10/100" },
-	{ { { 0x0df6, 0x061c } }, DeviceInfo::AX88178, "Sitecom LN-028" },
-	{ { { 0x1189, 0x0893 } }, DeviceInfo::AX88172, "Acer C&M EP-1427X-2" },
-	{ { { 0x13b1, 0x0018 } }, DeviceInfo::AX88772, "Linksys USB200M rev.2" },
-	{ { { 0x14ea, 0xab11 } }, DeviceInfo::AX88178, "Planex GU-1000T" },
-	{ { { 0x1557, 0x7720 } }, DeviceInfo::AX88772, "OQO 01+ Ethernet" },
-	{ { { 0x1631, 0x6200 } }, DeviceInfo::AX88172, "GoodWay USB2Ethernet" },
-	{ { { 0x1737, 0x0039 } }, DeviceInfo::AX88178, "LinkSys 1000" },
-	{ { { 0x2001, 0x1A00 } }, DeviceInfo::AX88172, "D-Link DUB-E100" },
-	{ { { 0x2001, 0x3c05 } }, DeviceInfo::AX88772, "D-Link DUB-E100 rev.B1" },
-	{ { { 0x6189, 0x182d } }, DeviceInfo::AX88172, "Sitecom LN-029" }
-}; 
+	{ { 0x0411, 0x003d }, DeviceInfo::AX88172, "Melco LUA-U2-KTX" },
+	{ { 0x0411, 0x006e }, DeviceInfo::AX88178, "Melco LUA3-U2-AGT" },
+	{ { 0x04bb, 0x0930 }, DeviceInfo::AX88178, "I/O Data ETG-US2" },
+	{ { 0x04f1, 0x3008 }, DeviceInfo::AX88172, "JVC MP-PRX1" },
+	{ { 0x050d, 0x5055 }, DeviceInfo::AX88178, "Belkin F5D5055" },
+	{ { 0x0557, 0x2009 }, DeviceInfo::AX88172, "ATEN UC-210T" },
+	{ { 0x05ac, 0x1402 }, DeviceInfo::AX88772, "Apple A1277" },
+	{ { 0x077b, 0x2226 }, DeviceInfo::AX88172, "LinkSys USB 2.0" },
+	{ { 0x0789, 0x0160 }, DeviceInfo::AX88178, "Logitec LAN-GTJ/U2A" },
+	{ { 0x07aa, 0x0017 }, DeviceInfo::AX88172, "Corega USB2TX" },
+	{ { 0x07b8, 0x420a }, DeviceInfo::AX88172, "ABOCOM UF200" },
+	{ { 0x07d1, 0x3c05 }, DeviceInfo::AX88772, "D-Link DUB-E100 rev.B1" },
+	{ { 0x0846, 0x1040 }, DeviceInfo::AX88172, "NetGear USB 2.0 Ethernet" },
+	{ { 0x086e, 0x1920 }, DeviceInfo::AX88172, "System TALKS SGC-X2UL" },
+	{ { 0x08dd, 0x90ff }, DeviceInfo::AX88172, "Billionton USB2AR" },
+	{ { 0x0b95, 0x1720 }, DeviceInfo::AX88172, "ASIX 88172 10/100" },
+	{ { 0x0b95, 0x1780 }, DeviceInfo::AX88178, "ASIX 88178 10/100/1000" },
+	{ { 0x0b95, 0x7720 }, DeviceInfo::AX88772, "ASIX 88772 10/100" },
+	{ { 0x0b95, 0x772a }, DeviceInfo::AX88772A, "AX88772A 10/100" },
+	{ { 0x0b95, 0x772b }, DeviceInfo::AX88772B, "AX88772B 10/100" },
+	{ { 0x0b95, 0x7e2b }, DeviceInfo::AX88772B, "AX88772B 10/100" },
+	{ { 0x0df6, 0x061c }, DeviceInfo::AX88178, "Sitecom LN-028" },
+	{ { 0x1189, 0x0893 }, DeviceInfo::AX88172, "Acer C&M EP-1427X-2" },
+	{ { 0x13b1, 0x0018 }, DeviceInfo::AX88772A, "Linksys USB200M rev.2" },
+	{ { 0x14ea, 0xab11 }, DeviceInfo::AX88178, "Planex GU-1000T" },
+	{ { 0x1557, 0x7720 }, DeviceInfo::AX88772, "OQO 01+ Ethernet" },
+	{ { 0x1631, 0x6200 }, DeviceInfo::AX88172, "GoodWay USB2Ethernet" },
+	{ { 0x1737, 0x0039 }, DeviceInfo::AX88178, "LinkSys 1000" },
+	{ { 0x2001, 0x1A00 }, DeviceInfo::AX88172, "D-Link DUB-E100" },
+	{ { 0x2001, 0x3c05 }, DeviceInfo::AX88772, "D-Link DUB-E100 rev.B1" },
+	{ { 0x6189, 0x182d }, DeviceInfo::AX88172, "Sitecom LN-029" }
+};
 
 
 ASIXDevice *
@@ -75,24 +80,26 @@ lookup_and_create_device(usb_device device)
 		return NULL;
 	}
 
-	TRACE("trying %#06x:%#06x.\n", 
+	TRACE("trying %#06x:%#06x.\n",
 			deviceDescriptor->vendor_id, deviceDescriptor->product_id);
-	
+
 	// use binary search to lookup device in table
-	DeviceInfo::Id id = { { deviceDescriptor->vendor_id, 
-							deviceDescriptor->product_id } };
+	uint32 id = deviceDescriptor->vendor_id << 16
+					| deviceDescriptor->product_id;
 	int left  = -1;
 	int right = _countof(gSupportedDevices);
 	while ((right - left) > 1) {
 		int i = (left + right) / 2;
-		((gSupportedDevices[i].Key() < id.fKey) ? left : right) = i;
+		((gSupportedDevices[i].Key() < id) ? left : right) = i;
 	}
 
-	if (gSupportedDevices[right].Key() == id.fKey) {
+	if (gSupportedDevices[right].Key() == id) {
 		switch (gSupportedDevices[right].fType) {
 			case DeviceInfo::AX88172:
 				return new AX88172Device(device, gSupportedDevices[right]);
 			case DeviceInfo::AX88772:
+			case DeviceInfo::AX88772A:
+			case DeviceInfo::AX88772B:
 				return new AX88772Device(device, gSupportedDevices[right]);
 			case DeviceInfo::AX88178:
 				return new AX88178Device(device, gSupportedDevices[right]);
@@ -101,6 +108,8 @@ lookup_and_create_device(usb_device device)
 						static_cast<int>(gSupportedDevices[right].fType));
 				break;
 		}
+	} else {
+		TRACE_ALWAYS("Search for %#x failed %d-%d.\n", id, left, right);
 	}
 
 	return NULL;
@@ -224,7 +233,7 @@ init_driver()
 	const size_t count = _countof(gSupportedDevices);
 	static usb_support_descriptor sDescriptors[count] = {{ 0 }};
 
-	for(size_t i = 0; i < count; i++) {
+	for (size_t i = 0; i < count; i++) {
 		sDescriptors[i].vendor  = gSupportedDevices[i].VendorId();
 		sDescriptors[i].product = gSupportedDevices[i].ProductId();
 	}

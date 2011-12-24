@@ -128,9 +128,13 @@ enum AX88772_SoftwareReset {
 
 // Software PHY Select Status
 enum AX88772_SoftwarePHYSelStatus {
-	SW_PHY_SEL_STATUS_EXT	= 0x00,
-	SW_PHY_SEL_STATUS_INT	= 0x01,
-	SW_PHY_SEL_STATUS_ASEL	= 0x02
+	SW_PHY_SEL_STATUS_EXT		= 0x00,
+	SW_PHY_SEL_STATUS_INT		= 0x01,
+	SW_PHY_SEL_STATUS_ASEL		= 0x02,
+	SW_PHY_SEL_STATUS_SS_MII	= 0x04,
+	SW_PHY_SEL_STATUS_SS_RVRS_MII	= 0x08,
+	SW_PHY_SEL_STATUS_SS_RVRS_GMII	= 0x0C,
+	SW_PHY_SEL_STATUS_SS_ENB	= 0x10
 };
 
 
@@ -153,6 +157,38 @@ enum AX88772_BBState {
 	LINK_STATE_MDINT	= 0x08
 };
 
+// EEPROM Map.
+enum AX88772B_EEPROM {
+	EEPROM_772B_NODE_ID	= 0x04
+};
+
+enum AX88772B_MFB {
+	AX88772B_MFB_2K = 0,
+	AX88772B_MFB_4K = 1,
+	AX88772B_MFB_6K = 2,
+	AX88772B_MFB_8K = 3,
+	AX88772B_MFB_16K = 4,
+	AX88772B_MFB_20K = 5,
+	AX88772B_MFB_24K = 6,
+	AX88772B_MFB_32K = 7,
+	AX88772B_MFB_Count = 8
+};
+
+struct _AX88772B_MFB {
+	size_t ByteCount;
+	size_t Threshold;
+	size_t Size;
+
+} AX88772B_MFBTable[AX88772B_MFB_Count] = {
+	{ 0x8000, 0x8001, 2048 },
+	{ 0x8100, 0x8147, 4096 },
+	{ 0x8200, 0x81EB, 6144 },
+	{ 0x8300, 0x83D7, 8192 },
+	{ 0x8400, 0x851E, 16384 },
+	{ 0x8500, 0x8666, 20480 },
+	{ 0x8600, 0x87AE, 24576 },
+	{ 0x8700, 0x8A3D, 32768 }
+};
 
 const uint16 maxFrameSize = 1536;
 
@@ -185,6 +221,35 @@ AX88772Device::InitDevice()
 
 
 status_t
+AX88772Device::ReadMACAddress(ether_address_t *address)
+{
+	if (fDeviceInfo.fType != DeviceInfo::AX88772B)
+		return ASIXDevice::ReadMACAddress(address);
+
+	// Auto-loaded default station address from internal ROM is
+	// 00:00:00:00:00:00 such that an explicit access to EEPROM
+	// is required to get real station address.
+	for (size_t i = 0; i < sizeof(ether_address_t) / 2; i++) {
+		size_t actual_length = 0;
+		uint16 addr = 0;
+		status_t result = gUSBModule->send_request(fDevice,
+								USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN,
+								READ_SROM, EEPROM_772B_NODE_ID + i, 0,
+								sizeof(addr), &addr, &actual_length);
+		if (result != B_OK) {
+			TRACE_ALWAYS("Error reading MAC[%d] address:%#010x\n", i, result);
+			return result;
+		}
+
+		address->ebyte[i * 2 + 0] = (uint8)addr;
+		address->ebyte[i * 2 + 1] = (uint8)(addr >> 8);
+	}
+
+	return B_OK;
+}
+
+
+status_t
 AX88772Device::SetupDevice(bool deviceReplugged)
 {
 	status_t result = ASIXDevice::SetupDevice(deviceReplugged);
@@ -194,10 +259,51 @@ AX88772Device::SetupDevice(bool deviceReplugged)
 
 	result = fMII.Init(fDevice);
 
+	switch (fDeviceInfo.fType) {
+		case DeviceInfo::AX88772A:
+			result = _SetupAX88772A();
+			break;
+		case DeviceInfo::AX88772B:
+			result = _SetupAX88772B();
+			break;
+		default:
+			result = _SetupAX88772();
+			break;
+	}
+
+	if (result != B_OK)
+		return result;
+
+	result = fMII.SetupPHY();
+	if (result != B_OK) {
+		return result;
+	}
+
+	size_t actualLength = 0;
+	result = gUSBModule->send_request(fDevice,
+						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
+						WRITE_MEDIUM_MODE,
+						MEDIUM_STATE_FD | MEDIUM_STATE_BIT2 |
+						MEDIUM_STATE_RFC| MEDIUM_STATE_TFC	|
+						MEDIUM_STATE_RE | MEDIUM_STATE_PS_100,
+						0, 0, 0, &actualLength);
+
+	if (result != B_OK) {
+		TRACE_ALWAYS("Error of setting medium mode: %#010x\n", result);
+	}
+
+	TRACE_RET(result);
+	return result;
+}
+
+
+status_t
+AX88772Device::_SetupAX88772()
+{
 	size_t actualLength = 0;
 	// enable GPIO2 - magic from FreeBSD's if_axe
 	uint16 GPIOs = GPIO_OO_2EN | GPIO_IO_2 | GPIO_RSE;
-	result = gUSBModule->send_request(fDevice,
+	status_t result = gUSBModule->send_request(fDevice,
 						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
 						WRITE_GPIOS, GPIOs, 0, 0, 0, &actualLength);
 
@@ -268,25 +374,124 @@ AX88772Device::SetupDevice(bool deviceReplugged)
 		return result;
 	}
 
-	result = fMII.SetupPHY();
+	return B_OK;
+}
+
+
+status_t
+AX88772Device::_WakeupPHY()
+{
+	// select PHY
+	bool useEmbeddedPHY = fMII.PHYID() == PHYIDEmbedded;
+	uint16 selectPHY = useEmbeddedPHY ?
+					SW_PHY_SEL_STATUS_INT : SW_PHY_SEL_STATUS_EXT;
+
+	selectPHY |= SW_PHY_SEL_STATUS_SS_MII | SW_PHY_SEL_STATUS_SS_ENB;
+
+	size_t actualLength = 0;
+	status_t result = gUSBModule->send_request(fDevice,
+						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
+						WRITE_PHY_SEL, selectPHY, 0, 0, 0, &actualLength);
+	snooze(31000);
+
+	TRACE("Selecting %s PHY[%#02x].\n",
+						useEmbeddedPHY ? "embedded" : "external", selectPHY);
+
 	if (result != B_OK) {
+		TRACE_ALWAYS("Error of selecting PHY:%#010x\n", result);
 		return result;
 	}
 
-	result = gUSBModule->send_request(fDevice,
-						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-						WRITE_MEDIUM_MODE,
-						MEDIUM_STATE_FD | MEDIUM_STATE_BIT2 |
-						MEDIUM_STATE_RFC| MEDIUM_STATE_TFC	|
-						MEDIUM_STATE_RE | MEDIUM_STATE_PS_100,
-						0, 0, 0, &actualLength);
+	struct SWReset {
+		uint16 		reset;
+		bigtime_t	delay;
+	} resetCommands[] = {
+		{ SW_RESET_IPRL | SW_RESET_IPPD, 250000 },
+		{ SW_RESET_IPRL, 1000000 },
+		{ SW_RESET_CLR, 31000 },
+		{ SW_RESET_IPRL, 31000 }
+	};
 
-	if (result != B_OK) {
-		TRACE_ALWAYS("Error of setting medium mode: %#010x\n", result);
+	for (size_t i = 0; i < _countof(resetCommands); i++) {
+		result = gUSBModule->send_request(fDevice,
+					USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
+					WRITE_SOFT_RESET, resetCommands[i].reset,
+					0, 0, 0, &actualLength);
+
+		snooze(resetCommands[i].delay);
+
+		if (result != B_OK) {
+			TRACE_ALWAYS("Error of SW reset command %d:[%#04x]: %#010x\n",
+										i, resetCommands[i].reset, result);
+			return result;
+		}
 	}
 
-	TRACE_RET(result);
-	return result;
+	return B_OK;
+}
+
+
+status_t
+AX88772Device::_SetupAX88772A()
+{
+	// Reload EEPROM
+	size_t actualLength = 0;
+	status_t result = gUSBModule->send_request(fDevice,
+						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
+						WRITE_GPIOS, GPIO_RSE, 0, 0, 0, &actualLength);
+
+	if (result != B_OK) {
+		TRACE_ALWAYS("Error of reloading EEPROM: %#010x\n", result);
+		return result;
+	}
+
+	result = _WakeupPHY();
+	if (result != B_OK)
+		return result;
+
+	result = WriteRXControlRegister(0);
+	if (result != B_OK) {
+		TRACE_ALWAYS("Error of writing %#04x RX Control:%#010x\n", 0, result);
+		return result;
+	}
+
+	fIPG[0] = 0x15;
+	fIPG[1] = 0x16;
+	fIPG[2] = 0x1A;
+
+	return B_OK;
+}
+
+
+status_t
+AX88772Device::_SetupAX88772B()
+{
+	// Reload EEPROM
+	size_t actualLength = 0;
+	status_t result = gUSBModule->send_request(fDevice,
+						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
+						WRITE_GPIOS, GPIO_RSE, 0, 0, 0, &actualLength);
+
+	if (result != B_OK) {
+		TRACE_ALWAYS("Error of reloading EEPROM: %#010x\n", result);
+		return result;
+	}
+
+	result = _WakeupPHY();
+	if (result != B_OK)
+		return result;
+
+	result = WriteRXControlRegister(0);
+	if (result != B_OK) {
+		TRACE_ALWAYS("Error of writing %#04x RX Control:%#010x\n", 0, result);
+		return result;
+	}
+
+	fIPG[0] = 0x15;
+	fIPG[1] = 0x16;
+	fIPG[2] = 0x1A;
+
+	return B_OK;
 }
 
 
@@ -306,6 +511,21 @@ AX88772Device::StartDevice()
 	if (actualLength != sizeof(fIPG)) {
 		TRACE_ALWAYS("Mismatch of written IPGs data. "
 				"%d bytes of %d written.\n", actualLength, sizeof(fIPG));
+
+	}
+	// AX88772B uses different maximum frame burst configuration.
+	if (fDeviceInfo.fType == DeviceInfo::AX88772B) {
+		result = gUSBModule->send_request(fDevice,
+						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
+						WRITE_RXCONTROL_CFG,
+						AX88772B_MFBTable[AX88772B_MFB_2K].ByteCount,
+						AX88772B_MFBTable[AX88772B_MFB_2K].Threshold,
+						0, 0, &actualLength);
+
+		if (result != B_OK) {
+			TRACE_ALWAYS("Error of writing frame burst:%#010x\n", result);
+			return result;
+		}
 	}
 
 	uint16 rxcontrol = RXCTL_START | RXCTL_BROADCAST;
