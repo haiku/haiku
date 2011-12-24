@@ -1,27 +1,27 @@
-1	simplified_chinese	x-vnd.Haiku-OpenGL	209187778
-Attributes stack size:	Capabilities		属性堆栈大小：
-Auxiliary buffer(s):	Capabilities		辅助指令缓冲器：
-Available	Extensions		可用
-Capabilities	Capabilities		兼容性
-Extensions	Extensions		扩展
-GLU version:	InfoView		GLU 版本：
-GLUT API version:	InfoView		GLUT API 版本：
-Information	InfoView		信息
+1	english	x-vnd.Haiku-OpenGL	209187778
 List stack size:	Capabilities		列出堆栈大小：
-Max. 2D texture size:	Capabilities		最大二维纹理面积：
-Max. 3D texture size:	Capabilities		最大3维文本面积
+Information	InfoView		信息
 Max. clipping planes:	Capabilities		最大片段片面
-Max. convolution:	Capabilities		最大变化
-Max. evaluators equation order:	Capabilities		最大评估方程次数
-Max. lights:	Capabilities		最大亮度
-Max. recommended index elements:	Capabilities		最大推荐索引单元
-Max. recommended vertex elements:	Capabilities		最大推荐顶部单元
 Max. texture units:	Capabilities		最大文字单位
-Model stack size:	Capabilities		模型堆栈大小：
+Renderer name:	InfoView		渲染器名称：
+Vendor name:	InfoView		设备供应商：
+Attributes stack size:	Capabilities		属性堆栈大小：
+OpenGL version:	InfoView		OpenGL 版本：
 Name stack size:	Capabilities		名称堆栈大小：
 OpenGL	System name		OpenGL
-OpenGL version:	InfoView		OpenGL 版本：
+Auxiliary buffer(s):	Capabilities		辅助指令缓冲器：
+Max. recommended vertex elements:	Capabilities		最大推荐顶部单元
+GLU version:	InfoView		GLU 版本：
+Model stack size:	Capabilities		模型堆栈大小：
 Projection stack size:	Capabilities		投影堆栈大小
-Renderer name:	InfoView		渲染器名称：
+Max. lights:	Capabilities		最大亮度
+Max. 2D texture size:	Capabilities		最大二维纹理面积：
+Max. convolution:	Capabilities		最大变化
+GLUT API version:	InfoView		GLUT API 版本：
 Texture stack size:	Capabilities		纹理堆栈大小
-Vendor name:	InfoView		设备供应商：
+Max. evaluators equation order:	Capabilities		最大评估方程次数
+Max. 3D texture size:	Capabilities		最大3维文本面积
+Capabilities	Capabilities		兼容性
+Max. recommended index elements:	Capabilities		最大推荐索引单元
+Available	Extensions		可用
+Extensions	Extensions		扩展

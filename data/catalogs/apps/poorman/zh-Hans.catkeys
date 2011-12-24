@@ -1,61 +1,60 @@
-1	simplified_chinese	x-vnd.Haiku.PoorMan	412131821
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		默认 web 目录创建于\"/boot/home/public_html。\"\n请确保该目录中存在名称为 \"index.html\" 的 HTML 文件 。
-About PoorMan…	PoorMan		关于 PoorMan...
+1	english	x-vnd.Haiku-PoorMan	995747556
+Website location	PoorMan		网址
+Error Server	PoorMan		服务器出错
+Settings…	PoorMan		设置...
+Create PoorMan log	PoorMan		创建 PoorMan 日志
+Shutting down.\n	PoorMan		关闭。\n
+Hits: %lu	PoorMan		访问： %lu
+Web folder:	PoorMan		Web 目录：
+Default	PoorMan		默认
+Save log console selection	PoorMan		保存日志控制台选择
+Run server	PoorMan		运行服务器
+PoorMan settings	PoorMan		PoorMan 设置
+Clear hit counter	PoorMan		清空访问统计
+Copy	PoorMan		复制
+Max. simultaneous connections:	PoorMan		最大同步连接：
+Start page:	PoorMan		起始页：
+done.\n	PoorMan		完成。\n
+Create	PoorMan		创建
+Shutting down.	PoorMan		关闭.
+Website options	PoorMan		网站选项
+File Name	PoorMan		文件名称
+Clear console log	PoorMan		清空控制台日志
 Advanced	PoorMan		高级
+OK	PoorMan		确定
+Status: Stopped	PoorMan		状态：停止
+Dir Created	PoorMan		创建目录
+Quit	PoorMan		退出
+Hits: 0	PoorMan		访问：0
+Save log console	PoorMan		保存日志控制台
+Edit	PoorMan		编辑
+Directory: (none)	PoorMan		目录：（无）
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		请选择j将要在网络上发布的目录。\n\n 您可以使用 PoorMan 在 home 目录中创建默认的  \"public_html\"。\n或者选择自定义的目录。
+Log To Console	PoorMan		控制台日志
+Status: Running	PoorMan		状态：运行
+connections	PoorMan		连接
+Controls	PoorMan		控制
+Send file listing if there's no start page	PoorMan		如果没有起始页，则发送文件列表。
+Error Dir	PoorMan		目录错误
+Select all	PoorMan		全选
+File	PoorMan		文件
+Save console selections as…	PoorMan		保存控制台选择为...
+File logging	PoorMan		文件记录
+Select web folder	PoorMan		选择 web 目录
+Logging view	PoorMan		日志视图
+Logging	PoorMan		登录
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		默认 web 目录创建于\"/boot/home/public_html。\"\n请确保该目录中存在名称为 \"index.html\" 的 HTML 文件 。
+Clear log file	PoorMan		清空日志文件
+Log file name:	PoorMan		日志文件名：
+Directory: 	PoorMan		目录：
+Log To File	PoorMan		文件日志
+Done	PoorMan		完成
+Create log file	PoorMan		创建日志文件
+Starting up... 	PoorMan		启动...
+Site	PoorMan		站点
 Cancel	PoorMan		取消
 Cannot start the server	PoorMan		无法启动服务器
-Clear console log	PoorMan		清空控制台日志
-Clear hit counter	PoorMan		清空访问统计
-Clear log file	PoorMan		清空日志文件
-Console Logging	PoorMan		控制台日志
-Controls	PoorMan		控制
-Copy	PoorMan		复制
-Create	PoorMan		创建
-Create PoorMan log	PoorMan		创建 PoorMan 日志
-Create log file	PoorMan		创建日志文件
-Default	PoorMan		默认
-Dir Created	PoorMan		创建目录
-Directory: 	PoorMan		目录：
-Directory: (none)	PoorMan		目录：（无）
-Done	PoorMan		完成
-Edit	PoorMan		编辑
-Error Dir	PoorMan		目录错误
-Error Server	PoorMan		服务器出错
-File	PoorMan		文件
-File Name	PoorMan		文件名称
-File logging	PoorMan		文件记录
-Hits: %lu	PoorMan		访问： %lu
-Hits: 0	PoorMan		访问：0
-Log To Console	PoorMan		控制台日志
-Log To File	PoorMan		文件日志
-Log file name:	PoorMan		日志文件名：
-Logging	PoorMan		登录
-Logging view	PoorMan		日志视图
-Max. simultaneous connections:	PoorMan		最大同步连接：
-OK	PoorMan		确定
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		请选择j将要在网络上发布的目录。\n\n 您可以使用 PoorMan 在 home 目录中创建默认的  \"public_html\"。\n或者选择自定义的目录。
-PoorMan	System name		PoorMan
-PoorMan settings	PoorMan		PoorMan 设置
-Quit	PoorMan		退出
-Run server	PoorMan		运行服务器
-Save console as…	PoorMan		保存控制台为...
-Save console selections as…	PoorMan		保存控制台选择为...
-Save log console	PoorMan		保存日志控制台
-Save log console selection	PoorMan		保存日志控制台选择
 Select	PoorMan		选择
-Select all	PoorMan		全选
-Select web folder	PoorMan		选择 web 目录
-Send file listing if there's no start page	PoorMan		如果没有起始页，则发送文件列表。
-Settings…	PoorMan		设置...
-Shutting down.	PoorMan		关闭.
-Shutting down.\n	PoorMan		关闭。\n
-Site	PoorMan		站点
-Start page:	PoorMan		起始页：
-Starting up... 	PoorMan		启动...
-Status: Running	PoorMan		状态：运行
-Status: Stopped	PoorMan		状态：停止
-Web folder:	PoorMan		Web 目录：
-Website location	PoorMan		网址
-Website options	PoorMan		网站选项
-connections	PoorMan		连接
-done.\n	PoorMan		完成。\n
+Save console as…	PoorMan		保存控制台为...
+PoorMan	System name		PoorMan
+Console Logging	PoorMan		控制台日志

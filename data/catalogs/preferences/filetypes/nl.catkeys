@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-FileTypes	1624004105
+1	dutch; flemish	x-vnd.Haiku-FileTypes	473999706
 Application types…	FileTypes Window		Toepassingstypes...
 Description:	Application Types Window		Beschrijving:
 Args only	Application Type Window		Alleen argumenten
@@ -45,19 +45,24 @@ FileTypes request	Preferred App Menu		BestandsTypen-verzoek
 Could not open file	FileType Window		Kon bestand niet openen
 Description:	FileTypes Window		Beschrijving:
 File	FileTypes Window		Bestand
+Name:	Application Types Window		Naam:
 Group name:	New File Type Window		Groepnaam:
 Preferred application	FileType Window		Voorkeurstoepassing
+Progress	Application Types Window		Voortgang
 File	Application Type Window		Bestand
 Version:	Application Type Window		Versie:
 Select…	FileTypes Window		Selecteer...
 FileTypes request	FileTypes		BestandsTypen-verzoek
 Open…	FileTypes Window		Open...
 Select…	FileType Window		Selecteer…
+Launch	Application Types Window		Uitvoeren
 Same as…	FileType Window	The same APPLICATION as ...	Zelfde als...
+Abort	Application Types Window		Afbreken
 FileTypes	FileTypes		BestandsTypen
 OK	FileTypes		Oké
 Extra attributes	FileTypes Window		Extra attributen
 Development	Application Type Window		Ontwikkeling
+Edit…	Application Types Window		Wijzigen...
 Icon	FileType Window		Icoon
 Final	Application Types Window		Laatste
 Development	Application Types Window		Ontwikkeling
@@ -69,6 +74,7 @@ Signature:	Application Type Window		Onderschrift:
 Quit, don't save	Application Type Window		Afsluiten zonder opslaan
 Add…	Application Type Window		Toevoegen…
 [Multiple files] file types	FileType Window		[Meerdere bestanden] Bestandstypen
+Information	Application Types Window		Informatie
 Gamma	Application Types Window		Gamma
 Quit	FileTypes Window		Sluiten
 Select preferred application	FileType Window		Selecteer voorkeurstoepassing
@@ -77,12 +83,15 @@ Golden master	Application Types Window		Golden master
 %s file type	FileType Window		%s bestandstype
 The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		De toepassing \"%s\" ondersteunt dit bestandstype niet.\nBent u zeker dat u het toch wilt instellen?
 Type:	Attribute Window		Type:
+Removing uninstalled application types	Application Types Window		Niet-geïnstalleerde applicatietypes worden verwijderd
 Done	Attribute Window		Klaar
 Set Preferred Application	Preferred App Menu		Voorkeurstoepassing instellen
 no icon	FileTypes Window		geen icoon
 Alpha	Application Types Window		Alfa
+Version	Application Types Window		Versie
 Background app	Application Type Window		Achtergrondtoepassing
 Add new group	New File Type Window		Nieuwe groep toevoegen
+Move down	FileTypes Window		Naar beneden verplaatsen
 Cancel	Application Type Window		Annuleren
 Settings	FileTypes Window		Instellingen
 New resource file…	FileTypes Window		Nieuw bronbestand...
@@ -94,14 +103,17 @@ Internal name:	FileTypes Window		Interne naam:
 Add	Attribute Window		Toevoegen
 Close	Application Type Window		Sluit
 File recognition	FileTypes Window		Bestandsherkenning
+Remove uninstalled	Application Types Window		Niet-geïnstalleerde verwijderen
 Center	Attribute Window	Attribute column alignment in Tracker	Centreren
 Golden master	Application Type Window		Golden master
 Could not open \"%s\":\n%s	FileTypes		Kon \"%s\":\n%s niet openen
 Alignment:	Attribute Window		Uitlijning:
 Left	Attribute Window	Attribute column alignment in Tracker	Links
 Cancel	Extension Window		Annuleren
+Path:	Application Types Window		Pad:
 Application flags	Application Type Window		Toepassingsvlaggen
 Cancel	Type List Window		Annuleren
+Move up	FileTypes Window		Naar boven verplaatsen
 Description	FileTypes Window		Beschrijving
 Save request	Application Type Window		Verzoek bewaren
 Beta	Application Type Window		Bèta
@@ -111,13 +123,16 @@ Attribute name:	Attribute Window		Atrribuutnaam:
 Extension	Extension Window		Extensie
 Add type	New File Type Window		Voeg een type toe
 Internal name:	Attribute Window		Interne naam:
+Show in Tracker…	Application Types Window		Toon in Tracker...
 Final	Application Type Window		Laatste
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Breedte:
 Display as:	Attribute Window	Tracker offers different display modes for attributes.	Toon als:
 This file type already exists	New File Type Window		Dit bestandstype bestaat al
 Same as…	FileTypes Window		Zelfde als...
 Exclusive launch	Application Type Window		Exclusieve lancering
+%ld Application type%s could be removed.	Application Types Window		%ld Applicatietype%s konden verwijderd worden.
 FileTypes	System name		BestandsTypen
+Application types	Application Types Window		Applicatietypes...
 Could not remove file type: %s\n	FileTypes Window		Kon bestandstype %s\n niet verwijderen.
 Signature:	Application Types Window		Onderschrift:
 Gamma	Application Type Window		Gamma

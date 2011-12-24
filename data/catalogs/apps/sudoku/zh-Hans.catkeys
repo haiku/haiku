@@ -1,34 +1,34 @@
-1	simplified_chinese	x-vnd.Haiku-Sudoku	2463385585
-Abort	ProgressWindow		关于
-Advanced	SudokuWindow		高级
-Blank	SudokuWindow		空白
-Copy	SudokuWindow		复制
-Could not open \"%s\":\n%s\n	SudokuWindow		无法打开 \"%s\"：\n%s\n 
-Could not set Sudoku:\n%s\n	SudokuWindow		无法设置数独：\n%s\n 
-Creating solvable field	SudokuGenerator		创建已完成区域
-Easy	SudokuWindow		容易
-Export as…	SudokuWindow		导出为...
-File	SudokuWindow		文件
-HTML	SudokuWindow		HTML
-Hard	SudokuWindow		困难
-Help	SudokuWindow		帮助
-Mark invalid values	SudokuWindow		标记无效线索
-Mark valid hints	SudokuWindow		标记有效线索
-New	SudokuWindow		新建
-OK	SudokuWindow		确定
-Open file…	SudokuWindow		打开文件...
-Progress monitor	ProgressWindow		进度管理
-Quit	SudokuWindow		退出
-Redo	SudokuWindow		重复
+1	english	x-vnd.Haiku-Sudoku	2463385585
 Restore snapshot	SudokuWindow		恢复快照
-Searching for removable values	SudokuGenerator		搜索可删值
-Snapshot current	SudokuWindow		当前快照
-Solve	SudokuWindow		解决
-Solve single field	SudokuWindow		保存单个区域
-Start again	SudokuWindow		重启
+Could not set Sudoku:\n%s\n	SudokuWindow		无法设置数独：\n%s\n 
+Export as…	SudokuWindow		导出为...
+OK	SudokuWindow		确定
+New	SudokuWindow		新建
+Abort	ProgressWindow		关于
 Sudoku	System name		数独
+Could not open \"%s\":\n%s\n	SudokuWindow		无法打开 \"%s\"：\n%s\n 
+Easy	SudokuWindow		容易
+Open file…	SudokuWindow		打开文件...
+Solve single field	SudokuWindow		保存单个区域
+Solve	SudokuWindow		解决
+Redo	SudokuWindow		重复
+File	SudokuWindow		文件
+Advanced	SudokuWindow		高级
+Start again	SudokuWindow		重启
+HTML	SudokuWindow		HTML
 Sudoku request	SudokuWindow		数独要求
+Copy	SudokuWindow		复制
+Mark valid hints	SudokuWindow		标记有效线索
 Sudoku solved - congratulations!\n	SudokuWindow		数独已完成 - 祝贺您取得成功！\n 
+Hard	SudokuWindow		困难
+Snapshot current	SudokuWindow		当前快照
 Text	SudokuWindow		文本
-Undo	SudokuWindow		撤销
+Creating solvable field	SudokuGenerator		创建已完成区域
 View	SudokuWindow		视图
+Progress monitor	ProgressWindow		进度管理
+Mark invalid values	SudokuWindow		标记无效线索
+Blank	SudokuWindow		空白
+Help	SudokuWindow		帮助
+Searching for removable values	SudokuGenerator		搜索可删值
+Undo	SudokuWindow		撤销
+Quit	SudokuWindow		退出

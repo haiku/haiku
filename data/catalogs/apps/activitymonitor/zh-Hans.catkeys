@@ -1,48 +1,48 @@
-1	simplified_chinese	x-vnd.Haiku-ActivityMonitor	3704566709
-%.1f KB/s	DataSource		%.1f KB/s
-%.1f MB	DataSource		%.1f MB
-%.1f faults/s	DataSource		%.1f faults/s
-%lld ms	SettingsWindow		%lld ms
-%lld sec.	SettingsWindow		%lld sec.
-ActivityMonitor	System name		系统监视器
-Add graph	ActivityWindow		添加图示
-Additional items	ActivityView		附加项
-Apps	DataSource		应用程序
-Block cache	DataSource		高速缓存
-Block cache memory	DataSource		高速缓存
-CPU	DataSource		CPU
-CPU usage	DataSource		CPU使用率
-CPU usage (combined)	DataSource		CPU 使用率（总和）
-Cache	DataSource		高速缓存
-Cached memory	DataSource		缓存内存
-File	ActivityWindow		文件
-Hide legend	ActivityView		隐藏说明
-MB	DataSource		MB
-Media nodes	DataSource		媒介节点
-Memory	DataSource		内存
-Network receive	DataSource		网络接收
-Network send	DataSource		网络发送
+1	english	x-vnd.Haiku-ActivityMonitor	3704566709
 P-faults	DataSource		页面错误
-Page faults	DataSource		页面错误
-Ports	DataSource		端口
-Quit	ActivityWindow		退出
-RX	DataSource	Shorter version for Receiving.	RX
-Raw clipboard	DataSource		原始剪贴板
+Media nodes	DataSource		媒介节点
+Threads	DataSource		线程
+MB	DataSource		MB
+Add graph	ActivityWindow		添加图示
+Teams	DataSource		团队
+Hide legend	ActivityView		隐藏说明
+Network send	DataSource		网络发送
+CPU usage (combined)	DataSource		CPU 使用率（总和）
+CPU	DataSource		CPU
+Used memory	DataSource		已用内存
+Cached memory	DataSource		缓存内存
+Apps	DataSource		应用程序
+Show legend	ActivityView		显示说明
+Text clipboard	DataSource		文本剪贴板
+Settings	ActivityWindow		设置
 Receiving	DataSource		接收
+Settings…	ActivityWindow		设置...
+Ports	DataSource		端口
+Page faults	DataSource		页面错误
+Sending	DataSource		发送
+Cache	DataSource		高速缓存
+%.1f faults/s	DataSource		%.1f faults/s
+Update time interval:	SettingsWindow		更新频率：
+TX	DataSource	Shorter version for Sending	TX
+Quit	ActivityWindow		退出
+Block cache memory	DataSource		高速缓存
 Remove graph	ActivityView		删除图示
+%.1f MB	DataSource		%.1f MB
+%lld sec.	SettingsWindow		%lld sec.
+%lld ms	SettingsWindow		%lld ms
+CPU usage	DataSource		CPU使用率
+Raw clipboard	DataSource		原始剪贴板
+Sems	DataSource		Sems
+ActivityMonitor	System name		系统监视器
 Running applications	DataSource		运行程序
 Semaphores	DataSource		信号量
-Sems	DataSource		Sems
-Sending	DataSource		发送
-Settings	ActivityWindow		设置
-Settings…	ActivityWindow		设置...
-Show legend	ActivityView		显示说明
-Swap	DataSource		Swap
+Block cache	DataSource		高速缓存
 Swap space	DataSource		交换空间
-TX	DataSource	Shorter version for Sending	TX
-Teams	DataSource		团队
-Text clipboard	DataSource		文本剪贴板
-Threads	DataSource		线程
-Update time interval:	SettingsWindow		更新频率：
-Used memory	DataSource		已用内存
+Swap	DataSource		Swap
+File	ActivityWindow		文件
 usage	DataSource		使用情况
+Additional items	ActivityView		附加项
+Network receive	DataSource		网络接收
+%.1f KB/s	DataSource		%.1f KB/s
+Memory	DataSource		内存
+RX	DataSource	Shorter version for Receiving.	RX

@@ -1,8 +1,9 @@
-1	dutch; flemish	x-vnd.Haiku-Locale	3534121428
+1	dutch; flemish	x-vnd.Haiku-Locale	1488345554
 Available languages	Locale Preflet Window		Beschikbare talen
 Negative:	TimeFormatSettings		Negatief:
 already chosen	LanguageListView		al gekozen
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Beschikbare talen werden niet gevonden. U kunt deze preflet niet gebruiken.
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Deskbar en Tracker moeten herstart worden om deze wijziging toe te passen. Wil je ze nu herstarten?
 Long format:	TimeFormatSettings		Lange notatie:
 Currency	TimeFormatSettings		Valuta
 Locale	System name		Lokaal
@@ -15,8 +16,11 @@ Locale	Locale Preflet Window		Lokaal
 Numbers	TimeFormatSettings		Nummers
 24 hour	TimeFormatSettings		24-uurs
 OK	Locale Preflet Window		Oké
+Restart	Locale Preflet Window		Herstarten
 Full format:	TimeFormatSettings		Volledig formaat:
 Defaults	Locale Preflet Window		Standaardwaarden
+Cancel	Locale Preflet Window		Annuleren
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Applicatie- en mapnamen vertalen in de Deskbar en Tracker.
 Revert	Locale Preflet Window		Herstellen
 Medium format:	TimeFormatSettings		Medium-formaat:
 12 hour	TimeFormatSettings		12-uurs
@@ -24,3 +28,4 @@ Time	TimeFormatSettings		Tijd
 Date	TimeFormatSettings		Datum
 Positive:	TimeFormatSettings		Positief:
 Locale	Locale Preflet		Locale
+Options	Locale Preflet Window		Opties

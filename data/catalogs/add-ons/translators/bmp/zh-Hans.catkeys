@@ -1,9 +1,9 @@
-1	simplified_chinese	x-vnd.Haiku-BMPTranslator	2497639570
-BMP Settings	BMPMain		BMP 设置
-BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	BMP 图像 （MS 格式，%d bits）
-BMP image (OS/2 format, %d bits)	BMPTranslator		BMP 图像 （OS/2 格式，%d bits）
-BMP image translator	BMPTranslator		BMP 图像转换器
-BMP image translator	BMPView		BMP 图像转换器
+1	english	x-vnd.Haiku-BMPTranslator	2497639570
 BMP images	BMPTranslator		BMP 图像
 BMPTranslator Settings	BMPTranslator		BMPTranslator 设置
+BMP image (OS/2 format, %d bits)	BMPTranslator		BMP 图像 （OS/2 格式，%d bits）
+BMP image translator	BMPView		BMP 图像转换器
+BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	BMP 图像 （MS 格式，%d bits）
+BMP Settings	BMPMain		BMP 设置
 Version %d.%d.%d, %s	BMPView		版本 %d.%d.%d, %s
+BMP image translator	BMPTranslator		BMP 图像转换器

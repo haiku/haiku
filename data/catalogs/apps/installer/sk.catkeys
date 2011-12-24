@@ -31,7 +31,7 @@ Write boot sector to '%s'	InstallerWindow		Zapísať zavádzací sektor na „%s
 2.1) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
 Collecting copy information.	InstallProgress		Zhromažďujú sa informácie o kopírovaní.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Zvoľte zdrojový disk z roletového menu. Potom kliknite na „Začať“.
-Quit Boot Manager and DriveSetup	InstallerWindow		Ukončiť Správcu zavádzania a DriveSetup
+Quit Boot Manager and DriveSetup	InstallerWindow		Ukončiť Správcu zavádzania a Nastavenie diskových oblastí
 Quit	InstallerWindow		Ukončiť
 Welcome to the Haiku Installer!\n\n	InstallerApp		Vitajte v Inštalátore Haiku!\n\n
 Boot sector successfully written.	InstallProgress		Zavádzací sektor úspešne zapísaný.
@@ -47,13 +47,13 @@ Finishing Installation.	InstallProgress		Dokončuje sa inštalácia.
 Restart	InstallerWindow		Reštartovať
 README	InstallerApp		README
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Cieľový disk nemusí mať dostatok miesta. Skúste zvoliť iný disk alebo zvoľte neinštalovať voliteľné položky.
-Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Prosím, zatvorte okná Správcu zavádzania a DriveSetup predtým, než zatvoríte okno Inštalátora.
+Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Prosím, zatvorte okná Správcu zavádzania a Nastavenie diskových oblastí predtým, než zatvoríte okno Inštalátora.
 Scanning for disks…	InstallerWindow		Zisťujú sa disky…
 2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Disk nie je možné pripojiť. Prosím, zvoľte iný disk.
 ?? of ??	InstallerWindow	Unknown progress	?? z ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Spustiť nástroj DriveSetup na rozdelenie\ndostupných pevných diskov a ďalších médií.\nOblasti je možné inicializovať Súborovým\nsystémom Be, ktorý je vyžadovaný pre\nzavádzaciu oblasť Haiku.
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Spustiť nástroj Nastavenie diskových oblastí na rozdelenie\ndostupných pevných diskov a ďalších médií.\nOblasti je možné inicializovať Súborovým\nsystémom Be, ktorý je vyžadovaný pre\nzavádzaciu oblasť Haiku.
 Show optional packages	InstallerWindow		Zobraziť voliteľné balíky
 No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Neboli nájdené žiadne oblasti vhodné na inštaláciu. Prosím, pripravte diskové oblasti a inicializujte aspoň jednu oblasť Súborovým systémom Be.
 Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		Naviac budete musieť upraviť ďalší súbor, aby sa zobrazilo zavádzacie menu:\n\n
@@ -69,10 +69,10 @@ Installer	System name		Inštalátor
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Nemôžete inštalovať obsah disku na rovnaký disk. Prosím, zvoľte iný disk.
 ???	InstallerWindow	Unknown currently copied item	???
 \"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		„n“ je číslo oblasti, ktoré pre GRUB 2 začína „1“.\n
-Quit DriveSetup	InstallerWindow		Ukončiť DriveSetup
+Quit DriveSetup	InstallerWindow		Ukončiť Nastavenie diskových oblastí
 \"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		„N“ je číslo pevného disku, začína „0“.\n
 Hide optional packages	InstallerWindow		Skryť voliteľné balíky
-Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Prosím, zatvorte okno DriveSetup pred zatvorením okna Inštalátora.
+Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Prosím, zatvorte okno Nastavenie diskových oblastí pred zatvorením okna Inštalátora.
 Restart system	InstallerWindow		Reštartovať systém
 OK	InstallerWindow		OK
 Set up partitions…	InstallerWindow		Nastaviť oblasti…
@@ -82,12 +82,12 @@ Install anyway	InstallProgress		Inštalovať napriek tomu
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Vyskytla sa chyba a inštalácia nebola dokončená:\n\nError:  %s
 \trootnoverify\t\t(hd0,6)\n	InstallerApp		\trootnoverify\t\t(hd0,6)\n
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Stlačením tlačidla „Začať“ spustíte inštaláciu z „%1s“ na „%2s“.
-Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Spúšťa sa DriveSetup…\n\nInštalácia bude pokračovať, keď zatvoríte DriveSetup.
+Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Spúšťa sa Nastavenie diskových oblastí…\n\nInštalácia bude pokračovať, keď zatvoríte Nastavenie diskových oblastí.
 Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Bavte sa a ďakujeme vám za vyskúšanie Haiku! Dúfame, že sa vám bude páčiť!
 OK	InstallProgress		OK
 Please choose target	InstallerWindow		Prosím, vyberte cieľ
 ???	InstallerWindow	Unknown partition name	???
-1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1)   Ak inštalujete Haiku na skutočný hardvér (nie v emulátore), odporúča sa, aby ste mali vopred pripravenú diskovú oblasť. Inštalátor a nástroj DriveSetup vám ponúknu inicializovať existujúce oblasti natívnym súborovým systémom Haiku, ale voľby na zmenu vlastného rozloženia oblastí neboli otestované na dostatočne rozličných konfiguráciách počítačov, preto neodporúčame ich používať.\n
+1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1)   Ak inštalujete Haiku na skutočný hardvér (nie v emulátore), odporúča sa, aby ste mali vopred pripravenú diskovú oblasť. Inštalátor a nástroj Nastavenie diskových oblastí vám ponúknu inicializovať existujúce oblasti natívnym súborovým systémom Haiku, ale voľby na zmenu vlastného rozloženia oblastí neboli otestované na dostatočne rozličných konfiguráciách počítačov, preto neodporúčame ich používať.\n
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2)   Inštalátor označí samotnú oblasť s Haiku ako zavádzaciu, ale nevykoná potrebné kroky na to, aby integroval Haiku do existujúceho menu zavádzača. Ak máte GRUB už nainštalovaný, môžete Haiku pridať do jeho menu. V závislosti na tom, ktorú verziu GRUB používate je postup odlišný.\n\n\n
 Begin	InstallerWindow		Začať
 Finally, you have to update the boot menu by entering:\n\n	InstallerApp		Nakoniec aktualizujte menu zavádzača zadaním:\n\n
@@ -95,7 +95,7 @@ If you have not created a partition yet, simply reboot, create the partition usi
 With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		V GRUB 2 má prvá logická oblasť vždy číslo „5“ bez ohľadu na počet primárnych oblastí.\n\n
 Write boot sector	InstallerWindow		Zapísať zavádzací sektor
 Cancel	InstallerWindow		Zrušiť
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, aplikáciu na konfiguráciu diskových oblastí, nebolo možné spustiť.
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Nastavenie diskových oblastí, aplikáciu na konfiguráciu diskových oblastí, nebolo možné spustiť.
 No optional packages available.	PackagesView		Nie sú dostupné žiadne voliteľné balíky.
 All hard disks start with \"hd\".\n	InstallerApp		Všetky pevné disky začínajú „hd“.\n
 Continue	InstallerApp		Pokračovať
@@ -106,7 +106,7 @@ Boot sector not written because of an internal error.	InstallProgress		Zavádzac
 Additional disk space required: %s	InstallerWindow		Je potrebných ešte %s miesta.
 NOTE: While the naming strategy for hard disks is still as described under 2.1) the naming scheme for partitions has changed.\n\n	InstallerApp		POZN.: Hoci stratégia pomenovania pevných diskov zostáva podľa popisu v 2.1), stratégia pomenovania doskových oblastí sa zmenila.\n\n
 Cancel	InstallProgress		Zrušiť
-Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Spúšťa sa Správca zavádzania a DriveSetup…\n\nInštalácia bude pokračovať, keď zatvoríte obe aplikácie.
+Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Spúšťa sa Správca zavádzania a Nastavenie diskových oblastí…\n\nInštalácia bude pokračovať, keď zatvoríte obe aplikácie.
 Try installing anyway	InstallProgress		Skúsiť inštalovať napriek tomu
 So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		Takže pod nadpisom, ktorý nesmiete upravovať, pridajte niečo podobné týmto riadkom:\n\n
 Are you sure you want to to stop the installation?	InstallerWindow		Ste si istý, že chcete zastaviť inštaláciu?

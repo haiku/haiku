@@ -1,22 +1,22 @@
-1	simplified_chinese	x-vnd.Haiku-FontDemo	1769653414
-Antialiased text	ControlView		抗锯齿文本：
-Bounding boxes	ControlView		边框
-Controls	FontDemo		控件
+1	english	x-vnd.Haiku-FontDemo	1769653414
+Outline:	ControlView		轮廓：
+Size: 50	ControlView		大小：50
+Stop cycling	ControlView		停止循环
+Shear: 90	ControlView		翻转：90
+Spacing: 0	ControlView		间距：0
+Haiku, Inc.	FontDemoView		Haiku, Inc.
+Rotation: %d	ControlView		旋转：%d
+Shear: %d	ControlView		翻转：%d
+Spacing: %d	ControlView		间距：%d
 Cycle fonts	ControlView		循环字体
-Drawing mode:	ControlView		绘制模式：
 Font:	ControlView		字体：
+Rotation: 0	ControlView		旋转：0
+Drawing mode:	ControlView		绘制模式：
 FontDemo	FontDemo		字体演示
 Haiku, Inc.	ControlView		Haiku, Inc.
-Haiku, Inc.	FontDemoView		Haiku, Inc.
-Outline:	ControlView		轮廓：
+Controls	FontDemo		控件
 Outline: %d	ControlView		轮廓：%d
-Rotation: %d	ControlView		旋转：%d
-Rotation: 0	ControlView		旋转：0
-Shear: %d	ControlView		翻转：%d
-Shear: 90	ControlView		翻转：90
-Size: %d	ControlView		大小：%d
-Size: 50	ControlView		大小：50
-Spacing: %d	ControlView		间距：%d
-Spacing: 0	ControlView		间距：0
-Stop cycling	ControlView		停止循环
 Text:	ControlView		文本：
+Antialiased text	ControlView		抗锯齿文本：
+Bounding boxes	ControlView		边框
+Size: %d	ControlView		大小：%d

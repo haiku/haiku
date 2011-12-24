@@ -1,24 +1,23 @@
-1	simplified_chinese	x-vnd.Haiku-DiskUsage	2324691237
-%a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
-%d file	Status View		%d 文件
-%d files	Status View		%d 文件
-9999.99 GB	Status View		9999.99 GB
-Created	Info Window		已创建
-DiskUsage	System name		磁盘查看器
-Free on %refName%	Scanner		空闲存在 %refName%
-Get Info	Pie View		获取信息
+1	english	x-vnd.Haiku-DiskUsage	3634416251
+Scanning %refName%	Scanner		扫描 %refName% 
+Size	Info Window		大小
+Rescan	Pie View		重新扫描
+Rescan	Volume View		重新扫描
+Outdated view	Pie View		过期视图
 Kind	Info Window		种类
+file unavailable	Pie View		文件不可用
+no supporting apps	Pie View		无可支持应用
+%d file	Status View		%d 文件
+Path	Info Window		路径
+Scan	Status View		扫描
+9999.99 GB	Status View		9999.99 GB
+file unavailable	Status View		文件不可用
+Get Info	Pie View		获取信息
+DiskUsage	System name		磁盘查看器
+%d files	Status View		%d 文件
+Created	Info Window		已创建
 Modified	Info Window		已修改
 Open	Pie View		打开
 Open With	Pie View		打开方式
-Outdated view	Pie View		过期视图
-Path	Info Window		路径
-Rescan	Pie View		重新扫描
-Rescan	Volume View		重新扫描
-Scan	Status View		扫描
-Scanning %refName%	Scanner		扫描 %refName% 
-Size	Info Window		大小
-file unavailable	Pie View		文件不可用
-file unavailable	Status View		文件不可用
-in %d files	Info Window		其中 %d 个文件
-no supporting apps	Pie View		无可支持应用
+%a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
+Free on %refName%	Scanner		空闲存在 %refName%

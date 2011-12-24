@@ -1,16 +1,16 @@
-1	simplified_chinese	x-vnd.Haiku-TIFFTranslator	292291870
+1	english	x-vnd.Haiku-TIFFTranslator	292291870
 LZW	TIFFView		LZW
-None	TIFFView		无
-RLE (Packbits)	TIFFView		RLE (Packbits)
-TIFF Image Translator	TIFFView		TIFF 图像转换器
-TIFF Library:	TIFFView		TIFF 库：
-TIFF Settings	TIFFMain		TIFF 设置
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header：无法设置目录\n
 TIFF image	TIFFTranslator		TIFF 图像
-TIFF image translator	TIFFTranslator		TIFF 图像转换器
+TIFF Library:	TIFFView		TIFF 库：
+TIFF Image Translator	TIFFView		TIFF 图像转换器
+None	TIFFView		无
 TIFF images	TIFFTranslator		TIFF 图像
 TIFFTranslator Settings	TIFFTranslator		TIFF 转换器设置
-Use Compression:	TIFFView		使用压缩：
-Version %d.%d.%d %s	TIFFView		版本 %d.%d.%d，%s
-ZIP (Deflate)	TIFFView		ZIP (Deflate)
-identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header：无法设置目录\n
+TIFF image translator	TIFFTranslator		TIFF 图像转换器
+RLE (Packbits)	TIFFView		RLE (Packbits)
+TIFF Settings	TIFFMain		TIFF 设置
 identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header：无效文档索引\n
+ZIP (Deflate)	TIFFView		ZIP (Deflate)
+Version %d.%d.%d %s	TIFFView		版本 %d.%d.%d，%s
+Use Compression:	TIFFView		使用压缩：

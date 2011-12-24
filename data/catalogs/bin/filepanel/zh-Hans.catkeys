@@ -1,20 +1,20 @@
-1	simplified_chinese	x-vnd.mmu_man.filepanel	1802971238
-%s not a valid option\n	FilePanelApp		%s 不是一个有效地选项。\n
-%s: UNIMPLEMENTED\n	FilePanelApp		%s：该选项还未实现\n
-%s: this option requires a parameter\n	FilePanelApp		%s：该选项需要一个参数\n
--1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\t允许选中单个文件\n
--a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\t该选项还未实现\n
--d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\t在该 <文件夹> 中打开\n
--f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\t该选项还未实现\n
--h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\t显示其用法\n
--k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n
--l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\t使用载入FilePanel（默认的）\n
--m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\t创建FilePanel模块\n
--n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\t设置默认保存名\n
--s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\t使用保存FilePanel\n
--t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\t设置FilePanel窗口标题\n
+1	english	x-vnd.mmu_man.filepanel	1802971238
 display a load/save file panel\n	FilePanelApp		显示载入/保存文件面板\n
 options:\n	FilePanelApp		选项：\n
-short\tlong\tdescription\n	FilePanelApp		短\t长\t描述\n
 usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		用法：%s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n
 usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		用法：%s [-h] [-d folder] [-l|-s] [-t ttl] [-1] [-m] [-a pattern] [-f pattern]\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\t在该 <文件夹> 中打开\n
+%s not a valid option\n	FilePanelApp		%s 不是一个有效地选项。\n
+short\tlong\tdescription\n	FilePanelApp		短\t长\t描述\n
+%s: this option requires a parameter\n	FilePanelApp		%s：该选项需要一个参数\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\t使用载入FilePanel（默认的）\n
+-f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\t该选项还未实现\n
+-s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\t使用保存FilePanel\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\t设置默认保存名\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\t创建FilePanel模块\n
+-h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\t显示其用法\n
+-a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\t该选项还未实现\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\t允许选中单个文件\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\t设置FilePanel窗口标题\n
+%s: UNIMPLEMENTED\n	FilePanelApp		%s：该选项还未实现\n

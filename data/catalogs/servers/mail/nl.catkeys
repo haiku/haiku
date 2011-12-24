@@ -1,0 +1,23 @@
+1	dutch; flemish	x-vnd.Be-POST	2300302075
+Fetching mail for %name	Notifier		Mail ophalen voor %name
+Check for mails only	DeskbarView		Alleen mails controleren
+Send pending mails	DeskbarView		Mails in wachtrij verzenden
+New Messages	MailDaemon		Nieuwe berichten
+<no accounts>	DeskbarView		<geen accounts>
+%num new messages	DeskbarView		%num nieuwe berichten
+Mail status	MailDaemon		Mailstatus
+Shutdown mail services	DeskbarView		Mailservices afsluiten
+%num new message	DeskbarView		%num nieuwe berichten
+Sending mail for %name	Notifier		Mail voor %name versturen
+Preferences…	DeskbarView		Voorkeuren...
+%num new messages.	MailDaemon		%num nieuwe berichten.
+%num new message.	MailDaemon		%num nieuw bericht.
+Create new message…	DeskbarView		Een nieuw bericht opstellen...
+%num new message for %name\n	MailDaemon		%num nieuwe berichten voor %name\n
+No new messages	MailDaemon		Geen nieuwe berichten
+Check for mail now	DeskbarView		Nu mail controleren
+No new messages	DeskbarView		Geen nieuwe berichten
+%num new messages for %name\n	MailDaemon		%num nieuwe berichten voor %name\n
+Mail daemon status log	MailDaemon		Statuslog van maildaemon
+No new messages.	MailDaemon		Geen nieuwe berichten.
+Mail status	Notifier		Mailstatus

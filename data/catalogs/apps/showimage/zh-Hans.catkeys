@@ -1,62 +1,62 @@
-1	simplified_chinese	x-vnd.Haiku-ShowImage	886873119
-%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS 秒
-Browse	Menus		浏览
-Cancel	ClosePrompt		取消
-Clear selection	Menus		清空选中
-Close	ClosePrompt		关闭
-Close	Menus		关闭
-Close document	ClosePrompt		关闭文档
-Copy	Menus		复制
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		无法打开图像！可能文件或者图像解码器不存在。
-DPI:	PrintOptionsWindow		像素:
-Edit	Menus		编辑
+1	english	x-vnd.Haiku-ShowImage	886873119
+Use as background…	Menus		设置为桌面背景…
 File	Menus		文件
-First page	Menus		第一页
-Fit image to page	PrintOptionsWindow		图像适合页面大小
-Fit to window	Menus		适合窗口
-Flip left to right	Menus		自左向右翻转
-Flip top to bottom	Menus		自上向下翻转
+Slide delay	Menus		幻灯片延迟
+Selection mode	Menus		选择模式
+Zoom in	Menus		放大
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		文档 '%s' 已经改变。是否关闭文档?
+Page setup…	Menus		页面启动...
+Print…	Menus		打印...
+OK	SaveToFile		确认
+Previous page	Menus		上一页
+View	Menus		视图
 Full screen	Menus		全屏
 Go to page	Menus		转到
-Height: 	PrintOptionsWindow		高度：
-High-quality zooming	Menus		优质缩放
-Image	Menus		图像
-Job setup	PrintOptionsWindow		安装
-Last page	Menus		最后一页
-Leave full screen	Menus		取消全屏
-Next file	Menus		下一个
-Next page	Menus		下一页
-OK	Alerts		确定
-OK	SaveToFile		确认
-Open…	Menus		打开...
-Original size	Menus		原始尺寸
-Page setup…	Menus		页面启动...
-Previous file	Menus		前一个文件
-Previous page	Menus		上一页
-Print options	PrintOptionsWindow		打印选项
-Print…	Menus		打印...
-Progress monitor	ProgressWindow		任务管理器
-Quit	Menus		退出
-Rating	Menus		评级
-Resize to (in 1/72 inches):	PrintOptionsWindow		缩放到(in 1/72 inches):
-Rotate clockwise	Menus		顺时针旋转
-Rotate counterclockwise	Menus		逆时针旋转
-Save as…	Menus		另存为...
-Select all	Menus		全选
-Selection mode	Menus		选择模式
-Show caption in full screen mode	Menus		全屏显示标题
-Show tool bar	Menus		显示工具栏
-ShowImage	System name		图像查看器
-Slide delay	Menus		幻灯片延迟
-Slide show	Menus		幻灯片
-Stretch to window	Menus		伸展到窗口
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		文档'%s' (page %d) 已经改变。是否关闭文档？
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		文档 '%s' 已经改变。是否关闭文档?
-The file '%s' could not be written.	SaveToFile		无法写文件'%s'
-Undo	Menus		撤销
-Use as background…	Menus		设置为桌面背景…
-View	Menus		视图
-Width:	PrintOptionsWindow		宽度：
-Zoom factor in %:	PrintOptionsWindow		缩放比例 %：
-Zoom in	Menus		放大
 Zoom out	Menus		缩小
+Quit	Menus		退出
+Rotate counterclockwise	Menus		逆时针旋转
+High-quality zooming	Menus		优质缩放
+Browse	Menus		浏览
+Edit	Menus		编辑
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		无法打开图像！可能文件或者图像解码器不存在。
+First page	Menus		第一页
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		文档'%s' (page %d) 已经改变。是否关闭文档？
+%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS 秒
+Leave full screen	Menus		取消全屏
+Close	Menus		关闭
+Close	ClosePrompt		关闭
+Undo	Menus		撤销
+Resize to (in 1/72 inches):	PrintOptionsWindow		缩放到(in 1/72 inches):
+Rating	Menus		评级
+Flip left to right	Menus		自左向右翻转
+Show caption in full screen mode	Menus		全屏显示标题
+DPI:	PrintOptionsWindow		像素:
+Open…	Menus		打开...
+Next file	Menus		下一个
+Clear selection	Menus		清空选中
+Close document	ClosePrompt		关闭文档
+Height: 	PrintOptionsWindow		高度：
+The file '%s' could not be written.	SaveToFile		无法写文件'%s'
+Cancel	ClosePrompt		取消
+Show tool bar	Menus		显示工具栏
+Fit to window	Menus		适合窗口
+Print options	PrintOptionsWindow		打印选项
+Copy	Menus		复制
+Progress monitor	ProgressWindow		任务管理器
+Last page	Menus		最后一页
+Stretch to window	Menus		伸展到窗口
+Previous file	Menus		前一个文件
+ShowImage	System name		图像查看器
+Slide show	Menus		幻灯片
+Fit image to page	PrintOptionsWindow		图像适合页面大小
+Flip top to bottom	Menus		自上向下翻转
+Select all	Menus		全选
+Zoom factor in %:	PrintOptionsWindow		缩放比例 %：
+Width:	PrintOptionsWindow		宽度：
+Image	Menus		图像
+OK	Alerts		确定
+Rotate clockwise	Menus		顺时针旋转
+Job setup	PrintOptionsWindow		安装
+Original size	Menus		原始尺寸
+Next page	Menus		下一页
+Save as…	Menus		另存为...

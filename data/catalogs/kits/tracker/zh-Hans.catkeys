@@ -1,434 +1,434 @@
-1	simplified_chinese	x-vnd.Haiku-libtracker	152904915
-%BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
-%Ld B	WidgetAttributeText		%Ld B
-%Ld bytes	WidgetAttributeText		%Ld 字节
-%capacity (%used used -- %free free)	InfoWindow		%capacity（已用 %used -- 空闲 %free）
-%name info	InfoWindow	InfoWindow Title	%name 信息
-%num items	CountView		%num 个项目
-(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed of %TotalSize, %BytesPerSecond/s)
-(%bytes bytes)	InfoWindow		（%bytes 字节）
-(Finish: %time)	StatusWindow		（完成：%time）
-1 item	CountView		1 个项目
-32 x 32	ContainerWindow		32 x 32
-32 x 32	DeskWindow		32 x 32
-40 x 40	ContainerWindow		40 x 40
-40 x 40	DeskWindow		40 x 40
-48 x 48	ContainerWindow		48 x 48
-48 x 48	DeskWindow		48 x 48
-64 x 64	ContainerWindow		64 x 64
-64 x 64	DeskWindow		64 x 64
-<No recent items>	FavoritesMenu		<无最近项目>
-Add	FindPanel		添加
-Add current folder	FilePanelPriv		添加当前目录
-Add printer…	ContainerWindow		添加打印机...
-Add-ons	ContainerWindow		附加组件
-Add-ons	DeskWindow		附加组件
-Add-ons	FilePanelPriv		附加组件
-Add-ons	VolumeWindow		附加组件
-All BeOS disks	AutoMounterSettings		所有 BeOS 磁盘
-All disks	AutoMounterSettings		所有磁盘
-All disks	FindPanel		所有磁盘
-All files and folders	FindPanel		所有文件及目录
-An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		一个条目名称 \"%name\"已经在这个文件夹中存在, 可能包括 \nitems 用同样的名称,你愿意用在该文件夹包中含由 %verb替代它吗?
-An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		该文件夹中已经存在命名为 \"%name\" 的项目，您希望将其替换为正在创建的符号链接吗？
-And	FindPanel		添加
-Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		您确定要删除选中项目？该操作将无法恢复。
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		您确定要移动或复制选择项到该文件夹？
-Ask before delete	SettingsView		删除之前询问
-At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		在 %func \nfind_directory()失败。\n原因：%error
-Attributes	ContainerWindow		属性
-Automatic disk mounting	AutoMounterSettings		磁盘自动挂载
-Cancel	ContainerWindow		取消
-Cancel	FSClipBoard		取消
-Cancel	FSUtils		取消
-Cancel	FilePanelPriv		取消
-Cancel	OpenWithWindow		取消
-Cancel	PoseView		取消
-Cancel	Tracker		取消
-Cancel	WidgetAttributeText		取消
-Cannot unmount the boot volume \"%name\".	FSUtils		无法卸载引导卷 \"%name\"。
-Capacity:	InfoWindow		容量：
-Clean up	ContainerWindow		清除
-Clean up	DeskWindow		清空
-Clean up	VolumeWindow		清空
-Clean up all	ContainerWindow		清空
-Close	ContainerWindow		关闭
-Close	QueryContainerWindow		关闭
-Close	VolumeWindow		关闭
-Close all	ContainerWindow		关闭所有
-Close all in workspace	ContainerWindow		在所有工作区关闭
-Copy	ContainerWindow		复制
-Copy	FilePanelPriv		复制
-Copy here	ContainerWindow		复制到此
-Copy layout	ContainerWindow		复制布局
-Copy more	ContainerWindow		更多复制
-Copy to	ContainerWindow		复制到
-Copying: 	StatusWindow		复制：
-Could not find an application to open \"%name\" (%error). 	FSUtils		未找到程序以打开 \"%name\"（%error）。
-Could not find application \"%appname\"	OpenWithWindow		未找到 \"%appname\" 程序。
-Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		无法打开 \"%document\"（缺失库：%library）。\n
-Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		无法打开 \"%document\"（缺失符号：%symbol）。\n
-Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		无法打开\"%document\"，\"%app\" 程序处于垃圾箱中。
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		无法使用 \"%app\" 应用程序打开 \"%document\"（%error)）。
-Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		无法使用 \"%app\" 程序打开 \"%document\"（缺失库：%library）。\n
-Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		无法使用 \"%app\" 程序打开 \"%document\"（缺失符号： %symbol）。\n
-Could not open \"%name\" (%error). 	FSUtils		无法打开 \"%name\"（%error）。
-Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		无法打开 \"%name\"。  该文件被错误标识为可执行文件。
-Could not update permissions of file \"%name\". %error	FSUtils		无法更新 \"%name\" 的文件权限。错误：%error
-Create %s clipping	PoseView		创建 %s 片段
-Create a Query	FindPanel		创建查询
-Create a Query template	FindPanel		创建查询模板
-Create link	ContainerWindow		创造链接
-Create link here	ContainerWindow		创建链接
-Create relative link	ContainerWindow		创建相对链接
-Create relative link here	ContainerWindow		创建相对链接
-Created	ContainerWindow		创建
-Created:	InfoWindow		创建：
-Creating links: 	StatusWindow		创建链接：
-Current folder	ContainerWindow		当前目录
-Cut	ContainerWindow		剪切
-Cut	FilePanelPriv		剪切
-Cut more	ContainerWindow		更多剪切
-Decrease size	ContainerWindow		缩小尺寸
-Decrease size	DeskWindow		缩小尺寸
-Default application	InfoWindow		默认程序
-Defaults	TrackerSettingsWindow		默认
-Delete	ContainerWindow		删除
-Delete	FSUtils		删除
-Delete	FilePanelPriv		删除
-Delete	PoseView		删除
-Deleting: 	StatusWindow		删除：
-Description:	InfoWindow		描述：
-Desktop	B_DESKTOP_DIRECTORY		桌面
-Desktop	Model		桌面
-Desktop	TrackerSettingsWindow		桌面
-Disk mount settings	AutoMounterSettings		磁盘挂载设置
-Disk mounting during boot	AutoMounterSettings		启动时挂载磁盘
-Disks	DirMenu		磁盘
-Disks	Model		磁盘
-Does not handle file	OpenWithWindow		不处理文件
-Don't automount	AutoMounterSettings		手动挂载
-Don't move files to Trash	SettingsView		无法移动文件到垃圾箱
-Done	AutoMounterSettings		完成
-Duplicate	ContainerWindow		副本
-Edit Query template	FindPanel		编辑查询模板
-Edit favorites…	FilePanelPriv		编辑收藏夹...
-Edit name	ContainerWindow		编辑名称
-Edit name	FilePanelPriv		编辑名称
-Edit name	InfoWindow		编辑名称
-Edit name	VolumeWindow		编辑名称
-Edit query	ContainerWindow		编辑查询
-Edit templates…	TemplatesMenu		编辑模版...
-Eject when unmounting	AutoMounterSettings		卸载并弹出
-Empty Trash	ContainerWindow		清空垃圾箱
-Empty Trash	InfoWindow		清空垃圾箱
-Empty folder	NavMenu		清空目录
-Empty folder	SlowContextPopup		清空目录
-Emptying Trash… 	StatusWindow		清空垃圾箱...
-Enable type-ahead filtering	SettingsView		启用输入提示过滤
-Error %error loading Add-On %name.	ContainerWindow		载入附加组件 %name 出错：%error 。
-Error calculating folder size.	InfoWindow		文件夹大小计算错误。
-Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		复制文件 \"%name\" 出错：\n\t%error\n\n是否继续？
-Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		复制目录 \"%name\" 出错：\n\t%error\n\n是否继续？
-Error creating link to \"%name\".	FSUtils		创建至 \"%name\" 的链接出错。
-Error deleting items	FSUtils		删除项目错误
-Error emptying Trash!	FSUtils		清空垃圾箱出错!
-Error in regular expression:\n\n'%errstring'	PoseView		正则表达式错误：\n\n'%errstring'
-Error moving \"%name\"	FSUtils		移动 \"%name\" 出错。
-Error moving \"%name\" to Trash. (%error)	FSUtils		移动 \"%name\" 到垃圾箱出错。（%error）
-Error moving \"%name\".	FSUtils		移动 \"%name\" 出错。
-Execute	FilePermissionsView		执行
-Favorites	FavoritesMenu		选择
-Favorites	FilePanelPriv		选择
-File	ContainerWindow		文件
-File	FilePanelPriv		文件
-Files cannot be moved or deleted from a read-only volume.	PoseView		无法从只读卷中移动或删除文件。
-Find	FSUtils		搜索
-Find	FindPanel		搜索
-Find…	ContainerWindow		搜索...
-Find…	VolumeWindow		搜索...
-Force identify	ContainerWindow		强制标识
-Formula %formula	FindPanel	FindResultTitle	表达式 %formula
-Free space color	SettingsView		空闲空间颜色
-Get info	ContainerWindow		获取信息
-Get info	FilePanelPriv		获取信息
-Get info	VolumeWindow		获取信息
-GiB	WidgetAttributeText		GiB
-Go to parent	FilePanelPriv		上级目录
-Group	FilePermissionsView		组
-Handles %type	OpenWithWindow		处理 %type
-Handles any %type	OpenWithWindow		处理所有 %type 类型
-Handles any file	OpenWithWindow		处理所有文件
-Icon view	ContainerWindow		图标视图
-Icon view	DeskWindow		图标视图
-Icon view	VolumeWindow		图标视图
-Identify	ContainerWindow		标识
-Identify	InfoWindow		标识
-Ignore case	SelectionWindow		忽略事件
-Include trash	FindPanel		包括垃圾箱
-Increase size	ContainerWindow		增加尺寸
-Increase size	DeskWindow		增大尺寸
-Invert	SelectionWindow		恢复
-Invert selection	ContainerWindow		反向选择
-Invert selection	FilePanelPriv		反向选择
-Invert selection	QueryContainerWindow		反向选择
-Invert selection	VolumeWindow		反向选择
-KiB	WidgetAttributeText		KiB
-Kind	ContainerWindow		种类
-Kind:	InfoWindow		种类:
-Link \"%name\" to:	InfoWindow	File dialog title for new sym link	链接 \"%name\" 到：
-Link to:	InfoWindow		链接到： 
-List folders first	SettingsView		首先列出目录
-List view	ContainerWindow		列表视图
-List view	VolumeWindow		列表视图
-Location	ContainerWindow		位置
-Location	OpenWithWindow		位置
-Location	QueryPoseView		位置
-Location:	InfoWindow		位置：
-Make active printer	ContainerWindow		创建活动打印机
-MiB	WidgetAttributeText		MiB
-Mini icon view	ContainerWindow		迷你视图
-Mini icon view	DeskWindow		迷你视图
-Mini icon view	VolumeWindow		迷你图标
-Modified	ContainerWindow		修改
-Modified	FindPanel		修改
-Modified	PoseView		修改
-Modified	QueryPoseView		修改
-Modified:	InfoWindow		修改：
-Mount	ContainerWindow		挂载
-Mount	DeskWindow		挂载
-Mount	VolumeWindow		装载
-Mount all	MountMenu		挂载所有
-Mount all disks now	AutoMounterSettings		挂载所有磁盘
-Mount server error	AutoMounterSettings		挂载服务错误
-Mount settings…	SettingsView		挂载设置...
-Mount settings…	VolumeWindow		挂载设置...
-Move	PoseView		移动
-Move here	ContainerWindow		移动到此
-Move to	ContainerWindow		移动到
-Move to Trash	ContainerWindow		移动到垃圾箱
-Move to Trash	FSUtils		移动到垃圾箱
-Move to Trash	FilePanelPriv		移动到垃圾箱
-Moving: 	StatusWindow		移动：
-Name	ContainerWindow		名称
-Name	FindPanel		名称
-Name	OpenWithWindow		名称
-Name	PoseView		名称
-Name	QueryPoseView		名称
-Name	SelectionWindow		名称
-Name = %name	FindPanel	FindResultTitle	名称 = %name
-Name matches wildcard expression:###	SelectionWindow		名称匹配通配符表达式：###
-New	ContainerWindow		新建
-New	DeskWindow		新建
-New Query	FindPanel		新建查询
-New folder	ContainerWindow		新建文件夹
-New folder	FSUtils		新建文件
-New folder	FilePanelPriv		新建文件夹
-New folder	TemplatesMenu		新建目录
-New folder %ld	FSUtils		新建目录 %d
-New folder%ld	FSUtils		新建目录 %ld
-OK	AutoMounterSettings		确定
-OK	FSUtils		确定
-OK	InfoWindow		确定
-OK	OpenWithWindow		确定
-OK	PoseView		确定
-OK	TrackerInitialState		确定
+1	english	x-vnd.Haiku-libtracker	152904915
+common	B_COMMON_DIRECTORY		常用
 OK	WidgetAttributeText		确定
-On	FindPanel		在
-Only the boot disk	AutoMounterSettings		仅引导磁盘
-Open	ContainerWindow		打开
-Open	FilePanelPriv		打开
-Open	InfoWindow		打开
+Icon view	VolumeWindow		图标视图
+Add-ons	FilePanelPriv		附加组件
+Desktop	Model		桌面
+Identify	ContainerWindow		标识
+Warning space color	SettingsView		空白颜色警告
+Close	VolumeWindow		关闭
 Open	OpenWithWindow		打开
-Open	VolumeWindow		打开
-Open %name with:	OpenWithWindow		%name 打开方式：
-Open and make preferred	OpenWithWindow		打开并创建首选
-Open parent	ContainerWindow		上级目录
-Open selection with:	OpenWithWindow		打开选中：
-Open with…	ContainerWindow		打开方式...
-Opens with:	InfoWindow		打开方式：
-Or	FindPanel		或者
-Original name	ContainerWindow		原始名称
-Other	FilePermissionsView		其它
-Outline selection rectangle only	SettingsView		仅勾画方形选框
-Owner	FilePermissionsView		拥有者
-Paste	ContainerWindow		粘贴
-Paste	FilePanelPriv		粘贴
-Paste layout	ContainerWindow		粘贴布局
-Paste links	ContainerWindow		粘贴链接
-Paused: click to resume or stop	StatusWindow		暂停：点击继续或停止
-Permissions	ContainerWindow		权限
+Tracker status	StatusWindow		文件浏览器状态
+Eject when unmounting	AutoMounterSettings		卸载并弹出
+Window	ContainerWindow		窗口
+Decrease size	ContainerWindow		缩小尺寸
+Mini icon view	VolumeWindow		迷你图标
+You must have at least one attribute showing.	PoseView		您必须至少显示一个属性。
 Permissions	InfoWindow		权限
-Preferences…	ContainerWindow		首选项...
-Preferred for %type	OpenWithWindow		首选 %type
-Preferred for file	OpenWithWindow		文件首选
-Preparing to copy items…	StatusWindow		准备复制项目...
-Preparing to create links…	StatusWindow		准备创建链接...
-Preparing to delete items…	StatusWindow		准备删除项目...
-Preparing to empty Trash…	StatusWindow		准备清空垃圾箱...
-Preparing to move items…	StatusWindow		准备移动项目...
-Preparing to restore items…	StatusWindow		准备恢复项目...
-Previously mounted disks	AutoMounterSettings		先前载入磁盘
-Proceed	FSUtils		执行
-Prompt	FSUtils		提示
-Query name:	FindPanel		查询名称：
-Query template	FindPanel		查询模板
-Read	FilePermissionsView		读取
-Real name	ContainerWindow		真实名称
-Recalculate folder size	InfoWindow		重新计算目录大小
+Invert selection	VolumeWindow		反向选择
 Recent documents	FavoritesMenu		最近文本
-Recent folders	ContainerWindow		最近目录
-Recent folders	FavoritesMenu		最近目录
-Relation	OpenWithWindow		联系
-Remove	FindPanel		删除
-Replace	FSUtils		替换
+Modified	QueryPoseView		修改
+Created	ContainerWindow		创建
+contains	SelectionWindow		包含
+Sorry, you can't save things at the root of your system.	FilePanelPriv		对不起，您不能够在系统根目录保存内容。
+Show shared volumes on Desktop	SettingsView		在桌面显示共享卷。
+Paste links	ContainerWindow		粘贴链接
+Name	OpenWithWindow		名称
+Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		无法打开\"%document\"，\"%app\" 程序处于垃圾箱中。
+File	ContainerWindow		文件
+Handles any %type	OpenWithWindow		处理所有 %type 类型
+Delete	ContainerWindow		删除
+32 x 32	ContainerWindow		32 x 32
+Cannot unmount the boot volume \"%name\".	FSUtils		无法卸载引导卷 \"%name\"。
+Open with…	ContainerWindow		打开方式...
+Write	FilePermissionsView		编辑
+for %num files	InfoWindow		给 %num 文件 
+Modified	PoseView		修改
+Make active printer	ContainerWindow		创建活动打印机
+Create link here	ContainerWindow		创建链接
+Moving: 	StatusWindow		移动：
+before	FindPanel		之前
+On	FindPanel		在
+MiB	WidgetAttributeText		MiB
+greater than	FindPanel		大于
+Delete	PoseView		删除
+Select all	ContainerWindow		全选
+Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		对不起，'Character' 属性无法存储多字节字体。
+Clean up	DeskWindow		清空
+You cannot copy or move the root directory.	FSUtils		您无法复制或移动根目录。
+Invert selection	FilePanelPriv		反向选择
+save text	FilePanelPriv		保存文本
+Select all	FilePanelPriv		全选
+Link to:	InfoWindow		链接到： 
+Location	ContainerWindow		位置
+Location	QueryPoseView		位置
+config	B_USER_CONFIG_DIRECTORY		设置
+apps	B_APPS_DIRECTORY		应用
+Icon view	ContainerWindow		图标视图
+Size	QueryPoseView		大小
+Emptying Trash… 	StatusWindow		清空垃圾箱...
+Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		文件浏览器新模板
+Close all in workspace	ContainerWindow		在所有工作区关闭
+Empty Trash	ContainerWindow		清空垃圾箱
+Name = %name	FindPanel	FindResultTitle	名称 = %name
+Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		您确定要移动或复制选择项到该文件夹？
+Does not handle file	OpenWithWindow		不处理文件
+Mount server error	AutoMounterSettings		挂载服务错误
+Search	FindPanel		搜索
+Preparing to empty Trash…	StatusWindow		准备清空垃圾箱...
+Disks	Model		磁盘
+Create link	ContainerWindow		创造链接
+develop	B_COMMON_DEVELOP_DIRECTORY		开发
+Decrease size	DeskWindow		缩小尺寸
+Size	ContainerWindow		尺寸
+All disks	AutoMounterSettings		所有磁盘
+Would you like to find some other suitable application?	FSUtils		您希望使用其他可用应用程序吗？
+Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		无法使用 \"%app\" 程序打开 \"%document\"（缺失库：%library）。\n
+no items	CountView		无项目
+Ignore case	SelectionWindow		忽略事件
+is not	FindPanel		不是
+OK	AutoMounterSettings		确定
+Windows	TrackerSettingsWindow		窗口
+Tracker preferences	TrackerSettingsWindow		文件浏览器首选项
+Cut	FilePanelPriv		剪切
 Replace	FilePanelPriv		替换
-Replace all	FSUtils		替换所有
-Replace other file	WidgetAttributeText		替换其他文件
+Select all	VolumeWindow		全选
+Opens with:	InfoWindow		打开方式：
+Open	ContainerWindow		打开
+(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed of %TotalSize, %BytesPerSecond/s)
+Error calculating folder size.	InfoWindow		文件夹大小计算错误。
+New folder	FilePanelPriv		新建文件夹
+%name info	InfoWindow	InfoWindow Title	%name 信息
+Favorites	FavoritesMenu		选择
+Add-ons	VolumeWindow		附加组件
+Sorry, you can't copy items to the Trash.	PoseView		对不起，您无法复制项目至垃圾箱。
+List view	VolumeWindow		列表视图
+matches wildcard expression	SelectionWindow		匹配通配符表达式
+You cannot replace a folder or a symbolic link with a file.	FSUtils		您不能够使用文件夹或符号链接替代文件。
+Show space bars on volumes	SettingsView		显示卷进度栏
+Invert selection	ContainerWindow		反向选择
+Increase size	DeskWindow		增大尺寸
 Resize to fit	ContainerWindow		合适大小
+%Ld bytes	WidgetAttributeText		%Ld 字节
+Add printer…	ContainerWindow		添加打印机...
+Open	VolumeWindow		打开
+New folder	ContainerWindow		新建文件夹
+Kind	ContainerWindow		种类
+home	B_USER_DIRECTORY		主目录
+Select…	ContainerWindow		选择...
+Copy to	ContainerWindow		复制到
+Move to Trash	ContainerWindow		移动到垃圾箱
+Move to	ContainerWindow		移动到
+Create %s clipping	PoseView		创建 %s 片段
+Set new link target	InfoWindow		设置链接目标
+Save as Query template:	FindPanel		保存查询模板：
+preferences	B_PREFERENCES_DIRECTORY		系统设置
+Cancel	FSUtils		取消
+Edit name	ContainerWindow		编辑名称
+Show volumes on Desktop	SettingsView		在桌面显示卷
+KiB	WidgetAttributeText		KiB
+Error %error loading Add-On %name.	ContainerWindow		载入附加组件 %name 出错：%error 。
+Defaults	TrackerSettingsWindow		默认
+%num items	CountView		%num 个项目
+Mini icon view	ContainerWindow		迷你视图
+Clean up	VolumeWindow		清空
+OK	TrackerInitialState		确定
+Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		无法打开 \"%name\"。  该文件被错误标识为可执行文件。
+Add-ons	ContainerWindow		附加组件
+Edit templates…	TemplatesMenu		编辑模版...
+An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		该文件夹中已经存在命名为 \"%name\" 的项目，您希望将其替换为正在创建的符号链接吗？
+Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		对不起，目标卷中没有足够的空间以复制选取对象。
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		无法使用 \"%app\" 应用程序打开 \"%document\"（%error)）。
+Sorry, saving more than one item is not allowed.	FilePanelPriv		对不起，不允许保存多个项目。
+Searching for disks to mount…	StatusWindow		搜索挂载磁盘...
+New folder	FSUtils		新建文件
+Free space color	SettingsView		空闲空间颜色
+Cut	ContainerWindow		剪切
+Remove	FindPanel		删除
 Resize to fit	QueryContainerWindow		适合大小
+Desktop	TrackerSettingsWindow		桌面
+Sorry, you can't copy items to the Trash.	FSClipBoard		对不起，您不能够复制项目到垃圾箱。
+by attribute	FindPanel		属性
+Disk mounting during boot	AutoMounterSettings		启动时挂载磁盘
+New Query	FindPanel		新建查询
+Preparing to move items…	StatusWindow		准备移动项目...
+You cannot replace a file with a folder or a symbolic link.	FSUtils		您无法使用文件夹或符号链接替换文件。
+Unmount	InfoWindow		卸载
+no supporting apps	OpenWithWindow		无支持应用程序
+That name is already taken. Please type another one.	InfoWindow		该名称已使用，请输入其他名称。
+Sorry, you can't create links in the Trash.	PoseView		对不起，您无法在垃圾箱中创建链接。
+An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		一个条目名称 \"%name\"已经在这个文件夹中存在, 可能包括 \nitems 用同样的名称,你愿意用在该文件夹包中含由 %verb替代它吗?
+Link \"%name\" to:	InfoWindow	File dialog title for new sym link	链接 \"%name\" 到：
+Mount settings…	VolumeWindow		挂载设置...
+Select…	VolumeWindow		选择...
+All disks	FindPanel		所有磁盘
+Revert	TrackerSettingsWindow		恢复
+Invert selection	QueryContainerWindow		反向选择
+Execute	FilePermissionsView		执行
+Size	FindPanel		尺寸
+1 item	CountView		1 个项目
+Open parent	ContainerWindow		上级目录
+Location:	InfoWindow		位置：
+Edit favorites…	FilePanelPriv		编辑收藏夹...
+Create relative link	ContainerWindow		创建相对链接
+Copy	ContainerWindow		复制
+Size	PoseView		尺寸
+Location	OpenWithWindow		位置
+Force identify	ContainerWindow		强制标识
+Duplicate	ContainerWindow		副本
+New folder%ld	FSUtils		新建目录 %ld
+Outline selection rectangle only	SettingsView		仅勾画方形选框
+Select all	DeskWindow		全选
+OK	InfoWindow		确定
+Replace	FSUtils		替换
+You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		你正试图使用项目\n\t%name%src\n来替换\n\t%name%src\n\n您确定使用正在 %movemode 的项目来进行替换吗？
+Mini icon view	DeskWindow		迷你视图
+Error in regular expression:\n\n'%errstring'	PoseView		正则表达式错误：\n\n'%errstring'
+Mount all	MountMenu		挂载所有
+calculating…	InfoWindow		计算...
+Unmount	VolumeWindow		卸载
+Edit name	VolumeWindow		编辑名称
+Mount all disks now	AutoMounterSettings		挂载所有磁盘
+Untitled bitmap	PoseView		未命名位图
+of %items	StatusWindow		of %items
+Description:	InfoWindow		描述：
+New	DeskWindow		新建
+Open	InfoWindow		打开
+64 x 64	ContainerWindow		64 x 64
+Replace all	FSUtils		替换所有
+The application \"%appname\" does not support the type of document you are about to open. Are you sure you want to proceed? If you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		\"%appname\" 程序不支持即将打开的文档类型。您确定要继续吗？如果您知道，此文件支持该文档类型，您应该联系程序发行商，并要求他们更新程序以支持您的文档类型。
+Preparing to restore items…	StatusWindow		准备恢复项目...
+Replace other file	WidgetAttributeText		替换其他文件
+Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		某些选中项目无法移动到垃圾箱。您希望删除它们吗？（该操作将无法恢复。）
+You cannot create a link to the root directory.	FSUtils		您无法创建至根目录的链接。
+48 x 48	ContainerWindow		48 x 48
 Resize to fit	VolumeWindow		合适大小
+Could not find application \"%appname\"	OpenWithWindow		未找到 \"%appname\" 程序。
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		选中项目无法移动至垃圾箱。您希望删除它们吗？（该操作将无法恢复。）
+Invert	SelectionWindow		恢复
+Save Query as template…	FindPanel		保存查询为模板...
+Find	FindPanel		搜索
+Get info	ContainerWindow		获取信息
+Error creating link to \"%name\".	FSUtils		创建至 \"%name\" 的链接出错。
+Select	SelectionWindow		选择
+Or	FindPanel		或者
+The Tracker must be running to see set the default printer.	PoseView		Tracker 必须运行以查看/设置默认打印机。
+by formula	FindPanel		公式
+40 x 40	DeskWindow		40 x 40
+Name	PoseView		名称
+Group	FilePermissionsView		组
+Version:	InfoWindow		版本:
+Created:	InfoWindow		创建：
+\nShould this be fixed?	FSUtils		\n 是否应该进行修复？
+Copying: 	StatusWindow		复制：
+Capacity:	InfoWindow		容量：
+Delete	FilePanelPriv		删除
+Save	FindPanel		保存
+copy	FSUtils	filename copy	复制
+Temporary	FindPanel		暂时
+Version	OpenWithWindow		版本
+Default application	InfoWindow		默认程序
+Preparing to copy items…	StatusWindow		准备复制项目...
+Show folder location in title tab	SettingsView		在标签标题显示目录位置
+Proceed	FSUtils		执行
+Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		目录中已经存在与您将 %verb 的项目同名的内容。\n\n您希望将其替换为您正在 %verb 的项目并将其应用于所有内容吗？
+The mount server could not be contacted.	AutoMounterSettings		挂载服务失去联系。
+Error deleting items	FSUtils		删除项目错误
+Create relative link here	ContainerWindow		创建相对链接
+trash	B_TRASH_DIRECTORY		垃圾箱
+matches regular expression	SelectionWindow		匹配正则表达式
+Mount settings…	SettingsView		挂载设置...
+Edit name	InfoWindow		编辑名称
+Could not open \"%name\" (%error). 	FSUtils		无法打开 \"%name\"（%error）。
+Paste	ContainerWindow		粘贴
+optional	/boot/optional		可选
+Modified:	InfoWindow		修改：
+Error moving \"%name\".	FSUtils		移动 \"%name\" 出错。
+TiB	WidgetAttributeText		TiB
+40 x 40	ContainerWindow		40 x 40
+The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		指定目录中已经存在 \"%name\" 文件。您确定要将其替换吗？
+Cancel	ContainerWindow		取消
+Only the boot disk	AutoMounterSettings		仅引导磁盘
+Trash	TrackerSettingsWindow		垃圾箱
+Unmount	ContainerWindow		卸载
+Copy layout	ContainerWindow		复制布局
+label too long	PoseView		标签太长
+Cancel	Tracker		取消
+Sorry, you cannot edit that attribute.	WidgetAttributeText		对不起，您无法编辑该属性。
+Name	ContainerWindow		名称
+Disk mount settings	AutoMounterSettings		磁盘挂载设置
+48 x 48	DeskWindow		48 x 48
+OK	OpenWithWindow		确定
+Add current folder	FilePanelPriv		添加当前目录
+Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		无法使用 \"%app\" 程序打开 \"%document\"（缺失符号： %symbol）。\n
+The target disk does not support creating links.	FSUtils		目标磁盘不支持创建链接。
+starts with	SelectionWindow		启动方式
+Preparing to delete items…	StatusWindow		准备删除项目...
+Enable type-ahead filtering	SettingsView		启用输入提示过滤
+Would you like to find a suitable application to open the file?	FSUtils		您希望搜索可用程序以打开文件吗？
+There was an error writing the attribute.	WidgetAttributeText		该属性写入出错。
+Recalculate folder size	InfoWindow		重新计算目录大小
+Unknown	WidgetAttributeText		未知
+Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		无法打开 \"%document\"（缺失符号：%symbol）。\n
+by name	FindPanel		名称
+Creating links: 	StatusWindow		创建链接：
+Paused: click to resume or stop	StatusWindow		暂停：点击继续或停止
+Preferred for %type	OpenWithWindow		首选 %type
+GiB	WidgetAttributeText		GiB
+There was an error deleting \"%name\":\n\t%error	FSUtils		删除 \"%name\" 出错：\n\t%error
+Paste	FilePanelPriv		粘贴
+Copy more	ContainerWindow		更多复制
+OK	PoseView		确定
+Read	FilePermissionsView		读取
+Clean up all	ContainerWindow		清空
+New folder	TemplatesMenu		新建目录
+Move here	ContainerWindow		移动到此
+File	FilePanelPriv		文件
+Real name	ContainerWindow		真实名称
+Error moving \"%name\"	FSUtils		移动 \"%name\" 出错。
+You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		您必须放置项目到 \"Disks\" 窗口中的磁盘图标上。
+Cancel	WidgetAttributeText		取消
+Could not find an application to open \"%name\" (%error). 	FSUtils		未找到程序以打开 \"%name\"（%error）。
+Create a Query template	FindPanel		创建查询模板
+Previously mounted disks	AutoMounterSettings		先前载入磁盘
+%Ld B	WidgetAttributeText		%Ld B
+copying	FSUtils		复制中
+Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		复制目录 \"%name\" 出错：\n\t%error\n\n是否继续？
+Show Disks icon	SettingsView		显示磁盘图标
+Mount	VolumeWindow		装载
+Cancel	PoseView		取消
+\n\t(%Ld bytes, 	FSUtils		\n\t(%Ld 字节， 
+You can't move or copy items to read-only volumes.	FSUtils		您无法移动或复制项目到只读卷。
+Unknown	FilePermissionsView		未知
+All files and folders	FindPanel		所有文件及目录
+Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		无法打开 \"%document\"（缺失库：%library）。\n
+The Tracker must be running to see Info windows.	PoseView		文件浏览器必须运行以查看信息窗口
+Other	FilePermissionsView		其它
+Query name:	FindPanel		查询名称：
+Permissions	ContainerWindow		权限
+moving	FSUtils		移动中
+Identify	InfoWindow		标识
+Recent folders	ContainerWindow		最近目录
+Close all	ContainerWindow		关闭所有
+Include trash	FindPanel		包括垃圾箱
+Query template	FindPanel		查询模板
+Open %name with:	OpenWithWindow		%name 打开方式：
+Empty folder	NavMenu		清空目录
+Copy here	ContainerWindow		复制到此
+Move to Trash	FilePanelPriv		移动到垃圾箱
+Current folder	ContainerWindow		当前目录
+(Finish: %time)	StatusWindow		（完成：%time）
+The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		指定名称已经作为目录名使用。请选择其他命名。
+Clean up	ContainerWindow		清除
+after	FindPanel		之后
+Select…	QueryContainerWindow		选择...
+link	FSUtils	filename link	链接
+At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		在 %func \nfind_directory()失败。\n原因：%error
+The specified name is illegal. Please choose another name.	FilePanelPriv		指定名称非法。请选择其他命名。
+You can't move a folder into itself or any of its own sub-folders.	FSUtils		您无法移动目录到其本身及子目录。
+List view	ContainerWindow		列表视图
+Handles any file	OpenWithWindow		处理所有文件
+Get info	FilePanelPriv		获取信息
+32 x 32	DeskWindow		32 x 32
+Cancel	FilePanelPriv		取消
+Disks	DirMenu		磁盘
+New folder %ld	FSUtils		新建目录 %d
+All BeOS disks	AutoMounterSettings		所有 BeOS 磁盘
+Used space color	SettingsView		已用空间颜色
+Sorry, could not create a new folder.	FSUtils		对不起，无法新建目录。
+multiple disks	FindPanel		多轴磁盘
+Done	AutoMounterSettings		完成
+You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		您必须放置项目到 \"Disks\" 窗口中的磁盘图标。
+Untitled clipping	PoseView		未命名片段
+Don't automount	AutoMounterSettings		手动挂载
+Save	FilePanelPriv		保存
+To: %dir	StatusWindow		到：%dir
+Window	FilePanelPriv		窗口
+Find…	VolumeWindow		搜索...
+Edit name	FilePanelPriv		编辑名称
+Size:	InfoWindow		大小：
+Empty folder	SlowContextPopup		清空目录
+Open selection with:	OpenWithWindow		打开选中：
+(%bytes bytes)	InfoWindow		（%bytes 字节）
+Preparing to create links…	StatusWindow		准备创建链接...
+Show navigator	SettingsView		显示导航
+Desktop	B_DESKTOP_DIRECTORY		桌面
+List folders first	SettingsView		首先列出目录
+Get info	VolumeWindow		获取信息
+Name	SelectionWindow		名称
+Trash	Model		垃圾箱
+Favorites	FilePanelPriv		选择
+Name	QueryPoseView		名称
+Delete	FSUtils		删除
+Modified	FindPanel		修改
+Error moving \"%name\" to Trash. (%error)	FSUtils		移动 \"%name\" 到垃圾箱出错。（%error）
+You can't replace a folder with one of its sub-folders.	FSUtils		您无法替换目录为其子目录。
+<No recent items>	FavoritesMenu		<无最近项目>
+Preferences…	ContainerWindow		首选项...
+Move	PoseView		移动
+Open and make preferred	OpenWithWindow		打开并创建首选
+Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		您确定要删除选中项目？该操作将无法恢复。
+Add-ons	DeskWindow		附加组件
+Name	FindPanel		名称
+And	FindPanel		添加
+Select…	DeskWindow		选择...
+Copy	FilePanelPriv		复制
+Icon view	DeskWindow		图标视图
+Select all	QueryContainerWindow		全选
+Files cannot be moved or deleted from a read-only volume.	PoseView		无法从只读卷中移动或删除文件。
+There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		试图替换 \"%name\" 失败。该项目可能为空或者处于忙碌状态。
+You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		您无法将 Trash，home或者Desktop目录放置到垃圾箱。
+Owner	FilePermissionsView		拥有者
+There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		试图保存到指定目录失败。请尝试其他目录。
 Restore	ContainerWindow		恢复
 Restoring: 	StatusWindow		恢复中...
-Revert	TrackerSettingsWindow		恢复
-Save	FilePanelPriv		保存
-Save	FindPanel		保存
-Save Query as template…	FindPanel		保存查询为模板...
-Save as Query template:	FindPanel		保存查询模板：
-Search	FindPanel		搜索
-Searching for disks to mount…	StatusWindow		搜索挂载磁盘...
-Select	InfoWindow		选择
-Select	SelectionWindow		选择
-Select all	ContainerWindow		全选
-Select all	DeskWindow		全选
-Select all	FilePanelPriv		全选
-Select all	QueryContainerWindow		全选
-Select all	VolumeWindow		全选
-Select…	ContainerWindow		选择...
-Select…	DeskWindow		选择...
-Select…	FilePanelPriv		选择...
-Select…	QueryContainerWindow		选择...
-Select…	VolumeWindow		选择...
-Set new link target	InfoWindow		设置链接目标
-Settings…	MountMenu		设置...
-Show Disks icon	SettingsView		显示磁盘图标
-Show folder location in title tab	SettingsView		在标签标题显示目录位置
-Show navigator	SettingsView		显示导航
-Show shared volumes on Desktop	SettingsView		在桌面显示共享卷。
-Show space bars on volumes	SettingsView		显示卷进度栏
-Show volumes on Desktop	SettingsView		在桌面显示卷
-Single window navigation	SettingsView		单个窗口导航
-Size	ContainerWindow		尺寸
-Size	FindPanel		尺寸
-Size	PoseView		尺寸
-Size	QueryPoseView		大小
-Size:	InfoWindow		大小：
-Skip	FSUtils		跳过
-Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		目录中已经存在与您将 %verb 的项目同名的内容。\n\n您希望将其替换为您正在 %verb 的项目并将其应用于所有内容吗？
-Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		某些选中项目无法移动到垃圾箱。您希望删除它们吗？（该操作将无法恢复。）
-Sorry, could not create a new folder.	FSUtils		对不起，无法新建目录。
-Sorry, saving more than one item is not allowed.	FilePanelPriv		对不起，不允许保存多个项目。
-Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		对不起，'Character' 属性无法存储多字节字体。
-Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		对不起，目标卷中没有足够的空间以复制选取对象。
-Sorry, you can't copy items to the Trash.	FSClipBoard		对不起，您不能够复制项目到垃圾箱。
-Sorry, you can't copy items to the Trash.	PoseView		对不起，您无法复制项目至垃圾箱。
-Sorry, you can't create links in the Trash.	PoseView		对不起，您无法在垃圾箱中创建链接。
-Sorry, you can't save things at the root of your system.	FilePanelPriv		对不起，您不能够在系统根目录保存内容。
-Sorry, you cannot edit that attribute.	WidgetAttributeText		对不起，您无法编辑该属性。
-Temporary	FindPanel		暂时
-That name is already taken. Please type another one.	InfoWindow		该名称已使用，请输入其他名称。
-That name is already taken. Please type another one.	WidgetAttributeText		该名称已被使用。请重新命名。
-That name is too long. Please type another one.	InfoWindow		名称太长，请重新命名。
-The Tracker must be running to see Info windows.	PoseView		文件浏览器必须运行以查看信息窗口
-The Tracker must be running to see set the default printer.	PoseView		Tracker 必须运行以查看/设置默认打印机。
-The application \"%appname\" does not support the type of document you are about to open. Are you sure you want to proceed? If you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		\"%appname\" 程序不支持即将打开的文档类型。您确定要继续吗？如果您知道，此文件支持该文档类型，您应该联系程序发行商，并要求他们更新程序以支持您的文档类型。
-The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		指定目录中已经存在 \"%name\" 文件。您确定要将其替换吗？
-The mount server could not be contacted.	AutoMounterSettings		挂载服务失去联系。
-The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		选中项目无法移动至垃圾箱。您希望删除它们吗？（该操作将无法恢复。）
-The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		指定名称已经作为目录名使用。请选择其他命名。
-The specified name is illegal. Please choose another name.	FilePanelPriv		指定名称非法。请选择其他命名。
-The target disk does not support creating links.	FSUtils		目标磁盘不支持创建链接。
-There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		试图替换 \"%name\" 失败。该项目可能为空或者处于忙碌状态。
-There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		试图保存到指定目录失败。请尝试其他目录。
-There was an error deleting \"%name\":\n\t%error	FSUtils		删除 \"%name\" 出错：\n\t%error
-There was an error resolving the link.	Tracker		恢复链接出错。
-There was an error writing the attribute.	WidgetAttributeText		该属性写入出错。
-TiB	WidgetAttributeText		TiB
-To: %dir	StatusWindow		到：%dir
-Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		文件浏览器新模板
-Tracker preferences	TrackerSettingsWindow		文件浏览器首选项
-Tracker status	StatusWindow		文件浏览器状态
-Trash	Model		垃圾箱
-Trash	TrackerSettingsWindow		垃圾箱
-Unknown	FilePermissionsView		未知
-Unknown	WidgetAttributeText		未知
-Unmount	ContainerWindow		卸载
-Unmount	InfoWindow		卸载
-Unmount	VolumeWindow		卸载
-Untitled bitmap	PoseView		未命名位图
-Untitled clipping	PoseView		未命名片段
-Used space color	SettingsView		已用空间颜色
-Version	OpenWithWindow		版本
-Version:	InfoWindow		版本:
-Volume icons	TrackerSettingsWindow		卷图标
-Warning space color	SettingsView		空白颜色警告
-Window	ContainerWindow		窗口
-Window	FilePanelPriv		窗口
-Windows	TrackerSettingsWindow		窗口
-Would you like to find a suitable application to open the file?	FSUtils		您希望搜索可用程序以打开文件吗？
-Would you like to find some other suitable application?	FSUtils		您希望使用其他可用应用程序吗？
-Write	FilePermissionsView		编辑
-You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		你正试图使用项目\n\t%name%src\n来替换\n\t%name%src\n\n您确定使用正在 %movemode 的项目来进行替换吗？
-You can't move a folder into itself or any of its own sub-folders.	FSUtils		您无法移动目录到其本身及子目录。
-You can't move or copy items to read-only volumes.	FSUtils		您无法移动或复制项目到只读卷。
-You can't move or copy the trash.	FSUtils		您无法移动或复制垃圾箱。
-You can't replace a folder with one of its sub-folders.	FSUtils		您无法替换目录为其子目录。
-You cannot copy or move the root directory.	FSUtils		您无法复制或移动根目录。
-You cannot create a link to the root directory.	FSUtils		您无法创建至根目录的链接。
-You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		您无法将 Trash，home或者Desktop目录放置到垃圾箱。
-You cannot replace a file with a folder or a symbolic link.	FSUtils		您无法使用文件夹或符号链接替换文件。
-You cannot replace a folder or a symbolic link with a file.	FSUtils		您不能够使用文件夹或符号链接替代文件。
-You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		您必须放置项目到 \"Disks\" 窗口中的磁盘图标上。
-You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		您必须放置项目到 \"Disks\" 窗口中的磁盘图标。
-You must have at least one attribute showing.	PoseView		您必须至少显示一个属性。
-\nShould this be fixed?	FSUtils		\n 是否应该进行修复？
-\n\t(%Ld bytes, 	FSUtils		\n\t(%Ld 字节， 
-after	FindPanel		之后
-apps	B_APPS_DIRECTORY		应用
-before	FindPanel		之前
-by attribute	FindPanel		属性
-by formula	FindPanel		公式
-by name	FindPanel		名称
-calculating…	InfoWindow		计算...
-common	B_COMMON_DIRECTORY		常用
-config	B_USER_CONFIG_DIRECTORY		设置
-contains	FindPanel		包含
-contains	SelectionWindow		包含
-copy	FSUtils	filename copy	复制
-copying	FSUtils		复制中
-develop	B_COMMON_DEVELOP_DIRECTORY		开发
-ends with	FindPanel		结束方式
-ends with	SelectionWindow		结束方式
-for %num files	InfoWindow		给 %num 文件 
-greater than	FindPanel		大于
-home	B_USER_DIRECTORY		主目录
-is	FindPanel		是
-is not	FindPanel		不是
-label too long	PoseView		标签太长
-less than	FindPanel		少于
-link	FSUtils	filename link	链接
-matches regular expression	SelectionWindow		匹配正则表达式
-matches wildcard expression	SelectionWindow		匹配通配符表达式
-moving	FSUtils		移动中
-multiple disks	FindPanel		多轴磁盘
-no items	CountView		无项目
-no supporting apps	OpenWithWindow		无支持应用程序
-of %items	StatusWindow		of %items
-optional	/boot/optional		可选
-parent folder	NavMenu		上级目录
-preferences	B_PREFERENCES_DIRECTORY		系统设置
-save text	FilePanelPriv		保存文本
-starts with	FindPanel		启动方式：
-starts with	SelectionWindow		启动方式
 system	B_SYSTEM_DIRECTORY		系统
-trash	B_TRASH_DIRECTORY		垃圾箱
+Skip	FSUtils		跳过
+Settings…	MountMenu		设置...
+Error emptying Trash!	FSUtils		清空垃圾箱出错!
+Recent folders	FavoritesMenu		最近目录
+Close	ContainerWindow		关闭
+Preferred for file	OpenWithWindow		文件首选
+Go to parent	FilePanelPriv		上级目录
+Cancel	OpenWithWindow		取消
+That name is too long. Please type another one.	InfoWindow		名称太长，请重新命名。
+OK	FSUtils		确定
+Paste layout	ContainerWindow		粘贴布局
+Select	InfoWindow		选择
+Could not update permissions of file \"%name\". %error	FSUtils		无法更新 \"%name\" 的文件权限。错误：%error
+Select…	FilePanelPriv		选择...
+Don't move files to Trash	SettingsView		无法移动文件到垃圾箱
+There was an error resolving the link.	Tracker		恢复链接出错。
+%BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
+You can't move or copy the trash.	FSUtils		您无法移动或复制垃圾箱。
+ends with	SelectionWindow		结束方式
+Volume icons	TrackerSettingsWindow		卷图标
+That name is already taken. Please type another one.	WidgetAttributeText		该名称已被使用。请重新命名。
+Close	QueryContainerWindow		关闭
+Formula %formula	FindPanel	FindResultTitle	表达式 %formula
+Kind:	InfoWindow		种类:
+starts with	FindPanel		启动方式：
+Increase size	ContainerWindow		增加尺寸
+is	FindPanel		是
+Attributes	ContainerWindow		属性
+Handles %type	OpenWithWindow		处理 %type
+ends with	FindPanel		结束方式
+New	ContainerWindow		新建
+Name matches wildcard expression:###	SelectionWindow		名称匹配通配符表达式：###
+less than	FindPanel		少于
+64 x 64	DeskWindow		64 x 64
+Modified	ContainerWindow		修改
+Edit Query template	FindPanel		编辑查询模板
+Prompt	FSUtils		提示
+Edit query	ContainerWindow		编辑查询
+Find…	ContainerWindow		搜索...
+Create a Query	FindPanel		创建查询
+Move to Trash	FSUtils		移动到垃圾箱
+Automatic disk mounting	AutoMounterSettings		磁盘自动挂载
+Original name	ContainerWindow		原始名称
+Find	FSUtils		搜索
+Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		复制文件 \"%name\" 出错：\n\t%error\n\n是否继续？
+Ask before delete	SettingsView		删除之前询问
+Single window navigation	SettingsView		单个窗口导航
+parent folder	NavMenu		上级目录
+contains	FindPanel		包含
+Relation	OpenWithWindow		联系
+Open	FilePanelPriv		打开
+Mount	DeskWindow		挂载
+Mount	ContainerWindow		挂载
+%capacity (%used used -- %free free)	InfoWindow		%capacity（已用 %used -- 空闲 %free）
+Cancel	FSClipBoard		取消
+Cut more	ContainerWindow		更多剪切
+Deleting: 	StatusWindow		删除：
+Empty Trash	InfoWindow		清空垃圾箱
+Add	FindPanel		添加

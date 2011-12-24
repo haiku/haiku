@@ -1,0 +1,8 @@
+1	dutch; flemish	x-vnd.Haiku-notification_server	906000487
+Couldn't start filter monitor. Live filter changes disabled.	NotificationWindow		De filtermonitor kon niet gestart worden. Live filterwijzigingen werden uitgeschakeld.
+Couldn't start display settings monitor.\nLive filter changes disabled.	NotificationWindow		De scherminstellingenmonitor kon niet gestart worden.\nLive filterwijzigingen werden uitgeschakeld.
+Darn.	NotificationWindow		Verdomme.
+Warning	NotificationWindow		Waarschuwing
+OK	NotificationWindow		OK
+Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		De monitor voor algemene instellingen kon niet gestart worden.\nLive filterwijzigingen werden uitgeschakeld.
+Notification	NotificationWindow		Melding

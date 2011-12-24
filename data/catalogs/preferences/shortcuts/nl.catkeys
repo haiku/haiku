@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Shortcuts	2965605727
+1	dutch; flemish	x-vnd.Haiku-Shortcuts	621368175
 Error, NULL state description?\n	ShortcutsSpec		Fout, NULL-statusbeschrijving?\n
 MoveMouse	ShortcutsSpec		VerplaatsMuis
 OK	ShortcutsWindow		Oké
@@ -49,3 +49,4 @@ Select	ShortcutsWindow		Selecteren
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Sneltoetsen was niet in staat om uw toetsencombinatiebestand op te slaan!
 Oh no	ShortcutsWindow		Oh nee
 LaunchHandler	ShortcutsSpec		StartAfhandelaar
+Shortcuts	System name		Snelkoppelingen

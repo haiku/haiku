@@ -1,93 +1,93 @@
-1	simplified_chinese	x-vnd.Haiku.CodyCam	441085909
-Can't find an available connection to the video window	CodyCam		未发现用于视频窗口的可用连接。
-Cannot connect the video source to the video window	CodyCam		无法连接视频源至视频窗口
-Cannot create a video window	CodyCam		无法创建录像窗口
-Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		未发现视频源。您需要一个网络摄像头来使用CodyCam。
+1	english	x-vnd.Haiku-CodyCam	2416864674
+Capturing Image…	VideoConsumer.cpp		捕获图像…
+Every 30 seconds	CodyCam		间隔 30 秒
+File name:	CodyCam		文件名：
+Last Capture: 	VideoConsumer.cpp		最后捕获：
+Server login failed	VideoConsumer.cpp		登陆服务器失败
+Remote host has closed the connection.\n	FtpClient		远程主机已关闭连接。\n
+Login:	CodyCam		登陆：
+Format:	CodyCam		格式：
+Every 2 hours	CodyCam		间隔 2 小时
+Closing the window\n	VideoConsumer.cpp		关闭窗口\n
+login ID expected	CodyCam		预期登录 ID
+Rate:	CodyCam		比率：
+JPEG image	CodyCam		JPEG 图像
+Capture Rate Menu	CodyCam		捕获比率菜单
+File %s # unterminated quote at end of file\n	SettingsHandler		文件 %s #文件结尾存在无端接引用\n
+Password:	CodyCam		密码：
+Passive FTP	CodyCam		被动 FTP
+destination directory expected	CodyCam		预期目标目录
+password	CodyCam		密码
+Directory:	CodyCam		目录：
+Every minute	CodyCam		间隔 1 分钟
+read: %ld\n	SftpClient		读取：%ld\n
+Waiting…	CodyCam		等待...
+Logging in…	VideoConsumer.cpp		登陆中...
+Server:	CodyCam		服务器：
+server address expected	CodyCam		预期服务器地址
+Error creating output file	VideoConsumer.cpp		创建输出文件出错
+unrecognized upload client specified	CodyCam		指定上传客户端未识别
+File %s ; Line %ld # unterminated quote\n	SettingsHandler		文件 %s 中 %ld 行 #存在无端接引用\n
+Output	CodyCam		输出
+Every 15 minutes	CodyCam		间隔 15 分钟
 Cannot find an available video stream	CodyCam		未发现可用视频流
-Cannot find the media roster	CodyCam		未发现媒体名单
+Can't find an available connection to the video window	CodyCam		未发现用于视频窗口的可用连接。
+Transmitting…	VideoConsumer.cpp		传送中...
 Cannot get a time source	CodyCam		无法获取时间源
+Every 8 hours	CodyCam		间隔 8 小时
+Rename failed	VideoConsumer.cpp		重命名失败
+Cannot start time source!	CodyCam		无法启动时间源
 Cannot register the video window	CodyCam		无法注册视频窗口
-Cannot seek time source!	CodyCam		无法找到时间源！
+CodyCam	System name		摄像头
+Every 24 hours	CodyCam		间隔 24 小时
+unknown command	SettingsHandler		未知命令
+Video settings	CodyCam		视频设置
+Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		未发现视频源。您需要一个网络摄像头来使用CodyCam。
+still image filename expected	CodyCam		预期静态图像文件名
+invalid upload client %ld\n	VideoConsumer.cpp		上传客户端 %ld 无效\n
+Every 15 seconds	CodyCam		间隔 15 秒
+Error writing output file	VideoConsumer.cpp		输出文件写入出错
+image file format expected	CodyCam		预期图像格式
 Cannot set the time source for the video source	CodyCam		无法为视频源设置时间源
+Type:	CodyCam		类型：
 Cannot set the time source for the video window	CodyCam		无法为视频源设置时间源
+Stop video	CodyCam		停止视频
+Locking the window\n	VideoConsumer.cpp		锁定窗口\n
+File %s; Line %ld # %s	SettingsHandler		文件 %s; 行 %ld # %s
+Couldn't find requested directory on server	VideoConsumer.cpp		在服务器上未发现需求的目录
+Renaming…	VideoConsumer.cpp		无法注册录像窗口
+Local	CodyCam		本地
+Error setting type of output file	VideoConsumer.cpp		设置输出文件类型出错
+upload client name expected	CodyCam		预期的上传客户端
+SFTP	CodyCam		SFTP
+Connected…	VideoConsumer.cpp		连接中...
+PASS <suppressed>  (real password sent)\n	FtpClient		通过<禁止>（发送真实密码）\n
+Every 5 minutes	CodyCam		间隔 5 分钟
+read: %d\n	SftpClient		读取：%d\n
+OK	CodyCam		确定
+Capture controls	CodyCam		捕获控制
+Every hour	CodyCam		间隔 1 小时
+Cannot connect the video source to the video window	CodyCam		无法连接视频源至视频窗口
+capture rate expected	CodyCam		预期的捕获比率
+Error getting initial latency for the capture node	CodyCam		无法连接视频源至录像窗口
+Send to…	CodyCam		发送到...
+on or off expected	Settings	Do not translate 'on' and 'off'	预期的 on/off
+Quit	CodyCam		退出
+cmd: '%s'\n	FtpClient		命令：‘%s’\n
+Never	CodyCam		从不
+Cannot create a video window	CodyCam		无法创建录像窗口
+Every 10 minutes	CodyCam		间隔 10 分钟
 Cannot start the video source	CodyCam		无法启动视频源
 Cannot start the video window	CodyCam		无法启动录像窗口
-Cannot start time source!	CodyCam		无法启动时间源
-Capture Rate Menu	CodyCam		捕获比率菜单
-Capture controls	CodyCam		捕获控制
-Capturing Image…	VideoConsumer.cpp		捕获图像…
-Closing the window\n	VideoConsumer.cpp		关闭窗口\n
-CodyCam	System name		摄像头
-Connected…	VideoConsumer.cpp		连接中...
-Couldn't find requested directory on server	VideoConsumer.cpp		在服务器上未发现需求的目录
-Directory:	CodyCam		目录：
-Error creating output file	VideoConsumer.cpp		创建输出文件出错
-Error getting initial latency for the capture node	CodyCam		无法连接视频源至录像窗口
-Error setting type of output file	VideoConsumer.cpp		设置输出文件类型出错
-Error writing output file	VideoConsumer.cpp		输出文件写入出错
-Every 10 minutes	CodyCam		间隔 10 分钟
-Every 15 minutes	CodyCam		间隔 15 分钟
-Every 15 seconds	CodyCam		间隔 15 秒
-Every 2 hours	CodyCam		间隔 2 小时
-Every 24 hours	CodyCam		间隔 24 小时
-Every 30 minutes	CodyCam		间隔 30 分钟
-Every 30 seconds	CodyCam		间隔 30 秒
-Every 4 hours	CodyCam		间隔 4 小时
-Every 5 minutes	CodyCam		间隔 5 分钟
-Every 8 hours	CodyCam		间隔 8 小时
-Every hour	CodyCam		间隔 1 小时
-Every minute	CodyCam		间隔 1 分钟
-FTP	CodyCam		FTP
-File	CodyCam		文件
-File %s # unterminated quote at end of file\n	SettingsHandler		文件 %s #文件结尾存在无端接引用\n
-File %s ; Line %ld # unterminated quote\n	SettingsHandler		文件 %s 中 %ld 行 #存在无端接引用\n
-File %s; Line %ld # %s	SettingsHandler		文件 %s; 行 %ld # %s
-File name:	CodyCam		文件名：
-File transmission failed	VideoConsumer.cpp		文件传输失败
-Format:	CodyCam		格式：
-Image Format Menu	CodyCam		图像格式菜单
-JPEG image	CodyCam		JPEG 图像
-Last Capture: 	VideoConsumer.cpp		最后捕获：
-Local	CodyCam		本地
-Locking the window\n	VideoConsumer.cpp		锁定窗口\n
-Logging in…	VideoConsumer.cpp		登陆中...
-Login:	CodyCam		登陆：
-Never	CodyCam		从不
-OK	CodyCam		确定
-Output	CodyCam		输出
-PASS <suppressed>  (real password sent)\n	FtpClient		通过<禁止>（发送真实密码）\n
-Passive FTP	CodyCam		被动 FTP
-Password:	CodyCam		密码：
-Quit	CodyCam		退出
-Rate:	CodyCam		比率：
-Remote host has closed the connection.\n	FtpClient		远程主机已关闭连接。\n
-Rename failed	VideoConsumer.cpp		重命名失败
-Renaming…	VideoConsumer.cpp		无法注册录像窗口
-SFTP	CodyCam		SFTP
-Send to…	CodyCam		发送到...
-Server login failed	VideoConsumer.cpp		登陆服务器失败
-Server:	CodyCam		服务器：
-Start video	CodyCam		启动录像
-Stop video	CodyCam		停止视频
-Transmitting…	VideoConsumer.cpp		传送中...
-Type:	CodyCam		类型：
-Video settings	CodyCam		视频设置
-Waiting…	CodyCam		等待...
-capture rate expected	CodyCam		预期的捕获比率
-cmd: '%s'\n	FtpClient		命令：‘%s’\n
-destination directory expected	CodyCam		预期目标目录
-image file format expected	CodyCam		预期图像格式
-invalid upload client %ld\n	VideoConsumer.cpp		上传客户端 %ld 无效\n
-login ID expected	CodyCam		预期登录 ID
-on or off expected	Settings	Do not translate 'on' and 'off'	预期的 on/off
-password	CodyCam		密码
 password expected	CodyCam		预期密码
-read: %d\n	SftpClient		读取：%d\n
-read: %ld\n	SftpClient		读取：%ld\n
 reply: %d, %d\n	FtpClient		回复：%d，%d\n
+Cannot find the media roster	CodyCam		未发现媒体名单
+Every 4 hours	CodyCam		间隔 4 小时
+FTP	CodyCam		FTP
+File transmission failed	VideoConsumer.cpp		文件传输失败
+Cannot seek time source!	CodyCam		无法找到时间源！
+File	CodyCam		文件
+Image Format Menu	CodyCam		图像格式菜单
+Every 30 minutes	CodyCam		间隔 30 分钟
 reply: '%s'\n	SftpClient		回复：‘%s’\n
-server address expected	CodyCam		预期服务器地址
-still image filename expected	CodyCam		预期静态图像文件名
-unknown command	SettingsHandler		未知命令
-unrecognized upload client specified	CodyCam		指定上传客户端未识别
-upload client name expected	CodyCam		预期的上传客户端
+Start video	CodyCam		启动录像

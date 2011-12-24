@@ -1,8 +1,0 @@
-1	simplified_chinese	x-vnd.Haiku-notification_server	906000487
-Couldn't start display settings monitor.\nLive filter changes disabled.	NotificationWindow		无法启动显示设置管理器。\n实时过滤修改已禁用。
-Couldn't start filter monitor. Live filter changes disabled.	NotificationWindow		无法启动过滤管理器。实时过滤修改已禁用。
-Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		无法启动常用设置管理器。\n实时过滤修改已禁用。
-Darn.	NotificationWindow		Darn。
-Notification	NotificationWindow		通知
-OK	NotificationWindow		确定
-Warning	NotificationWindow		警告

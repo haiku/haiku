@@ -1,0 +1,4 @@
+1	dutch; flemish	x-vnd.Haiku-debug_server	1035915338
+OK	DebugServer		OK
+Debug	DebugServer		Debuggen
+The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		De applicatie:\n\n%app\n\nheeft een fout tegengekomen waardoor het niet verder kan worden uitgevoerd. Haiku zal de applicatie beëindigen en het geheugen vrijmaken.

@@ -1,23 +1,23 @@
-1	simplified_chinese	application/x-vnd.Haiku-Registrar	2599857937
-%action%?	ShutdownProcess		%action% ？
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		\"%appName%\" 应用取消了关闭进程。
-Asking \"%appName%\" to quit.	ShutdownProcess		正在退出 \"%appName%\"。
-Asking background applications to quit.	ShutdownProcess		正在退出后台应用。
-Asking other processes to quit.	ShutdownProcess		正在退出其他进程。
-Cancel	ShutdownProcess		取消
-Cancel shutdown	ShutdownProcess		取消关闭
-Do you really want to restart the system?	ShutdownProcess		您确定要重启系统吗？
-Do you really want to shut down the system?	ShutdownProcess		您确定要关闭系统吗？
-It's now safe to turn off the computer.	ShutdownProcess		现在可以安全关闭电脑。
-Kill application	ShutdownProcess		杀死应用
-OK	ShutdownProcess		确定
-Restart	ShutdownProcess		重启
+1	english	x-vnd.haiku-registrar	2599857937
 Restart system	ShutdownProcess		重启系统
-Restarting…	ShutdownProcess		重启...
-Shut down	ShutdownProcess		关闭
-Shutdown aborted	ShutdownProcess		关闭取消
-Shutdown status	ShutdownProcess		关闭状态
-Shutting down…	ShutdownProcess		关闭...
-System is shut down	ShutdownProcess		系统正在关闭
 The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		\"%appName%\" 应用可能陷入模式面板。
+OK	ShutdownProcess		确定
+System is shut down	ShutdownProcess		系统正在关闭
+It's now safe to turn off the computer.	ShutdownProcess		现在可以安全关闭电脑。
+Cancel	ShutdownProcess		取消
+Do you really want to shut down the system?	ShutdownProcess		您确定要关闭系统吗？
+Asking other processes to quit.	ShutdownProcess		正在退出其他进程。
+Asking \"%appName%\" to quit.	ShutdownProcess		正在退出 \"%appName%\"。
+%action%?	ShutdownProcess		%action% ？
+Shutdown aborted	ShutdownProcess		关闭取消
+Restarting…	ShutdownProcess		重启...
+Asking background applications to quit.	ShutdownProcess		正在退出后台应用。
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		\"%appName%\" 应用取消了关闭进程。
 Tidying things up a bit.	ShutdownProcess		整理内容。
+Do you really want to restart the system?	ShutdownProcess		您确定要重启系统吗？
+Shutdown status	ShutdownProcess		关闭状态
+Cancel shutdown	ShutdownProcess		取消关闭
+Kill application	ShutdownProcess		杀死应用
+Shut down	ShutdownProcess		关闭
+Restart	ShutdownProcess		重启
+Shutting down…	ShutdownProcess		关闭...

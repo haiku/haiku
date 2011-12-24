@@ -1,9 +1,0 @@
-1	simplified_chinese	x-vnd.Haiku-RTFTranslator	526958155
-RTF Settings	main		RTF 设置
-RTF text files	RTFTranslator		RTF 文本文件
-RTF-Translator Settings	ConfigView		RTF转换器设置
-Rich Text Format (RTF) files	ConfigView		富文本格式（RTF）文件
-Rich Text Format Translator	RTFTranslator		富文本格式转换器
-Rich Text Format translator v%d.%d.%d %s	RTFTranslator		富文本格式转换器 v%d.%d.%d %s
-RichTextFormat file	RTFTranslator		富文本文件
-Version %d.%d.%d, %s	ConfigView		版本 %d.%d.%d, %s

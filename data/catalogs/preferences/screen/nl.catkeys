@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Screen	3440722853
+1	dutch; flemish	x-vnd.Haiku-Screen	2033930135
 yes	Screen		ja
 Use laptop panel:	Screen		Gebruik laptopscherm:
 15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 kleuren
@@ -19,6 +19,7 @@ The screen mode could not be set:\n\t%s\n	Screen		De schermmodus kon niet worden
 no	Screen		nee
 Could not write VESA mode settings file:\n\t	Screen		Kon instellingenbestand voor de VESA-modus niet instellen:\n\t
 Type or use the left and right arrow keys.	Screen		Typen of links/rechts-pijltoetsen gebruiken.
+Warning	Screen		Waarschuwing
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Horizontale frequentie:\t%lu - %lu kHz\nVerticale frequentie:\t%lu - %lu Hz\n\nMaximale pixelklok:\t%g MHz
 Keep	Screen		Behouden
 Unknown mode	Screen		Onbekende modus
@@ -48,3 +49,4 @@ Apply	Screen		Toepassen
 Refresh rate	Screen		verversingssnelheid
 %sSerial no.: %s	Screen		%sSerienummer: %s
 Colors:	Screen		Kleuren:
+Video format:	Screen		Videoformaat:

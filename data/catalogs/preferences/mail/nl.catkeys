@@ -1,20 +1,26 @@
-1	dutch; flemish	x-vnd.Haiku-Mail	316063979
+1	dutch; flemish	x-vnd.Haiku-Mail	2592587573
 Mail checking	Config Window		Mail checken
 Settings	Config Window		Instellingen
+Never	Config Window	show status window	Nooit
 Only when dial-up is connected	Config Window		Alleen bij een actieve dial-up-verbinding.
 While sending and receiving	Config Window		Tijdens versturen en ontvangen
 days	Config Window		dagen
+Incoming	Config Window		Binnenkomend
+Server name:	E-Mail		Servernaam:
 OK	Config Window		Oké
 Start mail services on startup	Config Window		Start maildiensten bij het opstarten
 E-mail address:	E-Mail		E-mailadres
 Account name:	E-Mail		Accountnaam:
 Account name:	Config Views		Accountnaam:
+Create new account	AutoConfigWindow		Een nieuw account aanmaken
 OK	Config Views		Oké
 The filter could not be moved. Deleting filter.	Config Views		Het filter kon niet verplaatst worden. Filter wordt verwijderd.
 Revert	Config Window		Herstellen
 Login name:	E-Mail		Loginnaam:
+Incoming	E-Mail		Binnenkomend
 Password:	E-Mail		Paswoord:
 Accounts	Config Window		Accounts
+Finish	AutoConfigWindow		Voltooien
 Remove	Config Window		Verwijderen
 Miscellaneous	Config Window		Diversen
 Show connection status window:	Config Window		Toon status-venster van de verbinding:
@@ -22,15 +28,24 @@ Server Name:	E-Mail		Servernaam:
 While sending	Config Window		Tijdens het versturen
 Schedule outgoing mail when dial-up is disconnected	Config Window		Uitgaande mail vastleggen wanneer de dial-up-verbinding verbroken is
 hours	Config Window		uren
+Enter a valid e-mail address.	AutoConfigWindow		Vul een geldig e-mailadres in.
 Add	Config Window		Toevoegen
 Account settings	AutoConfigWindow		Accountinstellingen
+E-mail	System name		E-mail
+never	Config Window	mail checking frequency	nooit
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nDe algemene instellingen konden niet hersteld worden.\n\nFout bij het ophalen van de algemene instellingen:\n%s\n
 Real name:	Config Views		Echte naam:
+\t\t· Outgoing	Config Window		\t\t · Uitgaand
 Choose Protocol	E-Mail		Kies protocol
 Return address:	Config Views		Retouradres:
 Edit mailbox menu…	Config Window		Mailbox-menu aanpassen...
+Outgoing	E-Mail		Uitgaand
+\t\t· E-mail filters	Config Window		\t\t · E-mailfilters
 Remove	Config Views		Verwijderen
+\t\t· Incoming	Config Window		\t\t · Binnenkomend
+Next	AutoConfigWindow		Volgende
 Check every	Config Window		Controleer elke
+Back	AutoConfigWindow		Terug
 Incoming mail filters	Config Views		Filters voor binnenkomende mail
 Account settings	Config Views		Accountinstellingen
 minutes	Config Window		minuten
@@ -40,6 +55,7 @@ Apply	Config Window		Toepassen
 Always	Config Window		Altijd
 OK	AutoConfigWindow		Oké
 Add filter	Config Views		Filter toevoegen
+Outgoing	Config Window		Uitgaand
 Outgoing mail filters	Config Views		Filters voor uitgaande mail
 \n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nMaak een nieuwe account aan met de 'Toevoegen' knop.\n\nVerwijder een account met de 'Verwijderen' knop bij het geselecteerde item.\n\nSelecteer een item in de lijst om de instellingen ervan te veranderen.
 Error	Config Window		Fout

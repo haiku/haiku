@@ -1,17 +1,24 @@
-1	dutch; flemish	x-vnd.Haiku-ScreenSaver	799085334
+1	dutch; flemish	x-vnd.Haiku-ScreenSaver	215605989
 Could not load screen saver	ScreenSaver		Kon screensaver niet laden
 30 seconds	ScreenSaver		30 seconden
+Start screensaver	ScreenSaver		Start de schermbeveiliging
 Password…	ScreenSaver		Paswoord...
 Password:	ScreenSaver		Paswoord:
 Password lock	ScreenSaver		Paswoordslot
 Add…	ScreenSaver		Toevoegen...
+Screensavers	ScreenSaver		Schermbeveiligingen
 mouse is here	ScreenSaver		muis hier is
+Display Power Management Signaling not available	ScreenSaver		Het Energiebeheersignaalvenster is niet beschikbaar
+ScreenSaver	System name		Schermbeveiliging
 Test	ScreenSaver		Test
+General	ScreenSaver		Algemeen
+Enable screensaver	ScreenSaver		Schermbeveiliging inschakelen
 Cancel	ScreenSaver		Annuleren
 Turn off screen	ScreenSaver		Scherm uit
 No options available	ScreenSaver		Geen opties aanwezig
 Password Window	ScreenSaver		Paspoortvenster
 Fade now when	ScreenSaver		Wegvagen zodra
+Screensaver settings	ScreenSaver		Schermbeveiliginginstellingen
 Passwords don't match. Please try again.	ScreenSaver		Paswoorden komen niet overeen. Probeer het nogmaals, alstublieft.
 OK	ScreenSaver		Oké
 Don't fade when	ScreenSaver		Niet wegvagen zodra

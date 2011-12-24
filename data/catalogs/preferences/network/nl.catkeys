@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Network	3810742593
+1	dutch; flemish	x-vnd.Haiku-Network	2324385456
 Choose automatically	EthernetSettingsView		Automatisch kiezen
 Gateway:	EthernetSettingsView		Netwerkpunt:
 Netmask:	EthernetSettingsView		Subnet:
@@ -12,6 +12,7 @@ Adapter:	EthernetSettingsView		Adapter:
 Domain:	EthernetSettingsView		Domein:
 Revert	EthernetSettingsView		Herstellen
 <no wireless networks found>	EthernetSettingsView		<geen draadloze netwerken gevonden>
+Network	System name		Netwerk
 Mode:	EthernetSettingsView		Modus:
 Network:	EthernetSettingsView		Netwerk:
 The net_server needs to run for the auto configuration!	EthernetSettingsView		Voor autoconfiguratie moet de net_server geactiveerd zijn.

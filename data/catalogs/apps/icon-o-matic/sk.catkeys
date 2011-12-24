@@ -1,4 +1,4 @@
-1	slovak	x-vnd.haiku-icon_o_matic	2326864078
+1	slovak	x-vnd.haiku-icon_o_matic	3736361491
 Select All	Icon-O-Matic-PathManipulator		Vybrať všetky
 Add Style	Icon-O-Matic-AddStylesCmd		Pridať štýl
 Color (#%02x%02x%02x)	Style name after dropping a color		Farba (#%02x%02x%02x)
@@ -158,6 +158,7 @@ Snap to grid	Icon-O-Matic-Menu-Settings		Prichytávať k mriežke
 Remove	Icon-O-Matic-ShapesList		Odstrániť
 Yes	Icon-O-Matic-StyledTextImport		Áno
 Transformation	Icon-O-Matic-TransformersList		Transformácia
+Save image	Icon-O-Matic-SavePanel		Uložiť obrázok
 Add Styles	Icon-O-Matic-AddStylesCmd		Pridať štýly
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		Odstrániť riadiace body
 Format	Icon-O-Matic-SavePanel		Formát

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Mouse	3904912604
+1	dutch; flemish	x-vnd.Haiku-Mouse	1033564338
 Mouse type:	SettingsView		Muistype:
 Warp	SettingsView		Verspringen
 2-Button	SettingsView		2-Knops
@@ -20,4 +20,5 @@ Focus follows mouse	SettingsView		Focus volgt muis
 Accept first click	SettingsView		Accepteer eerste klik
 Fast	SettingsView		Snel
 Normal	SettingsView		Normaal
+Mouse	System name		Muis
 Slow	SettingsView		Langzaam

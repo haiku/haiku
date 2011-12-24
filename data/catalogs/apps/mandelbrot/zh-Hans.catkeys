@@ -1,10 +1,10 @@
-1	simplified_chinese	x-vnd.Haiku-Mandelbrot	3766380907
+1	english	x-vnd.Haiku-Mandelbrot	3766380907
 File	Mandelbrot		文件
-Iterations	Mandelbrot		迭代次数
-Mandelbrot	System name		分形图形
-Palette	Mandelbrot		画板
-Palette 1	Mandelbrot		画板 1
-Palette 2	Mandelbrot		画板 2
 Palette 3	Mandelbrot		画板 3
-Palette 4	Mandelbrot		画板 4
 Quit	Mandelbrot		退出
+Palette 2	Mandelbrot		画板 2
+Palette 4	Mandelbrot		画板 4
+Palette	Mandelbrot		画板
+Mandelbrot	System name		分形图形
+Palette 1	Mandelbrot		画板 1
+Iterations	Mandelbrot		迭代次数

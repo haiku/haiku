@@ -1,10 +1,11 @@
-1	dutch; flemish	x-vnd.Haiku-Keyboard	1078858058
+1	dutch; flemish	x-vnd.Haiku-Keyboard	1711838804
 Written by Andrew Edward McCall	KeyboardApplication		Door Andrew Edward McCall
 Typing test area	KeyboardView		Typ-testgebied
 Defaults	KeyboardWindow		Standaardwaarden
 Key repeat rate	KeyboardView		Herhalingssnelheid toets
 Revert	KeyboardWindow		Herstellen
 Delay until key repeat	KeyboardView		Vertraging tot aan herhaling
+Keyboard	System name		Toetsenbord
 OK	KeyboardApplication		Oké
 Fast	KeyboardView		Snel
 Slow	KeyboardView		Langzaam

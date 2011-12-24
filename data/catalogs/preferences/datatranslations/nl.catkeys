@@ -1,6 +1,12 @@
-1	dutch; flemish	x-vnd.Haiku-DataTranslations	698538556
+1	dutch; flemish	x-vnd.Haiku-DataTranslations	458105477
+DataTranslations	System name		DataTranslations
 Cancel	DataTranslations		Annuleren
 Name:	DataTranslations		Naam:
+Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Naam: %s\nVersie: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n
+The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Het item '%name' lijkt geen Translator te zijn en zal niet geïnstalleerd worden.
+Could not install %s:\n%s	DataTranslations		%s kon niet geïnstalleerd worden:\n%s
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Gebruik dit controlepaneel om de standaardwaarden voor de vertalingen in te stellen, die gebruikt zullen worden als er geen andere instellingen gespecifieerd worden door een applicatie.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Er bestaat reeds een item met de naam '%name' in de Vertalingersmap!  Moet de bestaande vertaling overschreven worden?
 DataTranslations - Note	DataTranslations		DataOmzetting - Opmerking
 Overwrite	DataTranslations		Overschrijven
 Info:	DataTranslations		Info:
@@ -8,5 +14,6 @@ Info	DataTranslations		info
 Path:	DataTranslations		Pad:
 The new translator has been installed successfully.	DataTranslations		De nieuwe omzetter werd met succes geïnstalleerd.
 DataTranslations - Error	DataTranslations		DataOmzetting - Fout
+Ok	DataTranslations		OK
 OK	DataTranslations		Oké
 Version:	DataTranslations		Versie:

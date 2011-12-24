@@ -1,6 +1,6 @@
-1	simplified_chinese	x-vnd.Haiku-cmd-dstconfig	2337923203
-.\n\nIs this the correct time?	dstcheck		.\n\n当前时间是否正确？
-Ask me later	dstcheck		稍后询问
-Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		注意！\n\n由于夏令时的切换，您的计算机时钟可能会有一个小时的延迟。\n您的计算机时间显示为
-Manually adjust time…	dstcheck		手动调整时间...
+1	english	x-vnd.Haiku-cmd-dstconfig	2337923203
 Use this time	dstcheck		使用当前时间
+Ask me later	dstcheck		稍后询问
+Manually adjust time…	dstcheck		手动调整时间...
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		注意！\n\n由于夏令时的切换，您的计算机时钟可能会有一个小时的延迟。\n您的计算机时间显示为
+.\n\nIs this the correct time?	dstcheck		.\n\n当前时间是否正确？

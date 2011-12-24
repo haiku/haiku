@@ -1,49 +1,48 @@
-1	simplified_chinese	x-vnd.Haiku-Expander	187676748
-Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		确定停止解压\n该压缩文件? 已完成解压部分可能不完整。
-Automatically expand files	ExpanderPreferences		自动解压文件
-Automatically show contents listing	ExpanderPreferences		自动显示内容列表
-Cancel	ExpanderPreferences		取消
-Cancel	ExpanderWindow		取消
-Close	ExpanderMenu		关闭
-Close window when done expanding	ExpanderPreferences		完成解压后，关闭窗口。
-Continue	ExpanderWindow		继续
-Creating listing for '%s'	ExpanderWindow		为 '%s' 创建列表
-Destination	ExpanderWindow		目标文件
-Destination folder:	ExpanderPreferences		目标目录：
-Error when expanding archive	ExpanderWindow		解压缩出错
+1	english	x-vnd.Haiku-Expander	1852295567
 Expand	ExpanderMenu		解压缩
-Expand	ExpanderWindow		解压缩
-Expander	System name		归档管理器
-Expander settings	ExpanderPreferences		设置
-Expander: Choose destination	DirectoryFilePanel		归档管理器：选择目标文件
+Close window when done expanding	ExpanderPreferences		完成解压后，关闭窗口。
+Set destination…	ExpanderMenu		目标文件…
+Use:	ExpanderPreferences		使用：
+File expanded	ExpanderWindow		文件解压缩完成
+The destination is read only.	ExpanderWindow		目标文件为只读的。
 Expander: Open	ExpanderWindow		归档管理器：打开
+Expander settings	ExpanderPreferences		设置
+Select current	DirectoryFilePanel		选择当前
+Source	ExpanderWindow		源文件
+Error when expanding archive	ExpanderWindow		解压缩出错
+Hide contents	ExpanderWindow		隐藏内容
+Cancel	ExpanderWindow		取消
+Automatically expand files	ExpanderPreferences		自动解压文件
+Creating listing for '%s'	ExpanderWindow		为 '%s' 创建列表
+Continue	ExpanderWindow		继续
+The destination folder does not exist.	ExpanderWindow		目标文件夹不存在。
+Cancel	ExpanderPreferences		取消
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		确定停止解压\n该压缩文件? 已完成解压部分可能不完整。
+Select	DirectoryFilePanel		选择
+Destination folder:	ExpanderPreferences		目标目录：
+Same directory as source (archive) file	ExpanderPreferences		相同于源文件（压缩档）目录
 Expanding '%s'	ExpanderWindow		'%s' 解压进行中
 Expansion:	ExpanderPreferences		解压：
-File	ExpanderMenu		文件
-File expanded	ExpanderWindow		文件解压缩完成
-Hide contents	ExpanderWindow		隐藏内容
-Leave destination folder path empty	ExpanderPreferences		保持目标目录为空
-OK	ExpanderPreferences		确定
-Open destination folder after extraction	ExpanderPreferences		解压后，打开目标目录
-Other:	ExpanderPreferences		其他：
-Same directory as source (archive) file	ExpanderPreferences		相同于源文件（压缩档）目录
-Select	DirectoryFilePanel		选择
-Select	ExpanderPreferences		选择
-Select '%s'	DirectoryFilePanel		选择 '%s'
-Select current	DirectoryFilePanel		选择当前
-Set destination…	ExpanderMenu		目标文件…
-Set source…	ExpanderMenu		设定源文件…
 Settings	ExpanderMenu		设置
 Settings…	ExpanderMenu		设置…
-Show contents	ExpanderMenu		显示内容
+Expander: Choose destination	DirectoryFilePanel		归档管理器：选择目标文件
+Select	ExpanderPreferences		选择
 Show contents	ExpanderWindow		显示内容
-Source	ExpanderWindow		源文件
-Stop	ExpanderMenu		停止
-Stop	ExpanderWindow		停止
-The destination folder does not exist.	ExpanderWindow		目标文件夹不存在。
-The destination is not a folder.	ExpanderWindow		目标文件不是一个文件夹。
-The destination is read only.	ExpanderWindow		目标文件为只读的。
-The file doesn't exist	ExpanderWindow		文件不存在
+Automatically show contents listing	ExpanderPreferences		自动显示内容列表
+OK	ExpanderPreferences		确定
+Leave destination folder path empty	ExpanderPreferences		保持目标目录为空
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		文件夹已被删除，重命名或者不被\n支持.
-Use:	ExpanderPreferences		使用：
-is not supported	ExpanderWindow		不被支持
+The file doesn't exist	ExpanderWindow		文件不存在
+Stop	ExpanderMenu		停止
+File	ExpanderMenu		文件
+Other:	ExpanderPreferences		其他：
+Expander	System name		归档管理器
+Expand	ExpanderWindow		解压缩
+Close	ExpanderMenu		关闭
+The destination is not a folder.	ExpanderWindow		目标文件不是一个文件夹。
+Open destination folder after extraction	ExpanderPreferences		解压后，打开目标目录
+Set source…	ExpanderMenu		设定源文件…
+Select '%s'	DirectoryFilePanel		选择 '%s'
+Show contents	ExpanderMenu		显示内容
+Stop	ExpanderWindow		停止
+Destination	ExpanderWindow		目标文件

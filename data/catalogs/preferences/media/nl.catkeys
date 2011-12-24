@@ -1,4 +1,5 @@
-1	dutch; flemish	x-vnd.Haiku-Media	128032530
+1	dutch; flemish	x-vnd.Haiku-Media	1473363280
+Couldn't add volume control in Deskbar: %s\n	Media views		De volumebesturing kon niet aan Deskbar worden toegevoegd: %s\n
 Ready for use…	Media Window		Klaar voor gebruik...
 Video input:	Media views		Video-invoer:
 Waiting for media_server to quit.	Media Window		Wachten op afsluiting van media_server.
@@ -13,6 +14,8 @@ Video settings	Media Window		Video-instellingen
 Video output:	Media views		Video-output:
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Kon geen verbinding met mediaserver maken.\nWilt u hem starten?
 Restart media services	Media views		Mediaservices herstarten
+Couldn't remove volume control in Deskbar: %s\n	Media views		De volumebesturing kon niet van de Deskbar verwijderd worden: %s\n
+Media	System name		Media
 Telling media_addon_server to quit.	Media Window		media_addon_server laten afsluiten.
 Audio mixer	Media Window		Audiomixer
 This hardware has no controls.	Media Window		Deze hardware heeft geen bedieningselementen.

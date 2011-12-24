@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-CPUFrequencyPref	3974849433
+1	dutch; flemish	x-vnd.Haiku-CPUFrequencyPref	3079996868
 Ok	Status view		Oké
 CPU frequency status view	CPU Frequency View		Weergave CPU-frequentiestatus
 Set state	Status view		Toestand instellen
@@ -17,3 +17,4 @@ Revert	Pref Window		Herstellen
 Low energy	Status view		Lage energie
 Launching the CPU frequency preflet failed.\n\nError: 	Status view		Starten van de CPU-frequentiepreflet is mislukt.\n\nFout:
 CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPUFrequency\n\tdoor Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
+CPUFrequency	System name		CPUFrequency

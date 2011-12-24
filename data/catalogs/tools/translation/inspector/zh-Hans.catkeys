@@ -1,32 +1,32 @@
-1	simplified_chinese	x.vnd.OBOS-Inspector	2075781936
-Active Translators	ImageWindow		活跃翻译器
-Active Translators	InspectorApp		活动翻译器
-Bummer	ImageWindow		Bummer
-File	ImageWindow		文件
-First Page	ImageWindow		第一页
-Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		图像：%1\n色彩空间：%2 (%3)\n尺寸：%4 x %5\n每行字节数：%6\n总计字节：%7\n\n标识信息：\nID 字符串：%8\nMIME 类型：%9\n类型：'%10' (%11)\n翻译器 ID：%12\n组别：'%13' (%14)\n质量：%15\n性能：%16\n\n附加信息：\n
-Info	ImageWindow		信息
-Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	信息窗口
-Last Page	ImageWindow		上一页
-Next Page	ImageWindow		下一页
+1	english	x.vnd.OBOS-Inspector	2075781936
+User Translators	ActiveTranslatorsWindow		用户翻译器
 No image available to save.	ImageWindow		无图像可用于保存。
-Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		文档数：%1\n\n\已用转换器：\n名称：%2\n信息：%3\n版本：%4\n
-OK	ImageView		确定
-OK	ImageWindow		确定
-Open...	ImageWindow		打开...
-Previous Page	ImageWindow		上一页
-Quit	ImageWindow		退出
-Save feature not implemented yet.	ImageWindow		保存特性还未实现。
-Save...	ImageWindow		保存...
-Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		选择文本：%1\n\n已用翻译器：\n名称：%2\n信息：%3\n版本：%4\n
-Sorry, unable to load the image.	ImageView		对不起，无法载入图像。
 Sorry, unable to write the image file.	ImageView		对不起，无法写入图像文件。
+Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		文档数：%1\n\n\已用转换器：\n名称：%2\n信息：%3\n版本：%4\n
+\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		 \n类型：'%1' (%2)\n组别： '%3' (%4)\n质量：%5\n性能：%6\nMIME 类型：%7\n名称 ：%8\n
+Bummer	ImageWindow		Bummer
+Last Page	ImageWindow		上一页
+\nInput Formats:	ImageView		\n输入格式：
+Sorry, unable to load the image.	ImageView		对不起，无法载入图像。
+Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	信息窗口
+Active Translators	InspectorApp		活动翻译器
+Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		图像：%1\n色彩空间：%2 (%3)\n尺寸：%4 x %5\n每行字节数：%6\n总计字节：%7\n\n标识信息：\nID 字符串：%8\nMIME 类型：%9\n类型：'%10' (%11)\n翻译器 ID：%12\n组别：'%13' (%14)\n质量：%15\n性能：%16\n\n附加信息：\n
+\nOutput Formats:	ImageView		\n导出格式：
+Save feature not implemented yet.	ImageWindow		保存特性还未实现。
+First Page	ImageWindow		第一页
+Next Page	ImageWindow		下一页
+Open...	ImageWindow		打开...
+\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\n已用翻译器：\n名称：%1\n信息：%2\n版本：%3\n
+Save...	ImageWindow		保存...
+Info	ImageWindow		信息
+OK	ImageWindow		确定
+Window	ImageWindow		窗口
+Quit	ImageWindow		退出
+Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		选择文本：%1\n\n已用翻译器：\n名称：%2\n信息：%3\n版本：%4\n
+Active Translators	ImageWindow		活跃翻译器
+View	ImageWindow		视图
+Previous Page	ImageWindow		上一页
+OK	ImageView		确定
 System Translators	ActiveTranslatorsWindow		系统翻译器
 Unknown	ImageView		未知
-User Translators	ActiveTranslatorsWindow		用户翻译器
-View	ImageWindow		视图
-Window	ImageWindow		窗口
-\nInput Formats:	ImageView		\n输入格式：
-\nOutput Formats:	ImageView		\n导出格式：
-\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\n已用翻译器：\n名称：%1\n信息：%2\n版本：%3\n
-\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		 \n类型：'%1' (%2)\n组别： '%3' (%4)\n质量：%5\n性能：%6\nMIME 类型：%7\n名称 ：%8\n
+File	ImageWindow		文件

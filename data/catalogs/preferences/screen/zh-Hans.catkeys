@@ -1,52 +1,52 @@
-1	simplified_chinese	x-vnd.Haiku-Screen	2033930135
-%.1f Hz	Screen		%.1f Hz
-%sSerial no.: %s	Screen		%s 无序列号。：%s
-/other…	Screen		/其他...
-15 bits/pixel, 32768 colors	Screen		15 位/像素l，32768 色
-16 bits/pixel, 65536 colors	Screen		16 位/像素，65536色
-24 bits/pixel, 16 Million colors	Screen		24 位/像素，16万色
-32 bits/pixel, 16 Million colors	Screen		32 位/像素，16万色
-8 bits/pixel, 256 colors	Screen		8 位/像素，256 色
-About	Screen		关于
-All workspaces	Screen		所有工作区
-Apply	Screen		应用
-Cancel	Screen		取消
-Colors:	Screen		颜色：
-Columns:	Screen		列：
-Combine displays:	Screen		组合显示：
-Could not write VESA mode settings file:\n\t	Screen		无法写入 VESA 模式设置文件：\n\t
-Current workspace	Screen		当前工作区
-Do you wish to keep these settings?	Screen		是否保存设置?
-Done	Screen		完成
-Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		水平频率：\t%lu - %lu kHz\n垂直频率：\t%lu - %lu Hz\n\n最大像素频率：\t%g MHz
-Hz	Screen		Hz
-Keep	Screen		保持
-OK	Screen		确定
-Other…	Screen		其他...
-Refresh rate	Screen		刷新频率
-Refresh rate:	Screen		刷新频率：
-Resolution:	Screen		分辨率
-Revert	Screen		还原
-Rows:	Screen		行：
-Screen	Screen		屏幕
-Screen	System name		屏幕
-Screen preferences by the Haiku team	Screen		Screen 首选项编写者 Haiku项目组
-Set background…	Screen		设置背景...
-Settings will revert in %seconds seconds.	Screen		在 %seconds 秒之后，设置将会恢复。
-Swap displays:	Screen		交替显示：
-The screen mode could not be set:\n\t%s\n	Screen		屏幕模式无法设置为：\n\t%s\n
-Type or use the left and right arrow keys.	Screen		键入或使用左/右箭头键。
-Undo	Screen		撤销
-Unknown mode	Screen		未知模式
-Use laptop panel:	Screen		使用笔记本面板：
-Video format:	Screen		视频格式：
-Warning	Screen		警告
-Workspaces	Screen		工作区
-always	Screen		总是
-bits/pixel	Screen		位/像素
-disable	Screen		禁用
-horizontally	Screen		水平
-if needed	Screen		如果需要
-no	Screen		否
-vertically	Screen		垂直
+1	english	x-vnd.Haiku-Screen	2033930135
 yes	Screen		是
+Use laptop panel:	Screen		使用笔记本面板：
+15 bits/pixel, 32768 colors	Screen		15 位/像素l，32768 色
+/other…	Screen		/其他...
+16 bits/pixel, 65536 colors	Screen		16 位/像素，65536色
+Revert	Screen		还原
+Swap displays:	Screen		交替显示：
+Combine displays:	Screen		组合显示：
+Done	Screen		完成
+Set background…	Screen		设置背景...
+Undo	Screen		撤销
+if needed	Screen		如果需要
+Screen preferences by the Haiku team	Screen		Screen 首选项编写者 Haiku项目组
+Screen	System name		屏幕
+OK	Screen		确定
+Workspaces	Screen		工作区
+The screen mode could not be set:\n\t%s\n	Screen		屏幕模式无法设置为：\n\t%s\n
+no	Screen		否
+Could not write VESA mode settings file:\n\t	Screen		无法写入 VESA 模式设置文件：\n\t
+Type or use the left and right arrow keys.	Screen		键入或使用左/右箭头键。
+Warning	Screen		警告
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		水平频率：\t%lu - %lu kHz\n垂直频率：\t%lu - %lu Hz\n\n最大像素频率：\t%g MHz
+Keep	Screen		保持
+Unknown mode	Screen		未知模式
+disable	Screen		禁用
+Columns:	Screen		列：
+All workspaces	Screen		所有工作区
+always	Screen		总是
+32 bits/pixel, 16 Million colors	Screen		32 位/像素，16万色
+Current workspace	Screen		当前工作区
+About	Screen		关于
+24 bits/pixel, 16 Million colors	Screen		24 位/像素，16万色
+horizontally	Screen		水平
+Other…	Screen		其他...
+Cancel	Screen		取消
+bits/pixel	Screen		位/像素
+Settings will revert in %seconds seconds.	Screen		在 %seconds 秒之后，设置将会恢复。
+Refresh rate:	Screen		刷新频率：
+Hz	Screen		Hz
+Do you wish to keep these settings?	Screen		是否保存设置?
+Rows:	Screen		行：
+vertically	Screen		垂直
+Resolution:	Screen		分辨率
+Screen	Screen		屏幕
+%.1f Hz	Screen		%.1f Hz
+8 bits/pixel, 256 colors	Screen		8 位/像素，256 色
+Apply	Screen		应用
+Refresh rate	Screen		刷新频率
+%sSerial no.: %s	Screen		%s 无序列号。：%s
+Colors:	Screen		颜色：
+Video format:	Screen		视频格式：

@@ -1,0 +1,10 @@
+1	dutch; flemish	x-vnd.Haiku-libmail	161731481
+Partially download messages larger than	ProtocolConfigView		Berichten gedeeltelijk downloaden als ze groter zijn dan 
+Password:	ProtocolConfigView		Wachtwoord:
+Remove mail from server when deleted	ProtocolConfigView		Mail verwijderen van de server bij lokale verwijdering
+Mail server:	ProtocolConfigView		Mailserver: 
+Select…	MailKit		Selecteren...
+Connection type:	ProtocolConfigView		Verbindingstype:
+Leave mail on server	ProtocolConfigView		Mail op de server achterlaten
+Username:	ProtocolConfigView		Gebruikersnaam:
+Login type:	ProtocolConfigView		Logintype:

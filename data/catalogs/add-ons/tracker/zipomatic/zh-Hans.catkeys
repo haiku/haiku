@@ -1,18 +1,18 @@
-1	simplified_chinese	x-vnd.haiku.zip-o-matic	2207848100
-%ld files added.	file:ZipOMaticWindow.cpp		完成添加%ld个文件。
+1	english	x-vnd.haiku.zip-o-matic	2207848100
 1 file added.	file:ZipOMaticWindow.cpp		完成添加1个文件。
-Archive	file:ZipperThread.cpp		档案
-Archive created OK	file:ZipOMaticWindow.cpp		档案创建成功
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		你确定停止创建档案吗？
-Continue	file:ZipOMaticWindow.cpp		继续
+Stop	file:ZipOMaticWindow.cpp		停止
 Creating archive: %s	file:ZipOMaticWindow.cpp		创建档案：%s
-Do you want to stop them?	file:ZipOMatic.cpp		您想停止运行它们吗？
+Continue	file:ZipOMaticWindow.cpp		继续
+Preparing to archive	file:ZipperThread.cpp		准备归档
 Drop files here.	file:ZipOMaticWindow.cpp		拖拽文件到此。
-Error creating archive	file:ZipOMaticWindow.cpp		创建档案出错
 Filename: %s	file:ZipOMaticWindow.cpp		文件名：%s
 Let them continue	file:ZipOMatic.cpp		让它们继续
-Preparing to archive	file:ZipperThread.cpp		准备归档
-Stop	file:ZipOMaticWindow.cpp		停止
-Stop them	file:ZipOMatic.cpp		停止它们
+Do you want to stop them?	file:ZipOMatic.cpp		您想停止运行它们吗？
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		你确定停止创建档案吗？
+%ld files added.	file:ZipOMaticWindow.cpp		完成添加%ld个文件。
 Stopped	file:ZipOMaticWindow.cpp		已停止。
+Archive	file:ZipperThread.cpp		档案
+Error creating archive	file:ZipOMaticWindow.cpp		创建档案出错
 You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		你有%ld个Zip-O-Matic程序正在运行。\n\n
+Archive created OK	file:ZipOMaticWindow.cpp		档案创建成功
+Stop them	file:ZipOMatic.cpp		停止它们

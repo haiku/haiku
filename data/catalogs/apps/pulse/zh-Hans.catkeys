@@ -1,48 +1,48 @@
-1	simplified_chinese	x-vnd.Haiku-Pulse	2324471783
-%.2f GHz	NormalPulseView		%.2f GHz
-%ld MHz	NormalPulseView		%ld MHz
-%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\n由 David Ramsey 和 Arve Hjønnevåg 编写\n由 Daniel Switkin 修改\n
-About Pulse…	CPUButton		关于系统脉搏...
-About Pulse…	PulseView		关于系统脉搏...
-Active color	ConfigView		激活颜色
-Bar colors	ConfigView		边栏色彩
-CPU progress bar	NormalPulseView		CPU 进度条
-Defaults	PrefsWindow		默认
-Deskbar	CPUButton		桌面栏
-Deskbar menu	CPUButton		桌面栏菜单
-Deskbar mode	MiniPulseView		桌面栏模式
-Deskbar mode	NormalPulseView		桌面栏模式
-Deskbar mode	PrefsWindow		桌面栏模式
-Error	PulseApp		错误
-Fade colors	ConfigView		消除颜色
-Frame color	ConfigView		边框颜色
-Idle color	ConfigView		Idle 颜色
-Info	CPUButton		信息
-Info	DeskbarPulseView		信息
-Info	PulseApp		信息
-Info	PulseView		信息
-Installing in Deskbar failed\n%s	PulseApp		安装到桌面栏失败\n%s
-Mini mode	DeskbarPulseView		迷你模式
-Mini mode	NormalPulseView		迷你模式
-Mini mode	PrefsWindow		迷你模式
-Normal mode	DeskbarPulseView		正常模式
-Normal mode	MiniPulseView		正常模式
-Normal mode	PrefsWindow		正常模式
-OK	CPUButton		确定
-OK	DeskbarPulseView		确定
+1	english	x-vnd.Haiku-Pulse	2324471783
 OK	PrefsWindow		确定
-OK	PulseApp		确定
-OK	PulseView		确定
-Pulse	NormalPulseView		系统脉搏
-Pulse	PulseApp		系统脉搏
-Pulse	System name		系统脉搏
-Pulse settings	PulseWindow		系统脉搏设置
 Quit	DeskbarPulseView		退出
-Quit	MiniPulseView		退出
+Mini mode	DeskbarPulseView		迷你模式
 Remove replicant	CPUButton		删除复制件
-Removing from Deskbar failed.\n%s	DeskbarPulseView		从桌面栏删除失败。\n%s
-Settings…	PulseView		设置...
+Active color	ConfigView		激活颜色
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		用法：Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
+Fade colors	ConfigView		消除颜色
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\n由 David Ramsey 和 Arve Hjønnevåg 编写\n由 Daniel Switkin 修改\n
+OK	DeskbarPulseView		确定
+Deskbar mode	PrefsWindow		桌面栏模式
+%.2f GHz	NormalPulseView		%.2f GHz
+Normal mode	PrefsWindow		正常模式
+Defaults	PrefsWindow		默认
+Normal mode	MiniPulseView		正常模式
+Error	PulseApp		错误
+Info	PulseView		信息
+Deskbar	CPUButton		桌面栏
+Frame color	ConfigView		边框颜色
+Mini mode	PrefsWindow		迷你模式
+OK	PulseApp		确定
+Bar colors	ConfigView		边栏色彩
+Settings…	PulseView		设置...
+You can't disable the last active CPU.	PulseView		您不能禁用的最后一个活动的CPU。
+Info	PulseApp		信息
+Info	CPUButton		信息
+OK	PulseView		确定
+Deskbar menu	CPUButton		桌面栏菜单
+About Pulse…	PulseView		关于系统脉搏...
+Deskbar mode	MiniPulseView		桌面栏模式
+Quit	MiniPulseView		退出
+Pulse	System name		系统脉搏
+Pulse	NormalPulseView		系统脉搏
+%ld MHz	NormalPulseView		%ld MHz
+Deskbar mode	NormalPulseView		桌面栏模式
+Pulse	PulseApp		系统脉搏
 Width of icon:	ConfigView		图标宽度：
 You can't disable the last active CPU.	CPUButton		您无法禁用最后的活动 CPU。
-You can't disable the last active CPU.	PulseView		您不能禁用的最后一个活动的CPU。
+Normal mode	DeskbarPulseView		正常模式
+OK	CPUButton		确定
+About Pulse…	CPUButton		关于系统脉搏...
+Removing from Deskbar failed.\n%s	DeskbarPulseView		从桌面栏删除失败。\n%s
+Mini mode	NormalPulseView		迷你模式
+Info	DeskbarPulseView		信息
+Pulse settings	PulseWindow		系统脉搏设置
+Idle color	ConfigView		Idle 颜色
+Installing in Deskbar failed\n%s	PulseApp		安装到桌面栏失败\n%s
+CPU progress bar	NormalPulseView		CPU 进度条

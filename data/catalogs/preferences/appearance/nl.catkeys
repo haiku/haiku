@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Appearance	3606607024
+1	dutch; flemish	x-vnd.Haiku-Appearance	168322075
 Control highlight	Colors tab		Keuze-accent
 Control border	Colors tab		Keuzerand
 Antialiasing type:	AntialiasingSettingsView		Anti-aliasingtype:
@@ -7,11 +7,16 @@ On	AntialiasingSettingsView		Aan
 Defaults	APRWindow		Standaardwaarden
 Grayscale	AntialiasingSettingsView		Grijswaarden
 Shine	Colors tab		Glans
+About	DecorSettingsView		Over
 Off	AntialiasingSettingsView		Uit
+Choose Decorator	DecorSettingsView		Decorator kiezen
 Success	Colors tab		Gelukt
 Inactive window tab text	Colors tab		Tabtekst niet-actief venster
+About Decorator	DecorSettingsView		Over decorator
 Failure	Colors tab		Mislukt
 Hinting menu	AntialiasingSettingsView		Hinting-menu
+Window Decorator	APRWindow		Vensterdecorator
+Window Decorator:	DecorSettingsView		Vensterdecorator:
 Document background	Colors tab		Achtergrond document
 Revert	APRWindow		Herstellen
 Window tab	Colors tab		Venstertab
@@ -19,18 +24,23 @@ Tooltip background	Colors tab		Achtergrond Tooltip
 Selected menu item background	Colors tab		Achtergrond geselecteerd menu-item
 Antialiasing	APRWindow		Anti-aliasing
 Navigation base	Colors tab		Basis navigatie
+Window border	Colors tab		Vensterrand
 Window tab text	Colors tab		Tekst venstertab
 Document text	Colors tab		Tekst document
 Navigation pulse	Colors tab		Puls navigatie
 Selected menu item text	Colors tab		Tekst geselecteerd menu-item
 Menu background	Colors tab		Achtergrond menu
+OK	DecorSettingsView		OK
 Panel background	Colors tab		Achtergrond paneel
 Colors	APRWindow		Kleuren
 Control background	Colors tab		Achtergrond keuze
 Inactive window tab	Colors tab		Niet-actieve venstertab
+Appearance	System name		Uiterlijk
 Reduce colored edges filter strength:	AntialiasingSettingsView		Reductie filtersterkte gekleurde randen:
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Subpixelgebaseerde anti-aliasing in combinatie met gliefsuggesties is niet beschikbaar in deze Haikucompilatie om mogelijke patentproblemen te vermijden. Om deze functie in te schakelen, moet je Haiku zelf compileren en bepaalde opties in de configuratieheader van libfreetype kiezen.
 Control text	Colors tab		Tekst keuze
 Tooltip text	Colors tab		Tekst Tooltip
+Inactive window border	Colors tab		Rand van een inactief venster
 Menu item text	Colors tab		Tekst menu-item
 LCD subpixel	AntialiasingSettingsView		LCD-subpixel
 Selected menu item border	Colors tab		Rand geselecteerd menu-item

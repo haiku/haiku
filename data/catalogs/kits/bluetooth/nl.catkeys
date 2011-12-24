@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Bluetooth	2090488075
+1	dutch; flemish	x-vnd.Haiku-Bluetooth	3550394259
 Display	DeviceClass		Weergave
 Capturing	DeviceClass		Bezig met vastleggen
 Printer	DeviceClass		Printer
@@ -15,6 +15,7 @@ No service available	DeviceClass		Geen service beschikbaar
 Wearable	DeviceClass	A wearable computer	Draagbare
 Handheld	DeviceClass		Handheld
 Invalid device class!\n	DeviceClass		Ongeldige apparaatklasse!\n
+Sensing device	DeviceClass		Sensorapparaat
 Computer	DeviceClass		Computer
 Cellular	DeviceClass		Cellulair
 Microphone	DeviceClass		Microfoon
@@ -66,12 +67,14 @@ Video display and loudspeaker	DeviceClass		Videoscherm en luidspreker
 Peripheral	DeviceClass		Randapparaat
 #NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Ongeldige naam
 Wired modem or voice gateway	DeviceClass		Bedraad modem of stemgateway
+Jacket	DeviceClass		Jacket
 Unspecified	DeviceClass		Niet gespecificeerd
 Fully available	DeviceClass		Volledig beschikbaar
 67-83% utilized	DeviceClass		67-83% in gebruik
 Not implemented	RemoteDevice		Niet geïmplementeerd
 #NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Ongeldige naam
 Server	DeviceClass		Server
+Video conferencing	DeviceClass		Videoconfereren
 Video camera	DeviceClass		Videocamera
 HiFi audio device	DeviceClass		HiFi-audio-apparaat
 Smart phone	DeviceClass		Smartphone

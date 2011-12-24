@@ -1,8 +1,0 @@
-1	simplified_chinese	x-vnd.Haiku-ReadOnlyBootPrompt	2544294242
-Custom	BootPromptWindow		自定义
-Desktop (Live-CD)	BootPromptWindow		桌面系统 (Live-CD)
-Keymap	BootPromptWindow		键盘映射
-Language	BootPromptWindow		语言
-Run Installer	BootPromptWindow		运行系统安装器
-Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	欢迎使用 Haiku！希望喜欢它！\n\n您可以从左边的列表中选择首选语言和键盘类型，它们将马上启用。您可以在进入桌面之后进行修改。\n\n您希望运行系统安装器，还是继续引导进入桌面？
-Welcome to Haiku!	BootPromptWindow		欢迎使用 Haiku!

@@ -1,0 +1,4 @@
+1	dutch; flemish	x-vnd.Haiku-SystemLogger	57960782
+%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nDeze daemon is verantwoordelijk voor het verzamelen van alle systeemberichten en deze naar het systeemlogboek op \"%s\" te schrijven.\n\n
+OK	SyslogDaemon		OK
+Syslog Daemon	SyslogDaemon		Syslog Daemon

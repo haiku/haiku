@@ -1,8 +1,8 @@
-1	simplified_chinese	x-vnd.Haiku-InstalledPackages	4131220089
-InstalledPackages	System name		软件包管理
+1	english	x-vnd.Haiku-InstalledPackages	4131220089
 No package selected.	UninstallView		未选中安装包。
-OK	UninstallView		确定
-Package description	UninstallView		安装包描述
 Remove	UninstallView		删除
+Package description	UninstallView		安装包描述
+InstalledPackages	System name		软件包管理
 The package you selected has been successfully removed from your system.	UninstallView		选中包已从您的系统中成功删除。
+OK	UninstallView		确定
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		选中包未从您的系统中删除。指定安装包的信息文件可能已被覆盖。

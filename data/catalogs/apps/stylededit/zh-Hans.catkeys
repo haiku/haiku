@@ -1,80 +1,80 @@
-1	simplified_chinese	x-vnd.Haiku-StyledEdit	1508367857
+1	english	x-vnd.Haiku-StyledEdit	1508367857
+StyledEdit	System name		StyledEdit
+Paste	Menus		粘贴
+OK	LoadAlert		确定
+File	Menus		文件
 ???	LoadAlert		???
-Align	Menus		对齐
-Black	Menus		黑色
-Blue	Menus		蓝
-Bold	Menus		粗体
+Lines:	Statistics		行数：
+Italic	Menus		斜体
+Left	Menus		居左
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		恢复到最后一个\"%s\"版本？
+Search backwards	FindandReplaceWindow		后台搜索
+Size	Menus		大小
+Save	QuitAlert		保存
+Page setup…	Menus		页面设置…
+Print…	Menus		打印…
 Can't undo	Menus		无法撤销
-Cancel	FindandReplaceWindow		取消
-Cancel	QuitAlert		取消
-Cancel	RevertToSavedAlert		取消
+Save	Menus		保存
+Replace with:	FindandReplaceWindow		替换为：
 Cancel	SaveAlert		取消
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		无法恢复，文件未找到：\"%s\"。
 Case-sensitive	FindandReplaceWindow		区分大小写
-Center	Menus		居中
-Characters:	Statistics		字符数：
-Close	Menus		关闭
-Color	Menus		颜色
-Copy	Menus		复制
-Cut	Menus		剪切
-Cyan	Menus		青绿
-Default	Open_and_SaveAsPanel		默认
-Document	Menus		文档
-Document statistics	Statistics		文档统计
-Don't save	QuitAlert		不保存
-Don't save	SaveAlert		不保存
-Edit	Menus		编辑
-Encoding	Open_and_SaveAsPanel		编码
-Error loading \"%s\":\n\t%s	LoadAlert		加载错误 \"%s\"\n\t%s
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		加载 \"%s\"出错！:\n\t不支持的格式
-Error saving \"%s\":\n%s	SaveAlert		保存\"%s\"出错:\n%s
-File	Menus		文件
-Find	FindandReplaceWindow		查找
-Find again	Menus		再次查找
-Find selection	Menus		搜索选中
-Find:	FindandReplaceWindow		查找：
-Find…	Menus		查找…
-Font	Menus		字体
 Green	Menus		绿
-Italic	Menus		斜体
-Left	Menus		居左
-Lines:	Statistics		行数：
+Revert to saved…	Menus		恢复保存为...
+Yellow	Menus		黄
+Replace in all windows	FindandReplaceWindow		在所有窗口进行替换
+Wrap lines	Menus		收起
+Quit	Menus		退出
+Document statistics	Statistics		文档统计
+Cancel	RevertToSavedAlert		取消
+Document	Menus		文档
+Save changes to the document \"%s\"? 	QuitAlert		将所做更改存入文档\"%s\"中吗?
+Edit	Menus		编辑
+Font	Menus		字体
+Replace all	FindandReplaceWindow		全部替换
+Statistics…	Menus		统计...
+Default	Open_and_SaveAsPanel		默认
+Replace next	Menus		替换文本
+Cancel	FindandReplaceWindow		取消
+Close	Menus		关闭
+Save	SaveAlert		保存
+Words:	Statistics		字数：
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		加载 \"%s\"出错！:\n\t不支持的格式
+OK	RevertToSavedAlert		确定
+Don't save	QuitAlert		不保存
+Align	Menus		对齐
+Color	Menus		颜色
+Red	Menus		红
+Open…	Menus		打开…
+Center	Menus		居中
+Blue	Menus		蓝
+Cyan	Menus		青绿
+OK	Statistics		确定
 Magenta	Menus		洋红
 New	Menus		新建
-OK	LoadAlert		确定
-OK	RevertToSavedAlert		确定
-OK	SaveAlert		确定
-OK	Statistics		确定
-Open…	Menus		打开…
-Page setup…	Menus		页面设置…
-Paste	Menus		粘贴
-Print…	Menus		打印…
-Quit	Menus		退出
-Red	Menus		红
-Redo typing	QuitAlert		重复输入
-Replace	FindandReplaceWindow		替换
-Replace all	FindandReplaceWindow		全部替换
-Replace in all windows	FindandReplaceWindow		在所有窗口进行替换
-Replace next	Menus		替换文本
-Replace with:	FindandReplaceWindow		替换为：
-Replace…	Menus		替换…
-Revert to saved…	Menus		恢复保存为...
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		恢复到最后一个\"%s\"版本？
-Right	Menus		居右
-Save	Menus		保存
-Save	QuitAlert		保存
-Save	SaveAlert		保存
-Save as…	Menus		保存为...
-Save changes to the document \"%s\"? 	QuitAlert		将所做更改存入文档\"%s\"中吗?
-Search backwards	FindandReplaceWindow		后台搜索
-Select all	Menus		全选
-Size	Menus		大小
-Statistics…	Menus		统计...
-StyledEdit	System name		StyledEdit
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		文件为只读。将所做更改保存到文档\"%s\"吗?
-Undo typing	QuitAlert		取消输入
-Untitled 	StyledEditWindow		未命名
-Words:	Statistics		字数：
-Wrap lines	Menus		收起
 Wrap-around search	FindandReplaceWindow		循环搜索
-Yellow	Menus		黄
+Bold	Menus		粗体
+Find selection	Menus		搜索选中
+Find:	FindandReplaceWindow		查找：
+Error saving \"%s\":\n%s	SaveAlert		保存\"%s\"出错:\n%s
+Copy	Menus		复制
+Cut	Menus		剪切
+Replace	FindandReplaceWindow		替换
+Find again	Menus		再次查找
+Cancel	QuitAlert		取消
+Find…	Menus		查找…
+Select all	Menus		全选
+Don't save	SaveAlert		不保存
+Error loading \"%s\":\n\t%s	LoadAlert		加载错误 \"%s\"\n\t%s
+Undo typing	QuitAlert		取消输入
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		文件为只读。将所做更改保存到文档\"%s\"吗?
+Black	Menus		黑色
+Untitled 	StyledEditWindow		未命名
+OK	SaveAlert		确定
+Find	FindandReplaceWindow		查找
+Encoding	Open_and_SaveAsPanel		编码
+Characters:	Statistics		字符数：
+Save as…	Menus		保存为...
+Redo typing	QuitAlert		重复输入
+Replace…	Menus		替换…
+Right	Menus		居右

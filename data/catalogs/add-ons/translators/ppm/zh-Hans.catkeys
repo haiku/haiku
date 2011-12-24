@@ -1,31 +1,31 @@
-1	simplified_chinese	x-vnd.Haiku-PPMTranslator	2886727868
+1	english	x-vnd.Haiku-PPMTranslator	2886727868
+PPM Settings	PPMMain		PPM 设置
 Based on PPMTranslator sample code	PPMTranslator		基于 PPM转换器 示例代码
-Be Bitmap Format (PPMTranslator)	PPMTranslator		Be 位图格式（PPM 转换器）
-Bitmap 1 bit	PPMTranslator		位图 1 bit
+OK	PPMMain		确定
+Grayscale 8 bits	PPMTranslator		灰度 8 bits
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 bits
+PPM image	PPMTranslator		PPM 图像
+RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 bits
+PPM Image Translator	PPMTranslator		PPM 图像转换器
+Be Bitmap Format (PPMTranslator)	PPMTranslator		Be 位图格式（PPM 转换器）
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bits
 CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 bits
-Grayscale 8 bits	PPMTranslator		灰度 8 bits
-Input Color Space	PPMTranslator		输入颜色空间
-None	PPMTranslator		无
-OK	PPMMain		确定
-PPM Image Translator	PPMTranslator		PPM 图像转换器
-PPM Settings	PPMMain		PPM 设置
-PPM image	PPMTranslator		PPM 图像
-PPMTranslator Settings	PPMTranslator		PPM转换器设置
-RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 bits
+bits/space	PPMTranslator		bits/space
+RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 bits 大端格式
+RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 bits 大端格式
+Version %d.%d.%d %s	PPMTranslator		版本 %d.%d.%d %s
 RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 bits 大端格式
 RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 bits
-RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 bits 大端格式
-RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 bits
-RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 bits 大端格式
-RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 bits
-RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 bits 大端格式
+Write ASCII	PPMTranslator		写入 ASCII
 RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 bits
+None	PPMTranslator		无
+RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 bits 大端格式
+RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 bits
+Bitmap 1 bit	PPMTranslator		位图 1 bit
 RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 bits 大端格式
+Input Color Space	PPMTranslator		输入颜色空间
+RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 bits
 Sample code copyright 1999, Be Incorporated	PPMTranslator		示例代码 版权所有 1999, Be Inc
+PPMTranslator Settings	PPMTranslator		PPM转换器设置
 Something is wrong with the PPMTranslator!	PPMMain		PPM转换器出现错误
 System palette 8 bits	PPMTranslator		系统调色板 8 bits
-Version %d.%d.%d %s	PPMTranslator		版本 %d.%d.%d %s
-Write ASCII	PPMTranslator		写入 ASCII
-bits/space	PPMTranslator		bits/space

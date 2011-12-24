@@ -1,8 +1,13 @@
-1	dutch; flemish	x-vnd.Be-PRNT	1182140394
+1	dutch; flemish	x-vnd.Be-PRNT	2674539197
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Printer: %printer_name%\nDriver:   %driver%\n
 Waiting	JobListView		Bezig met wachten
+Print test page	PrintersWindow		Druk een testpagina af
+Test Page	TestPageView		Testpagina
+Test Page	PrintersWindow		Testpagina
 page	JobListView		pagina
 Cancel	AddPrinterDialog		Annuleren
 Add printer	AddPrinterDialog		Printer toevoegen
+Green	TestPageView		Groen
 Printers	PrintersWindow		Printers
 Default Printer	PrinterListView		Standaardprinter
 Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
@@ -10,13 +15,18 @@ No pending jobs.	PrinterListView		Geen taken in de wachtrij.
 pages	JobListView		pagina's
 Printers	System name		Printers
 Processing	JobListView		Bezig met verwerken
+Red	TestPageView		Rood
 Printer name:	AddPrinterDialog		Printernaam:
 Driver: %driver%	PrinterListView		Stuurprogramma: %driver%
+ pending jobs.	PrinterListView		wachtende taken.
+Black	TestPageView		Zwart
 Restart job	PrintersWindow		Taak herstarten
 Add	AddPrinterDialog		Toevoegen
 Make default	PrintersWindow		Standaard maken
 Transport: %transport% %transport_address%	TestPageView		Transport: %transport% %transport_address%
 Cancel job	PrintersWindow		Taak annuleren
+Yellow	TestPageView		Geel
+Blue	TestPageView		Blauw
 1 pending job.	PrinterListView		1 taak in de wachtrij
 Remove	PrintersWindow		Verwijderen
 <pick one>	AddPrinterDialog		<kies één>
@@ -24,9 +34,11 @@ Add …	PrintersWindow		Toevoegen...
 Print jobs for 	PrintersWindow		Afdruktaken voor
 Failed	JobListView		Mislukt
 %.2f KB	JobListView		%.2f KB
+Magenta	TestPageView		Magenta
 Completed	JobListView		Voltooid
 No printer found!	TransportMenu		Er werd geen printer gevonden!
 Print jobs: No printer selected	PrintersWindow		Afdruktaken: Geen printer geselecteerd
+Cyan	TestPageView		Cyaan
 Unknown status	JobListView		Onbekende status
 Connected to:	AddPrinterDialog		Verbonden met:
 Printer type:	AddPrinterDialog		Printertype:

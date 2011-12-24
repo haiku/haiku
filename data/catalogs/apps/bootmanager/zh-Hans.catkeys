@@ -1,65 +1,65 @@
-1	simplified_chinese	x-vnd.Haiku-BootManager	3014946856
-About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	将要从 %file 恢复 %disk 的主引导记录（MBR）。是否继续？
-About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		将要写入引导菜单到磁盘。是否继续？
-About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		将要写入下述引导菜单到引导磁盘（%s）。在继续之前，请核对下述信息。
-After five seconds	DefaultPartitionPage		五秒钟以后
-After four seconds	DefaultPartitionPage		四秒钟以后
-After one minute	DefaultPartitionPage		一分钟以后
-After one second	DefaultPartitionPage		一秒钟以后
-After three seconds	DefaultPartitionPage		三秒钟以后
+1	english	x-vnd.Haiku-BootManager	3014946856
+The boot manager has been successfully installed on your system.	BootManagerController		引导管理器已经成功安装到您的系统。
 After two seconds	DefaultPartitionPage		两秒钟以后
-An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		写入引导菜单出错。主引导记录将被破坏，现在您应该保存 MBR。
+Uninstall Boot Manager	UninstallPage	Title	卸载引导管理器
 At least one partition must be selected!	BootManagerController		至少选中一个分区！
-Back	BootManagerController	Button	退后
-Backup Master Boot Record	BootManagerController	Title	备份主引导记录
-Boot Manager is unable to read the partition table!	BootManagerController		引导管理器无法读取分区表！
-BootManager	System name		引导管理器
-Cannot access!	DrivesPage	Cannot install	无法获取！
-Default Partition	DefaultPartitionPage	Title	默认分区
-Default Partition:	DefaultPartitionPage	Menu field label	默认分区：
-Done	BootManagerController	Button	完成
-Drives	DrivesPage	Title	设备
-Error reading partition table	BootManagerController	Title	分区表读取出错
-File:	FileSelectionPage	Text control label	文件：
+The old Master Boot Record could not be saved to %s	BootManagerController		旧的主引导记录（MBR）无法保存到 %s
+Restore MBR	BootManagerController	Button	恢复 MBR
 Hard Drive	DrivesPage	Default disk name	硬盘
-Immediately	DefaultPartitionPage		立刻
-Install	DrivesPage	Button	安装
-Installation of boot menu completed	BootManagerController	Title	引导菜单安装完成
-Installation of boot menu failed	BootManagerController	Title	引导菜单安装失败
-Never	DefaultPartitionPage		从不
-Next	WizardView	Button	下一步
-No space available!	DrivesPage	Cannot install	无可用空间！
-OK	BootManagerController	Button	确定
-Old Master Boot Record Saved failure	BootManagerController	Title	旧的主引导记录保存失败
-Old Master Boot Record saved	BootManagerController	Title	旧的主引导记录已保存
-Partition table not compatible	BootManagerController	Title	分区表不兼容
-Partitions	DefaultPartitionPage	Pop up menu title	分区
+USB Drive	DrivesPage	Default disk name	USB 设备
+The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		引导设备的主引导记录（MBR）：\n\t%s\n将保存到磁盘。请选择保存 MBR 的文件。\n\n如果安装过程出错或者您希望移除引导菜单，请启动 bootman 程序，并选择 '卸载' 选项。
+About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	将要从 %file 恢复 %disk 的主引导记录（MBR）。是否继续？
+An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		写入引导菜单出错。主引导记录将被破坏，现在您应该保存 MBR。
 Partitions	PartitionsPage	Title	分区
+Timeout: %s	DefaultPartitionPage		超时：%s
+Select	FileSelectionPage	Button	选择
+Cannot access!	DrivesPage	Cannot install	无法获取！
+Uninstall boot manager	BootManagerController	Title	卸载引导管理器
+After four seconds	DefaultPartitionPage		四秒钟以后
+Uninstallation of boot menu failed	BootManagerController	Title	卸载引导菜单失败
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		请选择执行恢复的主引导记录（MBR）文件。该文件创建于首次安装引导管理器时。
-Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		请确定主引导记录备份文件以进行恢复。该文件创建于引导管理器首次安装时。
+Next	WizardView	Button	下一步
+Uninstallation of boot menu completed	BootManagerController	Title	卸载引导菜单完成
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		请选择设备以安装或卸载引导管理器。
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		请指定默认分区及超时限制。\n如果未选定分区，超时之后，引导菜单将会载入默认分区。您也可以使引导菜单等待您选定分区。\n按下 'Alt' 键以禁用引导期间的超时限制。
-Previous	WizardView	Button	上一步
-Quit	DrivesPage	Button	退出
-Restore MBR	BootManagerController	Button	恢复 MBR
-Select	FileSelectionPage	Button	选择
-Summary	BootManagerController	Title	摘要
-The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		引导设备的主引导记录（MBR）：\n\t%s\n将保存到磁盘。请选择保存 MBR 的文件。\n\n如果安装过程出错或者您希望移除引导菜单，请启动 bootman 程序，并选择 '卸载' 选项。
-The Master Boot Record could not be restored!	BootManagerController		主引导记录无法恢复！
-The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		引导设备（%DISK）的主引导记录已经从 %FILE 成功完成恢复。
-The boot manager has been successfully installed on your system.	BootManagerController		引导管理器已经成功安装到您的系统。
-The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		下述分区已删除。请选择分区表下的复选框以将其包含于引导菜单。您也可以设置分区的名称，它们将出现在引导菜单中。
-The old Master Boot Record could not be saved to %s	BootManagerController		旧的主引导记录（MBR）无法保存到 %s
-The old Master Boot Record was successfully saved to %s.	BootManagerController		旧的主引导记录成功保存到 %s。
+After one second	DefaultPartitionPage		一秒钟以后
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		首个硬盘的分区表与引导管理器不兼容。\n引导管理器要求首个分区之前具有 2KB 的可用空间。
-Timeout: %s	DefaultPartitionPage		超时：%s
-USB Drive	DrivesPage	Default disk name	USB 设备
-Uninstall	DrivesPage	Button	卸载
-Uninstall Boot Manager	UninstallPage	Title	卸载引导管理器
-Uninstall boot manager	BootManagerController	Title	卸载引导管理器
-Uninstallation of boot menu completed	BootManagerController	Title	卸载引导菜单完成
-Uninstallation of boot menu failed	BootManagerController	Title	卸载引导菜单失败
-Unknown	LegacyBootMenu	Text is shown for an unknown partition type	未知
-Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	未命名 %d
-Update	DrivesPage	Button	更新
+The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		下述分区已删除。请选择分区表下的复选框以将其包含于引导菜单。您也可以设置分区的名称，它们将出现在引导菜单中。
+After one minute	DefaultPartitionPage		一分钟以后
+The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		引导设备（%DISK）的主引导记录已经从 %FILE 成功完成恢复。
 Write boot menu	BootManagerController	Button	写入引导菜单
+The Master Boot Record could not be restored!	BootManagerController		主引导记录无法恢复！
+Uninstall	DrivesPage	Button	卸载
+Default Partition	DefaultPartitionPage	Title	默认分区
+After five seconds	DefaultPartitionPage		五秒钟以后
+Back	BootManagerController	Button	退后
+Installation of boot menu completed	BootManagerController	Title	引导菜单安装完成
+Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	未命名 %d
+File:	FileSelectionPage	Text control label	文件：
+Previous	WizardView	Button	上一步
+Install	DrivesPage	Button	安装
+About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		将要写入下述引导菜单到引导磁盘（%s）。在继续之前，请核对下述信息。
+Unknown	LegacyBootMenu	Text is shown for an unknown partition type	未知
+Update	DrivesPage	Button	更新
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		请确定主引导记录备份文件以进行恢复。该文件创建于引导管理器首次安装时。
+Old Master Boot Record Saved failure	BootManagerController	Title	旧的主引导记录保存失败
+Drives	DrivesPage	Title	设备
+No space available!	DrivesPage	Cannot install	无可用空间！
+Never	DefaultPartitionPage		从不
+Partition table not compatible	BootManagerController	Title	分区表不兼容
+Old Master Boot Record saved	BootManagerController	Title	旧的主引导记录已保存
+Boot Manager is unable to read the partition table!	BootManagerController		引导管理器无法读取分区表！
+Error reading partition table	BootManagerController	Title	分区表读取出错
+Installation of boot menu failed	BootManagerController	Title	引导菜单安装失败
+Backup Master Boot Record	BootManagerController	Title	备份主引导记录
+Quit	DrivesPage	Button	退出
+About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		将要写入引导菜单到磁盘。是否继续？
+The old Master Boot Record was successfully saved to %s.	BootManagerController		旧的主引导记录成功保存到 %s。
+Default Partition:	DefaultPartitionPage	Menu field label	默认分区：
+Partitions	DefaultPartitionPage	Pop up menu title	分区
+BootManager	System name		引导管理器
+Summary	BootManagerController	Title	摘要
+OK	BootManagerController	Button	确定
+Immediately	DefaultPartitionPage		立刻
+Done	BootManagerController	Button	完成
+After three seconds	DefaultPartitionPage		三秒钟以后

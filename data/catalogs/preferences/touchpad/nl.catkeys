@@ -1,10 +1,20 @@
-1	dutch; flemish	x-vnd.Haiku-Touchpad	4054922715
+1	dutch; flemish	x-vnd.Haiku-Touchpad	607725922
 Scrolling	TouchpadPrefView		Scrollen
+Touchpad	System name		Touchpad
 Revert	TouchpadPrefView		Herstellen
+Tapping	TouchpadPrefView		Tikken
+Please confirm	TouchpadPrefView		Gelieve te bevestigen
 Two finger scrolling	TouchpadPrefView		Tweevinger-scrollen
 Defaults	TouchpadPrefView		Standaardwaarden
 Slow	TouchpadPrefView		Langzaam
+Vertical	TouchpadPrefView		Verticaal
 High	TouchpadPrefView		Hoog
 Horizontal scrolling	TouchpadPrefView		Horizontaal scrollen
 Fast	TouchpadPrefView		Snel
+OK	TouchpadPrefView		OK
+Acceleration	TouchpadPrefView		Versnelling
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Het nieuwe scrollgebied is erg groot en kan de normale functionering van de muis verhinderen. Ben je zeker dat je dit wil wijzigen?
+Horizontal	TouchpadPrefView		Horizontaal
 Off	TouchpadPrefView		Uit
+Sensitivity	TouchpadPrefView		Gevoeligheid
+Cancel	TouchpadPrefView		Annuleren

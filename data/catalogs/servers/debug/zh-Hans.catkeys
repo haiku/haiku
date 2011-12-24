@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-debug_server	1035915338
-Debug	DebugServer		调试器
+1	english	x-vnd.Haiku-debug_server	1035915338
 OK	DebugServer		确定
+Debug	DebugServer		调试器
 The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		应用程序：\n\n %app\n\n出现错误，无法继续运行。Haiku 将终止该程序并予以清除。

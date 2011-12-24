@@ -1,4 +1,4 @@
-1	german	x-vnd.haiku-icon_o_matic	2326864078
+1	german	x-vnd.haiku-icon_o_matic	3736361491
 Select All	Icon-O-Matic-PathManipulator		Alles auswählen
 Add Style	Icon-O-Matic-AddStylesCmd		Stil hinzufügen
 Color (#%02x%02x%02x)	Style name after dropping a color		Farbe (#%02x%02x%02x)
@@ -158,6 +158,7 @@ Snap to grid	Icon-O-Matic-Menu-Settings		Am Gitter einrasten
 Remove	Icon-O-Matic-ShapesList		Entfernen
 Yes	Icon-O-Matic-StyledTextImport		Ja
 Transformation	Icon-O-Matic-TransformersList		Transformation
+Save image	Icon-O-Matic-SavePanel		Bild speichern
 Add Styles	Icon-O-Matic-AddStylesCmd		Stile hinzufügen
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		Kontrollpunkte entfernen
 Format	Icon-O-Matic-SavePanel		Format

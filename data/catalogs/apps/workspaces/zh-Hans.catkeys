@@ -1,12 +1,12 @@
-1	simplified_chinese	x-vnd.Be-WORK	932379173
-About Workspaces…	Workspaces		关于工作区... 
-Always on top	Workspaces		置顶
-Auto-raise	Workspaces		自动
-Change workspace count…	Workspaces		修改工作区数量... 
+1	english	x-vnd.Be-WORK	932379173
 Invalid argument: %s\n	Workspaces		无效参数：%s\n
-OK	Workspaces		确定
 Quit	Workspaces		退出
-Show window border	Workspaces		显示窗口边框
-Show window tab	Workspaces		显示窗口标签
 Workspaces	System name		工作区
+Change workspace count…	Workspaces		修改工作区数量... 
+About Workspaces…	Workspaces		关于工作区... 
 Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		工作区\n编写者：%1，%2。\n\n版权所有%3 Haiku .Inc。\n\n使用 Alt 键将窗口置后。使用 Ctrl 键将窗口置前。\n
+Show window border	Workspaces		显示窗口边框
+Auto-raise	Workspaces		自动
+OK	Workspaces		确定
+Always on top	Workspaces		置顶
+Show window tab	Workspaces		显示窗口标签

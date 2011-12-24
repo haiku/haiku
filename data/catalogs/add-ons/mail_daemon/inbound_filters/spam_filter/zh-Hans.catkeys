@@ -1,9 +1,9 @@
-1	simplified_chinese	x-vnd.Haiku-SpamFilter	1975155212
-Add spam rating to start of subject	SpamFilterConfig		在条目前添加垃圾邮件排名
-Close	SpamFilterConfig		关闭
+1	english	x-vnd.Haiku-SpamFilter	1975155212
+or empty e-mail	SpamFilterConfig		或者清空邮箱
+Spam Filter (AGMS Bayesian)	SpamFilter		垃圾邮件过滤器（AGMS 贝叶斯法）
 Genuine below and uncertain above:	SpamFilterConfig		根据确定性排序：
+Spam above:	SpamFilterConfig		垃圾邮件：
+Add spam rating to start of subject	SpamFilterConfig		在条目前添加垃圾邮件排名
 Learn from all incoming e-mail	SpamFilterConfig		从所有收件箱中学习
 Sorry, unable to launch the spamdbm program to let you edit the server settings.	SpamFilterConfig		对不起，无法启动垃圾过滤程序以编辑服务器设置。
-Spam Filter (AGMS Bayesian)	SpamFilter		垃圾邮件过滤器（AGMS 贝叶斯法）
-Spam above:	SpamFilterConfig		垃圾邮件：
-or empty e-mail	SpamFilterConfig		或者清空邮箱
+Close	SpamFilterConfig		关闭

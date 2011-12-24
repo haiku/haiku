@@ -1,9 +1,9 @@
-1	simplified_chinese	x-vnd.Haiku-EXRTranslator	3390292316
-Based on OpenEXR (http://www.openexr.com)	ConfigView		基于 OpenEXR (http://www.openexr.com)
-EXR Images	ConfigView		EXR 图像
-EXR Images	EXRTranslator		EXR 图像
-EXR Settings	main		EXR 设置
-EXR image	EXRTranslator		EXR 图像
-EXR image translator	EXRTranslator		EXR image translator
+1	english	x-vnd.Haiku-EXRTranslator	3390292316
 Version %d.%d.%d, %s	ConfigView		版本 %d.%d.%d，%s
+EXR image translator	EXRTranslator		EXR image translator
+Based on OpenEXR (http://www.openexr.com)	ConfigView		基于 OpenEXR (http://www.openexr.com)
+EXR Settings	main		EXR 设置
+EXR Images	EXRTranslator		EXR 图像
 a division of Lucasfilm Entertainment Company Ltd	ConfigView		卢卡斯影业娱乐有限公司协会
+EXR Images	ConfigView		EXR 图像
+EXR image	EXRTranslator		EXR 图像

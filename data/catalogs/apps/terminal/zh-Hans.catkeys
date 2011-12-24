@@ -1,102 +1,101 @@
-1	simplified_chinese	x-vnd.Haiku-Terminal	2059530645
-%app% settings	Terminal PrefWindow	window title	%app% 设置
--h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h，--help 显示帮助\n -t，--title 设置窗口标题\n -f，--fullscreen 启动全屏显示\n
-Abort	Terminal Shell		放弃
-Appearance	Terminal PrefWindow		外观
-Background	Terminal AppearancePrefView		背景
-Black on White	Terminal colors schema		白底黑字
-Cancel	Terminal PrefWindow		取消
-Cancel	Terminal SetTitleWindow		取消
-Cancel	Terminal TermView		取消
-Cancel	Terminal TermWindow		取消
-Cannot execute \"%command\":\n\t%error	Terminal Shell		无法运行\"%command\":\n\t%错误
-Change directory	Terminal TermView		更改目录
-Clear all	Terminal TermWindow		清空
-Close	Terminal TermWindow		关闭
-Close active tab	Terminal TermWindow		关闭活动标签
-Close other tabs	Terminal TermWindow		关闭其他标签
-Close tab	Terminal TermWindow		关闭标签
-Close window	Terminal TermWindow		关闭窗口
-Color schema:	Terminal AppearancePrefView		色彩模式：
-Color:	Terminal AppearancePrefView		颜色：
-Confirm exit if active programs exist	Terminal AppearancePrefView		如果存在活动程序，确定退出。
-Copy	Terminal TermWindow		复制
-Copy here	Terminal TermView		复制到此  
-Create link here	Terminal TermView		创建链接
-Custom	Terminal colors schema		自定义
-Decrease	Terminal TermWindow		缩小
-Don't save	Terminal PrefWindow		不保存
-Edit	Terminal TermWindow		编辑
-Edit tab title…	Terminal TermWindow		编辑标签标题...
-Error!	Terminal getString		错误！
-Find	Terminal FindWindow		查找
-Find failed	Terminal TermWindow		查找失败
-Find next	Terminal TermWindow		查找下一个
-Find previous	Terminal TermWindow		查找上一个
-Find…	Terminal TermWindow		查找…
-Font:	Terminal AppearancePrefView		字体：
-Full screen	Terminal TermWindow		全屏
-Green on Black	Terminal colors schema		黑底绿字
-Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku终端\n版权所有 2001-2009 Haiku Inc。\n版权所有（C）1999 Kazuho Okui 和 Takashi Murai。\n\n用法：%s 【OPTION】【SHELL】\n
-Increase	Terminal TermWindow		增大
-Insert path	Terminal TermView		插入路径  
-Match case	Terminal FindWindow		匹配大小写  
-Match word	Terminal FindWindow		匹配单词
-Move here	Terminal TermView		移动到此
-New Terminal	Terminal TermWindow		新建窗口
-New tab	Terminal TermWindow		新建标签
-No search string was entered.	Terminal TermWindow		未输入任何字符。
+1	english	x-vnd.Haiku-Terminal	1054657081
 Not found.	Terminal TermWindow		未找到。  
-Nothing is selected.	Terminal TermWindow		未选中任何文件。
-OK	Terminal PrefWindow		确定
-OK	Terminal SetTitleWindow		确定
-OK	Terminal TermApp		确定
-OK	Terminal TermWindow		确定
-Page setup…	Terminal TermWindow		页面设置...  
-Paste	Terminal TermWindow		粘贴
-Print	Terminal TermWindow		打印
-Quit	Terminal TermWindow		退出
-Really close?	Terminal TermWindow		确定关闭吗？
-Save	Terminal PrefWindow		保存
-Save as default	Terminal TermWindow		保存为默认
-Save changes to this settings panel?	Terminal PrefWindow		保存设置面板中的修改？
-Save to file…	Terminal PrefWindow		保存为…
-Search forward	Terminal FindWindow		搜索前一个
-Select all	Terminal TermWindow		全选
-Selected background	Terminal AppearancePrefView		选中背景
-Selected text	Terminal AppearancePrefView		选中文本
-Set tab title	Terminal TermWindow		设置标签标题
-Set window title	Terminal TermWindow		设置窗口标题
-Settings	Terminal TermWindow		设置
-Settings…	Terminal TermWindow		设置…
-Shell 	Terminal TermWindow		Shell
-Size:	Terminal AppearancePrefView		大小：
 Switch Terminals	Terminal TermWindow		切换终端
-Tab title:	Terminal AppearancePrefView		标签标题：
-Tab title:	Terminal TermWindow		标签标题：
-Terminal	System name		终端
+Change directory	Terminal TermView		更改目录
+OK	Terminal TermWindow		确定
+New Terminal	Terminal TermWindow		新建窗口
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		终端无法启动shell，非常抱歉。
-Text	Terminal AppearancePrefView		文本
-Text encoding	Terminal TermWindow		文字编码
-Text not found.	Terminal TermWindow		文本未搜索到。
 Text size	Terminal TermWindow		文本大小  
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		下述进程仍在运行：\n\n\t%1\n\n如果您关闭终端，这些进程将被杀死。
-The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		该图案指定了当前标签标题。可以使用下述的\n占位符：\n
-The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		该图案指定了标签标题。可以使用下述的\n占位符：\n
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		该图案指定了窗口标题。可以使用下述的\n占位符：\n
-The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		该图案指定了窗口标题。可以使用下述的\n占位符：\n
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		\"%1\" 进程仍在运行。\n如果关闭终端，该进程将被杀死。
-The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		\"%1\" 进程仍在运行。\n如果关闭该标签，该进程将被杀死。
-Unrecognized option \"%s\"\n	Terminal arguments parsing		无法识别的选项\"%s\"\n
-Use default	Terminal SetTitleWindow		使用默认
+Match case	Terminal FindWindow		匹配大小写  
+Quit	Terminal TermWindow		退出
 Use default shell	Terminal Shell		使用默认shell  
-Use selection	Terminal FindWindow		使用选择
-Use text:	Terminal FindWindow		使用文本：
-White on Black	Terminal colors schema		黑底白字
-Window size	Terminal TermWindow		窗口大小
+Confirm exit if active programs exist	Terminal AppearancePrefView		如果存在活动程序，确定退出。
+The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		该图案指定了当前标签标题。可以使用下述的\n占位符：\n
+Select all	Terminal TermWindow		全选
+Close tab	Terminal TermWindow		关闭标签
+Custom	Terminal colors schema		自定义
+Save to file…	Terminal PrefWindow		保存为…
+OK	Terminal PrefWindow		确定
+Black on White	Terminal colors schema		白底黑字
 Window title:	Terminal AppearancePrefView		窗口标题：
+Font:	Terminal AppearancePrefView		字体：
+Copy here	Terminal TermView		复制到此  
+Really close?	Terminal TermWindow		确定关闭吗？
+Copy	Terminal TermWindow		复制
 Window title:	Terminal TermWindow		窗口标题：
+Unrecognized option \"%s\"\n	Terminal arguments parsing		无法识别的选项\"%s\"\n
+%app% settings	Terminal PrefWindow	window title	%app% 设置
+Cancel	Terminal SetTitleWindow		取消
+Increase	Terminal TermWindow		增大
+Settings	Terminal TermWindow		设置
+Window size	Terminal TermWindow		窗口大小
+Selected text	Terminal AppearancePrefView		选中文本
+Find	Terminal FindWindow		查找
+Appearance	Terminal PrefWindow		外观
+Tab title:	Terminal AppearancePrefView		标签标题：
+The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		该图案指定了窗口标题。可以使用下述的\n占位符：\n
+Color schema:	Terminal AppearancePrefView		色彩模式：
+OK	Terminal SetTitleWindow		确定
+Background	Terminal AppearancePrefView		背景
+Use selection	Terminal FindWindow		使用选择
+Green on Black	Terminal colors schema		黑底绿字
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		\"%1\" 进程仍在运行。\n如果关闭该标签，该进程将被杀死。
+Size:	Terminal AppearancePrefView		大小：
+Cannot execute \"%command\":\n\t%error	Terminal Shell		无法运行\"%command\":\n\t%错误
+Full screen	Terminal TermWindow		全屏
 Window title…	Terminal TermWindow		窗口标题...
+Page setup…	Terminal TermWindow		页面设置...  
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		下述进程仍在运行：\n\n\t%1\n\n如果您关闭终端，这些进程将被杀死。
+Insert path	Terminal TermView		插入路径  
+Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku终端\n版权所有 2001-2009 Haiku Inc。\n版权所有（C）1999 Kazuho Okui 和 Takashi Murai。\n\n用法：%s 【OPTION】【SHELL】\n
+No search string was entered.	Terminal TermWindow		未输入任何字符。
+Don't save	Terminal PrefWindow		不保存
+Set window title	Terminal TermWindow		设置窗口标题
+Terminal	System name		终端
+Close other tabs	Terminal TermWindow		关闭其他标签
+Match word	Terminal FindWindow		匹配单词
+Nothing is selected.	Terminal TermWindow		未选中任何文件。
+Text not found.	Terminal TermWindow		文本未搜索到。
+Find…	Terminal TermWindow		查找…
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		\"%1\" 进程仍在运行。\n如果关闭终端，该进程将被杀死。
+Move here	Terminal TermView		移动到此
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\t当前标签中，活动进程的当前工作目录。\n\t\t组件可以指定的最大路径数量。例如，'%2d'，可以指定至多两个组件。\n\t%i\t-\t窗口的索引。\n\t%p\t-\t当前标签中的活动进程。\n\t%t\t-\t当前标签的标题。\n\t%%\t-\t字符 '%'。
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d-\t活动进程的当前工作目录。\n\t\t组件可以指定的\n\t\t最大路径数量。例如，'%2d' ，可以指定至多两个组件。\n\t%i\t-\t标签的索引。\n\t%p\t-\t活跃进程。\n\t%%\t-\t字符 '%' 。
+White on Black	Terminal colors schema		黑底白字
+Error!	Terminal getString		错误！
+New tab	Terminal TermWindow		新建标签
+The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		该图案指定了标签标题。可以使用下述的\n占位符：\n
+Selected background	Terminal AppearancePrefView		选中背景
+Decrease	Terminal TermWindow		缩小
+Create link here	Terminal TermView		创建链接
+Close	Terminal TermWindow		关闭
+Text	Terminal AppearancePrefView		文本
+Clear all	Terminal TermWindow		清空
+Text encoding	Terminal TermWindow		文字编码
 size	Terminal TermView		大小
+Close window	Terminal TermWindow		关闭窗口
+Save as default	Terminal TermWindow		保存为默认
+Set tab title	Terminal TermWindow		设置标签标题
+Settings…	Terminal TermWindow		设置…
+Abort	Terminal Shell		放弃
+Edit	Terminal TermWindow		编辑
+Color:	Terminal AppearancePrefView		颜色：
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		该图案指定了窗口标题。可以使用下述的\n占位符：\n
+Print	Terminal TermWindow		打印
+Use text:	Terminal FindWindow		使用文本：
+Cancel	Terminal TermWindow		取消
+OK	Terminal TermApp		确定
+Find failed	Terminal TermWindow		查找失败
+Search forward	Terminal FindWindow		搜索前一个
+Edit tab title…	Terminal TermWindow		编辑标签标题...
+Find previous	Terminal TermWindow		查找上一个
+Tab title:	Terminal TermWindow		标签标题：
+Find next	Terminal TermWindow		查找下一个
+Close active tab	Terminal TermWindow		关闭活动标签
+Paste	Terminal TermWindow		粘贴
+Save changes to this settings panel?	Terminal PrefWindow		保存设置面板中的修改？
+Cancel	Terminal PrefWindow		取消
+Shell 	Terminal TermWindow		Shell
+Save	Terminal PrefWindow		保存
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d-\t活动进程的当前工作目录。\n\t\t组件可以指定的\n\t\t最大路径数量。例如，'%2d' ，可以指定至多两个组件。\n\t%i\t-\t标签的索引。\n\t%p\t-\t活跃进程。\n\t%%\t-\t字符 '%' 。
+Cancel	Terminal TermView		取消
+Use default	Terminal SetTitleWindow		使用默认

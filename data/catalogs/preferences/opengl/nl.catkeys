@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-OpenGL	899836772
+1	dutch; flemish	x-vnd.Haiku-OpenGL	209187778
 List stack size:	Capabilities		Lijst stackgrootte:
 Information	InfoView		Informatie
 Max. clipping planes:	Capabilities		Max. clippingvlakken:
@@ -8,6 +8,7 @@ Vendor name:	InfoView		Vendor-naam:
 Attributes stack size:	Capabilities		Stackgrootte-kenmerken:
 OpenGL version:	InfoView		OpenGL-versie:
 Name stack size:	Capabilities		Naam stackgrootte:
+OpenGL	System name		OpenGL
 Auxiliary buffer(s):	Capabilities		Hulpbuffer(s):
 Max. recommended vertex elements:	Capabilities		Max. aanbevolen vertex-elementen:
 GLU version:	InfoView		GLU versie:
