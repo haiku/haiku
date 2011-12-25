@@ -6,30 +6,29 @@
 #include <string.h>
 #include <SupportDefs.h>
 
-// From Bit twiddling hacks: http://graphics.stanford.edu/~seander/bithacks.html
-#define hasZeroByte(value) (value - 0x01010101) & ~value & 0x80808080
+
+/* From Bit twiddling hacks:
+	http://graphics.stanford.edu/~seander/bithacks.html */
+#define HasZeroByte(value) ((value - 0x01010101) & ~value & 0x80808080)
+
 
 size_t
-strlen(char const *s)
+strlen(const char* s)
 {
-	size_t i = 0;
-	uint32 *value;
+	size_t length = 0;
+	uint32* valuePointer;
 
-	//Make sure we use aligned access
-	while (((uint32) s + i) & 3) {
-		if (!s[i]) return i;
-		i++;
-	}
+	/* Align access for four byte reads */
+	for (; (((addr_t) s + length) & 3) != 0; length++)
+		if (s[length] == '\0')
+			return length;
 
-	//Check four bytes at once
-	value = (uint32 *) (s + i);
-	while (!(hasZeroByte(*value)))
-		value++;
+	/* Check four bytes for zero char */
+	for (valuePointer = (uint32*) (s + length); !HasZeroByte(*valuePointer);
+		valuePointer++);
 
-	//Find the exact length
-	i = ((char *) value) - s;
-	while (s[i])
-		i++;
+	/* Find the exact length */
+	for (length = ((char*) valuePointer) - s; s[length] != '\0'; length++);
 
-	return i;
+	return length;
 }

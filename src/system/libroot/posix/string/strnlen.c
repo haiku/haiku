@@ -7,32 +7,31 @@
 #include <SupportDefs.h>
 
 
-// From Bit twiddling hacks: http://graphics.stanford.edu/~seander/bithacks.html
-#define hasZeroByte(value) (value - 0x01010101) & ~value & 0x80808080
+/* From Bit twiddling hacks:
+	http://graphics.stanford.edu/~seander/bithacks.html */
+#define HasZeroByte(value) ((value - 0x01010101) & ~value & 0x80808080)
+
 
 size_t
-strnlen(char const *s, size_t count)
+strnlen(const char* s, size_t count)
 {
-	size_t i = 0;
-	uint32 *value;
+	size_t length = 0;
+	uint32* valuePointer;
+	uint32* maxScanPosition;
 
-	//Make sure we use aligned access
-	while (((uint32) s + i) & 3) {
-		if (i == count || !s[i]) return i;
-		i++;
-	}
+	/* Align access for four byte reads */
+	for (; (((addr_t) s + length) & 3) != 0; length++)
+		if (length == count || s[length] == '\0')
+			return length;
 
+	/* Check four bytes for zero char */
+	maxScanPosition = (uint32*) (s + count - 4);
+	for (valuePointer = (uint32*) (s + length); valuePointer <= maxScanPosition
+		&& !HasZeroByte(*valuePointer); valuePointer++);
 
-	const uint32 * end = (uint32 *) s + count;
-	//Check four bytes at once
-	value = (uint32 *) (s + i);
-	while (value < end && !(hasZeroByte(*value)) )
-		value++;
+	/* Find the exact length */
+	for (length = ((char*) valuePointer) - s; length < count
+		&& s[length] != '\0'; length++);
 
-	//Find the exact length
-	i = ((char *) value) - s;
-	while (s[i] && i < count )
-		i++;
-
-	return i;
+	return length;
 }
