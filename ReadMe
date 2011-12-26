@@ -24,7 +24,7 @@ Pre-requisite software
 
 Tools provided within Haiku's repositories
 
- * Jam (Jam 2.5-haiku-20090626)
+ * Jam (Jam 2.5-haiku-20111222)
  * Haiku's cross-compiler (needed only for non-Haiku platforms)
 
 The tools to compile Haiku will vary, depending on the platform that you are
