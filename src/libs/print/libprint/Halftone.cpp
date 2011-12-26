@@ -167,7 +167,7 @@ Halftone::Dither(uchar* destination, const uchar* source, int x, int y,
 				break;
 		}
 	} else {
-		ASSERT(fGray == &gray);
+		ASSERT(fGray == &ToGray);
 	}
 
 	(this->*fDither)(destination, source, x, y, width);
