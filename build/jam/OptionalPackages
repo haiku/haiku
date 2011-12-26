@@ -566,8 +566,8 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 			flex-2.5.35-r1a3-x86-gcc4-2011-05-23.zip
 			: $(baseURL)/flex-2.5.35-r1a3-x86-gcc4-2011-05-23.zip ;
 		InstallOptionalHaikuImagePackage
-			jam-2.5-r1a3-x86-gcc4-2011-05-23.zip
-			: $(baseURL)/jam-2.5-r1a3-x86-gcc4-2011-05-23.zip ;
+			jam-2.5-x86-gcc4-2011-12-26.zip
+			: $(baseURL)/jam-2.5-x86-gcc4-2011-12-26.zip ;
 		InstallOptionalHaikuImagePackage
 			mkdepend-1.7-r1a3-x86-gcc4-2011-05-23.zip
 			: $(baseURL)/mkdepend-1.7-r1a3-x86-gcc4-2011-05-23.zip ;
@@ -585,8 +585,8 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 			flex-2.5.35-r1a3-x86-gcc2-2011-05-17.zip
 			: $(baseURL)/flex-2.5.35-r1a3-x86-gcc2-2011-05-17.zip ;
 		InstallOptionalHaikuImagePackage
-			jam-2.5-r1a3-x86-gcc2-2011-05-17.zip
-			: $(baseURL)/jam-2.5-r1a3-x86-gcc2-2011-05-17.zip ;
+			jam-2.5-x86-gcc2-2011-12-26.zip
+			: $(baseURL)/jam-2.5-x86-gcc2-2011-12-26.zip ;
 		InstallOptionalHaikuImagePackage
 			mkdepend-1.7-r1a3-x86-gcc2-2011-05-17.zip
 			: $(baseURL)/mkdepend-1.7-r1a3-x86-gcc2-2011-05-17.zip ;
