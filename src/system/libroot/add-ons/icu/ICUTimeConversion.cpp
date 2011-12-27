@@ -124,7 +124,7 @@ ICUTimeConversion::TZSet(const char* timeZoneID, const char* tz)
 			strcpy(fDataBridge->addrOfTZName[0], fTimeZoneID);
 		} else {
 			UnicodeString icuString;
-			fTimeZone->getDisplayName(i == 1, TimeZone::SHORT_COMMONLY_USED,
+			fTimeZone->getDisplayName(i == 1, TimeZone::SHORT,
 				fTimeData.ICULocale(), icuString);
 			CheckedArrayByteSink byteSink(fDataBridge->addrOfTZName[i],
 				sizeof(fTimeZoneID));
