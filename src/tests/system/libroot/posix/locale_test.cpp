@@ -1461,13 +1461,13 @@ static int sign (int a)
 
 
 void
-test_coll(bool useStrxfrm, const char* locale, const coll_data coll[])
+test_coll(bool useStrxfrm, const char* locale, const coll_data* coll)
 {
 	setlocale(LC_COLLATE, locale);
 	printf("%s in %s locale\n", useStrxfrm ? "strxfrm" : "strcoll", locale);
 
 	int problemCount = 0;
-	for (unsigned int i = 0; i < sizeof(coll) / sizeof(coll_data); ++i) {
+	for (unsigned int i = 0; coll[i].a != NULL; ++i) {
 		errno = 0;
 		int result;
 		char funcCall[100];
@@ -1508,6 +1508,7 @@ test_collation()
 		{ "test", "tester", -1, 0 },
 		{ "tast", "täst", -1, EINVAL },
 		{ "tæst", "test", 1, EINVAL },
+		{ NULL, NULL, 0, 0 },
 	};
 	test_coll(0, "POSIX", coll_posix);
 	test_coll(1, "POSIX", coll_posix);
@@ -1535,6 +1536,7 @@ test_collation()
 		{ "cote", "coté", -1, 0 },
 		{ "coté", "côte", -1, 0 },
 		{ "côte", "côté", -1, 0 },
+		{ NULL, NULL, 0, 0 },
 	};
 	test_coll(0, "en_US.UTF-8", coll_en);
 	test_coll(1, "en_US.UTF-8", coll_en);
@@ -1562,6 +1564,7 @@ test_collation()
 		{ "cote", "coté", -1, 0 },
 		{ "coté", "côte", -1, 0 },
 		{ "côte", "côté", -1, 0 },
+		{ NULL, NULL, 0, 0 },
 	};
 	test_coll(0, "de_DE.UTF-8", coll_de);
 	test_coll(1, "de_DE.UTF-8", coll_de);
@@ -1589,6 +1592,7 @@ test_collation()
 		{ "cote", "coté", -1, 0 },
 		{ "coté", "côte", -1, 0 },
 		{ "côte", "côté", -1, 0 },
+		{ NULL, NULL, 0, 0 },
 	};
 	test_coll(0, "de_DE.UTF-8@collation=phonebook", coll_de_phonebook);
 	test_coll(1, "de_DE.UTF-8@collation=phonebook", coll_de_phonebook);
@@ -1616,9 +1620,13 @@ test_collation()
 		{ "cote", "coté", -1, 0 },
 		{ "coté", "côte", 1, 0 },
 		{ "côte", "côté", -1, 0 },
+		{ NULL, NULL, 0, 0 },
 	};
-	test_coll(0, "fr_FR.UTF-8", coll_fr);
-	test_coll(1, "fr_FR.UTF-8", coll_fr);
+	// CLDR-1.9 has adjusted the defaults of fr_FR to no longer do reverse
+	// ordering of secondary differences (accents), but fr_CA still does that
+	// by default
+	test_coll(0, "fr_CA.UTF-8", coll_fr);
+	test_coll(1, "fr_CA.UTF-8", coll_fr);
 }
 
 
