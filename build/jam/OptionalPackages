@@ -277,8 +277,8 @@ if [ IsOptionalHaikuImagePackageAdded BeZillaBrowser ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				BeZillaBrowser-2.0.0.22pre-r1a2-x86-gcc4-2010-05-04.zip
-				: $(baseURL)/BeZillaBrowser-2.0.0.22pre-r1a2-x86-gcc4-2010-05-04.zip ;
+				BeZillaBrowser-2.0.0.22pre-x86-gcc4-2011-12-26.zip
+				: $(baseURL)/BeZillaBrowser-2.0.0.22pre-x86-gcc4-2011-12-26.zip ;
  		} else {
 			InstallOptionalHaikuImagePackage
 				BeZillaBrowser-2.0.0.22pre-r1a2-x86-gcc2-2010-05-02.zip
