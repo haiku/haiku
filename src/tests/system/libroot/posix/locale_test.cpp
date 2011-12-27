@@ -410,7 +410,7 @@ test_localeconv()
 		(char*)",",
 		(char*)"\x03\x02",
 		(char*)"INR ",
-		(char*)"રુ",
+		(char*)"\xE2\x82\xB9",
 		(char*)".",
 		(char*)",",
 		(char*)"\x03\x02",
@@ -631,7 +631,7 @@ test_strftime()
 	test_strftime("nl_NL", strftime_nl);
 
 	const strftime_data strftime_nb[] = {
-		{ "%c", "lørdag 17. juli 2010 kl. 18:26:09 GMT" },
+		{ "%c", "kl. 18:26:09 GMT lørdag 17. juli 2010" },
 		{ "%x", "17. juli 2010" },
 		{ "%X", "18:26:09" },
 		{ "%a", "lør." },
@@ -1808,7 +1808,7 @@ test_mktime(const char* tz, tm& tm, time_t expected, int expectedWeekDay,
 void
 test_timeconversions()
 {
-	setlocale(LC_ALL, "");
+	setlocale(LC_ALL, "en_US");
 	{
 		time_t testTime = 1279391169;	// Sat Jul 17 18:26:09 GMT 2010
 		tm gtm = {
@@ -1866,7 +1866,7 @@ test_timeconversions()
 		test_mktime(":America/Los_Angeles", latm, testTime, 6, 197);
 
 		tm ttm = {
-			9, 26, 3, 18, 6, 110, 0, 198, 0, 9 * 3600, (char*)"JST"
+			9, 26, 3, 18, 6, 110, 0, 198, 0, 9 * 3600, (char*)"GMT+09:00"
 		};
 		test_localtime(":Asia/Tokyo", testTime, ttm);
 		test_gmtime(":Asia/Tokyo", testTime, gtm);
@@ -1914,7 +1914,7 @@ test_timeconversions()
 		test_mktime(":America/Los_Angeles", latm, testTime, 2, 67);
 
 		tm ttm = {
-			9, 26, 3, 10, 2, 110, 3, 68, 0, 9 * 3600, (char*)"JST"
+			9, 26, 3, 10, 2, 110, 3, 68, 0, 9 * 3600, (char*)"GMT+09:00"
 		};
 		test_localtime(":Asia/Tokyo", testTime, ttm);
 		test_gmtime(":Asia/Tokyo", testTime, gtm);
@@ -1962,7 +1962,7 @@ test_timeconversions()
 		test_mktime(":America/Los_Angeles", latm, testTime, 3, 364);
 
 		tm ttm = {
-			0, 0, 9, 1, 0, 70, 4, 0, 0, 9 * 3600, (char*)"JST"
+			0, 0, 9, 1, 0, 70, 4, 0, 0, 9 * 3600, (char*)"GMT+09:00"
 		};
 		test_localtime(":Asia/Tokyo", testTime, ttm);
 		test_gmtime(":Asia/Tokyo", testTime, gtm);
