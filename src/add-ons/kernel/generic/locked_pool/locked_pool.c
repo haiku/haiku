@@ -430,7 +430,7 @@ create_pool(int block_size, int alignment, int next_ofs,
 	if (pool == NULL)
 		return NULL;
 
-	memset(pool, sizeof(*pool), 0);
+	memset(pool, 0, sizeof(*pool));
 
 	mutex_init(&pool->mutex, "locked_pool");
 
