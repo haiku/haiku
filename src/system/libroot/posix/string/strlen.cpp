@@ -17,20 +17,22 @@ size_t
 strlen(const char* string)
 {
 	size_t length = 0;
-	uint32* valuePointer;
 
 	/* Align access for four byte reads */
-	for (; (((addr_t)string + length) & 3) != 0; length++)
+	for (; (((addr_t)string + length) & 3) != 0; length++) {
 		if (string[length] == '\0')
 			return length;
+	}
 
 	/* Check four bytes for zero char */
-	for (valuePointer = (uint32*)(string + length);
-		LACKS_ZERO_BYTE(*valuePointer); valuePointer++);
+	uint32* valuePointer = (uint32*)(string + length);
+	for (; LACKS_ZERO_BYTE(*valuePointer); valuePointer++)
+		;
 
 	/* Find the exact length */
 	for (length = ((char*)valuePointer) - string; string[length] != '\0';
-		length++);
+		length++)
+		;
 
 	return length;
 }
