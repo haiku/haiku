@@ -86,8 +86,8 @@ BBufferedDataIO::Flush()
 	if (!fDirty)
 		return B_OK;
 
-	size_t bytesWritten = fStream.Write(fBuffer + fPosition, fSize);
-	if (bytesWritten == fSize) {
+	ssize_t bytesWritten = fStream.Write(fBuffer + fPosition, fSize);
+	if ((size_t)bytesWritten == fSize) {
 		fDirty = false;
 		fPosition = 0;
 		fSize = 0;
