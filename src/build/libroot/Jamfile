@@ -67,7 +67,7 @@ local librootSources =
 	driver_settings.cpp
 
 	$(strlSources)
-	strnlen.c
+	strnlen.cpp
 
 	KMessage.cpp
 ;
@@ -93,7 +93,7 @@ BuildPlatformStaticLibraryPIC libroot_build_function_remapper.a :
 
 SEARCH on [ FGristFiles driver_settings.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system libroot os ] ;
-SEARCH on [ FGristFiles $(strlSources) strnlen.c ]
+SEARCH on [ FGristFiles $(strlSources) strnlen.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
 SEARCH on [ FGristFiles KMessage.cpp ]
     = [ FDirName $(HAIKU_TOP) src system kernel messaging ] ;

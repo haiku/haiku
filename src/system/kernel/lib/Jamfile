@@ -109,12 +109,12 @@ KernelMergeObject kernel_lib_posix.o :
 	strerror.c
 	strlcat.c
 	strlcpy.c
-	strlen.c
+	strlen.cpp
 	strncat.c
 	strncmp.c
 	strncpy.c
 	strndup.cpp
-	strnlen.c
+	strnlen.cpp
 	strpbrk.c
 	strrchr.c
 	strspn.c

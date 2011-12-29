@@ -33,7 +33,7 @@ MergeObject posix_string.o :
 	strncmp.c
 	strncpy.c
 	strndup.cpp
-	strnlen.c
+	strnlen.cpp
 	strpbrk.c
 	strrchr.c
 	strspn.c
