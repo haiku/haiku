@@ -131,8 +131,10 @@ DefaultNotifier::ReportProgress(int bytes, int messages, const char* message)
 	if (fItemsDone == fTotalItems && fTotalItems != 0)
 		timeout = 1; // We're done, make the window go away faster
 
-	if ((!fIsInbound && fShowMode & B_MAIL_SHOW_STATUS_WINDOW_WHEN_SENDING)
-		|| (fIsInbound && fShowMode & B_MAIL_SHOW_STATUS_WINDOW_WHEN_ACTIVE))
+	if ((!fIsInbound
+			&& (fShowMode & B_MAIL_SHOW_STATUS_WINDOW_WHEN_SENDING) != 0)
+		|| (fIsInbound
+			&& (fShowMode & B_MAIL_SHOW_STATUS_WINDOW_WHEN_ACTIVE) != 0))
 		fNotification.Send(timeout);
 }
 
