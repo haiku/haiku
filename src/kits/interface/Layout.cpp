@@ -468,7 +468,7 @@ BLayout::AllUnarchived(const BMessage* from)
 	if (err != B_OK)
 		return err;
 
-	int32 itemCount;
+	int32 itemCount = 0;
 	unarchiver.ArchiveMessage()->GetInfo(kLayoutItemField, NULL, &itemCount);
 	for (int32 i = 0; i < itemCount && err == B_OK; i++) {
 		BLayoutItem* item;
