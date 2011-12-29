@@ -825,7 +825,7 @@ EcRead(struct acpi_ec_cookie* sc, uint8 address, uint8* readData)
 
 	acpi_status status;
 	for (uint8 retry = 0; retry < 2; retry++) {
-		acpi_status status = EcCommand(sc, EC_COMMAND_READ);
+		status = EcCommand(sc, EC_COMMAND_READ);
 		if (status != AE_OK)
 			return status;
 
