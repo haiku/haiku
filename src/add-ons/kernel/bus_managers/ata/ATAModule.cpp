@@ -172,7 +172,7 @@ ata_channel_added(device_node *parent)
 		return B_ERROR;
 	}
 
-	uint32 channelID = gDeviceManager->create_id(ATA_CHANNEL_ID_GENERATOR);
+	int32 channelID = gDeviceManager->create_id(ATA_CHANNEL_ID_GENERATOR);
 	if (channelID < 0) {
 		TRACE_ERROR("out of channel ids\n");
 		return B_ERROR;
@@ -195,7 +195,7 @@ ata_channel_added(device_node *parent)
 		// - ATA allows up to 256 blocks for LBA28 and 65535 for LBA48
 		// to fix specific drive bugs use ATAChannel::GetRestrictions()
 		{ B_DMA_MAX_TRANSFER_BLOCKS, B_UINT32_TYPE, { ui32: 0xffff } },
-		{ ATA_CHANNEL_ID_ITEM, B_UINT32_TYPE, { ui32: channelID } },
+		{ ATA_CHANNEL_ID_ITEM, B_UINT32_TYPE, { ui32: (uint32)channelID } },
 		{ NULL }
 	};
 
