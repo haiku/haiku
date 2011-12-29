@@ -456,7 +456,7 @@ BLayout::Archive(BMessage* into, bool deep) const
 status_t
 BLayout::AllArchived(BMessage* archive) const
 {
-	return BArchivable::AllArchived(archive);
+	return BLayoutItem::AllArchived(archive);
 }
 
 
