@@ -459,7 +459,7 @@ load_driver_settings_from_file(int file, const char *driverName)
 
 
 static bool
-put_string(char **_buffer, size_t *_bufferSize, char *string)
+put_string(char **_buffer, ssize_t *_bufferSize, char *string)
 {
 	size_t length, reserved, quotes;
 	char *buffer = *_buffer, c;
@@ -507,7 +507,7 @@ put_string(char **_buffer, size_t *_bufferSize, char *string)
 
 
 static bool
-put_chars(char **_buffer, size_t *_bufferSize, const char *chars)
+put_chars(char **_buffer, ssize_t *_bufferSize, const char *chars)
 {
 	char *buffer = *_buffer;
 	size_t length;
@@ -533,7 +533,7 @@ put_chars(char **_buffer, size_t *_bufferSize, const char *chars)
 
 
 static bool
-put_char(char **_buffer, size_t *_bufferSize, char c)
+put_char(char **_buffer, ssize_t *_bufferSize, char c)
 {
 	char *buffer = *_buffer;
 
@@ -553,7 +553,7 @@ put_char(char **_buffer, size_t *_bufferSize, char c)
 
 
 static void
-put_level_space(char **_buffer, size_t *_bufferSize, int32 level)
+put_level_space(char **_buffer, ssize_t *_bufferSize, int32 level)
 {
 	while (level-- > 0)
 		put_char(_buffer, _bufferSize, '\t');
@@ -561,7 +561,7 @@ put_level_space(char **_buffer, size_t *_bufferSize, int32 level)
 
 
 static void
-put_parameter(char **_buffer, size_t *_bufferSize,
+put_parameter(char **_buffer, ssize_t *_bufferSize,
 	struct driver_parameter *parameter, int32 level, bool flat)
 {
 	int32 i;
@@ -873,11 +873,11 @@ parse_driver_settings_string(const char *settingsString)
 	the "buffer" parameter is NULL, B_BAD_VALUE is returned.
 */
 status_t
-get_driver_settings_string(void *_handle, char *buffer, size_t *_bufferSize,
+get_driver_settings_string(void *_handle, char *buffer, ssize_t *_bufferSize,
 	bool flat)
 {
 	settings_handle *handle = (settings_handle *)_handle;
-	size_t bufferSize = *_bufferSize;
+	ssize_t bufferSize = *_bufferSize;
 	int32 i;
 
 	if (!check_handle(handle) || !buffer || *_bufferSize == 0)
