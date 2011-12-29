@@ -200,16 +200,18 @@ BLayout::RemoveView(BView* child)
 	bool removed = false;
 
 	// a view can have any number of layout items - we need to remove them all
-	BView::Private viewPrivate(child);
-	for (int32 i = viewPrivate.CountLayoutItems() - 1; i >= 0; i--) {
-		BLayoutItem* item = viewPrivate.LayoutItemAt(i);
+	int32 remaining = BView::Private(child).CountLayoutItems();
+	for (int32 i = CountItems() - 1; i >= 0 && remaining > 0; i--) {
+		BLayoutItem* item = ItemAt(i);
 
-		if (item->Layout() != this)
+		if (item->View() != child)
 			continue;
 
 		RemoveItem(i);
-		removed = true;
 		delete item;
+
+		remaining--;
+		removed = true;
 	}
 
 	return removed;
