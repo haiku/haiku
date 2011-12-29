@@ -117,6 +117,7 @@ static const Translation gTranslations[] =
 		"Jean-Loïc Charroud\n"
 		"Adrien Destugues (PulkoMandy)\n"
 		"Florent Revest\n"
+		"Harsh Vardhan\n"
 	},
 	{ "da",
 		"Brian Matzon\n"
