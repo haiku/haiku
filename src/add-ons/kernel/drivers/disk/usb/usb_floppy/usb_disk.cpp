@@ -652,18 +652,20 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 
 	mutex_init(&device->lock, "usb_disk device lock");
 
-	device->notify = create_sem(0, "usb_disk callback notify");
-	if (device->notify < B_OK) {
+	status_t result = device->notify =
+		create_sem(0, "usb_disk callback notify");
+
+	if (result < B_OK) {
 		mutex_destroy(&device->lock);
 		free(device);
-		return device->notify;
+		return result;
 	}
 
-	device->interruptLock = create_sem(0, "usb_disk interrupt lock");
-	if (device->interruptLock < B_OK) {
+	result = device->interruptLock = create_sem(0, "usb_disk interrupt lock");
+	if (result < B_OK) {
 		mutex_destroy(&device->lock);
 		free(device);
-		return device->interruptLock;
+		return result;
 	}
 
 	// TODO: handle more than 1 unit
@@ -673,7 +675,7 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 	for (uint8 i = 0; i < device->lun_count; i++)
 		device->luns[i] = NULL;
 
-	status_t result = B_OK;
+	result = B_OK;
 
 	TRACE_ALWAYS("device reports a lun count of %d\n", device->lun_count);
 	for (uint8 i = 0; i < device->lun_count; i++) {
