@@ -1451,15 +1451,20 @@ mwl_hal_bastream_alloc(struct mwl_hal_vap *vap, int ba_policy,
 	}
 	sp = &mh->mh_streams[s];
 	mh->mh_bastreams &= ~(1<<s);
-	sp->public.data[0] = a1;
-	sp->public.data[1] = a2;
-	IEEE80211_ADDR_COPY(sp->macaddr, Macaddr);
-	sp->tid = Tid;
-	sp->paraminfo = ParamInfo;
-	sp->setup = 0;
-	sp->ba_policy = ba_policy;
-	MWL_HAL_UNLOCK(mh);
-	return sp != NULL ? &sp->public : NULL;
+	if (sp != NULL) {
+		sp->public.data[0] = a1;
+		sp->public.data[1] = a2;
+		IEEE80211_ADDR_COPY(sp->macaddr, Macaddr);
+		sp->tid = Tid;
+		sp->paraminfo = ParamInfo;
+		sp->setup = 0;
+		sp->ba_policy = ba_policy;
+		MWL_HAL_UNLOCK(mh);
+		return &sp->public;
+	} else {
+		MWL_HAL_UNLOCK(mh);
+		return NULL;
+	}
 }
 
 const MWL_HAL_BASTREAM *
