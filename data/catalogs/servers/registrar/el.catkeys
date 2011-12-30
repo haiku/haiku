@@ -1,0 +1,23 @@
+1	modern_greek	application/x-vnd.Haiku-Registrar	2599857937
+%action%?	ShutdownProcess		%action%;
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Η εφαρμογή \"%appName%\" ακύρωσε τη διαδικασία τερματισμού.
+Asking \"%appName%\" to quit.	ShutdownProcess		Αίτηση \"%appName%\" για τερματισμό.
+Asking background applications to quit.	ShutdownProcess		Αίτηση εφαρμογών παρασκηνίου για τερματισμό.
+Asking other processes to quit.	ShutdownProcess		Αίτηση άλλων διεργασιών για τερματισμό.
+Cancel	ShutdownProcess		Άκυρο
+Cancel shutdown	ShutdownProcess		Ακύρωση τερματισμού
+Do you really want to restart the system?	ShutdownProcess		Θέλετε σίγουρα να επανακκινήσετε το σύστημα;
+Do you really want to shut down the system?	ShutdownProcess		Θέλετε πραγματικά να επανεκκινήσετε το σύστημα;
+It's now safe to turn off the computer.	ShutdownProcess		Μπορείτε τώρα να κλείσετε με ασφάλεια τον υπολογιστή.
+Kill application	ShutdownProcess		Τερματισμός εφαρμογής
+OK	ShutdownProcess		Εντάξει
+Restart	ShutdownProcess		Επανεκκίνηση
+Restart system	ShutdownProcess		Επανεκκίνηση συστήματος
+Restarting…	ShutdownProcess		Επανεκκίνηση...
+Shut down	ShutdownProcess		Τερματισμός
+Shutdown aborted	ShutdownProcess		Ο τερματισμός ακυρώθηκε
+Shutdown status	ShutdownProcess		Κατάσταση τερματισμού
+Shutting down…	ShutdownProcess		Τερματισμός...
+System is shut down	ShutdownProcess		Το σύστημα έχει τερματισει τη λειτουργία του.
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Η εφαρμογή \"%appName%\" μπορεί να αποκλειστεί σε ένα τυπικό πανελ.
+Tidying things up a bit.	ShutdownProcess		Γίνεται ένα γρήγορο συμμάζεμα.

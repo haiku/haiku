@@ -1,0 +1,29 @@
+1	modern_greek	x-vnd.Haiku-Magnify	3748875992
+%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize εικονοστοιχεία/εικονοστοιχείο
+Add a crosshair	Magnify-Main		Προσθήκη ενός σταυρονήματος
+Copy image	Magnify-Main		Αντιγραφή εικόνας
+Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Αντιγραφή/Αποθήκευση\n αντιγραφή - αντιγράφει την τρέχουσα εικόνα στο πρόχειρο\n αποθήκευση - προτείνει στον χρήστη ένα αρχείο για αποθήκευση και γράφει\n τα εικονοστοιχεία της εικόνας\n
+Decrease pixel size	Magnify-Main		Μείωση μεγέθους εικονοστοιχείου
+Decrease window size	Magnify-Main		Μείωση μεγέθους του παραθύρου
+Freeze/Unfreeze image	Magnify-Main		Πάγωμα/Ξεπάγωμα εικόνας
+General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		General:\n 32 x 32 - the top left numbers are the number of visible\n pixels (width x height)\n 8 pixels/pixel - represents the number of pixels that are\n used to magnify a pixel\n R:152 G:52 B:10 - the RGB values for the pixel under\n the red square\n
+Help	Magnify-Main		Βοήθεια
+Hide/Show grid	Magnify-Main		Απόκρυψη/Εμφάνιση πλέγματος
+Hide/Show info	Magnify-Main		Απόκρυψη/Εμφάνιση πληροφορίας
+Increase pixel size	Magnify-Main		Αύξηση μεγέθους Pixel
+Increase window size	Magnify-Main		Αύξηση μεγέθους του παραθύρου
+Info	Magnify-Main		Πληροφορίες
+Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Πληροφορίες:\n απόκρυψη/εμφάνιση πληροφοριών - αποκρύπτει/εμφανίζει όλα αυτά τα νέα χαρακτηριστικά\nσημείωση: κατά την εμφάνιση, ένα κόκκινο τετράγωνο θα εμφανιστεί που προσδιορίζει\n ποιές rgb αξίες των εικονοστοιχείων θα εμφανίζονται\n προσθήκη/αφαίρεση σταυρονημάτων - 2 σταυρονήματα μπορούν να προστεθούν (ή να αφαιρεθούν)\n για να βοηθήσουν στην ευθυγράμμιση και την τοποθέτηση των αντικειμένων.\n Τα σταυρονήματα εκπροσωπούνται από μπλε τετράγωνα και μπλε γραμμές.\n απόκρυψη/εμφάνιση πλέγματος -  αποκρύπτει/εμφανίζει το πλέγμα που χωρίζει κάθε εικονοστοιχείο\n
+Magnify	System name		Magnify
+Magnify help	Magnify-Help		Μεγέθυνση βοήθεια
+Make square	Magnify-Main		Δημιουργία τετραγώνου
+Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Πλοήγηση:\n πλήκτρα βέλους - μετακινήστε την τρέχουσα επιλογή (δείκτης rgb ή σταυρόνημα)\n περίπου 1 εικονοστοιχείο κάθε φορά\n option-arrow key - μετακινεί την τοποθεσία του ποντικιού κατά 1 εικονοστοιχείο κάθε φορά\n το x σημαδεύει την επιλογή - η τρέχουσα επιλογή έχει ένα 'x' σε αυτή\n
+Remove a crosshair	Magnify-Main		Αφαίρεση ενός σταυρονήματος
+Save image	Magnify-Main		Αποθήκευση εικόνας
+Sizing/Resizing:\n  make square - sets the width and the height to the larger\n    of the two making a square image\n  increase/decrease window size - grows or shrinks the window\n    size by 4 pixels.\n    note: this window can also be resized to any size via the\n      resizing region of the window\n  increase/decrease pixel size - increases or decreases the number\n    of pixels used to magnify a 'real' pixel. Range is 1 to 16.\n	Magnify-Help		Tαξινόμηση κατά μέγεθος/Αλλαγή μεγέθους:\n τετραγωνοποίηση - ορίζει το πλάτος και το ύψος του μεγαλύτερου\n εκ των δύο που σχηματίζουν μια τετράγωνη εικόνα\n αύξηση/μείωση μεγέθους του παραθύρου - μεγαλώνει ή μικραίνει το μέγεθος\n παραθύρου κατά 4 εικονοστοιχεία.\n σημείωση: αυτό το παράθυρο μπορεί να αλλάξει το μέγεθός του σε οποιοδήποτε άλλο μέσω της\n περιοχής αλλαγής μεγέθους του παραθύρου\n αύξηση/μείωση μεγέθους του εικονοστοιχείου - αυξάνει ή μειώνει τον αριθμό\n των εικονοστοιχείων που χρησιμοποιούνται για να μεγεθύνετε ένα 'πραγματικό' εικονοστοιχείο. Το εύρος τιμών είναι από 1 έως 16.\n
+Stick coordinates	Magnify-Main		Συντεταγμένες Στίκ
+freeze - freezes/unfreezes magnification of whatever the\n    cursor is currently over\n	Magnify-Help		πάγωμα - παγώνει/ξεπαγώνει τη μεγέθυνση από οποιοδήποτε ο\n κέρσορας βρίσκεται επάνω\n
+magnify: size must be a multiple of 4\n	Console		Μεγέθυνση: το μέγεθος πρέπει να είναι πολλαπλάσιο του 4\n
+no clip msg\n	In console, when clipboard is empty after clicking Copy image		κανένα μήνυμα κλιπ\n
+size must be > 4 and a multiple of 4\n	Console		το μέγεθος πρέπει να είναι > 4 και πολλαπλάσιο του 4\n
+usage: magnify [size] (magnify size * size pixels)\n	Console		χρήση: μεγέθυνση [μέγεθος] (μέγεθος μεγέθυνσης * μέγεθος εικονοστοιχείων)\n

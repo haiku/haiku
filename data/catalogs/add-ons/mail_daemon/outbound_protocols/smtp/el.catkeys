@@ -1,0 +1,16 @@
+1	modern_greek	x-vnd.Haiku-SMTP	2740407895
+. The server said:\n	smtp		Ο εξυπηρετητής αποκρίθηκε:\n
+. The server says:\n	smtp		Ο εξυπηρετητής αποκρίθηκε:\n
+: Connection refused or host not found.	smtp		: Η σύνδεση απορίφθηκε ή δε βρέθηκε διακομιστής.
+Connecting to server…	smtp		Σύνδεση στον εξυπηρετητή...
+Destination:	ConfigView		Προορισμός:
+ESMTP	ConfigView		ESMTP
+Error while logging in to %serv	smtp		Σφάλμα κατα τη σύνδεση στο %serv
+Error while opening connection to %serv	smtp		Σφάλμα κατά το άνοιγμα σύνδεσης στο %serv
+None	ConfigView		Κανένα
+POP3 authentication failed. The server said:\n	smtp		Η πιστοποίηση POP3 απέτυχε. Ο εξυπηρετητής αποκρίθηκε:\n
+POP3 before SMTP	ConfigView		POP3 πρίν από SMTP
+SMTP server:	ConfigView		Εξυπηρετητής SMTP:
+SSL	ConfigView		SSL
+STARTTLS	ConfigView		STARTTLS
+Unencrypted	ConfigView		Μη κρυπτογραφημένο

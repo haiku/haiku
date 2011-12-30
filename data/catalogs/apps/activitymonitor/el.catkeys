@@ -1,0 +1,48 @@
+1	modern_greek	x-vnd.Haiku-ActivityMonitor	3704566709
+%.1f KB/s	DataSource		%.1f KB/s
+%.1f MB	DataSource		%.1f MB
+%.1f faults/s	DataSource		%.1ς λάθοι/s
+%lld ms	SettingsWindow		%lld ms
+%lld sec.	SettingsWindow		%lld δευτ.
+ActivityMonitor	System name		ActivityMonitor
+Add graph	ActivityWindow		Προσθήκη γραφήματος
+Additional items	ActivityView		Επιπλέον αντικείμενα
+Apps	DataSource		Εφαρμογές
+Block cache	DataSource		Αποκλεισμός cache
+Block cache memory	DataSource		Αποκλεισμός λανθάνουσας μνήμης
+CPU	DataSource		ΚΜΕ
+CPU usage	DataSource		Χρήση ΚΜΕ
+CPU usage (combined)	DataSource		Χρήση ΚΜΕ (συνδυασμένη)
+Cache	DataSource		Λανθάνουσα μνήμη
+Cached memory	DataSource		Μνήμη προσωρινής αποθήκευσης
+File	ActivityWindow		Αρχείο
+Hide legend	ActivityView		Απόκρυψη υπομνήματος
+MB	DataSource		ΜΒ
+Media nodes	DataSource		Κόμβοι πολυμέσων
+Memory	DataSource		Μνήμη
+Network receive	DataSource		Λήψεις δικτύου
+Network send	DataSource		Αποστολή δικτύου
+P-faults	DataSource		P-σφάλματα
+Page faults	DataSource		Σφάλματα σελίδας
+Ports	DataSource		Θύρες 
+Quit	ActivityWindow		Έξοδος
+RX	DataSource	Shorter version for Receiving.	ΛΗ
+Raw clipboard	DataSource		Ακατέργαστο πρόχειρο
+Receiving	DataSource		Λήψη
+Remove graph	ActivityView		Αφαίρεση γραφήματος
+Running applications	DataSource		Ενεργές εφαρμογές
+Semaphores	DataSource		Σηματοφόροι
+Sems	DataSource		Sems
+Sending	DataSource		Αποστολή
+Settings	ActivityWindow		Ρυθμίσεις
+Settings…	ActivityWindow		Ρυθμίσεις...
+Show legend	ActivityView		Εμφάνιση υπομνήματος
+Swap	DataSource		Swap
+Swap space	DataSource		Χώρος Swap
+TX	DataSource	Shorter version for Sending	ΑΠ
+Teams	DataSource		Ομάδες
+Text clipboard	DataSource		Πρόχειρο κειμένου
+Threads	DataSource		Θέματα
+Update time interval:	SettingsWindow		Ενημέρωση χρονικού διαστήματος:
+Used memory	DataSource		Χρησιμοποιημένη μνήμη
+usage	DataSource		χρήση

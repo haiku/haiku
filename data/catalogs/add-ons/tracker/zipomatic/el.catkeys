@@ -1,0 +1,18 @@
+1	modern_greek	x-vnd.haiku.zip-o-matic	2207848100
+%ld files added.	file:ZipOMaticWindow.cpp		%ld αρχεία προστέθηκαν.
+1 file added.	file:ZipOMaticWindow.cpp		1 αρχείο προστέθηκε.
+Archive	file:ZipperThread.cpp		Συμπιεσμένο αρχείο
+Archive created OK	file:ZipOMaticWindow.cpp		Το αρχείο δημιουργήθηκε επιτυχώς.
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Είστε σίγουρος ότι θέλετε να σταματήσει η δημιουργία αυτού του αρχείου;
+Continue	file:ZipOMaticWindow.cpp		Συνέχεια
+Creating archive: %s	file:ZipOMaticWindow.cpp		Δημιουργία συμπιεσμένου αρχείου: %s
+Do you want to stop them?	file:ZipOMatic.cpp		Θέλετε να τα σταματήσετε;
+Drop files here.	file:ZipOMaticWindow.cpp		Αφήστε τα αρχεία εδώ.
+Error creating archive	file:ZipOMaticWindow.cpp		Σφάλμα κατά τη δημιουργία συμπιεσμένου αρχείου
+Filename: %s	file:ZipOMaticWindow.cpp		Όνομα αρχείου: %s
+Let them continue	file:ZipOMatic.cpp		Αφήστε τα να συνεχίσουν
+Preparing to archive	file:ZipperThread.cpp		Προετοιμάζεται το συμπιεσμένο αρχείο
+Stop	file:ZipOMaticWindow.cpp		Διακοπή
+Stop them	file:ZipOMatic.cpp		Σταματησέ τα 
+Stopped	file:ZipOMaticWindow.cpp		Σταματημένο
+You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Έχετε το %ld Zip-O-Matic να εκτελείται. \n\n

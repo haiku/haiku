@@ -1,0 +1,42 @@
+1	modern_greek	x-vnd.Be.ChartDemo	819116577
+(high) 100% 	ChartWindow		(ψηλά) 100%
+0.6 f/s  (logarythmic scale)	ChartWindow		0.6 f/s (λογαριθμική κλίμακα)
+2 threads	ChartWindow		2 τμήματα
+5% (low)	ChartWindow		5% (χαμηλά)
+600.0 f/s	ChartWindow		600.0 f/s
+Amas	ChartWindow		Σωρός
+Animation:	ChartWindow		Ζωηρότητα:
+Auto demo	ChartWindow		Αυτόματη επίδειξη
+Battle	ChartWindow		Μάχη
+Blue	ChartWindow		Μπλέ
+CPU load	ChartWindow		Φόρτωση CPU
+Chaos	ChartWindow		Χάος
+Chart	System name		Διάγραμμα
+Colors	ChartWindow		Χρώματα
+Comet	ChartWindow		Κομήτης
+DirectWindow	ChartWindow		Απευθείας Παράθυρο
+Display:	ChartWindow		Οθόνη:
+DrawBitmap	ChartWindow		DrawBitmap
+Fast motion	ChartWindow		Γρήγορη κίνηση
+Frames/s	ChartWindow		Frames/s
+Free motion	ChartWindow		Ελεύθερη κίνηση
+Full screen	ChartWindow		Πλήρης οθόνη
+Green	ChartWindow		Πράσινο
+LineArray	ChartWindow		Γραμμή Array
+None	ChartWindow		Κανένα
+Novas	ChartWindow		Novas
+Off	ChartWindow		Εκτός
+Orange	ChartWindow		Πορτοκαλί
+Pink	ChartWindow		Ρόζ
+Red	ChartWindow		Κόκκινο
+Refresh rate	ChartWindow		Ρυθμός ανανέωσης
+Slow motion	ChartWindow		Αργή Κίνηση
+Slow rotation	ChartWindow		Αργή περιστροφή
+Space color	ChartWindow		Χρώμα διαστήματος
+Space:	ChartWindow		Διάστημα:
+Special	ChartWindow		Ειδικό
+Spiral	ChartWindow		Spiral
+Star density	ChartWindow		Πυκνώτητα αστέρων
+Status	ChartWindow		Κατάσταση
+White	ChartWindow		Λευκο
+Yellow	ChartWindow		Κίτρινο

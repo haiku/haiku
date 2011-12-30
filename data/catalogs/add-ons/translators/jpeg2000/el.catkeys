@@ -1,0 +1,14 @@
+1	modern_greek	x-vnd.Haiku-JPEG2000Translator	547915409
+About	JPEG2000Translator		Περί
+Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Τύπος Be Bitmap(ΜεταφραστήςJPEG2000)	 
+High	JPEG2000Translator		Υψηλή
+JPEG2000 images	JPEG2000Translator		Εικόνες JPEG2000
+Low	JPEG2000Translator		Χαμηλή
+Output only codestream (.jpc)	JPEG2000Translator		Εξαγωγή μόνο ροής κώδικα (.jpc)	 
+Output quality	JPEG2000Translator		Ποιότητα εξόδου
+Read	JPEG2000Translator		Ανάγνωση
+Read greyscale images as RGB32	JPEG2000Translator		Ανάγνωση γκρι εικόνων ως RGB32
+Write	JPEG2000Translator		Εγγραφή
+Write black-and-white images as RGB24	JPEG2000Translator		Εγγραφή ασπρόμαυρων εικόνων ως RGB24
+©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nΒασισμένο στη βιβλιοθήκη JasPer:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 ο κωδικοποιητής χρησιμοποιήθηκε ως \"οδηγός\".\n\thttp://www.imagemagick.org/\n	
+

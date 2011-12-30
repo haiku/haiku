@@ -1,0 +1,77 @@
+1	modern_greek	x-vnd.Haiku-DriveSetup	2368051924
+%ld MiB	Support		%ld MiB
+<empty>	DiskView		<άδειο>
+<empty>	PartitionList		<άδειο>
+Active	PartitionList		Ενεργό
+Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Είστε σίγουρος ότι θέλετε να διαγράψετε την επιλεγμένη κατάτμηση;\n\nΌλα τα δεδομένα στη κατάτμηση θα χαθούν οριστικά αν το κάνετε αυτό!
+Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Είστε σίγουρος ότι θέλετε να αρχικοποιήσετε την κατάτμηση \"%s\; Θα ερωτηθείτε ξανά πριν καταγραφούν οι αλλαγές στον δίσκο.
+Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Είστε σίγουρος ότι θέλετε να αρχικοποιήσετε την κατάτμηση; Θα ερωτηθείτε ξανά πριν καταγραφούν οι αλλαγές στον δίσκο.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Είστε σίγουρος ότι θέλετε να γράψετε τις αλλαγές στο δίσκο τώρα;\n\nΌλα τα δεδομένα στο δίσκο %s θα χαθούν οριστικά αν το κάνετε αυτό!
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Είστε σίγουρος ότι θέλετε να εγγράψετε τις αλλαγές στο δίσκο τώρα;\n\nΌλα τα δεδομένα στη κατάτμηση %s θα χαθούν οριστικά εάν το κάνετε αυτό!
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Είστε σίγουρος ότι θέλετε να γράψετε τις αλλαγές στο δίσκο τώρα;\n\nΌλα τα δεδομένα στη κατάτμηση θα χαθούν οριστικά αν το κάνετε αυτό!
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Είστε σίγουρος ότι θέλετε να γράψετε τις αλλαγές στο δίσκο τώρα;\n\nΌλα τα δεδομένα στον επιλεγμένο δίσκο θα χαθούν οριστικά αν το κάνετε αυτό!
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Είστε σίγουρος ότι θέλετε να γράψετε τις αλλαγές στο δίσκο τώρα;\n\nΌλα τα δεδομένα στην επιλεγμένη κατάτμηση θα χαθούν οριστικά αν το κάνετε αυτό!
+Cancel	CreateParamsPanel		Άκυρο
+Cancel	InitParamsPanel		Άκυρο
+Cancel	MainWindow		Άκυρο
+Cannot delete the selected partition.	MainWindow		Δεν μπορείτε να διαγράψετε την επιλεγμένη κατάτμηση.
+Continue	MainWindow		Συνέχεια
+Could not aquire partitioning information.	MainWindow		Αδυναμία απόκτησης πληροφορίας διαμέρισης.
+Could not delete the selected partition.	MainWindow		Αδυναμία διαγραφής της επιλεγμένης κατάτμησης.
+Could not mount partition %s.	MainWindow		Αδυναμία προσάρτησης της κατάτμησης %s.
+Could not unmount partition %s.	MainWindow		Αδυναμία αποπροσάρτησης της κατάτμησης %s.
+Create	CreateParamsPanel		Δημιουργία
+Create…	MainWindow		Δημιουργία...
+Creation of the partition has failed.	MainWindow		Η δημιουργία της κατάτμησης έχει αποτύχει.
+Delete	MainWindow		Διαγραφή
+Delete partition	MainWindow		Διαγραφή κατάτμησης
+Device	DiskView		Συσκευή
+Device	PartitionList		Συσκευή
+Disk	MainWindow		Δίσκος
+Disk system \"%s\"\" not found!	MainWindow		Ο δίσκος συστήματος \"%s\"\" δεν βρέθηκε!
+DriveSetup	System name		Εγκατάσταση Οδηγού
+Eject	MainWindow		Εξαγωγή
+End: %ld MB	Support		Τέλος: %ld MB
+Error: 	MainWindow	in any error alert	Σφάλμα:
+Failed to delete the partition. No changes have been written to disk.	MainWindow		Αποτυχία διαγραφής της κατάτμησης. Καμία τροποποίηση δεν έχει γραφτεί στο δίσκο.
+Failed to initialize the partition %s!\n	MainWindow		Αποτυχία αρχικοποίησης της κατάτμησης %s!\n
+Failed to initialize the partition. No changes have been written to disk.	MainWindow		Αποτυχία αρχικοποίησης της κατάτμησης. Καμία τροποποίηση δεν έχει γραφτεί στο δίσκο.
+Format (not implemented)	MainWindow		Μορφοποίηση (δεν υλοποιήθηκε)
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Η αρχικοποίηση της κατάτμησης %s απέτυχε. (Τίποτα δεν γράφτηκε στο δίσκο.)
+Initialize	InitParamsPanel		Αρχικοποίηση
+Initialize	MainWindow		Αρχικοποίηση
+Mount	MainWindow		Προσάρτηση
+Mount all	MainWindow		Προσάρτηση όλων
+Mounted at	PartitionList		Προσαρτήθηκε στο
+No disk devices have been recognized.	DiskView		Καμία συσκευή δίσκου δεν έχει αναγνωριστεί.
+OK	MainWindow		Εντάξει
+Offset: %ld MB	Support		Μετατόπιση: %ld MB
+Parameters	PartitionList		Παράμετροι
+Partition	MainWindow		Κατάτμηση
+Partition %ld	DiskView		Κατάτμηση %ld
+Partition name:	CreateParamsPanel		Όνομα κατάτμησης:
+Partition size	CreateParamsPanel		Μέγεθος κατάτμησης
+Partition type:	CreateParamsPanel		Τύπος κατάτμησης:
+Rescan	MainWindow		Επανάληψη σάρωσης
+Select a partition from the list below.	DiskView		Επιλέξτε μία κατάτμηση από την παρακάτω λίστα.
+Size	PartitionList		Μέγεθος
+Surface test (not implemented)	MainWindow		Έλεγχος επιφάνειας (δεν υλοποιήθηκε)
+The currently selected partition does not have a parent partition.	MainWindow		Η τρέχουσα επιλεγμένη κατάτμηση δεν έχει κατάτμηση γονέα.
+The currently selected partition is not empty.	MainWindow		Η τρέχουσα επιλεγμένη κατάτμηση δεν είναι άδεια.
+The partition %s has been successfully initialized.\n	MainWindow		Η κατάτμηση %s αρχικοποιήθηκε επιτυχώς.\n
+The partition %s has been successfully initialized.\n	MainWindow		Η κατάτμηση %s αρχικοποιήθηκε επιτυχώς.\n
+The partition %s is already mounted.	MainWindow		Η κατάτμηση %s είναι ήδη προσαρτημένη.
+The partition %s is already unmounted.	MainWindow		Η κατάτμηση %s είναι ήδη αποπροσαρτημένη
+The partition %s is currently mounted.	MainWindow		Η κατάτμηση %s είναι τώρα προσαρτημένη.
+The selected disk is read-only.	MainWindow		Ο επιλεγμένος δίσκος είναι μόνο για ανάγνωση.
+The selected partition does not contain a partitioning system.	MainWindow		Η επιλεγμένη κατάτμηση δεν περιέχει σύστημα διαμέρισης.
+There was an error acquiring the partition row.	MainWindow		Υπήρξε ένα σφάλμα κατά την απόκτηση της σειράς κατάτμησης.
+There was an error preparing the disk for modifications.	MainWindow		Υπήρξε ένα σφάλμα κατά την προετοιμασία του δίσκου για τροποποιήσεις.
+There's no space on the partition where a child partition could be created.	MainWindow		Δεν υπάρχει χώρος στη κατάτμηση, όπου θα μπορούσε να δημιουργηθεί νέα κατάτμηση.
+Unable to find the selected partition by ID.	MainWindow		Αδύνατο να βρεθεί η επιλεγμένη κατάτμηση ID.
+Unmount	MainWindow		Αποπροσάρτηση
+Validation of the given creation parameters failed.	MainWindow		Η επικύρωση των δοθέντων παραμέτρων δημιουργίας απέτυχε.
+Validation of the given initialization parameters failed.	MainWindow		Η επικύρωση των δοθέντων παραμέτρων αρχικοποίησης απέτυχε.
+Volume name	PartitionList		Όνομα τόμου
+Write changes	MainWindow		Εγγραφή αλλαγών
+You need to select a partition entry from the list.	MainWindow		Θα χρειαστεί να επιλέξετε μια καταχωρημένη κατάτμηση από τη λίστα.

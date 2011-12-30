@@ -1,0 +1,47 @@
+1	modern_greek	x-vnd.Be-TSKB	107564593
+<Deskbar folder is empty>	DeskbarMenu		<Ο φάκελος Deskbar είναι άδειος>
+About Haiku	DeskbarMenu		Περί Haiku
+About this system	DeskbarMenu		Περί Συστήματος
+Always on top	PreferencesWindow		Πάντα στην κορυφή
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Εφαρμογές
+Applications	PreferencesWindow		Εφαρμογές
+Auto-hide	PreferencesWindow		Αυτόματη Απόκρυψη
+Auto-raise	PreferencesWindow		Αυτόματη-ανύψωση
+Change time…	TimeView		Αλλαγή ώρας...
+Clock	PreferencesWindow		Ρολόϊ
+Close all	WindowMenu		Κλείσιμο όλων
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Επιδείξεις
+Deskbar	System name		Deskbar
+Deskbar preferences	PreferencesWindow		Προτιμήσεις Deskbar
+Deskbar preferences…	DeskbarMenu		Προτιμήσεις Deskbar…
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Applets επιφάνειας εργασίας
+Edit menu…	PreferencesWindow		Επεξεργασία μενού...
+Expand new applications	PreferencesWindow		Επέκταση νέων εφαρμογών
+Find…	DeskbarMenu		Αναζήτηση…
+Hide all	WindowMenu		Απόκρυψη όλων
+Hide time	TimeView		Απόκρυψη ώρας
+Menu	PreferencesWindow		Μενού
+Mount	DeskbarMenu		Προσάρτηση
+No windows	WindowMenu		Χωρίς παράθυρα
+Power off	DeskbarMenu		Απενεργοποίηση
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Προτιμήσεις
+Quit application	WindowMenu		Έξοδος εφαρμογής
+Recent applications	DeskbarMenu		Πρόσφατες εφαρμογές
+Recent applications:	PreferencesWindow		Πρόσφατες εφαρμογές:
+Recent documents	DeskbarMenu		Πρόσφατα έγγραφα
+Recent documents:	PreferencesWindow		Πρόσφατα έγγραφα:
+Recent folders	DeskbarMenu		Πρόσφατοι φάκελοι
+Recent folders:	PreferencesWindow		Πρόσφατοι φάκελοι:
+Restart Tracker	DeskbarMenu		Επανεκκίνηση Tracker
+Restart system	DeskbarMenu		Επανεκκίνηση συστήματος
+Show Time	Tray		Εμφάνιση ώρας
+Show all	WindowMenu		Εμφάνιση όλων
+Show application expander	PreferencesWindow		Εμφάνιση της εφαρμογής Επεκτατής
+Show calendar…	TimeView		Εμφάνιση ημερολογίου…
+Show replicants	DeskbarMenu		Εμφάνιση αντιγράφων
+Show seconds	PreferencesWindow		Εμφάνιση δευτερολέπτων
+Shutdown…	DeskbarMenu		Κλείσιμο…
+Sort running applications	PreferencesWindow		Ταξινόμησε τις τρέχουσες εφαρμογές
+Suspend	DeskbarMenu		Αναστολή λειτουργίας
+Tracker always first	PreferencesWindow		Ο Tracker πάντα πρώτος
+Window	PreferencesWindow		Παράθυρο

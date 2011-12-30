@@ -1,0 +1,141 @@
+1	modern_greek	x-vnd.Haiku-MediaPlayer	138551800
+%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		Το %app% αντιμετώπησε ένα εσωτερικό σφάλμα. Τα αρχείο δεν μπόρεσε να ανοίξει.	
+
+1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Αμερικάνικο)
+100% scale	MediaPlayer-Main		100% κλίμακα
+2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
+200% scale	MediaPlayer-Main		200% κλίμακας
+300% scale	MediaPlayer-Main		300% κλίμακα
+400% scale	MediaPlayer-Main		400% κλίμακα
+50% scale	MediaPlayer-Main		50% κλίμακα
+<nothing to redo>	MediaPlayer-PlaylistWindow		<τίποτε προς επανάληψη>	 
+<nothing to undo>	MediaPlayer-PlaylistWindow		<τίποτε για αναίρεση>	 
+<unknown>	PlaylistItem-album		<άγνωστο>
+<unknown>	PlaylistItem-author		<άγνωστο>
+<unnamed>	PlaylistItem-name		<χωρίς όνομα>	 
+<untitled>	PlaylistItem-title		<χωρίς τίτλο>
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Δε μπόρεσαν όλα τα αρχεία να μετακινηθούν στα Απορρίματα..	 
+Always on top	MediaPlayer-Main		Πάντα στην κορυφή
+Aspect ratio	MediaPlayer-Main		Αναλογίες πλευρών
+Attributes	MediaPlayer-Main		Ιδιότητες
+Audio	MediaPlayer-Main		Ήχος
+Audio track	MediaPlayer-Main		Κομμάτι ήχου
+Automatically start playing	MediaPlayer-SettingsWindow		Αυτόματη έναρξει αναπαραγωγής
+Bottom of screen	MediaPlayer-SettingsWindow		Κάτω τμήμα της οθόνης 
+Bottom of video	MediaPlayer-SettingsWindow		Κάτω τμήμα του βίντεο
+Cancel	MediaPlayer-SettingsWindow		Άκυρο
+Close	MediaPlayer-Main		Κλείσιμο
+Close	MediaPlayer-PlaylistWindow		Κλείσιμο
+Close window after playing audio	MediaPlayer-SettingsWindow		Κλείσιμο παραθύρου έπειτα από την αναπαραγωγή του ήχου
+Close window after playing video	MediaPlayer-SettingsWindow		Κλείσιμο παραθύρου έπειτα από την αναπαραγωγή του βίντεο
+Copy Entries	MediaPlayer-CopyPLItemsCmd		Copy Entries	 
+Copy Entry	MediaPlayer-CopyPLItemsCmd		Αντιγραφή Καταχώρησης
+Drop files to play	MediaPlayer-Main		Αφήστε αρχεία προς αναπαραγωγή
+Edit	MediaPlayer-PlaylistWindow		Επεξεργασία
+Error: 	MediaPlayer-Main		Σφάλμα:
+Error: 	MediaPlayer-RemovePLItemsCmd		Σφάλμα:
+File Info	MediaPlayer-InfoWin		File Info	 
+File info…	MediaPlayer-Main		Πληροφορίες αρχείου...
+Full screen	MediaPlayer-Main		Πλήρη οθόνη
+Full volume	MediaPlayer-SettingsWindow		Πλήρη ένταση
+Gets the URI of the currently playing item.	MediaPlayer-Main		Λαμβάνει το URI του εν ενεργεία αναπαράγοντος αρχείου.
+Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Λαμβάνει/ρυθμίζει την ένταση (0.0-2.0).	 
+Hide interface	MediaPlayer-Main		Απόκρυψη διεπαφής
+Import Entries	MediaPlayer-ImportPLItemsCmd		Εισαγωγή Καταχωρήσεων	 
+Import Entry	MediaPlayer-ImportPLItemsCmd		Εισαγωγή Καταχώρησης
+Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Εσωτερικό σφάλμα (απέτυχε το κλείδωμα). Απέτυχε η αποθήκευση της λίστας αναπαραγωγής.	
+
+Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Εσωτερικό σφάλμα (ακατάλληλο μήνυμα). Απέτυχε η αποθήκευση της λίστας αναπαραγωγής.
+
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Εσωτερικό σφάλμα (έλλειψη μνήμης). Απέτυχε η αποθήκευση της λίστας αναπαραγωγής.
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Φαίνεται οτι ο εξυπηρετητής πολυμέσων δεν εκτελείται.\nΘα θέλατε να τον εκκινήσετε ;
+
+Large	MediaPlayer-SettingsWindow		Μεγάλο
+Lock Peaks	MediaPlayer-PeakView		Κλείδωμα Κορυφών
+Loop audio	MediaPlayer-SettingsWindow		Επανάληψη ήχου
+Loop video	MediaPlayer-SettingsWindow		Loop video
+Low volume	MediaPlayer-SettingsWindow		Χαμηλή ένταση
+MediaPlayer	System name		MediaPlayer	 	 
+MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer ρυθμίσεις
+Medium	MediaPlayer-SettingsWindow		Μεσαίο
+Move Entries	MediaPlayer-MovePLItemsCmd		Μετακίνηση Καταχωρήσεων
+Move Entry	MediaPlayer-MovePLItemsCmd		Μετακίνηση Καταχώρησης
+Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Μετακίνηση στα Απορρίματα Σφαλμάτων
+Move file to Trash	MediaPlayer-PlaylistWindow		Μετακίνηση αρχείου στον Κάδο
+Mute	MediaPlayer-Main		Σίγαση
+Muted	MediaPlayer-SettingsWindow		Muted
+New player…	MediaPlayer-Main		Νέος αναπαραγωγός…	 
+Next	MediaPlayer-Main		Επόμενο
+No aspect correction	MediaPlayer-Main		Καμία διόρθωση αναλογίας	 
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		None of the files you wanted to play appear to be media files.
+Nothing to Play	MediaPlayer-Main		Τίποτα να παίξει
+OK	MediaPlayer-Main		Εντάξει
+OK	MediaPlayer-PlaylistWindow		Εντάξει
+OK	MediaPlayer-RemovePLItemsCmd		Εντάξει
+OK	MediaPlayer-SettingsWindow		Εντάξει
+Off	Subtitles menu		Off	 
+Open	MediaPlayer-Main		Άνοιγμα
+Open	MediaPlayer-PlaylistWindow		Άνοιγμα
+Open Clips	MediaPlayer-Main		Άνοιγμα Κλιπ
+Open Playlist	MediaPlayer-PlaylistWindow		Άνοιγμα λίστας αναπαραγωγής
+Open file…	MediaPlayer-Main		Άνοιγμα αρχείου...
+Open…	MediaPlayer-PlaylistWindow		Άνοιγμα...
+Pause	MediaPlayer-Main		Παύση
+Pause playback.	MediaPlayer-Main		Παύση αναπαραγωγής
+Play	MediaPlayer-Main		Αναπαραγωγή
+Play mode	MediaPlayer-SettingsWindow		Λειτουργία αναπαραγωγής
+Playlist	MediaPlayer-PlaylistWindow		Λίστα αναπαραγωγής
+Playlist…	MediaPlayer-Main		Λίστα αναπαραγωγής...
+Prev	MediaPlayer-Main		Προηγούμενο
+Quit	MediaPlayer-Main		Έξοδος
+Randomize	MediaPlayer-PlaylistWindow		Τυχαία
+Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Τυχαία κατάταξη Καταχωρήσεων
+Rating	MediaPlayer-Main		Βαθμολογία 
+Redo	MediaPlayer-PlaylistWindow		Ακύρωση αναίρεσης
+Remove	MediaPlayer-PlaylistWindow		Αφαίρεση
+Remove Entries	MediaPlayer-RemovePLItemsCmd		Αφαίρεση Καταχωρήσεων
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Αφαίρεση Καταχωρήσεων στα Απορρίματα 
+Remove Entry	MediaPlayer-RemovePLItemsCmd		Αφαίρεση Καταχώρησης
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Αφαίρεση Καταχώρησης στα Απορρίματα
+Revert	MediaPlayer-SettingsWindow		Επαναφορά
+Save	MediaPlayer-Main		Αποθήκευση
+Save	MediaPlayer-PlaylistWindow		Αποθήκευση
+Save Playlist	MediaPlayer-PlaylistWindow		Αποθήκευση λίστας αναπαραγωγής
+Save as…	MediaPlayer-PlaylistWindow		Αποθήκευση ως...
+Save error	MediaPlayer-PlaylistWindow		Αποθήκευση σφάλματος
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Η αποθήκευση της λίστας αναπαραγωγής απέτυχε.\n\nΣφάλμα:
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Απέτυχε η αποθήκευση της λίστας αναπαραγωγής:\n\nΣφάλμα:
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Κλιμάκωση των ελέγχων σε λειτουργία πλήρους οθόνης
+Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Ομάλη κλιμάκωση ταινιών (λειτουργία χωρίς επικάλυψη)	 
+Select all	MediaPlayer-PlaylistWindow		Επιλογή όλων
+Settings…	MediaPlayer-Main		Ρυθμίσεις...
+Skip to the next track.	MediaPlayer-Main		Μετάβαση στο επόμενο κομμάτι.
+Skip to the previous track.	MediaPlayer-Main		Μετάβαση στο προηγούμενο κομμάτι.
+Small	MediaPlayer-SettingsWindow		Μικρό
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Μερικά αρχεία δεν μπορούν να μετακινηθούν στον Κάδο.
+Start media server	MediaPlayer-Main		Εκκίνηση εξυπηρετητή πολυμέσων	 
+Start playing.	MediaPlayer-Main		Ξεκίνημα αναπαραγωγής
+Stop	MediaPlayer-Main		Διακοπή
+Stop playing.	MediaPlayer-Main		Σταμάτημα αναπαραγωγής
+Stream settings	MediaPlayer-Main		Ρυθμίσεις ροής
+Subtitle placement:	MediaPlayer-SettingsWindow		Τοποθέτηση υπότιτλων:	 
+Subtitle size:	MediaPlayer-SettingsWindow		Μέγεθος υπότιτλων:	 
+Subtitles	MediaPlayer-Main		Υπότιτλοι
+The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Το αρχείο '%filename' δεν μπορεί να ανοιχτεί. \n\n
+There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Δεν υπάρχει κάποιος αποκωδικοποιητής για τον χειρισμό αυτού του τύπου αρχείων, ή ο αποκωδικοποιητής έχει πρόβλημα με τη συγκεκριμένη έκδοση του τύπου αρχείων.
+Toggle mute.	MediaPlayer-Main		Εναλλαγή σίγασης.
+Toggle pause/play.	MediaPlayer-Main		Εναλλαγή παύσης/αναπαραγωγής.	 
+TogglePlaying	MediaPlayer-Main		ΕναλλαγήΑναπαραγωγής
+Track	Audio Track Menu		Κομμάτι
+Track	Video Track Menu		Κομμάτι
+Track %d	MediaPlayer-Main		Track %d
+URI	MediaPlayer-Main		URI
+Undo	MediaPlayer-PlaylistWindow		Αναίρεση
+Use hardware video overlays if available	MediaPlayer-SettingsWindow		Use hardware video overlays if available
+Video	MediaPlayer-Main		Βίντεο
+Video track	MediaPlayer-Main		Κομμάτι βίντεο
+View options	MediaPlayer-SettingsWindow		Προβολή επιλογών
+Volume	MediaPlayer-Main		Ένταση
+Volume of background clips	MediaPlayer-SettingsWindow		Ένταση των κλιπ παρασκηνίου
+none	Audio track menu		κανένα
+none	Subtitles menu		τίποτα

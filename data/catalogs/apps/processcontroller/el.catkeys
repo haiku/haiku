@@ -1,0 +1,48 @@
+1	modern_greek	x-vnd.Haiku-ProcessController	2887520383
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+About ProcessController…	ProcessController		Περί ProcessController…
+Cancel	ProcessController		Άκυρο
+Custom priority	ProcessController		Προσαρμοσμένη προτεραιότητα
+Damned!	ProcessController		Να πάρει!
+Debug this thread!	ProcessController		Αποσφαλμάτωση αυτού του νήματος!
+Debug thread	ProcessController		Αποσφαλμάτωση νήματος
+Display priority	ProcessController		Προτεραιότητα εμφάνισης
+Do you really want to kill the team \"%s\"?	ProcessController		Θέλετε σίγουρα να τερματίσετε την ομάδα \"%s\";
+Error saving file	ProcessController		Σφάλμα κατα την αποθήκευση του αρχείου
+Gone teams…	ProcessController		Ομάδες που εξαφανίστηκαν...
+Idle priority	ProcessController		Ανενεργή προτεραιότητα
+Info	ProcessController		Πληροφορίες
+Install in Deskbar	ProcessController		Εγκατάσταση στη Deskbar
+Kill this thread!	ProcessController		Τερματισμός αυτού του νήματος!
+Live in the Deskbar	ProcessController		Ζωντανό στη Deskbar
+Low priority	ProcessController		Χαμηλή προτεραιότητα
+Lowest active priority	ProcessController		Χαμηλότερη ενεργή προτεραιότητα
+Memory usage	ProcessController		Χρήση μνήμης
+New Terminal	ProcessController		Νέο Τερματικό
+Normal priority	ProcessController		Κανονική προτεραιότητα
+OK	ProcessController		Εντάξει
+Ok!	ProcessController		Εντάξει!
+Please confirm	ProcessController		Παρακαλώ επιβεβαιώστε
+ProcessController	System name		ProcessController
+ProcessController is already installed in Deskbar.	ProcessController		Το ProcessController είναι ήδη εγκατεστημένο στη Deskbar. 
+Processor %d	ProcessController		Επεξεργαστής %d
+Quit an application	ProcessController		Έξοδος από μια εφαρμογή
+Quit application	ProcessController		Έξοδος εφαρμογής
+Real-time display priority	ProcessController		Προτεραιότητα εμφάνισης πραγματικού χρόνου
+Real-time priority	ProcessController		Προτεραιότητα πραγματικού χρόνου
+Restart Deskbar	ProcessController		Επανεκκίνηση Deskbar
+Restart Tracker	ProcessController		Επανεκκίνηση Ιχνηλάτη
+Run in window	ProcessController		Εκτέλεση σε παράθυρο
+System resources & caches…	ProcessController		Πόροι & λανθάνουσα μνήμη συστήματος...
+That's no Fun!	ProcessController		Αυτό δεν έχει πλάκα!
+This is the last active processor...\nYou can't turn it off!	ProcessController		Αυτός είναι ο τελευταίος ενεργός επεξεργαστής...\nΔε μπορείτε να τον απενεργοποιήσετε!
+This team is already gone…	ProcessController		Αυτή η όμαδα έχει ήδη εξαφανιστεί
+This thread is already gone…	ProcessController		Αυτή η αλλουλουχία έχει ήδη φύγει...
+Threads and CPU usage	ProcessController		Νήματα και χρήση της ΚΜΕ
+Urgent display priority	ProcessController		Επείγουσα προτεραιότητα εμφάνισης
+Urgent priority	ProcessController		Επείγουσα προτεραιότητα
+Usage: %s [-deskbar]\n	ProcessController		Χρήση: %s [-deskbar]\n
+What do you want to do with the thread \"%s\"?	ProcessController		Τι θέλετε να κάνετε με το νήμα \"%s\";
+Yes, kill this team!	ProcessController		Ναι, τερματισμός της ομάδας!
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Μπορείτε να εκτελέσετε το ProcessController σε ένα παράθυρο ή να το εγκαταστήσετε στη Deskbar.
+Your setting file could not be saved!\n(%s)	ProcessController		Το αρχείο ρυθμίσεων δεν μπορούσε να αποθηκευτεί!\n(%s)

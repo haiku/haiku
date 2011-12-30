@@ -1,0 +1,24 @@
+1	modern_greek	x-vnd.Haiku-GLTeapot	2890609668
+Add a teapot	TeapotWindow		Προσθήκη τσαγιέρας
+Backface culling	TeapotWindow		Κλείσιμο οπίσθιας όψης
+Blue	TeapotWindow		Μπλε
+FPS display	TeapotWindow		Προβολή FPS
+File	TeapotWindow		Αρχείο
+Filled polygons	TeapotWindow		Γεμισμένα πολύγωνα
+Fog	TeapotWindow		Ομίχλη
+GLTeapot	System name		GL-Τσαγιέρα
+Gouraud shading	TeapotWindow		Σκίαση Gouraud
+Green	TeapotWindow		Πράσινο
+Lighting	TeapotWindow		Φωτισμός
+Lights	TeapotWindow		Φώτα
+Lower left	TeapotWindow		Κάτω αριστερά
+Off	TeapotWindow		Κλειστό
+Options	TeapotWindow		Επιλογές
+Perspective	TeapotWindow		Προοπτική
+Quit	TeapotWindow		Έξοδος
+Red	TeapotWindow		Κόκκινο
+Right	TeapotWindow		Δεξιά
+Upper center	TeapotWindow		Πάνω κέντρο
+White	TeapotWindow		Άσπρο
+Yellow	TeapotWindow		Κίτρινο
+Z-buffered	TeapotWindow		Z-buffered

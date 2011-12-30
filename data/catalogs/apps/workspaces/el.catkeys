@@ -1,0 +1,15 @@
+1	modern_greek	x-vnd.Be-WORK	2548258861
+About Workspaces…	Workspaces		Περί Workspaces…
+Always on top	Workspaces		Πάντα στην κορυφή
+Auto-raise	Workspaces		Αυτόματη ανύψωση
+Change workspace count…	Workspaces		Αλλαγή της αρίθμησης του χώρου εργασίας...
+Invalid argument: %s\n	Workspaces		Μη έγκυρη παράμετρος: %s\n
+Live in the Deskbar	Workspaces		Παραμονή στη Deskbar
+OK	Workspaces		Εντάξει
+Quit	Workspaces		Έξοδος
+Remove replicant	Workspaces		Αφαίρεση αντίγραφου
+Show window border	Workspaces		Εμφάνιση περιγράμματος παραθύρου
+Show window tab	Workspaces		Εμφάνιση καρτέλας παραθύρου
+Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Χρήση: %s [επιλογές] [χώρος εργασίας]\nόπου \"επιλογές\" είναι:\n --notitle\t\η μπάρα τίτλου αφαιρείται, το πεδίο και το μέγεθος παραμένουν\n --noborder\t\ο τίτλος, το πεδίο και το μέγεθος αφαιρούνται\n --avoidfocus\t\αποτρέπει το παράθυρο από το να γίνεται στόχος συντομέυσεων πληκτρολογίου \n --alwaysontop\t\tκρατά το παράθυρο στην κορυφή\n --notmovable\t\tτο παράθυρο δε μπορεί να μετακινηθεί\n --autoraise\t\αυτόματη ανύψωση του παραθύρου του χώρου εργασίας όταν είναι στην άκρη της οθόνης\n --help\t\tεμφάνιση της βοήθειας και έξοδος\nand \"workspace\" είναι ο αριθμός του χώρου εργασίας που γίνεται η αλλαγή (0-31)\n
+Workspaces	System name		Workspaces
+Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Χώροι Εργασίας\nγράφτηκε από τους %1, και %2.\n\nΠνευματικά δικαιώματα %3, Haiku.\n\nΣτέλνετε τα παράθυρα πίσω χρησιμοποιώντας το πλήκτρο  Option. Μετακινήστε τα παράθυρα μπροστά χρησιμοποιώντας το πλήκτρο Control.\n

@@ -1,0 +1,161 @@
+1	modern_greek	x-vnd.Be-MAIL	2305575758
+%d - Date	Mail		%d - Ημερομηνία
+%e - E-mail address	Mail		%e - Διεύθυνση ηλεκτρονικού ταχυδρομείου
+%e wrote:\\n	Mail		%e έγγραψε:\\n
+%n - Full name	Mail		%n - Πλήρες όνομα
+(Address unavailable)	Mail		(Μη διαθέσιμη διεύθυνση)
+(Date unavailable)	Mail		(Μη διαθέσιμη ημερομηνία)
+(Name unavailable)	Mail		(Μη διαθέσιμο όνομα)
+<none>	Mail		<κανένα>
+Account from mail	Mail		Λογαριασμός από το ταχυδρομείο
+Account:	Mail		Λογαριασμός:
+Accounts…	Mail		Λογαριασμοί...
+Add	Mail		Προσθήκη
+Add enclosure…	Mail		Προσθήκη συνημμένου...
+Add signature	Mail		Προσθήκη υπογραφής
+An error occurred trying to open this signature.	Mail		Παρουσιάστηκε ένα σφάλμα, κατά τη προσπάθεια ανοίγματος αυτής της υπογραφής.
+An error occurred trying to save the attachment.	Mail		Παρουσιάστηκε ένα σφάλμα, κατά την αποθήκευση του συνημμένου.
+An error occurred trying to save this signature.	Mail		Παρουσιάστηκε ένα σφάλμα κατά την προσπάθεια αποθήκευσης της υπογραφής.
+Attach attributes:	Mail		Επισύναψη ιδιοτήτων:
+Attachments:	Mail		Συνημμένα:
+Auto signature:	Mail		Αυτόματη υπογραφή:
+Automatic	Mail		Αυτόματο
+Automatically mark mail as read:	Mail		Αυτόματο μαρκάρισμα μηνύματος ως αναγνωσμένο:
+Bcc:	Mail		Ιδιαίτ. κοιν.:
+Beginner	Mail		Αρχάριος
+Button bar:	Mail		Μπάρα πλήκτρου:
+Cancel	Mail		Άκυρο
+Cc:	Mail		Κοιν.:
+Check spelling	Mail		Έλεγχος ορθογραφίας
+Close	Mail		Κλείσιμο
+Close and 	Mail		Κλείσιμο και
+Colored quotes:	Mail		Έγχρωμες παραθέσεις:
+Copy	Mail		Αντιγραφή
+Copy link location	Mail		Αντιγραφή τοποθεσίας συνδέσμου
+Copy to new	Mail		Αντιγραφή σε νέο
+Couldn't open this signature. Sorry.	Mail		Αδυναμία ανοίγματος αυτής της υπογραφής. Συγνώμη για την αναστάτωση.
+Cut	Mail		Αποκοπή
+Date:	Mail		Ημερομηνία:
+Decoding:	Mail		Αποκωδικοποίηση:
+Default account:	Mail		Προεπιλεγμένος λογαριασμός:
+Delete	Mail		Διαγραφή
+Discard	Mail		Απόρριψη
+Do you wish to save this message as a draft before closing?	Mail		Θέλετε να αποθηκεύσετε το μήνυμα ως πρόχειρο πριν το κλείσιμο;
+Do you wish to send this message before closing?	Mail		Θέλετε να στείλετε το μήνυμα πριν το κλείσιμο;
+Don't save	Mail		Χωρίς αποθήκευση
+E-mail draft could not be saved!	Mail		Το πρόχειρο του ηλεκτρονικού ταχυδρομείου δεν μπορεί να αποθηκευτεί!
+Edit	Mail		Επεξεργασία
+Edit queries…	Mail		Επεξεργασία ερωτημάτων...
+Edit signatures…	Mail		Επεξεργασία υπογραφών...
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Εισαγωγή: %name% (Tύπος: %type%)
+Encoding:	Mail		Κωδικοποίηση:
+Expert	Mail		Έμπειρος
+File	Mail		Αρχείο
+Find	Mail		Εύρεση
+Find again	Mail		Εύρεση ξανά
+Find…	Mail		Εύρεση...
+Font:	Mail		Γραμματοσειρά:
+Forward	Mail		Προώθηση
+Forward without attachments	Mail		Προώθηση χωρίς συνημμένα
+From:	Mail		Από:
+Hide	Mail		Απόκρυψη
+Include file attributes in attachments	Mail		Να συμπεριληφθούν οι ιδιότητες του αρχείου στα συνημμένα
+Inconsistency occurred in the undo/redo buffer.	Mail		Παρουσιάστηκε ασυνέπεια κατά την αναίρεση/ακύρωση αναίρεσης της ενδιάμεσης μνήμης
+Initial spell check mode:	Mail		Αρχικοποίηση λειτουργίας ορθογραφικού ελέγχου:
+Leave as '%s'	Mail		Άφησε ως '%s'
+Leave as New	Mail		Άφησε ως Νέο
+Leave same	Mail		Άφησε το ίδιο
+Mail	System name		Mail
+Mail couldn't find its dictionary.	Mail		To Ταχυδρομείο δεν βρήκε το λεξικό.
+Mail preferences	Mail		Προτιμήσεις ταχυδρομείου
+Mailing	Mail		Αλληλογραφία
+Message	Mail		Μήνυμα
+Move to trash	Mail		Μετακίνηση στα απορρίμματα
+Need Tracker to move items to trash	Mail		Πρέπει ο Ανιχνευτής να μετακινήσει τα στοιχεία στο καλάθι απορριμάτων
+New	Mail		Νέο
+New mail message	Mail		Νέο μήνυμα ταχυδρομείου
+Next	Mail		Επόμενο
+Next message	Mail		Επόμενο μήνυμα
+No file attributes, just plain data	Mail		Χωρίς τις ιδιότητες του αρχείου, μόνο απλά δεδομένα
+No matches	Mail		Κανένα που να ταιριάζει
+None	Mail		Κανένα
+OK	Mail		Εντάξει
+Off	Mail		Απενεργοποίηση
+On	Mail		Ενεργοποίηση
+Only files can be added as attachments.	Mail		Μόνο αρχεία μπορούν να προστεθούν ως συνημμένα.
+Open	Mail		Άνοιγμα
+Open attachment	Mail		Άνοιγμα συνημμένου
+Open draft	Mail		Άνοιγμα πρόχειρου
+Open this link	Mail		Άνοιξε το σύνδεσμο
+Page setup…	Mail		Διαμόρφωση σελίδας…
+Paste	Mail		Επικόλληση
+Preferences…	Mail		Προτιμήσεις...
+Previous	Mail		Προηγούμενο
+Previous message	Mail		Προηγούμενο μήνυμα
+Print	Mail		Εκτύπωση
+Print…	Mail		Εκτύπωση...
+Put your favorite e-mail queries and query templates in this folder.	Mail		Τοποθετήστε τα αγαπημένα ερωτήματα ηλεκτρονικής αλληλογραφίας και τα πρότυπα ερωτημάτων σε αυτόν το φάκελο.
+Queries	Mail		Ερωτήματα
+Quit	Mail		Έξοδος
+Quote	Mail		Παράθεση
+Random	Mail		Τυχαία
+Read 	Mail		Ανάγνωση
+Really delete this signature? This cannot be undone.	Mail		Πράγματι να σβηστεί αυτή η υπογραφή; Δεν θα μπορείτε να την επαναφέρετε.
+Redo	Mail		Επανάληψη
+Remove attachment	Mail		Διαγραφή συνημμένου
+Remove enclosure	Mail		Αφαίρεση συνημμένου
+Remove quote	Mail		Διαγραφή παράθεσης
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Η αφαίρεση συνημμένων από ένα προωθημένο μήνυμα δεν έχει εφαρμοστεί!\nΔεν θα λειτουργήσει σωστά.
+Reply	Mail		Απάντηση
+Reply account:	Mail		Απάντηση λογαριασμού:
+Reply preamble:	Mail		Επανάληψη πρόλογου:
+Reply to all	Mail		Απάντηση σε όλους
+Reply to sender	Mail		Απάντηση στον αποστολέα
+Resend	Mail		Επανάληψη αποστολής
+Revert	Mail		Επαναφορά
+Save	Mail		Αποθήκευση
+Save address	Mail		Αποθήκευση διεύθυνσης
+Save as draft	Mail		Αποθήκευση ως πρόχειρο
+Save attachment…	Mail		Αποθήκευση συνημμένου...
+Save changes to this signature?	Mail		Να αποθηκευτούν οι αλλαγές σε αυτήν την υπογραφή;
+Select all	Mail		Επιλογή όλων
+Send	Mail		Αποστολή
+Send message	Mail		Αποστολή μηνύματος
+Set to %s	Mail		Όρισε στο %s
+Set to Saved	Mail		Όρισε στο αποθηκευμένο
+Set to…	Mail		Όρισε στο...
+Show header	Mail		Εμφάνιση επικεφαλίδας
+Show icons & labels	Mail		Εμφάνιση εικονιδίων & ετικετών
+Show icons only	Mail		Εμφάνιση μόνο εικονιδίων
+Show raw message	Mail		Εμφάνιση ανεπεξέργαστου μηνύματος
+Signature	Mail		Υπογραφή
+Signature:	Mail		Υπογραφή:
+Signatures	Mail		Υπογραφές
+Size:	Mail		Μέγεθος:
+Sorry	Mail		Συγνώμη για την αναστάτωση
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Συγνώμη, αδυναμία εύρεσης εφαρμογής η οποία να υπστηρίζει τον τύπο δεδομένων 'Person'
+Start now	Mail		Εκκίνηση τώρα
+Subject:	Mail		Θέμα:
+Text wrapping:	Mail		Αναδίπλωση κειμένου:
+The mail_daemon could not be started:\n\t	Mail		Αδυναμία εκκίνησης της υπηρεσίας ταχυδρομείου:\n\t
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Η υπηρεσία ταχυδρομείου δεν εκτελείται. Το μήνυμα είναι σε ουρά αναμονής, και θα σταλθεί όταν η υπηρεσία ταχυδρομείου ξεκινήσει.
+There is no installed handler for URL links.	Mail		Δεν έχει εγκατασταθεί χειριστής για τις συνδέσεις URL.
+Title:	Mail		Τίτλος:
+To:	Mail		Προς:
+Trash	Mail		Καλάθι απορριμάτων
+Undo	Mail		Αναίρεση
+Unread	Mail		Μη αναγνωσμένο
+Use default account	Mail		Χρησιμοποίησε τον προεπιλεγμένο λογαριασμό
+User interface	Mail		Διεπαφή χρήστη
+View	Mail		Προβολή
+Warn unencodable:	Mail		Προειδοποίηση μη κωδικοποιημένου:
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Το κύριο κείμενό σας περιέχει %ld μη κωδικοποιημένους χαρακτήρες. Ίσως ένα διαφορετικό σύνολο χαρακτήρων θα μπορούσε να λειτουργήσει καλύτερα; Πατήστε Αποστολή για να το στείλετε παρόλα αυτά (ένας χαρακτήρας υποκατάστατο θα χρησιμοποιηθεί στη θέση του μη κωδικοποιημένου), ή να επιλέξετε Ακύρωση για να επιστρέψετε και να προσπαθήσετε να το διορθώσετε.
+\\n - Newline	Mail		\\n - Νέα γραμμή
+draft	B_USER_DIRECTORY/mail/draft		πρότυπο
+helpful message	Mail		βοηθητικό μήνυμα
+in	B_USER_DIRECTORY/mail/in		μέσα
+mail	B_USER_DIRECTORY/mail		αλληλογραφία
+out	B_USER_DIRECTORY/mail/out		έξω
+queries	B_USER_DIRECTORY/mail/queries		ερωτήματα
+sent	B_USER_DIRECTORY/mail/sent		απεσταλμένο
+spam	B_USER_DIRECTORY/mail/spam		ανεπιθύμητη αλληλογραφία

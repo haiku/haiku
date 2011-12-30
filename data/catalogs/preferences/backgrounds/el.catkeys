@@ -1,6 +1,7 @@
-1	modern_greek	x-vnd.Haiku-Backgrounds	1075705819
+1	modern_greek	x-vnd.Haiku-Backgrounds	3513602073
 All workspaces	Main View		Σε όλες τις επιφάνειες εργασίας
 Apply	Main View		Εφαρμογή
+Backgrounds	System name		Φόντο
 Center	Main View		Στο κέντρο
 Current workspace	Main View		Τρέχουσα επιφάνεια εργασίας
 Default	Main View		Προκαθορισμένο
@@ -10,6 +11,7 @@ Icon label outline	Main View		Περίγραμμα ετικέτας εικονι
 Image:	Main View		Εικόνα:
 Manual	Main View		Χειρονακτικά
 None	Main View		Κανένα
+Other folder…	Main View		Άλλος φάκελος...
 Other…	Main View		Άλλο…
 Placement:	Main View		Τοποθέτηση:
 Preview	Main View		Προεπισκόπηση
@@ -17,6 +19,7 @@ Resolution: 	Image Filepanel		Ανάλυση:
 Revert	Main View		Επαναφορά
 Scale to fit	Main View		Προσαρμογή
 Select	Main View		Επιλογή
+Tile	Main View		Παράθεση
 X:	Main View		Χ:
 Y:	Main View		Υ:
 pick one	Main View		διαλέξτε ένα

@@ -1,0 +1,12 @@
+1	modern_greek	x-vnd.Haiku-HPGSTranslator	3633584048
+Based on HPGS (http://hpgs.berlios.de)	ConfigView		Βασισμένο στο HPGS (http://hpgs.berlios.de)
+Error: Cannot imbue plot device to reader: %s\n	HPGSTranslator		Σφάλμα: Αδύνατη η εμπότιση της συσκευής στον αναγνώστη: %s\n
+Error: Cannot process plot data %s\n	HPGSTranslator		Σφάλμα: αδύνατη επεξεργασία %s\n
+HPGS image	HPGSTranslator		Εικόνα HPGS
+HPGS image translator	HPGSTranslator		Μεταφραστής εικόνων HPGS 
+HPGS images	ConfigView		Εικόνες HPGS
+HPGS images	HPGSTranslator		Εικόνες HPGS
+HPGSTranslator Settings	ConfigView		Επιλογές μεταφραστή HPGS
+Version %d.%d.%d, %s	ConfigView		Έκδοση %d.%d.%d, %s
+Write error %s\n	HPGSTranslator		Σφάλμα εγγραφής %s\n
+no hpgs\n	HPGSTranslator		χωρίς hpgs\n

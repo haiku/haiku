@@ -1,0 +1,9 @@
+1	modern_greek	x-vnd.Haiku-BMPTranslator	2497639570
+BMP Settings	BMPMain		Επιλογές BMP
+BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	Εικόνα BMP (MS format, %d bits
+BMP image (OS/2 format, %d bits)	BMPTranslator		Εικόνα BMP (ΛΣ/2 format, %d bits)
+BMP image translator	BMPTranslator		Μετατροπέας εικόνων BMP
+BMP image translator	BMPView		Μετατροπέας εικόνων BMP
+BMP images	BMPTranslator		Εικόνες BMP
+BMPTranslator Settings	BMPTranslator		Επιλογές μετατροπέα BMP
+Version %d.%d.%d, %s	BMPView		Έκδοση %d.%d.%d, %s

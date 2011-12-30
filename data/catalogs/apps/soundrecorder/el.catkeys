@@ -1,0 +1,38 @@
+1	modern_greek	x-vnd.Haiku-SoundRecorder	2122042546
+Cannot connect to media server	RecorderWindow		Αδυναμία σύνδεσης με τον εξυπηρετητή πολυμέσων
+Cannot connect to the selected sound input	RecorderWindow		Αδυναμία σύνδεσης με την επιλεγμένη είσοδο ήχου
+Cannot find an unused name to use for the new recording	RecorderWindow		Αδυναμία εύρεσης αχρησιμοποίητου ονόματος για να χρησιμοποιηθεί στη νέα ηχογράφηση
+Cannot find default audio hardware	RecorderWindow		Αδυναμία εύρεσης προεπιλεγμένου υλικού ήχου
+Cannot find the temporary file created to hold the new recording	RecorderWindow		Αδυναμία εύρεσης του προσωρινού αρχείου που δημιουργήθηκε για να κρατήσει τη νέα ηχογράφηση
+Cannot get the file to play	RecorderWindow		Αδυναμία εύρεσης του αρχείου για αναπαραγωγή
+Cannot open the temporary file created to hold the new recording	RecorderWindow		Αδυναμία ανοίγματος του προσωρινού αρχείου που δημιουργήθηκε για να κρατήσει τη νέα ηχογράφηση
+Cannot recognize this file as a media file	RecorderWindow		Δεν είναι δυνατή η αναγνώριση αυτού του αρχείου ως αρχείο πολυμέσων
+Cannot record a sound that long	RecorderWindow		Αδυναμία εγγραφής ήχου μεγάλης διάρκειας
+Channels: 	RecorderWindow		Κανάλια:
+Compression:	RecorderWindow		Συμπίεση:
+Drop files here	SoundListView		Σύρετε τα αρχεία εδώ
+Duration:	RecorderWindow		Διάρκεια:
+File info	RecorderWindow		Πληροφορίες αρχείου
+File name:	RecorderWindow		Όνομα αρχείου:
+Format: 	RecorderWindow		Μορφοποίηση:
+Forward	RecorderWindow		Προς τα εμπρός
+Input	RecorderWindow		Είσοδος
+Input:	RecorderWindow		Είσοδος:
+Invalid audio files	RecorderWindow		Άκυρα αρχεία ήχου
+Loop	RecorderWindow		Βρόχος
+None	RecorderWindow		Κανένα
+None of the files appear to be audio files	RecorderWindow		Κανένα από τα αρχεία δεν φαίνεται να είναι αρχεία ήχου
+Nothing to play	RecorderWindow		Δεν υπάρχει τίποτα για αναπαραγωγή
+OK	RecorderWindow		Εντάξει
+Play	RecorderWindow		Αναπαραγωγή
+Record	RecorderWindow		Εγγραφή
+Rewind	RecorderWindow		Προς τα πίσω
+Sample rate: 	RecorderWindow		Ρυθμός δειγματοληψίας:
+Sample size: 	RecorderWindow		Μέγεθος δειγματοληψίας:
+Save	RecorderWindow		Αποθήκευση
+Some of the files don't appear to be audio files	RecorderWindow		Ορισμένα από τα αρχεία δεν φαίνεται να είναι αρχεία ήχου
+Sound List	RecorderWindow		Λίστα ήχου
+SoundRecorder	System name		SoundRecorder
+Stop	RecorderWindow		Σταμάτα
+bits	RecorderWindow		bits
+seconds	RecorderWindow		δευτερόλεπτα

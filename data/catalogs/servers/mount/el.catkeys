@@ -1,0 +1,17 @@
+1	modern_greek	x-vnd.Haiku-mount_server	1422362183
+Cancel	AutoMounter		Άκυρο
+Could not unmount disk \"%s\":\n\t%s	AutoMounter		Αδυναμία αποπροσάρτησης του δίσκου \"%s\":\n\t%s
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Αδυναμία αποπροσάρτησης του δίσκου \"%s\":\n\t%s\n\nΘέλετε να γίνει εξαναγκασμένη αποπροσάρτηση;\n\nΣημείωση: Εάν μια εφαρμογή γράφει τώρα στο τόμο, η αποπροσάρτηση τώρα μπορεί να οδηγήσει σε απώλεια δεδομένων.\n
+Error mounting volume:\n\n%s	AutoMounter		Σφάλμα προσάρτησης τόμου:\n\n%s
+Force unmount	AutoMounter		Εξαναγκασμένη αποπροσάρτηση
+It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Προτείνετε να προσαρτήσετε όλους τους πρόσθετους τόμους στο Haiku σε λειτουργία μόνο-ανάγνωσης. Αυτό θα εμποδίσει την απώλεια δεδομένων λόγω σφαλμάτων του Haiku.
+Mount error	AutoMounter		Σφάλμα προσάρτησης
+Mount read-only	AutoMounter		Προσάρτηση μόνο για ανάγνωση
+Mount read/write	AutoMounter		Προσάρτηση για ανάγνωση/εγγραφή
+Mount warning	AutoMounter		Προειδοποίηση προσάρτησης
+Mounting volume '%s'\n\n	AutoMounter		Προσάρτηση τόμου '%s'\n\n
+Mounting volume <unnamed volume>\n\n	AutoMounter		Προσάρτηση τόμου <ανώνυμος τόμος>\n\n
+OK	AutoMounter		Εντάξει
+Previous volumes mounted.	AutoMounter		Οι προηγούμενοι τόμοι έχουν προσαρτηθεί.
+The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Το σύστημα αρχείων του τόμου δεν είναι σύστημα αρχείων του Haiku. Συνιστούμε να προσαρτήσετε το τόμο σε λειτουργία μόνο-ανάγνωσης. Αυτό θα εμποδίσει την απώλεια δεδομένων λόγω σφαλμάτων του Haiku.
+Unmount error	AutoMounter		Σφάλμα αποπροσάρτησης

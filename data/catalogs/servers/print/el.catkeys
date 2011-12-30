@@ -1,0 +1,54 @@
+1	modern_greek	x-vnd.Be-PSRV	1761631281
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Ένας εκτυπωτής με ίδιο όνομα υπάρχει ήδη, αλλά δεν μπορεί να χρησιμοποηθεί καθόλου. Αντικατάσταση;
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Ένας εκτυπωτής με ίδιο όνομα υπάρχει ήδη, αλλά ο οδηγός δεν μπόρεσε να βρεθεί! Αντικατάσταση;
+A0	ConfigWindow	ISO 216 paper size	A0
+A1	ConfigWindow	ISO 216 paper size	A1
+A2	ConfigWindow	ISO 216 paper size	A2
+A3	ConfigWindow	ISO 216 paper size	A3
+A4	ConfigWindow	ISO 216 paper size	A4
+A5	ConfigWindow	ISO 216 paper size	A5
+A6	ConfigWindow	ISO 216 paper size	A6
+All pages	ConfigWindow		Όλες τις σελίδες
+All pages, %1 copies	ConfigWindow		Όλες οι σελίδες, %1 αντίγραφα
+B5	ConfigWindow	ISO 216 paper size	B5
+Cancel	ConfigWindow		Άκυρο
+Cancel	PrintServerApp		Άκυρο
+Create a new printer	PrintServerApp Scripting		Δημιούργησε ένα νέο εκτυπωτή
+Delete a specific printer	PrintServerApp Scripting		Διέγραψε ένα συγκεκριμένου εκτυπωτή
+Get comments about this printer	Printer Scripting		Βρες τα σχόλια για αυτόν τον εκτυπωτή
+Get currently available ports/devices	Transport Scripting		Βρες τις διαθέσιμες πόρτες/συσκευές
+Get name of printer	Printer Scripting		Βρες το όνομα του εκτυπωτή
+Get name of the printer add-on used for this printer	Printer Scripting		Βρες το όνομα του πρόσθετου που χρησιμοποιείται για αυτόν τον εκτυπωτή
+Get name of the transport add-on used for this printer	Printer Scripting		Βρες το όνομα του πρόσθετου της μεταφοράς που χρησιμοποιείται για αυτόν τον εκτυπωτή
+Get name of transport	Transport Scripting		Βρες το όνομα της μεταφοράς
+Get the transport configuration for this printer	Printer Scripting		Βρες τη παραμετροποίηση μεταφοράς για αυτόν τον εκτυπωτή
+Landscape	ConfigWindow		Τοπίο
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ledger
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	Letter
+No	PrintServerApp		Όχι
+OK	ConfigWindow		Εντάξει
+OK	PrintServerApp		Εντάξει
+Page %1 to %2	ConfigWindow		Σελίδα %1 εως %2
+Page %1 to %2, %3 copies	ConfigWindow		Σελίδα %1 to %2, %3 αντίγραφα
+Page setup	ConfigWindow		Διαμόρφωση σελίδας
+Page setup:	ConfigWindow		Διαμόρφωση σελίδας:
+Paper setup:	ConfigWindow		Διαμόρφωση χαρτιού:
+Portrait	ConfigWindow		Πορτραίτο
+Print setup	ConfigWindow		Ρύθμιση εκτυπωτή
+Printer server	ConfigWindow		Εκτυπωτής διακομιστής
+Printer:	ConfigWindow		Εκτυπωτής:
+Retrieve a specific printer	PrintServerApp Scripting		Ανάκτηση συγκεκριμένου εκτυπωτή
+Retrieve a specific transport	PrintServerApp Scripting		Ανάκτηση συγκεκριμένης μεταφοράς
+Retrieve or select the active printer	PrintServerApp Scripting		Ανάκτηση ή επιλογή ενεργού εκτυπωτή
+Return the number of available printers	PrintServerApp Scripting		Επέστρεψε τον αριθμό των διαθέσιμων εκτυπωτών
+Return the number of available transports	PrintServerApp Scripting		Επέστρεψε τον αριθμό των διαθέσιμων μεταφορών
+Select a printer	ConfigWindow		Επέλεξε ένα εκτυπωτή
+Show configuration window	PrintServerApp Scripting		Εμφάνισε το παράθυρο παραμετροποίησης
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid
+There are no printers set up.	PrintServerApp		Δεν έχουν οριστεί εκτυπωτές.
+There is no default printer set up.	PrintServerApp		Δεν έχει οριστεί προεπιλεγμένος εκτυπωτής.
+Undefined	ConfigWindow		Μη ορισμένο
+Would you like to make @ the default printer?	PrintServerApp		Θέλετε να ορίσετε το @ ως προεπιλεγμένο εκτυπωτή;
+Would you like to set one up now?	PrintServerApp		Θέλετε να ορίσετε ένα τώρα;
+Yes	PrintServerApp		Ναι

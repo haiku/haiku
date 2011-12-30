@@ -1,0 +1,15 @@
+1	modern_greek	x-vnd.Haiku-MatchHeader	1205906732
+<Choose account>	ConfigView		<Επιλέξτε λογαριασμό>
+<Choose action>	ConfigView		<Επιλέξτε ενέργεια>
+Delete message	ConfigView		Διαγραφή μηνύματος
+If	ConfigView		Αν
+Move to	ConfigView		Μεταφορά σε
+Reply with	ConfigView		Απάντηση με
+Rule filter	RuleFilter		Φίλτρο κανόνων
+Set as read	ConfigView		Θέση όπως διαβάζονται
+Set flags to	ConfigView		Θέση σημαιών σε
+Then	ConfigView		Τότε
+has	ConfigView		έχει
+header (e.g. Subject)	ConfigView		επικεφαλίδα (Θέμα)
+this field is based on the action	ConfigView		Αυτό το πεδίο βασίζεται σε
+value (use REGEX: in from of regular expressions like *spam*)	ConfigView		τιμή (χρήση REGEX όπως *spam*)

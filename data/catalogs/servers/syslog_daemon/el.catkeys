@@ -1,0 +1,4 @@
+1	modern_greek	x-vnd.Haiku-SystemLogger	57960782
+%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nΑυτός ο δαίμονας είναι υπέυθυνος για τη συλλογή όλων των μηνυμάτων του συστήματος και την καταχώρηση της καταγραφής του συστήματος στο \"%s\".\n\n
+OK	SyslogDaemon		Εντάξει
+Syslog Daemon	SyslogDaemon		Δαίμων Syslog

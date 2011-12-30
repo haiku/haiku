@@ -1,0 +1,4 @@
+1	modern_greek	x-vnd.Haiku-debug_server	1035915338
+Debug	DebugServer		Αποσφαλμάτωση
+OK	DebugServer		Εντάξει
+The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		Η εφαρμογή :\n\n %app\n\nhas εντόπισε ένα σφάλμα το οποίο το αποτρέπει απο το να συνεχίσει. Το Haiku θα τερματίσει την εφαρμογή και θα καθαρίσει.

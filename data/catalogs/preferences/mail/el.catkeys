@@ -1,0 +1,60 @@
+1	modern_greek	x-vnd.Haiku-Mail	3957822883
+Account name:	Config Views		Όνομα λογαριασμού
+Account name:	E-Mail		Όνομα Λογαριασμού:
+Account settings	AutoConfigWindow		Ρυθμίσεις λογαριασμού
+Account settings	Config Views		Ρυθμίσεις λογαριασμού
+Accounts	Config Window		Λογαριαμοί
+Add	Config Window		Προσθήκη
+Add filter	Config Views		Προσθήκη φίλτρου
+Always	Config Window		Πάντα
+Apply	Config Window		Εφαρμογή
+Back	AutoConfigWindow		Προηγούμενο
+Check every	Config Window		Έλενχος κάθε
+Choose Protocol	E-Mail		Επιλογή προτόκολου
+Create new account	AutoConfigWindow		Δημιουργία νέου λογαριασμού
+E-mail	System name		Ηλεκτρονική Διεύθυνση
+E-mail address:	E-Mail		Διεύθυνσή E-mail:
+Edit mailbox menu…	Config Window		Επεξεργασία μενού του γραμματοκιβωτίου...
+Enter a valid e-mail address.	AutoConfigWindow		Εισάγετε μια έγκυρη ηλεκτρονική διεύθυνση.
+Error	Config Window		Λάθος
+Error retrieving general settings: %s\n	Config Window		Σφάλμα κατά την ανάκτηση γενικών ρυθμίσεων: %s\n
+Finish	AutoConfigWindow		Ολοκλήρωση
+Incoming	Config Window		Εισερχόμενα
+Incoming	E-Mail		Εισερχόμενα
+Incoming mail filters	Config Views		Φιλτρα εισερχώμενης αλληλογραφίας
+Login name:	E-Mail		Όνομα πρόσβασης:
+Mail checking	Config Window		Έλενχος αλληλογραφίας
+Miscellaneous	Config Window		Δίαφορα
+Never	Config Window	show status window	Ποτέ
+Next	AutoConfigWindow		Επόμενο
+OK	AutoConfigWindow		Εντάξει
+OK	Config Views		ΟΚ
+OK	Config Window		ΟΚ
+Only when dial-up is connected	Config Window		Μόνο όταν υπάρχει σύνδεση dial-up
+Outgoing	Config Window		Εξερχόμενα
+Outgoing	E-Mail		Εξερχόμενα
+Outgoing mail filters	Config Views		Φιλτρα εξαρχόμενης αλληλογραφίας
+Password:	E-Mail		Κωδικός πρόσβασης:
+Real name:	Config Views		Πραγματικό όνομα:
+Real name:	E-Mail		Πραγματικό όνομα:
+Remove	Config Views		Αφαίρεση
+Remove	Config Window		Αφαίρεση
+Return address:	Config Views		Διεύθυνση αποστολέα:
+Revert	Config Window		Επαναφορά
+Schedule outgoing mail when dial-up is disconnected	Config Window		Προγραμματισμός εξερχόμενης αλληλογραφίας όταν η σύνδεση dial-up είναι αποσυνδεδεμένη
+Server Name:	E-Mail		Όνομα διακομιστή:
+Settings	Config Window		Επιλογές
+Show connection status window:	Config Window		Εμφάνιση παραθύρου κατάστασης σύνδεσης 
+Start mail services on startup	Config Window		Ενργοποιηση της υπηρεσιας αλληλογραφίας κατα την εκκίνηση
+The filter could not be moved. Deleting filter.	Config Views		Το φίλτρο δεν μπόρεσε να μετακινηθεί. Διαγραφή φίλτρου.
+While sending	Config Window		Καθώς στέλνοντας
+While sending and receiving	Config Window		Κατά την αποστολή και λήψη
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nΑδυναμία επαναστροφής των γενικών ρυθμίσεων.\n\nΣφάλμα κατά την επαναστροφή των γενικών ρυθμίσεων:\n%s\n
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nΔημιουργήστε ένα νέο λογαριασμό με το κουμπί προσθήκη.\n\nΑφαιρέστε ένα λογαριασμό με το κουμπί Αφαίρεση στο επιλεγμένο στοιχείο.\n\nΕπιλέξτε ένα στοιχείο από την λίστα για να αλλάξετε τις ρυθμίσεις του.
+\t\t· E-mail filters	Config Window		\t\t· Φίλτρα ηλεκτρονικής διεύθυνσης
+\t\t· Incoming	Config Window		\t\t· Εισερχόμενα
+\t\t· Outgoing	Config Window		\t\t· Εξερχόμενα
+days	Config Window		ημέρες
+hours	Config Window		ώρες
+minutes	Config Window		λεπτά
+never	Config Window	mail checking frequency	ποτέ

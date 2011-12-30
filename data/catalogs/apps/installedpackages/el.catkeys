@@ -1,0 +1,8 @@
+1	modern_greek	x-vnd.Haiku-InstalledPackages	4131220089
+InstalledPackages	System name		Εγκατεστημένα πακέτα
+No package selected.	UninstallView		Καμία επιλογή πακετου.
+OK	UninstallView		ΟΚ
+Package description	UninstallView		Περιγραφή πακέτου
+Remove	UninstallView		Αφαίρεση
+The package you selected has been successfully removed from your system.	UninstallView		Το πακέτο που έχετε επιλέξει έχει απεγκατασταθεί με επιτυχία από το σύστημα σας.
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Το επιλεγμένο πακέτο δεν έχει απεγατασταθεί από το σύστημα σας. Το πακέτο είναι πιθανό να είναι καταστραμμένο.

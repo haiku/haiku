@@ -1,0 +1,48 @@
+1	modern_greek	x-vnd.Haiku-PowerStatus	2178654445
+About	PowerStatus		Περί
+About…	PowerStatus		Περί...
+Battery charging	PowerStatus		Η μπαταρία φορτίζεται
+Battery discharging	PowerStatus		Η μπαταρία αποφορτίζεται
+Battery info	PowerStatus		Πληροφορίες μπαταρίας
+Battery info…	PowerStatus		Πληροφορίες μπαταρίας...
+Battery unused	PowerStatus		Αχρησιμοποίητη μπαταρία
+Capacity granularity 1: 	PowerStatus		Κατάτμηση χωριτικότητας 1:
+Capacity granularity 2: 	PowerStatus		Κατάτμηση χωριτικότητας 2:
+Capacity: 	PowerStatus		Χωρητικότητα:
+Current rate: 	PowerStatus		Τρέχων ρυθμός:
+Damaged battery	PowerStatus		Κατεστραμμένη μπαταρία
+Design capacity low warning: 	PowerStatus		Χαμηλή προειδοποίηση χωριτικότητας σχεδίασης:
+Design capacity warning: 	PowerStatus		Προειδοποίηση σχεδιασμένης τάσης:
+Design capacity: 	PowerStatus		Σχεδιασμένη χωριτικότητα:
+Design voltage: 	PowerStatus		Σχεδιασμένη τάση:
+Empty battery slot	PowerStatus		Κενή υποδοχή μπαταρίας
+Extended battery info	PowerStatus		Λεπτομερείς πληροφορίες μπαταρίας
+Install in Deskbar	PowerStatus		Εγκατάσταση στη Deskbar
+Last full charge: 	PowerStatus		Τελευταία πλήρης φόρτιση:
+Model number: 	PowerStatus		Αριθμός μοντέλου:
+OEM info: 	PowerStatus		Πληροφορίες OEM:
+OK	PowerStatus		Εντάξει
+Power status box	PowerStatus		Πλαίσιο κατάστασης ενέργειας
+PowerStatus	PowerStatus		PowerStatus
+PowerStatus	System name		PowerStatus
+PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\nδημιουργημένο από τους Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
+Quit	PowerStatus		Έξοδος
+Run in window	PowerStatus		Εκτέλεση σε παράθυρο
+Serial number: 	PowerStatus		Σειριακός αριθμός:
+Show percent	PowerStatus		Εμφάνιση ποσοστού
+Show status icon	PowerStatus		Εικονίδιο κατάστασης ενέργειας
+Show text label	PowerStatus		Εμφάνιση κειμένου ετικέτας
+Show time	PowerStatus		Εμφάνιση ώρας
+Technology: 	PowerStatus		Τεχνολογία:
+Type: 	PowerStatus		Τύπος:
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Μπορείτε να τρέξετε το PowerStatus σε ένα παράθυρο ή να το εγκαταστήσετε στη Deskbar.
+charging	PowerStatus		φόρτιση
+discharging	PowerStatus		αποφόρτιση
+mA	PowerStatus		mA
+mAh	PowerStatus		mAh
+mV	PowerStatus		mV
+mW	PowerStatus		mW
+mWh	PowerStatus		mWh
+no battery	PowerStatus		καμία μπαταρία
+non-rechargeable	PowerStatus		μη-επαναφορτιζόμενο
+rechargeable	PowerStatus		επαναφορτιζόμενο

@@ -1,0 +1,50 @@
+1	modern_greek	x-vnd.Haiku-Expander	2439467000
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Είστε σίγουρος ότι θέλετε να σταματήσετε την επέκταση αυτού του \nαρχείου; Τα επεκταμένα στοιχεία μπορεί να μην είναι ολοκληρωμένα.
+Automatically expand files	ExpanderPreferences		Αυτόματη επέκταση αρχείων
+Automatically show contents listing	ExpanderPreferences		Αυτόματα εμφάνιση του περιεχομένου
+Cancel	ExpanderPreferences		Άκυρο
+Cancel	ExpanderWindow		Άκυρο
+Cancel	ExpanderWindow		Άκυρο
+Close	ExpanderMenu		Κλείσιμο
+Close window when done expanding	ExpanderPreferences		Κλείσιμο παραθύρου μετά το πέρας
+Continue	ExpanderWindow		Συνέχεια
+Creating listing for '%s'	ExpanderWindow		Δημιούργησε την καταχώρηση για '%s'
+Destination	ExpanderWindow		Προορισμός
+Destination folder:	ExpanderPreferences		Φάκελος προορισμού:
+Error when expanding archive	ExpanderWindow		Σφάλμα κατά την επέκταση του αρχείου
+Expand	ExpanderMenu		Επέκταση
+Expand	ExpanderWindow		Επέκταση
+Expander	System name		Expander
+Expander settings	ExpanderPreferences		Ρυθμίσεις του Expander
+Expander: Choose destination	DirectoryFilePanel		Expander: Επιλογή προορισμού
+Expander: Open	ExpanderWindow		Expander: Άνοιγμα
+Expanding '%s'	ExpanderWindow		Επέκταση του '%s'
+Expansion:	ExpanderPreferences		Επέκταση:
+File	ExpanderMenu		Αρχείο
+File expanded	ExpanderWindow		Το αρχείο επεκτάθηκε
+Hide contents	ExpanderWindow		Απόκρυψη περιεχομένων
+Leave destination folder path empty	ExpanderPreferences		Αφήσε την διαδρομή του φάκελο προορισμού άδεια
+OK	ExpanderPreferences		Εντάξει
+Open destination folder after extraction	ExpanderPreferences		Ανοιξε τον φάκελο προορισμού μετά την εξαγωγή
+Other:	ExpanderPreferences		Αλλο:
+Same directory as source (archive) file	ExpanderPreferences		Ίδιος κατάλογος με τον αρχείο πηγής 
+Select	DirectoryFilePanel		Επιλογή
+Select	ExpanderPreferences		Επίλεξε
+Select '%s'	DirectoryFilePanel		Επιλογή '%s'
+Select current	DirectoryFilePanel		Τρέχουσα επιλογή
+Set destination…	ExpanderMenu		Ορισμός προορισμού...
+Set source…	ExpanderMenu		Ορισμός πηγής...
+Settings	ExpanderMenu		Ρυθμίσεις
+Settings…	ExpanderMenu		Ρυθμίσεις...
+Show contents	ExpanderMenu		Εμφάνιση περιεχομένων
+Show contents	ExpanderWindow		Εμφάνιση περιεχομένων
+Source	ExpanderWindow		Πηγή
+Stop	ExpanderMenu		Σταμάτα
+Stop	ExpanderWindow		Σταμάτα
+The destination folder does not exist.	ExpanderWindow		Ο φάκελος προορισμού δεν υπάρχει.
+The destination is not a folder.	ExpanderWindow		Ο προορισμός δεν είναι φάκελος.
+The destination is read only.	ExpanderWindow		Ο προορισμός είναι μόνο για ανάγνωση.
+The file doesn't exist	ExpanderWindow		Το αρχείο δεν υπάρχει
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Ο φάκελος είτε μετακινήθηκε, μετονομάστηκε ή δεν \nυποστηρίζεται.
+Use:	ExpanderPreferences		Χρήση:
+is not supported	ExpanderWindow		δεν υποστηρίζεται

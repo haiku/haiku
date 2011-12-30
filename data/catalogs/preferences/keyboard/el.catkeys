@@ -1,0 +1,14 @@
+1	modern_greek	x-vnd.Haiku-Keyboard	1711838804
+Defaults	KeyboardWindow		Προεπιλογές
+Delay until key repeat	KeyboardView		Καθυστέρηση επανάληψης πλήκτρου
+Fast	KeyboardView		Γρήγορα
+Key repeat rate	KeyboardView		Ρυθμός επανάληψης πλήκτρου
+Keyboard	System name		Keyboard
+Long	KeyboardView		Μακρύ
+OK	KeyboardApplication		Εντάξει
+Revert	KeyboardWindow		Επαναφορά
+Short	KeyboardView		Σύντομο
+Slow	KeyboardView		Αργά
+Something has gone wrong!	KeyboardApplication		Κάτι πήγε λάθος!
+Typing test area	KeyboardView		Περιοχή δοκιμής πληκτρολόγησης
+Written by Andrew Edward McCall	KeyboardApplication		Γράφτηκε από τον Andrew Edward McCall

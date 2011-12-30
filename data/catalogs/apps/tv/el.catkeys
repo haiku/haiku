@@ -1,0 +1,27 @@
+1	modern_greek	x-vnd.Haiku.TV	1995288111
+Always on top	MainWin		Πάντα στην κορυφή
+Channel	MainWin		Κανάλι
+DVB - Digital Video Broadcasting TV	MainWin		DVB -  Ψηφιακή μετάδοση τηλέορασης βίντεο
+Debug	MainWin		Αποσφαλμάτωση
+Error, connecting to interface failed:\n\n	MainWin		Σφάλμα, η διασύνδεση με τη διεπαφή απέτυχε:\n\n
+Error, interface is busy:\n\n	MainWin		Σφάλμα, η διεπαφή είναι απασχολημένη:\n\n
+Full screen	MainWin		Πλήρης οθόνη
+Interface	MainWin		Διεπαφή
+Keep aspect ratio	MainWin		Διατήρηση λόγου πλευρών
+Next channel	MainWin		Επόμενο κανάλι
+No border	MainWin		Χωρίς περίγραμμα
+No menu	MainWin		Χωρίς μενού
+None	MainWin		Κανένα
+OK	MainWin		Εντάξει
+Previous channel	MainWin		Προηγούμενο κανάλι
+Quit	MainWin		Έξοδος
+Scale to native size	MainWin		Κλιμάκωση στο φυσικό μέγεθος
+Settings	MainWin		Ρυθμίσεις
+Settings…	MainWin		Ρυθμίσεις...
+TV	MainWin		Τηλεόραση
+TV	System name		TV
+force 544 x 576, display aspect 4:3	MainWin		Εξαναγκασμός 544 x 576, λόγος οθόνης 4:3
+force 704 x 576, display aspect 4:3	MainWin		Εξαναγκασμός 704 x 576, λόγος οθόνης 4:3
+force 720 x 576, display aspect 4:3	MainWin		Εξαναγκασμός 720 x 576, λόγος οθόνης 4:3
+pixel aspect ratio	MainWin		λόγος πλευρών εικονοστoιχείου
+unknown	MainWin		άγνωστο

@@ -1,0 +1,52 @@
+1	modern_greek	x-vnd.Haiku-Shortcuts	621368175
+(Choose application with file requester)	ShortcutsWindow		(Επιλέξτε εφαρμογή με τον file requester)
+*Beep	ShortcutsWindow		*Μπιπ
+*InsertString \"Your Text Here\"	ShortcutsWindow		*Εισάγετε συμβολοσεια \"Το Κείμενο σας Εδώ\"
+*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
+*MouseButton 1	ShortcutsWindow		*Πλήκτρο Ποντικιού 1
+*MouseDown	ShortcutsWindow		*Ποντίκι Κάτω
+*MouseUp	ShortcutsWindow		*Ποντίκι Επάνω
+*MoveMouse +20 +0	ShortcutsWindow		*Μετακίνηση ποντικιού στο +20 +0
+*MoveMouseTo 50% 50%	ShortcutsWindow		*Μετακίνηση ποντικιού στο 50% 50%
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Πολλαπλό \"*Μετακίνηση ποντικιού σε 100% 0\" \"*Πλήκτρο ποντικιού 1\"
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*Αποστολή μηνύματος application/x-vnd.Be-TRAK 'Tfnd'
+Add new shortcut	ShortcutsWindow		Προσθήκη νέας συντόμευσης
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+Append	ShortcutsWindow		Προσάρτηση
+Append KeySet…	ShortcutsWindow		Control
+Application	ShortcutsWindow		Εφαρμογή
+Beep	ShortcutsSpec		Μπιπ
+Cancel	ShortcutsWindow		Άκυρο
+Control	ShortcutsSpec	Name for modifier on keyboard	Έλεγχος
+Don't save	ShortcutsWindow		Χωρίς αποθήκευση
+Error, NULL state description?\n	ShortcutsSpec		Σφάλμα, ΚΕΝΗ αναφορά περιγραφής;\n
+File	ShortcutsWindow		Αρχείο
+InsertString	ShortcutsSpec		Εισαγωγή Συμβολοσειράς
+Key	ShortcutsWindow		Κλειδί
+LaunchHandler	ShortcutsSpec		LaunchHandler
+MouseButton	ShortcutsSpec		Πλήκτρο Ποντικιού
+MouseDown	ShortcutsSpec		Ποντίκι Κάτω
+MouseUp	ShortcutsSpec		Ποντίκι Επάνω
+MoveMouse	ShortcutsSpec		Μετακίνηση Ποντικιού
+MoveMouseTo	ShortcutsSpec		Μετακίνηση Ποντικιού στο
+Multi	ShortcutsSpec		Πολλαπλό
+OK	ShortcutsWindow		Εντάξει
+Oh no	ShortcutsWindow		Ώχ όχι
+Open	ShortcutsWindow		Άνοιγμα
+Open KeySet…	ShortcutsWindow		Άνοιγμα Σετ Πλήκτρων...
+Quit	ShortcutsWindow		Έξοδος
+Really quit without saving your changes?	ShortcutsWindow		Πράγματι θέλετε να εγκαταλείψετε χωρίς να αποθηκεύσετε τις αλλαγές σας;
+Remove selected shortcut	ShortcutsWindow		Αφαίρεσε την επιλεγμένη συντόμευση
+Revert to saved	ShortcutsWindow		Επαναφορά στο αποθηκευμένο
+Save	ShortcutsWindow		Αποθήκευση
+Save & apply	ShortcutsWindow		Αποθήκευση & εφαρμογή
+Save KeySet as…	ShortcutsWindow		Αποθήκευση σετ πλήκτρων ως...
+Select	ShortcutsWindow		Επιλογή
+SendMessage	ShortcutsSpec		Αποστολή Μηνύματος
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Shortcuts	System name		Shortcuts
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Το Shortcuts δε μπόρεσε να ανοίξει το αρχείο του σετ πλήκτρων!
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Οι συντομέυσεις δεν ήταν δυνατό να αναλυθούν στο αρχείο του σετ πλήκτρων!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Οι συντομέυσεις δεν ήταν δυνατό να αποθηκευτούν στο αρχείο του σετ πλήκτρων!
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Οι συντομέυσεις δεν ήταν δυνατό να αποθηκευτούν στο σετ πλήκτρων.
+Window	ShortcutsSpec	Name for modifier on keyboard	Παράθυρο

@@ -1,0 +1,33 @@
+1	modern_greek	x-vnd.Haiku.TextSearch	1180598828
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME δεν μπορεί να ανοίξει ένα ή περισσότερους φακέλους.
+%s: Not enough room to escape the filename.	Grepper		%s: Δεν υπάρχει αρκετός χώρος για την αποφυγή του ονόματος αρχείου.
+%s: There was a problem running grep.	Grepper		%s: Υπήρξε ένα πρόβλημα κατά την εκτέλεσης της λειτουργίας grep.
+Actions	GrepWindow		Ενέργειες
+Cancel	GrepWindow		Άκυρο
+Case-sensitive	GrepWindow		Ταίριασμα πεζών/κεφαλαίων
+Close	GrepWindow		Κλείσιμο
+Copy text to clipboard	GrepWindow		Αντιγραφή κειμένου στο πρόχειρο
+Encoding	GrepWindow		Κωδικοποίηση
+Escape search text	GrepWindow		Έξοδος από την αναζήτηση κειμένου
+File	GrepWindow		Αρχείο
+Follow symbolic links	GrepWindow		Ακολούθησε τους συμβολικούς συνδέσμους
+History	GrepWindow		Ιστορικό
+Look in sub-folders	GrepWindow		Ψάξε στους υποφακέλους
+New window	GrepWindow		Νέο παράθυρο
+OK	GrepWindow		Εντάξει
+Open files in Pe	GrepWindow		Άνοιγμα των αρχείων με το Pe
+Open selection	GrepWindow		Άνοιγμα επιλεγμένου
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Παρακαλώ επιλέξτε τα αρχεία που επιθυμείτε, τα οποία έχουν επιλέγει στον Ανιχνευτή για σας.
+Please select the files you wish to keep searching.	GrepWindow		Παρακαλώ επιλέξτε τα αρχεία που επιθυμείτε να συνεχίσετε την αναζήτηση.
+Quit	GrepWindow		Έξοδος
+Search	GrepWindow		Αναζήτηση
+Select all	GrepWindow		Επιλογή όλων
+Set target…	GrepWindow		Όρισε στόχο…
+Settings	GrepWindow		Ρυθμίσεις
+Show files in Tracker	GrepWindow		Εμφάνιση των αρχείων στον Ανιχνευτή
+Show lines	GrepWindow		Εμφάνιση γραμμών
+Skip folders starting with a dot	GrepWindow		Παρέκαμψε τους φακέλους που ξεκινούν με μια τελεία
+Text files only	GrepWindow		Μόνο αρχεία κειμένου
+TextSearch	GrepWindow		Αναζήτηση Κειμένου
+The unselected files will be removed from the list.	GrepWindow		Τα μη επιλεγμένα αρχεία θα διαγραφούν από τη λίστα.
+Trim to selection	GrepWindow		Περικοπή στην επιλογή

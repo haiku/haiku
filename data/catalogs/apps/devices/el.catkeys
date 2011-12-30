@@ -1,0 +1,95 @@
+1	modern_greek	x-vnd.Haiku-Devices	865240481
+ACPI Information	DeviceACPI		Πληροφορίες για το ACPI
+ACPI Processor Namespace '%2'	DeviceACPI		Επεξεργαστής ACPI Namespace '%2'
+ACPI System Bus	DeviceACPI		Δίαυλος Συστήματος ACPI
+ACPI System Indicator	DeviceACPI		Δείκτης Συστήματος ACPI
+ACPI Thermal Zone	DeviceACPI		Θερμική Ζώνη ACPI
+ACPI bus	Device		Δίαυλος ACPI
+ACPI bus	DevicesView		Δίαυλος ACPI
+ACPI controller	Device		Ελεγκτής ACPI
+ACPI node '%1'	DeviceACPI		Κόμβος ACPI '%1'
+Array	DeviceSCSI		Παράταξη
+Basic information	DevicesView		Βασικές πληροφορίες
+Bridge	Device		Γεφύρωση
+Bridge	DeviceSCSI		Γέφυρα
+Bus	DevicesView		Δίαυλος
+Bus Information	Device		Πληροφορίες Διαύλου
+CD-ROM	DeviceSCSI		CD-ROM
+Card Reader	DeviceSCSI		Αναγνώστης Κάρτας
+Category	DevicesView		Κατηγορία
+Changer	DeviceSCSI		Αλλαγή
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Πληροφορίες Κατηγορίας:\t\t\t\t: %classInfo%
+Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Πληροφορίες Κατηγορίας:\t\t\t\t: %classInfo%
+Class info	DevicePCI		Πληροφορία Κατηγορίας 
+Communication controller	Device		Ελεγκτής επικοινωνιών
+Communications	DeviceSCSI		Επικοινωνίες
+Computer	Device		Υπολογιστής
+Computer	DevicesView		Υπολογιστής 
+Connection	DevicesView		Σύνδεση
+Detailed	DevicesView		Αναλυτικό
+Device	Device		Συσκευή
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Όνομα Συσκεής\t\t\t\t: %Name%\nΚατασκευαστής\t\t\t: %Manufacturer%\nΟδηγός που χρησιμοποιήθηκε\t\t\t\t: %DriverUsed%\nΔιαδρομές συσκεής\t: %DevicePaths%
+Device class	DeviceSCSI		Κατηγορία συσκευής
+Device name	Device		Όνομα συσκευής
+Device name	DeviceACPI		Όνομα συσκευής
+Device name	DevicePCI		Όνομα συσκευής
+Device name	DeviceSCSI		Όνομα συσκευής
+Device name:	Device		Όνομα συσκευής:
+Device paths	Device		Διαδρομές συσκευών
+Device paths	DevicePCI		Διαδρομή συσκευής
+Devices	DevicesView		Συσκευές
+Devices	System name		Συσκευές
+Disk Drive	DeviceSCSI		Οδηγός Δίσκου
+Display controller	Device		Ελεγκτής γραφικών
+Docking station	Device		Σταθμός σύνδεσης
+Driver used	Device		Χρησιμοποιημένος οδηγός
+Driver used	DevicePCI		Οδηγός που χρησιμοποιήθηκε
+Enclosure	DeviceSCSI		Περίφραξη
+Encryption controller	Device		Ελεγκτής κρυπτογράφησης
+Generate system information	DevicesView		Δημιουργία πληροφοριών συστήματος
+Generic system peripheral	Device		Γενικά περιφερειακά συστήματος
+Graphics Peripheral	DeviceSCSI		Περιφερειακά Γραφικών
+ISA bus	Device		Δίαυλος ISA
+ISA bus	DevicesView		Δίαυλος ISA
+Input device controller	Device		Ελεγκτής εισαγώμενης συσκευής
+Intelligent controller	Device		Ευφυής ελεγκτής
+Manufacturer	Device		Κατασκευαστής
+Manufacturer	DeviceACPI		Κατασκευαστής
+Manufacturer	DevicePCI		Κατασκευαστής
+Manufacturer	DeviceSCSI		Κατασκευαστής
+Manufacturer:	Device		Κατασκευαστής:
+Mass storage controller	Device		Ελεγκτής μαζικής αποθήκευσης
+Memory controller	Device		Ελεγκτής μνήμης
+Multimedia controller	Device		Ελεγκτής πολυμέσων
+Name	PropertyList		Όνομα
+Network controller	Device		Ελεγκτής δικτύου
+None	Device		Τίποτα
+Not implemented	DeviceACPI		Δεν εφαρμόστηκε
+Not implemented	DevicePCI		Δεν εφαρμόστηκε
+Optical Drive	DeviceSCSI		Οπτικός Οδηγός
+Order by:	DevicesView		Κατανομή κατά:
+Other	DeviceSCSI		Άλλο
+PCI Information	DevicePCI		Πληροφορίες PCI
+PCI bus	Device		Δίαυλος PCI
+PCI bus	DevicesView		Δίαυλος PCI
+Printer	DeviceSCSI		Εκτυπωτής
+Processor	Device		Επεξεργαστής
+Processor	DeviceSCSI		Επεξεργαστής
+Quit	DevicesView		Έξοδος
+RBC	DeviceSCSI		RBC
+Refresh devices	DevicesView		Ανανέωση συσκευών
+Report compatibility	DevicesView		Αναφορά συμβατότητας
+SCSI Information	DeviceSCSI		Πληροφορίες SCSI
+Satellite communications controller	Device		Ελεγκτής δορυφορικών επικοινωνιών
+Scanner	DeviceSCSI		Σαρωτής
+Serial bus controller	Device		Ελεγκης σειριακού διαύλου
+Signal processing controller	Device		Ελεγκτής προόδου σήματος
+Tape Drive	DeviceSCSI		Οδηγός Ταινίας
+Unclassified device	Device		Αταξινόμητη συσκευή
+Unknown	DevicePCI		Άγνωστο
+Unknown device	Device		Άγνωστη συσκευή
+Unknown device	DevicesView		Άγνωστη συσκευή
+Value	PropertyList		Τιμή
+Wireless controller	Device		Ελεγκτής ασύρματου δικτύου
+Worm	DeviceSCSI		Σκώληκας
+unknown	Device		άγνωστο

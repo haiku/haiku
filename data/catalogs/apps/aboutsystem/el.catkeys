@@ -1,0 +1,86 @@
+1	modern_greek	x-vnd.Haiku-About	3434348710
+%.2f GHz	AboutView		%.2f GHz
+%d MiB total	AboutView		%d MiB συνολικά
+%d MiB used (%d%%)	AboutView		%d MiB χρησιμοποιούνται (%d%%)
+%ld MHz	AboutView		%ld MHz
+%ld Processors:	AboutView		%ld Επεξεργαστές:
+%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB συνολικά, %inaccessible MiB μη χρησιμοποιούμενα
+... and the many people making donations!\n\n	AboutView		...και στους πολλούς ανθρώπους που κάνουν δωρεές!\n\n
+2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 απο τον Andy Ritger βασισμένο στο Generalized Timing Formula
+
+About this system	AboutWindow		Περί συστήματος
+AboutSystem	System name		AboutSystem
+BSD (2-clause)	AboutView		BSD (2-ρήτρα)	 
+BSD (3-clause)	AboutView		BSD (3-ρήτρα)	 
+BSD (4-clause)	AboutView		BSD (4-ρήτρα)
+Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. και η ομάδα προγραμματιστών, για να έχουν δημιουργήσει το BeOs!\n\n
+Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Περιέχει λογισμικό που αναπτύχθηκε απο το Ίδρυμα NetBSD, Inc, και τους διανομείς της:\nftp, tput\nΠνευματικά δικαιώματα © 1996-2008 Ίδρυμα NetBSD, Inc. Όλα τα δικαιώματα διατηρούνται.
+Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Περιέχει λογισμικό απο το Project FreeBSD,κυκλοφόρησε κάτω απο την άδεια BSD:\ncal, ftpd, ping, telnet, telnetd, traceroute\nΠνευματικά δικαιώματα 1994-2008 The FreeBSD Project. Όλα τα δικαιώματα διατηρούνται.
+Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Περιέχει λογισμικό απο το Project GNU, κυκλοφόρησε κάτω απο τα διπλώματα GPL και LGPL:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\n Πνευματικά δικαιώματα © Το Ίδρυμα Του Δωρεάν Λογισμικού.
+Contributors:\n	AboutView		Συντελεστές:\n
+Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Πνευματικά δικαιώματα © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nΌλα τα δικαιώματα διατηρούνται.
+Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Πνευματικά δικαιώματα © 1990-2002 Info-ZIP. Όλα τα δικαιώματα διατηρούνται.
+Copyright © 1990-2003 Wada Laboratory, the University of Tokyo.	AboutView		Πνευματικά δικαιώματα © 1990-2003 Wada Laboratory, πανεπιστήμιο του Τόκιο
+Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Πνευματικά δικαιώματα © 1991-2000 Silicon Graphics, Inc. Όλα τα δικαιώματα διατηρούνται.
+Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Πνευματικά δικαιώματα © 1994-1997 Mark Kilgard. Όλα τα δικαιώματα διατηρούνται.
+Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Πνευματικά δικαιώματα © 1994-2008 Xiph.Org. Όλα τα δικαιώματα διατηρούνται.
+Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Πνευματικά δικαιώματα © 1994-2009, Thomas G. Lane, Guido Vollbeding. Αυτό το λογισμικό βασίζεται κατα ένα μέρος στην δουλειά της Independent JPEG Group.
+Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Πνευματικά δικαιώματα © 1995, 1998-2001 Jef Poskanzer. Όλα τα δικαιώματα διατηρούνται.
+Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Πνευματικά δικαιώματα © 1995-2001 Lars Düning. Όλα τα δικαιώματα διατηρούνται.
+Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Πνευματικά δικαιώματα © 1995-2004 Jean-loup Gailly και Mark Adler.
+Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Πνευματικά δικαιώματα © 1996-1997 Jeff Prosise. Όλα τα δικαιώματα διατηρούνται.
+Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Πνευματικά δικαιώματα © 1996-2005 Julian R Seward. Όλα τα δικαιώματα διατηρούνται.
+Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		Πνευματικά δικαιώματα © 1997-2006 PDFlib GmbH και Thomas Merz. Όλα τα δικαιώματα διατηρούνται..\nΤα λογότυπα PDFlib και PDFlib είναι εγγεγραμμένες εμπορικές μάρκες της PDFlib GmbH.
+Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Πνευματικά δικαιώματα © 1998-2000 Thai Κέντρο Λογισμικού Ανοιχτού Κώδικα Ltd και Clark Cooper.
+Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Πνευματικά δικαιώματα © 1998-2003 Daniel Veillard. Όλα τα δικαιώματα διατηρούνται.
+Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Πνευματικά δικαιώματα © 1999-2000 Y.Takagi. Όλα τα δικαιώματα διατηρούνται.
+Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Πνευματικά δικαιώματα © 1999-2006 Brian Paul. Mesa3D Project. Όλα τα δικαιώματα διατηρούνται.
+Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Πνευματικά δικαιώματα © 1999-2007 Michael C. Ring. Όλα τα δικαιώματα διατηρούνται.
+Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Πνευματικά δικαιώματα © 1999-2010 απο τους συγγραφείς του Gutenprint. Όλα τα δικαιώματα διατηρούνται.
+Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Πνευματικά δικαιώματα © 2000 Jean-Pierre ervbefeL και Remi Lefebvre.
+Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Πνευματικά δικαιώματα © 2000-2007 Fabrice Bellard, et al.
+Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Πνευματικά δικαιώματα © 2001-2002 Thomas Broyer, Charlie Bozeman και Daniel Veillard. Όλα τα δικαιώματα διατηρούνται.
+Copyright © 2001-2003 Expat maintainers.	AboutView		Πνευματικά δικαιώματα © 2001-2003 Expat maintainers.
+Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Πνευματικά δικαιώματα © 2002-2003 Steve Lhomme. Όλα τα δικαιώματα διατηρούνται.
+Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Πνευματικά δικαιώματα © 2002-2004 Vivek Mohan. Όλα τα δικαιώματα διατηρούνται.
+Copyright © 2002-2005 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Πνευματικά δικαιώματα © 2002-2005 Industrial Light & Magic, ένα όραμα της Lucas Digital Ltd. LLC.
+Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Πνευματικά δικαιώματα © 2002-2006 Maxim Shemanarev (McSeem).
+Copyright © 2002-2008 Alexander L. Roshal. All rights reserved.	AboutView		Πνευματικά δικαιώματα © 2002-2008 Alexander L. Roshal. Όλα τα δικαιώματα διατηρούνται.
+Copyright © 2003 Peter Hanappe and others.	AboutView		Πνευματικά δικαιώματα © Peter Hanappe και άλλοι.
+Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Πνευματικά δικαιώματα © 2003-2006 Intel Corporation. Όλα τα δικαιώματα διατηρούνται.
+Copyright © 2004-2005 Intel Corporation. All rights reserved.	AboutView		Πνευματικά δικαιώματα © 2004-2005 Intel Corporation. Όλα τα δικαιώματα διατηρούνται.
+Copyright © 2006-2007 Intel Corporation. All rights reserved.	AboutView		Πνευματικά δικαιώματα © 2006-2007 Intel Corporation. Όλα τα δικαιώματα διατηρούνται.
+Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Πνευματικά δικαιώματα © 2007 Ralink Technology Corporation. Όλα τα δικαιώματα διατηρούνται.
+Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Πνευματικά δικαιώματα © 2007-2009 Marvell Semiconductor, Inc. Όλα τα δικαιώματα διατηρούνται.
+Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Πνευματικά δικαιώματα © 2010-2011 Google Inc. Όλα τα δικαιώματα διατηρούνται.
+Current maintainers:\n	AboutView		Εν ενεργεία συντηρητές:\n
+GCC %d Hybrid	AboutView		GCC %d Υβριδικό
+Google & their Google Summer of Code program\n	AboutView		Google και το πρόγραμμα Google Summer of Code\n
+Kernel:	AboutView		Πυρήνας:
+License: 	AboutView		Άδεια:
+Licenses: 	AboutView		Άδειες:
+MIT (no promotion)	AboutView		MIT (χωρίς προώθηση)
+MIT license. All rights reserved.	AboutView		Δίπλωμα MIT. Όλα τα δικαιώματα διατηρούνται.
+Memory:	AboutView		Μνήμη:
+Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (ιδρυτής του έργου)\n\n
+Past maintainers:\n	AboutView		Παλιοί συντηρητές:\n
+Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		Τμήματα αυτής της εφαρμογής υπάγονται από πνευματικά δικαιώματα. \nΠνευματικά δικαιώματα © 1996-2006 The FreeType Project. Όλα τα δικαιώματα διατηρούνται.
+Processor:	AboutView		Επεξεργαστής:
+Revision	AboutView		Αναθεώρηση
+Source Code: 	AboutView		Πηγαίος Κώδικας:
+The BeGeistert team\n	AboutView		Η ομάδα BeGeistert\n
+The Haiku-Ports team\n	AboutView		Η ομάδα του Haiku-Ports\n
+The Haikuware team and their bounty program\n	AboutView		Η ομάδα του Haikuware και το δικό της πρόγραμμα γενναιοδωρίας\n
+The University of Auckland and Christof Lutteroth\n\n	AboutView		Το πανεπιστήμιο του Auckland και ο Christof Lutteroth\n\n
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Ο κώδικας που είναι μοναδικός στο Haiku, και ειδικά ο πυρήνας και όλος ο κώδικας των εφαρμογών που συνδέονται, διανέμονται υπό τους όρους της άδειας%MIT license%. Μερικές βιβλιοθήκες του συστήματος περιέχουν ένα μέρος κώδικα τρίτων, ο οποίος διανέμεται κάτω από την άδεια LGPL. Μπορείτε να βρείτε τα δικαιώματα πνευματικής ιδιοκτησίας παρακάτω.\n\n
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Τα πνευματικά δικαιώματα του κώδικα Haiku είναι ιδιοκτησία της Haiku, Inc. η των αντίστοιχων δημιουργών που ρητά αναφέρθηκαν στην πηγή. aiku® και το HAIKU logo® είναι εγγεγραμένα εμπορικά σήματα της Haiku, Inc.\n\n
+Time running:	AboutView		Χρόνος λειτουργίας:
+Translations:\n	AboutView		Μεταφράσεις:\n
+Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (και ο πυρήνας NewOS)\n
+Unknown	AboutView		Άγνωστο
+Version:	AboutView		Έκδοση:
+Website, marketing & documentation:\n	AboutView		Ιστοσελίδα, μάρκετινγκ & τεκμηρίωση:\n
+[Click a license name to read the respective license.]\n\n	AboutView		[Κάντε κλικ στο όνομα άδειας για να διαβάσετε την αντίστοιχη άδεια.]\n\n
+\nCopyrights\n\n	AboutView		\nΠνευματικά δικαιώματα\n\n
+\n\nSpecial thanks to:\n	AboutView		\n\nΙδιαίτερες ευχαριστίες στους:\n
+\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n... και κατά πάσα πιθανότητα κάποιους που ξεχάσαμε να αναφέρουμε (συγνώμη!)\n\n

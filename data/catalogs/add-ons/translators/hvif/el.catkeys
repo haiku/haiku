@@ -1,0 +1,8 @@
+1	modern_greek	x-vnd.Haiku-HVIFTranslator	813066125
+HVIF Settings	HVIFMain		HVIF Ρυθμίσεις 
+HVIF icons	HVIFTranslator		HVIF Εικονίδια
+HVIFTranslator Settings	HVIFTranslator		Ρυθμίσεις HVIFTranslator
+Native Haiku icon format translator	HVIFView		Τοπικός μεταφραστής εικονιδίων του Haiku
+Native Haiku vector icon translator	HVIFTranslator		Τοπικός μεταφραστής vector εικονιδίων του Haiku
+Render size:	HVIFView		Render μέγεθος:
+Version %d.%d.%d, %s	HVIFView		Έκδοση %d.%d.%d, %s

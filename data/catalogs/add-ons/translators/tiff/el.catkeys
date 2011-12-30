@@ -1,0 +1,16 @@
+1	modern_greek	x-vnd.Haiku-TIFFTranslator	292291870
+LZW	TIFFView		LZW
+None	TIFFView		Κανένα
+RLE (Packbits)	TIFFView		RLE (Packbits)
+TIFF Image Translator	TIFFView		Μεταφραστής εικόνων TIFF
+TIFF Library:	TIFFView		TIFF Βιβλιοθήκη:
+TIFF Settings	TIFFMain		TIFF Ρυθμίσεις
+TIFF image	TIFFTranslator		TIFF εικόνα
+TIFF image translator	TIFFTranslator		Μεταφραστής εικόνων TIFF
+TIFF images	TIFFTranslator		TIFF εικόνες
+TIFFTranslator Settings	TIFFTranslator		Ρυθμίσεις μεταφραστή TIFF
+Use Compression:	TIFFView		Χρήση συμπίεσης:
+Version %d.%d.%d %s	TIFFView		Έκδοση %d.%d.%d %s
+ZIP (Deflate)	TIFFView		ZIP (Deflate)
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: αδυναμία ορισμού του καταλόγου\n
+identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: λανθασμένο έγγραφο ευρετηρίου\n

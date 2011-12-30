@@ -1,0 +1,48 @@
+1	modern_greek	x-vnd.Haiku-Pulse	2324471783
+%.2f GHz	NormalPulseView		%.2f GHz
+%ld MHz	NormalPulseView		%ld MHz
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nΑπό τους David Ramsey και Arve Hjønnevåg\nΑναθεωρήθηκε από τον Daniel Switkin\n
+About Pulse…	CPUButton		Περί Παλμός...
+About Pulse…	PulseView		Περί Παλμός...
+Active color	ConfigView		Ενεργό χρώμα
+Bar colors	ConfigView		Χρώματα μπάρας
+CPU progress bar	NormalPulseView		Μπάρα προόδου Επεξεργαστή
+Defaults	PrefsWindow		Προεπιλογές
+Deskbar	CPUButton		Μπάρα εργασιών
+Deskbar menu	CPUButton		Μενού μπάρας εργασιών
+Deskbar mode	MiniPulseView		Λειτουργία Deskbar
+Deskbar mode	NormalPulseView		Λειτουργία Deskbar
+Deskbar mode	PrefsWindow		Λειτουργία Deskbar
+Error	PulseApp		Σφάλμα
+Fade colors	ConfigView		Αχνά χρώματα
+Frame color	ConfigView		Χρώμα πλαισίου
+Idle color	ConfigView		Χρώμα αδράνειας
+Info	CPUButton		Πληροφορίες
+Info	DeskbarPulseView		Πληροφορίες
+Info	PulseApp		Πληροφορίες
+Info	PulseView		Πληροφορίες
+Installing in Deskbar failed\n%s	PulseApp		Η εγκατάσταση στη Deskbar απέτυχε\n%s
+Mini mode	DeskbarPulseView		Μίνι λειτουργία
+Mini mode	NormalPulseView		Μίνι λειτουργία
+Mini mode	PrefsWindow		Μίνι λειτουργία
+Normal mode	DeskbarPulseView		Κανονική λειτουργία
+Normal mode	MiniPulseView		Κανονική λειτουργία
+Normal mode	PrefsWindow		Κανονική λειτουργία
+OK	CPUButton		Εντάξει
+OK	DeskbarPulseView		Εντάξει
+OK	PrefsWindow		Εντάξει
+OK	PulseApp		Εντάξει
+OK	PulseView		Εντάξει
+Pulse	NormalPulseView		Παλμός
+Pulse	PulseApp		Παλμός
+Pulse	System name		Παλμός
+Pulse settings	PulseWindow		Παλμός ρυθμίσεις
+Quit	DeskbarPulseView		Έξοδος
+Quit	MiniPulseView		Έξοδος
+Remove replicant	CPUButton		Διαγραφή αντίγραφου
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Η κατάργηση από τη Deskbar απέτυχε.\n%s
+Settings…	PulseView		Ρυθμίσεις...
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Χρήση: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
+Width of icon:	ConfigView		Πλάτος εικονιδίου:
+You can't disable the last active CPU.	CPUButton		Δεν μπορείτε να απενεργοποιήσετε τον τελευταίο ενεργό Επεξεργαστή.
+You can't disable the last active CPU.	PulseView		Δεν μπορείτε να απενεργοποιήσετε τον τελευταίο ενεργό Επεξεργαστή.

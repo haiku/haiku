@@ -1,0 +1,22 @@
+1	modern_greek	x-vnd.Haiku-FontDemo	1769653414
+Antialiased text	ControlView		Antialiased κείμενο
+Bounding boxes	ControlView		Εξωτερικά κουτιά
+Controls	FontDemo		Κουμπιά
+Cycle fonts	ControlView		Κυκλικές γραμματοσειρές
+Drawing mode:	ControlView		Τρόπος σχεδίασης:
+Font:	ControlView		Γραμματοσειρά
+FontDemo	FontDemo		FontDemo
+Haiku, Inc.	ControlView		Haiku, Inc.
+Haiku, Inc.	FontDemoView		Haiku, Inc.
+Outline:	ControlView		Εξωτερική γραμμή
+Outline: %d	ControlView		Εξωτερική γραμμή: %d
+Rotation: %d	ControlView		Κλίση: %d
+Rotation: 0	ControlView		Κλίση: 0
+Shear: %d	ControlView		Shear: %d
+Shear: 90	ControlView		Shear: 90
+Size: %d	ControlView		Μέγεθος: %d
+Size: 50	ControlView		Μέγεθος: 50
+Spacing: %d	ControlView		Κενό: %d
+Spacing: 0	ControlView		Κενό: 0
+Stop cycling	ControlView		Διακοπή γυρίσματος
+Text:	ControlView		Κείμενο:

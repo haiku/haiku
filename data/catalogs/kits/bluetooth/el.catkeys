@@ -1,0 +1,88 @@
+1	modern_greek	x-vnd.Haiku-Bluetooth	3550394259
+#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Μη Έγκυρη ονομασία
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Μη Έγκυρη ονομασία
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Μη Έγκυρη ονομασία
+#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Μη Έγκυρη ονομασία
+(reserved)	DeviceClass		(δεσμευμένο)
+1-17% utilized	DeviceClass		1-17% χρησιμοποιείται
+17-33% utilized	DeviceClass		17-33% χρησιμοποιείται
+33-50% utilized	DeviceClass		33-50% χρησιμοποιείται
+50-67% utilized	DeviceClass		50-67% χρησιμοποιείται
+67-83% utilized	DeviceClass		67-83% χρησιμοποιείται
+83-99% utilized	DeviceClass		83-99% χρησιμοποιείται
+Audio	DeviceClass		Ήχος
+Audio/Video	DeviceClass		Ήχος/Εικόνα
+Camcorder	DeviceClass		Βιντεοκάμερα
+Camera	DeviceClass		Φωτογραφική μηχανή
+Capturing	DeviceClass		Αποκόμιση
+Car audio	DeviceClass		Ήχος αυτοκινήτου
+Card reader	DeviceClass		Αναγνώστης καρτών μνήμης
+Cellular	DeviceClass		Κινητό
+Combo keyboard/pointing device	DeviceClass		Συνδυασμός πληκτρολογίου/συσκευής κατάδειξης
+Common ISDN access	DeviceClass		Κοινή ISDN πρόσβαση
+Computer	DeviceClass		Υπολογιστής
+Controller	DeviceClass		Ελεγκτής
+Cordless	DeviceClass		Ασύρματο
+Desktop workstation	DeviceClass		Χώρος επιφάνειας εργασίας
+Device conforms to the headset profile	DeviceClass		Η συσκευή συμμορφώνεται με το προφίλ των ακουστικών
+Digitizer tablet	DeviceClass		Ψηφιακή ταμπλέτα
+Display	DeviceClass		Εμφάνιση
+Doll/Action figure	DeviceClass		Κούκλα/Φιγούρα δράσης
+Fully available	DeviceClass		Πλήρως διαθέσιμο
+Game	DeviceClass		Παιχνίδι
+Gamepad	DeviceClass		Χειρηστήριο
+Gaming/Toy	DeviceClass		Gaming/Παιχνίδια
+Glasses	DeviceClass		Γυαλιά
+Handheld	DeviceClass		Φορητές
+Hands-free	DeviceClass		Hands-free
+Headphones	DeviceClass		Ακουστικά
+Helmet	DeviceClass		Κράνος
+HiFi audio device	DeviceClass		Συκσκευή ήχου HiFi
+Imaging	DeviceClass		Απεικόνιση
+Information	DeviceClass		Πληροφορίες
+Invalid device class!\n	DeviceClass		Λανθασμένη ομάδα συσκευής!\n
+Jacket	DeviceClass		Ζακέτα
+Joystick	DeviceClass		Χειρηστήριο
+Keyboard	DeviceClass		Πληκτρολόγιο
+LAN access	DeviceClass		Πρόσβαση LAN
+Laptop	DeviceClass		Φορητός υπολογιστής
+Loudspeaker	DeviceClass		Ηχείο
+Major class: 	DeviceClass		Κύρια ομάδα:
+Microphone	DeviceClass		Μικρόφωνο
+Minor class: 	DeviceClass		Μικρή ομάδα:
+Miscellaneous	DeviceClass		Διάφορα
+Networking	DeviceClass		Δικτύωση
+No service available	DeviceClass		Δεν υπάρχει διαθέσιμη υπηρεσία
+Not implemented	RemoteDevice		Δεν εφαρμόζεται
+Object transfer	DeviceClass		Μεταφορά αντικειμένου
+Pager	DeviceClass	A small radio device to receive short text messages	Βομβητής
+Palm	DeviceClass	A palm-held device	Παλάμη
+Peripheral	DeviceClass		Περιφερειακό
+Phone	DeviceClass		Τηλέφωνο
+Pointing device	DeviceClass		Συσκευή κατάδειξης
+Portable audio	DeviceClass		Φορητός ήχος
+Positioning	DeviceClass		Τοποθέτηση
+Printer	DeviceClass		Εκτυπωτής
+Remote control	DeviceClass		Τηλεχειρηστήριο
+Rendering	DeviceClass		Απόδοση
+Robot	DeviceClass		Ρομπότ
+SIM card reader	DeviceClass		Αναγνώστης καρτών SIM
+Scanner	DeviceClass		Σαρωτής
+Sensing device	DeviceClass		Συσκευή αναγνώρισης
+Server	DeviceClass		Εξυπηρετητής
+Service classes: 	DeviceClass		Ομάδες υπηρεσιών:
+Set-top box	DeviceClass		Set-top box
+Smart phone	DeviceClass		Smart phone
+Telephony	DeviceClass		Τηλεφωνία
+Uncategorized	DeviceClass		Χωρίς κατηγορία
+Unknown (reserved) minor device class	DeviceClass		Άγνωστη (δεσμευμένη) μικρή κατηγορία συσκευών
+Unspecified	DeviceClass		Απροσδιόριστο
+VCR	DeviceClass		VCR
+Vehicle	DeviceClass		Όχημα
+Video camera	DeviceClass		Κάμερα
+Video conferencing	DeviceClass		Τηλε-εικονοδιάσκεψη
+Video display and loudspeaker	DeviceClass		Προβολή γραφικών και ηχείο
+Video monitor	DeviceClass		Οθόνη βίντεο
+Wearable	DeviceClass	A wearable computer	Φορητός
+Wired modem or voice gateway	DeviceClass		Ενσύρματο μόντεμ ή φωνητική πηγή
+Wrist watch	DeviceClass		Ρολόι χειρός

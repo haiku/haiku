@@ -1,0 +1,52 @@
+1	modern_greek	x-vnd.Haiku-Screen	2033930135
+%.1f Hz	Screen		%.1f Hz
+%sSerial no.: %s	Screen		%sΣειριακός αριθμός.: %s
+/other…	Screen		/άλλο...
+15 bits/pixel, 32768 colors	Screen		15 bits/εικονοστοιχείο, 32768 χρώματα
+16 bits/pixel, 65536 colors	Screen		16 bits/εικονοστοιχείο, 65536 χρώματα
+24 bits/pixel, 16 Million colors	Screen		24 bits/εικονοστοιχείο, 16 Εκατομμύρια χρώματα
+32 bits/pixel, 16 Million colors	Screen		32 bits/εικονοστοιχείο, 16 Εκατομμύρια χρώματα
+8 bits/pixel, 256 colors	Screen		8 bits/εικονοστοιχείο, 256 χρώματα
+About	Screen		Περί
+All workspaces	Screen		Όλοι οι χώροι εργασίας
+Apply	Screen		Εφαρμογή
+Cancel	Screen		Άκυρο
+Colors:	Screen		Χρώματα
+Columns:	Screen		Στήλες:
+Combine displays:	Screen		συνδιασμός οθόνων:
+Could not write VESA mode settings file:\n\t	Screen		Αδυναμία εγγραφής του αρχείο ρυθμίσεων της λειτουργίας VESA:\n\t
+Current workspace	Screen		Τρέχων χώρος εργασίας
+Do you wish to keep these settings?	Screen		Θέλετε να διατηρήσετε τις ακόλουθες ρυθμίσεις;
+Done	Screen		Έγινε
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Οριζόντια συχνότητα:\t%lu - %lu kHz\nΚάθετη συχνότητα:\t%lu - %lu Hz\n\nΜέγιστος μετρητής εικονοστοιχείων:\t%g MHz
+Hz	Screen		Hz
+Keep	Screen		Διατήρηση
+OK	Screen		Εντάξει
+Other…	Screen		Άλλο...
+Refresh rate	Screen		ρυθμός ανανέωσης
+Refresh rate:	Screen		Ρυθμός Ανανέωσης:
+Resolution:	Screen		Ανάλυση
+Revert	Screen		Επαναφορά
+Rows:	Screen		Γραμμές:
+Screen	Screen		Οθόνη
+Screen	System name		Screen
+Screen preferences by the Haiku team	Screen		Screen preferences από την ομάδα του Haiku
+Set background…	Screen		Ορισμός φόντου...
+Settings will revert in %seconds seconds.	Screen		Επαναφορά ρυθμίσεων σε %δευτερόλεπτα.
+Swap displays:	Screen		Ανταλαγή οθόνης:
+The screen mode could not be set:\n\t%s\n	Screen		Αυτή η λειτουργία οθόνης δε μπορούσε να οριστεί:\n\t%s\n
+Type or use the left and right arrow keys.	Screen		Πληκτρολογήστε ή χρησιμοποιήστε τα πλήκτρα αριστερού ή δεξιού βέλους.
+Undo	Screen		Αναίρεση
+Unknown mode	Screen		Άγνωστη λειτουργία
+Use laptop panel:	Screen		Χρήση πανελ φορητού υπολογιστή:
+Video format:	Screen		Φόρμα βίντεο
+Warning	Screen		Προσοχή
+Workspaces	Screen		Χώροι Εργασίας
+always	Screen		πάντα
+bits/pixel	Screen		bits/εικονοστοιχείο
+disable	Screen		απενεργοποίηση
+horizontally	Screen		οριζόντια
+if needed	Screen		εαν χρειάζεται
+no	Screen		όχι
+vertically	Screen		κάθετα
+yes	Screen		ναι

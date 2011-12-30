@@ -1,0 +1,9 @@
+1	modern_greek	x-vnd.Haiku-IMAP	3892875357
+Apply	IMAPFolderConfig		Εφαρμογή
+Destination:	imap_config		Προορισμός:
+Failed to fetch available storage.	IMAPFolderConfig		Αδύνατο το κατέβασμα επιπλέον χωρητικότητας.
+Fetching IMAP folders, have patience...	IMAPFolderConfig		Κατέβασμα φακέλων IMAP, υπομονή..
+IMAP Folders	IMAPFolderConfig		Φάκελοι IMAP
+IMAP Folders	imap_config		Φάκελοι IMAP
+Subcribe / Unsuscribe IMAP folders, have patience...	IMAPFolderConfig		Εγγραφή / Απεγγραφή από τους φακέλου IMAP υπομονή..
+status	IMAPFolderConfig		κατάσταση

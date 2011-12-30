@@ -1,0 +1,20 @@
+1	modern_greek	x-vnd.mmu_man.filepanel	1802971238
+%s not a valid option\n	FilePanelApp		%s μη έγκυρη επιλογή\n
+%s: UNIMPLEMENTED\n	FilePanelApp		%s: ΜΗ ΥΛΟΠΟΙΗΜΕΝΟ\n
+%s: this option requires a parameter\n	FilePanelApp		%s: η επιλογή απαιτεί μια παράμετρο\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\t επιτρεπεται μόνο 1 προεπιλεγμένο αρχείο\n
+-a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tμή υλοποιημένο\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tάνοιγμα στο <φάκελο>\n
+-f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tμή υλοποιημένο\n
+-h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tεμφάνιση χρήσης\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tτο είδος των καταχωρήσεων που μπορούν να ανόίξουν (flavour): οποιοσδήποτε συνδυασμός των f, d, s (αρχείο (προεπιλογή), κατάλογος, symlink)\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\t χρήση load FilePanel (προεποιλεγμένο)\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tκάνει τοFilePanel τυπικό\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tορίστε το προεπιλεγμένο όνομα για αποθήκευση\n
+-s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tχρήση αποθηκευμένου FilePanel\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tορισμός τίτλου παραθύρου FilePanel\n
+display a load/save file panel\n	FilePanelApp		Εμφάνιση φόρτωσεις/αποθήκευσεις αρχείου πάνελ\n
+options:\n	FilePanelApp		Επιλογές:\n
+short\tlong\tdescription\n	FilePanelApp		σύντομη\tlμεγάλη\tπεριγραφή\n
+usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		χρήση: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		χρήση: %s [-h] [-d κατάλογος] [-l|-s] [-t ttl] [-1] [-m] [-a 2.υπόδειγμα] [-f υπόδειγμα]\n

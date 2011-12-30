@@ -1,0 +1,20 @@
+1	modern_greek	x-vnd.Haiku-Touchpad	607725922
+Acceleration	TouchpadPrefView		Επιτάχυνση
+Cancel	TouchpadPrefView		Άκυρο
+Defaults	TouchpadPrefView		Προεπιλογές
+Fast	TouchpadPrefView		Γρήγορα
+High	TouchpadPrefView		Υψηλό
+Horizontal	TouchpadPrefView		Οριζόντια
+Horizontal scrolling	TouchpadPrefView		Οριζόντια κύλιση
+OK	TouchpadPrefView		Εντάξει
+Off	TouchpadPrefView		Σβηστό
+Please confirm	TouchpadPrefView		Παρακαλώ επιβεβαιώστε
+Revert	TouchpadPrefView		Επαναφορά
+Scrolling	TouchpadPrefView		Κύλιση
+Sensitivity	TouchpadPrefView		Ευαισθησία
+Slow	TouchpadPrefView		Αργά
+Tapping	TouchpadPrefView		Πληκτρολόγηση
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Η νέα περιοχή κύλισης είναι πολή μεγάλη και ενδέχεται να εμποδίσει την κανονική λειτουργία του ποντικιού. Θέλετε σίγουρα να την αλλάξετε;
+Touchpad	System name		Πινακίδα αφής
+Two finger scrolling	TouchpadPrefView		Κύλιση δύο δαχτύλων
+Vertical	TouchpadPrefView		Κάθετα

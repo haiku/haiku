@@ -1,0 +1,17 @@
+1	modern_greek	x-vnd.Haiku-Sounds	3924145958
+<none>	HEventList		<κανένα>
+<none>	HWindow		<κανένα>
+About Sounds	SoundsHApp		Περί Sounds...
+Event	HEventList		Γεγονός
+No such file or directory	HEventList		Δεν υπάρχει τέτοιο αρχείο ή κατάλογος
+OK	HEventList		Εντάξει
+OK	HWindow		Εντάξει
+OK	SoundsHApp		Εντάξει
+Other…	HWindow		Άλλο...
+Play	HWindow		Αναπαραγωγή
+Sound	HEventList		Ήχος
+Sound File:	HWindow		Αρχείο Ήχου:
+Sounds	System name		Sounds
+Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sounds\n Αναπτύχθηκε από τους :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n Αρχικό έργο από τον Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku
+Stop	HWindow		Σταμάτα
+This is not an audio file.	HWindow		Αυτό δεν είναι ένα αρχείο ήχου.

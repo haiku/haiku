@@ -1,0 +1,34 @@
+1	modern_greek	x-vnd.Haiku-Sudoku	2463385585
+Abort	ProgressWindow		Ματαίωση
+Advanced	SudokuWindow		Προχωρημένο
+Blank	SudokuWindow		Κενό
+Copy	SudokuWindow		Αντιγραφή
+Could not open \"%s\":\n%s\n	SudokuWindow		Αδυναμία ανοίγματος του \"%s\":\n%s\n
+Could not set Sudoku:\n%s\n	SudokuWindow		Αδυναμία ορισμού του Sudoku:\n%s\n
+Creating solvable field	SudokuGenerator		Δημιουργία επιλύσιμου πεδίου
+Easy	SudokuWindow		Εύκολο
+Export as…	SudokuWindow		Εξαγωγή ως...
+File	SudokuWindow		Αρχείο
+HTML	SudokuWindow		HTML
+Hard	SudokuWindow		Δύσκολο
+Help	SudokuWindow		Βοήθεια
+Mark invalid values	SudokuWindow		Σημείωση λανθασμένων τιμών
+Mark valid hints	SudokuWindow		Σημείωση έγκυρων συμβουλών
+New	SudokuWindow		Νέο
+OK	SudokuWindow		Εντάξει
+Open file…	SudokuWindow		Άνοιγμα αρχείου...
+Progress monitor	ProgressWindow		Ελεγκης προόδου
+Quit	SudokuWindow		Έξοδος
+Redo	SudokuWindow		Επαναφορά
+Restore snapshot	SudokuWindow		Επαναφορά στιγμιότυπου
+Searching for removable values	SudokuGenerator		Αναζήτηση για αφαιρούμενες τιμές
+Snapshot current	SudokuWindow		Τρέχων στιγμιότυπο
+Solve	SudokuWindow		Λύση
+Solve single field	SudokuWindow		Επίλυση απλού πεδίου
+Start again	SudokuWindow		Εκκίνηση ξανά
+Sudoku	System name		Sudoku
+Sudoku request	SudokuWindow		Αίτηση Sudoku
+Sudoku solved - congratulations!\n	SudokuWindow		Το Sudoku λύθηκε - συγχαρητήρια!\n
+Text	SudokuWindow		Κείμενο
+Undo	SudokuWindow		Αναίρεση
+View	SudokuWindow		Προβολή

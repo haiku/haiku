@@ -1,0 +1,9 @@
+1	modern_greek	x-vnd.Haiku-RAWTranslator	1938728039
+%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	% RAW εικόνα
+Based on Dave Coffin's dcraw 8.63	ConfigView		Βασισμένο το dcraw 8.63 του Dave Coffin
+RAW Images	ConfigView		RAW Εικόνες
+RAW Settings	RAWTranslator main		RAW Ρυθμίσεις
+RAW image translator	RAWTranslator		Μεταφραστής εικόνας RAW
+RAW images	RAWTranslator		RAW εικόνες
+RAWTranslator Settings	ConfigView		Ρυθμίσεις μεταφραστή RAW
+Version %d.%d.%d, %s	ConfigView		Έκδοση %d.%d.%d, %s

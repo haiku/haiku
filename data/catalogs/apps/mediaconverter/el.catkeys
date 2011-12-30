@@ -1,0 +1,68 @@
+1	modern_greek	x-vnd.Haiku-MediaConverter	424866547
+%.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld κανάλι/ %lld καρέ
+%.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld καρέ
+%.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stereo / %lld καρέ
+%amountOfFiles files were not recognized as supported media files:	MediaConverter		Τα %amountOfFiles αρχεία δεν αναγνωρίστηκαν ως υποστηριζόμενα αρχεία πολυμέσων:
+%d bit 	MediaFileInfo		%d bit
+%d byte 	MediaFileInfo		%d byte
+%u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2ffps / %Ld καρέ
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Προέκυψε ένα σφάλμα κατά την ανάγνωση των πληροφοριών του αρχείου.\n\nΣφάλμα:
+Audio encoding:	MediaConverter		Κωδικοποίηση ήχου:
+Audio quality not supported	MediaConverter		Η ποιότητα ήχου δεν υποστηρίζεται
+Audio quality: %3d%%	MediaConverter		Ποιότητα ήχου: %3d%%
+Audio:	MediaConverter-FileInfo		Ήχος:
+Cancel	MediaConverter		Άκυρο
+Cancelling	MediaConverter		Ακύρωση
+Cancelling…	MediaConverter		Ακύρωση…
+Continue	MediaConverter		Συνέχεια
+Conversion cancelled	MediaConverter		Η μετατροπή ακυρώθηκε
+Conversion completed	MediaConverter		Η μετατροπή ολοκληρώθηκε
+Convert	MediaConverter		Μετατροπή
+Drop media files onto this window	MediaConverter		Drop media files onto this window
+Duration:	MediaConverter-FileInfo		Διάρκεια:
+Encoder parameters	MediaConverter-EncoderWindow		Encoder parameters
+End   [ms]: 	MediaConverter		Τέλος [ms]:
+Error	MediaConverter		Σφάλμα
+Error converting '%filename'	MediaConverter		Σφάλμα κατά τη μετατροπή του '%filename'
+Error creating '%filename'	MediaConverter		Σφάλμα κατά τη δημιουργία του '%filename'
+Error launching: %strError%	MediaConverter		Σφάλμα κατά την εκτέλεση του: %strError%
+Error loading a file	MediaConverter		Σφάλμα κατά τη φόρτωση ενός αρχείου
+Error loading files	MediaConverter		Σφάλμα κατά τη φόρτωση των αρχείων
+Error read audio frame %Ld	MediaConverter		Σφάλμα κατά την ανάγνωση του καρέ ήχου %Ld
+Error read video frame %Ld	MediaConverter		Σφάλμα κατά την ανάγνωση του καρέ βίντεο %Ld
+Error writing audio frame %Ld	MediaConverter		Σφάλμα κατά την εγγραφή του καρέ ήχου %Ld
+Error writing video frame %Ld	MediaConverter		Σφάλμα κατά την εγγραφή του καρε βίντεο %Ld
+File	Menu		Αρχείο
+File Error	MediaConverter-FileInfo		Σφάλμα Αρχείου
+File details	MediaConverter		Λεπτομέρειες αρχείου
+File format:	MediaConverter		Μορφή αρχείου:
+High	MediaConverter		Υψηλή
+Low	MediaConverter		Χαμηλή
+MediaConverter	System name		Μετατροπέας Μέσων
+MediaConverter+:SaveDirectory	MediaConverter		ΜετατροπέαςΠολυμέσων+:ΑποθήκευσηΚαταλόγου
+No audio	Audio codecs list		Χωρίς ήχο
+No file selected	MediaConverter-FileInfo		Δεν επιλέχτηκε αρχείο
+No video	Video codecs list		Χωρίς βίντεο
+None available	Audio codecs		Κανένα διαθέσιμο
+None available	Video codecs		Κανένα διαθέσιμο
+OK	MediaConverter		Εντάξει
+OK	MediaConverter-FileInfo		Εντάξει
+Open…	Menu		Άνοιγμα...
+Output file '%filename' created	MediaConverter		Αρχείο εξόδου '%filename' φτιάχτηκε
+Output folder	MediaConverter		Φάκελος εξαγωγής
+Output format	MediaConverter		Τύπος εξαγωγής
+Preview	MediaConverter		Προεπισκόπηση
+Quit	Menu		Έξοδος
+Select	MediaConverter		Επιλογή
+Select this folder	MediaConverter		Επιλέξτε αυτό τον φάκελο
+Source files	MediaConverter		Πηγαία αρχεία
+Start [ms]: 	MediaConverter		Αρχή [ms]:
+The file was not recognized as a supported media file:	MediaConverter		Το αρχείο δεν αναγνωρίστηκε ως ένα συμβατό αρχείο πολυμέσων:
+Video encoding:	MediaConverter		Κωδικοποίηση βίντεο:
+Video quality not supported	MediaConverter		Η ποιότητα βίντεο δεν υποστηρίζεται
+Video quality: %3d%%	MediaConverter		Ποιότητα βίντεο: %3d%%
+Video using parameters form settings	MediaConverter		Βίντεο χρησιμοποιόντας τις ρυθμίσεις
+Video:	MediaConverter-FileInfo		Βίντεο:
+Writing audio track: %ld%% complete	MediaConverter		Εγγραφή κομματιού ήχου: %ld%% ολοκληρώθηκαν
+Writing video track: %ld%% complete	MediaConverter		Εγγραφή κομματιού βίντεο: %ld%% ολοκληρώθηκαν
+seconds	MediaFileInfo		δευτερόλεπτα

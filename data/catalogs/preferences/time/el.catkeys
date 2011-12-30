@@ -1,0 +1,44 @@
+1	modern_greek	x-vnd.Haiku-Time	3493650184
+<Other>	Time		<Άλλο>
+Add	Time		Προσθήκη
+Africa	Time		Αφρική
+America	Time		Αμερική
+Antarctica	Time		Ανταρκτική
+Arctic	Time		Αρκτική
+Asia	Time		Ασία
+Atlantic	Time		Αντλαντικός
+Australia	Time		Αυστραλία
+Could not contact server	Time		Αδυναμία επικοινωνίας με τον διακομιστή
+Could not create socket	Time		Αδυναμία δημιουργίας υποδοχής
+Current time:	Time		Τρέχουσα ώρα:
+Date and time	Time		Ημερομηνία και ώρα
+Europe	Time		Ευρώπη
+GMT (UNIX compatible)	Time		GMT (Συμβατό με το UNIX)
+Hardware clock set to:	Time		Το ρολόι υλικού μέρους ορίστηκε στο:
+Indian	Time		Ινδικός
+Local time (Windows compatible)	Time		Τοπική ώρα (συμβατή με τα Windows)
+Message receiving failed	Time		Η λήψη μηνυμάτων απέτυχε
+Network time	Time		Ώρα δικτύου
+OK	Time		Εντάξει
+Pacific	Time		Ειρηνικός
+Preview time:	Time		Προεπισκόπηση ώρας:
+Received invalid time	Time		Ελήφθη λανθασμένη ώρα
+Remove	Time		Αφαίρεση
+Reset	Time		Επαναφορά
+Revert	Time		Αντιστροφή
+Sending request failed	Time		Η αποστολή αίτησης απέτυχε
+Set time zone	Time		Ορισμός ζώνης ώρας
+Stop	Time		Διακοπή
+Synchronize	Time		Συγχρονισμός
+Synchronize again	Time		Συγχρονισμός ξανά
+Synchronize at boot	Time		Συγχρονισμός κατά την εκκίνηση
+The following error occured while synchronizing:r\n%s	Time		Το παρακάτω σφάλμα προέκυψε κατά τον συγχρονισμό:r\n%s
+The following error occured while synchronizing:r\n%s: %s	Time		Το παρακάτω σφάλμα προέκυψε κατά τον συγχρονισμό::r\n%s: %s
+Time	System name		Time
+Time	Time		Ώρα
+Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Ημερομηνία & Ώρα, γράφτηκε από τούς:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nΠνευματικά δικαιώματα © 2004-2008, Haiku.
+Time zone	Time		Ζώνη ώρας
+Try all servers	Time		Δοκιμή όλων των εξυπηρετητών
+Waiting for answer failed	Time		Η αναμονή για απάντηση απέτυχε
+\nNow: 	Time		\nΤώρα:
+about	Time		περί

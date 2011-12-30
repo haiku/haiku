@@ -1,0 +1,49 @@
+1	modern_greek	x-vnd.Be-PEPL	2993050801
+%name% picture	People		%name% φωτογραφία
+Address	People		Όδος
+Cancel	People		Άκυρο
+City	People		Πόλη
+Close	People		Κλείσιμο
+Company	People		Εταιρεία
+Configure attributes	People		Ρύθμιση ιδιοτήτων
+Contact information for a person.	Long mimetype description		Πληροφορίες επικοινωνίας επαφής.
+Contact name	People		Όνομα της επαφής
+Copy	People		Αντιγραφή
+Could not create %s.	People		Δεν ήταν δυνατή η δημιουργεία %S
+Country	People		Χώρα
+Cut	People		Αποκοπή
+Drop an image here,\nor use the contextual menu.	People		Αφήστε μια εικόνα εδώ,\nή χρησιμοποιήστε το σχετικό μενού.
+E-mail	People		E-Mail
+Edit	People		Επεξεργασία
+Error	People		Σφάλμα
+Fax	People		Φαξ
+File	People		Αρχείο
+Group	People		Γκρούπ
+Home phone	People		Τηλέφωνο σπιτιού
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Η εκκίνηση του FileTypes preflet για τη ρύθμιση των ιδιοητων του ατόμου απέτυχε.\n\nΣφάλμα: 
+Load image…	People		Φόρτωση εικόνας...
+Name	People		Όνομα
+New person	People		Νέα επαφή
+New person…	People		Νέο έπαφη...
+Nickname	People		Ψευδόνυμο
+OK	People		Εντάξει
+Paste	People		Επικόλλιση
+People	System name		People
+Person	Short mimetype description		Άτομο
+Quit	People		Έξοδος
+Redo	People		Επανάληψη
+Remove image	People		Αφαίρεση εικόνας
+Revert	People		Επαναφόρα
+Save	People		Αποθήκευση
+Save as…	People		Αποθήκευση σαν...
+Save changes before quitting?	People		Αποθήκευση των αλλαγών πριν το κλείσιμο;
+Select all	People		Επιλογή όλων
+Sorry	People		Συγγνώμη
+State	People		Πολιτεία
+The file '%name%' could not be written.	People		Το αρχείο '%name%' δε μπορούσε να εγγραφεί.
+URL	People		URL
+Undo	People		Αναίρεση
+Unnamed person	People		Ανώνυμο άτομο
+Work phone	People		Τηλέφωνο εργασίας
+Zip	People		Τ.Κ.
+none	Groups list		Ουδείς

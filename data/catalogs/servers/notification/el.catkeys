@@ -1,0 +1,8 @@
+1	modern_greek	x-vnd.Haiku-notification_server	906000487
+Couldn't start display settings monitor.\nLive filter changes disabled.	NotificationWindow		Αδυναμία εκκίνησης του ελεγκτή ρυθμίσεων προβολής.\nΑπενεργοποιήθηκαν οι αλλαγές του εν ενεργεία φίλτρου.	
+Couldn't start filter monitor. Live filter changes disabled.	NotificationWindow		Αδυναμία εκκίνησης του ελεγκτή φίλτρου. Απενεργοποιήθηκαν οι αλλαγές του εν ενεργεία φίλτρου.	
+Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Αδυναμία εκκίνησης του ελεγκτή γενικών ρυθμίσεων.\nΑπενεργοποιήθηκαν οι αλλαγές του εν ενεργεία φίλτρου.	
+Darn.	NotificationWindow		Να πάρει.
+Notification	NotificationWindow		Κοινοποίηση
+OK	NotificationWindow		Εντάξει
+Warning	NotificationWindow		Προειδοποίηση
