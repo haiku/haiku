@@ -60,7 +60,7 @@ extern device_hooks mixer_hooks;
 int32 num_cards;
 cmedia_pci_dev cards[NUM_CARDS];
 int num_names;
-char * names[NUM_CARDS*7+1];
+char * names[NUM_CARDS * 7 + 1];
 /* vuchar *io_base; */
 
 
@@ -139,14 +139,12 @@ init_hardware(void)
 }
 
 
-void set_direct( cmedia_pci_dev * card, int regno, uchar value, uchar mask)
+void set_direct(cmedia_pci_dev * card, int regno, uchar value, uchar mask)
 {
-	if (mask == 0)
-	{
+	if (mask == 0) {
 		return;
 	}
-	if (mask != 0xff)
-	{
+	if (mask != 0xff) {
 		uchar old = PCI_IO_RD(card->enhanced+regno);
 		value = (value&mask)|(old&~mask);
 	}
@@ -167,12 +165,10 @@ void set_indirect(cmedia_pci_dev * card, int regno, uchar value, uchar mask)
 {
 	PCI_IO_WR(card->enhanced+0x23, regno);
 	EIEIO();
-	if (mask == 0)
-	{
+	if (mask == 0) {
 		return;
 	}
-	if (mask != 0xff)
-	{
+	if (mask != 0xff) {
 		uchar old = PCI_IO_RD(card->enhanced+0x22);
 		value = (value&mask)|(old&~mask);
 	}
@@ -231,9 +227,9 @@ setup_dma(cmedia_pci_dev * card)
 {
 	/* we're appropriating some ISA space here... */
 	/* need kernel support to do it right */
-	const uint16	base = card->enhanced+0x80;
+	const uint16 base = card->enhanced + 0x80;
 	ddprintf(("cmedia_pci: dma base is 0x%04x\n", base));
-	if(0 == base)
+	if (base == 0)
 		return B_DEV_RESOURCE_CONFLICT;
 	card->dma_base = base;
 	return B_OK;
@@ -241,8 +237,7 @@ setup_dma(cmedia_pci_dev * card)
 
 
 static void
-set_default_registers(
-	cmedia_pci_dev * card)
+set_default_registers(cmedia_pci_dev * card)
 {
 	static uchar values[] = {
 #ifdef DO_JOY
@@ -276,11 +271,10 @@ set_default_registers(
 
 
 static void
-make_device_names(
-	cmedia_pci_dev * card)
+make_device_names(cmedia_pci_dev * card)
 {
 	char * name = card->name;
-	sprintf(name, "cmedia_pci/%ld", card-cards+1);
+	sprintf(name, "cmedia_pci/%ld", card-cards + 1);
 
 #if DO_MIDI
 	sprintf(card->midi.name, "midi/%s", name);
@@ -317,10 +311,10 @@ make_device_names(
 /* physical address range. */
 
 static status_t
-find_low_memory(
-	cmedia_pci_dev * card)
+find_low_memory(cmedia_pci_dev * card)
 {
-	size_t low_size = (MIN_MEMORY_SIZE+(B_PAGE_SIZE-1))&~(B_PAGE_SIZE-1);
+	size_t low_size = (MIN_MEMORY_SIZE + (B_PAGE_SIZE - 1))
+		&~ (B_PAGE_SIZE - 1);
 	physical_entry where;
 	size_t trysize;
 	area_id curarea;
@@ -416,8 +410,7 @@ a_o_k:
 
 
 static status_t
-setup_cmedia_pci(
-	cmedia_pci_dev * card)
+setup_cmedia_pci(cmedia_pci_dev * card)
 {
 	status_t err = B_OK;
 /*	cpu_status cp; */
@@ -457,8 +450,7 @@ setup_cmedia_pci(
 	ddprintf(("cmedia_pci: revision %x\n", get_indirect(card, 0x15)));
 
 	disable_card_interrupts(card);
-	if (setup_dma(card) != B_OK)
-	{
+	if (setup_dma(card) != B_OK) {
 		dprintf("cmedia pci: can't setup DMA\n");
 		goto bail6;
 	}
@@ -484,13 +476,11 @@ bail:
 
 
 static int
-debug_cmedia(
-	int argc,
-	char * argv[])
+debug_cmedia(int argc, char * argv[])
 {
 	int ix = 0;
 	if (argc == 2) {
-		ix = parse_expression(argv[1])-1;
+		ix = parse_expression(argv[1]) - 1;
 	}
 	if (argc > 2 || ix < 0 || ix >= num_cards) {
 		dprintf("cmedia_pci: dude, you gotta watch your syntax!\n");
@@ -528,7 +518,7 @@ init_driver(void)
 		return ENOSYS;
 	}
 	ddprintf(("MPU\n"));
-	if (get_module(mpu401_name, (module_info **) &mpu401)) {
+	if (get_module(mpu401_name, (module_info **)&mpu401)) {
 		put_module(gameport_name);
 		put_module(pci_name);
 		return ENOSYS;
@@ -587,8 +577,7 @@ init_driver(void)
 
 
 static void
-teardown_cmedia_pci(
-	cmedia_pci_dev * card)
+teardown_cmedia_pci(cmedia_pci_dev * card)
 {
 	static uchar regs[] = {
 #ifdef DO_JOY
@@ -608,7 +597,7 @@ teardown_cmedia_pci(
 	cp = disable_interrupts();
 	acquire_spinlock(&card->hardware);
 
-	while (ptr < regs+sizeof(regs)) {
+	while (ptr < regs + sizeof(regs)) {
 		set_direct(card, ptr[0], ptr[1], ptr[2]);
 		ptr += 3;
 	}
@@ -635,7 +624,7 @@ uninit_driver(void)
 	ddprintf(("cmedia_pci: uninit_driver()\n"));
 	remove_debugger_command("cmedia", debug_cmedia);
 
-	for (ix=0; ix<cnt; ix++) {
+	for (ix = 0; ix < cnt; ix++) {
 		teardown_cmedia_pci(&cards[ix]);
 	}
 	memset(&cards, 0, sizeof(cards));
@@ -651,7 +640,7 @@ publish_devices(void)
 	int ix = 0;
 	ddprintf(("cmedia_pci: publish_devices()\n"));
 
-	for (ix=0; names[ix]; ix++) {
+	for (ix = 0; names[ix]; ix++) {
 		ddprintf(("cmedia_pci: publish %s\n", names[ix]));
 	}
 	return (const char **)names;
@@ -659,14 +648,13 @@ publish_devices(void)
 
 
 device_hooks *
-find_device(
-	const char * name)
+find_device(const char * name)
 {
 	int ix;
 
 	ddprintf(("cmedia_pci: find_device(%s)\n", name));
 
-	for (ix=0; ix<num_cards; ix++) {
+	for (ix = 0; ix < num_cards; ix++) {
 #if DO_MIDI
 		if (!strcmp(cards[ix].midi.name, name)) {
 			return &midi_hooks;
@@ -704,8 +692,7 @@ find_device(
 int32	api_version = B_CUR_DRIVER_API_VERSION;
 
 static int32
-cmedia_pci_interrupt(
-	void * data)
+cmedia_pci_interrupt(void * data)
 {
 	cpu_status cp = disable_interrupts();
 	cmedia_pci_dev * card = (cmedia_pci_dev *)data;
@@ -761,7 +748,7 @@ cmedia_pci_interrupt(
 	**  But not bother setting the midi interrupt bit in the ISR.
 	**  Thanks a lot, S3.
 	*/
-	if(handled == B_UNHANDLED_INTERRUPT){
+	if (handled == B_UNHANDLED_INTERRUPT) {
 		if (midi_interrupt(card)) {
 			handled = B_INVOKE_SCHEDULER;
 		}
@@ -777,8 +764,7 @@ cmedia_pci_interrupt(
 
 
 void
-increment_interrupt_handler(
-	cmedia_pci_dev * card)
+increment_interrupt_handler(cmedia_pci_dev * card)
 {
 	KPRINTF(("cmedia_pci: increment_interrupt_handler()\n"));
 	if (atomic_add(&card->inth_count, 1) == 0) {
@@ -791,8 +777,7 @@ increment_interrupt_handler(
 
 
 void
-decrement_interrupt_handler(
-	cmedia_pci_dev * card)
+decrement_interrupt_handler(cmedia_pci_dev * card)
 {
 	KPRINTF(("cmedia_pci: decrement_interrupt_handler()\n"));
 	if (atomic_add(&card->inth_count, -1) == 1) {
