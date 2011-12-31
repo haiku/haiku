@@ -209,26 +209,25 @@ postoffice_func(fs_nspace *ns)
 {
 	uint8 *buffer=(uint8 *)malloc(B_UDP_MAX_SIZE);
 
-	while (!ns->quit)
-	{
+	while (!ns->quit) {
 		struct sockaddr_in from;
 		socklen_t fromLen=sizeof(from);
 
-		ssize_t bytes=recvfrom (ns->s,buffer,B_UDP_MAX_SIZE,0,(struct sockaddr *)&from,&fromLen);
+		ssize_t bytes = recvfrom(ns->s, buffer, B_UDP_MAX_SIZE, 0,
+			(struct sockaddr *)&from, &fromLen);
 
-		if (bytes>=4)
-		{
+		if (bytes >= 4) {
 			struct PendingCall *call;
 			int32 xid=B_BENDIAN_TO_HOST_INT32(*((int32 *)buffer));
 
-			call=RPCPendingCallsFindAndRemovePendingCall(&ns->pendingCalls,xid,&from);
+			call=RPCPendingCallsFindAndRemovePendingCall(&ns->pendingCalls, xid,
+				&from);
 
-			if (call)
-			{
+			if (call) {
 				call->buffer=(uint8 *)malloc(bytes);
-				memcpy (call->buffer,buffer,bytes);
+				memcpy(call->buffer, buffer, bytes);
 
-				while (release_sem (call->sem)==B_INTERRUPTED);
+				while (release_sem (call->sem) == B_INTERRUPTED);
 			} else {
 				dprintf("nfs: postoffice: can't find pending call to remove for xid %ld\n", xid);
 			}
@@ -253,40 +252,40 @@ send_rpc_call(fs_nspace *ns, const struct sockaddr_in *addr, int32 prog,
 	struct PendingCall *call;
 
 	struct XDROutPacket rpc_call;
-	XDROutPacketInit (&rpc_call);
+	XDROutPacketInit(&rpc_call);
 
-	xid=atomic_add(&ns->xid,1);
+	xid=atomic_add(&ns->xid, 1);
 #ifdef DEBUG_XID
 	//dbgprintxid(logfd1, xid);
 #endif
 
-	XDROutPacketAddInt32(&rpc_call,xid);
-	XDROutPacketAddInt32(&rpc_call,RPC_CALL);
-	XDROutPacketAddInt32(&rpc_call,RPC_VERSION);
-	XDROutPacketAddInt32(&rpc_call,prog);
-	XDROutPacketAddInt32(&rpc_call,vers);
-	XDROutPacketAddInt32(&rpc_call,proc);
+	XDROutPacketAddInt32(&rpc_call, xid);
+	XDROutPacketAddInt32(&rpc_call, RPC_CALL);
+	XDROutPacketAddInt32(&rpc_call, RPC_VERSION);
+	XDROutPacketAddInt32(&rpc_call, prog);
+	XDROutPacketAddInt32(&rpc_call, vers);
+	XDROutPacketAddInt32(&rpc_call, proc);
 
 #if !defined(USE_SYSTEM_AUTHENTICATION)
-	XDROutPacketAddInt32(&rpc_call,RPC_AUTH_NONE);
-	XDROutPacketAddDynamic (&rpc_call,NULL,0);
+	XDROutPacketAddInt32(&rpc_call, RPC_AUTH_NONE);
+	XDROutPacketAddDynamic (&rpc_call, NULL, 0);
 #else
-	XDROutPacketAddInt32(&rpc_call,RPC_AUTH_SYS);
-	authSize=4+4+((strlen(ns->params.server)+3)&~3)+4+4+4;
-	XDROutPacketAddInt32(&rpc_call,authSize);
-	XDROutPacketAddInt32(&rpc_call,0);
-	XDROutPacketAddString(&rpc_call,ns->params.server);
-	XDROutPacketAddInt32(&rpc_call,ns->params.uid);
-	XDROutPacketAddInt32(&rpc_call,ns->params.gid);
-	XDROutPacketAddInt32(&rpc_call,0);
+	XDROutPacketAddInt32(&rpc_call, RPC_AUTH_SYS);
+	authSize = 4 + 4 + ((strlen(ns->params.server) + 3) &~3) + 4 + 4 + 4;
+	XDROutPacketAddInt32(&rpc_call, authSize);
+	XDROutPacketAddInt32(&rpc_call, 0);
+	XDROutPacketAddString(&rpc_call, ns->params.server);
+	XDROutPacketAddInt32(&rpc_call, ns->params.uid);
+	XDROutPacketAddInt32(&rpc_call, ns->params.gid);
+	XDROutPacketAddInt32(&rpc_call, 0);
 #endif
 
-	XDROutPacketAddInt32(&rpc_call,RPC_AUTH_NONE);
-	XDROutPacketAddDynamic (&rpc_call,NULL,0);
+	XDROutPacketAddInt32(&rpc_call, RPC_AUTH_NONE);
+	XDROutPacketAddDynamic (&rpc_call, NULL, 0);
 
-	XDROutPacketAppend (&rpc_call,packet);
+	XDROutPacketAppend (&rpc_call, packet);
 
-	pending=RPCPendingCallsAddPendingCall(&ns->pendingCalls,xid,addr);
+	pending = RPCPendingCallsAddPendingCall(&ns->pendingCalls, xid, addr);
 #ifdef DEBUG_XID
 	checksemstate(xid, pending->sem, 0);
 #endif
@@ -301,7 +300,8 @@ send_rpc_call(fs_nspace *ns, const struct sockaddr_in *addr, int32 prog,
 		while (bytes < 0 && errno == EINTR);
 
 		do {
-			result = acquire_sem_etc (pending->sem,1,B_TIMEOUT,(retries)?(conf_call_timeout):(2*conf_call_timeout));
+			result = acquire_sem_etc (pending->sem, 1, B_TIMEOUT,
+				(retries) ? (conf_call_timeout) : (2*conf_call_timeout));
 		}
 		while (result == B_INTERRUPTED);
 
@@ -415,31 +415,30 @@ get_remote_address(fs_nspace *ns, int32 prog, int32 vers, int32 prot,
 	struct XDROutPacket call;
 	uint8 *replyBuf;
 
-	XDROutPacketInit (&call);
+	XDROutPacketInit(&call);
 
-	addr->sin_port=htons(PMAP_PORT);
+	addr->sin_port = htons(PMAP_PORT);
 
-	XDROutPacketAddInt32 (&call,prog);
-	XDROutPacketAddInt32 (&call,vers);
-	XDROutPacketAddInt32 (&call,prot);
-	XDROutPacketAddInt32 (&call,0);
+	XDROutPacketAddInt32(&call, prog);
+	XDROutPacketAddInt32(&call, vers);
+	XDROutPacketAddInt32(&call, prot);
+	XDROutPacketAddInt32(&call, 0);
 
-	replyBuf=send_rpc_call (ns,addr,PMAP_PROGRAM,PMAP_VERSION,PMAPPROC_GETPORT,&call);
+	replyBuf = send_rpc_call(ns, addr, PMAP_PROGRAM, PMAP_VERSION,
+		PMAPPROC_GETPORT, &call);
 
-	if (replyBuf)
-	{
+	if (replyBuf) {
 		struct XDRInPacket reply;
-		XDRInPacketInit (&reply);
+		XDRInPacketInit(&reply);
 
-		XDRInPacketSetTo (&reply,replyBuf,0);
+		XDRInPacketSetTo(&reply,replyBuf,0);
 
-		if (is_successful_reply(&reply))
-		{
-			addr->sin_port=htons(XDRInPacketGetInt32(&reply));
-			memset (addr->sin_zero,0,sizeof(addr->sin_zero));
+		if (is_successful_reply(&reply)) {
+			addr->sin_port = htons(XDRInPacketGetInt32(&reply));
+			memset(addr->sin_zero, 0, sizeof(addr->sin_zero));
 
 			XDRInPacketDestroy(&reply);
-			XDROutPacketDestroy (&call);
+			XDROutPacketDestroy(&call);
 			return B_OK;
 		}
 
@@ -450,100 +449,99 @@ get_remote_address(fs_nspace *ns, int32 prog, int32 vers, int32 prot,
 	return EHOSTUNREACH;
 }
 
-status_t nfs_mount (fs_nspace *ns, const char *path, nfs_fhandle *fhandle)
+status_t
+nfs_mount(fs_nspace *ns, const char *path, nfs_fhandle *fhandle)
 {
 	struct XDROutPacket call;
 	struct XDRInPacket reply;
 	uint8 *replyBuf;
 	int32 fhstatus;
 
-	XDROutPacketInit (&call);
-	XDRInPacketInit (&reply);
+	XDROutPacketInit(&call);
+	XDRInPacketInit(&reply);
 
-	XDROutPacketAddString (&call,path);
+	XDROutPacketAddString(&call,path);
 
-	replyBuf=send_rpc_call (ns,&ns->mountAddr,MOUNT_PROGRAM,MOUNT_VERSION,MOUNTPROC_MNT,&call);
+	replyBuf = send_rpc_call(ns, &ns->mountAddr, MOUNT_PROGRAM, MOUNT_VERSION,
+		MOUNTPROC_MNT, &call);
 
-	if (!replyBuf)
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	if (!replyBuf) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return EHOSTUNREACH;
 	}
 
-	XDRInPacketSetTo (&reply,replyBuf,0);
+	XDRInPacketSetTo(&reply, replyBuf, 0);
 
-	if (!is_successful_reply(&reply))
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	if (!is_successful_reply(&reply)) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return B_ERROR;
 	}
 
-	fhstatus=XDRInPacketGetInt32(&reply);
+	fhstatus = XDRInPacketGetInt32(&reply);
 
-	if (fhstatus!=0)
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	if (fhstatus != 0) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return map_nfs_to_system_error(fhstatus);
 	}
 
-	XDRInPacketGetFixed (&reply,fhandle->opaque,NFS_FHSIZE);
+	XDRInPacketGetFixed(&reply, fhandle->opaque, NFS_FHSIZE);
 
-	XDRInPacketDestroy (&reply);
-	XDROutPacketDestroy (&call);
+	XDRInPacketDestroy(&reply);
+	XDROutPacketDestroy(&call);
 	return B_OK;
 }
 
-status_t nfs_lookup (fs_nspace *ns, const nfs_fhandle *dir, const char *filename, nfs_fhandle *fhandle,
-						struct stat *st)
+
+status_t
+nfs_lookup (fs_nspace *ns, const nfs_fhandle *dir, const char *filename,
+	nfs_fhandle *fhandle, struct stat *st)
 {
 	struct XDROutPacket call;
 	struct XDRInPacket reply;
 	int32 status;
 	uint8 *replyBuf;
 
-	XDROutPacketInit (&call);
-	XDRInPacketInit (&reply);
+	XDROutPacketInit(&call);
+	XDRInPacketInit(&reply);
 
-	XDROutPacketAddFixed (&call,dir->opaque,NFS_FHSIZE);
-	XDROutPacketAddString (&call,filename);
+	XDROutPacketAddFixed(&call, dir->opaque, NFS_FHSIZE);
+	XDROutPacketAddString(&call, filename);
 
-	replyBuf=send_rpc_call (ns,&ns->nfsAddr,NFS_PROGRAM,NFS_VERSION,NFSPROC_LOOKUP,&call);
+	replyBuf = send_rpc_call(ns, &ns->nfsAddr, NFS_PROGRAM, NFS_VERSION,
+		NFSPROC_LOOKUP, &call);
 
-	if (!replyBuf)
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	if (!replyBuf) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return EHOSTUNREACH;
 	}
 
-	XDRInPacketSetTo(&reply,replyBuf,0);
+	XDRInPacketSetTo(&reply, replyBuf, 0);
 
-	if (!is_successful_reply(&reply))
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	if (!is_successful_reply(&reply)) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return B_ERROR;
 	}
 
-	status=XDRInPacketGetInt32(&reply);
+	status = XDRInPacketGetInt32(&reply);
 
-	if (status!=NFS_OK)
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	if (status != NFS_OK) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return map_nfs_to_system_error(status);
 	}
 
-	XDRInPacketGetFixed (&reply,fhandle->opaque,NFS_FHSIZE);
+	XDRInPacketGetFixed(&reply, fhandle->opaque, NFS_FHSIZE);
 
 	if (st)
-		get_nfs_attr (&reply,st);
+		get_nfs_attr(&reply, st);
 
-	XDRInPacketDestroy (&reply);
-	XDROutPacketDestroy (&call);
+	XDRInPacketDestroy(&reply);
+	XDROutPacketDestroy(&call);
 	return B_OK;
 }
 
@@ -758,24 +756,23 @@ insert_node(fs_nspace *ns, fs_node *node)
 {
 	fs_node *current;
 
-	while (acquire_sem (ns->sem)==B_INTERRUPTED);
+	while (acquire_sem(ns->sem) == B_INTERRUPTED);
 
-	current=ns->first;
+	current = ns->first;
 
-	while ((current)&&(current->vnid!=node->vnid))
-		current=current->next;
+	while (current != NULL && current->vnid != node->vnid)
+		current = current->next;
 
-	if (current)
-	{
+	if (current) {
 		free(node);
-		while (release_sem (ns->sem)==B_INTERRUPTED);
+		while (release_sem(ns->sem) == B_INTERRUPTED);
 		return;
 	}
 
-	node->next=ns->first;
-	ns->first=node;
+	node->next = ns->first;
+	ns->first = node;
 
-	while (release_sem (ns->sem)==B_INTERRUPTED);
+	while (release_sem (ns->sem) == B_INTERRUPTED);
 }
 
 
@@ -785,10 +782,10 @@ remove_node(fs_nspace *ns, ino_t vnid)
 	fs_node *current;
 	fs_node *previous;
 
-	while(acquire_sem (ns->sem)==B_INTERRUPTED);
+	while (acquire_sem(ns->sem) == B_INTERRUPTED);
 
-	current=ns->first;
-	previous=NULL;
+	current = ns->first;
+	previous = NULL;
 
 	while (current != NULL && current->vnid != vnid) {
 		previous = current;
@@ -797,14 +794,14 @@ remove_node(fs_nspace *ns, ino_t vnid)
 
 	if (current) {
 		if (previous)
-			previous->next=current->next;
+			previous->next = current->next;
 		else
-			ns->first=current->next;
+			ns->first = current->next;
 
 		free(current);
 	}
 
-	while (release_sem (ns->sem)==B_INTERRUPTED);
+	while (release_sem(ns->sem) == B_INTERRUPTED);
 }
 
 
@@ -813,23 +810,21 @@ remove_node(fs_nspace *ns, ino_t vnid)
 
 static status_t
 fs_read_vnode(fs_volume *_volume, ino_t vnid, fs_vnode *_node, int *_type,
-		uint32 *_flags, bool r)
-
+	uint32 *_flags, bool r)
 {
 	fs_nspace *ns;
 	fs_node *current;
 
 	ns = _volume->private_volume;
 
-	if (!r)
-	{
-		while (acquire_sem (ns->sem)==B_INTERRUPTED);
+	if (!r) {
+		while (acquire_sem(ns->sem) == B_INTERRUPTED);
 	}
 
-	current=ns->first;
+	current = ns->first;
 
-	while ((current)&&(current->vnid!=vnid))
-		current=current->next;
+	while (current != NULL && current->vnid != vnid)
+		current = current->next;
 
 	if (!current)
 		return EINVAL;
@@ -840,9 +835,8 @@ fs_read_vnode(fs_volume *_volume, ino_t vnid, fs_vnode *_node, int *_type,
 	*_type = current->mode;
 	*_flags = 0;
 
-	if (!r)
-	{
-		while (release_sem (ns->sem)==B_INTERRUPTED);
+	if (!r) {
+		while (release_sem(ns->sem) == B_INTERRUPTED);
 	}
 
 	return B_OK;
@@ -872,32 +866,29 @@ fs_walk(fs_volume *_volume, fs_vnode *_base, const char *file, ino_t *vnid)
 	ns = _volume->private_volume;
 	base = _base->private_node;
 
-	if (!strcmp(".",file))
-	{
-		*vnid=base->vnid;
-		isLink=false;
-	}
-	else
-	{
-		fs_node *newNode=(fs_node *)malloc(sizeof(fs_node));
+	if (!strcmp(".", file)) {
+		*vnid = base->vnid;
+		isLink = false;
+	} else {
+		fs_node *newNode = (fs_node *)malloc(sizeof(fs_node));
 		struct stat st;
 
-		if ((result=nfs_lookup(ns,&base->fhandle,file,&newNode->fhandle,&st))<B_OK)
-		{
+		if ((result = nfs_lookup(ns, &base->fhandle, file, &newNode->fhandle,
+			&st)) < B_OK) {
 			free(newNode);
 			return result;
 		}
 
-		newNode->vnid=st.st_ino;
-		newNode->mode=st.st_mode;
-		*vnid=newNode->vnid;
+		newNode->vnid = st.st_ino;
+		newNode->mode = st.st_mode;
+		*vnid = newNode->vnid;
 
-		insert_node (ns,newNode);
+		insert_node(ns, newNode);
 
-		isLink=S_ISLNK(st.st_mode);
+		isLink = S_ISLNK(st.st_mode);
 	}
 
-	if ((result=get_vnode (_volume,*vnid,(void **)&dummy))<B_OK)
+	if ((result = get_vnode (_volume, *vnid, (void **)&dummy)) < B_OK)
 		return result;
 
 	return B_OK;
@@ -918,14 +909,14 @@ fs_opendir(fs_volume *_volume, fs_vnode *_node, void **_cookie)
 	node = _node->private_node;
 	cookie = (nfs_cookie **)_cookie;
 
-	if ((result=nfs_getattr(ns,&node->fhandle,&st))<B_OK)
+	if ((result = nfs_getattr(ns, &node->fhandle, &st)) < B_OK)
 		return result;
 
 	if (!S_ISDIR(st.st_mode))
 		return ENOTDIR;
 
-	*cookie=(nfs_cookie *)malloc(sizeof(nfs_cookie));
-	memset ((*cookie)->opaque,0,NFS_COOKIESIZE);
+	*cookie = (nfs_cookie *)malloc(sizeof(nfs_cookie));
+	memset((*cookie)->opaque,0,NFS_COOKIESIZE);
 
 	return B_OK;
 }
@@ -947,7 +938,7 @@ fs_rewinddir(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 	nfs_cookie *cookie = (nfs_cookie *)_cookie;
 	(void) _volume;
 	(void) _node;
-	memset (cookie->opaque,0,NFS_COOKIESIZE);
+	memset (cookie->opaque, 0, NFS_COOKIESIZE);
 
 	return B_OK;
 }
@@ -958,21 +949,20 @@ fs_readdir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 		struct dirent *buf, size_t bufsize, uint32 *num)
 {
 	nfs_cookie *cookie = (nfs_cookie *)_cookie;
-	int32 max=*num;
+	int32 max = *num;
 	int32 eof;
 
 	fs_nspace *ns;
 	fs_node *node;
 
-	size_t count=min_c(6000,max*300);
+	size_t count = min_c(6000, max * 300);
 
-	*num=0;
+	*num = 0;
 
 	ns = _volume->private_volume;
 	node = _node->private_node;
 
-	do
-	{
+	do {
 		ino_t vnid;
 		char *filename;
 		uint8 *replyBuf;
@@ -980,61 +970,58 @@ fs_readdir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 		struct XDRInPacket reply;
 		int32 status;
 
-		XDROutPacketInit (&call);
-		XDRInPacketInit (&reply);
+		XDROutPacketInit(&call);
+		XDRInPacketInit(&reply);
 
-		XDROutPacketAddFixed (&call,node->fhandle.opaque,NFS_FHSIZE);
-		XDROutPacketAddFixed (&call,cookie->opaque,NFS_COOKIESIZE);
-		XDROutPacketAddInt32 (&call,count);
+		XDROutPacketAddFixed(&call, node->fhandle.opaque, NFS_FHSIZE);
+		XDROutPacketAddFixed(&call, cookie->opaque, NFS_COOKIESIZE);
+		XDROutPacketAddInt32(&call, count);
 
-		replyBuf=send_rpc_call (ns,&ns->nfsAddr,NFS_PROGRAM,NFS_VERSION,NFSPROC_READDIR,&call);
+		replyBuf = send_rpc_call (ns, &ns->nfsAddr, NFS_PROGRAM, NFS_VERSION,
+			NFSPROC_READDIR, &call);
 
-		if (!replyBuf)
-		{
-			XDRInPacketDestroy (&reply);
-			XDROutPacketDestroy (&call);
+		if (!replyBuf) {
+			XDRInPacketDestroy(&reply);
+			XDROutPacketDestroy(&call);
 			return B_ERROR;
 		}
 
-		XDRInPacketSetTo(&reply,replyBuf,0);
+		XDRInPacketSetTo(&reply, replyBuf, 0);
 
-		if (!is_successful_reply(&reply))
-		{
-			XDRInPacketDestroy (&reply);
-			XDROutPacketDestroy (&call);
+		if (!is_successful_reply(&reply)) {
+			XDRInPacketDestroy(&reply);
+			XDROutPacketDestroy(&call);
 			return B_ERROR;
 		}
 
-		status=XDRInPacketGetInt32(&reply);
+		status = XDRInPacketGetInt32(&reply);
 
-		if (status!=NFS_OK)
-		{
-			XDRInPacketDestroy (&reply);
-			XDROutPacketDestroy (&call);
+		if (status != NFS_OK) {
+			XDRInPacketDestroy(&reply);
+			XDROutPacketDestroy(&call);
 			return map_nfs_to_system_error(status);
 		}
 
-		while (XDRInPacketGetInt32(&reply)==1)
-		{
+		while (XDRInPacketGetInt32(&reply) == 1) {
 			nfs_cookie newCookie;
 
 			vnid=XDRInPacketGetInt32(&reply);
 			filename=XDRInPacketGetString(&reply);
 
-			XDRInPacketGetFixed(&reply,newCookie.opaque,NFS_COOKIESIZE);
+			XDRInPacketGetFixed(&reply, newCookie.opaque, NFS_COOKIESIZE);
 
 			//if (strcmp(".",filename)&&strcmp("..",filename))
 			//if ((ns->rootid != node->vnid) || (strcmp(".",filename)&&strcmp("..",filename)))
-			if (conf_ls_root_parent || ((ns->rootid != node->vnid) || strcmp("..",filename)))
-			{
+			if (conf_ls_root_parent
+				|| ((ns->rootid != node->vnid) || strcmp("..", filename))) {
 				status_t result;
 				struct stat st;
 
-				fs_node *newNode=(fs_node *)malloc(sizeof(fs_node));
-				newNode->vnid=vnid;
+				fs_node *newNode = (fs_node *)malloc(sizeof(fs_node));
+				newNode->vnid = vnid;
 
-				if ((result=nfs_lookup(ns,&node->fhandle,filename,&newNode->fhandle,&st))<B_OK)
-				{
+				if ((result = nfs_lookup(ns, &node->fhandle, filename,
+					&newNode->fhandle, &st)) < B_OK) {
 					free (filename);
 					free(newNode);
 					XDRInPacketDestroy (&reply);
@@ -1043,41 +1030,40 @@ fs_readdir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 				}
 
 				newNode->mode = st.st_mode;
-				insert_node (ns,newNode);
+				insert_node(ns,newNode);
 
-				if (bufsize<2*(sizeof(dev_t)+sizeof(ino_t))+sizeof(unsigned short)+strlen(filename)+1)
-				{
-					XDRInPacketDestroy (&reply);
-					XDROutPacketDestroy (&call);
+				if (bufsize < 2 * (sizeof(dev_t) + sizeof(ino_t))
+					+ sizeof(unsigned short) + strlen(filename) + 1) {
+					XDRInPacketDestroy(&reply);
+					XDROutPacketDestroy(&call);
 					return B_OK;
 				}
 
-				buf->d_dev=ns->nsid;
-				buf->d_pdev=ns->nsid;
-				buf->d_ino=vnid;
-				buf->d_pino=node->vnid;
-				buf->d_reclen=2*(sizeof(dev_t)+sizeof(ino_t))+sizeof(unsigned short)+strlen(filename)+1;
+				buf->d_dev = ns->nsid;
+				buf->d_pdev = ns->nsid;
+				buf->d_ino = vnid;
+				buf->d_pino = node->vnid;
+				buf->d_reclen = 2 * (sizeof(dev_t) + sizeof(ino_t))
+					+ sizeof(unsigned short) + strlen(filename) + 1;
 				strcpy (buf->d_name,filename);
 //				if ((ns->rootid == node->vnid))//XXX:mmu_man:test
 //					dprintf("nfs: dirent %d {d:%ld pd:%ld i:%lld pi:%lld '%s'}\n", *num, buf->d_dev, buf->d_pdev, buf->d_ino, buf->d_pino, buf->d_name);
 
-				bufsize-=buf->d_reclen;
-				buf=(struct dirent *)((char *)buf+buf->d_reclen);
+				bufsize -= buf->d_reclen;
+				buf = (struct dirent *)((char *)buf + buf->d_reclen);
 
-				memcpy (cookie->opaque,newCookie.opaque,NFS_COOKIESIZE);
+				memcpy(cookie->opaque, newCookie.opaque, NFS_COOKIESIZE);
 
 				(*num)++;
-			}
-			else {
-				memcpy (cookie->opaque,newCookie.opaque,NFS_COOKIESIZE);
+			} else {
+				memcpy(cookie->opaque, newCookie.opaque, NFS_COOKIESIZE);
 			}
 
 			free (filename);
 
-			if ((*num)==max)
-			{
-				XDRInPacketDestroy (&reply);
-				XDROutPacketDestroy (&call);
+			if ((*num) == max) {
+				XDRInPacketDestroy(&reply);
+				XDROutPacketDestroy(&call);
 				return B_OK;
 			}
 		}
@@ -1087,7 +1073,7 @@ fs_readdir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 		XDRInPacketDestroy (&reply);
 		XDROutPacketDestroy (&call);
 	}
-	while (eof==0);
+	while (eof == 0);
 
 	return B_OK;
 }
@@ -1114,10 +1100,10 @@ fs_rstat(fs_volume *_volume, fs_vnode *_node, struct stat *st)
 	node = _node->private_node;
 
 	//dprintf("nfs: rstat()\n");//XXX:mmu_man:debug
-	if ((result=nfs_getattr(ns,&node->fhandle,st))<B_OK)
+	if ((result = nfs_getattr(ns, &node->fhandle, st)) < B_OK)
 		return result;
 
-	st->st_dev=ns->nsid;
+	st->st_dev = ns->nsid;
 //st->st_nlink = 1; //XXX:mmu_man:test
 	return B_OK;
 }
@@ -1126,14 +1112,14 @@ fs_rstat(fs_volume *_volume, fs_vnode *_node, struct stat *st)
 void
 fs_nspaceInit(struct fs_nspace *nspace)
 {
-	RPCPendingCallsInit (&nspace->pendingCalls);
+	RPCPendingCallsInit(&nspace->pendingCalls);
 }
 
 
 void
 fs_nspaceDestroy(struct fs_nspace *nspace)
 {
-	RPCPendingCallsDestroy (&nspace->pendingCalls);
+	RPCPendingCallsDestroy(&nspace->pendingCalls);
 }
 
 
@@ -1154,7 +1140,7 @@ dprintf("nfs:ip!\n");
 	if (!e)
 		return EINVAL;
 	params->server = malloc(e - p + 1);
-	params->server[e-p] = '\0';
+	params->server[e - p] = '\0';
 	strncpy(params->server, p, e - p);
 	// hack
 	params->serverIP = 0;
@@ -1187,7 +1173,7 @@ dprintf("%ld\n", v);
 	e = strchr(p, ',');
 	i = (e) ? (e - p) : (strlen(p));
 
-	params->_export = malloc(i+1);
+	params->_export = malloc(i + 1);
 	params->_export[i] = '\0';
 	strncpy(params->_export, p, i);
 
@@ -1199,7 +1185,7 @@ dprintf("nfs:hn!\n");
 	e = strchr(p, ',');
 	i = (e) ? (e - p) : (strlen(p));
 
-	params->hostname = malloc(i+1);
+	params->hostname = malloc(i + 1);
 	params->hostname[i] = '\0';
 	strncpy(params->hostname, p, i);
 
@@ -1261,21 +1247,18 @@ fs_mount(fs_volume *_vol, const char *devname, uint32 flags, const char *_parms,
 	ns->mountAddr.sin_addr.s_addr = htonl(ns->params.serverIP);
 	memset(ns->mountAddr.sin_zero, 0, sizeof(ns->mountAddr.sin_zero));
 
-	if ((result = create_socket(ns)) < B_OK)
-	{
+	if ((result = create_socket(ns)) < B_OK) {
 		dprintf( "nfs: could not create socket (%d)\n", (int)result );
 		goto err_socket;
 	}
 
-	if ((result = init_postoffice(ns)) < B_OK)
-	{
+	if ((result = init_postoffice(ns)) < B_OK) {
 		dprintf( "nfs: could not init_postoffice() (%d)\n", (int)result );
 		goto err_postoffice;
 	}
 
 	if ((result = get_remote_address(ns, MOUNT_PROGRAM, MOUNT_VERSION,
-			PMAP_IPPROTO_UDP, &ns->mountAddr)) < B_OK)
-	{
+			PMAP_IPPROTO_UDP, &ns->mountAddr)) < B_OK) {
 		dprintf( "could not get_remote_address() (%d)\n", (int)result );
 		goto err_sem;
 	}
@@ -1322,7 +1305,7 @@ dprintf("nfs: nfsd at %08x:%d\n", ns->nfsAddr.sin_addr.s_addr, ntohs(ns->nfsAddr
 					S_IFDIR, 0)) < B_OK)
 		goto err_publish;
 
-	ns->first=rootNode;
+	ns->first = rootNode;
 
 	return B_OK;
 
@@ -1339,11 +1322,11 @@ err_postoffice:
 	close(ns->s);
 err_socket:
 err_params:
-	free (ns->params.hostname);
-	free (ns->params._export);
-	free (ns->params.server);
+	free(ns->params.hostname);
+	free(ns->params._export);
+	free(ns->params.server);
 
-	fs_nspaceDestroy (ns);
+	fs_nspaceDestroy(ns);
 	free(ns);
 err_nspace:
 
@@ -1461,7 +1444,7 @@ fs_open(fs_volume *_volume, fs_vnode *_node, int omode, void **_cookie)
 	node = _node->private_node;
 	cookie = (fs_file_cookie **)_cookie;
 
-	if ((result=nfs_getattr(ns,&node->fhandle,&st))<B_OK)
+	if ((result = nfs_getattr(ns, &node->fhandle, &st)) < B_OK)
 		return result;
 
 	if (S_ISDIR(st.st_mode)) {
@@ -1473,10 +1456,10 @@ fs_open(fs_volume *_volume, fs_vnode *_node, int omode, void **_cookie)
 			return EISDIR;
 	}
 
-	*cookie=(fs_file_cookie *)malloc(sizeof(fs_file_cookie));
-	(*cookie)->omode=omode;
-	(*cookie)->original_size=st.st_size;
-	(*cookie)->st=st;
+	*cookie = (fs_file_cookie *)malloc(sizeof(fs_file_cookie));
+	(*cookie)->omode = omode;
+	(*cookie)->original_size = st.st_size;
+	(*cookie)->st = st;
 
 	return B_OK;
 }
@@ -1524,7 +1507,7 @@ fs_read(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
 		return EISDIR; /* do not permit reading of directories */
 
 	while ((*len) < max) {
-		size_t count = min_c(NFS_MAXDATA, max-(*len));
+		size_t count = min_c(NFS_MAXDATA, max - (*len));
 		struct XDROutPacket call;
 		struct XDRInPacket reply;
 		int32 status;
@@ -1599,10 +1582,10 @@ fs_write(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
 	if (!cookie)
 		return EISDIR; /* do not permit reading of directories */
 	if (cookie->omode & O_APPEND)
-		pos+=cookie->original_size;
+		pos += cookie->original_size;
 
 	while (bytesWritten < *len) {
-		size_t count=min_c(NFS_MAXDATA,(*len)-bytesWritten);
+		size_t count = min_c(NFS_MAXDATA,(*len) - bytesWritten);
 
 		struct XDROutPacket call;
 		struct XDRInPacket reply;
@@ -1610,54 +1593,53 @@ fs_write(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
 		uint8 *replyBuf;
 		struct stat st;
 
-		XDROutPacketInit (&call);
-		XDRInPacketInit (&reply);
+		XDROutPacketInit(&call);
+		XDRInPacketInit(&reply);
 
-		XDROutPacketAddFixed (&call,&node->fhandle.opaque,NFS_FHSIZE);
-		XDROutPacketAddInt32 (&call,0);
-		XDROutPacketAddInt32 (&call,pos+bytesWritten);
-		XDROutPacketAddInt32 (&call,0);
-		XDROutPacketAddDynamic (&call,(const char *)buf+bytesWritten,count);
+		XDROutPacketAddFixed(&call, &node->fhandle.opaque, NFS_FHSIZE);
+		XDROutPacketAddInt32(&call, 0);
+		XDROutPacketAddInt32(&call, pos + bytesWritten);
+		XDROutPacketAddInt32(&call, 0);
+		XDROutPacketAddDynamic(&call, (const char *)buf + bytesWritten, count);
 
-		replyBuf=send_rpc_call (ns,&ns->nfsAddr,NFS_PROGRAM,NFS_VERSION,NFSPROC_WRITE,&call);
+		replyBuf = send_rpc_call(ns, &ns->nfsAddr, NFS_PROGRAM, NFS_VERSION,
+			NFSPROC_WRITE, &call);
 
-		if (!replyBuf)
-		{
-			XDRInPacketDestroy (&reply);
-			XDROutPacketDestroy (&call);
+		if (!replyBuf) {
+			XDRInPacketDestroy(&reply);
+			XDROutPacketDestroy(&call);
 			return B_ERROR;
 		}
 
-		XDRInPacketSetTo (&reply,replyBuf,0);
+		XDRInPacketSetTo(&reply, replyBuf, 0);
 
-		if (!is_successful_reply(&reply))
-		{
-			XDRInPacketDestroy (&reply);
-			XDROutPacketDestroy (&call);
+		if (!is_successful_reply(&reply)) {
+			XDRInPacketDestroy(&reply);
+			XDROutPacketDestroy(&call);
 			return B_ERROR;
 		}
 
-		status=XDRInPacketGetInt32(&reply);
+		status = XDRInPacketGetInt32(&reply);
 
-		if (status!=NFS_OK)
-		{
-			XDRInPacketDestroy (&reply);
-			XDROutPacketDestroy (&call);
+		if (status != NFS_OK) {
+			XDRInPacketDestroy(&reply);
+			XDROutPacketDestroy(&call);
 			return map_nfs_to_system_error(status);
 		}
 
-		get_nfs_attr (&reply,&st);
+		get_nfs_attr(&reply, &st);
 
-		cookie->st=st;
+		cookie->st = st;
 
-		bytesWritten+=count;
+		bytesWritten += count;
 
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 	}
 
 	return B_OK;
 }
+
 
 static status_t
 fs_wstat(fs_volume *_volume, fs_vnode *_node, const struct stat *st, uint32 mask)
@@ -1673,47 +1655,46 @@ fs_wstat(fs_volume *_volume, fs_vnode *_node, const struct stat *st, uint32 mask
 	ns = _volume->private_volume;
 	node = _node->private_node;
 
-	XDROutPacketInit (&call);
-	XDRInPacketInit (&reply);
+	XDROutPacketInit(&call);
+	XDRInPacketInit(&reply);
 
-	XDROutPacketAddFixed (&call,node->fhandle.opaque,NFS_FHSIZE);
+	XDROutPacketAddFixed(&call,node->fhandle.opaque,NFS_FHSIZE);
 
-	XDROutPacketAddInt32 (&call,(mask & WSTAT_MODE) ? st->st_mode : -1);
-	XDROutPacketAddInt32 (&call,(mask & WSTAT_UID) ? st->st_uid : -1);
-	XDROutPacketAddInt32 (&call,(mask & WSTAT_GID) ? st->st_gid : -1);
-	XDROutPacketAddInt32 (&call,(mask & WSTAT_SIZE) ? st->st_size : -1);
-	XDROutPacketAddInt32 (&call,(mask & WSTAT_ATIME) ? st->st_atime : -1);
-	XDROutPacketAddInt32 (&call,(mask & WSTAT_ATIME) ? 0 : -1);
-	XDROutPacketAddInt32 (&call,(mask & WSTAT_MTIME) ? st->st_mtime : -1);
-	XDROutPacketAddInt32 (&call,(mask & WSTAT_MTIME) ? 0 : -1);
+	XDROutPacketAddInt32(&call, (mask & WSTAT_MODE) ? st->st_mode : -1);
+	XDROutPacketAddInt32(&call, (mask & WSTAT_UID) ? st->st_uid : -1);
+	XDROutPacketAddInt32(&call, (mask & WSTAT_GID) ? st->st_gid : -1);
+	XDROutPacketAddInt32(&call, (mask & WSTAT_SIZE) ? st->st_size : -1);
+	XDROutPacketAddInt32(&call, (mask & WSTAT_ATIME) ? st->st_atime : -1);
+	XDROutPacketAddInt32(&call, (mask & WSTAT_ATIME) ? 0 : -1);
+	XDROutPacketAddInt32(&call, (mask & WSTAT_MTIME) ? st->st_mtime : -1);
+	XDROutPacketAddInt32(&call, (mask & WSTAT_MTIME) ? 0 : -1);
 
-	replyBuf=send_rpc_call (ns,&ns->nfsAddr,NFS_PROGRAM,NFS_VERSION,NFSPROC_SETATTR,&call);
+	replyBuf = send_rpc_call(ns, &ns->nfsAddr, NFS_PROGRAM, NFS_VERSION,
+		NFSPROC_SETATTR, &call);
 
-	if (!replyBuf)
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	if (!replyBuf) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return EHOSTUNREACH;
 	}
 
-	XDRInPacketSetTo (&reply,replyBuf,0);
+	XDRInPacketSetTo(&reply, replyBuf, 0);
 
-	if (!is_successful_reply(&reply))
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	if (!is_successful_reply(&reply)) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return B_ERROR;
 	}
 
-	status=XDRInPacketGetInt32(&reply);
+	status = XDRInPacketGetInt32(&reply);
 
-	if (status!=NFS_OK)
+	if (status != NFS_OK)
 		return map_nfs_to_system_error(status);
 
-	XDRInPacketDestroy (&reply);
-	XDROutPacketDestroy (&call);
+	XDRInPacketDestroy(&reply);
+	XDROutPacketDestroy(&call);
 
-	return notify_stat_changed (_volume->id, node->vnid, mask);
+	return notify_stat_changed(_volume->id, node->vnid, mask);
 }
 
 static status_t
@@ -1726,7 +1707,8 @@ fs_wfsstat(fs_volume *_volume, const struct fs_info *info, uint32 mask)
 }
 
 static status_t
-fs_create(fs_volume *_volume, fs_vnode *_dir, const char *name, int omode, int perms, void **_cookie, ino_t *vnid)
+fs_create(fs_volume *_volume, fs_vnode *_dir, const char *name, int omode,
+	int perms, void **_cookie, ino_t *vnid)
 {
 	nfs_fhandle fhandle;
 	struct stat st;
@@ -1741,20 +1723,22 @@ fs_create(fs_volume *_volume, fs_vnode *_dir, const char *name, int omode, int p
 	dir = _dir->private_node;
 	cookie = (fs_file_cookie **)_cookie;
 
-	result=nfs_lookup(ns,&dir->fhandle,name,&fhandle,&st);
+	result = nfs_lookup(ns,&dir->fhandle,name,&fhandle,&st);
 
-	if (result==B_OK)
-	{
+	if (result == B_OK) {
 		void *dummy;
-		fs_node *newNode=(fs_node *)malloc(sizeof(fs_node));
-		newNode->fhandle=fhandle;
-		newNode->vnid=st.st_ino;
-		newNode->mode=st.st_mode;
-		insert_node (ns,newNode);
+		fs_node *newNode = (fs_node *)malloc(sizeof(fs_node));
+		if (newNode == NULL)
+			return B_NO_MEMORY;
 
-		*vnid=st.st_ino;
+		newNode->fhandle = fhandle;
+		newNode->vnid = st.st_ino;
+		newNode->mode = st.st_mode;
+		insert_node(ns, newNode);
 
-		if ((result=get_vnode(_volume,*vnid,&dummy))<B_OK)
+		*vnid = st.st_ino;
+
+		if ((result = get_vnode(_volume,*vnid,&dummy)) < B_OK)
 			return result;
 
 		if (S_ISDIR(st.st_mode))
@@ -1765,21 +1749,22 @@ fs_create(fs_volume *_volume, fs_vnode *_dir, const char *name, int omode, int p
 
 		if (omode & O_TRUNC)
 		{
-			if ((result=nfs_truncate_file(ns,&fhandle,NULL))<B_OK)
+			if ((result = nfs_truncate_file(ns, &fhandle, NULL)) < B_OK)
 				return result;
 		}
 
 		*cookie=(fs_file_cookie *)malloc(sizeof(fs_file_cookie));
+		if (*cookie == NULL)
+			return B_NO_MEMORY;
+
 		(*cookie)->omode=omode;
 		(*cookie)->original_size=st.st_size;
 		(*cookie)->st=st;
 
 		return B_OK;
-	}
-	else if (result!=ENOENT)
+	} else if (result != ENOENT) {
 		return result;
-	else
-	{
+	} else {
 		struct XDROutPacket call;
 		struct XDRInPacket reply;
 
@@ -1791,78 +1776,86 @@ fs_create(fs_volume *_volume, fs_vnode *_dir, const char *name, int omode, int p
 		if (!(omode & O_CREAT))
 			return ENOENT;
 
-		XDROutPacketInit (&call);
-		XDRInPacketInit (&reply);
+		XDROutPacketInit(&call);
+		XDRInPacketInit(&reply);
 
-		XDROutPacketAddFixed (&call,dir->fhandle.opaque,NFS_FHSIZE);
-		XDROutPacketAddString(&call,name);
-		XDROutPacketAddInt32 (&call,perms|S_IFREG);
-		XDROutPacketAddInt32 (&call,-1);
-		XDROutPacketAddInt32 (&call,-1);
-		XDROutPacketAddInt32 (&call,0);
-		XDROutPacketAddInt32 (&call,time(NULL));
-		XDROutPacketAddInt32 (&call,0);
-		XDROutPacketAddInt32 (&call,time(NULL));
-		XDROutPacketAddInt32 (&call,0);
+		XDROutPacketAddFixed(&call, dir->fhandle.opaque, NFS_FHSIZE);
+		XDROutPacketAddString(&call, name);
+		XDROutPacketAddInt32(&call, perms | S_IFREG);
+		XDROutPacketAddInt32(&call, -1);
+		XDROutPacketAddInt32(&call, -1);
+		XDROutPacketAddInt32(&call, 0);
+		XDROutPacketAddInt32(&call, time(NULL));
+		XDROutPacketAddInt32(&call, 0);
+		XDROutPacketAddInt32(&call, time(NULL));
+		XDROutPacketAddInt32(&call, 0);
 
-		replyBuf=send_rpc_call (ns,&ns->nfsAddr,NFS_PROGRAM,NFS_VERSION,NFSPROC_CREATE,&call);
+		replyBuf = send_rpc_call(ns, &ns->nfsAddr, NFS_PROGRAM, NFS_VERSION,
+			NFSPROC_CREATE, &call);
 
-		if (!replyBuf)
-		{
-			XDRInPacketDestroy (&reply);
-			XDROutPacketDestroy (&call);
+		if (!replyBuf) {
+			XDRInPacketDestroy(&reply);
+			XDROutPacketDestroy(&call);
 			return B_ERROR;
 		}
 
-		XDRInPacketSetTo (&reply,replyBuf,0);
+		XDRInPacketSetTo(&reply, replyBuf, 0);
 
-		if (!is_successful_reply(&reply))
-		{
-			XDRInPacketDestroy (&reply);
-			XDROutPacketDestroy (&call);
+		if (!is_successful_reply(&reply)) {
+			XDRInPacketDestroy(&reply);
+			XDROutPacketDestroy(&call);
 			return B_ERROR;
 		}
 
-		status=XDRInPacketGetInt32(&reply);
+		status = XDRInPacketGetInt32(&reply);
 
-		if (status!=NFS_OK)
-		{
-			XDRInPacketDestroy (&reply);
-			XDROutPacketDestroy (&call);
+		if (status != NFS_OK) {
+			XDRInPacketDestroy(&reply);
+			XDROutPacketDestroy(&call);
 			return map_nfs_to_system_error(status);
 		}
 
-		XDRInPacketGetFixed (&reply,fhandle.opaque,NFS_FHSIZE);
+		XDRInPacketGetFixed(&reply, fhandle.opaque, NFS_FHSIZE);
 
-		get_nfs_attr (&reply,&st);
+		get_nfs_attr(&reply,&st);
 
-		newNode=(fs_node *)malloc(sizeof(fs_node));
-		newNode->fhandle=fhandle;
-		newNode->vnid=st.st_ino;
-		newNode->mode=st.st_mode;
+		newNode = (fs_node *)malloc(sizeof(fs_node));
+		if (newNode == NULL) {
+			XDRInPacketDestroy(&reply);
+			XDROutPacketDestroy(&call);
+			return B_NO_MEMORY;
+		}
+		newNode->fhandle = fhandle;
+		newNode->vnid = st.st_ino;
+		newNode->mode = st.st_mode;
 
-		insert_node (ns,newNode);
+		insert_node (ns, newNode);
 
-		*vnid=st.st_ino;
-		*cookie=(fs_file_cookie *)malloc(sizeof(fs_file_cookie));
-		(*cookie)->omode=omode;
-		(*cookie)->original_size=st.st_size;
-		(*cookie)->st=st;
+		*vnid = st.st_ino;
+		*cookie = (fs_file_cookie *)malloc(sizeof(fs_file_cookie));
+		if (*cookie == NULL) {
+			XDRInPacketDestroy(&reply);
+			XDROutPacketDestroy(&call);
+			return B_NO_MEMORY;
+		}
+		(*cookie)->omode = omode;
+		(*cookie)->original_size = st.st_size;
+		(*cookie)->st = st;
 
-		result=new_vnode (_volume,*vnid,newNode,&sNFSVnodeOps);
+		result = new_vnode(_volume, *vnid, newNode, &sNFSVnodeOps);
 
-		if (result<B_OK)
-		{
-			XDRInPacketDestroy (&reply);
-			XDROutPacketDestroy (&call);
+		if (result < B_OK) {
+			XDRInPacketDestroy(&reply);
+			XDROutPacketDestroy(&call);
 			return result;
 		}
 
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
-		return notify_entry_created (_volume->id, dir->vnid, name, *vnid);
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
+		return notify_entry_created(_volume->id, dir->vnid, name, *vnid);
 	}
 }
+
 
 static status_t
 fs_unlink(fs_volume *_volume, fs_vnode *_dir, const char *name)
@@ -1885,86 +1878,84 @@ fs_unlink(fs_volume *_volume, fs_vnode *_dir, const char *name)
 	ns = _volume->private_volume;
 	dir = _dir->private_node;
 
-	XDROutPacketInit (&call);
-	XDRInPacketInit (&reply);
+	XDROutPacketInit(&call);
+	XDRInPacketInit(&reply);
 
-	if ((result=nfs_lookup(ns,&dir->fhandle,name,&fhandle,&st))<B_OK)
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	if ((result = nfs_lookup(ns, &dir->fhandle, name, &fhandle, &st)) < B_OK) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return result;
 	}
 
-	newNode=(fs_node *)malloc(sizeof(fs_node));
-	newNode->fhandle=fhandle;
-	newNode->vnid=st.st_ino;
-	newNode->mode=st.st_mode;
+	newNode = (fs_node *)malloc(sizeof(fs_node));
+	if (newNode == NULL) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
+		return B_NO_MEMORY;
+	}
+	newNode->fhandle = fhandle;
+	newNode->vnid = st.st_ino;
+	newNode->mode = st.st_mode;
 
-	insert_node (ns,newNode);
+	insert_node(ns, newNode);
 
-	if ((result=get_vnode(_volume,st.st_ino,(void **)&dummy))<B_OK)
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	if ((result = get_vnode(_volume, st.st_ino, (void **)&dummy)) < B_OK) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return result;
 	}
 
-	if (!S_ISREG(st.st_mode)&&!S_ISLNK(st.st_mode))
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	if (!S_ISREG(st.st_mode) && !S_ISLNK(st.st_mode)) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return EISDIR;
 	}
 
-	if ((result=remove_vnode(_volume,st.st_ino))<B_OK)
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	if ((result=remove_vnode(_volume,st.st_ino)) < B_OK) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return result;
 	}
 
-	if ((result=put_vnode(_volume,st.st_ino))<B_OK)
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	if ((result=put_vnode(_volume, st.st_ino)) < B_OK) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return result;
 	}
 
-	XDROutPacketAddFixed (&call,dir->fhandle.opaque,NFS_FHSIZE);
-	XDROutPacketAddString(&call,name);
+	XDROutPacketAddFixed(&call, dir->fhandle.opaque, NFS_FHSIZE);
+	XDROutPacketAddString(&call, name);
 
 	replyBuf=send_rpc_call (ns,&ns->nfsAddr,NFS_PROGRAM,NFS_VERSION,NFSPROC_REMOVE,&call);
 
-	if (!replyBuf)
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	if (!replyBuf) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return EHOSTUNREACH;
 	}
 
-	XDRInPacketSetTo(&reply,replyBuf,0);
+	XDRInPacketSetTo(&reply, replyBuf, 0);
 
-	if (!is_successful_reply(&reply))
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	if (!is_successful_reply(&reply)) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return B_ERROR;
 	}
 
-	status=XDRInPacketGetInt32(&reply);
+	status = XDRInPacketGetInt32(&reply);
 
-	if (status!=NFS_OK)
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	if (status != NFS_OK) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return map_nfs_to_system_error(status);
 	}
 
-	XDRInPacketDestroy (&reply);
-	XDROutPacketDestroy (&call);
+	XDRInPacketDestroy(&reply);
+	XDROutPacketDestroy(&call);
 
-	return notify_entry_removed (_volume->id, dir->vnid, name, st.st_ino);
+	return notify_entry_removed(_volume->id, dir->vnid, name, st.st_ino);
 }
+
 
 static status_t
 fs_remove_vnode(fs_volume *_volume, fs_vnode *_node, bool r)
@@ -1974,10 +1965,11 @@ fs_remove_vnode(fs_volume *_volume, fs_vnode *_node, bool r)
 
 	(void) r;
 
-	remove_node (ns,node->vnid);
+	remove_node (ns, node->vnid);
 
 	return B_OK;
 }
+
 
 static status_t
 fs_mkdir(fs_volume *_volume, fs_vnode *_dir, const char *name, int perms)
@@ -1999,81 +1991,81 @@ fs_mkdir(fs_volume *_volume, fs_vnode *_dir, const char *name, int perms)
 	ns = _volume->private_volume;
 	dir = _dir->private_node;
 
-	XDROutPacketInit (&call);
-	XDRInPacketInit (&reply);
+	XDROutPacketInit(&call);
+	XDRInPacketInit(&reply);
 
-	result=nfs_lookup(ns,&dir->fhandle,name,&fhandle,&st);
+	result = nfs_lookup(ns, &dir->fhandle, name, &fhandle, &st);
 
-	if (result==B_OK)
-	{
+	if (result == B_OK) {
 		//void *dummy;
 
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		// XXX: either OK or not get_vnode !!! ??
 		//if ((result=get_vnode(_volume,st.st_ino,&dummy))<B_OK)
 		//	return result;
 		return EEXIST;
-	}
-	else if (result!=ENOENT)
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	} else if (result != ENOENT) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return result;
 	}
 
-	XDROutPacketAddFixed (&call,dir->fhandle.opaque,NFS_FHSIZE);
-	XDROutPacketAddString(&call,name);
-	XDROutPacketAddInt32 (&call,perms|S_IFDIR);
-	XDROutPacketAddInt32 (&call,-1);
-	XDROutPacketAddInt32 (&call,-1);
-	XDROutPacketAddInt32 (&call,-1);
-	XDROutPacketAddInt32 (&call,time(NULL));
-	XDROutPacketAddInt32 (&call,0);
-	XDROutPacketAddInt32 (&call,time(NULL));
-	XDROutPacketAddInt32 (&call,0);
+	XDROutPacketAddFixed(&call, dir->fhandle.opaque, NFS_FHSIZE);
+	XDROutPacketAddString(&call, name);
+	XDROutPacketAddInt32(&call, perms | S_IFDIR);
+	XDROutPacketAddInt32(&call, -1);
+	XDROutPacketAddInt32(&call, -1);
+	XDROutPacketAddInt32(&call, -1);
+	XDROutPacketAddInt32(&call, time(NULL));
+	XDROutPacketAddInt32(&call, 0);
+	XDROutPacketAddInt32(&call, time(NULL));
+	XDROutPacketAddInt32(&call, 0);
 
-	replyBuf=send_rpc_call (ns,&ns->nfsAddr,NFS_PROGRAM,NFS_VERSION,NFSPROC_MKDIR,&call);
+	replyBuf = send_rpc_call(ns, &ns->nfsAddr, NFS_PROGRAM, NFS_VERSION,
+		NFSPROC_MKDIR, &call);
 
-	if (!replyBuf)
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	if (!replyBuf) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return B_ERROR;
 	}
 
-	XDRInPacketSetTo (&reply,replyBuf,0);
+	XDRInPacketSetTo(&reply, replyBuf, 0);
 
-	if (!is_successful_reply(&reply))
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	if (!is_successful_reply(&reply)) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return B_ERROR;
 	}
 
-	status=XDRInPacketGetInt32(&reply);
+	status = XDRInPacketGetInt32(&reply);
 
-	if (status!=NFS_OK)
-	{
-		XDROutPacketDestroy (&call);
+	if (status != NFS_OK) {
+		XDROutPacketDestroy(&call);
 		return map_nfs_to_system_error(status);
 	}
 
-	XDRInPacketGetFixed(&reply,fhandle.opaque,NFS_FHSIZE);
+	XDRInPacketGetFixed(&reply, fhandle.opaque, NFS_FHSIZE);
 
-	get_nfs_attr (&reply,&st);
+	get_nfs_attr(&reply, &st);
 
 	newNode=(fs_node *)malloc(sizeof(fs_node));
-	newNode->fhandle=fhandle;
-	newNode->vnid=st.st_ino;
-	newNode->mode=st.st_mode;
+	if (newNode == NULL) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
+		return B_NO_MEMORY;
+	}
+	newNode->fhandle = fhandle;
+	newNode->vnid = st.st_ino;
+	newNode->mode = st.st_mode;
 
-	insert_node (ns,newNode);
+	insert_node(ns, newNode);
 
-	XDRInPacketDestroy (&reply);
-	XDROutPacketDestroy (&call);
+	XDRInPacketDestroy(&reply);
+	XDROutPacketDestroy(&call);
 
-	return notify_entry_created( _volume->id, dir->vnid, name, st.st_ino );
+	return notify_entry_created(_volume->id, dir->vnid, name, st.st_ino);
 }
 
 static status_t
@@ -2095,67 +2087,65 @@ fs_rename(fs_volume *_volume, fs_vnode *_olddir, const char *oldname,
 	olddir = _olddir->private_node;
 	newdir = _newdir->private_node;
 
-	XDROutPacketInit (&call);
-	XDRInPacketInit (&reply);
+	XDROutPacketInit(&call);
+	XDRInPacketInit(&reply);
 
-	if ((result=nfs_lookup(ns,&newdir->fhandle,newname,&fhandle,&st))==B_OK)
-	{
+	if ((result = nfs_lookup(ns, &newdir->fhandle, newname, &fhandle, &st))
+		== B_OK) {
 		if (S_ISREG(st.st_mode))
-			result=fs_unlink (_volume,_newdir,newname);
+			result = fs_unlink (_volume,_newdir,newname);
 		else
-			result=fs_rmdir (_volume,_newdir,newname);
+			result = fs_rmdir (_volume,_newdir,newname);
 
-		if (result<B_OK)
-		{
+		if (result < B_OK) {
 			XDRInPacketDestroy (&reply);
 			XDROutPacketDestroy (&call);
 			return result;
 		}
 	}
 
-	if ((result=nfs_lookup(ns,&olddir->fhandle,oldname,&fhandle,&st))<B_OK)
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	if ((result = nfs_lookup(ns, &olddir->fhandle, oldname, &fhandle, &st))
+		< B_OK) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return result;
 	}
 
-	XDROutPacketAddFixed (&call,olddir->fhandle.opaque,NFS_FHSIZE);
-	XDROutPacketAddString(&call,oldname);
-	XDROutPacketAddFixed (&call,newdir->fhandle.opaque,NFS_FHSIZE);
-	XDROutPacketAddString(&call,newname);
+	XDROutPacketAddFixed(&call, olddir->fhandle.opaque, NFS_FHSIZE);
+	XDROutPacketAddString(&call, oldname);
+	XDROutPacketAddFixed(&call, newdir->fhandle.opaque, NFS_FHSIZE);
+	XDROutPacketAddString(&call, newname);
 
-	replyBuf=send_rpc_call (ns,&ns->nfsAddr,NFS_PROGRAM,NFS_VERSION,NFSPROC_RENAME,&call);
+	replyBuf = send_rpc_call(ns, &ns->nfsAddr, NFS_PROGRAM, NFS_VERSION,
+		NFSPROC_RENAME, &call);
 
-	if (!replyBuf)
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	if (!replyBuf) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return EHOSTUNREACH;
 	}
 
-	XDRInPacketSetTo (&reply,replyBuf,0);
+	XDRInPacketSetTo(&reply, replyBuf, 0);
 
-	if (!is_successful_reply(&reply))
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	if (!is_successful_reply(&reply)) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return B_ERROR;
 	}
 
-	status=XDRInPacketGetInt32(&reply);
+	status = XDRInPacketGetInt32(&reply);
 
-	if (status!=NFS_OK)
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	if (status != NFS_OK) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return map_nfs_to_system_error(status);
 	}
 
 	XDRInPacketDestroy (&reply);
 	XDROutPacketDestroy (&call);
 
-	return notify_entry_moved (_volume->id, olddir->vnid, oldname, newdir->vnid, newname, st.st_ino);
+	return notify_entry_moved(_volume->id, olddir->vnid, oldname, newdir->vnid,
+		newname, st.st_ino);
 }
 
 
@@ -2182,55 +2172,55 @@ fs_rmdir(fs_volume *_volume, fs_vnode *_dir, const char *name)
 	XDROutPacketInit(&call);
 	XDRInPacketInit(&reply);
 
-	if ((result=nfs_lookup(ns,&dir->fhandle,name,&fhandle,&st))<B_OK)
-	{
+	if ((result = nfs_lookup(ns, &dir->fhandle, name, &fhandle, &st)) < B_OK) {
 		XDRInPacketDestroy(&reply);
 		XDROutPacketDestroy(&call);
 		return result;
 	}
 
-	newNode=(fs_node *)malloc(sizeof(fs_node));
-	newNode->fhandle=fhandle;
-	newNode->vnid=st.st_ino;
-	newNode->mode=st.st_mode;
+	newNode = (fs_node *)malloc(sizeof(fs_node));
+	if (newNode == NULL) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
+		return B_NO_MEMORY;
+	}
+	newNode->fhandle = fhandle;
+	newNode->vnid = st.st_ino;
+	newNode->mode = st.st_mode;
 
-	insert_node (ns,newNode);
+	insert_node(ns, newNode);
 
-	if ((result=get_vnode(_volume,st.st_ino,(void **)&dummy))<B_OK)
-	{
+	if ((result = get_vnode(_volume, st.st_ino, (void **)&dummy)) < B_OK) {
 		XDRInPacketDestroy(&reply);
 		XDROutPacketDestroy(&call);
 		return result;
 	}
 
-	if (!S_ISDIR(st.st_mode))
-	{
+	if (!S_ISDIR(st.st_mode)) {
 		XDRInPacketDestroy(&reply);
 		XDROutPacketDestroy(&call);
 		return ENOTDIR;
 	}
 
-	if ((result=remove_vnode(_volume,st.st_ino))<B_OK)
-	{
+	if ((result = remove_vnode(_volume, st.st_ino)) < B_OK) {
 		XDRInPacketDestroy(&reply);
 		XDROutPacketDestroy(&call);
 		return result;
 	}
 
-	if ((result=put_vnode(_volume,st.st_ino))<B_OK)
-	{
+	if ((result = put_vnode(_volume, st.st_ino)) < B_OK) {
 		XDRInPacketDestroy(&reply);
 		XDROutPacketDestroy(&call);
 		return result;
 	}
 
-	XDROutPacketAddFixed (&call,dir->fhandle.opaque,NFS_FHSIZE);
-	XDROutPacketAddString(&call,name);
+	XDROutPacketAddFixed (&call, dir->fhandle.opaque, NFS_FHSIZE);
+	XDROutPacketAddString(&call, name);
 
-	replyBuf=send_rpc_call (ns,&ns->nfsAddr,NFS_PROGRAM,NFS_VERSION,NFSPROC_RMDIR,&call);
+	replyBuf = send_rpc_call(ns, &ns->nfsAddr, NFS_PROGRAM, NFS_VERSION,
+		NFSPROC_RMDIR, &call);
 
-	if (!replyBuf)
-	{
+	if (!replyBuf) {
 		XDRInPacketDestroy(&reply);
 		XDROutPacketDestroy(&call);
 		return EHOSTUNREACH;
@@ -2238,17 +2228,15 @@ fs_rmdir(fs_volume *_volume, fs_vnode *_dir, const char *name)
 
 	XDRInPacketSetTo (&reply,replyBuf,0);
 
-	if (!is_successful_reply(&reply))
-	{
+	if (!is_successful_reply(&reply)) {
 		XDRInPacketDestroy(&reply);
 		XDROutPacketDestroy(&call);
 		return B_ERROR;
 	}
 
-	status=XDRInPacketGetInt32(&reply);
+	status = XDRInPacketGetInt32(&reply);
 
-	if (status!=NFS_OK)
-	{
+	if (status != NFS_OK) {
 		XDRInPacketDestroy(&reply);
 		XDROutPacketDestroy(&call);
 		return map_nfs_to_system_error(status);
@@ -2256,8 +2244,9 @@ fs_rmdir(fs_volume *_volume, fs_vnode *_dir, const char *name)
 
 	XDRInPacketDestroy(&reply);
 	XDROutPacketDestroy(&call);
-	return notify_entry_removed (_volume->id, dir->vnid, name, st.st_ino);
+	return notify_entry_removed(_volume->id, dir->vnid, name, st.st_ino);
 }
+
 
 static status_t
 fs_readlink(fs_volume *_volume, fs_vnode *_node, char *buf, size_t *bufsize)
@@ -2274,51 +2263,50 @@ fs_readlink(fs_volume *_volume, fs_vnode *_node, char *buf, size_t *bufsize)
 	ns = _volume->private_volume;
 	node = _node->private_node;
 
-	XDROutPacketInit (&call);
+	XDROutPacketInit(&call);
 	XDRInPacketInit(&reply);
 
-	XDROutPacketAddFixed (&call,node->fhandle.opaque,NFS_FHSIZE);
+	XDROutPacketAddFixed(&call, node->fhandle.opaque, NFS_FHSIZE);
 
-	replyBuf=send_rpc_call (ns,&ns->nfsAddr,NFS_PROGRAM,NFS_VERSION,NFSPROC_READLINK,&call);
+	replyBuf = send_rpc_call(ns, &ns->nfsAddr, NFS_PROGRAM, NFS_VERSION,
+		NFSPROC_READLINK, &call);
 
-	if (!replyBuf)
-	{
+	if (!replyBuf) {
 		XDRInPacketDestroy(&reply);
-		XDROutPacketDestroy (&call);
+		XDROutPacketDestroy(&call);
 		return EHOSTUNREACH;
 	}
 
-	XDRInPacketSetTo (&reply,replyBuf,0);
+	XDRInPacketSetTo (&reply, replyBuf, 0);
 
-	if (!is_successful_reply(&reply))
-	{
+	if (!is_successful_reply(&reply)) {
 		XDRInPacketDestroy(&reply);
-		XDROutPacketDestroy (&call);
+		XDROutPacketDestroy(&call);
 		return B_ERROR;
 	}
 
-	status=XDRInPacketGetInt32(&reply);
+	status = XDRInPacketGetInt32(&reply);
 
-	if (status!=NFS_OK)
-	{
+	if (status != NFS_OK) {
 		XDRInPacketDestroy(&reply);
 		XDROutPacketDestroy (&call);
 		return map_nfs_to_system_error(status);
 	}
 
-	length=XDRInPacketGetDynamic(&reply,data);
+	length = XDRInPacketGetDynamic(&reply, data);
 
-	length=min_c(length,*bufsize);
-	memcpy (buf,data,length);
-	*bufsize=length;
+	length = min_c(length, *bufsize);
+	memcpy(buf, data, length);
+	*bufsize = length;
 
 	XDRInPacketDestroy(&reply);
-	XDROutPacketDestroy (&call);
+	XDROutPacketDestroy(&call);
 	return B_OK;
 }
 
 static status_t
-fs_symlink(fs_volume *_volume, fs_vnode *_dir, const char *name, const char *path, int mode)
+fs_symlink(fs_volume *_volume, fs_vnode *_dir, const char *name,
+	const char *path, int mode)
 {
 	fs_nspace *ns;
 	fs_node *dir;
@@ -2334,59 +2322,55 @@ fs_symlink(fs_volume *_volume, fs_vnode *_dir, const char *name, const char *pat
 	ns = _volume->private_volume;
 	dir = _dir->private_node;
 
-	XDROutPacketInit (&call);
-	XDRInPacketInit (&reply);
+	XDROutPacketInit(&call);
+	XDRInPacketInit(&reply);
 
-	result=nfs_lookup(ns,&dir->fhandle,name,&fhandle,&st);
+	result = nfs_lookup(ns, &dir->fhandle, name, &fhandle, &st);
 
-	if (result==B_OK)
-	{
+	if (result == B_OK) {
 		void *dummy;
-		if ((result=get_vnode(_volume,st.st_ino,&dummy))<B_OK)
+		if ((result = get_vnode(_volume, st.st_ino, &dummy)) < B_OK)
 			return result;
 
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return EEXIST;
-	}
-	else if (result!=ENOENT)
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	} else if (result != ENOENT) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return result;
 	}
 
-	XDROutPacketAddFixed (&call,dir->fhandle.opaque,NFS_FHSIZE);
-	XDROutPacketAddString(&call,name);
-	XDROutPacketAddString(&call,path);
-	XDROutPacketAddInt32 (&call,S_IFLNK);
-	XDROutPacketAddInt32 (&call,-1);
-	XDROutPacketAddInt32 (&call,-1);
-	XDROutPacketAddInt32 (&call,-1);
-	XDROutPacketAddInt32 (&call,time(NULL));
-	XDROutPacketAddInt32 (&call,0);
-	XDROutPacketAddInt32 (&call,time(NULL));
-	XDROutPacketAddInt32 (&call,0);
+	XDROutPacketAddFixed(&call, dir->fhandle.opaque, NFS_FHSIZE);
+	XDROutPacketAddString(&call, name);
+	XDROutPacketAddString(&call, path);
+	XDROutPacketAddInt32(&call, S_IFLNK);
+	XDROutPacketAddInt32(&call, -1);
+	XDROutPacketAddInt32(&call, -1);
+	XDROutPacketAddInt32(&call, -1);
+	XDROutPacketAddInt32(&call, time(NULL));
+	XDROutPacketAddInt32(&call, 0);
+	XDROutPacketAddInt32(&call, time(NULL));
+	XDROutPacketAddInt32(&call, 0);
 
-	replyBuf=send_rpc_call (ns,&ns->nfsAddr,NFS_PROGRAM,NFS_VERSION,NFSPROC_SYMLINK,&call);
+	replyBuf = send_rpc_call (ns, &ns->nfsAddr, NFS_PROGRAM, NFS_VERSION,
+		NFSPROC_SYMLINK, &call);
 
-	if (!replyBuf)
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	if (!replyBuf) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return B_ERROR;
 	}
 
-	XDRInPacketSetTo (&reply,replyBuf,0);
+	XDRInPacketSetTo(&reply, replyBuf, 0);
 
-	if (!is_successful_reply(&reply))
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	if (!is_successful_reply(&reply)) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return B_ERROR;
 	}
 
-	status=XDRInPacketGetInt32(&reply);
+	status = XDRInPacketGetInt32(&reply);
 
 /*	if (status!=NFS_OK)
 		return map_nfs_to_system_error(status);
@@ -2394,25 +2378,29 @@ fs_symlink(fs_volume *_volume, fs_vnode *_dir, const char *name, const char *pat
 	ignore status here, weird thing, nfsservers that is
 */
 
-	result=nfs_lookup(ns,&dir->fhandle,name,&fhandle,&st);
+	result = nfs_lookup(ns, &dir->fhandle, name, &fhandle, &st);
 
-	if (result<B_OK)
-	{
-		XDRInPacketDestroy (&reply);
-		XDROutPacketDestroy (&call);
+	if (result < B_OK) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
 		return result;
 	}
 
-	newNode=(fs_node *)malloc(sizeof(fs_node));
-	newNode->fhandle=fhandle;
-	newNode->vnid=st.st_ino;
+	newNode = (fs_node *)malloc(sizeof(fs_node));
+	if (newNode == NULL) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
+		return B_NO_MEMORY;
+	}
+	newNode->fhandle = fhandle;
+	newNode->vnid = st.st_ino;
 
-	insert_node (ns,newNode);
+	insert_node(ns, newNode);
 
 	result = notify_entry_created (_volume->id, dir->vnid, name, st.st_ino);
 
-	XDRInPacketDestroy (&reply);
-	XDROutPacketDestroy (&call);
+	XDRInPacketDestroy(&reply);
+	XDROutPacketDestroy(&call);
 	return result;
 }
 
