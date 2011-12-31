@@ -1164,8 +1164,10 @@ devfs_open(fs_volume* _volume, fs_vnode* _vnode, int openMode,
 	if (S_ISCHR(vnode->stream.type)) {
 		BaseDevice* device = vnode->stream.u.dev.device;
 		status = device->InitDevice();
-		if (status != B_OK)
+		if (status != B_OK) {
+			free(cookie);
 			return status;
+		}
 
 		char path[B_FILE_NAME_LENGTH];
 		get_device_name(vnode, path, sizeof(path));
