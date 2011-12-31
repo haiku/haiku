@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku.TV	2422560392
+1	dutch; flemish	x-vnd.Haiku.TV	1995288111
 TV	MainWin		TV
 Channel	MainWin		Kanaal
 Settings…	MainWin		Instellingen...
@@ -24,3 +24,4 @@ force 544 x 576, display aspect 4:3	MainWin		Forceer 544 x 576, beeldverhouding 
 pixel aspect ratio	MainWin		pixelverhouding
 No menu	MainWin		Geen menu
 Error, connecting to interface failed:\n\n	MainWin		Fout, verbinden naar interface is mislukt:\n\n
+force 720 x 576, display aspect 4:3	MainWin		forceer 704 x 576, beeldverhouding 4:3

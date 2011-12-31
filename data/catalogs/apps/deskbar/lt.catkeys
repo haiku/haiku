@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Be-TSKB	2311697004
+1	lithuanian	x-vnd.Be-TSKB	107564593
 Power off	DeskbarMenu		Išjungti
 Edit menu…	PreferencesWindow		Taisyti meniu…
 Suspend	DeskbarMenu		Pristabdyti
@@ -16,6 +16,7 @@ Recent documents	DeskbarMenu		Paskiausiai atverti dokumentai
 Show seconds	PreferencesWindow		Rodyti sekundes
 Auto-hide	PreferencesWindow		Automatiškai slėpti
 Always on top	PreferencesWindow		Visuomet viršuje
+<Deskbar folder is empty>	DeskbarMenu		<Meniu aplankas tuščias>
 Show all	WindowMenu		Rodyti visus
 No windows	WindowMenu		Langų nėra
 Deskbar	System name		Užduočių juosta

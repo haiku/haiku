@@ -1,27 +1,37 @@
-1	dutch; flemish	x-vnd.Haiku-SoundRecorder	4015960867
+1	dutch; flemish	x-vnd.Haiku-SoundRecorder	2149017672
 Loop	RecorderWindow		Herhalen
 Cannot find default audio hardware	RecorderWindow		Kan de standaard-hardware voor geluid niet vinden
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Kan het tijdelijke bestand van de nieuwe opname niet vinden.
+Sample size:	RecorderWindow		Samplegrootte:
 Nothing to play	RecorderWindow		Niets om af te spelen
+Duration: 	RecorderWindow		Tijdsduur:
 Some of the files don't appear to be audio files	RecorderWindow		Sommige bestanden lijken geen geluidsbestanden te zijn
 File info	RecorderWindow		Bestandsinfo
 Drop files here	SoundListView		Sleep bestanden hierheen
 Input	RecorderWindow		Input
 Stop	RecorderWindow		Stop
+Format:	RecorderWindow		Formaat:
 Sound List	RecorderWindow		Geluidlijst
+Compression: 	RecorderWindow		Compressie:
 Rewind	RecorderWindow		Terug
+Sample rate:	RecorderWindow		Samplewaarde:
 Invalid audio files	RecorderWindow		Ongeldige geluidsbestanden
+ seconds	RecorderWindow		seconden
 OK	RecorderWindow		Oké
 Cannot open the temporary file created to hold the new recording	RecorderWindow		Kan het tijdelijke bestand van de nieuwe opname niet openen.
 None of the files appear to be audio files	RecorderWindow		Geen van de bestanden lijkt een geluidsbestand te zijn
 Input:	RecorderWindow		Input:
 Forward	RecorderWindow		Vooruit
 Play	RecorderWindow		Afspelen
+SoundRecorder	System name		SoundRecorder
+Channels:	RecorderWindow		Kanalen:
+ bits	RecorderWindow		bits
 None	RecorderWindow		Geen
 Record	RecorderWindow		Opnemen
 Sample size: 	RecorderWindow		Sample-grootte:
 Cannot recognize this file as a media file	RecorderWindow		Kan dit bestand niet herkennen als mediabestand
 Format: 	RecorderWindow		Bestandsformaat:
+File name: 	RecorderWindow		Bestandsnaam:
 Cannot connect to the selected sound input	RecorderWindow		Kan geen verbinding maken met de geselecteerde geluidsinput
 Cannot get the file to play	RecorderWindow		Bestand afspelen lukt niet
 Cannot record a sound that long	RecorderWindow		Geluid van die lengte kan niet opgenomen worden

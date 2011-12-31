@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Installer	1384722558
+1	dutch; flemish	x-vnd.Haiku-Installer	3852628561
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Voeg dus achter de andere menu-onderdelen aan de onderkant van het bestand iets soortgelijks als dit toe:
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Bent u zeker dat u de installatie wilt afbreken en het systeem wilt herstarten?
 \t}\n\n	InstallerApp		\t}\n\n
@@ -44,6 +44,7 @@ GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		GRUB's schema voor naam
 Abort	InstallerWindow		Afbreken
 Finishing Installation.	InstallProgress		Installatie wordt beëindigd.
 \tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <uw favoriete editor> /etc/default/grub\n\n
+Restart	InstallerWindow		Herstarten
 README	InstallerApp		LEESMIJ
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		De doelschijf heeft mogelijk niet genoeg ruimte. Probeer een andere schijf te kiezen, of kies ervoor om geen optionele items te installeren.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Sluit alstublieft de vensters van Boot Manager en DriveSetup, voordat u het Installer-venster sluit.
@@ -62,6 +63,7 @@ Unknown Type	InstallProgress	Partition content type	Onbekend Type
 \t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
 You'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\n	InstallerApp		U zult opmerken dat GRUB een andere naamgevingsstrategie voor harde schijven gebruikt dan Linux.\n\n
 \"n\" is the partition number, also starting with \"0\".\n	InstallerApp		\"n\" is het partitienummer, ook beginnend met \"0\".\n
+Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Installatie voltooid. Bootsector werd naar '%s' geschreven. Klik op Herstarten om de computer opnieuw op te starten of kies een nieuw doelvolume om een andere installatie uit te voeren.
 Installation canceled.	InstallProgress		Installatie geannuleerd.
 Installer	System name		Installatieprogramma
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		U kunt de inhoud van een schijf niet op zichzelf installeren. Kies alstublieft een andere schijf.

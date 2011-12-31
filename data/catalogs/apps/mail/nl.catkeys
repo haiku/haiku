@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Be-MAIL	361254796
+1	dutch; flemish	x-vnd.Be-MAIL	4254685853
 View	Mail		Bekijken
 %d - Date	Mail		%d - Datum
 Attach attributes:	Mail		Attributen bijvoegen:
@@ -11,9 +11,11 @@ Print	Mail		Afdrukken
 New mail message	Mail		Nieuw mailbericht
 Automatic	Mail		Automatisch
 Automatically mark mail as read:	Mail		Automatisch markeren als gelezen:
+helpful message	Mail		nuttig bericht
 Colored quotes:	Mail		Quotes in kleur:
 Subject:	Mail		Onderwerp:
 Reply to all	Mail		Allen beantwoorden
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Bijlage: %name% (Type: %type%)
 Show icons & labels	Mail		Toon iconen & tekst
 Remove attachment	Mail		Verwijder bijlage
 Button bar:	Mail		Knoppenbalk:
@@ -33,6 +35,7 @@ Your main text contains %ld unencodable characters. Perhaps a different characte
 Signature:	Mail		Onderschrift:
 Save changes to this signature?	Mail		Veranderingen aan dit onderschrift opslaan?
 Cc:	Mail		Cc:
+Off	Mail		Uit
 Find	Mail		Zoeken
 Preferences…	Mail		Voorkeuren...
 Undo	Mail		Ongedaan maken
@@ -54,6 +57,7 @@ Hide	Mail		Verbergen
 Forward without attachments	Mail		Doorsturen zonder bijlagen
 Previous	Mail		Vorige
 Redo	Mail		Herstellen
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku-tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
 Add enclosure…	Mail		Bijlage toevoegen...
 Mail	System name		Mail
 Print…	Mail		Afdrukken…
@@ -139,6 +143,7 @@ The mail_daemon could not be started:\n\t	Mail		De mail_daemon kon niet worden g
 Open attachment	Mail		Bijlage openen
 sent	B_USER_DIRECTORY/mail/sent		verzonden
 (Date unavailable)	Mail		(Datum niet beschikbaar)
+Put your favorite e-mail queries and query templates in this folder.	Mail		Plaats je favoriete e-mailqueries en querysjablonen in deze map.
 Reply	Mail		Beantwoorden
 From:	Mail		Van:
 Couldn't open this signature. Sorry.	Mail		Kon dit onderschrift niet openen. Sorry.

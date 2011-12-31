@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.haiku-icon_o_matic	1966575707
+1	dutch; flemish	x-vnd.haiku-icon_o_matic	3736361491
 Select All	Icon-O-Matic-PathManipulator		Alles selecteren
 Add Style	Icon-O-Matic-AddStylesCmd		Stijl toevoegen
 Color (#%02x%02x%02x)	Style name after dropping a color		Kleur (#02x%02x%02x)
@@ -11,7 +11,9 @@ None	Icon-O-Matic-Properties		Geen
 New	Icon-O-Matic-Menu-File		Nieuw
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Tijdens het laden heeft Icon-O-Matic mogelijk niet alle data van de SVG geïnterpreteerd. Door het originele bestand te overschrijven, zou deze informatie nu verloren zijn.
 Paste Properties	Icon-O-Matic-Properties		Plak-eigenschappen
+Stroke	Transformation		Streek
 Save Icon	Dialog title		Icoon opslaan
+Closed	Icon-O-Matic-PropertyNames		Gesloten
 Remove Path	Icon-O-Matic-RemovePathsCmd		Pad verwijderen
 Add shape with path	Icon-O-Matic-Menu-Shape		Pad met vorm toevoegen
 Select	Icon-O-Matic-Properties		Selecteren
@@ -27,6 +29,7 @@ Move	Icon-O-Matic-TransformationBoxStates		Verplaatsen
 Flip Control Points	Icon-O-Matic-FlipPointsCmd		Controlepunten omwisselen
 warning	Icon-O-Matic-SVGExport		waarschuwing
 Copy	Icon-O-Matic-Properties		Kopiëren
+Miter Limit	Icon-O-Matic-PropertyNames		Hoekslimiet
 OK	Icon-O-Matic-ColorPicker		Oké
 Remove Control Point	Icon-O-Matic-RemovePointsCmd		Controlepunt verwijderen
 Bleep!	Exporter - Continue in error dialog		Bliep!
@@ -34,33 +37,47 @@ Add circle	Icon-O-Matic-PathsList		Cirkel toevoegen
 Shorten	Icon-O-Matic-PropertyNames		Afkorten
 bad news	Title of error alert		slecht nieuws
 Remove Paths	Icon-O-Matic-RemovePathsCmd		Paden verwijderen
+Scale Y	Icon-O-Matic-PropertyNames		Y-schaal
 Add Control Point	Icon-O-Matic-AddPointCmd		Controlepunt toevoegen
+Untitled	Icon-O-Matic-Main		Naamloos
+Multi Set 	Multi Set (property name)		Meervoudige Set
+any of the other lists to	Empty property list - 2nd line		een van de andere lijsten om
 Save as…	Icon-O-Matic-Menu-File		Opslaan als...
 Change Color	Icon-O-Matic-SetColorCmd		Kleur veranderen
 Style	Icon-O-Matic-Menus		Stijl
 <modify path>	Icon-O-Matic-PathCmd		<pad aanpassen>
 Opening the icon failed!	Icon-O-Matic-Main		Openen van het icoon is mislukt!
 Error: 	Icon-O-Matic-Main		Fout:
+Rotate indices backwards	Icon-O-Matic-PathsList		Indices achterwaarts roteren
 Name	Icon-O-Matic-PropertyNames		Naam
 bad news	Icon-O-Matic-Exporter		slecht nieuws
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<niets om ongedaan te maken>
+Off	Icon-O-Matic-Menu-Settings		Uit
+Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Vorm bevriezen
+PNG Set	Icon-O-Matic-SavePanel		PNG Set
 Joins	Icon-O-Matic-PropertyNames		Hechtpunten
 Remove Style	Icon-O-Matic-RemoveStylesCmd		Stijl verwijderen
+Scale X	Icon-O-Matic-PropertyNames		X-schaal
 Set 	Set (property name)		Instellen
 Cancel	Icon-O-Matic-SVGExport		Annuleren
 Add shape with style	Icon-O-Matic-Menu-Shape		Vorm met stijl toevoegen
 Remove Shape	Icon-O-Matic-RemoveShapesCmd		Vorm verwijderen
+Reverse	Icon-O-Matic-PathsList		Omgekeerd
+HVIF Source Code	Icon-O-Matic-SavePanel		HVIF-broncode
 Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Transformaties opnieuw instellen
+All	Icon-O-Matic-Properties		Alle
 Multi Paste Properties	Icon-O-Matic-Properties		Eigenschappen van meervoudig plakken
 Undo	Icon-O-Matic-Main		Ongedaan maken
 Click on a shape above	Empty transformers list - 1st line		Klik op een vorm hierboven
 Add Shape	Icon-O-Matic-AddShapesCmd		Vorm toevoegen
+Contour	Transformation		Contour
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<niets om opnieuw te doen>
 Perspective	Transformation		Perspectief
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Transformator verplaatsen
 Opacity	Icon-O-Matic-PropertyNames		Opaciteit
 Add with path	Icon-O-Matic-ShapesList		Toevoegen met pad
 Gradient type	Icon-O-Matic-StyleTypes		Gradiënttype
+Icon-O-Matic	System name		Icon-O-Matic
 Cancel	Icon-O-Matic-Menu-Settings		Annuleren
 Modify Control Point	Icon-O-Matic-ChangePointCmd		Controlepunt aanpassen
 Saving your document failed!	Icon-O-Matic-Exporter		Opslaan van uw document is mislukt!
@@ -69,6 +86,8 @@ Split	Icon-O-Matic-PathManipulator		Splitsen
 Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Controlepunten benaderen
 Remove	Icon-O-Matic-StylesList		Verwijderen
 Add with path & style	Icon-O-Matic-ShapesList		Toevoegen met pad en stijl
+META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON-attribuut
+Translation Y	Icon-O-Matic-PropertyNames		Y-verschuiving
 Rotate	Icon-O-Matic-TransformationBoxStates		Roteren
 Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Verwijder Omzetter
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Pad-indices roteren
@@ -78,6 +97,9 @@ Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Controlepunt benaderen
 Pick a color	Icon-O-Matic-ColorPicker		Kleur kiezen
 Quit	Icon-O-Matic-Menu-File		Afsluiten
 Export	Icon-O-Matic-Menu-File		Exporteren
+No	Icon-O-Matic-StyledTextImport		Nee
+Save changes to current icon?	Icon-O-Matic-Menu-Settings		Wijzigingen voor het huidige icoon opslaan?
+Rotate indices forwards	Icon-O-Matic-PathsList		Indices voorwaarts roteren
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Pad ontzeggen
 load error	Icon-O-Matic-SVGImport		laadfout
 Move Shapes	Icon-O-Matic-MoveShapesCommand		Vormen verplaatsen
@@ -93,24 +115,38 @@ Perspective	Icon-O-Matic-TransformersList		Perspectief
 Add shape with path & style	Icon-O-Matic-Menu-Shape		Vorm met pad & stijl toevoegen
 Gradient	Icon-O-Matic-StyleTypes		Gradiënt
 Min LOD	Icon-O-Matic-PropertyNames		Min. LOD
+BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON-attribuut
 Invert selection	Icon-O-Matic-Properties		Selectie omkeren
 Export as…	Icon-O-Matic-Menu-File		Exporteren als...
 Transformation	Transformation		Transformatie
+Click on an object in	Empty property list - 1st line		Klik op een object in
+Move Transformers	Icon-O-Matic-MoveTransformersCmd		Transformators verplaatsen
+Move Styles	Icon-O-Matic-MoveStylesCmd		Stijlen verplaatsen
 Reset transformation	Icon-O-Matic-StylesList		Transformatie opnieuw instellen
 Max LOD	Icon-O-Matic-PropertyNames		Max. LOD
+Transformer	Icon-O-Matic-Menus		Transformator
+Flip	Icon-O-Matic-PathManipulator		Spiegelen
 Conic	Icon-O-Matic-StyleTypes		Kegelvormig
+Split Control Points	Icon-O-Matic-SplitPointsCmd		Controlepunten splitsen
 Save	Icon-O-Matic-Menu-Settings		Opslaan
+Add empty	Icon-O-Matic-ShapesList		Lege toevoegen
+Close	Icon-O-Matic-Menu-File		Sluiten
 Cancel	Icon-O-Matic-ColorPicker		Annuleren
 Paste	Icon-O-Matic-Properties		Plakken
 Shape	Icon-O-Matic-Menus		Vorm
+Translation X	Icon-O-Matic-PropertyNames		X-verschuiving
 Properties	Icon-O-Matic-Menus		Eigenschappen
+Move Pivot	Icon-O-Matic-TransformationBoxStates		Pivot verplaatsen
 Path	Icon-O-Matic-Menus		Pad
+Freeze transformation	Icon-O-Matic-ShapesList		Transformatie bevriezen
 File	Icon-O-Matic-Menus		Bestand
 Error: 	Icon-O-Matic-Exporter		Fout:
 Add Transformers	Icon-O-Matic-AddTransformersCmd		Omzetters toevoegen
 Diamond	Icon-O-Matic-StyleTypes		Diamantvormig
 Path	Icon-O-Matic-PropertyNames		Pad
 Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Kon het bestand '%s' niet als SVG-document openen.\n\nFout: %s
+Discard	Icon-O-Matic-Menu-Settings		Verwerpen
+Swatches	Icon-O-Matic-Menus		Paletten
 <unavailable>	Icon-O-Matic-StyleTypes		<onbeschikbaar>
 Rotation	Icon-O-Matic-PropertyNames		Rotatie
 Add with style	Icon-O-Matic-ShapesList		Toevoegen met stijl
@@ -122,8 +158,10 @@ Snap to grid	Icon-O-Matic-Menu-Settings		Naar rasterpunten
 Remove	Icon-O-Matic-ShapesList		Verwijderen
 Yes	Icon-O-Matic-StyledTextImport		Ja
 Transformation	Icon-O-Matic-TransformersList		Transformatie
+Save image	Icon-O-Matic-SavePanel		Afbeelding opslaan
 Add Styles	Icon-O-Matic-AddStylesCmd		Stijlen toevoegen
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		Controlepunten verwijderen
+Format	Icon-O-Matic-SavePanel		Opmaak
 Add rect	Icon-O-Matic-PathsList		Rechthoek toevoegen
 Edit	Icon-O-Matic-Menus		Aanpassen
 Duplicate	Icon-O-Matic-StylesList		Dupliceren
@@ -136,10 +174,13 @@ Assign Style	Icon-O-Matic-AssignStyleCmd		Stijl toekennen
 Add Path	Icon-O-Matic-AddPathsCmd		Pad toevoegen
 Color	Icon-O-Matic-PropertyNames		Kleur
 Insert Control Point	Icon-O-Matic-InsertPointCmd		Controlepunt invoegen
+Flip Control Point	Icon-O-Matic-FlipPointsCmd		Controlepunt spiegelen
 Redo	Icon-O-Matic-Main		Opnieuw doen
 Assign Paths	Icon-O-Matic-AddPathsCmd		Paden toekennen
 OK	Icon-O-Matic-SVGImport		Oké
 Multi paste	Icon-O-Matic-Properties		Meervoudig plakken
+to attach transformers.	Empty transformers list - 2nd line		om transformators toe te voegen.
+Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Transformatie herstellen
 Reverse Path	Icon-O-Matic-ReversePathCmd		Pad omkeren
 Scale	Icon-O-Matic-TransformationBoxStates		Schaal veranderen
 Duplicate	Icon-O-Matic-PathsList		Dupliceren
@@ -147,12 +188,14 @@ Save	Icon-O-Matic-Menu-File		Opslaan
 Append…	Icon-O-Matic-Menu-File		Toepassen...
 Move Path	Icon-O-Matic-MovePathsCmd		Pad verplaatsen
 Overwrite	Icon-O-Matic-SVGExport		Overschrijven
+Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Vormen bevriezen
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Controlepunt splitsen
 Open…	Icon-O-Matic-Menu-File		Openen...
 Options	Icon-O-Matic-Menus		Opties
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Kleur (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Gradiënt aanpassen
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Pad opruimen
+Rounding	Icon-O-Matic-PropertyNames		Afronding
 Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Vormen verwijderen
 Clean up	Icon-O-Matic-PathsList		Opruimen
 Detect Orient.	Icon-O-Matic-PropertyNames		Oriëntatie opmerken.

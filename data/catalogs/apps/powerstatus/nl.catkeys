@@ -1,23 +1,31 @@
-1	dutch; flemish	x-vnd.Haiku-PowerStatus	4203845861
+1	dutch; flemish	x-vnd.Haiku-PowerStatus	3419486861
 Design capacity low warning: 	PowerStatus		Waarschuwing lage ontwerpcapaciteit:
 Show percent	PowerStatus		Toon percentage
 Design capacity: 	PowerStatus		Ontwerpcapaciteit
+ mW	PowerStatus		mW
 Type: 	PowerStatus		Type:
 non-rechargeable	PowerStatus		Niet-oplaadbaar
 Empty battery slot	PowerStatus		Accuvak is leeg
+ mV	PowerStatus		mV
 Run in window	PowerStatus		Actief in venster
 About	PowerStatus		over
+PowerStatus	System name		PowerStatus
+PowerStatus	PowerStatus		PowerStatus
+ mWh	PowerStatus		mWh
 Battery info…	PowerStatus		Accu-info...
+Damaged battery	PowerStatus		Beschadigde batterij
 Show time	PowerStatus		Toon de tijd
 Last full charge: 	PowerStatus		Laatst compleet opgeladen:
 Battery unused	PowerStatus		Accu ongebruikt
 Extended battery info	PowerStatus		Uitgebreide accu-informatie
+ mA	PowerStatus		mA
 Current rate: 	PowerStatus		Huidige stroom:
 discharging	PowerStatus		Bezig met ontladen
 Show text label	PowerStatus		Toon tekstlabel
 About…	PowerStatus		Over...
 Model number: 	PowerStatus		Modelnummer
 Install in Deskbar	PowerStatus		Installeer in Deskbar
+ mAh	PowerStatus		mAh
 Capacity: 	PowerStatus		Capaciteit
 Battery discharging	PowerStatus		Accu bezig met ontladen
 Serial number: 	PowerStatus		Serienummer:

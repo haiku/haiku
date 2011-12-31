@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-ShowImage	3102627336
+1	dutch; flemish	x-vnd.Haiku-ShowImage	886873119
 Use as background…	Menus		Gebruik als achtergrond…
 File	Menus		Bestand
 Slide delay	Menus		Dia-vertraging
@@ -21,10 +21,13 @@ Edit	Menus		Aanpassen
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		De afbeelding kon niet geladen worden! Het bestand bestaat mogelijk niet, of er bestaat geen afbeeldings-omzetter voor.
 First page	Menus		Eerste pagina
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Het document '%s' (pagina %d) werd veranderd. Wilt u het document sluiten?
+%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS seconden
+Leave full screen	Menus		Volledig scherm verlaten
 Close	Menus		Sluiten
 Close	ClosePrompt		Sluit
 Undo	Menus		Ongedaan maken
 Resize to (in 1/72 inches):	PrintOptionsWindow		Omvormen naar (in eenheden van 1/72 inch):
+Rating	Menus		Waardering
 Flip left to right	Menus		Omklappen van links naar rechts
 Show caption in full screen mode	Menus		Toon opschrift in volledig-scherm-modus
 DPI:	PrintOptionsWindow		DPI:
@@ -35,6 +38,7 @@ Close document	ClosePrompt		Sluit document
 Height: 	PrintOptionsWindow		Hoogte:
 The file '%s' could not be written.	SaveToFile		Bestand '%s' kon niet geschreven worden.
 Cancel	ClosePrompt		Annuleren
+Show tool bar	Menus		Werkbalk tonen
 Fit to window	Menus		Tot venster passend maken
 Print options	PrintOptionsWindow		Afdrukopties
 Copy	Menus		Kopiëren
@@ -42,6 +46,7 @@ Progress monitor	ProgressWindow		Voortgangsmonitor
 Last page	Menus		Laatste pagina
 Stretch to window	Menus		Uitrekken tot venster
 Previous file	Menus		Vorige bestand
+ShowImage	System name		ShowImage
 Slide show	Menus		Diashow
 Fit image to page	PrintOptionsWindow		Afbeelding inpassen tot pagina
 Flip top to bottom	Menus		Omklappen van boven naar beneden

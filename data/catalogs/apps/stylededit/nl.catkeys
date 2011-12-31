@@ -1,4 +1,5 @@
-1	dutch; flemish	x-vnd.Haiku-StyledEdit	2071192997
+1	dutch; flemish	x-vnd.Haiku-StyledEdit	1508367857
+StyledEdit	System name		StyledEdit
 Paste	Menus		Plakken
 OK	LoadAlert		Oké
 File	Menus		Bestand
@@ -33,6 +34,7 @@ Font	Menus		Lettertype
 Replace all	FindandReplaceWindow		Alles vervangen
 Statistics…	Menus		Statistieken...
 Default	Open_and_SaveAsPanel		Standaard
+Replace next	Menus		Volgende vervangen
 Cancel	FindandReplaceWindow		Annuleren
 Close	Menus		Sluiten
 Save	SaveAlert		Opslaan
@@ -55,6 +57,7 @@ Bold	Menus		Vet
 Find selection	Menus		Selectie vinden
 Find:	FindandReplaceWindow		Vind:
 Error saving \"%s\":\n%s	SaveAlert		Fout bij opslaan van \"%s\":\n%s
+Copy	Menus		Kopiëren
 Cut	Menus		Knippen
 Replace	FindandReplaceWindow		Vervangen
 Find again	Menus		Opnieuw zoeken

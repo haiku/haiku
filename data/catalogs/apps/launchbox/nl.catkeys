@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-LaunchBox	2160711892
+1	dutch; flemish	x-vnd.Haiku-LaunchBox	3016105370
 New	LaunchBox		Nieuw
 Set description…	LaunchBox		Naamgeving...
 Vertical layout	LaunchBox		Verticale lay-out
@@ -7,6 +7,7 @@ Pad 1	LaunchBox		Balk 1
 last chance	LaunchBox		laatste kans
 Quit	LaunchBox		Afsluiten
 Clear button	LaunchBox		Knop leegmaken
+LaunchBox	System name		LaunchBox
 Ignore double-click	LaunchBox		Negeer dubbelklik
 Auto-raise	LaunchBox		Automatisch bovenop
 Show on all workspaces	LaunchBox		Toon in alle werkplekken
@@ -17,11 +18,14 @@ Bummer	LaunchBox		Pech hebben
 Cancel	LaunchBox		Annuleren
 Remove button	LaunchBox		Knop verwijderen
 Horizontal layout	LaunchBox		Horizontale lay-out
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nHet starten van de applicatie met handtekening '%2' is mislukt.\n\nFout:
 Failed to launch '%1'.\n\nError:	LaunchBox		zie vorige
 Name Panel	LaunchBox		Naampaneel
 Add button here	LaunchBox		Voeg hier knop toe
 Description for '%3'	LaunchBox		Beschrijving voor '%3'
 Settings	LaunchBox		Instellingen
+Failed to launch 'something', error in Pad data.	LaunchBox		Het starten van 'iets' is mislukt, fout in Paddata.
+Pad %1	LaunchBox		Balk %1
 Close	LaunchBox		Sluiten
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		'Open map'-commando kon niet naar Tracker gestuurd worden.\n\nError: 
 You can drag an icon here.	LaunchBox		Hierheen kunt u een icoon slepen.

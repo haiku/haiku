@@ -1,8 +1,12 @@
-1	dutch; flemish	x-vnd.Haiku-PackageInstaller	3379682852
+1	dutch; flemish	x-vnd.Haiku-PackageInstaller	3054356223
 Install to:	PackageView		Installeren naar:
 OK	PackageView		OK
 Accept	PackageTextViewer		Akkoord
 Continue	PackageInstall		Doorgaan
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Het gevraagde pakket kon nog worden geïnstalleerd op uw systeem. Dit zou een probleem met het doelpakket kunnen zijn. Gelieve dit probleem te controleren met de distributeur.
+Image not loaded correctly	PackageImageViewer		De afbeelding werd niet correct geladen
 Install 	PackageView		Installeren
 No package selected.	PackageInfo		Geen pakket geselecteerd.
 Install	PackageView		Installeren
+Continue	PackageInfo		Doorgaan
+Continue	PackageTextViewer		Doorgaan

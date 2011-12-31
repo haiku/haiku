@@ -1,7 +1,8 @@
-1	dutch; flemish	x-vnd.Haiku-InstalledPackages	148986533
+1	dutch; flemish	x-vnd.Haiku-InstalledPackages	4131220089
 No package selected.	UninstallView		Geen pakket geselecteerd
 Remove	UninstallView		Verwijderen
 Package description	UninstallView		Beschrijving pakket
+InstalledPackages	System name		InstalledPackages
 The package you selected has been successfully removed from your system.	UninstallView		Het pakket dat u hebt geselecteerd, werd met succes van uw systeem verwijderd.
 OK	UninstallView		Oké
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Het geselecteerde pakket werd niet verwijderd van uw systeem. Het informatiebestand van het geïnstalleerde pakket kan misschien beschadigd zijn.

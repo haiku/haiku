@@ -1,17 +1,25 @@
-1	dutch; flemish	x-vnd.Haiku-MediaConverter	2584540201
+1	dutch; flemish	x-vnd.Haiku-MediaConverter	296071315
+Video using parameters form settings	MediaConverter		Video gebruik makend van de gespecifieerde instellingen
+Video encoding:	MediaConverter		Videocodering:
 No audio	Audio codecs list		Geen audio
 Error	MediaConverter		Fout
 Error loading a file	MediaConverter		Fout bij het laden van een bestand
 File Error	MediaConverter-FileInfo		Bestandsfout
 Open…	Menu		Openen ...
 Start [ms]: 	MediaConverter		Start [ms]:
+Output file '%filename' created	MediaConverter		Uitvoerbestand '%filename' gemaakt
 Output format	MediaConverter		Uitvoerformaat
+%.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stereo / %lld frames
 End   [ms]: 	MediaConverter		Einde [ms]:
 MediaConverter	System name		MediaConverter
 No video	Video codecs list		Geen video
 Duration:	MediaConverter-FileInfo		Duur:
 OK	MediaConverter		OK
+Error writing audio frame %Ld	MediaConverter		Fout bij het schrijven van audioframe %Ld
+Error converting '%filename'	MediaConverter		Fout bij het omzetten van '%filename'
 Low	MediaConverter		Laag
+Conversion completed	MediaConverter		Conversie voltooid
+Audio:	MediaConverter-FileInfo		Audio:
 OK	MediaConverter-FileInfo		OK
  seconds	MediaFileInfo		seconden
 Source files	MediaConverter		Bronbestanden
@@ -20,17 +28,41 @@ Cancelling	MediaConverter		Annuleren
 Error loading files	MediaConverter		Fout bij het laden van bestanden
 Cancel	MediaConverter		Annuleren
 None available	Video codecs		Geen beschikbaar
+Conversion cancelled	MediaConverter		Omzetting geannuleerd
+No file selected	MediaConverter-FileInfo		Geen bestand geselecteerd
+Error writing video frame %Ld	MediaConverter		Fout bij het schrijven van videoframe %Ld
+Select this folder	MediaConverter		Deze map selecteren
 Continue	MediaConverter		Voortzetten
 Encoder parameters	MediaConverter-EncoderWindow		Parameters van de encoder
+Video:	MediaConverter-FileInfo		Video:
+%u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2ffps / %Ld frames
 %d bit 	MediaFileInfo		%d bit
+Error creating '%filename'	MediaConverter		Fout bij het aanmaken van '%filename'
 Video quality not supported	MediaConverter		Videokwaliteit niet ondersteund
+Cancelling…	MediaConverter		Wordt geannuleerd...
 File details	MediaConverter		Bestandsdetails
 Select	MediaConverter		Selecteren
+Writing video track: %ld%% complete	MediaConverter		Schrijven van videospoor: %ld%% voltooid
 Quit	Menu		Afsluiten
 Preview	MediaConverter		Voorbeeld
 File format:	MediaConverter		Bestandsformaat:
 None available	Audio codecs		Geen beschikbaar
+MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:OpslagMap
+Error read audio frame %Ld	MediaConverter		Fout bij het lezen van audioframe %Ld
+%.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld kanaal / %lld frames
+Error launching: %strError%	MediaConverter		Fout bij het starten: %strError%
 High	MediaConverter		Hoog
+The file was not recognized as a supported media file:	MediaConverter		Het bestand werd niet herkend als een ondersteund mediabestand:
+Drop media files onto this window	MediaConverter		Sleep mediabestanden naar dit venster
 Audio encoding:	MediaConverter		Audiocodering:
 Audio quality not supported	MediaConverter		Geluidskwaliteit wordt niet ondersteund
 File	Menu		Bestand
+Convert	MediaConverter		Converteren
+Writing audio track: %ld%% complete	MediaConverter		Schrijven van audiospoor: %ld%% voltooid
+Video quality: %3d%%	MediaConverter		Videokwaliteit: %3d%%
+Output folder	MediaConverter		Uitvoermap
+Audio quality: %3d%%	MediaConverter		Audiokwaliteit: %3d%%
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Er is een fout opgetreden bij het lezen van de bestandsinformatie.\n\nFout:
+Error read video frame %Ld	MediaConverter		Fout bij het lezen van videoframe %Ld
+%amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles bestanden werden niet herkend als ondersteunde mediabestanden:
+%.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld frames

@@ -1,5 +1,7 @@
-1	dutch; flemish	x-vnd.Haiku.TextSearch	2369757330
+1	dutch; flemish	x-vnd.Haiku.TextSearch	1180598828
+%s: Not enough room to escape the filename.	Grepper		%s: Niet genoeg ruimte om de bestandsnaam om te vormen.
 Trim to selection	GrepWindow		Beperken tot selectie
+Follow symbolic links	GrepWindow		Symbolische koppelingen volgen
 Close	GrepWindow		Sluiten
 Cancel	GrepWindow		Annuleren
 The unselected files will be removed from the list.	GrepWindow		De niet-geselecteerde bestanden zullen van de lijst verwijderd worden.
@@ -12,11 +14,13 @@ Select all	GrepWindow		Alles selecteren
 OK	GrepWindow		Oké
 Skip folders starting with a dot	GrepWindow		Mappen overslaan die met een punt (.) beginnen
 %APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME kon één of meerdere mappen niet openen
+Escape search text	GrepWindow		Zoektekst omvormen
 Search	GrepWindow		Zoeken
 Open selection	GrepWindow		Selectie openen
 Look in sub-folders	GrepWindow		In submappen zoeken
 Actions	GrepWindow		Acties
 File	GrepWindow		Bestand
+Encoding	GrepWindow		Codering
 History	GrepWindow		Geschiedenis
 %s: There was a problem running grep.	Grepper		%s: Er was een probleem bij het uitvoeren van grep.
 New window	GrepWindow		Nieuw venster

@@ -1,13 +1,16 @@
-1	dutch; flemish	x-vnd.Haiku-MediaPlayer	3131325102
+1	dutch; flemish	x-vnd.Haiku-MediaPlayer	138551800
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikaans)
 Stream settings	MediaPlayer-Main		Stream-instellingen
 <unknown>	PlaylistItem-album		<onbekend>
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Het bestand '%filename' kon niet geopend worden.\n\n
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Besturingselementen schalen in modus volledig scherm
+Subtitle size:	MediaPlayer-SettingsWindow		Grootte van de ondertitels:
 Save Playlist	MediaPlayer-PlaylistWindow		Afspeellijst bewaren
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Geen van de bestanden die u wilde afspelen lijken mediabestanden te zijn.
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Opslaan van de afspeellijst is mislukt.\n\nFout:
 New player…	MediaPlayer-Main		Nieuwe speler...
 100% scale	MediaPlayer-Main		100% schaal
+Subtitle placement:	MediaPlayer-SettingsWindow		Positie van de ondertitels:
 Close	MediaPlayer-Main		Afsluiten
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Sommige bestanden konden niet naar Trash worden verplaatst.
 Open	MediaPlayer-Main		Openen
@@ -24,9 +27,12 @@ Use hardware video overlays if available	MediaPlayer-SettingsWindow		Gebruik waa
 File info…	MediaPlayer-Main		Bestandsinfo...
 Pause playback.	MediaPlayer-Main		Afspelen pauzeren.
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Onderdeel verwijderen
+Close window after playing audio	MediaPlayer-SettingsWindow		Het venster sluiten na het afspelen van de audio
 Full volume	MediaPlayer-SettingsWindow		Maximaal volume
 Drop files to play	MediaPlayer-Main		Bestanden verslepen om af te spelen
+TogglePlaying	MediaPlayer-Main		SpelenSchakelen
 Cancel	MediaPlayer-SettingsWindow		Annuleren
+Loop audio	MediaPlayer-SettingsWindow		Audio herhalen
 Nothing to Play	MediaPlayer-Main		Niets om af te spelen
 Muted	MediaPlayer-SettingsWindow		Geluid uit
 Quit	MediaPlayer-Main		Afsluiten
@@ -41,6 +47,7 @@ Move Entries	MediaPlayer-MovePLItemsCmd		Onderdelen verplaatsen
 Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Fout bij het verplaatsen naar Trash
 Audio	MediaPlayer-Main		Audio
 Open Playlist	MediaPlayer-PlaylistWindow		Afspeellijst openen
+MediaPlayer	System name		Mediaspeler
 OK	MediaPlayer-Main		Oké
 Settings…	MediaPlayer-Main		Instellingen...
 MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer-instellingen
@@ -51,6 +58,9 @@ Stop playing.	MediaPlayer-Main		Stop afspelen.
 Error: 	MediaPlayer-RemovePLItemsCmd		Fout:
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interne fout (misvormd bericht). Opslaan van de afspeellijst is mislukt.
 Skip to the previous track.	MediaPlayer-Main		Overslaan tot de vorige track.
+%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		Er trad een interne fout op bij %app%. Het bestand kon niet geopend worden.
+Close window after playing video	MediaPlayer-SettingsWindow		Het venster sluiten na het afspelen van video
+Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Films vloeiend schalen (modus zonder overlapping)
 OK	MediaPlayer-RemovePLItemsCmd		Oké
 50% scale	MediaPlayer-Main		50% schaal
 Subtitles	MediaPlayer-Main		Ondertitels
@@ -59,6 +69,7 @@ Volume	MediaPlayer-Main		Volume
 Audio track	MediaPlayer-Main		Audiotrack
 Import Entries	MediaPlayer-ImportPLItemsCmd		Onderdelen importeren
 Pause	MediaPlayer-Main		Pauzeer
+No aspect correction	MediaPlayer-Main		Geen aspectcorrectie
 Automatically start playing	MediaPlayer-SettingsWindow		Automatisch beginnen met afspelen
 Track	Video Track Menu		Track
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interne fout (vastzetten is mislukt). Opslaan van de afspeellijst is mislukt.
@@ -66,6 +77,7 @@ View options	MediaPlayer-SettingsWindow		Weergave-opties
 Play mode	MediaPlayer-SettingsWindow		Afspeelmodus
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Onderdelen verwijderen
 Video track	MediaPlayer-Main		Videotrack
+Loop video	MediaPlayer-SettingsWindow		Video herhalen
 Attributes	MediaPlayer-Main		Attributen
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Niet alle bestanden konden Trash in.
 <untitled>	PlaylistItem-title		<zonder titel>
@@ -81,10 +93,12 @@ Error: 	MediaPlayer-Main		Fout:
 Large	MediaPlayer-SettingsWindow		Groot
 Bottom of video	MediaPlayer-SettingsWindow		Onderaan video
 Stop	MediaPlayer-Main		Stoppen
+Volume of background clips	MediaPlayer-SettingsWindow		Volume van achtergrondclips
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interne fout (opgeraakt geheugen). Opslaan van de afspeellijst is mislukt.
 Hide interface	MediaPlayer-Main		Interface niet tonen
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Onderdeel kopiëren
 none	Subtitles menu		geen
+Move file to Trash	MediaPlayer-PlaylistWindow		Bestand naar de prullenbak verplaatsen
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		Geen geluid
 Toggle pause/play.	MediaPlayer-Main		Schakelen tussen pauzeren/afspelen.
@@ -96,6 +110,7 @@ Revert	MediaPlayer-SettingsWindow		Herstellen
 Edit	MediaPlayer-PlaylistWindow		Aanpassen
 Start media server	MediaPlayer-Main		Start mediaserver
 <unnamed>	PlaylistItem-name		<naamloos>
+Open Clips	MediaPlayer-Main		Clips openen
 OK	MediaPlayer-PlaylistWindow		Oké
 none	Audio track menu		geen
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Volume (0.0-2.0) ophalen/instellen
