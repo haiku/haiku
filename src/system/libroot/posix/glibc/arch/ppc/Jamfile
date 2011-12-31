@@ -132,7 +132,6 @@ MergeObject posix_gnu_arch_$(TARGET_ARCH)_other.o :
 	ldbl2mpn.c
 	lshift.S rshift.S
 	mul_1.S
-	strlen.S
 	sub_n.S
 	submul_1.S
 
