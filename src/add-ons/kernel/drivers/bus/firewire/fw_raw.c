@@ -122,7 +122,7 @@ TRACE("fwdev_allocbuf %d\n", b->psize*b->nchunk*b->npacket);
 	STAILQ_INIT(&q->stdma);
 	q->stproc = NULL;
 
-	for(i = 0 ; i < q->bnchunk; i++){
+	for (i = 0 ; i < q->bnchunk; i++) {
 		q->bulkxfer[i].poffset = i * q->bnpacket;
 		//q->bulkxfer[i].mbuf = NULL; //to be completed when find mbuf's counterpart
 		STAILQ_INSERT_TAIL(&q->stfree, &q->bulkxfer[i], link);
@@ -161,7 +161,7 @@ fw_open (const char *name, uint32 flags, void **cookie)
 	struct firewire_softc *sc = NULL;
 	
 	*cookie = NULL;
-	for (i=0; i<devices_count; i++) {
+	for (i = 0; i < devices_count; i++) {
 		if (strcmp(name, devices[i]) == 0) {
 			count = i;
 			break;
@@ -198,7 +198,7 @@ fw_open (const char *name, uint32 flags, void **cookie)
 	STAILQ_INIT(&d->binds);
 	STAILQ_INIT(&d->rq);
 	d->rqSem = create_sem(0, "fw_raw rq");
-	if(d->rqSem < B_OK){
+	if (d->rqSem < B_OK) {
 		dprintf("fwraw: failed creating rq semaphore\n");
 		free(*cookie);
 		return B_ERROR;
@@ -272,8 +272,7 @@ fw_free(void *cookie)
 		}
 		/* free extbuf */
 		fwdev_freebuf(it);
-		it->flag &= ~(FWXFERQ_OPEN |
-			FWXFERQ_MODEMASK | FWXFERQ_CHTAGMASK);
+		it->flag &= ~(FWXFERQ_OPEN | FWXFERQ_MODEMASK | FWXFERQ_CHTAGMASK);
 		d->it = NULL;
 	}
 	free(d);
@@ -297,10 +296,11 @@ fw_read_async(struct fw_drv1 *d, off_t position, void *buf, size_t *num_bytes)
 	*num_bytes = 0;
 
 	FW_GLOCK(d->fc);
-	while ((xfer = STAILQ_FIRST(&d->rq)) == NULL && err == B_OK){
+	while ((xfer = STAILQ_FIRST(&d->rq)) == NULL && err == B_OK) {
 		//err = msleep(&d->rq, FW_GMTX(d->fc), FWPRI, "fwra", 0);
 		FW_GUNLOCK(d->fc);
-		err = acquire_sem_etc(d->rqSem, 1, B_CAN_INTERRUPT | B_TIMEOUT, B_INFINITE_TIMEOUT);//B_INFINITE_TIMEOUT means no timeout?
+		err = acquire_sem_etc(d->rqSem, 1, B_CAN_INTERRUPT | B_TIMEOUT,
+			B_INFINITE_TIMEOUT);//B_INFINITE_TIMEOUT means no timeout?
 		FW_GLOCK(d->fc);
 	}
 
@@ -323,14 +323,14 @@ fw_read_async(struct fw_drv1 *d, off_t position, void *buf, size_t *num_bytes)
 	tinfo = &xfer->fc->tcode[fp->mode.hdr.tcode];
 //	err = uiomove((void *)fp, tinfo->hdr_len, uio);
 	len = tinfo->hdr_len;
-	len = MIN(len, pbytes);	
+	len = MIN(len, pbytes);
 	err = user_memcpy(buf, fp, len);
 	pbytes -= len;
 	*num_bytes += len;
 	buf = (void *)((caddr_t)buf + len);
 
 //	if (err)
-	if (err < B_OK){
+	if (err < B_OK) {
 		goto out;
 	}
 	
@@ -363,7 +363,7 @@ fw_read (void *cookie, off_t position, void *buf, size_t *num_bytes)
 	struct fw_drv1 *d;
 	struct fw_xferq *ir;
 	struct firewire_comm *fc;
-	int err = 0,  slept = 0;
+	int err = 0, slept = 0;
 	struct fw_pkt *fp;
 	cpu_status s;
 	
@@ -409,14 +409,14 @@ readloop:
 			err = EIO;
 		FW_GUNLOCK(fc);
 		return err;
-	} else if(ir->stproc != NULL) {
+	} else if (ir->stproc != NULL) {
 		/* iso bulkxfer */
 		FW_GUNLOCK(fc);
 		fp = (struct fw_pkt *)fwdma_v_addr(ir->buf, 
 				ir->stproc->poffset + ir->queued);
-		if(fc->irx_post != NULL)
+		if (fc->irx_post != NULL)
 			fc->irx_post(fc, fp->mode.ld);
-		if(fp->mode.stream.len == 0){
+		if (fp->mode.stream.len == 0) {
 			err = EIO;
 			return err;
 		}
@@ -430,7 +430,7 @@ readloop:
 		buf = (void *)((caddr_t)buf + len);
 
 		ir->queued ++;
-		if(ir->queued >= ir->bnpacket){
+		if (ir->queued >= ir->bnpacket) {
 			s = splfw();
 			STAILQ_INSERT_TAIL(&ir->stfree, ir->stproc, link);
 			splx(s);
@@ -448,7 +448,8 @@ readloop:
 
 
 static int
-fw_write_async(struct fw_drv1 *d, off_t position, const void *buf, size_t *num_bytes)
+fw_write_async(struct fw_drv1 *d, off_t position, const void *buf,
+	size_t *num_bytes)
 {
 	struct fw_xfer *xfer;
 	struct fw_pkt pkt;
@@ -578,7 +579,7 @@ isoloop:
 #endif
 //			err = msleep(it, FW_GMTX(fc), FWPRI, "fw_write", hz);
 			FW_GUNLOCK(fc);
-			acquire_sem_etc(it->Sem, 1, B_CAN_INTERRUPT | B_TIMEOUT, 1000000);
+			err = acquire_sem_etc(it->Sem, 1, B_CAN_INTERRUPT | B_TIMEOUT, 1000000);
 			FW_GLOCK(fc);
 
 //			if (err)
@@ -832,7 +833,7 @@ out:
 	case FW_CBINDADDR:
 		fwb = gFirewire->fw_bindlookup(fc,
 				bindreq->start.hi, bindreq->start.lo);
-		if(fwb == NULL){
+		if (fwb == NULL) {
 			err = EINVAL;
 			break;
 		}
@@ -842,22 +843,22 @@ out:
 		free(fwb);
 		break;
 	case FW_SBINDADDR:
-		if(bindreq->len <= 0 ){
+		if (bindreq->len <= 0) {
 			err = EINVAL;
 			break;
 		}
-		if(bindreq->start.hi > 0xffff ){
+		if (bindreq->start.hi > 0xffff) {
 			err = EINVAL;
 			break;
 		}
 		fwb = (struct fw_bind *)malloc(sizeof (struct fw_bind));
-		if(fwb == NULL){
+		if (fwb == NULL) {
 			err = ENOMEM;
 			break;
 		}
 		fwb->start = ((u_int64_t)bindreq->start.hi << 32) |
 		    bindreq->start.lo;
-		fwb->end = fwb->start +  bindreq->len;
+		fwb->end = fwb->start + bindreq->len;
 		fwb->sc = (void *)d;
 		STAILQ_INIT(&fwb->xferlist);
 		err = gFirewire->fw_bindadd(fc, fwb);
@@ -878,11 +879,11 @@ out:
 		devinfo->eui.hi = fc->eui.hi;
 		devinfo->eui.lo = fc->eui.lo;
 		STAILQ_FOREACH(fwdev, &fc->devices, link) {
-			if(len < FW_MAX_DEVLST){
+			if (len < FW_MAX_DEVLST) {
 				devinfo = &fwdevlst->dev[len++];
 				devinfo->dst = fwdev->dst;
 				devinfo->status = 
-					(fwdev->status == FWDEVINVAL)?0:1;
+					(fwdev->status == FWDEVINVAL) ? 0 : 1;
 				devinfo->eui.hi = fwdev->eui.hi;
 				devinfo->eui.lo = fwdev->eui.lo;
 			}
@@ -907,7 +908,7 @@ out:
 			/* myself */
 			ptr = malloc(CROMSIZE);
 			len = CROMSIZE;
-			for (i = 0; i < CROMSIZE/4; i++)
+			for (i = 0; i < CROMSIZE / 4; i++)
 				((uint32_t *)ptr)[i]
 					= B_BENDIAN_TO_HOST_INT32(fc->config_rom[i]);
 		} else {
@@ -987,7 +988,7 @@ init_driver()
 	}
 
 	devices_count = 0;
-	while (gFirewire->get_handle(devices_count, &sc)==B_OK) {
+	while (gFirewire->get_handle(devices_count, &sc) == B_OK) {
 		devices_count++;
 	}
 
@@ -996,12 +997,12 @@ init_driver()
 		return ENODEV;
 	}
 	
-	devices = malloc(sizeof(char *) * (devices_count+1));
+	devices = malloc(sizeof(char *) * (devices_count + 1));
 	if (!devices) {
 		put_module(FIREWIRE_MODULE_NAME);
 		return ENOMEM;
 	}
-	for (i=0; i<devices_count; i++) {
+	for (i = 0; i < devices_count; i++) {
 		devices[i] = strdup(fwname);
 		snprintf(devices[i], FWNAMEMAX, fwname, i);
 	}
@@ -1016,7 +1017,7 @@ void
 uninit_driver()
 {
 	int32 i = 0;
-	for (i=0; i<devices_count; i++) {
+	for (i = 0; i < devices_count; i++) {
 		free(devices[i]);
 	}
 	free(devices);
