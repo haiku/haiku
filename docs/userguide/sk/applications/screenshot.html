@@ -9,12 +9,15 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Bachoru
+ *		helix84
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Screenshot</title>
+	<title>Snímka obrazovky</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -42,7 +45,7 @@
 </ul>
 <span>
  «  <a href="poorman.html">PoorMan</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplikácie</a> 
 ::  <a href="showimage.html">Showimage</a>  »
 </span></div>
 </div>
@@ -51,29 +54,29 @@
 <div>
 <div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/apps-images/screenshot-icon_64.png" alt="screenshot-icon_64.png" width="64" height="64" />Screenshot</h2>
+<h2><img src="../../images/apps-images/screenshot-icon_64.png" alt="screenshot-icon_64.png" width="64" height="64" />Snímka obrazovky</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
-<tr><td>Location:</td><td></td><td><span class="path">/boot/system/apps/Screenshot</span><br />
+<tr><td>Panel:</td><td style="width:15px;"></td><td><span class="menu">Aplikácie</span></td></tr>
+<tr><td>Umiestnenie:</td><td></td><td><span class="path">/boot/system/apps/Screenshot</span><br />
 <span class="path">/bin/screenshot</span></td></tr>
-<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/screenshot</span></td></tr>
+<tr><td>Nastavenia:</td><td></td><td><span class="path">~/config/settings/screenshot</span></td></tr>
 </table>
 <p><br /></p>
-<p>Screenshots are taken by either starting the Screenshot application or by pressing the <span class="key">PRINT</span> key,</p>
+<p>Snímky obrazovky sa robia buď pomocou aplikácie Snímka obrazovky alebo stlačením klávesu <span class="key">PRINT</span>.</p>
 <p><img id="sreenshot" src="../images/apps-images/screenshot.png" alt="screenshot.png" /></p>
-<p>In the Screenshot panel you can toggle between taking the whole screen or just the active window and decide if the window border and mouse pointer should be included. You can also enter a delay before a screenshot is taken.</p>
-<p>Below that you set the name, format and location for the screenshot that will be used when you click <span class="button">Save</span>. Instead of saving the file to disk you can also decide to <span class="button">Copy to clipboard</span> to be able to paste the shot directly into another application, or take a <span class="button">New screenshot</span>.</p>
-<p>All settings are remembered the next time you take a screenshot, enabling these convenient keyboard shortcuts:</p>
+<p>V paneli Snímky obrazovky môžete rozhodnúť, či chcete urobiť snímku celej obrazovky alebo iba aktívneho okna a či chcete v snímke zahrnúť okraj okna a kurzor myši. Taktiež môžete nastaviť oneskorenie zachytenia snímky.</p>
+<p>Pod tým nastavujete názov, formát a priečinok, do ktorého sa snímky budú ukladať, keď stlačíte tlačidlo <span class="button">Uložiť</span>. Namiesto ukladania súboru na disk ho môžete <span class="button">Skopírovať do schránky</span>, odkiaľ môžete snímku vložiť priamo do inej aplikácie alebo môžete zachytiť <span class="button">Novú snímku obrazovky</span>.</p>
+<p>Všetky nastavenia sa zapamätajú, keď budete chcieť znova zachytiť snímku, čím sa sprístupnia praktické klávesové skratky:</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="key">PRINT</span></td><td style="width:15px;"></td><td>Takes a screenshot with zero delay and launches the Screenshot panel.</td></tr>
-<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">PRINT</span></td><td></td><td>Takes a screenshot silently (without opening the panel), while still respecting the last used settings.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">PRINT</span></td><td></td><td>Also takes a screenshot silently with the saved settings, but instead of saving it as a file, it's just copied to the clipboard.</td></tr>
+<tr><td><span class="key">PRINT</span></td><td style="width:15px;"></td><td>Urobí snímku obrazovky s nulovým oneskorením a spustí panel Snímky obrazovky.</td></tr>
+<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">PRINT</span></td><td></td><td>Urobí snímku obrazovky (bez otvorenia panelu) s ohľadom na posledné použité nastavenie.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">PRINT</span></td><td></td><td>Tiež urobí snímku obrazovky bez otvorenia panelu a s uloženými nastaveniami, no neuloží snímku ako súbor, ale skopíruje ju do schránky.</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Taking a screenshot from Terminal</h2>
-<p>There's a special <span class="cli">screenshot</span> application to be used from Terminal or a script.<br />
-<span class="cli">screenshot --help</span> shows the familiar options as parameters:</p>
+Robenie snímkov obrazovky z Terminálu</h2>
+<p>Existuje špeciálna aplikácia <span class="cli">screenshot</span>, ktorá sa dá použiť z Terminálu alebo zo skriptu.<br />
+<span class="cli">screenshot --help</span> zobrazí známe možnosti ako parametre:</p>
 
 <pre class="terminal">~&gt; screenshot --help
 
@@ -105,7 +108,7 @@ Note: OPTION -b, --border takes only effect when used with -w, --window
 <div class="nav">
 <div class="inner"><span>
  «  <a href="poorman.html">PoorMan</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplikácie</a> 
 ::  <a href="showimage.html">Showimage</a>  »
 </span></div>
 </div>

@@ -9,6 +9,9 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		helix84
+ *		Peter Poláčik
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -41,191 +44,190 @@
 <li><a href="../../en/preferences/e-mail.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="deskbar.html">Deskbar</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="filetypes.html">FileTypes</a>  »
+ «  <a href="deskbar.html">Panel</a> 
+::  <a href="../preferences.html" class="uplink">Nastavenia</a> 
+::  <a href="filetypes.html">Typy súborov</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Index</td></tr>
 <tr class="index"><td>
-	<a href="#creating">Creating a new e-mail account</a><br />
-	<a href="#account-settings">Account settings</a><br />
-	<a href="#incoming">Setting up incoming e-mail</a><br />
-	<a href="#outgoing">Setting up outgoing e-mail</a><br />
-	<a href="#filters">Notifications and e-mail filters</a><br />
-	<a href="#settings">Setting up the Mail Service</a>
+	<a href="#creating">Vytvorenie nového emailového účtu</a><br />
+	<a href="#account-settings">Nastavenia účtu</a><br />
+	<a href="#incoming">Nastavenie prichádzajúceho e-mailu</a><br />
+	<a href="#outgoing">Nastavenie odchádzajúceho e-mailu</a><br />
+	<a href="#filters">Notifikácie a filtre e-mailu</a><br />
+	<a href="#settings">Nastavenie poštovej služby</a>
 </td></tr>
 </table>
 
 <h2><img src="../../images/prefs-images/e-mail-icon_64.png" alt="e-mail-icon_64.png" width="64" height="64" />E-mail</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
-<tr><td>Location:</td><td></td><td><span class="path">/boot/system/preferences/E-mail</span></td></tr>
-<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/Mail/*</span></td></tr>
+<tr><td>Panel:</td><td style="width:15px;"></td><td><span class="menu">Nastavenia</span></td></tr>
+<tr><td>Umiestnenie:</td><td></td><td><span class="path">/boot/system/preferences/E-mail</span></td></tr>
+<tr><td>Nastavenia:</td><td></td><td><span class="path">~/config/settings/Mail/*</span></td></tr>
 </table>
-<p>Haiku provides a system that retrieves e-mail regularly via a Mail Service (also known as mail_daemon) and saves each mail as a single text file. It parses the mail and fills its attributes with all necessary header information, like from, to, subject and its unread status. Now it can be queried by you or any application. This system also makes switching e-mail clients easy as all the data and your configuration stays the same.<br />
-The configuration is done in the E-Mail preference panel.</p>
+<p>Haiku poskytuje systém, ktorý pravidelne prijíma e-maily cez Poštovú službu (tiež známu ako mail_daemon) a ukladá každú správu ako jeden textový súbor. Analyzuje správu a vypĺňa jej atribúty so všetkými potrebnými hlavičkovými informáciami, ako napríklad Od, Komu, Predmet a stav prečítania správy. Môžete mu posielať požiadavky buď vy osobne alebo akákoľvek aplikácia. Tento systém tiež zjednodušuje prechádzanie medzi e-mailovými klientmi, keďže všetky údaje a nastavenia zostávajú rovnaké.<br />
+Nastavenie prebieha cez panel nastavení Email.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="creating" name="creating">Creating a new e-mail account</a></h2>
-<p>Let's go through the process of setting up an e-mail account.<br />
-You start by clicking the <span class="button">Add</span> button to create a new, unnamed account. This opens a panel where you fill in your account info:</p>
+<a id="creating" name="creating">Vytvorenie nového emailového účtu</a></h2>
+<p>Prejdime si proces nastavenia e-mailového účtu.<br />
+Začnete kliknutím na tlačidlo <span class="button">Pridať</span>, čím vytvoríme nový, nepomenovaný účet. Otvorí sa panel, do ktorého zadáte informácie o svojom účte:</p>
 <img src="../images/prefs-images/e-mail-new-account.png" alt="e-mail-new-account.png" />
-<p>First, you set how you get your mail, via <span class="menu">POP3</span> or <span class="menu">IMAP</span>.</p>
-<p>Now you enter your <i>E-mail address</i>, <i>Login name</i> and <i>Password</i>, give an <i>Account name</i> under which it will be known under Haiku and your <i>Real name</i>.</p>
-<p>If your account is from a major e-mail provider, Haiku already knows all technical details like server IP addresses. If that is not the case, clicking <span class="button">Next</span> will open another window to enter this information by hand:</p>
+<p>Najprv nastavujete, ako prijímate správy - či cez <span class="menu">POP3</span> alebo <span class="menu">IMAP</span>.</p>
+<p>Potom zadajte svoju <i>Emailovú adresu</i>, <i>Prihlasovacie meno</i> a <i>Heslo</i>, uveďte <i>Názov účtu</i>, pod ktorým bude známy v Haiku a vaše <i>Skutočné meno</i>.</p>
+<p>Ak je váš účet od jedného z veľkých poskytovateľov e-mailu, Haiku už pozná všetky technické detaily ako napríklad IP adresa servera. Ak to ale nie je váš prípad, kliknutím na <span class="button">Ďalej</span> otvoríte nové okno, do ktorého treba tieto informácie zadať:</p>
 <img src="../images/prefs-images/e-mail-new-account-2.png" alt="e-mail-new-account-2.png" />
-<p>You first set the <i>Server name</i>, <i>Login type</i> and <i>Connection type</i> for the incoming mail, below that for the outgoing mail. You should find the necessary information on your email provider's website.<br />
-See below for more info about the various settings and additional options.</p>
+<p>Najprv nastavíte <i>Názov servera</i>, <i>Typ prihlásenia</i> a <i>Typ pripojenia</i> pre prichádzajúce správy, pod tým pre odchádzajúce. Potrebné informácie by ste mali nájsť na webstránke vášho poskytovateľa emailu.<br />
+Pozrite nižšie pre viac informácií o rôznych nastaveniach a ďalších možnostiach.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="account-settings" name="account-settings">Account settings</a></h2>
-<p>By selecting the name of an account in the left list, you can change some general settings:</p>
+<a id="account-settings" name="account-settings">Nastavenia účtu</a></h2>
+<p>Vybratím názvu účtu v ľavom zozname môžete meniť niekoľko všeobecných nastavení:</p>
 <img src="../images/prefs-images/e-mail-settings.png" alt="e-mail-settings.png" />
-<p>The <i>Account name</i> is the name that's shown for example in the list of accounts in the E-mail preferences. <i>Real name</i> is the name someone sees when she gets mail from you. <i>Return address</i> is the email address that is used when someone replies to your mail. Normally that is the same address you've sent your email from.</p>
-<p>If you'd like to use an email account to only send or only receive email, you can de/activate that usage by right-clicking the account's name in the leftside list to set the checkmarks accordingly.</p>
+<p><i>Názov účtu</i> je meno, ktoré sa zobrazuje, napríklad, v zozname účtov v nastaveniach Emailu. <i>Skutočné meno</i> je meno, ktoré ľudia uvidia, keď od vás dostanú správu. <i>Návratová adresa</i> je emailová adresa, ktorá je použitá, keď niekto odpovedá na vašu správu. Zvyčajne je to rovnaká adresa ako tá, z ktorej ste posielali email.</p>
+<p>Ak chcete používať emailový účet len na prijímanie alebo len na posielanie správ, môžete (de)aktivovať toto použitie kliknutím pravým tlačidlom na názov účtu v zozname na ľavej strane a nastaviť zaškrtávacie tlačidlá podľa vášho výberu.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="incoming" name="incoming">More on setting up incoming e-mail</a></h2>
-<p>Click on <span class="menu">Incoming</span> under your account's name to set up how e-mails are received.</p>
+<a id="incoming" name="incoming">Viac o nastavovaní prichádzajúceho e-mailu</a></h2>
+<p>Kliknutím na <span class="menu">Prichádzajúce</span> pod názvom vášho účtu nastavíte prijímanie e-mailov.</p>
 <img src="../images/prefs-images/e-mail-in.png" alt="e-mail-in.png" />
-<p>First is the <span class="menu">Mail server</span> address for incoming mails. If your provider needs you to log into a specific port, you add that to the address, separated by a colon. For example, <tt>pop.your-provider.org:1400</tt>.</p>
-<p>Then you enter your login information, <i>Login name</i> and <i>Password</i>, and if necessary change the <i>Login type</i> from the default <span class="menu">Plain text</span> to <span class="menu">APOP</span> for authentication.</p>
-<p>If you use <i>POP3</i> and retrieve mails of this account from different computers, you may want to activate the option to <span class="menu">Leave mail on server</span> and only <span class="menu">Remove mail from server when deleted</span> locally.</p>
-<p>If you use <i>IMAP</i> instead, you have the option to <span class="menu">Remove mail from server when deleted</span> locally. You can specify <span class="menu">IMAP folders</span> to only synchronize with a specific folder and its subfolders.</p>
-<p>Also, you can opt to only <span class="menu">Partially download messages larger than</span> a certain size. This will only get the header and you can decide if you want to download the rest of the message plus possible attachments after seeing the subject and who sent it. Useful if you have a slow connection.</p>
-<p>You can change the <i>Destination</i> of your inbox (default: <span class="path">/boot/home/mail/in/</span>), which is useful if you'd like to separate the mails from different accounts into their own folders. However, queries let you sort things out just as well.</p>
+<p>Prvá je adresa <span class="menu">Poštového servera</span> pre prichádzajúce správy. Ak váš poskytovateľ požaduje pripojenie ku konkrétnemu portu, pridajte ho za adresu, oddelený od nej dvojbodkou. Napríklad <tt>pop.vas-poskytovatel.sk:1400</tt>.</p>
+<p>Potom vložíte prihlasovacie údaje, <i>Používateľské meno</i> a <i>Heslo</i>, a ak je to potrebné, zmeňte <i>Typ prihlásenia</i> z prednastavenej autentifikácie <span class="menu">Čistý text</span> na <span class="menu">APOP</span>.</p>
+<p>Ak používate <i>POP3</i> a prijímate správy z tohto účtu na viacerých počítačoch, asi budete chcieť aktivovať možnosť <span class="menu">Ponechať poštu na serveri</span> a len <span class="menu">Odstrániť poštu zo servera pri zmazaní</span> lokálne.</p>
+<p>Ak namiesto toho používate <i>IMAP</i>, máte možnosť <span class="menu">Odstrániť poštu zo servera pri zmazaní</span> lokálne. Môžete špecifikovať <span class="menu">Priečinky IMAP</span> pre synchronizáciu len určitých priečinkov a ich podpriečinkov.</p>
+<p>Tiež si môžete vybrať <span class="menu">Čiastočne stiahnuť správy väčšie ako</span> určitá veľkosť. Toto stiahne len hlavičku a vy sa môžete rozhodnúť, či chcete stiahnuť zvyšok správy plus možné prílohy potom, ako uvidíte predmet a odosielateľa. Výhodné najmä pre pomalšie pripojenia.</p>
+<p>Môžete zmeniť <i>Cieľ</i> vašej schránky prichádzajúcich správ (prednastavený: <span class="path">/boot/home/mail/in/</span>), čo je výhodné, ak chcete oddeliť správy z rôznych účtov do ich vlastných priečinkov. Požiadavky vám však tiež umožňujú triediť správy.</p>
 
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="outgoing" name="outgoing">More on setting up outgoing e-mail</a></h2>
-<p>Click on <span class="menu">Outgoing</span> under your account's name to set up how e-mails are sent.</p>
+<a id="outgoing" name="outgoing">Viac o nastavovaní odchádzajúceho e-mailu</a></h2>
+<p>Kliknutím na <span class="menu">Odchádzajúce</span> pod názvom vášho účtu nastavíte odosielanie e-mailov.</p>
 <img src="../images/prefs-images/e-mail-out.png" alt="e-mail-out.png" />
-<p>First is the <i>SMTP server</i> address for outgoing mails. As with the incoming server before, you can use a specific port if needed, e.g. <tt>mail.your-provider.org:1200</tt>.</p>
-<p>If you need to login, you change the <i>Login Type</i> to <span class="menu">ESMTP</span> and enter username and password above. The other type is used for providers that need you to check for mail with <span class="menu">POP3 before SMTP</span> for identification.</p>
-<p>As with incoming mail, you can also change the <i>Destination</i> of your outbox (default: <span class="path">/boot/home/mail/out/</span>).</p>
+<p>Najprv nastavte adresu <i>Servera SMTP</i> pre odchádzajúce správy. Tak isto ako s odchádzajúcimi správami, môžete nastaviť port, ak je potrebný, napr. <tt>mail.your-provider.org:1200</tt>.</p>
+<p>Ak sa potrebujete prihlásiť, zmeňte <i>Typ prihlásenia</i> na <span class="menu">ESMTP</span> a zadajte používateľske meno a heslo, ktoré sú uvedené vyššie. Druhý typ sa používa u poskytovateľov, ktorí potrebujú, aby ste si správy sťahovali cez <span class="menu">POP3, potom SMTP</span> kvôli identifikácii.</p>
+<p>Tak isto ako s prichádzajúcimi správami, môžete zmeniť <i>Cieľ</i> vašej schránky odchádzajúcich správ (prednastavené: <span class="path">/boot/home/mail/out/</span>).</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="filters" name="filters">Notifications and other e-mail filters</a></h2>
-<p>Notifications for newly arrived email and methods to sort and filter emails are found in <span class="menu">E-Mail filters</span> under an account's name. You can add any number of filters that are applied one after the other and rearrange them by drag&amp;dropping them to their new position.<br />
-Currently there are three <span class="menu">Incoming mail filters</span> you can add. After adding a filter, you have to select it to see its options.</p>
+<a id="filters" name="filters">Upozornenia a ostatné filtre e-mailu</a></h2>
+<p>Upozornenie na novo prijaté správy a spôsoby ich triedenia a filtrovania nájdete v položke <span class="menu">Filtre pošty</span> pod názvom účtu. Môžete pridať akýkoľvek počet filtrov, ktoré sa použijú jeden po druhom a zmeniť ich poradie ich pomocou chytenia a ťahania na novú pozíciu.<br />
+Momentálne sú tri <span class="menu">Filtre prichádzajúcej pošty</span>, ktoré si môžete pridať. Po pridaní filtra na neho musíte kliknúť pre zobrazenie jeho nastavení.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Spam filter (AGMS Bayesian)</h3>
+Spamový filter (AGMS Bayesian)</h3>
 <img src="../images/prefs-images/e-mail-filter-spam.png" alt="e-mail-filter-spam.png" />
-<p>The spam filter uses statistical methods to classify a mail as unwanted spam. It assigns a value between 0 and 1 to it and you can decide what are the limits for a genuine mail and what will be considered spam.<br />
-You can have that spam rating added to the start of the subject.<br />
-Also, the spam filter can learn from all incoming e-mail. Of course, you'll have to teach it by sorting out the false positives, mails that were mistakenly marked as spam. You'll find more on that when we discuss the application <span class="app">Mail</span>.</p>
-<p>Together with the following <span class="menu">Rule filter</span>, you're able to automatically sort out detected spam mails.</p>
+<p>Spamový filter používa štatistické metódy na klasifikovanie správy ako nevyžiadaná pošta. Prideľuje správe hodnotu medzi 0 a 1, takže môžete určiť limit pre normálnu správu a čo bude považované za spam.<br />
+Môžete pridať označenie ako spam na začiatok predmetu správy.<br />
+Spamový filter sa tiež dokáže učiť zo všetkých prichádzajúcich správ. Samozrejme, budete ho to musieť naučiť vytriedením správ nesprávne uvedených ako spam. Dozviete sa o tom viac, keď budeme preberať aplikáciu <span class="app">Pošta</span>.</p>
+<p>Spolu s nasledujúcim <span class="menu">Filtrom pravidiel</span> môžete automaticky vytriediť objavené nevyžiadané správy.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Rule filter</h3>
+Filter pravidiel</h3>
 <img src="../images/prefs-images/e-mail-filter-header.png" alt="e-mail-filter-header.png" />
-<p>This filter compares the mail header to a search pattern and performs some action according to the rules you set up.<br />
- With the first text field you specify which header to check against. These are available:</p>
+<p>Tento filter porovnáva hlavičku správy s vyhľadávacím vzorom a vykonáva určité operácie podľa pravidiel, ktoré si nastavíte.<br />
+Prvým textovým poľom určujete, ktoré hlavičky sa majú kontrolovať. Dostupné sú tieto:</p>
 <table summary="match header" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><span class="menu">Name</span></td><td style="width:5px;"> </td>
-		<td>the name of the sender</td></tr>
-	<tr><td><span class="menu">From</span></td><td> </td>
-		<td>the e-mail address of the sender</td></tr>
-	<tr><td><span class="menu">To</span></td><td> </td>
-		<td>your e-mail address (different for each e-mail account)</td></tr>
-	<tr><td><span class="menu">Reply to</span></td><td> </td>
-		<td>the e-mail address replies are sent to</td></tr>
-	<tr><td><span class="menu">When</span></td><td> </td>
-		<td>the date and time the mail was received</td></tr>
-	<tr><td><span class="menu">Subject</span></td><td> </td>
-		<td>the subject line</td></tr>
+	<tr><td><span class="menu">Meno</span></td><td style="width:5px;"> </td>
+		<td>meno odosielateľa</td></tr>
+	<tr><td><span class="menu">Od</span></td><td> </td>
+		<td>e-mailová adresa odosielateľa</td></tr>
+	<tr><td><span class="menu">Pre</span></td><td> </td>
+		<td>vaša e-mailová adresa (odlišná pre každý účet)</td></tr>
+	<tr><td><span class="menu">Odpovedať</span></td><td> </td>
+		<td>adresa, na ktorú sú posielané odpovede</td></tr>
+	<tr><td><span class="menu">Kedy</span></td><td> </td>
+		<td>dátum a čas prijatia správy</td></tr>
+	<tr><td><span class="menu">Predmet</span></td><td> </td>
+		<td>predmet správy</td></tr>
 	<tr><td><span class="menu">Cc</span></td><td> </td>
-		<td>addresses of anyone receiving a carbon copy (Cc)</td></tr>
-	<tr><td><span class="menu">Account</span></td><td> </td>
-		<td>the name of the e-mail's account</td></tr>
-	<tr><td><span class="menu">Status</span></td><td> </td>
-		<td>The current status of the e-mail. Normally, this can be "Read", "Replied", "Sent", "Forwarded", "New", or anything you have defined yourself. However, unless you change it yourself in a filter, it will always be "New" after the Mail Service fetched the mail.</td></tr>
-	<tr><td><span class="menu">Priority</span></td><td> </td>
-		<td>is set by the sender's e-mail program (e.g. "urgent")</td></tr>
-	<tr><td><span class="menu">Thread</span></td><td> </td>
-		<td>essentially the same as "Subject", but without things like Re: or Fwd:</td></tr>
-	<tr><td><span class="menu">Classification group</span></td><td> </td>
-		<td>depending on what the spam filter classified it as, this will either be empty (if uncertain) or contain the word "Genuine" or "Spam"</td></tr>
-	<tr><td class="onelinetop"><span class="menu">Spam/Genuine estimate</span></td><td> </td>
-		<td>this is a numerical estimate that the spam filter assigned to the e-mail. They are shown in scientific notation, where 1.065e-12 translates to 1.065 divided by 10 to the 12th power, which in this case translates to 0.000000000001065.</td></tr>
+		<td>adresy kohokoľvek, kto dostane „Skrytú kópiu“ (Cc)</td></tr>
+	<tr><td><span class="menu">Účet</span></td><td> </td>
+		<td>názov účtu</td></tr>
+	<tr><td><span class="menu">Stav</span></td><td> </td>
+		<td>Aktuálny stav správy. Zvyčajne to môže byť „Prečítaná“, „Poslaná odpoveď“, „Odoslaná“, „Preposlaná“, „Nová“, alebo čokoľvek, čo ste si sami definovali. Ale, ak to sami nezmeníte vo filtri, vždy to bude „Nová“ potom, ako Poštová služba správu prijme.</td></tr>
+	<tr><td><span class="menu">Priorita</span></td><td> </td>
+		<td>nastavuje ju e-mailový program odosielateľa (napr. „urgentné“)</td></tr>
+	<tr><td><span class="menu">Vlákno</span></td><td> </td>
+		<td>v podstate to isté ako „Predmet“, ale bez vecí ako Re: alebo Fwd:</td></tr>
+	<tr><td><span class="menu">Klasifikačná skupina</span></td><td> </td>
+		<td>na základe toho, ako spamový filter správu klasifikoval, bude buď prázdna (ak si nie je istý) alebo bude obsahovať slovo „Pravá“ alebo „Spam“</td></tr>
+	<tr><td class="onelinetop"><span class="menu">Odhad Spam/Pravá</span></td><td> </td>
+		<td>Toto je číselné ohodnotenie, ktoré spamový filter pridelil správe. Sú zobrazené vo vedeckej notácii, kde 1.065e-1 znamená 1.065 vydelená 10 umocnenými na 12-tu, čo v tomto prípade znamená 0.000000000001065.</td></tr>
 </table>
-<p>The second text field holds your search pattern. It accepts <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression" rel="nofollow">regular expressions</a> which gives it great flexibility, while unfortunately complicating things a bit. Read up on it a bit, it's well worth it and simple search patterns aren't <i>that</i> complicated at all.</p>
-<p>With the pop-up menu below it, you assign an action when the pattern matches. You can move or delete a mail, set the status to "Read" or anything else or set the e-mail account you'll reply with.</p>
+<p>Druhé textové pole obsahuje vyhľadávací vzor. Prijíma <a href="http://sk.wikipedia.org/wiki/Regul%C3%A1rny_v%C3%BDraz" class="external free" title="Wikipedia: Regulárny výraz" rel="nofollow">regulárne výrazy</a>, ktoré prinášajú veľkú flexibilitu, aj keď nanešťastie trochu veci komplikujú. Prečítajte si o nich niečo, stojí to za to a jednoduché vyhľadávacie vzory nie sú <i>až také</i> komplikované.</p>
+<p>S použitím vysúvacieho menu pod tým, pridelíte akciu, ktorá sa má vykonať, keď vzor pasuje. Môžete presunúť alebo vymazať správu, nastaviť status na "Prečítaná" alebo čokoľvek iné, alebo nastaviť účet s ktorým odpoviete.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-New mails notification</h3>
+Upozornenie na nové správy</h3>
 <img src="../images/prefs-images/e-mail-filter-notification.png" alt="e-mail-filter-notification.png" />
-<p>There are several ways you can choose to be notified of newly arrived email. Under <span class="menu">Method</span> you find a number of options that can be combined as well:</p>
+<p>Existuje niekoľko možností, ktoré si môžete vybrať, ako byť informovaný o novo prijatej pošte. Pod menu <span class="menu">Metóda</span> môžete nájsť niekoľko možností, ktoré sa dajú tiež kombinovať:</p>
 <table summary="notofications" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><span class="menu">none</span></td><td style="width:5px;"> </td>
-		<td>No notification</td></tr>
-	<tr><td><span class="menu">Beep</span></td><td> </td>
-		<td>Plays the sound file of the "New E-mail" event set in the <a href="sounds.html">Sounds</a> preferences for <i>every</i> new email</td></tr>
-	<tr><td><span class="menu">Alert</span></td><td> </td>
-		<td>Shows an alert window for <i>every</i> new email</td></tr>
-	<tr><td><span class="menu">Keyboard LEDs</span></td><td> </td>
-		<td>Blinks some LEDs like the caps-lock indicator</td></tr>
-	<tr><td class="onelinetop"><span class="menu">Central alert</span></td><td> </td>
-		<td>Shows <i>one</i> alert window for all new mails</td></tr>
-	<tr><td><span class="menu">Central beep</span></td><td> </td>
-		<td>Plays the sound file of the "New E-mail" event set in the <a href="sounds.html">Sounds</a> preferences <i>once</i> for new mail</td></tr>
-	<tr><td><span class="menu">Log window</span></td><td> </td>
-		<td>Shows the log window</td></tr>
+	<tr><td><span class="menu">žiadne</span></td><td style="width:5px;"> </td>
+		<td>Žiadne upozornenia.</td></tr>
+	<tr><td><span class="menu">Pípnutie</span></td><td> </td>
+		<td>Prehrá zvukový súbor pridelený udalosti „Nový E-mail“ v nastaveniach <a href="sounds.html">Zvuky</a> pri <i>každej</i> novej správe.</td></tr>
+	<tr><td><span class="menu">Upozornenie</span></td><td> </td>
+		<td>Zobrazí upozornenie na <i>každú</i> novú správu.</td></tr>
+	<tr><td><span class="menu">LED klávesnice</span></td><td> </td>
+		<td>Bliká niektorými LEDkami, ako napríklad indikátor caps-lock</td></tr>
+	<tr><td class="onelinetop"><span class="menu">Centrálne upozornenie</span></td><td> </td>
+		<td>Zobrazí <i>jedno</i> okno s upozornením pre všetky nové správy.</td></tr>
+	<tr><td><span class="menu">Centrálne pípnutie</span></td><td> </td>
+		<td>Prehrá zvukový súbor priradený udalosti „Nový E-mail“ v nastaveniach <a href="sounds.html">Zvuky</a>, len <i>raz</i> pri nových správach.</td></tr>
+	<tr><td><span class="menu">Okno záznamu</span></td><td> </td>
+		<td>Zobrazí okno záznamu.</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Outgoing Mail Filters</h3>
-<p>At this moment, there's only one filter that deals with outgoing mail: <span class="cli">fortune</span>.
-<br />It will attach a randomly chosen funny or wise "fortune cookie" to the end of every mail before it's sent out. You can do a dry run by issuing the command <span class="cli">fortune</span> in a Terminal.</p>
+Filtre odchádzajúcich správ</h3>
+<p>Momentálne je pre odchádzajúce správy dostupný len jeden filter: <span class="cli">fortune</span>.
+<br />Priloží k správe náhodne vybratú vtipnú alebo múdru hlášku zo súboru tzv. „koláčikov pre šťastie“ na koniec každej správy predtým, ako je odoslaná. Môžete si pozrieť ako približne tieto hlášky vyzerajú, spustením príkazu <span class="cli">fortune</span> v Termináli.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="settings" name="settings">Setting up the Mail Service</a></h2>
-<p>Now that your incoming and outgoing mail servers (and maybe some filters, too), are configured, you have to tell the Mail Service that does all the actual checking and fetching how to do its job.</p>
+<a id="settings" name="settings">Nastavenie Poštovej Služby</a></h2>
+<p>Takže teraz, keď ste si nastavili servery (a možno aj zopár filtrov) pre prichádzajúcu aj odchádzajúcu poštu, musíte povedať Poštovej službe, ktorá v skutočnosti vykonáva kontrolu a získavanie nových správ, ako má vykonávať svoju robotu.</p>
 <img src="../images/prefs-images/e-mail-settings.png" alt="e-mail-settings.png" />
-<p>Under <i>Mail checking</i> you configure the interval at which the account's mail server is probed for new mail.<br />
-If you're on a dial-up connection, you may want to do that <span class="menu">Only when dial-up is connected</span> and also <span class="menu">Schedule outgoing mail when dial-up is disconnected</span> to avoid dialing automatically in regularly only to check for mail.</p>
-<p>The Mail Service has a status window which you can set to show up <span class="menu">Never</span>, <span class="menu">While sending</span>, <span class="menu">While sending and receiving</span> or <span class="menu">Always</span>.</p>
-<p>Make sure to <span class="menu">Start mail services on startup</span> or there will be no mail_daemon running to do your bidding...</p>
+<p>Pod <i>Kontrola pošty</i> nastavujete interval, v akom sa kontrolujú nové správy na serveri.<br />
+Ak ste na vytáčanom spojení, budete to asi chcieť robiť <span class="menu">Iba ak je vytočené spojenie</span> a tiež <span class="menu">Naplánovať odchádzajúcu poštu pri odpojení vytáčaného spojenia</span>, aby ste zabránili pravidelnému vytáčaniu len kvôli skontrolovaniu e-mailu.</p>
+<p>Poštová služba má okno so stavom, ktoré môžete nastaviť, aby sa zobrazovalo <span class="menu">Nikdy</span>, <span class="menu">Počas odosielania</span>, <span class="menu">Počas odosielania a prijímania</span> alebo <span class="menu">Vždy</span>.</p>
+<p>Uistite sa, že je začiarknuté <span class="menu">Spustiť služby pošty pri štarte</span> alebo nebude bežať mail_daemon, ktorý by vaše požiadavky plnil...</p>
 <img src="../images/prefs-images/e-mail-mailbox.png" alt="e-mail-mailbox.png" />
-<p><span class="menu">Edit mailbox menu...</span> will open the folder <span class="path">/boot/home/config/Mail/Menu Links/</span>. All folders or queries (!) or their links put into this folder will appear in the context menu of the mailbox icon of the Mail Services in the Deskbar tray.</p>
-<p>From that menu, you can also <span class="menu">Create new message...</span>, <span class="menu">Check for mail now</span> or edit <span class="menu">Preferences...</span>.</p>
-<p>If you hold down <span class="key">SHIFT</span> when invoking the context menu, you'll get additional commands:</p>
+<p><span class="menu">Upraviť menu poštovej schránky...</span> otvorí priečinok <span class="path">/boot/home/config/Mail/Menu Links/</span>. Všetky priečinky alebo požiadavky (!) alebo ich odkazy v tomto priečinku sa zjavia v kontextovom menu ikony schránky Poštovej služby v Paneli.</p>
+<p>Z toho menu môžete tiež <span class="menu">Vytvoriť novú správu...</span>, <span class="menu">Skontrolovať poštu teraz</span> alebo upraviť <span class="menu">Nastavenia...</span>.</p>
+<p>Ak podržíte stlačený kláves <span class="key">SHIFT</span> počas otvárania kontextového menu, dostanete ďalšie príkazy:</p>
 <table summary="notofications" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><span class="menu">Check for mails only</span></td><td style="width:5px;"> </td>
-		<td>Offers a submenu to check only one specific account</td></tr>
-	<tr><td><span class="menu">Send pending mails</span></td><td> </td>
-		<td>Allows you to send pending mails without also checking for new mails</td></tr>
-	<tr><td><span class="menu">Shutdown mail services</span></td><td> </td>
-		<td>Quits the whole email infrastructure (mail_daemon)</td></tr>
+	<tr><td><span class="menu">Iba skontrolovať novú poštu</span></td><td style="width:5px;"> </td>
+		<td>Poskytuje podmenu pre kontrolu pošty len pre jeden konkrétny účet.</td></tr>
+	<tr><td><span class="menu">Odoslať čakajúce emaily</span></td><td> </td>
+		<td>Dovoľuje vám odoslať čakajúce správy bez toho, aby sa zároveň kontrolovali aj nové správy.</td></tr>
+	<tr><td><span class="menu">Vypnúť poštové služby</span></td><td> </td>
+		<td>Ukončí celú emailovú infraštruktúru (mail_daemon).</td></tr>
 </table>
-<p>The mailbox icon itself shows if there are unread messages (status "New") when there are envelopes inside.</p>
+<p>Ikona schránky zobrazuje, či sú v schránke neprečítané správy (so stavom „Nová“), keď obsahuje obálky.</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="deskbar.html">Deskbar</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="filetypes.html">FileTypes</a>  »
+ «  <a href="deskbar.html">Panel</a> 
+::  <a href="../preferences.html" class="uplink">Nastavenia</a> 
+::  <a href="filetypes.html">Typy súborov</a>  »
 </span></div>
 </div>
 

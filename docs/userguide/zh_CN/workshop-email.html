@@ -81,13 +81,13 @@
 <p>With every email being in a separate file, viewing them becomes just as easy as browsing through a folder (or query result) of images with <a href="applications/showimage.html">ShowImage</a>. Leaving the Tracker window open, you'll see the moving selection of the currently viewed file while you use the previous/next button to move through them.<br />
 As they are independent files, using a viewer other than Haiku's <a href="applications/mail.html">Mail</a> causes no problems whatsoever.</p>
 <p>Similarly, creating a new message results in just another file that is handed to the mail_daemon that takes care of sending it off. Contact management is deferred to the <a href="applications/people.html">People</a> application.</p>
-<p>In a nutshell, where other mail clients do everything, from communicating with the mail servers to providing a view with all your mails and tools to search and filter them, Haiku uses a chain of smaller tools and general file management:
+<p>In a nutshell, where other mail clients do everything, from communicating with the mail servers to providing a view with all your mails and tools to search and filter them, Haiku uses a chain of smaller tools and general file management:</p>
 <ul>
 <li><p>The <span class="app">mail_daemon</span> to fetch/send mail and save them as normal files.</p></li>
 <li><p>Tracker windows and queries to find and show email files.</p></li>
 <li><p>The <span class="app">Mail</span> application to view email files and create new messages relying on system-wide contact management by the <span class="app">People</span> app.</p></li>
 </ul>
-Especially using Tracker and queries to manage emails is a powerful idea. The experience you gain can be transferred to any other problem that is dealing with files. Be it images, music, video, contacts or any other documents, using Tracker is at the core of all file managing.<br />
+<p>Especially using Tracker and queries to manage emails is a powerful idea. The experience you gain can be transferred to any other problem that is dealing with files. Be it images, music, video, contacts or any other documents, using Tracker is at the core of all file managing.<br />
 Also, improvements in any of these system areas benefit not just emailing, but all applications that make use of them.</p>
 
 <h2>
@@ -113,7 +113,7 @@ In any case, try to keep the status name short. That way it always fits in a nor
 <p><span class="menu">Open Inbox Folder</span> and <span class="menu">Open Mail Folder</span> are just links to regular folders (and not very useful in my opinion).</p>
 <p>The <span class="menu"># new messages</span> submenu is populated by a query for email with the status "<i>New</i>" (that same query is used to change the mailbox icon to show some letters in it, by the way).</p>
 
-<p>You can add your own queries (and links to folders) in that context menu too, by putting them into <span class="path">~/config/settings/Mail/Menu Links</span>.</p>
+<p>You can add your own queries (or folders, applications, scripts etc.) to that context menu too, by putting them or links to them into <span class="path">~/config/settings/Mail/Menu Links</span>.</p>
 <div class="box-info">The query <span class="path">~/config/settings/Mail/mailbox</span> is a special case: It is executed when left-clicking the mailbox icon in the Deskbar. If you want to change that behavior, you can replace it with any other file (or link to a file), just name it "<i>mailbox</i>". It doesn't have to be a query, a link to a folder of queries or a script or application works just as well.</div>
 
 <h3>

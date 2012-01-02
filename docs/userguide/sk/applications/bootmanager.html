@@ -9,12 +9,15 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		helix84
+ *		Bachoru
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>BootManager</title>
+	<title>Správca zavádzania</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -41,62 +44,61 @@
 <li><a href="../../en/applications/bootmanager.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="activitymonitor.html">ActivityMonitor</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
-::  <a href="cdplayer.html">CDPlayer</a>  »
+ «  <a href="activitymonitor.html">Monitor aktivity</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplikácie</a> 
+::  <a href="cdplayer.html">Prehrávač CD</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/apps-images/bootmanager-icon_64.png" alt="bootmanager-icon_64.png" width="64" height="64" />BootManager</h2>
+<h2><img src="../../images/apps-images/bootmanager-icon_64.png" alt="bootmanager-icon_64.png" width="64" height="64" />Správca zavádzania</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><i>No entry, normally started from Installer's <span class="menu">Tools</span> menu</i></td></tr>
-<tr><td>Location:</td><td></td><td><span class="path">/boot/system/apps/BootManager</span></td></tr>
-<tr><td>Settings:</td><td></td><td><i>none</i><br />MBR backups are saved by default in <span class="path">~/config/settings/bootman/</span></td></tr>
+<tr><td>Panel:</td><td style="width:15px;"></td><td><i>Žiadny záznam, zvyčajne sa spúšťa z menu <span class="menu">Nástroje</span> Inštalátora</i></td></tr>
+<tr><td>Umiestnenie:</td><td></td><td><span class="path">/boot/system/apps/BootManager</span></td></tr>
+<tr><td>Nastavenia:</td><td></td><td><i>žiadne</i><br />Zálohy MBR sa štandardne ukladajú do <span class="path">~/config/settings/bootman/</span></td></tr>
 </table>
 <p><br /></p>
-<p>If you don't add the Haiku partition to an existing boot manager like GRUB, BootManager can install a small boot menu in the Master Boot Record (MBR) that looks something like this:</p>
+<p>Ak nepridáte oblasť Haiku do existujúceho správcu zavádzania ako GRUB, Správca zavádzania Haiku môže nainštalovať malé zavádzacie menu do MBR (Master Boot Record), ktoré vyzerá takto:</p>
 <img src="../images/apps-images/bootmenu.png" alt="bootmenu.png" />
-<div class="box-info">Boot Manager isn't yet tested very well and still has a few restrictions that it will complain about if they aren't met: the menu can only be installed on your first harddisk and there has to be a 2KiB space after the Master Boot Record (MBR).</div>
-<p>BootManager guides you through the installation process of the boot menu.</p>
+<div class="box-info">Správca zavádzania zatiaľ nie je dobre otestovaný a stále má zopár obmedzení, na ktoré sa bude sťažovať v prípade ich nesplnenia: menu môže byť nainštalované iba na vašom prvom pevnom disku a vyžaduje 2KiB miesta po Master Boot Record (MBR).</div>
+<p>Správca zavádzania vás riadi počas celého inštalačného procesu zavádzacieho menu.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="1-drives" id="1-drives">Choosing the destination drive</a></h2>
+<a name="1-drives" id="1-drives">Výber cieľového disku</a></h2>
 <img src="../images/apps-images/bootmanager-1.png" alt="bootmanager-1.png" />
-<p>The BootManager starts off with a list of all available drives from which you choose the destination. If there's already a boot menu on that drive, the <span class="button">Uninstall</span> button becomes active, leading you through the simple procedure to restore a formerly backed-up MBR, thereby removing the boot menu again.<br />
-Otherwise, choose <span class="button">Install</span> to continue.</p>
+<p>Správca zavádzania vás privíta zoznamom dostupných jednotiek, z ktorých si vyberiete cieľovú jednotku. Ak sa na tejto jednotke už nachádza menu zavádzania, bude dostupné tlačidlo <span class="button">Odinštalovať</span>, ktoré vás prevedie jednoduchým procesom obnovenia predtým zálohovaného MBR, čím sa odstráni menu zavádzania.<br />
+Inak pokračujte stlačením tlačidla <span class="button">Nainštalovať</span>.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="2-backup" id="2-backup">Backing up the Master Boot Record (MBR)</a></h2>
-<p>In case anything goes wrong or you want to remove the boot menu again, the Master Boot Record (MBR) is now saved. This is obviously a very important step, make sure you don't accidentally overwrite some other MBR-backup maybe from some earlier experimentation, for example!</p>
+<a name="2-backup" id="2-backup">Zálohovanie Master Boot Record (MBR)</a></h2>
+<p>V prípade, že sa niečo pokazí alebo len budete chcieť znova odstrániť menu zavádzania, Master Boot Record (MBR) je teraz uložený. Toto je očividne veľmi dôležitý krok - uistite sa, že náhodou napríklad neprepíšete nejakú inú zálohu MBR z niektorých predchádzajúcich experimentov.</p>
 <img src="../images/apps-images/bootmanager-2.png" alt="bootmanager-2.png" /> 
 <img src="../images/apps-images/bootmanager-3.png" alt="bootmanager-3.png" />
-<p>Just select a destination for the backup file "<tt>MBR</tt>" or leave the default path. After clicking <span class="button">Next</span> you'll get a confirmation if the backup was successful.</p>
+<p>Iba vyberte cieľ pre záložný súbor „<tt>MBR</tt>“ alebo nechajte predvolenú cestu. Po stlačení tlačidla <span class="button">Ďalej</span> dostanete potvrdenie o tom, či sa záloha podarila.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="3-menu" id="3-menu">Configuring the boot menu</a></h2>
+<a name="3-menu" id="3-menu">Konfigurácia menu zavádzania</a></h2>
 <img src="../images/apps-images/bootmanager-4.png" alt="bootmanager-4.png" /> 
 <img src="../images/apps-images/bootmanager-5.png" alt="bootmanager-5.png" />
-<p>Next you're presented with a list of all partitions on the destination drive. By setting checkmarks you decide what entries will appear in the boot menu, the text boxes allow you to rename an entry.</p>
-<p>After that, you pick from the pop-up menu which partition will be booted from by default and set a timeout with the slider below. Here, "<i>Immediately</i>" will skip the boot menu entirely, "<i>Never</i>" will just stop at the boot menu. You can override the timeout setting by holding <span class="key">ALT</span> while booting.</p>
+<p>Ďalej vám bude predložený zoznam oblastí na jednotke destinácie. Zaškrtávaním určujete, ktoré položky sa objavia v menu zavádzania, textové políčka vám umožňujú položky premenovať.</p>
+<p>Potom si z rozbaľovacieho menu vyberiete, z ktorej diskovej oblasti chcete predvolene zavádzať a nastavíte časovač posuvníkom nižšie. „<i>Okamžite</i>“ znamená, že menu zavádzania bude vynechané, „<i>Nikdy</i>“ menu zavádzania zastaví. Časovač môžete počas zavádzania preskočiť držaním klávesu <span class="key">ALT</span>.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="4-mbr" id="4-mbr">Writing the boot menu</a></h2>
+<a name="4-mbr" id="4-mbr">Zapísanie menu zavádzania</a></h2>
 <img src="../images/apps-images/bootmanager-6.png" alt="bootmanager-6.png" /> 
 <img src="../images/apps-images/bootmanager-7.png" alt="bootmanager-7.png" />
-<p>Before the boot menu is written to the MBR, you'll get a summary of your configuration and then one last chance to abort the operation. Don't worry though, as long as you keep the MBR backup safe, you can easily revert the changes. Should things get thoroughly messed up, you can always boot from a Haiku install CD or USB stick and write back the MBR backup with BootManager.</p>
+<p>Predtým, ako sa menu zavádzania zapíše do MBR, sa zobrazí zhrnutie vašej konfigurácie a poslednú šancu na zrušenie operácie. Nebojte sa ale, pokiaľ je záloha MBR v bezpečí, môžete jednoducho zvrátiť všetky zmeny. Ak by nastal vážnejší problém, môžete stále zavádzať Haiku z inštalačného CD alebo USB flash disku a znova zapísať MBR zálohu pomocou Správcu zavádzania.</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="activitymonitor.html">ActivityMonitor</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
-::  <a href="cdplayer.html">CDPlayer</a>  »
+ «  <a href="activitymonitor.html">Monitor aktivity</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplikácie</a> 
+::  <a href="cdplayer.html">Prehrávač CD</a>  »
 </span></div>
 </div>
 

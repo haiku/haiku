@@ -10,12 +10,15 @@
  * Authors:
  *		Maciej Bałuta  (Google Code-In student)
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		dianamuscalu
+ *		Barrett
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>ProcessController</title>
+	<title>Controllore processo</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -50,45 +53,44 @@
 
 <div id="content">
 <div>
-<div class="box-info">La traduzione di questa pagina non è stata completata. Per questo motivo le parti non tradotte sono visibili in inglese.</div>
 
-<h2><img src="../../images/desktop-applets-images/processcontroller-icon_64.png" alt="processcontroller-icon_64.png" width="64" height="64" />ProcessController</h2>
+<h2><img src="../../images/desktop-applets-images/processcontroller-icon_64.png" alt="processcontroller-icon_64.png" width="64" height="64" />Controllore processo</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Desktop Applets</span></td></tr>
-<tr><td>Locazione:</td><td></td><td><span class="path">/boot/system/apps/ProcessController</span></td></tr>
+<tr><td>Localita:</td><td></td><td><span class="path">/boot/system/apps/Controllore processo</span></td></tr>
 <tr><td>Impostazioni:</td><td></td><td><i>nessuna</i></td></tr>
 </table>
 
-<p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />The primary task of the ProcessController applet is to show the activity of your CPU(s) and the amount of used memory. It allows monitoring of individual teams, change their priority, and kill them if the program freezes. In multiprocessor environments it allows you to disable individual processors/cores. When Tracker or Deskbar crash you can restart them from ProcessController's menu.</p>
-<p>Indicators on the left show each CPU's usage, while the bar on the right shows the memory consumption. Remember that the number of indicators depend on the number of processors/cores in the computer.</p>
-<p>If not yet running, launching ProcessController asks if it should open in window mode or live in the Deskbar. In window mode you can resize the bar-display by resizing the window and then use the <a href="../gui.html#replicants">Replicant</a> handle to drag it to the Desktop.<br />
-Wherever it's installed, it's operated via a right-click context menu.<br />
-To remove the applet again from the Deskbar, uncheck <span class="menu">Live in the Deskbar</span> in its context menu.</p>
-<h2>Quit an application</h2>
+<p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />Il compito principale dell'applet ProcessController è quello di mostrare l'attività della CPU (s) e la quantità di memoria utilizzata. Esso consente il monitoraggio di singoli team, cambiare la loro priorità, e ucciderli se il programma si blocca. In ambienti multiprocessore che consente di disabilitare singoli processori / core. Quando incidente Tracker o deskbar poterli riavviare dal menu di ProcessController.</p>
+<p>Indicatori sulla sinistra mostrano l'utilizzo di ogni CPU, mentre la barra sulla destra mostra il consumo di memoria. Ricordate che il numero degli l'indicatori dipendono dal numero di processori /nucleo nel computer.</p>
+<p>Se non ancora in esecuzione, lanciando ProcessController chiede se si dovrebbe aprire in modalità finestra o vivono nella Deskbar. In modalità finestra è possibile ridimensionare la barra-display ridimensionando la finestra e quindi utilizzare il  <a href="../gui.html#replicants">Replicant</a> maniglia per trascinarla sul desktop.<br />
+Ovunque è installato, è gestito tramite un menu di scelta rapida. <br />
+Per rimuovere l'applet di nuovo dal deskbar, deselezionare  <span class="menu">dal vivo nel  Deskbar</span> nel suo menu contestuale.</p>
+<h2>Chiudere un'applicazione</h2>
 <img src="../images/processcontroller-images/quit.png" alt="ProcessController - Quit an application" />
-<p>To quit an application just choose its name from the <span class="menu">Quit an application</span> menu. This is a clean way to close app, just like  clicking its close button. Be careful not to quit system processes like servers or daemons, however. Your system may stop working reliably. </p>
-<h2>Memory usage</h2>
+<p>Per chiudere un'applicazione basta scegliere il nome dal  menu<span class="menu">Chiudere di un'applicazione</span>. Questo è un modo pulito per chiudere app, proprio come cliccando sul suo pulsante di chiusura.Fare attenzione a non uscire dai processi di sistema come server o demoni, tuttavia. Il sistema può smettere di funzionare in modo affidabile.</p>
+<h2>Utilizzo della memoria</h2>
 <img src="../images/processcontroller-images/memory.png" alt="ProcessController - Memory usage" />
-<p>Monitoring memory usage can be rather inaccurate.</p>
-<p>This menu allows you to monitor memory usage of different teams in your system. Next to the team's name there are two columns: first with the amount reserved for writable memory, while the second shows all memory including read-only space (shared libraries for example).</p>
-<p>The first row <i>System resources &amp; caches...</i> shows the total amount of memory used by the system and all applications. The length of the blue bar is based on the total physical memory in your computer. The next rows show memory used by each process. Note that the length of the bar is based only on the actually used part of the memory.</p>
+<p>Monitorizzare la memoria  può essere piuttosto impreciso.</p>
+<p>Questo menu consente di monitorare l'utilizzo di memoria di diversi team nel vostro sistema. Accanto al nome della squadra ci sono due colonne: la prima con l'ammontare riservato per memoria scrivibile, mentre il secondo mostra tutta la memoria anche in sola lettura dello spazio (librerie condivise per esempio).</p>
+<p>La prima fila <i> le risorse di sistema &amp; cache ...</i> mostra la quantità totale di memoria utilizzata dal sistema e tutte le applicazioni. La lunghezza della barra blu è basato sulla memoria fisica totale del computer. Le righe successive mostrano memoria utilizzata da ogni processo. Si noti che la lunghezza della barra si basa solo sulla parte effettivamente utilizzata della memoria.</p>
 <table>
-		<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Memory used only by given application (with write access)</td></tr>
-		<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Memory including read-only space (can be shared with other applications)</td></tr>
+		<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Memoria utilizzata solo per l'applicazione data  (con accesso di scrittura)</td></tr>
+		<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Memoria di sola lettura tra spazio (può essere condiviso con altre applicazioni)</td></tr>
 </table>
 
-<h2>Threads and CPU usage</h2>
-<p>This menu allows you to change thread priorities, kill teams or debug them.</p>
-<div class="box-stop">Changes via the commands in this menu reach deep into the system and can cause data loss and system instability. Keep that mouse hand steady!</div>
+<h2>Fili e utilizzo della CPU</h2>
+<p>Questo menu consente di modificare le priorità dell filo, uccidere le squadre o eseguirne il debug.</p>
+<div class="box-stop">Cambiamenti via i comandi di questo menu possono aggiungere nella profondità del sistema e possono causare perdite di dati e l'instabilità della sistema. Mantenere la mano ferma sul mouse!</div>
 <img src="../images/processcontroller-images/priority.png" alt="ProcessController - Priority" />
 <table>
-	<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Kernel code</td></tr>
-	<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>User code</td></tr>
-	<tr><td style="height:20px;background:#6EBE6E"></td><td></td><td>Idle thread</td></tr>
+	<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Codice del kernel</td></tr>
+	<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Codice utente</td></tr>
+	<tr><td style="height:20px;background:#6EBE6E"></td><td></td><td>Filo inattivo</td></tr>
 </table>
-<p>At the first level you see team names. By clicking on one, you can kill the whole team. The dark-blue part of the bar is time spent in kernel code, the light-blue part in user code, the green part in the idle thread(s). A bar completely filled with blue means that the team is using all processoring power.</p>
-<p>The second level shows particular threads of a team. By clicking on one, you can debug or kill it. A bar completely filled with blue means that the thread is pegging one processor/core.</p>
-<p>The last level of the menu allows you to change a thread's priority. Be careful with that! As a rule of thumb the priority of a thread should be inverse its CPU usage. That is, the more it tries to claim CPU time, the lower should be it's priority. In general, don't mess with an app's priorities; contact its author, that's his business.
+<p>Al primo livello vengono visualizzati nomi di squadra. Cliccando su uno, si può uccidere tutta la squadra. Il blu scuro parte della barra è il tempo trascorso in codice del kernel, l'azzurro parte nel codice utente, la parte verde nel thread inattivo (s). Una barra completamente riempita con mezzi blu che la squadra sta usando tutto il potere processoring.</p>
+<p>Il secondo livello mostra le discussioni particolare di una squadra. Facendo clic su uno, è possibile eseguire il debug o ucciderlo. Una barra completamente riempita con mezzi blu che il thread è pegging un processore / core.</p>
+<p>L'ultimo livello del menu consente di cambiare la priorità di un thread. State attenti con quello! Come regola generale la priorità di un thread deve essere inverso il suo utilizzo della CPU. Questo è, più si cerca di rivendicare il tempo di CPU, minore dovrebbe essere è la priorità. In generale, non si scherza con le priorità di una app; contattare il suo autore, questo è il suo affare.
 </p>
 
 </div>

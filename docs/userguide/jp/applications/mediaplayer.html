@@ -10,12 +10,14 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  *		Szymon Barczak (Google Code-In student)
+ * Translators:
+ *		thebowseat
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>MediaPlayer</title>
+	<title>メディアプレーヤー</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -42,85 +44,84 @@
 <li><a href="../../en/applications/mediaplayer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="mail.html">Mail</a> 
+ «  <a href="mail.html">メール</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
-::  <a href="midiplayer.html">MidiPlayer</a>  »
+::  <a href="midiplayer.html">MIDIプレーヤー</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
-<h2><img src="../../images/apps-images/mediaplayer-icon_64.png" alt="mediaplayer-icon_64.png" width="64" height="64" />MediaPlayer</h2>
+<h2><img src="../../images/apps-images/mediaplayer-icon_64.png" alt="mediaplayer-icon_64.png" width="64" height="64" />メディアプレーヤー</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><span class="menu">アプリケーション (Applications)</span></td></tr>
-<tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/MediaPlayer</span></td></tr>
-<tr><td>設定ファイル：</td><td></td><td><span class="path">~/config/settings/MediaPlayer</span></td></tr>
+<tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/メディアプレイヤー</span></td></tr>
+<tr><td>設定ファイル：</td><td></td><td><span class="path">~/config/settings/メディアプレイヤー</span></td></tr>
 </table>
 <p><br /></p>
-<p>MediaPlayer is the default player for all audio and video files. Thanks to it's <a href="http://www.ffmpeg.org/">ffmpeg</a> backend, a plethora of widely used formats are supported. Its simple interface has all the controls you'd expect:</p>
+<p>メディアプレイヤーはすべてのオーディオと動画ファイルの標準プレーヤーです。 <a href="http://www.ffmpeg.org/">ffmpeg</a> バックエンドのおかげで多くのフォーマットがサポートされています。シンプルなインターフェースにはあなたが期待するすべてのコントロールが付いています：</p>
 <img src="../images/apps-images/mediaplayer.png" alt="mediaplayer.png" />
-<p>The slider of the progress bar allows you to quickly skim to a position, resting the mouse over it shows the current and remaining time of the clip. Clicking on the time display to the right of it, toggles between length, current and remaining time.<br />
-Below that you find the usual controls to skip to the previous track, play/pause, stop and jump to the next track. Then comes a volume control (clicking the speaker symbol toggles muting) and a VU meter.</p>
+<p>プログレスバーのスライダーで素早く新しい位置に移動することができます。マウスをスライダーの上に置くとクリップの現在と残り時間を表示します。右にあるタイムディスプレーにクリックすると長さ、現在時間か残り時間を切り替えます。<br />
+その下には、前のトラックにスキップ、再生/一時停止、停止と次のトラックにスキップする通常のコントロールがあります。次にボリュームコントロール (スピーカーシンボルをクリックするとミュートに切り替えます) とVUメーターがあります。</p>
 
-<h2>Audio and video playback</h2>
-<p>Since there aren't any specific features for for audio playback, we'll go straight to video or general features.</p>
+<h2>オーディオとビデオの再生</h2>
+<p>オーディオ再生用の特別な機能はついていないので、直にビデオ再生と一般設定に行きます。</p>
 <img src="../images/apps-images/mediaplayer-info.png" alt="mediaplayer-info.png" />
-<p>Available to all media is the <span class="menu">File info...</span> (<span class="key">ALT</span> <span class="key">I</span>). It shows information about the currently loaded file, like playing time or details of the audio/video track and its codec.</p>
-<p>Most of the often used commands from the menus are also available from a right-click context menu on the video area. Convenient when in full-screen mode.<br />
-Under <span class="menu">Video</span> you'll find options to zoom the window to various levels or force the aspect ratio to some standard values. Leaving the aspect ration to the default <span class="menu">Stream settings</span> should work best for correctly encoded files.</p>
-<p>MediaPlayer supports subtitles in <a href="http://en.wikipedia.org/wiki/SubRip">SRT</a> format. To have them show up under <span class="menu">Subtitles</span>, their filenames have to be identical to their video file, with a suffixed language name and ".srt" instead of the video's extension. For example:</p>
-<pre>MyMovie.avi
-MyMovie.Deutsch.srt
-MyMovie.English.srt
-MyMovie.Français.srt</pre>
-<p>Multiple audio tracks, most often used for several languages inside one video file, are available from the <span class="menu">Audio track</span> submenu. The <span class="menu">Video | Track</span> submenu offers the same when having multiple video streams available.</p>
-<p>You can toggle the <span class="menu">Full screen</span> mode (<span class="key">ALT</span> <span class="key">ENTER</span> or <span class="key">F</span> or a double left-click), hide MediaPlayer's window borders and controls with <span class="menu">Hide interface</span> (<span class="key">ALT</span> <span class="key">H</span> or a double right-click) or have it's window <span class="menu">Always on top</span> (<span class="key">ALT</span> <span class="key">A</span>).</p>
+<p><span class="menu">ファイルの情報...</span> (<span class="key">ALT</span> <span class="key">I</span>) はすべてのメディアに利用できます。現在ロードされているファイルの情報 (例えばプレイタイム、オーディオ/ビデオの詳細やエンコーダー)を表示します。</p>
+<p>メニューから煩雑に利用されているコマンドのほとんどはビデオエリア右クリックして開くコンテキストメニューからも利用可能です。フルスクリーンモードのときに便利です。<br />
+<span class="menu">ビデオ</span> ではウィンドウをズームしたりアスペクト比を標準値に強制的に変更することができます。アスペクト比を<span class="menu">ストリーム設定</span>の標準にしておくことは正しくエンコードされたファイルには最適なはずです。</p>
+<p>メディアプレーヤーは <a href="http://en.wikipedia.org/wiki/SubRip">SRT</a> フォーマットの字幕をサポートしています。
+<span class="menu">字幕</span> に表示するには、ファイル名がビデオファイルと同じ名前にし、言語名を追加し、ビデオの拡張子の代わりに ".srt" で保存してください。例えば：</p>
+<pre>マイムービー.avi
+マイムービー.Deutsch.srt
+マイムービー.English.srt
+マイムービー.Français.srt</pre>
+<p>一つのビデオファイル内に複数の言語のために頻繁に使われる複数のオーディオトラックは <span class="menu">音声トラック</span> サブメニューから利用できます。
+<span class="menu">ビデオ | トラック</span> サブメニューは複数のビデオストリームがあるときに同じことを提供します。</p>
+<p><span class="menu">フルスクリーン</span> モード (<span class="key">ALT</span> <span class="key">ENTER</span> か <span class="key">F</span> 又はダブルクリック)に切り替えたり、<span class="menu">インターフェースを隠す</span> (<span class="key">ALT</span> <span class="key">H</span> かダブルクリック)でメディアプレーヤーのウィンドウ境界とコントロールを隠したり、ウィンドウを<span class="menu">常に最前面</span> (<span class="key">ALT</span> <span class="key">A</span>)に表示することができます。</p>
 
-<h2>Playlists</h2>
-<p><span class="menu">MediaPlayer | Playlist...</span> (<span class="key">ALT</span> <span class="key">P</span>) opens a window with the files currently queued up for playback. Double-clicking an entry starts playing it.</p>
+<h2>プレイリスト</h2>
+<p><span class="menu">メディアプレーヤー | プレイリスト...</span> (<span class="key">ALT</span> <span class="key">P</span>) で現在プレイバックを待っているファイルを含むウィンドウを開くことができます。ダブルクリックすると再生が始まります。</p>
 <img src="../images/apps-images/mediaplayer-playlist.png" alt="mediaplayer-playlist.png" />
-<p>You can add more files by dropping them into the list and rearrange their position via drag &amp; drop. From the <span class="menu">Edit</span> menu you can <span class="menu">Randomize</span> or <span class="menu">Remove</span> (<span class="key">DEL</span>) an entry from the list or delete the actual file with <span class="menu">Move to Trash</span> (<span class="key">ALT</span> <span class="key">T</span>).</p>
-<p>Of course, you can <span class="menu">Save</span> a playlist and later <span class="menu">Open</span> it again, or start it with simply double-clicking the playlist file.</p>
+<p>ドラッグ &amp; ドロップでファイルをリストに追加し、配置を変更することができます。<span class="menu">編集</span> メニューからリストから <span class="menu">ランダムに並べ替え</span> かエントリーをリストから <span class="menu">削除</span> (<span class="key">DEL</span>) 又はファイルを実際に <span class="menu">ごみ箱へ移動</span> (<span class="key">ALT</span> <span class="key">T</span>) できます。</p>
+<p>もちろん、プレイリストを<span class="menu">保存</span>して後で<span class="menu">開く</span>こともできます。プレイリストファイルを単にダブルクリックすることも可能です。</p>
 
-<h2>Settings</h2>
-<p>There are several settings to fine-tune MediaPlayer's behavior:</p>
+<h2>設定</h2>
+<p>メディアプレーヤーの動作を微調整するためいくつかの設定があります：</p>
 <img src="../images/apps-images/mediaplayer-settings.png" alt="mediaplayer-settings.png" />
-<p>The first batch, <span class="menu">Play mode</span>, is pretty self-explaining. Start playback automatically, close windows when finished or play clips in a loop.</p>
-<p>Next are different <span class="menu">View options</span>.<br />
-You can opt to <span class="menu">Use hardware overlay if available</span>, which cuts down CPU usage but only works for one video window and needs a supporting video card driver.<br />
-You can <span class="menu">Scale movies smoothly</span> (when not in overlay mode) which uses very fast filtering to smooth over otherwise blocky pixels when zooming video or watching in full-screen mode.<br />
-<span class="menu">Scale controls in full-screen mode</span> if you prefer slightly bigger controls, maybe because you watch the screen from a bit farther away when in full-screen mode.<br />
-Then there are settings for <span class="menu">Subtitle size</span> and <span class="menu">Subtitle placement</span>. They can be shown at the <span class="menu">Bottom of video</span>, which will always have them overlayed over the picture. Or <span class="menu">Bottom of window</span>, which allows you to resize the window vertically and have the subtitles appear in the black bar at the bottom instead.</p>
-<p>The last setting determines the volume of clips whose windows are not currently active. You can have them all blaring at <span class="menu">Full volume</span>, at less confusing <span class="menu">Low volume</span> or quietly <span class="menu">Muted</span>.</p>
+<p>最初の<span class="menu">再生モード</span>は一目瞭然です。自動で再生を開始し、終わったらウィンドウを閉じるかループで再生を繰り返します。</p>
+<p>次は<span class="menu">表示オプション</span>です。<br /><span class="menu">可能なら、ハードウェアビデオオーバーレイを使う</span>とCPU使用率を下げますが、一つのビデオウィンドウにしか作動せず、サポートされたビデオカードドライバが必要です。<br /><span class="menu">ムービーのスムーズな拡大縮小 (オーバーレイモード以外)</span> 
+でズーム中やフルスクリーンモードのときにピクセルを素早いフィルタリングでスムーズにします。<br />フルスクリーンモードのときにスクリーンを遠くから見るなどの理由で大きいコントロールが好みの場合は、<span class="menu">フルスクリーン表示時にコントロールを拡大する</span> ことができます。<br />それから、<span class="menu">サブタイトルのサイズ</span> と <span class="menu">サブタイトルの位置</span>の設定があります。これらは<span class="menu">ビデオの下側</span>に表示して画像の上に表示するか、ウィンドウのサイズを変更して<span class="menu">画面の下側</span>の黒いバーの中に字幕を表示することができます。</p>
+<p>最後の設定はウィンドウが現在アクティブではないクリップの音量を設定します。
+<span class="menu">最大音量</span>で鳴らすか、<span class="menu">低音量</span> 又は<span class="menu">ミュート</span>にすることができます。</p>
 
-<h2>Keyboard controls</h2>
-<p>MediaPlayer offers convenient key combinations to control playback without using the mouse.</p>
+<h2>キーボードコントロール</h2>
+<p>メディアプレイヤーはプレーバックをコントロールするためにマウスを使わない便利なキーの組み合わせを提供します。</p>
 <table summary="keycombos" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="key">Z</span></td><td style="width:15px;"></td><td>Skip to previous track</td></tr>
-<tr><td><span class="key">X</span></td><td></td><td>Play</td></tr>
-<tr><td><span class="key">C</span></td><td></td><td>Pause</td></tr>
-<tr><td><span class="key">V</span></td><td></td><td>Stop</td></tr>
-<tr><td><span class="key">B</span></td><td></td><td>Skip to next track</td></tr>
+<tr><td><span class="key">Z</span></td><td style="width:15px;"></td><td>前のトラックに飛ぶ</td></tr>
+<tr><td><span class="key">X</span></td><td></td><td>再生</td></tr>
+<tr><td><span class="key">C</span></td><td></td><td>一時停止</td></tr>
+<tr><td><span class="key">V</span></td><td></td><td>停止</td></tr>
+<tr><td><span class="key">B</span></td><td></td><td>次のトラックに飛ぶ</td></tr>
 </table>
-<p>These keys are assigned to the functions of the control buttons. They are always the bottom left letter keys on the keyboard, i.e. they are used independently of your current keymapping. The above keys correspond to a standard US-american keymap.</p>
+<p>これらのキーはコントロールボタンの機能に割り当てられています。これらはいつもキーボードの左下に割り当てられ、現在のキーマップに関係なく使用されます。下のキーはキーはUS-アメリカンの標準キーマップに対応しています。</p>
 <table summary="keycombos" border="0" cellspacing="0" cellpadding="2">
-<tr><td align="right"><span class="key">→</span></td><td style="width:15px;"></td><td>Seek forwards</td></tr>
-<tr><td align="right"><span class="key">SHIFT</span> <span class="key">→</span></td><td></td><td>Jump forwards 10 seconds</td></tr>
-<tr><td align="right"><span class="key">ALT</span> <span class="key">→</span></td><td></td><td>Jump forwards 30 seconds</td></tr>
-<tr><td align="right"><span class="key">←</span></td><td></td><td>Seek backwards</td></tr>
-<tr><td align="right"><span class="key">SHIFT</span> <span class="key">←</span></td><td></td><td>Jump backwards 10 seconds</td></tr>
-<tr><td align="right"><span class="key">ALT</span> <span class="key">←</span></td><td></td><td>Jump backwards 30 seconds</td></tr>
+<tr><td align="right"><span class="key">→</span></td><td style="width:15px;"></td><td>前へシーク</td></tr>
+<tr><td align="right"><span class="key">SHIFT</span> <span class="key">→</span></td><td></td><td>十秒後にジャンプ</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">→</span></td><td></td><td>三十秒後にジャンプ</td></tr>
+<tr><td align="right"><span class="key">←</span></td><td></td><td>後ろへシーク</td></tr>
+<tr><td align="right"><span class="key">SHIFT</span> <span class="key">←</span></td><td></td><td>十秒前にジャンプ</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">←</span></td><td></td><td>三十秒前にジャンプ</td></tr>
 
-<tr><td align="right"><span class="key">↑</span></td><td></td><td>Increase volume</td></tr>
-<tr><td align="right"><span class="key">↓</span></td><td></td><td>Decrease volume</td></tr>
+<tr><td align="right"><span class="key">↑</span></td><td></td><td>音量を上げる</td></tr>
+<tr><td align="right"><span class="key">↓</span></td><td></td><td>音量を下げる</td></tr>
 
-<tr><td align="right"><span class="key">ALT</span> <span class="key">↑</span></td><td></td><td>Skip to previous Track</td></tr>
-<tr><td align="right"><span class="key">ALT</span> <span class="key">↓</span></td><td></td><td>Skip to next Track</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">↑</span></td><td></td><td>前のトラックに飛ぶ</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">↓</span></td><td></td><td>次のトラックに飛ぶ</td></tr>
 
-<tr><td align="right"><span class="key">Spacebar</span></td><td></td><td>Toggle play/pause</td></tr>
-<tr><td align="right"><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>Toggle full-screen mode (also done by double left-clicking the video area)</td></tr>
+<tr><td align="right"><span class="key">Spacebar</span></td><td></td><td>再生と一時停止の切替え</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>フルスクリーンモードの切り替え (ビデオをダブル左クリックでもできます)</td></tr>
 </table>
 
 </div>
@@ -128,9 +129,9 @@ Then there are settings for <span class="menu">Subtitle size</span> and <span cl
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="mail.html">Mail</a> 
+ «  <a href="mail.html">メール</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
-::  <a href="midiplayer.html">MidiPlayer</a>  »
+::  <a href="midiplayer.html">MIDIプレーヤー</a>  »
 </span></div>
 </div>
 

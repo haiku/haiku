@@ -9,12 +9,15 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		helix84
+ *		Bachoru
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Queries</title>
+	<title>Požiadavky</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -55,99 +58,99 @@
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Index</td></tr>
 <tr class="index"><td>
-	<a href="#find-window">The Find window</a><br />
-	<a href="#basic-query">Basic queries - "by Name"</a><br />
-	<a href="#adv-query">Advanced queries - "by Attribute"</a><br />
-	<a href="#more-adv-query">Even more advanced queries - "by Formula"</a><br />
-	<a href="#result-window">The result window</a><br />
-	<a href="#query-template">Query Templates</a>
+	<a href="#find-window">Okno Nájsť</a><br />
+	<a href="#basic-query">Základné požiadavky - „podľa názvu“</a><br />
+	<a href="#adv-query">Pokročilé požiadavky - „podľa atribútu“</a><br />
+	<a href="#more-adv-query">Ešte pokročilejšie požiadavky - „podľa vzorca“</a><br />
+	<a href="#result-window">Výsledkové okno</a><br />
+	<a href="#query-template">Šablóny požiadaviek</a>
 </td></tr>
 </table>
 
-<h1>Queries</h1>
+<h1>Požiadavky</h1>
 
-<p>A query is a file search based on file attributes and can be performed within Tracker or in Terminal. Queries are saved in <span class="path">/boot/home/queries/</span> and by default last seven days before being purged. Note, these aren't static result lists of your search, but are the query formulas which trigger a new search whenever you open them.<br />
-Even better, you don't have to double-click to re-do a query. You can <a href="tracker.html#navigating">drill down</a> a saved query just like any folder by right-clicking on it and navigating through the submenus.</p>
+<p>Požiadavka je systém hľadania súborov založený na atribútoch a môže byť vykonaná v Trackeri alebo Termináli. Požiadavky sa ukladajú v <span class="path">/boot/home/queries/</span> a predvolene tam zostávajú sedem dní, potom sú prečistené. Pamätajte, že tieto súbory nie sú statické výsledky hľadania, ale vzorce požiadaviek a ich otvorením spustíte nové hľadanie.<br />
+Je to ešte lepšie - na opätovné vykonanie požiadavky na ňu nemusíte ani dvakrát kliknúť. Môžete postupne <a href="tracker.html#navigating">prechádzať</a> uloženou požiadavkou kliknutím pravým tlačidlom na ňu a navigáciou cez jej submenu.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="find-window" name="find-window">The Find window</a></h2>
-<p>You start a query by invoking the <span class="menu">Find...</span> menu either from the Deskbar menu or any Tracker window or the Desktop (which is actually a fullscreen Tracker window). The shortcut is <span class="key">ALT</span> <span class="key">F</span>. You're presented with the Find window:</p>
+<a id="find-window" name="find-window">Okno Nájsť</a></h2>
+<p>Novú požiadavku začnete vyvolaním menu <span class="menu">Nájsť...</span> buď z menu Panelu, alebo akéhokoľvek okna Trackera alebo Plochy (ktorá je vlastne celoobrazovkovým oknom Trackera). Skratka je <span class="key">ALT</span> <span class="key">F</span>. Privíta vás toto okno:</p>
 <img src="images/queries-images/basic-query.png" alt="basic-query.png" />
 <ol>
-<li><p>Select recent or saved queries or save the current search parameters as <a href="#query-template">Query Template</a>.</p></li>
-<li><p>Narrow down your search from <span class="menu">All files and folders</span> to specific file types.</p></li>
-<li>Define the search method:<ul>
-    <li><span class="menu">by Name</span> - a basic search by file or folder name</li>
-    <li><span class="menu">by Attribute</span> - an advanced search, you specify search terms for one or more attributes</li>
-    <li><span class="menu">by Formula</span> - an even more advanced search, you can fine-tune a complex query term</li></ul></li>
-<li><p>Select which drives to search on.</p></li>
-<li><p>Enter the search term.</p></li>
-<li><p>The expander hides/unhides the additional options.</p></li>
-<li><p>Uncheck the <span class="menu">Temporary</span>  checkbox if you don't want this query self-destruct after 7 days.</p></li>
-<li><p>Check if your query is supposed to <span class="menu">Include trash</span>.</p></li>
-<li><p>Optionally, enter a name for this query if you want to save it.</p></li>
-<li><p>You can drag&amp;drop the icon anywhere to save a query. Doing that with the right mouse button, offers the option to save as template.</p></li>
+<li><p>Výber nedávno použitej alebo uloženej požiadavky či uloženie aktuálnych parametrov hľadania ako <a href="#query-template">Šablónu Požiadavky</a>.</p></li>
+<li><p>Zúženie hľadania zo <span class="menu">Všetkých súborov a priečinkov</span> na konkrétne typy súborov.</p></li>
+<li>Určenie metódy hľadania:<ul>
+    <li><span class="menu">podľa názvu</span> - základný typ hľadania podľa názvu súboru alebo priečinka</li>
+    <li><span class="menu">podľa atribútu</span> - pokročilý typ hľadanie, určujete hľadané výrazy pre jeden alebo viac atribútov</li>
+    <li><span class="menu">podľa vzorca</span> - ešte pokročilejší typ hľadania, môžete vyladiť komplexný výraz požiadavky</li></ul></li>
+<li><p>Výber diskov, na ktorých sa bude hľadať.</p></li>
+<li><p>Zadanie hľadaného výrazu.</p></li>
+<li><p>Skrytie/zobrazenie ďalších možností.</p></li>
+<li><p>Odškrtnite zaškrtávacie políčko <span class="menu">Dočasné</span>  ak nechcete, aby bola požiadavka odstránená po 7 dňoch.</p></li>
+<li><p>Vyberte, či má vaša požiadavka zahŕňať Kôš.</p></li>
+<li><p>Sem môžete zadať názov požiadavky, ak ju chcete uložiť.</p></li>
+<li><p>Ikonu môžete hocikam pretiahnuť myšou, čím sa požiadavka uloží. Ak tak vykonáte pravým tlačidlom myši, môžete ju uložiť ako šablónu.</p></li>
 </ol>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="basic-query" name="basic-query">Basic queries - "by Name"</a></h2>
-<p>If you simply want to find all files and folders on your mounted disks that match a certain pattern, simply leave the search method at <span class="menu">by Name</span>, enter the search term into the text box and press <span class="key">ENTER</span>.</p>
+<a id="basic-query" name="basic-query">Základné požiadavky - „podľa názvu“</a></h2>
+<p>Ak chcete jednoducho nájsť všetky súbory a priečinky na vašich diskoch, ktoré zodpovedajú určitému vzoru, nechajte možnosť hľadania<span class="menu">podľa názvu</span>, zadajte hľadaný výraz to textového poľa a stlačte <span class="key">ENTER</span>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="adv-query" name="adv-query">Advanced queries - "by Attribute"</a></h2>
-<p>You can create more advanced queries by searching within the attributes of specific file types. For that to work, these attributes have to be <a href="index.html">indexed</a>.</p>
+<a id="adv-query" name="adv-query">Pokročilé požiadavky - „podľa atribútu“</a></h2>
+<p>Môžete vytvoriť ešte pokročilejšie požiadavky hľadaním vrámci atribútov konkrétnych typov súborov. Aby to mohlo fungovať, tieto atribúty musia byť <a href="index.html">indexované</a>.</p>
 <img src="images/queries-images/query-window.png" alt="query-window.png" />
-<p>You start by setting the filetype from <span class="menu">All files and folders</span> to, for example, <span class="menu">Text | E-mail</span> and change the search method to <span class="menu">by Attribute</span>.</p>
-<p>This adds a pop-up menu to the left of the textbox and the buttons <span class="button">Add</span> and <span class="button">Remove</span> under that. From the menu you choose which attribute to query. With <span class="button">Add</span> and <span class="button">Remove</span> you can query additional attributes or remove them again. These attributes can be logically linked with AND/OR.</p>
-<p>Let's do an email query as an example:</p>
+<p>Môžete začať nastavením typu súboru z <span class="menu">Všetky súbory a priečinky</span> na, povedzme, <span class="menu">Text | E-mail</span> a zmeniť metódu hľadania na <span class="menu">podľa atribútu</span>.</p>
+<p>Týmto pribudne naľavo od textového poľa rozbaľovacieho menu a tlačidlá <span class="button">Pridať</span> a <span class="button">Odstrániť</span> pod tým. Z menu si vyberiete, ktorý atribút má byť predmetom požiadavky. Tlačidlami <span class="button">Pridať</span> a <span class="button">Odstrániť</span> môžete hľadať ďalšie atribúty alebo ich znova odstrániť. Tieto atribúty môžete logicky spojiť operátormi A alebo ALEBO.</p>
+<p>Ako príklad spravme požiadavku na e-mail:</p>
 <img src="images/queries-images/query-window-filled.png" alt="query-window-filled.png" />
-<p>This is your Find window when you're looking for all emails Clara Botters has sent to you in the last two months that had in the subject "vibraphone" or "skepticality".<br />
-As you see, searching through time-based attributes supports some useful phrases: besides for the "last 2 months", you could also use "today", "yesterday", "Monday" or "last Monday" (which would be the Monday last week), or "last 2 minutes/hours/days/weeks".<br />
-A good way to cut down the number of search results.</p>
+<p>Takto vyzerá okno Nájsť, keď hľadáte všetky e-maily, ktoré vám Clara Botters poslala za posledné 2 mesiace a mali v predmete slová „vibrafón“ alebo „skeptickosť“.<br />
+Ako vidíte, hľadanie časovo založených atribútov ponúka zopár užitočných fráz: okrem „posledné 2 mesiace“ môžete použiť „dnes“, „včera“, „Pondelok“ alebo „minulý pondelok“ (čo by bol pondelok minulého týždňa), či „posledné 2 minúty/hodiny/dni/týždne“.<br />
+Je to dobrý spôsob na zúženie výsledkov hľadania.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="more-adv-query" name="more-adv-query">Even more advanced queries - "by Formula"</a></h2>
-<p>Typing in a formula query by hand is daunting and really quite unpractical. It still has its uses.</p>
-<p>Take the above query by attribute of Clara's mails concerning vibraphones etc. If you have all the attributes and their search terms set, try switching to <span class="menu">by Formula</span> mode and be overwhelmed by this one line query string:</p>
+<a id="more-adv-query" name="more-adv-query">Ešte pokročilejšie požiadavky - „podľa vzorca“</a></h2>
+<p>Písanie vzorca ručne môže byť skľučujúce a veľmi nepraktické. Napriek tomu ale má využitie.</p>
+<p>Vezmite si hore uvedenú požiadavku podľa atribútu ohľadom e-mailov od Clary. Ak máte všetky atribúty a hľadané výrazy nastavené, skúste prepnúť do režimu <span class="menu">podľa vzorca</span> a nechajte sa ohromiť týmto jednoriadkovým reťazcom:</p>
 <img src="images/queries-images/formula-query.png" alt="formula-query.png" />
-<p>Once more as text, edited for readability:</p>
+<p>Ešte raz ako text upravený pre lepšiu čitateľnosť:</p>
 <pre>(((((MAIL:from=="*[cC][lL][aA][rR][aA] [bB][oO][tT][tT][eE][rR][sS]*")
        &amp;&amp;(MAIL:when&gt;=%2 months%))
        &amp;&amp;(MAIL:subject=="*[vV][iI][bB][rR][aA][pP][hH][oO][nN][eE]*"))
        ||(MAIL:subject=="*[sS][kK][eE][pP][tT][iI][cC][aA][lL][iI][tT][yY]*"))
        &amp;&amp;(BEOS:TYPE=="text/x-email"))</pre>
-<p>What's the use?</p>
+<p>Aké je využitie?</p>
 <ul>
-<li><p>You could copy and paste the string into an email, forum or IRC for others to use or debug.</p></li>
-<li><p>You can use this method to construct a query in <span class="menu">Attribute</span> mode and then switch to <span class="menu">Formula</span> mode, to comfortably generate a search string to use for a query in Terminal or a script.</p></li>
-<li><p>You can fine tune your query by inserting parenthesis where needed, make parts case-sensitive or negate logical combinations by changing. e.g. "<tt>==</tt>" to "<tt>!=</tt>" for a NOT AND. All you need is a basic understanding of <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression">regular expressions</a> and maybe some scripting basics.</p></li>
+<li><p>Reťazec môžete kopírovať a vložiť do e-mailu, fóra alebo IRC pre iných na použitie alebo ladenie.</p></li>
+<li><p>Môžete použiť túto metódu na skonštruovanie požiadavky v režime <span class="menu">podľa atribútu</span> a potom prepnúť do režimu <span class="menu">podľa vzorca</span>, čím môžete pohodlne vygenerovať reťazec na hľadanie s použitím Terminálu alebo skriptu.</p></li>
+<li><p>Môžete doladiť vašu požiadavku vložením zátvorky kde to je potrebné, nastavením odlišovania veľkosti písma alebo negáciou logických kombinácií napr. zmenou „<tt>==</tt>“ na „<tt>!=</tt>“ pre A ANI. Potrebujete iba základné chápanie <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression">regulárnych výrazov</a> a možno nejaké základy skriptovania.</p></li>
 </ul>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="result-window" name="result-window">The result window</a></h2>
-<p>After you start a search, the Find window will be replaced by a result window. Here is an example that queried for "server":</p>
+<a id="result-window" name="result-window">Výsledkové okno</a></h2>
+<p>Keď začnete hľadanie, okno Nájsť bude nahradené výsledkovým oknom. Tu je príklad požiadavky pre slovo „server“:</p>
 <img src="images/queries-images/result-window.png" alt="result-window.png" />
-<p>Besides the gray background, result windows work exactly like any other Tracker window. Some things are worth noting:</p>
+<p>Až na šedé pozadie funguje výsledkové okno rovnako ako všetky ostatné okná Trackera. Niektoré veci stoja za zmienku:</p>
 <ul>
-<li><p>You can open the location of a file or folder by double clicking on its path attribute.</p></li>
-<li><p>With <span class="menu">File | Edit query</span> or <span class="key">ALT</span> <span class="key">G</span> you get back to your Find window to refine your query.</p></li>
-<li><p>A query is live, i.e. if a file that matches your search criteria appears or disappears from your system, this change is reflected in your results in real-time.</p></li>
+<li><p>Môžete otvoriť umiestnenie súboru dvojitým kliknutím na jej atribút cesty.</p></li>
+<li><p>Pomocou <span class="menu">Súbor | Upraviť požiadavku</span> alebo <span class="key">ALT</span> <span class="key">G</span> sa môžete vrátiť do okna Nájsť a upraviť vašu požiadavku.</p></li>
+<li><p>Požiadavka je živá, teda ak sa súbor vyhovujúci kritériám hľadania objaví alebo odstráni z vašeho systému, táto zmena sa odrazí vo výsledkoch v reálnom čase.</p></li>
 </ul>
-<p>You can assign a sensible attribute layout for query results of a specific filetype. Open a folder containing files of the filetype you'd like to create a template for and arrange the attributes how you'd like to have query results presented. Copy this layout with <span class="menu">Attributes | Copy layout</span>.</p>
-<p>Open <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, create a new folder named <i>group/filetype</i>, replacing the slash with an underscore, e.g. "audio_x-mp3". Open the new folder and paste in the previously copied layout with <span class="menu">Attributes | Paste layout</span>.</p>
+<p>Môžete priradiť rozumné rozložené atribútov konkrétnemu typu súboru. Otvorte súbor obsahujúci súbory takého typu, pre aký chcete vytvoriť šablónu, a usporiadajte atribúty tak, ako ich chcete vidieť vo výsledkoch požiadavky. Toto rozloženie skopírujte v <span class="menu">Atribúty | Kopírovať rozloženie</span>.</p>
+<p>Otvorte <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, vytvorte nový priečinok s názvom <i>skupina/typ_súboru</i>, lomka nahraďte podčiarkovníkom, napr. „audio_x-mp3“. Otvorte tento priečinok a vložte predtým skopírované rozloženie v <span class="menu">Atribúty | Vložiť usporiadanie</span>.</p>
 
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="query-template" name="query-template">Query Templates</a></h2>
-<p>If you double click a saved query, the file search is at once started and the result window opens immediately. However, you may not want to search with these <i>exact</i> search parameters, but use it as starting point to only slightly tweak the formula.<br />
-By using the <span class="menu">Save query as template</span> menu item (see <a href="#find-window">(1) in screenshot</a> at the top) or drag&amp;dropping the icon (10) anywhere with the right mouse button, you can create just such a template. Double clicking it won't open a result window, but the Find panel, giving you the opportunity to quickly change search strings or add/remove attributes.</p>
-<p>Wherever you choose to save query templates, they'll be listed in the Find panel's menu of recent queries.</p>
+<a id="query-template" name="query-template">Šablóny požiadaviek</a></h2>
+<p>Ak dvakrát kliknete na uloženú požiadavku, uskutoční sa hľadanie a okamžite sa zobrazí výsledkové okno. Možno ale nechcete hľadať <i>presne</i> s týmito parametrami, ale použiť ich ako východisko pre mierne upravený vzorec.<br />
+Použitím položky menu <span class="menu">Uložiť požiadavku ako šablónu</span> (pozri <a href="#find-window">(1) v snímke</a> navrchu) alebo pretiahnutí ikony pravým tlačidlom myši (10) hocikam môžete vytvoriť šablónu. Dvojité kliknutie na ňu neotvorí výsledkové okno, ale panel Nájsť, čo vám dá možnosť rýchlo zmeniť hľadaný reťazec alebo pridať/odstrániť atribúty.</p>
+<p>Kdekoľvek tieto šablóny uložíte, budú uvedené v zozname nedávno použitých požiadaviek v paneli Nájsť.</p>
 </div>
 </div>
 

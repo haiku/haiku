@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		helix84
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Boot Loader</title>
+	<title>Zavádzač systému</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -44,61 +46,60 @@
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
     <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="filesystem-layout.html">Filesystem layout</a>  »
+::  <a href="filesystem-layout.html">Rozloženie súborového systému Haiku</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h1>Boot Loader</h1>
+<h1>Zavádzač systému</h1>
 
-<p>Haiku's Boot Loader can help when you experience hardware related problems or want to choose which Haiku installation to start, if you have more than one (maybe on an installation CD or USB stick).<br />
-It's also handy after you installed a software component that acts up and prevents you from booting the system to remove it again. The <i>Disable user add-ons</i> option that's mentioned below, will start Haiku without loading user installed components, e.g. a driver.</p>
-<p>To enter the Boot Loader options, you have to press and keep holding the <span class="key">SHIFT</span> key before the beginning of Haiku's boot process. If there's a boot manager installed, you can start holding <span class="key">SHIFT</span> before invoking the boot entry for Haiku. If Haiku is the only operating system on the machine, you can begin holding the key while still seeing boot messages from the BIOS.</p>
+<p>Zavádzač systému Haiku vám môže pomôcť, keď narazíte na problémy s hardvérom alebo ak si chcete vybrať, ktorú inštaláciu Haiku chcete spustiť ak máte viac než jednu (možno na inštalačnom CD alebo na kľúči USB).<br />
+Tiež sa hodí potom ako nainštalujete softvérový komponent, ktorý robí problémy a zabraňuje vám naštartovať systém, na jeho odstránenie a opätovné pridanie. Voľba <i>Vypnúť používateľské doplnky</i>, ktorá sa spomína nižšie spustí Haiku bez načítania komponentov, ktoré nainštaloval používateľ, napr. ovládače zariadení.</p>
+<p>Voľby Zavádzača systému môžete zadať po stlačení a podržaní klávesu <span class="key">SHIFT</span> pred začiatkom zavádzania systému Haiku. Ak je nainštalovaný správca zavádzania, môžete kláves <span class="key">SHIFT</span> začať držať už predtým, než vyvoláte položku Haiku. Ak je Haiku na počítači jediný operačný systém, môžete začať držať kláves ešte vtedy, keď vidíte štartovacie správy od BIOSu.</p>
 <p><br /></p>
-<p>Once it's there, you're offered four menus:</p>
+<p>Po jeho zobrazení vám ponúkne štyri menu:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
-<tr><td><b>Select boot volume</b></td><td> </td><td>Choose which Haiku installation to start.</td></tr>
-<tr><td><b>Select safe mode options</b><br />
-</td><td> </td><td>There are several options to try in case of hardware related trouble. When moving the selection bar to an option, a short explanation appears at the bottom of the screen.
-<p><i>- Safe mode</i><br />
-<i>- Disable user add-ons</i><br />
-<i>- Disable IDE DMA</i><br />
-<i>- Use fail-safe video mode</i><br />
-<i>- Disable IO-APIC</i><br />
-<i>- Disable LOCAL APIC</i><br />
-<i>- Don't call the BIOS</i><br />
-<i>- Disable APM</i><br />
-<i>- Disable ACPI</i>
+<tr><td><b>Vyberte zavádzací zväzok</b></td><td> </td><td>Vyberte, ktorú inštaláciu Haiku chcete spustiť.</td></tr>
+<tr><td><b>Vyberte voľby bezpečného režimu</b><br />
+</td><td> </td><td>V prípade problémov súvisiacim s hardvérom existuje niekoľko volieb, ktoré môžete skúsiť. Pri označení každej z volieb sa zobrazí na spodku obrazovky jej krátky popis.
+<p><i>- Bezpečný režim</i><br />
+<i>- Vypnúť používateľské doplnky</i><br />
+<i>- Vypnúť IDE DMA</i><br />
+<i>- Použiť bezpečný grafický režim</i><br />
+<i>- Vypnúť IO-APIC</i><br />
+<i>- Vypnúť LOCAL APIC</i><br />
+<i>- Nevolať BIOS</i><br />
+<i>- Vypnúť APM</i><br />
+<i>- Vypnúť ACPI</i>
 </p></td></tr>
-<tr><td><b>Select debug options</b><br />
-</td><td> </td><td>Here you'll find several options that help with debugging or getting details for a bug report. Again, a short explanation for each option is displayed at the bottom.
-<p><i>- Enable serial debug output</i><br />
-<i>- Enable on screen debug output</i><br />
-<i>- Enable debug syslog</i>
+<tr><td><b>Vyberte voľby ladenia</b><br />
+</td><td> </td><td>Tu nájdete niekoľko volieb, ktoré pomáhajú pri ladení alebo získavaní podrobností do hlásenia chyby. Dolu má opäť každá voľba krátke vysvetlenie.
+<p><i>- Zapnúť výstup ladenia na sériový port</i><br />
+<i>- Zapnúť výstup ladenia na obrazovku</i><br />
+<i>- Zapnúť výstup ladenia do syslog</i>
 </p>
-<p>If "debug syslog" is enabled, a warm reboot after a crash shows these additional options:</p>
-<p><i>- Display syslog from previous session</i><br />
-<i>- Save syslog from previous session</i>
+<p>Ak je voľba „Zapnúť výstup ladenia do syslog“zapnutá, teplý reštart po havárii zobrazí naviac tieto ďalšie voľby:</p>
+<p><i>- Zoraziť syslog z predošlej relácie</i><br />
+<i>- Uložiť syslog z predošlej relácie</i>
 </p></td></tr>
-<tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td>If you had to activate the option <i>Use fail-safe video mode</i>, you can set resolution and color depth.</td></tr>
+<tr><td class="onelinetop"><b>Vyberte bezpečný grafický režim</b></td><td> </td><td>Ak ste museli aktivovať voľbu <i>Použiť bezpečný grafický režim</i>, tu môžete nastaviť rozlíšenie a farebnú hĺbku.</td></tr>
 </table>
 <p><br /></p>
-<p>After activating one or more options, you return to the main menu and continue booting, which presents you with this boot screen:</p>
+<p>Po aktivovaní jednej alebo viacerých volieb sa vrátite do hlavného menu a môžete pokračovať v zavádzaní systému, ktoré sa nachádza na tejto obrazovke:</p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
-<p>If everything works OK, one symbol after another quickly lights up.<br />
-The different symbols roughly correspond to these boot stages:</p>
+<p>Ak všetko funguje, postupne sa rozsvecuje jeden symbol za druhým.<br />
+Rozličné symboly zhruba zodpovedajú týmto fázam zavádzania:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>Initializing modules.</td></tr>
-	<tr><td><b>Disk + magnifier</b></td><td> </td><td>Creating rootfs (<span class="path">/</span>) and mounting devfs (<span class="path">/dev</span>).</td></tr>
-	<tr><td><b>Plug-in card</b></td><td> </td><td>Initializing device manager.</td></tr>
-	<tr><td><b>Boot disk</b></td><td> </td><td>Mounting boot disk.</td></tr>
-	<tr><td><b>Chip</b></td><td> </td><td>Loading CPU specific modules.</td></tr>
-	<tr><td><b>Folder</b></td><td> </td><td>Final initialization of subsystems.</td></tr>
-	<tr><td><b>Rocket</b></td><td> </td><td>Boot script starting the system.</td></tr>
+	<tr><td><b>Atóm</b></td><td style="width:10px;"> </td><td>Inicializácia modulov.</td></tr>
+	<tr><td><b>Disk + lupa</b></td><td> </td><td>Vytvára sa rootfs (<span class="path">/</span>) a pripája sa devfs (<span class="path">/dev</span>).</td></tr>
+	<tr><td><b>Zásuvná karta</b></td><td> </td><td>Inicializuje sa správca zariadení.</td></tr>
+	<tr><td><b>Zavádzací disk</b></td><td> </td><td>Pripája sa zavádzací disk.</td></tr>
+	<tr><td><b>Čip</b></td><td> </td><td>Načítavajú sa moduly špecifické pre CPU.</td></tr>
+	<tr><td><b>Priečinok</b></td><td> </td><td>Konečná inicializácia subsystémov.</td></tr>
+	<tr><td><b>Raketa</b></td><td> </td><td>Zavádzací skript spúšťa systém.</td></tr>
 </table>
 
 </div>
@@ -109,7 +110,7 @@ The different symbols roughly correspond to these boot stages:</p>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
     <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="filesystem-layout.html">Filesystem layout</a>  »
+::  <a href="filesystem-layout.html">Rozloženie súborového systému Haiku</a>  »
 </span></div>
 </div>
 

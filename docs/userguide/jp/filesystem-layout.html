@@ -54,11 +54,11 @@
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 <h1>ファイルシステムの設計</h1>
 
-<p>Haiku's filesystem layout is quite transparent, trying to always use non-cryptic names for files and folders, that don't leave the user guessing. Files and folders that are important for the system to function properly, are protected from accidental tempering by showing one of these alerts:</p>
+<p>Haikuのファイルシステムの設計は完全に透過的で、ファイルやフォルダに暗号めいていない名前を使うよう常に努力しています。
+システムが正しく機能するために重要なファイルやフォルダについては、次のような警告を表示することで不慮の操作からそれらを保護します:</p>
 <img src="images/filesystem-layout-images/achtung-user.png" alt="achtung-user.png" /> 
 <img src="images/filesystem-layout-images/achtung-system.png" alt="achtung-system.png" />
 <p>システム階層下の何かをリネームまたは削除しようとすると、第二の警告が表示されます。 "<span class="button">Do it</span>" ボタンは<span class="key">SHIFT</span> キーを押している間だけクリック可能になります。</p>
@@ -73,8 +73,8 @@
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="system" name="system">システムフォルダー - <span class="path">/boot/system/</span></a></h2>
 <p>Haiku の前身である BeOS では、このフォルダは <span class="path">/boot/beos/</span> と名付けられていました。まだその名称をいくつかの古いドキュメント（例えば、オリジナルの BeBook ）の中に見ることができます。<br />
-システムフォルダの名称にかかわらず、その内部にあるものを変更すべきではありません。 Haiku をアップデートするたびに、システムフォルダ内にファイルやフォルダが追加されたり、システムフォルダ内のファイルやフォルダが削除・上書きされたりする可能性があります。他の Tracker アドオンや Translator 、あるいは他のハードウェアドライバで機能を追加したい場合は、自分の <span class="path">/boot/home/</span> の階層に、あるいはこれがすべてのユーザ向けであると思われる時は、 <span class="path">/boot/common/</span> の下にこれらをインストールします。 Haiku が現在同様マルチユーザに対応していない間は、1つの home フォルダを持った1人のユーザしか存在しないので、この区別には明白な効果がありません。しかし、将来的には1人以上の複数ユーザがサポートされるため、最初から正しい方法を知っておくことには意味があります。</p>
-<p>それでは、仮に最新の画像形式のための新しい Translator をインストールしたいとしましょう。各自のシステムフォルダにそれを単純にコピーしてはいけません。思い出してください： システムフォルダに変更を加えてはいけません！
+システムフォルダの名称にかかわらず、その内部にあるものを変更すべきではありません。 Haiku をアップデートするたびに、システムフォルダ内にファイルやフォルダが追加されたり、システムフォルダ内のファイルやフォルダが削除・上書きされたりする可能性があります。他の Tracker アドオンや Translator 、あるいは他のハードウェアドライバで機能を追加したい場合は、自分の <span class="path">/boot/home/</span> の階層に、あるいはこれがすべてのユーザ向けであると思われる時は、 <span class="path">/boot/common/</span> の下にこれらをインストールします。 Haiku が現在同様マルチユーザに対応していない間は、1つの <i>home</i> フォルダを持った1人のユーザしか存在しないので、この区別には明白な効果がありません。しかし、将来的には1人以上の複数ユーザがサポートされるため、最初から正しい方法を知っておくことには意味があります。</p>
+<p>それでは、仮に最新の画像形式のための新しい Translator をインストールしたいとしましょう。各自のシステムフォルダにそれを単純にコピーしてはいけません。思い出してください： システムフォルダに変更を加えてはいけません！<br />
 その代わりに、それを <span class="path">/boot/common/</span> あるいは <span class="path">/boot/home/config/</span> の下にある、システムフォルダがミラーされている階層に入れます。</p>
 <p>この例では、システムフォルダ下の Translator の位置は</p>
 <p><span class="path">/boot/system/add-ons/Translators/</span>
@@ -143,7 +143,7 @@ If you do want to know more about how things tick in Haiku, have a look at this 
 
 <tr><td align="right"><span class="path">DefaultQueryTemplates/</span></td><td></td><td>特定のファイルタイプのためのクエリ結果ウインドウのレイアウトを定義できます。トピック<a href="queries.html#result-window">クエリ： 結果ウィンドウ</a>を参照してください。</td></tr>
 
-<tr><td align="right"><span class="path">Go/</span></td><td></td><td>例えば、Open / Save パネルでリンクが利用できるようにするといった目的で、このフォルダの中にユーザの使いたい場所へのリンクを置きます。トピック <a href="gui.html#favorites-recent">Haiku の GUI： Favorites および Recent フォルダ</a>を参照してください。</td></tr>
+<tr><td align="right"><span class="path">Go/</span></td><td></td><td>例えば、読込／保存パネルでリンクが利用できるようにするといった目的で、このフォルダの中にユーザの使いたい場所へのリンクを置きます。トピック <a href="gui.html#favorites-recent">Haiku の GUI： Favorites および Recent フォルダ</a>を参照してください。</td></tr>
 
 <tr><td align="right"><span class="path">Tracker New Template/</span></td><td></td><td>Tracker の <span class="menu">File | New...</span> メニューから利用可能なあらゆるファイルタイプのためのテンプレートを追加します。トピック <a href="tracker.html#working-with-files">Tracker: Working with files</a> を参照してください。</td></tr>
 </table>

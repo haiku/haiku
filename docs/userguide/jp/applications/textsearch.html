@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		thebowseat
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>TextSearch</title>
+	<title>テキスト検索</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -41,7 +43,7 @@
 <li><a href="../../en/applications/textsearch.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="terminal.html">Terminal</a> 
+ «  <a href="terminal.html">ターミナル</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
 ::  <a href="tv.html">TV</a>  »
 </span></div>
@@ -49,47 +51,45 @@
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
-<h2><img src="../../images/apps-images/textsearch-icon_64.png" alt="textsearch-icon_64.png" width="64" height="64" />TextSearch</h2>
+<h2><img src="../../images/apps-images/textsearch-icon_64.png" alt="textsearch-icon_64.png" width="64" height="64" />テキスト検索</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><i>No entry, normally launched via Tracker Add-on</i></td></tr>
-<tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/TextSearch</span></td></tr>
-<tr><td>設定ファイル：</td><td></td><td><span class="path">~/config/settings/TextSearch</span></td></tr>
+<tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><i>エントリーなし、通常はTrackerアドオンから起動</i></td></tr>
+<tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/テキスト検索</span></td></tr>
+<tr><td>設定ファイル：</td><td></td><td><span class="path">~/config/settings/テキスト検索</span></td></tr>
 </table>
 <p><br /></p>
-<p>TextSearch looks for a string in text files. Typically it is invoked from <a href="../tracker-add-ons.html">Tracker's Add-on</a> context menu on the selection of files or folders you want to search.</p>
+<p>テキスト検索はテキストファイルの中の文字列を検索します。通常は <a href="../tracker-add-ons.html">Tracker's Add-on</a> コンテキストメニューから選択したフォルダーやファイル内を検索するために呼び出されます。</p>
 
 <img src="../images/apps-images/textsearch.png" alt="textsearch.png" />
 
-<p>You enter a search string in the text box on top and hit <span class="key">RETURN</span> or click <span class="button">Search</span> to start. If <span class="menu">Show lines</span> is checked, the hits are automatically expanded to show the lines of the file containing the search string.</p>
+<p>上に検索したい文字列を入力し、<span class="key">RETURN</span> を押すか <span class="button">検索開始</span> をクリックして開始します。 <span class="menu">行を表示</span> がチェックされていた場合、検索結果は検索内容が入っているファイルの行を表示するため自動的に拡大されます。</p>
 
-<p>Only a few words on some of the otherwise self-explaining menu items:</p>
+<p>一目瞭然のメニューアイテムについて少し：</p>
 <table summary="menus" border="0" cellpadding="2" cellspacing="0">
-<tr><td colspan="5"><h3>File menu</h3></td></tr>
-<tr><td class="onelinetop"><span class="menu">New window</span></td><td></td><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Opens a new window where you can enter another string and search through the same files/folders.
-</td></tr>
-<tr><td><span class="menu">Set target...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Lets you choose a new set of files and folders to search through.</td></tr>
-<tr><td colspan="5"><h3>Action menu</h3></td></tr>
-<tr><td><span class="menu">Trim selection</span></td><td></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Removes all entries from the list that are not currently selected.</td></tr>
-<tr><td><span class="menu">Open selection</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>Opens the currently selected files with their preferred application (same as a double-click). If it's a text editor supporting it (like Pe), you can jump to the exact line the search string was found.</td></tr>
-<tr><td><span class="menu">Open files in Tracker</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>Opens the location of the currently selected files in Tracker.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Copy text to clipboard</span></td><td></td><td><span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Copies the current selection to the clipboard.</td></tr>
-<tr><td colspan="5"><h3>Settings menu</h3></td></tr>
-<tr><td colspan="3" class="onelinetop"><span class="menu">Skip folders starting with a dot</span></td><td> </td><td>This is useful when working in a "unixy" environment, where often administrative files are hidden inside "<tt>.folders/</tt>". Source versioning systems like SVN and CVS are examples of applications using this and are also widely used in Haiku.</td></tr>
-<tr><td colspan="3"><span class="menu">Escape search text</span></td><td> </td><td>TextSearch uses the command line tool <span class="cli">grep</span>. For it, special characters like <tt>'"*\$?!</tt> and spaces have to be escaped with a <tt>\</tt>. Deactivating this setting means you have to do this yourself, but in exchange grants you the power of <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">regular expressions</a>.</td></tr>
-<tr><td colspan="3"><span class="menu">Text files only</span></td><td> </td><td>TextSearch is currently only useful for finding strings in plain text files. Deactivating this setting will have it look through any kind of file anyway.</td></tr>
-<tr><td colspan="5"><h3>History menu</h3></td></tr>
-<tr><td colspan="4"></td><td>Contains recently used search strings.</td></tr>
-<tr><td colspan="5"><h3>Encoding menu</h3></td></tr>
-<tr><td colspan="4"></td><td>Lets you choose different character encodings if needed.</td></tr>
+<tr><td colspan="5"><h3>ファイルメニュー</h3></td></tr>
+<tr><td class="onelinetop"><span class="menu">新規ウインドウ</span></td><td></td><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>新しいウィンドウを開き、同じファイルやフォルダーを別の文字列で検索できます。</td></tr>
+<tr><td><span class="menu">ターゲットの指定...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>検索する新しいファイルやフォルダーを選択できます。</td></tr>
+<tr><td colspan="5"><h3>アクションメニュー</h3></td></tr>
+<tr><td><span class="menu">選択部のみ残す</span></td><td></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>リストから選択されてない部分を取り除きます。</td></tr>
+<tr><td><span class="menu">選択部を開く</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>現在選択しているファイルを標準のアプリケーションで開きます (ダブルクリックと同じです)。Pe などのテキストエディターが開かれた場合、検索文字列が見つかった行にジャンプすることができます。</td></tr>
+<tr><td><span class="menu">Tracker で開く</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>現在選択しているファイルの場所を Tracker で開きます。</td></tr>
+<tr><td class="onelinetop"><span class="menu">テキストをクリップボードにコピー</span></td><td></td><td><span class="key">ALT</span> <span class="key">B</span></td><td></td><td>選択部分をクリップボードにコピーします。</td></tr>
+<tr><td colspan="5"><h3>設定メニュー</h3></td></tr>
+<tr><td colspan="3" class="onelinetop"><span class="menu">ドットで始まるフォルダーを無視する</span></td><td> </td><td>これはアドミンファイルが "<tt>.folders/</tt>" フォルダーの中に隠されている "unixy" な環境で働いている時に便利です。このフォルダーは SVN and CVS などのソフトバージョンシステムに使用されていて、 Haiku でも広く使われています。</td></tr>
+<tr><td colspan="3"><span class="menu">検索文字をエスケープする</span></td><td> </td><td>テキスト検索は <span class="cli">grep</span> と呼ばれる子納戸ラインツールを使用します。これには <tt>'"*\$?!</tt> やスペースなどの特別な文字には <tt>\</tt> が付いていなければいけません。この設定をオフにすると、自分で <tt>\</tt> をつけなければいけませんが、 <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">正規表現</a> ができるようになります。</td></tr>
+<tr><td colspan="3"><span class="menu">テキストファイルのみ</span></td><td> </td><td>TextSearch は現在テキストファイル内のみの文字列を探すのに便利です。この設定を無効にするとすべてのファイルの中身をチェックします。</td></tr>
+<tr><td colspan="5"><h3>検索履歴メニュー</h3></td></tr>
+<tr><td colspan="4"></td><td>最近検索した文字列が含まれています。</td></tr>
+<tr><td colspan="5"><h3>文字コードメニュー</h3></td></tr>
+<tr><td colspan="4"></td><td>必要な場合別の文字コードを選択できます。</td></tr>
 </table>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="terminal.html">Terminal</a> 
+ «  <a href="terminal.html">ターミナル</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
 ::  <a href="tv.html">TV</a>  »
 </span></div>

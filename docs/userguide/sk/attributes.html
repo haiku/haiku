@@ -9,12 +9,15 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Bachoru
+ *		helix84
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Attributes</title>
+	<title>Atribúty</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -41,7 +44,7 @@
 <li><a href="../en/attributes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="filetypes.html">Filetypes</a> 
+ «  <a href="filetypes.html">Typy súborov</a> 
 ::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="index.html">Index</a>  »
 </span></div>
@@ -51,35 +54,35 @@
 <div>
 <div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h1>Attributes</h1>
+<h1>Atribúty</h1>
 
-<p>Attributes are data fields that belong to a file but aren't part of that file, e.g. they are not computed into the file size and can be copied or changed without touching the file itself. The system uses these attributes to store e.g. file size, file type or date of the last modification. This is similar to other operating systems and their filesystems.</p>
-<p>What's different is that you can add any kind of attribute to any file and display it or make it editable in a Tracker window. You just have to define the kind of attribute you want to add to a file type (e.g. string, integer or time) and give it a name and description.</p>
-<p>The file itself doesn't even need any contents at all. Take a look at these People files for example:</p>
+<p>Atribúty sú dátové polia, ktoré patria súboru, no nie sú jeho súčasťou, teda napr. nepočítajú sa to veľkosti súboru a môžu sa kopírovať alebo meniť bez akejkoľvek manipulácie so samotným súborom. Systém používa tieto atribúty na ukladanie napr. veľkosti súboru, typu súboru alebo dátumu poslednej úpravy. Dá sa to prirovnať k iným operačným systémom a ich súborovým systémom.</p>
+<p>Rozdiel je taký, že môžete pridať hocijaký atribút hocijakému súboru a zobraziť ho alebo ho urobiť upraviteľným v okne Trackera. Musíte iba definovať typ atribútu, ktorý chcete priradiť typu súboru (napr. reťazec, celé číslo alebo čas) a dať mu názov a popis.</p>
+<p>Súbor samotný nemusí vôbec nič obsahovať. Pozrite sa napríklad na tieto súbory Ľudí:</p>
 <img src="images/attributes-images/people.png" alt="people.png" />
 <br />
-<p>As you can see, these are all 0-sized files with attached attributes, the E-mail attribute of "John Nox" being edited right in Tracker.</p>
-<p>If you index these attributes, as People, Email or audio files are by default, they are also searchable with Haiku's fast query system.</p>
+<p>Toto sú súbory s nulovou veľkosťou s priradenými atribútmi, atribút e-mailu osoby „John Nox“ používateľ práve upravuje v Trackeri.</p>
+<p>Ak tieto atribúty indexujete, ako sa predvolene indexujú súbory Ľudí, E-mailov alebo zvuku, bude ich možné vyhľadať rýchlym systémom hľadania Haiku.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="attributes-tracker" name="attributes-tracker">Attributes in Tracker</a></h2>
-<p>Attributes are displayed quite similar to a database or spreadsheet. Using Tracker you can choose which attributes to display (columns) and sort file listings (rows) accordingly.</p>
-<p>To do this, open a Tracker window, click on the <span class="menu">Attributes</span> menu, and select the attributes you want to display. Alternatively, simply right-click onto a column heading and mark the items in the context menu. You can rearrange the columns by a simple drag&amp;drop of the column heading. Moving a column out of a window, is a fast way to get rid of columns you don't need.</p>
-<p>Double-click on the line between two attributes in the heading to automatically resize a column to its optimal width.</p>
-<p>Click on a column heading to toggle the sorting order from ascending to descending. You can establish a secondary sort order by pressing the <span class="key">SHIFT</span> key while clicking on a column heading. You can sort your People files by company and within that order sort by contact name, for instance. See the above screenshot as an example. The secondary sort order is marked by a lighter colored indicator beside the heading.</p>
-<p>Editing these attributes is as simple as renaming a file: Either click on an entry or press <span class="key">ALT</span> <span class="key">E</span> and move between the attributes with <span class="key">TAB</span> and <span class="key">SHIFT</span> <span class="key">TAB</span>. <span class="key">ESC</span> leaves the editing mode without applying the changes.</p>
+<a id="attributes-tracker" name="attributes-tracker">Atribúty v Trackeri</a></h2>
+<p>Atribúty sa zobrazujú podobne ako databázy alebo tabuľky. V Trackeri môžete určiť, ktoré atribúty chcete mať zobrazené (stĺpce) a zoraďovať podľa toho zoznam súborov (riadky).</p>
+<p>To sa robí tak, že v Trackeri kliknete na menu <span class="menu">Atribútov</span> a vyberiete atribúty, ktoré chcete zobraziť. Prípadne môžete jednoducho kliknúť na záhlavie stĺpca a vybrať položky z kontextového menu. Meniť poradie stĺpcov môžete jednoduchým pretiahnutím hlavičky stĺpca myšou na inú pozíciu. Ak stĺpec nepotrebujete, zbavíte sa ho pretiahnutím myšou von z okna.</p>
+<p>Dvojitým kliknutím na čiaru deliacu dva atribúty v hlavičke sa automaticky zmení šírka stĺpcov na optimálnu.</p>
+<p>Kliknutím na hlavičku stĺpca prepínate medzi vzostupným a zostupným usporiadaním. Stanoviť sekundárne usporiadanie môžete držaním klávesu <span class="key">SHIFT</span> počas klikania na hlavičku stĺpca. Napríklad môžete zoradiť vaše súbory Ľudí podľa firmy a v tomto usporiadaní ich zoradiť podľa mena kontaktu. Sekundárne poradie je označené svetlejšie zafarbeným indikátorom vedľa hlavičky.</p>
+<p>Úprava týchto atribútov je rovnako jednoduchá ako premenovanie súboru: Buď kliknite na položku alebo stlačte <span class="key">ALT</span> <span class="key">E</span> a presúvajte sa medzi atribútmi pomocou <span class="key">TAB</span> a <span class="key">SHIFT</span> <span class="key">TAB</span>. <span class="key">ESC</span> opustí režim úpravy bez použitia zmien.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="attributes-terminal" name="attributes-terminal">Attributes in Terminal</a></h2>
-<p>If you prefer to use the commandline or plan to work with many files using scripting, there are several commands for controlling attributes from Terminal.</p>
+<a id="attributes-terminal" name="attributes-terminal">Atribúty v Termináli</a></h2>
+<p>Ak uprednostňujete príkazový riadok alebo plánujete pracovať s viacerými súbormi s použitím skriptovania, existuje niekoľko príkazov na ovládanie atribútov v Termináli.</p>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="listattr" name="listattr">listattr</a></h3>
-<p><span class="cli">listattr</span> lists a file's attributes, but doesn't show the contents of the attributes.</p>
-<pre>usage: listattr 'filename' ['filename' ...]</pre>
-<p>From our screenshot example above:</p>
+<p><span class="cli">listattr</span> vypíše zoznam atribútov súboru, no nezobrazí obsah týchto atribútov.</p>
+<pre>použitie: listattr 'názov súboru' ['názov súboru' ...]</pre>
+<p>Z nášho obrázka hore:</p>
 <pre class="terminal"> ~/people -&gt;listattr Clara\ Botters
 File: Clara Botters
    Type         Size                 Name
@@ -105,63 +108,63 @@ MIME String         21  "BEOS:TYPE"
     Raw Data         20  "_trk/pinfo_le"
  
 131 bytes total in attributes.</pre>
-<p>Besides all the "<tt>META:*</tt>" attributes that hold the contact's information, there are two attributes that are managed by the system:</p>
+<p>Okrem všetkých atribútov „<tt>META:*</tt>“, ktoré obsahujú kontaktné informácie, existujú ešte dva atribúty, ktoré spravuje systém:</p>
 <ul>
-<li><p><tt>BEOS:TYPE</tt> holds the file type as a <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> string, here "<tt>application/x-person</tt>". It determines the default icon and the application that opens the file when you e.g. double click it.</p></li>
-<li><p>"<tt>_trk/pinfo_le</tt>" is the attribute with which Tracker keeps track of a file's icon position.</p></li></ul>
-<div class="box-info">Note the backslash after "Clara". In Terminal you have to "escape" special characters like <tt>'"*\$?!</tt>. The space between "Clara" and "Botters" is also one of those. Therefore the backslash is really in front of the space character, and not after "Clara".</div>
+<li><p><tt>BEOS:TYPE</tt> ukladá typ súboru ako reťazec <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym>, tu „<tt>application/x-person</tt>“. Ten určuje predvolenú ikonu a aplikáciu, v ktorej sa súbor otvorí keď naň napr. dvakrát kliknete.</p></li>
+<li><p>„<tt>_trk/pinfo_le</tt>“ je atribút, ktorým Tracker sleduje pozíciu ikony súboru.</p></li></ul>
+<div class="box-info">Všimnite si obrátené lomítko po slove "Clara". V termináli sa musíte „vyhnúť“ špeciálnym znakom ako <tt>'"*\$?!</tt>. Medzera medzi "Clara" a "Botters" je tiež jedným z nich. Tým pádom sa lomítko v skutočnosti nachádza pred medzerou, nie po slove "Clara".</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="catattr" name="catattr">catattr</a></h3>
-<p><span class="cli">catattr</span> displays the contents of a specific attribute of a file.</p>
-<pre>usage: catattr [--raw|-r] attr_name file1 [file2...]</pre>
-<p>Again our example:</p>
+<p><span class="cli">catattr</span> zobrazí obsah konkrétneho atribútu súboru.</p>
+<pre>použitie: catattr [--raw|-r] názov_atribútu súbor1 [súbor2...]</pre>
+<p>A znova náš príklad:</p>
 <pre class="terminal"> ~/people -&gt;catattr META:city Clara\ Botters
 Clara Botters : string : Whelton</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="addattr" name="addattr">addattr</a></h3>
-<p><span class="cli">addattr</span> adds an attribute to a file and/or fills it with a value.</p>
-<pre>usage: addattr [-t type] attr value file1 [file2...]
-    or: addattr [-f value-from-file] [-t type] attr file1 [file2...]
+<p><span class="cli">addattr</span> pridá súboru atribút a/alebo mu dá hodnotu.</p>
+<pre>použitie: addattr [-t typ] attr hodnota súbor1 [súbor2...]
+    alebo: addattr [-f hodnota-zo-súboru] [-t typ] attr súbor1 [súbor2...]
  
-         Type is one of:
+         Typ môže byť:
                  string, mime, int, llong, float, double, bool, icon, raw
-                 or a numeric value (ie. 0x1234, 42, 'ABCD', ...)
-         The default is "string"</pre>
-<p>So, say dear Clara took a job with the multi-national Barkelbaer Inc., you fill the formerly empty "Company" attribute with that data (which is of type "string"):</p>
+                 alebo číselná hodnota (ie. 0x1234, 42, 'ABCD', ...)
+         Predvolený je „string“</pre>
+<p>Povedzme, že si Clara našla prácu v nadnárodnom Barkelbaer Inc., predtým prázdny atribút „Company“ zaplníme údajom, ktorý je typu „string“ (reťazec znakov):</p>
 <pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\ Inc. Clara\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="rmattr" name="rmattr">rmattr</a></h3>
-<p><span class="cli">rmattr</span> completely removes an attribute from a file.</p>
+<p><span class="cli">rmattr</span> úplne odstráni atribút zo súboru.</p>
 
-<pre>usage: rmattr [-p] attr filename1 [filename2...]
-         'attr' is the name of an attribute of the file
-         If '-p' is specified, 'attr' is regarded as a pattern.</pre>
-<p>Though in all practicality it would be enough to just not fill the "Fax" attribute, you can completely remove it from Clara's file by typing:</p>
+<pre>použitie: rmattr [-p] attr názov_súboru1 [názov_súboru2...]
+         „attr“ je názov atribútu súboru
+         Ak je „-p“ uvedené, „attr“ sa považuje za vzor.</pre>
+<p>Aj keď by bolo praktickejšie vôbec nevypĺňať atribút „Fax“, môžete ho úplne odstrániť zo súboru Clary napísaním:</p>
 <pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="copyattr" name="copyattr">copyattr</a></h3>
 <p><span class="cli">copyattr</span> copies attributes from one or more files to another. By default, the actual contents of the file is <b>not</b> copied.</p>
-<pre>Usage: copyattr &lt;options&gt; &lt;source&gt; [ ... ] &lt;destination&gt;</pre>
+<pre>použitie: copyattr &lt;možnosti&gt; &lt;zdroj&gt; [ ... ] &lt;cieľový priečinok&gt;</pre>
 
-<p>If you do want to copy the attributes plus the data of the file itself, you can add the option "<span class="cli">-d</span>" or "<span class="cli">--data</span>".</p>
+<p>Ak chcete skopírovať atribúty a aj dáta samotného súboru, môžete pridať možnosť „<span class="cli">-d</span>“ alebo „<span class="cli">--data</span>“.</p>
 
 <p><br /></p>
-<p>More information on these commands and their options can be found by typing the command name followed by "<span class="cli">-h</span>" or "<span class="cli">--help</span>".</p>
+<p>Viac informácií o týchto príkazoch zistíte napísaním názvu príkazu nasledovaným „<span class="cli">-h</span>“ alebo „<span class="cli">--help</span>“.</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="filetypes.html">Filetypes</a> 
+ «  <a href="filetypes.html">Typy súborov</a> 
 ::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="index.html">Index</a>  »
 </span></div>

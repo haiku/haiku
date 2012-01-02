@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		thebowseat
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Terminal</title>
+	<title>ターミナル</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -41,89 +43,95 @@
 <li><a href="../../en/applications/terminal.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="stylededit.html">StyledEdit</a> 
+ «  <a href="stylededit.html">テキストエディター</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
-::  <a href="textsearch.html">TextSearch</a>  »
+::  <a href="textsearch.html">テキスト検索</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
-<h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Terminal</h2>
+<h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />ターミナル</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><span class="menu">アプリケーション (Applications)</span></td></tr>
-<tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/Terminal</span></td></tr>
-<tr><td>設定ファイル：</td><td></td><td><span class="path">~/config/settings/Terminal</span><br />
-<span class="path">~/.profile</span> - adds/overrides defaults in <span class="path">/boot/common/etc/profile</span><br />
-<span class="path">~/.inputrc</span> - adds/overrides defaults in <span class="path">/boot/common/etc/inputrc</span></td></tr>
+<tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/ターミナル</span></td></tr>
+<tr><td>設定ファイル：</td><td></td><td><span class="path">~/config/settings/ターミナル</span><br />
+<span class="path">~/.profile</span> -  <span class="path">/boot/common/etc/profile</span> のデフォルトに追加/上書き<br />
+<span class="path">~/.inputrc</span> -  <span class="path">/boot/common/etc/inputrc</span> のデフォルトに追加/上書き</td></tr>
 </table>
 <p><br /></p>
-<p>The Terminal is Haiku's interface to bash, the Bourne Again Shell.</p>
-<p>Please refer to the topic on <a href="../bash-scripting.html">Scripting</a> for a few links to online tutorials on working in the shell and also have a look at <a href="cli-apps.html">Haiku's commandline applications</a>. Here, we'll concentrate on the Terminal application itself.</p>
+<p>ターミナルはHaikuのBash (Bourne Again Shell) へのインターフェースです。</p>
+<p>シェルを使うオンラインチュートリアルへのリンクは
+<a href="../bash-scripting.html">スクリプト</a> と <a href="cli-apps.html">Haiku's commandline applications</a> にあります。ここではターミナルのアプリケーション自体に集中します。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="windows-tabs" name="windows-tabs">Windows and tabs</a></h2>
-<p>You can open as many Terminals as needed, either each in it's own window by simply launching more Terminals or with <span class="key">ALT</span> <span class="key">N</span> from an already running Terminal. Or you use Terminal's tabbed view and open more tabs with <span class="key">ALT</span> <span class="key">T</span>.</p>
+<a id="windows-tabs" name="windows-tabs">ウィンドウとタブ</a></h2>
+<p>ターミナルは必要ならば何個でも開くことができます。すでに走っているターミナルから<span class="key">ALT</span> <span class="key">N</span> で新しいウィンドウを開くか、<span class="key">ALT</span> <span class="key">T</span> でタブを開くことができます。</p>
 <img src="../images/apps-images/terminal.png" alt="terminal.png" />
 <br />
-<p>Double-clicking into the emtpy part of the tab bar opens a new tab; onto a tab opens a dialog to rename its title. There are several %-designated variables that are explained with a tooltip when you hover the mouse over the text field.<br />
-By default, <tt>%1d: %p</tt>, a tab shows the current directory and, separated by a <tt>:</tt>, the name of the currently running process (or <tt>--</tt> if it's just bash running, probably idling). The screenshot above shows the first tab with a FTP session in the <span class="path">Desktop</span> folder and a second tab idling at <span class="path">home</span>.<br />
-Via <span class="menu">Edit | Window title...</span> the Terminal window's title can be edited in a similar way.</p>
-<p>Right-clicking a tab shows a context menu to <span class="menu">Close tab</span>, <span class="menu">Close other tabs</span> or, like double-clicking, <span class="menu">Edit tab title...</span>.</p>
-<p>A Terminal window can be resized like any other window or you use the presets from the <span class="menu">Settings | Window size</span> menu. <span class="key">ALT</span> <span class="key">ENTER</span> toggles fullscreen mode.</p>
-<p>Changed window size and text encoding are only kept choosing <span class="menu">Settings | Save as default</span>.</p>
+<p>タブの空白部分をダブルクリックすると新しいタブが開かれ、タブをダブルクリックするとタイトルを編集するダイアログが開かれます。％で指定された変数はいくつかあり、テキストフィールドの上にマウスを移動させると説明がツールチップで表示されます。<br />
+標準 (<tt>%1d: %p</tt>) では、タブはカレントディレクトリを表示し、 <tt>:</tt> で区切った後、現在実行中のプロセス(bash が実行中かアイドル中の場合は <tt>--</tt>) を表示します。上のスクリーンショットでは、 <span class="path">Desktop</span> フォルダー内の FTPセッションを最初のタブで実行しており、二つ目のタブは <span class="path">home</span> でアイドルしています。<br /><span class="menu">設定 | ウィンドウタイトル...</span>でターミナルのウィンドウタイトルも同じように編集できます。</p>
+<p>タブを右クリックすると <span class="menu">タブを閉じる</span> か、ダブルクリックのように、<span class="menu">タブタイトルの編集...</span>をする コンテキストメニューが表示されます。</p>
+<p>ターミナルのウィンドウは他のウィンドウのようにサイズを変更するか、<span class="menu">設定 | ウィンドウサイズ</span> メニューでプリセットされたサイズを使うことができます。 <span class="key">ALT</span> <span class="key">ENTER</span> でフルスクリーンモードに切り替えます。</p>
+<p>変更されたウィンドウサイズと文字エンコーディングは <span class="menu">設定 | デフォルトで保存</span>を選択しなければ保存されません。</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="settings" name="settings">Settings</a></h2>
-<p><span class="menu">Settings | Settings...</span> opens a panel to configure the standard settings of a Terminal.</p>
+<a id="settings" name="settings">設定</a></h2>
+<p><span class="menu">設定 | 設定...</span> ではターミナルの標準設定を変更できます。</p>
 <img src="../images/apps-images/terminal-settings.png" alt="terminal-settings.png" />
 <br />
-<p>It starts off with the "formulas" for naming tab and window titles. Again, tooltips show the available variables. Below that you set font type, font size and the different text and background colors. You can choose a pre-defined color schema like <span class="menu">Black on white</span> or <span class="menu">White on black</span> or create a <span class="menu">Custom</span> one using the color picker below.<br />
-Activate the checkbox to <span class="menu">Confirm exit if active programs exist</span> and you'll be warned when trying to close a Terminal window while an app is still being executed.<br />
-You can save different settings as separate profiles, which on double-click open an accordingly configured Terminal.<br />
-Pressing <span class="button">OK</span> will save the current settings as default.</p>
+<p>タブやウィンドウのタイトルの名前を付ける”式”から始まります。
+再び、ツールチップは利用可能な変数を表示します。
+その下ではフォントタイプ、フォントサイズやテキストのバックグランドの色を設定できます。
+<span class="menu">白地に黒文字</span> のようなプリセット配色を選択するか、下にあるカラー選択を使って <span class="menu">カスタム</span>配色を作成することができます。<br />
+チェックボックスをオンにすると <span class="menu">実行中のプログラムがある場合、終了時に確認する</span> ことができ、実行中のプログラムがある場合にターミナルを終了しようとすると警告が出ます。<br />
+設定をファイルに保存でき、ファイルをダブルクリックすると設定されたターミナルが開きます。<br />
+<span class="button">OK</span> をクリックすると現在の設定をデフォルトとして保存します。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="shortcuts" name="shortcuts">Keyboard shortcuts</a></h2>
-<p>You'll find a list of useful shortcuts in <a href="../keyboard-shortcuts.html#terminal">Shortcuts and key combinations</a>.</p>
+<a id="shortcuts" name="shortcuts">キーボードショートカット</a></h2>
+<p>便利なショートカットは <a href="../keyboard-shortcuts.html#terminal">ショートカットとキーの組み合わせ</a> にリストがのっています。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="customization" name="customization">Bash customization</a></h2>
-<p>Coming from Unix, there are countless possibilities to customize the bash itself. There are two files that are especially important to the user: <span class="cli">.profile</span> and <span class="cli">.inputrc</span><br />
-Both files can be created in the <span class="path">home/</span> folder and add or override the system defaults that are defined in <span class="path">/boot/common/etc/</span>.</p>
+<a id="customization" name="customization">Bash カスタマイズ</a></h2>
+<p>Unix から来る bash をカスタマイズする方法は数え切れないほどあります。ユーザーにとって重要なファイルは二つあります： <span class="cli">.profile</span> と <span class="cli">.inputrc</span> です。<br />
+両方のファイルは <span class="path">home/</span> 内で作成することができ、 <span class="path">/boot/common/etc/</span> で設定されたシステムデフォルトを上書きすることができます。</p>
 
 <h3>.profile</h3>
-<p>The <span class="cli">.profile</span> is loaded every time you open a new Terminal. It sets all kinds of aliases and variables that will affect bash's behavior and appearance. You'll find many online resources that will detail all possibilities.</p>
-<p>The Haiku/BeOS Tip Server has quite a few tips to get you started, for example:</p>
+<p><span class="cli">.profile</span> は新しいターミナルを開くたびにロードされます。
+bash の動作に影響する様々なエイリアスや変数を設定します。これについてのヘルプはオンラインで見つけられるでしょう。</p>
+<p>The Haiku/BeOS Tip Server からいろいろなヘルプを見られます。例えば：</p>
 <ul>
-<li><a href="http://betips.net/1997/09/09/customize-your-terminal-prompt/">Customize your Terminal prompt</a></li>
-<li><a href="http://betips.net/1997/09/09/more-prompt-customizations/">More prompt customizations</a></li>
-<li><a href="http://betips.net/1997/09/09/enhancing-bash/">Enhancing bash</a></li>
-<li><a href="http://betips.net/1997/09/09/custom-keyboard-shortcuts/">Custom keyboard shortcuts</a></li>
+<li><a href="http://betips.net/1997/09/09/customize-your-terminal-prompt/">ターミナルプロンプトをカスタマイズ</a></li>
+<li><a href="http://betips.net/1997/09/09/more-prompt-customizations/">さらに多くのプロンプトをカスタマイズ</a></li>
+<li><a href="http://betips.net/1997/09/09/enhancing-bash/">bash の強化</a></li>
+<li><a href="http://betips.net/1997/09/09/custom-keyboard-shortcuts/">カスタムキーボードショートカット</a></li>
 </ul>
-<p>There are more, <a href="http://betips.net/index.php?s=.profile">have a look</a>.</p>
+<p>より多くのヘルプは： <a href="http://betips.net/index.php?s=.profile">こちらへ</a></p>
 
 <h3>.inputrc</h3>
-<p>The <span class="cli">.inputrc</span> deals with keybindings. Since Haiku provides useful defaults, you probably don't have to mess with these more involved settings. If you do have special needs here, consult one of the many online resources, e.g. <a href="http://tiswww.case.edu/php/chet/readline/rluserman.html">The GNU Readline Library</a>.</p>
+<p><span class="cli">.inputrc</span> はキーバインドに対して働きます。Haiku は便利なデフォルトを提供するので、あなたが詳細設定を変更する必要はないでしょう。もし特別なキーバインドが必要があった場合、 <a href="http://tiswww.case.edu/php/chet/readline/rluserman.html">The GNU Readline Library</a> などのオンラインリソースを見てください。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="hints" name="hints">Hints for working with the Terminal</a></h2>
-<ul><li><p>Dragging a file or folder from a Tracker window into the Terminal will insert its path at the location of the cursor. Dragging with the right mouse button offers additional actions in a context menu:</p>
+<a id="hints" name="hints">ターミナルで作業するためのヒント</a></h2>
+<ul><li><p>
+ファイルやフォルダーを Tracker ウィンドウからターミナルにドラッグすると、カーソルの場所にファイルやフォルダーの場所を挿入します。右クリックでドラッグすると、次のようなアクションがコンテキストメニューに表示されます：</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Insert path</span></td><td> </td><td>Inserts the location of the file, same as drag&amp;dropping with the left mouse button.</td></tr>
-<tr><td><span class="menu">Change directory</span></td><td> </td><td>Changes to the folder of the dragged file.</td></tr>
-<tr><td><span class="menu">Create link here</span></td><td> </td><td>Creates a link to the dragged file in the current working directory of the Terminal.</td></tr>
-<tr><td><span class="menu">Move here</span></td><td> </td><td>Moves the dragged file into the current working directory of the Terminal.</td></tr>
-<tr><td><span class="menu">Copy here</span></td><td> </td><td>Copies the dragged file into the current working directory of the Terminal.</td></tr>
+<tr><td><span class="menu">パスを挿入</span></td><td> </td><td>左クリックと同様、ファイルの場所を挿入します。</td></tr>
+<tr><td><span class="menu">ディレクトリを変更</span></td><td> </td><td>ドラッグされたファイルのフォルダーへディレクトリを変更します。</td></tr>
+<tr><td><span class="menu">カレントディレクトリにリンク作成</span></td><td> </td><td>現在ターミナルで作業中のディレクトリにドラッグされたファイルのリンクを作成します。</td></tr>
+<tr><td><span class="menu">カレントディレクトリへ移動</span></td><td> </td><td>ドラッグされたファイルをカレントディレクトリへ移動させます。</td></tr>
+<tr><td><span class="menu">カレントディレクトリへコピー</span></td><td> </td><td>ドラッグされたファイルをカレントディレクトリにコピーします。</td></tr>
 </table></li>
-<li><p>You can open any file with its preferred application with the command <span class="cli">open <i>[filename]</i></span>. This also works with the representation of the current ("<span class="cli">.</span>") and parent ("<span class="cli">..</span>") folder which then open in a Tracker window. So, to open the current working directory, you type:</p>
-<pre class="terminal">open .</pre>
+<li><p><span class="cli">open <i>[filename]</i></span> コマンドでどのファイルも標準アプリケーションで開くことができます。
+これは現在 ("<span class="cli">.</span>") と親 ("<span class="cli">..</span>") フォルダーの表現でも可能で、 Tracker ウィンドウで開かれます。
+現在作業しているディレクトリを開くには、</p>
+<pre class="terminal">open .</pre> <p>と入力してください。</p>
 </li></ul>
 
 
@@ -132,9 +140,9 @@ Both files can be created in the <span class="path">home/</span> folder and add 
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="stylededit.html">StyledEdit</a> 
+ «  <a href="stylededit.html">テキストエディター</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
-::  <a href="textsearch.html">TextSearch</a>  »
+::  <a href="textsearch.html">テキスト検索</a>  »
 </span></div>
 </div>
 

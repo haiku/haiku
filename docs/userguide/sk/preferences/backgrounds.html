@@ -9,12 +9,15 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Bachoru
+ *		helix84
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Backgrounds</title>
+	<title>Pozadia</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -41,41 +44,40 @@
 <li><a href="../../en/preferences/backgrounds.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="appearance.html">Appearance</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="datatranslations.html">DataTranslations</a>  »
+ «  <a href="appearance.html">Vzhľad</a> 
+::  <a href="../preferences.html" class="uplink">Nastavenia</a> 
+::  <a href="datatranslations.html">Preklad dát</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/prefs-images/backgrounds-icon_64.png" alt="backgrounds-icon_64.png" width="64" height="64" />Backgrounds</h2>
+<h2><img src="../../images/prefs-images/backgrounds-icon_64.png" alt="backgrounds-icon_64.png" width="64" height="64" />Pozadia</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
-<tr><td>Location:</td><td></td><td><span class="path">/boot/system/preferences/Backgrounds</span></td></tr>
-<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/system/app_server/workspaces</span><br />
-<span class="path">~/config/settings/Backgrounds settings</span> - stores the panel's window position</td></tr>
+<tr><td>Panel:</td><td style="width:15px;"></td><td><span class="menu">Nastavenia</span></td></tr>
+<tr><td>Umiestnenie:</td><td></td><td><span class="path">/boot/system/preferences/Backgrounds</span></td></tr>
+<tr><td>Nastavenia:</td><td></td><td><span class="path">~/config/settings/system/app_server/workspaces</span><br />
+<span class="path">~/config/settings/Backgrounds settings</span> - ukladá pozíciu okna panelu</td></tr>
 </table>
-<p>You can set a color or an image as background for every folder and the Desktop for every workspace.</p>
+<p>Môžete nastaviť farbu alebo obrázok ako pozadie pre každý súbor a Plochu pre každú pracovnú plochu.</p>
 <p><br /></p>
 <img src="../images/prefs-images/backgrounds.png" alt="backgrounds.png" />
-<p>The top menu specifies if your changes are applied to the current workspace only, all workspaces, a specific folder or as default for every new folder.</p>
-<p>Below that you can assign an image or select <span class="menu">None</span> if you want simply a colored background. Images can also be drag&amp;dropped onto the preview to the left.</p>
-<p>If you are using an image, you have to decide on the placement:</p>
+<p>Horné menu špecifikuje, či sa vami vykonané zmeny budú aplikovať iba na aktuálnu pracovnú plochu, všetky pracovné plochy, konkrétny priečinok alebo či budú predvolené pre každý nový priečinok.</p>
+<p>Pod tým môžete priradiť obrázok alebo nevybrať <span class="menu">Žiadny</span> ak chcete mať jednofarebné pozadie. Obrázky môžete tiež pretiahnuť myšou do okna náhľadu vľavo.</p>
+<p>Ak použijete obrázok, musíte rozhodnúť o jeho umiestnení:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Manual</span></td><td> </td><td>lets you specify the coordinates. You can drag the picture around in the preview to the left or enter <i>X</i> and <i>Y</i> manually.</td></tr>
-<tr><td><span class="menu">Center</span></td><td> </td><td>centers the picture in the middle of the screen.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Scale to fit</span></td><td> </td><td>enlarges the picture with no regard to its aspect ratio until it fills the screen.</td></tr>
-<tr><td><span class="menu">Tile</span></td><td> </td><td>fills the screen by repeating the picture.</td></tr>
+<tr><td><span class="menu">Ručne</span></td><td> </td><td>umožní vám špecifikovať súradnice. Môžete buď umiestniť obrázok v okne náhľadu, alebo zadať <i>X</i> a <i>Y</i> ručne</td></tr>
+<tr><td><span class="menu">Stred</span></td><td> </td><td>umiestní obrázok do stredu obrazovky.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Zmeniť veľkosť, aby zodpovedala</span></td><td> </td><td>zväčší obrázok bez ohľadu na jeho pomer strán, až kým nezaplní celú obrazovku.</td></tr>
+<tr><td><span class="menu">Dlaždice</span></td><td> </td><td>vydláždi obrazovku obrázkom.</td></tr>
 </table>
-<p>Activating <span class="menu">Icon label outline</span> puts a thin contour around icon labels.</p>
-<p>Whether an icon label's actual text is black or white depends on the setting of the color picker. A dark color sets the text to white, a light color to black. So, if you assign a very bright image to the background, you should also set the color picker to a bright color in order to have icon labels readable in black. (Or use the outline option above.)<br />
-The selected color is also reflected in the <a href="../desktop-applets/workspaces.html">Workspaces applet</a>, which ignores images as backgrounds.</p>
+<p>Nastavenie <span class="menu">Obrys titulku ikony</span> vytvorí tenký obrys okolo titulkov ikon.</p>
+<p>Či je farba titulku ikony biela alebo čierna závisí na nastavení pomocou výberu farieb. Tmavá farba nastaví biely text, bledá nastaví čierny. Keď teda nastavíte veľmi svetlý obrázok ako pozadie, mali by ste vo výberi farieb nastaviť svetlú farbu, aby boli titulky ikon dobre čitateľné - čierne. (Alebo nastavte možnosť obrysu popísanú vyššie.)<br />
+Vybraná farba bude taktiež zobrazená v aplete <a href="../desktop-applets/workspaces.html">Pracovné plochy</a>, ktorý ignoruje obrázky ako pozadia.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">Revert</span></td><td> </td><td>brings back the settings that were active when you started the Backgrounds preferences.</td></tr>
-<tr><td><span class="button">Apply</span></td><td> </td><td>sets your changes.</td></tr>
+<tr><td><span class="button">Vrátiť</span></td><td> </td><td>vráti nastavenia, ktoré boli aktívne v momente spustenia nastavení pozadia.</td></tr>
+<tr><td><span class="button">Použiť</span></td><td> </td><td>aplikuje zmeny, ktoré ste vykonali.</td></tr>
 </table>
 
 </div>
@@ -83,9 +85,9 @@ The selected color is also reflected in the <a href="../desktop-applets/workspac
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="appearance.html">Appearance</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="datatranslations.html">DataTranslations</a>  »
+ «  <a href="appearance.html">Vzhľad</a> 
+::  <a href="../preferences.html" class="uplink">Nastavenia</a> 
+::  <a href="datatranslations.html">Preklad dát</a>  »
 </span></div>
 </div>
 

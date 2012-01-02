@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Boot Loader</title>
+	<title>Alkukäynnistyslataaja</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -50,55 +52,52 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h1>Boot Loader</h1>
+<h1>Alkukäynnistyslataaja</h1>
 
-<p>Haiku's Boot Loader can help when you experience hardware related problems or want to choose which Haiku installation to start, if you have more than one (maybe on an installation CD or USB stick).<br />
-It's also handy after you installed a software component that acts up and prevents you from booting the system to remove it again. The <i>Disable user add-ons</i> option that's mentioned below, will start Haiku without loading user installed components, e.g. a driver.</p>
-<p>To enter the Boot Loader options, you have to press and keep holding the <span class="key">SHIFT</span> key before the beginning of Haiku's boot process. If there's a boot manager installed, you can start holding <span class="key">SHIFT</span> before invoking the boot entry for Haiku. If Haiku is the only operating system on the machine, you can begin holding the key while still seeing boot messages from the BIOS.</p>
+<p>Haikun alkukäynnistyslataaja voi avustaa kun koet laitteistopulmia tai haluat valita, minkä Haiku-asennuksen käynnistät, jos sinulla on useampi kuin yksi. (ehkä asennus-CD:llä tai USB-tikulla)<br />Se on myös kätevä kun olet asentanut ohjelmistokomponentin, joka oireilee ja estää sinua alkukäynnistämästä järjestelmää uudelleen komponentin poistamiseksi. <i>Ota pois käytössä lisäosa</i>-valitsin, joka on mainittu alla, käynnistää Haikun lataamatta käyttäjän asentamia komponentteja, esim.: ajuria.</p>
+<p>Alkulatauslataajan valitsimiin pääsemiseksi sinun on painettava ja pidettävä alhaalla  <span class="key">VAIHTO</span>-näppäintä ennen Haikun alkulatausprosessin käynnistymistä. Jos alkulataushallinta on asennettu, voit aloittaa pitämällä <span class="key">VAIHTO</span>-näppäintä ennen Haikun alkulatausrivin valintaa. Jos Haiku on ainoa koneeseen asennettu käyttöjärjestelmä, voit aloittaa näppäimen pitämisen alhaalla jo silloin, kun näet näytölläsi BIOS-alkulatausviestit.</p>
 <p><br /></p>
-<p>Once it's there, you're offered four menus:</p>
+<p>Kun olet päässyt sinne, näkyviin tulee neljä valikkoa:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
-<tr><td><b>Select boot volume</b></td><td> </td><td>Choose which Haiku installation to start.</td></tr>
-<tr><td><b>Select safe mode options</b><br />
-</td><td> </td><td>There are several options to try in case of hardware related trouble. When moving the selection bar to an option, a short explanation appears at the bottom of the screen.
-<p><i>- Safe mode</i><br />
-<i>- Disable user add-ons</i><br />
-<i>- Disable IDE DMA</i><br />
-<i>- Use fail-safe video mode</i><br />
-<i>- Disable IO-APIC</i><br />
-<i>- Disable LOCAL APIC</i><br />
-<i>- Don't call the BIOS</i><br />
-<i>- Disable APM</i><br />
-<i>- Disable ACPI</i>
+<tr><td><b>Valitse alkulatauslevy</b></td><td> </td><td>Valitse, minkä Haiku-asennuksen käynnistät.</td></tr>
+<tr><td><b>Valitse turvatilavalitsimet</b><br />
+</td><td> </td><td>Laitteistopulmien tapahtuessa voit kokeilla useita valitsimia. Kun valintapalkin siirtää valitsimelle, niin näytön alalaiteen ilmaantuu lyhyt selite.
+<p><i>- Turvatila</i><br />
+<i>- Ota käyttäjälisäosat pois käytöstä</i><br />
+<i>- Ota pois käytöstä IDE DMA</i><br />
+<i>- Käytä vikaturvallista videotilaa</i><br />
+<i>- Ota pois käytöstä IO-APIC</i><br />
+<i>- Ota pois käytöstä LOCAL APIC</i><br />
+<i>- Älä kutsu BIOS:ia</i><br />
+<i>- Ota pois käytöstä APM</i><br />
+<i>- Ota pois käytöstä ACPI</i>
 </p></td></tr>
-<tr><td><b>Select debug options</b><br />
-</td><td> </td><td>Here you'll find several options that help with debugging or getting details for a bug report. Again, a short explanation for each option is displayed at the bottom.
-<p><i>- Enable serial debug output</i><br />
-<i>- Enable on screen debug output</i><br />
-<i>- Enable debug syslog</i>
+<tr><td><b>Valitse vianjäljitysvalitsimet</b><br />
+</td><td> </td><td>Tästä löydät useita valitsimia, jotka opastavat vianjäljityksessä tai yksityiskohtien hakemisessa vikailmoitukseen. Taas näytön alalaidassa näytetään lyhyt selite.
+<p><i>- Ota käyttöön vianjäljitystuloste sarjaväylän kautta</i><br />
+<i>- Ota käyttöön vianjäljitystuloste näytölle</i><br />
+<i>- Ota käyttöön vianjäljitys syslog-tiedostoon</i>
 </p>
-<p>If "debug syslog" is enabled, a warm reboot after a crash shows these additional options:</p>
-<p><i>- Display syslog from previous session</i><br />
-<i>- Save syslog from previous session</i>
+<p>Jos valitsin "debug syslog" on käytössä, uudelleenkäynnistyminen kaatumisen jälkeen näyttää nämä lisävalitsimet:</p>
+<p><i>- Näytä syslog-tiedosto edellisestä istunnosta</i><br />
+<i>- Tallenna syslog-tiedosto edellisestä istunnosta</i>
 </p></td></tr>
-<tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td>If you had to activate the option <i>Use fail-safe video mode</i>, you can set resolution and color depth.</td></tr>
+<tr><td class="onelinetop"><b>Valitse vikaturvallinen videotila</b></td><td> </td><td>Jos sinun oli aktivoitava valitsin <i>Käytä vikaturvallista videotila</i>a, voit asettaa resoluution ja värisyvyyden.</td></tr>
 </table>
 <p><br /></p>
-<p>After activating one or more options, you return to the main menu and continue booting, which presents you with this boot screen:</p>
+<p>Yhden tai useamman valitsimen aktivoinnin jälkeen palaat päävalikkoon ja jatkat alkulatausta, mikä esittää sinulle tämän alkulatausnäytön:</p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
-<p>If everything works OK, one symbol after another quickly lights up.<br />
-The different symbols roughly correspond to these boot stages:</p>
+<p>Jos kaikki toimii normaalisti, symboli toisensa jälkeen syttyy.<br />Erilaiset symbolit vastaavat likimain näitä alkulatausvaiheita:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>Initializing modules.</td></tr>
-	<tr><td><b>Disk + magnifier</b></td><td> </td><td>Creating rootfs (<span class="path">/</span>) and mounting devfs (<span class="path">/dev</span>).</td></tr>
-	<tr><td><b>Plug-in card</b></td><td> </td><td>Initializing device manager.</td></tr>
-	<tr><td><b>Boot disk</b></td><td> </td><td>Mounting boot disk.</td></tr>
-	<tr><td><b>Chip</b></td><td> </td><td>Loading CPU specific modules.</td></tr>
-	<tr><td><b>Folder</b></td><td> </td><td>Final initialization of subsystems.</td></tr>
-	<tr><td><b>Rocket</b></td><td> </td><td>Boot script starting the system.</td></tr>
+	<tr><td><b>Atomi</b></td><td style="width:10px;"> </td><td>Moduulien alustaminen</td></tr>
+	<tr><td><b>Levy + suurentaja</b></td><td> </td><td>Luodaan rootfs (<span class="path">/</span>) ja liitetään devfs (<span class="path">/dev</span>).</td></tr>
+	<tr><td><b>Lisäosakortti</b></td><td> </td><td>Alustetaan laitehallintaa</td></tr>
+	<tr><td><b>Alkukäynnistetään levy</b></td><td> </td><td>Liitetään alkulatauslevy</td></tr>
+	<tr><td><b>Mikropiirit</b></td><td> </td><td>Ladataan prosessorikohtaiset moduulit</td></tr>
+	<tr><td><b>Kansio</b></td><td> </td><td>Alijärjestelmien loppualustus.</td></tr>
+	<tr><td><b>Raketti</b></td><td> </td><td>Järjestelmän käynnistävä alkulatausskripti.</td></tr>
 </table>
 
 </div>

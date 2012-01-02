@@ -9,12 +9,15 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		helix84
+ *		Bachoru
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>ScreenSaver</title>
+	<title>Šetrič obrazovky</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -41,46 +44,42 @@
 <li><a href="../../en/preferences/screensaver.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="screen.html">Screen</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="sounds.html">Sounds</a>  »
+ «  <a href="screen.html">Obrazovka</a> 
+::  <a href="../preferences.html" class="uplink">Nastavenia</a> 
+::  <a href="sounds.html">Zvuky</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
-<h2><img src="../../images/prefs-images/screensaver-icon_64.png" alt="screensaver-icon_64.png" width="64" height="64" />ScreenSaver</h2>
+<h2><img src="../../images/prefs-images/screensaver-icon_64.png" alt="screensaver-icon_64.png" width="64" height="64" />Šetrič obrazovky</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
-<tr><td>Location:</td><td></td><td><span class="path">/boot/system/preferences/Screensaver</span></td></tr>
-<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/ScreenSaver_settings</span></td></tr>
+<tr><td>Panel:</td><td style="width:15px;"></td><td><span class="menu">Nastavenia</span></td></tr>
+<tr><td>Umiestnenie:</td><td></td><td><span class="path">/boot/system/preferences/Screensaver</span></td></tr>
+<tr><td>Nastavenia:</td><td></td><td><span class="path">~/config/settings/ScreenSaver_settings</span></td></tr>
 </table>
 
-<p>The panel of the ScreenSaver preferences is split into two tabs:
-</p>
+<p>Panel nastavení Šetriča obrazovky je rozdelený do dvoch kariet:</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="fade" id="fade">Fade</a></h2>
+<a name="fade" id="fade">Stmievanie</a></h2>
 <img src="../images/prefs-images/screensaver-fade.png" alt="screensaver-fade.png" />
 <br />
-<p>The top checkbox enables/disables the screen saver.<br />
-With the slider below it, you control after how long an idle time the screen saver kicks in.
+<p>Horným zaškrtávacím políčkom môžete zapnúť/vypnúť šetrič obrazovky.<br />
+Posuvníkom pod tým nastavujete, po koľkých minútach nečinnosti sa má šetrič spustiť.</p>
+<p>Ďalšie dva posuvníky sa dajú použiť iba vtedy, keď aktivujete ich zaškrtávacie políčka:<br />
+Prvý posuvník určuje, po koľkých minútach sa má vypnúť obrazovka.<br />
+Druhý určuje, po koľkých minútach bude treba zadať heslo na odomknutie počítača.
 </p>
-<p>The next two sliders are only usable after you activated their checkboxes:<br />
-One slider determines after how many minutes the screen is powered off.<br />
-The other, after how many minutes you need a password to unlock your machine.
-</p>
-<p>By clicking into different corners of the two screens at the bottom, you tell the system when to immediately start the screen saver or when to prevent it from kicking in when you rest the mouse in the indicated corner. Click in the middle of the screens to disable that feature again.
-</p>
+<p>Kliknutím do rôznych rohov dvoch obrazoviek dole určujete, kedy má systém okamžite spustiť šetrič alebo kedy ho spustiť nemá v prípade, že na danom mieste necháte kurzor myši. Kliknutím do stredu týchto obrazoviek ich funkcie deaktivujete.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="screensavers" id="modules">Screensavers</a></h2>
+<a name="screensavers" id="modules">Šetriče obrazovky</a></h2>
 <img src="../images/prefs-images/screensaver-modules.png" alt="screensaver-modules.png" />
 <br />
-<p>The second tab shows a list of all installed screen savers and their individual settings. You can test your settings with the <span class="button">Test</span> button below the list and add more screen savers with the <span class="button">Add...</span> button beside it. Another way to install new screen savers is by a simple drag&amp;drop into the list. Of course, you can also copy/delete its file in its respective user folder, i.e. <span class="path">/boot/common/add-ons/Screen Savers/</span> or <span class="path">/boot/home/config/add-ons/Screen Savers/</span> (see topic <a href="../filesystem-layout.html">Filesystem layout</a>).
+<p>Druhá karta zobrazuje zoznam všetkých nainštalovaných šetričov obrazovky a ich individuálne nastavenia. Otestovať vaše nastavenia môžete tlačidlom <span class="button">Test</span> pod zoznamom a pridať ďalšie šetriče obrazovky tlačidlom <span class="button">Pridať...</span> vedľa. Nainštalovať šetrič môžete aj jednoduchým pretiahnutím myšou do zoznamu. Samozrejme môžete aj skopírovať/vymazať súbor šetriča v jeho príslušnom priečinku, teda <span class="path">/boot/common/add-ons/Screen Savers/</span> alebo <span class="path">/boot/home/config/add-ons/Screen Savers/</span> (pozri tému <a href="../filesystem-layout.html">Rozloženie súborového systému</a>).
 </p>
 
 </div>
@@ -88,9 +87,9 @@ The other, after how many minutes you need a password to unlock your machine.
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="screen.html">Screen</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="sounds.html">Sounds</a>  »
+ «  <a href="screen.html">Obrazovka</a> 
+::  <a href="../preferences.html" class="uplink">Nastavenia</a> 
+::  <a href="sounds.html">Zvuky</a>  »
 </span></div>
 </div>
 

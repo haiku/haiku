@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Filetypes</title>
+	<title>ファイルタイプ</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -41,7 +43,7 @@
 <li><a href="../en/filetypes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="deskbar.html">デスクバー</a> 
+ «  <a href="deskbar.html">Deskbar</a> 
 ::  <a href="contents.html" class="uplink">目次</a> 
 ::  <a href="attributes.html">属性</a>  »
 </span></div>
@@ -49,69 +51,68 @@
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
-<h1>Filetypes</h1>
+<h1>ファイルタイプ</h1>
 
-<p>Other than Windows, Haiku doesn't rely on the 3-letter file extension for a file type (e.g. .txt, .jpg, .mp3). This method is only a last resort fallback. Haiku uses <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> types just like it's custom on the internet.</p>
-<div class="box-info">While there's no reason to use file extensions in Haiku, remember to add them to files you want to share with users of other operating systems, e.g. over email, uploading to a server or via exchange of an USB drive. Otherwise their system may not recognize the file type.</div>
+<p>Windowsと異なり、Haikuはファイルタイプを 3 文字の拡張子 (例えば、txt、.jpg、.mp3) に頼りません。この方法は最後の代案に過ぎません。Haiku はインターネット上の習慣と同様に、<acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> 形式を使用します。</p>
+<div class="box-info">Haiku において拡張子を使う理由はまったくありませんが、例えば、電子メールを通じて、サーバへのアップロード、または USB ドライブの交換によって、別のオペレーティングシステムのユーザーと共有したいファイルには拡張子を付けることを覚えていてください。そうでなければ、彼らのシステムではファイルタイプを認識できないでしょう。</div>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="specific-file" name="specific-file">Setting the filetype of a specific file</a></h2>
-<p>You can change the type of a specific file, its icon and the associated application. Select the file and invoke the <span class="menu">Add-Ons | Filetype add-on</span> from the right-click context menu.</p>
+<a id="specific-file" name="specific-file">特定のファイルのファイルタイプを設定する</a></h2>
+<p>特定のファイルの形式、アイコン、および関連するアプリケーションを変更できます。ファイルを選択して、右クリックコンテキストメニューから <span class="menu">Add-Ons | Filetype アドオン</span>を起動します。</p>
 <img src="images/filetypes-images/filetype-addon.png" alt="filetype-addon.png" />
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="filetype" id="filetype">The File Type</a></h3>
-<p>The above is a PNG file, it's MIME string image/png. Let's say you definitely know that it's not a PNG but a GIF. You can change that either by entering the correct MIME string by hand or with one of the two buttons below the textbox:</p>
+<a name="filetype" id="filetype">ファイルタイプ</a></h3>
+<p>上図は PNG ファイルで、MIME 文字列は image/png です。仮にファイルが PNG ではなくGIF であることが明確に分かっているとしましょう。正しい MIME 文字列を手入力するか、あるいはテキストボックスの下にある 2 個のボタンのどちらかで MIME 文字列を変更できます。</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">Select...</span></td><td> </td><td>shows a hierarchical list of filetypes where you navigate to <tt>image | GIF Image</tt>.</td></tr>
-<tr><td><span class="button">Same as...</span></td><td> </td><td>opens a file dialog where you choose any file that already has the filetype you're looking for.</td></tr>
+<tr><td><span class="button">選択… (Select...)</span></td><td> </td><td>ファイルタイプの階層リストを表示し、そこから <tt>image | GIF Image</tt>.へ移動します。</td></tr>
+<tr><td><span class="button">このタイプと同様… (Same as...)</span></td><td> </td><td>ファイルダイアログを開き、探しているファイルタイプをすでに持つファイルをどれでも選択します。</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="preferred-app" name="preferred-app">The Preferred Application</a></h3>
-<p>This pop-up menu shows a list of all applications that can handle this particular filetype. From here you can choose which program should open this specific file when it's double-clicked. You could, for example, change a HTML file's preferred application from the browser to a text editor while you're working on it. Every other HTML file still opens in the browser, only this particular one starts in your text editor.</p>
+<a id="preferred-app" name="preferred-app">推奨アプリケーション</a></h3>
+<p>このポップアップメニューは、この特定のファイルタイプを扱えるすべてのアプリケーションのリストを表示します。ここから、この特定のファイルがダブルクリックされた時にどのプログラムで開くべきかを決定できます。例えば、作業中の HTML ファイルの推奨アプリケーションをブラウザからテキストエディタに変更できます。にもかかわらず他の HTML  ファイルはブラウザで開きます、この特定のファイルだけが、テキストエディタ中に開きます。</p>
 
-<p>The <span class="menu">Default application</span> is the one that's set globally for that filetype. If you don't find the program you want to associate with this file in the pop-up menu, you'll again find the buttons <span class="button">Select...</span> and <span class="button">Same as...</span> which do the similar thing described under "The File Type" above.</p>
+<p><span class="menu">デフォルトアプリケーション (Default application)</span> はそのファイルタイプに関してアプリケーションを全体的に設定するものです。ポップアップメニューの中にこのファイルに関連させたいプログラムが見つからなかったら、再び <span class="button">選択… (Select...)</span> および <span class="button">このタイプと同様… (Same as...)</span> ボタンに行き着くでしょう。これらのボタンは上記の "ファイルタイプ" で記述されているものと同じ働きをします。</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="icon" name="icon">The Icon</a></h3>
-<p>If you're wondering why the icon well on the top right is empty: Icons are normally inherited from the system default for that filetype. You can open the <span class="app">Filetype add-on</span> of a file that contains an icon and drag&amp;drop it into your file's icon well. Or you double-click the icon well and create or edit your own icon. For more info on icons and how to create your own, see topic <a href="applications/icon-o-matic.html">Icon-O-Matic</a>.</p>
+<a id="icon" name="icon">アイコン</a></h3>
+<p>なぜ右上のアイコンウェルが空か不思議に思っているなら、通常、そのファイルタイプのシステムデフォルトからアイコンは継承されます。アイコンを含んでいるファイルで  <span class="app">Filetype アドオン</span>を起動し、アイコンをアイコンウェルにドラッグ＆ドロップできます。あるいは、アイコンウェルをダブルクリックし、独自のアイコンを作成または編集します。アイコンに関するさらに詳しい情報、および独自のアイコンの作成方法については <a href="applications/icon-o-matic.html">Icon-O-Matic</a> のトピックを見てください。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="settings-apps" name="settings-apps">Special settings for applications</a></h2>
-<p>If you invoke the <span class="app">Filetype add-on</span> on an executable (here: <span class="app">StyledEdit</span>), you'll get a different dialog:</p>
+<a id="settings-apps" name="settings-apps">アプリケーションのための特別な設定</a></h2>
+<p>実行可能なファイル上 (ここでは <span class="app">StyledEdit</span>) で <span class="app">Filetype アドオン</span>を起動した場合、異なるダイアログが開きます。</p>
 <img src="images/filetypes-images/filetype-addon-stylededit.png" alt="filetype-addon-stylededit.png" />
-<p>On top, you'll see, instead of a standardized MIME string, the unique application signature. With it, the system finds the program wherever it's installed.</p>
-<p>Below it are several flags, controlling the app's behaviour:</p>
+<p>一番上には、標準化された MIME 文字列の代わりに、ユニークなアプリケーション署名が見つかるでしょう。それによって、プログラムがどこにインストールされていても、システムはプログラムを見つけます。</p>
+<p>その下に、アプリケーションの振る舞いをコントロールするいくつかのフラグがあります。</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Single launch</span></td><td> </td><td>Only one instance of the app can be running per executable file. If you have two copies of that app, however, they can run side by side.</td></tr>
-<tr><td><span class="menu">Multiple launch</span></td><td> </td><td>Many instances of the app can run simultaneously.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Exclusive launch</span></td><td> </td><td>Really only one instance with that app's signature is allowed to run at a time.</td></tr>
-<tr><td><span class="menu">Args only</span></td><td> </td><td>Indicates the app doesn't respond to messages.</td></tr>
-<tr><td><span class="menu">Background app</span></td><td> </td><td>The app won't appear in <a href="twitcher.html">Twitcher</a> or the list of running apps of the Deskbar.</td></tr>
+<tr><td><span class="menu">複数同時起動不可 (Single launch)</span></td><td> </td><td>実行可能なファイル毎に 1 つのインスタンスだけが実行できます。しかしながら、アプリケーションの 2 つのコピーがあれば、それらは並行して実行できます。</td></tr>
+<tr><td><span class="menu">複数起動可能 (Multiple launch)</span></td><td> </td><td>アプリケーションの複数のインスタンスが同時に実行できます。</td></tr>
+<tr><td class="onelinetop"><span class="menu">排他的起動 (Exclusive launch)</span></td><td> </td><td>実際に、そのアプリケーションの署名を備えたただ 1 つのインスタンスだけが、同時に実行することを許されます。</td></tr>
+<tr><td><span class="menu">引数のみ (Args only)</span></td><td> </td><td>アプリケーションがメッセージに応答しないことを意味します。</td></tr>
+<tr><td><span class="menu">バックグラウンド実行 (Background app)</span></td><td> </td><td>アプリケーションは、<a href="twitcher.html">Twitcher</a>、あるいは Deskbar の実行中アプリケーションリストに表示されません。</td></tr>
 </table>
-<p>Then there's the list of supported filetypes. You can add (and remove) filetypes if you think the application can handle them. As a consequence, the app will appear in the menu for preferred applications or Tracker's <span class="menu">Open with...</span> context menu when you right-click on a file of that type.</p>
-<p>At the bottom are version and copyright information. Like the application signature, they are filled in by the app's author and shouldn't be altered.</p>
+<p>その次に、アプリケーションがサポートするファイルタイプのリストがあります。アプリケーションがそれらを扱えると考えるなら、ファイルタイプを追加 (および削除) できます。結果として、そのタイプのファイルを右クリックすると、アプリケーションが推奨アプリケーション、あるいは Tracker の  <span class="menu">Open with...</span> コンテキストメニューに現われるでしょう。</p>
+<p>一番下には、バージョンおよび著作権情報があります。アプリケーションの署名と同じく、それらはアプリケーションの著者によって記入されています。それらは変更してはいけません。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="filetypes-preferences" name="filetypes-preferences">Global settings with the FileTypes Preferences</a></h2>
-<p>The <span class="app">FileTypes</span> preferences don't deal with individual files but with global settings of filetypes. You can change default icons and preferred applications or add, remove, or alter attributes of whole filetypes. You can even create your own filetype from scratch.</p>
-<p>All filetypes and their configurations are stored in <span class="path">/boot/home/config/settings/beos_mime/</span>. Before you start experimenting, it may be prudent to make a backup of that folder...</p>
-<p>To learn more about the <span class="app">FileTypes</span> preferences see the workshop: <a href="workshop-filetypes+attributes.html">Filetypes, Attributes, Index and Queries</a>.</p>
+<a id="filetypes-preferences" name="filetypes-preferences">Filetypes Preference の全体設定</a></h2>
+<p><span class="app">FileTypes</span> preferences は、 個々のファイルでなく、ファイルタイプの全体的な設定を処理します。デフォルトアイコンや推奨アプリケーションを変更でき、また、ファイルタイプ全体の属性を追加、削除、変更できます。さらに一から独自のファイル形式を作成できます。</p>
+<p>すべてのファイルタイプ、およびそれらの設定は <span class="path">/boot/home/config/settings/beos_mime/</span> に格納されます。試してみる前に、そのフォルダーのバックアップを作ることは賢明なことでしょう…</p>
+<p><span class="app">FileTypes</span> preferences に関してより多くを学ぶには、ワークショップ <a href="workshop-filetypes+attributes.html">Filetypes, Attributes, Index and Queries</a> を参照ください。</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="deskbar.html">デスクバー</a> 
+ «  <a href="deskbar.html">Deskbar</a> 
 ::  <a href="contents.html" class="uplink">目次</a> 
 ::  <a href="attributes.html">属性</a>  »
 </span></div>

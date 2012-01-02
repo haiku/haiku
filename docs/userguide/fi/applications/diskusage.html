@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>DiskUsage</title>
+	<title>Levyasemakäyttö</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -41,47 +43,46 @@
 <li><a href="../../en/applications/diskusage.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="diskprobe.html">DiskProbe</a> 
+ «  <a href="diskprobe.html">Levyasemakoestin</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
-::  <a href="drivesetup.html">DriveSetup</a>  »
+::  <a href="drivesetup.html">Levyasema-asetukset</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/apps-images/diskusage-icon_64.png" alt="diskusage-icon_64.png" width="64" height="64" />DiskUsage</h2>
+<h2><img src="../../images/apps-images/diskusage-icon_64.png" alt="diskusage-icon_64.png" width="64" height="64" />Levyasemakäyttö</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
-<tr><td>Location:</td><td></td><td><span class="path">/boot/system/apps/DiskUsage</span></td></tr>
-<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/DiskUsage</span></td></tr>
+<tr><td>Työpöytäpalkki</td><td style="width:15px;"></td><td><span class="menu">Sovellukset</span></td></tr>
+<tr><td>Sijainti</td><td></td><td><span class="path">/boot/system/apps/DiskUsage</span></td></tr>
+<tr><td>Asetukset</td><td></td><td><span class="path">~/config/settings/DiskUsage</span></td></tr>
 </table>
 <p><br /></p>
-<p>DiskUsage shows graphically how the space on your volumes is utilized.<br />
-A useful tool to answer the question, "<i>Where has all my disk space gone?</i>".</p>
+<p>Levyasemakäyttö näyttää graafisesti kuinka levyasemasi tila on käytetty.<br />
+Hyödyllinen työkalu vastaamaan kysymykseen, "<i>Minne kaikki levytilani on mennyt?</i>".</p>
 <p><img id="diskusage" src="../images/apps-images/diskusage.png" alt="diskusage.png" /></p>
-<p>The concentric circles represent different levels in the file system hierarchy. Above, the circle in the center represents the <span class="path">/boot/home/</span> folder. Each segment of the ring immediately outside that circle is a file or folder under <span class="path">/boot/home/</span>. Every segment farther outside brings you one level deeper in the file hierarchy. You may have to resize the window to accommodate very deep folders.</p>
-<p>Above the graphic is a pop-up menu that lets you switch between all mounted volumes. Before the disk usage of a volume can be displayed, it has to be scanned. As this can take a while for larger disks, you can examine another volume while that scan is done in the background.</p>
+<p>Samankeskiset ympyrät edustavat tiedostojärjestelmähierarkian eri tasoja. Ylinnä, ympyrä keskustassa edustaa <span class="path">/boot/home/</span>-kansiota. Jokainen rengassegmentti välittömästi ympyrän ulkopuolella on tiedosto tai kansio kansion <span class="path">/boot/home/</span> alapuolella. Jokanen segmentti kauempana ulkona tuo sinut yhden tason syvemmälle tiedostohierarkiassa. Sinun on ehkä muutetttava ikkunan kokoa sopeutumisessa hyvin syviä kansioita varten.</p>
+<p>Grafiikan yläpuolella on ponnahdusvalikko, joka sallii sinun vaihtaa kaikkien liitettyjen levyasemien välillä. Ennen kuin levyaseman levykäyttö voidaan näyttää, se on tutkittava. Koska tämä kestää jonkin aikaa laajoilla levyasemilla, voit tutkia toista levyasemaa samalla kun tutkinta suoritetaan taustalla.</p>
 <div class="box-info"><ul>
-<li>If the graphical representation of a file or folder comprises less than about 2° of a circle, it is excluded from the display.</li>
-<li>The number of files that's reported for a folder includes files in subfolders too. A folder counts as a file.</li>
-<li>DiskUsage ignores symbolic links.</li>
+<li>Jos tiedoston tai kansion graafinen esitys muodostaa vähemmän kuin 2 astetta ympyrästä, se jätetään näyttämättä.</li>
+<li>Ilmoitettu kansion sisältämien tiedostojen lukumäärä sisältää myös alikansion tiedostot. Kansio lasketaan tiedostoksi.</li>
+<li>Levyasemakäyttö ohittaa symboliset linkit.</li>
 </ul></div>
-<p>As you move the mouse over a segment, information about that file or folder appears in the status bar at the bottom.</p>
-<p>Right-clicking a segment offers a context menu to <span class="menu">Get Info</span>, <span class="menu">Open</span> (with Tracker), <span class="menu">Open With</span> another suitable application or <span class="menu">Rescan</span> that particular folder.<br />
-Left-clicking a segment makes that file/folder the center circle.<br />
-Left-clicking the center circle moves you up one level.</p>
-<p>You can drag files and folders from DiskUsage to other applications or to the Desktop or other Tracker windows for copying. Vice versa, dropped volumes and folders on DiskUsage's window will zoom directly to them, making them the new center circle.</p>
+<p>Kun siirrät hiiren kohdistimen segmentin yläpuolelle, tietoja tuosta tiedostosta tai kansiosta näytetään alalaidan tilapalkissa.</p>
+<p>Segmentin napsauttaminen hiiren oikealla painikkeella tarjoaa kontekstivalikon <span class="menu">Hae tiedot</span>, <span class="menu">Avaa</span> (Seuraajalla), <span class="menu">Avaa sovelluksella</span> tai <span class="menu">Tutki uudelleen</span> tuo kyseinen kansio.<br />
+Segmentin napsauttaminen hiiren vasemmalla painikkeella tekee tuon tiedoston/kansion keskusympyräksi.<br />
+Napsauttamalla hiiren vasemmalla painikkeella keskiympyrää siirtyy yhden tason ylöspäin.</p>
+<p>Voit raahata tiedostoja ja kansioita Levyasemakäytöstä muihin sovelluksiin tai työpöydälle tai toiseen Seuraaja-ikkunaan, jolloin ne kopioituvat. Päinvastoin, Levyasemakäyttöön pudotetut tiedostot tai levyasemat rajautuvat heti sovelluksen uudeksi keskiympyräksi.</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="diskprobe.html">DiskProbe</a> 
+ «  <a href="diskprobe.html">Levyasemakoestin</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
-::  <a href="drivesetup.html">DriveSetup</a>  »
+::  <a href="drivesetup.html">Levyasema-asetukset</a>  »
 </span></div>
 </div>
 

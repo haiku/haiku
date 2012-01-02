@@ -12,12 +12,13 @@
  * Translators:
  *		hiromu1996
  *		log-1
+ *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Installer</title>
+	<title>インストーラー (Installer)</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -52,7 +53,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 <h2><img src="../../images/apps-images/installer-icon_64.png" alt="installer-icon_64.png" width="64" height="64" />Installer</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -73,15 +73,15 @@
 <img src="../images/apps-images/installer.png" alt="installer.png" />
 <p>1つ目のポップアップメニューで、Haikuのインストール元を指定します。例えば、すでにHaikuがインストールされたディスクや、インストールCD/USBドライブなどが当てはまります。<br />
 2つ目のポップアップメニューで、インストール先を指定します。これは完全に上書きされます。また、あらかじめGPartedのようなパーティショニングツールでパーティションを作っておく必要があります。</p>
-<p>Clicking the little expander widget will <i>Show optional packages</i>, if available, that you can choose to install in addition to the basic Haiku.</p>
+<p><i>オプショナルパッケージを表示</i>のメニューを展開すると、Haikuに追加でインストールするソフトウェアを選択できます。</p>
 <p>インストールプロセスを開始する前に、正しいインストール先が選択されているか、最終確認をしてください。<span class="button">Setup partitions...</span>をクリックすると<a href="drivesetup.html">DriveSetup</a>が開きます。</p>
 <p><span class="button">開始</span> を押すと、インストールプロセスが開始します。このプロセスでは基本的に<span class="path">home/</span>と<span class="path">common/</span>以外のファイルをインストール先にコピーされます。そして、インストール先のボリュームを起動可能に設定します。</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tools" name="tools">ツール</a></h2>
 <p>インストールが完了すると、パーティションは自動的に起動可能に設定されます。ですが、他のオペレーティングシステムやパーティショニングツールがパーティションのブートセクタを書き換えてしまうことがあるかもしれません。その際はインストールCDから起動して、Installerの<span class="menu">インストール先: インストール先の選択</span>の部分でHaikuのパーティションを選択した後に、<span class="menu">ツール</span>の<span class="menu">ブートセクターを書き込む</span>からパーティションを起動可能に再設定してください。</p>
-<p><span class="menu">ツール</span>の他のメニューは<span class="menu">ブートセクターの設定</span>で、起動するオペレーティングシステムの選択をするメニューをブートセクタに書き込むために使われています。詳しくは、<a href="bootmanager.html">BootManager</a>をお読みください。<br />
-もし既にGRUBのようなブートマネージャーを利用して手動でHaikuのエントリを追加した場合や、Haikuしかそのマシンで実行しない場合は、<span class="app">BootManager</span>を使用する必要はありません。</p>
+<p><span class="menu">ツール</span>の他のメニューは<span class="menu">ブートセクターの設定</span>で、起動するオペレーティングシステムの選択をするメニューをブートセクタに書き込むために使われています。詳しくは、<a href="bootmanager.html">ブートマネージャー</a>をお読みください。<br />
+もし既にGRUBのようなブートマネージャーを利用して手動でHaikuのエントリを追加した場合や、Haikuしかそのマシンで実行しない場合は、<span class="app">ブートマネージャー</span>を使用する必要はありません。</p>
 
 
 </div>

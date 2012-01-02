@@ -9,12 +9,15 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		thebowseat
+ *		log-1
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Screenshot</title>
+	<title>スクリーンショット</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -49,9 +52,8 @@
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
-<h2><img src="../../images/apps-images/screenshot-icon_64.png" alt="screenshot-icon_64.png" width="64" height="64" />Screenshot</h2>
+<h2><img src="../../images/apps-images/screenshot-icon_64.png" alt="screenshot-icon_64.png" width="64" height="64" />スクリーンショット</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><span class="menu">アプリケーション (Applications)</span></td></tr>
 <tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/Screenshot</span><br />
@@ -59,45 +61,39 @@
 <tr><td>設定ファイル：</td><td></td><td><span class="path">~/config/settings/screenshot</span></td></tr>
 </table>
 <p><br /></p>
-<p>Screenshots are taken by either starting the Screenshot application or by pressing the <span class="key">PRINT</span> key,</p>
+<p>スクリーンショットはスクリーンショットアプリケーションを起動するか <span class="key">PRINT</span> キーを押すことで撮ることができます。</p>
 <p><img id="sreenshot" src="../images/apps-images/screenshot.png" alt="screenshot.png" /></p>
-<p>In the Screenshot panel you can toggle between taking the whole screen or just the active window and decide if the window border and mouse pointer should be included. You can also enter a delay before a screenshot is taken.</p>
-<p>Below that you set the name, format and location for the screenshot that will be used when you click <span class="button">Save</span>. Instead of saving the file to disk you can also decide to <span class="button">Copy to clipboard</span> to be able to paste the shot directly into another application, or take a <span class="button">New screenshot</span>.</p>
-<p>All settings are remembered the next time you take a screenshot, enabling these convenient keyboard shortcuts:</p>
+<p>スクリーンショットパネルの中ではスクリーン全体を撮るかアクティブなウィンドウだけをとるか選べ、ウィンドウの境界とマウスを入れるかどうか選べます。さらにスクリーンショットを撮る前の延長時間も設定できます。</p>
+<p>その下に名前、フォーマットと <span class="button">保存</span> をクリックしたときの保存場所を指定します。ファイルをディスクに保存せず、 <span class="button">クリップボードにコピー</span> してほかのアプリケーションに直接貼り付けるか、 <span class="button">新しいスクリーンショット</span> を撮ることもできます。</p>
+<p>設定はすべて記憶されるので、次にスクリーンショットを撮る時に便利なキーボードショートカットを使えます：</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="key">PRINT</span></td><td style="width:15px;"></td><td>Takes a screenshot with zero delay and launches the Screenshot panel.</td></tr>
-<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">PRINT</span></td><td></td><td>最後に用いた設定を引き継いで、静かに（パネルを開かずに）スクリーンショットを撮ります。</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">PRINT</span></td><td></td><td>同様に保存された設定で静かにスクリーンショットを撮りますが、それをファイルとして保存する代わりに、ただクリップボードにコピーします。</td></tr>
+<tr><td><span class="key">PRINT</span></td><td style="width:15px;"></td><td>遅延時間なしでスクリーンショットを撮り、スクリーンショットパネルを開きます。</td></tr>
+<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">PRINT</span></td><td></td><td>最後に用いた設定を引き継いで、静かに（パネルを開かずに）スクリーンショットを撮影します。</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">PRINT</span></td><td></td><td>同様に保存された設定で静かにスクリーンショットを撮影しますが、それをファイルとして保存する代わりに、ただクリップボードにコピーします。</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Taking a screenshot from Terminal</h2>
-<p>There's a special <span class="cli">screenshot</span> application to be used from Terminal or a script.<br />
-<span class="cli">screenshot --help</span> shows the familiar options as parameters:</p>
+ターミナルからスクリーンショットを撮る</h2>
+<p>ターミナルやスクリプトからスクリーンショットを起動するには特別な <span class="cli">screenshot</span> アプリケーションがあります。<br />
+<span class="cli">screenshot --help</span> は便利なオプションをパラメータとして表示します：</p>
 
 <pre class="terminal">~&gt; screenshot --help
 
-screenshot [OPTIONS] [FILE]  Creates a bitmap of the current screen
+screenshot [OPTIONS] [FILE]  スクリーンのビットマップを作成します
 
-FILE is the optional output path / filename used in silent mode. An exisiting
-file with the same name will be overwritten without warning. If FILE is not
-given the screenshot will be saved to a file with the default filename in the
-user's home directory.
+FILE は silent mode のときに使われる保存場所/ファイル名です。 存在するファイルは警告なしに上書きされます。
+FILE が指定されてない場合スクリーンショットはユーザーのホームディレクトリにデフォルトの名前で保存されます。
 
-OPTIONS
-  -m, --mouse-pointer   Include the mouse pointer
-  -b, --border          Include the window border
-  -w, --window          Capture the active window instead of the entire screen
-  -d, --delay=seconds   Take screenshot after the specified delay [in seconds]
-  -s, --silent          Saves the screenshot without showing the application
-                        window
-  -f, --format=image    Give the image format you like to save as
-                        [bmp], [gif], [jpg], [png], [ppm], [tga], [tif]
-  -c, --clipboard       Copies the screenshot to the system clipboard without
-                        showing the application window
+オプション
+  -m, --mouse-pointer   マウスポインタを含める
+  -b, --border          ウィンドウ境界を含める
+  -w, --window          アクティブなウィンドウのみを撮る
+  -d, --delay=seconds   指定された延長時間の後スクリーンショットを撮ります [秒]
+  -s, --silent          アプリケーションウィンドウを表示せずにスクリーンショットを保存します
+  -f, --format=image    フォーマットを指定します：[bmp], [gif], [jpg], [png], [ppm], [tga], [tif]
+  -c, --clipboard       スクリーンショットをアプリケーションウィンドウを表示せずにシステムクリップボードに保存します。
 
-Note: OPTION -b, --border takes only effect when used with -w, --window
-</pre>
+注：オプション -b, --border は -w, --window と一緒に使ったときのみ有効です。</pre>
 
 </div>
 </div>

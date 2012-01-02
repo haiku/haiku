@@ -9,12 +9,15 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		helix84
+ *		Peter Poláčik
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>DriveSetup</title>
+	<title>Nastavenie diskových oblastí</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -41,55 +44,54 @@
 <li><a href="../../en/applications/drivesetup.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="diskusage.html">DiskUsage</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
-::  <a href="expander.html">Expander</a>  »
+ «  <a href="diskusage.html">Využitie disku</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplikácie</a> 
+::  <a href="expander.html">Rozbaľovač</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/apps-images/drivesetup-icon_64.png" alt="drivesetup-icon_64.png" width="64" height="64" />DriveSetup</h2>
+<h2><img src="../../images/apps-images/drivesetup-icon_64.png" alt="drivesetup-icon_64.png" width="64" height="64" />Nastavenie diskových oblastí</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
-<tr><td>Location:</td><td></td><td><span class="path">/boot/system/apps/DriveSetup</span></td></tr>
-<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/DriveSetup</span></td></tr>
+<tr><td>Panel:</td><td style="width:15px;"></td><td><span class="menu">Aplikácie</span></td></tr>
+<tr><td>Umiestnenie:</td><td></td><td><span class="path">/boot/system/apps/DriveSetup</span></td></tr>
+<tr><td>Nastavenia:</td><td></td><td><span class="path">~/config/settings/DriveSetup</span></td></tr>
 </table>
 <p><br /></p>
-<p>DriveSetup is a tool to create, delete and initialize partitions. At this time it can't resize or move existing partitions, so that you'll either need an unpartitioned volume (perhaps an external USB drive or another harddisk) or do the initial setup with a tool like the <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> to provide the space for another partition.</p>
+<p>Nastavenie diskových oblastí je nástroj na vytvorenie, vymazanie a inicializovanie oblastí disku. Momentálne nedokáže zmeniť veľkosť alebo presunúť existujúce oblasti, takže budete buď potrebovať nerozdelené zariadenie (možno externý USB disk alebo ďalší pevný disk) alebo spraviť predprípravu nástrojom ako napríklad <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a>, aby ste poskytli miesto pre ďalšiu oblasť.</p>
 <img src="../images/apps-images/drivesetup.png" alt="drivesetup.png" />
-<p>At the top is a graphical representation of all partitions inside the device chosen in the list below it. Besides a maximum of 4 primary partitions, each of those can contain a number of extended/logical partitions. You may have to expand such a list with the +/- widget that appears in that case in front of that device to see the details of every logical partition.</p>
-<p>You can select a partition from the list and mount and unmount them with the commands in the <span class="menu">Partition</span> menu or by pressing <span class="key">ALT</span> <span class="key">M</span> or <span class="key">ALT</span> <span class="key">U</span>.</p>
-<p>You can also completely delete a partition with <span class="menu">Partition | Delete</span>.<br />
-Which brings us to this:</p>
-<div class="box-stop">Dealing with creating/deleting/initializing partitions is very dangerous business. Always check twice to be sure you're working with the right one and always keep an up-to-date backup of your data in case something goes wrong!</div>
+<p>Navrchu je grafické zobrazenie všetkých oblastí v rámci zariadenia, ktoré ste vybrali v zozname pod tým. Okrem maximálne 4 primárnych oblastí, každá z týchto môže obsahovať množstvo rozšírených/logických oblastí. Možno budete musieť rozbaliť takýto zoznam pomocou tlačidla +/-, ktoré sa v takom prípade zjaví pred zariadením, aby ste si pozreli podrobnosti o každej logickej oblasti.</p>
+<p>Môžete vybrať oblasť zo zoznamu a pripojiť alebo odpojiť ju príkazom v menu <span class="menu">Oblasť</span> alebo stlačením <span class="key">ALT</span> <span class="key">M</span> alebo <span class="key">ALT</span> <span class="key">U</span>.</p>
+<p>Môžete oblasť úplne vymazať pomocou <span class="menu">Oblasť | Zmazať</span>.<br />
+Čo nás privádza k upozorneniu:</p>
+<div class="box-stop">Vytváranie/mazanie/inicializácia oblastí je veľmi nebezpečná činnosť. Vždy si prekontrolujte nastavenia, aby ste sa uistili, že pracujete so správnou oblasťou a vždy majte aktuálne zálohy údajov, pre prípad, že sa niečo pokazí!</div>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="creating" name="creating">Creating a new partition</a></h2>
-<div class="box-info">If you plan to use the entire drive as one partition, e.g. a USB stick or a Compact Flash card, you can skip the creation of a partition and proceed right to <a href="#initializing">Initializing</a>.</div>
-<p>When you found unformatted space on a drive, like the above <tt>&lt;empty&gt;</tt>, you can create a new partition in this space with <span class="menu">Partition | Create...</span>(<span class="key">ALT</span> <span class="key">C</span>).</p>
+<a id="creating" name="creating">Vytváranie novej oblasti</a></h2>
+<div class="box-info">Ak plánujete použiť celé zariadenie ako jednu oblasť, napr. USB kľúč alebo karta Compact Flash, môžete preskočiť vytváranie oblasti a prejsť priamo na jej <a href="#initializing">Inicializáciu</a>.</div>
+<p>Keď ste našli neformátované miesto na zariadení, ako napríklad <tt>&lt;prázdne&gt;</tt> vyššie, môžete vytvoriť na tomto mieste novú oblasť pomocou <span class="menu">Oblasť | Vytvoriť...</span>(<span class="key">ALT</span> <span class="key">C</span>).</p>
 <img src="../images/apps-images/drivesetup-create.png" alt="drivesetup-create.png" />
-<p>You're prompted with this dialog that lets you adjust the partition size and type. Choose <span class="menu">Be File System</span> if you want to use the partition for an Haiku installation or if you want to use all the interesting Haiku features with it, like attributes and queries. Note, that other operating systems might not be able to access such a partition.</p>
-<p>If you have created a primary partition instead of just another extended/logical partition within one, the above dialog also displays an <span class="menu">Active partition</span> checkbox. You'll have to check that, if you'll use that partition to boot a Haiku installation.</p>
-<p>Before you can use, or even mount the newly created partition, it has to be initialized with a filesystem.</p>
+<p>Zobrazí sa vám tento dialóg, ktorý vám dovolí nastaviť typ a veľkosť oblasti. Vyberte <span class="menu">Be File System</span> ak chcete použiť oblasť pre inštaláciu Haiku alebo ak tam chcete použiť všetky zaujímavé vlastnosti Haiku, ako atribúty a požiadavky. Uvedomte si, že iné operačné systémy nebudú schopné k takej oblasti pristupovať.</p>
+<p>Ak ste vytvorili primárnu oblasť miesto ďalšej rozšírenej/logickej oblasti v rámci nejakej, dialóg vyššie tiež zobrazí zaškrtávaciu voľbu <span class="menu">Aktívna oblasť</span>. Ak tú oblasť chcete použiť na zavedenie inštalácie Haiku, budete túto voľbu musieť zaškrtnúť.</p>
+<p>Predtým ako môžete použiť alebo dokonca len pripojiť novo vytvorenú oblasť, musí byť inicializovaná súborovým systémom.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="initializing" name="initializing">Initializing a partition</a></h2>
-<p>Only unmounted partitions can be initialized by using the <span class="menu">Partition | Initialize</span> menu.</p>
+<a id="initializing" name="initializing">Inicializácia oblasti</a></h2>
+<p>Len nepripojené oblasti je možné inicializovať, pomocou menu <span class="menu">Oblasť | Inicializovať</span>.</p>
 <img src="../images/apps-images/drivesetup-initialize.png" alt="drivesetup-initialize.png" />
-<p>Here you set the name for the partition and it's blocksize. 2048 bytes per block are recommended, but you can choose larger or smaller sizes if you have these very specific needs.<br />
-Initializing will destroy all data on that partition!</p>
+<p>Tu nastavujete názov a veľkosť bloku oblasti. Odporúča sa 2048 bajtov na blok, ale tiež môžete vybrať väčšie alebo menšie veľkosti, ak máte veľmi špecifické požiadavky.<br />
+Inicializácia zničí všetky údaje na dotyčnej oblasti!</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="diskusage.html">DiskUsage</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
-::  <a href="expander.html">Expander</a>  »
+ «  <a href="diskusage.html">Využitie disku</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplikácie</a> 
+::  <a href="expander.html">Rozbaľovač</a>  »
 </span></div>
 </div>
 

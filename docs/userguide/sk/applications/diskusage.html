@@ -9,12 +9,15 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		helix84
+ *		Peter Poláčik
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>DiskUsage</title>
+	<title>Využitie disku</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -41,47 +44,46 @@
 <li><a href="../../en/applications/diskusage.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="diskprobe.html">DiskProbe</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
-::  <a href="drivesetup.html">DriveSetup</a>  »
+ «  <a href="diskprobe.html">Disková sonda</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplikácie</a> 
+::  <a href="drivesetup.html">Nastavenie diskových oblastí</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/apps-images/diskusage-icon_64.png" alt="diskusage-icon_64.png" width="64" height="64" />DiskUsage</h2>
+<h2><img src="../../images/apps-images/diskusage-icon_64.png" alt="diskusage-icon_64.png" width="64" height="64" />Využitie disku</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
-<tr><td>Location:</td><td></td><td><span class="path">/boot/system/apps/DiskUsage</span></td></tr>
-<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/DiskUsage</span></td></tr>
+<tr><td>Panel:</td><td style="width:15px;"></td><td><span class="menu">Aplikácie</span></td></tr>
+<tr><td>Umiestnenie:</td><td></td><td><span class="path">/boot/system/apps/DiskUsage</span></td></tr>
+<tr><td>Nastavenia:</td><td></td><td><span class="path">~/config/settings/DiskUsage</span></td></tr>
 </table>
 <p><br /></p>
-<p>DiskUsage shows graphically how the space on your volumes is utilized.<br />
-A useful tool to answer the question, "<i>Where has all my disk space gone?</i>".</p>
+<p>Využitie disku graficky zobrazuje ako sa využíva miesto na vašich diskoch.<br />
+Užitočný nástroj zodpovedajúci otázku „<i>Kam sa podelo miesto na mojom disku?</i>“.</p>
 <p><img id="diskusage" src="../images/apps-images/diskusage.png" alt="diskusage.png" /></p>
-<p>The concentric circles represent different levels in the file system hierarchy. Above, the circle in the center represents the <span class="path">/boot/home/</span> folder. Each segment of the ring immediately outside that circle is a file or folder under <span class="path">/boot/home/</span>. Every segment farther outside brings you one level deeper in the file hierarchy. You may have to resize the window to accommodate very deep folders.</p>
-<p>Above the graphic is a pop-up menu that lets you switch between all mounted volumes. Before the disk usage of a volume can be displayed, it has to be scanned. As this can take a while for larger disks, you can examine another volume while that scan is done in the background.</p>
+<p>Sústredné kruhy reprezentujú rozličné úrovne v hierarchii súborového systému. Hore, kruh v strede predstavuje priečinok <span class="path">/boot/home/</span>. Každý segment prstenca tesne mimo toho kruhu sú súbory alebo priečinky pod  <span class="path">/boot/home/</span>. Každý segment ďalej mimo je o úroveň ďalej v hierarchii súborov. Možno budete musieť zväčšiť okno, aby sa vám dobre zobrazili veľmi hlboko zanorené priečinky.</p>
+<p>Nad obrázkom je vyskakovacie menu, ktoré vám dovolí prepnúť medzi pripojenými diskami. Predtým, než bude možné zobraziť využitie disku, musí ho program preskúmať. Keďže toto môže pri veľkých diskoch chvíľu trvať, môžete prehliadať iný disk, zatiaľ čo prieskum prebieha na pozadí.</p>
 <div class="box-info"><ul>
-<li>If the graphical representation of a file or folder comprises less than about 2° of a circle, it is excluded from the display.</li>
-<li>The number of files that's reported for a folder includes files in subfolders too. A folder counts as a file.</li>
-<li>DiskUsage ignores symbolic links.</li>
+<li>Ak je grafická reprezentácia súboru alebo priečinku menej ako alebo približne 2° kruhu, nezobrazí sa.</li>
+<li>Počet súborov uvedených pre priečinok zahŕňa súbory v podpriečinkoch. Priečinok sa ráta ako súbor.</li>
+<li>Využitie disku ignoruje symbolické odkazy.</li>
 </ul></div>
-<p>As you move the mouse over a segment, information about that file or folder appears in the status bar at the bottom.</p>
-<p>Right-clicking a segment offers a context menu to <span class="menu">Get Info</span>, <span class="menu">Open</span> (with Tracker), <span class="menu">Open With</span> another suitable application or <span class="menu">Rescan</span> that particular folder.<br />
-Left-clicking a segment makes that file/folder the center circle.<br />
-Left-clicking the center circle moves you up one level.</p>
-<p>You can drag files and folders from DiskUsage to other applications or to the Desktop or other Tracker windows for copying. Vice versa, dropped volumes and folders on DiskUsage's window will zoom directly to them, making them the new center circle.</p>
+<p>Počas presúvania kurzora ponad segmenty sa dolu, v stavovej lište zobrazujú informácie o súbore alebo priečinku pod kurzorom.</p>
+<p>Kliknutie pravým tlačidlom myši na segment poskytuje kontextové menu s položkami <span class="menu">Získať informácie</span>, <span class="menu">Otvoriť</span> (pomocou Trackera), <span class="menu">Otvoriť pomocou</span> inej vhodnej aplikácie alebo <span class="menu">Preskúmať znova</span> ten určitý priečinok.<br />
+Ľavé kliknutie na segment spraví z toho súboru/priečinku stredný kruh.<br />
+Ľavé kliknutie na stredný kruh vás posunie hore o jednu úroveň.</p>
+<p>Pretiahnutím súboru alebo priečinka z Využitia disku do inej aplikácie, Plochu alebo do iného okna Trackera ich môžete skopírovať. Naopak, pretiahnutím disku alebo priečinka do okna Využitia disku priblížite priamo danú položku, z ktorej spraví stredný kruh.</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="diskprobe.html">DiskProbe</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
-::  <a href="drivesetup.html">DriveSetup</a>  »
+ «  <a href="diskprobe.html">Disková sonda</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplikácie</a> 
+::  <a href="drivesetup.html">Nastavenie diskových oblastí</a>  »
 </span></div>
 </div>
 

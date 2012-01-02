@@ -9,12 +9,15 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		helix84
+ *		Peter Poláčik
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Installer</title>
+	<title>Inštalátor</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -42,43 +45,42 @@
 </ul>
 <span>
  «  <a href="icon-o-matic.html">Icon-O-Matic</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
-::  <a href="magnify.html">Magnify</a>  »
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplikácie</a> 
+::  <a href="magnify.html">Lupa</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/apps-images/installer-icon_64.png" alt="installer-icon_64.png" width="64" height="64" />Installer</h2>
+<h2><img src="../../images/apps-images/installer-icon_64.png" alt="installer-icon_64.png" width="64" height="64" />Inštalátor</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
-<tr><td>Location:</td><td></td><td><span class="path">/boot/system/apps/Installer</span></td></tr>
-<tr><td>Settings:</td><td></td><td><i>none</i></td></tr>
+<tr><td>Panel:</td><td style="width:15px;"></td><td><span class="menu">Aplikácie</span></td></tr>
+<tr><td>Umiestnenie:</td><td></td><td><span class="path">/boot/system/apps/Installer</span></td></tr>
+<tr><td>Nastavenia:</td><td></td><td><i>žiadne</i></td></tr>
 </table>
 <p><br /></p>
-<p>The Installer is used to copy Haiku onto another volume.<br />
-Upon launch it displays a start window with important information. It's not a mindless EULA you're used to click away in the blink of an eye, it states:</p>
+<p>Inštalátor sa používa na skopírovanie Haiku na iný disk.<br />
+Po štarte zobrazí štartovacie okno s dôležitou informáciou. Nie je to bezduchá EULA (licenčná dohoda s koncovým používateľom), ktorú zvyknete odkliknúť bez mihnutia oka, hovorí:</p>
 <ul>
-<li><p>This is alpha-quality software. Make backups or suffer the consequences!</p></li>
-<li><p>The Installer needs a prepared partition. You may have to use a <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> or a similar tool until Haiku's DriveSetup is mature enough to handle this task.</p></li>
-<li>Haiku can be added manually to the bootmanager <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>. How that is done exactly is available as an <a href="http://www.haiku-os.org/get-haiku/installation-guide">online guide</a>.</li>
+<li><p>Toto je softvér alfa kvality. Robte zálohy alebo trpte následky!</p></li>
+<li><p>Inštalátor potrebuje pripravenú oblasť. Budete možno musieť použiť <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> alebo podobný nástroj až kým nástroj Nastavenie diskových oblastí v Haiku nebude dostatočne vyspelý, aby zvládal túto úlohu.</p></li>
+<li>Haiku môžete manuálne pridať do správcu zavádzania systému <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>. Ako presne sa to robí je uvedené v <a href="http://www.haiku-os.org/get-haiku/installation-guide">online príručke</a>.</li>
 </ul>
 <p><br /><br /></p>
-<p>Once you acknowledged with <span class="button">Continue</span>, you're presented with the main window:</p>
+<p>Keď ste súhlasili stlačením <span class="button">Pokračovať</span>, zobrazí sa vám hlavné okno:</p>
 <img src="../images/apps-images/installer.png" alt="installer.png" />
-<p>In the first pop-up menu you choose the source for the installation. It can be a currently installed Haiku or can come from an install CD or USB drive, etc.<br />
-The second pop-up menu specifies the target for the installation. This target partition/volume will be completely overwritten and has to be set aside beforehand by a partitioning tool like GParted.</p>
-<p>Clicking the little expander widget will <i>Show optional packages</i>, if available, that you can choose to install in addition to the basic Haiku.</p>
-<p>You should do a last check if you really picked the right target before starting the installation process. Click on <span class="button">Setup partitions...</span> to open <a href="drivesetup.html">DriveSetup</a> and have a look at the naming and layout of the available volumes and partitions.</p>
-<p><span class="button">Begin</span> starts the installation procedure, which basically copies everything but the <span class="path">home/</span> and <span class="path">common/</span> folder onto the target volume and makes it bootable.</p>
+<p>V prvom vysúvacom menu vyberáte zdroj pre inštaláciu. Môže to byť aktuálne nainštalované Haiku alebo to môže byť inštalačné CD alebo USB kľúč atď.<br />
+Druhé vysúvacie menu špecifikuje cieľ inštalácie. Cieľová oblasť/disk budú úplne prepísané a musia byť nastavené predtým, nástrojom na správu oblastí ako napríklad GParted.</p>
+<p>Kliknutím na malú rozbaľovaciu šípku <i>Zobrazí voliteľné balíky</i>, ak sú dostupné, ktoré si môžete vybrať na doinštalovanie k základnému Haiku.</p>
+<p>Mali by ste naposledy skontrolovať, či ste naozaj vybrali správny cieľ pred začatím inštalácie. Kliknite na <span class="button">Nastaviť oblasti...</span> na otvorenie <a href="drivesetup.html">Nastavenia diskových oblastí</a> a pozrite sa na názvy a rozloženie dostupných diskov a oblastí.</p>
+<p><span class="button">Začať</span> začne inštalačnú procedúru, ktoré v podstate kopíruje všetko okrem adresárov <span class="path">home/</span> a <span class="path">common/</span> na cieľové zariadenie a nastaví, aby sa z neho dal zavádzať systém.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="tools" name="tools">Tools</a></h2>
-<p>At the end of the installation procedure, the partition is automatically made bootable. However, it can happen that some other operating system or partitioning tool (accidentally) overwrites the boot sector of your Haiku volume. In this case, boot your installation CD and start the Installer. Select your Haiku boot partition from the <span class="menu">Onto: Please choose target</span> menu and select <span class="menu">Write boot sector</span> from the <span class="menu">Tools</span> menu to make it bootable again.</p>
-<p>The other item in the <span class="menu">Tools</span> menu is used to <span class="menu">Set up a boot menu</span> that puts a menu in the boot sector to choose what operating system to boot. See topic <a href="bootmanager.html">BootManager</a> for more information.<br />
- You don't need to run the <span class="app">BootManager</span> if you already use a bootmanager like GRUB, in which case you have to add Haiku manually (see above), or Haiku runs exclusively on your machine.</p>
+<a id="tools" name="tools">Nástroje</a></h2>
+<p>Na konci inštalačnej procedúry je oblasť automaticky nastavená ako zavádzacia. Avšak, môže sa stať, že nejaký iný operačný systém alebo nástroj na správu oblastí (náhodou) prepíše zavádzací sektor vášho disku s Haiku. V tom prípade, použite vaše inštalačné CD a spustite Inštalátor. Vyberte vašu zavádzaciu oblasť Haiku z menu <span class="menu">Na: Prosím, vyberte cieľ</span> a vyberte <span class="menu">Zapísať zavádzací sektor</span> z menu <span class="menu">Nástroje</span> aby ste ho opäť označili ako zavádzací.</p>
+<p>Druhá položka v menu <span class="menu">Nástroje</span> sa používa, keď chcete <span class="menu">Nastaviť zavádzacie menu</span>, ktoré uloží do zavádzacieho sektora menu, z ktorého si môžete vybrať, ktorý operačný systém zaviesť. Ďalšie informácie nájdete v téme <a href="bootmanager.html">Správca zavádzania</a>.<br />
+ Nemusíte používať <span class="app">Správcu zavádzania</span>, ak už používate iný podobný program, ako napríklad GRUB, v tomto prípade musíte Haiku pridať ručne (pozrite vyššie), alebo ak je Haiku jediný operačný systém na vašom počítači.</p>
 
 
 </div>
@@ -87,8 +89,8 @@ The second pop-up menu specifies the target for the installation. This target pa
 <div class="nav">
 <div class="inner"><span>
  «  <a href="icon-o-matic.html">Icon-O-Matic</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
-::  <a href="magnify.html">Magnify</a>  »
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplikácie</a> 
+::  <a href="magnify.html">Lupa</a>  »
 </span></div>
 </div>
 

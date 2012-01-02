@@ -10,12 +10,15 @@
  * Authors:
  *		Maciej Bałuta  (Google Code-In student)
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Bachoru
+ *		helix84
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>ProcessController</title>
+	<title>Správca procesov</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -42,62 +45,59 @@
 <li><a href="../../en/desktop-applets/processcontroller.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="powerstatus.html">PowerStatus</a> 
-::  <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
+ «  <a href="powerstatus.html">Stav napájania</a> 
+::  <a href="../desktop-applets.html" class="uplink">Aplety plochy</a> 
 ::  <a href="workspaces.html">Workspaces</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/desktop-applets-images/processcontroller-icon_64.png" alt="processcontroller-icon_64.png" width="64" height="64" />ProcessController</h2>
+<h2><img src="../../images/desktop-applets-images/processcontroller-icon_64.png" alt="processcontroller-icon_64.png" width="64" height="64" />Správca procesov</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Desktop Applets</span></td></tr>
-<tr><td>Location:</td><td></td><td><span class="path">/boot/system/apps/ProcessController</span></td></tr>
-<tr><td>Settings:</td><td></td><td><i>none</i></td></tr>
+<tr><td>Panel:</td><td style="width:15px;"></td><td><span class="menu">Aplety plochy</span></td></tr>
+<tr><td>Umiestnenie:</td><td></td><td><span class="path">/boot/system/apps/ProcessController</span></td></tr>
+<tr><td>Nastavenia:</td><td></td><td><i>žiadne</i></td></tr>
 </table>
 
-<p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />The primary task of the ProcessController applet is to show the activity of your CPU(s) and the amount of used memory. It allows monitoring of individual teams, change their priority, and kill them if the program freezes. In multiprocessor environments it allows you to disable individual processors/cores. When Tracker or Deskbar crash you can restart them from ProcessController's menu.</p>
-<p>Indicators on the left show each CPU's usage, while the bar on the right shows the memory consumption. Remember that the number of indicators depend on the number of processors/cores in the computer.</p>
-<p>If not yet running, launching ProcessController asks if it should open in window mode or live in the Deskbar. In window mode you can resize the bar-display by resizing the window and then use the <a href="../gui.html#replicants">Replicant</a> handle to drag it to the Desktop.<br />
-Wherever it's installed, it's operated via a right-click context menu.<br />
-To remove the applet again from the Deskbar, uncheck <span class="menu">Live in the Deskbar</span> in its context menu.</p>
-<h2>Quit an application</h2>
+<p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />Primárna úloha Správcu procesov je zobrazovať aktivitu vašich CPU a množstvo používanej pamäte. Umožňuje monitorovať jednotlivé skupiny, meniť ich priority, a ukončiť ich v prípade, že program zamrzne. V prostredí s viacerými procesormi vám umožňuje vypnúť jednotlivé procesory/jadrá. Keď zlyhá Tracker alebo Panel, môžete ich reštartovať v menu Správcu procesov.</p>
+<p>Indikátory vľavo zobrazujú využitie každého CPU, zatiaľ čo stĺpec napravo ukazuje spotrebu pamäte. Pamätajte, že počet indikátorov závisí od počtu procesorov/jadier v počítači.</p>
+<p>Po spustení Správcu procesov sa vás aplet opýta, či ho chcete spúšťať v okne alebo nainštalovať do Panelu. V režime okna sa dá ikone meniť veľkosť zmenou veľkosti okna a aplet sa dá pretiahnuť na plochu pomocou rúčky <a href="../gui.html#replicants">Replikanta</a>. Nezávisle na tom, kde je nainštalovaný, ovláda sa kontextovým menu vyvolaným kliknutím pravým tlačidlom myši.<br /><br />
+Aplet z Panelu odstránite odškrtnutím <span class="menu">Zobrazovať v Paneli</span> v kontextovom menu.</p>
+<h2>Ukončenie aplikácie</h2>
 <img src="../images/processcontroller-images/quit.png" alt="ProcessController - Quit an application" />
-<p>To quit an application just choose its name from the <span class="menu">Quit an application</span> menu. This is a clean way to close app, just like  clicking its close button. Be careful not to quit system processes like servers or daemons, however. Your system may stop working reliably. </p>
-<h2>Memory usage</h2>
+<p>Aplikáciu ukončíte jednoducho tak, že vyberiete jej názov v menu <span class="menu">Ukončiť aplikáciu</span>. Toto je čistý spôsob zatvárania aplikácie, rovnako ako kliknutie na tlačidlo Zatvoriť. Dávajte si ale pozor, aby ste takto neukončili systémové procesy ako sú servery alebo démony. Váš systém by mohol prestať fungovať spoľahlivo. </p>
+<h2>Využitie pamäte</h2>
 <img src="../images/processcontroller-images/memory.png" alt="ProcessController - Memory usage" />
-<p>Monitoring memory usage can be rather inaccurate.</p>
-<p>This menu allows you to monitor memory usage of different teams in your system. Next to the team's name there are two columns: first with the amount reserved for writable memory, while the second shows all memory including read-only space (shared libraries for example).</p>
-<p>The first row <i>System resources &amp; caches...</i> shows the total amount of memory used by the system and all applications. The length of the blue bar is based on the total physical memory in your computer. The next rows show memory used by each process. Note that the length of the bar is based only on the actually used part of the memory.</p>
+<p>Monitorovanie využitia pamäte môže byť dosť nepresné.</p>
+<p>Toto menu vám umožňuje monitorovať využitie pamäte rôznych tímov vo vašom systéme. Vedľa názvy skupiny sú dva stĺpce: prvý zobrazuje množstvo vyhradené pre zapisovateľnú pamäť, zatiaľ čo druhý zobrazuje všetku pamäť vrátane tej, ktorá je iba na čítanie (napríklad zdieľané knižnice).</p>
+<p>Prvý riadok <i>Zdroje a vyrovnávacia pamäť systému</i> zobrazuje celkové množstvo pamäte, ktorú využíva systém a všetky aplikácie. Dĺžka modrého pásma závisí od množstva celkovej fyzickej pamäte vo vašom počítači. Ďalšie riadky zobrazujú pamäť využívanú každým procesom. Dĺžka pásma závisí od skutočne využívanej časti pamäte.</p>
 <table>
-		<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Memory used only by given application (with write access)</td></tr>
-		<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Memory including read-only space (can be shared with other applications)</td></tr>
+		<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Pamäť využívaná výlučne danou aplikáciou (s prístupom na zápis)</td></tr>
+		<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Pamäť vrátane tej, ktorá je iba na čítanie (môže byť zdieľaná s inými aplikáciami)</td></tr>
 </table>
 
-<h2>Threads and CPU usage</h2>
-<p>This menu allows you to change thread priorities, kill teams or debug them.</p>
-<div class="box-stop">Changes via the commands in this menu reach deep into the system and can cause data loss and system instability. Keep that mouse hand steady!</div>
+<h2>Vlákna a využitie CPU</h2>
+<p>Toto menu vám umožňuje meniť priority vlákien, ukončovať tímy alebo ladiť ich.</p>
+<div class="box-stop">Zmeny vykonané príkazmi v tomto menu siahajú hlboko do systému a môžu spôsobiť stratu dát a nestabilitu systému. Dávajte pozor, kam klikáte!</div>
 <img src="../images/processcontroller-images/priority.png" alt="ProcessController - Priority" />
 <table>
-	<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Kernel code</td></tr>
-	<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>User code</td></tr>
-	<tr><td style="height:20px;background:#6EBE6E"></td><td></td><td>Idle thread</td></tr>
+	<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Kód jadra</td></tr>
+	<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Kód používateľského priestoru</td></tr>
+	<tr><td style="height:20px;background:#6EBE6E"></td><td></td><td>Nečinné vlákno</td></tr>
 </table>
-<p>At the first level you see team names. By clicking on one, you can kill the whole team. The dark-blue part of the bar is time spent in kernel code, the light-blue part in user code, the green part in the idle thread(s). A bar completely filled with blue means that the team is using all processoring power.</p>
-<p>The second level shows particular threads of a team. By clicking on one, you can debug or kill it. A bar completely filled with blue means that the thread is pegging one processor/core.</p>
-<p>The last level of the menu allows you to change a thread's priority. Be careful with that! As a rule of thumb the priority of a thread should be inverse its CPU usage. That is, the more it tries to claim CPU time, the lower should be it's priority. In general, don't mess with an app's priorities; contact its author, that's his business.
-</p>
+<p>V prvej úrovni môžete vidieť názvy tímov. Kliknutím na jeden z nich môžete celý tím ukončiť. Tmavomodrá časť stĺpca predstavuje čas strávený v kóde jadra, bledomodrá časť v kóde používateľského priestoru, zelená časť v nečinných vláknach. Pásmo celé vyplnené modrou znamená, že skupina využíva všetok výpočtový výkon.</p>
+<p>Druhá úroveň zobrazuje jednotlivé vlákna tímu. Kliknutím na jedno z nich ho môžete ukončiť alebo ladiť. Pásmo celé vyplnené modrou znamená, že vlákno vyčerpáva jeden procesor/jadro.</p>
+<p>Posledná úroveň menu vám umožňuje zmeniť prioritu vlákna. Používajte to však opatrne! Základné pravidlo je také, že priorita by mala byť opačná k využitiu CPU. To znamená, že čím viac času CPU sa snaží vlákno získať, tým nižšia by mala byť jeho priorita. Vo všeobecnosti sa snažte nehrať sa s prioritami aplikácií; kontaktuje ich autora, jeho sa to týka.</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
-«  <a href="powerstatus.html">PowerStatus</a> 
-::  <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
+«  <a href="powerstatus.html">Stav napájania</a> 
+::  <a href="../desktop-applets.html" class="uplink">Aplety plochy</a> 
 ::  <a href="workspaces.html">Workspaces</a>  »
 </span></div>
 </div>

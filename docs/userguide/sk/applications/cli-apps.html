@@ -9,12 +9,15 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		helix84
+ *		Bachoru
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Commandline Applications</title>
+	<title>Aplikácie príkazového riadka</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -49,60 +52,59 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Haiku-specific commandline applications</h2>
+<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Aplikácie príkazového riadka špecifické pre Haiku</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Location:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
+<tr><td>Umiestnenie:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
 </table>
 <p><br /></p>
-<p>All commandline applications shipped with Haiku are in either <span class="path">/boot/system/bin</span> or <span class="path">/boot/common/bin</span>. Your own or additionally installed commandline apps should go in <span class="path">~/config/bin</span>. All these locations are part of the PATH variable and are therefore automatically found.<br />
-The following isn't an exhaustive list of all Haiku-specific CLI apps, it serves just to highlight a few of the most useful to give you a taste. Feel encouraged to explore what's in the <span class="path">bin/</span> folders on your own a bit. Executing an app with the parameter <tt>--help</tt> shows the usage of the command and all its various options.</p>
+<p>Všetky aplikácie príkazového riadka v Haiku sa nachádzajú buď v <span class="path">/boot/system/bin</span> alebo v <span class="path">/boot/common/bin</span>. Vaše vlastné alebo dodatočne nainštalované aplikácie príkazového riadka by mali ísť do <span class="path">~/config/bin</span>. Všetky tieto lokality sú súčasťou premennej PATH, teda budú automaticky nájdené.<br />
+Nasledujúci zoznam neobsahuje všetky aplikácie príkazového riadka špecifické pre Haiku, jeho účelom je vyzdvihnúť malú časť tých najužitočnejších. Voľne môžete skúmať obsah priečinkov <span class="path">bin/</span> aj sami. Ďalšie informácie o príkaze a jeho rôznych nastaveniach získate spustením daného príkazu spolu s parametrom <tt>--help</tt>.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-attributes" name="cli-attributes">Relating to attributes: <span class="cli">listattr</span>, <span class="cli">catattr</span>, <span class="cli">addattr</span>, <span class="cli">rmattr</span>, <span class="cli">copyattr</span></a></h3>
-<p>These commands are used to display, read out, add and remove attributes of files. Remember that these meta data are currently only available on BFS formatted volumes. Moving files onto other file systems will strip all attributes!<br />
-All these commands are described in topic <a href="../attributes.html#attributes-terminal">Attributes in Terminal</a>.</p>
+<a id="cli-attributes" name="cli-attributes">Súvisiace s atribútmi: <span class="cli">listattr</span>, <span class="cli">catattr</span>, <span class="cli">addattr</span>, <span class="cli">rmattr</span>, <span class="cli">copyattr</span></a></h3>
+<p>Tieto príkazy sa používajú na zobrazenie, čítanie, pridanie alebo odstránenie atribútov zo súborov. Pamätajte, že tieto metadáta sú momentálne dostupné iba na zväzkoch so súborovým systémom BFS. Prenášanie súborov na iné súborové systémy odstráni všetky atribúty! <br />
+Všetky tieto príkazy sú popísané v téme <a href="../attributes.html#attributes-terminal">Atribúty v Termináli</a>.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-index" name="cli-index">Relating to the index: <span class="cli">lsindex</span>, <span class="cli">mkindex</span>, <span class="cli">reindex</span>, <span class="cli">rmindex</span></a></h3>
-<p>With these commands you list, make, reindex and remove attributes to BFS' index. Every volume has it's own index, remember that when copying files from one volume to another.<br />
-These commands are described in topic <a href="../index.html">Index</a>.</p>
+<a id="cli-index" name="cli-index">Súvisiace s indexom: <span class="cli">lsindex</span>, <span class="cli">mkindex</span>, <span class="cli">reindex</span>, <span class="cli">rmindex</span></a></h3>
+<p>Pomocou týchto príkazov môžete vypísať, vytvoriť, reindexovať alebo odstrániť atribúty indexu BFS. Každý zväzok má svoj vlastný index, pamätajte na to pri kopírovaní z jedného zväzku do druhého.<br />
+Tieto príkazy sú popísané v téme <a href="../index.html">Index</a>.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-scripting" name="cli-scripting">Useful scripting commands</a></h3>
-<p>Here are a few commandline tools that are especially useful for scripting (see also topic <a href="../bash-scripting.html">Bash and Scripting</a>).</p>
+<a id="cli-scripting" name="cli-scripting">Užitočné skriptovacie príkazy</a></h3>
+<p>Tu je niekoľko nástrojov príkazového riadka, ktoré sú obzvlášť užitočné na skriptovanie (tiež pozri tému <a href="../bash-scripting.html">Bash a Skriptovanie</a>).</p>
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">alert</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">alert</span> conjures up the typical alert window with a pre-defined icon, explanatory text and up to three buttons. It will return the title of the pressed button and an exit status (starting with 0). For example, this is made of the line:</p>
+		<td valign="top"><p><span class="cli">alert</span> vyvolá typické okno s upozornením obsahujúce preddefinovanú ikonu, vysvetlujúci text a maximálne tri tlačidlá. Vráti názov stlačeného tlačidla a návratový kód (počínajúc nulou). Napríklad okno na obrázku bolo vyvolané týmto riadkom:</p>
 <pre class="terminal">alert --idea "FantasticApp(tm) installed successfully!
 Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <p><img src="../images/apps-images/cli-alert.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">filepanel</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">filepanel</span> displays a load or save file panel and lets the user choose a file or location. As a return value you'll get the chosen file or folder's path. There are several parameters available, for example to set a starting directory, a window title, a default name when saving or restrictions to the allowed types of files. This is an example of</p>
+		<td valign="top"><p><span class="cli">filepanel</span> zobrazí okno na otvorenie alebo uloženie a nechá používateľa vybrať súbor alebo lokalitu. Ako návratnú hodnotu dostanete vybraný súbor alebo cestu priečinka. Dostupné sú viaceré parametre, napríklad nastavenie začínajúceho priečinka, názov okna, predvolený názov súboru pri ukladaní alebo obmedzenia povolených typov súborov. Príklad:</p>
 <pre class="terminal">filepanel -s -t "Save your logfile" -d ~/config/settings -n Fantastic.log</pre>
 <p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">waitfor</span> is a nice way to wait for a particular application or thread to be started or to have ended.</p>
+		<td valign="top"><p><span class="cli">waitfor</span> je dobrý spôsob ako počkať, kým sa daná aplikácia alebo vlákno nespustí alebo neukončí.</p>
 </td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">query</span> is the commandline version of the Find panel. In fact, a quick way to generate the search term is to build a query in the Find panel, switch to <span class="menu">by formula</span>, add double quotes (<tt>"</tt>) in front and back and paste the whole string after your <span class="cli">query</span> command in Terminal or your script.</p>
+		<td valign="top"><p><span class="cli">query</span> je verzia panela „Nájsť...“ pre príkazový riadok. Rýchlym spôsobom ako vygenerovať hľadaný termín je vytvoriť požiadavku v paneli „Nájsť...“, prepnúť na <span class="menu">podľa vzorca</span>, pridať úvodzovky (<tt>"</tt>) na začiatok a koniec a celý reťazec skopírovať za váš príkaz <span class="cli">query</span> v Termináli alebo vašom skripte.</p>
 </td></tr></table>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-other" name="cli-other">Other commands</a></h3>
+<a id="cli-other" name="cli-other">Iné príkazy</a></h3>
 
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
-		<td><p><span class="cli">checkfs</span> is an important tool to check for errors in your file system. Simply add the volume or device name and it'll run through every file and correct inconsistencies where possible.</p>
+		<td><p><span class="cli">checkfs</span> je dôležity nástroj na hľadanie chýb vo vašom súborovom systéme. Jednoducho pridajte názov zväzku alebo zariadenia a systém prebehne každý súbor a opraví možné nezrovnalosti.</p>
 </td></tr>
 <tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">open</span> is a very handy little tool. With it you open any file with its preferred application, or start a specific application by its signature without the need to know its exact path. It also works with URLs and even with the "virtual" directories <tt>.</tt> for the current directory and <tt>..</tt> for the parent, opening the folder in Tracker.</p>
+		<td valign="top"><p><span class="cli">open</span> je veľmi užitočný nástroj. Môžete ním otvoriť ľubovoľný súbor v jeho preferovanej aplikácii alebo spustiť konkrétnu aplikáciu podľa jej podpisu bez potreby poznať jej presnú cestu. Príkaz funguje aj na odkazoch URL a dokonca aj na „virtuálnych“ priečinkoch - <tt>.</tt> pre aktuálny priečinok a <tt>..</tt> pre nadradený otvorí priečinok v Trackeri.</p>
 </td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">desklink</span> can install an icon for any file, folder, query or application in the Deskbar tray. It also offers the option to provide a context menu when right-clicking an icon to execute special actions. As an example, try this to add the commandline app <span class="app">screenshot</span> with various options (the "<tt>\</tt>" in the first line is just for the line break in Terminal):</p>
+		<td valign="top"><p><span class="cli">desklink</span> dokáže priradiť ikonu ľubovolnému súboru, priečinku, požiadavke alebo aplikácii v oznamovacej oblasti Panela. Taktiež ponúka možnosť poskytnúť kontextové menu po kliknutí na ikonu pravým tlačidlom na vykonanie špeciálnych operácií. Ako príklad môžete skúsiť pridať aplikáciu príkazového riadka <span class="app">screenshot</span> s rôznymi možnosťami pomocou tohto kódu (znak „<tt>\</tt>“ v prvom riadku je na zalomenie riadka v Termináli):</p>
 <pre class="terminal"> desklink "cmd=Active window (2s):/bin/screenshot --window --border --delay 2" \
 "cmd=Remove replicant:desklink --remove=screenshot" /bin/screenshot
 </pre>
@@ -114,8 +116,8 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="list-cli-apps.html">List of commands</a> 
-::  <a href="../applications.html#cli-apps" class="uplink">Applications</a> 
+ «  <a href="list-cli-apps.html">Zoznam príkazov</a> 
+::  <a href="../applications.html#cli-apps" class="uplink">Aplikácie</a> 
 </span></div>
 </div>
 

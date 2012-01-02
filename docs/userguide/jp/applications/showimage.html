@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		thebowseat
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>ShowImage</title>
+	<title>画像ビューワ</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -41,71 +43,75 @@
 <li><a href="../../en/applications/showimage.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="screenshot.html">Screenshot</a> 
+ «  <a href="screenshot.html">スクリーンショット</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
-::  <a href="soundrecorder.html">サウンドレコーダー (SoundRecorder)</a>  »
+::  <a href="soundrecorder.html">サウンドレコーダー</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
-<h2><img src="../../images/apps-images/showimage-icon_64.png" alt="showimage-icon_64.png" width="64" height="64" />ShowImage</h2>
+<h2><img src="../../images/apps-images/showimage-icon_64.png" alt="showimage-icon_64.png" width="64" height="64" />画像ビューワ</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><i>No entry, normally launched via
-double-clicking a supported file.</i></td></tr>
-<tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/ShowImage</span></td></tr>
+<tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><i>なし（サポートされたファイルをダブルクリックで起動）
+</i></td></tr>
+<tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/画像ビューワ</span></td></tr>
 <tr><td>設定ファイル：</td><td></td><td><span class="path">~/config/settings/ShowImage_settings</span></td></tr>
 </table>
 <p><br /></p>
-<p>ShowImage allows you to view images in all formats that are supported through <a href="../preferences/datatranslation.html">DataTranslators</a>. New formats are automatically recognized when their translator is added to the system. This has been done for Haiku's vector icon files, WonderBrush images or when WebP images became available, for example.<br />
-ShowImage provides minimal editing features to crop, rotate and flip images and to save them in another format.</p>
-<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Viewing</h2>
+<p>画像ビューワを使って <a href="../preferences/datatranslation.html">データトランスレータ</a> でサポートされているフォーマットの画像を見ることができます。新しいフォーマットはトランスレータがシステムに追加されると認識されます。これは Haiku のベクターアイコンファイル、 WonderBrush イメージや WebP イメージが使用可能になった時に行われています。<br />
+画像ビューワは最低限の画像をトリム、回転、フリップや、他のフォーマットで保存する機能を提供します。
+</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>表示</h2>
 <img src="../images/apps-images/showimage-view.jpg" alt="showimage-view.jpg" />
-<p>The <span class="menu">View</span> menu offers to start a <span class="menu">Slide show</span> of all images in a folder (or query result window) and set a <span class="menu">Slide delay</span> from 2 to 20 seconds.</p>
-<p>Other commands apply to the currently displayed image (without changing the size of the window):<br />
-<span class="menu">Original size</span> shows the image with a 100% zoom factor.<br />
-<span class="menu">Fit to window</span> shrinks the image back into the window fame, e.g. after having zoomed into it or after resizing the window.<br />
-<span class="menu">Zoom in</span> and <span class="menu">Zoom out</span> move into and out of the image in 10% steps. Zooming is also done with the mouse wheel; to pan an image bigger than the window, simply left-click and drag your mouse around.</p>
-<p>Two settings don't just apply to the currently displayed image and are remembered when browsing from one image to the next:<br />
-<span class="menu">High quality zooming</span> applies a very fast filter when zooming to reduce jagged lines and produce a smoother result.<br />
-<span class="menu">Stretch to window</span> will stretch smaller images to fill the current window frame.</p>
-<p>Then there's a <span class="menu">Full screen</span> mode with an option to <span class="menu">Show caption in full screen mode</span> which overlays the file name at the bottom of the image.</p>
-<p>Lastly, <span class="menu">Show tool bar</span> will show/hide the graphical controls:</p>
+<p><span class="menu">表示</span> メニューは フォルダ内 (又はクエリのウィンドウ内) の画像の<span class="menu">スライドショー</span> を始め、 <span class="menu">スライド間隔</span> を二秒から二十秒まで設定できます。</p>
+<p>現在表示されたイメージに (ウィンドウサイズを変更せずに) 適用されるほかのコマンド：<br />
+<span class="menu">原寸に戻す</span> は画像を100%ズームで表示します。<br />
+ズームインしたイメージやウィンドウサイズを変更した跡に<span class="menu">ウィンドウに合わせる</span>とイメージをウィンドウフレームの中に縮めます。<br />
+<span class="menu">ズームイン</span> と <span class="menu">ズームアウト</span> は10%ステップでイメージのズームを変更します。
+ズームはマウスホイールでもできます。ウィンドウより広く拡大したイメージをパンするには左クリックしてマウスをドラッグします。</p>
+<p>二つの設定は現在表示されたイメージだけではなく別のイメージにブラウズしても記憶されます：<br />
+<span class="menu">高画質ズーム</span> 
+はズーム時に高速でフィルターをかけ、ぎざぎざの線を取り除きスムーズなイメージを作り出します。<br />
+<span class="menu">ウィンドウの大きさに広げる</span> は小さなイメージをウィンドウフレーム全体に表示します。</p>
+<p>それから、<span class="menu">全画面表示モードでキャプションを表示</span>してファイル名をイメージの下に表示することができる <span class="menu">フルスクリーン</span>モードがあります。</p>
+<p>最後に、<span class="menu">ツールバーを表示</span>でグラフィックコントロールを表示/隠すことができます。</p>
 <img src="../images/apps-images/showimage-toolbar.png" alt="showimage-toolbar.png" />
-<p>From left to right: Previous image, next image, start slide show (in full screen mode), selection mode, original size, fit to window, zoom in, zoom out.</p>
-<p>Most of the more often used commands are also available from a right-click context menu on the image. Convenient when in full-screen mode.</p>
-<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Browsing</h2>
+<p>左から右へ：前のイメージ、次のイメージ、スライドショーを (フルスクリーンモードで) 開始、原寸に戻す、ウィンドウにあわせる、ズームイン、ズームアウト</p>
+<p>頻繁に使われているコマンドのほとんどは右クリックのコンテキストメニューから利用可能です。フルスクリーンモードのときに便利です。</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>ブラウジング (Browsing)</h2>
 <img src="../images/apps-images/showimage-browse.jpg" alt="showimage-browse.jpg" />
-<p>After opening an image you can quickly browse through all the other images in its folder (or query result window) by pressing <span class="key">↑</span>/<span class="key">↓</span> or <span class="key">←</span>/<span class="key">→</span>. You can see the selection change accordingly in the Tracker window.</p>
-<p>There is a quick way to open the folder of the current image and even navigate to its parent and subfolders. It works just like with <a href="../tracker.html#drill-down">drill-down navigating</a> in Tracker by clicking in the info area in the status bar that shows size and format of the current image.</p>
-<p>Looking at the <span class="menu">Browse</span> menu, shows another type of browsing: Some image formats, like TIFF, can contain several pages in one file. Commands like <span class="menu">First page</span> and <span class="menu">Next page</span> let you navigate those pages.</p>
-<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Editing</h2>
+<p>イメージを開くと <span class="key">↑</span>/<span class="key">↓</span> か <span class="key">←</span>/<span class="key">→</span> を押してそのフォルダー (又はクエリ結果ウィンドウ) の中のほかのイメージを素早く閲覧することができます。それにあわせてTracker ウィンドウでも選択変更を見ることができます。</p>
+<p>現在のイメージのフォルダを開いてその親フォルダーとサブフォルダーへ素早くナビゲートする方法があります。
+Tracker の<a href="../tracker.html#drill-down">ドリルダウンナビゲート</a> と同じように、ステータスバーの情報エリアをクリックして現在のイメージのサイズとフォーマットを表示します。</p>
+<p><span class="menu">閲覧</span> メニューを見ると、別の閲覧タイプが表示されます：例えばTIFFなのどイメージフォルダーはひとつのファイルに複数のページが入っています。 <span class="menu">最初のページ</span> や <span class="menu">次のページ</span> などのコマンドでページをナビゲートすることができます。</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>編集</h2>
 <img src="../images/apps-images/showimage-edit.jpg" alt="showimage-edit.jpg" />
-<p>The <span class="menu">Image</span> menu offers the few image manipulations necessary for an image viewer: rotating and flipping the image. Note however, that the actual image data won't be changed. Only an attribute is added to the file so it'll be shown rotated or flipped the next time you open it.</p>
-<p><span class="menu">Use as backgroud...</span> will open the <a href="../preferences/backgrounds.html">Backgrounds</a> preferences to set the current picture as image for your workspaces.</p>
-<p>Cropping is another feature that's needed sometimes. To define the frame to cut to, you can switch to <span class="menu">Selection mode</span> from the <span class="menu">Edit</span> menu and drag out a box with your left mouse button. If you don't want to change modes first, you can create this box in "normal mode" by simply holding <span class="key">CTRL</span> while left-click-dragging, which otherwise would just pan the image around.<br />
-<span class="menu">Clear selection</span> or <span class="key">ESC</span> will remove the selection box.</p>
-<p>The following chapter shows how to actually save the cropped area.</p>
-<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Saving and converting</h2>
-<p>To save or convert an image into any available format, you can invoke the normal <span class="menu">Save as...</span> item from the <span class="menu">File</span> menu, select the format and choose a file name.<br />
-Often quicker, especially when the Tracker window with the destination folder is already open, is using drag &amp; drop.</p>
+<p><span class="menu">イメージ</span> メニューはイメージビューアに必要ないくつかの画像操作を提供します：イメージの回転とフリップ。しかし実際のイメージデータは変更されません。次に開いたときに回転した状態で表示するために属性を追加するだけです。</p>
+<p>現在の画像をワークスペース用のイメージとして保存するには <span class="menu">デスクトップの背景にする...</span> から <a href="../preferences/backgrounds.html">背景</a> 設定を開きます。</p>
+<p>トリミングは別の時々必要な機能です。トリムするフレームを定義するには、 <span class="menu">編集</span> メニューから <span class="menu">選択モード</span> に切り替え、左マウスボタンでボックスを引っ張り出すことができます。モードを変更したくない場合は”ノーマルモード”の中で左クリックドラッグ中に <span class="key">CTRL</span> を押すことでボックスを作成することができます。<br />
+<span class="menu">選択解除</span> か <span class="key">ESC</span> で選択ボックスを取り除くことができます。</p>
+<p>次の章ではトリムした部分を実際に保存する方法を説明します。</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>保存と変換</h2>
+<p>イメージを保存するか別のフォーマットに変換するには、普通の <span class="menu">ファイル</span> メニューから <span class="menu">ファイル形式を選んで保存...</span> を選び、フォーマットとファイル名を選択します。<br />
+Tracker ウィンドウが保存先のフォルダーを開いている時は、ドラッグ &amp; ドロップで素早く保存できます。</p>
 <img src="../images/apps-images/showimage-dnd.jpg" alt="showimage-dnd.jpg" />
-<p>This is also how the above mentioned cropping is finalized. Either select a frame as described above, or choose <span class="menu">Edit | Select all</span> for the whole image. Then drag &amp; drop the selection onto the Desktop or any Tracker window to create a new image clipping in the same format of the original image.</p>
-<p>To save in another file format, do the dragging with the right mouse button and choose a format from the context menu when dropping the image.</p>
-<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Keyboard shortcuts</h2>
-<p>Here's a list of the most useful shortcuts:</p>
+<p>上記のトリミングを完成させるには、フレームを選択するか、<span class="menu">編集 | すべて選択</span>でイメージを選択してください。それから選択部分をデスクトップか Tracker ウィンドウへドラッグ&amp; ドロップして新しいイメージをオリジナルと同じフォーマットで作成します。</p>
+<p>ファイルを別のフォーマットで保存するには、
+右マウスボタンでドラッグしてドロップするときに出るコンテキストメニューからフォーマットを選択してください。</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>キーボードショートカット(Keyboard shortcuts)</h2>
+<p>最も便利なショートカットのリストです：</p>
 <table summary="keycombos" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="key">←</span> / <span class="key">↑</span></td><td style="width:15px;"></td><td>Previous image</td></tr>
-<tr><td><span class="key">→</span> / <span class="key">↓</span></td><td></td><td>Next image</td></tr>
-<tr><td><span class="key">DEL</span></td><td></td><td>Move to Trash</td></tr>
-<tr><td><span class="key">+</span></td><td></td><td>Zoom in</td></tr>
-<tr><td><span class="key">-</span></td><td></td><td>Zoom out</td></tr>
-<tr><td><span class="key">0</span></td><td></td><td>Original size (100% zoom)</td></tr>
-<tr><td><span class="key">1</span></td><td></td><td>Fit to window</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>Toggle full screen mode (also via doubleclick)</td></tr>
-<tr><td><span class="key">CTRL</span></td><td></td><td>While holding <span class="key">CTRL</span> you can create a selection frame without explicitly switching to selection mode.</td></tr>
+<tr><td><span class="key">←</span> / <span class="key">↑</span></td><td style="width:15px;"></td><td>前の画像</td></tr>
+<tr><td><span class="key">→</span> / <span class="key">↓</span></td><td></td><td>次の画像</td></tr>
+<tr><td><span class="key">DEL</span></td><td></td><td>ゴミ箱に移動</td></tr>
+<tr><td><span class="key">+</span></td><td></td><td>ズームイン</td></tr>
+<tr><td><span class="key">-</span></td><td></td><td>ズームアウト</td></tr>
+<tr><td><span class="key">0</span></td><td></td><td>原寸に戻す (100% ズーム)</td></tr>
+<tr><td><span class="key">1</span></td><td></td><td>ウィンドウに合わせる</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>全画面表示モードの切り替え (ダブルクリックで切り替えも可能です)</td></tr>
+<tr><td><span class="key">CTRL</span></td><td></td><td><span class="key">CTRL</span> を押しながら選択モードに切り替えずに選択フレームを作成することができます。</td></tr>
 </table>
 
 </div>
@@ -113,9 +119,9 @@ Often quicker, especially when the Tracker window with the destination folder is
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="screenshot.html">Screenshot</a> 
+ «  <a href="screenshot.html">スクリーンショット</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
-::  <a href="soundrecorder.html">サウンドレコーダー (SoundRecorder)</a>  »
+::  <a href="soundrecorder.html">サウンドレコーダー</a>  »
 </span></div>
 </div>
 

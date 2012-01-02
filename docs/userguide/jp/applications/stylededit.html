@@ -9,12 +9,15 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		thebowseat
+ *		log-1
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>StyledEdit</title>
+	<title>テキストエディター</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -41,26 +44,25 @@
 <li><a href="../../en/applications/stylededit.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="soundrecorder.html">サウンドレコーダー (SoundRecorder)</a> 
+ «  <a href="soundrecorder.html">サウンドレコーダー</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
-::  <a href="terminal.html">Terminal</a>  »
+::  <a href="terminal.html">ターミナル</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
-<h2><img src="../../images/apps-images/stylededit-icon_64.png" alt="stylededit-icon_64.png" width="64" height="64" />StyledEdit</h2>
+<h2><img src="../../images/apps-images/stylededit-icon_64.png" alt="stylededit-icon_64.png" width="64" height="64" />テキストエディター</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><span class="menu">アプリケーション (Applications)</span></td></tr>
-<tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/StyledEdit</span></td></tr>
+<tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/テキストエディター</span></td></tr>
 <tr><td>設定ファイル：</td><td></td><td><i>なし</i></td></tr>
 </table>
 <p><br /></p>
-<p>StyledEdit is Haiku's simple text editor. Although it saves files in plain text format, additional attributes are written in order to have limited formatting capabilities when viewed with StyledEdit.</p>
+<p>StyledEdit はHaikuのシンプルなテキストエディターです。 StyledEdit はファイルを普通のテキスト形式で保存しますが、StyledEdit で表示したときに限定的なフォーマット機能を実現するために、追加の属性が書き込まれます。</p>
 <img src="../images/apps-images/stylededit.png" alt="stylededit.png" />
-<p>If you're interested, this is what those additional attributes look like when examined in Terminal with <span class="cli">listattr</span>:</p>
+<p>興味があれば、ターミナルで <span class="cli">listattr</span> を使うと属性はこのように表示されます：</p>
 <pre class="terminal">~&gt; listattr /boot/home/Desktop/test.txt
 File: /boot/home/Desktop/test.txt
   Type         Size                 Name
@@ -72,19 +74,20 @@ MIME String         11  "BEOS:TYPE"
    Raw Data       1048  "styles"
 
 1071 bytes total in attributes.</pre>
-<p>As you can see, all the formatting options from StyledEdit's menu are present: line wrapping (on/off) and alignment (left/center/right), each in one attribute. Styles (font, size, color) of each letter mangled into another.</p>
-<div class="box-info">Because these attributes are a file system feature of BFS, this means that not only other platforms just see a plain text file, it also follows, that the formatting will be lost when a file is stored on a non-BFS partition. The above attributes are simply stripped and what's left is the ordinary, plain text file.</div>
-<p>In any case, it's a nice idea having the possibility of colored text in different fonts and sizes while still being a normal text file. A <span class="cli">ReadMe.txt</span>, for example, is therefore readable in a shell on any platform and still has a bit of style when viewed via double-click from Haiku.</p>
-<p>Actually using StyledEdit is so simple, we'll skip explaining every mundane menu item. Just write down your text then select the words you'd like to format and apply font, size and color from the <span class="menu">Font</span> menu. Line wrapping and alignment from the <span class="menu">Document</span> menu only work on the whole file.</p>
+<p>この通り、テキストエディターのメニューからのフォーマットオプションはすべて表示されています：
+ワードラップ (オン/オフ) と配置 (左、中央、右) がそれぞれ一つの属性に入っています。文字のスタイル (フォント、サイズ、色) も別の属性に入っています。</p>
+<div class="box-info">これらの属性はBFSのファイルシステムの機能なので、ほかのプラットフォームはただのテキストファイルと認識することだけでなく、BFS以外のパーティションにファイルを保存するとフォーマットが消えてしまいます。上記の属性はただ取り除かれ、普通のテキストファイルが残ります。</div>
+<p>いずれにしても、普通のテキストファイルであっても異なるフォントやサイズで書かれた色つきのテキストを持つことを可能にするというのは、すてきなアイディアです。例えば、ReadMe.txt はこの仕組みによってどんなプラットフォーム上でもシェルで読むことができますし、その状態でもなおかつ Haiku からダブルクリックで開いた場合には、ちょっとだけど書式の内容を保持しているのです。</p>
+<p>テキストエディターを使用するのはすごく簡単なので、メニューアイテムを一つ一つ説明するのは飛ばします。テキストを書き、フォーマットしたいテキストを選択して <span class="menu">フォント</span> メニューからフォント、サイズと色を変更してください。 <span class="menu">ドキュメント</span> メニューのワードラップと配置はファイル全体にしか適用できません。</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="soundrecorder.html">サウンドレコーダー (SoundRecorder)</a> 
+ «  <a href="soundrecorder.html">サウンドレコーダー</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
-::  <a href="terminal.html">Terminal</a>  »
+::  <a href="terminal.html">ターミナル</a>  »
 </span></div>
 </div>
 

@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Backgrounds</title>
+	<title>Tausta-asetukset</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -41,7 +43,7 @@
 <li><a href="../../en/preferences/backgrounds.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="appearance.html">Appearance</a> 
+ «  <a href="appearance.html">Ulkoasuasetukset</a> 
 ::  <a href="../preferences.html" class="uplink">Preferences</a> 
 ::  <a href="datatranslations.html">DataTranslations</a>  »
 </span></div>
@@ -49,33 +51,32 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/prefs-images/backgrounds-icon_64.png" alt="backgrounds-icon_64.png" width="64" height="64" />Backgrounds</h2>
+<h2><img src="../../images/prefs-images/backgrounds-icon_64.png" alt="backgrounds-icon_64.png" width="64" height="64" />Tausta-asetukset</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
-<tr><td>Location:</td><td></td><td><span class="path">/boot/system/preferences/Backgrounds</span></td></tr>
-<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/system/app_server/workspaces</span><br />
-<span class="path">~/config/settings/Backgrounds settings</span> - stores the panel's window position</td></tr>
+<tr><td>Työpöytäpalkki</td><td style="width:15px;"></td><td><span class="menu">Asetukset</span></td></tr>
+<tr><td>Sijainti</td><td></td><td><span class="path">/boot/system/preferences/Backgrounds</span></td></tr>
+<tr><td>Asetukset</td><td></td><td><span class="path">~/config/settings/system/app_server/workspaces</span><br />
+<span class="path">~/config/settings/Backgrounds settings</span> - tallentaa paneeli-ikkunan sijainnin</td></tr>
 </table>
-<p>You can set a color or an image as background for every folder and the Desktop for every workspace.</p>
+<p>Voit asettaa värin tai kuvan taustaksi jokaiselle kansiolle ja Työpöydän jokaiselle työtilalle.</p>
 <p><br /></p>
 <img src="../images/prefs-images/backgrounds.png" alt="backgrounds.png" />
-<p>The top menu specifies if your changes are applied to the current workspace only, all workspaces, a specific folder or as default for every new folder.</p>
-<p>Below that you can assign an image or select <span class="menu">None</span> if you want simply a colored background. Images can also be drag&amp;dropped onto the preview to the left.</p>
-<p>If you are using an image, you have to decide on the placement:</p>
+<p>Ylin valikko määrää, että koskeeko muutoksesi vain nykyistä työtilaa, kaikkia työtiloja, tiettyä kansiota tai oletuksena jokaista uutta kansiota.</p>
+<p>Sen alla voit liittää kuvan tai valita <span class="menu">Ei mitään</span> jos haluat yksinkertaisesti värillisen taustan. Kuvat voidaan myös raahata ja pudottaa vasemmalla olevaan esikatseluun.</p>
+<p>Jos käytät kuvaa, sinun on päätettävä sijoittelu:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Manual</span></td><td> </td><td>lets you specify the coordinates. You can drag the picture around in the preview to the left or enter <i>X</i> and <i>Y</i> manually.</td></tr>
-<tr><td><span class="menu">Center</span></td><td> </td><td>centers the picture in the middle of the screen.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Scale to fit</span></td><td> </td><td>enlarges the picture with no regard to its aspect ratio until it fills the screen.</td></tr>
-<tr><td><span class="menu">Tile</span></td><td> </td><td>fills the screen by repeating the picture.</td></tr>
+<tr><td><span class="menu">Manuaalinen</span></td><td> </td><td>sallii sinun määritellä koordinaatit. Voit raahata kuvaa ympäriinsä vasemmalla olevalla esikatselualueella tai kirjoittaa <i>X</i> ja <i>Y</i> -koordinaatit käsin.</td></tr>
+<tr><td><span class="menu">Keskitä</span></td><td> </td><td>keskittää kuvan näytön keskelle.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Skaalaa sopimaan</span></td><td> </td><td>laajentaa kuvaa ottamatta huomioon sen kuvasuhdetta kunnes se täyttää näytön.</td></tr>
+<tr><td><span class="menu">Limitä</span></td><td> </td><td>täyttää näytön toistamalla kuvaa.</td></tr>
 </table>
-<p>Activating <span class="menu">Icon label outline</span> puts a thin contour around icon labels.</p>
-<p>Whether an icon label's actual text is black or white depends on the setting of the color picker. A dark color sets the text to white, a light color to black. So, if you assign a very bright image to the background, you should also set the color picker to a bright color in order to have icon labels readable in black. (Or use the outline option above.)<br />
-The selected color is also reflected in the <a href="../desktop-applets/workspaces.html">Workspaces applet</a>, which ignores images as backgrounds.</p>
+<p><span class="menu">Kuvakenimiön ääriviiva</span>n aktivoiminen laittaa ohuen ääriviivan kuvakkeen nimiöiden ympärille.</p>
+<p>Se onko kuvakenimiön todellinen teksti musta vai valkoinen, riippuu väripoimijan asetuksista. Tumma väri asettaa tekstin valkoiseksi, vaalea väri mustaksi. Joten jos liität hyvin vaalean kuvan taustaksi, sinun olisi asetettava myös väripoimija vaaleaan väriin, jotta kuvakenimiö on luettava mustana. (Tai käytä yllä mainittua ääriviivavalitsinta.)<br />
+Valittu väri heijastuu myös <a href="../desktop-applets/workspaces.html">Työtilat-applettiin</a>, joka ohittaa kuvat taustana.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">Revert</span></td><td> </td><td>brings back the settings that were active when you started the Backgrounds preferences.</td></tr>
-<tr><td><span class="button">Apply</span></td><td> </td><td>sets your changes.</td></tr>
+<tr><td><span class="button">Palauta</span></td><td> </td><td>tuo takaisin asetukset, jotka olivat aktiivisia, kun käynnistit Tausta-asetukset.</td></tr>
+<tr><td><span class="button">Käytä</span></td><td> </td><td>asettaa muutoksesi.</td></tr>
 </table>
 
 </div>
@@ -83,7 +84,7 @@ The selected color is also reflected in the <a href="../desktop-applets/workspac
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="appearance.html">Appearance</a> 
+ «  <a href="appearance.html">Ulkoasuasetukset</a> 
 ::  <a href="../preferences.html" class="uplink">Preferences</a> 
 ::  <a href="datatranslations.html">DataTranslations</a>  »
 </span></div>

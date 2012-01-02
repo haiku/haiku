@@ -9,12 +9,15 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		helix84
+ *		Bachoru
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Haiku's GUI</title>
+	<title>Používateľské rozhranie Haiku</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -41,7 +44,7 @@
 <li><a href="../en/gui.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="filesystem-layout.html">Filesystem layout</a> 
+ «  <a href="filesystem-layout.html">Rozloženie súborového systému Haiku</a> 
 ::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="workspaces.html">Workspaces</a>  »
 </span></div>
@@ -49,79 +52,78 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h1>Haiku's GUI</h1>
+<h1>Používateľské rozhranie Haiku</h1>
 
-<p>Haiku's graphical user interface is an integral part of the system. Unlike Unix-based operating systems, there's no separate window manager and booting just into a command line shell is not possible. Haiku's focus being on the desktop user, this is just not considered necessary.</p>
-<p>As you probably have experience with other graphical environments, let's skip over the standards like menus, right-click context menus, drag&amp;drop etc. Let's have a look at the few unique aspects of Haiku's GUI instead.</p>
+<p>Grafické používateľské rozhranie Haiku je integrálnou súčasťou systému. Na rozdiel od unixových operačných systémov neexistuje samostatný správca okien a zavedenie systému iba do shellu s príkazovým riadkom nie je možné. Haiku sa zameriava na používateľa pracovného prostredia a toto sa jednoducho nepovažuje za potrebné.</p>
+<p>Pretože už pravdepodobne máte skúsenosti s inými grafickými prostrediami, preskočme štandardné veci ako menu, kontextové ponuky pri kliknutím pravým tlačidlom, Ťahaj&amp;pusť atď. Pozrime sa namiesto toho na niekoľko jedinečných aspektov grafického používateľského prostredia Haiku.</p>
 <img src="images/gui-images/gui.png" alt="gui.png" />
-<p>There are only a few things in Haiku's GUI that aren't obvious and deserve an explanation.</p>
+<p>V grafickom rozhraní Haiku je len niekoľko vecí, ktoré nie sú zjavné a zaslúžia si vysvetlenie.</p>
 <ol>
-<li><p>The Deskbar is Haiku's "Start" menu and taskbar, if you will. See topic <a href="deskbar.html">Deskbar</a>.</p></li>
-<li>The yellow tab offers more than just a program's name or a document's filename:
-<ul><li>You can move it by holding the <span class="key">SHIFT</span> key while dragging it to another position, enabling you to stack a number of windows and conveniently access them by their named tab.</li>
-<li>You minimize a window with a double-click on its tab (or with <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span>). A such hidden window can be accessed by its entry in the <a href="deskbar.html">Deskbar</a> or the <a href="twitcher.html">Twitcher</a>.</li>
-<li>You can send a window to the back with a right-click on its tab (or its border).</li></ul></li>
-<li><p>The close button.</p></li>
-<li><p>The "zoom" button (or <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). In most applications, this will expand a window to maximum size. It doesn't have to, however. Tracker windows, for example, will resize to best fit the contents.</p></li>
-<li><p>The resize corner. Dragging anywhere else on a window's border will move the window.</p></li>
+<li><p>Panel je ako ponuka „Štart“ a hlavný panel vo Windows. Pozrite sekciu <a href="deskbar.html">Panel</a>.</p></li>
+<li>Žltá karta ponúka viac ako len názov programu či súboru:
+<ul><li>Môžete ju presúvať držaním klávesu <span class="key">SHIFT</span> a ťahaním na inú pozíciu, čím môžete pohodlne prepínať medzi rôznymi oknami aj keď sú na sebe.</li>
+<li>Okno môžete minimalizovať dvojklikom na jeho kartu (alebo pomocou <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span>). K takto skrytému oknu sa dostanete cez jeho položku v <a href="deskbar.html">Paneli</a> alebo <a href="twitcher.html">Twitcheri</a>.</li>
+<li>Okno môžete dať preč z popredia pravým kliknutím na jeho kartu (alebo okraj).</li></ul></li>
+<li><p>Tlačidlo Zavrieť.</p></li>
+<li><p>Tlačidlo „zväčšenia“ (alebo <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). Vo väčšina aplikácií sa okno maximalizuje. Sú ale aj výnimky. Napríklad okná Trackera, ktoré svoju veľkosť zmenia tak, aby sa čo najlepšie prispôsobili obsahu.</p></li>
+<li><p>Ťahaním myšou počas držania rohu meníte veľkosť okna. Ťahaním počas držania hocijakej inej časti okraja sa okno presúva.</p></li>
 </ol>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="move-resize" name="move-resize">A quick way to move or resize windows</a></h2>
-<p>Moving and resizing windows is a large part of interacting with several concurrently running applications. Instead of aiming at the small yellow title tab or the even tinier window border, there's a more convenient way to move a window. Also, additionally to its small size, the resize corner has another limitation: It only allows resizing at and in the direction of the lower right corner.</p>
-<p>To address these issues, Haiku provides a neat solution using the window management key combo <span class="key">CTRL</span> <span class="key">ALT</span> and the mouse. See also chapter <a href="keyboard-shortcuts.html#general">Shortcuts and key combinations</a> for more shortcuts concerning window management.</p>
+<a id="move-resize" name="move-resize">Rýchly spôsob na presúvanie a zmenu veľkosti okien</a></h2>
+<p>Pohybovanie a menenie veľkosti je veľká časť interakcie s viacerými súčasne bežiacimi aplikáciami. Namiesto triafania malej žltej karty alebo ešte menšieho okraja, existuje aj pohodlnejší spôsob. Okrem toho, že je roh okna malý, má aj ďalšie obmedzenie: Dovoľuje vám meniť veľkosť iba v smere dolného pravého rohu.</p>
+<p>Ako elegantné riešenie tohoto problému ponúka Haiku klávesovú skratku <span class="key">CTRL</span> <span class="key">ALT</span> s použitím myši. Pozrite aj sekciu <a href="keyboard-shortcuts.html#general">Skratky a klávesové kombinácie</a>, kde nájdete ďalšie informácie o skratkách na správu okien.</p>
 <img src="images/gui-images/resizing.png" alt="resizing.png" />
-<p>Holding down <span class="key">CTRL</span> <span class="key">ALT</span> will highlight the window borders nearest to the mouse pointer. Move the mouse in the direction of another border to change the target. Click and dragging with the <i>right mouse button</i> will resize the window along the highlighted border(s).</p>
-<p>Hold down <span class="key">CTRL</span> <span class="key">ALT</span> and click and drag with the <i>left mouse button</i> anywhere in a window to move it around. A quick click with the <i>right mouse button</i> sends it to the back.</p>
+<p>Držanie <span class="key">CTRL</span> <span class="key">ALT</span> zvýrazní okraje najbližšie pri kurzore. Presúvaním myši môžete meniť zvýraznené okraje. Držaním  <i>pravého tlačidla myši</i> ťahaním meníte veľkosť okna pozdĺž vyznačených okrajov.</p>
+<p>Držaním <span class="key">CTRL</span> <span class="key">ALT</span> a ťahaním  <i>ľavým tlačidlom myši</i> hocikde vrámci okna ním môžete hýbať. Rýchlym kliknutím <i>pravým tlačidlom myši</i> vrátite okno do jeho pôvodnej pozície.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="open-save-panel" name="open-save-panel">Open and save panels</a></h2>
-<p>When opening or saving a file from any application, a panel like this opens:</p>
+<a id="open-save-panel" name="open-save-panel">Panely Otvoriť a Uložiť</a></h2>
+<p>Pri otváraní alebo ukladaní súboru z aplikácie sa otvorí takýto panel:</p>
 <img src="images/gui-images/open-save.png" alt="open-save.png" />
-<p>It has all the usual things: A list of files of the current folder to choose from, in case of a save panel, a text field to enter a filename and a pop-up menu for different file formats and their settings.<br />
-You can enter parent folders with the pop-up menu above the file listing.</p>
-<p>If you already have a Tracker window with the location for a file open, you can simply drag either any file or the folder-representation (i.e. the symbol to the far right in its menu bar) into the panel. This changes the panel to that new location.</p>
+<p>Má všetko, čo by ste čakali: Zoznam súborov na výber z aktuálneho priečinka, v prípade ukladania aj textové pole, do ktorého zadáte názov súboru, a rozbaľovacie menu s ponukou formátov a ich nastavenia. <br />
+Z rozbaľovacieho menu hore môžete vybrať nadradený priečinok.</p>
+<p>Ak už máte otvorený vami zvolený cieľový priečinok alebo jeho reprezentáciu (symbol úplne vpravo v jeho paneli menu), môžete ho jednoducho pretiahnuť myšou do panela. Panel tak zmení svoju lokalitu na daný priečinok.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="open-save-shortcuts" name="open-save-shortcuts">Keyboard shortcuts</a></h3>
-<p>Many shortcuts in open and save panels are the same used in Tracker. Besides the commands that are also available through the <span class="menu">File</span> menu, there are a few not that obvious:</p>
+<a id="open-save-shortcuts" name="open-save-shortcuts">Klávesové skratky</a></h3>
+<p>Veľa skratiek v paneli otvárania a ukladania sú tie isté, ktoré sú použité aj v Trackeri. Okrem príkazov dostupných z menu <span class="menu">Súboru</span> existujú ešte nejaké, ktoré nie sú také zjavné:</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td> Creates a new folder.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">E</span></td><td></td><td> Lets you rename the selected entry.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:24px;"></td><td> Moves into the parent folder.</td></tr>
-<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> or <span class="key">ENTER</span></td><td></td><td> Moves into the selected folder.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td></td><td> Takes you to your Desktop.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td></td><td> Takes you to your Home folder.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td>Vytvorí nový súbor.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">E</span></td><td></td><td>Umožní premenovanie označenej položky.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:24px;"></td><td>Presunie položku do nadradeného priečinka.</td></tr>
+<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> alebo <span class="key">ENTER</span></td><td></td><td>Vstúpi do označeného priečinka.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td></td><td>Vráti vás na plochu.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td></td><td>Vráti vás do domovského priečinka.</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="favorites-recent" name="favorites-recent">Favorites and recent folders</a></h3>
-<p>The <span class="menu">Favorites</span> menu in open and save panels provides recently visited folders and favorite locations that you can set up yourself. As indicated by the little arrow, you can also use these locations to navigate further down the hierarchy via submenus.</p>
+<a id="favorites-recent" name="favorites-recent">Priečinky Obľubené a Nedávno použité</a></h3>
+<p>Menu <span class="menu">Obľúbené</span> vám v paneli otvárania a ukladania ponúka nedávno navštívené priečinky a obľúbené lokality, ktoré si môžete sami nastaviť. Šípka indikuje, že sa môžete cez tieto súbory dostať hlbšie do hierarchie pomocou submenu.</p>
 <img src="images/gui-images/favorites.png" alt="favorites.png" />
-<p>To add a Favorite, you simply navigate to your destination and choose <span class="menu">Favorites | Add current folder</span>. From now on it will appear in every open/save panel. To remove a Favorite, choose <span class="menu">Favorites | Configure favorites...</span> and delete its entry.<br />
-All Favorites are kept in <span class="path">/boot/home/config/settings/Tracker/Go/</span>. So you might as well add and remove links to files and folders there directly.</p>
+<p>Ak si chcete pridať súbor medzi Obľúbené, jednoducho v ňom z menu vyberte <span class="menu">Obľúbené | Pridať aktuálny priečinok</span>. Odteraz sa tento priečinok objaví v každom paneli otvárania/ukladania. Ak chcete priečinok z Obľúbených odstrániť, vyberte <span class="menu">Obľúbené | Upraviť obľúbené...</span> a vymažte jeho položku.<br />
+Všetky Obľúbené sú uložené v <span class="path">/boot/home/config/settings/Tracker/Go/</span>. Tam môžete rovno pridávať alebo odstraňovať odkazy na súbory a priečinky.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="replicants" name="replicants">Replicants</a></h2>
-<p>Replicants are small self-contained parts of applications that can be integrated into other programs. Provided Deskbar's option to <span class="menu">Show replicants</span> is activated, you'll recognize a replicantable part of an application by its small handle, normally in the bottom right corner:</p>
+<a id="replicants" name="replicants">Replikanty</a></h2>
+<p>Replikanty sú malé samostatné súčasti aplikácií, ktoré sa dajú integrovať do iných programov. Po aktivovaní možnosti Panela <span class="menu">Zobraziť replikantov</span> môžete rozoznať aplikácie s replikantom podľa tejto malej rúčky v pravom dolnom rohu:</p>
 <img src="../images/gui-images/replicant.png" alt="replicant.png" />
-<p>The most prominent place that accepts Replicants is the Desktop: You simply drag &amp; drop the little handle onto it. From now on it's part of the Desktop and the Replicant's originating app doesn't have to be started for it to work.<br />
-A right-click on a Replicant handle offers a context menu to show the originating app's <span class="menu">About</span> window and to <span class="menu">Remove replicant</span>.</p>
-<div class="box-info">Should you experience difficulties with a Replicant on the Desktop and just can't get rid of it, delete <span class="path">~/config/settings/Tracker/tracker_shelf</span>. Unfortunately, this will remove <i>all</i> Replicants from the Desktop.</div>
-<p>Examples for replicatable applications are the graphs of the <a href="applications/activitymonitor.html">ActivityMonitor</a>, the <a href="workspaces.html">Workspaces applet</a> or <a href="applications/deskcalc.html">DeskCalc</a>.</p>
+<p>Najprominentnejšie miesto na použitie replikantov je Plocha: Jednoducho na ňu myšou pretiahnite rúčku replikanta. Odteraz je táto aplikácia súčasťou Plochy a ak s ňou chcete pracovať, pôvodnú aplikáciu už nemusíte spúšťať.<br />
+Pravým kliknutím na rúčku replikanta vyvoláte menu s možnosťami zobraziť ďalšie informácie <span class="menu">O aplikácií</span> alebo <span class="menu">Odstrániť replikanta</span>.</p>
+<div class="box-info">Ak sa s replikantom vyskytnú problémy a vy sa ho neviete zbaviť, odstráňte <span class="path">~/config/settings/Tracker/tracker_shelf</span>. Bohužiaľ, toto odstráni <i>všetky</i> replikanty z Plochy.</div>
+<p>Možnosť vytvoriť replikanta majú napríklad aplikácie <a href="applications/activitymonitor.html">Monitor aktivity</a>, aplet <a href="workspaces.html">Pracovné plochy</a> alebo <a href="applications/deskcalc.html">DeskCalc</a>.</p>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="filesystem-layout.html">Filesystem layout</a> 
+ «  <a href="filesystem-layout.html">Rozloženie súborového systému Haiku</a> 
 ::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="workspaces.html">Workspaces</a>  »
 </span></div>

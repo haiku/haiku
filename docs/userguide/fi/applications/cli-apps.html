@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Commandline Applications</title>
+	<title>Komentorivisovellukset</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -49,60 +51,59 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Haiku-specific commandline applications</h2>
+<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Haiku-kohtaiset komentorivisovellukset</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Location:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
+<tr><td>Sijainti</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
 </table>
 <p><br /></p>
-<p>All commandline applications shipped with Haiku are in either <span class="path">/boot/system/bin</span> or <span class="path">/boot/common/bin</span>. Your own or additionally installed commandline apps should go in <span class="path">~/config/bin</span>. All these locations are part of the PATH variable and are therefore automatically found.<br />
-The following isn't an exhaustive list of all Haiku-specific CLI apps, it serves just to highlight a few of the most useful to give you a taste. Feel encouraged to explore what's in the <span class="path">bin/</span> folders on your own a bit. Executing an app with the parameter <tt>--help</tt> shows the usage of the command and all its various options.</p>
+<p>Kaikki Haikun mukana toimitettavat komentorivisovellukset ovat joko kansiossa  <span class="path">/boot/system/bin</span> tai kansiossa <span class="path">/boot/common/bin</span>. Omien tai ylimääräisinä asennettujen komentorivisovellusten pitäisi mennä kansioon <span class="path">~/config/bin</span>. Kaikki nämä sijainnit ovat PATH-muuttujan osia ja löytyvät siksi automaattisesti.<br />
+Seuraava ei ole tyhjentävä luettelo kaikista Haiku-kohtaisista CLI-sovelluksista, se palvelee vain korostamalla muutamaa kaikkein hyödyllisintä antamaan sinulle makua komentorivisovelluksista. Rohkaistu itse omalta osaltasi tutkimaan, mitä on <span class="path">bin/</span> -kansioissa. Sovelluksen suorittaminen parametrillä <tt>--help</tt> näyttää komennon käytön ja kaikki sen eri valitsimet.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-attributes" name="cli-attributes">Relating to attributes: <span class="cli">listattr</span>, <span class="cli">catattr</span>, <span class="cli">addattr</span>, <span class="cli">rmattr</span>, <span class="cli">copyattr</span></a></h3>
-<p>These commands are used to display, read out, add and remove attributes of files. Remember that these meta data are currently only available on BFS formatted volumes. Moving files onto other file systems will strip all attributes!<br />
-All these commands are described in topic <a href="../attributes.html#attributes-terminal">Attributes in Terminal</a>.</p>
+<a id="cli-attributes" name="cli-attributes">Attribuutteihin liittyvät sovellukset: <span class="cli">listattr</span>, <span class="cli">catattr</span>, <span class="cli">addattr</span>, <span class="cli">rmattr</span>, <span class="cli">copyattr</span></a></h3>
+<p>Näitä komentoja käytetään näyttämään, lukemaan, lisäämään ja poistamaan tiedostojen attribuutteja. Muista, että nämä metatiedot ovat nykyisin käytettävissä vain BFS-alustetuilla taltioilla. Siirrettäessä tiedostoja toisiin tiedostojärjestelmiin kaikki attribuutit häviävät!<br />
+Kaikki nämä komennot on kuvailtu aiheessa <a href="../attributes.html#attributes-terminal">Pääteikkunan attribuutit</a>.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-index" name="cli-index">Relating to the index: <span class="cli">lsindex</span>, <span class="cli">mkindex</span>, <span class="cli">reindex</span>, <span class="cli">rmindex</span></a></h3>
-<p>With these commands you list, make, reindex and remove attributes to BFS' index. Every volume has it's own index, remember that when copying files from one volume to another.<br />
-These commands are described in topic <a href="../index.html">Index</a>.</p>
+<a id="cli-index" name="cli-index">Hakemistoihin liittyvät sovellukset: <span class="cli">lsindex</span>, <span class="cli">mkindex</span>, <span class="cli">reindex</span>, <span class="cli">rmindex</span></a></h3>
+<p>Näillä komennoilla voit luetteloida, tehdä, indeksoida uudelleen ja poistaa BFS-hakemistojen indeksejä. Jokaisella taltiolla on oma hakemistonsa, muista se kopioidessasi tiedostoja taltiolta toiselle.<br />
+Nämä komennot kuvaillaan aiheessa <a href="../index.html">Hakemisto</a>.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-scripting" name="cli-scripting">Useful scripting commands</a></h3>
-<p>Here are a few commandline tools that are especially useful for scripting (see also topic <a href="../bash-scripting.html">Bash and Scripting</a>).</p>
+<a id="cli-scripting" name="cli-scripting">Hyödylliset skriptikomennot</a></h3>
+<p>Tässä on muutamia komentorivityökaluja, jotka ovat erityisen hyödyllisiä skriptikäyttöön (katso myös aihetta <a href="../bash-scripting.html">Bash ja skriptien käyttö</a>).</p>
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">alert</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">alert</span> conjures up the typical alert window with a pre-defined icon, explanatory text and up to three buttons. It will return the title of the pressed button and an exit status (starting with 0). For example, this is made of the line:</p>
-<pre class="terminal">alert --idea "FantasticApp(tm) installed successfully!
-Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
+		<td valign="top"><p><span class="cli">alert</span> taikoo tyypillisen hälytysikkunan ennalta määritellyllä kuvakkeella, selittävällä tekstillä ja enimmillään kolmella painikkeella. Se palauttaa painetun painikkeen otsikon ja poistumistilan (alkaen numerosta 0). Esimerkiksi, tämä on tehty rivillä:</p>
+<pre class="terminal">alert --idea "FantasticApp(tm) asennettu onnistuneesti!
+Haluaisitko linkittää sen?" "Työpöydälle" "Työpöytäpalkkiin" "Ei kiitos"</pre>
 <p><img src="../images/apps-images/cli-alert.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">filepanel</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">filepanel</span> displays a load or save file panel and lets the user choose a file or location. As a return value you'll get the chosen file or folder's path. There are several parameters available, for example to set a starting directory, a window title, a default name when saving or restrictions to the allowed types of files. This is an example of</p>
-<pre class="terminal">filepanel -s -t "Save your logfile" -d ~/config/settings -n Fantastic.log</pre>
+		<td valign="top"><p><span class="cli">filepanel</span> näyttää lataus- ja tallennustiedostopaneelin ja sallii käyttäjän valita tiedoston tai sijainnin. Paluuarvona saat valitun tiedoston tai kansion polun. Käytettävissä on useita parametreja, esimerkiksi aloituskansion asettaminen, ikkunan otsikko, oletusnimi tallennettaessa tai rajoitukset sallituissa tiedostotyypeissä. Tämä on esimerkki</p>
+<pre class="terminal">filepanel -s -t "Tallenna tiedostosi logfile" -d ~/config/settings -n Fantastic.log</pre>
 <p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">waitfor</span> is a nice way to wait for a particular application or thread to be started or to have ended.</p>
+		<td valign="top"><p><span class="cli">waitfor</span> on kiva tapa odottaa tietyn sovelluksen tai säikeen käynnistymistä tai loppumista.</p>
 </td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">query</span> is the commandline version of the Find panel. In fact, a quick way to generate the search term is to build a query in the Find panel, switch to <span class="menu">by formula</span>, add double quotes (<tt>"</tt>) in front and back and paste the whole string after your <span class="cli">query</span> command in Terminal or your script.</p>
+		<td valign="top"><p><span class="cli">query</span> on komentoriviversio Etsi-paneelista. Itse asiassa, nopea tapa tuottaa hakutermi on rakentaa kysely Työpöytäpalkin Etsi-paneelissa, vaihtaa valikkoon <span class="menu">kaavoittain</span>, lisätä kaksoislainausmerkit (<tt>"</tt>) eteen ja taakse ja liittää koko merkkijono <span class="cli">query</span>-komentosi perään Pääteikkunassa tai skriptissäsi.</p>
 </td></tr></table>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-other" name="cli-other">Other commands</a></h3>
+<a id="cli-other" name="cli-other">Muut komennot</a></h3>
 
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
-		<td><p><span class="cli">checkfs</span> is an important tool to check for errors in your file system. Simply add the volume or device name and it'll run through every file and correct inconsistencies where possible.</p>
+		<td><p><span class="cli">checkfs</span> on tärkeä työkalu tarkistamaan tiedostojärjestelmäsi virheet. Lisää yksinkertaisesti taltio tai laitenimi ja ohjelma käy lävitse jokaisen tiedoston ja korjaa epäyhtenäisyydet missä mahdollista.</p>
 </td></tr>
 <tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">open</span> is a very handy little tool. With it you open any file with its preferred application, or start a specific application by its signature without the need to know its exact path. It also works with URLs and even with the "virtual" directories <tt>.</tt> for the current directory and <tt>..</tt> for the parent, opening the folder in Tracker.</p>
+		<td valign="top"><p><span class="cli">open</span> on hyvin kätevä pieni työkalu. Sillä voi avata minkä tahansa tiedoston sen parhaimmaksi katsotulla sovelluksella, tai käynnistää tietyn sovelluksen sen tunnisteen avulla tietämättä sen tarkkaa polkua. Se toimii myös verkko-osoitteiden ja vieläpä "virtuaali"-kansioiden kanssa <tt>.</tt> nykyiselle kansiolle ja  <tt>..</tt> äitikansiolle, avaten kansion Seuraajassa.</p>
 </td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">desklink</span> can install an icon for any file, folder, query or application in the Deskbar tray. It also offers the option to provide a context menu when right-clicking an icon to execute special actions. As an example, try this to add the commandline app <span class="app">screenshot</span> with various options (the "<tt>\</tt>" in the first line is just for the line break in Terminal):</p>
+		<td valign="top"><p><span class="cli">desklink</span> voi asentaa kuvakkeen mille tahansa tiedostolle, kansiolle, kyselylle tai sovellukselle Työpöytäpalkin tarjottimelle. Se tarjoaa myös mahdollisuuden tiettyjen toimintojen suorittamiseen kontekstivalikosta napsauttamalla hiiren oikealla painikkeella kuvaketta. Esimerkkinä, yritä tätä lisäämällä komentorivisovellus <span class="app">screenshot</span> eri valitsimilla ("<tt>\</tt>" ensimmäisellä rivillä on vain rivinvaihto Pääteikkunassa):</p>
 <pre class="terminal"> desklink "cmd=Active window (2s):/bin/screenshot --window --border --delay 2" \
 "cmd=Remove replicant:desklink --remove=screenshot" /bin/screenshot
 </pre>

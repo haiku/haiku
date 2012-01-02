@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>BootManager</title>
+	<title>ブートマネージャー</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -49,45 +51,46 @@
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
-<h2><img src="../../images/apps-images/bootmanager-icon_64.png" alt="bootmanager-icon_64.png" width="64" height="64" />BootManager</h2>
+<h2><img src="../../images/apps-images/bootmanager-icon_64.png" alt="bootmanager-icon_64.png" width="64" height="64" />ブートマネージャー (BootManager)
+</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><i>No entry, normally started from Installer's <span class="menu">Tools</span> menu</i></td></tr>
+<tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><i>メニューにはありません。通常、インストーラーの<span class="menu">ツール</span>メニューから呼び出されます。</i></td></tr>
 <tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/BootManager</span></td></tr>
-<tr><td>設定ファイル：</td><td></td><td><i>none</i><br />MBR backups are saved by default in <span class="path">~/config/settings/bootman/</span></td></tr>
+<tr><td>設定ファイル：</td><td></td><td><i>無し。</i><br />MBR のバックアップはデフォルトで <span class="path">~/config/settings/bootman/</span> に保存されます。</td></tr>
 </table>
 <p><br /></p>
-<p>If you don't add the Haiku partition to an existing boot manager like GRUB, BootManager can install a small boot menu in the Master Boot Record (MBR) that looks something like this:</p>
+<p>Haiku のパーティションを GRUB のような既存のブートマネージャーに追加しない場合、ブートマネージャーはマスターブートレコード (MBR) に以下の図のような小さなブートメニューをインストールできます。</p>
 <img src="../images/apps-images/bootmenu.png" alt="bootmenu.png" />
-<div class="box-info">Boot Manager isn't yet tested very well and still has a few restrictions that it will complain about if they aren't met: the menu can only be installed on your first harddisk and there has to be a 2KiB space after the Master Boot Record (MBR).</div>
-<p>BootManager guides you through the installation process of the boot menu.</p>
+<div class="box-info">ブートマネージャーは充分にテストされていません、さらに、いくつかの制限を満たしていない場合、動かなくなります。メニューは最初のハードディスクのみにインストールでき、マスターブートレコード (MBR) のうしろに 2KiB のスペースを必要とします。</div>
+<p>ブートマネージャーは、ブートメニューのインストール作業全体を案内してくれます。</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="1-drives" id="1-drives">Choosing the destination drive</a></h2>
+<a name="1-drives" id="1-drives">インストール先ドライブの選択</a></h2>
 <img src="../images/apps-images/bootmanager-1.png" alt="bootmanager-1.png" />
-<p>The BootManager starts off with a list of all available drives from which you choose the destination. If there's already a boot menu on that drive, the <span class="button">Uninstall</span> button becomes active, leading you through the simple procedure to restore a formerly backed-up MBR, thereby removing the boot menu again.<br />
-Otherwise, choose <span class="button">Install</span> to continue.</p>
+<p>ブートマネージャーは、起動時にインストール先ドライブの選択リストを表示します。すでにドライブにブートメニューがある場合、<span class="button">削除 (Uninstall)</span> ボタンが有効になり、以前にバックアップした MBR をリストアすることで、再びブートメニューを削除する簡単な一連の手順に誘導します。<br />
+そうでなければ、<span class="button">インストール (Install)</span> を選択して続けてください。</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="2-backup" id="2-backup">Backing up the Master Boot Record (MBR)</a></h2>
-<p>In case anything goes wrong or you want to remove the boot menu again, the Master Boot Record (MBR) is now saved. This is obviously a very important step, make sure you don't accidentally overwrite some other MBR-backup maybe from some earlier experimentation, for example!</p>
+<a name="2-backup" id="2-backup">マスターブートレコード (MBR) のバックアップ
+</a></h2>
+<p>なにか調子が悪くなった場合や、再びブートメニューを削除したい場合に備えて、直ちにマスターブートレコード (MBR) が保存されます。これは明らかに重要なステップなので、例えば以前の実験分のような、ほかの MBR バックアップをうっかり上書きしないよう確認してください。</p>
 <img src="../images/apps-images/bootmanager-2.png" alt="bootmanager-2.png" /> 
 <img src="../images/apps-images/bootmanager-3.png" alt="bootmanager-3.png" />
-<p>Just select a destination for the backup file "<tt>MBR</tt>" or leave the default path. After clicking <span class="button">Next</span> you'll get a confirmation if the backup was successful.</p>
+<p>単に、バックアップファイル "<tt>MBR</tt>" の保存先を選択するか、デフォルトのパスのままにするかです。<span class="button">次へ (Next)</span> を押した後に、バックアップが成功したかどうかの確認が表示されます。</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="3-menu" id="3-menu">Configuring the boot menu</a></h2>
+<a name="3-menu" id="3-menu">ブートメニューの設定</a></h2>
 <img src="../images/apps-images/bootmanager-4.png" alt="bootmanager-4.png" /> 
 <img src="../images/apps-images/bootmanager-5.png" alt="bootmanager-5.png" />
-<p>Next you're presented with a list of all partitions on the destination drive. By setting checkmarks you decide what entries will appear in the boot menu, the text boxes allow you to rename an entry.</p>
-<p>After that, you pick from the pop-up menu which partition will be booted from by default and set a timeout with the slider below. Here, "<i>Immediately</i>" will skip the boot menu entirely, "<i>Never</i>" will just stop at the boot menu. You can override the timeout setting by holding <span class="key">ALT</span> while booting.</p>
+<p>次に、インストール先ドライブ上のすべてのパーティションのリストを提示されます。チェックマークを入れることで、どの項目をブートメニューに表示するか決定します。テキストボックスで項目名を変更できます。</p>
+<p>次いで、ポップアップメニューから、デフォルトでどのパーティションから起動するかを選択し、その下のスライダーでがデフォルトで起動までの時間を設定します。ここで、 "<i>すぐに (Immediately)</i>" はブートメニューを完全にスキップし、 "<i>永久 (Never)</i>" はブートメニューでストップします。タイムアウト設定は、起動時に <span class="key">ALT</span> を押すことで無効にできます。</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="4-mbr" id="4-mbr">Writing the boot menu</a></h2>
+<a name="4-mbr" id="4-mbr">ブートメニューの書き込み</a></h2>
 <img src="../images/apps-images/bootmanager-6.png" alt="bootmanager-6.png" /> 
 <img src="../images/apps-images/bootmanager-7.png" alt="bootmanager-7.png" />
-<p>Before the boot menu is written to the MBR, you'll get a summary of your configuration and then one last chance to abort the operation. Don't worry though, as long as you keep the MBR backup safe, you can easily revert the changes. Should things get thoroughly messed up, you can always boot from a Haiku install CD or USB stick and write back the MBR backup with BootManager.</p>
+<p>ブートメニューが MBR に書き込まれる前に、設定の概要が表示され、次に作業を中止する最後のチャンスがあります。しかし、慌てないでください。MBR のバックアップを安全に保存していれば、変更は容易に戻せます。めちゃくちゃになってしまったとしても、いつでも Haiku インストールl CD や USB ステックから立ち上げて、 MBR バックアップをブートマネージャーを使って書き戻せます。</p>
 
 </div>
 </div>

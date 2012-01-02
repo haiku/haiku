@@ -11,12 +11,13 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		mt
+ *		thebowseat
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Mail</title>
+	<title>メール</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -45,7 +46,7 @@
 <span>
  «  <a href="magnify.html">Magnify</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
-::  <a href="mediaplayer.html">MediaPlayer</a>  »
+::  <a href="mediaplayer.html">メディアプレーヤー</a>  »
 </span></div>
 </div>
 
@@ -55,133 +56,139 @@
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>インデックス</td></tr>
-<tr class="index"><td><a href="#reading">Reading messages</a><br />
-	<a href="#creating">Creating new messages</a><br />
-	<a href="#preferences">Preferences</a></td></tr>
+<tr class="index"><td><a href="#reading">メッセージを読む</a><br />
+	<a href="#creating">新規メッセージの作成</a><br />
+	<a href="#preferences">メールの設定</a></td></tr>
 </table>
 
-<h2><img src="../../images/apps-images/mail-icon_64.png" alt="mail-icon_64.png" width="64" height="64" />Mail</h2>
+<h2><img src="../../images/apps-images/mail-icon_64.png" alt="mail-icon_64.png" width="64" height="64" />Mail (メール)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><span class="menu">アプリケーション (Applications)</span></td></tr>
-<tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/Mail</span></td></tr>
-<tr><td>設定ファイル：</td><td></td><td><span class="path">~/config/settings/Mail/</span><br />
-<span class="path">~/config/settings/Mail/Menu Links/</span> - Objects put here appear in the mailbox' context menu<br />
-<span class="path">~/config/settings/Mail/signatures/</span> - Location to store signatures<br />
-<span class="path">~/config/settings/Mail/status/</span> - Location to store custom statuses</td></tr>
+<tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/メール</span></td></tr>
+<tr><td>設定ファイル：</td><td></td><td><span class="path">~/config/settings/メール/</span><br />
+<span class="path">~/config/settings/メール/Menu Links/</span> - ここに置かれたものはメールボックスのコンテキストメニューに表示されます。<br />
+<span class="path">~/config/settings/メール/signatures/</span> - 署名の保存場所<br />
+<span class="path">~/config/settings/メール/status/</span> - カスタムステータスの保存場所</td></tr>
 </table>
 <p><br /></p>
-<p>Mail is Haiku's default viewer and editor of emails. It has nothing to do with the actual fetching and sending of mails, which is done by the mail_daemon and can be configured via the <a href="../preferences/e-mail.html">E-mail</a> preferences.</p>
-<p>This page is a general overview of the application Mail. For more information how email in Haiku works, refer to the <a href="../workshop-email.html">Workshop on managing email</a>.</p>
+<p>MailはHaikuのe-メールのデフォルトビューアまたは編集ソフトです。メールの送受信はメールサービスによって行われ、Mailとは全く関係ありません。送受信の設定は<a href="../preferences/e-mail.html">メール</a> 設定で変更できます。</p>
+<p>このページはMailアプリケーションの概要です。Haikuとメールの詳細は、 <a href="../workshop-email.html">メールの管理のワークショップ</a>を参照してください。</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="reading" name="reading">Reading messages</a></h2>
-<p>You double-click an email file to open it in Mail. The interface is quite simple:</p>
+<a id="reading" name="reading">メッセージを読む</a></h2>
+<p>Mailで電子メールを開くにはメッセージをダブルクリックしてください。インターフェースは非常に簡単です：</p>
 <img src="../images/apps-images/mail-read.png" alt="email-read.png" /> 
-<p>A menu and optional tool bar on top, with an area of the interesting attributes of a mail (to, from, subject, date) below that, and then the actual body of the mail. If the mail appears with strange characters or empty, try to change the <span class="menu">Decoding</span> from the pop-up menu.</p>
-<p>If there are files attached to an email, they are listed at the end of the message. A right-click on one opens a context menu to <span class="menu">Save attachment...</span> or <span class="menu">Open attachment</span>. You can also drag &amp; drop directly to the Desktop or another Tracker window.</p>
-<p>Most of the menu and tool bar items are pretty self-explaining, so we'll concentrate just on the highlights.</p>
+<p>上にはメニューと任意のツールバーがあり、メッセージの属性 (宛先、差出人、件名、日付)と内容がその下にあります。メッセージが変な文字で表示されたり何も表示されない場合は、ポップアップメニューから <span class="menu">文字コード</span> を変更してください。</p>
+<p>メッセージに添付ファイルがある場合は、メッセージの最後に表示されます。添付ファイルを右クリックすると、 <span class="menu">添付ファイルを保存...</span> や <span class="menu">添付ファイルを開く</span> メニューが表示されます。またドラッグ &amp; ドロップでデスクトップやTrackerウィンドウに直接保存することができます。</p>
+<p>メニューとツールバーはほとんど一目瞭然なので、ここでは主な動作に集中します。</p>
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>File</h3>
-<p>When you close the window of a new mail, its status is normally switched from "New" to "Read". But you can set other statuses as well, by choosing from the <span class="menu">Close and...</span> submenu. There you'll also find the option <span class="menu">Set to...</span> to create your own custom statuses, which are saved under <span class="path">~/config/settings/Mail/status/</span>.</p>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>ファイル</h3>
+<p>新着メッセージのウィンドウを閉じると、そのステータスは"新着"から"朗読"に変わります。ですが <span class="menu">閉じる...</span> サブメニューから他のステータスにすることも可能です。そこでは、
+<span class="menu">他の属性に変更...</span> でカスタムステータスを作成することができ、 <span class="path">~/config/settings/メール/status/</span>に保存されます。</p>
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Edit</h3>
-<p>Here you'll find an item to open Mail's <span class="menu">Preferences...</span> (<a href="#preferences">see below</a>) and a shortcut to managing your <span class="menu">Accounts...</span>, which will open the <a href="../preferences/e-mail.html">E-mail</a> preference panel.</p>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>編集</h3>
+<p>ここではMailの <span class="menu">メールの設定...</span> (<a href="#preferences">下を参照</a>) を開くことができ、 <a href="../preferences/e-mail.html">メール</a>設定パネルを開く <span class="menu">アカウントの設定...</span>のショートカットもあります。</p>
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>View</h3>
-<p>You'll only seldomly need these two items, if at all:</p>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>表示</h3>
+<p>たいていの場合次の二つはめったに必要ありません：</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Show header</span></td><td class="onelinetop"><span class="key">ALT</span> <span class="key">H</span></td><td style="width:10px;"></td><td>Shows the complete header of a mail, in case you need to track down the path of your mail, for example.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Show raw message</span></td><td></td><td></td><td>Displays a mail in its raw state, i.e. with all its control characters and without Mail's coloring of quotes or URLs, for example..</td></tr>
+<tr><td><span class="menu">ヘッダーを表示</span></td><td class="onelinetop"><span class="key">ALT</span> <span class="key">H</span></td><td style="width:10px;"></td><td>メッセージのヘッダーをすべて表示します。例えば、メッセージの経路が知りたいときに使えます。</td></tr>
+<tr><td class="onelinetop"><span class="menu">生のメッセージを表示</span></td><td></td><td></td><td>メッセージを生の状態で表示します。例えば、制御文字やMailの引用部分やURLの着色は表示されません。</td></tr>
 </table>
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Message</h3>
-<p>The different options to reply to a mail may need a bit of explanation.</p>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>メッセージ</h3>
+<p>メッセージの返信方法は説明が必要かもしれません。</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Reply</span></td><td><span class="key">ALT</span> <span class="key">R</span></td><td style="width:10px;"></td><td>The standard reply to the server that has sent the mail to you. NOTE: In case of a mailing list post, this normally replies back to the mailing list, <i>not</i> just the person that wrote the post!</td></tr>
-<tr><td class="onelinetop"><span class="menu">Reply to sender</span></td><td><span class="key">OPT</span> <span class="key">ALT</span> <span class="key">R</span></td><td></td><td>This on the other hand, sends directly and only to the person listed in the "From" attribute.</td></tr>
-<tr><td><span class="menu">Reply to all</span></td><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">R</span></td><td></td><td>Replies to the original sender plus all other (cc'ed) recipients of the original mail.</td></tr>
+<tr><td><span class="menu">返信</span></td><td><span class="key">ALT</span> <span class="key">R</span></td><td style="width:10px;"></td><td>あなたにメールを送ったサーバーへの標準の返信です。
+注：メーリングリストの場合、通常は差出人<i>だけではなく</i>、メーリングリストに返信します。</td></tr>
+<tr><td class="onelinetop"><span class="menu">差出人に返信</span></td><td><span class="key">OPT</span> <span class="key">ALT</span> <span class="key">R</span></td><td></td><td>一方でこの方法は”差出人：”に表示されている差出人のみに返信します。</td></tr>
+<tr><td><span class="menu">全員に返信</span></td><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">R</span></td><td></td><td>元の差出人とほかの受信者（CC）に返信します。</td></tr>
 </table>
-<div class="box-info">If you mark a passage in the email before replying to it, only the marked text will be quoted in your answering mail. A nice way to cut down on excessive quoting, which is frowned upon by pretty much everybody...</div>
-<p>The items to <span class="menu">Forward</span>, <span class="menu">Resend</span> and <span class="menu">Copy to new</span> are again pretty self-explaining.</p>
-<p>When you've opened an email from a Tracker or query result window, <span class="menu">Previous message</span> and <span class="menu">Next message</span> will move to the previous/next email in the list.</p>
-<p><span class="menu">Save address</span> collects all email addresses from the header and the actual email body in a submenu. Choosing an address will open the <a href="people.html">People</a> application in order to save the contact information.</p>
+<div class="box-info">メールに返信する前に一部分をマークした場合、返信メールに引用されるテキストはマークされた部分のみになります。皆から嫌われている過度の引用を上手く抑えることができます。</div>
+<p><span class="menu">転送</span>、<span class="menu">再送信</span>と<span class="menu">新規メッセージにコピー</span>するアイテムはまた一目瞭然です。</p>
+<p>メールをTrackerかクエリから開けた場合、<span class="menu">前のメッセージ</span> と <span class="menu">次のメッセージ</span> はリストの前/次のメールになります。</p>
+<p><span class="menu">アドレスを保存</span> はヘッダーのメールアドレスすべてを回収し、メールの内容をサブメニューに保存します。
+メールアドレスを選択すると連絡情報を保存するために <a href="people.html">People</a> アプリケーションを開きます。</p>
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Queries</h3>
-<p>This doesn't work yet, but is intended to hold queries that would show all mail related to the currently open mail, like all from the same sender or same subject/thread.</p>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>クエリ</h3>
+<p>この機能はまだ動作しませんが、現在開いているメッセージに関係するメッセージを表示するためのクエリ（同じ受信者や同じ件名）を表示するはずです。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="creating" name="creating">Creating new messages</a></h2>
-<p>A new email is created by invoking the <span class="menu">New mail message</span> menu or the corresponding icon from the tool bar of an open email. Or you just start the Mail application or choose <span class="menu">Create new message...</span> from the context menu of the mailbox icon in the Deskbar.</p>
+<a id="creating" name="creating">新規メッセージの作成</a></h2>
+<p><span class="menu">新規メッセージ</span> メニューまたはツールバーからアイコンを選択させることで新規メッセージを作成できます。
+また、Mailアプリケーションを起動するか、Deskbarのメールボックスアイコンのコンテキストメニューから<span class="menu">新規メッセージの作成...</span> を選択することで新規メッセージを作成できます。</p>
 <img src="../images/apps-images/mail-write.png" alt="email-write.png" /> 
-<p>The window is pretty similar to the one when reading mails. The menu and tool bar items are slightly different and the text boxes have to be filled with the recipient's email address, subject and so on, of course.</p>
-<p><span class="menu">Cc</span> is short for the anachronistic term "<i>carbon copy</i>" and results in copies of your mail being sent to the listed people. The difference to just listing a buch of addresses in the "To" field is, that you don't directly address the cc'ed people, thereby signaling that you probably don't expect an answer of them.<br />
-<span class="menu">Bcc</span> means "<i>blind carbon copy</i>" which does practically the same as "Cc", but hides the recipients from each other.</p>
-<p>You can enter several recipients by separating their addresses with a comma.
-<span class="menu">To</span>, <span class="menu">CC</span>, and <span class="menu">BCC</span> are pop-up menus. They contain all email addresses on your system found by a query for <a href="people.html">People</a> files. Their "Group" attribute will sort them in corresponding submenus.</p>
-<p>Again, we'll focus on the more interesting features in the menus.</p>
+<p>このウィンドウはメールを読むときのウィンドウに似ています。メニューとツールバーは少し違っていて、テキストボックスには受信者のメールアドレスや件名などを入力しなければいけません。</p>
+<p><span class="menu">Cc</span> は "<i>カーボンコピー</i>" の略で、送信したメールのコピーをリストのメールアドレスにも送ることができます。
+Ccと"宛先："にメールアドレスを入力する違いは、Ccのアドレスは直接送信しないので、CCのアドレスからは返信は期待していないと言っていることです。<br />
+<span class="menu">Bcc</span> は "<i>blind carbon copy</i>" のことで、”Cc”と同じことをしますが、受信者のメールアドレスを隠します。</p>
+<p>コンマでメールアドレスを分離することで複数の受信者を入力できます。<span class="menu">宛先</span>、 <span class="menu">CC</span> と <span class="menu">BCC</span> はポップアップメニューです。あなたのシステムのクエリで<a href="people.html">People</a> ファイルが探せるすべてのメールアドレスの情報を持っています。
+”グループ”属性はそれをサブメニューに類別するときに使われます。</p>
+<p>次はメニューの面白い機能に注目します。</p>
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>File</h3>
-<p>With <span class="menu">Save as draft</span> you can store your work so far and come back to it later. To load it again, choose it from the <span class="menu">Open draft</span> submenu that will list the result of a query for all mails with the status "Draft".</p>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>ファイル</h3>
+<p><span class="menu">下書きとして保存</span> でメールを保存して後で再開することができます。
+<span class="menu">下書きを開く</span>サブメニューに”下書き”のステータスのメールがすべて表示され、一覧からメールを選択すると再開できます。</p>
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Edit</h3>
-<p><span class="menu">Quote</span> and <span class="menu">Remove quote</span> or their respective shortcuts <span class="key">ALT</span> <span class="key">←</span> / <span class="key">→</span> are used to add/remove a level of quoting by adjusting the number of "&gt;" symbols in front of quoted lines. Just select some text in all the lines you want un/quoted and invoke the menu item.</p>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>編集</h3>
+<p><span class="menu">引用符をつける</span> と<span class="menu">引用を削除</span> またはそれぞれのショートカット <span class="key">ALT</span> <span class="key">←</span> / <span class="key">→</span> を使って &gt; シンボルの数を調整して引用のレベルを変更できます。引用したいテキストを選択して、引用メニューを開いてください。</p>
 
 <img src="../images/apps-images/mail-spellcheck.png" alt="email-spellcheck.png" /> 
 
-<p><span class="menu">Check spelling</span> currently only offers corrections of English texts by marking wrong or unknown words red and showing them in italic.
-Right-clicking such a word opens a context menu offering suggestions to correct the word or to <span class="menu">Add</span> it to the accepted vocabulary.</p>
-<p>Then, there are again the items to open Mail's <span class="menu">Preferences...</span> (<a href="#preferences">see below</a>) and a shortcut to managing your <span class="menu">Accounts...</span>, which will open the <a href="../preferences/e-mail.html">E-mail</a> preference panel.</p>
+<p><span class="menu">スペルチェック</span> は現在英語のテキストのみ間違った文字や不明な文字を赤い斜体で表示してくれます。赤い文字を右クリックすると、コンテキストメニューが開き、文字を修正するか辞書に<span class="menu">追加</span>することができます。</p>
+<p>さらに、Mailの<span class="menu">メールの設定...</span> (<a href="#preferences">下を参照</a>) を開くアイテムもあり、<span class="menu">アカウントの設定...</span>で<a href="../preferences/e-mail.html">メール</a> 設定パネルを開くショートカットもあります。</p>
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Message</h3>
-<p>With <span class="menu">Add signature</span> you can add predefined texts to the end of your mail. From its submenu you can choose a specific or <span class="menu">Random</span> one.</p>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>メッセージ</h3>
+<p><span class="menu">署名を追加</span> で事前に定義されたテキストをメールの最後に追加できます。
+サブメニューから署名を特定するか、<span class="menu">ランダム</span>な署名を使用できます。</p>
 
 <img src="../images/apps-images/mail-signature.png" alt="email-signature.png" /> 
 
-<p>You create new or edit existing signatures with <span class="menu">Edit signatures...</span>, which will open a window where you enter the text itself and the title of your new sig. Signatures should be saved in <span class="path">~/config/settings/Mail/sigantures</span>.</p>
-<p>Use <span class="menu">Add enclosure...</span> and <span class="menu">Remove enclosure</span> to add/remove files as attachments. You can also drag &amp; drop files from a Tracker window. Be careful though to drop those in the header section (To/From/Subject area at the top) or they'll get pasted into the email body if they are text files.</p>
+<p>You create new or edit existing signatures with <span class="menu">Edit signatures...</span>, which will open a window where you enter the text itself and the title of your new sig. There, in the <span class="menu">Signature</span> menu, you find items to <span class="menu">Open</span> a specific signature or <span class="menu">Save</span> or <span class="menu">Delete</span> the currently loaded one, Signatures should be saved in <span class="path">~/config/settings/Mail/signatures</span>.</p>
+<p><span class="menu">添付ファイルを追加...</span> と <span class="menu">添付ファイルを削除</span> を使って添付ファイルを追加/削除することができます。また、Trackerウィンドウからドラッグ &amp; ドロップでファイルを追加することもできます。ただし、ファイルをヘッダー部分(上にある宛先、差出人、件名)にドロップしてください。でないと、ファイルがテキストファイルだった場合、メールの本文に貼り付けされてしまいます。</p>
 
 <img src="../images/apps-images/mail-attachments.png" alt="email-attachments.png" /> 
 
-<p>File attachments are listed below the header section. You can remove a file by invoking a context menu or by selecting it and pressing <span class="key">DEL</span>.</p>
+<p>添付ファイルはヘッダーセクションの下にリストされています。コンテキストメニューを開くかファイルを選択して <span class="key">DEL</span> を押すことで削除できます。</p>
 
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Queries</h3>
-<p>This doesn't work yet, but is intended to hold queries that would show all mail related to the currently open mail, like all to the same recipient or same subject/thread.</p>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>クエリ</h3>
+<p>この機能はまだ動作しませんが、現在開いているメッセージに関係するメッセージを表示するためのクエリ（同じ受信者や同じ件名）を表示するはずです。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="preferences" name="preferences">Preferences</a></h2>
+<a id="preferences" name="preferences">メールの設定</a></h2>
 <img src="../images/apps-images/mail-preferences.png" alt="email-preferences.png" /> 
-<p>Mail's preferences come in two parts:</p>
+<p>Mailの設定は二部分に分かれています：</p>
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>User interface</h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>インターフェースの設定</h3>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Button bar</span></td><td style="width:10px;"></td><td>Options to show labels under the icons or hide the tool bar completely.</td></tr>
-<tr><td><span class="menu">Font</span></td><td></td><td>Sets the type of font used for the email text.</td></tr>
-<tr><td><span class="menu">Size</span></td><td></td><td>Sets the font size.</td></tr>
-<tr><td><span class="menu">Colored quotes</span></td><td></td><td>Colors different levels of quotation.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Initial spell check mode</span></td><td></td><td>Turns the spell checker on/off on startup.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Automatically mark mail as read</span></td><td></td><td>If you close an email with the Status "New", you can have it automatically marked as "Read".</td></tr>
+<tr><td><span class="menu">ボタンバー</span></td><td style="width:10px;"></td><td>アイコンにラベルを表示、またはツールバーを隠すオプション</td></tr>
+<tr><td><span class="menu">フォント</span></td><td></td><td>メッセージのテキストに使用するフォントを設定</td></tr>
+<tr><td><span class="menu">フォントサイズ</span></td><td></td><td>フォントサイズの設定</td></tr>
+<tr><td><span class="menu">引用部分の着色</span></td><td></td><td>引用部分をレベル別に着色</td></tr>
+<tr><td class="onelinetop"><span class="menu">スペルチェックモード</span></td><td></td><td>起動時にスペルチェックをオン/オフにする</td></tr>
+<tr><td class="onelinetop"><span class="menu">メールを自動的に既読に設定</span></td><td></td><td>”新着”ステータスのメールを閉じた後、ステータスを自動的に”既読”に変更する</td></tr>
 </table>
 
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Mailing</h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>メールの設定</h3>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Default account</span></td><td style="width:10px;"></td><td>If you have several email accounts, this specifies which to use by default when creating a new message.</td></tr>
-<tr><td><span class="menu">Reply account</span></td><td></td><td>When you reply to a mail, you can either always <span class="menu">Use default account</span> set in the pop-up menu above, or use the <span class="menu">Account from mail</span>, which will send the mail from the same account that received the original message.</td></tr>
-<tr><td><span class="menu">Reply preamble</span></td><td></td><td>This is inserted before the quoted text in your reply. You can use various variables from the pop-up menu next to the text field. Example: "<i>Hello %n!\n\nOn %d you wrote:\n</i>" produces this:
-<pre>Hello Dr. Hawking!
+<tr><td><span class="menu">標準アカウント</span></td><td style="width:10px;"></td><td>複数のメールアカウントがある場合、新規メッセージを作成するとき使用するアカウントを指定します。</td></tr>
+<tr><td><span class="menu">返信アカウント</span></td><td></td><td>メールに返信するとき、上のポップアップメニューの<span class="menu">標準アカウントを使う</span>または<span class="menu">メッセージを受信したアカウント</span>でどのアカウントからメールを返信するかを指定できます。</td></tr>
+<tr><td><span class="menu">返信の前書き</span></td><td></td><td>これは引用されたテキストの前に挿入されます。
+テキストフィールドの横のポップアップメニューから様々な変数を使用することができます。<br />例: "<i>こんにちは %n!\n\n %d にあなたは書きました：\n</i>" はこうなります：
+<pre>こんにちは Dr. Hawking!
 
-On Mon, 18 Jan 1998 02:55:16 +0800 you wrote:
+Mon, 18 Jan 1998 02:55:16 +0800 あなたは書きました：
 &gt; so thanks again for the inspiration concerning the cosmological constant.
 &gt; ...and the rest of the quoted text following...</pre></td></tr>
-<tr><td><span class="menu">Auto signature</span></td><td></td><td>Adds a signature automatically to the end of the mail.</td></tr>
-<tr><td><span class="menu">Encoding</span></td><td></td><td>Sets the default encoding.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Warn unencodable</span></td><td></td><td>If your mail contains characters that can't be encoded with the currently set encoding method, you can turn on being warned about that. That gives you the opportunity to change the encoding before sending. Otherwise unencodable characters are replaced by rectangle symbols.</td></tr>
-<tr><td><span class="menu">Text wrapping</span></td><td></td><td>Inserts line-breaks every 76 characters which makes mails easier to read.</td></tr>
-<tr><td><span class="menu">Attach attributes</span></td><td></td><td>You can choose to send BFS' attributes of a file alongside the attachments. This is nice for other Haiku users, as they'll get a "complete" file (think artist, album, title attributes of MP3 files), but may cause confusion (or even suspicion) with others, who will wonder what the additional "BeOS Attributes" attachment might be...<br />
-Should you opt not to send attributes with your attachments, remember zip up your files before you send them or you'll strip away BFS attributes.</td></tr>
+<tr><td><span class="menu">署名の自動的追加</span></td><td></td><td>メールの終わりに自動的に署名を追加します。</td></tr>
+<tr><td><span class="menu">文字コード</span></td><td></td><td>標準文字コードを設定します。</td></tr>
+<tr><td class="onelinetop"><span class="menu">文字コード不一致通知</span></td><td></td><td>もし作成したメールの中にエンコードできない文字が含まれていた時に警告を受けるかどうか設定できます。警告によって文字コードを変更することができます。文字コードを変更しないと、エンコードできない文字は四角形のシンボルに置き換えられます。</td></tr>
+<tr><td><span class="menu">文字列の折り返し</span></td><td></td><td>76文字ごとに改行し、メールを見やすくします。</td></tr>
+<tr><td><span class="menu">属性の添付</span></td><td></td><td>添付ファイルと一緒にBFS属性を送るかどうか選択できます。これは他のHaikuユーザーにとっては便利で、”完全な”ファイル（アーティスト、アルバム、MP3ファイルのタイトル属性）を送信できますが、Haikuを使用していないユーザーには混乱（または疑い）を起こす可能性があり、追加された”BeOS属性”が何なのか知りたがるかもしれません。<br />添付ファイルにBFS属性をつけないで送信することを選択した場合、送信前にファイルをzip圧縮することを思い出してください、さもなければ属性は取りさられてしまうでしょう。</td></tr>
 </table>
 
 </div>
@@ -192,7 +199,7 @@ Should you opt not to send attributes with your attachments, remember zip up you
 <div class="inner"><span>
  «  <a href="magnify.html">Magnify</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
-::  <a href="mediaplayer.html">MediaPlayer</a>  »
+::  <a href="mediaplayer.html">メディアプレーヤー</a>  »
 </span></div>
 </div>
 

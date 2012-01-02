@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>E-mail</title>
+	<title>Sähköposti</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -52,7 +54,7 @@
 <div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Index</td></tr>
+<tr class="heading"><td>Hakemisto</td></tr>
 <tr class="index"><td>
 	<a href="#creating">Creating a new e-mail account</a><br />
 	<a href="#account-settings">Account settings</a><br />
@@ -63,18 +65,18 @@
 </td></tr>
 </table>
 
-<h2><img src="../../images/prefs-images/e-mail-icon_64.png" alt="e-mail-icon_64.png" width="64" height="64" />E-mail</h2>
+<h2><img src="../../images/prefs-images/e-mail-icon_64.png" alt="e-mail-icon_64.png" width="64" height="64" />Sähköposti</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
-<tr><td>Location:</td><td></td><td><span class="path">/boot/system/preferences/E-mail</span></td></tr>
-<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/Mail/*</span></td></tr>
+<tr><td>Työpöytäpalkki</td><td style="width:15px;"></td><td><span class="menu">Asetukset</span></td></tr>
+<tr><td>Sijainti</td><td></td><td><span class="path">/boot/system/preferences/E-mail</span></td></tr>
+<tr><td>Asetukset</td><td></td><td><span class="path">~/config/settings/Mail/*</span></td></tr>
 </table>
 <p>Haiku provides a system that retrieves e-mail regularly via a Mail Service (also known as mail_daemon) and saves each mail as a single text file. It parses the mail and fills its attributes with all necessary header information, like from, to, subject and its unread status. Now it can be queried by you or any application. This system also makes switching e-mail clients easy as all the data and your configuration stays the same.<br />
 The configuration is done in the E-Mail preference panel.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="creating" name="creating">Creating a new e-mail account</a></h2>
+<a id="creating" name="creating">Uuden sähköpostitilin luominen</a></h2>
 <p>Let's go through the process of setting up an e-mail account.<br />
 You start by clicking the <span class="button">Add</span> button to create a new, unnamed account. This opens a panel where you fill in your account info:</p>
 <img src="../images/prefs-images/e-mail-new-account.png" alt="e-mail-new-account.png" />
@@ -87,7 +89,7 @@ See below for more info about the various settings and additional options.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="account-settings" name="account-settings">Account settings</a></h2>
+<a id="account-settings" name="account-settings">Tiliasetukset</a></h2>
 <p>By selecting the name of an account in the left list, you can change some general settings:</p>
 <img src="../images/prefs-images/e-mail-settings.png" alt="e-mail-settings.png" />
 <p>The <i>Account name</i> is the name that's shown for example in the list of accounts in the E-mail preferences. <i>Real name</i> is the name someone sees when she gets mail from you. <i>Return address</i> is the email address that is used when someone replies to your mail. Normally that is the same address you've sent your email from.</p>
@@ -95,7 +97,7 @@ See below for more info about the various settings and additional options.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="incoming" name="incoming">More on setting up incoming e-mail</a></h2>
+<a id="incoming" name="incoming">Lisää saapuvan sähköpostin asetuksista</a></h2>
 <p>Click on <span class="menu">Incoming</span> under your account's name to set up how e-mails are received.</p>
 <img src="../images/prefs-images/e-mail-in.png" alt="e-mail-in.png" />
 <p>First is the <span class="menu">Mail server</span> address for incoming mails. If your provider needs you to log into a specific port, you add that to the address, separated by a colon. For example, <tt>pop.your-provider.org:1400</tt>.</p>
@@ -108,7 +110,7 @@ See below for more info about the various settings and additional options.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="outgoing" name="outgoing">More on setting up outgoing e-mail</a></h2>
+<a id="outgoing" name="outgoing">Lisää lähtevän sähköpostin asetuksista</a></h2>
 <p>Click on <span class="menu">Outgoing</span> under your account's name to set up how e-mails are sent.</p>
 <img src="../images/prefs-images/e-mail-out.png" alt="e-mail-out.png" />
 <p>First is the <i>SMTP server</i> address for outgoing mails. As with the incoming server before, you can use a specific port if needed, e.g. <tt>mail.your-provider.org:1200</tt>.</p>
@@ -117,13 +119,13 @@ See below for more info about the various settings and additional options.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="filters" name="filters">Notifications and other e-mail filters</a></h2>
+<a id="filters" name="filters">Ilmoitukset ja muut sähköpostisuodattimet</a></h2>
 <p>Notifications for newly arrived email and methods to sort and filter emails are found in <span class="menu">E-Mail filters</span> under an account's name. You can add any number of filters that are applied one after the other and rearrange them by drag&amp;dropping them to their new position.<br />
 Currently there are three <span class="menu">Incoming mail filters</span> you can add. After adding a filter, you have to select it to see its options.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Spam filter (AGMS Bayesian)</h3>
+Roskapostisuodatin (AGMS Bayesian)</h3>
 <img src="../images/prefs-images/e-mail-filter-spam.png" alt="e-mail-filter-spam.png" />
 <p>The spam filter uses statistical methods to classify a mail as unwanted spam. It assigns a value between 0 and 1 to it and you can decide what are the limits for a genuine mail and what will be considered spam.<br />
 You can have that spam rating added to the start of the subject.<br />
@@ -131,8 +133,7 @@ Also, the spam filter can learn from all incoming e-mail. Of course, you'll have
 <p>Together with the following <span class="menu">Rule filter</span>, you're able to automatically sort out detected spam mails.</p>
 
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Rule filter</h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Sääntösuodatin</h3>
 <img src="../images/prefs-images/e-mail-filter-header.png" alt="e-mail-filter-header.png" />
 <p>This filter compares the mail header to a search pattern and performs some action according to the rules you set up.<br />
  With the first text field you specify which header to check against. These are available:</p>
@@ -169,7 +170,7 @@ Rule filter</h3>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-New mails notification</h3>
+Ilmoitus uudesta sähköpostiviestistä</h3>
 <img src="../images/prefs-images/e-mail-filter-notification.png" alt="e-mail-filter-notification.png" />
 <p>There are several ways you can choose to be notified of newly arrived email. Under <span class="menu">Method</span> you find a number of options that can be combined as well:</p>
 <table summary="notofications" border="0" cellpadding="2" cellspacing="0"> 
@@ -191,13 +192,13 @@ New mails notification</h3>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Outgoing Mail Filters</h3>
+Lähtevän sähköpostin suodattimet</h3>
 <p>At this moment, there's only one filter that deals with outgoing mail: <span class="cli">fortune</span>.
 <br />It will attach a randomly chosen funny or wise "fortune cookie" to the end of every mail before it's sent out. You can do a dry run by issuing the command <span class="cli">fortune</span> in a Terminal.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="settings" name="settings">Setting up the Mail Service</a></h2>
+<a id="settings" name="settings">Postipalvelun asettaminen</a></h2>
 <p>Now that your incoming and outgoing mail servers (and maybe some filters, too), are configured, you have to tell the Mail Service that does all the actual checking and fetching how to do its job.</p>
 <img src="../images/prefs-images/e-mail-settings.png" alt="e-mail-settings.png" />
 <p>Under <i>Mail checking</i> you configure the interval at which the account's mail server is probed for new mail.<br />

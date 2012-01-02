@@ -10,12 +10,15 @@
  * Authors:
  *		Daniel Marth
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		helix84
+ *		Bachoru
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>List of commands</title>
+	<title>Zoznam príkazov</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -52,303 +55,302 @@
 <div>
 <div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />List of all commandline applications</h2>
+<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Zoznam všetkých aplikácií príkazového riadka</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Location:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
+<tr><td>Umiestnenie:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
 </table>
 <p><br /></p>
-<p>All commandline applications shipped with Haiku are in either <span class="path">/boot/system/bin</span> or <span class="path">/boot/common/bin</span>. Your own or additionally installed commandline apps should go in <span class="path">~/config/bin</span>. All these locations are part of the PATH variable and are therefore automatically found.<br />
-Here's a list of all commandline applications that are shipped with Haiku. Each with only a short description of what it does, for more detailed information on its usage execute the command with the parameter <tt>--help</tt>.</p>
+<p>Všetky aplikácie príkazového riadka v Haiku sa nachádzajú buď v <span class="path">/boot/system/bin</span>, alebo <span class="path">/boot/common/bin</span>. Vaše vlastné alebo dodatočne nainštalované aplikácie príkazového riadka by mali ísť do <span class="path">~/config/bin</span>. Všetky tieto lokality sú súčasťou premennej PATH, teda budú automaticky nájdené.<br /> Tu je zoznam aplikácií príkazového riadka, ktoré sa nachádzajú v Haiku. Každej je pridelený iba krátky popis toho, čo robí. Ďalšie informácií o ich použití získate spustením daného príkazu spolu s parametrom <tt>--help</tt>.</p>
 <p><br /></p>
-<p>Index:   <a href="#A">A – E</a>   ::   <a href="#F"> F – J </a>   ::   <a href="#K"> K – O </a>   ::   <a href="#P"> P – S </a>   ::   <a href="#T"> T – Z </a></p>
+<p>Obsah:   <a href="#A">A – E</a>   ::   <a href="#F"> F – J </a>   ::   <a href="#K"> K – O </a>   ::   <a href="#P"> P – S </a>   ::   <a href="#T"> T – Z </a></p>
 <p><br /></p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-<tr><td><tt>CortexAddOnHost</tt></td><td style="width:10px;"> </td><td>Starts service to monitor audio and video media add-ons in use. </td></tr>
-<tr><td><tt>ReadOnlyBootPrompt</tt></td><td> </td><td>Language setup. </td></tr>
-<tr><td><tt>[</tt></td><td> </td><td>Returns true/false after comparing items.</td></tr>
+<tr><td><tt>CortexAddOnHost</tt></td><td style="width:10px;"> </td><td>Spustí službu na monitorovanie multimediálnych audio a video  doplnkov.</td></tr>
+<tr><td><tt>ReadOnlyBootPrompt</tt></td><td> </td><td>Nastavenie jazyka.</td></tr>
+<tr><td><tt>[</tt></td><td> </td><td>Porovná dve položky a vráti hodnotu pravda (ak sa zhodujú) alebo nepravda (ak sa nezhodujú).</td></tr>
 <tr><td colspan="3"><a id="A" name="A"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>A</h2></a></td></tr>
-<tr><td><tt>addattr</tt></td><td> </td><td>Writes an attribute to a file, taking the type into account and converting the values accordingly. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>alert</tt></td><td> </td><td>Shows a message box. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>arp</tt></td><td> </td><td>Manipulates the system ARP cache. </td></tr>
-<tr><td><tt>awk</tt></td><td> </td><td>See <tt>gawk</tt>.</td></tr>
-<tr><td><tt>base64</tt></td><td> </td><td>Base64 encode or decode to standard output. </td></tr>
-<tr><td><tt>basename</tt></td><td> </td><td>Strips directory and optionally suffix from a /path/to/filename string.</td></tr>
+<tr><td><tt>addattr</tt></td><td> </td><td>Pripíše súboru atribút s ohľadom na jeho typ a podľa toho prevedie hodnoty. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
+<tr><td><tt>alert</tt></td><td> </td><td>Zobrazí okno so správou. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
+<tr><td><tt>arp</tt></td><td> </td><td>Manipuluje so systémovou vyrovnávacou pamäťou ARP.</td></tr>
+<tr><td><tt>awk</tt></td><td> </td><td>Pozrite <tt>gawk</tt>.</td></tr>
+<tr><td><tt>base64</tt></td><td> </td><td>Zakódovanie alebo dekódovanie algoritmom Base64 na štandardný výstup.</td></tr>
+<tr><td><tt>basename</tt></td><td> </td><td>Odstráni adresár a voliteľne aj príponu z reťazca /cesta/k/súboru.</td></tr>
 <tr><td><tt>bash</tt></td><td> </td><td>Bourne-again shell</td></tr>
-<tr><td><tt>bc</tt></td><td> </td><td>An arbitrary precision calculator language.</td></tr>
-<tr><td><tt>beep</tt></td><td> </td><td>Rings a bell. </td></tr>
-<tr><td><tt>bootman</tt></td><td> </td><td>Installs or uninstalls a boot-menu. </td></tr>
-<tr><td><tt>bunzip2</tt></td><td> </td><td>See <tt>bzip2</tt>.</td></tr>
-<tr><td><tt>bzip2</tt></td><td> </td><td>File compressor</td></tr>
-<tr><td><tt>c++</tt></td><td> </td><td>C++-Compiler</td></tr>
-<tr><td><tt>cal</tt></td><td> </td><td>Displays a calendar. </td></tr>
-<tr><td><tt>cat</tt></td><td> </td><td>Concatenates files and prints to standard output. </td></tr>
-<tr><td><tt>catattr</tt></td><td> </td><td>Prints out the contents of an attribute of a file. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>cc</tt></td><td> </td><td>C-Compiler</td></tr>
-<tr><td><tt>checkfs</tt></td><td> </td><td>Checks and repairs the file system. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
+<tr><td><tt>bc</tt></td><td> </td><td>Jazyk na výpočty s ľubovoľnou presnosťou.</td></tr>
+<tr><td><tt>beep</tt></td><td> </td><td>Zazvoní zvonček.</td></tr>
+<tr><td><tt>bootman</tt></td><td> </td><td>Nainštaluje alebo odinštaluje menu zavádzača.</td></tr>
+<tr><td><tt>bunzip2</tt></td><td> </td><td>Pozrite <tt>bzip2</tt>.</td></tr>
+<tr><td><tt>bzip2</tt></td><td> </td><td>Kompresia súborov</td></tr>
+<tr><td><tt>c++</tt></td><td> </td><td>Kompilátor jazyka C++</td></tr>
+<tr><td><tt>cal</tt></td><td> </td><td>Zobrazí kalendár.</td></tr>
+<tr><td><tt>cat</tt></td><td> </td><td>Zreťazí súbory a vypisuje na štandardný výstup.</td></tr>
+<tr><td><tt>catattr</tt></td><td> </td><td>Vypíše obsah atribútu súboru. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
+<tr><td><tt>cc</tt></td><td> </td><td>Kompilátor jazyka C</td></tr>
+<tr><td><tt>checkfs</tt></td><td> </td><td>Skontroluje a opraví súborový systém. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
 <tr><td><tt>checkitout</tt></td><td> </td><td>Checks out sources simply with their repository's URL.</td></tr>
-<tr><td><tt>chgrp</tt></td><td> </td><td>Changes group ownership of files. </td></tr>
-<tr><td><tt>chmod</tt></td><td> </td><td>Changes permissions of files.</td></tr>
-<tr><td><tt>chop</tt></td><td> </td><td>Splits a file into smaller files. </td></tr>
-<tr><td><tt>chown</tt></td><td> </td><td>Changes the owner of files. </td></tr>
-<tr><td><tt>chroot</tt></td><td> </td><td>Runs a command within a specified root directory. </td></tr>
-<tr><td><tt>cksum</tt></td><td> </td><td>Prints out CRC checksum and byte count of files. </td></tr>
-<tr><td><tt>clear</tt></td><td> </td><td>Clears the terminal window. </td></tr>
-<tr><td><tt>clockconfig</tt></td><td> </td><td>Prints out the clock configuration.</td></tr>
-<tr><td><tt>cmp</tt></td><td> </td><td>Compares files byte by byte.</td></tr>
-<tr><td><tt>collectcatkeys </tt></td><td> </td><td>[Leftover from the move of locale-kit.]</td></tr>
-<tr><td><tt>comm</tt></td><td> </td><td>Compares sorted files line by line. </td></tr>
-<tr><td><tt>compress</tt></td><td> </td><td>Data compression program</td></tr>
-<tr><td><tt>consoled</tt></td><td> </td><td>Console daemon </td></tr>
-<tr><td><tt>copyattr</tt></td><td> </td><td>Copies all or a subset of attributes from one or more files to another or new file. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>cp</tt></td><td> </td><td>Copies files and directories. </td></tr>
-<tr><td><tt>csplit</tt></td><td> </td><td>Split a file into pieces separated by a specified pattern.</td></tr>
-<tr><td><tt>ctags</tt></td><td> </td><td>Generates an index file for a variety of language objects found in files</td></tr>
-<tr><td><tt>cut</tt></td><td> </td><td>Prints out sections from each line of a file.</td></tr>
-<tr><td><tt>date</tt></td><td> </td><td>Displays or sets the current time and date.</td></tr>
-<tr><td><tt>dc</tt></td><td> </td><td>Desk calculator language.</td></tr>
-<tr><td><tt>dd</tt></td><td> </td><td>Copies raw data, converting and formatting according operands. </td></tr>
-<tr><td><tt>desklink</tt></td><td> </td><td>Installs items in Deskbar. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>df</tt></td><td> </td><td>Reports free and used space of mounted volumes.</td></tr>
-<tr><td><tt>diff</tt></td><td> </td><td>Compares files line by line.</td></tr>
-<tr><td><tt>diff3</tt></td><td> </td><td>Compares three files line by line.</td></tr>
-<tr><td><tt>dircolors</tt></td><td> </td><td>Color setup for <tt>ls</tt>. </td></tr>
-<tr><td><tt>dirname</tt></td><td> </td><td>Strips the filename from a /path/to/filename string.</td></tr>
-<tr><td><tt>draggers</tt></td><td> </td><td>Shows/sets the dragger state of Replicants.</td></tr>
-<tr><td><tt>driveinfo</tt></td><td> </td><td>Shows hardware information. </td></tr>
-<tr><td><tt>dstcheck</tt></td><td> </td><td>Shows a message box used when switching to/from daylight saving time.</td></tr>
-<tr><td><tt>du</tt></td><td> </td><td>Summarizes disk usage of each file, recursively for directories. </td></tr>
-<tr><td><tt>dumpcatalog</tt></td><td> </td><td>[Leftover from the move of locale-kit.] </td></tr>
-<tr><td><tt>echo</tt></td><td> </td><td>Displays a line of text.</td></tr>
-<tr><td><tt>egrep</tt></td><td> </td><td>See <tt>grep</tt>.</td></tr>
-<tr><td><tt>eject</tt></td><td> </td><td>Ejects removable media. </td></tr>
-<tr><td><tt>env</tt></td><td> </td><td>Runs a program in a modified environment. </td></tr>
-<tr><td><tt>error</tt></td><td> </td><td>Prints clear text error messages for given error numbers. </td></tr>
-<tr><td><tt>expand</tt></td><td> </td><td>Converts tabs to spaces.</td></tr>
-<tr><td><tt>expr</tt></td><td> </td><td>Prints the value of an expression.</td></tr>
+<tr><td><tt>chgrp</tt></td><td> </td><td>Zmení skupinu, ktorá vlastní súbory.</td></tr>
+<tr><td><tt>chmod</tt></td><td> </td><td>Zmení oprávnenia na prístup k súborom.</td></tr>
+<tr><td><tt>chop</tt></td><td> </td><td>Rozdelí súbor na viacero menších súborov.</td></tr>
+<tr><td><tt>chown</tt></td><td> </td><td>Zmení vlastníka súborov.</td></tr>
+<tr><td><tt>chroot</tt></td><td> </td><td>Spustí príkaz v rámci zadaného koreňového adresára.</td></tr>
+<tr><td><tt>cksum</tt></td><td> </td><td>Vypíše kontrolný súčet CRC a počet bajtov súborov.</td></tr>
+<tr><td><tt>clear</tt></td><td> </td><td>Vymaže okno terminálu.</td></tr>
+<tr><td><tt>clockconfig</tt></td><td> </td><td>Vypíše konfiguráciu hodín.</td></tr>
+<tr><td><tt>cmp</tt></td><td> </td><td>Porovná súbory bajt po bajte.</td></tr>
+<tr><td><tt>collectcatkeys </tt></td><td> </td><td>[Pozostatok po prechode z locale-kit.]</td></tr>
+<tr><td><tt>comm</tt></td><td> </td><td>Porovná utriedené súbory riadok po riadku.</td></tr>
+<tr><td><tt>compress</tt></td><td> </td><td>Program na kompresiu dát</td></tr>
+<tr><td><tt>consoled</tt></td><td> </td><td>Démon konzoly</td></tr>
+<tr><td><tt>copyattr</tt></td><td> </td><td>Skopíruje všetky alebo podmnožinu atribútov z jedného súboru do iného alebo do nového súboru. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
+<tr><td><tt>cp</tt></td><td> </td><td>Skopíruje súbory a priečinky.</td></tr>
+<tr><td><tt>csplit</tt></td><td> </td><td>Rozdelí súbor na časti rozdelené podľa konkrétneho vzoru.</td></tr>
+<tr><td><tt>ctags</tt></td><td> </td><td>Vygeneruje indexový súbor pre množstvo jazykových objektov nájdených v súboroch.</td></tr>
+<tr><td><tt>cut</tt></td><td> </td><td>Vypíše sekcie z každého riadka súboru.</td></tr>
+<tr><td><tt>date</tt></td><td> </td><td>Zobrazí alebo nastaví aktuálny čas a dátum.</td></tr>
+<tr><td><tt>dc</tt></td><td> </td><td>Jazyk dc na výpočty.</td></tr>
+<tr><td><tt>dd</tt></td><td> </td><td>Kopíruje nespracované dáta, konvertuje a formátuje podľa operandov.</td></tr>
+<tr><td><tt>desklink</tt></td><td> </td><td>Inštaluje položky do Panela. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
+<tr><td><tt>df</tt></td><td> </td><td>Podá správu o voľnom a využívanom mieste na pripojených zväzkoch.</td></tr>
+<tr><td><tt>diff</tt></td><td> </td><td>Porovná súbory riadok po riadku.</td></tr>
+<tr><td><tt>diff3</tt></td><td> </td><td>Porovná 3 súbory riadok po riadku.</td></tr>
+<tr><td><tt>dircolors</tt></td><td> </td><td>Nastavenie farieb pre <tt>ls</tt>. </td></tr>
+<tr><td><tt>dirname</tt></td><td> </td><td>Odstráni názov súboru z reťazca /cesta/k/súboru.</td></tr>
+<tr><td><tt>draggers</tt></td><td> </td><td>Zobrazí/nastaví stav rúčok Replikantov.</td></tr>
+<tr><td><tt>driveinfo</tt></td><td> </td><td>Zobrazí informácie o hardvéri.</td></tr>
+<tr><td><tt>dstcheck</tt></td><td> </td><td>Zobrazí okno so správou použité pri prepínaní na/z letného času.</td></tr>
+<tr><td><tt>du</tt></td><td> </td><td>Sumarizuje využitie disku každého súboru, rekurzívne pre priečinky.</td></tr>
+<tr><td><tt>dumpcatalog</tt></td><td> </td><td>[Zostatok po prechode z locale-kit.]</td></tr>
+<tr><td><tt>echo</tt></td><td> </td><td>Zobrazí riadok textu.</td></tr>
+<tr><td><tt>egrep</tt></td><td> </td><td>Pozrite <tt>grep</tt>.</td></tr>
+<tr><td><tt>eject</tt></td><td> </td><td>Vysunie výmenné médium.</td></tr>
+<tr><td><tt>env</tt></td><td> </td><td>Spustí program v modifikovanom prostredí.</td></tr>
+<tr><td><tt>error</tt></td><td> </td><td>Vypíše obsah správy o chybe pre dané číslo chyby.</td></tr>
+<tr><td><tt>expand</tt></td><td> </td><td>Konvertuje znak tabulátoru na medzery.</td></tr>
+<tr><td><tt>expr</tt></td><td> </td><td>Vypíše hodnotu výrazu.</td></tr>
 <tr><td colspan="3"><a id="F" name="F"><h2>F</h2></a></td></tr>
-<tr><td><tt>factor</tt></td><td> </td><td>Prints the prime factors of integer numbers.</td></tr>
-<tr><td><tt>false</tt></td><td> </td><td>Does nothing, indicates "unsuccessful" and returns the value "1".</td></tr>
-<tr><td><tt>fdinfo</tt></td><td> </td><td>Shows info about the used file descriptors in the system. </td></tr>
-<tr><td><tt>ffm</tt></td><td> </td><td>Sets focus follows mouse. </td></tr>
-<tr><td><tt>fgrep</tt></td><td> </td><td>See <tt>grep</tt>.</td></tr>
-<tr><td><tt>filepanel</tt></td><td> </td><td>Displays a load/save file panel. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>find</tt></td><td> </td><td>Searches for files in a directory hierarchy.</td></tr>
-<tr><td><tt>finddir</tt></td><td> </td><td>Finds special directories defined by the system.</td></tr>
-<tr><td><tt>fmt</tt></td><td> </td><td>Reformats the paragraphs of a file.</td></tr>
-<tr><td><tt>fold</tt></td><td> </td><td>Wraps input lines of a file.</td></tr>
-<tr><td><tt>fortune</tt></td><td> </td><td>Prints a random, hopefully interesting, adage. </td></tr>
-<tr><td><tt>frcode</tt></td><td> </td><td>Called by updatedb to compress the list of file names.</td></tr>
-<tr><td><tt>freetype-config</tt></td><td> </td><td>Shows FreeType compilation and linking information.</td></tr>
-<tr><td><tt>ftp</tt></td><td> </td><td>File transfer program</td></tr>
-<tr><td><tt>ftpd</tt></td><td> </td><td>FTP daemon</td></tr>
-<tr><td><tt>funzip</tt></td><td> </td><td>Extracts the first item of an archive to standard output.</td></tr>
-<tr><td><tt>fwcontrol</tt></td><td> </td><td>FireWire control program</td></tr>
-<tr><td><tt>gawk</tt></td><td> </td><td>Pattern scanning and processing language. </td></tr>
+<tr><td><tt>factor</tt></td><td> </td><td>Vypíše rozklad celého čísla na prvočísla.</td></tr>
+<tr><td><tt>false</tt></td><td> </td><td>Nerobí nič, indikuje „neúspech“ a vráti hodnotu „1“.</td></tr>
+<tr><td><tt>fdinfo</tt></td><td> </td><td>Zobrazí informácie o použitých popisovačoch súborov v systéme.</td></tr>
+<tr><td><tt>ffm</tt></td><td> </td><td>Nastaví automatickú aktiváciu ovládacích prvkov pod kurzorom myši.</td></tr>
+<tr><td><tt>fgrep</tt></td><td> </td><td>Pozrite <tt>grep</tt>.</td></tr>
+<tr><td><tt>filepanel</tt></td><td> </td><td>Zobrazí panel na otvorenie/uloženie súboru. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
+<tr><td><tt>find</tt></td><td> </td><td>Hľadá súbory v rámci adresárovej štruktúry.</td></tr>
+<tr><td><tt>finddir</tt></td><td> </td><td>Hľadá špeciálne priečinky definované systémom.</td></tr>
+<tr><td><tt>fmt</tt></td><td> </td><td>Preformátuje odstavce súboru.</td></tr>
+<tr><td><tt>fold</tt></td><td> </td><td>Zalomí riadky vstupného súboru.</td></tr>
+<tr><td><tt>fortune</tt></td><td> </td><td>Vypíše náhodné, snáď zaujímavé, porekadlo.</td></tr>
+<tr><td><tt>frcode</tt></td><td> </td><td>Zavolaním tohto príkazu updatedb skomprimuje zoznam názvov súborov.</td></tr>
+<tr><td><tt>freetype-config</tt></td><td> </td><td>Zobrazí informácie o kompilácii a linkovaní FreeType.</td></tr>
+<tr><td><tt>ftp</tt></td><td> </td><td>Program na prenos súborov</td></tr>
+<tr><td><tt>ftpd</tt></td><td> </td><td>FTP démon</td></tr>
+<tr><td><tt>funzip</tt></td><td> </td><td>Rozbalí prvý súbor z archívu na štandardný výstup.</td></tr>
+<tr><td><tt>fwcontrol</tt></td><td> </td><td>Program na ovládanie FireWire</td></tr>
+<tr><td><tt>gawk</tt></td><td> </td><td>Jazyk na hľadanie a spracovanie vzorov.</td></tr>
 <tr><td><tt>gdb</tt></td><td> </td><td>GNU debugger</td></tr>
-<tr><td><tt>getlimits</tt></td><td> </td><td>Prints platform dependent limits in a format useful for shell scripts. </td></tr>
-<tr><td><tt>grep</tt></td><td> </td><td>Search for a pattern.</td></tr>
-<tr><td><tt>groups</tt></td><td> </td><td>Prints group memberships for each username. </td></tr>
-<tr><td><tt>gunzip</tt></td><td> </td><td>See <tt>gzip</tt>.</td></tr>
-<tr><td><tt>gzexe</tt></td><td> </td><td>De/Compresses executables. </td></tr>
-<tr><td><tt>gzip</tt></td><td> </td><td>De/Compresses files. </td></tr>
-<tr><td><tt>hd</tt></td><td> </td><td>Hexdump</td></tr>
-<tr><td><tt>head</tt></td><td> </td><td>Prints the first lines of a file.</td></tr>
-<tr><td><tt>hey</tt></td><td> </td><td>A small tool for scripting GUI apps.</td></tr>
-<tr><td><tt>hostname</tt></td><td> </td><td>Prints or sets the hostname of the system. </td></tr>
-<tr><td><tt>id</tt></td><td> </td><td>Prints user and group information. </td></tr>
-<tr><td><tt>ident</tt></td><td> </td><td>Identifies RCS keywords in files. </td></tr>
-<tr><td><tt>ifconfig</tt></td><td> </td><td>Configures a network interface. </td></tr>
-<tr><td><tt>install</tt></td><td> </td><td>Copies files to a destination without disrupting the running system.</td></tr>
-<tr><td><tt>install-wifi-firmwares.sh</tt></td><td> </td><td>Installs firmware for various wireless network cards. </td></tr>
-<tr><td><tt>installoptionalpackage</tt></td><td> </td><td>Temporary solution for installing optional packages. </td></tr>
-<tr><td><tt>installsound</tt></td><td> </td><td>Installs a new sound event in the Sounds preferences panel. </td></tr>
-<tr><td><tt>iroster</tt></td><td> </td><td>Lists input devices. </td></tr>
-<tr><td><tt>isvolume</tt></td><td> </td><td>Gets information about a mounted volume.</td></tr>
-<tr><td><tt>join</tt></td><td> </td><td>For each pair of input lines with identical join fields, write a line to standard output. </td></tr>
+<tr><td><tt>getlimits</tt></td><td> </td><td>Zobrazí obmedzenia závislé na platforme vo formáte užitočnom pre skripty shellu.</td></tr>
+<tr><td><tt>grep</tt></td><td> </td><td>Hľadá vzory.</td></tr>
+<tr><td><tt>groups</tt></td><td> </td><td>Vypíše členstvá v skupinách každého používateľského mena.</td></tr>
+<tr><td><tt>gunzip</tt></td><td> </td><td>Pozrite <tt>gzip</tt>.</td></tr>
+<tr><td><tt>gzexe</tt></td><td> </td><td>(De)komprimuje spustiteľné súbory.</td></tr>
+<tr><td><tt>gzip</tt></td><td> </td><td>(De)komprimuje súbory.</td></tr>
+<tr><td><tt>hd</tt></td><td> </td><td>Výpis v hexadecimálnom tvare</td></tr>
+<tr><td><tt>head</tt></td><td> </td><td>Vypíše prvé riadky súboru.</td></tr>
+<tr><td><tt>hey</tt></td><td> </td><td>Malý nástroj na skriptovanie aplikácií grafického rozhrania.</td></tr>
+<tr><td><tt>hostname</tt></td><td> </td><td>Vypíše alebo nastaví názov hostiteľa systému.</td></tr>
+<tr><td><tt>id</tt></td><td> </td><td>Vypíše informácie o používateľovi a skupine.</td></tr>
+<tr><td><tt>ident</tt></td><td> </td><td>Identifikuje kľúčové slová RCS v súboroch.</td></tr>
+<tr><td><tt>ifconfig</tt></td><td> </td><td>Konfiguruje sieťové rozhranie.</td></tr>
+<tr><td><tt>install</tt></td><td> </td><td>Skopíruje súbory na miesto určenia bez narušenia bežiaceho systému.</td></tr>
+<tr><td><tt>install-wifi-firmwares.sh</tt></td><td> </td><td>Nainštaluje firmvér niektorým bezdrôtovým sieťovým kartám.</td></tr>
+<tr><td><tt>installoptionalpackage</tt></td><td> </td><td>Dočasné riešenie inštalácie voliteľných balíčkov.</td></tr>
+<tr><td><tt>installsound</tt></td><td> </td><td>Nainštaluje novú zvukovú udalosť do panela nastavenia Zvukov.</td></tr>
+<tr><td><tt>iroster</tt></td><td> </td><td>Vypíše zoznam vstupných zariadení.</td></tr>
+<tr><td><tt>isvolume</tt></td><td> </td><td>Získa informácie o pripojenom zväzku.</td></tr>
+<tr><td><tt>join</tt></td><td> </td><td>Na štandardný výstup zapíše riadok pre každý pár vstupných riadkov so zhodnými poliami, podľa ktorých sa vykoná spojenie (join).</td></tr>
 <tr><td colspan="3"><a id="K" name="K"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>K</h2></a></td></tr>
-<tr><td><tt>kernel_debugger</tt></td><td> </td><td>Enters the kernel debugger.</td></tr>
-<tr><td><tt>keymap</tt></td><td> </td><td>Loads or saves a keymap.</td></tr>
-<tr><td><tt>kill</tt></td><td> </td><td>Sends a signal to quit a process. </td></tr>
-<tr><td><tt>less</tt></td><td> </td><td>Views a file.</td></tr>
-<tr><td><tt>lessecho</tt></td><td> </td><td>Echos its arguments and expands metacharacters, such as * and ? in filenames.</td></tr>
-<tr><td><tt>lesskey</tt></td><td> </td><td>Specifies key binding for less. </td></tr>
-<tr><td><tt>link</tt></td><td> </td><td>Creates a link to a file. </td></tr>
-<tr><td><tt>linkcatkeys</tt></td><td> </td><td>[Leftover from the move of locale-kit.] </td></tr>
-<tr><td><tt>listarea</tt></td><td> </td><td>Lists area info for all currently running teams. </td></tr>
-<tr><td><tt>listattr</tt></td><td> </td><td>Lists the attributes of a file. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>listdev</tt></td><td> </td><td>Lists all hardware devices.</td></tr>
-<tr><td><tt>listimage</tt></td><td> </td><td>Lists image info for all currently running teams. </td></tr>
-<tr><td><tt>listport</tt></td><td> </td><td>Lists all open ports in the system organized by team. </td></tr>
-<tr><td><tt>listres</tt></td><td> </td><td>Lists resources of files. </td></tr>
-<tr><td><tt>listsem</tt></td><td> </td><td>Lists the semaphores allocated by the specified team. </td></tr>
-<tr><td><tt>listusb</tt></td><td> </td><td>Lists USB devices. </td></tr>
-<tr><td><tt>ln</tt></td><td> </td><td>Creates a link to a file.</td></tr>
-<tr><td><tt>locale</tt></td><td> </td><td>Shows the set preferred language, its LC_CTYPE and the preferred formatting.</td></tr>
-<tr><td><tt>locate</tt></td><td> </td><td>Locates a file. </td></tr>
-<tr><td><tt>logger</tt></td><td> </td><td>Sends a message to the system log. </td></tr>
-<tr><td><tt>login</tt></td><td> </td><td>Starts a session on the system. </td></tr>
-<tr><td><tt>logname</tt></td><td> </td><td>Prints the name of the current user. </td></tr>
-<tr><td><tt>ls</tt></td><td> </td><td>Lists directory content. </td></tr>
-<tr><td><tt>lsindex</tt></td><td> </td><td>Displays the indexed attributes on the current volume/partition.  <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>mail2mbox</tt></td><td> </td><td>Converts BeOS e-mail files to Unix mailbox files. </td></tr>
-<tr><td><tt>make</tt></td><td> </td><td>GNU make utility</td></tr>
-<tr><td><tt>makebootable</tt></td><td> </td><td>Makes the specified BFS partitions/devices bootable by writing boot code into the first two sectors. </td></tr>
-<tr><td><tt>mbox2mail</tt></td><td> </td><td>Converts Unix mailbox files to BeOS e-mail files.</td></tr>
-<tr><td><tt>md5sum</tt></td><td> </td><td>Prints or checks MD5 checksums.</td></tr>
-<tr><td><tt>merge</tt></td><td> </td><td>Three-way file merge. </td></tr>
-<tr><td><tt>message</tt></td><td> </td><td>Prints a flattened BMessage file. </td></tr>
-<tr><td><tt>mimeset</tt></td><td> </td><td>Sets MIME type of a file. </td></tr>
-<tr><td><tt>mkdepend</tt></td><td> </td><td>Makefile dependency generator</td></tr>
-<tr><td><tt>mkdir</tt></td><td> </td><td>Creates a directory. </td></tr>
-<tr><td><tt>mkdos</tt></td><td> </td><td>Initializes FAT partitions. </td></tr>
-<tr><td><tt>mkfifo</tt></td><td> </td><td>Creates named pipes. </td></tr>
-<tr><td><tt>mkfs</tt></td><td> </td><td>Creates a file system.</td></tr>
-<tr><td><tt>mkindex</tt></td><td> </td><td>Creates a new index for an attribute.  <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>mktemp</tt></td><td> </td><td>Safely creates a temporary file or directory.</td></tr>
-<tr><td><tt>modifiers</tt></td><td> </td><td>Prints currently (un)pressed modifier keys. </td></tr>
-<tr><td><tt>more</tt></td><td> </td><td>See <tt>less</tt>. </td></tr>
-<tr><td><tt>mount</tt></td><td> </td><td>Mounts a file system. </td></tr>
-<tr><td><tt>mount_nfs</tt></td><td> </td><td>Mounts a NFS partition. </td></tr>
-<tr><td><tt>mountvolume</tt></td><td> </td><td>Mounts a volume by name.</td></tr>
-<tr><td><tt>mv</tt></td><td> </td><td>Moves/renames a file. </td></tr>
-<tr><td><tt>netcat</tt></td><td> </td><td>TCP and UDP utility.</td></tr>
-<tr><td><tt>netstat</tt></td><td> </td><td>Prints network connections, routing tables, interface statistics, masquerade connections and multicast memberships. </td></tr>
-<tr><td><tt>nl</tt></td><td> </td><td>Prints each file with line numbers added. </td></tr>
-<tr><td><tt>nohup</tt></td><td> </td><td>Runs a command ignoring hangup signals. </td></tr>
-<tr><td><tt>nproc</tt></td><td> </td><td>Prints the number of available processing units.</td></tr>
-<tr><td><tt>od</tt></td><td> </td><td>Writes an unambiguous representation of a file.</td></tr>
-<tr><td><tt>open</tt></td><td> </td><td>Launches an application/document from the shell. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
+<tr><td><tt>kernel_debugger</tt></td><td> </td><td>Spustí ladenie jadra.</td></tr>
+<tr><td><tt>keymap</tt></td><td> </td><td>Načíta alebo uloží klávesovú mapu.</td></tr>
+<tr><td><tt>kill</tt></td><td> </td><td>Pošle signál na ukončenie procesu.</td></tr>
+<tr><td><tt>less</tt></td><td> </td><td>Zobrazí súbor.</td></tr>
+<tr><td><tt>lessecho</tt></td><td> </td><td>Vypíše argumenty, ktoré dostal a expanduje metaznaky ako * a ? v názvoch súborov.</td></tr>
+<tr><td><tt>lesskey</tt></td><td> </td><td>Určuje klávesové väzby pre less. </td></tr>
+<tr><td><tt>link</tt></td><td> </td><td>Vytvorí odkaz na súbor.</td></tr>
+<tr><td><tt>linkcatkeys</tt></td><td> </td><td>[Zostatok po prechode z locale-kit.]</td></tr>
+<tr><td><tt>listarea</tt></td><td> </td><td>Vypíše informácie z oblasti každého bežiaceho tímu.</td></tr>
+<tr><td><tt>listattr</tt></td><td> </td><td>Vypíše atribúty súboru. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
+<tr><td><tt>listdev</tt></td><td> </td><td>Vypíše zoznam všetkých hardvérových zariadení.</td></tr>
+<tr><td><tt>listimage</tt></td><td> </td><td>Vypíše obrazové informácie všetkých momentálne bežiacich procesov. </td></tr>
+<tr><td><tt>listport</tt></td><td> </td><td>Vypíše všetky otvorené porty systému zorganizované podľa tímov.</td></tr>
+<tr><td><tt>listres</tt></td><td> </td><td>Vypíše prostriedky súborov.</td></tr>
+<tr><td><tt>listsem</tt></td><td> </td><td>Vypíše semafory, ktoré alokoval určený tím.</td></tr>
+<tr><td><tt>listusb</tt></td><td> </td><td>Vypíše zoznam zariadení USB.</td></tr>
+<tr><td><tt>ln</tt></td><td> </td><td>Vytvorí odkaz na súbor.</td></tr>
+<tr><td><tt>locale</tt></td><td> </td><td>Zobrazí nastavený uprednostňovaný jazyk, jeho LC_CTYPE a uprednostňované formátovanie.</td></tr>
+<tr><td><tt>locate</tt></td><td> </td><td>Nájde súbor.</td></tr>
+<tr><td><tt>logger</tt></td><td> </td><td>Pošle správu do systémového záznamu.</td></tr>
+<tr><td><tt>login</tt></td><td> </td><td>Spustí používateľskú reláciu systému.</td></tr>
+<tr><td><tt>logname</tt></td><td> </td><td>Vypíše meno aktuálneho používateľa.</td></tr>
+<tr><td><tt>ls</tt></td><td> </td><td>Vypíše obsah priečinka.</td></tr>
+<tr><td><tt>lsindex</tt></td><td> </td><td>Zobrazí indexované atribúty na aktuálnom zväzku/diskovej oblasti. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
+<tr><td><tt>mail2mbox</tt></td><td> </td><td>Zmení e-mailové súbory BeOS na unixové súbory mailbox.</td></tr>
+<tr><td><tt>make</tt></td><td> </td><td>Nástroj GNU make</td></tr>
+<tr><td><tt>makebootable</tt></td><td> </td><td>Umožní zavádzanie systému z vybranej diskovej oblasti alebo zariadenie BFS zapísaním zavádzacieho kódu do prvých dvoch sektorov.</td></tr>
+<tr><td><tt>mbox2mail</tt></td><td> </td><td>Zmení unixové súbory mailbox na e-mailové súbory BeOS.</td></tr>
+<tr><td><tt>md5sum</tt></td><td> </td><td>Vypíše alebo skontroluje kontrolný súčet MD5.</td></tr>
+<tr><td><tt>merge</tt></td><td> </td><td>Trojcestné zlúčenie súboru.</td></tr>
+<tr><td><tt>message</tt></td><td> </td><td>Vypíše sploštený súbor BMessage.</td></tr>
+<tr><td><tt>mimeset</tt></td><td> </td><td>Nastaví typ MIME súboru. </td></tr>
+<tr><td><tt>mkdepend</tt></td><td> </td><td>Generátor závislostí Makefile</td></tr>
+<tr><td><tt>mkdir</tt></td><td> </td><td>Vytvorí priečinok</td></tr>
+<tr><td><tt>mkdos</tt></td><td> </td><td>Inicializuje diskové oblasti FAT.</td></tr>
+<tr><td><tt>mkfifo</tt></td><td> </td><td>Vytvorí pomenované rúry.</td></tr>
+<tr><td><tt>mkfs</tt></td><td> </td><td>Vytvorí súborový systém.</td></tr>
+<tr><td><tt>mkindex</tt></td><td> </td><td>Vytvorí nový index pre atribút. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
+<tr><td><tt>mktemp</tt></td><td> </td><td>Bezpečne vytvorí dočasný súbor alebo priečinok.</td></tr>
+<tr><td><tt>modifiers</tt></td><td> </td><td>Vypíše všetky momentálne (ne)stlačené modifikačné klávesy.</td></tr>
+<tr><td><tt>more</tt></td><td> </td><td>Pozrite <tt>less</tt>. </td></tr>
+<tr><td><tt>mount</tt></td><td> </td><td>Pripojí súborový systém.</td></tr>
+<tr><td><tt>mount_nfs</tt></td><td> </td><td>Pripojí diskovú oblasť NFS.</td></tr>
+<tr><td><tt>mountvolume</tt></td><td> </td><td>Pripojí zväzok podľa názvu.</td></tr>
+<tr><td><tt>mv</tt></td><td> </td><td>Presunie/premenuje súbor.</td></tr>
+<tr><td><tt>netcat</tt></td><td> </td><td>TCP a UDP nástroj.</td></tr>
+<tr><td><tt>netstat</tt></td><td> </td><td>Vypíše sieťové spojenia, smerovacie tabuľky, štatistiky rozhraní, spojenia NAT a členstvá v multicastových skupinách.</td></tr>
+<tr><td><tt>nl</tt></td><td> </td><td>Vypíše všetky súbory s pridanými číslami riadkov.</td></tr>
+<tr><td><tt>nohup</tt></td><td> </td><td>Spustí príkaz ignorujúc signály zavesenia (HUP).</td></tr>
+<tr><td><tt>nproc</tt></td><td> </td><td>Vypíše počet dostupných procesorov.</td></tr>
+<tr><td><tt>od</tt></td><td> </td><td>Zapíše jednoznačnú reprezentáciu súboru.</td></tr>
+<tr><td><tt>open</tt></td><td> </td><td>Spustí aplikáciu alebo dokument zo shellu. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
 <tr><td colspan="3"><a id="P" name="P"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>P</h2></a></td></tr>
-<tr><td><tt>passwd</tt></td><td> </td><td>Changes the user password. </td></tr>
-<tr><td><tt>paste</tt></td><td> </td><td>Prints lines consisting of the sequentially corresponding lines from each file, separated by tabs.</td></tr>
-<tr><td><tt>patch</tt></td><td> </td><td>Applies a diff file to an original. </td></tr>
-<tr><td><tt>pathchk</tt></td><td> </td><td>Diagnoses invalid or unportable file names. </td></tr>
-<tr><td><tt>pc</tt></td><td> </td><td>Programmer's calculator</td></tr>
-<tr><td><tt>ping</tt></td><td> </td><td>Sends ICMP-echo-request to network host. </td></tr>
-<tr><td><tt>play</tt></td><td> </td><td>Plays tracks from CD. </td></tr>
-<tr><td><tt>playfile</tt></td><td> </td><td>Plays an audio file. </td></tr>
-<tr><td><tt>playsound</tt></td><td> </td><td>Plays an audio file.</td></tr>
-<tr><td><tt>playwav</tt></td><td> </td><td>Plays a WAV file. </td></tr>
-<tr><td><tt>pr</tt></td><td> </td><td>Paginates or columnates files for printing. </td></tr>
-<tr><td><tt>printenv</tt></td><td> </td><td>Prints the value of an environment variable.</td></tr>
-<tr><td><tt>printf</tt></td><td> </td><td>Formats and prints data. </td></tr>
-<tr><td><tt>prio</tt></td><td> </td><td>Changes priority of a process. </td></tr>
-<tr><td><tt>profile</tt></td><td> </td><td>Profiles threads. </td></tr>
-<tr><td><tt>ps</tt></td><td> </td><td>Lists running processes. </td></tr>
-<tr><td><tt>ptx</tt></td><td> </td><td>Outputs a permuted index, including context, of the words in the input files.</td></tr>
-<tr><td><tt>pwd</tt></td><td> </td><td>Prints current directory. </td></tr>
-<tr><td><tt>query</tt></td><td> </td><td>A shell utility emulating Tracker's "Find by formula" functionality.  <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>quit</tt></td><td> </td><td>Quits an application. </td></tr>
-<tr><td><tt>rc</tt></td><td> </td><td>Resource compiler</td></tr>
-<tr><td><tt>readlink</tt></td><td> </td><td>Prints the path to the destination of a symbolic link.</td></tr>
-<tr><td><tt>reindex</tt></td><td> </td><td>Puts attributes of existing files into newly created indexes. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>release</tt></td><td> </td><td>Releases a semaphore. </td></tr>
-<tr><td><tt>renice</tt></td><td> </td><td>Alters the priority of a running process. </td></tr>
-<tr><td><tt>rlog</tt></td><td> </td><td>Prints log messages and other information about RCS files.</td></tr>
-<tr><td><tt>rm</tt></td><td> </td><td>Removes files and directories. </td></tr>
-<tr><td><tt>rmattr</tt></td><td> </td><td>Removes an attribute from a file.  <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>rmdir</tt></td><td> </td><td>Removes directories.</td></tr>
-<tr><td><tt>rmindex</tt></td><td> </td><td>Removes the index for an attribute. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>roster</tt></td><td> </td><td>Prints information about running teams. </td></tr>
-<tr><td><tt>route</tt></td><td> </td><td>Lists and manipulates network routes. </td></tr>
-<tr><td><tt>safemode</tt></td><td> </td><td>Checks if the system is running in safemode. </td></tr>
-<tr><td><tt>screen_blanker</tt></td><td> </td><td>Starts the screen blanker.</td></tr>
-<tr><td><tt>screenmode</tt></td><td> </td><td>Show/sets the screen mode. </td></tr>
-<tr><td><tt>sdiff</tt></td><td> </td><td>Shows or merges differences of two files side-by-side.</td></tr>
-<tr><td><tt>seq</tt></td><td> </td><td>Prints a sequence of numbers.</td></tr>
-<tr><td><tt>setdecor</tt></td><td> </td><td>Shows/sets the decorator. </td></tr>
-<tr><td><tt>setgcc</tt></td><td> </td><td>Shows/sets the used gcc version. </td></tr>
-<tr><td><tt>settype</tt></td><td> </td><td>Sets the MIME type, signature and preferred application of a file. </td></tr>
-<tr><td><tt>setversion</tt></td><td> </td><td>Shows the version of a file.</td></tr>
-<tr><td><tt>setvolume</tt></td><td> </td><td>Sets the system sound volume. </td></tr>
-<tr><td><tt>setwep</tt></td><td> </td><td>Provides WEP encryption for wireless networks. </td></tr>
-<tr><td><tt>sh</tt></td><td> </td><td>See <tt>bash</tt>. </td></tr>
-<tr><td><tt>sha1sum</tt></td><td> </td><td>Prints or checks SHA1 checksums. </td></tr>
-<tr><td><tt>shar</tt></td><td> </td><td>Creates shell archives.</td></tr>
-<tr><td><tt>shred</tt></td><td> </td><td>Overwrites a file repeatedly. </td></tr>
-<tr><td><tt>shuf</tt></td><td> </td><td>Prints a random permutation of the input lines.</td></tr>
-<tr><td><tt>shutdown</tt></td><td> </td><td>Shuts down the computer. </td></tr>
-<tr><td><tt>sleep</tt></td><td> </td><td>Pauses for a specified number of seconds. </td></tr>
-<tr><td><tt>sort</tt></td><td> </td><td>Prints a sorted concatenation of all files.</td></tr>
-<tr><td><tt>spamdbm</tt></td><td> </td><td>Classifies e-mail messages as spam or genuine. </td></tr>
-<tr><td><tt>split</tt></td><td> </td><td>Outputs fixed-size pieces of input files to files with prefixes. </td></tr>
-<tr><td><tt>stat</tt></td><td> </td><td>Displays file or file system status. </td></tr>
-<tr><td><tt>strace</tt></td><td> </td><td>Traces the syscalls of a thread or a team. </td></tr>
-<tr><td><tt>stty</tt></td><td> </td><td>Shows/sets terminal characteristics. </td></tr>
-<tr><td><tt>su</tt></td><td> </td><td>Changes the effective user id and group. </td></tr>
-<tr><td><tt>sum</tt></td><td> </td><td>Prints checksum and block counts for each file. </td></tr>
-<tr><td><tt>sync</tt></td><td> </td><td>Forces changed blocks to disk, updates the super block. </td></tr>
-<tr><td><tt>sysinfo</tt></td><td> </td><td>Shows system info. </td></tr>
+<tr><td><tt>passwd</tt></td><td> </td><td>Zmení heslo používateľa.</td></tr>
+<tr><td><tt>paste</tt></td><td> </td><td>Vypíše riadky pozostávajúce zo sekvenčne zodpovedajúcich riadkov z každého súboru, oddelené tabulátormi.</td></tr>
+<tr><td><tt>patch</tt></td><td> </td><td>Aplikuje rozdielový súbor diff na originál. </td></tr>
+<tr><td><tt>pathchk</tt></td><td> </td><td>Diagnostikuje neplatné alebo neprenosné názvy súborov.</td></tr>
+<tr><td><tt>pc</tt></td><td> </td><td>Programátorská kalkulačka</td></tr>
+<tr><td><tt>ping</tt></td><td> </td><td>Pošle počítaču v sieti paket ICMP-echo-request.</td></tr>
+<tr><td><tt>play</tt></td><td> </td><td>Prehrá stopu z CD.</td></tr>
+<tr><td><tt>playfile</tt></td><td> </td><td>Prehrá zvukový súbor.</td></tr>
+<tr><td><tt>playsound</tt></td><td> </td><td>Prehrá zvukový súbor.</td></tr>
+<tr><td><tt>playwav</tt></td><td> </td><td>Prehrá súbor WAV.</td></tr>
+<tr><td><tt>pr</tt></td><td> </td><td>Ostránkuje alebo ostĺpcuje súbory na tlač.</td></tr>
+<tr><td><tt>printenv</tt></td><td> </td><td>Vypíše hodnotu premennej prostredia.</td></tr>
+<tr><td><tt>printf</tt></td><td> </td><td>Formátuje a vypíše dáta.</td></tr>
+<tr><td><tt>prio</tt></td><td> </td><td>Zmení prioritu procesu.</td></tr>
+<tr><td><tt>profile</tt></td><td> </td><td>Profiluje vlákna.</td></tr>
+<tr><td><tt>ps</tt></td><td> </td><td>Vypíše zoznam spustených procesov.</td></tr>
+<tr><td><tt>ptx</tt></td><td> </td><td>Vypíše permutovaný index (vrátane kontextu) slov vo vstupných súboroch.</td></tr>
+<tr><td><tt>pwd</tt></td><td> </td><td>Vypíše aktuálny adresár.</td></tr>
+<tr><td><tt>query</tt></td><td> </td><td>Nástroj shellu emulujúci funkciu Trackera „Nájsť podľa vzorca“.  <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
+<tr><td><tt>quit</tt></td><td> </td><td>Ukončí aplikáciu.</td></tr>
+<tr><td><tt>rc</tt></td><td> </td><td>Kompilátor zdrojov</td></tr>
+<tr><td><tt>readlink</tt></td><td> </td><td>Vypíše cestu k cieľu symbolického odkazu.</td></tr>
+<tr><td><tt>reindex</tt></td><td> </td><td>Vloží atribúty existujúcich súborov do novo vytvorených indexov. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
+<tr><td><tt>release</tt></td><td> </td><td>Uvoľní semafor.</td></tr>
+<tr><td><tt>renice</tt></td><td> </td><td>Zmení prioritu bežiaceho procesu.</td></tr>
+<tr><td><tt>rlog</tt></td><td> </td><td>Vypíše správy záznamu a iné informácie o súboroch RCS.</td></tr>
+<tr><td><tt>rm</tt></td><td> </td><td>Odstráni súbor alebo priečinok.</td></tr>
+<tr><td><tt>rmattr</tt></td><td> </td><td>Odstráni zo súboru atribút. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
+<tr><td><tt>rmdir</tt></td><td> </td><td>Odstráni priečinky.</td></tr>
+<tr><td><tt>rmindex</tt></td><td> </td><td>Odstráni index atribútu. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
+<tr><td><tt>roster</tt></td><td> </td><td>Vypíše informácie o bežiacich tímoch.</td></tr>
+<tr><td><tt>route</tt></td><td> </td><td>Vymenuje a manipuluje smerovanie v sieti.</td></tr>
+<tr><td><tt>safemode</tt></td><td> </td><td>Zistí, či systém beží v núdzovom režime.</td></tr>
+<tr><td><tt>screen_blanker</tt></td><td> </td><td>Spustí šetrič obrazovky.</td></tr>
+<tr><td><tt>screenmode</tt></td><td> </td><td>Zobrazí/nastaví režim obrazovky.</td></tr>
+<tr><td><tt>sdiff</tt></td><td> </td><td>Zobrazí alebo zlúči rozdiely v dvoch súboroch bok po boku. </td></tr>
+<tr><td><tt>seq</tt></td><td> </td><td>Vypíše postupnosť čísel.</td></tr>
+<tr><td><tt>setdecor</tt></td><td> </td><td>Zobrazí/nastaví dekorátor.</td></tr>
+<tr><td><tt>setgcc</tt></td><td> </td><td>Zobrazí/nastaví použitú verziu gcc.</td></tr>
+<tr><td><tt>settype</tt></td><td> </td><td>Nastaví typ MIME, podpis a preferovanú aplikáciu súboru.</td></tr>
+<tr><td><tt>setversion</tt></td><td> </td><td>Zobrazí verziu súboru.</td></tr>
+<tr><td><tt>setvolume</tt></td><td> </td><td>Nastaví systémovú úroveň hlasitosti.</td></tr>
+<tr><td><tt>setwep</tt></td><td> </td><td>Poskytuje šifrovanie WEP pre bezdrôtové siete.</td></tr>
+<tr><td><tt>sh</tt></td><td> </td><td>Pozrite <tt>bash</tt>. </td></tr>
+<tr><td><tt>sha1sum</tt></td><td> </td><td>Vypíše alebo skontroluje kontrolné súčty SHA1. </td></tr>
+<tr><td><tt>shar</tt></td><td> </td><td>Vytvára shell archívy.</td></tr>
+<tr><td><tt>shred</tt></td><td> </td><td>Opakovane prepíše súbor.</td></tr>
+<tr><td><tt>shuf</tt></td><td> </td><td>Vypíše náhodnú permutáciu vstupných čísel. </td></tr>
+<tr><td><tt>shutdown</tt></td><td> </td><td>Vypne počítač.</td></tr>
+<tr><td><tt>sleep</tt></td><td> </td><td>Pozastaví sa na určený počet sekúnd.</td></tr>
+<tr><td><tt>sort</tt></td><td> </td><td>Vypíše usporiadané poradie všetkých súborov.</td></tr>
+<tr><td><tt>spamdbm</tt></td><td> </td><td>Triedi e-mailové správy na legitímne a spam.</td></tr>
+<tr><td><tt>split</tt></td><td> </td><td>Vypisuje časti vstupu s pevnou veľkosťou do súborov s predponami.</td></tr>
+<tr><td><tt>stat</tt></td><td> </td><td>Zobrazí stav súboru alebo súborového systému.</td></tr>
+<tr><td><tt>strace</tt></td><td> </td><td>Trasuje systémové volania vlákna alebo tímu.</td></tr>
+<tr><td><tt>stty</tt></td><td> </td><td>Zobrazí/nastaví charakteristiky terminálu.</td></tr>
+<tr><td><tt>su</tt></td><td> </td><td>Zmení efektívny používateľský id a skupinu.</td></tr>
+<tr><td><tt>sum</tt></td><td> </td><td>Vypíše kontrolný súčet a počet blokov každého súboru.</td></tr>
+<tr><td><tt>sync</tt></td><td> </td><td>Vynúti zápis zmenených blokov na disk, aktualizuje super blok.</td></tr>
+<tr><td><tt>sysinfo</tt></td><td> </td><td>Zobrazí informácie o systéme.</td></tr>
 <tr><td colspan="3"><a id="T" name="T"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>T</h2></a></td></tr>
-<tr><td><tt>tac</tt></td><td> </td><td>Concatenates and prints files, last line first. </td></tr>
-<tr><td><tt>tail</tt></td><td> </td><td>Prints the last ten lines of a file.</td></tr>
-<tr><td><tt>tcpdump</tt></td><td> </td><td>Dumps traffic of a network. </td></tr>
-<tr><td><tt>tcptester</tt></td><td> </td><td>[deprecated] </td></tr>
-<tr><td><tt>tee</tt></td><td> </td><td>Writes or appends data from standard input to a file.</td></tr>
-<tr><td><tt>telnet</tt></td><td> </td><td>User interface to the telnet protocol. </td></tr>
-<tr><td><tt>telnetd</tt></td><td> </td><td>Telnet daemon</td></tr>
-<tr><td><tt>test</tt></td><td> </td><td>Returns true/false after comparing items.</td></tr>
-<tr><td><tt>timeout</tt></td><td> </td><td>Starts a command and kills it if it's still running after a specified number of seconds. </td></tr>
-<tr><td><tt>top</tt></td><td> </td><td>Displays running threads and CPU usage.</td></tr>
-<tr><td><tt>touch</tt></td><td> </td><td>Changes a file's timestamp. </td></tr>
-<tr><td><tt>tput</tt></td><td> </td><td>Initializes a terminal or query terminfo database. </td></tr>
-<tr><td><tt>tr</tt></td><td> </td><td>Translates, squeezes and/or deletes characters from standard input.</td></tr>
-<tr><td><tt>traceroute</tt></td><td> </td><td>Prints the route packets take through a network.</td></tr>
-<tr><td><tt>translate</tt></td><td> </td><td>Uses DataTranslators to convert file formats.</td></tr>
-<tr><td><tt>trash</tt></td><td> </td><td>Sends files to trash or restores them. </td></tr>
-<tr><td><tt>true</tt></td><td> </td><td>Does nothing, indicates "success" and returns the value "0".</td></tr>
-<tr><td><tt>truncate</tt></td><td> </td><td>Shrinks or extends the size of a file.</td></tr>
-<tr><td><tt>tsort</tt></td><td> </td><td>Does a topological sorting.</td></tr>
-<tr><td><tt>tty</tt></td><td> </td><td>Prints the file name of the terminal connected to standard input.</td></tr>
-<tr><td><tt>uname</tt></td><td> </td><td>Prints out system information. </td></tr>
-<tr><td><tt>unchop</tt></td><td> </td><td>Recreates a file previously split with <tt>chop</tt>. </td></tr>
-<tr><td><tt>unexpand</tt></td><td> </td><td>Converts spaces to tabs.</td></tr>
-<tr><td><tt>uniq</tt></td><td> </td><td>Filters adjacent matching lines from input, writing to output. </td></tr>
-<tr><td><tt>unlink</tt></td><td> </td><td>Calls the unlink function to remove the specified file. </td></tr>
-<tr><td><tt>unmount</tt></td><td> </td><td>Unmounts a volume.</td></tr>
-<tr><td><tt>unrar</tt></td><td> </td><td>Expands a rar archive.</td></tr>
-<tr><td><tt>unshar</tt></td><td> </td><td>Expands a shar archive.</td></tr>
-<tr><td><tt>untrash</tt></td><td> </td><td>See <tt>trash</tt>. </td></tr>
-<tr><td><tt>unzip</tt></td><td> </td><td>Expands a zip archive.</td></tr>
-<tr><td><tt>unzipsfx</tt></td><td> </td><td>Used to make existing zip archives self-extracting.</td></tr>
-<tr><td><tt>updatedb</tt></td><td> </td><td>Updates a localization database.</td></tr>
-<tr><td><tt>uptime</tt></td><td> </td><td>Prints date and time, as well as the time elapsed since the system was started. </td></tr>
-<tr><td><tt>urlwrapper</tt></td><td> </td><td>Wraps URL MIME types around command line or other apps that don't handle them directly. </td></tr>
-<tr><td><tt>useradd</tt></td><td> </td><td>Creates a new user. </td></tr>
-<tr><td><tt>uudecode</tt></td><td> </td><td>Decodes a uuencoded file.</td></tr>
-<tr><td><tt>uuencode</tt></td><td> </td><td>Uuencodes a file so it can be mailed to a remote system. </td></tr>
-<tr><td><tt>vdir</tt></td><td> </td><td>Lists information about files. </td></tr>
-<tr><td><tt>version</tt></td><td> </td><td>Returns the version of a file. </td></tr>
-<tr><td><tt>vmstat</tt></td><td> </td><td>Prints information about the virtual memory system.</td></tr>
-<tr><td><tt>waitfor</tt></td><td> </td><td>Waits until a certain thread appears. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>watch</tt></td><td> </td><td>Executes a program periodically. </td></tr>
-<tr><td><tt>wc</tt></td><td> </td><td>Prints the number of paragraphs, words and characters (bytes) of a file. </td></tr>
-<tr><td><tt>wget</tt></td><td> </td><td>Tool for downloading via HTTP, HTTPS or FTP</td></tr>
-<tr><td><tt>which</tt></td><td> </td><td>Locates a command. </td></tr>
-<tr><td><tt>whoami</tt></td><td> </td><td>Prints user name associated with the current effective user ID. </td></tr>
-<tr><td><tt>xargs</tt></td><td> </td><td>Builds and executes command lines from standard input. </td></tr>
-<tr><td><tt>xres</tt></td><td> </td><td>Lists and manipulates resources. </td></tr>
-<tr><td><tt>yes</tt></td><td> </td><td>Prints out a string repeatedly until killed. </td></tr>
-<tr><td><tt>zcat</tt></td><td> </td><td>See <tt>gzip</tt>.</td></tr>
-<tr><td><tt>zcmp</tt></td><td> </td><td>See <tt>zdiff</tt>. </td></tr>
-<tr><td><tt>zdiff</tt></td><td> </td><td>Compares compressed files. </td></tr>
-<tr><td><tt>zforce</tt></td><td> </td><td>Forces a '.gz' extension on gzip files. </td></tr>
-<tr><td><tt>zgrep</tt></td><td> </td><td>Scan through possibly compressed files for a regular expression. </td></tr>
-<tr><td><tt>zip</tt></td><td> </td><td>Adds or replaces items in a zip archive.</td></tr>
-<tr><td><tt>zipcloak</tt></td><td> </td><td>Encrypts all unencrypted items in a zip archive. </td></tr>
-<tr><td><tt>zipgrep</tt></td><td> </td><td>Scans the given zip items for a string or pattern. </td></tr>
-<tr><td><tt>zipinfo</tt></td><td> </td><td>See <tt>unzip</tt>.</td></tr>
-<tr><td><tt>zipnote</tt></td><td> </td><td>Prints the comments in a zip archive.</td></tr>
-<tr><td><tt>zipsplit</tt></td><td> </td><td>Splits a zip archive into smaller pieces. </td></tr>
-<tr><td><tt>zmore</tt></td><td> </td><td>Like <tt>more</tt> but operates on the uncompressed contents of any compressed file.</td></tr>
-<tr><td><tt>znew</tt></td><td> </td><td>Recompresses .Z files into .gz (gzip) archives.</td></tr>
+<tr><td><tt>tac</tt></td><td> </td><td>Zreťazí a vypíše súbory, počínajúc s prvým riadkom.</td></tr>
+<tr><td><tt>tail</tt></td><td> </td><td>Vypíše posledných desať riadkov súboru.</td></tr>
+<tr><td><tt>tcpdump</tt></td><td> </td><td>Zaznamená sieťovú premávku.</td></tr>
+<tr><td><tt>tcptester</tt></td><td> </td><td>[zavrhované] </td></tr>
+<tr><td><tt>tee</tt></td><td> </td><td>Zapíše alebo pripojí dáta zo štandardného vstupu do súboru.</td></tr>
+<tr><td><tt>telnet</tt></td><td> </td><td>Používateľské rozhranie pre protokol telnet.</td></tr>
+<tr><td><tt>telnetd</tt></td><td> </td><td>Démon služby telnet.</td></tr>
+<tr><td><tt>test</tt></td><td> </td><td>Porovná dve položky a vráti hodnotu pravda (ak sa zhodujú) alebo nepravda (ak sa nezhodujú).</td></tr>
+<tr><td><tt>timeout</tt></td><td> </td><td>Spustí príkaz a ukončí ho ak stále beží po určenom počte sekúnd. </td></tr>
+<tr><td><tt>top</tt></td><td> </td><td>Zobrazí bežiace vlákna a využitie CPU.</td></tr>
+<tr><td><tt>touch</tt></td><td> </td><td>Zmení časovú značku súboru.</td></tr>
+<tr><td><tt>tput</tt></td><td> </td><td>Inicializuje terminál alebo odovzdá požiadavku databáze terminfo.</td></tr>
+<tr><td><tt>tr</tt></td><td> </td><td>Preloží, vytlačí a/alebo odstráni znaky zo štandardného vstupu.</td></tr>
+<tr><td><tt>traceroute</tt></td><td> </td><td>Vypíše cestu, ktorou šli pakety v sieti.</td></tr>
+<tr><td><tt>translate</tt></td><td> </td><td>Použije Prekladač dát na prevedenie formátu súboru.</td></tr>
+<tr><td><tt>trash</tt></td><td> </td><td>Pošle súbory do Koša alebo ich z neho obnoví.</td></tr>
+<tr><td><tt>true</tt></td><td> </td><td>Nerobí nič, indikuje „úspech“ a vráti hodnotu „0“.</td></tr>
+<tr><td><tt>truncate</tt></td><td> </td><td>Zmenší alebo roztiahne veľkosť súboru.</td></tr>
+<tr><td><tt>tsort</tt></td><td> </td><td>Vykoná topologické triedenie.</td></tr>
+<tr><td><tt>tty</tt></td><td> </td><td>Vypíše názov súboru terminálu spojeného so štandardným vstupom.</td></tr>
+<tr><td><tt>uname</tt></td><td> </td><td>Vypíše informácie o systéme.</td></tr>
+<tr><td><tt>unchop</tt></td><td> </td><td>Obnoví súbor predtým rozdelený príkazom <tt>chop</tt>. </td></tr>
+<tr><td><tt>unexpand</tt></td><td> </td><td>Konvertuje medzery na tabulátory.</td></tr>
+<tr><td><tt>uniq</tt></td><td> </td><td>Odfiltruje susediace zhodné riadky zo vstupu a zapíše ho na výstup.</td></tr>
+<tr><td><tt>unlink</tt></td><td> </td><td>Zavolá funkciu unlink na odstránenie určeného súboru.</td></tr>
+<tr><td><tt>unmount</tt></td><td> </td><td>Odpojí zväzok.</td></tr>
+<tr><td><tt>unrar</tt></td><td> </td><td>Rozbalí archív rar.</td></tr>
+<tr><td><tt>unshar</tt></td><td> </td><td>Rozbalí archív shar.</td></tr>
+<tr><td><tt>untrash</tt></td><td> </td><td>Pozrite <tt>trash</tt>. </td></tr>
+<tr><td><tt>unzip</tt></td><td> </td><td>Rozbalí archív zip.</td></tr>
+<tr><td><tt>unzipsfx</tt></td><td> </td><td>Používa sa na zmenu existujúcich archívov zip na samo-rozbaľovacie.</td></tr>
+<tr><td><tt>updatedb</tt></td><td> </td><td>Aktualizuje databázu nástroja locate s umiestnením všetkých súborov.</td></tr>
+<tr><td><tt>uptime</tt></td><td> </td><td>Vypíše dátum a čas, ako aj čas uplynutý od spustenia systému.</td></tr>
+<tr><td><tt>urlwrapper</tt></td><td> </td><td>Wrapper pridávajúci podporu typov MIME aplikáciám príkazového riadka alebo iným aplikáciám, ktoré ich priamo nepodporujú.</td></tr>
+<tr><td><tt>useradd</tt></td><td> </td><td>Vytvorí nového používateľa.</td></tr>
+<tr><td><tt>uudecode</tt></td><td> </td><td>Dekóduje súbor zakódovaný algoritmom uuencode.</td></tr>
+<tr><td><tt>uuencode</tt></td><td> </td><td>Zakóduje súbor algoritmom uuencode, aby mohol byť poslaný vzdialenému systému.</td></tr>
+<tr><td><tt>vdir</tt></td><td> </td><td>Vypíše informácie o súboroch.</td></tr>
+<tr><td><tt>version</tt></td><td> </td><td>Vráti verziu súboru.</td></tr>
+<tr><td><tt>vmstat</tt></td><td> </td><td>Vypíše informácie o systéme virtuálnej pamäte.</td></tr>
+<tr><td><tt>waitfor</tt></td><td> </td><td>Čaká, kým sa neobjaví určité vlákno. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
+<tr><td><tt>watch</tt></td><td> </td><td>Spúšťa program periodicky.</td></tr>
+<tr><td><tt>wc</tt></td><td> </td><td>Vypíše počet paragrafov, slov a znakov (bajtov) súboru.</td></tr>
+<tr><td><tt>wget</tt></td><td> </td><td>Nástroj pre sťahovanie cez HTTP, HTTPS alebo FTP</td></tr>
+<tr><td><tt>which</tt></td><td> </td><td>Nájde príkaz.</td></tr>
+<tr><td><tt>whoami</tt></td><td> </td><td>Vypíše meno používateľa spojené s aktuálnym efektívnym ID používateľa.</td></tr>
+<tr><td><tt>xargs</tt></td><td> </td><td>Zostaví a spustí príkazový riadok zo štandardného vstupu.</td></tr>
+<tr><td><tt>xres</tt></td><td> </td><td>Vypíše a manipuluje so zdrojmi.</td></tr>
+<tr><td><tt>yes</tt></td><td> </td><td>Až do ukončenia opakovane vypisuje reťazec.</td></tr>
+<tr><td><tt>zcat</tt></td><td> </td><td>Pozrite <tt>gzip</tt>.</td></tr>
+<tr><td><tt>zcmp</tt></td><td> </td><td>Pozrite <tt>zdiff</tt>. </td></tr>
+<tr><td><tt>zdiff</tt></td><td> </td><td>Porovná skomprimované súbory.</td></tr>
+<tr><td><tt>zforce</tt></td><td> </td><td>Vynúti príponu „.gz“ na súboroch gzip. </td></tr>
+<tr><td><tt>zgrep</tt></td><td> </td><td>Vyhľadá regulárny výraz v súboroch, ktoré môžu byť komprimované.</td></tr>
+<tr><td><tt>zip</tt></td><td> </td><td>Pridá alebo nahradí položky v archíve zip.</td></tr>
+<tr><td><tt>zipcloak</tt></td><td> </td><td>Zašifruje všetky nešifrované položky v archíve zip.</td></tr>
+<tr><td><tt>zipgrep</tt></td><td> </td><td>Vyhľadáva reťazec alebo vzor v daných súboroch zip.</td></tr>
+<tr><td><tt>zipinfo</tt></td><td> </td><td>Pozrite <tt>unzip</tt>.</td></tr>
+<tr><td><tt>zipnote</tt></td><td> </td><td>Vypíše komentáre v archíve zip.</td></tr>
+<tr><td><tt>zipsplit</tt></td><td> </td><td>Rozdelí archív zip na menšie časti.</td></tr>
+<tr><td><tt>zmore</tt></td><td> </td><td>Ako <tt>more</tt>, ale pracuje s nekomprimovaným obsahom akéhokoľvek komprimovaného súboru.</td></tr>
+<tr><td><tt>znew</tt></td><td> </td><td>Rekomprimuje súbory .Z na archívy .gz (gzip).</td></tr>
 </table>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
-<a href="../applications.html#cli-apps" class="uplink">Applications</a>
+<a href="../applications.html#cli-apps" class="uplink">Aplikácie</a>
 ::  <a href="cli-apps.html">Haiku-specific commands</a>  »
 </span></div>
 </div>

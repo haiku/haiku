@@ -10,6 +10,9 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  *		Gerard Stanczak (Google Code-In student)
+ * Translators:
+ *		helix84
+ *		Peter Poláčik
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -51,38 +54,37 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/prefs-images/locale-icon_64.png" alt="locale-icon_64.png" width="64" height="64" />Locale</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
-<tr><td>Location:</td><td></td><td><span class="path">/boot/system/preferences/Locale</span></td></tr>
-<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/Locale settings</span></td></tr>
+<tr><td>Panel:</td><td style="width:15px;"></td><td><span class="menu">Nastavenia</span></td></tr>
+<tr><td>Umiestnenie:</td><td></td><td><span class="path">/boot/system/preferences/Locale</span></td></tr>
+<tr><td>Nastavenia:</td><td></td><td><span class="path">~/config/settings/Locale settings</span></td></tr>
 </table>
 <p><br /></p>
-<p>Haiku's localization system does not only include replacing texts with their translations, but also more complex tasks such as formatting numbers, dates, and times in a way that matches your Locale preferences.</p>
-<div class="box-info">If you would like to help with translations or start with a language that is currently missing, please get in contact on the <a href="http://www.freelists.org/list/haiku-i18n">Haiku-i18n mailing list</a>.</div>
+<p>Lokalizačný systém Haiku zahŕňa nielen nahrádzanie textov ich prekladmi, ale aj komplexnejšie úlohy, ako napríklad formátovanie čísel, dátumov a časov tak, aby vyhovovali nastaveniam Locale, ktoré ste si zvolili.</p>
+<div class="box-info">Ak by ste radi pomohli s prekladom alebo by ste chceli začať s jazykom, ktorý momentálne chýba, prosím, kontaktujte <a href="http://www.freelists.org/list/haiku-i18n">poštovú konferenciu Haiku-i18n</a>.</div>
 <h2>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Language</h2>
-<p>Haiku has been translated to dozens of languages, unfortunately some translations are not complete yet. For that reason, you can choose more than one language as “Preferred languages”. If some text is missing in a translation, it's replaced with the words of the next preferred language. English is the default fallback (also when not listed).</p>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Jazyk</h2>
+<p>Haiku bolo preložené do tuctov jazykov, ale nanešťastie, niektoré z prekladov ešte nie sú dokončené. Z tohto dôvodu si môžete vybrať viac než jeden jazyk ako „Preferované jazyky“. Ak nejaký text chýba v preklade, nahradí sa slovami z nasledujúceho preferovaného jazyka. Angličtina je prednastavená ako posledná záložná možnosť (aj v prípade, že sa nenachádza v zozname).</p>
 <img src="../images/prefs-images/locale-language.png" alt="locale-language.png" />
-<p>In this example, the preferred language is set to Spanish. The first fallback is Italian, and if the text is missing there too, it's back to default English.<br />
-As you can see, expanding a language entry on the left side reveals sub-entries for specific variations or dialects of a language (if available).</p>
+<p>V tomto prípade je ako prednastavený jazyk nastavená španielčina. Prvá záloha je čeština, a ak aj v tomto jazyku text chýba, bude zobrazený jeho anglický ekvivalent.<br />
+Ako môžete vidieť, rozbalenie záznamu jazyka na ľavej strane odhalí pod-záznamy pre konkrétne varianty alebo dialekty jazyka (ak sú dostupné).</p>
 <h2>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Formatting</h2>
-<p>On the <span class="menu">Formatting</span> tab you can set up the formatting of date, time, number and currency formats independently from the settings of your preferred language.</p>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Formátovanie</h2>
+<p>Na záložke <span class="menu">Formátovanie</span> môžete nastaviť formát dátumu, času, čísel a meny nezávisle na nastaveniach vášho prednastaveného jazyka.</p>
 <img src="../images/prefs-images/locale-formatting.png" alt="locale-formatting.png" />
-<p>You may be a Spanish fellow located in the Italian speaking part of Switzerland. So, you'd prefer your system in Spanish, but numbers and currency formatted like at work: Swiss/Italian.<br />
-If you're more comfortable with your Spanish names for days and months (think of the modified dates of files, for example), you can override this time-specific formatting with the checkbox at the top to <span class="menu">Use month/day-names from preferred language</span>.</p>
-<p>Granted, the above example is maybe not the most common scenario, but it demonstrates the flexibility of the system.</p>
+<p>Možno ste španiel žijúci v časti Švajčiarska, kde sa hovorí po taliansky. Takže by ste mali radi váš systém v španielčine, ale čísla a formát meny ako v práci: švajčiarsko/talianske.<br />
+Ak vám je pohodlnejšie pracovať so španielskymi názvami dní a mesiacov (napr. dátum úpravy súboru), môžete upraviť toto formátovanie času pomocou zaškrtávacieho políčka navrchu <span class="menu">Používať názvy mesiacov/dní z preferovaného jazyka</span>.</p>
+<p>Samozrejme, že tento príklad nie je práve najbežnejší, ale ilustruje flexibilitu systému.</p>
 <h2>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Options</h2>
-<p>The last tab provides an option that will <span class="menu">Translate application and folder names in Deskbar and Tracker</span>. Disable the checkbox if you prefer the graphical interface localized, while retaining the original English names for preference panels, applications and standard folder names.</p>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Možnosti</h2>
+<p>Posledná záložka poskytuje nastavenie, ktoré <span class="menu">Prekladá názvy aplikácií v Paneli a Trackeri</span>. Zrušte označenie zaškrtávacieho poľa ak preferujete lokalizované grafické prostredie, pričom budú zachované názvy aplikácií, nastavení a štandardné názvy priečinkov v angličtine.</p>
 <p><br /> </p>
-<p>Changes are applied immediately, though currently running applications may require to be closed and restarted before showing the new setting.</p>
+<p>Zmeny sú aplikované okamžite, ale práve bežiace programy môžu vyžadovať zatvorenie a opätovné spustenie než sa v nich prejaví nové nastavenie.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">Defaults</span></td><td> </td><td>resets everything to default values.</td></tr>
-<tr><td><span class="button">Revert</span></td><td> </td><td>brings back the settings that were active when you started the Locale preferences.</td></tr>
+<tr><td><span class="button">Predvolené</span></td><td> </td><td>obnoví všetky hodnoty na predvolené.</td></tr>
+<tr><td><span class="button">Vrátiť</span></td><td> </td><td>vráti späť nastavenia, ktoré boli aktívne, keď ste spustili nastavenia Locale.</td></tr>
 </table>
 
 </div>
@@ -90,9 +92,9 @@ If you're more comfortable with your Spanish names for days and months (think of
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="keymap.html">Keymap</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="media.html">Media</a>  »
+ «  <a href="keymap.html">Mapa klávesov</a> 
+::  <a href="../preferences.html" class="uplink">Nastavenia</a> 
+::  <a href="media.html">Multimédiá</a>  »
 </span></div>
 </div>
 
