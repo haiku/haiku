@@ -716,6 +716,8 @@ TContentView::MessageReceived(BMessage *msg)
 					break;
 
 				char *signature = (char *)malloc(size);
+				if (signature == NULL)
+					break;
 				ssize_t bytesRead = file.Read(signature, size);
 				if (bytesRead < B_OK) {
 					free (signature);
@@ -2297,6 +2299,9 @@ TTextView::Reader::ParseMail(BMailContainer *container,
 				return false;
 
 			hyper_text *enclosure = (hyper_text *)malloc(sizeof(hyper_text));
+			if (enclosure == NULL)
+				return false;
+
 			memset(enclosure, 0, sizeof(hyper_text));
 
 			enclosure->type = TYPE_ENCLOSURE;
@@ -2324,6 +2329,9 @@ TTextView::Reader::ParseMail(BMailContainer *container,
 				count--;
 		} else if (fIncoming) {
 			hyper_text *enclosure = (hyper_text *)malloc(sizeof(hyper_text));
+			if (enclosure == NULL)
+				return false;
+
 			memset(enclosure, 0, sizeof(hyper_text));
 
 			enclosure->type = TYPE_ENCLOSURE;
@@ -2397,13 +2405,18 @@ TTextView::Reader::Process(const char *data, int32 data_len, bool isHeader)
 				count = 0;
 
 				hyper_text *enclosure = (hyper_text *)malloc(sizeof(hyper_text));
+				if (enclosure == NULL)
+					return false;
+
 				memset(enclosure, 0, sizeof(hyper_text));
 				fView->GetSelection(&enclosure->text_start,
 									&enclosure->text_end);
 				enclosure->type = type;
 				enclosure->name = strdup(url.String());
-				if (enclosure->name == NULL)
+				if (enclosure->name == NULL) {
+					free(enclosure);
 					return false;
+				}
 
 				Insert(&data[loop], urlLength, true, isHeader);
 				enclosure->text_end += urlLength;
