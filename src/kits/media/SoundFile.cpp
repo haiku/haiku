@@ -310,7 +310,7 @@ status_t
 BSoundFile::_ref_to_file(const entry_ref *ref)
 {
 	status_t status;
-	BFile * file = new BFile(ref,B_READ_ONLY);
+	BFile * file = new BFile(ref, B_READ_ONLY);
 	status = file->InitCheck();
 	if (status != B_OK) {
 		fSoundFile = file;
@@ -326,9 +326,9 @@ BSoundFile::_ref_to_file(const entry_ref *ref)
 	media_file_format mfi;
 	media->GetFileFormatInfo(&mfi);
 	switch (mfi.family) {
-	case B_AIFF_FORMAT_FAMILY: fFileFormat = B_AIFF_FILE; break;
-	case B_WAV_FORMAT_FAMILY:  fFileFormat = B_WAVE_FILE; break;
-	default:                fFileFormat = B_UNKNOWN_FILE; break;
+		case B_AIFF_FORMAT_FAMILY: fFileFormat = B_AIFF_FILE; break;
+		case B_WAV_FORMAT_FAMILY:  fFileFormat = B_WAVE_FILE; break;
+		default:                fFileFormat = B_UNKNOWN_FILE; break;
 	}
 	int trackNum = 0;
 	BMediaTrack * track = 0;
@@ -353,29 +353,33 @@ BSoundFile::_ref_to_file(const entry_ref *ref)
 		delete file;
 		return B_ERROR;
 	}
-	media_raw_audio_format * raw = 0;	
+	media_raw_audio_format * raw = 0;
 	if (mf.type == B_MEDIA_ENCODED_AUDIO) {
 		raw = &mf.u.encoded_audio.output;
 	}
 	if (mf.type == B_MEDIA_RAW_AUDIO) {
 		raw = &mf.u.raw_audio;
 	}
+
+	if (raw == NULL)
+		return B_ERROR;
+
 	fSamplingRate = (int)raw->frame_rate;
 	fChannelCount = raw->channel_count;
 	fSampleSize = raw->format & 0xf;
 	fByteOrder = raw->byte_order;
 	switch (raw->format) {
-	case media_raw_audio_format::B_AUDIO_FLOAT: 
-		fSampleFormat = B_FLOAT_SAMPLES;
-		break;
-	case media_raw_audio_format::B_AUDIO_INT:
-	case media_raw_audio_format::B_AUDIO_SHORT: 
-	case media_raw_audio_format::B_AUDIO_UCHAR:
-	case media_raw_audio_format::B_AUDIO_CHAR:
-		fSampleFormat = B_LINEAR_SAMPLES;
-		break;
-	default:
-		fSampleFormat = B_UNDEFINED_SAMPLES;
+		case media_raw_audio_format::B_AUDIO_FLOAT: 
+			fSampleFormat = B_FLOAT_SAMPLES;
+			break;
+		case media_raw_audio_format::B_AUDIO_INT:
+		case media_raw_audio_format::B_AUDIO_SHORT: 
+		case media_raw_audio_format::B_AUDIO_UCHAR:
+		case media_raw_audio_format::B_AUDIO_CHAR:
+			fSampleFormat = B_LINEAR_SAMPLES;
+			break;
+		default:
+			fSampleFormat = B_UNDEFINED_SAMPLES;
 	}
 	fByteOffset = 0;
 	fFrameCount = track->CountFrames();
