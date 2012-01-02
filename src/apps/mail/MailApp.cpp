@@ -131,11 +131,11 @@ TMailApp::TMailApp()
 		TITLE_BAR_HEIGHT + kSigHeight);
 	fPrefsWindowPos.Set(6, TITLE_BAR_HEIGHT);
 
-	const BCharacterSet *defaultComposeEncoding = 
+	const BCharacterSet *defaultComposeEncoding =
 		BCharacterSetRoster::FindCharacterSetByName(
 		B_TRANSLATE_COMMENT("UTF-8", "This string is used as a key to set "
 		"default message compose encoding. It must be correct IANA name from "
-		"http://cgit.haiku-os.org/haiku-tree/src/kits/textencoding"
+		"http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding"
 		"/character_sets.cpp Translate it only if you want to change default "
 		"message compose encoding for your locale. If you don't know what is "
 		"it and why it may needs changing, just leave \"UTF-8\"."));
