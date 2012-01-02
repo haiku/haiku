@@ -1470,7 +1470,8 @@ public:
  * printed to stderr rather than showing up in a dialog box.
  */
 
-static void DisplayErrorMessage (
+static void
+DisplayErrorMessage (
   const char *MessageString = NULL,
   int ErrorNumber = 0,
   const char *TitleString = NULL)
@@ -1514,7 +1515,8 @@ static void DisplayErrorMessage (
  * result on the given output stream.
  */
 
-static void WrapTextToStream (ostream& OutputStream, const char *TextPntr)
+static void
+WrapTextToStream (ostream& OutputStream, const char *TextPntr)
 {
   const int LineLength = 79;
   char     *StringPntr;
@@ -1696,7 +1698,8 @@ ostream& PrintUsage (ostream& OutputStream)
  * int, so now it has slightly different names depending on the arguments.
  */
 
-static void SubmitCommand (BMessage& CommandMessage)
+static void
+SubmitCommand (BMessage& CommandMessage)
 {
   status_t ErrorCode;
 
@@ -1710,7 +1713,8 @@ static void SubmitCommand (BMessage& CommandMessage)
 }
 
 
-static void SubmitCommandString (
+static void
+SubmitCommandString (
   PropertyNumbers Property,
   uint32 CommandCode,
   const char *StringArgument = NULL)
@@ -1729,7 +1733,8 @@ static void SubmitCommandString (
 }
 
 
-static void SubmitCommandInt32 (
+static void
+SubmitCommandInt32 (
   PropertyNumbers Property,
   uint32 CommandCode,
   int32 Int32Argument)
@@ -1747,7 +1752,8 @@ static void SubmitCommandInt32 (
 }
 
 
-static void SubmitCommandBool (
+static void
+SubmitCommandBool (
   PropertyNumbers Property,
   uint32 CommandCode,
   bool BoolArgument)
@@ -1776,7 +1782,8 @@ static void SubmitCommandBool (
  * view.
  */
 
-static void EstimateRefFilesAndDisplay (BMessage *MessagePntr)
+static void
+EstimateRefFilesAndDisplay (BMessage *MessagePntr)
 {
   BAlert     *AlertPntr;
   BEntry      Entry;
@@ -1970,7 +1977,8 @@ of words, checking for maximum word length and prepending the prefix to the
 word, which gets modified by this function to reflect the word actually added
 to the set. */
 
-static void AddWordAndPrefixToSet (
+static void
+AddWordAndPrefixToSet (
   string &Word,
   const char *PrefixString,
   set<string> &WordSet)
@@ -2490,7 +2498,8 @@ ABSApp::~ABSApp ()
 
 /* Display a box showing information about this program. */
 
-void ABSApp::AboutRequested ()
+void
+ABSApp::AboutRequested ()
 {
   BAlert *AboutAlertPntr;
 
@@ -2770,7 +2779,8 @@ the PrefixCharacter isn't zero then it is prepended to all words found (so you
 can distinguish words as being from a header or from the body text).  See also
 TokenizeWhole which does something similar. */
 
-void ABSApp::AddWordsToSet (
+void
+ABSApp::AddWordsToSet (
   const char *InputString,
   size_t NumberOfBytes,
   char PrefixCharacter,
@@ -2830,7 +2840,8 @@ asynchronously converted into a scripting message(s) that are sent back to this
 BApplication.  The intermediary is needed since we can't recursively execute
 scripting messages while processing a message (this ArgsReceived one). */
 
-void ABSApp::ArgvReceived (int32 argc, char **argv)
+void
+ABSApp::ArgvReceived (int32 argc, char **argv)
 {
   if (g_CommanderLooperPntr != NULL)
     g_CommanderLooperPntr->CommandArguments (argc, argv);
@@ -2853,7 +2864,8 @@ status_t ABSApp::CreateDatabaseFile (char *ErrorMessage)
 /* Set the settings to the defaults.  Needed in case there isn't a settings
 file or it is obsolete. */
 
-void ABSApp::DefaultSettings ()
+void
+ABSApp::DefaultSettings ()
 {
   status_t ErrorCode;
   BPath    DatabasePath (m_SettingsDirectoryPath);
@@ -3997,7 +4009,8 @@ ErrorExit: /* Error message in TempString, code in ErrorCode. */
 }
 
 
-void ABSApp::MessageReceived (BMessage *MessagePntr)
+void
+ABSApp::MessageReceived (BMessage *MessagePntr)
 {
   const char           *PropertyName;
   struct property_info *PropInfoPntr;
@@ -4105,7 +4118,8 @@ status_t ABSApp::MakeBackup (char *ErrorMessage)
 }
 
 
-void ABSApp::MakeDatabaseEmpty ()
+void
+ABSApp::MakeDatabaseEmpty ()
 {
   m_WordMap.clear (); /* Sets the map to empty, deallocating any old data. */
   m_WordCount = 0;
@@ -4122,7 +4136,8 @@ resulting data for a get or count command.  If it isn't understood, then rather
 than a B_REPLY kind of message, it will be a B_MESSAGE_NOT_UNDERSTOOD message
 with an "error" number and an "message" string with a description. */
 
-void ABSApp::ProcessScriptingMessage (
+void
+ABSApp::ProcessScriptingMessage (
   BMessage *MessagePntr,
   struct property_info *PropInfoPntr)
 {
@@ -4642,7 +4657,8 @@ message in case one client tells us to quit while another one is still using us
 (happens when you have two or more e-mail accounts).  But if the system is
 shutting down, quit immediately! */
 
-void ABSApp::Pulse ()
+void
+ABSApp::Pulse ()
 {
   if (g_QuitCountdown == 0)
   {
@@ -4662,7 +4678,8 @@ void ABSApp::Pulse ()
 allow the request, otherwise reject it (and start the countdown if it hasn't
 been started). */
 
-bool ABSApp::QuitRequested ()
+bool
+ABSApp::QuitRequested ()
 {
   BMessage  *QuitMessage;
   team_info  RemoteInfo;
@@ -4699,7 +4716,8 @@ equivalent to the number of messages added to the database) and too unpopular
 are just hunks of binary or other garbage.  The database has been loaded
 elsewhere. */
 
-status_t ABSApp::PurgeOldWords (char *ErrorMessage)
+status_t
+ABSApp::PurgeOldWords (char *ErrorMessage)
 {
   uint32                  CurrentTime;
   StatisticsMap::iterator CurrentIter;
@@ -4713,14 +4731,12 @@ status_t ABSApp::PurgeOldWords (char *ErrorMessage)
 
   EndIter = m_WordMap.end ();
   NextIter = m_WordMap.begin ();
-  while (NextIter != EndIter)
-  {
+  while (NextIter != EndIter) {
     CurrentIter = NextIter++;
 
     if (CurrentTime - CurrentIter->second.age >= m_PurgeAge &&
     CurrentIter->second.genuineCount + CurrentIter->second.spamCount <=
-    m_PurgePopularity)
-    {
+    m_PurgePopularity) {
       /* Delete this word, it is unpopular and old.  Sob. */
 
       m_WordMap.erase (CurrentIter);
@@ -4738,10 +4754,9 @@ status_t ABSApp::PurgeOldWords (char *ErrorMessage)
 
   /* Just a little bug check here.  Just in case. */
 
-  if (m_WordCount != m_WordMap.size ())
-  {
+  if (m_WordCount != m_WordMap.size ()) {
     sprintf (TempString, "Our word count of %lu doesn't match the "
-      "size of the database, %lu", m_WordCount, m_WordMap.size ());
+      "size of the database, %lu", m_WordCount, m_WordMap.size());
     DisplayErrorMessage (TempString, -1, "Bug!");
     m_WordCount = m_WordMap.size ();
   }
@@ -4750,7 +4765,8 @@ status_t ABSApp::PurgeOldWords (char *ErrorMessage)
 }
 
 
-void ABSApp::ReadyToRun ()
+void
+ABSApp::ReadyToRun ()
 {
   DatabaseWindow *DatabaseWindowPntr;
   float           JunkFloat;
@@ -4784,10 +4800,10 @@ void ABSApp::ReadyToRun ()
   attached to our window, then resize it to its prefered size so that it
   accomodates the font size and other frills it needs. */
 
-  TempWindowPntr = new BWindow (BRect (10, 20, 200, 200), "Temporary Window",
-    B_DOCUMENT_WINDOW, B_NO_WORKSPACE_ACTIVATION | B_ASYNCHRONOUS_CONTROLS);
-  if (TempWindowPntr == NULL)
-  {
+  TempWindowPntr = new (std::nothrow) BWindow (BRect (10, 20, 200, 200),
+	"Temporary Window", B_DOCUMENT_WINDOW,
+	B_NO_WORKSPACE_ACTIVATION | B_ASYNCHRONOUS_CONTROLS);
+  if (TempWindowPntr == NULL) {
     DisplayErrorMessage ("Unable to create temporary window for finding "
       "sizes of controls.");
     g_QuitCountdown = 0;
@@ -4798,14 +4814,13 @@ void ABSApp::ReadyToRun ()
 
   /* Find the height of a single line of text in a BStringView. */
 
-  TempStringViewPntr = new BStringView (TempRect, TempString, TempString);
-  if (TempStringViewPntr != NULL)
-  {
-    TempWindowPntr->Lock ();
+  TempStringViewPntr = new (std::nothrow) BStringView (TempRect, TempString, TempString);
+  if (TempStringViewPntr != NULL) {
+    TempWindowPntr->Lock();
     TempWindowPntr->AddChild (TempStringViewPntr);
     TempStringViewPntr->GetPreferredSize (&JunkFloat, &g_StringViewHeight);
     TempWindowPntr->RemoveChild (TempStringViewPntr);
-    TempWindowPntr->Unlock ();
+    TempWindowPntr->Unlock();
     delete TempStringViewPntr;
   }
 
@@ -4813,23 +4828,21 @@ void ABSApp::ReadyToRun ()
   control and can make life difficult.  Make a temporary button, which
   is attached to our window so that it resizes to accomodate the font size. */
 
-  TempButtonPntr = new BButton (TempRect, TempString, TempString, NULL);
-  if (TempButtonPntr != NULL)
-  {
-    TempWindowPntr->Lock ();
+  TempButtonPntr = new (std::nothrow) BButton (TempRect, TempString, TempString, NULL);
+  if (TempButtonPntr != NULL) {
+    TempWindowPntr->Lock();
     TempWindowPntr->AddChild (TempButtonPntr);
     TempButtonPntr->GetPreferredSize (&JunkFloat, &g_ButtonHeight);
     TempWindowPntr->RemoveChild (TempButtonPntr);
-    TempWindowPntr->Unlock ();
+    TempWindowPntr->Unlock();
     delete TempButtonPntr;
   }
 
   /* Find the height of a text box. */
 
-  TempTextPntr = new BTextControl (TempRect, TempString, NULL /* label */,
+  TempTextPntr = new (std::nothrow) BTextControl (TempRect, TempString, NULL /* label */,
     TempString, NULL);
-  if (TempTextPntr != NULL)
-  {
+  if (TempTextPntr != NULL) {
     TempWindowPntr->Lock ();
     TempWindowPntr->AddChild (TempTextPntr);
     TempTextPntr->GetPreferredSize (&JunkFloat, &g_TextBoxHeight);
@@ -4840,9 +4853,8 @@ void ABSApp::ReadyToRun ()
 
   /* Find the height of a checkbox control. */
 
-  TempCheckBoxPntr = new BCheckBox (TempRect, TempString, TempString, NULL);
-  if (TempCheckBoxPntr != NULL)
-  {
+  TempCheckBoxPntr = new (std::nothrow) BCheckBox (TempRect, TempString, TempString, NULL);
+  if (TempCheckBoxPntr != NULL) {
     TempWindowPntr->Lock ();
     TempWindowPntr->AddChild (TempCheckBoxPntr);
     TempCheckBoxPntr->GetPreferredSize (&JunkFloat, &g_CheckBoxHeight);
@@ -4854,9 +4866,8 @@ void ABSApp::ReadyToRun ()
   /* Find the height of a radio button control. */
 
   TempRadioButtonPntr =
-    new BRadioButton (TempRect, TempString, TempString, NULL);
-  if (TempRadioButtonPntr != NULL)
-  {
+    new (std::nothrow) BRadioButton (TempRect, TempString, TempString, NULL);
+  if (TempRadioButtonPntr != NULL) {
     TempWindowPntr->Lock ();
     TempWindowPntr->AddChild (TempRadioButtonPntr);
     TempRadioButtonPntr->GetPreferredSize (&JunkFloat, &g_RadioButtonHeight);
@@ -4867,11 +4878,11 @@ void ABSApp::ReadyToRun ()
 
   /* Find the height of a pop-up menu. */
 
-  TempMenuBarPntr = new BMenuBar (TempRect, TempString,
+  TempMenuBarPntr = new (std::nothrow) BMenuBar (TempRect, TempString,
     B_FOLLOW_LEFT | B_FOLLOW_TOP, B_ITEMS_IN_COLUMN,
     true /* resize to fit items */);
-  TempPopUpMenuPntr = new BPopUpMenu (TempString);
-  TempMenuItemPntr = new BMenuItem (TempString, new BMessage (12345), 'g');
+  TempPopUpMenuPntr = new (std::nothrow) BPopUpMenu (TempString);
+  TempMenuItemPntr = new (std::nothrow) BMenuItem (TempString, new BMessage (12345), 'g');
 
   if (TempMenuBarPntr != NULL && TempPopUpMenuPntr != NULL &&
   TempMenuItemPntr != NULL)
@@ -4896,13 +4907,11 @@ void ABSApp::ReadyToRun ()
     g_QuitCountdown = 0; /* Quit as soon as queued up commands done. */
   else /* GUI mode, make a window. */
   {
-    DatabaseWindowPntr = new DatabaseWindow ();
-    if (DatabaseWindowPntr == NULL)
-    {
+    DatabaseWindowPntr = new (std::nothrow) DatabaseWindow ();
+    if (DatabaseWindowPntr == NULL) {
       DisplayErrorMessage ("Unable to create window.");
       g_QuitCountdown = 0;
-    }
-    else {
+    } else {
       DatabaseWindowPntr->Show (); /* Starts the window's message loop. */
     }
   }
@@ -4916,7 +4925,8 @@ it.  If the tokenize mode specifies that it isn't one of the ones we are
 looking for, just skip it.  For container type components, recursively examine
 their contents, up to the maximum depth specified. */
 
-status_t ABSApp::RecursivelyTokenizeMailComponent (
+status_t
+ABSApp::RecursivelyTokenizeMailComponent (
   BMailComponent *ComponentPntr,
   const char *OptionalFileName,
   set<string> &WordSet,
@@ -5084,7 +5094,8 @@ asynchronously converted into a scripting message(s) that are sent back to this
 BApplication.  The intermediary is needed since we can't recursively execute
 scripting messages while processing a message (this RefsReceived one). */
 
-void ABSApp::RefsReceived (BMessage *MessagePntr)
+void
+ABSApp::RefsReceived (BMessage *MessagePntr)
 {
   if (g_CommanderLooperPntr != NULL)
     g_CommanderLooperPntr->CommandReferences (MessagePntr);
@@ -5339,7 +5350,8 @@ ClassificationChoicesWindow::ClassificationChoicesWindow (
 }
 
 
-void ClassificationChoicesWindow::MessageReceived (BMessage *MessagePntr)
+void
+ClassificationChoicesWindow::MessageReceived (BMessage *MessagePntr)
 {
   BControl *ControlPntr;
 
@@ -5371,7 +5383,8 @@ void ClassificationChoicesWindow::MessageReceived (BMessage *MessagePntr)
 }
 
 
-void ClassificationChoicesWindow::Go (
+void
+ClassificationChoicesWindow::Go (
   bool *BulkModeSelectedPntr,
   ClassificationTypes *ChoosenClassificationPntr)
 {
@@ -5437,7 +5450,8 @@ ClassificationChoicesView::ClassificationChoicesView (
 }
 
 
-void ClassificationChoicesView::AttachedToWindow ()
+void
+ClassificationChoicesView::AttachedToWindow ()
 {
   BButton            *ButtonPntr;
   BCheckBox          *CheckBoxPntr;
@@ -5537,7 +5551,8 @@ void ClassificationChoicesView::AttachedToWindow ()
 }
 
 
-void ClassificationChoicesView::GetPreferredSize (float *width, float *height)
+void
+ClassificationChoicesView::GetPreferredSize (float *width, float *height)
 {
   if (width != NULL)
     *width = Bounds().Width();
@@ -5571,7 +5586,8 @@ CommanderLooper::~CommanderLooper ()
 looper itself to do the work later.  That way the caller can continue doing
 whatever they're doing, particularly if it's the BApplication. */
 
-void CommanderLooper::CommandArguments (int argc, char **argv)
+void
+CommanderLooper::CommandArguments (int argc, char **argv)
 {
   int      i;
   BMessage InternalMessage;
@@ -5590,7 +5606,8 @@ and if it is Tracker, it can close the file handles it has open).  Optionally
 allow preset classification rather than asking the user (set BulkMode to TRUE
 and specify the class with BulkClassification). */
 
-void CommanderLooper::CommandReferences (
+void
+CommanderLooper::CommandReferences (
   BMessage *MessagePntr,
   bool BulkMode,
   ClassificationTypes BulkClassification)
@@ -5612,7 +5629,8 @@ void CommanderLooper::CommandReferences (
 /* This function is called by other threads to see if the CommanderLooper is
 busy working on something. */
 
-bool CommanderLooper::IsBusy ()
+bool 
+CommanderLooper::IsBusy ()
 {
   if (m_IsBusy)
     return true;
@@ -5624,7 +5642,9 @@ bool CommanderLooper::IsBusy ()
 }
 
 
-void CommanderLooper::MessageReceived (BMessage *MessagePntr)
+void
+
+CommanderLooper::MessageReceived (BMessage *MessagePntr)
 {
   m_IsBusy = true;
 
@@ -5643,7 +5663,8 @@ void CommanderLooper::MessageReceived (BMessage *MessagePntr)
 messages (possibly thousands) and sent them to the BApplication synchronously
 (so we can print the result). */
 
-void CommanderLooper::ProcessArgs (BMessage *MessagePntr)
+void
+CommanderLooper::ProcessArgs (BMessage *MessagePntr)
 {
   int32                 argc = 0;
   const char          **argv = NULL;
@@ -5883,7 +5904,8 @@ and add them to the database.  Prompt the user for the spam or genuine or
 uncertain (declassification) choice, with the option to bulk mark many files at
 once. */
 
-void CommanderLooper::ProcessRefs (BMessage *MessagePntr)
+void
+CommanderLooper::ProcessRefs (BMessage *MessagePntr)
 {
   bool                         BulkMode = false;
   ClassificationTypes          BulkClassification = CL_GENUINE;
@@ -6087,7 +6109,8 @@ ControlsView::~ControlsView ()
 }
 
 
-void ControlsView::AttachedToWindow ()
+void
+ControlsView::AttachedToWindow ()
 {
   float         BigPurgeButtonTop;
   BMessage      CommandMessage;
@@ -6673,7 +6696,8 @@ ErrorExit:
 }
 
 
-void ControlsView::BrowseForDatabaseFile ()
+void
+ControlsView::BrowseForDatabaseFile ()
 {
   if (m_BrowseFilePanelPntr == NULL)
   {
@@ -6723,7 +6747,8 @@ void ControlsView::BrowseForDatabaseFile ()
 }
 
 
-void ControlsView::BrowseForFileToEstimate ()
+void
+ControlsView::BrowseForFileToEstimate ()
 {
   if (m_EstimateSpamFilePanelPntr == NULL)
   {
@@ -6785,14 +6810,16 @@ show the new size (the sub-items need to be resized too).  Then make it redraw.
 Well, actually just resetting the mark on the current item will resize it
 properly. */
 
-void ControlsView::FrameResized (float, float)
+void
+ControlsView::FrameResized (float, float)
 {
   m_ScoringModeCachedValue = SM_MAX; /* Force it to reset the mark. */
   m_TokenizeModeCachedValue = TM_MAX; /* Force it to reset the mark. */
 }
 
 
-void ControlsView::MessageReceived (BMessage *MessagePntr)
+void
+ControlsView::MessageReceived (BMessage *MessagePntr)
 {
   BMessage CommandMessage;
   bool     TempBool;
@@ -6859,7 +6886,8 @@ commands will be in the queue ahead of our requests for info).  Instead, we
 lock the BApplication (so it isn't changing things while we're looking) and
 retrieve our values. */
 
-void ControlsView::PollServerForChanges ()
+void
+ControlsView::PollServerForChanges ()
 {
   ABSApp     *MyAppPntr;
   BMenuItem  *TempMenuItemPntr;
@@ -7017,7 +7045,8 @@ void ControlsView::PollServerForChanges ()
 }
 
 
-void ControlsView::Pulse ()
+void
+ControlsView::Pulse ()
 {
   if (system_time () > m_TimeOfLastPoll + 200000)
   {
@@ -7070,7 +7099,8 @@ ErrorExit:
 }
 
 
-void DatabaseWindow::MessageReceived (BMessage *MessagePntr)
+void
+DatabaseWindow::MessageReceived (BMessage *MessagePntr)
 {
   if (MessagePntr->what == B_MOUSE_WHEEL_CHANGED)
   {
@@ -7086,7 +7116,8 @@ void DatabaseWindow::MessageReceived (BMessage *MessagePntr)
 }
 
 
-bool DatabaseWindow::QuitRequested ()
+bool
+DatabaseWindow::QuitRequested ()
 {
   be_app->PostMessage (B_QUIT_REQUESTED);
   return true;
@@ -7139,7 +7170,8 @@ WordsView::WordsView (BRect NewBounds)
 }
 
 
-void WordsView::AttachedToWindow ()
+void
+WordsView::AttachedToWindow ()
 {
   BPolygon        DownLinePolygon (g_DownLinePoints,
                     sizeof (g_DownLinePoints) /
@@ -7280,7 +7312,8 @@ available (if it isn't, don't draw, a redraw will usually be requested by the
 Pulse member function when it keeps on noticing that the stuff on the display
 doesn't match the database). */
 
-void WordsView::Draw (BRect UpdateRect)
+void
+WordsView::Draw (BRect UpdateRect)
 {
   float                   AgeDifference;
   float                   AgeProportion;
@@ -7503,7 +7536,8 @@ the view (it's the word at or lexicographically after the word typed in).  The
 keys are appended to the starting word, until the user stops typing for a
 while, then the next key will be the first letter of a new starting word. */
 
-void WordsView::KeyDown (const char *BufferPntr, int32 NumBytes)
+void
+WordsView::KeyDown (const char *BufferPntr, int32 NumBytes)
 {
   int32          CharLength;
   bigtime_t      CurrentTime;
@@ -7553,7 +7587,8 @@ void WordsView::KeyDown (const char *BufferPntr, int32 NumBytes)
 /* Change the background colour to show that we have the focus.  When we have
 it, keystrokes will select the word to be displayed at the top of the list. */
 
-void WordsView::MakeFocus (bool Focused)
+void
+WordsView::MakeFocus (bool Focused)
 {
   if (Focused)
     m_BackgroundColour = m_FocusedColour;
@@ -7595,7 +7630,8 @@ void WordsView::MakeFocus (bool Focused)
 }
 
 
-void WordsView::MessageReceived (BMessage *MessagePntr)
+void
+WordsView::MessageReceived (BMessage *MessagePntr)
 {
   int32     CountFound;
   float     DeltaY; /* Usually -1.0, 0.0 or +1.0. */
@@ -7636,14 +7672,16 @@ void WordsView::MessageReceived (BMessage *MessagePntr)
 
 /* If the user clicks on our view, take over the focus. */
 
-void WordsView::MouseDown (BPoint)
+void
+WordsView::MouseDown (BPoint)
 {
   if (!IsFocus ())
     MakeFocus (true);
 }
 
 
-void WordsView::MoveTextUpOrDown (uint32 MovementType)
+void
+WordsView::MoveTextUpOrDown (uint32 MovementType)
 {
   StatisticsMap::iterator  DataIter;
   int                      i;
@@ -7709,7 +7747,8 @@ changed.  If the word list is different or the display has changed in some
 other way, it will then try to refresh the display, repeating the attempt until
 it gets successfully drawn. */
 
-void WordsView::Pulse ()
+void
+WordsView::Pulse ()
 {
   ABSApp *MyAppPntr;
 
@@ -7731,7 +7770,8 @@ it is in the left third, add the file(s) as examples of genuine messages, right
 third for spam messages and if it is in the middle third then evaluate the
 file(s) for spaminess. */
 
-void WordsView::RefsDroppedHere (BMessage *MessagePntr)
+void
+WordsView::RefsDroppedHere (BMessage *MessagePntr)
 {
   float  Left;
   bool   SpamExample = true; /* TRUE if example is of spam, FALSE genuine. */
