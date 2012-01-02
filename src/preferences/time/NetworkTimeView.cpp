@@ -175,8 +175,10 @@ Settings::SettingsChanged()
 		return true;
 	fOldMessage.Flatten(oldBytes, oldSize);
 	char* newBytes = new (std::nothrow) char[newSize];
-	if (newBytes == NULL)
+	if (newBytes == NULL) {
+		delete[] oldBytes;
 		return true;
+	}
 	fMessage.Flatten(newBytes, newSize);
 	
 	int result = memcmp(oldBytes, newBytes, oldSize);
