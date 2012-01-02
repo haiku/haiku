@@ -91,7 +91,7 @@ Preferences::~Preferences()
 		BFile file;
 		status_t set = B_ERROR;
 		if (fSettingsFile)
-			file.SetTo (fSettingsFile, B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
+			file.SetTo(fSettingsFile, B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
 		else {
 			BPath prefpath;
 			if (find_directory(B_USER_SETTINGS_DIRECTORY, &prefpath, true) == B_OK) {
@@ -121,6 +121,7 @@ Preferences::~Preferences()
 			alert->Go();
 		}
 	}
+	delete fSettingsFile;
 	free(fName);
 	free(fSignature);
 }
