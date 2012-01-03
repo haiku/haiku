@@ -5,8 +5,8 @@
 */
 
 
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <Directory.h>
 #include <E-mail.h>
