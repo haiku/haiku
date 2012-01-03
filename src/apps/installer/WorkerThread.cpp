@@ -527,6 +527,7 @@ WorkerThread::_MirrorIndices(const BPath& sourceDirectory,
 			continue;
 		}
 	}
+	fs_close_index_dir(indices);
 	return B_OK;
 }
 
