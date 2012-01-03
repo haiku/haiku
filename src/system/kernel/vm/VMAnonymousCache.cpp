@@ -1342,8 +1342,10 @@ swap_init_post_modules()
 
 	void* settings = load_driver_settings("virtual_memory");
 	if (settings != NULL) {
-		if (!get_driver_boolean_parameter(settings, "vm", false, false))
+		if (!get_driver_boolean_parameter(settings, "vm", false, false)) {
+			unload_driver_settings(settings);
 			return;
+		}
 
 		const char* string = get_driver_parameter(settings, "swap_size", NULL,
 			NULL);
