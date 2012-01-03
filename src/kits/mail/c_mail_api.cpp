@@ -6,6 +6,7 @@
 
 
 #include <string.h>
+#include <stdlib.h>
 
 #include <Directory.h>
 #include <E-mail.h>
@@ -86,6 +87,7 @@ get_pop_account(mail_pop_account* account, int32 index)
 		password = passwd;
 	strcpy(account->pop_password, password);
 
+	free((char *)passwd);
 	return B_OK;
 }
 
