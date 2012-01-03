@@ -535,6 +535,7 @@ BIconUtils::ConvertFromCMAP8(const uint8* src, uint32 width, uint32 height,
 			uint8* convertedBits = (uint8*)converted->Bits();
 			int32 convertedBPR = converted->BytesPerRow();
 			scale2x(convertedBits, dst, width, height, convertedBPR, dstBPR);
+			delete converted;
 		} else {
 			// bilinear scaling
 			scale_bilinear(dst, width, height, dstWidth, dstHeight, dstBPR);
