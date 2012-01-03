@@ -101,6 +101,7 @@ archive_bitmap(const BBitmap* bitmap, BMessage* into, const char* fieldName)
 				ret = into->AddRect("construction bounds", bitmap->Bounds());
 			if (ret >= B_OK)
 				ret = into->AddInt32("format", bitmap->ColorSpace());
+			free(buffer);
 		}
 	}
 	return ret;
