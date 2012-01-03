@@ -615,7 +615,7 @@ TermView::_InitObject(const ShellParameters& shellParameters)
 	
 	const BCharacterSet* charset
 		= BCharacterSetRoster::GetCharacterSetByConversionID(fEncoding);
-	modifiedShellParameters.SetEncoding(!charset ? charset->GetName() : "UTF-8");
+	modifiedShellParameters.SetEncoding(charset ? charset->GetName() : "UTF-8");
 
 	error = fShell->Open(fRows, fColumns, modifiedShellParameters);
 
