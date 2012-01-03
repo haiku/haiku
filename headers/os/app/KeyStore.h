@@ -41,12 +41,10 @@ public:
 									bool secondaryIdentifierOptional,
 									BKey& key);
 
-			status_t			RegisterKey(const BKey& key);
-			status_t			RegisterKey(const char* keyring,
-									const BKey& key);
-			status_t			UnregisterKey(const BKey& key);
-			status_t			UnregisterKey(const char* keyring,
-									const BKey& key);
+			status_t			AddKey(const BKey& key);
+			status_t			AddKey(const char* keyring, const BKey& key);
+			status_t			RemoveKey(const BKey& key);
+			status_t			RemoveKey(const char* keyring, const BKey& key);
 
 			status_t			GetNextKey(uint32& cookie, BKey& key);
 			status_t			GetNextKey(BKeyType type, BKeyPurpose purpose,
@@ -59,9 +57,9 @@ public:
 
 			// Keyrings
 
-			status_t			RegisterKeyring(const char* keyring,
+			status_t			AddKeyring(const char* keyring,
 									const BKey& key);
-			status_t			UnregisterKeyring(const char* keyring);
+			status_t			RemoveKeyring(const char* keyring);
 
 			status_t			GetNextKeyring(uint32& cookie,
 									BString& keyring);

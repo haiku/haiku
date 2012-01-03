@@ -74,28 +74,28 @@ BKeyStore::GetKey(const char* keyring, BKeyType type, BKeyPurpose purpose,
 
 
 status_t
-BKeyStore::RegisterKey(const BKey& key)
+BKeyStore::AddKey(const BKey& key)
 {
-	return RegisterKey(NULL, key);
+	return AddKey(NULL, key);
 }
 
 
 status_t
-BKeyStore::RegisterKey(const char* keyring, const BKey& key)
+BKeyStore::AddKey(const char* keyring, const BKey& key)
 {
 	return B_ERROR;
 }
 
 
 status_t
-BKeyStore::UnregisterKey(const BKey& key)
+BKeyStore::RemoveKey(const BKey& key)
 {
-	return UnregisterKey(NULL, key);
+	return RemoveKey(NULL, key);
 }
 
 
 status_t
-BKeyStore::UnregisterKey(const char* keyring, const BKey& key)
+BKeyStore::RemoveKey(const char* keyring, const BKey& key)
 {
 	return B_ERROR;
 }
@@ -135,14 +135,14 @@ BKeyStore::GetNextKey(const char* keyring, BKeyType type, BKeyPurpose purpose,
 
 
 status_t
-BKeyStore::RegisterKeyring(const char* keyring, const BKey& key)
+BKeyStore::AddKeyring(const char* keyring, const BKey& key)
 {
 	return B_ERROR;
 }
 
 
 status_t
-BKeyStore::UnregisterKeyring(const char* keyring)
+BKeyStore::RemoveKeyring(const char* keyring)
 {
 	return B_ERROR;
 }
