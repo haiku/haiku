@@ -574,7 +574,7 @@ BTextView::MouseDown(BPoint where)
 	_StopMouseTracking();
 
 	int32 modifiers = 0;
-	uint32 buttons;
+	uint32 buttons = 0;
 	BMessage *currentMessage = Window()->CurrentMessage();
 	if (currentMessage != NULL) {
 		currentMessage->FindInt32("modifiers", &modifiers);
