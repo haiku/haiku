@@ -1063,10 +1063,11 @@ BPoseView::InitDirentIterator(const entry_ref *ref)
 
 	ASSERT(!sourceModel.IsQuery());
 	ASSERT(sourceModel.Node());
-	ASSERT(dynamic_cast<BDirectory *>(sourceModel.Node()));
 
-	EntryListBase *result = new CachedDirectoryEntryList(
-		*dynamic_cast<BDirectory *>(sourceModel.Node()));
+	BDirectory *directory = dynamic_cast<BDirectory *>(sourceModel.Node());
+	ASSERT(directory);
+
+	EntryListBase *result = new CachedDirectoryEntryList(*directory);
 
 	if (result->Rewind() != B_OK) {
 		delete result;
