@@ -13,25 +13,254 @@
 
 
 int
-main(int argc, char* argv[])
+add_password(const char* keyring, const char* identifier,
+	const char* secondaryIdentifier, const char* passwordString)
+{
+	BKeyStore keyStore;
+	BPasswordKey password(passwordString, B_KEY_PURPOSE_GENERIC, identifier,
+		secondaryIdentifier);
+
+	status_t result = keyStore.AddKey(keyring, password);
+	if (result != B_OK) {
+		printf("failed to add password: %s\n", strerror(result));
+		return 2;
+	}
+
+	return 0;
+}
+
+
+int
+remove_password(const char* keyring, const char* identifier,
+	const char* secondaryIdentifier)
 {
 	BKeyStore keyStore;
 	BPasswordKey password;
+
+	status_t result = keyStore.GetKey(keyring, B_KEY_TYPE_PASSWORD,
+		B_KEY_PURPOSE_ANY, identifier, secondaryIdentifier, false, password);
+	if (result != B_OK) {
+		printf("failed to get password \"%s\": %s\n", identifier,
+			strerror(result));
+		return 2;
+	}
+
+	result = keyStore.RemoveKey(keyring, password);
+	if (result != B_OK) {
+		printf("failed to remove password: %s\n", strerror(result));
+		return 3;
+	}
+
+	return 0;
+}
+
+
+int
+add_keyring(const char* keyring, const char* passwordString)
+{
+	BKeyStore keyStore;
+	BPasswordKey password(passwordString, B_KEY_PURPOSE_KEYRING, NULL);
+
+	status_t result = keyStore.AddKeyring(keyring, password);
+	if (result != B_OK) {
+		printf("failed to add keyring: %s\n", strerror(result));
+		return 2;
+	}
+
+	return 0;
+}
+
+
+int
+remove_keyring(const char* keyring)
+{
+	BKeyStore keyStore;
+
+	status_t result = keyStore.RemoveKeyring(keyring);
+	if (result != B_OK) {
+		printf("failed to remove keyring: %s\n", strerror(result));
+		return 2;
+	}
+
+	return 0;
+}
+
+
+int
+list_passwords(const char* keyring)
+{
+	BKeyStore keyStore;
 	uint32 cookie = 0;
 
 	while (true) {
-		printf("trying to get next password with cookie: %" B_PRIu32 "\n",
-			cookie);
-
-		status_t result = keyStore.GetNextKey(B_KEY_TYPE_PASSWORD,
+		BPasswordKey password;
+		status_t result = keyStore.GetNextKey(keyring, B_KEY_TYPE_PASSWORD,
 			B_KEY_PURPOSE_ANY, cookie, password);
-		if (result != B_OK) {
-			printf("failed with: %s\n", strerror(result));
+		if (result == B_ENTRY_NOT_FOUND)
 			break;
+
+		if (result != B_OK) {
+			printf("failed to get next key with: %s\n", strerror(result));
+			return 2;
 		}
 
 		password.PrintToStream();
 	}
 
 	return 0;
+}
+
+
+int
+list_keyrings()
+{
+	BKeyStore keyStore;
+	uint32 cookie = 0;
+
+	while (true) {
+		BString keyring;
+		status_t result = keyStore.GetNextKeyring(cookie, keyring);
+		if (result == B_ENTRY_NOT_FOUND)
+			break;
+
+		if (result != B_OK) {
+			printf("failed to get next key with: %s\n", strerror(result));
+			return 2;
+		}
+
+		printf("keyring: \"%s\"\n", keyring.String());
+	}
+
+	return 0;
+}
+
+
+int
+show_status(const char* keyring)
+{
+	BKeyStore keyStore;
+	printf("keyring \"%s\" is %saccessible\n", keyring,
+		keyStore.IsKeyringAccessible(keyring) ? "" : "not ");
+	return 0;
+}
+
+
+int
+print_usage(const char* name)
+{
+	printf("usage:\n");
+	printf("\t%s list passwords [<fromKeyring>]\n", name);
+	printf("\t\tLists all accessible passwords from the specified keyring or"
+		" from the default keyring if none is supplied.\n");
+	printf("\t%s list keyrings\n", name);
+	printf("\t\tLists all accessible keyrings.\n\n");
+
+	printf("\t%s add password <identifier> [<secondaryIdentifier>] <password>"
+		"\n", name);
+	printf("\t\tAdds the specified password to the default keyring.\n");
+	printf("\t%s add password to <keyring> <identifier> [<secondaryIdentifier>]"
+		" <password>\n", name);
+	printf("\t\tAdds the specified password to the specified keyring.\n\n");
+
+	printf("\t%s remove password <identifier> [<secondaryIdentifier>]\n", name);
+	printf("\t\tRemoves the specified password from the default keyring.\n");
+	printf("\t%s remove password from <keyring> <identifier>"
+		" [<secondaryIdentifier>]\n", name);
+	printf("\t\tRemoves the specified password from the specified keyring.\n\n");
+
+	printf("\t%s add keyring <name> <password>\n", name);
+	printf("\t\tAdds a new keyring with the specified name, protected by the"
+		" supplied password.\n\n");
+
+	printf("\t%s remove keyring <name>\n", name);
+	printf("\t\tRemoves the specified keyring.\n\n");
+
+	printf("\t%s status <keyring>\n", name);
+	printf("\t\tShows the access status of the specified keyring.\n\n");
+
+	return 1;
+}
+
+
+int
+main(int argc, char* argv[])
+{
+	if (argc < 3)
+		return print_usage(argv[0]);
+
+	if (strcmp(argv[1], "list") == 0) {
+		if (strcmp(argv[2], "passwords") == 0)
+			return list_passwords(argc > 3 ? argv[3] : NULL);
+		if (strcmp(argv[2], "keyrings") == 0)
+			return list_keyrings();
+	} else if (strcmp(argv[1], "add") == 0) {
+		if (strcmp(argv[2], "password") == 0) {
+			if (argc < 5)
+				return print_usage(argv[0]);
+
+			const char* keyring = NULL;
+			const char* identifier = NULL;
+			const char* secondaryIdentifier = NULL;
+			const char* password = NULL;
+			if (argc >= 7 && argc <= 8 && strcmp(argv[3], "to") == 0) {
+				keyring = argv[4];
+				identifier = argv[5];
+				if (argc == 7)
+					password = argv[6];
+				else {
+					secondaryIdentifier = argv[6];
+					password = argv[7];
+				}
+			} else if (argc <= 6) {
+				identifier = argv[3];
+				if (argc == 5)
+					password = argv[4];
+				else {
+					secondaryIdentifier = argv[4];
+					password = argv[5];
+				}
+			}
+
+			if (password != NULL) {
+				return add_password(keyring, identifier, secondaryIdentifier,
+					password);
+			}
+		} else if (strcmp(argv[2], "keyring") == 0) {
+			if (argc < 5)
+				return print_usage(argv[0]);
+
+			return add_keyring(argv[3], argv[4]);
+		}
+	} else if (strcmp(argv[1], "remove") == 0) {
+		if (strcmp(argv[2], "password") == 0) {
+			if (argc < 4)
+				return print_usage(argv[0]);
+
+			const char* keyring = NULL;
+			const char* identifier = NULL;
+			const char* secondaryIdentifier = NULL;
+			if (argc >= 6 && argc <= 7 && strcmp(argv[3], "from") == 0) {
+				keyring = argv[4];
+				identifier = argv[5];
+				if (argc == 7)
+					secondaryIdentifier = argv[6];
+			} else if (argc <= 5) {
+				identifier = argv[3];
+				if (argc == 5)
+					secondaryIdentifier = argv[4];
+			}
+
+			if (identifier != NULL) {
+				return remove_password(keyring, identifier,
+					secondaryIdentifier);
+			}
+		} else if (strcmp(argv[2], "keyring") == 0) {
+			if (argc == 4)
+				return remove_keyring(argv[3]);
+		}
+	} else if (strcmp(argv[1], "status") == 0) {
+		return show_status(argv[2]);
+	}
+
+	return print_usage(argv[0]);
 }
