@@ -6,6 +6,7 @@ SubInclude HAIKU_TOP src servers cddb_daemon ;
 SubInclude HAIKU_TOP src servers debug ;
 SubInclude HAIKU_TOP src servers index ;
 SubInclude HAIKU_TOP src servers input ;
+SubInclude HAIKU_TOP src servers keystore ;
 SubInclude HAIKU_TOP src servers mail ;
 SubInclude HAIKU_TOP src servers media ;
 SubInclude HAIKU_TOP src servers media_addon ;

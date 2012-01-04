@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src servers keystore ;
+
+UsePrivateHeaders app ;
+
+Server keystore_server :
+	KeyStoreServer.cpp
+	: be $(TARGET_LIBSTDC++)
+	: keystore_server.rdef
+;
