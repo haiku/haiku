@@ -6,8 +6,9 @@
 
 #include <KeyStore.h>
 
-#include <RegistrarDefs.h>
-#include <RosterPrivate.h>
+#include <KeyStoreDefs.h>
+
+#include <Messenger.h>
 
 
 using namespace BPrivate;
@@ -75,7 +76,7 @@ BKeyStore::GetKey(const char* keyring, BKeyType type, BKeyPurpose purpose,
 	const char* identifier, const char* secondaryIdentifier,
 	bool secondaryIdentifierOptional, BKey& key)
 {
-	BMessage message(B_REG_GET_KEY);
+	BMessage message(KEY_STORE_GET_KEY);
 	message.AddString("keyring", keyring);
 	message.AddUInt32("type", type);
 	message.AddUInt32("purpose", purpose);
@@ -110,7 +111,7 @@ BKeyStore::AddKey(const char* keyring, const BKey& key)
 	if (key._Flatten(keyMessage) != B_OK)
 		return B_BAD_VALUE;
 
-	BMessage message(B_REG_ADD_KEY);
+	BMessage message(KEY_STORE_ADD_KEY);
 	message.AddString("keyring", keyring);
 	message.AddMessage("key", &keyMessage);
 
@@ -132,7 +133,7 @@ BKeyStore::RemoveKey(const char* keyring, const BKey& key)
 	if (key._Flatten(keyMessage) != B_OK)
 		return B_BAD_VALUE;
 
-	BMessage message(B_REG_REMOVE_KEY);
+	BMessage message(KEY_STORE_REMOVE_KEY);
 	message.AddString("keyring", keyring);
 	message.AddMessage("key", &keyMessage);
 
@@ -166,7 +167,7 @@ status_t
 BKeyStore::GetNextKey(const char* keyring, BKeyType type, BKeyPurpose purpose,
 	uint32& cookie, BKey& key)
 {
-	BMessage message(B_REG_GET_NEXT_KEY);
+	BMessage message(KEY_STORE_GET_NEXT_KEY);
 	message.AddString("keyring", keyring);
 	message.AddUInt32("type", type);
 	message.AddUInt32("purpose", purpose);
@@ -195,7 +196,7 @@ BKeyStore::AddKeyring(const char* keyring, const BKey& key)
 	if (key._Flatten(keyMessage) != B_OK)
 		return B_BAD_VALUE;
 
-	BMessage message(B_REG_ADD_KEYRING);
+	BMessage message(KEY_STORE_ADD_KEYRING);
 	message.AddString("keyring", keyring);
 	message.AddMessage("key", &keyMessage);
 
@@ -206,7 +207,7 @@ BKeyStore::AddKeyring(const char* keyring, const BKey& key)
 status_t
 BKeyStore::RemoveKeyring(const char* keyring)
 {
-	BMessage message(B_REG_REMOVE_KEYRING);
+	BMessage message(KEY_STORE_REMOVE_KEYRING);
 	message.AddString("keyring", keyring);
 	return _SendKeyMessage(message, NULL);
 }
@@ -215,7 +216,7 @@ BKeyStore::RemoveKeyring(const char* keyring)
 status_t
 BKeyStore::GetNextKeyring(uint32& cookie, BString& keyring)
 {
-	BMessage message(B_REG_GET_NEXT_KEYRING);
+	BMessage message(KEY_STORE_GET_NEXT_KEYRING);
 	message.AddUInt32("cookie", cookie);
 
 	BMessage reply;
@@ -240,7 +241,7 @@ BKeyStore::SetMasterKey(const BKey& key)
 	if (key._Flatten(keyMessage) != B_OK)
 		return B_BAD_VALUE;
 
-	BMessage message(B_REG_SET_MASTER_KEY);
+	BMessage message(KEY_STORE_SET_MASTER_KEY);
 	message.AddMessage("key", &keyMessage);
 
 	return _SendKeyMessage(message, NULL);
@@ -250,7 +251,7 @@ BKeyStore::SetMasterKey(const BKey& key)
 status_t
 BKeyStore::RemoveMasterKey()
 {
-	BMessage message(B_REG_REMOVE_MASTER_KEY);
+	BMessage message(KEY_STORE_REMOVE_MASTER_KEY);
 	return _SendKeyMessage(message, NULL);
 }
 
@@ -258,7 +259,7 @@ BKeyStore::RemoveMasterKey()
 status_t
 BKeyStore::AddKeyringToMaster(const char* keyring)
 {
-	BMessage message(B_REG_ADD_KEYRING_TO_MASTER);
+	BMessage message(KEY_STORE_ADD_KEYRING_TO_MASTER);
 	message.AddString("keyring", keyring);
 	return _SendKeyMessage(message, NULL);
 }
@@ -267,7 +268,7 @@ BKeyStore::AddKeyringToMaster(const char* keyring)
 status_t
 BKeyStore::RemoveKeyringFromMaster(const char* keyring)
 {
-	BMessage message(B_REG_REMOVE_KEYRING_FROM_MASTER);
+	BMessage message(KEY_STORE_REMOVE_KEYRING_FROM_MASTER);
 	message.AddString("keyring", keyring);
 	return _SendKeyMessage(message, NULL);
 }
@@ -276,7 +277,7 @@ BKeyStore::RemoveKeyringFromMaster(const char* keyring)
 status_t
 BKeyStore::GetNextMasterKeyring(uint32& cookie, BString& keyring)
 {
-	BMessage message(B_REG_GET_NEXT_MASTER_KEYRING);
+	BMessage message(KEY_STORE_GET_NEXT_MASTER_KEYRING);
 	message.AddUInt32("cookie", cookie);
 
 	BMessage reply;
@@ -297,7 +298,7 @@ BKeyStore::GetNextMasterKeyring(uint32& cookie, BString& keyring)
 bool
 BKeyStore::IsKeyringAccessible(const char* keyring)
 {
-	BMessage message(B_REG_IS_KEYRING_ACCESSIBLE);
+	BMessage message(KEY_STORE_IS_KEYRING_ACCESSIBLE);
 	message.AddString("keyring", keyring);
 	return _SendKeyMessage(message, NULL) == B_OK;
 }
@@ -306,7 +307,7 @@ BKeyStore::IsKeyringAccessible(const char* keyring)
 status_t
 BKeyStore::RevokeAccess(const char* keyring)
 {
-	BMessage message(B_REG_REVOKE_ACCESS);
+	BMessage message(KEY_STORE_REVOKE_ACCESS);
 	message.AddString("keyring", keyring);
 	return _SendKeyMessage(message, NULL);
 }
@@ -315,7 +316,7 @@ BKeyStore::RevokeAccess(const char* keyring)
 status_t
 BKeyStore::RevokeMasterAccess()
 {
-	BMessage message(B_REG_REVOKE_MASTER_ACCESS);
+	BMessage message(KEY_STORE_REVOKE_MASTER_ACCESS);
 	return _SendKeyMessage(message, NULL);
 }
 
@@ -332,7 +333,7 @@ BKeyStore::GetNextApplication(const BKey& key, uint32& cookie,
 	if (key._Flatten(keyMessage) != B_OK)
 		return B_BAD_VALUE;
 
-	BMessage message(B_REG_GET_NEXT_APPLICATION);
+	BMessage message(KEY_STORE_GET_NEXT_APPLICATION);
 	message.AddMessage("key", &keyMessage);
 	message.AddUInt32("cookie", cookie);
 
@@ -355,7 +356,7 @@ BKeyStore::RemoveApplication(const BKey& key, const char* signature)
 	if (key._Flatten(keyMessage) != B_OK)
 		return B_BAD_VALUE;
 
-	BMessage message(B_REG_REMOVE_APPLICATION);
+	BMessage message(KEY_STORE_REMOVE_APPLICATION);
 	message.AddMessage("key", &keyMessage);
 	message.AddString("signature", signature);
 
@@ -390,10 +391,14 @@ BKeyStore::_SendKeyMessage(BMessage& message, BMessage* reply) const
 	if (reply == NULL)
 		reply = &localReply;
 
-	if (BRoster::Private().SendTo(&message, reply, false) != B_OK)
+	BMessenger messenger(kKeyStoreServerSignature);
+	if (!messenger.IsValid())
 		return B_ERROR;
 
-	if (reply->what != B_REG_SUCCESS) {
+	if (messenger.SendMessage(&message, reply) != B_OK)
+		return B_ERROR;
+
+	if (reply->what != KEY_STORE_SUCCESS) {
 		status_t result = B_ERROR;
 		if (reply->FindInt32("result", &result) != B_OK)
 			return B_ERROR;

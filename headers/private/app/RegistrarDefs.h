@@ -122,25 +122,6 @@ enum {
 	B_REG_GET_USER_GROUPS					= 'rgug',
 	B_REG_UPDATE_USER						= 'ruus',
 	B_REG_UPDATE_GROUP						= 'rugr',
-
-	// KeyStore requests
-	B_REG_GET_KEY							= 'rgtK',
-	B_REG_GET_NEXT_KEY						= 'rgnK',
-	B_REG_ADD_KEY							= 'radK',
-	B_REG_REMOVE_KEY						= 'rrmK',
-	B_REG_ADD_KEYRING						= 'raKR',
-	B_REG_REMOVE_KEYRING					= 'rrKR',
-	B_REG_GET_NEXT_KEYRING					= 'rnKR',
-	B_REG_SET_MASTER_KEY					= 'rsMK',
-	B_REG_REMOVE_MASTER_KEY					= 'rrMK',
-	B_REG_ADD_KEYRING_TO_MASTER				= 'rarM',
-	B_REG_REMOVE_KEYRING_FROM_MASTER		= 'rrrM',
-	B_REG_GET_NEXT_MASTER_KEYRING			= 'rnrM',
-	B_REG_IS_KEYRING_ACCESSIBLE				= 'riaR',
-	B_REG_REVOKE_ACCESS						= 'rvaR',
-	B_REG_REVOKE_MASTER_ACCESS				= 'rvaM',
-	B_REG_GET_NEXT_APPLICATION				= 'rnKA',
-	B_REG_REMOVE_APPLICATION				= 'rrKA',
 };
 
 // B_REG_MIME_SET_PARAM "which" constants
