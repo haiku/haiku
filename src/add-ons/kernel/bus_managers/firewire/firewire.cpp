@@ -1195,8 +1195,8 @@ fw_xfer_alloc_buf(int send_len, int recv_len)
 			fw_xfer_free(xfer);
 			return(NULL);
 		}
-		xfer->recv.payload = (uint32_t *)send_virt;
-		xfer->recv.bus_addr = (bus_addr_t)send_phy;
+		xfer->recv.payload = (uint32_t *)recv_virt;
+		xfer->recv.bus_addr = (bus_addr_t)recv_phy;
 	}
 	return(xfer);
 }
