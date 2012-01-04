@@ -73,14 +73,19 @@ public:
 			bool				operator==(const BKey& other) const;
 			bool				operator!=(const BKey& other) const;
 
+protected:
+	virtual	status_t			_Flatten(BMessage& message) const;
+	virtual	status_t			_Unflatten(const BMessage& message);
+
 private:
+			friend class BKeyStore;
+
 			BKeyPurpose			fPurpose;
 			BString				fIdentifier;
 			BString				fSecondaryIdentifier;
 			BString				fOwner;
 			bigtime_t			fCreationTime;
 	mutable	BMallocIO			fData;
-			BObjectList<BString> fApplications;
 			bool				fRegistered;
 };
 

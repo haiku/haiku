@@ -7,6 +7,8 @@
 #include <Key.h>
 
 
+#if 0
+// TODO: move this to the KeyStore or the registrar backend if needed
 static bool
 CompareLists(BObjectList<BString> a, BObjectList<BString> b)
 {
@@ -20,6 +22,7 @@ CompareLists(BObjectList<BString> a, BObjectList<BString> b)
 
 	return true;
 }
+#endif
 
 
 // #pragma mark - Generic BKey
@@ -159,35 +162,6 @@ BKey::IsRegistered() const
 }
 
 
-#if 0
-// To be moved to BKeyStore
-status_t
-BKey::GetNextApplication(uint32& cookie, BString& signature) const
-{
-	BString* item = fApplications.ItemAt(cookie++);
-	if (item == NULL)
-		return B_ENTRY_NOT_FOUND;
-
-	signature = *item;
-	return B_OK;
-}
-
-
-status_t
-BKey::RemoveApplication(const char* signature)
-{
-	for (int32 i = 0; i < fApplications.CountItems(); i++) {
-		if (*fApplications.ItemAt(i) == signature) {
-			fApplications.RemoveItemAt(i);
-			return B_OK;
-		}
-	}
-
-	return B_ENTRY_NOT_FOUND;
-}
-#endif
-
-
 BKey&
 BKey::operator=(const BKey& other)
 {
@@ -199,7 +173,6 @@ BKey::operator=(const BKey& other)
 	fOwner = other.fOwner;
 	fCreationTime = other.CreationTime();
 	fRegistered = other.IsRegistered();
-	fApplications = other.fApplications;
 
 	return *this;
 }
@@ -214,8 +187,7 @@ BKey::operator==(const BKey& other) const
 		&& fOwner == other.fOwner
 		&& fIdentifier == other.fIdentifier
 		&& fSecondaryIdentifier == other.fSecondaryIdentifier
-		&& memcmp(Data(), other.Data(), DataLength()) == 0
-		&& CompareLists(fApplications, other.fApplications);
+		&& memcmp(Data(), other.Data(), DataLength()) == 0;
 }
 
 
@@ -223,6 +195,50 @@ bool
 BKey::operator!=(const BKey& other) const
 {
 	return !(*this == other);
+}
+
+
+status_t
+BKey::_Flatten(BMessage& message) const
+{
+	if (message.MakeEmpty() != B_OK
+		|| message.AddUInt32("type", Type()) != B_OK
+		|| message.AddUInt32("purpose", fPurpose) != B_OK
+		|| message.AddString("identifier", fIdentifier) != B_OK
+		|| message.AddString("secondaryIdentifier", fSecondaryIdentifier)
+			!= B_OK
+		|| message.AddString("owner", fOwner) != B_OK
+		|| message.AddInt64("creationTime", fCreationTime) != B_OK
+		|| message.AddData("data", B_RAW_TYPE, fData.Buffer(),
+			fData.BufferLength()) != B_OK) {
+		return B_ERROR;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+BKey::_Unflatten(const BMessage& message)
+{
+	BKeyType type;
+	if (message.FindUInt32("type", (uint32*)&type) != B_OK || type != Type())
+		return B_BAD_VALUE;
+
+	const void* data = NULL;
+	ssize_t dataLength = 0;
+	if (message.FindUInt32("purpose", (uint32*)&fPurpose) != B_OK
+		|| message.FindString("identifier", &fIdentifier) != B_OK
+		|| message.FindString("secondaryIdentifier", &fSecondaryIdentifier)
+			!= B_OK
+		|| message.FindString("owner", &fOwner) != B_OK
+		|| message.FindInt64("creationTime", &fCreationTime) != B_OK
+		|| message.FindData("data", B_RAW_TYPE, &data, &dataLength) != B_OK
+		|| dataLength < 0) {
+		return B_ERROR;
+	}
+
+	return SetData((const uint8*)data, (size_t)dataLength);
 }
 
 

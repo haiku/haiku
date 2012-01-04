@@ -6,6 +6,12 @@
 
 #include <KeyStore.h>
 
+#include <RegistrarDefs.h>
+#include <RosterPrivate.h>
+
+
+using namespace BPrivate;
+
 
 BKeyStore::BKeyStore()
 {
@@ -69,7 +75,24 @@ BKeyStore::GetKey(const char* keyring, BKeyType type, BKeyPurpose purpose,
 	const char* identifier, const char* secondaryIdentifier,
 	bool secondaryIdentifierOptional, BKey& key)
 {
-	return B_ERROR;
+	BMessage message(B_REG_GET_KEY);
+	message.AddString("keyring", keyring);
+	message.AddUInt32("type", type);
+	message.AddUInt32("purpose", purpose);
+	message.AddString("identifier", identifier);
+	message.AddString("secondaryIdentifier", secondaryIdentifier);
+	message.AddBool("secondaryIdentifierOptional", secondaryIdentifierOptional);
+
+	BMessage reply;
+	status_t result = _SendKeyMessage(message, &reply);
+	if (result != B_OK)
+		return result;
+
+	BMessage keyMessage;
+	if (reply.FindMessage("key", &keyMessage) != B_OK)
+		return B_ERROR;
+
+	return key._Unflatten(keyMessage);
 }
 
 
@@ -83,7 +106,15 @@ BKeyStore::AddKey(const BKey& key)
 status_t
 BKeyStore::AddKey(const char* keyring, const BKey& key)
 {
-	return B_ERROR;
+	BMessage keyMessage;
+	if (key._Flatten(keyMessage) != B_OK)
+		return B_BAD_VALUE;
+
+	BMessage message(B_REG_ADD_KEY);
+	message.AddString("keyring", keyring);
+	message.AddMessage("key", &keyMessage);
+
+	return _SendKeyMessage(message, NULL);
 }
 
 
@@ -97,7 +128,15 @@ BKeyStore::RemoveKey(const BKey& key)
 status_t
 BKeyStore::RemoveKey(const char* keyring, const BKey& key)
 {
-	return B_ERROR;
+	BMessage keyMessage;
+	if (key._Flatten(keyMessage) != B_OK)
+		return B_BAD_VALUE;
+
+	BMessage message(B_REG_REMOVE_KEY);
+	message.AddString("keyring", keyring);
+	message.AddMessage("key", &keyMessage);
+
+	return _SendKeyMessage(message, NULL);
 }
 
 
@@ -119,7 +158,7 @@ BKeyStore::GetNextKey(BKeyType type, BKeyPurpose purpose, uint32& cookie,
 status_t
 BKeyStore::GetNextKey(const char* keyring, uint32& cookie, BKey& key)
 {
-	return B_ERROR;
+	return GetNextKey(keyring, B_KEY_TYPE_ANY, B_KEY_PURPOSE_ANY, cookie, key);
 }
 
 
@@ -127,7 +166,22 @@ status_t
 BKeyStore::GetNextKey(const char* keyring, BKeyType type, BKeyPurpose purpose,
 	uint32& cookie, BKey& key)
 {
-	return B_ERROR;
+	BMessage message(B_REG_GET_NEXT_KEY);
+	message.AddString("keyring", keyring);
+	message.AddUInt32("type", type);
+	message.AddUInt32("purpose", purpose);
+	message.AddUInt32("cookie", cookie);
+
+	BMessage reply;
+	status_t result = _SendKeyMessage(message, &reply);
+	if (result != B_OK)
+		return result;
+
+	BMessage keyMessage;
+	if (reply.FindMessage("key", &keyMessage) != B_OK)
+		return B_ERROR;
+
+	return key._Unflatten(keyMessage);
 }
 
 
@@ -137,21 +191,42 @@ BKeyStore::GetNextKey(const char* keyring, BKeyType type, BKeyPurpose purpose,
 status_t
 BKeyStore::AddKeyring(const char* keyring, const BKey& key)
 {
-	return B_ERROR;
+	BMessage keyMessage;
+	if (key._Flatten(keyMessage) != B_OK)
+		return B_BAD_VALUE;
+
+	BMessage message(B_REG_ADD_KEYRING);
+	message.AddString("keyring", keyring);
+	message.AddMessage("key", &keyMessage);
+
+	return _SendKeyMessage(message, NULL);
 }
 
 
 status_t
 BKeyStore::RemoveKeyring(const char* keyring)
 {
-	return B_ERROR;
+	BMessage message(B_REG_REMOVE_KEYRING);
+	message.AddString("keyring", keyring);
+	return _SendKeyMessage(message, NULL);
 }
 
 
 status_t
 BKeyStore::GetNextKeyring(uint32& cookie, BString& keyring)
 {
-	return B_ERROR;
+	BMessage message(B_REG_GET_NEXT_KEYRING);
+	message.AddUInt32("cookie", cookie);
+
+	BMessage reply;
+	status_t result = _SendKeyMessage(message, &reply);
+	if (result != B_OK)
+		return result;
+
+	if (reply.FindString("keyring", &keyring) != B_OK)
+		return B_ERROR;
+
+	return B_OK;
 }
 
 
@@ -161,35 +236,58 @@ BKeyStore::GetNextKeyring(uint32& cookie, BString& keyring)
 status_t
 BKeyStore::SetMasterKey(const BKey& key)
 {
-	return B_ERROR;
+	BMessage keyMessage;
+	if (key._Flatten(keyMessage) != B_OK)
+		return B_BAD_VALUE;
+
+	BMessage message(B_REG_SET_MASTER_KEY);
+	message.AddMessage("key", &keyMessage);
+
+	return _SendKeyMessage(message, NULL);
 }
 
 
 status_t
 BKeyStore::RemoveMasterKey()
 {
-	return B_ERROR;
+	BMessage message(B_REG_REMOVE_MASTER_KEY);
+	return _SendKeyMessage(message, NULL);
 }
 
 
 status_t
 BKeyStore::AddKeyringToMaster(const char* keyring)
 {
-	return B_ERROR;
+	BMessage message(B_REG_ADD_KEYRING_TO_MASTER);
+	message.AddString("keyring", keyring);
+	return _SendKeyMessage(message, NULL);
 }
 
 
 status_t
 BKeyStore::RemoveKeyringFromMaster(const char* keyring)
 {
-	return B_ERROR;
+	BMessage message(B_REG_REMOVE_KEYRING_FROM_MASTER);
+	message.AddString("keyring", keyring);
+	return _SendKeyMessage(message, NULL);
 }
 
 
 status_t
 BKeyStore::GetNextMasterKeyring(uint32& cookie, BString& keyring)
 {
-	return B_ERROR;
+	BMessage message(B_REG_GET_NEXT_MASTER_KEYRING);
+	message.AddUInt32("cookie", cookie);
+
+	BMessage reply;
+	status_t result = _SendKeyMessage(message, &reply);
+	if (result != B_OK)
+		return result;
+
+	if (reply.FindString("keyring", &keyring) != B_OK)
+		return B_ERROR;
+
+	return B_OK;
 }
 
 
@@ -199,21 +297,26 @@ BKeyStore::GetNextMasterKeyring(uint32& cookie, BString& keyring)
 bool
 BKeyStore::IsKeyringAccessible(const char* keyring)
 {
-	return false;
+	BMessage message(B_REG_IS_KEYRING_ACCESSIBLE);
+	message.AddString("keyring", keyring);
+	return _SendKeyMessage(message, NULL) == B_OK;
 }
 
 
 status_t
 BKeyStore::RevokeAccess(const char* keyring)
 {
-	return B_ERROR;
+	BMessage message(B_REG_REVOKE_ACCESS);
+	message.AddString("keyring", keyring);
+	return _SendKeyMessage(message, NULL);
 }
 
 
 status_t
 BKeyStore::RevokeMasterAccess()
 {
-	return B_ERROR;
+	BMessage message(B_REG_REVOKE_MASTER_ACCESS);
+	return _SendKeyMessage(message, NULL);
 }
 
 
@@ -225,14 +328,38 @@ status_t
 BKeyStore::GetNextApplication(const BKey& key, uint32& cookie,
 	BString& signature) const
 {
-	return B_ERROR;
+	BMessage keyMessage;
+	if (key._Flatten(keyMessage) != B_OK)
+		return B_BAD_VALUE;
+
+	BMessage message(B_REG_GET_NEXT_APPLICATION);
+	message.AddMessage("key", &keyMessage);
+	message.AddUInt32("cookie", cookie);
+
+	BMessage reply;
+	status_t result = _SendKeyMessage(message, &reply);
+	if (result != B_OK)
+		return result;
+
+	if (reply.FindString("signature", &signature) != B_OK)
+		return B_ERROR;
+
+	return B_OK;
 }
 
 
 status_t
 BKeyStore::RemoveApplication(const BKey& key, const char* signature)
 {
-	return B_ERROR;
+	BMessage keyMessage;
+	if (key._Flatten(keyMessage) != B_OK)
+		return B_BAD_VALUE;
+
+	BMessage message(B_REG_REMOVE_APPLICATION);
+	message.AddMessage("key", &keyMessage);
+	message.AddString("signature", signature);
+
+	return _SendKeyMessage(message, NULL);
 }
 
 
@@ -250,4 +377,29 @@ float
 BKeyStore::PasswordStrength(const char* password)
 {
 	return 0;
+}
+
+
+// #pragma mark - Private functions
+
+
+status_t
+BKeyStore::_SendKeyMessage(BMessage& message, BMessage* reply) const
+{
+	BMessage localReply;
+	if (reply == NULL)
+		reply = &localReply;
+
+	if (BRoster::Private().SendTo(&message, reply, false) != B_OK)
+		return B_ERROR;
+
+	if (reply->what != B_REG_SUCCESS) {
+		status_t result = B_ERROR;
+		if (reply->FindInt32("result", &result) != B_OK)
+			return B_ERROR;
+
+		return result;
+	}
+
+	return B_OK;
 }

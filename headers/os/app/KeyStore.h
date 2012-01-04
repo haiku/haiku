@@ -93,6 +93,10 @@ public:
 			status_t			GeneratePassword(BPasswordKey& password,
 									size_t length, uint32 flags);
 			float				PasswordStrength(const char* password);
+
+private:
+			status_t			_SendKeyMessage(BMessage& message,
+									BMessage* reply) const;
 };
 
 
