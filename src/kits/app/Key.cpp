@@ -214,6 +214,9 @@ BKey::PrintToStream()
 		case B_KEY_PURPOSE_GENERIC:
 			purposeString = "generic";
 			break;
+		case B_KEY_PURPOSE_KEYRING:
+			purposeString = "keyring";
+			break;
 		case B_KEY_PURPOSE_WEB:
 			purposeString = "web";
 			break;
