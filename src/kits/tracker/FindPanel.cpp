@@ -2806,7 +2806,7 @@ TAttrView::GetDefaultName(BString &result) const
 	else
 		result << B_TRANSLATE("Name");
 
-	if (item->Submenu() != NULL)
+	if (item && item->Submenu() != NULL)
 		item = item->Submenu()->FindMarked();
 	else
 		item = NULL;
