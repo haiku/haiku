@@ -9,6 +9,12 @@
 #include <Application.h>
 #include <File.h>
 #include <Key.h>
+#include <ObjectList.h>
+
+
+class Keyring;
+
+typedef BObjectList<Keyring> KeyringList;
 
 
 class KeyStoreServer : public BApplication {
@@ -22,19 +28,14 @@ private:
 		status_t					_ReadKeyStoreDatabase();
 		status_t					_WriteKeyStoreDatabase();
 
-		status_t					_FindKey(const BString& identifier,
-										const BString& secondaryIdentifier,
-										bool secondaryIdentifierOptional,
-										BMessage* _foundKeyMessage);
-		status_t					_FindKey(BKeyType type, BKeyPurpose purpose,
-										uint32 index,
-										BMessage& _foundKeyMessage);
+		Keyring*					_FindKeyring(const BString& name);
 
-		status_t					_AddKey(const BString& identifier,
-										const BString& secondaryIdentifier,
+		status_t					_AddKeyring(const BString& name,
 										const BMessage& keyMessage);
+		status_t					_RemoveKeyring(const BString& name);
 
-		BMessage					fDatabase;
+		Keyring*					fDefaultKeyring;
+		KeyringList					fKeyrings;
 		BFile						fKeyStoreFile;
 };
 

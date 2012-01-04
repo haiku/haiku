@@ -5,6 +5,7 @@
 
 
 #include "KeyStoreServer.h"
+#include "Keyring.h"
 
 #include <KeyStoreDefs.h>
 
@@ -24,7 +25,9 @@ using namespace BPrivate;
 
 KeyStoreServer::KeyStoreServer()
 	:
-	BApplication(kKeyStoreServerSignature)
+	BApplication(kKeyStoreServerSignature),
+	fDefaultKeyring(NULL),
+	fKeyrings(20, true)
 {
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
@@ -47,6 +50,9 @@ KeyStoreServer::KeyStoreServer()
 		| (settingsDir.Contains(path.Path()) ? 0 : B_CREATE_FILE));
 
 	_ReadKeyStoreDatabase();
+
+	if (fDefaultKeyring == NULL)
+		fDefaultKeyring = new(std::nothrow) Keyring("", BMessage());
 }
 
 
@@ -59,12 +65,61 @@ void
 KeyStoreServer::MessageReceived(BMessage* message)
 {
 	BMessage reply;
-	status_t result = B_MESSAGE_NOT_UNDERSTOOD;
+	status_t result = B_UNSUPPORTED;
+
+	// Resolve the keyring for the relevant messages.
+	Keyring* keyring = NULL;
+	switch (message->what) {
+		case KEY_STORE_GET_KEY:
+		case KEY_STORE_GET_NEXT_KEY:
+		case KEY_STORE_ADD_KEY:
+		case KEY_STORE_REMOVE_KEY:
+		case KEY_STORE_IS_KEYRING_ACCESSIBLE:
+		case KEY_STORE_REVOKE_ACCESS:
+		{
+			BString keyringName;
+			if (message->FindString("keyring", &keyringName) != B_OK)
+				keyringName = "";
+
+			keyring = _FindKeyring(keyringName);
+			if (keyring == NULL) {
+				result = B_BAD_VALUE;
+				message->what = 0;
+					// So that we don't do anything in the second switch.
+				break;
+			}
+
+			break;
+		}
+	}
 
 	switch (message->what) {
 		case KEY_STORE_GET_KEY:
 		{
-			result = B_NOT_ALLOWED;
+			BString identifier;
+			if (message->FindString("identifier", &identifier) != B_OK) {
+				result = B_BAD_VALUE;
+				break;
+			}
+
+			bool secondaryIdentifierOptional;
+			if (message->FindBool("secondaryIdentifierOptional",
+					&secondaryIdentifierOptional) != B_OK) {
+				secondaryIdentifierOptional = false;
+			}
+
+			BString secondaryIdentifier;
+			if (message->FindString("secondaryIdentifier",
+					&secondaryIdentifier) != B_OK) {
+				secondaryIdentifier = "";
+				secondaryIdentifierOptional = true;
+			}
+
+			BMessage keyMessage;
+			result = keyring->FindKey(identifier, secondaryIdentifier,
+				secondaryIdentifierOptional, &keyMessage);
+			if (result == B_OK)
+				reply.AddMessage("key", &keyMessage);
 			break;
 		}
 
@@ -81,7 +136,7 @@ KeyStoreServer::MessageReceived(BMessage* message)
 			}
 
 			BMessage keyMessage;
-			result = _FindKey(type, purpose, cookie, keyMessage);
+			result = keyring->FindKey(type, purpose, cookie, keyMessage);
 			if (result == B_OK) {
 				cookie++;
 				reply.AddUInt32("cookie", cookie);
@@ -107,7 +162,94 @@ KeyStoreServer::MessageReceived(BMessage* message)
 				secondaryIdentifier = "";
 			}
 
-			result = _AddKey(identifier, secondaryIdentifier, keyMessage);
+			result = keyring->AddKey(identifier, secondaryIdentifier, keyMessage);
+			if (result == B_OK)
+				_WriteKeyStoreDatabase();
+
+			break;
+		}
+
+		case KEY_STORE_REMOVE_KEY:
+		{
+			BMessage keyMessage;
+			BString identifier;
+			if (message->FindMessage("key", &keyMessage) != B_OK
+				|| keyMessage.FindString("identifier", &identifier) != B_OK) {
+				result = B_BAD_VALUE;
+				break;
+			}
+
+			result = keyring->RemoveKey(identifier, keyMessage);
+			if (result == B_OK)
+				_WriteKeyStoreDatabase();
+
+			break;
+		}
+
+		case KEY_STORE_ADD_KEYRING:
+		{
+			BMessage keyMessage;
+			BString keyring;
+			if (message->FindString("keyring", &keyring) != B_OK
+				|| message->FindMessage("key", &keyMessage) != B_OK) {
+				result = B_BAD_VALUE;
+				break;
+			}
+
+			result = _AddKeyring(keyring, keyMessage);
+			if (result == B_OK)
+				_WriteKeyStoreDatabase();
+
+			break;
+		}
+
+		case KEY_STORE_REMOVE_KEYRING:
+		{
+			BString keyringName;
+			if (message->FindString("keyring", &keyringName) != B_OK)
+				keyringName = "";
+
+			result = _RemoveKeyring(keyringName);
+			if (result == B_OK)
+				_WriteKeyStoreDatabase();
+
+			break;
+		}
+
+		case KEY_STORE_GET_NEXT_KEYRING:
+		{
+			uint32 cookie;
+			if (message->FindUInt32("cookie", &cookie) != B_OK) {
+				result = B_BAD_VALUE;
+				break;
+			}
+
+			if (cookie == 0)
+				keyring = fDefaultKeyring;
+			else
+				keyring = fKeyrings.ItemAt(cookie - 1);
+
+			if (keyring == NULL) {
+				result = B_ENTRY_NOT_FOUND;
+				break;
+			}
+
+			cookie++;
+			reply.AddUInt32("cookie", cookie);
+			reply.AddString("keyring", keyring->Name());
+			result = B_OK;
+			break;
+		}
+
+		case KEY_STORE_IS_KEYRING_ACCESSIBLE:
+		{
+			reply.AddBool("accessible", keyring->IsAccessible());
+			result = B_OK;
+		}
+
+		case 0:
+		{
+			// Just the error case from above.
 			break;
 		}
 
@@ -129,318 +271,42 @@ KeyStoreServer::MessageReceived(BMessage* message)
 
 		message->SendReply(&reply);
 	}
-
-#if 0
-    // Get thread info that contains our team ID for replying.
-	thread_info threadInfo;
-	status_t result = get_thread_info(find_thread(NULL), &threadInfo);
-	if (result != B_OK)
-		return result;
-
-	while (true) {
-		KMessage message;
-		port_message_info messageInfo;
-		status_t error = message.ReceiveFrom(fRequestPort, -1, &messageInfo);
-		if (error != B_OK)
-			return B_OK;
-
-		bool isRoot = (messageInfo.sender == 0);
-
-		switch (message.What()) {
-			case B_REG_GET_PASSWD_DB:
-			{
-				// lazily build the reply
-				try {
-					if (fPasswdDBReply->What() == 1) {
-						FlatStore store;
-						int32 count = fUserDB->WriteFlatPasswdDB(store);
-						if (fPasswdDBReply->AddInt32("count", count) != B_OK
-							|| fPasswdDBReply->AddData("entries", B_RAW_TYPE,
-									store.Buffer(), store.BufferLength(),
-									false) != B_OK) {
-							error = B_NO_MEMORY;
-						}
-
-						fPasswdDBReply->SetWhat(0);
-					}
-				} catch (...) {
-					error = B_NO_MEMORY;
-				}
-
-				if (error == B_OK) {
-					message.SendReply(fPasswdDBReply, -1, -1, 0, registrarTeam);
-				} else {
-					fPasswdDBReply->SetTo(1);
-					KMessage reply(error);
-					message.SendReply(&reply, -1, -1, 0, registrarTeam);
-				}
-
-				break;
-			}
-
-			case B_REG_GET_GROUP_DB:
-			{
-				// lazily build the reply
-				try {
-					if (fGroupDBReply->What() == 1) {
-						FlatStore store;
-						int32 count = fGroupDB->WriteFlatGroupDB(store);
-						if (fGroupDBReply->AddInt32("count", count) != B_OK
-							|| fGroupDBReply->AddData("entries", B_RAW_TYPE,
-									store.Buffer(), store.BufferLength(),
-									false) != B_OK) {
-							error = B_NO_MEMORY;
-						}
-
-						fGroupDBReply->SetWhat(0);
-					}
-				} catch (...) {
-					error = B_NO_MEMORY;
-				}
-
-				if (error == B_OK) {
-					message.SendReply(fGroupDBReply, -1, -1, 0, registrarTeam);
-				} else {
-					fGroupDBReply->SetTo(1);
-					KMessage reply(error);
-					message.SendReply(&reply, -1, -1, 0, registrarTeam);
-				}
-
-				break;
-			}
-
-
-			case B_REG_GET_SHADOW_PASSWD_DB:
-			{
-				// only root may see the shadow passwd
-				if (!isRoot)
-					error = EPERM;
-
-				// lazily build the reply
-				try {
-					if (error == B_OK && fShadowPwdDBReply->What() == 1) {
-						FlatStore store;
-						int32 count = fUserDB->WriteFlatShadowDB(store);
-						if (fShadowPwdDBReply->AddInt32("count", count) != B_OK
-							|| fShadowPwdDBReply->AddData("entries", B_RAW_TYPE,
-									store.Buffer(), store.BufferLength(),
-									false) != B_OK) {
-							error = B_NO_MEMORY;
-						}
-
-						fShadowPwdDBReply->SetWhat(0);
-					}
-				} catch (...) {
-					error = B_NO_MEMORY;
-				}
-
-				if (error == B_OK) {
-					message.SendReply(fShadowPwdDBReply, -1, -1, 0,
-						registrarTeam);
-				} else {
-					fShadowPwdDBReply->SetTo(1);
-					KMessage reply(error);
-					message.SendReply(&reply, -1, -1, 0, registrarTeam);
-				}
-
-				break;
-			}
-
-			case B_REG_GET_USER:
-			{
-				User* user = NULL;
-				int32 uid;
-				const char* name;
-
-				// find user
-				if (message.FindInt32("uid", &uid) == B_OK) {
-					user = fUserDB->UserByID(uid);
-				} else if (message.FindString("name", &name) == B_OK) {
-					user = fUserDB->UserByName(name);
-				} else {
-					error = B_BAD_VALUE;
-				}
-
-				if (error == B_OK && user == NULL)
-					error = ENOENT;
-
-				bool getShadowPwd = message.GetBool("shadow", false);
-
-				// only root may see the shadow passwd
-				if (error == B_OK && getShadowPwd && !isRoot)
-					error = EPERM;
-
-				// add user to message
-				KMessage reply;
-				if (error == B_OK)
-					error = user->WriteToMessage(reply, getShadowPwd);
-
-				// send reply
-				reply.SetWhat(error);
-				message.SendReply(&reply, -1, -1, 0, registrarTeam);
-
-				break;
-			}
-
-			case B_REG_GET_GROUP:
-			{
-				Group* group = NULL;
-				int32 gid;
-				const char* name;
-
-				// find group
-				if (message.FindInt32("gid", &gid) == B_OK) {
-					group = fGroupDB->GroupByID(gid);
-				} else if (message.FindString("name", &name) == B_OK) {
-					group = fGroupDB->GroupByName(name);
-				} else {
-					error = B_BAD_VALUE;
-				}
-
-				if (error == B_OK && group == NULL)
-					error = ENOENT;
-
-				// add group to message
-				KMessage reply;
-				if (error == B_OK)
-					error = group->WriteToMessage(reply);
-
-				// send reply
-				reply.SetWhat(error);
-				message.SendReply(&reply, -1, -1, 0, registrarTeam);
-
-				break;
-			}
-
-			case B_REG_GET_USER_GROUPS:
-			{
-				// get user name
-				const char* name;
-				int32 maxCount;
-				if (message.FindString("name", &name) != B_OK
-					|| message.FindInt32("max count", &maxCount) != B_OK
-					|| maxCount <= 0) {
-					error = B_BAD_VALUE;
-				}
-
-				// get groups
-				gid_t groups[NGROUPS_MAX + 1];
-				int32 count = 0;
-				if (error == B_OK) {
-					maxCount = min_c(maxCount, NGROUPS_MAX + 1);
-					count = fGroupDB->GetUserGroups(name, groups, maxCount);
-				}
-
-				// add groups to message
-				KMessage reply;
-				if (error == B_OK) {
-					if (reply.AddInt32("count", count) != B_OK
-						|| reply.AddData("groups", B_INT32_TYPE,
-								groups, min_c(maxCount, count) * sizeof(gid_t),
-								false) != B_OK) {
-						error = B_NO_MEMORY;
-					}
-				}
-
-				// send reply
-				reply.SetWhat(error);
-				message.SendReply(&reply, -1, -1, 0, registrarTeam);
-
-				break;
-			}
-
-			case B_REG_UPDATE_USER:
-			{
-				// find user
-				User* user = NULL;
-				int32 uid;
-				const char* name;
-
-				if (message.FindInt32("uid", &uid) == B_OK) {
-					user = fUserDB->UserByID(uid);
-				} else if (message.FindString("name", &name) == B_OK) {
-					user = fUserDB->UserByName(name);
-				} else {
-					error = B_BAD_VALUE;
-				}
-
-				// only can change anything
-				if (error == B_OK && !isRoot)
-					error = EPERM;
-
-				// check addUser vs. existing user
-				bool addUser = message.GetBool("add user", false);
-				if (error == B_OK) {
-					if (addUser) {
-						if (user != NULL)
-							error = EEXIST;
-					} else if (user == NULL)
-						error = ENOENT;
-				}
-
-				// apply all changes
-				if (error == B_OK) {
-					// clone the user object and update it from the message
-					User* oldUser = user;
-					user = NULL;
-					try {
-						user = (oldUser != NULL ? new User(*oldUser)
-							: new User);
-						user->UpdateFromMessage(message);
-
-						// uid and name should remain the same
-						if (oldUser != NULL) {
-							if (oldUser->UID() != user->UID()
-								|| oldUser->Name() != user->Name()) {
-								error = B_BAD_VALUE;
-							}
-						}
-
-						// replace the old user and write DBs to disk
-						if (error == B_OK) {
-							fUserDB->AddUser(user);
-							fUserDB->WriteToDisk();
-							fPasswdDBReply->SetTo(1);
-							fShadowPwdDBReply->SetTo(1);
-						}
-					} catch (...) {
-						error = B_NO_MEMORY;
-					}
-
-					if (error == B_OK)
-						delete oldUser;
-					else
-						delete user;
-				}
-
-				// send reply
-				KMessage reply;
-				reply.SetWhat(error);
-				message.SendReply(&reply, -1, -1, 0, registrarTeam);
-
-				break;
-			}
-			case B_REG_UPDATE_GROUP:
-				debug_printf("B_REG_UPDATE_GROUP done: currently unsupported!\n");
-				break;
-			default:
-				debug_printf("REG: invalid message: %lu\n", message.What());
-
-		}
-	}
-#endif
 }
 
 
 status_t
 KeyStoreServer::_ReadKeyStoreDatabase()
 {
-	status_t result = fDatabase.Unflatten(&fKeyStoreFile);
+	BMessage keyrings;
+	status_t result = keyrings.Unflatten(&fKeyStoreFile);
 	if (result != B_OK) {
 		printf("failed to read keystore database\n");
-		fDatabase.MakeEmpty();
 		_WriteKeyStoreDatabase();
 		return result;
+	}
+
+	int32 index = 0;
+	char* keyringName = NULL;
+	while (keyrings.GetInfo(B_MESSAGE_TYPE, index++, &keyringName,
+			NULL) == B_OK) {
+
+		BMessage keyringData;
+		if (keyrings.FindMessage(keyringName, &keyringData) != B_OK) {
+			printf("failed to retrieve keyring data for keyring \"%s\"\n",
+				keyringName);
+			continue;
+		}
+
+		Keyring* keyring = new(std::nothrow) Keyring(keyringName, keyringData);
+		if (keyring == NULL) {
+			printf("no memory for allocating keyring \"%s\"\n", keyringName);
+			continue;
+		}
+
+		if (strlen(keyringName) == 0)
+			fDefaultKeyring = keyring;
+		else
+			fKeyrings.BinaryInsert(keyring, &Keyring::Compare);
 	}
 
 	return B_OK;
@@ -452,127 +318,65 @@ KeyStoreServer::_WriteKeyStoreDatabase()
 {
 	fKeyStoreFile.SetSize(0);
 	fKeyStoreFile.Seek(0, SEEK_SET);
-	return fDatabase.Flatten(&fKeyStoreFile);
+
+	BMessage keyrings;
+	if (fDefaultKeyring != NULL)
+		keyrings.AddMessage("", &fDefaultKeyring->Data());
+
+	for (int32 i = 0; i < fKeyrings.CountItems(); i++) {
+		Keyring* keyring = fKeyrings.ItemAt(i);
+		if (keyring == NULL)
+			continue;
+
+		keyrings.AddMessage(keyring->Name(), &keyring->Data());
+	}
+
+	return keyrings.Flatten(&fKeyStoreFile);
+}
+
+
+Keyring*
+KeyStoreServer::_FindKeyring(const BString& name)
+{
+	if (name.IsEmpty())
+		return fDefaultKeyring;
+
+	return fKeyrings.BinarySearchByKey(name, &Keyring::Compare);
 }
 
 
 status_t
-KeyStoreServer::_FindKey(const BString& identifier,
-	const BString& secondaryIdentifier, bool secondaryIdentifierOptional,
-	BMessage* _foundKeyMessage)
+KeyStoreServer::_AddKeyring(const BString& name, const BMessage& keyMessage)
 {
-	int32 count;
-	type_code type;
-	if (fDatabase.GetInfo(identifier, &type, &count) != B_OK)
-		return B_ENTRY_NOT_FOUND;
-
-	// We have a matching primary identifier, need to check for the secondary
-	// identifier.
-	for (int32 i = 0; i < count; i++) {
-		BMessage candidate;
-		if (fDatabase.FindMessage(identifier, i, &candidate) != B_OK)
-			return B_ERROR;
-
-		BString candidateIdentifier;
-		if (candidate.FindString("secondaryIdentifier",
-				&candidateIdentifier) != B_OK) {
-			candidateIdentifier = "";
-		}
-
-		if (candidateIdentifier == secondaryIdentifier) {
-			if (_foundKeyMessage != NULL)
-				*_foundKeyMessage = candidate;
-			return B_OK;
-		}
-	}
-
-	// We didn't find an exact match.
-	if (secondaryIdentifierOptional) {
-		if (_foundKeyMessage == NULL)
-			return B_OK;
-
-		// The secondary identifier is optional, so we just return the
-		// first entry.
-		return fDatabase.FindMessage(identifier, 0, _foundKeyMessage);
-	}
-
-	return B_ENTRY_NOT_FOUND;
-}
-
-
-status_t
-KeyStoreServer::_FindKey(BKeyType type, BKeyPurpose purpose, uint32 index,
-	BMessage& _foundKeyMessage)
-{
-	for (int32 keyIndex = 0;; keyIndex++) {
-		int32 count = 0;
-		char* identifier = NULL;
-		if (fDatabase.GetInfo(B_MESSAGE_TYPE, keyIndex, &identifier, NULL,
-				&count) != B_OK) {
-			break;
-		}
-
-		if (type == B_KEY_TYPE_ANY && purpose == B_KEY_PURPOSE_ANY) {
-			// No need to inspect the actual keys.
-			if ((int32)index >= count) {
-				index -= count;
-				continue;
-			}
-
-			return fDatabase.FindMessage(identifier, index, &_foundKeyMessage);
-		}
-
-		// Go through the keys to check their type and purpose.
-		for (int32 subkeyIndex = 0; subkeyIndex < count; subkeyIndex++) {
-			BMessage subkey;
-			if (fDatabase.FindMessage(identifier, subkeyIndex, &subkey) != B_OK)
-				return B_ERROR;
-
-			bool match = true;
-			if (type != B_KEY_TYPE_ANY) {
-				BKeyType subkeyType;
-				if (subkey.FindUInt32("type", (uint32*)&subkeyType) != B_OK)
-					return B_ERROR;
-
-				match = subkeyType == type;
-			}
-
-			if (match && purpose != B_KEY_PURPOSE_ANY) {
-				BKeyPurpose subkeyPurpose;
-				if (subkey.FindUInt32("purpose", (uint32*)&subkeyPurpose)
-						!= B_OK) {
-					return B_ERROR;
-				}
-
-				match = subkeyPurpose == purpose;
-			}
-
-			if (match) {
-				if (index == 0) {
-					_foundKeyMessage = subkey;
-					return B_OK;
-				}
-
-				index--;
-			}
-		}
-	}
-
-	return B_ENTRY_NOT_FOUND;
-}
-
-
-status_t
-KeyStoreServer::_AddKey(const BString& identifier,
-	const BString& secondaryIdentifier, const BMessage& keyMessage)
-{
-	// Check for collisions.
-	if (_FindKey(identifier, secondaryIdentifier, false, NULL) == B_OK)
+	if (_FindKeyring(name) != NULL)
 		return B_NAME_IN_USE;
 
-	// We're fine, just add the new key.
-	fDatabase.AddMessage(identifier, &keyMessage);
-	return _WriteKeyStoreDatabase();
+	Keyring* keyring = new(std::nothrow) Keyring(name, BMessage());
+	if (keyring == NULL)
+		return B_NO_MEMORY;
+
+	if (!fKeyrings.BinaryInsert(keyring, &Keyring::Compare)) {
+		delete keyring;
+		return B_ERROR;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+KeyStoreServer::_RemoveKeyring(const BString& name)
+{
+	Keyring* keyring = _FindKeyring(name);
+	if (keyring == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	if (keyring == fDefaultKeyring) {
+		// The default keyring can't be removed.
+		return B_NOT_ALLOWED;
+	}
+
+	return fKeyrings.RemoveItem(keyring) ? B_OK : B_ERROR;
 }
 
 

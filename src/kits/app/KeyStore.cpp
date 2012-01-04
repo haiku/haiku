@@ -303,7 +303,16 @@ BKeyStore::IsKeyringAccessible(const char* keyring)
 {
 	BMessage message(KEY_STORE_IS_KEYRING_ACCESSIBLE);
 	message.AddString("keyring", keyring);
-	return _SendKeyMessage(message, NULL) == B_OK;
+
+	BMessage reply;
+	if (_SendKeyMessage(message, &reply) != B_OK)
+		return false;
+
+	bool accessible;
+	if (reply.FindBool("accessible", &accessible) != B_OK)
+		return false;
+
+	return accessible;
 }
 
 
