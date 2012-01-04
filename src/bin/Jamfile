@@ -88,6 +88,7 @@ StdBinCommands
 	draggers.cpp
 	ffm.cpp
 	iroster.cpp
+	keystore.cpp
 	listattr.cpp
 	listfont.cpp
 	listres.cpp
