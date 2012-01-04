@@ -182,6 +182,7 @@ BKeyStore::GetNextKey(const char* keyring, BKeyType type, BKeyPurpose purpose,
 	if (reply.FindMessage("key", &keyMessage) != B_OK)
 		return B_ERROR;
 
+	reply.FindUInt32("cookie", &cookie);
 	return key._Unflatten(keyMessage);
 }
 
@@ -227,6 +228,7 @@ BKeyStore::GetNextKeyring(uint32& cookie, BString& keyring)
 	if (reply.FindString("keyring", &keyring) != B_OK)
 		return B_ERROR;
 
+	reply.FindUInt32("cookie", &cookie);
 	return B_OK;
 }
 
@@ -288,6 +290,7 @@ BKeyStore::GetNextMasterKeyring(uint32& cookie, BString& keyring)
 	if (reply.FindString("keyring", &keyring) != B_OK)
 		return B_ERROR;
 
+	reply.FindUInt32("cookie", &cookie);
 	return B_OK;
 }
 
@@ -345,6 +348,7 @@ BKeyStore::GetNextApplication(const BKey& key, uint32& cookie,
 	if (reply.FindString("signature", &signature) != B_OK)
 		return B_ERROR;
 
+	reply.FindUInt32("cookie", &cookie);
 	return B_OK;
 }
 
