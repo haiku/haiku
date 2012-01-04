@@ -7,6 +7,8 @@
 
 
 #include <Application.h>
+#include <File.h>
+#include <Key.h>
 
 
 class KeyStoreServer : public BApplication {
@@ -17,7 +19,23 @@ virtual								~KeyStoreServer();
 virtual	void						MessageReceived(BMessage* message);
 
 private:
-		status_t					_InitKeyStoreDatabase();
+		status_t					_ReadKeyStoreDatabase();
+		status_t					_WriteKeyStoreDatabase();
+
+		status_t					_FindKey(const BString& identifier,
+										const BString& secondaryIdentifier,
+										bool secondaryIdentifierOptional,
+										BMessage* _foundKeyMessage);
+		status_t					_FindKey(BKeyType type, BKeyPurpose purpose,
+										uint32 index,
+										BMessage& _foundKeyMessage);
+
+		status_t					_AddKey(const BString& identifier,
+										const BString& secondaryIdentifier,
+										const BMessage& keyMessage);
+
+		BMessage					fDatabase;
+		BFile						fKeyStoreFile;
 };
 
 

@@ -8,6 +8,12 @@
 
 #include <KeyStoreDefs.h>
 
+#include <Directory.h>
+#include <Entry.h>
+#include <FindDirectory.h>
+#include <Path.h>
+#include <String.h>
+
 #include <new>
 
 #include <stdio.h>
@@ -20,7 +26,27 @@ KeyStoreServer::KeyStoreServer()
 	:
 	BApplication(kKeyStoreServerSignature)
 {
-	_InitKeyStoreDatabase();
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
+		return;
+
+	BDirectory settingsDir(path.Path());
+	path.Append("system");
+	if (!settingsDir.Contains(path.Path()))
+		settingsDir.CreateDirectory(path.Path(), NULL);
+
+	settingsDir.SetTo(path.Path());
+	path.Append("keystore");
+	if (!settingsDir.Contains(path.Path()))
+		settingsDir.CreateDirectory(path.Path(), NULL);
+
+	settingsDir.SetTo(path.Path());
+	path.Append("keystore_database");
+
+	fKeyStoreFile.SetTo(path.Path(), B_READ_WRITE
+		| (settingsDir.Contains(path.Path()) ? 0 : B_CREATE_FILE));
+
+	_ReadKeyStoreDatabase();
 }
 
 
@@ -32,20 +58,56 @@ KeyStoreServer::~KeyStoreServer()
 void
 KeyStoreServer::MessageReceived(BMessage* message)
 {
+	BMessage reply;
+	status_t result = B_MESSAGE_NOT_UNDERSTOOD;
+
 	switch (message->what) {
 		case KEY_STORE_GET_KEY:
 		{
-			BMessage reply(KEY_STORE_RESULT);
-			reply.AddInt32("result", B_NOT_ALLOWED);
-			message->SendReply(&reply);
+			result = B_NOT_ALLOWED;
 			break;
 		}
 
 		case KEY_STORE_GET_NEXT_KEY:
 		{
-			BMessage reply(KEY_STORE_RESULT);
-			reply.AddInt32("result", B_ENTRY_NOT_FOUND);
-			message->SendReply(&reply);
+			BKeyType type;
+			BKeyPurpose purpose;
+			uint32 cookie;
+			if (message->FindUInt32("type", (uint32*)&type) != B_OK
+				|| message->FindUInt32("purpose", (uint32*)&purpose) != B_OK
+				|| message->FindUInt32("cookie", &cookie) != B_OK) {
+				result = B_BAD_VALUE;
+				break;
+			}
+
+			BMessage keyMessage;
+			result = _FindKey(type, purpose, cookie, keyMessage);
+			if (result == B_OK) {
+				cookie++;
+				reply.AddUInt32("cookie", cookie);
+				reply.AddMessage("key", &keyMessage);
+			}
+
+			break;
+		}
+
+		case KEY_STORE_ADD_KEY:
+		{
+			BMessage keyMessage;
+			BString identifier;
+			if (message->FindMessage("key", &keyMessage) != B_OK
+				|| keyMessage.FindString("identifier", &identifier) != B_OK) {
+				result = B_BAD_VALUE;
+				break;
+			}
+
+			BString secondaryIdentifier;
+			if (keyMessage.FindString("secondaryIdentifier",
+					&secondaryIdentifier) != B_OK) {
+				secondaryIdentifier = "";
+			}
+
+			result = _AddKey(identifier, secondaryIdentifier, keyMessage);
 			break;
 		}
 
@@ -55,6 +117,17 @@ KeyStoreServer::MessageReceived(BMessage* message)
 				message->what, (const char*)&message->what);
 			break;
 		}
+	}
+
+	if (message->IsSourceWaiting()) {
+		if (result == B_OK)
+			reply.what = KEY_STORE_SUCCESS;
+		else {
+			reply.what = KEY_STORE_RESULT;
+			reply.AddInt32("result", result);
+		}
+
+		message->SendReply(&reply);
 	}
 
 #if 0
@@ -360,9 +433,146 @@ KeyStoreServer::MessageReceived(BMessage* message)
 
 
 status_t
-KeyStoreServer::_InitKeyStoreDatabase()
+KeyStoreServer::_ReadKeyStoreDatabase()
 {
-	return B_ERROR;
+	status_t result = fDatabase.Unflatten(&fKeyStoreFile);
+	if (result != B_OK) {
+		printf("failed to read keystore database\n");
+		fDatabase.MakeEmpty();
+		_WriteKeyStoreDatabase();
+		return result;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+KeyStoreServer::_WriteKeyStoreDatabase()
+{
+	fKeyStoreFile.SetSize(0);
+	fKeyStoreFile.Seek(0, SEEK_SET);
+	return fDatabase.Flatten(&fKeyStoreFile);
+}
+
+
+status_t
+KeyStoreServer::_FindKey(const BString& identifier,
+	const BString& secondaryIdentifier, bool secondaryIdentifierOptional,
+	BMessage* _foundKeyMessage)
+{
+	int32 count;
+	type_code type;
+	if (fDatabase.GetInfo(identifier, &type, &count) != B_OK)
+		return B_ENTRY_NOT_FOUND;
+
+	// We have a matching primary identifier, need to check for the secondary
+	// identifier.
+	for (int32 i = 0; i < count; i++) {
+		BMessage candidate;
+		if (fDatabase.FindMessage(identifier, i, &candidate) != B_OK)
+			return B_ERROR;
+
+		BString candidateIdentifier;
+		if (candidate.FindString("secondaryIdentifier",
+				&candidateIdentifier) != B_OK) {
+			candidateIdentifier = "";
+		}
+
+		if (candidateIdentifier == secondaryIdentifier) {
+			if (_foundKeyMessage != NULL)
+				*_foundKeyMessage = candidate;
+			return B_OK;
+		}
+	}
+
+	// We didn't find an exact match.
+	if (secondaryIdentifierOptional) {
+		if (_foundKeyMessage == NULL)
+			return B_OK;
+
+		// The secondary identifier is optional, so we just return the
+		// first entry.
+		return fDatabase.FindMessage(identifier, 0, _foundKeyMessage);
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+status_t
+KeyStoreServer::_FindKey(BKeyType type, BKeyPurpose purpose, uint32 index,
+	BMessage& _foundKeyMessage)
+{
+	for (int32 keyIndex = 0;; keyIndex++) {
+		int32 count = 0;
+		char* identifier = NULL;
+		if (fDatabase.GetInfo(B_MESSAGE_TYPE, keyIndex, &identifier, NULL,
+				&count) != B_OK) {
+			break;
+		}
+
+		if (type == B_KEY_TYPE_ANY && purpose == B_KEY_PURPOSE_ANY) {
+			// No need to inspect the actual keys.
+			if ((int32)index >= count) {
+				index -= count;
+				continue;
+			}
+
+			return fDatabase.FindMessage(identifier, index, &_foundKeyMessage);
+		}
+
+		// Go through the keys to check their type and purpose.
+		for (int32 subkeyIndex = 0; subkeyIndex < count; subkeyIndex++) {
+			BMessage subkey;
+			if (fDatabase.FindMessage(identifier, subkeyIndex, &subkey) != B_OK)
+				return B_ERROR;
+
+			bool match = true;
+			if (type != B_KEY_TYPE_ANY) {
+				BKeyType subkeyType;
+				if (subkey.FindUInt32("type", (uint32*)&subkeyType) != B_OK)
+					return B_ERROR;
+
+				match = subkeyType == type;
+			}
+
+			if (match && purpose != B_KEY_PURPOSE_ANY) {
+				BKeyPurpose subkeyPurpose;
+				if (subkey.FindUInt32("purpose", (uint32*)&subkeyPurpose)
+						!= B_OK) {
+					return B_ERROR;
+				}
+
+				match = subkeyPurpose == purpose;
+			}
+
+			if (match) {
+				if (index == 0) {
+					_foundKeyMessage = subkey;
+					return B_OK;
+				}
+
+				index--;
+			}
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+status_t
+KeyStoreServer::_AddKey(const BString& identifier,
+	const BString& secondaryIdentifier, const BMessage& keyMessage)
+{
+	// Check for collisions.
+	if (_FindKey(identifier, secondaryIdentifier, false, NULL) == B_OK)
+		return B_NAME_IN_USE;
+
+	// We're fine, just add the new key.
+	fDatabase.AddMessage(identifier, &keyMessage);
+	return _WriteKeyStoreDatabase();
 }
 
 
