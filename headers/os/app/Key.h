@@ -73,6 +73,8 @@ public:
 			bool				operator==(const BKey& other) const;
 			bool				operator!=(const BKey& other) const;
 
+	virtual	void				PrintToStream();
+
 protected:
 	virtual	status_t			_Flatten(BMessage& message) const;
 	virtual	status_t			_Unflatten(const BMessage& message);
@@ -108,6 +110,8 @@ public:
 
 			status_t			SetPassword(const char* password);
 			const char*			Password() const;
+
+	virtual	void				PrintToStream();
 };
 
 #endif	// _KEY_H

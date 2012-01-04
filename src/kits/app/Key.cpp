@@ -6,6 +6,8 @@
 
 #include <Key.h>
 
+#include <stdio.h>
+
 
 #if 0
 // TODO: move this to the KeyStore or the registrar backend if needed
@@ -198,6 +200,40 @@ BKey::operator!=(const BKey& other) const
 }
 
 
+void
+BKey::PrintToStream()
+{
+	if (Type() == B_KEY_TYPE_GENERIC)
+		printf("generic key:\n");
+
+	const char* purposeString = "unknown";
+	switch (fPurpose) {
+		case B_KEY_PURPOSE_ANY:
+			purposeString = "any";
+			break;
+		case B_KEY_PURPOSE_GENERIC:
+			purposeString = "generic";
+			break;
+		case B_KEY_PURPOSE_WEB:
+			purposeString = "web";
+			break;
+		case B_KEY_PURPOSE_NETWORK:
+			purposeString = "network";
+			break;
+		case B_KEY_PURPOSE_VOLUME:
+			purposeString = "volume";
+			break;
+	}
+
+	printf("\tpurpose: %s\n", purposeString);
+	printf("\tidentifier: \"%s\"\n", fIdentifier.String());
+	printf("\tsecondary identifier: \"%s\"\n", fSecondaryIdentifier.String());
+	printf("\towner: \"%s\"\n", fOwner.String());
+	printf("\tcreation time: %" B_PRIu64 "\n", fCreationTime);
+	printf("\traw data length: %" B_PRIuSIZE "\n", fData.BufferLength());
+}
+
+
 status_t
 BKey::_Flatten(BMessage& message) const
 {
@@ -289,4 +325,13 @@ const char*
 BPasswordKey::Password() const
 {
 	return (const char*)Data();
+}
+
+
+void
+BPasswordKey::PrintToStream()
+{
+	printf("password key:\n");
+	BKey::PrintToStream();
+	printf("\tpassword: \"%s\"\n", Password());
 }
