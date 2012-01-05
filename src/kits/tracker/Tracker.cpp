@@ -600,10 +600,8 @@ TTracker::MoveRefsToTrash(const BMessage *message)
 			srcList->AddItem(new entry_ref(ref));
 	}
 
-	if (srcList->CountItems())
-		// async move to trash
-		FSMoveToTrash(srcList);
-	delete srcList;
+	// async move to trash
+	FSMoveToTrash(srcList);
 }
 
 
