@@ -239,6 +239,7 @@ rule ExtractArchive directory : entries : archiveFile : grist
 							$(archiveFile) ;
 			case .tgz 	: ExtractTarArchive1 $(targets) : $(directory)
 							$(archiveFile) ;
+			case ""		: Exit "ExtractArchive: No archive passed" ;
 			case * 		: Exit "ExtractArchive: Unhandled archive extension:
 							$(archiveFile:S)" ;
 		}
