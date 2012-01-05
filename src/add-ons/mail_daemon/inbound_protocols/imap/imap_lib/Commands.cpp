@@ -740,7 +740,7 @@ GetQuotaCommand::GetQuotaCommand(const char* mailboxName)
 BString
 GetQuotaCommand::CommandString()
 {
-	BString command = "GETQUOTA \"";
+	BString command = "GETQUOTAROOT \"";
 	command += fMailboxName;
 	command += "\"";
 	return command;
@@ -750,12 +750,15 @@ GetQuotaCommand::CommandString()
 bool
 GetQuotaCommand::HandleUntagged(Response& response)
 {
-	if (!response.IsCommand("QUOTA") || response.IsListAt(1))
+	if (!response.IsCommand("QUOTA") || !response.IsListAt(2))
 		return false;
 
-	const ArgumentList& arguments = response.ListAt(1);
-	fUsedStorage = (uint64)arguments.NumberAt(0) * 1024;
-	fTotalStorage = (uint64)arguments.NumberAt(1) * 1024;
+	const ArgumentList& arguments = response.ListAt(2);
+	if (!arguments.EqualsAt(0, "STORAGE"))
+		return false;
+
+	fUsedStorage = (uint64)arguments.NumberAt(1) * 1024;
+	fTotalStorage = (uint64)arguments.NumberAt(2) * 1024;
 
 	return true;
 }

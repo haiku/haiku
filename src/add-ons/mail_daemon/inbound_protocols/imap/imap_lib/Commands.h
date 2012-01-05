@@ -289,7 +289,8 @@ private:
 
 class GetQuotaCommand : public Command, public Handler {
 public:
-								GetQuotaCommand(const char* mailboxName = "");
+								GetQuotaCommand(
+									const char* mailboxName = "INBOX");
 
 			BString				CommandString();
 			bool				HandleUntagged(Response& response);
