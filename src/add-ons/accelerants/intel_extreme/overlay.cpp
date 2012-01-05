@@ -543,7 +543,7 @@ intel_configure_overlay(overlay_token overlayToken,
 	if (overlayToken != (overlay_token)gInfo->shared_info->overlay_token)
 		return B_BAD_VALUE;
 
-	if (window == NULL && view == NULL) {
+	if (window == NULL || view == NULL) {
 		hide_overlay();
 		return B_OK;
 	}
