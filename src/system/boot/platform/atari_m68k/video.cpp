@@ -1192,10 +1192,10 @@ platform_init_video(void)
 
 	if (sMilanModeOps.Init() == B_OK) {
 		sMilanModeOps.Enumerate();
-	} else if (sSTModeOps.Init() == B_OK) {
-		sSTModeOps.Enumerate();
 	} else if (sFalconModeOps.Init() == B_OK) {
 		sFalconModeOps.Enumerate();
+	} else if (sSTModeOps.Init() == B_OK) {
+		sSTModeOps.Enumerate();
 	} else {
 		dprintf("No usable video API found\n");
 	}
