@@ -61,7 +61,7 @@ public:
 	}
 
 	
-	template <typename OtherType>
+	template<typename OtherType>
 	BReference(const BReference<OtherType>& other)
 		:
 		fObject(NULL)
@@ -131,7 +131,7 @@ public:
 		return *this;
 	}
 
-	template <typename OtherType>
+	template<typename OtherType>
 	BReference& operator=(const BReference<OtherType>& other)
 	{
 		SetTo(other.Get());
