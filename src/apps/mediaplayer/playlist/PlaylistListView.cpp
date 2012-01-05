@@ -331,7 +331,7 @@ PlaylistListView::MouseDown(BPoint where)
 				// only do something if user clicked the same item twice
 				if (fLastClickedItem == item) {
 					BAutolock _(fPlaylist);
-					fPlaylist->SetCurrentItemIndex(i);
+					fPlaylist->SetCurrentItemIndex(i, true);
 					handled = true;
 				}
 			} else {

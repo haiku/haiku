@@ -360,7 +360,7 @@ Playlist::ItemAtFast(int32 index) const
 
 
 bool
-Playlist::SetCurrentItemIndex(int32 index)
+Playlist::SetCurrentItemIndex(int32 index, bool forceNotify)
 {
 	bool result = true;
 	if (index >= CountItems()) {
@@ -371,7 +371,7 @@ Playlist::SetCurrentItemIndex(int32 index)
 		index = -1;
 		result = false;
 	}
-	if (index == fCurrentIndex)
+	if (index == fCurrentIndex && !forceNotify)
 		return result;
 
 	fCurrentIndex = index;

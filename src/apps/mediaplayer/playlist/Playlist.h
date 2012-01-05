@@ -91,7 +91,8 @@ public:
 			PlaylistItem*		ItemAtFast(int32 index) const;
 
 			// navigating current ref
-			bool				SetCurrentItemIndex(int32 index);
+			bool				SetCurrentItemIndex(int32 index,
+									bool forceNotify = false);
 			int32				CurrentItemIndex() const;
 
 			void				GetSkipInfo(bool* canSkipPrevious,
