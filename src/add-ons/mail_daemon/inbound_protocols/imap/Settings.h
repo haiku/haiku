@@ -25,7 +25,7 @@ public:
 			BString				Password() const;
 
 private:
-			const BMessage&		fMessage;
+			const BMessage		fMessage;
 };
 
 
