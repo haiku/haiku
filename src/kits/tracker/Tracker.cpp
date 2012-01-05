@@ -719,6 +719,8 @@ TTracker::OpenRef(const entry_ref *ref, const node_ref *nodeToClose,
 	} else if (model->IsQueryTemplate()) {
 		// query template - open new find window
 		(new FindWindow(model->EntryRef()))->Show();
+
+		delete model;
 		if (nodeToClose)
 			CloseParentWaitingForChildSoon(ref, nodeToClose);
 	} else {
