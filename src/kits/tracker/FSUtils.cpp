@@ -115,7 +115,7 @@ static status_t MoveTask(BObjectList<entry_ref> *, BEntry *, BList *, uint32);
 static status_t _DeleteTask(BObjectList<entry_ref> *, bool);
 static status_t _RestoreTask(BObjectList<entry_ref> *);
 status_t CalcItemsAndSize(CopyLoopControl* loopControl,
-	BObjectList<entry_ref> *refList, size_t blockSize, int32 *totalCount,
+	BObjectList<entry_ref> *refList, ssize_t blockSize, int32 *totalCount,
 	off_t *totalSize);
 status_t MoveItem(BEntry *entry, BDirectory *destDir, BPoint *loc,
 	uint32 moveMode, const char *newName, Undo &undo,
@@ -2391,7 +2391,7 @@ FSRecursiveCalcSize(BInfoWindow* window, CopyLoopControl* loopControl,
 
 status_t
 CalcItemsAndSize(CopyLoopControl* loopControl, BObjectList<entry_ref> *refList,
-	size_t blockSize, int32 *totalCount, off_t *totalSize)
+	ssize_t blockSize, int32 *totalCount, off_t *totalSize)
 {
 	int32 fileCount = 0;
 	int32 dirCount = 0;
