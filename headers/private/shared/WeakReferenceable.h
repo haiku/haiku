@@ -87,6 +87,22 @@ public:
 		SetTo(other);
 	}
 
+	template <typename OtherType>
+	BWeakReference(const BReference<OtherType>& other)
+		:
+		fPointer(NULL)
+	{
+		SetTo(other.Get());
+	}
+
+	template <typename OtherType>
+	BWeakReference(const BWeakReference<OtherType>& other)
+		:
+		fPointer(NULL)
+	{
+		SetTo(other);
+	}
+
 	~BWeakReference()
 	{
 		Unset();
@@ -106,6 +122,22 @@ public:
 
 		if (other.fPointer) {
 			fPointer = other.fPointer;
+			fPointer->AcquireReference();
+		}
+	}
+
+	template <typename OtherType>
+	void SetTo(const BWeakReference<OtherType>& other)
+	{
+		// Just a compiler check if the types are compatible.
+		OtherType* otherDummy = NULL;
+		Type* dummy = otherDummy;
+		dummy = NULL;
+
+		Unset();
+
+		if (other.Get()) {
+			fPointer = const_cast<WeakPointer*>(other.Get());
 			fPointer->AcquireReference();
 		}
 	}
@@ -140,18 +172,19 @@ public:
 		return BReference<Type>(object, true);
 	}
 
+	/*! Do not use this if you do not know what you are doing. The WeakPointer
+	is for internal use only. */
+	const WeakPointer* Get() const
+	{
+		return fPointer;
+	}
+
 	BWeakReference& operator=(const BWeakReference<Type>& other)
 	{
 		if (this == &other)
 			return *this;
 
-		SetTo(other.fPointer);
-		return *this;
-	}
-
-	BWeakReference& operator=(const Type& other)
-	{
-		SetTo(&other);
+		SetTo(other);
 		return *this;
 	}
 
@@ -164,6 +197,20 @@ public:
 	BWeakReference& operator=(const BReference<Type>& other)
 	{
 		SetTo(other.Get());
+		return *this;
+	}
+
+	template <typename OtherType>
+	BWeakReference& operator=(const BReference<OtherType>& other)
+	{
+		SetTo(other.Get());
+		return *this;
+	}
+
+	template <typename OtherType>
+	BWeakReference& operator=(const BWeakReference<OtherType>& other)
+	{
+		SetTo(other);
 		return *this;
 	}
 
