@@ -108,24 +108,23 @@ if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 {
 			: extracted-icu
 		] ;
 	}
+
+	# zip file and output directory
+	HAIKU_ICU_DEVEL_ZIP_FILE = [ DownloadFile $(HAIKU_ICU_DEVEL_PACKAGE)
+			: $(baseURL)/$(HAIKU_ICU_DEVEL_PACKAGE) ] ;
+	HAIKU_ICU_DEVEL_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_ICU_DEVEL_PACKAGE:B) ] ;
+
+	# extract headers
+	HAIKU_ICU_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_ICU_DEVEL_DIR)
+		: develop/headers/3rdparty : $(HAIKU_ICU_DEVEL_ZIP_FILE)
+		: extracted-icu-devel ] ;
+
+	HAIKU_ICU_HEADERS
+		= [ FDirName $(HAIKU_ICU_DEVEL_DIR) develop headers 3rdparty ] ;
 } else  {
 	Echo "ICU not available for $(TARGET_ARCH)" ;
 }
-
-
-# zip file and output directory
-HAIKU_ICU_DEVEL_ZIP_FILE = [ DownloadFile $(HAIKU_ICU_DEVEL_PACKAGE)
-		: $(baseURL)/$(HAIKU_ICU_DEVEL_PACKAGE) ] ;
-HAIKU_ICU_DEVEL_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
-	$(HAIKU_ICU_DEVEL_PACKAGE:B) ] ;
-
-# extract headers
-HAIKU_ICU_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_ICU_DEVEL_DIR)
-	: develop/headers/3rdparty : $(HAIKU_ICU_DEVEL_ZIP_FILE)
-	: extracted-icu-devel ] ;
-
-HAIKU_ICU_HEADERS
-	= [ FDirName $(HAIKU_ICU_DEVEL_DIR) develop headers 3rdparty ] ;
 
 
 # CLucene
