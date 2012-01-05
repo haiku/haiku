@@ -851,6 +851,8 @@ AttributeView::AttributeView(BRect rect, Model *model)
 		if (resolvedModel->InitCheck() == B_OK)
 			fIconModel = resolvedModel;
 		// broken link, just show the symlink
+		else
+			delete resolvedModel;
 	}
 
 	// Create the rect for displaying the icon
