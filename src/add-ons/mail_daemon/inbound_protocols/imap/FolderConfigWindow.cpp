@@ -7,14 +7,15 @@
 
 #include "FolderConfigWindow.h"
 
+#include <Button.h>
 #include <Catalog.h>
 #include <ControlLook.h>
+#include <LayoutBuilder.h>
 #include <ListItem.h>
+#include <ScrollView.h>
 #include <SpaceLayoutItem.h>
 #include <StringView.h>
 
-#include <ALMLayout.h>
-#include <ALMGroup.h>
 #include <StringForSize.h>
 
 #include "Settings.h"
@@ -77,28 +78,17 @@ private:
 
 class StatusWindow : public BWindow {
 public:
-	StatusWindow(const char* text)
+	StatusWindow(BWindow* parent, const char* text)
 		:
 		BWindow(BRect(0, 0, 10, 10), B_TRANSLATE("status"), B_MODAL_WINDOW_LOOK,
 			B_MODAL_APP_WINDOW_FEEL, B_NO_WORKSPACE_ACTIVATION | B_NOT_ZOOMABLE
-				| B_AVOID_FRONT | B_NOT_RESIZABLE)
+				| B_AVOID_FRONT | B_NOT_RESIZABLE | B_NOT_ZOOMABLE
+				| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 	{
-		BView* rootView = new BView(Bounds(), "root", B_FOLLOW_ALL,
-			B_WILL_DRAW);
-		AddChild(rootView);
-		rootView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-		BALMLayout* layout = new BALMLayout(B_USE_ITEM_SPACING,
-				B_USE_ITEM_SPACING);
-		rootView->SetLayout(layout);
-		layout->SetInsets(B_USE_WINDOW_SPACING);
-
-		BStringView* string = new BStringView("text", text);
-		layout->AddView(string, layout->Left(), layout->Top(), layout->Right(),
-			layout->Bottom());
-		BSize min = layout->MinSize();
-		ResizeTo(min.Width(), min.Height());
-		CenterOnScreen();
+		BLayoutBuilder::Group<>(this)
+			.SetInsets(B_USE_DEFAULT_SPACING)
+			.Add(new BStringView("text", text));
+		CenterIn(parent->Frame());
 	}
 };
 
@@ -127,35 +117,50 @@ CheckBoxItem::CheckBoxItem(const char* text, bool checked)
 	fChecked(checked),
 	fMouseDown(false)
 {
-
 }
 
 
 void
 CheckBoxItem::DrawItem(BView* owner, BRect itemRect, bool drawEverything)
 {
-	BStringItem::DrawItem(owner, itemRect, drawEverything);
-
-	if (!be_control_look)
-		return;
-
 	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color lowColor = owner->LowColor();
 	uint32 flags = 0;
 	if (fMouseDown)
 		flags |= BControlLook::B_CLICKED;
 	if (fChecked)
 		flags |= BControlLook::B_ACTIVATED;
+
 	font_height fontHeight;
 	owner->GetFontHeight(&fontHeight);
 	BRect boxRect(0.0f, 2.0f, ceilf(3.0f + fontHeight.ascent),
 		ceilf(5.0f + fontHeight.ascent));
 
-	fBoxRect.left = itemRect.right - boxRect.Width();
+	owner->PushState();
+
+	float left = itemRect.left;
+	fBoxRect.left = left + 3;
 	fBoxRect.top = itemRect.top + (itemRect.Height() - boxRect.Height()) / 2;
-	fBoxRect.right = itemRect.right;
+	fBoxRect.right = fBoxRect.left + boxRect.Width();
 	fBoxRect.bottom = itemRect.top + boxRect.Height();
 
+	itemRect.left = fBoxRect.right + be_control_look->DefaultLabelSpacing();
+
+	if (IsSelected() || drawEverything) {
+		if (IsSelected()) {
+			owner->SetHighColor(tint_color(lowColor, B_DARKEN_2_TINT));
+			owner->SetLowColor(owner->HighColor());
+		} else
+			owner->SetHighColor(lowColor);
+
+		owner->FillRect(
+			BRect(left, itemRect.top, itemRect.left, itemRect.bottom));
+	}
+
 	be_control_look->DrawCheckBox(owner, fBoxRect, fBoxRect, base, flags);
+	owner->PopState();
+
+	BStringItem::DrawItem(owner, itemRect, drawEverything);
 }
 
 
@@ -247,40 +252,36 @@ EditListView::FrameResized(float newWidth, float newHeight)
 
 FolderConfigWindow::FolderConfigWindow(BRect parent, const BMessage& settings)
 	:
-	BWindow(BRect(0, 0, 300, 300), B_TRANSLATE("IMAP Folders"),
+	BWindow(BRect(0, 0, 350, 350), B_TRANSLATE("IMAP Folders"),
 		B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
-		B_NO_WORKSPACE_ACTIVATION | B_NOT_ZOOMABLE | B_AVOID_FRONT),
+		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fSettings(settings)
 {
-	BView* rootView = new BView(Bounds(), "root", B_FOLLOW_ALL, B_WILL_DRAW);
-	AddChild(rootView);
-	rootView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	BALMLayout* layout = new BALMLayout(B_USE_ITEM_SPACING, B_USE_ITEM_SPACING);
-	rootView->SetLayout(layout);
-	layout->SetInsets(B_USE_WINDOW_INSETS);
-
-	fFolderListView = new EditListView(B_TRANSLATE("IMAP Folders"));
-	fFolderListView->SetExplicitPreferredSize(BSize(B_SIZE_UNLIMITED,
-		B_SIZE_UNLIMITED));
-	fApplyButton = new BButton("Apply", B_TRANSLATE("Apply"),
-		new BMessage(kMsgApplyButton));
-
 	fQuotaView = new BStringView("quota view",
 		B_TRANSLATE("Failed to fetch available storage."));
 	fQuotaView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_CENTER));
+	fQuotaView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
-	(ALMGroup(fQuotaView) / ALMGroup(fFolderListView)
-		/ (ALMGroup(BSpaceLayoutItem::CreateGlue())
-			| ALMGroup(fApplyButton))).BuildLayout(layout);
+	fFolderListView = new EditListView(B_TRANSLATE("IMAP Folders"));
+	fFolderListView->SetExplicitPreferredSize(BSize(B_SIZE_UNLIMITED,
+		B_SIZE_UNLIMITED));
+
+	BButton* cancelButton = new BButton("cancel", B_TRANSLATE("Cancel"),
+		new BMessage(B_QUIT_REQUESTED));
+	BButton* applyButton = new BButton("apply", B_TRANSLATE("Apply"),
+		new BMessage(kMsgApplyButton));
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(fQuotaView)
+		.Add(new BScrollView("scroller", fFolderListView, 0, false, true))
+		.AddGroup(B_HORIZONTAL)
+			.AddGlue()
+			.Add(cancelButton)
+			.Add(applyButton);
 
 	PostMessage(kMsgInit);
-
-	BSize min = layout->MinSize();
-	BSize max = layout->MaxSize();
-	SetSizeLimits(min.Width(), max.Width(), min.Height(), max.Height());
-
 	CenterIn(parent);
 }
 
@@ -307,12 +308,15 @@ FolderConfigWindow::MessageReceived(BMessage* message)
 void
 FolderConfigWindow::_LoadFolders()
 {
-	StatusWindow* status = new StatusWindow(
+	StatusWindow* statusWindow = new StatusWindow(this,
 		B_TRANSLATE("Fetching IMAP folders, have patience..."));
-	status->Show();
+	statusWindow->Show();
 
-	fProtocol.Connect(fSettings.ServerAddress(), fSettings.Username(),
-		fSettings.Password(), fSettings.UseSSL());
+	status_t status = fProtocol.Connect(fSettings.ServerAddress(),
+		fSettings.Username(), fSettings.Password(), fSettings.UseSSL());
+	if (status != B_OK) {
+		// TODO: show error message
+	}
 
 	// TODO: don't get all of them at once, but retrieve them level by level
 	fFolderList.clear();
@@ -335,7 +339,7 @@ FolderConfigWindow::_LoadFolders()
 		fQuotaView->SetText(quotaString);
 	}
 
-	status->PostMessage(B_QUIT_REQUESTED);
+	statusWindow->PostMessage(B_QUIT_REQUESTED);
 }
 
 
@@ -354,8 +358,8 @@ FolderConfigWindow::_ApplyChanges()
 	if (!haveChanges)
 		return;
 
-	StatusWindow* status = new StatusWindow(B_TRANSLATE("Subcribe / Unsuscribe "
-		"IMAP folders, have patience..."));
+	StatusWindow* status = new StatusWindow(this,
+		B_TRANSLATE("Update subcription of IMAP folders, have patience..."));
 	status->Show();
 
 	for (size_t i = 0; i < fFolderList.size(); i++) {

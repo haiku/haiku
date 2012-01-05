@@ -7,7 +7,6 @@
 #define FOLDER_CONFIG_WINDOW_H
 
 
-#include <Button.h>
 #include <ListView.h>
 #include <StringView.h>
 #include <Window.h>
@@ -32,11 +31,10 @@ private:
 private:
 			const Settings		fSettings;
 			IMAP::Protocol		fProtocol;
-			BListView*			fFolderListView;
-			BButton*			fApplyButton;
 			IMAP::FolderList	fFolderList;
 
 			BStringView*		fQuotaView;
+			BListView*			fFolderListView;
 };
 
 
