@@ -5,7 +5,7 @@ ENTRY(_start)
 
 SECTIONS
 {
-	. = 0x102000 + SIZEOF_HEADERS;
+	. = 0x200000 + SIZEOF_HEADERS;
 
 	__text_begin = .;
 
