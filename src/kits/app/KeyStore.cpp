@@ -328,8 +328,7 @@ BKeyStore::RevokeAccess(const char* keyring)
 status_t
 BKeyStore::RevokeMasterAccess()
 {
-	BMessage message(KEY_STORE_REVOKE_MASTER_ACCESS);
-	return _SendKeyMessage(message, NULL);
+	return RevokeAccess(NULL);
 }
 
 
