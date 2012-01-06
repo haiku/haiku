@@ -10,7 +10,8 @@
 Keyring::Keyring(const char* name, const BMessage& data)
 	:
 	fName(name),
-	fData(data)
+	fData(data),
+	fAccessible(false)
 {
 }
 
@@ -20,10 +21,25 @@ Keyring::~Keyring()
 }
 
 
+status_t
+Keyring::Access(const BMessage& keyMessage)
+{
+	fAccessible = true;
+	return B_OK;
+}
+
+
+void
+Keyring::RevokeAccess()
+{
+	fAccessible = false;
+}
+
+
 bool
 Keyring::IsAccessible()
 {
-	return true;
+	return fAccessible;
 }
 
 
@@ -31,6 +47,9 @@ status_t
 Keyring::FindKey(const BString& identifier, const BString& secondaryIdentifier,
 	bool secondaryIdentifierOptional, BMessage* _foundKeyMessage)
 {
+	if (!fAccessible)
+		return B_NOT_ALLOWED;
+
 	int32 count;
 	type_code type;
 	if (fData.GetInfo(identifier, &type, &count) != B_OK)
@@ -74,6 +93,9 @@ status_t
 Keyring::FindKey(BKeyType type, BKeyPurpose purpose, uint32 index,
 	BMessage& _foundKeyMessage)
 {
+	if (!fAccessible)
+		return B_NOT_ALLOWED;
+
 	for (int32 keyIndex = 0;; keyIndex++) {
 		int32 count = 0;
 		char* identifier = NULL;
@@ -136,6 +158,9 @@ status_t
 Keyring::AddKey(const BString& identifier, const BString& secondaryIdentifier,
 	const BMessage& keyMessage)
 {
+	if (!fAccessible)
+		return B_NOT_ALLOWED;
+
 	// Check for collisions.
 	if (FindKey(identifier, secondaryIdentifier, false, NULL) == B_OK)
 		return B_NAME_IN_USE;
@@ -149,6 +174,9 @@ status_t
 Keyring::RemoveKey(const BString& identifier,
 	const BMessage& keyMessage)
 {
+	if (!fAccessible)
+		return B_NOT_ALLOWED;
+
 	int32 count;
 	type_code type;
 	if (fData.GetInfo(identifier, &type, &count) != B_OK)

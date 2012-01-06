@@ -19,6 +19,8 @@ public:
 		const char*					Name() const { return fName; }
 		const BMessage&				Data() const { return fData; }
 
+		status_t					Access(const BMessage& keyMessage);
+		void						RevokeAccess();
 		bool						IsAccessible();
 
 		status_t					FindKey(const BString& identifier,
@@ -43,6 +45,7 @@ static	int							Compare(const BString* name,
 private:
 		BString						fName;
 		BMessage					fData;
+		bool						fAccessible;
 };
 
 

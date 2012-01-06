@@ -34,6 +34,10 @@ private:
 										const BMessage& keyMessage);
 		status_t					_RemoveKeyring(const BString& name);
 
+		status_t					_AccessKeyring(Keyring& keyring);
+
+		status_t					_RequestKey(BMessage& keyMessage);
+
 		Keyring*					fDefaultKeyring;
 		KeyringList					fKeyrings;
 		BFile						fKeyStoreFile;

@@ -5,6 +5,8 @@
 
 
 #include "KeyStoreServer.h"
+
+#include "KeyRequestWindow.h"
 #include "Keyring.h"
 
 #include <KeyStoreDefs.h>
@@ -87,6 +89,24 @@ KeyStoreServer::MessageReceived(BMessage* message)
 				message->what = 0;
 					// So that we don't do anything in the second switch.
 				break;
+			}
+
+			switch (message->what) {
+				case KEY_STORE_GET_KEY:
+				case KEY_STORE_GET_NEXT_KEY:
+				case KEY_STORE_ADD_KEY:
+				case KEY_STORE_REMOVE_KEY:
+				{
+					// These need keyring access to do anything.
+					while (!keyring->IsAccessible()) {
+						status_t accessResult = _AccessKeyring(*keyring);
+						if (accessResult != B_OK) {
+							result = accessResult;
+							message->what = 0;
+							break;
+						}
+					}
+				}
 			}
 
 			break;
@@ -247,6 +267,12 @@ KeyStoreServer::MessageReceived(BMessage* message)
 			result = B_OK;
 		}
 
+		case KEY_STORE_REVOKE_ACCESS:
+		{
+			keyring->RevokeAccess();
+			result = B_OK;
+		}
+
 		case 0:
 		{
 			// Just the error case from above.
@@ -377,6 +403,42 @@ KeyStoreServer::_RemoveKeyring(const BString& name)
 	}
 
 	return fKeyrings.RemoveItem(keyring) ? B_OK : B_ERROR;
+}
+
+
+status_t
+KeyStoreServer::_AccessKeyring(Keyring& keyring)
+{
+	// If we are accessing a keyring that has been added to master access we
+	// get the key from the default keyring and unlock with that.
+	BMessage keyMessage;
+	if (&keyring != fDefaultKeyring && fDefaultKeyring->IsAccessible()) {
+		if (fDefaultKeyring->FindKey("Keyrings", keyring.Name(), false,
+				&keyMessage) == B_OK) {
+			// We found a key for this keyring, try to access with it.
+			if (keyring.Access(keyMessage) == B_OK)
+				return B_OK;
+		}
+	}
+
+	// No key, we need to request one from the user.
+	keyMessage.AddString("keyring", keyring.Name());
+	status_t result = _RequestKey(keyMessage);
+	if (result != B_OK)
+		return result;
+
+	return keyring.Access(keyMessage);
+}
+
+
+status_t
+KeyStoreServer::_RequestKey(BMessage& keyMessage)
+{
+	KeyRequestWindow* requestWindow = new(std::nothrow) KeyRequestWindow();
+	if (requestWindow == NULL)
+		return B_NO_MEMORY;
+
+	return requestWindow->RequestKey(keyMessage);
 }
 
 
