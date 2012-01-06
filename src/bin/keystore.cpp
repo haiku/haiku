@@ -146,6 +146,21 @@ show_status(const char* keyring)
 
 
 int
+revoke_access(const char* keyring)
+{
+	BKeyStore keyStore;
+	status_t result = keyStore.RevokeAccess(keyring);
+	if (result != B_OK) {
+		printf("failed to revoke access to keyring \"%s\": %s\n", keyring,
+			strerror(result));
+		return 2;
+	}
+
+	return 0;
+}
+
+
+int
 print_usage(const char* name)
 {
 	printf("usage:\n");
@@ -185,15 +200,21 @@ print_usage(const char* name)
 int
 main(int argc, char* argv[])
 {
-	if (argc < 3)
+	if (argc < 2)
 		return print_usage(argv[0]);
 
 	if (strcmp(argv[1], "list") == 0) {
+		if (argc < 3)
+			return print_usage(argv[0]);
+
 		if (strcmp(argv[2], "passwords") == 0)
 			return list_passwords(argc > 3 ? argv[3] : NULL);
 		if (strcmp(argv[2], "keyrings") == 0)
 			return list_keyrings();
 	} else if (strcmp(argv[1], "add") == 0) {
+		if (argc < 3)
+			return print_usage(argv[0]);
+
 		if (strcmp(argv[2], "password") == 0) {
 			if (argc < 5)
 				return print_usage(argv[0]);
@@ -232,6 +253,9 @@ main(int argc, char* argv[])
 			return add_keyring(argv[3], argv[4]);
 		}
 	} else if (strcmp(argv[1], "remove") == 0) {
+		if (argc < 3)
+			return print_usage(argv[0]);
+
 		if (strcmp(argv[2], "password") == 0) {
 			if (argc < 4)
 				return print_usage(argv[0]);
@@ -259,7 +283,15 @@ main(int argc, char* argv[])
 				return remove_keyring(argv[3]);
 		}
 	} else if (strcmp(argv[1], "status") == 0) {
-		return show_status(argv[2]);
+		if (argc != 2 && argc != 3)
+			return print_usage(argv[0]);
+
+		return show_status(argc == 3 ? argv[2] : "");
+	} else if (strcmp(argv[1], "revoke") == 0) {
+		if (argc != 2 && argc != 3)
+			return print_usage(argv[0]);
+
+		return revoke_access(argc == 3 ? argv[2] : "");
 	}
 
 	return print_usage(argv[0]);
