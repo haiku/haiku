@@ -1547,6 +1547,7 @@ BContainerWindow::MessageReceived(BMessage *message)
 					TrackerSettings settings;
 					if (settings.ShowNavigator() || settings.ShowFullPathInTitleBar())
 						SetPathWatchingEnabled(true);
+					SetSingleWindowBrowseShortcuts(settings.SingleWindowBrowse());
 
 					// Update draggable folder icon
 					BView *view = FindView("MenuBar");
@@ -1631,6 +1632,7 @@ BContainerWindow::MessageReceived(BMessage *message)
 							SetPathWatchingEnabled(true);
 						if (IsPathWatchingEnabled() && !(settings.ShowNavigator() || settings.ShowFullPathInTitleBar()))
 							SetPathWatchingEnabled(false);
+						SetSingleWindowBrowseShortcuts(settings.SingleWindowBrowse());
 						break;
 
 					case kDontMoveFilesToTrashChanged:
@@ -3069,7 +3071,24 @@ BContainerWindow::UpdateMenu(BMenu *menu, UpdateMenuContext context)
 		SetArrangeMenu(menu);
 		SetPasteItem(menu);
 
-		EnableNamedMenuItem(menu, kOpenParentDir, !TargetModel()->IsRoot());
+
+		BEntry entry(TargetModel()->EntryRef());
+		BDirectory parent;
+		entry_ref ref;
+		BEntry root("/");	
+
+		bool parentIsRoot = (entry.GetParent(&parent) == B_OK
+			&& parent.GetEntry(&entry) == B_OK
+			&& entry.GetRef(&ref) == B_OK
+			&& entry == root);
+
+		EnableNamedMenuItem(menu, kOpenParentDir, !TargetModel()->IsDesktop()
+			&& !TargetModel()->IsRoot()
+			&& (!parentIsRoot
+				|| TrackerSettings().SingleWindowBrowse()
+				|| TrackerSettings().ShowDisksIcon()
+				|| (modifiers() & B_CONTROL_KEY) != 0));
+
 		EnableNamedMenuItem(menu, kEmptyTrash, count > 0);
 		EnableNamedMenuItem(menu, B_SELECT_ALL, count > 0);
 

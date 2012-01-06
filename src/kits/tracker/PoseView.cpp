@@ -8051,7 +8051,9 @@ BPoseView::OpenParent()
 		return;
 
 	BEntry root("/");
-	if (!TrackerSettings().ShowDisksIcon() && entry == root
+	if (!TrackerSettings().SingleWindowBrowse()
+		&& !TrackerSettings().ShowNavigator()
+		&& !TrackerSettings().ShowDisksIcon() && entry == root
 		&& (modifiers() & B_CONTROL_KEY) == 0)
 		return;
 
@@ -8072,7 +8074,13 @@ BPoseView::OpenParent()
 				sizeof (node_ref));
 	}
 
-	be_app->PostMessage(&message);
+
+	if (TrackerSettings().SingleWindowBrowse()) {
+		BMessage msg(kSwitchDirectory);
+		msg.AddRef("refs", &ref);
+		Window()->PostMessage(&msg);
+	} else
+		be_app->PostMessage(&message);
 }
 
 
