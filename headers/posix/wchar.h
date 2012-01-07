@@ -62,7 +62,7 @@ extern wint_t	getwc(FILE *stream);
 extern wint_t	getwchar(void);
 
 extern size_t 	mbrlen(const char *s, size_t n, mbstate_t *mbState);
-extern size_t 	mbrtowc(wchar_t *dest, const char *src, size_t destLength,
+extern size_t 	mbrtowc(wchar_t *dest, const char *src, size_t srcLength,
 					mbstate_t *mbState);
 extern int		mbsinit(const mbstate_t *mbState);
 extern size_t	mbsnrtowcs(wchar_t *dest, const char **src, size_t srcLength,

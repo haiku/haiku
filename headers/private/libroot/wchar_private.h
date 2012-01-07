@@ -19,7 +19,7 @@ extern wint_t	__btowc(int c);
 
 extern int		__mblen(const char *string, size_t length);
 extern size_t 	__mbrlen(const char *s, size_t n, mbstate_t *mbState);
-extern size_t 	__mbrtowc(wchar_t *dest, const char *src, size_t destLength,
+extern size_t 	__mbrtowc(wchar_t *dest, const char *src, size_t srcLength,
 					mbstate_t *mbState);
 extern int		__mbsinit(const mbstate_t *mbState);
 extern size_t	__mbsnrtowcs(wchar_t *dest, const char **src, size_t srcLength,
