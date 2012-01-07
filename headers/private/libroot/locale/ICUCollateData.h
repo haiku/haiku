@@ -29,6 +29,10 @@ public:
 			status_t			Strcoll(const char* a, const char* b, int& out);
 			status_t			Strxfrm(char* out, const char* in, size_t size,
 									size_t& outSize);
+			status_t			Wcscoll(const wchar_t* a, const wchar_t* b,
+									int& out);
+			status_t			Wcsxfrm(wchar_t* out, const wchar_t* in,
+									size_t size, size_t& outSize);
 
 private:
 			status_t			_ToUnicodeString(const char* in,

@@ -295,6 +295,25 @@ ICULocaleBackend::Strxfrm(char* out, const char* in, size_t size,
 
 
 status_t
+ICULocaleBackend::Wcscoll(const wchar_t* a, const wchar_t* b, int& result)
+{
+	ErrnoMaintainer errnoMaintainer;
+
+	return fCollateData.Wcscoll(a, b, result);
+}
+
+
+status_t
+ICULocaleBackend::Wcsxfrm(wchar_t* out, const wchar_t* in, size_t size,
+	size_t& outSize)
+{
+	ErrnoMaintainer errnoMaintainer;
+
+	return fCollateData.Wcsxfrm(out, in, size, outSize);
+}
+
+
+status_t
 ICULocaleBackend::TZSet(const char* timeZoneID, const char* tz)
 {
 	ErrnoMaintainer errnoMaintainer;

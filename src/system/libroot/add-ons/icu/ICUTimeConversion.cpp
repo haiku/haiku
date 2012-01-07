@@ -11,8 +11,6 @@
 
 #include <unicode/gregocal.h>
 
-#include <AutoDeleter.h>
-
 
 namespace BPrivate {
 namespace Libroot {
