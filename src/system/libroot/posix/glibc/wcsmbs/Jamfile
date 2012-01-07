@@ -18,42 +18,12 @@ UsePrivateHeaders libroot ;
 SubDirCcFlags -D_GNU_SOURCE -DUSE_IN_LIBIO ;
 
 MergeObject posix_gnu_wcsmbs.o :
-	wcpcpy.c
-	wcpncpy.c
-	wcscasecmp.c
-#	wcscasecmp_l.c
-	wcscat.c
-	wcschr.c
-	wcschrnul.c
-	wcscmp.c
-	wcscoll.c
-	wcscpy.c
-	wcscspn.c
-	wcsdup.c
-	wcslen.c
 	wcsmbsload.c
-	wcsncase.c
-	wcsncat.c
-	wcsncmp.c
-	wcsncpy.c
-	wcsnlen.c
-	wcspbrk.c
-	wcsrchr.c
-	wcsspn.c
-	wcsstr.c
 	wcstod.c
 	wcstof.c
-	wcstok.c
 	wcstol.c
 	wcstoll.c
 	wcstold.c
 	wcstoul.c
 	wcstoull.c
-	wcsxfrm.c
-	wmemchr.c
-	wmemcmp.c
-	wmemcpy.c
-	wmemmove.c
-	wmempcpy.c
-	wmemset.c
 ;
