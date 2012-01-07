@@ -63,6 +63,7 @@ SimpleTest tst-wprintf2 : tst-wprintf2.c ;
 SimpleTest tst-wscanf : tst-wscanf.c ;
 SimpleTest test_wcfuncs : test_wcfuncs.c ;
 SimpleTest test_wctype : test_wctype.c ;
+SimpleTest wcs_test : wcs_test.cpp ;
 
 
 # Tell Jam where to find these sources
