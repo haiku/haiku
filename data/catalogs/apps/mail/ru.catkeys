@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-MAIL	1350013868
+1	russian	x-vnd.Be-MAIL	1378960348
 View	Mail		Вид
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Прикрепление атрибутов:
@@ -15,6 +15,7 @@ helpful message	Mail		полезное сообщение
 Colored quotes:	Mail		Цветные кавычки:
 Subject:	Mail		Тема:
 Reply to all	Mail		Ответить всем
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Вложение: %name% (Tип: %type%)
 Show icons & labels	Mail		Отображать иконки и надписи
 Remove attachment	Mail		Удалить вложение
 Button bar:	Mail		Панель кнопок:
@@ -69,7 +70,7 @@ Account from mail	Mail		Использовать аккаунт из письм�
 Edit signatures…	Mail		Изменить подписи…
 New	Mail		Новое
 On	Mail		Включить
-Set to %s	Mail		Установить как %s
+Set to %s	Mail		Пометить как %s
 Forward	Mail		Переслать
 E-mail draft could not be saved!	Mail		Черновик не может быть сохранен!
 %e wrote:\\n	Mail		%e написал:\\n
@@ -122,7 +123,7 @@ Mail couldn't find its dictionary.	Mail		Невозможно найти фай�
 Reply preamble:	Mail		Ответное вступление:
 Signatures	Mail		Подписи
 Next	Mail		Следущее
-Set to…	Mail		Установить в…
+Set to…	Mail		Пометить как…
 Use default account	Mail		Использовать аккаунт по умолчанию
 Sorry	Mail		Извините
 Encoding:	Mail		Кодировка:
