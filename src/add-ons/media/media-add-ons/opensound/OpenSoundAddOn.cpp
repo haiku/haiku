@@ -90,7 +90,7 @@ status_t OpenSoundAddOn::InitCheck(
 int32 OpenSoundAddOn::CountFlavors()
 {
 	CALLED();
-	PRINT(("%d flavours\n", fDevices.CountItems()));
+	PRINT(("%" B_PRId32 " flavours\n", fDevices.CountItems()));
 	return fDevices.CountItems();
 }
 

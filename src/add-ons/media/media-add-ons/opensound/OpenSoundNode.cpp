@@ -559,7 +559,7 @@ OpenSoundNode::NodeRegistered()
 	SetParameterWeb(fWeb);
 
 	// apply configuration
-#ifdef PRINTING
+#ifdef TRACE_OSS_NODE
 	bigtime_t start = system_time();
 #endif
 
