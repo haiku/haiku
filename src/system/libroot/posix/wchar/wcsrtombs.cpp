@@ -8,9 +8,8 @@
 #include <wchar.h>
 
 #include <errno_private.h>
+#include <LocaleBackend.h>
 #include <wchar_private.h>
-
-#include "LocaleBackend.h"
 
 
 //#define TRACE_WCSRTOMBS
@@ -103,9 +102,8 @@ __wcsnrtombs(char* dst, const wchar_t** src, size_t nwc, size_t len,
 }
 
 
-// deactivated, as wcsnrtombs() isn't publically available yet.
-//extern "C"
-//B_DEFINE_WEAK_ALIAS(__wcsnrtombs, wcsnrtombs);
+extern "C"
+B_DEFINE_WEAK_ALIAS(__wcsnrtombs, wcsnrtombs);
 
 
 extern "C" size_t

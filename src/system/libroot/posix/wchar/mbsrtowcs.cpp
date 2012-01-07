@@ -8,7 +8,7 @@
 #include <wchar.h>
 
 #include <errno_private.h>
-#include "LocaleBackend.h"
+#include <LocaleBackend.h>
 
 
 //#define TRACE_MBSRTOWCS
@@ -101,9 +101,8 @@ __mbsnrtowcs(wchar_t* dst, const char** src, size_t nmc, size_t len,
 }
 
 
-// deactivated, as mbsnrtowcs() isn't publically available yet.
-//extern "C"
-//B_DEFINE_WEAK_ALIAS(__mbsnrtowcs, mbsnrtowcs);
+extern "C"
+B_DEFINE_WEAK_ALIAS(__mbsnrtowcs, mbsnrtowcs);
 
 
 extern "C" size_t
