@@ -1,0 +1,8 @@
+1	hungarian	x-vnd.Haiku-InstalledPackages	4131220089
+InstalledPackages	System name		TelepíttettCsomagok
+No package selected.	UninstallView		Nincs csomag kiválasztva.
+OK	UninstallView		OK
+Package description	UninstallView		Csomag leírása
+Remove	UninstallView		Eltávolítás
+The package you selected has been successfully removed from your system.	UninstallView		A kiválasztott csomag sikeresen el lett távolítva a rendszerről.
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		A kiválasztott csomag nem lett eltávolítva a rendszerről. Lehet, hogy korrupt a csomag információs fájlja.

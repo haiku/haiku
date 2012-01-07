@@ -1,0 +1,13 @@
+1	hungarian	x-vnd.Haiku-JPEG2000Translator	547915409
+About	JPEG2000Translator		Névjegy
+Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Be Bittérkép Formátum (JPEG2000Fordító)
+High	JPEG2000Translator		Magas
+JPEG2000 images	JPEG2000Translator		JPEG2000 képek
+Low	JPEG2000Translator		Alacsony
+Output only codestream (.jpc)	JPEG2000Translator		Csak a kódfolyam (.jpc) küldése a kimenetre
+Output quality	JPEG2000Translator		Kimeneti minőség
+Read	JPEG2000Translator		Olvasás
+Read greyscale images as RGB32	JPEG2000Translator		Szürkeárnyalatos képek olvasása RGB32-ként
+Write	JPEG2000Translator		Írás
+Write black-and-white images as RGB24	JPEG2000Translator		Fekete-fehér képek írása RGB24-ként
+©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nJasPer programkönyvtár alapján:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n

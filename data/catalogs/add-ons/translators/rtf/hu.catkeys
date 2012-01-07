@@ -1,0 +1,9 @@
+1	hungarian	x-vnd.Haiku-RTFTranslator	526958155
+RTF Settings	main		RTF Beállítások
+RTF text files	RTFTranslator		RTF szövegfájlok
+RTF-Translator Settings	ConfigView		RTF-fordító Beállításai
+Rich Text Format (RTF) files	ConfigView		RTF fájlok
+Rich Text Format Translator	RTFTranslator		RTF-fordító
+Rich Text Format translator v%d.%d.%d %s	RTFTranslator		RTF-fordító v%d.%d.%d %s
+RichTextFormat file	RTFTranslator		RTF fájl
+Version %d.%d.%d, %s	ConfigView		%d.%d.%d, %s verzió

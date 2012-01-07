@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.haiku.zip-o-matic	829498916
+1	hungarian	x-vnd.haiku.zip-o-matic	2207848100
 %ld files added.	file:ZipOMaticWindow.cpp		%ld fájl hozzáadva.
 1 file added.	file:ZipOMaticWindow.cpp		1 fájl hozzáadva.
 Archive	file:ZipperThread.cpp		Archívum
@@ -7,6 +7,7 @@ Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		B
 Continue	file:ZipOMaticWindow.cpp		Folytatás
 Creating archive: %s	file:ZipOMaticWindow.cpp		Archívum létrehozása: „%s”
 Do you want to stop them?	file:ZipOMatic.cpp		Le szeretné állítani?
+Drop files here.	file:ZipOMaticWindow.cpp		Húzza ide a fájlokat.
 Error creating archive	file:ZipOMaticWindow.cpp		Hiba az archívum létrehozása közben.
 Filename: %s	file:ZipOMaticWindow.cpp		Fájlnév: „%s”
 Let them continue	file:ZipOMatic.cpp		Hadd legyen folytatva

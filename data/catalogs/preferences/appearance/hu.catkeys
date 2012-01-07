@@ -1,7 +1,11 @@
-1	hungarian	x-vnd.Haiku-Appearance	1227622574
+1	hungarian	x-vnd.Haiku-Appearance	168322075
+About	DecorSettingsView		Névjegy
+About Decorator	DecorSettingsView		Díszítés névjegye
 Antialiasing	APRWindow		Élsimítás
 Antialiasing menu	AntialiasingSettingsView		Élsimítási menü
 Antialiasing type:	AntialiasingSettingsView		Élsimítás módja:
+Appearance	System name		Megjelenés
+Choose Decorator	DecorSettingsView		Díszítés kiválasztása
 Colors	APRWindow		Színek
 Control background	Colors tab		Kiválasztás háttere
 Control border	Colors tab		Szegély szabályozása
@@ -14,6 +18,7 @@ Failure	Colors tab		Nem sikerült
 Glyph hinting:	AntialiasingSettingsView		Glifák körvonala:
 Grayscale	AntialiasingSettingsView		Szürkeárnyalat
 Hinting menu	AntialiasingSettingsView		Körvonalmenü
+Inactive window border	Colors tab		Inaktív ablakkeret
 Inactive window tab	Colors tab		Nem aktív albak füle
 Inactive window tab text	Colors tab		Nem aktív ablak címszövege
 LCD subpixel	AntialiasingSettingsView		LCD-szubpixel
@@ -22,6 +27,7 @@ Menu item text	Colors tab		Menüelem-szöveg
 Monospaced fonts only	AntialiasingSettingsView		Csak rögzített szélességű betűtípusok
 Navigation base	Colors tab		Navigációs alapszín
 Navigation pulse	Colors tab		Navigációs pulzálás
+OK	DecorSettingsView		OK
 Off	AntialiasingSettingsView		Ki
 On	AntialiasingSettingsView		Be
 Panel background	Colors tab		Panel háttere
@@ -38,5 +44,8 @@ Subpixel based anti-aliasing in combination with glyph hinting is not available 
 Success	Colors tab		Sikerült
 Tooltip background	Colors tab		Eszköztár háttere
 Tooltip text	Colors tab		Eszköztár-szöveg
+Window Decorator	APRWindow		Ablakdíszítés
+Window Decorator:	DecorSettingsView		Ablakdíszítés:
+Window border	Colors tab		Ablakkeret
 Window tab	Colors tab		Ablakfül
 Window tab text	Colors tab		Ablakfül szövege

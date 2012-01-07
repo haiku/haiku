@@ -1,0 +1,28 @@
+1	hungarian	x-vnd.Haiku-libtextencoding	3062073902
+Chinese Big5	textencodings		Kínai Big5
+Chinese GB18030	textencodings		Kínai GB18030
+DOS Cyrillic	textencodings		DOS cirill
+DOS Latin-US	textencodings		DOS latin-US
+EUC Korean	textencodings		EUC koreai
+ISO Arabic	textencodings		ISO arab
+ISO Baltic	textencodings		ISO balti
+ISO Celtic	textencodings		ISO kelta
+ISO Cyrillic	textencodings		ISO cirill
+ISO East European	textencodings		ISO kelet-európai
+ISO Greek	textencodings		ISO görög
+ISO Hebrew	textencodings		ISO héber
+ISO Latin 9	textencodings		ISO latin-9
+ISO Nordic	textencodings		ISO északi
+ISO North European	textencodings		ISO észak-európai
+ISO South European	textencodings		ISO dél-európai
+ISO Turkish	textencodings		ISO török
+ISO West European	textencodings		ISO nyugat-európai
+Japanese EUC	textencodings		Japán EUC
+Japanese JIS	textencodings		Japán JIS
+Japanese Shift JIS	textencodings		Japán Shift JIS
+KOI8-R Cyrillic	textencodings		KOI8-R cirill
+Macintosh Roman	textencodings		Macintosh római
+Unicode	textencodings		Unicode
+Unicode (UCS-2)	textencodings		Unicode (UCS-2)
+Windows Cyrillic (CP 1251)	textencodings		Windows cirill (CP 1251)
+Windows Latin-1 (CP 1252)	textencodings		Windows latin-1 (CP 1252)

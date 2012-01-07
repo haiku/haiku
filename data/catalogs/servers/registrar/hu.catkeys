@@ -1,0 +1,23 @@
+1	hungarian	application/x-vnd.Haiku-Registrar	2599857937
+%action%?	ShutdownProcess		%action%?
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		A(z) \"%appName%\" megszakította a rendszer leállítását.
+Asking \"%appName%\" to quit.	ShutdownProcess		\"%appName%\" megkérése a leállásra.
+Asking background applications to quit.	ShutdownProcess		Háttéralkalmazások megkérése a leállásra.
+Asking other processes to quit.	ShutdownProcess		Folyamatok megkérése a leállásra.
+Cancel	ShutdownProcess		Mégse
+Cancel shutdown	ShutdownProcess		Leállítás megszakítása
+Do you really want to restart the system?	ShutdownProcess		Biztos újra kívánja indítani a rendszert?
+Do you really want to shut down the system?	ShutdownProcess		Biztos le kívánja állítani a rendszert?
+It's now safe to turn off the computer.	ShutdownProcess		Most már kikapcsolhatja a számítógépet.
+Kill application	ShutdownProcess		Alkalmazás leállítása
+OK	ShutdownProcess		OK
+Restart	ShutdownProcess		Újraindítás
+Restart system	ShutdownProcess		Rendszer újraindítása
+Restarting…	ShutdownProcess		Újraindulás...
+Shut down	ShutdownProcess		Leállítás
+Shutdown aborted	ShutdownProcess		Leállítás megszakítva
+Shutdown status	ShutdownProcess		Leállítás állapota
+Shutting down…	ShutdownProcess		Leállás...
+System is shut down	ShutdownProcess		A rendszer leállt
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		A(z) \"%appName%\" alkalmazás lehet, hogy blokkolva van egy modális panelen.
+Tidying things up a bit.	ShutdownProcess		Rendezés.

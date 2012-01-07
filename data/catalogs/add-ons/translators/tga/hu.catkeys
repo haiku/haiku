@@ -1,0 +1,16 @@
+1	hungarian	x-vnd.Haiku-TGATranslator	4159874267
+Ignore TGA alpha channel	TGAView		TGA alfa csatorna figyelmen kívül hagyása
+Save with RLE Compression	TGAView		RLE tömörítéssel való mentés
+TGA Image Translator	TGAView		TGA képértelmező
+TGA Settings	TGAMain		TGA beállítások
+TGA image translator	TGATranslator		TGA képértelmező
+TGA images	TGATranslator		TGA képek
+TGATranslator Settings	TGATranslator		TGA értelmező beállításai
+Targa image (%d bits RLE colormap)	TGATranslator		Targa kép (%d bites RLE színtérkép)
+Targa image (%d bits RLE gray)	TGATranslator		Targa kép (%d bites RLE szürkeárnyalatos)
+Targa image (%d bits RLE truecolor)	TGATranslator		Targa kép (%d bites RLE truecolor)
+Targa image (%d bits colormap)	TGATranslator		Targa kép (%d bites színtérkép)
+Targa image (%d bits gray)	TGATranslator		Targa kép (%d bites szürkeárnyalatos)
+Targa image (%d bits truecolor)	TGATranslator		Targa kép (%d bites trucolor)
+Version %d.%d.%d %s	TGAView		%d.%d.%d %s verzió
+Written by the Haiku Translation Kit Team	TGAView		a Haiku Translation Kit csapata készítette

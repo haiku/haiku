@@ -1,0 +1,52 @@
+1	hungarian	x-vnd.Haiku-Shortcuts	621368175
+(Choose application with file requester)	ShortcutsWindow		(A fájlkérővel válasszon programot)
+*Beep	ShortcutsWindow		*Sípolás
+*InsertString \"Your Text Here\"	ShortcutsWindow		*KarakterekBeszúrása \"Ide írja a szöveget\"
+*LaunchHandler text/html	ShortcutsWindow		*Indítás text/html
+*MouseButton 1	ShortcutsWindow		*EgérGomb 1
+*MouseDown	ShortcutsWindow		*EgérLe
+*MouseUp	ShortcutsWindow		*EgérFel
+*MoveMouse +20 +0	ShortcutsWindow		*EgérMozgatás +20 +0
+*MoveMouseTo 50% 50%	ShortcutsWindow		*EgérMozgatásIde 50% 50%
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*EgérMozgatásIde 100% 0\" \"*EgérGomb 1\"
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*ÜzenetKüldés application/x-vnd.Be-TRAK 'Tfnd'
+Add new shortcut	ShortcutsWindow		Új gyorsbillentyű hozzáadása
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+Append	ShortcutsWindow		Hozzáfűzés
+Append KeySet…	ShortcutsWindow		Gyorsbillentyű hozzáadása...
+Application	ShortcutsWindow		Alkalmazás
+Beep	ShortcutsSpec		Sípolás
+Cancel	ShortcutsWindow		Mégse
+Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
+Don't save	ShortcutsWindow		Ne mentse
+Error, NULL state description?\n	ShortcutsSpec		Hiba, NULL állapotleírás?\n
+File	ShortcutsWindow		Fájl
+InsertString	ShortcutsSpec		Karakterbeszúrás
+Key	ShortcutsWindow		Billentyű
+LaunchHandler	ShortcutsSpec		IndításKezelő
+MouseButton	ShortcutsSpec		EgérGomb
+MouseDown	ShortcutsSpec		EgérLe
+MouseUp	ShortcutsSpec		EgérFel
+MoveMouse	ShortcutsSpec		EgérMozgatás
+MoveMouseTo	ShortcutsSpec		EgérMozgatásIde
+Multi	ShortcutsSpec		Multi
+OK	ShortcutsWindow		OK
+Oh no	ShortcutsWindow		Ó jaj
+Open	ShortcutsWindow		Megnyitás
+Open KeySet…	ShortcutsWindow		Gyorsbillentyű megnyitása...
+Quit	ShortcutsWindow		Kilépés
+Really quit without saving your changes?	ShortcutsWindow		Biztos ki akar lépni a változtatásainak mentése nélkül?
+Remove selected shortcut	ShortcutsWindow		Kiválasztott gyorsbillentyű eltávolítása
+Revert to saved	ShortcutsWindow		Visszaállítás az elmentettre
+Save	ShortcutsWindow		Mentés
+Save & apply	ShortcutsWindow		Mentés és alkalmazás
+Save KeySet as…	ShortcutsWindow		Beállítások mentése másként...
+Select	ShortcutsWindow		Kiválasztás
+SendMessage	ShortcutsSpec		ÜzenetKüldés
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Shortcuts	System name		Parancsgombok
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		A Parancsgombok nem tudta megnyitni a beállításfájlját!
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		A Parancsgombok nem tudta beolvasni a beállításait!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		A Parancsgombok nem tudta elmenteni a beállításait!
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		A Parancsgombok nem tudta elmenteni a beállításait.
+Window	ShortcutsSpec	Name for modifier on keyboard	Win

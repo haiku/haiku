@@ -1,0 +1,34 @@
+1	hungarian	system	180647795
+%.2f TiB	StringForSize		%.2f TiB
+%3.2f GiB	StringForSize		%3.2f GiB
+%3.2f KiB	StringForSize		%3.2f KiB
+%3.2f MiB	StringForSize		%3.2f MiB
+%d bytes	StringForSize		%Ld byte
+<empty>	Menu		<üres>
+About %app%	AboutMenuItem		%app% névjegye
+About %app…	Dragger		%app névjegye...
+About…	AboutWindow		Névjegy...
+Blue:	ColorControl		Kék:
+Can't delete this replicant from its original application. Life goes on.	Dragger		Nem lehet ezt a másolatot törölni az eredeti alkalmazástól, de az élet megy tovább.
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nem lehetet másolatot létrehozni ehhez: \"%description\".\n%error
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nem található a másolathoz tartozó alkalmazás. Nincs megadva alkalmazásaláírás.\n%error
+Close	AboutWindow		Bezárás
+Copy	TextView		Másolás
+Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
+Cut	TextView		Kivágás
+Error	PrintJob		Hiba
+Error	ZombieReplicantView		Hiba
+Green:	ColorControl		Zöld:
+No Pages to print!	PrintJob		Nincs nyomtatható oldal!
+OK	Dragger		OK
+OK	PrintJob		OK
+OK	ZombieReplicantView		OK
+Paste	TextView		Beillesztés
+Print Server is not responding.	PrintJob		A nyomtatókiszolgáló nem válaszol.
+Red:	ColorControl		Vörös:
+Redo	TextView		Újra
+Remove replicant	Dragger		Másolat eltávolítása
+Select All	TextView		Mind kijelölése
+Undo	TextView		Visszavonás
+Warning	Dragger		Figyelmeztetés
+Written by:	AboutWindow		Írta:

@@ -1,0 +1,47 @@
+1	hungarian	x-vnd.Be-TSKB	107564593
+<Deskbar folder is empty>	DeskbarMenu		<A Deskbar mappa üres>
+About Haiku	DeskbarMenu		Haiku névjegye
+About this system	DeskbarMenu		Rendszer névjegye
+Always on top	PreferencesWindow		Mindig felül
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programok
+Applications	PreferencesWindow		Programok
+Auto-hide	PreferencesWindow		Automatikus elrejtés
+Auto-raise	PreferencesWindow		Automatikus kiemelés
+Change time…	TimeView		Idő beállítása...
+Clock	PreferencesWindow		Óra
+Close all	WindowMenu		Összes bezárása
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demók
+Deskbar	System name		Deskbar
+Deskbar preferences	PreferencesWindow		Deskbar beállítások
+Deskbar preferences…	DeskbarMenu		Deskbar beállítások...
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Asztali kisalkalmazások
+Edit menu…	PreferencesWindow		Menü szerkesztése...
+Expand new applications	PreferencesWindow		Új alkalmazások kibontása
+Find…	DeskbarMenu		Keresés...
+Hide all	WindowMenu		Összes elrejtése
+Hide time	TimeView		Idő elrejtése
+Menu	PreferencesWindow		Menü
+Mount	DeskbarMenu		Felcsatolás
+No windows	WindowMenu		Nincsenek ablakok
+Power off	DeskbarMenu		Kikapcsolás
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Beállítások
+Quit application	WindowMenu		Kilépés az alkalmazásból
+Recent applications	DeskbarMenu		Legutóbbi alkalmazások
+Recent applications:	PreferencesWindow		Legutóbbi programok:
+Recent documents	DeskbarMenu		Legutóbbi dokumentumok
+Recent documents:	PreferencesWindow		Utolsó dokumentumok:
+Recent folders	DeskbarMenu		Legutóbbi mappák
+Recent folders:	PreferencesWindow		Utolsó mappák:
+Restart Tracker	DeskbarMenu		Tracker újraindítása
+Restart system	DeskbarMenu		Rendszer újraindítása
+Show Time	Tray		Idő megjelenítése
+Show all	WindowMenu		Összes megjelenítése
+Show application expander	PreferencesWindow		Programkiterjesztő mutatása
+Show calendar…	TimeView		Naptár megjelenítése...
+Show replicants	DeskbarMenu		Másolatok megjelenítése
+Show seconds	PreferencesWindow		Másodperc megjelenítése
+Shutdown…	DeskbarMenu		Leállítás...
+Sort running applications	PreferencesWindow		Futó alkalmazások rendezése
+Suspend	DeskbarMenu		Felfüggesztés
+Tracker always first	PreferencesWindow		Tracker mindig az első
+Window	PreferencesWindow		Ablak

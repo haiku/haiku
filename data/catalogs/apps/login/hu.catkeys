@@ -1,0 +1,21 @@
+1	hungarian	x-vnd.Haiku-Login	1678631300
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tIndítás szerkesztési módban, hogy lehetssen szerkeszteni az asztalt.\n
+--nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tKikapcsolja az ablak modálisságát\n
+Desktop	Desktop Window		Asztal
+Error	Login App		Hiba
+Error: %1	Login App		Hiba: %1
+Halt	Login View		Megszakítás
+Hide password	Login View		Jelszó elrejtése
+Info	Login App		Infó
+Invalid login!	Login View		Érvénytelen felhasználónév!
+Login application for Haiku\nUsage:\n	Login App		A Haiku bejelentkezési programja\nHasználat:\n
+Login:	Login View		Felhasználónév:
+OK	Login App		OK
+OK	Login View		OK
+Password:	Login View		Jelszó:
+Reboot	Login View		Újraindítás
+Unimplemented	Login App		Nincs még megvalósítva
+ValidateLogin: %s\n	Login App	A message returned from the ValidateLogin function. It can be \"B_OK\".	Ellenőrzés: %s\n
+Welcome to Haiku	Login Window		Üdvözöljük a Haikuban
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Alt-Q).	Login App		Másolatok ráhúzásával szerkesztheti a Bejelentkezés alkalmazás mögött lévő asztalt.\n\nHa kész van, csak lépjen ki az alkalmazásból az Alt-Q gombokkal.
+error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	hiba %s\n

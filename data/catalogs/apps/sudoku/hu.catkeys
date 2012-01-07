@@ -1,0 +1,34 @@
+1	hungarian	x-vnd.Haiku-Sudoku	2463385585
+Abort	ProgressWindow		Megszakítás
+Advanced	SudokuWindow		Haladó
+Blank	SudokuWindow		Üres
+Copy	SudokuWindow		Másolás
+Could not open \"%s\":\n%s\n	SudokuWindow		Nem lehetett megnyitni ezt: \"%s\":\n%s\n
+Could not set Sudoku:\n%s\n	SudokuWindow		Nem sikerült beállítani ezt:\n%s\n
+Creating solvable field	SudokuGenerator		Megoldható mező készítése
+Easy	SudokuWindow		Könnyű
+Export as…	SudokuWindow		Exportálás...
+File	SudokuWindow		Fájl
+HTML	SudokuWindow		HTML
+Hard	SudokuWindow		Nehéz
+Help	SudokuWindow		Segítség
+Mark invalid values	SudokuWindow		Érvénytelen mezők bejelölése
+Mark valid hints	SudokuWindow		Érvényes mezők megjelölése
+New	SudokuWindow		Új
+OK	SudokuWindow		OK
+Open file…	SudokuWindow		Fájl megnyitása...
+Progress monitor	ProgressWindow		Állapot kijelzése
+Quit	SudokuWindow		Kilépés
+Redo	SudokuWindow		Újra
+Restore snapshot	SudokuWindow		Mentett állás visszaállítása
+Searching for removable values	SudokuGenerator		Eltávolítható értékek keresése
+Snapshot current	SudokuWindow		Jelenlegi állás mentése
+Solve	SudokuWindow		Megoldás
+Solve single field	SudokuWindow		Egy mező megoldása
+Start again	SudokuWindow		Újrakezdés
+Sudoku	System name		Sudoku
+Sudoku request	SudokuWindow		Sudoku kérés
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku megoldva - gratulálunk!\n
+Text	SudokuWindow		Szöveg
+Undo	SudokuWindow		Visszavonás
+View	SudokuWindow		Nézet

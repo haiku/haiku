@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-OpenGL	899836772
+1	hungarian	x-vnd.Haiku-OpenGL	209187778
 Attributes stack size:	Capabilities		Attribútumok veremmérete:
 Auxiliary buffer(s):	Capabilities		Segédpufferek száma:
 Available	Extensions		Elérhető
@@ -19,6 +19,7 @@ Max. recommended vertex elements:	Capabilities		Maximálisan ajánlott csúcspon
 Max. texture units:	Capabilities		Legtöbb elérhető textúrázó egységek száma:
 Model stack size:	Capabilities		Modellverem mérete:
 Name stack size:	Capabilities		Névverem mérete:
+OpenGL	System name		OpenGL
 OpenGL version:	InfoView		OpenGL-verzió:
 Projection stack size:	Capabilities		Vetítési verem mérete:
 Renderer name:	InfoView		Renderelő neve:

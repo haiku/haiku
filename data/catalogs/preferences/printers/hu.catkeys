@@ -1,0 +1,44 @@
+1	hungarian	x-vnd.Be-PRNT	2065133853
+%.2f KB	JobListView		%.2f KB
+1 pending job.	PrinterListView		1 függő feladat.
+<pick one>	AddPrinterDialog		<válasszon egyet>
+Add	AddPrinterDialog		Hozzáadás
+Add printer	AddPrinterDialog		Nyomtató hozzáadása
+Add …	PrintersWindow		Hozzáadás...
+Black	TestPageView		Fekete
+Blue	TestPageView		Kék
+Cancel	AddPrinterDialog		Mégse
+Cancel job	PrintersWindow		Feladat visszavonása
+Completed	JobListView		Kész
+Connected to:	AddPrinterDialog		Kapcsolódva ehhez:
+Cyan	TestPageView		Cián
+Default Printer	PrinterListView		Alapértelmezett nyomtató
+Driver: %driver%	PrinterListView		Illesztőprogram: %driver%
+Failed	JobListView		Sikertelen
+Green	TestPageView		Zöld
+Magenta	TestPageView		Magenta
+Make default	PrintersWindow		Alapértelmezetté tétel
+No pending jobs.	PrinterListView		Nincs függő feladat.
+No printer found!	TransportMenu		Nem található nyomtató!
+Print jobs for 	PrintersWindow		Feladatok ennek:
+Print jobs: No printer selected	PrintersWindow		Feladatok: Nincs nyomtató kiválasztva
+Print test page	PrintersWindow		Tesztoldal nyomtatása
+Printer name:	AddPrinterDialog		Nyomtató neve:
+Printer type:	AddPrinterDialog		Nyomtató típusa:
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Nyomtató: %printer_name%\nDriver: %driver%\n
+Printers	PrintersWindow		Nyomtatók
+Printers	System name		Nyomtatók
+Processing	JobListView		Feldolgozás
+Red	TestPageView		Vörös
+Remove	PrintersWindow		Eltávolítás
+Restart job	PrintersWindow		Feladat újraindítása
+Test Page	PrintersWindow		Tesztoldal
+Test Page	TestPageView		Tesztoldal
+Transport: %transport% %transport_address%	PrinterListView		Transzporter: %transport% %transport_address%
+Transport: %transport% %transport_address%	TestPageView		Transzporter: %transport% %transport_address%
+Unknown status	JobListView		Ismeretlen állapot
+Waiting	JobListView		Várakozás
+Yellow	TestPageView		Sárga
+page	JobListView		oldal
+pages	JobListView		oldal
+pending jobs.	PrinterListView		függő feladat.

@@ -1,0 +1,10 @@
+1	hungarian	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
+(This team is a system component)	Team monitor		(Ez a csapat a rendszer egy komponense)
+Cancel	Team monitor		Mégse
+Force reboot	Team monitor		Újraindítás kikényszerítése
+If the application will not quit you may have to kill it.	Team monitor		Ha az alkalmazás nem lép ki magától, lehet, hogy szükséges megszakítani azt.
+Kill application	Team monitor		Alkalmazás megszakítása
+Quit application	Team monitor		Kilépés az alkalmazásból
+Restart the desktop	Team monitor		Asztal újraindítása
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Egy alkalmazás bezárásához válassza ki a fenti listában, majd nyomja meg az 'Alkalmazás megszakítása', majd pedig a 'Kilépés az alkalamzásból' gombot.\n\nA CONTROL+ALT+DELETE %ld másodpercig való lenyomva tartásával újraindíthatja a számítógépet.
+Team monitor	Team monitor		Csapat monitor

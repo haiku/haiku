@@ -1,0 +1,24 @@
+1	hungarian	x-vnd.Haiku-GLTeapot	2890609668
+Add a teapot	TeapotWindow		Teapot hozzáadása
+Backface culling	TeapotWindow		Háttérszűrés
+Blue	TeapotWindow		Kék
+FPS display	TeapotWindow		FPS megjelenítése
+File	TeapotWindow		Fájl
+Filled polygons	TeapotWindow		Kitöltött poligonszám
+Fog	TeapotWindow		Köd
+GLTeapot	System name		GLTeapot
+Gouraud shading	TeapotWindow		Elmosott árnyékolás
+Green	TeapotWindow		Zöld
+Lighting	TeapotWindow		Megvilágítás
+Lights	TeapotWindow		Fények
+Lower left	TeapotWindow		Bal alsó
+Off	TeapotWindow		Ki
+Options	TeapotWindow		Opciók
+Perspective	TeapotWindow		Perspektíva
+Quit	TeapotWindow		Kilépés
+Red	TeapotWindow		Vörös
+Right	TeapotWindow		Jobb
+Upper center	TeapotWindow		Felső közép
+White	TeapotWindow		Fehér
+Yellow	TeapotWindow		Sárga
+Z-buffered	TeapotWindow		Z-pufferelt

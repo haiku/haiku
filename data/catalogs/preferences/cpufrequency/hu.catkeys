@@ -1,5 +1,6 @@
-1	hungarian	x-vnd.Haiku-CPUFrequencyPref	3974849433
+1	hungarian	x-vnd.Haiku-CPUFrequencyPref	3079996868
 CPU frequency status view	CPU Frequency View		A processzor órajelmutatója
+CPUFrequency	System name		CPUFrequency
 CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Processzor-órajelbeállító\n\tÍrta: Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
 Defaults	Pref Window		Alapértelmezés
 Dynamic performance	Status view		Dinamikus teljesítmény

@@ -1,12 +1,17 @@
-1	hungarian	x-vnd.Haiku-Media	2390037910
+1	hungarian	x-vnd.Haiku-Media	1473363280
+<none>	Media views		<nincs>
 Audio input:	Media views		Hangbemenet:
+Audio mixer	Media Window		Hangerőszabályzó
 Audio output:	Media views		Hangkimenet:
 Audio settings	Media Window		Hangbeállítások
 Channel:	Media views		Csatorna:
 Cleaning up.	Media Window		Rendrakás.
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Nem lehet csatlakozni a Médiakiszolgálóhoz.\nEl szeretné indítani most?
+Couldn't add volume control in Deskbar: %s\n	Media views		Nem lehetett a hangerőszabályzót helyezni a Deskbarra: %s\n
+Couldn't remove volume control in Deskbar: %s\n	Media views		Nem lehetett a hangerőszabályzót eltávolítani a Deskbarról: %s\n
 Defaults	Media views		Alapértelmezés
 Done shutting down.	Media Window		Leállítva.
+Media	System name		Média
 OK	Media Window		Rendben
 Quit	Media Window		Kilépés
 Ready for use…	Media Window		Használatra kész…
@@ -21,4 +26,5 @@ Telling media_addon_server to quit.	Media Window		A Médiabővítmény-kiszolgá
 This hardware has no controls.	Media Window		Ennek az eszköznek nincsenek vezérlői.
 Video input:	Media views		Képbemenet:
 Video output:	Media views		Képkimenet:
+Video settings	Media Window		Videóbeállítások
 Waiting for media_server to quit.	Media Window		Várakozás a Médiakiszolgáló kilépésére.

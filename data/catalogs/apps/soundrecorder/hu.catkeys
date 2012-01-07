@@ -1,0 +1,38 @@
+1	hungarian	x-vnd.Haiku-SoundRecorder	2122042546
+Cannot connect to media server	RecorderWindow		Nem sikerült csatlakozni a médiakiszolgálóhoz
+Cannot connect to the selected sound input	RecorderWindow		Nem sikerült csatlakozni a kiválasztott hangbemenethez
+Cannot find an unused name to use for the new recording	RecorderWindow		Nem található még nem használt név az új felvételnek
+Cannot find default audio hardware	RecorderWindow		Nem található az alapértelmezett hangeszköz
+Cannot find the temporary file created to hold the new recording	RecorderWindow		Nem található az új felvételt tároló ideiglenes fájl
+Cannot get the file to play	RecorderWindow		Nem sikerült lejátszani a fájlt
+Cannot open the temporary file created to hold the new recording	RecorderWindow		Nem sikerült megnyitni az új felvételt tároló ideiglenes fájlt
+Cannot recognize this file as a media file	RecorderWindow		Ez a fájl nem ismerhető fel médiafájlnak
+Cannot record a sound that long	RecorderWindow		Nem lehet ilyen hosszú hangfelvételt készíteni
+Channels: 	RecorderWindow		Csatornák:
+Compression:	RecorderWindow		Tömörítés:
+Drop files here	SoundListView		Húzza ide a fájlokat
+Duration:	RecorderWindow		Hossz:
+File info	RecorderWindow		Fájlinformációk
+File name:	RecorderWindow		Fájlnév:
+Format: 	RecorderWindow		Formátum:
+Forward	RecorderWindow		Előretekerés
+Input	RecorderWindow		Bemenet
+Input:	RecorderWindow		Bemenet:
+Invalid audio files	RecorderWindow		Érvénytelen hangfájlok
+Loop	RecorderWindow		Ismétlés
+None	RecorderWindow		Nincs
+None of the files appear to be audio files	RecorderWindow		A fájlok egyike sem hangfájl
+Nothing to play	RecorderWindow		Nincs mit lejátszani
+OK	RecorderWindow		OK
+Play	RecorderWindow		Lejátszás
+Record	RecorderWindow		Felvétel
+Rewind	RecorderWindow		Visszatekerés
+Sample rate: 	RecorderWindow		Mintavételezés frekvenciája:
+Sample size: 	RecorderWindow		Mintavételezés mérete:
+Save	RecorderWindow		Mentés
+Some of the files don't appear to be audio files	RecorderWindow		A fájlok között van olyan, ami nem hangfájl
+Sound List	RecorderWindow		Hanglista
+SoundRecorder	System name		Hangfelvevő
+Stop	RecorderWindow		Leállítás
+bits	RecorderWindow		bit
+seconds	RecorderWindow		másodperc

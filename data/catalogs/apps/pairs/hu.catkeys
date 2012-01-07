@@ -1,0 +1,14 @@
+1	hungarian	x-vnd.Haiku-Pairs	1981673050
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\tírta: Ralf Schülke\n\tSzerzői jog 2008-2010, Haiku Inc.\n\n%num% kattintásból nyerte meg a játékot.\n
+Beginner (4x4)	PairsWindow		Kezdő (4x4)
+Expert (8x8)	PairsWindow		Mester (8x8)
+Game	PairsWindow		Játék
+Intermediate (6x6)	PairsWindow		Haladó (6x6)
+New	PairsWindow		Új
+New game	PairsWindow		Új játék
+OK	PairsView		OK
+Pairs	System name		Párok
+Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		A Párok játék nem talált elég vektorikont a rendszeren, legalább %d darabra van szükség.
+Quit	PairsWindow		Kilépés
+Quit game	PairsWindow		Kilépés a játékból
+Size	PairsWindow		Méret

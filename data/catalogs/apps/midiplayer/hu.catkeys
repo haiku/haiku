@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-MidiPlayer	3885957623
+1	hungarian	x-vnd.Haiku-MidiPlayer	4180509704
 Cavern	Main Window		Barlang
 Closet	Main Window		Szekrény
 Could not load song	Main Window		Nem lehetett betölteni a számot!
@@ -8,6 +8,7 @@ Garage	Main Window		Garázs
 Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku MIDI-lejátszó 1.0.0 beta\n\nApró kis program\nGyatrán hangzó dalokat\nJátszik le ezret
 Igor's lab	Main Window		Igor laboratóriuma
 Live input:	Main Window		Élő bemenet:
+MidiPlayer	System name		Midilejátszó
 None	Main Window		Semmi
 OK	Main Window		Rendben
 Off	Main Window		Nincs

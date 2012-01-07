@@ -1,0 +1,48 @@
+1	hungarian	x-vnd.Haiku-Pulse	2324471783
+%.2f GHz	NormalPulseView		%.2f GHz
+%ld MHz	NormalPulseView		%ld MHz
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nÍrta: David Ramsey és Arve Hjønnevåg\nÁtírta: Daniel Switkin\n
+About Pulse…	CPUButton		Pulse névjegye...
+About Pulse…	PulseView		Pulse névjegye...
+Active color	ConfigView		Aktív szín
+Bar colors	ConfigView		Sávok színe
+CPU progress bar	NormalPulseView		CPU folyamatsáv
+Defaults	PrefsWindow		Alapértelmezett
+Deskbar	CPUButton		Deskbar
+Deskbar menu	CPUButton		Deskbar menü
+Deskbar mode	MiniPulseView		Deskbar mód
+Deskbar mode	NormalPulseView		Deskbar mód
+Deskbar mode	PrefsWindow		Deskbar mód
+Error	PulseApp		Hiba
+Fade colors	ConfigView		Színek elhalványítása
+Frame color	ConfigView		Keret színe
+Idle color	ConfigView		Üresjárat színe
+Info	CPUButton		Infó
+Info	DeskbarPulseView		Infó
+Info	PulseApp		Infó
+Info	PulseView		Infó
+Installing in Deskbar failed\n%s	PulseApp		Nem sikerült telepíteni a Deskbarra\n%s
+Mini mode	DeskbarPulseView		Mini mód
+Mini mode	NormalPulseView		Mini mód
+Mini mode	PrefsWindow		Mini mód
+Normal mode	DeskbarPulseView		Normál mód
+Normal mode	MiniPulseView		Normál mód
+Normal mode	PrefsWindow		Normál mód
+OK	CPUButton		OK
+OK	DeskbarPulseView		OK
+OK	PrefsWindow		OK
+OK	PulseApp		OK
+OK	PulseView		OK
+Pulse	NormalPulseView		Pulse
+Pulse	PulseApp		Pulse
+Pulse	System name		Pulse
+Pulse settings	PulseWindow		Pulse beállításai
+Quit	DeskbarPulseView		Kilépés
+Quit	MiniPulseView		Kilépés
+Remove replicant	CPUButton		Másolat eltávolítása
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Nem sikerült eltávolítani a Deskbarról.\n%s
+Settings…	PulseView		Beállítások...
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Használat: Pulse [--mini] [-w szélesség] [--width=szélesség]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
+Width of icon:	ConfigView		Ikon szélessége
+You can't disable the last active CPU.	CPUButton		Nem lehet letiltani a legutolsó aktív processzort.
+You can't disable the last active CPU.	PulseView		Nem lehet letiltani a legutolsó aktív processzort.

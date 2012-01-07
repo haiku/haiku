@@ -1,8 +1,11 @@
-1	hungarian	x-vnd.Haiku-DriveSetup	201850780
+1	hungarian	x-vnd.Haiku-DriveSetup	1209826930
 %ld MiB	Support		%ld MiB
 <empty>	DiskView		<üres>
 <empty>	PartitionList		<üres>
+Active	PartitionList		Aktív
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Biztosan törölni szeretné a kiválasztott partíciót?\n\nEz esetben a partíció teljes tartalma visszavonhatatlanul meg fog semmisülni.
+Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Biztosan inicializálni kívánja a(z) \"%s\" partíciót? Még egyszer megkérdezni majd mielőtt a változtatások írásra kerülnek.
+Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Biztosan inicializálni kívánja a partíciót? Még egyszer megkérdezni majd mielőtt a változtatások írásra kerülnek.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Biztosan lemezre szeretné írni a kijelölt változtatásokat?\n\nEz esetben a „%s” lemez teljes tartalma visszavonhatatlanul meg fog semmisülni.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Biztosan a lemezre szeretné írni a kijelölt változtatásokat?\n\nEz esetben a(z) „%s” partíció teljes tartalma visszavonhatatlanul meg fog semmisülni.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Biztosan lemezre szeretné írni a változtatásokat?\n\nEz esetben a partíció teljes tartalma visszavonhatatlanul meg fog semmisülni!
@@ -26,6 +29,7 @@ Device	DiskView		Eszköz
 Device	PartitionList		Eszköz
 Disk	MainWindow		Lemez
 Disk system \"%s\"\" not found!	MainWindow		„%s” rendszerlemez nem található!
+DriveSetup	System name		Lemezkezelő
 Eject	MainWindow		Kiadás
 End: %ld MB	Support		Vége: %ld MB
 Error: 	MainWindow	in any error alert	Hiba: 
@@ -43,6 +47,7 @@ Mounted at	PartitionList		Csatolási pont
 No disk devices have been recognized.	DiskView		Nem található tárolóeszköz.
 OK	MainWindow		Rendben
 Offset: %ld MB	Support		Tartomány: %ld MB
+Parameters	PartitionList		Paraméterek
 Partition	MainWindow		Partíció
 Partition %ld	DiskView		%ld. paríció
 Partition name:	CreateParamsPanel		Partíció neve:

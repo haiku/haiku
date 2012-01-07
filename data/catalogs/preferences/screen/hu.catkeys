@@ -1,0 +1,52 @@
+1	hungarian	x-vnd.Haiku-Screen	2033930135
+%.1f Hz	Screen		%.1f Hz
+%sSerial no.: %s	Screen		%sSorozatszám: %s
+/other…	Screen		/egyéb...
+15 bits/pixel, 32768 colors	Screen		15 bit/pixel, 32768 szín
+16 bits/pixel, 65536 colors	Screen		16 bit/pixel, 65538 szín
+24 bits/pixel, 16 Million colors	Screen		24 bit/pixel, 16 millió szín
+32 bits/pixel, 16 Million colors	Screen		32 bit/pixel, 16 millió szín
+8 bits/pixel, 256 colors	Screen		8 bit/pixel, 256 szín
+About	Screen		Névjegy
+All workspaces	Screen		Minden munkaasztal
+Apply	Screen		Alkalmaz
+Cancel	Screen		Mégse
+Colors:	Screen		Színek:
+Columns:	Screen		Oszlopok:
+Combine displays:	Screen		Kijelzők összevonása:
+Could not write VESA mode settings file:\n\t	Screen		A VESA mód beállítási fájl írása sikertelen:\n\t
+Current workspace	Screen		Jelenlegi munkaasztal
+Do you wish to keep these settings?	Screen		Kívánja megtartani ezeket a beállításokat?
+Done	Screen		Kész
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Vízszíntes frekvencia:\t%lu - %lu kHz\nFüggőleges frekvencia:\t%lu - %lu Hz\n\nMaximális pixelórajel:\t%g MHz
+Hz	Screen		Hz
+Keep	Screen		Megtartás
+OK	Screen		OK
+Other…	Screen		Egyéb...
+Refresh rate	Screen		Frissítési frekvencia
+Refresh rate:	Screen		Frissítési frekvencia:
+Resolution:	Screen		Felbontás:
+Revert	Screen		Visszaállítás
+Rows:	Screen		Sorok:
+Screen	Screen		Képernyő
+Screen	System name		Képernyő
+Screen preferences by the Haiku team	Screen		A Haiku csapat képernyő-beállításai
+Set background…	Screen		Háttér beállítása...
+Settings will revert in %seconds seconds.	Screen		A beállítások %seconds másodperc múlva automatikusan visszaállításra kerülnek.
+Swap displays:	Screen		Kijezők megcserélése:
+The screen mode could not be set:\n\t%s\n	Screen		A kijelzőmód nem állítható be erre:\n\t%s\n
+Type or use the left and right arrow keys.	Screen		Gépeljen, vagy hasznája a bal és jobb nyilakat.
+Undo	Screen		Visszavonás
+Unknown mode	Screen		Ismeretlen mód
+Use laptop panel:	Screen		Használt laptopképernyő:
+Video format:	Screen		Videóformátum:
+Warning	Screen		Figyelmeztetés
+Workspaces	Screen		Munkaasztalok
+always	Screen		mindig
+bits/pixel	Screen		bit/pixel
+disable	Screen		letiltás
+horizontally	Screen		vízszintesen
+if needed	Screen		ha szükséges
+no	Screen		nem
+vertically	Screen		függőlegesen
+yes	Screen		igen

@@ -1,0 +1,93 @@
+1	hungarian	x-vnd.Haiku.CodyCam	441085909
+Can't find an available connection to the video window	CodyCam		Nem található használható kapcsolat a videó ablakához
+Cannot connect the video source to the video window	CodyCam		Nem lehet beállítani az videó forrását a videó ablakának
+Cannot create a video window	CodyCam		Nem sikerült létrehozni a videó ablakát
+Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Nem található videóforrás. A CodyCam használatához szükség van egy webkamerához.
+Cannot find an available video stream	CodyCam		Nem található elérhető videóadás
+Cannot find the media roster	CodyCam		Nem található a médiajegyzék
+Cannot get a time source	CodyCam		Nem található időforrás
+Cannot register the video window	CodyCam		A videó ablaka nem regisztrálható
+Cannot seek time source!	CodyCam		Nem lehet az időforráshoz ugrani!
+Cannot set the time source for the video source	CodyCam		Nem lehet beállítani az időforrást a videó forrásának
+Cannot set the time source for the video window	CodyCam		Nem lehet beállítani az időforrást a videó ablakának
+Cannot start the video source	CodyCam		Nem sikerült elindítani a videóforrást
+Cannot start the video window	CodyCam		Nem sikerült elindítani a videó ablakát
+Cannot start time source!	CodyCam		Az időforrás nem indítható el
+Capture Rate Menu	CodyCam		Képkészítési gyakoriság menü
+Capture controls	CodyCam		Képkészítés vezérlői
+Capturing Image…	VideoConsumer.cpp		Kép készítése...
+Closing the window\n	VideoConsumer.cpp		Ablak bezárása\n
+CodyCam	System name		CodyCam
+Connected…	VideoConsumer.cpp		Csatlakozva...
+Couldn't find requested directory on server	VideoConsumer.cpp		A megadott könyvtár nem található a kiszolgálón
+Directory:	CodyCam		Könyvtár:
+Error creating output file	VideoConsumer.cpp		Hiba történt a kimeneti fájl készítése során
+Error getting initial latency for the capture node	CodyCam		Hiba történt a képkészítési csomópont kezdeti késésének lekérése során
+Error setting type of output file	VideoConsumer.cpp		Hiba történt a kimeneti fájl típusának megadása során
+Error writing output file	VideoConsumer.cpp		Hiba történt a kimeneti fájl írása során
+Every 10 minutes	CodyCam		10 percenként
+Every 15 minutes	CodyCam		15 percenként
+Every 15 seconds	CodyCam		15 másodpercenként
+Every 2 hours	CodyCam		2 óránként
+Every 24 hours	CodyCam		24 óránként
+Every 30 minutes	CodyCam		30 percenként
+Every 30 seconds	CodyCam		30 másodpercenként
+Every 4 hours	CodyCam		4 óránként
+Every 5 minutes	CodyCam		5 percenként
+Every 8 hours	CodyCam		8 óránként
+Every hour	CodyCam		Óránként
+Every minute	CodyCam		Percenként
+FTP	CodyCam		FTP
+File	CodyCam		Fálj
+File %s # unterminated quote at end of file\n	SettingsHandler		%s fájl # bezáratlan idézőjel a fájl végén\n
+File %s ; Line %ld # unterminated quote\n	SettingsHandler		%s fájl ; Sor %ld # bezáratlan idézőjel\n
+File %s; Line %ld # %s	SettingsHandler		%s fájl; Sor %ld # %s
+File name:	CodyCam		Fájlnév:
+File transmission failed	VideoConsumer.cpp		A fáljátvitel sikertelen
+Format:	CodyCam		Formátum:
+Image Format Menu	CodyCam		Képformátum menü
+JPEG image	CodyCam		JPEG kép
+Last Capture: 	VideoConsumer.cpp		Legutóbbi kép:
+Local	CodyCam		Helyi
+Locking the window\n	VideoConsumer.cpp		Ablak zárolása\n
+Logging in…	VideoConsumer.cpp		Bejelentkezés...
+Login:	CodyCam		Bejelentkezés:
+Never	CodyCam		Soha
+OK	CodyCam		OK
+Output	CodyCam		Kimenet
+PASS <suppressed>  (real password sent)\n	FtpClient		PASS <rejtve> (itt az igazi jelszó lett elküldve)\n
+Passive FTP	CodyCam		Passzív FTP
+Password:	CodyCam		Jelszó:
+Quit	CodyCam		Kilépés
+Rate:	CodyCam		Frissítés:
+Remote host has closed the connection.\n	FtpClient		A távoli kiszolgáló megszakította a kapcsolatot.\n
+Rename failed	VideoConsumer.cpp		Átnevezés sikertelen
+Renaming…	VideoConsumer.cpp		Átnevezés...
+SFTP	CodyCam		SFTP
+Send to…	CodyCam		Küldés...
+Server login failed	VideoConsumer.cpp		Sikertelen bejelentkezés
+Server:	CodyCam		Kiszolgáló:
+Start video	CodyCam		Videó indítása
+Stop video	CodyCam		Videó leállítása
+Transmitting…	VideoConsumer.cpp		Átvitel...
+Type:	CodyCam		Típus:
+Video settings	CodyCam		Videóbeállítások
+Waiting…	CodyCam		Várakozás...
+capture rate expected	CodyCam		nincs megadva a képkészítés gyakorisága
+cmd: '%s'\n	FtpClient		cmd: '%s'\n
+destination directory expected	CodyCam		nincs megadva célkönyvtár
+image file format expected	CodyCam		nincs megadva fájlformátum a képnek
+invalid upload client %ld\n	VideoConsumer.cpp		ismeretlen feltöltési kliens %ld\n
+login ID expected	CodyCam		felhasználónév szükséges
+on or off expected	Settings	Do not translate 'on' and 'off'	nincs megadva hogy 'on' vagy 'off'
+password	CodyCam		jelszó
+password expected	CodyCam		nincs megadva jelszó
+read: %d\n	SftpClient		olvasás: %d\n
+read: %ld\n	SftpClient		olvasás: %ld\n
+reply: %d, %d\n	FtpClient		válasz: %d, %d\n
+reply: '%s'\n	SftpClient		válasz: '%s'\n
+server address expected	CodyCam		kiszolgáló címének megadása szükséges
+still image filename expected	CodyCam		nincs megadva fájlnév a képekhez
+unknown command	SettingsHandler		ismeretlen parancs
+unrecognized upload client specified	CodyCam		ismeretlen feltöltő kliens van megadva
+upload client name expected	CodyCam		nincs megadva a feltöltési kliens neve

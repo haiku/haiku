@@ -1,0 +1,44 @@
+1	hungarian	x-vnd.Haiku-Time	3493650184
+<Other>	Time		<Egyéb>
+Add	Time		Hozzáadás
+Africa	Time		Afrika
+America	Time		Amerika
+Antarctica	Time		Antarktisz
+Arctic	Time		Arktisz
+Asia	Time		Ázsia
+Atlantic	Time		Atlanti-óceán
+Australia	Time		Ausztrália
+Could not contact server	Time		Nem sikerült kapcsolatba lépni a kiszolgálóval
+Could not create socket	Time		Socket készítése sikertelen
+Current time:	Time		Jelenlegi idő:
+Date and time	Time		Dátum és idő
+Europe	Time		Európa
+GMT (UNIX compatible)	Time		GMT (UNIX kompatibilis)
+Hardware clock set to:	Time		A hardveres óra beállítva erre:
+Indian	Time		India
+Local time (Windows compatible)	Time		Helyi idő (Windows kompatibilis)
+Message receiving failed	Time		Sikertelen üzenetfogadás
+Network time	Time		Hálózati idő
+OK	Time		OK
+Pacific	Time		Csendes-óceán
+Preview time:	Time		Idő előnézete:
+Received invalid time	Time		Érvénytelen idő érkezett
+Remove	Time		Eltávolítás
+Reset	Time		Visszaállítás
+Revert	Time		Visszaállítás
+Sending request failed	Time		Sikertelen kérelemküldés
+Set time zone	Time		Időzóna beállítása
+Stop	Time		Leállítás
+Synchronize	Time		Szinkronizálás
+Synchronize again	Time		Szinkronizálás újra
+Synchronize at boot	Time		Szinkronizálás indításkor
+The following error occured while synchronizing:r\n%s	Time		A következő hiba történt szinkronizálás közben:r\n%s
+The following error occured while synchronizing:r\n%s: %s	Time		A következő hiba történt szinkronizálás közben:r\n%s: %s
+Time	System name		Idő
+Time	Time		Idő
+Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Idő & Dátum - írta:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nMinden jog fenntartva 2004-2008, Haiku.
+Time zone	Time		Időzóna
+Try all servers	Time		Összes kiszolgáló kipróbálása
+Waiting for answer failed	Time		Nem érkezett válasz
+\nNow: 	Time		\nMost:
+about	Time		névjegy

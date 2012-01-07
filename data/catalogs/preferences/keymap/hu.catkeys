@@ -1,18 +1,28 @@
-1	hungarian	x-vnd.Haiku-Keymap	3858687220
+1	hungarian	x-vnd.Haiku-Keymap	3895282621
 (Current)	Keymap window		(jelenlegi)
 Acute trigger	Keymap window		Ékezet kapcsoló
+Cancel	Modifier Keys window		Mégse
+Caps Lock:	Modifier Keys window		Caps Lock:
 Circumflex trigger	Keymap window		Kalap kapcsoló
+Command:	Modifier Keys window		Command:
+Control:	Modifier Keys window		Control:
 Diaeresis trigger	Keymap window		Tréma kapcsoló
 File	Keymap window		Fájl
 Font	Keymap window		Betűtípus
 Grave trigger	Keymap window		Fordított ékezet kapcsoló
+Keymap	System name		Billentyűzetkiosztás
 Layout	Keymap window		Elrendezés
+Modifier Keys	Modifier Keys window		Módosító gombok
+OK	Modifier Keys window		OK
 Open…	Keymap window		Megnyitás…
+Option:	Modifier Keys window		Opció:
 Quit	Keymap window		Kilépés
 Revert	Keymap window		Visszaállítás
+Revert	Modifier Keys window		Visszaállítás
 Sample and clipboard:	Keymap window		Minta és vágólap:
 Save as…	Keymap window		Mentés másként…
 Select dead keys	Keymap window		„Beragadó” gombok kiválasztása
+Set Modifier Keys…	Keymap window		Módosító gombok beállítása...
 Switch shortcut keys	Keymap window		Billentyűzetkombináció-váltás
 Switch shortcut keys to Haiku mode	Keymap window		Billentyűzetkombináció-váltás Haiku-módra
 Switch shortcut keys to Windows/Linux mode	Keymap window		Billentyűkombináció váltása Windows/Linux módra

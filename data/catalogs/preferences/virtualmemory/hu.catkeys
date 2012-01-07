@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-VirtualMemory	2137942259
+1	hungarian	x-vnd.Haiku-VirtualMemory	688347876
 %Ld B	SettingsWindow		%Ld B
 Changes will take effect on restart!	SettingsWindow		A változtatások csak újraindítás után válnak érvényessé!
 Current swap file size: 	SettingsWindow		Jelenlegi cserefájl mérete: 
@@ -6,6 +6,7 @@ Defaults	SettingsWindow		Alapértelmezés
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		A virtuális memória kikapcsolása egyes esetekkor nem kívánt hatással lehet a rendszer stabilitására.\nAmíg a rendszermemória el nem fogy, addig a virtuális memória használatára nincs szükség.\n\nBiztosan ki szeretné kapcsolni ezt a funkciót?
 Enable virtual memory	SettingsWindow		Virtuális memória engedélyezése
 GB	SettingsWindow		GB
+Insufficient space for a swap file.	SettingsWindow		Nincs elég hely a cserefájlnak.
 KB	SettingsWindow		KB
 Keep enabled	SettingsWindow		Tartsa bekapcsolva
 MB	SettingsWindow		MB
@@ -15,4 +16,5 @@ Requested swap file size:	SettingsWindow		Az igényelt cserefájl mérete:
 Revert	SettingsWindow		Visszaállít
 Turn off	SettingsWindow		Kikapcsol
 Use volume:	SettingsWindow		Partíció:
+VirtualMemory	System name		VirtuálisMemória
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Virtuális memória\n\tÍrta Axel Dörfler\n\tCopyright 2005, Haiku.\n

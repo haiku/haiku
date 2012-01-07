@@ -1,0 +1,48 @@
+1	hungarian	x-vnd.Haiku-ActivityMonitor	3704566709
+%.1f KB/s	DataSource		%.1f KB/s
+%.1f MB	DataSource		%.1f MB
+%.1f faults/s	DataSource		%.1f hiba/s
+%lld ms	SettingsWindow		%lld ms
+%lld sec.	SettingsWindow		%lld s.
+ActivityMonitor	System name		Folyamatmonitor
+Add graph	ActivityWindow		Grafikon hozzáadása
+Additional items	ActivityView		További elemek
+Apps	DataSource		Alkalmazások
+Block cache	DataSource		Blokk gyorsítótár
+Block cache memory	DataSource		Blokk gyorsítótár
+CPU	DataSource		CPU
+CPU usage	DataSource		CPU terhelés
+CPU usage (combined)	DataSource		CPU használat (kombinált)
+Cache	DataSource		Gyorsítótár
+Cached memory	DataSource		Gyorsítótárazott memória
+File	ActivityWindow		Fájl
+Hide legend	ActivityView		Magyarázat elrejtése
+MB	DataSource		MB
+Media nodes	DataSource		Média csomópontok
+Memory	DataSource		Memória
+Network receive	DataSource		Fogadott adatok
+Network send	DataSource		Küldött adatok
+P-faults	DataSource		P hibák
+Page faults	DataSource		Laphibák
+Ports	DataSource		Portok
+Quit	ActivityWindow		Kilépés
+RX	DataSource	Shorter version for Receiving.	Vétel
+Raw clipboard	DataSource		Nyers vágólap
+Receiving	DataSource		Fogadás
+Remove graph	ActivityView		Grafikon eltávolítása
+Running applications	DataSource		Futó programok
+Semaphores	DataSource		Szemaforok
+Sems	DataSource		Szemaforok
+Sending	DataSource		Küldés
+Settings	ActivityWindow		Beállítások
+Settings…	ActivityWindow		Beállítások...
+Show legend	ActivityView		Magyarázat megjelenítése
+Swap	DataSource		Swap
+Swap space	DataSource		Lapozótér
+TX	DataSource	Shorter version for Sending	Adás
+Teams	DataSource		Csapatok
+Text clipboard	DataSource		Szöveges vágólap
+Threads	DataSource		Szálak
+Update time interval:	SettingsWindow		Frissítési időköz
+Used memory	DataSource		Használt memória
+usage	DataSource		használat

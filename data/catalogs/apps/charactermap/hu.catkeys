@@ -1,0 +1,181 @@
+1	hungarian	x-vnd.Haiku-CharacterMap	2745781253
+Aegean numbers	UnicodeBlocks		Aegean számok
+Alphabetic presentation forms	UnicodeBlocks		Alfabetikus prezentációs formák
+Ancient Greek musical notation	UnicodeBlocks		Ősi görög zenei jelek
+Ancient Greek numbers	UnicodeBlocks		Ősi görög azámok
+Ancient smbols	UnicodeBlocks		Ősi szimbólumok
+Arabic	UnicodeBlocks		Arab
+Arabic presentation forms A	UnicodeBlocks		Arab prezentációs
+Arabic presentation forms B	UnicodeBlocks		Arab prezentációs formák B
+Arabic supplement	UnicodeBlocks		Arab kiegészítés
+Armenian	UnicodeBlocks		Örmény
+Arrows	UnicodeBlocks		Nyilak
+Balinese	UnicodeBlocks		Balinéz
+Basic Latin	UnicodeBlocks		Alap latin
+Bengali	UnicodeBlocks		Bengali
+Block elements	UnicodeBlocks		Blokk elemek
+Bopomofo	UnicodeBlocks		Bopomofo
+Bopomofo extended	UnicodeBlocks		Bopomofo kiterjesztett
+Box drawing	UnicodeBlocks		Dobozrajz
+Braille patterns	UnicodeBlocks		Braille minták
+Buginese	UnicodeBlocks		Bunginéz
+Buhid	UnicodeBlocks		Buhid
+Byzantine musical symbols	UnicodeBlocks		Bizánci zenei szimbólumok
+CJK compatibility	UnicodeBlocks		CJK kompatibilitás
+CJK compatibility forms	UnicodeBlocks		CJK kompatibilis formák
+CJK compatibility ideographs	UnicodeBlocks		CJK kompatibilis ideográfiák
+CJK compatibility ideographs Supplement	UnicodeBlocks		CJK kompatibilis ideográfiák Kiegészítés
+CJK radicals supplement	UnicodeBlocks		CJK gyökök kiegészítés
+CJK strokes	UnicodeBlocks		CJK áthúzások
+CJK symbols and punctuation	UnicodeBlocks		CJK szimbólumok és írásjelek
+CJK unified ideographs	UnicodeBlocks		CJK egyesített ideográfiák
+CJK unified ideographs extension A	UnicodeBlocks		CJK egyesített ideográfiai kiterjesztések A
+CJK unified ideographs extension B	UnicodeBlocks		CJK egységes ideográfok B kiterjesztése
+Carian	UnicodeBlocks		Kariai
+Cham	UnicodeBlocks		Csam
+CharacterMap	System name		CharacterMap
+Cherokee	UnicodeBlocks		Cseroki
+Clear	CharacterWindow		Tiszta
+Code	CharacterWindow		Kód
+Combining diacritical marks	UnicodeBlocks		Diakritikális jelek kombinációja
+Combining diacritical marks for symbols	UnicodeBlocks		Diakritikus jelölések kombinációja szimbólumokért
+Combining diacritical marks supplement	UnicodeBlocks		Diakritikus jelölés kombinációk kiegészítése
+Combining half marks	UnicodeBlocks		Fél jelölések kombinációja
+Control pictures	UnicodeBlocks		Kontroll képek
+Coptic	UnicodeBlocks		Kopt
+Copy as escaped byte string	CharacterView		Másolás escape byte karakterként
+Copy character	CharacterView		Karakter kimásolása
+Counting rod numerals	UnicodeBlocks		Számolópálcás számok
+Cuneiform	UnicodeBlocks		Ékírás
+Cuneiform numbers and punctuation	UnicodeBlocks		Ékírásos számok és írásjelek
+Currency symbols	UnicodeBlocks		Pénz szimbólumok
+Cypriot syllabary	UnicodeBlocks		Ciprusi szótagábécé
+Cyrillic	UnicodeBlocks		Cyrillic
+Cyrillic extended A	UnicodeBlocks		Cirill kiterjesztett A
+Cyrillic extended B	UnicodeBlocks		Cirill B kiterjesztett
+Cyrillic supplement	UnicodeBlocks		Cirill kiegészítés
+Deseret	UnicodeBlocks		Deseret
+Devanagari	UnicodeBlocks		Devangari
+Dingbats	UnicodeBlocks		Dingbats
+Domino tiles	UnicodeBlocks		Domino részek
+Enclosed CJK letters and months	UnicodeBlocks		Zárt CJK betűk és hónapok
+Enclosed alphanumerics	UnicodeBlocks		Zárt alfanumerikus
+Ethiopic	UnicodeBlocks		Etióp
+Ethiopic extended	UnicodeBlocks		Ethiopic kiterjesztés
+Ethiopic supplement	UnicodeBlocks		Etióp kiegészítés
+File	CharacterWindow		Fájl
+Filter:	CharacterWindow		Szűrő:
+Font	CharacterWindow		Betű
+Font size:	CharacterWindow		Font mérete:
+General punctuation	UnicodeBlocks		Általános központozás
+Geometric shapes	UnicodeBlocks		Geometriai formák
+Georgian	UnicodeBlocks		Grúz
+Georgian supplement	UnicodeBlocks		Grúz kiegészítő
+Glagotic	UnicodeBlocks		Glagolita
+Gothic	UnicodeBlocks		Gót
+Greek and Coptic	UnicodeBlocks		Görög és kopt
+Greek extended	UnicodeBlocks		Görög kiterjesztett
+Gujarati	UnicodeBlocks		Gudzsarati
+Gurmukhi	UnicodeBlocks		Gurmukhi
+Halfwidth and fullwidth forms	UnicodeBlocks		Félszűkített és szűkített formák
+Hangul Jamo	UnicodeBlocks		Hangul Jamo
+Hangul compatibility Jamo	UnicodeBlocks		Hangul kompatibilis Jamo
+Hangul syllables	UnicodeBlocks		Hangul szótagok
+Hanunoo	UnicodeBlocks		Hanunoo
+Hebrew	UnicodeBlocks		Héber
+Hiragana	UnicodeBlocks		Hiragana
+IPA extensions	UnicodeBlocks		IPA extensions
+Ideographic description characters	UnicodeBlocks		Ideografikus leíró karakterek
+Kanbun	UnicodeBlocks		Kanbun
+Kangxi radicals	UnicodeBlocks		Kangxi gyökök
+Kannada	UnicodeBlocks		Kannada
+Katakana	UnicodeBlocks		Katakana
+Katakana phonetic extensions	UnicodeBlocks		Katakana fonetikus kiterjesztései
+Kayah Li	UnicodeBlocks		Kayah Li
+Kharoshthi	UnicodeBlocks		Kharosti
+Khmer	UnicodeBlocks		Khmer
+Khmer symbols	UnicodeBlocks		Kmer szimbólumok
+Lao	UnicodeBlocks		Lao
+Latin extended A	UnicodeBlocks		Latin kiterjesztett A
+Latin extended B	UnicodeBlocks		Latin kiterjesztett B
+Latin extended C	UnicodeBlocks		Latin kiterjesztett C
+Latin extended D	UnicodeBlocks		Latin kiterjesztett D
+Latin extended additional	UnicodeBlocks		Latin további kiterjesztett
+Latin-1 supplement	UnicodeBlocks		Latin-1 kiegészítő
+Lepcha	UnicodeBlocks		Lepcha
+Letterlike symbols	UnicodeBlocks		Betűforma szimbólumok
+Limbu	UnicodeBlocks		Linbu
+Linear B ideograms	UnicodeBlocks		Lineáris B ideogrammok
+Linear B syllabary	UnicodeBlocks		Lineáris B szótagábécé
+Lycian	UnicodeBlocks		Lícián
+Lydian	UnicodeBlocks		Lüd
+Mahjong tiles	UnicodeBlocks		Mahjong kockák
+Malayalam	UnicodeBlocks		Maya
+Mathematical alphanumeric symbols	UnicodeBlocks		Matematikai alfanumerikus szimbólumok
+Mathematical operators	UnicodeBlocks		Matematikai operátorok
+Miscellaneous mathematical symbols A	UnicodeBlocks		Egyéb matematikai szimbólumok A
+Miscellaneous mathematical symbols B	UnicodeBlocks		Különféle matematikai B szimbólumok
+Miscellaneous symbols	UnicodeBlocks		Egyéb szimbólumok
+Miscellaneous symbols and arrows	UnicodeBlocks		Egyéb szimbólumok és nyilak
+Miscellaneous technical	UnicodeBlocks		Egyéb technikai
+Modifier tone letters	UnicodeBlocks		Hangmódosító betűk
+Mongolian	UnicodeBlocks		Mongol
+Musical symbols	UnicodeBlocks		Zenei jelek
+Myanmar	UnicodeBlocks		Mianmar
+N'Ko	UnicodeBlocks		N'Ko
+New Tai Lue	UnicodeBlocks		Új Tai Lue
+Number forms	UnicodeBlocks		Számformák
+Ogham	UnicodeBlocks		Ogham
+Ol Chiki	UnicodeBlocks		Ol Chiki
+Old Persian	UnicodeBlocks		Régi perzsa
+Old italic	UnicodeBlocks		Régi dőlt
+Optical character recognition	UnicodeBlocks		Optikai karakter felismerés
+Oriya	UnicodeBlocks		Oria
+Osmanya	UnicodeBlocks		Osmán
+Phags-pa	UnicodeBlocks		Phags-pa
+Phaistos disc	UnicodeBlocks		Phaistos lemez
+Phoenician	UnicodeBlocks		Főinciai
+Phonetic extensions	UnicodeBlocks		Fonetikus kiterjesztések
+Phonetic extensions supplement	UnicodeBlocks		Fonetikus kiterjesztés kiegészítés
+Private use area	UnicodeBlocks		Személyes használatú terület
+Quit	CharacterWindow		Kilépés
+Rejang	UnicodeBlocks		Rejang
+Runic	UnicodeBlocks		Rúnák
+Saurashtra	UnicodeBlocks		Saurashtra
+Shavian	UnicodeBlocks		Shaw-féle
+Show private blocks	CharacterWindow		Privát blokkok megjelenítése
+Sinhala	UnicodeBlocks		Sinhala
+Small form variants	UnicodeBlocks		Kis formavariánsok
+Spacing modifier letters	UnicodeBlocks		Betűköz módosÍtó betűk
+Specials	UnicodeBlocks		Speciálisok
+Sundanese	UnicodeBlocks		Szundanéz
+Superscripts and subscripts	UnicodeBlocks		Felső és alsó index
+Supplement punctuation	UnicodeBlocks		Kiegészítő írásjelek
+Supplemental arrows A	UnicodeBlocks		Kiegáészítő nyilak A
+Supplemental arrows B	UnicodeBlocks		Kiegészítő nyilak B
+Supplemental mathematical operators	UnicodeBlocks		Kiegészítő matematikai műveletek
+Supplementary private use area A	UnicodeBlocks		Kiegészítő privát felhasználású terület A
+Supplementary private use area B	UnicodeBlocks		Kiegészítő privát felhasználású terület B
+Syloti Nagri	UnicodeBlocks		Syloti Nagri
+Syriac	UnicodeBlocks		Szír
+Tagalog	UnicodeBlocks		Tagalog
+Tagbanwa	UnicodeBlocks		Tagbanwa
+Tags	UnicodeBlocks		Cimkék
+Tai Le	UnicodeBlocks		Tai Le
+Tai Xuan Jing symbols	UnicodeBlocks		Tai Xuan Jing szimbólumok
+Tamil	UnicodeBlocks		Tamil
+Telugu	UnicodeBlocks		Teuglu
+Thaana	UnicodeBlocks		Thaana
+Thai	UnicodeBlocks		Thai
+Tibetan	UnicodeBlocks		Tibeti
+Tifinagh	UnicodeBlocks		Tifinagh
+Ugaritic	UnicodeBlocks		Ugariti
+Unified Canadian Aboriginal syllabics	UnicodeBlocks		Egységes kanadai őslakos szótagok
+Vai	UnicodeBlocks		Vai
+Variation selectors	UnicodeBlocks		Eltérő elválasztók
+Variation selectors supplement	UnicodeBlocks		Variációválasztók kiegészítő
+Vertical forms	UnicodeBlocks		Függőleges formák
+View	CharacterWindow		Nézet
+Yi Radicals	UnicodeBlocks		Yi gyökök
+Yi syllables	UnicodeBlocks		Yi szótagok
+Yijing hexagram symbols	UnicodeBlocks		Yijing hexagram szimbólumok

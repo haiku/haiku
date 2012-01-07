@@ -1,0 +1,34 @@
+1	hungarian	x-vnd.Haiku-LaunchBox	3016105370
+Add button here	LaunchBox		Helyezze a gombokat ide
+Auto-raise	LaunchBox		Automatikus emelés
+Bummer	LaunchBox		Fenébe
+Cancel	LaunchBox		Mégse
+Clear button	LaunchBox		Törlés gomb
+Clone	LaunchBox		Klónozás
+Close	LaunchBox		Bezárás
+Description for '%3'	LaunchBox		A(z) '%3' leírása
+Failed to launch '%1'.\n\nError:	LaunchBox		Nem sikerült ezt elindítani: '%1'.\n\nHiba:
+Failed to launch 'something', error in Pad data.	LaunchBox		Nem sikerült elindítani valamit, hiba van a tálca adataiban.
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Nem sikerült elküldeni a Trackernek a 'mappa megnyitása' parancsot.\n\nHiba:
+Horizontal layout	LaunchBox		Vízszintes elrendezés
+Icon size	LaunchBox		Ikonméret
+Ignore double-click	LaunchBox		Dupla kattintás figyelmen kívül hagyása
+LaunchBox	System name		Indítódobozok
+Name Panel	LaunchBox		Név Panel
+New	LaunchBox		Új
+OK	LaunchBox		OK
+Pad	LaunchBox		Tálca
+Pad %1	LaunchBox		%1 tálca
+Pad 1	LaunchBox		1. tálca
+Quit	LaunchBox		Kilépés
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Biztos bezárja ezt a tálcát?\n(A tálca nem lesz rögzítve sehol.)
+Remove button	LaunchBox		Eltávolítás gomb
+Set description…	LaunchBox		Leírás beállítása...
+Settings	LaunchBox		Beállítások
+Show on all workspaces	LaunchBox		Megjelenítés az összes munkaasztalon
+Show window border	LaunchBox		Ablak keretének mutatása
+Vertical layout	LaunchBox		Függőleges elrendezés
+You can drag an icon here.	LaunchBox		Az ikonok ide húzhatók
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nNem sikerült a programot elindítani ezzel az aláírással: '%2'.\n\nHiba:
+last chance	LaunchBox		utolsó esély
+launch popup	LaunchBox		felugró ablak indítása

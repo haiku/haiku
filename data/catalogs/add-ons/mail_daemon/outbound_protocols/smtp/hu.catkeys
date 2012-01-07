@@ -1,0 +1,16 @@
+1	hungarian	x-vnd.Haiku-SMTP	2740407895
+. The server said:\n	smtp		. A kiszolgáló válasza:\n
+. The server says:\n	smtp		. A kiszolgáló válasza:\n
+: Connection refused or host not found.	smtp		: kapcsolat visszautasítva, vagy a kiszolgáló nem található.
+Connecting to server…	smtp		Csatlakozás a kiszolgálóhoz...
+Destination:	ConfigView		Cél:
+ESMTP	ConfigView		ESMTP
+Error while logging in to %serv	smtp		Hiba történt a %serv kiszolgálóra való bejelentkezés közben
+Error while opening connection to %serv	smtp		Hiba történt a %serv kiszolgálóval való kapcsolat nyitása közben
+None	ConfigView		Nincs
+POP3 authentication failed. The server said:\n	smtp		A POP3 hitelesítés sikertelen volt. A kiszolgáló válasza:\n
+POP3 before SMTP	ConfigView		POP3 az SMTP előtt
+SMTP server:	ConfigView		SMTP kiszolgáló:
+SSL	ConfigView		SSL
+STARTTLS	ConfigView		STARTTLS
+Unencrypted	ConfigView		Titkosítatlan

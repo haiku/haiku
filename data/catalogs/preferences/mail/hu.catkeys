@@ -1,0 +1,60 @@
+1	hungarian	x-vnd.Haiku-Mail	3957822883
+Account name:	Config Views		Felhasználói név:
+Account name:	E-Mail		Fiók neve:
+Account settings	AutoConfigWindow		Fiókbeállítások
+Account settings	Config Views		Fiókbeállítások
+Accounts	Config Window		Fiókok
+Add	Config Window		Hozzáadás
+Add filter	Config Views		Szűrő hozzáadása
+Always	Config Window		Mindig
+Apply	Config Window		Alkalmaz
+Back	AutoConfigWindow		Vissza
+Check every	Config Window		Ellenőrzés gyakorisága:
+Choose Protocol	E-Mail		Protokoll választása
+Create new account	AutoConfigWindow		Új fiók létrehozása
+E-mail	System name		E-mail
+E-mail address:	E-Mail		E-mail cím:
+Edit mailbox menu…	Config Window		Postafiókmenü szerkesztése...
+Enter a valid e-mail address.	AutoConfigWindow		Írjon be egy valós e-mail címet.
+Error	Config Window		Hiba
+Error retrieving general settings: %s\n	Config Window		Hiba történt az általános beállítások beolvasása közben:%s\n
+Finish	AutoConfigWindow		Befejezés
+Incoming	Config Window		Bejövő
+Incoming	E-Mail		Bejövő
+Incoming mail filters	Config Views		Bejövő levelek szűrői
+Login name:	E-Mail		Felhasználói név:
+Mail checking	Config Window		Levelek ellenőrzése
+Miscellaneous	Config Window		Egyéb
+Never	Config Window	show status window	Soha
+Next	AutoConfigWindow		Következő
+OK	AutoConfigWindow		OK
+OK	Config Views		OK
+OK	Config Window		OK
+Only when dial-up is connected	Config Window		Csak mikor betárcsázós internet kapcsolva van
+Outgoing	Config Window		Kimenő
+Outgoing	E-Mail		Kimenő
+Outgoing mail filters	Config Views		Kimenő levelek szűrői
+Password:	E-Mail		Jelszó:
+Real name:	Config Views		Valódi név:
+Real name:	E-Mail		Valódi név:
+Remove	Config Views		Eltávolítás
+Remove	Config Window		Eltávolítás
+Return address:	Config Views		Feladói cím:
+Revert	Config Window		Visszaállítás
+Schedule outgoing mail when dial-up is disconnected	Config Window		Kimenő levelek küldése mikor betárcsázós internet kapcsolat létezik
+Server Name:	E-Mail		Kiszolgáló neve:
+Settings	Config Window		Beállítások
+Show connection status window:	Config Window		Kapcsolat állapotkijelző ablakának kijelzése:
+Start mail services on startup	Config Window		A rendszer indításával együtt a levelezés szolgáltatásai is induljanak el
+The filter could not be moved. Deleting filter.	Config Views		Nem lehetett áthelyezni a szűrőt. A szűrő törlése.
+While sending	Config Window		Küldés közben
+While sending and receiving	Config Window		Küldéskor és fogadáskor
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nAz általános beállítások visszaállítása sikertelen.\n\nHiba történt az általános beállítások beolvasása közben:\n%s\n
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nA Hozzáad gombbal hozhat létre új fiókot.\n\nAz Eltávolít gombbal törölhet egy fiókot.\n\nVálasszon ki egy elemet a listából annak beállításainak a módosításához.
+\t\t· E-mail filters	Config Window		\t\t· Email szűrők
+\t\t· Incoming	Config Window		\t\t· Bejövő
+\t\t· Outgoing	Config Window		\t\t· Kimenő
+days	Config Window		naponként
+hours	Config Window		óránként
+minutes	Config Window		percenként
+never	Config Window	mail checking frequency	soha

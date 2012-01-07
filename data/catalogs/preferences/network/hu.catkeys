@@ -1,15 +1,20 @@
-1	hungarian	x-vnd.Haiku-Network	2513327377
+1	hungarian	x-vnd.Haiku-Network	2324385456
+<no wireless networks found>	EthernetSettingsView		<nem található vezeték nélküli hálózat>
 Adapter:	EthernetSettingsView		Adapter:
 Apply	EthernetSettingsView		Alkalmaz
 Auto-configuring failed: 	EthernetSettingsView		Az automatikus beállítás nem sikerült: 
+Choose automatically	EthernetSettingsView		Választás automatikusan
 DHCP	EthernetSettingsView		DHCP
 DNS #1:	EthernetSettingsView		DNS #1:
 DNS #2:	EthernetSettingsView		DNS #2:
+Disabled	EthernetSettingsView		Letiltva
 Domain:	EthernetSettingsView		Domain:
 Gateway:	EthernetSettingsView		Átjáró:
 IP address:	EthernetSettingsView		IP-cím:
 Mode:	EthernetSettingsView		Mód:
 Netmask:	EthernetSettingsView		Alhálózati maszk:
+Network	System name		Hálózat
+Network:	EthernetSettingsView		Hálózat:
 OK	EthernetSettingsView		Rendben
 Revert	EthernetSettingsView		Visszaállít
 Static	EthernetSettingsView		Állandó

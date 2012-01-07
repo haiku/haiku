@@ -1,0 +1,14 @@
+1	hungarian	x-vnd.Haiku-CDPlayer	592310631
+Audio CD	CDPlayer		Audio CD
+CD	CDPlayer		CD
+CD drive is empty	CDPlayer		CD meghajtó üres
+CDPlayer	System name		CDPlayer
+Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		Lemez: %ld:%.2ld / %ld:%.2ld
+Disc: --:-- / --:--	CDPlayer		Lemez: --:-- / --:--
+Disc: 88:88 / 88:88	CDPlayer		Lemez: 88:88 / 88:88
+It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Úgy tűnik, nincs meghajtó a gépében vagy rendszerprogram ami támogatná.
+OK	CDPlayer		OK
+Track %whichTrack%: %trackAt%	CDPlayer		Dal %whichTrack%: %trackAt%
+Track: %ld:%.2ld / %ld:%.2ld	CDPlayer		Dal: %ld:%.2ld / %ld:%.2ld
+Track: --:-- / --:--	CDPlayer		Dal: --:-- / --:--
+Track: 88:88 / 88:88	CDPlayer		Dal: 88:88 / 88:88

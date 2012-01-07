@@ -1,0 +1,8 @@
+1	hungarian	application/x-vnd.Haiku-BFSAddOn	1074880496
+1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (nagyrészt kis fájlok)
+2048 (Recommended)	BFS_Initialize_Parameter		2048 (ajánlott)
+8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (nagyrészt nagy fájlok)
+Blocksize:	BFS_Initialize_Parameter		Blokkméret:
+Disabling query support may speed up certain file system operations, but should only be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		A lekérdezések támogatásának letiltása felgyorsíthat bizonyos fájlműveleteket, de csak akkor ajánlott használni, ha biztos, hogy nem lesz szükség a lekérdezésekre.\nMinden Haiku rendszerindító kötetnek támogatnia kell a lekérdezéseket.
+Enable query support	BFS_Initialize_Parameter		Lekérdezéstámogatás engedélyezése
+Name:	BFS_Initialize_Parameter		Név:

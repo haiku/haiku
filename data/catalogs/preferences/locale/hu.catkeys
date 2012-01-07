@@ -1,17 +1,31 @@
-1	hungarian	x-vnd.Haiku-Locale	2023461026
+1	hungarian	x-vnd.Haiku-Locale	1488345554
 12 hour	TimeFormatSettings		12-órás
 24 hour	TimeFormatSettings		24-órás
 Available languages	Locale Preflet Window		Elérhető nyelvek
+Cancel	Locale Preflet Window		Mégse
 Currency	TimeFormatSettings		Pénznem
 Date	TimeFormatSettings		Dátum
 Defaults	Locale Preflet Window		Alapértelmezés
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		A Deskbart és a Trackert újra kell indítani hogy ez a változtatás érvénybe lépjen. Szeretné most újraindítani őket?
+Formatting	Locale Preflet Window		Formázás
+Full format:	TimeFormatSettings		Teljes formátum:
 Language	Locale Preflet Window		Nyelv
 Locale	Locale Preflet		Nyelvi beállítások
+Locale	Locale Preflet Window		Nyelv
+Locale	System name		Nyelv
 Long format:	TimeFormatSettings		Hosszú alak:
+Medium format:	TimeFormatSettings		Közepes formátum:
+Negative:	TimeFormatSettings		Negatív:
 Numbers	TimeFormatSettings		Számok
 OK	Locale Preflet Window		Ok
+Options	Locale Preflet Window		Opciók
+Positive:	TimeFormatSettings		Pozitív:
 Preferred languages	Locale Preflet Window		Előnyben részesített nyelvek
+Restart	Locale Preflet Window		Újraindítás
 Revert	Locale Preflet Window		Visszaállítás
 Short format:	TimeFormatSettings		Rövid alak:
 Time	TimeFormatSettings		Idő
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Az alkalmazások és mappák neveinek lefordítása a Deskbarban és a Trackerben.
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Nem található a nyelvi fájl! Sajnos így a beállítópanel nem használható!
+Use month/day-names from preferred language	TimeFormatSettings		Előnyben részesített nyelv hónap- és napneveinek használata
+already chosen	LanguageListView		már ki van választva

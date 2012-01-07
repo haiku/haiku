@@ -1,8 +1,9 @@
-1	hungarian	x-vnd.Haiku-Keyboard	1078858058
+1	hungarian	x-vnd.Haiku-Keyboard	1711838804
 Defaults	KeyboardWindow		Alapértelmezés
 Delay until key repeat	KeyboardView		Ismétlés előtti várakozás
 Fast	KeyboardView		Gyors
 Key repeat rate	KeyboardView		Karakterismétlődés gyakorisága
+Keyboard	System name		Billentyűzet
 Long	KeyboardView		Hosszú
 OK	KeyboardApplication		Rendben
 Revert	KeyboardWindow		Visszaállít

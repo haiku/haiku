@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-BluetoothPrefs	2887401895
+1	hungarian	x-vnd.Haiku-BluetoothPrefs	4055730587
 15 secs	Settings view		15 mp
 61 secs	Settings view		61 mp
 About Bluetooth…	Window		A Bluetoothról…
@@ -6,11 +6,14 @@ Add device to list	Inquiry panel		Eszköz hozzáadása
 Add…	Remote devices		Hozzáadás…
 Always ask	Settings view		Mindig kérdezze
 As blocked	Remote devices		Blokkoltként
+Authenticate	Extended local device view		HItelesítés
+Bluetooth	System name		Bluetooth
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Bizonyosodjon meg afelől, hogy eszközének Bluetooth-funkciója be van-e kapcsolva! Nyomja meg a „Lekérdezés” gombot a keresés megkezdéséhez. A nevek lekérdezéséhez szükséges időt nem lehet pontosan meghatározni, de általában 3 másodpercnél tovább ez nem szokott tartani. A névlekérdezés után megjelenik a körzetben elérhető összes eszköz listája, ahonnan kiválaszthatja melyiket szeretné párosítani számítógépével.
 Connections & channels…	Window		Kapcsolatok és csatornák…
 Default inquiry time:	Settings view		Alapértelmezett lekérdezési időkorlát:
 Defaults	Window		Alapértelmezés
 Desktop	Settings view		Asztal
+Disconnect	Remote devices		Kapcsolatbontás
 Discoverable	Extended local device view		Felfedezhető
 From all devices	Settings view		Minden eszköztől
 Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetooth rendszer, (ARCE)\n\nLétrehozta: Oliver Ruiz Dorantes\n\nA következők támogatásával:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nKöszönjük azoknak, akik segítettek…\n\nHardver szállításával/adományozásával:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nGazdaságilag:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nJavításokkal:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nAki megtanított engem minderre:\n\t- A yellowTAB csapat
@@ -22,15 +25,20 @@ Incoming connections policy:	Settings view		Bejövő kapcsolatokra vonatkozó sz
 Inquiry	Inquiry panel		Lekérdezés
 Laptop	Settings view		Laptop
 Local devices found on system:	Settings view		Helyi megtalált eszközök a rendszerben:
+Manufacturer: 	Device View		Gyártó:
+OK	main		OK
 Only from trusted devices	Settings view		Csak biztonságos eszközöktől
 Pair…	Remote devices		Párosítás…
 Pick LocalDevice...	Settings view		Helyi eszköz kiválasztása…
 Policy...	Settings view		Szabály…
+Quit	main		Kilépés
 Refresh LocalDevices…	Window		Helyi eszközök frissítése…
 Refresh…	Remote devices		Frissítés…
+Remaining %1 seconds	Inquiry panel		%1 másodperc van hátra
 Remote devices	Window		Távoli eszközök
 Remote devices list…	Window		Távoli eszközök listája…
 Remove	Remote devices		Eltávolítás
+Retrieving name of %1	Inquiry panel		%1 nevének fogadása
 Retrieving names...	Inquiry panel		Nevek lekérdezése…
 Revert	Window		Visszaállít
 Scanning completed.	Inquiry panel		Keresés befejezve.
@@ -43,7 +51,11 @@ Show bluetooth console…	Window		Bluetooth-konzol megjelenítése…
 Show name	Extended local device view		Név mutatása
 Smart phone	Settings view		Okostelefon
 Start bluetooth services…	Window		Bluetooth-szolgáltatások elindítása…
+Start please	main		Indítás
 Starting scan...	Inquiry panel		Keresés...
 Stop bluetooth services…	Window		Bluetooth-szolgáltatások leállítása…
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Nincs egy regisztrált Bluetooth eszköz sem a rendszerben
 View	Window		Nézet
+Work offline	main		Kapcsolat nélküli munka
+bluetooth_server has not been found running on the system. Should be started, or stay offline	main		A bluetooth_server jelenleg nem fut. El kívánja indítani, vagy kapcsolat nélküli módban kíván tovább dolgozni?
+packets: 	Device View		csomagok:

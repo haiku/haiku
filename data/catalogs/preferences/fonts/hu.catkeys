@@ -1,9 +1,11 @@
-1	hungarian	x-vnd.Haiku-Fonts	2438341287
+1	hungarian	x-vnd.Haiku-Fonts	4164233892
 Bold font:	Font view		Félkövér betűtípus:
 Defaults	Main window		Alapértelmezés
 Fixed font:	Font view		Fix méretű betűtípus:
+Fonts	System name		Betűtípusok
 Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Betűtípusok\n\tCopyright 2004-2005, Haiku.\n\n
 Menu font:	Font view		Menük betűtípusa:
+OK	main		OK
 Plain font:	Font view		Egyszerű betűtípus:
 Revert	Main window		Visszaállítás
 Size:	Font Selection view		Méret:
