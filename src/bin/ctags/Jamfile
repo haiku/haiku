@@ -15,6 +15,7 @@ BinCommand ctags :
 	beta.c
 	c.c
 	cobol.c
+	debug.c
 	eiffel.c
 	entry.c
 	erlang.c
