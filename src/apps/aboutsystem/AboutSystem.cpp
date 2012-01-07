@@ -142,7 +142,9 @@ static const Translation gTranslations[] =
 		"zvacet\n"
 	},
 	{ "hu",
+		"Kálmán Kéménczy\n"
 		"Zoltán Mizsei (miqlas)\n"
+		"Bence Nagy\n"
 		"Zoltán Szabó (Bird)\n"
 	},
 	{ "it",
