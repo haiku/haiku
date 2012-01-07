@@ -162,7 +162,7 @@ ImportPLItemsCommand::Undo()
 		}
 		// Restore previously playing item
 		if (fPlaylingIndex >= 0)
-			fPlaylist->SetCurrentItemIndex(fPlaylingIndex);
+			fPlaylist->SetCurrentItemIndex(fPlaylingIndex, false);
 	} else {
 		// remove new items from playlist
 		for (int32 i = 0; i < fNewCount; i++) {

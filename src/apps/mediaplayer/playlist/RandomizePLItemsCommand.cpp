@@ -135,7 +135,7 @@ RandomizePLItemsCommand::_Sort(bool random)
 
 	// take care about currently played item
 	if (current != NULL)
-		fPlaylist->SetCurrentItemIndex(fPlaylist->IndexOf(current));
+		fPlaylist->SetCurrentItemIndex(fPlaylist->IndexOf(current), false);
 
 	return B_OK;
 }

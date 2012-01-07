@@ -605,6 +605,10 @@ MainWin::MessageReceived(BMessage* msg)
 			BAutolock _(fPlaylist);
 
 			int32 index;
+			// if false, the message was meant to only update the GUI
+			bool play;
+			if (msg->FindBool("play", &play) < B_OK || !play)
+				break;
 			if (msg->FindInt32("index", &index) < B_OK
 				|| index != fPlaylist->CurrentItemIndex())
 				break;

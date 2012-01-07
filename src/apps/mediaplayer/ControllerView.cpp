@@ -105,7 +105,7 @@ ControllerView::TogglePlaying()
 		&& Position() == 1.0) {
 		// Reached end of playlist and end of last item
 		// -> start again from the first item.
-		fPlaylist->SetCurrentItemIndex(0);
+		fPlaylist->SetCurrentItemIndex(0, true);
 	} else
 		fController->TogglePlaying();
 }
@@ -141,7 +141,7 @@ ControllerView::SkipBackward()
 	int32 index = fPlaylist->CurrentItemIndex() - 1;
 	if (index < 0)
 		index = 0;
-	fPlaylist->SetCurrentItemIndex(index);
+	fPlaylist->SetCurrentItemIndex(index, true);
 }
 
 
@@ -152,7 +152,7 @@ ControllerView::SkipForward()
 	int32 index = fPlaylist->CurrentItemIndex() + 1;
 	if (index >= fPlaylist->CountItems())
 		index = fPlaylist->CountItems() - 1;
-	fPlaylist->SetCurrentItemIndex(index);
+	fPlaylist->SetCurrentItemIndex(index, true);
 }
 
 
