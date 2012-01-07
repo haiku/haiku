@@ -150,15 +150,15 @@ typedef char* caddr_t;
   #undef htonl
   #undef htons
 
-  extern __inline__ unsigned long __ntohl (unsigned long x);
-  extern __inline__ unsigned short __ntohs (unsigned short x);
+  static __inline__ unsigned long __ntohl (unsigned long x);
+  static __inline__ unsigned short __ntohs (unsigned short x);
 
   #define ntohl(x)  __ntohl(x)
   #define ntohs(x)  __ntohs(x)
   #define htonl(x)  __ntohl(x)
   #define htons(x)  __ntohs(x)
 
-  extern __inline__ unsigned long __ntohl (unsigned long x)
+  static __inline__ unsigned long __ntohl (unsigned long x)
   {
     __asm__ ("xchgb %b0, %h0\n\t"   /* swap lower bytes  */
              "rorl  $16, %0\n\t"    /* swap words        */
@@ -167,7 +167,7 @@ typedef char* caddr_t;
     return (x);
   }
 
-  extern __inline__ unsigned short __ntohs (unsigned short x)
+  static __inline__ unsigned short __ntohs (unsigned short x)
   {
     __asm__ ("xchgb %b0, %h0"       /* swap bytes */
             : "=q" (x) : "0" (x));
