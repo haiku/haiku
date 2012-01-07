@@ -35,28 +35,6 @@ struct gconv_fcts
 extern struct gconv_fcts __wcsmbs_gconv_fcts;
 
 
-/* Last loaded locale for LC_CTYPE.  */
-extern const struct locale_data *__wcsmbs_last_locale;
-
-
-/* Load conversion functions for the currently selected locale.  */
-extern void __wcsmbs_load_conv (const struct locale_data *new_category)
-     internal_function;
-
 /* Clone the current `__wcsmbs_load_conv' value.  */
 extern void __wcsmbs_clone_conv (struct gconv_fcts *copy)
      internal_function;
-
-/* Find the conversion functions for converting to and from NAME.  */
-extern int __wcsmbs_named_conv (struct gconv_fcts *copy, const char *name)
-     internal_function;
-
-
-/* Check whether the LC_CTYPE locale changed since the last call.
-   Update the pointers appropriately.  */
-static inline void
-update_conversion_ptrs (void)
-{
-  if (__wcsmbs_last_locale != _nl_current_LC_CTYPE)
-    __wcsmbs_load_conv (_nl_current_LC_CTYPE);
-}
