@@ -254,6 +254,7 @@ NodeManager::ReleaseNodeReference(media_node_id id, team_id team)
 
 #if DEBUG
 	int32 teamCount = teamRef->second - 1;
+	(void)teamCount;
 #endif
 
 	if (--teamRef->second == 0)
