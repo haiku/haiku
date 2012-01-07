@@ -223,6 +223,7 @@ StaticLibrary libfetish.a :
 	version-etc-fsf.c
 	write-any-file.c
 	xalloc-die.c
+	xfreopen.c
 	xfts.c
 	xgetcwd.c
 	xgethostname.c
