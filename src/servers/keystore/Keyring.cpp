@@ -7,11 +7,13 @@
 #include "Keyring.h"
 
 
-Keyring::Keyring(const char* name, const BMessage& data)
+Keyring::Keyring(const char* name, const BMessage& data,
+	const BMessage* keyMessage)
 	:
 	fName(name),
 	fData(data),
-	fAccessible(false)
+	fKeyMessage(*keyMessage),
+	fAccessible(keyMessage != NULL)
 {
 }
 
@@ -24,6 +26,7 @@ Keyring::~Keyring()
 status_t
 Keyring::Access(const BMessage& keyMessage)
 {
+	fKeyMessage = keyMessage;
 	fAccessible = true;
 	return B_OK;
 }
@@ -32,20 +35,28 @@ Keyring::Access(const BMessage& keyMessage)
 void
 Keyring::RevokeAccess()
 {
+	fKeyMessage.MakeEmpty();
 	fAccessible = false;
 }
 
 
 bool
-Keyring::IsAccessible()
+Keyring::IsAccessible() const
 {
 	return fAccessible;
 }
 
 
+const BMessage&
+Keyring::KeyMessage() const
+{
+	return fKeyMessage;
+}
+
+
 status_t
 Keyring::FindKey(const BString& identifier, const BString& secondaryIdentifier,
-	bool secondaryIdentifierOptional, BMessage* _foundKeyMessage)
+	bool secondaryIdentifierOptional, BMessage* _foundKeyMessage) const
 {
 	if (!fAccessible)
 		return B_NOT_ALLOWED;
@@ -91,7 +102,7 @@ Keyring::FindKey(const BString& identifier, const BString& secondaryIdentifier,
 
 status_t
 Keyring::FindKey(BKeyType type, BKeyPurpose purpose, uint32 index,
-	BMessage& _foundKeyMessage)
+	BMessage& _foundKeyMessage) const
 {
 	if (!fAccessible)
 		return B_NOT_ALLOWED;

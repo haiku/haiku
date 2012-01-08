@@ -377,7 +377,7 @@ KeyStoreServer::_AddKeyring(const BString& name, const BMessage& keyMessage)
 	if (_FindKeyring(name) != NULL)
 		return B_NAME_IN_USE;
 
-	Keyring* keyring = new(std::nothrow) Keyring(name, BMessage());
+	Keyring* keyring = new(std::nothrow) Keyring(name, BMessage(), &keyMessage);
 	if (keyring == NULL)
 		return B_NO_MEMORY;
 

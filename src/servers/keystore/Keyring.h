@@ -13,7 +13,8 @@
 class Keyring {
 public:
 									Keyring(const char* name,
-										const BMessage& data);
+										const BMessage& data,
+										const BMessage* keyMessage = NULL);
 									~Keyring();
 
 		const char*					Name() const { return fName; }
@@ -21,15 +22,16 @@ public:
 
 		status_t					Access(const BMessage& keyMessage);
 		void						RevokeAccess();
-		bool						IsAccessible();
+		bool						IsAccessible() const;
+		const BMessage&				KeyMessage() const;
 
 		status_t					FindKey(const BString& identifier,
 										const BString& secondaryIdentifier,
 										bool secondaryIdentifierOptional,
-										BMessage* _foundKeyMessage);
+										BMessage* _foundKeyMessage) const;
 		status_t					FindKey(BKeyType type, BKeyPurpose purpose,
 										uint32 index,
-										BMessage& _foundKeyMessage);
+										BMessage& _foundKeyMessage) const;
 
 		status_t					AddKey(const BString& identifier,
 										const BString& secondaryIdentifier,
@@ -45,6 +47,7 @@ static	int							Compare(const BString* name,
 private:
 		BString						fName;
 		BMessage					fData;
+		BMessage					fKeyMessage;
 		bool						fAccessible;
 };
 
