@@ -21,10 +21,18 @@
 extern "C" {
 
 #include "context.h"
+#include "swrast/s_chan.h"
+
+
+#if defined(__GNUC__) && (__GNUC__ > 2)
+#define NEW_MESA
+#endif
+
 
 struct msr_renderbuffer {
-	struct gl_renderbuffer Base;
-	uint32 Size;
+	struct gl_renderbuffer base;
+	uint32 size;
+	bool active;
 };
 
 
@@ -36,9 +44,9 @@ msr_renderbuffer(struct gl_renderbuffer* rb)
 
 
 struct msr_framebuffer {
-	struct gl_framebuffer Base;
-	uint32 Width;
-	uint32 Height;
+	struct gl_framebuffer base;
+	uint32 width;
+	uint32 height;
 };
 
 
@@ -48,7 +56,9 @@ msr_framebuffer(struct gl_framebuffer* rb)
 	return (struct msr_framebuffer*)rb;
 }
 
+
 }
+
 
 class MesaSoftwareRenderer : public BGLRenderer {
 public:
@@ -72,21 +82,21 @@ public:
 		virtual	void			DirectConnected(direct_buffer_info* info);
 
 private:
-		static	void			_Error(GLcontext* ctx);
-		static	const GLubyte*	_GetString(GLcontext* ctx, GLenum name);
-		static	void			_Viewport(GLcontext* ctx, GLint x, GLint y,
+		static	void			_Error(gl_context* ctx);
+		static	const GLubyte*	_GetString(gl_context* ctx, GLenum name);
+		static	void			_Viewport(gl_context* ctx, GLint x, GLint y,
 									GLsizei w, GLsizei h);
-		static	void			_UpdateState(GLcontext* ctx, GLuint newState);
-		static	void 			_ClearFront(GLcontext* ctx);
-		static	GLboolean		_FrontRenderbufferStorage(GLcontext* ctx,
+		static	void			_UpdateState(gl_context* ctx, GLuint newState);
+		static	void 			_ClearFront(gl_context* ctx);
+		static	GLboolean		_FrontRenderbufferStorage(gl_context* ctx,
 									struct gl_renderbuffer* render,
 									GLenum internalFormat,
 									GLuint width, GLuint height);
-		static	GLboolean		_BackRenderbufferStorage(GLcontext* ctx,
+		static	GLboolean		_BackRenderbufferStorage(gl_context* ctx,
 									struct gl_renderbuffer* render,
 									GLenum internalFormat,
 									GLuint width, GLuint height);
-		static void				_Flush(GLcontext *ctx);
+		static void				_Flush(gl_context *ctx);
 		void					_SetSpanFuncs(struct msr_renderbuffer* buffer,
 									color_space colorSpace);
 		static void				_DeleteBackBuffer(struct gl_renderbuffer* rb);
@@ -100,8 +110,8 @@ private:
 		BLocker					fInfoLocker;
 		ulong					fOptions;
 
-		GLcontext*				fContext;
-		GLvisual*				fVisual;
+		gl_context*				fContext;
+		gl_config*				fVisual;
 		struct msr_framebuffer*	fFrameBuffer;
 		struct msr_renderbuffer*	fFrontRenderBuffer;
 		struct msr_renderbuffer*	fBackRenderBuffer;
