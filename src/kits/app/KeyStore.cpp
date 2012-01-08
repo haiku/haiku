@@ -336,11 +336,20 @@ status_t
 BKeyStore::GetNextApplication(const BKey& key, uint32& cookie,
 	BString& signature) const
 {
+	return GetNextApplication(NULL, key, cookie, signature);
+}
+
+
+status_t
+BKeyStore::GetNextApplication(const char* keyring, const BKey& key,
+	uint32& cookie, BString& signature) const
+{
 	BMessage keyMessage;
 	if (key.Flatten(keyMessage) != B_OK)
 		return B_BAD_VALUE;
 
 	BMessage message(KEY_STORE_GET_NEXT_APPLICATION);
+	message.AddString("keyring", keyring);
 	message.AddMessage("key", &keyMessage);
 	message.AddUInt32("cookie", cookie);
 
@@ -360,11 +369,20 @@ BKeyStore::GetNextApplication(const BKey& key, uint32& cookie,
 status_t
 BKeyStore::RemoveApplication(const BKey& key, const char* signature)
 {
+	return RemoveApplication(NULL, key, signature);
+}
+
+
+status_t
+BKeyStore::RemoveApplication(const char* keyring, const BKey& key,
+	const char* signature)
+{
 	BMessage keyMessage;
 	if (key.Flatten(keyMessage) != B_OK)
 		return B_BAD_VALUE;
 
 	BMessage message(KEY_STORE_REMOVE_APPLICATION);
+	message.AddString("keyring", keyring);
 	message.AddMessage("key", &keyMessage);
 	message.AddString("signature", signature);
 

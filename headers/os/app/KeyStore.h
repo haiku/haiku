@@ -81,8 +81,13 @@ public:
 
 			status_t			GetNextApplication(const BKey& key,
 									uint32& cookie, BString& signature) const;
+			status_t			GetNextApplication(const char* keyring,
+									const BKey& key, uint32& cookie,
+									BString& signature) const;
 			status_t			RemoveApplication(const BKey& key,
 									const char* signature);
+			status_t			RemoveApplication(const char* keyring,
+									const BKey& key, const char* signature);
 
 			// Service functions
 
