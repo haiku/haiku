@@ -37,8 +37,8 @@ remove_password(const char* keyring, const char* identifier,
 	BKeyStore keyStore;
 	BPasswordKey password;
 
-	status_t result = keyStore.GetKey(keyring, B_KEY_TYPE_PASSWORD,
-		B_KEY_PURPOSE_ANY, identifier, secondaryIdentifier, false, password);
+	status_t result = keyStore.GetKey(keyring, B_KEY_TYPE_PASSWORD, identifier,
+		secondaryIdentifier, false, password);
 	if (result != B_OK) {
 		printf("failed to get password \"%s\": %s\n", identifier,
 			strerror(result));

@@ -16,27 +16,23 @@ public:
 
 // TODO: -> GetNextPassword() - there can always be more than one key
 // with the same identifier/secondaryIdentifier (ie. different username)
-			status_t			GetKey(BKeyType type, BKeyPurpose purpose,
-									const char* identifier, BKey& key);
-			status_t			GetKey(BKeyType type, BKeyPurpose purpose,
-									const char* identifier,
+			status_t			GetKey(BKeyType type, const char* identifier,
+									BKey& key);
+			status_t			GetKey(BKeyType type, const char* identifier,
 									const char* secondaryIdentifier, BKey& key);
-			status_t			GetKey(BKeyType type, BKeyPurpose purpose,
-									const char* identifier,
+			status_t			GetKey(BKeyType type, const char* identifier,
 									const char* secondaryIdentifier,
 									bool secondaryIdentifierOptional,
 									BKey& key);
 
 			status_t			GetKey(const char* keyring,
-									BKeyType type, BKeyPurpose purpose,
-									const char* identifier, BKey& key);
+									BKeyType type, const char* identifier,
+									BKey& key);
 			status_t			GetKey(const char* keyring,
-									BKeyType type, BKeyPurpose purpose,
-									const char* identifier,
+									BKeyType type, const char* identifier,
 									const char* secondaryIdentifier, BKey& key);
 			status_t			GetKey(const char* keyring,
-									BKeyType type, BKeyPurpose purpose,
-									const char* identifier,
+									BKeyType type, const char* identifier,
 									const char* secondaryIdentifier,
 									bool secondaryIdentifierOptional,
 									BKey& key);

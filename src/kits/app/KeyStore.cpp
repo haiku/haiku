@@ -28,58 +28,54 @@ BKeyStore::~BKeyStore()
 
 
 status_t
-BKeyStore::GetKey(BKeyType type, BKeyPurpose purpose, const char* identifier,
-	BKey& key)
+BKeyStore::GetKey(BKeyType type, const char* identifier, BKey& key)
 {
-	return GetKey(NULL, type, purpose, identifier, NULL, true, key);
+	return GetKey(NULL, type, identifier, NULL, true, key);
 }
 
 
 status_t
-BKeyStore::GetKey(BKeyType type, BKeyPurpose purpose, const char* identifier,
+BKeyStore::GetKey(BKeyType type, const char* identifier,
 	const char* secondaryIdentifier, BKey& key)
 {
-	return GetKey(NULL, type, purpose, identifier, secondaryIdentifier, true,
-		key);
+	return GetKey(NULL, type, identifier, secondaryIdentifier, true, key);
 }
 
 
 status_t
-BKeyStore::GetKey(BKeyType type, BKeyPurpose purpose, const char* identifier,
+BKeyStore::GetKey(BKeyType type, const char* identifier,
 	const char* secondaryIdentifier, bool secondaryIdentifierOptional,
 	BKey& key)
 {
-	return GetKey(NULL, type, purpose, identifier, secondaryIdentifier,
+	return GetKey(NULL, type, identifier, secondaryIdentifier,
 		secondaryIdentifierOptional, key);
 }
 
 
 status_t
-BKeyStore::GetKey(const char* keyring, BKeyType type, BKeyPurpose purpose,
-	const char* identifier, BKey& key)
+BKeyStore::GetKey(const char* keyring, BKeyType type, const char* identifier,
+	BKey& key)
 {
-	return GetKey(keyring, type, purpose, identifier, NULL, true, key);
+	return GetKey(keyring, type, identifier, NULL, true, key);
 }
 
 
 status_t
-BKeyStore::GetKey(const char* keyring, BKeyType type, BKeyPurpose purpose,
-	const char* identifier, const char* secondaryIdentifier, BKey& key)
+BKeyStore::GetKey(const char* keyring, BKeyType type, const char* identifier,
+	const char* secondaryIdentifier, BKey& key)
 {
-	return GetKey(keyring, type, purpose, identifier, secondaryIdentifier, true,
-		key);
+	return GetKey(keyring, type, identifier, secondaryIdentifier, true, key);
 }
 
 
 status_t
-BKeyStore::GetKey(const char* keyring, BKeyType type, BKeyPurpose purpose,
-	const char* identifier, const char* secondaryIdentifier,
-	bool secondaryIdentifierOptional, BKey& key)
+BKeyStore::GetKey(const char* keyring, BKeyType type, const char* identifier,
+	const char* secondaryIdentifier, bool secondaryIdentifierOptional,
+	BKey& key)
 {
 	BMessage message(KEY_STORE_GET_KEY);
 	message.AddString("keyring", keyring);
 	message.AddUInt32("type", type);
-	message.AddUInt32("purpose", purpose);
 	message.AddString("identifier", identifier);
 	message.AddString("secondaryIdentifier", secondaryIdentifier);
 	message.AddBool("secondaryIdentifierOptional", secondaryIdentifierOptional);
