@@ -161,6 +161,36 @@ revoke_access(const char* keyring)
 
 
 int
+add_keyring_to_master(const char* keyring)
+{
+	BKeyStore keyStore;
+	status_t result= keyStore.AddKeyringToMaster(keyring);
+	if (result != B_OK) {
+		printf("failed to add keyring \"%s\" to master: %s\n", keyring,
+			strerror(result));
+		return 2;
+	}
+
+	return 0;
+}
+
+
+int
+remove_keyring_from_master(const char* keyring)
+{
+	BKeyStore keyStore;
+	status_t result= keyStore.RemoveKeyringFromMaster(keyring);
+	if (result != B_OK) {
+		printf("failed to remove keyring \"%s\" from master: %s\n", keyring,
+			strerror(result));
+		return 2;
+	}
+
+	return 0;
+}
+
+
+int
 print_usage(const char* name)
 {
 	printf("usage:\n");
@@ -190,8 +220,21 @@ print_usage(const char* name)
 	printf("\t%s remove keyring <name>\n", name);
 	printf("\t\tRemoves the specified keyring.\n\n");
 
-	printf("\t%s status <keyring>\n", name);
-	printf("\t\tShows the access status of the specified keyring.\n\n");
+	printf("\t%s status [<keyring>]\n", name);
+	printf("\t\tShows the access status of the specified keyring, or the"
+		" default keyring if none is supplied.\n\n");
+
+	printf("\t%s revoke [<keyring>]\n", name);
+	printf("\t\tRevoke access to the specified keyring, or to the default"
+		" keyring if none is supplied.\n\n");
+
+	printf("\t%s master add <keyring>\n", name);
+	printf("\t\tAdd the access key for the specified keyring to the default"
+		" keyring.\n");
+
+	printf("\t%s master remove <keyring>\n", name);
+	printf("\t\tRemove the access key for the specified keyring from the"
+		" default keyring.\n");
 
 	return 1;
 }
@@ -292,6 +335,14 @@ main(int argc, char* argv[])
 			return print_usage(argv[0]);
 
 		return revoke_access(argc == 3 ? argv[2] : "");
+	} else if (strcmp(argv[1], "master") == 0) {
+		if (argc != 4)
+			return print_usage(argv[0]);
+
+		if (strcmp(argv[2], "add") == 0)
+			return add_keyring_to_master(argv[3]);
+		if (strcmp(argv[2], "remove") == 0)
+			return remove_keyring_from_master(argv[3]);
 	}
 
 	return print_usage(argv[0]);
