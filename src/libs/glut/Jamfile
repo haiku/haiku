@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src libs mesa glut ;
+SubDir HAIKU_TOP src libs glut ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 

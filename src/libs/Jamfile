@@ -9,6 +9,7 @@ SubInclude HAIKU_TOP src libs edit ;
 SubInclude HAIKU_TOP src libs expat ;
 SubInclude HAIKU_TOP src libs fluidsynth ;
 SubInclude HAIKU_TOP src libs freetype2 ;
+SubInclude HAIKU_TOP src libs glut ;
 SubInclude HAIKU_TOP src libs gnu ;
 SubInclude HAIKU_TOP src libs icon ;
 SubInclude HAIKU_TOP src libs iconv ;

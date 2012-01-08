@@ -1,5 +1,4 @@
 SubDir HAIKU_TOP src libs mesa ;
 
 SubInclude HAIKU_TOP src libs mesa glu ;
-SubInclude HAIKU_TOP src libs mesa glut ;
 SubInclude HAIKU_TOP src libs mesa mesa ;
