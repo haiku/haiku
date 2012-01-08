@@ -797,6 +797,8 @@ KeyStrokeSequenceCommandActuator::_GenerateKeyCodes()
 			_SetStateBit(states, overrideKey);
 		}
 	}
+	free(keys);
+	free(map);
 }
 
 
