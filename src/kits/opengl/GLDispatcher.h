@@ -3,7 +3,10 @@
 
 
 #include <BeBuild.h>
+#include <GL/gl.h>
 #include <SupportDefs.h>
+
+#include "glheader.h"
 
 extern "C" {
 #include "glapi.h"

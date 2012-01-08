@@ -32,12 +32,10 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
 
-#include <GL/gl.h>
-#include "glheader.h"
-
 extern "C" {
 
 #include "glapi.h"
+#include "glapi_priv.h"
 #include "glapitable.h"
 
 /*
