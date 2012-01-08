@@ -25,6 +25,9 @@
 using namespace BPrivate;
 
 
+static const char* kKeyringKeysIdentifier = "Keyrings";
+
+
 KeyStoreServer::KeyStoreServer()
 	:
 	BApplication(kKeyStoreServerSignature),
@@ -78,6 +81,8 @@ KeyStoreServer::MessageReceived(BMessage* message)
 		case KEY_STORE_REMOVE_KEY:
 		case KEY_STORE_IS_KEYRING_ACCESSIBLE:
 		case KEY_STORE_REVOKE_ACCESS:
+		case KEY_STORE_ADD_KEYRING_TO_MASTER:
+		case KEY_STORE_REMOVE_KEYRING_FROM_MASTER:
 		{
 			BString keyringName;
 			if (message->FindString("keyring", &keyringName) != B_OK)
@@ -96,6 +101,7 @@ KeyStoreServer::MessageReceived(BMessage* message)
 				case KEY_STORE_GET_NEXT_KEY:
 				case KEY_STORE_ADD_KEY:
 				case KEY_STORE_REMOVE_KEY:
+				case KEY_STORE_ADD_KEYRING_TO_MASTER:
 				{
 					// These need keyring access to do anything.
 					while (!keyring->IsAccessible()) {
@@ -140,6 +146,7 @@ KeyStoreServer::MessageReceived(BMessage* message)
 				secondaryIdentifierOptional, &keyMessage);
 			if (result == B_OK)
 				reply.AddMessage("key", &keyMessage);
+
 			break;
 		}
 
@@ -265,12 +272,55 @@ KeyStoreServer::MessageReceived(BMessage* message)
 		{
 			reply.AddBool("accessible", keyring->IsAccessible());
 			result = B_OK;
+			break;
 		}
 
 		case KEY_STORE_REVOKE_ACCESS:
 		{
 			keyring->RevokeAccess();
 			result = B_OK;
+			break;
+		}
+
+		case KEY_STORE_ADD_KEYRING_TO_MASTER:
+		case KEY_STORE_REMOVE_KEYRING_FROM_MASTER:
+		{
+			// We also need access to the default keyring.
+			while (!fDefaultKeyring->IsAccessible()) {
+				status_t accessResult = _AccessKeyring(*fDefaultKeyring);
+				if (accessResult != B_OK) {
+					result = accessResult;
+					message->what = 0;
+					break;
+				}
+			}
+
+			if (message->what == 0)
+				break;
+
+			BString secondaryIdentifier = keyring->Name();
+			BMessage keyMessage = keyring->KeyMessage();
+			keyMessage.RemoveName("identifier");
+			keyMessage.AddString("identifier", kKeyringKeysIdentifier);
+			keyMessage.RemoveName("secondaryIdentifier");
+			keyMessage.AddString("secondaryIdentifier", secondaryIdentifier);
+
+			switch (message->what) {
+				case KEY_STORE_ADD_KEYRING_TO_MASTER:
+					result = fDefaultKeyring->AddKey(kKeyringKeysIdentifier,
+						secondaryIdentifier, keyMessage);
+					break;
+
+				case KEY_STORE_REMOVE_KEYRING_FROM_MASTER:
+					result = fDefaultKeyring->RemoveKey(kKeyringKeysIdentifier,
+						keyMessage);
+					break;
+			}
+
+			if (result == B_OK)
+				_WriteKeyStoreDatabase();
+
+			break;
 		}
 
 		case 0:
@@ -413,8 +463,8 @@ KeyStoreServer::_AccessKeyring(Keyring& keyring)
 	// get the key from the default keyring and unlock with that.
 	BMessage keyMessage;
 	if (&keyring != fDefaultKeyring && fDefaultKeyring->IsAccessible()) {
-		if (fDefaultKeyring->FindKey("Keyrings", keyring.Name(), false,
-				&keyMessage) == B_OK) {
+		if (fDefaultKeyring->FindKey(kKeyringKeysIdentifier, keyring.Name(),
+				false, &keyMessage) == B_OK) {
 			// We found a key for this keyring, try to access with it.
 			if (keyring.Access(keyMessage) == B_OK)
 				return B_OK;
