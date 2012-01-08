@@ -1,4 +1,5 @@
 SubDir HAIKU_TOP src preferences opengl ;
+SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
 
 UsePrivateHeaders interface ;
 

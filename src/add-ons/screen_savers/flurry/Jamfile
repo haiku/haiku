@@ -1,4 +1,5 @@
 SubDir HAIKU_TOP src add-ons screen_savers flurry ;
+SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
 
 AddResources Message : Flurry.rdef ;
 

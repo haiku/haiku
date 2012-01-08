@@ -7,6 +7,7 @@
 #define UTIL_H
 
 #include <memory.h>
+#include <stdlib.h>
 #include "error.h"
 
 template <class contents>

@@ -1,4 +1,5 @@
 SubDir HAIKU_TOP src apps glteapot ;
+SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
