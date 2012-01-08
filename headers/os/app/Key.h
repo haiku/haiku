@@ -67,7 +67,9 @@ public:
 
 			const char*			Owner() const;
 			bigtime_t			CreationTime() const;
-			bool				IsRegistered() const;
+
+	virtual	status_t			Flatten(BMessage& message) const;
+	virtual	status_t			Unflatten(const BMessage& message);
 
 			BKey&				operator=(const BKey& other);
 
@@ -75,10 +77,6 @@ public:
 			bool				operator!=(const BKey& other) const;
 
 	virtual	void				PrintToStream();
-
-protected:
-	virtual	status_t			_Flatten(BMessage& message) const;
-	virtual	status_t			_Unflatten(const BMessage& message);
 
 private:
 			friend class BKeyStore;
@@ -89,7 +87,6 @@ private:
 			BString				fOwner;
 			bigtime_t			fCreationTime;
 	mutable	BMallocIO			fData;
-			bool				fRegistered;
 };
 
 

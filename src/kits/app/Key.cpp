@@ -52,6 +52,13 @@ BKey::~BKey()
 }
 
 
+void
+BKey::Unset()
+{
+	SetTo(B_KEY_PURPOSE_GENERIC, "", "", NULL, 0);
+}
+
+
 status_t
 BKey::SetTo(BKeyPurpose purpose, const char* identifier,
 	const char* secondaryIdentifier, const uint8* data, size_t length)
@@ -157,10 +164,47 @@ BKey::CreationTime() const
 }
 
 
-bool
-BKey::IsRegistered() const
+status_t
+BKey::Flatten(BMessage& message) const
 {
-	return fRegistered;
+	if (message.MakeEmpty() != B_OK
+		|| message.AddUInt32("type", Type()) != B_OK
+		|| message.AddUInt32("purpose", fPurpose) != B_OK
+		|| message.AddString("identifier", fIdentifier) != B_OK
+		|| message.AddString("secondaryIdentifier", fSecondaryIdentifier)
+			!= B_OK
+		|| message.AddString("owner", fOwner) != B_OK
+		|| message.AddInt64("creationTime", fCreationTime) != B_OK
+		|| message.AddData("data", B_RAW_TYPE, fData.Buffer(),
+			fData.BufferLength()) != B_OK) {
+		return B_ERROR;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+BKey::Unflatten(const BMessage& message)
+{
+	BKeyType type;
+	if (message.FindUInt32("type", (uint32*)&type) != B_OK || type != Type())
+		return B_BAD_VALUE;
+
+	const void* data = NULL;
+	ssize_t dataLength = 0;
+	if (message.FindUInt32("purpose", (uint32*)&fPurpose) != B_OK
+		|| message.FindString("identifier", &fIdentifier) != B_OK
+		|| message.FindString("secondaryIdentifier", &fSecondaryIdentifier)
+			!= B_OK
+		|| message.FindString("owner", &fOwner) != B_OK
+		|| message.FindInt64("creationTime", &fCreationTime) != B_OK
+		|| message.FindData("data", B_RAW_TYPE, &data, &dataLength) != B_OK
+		|| dataLength < 0) {
+		return B_ERROR;
+	}
+
+	return SetData((const uint8*)data, (size_t)dataLength);
 }
 
 
@@ -173,8 +217,7 @@ BKey::operator=(const BKey& other)
 	fIdentifier = other.fIdentifier;
 	fSecondaryIdentifier = other.fSecondaryIdentifier;
 	fOwner = other.fOwner;
-	fCreationTime = other.CreationTime();
-	fRegistered = other.IsRegistered();
+	fCreationTime = other.fCreationTime;
 
 	return *this;
 }
@@ -234,50 +277,6 @@ BKey::PrintToStream()
 	printf("\towner: \"%s\"\n", fOwner.String());
 	printf("\tcreation time: %" B_PRIu64 "\n", fCreationTime);
 	printf("\traw data length: %" B_PRIuSIZE "\n", fData.BufferLength());
-}
-
-
-status_t
-BKey::_Flatten(BMessage& message) const
-{
-	if (message.MakeEmpty() != B_OK
-		|| message.AddUInt32("type", Type()) != B_OK
-		|| message.AddUInt32("purpose", fPurpose) != B_OK
-		|| message.AddString("identifier", fIdentifier) != B_OK
-		|| message.AddString("secondaryIdentifier", fSecondaryIdentifier)
-			!= B_OK
-		|| message.AddString("owner", fOwner) != B_OK
-		|| message.AddInt64("creationTime", fCreationTime) != B_OK
-		|| message.AddData("data", B_RAW_TYPE, fData.Buffer(),
-			fData.BufferLength()) != B_OK) {
-		return B_ERROR;
-	}
-
-	return B_OK;
-}
-
-
-status_t
-BKey::_Unflatten(const BMessage& message)
-{
-	BKeyType type;
-	if (message.FindUInt32("type", (uint32*)&type) != B_OK || type != Type())
-		return B_BAD_VALUE;
-
-	const void* data = NULL;
-	ssize_t dataLength = 0;
-	if (message.FindUInt32("purpose", (uint32*)&fPurpose) != B_OK
-		|| message.FindString("identifier", &fIdentifier) != B_OK
-		|| message.FindString("secondaryIdentifier", &fSecondaryIdentifier)
-			!= B_OK
-		|| message.FindString("owner", &fOwner) != B_OK
-		|| message.FindInt64("creationTime", &fCreationTime) != B_OK
-		|| message.FindData("data", B_RAW_TYPE, &data, &dataLength) != B_OK
-		|| dataLength < 0) {
-		return B_ERROR;
-	}
-
-	return SetData((const uint8*)data, (size_t)dataLength);
 }
 
 

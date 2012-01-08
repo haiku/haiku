@@ -93,7 +93,7 @@ BKeyStore::GetKey(const char* keyring, BKeyType type, BKeyPurpose purpose,
 	if (reply.FindMessage("key", &keyMessage) != B_OK)
 		return B_ERROR;
 
-	return key._Unflatten(keyMessage);
+	return key.Unflatten(keyMessage);
 }
 
 
@@ -108,7 +108,7 @@ status_t
 BKeyStore::AddKey(const char* keyring, const BKey& key)
 {
 	BMessage keyMessage;
-	if (key._Flatten(keyMessage) != B_OK)
+	if (key.Flatten(keyMessage) != B_OK)
 		return B_BAD_VALUE;
 
 	BMessage message(KEY_STORE_ADD_KEY);
@@ -130,7 +130,7 @@ status_t
 BKeyStore::RemoveKey(const char* keyring, const BKey& key)
 {
 	BMessage keyMessage;
-	if (key._Flatten(keyMessage) != B_OK)
+	if (key.Flatten(keyMessage) != B_OK)
 		return B_BAD_VALUE;
 
 	BMessage message(KEY_STORE_REMOVE_KEY);
@@ -183,7 +183,7 @@ BKeyStore::GetNextKey(const char* keyring, BKeyType type, BKeyPurpose purpose,
 		return B_ERROR;
 
 	reply.FindUInt32("cookie", &cookie);
-	return key._Unflatten(keyMessage);
+	return key.Unflatten(keyMessage);
 }
 
 
@@ -194,7 +194,7 @@ status_t
 BKeyStore::AddKeyring(const char* keyring, const BKey& key)
 {
 	BMessage keyMessage;
-	if (key._Flatten(keyMessage) != B_OK)
+	if (key.Flatten(keyMessage) != B_OK)
 		return B_BAD_VALUE;
 
 	BMessage message(KEY_STORE_ADD_KEYRING);
@@ -240,7 +240,7 @@ status_t
 BKeyStore::SetMasterKey(const BKey& key)
 {
 	BMessage keyMessage;
-	if (key._Flatten(keyMessage) != B_OK)
+	if (key.Flatten(keyMessage) != B_OK)
 		return B_BAD_VALUE;
 
 	BMessage message(KEY_STORE_SET_MASTER_KEY);
@@ -341,7 +341,7 @@ BKeyStore::GetNextApplication(const BKey& key, uint32& cookie,
 	BString& signature) const
 {
 	BMessage keyMessage;
-	if (key._Flatten(keyMessage) != B_OK)
+	if (key.Flatten(keyMessage) != B_OK)
 		return B_BAD_VALUE;
 
 	BMessage message(KEY_STORE_GET_NEXT_APPLICATION);
@@ -365,7 +365,7 @@ status_t
 BKeyStore::RemoveApplication(const BKey& key, const char* signature)
 {
 	BMessage keyMessage;
-	if (key._Flatten(keyMessage) != B_OK)
+	if (key.Flatten(keyMessage) != B_OK)
 		return B_BAD_VALUE;
 
 	BMessage message(KEY_STORE_REMOVE_APPLICATION);
