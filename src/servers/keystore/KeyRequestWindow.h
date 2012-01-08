@@ -22,7 +22,8 @@ virtual	void						DispatchMessage(BMessage* message,
 										BHandler* handler);
 virtual	void						MessageReceived(BMessage* message);
 
-		status_t					RequestKey(BMessage& keyMessage);
+		status_t					RequestKey(const BString& keyringName,
+										BMessage& keyMessage);
 
 private:
 		KeyRequestView*				fRequestView;

@@ -472,8 +472,7 @@ KeyStoreServer::_AccessKeyring(Keyring& keyring)
 	}
 
 	// No key, we need to request one from the user.
-	keyMessage.AddString("keyring", keyring.Name());
-	status_t result = _RequestKey(keyMessage);
+	status_t result = _RequestKey(keyring.Name(), keyMessage);
 	if (result != B_OK)
 		return result;
 
@@ -482,13 +481,13 @@ KeyStoreServer::_AccessKeyring(Keyring& keyring)
 
 
 status_t
-KeyStoreServer::_RequestKey(BMessage& keyMessage)
+KeyStoreServer::_RequestKey(const BString& keyringName, BMessage& keyMessage)
 {
 	KeyRequestWindow* requestWindow = new(std::nothrow) KeyRequestWindow();
 	if (requestWindow == NULL)
 		return B_NO_MEMORY;
 
-	return requestWindow->RequestKey(keyMessage);
+	return requestWindow->RequestKey(keyringName, keyMessage);
 }
 
 

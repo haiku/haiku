@@ -12,6 +12,7 @@
 #include <GridView.h>
 #include <GroupLayout.h>
 #include <GroupView.h>
+#include <Key.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <NetworkDevice.h>
@@ -103,21 +104,16 @@ public:
 	}
 
 	void
-	SetUp(const BMessage& keyMessage)
+	SetUp(const BString& keyringName)
 	{
-		BString keyringName;
-		if (keyMessage.FindString("keyring", &keyringName) == B_OK)
-			fKeyringName->SetText(keyringName);
+		fKeyringName->SetText(keyringName);
 	}
 
-	void
+	status_t
 	Complete(BMessage& keyMessage)
 	{
-		keyMessage.RemoveName("password");
-		keyMessage.AddString("password", fPassword->Text());
-
-		keyMessage.RemoveName("persistent");
-		keyMessage.AddBool("persistent", fPersist->Value() != 0);
+		BPasswordKey password(fPassword->Text(), B_KEY_PURPOSE_KEYRING, "");
+		return password.Flatten(keyMessage);
 	}
 
 private:
@@ -193,9 +189,9 @@ KeyRequestWindow::MessageReceived(BMessage* message)
 
 
 status_t
-KeyRequestWindow::RequestKey(BMessage& keyMessage)
+KeyRequestWindow::RequestKey(const BString& keyringName, BMessage& keyMessage)
 {
-	fRequestView->SetUp(keyMessage);
+	fRequestView->SetUp(keyringName);
 
 	CenterOnScreen();
 	Show();
@@ -204,7 +200,8 @@ KeyRequestWindow::RequestKey(BMessage& keyMessage)
 		;
 
 	status_t result = fResult;
-	fRequestView->Complete(keyMessage);
+	if (result == B_OK)
+		result = fRequestView->Complete(keyMessage);
 
 	LockLooper();
 	Quit();

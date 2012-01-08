@@ -36,7 +36,8 @@ private:
 
 		status_t					_AccessKeyring(Keyring& keyring);
 
-		status_t					_RequestKey(BMessage& keyMessage);
+		status_t					_RequestKey(const BString& keyringName,
+										BMessage& keyMessage);
 
 		Keyring*					fDefaultKeyring;
 		KeyringList					fKeyrings;
