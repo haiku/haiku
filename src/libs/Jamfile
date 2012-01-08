@@ -18,7 +18,6 @@ SubInclude HAIKU_TOP src libs libtelnet ;
 SubInclude HAIKU_TOP src libs linprog ;
 SubInclude HAIKU_TOP src libs lp_solve ;
 SubInclude HAIKU_TOP src libs mapm ;
-SubInclude HAIKU_TOP src libs mesa ;
 SubInclude HAIKU_TOP src libs ncurses ;
 SubInclude HAIKU_TOP src libs pdflib ;
 SubInclude HAIKU_TOP src libs png ;
