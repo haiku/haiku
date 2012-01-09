@@ -1478,6 +1478,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 		case M_UNREAD:
 			MarkMessageRead(fRef, B_SEEN);
 			_UpdateReadButton();
+			PostMessage(M_NEXTMSG);
 			break;
 		case M_READ:
 			wasReadMsg = true;
@@ -3190,7 +3191,7 @@ TMailWindow::_UpdateReadButton()
 	if (fApp->ShowButtonBar()) {
 		fButtonBar->RemoveButton(fReadButton);
 		fReadButton = NULL;
-		if (!fAutoMarkRead)
+		if (!fAutoMarkRead && fIncoming)
 			_AddReadButton();
 	}
 	UpdateViews();
