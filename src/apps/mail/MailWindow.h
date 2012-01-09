@@ -163,6 +163,7 @@ class TMailWindow : public BWindow {
 				BMenu*			fSaveAddrMenu;
 
 				BMenu*			fQueryMenu;
+				BMenu*			fLeaveStatusMenu;
 		
 				ButtonBar*		fButtonBar;
 				BmapButton*		fSendButton;

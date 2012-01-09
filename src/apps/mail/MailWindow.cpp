@@ -157,6 +157,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	fRef(NULL),
 	fFieldState(0),
 	fPanel(NULL),
+	fLeaveStatusMenu(NULL),
 	fSendButton(NULL),
 	fSaveButton(NULL),
 	fPrintButton(NULL),
@@ -244,7 +245,9 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		read_read_attr(file, flag);
 
 		if (flag == B_UNREAD) {
-			subMenu->AddItem(item = new BMenuItem(B_TRANSLATE("Leave as New"),
+			subMenu->AddItem(item = new BMenuItem(
+				B_TRANSLATE_COMMENT("Leave as 'New'",
+				"Do not translate New - this is non-localizable e-mail status"),
 				new BMessage(kMsgQuitAndKeepAllStatus), 'W', B_SHIFT_KEY));
 		} else {
 			BString status;
@@ -287,6 +290,8 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 			new BMessage(M_CLOSE_CUSTOM)));
 #endif
 		menu->AddItem(subMenu);
+
+		fLeaveStatusMenu = subMenu;
 	} else {
 		menu->AddSeparatorItem();
 		menu->AddItem(new BMenuItem(B_TRANSLATE("Close"),
@@ -906,6 +911,22 @@ TMailWindow::MenusBeginning()
 //	fUndo->SetLabel((isRedo)
 //	? kRedoStrings[undoState] : kUndoStrings[undoState]);
 	fUndo->SetEnabled(undoState != B_UNDO_UNAVAILABLE);
+
+	if (fLeaveStatusMenu != NULL && fRef != NULL) {
+		BFile file(fRef, B_READ_ONLY);
+		BString status;
+		file.ReadAttrString(B_MAIL_ATTR_STATUS, &status);
+
+		BMenuItem* LeaveStatus = fLeaveStatusMenu->FindItem(B_QUIT_REQUESTED);
+		if (LeaveStatus == NULL)
+			LeaveStatus = fLeaveStatusMenu->FindItem(kMsgQuitAndKeepAllStatus);
+
+		if (LeaveStatus != NULL && status.Length() > 0) {
+			BString label;
+			label.SetToFormat(B_TRANSLATE("Leave as '%s'"), status.String());
+			LeaveStatus->SetLabel(label.String());
+		}
+	}
 }
 
 
