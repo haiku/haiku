@@ -464,23 +464,37 @@ TMailApp::ReadyToRun()
 	// Load dictionaries
 	BPath indexDir;
 	BPath dictionaryDir;
+	BPath userDictionaryDir;
+	BPath userIndexDir;
 	BPath dataPath;
 	BPath indexPath;
 	BDirectory directory;
 	BEntry entry;
 
-	// Locate user settings directory
+	// Locate dictionaries directory
 	find_directory(B_SYSTEM_DATA_DIRECTORY, &indexDir, true);
 	indexDir.Append("spell_check");
 	dictionaryDir = indexDir;
 
+	//Locate user dictionary directory
+	find_directory(B_USER_CONFIG_DIRECTORY, &userIndexDir, true);
+	userIndexDir.Append("data/spell_check");
+	userDictionaryDir = userIndexDir;
+
+	// Create directory if needed
+	directory.CreateDirectory(userIndexDir.Path(),  NULL);
+
 	// Setup directory paths
 	indexDir.Append(kIndexDirectory);
 	dictionaryDir.Append(kDictDirectory);
+	userIndexDir.Append(kIndexDirectory);
+	userDictionaryDir.Append(kDictDirectory);
 
 	// Create directories if needed
 	directory.CreateDirectory(indexDir.Path(), NULL);
 	directory.CreateDirectory(dictionaryDir.Path(), NULL);
+	directory.CreateDirectory(userIndexDir.Path(), NULL);
+	directory.CreateDirectory(userDictionaryDir.Path(), NULL);
 
 	dataPath = dictionaryDir;
 	dataPath.Append("words");
@@ -500,14 +514,6 @@ TMailApp::ReadyToRun()
 			BNodeInfo(&copy).SetType("text/plain");
 		}
 
-		// Create user dictionary if it does not exist
-		dataPath = dictionaryDir;
-		dataPath.Append("user");
-		if (!BEntry(dataPath.Path()).Exists()) {
-			BFile user(dataPath.Path(), B_WRITE_ONLY | B_CREATE_FILE);
-			BNodeInfo(&user).SetType("text/plain");
-		}
-
 		// Load dictionaries
 		directory.SetTo(dictionaryDir.Path());
 
@@ -518,12 +524,6 @@ TMailApp::ReadyToRun()
 			&& directory.GetNextEntry(&entry) != B_ENTRY_NOT_FOUND) {
 			dataPath.SetTo(&entry);
 
-			// Identify the user dictionary
-			if (strcmp("user", dataPath.Leaf()) == 0) {
-				gUserDictFile = new BFile(dataPath.Path(), B_WRITE_ONLY | B_OPEN_AT_END);
-				gUserDict = gDictCount;
-			}
-
 			indexPath = indexDir;
 			leafName.SetTo(dataPath.Leaf());
 			leafName.Append(kMetaphone);
@@ -531,6 +531,33 @@ TMailApp::ReadyToRun()
 			gWords[gDictCount] = new Words(dataPath.Path(), indexPath.Path(), true);
 
 			indexPath = indexDir;
+			leafName.SetTo(dataPath.Leaf());
+			leafName.Append(kExact);
+			indexPath.Append(leafName.String());
+			gExactWords[gDictCount] = new Words(dataPath.Path(), indexPath.Path(), false);
+			gDictCount++;
+		}		
+
+		// Create user dictionary if it does not exist
+		dataPath = userDictionaryDir;
+		dataPath.Append("user");
+		if (!BEntry(dataPath.Path()).Exists()) {
+			BFile user(dataPath.Path(), B_WRITE_ONLY | B_CREATE_FILE);
+			BNodeInfo(&user).SetType("text/plain");
+		}
+
+		// Load user dictionary
+		if (BEntry(userDictionaryDir.Path()).Exists()) {
+			gUserDictFile = new BFile(dataPath.Path(), B_WRITE_ONLY | B_OPEN_AT_END);
+			gUserDict = gDictCount;
+
+			indexPath = userIndexDir;
+			leafName.SetTo(dataPath.Leaf());
+			leafName.Append(kMetaphone);
+			indexPath.Append(leafName.String());
+			gWords[gDictCount] = new Words(dataPath.Path(), indexPath.Path(), true);
+
+			indexPath = userIndexDir;
 			leafName.SetTo(dataPath.Leaf());
 			leafName.Append(kExact);
 			indexPath.Append(leafName.String());
