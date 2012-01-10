@@ -67,6 +67,7 @@ public:
 
 			Area*				AreaFor(const BView* view) const;
 			Area*				AreaFor(const BLayoutItem* item) const;
+			int32				CountAreas() const;
 			Area*				AreaAt(int32 index) const;
 			Area*				CurrentArea() const;
 			bool				SetCurrentArea(const Area* area);
@@ -121,6 +122,9 @@ public:
 	virtual	Area*				AddItemToBottom(BLayoutItem* item,
 									YTab* bottom = NULL, XTab* left = NULL,
 									XTab* right = NULL);
+
+			bool				SaveLayout(BMessage* archive) const;
+			bool				RestoreLayout(const BMessage* archive);
 
 	virtual	BSize				BaseMinSize();
 	virtual	BSize				BaseMaxSize();

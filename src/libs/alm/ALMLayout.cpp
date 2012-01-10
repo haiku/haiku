@@ -11,6 +11,7 @@
 #include <math.h>		// for floor
 #include <new>
 #include <iostream>
+#include <vector>
 
 #include "RowColumnManager.h"
 #include "ViewLayoutItem.h"
@@ -129,8 +130,8 @@ BALMLayout::YTabAt(int32 index) const
 }
 
 
-int
-CompareXTabFunc(const XTab* tab1, const XTab* tab2)
+static int
+compare_x_tab_func(const XTab* tab1, const XTab* tab2)
 {
 	if (tab1->Value() < tab2->Value())
 		return -1;
@@ -140,8 +141,8 @@ CompareXTabFunc(const XTab* tab1, const XTab* tab2)
 }
 
 
-int
-CompareYTabFunc(const YTab* tab1, const YTab* tab2)
+static int
+compare_y_tab_func(const YTab* tab1, const YTab* tab2)
 {
 	if (tab1->Value() < tab2->Value())
 		return -1;
@@ -149,13 +150,12 @@ CompareYTabFunc(const YTab* tab1, const YTab* tab2)
 		return 0;
 	return 1;
 }
-
 
 
 const XTabList&
 BALMLayout::OrderedXTabs()
 {
-	fXTabList.SortItems(CompareXTabFunc);
+	fXTabList.SortItems(compare_x_tab_func);
 	return fXTabList;
 }
 
@@ -163,7 +163,7 @@ BALMLayout::OrderedXTabs()
 const YTabList&
 BALMLayout::OrderedYTabs()
 {
-	fYTabList.SortItems(CompareYTabFunc);
+	fYTabList.SortItems(compare_y_tab_func);
 	return fYTabList;
 }
 
@@ -227,6 +227,13 @@ BALMLayout::AreaFor(const BLayoutItem* item) const
 	if (!item)
 		return NULL;
 	return static_cast<Area*>(item->LayoutData());
+}
+
+
+int32
+BALMLayout::CountAreas() const
+{
+	return CountItems();
 }
 
 
@@ -667,6 +674,134 @@ BALMLayout::AddItemToBottom(BLayoutItem* item, YTab* _bottom, XTab* left,
 		bottom = AddYTab();
 
 	return AddItem(item, left, top, right, bottom);
+}
+
+
+enum {
+	kLeftBorderIndex = -2,
+	kTopBorderIndex = -3,
+	kRightBorderIndex = -4,
+	kBottomBorderIndex = -5,
+};
+
+
+bool
+BALMLayout::SaveLayout(BMessage* archive) const
+{
+	archive->MakeEmpty();
+
+	archive->AddInt32("nXTabs", CountXTabs());
+	archive->AddInt32("nYTabs", CountYTabs());
+
+	XTabList xTabs = fXTabList;
+	xTabs.RemoveItem(fLeft);
+	xTabs.RemoveItem(fRight);
+	YTabList yTabs = fYTabList;
+	yTabs.RemoveItem(fTop);
+	yTabs.RemoveItem(fBottom);
+	
+	int32 nAreas = CountAreas();
+	for (int32 i = 0; i < nAreas; i++) {
+		Area* area = AreaAt(i);
+		if (area->Left() == fLeft)
+			archive->AddInt32("left", kLeftBorderIndex);
+		else
+			archive->AddInt32("left", xTabs.IndexOf(area->Left()));
+		if (area->Top() == fTop)
+			archive->AddInt32("top", kTopBorderIndex);
+		else
+			archive->AddInt32("top", yTabs.IndexOf(area->Top()));
+		if (area->Right() == fRight)
+			archive->AddInt32("right", kRightBorderIndex);
+		else
+			archive->AddInt32("right", xTabs.IndexOf(area->Right()));
+		if (area->Bottom() == fBottom)
+			archive->AddInt32("bottom", kBottomBorderIndex);
+		else
+			archive->AddInt32("bottom", yTabs.IndexOf(area->Bottom()));
+	}
+	return true;
+}
+
+
+bool
+BALMLayout::RestoreLayout(const BMessage* archive)
+{
+	int32 neededXTabs;
+	int32 neededYTabs;
+	if (archive->FindInt32("nXTabs", &neededXTabs) != B_OK)
+		return false;
+	if (archive->FindInt32("nYTabs", &neededYTabs) != B_OK)
+		return false;
+	// First store a reference to all needed tabs otherwise they might get lost
+	// while editing the layout
+	std::vector<BReference<XTab> > newXTabs;
+	std::vector<BReference<YTab> > newYTabs;
+	int32 existingXTabs = fXTabList.CountItems();
+	for (int32 i = 0; i < neededXTabs; i++) {
+		if (i < existingXTabs)
+			newXTabs.push_back(BReference<XTab>(fXTabList.ItemAt(i)));
+		else
+			newXTabs.push_back(AddXTab());
+	}
+	int32 existingYTabs = fYTabList.CountItems();
+	for (int32 i = 0; i < neededYTabs; i++) {
+		if (i < existingYTabs)
+			newYTabs.push_back(BReference<YTab>(fYTabList.ItemAt(i)));
+		else
+			newYTabs.push_back(AddYTab());
+	}
+
+	XTabList xTabs = fXTabList;
+	xTabs.RemoveItem(fLeft);
+	xTabs.RemoveItem(fRight);
+	YTabList yTabs = fYTabList;
+	yTabs.RemoveItem(fTop);
+	yTabs.RemoveItem(fBottom);
+
+	int32 nAreas = CountAreas();
+	for (int32 i = 0; i < nAreas; i++) {
+		Area* area = AreaAt(i);
+		if (area == NULL)
+			return false;
+		int32 left = -1;
+		if (archive->FindInt32("left", i, &left) != B_OK)
+			break;
+		int32 top = archive->FindInt32("top", i);
+		int32 right = archive->FindInt32("right", i);
+		int32 bottom = archive->FindInt32("bottom", i);
+
+		XTab* leftTab = NULL;
+		YTab* topTab = NULL;
+		XTab* rightTab = NULL;
+		YTab* bottomTab = NULL;
+
+		if (left == kLeftBorderIndex)
+			leftTab = fLeft;
+		else
+			leftTab = xTabs.ItemAt(left);
+		if (top == kTopBorderIndex)
+			topTab = fTop;
+		else
+			topTab = yTabs.ItemAt(top);
+		if (right == kRightBorderIndex)
+			rightTab = fRight;
+		else
+			rightTab = xTabs.ItemAt(right);
+		if (bottom == kBottomBorderIndex)
+			bottomTab = fBottom;
+		else
+			bottomTab = yTabs.ItemAt(bottom);
+		if (leftTab == NULL || topTab == NULL || rightTab == NULL
+			|| bottomTab == NULL)
+			return false;
+
+		area->SetLeft(leftTab);
+		area->SetTop(topTab);
+		area->SetRight(rightTab);
+		area->SetBottom(bottomTab);
+	}
+	return true;
 }
 
 
