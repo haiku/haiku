@@ -28,9 +28,17 @@ UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa main ] ;
 UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mapi ] ;
 UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mapi glapi ] ;
 
+# For older versions of Mesa
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa glapi ] ;
 
 LINKFLAGS on libGL.so = [ on libGL.so return $(LINKFLAGS) ]
 	-Xlinker --strip-debug -Xlinker --whole-archive -Xlinker -zmuldefs ;
+
+# For GCC2
+if $(HAIKU_GCC_VERSION[1]) < 3 {
+	SubDirC++Flags --no-warnings ;
+}
+	
 
 SharedLibrary libGL.so : $(sources) :
 

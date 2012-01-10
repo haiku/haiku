@@ -1,6 +1,12 @@
 SubDir HAIKU_TOP src add-ons screen_savers flurry ;
 SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
 
+# For GCC2
+if $(HAIKU_GCC_VERSION[1]) < 3 { 
+    SubDirC++Flags --no-warnings ;
+}
+
+
 AddResources Message : Flurry.rdef ;
 
 ScreenSaver Flurry :

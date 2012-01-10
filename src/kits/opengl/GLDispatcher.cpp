@@ -35,8 +35,11 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 extern "C" {
 
 #include "glapi.h"
+#if __GNUC__ > 2
+// New Mesa
 #include "glapi_priv.h"
 #include "glapitable.h"
+#endif
 
 /*
  * NOTE: this file portion implements C-based dispatch of the OpenGL entrypoints
@@ -64,7 +67,9 @@ extern "C" {
    return (dispatch->func) args
 
 
+#if __GNUC__ > 2
 #include "glapitemp.h"
+#endif
 
 #endif /* USE_X86_ASM */
 

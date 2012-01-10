@@ -30,12 +30,12 @@ extern "C" {
 #include "drivers/common/meta.h"
 #include "main/colormac.h"
 #include "main/buffers.h"
+#include "main/formats.h"
 #include "main/framebuffer.h"
 #include "main/renderbuffer.h"
 #include "main/state.h"
-#include "main/version.h"
 #include "swrast/swrast.h"
-#ifdef NEW_MESA
+#if __GNUC__ > 2
 #include "swrast/s_renderbuffer.h"
 #endif
 #include "swrast_setup/swrast_setup.h"
@@ -44,7 +44,8 @@ extern "C" {
 #include "tnl/t_pipeline.h"
 #include "vbo/vbo.h"
 
-#define CALLED() printf("CALLED %s\n",__PRETTY_FUNCTION__)
+
+#define CALLED() //printf("CALLED %s\n",__PRETTY_FUNCTION__)
 
 #if defined(USE_X86_ASM)
 #include "x86/common_x86_asm.h"
@@ -269,8 +270,12 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView* view, ulong options,
 	functions.Flush			= _Flush;
 
 	// create core context
+#if HAIKU_MESA_VER <= 708
+	fContext = _mesa_create_context(fVisual, NULL, &functions, this);
+#else
 	fContext = _mesa_create_context(API_OPENGL, fVisual, NULL,
 		&functions, this);
+#endif
 
 	if (!fContext) {
 		_mesa_destroy_visual(fVisual);
@@ -311,8 +316,11 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView* view, ulong options,
 
 	switch(fColorSpace) {
 		case B_RGB32:
+#if HAIKU_MESA_VER >= 709
+			// Only in New Mesa
 			fFrontRenderBuffer->base.Format = MESA_FORMAT_XRGB8888;
 			break;
+#endif
 		case B_RGBA32:
 			fFrontRenderBuffer->base.Format = MESA_FORMAT_ARGB8888;
 			break;
@@ -362,9 +370,17 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView* view, ulong options,
 		fBackRenderBuffer->active = false;
 	}
 
+#if HAIKU_MESA_VER >= 709
+	// New Mesa
 	_swrast_add_soft_renderbuffers(&fFrameBuffer->base, GL_FALSE,
 		fVisual->haveDepthBuffer, fVisual->haveStencilBuffer,
 		fVisual->haveAccumBuffer, alphaFlag, GL_FALSE);
+#else
+	// Old Mesa
+	_mesa_add_soft_renderbuffers(&fFrameBuffer->base, GL_FALSE,
+		fVisual->haveDepthBuffer, fVisual->haveStencilBuffer,
+		fVisual->haveAccumBuffer, alphaFlag, GL_FALSE);
+#endif
 
 	BRect bounds = view->Bounds();
 	fWidth = fNewWidth = (GLint)bounds.Width();
@@ -786,7 +802,9 @@ MesaSoftwareRenderer::_FrontRenderbufferStorage(gl_context* ctx,
 	render->Data = NULL;
 	render->Width = width;
 	render->Height = height;
+#if HAIKU_MESA_VER >= 712
 	render->RowStride = width;
+#endif
 
 	return GL_TRUE;
 }
@@ -832,36 +850,66 @@ MesaSoftwareRenderer::_SetSpanFuncs(
 			buffer->base.GetValues = get_values_RGBA32;
 			buffer->base.PutRow = put_row_RGBA32;
 			buffer->base.PutValues = put_values_RGBA32;
+#if HAIKU_MESA_VER <= 711
+			buffer->base.PutRowRGB = put_row_rgb_RGBA32;
+			buffer->base.PutMonoRow = put_mono_row_RGBA32;
+			buffer->base.PutMonoValues = put_values_RGBA32;
+#endif
 			break;
 		case B_RGB32:
 			buffer->base.GetRow = get_row_RGB32;
 			buffer->base.GetValues = get_values_RGB32;
 			buffer->base.PutRow = put_row_RGB32;
 			buffer->base.PutValues = put_values_RGB32;
+#if HAIKU_MESA_VER <= 711
+			buffer->base.PutRowRGB = put_row_rgb_RGB32;
+			buffer->base.PutMonoRow = put_mono_row_RGB32;
+			buffer->base.PutMonoValues = put_values_RGB32;
+#endif
 			break;
 		case B_RGB24:
 			buffer->base.GetRow = get_row_RGB24;
 			buffer->base.GetValues = get_values_RGB24;
 			buffer->base.PutRow = put_row_RGB24;
 			buffer->base.PutValues = put_values_RGB24;
+#if HAIKU_MESA_VER <= 711
+			buffer->base.PutRowRGB = put_row_rgb_RGB24;
+			buffer->base.PutMonoRow = put_mono_row_RGB24;
+			buffer->base.PutMonoValues = put_values_RGB24;
+#endif
 			break;
 		case B_RGB16:
 			buffer->base.GetRow = get_row_RGB16;
 			buffer->base.GetValues = get_values_RGB16;
 			buffer->base.PutRow = put_row_RGB16;
 			buffer->base.PutValues = put_values_RGB16;
+#if HAIKU_MESA_VER <= 711
+			buffer->base.PutRowRGB = put_row_rgb_RGB16;
+			buffer->base.PutMonoRow = put_mono_row_RGB16;
+			buffer->base.PutMonoValues = put_values_RGB16;
+#endif
 			break;
 		case B_RGB15:
 			buffer->base.GetRow = get_row_RGB15;
 			buffer->base.GetValues = get_values_RGB15;
 			buffer->base.PutRow = put_row_RGB15;
 			buffer->base.PutValues = put_values_RGB15;
+#if HAIKU_MESA_VER <= 711
+			buffer->base.PutRowRGB = put_row_rgb_RGB15;
+			buffer->base.PutMonoRow = put_mono_row_RGB15;
+			buffer->base.PutMonoValues = put_values_RGB15;
+#endif
 			break;
 		case B_CMAP8:
 			buffer->base.GetRow = get_row_CMAP8;
 			buffer->base.GetValues = get_values_CMAP8;
 			buffer->base.PutRow = put_row_CMAP8;
 			buffer->base.PutValues = put_values_CMAP8;
+#if HAIKU_MESA_VER <= 711
+			buffer->base.PutRowRGB = put_row_rgb_CMAP8;
+			buffer->base.PutMonoRow = put_mono_row_CMAP8;
+			buffer->base.PutMonoValues = put_values_CMAP8;
+#endif
 			break;
 		default:
 			fprintf(stderr, "Unsupported screen color space %d\n", fColorSpace);
