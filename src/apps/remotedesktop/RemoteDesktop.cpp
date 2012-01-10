@@ -42,6 +42,7 @@ main(int argc, char *argv[])
 	bool listenOnly = false;
 	uint32 listenPort = 10900;
 	uint32 sshPort = 22;
+	const char* command = NULL;
 
 	for (int32 i = 2; i < argc; i++) {
 		if (strcmp(argv[i], "-p") == 0) {
@@ -86,21 +87,24 @@ main(int argc, char *argv[])
 
 	pid_t sshPID = -1;
 	if (!listenOnly) {
-
 		BPath terminalPath;
-		if (find_directory(B_SYSTEM_APPS_DIRECTORY, &terminalPath) != B_OK) {
-			printf("failed to determine system-apps directory\n");
-			return 3;
-		}
-		if (terminalPath.Append("Terminal") != B_OK) {
-			printf("failed to append to system-apps path\n");
-			return 3;
+		if (command == NULL) {
+			if (find_directory(B_SYSTEM_APPS_DIRECTORY, &terminalPath)
+					!= B_OK) {
+				printf("failed to determine system-apps directory\n");
+				return 3;
+			}
+			if (terminalPath.Append("Terminal") != B_OK) {
+				printf("failed to append to system-apps path\n");
+				return 3;
+			}
+			command = terminalPath.Path();
 		}
 
 		char shellCommand[4096];
 		snprintf(shellCommand, sizeof(shellCommand),
 			"echo connected; export TARGET_SCREEN=localhost:%lu; %s\n",
-			listenPort, terminalPath.Path());
+			listenPort, command);
 
 		int pipes[4];
 		if (pipe(&pipes[0]) != 0 || pipe(&pipes[2]) != 0) {
