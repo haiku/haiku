@@ -133,7 +133,9 @@ radeon_dpms_set(int mode)
 			for (uint8 id = 0; id < MAX_DISPLAY; id++) {
 				if (gDisplay[id]->active == false)
 					continue;
+				encoder_output_lock(true);
 				encoder_dpms_set(id, mode);
+				encoder_output_lock(false);
 				display_crtc_lock(id, ATOM_ENABLE);
 				display_crtc_power(id, ATOM_ENABLE);
 				if (info.dceMajor >= 3)
@@ -155,7 +157,9 @@ radeon_dpms_set(int mode)
 					display_crtc_memreq(id, ATOM_DISABLE);
 				display_crtc_power(id, ATOM_DISABLE);
 				display_crtc_lock(id, ATOM_DISABLE);
+				encoder_output_lock(true);
 				encoder_dpms_set(id, mode);
+				encoder_output_lock(false);
 			}
 			break;
 	}
