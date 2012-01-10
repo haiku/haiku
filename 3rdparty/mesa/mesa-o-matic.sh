@@ -15,7 +15,7 @@ echo ""
 # These are the Mesa headers and libraries used by the opengl kit
 #   Headers are probed for dependencies, only specify ones referenced
 #   by the opengl kit.
-MESA_PRIVATE_HEADERS="glheader.h glapi.h glapitable.h glapitemp.h glapi_priv.h context.h driverfuncs.h meta.h colormac.h buffers.h framebuffer.h renderbuffer.h state.h version.h swrast.h swrast_setup.h tnl.h t_context.h t_pipeline.h vbo.h common_x86_asm.h common_ppc_features.h extensions.h s_spantemp.h s_renderbuffer.h"
+MESA_PRIVATE_HEADERS="glheader.h glapi.h glapitable.h glapitemp.h glapi_priv.h context.h driverfuncs.h meta.h colormac.h buffers.h framebuffer.h renderbuffer.h state.h version.h swrast.h swrast_setup.h tnl.h t_context.h t_pipeline.h vbo.h common_x86_asm.h common_ppc_features.h extensions.h s_spantemp.h s_renderbuffer.h formats.h"
 
 # These are public header directories, all files grabbed
 MESA_PUBLIC_HEADERS="include/GL"
