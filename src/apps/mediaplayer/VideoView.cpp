@@ -31,6 +31,8 @@ VideoView::VideoView(BRect frame, const char* name, uint32 resizeMask)
 	fOverlayMode(false),
 	fIsPlaying(false),
 	fIsFullscreen(false),
+	fFullscreenControlsVisible(false),
+	fSendHideCounter(0),
 	fLastMouseMove(system_time()),
 
 	fSubtitleBitmap(new SubtitleBitmap),
@@ -127,9 +129,17 @@ VideoView::Pulse()
 		uint32 buttons;
 		GetMouse(&where, &buttons, false);
 		if (buttons == 0) {
-			BMessage message(M_HIDE_FULL_SCREEN_CONTROLS);
-			message.AddPoint("where", where);
-			Window()->PostMessage(&message, Window());
+			if (fFullscreenControlsVisible) {
+				if (fSendHideCounter == 0 || fSendHideCounter == 3) {
+					// Send after 1.5s and after 4.5s
+					BMessage message(M_HIDE_FULL_SCREEN_CONTROLS);
+					message.AddPoint("where", where);
+					if (fSendHideCounter > 0)
+						message.AddBool("force", true);
+					Window()->PostMessage(&message, Window());
+				}
+				fSendHideCounter++;
+			}
 
 			ConvertToScreen(&where);
 			set_mouse_position((int32)where.x, (int32)where.y);
@@ -292,6 +302,15 @@ void
 VideoView::SetFullscreen(bool fullScreen)
 {
 	fIsFullscreen = fullScreen;
+	fSendHideCounter = 0;
+}
+
+
+void
+VideoView::SetFullscreenControlsVisible(bool visible)
+{
+	fFullscreenControlsVisible = visible;
+	fSendHideCounter = 0;
 }
 
 

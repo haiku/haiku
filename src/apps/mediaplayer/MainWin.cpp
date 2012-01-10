@@ -975,7 +975,8 @@ MainWin::MessageReceived(BMessage* msg)
 			if (fIsFullscreen) {
 				BPoint videoViewWhere;
 				if (msg->FindPoint("where", &videoViewWhere) == B_OK) {
-					if (!fControls->Frame().Contains(videoViewWhere)) {
+					if (msg->FindBool("force")
+						|| !fControls->Frame().Contains(videoViewWhere)) {
 						_ShowFullscreenControls(false);
 						// hide the mouse cursor until the user moves it
 						be_app->ObscureCursor();
@@ -2333,6 +2334,7 @@ MainWin::_ShowFullscreenControls(bool show, bool animate)
 		return;
 
 	fShowsFullscreenControls = show;
+	fVideoView->SetFullscreenControlsVisible(show);
 
 	if (show) {
 		fControls->RemoveSelf();
@@ -2341,6 +2343,7 @@ MainWin::_ShowFullscreenControls(bool show, bool animate)
 		fVideoView->AddChild(fControls);
 		if (fScaleFullscreenControls)
 			fControls->SetSymbolScale(1.5f);
+
 		while (fControls->IsHidden())
 			fControls->Show();
 	}
@@ -2364,16 +2367,15 @@ MainWin::_ShowFullscreenControls(bool show, bool animate)
 		finalMessage.AddFloat("offset", originalY + moveDist);
 		finalMessage.AddBool("show", show);
 		PostMessage(&finalMessage, this);
-	} else {
-		if (!show) {
-			fControls->RemoveSelf();
-			fControls->MoveTo(fVideoView->Frame().left,
-				fVideoView->Frame().bottom + 1);
-			fBackground->AddChild(fControls);
-			fControls->SetSymbolScale(1.0f);
-			while (!fControls->IsHidden())
-				fControls->Hide();
-		}
+	} else if (!show) {
+		fControls->RemoveSelf();
+		fControls->MoveTo(fVideoView->Frame().left,
+			fVideoView->Frame().bottom + 1);
+		fBackground->AddChild(fControls);
+		fControls->SetSymbolScale(1.0f);
+
+		while (!fControls->IsHidden())
+			fControls->Hide();
 	}
 }
 
