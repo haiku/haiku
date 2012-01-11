@@ -1,4 +1,5 @@
 SubDir HAIKU_TOP src libs glut ;
+SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
@@ -6,6 +7,13 @@ if $(TARGET_PLATFORM) != haiku {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers os opengl ] : true ;
 		# We need our public GL headers also when not compiling for Haiku.
 }
+
+
+# For GCC2
+if $(HAIKU_GCC_VERSION[1]) < 3 {
+	SubDirC++Flags --no-warnings ;
+}
+
 
 MergeObject <opengl>glut.o :
 	# C++ sources

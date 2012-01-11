@@ -38,12 +38,15 @@ LINKFLAGS on libGL.so = [ on libGL.so return $(LINKFLAGS) ]
 if $(HAIKU_GCC_VERSION[1]) < 3 {
 	SubDirC++Flags --no-warnings ;
 }
-	
+
 
 SharedLibrary libGL.so : $(sources) :
 
 	# Mesa libraries (from Mesa optional package):
 	$(HAIKU_MESA_LIBS)
+
+	# Glut
+	<opengl>glut.o
 
 	# External libraries:
 	be

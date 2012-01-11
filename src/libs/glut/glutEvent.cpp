@@ -19,6 +19,7 @@
 #include "glutState.h"
 #include "glutBlocker.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 #define MOUSE_WHEEL_UP   3
 #define MOUSE_WHEEL_DOWN 4

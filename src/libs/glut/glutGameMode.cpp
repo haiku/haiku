@@ -14,6 +14,7 @@
 #include <GL/glut.h>
 #include <String.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 
 // GlutGameMode class
