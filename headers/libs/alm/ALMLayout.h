@@ -65,6 +65,7 @@ public:
 			void				SetSpacing(float spacing);
 			float				Spacing() const;
 
+			Area*				AreaFor(int32 id) const;
 			Area*				AreaFor(const BView* view) const;
 			Area*				AreaFor(const BLayoutItem* item) const;
 			int32				CountAreas() const;

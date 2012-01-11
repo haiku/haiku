@@ -65,6 +65,9 @@ class Area {
 public:
 								~Area();
 
+			int32				ID() const;
+			void				SetID(int32 id);
+
 			BLayoutItem*		Item();
 
 			XTab*				Left() const;
@@ -121,6 +124,7 @@ private:
 			void				_UpdateMaxSizeConstraint(BSize max);
 private:
 			BLayoutItem*		fLayoutItem;
+			int32				fID;
 
 			LinearSpec*			fLS;
 

@@ -522,6 +522,15 @@ Area::~Area()
 }
 
 
+static int32 sAreaID = 0;
+
+static int32
+new_area_id()
+{
+	return sAreaID++;
+}
+
+
 /**
  * Constructor.
  * Uses XTabs and YTabs.
@@ -550,7 +559,21 @@ Area::Area(BLayoutItem* item)
 	fContentAspectRatio(-1),
 	fContentAspectRatioC(NULL)
 {
+	fID = new_area_id();
+}
 
+
+int32
+Area::ID() const
+{
+	return fID;
+}
+
+
+void
+Area::SetID(int32 id)
+{
+	fID = id;
 }
 
 

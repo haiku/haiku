@@ -208,6 +208,19 @@ BALMLayout::AddColumn(XTab* _left, XTab* _right)
 }
 
 
+Area*
+BALMLayout::AreaFor(int32 id) const
+{
+	int32 areaCount = CountAreas();
+	for (int32 i = 0; i < areaCount; i++) {
+		Area* area = AreaAt(i);
+		if (area->ID() == id)
+			return area;
+	}
+	return NULL;
+}
+
+
 /**
  * Finds the area that contains the given control.
  *
