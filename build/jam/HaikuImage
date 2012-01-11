@@ -708,6 +708,10 @@ CopyDirectoryToHaikuImage develop sample-code
 	: [ FDirName $(HAIKU_TOP) src libs pdflib bind pdflib ]
 	: pdflib : -x .svn ;
 
+# Copy Mesa3D GL headers into image
+CopyDirectoryToHaikuImage develop headers os opengl
+	: [ FDirName $(HAIKU_MESA_HEADERS) GL ] : : -x .svn ;
+
 #pragma mark - Optional Packages
 
 
