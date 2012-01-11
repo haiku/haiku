@@ -1,4 +1,11 @@
 SubDir HAIKU_TOP src preferences opengl ;
+SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
+
+# For GCC2
+if $(HAIKU_GCC_VERSION[1]) < 3 { 
+	SubDirC++Flags --no-warnings ;
+}
+
 
 UsePrivateHeaders interface ;
 

@@ -170,6 +170,51 @@ if $(HAIKU_BUILD_FEATURE_CLUCENE) {
 }
 
 
+# Mesa
+local mesaBaseURL = http://pub.haikufire.com/mesa ;
+if $(TARGET_ARCH) = x86 {
+	local zipFile ;
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		HAIKU_MESA_FILE = mesa-71cc639-gcc4-x86.zip ;
+	} else {
+		HAIKU_MESA_FILE = mesa-7.8.2-gcc2-x86.zip ;
+	}
+
+	zipFile = [ DownloadFile $(HAIKU_MESA_FILE)
+		: $(mesaBaseURL)/$(HAIKU_MESA_FILE) ] ;
+
+	HAIKU_MESA_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_MESA_FILE:B) ] ;
+
+	HAIKU_MESA_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_MESA_DIR)
+		: include/ : $(zipFile) : extracted-mesa ] ;
+
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		HAIKU_MESA_LIBS = [ ExtractArchive $(HAIKU_MESA_DIR)
+		:
+		src/mesa/libmesa.a
+		src/mapi/glapi/libglapi.a
+		lib/libGLU.a
+		: $(zipFile)
+		: extracted-mesa ] ;
+	} else {
+		# Older Mesa 7.8
+		HAIKU_MESA_LIBS = [ ExtractArchive $(HAIKU_MESA_DIR)
+		:
+		src/mesa/libmesa.a
+		src/mesa/libglapi.a
+		lib/libGLU.a
+		: $(zipFile)
+		: extracted-mesa ] ;
+	}
+
+	HAIKU_MESA_HEADERS = [ FDirName $(HAIKU_MESA_DIR) include ] ;
+
+} else {
+	Echo "Mesa 3D rendering support not available on $(TARGET_ARCH)" ;
+}
+
+
 # TagLib
 
 # Automatically install the TagLib feature, when the optional TagLib optional
