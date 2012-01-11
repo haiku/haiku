@@ -8,7 +8,7 @@
 
 #include "Texture.h"
 
-#include <opengl/GL/gl.h>
+#include <GL/gl.h>
 
 
 Texture::Texture()

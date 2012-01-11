@@ -1,7 +1,13 @@
 SubDir HAIKU_TOP src apps haiku3d ;
+SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) mesh ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) texture ] ;
+
+# For GCC2
+if $(HAIKU_GCC_VERSION[1]) < 3 {
+	SubDirC++Flags --no-warnings ;
+}
 
 UsePrivateHeaders shared ;
 
