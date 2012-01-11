@@ -175,7 +175,7 @@ local mesaBaseURL = http://pub.haikufire.com/mesa ;
 if $(TARGET_ARCH) = x86 {
 	local zipFile ;
 	if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		HAIKU_MESA_FILE = mesa-71cc639-gcc4-x86.zip ;
+		HAIKU_MESA_FILE = mesa-8.0-devel-gcc4-x86.zip ;
 	} else {
 		HAIKU_MESA_FILE = mesa-7.8.2-gcc2-x86.zip ;
 	}
