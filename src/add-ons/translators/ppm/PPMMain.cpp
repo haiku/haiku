@@ -6,7 +6,7 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
-#include <GroupLayout.h>
+#include <LayoutBuilder.h>
 #include <Screen.h>
 #include <TranslatorAddOn.h>
 #include <View.h>
@@ -30,7 +30,7 @@ public:
 		BWindow(area, B_TRANSLATE("PPM Settings"), B_TITLED_WINDOW,
 			B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 		{
-			SetLayout(new BGroupLayout(B_HORIZONTAL));
+				BLayoutBuilder::Group<>(this, B_HORIZONTAL);
 		}
 	~PPMWindow()
 		{

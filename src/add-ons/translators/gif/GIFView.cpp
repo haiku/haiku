@@ -20,10 +20,8 @@
 #include <stdlib.h>
 
 #include <Catalog.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
 #include <InterfaceKit.h>
+#include <LayoutBuilder.h>
 #include <String.h>
 
 #include "Prefs.h"
@@ -124,23 +122,22 @@ GIFView::GIFView(const char *name)
 		}
 	}
 
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 7)
-		.Add(BGridLayoutBuilder(10, 10)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 7)
+		.SetInsets(5)
+		.AddGrid(10, 10)
 			.Add(title, 0, 0)
 			.Add(version, 1, 0)
-		)
+		.End()
 		.Add(copyright)
 		.AddGlue()
 
-		.Add(BGridLayoutBuilder(10, 10)
+		.AddGrid(10, 10)
 			.Add(fPaletteMF->CreateLabelLayoutItem(), 0, 0)
         	.Add(fPaletteMF->CreateMenuBarLayoutItem(), 1, 0)
 
 			.Add(fColorCountMF->CreateLabelLayoutItem(), 0, 1)
         	.Add(fColorCountMF->CreateMenuBarLayoutItem(), 1, 1)
-		)
+		.End()
 		.AddGlue()
 
 		.Add(fUseDitheringCB)
@@ -148,15 +145,13 @@ GIFView::GIFView(const char *name)
 		.Add(fUseTransparentCB)
 
 		.Add(fUseTransparentAutoRB)
-		.Add(BGridLayoutBuilder(10, 10)
+		.AddGrid(10, 10)
 			.Add(fUseTransparentColorRB, 0, 0)
 			.Add(fTransparentRedTC, 1, 0)
 			.Add(fTransparentGreenTC, 2, 0)
 			.Add(fTransparentBlueTC, 3, 0)
-		)
-		.AddGlue()
-		.SetInsets(5, 5, 5, 5)
-	);
+		.End()
+		.AddGlue();
 
 	BFont font;
 	GetFont(&font);

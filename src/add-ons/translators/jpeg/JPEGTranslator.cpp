@@ -38,8 +38,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <Alignment.h>
 #include <Catalog.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <TabView.h>
 #include <TextView.h>
 
@@ -437,14 +436,13 @@ TranslatorReadView::TranslatorReadView(const char* name,
 		fShowErrorBox->SetValue(B_CONTROL_ON);
 
 	float padding = 5.0f;
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, padding)
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL, padding)
+		.SetInsets(padding)
 		.Add(fAlwaysRGB32)
 		.Add(fPhotoshopCMYK)
 		.Add(fShowErrorBox)
-		.AddGlue()
-		.SetInsets(padding, padding, padding, padding)
-	);
-
+		.AddGlue();
 }
 
 
@@ -559,16 +557,15 @@ TranslatorWriteView::TranslatorWriteView(const char* name,
 		fGrayAsRGB24->SetValue(B_CONTROL_ON);
 
 	float padding = 5.0f;
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, padding)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, padding)
+		.SetInsets(padding)
 		.Add(fQualitySlider)
 		.Add(fSmoothingSlider)
 		.Add(fProgress)
 		.Add(fOptimizeColors)
 		.Add(fSmallerFile)
 		.Add(fGrayAsRGB24)
-		.AddGlue()
-		.SetInsets(padding, padding, padding, padding)
-	);
+		.AddGlue();
 }
 
 
@@ -687,15 +684,14 @@ TranslatorAboutView::TranslatorAboutView(const char* name)
 	infoView->MakeEditable(false);
 
 	float padding = 5.0f;
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, padding)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, padding)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, padding)
+		.SetInsets(padding)
+		.AddGroup(B_HORIZONTAL, padding)
 			.Add(title)
 			.Add(version)
 			.AddGlue()
-		)
-		.Add(infoView)
-		.SetInsets(padding, padding, padding, padding)
-	);
+		.End()
+		.Add(infoView);
 }
 
 

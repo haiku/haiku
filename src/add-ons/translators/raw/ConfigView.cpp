@@ -10,8 +10,7 @@
 
 #include <Catalog.h>
 #include <CheckBox.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <StringView.h>
 
 #include <stdio.h>
@@ -49,9 +48,8 @@ ConfigView::ConfigView(uint32 flags)
 		B_UTF8_COPYRIGHT "1997-2007 Dave Coffin");
 
 	// Build the layout
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 7)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 7)
+		.SetInsets(5)
 		.Add(fTitle)
 		.AddGlue()
 		.Add(fVersion)
@@ -59,9 +57,7 @@ ConfigView::ConfigView(uint32 flags)
 		.AddGlue()
 		.Add(fCopyright2)
 		.Add(fCopyright3)
-		.AddGlue()
-		.SetInsets(5, 5, 5, 5)
-	);
+		.AddGlue();
 
 	BFont font;
 	GetFont(&font);

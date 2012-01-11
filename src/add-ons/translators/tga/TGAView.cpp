@@ -30,8 +30,7 @@
 /*****************************************************************************/
 
 #include <Catalog.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <SpaceLayoutItem.h>
 
 #include <stdio.h>
@@ -78,9 +77,8 @@ TGAView::TGAView(const char *name, uint32 flags, TranslatorSettings *settings)
  	fpchkRLE->SetViewColor(ViewColor());
 
  	// Build the layout
- 	SetLayout(new BGroupLayout(B_HORIZONTAL));
-
- 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 7)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 7)
+		.SetInsets(5)
  		.Add(fTitle)
  		.Add(fDetail)
  		.AddGlue()
@@ -88,9 +86,7 @@ TGAView::TGAView(const char *name, uint32 flags, TranslatorSettings *settings)
  		.Add(fpchkRLE)
  		.AddGlue()
  		.Add(fWrittenBy)
- 		.AddGlue()
- 		.SetInsets(5, 5, 5, 5)
- 	);
+		.AddGlue();
 
  	BFont font;
  	GetFont(&font);

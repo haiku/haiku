@@ -34,7 +34,7 @@
 #include <string.h>
 
 #include <Catalog.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <MenuBar.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -132,16 +132,15 @@ SGIView::SGIView(const char* name, uint32 flags, TranslatorSettings* settings)
 	infoView->MakeEditable(false);
 	infoView->MakeResizable(true);
 	infoView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
+
 	float padding = 5.0f;
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, padding)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, padding)
+		.SetInsets(padding)
 		.Add(titleView)
 		.Add(detailView)
 		.Add(fCompressionMF)
 		.Add(infoView)
-		.AddGlue()
-		.SetInsets(padding, padding, padding, padding)
-	);
+		.AddGlue();
 
 	BFont font;
 	GetFont(&font);

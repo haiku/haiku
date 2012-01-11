@@ -13,9 +13,7 @@
 #include <Catalog.h>
 #include <CheckBox.h>
 #include <FindDirectory.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locker.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -23,7 +21,6 @@
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <Screen.h>
-#include <SpaceLayoutItem.h>
 #include <StringView.h>
 #include <TranslatorAddOn.h>
 #include <TranslationKit.h>
@@ -521,23 +518,20 @@ public:
  				mAscii->SetViewColor(ViewColor());
 
  				// Build the layout
- 				SetLayout(new BGroupLayout(B_HORIZONTAL));
-
- 				AddChild(BGroupLayoutBuilder(B_VERTICAL, 7)
- 					.Add(mTitle)
+				BLayoutBuilder::Group<>(this, B_VERTICAL, 7)
+					.SetInsets(5)
+					.Add(mTitle)
  					.Add(mDetail)
  					.AddGlue()
  					.Add(mBasedOn)
  					.Add(mCopyright)
  					.AddGlue()
- 					.Add(BGridLayoutBuilder(10, 10)
- 						.Add(mField->CreateLabelLayoutItem(), 0, 0)
+					.AddGrid(10, 10)
+						.Add(mField->CreateLabelLayoutItem(), 0, 0)
  						.Add(mField->CreateMenuBarLayoutItem(), 1, 0)
  						.Add(mAscii, 0, 1)
- 					)
- 					.AddGlue()
- 					.SetInsets(5, 5, 5, 5)
- 				);
+					.End()
+					.AddGlue();
 
  				BFont font;
  				GetFont(&font);

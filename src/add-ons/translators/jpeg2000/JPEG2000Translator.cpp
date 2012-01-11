@@ -37,7 +37,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <syslog.h>
 
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <TabView.h>
 #include <TextView.h>
 
@@ -566,11 +566,10 @@ TranslatorReadView::TranslatorReadView(const char* name,
 		fGrayAsRGB32->SetValue(B_CONTROL_ON);
 
 	float padding = 10.0f;
-	AddChild(BGroupLayoutBuilder(B_VERTICAL)
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(padding)
 		.Add(fGrayAsRGB32)
-		.AddGlue()
-		.SetInsets(padding, padding, padding, padding)
-	);
+		.AddGlue();
 }
 
 
@@ -637,13 +636,12 @@ TranslatorWriteView::TranslatorWriteView(const char* name,
 		fCodeStreamOnly->SetValue(B_CONTROL_ON);
 
 	float padding = 10.0f;
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, padding)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, padding)
+		.SetInsets(padding)
 		.Add(fQualitySlider)
 		.Add(fGrayAsRGB24)
 		.Add(fCodeStreamOnly)
-		.AddGlue()
-		.SetInsets(padding, padding, padding, padding)
-	);
+		.AddGlue();
 }
 
 
@@ -729,15 +727,14 @@ TranslatorAboutView::TranslatorAboutView(const char* name)
 	infoView->MakeEditable(false);
 
 	float padding = 10.0f;
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, padding)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, padding)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, padding)
+		.SetInsets(padding)
+		.AddGroup(B_HORIZONTAL, padding)
 			.Add(title)
 			.Add(version)
 			.AddGlue()
-		)
-		.Add(infoView)
-		.SetInsets(padding, padding, padding, padding)
-	);
+		.End()
+		.Add(infoView);
 }
 
 

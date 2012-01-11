@@ -16,7 +16,7 @@
 #if SHOW_MODE && TEST_MODE
 #	include <Bitmap.h>
 #	include <BitmapStream.h>
-#	include <GroupLayout.h>
+#	include <LayoutBuilder.h>
 #	include <String.h>
 #	include <View.h>
 #	include <Window.h>
@@ -123,8 +123,8 @@ main(int argc, char **argv)
 							B_AUTO_UPDATE_SIZE_LIMITS);
 						BView* view = new BView(window->Bounds(), NULL,
 							B_WILL_DRAW, B_FOLLOW_NONE);
-						window->AddChild(view);
-						window->SetLayout(new BGroupLayout(B_HORIZONTAL));
+						BLayoutBuilder::Group<>(window, B_HORIZONTAL)
+							.Add(view);
 						window->Show();
 						snooze(300000);
 						window->Lock();

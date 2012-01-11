@@ -11,9 +11,7 @@
 
 #include <Catalog.h>
 #include <CheckBox.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
-#include <SpaceLayoutItem.h>
+#include <LayoutBuilder.h>
 #include <StringView.h>
 
 #include <stdio.h>
@@ -52,10 +50,9 @@ ConfigView::ConfigView(uint32 flags)
 		B_TRANSLATE("a division of Lucasfilm Entertainment Company Ltd"));
 
 	// Build the layout
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 7)
-		.Add(fTitle)
+    BLayoutBuilder::Group<>(this, B_VERTICAL, 7)
+		.SetInsets(5)
+        .Add(fTitle)
 		.Add(fVersion)
 		.AddGlue()
 		.Add(fCopyright)
@@ -63,9 +60,7 @@ ConfigView::ConfigView(uint32 flags)
 		.AddGlue()
 		.Add(fCopyright3)
 		.Add(fCopyright4)
-		.AddGlue()
-		.SetInsets(5, 5, 5, 5)
-	);
+		.AddGlue();
 
 	BFont font;
 	GetFont(&font);

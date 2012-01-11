@@ -10,7 +10,7 @@
 #include "HVIFTranslator.h"
 
 #include <Catalog.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <String.h>
 #include <StringView.h>
 
@@ -63,15 +63,14 @@ HVIFView::HVIFView(const char* name, uint32 flags, TranslatorSettings *settings)
 	fRenderSize->SetExplicitAlignment(labelAlignment);
 
 	float padding = 5.0f;
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, padding)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, padding)
+		.SetInsets(padding)
 		.Add(title)
 		.Add(version)
 		.Add(copyright)
 		.Add(fRenderSize)
-		.AddGlue()
-		.SetInsets(padding, padding, padding, padding)
-	);
-	
+		.AddGlue();
+
  	BFont font;
  	GetFont(&font);
  	SetExplicitPreferredSize(
