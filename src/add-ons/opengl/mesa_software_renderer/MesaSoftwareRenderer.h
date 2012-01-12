@@ -103,8 +103,8 @@ private:
 									GLenum internalFormat,
 									GLuint width, GLuint height);
 		static void				_Flush(gl_context *ctx);
-		void					_SetSpanFuncs(struct msr_renderbuffer* buffer,
-									color_space colorSpace);
+		status_t				_SetupRenderBuffer(struct msr_renderbuffer*
+									buffer, color_space colorSpace);
 		static void				_DeleteBackBuffer(struct gl_renderbuffer* rb);
 
 		void					_AllocateBitmap();

@@ -180,27 +180,6 @@ extern "C" {
 	DST[BCOMP] = ((*SRC & 0x001f) << 3); \
 	DST[ACOMP] = 0xff
 #include "swrast/s_spantemp.h"
-
-/* 8-bit CMAP */
-#define NAME(PREFIX) PREFIX##_CMAP8
-#define RB_TYPE GLubyte
-#define SPAN_VARS \
-	MesaSoftwareRenderer* mr = (MesaSoftwareRenderer*)ctx->DriverCtx; \
-	const color_map* colorMap = system_colors();
-#define INIT_PIXEL_PTR(P, X, Y) \
-	GLubyte* P = ((GLubyte**) mr->GetRows())[Y] + (X)
-#define INC_PIXEL_PTR(P) P += 1
-#define STORE_PIXEL(DST, X, Y, VALUE) \
-	*DST = colorMap->index_map[( (((VALUE[BCOMP]) ) >> 3) | \
-		(((VALUE[GCOMP]) & 0xf8) << 2) | \
-		(((VALUE[RCOMP]) & 0xf8) << 7) )]
-#define FETCH_PIXEL(DST, SRC) \
-	DST[RCOMP] = (colorMap->color_list[*SRC].red); \
-	DST[GCOMP] = (colorMap->color_list[*SRC].green); \
-	DST[BCOMP] = (colorMap->color_list[*SRC].blue); \
-	DST[ACOMP] = 0xff
-#include "swrast/s_spantemp.h"
-
 }
 
 
@@ -305,65 +284,30 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView* view, ulong options,
 		sizeof(*fFrameBuffer));
 	_mesa_initialize_window_framebuffer(&fFrameBuffer->base, fVisual);
 
+	// Setup front render buffer
 	fFrontRenderBuffer = (struct msr_renderbuffer*)calloc(1,
 		sizeof(*fFrontRenderBuffer));
 	_mesa_init_renderbuffer(&fFrontRenderBuffer->base, 0);
-
 	fFrontRenderBuffer->active = true;
-	fFrontRenderBuffer->base.InternalFormat = GL_RGBA;
-	fFrontRenderBuffer->base._BaseFormat = GL_RGBA;
-	fFrontRenderBuffer->base.DataType = GL_UNSIGNED_BYTE;
-
-	switch(fColorSpace) {
-		case B_RGB32:
-#if HAIKU_MESA_VER >= 709
-			// Only in New Mesa
-			fFrontRenderBuffer->base.Format = MESA_FORMAT_XRGB8888;
-			break;
-#endif
-		case B_RGBA32:
-			fFrontRenderBuffer->base.Format = MESA_FORMAT_ARGB8888;
-			break;
-		case B_RGB24:
-			fFrontRenderBuffer->base.Format = MESA_FORMAT_ARGB8888;
-			break;
-		case B_RGB16:
-			fFrontRenderBuffer->base.Format = MESA_FORMAT_RGB565;
-			break;
-		case B_RGB15:
-		case B_RGBA15:
-			fFrontRenderBuffer->base.Format = MESA_FORMAT_ARGB1555;
-			break;
-		case B_CMAP8:
-		default:
-			fprintf(stderr, "Unsupported screen color space %d\n", fColorSpace);
-			debugger("Unsupported OpenGL color space");
-			break;
+	if (_SetupRenderBuffer(fFrontRenderBuffer, fColorSpace) != B_OK) {
+		free(fFrameBuffer);
+		_mesa_destroy_visual(fVisual);
+		return;
 	}
-
 	fFrontRenderBuffer->base.AllocStorage = _FrontRenderbufferStorage;
-	fFrontRenderBuffer->base.Data = NULL;
-
-	_SetSpanFuncs(fFrontRenderBuffer, fColorSpace);
 	_mesa_add_renderbuffer(&fFrameBuffer->base, BUFFER_FRONT_LEFT,
 		&fFrontRenderBuffer->base);
 
+	// Setup back render buffer (if needed)
 	fBackRenderBuffer = (struct msr_renderbuffer*)calloc(1,
 		sizeof(*fBackRenderBuffer));
 	if (dblFlag) {
 		_mesa_init_renderbuffer(&fBackRenderBuffer->base, 0);
 
 		fBackRenderBuffer->active = true;
+		_SetupRenderBuffer(fBackRenderBuffer, fColorSpace);
 		fBackRenderBuffer->base.AllocStorage = _BackRenderbufferStorage;
-		fBackRenderBuffer->base.Data = NULL;
 		fBackRenderBuffer->base.Delete = _DeleteBackBuffer;
-		fBackRenderBuffer->base.InternalFormat
-			= fFrontRenderBuffer->base.InternalFormat;
-		fBackRenderBuffer->base._BaseFormat
-			= fFrontRenderBuffer->base._BaseFormat;
-		fBackRenderBuffer->base.Format = fFrontRenderBuffer->base.Format;
-
-		_SetSpanFuncs(fBackRenderBuffer, fColorSpace);
 		_mesa_add_renderbuffer(&fFrameBuffer->base, BUFFER_BACK_LEFT,
 			&fBackRenderBuffer->base);
 	} else {
@@ -435,9 +379,9 @@ MesaSoftwareRenderer::LockGL()
 
 	if (cs != fColorSpace) {
 		fColorSpace = cs;
-		_SetSpanFuncs(fFrontRenderBuffer, fColorSpace);
+		_SetupRenderBuffer(fFrontRenderBuffer, fColorSpace);
 		if (fBackRenderBuffer->active)
-			_SetSpanFuncs(fBackRenderBuffer, fColorSpace);
+			_SetupRenderBuffer(fBackRenderBuffer, fColorSpace);
 	}
 
 	if (fBitmap && fNewWidth == fWidth
@@ -837,15 +781,21 @@ MesaSoftwareRenderer::_Flush(gl_context* ctx)
 }
 
 
-void
-MesaSoftwareRenderer::_SetSpanFuncs(
+status_t
+MesaSoftwareRenderer::_SetupRenderBuffer(
 	struct msr_renderbuffer* buffer, color_space colorSpace)
 {
 	if (!buffer->active)
-		return;
+		return B_OK;
+
+	buffer->base.DataType = GL_UNSIGNED_BYTE;
+	buffer->base.Data = NULL;
 
 	switch (colorSpace) {
 		case B_RGBA32:
+			buffer->base._BaseFormat = GL_RGBA;
+			buffer->base.Format = MESA_FORMAT_ARGB8888;
+
 			buffer->base.GetRow = get_row_RGBA32;
 			buffer->base.GetValues = get_values_RGBA32;
 			buffer->base.PutRow = put_row_RGBA32;
@@ -857,6 +807,14 @@ MesaSoftwareRenderer::_SetSpanFuncs(
 #endif
 			break;
 		case B_RGB32:
+			buffer->base._BaseFormat = GL_RGB;
+#if HAIKU_MESA_VER >= 709
+			// XRGB8888 only in newer Mesa
+			buffer->base.Format = MESA_FORMAT_XRGB8888;
+#else
+			buffer->base.Format = MESA_FORMAT_ARGB8888;
+#endif
+
 			buffer->base.GetRow = get_row_RGB32;
 			buffer->base.GetValues = get_values_RGB32;
 			buffer->base.PutRow = put_row_RGB32;
@@ -868,6 +826,9 @@ MesaSoftwareRenderer::_SetSpanFuncs(
 #endif
 			break;
 		case B_RGB24:
+			buffer->base._BaseFormat = GL_RGB;
+			buffer->base.Format = MESA_FORMAT_RGB888;
+
 			buffer->base.GetRow = get_row_RGB24;
 			buffer->base.GetValues = get_values_RGB24;
 			buffer->base.PutRow = put_row_RGB24;
@@ -879,6 +840,9 @@ MesaSoftwareRenderer::_SetSpanFuncs(
 #endif
 			break;
 		case B_RGB16:
+			buffer->base._BaseFormat = GL_RGB;
+			buffer->base.Format = MESA_FORMAT_RGB565;
+
 			buffer->base.GetRow = get_row_RGB16;
 			buffer->base.GetValues = get_values_RGB16;
 			buffer->base.PutRow = put_row_RGB16;
@@ -890,6 +854,9 @@ MesaSoftwareRenderer::_SetSpanFuncs(
 #endif
 			break;
 		case B_RGB15:
+			buffer->base._BaseFormat = GL_RGB;
+			buffer->base.Format = MESA_FORMAT_ARGB1555;
+
 			buffer->base.GetRow = get_row_RGB15;
 			buffer->base.GetValues = get_values_RGB15;
 			buffer->base.PutRow = put_row_RGB15;
@@ -900,22 +867,13 @@ MesaSoftwareRenderer::_SetSpanFuncs(
 			buffer->base.PutMonoValues = put_values_RGB15;
 #endif
 			break;
-		case B_CMAP8:
-			buffer->base.GetRow = get_row_CMAP8;
-			buffer->base.GetValues = get_values_CMAP8;
-			buffer->base.PutRow = put_row_CMAP8;
-			buffer->base.PutValues = put_values_CMAP8;
-#if HAIKU_MESA_VER <= 711
-			buffer->base.PutRowRGB = put_row_rgb_CMAP8;
-			buffer->base.PutMonoRow = put_mono_row_CMAP8;
-			buffer->base.PutMonoValues = put_values_CMAP8;
-#endif
-			break;
 		default:
-			fprintf(stderr, "Unsupported screen color space %d\n", fColorSpace);
+			fprintf(stderr, "Unsupported screen color space %s\n",
+				color_space_name(fColorSpace));
 			debugger("Unsupported OpenGL color space");
-			break;
+			return B_ERROR;
 	}
+	return B_OK;
 }
 
 
