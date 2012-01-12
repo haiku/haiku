@@ -1,4 +1,4 @@
-1	finnish	x-vnd.haiku-icon_o_matic	2326864078
+1	finnish	x-vnd.haiku-icon_o_matic	3736361491
 <modify path>	Icon-O-Matic-PathCmd		<muokkaa polkua>
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<ei tehdä mitään uudelleen>
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<ei mitään tehtävää>
@@ -159,6 +159,7 @@ Save	Icon-O-Matic-Menu-Settings		Tallenna
 Save Icon	Dialog title		Tallenna kuvake
 Save as…	Icon-O-Matic-Menu-File		Tallenna nimellä...
 Save changes to current icon?	Icon-O-Matic-Menu-Settings		Tallenna muutokset nykyiseen kuvakkeeseen?
+Save image	Icon-O-Matic-SavePanel		Tallenna kuva
 Saving your document failed!	Icon-O-Matic-Exporter		Asiakirjan tallentaminen epäonnistui!
 Scale	Icon-O-Matic-TransformationBoxStates		Skaalaa
 Scale X	Icon-O-Matic-PropertyNames		Skaalaa X

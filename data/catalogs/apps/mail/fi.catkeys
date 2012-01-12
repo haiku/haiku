@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-MAIL	2276629278
+1	finnish	x-vnd.Be-MAIL	35886147
 %d - Date	Mail		%d - Päivämäärä
 %e - E-mail address	Mail		%e - Sähköpostiosoite
 %e wrote:\\n	Mail		%e kirjoitti:\\n
@@ -47,6 +47,7 @@ E-mail draft could not be saved!	Mail		Sähköpostiviestiluonnosta ei voitu tall
 Edit	Mail		Muokkaa
 Edit queries…	Mail		Muokkaa kyselyjä…
 Edit signatures…	Mail		Muokkaa allekirjoituksia…
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Suljettu alue: %name% (Tyyppi: %type%)
 Encoding:	Mail		Koodaus:
 Expert	Mail		Asiantuntija
 File	Mail		Tiedosto
@@ -142,6 +143,7 @@ There is no installed handler for URL links.	Mail		Verkko-osoitelinkeille ei ole
 Title:	Mail		Otsikko:
 To:	Mail		Vastaanottaja:
 Trash	Mail		Roskakori
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding f	UTF-8
 Undo	Mail		Peru
 Unread	Mail		Lukematon
 Use default account	Mail		Käytä oletustiliä
