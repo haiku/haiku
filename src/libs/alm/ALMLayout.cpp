@@ -53,8 +53,6 @@ BALMLayout::BALMLayout(float spacing, BALMLayout* friendLayout)
 	fMinSize = kUnsetSize;
 	fMaxSize = kUnsetSize;
 	fPreferredSize = kUnsetSize;
-
-	fPerformancePath = NULL;
 }
 
 
@@ -968,30 +966,6 @@ BALMLayout::DoLayout()
 	// set the calculated positions and sizes for every area
 	for (int32 i = 0; i < CountItems(); i++)
 		AreaFor(ItemAt(i))->_DoLayout();
-}
-
-
-/**
- * Gets the path of the performance log file.
- *
- * @return the path of the performance log file
- */
-char*
-BALMLayout::PerformancePath() const
-{
-	return fPerformancePath;
-}
-
-
-/**
- * Sets the path of the performance log file.
- *
- * @param path	the path of the performance log file
- */
-void
-BALMLayout::SetPerformancePath(char* path)
-{
-	fPerformancePath = path;
 }
 
 

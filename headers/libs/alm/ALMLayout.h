@@ -54,9 +54,6 @@ public:
 			YTab*				Top() const;
 			YTab*				Bottom() const;
 
-			char*				PerformancePath() const;
-			void				SetPerformancePath(char* path);
-
 			LinearSpec*			Solver() const;
 
 			void				SetInset(float inset);
@@ -167,7 +164,6 @@ private:
 			BSize				fMinSize;
 			BSize				fMaxSize;
 			BSize				fPreferredSize;
-			char*				fPerformancePath;
 
 			float				fInset;
 			float				fSpacing;
