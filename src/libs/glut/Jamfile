@@ -9,28 +9,7 @@ if $(TARGET_PLATFORM) != haiku {
 }
 
 
-# For GCC2
-if $(HAIKU_GCC_VERSION[1]) < 3 {
-	SubDirC++Flags --no-warnings ;
-}
-
-
-MergeObject <opengl>glut.o :
-	# C++ sources
-	glutBlocker.cpp
-	glutInit.cpp
-	glutWindow.cpp
-	glutEvent.cpp
-	glutCallback.cpp
-	glutOverlay.cpp
-	glutGet.cpp
-	glutColor.cpp
-	glutCursor.cpp
-	glutMenu.cpp
-	glutDstr.cpp
-	glutGameMode.cpp
-	beos_x11.cpp
-
+local sourcesCc =
 	# C sources
 	glut_8x13.c
 	glut_9x15.c
@@ -50,4 +29,39 @@ MergeObject <opengl>glut.o :
 	glut_vidresize.c
 	glut_util.c
 	glut_ext.c
+;
+
+
+local sourcesCpp =
+	glutBlocker.cpp
+	glutInit.cpp
+	glutWindow.cpp
+	glutEvent.cpp
+	glutCallback.cpp
+	glutOverlay.cpp
+	glutGet.cpp
+	glutColor.cpp
+	glutCursor.cpp
+	glutMenu.cpp
+	glutDstr.cpp
+	glutGameMode.cpp
+	beos_x11.cpp
+;
+
+
+# For GCC2
+if $(HAIKU_GCC_VERSION[1]) < 3 {
+	SubDirC++Flags --no-warnings ;
+}
+
+
+# Ensure Mesa dependency is met
+Includes [ FGristFiles $(sourcesCc) $(sourcesCpp) ]
+	: $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+
+MergeObject <opengl>glut.o :
+	# C++ sources
+	$(sourcesCpp)
+	# C sources
+	$(sourcesCc)
 ;
