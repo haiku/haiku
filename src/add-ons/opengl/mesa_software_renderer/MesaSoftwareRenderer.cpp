@@ -366,19 +366,18 @@ MesaSoftwareRenderer::LockGL()
 
 	_mesa_make_current(fContext, &fFrameBuffer->base, &fFrameBuffer->base);
 
-	color_space cs = B_RGBA32;
+	color_space colorSpace = BScreen(GLView()->Window()).ColorSpace();
 
 	BAutolock lock(fInfoLocker);
 	if (fDirectModeEnabled && fInfo != NULL) {
-		cs = BScreen(GLView()->Window()).ColorSpace();
 		fNewWidth = fInfo->window_bounds.right
 			- fInfo->window_bounds.left + 1;
 		fNewHeight = fInfo->window_bounds.bottom
 			- fInfo->window_bounds.top + 1;
 	}
 
-	if (cs != fColorSpace) {
-		fColorSpace = cs;
+	if (fColorSpace != colorSpace) {
+		fColorSpace = colorSpace;
 		_SetupRenderBuffer(fFrontRenderBuffer, fColorSpace);
 		if (fBackRenderBuffer->active)
 			_SetupRenderBuffer(fBackRenderBuffer, fColorSpace);
