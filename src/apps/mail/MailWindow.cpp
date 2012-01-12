@@ -795,6 +795,31 @@ TMailWindow::SetTrackerSelectionToCurrent()
 
 
 void
+TMailWindow::PreserveReadingPos(bool save)
+{
+	BScrollBar *scroll = fContentView->fTextView->ScrollBar(B_VERTICAL);
+	if (scroll == NULL || fRef == NULL)
+		return;
+
+	BNode node(fRef);
+	float pos = scroll->Value();
+
+	const char* name = "MAIL:read_pos";
+	if (save) {
+		node.WriteAttr(name, B_FLOAT_TYPE, 0, &pos, sizeof(pos));
+		syslog(0, "save: %f", pos);
+		return;
+	}
+
+	if (node.ReadAttr(name, B_FLOAT_TYPE, 0, &pos, sizeof(pos)) == sizeof(pos)) {
+		Lock();
+		scroll->SetValue(pos);
+		Unlock();
+	}
+}
+
+
+void
 TMailWindow::MarkMessageRead(entry_ref* message, read_flags flag)
 {
 	BNode node(message);
@@ -809,6 +834,9 @@ TMailWindow::MarkMessageRead(entry_ref* message, read_flags flag)
 
 	// don't wait for the server write the attribute directly
 	write_read_attr(node, flag);
+
+	// preserve the read position in the node attribute
+	PreserveReadingPos(true);
 
 	BMailDaemon::MarkAsRead(account, *message, flag);
 }
@@ -1336,6 +1364,10 @@ TMailWindow::MessageReceived(BMessage *msg)
 			free(arg);
 			break;
 		}
+
+		case M_READ_POS:
+			PreserveReadingPos(false);
+			break;
 
 		case M_PRINT_SETUP:
 			PrintSetup();
@@ -2848,6 +2880,10 @@ TMailWindow::OpenMessage(const entry_ref *ref, uint32 characterSetForDecoding)
 			}
 			AddEnclosure(&msg);
 		}
+		
+		// restore the reading position if available
+		PostMessage(M_READ_POS);
+
 		PostMessage(RESET_BUTTONS);
 		fIncoming = false;
 		fDraft = true;

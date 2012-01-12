@@ -86,6 +86,7 @@ enum MENUS {
 	M_CLOSE_SAVED,
 	M_CLOSE_CUSTOM,
 	M_STATUS,
+	M_READ_POS,
 
 	// edit
 	M_SELECT,

@@ -2622,6 +2622,9 @@ TTextView::Reader::Run(void *_this)
 	}
 
 done:
+	// restore the reading position if available
+	view->Window()->PostMessage(M_READ_POS);
+
 	reader->Unlock();
 
 	delete reader;
