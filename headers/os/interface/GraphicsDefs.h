@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2012 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _GRAPHICS_DEFS_H
@@ -10,26 +10,26 @@
 
 
 // Pattern
-
 typedef struct pattern {
 	uint8 data[8];
 } pattern;
 
-#ifdef __cplusplus
 
+#ifdef __cplusplus
 inline bool
 operator==(const pattern& a, const pattern& b)
 {
 	return (*(uint64*)a.data == *(uint64*)b.data);
 }
 
+
 inline bool
 operator!=(const pattern& a, const pattern& b)
 {
 	return !(a == b);
 }
-
 #endif // __cplusplus
+
 
 extern const pattern B_SOLID_HIGH;
 extern const pattern B_MIXED_COLORS;
@@ -37,7 +37,6 @@ extern const pattern B_SOLID_LOW;
 
 
 // rgb_color
-
 typedef struct rgb_color {
 	uint8		red;
 	uint8		green;
@@ -46,7 +45,6 @@ typedef struct rgb_color {
 
 #if defined(__cplusplus)
 	// some convenient additions
-
 	inline rgb_color&
 	set_to(uint8 r, uint8 g, uint8 b, uint8 a = 255)
 	{
@@ -68,7 +66,7 @@ typedef struct rgb_color {
 	{
 		return *(const uint32 *)this != *(const uint32 *)&other;
 	}
-	
+
 	inline rgb_color&
 	operator=(const rgb_color& other)
 	{
@@ -76,6 +74,7 @@ typedef struct rgb_color {
 	}
 #endif
 } rgb_color;
+
 
 #if defined(__cplusplus)
 inline rgb_color
@@ -86,19 +85,18 @@ make_color(uint8 red, uint8 green, uint8 blue, uint8 alpha = 255)
 }
 #endif
 
+
 extern const rgb_color 	B_TRANSPARENT_COLOR;
 extern const uint8		B_TRANSPARENT_MAGIC_CMAP8;
 extern const uint16		B_TRANSPARENT_MAGIC_RGBA15;
 extern const uint16		B_TRANSPARENT_MAGIC_RGBA15_BIG;
 extern const uint32		B_TRANSPARENT_MAGIC_RGBA32;
 extern const uint32		B_TRANSPARENT_MAGIC_RGBA32_BIG;
-
 extern const uint8 		B_TRANSPARENT_8_BIT;
 extern const rgb_color	B_TRANSPARENT_32_BIT;
 
 
 // color map
-
 typedef struct color_map {
 	int32				id;
 	rgb_color			color_list[256];
@@ -108,7 +106,6 @@ typedef struct color_map {
 
 
 // overlay
-
 typedef struct overlay_rect_limits {
 	uint16				horizontal_alignment;
 	uint16				vertical_alignment;
@@ -121,6 +118,7 @@ typedef struct overlay_rect_limits {
 	uint32				reserved[8];
 } overlay_rect_limits;
 
+
 typedef struct overlay_restrictions {
 	overlay_rect_limits	source;
 	overlay_rect_limits	destination;
@@ -132,38 +130,35 @@ typedef struct overlay_restrictions {
 } overlay_restrictions;
 
 
-// screen ID
-
+// Screen ID
 struct screen_id { int32 id; };
-
 extern const struct screen_id B_MAIN_SCREEN_ID;
 
 
-// color spaces
-
+// Color spaces
 typedef enum {
 	B_NO_COLOR_SPACE	= 0x0000,
 
 	// linear color space (little endian)
-	B_RGB32				= 0x0008,	// BGR-
-	B_RGBA32			= 0x2008,	// BGRA
-	B_RGB24				= 0x0003,	// BGR
-	B_RGB16				= 0x0005,
-	B_RGB15				= 0x0010,
-	B_RGBA15			= 0x2010,
-	B_CMAP8				= 0x0004,
-	B_GRAY8				= 0x0002,
-	B_GRAY1				= 0x0001,
+	B_RGB32				= 0x0008,	// BGR-		-RGB 8:8:8:8
+	B_RGBA32			= 0x2008,	// BGRA		ARGB 8:8:8:8
+	B_RGB24				= 0x0003,	// BGR		 RGB 8:8:8
+	B_RGB16				= 0x0005,	// BGR		 RGB 5:6:5
+	B_RGB15				= 0x0010,	// BGR-		-RGB 1:5:5:5
+	B_RGBA15			= 0x2010,	// BGRA		ARGB 1:5:5:5
+	B_CMAP8				= 0x0004,	// 256 color index table
+	B_GRAY8				= 0x0002,	// 256 greyscale table
+	B_GRAY1				= 0x0001,	// Each bit represents a single pixel
 
-	// big endian version
-	B_RGB32_BIG			= 0x1008,	// -RGB
-	B_RGBA32_BIG		= 0x3008,	// ARGB
-	B_RGB24_BIG			= 0x1003,	// RGB
-	B_RGB16_BIG			= 0x1005,
-	B_RGB15_BIG			= 0x1010,
-	B_RGBA15_BIG		= 0x3010,
+	// linear color space (big endian)
+	B_RGB32_BIG			= 0x1008,	// -RGB		BGR- 8:8:8:8
+	B_RGBA32_BIG		= 0x3008,	// ARGB		BGRA 8:8:8:8
+	B_RGB24_BIG			= 0x1003,	//  RGB		BGR  8:8:8
+	B_RGB16_BIG			= 0x1005,	//  RGB		BGR  5:6:5
+	B_RGB15_BIG			= 0x1010,	// -RGB		BGR- 5:5:5:1
+	B_RGBA15_BIG		= 0x3010,	// ARGB		BGRA 5:5:5:1
 
-	// explicit little-endian for completeness
+	// linear color space (little endian, for completeness)
 	B_RGB32_LITTLE		= B_RGB32,
 	B_RGBA32_LITTLE		= B_RGBA32,
 	B_RGB24_LITTLE		= B_RGB24,
@@ -174,15 +169,16 @@ typedef enum {
 	// non linear color space -- incidently, all with 8 bits per value
 	// Note, BBitmap and BView do not support all of these!
 
-	// loss/saturation points are Y 16-235 (absolute), Cb/Cr 16-240
-	// (center 128)
+	// Loss / saturation points:
+	//  Y		16 - 235 (absolute)
+	//  Cb/Cr	16 - 240 (center 128)
 
-	B_YCbCr422			= 0x4000,	// Y0  Cb0  Y1  Cr0  Y2...
-									// Cb2 Y3  Cr2...
-	B_YCbCr411			= 0x4001,	// Cb0 Y0  Cr0  Y1  Cb4...
-									// Y2  Cr4 Y3   Y4  Y5...
-									// Y6  Y7...
-	B_YCbCr444			= 0x4003,	// Y Cb Cr
+	B_YCbCr422			= 0x4000,	// Y0  Cb0 Y1  Cr0
+									// Y2  Cb2 Y3  Cr4
+	B_YCbCr411			= 0x4001,	// Cb0 Y0  Cr0 Y1
+									// Cb4 Y2  Cr4 Y3
+									// Y4  Y5  Y6  Y7
+	B_YCbCr444			= 0x4003,	// Y   Cb  Cr
 	B_YCbCr420			= 0x4004,	// Non-interlaced only
 		// on even scan lines: Cb0  Y0  Y1  Cb2 Y2  Y3
 		// on odd scan lines:  Cr0  Y0  Y1  Cr2 Y2  Y3
@@ -194,10 +190,10 @@ typedef enum {
 
 	// Note that YUV byte order is different from YCbCr; use YCbCr, not YUV,
 	// when that's what you mean!
-	B_YUV422			= 0x4020,	// U0  Y0  V0  Y1...
-									// U2  Y2  V2  Y3...
-	B_YUV411			= 0x4021,	// U0  Y0  Y1  V0  Y2  Y3...
-									// U4  Y4  Y5  V4  Y6  Y7...
+	B_YUV422			= 0x4020,	// U0  Y0  V0  Y1
+									// U2  Y2  V2  Y3
+	B_YUV411			= 0x4021,	// U0  Y0  Y1  V0  Y2  Y3
+									// U4  Y4  Y5  V4  Y6  Y7
 	B_YUV444			= 0x4023,	// U0  Y0  V0  U1  Y1  V1
 	B_YUV420			= 0x4024,	// Non-interlaced only
 		// on even scan lines: U0  Y0  Y1  U2 Y2  Y3
@@ -232,7 +228,7 @@ typedef enum {
 	B_CMYA32			= 0xE002,	// CMYA
 	B_CMYK32			= 0xC003,	// CMYK
 
-	// compatibility declarations
+	// Compatibility declarations
 	B_MONOCHROME_1_BIT	= B_GRAY1,
 	B_GRAYSCALE_8_BIT	= B_GRAY8,
 	B_COLOR_8_BIT		= B_CMAP8,
@@ -244,15 +240,17 @@ typedef enum {
 
 
 // Bitmap Support Flags
-
 enum {
 	B_VIEWS_SUPPORT_DRAW_BITMAP			= 0x1,
 	B_BITMAPS_SUPPORT_ATTACHED_VIEWS	= 0x2,
 	B_BITMAPS_SUPPORT_OVERLAY			= 0x4
 };
+
+
 bool bitmaps_support_space(color_space space, uint32* _supportFlags);
 
-status_t get_pixel_size_for(color_space space, size_t* _pixelChunk, 
+
+status_t get_pixel_size_for(color_space space, size_t* _pixelChunk,
 	size_t* _rowAlignment, size_t* _pixelsPerChunk);
 
 
@@ -261,13 +259,13 @@ enum buffer_orientation {
 	B_BUFFER_BOTTOM_TO_TOP
 };
 
-enum buffer_layout { 
+
+enum buffer_layout {
 	B_BUFFER_NONINTERLEAVED = 1
 };
 
-		      
-// Drawing Modes
 
+// Drawing Modes
 enum drawing_mode {
 	B_OP_COPY,
 	B_OP_OVER,
@@ -282,10 +280,12 @@ enum drawing_mode {
 	B_OP_ALPHA
 };
 
+
 enum source_alpha {
 	B_PIXEL_ALPHA = 0,
 	B_CONSTANT_ALPHA
 };
+
 
 enum alpha_function {
 	B_ALPHA_OVERLAY = 0,
@@ -294,7 +294,6 @@ enum alpha_function {
 
 
 // Fixed Screen Modes
-
 enum {
 	B_8_BIT_640x480		= 0x00000001,
 	B_8_BIT_800x600		= 0x00000002,
@@ -320,8 +319,8 @@ enum {
 	B_15_BIT_1280x1024	= 0x00200000,
 	B_15_BIT_1600x1200	= 0x00400000,
 	B_15_BIT_1152x900	= 0x00800000,
-	
 	B_8_BIT_640x400		= 0x80000000
 };
+
 
 #endif	// _GRAPHICS_DEFS_H
