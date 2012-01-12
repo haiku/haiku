@@ -58,7 +58,7 @@ public:
 		SetLayout(layout);
 		layout->SetInset(10.);
 
-		layout->AddView(button1);
+		layout->AddView(button1, layout->Left(), layout->Top());
 		layout->AddViewToRight(radioButton);
 		layout->AddItemToRight(BSpaceLayoutItem::CreateGlue());
 		Area* a3 = layout->AddViewToRight(button3);
