@@ -15,14 +15,15 @@
  * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
  */
 
+
 #include "MesaSoftwareRenderer.h"
 
-#include <stdio.h>
-#include <string.h>
 #include <Autolock.h>
 #include <DirectWindowPrivate.h>
 #include <GraphicsDefs.h>
 #include <Screen.h>
+#include <stdio.h>
+#include <string.h>
 
 extern "C" {
 #include "extensions.h"
@@ -56,7 +57,9 @@ extern "C" {
 #endif
 }
 
+
 extern const char* color_space_name(color_space space);
+
 
 // BeOS component ordering for B_RGBA32 bitmap format
 #if B_HOST_IS_LENDIAN
@@ -64,20 +67,18 @@ extern const char* color_space_name(color_space space);
 #define BE_GCOMP 1
 #define BE_BCOMP 0
 #define BE_ACOMP 3
-
 #else
 // Big Endian B_RGBA32 bitmap format
 #define BE_RCOMP 1
 #define BE_GCOMP 2
 #define BE_BCOMP 3
 #define BE_ACOMP 0
-
 #endif
+
 
 /**********************************************************************/
 /*****        Read/write spans/arrays of pixels                   *****/
 /**********************************************************************/
-
 extern "C" {
 
 /* 32-bit RGBA */
@@ -89,20 +90,20 @@ extern "C" {
 	GLubyte* P = ((GLubyte**)mr->GetRows())[Y] + (X) * 4
 #define INC_PIXEL_PTR(P) P += 4
 #define STORE_PIXEL(DST, X, Y, VALUE) \
-   DST[BE_RCOMP] = VALUE[RCOMP];  \
-   DST[BE_GCOMP] = VALUE[GCOMP];  \
-   DST[BE_BCOMP] = VALUE[BCOMP];  \
-   DST[BE_ACOMP] = VALUE[ACOMP]
+	DST[BE_RCOMP] = VALUE[RCOMP];  \
+	DST[BE_GCOMP] = VALUE[GCOMP];  \
+	DST[BE_BCOMP] = VALUE[BCOMP];  \
+	DST[BE_ACOMP] = VALUE[ACOMP]
 #define STORE_PIXEL_RGB(DST, X, Y, VALUE) \
-   DST[BE_RCOMP] = VALUE[RCOMP];  \
-   DST[BE_GCOMP] = VALUE[GCOMP];  \
-   DST[BE_BCOMP] = VALUE[BCOMP];  \
-   DST[BE_ACOMP] = 255
+	DST[BE_RCOMP] = VALUE[RCOMP];  \
+	DST[BE_GCOMP] = VALUE[GCOMP];  \
+	DST[BE_BCOMP] = VALUE[BCOMP];  \
+	DST[BE_ACOMP] = 255
 #define FETCH_PIXEL(DST, SRC) \
-   DST[RCOMP] = SRC[BE_RCOMP];  \
-   DST[GCOMP] = SRC[BE_GCOMP];  \
-   DST[BCOMP] = SRC[BE_BCOMP];  \
-   DST[ACOMP] = SRC[BE_ACOMP]
+	DST[RCOMP] = SRC[BE_RCOMP];  \
+	DST[GCOMP] = SRC[BE_GCOMP];  \
+	DST[BCOMP] = SRC[BE_BCOMP];  \
+	DST[ACOMP] = SRC[BE_ACOMP]
 #include "swrast/s_spantemp.h"
 
 /* 32-bit RGB */
@@ -115,8 +116,8 @@ extern "C" {
 #define INC_PIXEL_PTR(P) P += 1
 #define STORE_PIXEL(DST, X, Y, VALUE) \
 	*DST = ( ((VALUE[RCOMP]) << 16) | \
-   			((VALUE[GCOMP]) << 8) | \
-   			((VALUE[BCOMP]) ) )
+		((VALUE[GCOMP]) << 8) | \
+		((VALUE[BCOMP]) ) )
 #define FETCH_PIXEL(DST, SRC) \
 	DST[RCOMP] = ((*SRC & 0x00ff0000) >> 16);  \
 	DST[GCOMP] = ((*SRC & 0x0000ff00) >> 8);  \
@@ -166,7 +167,7 @@ extern "C" {
 #define NAME(PREFIX) PREFIX##_RGB15
 #define RB_TYPE GLubyte
 #define SPAN_VARS \
-        MesaSoftwareRenderer* mr = (MesaSoftwareRenderer*)ctx->DriverCtx;
+	MesaSoftwareRenderer* mr = (MesaSoftwareRenderer*)ctx->DriverCtx;
 #define INIT_PIXEL_PTR(P, X, Y) \
 	GLushort* P = (GLushort*)(((GLubyte**)mr->GetRows())[Y] + (X) * 2)
 #define INC_PIXEL_PTR(P) P += 1
@@ -423,7 +424,7 @@ MesaSoftwareRenderer::SwapBuffers(bool VSync)
 			GLView()->UnlockLooper();
 		}
 	} else {
-		// TODO: Here the BGLView needs to be drawlocked.		
+		// TODO: Here the BGLView needs to be drawlocked.
 		_CopyToDirect();
 	}
 
