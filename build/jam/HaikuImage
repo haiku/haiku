@@ -73,18 +73,18 @@ SYSTEM_APPS = AboutSystem ActivityMonitor $(X86_ONLY)BootManager CharacterMap
 ;
 SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations
 	<preference>Deskbar E-mail FileTypes Fonts Keyboard Keymap Locale Media
-	Mouse Network Notifications OpenGL Printers Screen ScreenSaver Shortcuts
-	Sounds Time Touchpad <preference>Tracker VirtualMemory
+	Mouse Network Notifications $(X86_ONLY)OpenGL Printers Screen ScreenSaver
+	Shortcuts Sounds Time Touchpad <preference>Tracker VirtualMemory
 ;
-SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo GLTeapot
-	$(HAIKU_INCLUDE_TRADEMARKS)Haiku3d Mandelbrot OverlayImage Pairs Playground
-	Pulse Sudoku
+SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo $(X86_ONLY)GLTeapot
+	$(HAIKU_INCLUDE_TRADEMARKS)$(X86_ONLY)Haiku3d Mandelbrot OverlayImage Pairs
+	Playground Pulse Sudoku
 ;
 SYSTEM_LIBS =
 	libbe.so libbsd.so libbnetapi.so
 	libdebug.so libdevice.so
 	libfreetype.so
-	libgame.so libGL.so libgnu.so
+	libgame.so $(X86_ONLY)libGL.so libgnu.so
 	libjpeg.so
 	liblocale.so
 	libmail.so libmedia.so libmidi.so libmidi2.so
@@ -158,7 +158,7 @@ SYSTEM_ADD_ONS_PRINT_TRANSPORT = HP\ JetDirect IPP LPR
 	# Parallel\ Port
 	Print\ To\ File Serial\ Port USB\ Port
 ;
-SYSTEM_ADD_ONS_SCREENSAVERS = Butterfly DebugNow Flurry
+SYSTEM_ADD_ONS_SCREENSAVERS = Butterfly DebugNow $(X86_ONLY)Flurry
 	$(HAIKU_INCLUDE_TRADEMARKS)Haiku Icons IFS Leaves Message Spider ;
 SYSTEM_ADD_ONS_DRIVERS_AUDIO = auich auvia echo3g emuxki hda sis7018 ;
 SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD = ; #cmedia usb_audio ;
@@ -587,8 +587,10 @@ AddBootModuleSymlinksToHaikuImage
 # add-ons
 AddFilesToHaikuImage system add-ons accelerants
 	: $(SYSTEM_ADD_ONS_ACCELERANTS) ;
-AddFilesToHaikuHybridImage system add-ons opengl
-	: Mesa\ Software\ Renderer : : true ;
+if $(TARGET_ARCH) = x86 {
+	AddFilesToHaikuHybridImage system add-ons opengl
+		: Mesa\ Software\ Renderer : : true ;
+}
 AddFilesToHaikuHybridImage system add-ons Translators
 	: $(SYSTEM_ADD_ONS_TRANSLATORS) : : true ;
 AddFilesToHaikuImage system add-ons locale catalogs
@@ -709,8 +711,10 @@ CopyDirectoryToHaikuImage develop sample-code
 	: pdflib : -x .svn ;
 
 # Copy Mesa3D GL headers into image
-CopyDirectoryToHaikuImage develop headers os opengl
-	: [ FDirName $(HAIKU_MESA_HEADERS) GL ] : : -x .svn ;
+if $(TARGET_ARCH) = x86 {
+	CopyDirectoryToHaikuImage develop headers os opengl
+		: [ FDirName $(HAIKU_MESA_HEADERS) GL ] : : -x .svn ;
+}
 
 #pragma mark - Optional Packages
 
