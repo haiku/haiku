@@ -711,8 +711,8 @@ bool
 connector_is_dp(uint32 connectorIndex)
 {
 	if (gConnector[connectorIndex]->type == VIDEO_CONNECTOR_DP
-		|| gConnector[connectorIndex]->type != VIDEO_CONNECTOR_EDP
-		|| gConnector[connectorIndex]->encoder.isDPBridge == false) {
+		|| gConnector[connectorIndex]->type == VIDEO_CONNECTOR_EDP
+		|| gConnector[connectorIndex]->encoder.isDPBridge == true) {
 		return true;
 	}
 	return false;
