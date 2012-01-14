@@ -10,8 +10,6 @@
  *		Mikael Eiman, mikael@eiman.tv
  *		Pier Luigi Fiorini, pierluigi.fiorini@gmail.com
  */
-
-
 #include "NotificationWindow.h"
 
 #include <algorithm>
@@ -21,7 +19,6 @@
 #include <Catalog.h>
 #include <File.h>
 #include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
 #include <Layout.h>
 #include <NodeMonitor.h>
 #include <Path.h>
@@ -30,6 +27,7 @@
 
 #include "AppGroupView.h"
 #include "AppUsage.h"
+
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "NotificationWindow"
@@ -214,6 +212,29 @@ NotificationWindow::MessageReceived(BMessage* message)
 				fViews.erase(it);
 
 			_ResizeAll();
+			break;
+		}
+		case kRemoveGroupView:
+		{
+			AppGroupView* view = NULL;
+			if (message->FindPointer("view", (void**)&view) != B_OK)
+				return;
+
+			// It's possible that between sending this message, and us receiving
+			// it, the view has become used again, in which case we shouldn't
+			// delete it.
+			if (view->HasChildren())
+				return;
+
+			// this shouldn't happen
+			if (fAppViews.erase(view->Group()) < 1)
+				break;
+
+			if (GetLayout()->RemoveView(view))
+				delete view;
+
+			if (fAppViews.size() == 0)
+				Hide();
 			break;
 		}
 		default:

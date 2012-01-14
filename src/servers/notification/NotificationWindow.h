@@ -37,6 +37,9 @@ extern const float kCloseSize;
 extern const float kExpandSize;
 extern const float kPenSize;
 
+const uint32 kRemoveGroupView = 'RGVi';
+
+
 class NotificationWindow : public BWindow {
 public:
 									NotificationWindow();

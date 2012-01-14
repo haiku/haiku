@@ -156,10 +156,7 @@ AppGroupView::Draw(BRect updateRect)
 	void
 AppGroupView::MouseDown(BPoint point)
 {
-	bool changed = false;
 	if (fCloseRect.Contains(point)) {
-		changed = true;
-
 		int32 children = fInfo.size();
 		for (int32 i = 0; i < children; i++) {
 			GetLayout()->RemoveView(fInfo[i]);
@@ -169,7 +166,7 @@ AppGroupView::MouseDown(BPoint point)
 		fInfo.clear();
 
 		// Remove ourselves from the parent view
-		BMessage message(kRemoveView);
+		BMessage message(kRemoveGroupView);
 		message.AddPointer("view", this);
 		fParent->PostMessage(&message);
 	}
@@ -188,17 +185,10 @@ AppGroupView::MouseDown(BPoint point)
 					fInfo[i]->Show();
 			}
 		}
-		changed = true;
+
 		Invalidate(); // Need to redraw the collapse indicator and title
-
-		BMessage message(kRemoveView);
-			// Do not actually remive anything, but update size
-		fParent->PostMessage(&message);
 	}
 
-	if (changed) {
-		_ResizeViews();
-	}
 }
 
 
@@ -263,6 +253,13 @@ AppGroupView::AddInfo(NotificationView* view)
 		Show();
 	if (view->IsHidden() && !fCollapsed)
 		view->Show();
+}
+
+
+const BString&
+AppGroupView::Group() const
+{
+	return fLabel;
 }
 
 

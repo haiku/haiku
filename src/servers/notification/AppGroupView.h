@@ -32,6 +32,8 @@ public:
 
 			void				AddInfo(NotificationView* view);
 
+			const BString&		Group() const;
+
 private:
 			void				_ResizeViews();
 
