@@ -203,17 +203,22 @@ AppGroupView::MessageReceived(BMessage* msg)
 				return;
 
 			infoview_t::iterator vIt = find(fInfo.begin(), fInfo.end(), view);
+			if (vIt == fInfo.end())
+				break;
 
-			if (vIt != fInfo.end()) {
-				fInfo.erase(vIt);
-				GetLayout()->RemoveView(view);
-				delete view;
+			fInfo.erase(vIt);
+			GetLayout()->RemoveView(view);
+			delete view;
+
+			fParent->PostMessage(msg);
+
+			if (!this->HasChildren()) {
+				Hide();
+				BMessage removeSelfMessage(kRemoveGroupView);
+				removeSelfMessage.AddPointer("view", this);
+				fParent->PostMessage(&removeSelfMessage);
 			}
-
-			_ResizeViews();
-
-			if (Window() != NULL)
-				Window()->PostMessage(msg);
+			
 			break;
 		}
 		default:
@@ -260,28 +265,6 @@ const BString&
 AppGroupView::Group() const
 {
 	return fLabel;
-}
-
-
-void
-AppGroupView::_ResizeViews()
-{
-	int32 children = fInfo.size();
-
-	if (!fCollapsed) {
-		for (int32 i = 0; i < children; i++) {
-			if (fInfo[i]->IsHidden())
-				fInfo[i]->Show();
-		}
-	} else {
-		for (int32 i = 0; i < children; i++)
-			if (!fInfo[i]->IsHidden())
-				fInfo[i]->Hide();
-	}
-
-	if (!IsHidden() && !HasChildren())
-		Hide();
-	fParent->Layout(true);
 }
 
 

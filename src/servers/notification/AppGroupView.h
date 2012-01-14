@@ -35,8 +35,6 @@ public:
 			const BString&		Group() const;
 
 private:
-			void				_ResizeViews();
-
 			BString				fLabel;
 			NotificationWindow*	fParent;
 			infoview_t			fInfo;
