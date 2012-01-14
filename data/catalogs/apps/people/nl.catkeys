@@ -1,26 +1,38 @@
-1	dutch; flemish	x-vnd.Be-PEPL	1427985968
+1	dutch; flemish	x-vnd.Be-PEPL	2993050801
 Edit	People		Aanpassen
+Error	People		Fout
 City	People		Stad
+The file '%name%' could not be written.	People		Het bestand '%name%' kon niet weggeschreven worden.
 none	Groups list		geen
+Configure attributes	People		Attributen configureren
 Company	People		Bedrijf
+%name% picture	People		afbeelding %name%
 Work phone	People		Telefoon werk
+People	System name		People
 New person	People		Nieuw persoon
 Select all	People		Alles selecteren
 File	People		Bestand
+Unnamed person	People		Naamloze persoon
+Could not create %s.	People		%s kon niet aangemaakt worden.
 Country	People		Land
 Close	People		Afsluiten
 Group	People		Groep
+Nickname	People		Bijnaam
 Quit	People		Afsluiten
 Name	People		Naam
 Revert	People		Omkeren
 Undo	People		Ongedaan maken
 E-mail	People		E-mail
 Save changes before quitting?	People		Veranderingen opslaan voordat u afsluit?
+Load image…	People		Afbeelding laden...
 OK	People		Oké
+Remove image	People		Afbeelding verwijderen
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Het starten van het Bestandstypespreflet om de attributen van de persoon in te stellen is mislukt.\n\nFout:
 Home phone	People		Telefoon thuis
 Save as…	People		Opslaan als...
 Redo	People		Opnieuw uitvoeren
 Paste	People		Plakken
+Drop an image here,\nor use the contextual menu.	People		Sleep hier een afbeelding naar toe,\nof gebruik het contextmenu.
 Save	People		Opslaan
 Person	Short mimetype description		Persoon
 New person…	People		Nieuw persoon...
@@ -30,6 +42,7 @@ Sorry	People		Sorry
 Zip	People		Postcode
 Contact information for a person.	Long mimetype description		Contactinfo voor een persoon.
 Fax	People		Fax
+Contact name	People		Naam van de contactpersoon
 Cut	People		Knippen
 Cancel	People		Annuleren
 State	People		Provincie

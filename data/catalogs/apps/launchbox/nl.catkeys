@@ -19,7 +19,7 @@ Cancel	LaunchBox		Annuleren
 Remove button	LaunchBox		Knop verwijderen
 Horizontal layout	LaunchBox		Horizontale lay-out
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nHet starten van de applicatie met handtekening '%2' is mislukt.\n\nFout:
-Failed to launch '%1'.\n\nError:	LaunchBox		zie vorige
+Failed to launch '%1'.\n\nError:	LaunchBox		Het starten van '%1' is mislukt.\n\nFout:
 Name Panel	LaunchBox		Naampaneel
 Add button here	LaunchBox		Voeg hier knop toe
 Description for '%3'	LaunchBox		Beschrijving voor '%3'

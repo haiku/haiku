@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-CharacterMap	1545664922
+1	belarusian	x-vnd.Haiku-CharacterMap	2745781253
 Enclosed alphanumerics	UnicodeBlocks		Закрытыя літары і лічбы
 Basic Latin	UnicodeBlocks		Простая лацінка
 View	CharacterWindow		Від
@@ -40,6 +40,7 @@ Tagbanwa	UnicodeBlocks		Тагбанва
 Kanbun	UnicodeBlocks		Канбун
 Syriac	UnicodeBlocks		Сірыйскія
 CJK compatibility ideographs Supplement	UnicodeBlocks		CJK сумяшчальныя іерогліфы Дапаўненне
+Musical symbols	UnicodeBlocks		Музычныя сімвалы
 Hangul syllables	UnicodeBlocks		Склады Хангул
 Coptic	UnicodeBlocks		Коптскі
 Tai Le	UnicodeBlocks		Тай Ле

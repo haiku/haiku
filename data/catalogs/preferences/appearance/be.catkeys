@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Appearance	2018849951
+1	belarusian	x-vnd.Haiku-Appearance	2547306525
 Control highlight	Colors tab		Выдзяленне кнопак
 Control border	Colors tab		Аблямоўка кнопак
 Antialiasing type:	AntialiasingSettingsView		Тып згладжвання
@@ -12,6 +12,7 @@ Off	AntialiasingSettingsView		Выкл.
 Choose Decorator	DecorSettingsView		Абраць Дэкаратар
 Success	Colors tab		Паспяхова
 Inactive window tab text	Colors tab		Тэкст неактыўнай укладкі вакна
+About Decorator	DecorSettingsView		Пра Decorator
 Failure	Colors tab		Непаспяхова
 Hinting menu	AntialiasingSettingsView		Меню хінтынгу
 Window Decorator	APRWindow		Дэкаратар Вакон

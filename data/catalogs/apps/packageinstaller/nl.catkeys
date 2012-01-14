@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-PackageInstaller	3054356223
+1	dutch; flemish	x-vnd.Haiku-PackageInstaller	1396489627
 Install to:	PackageView		Installeren naar:
 OK	PackageView		OK
 Accept	PackageTextViewer		Akkoord
@@ -8,5 +8,51 @@ Image not loaded correctly	PackageImageViewer		De afbeelding werd niet correct g
 Install 	PackageView		Installeren
 No package selected.	PackageInfo		Geen pakket geselecteerd.
 Install	PackageView		Installeren
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Het gegeven pakket lijkt al geïnstalleerd te zijn op uw systeem. Wil je het aanwezige pakket verwijderen en de installatie voortzetten?
+Do you want to remember this decision for the rest of this installation?\n	PackageView		Wil je deze keuze laten onthouden voor de rest van de installatie?\n
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Er lijkt een bestandsgrootte in het pakket niet overeen te komen. Mogelijks is het pakket beschadigd of werd het gewijzigd na het aanmaken. Wil je nog steeds verdergaan?
+Error while installing the package\n	PackageView		Fout tijdens het installeren van het pakket\n
+Disclaimer	PackageTextViewer		Afwijzing van verantwoordelijkheid
+%.1f GiB	PackageView		%.1f GiB
+The installation of the package has been aborted.	PackageView		De installatie van het pakket is afgebroken.
+Done	PackageInstall		Gereed
+All existing files will be replaced?	PackageView		Alle bestaande bestanden zullen vervangen worden?
+Preparing package	PackageInstall		Het pakket wordt voorbereid
+No package available.	PackageInfo		Er is geen pakket beschikbaar.
+none	PackageView		geen
+Stop	PackageStatus		Stoppen
+Other…	PackageView		Overige…
+No installation type selected	PackageView		Er is geen installatietype geselecteerd
+The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		De symbolische koppeling met de naam '%s' bestaad reeds op de gegeven locatie.\nWilt u die koppeling vervangen door de koppeling van dit pakket of deze overslaan?
+Installing files and folders	PackageInstall		Bestanden en mappen worden geïnstalleerd
+Package installer	PackageView		Pakketinstallatieprogramma
+Skip all	PackageView		Alles overslaan
+The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Het item met de naam '%s' bestaat reeds op de gegeven locatie.\nWilt u dat item vervangen met het item van dit pakket of het overslaan?
+The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Het script met de naam '%s' bestaat reeds op de gegeven locatie.\nWilt u dat script vervangen met het script van dit pakket of het overslaan?
+Running post-installation scripts	PackageInstall		Post-installatiescripts worden uitgevoerd
+%llu bytes	PackageView		%llu bytes
+Skip	PackageView		Overslaan
+%.1f MiB	PackageView		%.1f MiB
+The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		De map met de naam '%s' bestaat reeds op de gegeven locatie.\nWilt u die map vervangen door de map van dit pakket of deze overslaan?
+The package you requested has been successfully installed on your system.	PackageView		Het pakket dat u opvroeg werd succesvol op uw systeem geïnstalleerd.
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Fout! \"%s\" is geen geldige bestandslocatie.\n
+Installation type:	PackageView		Installatietype:
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Fout (%s)! \"%s\" kon niet geopend worden.\n
+Finishing installation	PackageInstall		Installatie wordt afgerond
+Installing package	PackageStatus		Het pakket wordt geïnstalleerd
+Ask again	PackageView		Opnieuw vragen
+Abort	PackageView		Afbreken
+Replace all	PackageView		Alles vervangen
+Decline	PackageTextViewer		Afwijzen
+The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Het bestand met de naam '%s' bestaat al op de gegeven locatie.\nWilt u dat bestand vervangen door het bestand van dit pakket of het overslaan?
+All existing files will be skipped?	PackageView		Alle bestaande bestanden zullen overgeslaan worden?
 Continue	PackageInfo		Doorgaan
+%.1f KiB	PackageView		%.1f KiB
+(%s free)	PackageView		(%s vrij)
+Abort	PackageInfo		Afbreken
+PackageInstaller	System name		PackageInstaller
+Abort	PackageInstall		Afbreken
 Continue	PackageTextViewer		Doorgaan
+Replace	PackageView		Vervangen
+Installation progress	PackageView		Voortgang van de installatie
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Het pakket is niet leesbaar.\nEen van de mogelijke redenen is dat het gevraagde pakket geen geldig BeOS .pkg-pakket is.

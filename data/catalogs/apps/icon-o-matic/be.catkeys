@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.haiku-icon_o_matic	2326864078
+1	belarusian	x-vnd.haiku-icon_o_matic	3736361491
 Select All	Icon-O-Matic-PathManipulator		Выбраць Усё
 Add Style	Icon-O-Matic-AddStylesCmd		Дадаць Стыль
 Color (#%02x%02x%02x)	Style name after dropping a color		Колер (#%02x%02x%02x)
@@ -158,6 +158,7 @@ Snap to grid	Icon-O-Matic-Menu-Settings		Прыляпіць да сеткі
 Remove	Icon-O-Matic-ShapesList		Выдаліць
 Yes	Icon-O-Matic-StyledTextImport		Так
 Transformation	Icon-O-Matic-TransformersList		Трасфармацыя
+Save image	Icon-O-Matic-SavePanel		Захаваць выяву
 Add Styles	Icon-O-Matic-AddStylesCmd		Дадаць Стылі
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		Выдаліць Кантрольныя Кропкі
 Format	Icon-O-Matic-SavePanel		Фармат

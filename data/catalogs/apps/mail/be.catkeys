@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-MAIL	1835398254
+1	belarusian	x-vnd.Be-MAIL	1411133407
 View	Mail		Агляд
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Атрыбуты ўкладання:
@@ -15,6 +15,7 @@ helpful message	Mail		Карыснае паведамленне
 Colored quotes:	Mail		Каляровыя цытаты:
 Subject:	Mail		Тэма:
 Reply to all	Mail		Адкзаць усім
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Укладанне: %name% (Тып: %type%)
 Show icons & labels	Mail		Паказваць значкі і подпісы
 Remove attachment	Mail		Выдаліць укладанне
 Button bar:	Mail		Панэль кнопак:
@@ -63,6 +64,7 @@ Warn unencodable:	Mail		Правяраць кадоўку:
 Quit	Mail		Выйсці
 %n - Full name	Mail		%n - Поўнае імя
  Read 	Mail		Чытаць
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	cp1251
 Trash	Mail		Сметніца
 Default account:	Mail		Прадвызначаны акаунт:
 Size:	Mail		Памер:

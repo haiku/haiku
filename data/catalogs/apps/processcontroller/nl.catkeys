@@ -1,33 +1,48 @@
-1	dutch; flemish	x-vnd.Haiku-ProcessController	2585863409
+1	dutch; flemish	x-vnd.Haiku-ProcessController	2887520383
 Memory usage	ProcessController		Geheugengebruik
 Do you really want to kill the team \"%s\"?	ProcessController		Wilt u echt team \"%s\" afbreken?
+Idle priority	ProcessController		Inactieve prioriteit
 Restart Deskbar	ProcessController		Deskbar herstarten
+Custom priority	ProcessController		Aangepaste prioriteit
 Debug thread	ProcessController		Thread debuggen
 This team is already gone…	ProcessController		Dit team is al verdwenen...
 Error saving file	ProcessController		Fout bij bestandsopslag
+Real-time priority	ProcessController		Real-time prioriteit
+Your setting file could not be saved!\n(%s)	ProcessController		Uw instellingenbestand kon niet opgeslagen worden!\n(%s)
 This thread is already gone…	ProcessController		Deze thread is al weg...
 Cancel	ProcessController		Annuleren
+Display priority	ProcessController		Weergave prioriteit
 Run in window	ProcessController		Actief in venster
 Processor %d	ProcessController		Processor %d
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 ProcessController is already installed in Deskbar.	ProcessController		ProcessController is al in Deskbar geïnstalleerd.
 This is the last active processor...\nYou can't turn it off!	ProcessController		Dit is de laatste actieve processor...\nU kunt hem niet uitschakelen!
+Info	ProcessController		Informatie
 Quit application	ProcessController		Toepassing afsluiten
+Low priority	ProcessController		Lage prioriteit
 What do you want to do with the thread \"%s\"?	ProcessController		Wat wilt u met de thread doen?
 Gone teams…	ProcessController		Verdwenen teams...
+Lowest active priority	ProcessController		Laagste actieve prioriteit
 Restart Tracker	ProcessController		Tracker herstarten
 Live in the Deskbar	ProcessController		Actief in Deskbar
 Kill this thread!	ProcessController		Thread afbreken!
 Debug this thread!	ProcessController		Deze thread debuggen!
+Normal priority	ProcessController		Normale prioriteit
 New Terminal	ProcessController		Nieuwe Terminal
+Urgent priority	ProcessController		Dringende prioriteit
 About ProcessController…	ProcessController		Over ProcessController...
 Ok!	ProcessController		Oké!
 Quit an application	ProcessController		Een toepassing afsluiten
 Install in Deskbar	ProcessController		Installeren in Deskbar
 Threads and CPU usage	ProcessController		Threads en CPU-gebruik
+Urgent display priority	ProcessController		Dringende weergave prioriteit
 OK	ProcessController		Oké
 Damned!	ProcessController		Verdomme!
 Usage: %s [-deskbar]\n	ProcessController		Gebruik: %s [-deskbar]\n
+ProcessController	System name		ProcessController
+Real-time display priority	ProcessController		Real-time weergave prioriteit
+Please confirm	ProcessController		Gelieve te bevestigen
 Yes, kill this team!	ProcessController		Ja, breek dit team af!
+System resources & caches…	ProcessController		Systeembronnen en -caches...
 That's no Fun!	ProcessController		Da's niet Leuk!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		U kunt ProcessController in een venster actief hebben, of in Deskbar installeren.
