@@ -226,6 +226,7 @@ static const Translation gTranslations[] =
 		"Aras Ergus\n"
 	},
 	{ "uk",
+		"Mariya Pilipchuk\n"
 		"Alex Rudyk - totish\n"
 		"Oleg Varunok\n"
 	},
@@ -1133,8 +1134,10 @@ AboutView::_CreateCreditsView()
 		"Pahtz\n"
 		"Michael Paine\n"
 		"Adrian Panasiuk\n"
+		"Aleksas Pantechovskis\n"
 		"Romain Picard\n"
 		"Francesco Piccinno\n"
+		"Peter Poláčik\n"
 		"David Powell\n"
 		"Jeremy Rand\n"
 		"Hartmut Reh\n"
