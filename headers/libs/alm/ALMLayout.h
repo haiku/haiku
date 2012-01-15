@@ -150,8 +150,7 @@ private:
 			float				InsetForTab(XTab* tab);
 			float				InsetForTab(YTab* tab);
 
-			/*! Add a view without initialize the Area. */
-			BLayoutItem*		_CreateLayoutItem(BView* view);
+			BLayoutItem*		_LayoutItemToAdd(BView* view);
 
 			void				_UpdateAreaConstraints();
 

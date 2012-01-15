@@ -451,10 +451,11 @@ Area*
 BALMLayout::AddView(BView* view, XTab* left, YTab* top, XTab* right,
 	YTab* bottom)
 {
-	BLayoutItem* item = _CreateLayoutItem(view);
+	BLayoutItem* item = _LayoutItemToAdd(view);
 	Area* area = AddItem(item, left, top, right, bottom);
 	if (!area) {
-		delete item;
+		if (item != view->GetLayout())
+			delete item;
 		return NULL;
 	}
 	return area;
@@ -472,10 +473,11 @@ BALMLayout::AddView(BView* view, XTab* left, YTab* top, XTab* right,
 Area*
 BALMLayout::AddView(BView* view, Row* row, Column* column)
 {
-	BLayoutItem* item = _CreateLayoutItem(view);
+	BLayoutItem* item = _LayoutItemToAdd(view);
 	Area* area = AddItem(item, row, column);
 	if (!area) {
-		delete item;
+		if (item != view->GetLayout())
+			delete item;
 		return NULL;
 	}
 	return area;
@@ -485,10 +487,11 @@ BALMLayout::AddView(BView* view, Row* row, Column* column)
 Area*
 BALMLayout::AddViewToRight(BView* view, XTab* right, YTab* top, YTab* bottom)
 {
-	BLayoutItem* item = _CreateLayoutItem(view);
+	BLayoutItem* item = _LayoutItemToAdd(view);
 	Area* area = AddItemToRight(item, right, top, bottom);
 	if (!area) {
-		delete item;
+		if (item != view->GetLayout())
+			delete item;
 		return NULL;
 	}
 	return area;
@@ -498,10 +501,11 @@ BALMLayout::AddViewToRight(BView* view, XTab* right, YTab* top, YTab* bottom)
 Area*
 BALMLayout::AddViewToLeft(BView* view, XTab* left, YTab* top, YTab* bottom)
 {
-	BLayoutItem* item = _CreateLayoutItem(view);
+	BLayoutItem* item = _LayoutItemToAdd(view);
 	Area* area = AddItemToLeft(item, left, top, bottom);
 	if (!area) {
-		delete item;
+		if (item != view->GetLayout())
+			delete item;
 		return NULL;
 	}
 	return area;
@@ -511,10 +515,11 @@ BALMLayout::AddViewToLeft(BView* view, XTab* left, YTab* top, YTab* bottom)
 Area*
 BALMLayout::AddViewToTop(BView* view, YTab* top, XTab* left, XTab* right)
 {
-	BLayoutItem* item = _CreateLayoutItem(view);
+	BLayoutItem* item = _LayoutItemToAdd(view);
 	Area* area = AddItemToTop(item, top, left, right);
 	if (!area) {
-		delete item;
+		if (item != view->GetLayout())
+			delete item;
 		return NULL;
 	}
 	return area;
@@ -524,10 +529,11 @@ BALMLayout::AddViewToTop(BView* view, YTab* top, XTab* left, XTab* right)
 Area*
 BALMLayout::AddViewToBottom(BView* view, YTab* bottom, XTab* left, XTab* right)
 {
-	BLayoutItem* item = _CreateLayoutItem(view);
+	BLayoutItem* item = _LayoutItemToAdd(view);
 	Area* area = AddItemToBottom(item, bottom, left, right);
 	if (!area) {
-		delete item;
+		if (item != view->GetLayout())
+			delete item;
 		return NULL;
 	}
 	return area;
@@ -1074,8 +1080,10 @@ BALMLayout::InsetForTab(YTab* tab)
 
 
 BLayoutItem*
-BALMLayout::_CreateLayoutItem(BView* view)
+BALMLayout::_LayoutItemToAdd(BView* view)
 {
+	if (view->GetLayout())
+		return view->GetLayout();
 	return new(std::nothrow) BViewLayoutItem(view);
 }
 
