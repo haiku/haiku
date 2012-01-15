@@ -172,7 +172,6 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	fSent(false),
 	fDraft(false),
 	fChanged(false),
-	fStartingText(NULL),
 	fOriginatingWindow(NULL),
 	fReadButton(NULL),
 	fNextButton(NULL),
@@ -1687,9 +1686,6 @@ TMailWindow::QuitRequested()
 			|| strlen(fHeaderView->fSubject->Text())
 			|| (fHeaderView->fCc && strlen(fHeaderView->fCc->Text()))
 			|| (fHeaderView->fBcc && strlen(fHeaderView->fBcc->Text()))
-			|| (strlen(fContentView->fTextView->Text()) && (!fStartingText
-				|| (fStartingText
-					&& strcmp(fContentView->fTextView->Text(), fStartingText))))
 			|| (fEnclosuresView != NULL
 				&& fEnclosuresView->fList->CountItems()))) {
 		if (fResending) {
@@ -2791,10 +2787,6 @@ TMailWindow::OpenMessage(const entry_ref *ref, uint32 characterSetForDecoding)
 	delete fRef;
 	fRef = new entry_ref(*ref);
 
-	if (fStartingText) {
-		free(fStartingText);
-		fStartingText = NULL;
-	}
 	fPrevTrackerPositionSaved = false;
 	fNextTrackerPositionSaved = false;
 

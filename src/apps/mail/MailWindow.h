@@ -200,7 +200,6 @@ class TMailWindow : public BWindow {
 				static BList	sWindowList;
 				static BLocker	sWindowListLock;
 		
-				char*			fStartingText;	
 				entry_ref		fRepliedMail;
 				BMessenger*		fOriginatingWindow;
 				
