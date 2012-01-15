@@ -807,7 +807,6 @@ TMailWindow::PreserveReadingPos(bool save)
 	const char* name = "MAIL:read_pos";
 	if (save) {
 		node.WriteAttr(name, B_FLOAT_TYPE, 0, &pos, sizeof(pos));
-		syslog(0, "save: %f", pos);
 		return;
 	}
 
