@@ -702,6 +702,13 @@ TContentView::MessageReceived(BMessage *msg)
 
 		case M_SIGNATURE:
 		{
+			if (fTextView->IsReaderThreadRunning()) {
+				// Do not add the signature until the reader thread
+				// is finished. Resubmit the message for later processing
+				Window()->PostMessage(msg);
+				break;
+			}
+
 			entry_ref ref;
 			msg->FindRef("ref", &ref);
 
@@ -727,21 +734,23 @@ TContentView::MessageReceived(BMessage *msg)
 				const char *text = fTextView->Text();
 				int32 length = fTextView->TextLength();
 
-				if (length && text[length - 1] != '\n') {
-					fTextView->Select(length, length);
+				// reserve some empty lines before the signature
+				const char* newLines = "\n\n\n\n";
+				if (length && text[length - 1] == '\n')
+					newLines++;
 
-					char newLine = '\n';
-					fTextView->Insert(&newLine, 1);
+				fTextView->Select(length, length);
+				fTextView->Insert(newLines, strlen(newLines));
+				length += strlen(newLines);
 
-					length++;
-				}
-
+				// append the signature
 				fTextView->Select(length, length);
 				fTextView->Insert(signature, bytesRead);
 				fTextView->Select(length, length + bytesRead);
 				fTextView->ScrollToSelection();
 
-				fTextView->Select(start, finish);
+				// set the editing cursor position
+				fTextView->Select(length - 2 , length - 2);
 				fTextView->ScrollToSelection();
 				free (signature);
 			} else {
@@ -2083,6 +2092,20 @@ TTextView::StopLoad()
 	}
 
 	Window()->Lock();
+}
+
+
+bool
+TTextView::IsReaderThreadRunning()
+{
+	if (fThread == 0)
+		return false;
+
+	thread_info info;
+	for (int i = 5; i > 0; i--, usleep(100000))
+		if (get_thread_info(fThread, &info) != B_OK)
+			return false;
+	return true;
 }
 
 

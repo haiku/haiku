@@ -534,22 +534,15 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 			// If we find the named query, add it to the text.
 			BEntry entry;
 			if (query.GetNextEntry(&entry) == B_NO_ERROR) {
-				off_t size;
 				BFile file;
 				file.SetTo(&entry, O_RDWR);
 				if (file.InitCheck() == B_NO_ERROR) {
-					file.GetSize(&size);
-					char *str = (char *)malloc(size);
-					size = file.Read(str, size);
+					entry_ref ref;
+					entry.GetRef(&ref);
 
-					fContentView->fTextView->Insert(str, size);
-					fContentView->fTextView->GoToLine(0);
-					fContentView->fTextView->ScrollToSelection();
-
-					fStartingText = (char *)malloc(size
-						= strlen(fContentView->fTextView->Text()) + 1);
-					if (fStartingText != NULL)
-						strcpy(fStartingText, fContentView->fTextView->Text());
+					BMessage msg(M_SIGNATURE);
+					msg.AddRef("ref", &ref);
+					PostMessage(&msg);
 				}
 			} else {
 				char tempString [2048];
