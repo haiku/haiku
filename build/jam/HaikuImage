@@ -60,7 +60,8 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bzip2
 	tput tr traceroute translate trash true truncate tsort tty
 	uname unchop unexpand unmount uniq unlink unrar unshar unzip unzipsfx
 	<bin>updatedb uptime urlwrapper useradd uudecode uuencode
-	vdir version vmstat waitfor watch wc wget whoami xargs xres yes
+	vdir version vmstat
+	waitfor watch wc wget whoami $(X86_ONLY)writembr xargs xres yes
 	zdiff zforce zgrep zip zipcloak <bin>zipgrep zipnote zipsplit zmore znew
 ;
 
