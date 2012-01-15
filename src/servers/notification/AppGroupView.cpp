@@ -169,9 +169,7 @@ AppGroupView::MouseDown(BPoint point)
 		BMessage message(kRemoveGroupView);
 		message.AddPointer("view", this);
 		fParent->PostMessage(&message);
-	}
-
-	if (fCollapseRect.Contains(point)) {
+	} else if (fCollapseRect.Contains(point)) {
 		fCollapsed = !fCollapsed;
 		int32 children = fInfo.size();
 		if (fCollapsed) {
@@ -179,16 +177,18 @@ AppGroupView::MouseDown(BPoint point)
 				if (!fInfo[i]->IsHidden())
 					fInfo[i]->Hide();
 			}
+			GetLayout()->SetExplicitMaxSize(GetLayout()->MinSize());
 		} else {
 			for (int32 i = 0; i < children; i++) {
 				if (fInfo[i]->IsHidden())
 					fInfo[i]->Show();
 			}
+			GetLayout()->SetExplicitMaxSize(BSize(B_SIZE_UNSET, B_SIZE_UNSET));
 		}
 
+		InvalidateLayout();
 		Invalidate(); // Need to redraw the collapse indicator and title
 	}
-
 }
 
 
