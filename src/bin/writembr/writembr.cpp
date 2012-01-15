@@ -30,11 +30,9 @@ const char* kUsageMessage = \
 int
 main(int argc, char** argv)
 {
-	status_t result = B_ERROR;
-
 	if ((argc == 2 && strcmp(argv[1], "--help") == 0) || argc > 2) {
 		cerr << kUsageMessage;
-		return result;
+		return B_ERROR;
 	}
 
 	BPath device;
@@ -49,14 +47,14 @@ main(int argc, char** argv)
 		BVolume bootVolume;
 		if (volumeRoster.GetBootVolume(&bootVolume) != B_OK) {
 			cerr << "Can not find boot device" << endl;
-			return result;
+			return B_ERROR;
 		}
 
 		BDiskDeviceRoster roster;
 		BDiskDevice bootDevice;
 		if(roster.FindPartitionByVolume(bootVolume, &bootDevice, NULL) != B_OK) {
 			cerr << "Can not find boot device" << endl;
-			return result;
+			return B_ERROR;
 		}
 
 		bootDevice.GetPath(&device);
@@ -65,61 +63,56 @@ main(int argc, char** argv)
 
 	if (strcmp(device.Leaf(), "raw") != 0) {
 		cerr << device.Path() << " is not a raw device" << endl;
-		return result;
+		return B_ERROR;
 	}
 
 	fstream fs;
-	fs.exceptions(ios::failbit | ios::badbit);
-
-	try {
-		
-		fs.open(device.Path(), fstream::in | fstream::out | fstream::binary);
-
-		unsigned char MBR[kMBRSize];
-		fs.read((char*)MBR, kMBRSize);
-		if (fs.gcount() < kMBRSize ) {
-			stringstream error;
-			error << "only " << fs.gcount() << " of " << kMBRSize
-				<< " bytes was read from " << device.Path();
-			throw fstream::failure(error.str());
-		}
-
-		// update only the code area and the MBR signature
-		memcpy(MBR, kMBR, 0x1be);
-		MBR[0x1FE] = kMBR[0x1FE];
-		MBR[0x1FF] = kMBR[0x1FF];
-
-		cerr << "About to overwrite the MBR boot code on " << device.Path()
-			<< "\nThis may disable any partition managers you have installed.\n"
-			<< "Are you sure you want to continue?\nyes/[no]: ";
-
-		string choice;
-		getline(cin, choice, '\n');
-		if (choice == "no" || choice == "" || choice != "yes")
-			throw fstream::failure("users cancel");
-			
-		cerr << "Rewriting MBR for " << device.Path() << endl;
-		
-		fs.seekg(0, ios::beg);
-		fs.write((char*)MBR, kMBRSize);
-		fs.flush();
-		
-		cerr << "MBR was written OK" << endl;
-		result = B_OK;
-
-	} catch (fstream::failure exception) {
-		cerr << "MBR was NOT written" << endl;
-		cerr << "Error: ";
-		if (fs.is_open())
-			cerr << exception.what();
-		else 
-			cerr << "Can't open " << device.Path();
-		cerr << endl;
+	fs.open(device.Path(), fstream::in | fstream::out | fstream::binary);
+	if (!fs.is_open()) {
+		cerr << "Can't open " << device.Path() << endl;
+		return B_ERROR;
 	}
 
-	if (fs.is_open())
+	unsigned char MBR[kMBRSize];
+	fs.read((char*)MBR, kMBRSize);
+	if (fs.fail() || fs.gcount() < kMBRSize ) {
+		cerr << "Cannot read " << kMBRSize
+			<< " bytes from " << device.Path() << endl;
 		fs.close();
+		return B_ERROR;
+	}
 
-	return result;
+	// update only the code area and the MBR signature
+	memcpy(MBR, kMBR, 0x1be);
+	MBR[0x1FE] = kMBR[0x1FE];
+	MBR[0x1FF] = kMBR[0x1FF];
+
+	cerr << "About to overwrite the MBR boot code on " << device.Path()
+		<< "\nThis may disable any partition managers you have installed.\n"
+		<< "Are you sure you want to continue?\nyes/[no]: ";
+
+	string choice;
+	getline(cin, choice, '\n');
+	if (choice == "no" || choice == "" || choice != "yes") {
+		cerr << "MBR was NOT written" << endl;
+		fs.close();
+		return B_ERROR;
+	}
+			
+	cerr << "Rewriting MBR for " << device.Path() << endl;
+		
+	fs.seekg(0, ios::beg);
+	fs.write((char*)MBR, kMBRSize);
+	if (fs.fail()) {
+		cerr << "Cannot write " << kMBRSize
+			<< " bytes to " << device.Path() << endl;
+		fs.close();
+		return B_ERROR;
+	}
+
+	fs.close();
+
+	cerr << "MBR was written OK" << endl;
+	return B_OK;
 }
 
