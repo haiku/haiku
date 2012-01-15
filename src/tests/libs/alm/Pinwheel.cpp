@@ -37,7 +37,7 @@ public:
 		BALMLayout* layout = new BALMLayout(10.);
 		SetLayout(layout);
 
-		layout->SetInset(5.);
+		layout->SetInsets(5.);
 
 		// create extra tabs
 		BReference<XTab> x1 = layout->AddXTab();

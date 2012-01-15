@@ -56,7 +56,7 @@ public:
 		// create a new BALMLayout and use  it for this window
 		BALMLayout* layout = new BALMLayout(10);
 		SetLayout(layout);
-		layout->SetInset(10.);
+		layout->SetInsets(10.);
 
 		layout->AddView(button1, layout->Left(), layout->Top());
 		layout->AddViewToRight(radioButton);

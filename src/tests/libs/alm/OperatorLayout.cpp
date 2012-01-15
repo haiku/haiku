@@ -35,7 +35,7 @@ public:
 		float spacing = be_control_look->DefaultItemSpacing();
 		BALMLayout* layout = new BALMLayout(spacing);
 		SetLayout(layout);
-		layout->SetInset(spacing);
+		layout->SetInsets(spacing);
 
 		GroupItem item = GroupItem(button1) | (GroupItem(button2)
 			/ (GroupItem(button3) | GroupItem(BSpaceLayoutItem::CreateGlue())
