@@ -337,9 +337,7 @@ Area::LeftInset() const
 		return fTopLeftInset.Width();
 
 	BALMLayout* layout = static_cast<BALMLayout*>(fLayoutItem->Layout());
-	if (fLeft.Get() == layout->Left())
-		return layout->Inset();
-	return layout->Spacing() / 2;
+	return layout->InsetForTab(fLeft.Get());
 }
 
 
@@ -353,9 +351,7 @@ Area::TopInset() const
 		return fTopLeftInset.Height();
 
 	BALMLayout* layout = static_cast<BALMLayout*>(fLayoutItem->Layout());
-	if (fTop.Get() == layout->Top())
-		return layout->Inset();
-	return layout->Spacing() / 2;
+	return layout->InsetForTab(fTop.Get());
 }
 
 
@@ -369,9 +365,7 @@ Area::RightInset() const
 		return fRightBottomInset.Width();
 
 	BALMLayout* layout = static_cast<BALMLayout*>(fLayoutItem->Layout());
-	if (fRight.Get() == layout->Right())
-		return layout->Inset();
-	return layout->Spacing() / 2;
+	return layout->InsetForTab(fRight.Get());
 }
 
 
@@ -385,9 +379,7 @@ Area::BottomInset() const
 		return fRightBottomInset.Height();
 
 	BALMLayout* layout = static_cast<BALMLayout*>(fLayoutItem->Layout());
-	if (fBottom.Get() == layout->Bottom())
-		return layout->Inset();
-	return layout->Spacing() / 2;
+	return layout->InsetForTab(fBottom.Get());
 }
 
 

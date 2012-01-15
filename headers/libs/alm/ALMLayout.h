@@ -31,7 +31,8 @@ class RowColumnManager;
  */
 class BALMLayout : public BAbstractLayout {
 public:
-								BALMLayout(float spacing = 0.0f,
+								BALMLayout(float hSpacing = 0.0f,
+									float vSpacing = 0.0f,
 									BALMLayout* friendLayout = NULL);
 	virtual						~BALMLayout();
 
@@ -56,11 +57,16 @@ public:
 
 			LinearSpec*			Solver() const;
 
-			void				SetInset(float inset);
-			float				Inset() const;
+			void				SetInsets(float insets);
+			void				SetInsets(float x, float y);
+			void				SetInsets(float left, float top, float right,
+									float bottom);
+			void				GetInsets(float* left, float* top, float* right,
+									float* bottom) const;
 
-			void				SetSpacing(float spacing);
-			float				Spacing() const;
+			void				SetSpacing(float hSpacing, float vSpacing);
+			void				GetSpacing(float* _hSpacing,
+									float* _vSpacing) const;
 
 			Area*				AreaFor(int32 id) const;
 			Area*				AreaFor(const BView* view) const;
@@ -139,6 +145,10 @@ protected:
 private:
 	friend class XTab;
 	friend class YTab;
+	friend class Area;
+
+			float				InsetForTab(XTab* tab);
+			float				InsetForTab(YTab* tab);
 
 			/*! Add a view without initialize the Area. */
 			BLayoutItem*		_CreateLayoutItem(BView* view);
@@ -165,8 +175,13 @@ private:
 			BSize				fMaxSize;
 			BSize				fPreferredSize;
 
-			float				fInset;
-			float				fSpacing;
+			float				fLeftInset;
+			float				fRightInset;
+			float				fTopInset;
+			float				fBottomInset;
+
+			float				fHSpacing;
+			float				fVSpacing;
 
 			Area*				fCurrentArea;
 

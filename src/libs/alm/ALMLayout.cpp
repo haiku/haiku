@@ -4,14 +4,14 @@
  * Copyright 2010, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
  */
-
-
 #include "ALMLayout.h"
 
 #include <math.h>		// for floor
 #include <new>
 #include <iostream>
 #include <vector>
+
+#include <ControlLook.h>
 
 #include "RowColumnManager.h"
 #include "ViewLayoutItem.h"
@@ -29,10 +29,14 @@ const BSize kUnsetSize(B_SIZE_UNSET, B_SIZE_UNSET);
  *
  * If friendLayout is not NULL the solver of the friend layout is used.
  */
-BALMLayout::BALMLayout(float spacing, BALMLayout* friendLayout)
+BALMLayout::BALMLayout(float hSpacing, float vSpacing, BALMLayout* friendLayout)
 	:
-	fInset(0.0f),
-	fSpacing(spacing / 2),
+	fLeftInset(0),
+	fRightInset(0),
+	fTopInset(0),
+	fBottomInset(0),
+	fHSpacing(hSpacing),
+	fVSpacing(vSpacing),
 	fCurrentArea(NULL)
 {
 	fSolver = friendLayout ? friendLayout->Solver() : &fOwnSolver;
@@ -977,30 +981,95 @@ BALMLayout::Solver() const
 
 
 void
-BALMLayout::SetInset(float inset)
+BALMLayout::SetInsets(float left, float top, float right,
+	float bottom)
 {
-	fInset = inset;
-}
+	fLeftInset = BControlLook::ComposeSpacing(left);
+	fTopInset = BControlLook::ComposeSpacing(top);
+	fRightInset = BControlLook::ComposeSpacing(right);
+	fBottomInset = BControlLook::ComposeSpacing(bottom);
 
-
-float
-BALMLayout::Inset() const
-{
-	return fInset;
+	InvalidateLayout();
 }
 
 
 void
-BALMLayout::SetSpacing(float spacing)
+BALMLayout::SetInsets(float horizontal, float vertical)
 {
-	fSpacing = spacing / 2;
+	fLeftInset = BControlLook::ComposeSpacing(horizontal);
+	fRightInset = fLeftInset;
+
+	fTopInset = BControlLook::ComposeSpacing(vertical);
+	fBottomInset = fTopInset;
+
+	InvalidateLayout();
+}
+
+
+void
+BALMLayout::SetInsets(float insets)
+{
+	fLeftInset = BControlLook::ComposeSpacing(insets);
+	fRightInset = fLeftInset;
+	fTopInset = fLeftInset;
+	fBottomInset = fLeftInset;
+
+	InvalidateLayout();
+}
+
+
+void
+BALMLayout::GetInsets(float* left, float* top, float* right,
+	float* bottom) const
+{
+	if (left)
+		*left = fLeftInset;
+	if (top)
+		*top = fTopInset;
+	if (right)
+		*right = fRightInset;
+	if (bottom)
+		*bottom = fBottomInset;
+}
+
+
+void
+BALMLayout::SetSpacing(float hSpacing, float vSpacing)
+{
+	fHSpacing = BControlLook::ComposeSpacing(hSpacing);
+	fVSpacing = BControlLook::ComposeSpacing(vSpacing);
+}
+
+
+void
+BALMLayout::GetSpacing(float *_hSpacing, float *_vSpacing) const
+{
+	if (_hSpacing)
+		*_hSpacing = fHSpacing;
+	if (_vSpacing)
+		*_vSpacing = fVSpacing;
 }
 
 
 float
-BALMLayout::Spacing() const
+BALMLayout::InsetForTab(XTab* tab)
 {
-	return fSpacing * 2;
+	if (tab == fLeft.Get())
+		return fLeftInset;
+	if (tab == fRight.Get())
+		return fRightInset;
+	return fHSpacing / 2;
+}
+
+
+float
+BALMLayout::InsetForTab(YTab* tab)
+{
+	if (tab == fTop.Get())
+		return fTopInset;
+	if (tab == fBottom.Get())
+		return fBottomInset;
+	return fVSpacing / 2;
 }
 
 
