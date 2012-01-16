@@ -75,10 +75,6 @@ public:
 			Area*				AreaFor(const BLayoutItem* item) const;
 			int32				CountAreas() const;
 			Area*				AreaAt(int32 index) const;
-			Area*				CurrentArea() const;
-			bool				SetCurrentArea(const Area* area);
-			bool				SetCurrentArea(const BView* view);
-			bool				SetCurrentArea(const BLayoutItem* item);
 	
 			XTab*				LeftOf(const BView* view) const;
 			XTab*				LeftOf(const BLayoutItem* item) const;
@@ -98,15 +94,6 @@ public:
 	virtual	Area*				AddView(BView* view, XTab* left, YTab* top,
 									XTab* right = NULL, YTab* bottom = NULL);
 	virtual	Area*				AddView(BView* view, Row* row, Column* column);
-	virtual	Area*				AddViewToRight(BView* view, XTab* right = NULL,
-									YTab* top = NULL, YTab* bottom = NULL);
-	virtual	Area*				AddViewToLeft(BView* view, XTab* left = NULL,
-									YTab* top = NULL, YTab* bottom = NULL);
-	virtual	Area*				AddViewToTop(BView* view, YTab* top = NULL,
-									XTab* left = NULL, XTab* right = NULL);
-	virtual	Area*				AddViewToBottom(BView* view,
-									YTab* bottom = NULL, XTab* left = NULL,
-									XTab* right = NULL);
 
 	virtual	bool				AddItem(BLayoutItem* item);
 	virtual	bool				AddItem(int32 index, BLayoutItem* item);
@@ -116,19 +103,6 @@ public:
 	virtual	Area*				AddItem(BLayoutItem* item, Row* row,
 									Column* column);
 									
-	virtual	Area*				AddItemToRight(BLayoutItem* item,
-									XTab* right = NULL, YTab* top = NULL,
-									YTab* bottom = NULL);
-	virtual	Area*				AddItemToLeft(BLayoutItem* item,
-									XTab* left = NULL, YTab* top = NULL,
-									YTab* bottom = NULL);
-	virtual	Area*				AddItemToTop(BLayoutItem* item,
-									YTab* top = NULL, XTab* left = NULL,
-									XTab* right = NULL);
-	virtual	Area*				AddItemToBottom(BLayoutItem* item,
-									YTab* bottom = NULL, XTab* left = NULL,
-									XTab* right = NULL);
-
 			bool				SaveLayout(BMessage* archive) const;
 			bool				RestoreLayout(const BMessage* archive);
 
@@ -183,8 +157,6 @@ private:
 
 			float				fHSpacing;
 			float				fVSpacing;
-
-			Area*				fCurrentArea;
 
 			XTabList			fXTabList;
 			YTabList			fYTabList;

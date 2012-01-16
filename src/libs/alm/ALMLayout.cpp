@@ -36,8 +36,7 @@ BALMLayout::BALMLayout(float hSpacing, float vSpacing, BALMLayout* friendLayout)
 	fTopInset(0),
 	fBottomInset(0),
 	fHSpacing(hSpacing),
-	fVSpacing(vSpacing),
-	fCurrentArea(NULL)
+	fVSpacing(vSpacing)
 {
 	fSolver = friendLayout ? friendLayout->Solver() : &fOwnSolver;
 	fRowColumnManager = new RowColumnManager(fSolver);
@@ -275,43 +274,6 @@ BALMLayout::AreaAt(int32 index) const
 }
 
 
-Area*
-BALMLayout::CurrentArea() const
-{
-	return fCurrentArea;
-}
-
-
-bool
-BALMLayout::SetCurrentArea(const Area* area)
-{
-	fCurrentArea = const_cast<Area*>(area);
-	return true;
-}
-
-
-bool
-BALMLayout::SetCurrentArea(const BView* view)
-{
-	Area* area = AreaFor(view);
-	if (!area)
-		return false;
-	fCurrentArea = area;
-	return true;
-}
-
-
-bool
-BALMLayout::SetCurrentArea(const BLayoutItem* item)
-{
-	Area* area = AreaFor(item);
-	if (!area)
-		return false;
-	fCurrentArea = area;
-	return true;
-}
-
-
 XTab*
 BALMLayout::LeftOf(const BView* view) const
 {
@@ -500,62 +462,6 @@ BALMLayout::AddView(BView* view, Row* row, Column* column)
 }
 
 
-Area*
-BALMLayout::AddViewToRight(BView* view, XTab* right, YTab* top, YTab* bottom)
-{
-	BLayoutItem* item = _LayoutItemToAdd(view);
-	Area* area = AddItemToRight(item, right, top, bottom);
-	if (!area) {
-		if (item != view->GetLayout())
-			delete item;
-		return NULL;
-	}
-	return area;
-}
-
-
-Area*
-BALMLayout::AddViewToLeft(BView* view, XTab* left, YTab* top, YTab* bottom)
-{
-	BLayoutItem* item = _LayoutItemToAdd(view);
-	Area* area = AddItemToLeft(item, left, top, bottom);
-	if (!area) {
-		if (item != view->GetLayout())
-			delete item;
-		return NULL;
-	}
-	return area;
-}
-
-
-Area*
-BALMLayout::AddViewToTop(BView* view, YTab* top, XTab* left, XTab* right)
-{
-	BLayoutItem* item = _LayoutItemToAdd(view);
-	Area* area = AddItemToTop(item, top, left, right);
-	if (!area) {
-		if (item != view->GetLayout())
-			delete item;
-		return NULL;
-	}
-	return area;
-}
-
-
-Area*
-BALMLayout::AddViewToBottom(BView* view, YTab* bottom, XTab* left, XTab* right)
-{
-	BLayoutItem* item = _LayoutItemToAdd(view);
-	Area* area = AddItemToBottom(item, bottom, left, right);
-	if (!area) {
-		if (item != view->GetLayout())
-			delete item;
-		return NULL;
-	}
-	return area;
-}
-
-
 bool
 BALMLayout::AddItem(BLayoutItem* item)
 {
@@ -609,7 +515,6 @@ BALMLayout::AddItem(BLayoutItem* item, XTab* left, YTab* top, XTab* _right,
 	Area* area = AreaFor(item);
 	if (!area)
 		return NULL;
-	fCurrentArea = area;
 
 	area->_Init(fSolver, left, top, right, bottom, fRowColumnManager);
 
@@ -626,91 +531,11 @@ BALMLayout::AddItem(BLayoutItem* item, Row* row, Column* column)
 	Area* area = AreaFor(item);
 	if (!area)
 		return NULL;
-	fCurrentArea = area;
 
 	area->_Init(fSolver, row, column, fRowColumnManager);
 
 	fRowColumnManager->AddArea(area);
 	return area;
-}
-
-
-Area*
-BALMLayout::AddItemToRight(BLayoutItem* item, XTab* _right, YTab* top,
-	YTab* bottom)
-{
-	if (fCurrentArea == NULL)
-		return NULL;
-
-	XTab* left = fCurrentArea->Right();
-	BReference<XTab> right = _right;
-	if (_right == NULL)
-		right = AddXTab();
-	if (!top)
-		top = fCurrentArea->Top();
-	if (!bottom)
-		bottom = fCurrentArea->Bottom();
-
-	return AddItem(item, left, top, right, bottom);
-}
-
-
-Area*
-BALMLayout::AddItemToLeft(BLayoutItem* item, XTab* _left, YTab* top,
-	YTab* bottom)
-{
-	if (fCurrentArea == NULL)
-		return NULL;
-
-	BReference<XTab> left = _left;
-	if (_left == NULL)
-		left = AddXTab();
-	XTab* right = fCurrentArea->Left();
-	if (!top)
-		top = fCurrentArea->Top();
-	if (!bottom)
-		bottom = fCurrentArea->Bottom();
-
-	return AddItem(item, left, top, right, bottom);
-}
-
-
-Area*
-BALMLayout::AddItemToTop(BLayoutItem* item, YTab* _top, XTab* left, XTab* right)
-{
-	if (fCurrentArea == NULL)
-		return NULL;
-
-	if (!left)
-		left = fCurrentArea->Left();
-	if (!right)
-		right = fCurrentArea->Right();
-	BReference<YTab> top = _top;
-	if (_top == NULL)
-		top = AddYTab();
-	YTab* bottom = fCurrentArea->Top();
-
-	return AddItem(item, left, top, right, bottom);
-}
-
-
-Area*
-BALMLayout::AddItemToBottom(BLayoutItem* item, YTab* _bottom, XTab* left,
-	XTab* right)
-{
-	if (fCurrentArea == NULL)
-		return NULL;
-
-	if (!left)
-		left = fCurrentArea->Left();
-	if (!right)
-		right = fCurrentArea->Right();
-	YTab* top = fCurrentArea->Bottom();
-	BReference<YTab> bottom = _bottom;
-	if (_bottom == NULL)
-		bottom = AddYTab();
-
-	return AddItem(item, left, top, right, bottom);
 }
 
 
