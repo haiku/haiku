@@ -1558,8 +1558,9 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 	addr_t mapOffset;
 
 	TRACE(("vm_map_physical_memory(aspace = %ld, \"%s\", virtual = %p, "
-		"spec = %ld, size = %lu, protection = %ld, phys = %#lx)\n", team,
-		name, *_address, addressSpec, size, protection, physicalAddress));
+		"spec = %ld, size = %lu, protection = %ld, phys = %#" B_PRIxPHYSADDR
+		")\n", team, name, *_address, addressSpec, size, protection,
+		physicalAddress));
 
 	if (!arch_vm_supports_protection(protection))
 		return B_NOT_SUPPORTED;
@@ -4301,7 +4302,7 @@ fault_get_page(PageFaultContext& context)
 		// allocate a clean page
 		page = vm_page_allocate_page(&context.reservation,
 			PAGE_STATE_ACTIVE | VM_PAGE_ALLOC_CLEAR);
-		FTRACE(("vm_soft_fault: just allocated page 0x%lx\n",
+		FTRACE(("vm_soft_fault: just allocated page 0x%" B_PRIxPHYSADDR "\n",
 			page->physical_page_number));
 
 		// insert the new page into our cache
