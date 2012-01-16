@@ -8,6 +8,7 @@ UseHeaders [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) kits interface ] ;
 
 SharedLibrary libalm.so :
 	ALMLayout.cpp
+	ALMLayoutBuilder.cpp
 	Area.cpp
 	Column.cpp
 	Row.cpp
