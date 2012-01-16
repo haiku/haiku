@@ -12,6 +12,7 @@
 
 // include this for ALM
 #include "ALMLayout.h"
+#include "ALMLayoutBuilder.h"
 
 
 class ComplexButtonsWindow : public BWindow {
@@ -55,6 +56,17 @@ public:
 		button5->SetExplicitMaxSize(BSize(500, 500));
 		button5->SetExplicitPreferredSize(BSize(30 + kOffset, B_SIZE_UNSET));
 
+		BALMLayout* fLayout = new BALMLayout(10, 10);
+		BALM::BALMLayoutBuilder(this, fLayout)
+			.Add(button1, fLayout->Left(), fLayout->Top())
+			.StartingAt(button1)
+				.AddToRight(button2)
+				.AddToRight(button3, fLayout->Right())
+			.AddBelow(button4, fLayout->Bottom(), fLayout->Left(),
+				fLayout->AddXTab())
+			.AddToRight(button5, fLayout->Right());
+				
+		/*
 		// create a new BALMLayout and use  it for this window
 		fLayout = new BALMLayout();
 		SetLayout(fLayout);
@@ -66,6 +78,7 @@ public:
 		fLayout->AddView(button4, fLayout->Left(), fLayout->BottomOf(button1),
 			NULL, fLayout->Bottom());
 		fLayout->AddViewToRight(button5, fLayout->Right());
+		*/
 
 		// test size limits
 		BSize min = fLayout->MinSize();

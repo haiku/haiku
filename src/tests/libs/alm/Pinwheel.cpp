@@ -13,6 +13,7 @@
 
 // include this for ALM
 #include "ALMLayout.h"
+#include "ALMLayoutBuilder.h"
 
 
 class PinwheelWindow : public BWindow {
@@ -34,7 +35,24 @@ public:
 		button4->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 
 		// create a new BALMLayout and use  it for this window
-		BALMLayout* layout = new BALMLayout(10.);
+		BALMLayout* layout = new BALMLayout(10, 10);
+
+		BReference<XTab> xTabs[2];
+		BReference<YTab> yTabs[2];
+		layout->AddXTabs(xTabs, 2);
+		layout->AddYTabs(yTabs, 2);
+
+		BALM::BALMLayoutBuilder(this, layout)
+			.SetInsets(5)
+			.Add(textView1, xTabs[0], yTabs[0], xTabs[1], yTabs[1])
+			.StartingAt(textView1)
+				.AddAbove(button1, layout->Top(), layout->Left())
+				.AddToRight(button2, layout->Right(), NULL, yTabs[1])
+				.AddBelow(button3, layout->Bottom(), xTabs[0])
+				.AddToLeft(button4, layout->Left(),  yTabs[0]);
+
+		// alternative setup
+		/*
 		SetLayout(layout);
 
 		layout->SetInsets(5.);
@@ -52,6 +70,7 @@ public:
 			layout->Bottom());
 		layout->AddView(button4, layout->Left(), y1, x1, layout->Bottom());
 		layout->AddView(textView1, x1, y1, x2, y2);
+		*/
 
 		// alternative setup
 		/* 
