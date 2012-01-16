@@ -66,20 +66,6 @@ public:
 				fLayout->AddXTab())
 			.AddToRight(button5, fLayout->Right());
 				
-		/*
-		// create a new BALMLayout and use  it for this window
-		fLayout = new BALMLayout();
-		SetLayout(fLayout);
-
-		fLayout->AddView(button1, fLayout->Left(), fLayout->Top(), NULL,
-			NULL);
-		fLayout->AddViewToRight(button2);
-		fLayout->AddViewToRight(button3, fLayout->Right());
-		fLayout->AddView(button4, fLayout->Left(), fLayout->BottomOf(button1),
-			NULL, fLayout->Bottom());
-		fLayout->AddViewToRight(button5, fLayout->Right());
-		*/
-
 		// test size limits
 		BSize min = fLayout->MinSize();
 		BSize max = fLayout->MaxSize();

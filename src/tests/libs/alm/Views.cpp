@@ -78,35 +78,6 @@ public:
 				.AddToRight(stringView2)
 				.AddToRight(BSpaceLayoutItem::CreateGlue(), layout->Right());
 
-		/*
-		// create a new BALMLayout and use  it for this window
-		BALMLayout* layout = new BALMLayout(10);
-		SetLayout(layout);
-		layout->SetInsets(10.);
-
-		layout->AddView(button1, layout->Left(), layout->Top());
-		layout->AddViewToRight(radioButton);
-		layout->AddItemToRight(BSpaceLayoutItem::CreateGlue());
-		Area* a3 = layout->AddViewToRight(button3);
-		layout->SetCurrentArea(radioButton);
-		layout->AddViewToBottom(textView1, NULL, NULL, a3->Right());
-		layout->AddViewToBottom(button4);
-		layout->AddViewToRight(button5, layout->Right());
-		layout->AddViewToBottom(button6);
-
-		layout->AddView(menu1, layout->Left(), layout->BottomOf(button6));
-		layout->AddViewToRight(stringView1);
-		layout->AddItemToRight(BSpaceLayoutItem::CreateGlue(), layout->Right());
-
-		layout->AddViewToBottom(statusBar, NULL, layout->Left(),
-			layout->Right());
-
-		layout->AddView(menu2, layout->Left(), layout->BottomOf(statusBar),
-			layout->RightOf(menu1), layout->Bottom());
-		layout->AddViewToRight(stringView2);
-		layout->AddItemToRight(BSpaceLayoutItem::CreateGlue(), layout->Right());
-		*/
-
 		layout->Solver()->AddConstraint(2, layout->TopOf(menu1), -1,
 			layout->Bottom(), OperatorType(kEQ), 0);
 

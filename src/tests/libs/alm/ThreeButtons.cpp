@@ -45,17 +45,6 @@ public:
 				.AddBelow(button2)
 				.AddBelow(button3, fLayout->Bottom());
 
-		/*
-		// create a new BALMLayout and use  it for this window
-		fLayout = new BALMLayout();
-		SetLayout(fLayout);
-		
-		fLayout->AddView(button1, fLayout->Left(), fLayout->Top(),
-			fLayout->Right(), NULL);
-		fLayout->AddViewToBottom(button2);
-		fLayout->AddViewToBottom(button3, fLayout->Bottom());
-		*/
-
 		// test size limits
 		BSize min = fLayout->MinSize();
 		BSize max = fLayout->MaxSize();

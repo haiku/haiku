@@ -72,23 +72,6 @@ public:
 		layout->AddView(textView1, x1, y1, x2, y2);
 		*/
 
-		// alternative setup
-		/* 
-		layout->AddView(button1);
-		Area* a1 = layout->AreaOf(button1);
-		Area* a2 = layout->AddViewToRight(button2, a1, layout->Right(), NULL,
-			layout->AddYTab());
-		Area* a3 = layout->AddViewToBottom(button3, a2, layout->Bottom(),
-			layout->AddXTab(), NULL);
-		Area* a4 = layout->AddViewToLeft(button4, a3, layout->Left(),
-			a1->Bottom());
-
-		layout->AddView(textView1, a4->Right(), a1->Bottom(), a2->Left(),
-			a3->Top());
-		a1->SetWidthAs(a3);
-		a1->SetHeightAs(a3);
-		*/
-
 		// test size limits
 		BSize min = layout->MinSize();
 		BSize max = layout->MaxSize();
