@@ -12,6 +12,7 @@
 
 #include <Button.h>
 #include <CheckBox.h>
+#include <ControlLook.h>
 #include <PictureButton.h>
 #include <RadioButton.h>
 #include <StatusBar.h>
@@ -327,6 +328,20 @@ Area::SetContentAspectRatio(double ratio)
 }
 
 
+void
+Area::GetInsets(float* left, float* top, float* right, float* bottom) const
+{
+	if (left)
+		*left = fTopLeftInset.Width();
+	if (top)
+		*top = fTopLeftInset.Height();
+	if (right)
+		*right = fRightBottomInset.Width();
+	if (bottom)
+		*bottom = fRightBottomInset.Height();
+}
+
+
 /**
  * Gets left inset between area and its content.
  */
@@ -380,6 +395,50 @@ Area::BottomInset() const
 
 	BALMLayout* layout = static_cast<BALMLayout*>(fLayoutItem->Layout());
 	return layout->InsetForTab(fBottom.Get());
+}
+
+
+void
+Area::SetInsets(float insets)
+{
+	if (insets != B_SIZE_UNSET)
+		insets = BControlLook::ComposeSpacing(insets);
+
+	fTopLeftInset.Set(insets, insets);
+	fRightBottomInset.Set(insets, insets);
+	fLayoutItem->Layout()->InvalidateLayout();
+}
+
+
+void
+Area::SetInsets(float horizontal, float vertical)
+{
+	if (horizontal != B_SIZE_UNSET)
+		horizontal = BControlLook::ComposeSpacing(horizontal);
+	if (vertical != B_SIZE_UNSET)
+		vertical = BControlLook::ComposeSpacing(vertical);
+
+	fTopLeftInset.Set(horizontal, horizontal);
+	fRightBottomInset.Set(vertical, vertical);
+	fLayoutItem->Layout()->InvalidateLayout();
+}
+
+
+void
+Area::SetInsets(float left, float top, float right, float bottom)
+{
+	if (left != B_SIZE_UNSET)
+		left = BControlLook::ComposeSpacing(left);
+	if (right != B_SIZE_UNSET)
+		right = BControlLook::ComposeSpacing(right);
+	if (top != B_SIZE_UNSET)
+		top = BControlLook::ComposeSpacing(top);
+	if (bottom != B_SIZE_UNSET)
+		bottom = BControlLook::ComposeSpacing(bottom);
+
+	fTopLeftInset.Set(left, top);
+	fRightBottomInset.Set(right, bottom);
+	fLayoutItem->Layout()->InvalidateLayout();
 }
 
 

@@ -90,10 +90,17 @@ public:
 			void				SetShrinkPenalties(BSize shrink);
 			void				SetGrowPenalties(BSize grow);
 
+			void				GetInsets(float* left, float* top, float* right,
+									float* bottom) const;
 			float				LeftInset() const;
 			float				TopInset() const;
 			float				RightInset() const;
 			float				BottomInset() const;
+
+			void				SetInsets(float insets);
+			void				SetInsets(float horizontal, float vertical);
+			void				SetInsets(float left, float top, float right,
+									float bottom);
 			void				SetLeftInset(float left);
 			void				SetTopInset(float top);
 			void				SetRightInset(float right);
