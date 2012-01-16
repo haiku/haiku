@@ -1,49 +1,49 @@
 1	french	x-vnd.Be-PEPL	2993050801
-%name% picture	People		Photo de 
-Address	People		Adresse
-Cancel	People		Annuler
-City	People		Ville
-Close	People		Fermer
-Company	People		Société
-Configure attributes	People		Configurer les attributs
-Contact information for a person.	Long mimetype description		Informations pour contacter la personne.
-Contact name	People		Nom du contact
-Copy	People		Copier
-Could not create %s.	People		Impossible de créer %s.
-Country	People		Pays
-Cut	People		Couper
-Drop an image here,\nor use the contextual menu.	People		Déposez une image ici,\nou utilisez le menu contextuel.
-E-mail	People		E-mail
 Edit	People		Éditer
 Error	People		Erreur
-Fax	People		Fax
-File	People		Fichier
-Group	People		Groupe
-Home phone	People		Téléphone du domicile
-Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Le lancement des préférences de fichiers pour configurer les attributs sur les personnes a échoué.\n\nErreur :
-Load image…	People		Charger une image…
-Name	People		Nom
-New person	People		Nouvelle personne
-New person…	People		Nouvelle personne…
-Nickname	People		Surnom
-OK	People		OK
-Paste	People		Coller
-People	System name		Personnes
-Person	Short mimetype description		Personne
-Quit	People		Quitter
-Redo	People		Rétablir
-Remove image	People		Supprimer l'image
-Revert	People		Rétablir
-Save	People		Enregistrer
-Save as…	People		Enregistrer sous…
-Save changes before quitting?	People		Voulez-vous enregistrer les changements avant de sortir ?
-Select all	People		Sélectionner tout
-Sorry	People		Désolé
-State	People		État
+City	People		Ville
 The file '%name%' could not be written.	People		Impossible d'écrire le fichier « %name% ».
-URL	People		URL
-Undo	People		Annuler
-Unnamed person	People		Anonyme
-Work phone	People		Téléphone professionnel
-Zip	People		Code postal
 none	Groups list		Aucun
+Configure attributes	People		Configurer les attributs
+Company	People		Société
+%name% picture	People		Photo de 
+Work phone	People		Téléphone professionnel
+People	System name		Personnes
+New person	People		Nouvelle personne
+Select all	People		Sélectionner tout
+File	People		Fichier
+Unnamed person	People		Anonyme
+Could not create %s.	People		Impossible de créer %s.
+Country	People		Pays
+Close	People		Fermer
+Group	People		Groupe
+Nickname	People		Surnom
+Quit	People		Quitter
+Name	People		Nom
+Revert	People		Rétablir
+Undo	People		Annuler
+E-mail	People		E-mail
+Save changes before quitting?	People		Voulez-vous enregistrer les changements avant de sortir ?
+Load image…	People		Charger une image…
+OK	People		OK
+Remove image	People		Supprimer l'image
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Le lancement des préférences de fichiers pour configurer les attributs sur les personnes a échoué.\n\nErreur :
+Home phone	People		Téléphone du domicile
+Save as…	People		Enregistrer sous…
+Redo	People		Rétablir
+Paste	People		Coller
+Drop an image here,\nor use the contextual menu.	People		Déposez une image ici,\nou utilisez le menu contextuel.
+Save	People		Enregistrer
+Person	Short mimetype description		Personne
+New person…	People		Nouvelle personne…
+Address	People		Adresse
+URL	People		URL
+Sorry	People		Désolé
+Zip	People		Code postal
+Contact information for a person.	Long mimetype description		Informations pour contacter la personne.
+Fax	People		Fax
+Contact name	People		Nom du contact
+Cut	People		Couper
+Cancel	People		Annuler
+State	People		État
+Copy	People		Copier

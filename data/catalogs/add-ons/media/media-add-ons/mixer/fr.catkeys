@@ -1,0 +1,8 @@
+1	french	x-vnd.Haiku-mixer.media_addon	406546530
+Linear interpolation	AudioMixer		Interpolation linéaire
+Resampling algorithm	AudioMixer		Algorithme de ré-échantillonnage
+dB	AudioMixer		dB
+Gain controls	AudioMixer		Contrôles de gain
+Mute	AudioMixer		Sourdine
+Setup	AudioMixer		Réglages
+Gain	AudioMixer		Gain

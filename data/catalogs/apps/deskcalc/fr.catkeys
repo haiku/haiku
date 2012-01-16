@@ -1,7 +1,7 @@
 1	french	x-vnd.Haiku-DeskCalc	1916192649
-Audio Feedback	CalcView		Échos sonores
-Basic	CalcView		Basique
 Compact	CalcView		Compact
-DeskCalc	System name		Calculatrice
-Enable Num Lock on startup	CalcView		Verrouiller le pavé numérique au démarrage
 Scientific	CalcView		Scientifique
+DeskCalc	System name		Calculatrice
+Basic	CalcView		Basique
+Enable Num Lock on startup	CalcView		Verrouiller le pavé numérique au démarrage
+Audio Feedback	CalcView		Échos sonores

@@ -1,8 +1,9 @@
-1	french	x-vnd.Haiku-IMAP	2655366227
-Apply	IMAPFolderConfig		Appliquer
+1	french	x-vnd.Haiku-IMAP	3892875357
 Destination:	imap_config		Destination :
-Fetching IMAP folders, have patience...	IMAPFolderConfig		Récupération des dossiers IMAP, Merci de patienter…
-IMAP Folders	IMAPFolderConfig		Dossiers IMAP
-IMAP Folders	imap_config		Dossiers IMAP
-Subcribe / Unsuscribe IMAP folders, have patience...	IMAPFolderConfig		Abonnement / désabonnement aux dossiers IMAP, Merci de patienter…
 status	IMAPFolderConfig		état
+Apply	IMAPFolderConfig		Appliquer
+IMAP Folders	imap_config		Dossiers IMAP
+Fetching IMAP folders, have patience...	IMAPFolderConfig		Récupération des dossiers IMAP. Merci de patienter…
+IMAP Folders	IMAPFolderConfig		Dossiers IMAP
+Subcribe / Unsuscribe IMAP folders, have patience...	IMAPFolderConfig		Abonnement / Désabonnement aux dossiers IMAP. Merci de patienter…
+Failed to fetch available storage.	IMAPFolderConfig		Impossible de récupérer le courrier reçu.

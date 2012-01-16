@@ -1,18 +1,18 @@
 1	french	x-vnd.Haiku-DataTranslations	3820343452
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Un élément nommé « %name » existe déjà dans le dossier des traducteurs ! Faut-il remplacer le traducteur existant ?
-Cancel	DataTranslations		Annuler
-Could not install %s:\n%s	DataTranslations		Impossible d'installer %s :\n%s
 DataTranslations	System name		TraductionDeDonnées
-DataTranslations - Error	DataTranslations		TraductionDeDonnées - Erreur
-DataTranslations - Note	DataTranslations		DataTranslations - Notes
-Info	DataTranslations		information
-Info:	DataTranslations		Information :
+Cancel	DataTranslations		Annuler
 Name:	DataTranslations		Nom :
 Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Nom : %s \nVersion : %ld.%ld.%ld\n\nInformations :\n%s\n\nChemin :\n%s\n
-OK	DataTranslations		OK
-Overwrite	DataTranslations		Remplacer
-Path:	DataTranslations		Chemin :
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		L'élément « %name » ne semble pas être un traducteur et ne sera pas installé.
-The new translator has been installed successfully.	DataTranslations		Le nouveau traducteur a été installé avec succès.
+Could not install %s:\n%s	DataTranslations		Impossible d'installer %s :\n%s
 Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Utilisez ce panneau de contrôle pour définir les paramètres par défaut des traducteurs à utiliser quand l'application ne spécifie aucun autre réglage.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Un élément nommé « %name » existe déjà dans le dossier des traducteurs ! Faut-il remplacer le traducteur existant ?
+DataTranslations - Note	DataTranslations		DataTranslations - Notes
+Overwrite	DataTranslations		Remplacer
+Info:	DataTranslations		Information :
+Info	DataTranslations		information
+Path:	DataTranslations		Chemin :
+The new translator has been installed successfully.	DataTranslations		Le nouveau traducteur a été installé avec succès.
+DataTranslations - Error	DataTranslations		TraductionDeDonnées - Erreur
+OK	DataTranslations		OK
 Version:	DataTranslations		Version :

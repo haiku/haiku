@@ -1,15 +1,15 @@
 1	french	x-vnd.Haiku-GIFTranslator	829368084
-Automatic (from alpha channel)	GIFView		Automatique (à partir du canal alpha)
-Be Bitmap Format (GIFTranslator)	GIFTranslator		Format Bitmap Be (Traducteur GIF)
-BeOS system	GIFView		Système BeOS
-Colors	GIFView		Couleurs
-GIF Settings	GIFTranslator		Réglages GIF
-GIF image	GIFTranslator		Image GIF
-Greyscale	GIFView		Nuances de gris
+Websafe	GIFView		Garantie pour le web
+Write interlaced images	GIFView		Enregistrer les images entrelacées
 Optimal	GIFView		Optimale
+Greyscale	GIFView		Nuances de gris
+Be Bitmap Format (GIFTranslator)	GIFTranslator		Format Bitmap Be (Traducteur GIF)
+GIF image	GIFTranslator		Image GIF
+Write transparent images	GIFView		Enregistrer la transparence des images
 Palette	GIFView		Palette
 Use RGB color	GIFView		Utilisez la couleur RVB
 Use dithering	GIFView		Utilisez le tramage
-Websafe	GIFView		Garantie pour le web
-Write interlaced images	GIFView		Enregistrer les images entrelacées
-Write transparent images	GIFView		Enregistrer la transparence des images
+GIF Settings	GIFTranslator		Réglages GIF
+BeOS system	GIFView		Système BeOS
+Automatic (from alpha channel)	GIFView		Automatique (à partir du canal alpha)
+Colors	GIFView		Couleurs

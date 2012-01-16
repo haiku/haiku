@@ -1,12 +1,12 @@
 1	french	x-vnd.Be-WORK	932379173
-About Workspaces…	Workspaces		À propos de Bureaux…
-Always on top	Workspaces		Toujours au dessus
-Auto-raise	Workspaces		Auto-montée
-Change workspace count…	Workspaces		Changer le nombre de bureaux virtuels…
 Invalid argument: %s\n	Workspaces		Argument invalide : %sn
-OK	Workspaces		OK
 Quit	Workspaces		Quitter
-Show window border	Workspaces		Montrer la bordure de fenêtre
-Show window tab	Workspaces		Afficher l'onglet de la fenêtre
 Workspaces	System name		Bureaux
+Change workspace count…	Workspaces		Changer le nombre de bureaux virtuels…
+About Workspaces…	Workspaces		À propos de Bureaux…
 Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Bureaux\nécrit par %1 et %2.\n\nCopyright %3, Haiku.\n\nEnvoyez les fenêtre à l'arrière-plan avec la touche Option. Envoyez les fenêtres au premier plan avec la touche Contrôle.\n
+Show window border	Workspaces		Montrer la bordure de fenêtre
+Auto-raise	Workspaces		Auto-montée
+OK	Workspaces		OK
+Always on top	Workspaces		Toujours au dessus
+Show window tab	Workspaces		Afficher l'onglet de la fenêtre

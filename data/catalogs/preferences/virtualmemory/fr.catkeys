@@ -1,20 +1,20 @@
 1	french	x-vnd.Haiku-VirtualMemory	688347876
-%Ld B	SettingsWindow		%Ld o
-Changes will take effect on restart!	SettingsWindow		Les changements seront pris en compte au redémarrage !
-Current swap file size: 	SettingsWindow		Taille actuelle du fichier d'échange : 
-Defaults	SettingsWindow		Par défaut
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Désactiver la mémoire virtuelle perturbe le système quand la mémoire est pleine.\nLa mémoire virtuelle n'affecte pas les performances avant que ce point soit atteint.\n\nÊtes-vous vraiment sur de vouloir la désactiver ?
-Enable virtual memory	SettingsWindow		Activer la mémoire virtuelle
-GB	SettingsWindow		Go
-Insufficient space for a swap file.	SettingsWindow		Il n'y a as assez d'espace pour un fichier d'échange
-KB	SettingsWindow		Ko
-Keep enabled	SettingsWindow		Laisser actif
-MB	SettingsWindow		Mo
-OK	VirtualMemoryApp		OK
-Physical memory: 	SettingsWindow		Mémoire physique : 
-Requested swap file size:	SettingsWindow		Taille demandée pour le fichier d'échange :
-Revert	SettingsWindow		Défaire
 Turn off	SettingsWindow		Désactiver
+GB	SettingsWindow		Go
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Désactiver la mémoire virtuelle perturbe le système quand la mémoire est pleine.\nLa mémoire virtuelle n'affecte pas les performances avant que ce point soit atteint.\n\nÊtes-vous vraiment sur de vouloir la désactiver ?
+Requested swap file size:	SettingsWindow		Taille demandée pour le fichier d'échange :
+Physical memory: 	SettingsWindow		Mémoire physique : 
+Changes will take effect on restart!	SettingsWindow		Les changements seront pris en compte au redémarrage !
+Defaults	SettingsWindow		Par défaut
+KB	SettingsWindow		Ko
 Use volume:	SettingsWindow		Utiliser le volume :
+Insufficient space for a swap file.	SettingsWindow		Il n'y a as assez d'espace pour un fichier d'échange
+Keep enabled	SettingsWindow		Laisser actif
+Revert	SettingsWindow		Défaire
 VirtualMemory	System name		Mémoire Virtuelle
+Current swap file size: 	SettingsWindow		Taille actuelle du fichier d'échange : 
+OK	VirtualMemoryApp		OK
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Mémoire Virtuelle\n\tÉcrit par Axel Dörfler\n\tCopyright 2005, Haiku.\n
+Enable virtual memory	SettingsWindow		Activer la mémoire virtuelle
+MB	SettingsWindow		Mo
+%Ld B	SettingsWindow		%Ld o

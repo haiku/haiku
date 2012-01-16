@@ -1,17 +1,17 @@
 1	french	x-vnd.Haiku-GLTeapot	3661633351
-Blue	TeapotWindow		Bleu
-File	TeapotWindow		Fichier
-Fog	TeapotWindow		Brouillard
-GLTeapot	System name		GLTeapot
-Green	TeapotWindow		Vert
-Lighting	TeapotWindow		Éclairage
-Lights	TeapotWindow		Lumières
-Lower left	TeapotWindow		En bas à gauche
-Options	TeapotWindow		Options
-Perspective	TeapotWindow		Perspective
-Quit	TeapotWindow		Quitter
-Red	TeapotWindow		Rouge
-Right	TeapotWindow		À droite
 Upper center	TeapotWindow		En haut au centre
+Lighting	TeapotWindow		Éclairage
+Lower left	TeapotWindow		En bas à gauche
 White	TeapotWindow		Blanc
 Yellow	TeapotWindow		Jaune
+Blue	TeapotWindow		Bleu
+Quit	TeapotWindow		Quitter
+Fog	TeapotWindow		Brouillard
+File	TeapotWindow		Fichier
+Options	TeapotWindow		Options
+Perspective	TeapotWindow		Perspective
+GLTeapot	System name		GLTeapot
+Green	TeapotWindow		Vert
+Right	TeapotWindow		À droite
+Red	TeapotWindow		Rouge
+Lights	TeapotWindow		Lumières

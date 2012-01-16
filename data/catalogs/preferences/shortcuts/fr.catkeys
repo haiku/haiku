@@ -1,52 +1,52 @@
 1	french	x-vnd.Haiku-Shortcuts	621368175
-(Choose application with file requester)	ShortcutsWindow		(Choisissez une application avec une requête de fichier)
-*Beep	ShortcutsWindow		*Bip
-*InsertString \"Your Text Here\"	ShortcutsWindow		*InsérerTexte « votre texte ici »
-*LaunchHandler text/html	ShortcutsWindow		*GestionnaireDeLancement text/html
-*MouseButton 1	ShortcutsWindow		*BoutonSouris 1
-*MouseDown	ShortcutsWindow		*SourisEnBas
-*MouseUp	ShortcutsWindow		*SourisEnHaut
-*MoveMouse +20 +0	ShortcutsWindow		*BougeSouris +20 +0
-*MoveMouseTo 50% 50%	ShortcutsWindow		*BougerLaSourisEn 50% 50%
-*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi « *BougerSourisEn 100% 0 » « *BoutonSouris 1 »
-*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*EnvoyerMessage application/x-vnd.Be-TRAK 'Tfnd'
-Add new shortcut	ShortcutsWindow		Ajouter un nouveau raccourci
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
-Append	ShortcutsWindow		Ajouter
-Append KeySet…	ShortcutsWindow		Ajouter un jeu de touches…
-Application	ShortcutsWindow		Application
-Beep	ShortcutsSpec		Bip
-Cancel	ShortcutsWindow		Annuler
-Control	ShortcutsSpec	Name for modifier on keyboard	Contrôle
-Don't save	ShortcutsWindow		Ne pas enregistrer
 Error, NULL state description?\n	ShortcutsSpec		Erreur : description d'état NULL ?\n
-File	ShortcutsWindow		Fichier
-InsertString	ShortcutsSpec		InsérerTexte
-Key	ShortcutsWindow		Touche
-LaunchHandler	ShortcutsSpec		GestionnaireDeLancement
-MouseButton	ShortcutsSpec		BoutonSouris
-MouseDown	ShortcutsSpec		SourisEnBas
-MouseUp	ShortcutsSpec		SourisEnHaut
 MoveMouse	ShortcutsSpec		BougerSouris
-MoveMouseTo	ShortcutsSpec		BougerSourisEn
-Multi	ShortcutsSpec		Multi
 OK	ShortcutsWindow		OK
-Oh no	ShortcutsWindow		Oh non!
-Open	ShortcutsWindow		Ouvrir
-Open KeySet…	ShortcutsWindow		Ouvrir un jeu de touches…
-Quit	ShortcutsWindow		Quitter
-Really quit without saving your changes?	ShortcutsWindow		Voulez-vous vraiment sortir sans enregistrer vos modifications ? 
-Remove selected shortcut	ShortcutsWindow		Supprimer le raccourci sélectionné
-Revert to saved	ShortcutsWindow		Revenir à la version enregistrée
-Save	ShortcutsWindow		Enregistrer
-Save & apply	ShortcutsWindow		Sauver et appliquer
-Save KeySet as…	ShortcutsWindow		Enregistrer le jeu de touches sous…
-Select	ShortcutsWindow		Sélectionner
-SendMessage	ShortcutsSpec		EnvoiMessage
-Shift	ShortcutsSpec	Name for modifier on keyboard	Majuscule
-Shortcuts	System name		Raccourcis 
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Raccourcis n'a pas pu ouvrir le fichier de jeu de touches !
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Raccourcis n'a pas pu analyser votre fichier de jeu de touches !
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Raccourcis n'a pas pu enregistrer votre fichier de jeu de touches !
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Raccourcis n'a pas pu enregistrer votre jeu de touches.
+Cancel	ShortcutsWindow		Annuler
+InsertString	ShortcutsSpec		InsérerTexte
+Append KeySet…	ShortcutsWindow		Ajouter un jeu de touches…
+Control	ShortcutsSpec	Name for modifier on keyboard	Contrôle
+Key	ShortcutsWindow		Touche
+Open KeySet…	ShortcutsWindow		Ouvrir un jeu de touches…
+MouseUp	ShortcutsSpec		SourisEnHaut
+Revert to saved	ShortcutsWindow		Revenir à la version enregistrée
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InsérerTexte « votre texte ici »
+*MouseUp	ShortcutsWindow		*SourisEnHaut
+(Choose application with file requester)	ShortcutsWindow		(Choisissez une application avec une requête de fichier)
 Window	ShortcutsSpec	Name for modifier on keyboard	Fenêtre
+*LaunchHandler text/html	ShortcutsWindow		*GestionnaireDeLancement text/html
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Raccourcis n'a pas pu ouvrir le fichier de jeu de touches !
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi « *BougerSourisEn 100% 0 » « *BoutonSouris 1 »
+SendMessage	ShortcutsSpec		EnvoiMessage
+MoveMouseTo	ShortcutsSpec		BougerSourisEn
+Save	ShortcutsWindow		Enregistrer
+*MouseButton 1	ShortcutsWindow		*BoutonSouris 1
+*MoveMouse +20 +0	ShortcutsWindow		*BougeSouris +20 +0
+MouseDown	ShortcutsSpec		SourisEnBas
+Remove selected shortcut	ShortcutsWindow		Supprimer le raccourci sélectionné
+MouseButton	ShortcutsSpec		BoutonSouris
+Add new shortcut	ShortcutsWindow		Ajouter un nouveau raccourci
+Save & apply	ShortcutsWindow		Sauver et appliquer
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*EnvoyerMessage application/x-vnd.Be-TRAK 'Tfnd'
+Append	ShortcutsWindow		Ajouter
+File	ShortcutsWindow		Fichier
+Beep	ShortcutsSpec		Bip
+Quit	ShortcutsWindow		Quitter
+*MouseDown	ShortcutsWindow		*SourisEnBas
+Don't save	ShortcutsWindow		Ne pas enregistrer
+Multi	ShortcutsSpec		Multi
+Application	ShortcutsWindow		Application
+Shift	ShortcutsSpec	Name for modifier on keyboard	Majuscule
+*Beep	ShortcutsWindow		*Bip
+*MoveMouseTo 50% 50%	ShortcutsWindow		*BougerLaSourisEn 50% 50%
+Save KeySet as…	ShortcutsWindow		Enregistrer le jeu de touches sous…
+Open	ShortcutsWindow		Ouvrir
+Really quit without saving your changes?	ShortcutsWindow		Voulez-vous vraiment sortir sans enregistrer vos modifications ? 
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Raccourcis n'a pas pu analyser votre fichier de jeu de touches !
+Select	ShortcutsWindow		Sélectionner
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Raccourcis n'a pas pu enregistrer votre fichier de jeu de touches !
+Oh no	ShortcutsWindow		Oh non!
+LaunchHandler	ShortcutsSpec		GestionnaireDeLancement
+Shortcuts	System name		Raccourcis 

@@ -1,29 +1,27 @@
-1	french	x-vnd.Haiku-Magnify	3748875992
-%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width ⨯ %height @ %pixelSize pixels/pixel
-Add a crosshair	Magnify-Main		Ajouter un viseur
+1	french	x-vnd.Haiku-Magnify	2227745383
+no clip msg\n	In console, when clipboard is empty after clicking Copy image		Aucun clip\n
+Make square	Magnify-Main		Rendre carré
 Copy image	Magnify-Main		Copier l'image
-Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Copier/Enregistrer :\n copier - copie l'image vers le presse-papier\n enregistrer : demande à l'utilisateur de spécifier un fichier de destination où\n enregistrer l'image.\n
-Decrease pixel size	Magnify-Main		Réduire le grossissement
-Decrease window size	Magnify-Main		Diminuer la taille de la fenêtre
-Freeze/Unfreeze image	Magnify-Main		Gèle/Dégèle l'image
+Magnify help	Magnify-Help		Aide de la Loupe
+usage: magnify [size] (magnify size * size pixels)\n	Console		utilisation : magnify [taille] (taille d'agrandissement * taille des pixels)\n
+Stick coordinates	Magnify-Main		Mémoriser les coordonnées
+Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		informations :\n Cacher/Afficher les informations - cache ou affiche toutes les nouvelles fonctionnalités\n  note : Lorsqu'un carré rouge apparait.\n  Il indique sur quel pixel la valeur de couleur RVB est mesurées.\n Ajouter/Enlever un viseur - 2 viseurs peuvent être ajoutés (ou retirés...)\n  pour aider à aligner et placer des objets.\n  Les viseurs sont représentés par des carrés bleus et des lignes bleus.\n montrer/cacher la grille - montre ou cache la grille séparant chaque pixel.\n
+Hide/Show grid	Magnify-Main		Cacher/afficher la grille
+magnify: size must be a multiple of 4\n	Console		Loupe : la taille doit être un multiple de 4\n
 General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		Général: \n 32⨯32 - ces nombres dans le coin supérieur gauche représentent le nombre de\npixels affichés (largeur ⨯ hauteur).\n8 pixels/pixel - représente le facteur de grossissement des pixels.\nR:152 V:52 B:10 - valeurs RVB du pixel sous le carré rouge.\n
 Help	Magnify-Main		Aide
-Hide/Show grid	Magnify-Main		Cacher/afficher la grille
-Hide/Show info	Magnify-Main		Cacher/Afficher les informations
-Increase pixel size	Magnify-Main		Augmenter le grossissement
-Increase window size	Magnify-Main		Augmenter la taille de la fenêtre
-Info	Magnify-Main		Information
-Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		informations :\n Cacher/Afficher les informations - cache ou affiche toutes les nouvelles fonctionnalités\n  note : Lorsqu'un carré rouge apparait.\n  Il indique sur quel pixel la valeur de couleur RVB est mesurées.\n Ajouter/Enlever un viseur - 2 viseurs peuvent être ajoutés (ou retirés...)\n  pour aider à aligner et placer des objets.\n  Les viseurs sont représentés par des carrés bleus et des lignes bleus.\n montrer/cacher la grille - montre ou cache la grille séparant chaque pixel.\n
-Magnify	System name		Loupe
-Magnify help	Magnify-Help		Aide de la Loupe
-Make square	Magnify-Main		Rendre carré
-Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Navigation :\n les flèches de direction - déplacent l'élément sélectionné (l'indicateur RVB ou les viseurs) pixel par pixel.\n les flèches de direction+<option> - déplacent le curseur pixel par pixel\n x indique la sélection en cours\n
-Remove a crosshair	Magnify-Main		Enlever un viseur
-Save image	Magnify-Main		Enregistrer l'image
 Sizing/Resizing:\n  make square - sets the width and the height to the larger\n    of the two making a square image\n  increase/decrease window size - grows or shrinks the window\n    size by 4 pixels.\n    note: this window can also be resized to any size via the\n      resizing region of the window\n  increase/decrease pixel size - increases or decreases the number\n    of pixels used to magnify a 'real' pixel. Range is 1 to 16.\n	Magnify-Help		Dimensionnement/Redimensionnement :\n Rendre carré - définit la largeur et la hauteur à la plus grande\n  des deux pour faire une image carrée\n Augmenter/Diminuer la taille de la fenêtre - augmente ou\n  diminue la taille de la fenêtre de 4 pixels\n  note : la fenêtre peut également être redimensionnée à\n  n'importe quelle taille par l'intermédiaire de sa poignée.\n Augmenter/Réduire le grossissement - augmente ou diminue\n  le nombre de pixels utilisés pour grossir un « vrai » pixel, le\n  grossissement allant de 1 à 16.\n
-Stick coordinates	Magnify-Main		Mémoriser les coordonnées
-freeze - freezes/unfreezes magnification of whatever the\n    cursor is currently over\n	Magnify-Help		freeze - gèle/dégèle l'agrandissement de ce qui se trouve sous le curseur.\n
-magnify: size must be a multiple of 4\n	Console		Loupe : la taille doit être un multiple de 4\n
-no clip msg\n	In console, when clipboard is empty after clicking Copy image		Aucun clip\n
-size must be > 4 and a multiple of 4\n	Console		La taille doit être > 4 et multiple de 4\n
-usage: magnify [size] (magnify size * size pixels)\n	Console		utilisation : magnify [taille] (taille d'agrandissement * taille des pixels)\n
+Decrease pixel size	Magnify-Main		Réduire le grossissement
+Magnify	System name		Loupe
+%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width ⨯ %height @ %pixelSize pixels/pixel
+Info	Magnify-Main		Information
+Remove a crosshair	Magnify-Main		Enlever un viseur
+Freeze/Unfreeze image	Magnify-Main		Gèle/Dégèle l'image
+Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Copier/Enregistrer :\n copier - copie l'image vers le presse-papier\n enregistrer : demande à l'utilisateur de spécifier un fichier de destination où\n enregistrer l'image.\n
+Hide/Show info	Magnify-Main		Cacher/Afficher les informations
+Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Navigation :\n les flèches de direction - déplacent l'élément sélectionné (l'indicateur RVB ou les viseurs) pixel par pixel.\n les flèches de direction+<option> - déplacent le curseur pixel par pixel\n x indique la sélection en cours\n
+Save image	Magnify-Main		Enregistrer l'image
+Increase window size	Magnify-Main		Augmenter la taille de la fenêtre
+Decrease window size	Magnify-Main		Diminuer la taille de la fenêtre
+Increase pixel size	Magnify-Main		Augmenter le grossissement
+Add a crosshair	Magnify-Main		Ajouter un viseur

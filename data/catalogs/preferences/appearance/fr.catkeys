@@ -1,51 +1,51 @@
 1	french	x-vnd.Haiku-Appearance	168322075
-About	DecorSettingsView		À propos
-About Decorator	DecorSettingsView		À propos du Décorateur
-Antialiasing	APRWindow		Lissage
-Antialiasing menu	AntialiasingSettingsView		Menu lissage
-Antialiasing type:	AntialiasingSettingsView		Type de lissage :
-Appearance	System name		Apparence
-Choose Decorator	DecorSettingsView		Choisir un décorateur
-Colors	APRWindow		Couleurs
-Control background	Colors tab		Arrière plan des contrôles
-Control border	Colors tab		Bordure des contrôles
 Control highlight	Colors tab		Mise en valeur de contrôle
-Control text	Colors tab		Texte des contrôles
-Defaults	APRWindow		Défaut
-Document background	Colors tab		Arrière plan du document
-Document text	Colors tab		Texte du document
-Failure	Colors tab		Échec
-Glyph hinting:	AntialiasingSettingsView		Consigne de glyphes :
-Grayscale	AntialiasingSettingsView		Niveaux de gris
-Hinting menu	AntialiasingSettingsView		Menu ajustement
-Inactive window border	Colors tab		Bordure de fenêtre inactive
-Inactive window tab	Colors tab		Titres des fenêtres inactives
-Inactive window tab text	Colors tab		Texte des titres de fenêtres inactives
-LCD subpixel	AntialiasingSettingsView		Sous-pixel LCD
-Menu background	Colors tab		Arrière plan de menu
-Menu item text	Colors tab		Texte des éléments de menu
-Monospaced fonts only	AntialiasingSettingsView		Seulement les polices à chasse fixe
-Navigation base	Colors tab		Base de navigation
-Navigation pulse	Colors tab		Pulsation de navigation
-OK	DecorSettingsView		OK
-Off	AntialiasingSettingsView		Désactivé
-On	AntialiasingSettingsView		Activé
-Panel background	Colors tab		Arrière plan des panneaux
-Panel text	Colors tab		Texte des panneaux
-Reduce colored edges filter strength:	AntialiasingSettingsView		Intensité du filtre de réduction des bords de couleurs :
-Revert	APRWindow		Rétablir
-Selected menu item background	Colors tab		Arrière plan de l'élément sélectionnée dans le menu
-Selected menu item border	Colors tab		Bordure de l'élément sélectionné dans le menu
-Selected menu item text	Colors tab		Texte de l'élément sélectionné dans le menu
+Control border	Colors tab		Bordure des contrôles
+Antialiasing type:	AntialiasingSettingsView		Type de lissage :
 Shadow	Colors tab		Ombre
+On	AntialiasingSettingsView		Activé
+Defaults	APRWindow		Défaut
+Grayscale	AntialiasingSettingsView		Niveaux de gris
 Shine	Colors tab		Lumière
-Strong	AntialiasingSettingsView		Épais
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Le lissage sous-pixel n'est pas disponible en même temps que les consignes de glyphes dans cette version d'Haiku afin d'éviter des problèmes de brevets logiciels. Pour activer cette fonctionnalité, vous devez compiler Haiku vous-même et activer certaines options dans l'en-tête de configuration de libfreetype.
+About	DecorSettingsView		À propos
+Off	AntialiasingSettingsView		Désactivé
+Choose Decorator	DecorSettingsView		Choisir un décorateur
 Success	Colors tab		Réussite
-Tooltip background	Colors tab		Arrière plan des bulles d'aide
-Tooltip text	Colors tab		Texte des bulles d'aide
+Inactive window tab text	Colors tab		Texte des titres de fenêtres inactives
+About Decorator	DecorSettingsView		À propos du Décorateur
+Failure	Colors tab		Échec
+Hinting menu	AntialiasingSettingsView		Menu ajustement
 Window Decorator	APRWindow		Décorateur de fenêtre
 Window Decorator:	DecorSettingsView		Décorateur de fenêtre :
-Window border	Colors tab		Bordure de fenêtre
+Document background	Colors tab		Arrière plan du document
+Revert	APRWindow		Rétablir
 Window tab	Colors tab		Titre des fenêtres
+Tooltip background	Colors tab		Arrière plan des bulles d'aide
+Selected menu item background	Colors tab		Arrière plan de l'élément sélectionnée dans le menu
+Antialiasing	APRWindow		Lissage
+Navigation base	Colors tab		Base de navigation
+Window border	Colors tab		Bordure de fenêtre
 Window tab text	Colors tab		Texte des titres de fenêtres
+Document text	Colors tab		Texte du document
+Navigation pulse	Colors tab		Pulsation de navigation
+Selected menu item text	Colors tab		Texte de l'élément sélectionné dans le menu
+Menu background	Colors tab		Arrière plan de menu
+OK	DecorSettingsView		OK
+Panel background	Colors tab		Arrière plan des panneaux
+Colors	APRWindow		Couleurs
+Control background	Colors tab		Arrière plan des contrôles
+Inactive window tab	Colors tab		Titres des fenêtres inactives
+Appearance	System name		Apparence
+Reduce colored edges filter strength:	AntialiasingSettingsView		Intensité du filtre de réduction des bords de couleurs :
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Le lissage sous-pixel n'est pas disponible en même temps que les consignes de glyphes dans cette version d'Haiku afin d'éviter des problèmes de brevets logiciels. Pour activer cette fonctionnalité, vous devez compiler Haiku vous-même et activer certaines options dans l'en-tête de configuration de libfreetype.
+Control text	Colors tab		Texte des contrôles
+Tooltip text	Colors tab		Texte des bulles d'aide
+Inactive window border	Colors tab		Bordure de fenêtre inactive
+Menu item text	Colors tab		Texte des éléments de menu
+LCD subpixel	AntialiasingSettingsView		Sous-pixel LCD
+Selected menu item border	Colors tab		Bordure de l'élément sélectionné dans le menu
+Strong	AntialiasingSettingsView		Épais
+Panel text	Colors tab		Texte des panneaux
+Monospaced fonts only	AntialiasingSettingsView		Seulement les polices à chasse fixe
+Antialiasing menu	AntialiasingSettingsView		Menu lissage
+Glyph hinting:	AntialiasingSettingsView		Consigne de glyphes :

@@ -1,24 +1,24 @@
 1	french	x-vnd.Haiku-Mouse	1033564338
-...by Andrew Edward McCall	MouseApplication		…par Andrew Edward McCall
-1-Button	SettingsView		1 bouton
+Mouse type:	SettingsView		Type de souris :
+Warp	SettingsView		Téléportation 
 2-Button	SettingsView		2 boutons
-3-Button	SettingsView		3 boutons
-Accept first click	SettingsView		Accepter le premier clic
+Double-click test area	SettingsView		Zone de test du double clic
+Revert	MouseWindow		Rétablir
+...by Andrew Edward McCall	MouseApplication		…par Andrew Edward McCall
+Mouse acceleration	SettingsView		Accélération de la souris
 Click to focus	SettingsView		Cliquer pour le focus
 Click to focus and raise	SettingsView		Cliquer pour avoir le focus et passer au premier plan
-Defaults	MouseWindow		Par défaut
-Dig Deal	MouseApplication		Tu piges ?
-Double-click speed	SettingsView		Vitesse du double clic
-Double-click test area	SettingsView		Zone de test du double clic
-Fast	SettingsView		Rapide
-Focus follows mouse	SettingsView		Le focus suit le pointeur
+3-Button	SettingsView		3 boutons
+Mouse speed	SettingsView		Vitesse de la souris
 Focus mode:	SettingsView		Méthode de focus :
 Instant warp	SettingsView		Téléportation instantanée
-Mouse	System name		Souris
-Mouse acceleration	SettingsView		Accélération de la souris
-Mouse speed	SettingsView		Vitesse de la souris
-Mouse type:	SettingsView		Type de souris :
+Dig Deal	MouseApplication		Tu piges ?
+1-Button	SettingsView		1 bouton
+Double-click speed	SettingsView		Vitesse du double clic
+Defaults	MouseWindow		Par défaut
+Focus follows mouse	SettingsView		Le focus suit le pointeur
+Accept first click	SettingsView		Accepter le premier clic
+Fast	SettingsView		Rapide
 Normal	SettingsView		Normal
-Revert	MouseWindow		Rétablir
+Mouse	System name		Souris
 Slow	SettingsView		Lente
-Warp	SettingsView		Téléportation 

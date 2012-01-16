@@ -1,16 +1,16 @@
 1	french	x-vnd.Haiku-TIFFTranslator	292291870
 LZW	TIFFView		LZW
-None	TIFFView		Aucun
-RLE (Packbits)	TIFFView		RLE (bits empaqueté)
-TIFF Image Translator	TIFFView		Traducteur d'images TIFF
-TIFF Library:	TIFFView		Bibliothèque TIFF :
-TIFF Settings	TIFFMain		Réglages TIFF
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identification de l'entête TIFF : impossible de déterminer l'annuaire
 TIFF image	TIFFTranslator		Image TIFF
-TIFF image translator	TIFFTranslator		Traducteur d'images TIFF
+TIFF Library:	TIFFView		Bibliothèque TIFF :
+TIFF Image Translator	TIFFView		Traducteur d'images TIFF
+None	TIFFView		Aucun
 TIFF images	TIFFTranslator		Images TIFF
 TIFFTranslator Settings	TIFFTranslator		Réglages du traducteur TIFF
-Use Compression:	TIFFView		Utiliser la compression :
-Version %d.%d.%d %s	TIFFView		Version %d.%d.%d %s
-ZIP (Deflate)	TIFFView		ZIP (Compression)
-identify_tiff_header: couldn't set directory\n	TIFFTranslator		identification de l'entête TIFF : impossible de déterminer l'annuaire
+TIFF image translator	TIFFTranslator		Traducteur d'images TIFF
+RLE (Packbits)	TIFFView		RLE (bits empaqueté)
+TIFF Settings	TIFFMain		Réglages TIFF
 identify_tiff_header: invalid document index\n	TIFFTranslator		identification de l'entête TIFF : index de document invalide\n
+ZIP (Deflate)	TIFFView		ZIP (Compression)
+Version %d.%d.%d %s	TIFFView		Version %d.%d.%d %s
+Use Compression:	TIFFView		Utiliser la compression :

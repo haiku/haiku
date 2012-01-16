@@ -1,88 +1,88 @@
 1	french	x-vnd.Haiku-Bluetooth	3550394259
-#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Nom invalide
-#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Nom invalide
-#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Nom invalide
-#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Nom invalide
-(reserved)	DeviceClass		(réservé)
-1-17% utilized	DeviceClass		1 à 17% utilisés
-17-33% utilized	DeviceClass		17 à 33% utilisés
-33-50% utilized	DeviceClass		33 à 55% utilisés
-50-67% utilized	DeviceClass		50 à 67% utilisés
-67-83% utilized	DeviceClass		67 à 83% utilisés
-83-99% utilized	DeviceClass		83 à 99% utilisés
-Audio	DeviceClass		Audio
-Audio/Video	DeviceClass		Audio/Video
-Camcorder	DeviceClass		Caméscope
-Camera	DeviceClass		Appareil photo
-Capturing	DeviceClass		Capture
-Car audio	DeviceClass		Autoradio
-Card reader	DeviceClass		Lecteur de carte
-Cellular	DeviceClass		Mobile
-Combo keyboard/pointing device	DeviceClass		Clavier combiné à un dispositif de pointage
-Common ISDN access	DeviceClass		Accès Numéris
-Computer	DeviceClass		Ordinateur
-Controller	DeviceClass		Contrôleur
-Cordless	DeviceClass		Sans fil
-Desktop workstation	DeviceClass		Station de travail
-Device conforms to the headset profile	DeviceClass		Le périphérique est conforme aux profils d'applications Bluetooth
-Digitizer tablet	DeviceClass		Tablette à digitaliser
 Display	DeviceClass		Affichage
-Doll/Action figure	DeviceClass		Poupée/Figurine
-Fully available	DeviceClass		Entièrement disponible
+Capturing	DeviceClass		Capture
+Printer	DeviceClass		Imprimante
+Uncategorized	DeviceClass		Inclassable
+1-17% utilized	DeviceClass		1 à 17% utilisés
+Positioning	DeviceClass		Géolocalisation
+Rendering	DeviceClass		Interprétation
+Phone	DeviceClass		Téléphone
+17-33% utilized	DeviceClass		17 à 33% utilisés
+#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Nom invalide
+Combo keyboard/pointing device	DeviceClass		Clavier combiné à un dispositif de pointage
+Controller	DeviceClass		Contrôleur
+No service available	DeviceClass		Aucun service disponible
+Wearable	DeviceClass	A wearable computer	Vêtement
+Handheld	DeviceClass		Ordinateur de poche
+Invalid device class!\n	DeviceClass		Classe de périphérique invalide!\n
+Sensing device	DeviceClass		Dispositif de détection
+Computer	DeviceClass		Ordinateur
+Cellular	DeviceClass		Mobile
+Microphone	DeviceClass		Microphone
+Unknown (reserved) minor device class	DeviceClass		Classe mineure inconnue (réservée)
+Cordless	DeviceClass		Sans fil
+Common ISDN access	DeviceClass		Accès Numéris
+83-99% utilized	DeviceClass		83 à 99% utilisés
+Scanner	DeviceClass		Scanner
 Game	DeviceClass		Jeu
 Gamepad	DeviceClass		Manette de jeu
-Gaming/Toy	DeviceClass		Jouet
+(reserved)	DeviceClass		(réservé)
+Desktop workstation	DeviceClass		Station de travail
+Audio/Video	DeviceClass		Audio/Video
 Glasses	DeviceClass		Lunettes
-Handheld	DeviceClass		Ordinateur de poche
-Hands-free	DeviceClass		Kit mains-libres
-Headphones	DeviceClass		Écouteurs
-Helmet	DeviceClass		Casque
-HiFi audio device	DeviceClass		Chaîne hifi
-Imaging	DeviceClass		Dispositif d'imagerie
-Information	DeviceClass		Information
-Invalid device class!\n	DeviceClass		Classe de périphérique invalide!\n
-Jacket	DeviceClass		Veste
-Joystick	DeviceClass		Joystick
 Keyboard	DeviceClass		Clavier
-LAN access	DeviceClass		Accès LAN
-Laptop	DeviceClass		Ordinateur portable
-Loudspeaker	DeviceClass		Haut-parleur
+Camera	DeviceClass		Appareil photo
 Major class: 	DeviceClass		Classe majeure :
-Microphone	DeviceClass		Microphone
-Minor class: 	DeviceClass		Classe mineure :
-Miscellaneous	DeviceClass		Divers
-Networking	DeviceClass		Réseau
-No service available	DeviceClass		Aucun service disponible
-Not implemented	RemoteDevice		Non implémenté
-Object transfer	DeviceClass		Transfert d'objet
-Pager	DeviceClass	A small radio device to receive short text messages	Radiomessagerie
-Palm	DeviceClass	A palm-held device	Organiseur électronique
-Peripheral	DeviceClass		Périphérique
-Phone	DeviceClass		Téléphone
-Pointing device	DeviceClass		Dispositif de pointage
-Portable audio	DeviceClass		Baladeur
-Positioning	DeviceClass		Géolocalisation
-Printer	DeviceClass		Imprimante
-Remote control	DeviceClass		Télécommande
-Rendering	DeviceClass		Interprétation
-Robot	DeviceClass		Robot
-SIM card reader	DeviceClass		Lecteur de carte SIM
-Scanner	DeviceClass		Scanner
-Sensing device	DeviceClass		Dispositif de détection
-Server	DeviceClass		Serveur
-Service classes: 	DeviceClass		Classe de service :
+50-67% utilized	DeviceClass		50 à 67% utilisés
+Card reader	DeviceClass		Lecteur de carte
 Set-top box	DeviceClass		Décodeur TV
+Helmet	DeviceClass		Casque
+Laptop	DeviceClass		Ordinateur portable
+Car audio	DeviceClass		Autoradio
+SIM card reader	DeviceClass		Lecteur de carte SIM
+Headphones	DeviceClass		Écouteurs
+Information	DeviceClass		Information
+Remote control	DeviceClass		Télécommande
+Service classes: 	DeviceClass		Classe de service :
+Pager	DeviceClass	A small radio device to receive short text messages	Radiomessagerie
+Object transfer	DeviceClass		Transfert d'objet
+Gaming/Toy	DeviceClass		Jouet
+Audio	DeviceClass		Audio
+Robot	DeviceClass		Robot
+Camcorder	DeviceClass		Caméscope
+Digitizer tablet	DeviceClass		Tablette à digitaliser
+Loudspeaker	DeviceClass		Haut-parleur
+Joystick	DeviceClass		Joystick
+LAN access	DeviceClass		Accès LAN
+Wrist watch	DeviceClass		Montre
+Minor class: 	DeviceClass		Classe mineure :
+Networking	DeviceClass		Réseau
+Portable audio	DeviceClass		Baladeur
+Device conforms to the headset profile	DeviceClass		Le périphérique est conforme aux profils d'applications Bluetooth
+Hands-free	DeviceClass		Kit mains-libres
+#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Nom invalide
+Vehicle	DeviceClass		Véhicule
+Palm	DeviceClass	A palm-held device	Organiseur électronique
+Video display and loudspeaker	DeviceClass		Écran avec haut-parleur
+Peripheral	DeviceClass		Périphérique
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Nom invalide
+Wired modem or voice gateway	DeviceClass		Modem filaire ou passerelle vocale
+Jacket	DeviceClass		Veste
+Unspecified	DeviceClass		Non spécifié
+Fully available	DeviceClass		Entièrement disponible
+67-83% utilized	DeviceClass		67 à 83% utilisés
+Not implemented	RemoteDevice		Non implémenté
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Nom invalide
+Server	DeviceClass		Serveur
+Video conferencing	DeviceClass		Visioconférence
+Video camera	DeviceClass		Caméra
+HiFi audio device	DeviceClass		Chaîne hifi
 Smart phone	DeviceClass		Smartphone
 Telephony	DeviceClass		Téléphonie
-Uncategorized	DeviceClass		Inclassable
-Unknown (reserved) minor device class	DeviceClass		Classe mineure inconnue (réservée)
-Unspecified	DeviceClass		Non spécifié
+Doll/Action figure	DeviceClass		Poupée/Figurine
 VCR	DeviceClass		Magnétoscope
-Vehicle	DeviceClass		Véhicule
-Video camera	DeviceClass		Caméra
-Video conferencing	DeviceClass		Visioconférence
-Video display and loudspeaker	DeviceClass		Écran avec haut-parleur
 Video monitor	DeviceClass		Moniteur
-Wearable	DeviceClass	A wearable computer	Vêtement
-Wired modem or voice gateway	DeviceClass		Modem filaire ou passerelle vocale
-Wrist watch	DeviceClass		Montre
+Pointing device	DeviceClass		Dispositif de pointage
+Miscellaneous	DeviceClass		Divers
+33-50% utilized	DeviceClass		33 à 55% utilisés
+Imaging	DeviceClass		Dispositif d'imagerie

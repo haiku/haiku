@@ -1,23 +1,23 @@
-1	french	application/x-vnd.Haiku-Registrar	2599857937
-%action%?	ShutdownProcess		%action% ?
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		L'application « %appName% » a interrompu le traitement d'arrêt.
-Asking \"%appName%\" to quit.	ShutdownProcess		Arrêt demandé à « %appName% ».
-Asking background applications to quit.	ShutdownProcess		Arrêt demandé aux tâches de fond
-Asking other processes to quit.	ShutdownProcess		Arrêt demandé aux autres processus.
-Cancel	ShutdownProcess		Annuler
-Cancel shutdown	ShutdownProcess		Annuler l'arrêt
-Do you really want to restart the system?	ShutdownProcess		Voulez-vous vraiment redémarrer le système ?
-Do you really want to shut down the system?	ShutdownProcess		Voulez-vous vraiment éteindre le système ?
-It's now safe to turn off the computer.	ShutdownProcess		Vous pouvez maintenant éteindre votre ordinateur.
-Kill application	ShutdownProcess		Tuer l'application
-OK	ShutdownProcess		OK
-Restart	ShutdownProcess		Redémarrer
+1	french	x-vnd.haiku-registrar	2599857937
 Restart system	ShutdownProcess		Redémarrer le système
-Restarting…	ShutdownProcess		Redémarrage…
-Shut down	ShutdownProcess		Éteindre
-Shutdown aborted	ShutdownProcess		Extinction interrompue
-Shutdown status	ShutdownProcess		État de l'extinction
-Shutting down…	ShutdownProcess		Fermeture…
-System is shut down	ShutdownProcess		Le système est arrêté
 The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		L'application « %appName% » est peut-être bloquée sur une fenêtre modale.
+OK	ShutdownProcess		OK
+System is shut down	ShutdownProcess		Le système est arrêté
+It's now safe to turn off the computer.	ShutdownProcess		Vous pouvez maintenant éteindre votre ordinateur.
+Cancel	ShutdownProcess		Annuler
+Do you really want to shut down the system?	ShutdownProcess		Voulez-vous vraiment éteindre le système ?
+Asking other processes to quit.	ShutdownProcess		Arrêt demandé aux autres processus.
+Asking \"%appName%\" to quit.	ShutdownProcess		Arrêt demandé à « %appName% ».
+%action%?	ShutdownProcess		%action% ?
+Shutdown aborted	ShutdownProcess		Extinction interrompue
+Restarting…	ShutdownProcess		Redémarrage…
+Asking background applications to quit.	ShutdownProcess		Arrêt demandé aux tâches de fond
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		L'application « %appName% » a interrompu le traitement d'arrêt.
 Tidying things up a bit.	ShutdownProcess		On calme un peu les choses.
+Do you really want to restart the system?	ShutdownProcess		Voulez-vous vraiment redémarrer le système ?
+Shutdown status	ShutdownProcess		État de l'extinction
+Cancel shutdown	ShutdownProcess		Annuler l'arrêt
+Kill application	ShutdownProcess		Tuer l'application
+Shut down	ShutdownProcess		Éteindre
+Restart	ShutdownProcess		Redémarrer
+Shutting down…	ShutdownProcess		Fermeture…

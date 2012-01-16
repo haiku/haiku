@@ -1,9 +1,9 @@
 1	french	x-vnd.Haiku-WonderBrushTranslator	491575314
-Version %d.%d.%d %s	WonderBrushView		Version %d.%d.%d %s
-WBI Settings	WonderBrushMain		Réglages WonderBrush
-WBI Settings	WonderBrushTranslator		Réglages WonderBrush
-WonderBrush image	WonderBrushTranslator		Image WonderBrush
 WonderBrush image translator	WonderBrushTranslator		Traducteur d'images WonderBrush
-WonderBrush image translator	WonderBrushView		Traducteur d'images WonderBrush
+WBI Settings	WonderBrushTranslator		Réglages WonderBrush
+WBI Settings	WonderBrushMain		Réglages WonderBrush
+Version %d.%d.%d %s	WonderBrushView		Version %d.%d.%d %s
 WonderBrush images	WonderBrushTranslator		Images WonderBrush
+WonderBrush image	WonderBrushTranslator		Image WonderBrush
+WonderBrush image translator	WonderBrushView		Traducteur d'images WonderBrush
 written by:	WonderBrushView		Écrit par :

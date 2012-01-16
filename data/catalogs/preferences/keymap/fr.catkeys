@@ -1,23 +1,29 @@
-1	french	x-vnd.Haiku-Keymap	3428686297
-(Current)	Keymap window		(Actif)
-Acute trigger	Keymap window		Accent aigu
-Circumflex trigger	Keymap window		Accent circonflexe
-Diaeresis trigger	Keymap window		Tréma
-File	Keymap window		Fichier
-Font	Keymap window		Police
-Grave trigger	Keymap window		Accent grave
-Keymap	System name		Disposition du clavier
-Layout	Keymap window		Disposition
-Open…	Keymap window		Ouvrir…
-Quit	Keymap window		Quitter
-Revert	Keymap window		Défaire
-Sample and clipboard:	Keymap window		Exemple et presse-papier :
-Save as…	Keymap window		Enregistrer sous…
-Select dead keys	Keymap window		Sélection des touches mortes
-Set Modifier Keys…	Keymap window		Définir les modificateurs de touches…
-Switch shortcut keys	Keymap window		Basculer les touches de raccourcis
-Switch shortcut keys to Haiku mode	Keymap window		Basculer les touches de raccourcis en mode Haiku
-Switch shortcut keys to Windows/Linux mode	Keymap window		Basculer les touches de raccourcis en mode Linux/Windows
-System:	Keymap window		Système :
+1	french	x-vnd.Haiku-Keymap	300845166
+Caps Lock:	Modifier Keys window		Verr. Maj. :
+OK	Modifier Keys window		Ok
 Tilde trigger	Keymap window		Tilde
+Modifier Keys	Modifier Keys window		Touches modificatrices
+Grave trigger	Keymap window		Accent grave
+Select dead keys	Keymap window		Sélection des touches mortes
+Option:	Modifier Keys window		Option :
+Quit	Keymap window		Quitter
+Switch shortcut keys to Haiku mode	Keymap window		Basculer les touches de raccourcis en mode Haiku
+Circumflex trigger	Keymap window		Accent circonflexe
+Cancel	Modifier Keys window		Annuler
+Diaeresis trigger	Keymap window		Tréma
+Open…	Keymap window		Ouvrir…
+System:	Keymap window		Système :
+Switch shortcut keys	Keymap window		Basculer les touches de raccourcis
+Set Modifier Keys…	Keymap window		Définir les modificateurs de touches…
 User:	Keymap window		Utilisateur :
+Sample and clipboard:	Keymap window		Exemple et presse-papier :
+Layout	Keymap window		Disposition
+Switch shortcut keys to Windows/Linux mode	Keymap window		Basculer les touches de raccourcis en mode Linux/Windows
+Revert	Keymap window		Défaire
+Save as…	Keymap window		Enregistrer sous…
+File	Keymap window		Fichier
+(Current)	Keymap window		(Actif)
+Font	Keymap window		Police
+Keymap	System name		Disposition du clavier
+Command:	Modifier Keys window		Commande :
+Acute trigger	Keymap window		Accent aigu

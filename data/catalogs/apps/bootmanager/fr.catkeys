@@ -1,65 +1,65 @@
 1	french	x-vnd.Haiku-BootManager	3014946856
-About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Le programme est sur le point de restaurer l'enregistrement d'amorçage maître (MBR) de %disk à partir de %file. Voulez-vous continuer ?
-About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		vous êtes sur le point d'écrire le menu de démarrage sur le disque. Êtes-vous sûr de vouloir continuer ?
-About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Le programme est sur le point d'écrire le menu suivant sur le disque de démarrage (%s). Veuillez vérifier les informations ci-dessous avant de continuer.
-After five seconds	DefaultPartitionPage		Après cinq secondes
-After four seconds	DefaultPartitionPage		Après quatres secondes
-After one minute	DefaultPartitionPage		Après une minute
-After one second	DefaultPartitionPage		Après une seconde
-After three seconds	DefaultPartitionPage		Après 3 secondes
+The boot manager has been successfully installed on your system.	BootManagerController		Le gestionnaire d'amorçage a été installé avec succès sur votre système.
 After two seconds	DefaultPartitionPage		Après deux secondes
-An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Une erreur est survenue lors de l'écriture du menu de démarrage. L'enregistrement d'amorçage maître (MBR) est probablement endommagé, vous devriez le restaurer maintenant !
+Uninstall Boot Manager	UninstallPage	Title	Désinstallation du Gestionnaire d'amorçage
 At least one partition must be selected!	BootManagerController		Au moins une partition doit être sélectionnée !
-Back	BootManagerController	Button	Retour
-Backup Master Boot Record	BootManagerController	Title	Sauvegarde du MBR
-Boot Manager is unable to read the partition table!	BootManagerController		Le gestionnaire d'amorçage n'est pas en mesure de lire la table des partition !
-BootManager	System name		Gestionnaire d'amorçage
-Cannot access!	DrivesPage	Cannot install	Accès impossible !
-Default Partition	DefaultPartitionPage	Title	Partition par défaut
-Default Partition:	DefaultPartitionPage	Menu field label	Partition par défaut
-Done	BootManagerController	Button	Fait
-Drives	DrivesPage	Title	Disques
-Error reading partition table	BootManagerController	Title	Erreur de lecture de la table de partition
-File:	FileSelectionPage	Text control label	Fichier :
+The old Master Boot Record could not be saved to %s	BootManagerController		L'ancien MBR n'a pas pu être sauvegardé vers %s
+Restore MBR	BootManagerController	Button	Restaurer le MBR
 Hard Drive	DrivesPage	Default disk name	Disque Dur
-Immediately	DefaultPartitionPage		Immédiatement
-Install	DrivesPage	Button	Installer
-Installation of boot menu completed	BootManagerController	Title	Le menu de démarrage a été complètement désinstallé
-Installation of boot menu failed	BootManagerController	Title	Echec de l'installation du menu de démarrage
-Never	DefaultPartitionPage		Jamais
-Next	WizardView	Button	Suivant
-No space available!	DrivesPage	Cannot install	Espace insuffisant
-OK	BootManagerController	Button	OK
-Old Master Boot Record Saved failure	BootManagerController	Title	Echec lors de l'enregistrement de l'ancien MBR
-Old Master Boot Record saved	BootManagerController	Title	L'ancien MBR a été sauvegardé
-Partition table not compatible	BootManagerController	Title	Table des partitions incompatible
-Partitions	DefaultPartitionPage	Pop up menu title	Partitions
+USB Drive	DrivesPage	Default disk name	Disque USB
+The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		L'enregistrement d'amorçage maître ("Master Boot Record" ou MBR) du périphérique de démarrage :\n\t%s\nva maintenant être sauvegardé sur disque. Sélectionnez un fichier dans lequel enregistrer ce MBR.\n\nSi l'installation ne fonctionne pas ou si vous voulez plus tard supprimer le menu de démarrage, il vous suffira d'exécuter BootManager à l'aide de l'option « Uninstall » (Désinstaller).
+About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Le programme est sur le point de restaurer l'enregistrement d'amorçage maître (MBR) de %disk à partir de %file. Voulez-vous continuer ?
+An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Une erreur est survenue lors de l'écriture du menu de démarrage. L'enregistrement d'amorçage maître (MBR) est probablement endommagé, vous devriez le restaurer maintenant !
 Partitions	PartitionsPage	Title	Partitions
+Timeout: %s	DefaultPartitionPage		délai d'expiration : %s
+Select	FileSelectionPage	Button	Selectionner
+Cannot access!	DrivesPage	Cannot install	Accès impossible !
+Uninstall boot manager	BootManagerController	Title	Désinstallation du gestionnaire d'amorçage
+After four seconds	DefaultPartitionPage		Après quatres secondes
+Uninstallation of boot menu failed	BootManagerController	Title	La désinstallation du menu d'amorçage a échoué
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Veuillez indiquer le fichier de sauvegarde du MBR qui va servir à la restauration de celui-ci. C'est normalement le fichier qui a été crée lors de la première installation du gestionnaire de démarrage.
-Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Veuillez indiquer le fichier de sauvegarde du MBR qui va servir à la restauration de celui-ci. C'est normalement le fichier qui a été crée lors de la première installation du gestionnaire de démarrage.
+Next	WizardView	Button	Suivant
+Uninstallation of boot menu completed	BootManagerController	Title	Le menu d'amorçage a été complètement désinstallé
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Veuillez sélectionner le lecteur sur lequel vous souhaiter installer ou désinstaller le gestionnaire d'amorçage.
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Veuillez définir une partition par défaut et un délai d'expiration.\nPassé ce délai, le menu d'amorçage chargera cette partition, à moins que vous ayez sélectionné une autre partition. Vous pouvez aussi définir une attente infinie, qui nécessitera que vous renseigniez manuellement votre choix.\nGardez la touche “ALT” appuyée au démarrage pour désactiver le délai d'expiration.
-Previous	WizardView	Button	Précédant
-Quit	DrivesPage	Button	Quitter
-Restore MBR	BootManagerController	Button	Restaurer le MBR
-Select	FileSelectionPage	Button	Selectionner
-Summary	BootManagerController	Title	Récapitulatif
-The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		L'enregistrement d'amorçage maître ("Master Boot Record" ou MBR) du périphérique de démarrage :\n\t%s\nva maintenant être sauvegardé sur disque. Sélectionnez un fichier dans lequel enregistrer ce MBR.\n\nSi l'installation ne fonctionne pas ou si vous voulez plus tard supprimer le menu de démarrage, il vous suffira d'exécuter BootManager à l'aide de l'option « Uninstall » (Désinstaller).
-The Master Boot Record could not be restored!	BootManagerController		Le MBR n'a pas pu être restauré !
-The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Le MBR du périphérique de démarrage (%DISK) a été récupéré avec succès depuis %FILE.
-The boot manager has been successfully installed on your system.	BootManagerController		Le gestionnaire d'amorçage a été installé avec succès sur votre système.
-The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Les partitions suivantes ont été détectées. Veuillez cocher les cases correspondantes aux partitions à inclure dans le menu d'amorçage. Vous pouvez aussi définir le libellé que vous souhaitez voir apparaître dans le menu d'amorçage pour chacune des partitions.
-The old Master Boot Record could not be saved to %s	BootManagerController		L'ancien MBR n'a pas pu être sauvegardé vers %s
-The old Master Boot Record was successfully saved to %s.	BootManagerController		L'ancien MBR a été correctement sauvegardé dans le fichier %s.
+After one second	DefaultPartitionPage		Après une seconde
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		La table de partitions du premier disque dur n'est pas compatible avec le gestionnaire de démarrage.\nLe gestionnaire de démarrage a besoin de 2 Kilo-octets d'espace disque vide situé avant la première partition.
-Timeout: %s	DefaultPartitionPage		délai d'expiration : %s
-USB Drive	DrivesPage	Default disk name	Disque USB
-Uninstall	DrivesPage	Button	Désinstaller
-Uninstall Boot Manager	UninstallPage	Title	Désinstallation du Gestionnaire d'amorçage
-Uninstall boot manager	BootManagerController	Title	Désinstallation du gestionnaire d'amorçage
-Uninstallation of boot menu completed	BootManagerController	Title	Le menu d'amorçage a été complètement désinstallé
-Uninstallation of boot menu failed	BootManagerController	Title	La désinstallation du menu d'amorçage a échoué
-Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Inconnu
-Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	%d anonyme
-Update	DrivesPage	Button	Mettre à jour
+The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Les partitions suivantes ont été détectées. Veuillez cocher les cases correspondantes aux partitions à inclure dans le menu d'amorçage. Vous pouvez aussi définir le libellé que vous souhaitez voir apparaître dans le menu d'amorçage pour chacune des partitions.
+After one minute	DefaultPartitionPage		Après une minute
+The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Le MBR du périphérique de démarrage (%DISK) a été récupéré avec succès depuis %FILE.
 Write boot menu	BootManagerController	Button	Écrire le menu de démarrage
+The Master Boot Record could not be restored!	BootManagerController		Le MBR n'a pas pu être restauré !
+Uninstall	DrivesPage	Button	Désinstaller
+Default Partition	DefaultPartitionPage	Title	Partition par défaut
+After five seconds	DefaultPartitionPage		Après cinq secondes
+Back	BootManagerController	Button	Retour
+Installation of boot menu completed	BootManagerController	Title	Le menu de démarrage a été complètement désinstallé
+Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	%d anonyme
+File:	FileSelectionPage	Text control label	Fichier :
+Previous	WizardView	Button	Précédant
+Install	DrivesPage	Button	Installer
+About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Le programme est sur le point d'écrire le menu suivant sur le disque de démarrage (%s). Veuillez vérifier les informations ci-dessous avant de continuer.
+Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Inconnu
+Update	DrivesPage	Button	Mettre à jour
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Veuillez indiquer le fichier de sauvegarde du MBR qui va servir à la restauration de celui-ci. C'est normalement le fichier qui a été crée lors de la première installation du gestionnaire de démarrage.
+Old Master Boot Record Saved failure	BootManagerController	Title	Echec lors de l'enregistrement de l'ancien MBR
+Drives	DrivesPage	Title	Disques
+No space available!	DrivesPage	Cannot install	Espace insuffisant
+Never	DefaultPartitionPage		Jamais
+Partition table not compatible	BootManagerController	Title	Table des partitions incompatible
+Old Master Boot Record saved	BootManagerController	Title	L'ancien MBR a été sauvegardé
+Boot Manager is unable to read the partition table!	BootManagerController		Le gestionnaire d'amorçage n'est pas en mesure de lire la table des partition !
+Error reading partition table	BootManagerController	Title	Erreur de lecture de la table de partition
+Installation of boot menu failed	BootManagerController	Title	Echec de l'installation du menu de démarrage
+Backup Master Boot Record	BootManagerController	Title	Sauvegarde du MBR
+Quit	DrivesPage	Button	Quitter
+About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		vous êtes sur le point d'écrire le menu de démarrage sur le disque. Êtes-vous sûr de vouloir continuer ?
+The old Master Boot Record was successfully saved to %s.	BootManagerController		L'ancien MBR a été correctement sauvegardé dans le fichier %s.
+Default Partition:	DefaultPartitionPage	Menu field label	Partition par défaut
+Partitions	DefaultPartitionPage	Pop up menu title	Partitions
+BootManager	System name		Gestionnaire d'amorçage
+Summary	BootManagerController	Title	Récapitulatif
+OK	BootManagerController	Button	OK
+Immediately	DefaultPartitionPage		Immédiatement
+Done	BootManagerController	Button	Fait
+After three seconds	DefaultPartitionPage		Après 3 secondes

@@ -1,34 +1,34 @@
 1	french	x-vnd.Haiku-Sudoku	2463385585
-Abort	ProgressWindow		Abandon
-Advanced	SudokuWindow		Expérimenté
-Blank	SudokuWindow		Vide
-Copy	SudokuWindow		Copier
-Could not open \"%s\":\n%s\n	SudokuWindow		Impossible d'ouvrir « %s » :\n%s\n
-Could not set Sudoku:\n%s\n	SudokuWindow		Impossible d'initialiser Sudoku :\n%s\n
-Creating solvable field	SudokuGenerator		Création d'un champ solvable
-Easy	SudokuWindow		Facile
-Export as…	SudokuWindow		Exporter sous…
-File	SudokuWindow		Fichier
-HTML	SudokuWindow		HTML
-Hard	SudokuWindow		Difficile
-Help	SudokuWindow		Aide
-Mark invalid values	SudokuWindow		Marquer les valeurs invalides
-Mark valid hints	SudokuWindow		Marquer les consignes valides
-New	SudokuWindow		Nouveau
-OK	SudokuWindow		OK
-Open file…	SudokuWindow		Ouvrir un fichier…
-Progress monitor	ProgressWindow		Moniteur de progression
-Quit	SudokuWindow		Quitter
-Redo	SudokuWindow		Rétablir
 Restore snapshot	SudokuWindow		Restaurer le cliché
-Searching for removable values	SudokuGenerator		Recherche des cases effaçables
-Snapshot current	SudokuWindow		Prendre un cliché
-Solve	SudokuWindow		Résoudre
-Solve single field	SudokuWindow		Résoudre une case
-Start again	SudokuWindow		Recommencer
+Could not set Sudoku:\n%s\n	SudokuWindow		Impossible d'initialiser Sudoku :\n%s\n
+Export as…	SudokuWindow		Exporter sous…
+OK	SudokuWindow		OK
+New	SudokuWindow		Nouveau
+Abort	ProgressWindow		Abandon
 Sudoku	System name		Sudoku
+Could not open \"%s\":\n%s\n	SudokuWindow		Impossible d'ouvrir « %s » :\n%s\n
+Easy	SudokuWindow		Facile
+Open file…	SudokuWindow		Ouvrir un fichier…
+Solve single field	SudokuWindow		Résoudre une case
+Solve	SudokuWindow		Résoudre
+Redo	SudokuWindow		Rétablir
+File	SudokuWindow		Fichier
+Advanced	SudokuWindow		Expérimenté
+Start again	SudokuWindow		Recommencer
+HTML	SudokuWindow		HTML
 Sudoku request	SudokuWindow		Demande de Sudoku
+Copy	SudokuWindow		Copier
+Mark valid hints	SudokuWindow		Marquer les consignes valides
 Sudoku solved - congratulations!\n	SudokuWindow		Sudoku résolu - félicitations !\n
+Hard	SudokuWindow		Difficile
+Snapshot current	SudokuWindow		Prendre un cliché
 Text	SudokuWindow		Texte
-Undo	SudokuWindow		Annuler
+Creating solvable field	SudokuGenerator		Création d'un champ solvable
 View	SudokuWindow		Vue
+Progress monitor	ProgressWindow		Moniteur de progression
+Mark invalid values	SudokuWindow		Marquer les valeurs invalides
+Blank	SudokuWindow		Vide
+Help	SudokuWindow		Aide
+Searching for removable values	SudokuGenerator		Recherche des cases effaçables
+Undo	SudokuWindow		Annuler
+Quit	SudokuWindow		Quitter

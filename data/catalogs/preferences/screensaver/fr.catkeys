@@ -1,29 +1,29 @@
 1	french	x-vnd.Haiku-ScreenSaver	215605989
-30 seconds	ScreenSaver		30 secondes
-Add…	ScreenSaver		Ajouter…
-Blackness	ScreenSaver		Ténèbres
-Cancel	ScreenSaver		Annuler
-Confirm password:	ScreenSaver		Confirmer le mot de passe :
 Could not load screen saver	ScreenSaver		Impossible de charger l'économiseur d'écran
-Display Power Management Signaling not available	ScreenSaver		Le système d'économie d'énergie de l'écran (DPMS) n'est pas disponible
-Don't fade when	ScreenSaver		Ne pas éclipser quand
-Done	ScreenSaver		Terminé
-Enable screensaver	ScreenSaver		Activer l'économiseur
-Fade now when	ScreenSaver		Éclipser immédiatement quand
-General	ScreenSaver		Général
-No options available	ScreenSaver		Aucune option disponible
-OK	ScreenSaver		OK
-Password Window	ScreenSaver		Fenêtre de mot de passe
-Password lock	ScreenSaver		Verrouillage par mot de passe
-Password:	ScreenSaver		Mot de passe :
-Passwords don't match. Please try again.	ScreenSaver		Les mots de passe ne correspondent pas. Veuillez réessayez.
-Password…	ScreenSaver		Mot de passe…
-ScreenSaver	System name		Économiseur d'écran
-Screensaver settings	ScreenSaver		Réglages de l'économiseur
-Screensavers	ScreenSaver		Économiseurs
+30 seconds	ScreenSaver		30 secondes
 Start screensaver	ScreenSaver		Démarrer l'économiseur
-Test	ScreenSaver		Test
-Turn off screen	ScreenSaver		Extinction de l'écran
-Use custom password	ScreenSaver		Utiliser un mot de passe personnalisé
-Use network password	ScreenSaver		Utiliser un mot de passe réseau
+Password…	ScreenSaver		Mot de passe…
+Password:	ScreenSaver		Mot de passe :
+Password lock	ScreenSaver		Verrouillage par mot de passe
+Add…	ScreenSaver		Ajouter…
+Screensavers	ScreenSaver		Économiseurs
 mouse is here	ScreenSaver		la souris est là
+Display Power Management Signaling not available	ScreenSaver		Le système d'économie d'énergie de l'écran (DPMS) n'est pas disponible
+ScreenSaver	System name		Économiseur d'écran
+Test	ScreenSaver		Test
+General	ScreenSaver		Général
+Enable screensaver	ScreenSaver		Activer l'économiseur
+Cancel	ScreenSaver		Annuler
+Turn off screen	ScreenSaver		Extinction de l'écran
+No options available	ScreenSaver		Aucune option disponible
+Password Window	ScreenSaver		Fenêtre de mot de passe
+Fade now when	ScreenSaver		Éclipser immédiatement quand
+Screensaver settings	ScreenSaver		Réglages de l'économiseur
+Passwords don't match. Please try again.	ScreenSaver		Les mots de passe ne correspondent pas. Veuillez réessayez.
+OK	ScreenSaver		OK
+Don't fade when	ScreenSaver		Ne pas éclipser quand
+Blackness	ScreenSaver		Ténèbres
+Use custom password	ScreenSaver		Utiliser un mot de passe personnalisé
+Done	ScreenSaver		Terminé
+Confirm password:	ScreenSaver		Confirmer le mot de passe :
+Use network password	ScreenSaver		Utiliser un mot de passe réseau

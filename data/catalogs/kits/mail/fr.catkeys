@@ -1,5 +1,7 @@
-1	french	x-vnd.Haiku-libmail	2667177367
-Mail server:	ProtocolConfigView		Serveur mail :
+1	french	x-vnd.Haiku-libmail	870689359
 Password:	ProtocolConfigView		Mot de passe :
+Mail server:	ProtocolConfigView		Serveur mail :
 Select…	MailKit		Sélectionner…
+Connection type:	ProtocolConfigView		Type de connexion :
+Leave mail on server	ProtocolConfigView		Laisser le message sur le serveur
 Username:	ProtocolConfigView		Nom d'utilisateur :

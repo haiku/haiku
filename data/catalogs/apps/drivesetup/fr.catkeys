@@ -1,77 +1,77 @@
 1	french	x-vnd.Haiku-DriveSetup	1209826930
-%ld MiB	Support		%ld Mio
-<empty>	DiskView		<vide>
-<empty>	PartitionList		<vide>
-Active	PartitionList		Active
-Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Êtes-vous sûr de vouloir supprimer la partition sélectionnée ?\n\nToutes les données sur la partition seront définitivement perdues si vous le faites !
-Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Êtes-vous sûr de vouloir initialiser la partition « %s » ? La question vous sera à nouveau posée avant que les modifications ne soient écrites sur le disque.
-Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Êtes-vous sûr de vouloir initialiser la partition ? La question vous sera à nouveau posée avant que les modifications ne soient écrites sur le disque.
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Êtes-vous sûr de vouloir enregistrer les modifications au disque maintenant ?\n\nToutes les données sur le disque seront irrémédiablement perdues si vous le faites !
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Êtes-vous sûr de vouloir enregistrer les modifications sur le disque maintenant ?\n\nToutes les données sur la partition %s seront définitivement perdues si vous le faites !
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Êtes-vous sur de vouloir enregistrer les changements sur le disque ?\n\nToutes les données de la partition seront définitivement perdues si vous le faites !
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Êtes-vous sur de vouloir enregistrer les changements sur le disque ?\n\nToutes les données du disque seront définitivement perdues si vous le faites !
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Êtes-vous sûr de vouloir écrire les changements sur le disque ?\n\nToutes les données de la partition sélectionnée seront effacées si vous le faites !
-Cancel	CreateParamsPanel		Annuler
-Cancel	InitParamsPanel		Annuler
-Cancel	MainWindow		Annuler
-Cannot delete the selected partition.	MainWindow		La partition sélectionnée ne peut pas être supprimée.
-Continue	MainWindow		Continuer
-Could not aquire partitioning information.	MainWindow		Impossible de récupérer les informations sur les partitions
-Could not delete the selected partition.	MainWindow		Impossible de supprimer la partition sélectionnée.
-Could not mount partition %s.	MainWindow		Impossible de monter la partition %s.
-Could not unmount partition %s.	MainWindow		Impossible de démonter la partition %s.
-Create	CreateParamsPanel		Créer
-Create…	MainWindow		Créer…
-Creation of the partition has failed.	MainWindow		La partition n'a pas pu être créée.
+DriveSetup	System name		Gestionnaire de disque
 Delete	MainWindow		Supprimer
-Delete partition	MainWindow		Supprimer la partition
-Device	DiskView		Périphérique
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Êtes-vous sûr de vouloir écrire les changements sur le disque ?\n\nToutes les données de la partition sélectionnée seront effacées si vous le faites !
+Rescan	MainWindow		Analyser
+OK	MainWindow		OK
+Could not aquire partitioning information.	MainWindow		Impossible de récupérer les informations sur les partitions
+There's no space on the partition where a child partition could be created.	MainWindow		Il n'y a pas de place dans cette partition pour créer une partition fille.
+%ld MiB	Support		%ld Mio
+<empty>	PartitionList		<vide>
+Unable to find the selected partition by ID.	MainWindow		Impossible de trouver la partition sélectionnée par son ID.
+Select a partition from the list below.	DiskView		Sélectionnez une partition dans la liste ci-dessous.
+No disk devices have been recognized.	DiskView		Aucun périphérique disque n'a été reconnu.
+The selected disk is read-only.	MainWindow		Le disque choisi est en lecture seule.
+Partition name:	CreateParamsPanel		Nom de la partition :
+Initialize	InitParamsPanel		Initialiser
+Could not mount partition %s.	MainWindow		Impossible de monter la partition %s.
+The partition %s is already unmounted.	MainWindow		La partition %s est déjà démontée.
+Failed to initialize the partition. No changes have been written to disk.	MainWindow		Impossible d'initialiser la partition. Aucun changement n'a été enregistré sur le disque.
+Failed to delete the partition. No changes have been written to disk.	MainWindow		Impossible de supprimer la partition. Aucun changement n'a été enregistré sur le disque.
+Partition type:	CreateParamsPanel		Type de partition :
+Could not delete the selected partition.	MainWindow		Impossible de supprimer la partition sélectionnée.
+Initialize	MainWindow		Initialiser
+Error: 	MainWindow	in any error alert	Erreur : 
+Partition %ld	DiskView		Partition %ld
+The partition %s has been successfully initialized.\n	MainWindow		La partition %s a été correctement initialisée.\n
+<empty>	DiskView		<vide>
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		L'initialisation de la partition %s a échoué. (Aucune modification n'a été apportée au disque.)
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Êtes-vous sur de vouloir enregistrer les changements sur le disque ?\n\nToutes les données de la partition seront définitivement perdues si vous le faites !
+Mounted at	PartitionList		Montée en
+Failed to initialize the partition %s!\n	MainWindow		Impossible d'initialiser la partition %s !\n
+There was an error acquiring the partition row.	MainWindow		Erreur de lecture des informations de la partition.
+You need to select a partition entry from the list.	MainWindow		Sélectionnez d'abord une entrée de la table des partitions.
+Format (not implemented)	MainWindow		Format (non implémenté)
+The currently selected partition does not have a parent partition.	MainWindow		La partition sélectionnée n'a pas de partition parente.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Êtes-vous sur de vouloir enregistrer les changements sur le disque ?\n\nToutes les données du disque seront définitivement perdues si vous le faites !
+Offset: %ld MB	Support		Décalage : %ld Mo
+Write changes	MainWindow		Enregistrer les modifications
+There was an error preparing the disk for modifications.	MainWindow		Une erreur est survenue pendant la préparation des modifications du disque.
+The partition %s is already mounted.	MainWindow		La partition %s est déjà montée.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Êtes-vous sûr de vouloir enregistrer les modifications au disque maintenant ?\n\nToutes les données sur le disque seront irrémédiablement perdues si vous le faites !
+Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Êtes-vous sûr de vouloir supprimer la partition sélectionnée ?\n\nToutes les données sur la partition seront définitivement perdues si vous le faites !
+Create…	MainWindow		Créer…
+Disk system \"%s\"\" not found!	MainWindow		Le disque système « %s » est introuvable !
+Could not unmount partition %s.	MainWindow		Impossible de démonter la partition %s.
+Mount	MainWindow		Monter
+Create	CreateParamsPanel		Créer
 Device	PartitionList		Périphérique
 Disk	MainWindow		Disque
-Disk system \"%s\"\" not found!	MainWindow		Le disque système « %s » est introuvable !
-DriveSetup	System name		Gestionnaire de disque
-Eject	MainWindow		Éjecter
-End: %ld MB	Support		Fin : %ld Mo
-Error: 	MainWindow	in any error alert	Erreur : 
-Failed to delete the partition. No changes have been written to disk.	MainWindow		Impossible de supprimer la partition. Aucun changement n'a été enregistré sur le disque.
-Failed to initialize the partition %s!\n	MainWindow		Impossible d'initialiser la partition %s !\n
-Failed to initialize the partition. No changes have been written to disk.	MainWindow		Impossible d'initialiser la partition. Aucun changement n'a été enregistré sur le disque.
-File system	PartitionList		Système de fichiers
-Format (not implemented)	MainWindow		Format (non implémenté)
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		L'initialisation de la partition %s a échoué. (Aucune modification n'a été apportée au disque.)
-Initialize	InitParamsPanel		Initialiser
-Initialize	MainWindow		Initialiser
-Mount	MainWindow		Monter
-Mount all	MainWindow		Monter Tout
-Mounted at	PartitionList		Montée en
-No disk devices have been recognized.	DiskView		Aucun périphérique disque n'a été reconnu.
-OK	MainWindow		OK
-Offset: %ld MB	Support		Décalage : %ld Mo
-Parameters	PartitionList		Paramètres
-Partition	MainWindow		Partition
-Partition %ld	DiskView		Partition %ld
-Partition name:	CreateParamsPanel		Nom de la partition :
-Partition size	CreateParamsPanel		Taille de la partition
-Partition type:	CreateParamsPanel		Type de partition :
-Rescan	MainWindow		Analyser
-Select a partition from the list below.	DiskView		Sélectionnez une partition dans la liste ci-dessous.
-Size	PartitionList		Taille
-Surface test (not implemented)	MainWindow		Test de surface (non implémenté)
-The currently selected partition does not have a parent partition.	MainWindow		La partition sélectionnée n'a pas de partition parente.
-The currently selected partition is not empty.	MainWindow		La partition sélectionnée n'est pas vide.
-The partition %s has been successfully initialized.\n	MainWindow		La partition %s a été correctement initialisée.\n
-The partition %s is already mounted.	MainWindow		La partition %s est déjà montée.
-The partition %s is already unmounted.	MainWindow		La partition %s est déjà démontée.
-The partition %s is currently mounted.	MainWindow		La partition %s est actuellement montée.
-The selected disk is read-only.	MainWindow		Le disque choisi est en lecture seule.
-The selected partition does not contain a partitioning system.	MainWindow		La partition sélectionnée ne contient pas de système de partitionnement.
-There was an error acquiring the partition row.	MainWindow		Erreur de lecture des informations de la partition.
-There was an error preparing the disk for modifications.	MainWindow		Une erreur est survenue pendant la préparation des modifications du disque.
-There's no space on the partition where a child partition could be created.	MainWindow		Il n'y a pas de place dans cette partition pour créer une partition fille.
-Unable to find the selected partition by ID.	MainWindow		Impossible de trouver la partition sélectionnée par son ID.
-Unmount	MainWindow		Démonter
-Validation of the given creation parameters failed.	MainWindow		Le contrôle des paramètres de création donnés a échoué.
-Validation of the given initialization parameters failed.	MainWindow		Le contrôle des paramètres d'initialisation donnés a échoué.
+Device	DiskView		Périphérique
+Active	PartitionList		Active
 Volume name	PartitionList		Nom de volume
-Write changes	MainWindow		Enregistrer les modifications
-You need to select a partition entry from the list.	MainWindow		Sélectionnez d'abord une entrée de la table des partitions.
+Continue	MainWindow		Continuer
+Cannot delete the selected partition.	MainWindow		La partition sélectionnée ne peut pas être supprimée.
+Mount all	MainWindow		Monter Tout
+Cancel	MainWindow		Annuler
+Delete partition	MainWindow		Supprimer la partition
+End: %ld MB	Support		Fin : %ld Mo
+Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Êtes-vous sûr de vouloir initialiser la partition « %s » ? La question vous sera à nouveau posée avant que les modifications ne soient écrites sur le disque.
+Eject	MainWindow		Éjecter
+Partition	MainWindow		Partition
+File system	PartitionList		Système de fichiers
+Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Êtes-vous sûr de vouloir initialiser la partition ? La question vous sera à nouveau posée avant que les modifications ne soient écrites sur le disque.
+Validation of the given creation parameters failed.	MainWindow		Le contrôle des paramètres de création donnés a échoué.
+Size	PartitionList		Taille
+Validation of the given initialization parameters failed.	MainWindow		Le contrôle des paramètres d'initialisation donnés a échoué.
+The selected partition does not contain a partitioning system.	MainWindow		La partition sélectionnée ne contient pas de système de partitionnement.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Êtes-vous sûr de vouloir enregistrer les modifications sur le disque maintenant ?\n\nToutes les données sur la partition %s seront définitivement perdues si vous le faites !
+The partition %s is currently mounted.	MainWindow		La partition %s est actuellement montée.
+Partition size	CreateParamsPanel		Taille de la partition
+Surface test (not implemented)	MainWindow		Test de surface (non implémenté)
+Cancel	InitParamsPanel		Annuler
+Cancel	CreateParamsPanel		Annuler
+Parameters	PartitionList		Paramètres
+Creation of the partition has failed.	MainWindow		La partition n'a pas pu être créée.
+The currently selected partition is not empty.	MainWindow		La partition sélectionnée n'est pas vide.
+Unmount	MainWindow		Démonter

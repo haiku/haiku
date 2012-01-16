@@ -1,52 +1,52 @@
 1	french	x-vnd.Haiku-Screen	2033930135
-%.1f Hz	Screen		%.1f Hz
-%sSerial no.: %s	Screen		N° de serie de %s : %s
-/other…	Screen		/autre…
-15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 couleurs
-16 bits/pixel, 65536 colors	Screen		16 bits/pixel, 65536 couleurs
-24 bits/pixel, 16 Million colors	Screen		24 bits/pixel, 16 Millions de couleurs
-32 bits/pixel, 16 Million colors	Screen		32 bits/pixel, 16 Millions de couleurs
-8 bits/pixel, 256 colors	Screen		8 bits/pixel, 256 couleurs
-About	Screen		À propos
-All workspaces	Screen		Tous les espaces de travail
-Apply	Screen		Appliquer
-Cancel	Screen		Annuler
-Colors:	Screen		Couleurs :
-Columns:	Screen		Colonnes :
-Combine displays:	Screen		Combiner les écrans :
-Could not write VESA mode settings file:\n\t	Screen		Impossible d'écrire le fichier des réglages du mode VESA :\n\t
-Current workspace	Screen		Espace de travail courant
-Do you wish to keep these settings?	Screen		Voulez-vous conserver ces paramètres ?
-Done	Screen		Fait
-Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Fréquence horizontale :\t%lu - %lu kHz\nFréquence verticale :\t%lu - %lu Hz\n\nBande passante maximum :\t%g MHz
-Hz	Screen		Hz
-Keep	Screen		Conserver
-OK	Screen		OK
-Other…	Screen		Autre…
-Refresh rate	Screen		fréquence de rafraîchissement
-Refresh rate:	Screen		Fréquence de rafraîchissement :
-Resolution:	Screen		Résolution :
-Revert	Screen		Rétablir
-Rows:	Screen		Lignes :
-Screen	Screen		Écran
-Screen	System name		Écran
-Screen preferences by the Haiku team	Screen		Préférences de l'écran par l'équipe Haiku
-Set background…	Screen		Choisir un fond d'écran…
-Settings will revert in %seconds seconds.	Screen		Les réglages seront rétablis dans %seconds secondes.
-Swap displays:	Screen		Échanger les écrans :
-The screen mode could not be set:\n\t%s\n	Screen		Impossible de régler le mode de l'écran :\n\t%s\n
-Type or use the left and right arrow keys.	Screen		Utilisez les touches gauche et droite
-Undo	Screen		Annuler
-Unknown mode	Screen		Mode inconnu
-Use laptop panel:	Screen		Utiliser l'écran du portable :
-Video format:	Screen		Format vidéo:
-Warning	Screen		Avertissement
-Workspaces	Screen		Espaces de travail
-always	Screen		toujours
-bits/pixel	Screen		bits/pixel
-disable	Screen		désactiver
-horizontally	Screen		horizontalement
-if needed	Screen		si nécessaire
-no	Screen		non
-vertically	Screen		verticalement
 yes	Screen		oui
+Use laptop panel:	Screen		Utiliser l'écran du portable :
+15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 couleurs
+/other…	Screen		/autre…
+16 bits/pixel, 65536 colors	Screen		16 bits/pixel, 65536 couleurs
+Revert	Screen		Rétablir
+Swap displays:	Screen		Échanger les écrans :
+Combine displays:	Screen		Combiner les écrans :
+Done	Screen		Fait
+Set background…	Screen		Choisir un fond d'écran…
+Undo	Screen		Annuler
+if needed	Screen		si nécessaire
+Screen preferences by the Haiku team	Screen		Préférences de l'écran par l'équipe Haiku
+Screen	System name		Écran
+OK	Screen		OK
+Workspaces	Screen		Espaces de travail
+The screen mode could not be set:\n\t%s\n	Screen		Impossible de régler le mode de l'écran :\n\t%s\n
+no	Screen		non
+Could not write VESA mode settings file:\n\t	Screen		Impossible d'écrire le fichier des réglages du mode VESA :\n\t
+Type or use the left and right arrow keys.	Screen		Utilisez les touches gauche et droite
+Warning	Screen		Avertissement
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Fréquence horizontale :\t%lu - %lu kHz\nFréquence verticale :\t%lu - %lu Hz\n\nBande passante maximum :\t%g MHz
+Keep	Screen		Conserver
+Unknown mode	Screen		Mode inconnu
+disable	Screen		désactiver
+Columns:	Screen		Colonnes :
+All workspaces	Screen		Tous les espaces de travail
+always	Screen		toujours
+32 bits/pixel, 16 Million colors	Screen		32 bits/pixel, 16 Millions de couleurs
+Current workspace	Screen		Espace de travail courant
+About	Screen		À propos
+24 bits/pixel, 16 Million colors	Screen		24 bits/pixel, 16 Millions de couleurs
+horizontally	Screen		horizontalement
+Other…	Screen		Autre…
+Cancel	Screen		Annuler
+bits/pixel	Screen		bits/pixel
+Settings will revert in %seconds seconds.	Screen		Les réglages seront rétablis dans %seconds secondes.
+Refresh rate:	Screen		Fréquence de rafraîchissement :
+Hz	Screen		Hz
+Do you wish to keep these settings?	Screen		Voulez-vous conserver ces paramètres ?
+Rows:	Screen		Lignes :
+vertically	Screen		verticalement
+Resolution:	Screen		Résolution :
+Screen	Screen		Écran
+%.1f Hz	Screen		%.1f Hz
+8 bits/pixel, 256 colors	Screen		8 bits/pixel, 256 couleurs
+Apply	Screen		Appliquer
+Refresh rate	Screen		fréquence de rafraîchissement
+%sSerial no.: %s	Screen		N° de serie de %s : %s
+Colors:	Screen		Couleurs :
+Video format:	Screen		Format vidéo:

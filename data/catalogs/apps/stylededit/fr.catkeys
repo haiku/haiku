@@ -1,80 +1,80 @@
 1	french	x-vnd.Haiku-StyledEdit	1508367857
+StyledEdit	System name		Éditeur stylé
+Paste	Menus		Coller
+OK	LoadAlert		OK
+File	Menus		Fichier
 ???	LoadAlert		???
-Align	Menus		Aligner
-Black	Menus		Noir
-Blue	Menus		Bleu
-Bold	Menus		Gras
+Lines:	Statistics		Lignes :
+Italic	Menus		Italique
+Left	Menus		À gauche
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Retourner à la dernière version de « %s » ? 
+Search backwards	FindandReplaceWindow		Chercher en arrière
+Size	Menus		Taille
+Save	QuitAlert		Sauvegarder
+Page setup…	Menus		Mise en page…
+Print…	Menus		Imprimer…
 Can't undo	Menus		Impossible d'annuler
-Cancel	FindandReplaceWindow		Annuler
-Cancel	QuitAlert		Annuler
-Cancel	RevertToSavedAlert		Annuler
+Save	Menus		Sauvegarder
+Replace with:	FindandReplaceWindow		Remplacer par :
 Cancel	SaveAlert		Annuler
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impossible de revenir, fichier non trouvé : « %s ».
 Case-sensitive	FindandReplaceWindow		Sensible à la casse
-Center	Menus		Centré
-Characters:	Statistics		Caractères :
-Close	Menus		Fermer
-Color	Menus		Couleur
-Copy	Menus		Copier
-Cut	Menus		Couper
-Cyan	Menus		Cyan
-Default	Open_and_SaveAsPanel		Défaut
-Document	Menus		Document
-Document statistics	Statistics		Statistiques du document
-Don't save	QuitAlert		Ne pas enregistrer
-Don't save	SaveAlert		Ne pas enregistrer
-Edit	Menus		Édition
-Encoding	Open_and_SaveAsPanel		Encodage
-Error loading \"%s\":\n\t%s	LoadAlert		Erreur au de chargement de « %s » :\n\t%s
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Erreur de chargement de « %s » :\n\tFormat inconnu
-Error saving \"%s\":\n%s	SaveAlert		Erreur à l'enregistrement de « %s » :\n%s
-File	Menus		Fichier
-Find	FindandReplaceWindow		Trouver
-Find again	Menus		Chercher encore
-Find selection	Menus		Chercher la sélection
-Find:	FindandReplaceWindow		Chercher :
-Find…	Menus		Chercher…
-Font	Menus		Police
 Green	Menus		Vert
-Italic	Menus		Italique
-Left	Menus		À gauche
-Lines:	Statistics		Lignes :
+Revert to saved…	Menus		Revenir à la dernière version enregistrée…
+Yellow	Menus		Jaune
+Replace in all windows	FindandReplaceWindow		Remplacer dans toutes les fenêtres
+Wrap lines	Menus		Retour à la ligne
+Quit	Menus		Quitter
+Document statistics	Statistics		Statistiques du document
+Cancel	RevertToSavedAlert		Annuler
+Document	Menus		Document
+Save changes to the document \"%s\"? 	QuitAlert		Enregistrer les modifications du document « %s » ? 
+Edit	Menus		Édition
+Font	Menus		Police
+Replace all	FindandReplaceWindow		Tout remplacer
+Statistics…	Menus		Statistiques…
+Default	Open_and_SaveAsPanel		Défaut
+Replace next	Menus		Remplacer le suivant
+Cancel	FindandReplaceWindow		Annuler
+Close	Menus		Fermer
+Save	SaveAlert		Sauvegarder
+Words:	Statistics		Mots :
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Erreur de chargement de « %s » :\n\tFormat inconnu
+OK	RevertToSavedAlert		OK
+Don't save	QuitAlert		Ne pas enregistrer
+Align	Menus		Aligner
+Color	Menus		Couleur
+Red	Menus		Rouge
+Open…	Menus		Ouvrir…
+Center	Menus		Centré
+Blue	Menus		Bleu
+Cyan	Menus		Cyan
+OK	Statistics		OK
 Magenta	Menus		Magenta
 New	Menus		Nouveau
-OK	LoadAlert		OK
-OK	RevertToSavedAlert		OK
-OK	SaveAlert		OK
-OK	Statistics		OK
-Open…	Menus		Ouvrir…
-Page setup…	Menus		Mise en page…
-Paste	Menus		Coller
-Print…	Menus		Imprimer…
-Quit	Menus		Quitter
-Red	Menus		Rouge
-Redo typing	QuitAlert		Rétablir la saisie
-Replace	FindandReplaceWindow		Remplacer
-Replace all	FindandReplaceWindow		Tout remplacer
-Replace in all windows	FindandReplaceWindow		Remplacer dans toutes les fenêtres
-Replace next	Menus		Remplacer le suivant
-Replace with:	FindandReplaceWindow		Remplacer par :
-Replace…	Menus		Remplacer…
-Revert to saved…	Menus		Revenir à la dernière version enregistrée…
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Retourner à la dernière version de « %s » ? 
-Right	Menus		À droite
-Save	Menus		Sauvegarder
-Save	QuitAlert		Sauvegarder
-Save	SaveAlert		Sauvegarder
-Save as…	Menus		Enregistrer sous…
-Save changes to the document \"%s\"? 	QuitAlert		Enregistrer les modifications du document « %s » ? 
-Search backwards	FindandReplaceWindow		Chercher en arrière
-Select all	Menus		Selectionner tout
-Size	Menus		Taille
-Statistics…	Menus		Statistiques…
-StyledEdit	System name		Éditeur stylé
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Ce fichier est en lecture seule. Voulez-vous sauvegarder les modifications dans le document « %s » ?
-Undo typing	QuitAlert		Annuler la saisie
-Untitled 	StyledEditWindow		Sans titre
-Words:	Statistics		Mots :
-Wrap lines	Menus		Retour à la ligne
 Wrap-around search	FindandReplaceWindow		Recherche en boucle
-Yellow	Menus		Jaune
+Bold	Menus		Gras
+Find selection	Menus		Chercher la sélection
+Find:	FindandReplaceWindow		Chercher :
+Error saving \"%s\":\n%s	SaveAlert		Erreur à l'enregistrement de « %s » :\n%s
+Copy	Menus		Copier
+Cut	Menus		Couper
+Replace	FindandReplaceWindow		Remplacer
+Find again	Menus		Chercher encore
+Cancel	QuitAlert		Annuler
+Find…	Menus		Chercher…
+Select all	Menus		Selectionner tout
+Don't save	SaveAlert		Ne pas enregistrer
+Error loading \"%s\":\n\t%s	LoadAlert		Erreur au de chargement de « %s » :\n\t%s
+Undo typing	QuitAlert		Annuler la saisie
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Ce fichier est en lecture seule. Voulez-vous sauvegarder les modifications dans le document « %s » ?
+Black	Menus		Noir
+Untitled 	StyledEditWindow		Sans titre
+OK	SaveAlert		OK
+Find	FindandReplaceWindow		Trouver
+Encoding	Open_and_SaveAsPanel		Encodage
+Characters:	Statistics		Caractères :
+Save as…	Menus		Enregistrer sous…
+Redo typing	QuitAlert		Rétablir la saisie
+Replace…	Menus		Remplacer…
+Right	Menus		À droite

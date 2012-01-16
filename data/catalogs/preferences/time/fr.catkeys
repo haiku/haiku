@@ -1,32 +1,32 @@
 1	french	x-vnd.Haiku-Time	2926970495
-<Other>	Time		<Autre>
-Add	Time		Ajouter
-Could not contact server	Time		Impossible de contacter le serveur
-Could not create socket	Time		Impossible de créer le socket
-Current time:	Time		Heure actuelle :
-Date and time	Time		Date et heure
-Hardware clock set to:	Time		L'horloge matérielle est réglée sur :
-Message receiving failed	Time		La réception du message a échoué
-Network time	Time		Heure réseau
 OK	Time		OK
-Preview time:	Time		Aperçu de l'heure :
-Received invalid time	Time		Une heure non valide a été reçue
-Remove	Time		Retirer
-Reset	Time		Réinitialiser
-Revert	Time		Rétablir
-Sending request failed	Time		L'envoi d'une requête a échoué
-Set time zone	Time		Régler le fuseau horaire
-Stop	Time		Arrêter
-Synchronize	Time		Synchroniser
-Synchronize again	Time		Synchroniser à nouveau
-Synchronize at boot	Time		Synchroniser au démarrage
-The following error occured while synchronizing:r\n%s	Time		L'erreur suivante est survenue lors de la synchronisation :\n%s
-The following error occured while synchronizing:r\n%s: %s	Time		L'erreur suivante est survenue lors de la synchronisation :\n%s : %s
-Time	System name		Heure
-Time	Time		Heure
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Date & Heure, écrit par :\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
-Time zone	Time		Fuseau horaire
-Try all servers	Time		Essayer tous les serveurs
-Waiting for answer failed	Time		L'attente d'une réponse a échoué
 \nNow: 	Time		\nMaintenant, il est : 
+Stop	Time		Arrêter
+Could not contact server	Time		Impossible de contacter le serveur
+Preview time:	Time		Aperçu de l'heure :
+Synchronize	Time		Synchroniser
+Revert	Time		Rétablir
+Add	Time		Ajouter
+Date and time	Time		Date et heure
 about	Time		À propos
+Message receiving failed	Time		La réception du message a échoué
+Set time zone	Time		Régler le fuseau horaire
+Waiting for answer failed	Time		L'attente d'une réponse a échoué
+Hardware clock set to:	Time		L'horloge matérielle est réglée sur :
+The following error occured while synchronizing:r\n%s	Time		L'erreur suivante est survenue lors de la synchronisation :\n%s
+Remove	Time		Retirer
+Time	Time		Heure
+Sending request failed	Time		L'envoi d'une requête a échoué
+Time	System name		Heure
+Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Date & Heure, écrit par :\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
+Reset	Time		Réinitialiser
+Synchronize at boot	Time		Synchroniser au démarrage
+Received invalid time	Time		Une heure non valide a été reçue
+The following error occured while synchronizing:r\n%s: %s	Time		L'erreur suivante est survenue lors de la synchronisation :\n%s : %s
+<Other>	Time		<Autre>
+Current time:	Time		Heure actuelle :
+Try all servers	Time		Essayer tous les serveurs
+Time zone	Time		Fuseau horaire
+Could not create socket	Time		Impossible de créer le socket
+Synchronize again	Time		Synchroniser à nouveau
+Network time	Time		Heure réseau

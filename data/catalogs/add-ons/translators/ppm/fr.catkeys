@@ -1,31 +1,31 @@
 1	french	x-vnd.Haiku-PPMTranslator	2886727868
+PPM Settings	PPMMain		Réglages PPM
 Based on PPMTranslator sample code	PPMTranslator		Basé sur le code d'exemple du traducteur PPM
-Be Bitmap Format (PPMTranslator)	PPMTranslator		Format Bitmap Be (Traducteur PPM)
-Bitmap 1 bit	PPMTranslator		Bitmap 1 bit
+OK	PPMMain		OK
+Grayscale 8 bits	PPMTranslator		Nuances de gris 8 bits
 CMY 8:8:8 32 bits	PPMTranslator		CMJ 8:8:8 32 bits
+PPM image	PPMTranslator		Image PPM
+RGBA 5:5:5:1 16 bits	PPMTranslator		RVBA 5:5:5:1 16 bits
+PPM Image Translator	PPMTranslator		Traducteur PPM
+Be Bitmap Format (PPMTranslator)	PPMTranslator		Format Bitmap Be (Traducteur PPM)
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMJA 8:8:8:8 32 bits
 CMYK 8:8:8:8 32 bits	PPMTranslator		CMJN 8:8:8:8 32 bits
-Grayscale 8 bits	PPMTranslator		Nuances de gris 8 bits
-Input Color Space	PPMTranslator		Espace de couleur d'entrée
-None	PPMTranslator		Aucun
-OK	PPMMain		OK
-PPM Image Translator	PPMTranslator		Traducteur PPM
-PPM Settings	PPMMain		Réglages PPM
-PPM image	PPMTranslator		Image PPM
-PPMTranslator Settings	PPMTranslator		Réglages du traducteur PPM
-RGB 5:5:5 16 bits	PPMTranslator		RVB 5:5:5 16 bits
+bits/space	PPMTranslator		bits/espace
+RGB 8:8:8 32 bits big-endian	PPMTranslator		RVB 8:8:8 32 bits big-endian
+RGB 5:6:5 16 bits big-endian	PPMTranslator		RVB 5:6:5 16 bits big-endian
+Version %d.%d.%d %s	PPMTranslator		Version %d.%d.%d %s
 RGB 5:5:5 16 bits big-endian	PPMTranslator		RVB 5:5:5 16 bits big-endian
 RGB 5:6:5 16 bits	PPMTranslator		RVB 5:6:5 16 bits
-RGB 5:6:5 16 bits big-endian	PPMTranslator		RVB 5:6:5 16 bits big-endian
-RGB 8:8:8 32 bits	PPMTranslator		RVB 8:8:8 32 bits
-RGB 8:8:8 32 bits big-endian	PPMTranslator		RVB 8:8:8 32 bits big-endian
-RGBA 5:5:5:1 16 bits	PPMTranslator		RVBA 5:5:5:1 16 bits
-RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RVBA 5:5:5:1 16 bits big-endian
+Write ASCII	PPMTranslator		Écriture ASCII
 RGBA 8:8:8:8 32 bits	PPMTranslator		RVBA 8:8:8:8 32 bits
+None	PPMTranslator		Aucun
+RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RVBA 5:5:5:1 16 bits big-endian
+RGB 5:5:5 16 bits	PPMTranslator		RVB 5:5:5 16 bits
+Bitmap 1 bit	PPMTranslator		Bitmap 1 bit
 RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RVBA 8:8:8:8 32 bits big-endian
+Input Color Space	PPMTranslator		Espace de couleur d'entrée
+RGB 8:8:8 32 bits	PPMTranslator		RVB 8:8:8 32 bits
 Sample code copyright 1999, Be Incorporated	PPMTranslator		Code d'exemple, copyright 1999, Be Incorporated
+PPMTranslator Settings	PPMTranslator		Réglages du traducteur PPM
 Something is wrong with the PPMTranslator!	PPMMain		Quelque chose ne va pas avec le Traducteur PPM !
 System palette 8 bits	PPMTranslator		Palette système 8 bits
-Version %d.%d.%d %s	PPMTranslator		Version %d.%d.%d %s
-Write ASCII	PPMTranslator		Écriture ASCII
-bits/space	PPMTranslator		bits/espace

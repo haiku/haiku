@@ -1,21 +1,21 @@
 1	french	x-vnd.Haiku-Network	2324385456
-<no wireless networks found>	EthernetSettingsView		<aucun réseau sans fil disponible>
-Adapter:	EthernetSettingsView		Adaptateur :
-Apply	EthernetSettingsView		Appliquer
-Auto-configuring failed: 	EthernetSettingsView		Échec de la configuration automatique :
 Choose automatically	EthernetSettingsView		Choisir automatiquement
-DHCP	EthernetSettingsView		DHCP
-DNS #1:	EthernetSettingsView		DNS n°1 :
-DNS #2:	EthernetSettingsView		DNS n°2 :
-Disabled	EthernetSettingsView		Désactivé
-Domain:	EthernetSettingsView		Domaine :
 Gateway:	EthernetSettingsView		Passerelle :
-IP address:	EthernetSettingsView		Adresse IP :
-Mode:	EthernetSettingsView		Mode :
 Netmask:	EthernetSettingsView		Masque réseau :
-Network	System name		Réseau
-Network:	EthernetSettingsView		Réseau :
+DHCP	EthernetSettingsView		DHCP
+DNS #2:	EthernetSettingsView		DNS n°2 :
+Apply	EthernetSettingsView		Appliquer
 OK	EthernetSettingsView		Ok
+DNS #1:	EthernetSettingsView		DNS n°1 :
+IP address:	EthernetSettingsView		Adresse IP :
+Adapter:	EthernetSettingsView		Adaptateur :
+Domain:	EthernetSettingsView		Domaine :
 Revert	EthernetSettingsView		Rétablir
-Static	EthernetSettingsView		Static
+<no wireless networks found>	EthernetSettingsView		<aucun réseau sans fil disponible>
+Network	System name		Réseau
+Mode:	EthernetSettingsView		Mode :
+Network:	EthernetSettingsView		Réseau :
 The net_server needs to run for the auto configuration!	EthernetSettingsView		Le net_server doit être lancé pour la configuration automatique !
+Disabled	EthernetSettingsView		Désactivé
+Auto-configuring failed: 	EthernetSettingsView		Échec de la configuration automatique :
+Static	EthernetSettingsView		Static

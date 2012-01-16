@@ -1,7 +1,7 @@
 1	french	x-vnd.Haiku-STXTTranslator	4053395273
 Be styled text file	STXTTranslator		Fichier texte stylé Be
+StyledEdit files translator	STXTTranslator		Traducteur de fichiers textes stylés
 Plain text file	STXTTranslator		Fichier de texte brut
-STXT Settings	STXTMain		Réglages STXT
 STXTTranslator Settings	STXTTranslator		Réglages du traducteur STXT
 StyledEdit files	STXTTranslator		Fichiers texte stylé 
-StyledEdit files translator	STXTTranslator		Traducteur de fichiers textes stylés
+STXT Settings	STXTMain		Réglages STXT

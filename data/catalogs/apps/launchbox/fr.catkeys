@@ -1,32 +1,32 @@
 1	french	x-vnd.Haiku-LaunchBox	3587127275
-Add button here	LaunchBox		Ajouter un bouton ici
-Auto-raise	LaunchBox		Faire apparaître automatiquement
-Bummer	LaunchBox		Zut
-Cancel	LaunchBox		Annuler
-Clear button	LaunchBox		Vider le bouton
-Clone	LaunchBox		Cloner
-Close	LaunchBox		Fermer
-Description for '%3'	LaunchBox		Description for « %3 »
-Failed to launch '%1'.\n\nError:	LaunchBox		Impossible de lancer « %1 ».\n\nErreur : 
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Impossible d'envoyer « ouvrir le dossier » au Tracker.\n\nErreur : 
-Horizontal layout	LaunchBox		Disposition horizontale
-Icon size	LaunchBox		Taille d'icône
-Ignore double-click	LaunchBox		Ignorer le double click
-LaunchBox	System name		Lanceur rapide
-Name Panel	LaunchBox		Nom du panneau
 New	LaunchBox		Nouveau
-OK	LaunchBox		OK
-Pad	LaunchBox		Pavé
-Pad %1	LaunchBox		Pavé %1
-Pad 1	LaunchBox		Pavé 1
-Quit	LaunchBox		Quitter
-Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Voulez-vous vraiment fermer ce pavé ?\n(Le pavé ne sera pas enregistré.)
-Remove button	LaunchBox		Ôter le boutton
 Set description…	LaunchBox		Ajouter une description…
-Settings	LaunchBox		Réglages
+Vertical layout	LaunchBox		Disposition verticale
+OK	LaunchBox		OK
+Pad 1	LaunchBox		Pavé 1
+last chance	LaunchBox		dernière chance
+Quit	LaunchBox		Quitter
+Clear button	LaunchBox		Vider le bouton
+LaunchBox	System name		Lanceur rapide
+Ignore double-click	LaunchBox		Ignorer le double click
+Auto-raise	LaunchBox		Faire apparaître automatiquement
 Show on all workspaces	LaunchBox		Afficher dans tous les espaces de travail
 Show window border	LaunchBox		Afficher la bordure de la fenêtre
-Vertical layout	LaunchBox		Disposition verticale
+Pad	LaunchBox		Pavé
+Icon size	LaunchBox		Taille d'icône
+Bummer	LaunchBox		Zut
+Cancel	LaunchBox		Annuler
+Remove button	LaunchBox		Ôter le boutton
+Horizontal layout	LaunchBox		Disposition horizontale
+Failed to launch '%1'.\n\nError:	LaunchBox		Impossible de lancer « %1 ».\n\nErreur : 
+Name Panel	LaunchBox		Nom du panneau
+Add button here	LaunchBox		Ajouter un bouton ici
+Description for '%3'	LaunchBox		Description for « %3 »
+Settings	LaunchBox		Réglages
+Pad %1	LaunchBox		Pavé %1
+Close	LaunchBox		Fermer
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Impossible d'envoyer « ouvrir le dossier » au Tracker.\n\nErreur : 
 You can drag an icon here.	LaunchBox		Vous pouvez glisser une icône ici.
-last chance	LaunchBox		dernière chance
+Clone	LaunchBox		Cloner
 launch popup	LaunchBox		launch popup
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Voulez-vous vraiment fermer ce pavé ?\n(Le pavé ne sera pas enregistré.)

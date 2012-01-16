@@ -1,19 +1,19 @@
 1	french	x-vnd.Haiku-MidiPlayer	4180509704
-Cavern	Main Window		Grotte
-Closet	Main Window		Cabinet
-Could not load song	Main Window		Impossible de charger la musique
-Drop MIDI file here	Scope View		Déposer un fichier MIDI ici
-Dungeon	Main Window		Donjon
-Garage	Main Window		Garage
-Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Lecteur MIDI Haiku 1.0.0 beta\n\nCe petit programe\nEst dans un ordinateur\nLa boîte à musique
-Igor's lab	Main Window		Laboratoire d'Igor
-Live input:	Main Window		Entrée directe :
-MidiPlayer	System name		Lecteur MIDI
 None	Main Window		Aucun
+Live input:	Main Window		Entrée directe :
+Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Lecteur MIDI Haiku 1.0.0 beta\n\nCe petit programe\nEst dans un ordinateur\nLa boîte à musique
+Stop	Main Window		Arrêt
+Cavern	Main Window		Grotte
+Volume:	Main Window		Volume :
+Reverb:	Main Window		Réverbération :
 OK	Main Window		OK
 Off	Main Window		Désactivé
+Dungeon	Main Window		Donjon
 Play	Main Window		Lire
-Reverb:	Main Window		Réverbération :
+Garage	Main Window		Garage
+Closet	Main Window		Cabinet
+MidiPlayer	System name		Lecteur MIDI
+Drop MIDI file here	Scope View		Déposer un fichier MIDI ici
+Igor's lab	Main Window		Laboratoire d'Igor
 Scope	Main Window		Scope
-Stop	Main Window		Arrêt
-Volume:	Main Window		Volume :
+Could not load song	Main Window		Impossible de charger la musique

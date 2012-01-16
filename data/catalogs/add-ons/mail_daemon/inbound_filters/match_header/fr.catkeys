@@ -1,8 +1,11 @@
-1	french	x-vnd.Haiku-MatchHeader	3652092583
-<Choose account>	ConfigView		<choisir un compte>
-<Choose action>	ConfigView		<choisir une action>
-If	ConfigView		Si
+1	french	x-vnd.Haiku-MatchHeader	2644029174
+<Choose action>	ConfigView		<Choisir une action>
+has	ConfigView		a
 Move to	ConfigView		Déplacer vers
-Set as read	ConfigView		Marquer comme lu
 Then	ConfigView		Alors
+this field is based on the action	ConfigView		ce champ est basé sur l'action
+Delete message	ConfigView		Supprimer le message
+<Choose account>	ConfigView		<Choisir un compte>
+Set as read	ConfigView		Marquer comme lu
+If	ConfigView		Si
 header (e.g. Subject)	ConfigView		entête (ex. Sujet)

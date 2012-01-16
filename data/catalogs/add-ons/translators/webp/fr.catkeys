@@ -1,25 +1,25 @@
 1	french	x-vnd.Haiku-WebPTranslator	3630570850
-Based on libwebp v0.1,	ConfigView		Basé sur libwebp v0.1,
 Compression method:	ConfigView		Méthode de compression :
-Default	ConfigView		Par défaut
-Drawing	ConfigView		Dessin
-Fast	ConfigView		Rapide
-High	ConfigView		Haute
-Icon	ConfigView		Icône
-Low	ConfigView		Basse
-Output preset:	ConfigView		Préréglage de sortie :
-Output quality:	ConfigView		Qualité de sortie :
-Photo	ConfigView		Photo
-Picture	ConfigView		Illustration
-Preprocessing filter	ConfigView		Filtre de prétraitement
+Based on libwebp v0.1,	ConfigView		Basé sur libwebp v0.1,
 Preset	ConfigView		Préréglage
-Slower but better	ConfigView		Plus lent mais meilleur
-Text	ConfigView		Texte
 WebP Images	ConfigView		Images WebP
-WebP Settings	main		Réglages WebP
-WebP image	WebPTranslator		Image WebP
-WebP image translator	WebPTranslator		Traducteur d'images WebP
 WebP images	WebPTranslator		Images WebP
 WebPTranslator Settings	ConfigView		Réglages du traducteur WebP
-©2010-2011 Google Inc.	ConfigView		©2010-2011 Google Inc.
+Output quality:	ConfigView		Qualité de sortie :
+WebP Settings	main		Réglages WebP
+Text	ConfigView		Texte
+Slower but better	ConfigView		Plus lent mais meilleur
+WebP image	WebPTranslator		Image WebP
 ©2010-2011 Haiku Inc.	ConfigView		©2010-2011 Haiku Inc.
+Output preset:	ConfigView		Préréglage de sortie :
+Picture	ConfigView		Illustration
+Low	ConfigView		Basse
+High	ConfigView		Haute
+Drawing	ConfigView		Dessin
+Default	ConfigView		Par défaut
+Fast	ConfigView		Rapide
+Photo	ConfigView		Photo
+Preprocessing filter	ConfigView		Filtre de prétraitement
+©2010-2011 Google Inc.	ConfigView		©2010-2011 Google Inc.
+WebP image translator	WebPTranslator		Traducteur d'images WebP
+Icon	ConfigView		Icône

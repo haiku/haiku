@@ -1,33 +1,46 @@
-1	french	x-vnd.Haiku-Mail	3361588786
-Account name:	Config Views		Nom du compte :
-Account settings	Config Views		Réglages du compte
-Accounts	Config Window		Comptes
-Add	Config Window		Ajouter
-Add filter	Config Views		Ajouter un filtre
-Always	Config Window		Toujours
-Apply	Config Window		Appliquer
-Check every	Config Window		Vérifier toutes les
-E-mail	System name		E-mail
-Edit mailbox menu…	Config Window		Éditer le menu de la boite mail…
-Error	Config Window		Erreur
-Error retrieving general settings: %s\n	Config Window		Erreur à la récupération des réglages généraux : %s\n
-Mail checking	Config Window		Vérification des mails
-Miscellaneous	Config Window		Divers
-OK	Config Views		OK
-OK	Config Window		OK
-Only when dial-up is connected	Config Window		Uniquement quand le modem est connecté
-Real name:	Config Views		Nom réel :
-Remove	Config Window		Supprimer
-Return address:	Config Views		Adresse de réponse :
-Revert	Config Window		Rétablir
-Schedule outgoing mail when dial-up is disconnected	Config Window		Mettre les mails en partance dans la file d'attente quand le modem est déconnecté
+1	french	x-vnd.Haiku-Mail	831934360
 Settings	Config Window		Réglages
-Show connection status window:	Config Window		Afficher la fenêtre d'état de la connexion :
-Start mail services on startup	Config Window		Lancer les services de mail au démarrage
-While sending	Config Window		Pendant l'envoi 
+Never	Config Window	show status window	Jamais
+Only when dial-up is connected	Config Window		Seulement lorsque le modem est connecté
 While sending and receiving	Config Window		Pendant l'envoi et la réception
-\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nImpossible de récupérer les réglages généraux.\n\nErreur durant la récupération des paramètres :\n%s\n
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nCréez un nouveau compte avec le bouton Ajouter.\n\nSupprimez un compte avec le bouton supprimer sur l'item sélectionné.\n\nSélectionnez un item dans la liste pour changer ses réglages.
 days	Config Window		jours
+Server name:	E-Mail		Nom du serveur :
+OK	Config Window		OK
+Start mail services on startup	Config Window		Lancer les services de mail au démarrage
+E-mail address:	E-Mail		Adresse email :
+Account name:	E-Mail		Nom du compte :
+Account name:	Config Views		Nom du compte :
+OK	Config Views		OK
+Revert	Config Window		Rétablir
+Login name:	E-Mail		Nom de connexion :
+Password:	E-Mail		Mot de passe :
+Accounts	Config Window		Comptes
+Remove	Config Window		Supprimer
+Miscellaneous	Config Window		Divers
+Show connection status window:	Config Window		Afficher la fenêtre d'état de la connexion :
+Server Name:	E-Mail		Nom du serveur :
+While sending	Config Window		Pendant l'envoi
+Schedule outgoing mail when dial-up is disconnected	Config Window		Mettre les mails en partance dans la file d'attente quand le modem est déconnecté
 hours	Config Window		heures
+Add	Config Window		Ajouter
+Account settings	AutoConfigWindow		Réglages du compte
+E-mail	System name		Courriel
+never	Config Window	mail checking frequency	jamais
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nImpossible de récupérer les réglages généraux.\n\nErreur durant la récupération des paramètres :\n%s\n
+Real name:	Config Views		Nom réel :
+Return address:	Config Views		Adresse de réponse :
+Edit mailbox menu…	Config Window		Éditer le menu de la boite mail…
+Remove	Config Views		Supprimer
+Next	AutoConfigWindow		Suivant
+Check every	Config Window		Vérifier chaque
+Back	AutoConfigWindow		Précédent
+Account settings	Config Views		Réglages du compte
 minutes	Config Window		minutes
+Error retrieving general settings: %s\n	Config Window		Erreur à la récupération des réglages généraux : %s\n
+Real name:	E-Mail		Nom réel :
+Apply	Config Window		Appliquer
+Always	Config Window		Toujours
+OK	AutoConfigWindow		OK
+Add filter	Config Views		Ajouter un filtre
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nCréez un nouveau compte avec le bouton Ajouter.\n\nSupprimez un compte avec le bouton supprimer sur l'item sélectionné.\n\nSélectionnez un item dans la liste pour changer ses réglages.
+Error	Config Window		Erreur

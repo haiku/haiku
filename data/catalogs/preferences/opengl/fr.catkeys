@@ -1,22 +1,22 @@
 1	french	x-vnd.Haiku-OpenGL	953276299
-Attributes stack size:	Capabilities		Taille de la pile d'attributs :
-Auxiliary buffer(s):	Capabilities		Tampon(s) auxilliaire(s) :
-Available	Extensions		Disponible
-Capabilities	Capabilities		Aptitudes
-Extensions	Extensions		Extensions
-GLU version:	InfoView		Version de GLU :
-GLUT API version:	InfoView		Version de l'API GLUT :
-Information	InfoView		Informations
 List stack size:	Capabilities		Taille de la pile de listes :
-Max. 2D texture size:	Capabilities		Taille maximum des textures 2D :
-Max. 3D texture size:	Capabilities		Taille maximum des textures 3D :
+Information	InfoView		Informations
 Max. clipping planes:	Capabilities		Nombre de plans de coupes :
-Max. convolution:	Capabilities		Convolution maximale :
-Max. lights:	Capabilities		Nombre d'éclairages maximum :
-Model stack size:	Capabilities		Taille de la pile de modèles :
-Name stack size:	Capabilities		Taille de la pile de noms :
-OpenGL	System name		OpenGL
-OpenGL version:	InfoView		Version d'OpenGL :
-Projection stack size:	Capabilities		Taille de la pile de projection :
 Renderer name:	InfoView		Nom du moteur de rendu :
 Vendor name:	InfoView		Nom du vendeur :
+Attributes stack size:	Capabilities		Taille de la pile d'attributs :
+OpenGL version:	InfoView		Version d'OpenGL :
+Name stack size:	Capabilities		Taille de la pile de noms :
+OpenGL	System name		OpenGL
+Auxiliary buffer(s):	Capabilities		Tampon(s) auxilliaire(s) :
+GLU version:	InfoView		Version de GLU :
+Model stack size:	Capabilities		Taille de la pile de modèles :
+Projection stack size:	Capabilities		Taille de la pile de projection :
+Max. lights:	Capabilities		Nombre d'éclairages maximum :
+Max. 2D texture size:	Capabilities		Taille maximum des textures 2D :
+Max. convolution:	Capabilities		Convolution maximale :
+GLUT API version:	InfoView		Version de l'API GLUT :
+Max. 3D texture size:	Capabilities		Taille maximum des textures 3D :
+Capabilities	Capabilities		Aptitudes
+Available	Extensions		Disponible
+Extensions	Extensions		Extensions

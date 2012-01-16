@@ -1,13 +1,13 @@
 1	french	x-vnd.Haiku-JPEG2000Translator	547915409
-About	JPEG2000Translator		À propos
-Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Format Bitmap Be (Traducteur JPEG2000)
-High	JPEG2000Translator		Haute
+Write	JPEG2000Translator		Écriture
 JPEG2000 images	JPEG2000Translator		Images JPEG2000
-Low	JPEG2000Translator		Basse
 Output only codestream (.jpc)	JPEG2000Translator		Flux de sortie code seul (.jpc)
+Write black-and-white images as RGB24	JPEG2000Translator		Écrire les images noir&blanc en RVB24
 Output quality	JPEG2000Translator		Qualité de sortie
 Read	JPEG2000Translator		Lecture
-Read greyscale images as RGB32	JPEG2000Translator		Lire les images en nuances de gris en RVB24
-Write	JPEG2000Translator		Écriture
-Write black-and-white images as RGB24	JPEG2000Translator		Écrire les images noir&blanc en RVB24
 ©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nBasé sur la bibliothèque JasPer :\n© 1999-2000, Image Power, Inc. et\nl'Université de Colombie Britannique, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nLe codec jp2 de ImageMagick's a été utilisé en « tutoriel ».\n\thttp://www.imagemagick.org/\n
+Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Format Bitmap Be (Traducteur JPEG2000)
+Low	JPEG2000Translator		Basse
+About	JPEG2000Translator		À propos
+High	JPEG2000Translator		Haute
+Read greyscale images as RGB32	JPEG2000Translator		Lire les images en nuances de gris en RVB24

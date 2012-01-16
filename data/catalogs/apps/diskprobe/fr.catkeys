@@ -1,133 +1,132 @@
-1	french	x-vnd.Haiku-DiskProbe	3441574721
-%ld (native)	ProbeView		%ld (natif)
-(native)	ProbeView		(natif)
-15 bit	TypeEditors		15 bits
-16 bit	TypeEditors		16 bits
-16 bit signed value:	TypeEditors		Valeur signée sur 16 bits :
-16 bit unsigned value:	TypeEditors		Valeur non signée sur 16 bits :
-32 bit	TypeEditors		32 bits
-32 bit signed value:	TypeEditors		Valeur signée sur 32 bits :
-32 bit size or status:	TypeEditors		Taille ou statut sur 32 bits :
-32 bit unsigned pointer:	TypeEditors		Pointeur non signé sur 32 bits:
-32 bit unsigned size:	TypeEditors		Taille sur 32 bits non signés :
-32 bit unsigned value:	TypeEditors		Valeur non signée sur 32 bits :
-64 bit signed offset:	TypeEditors		Déplacement sur 64 bits signés :
-64 bit signed value:	TypeEditors		Valeur signée sur 64 bits :
-64 bit unsigned value:	TypeEditors		Valeur non signée sur 64 bits :
-8 bit palette	TypeEditors		Palette 8 bits :
-8 bit signed value:	TypeEditors		Valeur signée sur 8 bits :
-8 bit unsigned value:	TypeEditors		Valeur non signée sur 8 bits :
-Add	ProbeView		Ajouter
-Attribute	AttributeWindow		Attribut
-Attribute	ProbeView		Attribut
-Attribute offset: 	ProbeView		Offset dans l'attribut :
-Attribute type: 	ProbeView		Type d'attribut :
-Attribute: 	ProbeView		Attribut :
-Attributes	ProbeView		Attributs
-Back	ProbeView		Dernier vu
-Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Base
-Block	ProbeView		Bloc
-Block %Ld (0x%Lx)	ProbeView		Bloc %Ld (0x%Lx)
-Block 0x%Lx	ProbeView		Bloc 0x%Lx
-Block: 	ProbeView		Bloc :
-BlockSize	ProbeView	A menu item, a shortened form from 'block size'. This is in the same menu windowthan 'Base' and 'Font size'	Taille de bloc
-Bookmarks	ProbeView		Marque-pages
-Boolean	TypeEditors	This is the type of editor	Booléen
-Boolean editor	TypeEditors		Éditeur de booléen
-Boolean value:	TypeEditors		Valeur booléenne :
-Cancel	AttributeWindow		Annuler
-Cancel	OpenWindow		Annuler
-Cancel	ProbeView		Annuler
-Case sensitive	FindWindow		Sensible à la casse
-Close	AttributeWindow		Fermer
-Close	FileWindow		Fermer
-Close	ProbeView		Fermer
-Contents:	TypeEditors		Contenu :
-Copy	ProbeView		Copier
-Could not find search string.	ProbeView		La chaîne recherchée n'a pas été trouvée.
-Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Impossible d'ouvrir « %s » :\n%s
-Could not open file \"%s\": %s\n	DiskProbe		Impossible d'ouvrir le fichier « %s » : %s\n
-Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Impossible de lire l'image
-Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Décimal
-Device	ProbeView		Périphérique
-Device offset: 	ProbeView		Déplacement dans le périphérique :
-Device: 	ProbeView		Périphérique :
-DiskProbe	System name		Sondeur Disque
-DiskProbe request	AttributeWindow		Requête Sondeur Disque
-DiskProbe request	DiskProbe		Requête Sondeur Disque
-DiskProbe request	ProbeView		Requête Sondeur Disque
-Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Êtes-vous sûr de vouloir supprimer l'attribut « %s » du fichier « %s » ?\n\nVous ne pourrez pas annuler cette action.
-Don't save	ProbeView		Ne pas sauvegarder
-Double precision floating-point value:	TypeEditors		Valeur en virgule flottante double précision :
-Edit	ProbeView		Éditer
-Examine device:	OpenWindow		Examiner le périphérique
-File	FileWindow		Fichier
-File	ProbeView		Fichier
+1	french	x-vnd.Haiku-DiskProbe	2706202187
 File offset: 	ProbeView		Déplacement dans le fichier :
-File: 	ProbeView		Fichier :
-Find	FindWindow		Chercher
+%ld (native)	ProbeView		%ld (natif)
+64 bit unsigned value:	TypeEditors		Valeur non signée sur 64 bits :
 Find again	ProbeView		Chercher encore
-Find…	ProbeView		Chercher…
-Fit	ProbeView	Size of fonts, fits to available room	Utiliser l'espace
-Flattened bitmap	TypeEditors		Matriciel plat
-Floating-point value:	TypeEditors		Valeur en virgule flottante :
-Font size	ProbeView		Taille de la police
-Grayscale	TypeEditors		Niveaux de gris
-Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
-Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Héxadécimal
-Icon	TypeEditors		Icône
-Icon view	TypeEditors		Visualisation de l'icône
-Image	TypeEditors	This is the type of view	Image
-Image view	TypeEditors	Image means here a picture file, not a disk image.	Visualisateur d'image
-MIME type editor	TypeEditors		Éditeur de type MIME
-MIME type:	TypeEditors		Type MIME :
-Message	TypeEditors	This is the type of view	Message
-Message View	TypeEditors		Message
-Mode:	FindWindow		Mode :
-Native: %Ld (0x%0*Lx)	ProbeView		Natif : %Ld (0x%0*Lx)
-Native: 0x%0*Lx	ProbeView		Natif : 0x%0*Lx
-New…	FileWindow		Nouveau…
-Next	ProbeView		Suivant
-No type editor available	AttributeWindow		Pas d'éditeur disponible pour ce type d'attribut
-Number	TypeEditors	This is the type of editor	Nombre
-Number editor	TypeEditors		Éditeur de nombre
-Number:	TypeEditors		Nombre :
-OK	DiskProbe		OK
-OK	ProbeView		OK
-Offset: 	ProbeView		Déplacement :
-Open device	FileWindow		Ouvrir le périphérique
-Open file…	FileWindow		Ouvrir un fichier…
-PNG format	TypeEditors		Format PNG
-Page setup…	ProbeView		Mise en page…
-Paste	ProbeView		Coller
-Previous	ProbeView		Précédent
-Print…	ProbeView		Imprimer…
-Probe device	OpenWindow		Examiner le périphérique
-Probe file…	OpenWindow		Examiner le fichier…
-Quit	FileWindow		Quitter
-Raw editor	AttributeWindow		Éditeur de données brutes
-Redo	ProbeView		Rétablir
-Remove	AttributeWindow		Enlever
-Remove from file	AttributeWindow		Supprimer du fichier
-Save	ProbeView		Enregistrer
-Save changes before closing?	ProbeView		Sauvegarder les changements avant de fermer ?
-Select all	ProbeView		Sélectionner tout
-Selection	ProbeView		Sélection
-Stop	ProbeView		Arrêt
-String editor	TypeEditors		Éditeur de chaîne
-Swapped: %Ld (0x%0*Lx)	ProbeView		Endianness inversé : %Ld (0x%0*Lx)
-Swapped: 0x%0*Lx	ProbeView		Endianness inversé: 0x%0*Lx
 Text	FindWindow		Texte
-Text	TypeEditors	This is the type of editor	Texte
-Type editor	AttributeWindow		Éditeur de types
-Type editor	ProbeView		Éditeur de type
-Type editor not supported	ProbeView		Éditeur de type non supporté
-Undo	ProbeView		Annuler
-Unknown format	TypeEditors		Format inconnu
-Unknown type	TypeEditors		Type inconnu
-View	ProbeView	This is the last menubar item 'File Edit Block View'	Vue
-Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		L'écriture dans le fichier a échouée:\n%s\n\nToutes les modifications effectuées seront perdues lorsque vous quitterez l'application.
-none	ProbeView	No attributes	aucun
-of 	ProbeView		sur 
-of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	sur 0x0
+Find…	ProbeView		Chercher…
+Case sensitive	FindWindow		Sensible à la casse
+Cancel	OpenWindow		Annuler
+Close	AttributeWindow		Fermer
+File	ProbeView		Fichier
+Attribute	ProbeView		Attribut
+Floating-point value:	TypeEditors		Valeur en virgule flottante :
+16 bit	TypeEditors		16 bits
+Attributes	ProbeView		Attributs
+Device offset: 	ProbeView		Déplacement dans le périphérique :
+Selection	ProbeView		Sélection
+DiskProbe	System name		Sondeur Disque
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	quoi : '%.4s'\n\n
+File	FileWindow		Fichier
+OK	DiskProbe		OK
+Boolean	TypeEditors	This is the type of editor	Booléen
+Paste	ProbeView		Coller
+PNG format	TypeEditors		Format PNG
+Font size	ProbeView		Taille de la police
+Attribute type: 	ProbeView		Type d'attribut :
+Attribute	AttributeWindow		Attribut
+8 bit signed value:	TypeEditors		Valeur signée sur 8 bits :
+Number:	TypeEditors		Nombre :
+Save	ProbeView		Enregistrer
+Stop	ProbeView		Arrêt
+Number editor	TypeEditors		Éditeur de nombre
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
+No type editor available	AttributeWindow		Pas d'éditeur disponible pour ce type d'attribut
+Double precision floating-point value:	TypeEditors		Valeur en virgule flottante double précision :
+Device: 	ProbeView		Périphérique :
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Êtes-vous sûr de vouloir supprimer l'attribut « %s » du fichier « %s » ?\n\nVous ne pourrez pas annuler cette action.
+Text	TypeEditors	This is the type of editor	Texte
+8 bit unsigned value:	TypeEditors		Valeur non signée sur 8 bits :
+Block	ProbeView		Bloc
+Back	ProbeView		Dernier vu
+Device	ProbeView		Périphérique
+Unknown type	TypeEditors		Type inconnu
+Block 0x%Lx	ProbeView		Bloc 0x%Lx
+Quit	FileWindow		Quitter
+Undo	ProbeView		Annuler
+Close	ProbeView		Fermer
+Number	TypeEditors	This is the type of editor	Nombre
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Décimal
+16 bit signed value:	TypeEditors		Valeur signée sur 16 bits :
+String editor	TypeEditors		Éditeur de chaîne
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	sur 0x0
+64 bit signed offset:	TypeEditors		Déplacement sur 64 bits signés :
+Boolean editor	TypeEditors		Éditeur de booléen
+Copy	ProbeView		Copier
+none	ProbeView	No attributes	aucun
+Boolean value:	TypeEditors		Valeur booléenne :
+32 bit size or status:	TypeEditors		Taille ou statut sur 32 bits :
+8 bit palette	TypeEditors		Palette 8 bits :
+Fit	ProbeView	Size of fonts, fits to available room	Utiliser l'espace
+Probe device	OpenWindow		Examiner le périphérique
+Unknown format	TypeEditors		Format inconnu
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Héxadécimal
+MIME type:	TypeEditors		Type MIME :
+Page setup…	ProbeView		Mise en page…
+New…	FileWindow		Nouveau…
+DiskProbe request	AttributeWindow		Requête Sondeur Disque
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Impossible de lire l'image
+BlockSize	ProbeView	A menu item, a shortened form from 'block size'. This is in the same menu windowthan 'Base' and 'Font size'	Taille de bloc
+Save changes before closing?	ProbeView		Sauvegarder les changements avant de fermer ?
+Type editor	AttributeWindow		Éditeur de types
+Native: 0x%0*Lx	ProbeView		Natif : 0x%0*Lx
+Raw editor	AttributeWindow		Éditeur de données brutes
+Message View	TypeEditors		Message
+DiskProbe request	ProbeView		Requête Sondeur Disque
+32 bit unsigned size:	TypeEditors		Taille sur 32 bits non signés :
+Flattened bitmap	TypeEditors		Matriciel plat
+Open file…	FileWindow		Ouvrir un fichier…
+Next	ProbeView		Suivant
+Close	FileWindow		Fermer
+Attribute: 	ProbeView		Attribut :
+Remove from file	AttributeWindow		Supprimer du fichier
+Don't save	ProbeView		Ne pas sauvegarder
+Previous	ProbeView		Précédent
+64 bit signed value:	TypeEditors		Valeur signée sur 64 bits :
+Icon	TypeEditors		Icône
+Block: 	ProbeView		Bloc :
+Examine device:	OpenWindow		Examiner le périphérique
+Offset: 	ProbeView		Déplacement :
+OK	ProbeView		OK
+Add	ProbeView		Ajouter
+Edit	ProbeView		Éditer
+Native: %Ld (0x%0*Lx)	ProbeView		Natif : %Ld (0x%0*Lx)
+32 bit unsigned value:	TypeEditors		Valeur non signée sur 32 bits :
+Message	TypeEditors	This is the type of view	Message
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Impossible d'ouvrir « %s » :\n%s
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Base
+Image view	TypeEditors	Image means here a picture file, not a disk image.	Visualisateur d'image
+Cancel	AttributeWindow		Annuler
+Type editor not supported	ProbeView		Éditeur de type non supporté
+MIME type editor	TypeEditors		Éditeur de type MIME
+Swapped: %Ld (0x%0*Lx)	ProbeView		Endianness inversé : %Ld (0x%0*Lx)
+Find	FindWindow		Chercher
+Remove	AttributeWindow		Enlever
+Print…	ProbeView		Imprimer…
+Block %Ld (0x%Lx)	ProbeView		Bloc %Ld (0x%Lx)
+Image	TypeEditors	This is the type of view	Image
+Could not open file \"%s\": %s\n	DiskProbe		Impossible d'ouvrir le fichier « %s » : %s\n
+Select all	ProbeView		Sélectionner tout
+Probe file…	OpenWindow		Examiner le fichier…
+Icon view	TypeEditors		Visualisation de l'icône
+Bookmarks	ProbeView		Marque-pages
+Mode:	FindWindow		Mode :
+15 bit	TypeEditors		15 bits
+Open device	FileWindow		Ouvrir le périphérique
+Could not find search string.	ProbeView		La chaîne recherchée n'a pas été trouvée.
+16 bit unsigned value:	TypeEditors		Valeur non signée sur 16 bits :
+Attribute offset: 	ProbeView		Offset dans l'attribut :
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Vue
+Redo	ProbeView		Rétablir
+File: 	ProbeView		Fichier :
+32 bit unsigned pointer:	TypeEditors		Pointeur non signé sur 32 bits:
+of 	ProbeView		sur 
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		L'écriture dans le fichier a échouée:\n%s\n\nToutes les modifications effectuées seront perdues lorsque vous quitterez l'application.
+32 bit	TypeEditors		32 bits
+Cancel	ProbeView		Annuler
+Swapped: 0x%0*Lx	ProbeView		Endianness inversé: 0x%0*Lx
+Grayscale	TypeEditors		Niveaux de gris
+32 bit signed value:	TypeEditors		Valeur signée sur 32 bits :
+DiskProbe request	DiskProbe		Requête Sondeur Disque
+Type editor	ProbeView		Éditeur de type
+Contents:	TypeEditors		Contenu :

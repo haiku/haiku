@@ -1,30 +1,30 @@
 1	french	x-vnd.Haiku-Media	1473363280
-<none>	Media views		<aucun>
-Audio input:	Media views		Entrée son :
-Audio mixer	Media Window		Mélangeur audio
-Audio output:	Media views		Sortie audio:
-Audio settings	Media Window		Réglages audio
-Channel:	Media views		Canal :
-Cleaning up.	Media Window		Nettoyage.
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Impossible de se connecter au serveur de médias.\nVoulez-vous le démarrer ?
 Couldn't add volume control in Deskbar: %s\n	Media views		Impossible d'insérer le contrôle du volume dans la Deskbar : %s\n
-Couldn't remove volume control in Deskbar: %s\n	Media views		Impossible de retirer le contrôle du volume de la Deskbar : %s\n
-Defaults	Media views		Par défaut
-Done shutting down.	Media Window		Arrêt terminé.
-Media	System name		Média
-OK	Media Window		Ok
-Quit	Media Window		Quitter
 Ready for use…	Media Window		Prêt à servir…
-Restart media services	Media views		Redémarrer les services médias
-Restarting media services\nShutting down media server\n	Media Window		Redémarrage des services médias\nArrêt du serveur de médias\n
-Restarting media services\nStarting media server…\n	Media Window		Redémarrage des services médias\nDémarrage du serveur de médias…\n
-Show volume control on Deskbar	Media views		Afficher le contrôle de volume dans la Deskbar
-Start media server	Media Window		Démarrer le serveur media
-Starting media server…	Media Window		Démarrage du serveur de médias…
-Stopping media server…	Media Window		Arrêt du serveur de médias…
-Telling media_addon_server to quit.	Media Window		Demande au serveur des extensions de médias de quitter.
-This hardware has no controls.	Media Window		Ce matériel n'a pas de contrôles.
 Video input:	Media views		Entrée vidéo:
-Video output:	Media views		Sortie vidéo :
-Video settings	Media Window		Réglages vidéo
 Waiting for media_server to quit.	Media Window		Attente de la fin du serveur de médias.
+Cleaning up.	Media Window		Nettoyage.
+Defaults	Media views		Par défaut
+Stopping media server…	Media Window		Arrêt du serveur de médias…
+Quit	Media Window		Quitter
+OK	Media Window		Ok
+Starting media server…	Media Window		Démarrage du serveur de médias…
+Done shutting down.	Media Window		Arrêt terminé.
+Video settings	Media Window		Réglages vidéo
+Video output:	Media views		Sortie vidéo :
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Impossible de se connecter au serveur de médias.\nVoulez-vous le démarrer ?
+Restart media services	Media views		Redémarrer les services médias
+Couldn't remove volume control in Deskbar: %s\n	Media views		Impossible de retirer le contrôle du volume de la Deskbar : %s\n
+Media	System name		Média
+Telling media_addon_server to quit.	Media Window		Demande au serveur des extensions de médias de quitter.
+Audio mixer	Media Window		Mélangeur audio
+This hardware has no controls.	Media Window		Ce matériel n'a pas de contrôles.
+Audio output:	Media views		Sortie audio:
+Restarting media services\nStarting media server…\n	Media Window		Redémarrage des services médias\nDémarrage du serveur de médias…\n
+Audio settings	Media Window		Réglages audio
+Start media server	Media Window		Démarrer le serveur media
+Restarting media services\nShutting down media server\n	Media Window		Redémarrage des services médias\nArrêt du serveur de médias\n
+<none>	Media views		<aucun>
+Channel:	Media views		Canal :
+Show volume control on Deskbar	Media views		Afficher le contrôle de volume dans la Deskbar
+Audio input:	Media views		Entrée son :

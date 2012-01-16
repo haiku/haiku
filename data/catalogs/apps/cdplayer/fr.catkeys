@@ -1,14 +1,14 @@
 1	french	x-vnd.Haiku-CDPlayer	592310631
-Audio CD	CDPlayer		CD Audio
-CD	CDPlayer		CD
-CD drive is empty	CDPlayer		Le lecteur de CD est vide
 CDPlayer	System name		Lecteur CD
+CD	CDPlayer		CD
 Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		Disque : %ld:%.2ld / %ld:%.2ld
-Disc: --:-- / --:--	CDPlayer		Disque : --:-- / --:--
-Disc: 88:88 / 88:88	CDPlayer		Disque : 88:88 / 88:88
-It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		votre ordinateur ne comporte pas de lecteur de CD, ou il n'est supporté par aucun pilote. Désolé.
 OK	CDPlayer		OK
 Track %whichTrack%: %trackAt%	CDPlayer		Piste %whichTrack% : %trackAt%
+Audio CD	CDPlayer		CD Audio
+It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		votre ordinateur ne comporte pas de lecteur de CD, ou il n'est supporté par aucun pilote. Désolé.
 Track: %ld:%.2ld / %ld:%.2ld	CDPlayer		Piste : %ld:%.2ld / %ld:%.2ld
-Track: --:-- / --:--	CDPlayer		Piste : --:-- / --:--
 Track: 88:88 / 88:88	CDPlayer		Piste : 88:88 / 88:88
+Track: --:-- / --:--	CDPlayer		Piste : --:-- / --:--
+Disc: 88:88 / 88:88	CDPlayer		Disque : 88:88 / 88:88
+Disc: --:-- / --:--	CDPlayer		Disque : --:-- / --:--
+CD drive is empty	CDPlayer		Le lecteur de CD est vide

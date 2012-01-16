@@ -1,50 +1,50 @@
 1	french	x-vnd.Haiku-Notifications	3631903554
-Allowed	NotificationView		Autorisé
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Une erreur est survenue lors de la sauvegarde des préférences.\nVous n'avez peut-être plus suffisamment d'espace libre sur votre disque.
-Application	NotificationView		Application
-Applications	NotificationView		Applications
-Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Impossible d'activer les notifications au démarrage. Vous n'avez probablement pas le droit d'écrire dans le répertoire des réglages du démarrage.
-Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Impossible d'enregistrer les préférences, vous n'avez probablement pas le droit d'écrire dans le répertoire des  réglages du démarrage.
-Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Impossible d'enregistrer les préférences. Vous n'avez probablement pas le droit d'écrire dans le répertoire des paramètres ou alors le disque est plein.
-Cannot disable notifications because the server can't be reached.	GeneralView		Impossible de désactiver les notifications car le serveur ne peut pas être atteint.
-Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Impossible d'activer les notifications, car le serveur est introuvable.\nCela signifie que votre installation d'InfoPopper ne s'est par terminée correctement.
-Disable notifications	GeneralView		Désactiver les notifications
-Display	PrefletView		Affichage
-Enable notifications	GeneralView		Activer les notifications
-Enable notifications at startup	GeneralView		Activer les notifications au démarrage
-Enabled	NotificationView		Activer
-Error	NotificationView		Erreur
-Events are not notified	GeneralView		Les événements ne sont pas notifiés
-Events are notified	GeneralView		Les événements sont notifiés
-General	PrefletView		Général
-Hide notifications from screen after	GeneralView		Faire disparaître les notifications de l'écran après
-Icon size:	DisplayView		Taille de l'icône
-Important	NotificationView		Important
-Information	NotificationView		Information
-Large icon	DisplayView		Grande icône
-Last Received	NotificationView		Dernière reçue
-Mini icon	DisplayView		Petite icône
-No	NotificationView		Non
 Notifications	GeneralView		Notifications
-Notifications	NotificationView		Notifications
-Notifications	PrefletView		Notifications
-Notifications	System name		Notifications
-Notifications cannot be stopped, because the server can't be reached.	GeneralView		Les notifications ne peuvent pas être arrêtées, parce qu'il est impossible d'atteindre le serveur.
-OK	DisplayView		OK
-OK	GeneralView		OK
-OK	NotificationView		OK
-Progress	NotificationView		Progression
+seconds of inactivity	GeneralView		secondes d'inactivités
 Revert	PrefletWin		Rétablir
+Mini icon	DisplayView		Petite icône
+Enable notifications	GeneralView		Activer les notifications
+Error	NotificationView		Erreur
+OK	GeneralView		OK
+Events are not notified	GeneralView		Les événements ne sont pas notifiés
 Save	PrefletWin		Enregistrer
+Type	NotificationView		Type
+Notifications cannot be stopped, because the server can't be reached.	GeneralView		Les notifications ne peuvent pas être arrêtées, parce qu'il est impossible d'atteindre le serveur.
+Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Impossible d'activer les notifications, car le serveur est introuvable.\nCela signifie que votre installation d'InfoPopper ne s'est par terminée correctement.
+OK	NotificationView		OK
+Important	NotificationView		Important
+Cannot disable notifications because the server can't be reached.	GeneralView		Impossible de désactiver les notifications car le serveur ne peut pas être atteint.
+Progress	NotificationView		Progression
+Last Received	NotificationView		Dernière reçue
+General	PrefletView		Général
+Display	PrefletView		Affichage
+Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Impossible d'activer les notifications au démarrage. Vous n'avez probablement pas le droit d'écrire dans le répertoire des réglages du démarrage.
 Search:	NotificationView		Rechercher :
-The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Impossible de trouver le serveur de notifications.\nCela signifie que votre installation d'InfoPopper ne s'est par terminée correctement.
 The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		Impossible de trouver le serveur de notifications.\nIl est possible que l'installation ait été mal faite.
+Allowed	NotificationView		Autorisé
+Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Impossible d'enregistrer les préférences. Vous n'avez probablement pas le droit d'écrire dans le répertoire des paramètres ou alors le disque est plein.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	DisplayView		Il y a eu un problème à la sauvegarde des préférences.\nIl est possible que vous n'ayez pas le droit d'écrire dans le répertoire des réglages.
+Yes	NotificationView		Oui
+Large icon	DisplayView		Grande icône
+Icon size:	DisplayView		Taille de l'icône
+Hide notifications from screen after	GeneralView		Faire disparaître les notifications de l'écran après
+Disable notifications	GeneralView		Désactiver les notifications
+Notifications	System name		Notifications
+Notifications	NotificationView		Notifications
+No	NotificationView		Non
+Title	NotificationView		Titre
+Information	NotificationView		Information
+Window width:	DisplayView		Largeur de la fenêtre
+Application	NotificationView		Application
+Enabled	NotificationView		Activer
+OK	DisplayView		OK
+Unknown	NotificationView		Inconnu
+Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Impossible d'enregistrer les préférences, vous n'avez probablement pas le droit d'écrire dans le répertoire des  réglages du démarrage.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Il y a eu un problème à la sauvegarde des préférences.\nIl est possible que vous n'ayez pas le droit d'écrire dans le répertoire des réglages.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Il y a eu un problème à la sauvegarde des préférences.\nIl est possible que vous n'ayez pas le droit d'écrire dans le répertoire des réglages.
-Title	NotificationView		Titre
-Type	NotificationView		Type
-Unknown	NotificationView		Inconnu
-Window width:	DisplayView		Largeur de la fenêtre
-Yes	NotificationView		Oui
-seconds of inactivity	GeneralView		secondes d'inactivités
+Enable notifications at startup	GeneralView		Activer les notifications au démarrage
+Notifications	PrefletView		Notifications
+The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Impossible de trouver le serveur de notifications.\nCela signifie que votre installation d'InfoPopper ne s'est par terminée correctement.
+Applications	NotificationView		Applications
+Events are notified	GeneralView		Les événements sont notifiés

@@ -1,8 +1,8 @@
 1	french	x-vnd.Haiku-PCXTranslator	1002061545
-PCX %lu bit image	PCXTranslator		Image PCX %lu bits
 PCX Settings	main		Réglages PCX
+PCX translator	PCXTranslator		Traducteur PCX
+Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
+PCXTranslator Settings	ConfigView		Réglages du traducteur PCX
+PCX %lu bit image	PCXTranslator		Image PCX %lu bits
 PCX images	ConfigView		Images PCX
 PCX images	PCXTranslator		Images PCX
-PCX translator	PCXTranslator		Traducteur PCX
-PCXTranslator Settings	ConfigView		Réglages du traducteur PCX
-Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s

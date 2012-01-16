@@ -1,20 +1,20 @@
 1	french	x-vnd.mmu_man.filepanel	1802971238
-%s not a valid option\n	FilePanelApp		%s n'est pas une option valide\n
-%s: UNIMPLEMENTED\n	FilePanelApp		%s: NON IMPLÉMENTÉ\n
-%s: this option requires a parameter\n	FilePanelApp		%s: cette option requiert un paramètre\n
--1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tpermet la sélection d'un seul fichier\n
--a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tnon implémenté\n
--d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tdémarrer dans <dossier>\n
--f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tnon implémenté\n
--h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\taffiche cette aide\n
--k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tType d'entrées qui peuvent être ouvertes : n'importe quelle combinaison de f, d, s (fichier (par défaut), dossier, lien symbolique)\n
--l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\touvre un panneau d'ouverture de fichier (par défaut)\n
--m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\trend le panneau modal\n
--n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tspécifie un nom par défaut pour l'enregistrement\n
--s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\touvre un panneau de sauvegarde de fichier \n
--t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tchange le titre de la fenêtre du panneau de fichier\n
 display a load/save file panel\n	FilePanelApp		affiche un panneau pour ouvrir ou sauvegarder un fichier\n
 options:\n	FilePanelApp		options :\n
-short\tlong\tdescription\n	FilePanelApp		courte\tlongue\tdescription\n
 usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		utilisation : %s [--help] [--directory dossier] [--load|--save] [--title ttl] [--single] [--modal] [--allow modèle] [--forbid modèle]\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tType d'entrées qui peuvent être ouvertes : n'importe quelle combinaison de f, d, s (fichier (par défaut), dossier, lien symbolique)\n
 usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		utilisation : %s [-h] [-d dossier] [-l|-s] [-t ttl] [-1] [-m] [-a modèle] [-f modèle]\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tdémarrer dans <dossier>\n
+%s not a valid option\n	FilePanelApp		%s n'est pas une option valide\n
+short\tlong\tdescription\n	FilePanelApp		courte\tlongue\tdescription\n
+%s: this option requires a parameter\n	FilePanelApp		%s: cette option requiert un paramètre\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\touvre un panneau d'ouverture de fichier (par défaut)\n
+-f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tnon implémenté\n
+-s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\touvre un panneau de sauvegarde de fichier \n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tspécifie un nom par défaut pour l'enregistrement\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\trend le panneau modal\n
+-h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\taffiche cette aide\n
+-a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tnon implémenté\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tpermet la sélection d'un seul fichier\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tchange le titre de la fenêtre du panneau de fichier\n
+%s: UNIMPLEMENTED\n	FilePanelApp		%s: NON IMPLÉMENTÉ\n

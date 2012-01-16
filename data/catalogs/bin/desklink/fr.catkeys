@@ -1,13 +1,13 @@
 1	french	x-vnd.Haiku-desklink	4173541219
-%g dB	MediaReplicant		%g dB
-%ld dB	VolumeControl		%ld dB
-Beep	MediaReplicant		Bip
 Control physical output	MediaReplicant		Contrôler la sortie physique
 Couldn't launch 	MediaReplicant		Lancement Impossible
-Media preferences…	MediaReplicant		Réglages média…
-No media server running	VolumeControl		Aucun serveur de médias en cours d'exécution
 OK	MediaReplicant		OK
+Sound preferences…	MediaReplicant		Réglages sons…
+%g dB	MediaReplicant		%g dB
+No media server running	VolumeControl		Aucun serveur de médias en cours d'exécution
+Media preferences…	MediaReplicant		Réglages média…
 Open MediaPlayer	MediaReplicant		Ouvrir le Lecteur Média
 Options	MediaReplicant		Options
-Sound preferences…	MediaReplicant		Réglages sons…
+%ld dB	VolumeControl		%ld dB
+Beep	MediaReplicant		Bip
 Volume	VolumeControl		Volume

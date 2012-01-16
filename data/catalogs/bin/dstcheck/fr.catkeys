@@ -1,6 +1,6 @@
 1	french	x-vnd.Haiku-cmd-dstconfig	2337923203
-.\n\nIs this the correct time?	dstcheck		.\n\nest-ce l'heure correcte ?
-Ask me later	dstcheck		Me demander plus tard
-Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		Attention !\n\nEn raison du changement d'heure, l'horloge de votre ordinateur est peut-être décalée d'une heure. Maintenant, votre ordinateur pense qu'il est
-Manually adjust time…	dstcheck		Ajuster l'heure manuellement
 Use this time	dstcheck		Utiliser cette heure
+Ask me later	dstcheck		Me demander plus tard
+Manually adjust time…	dstcheck		Ajuster l'heure manuellement
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		Attention !\n\nEn raison du changement d'heure, l'horloge de votre ordinateur est peut-être décalée d'une heure. Maintenant, votre ordinateur pense qu'il est
+.\n\nIs this the correct time?	dstcheck		.\n\nest-ce l'heure correcte ?
