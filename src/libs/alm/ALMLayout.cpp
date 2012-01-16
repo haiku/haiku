@@ -85,6 +85,22 @@ BALMLayout::AddXTab()
 }
 
 
+void
+BALMLayout::AddXTabs(BReference<XTab>* tabs, uint32 count)
+{
+	for (uint32 i = 0; i < count; i++)
+		tabs[i] = AddXTab();
+}
+
+
+void
+BALMLayout::AddYTabs(BReference<YTab>* tabs, uint32 count)
+{
+	for (uint32 i = 0; i < count; i++)
+		tabs[i] = AddYTab();
+}
+
+
 /**
  * Adds a new y-tab to the specification.
  *

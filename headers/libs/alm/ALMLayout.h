@@ -37,7 +37,9 @@ public:
 	virtual						~BALMLayout();
 
 			BReference<XTab>	AddXTab();
+			void				AddXTabs(BReference<XTab>* tabs, uint32 count);
 			BReference<YTab>	AddYTab();
+			void				AddYTabs(BReference<YTab>* tabs, uint32 count);
 
 			int32				CountXTabs() const;
 			int32				CountYTabs() const;
@@ -192,6 +194,8 @@ private:
 
 }	// namespace BALM
 
+
 using BALM::BALMLayout;
+
 
 #endif	// ALM_LAYOUT_H
