@@ -491,15 +491,8 @@ Area::InvalidateSizeConstraints()
 BRect
 Area::Frame() const
 {
-	return BRect(fLeft->Value(), fTop->Value(), fRight->Value(),
-		fBottom->Value());
-}
-
-
-BRect
-Area::ItemFrame() const
-{
-	return fLayoutItem->Frame();
+	return BRect(round(fLeft->Value()), round(fTop->Value()),
+		round(fRight->Value()), round(fBottom->Value()));
 }
 
 
@@ -615,8 +608,7 @@ Area::_DoLayout()
 	if (!fLeft)
 		return;
 
-	BRect areaFrame(round(fLeft->Value()), round(fTop->Value()),
-		round(fRight->Value()), round(fBottom->Value()));
+	BRect areaFrame(Frame());
 	areaFrame.left += LeftInset();
 	areaFrame.right -= RightInset();
 	areaFrame.top += TopInset();

@@ -107,7 +107,6 @@ public:
 			void				InvalidateSizeConstraints();
 
 			BRect				Frame() const;
-			BRect				ItemFrame() const;
 
 private:
 								Area(BLayoutItem* item);
