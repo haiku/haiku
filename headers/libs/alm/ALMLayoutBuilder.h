@@ -9,6 +9,8 @@
 #include "ALMLayout.h"
 
 
+class BLayoutItem;
+class BView;
 class BWindow;
 
 

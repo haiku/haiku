@@ -6,9 +6,14 @@
 #define	ROW_H
 
 
-#include "Constraint.h"
-#include "LinearSpec.h"
-#include "Tab.h"
+#include <ObjectList.h>
+#include <Referenceable.h>
+
+
+namespace LinearProgramming {
+	class Constraint;
+	class LinearSpec;
+};
 
 
 namespace BALM {
@@ -17,6 +22,8 @@ namespace BALM {
 class Area;
 class BALMLayout;
 class RowColumnManager;
+class XTab;
+class YTab;
 
 
 /**
@@ -30,14 +37,16 @@ public:
 			YTab*				Bottom() const;
 
 private:
-								Row(LinearSpec* ls, YTab* top, YTab* bottom);
+								Row(LinearProgramming::LinearSpec* ls,
+										YTab* top, YTab* bottom);
 
-			LinearSpec*			fLS;
 			BReference<YTab>	fTop;
 			BReference<YTab>	fBottom;
 
-			//! managed by RowColumnManager
-			Constraint*			fPrefSizeConstraint;
+			LinearProgramming::LinearSpec* fLS;
+			LinearProgramming::Constraint* fPrefSizeConstraint;
+				// managed by RowColumnManager
+
 			BObjectList<Area>	fAreas;
 
 public:

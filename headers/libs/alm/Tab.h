@@ -7,7 +7,7 @@
 
 
 #include <Referenceable.h>
-#include "LinearSpec.h"
+
 #include "Variable.h"
 
 
@@ -24,9 +24,8 @@ class XTab : public Variable, public BReferenceable {
 public:
 	virtual						~XTab();
 
-	friend	class				BALMLayout;
-
 protected:
+	friend	class				BALMLayout;
 								XTab(BALMLayout* layout);
 
 private:
@@ -38,9 +37,8 @@ class YTab : public Variable, public BReferenceable {
 public:
 	virtual						~YTab();
 
-	friend	class				BALMLayout;
-
 protected:
+	friend	class				BALMLayout;
 								YTab(BALMLayout* layout);
 
 private:

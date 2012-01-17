@@ -7,22 +7,23 @@
 
 
 #include <AbstractLayout.h>
-#include <File.h>
-#include <List.h>
 #include <Size.h>
-#include <SupportDefs.h>
-#include <View.h>
 
 #include "Area.h"
-#include "Column.h"
 #include "LinearSpec.h"
-#include "Row.h"
 #include "Tab.h"
+
+
+class BView;
+class BLayoutItem;
 
 
 namespace BALM {
 
 
+class Column;
+class GroupItem;
+class Row;
 class RowColumnManager;
 
 
@@ -57,7 +58,7 @@ public:
 			YTab*				Top() const;
 			YTab*				Bottom() const;
 
-			LinearSpec*			Solver() const;
+			LinearProgramming::LinearSpec* Solver() const;
 
 			void				SetInsets(float insets);
 			void				SetInsets(float x, float y);
@@ -139,8 +140,8 @@ private:
 									BReference<XTab> right,
 									BReference<YTab> bottom);
 
-			LinearSpec*			fSolver;
-			LinearSpec			fOwnSolver;
+			LinearProgramming::LinearSpec*	fSolver;
+			LinearProgramming::LinearSpec	fOwnSolver;
 
 			BReference<XTab>	fLeft;
 			BReference<XTab>	fRight;

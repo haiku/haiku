@@ -7,6 +7,8 @@
 
 #include <Window.h>
 
+#include "Area.h"
+
 
 namespace BALM {
 

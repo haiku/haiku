@@ -6,9 +6,7 @@
  */
 #include "ALMLayout.h"
 
-#include <math.h>		// for floor
-#include <new>
-#include <iostream>
+
 #include <vector>
 
 #include <ControlLook.h>

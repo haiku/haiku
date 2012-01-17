@@ -5,11 +5,10 @@
  * Copyright 2010, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
  */
-
-
 #include "Column.h"
 
 #include "ALMLayout.h"
+#include "Area.h"
 #include "Tab.h"
 
 
@@ -51,9 +50,9 @@ Column::~Column()
  */
 Column::Column(LinearSpec* ls, XTab* left, XTab* right)
 	:
-	fLS(ls),
 	fLeft(left),
 	fRight(right),
+	fLS(ls),
 	fPrefSizeConstraint(NULL)
 {
 

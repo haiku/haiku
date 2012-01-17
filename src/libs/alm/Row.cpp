@@ -5,14 +5,11 @@
  * Copyright 2010, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
  */
-
-
 #include "Row.h"
 
 #include "ALMLayout.h"
+#include "Area.h"
 #include "Tab.h"
-
-#include <SupportDefs.h>
 
 
 using namespace LinearProgramming;
@@ -53,9 +50,9 @@ Row::~Row()
  */
 Row::Row(LinearSpec* ls, YTab* top, YTab* bottom)
 	:
-	fLS(ls),
 	fTop(top),
 	fBottom(bottom),
+	fLS(ls),
 	fPrefSizeConstraint(NULL)
 {
 

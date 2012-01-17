@@ -4,22 +4,16 @@
  * Copyright 2010, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
  */
-
-
 #include "Area.h"
 
-#include <algorithm>	// for max
-
-#include <Button.h>
-#include <CheckBox.h>
+#include <Alignment.h>
 #include <ControlLook.h>
-#include <PictureButton.h>
-#include <RadioButton.h>
-#include <StatusBar.h>
-#include <StringView.h>
+#include <View.h>
 
 #include "ALMLayout.h"
 #include "RowColumnManager.h"
+#include "Row.h"
+#include "Column.h"
 
 
 using namespace LinearProgramming;
@@ -595,12 +589,14 @@ Area::Area(BLayoutItem* item)
 	fShrinkPenalties(5, 5),
 	fGrowPenalties(5, 5),
 
+	fContentAspectRatio(-1),
+	fRowColumnManager(NULL),
+
 	fMinContentWidth(NULL),
 	fMaxContentWidth(NULL),
 	fMinContentHeight(NULL),
 	fMaxContentHeight(NULL),
 
-	fContentAspectRatio(-1),
 	fContentAspectRatioC(NULL)
 {
 	fID = new_area_id();

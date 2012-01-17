@@ -8,22 +8,30 @@
 
 #include <vector>
 
-#include <Alignment.h>
-#include <List.h>
+#include <InterfaceDefs.h> // for enum orientation
+#include <ObjectList.h>
+#include <Referenceable.h>
 #include <Size.h>
-#include <SupportDefs.h>
-#include <View.h>
-
-#include "Column.h"
-#include "LinearSpec.h"
-#include "Row.h"
-#include "Tab.h"
+#include <String.h>
 
 
-class Constraint;
+class BLayoutItem;
+class BView;
+
+
+namespace LinearProgramming {
+	class LinearSpec;
+	class Constraint;
+};
 
 
 namespace BALM {
+
+
+class Column;
+class Row;
+class XTab;
+class YTab;
 
 
 class GroupItem {
@@ -108,8 +116,11 @@ public:
 
 			BString				ToString() const;
 
-			Constraint*			SetWidthAs(Area* area, float factor = 1.0f);
-			Constraint*			SetHeightAs(Area* area, float factor = 1.0f);
+			LinearProgramming::Constraint*
+								SetWidthAs(Area* area, float factor = 1.0f);
+
+			LinearProgramming::Constraint*
+								SetHeightAs(Area* area, float factor = 1.0f);
 
 			void				InvalidateSizeConstraints();
 
@@ -118,10 +129,11 @@ public:
 private:
 								Area(BLayoutItem* item);
 
-			void				_Init(LinearSpec* ls, XTab* left, YTab* top,
-									XTab* right, YTab* bottom,
-									RowColumnManager* manager);
-			void				_Init(LinearSpec* ls, Row* row, Column* column,
+			void				_Init(LinearProgramming::LinearSpec* ls,
+									XTab* left, YTab* top, XTab* right,
+									YTab* bottom, RowColumnManager* manager);
+			void				_Init(LinearProgramming::LinearSpec* ls,
+									Row* row, Column* column,
 									RowColumnManager* manager);
 
 			void				_DoLayout();
@@ -132,7 +144,7 @@ private:
 			BLayoutItem*		fLayoutItem;
 			int32				fID;
 
-			LinearSpec*			fLS;
+			LinearProgramming::LinearSpec* fLS;
 
 			BReference<XTab>	fLeft;
 			BReference<XTab>	fRight;
@@ -148,15 +160,16 @@ private:
 			BSize				fTopLeftInset;
 			BSize				fRightBottomInset;
 
-			BObjectList<Constraint>	fConstraints;
-			Constraint*			fMinContentWidth;
-			Constraint*			fMaxContentWidth;
-			Constraint*			fMinContentHeight;
-			Constraint*			fMaxContentHeight;
 			double				fContentAspectRatio;
-			Constraint*			fContentAspectRatioC;
-
 			RowColumnManager*	fRowColumnManager;
+
+			BObjectList<LinearProgramming::Constraint>	fConstraints;
+			LinearProgramming::Constraint* fMinContentWidth;
+			LinearProgramming::Constraint* fMaxContentWidth;
+			LinearProgramming::Constraint* fMinContentHeight;
+			LinearProgramming::Constraint* fMaxContentHeight;
+			LinearProgramming::Constraint* fContentAspectRatioC;
+
 public:
 	friend class BALMLayout;
 	friend class RowColumnManager;
