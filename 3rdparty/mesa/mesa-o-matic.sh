@@ -17,12 +17,6 @@ echo ""
 #   by the opengl kit.
 MESA_PRIVATE_HEADERS="glheader.h glapi.h glapitable.h glapitemp.h glapi_priv.h context.h driverfuncs.h meta.h colormac.h buffers.h framebuffer.h renderbuffer.h state.h version.h swrast.h swrast_setup.h tnl.h t_context.h t_pipeline.h vbo.h common_x86_asm.h common_ppc_features.h extensions.h s_spantemp.h s_renderbuffer.h formats.h"
 
-# These are public header directories, all files grabbed
-MESA_PUBLIC_HEADERS="include/GL"
-
-# These libraries are 1:1 file find/grabs
-MESA_LIBRARIES="libmesa.a libglapi.a libGLU.a"
-
 #######################################################################
 # END CONFIG DATA, Dragons below!
 #######################################################################
@@ -78,28 +72,29 @@ do
 	if [[ $GCC_VER -eq 2 ]]; then
 		setgcc gcc2
 	fi
-	HEADERS=$( echo "$HEADERS_RAW" | cut -d':' -f2 | sed 's/\\//g' | tr -d '\n' )
-	ZIP_HEADERS="$ZIP_HEADERS $HEADERS"
+
+	for y in $( echo "$HEADERS_RAW" | cut -d':' -f2 | sed 's/\\//g' | tr -d '\n' )
+	do
+		CLEAN_HEADER=$( echo "$y" | grep -v "include/GL" )
+		ZIP_HEADERS="$ZIP_HEADERS $CLEAN_HEADER"
+	done
 done
 
-echo "Collecting required Mesa public headers..."
-#for i in $MESA_PUBLIC_HEADERS
-#do
-	HEADERS=$( find $MESA_PUBLIC_HEADERS -exec echo -n "{} " \; )
-	ZIP_HEADERS="$ZIP_HEADERS $HEADERS"
-#done
-
-ZIP_LIBRARIES=""
 echo "Collecting required Mesa libraries..."
-for i in $MESA_LIBRARIES
+rm -rf lib.haiku
+mkdir -p lib.haiku
+for i in $( find . -name "*.a" ) 
 do
-	FOUND=$(findInTree $i)
-	ZIP_LIBRARIES="$ZIP_LIBRARIES $FOUND"
+	cp $i lib.haiku/
 done
+
+# Disabled as to give the choice to the user ah-la stripOptionalPackageDebugSymbols
+#echo "Stripping debug symbols from Mesa libraries..."
+#find lib.haiku -exec strip --strip-debug {} \; ;
 
 echo "Creating Mesa OptionalPackage..."
 PLATFORM=$( uname -m )
 ZIP_FILENAME="../mesa-$MESA_VER-gcc$GCC_VER-x86.zip"
-zip -9 $ZIP_FILENAME $ZIP_HEADERS $ZIP_LIBRARIES
+zip -9 $ZIP_FILENAME $ZIP_HEADERS ./include/GL/* ./lib.haiku/*
 
 echo "Great Success! $ZIP_FILENAME created."
