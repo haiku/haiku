@@ -1,3 +1,7 @@
+/*
+ * Copyright 2010, Clemens Zeidler <haiku@clemens-zeidler.de>
+ * Distributed under the terms of the MIT License.
+ */
 #include "ALMGroup.h"
 
 
