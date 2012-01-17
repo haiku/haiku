@@ -1,0 +1,458 @@
+diff -rupN Mesa-7.8.2/bin/mklib Mesa-7.8.2-haiku/bin/mklib
+--- Mesa-7.8.2/bin/mklib	2010-06-15 17:43:41.034340864 +0000
++++ Mesa-7.8.2-haiku/bin/mklib	2012-01-17 09:57:07.461373440 +0000
+@@ -260,7 +260,7 @@ if [ $STATIC = 1 ]; then
+     NEWOBJECTS=""
+     for OBJ in $OBJECTS ; do
+ 	case $OBJ in
+-	    -Wl,*)
++	    -Wl,*|-L*|-l*)
+ 		echo "mklib: warning: ignoring $OBJ for static library"
+ 		;;
+ 	    *)
+@@ -307,7 +307,7 @@ fi
+ #
+ case $ARCH in
+ 
+-    'Linux' | 'OpenBSD' | 'DragonFly' | 'GNU' | GNU/*)
++    'Linux' | 'OpenBSD' | 'DragonFly' | 'GNU' | GNU/* | 'NetBSD')
+ 	# we assume gcc
+ 
+ 	if [ "x$LINK" = "x" ] ; then
+@@ -494,13 +494,16 @@ case $ARCH in
+ 		OPTS="${OPTS} -Wl,-Mmapfile.scope"
+ 	    fi
+ 
+-	    # Check if objects are SPARC v9
++	    # Check if objects are 64-bit
+ 	    # file says: ELF 64-bit MSB relocatable SPARCV9 Version 1
+ 	    set ${OBJECTS}
+ 	    if [ ${LINK} = "cc" -o ${LINK} = "CC" ] ; then
+-		SPARCV9=`file $1 | grep SPARCV9`
+-		if [ "${SPARCV9}" ] ; then
+-		    OPTS="${OPTS} -xarch=v9"
++		ABI64=`file $1 | grep "ELF 64-bit"`
++		if [ "${ABI64}" ] ; then
++		    case `uname -p` in
++			sparc)	    OPTS="${OPTS} -xarch=v9" ;;
++			i386)	    OPTS="${OPTS} -xarch=amd64" ;;
++		    esac
+ 		fi
+ 	    fi
+             if [ "${ALTOPTS}" ] ; then
+@@ -571,20 +574,6 @@ case $ARCH in
+ 	fi
+ 	;;
+ 
+-    'NetBSD')
+-        if [ $STATIC = 1 ] ; then
+-	    LIBNAME="lib${LIBNAME}_pic.a"
+-	    echo "mklib: Making NetBSD PIC static library: " ${LIBNAME}
+-	    FINAL_LIBS=`make_ar_static_lib cq 1 ${LIBNAME} ${OBJECTS}`
+-	else
+-	    LIBNAME="lib${LIBNAME}.so.${MAJOR}.${MINOR}"
+-	    echo "mklib: Making NetBSD PIC shared library: " ${LIBNAME}
+-	    rm -f ${LIBNAME}
+-	    ld -x -Bshareable -Bforcearchive -o ${LIBNAME} ${OBJECTS}
+-	    FINAL_LIBS=${LIBNAME}
+-	fi
+-	;;
+-
+     'IRIX' | 'IRIX64')
+         if [ $STATIC = 1 ] ; then
+ 	    LIBNAME="lib${LIBNAME}.a"
+@@ -778,9 +767,8 @@ case $ARCH in
+                 OPTS="${OPTS} -exported_symbols_list ${EXPORTS}"
+             fi
+ 
+-            LINKNAME="lib${LIBNAME}.${MAJOR}.${LIBSUFFIX}"
+-            LINKNAME2="lib${LIBNAME}.${LIBSUFFIX}"
+-            LIBNAME="lib${LIBNAME}.${MAJOR}.${MINOR}.${LIBSUFFIX}"
++            LINKNAME="lib${LIBNAME}.${LIBSUFFIX}"
++            LIBNAME="lib${LIBNAME}.${MAJOR}.${LIBSUFFIX}"
+ 
+ 	    # examine first object to determine ABI
+     	    set ${OBJECTS}
+@@ -793,9 +781,6 @@ case $ARCH in
+                 OPTS=${ALTOPTS}
+             fi
+ 
+-	    # XXX can we always add -isysroot /Developer/SDKs/MacOSX10.4u.sdk
+-	    # to OPTS here?
+-
+ 	    # determine linker
+ 	    if [ $CPLUSPLUS = 1 ] ; then
+ 		LINK="g++"
+@@ -807,8 +792,7 @@ case $ARCH in
+ 
+             ${LINK} ${OPTS} ${LDFLAGS} -o ${LIBNAME} ${OBJECTS} ${DEPS}
+             ln -s ${LIBNAME} ${LINKNAME}
+-            ln -s ${LIBNAME} ${LINKNAME2}
+-            FINAL_LIBS="${LIBNAME} ${LINKNAME} ${LINKNAME2}"
++            FINAL_LIBS="${LIBNAME} ${LINKNAME}"
+         fi
+         ;;
+ 
+@@ -818,22 +802,6 @@ case $ARCH in
+         FINAL_LIBS=`make_ar_static_lib -ru 0 ${LIBNAME} ${OBJECTS}`
+ 	;;
+ 
+-    'BeOS')
+-        if [ $STATIC = 1 ] ; then
+-            LIBNAME="lib${LIBNAME}.a"
+-            echo "mklib: Making BeOS static library: " ${LIBNAME}
+-            FINAL_LIBS=`make_ar_static_lib -cru 0 ${LIBNAME} ${OBJECTS}`
+-        else
+-	    LIBNAME="lib${LIBNAME}.so"
+-	    echo "mklib: Making BeOS shared library: " ${LIBNAME}
+-	    gcc -nostart -Xlinker "-soname=${LIBNAME}" -L/Be/develop/lib/x86 -lbe ${DEPS} ${OBJECTS} -o "${LIBNAME}"
+-	    mimeset -f "${LIBNAME}"
+-	    # XXX remove the Mesa3D stuff here since mklib isn't mesa-specific.
+-	    setversion "${LIBNAME}" -app ${MAJOR} ${MINOR} ${PATCH} -short "Powered by Mesa3D!" -long "Powered by Mesa3D!"
+-	fi
+-	FINAL_LIBS=${LIBNAME}
+-	;;
+-
+     'QNX')
+ 	LIBNAME="lib${LIBNAME}.a"
+ 	echo "mklib: Making QNX library: " ${LIBNAME}
+@@ -927,6 +895,16 @@ case $ARCH in
+ 
+      CYGWIN*)
+ 	# GCC-based environment
++
++	if [ "x$LINK" = "x" ] ; then
++	    # -linker was not specified so set default link command now
++            if [ $CPLUSPLUS = 1 ] ; then
++                LINK=g++
++            else
++                LINK=gcc
++            fi
++	fi
++
+ 	if [ $NOPREFIX = 1 ] ; then
+ 	    # No "lib" or ".so" part
+ 	    echo "mklib: Making CYGWIN shared library: " ${LIBNAME}
+@@ -935,7 +913,7 @@ case $ARCH in
+                 OPTS=${ALTOPTS}
+             fi
+ 	    rm -f ${LIBNAME}
+-	    ${LINK} ${OPTS} ${LDFLAGS} -o ${LIBNAME} ${OBJECTS} ${DEPS}
++	    ${LINK} ${OPTS} ${LDFLAGS} -o ${LIBNAME} ${OBJECTS} ${DEPS} || exit $?
+ 	    FINAL_LIBS=${LIBNAME}
+         else
+ 	CYGNAME="cyg${LIBNAME}"     # prefix with "cyg"
+@@ -943,7 +921,7 @@ case $ARCH in
+ 
+         if [ $STATIC = 1 ] ; then
+ 	    LIBNAME=${LIBNAME}.a
+-            echo "mklib: Making" $ARCH "static library: " ${LIBNAME}
++            echo "mklib: Making CYGWIN static library: " ${LIBNAME}
+             OPTS="-ru"
+             if [ "${ALTOPTS}" ] ; then
+                 OPTS=${ALTOPTS}
+@@ -961,13 +939,7 @@ case $ARCH in
+             if [ "${ALTOPTS}" ] ; then
+                 OPTS=${ALTOPTS}
+             fi
+-            echo "mklib: Making" $ARCH "shared library: " ${CYGNAME}-${MAJOR}.dll
+-
+-            if [ $CPLUSPLUS = 1 ] ; then
+-                LINK="g++"
+-            else
+-                LINK="gcc"
+-            fi
++            echo "mklib: Making CYGWIN shared library: " ${CYGNAME}-${MAJOR}.dll
+ 
+             # rm any old libs
+             rm -f ${CYGNAME}-${MAJOR}.dll
+@@ -976,12 +948,7 @@ case $ARCH in
+             rm -f ${LIBNAME}.a
+ 
+             # make lib
+-            ${LINK} ${OPTS} ${LDFLAGS} -o ${CYGNAME}-${MAJOR}.dll ${OBJECTS} ${DEPS}
+-            # make build fail if link failed
+-            es=$?
+-            if [ "$es" -ne "0" ]; then
+-                exit $es
+-            fi
++            ${LINK} ${OPTS} ${LDFLAGS} -o ${CYGNAME}-${MAJOR}.dll ${OBJECTS} ${DEPS} || exit $?
+             # make usual symlinks
+             ln -s ${LIBNAME}-${MAJOR}.dll.a ${LIBNAME}.dll.a
+             # finish up
+@@ -992,6 +959,43 @@ case $ARCH in
+         fi
+ 	;;
+ 
++	'Haiku')
++		if [ $STATIC = 1 ] ; then
++			LIBNAME="lib${LIBNAME}.a"
++			if [ "x$LINK" = "x" ] ; then
++				# -linker was not specified so set default link command now
++				if [ $CPLUSPLUS = 1 ] ; then
++					LINK=g++
++				else
++					LINK=gcc
++				fi
++			fi
++
++			OPTS="-ru"
++			if [ "${ALTOPTS}" ] ; then
++				OPTS=${ALTOPTS}
++			fi
++
++			echo "mklib: Making static library for Haiku: " ${LIBNAME}
++
++			# expand .a into .o files
++			NEW_OBJECTS=`expand_archives ${LIBNAME}.obj $OBJECTS`
++
++			# make static lib
++			FINAL_LIBS=`make_ar_static_lib ${OPTS} 1 ${LIBNAME} ${NEW_OBJECTS}`
++
++			# remove temporary extracted .o files
++			rm -rf ${LIBNAME}.obj
++		else
++			LIBNAME="lib${LIBNAME}.so"  # prefix with "lib", suffix with ".so"
++			OPTS="-shared"
++
++			echo "mklib: Making shared library for Haiku: " ${LIBNAME}
++			${LINK} ${OPTS} ${LDFLAGS} ${OBJECTS} ${DEPS} -o ${LIBNAME}
++			FINAL_LIBS="${LIBNAME}"
++		fi
++	;;
++
+     'example')
+ 	# If you're adding support for a new architecture, you can
+ 	# start with this:
+@@ -1021,4 +1025,9 @@ if [ ${INSTALLDIR} != "." ] ; then
+     echo "mklib: Installing" ${FINAL_LIBS} "in" ${INSTALLDIR}
+     test -d ${INSTALLDIR} || mkdir -p ${INSTALLDIR}
+     mv ${FINAL_LIBS} ${INSTALLDIR}/
++
++    if [ "x${FINAL_BINS}" != "x" ] ; then
++        echo "mklib: Installing" ${FINAL_BINS} "in" ${INSTALLDIR}
++        mv ${FINAL_BINS} ${INSTALLDIR}/
++    fi
+ fi
+diff -rupN Mesa-7.8.2/configs/current Mesa-7.8.2-haiku/configs/current
+--- Mesa-7.8.2/configs/current	1970-01-01 00:00:00.000000000 +0000
++++ Mesa-7.8.2-haiku/configs/current	2012-01-17 11:03:50.553910272 +0000
+@@ -0,0 +1,63 @@
++# Configuration for Haiku
++# Written by Alexander von Gluck IV
++#
++# Based on the BeOS config 
++# written by Philippe Houdoin
++
++include $(TOP)/configs/default
++
++CONFIG_NAME = haiku
++
++# Haiku settings
++
++DEFINES = \
++	-DBEOS_THREADS \
++	-DGNU_ASSEMBLER \
++	-DUSE_X86_ASM \
++	-DUSE_MMX_ASM \
++	-DUSE_3DNOW_ASM \
++	-DUSE_SSE_ASM
++ 
++MESA_ASM_SOURCES = $(X86_SOURCES)
++GLAPI_ASM_SOURCES = $(X86_API)
++
++CC = gcc
++CXX = g++
++LD = gcc
++ 
++CFLAGS = -Wall -Wno-multichar $(DEFINES)
++CXXFLAGS = $(CFLAGS)
++LDFLAGS +=
++
++# Work around aliasing bugs - developers should comment this out
++CFLAGS += -fno-strict-aliasing
++#CFLAGS += -std=c99
++CXXFLAGS += -fno-strict-aliasing
++
++# No makedepend on Haiku, this will solve it
++MKDEP = true
++
++# Debug defines
++ifdef DEBUG
++	CFLAGS  += -g -O0
++	LDFLAGS += -g
++	DEFINES += -DDEBUG
++else
++	CFLAGS   += -O3
++endif
++
++# GLU settings
++GLU_LIB_NAME = libglu.a
++GLU_LIB = glu
++
++# Directories
++SRC_DIRS = glsl mesa/x86 mapi/glapi mesa glu
++GLU_DIRS = sgi
++DRIVER_DIRS =
++PROGRAM_DIRS =
++
++# Library/program dependencies
++GL_LIB_DEPS = 
++OSMESA_LIB_DEPS = -L$(TOP)/$(LIB_DIR) -l$(GL_LIB)
++GLU_LIB_DEPS =  
++APP_LIB_DEPS = -lbe -L$(TOP)/$(LIB_DIR) -l$(GL_LIB) -l$(GLUT_LIB)
+diff -rupN Mesa-7.8.2/configs/haiku Mesa-7.8.2-haiku/configs/haiku
+--- Mesa-7.8.2/configs/haiku	1970-01-01 00:00:00.000000000 +0000
++++ Mesa-7.8.2-haiku/configs/haiku	2012-01-17 11:03:50.553910272 +0000
+@@ -0,0 +1,63 @@
++# Configuration for Haiku
++# Written by Alexander von Gluck IV
++#
++# Based on the BeOS config 
++# written by Philippe Houdoin
++
++include $(TOP)/configs/default
++
++CONFIG_NAME = haiku
++
++# Haiku settings
++
++DEFINES = \
++	-DBEOS_THREADS \
++	-DGNU_ASSEMBLER \
++	-DUSE_X86_ASM \
++	-DUSE_MMX_ASM \
++	-DUSE_3DNOW_ASM \
++	-DUSE_SSE_ASM
++ 
++MESA_ASM_SOURCES = $(X86_SOURCES)
++GLAPI_ASM_SOURCES = $(X86_API)
++
++CC = gcc
++CXX = g++
++LD = gcc
++ 
++CFLAGS = -Wall -Wno-multichar $(DEFINES)
++CXXFLAGS = $(CFLAGS)
++LDFLAGS +=
++
++# Work around aliasing bugs - developers should comment this out
++CFLAGS += -fno-strict-aliasing
++#CFLAGS += -std=c99
++CXXFLAGS += -fno-strict-aliasing
++
++# No makedepend on Haiku, this will solve it
++MKDEP = true
++
++# Debug defines
++ifdef DEBUG
++	CFLAGS  += -g -O0
++	LDFLAGS += -g
++	DEFINES += -DDEBUG
++else
++	CFLAGS   += -O3
++endif
++
++# GLU settings
++GLU_LIB_NAME = libglu.a
++GLU_LIB = glu
++
++# Directories
++SRC_DIRS = glsl mesa/x86 mapi/glapi mesa glu
++GLU_DIRS = sgi
++DRIVER_DIRS =
++PROGRAM_DIRS =
++
++# Library/program dependencies
++GL_LIB_DEPS = 
++OSMESA_LIB_DEPS = -L$(TOP)/$(LIB_DIR) -l$(GL_LIB)
++GLU_LIB_DEPS =  
++APP_LIB_DEPS = -lbe -L$(TOP)/$(LIB_DIR) -l$(GL_LIB) -l$(GLUT_LIB)
+Binary files Mesa-7.8.2/lib/libglu.a and Mesa-7.8.2-haiku/lib/libglu.a differ
+diff -rupN Mesa-7.8.2/Makefile Mesa-7.8.2-haiku/Makefile
+--- Mesa-7.8.2/Makefile	2010-06-16 21:22:57.033030144 +0000
++++ Mesa-7.8.2-haiku/Makefile	2012-01-17 09:56:45.423886848 +0000
+@@ -84,6 +84,7 @@ freebsd \
+ freebsd-dri \
+ freebsd-dri-amd64 \
+ freebsd-dri-x86 \
++haiku \
+ hpux10 \
+ hpux10-gcc \
+ hpux10-static \
+diff -rupN Mesa-7.8.2/src/gallium/auxiliary/draw/draw_private.h Mesa-7.8.2-haiku/src/gallium/auxiliary/draw/draw_private.h
+--- Mesa-7.8.2/src/gallium/auxiliary/draw/draw_private.h	2010-06-15 17:43:42.046137344 +0000
++++ Mesa-7.8.2-haiku/src/gallium/auxiliary/draw/draw_private.h	2012-01-17 09:59:43.815005696 +0000
+@@ -70,7 +70,7 @@ struct vertex_header {
+ 
+    /* This will probably become float (*data)[4] soon:
+     */
+-   float data[][4];
++   float (*data)[4];
+ };
+ 
+ /* NOTE: It should match vertex_id size above */
+diff -rupN Mesa-7.8.2/src/gallium/auxiliary/os/os_thread.h Mesa-7.8.2-haiku/src/gallium/auxiliary/os/os_thread.h
+--- Mesa-7.8.2/src/gallium/auxiliary/os/os_thread.h	2010-06-15 17:43:42.056098816 +0000
++++ Mesa-7.8.2-haiku/src/gallium/auxiliary/os/os_thread.h	2012-01-17 10:00:38.613154816 +0000
+@@ -257,7 +257,7 @@ typedef unsigned pipe_condvar;
+  * pipe_barrier
+  */
+ 
+-#if defined(PIPE_OS_LINUX) || defined(PIPE_OS_BSD) || defined(PIPE_OS_SOLARIS) || defined(PIPE_OS_HAIKU)
++#if defined(PIPE_OS_LINUX) || defined(PIPE_OS_BSD) || defined(PIPE_OS_SOLARIS)
+ 
+ typedef pthread_barrier_t pipe_barrier;
+ 
+diff -rupN Mesa-7.8.2/src/gallium/auxiliary/util/u_debug.h Mesa-7.8.2-haiku/src/gallium/auxiliary/util/u_debug.h
+--- Mesa-7.8.2/src/gallium/auxiliary/util/u_debug.h	2010-06-15 17:43:42.066584576 +0000
++++ Mesa-7.8.2-haiku/src/gallium/auxiliary/util/u_debug.h	2012-01-17 10:02:01.553385984 +0000
+@@ -91,8 +91,10 @@ debug_printf(const char *format, ...)
+    (void) format; /* silence warning */
+ #endif
+ }
+-
+-#endif /* !PIPE_OS_HAIKU */
++#else /* is Haiku */
++/* Haiku provides debug_printf in libroot with OS.h */
++#include <OS.h>
++#endif
+ 
+ /*
+  * ... isn't portable so we need to pass arguments in parentheses.
+diff -rupN Mesa-7.8.2/src/glu/sgi/Makefile Mesa-7.8.2-haiku/src/glu/sgi/Makefile
+--- Mesa-7.8.2/src/glu/sgi/Makefile	2010-02-05 00:10:40.063963136 +0000
++++ Mesa-7.8.2-haiku/src/glu/sgi/Makefile	2012-01-17 10:02:42.222822400 +0000
+@@ -135,13 +135,19 @@ $(TOP)/$(LIB_DIR):
+ 	-mkdir $(TOP)/$(LIB_DIR)
+ 
+ # Make the library:
+-$(TOP)/$(LIB_DIR)/$(GLU_LIB_NAME): $(OBJECTS)
++$(TOP)/$(LIB_DIR)/lib$(GLU_LIB).so: $(OBJECTS)
+ 	$(MKLIB) -o $(GLU_LIB) -linker '$(CXX)' -ldflags '$(LDFLAGS)' \
+ 		-major $(GLU_MAJOR) -minor $(GLU_MINOR) -patch $(GLU_TINY) \
+ 		-cplusplus $(MKLIB_OPTIONS) -install $(TOP)/$(LIB_DIR) \
+ 		-exports glu.exports -id $(INSTALL_LIB_DIR)/lib$(GLU_LIB).$(GLU_MAJOR).dylib \
+ 		$(GLU_LIB_DEPS) $(OBJECTS)
+ 
++$(TOP)/$(LIB_DIR)/lib$(GLU_LIB).a: $(OBJECTS)
++	$(MKLIB) -o $(GLU_LIB) -static -linker '$(CXX)' -ldflags '$(LDFLAGS)' \
++		-major $(GLU_MAJOR) -minor $(GLU_MINOR) -patch $(GLU_TINY) \
++		-cplusplus $(MKLIB_OPTIONS) -install $(TOP)/$(LIB_DIR) \
++		-exports glu.exports -id $(INSTALL_LIB_DIR)/lib$(GLU_LIB).$(GLU_MAJOR).dylib \
++		$(GLU_LIB_DEPS) $(OBJECTS)
+ 
+ clean:
+ 	-rm -f *.o */*.o */*/*.o
+diff -rupN Mesa-7.8.2/src/mesa/glapi/glapi.h Mesa-7.8.2-haiku/src/mesa/glapi/glapi.h
+--- Mesa-7.8.2/src/mesa/glapi/glapi.h	2010-06-15 17:43:43.026214400 +0000
++++ Mesa-7.8.2-haiku/src/mesa/glapi/glapi.h	2012-01-17 10:51:04.699662336 +0000
+@@ -62,7 +62,7 @@ typedef void (*_glapi_proc)(void); /* ge
+ #endif
+ 
+ 
+-#if defined(__GNUC__)
++#if defined(__GNUC__) && __GNUC__ > 2
+ #  define likely(x)   __builtin_expect(!!(x), 1)
+ #  define unlikely(x) __builtin_expect(!!(x), 0)
+ #else
