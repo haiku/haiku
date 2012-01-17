@@ -131,7 +131,7 @@ private:
 			BSize				fShrinkPenalties;
 			BSize				fGrowPenalties;
 
-			BSize				fTopLeftInset;
+			BSize				fLeftTopInset;
 			BSize				fRightBottomInset;
 
 			double				fContentAspectRatio;

@@ -240,9 +240,9 @@ void
 Area::GetInsets(float* left, float* top, float* right, float* bottom) const
 {
 	if (left)
-		*left = fTopLeftInset.Width();
+		*left = fLeftTopInset.Width();
 	if (top)
-		*top = fTopLeftInset.Height();
+		*top = fLeftTopInset.Height();
 	if (right)
 		*right = fRightBottomInset.Width();
 	if (bottom)
@@ -256,8 +256,8 @@ Area::GetInsets(float* left, float* top, float* right, float* bottom) const
 float
 Area::LeftInset() const
 {
-	if (fTopLeftInset.IsWidthSet())
-		return fTopLeftInset.Width();
+	if (fLeftTopInset.IsWidthSet())
+		return fLeftTopInset.Width();
 
 	BALMLayout* layout = static_cast<BALMLayout*>(fLayoutItem->Layout());
 	return layout->InsetForTab(fLeft.Get());
@@ -270,8 +270,8 @@ Area::LeftInset() const
 float
 Area::TopInset() const
 {
-	if (fTopLeftInset.IsHeightSet())
-		return fTopLeftInset.Height();
+	if (fLeftTopInset.IsHeightSet())
+		return fLeftTopInset.Height();
 
 	BALMLayout* layout = static_cast<BALMLayout*>(fLayoutItem->Layout());
 	return layout->InsetForTab(fTop.Get());
@@ -312,7 +312,7 @@ Area::SetInsets(float insets)
 	if (insets != B_SIZE_UNSET)
 		insets = BControlLook::ComposeSpacing(insets);
 
-	fTopLeftInset.Set(insets, insets);
+	fLeftTopInset.Set(insets, insets);
 	fRightBottomInset.Set(insets, insets);
 	fLayoutItem->Layout()->InvalidateLayout();
 }
@@ -326,7 +326,7 @@ Area::SetInsets(float horizontal, float vertical)
 	if (vertical != B_SIZE_UNSET)
 		vertical = BControlLook::ComposeSpacing(vertical);
 
-	fTopLeftInset.Set(horizontal, horizontal);
+	fLeftTopInset.Set(horizontal, horizontal);
 	fRightBottomInset.Set(vertical, vertical);
 	fLayoutItem->Layout()->InvalidateLayout();
 }
@@ -344,7 +344,7 @@ Area::SetInsets(float left, float top, float right, float bottom)
 	if (bottom != B_SIZE_UNSET)
 		bottom = BControlLook::ComposeSpacing(bottom);
 
-	fTopLeftInset.Set(left, top);
+	fLeftTopInset.Set(left, top);
 	fRightBottomInset.Set(right, bottom);
 	fLayoutItem->Layout()->InvalidateLayout();
 }
@@ -356,7 +356,7 @@ Area::SetInsets(float left, float top, float right, float bottom)
 void
 Area::SetLeftInset(float left)
 {
-	fTopLeftInset.width = left;
+	fLeftTopInset.width = left;
 	fLayoutItem->Layout()->InvalidateLayout();
 }
 
@@ -367,7 +367,7 @@ Area::SetLeftInset(float left)
 void
 Area::SetTopInset(float top)
 {
-	fTopLeftInset.height = top;
+	fLeftTopInset.height = top;
 	fLayoutItem->Layout()->InvalidateLayout();
 }
 
