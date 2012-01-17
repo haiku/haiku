@@ -22,7 +22,7 @@ namespace BALM {
 
 
 class Column;
-class GroupItem;
+class ALMGroup;
 class Row;
 class RowColumnManager;
 
@@ -86,10 +86,6 @@ public:
 			YTab*				BottomOf(const BView* view) const;
 			YTab*				BottomOf(const BLayoutItem* item) const;
 
-			void				BuildLayout(GroupItem& item, XTab* left = NULL,
-									YTab* top = NULL, XTab* right = NULL,
-									YTab* bottom = NULL);
-
 	virtual	BLayoutItem*		AddView(BView* child);
 	virtual	BLayoutItem*		AddView(int32 index, BView* child);
 	virtual	Area*				AddView(BView* view, XTab* left, YTab* top,
@@ -134,11 +130,6 @@ private:
 			BSize				_CalculateMinSize();
 			BSize				_CalculateMaxSize();
 			BSize				_CalculatePreferredSize();
-
-			void				_ParseGroupItem(GroupItem& item,
-									BReference<XTab> left, BReference<YTab> top,
-									BReference<XTab> right,
-									BReference<YTab> bottom);
 
 			LinearProgramming::LinearSpec*	fSolver;
 			LinearProgramming::LinearSpec	fOwnSolver;

@@ -11,6 +11,7 @@
 #include <Window.h>
 
 #include "ALMLayout.h"
+#include "ALMGroup.h"
 
 
 class OperatorWindow : public BWindow {
@@ -37,11 +38,10 @@ public:
 		SetLayout(layout);
 		layout->SetInsets(spacing);
 
-		GroupItem item = GroupItem(button1) | (GroupItem(button2)
-			/ (GroupItem(button3) | GroupItem(BSpaceLayoutItem::CreateGlue())
-					| GroupItem(button4))
-			/ GroupItem(button5));
-		layout->BuildLayout(item);
+		(ALMGroup(button1) | (ALMGroup(button2)
+		/ (ALMGroup(button3) | ALMGroup(BSpaceLayoutItem::CreateGlue())
+			| ALMGroup(button4))
+		/ ALMGroup(button5))).BuildLayout(layout);
 
 		// test size limits
 		BSize min = layout->MinSize();

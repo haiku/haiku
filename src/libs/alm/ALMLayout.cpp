@@ -11,6 +11,7 @@
 
 #include <ControlLook.h>
 
+#include "ALMGroup.h"
 #include "RowColumnManager.h"
 #include "ViewLayoutItem.h"
 
@@ -349,53 +350,6 @@ BALMLayout::BottomOf(const BLayoutItem* item) const
 	if (!area)
 		return NULL;
 	return area->Bottom();
-}
-
-
-void
-BALMLayout::BuildLayout(GroupItem& item, XTab* left, YTab* top, XTab* right,
-	YTab* bottom)
-{
-	if (left == NULL)
-		left = Left();
-	if (top == NULL)
-		top = Top();
-	if (right == NULL)
-		right = Right();
-	if (bottom == NULL)
-		bottom = Bottom();
-
-	_ParseGroupItem(item, left, top, right, bottom);
-}
-
-
-void
-BALMLayout::_ParseGroupItem(GroupItem& item, BReference<XTab> left,
-	BReference<YTab> top, BReference<XTab> right, BReference<YTab> bottom)
-{
-	if (item.LayoutItem())
-		AddItem(item.LayoutItem(), left, top, right, bottom);
-	else if (item.View()) {
-		AddView(item.View(), left, top, right, bottom);
-	}
-	else {
-		for (unsigned int i = 0; i < item.GroupItems().size(); i++) {
-			GroupItem& current = const_cast<GroupItem&>(
-				item.GroupItems()[i]);
-			if (item.Orientation() == B_HORIZONTAL) {
-				BReference<XTab> r = (i == item.GroupItems().size() - 1) ? right
-					: AddXTab();
-				_ParseGroupItem(current, left, top, r, bottom);
-				left = r;
-			}
-			else {
-				BReference<YTab> b = (i == item.GroupItems().size() - 1)
-					? bottom : AddYTab();
-				_ParseGroupItem(current, left, top, right, b);
-				top = b;
-			}
-		}
-	}
 }
 
 

@@ -6,11 +6,9 @@
 #define	AREA_H
 
 
-#include <vector>
-
-#include <InterfaceDefs.h> // for enum orientation
 #include <ObjectList.h>
 #include <Referenceable.h>
+#include <Rect.h>
 #include <Size.h>
 #include <String.h>
 
@@ -34,33 +32,6 @@ class XTab;
 class YTab;
 
 
-class GroupItem {
-public:
-								GroupItem(BLayoutItem* item);
-								GroupItem(BView* view);
-
-			BLayoutItem*		LayoutItem();
-			BView*				View();
-
-	const	std::vector<GroupItem>&	GroupItems();
-			enum orientation	Orientation();
-
-			GroupItem& 			operator|(const GroupItem& right);
-			GroupItem& 			operator/(const GroupItem& bottom);
-private:
-								GroupItem();
-
-			void				_Init(BLayoutItem* item, BView* view,
-									  enum orientation orien = B_HORIZONTAL);
-			GroupItem& 			_AddItem(const GroupItem& item,
-									enum orientation orien);
-
-			BLayoutItem*		fLayoutItem;
-			BView*				fView;
-
-			std::vector<GroupItem>	fGroupItems;
-			enum orientation	fOrientation;
-};
 
 
 class RowColumnManager;
@@ -179,7 +150,6 @@ public:
 }	// namespace BALM
 
 using BALM::Area;
-using BALM::GroupItem;
 
 #endif	// AREA_H
 
