@@ -32,7 +32,7 @@ UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mapi glapi ] ;
 UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa glapi ] ;
 
 LINKFLAGS on libGL.so = [ on libGL.so return $(LINKFLAGS) ]
-	-Xlinker --whole-archive -Xlinker --no-undefined -fvisibility=default ;
+	-Xlinker --whole-archive -Xlinker --no-undefined ;
 
 # For GCC2
 if $(HAIKU_GCC_VERSION[1]) < 3 {
