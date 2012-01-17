@@ -13,6 +13,9 @@
 
 #include "ALMLayout.h"
 
+#include "Row.h"
+#include "Column.h"
+
 
 class TableDemoWindow : public BWindow {
 public:
