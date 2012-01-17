@@ -16,6 +16,7 @@
 #include <NaturalCompare.h>
 
 #include "ALMLayout.h"
+#include "ALMLayoutBuilder.h"
 
 
 static int
@@ -204,10 +205,6 @@ MusicCollectionWindow::MusicCollectionWindow(BRect frame, const char* title)
 	:
 	BWindow(frame, title, B_DOCUMENT_WINDOW, B_AVOID_FRONT)
 {
-	BView* rootView = new BView(Bounds(), NULL, B_FOLLOW_ALL, B_WILL_DRAW);
-	AddChild(rootView);
-	rootView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
 	fQueryField = new BTextControl("Search: ", "", NULL);
 	fQueryField->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER,
 		B_ALIGN_USE_FULL_HEIGHT));
@@ -220,16 +217,14 @@ MusicCollectionWindow::MusicCollectionWindow(BRect frame, const char* title)
 	BScrollView* scrollView = new BScrollView("list scroll", fFileListView, 0,
 		true, true, B_PLAIN_BORDER);
 
-	float spacing = be_control_look->DefaultItemSpacing() / 2;
-	BALMLayout* layout = new BALMLayout(spacing);
-	layout->SetInset(spacing);
-	rootView->SetLayout(layout);
-
-	layout->AddView(fQueryField, layout->Left(), layout->Top());
-	layout->AddViewToRight(fCountView, layout->Right());
-	layout->AddView(scrollView, layout->Left(),
-		layout->AreaFor(fQueryField)->Bottom(), layout->Right(),
-		layout->Bottom());
+	BALMLayout* layout = new BALMLayout(B_USE_ITEM_SPACING, B_USE_ITEM_SPACING);
+	BALM::BALMLayoutBuilder(this, layout)
+		.SetInsets(B_USE_WINDOW_INSETS)
+		.Add(fQueryField, layout->Left(), layout->Top())
+		.StartingAt(fQueryField)
+			.AddToRight(fCountView, layout->Right())
+			.AddBelow(scrollView, layout->Bottom(), layout->Left(),
+				layout->Right());
 
 	Area* area = layout->AreaFor(scrollView);
 	area->SetLeftInset(0);
