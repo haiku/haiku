@@ -14,6 +14,7 @@
 #include <StringView.h>
 
 #include <ALMLayout.h>
+#include <ALMGroup.h>
 #include <StringForSize.h>
 
 #include <crypt.h>
@@ -86,10 +87,11 @@ public:
 			B_WILL_DRAW);
 		AddChild(rootView);
 		rootView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-		float spacing = be_control_look->DefaultItemSpacing();
-		BALMLayout* layout = new BALMLayout(spacing);
+
+		BALMLayout* layout = new BALMLayout(B_USE_ITEM_SPACING,
+				B_USE_ITEM_SPACING);
 		rootView->SetLayout(layout);
-		layout->SetInset(spacing);
+		layout->SetInsets(B_USE_WINDOW_SPACING);
 
 		BStringView* string = new BStringView("text", text);
 		layout->AddView(string, layout->Left(), layout->Top(), layout->Right(),
@@ -254,10 +256,9 @@ FolderConfigWindow::FolderConfigWindow(BRect parent, const BMessage& settings)
 	AddChild(rootView);
 	rootView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	float spacing = be_control_look->DefaultItemSpacing();
-	BALMLayout* layout = new BALMLayout(spacing);
+	BALMLayout* layout = new BALMLayout(B_USE_ITEM_SPACING, B_USE_ITEM_SPACING);
 	rootView->SetLayout(layout);
-	layout->SetInset(spacing);
+	layout->SetInsets(B_USE_WINDOW_INSETS);
 
 	fFolderListView = new EditListView(B_TRANSLATE("IMAP Folders"));
 	fFolderListView->SetExplicitPreferredSize(BSize(B_SIZE_UNLIMITED,
@@ -270,13 +271,9 @@ FolderConfigWindow::FolderConfigWindow(BRect parent, const BMessage& settings)
 	fQuotaView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_CENTER));
 
-	layout->AddView(fFolderListView, layout->Left(), layout->Top(),
-		layout->Right(), layout->Bottom());
-
-	GroupItem item = GroupItem(fQuotaView) / GroupItem(fFolderListView)
-		/ (GroupItem(BSpaceLayoutItem::CreateGlue())
-			| GroupItem(fApplyButton));
-	layout->BuildLayout(item);
+	(ALMGroup(fQuotaView) / ALMGroup(fFolderListView)
+		/ (ALMGroup(BSpaceLayoutItem::CreateGlue())
+			| ALMGroup(fApplyButton))).BuildLayout(layout);
 
 	PostMessage(kMsgInit);
 
