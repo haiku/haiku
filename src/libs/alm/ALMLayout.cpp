@@ -851,7 +851,7 @@ BALMLayout::GetSpacing(float *_hSpacing, float *_vSpacing) const
 
 
 float
-BALMLayout::InsetForTab(XTab* tab)
+BALMLayout::InsetForTab(XTab* tab) const
 {
 	if (tab == fLeft.Get())
 		return fLeftInset;
@@ -862,7 +862,7 @@ BALMLayout::InsetForTab(XTab* tab)
 
 
 float
-BALMLayout::InsetForTab(YTab* tab)
+BALMLayout::InsetForTab(YTab* tab) const
 {
 	if (tab == fTop.Get())
 		return fTopInset;

@@ -120,8 +120,8 @@ private:
 	friend class YTab;
 	friend class Area;
 
-			float				InsetForTab(XTab* tab);
-			float				InsetForTab(YTab* tab);
+			float				InsetForTab(XTab* tab) const;
+			float				InsetForTab(YTab* tab) const;
 
 			BLayoutItem*		_LayoutItemToAdd(BView* view);
 
