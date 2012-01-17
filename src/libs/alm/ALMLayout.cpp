@@ -941,3 +941,23 @@ BALMLayout::_UpdateAreaConstraints()
 		AreaFor(ItemAt(i))->InvalidateSizeConstraints();
 	fRowColumnManager->UpdateConstraints();
 }
+
+
+status_t
+BALMLayout::Perform(perform_code d, void* arg)
+{
+	return BAbstractLayout::Perform(d, arg);
+}
+
+
+void BALMLayout::_ReservedALMLayout1() {}
+void BALMLayout::_ReservedALMLayout2() {}
+void BALMLayout::_ReservedALMLayout3() {}
+void BALMLayout::_ReservedALMLayout4() {}
+void BALMLayout::_ReservedALMLayout5() {}
+void BALMLayout::_ReservedALMLayout6() {}
+void BALMLayout::_ReservedALMLayout7() {}
+void BALMLayout::_ReservedALMLayout8() {}
+void BALMLayout::_ReservedALMLayout9() {}
+void BALMLayout::_ReservedALMLayout10() {}
+

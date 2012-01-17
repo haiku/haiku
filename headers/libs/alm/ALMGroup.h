@@ -60,6 +60,8 @@ private:
 
 			std::vector<ALMGroup> fGroups;
 			enum orientation	fOrientation;
+
+			uint32				_reserved[4];
 };
 
 

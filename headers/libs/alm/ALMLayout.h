@@ -108,6 +108,8 @@ public:
 	virtual	BSize				BasePreferredSize();
 	virtual	BAlignment			BaseAlignment();
 
+	virtual	status_t			Perform(perform_code d, void* arg);
+
 protected:
 	virtual	bool				ItemAdded(BLayoutItem* item, int32 atIndex);
 	virtual	void				ItemRemoved(BLayoutItem* item, int32 fromIndex);
@@ -116,6 +118,24 @@ protected:
 	virtual	void				DoLayout();
 
 private:
+
+	// FBC padding
+	virtual	void				_ReservedALMLayout1();
+	virtual	void				_ReservedALMLayout2();
+	virtual	void				_ReservedALMLayout3();
+	virtual	void				_ReservedALMLayout4();
+	virtual	void				_ReservedALMLayout5();
+	virtual	void				_ReservedALMLayout6();
+	virtual	void				_ReservedALMLayout7();
+	virtual	void				_ReservedALMLayout8();
+	virtual	void				_ReservedALMLayout9();
+	virtual	void				_ReservedALMLayout10();
+
+	// forbidden methods
+								BALMLayout(const BALMLayout&);
+			void				operator =(const BALMLayout&);
+
+
 	friend class XTab;
 	friend class YTab;
 	friend class Area;
@@ -154,6 +174,8 @@ private:
 			YTabList			fYTabList;
 
 			RowColumnManager*	fRowColumnManager;
+
+			uint32				_reserved[5];
 };
 
 }	// namespace BALM

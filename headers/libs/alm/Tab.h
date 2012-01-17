@@ -30,6 +30,8 @@ protected:
 
 private:
 			BALMLayout*			fALMLayout;
+
+			uint32				_reserved[2];
 };
 
 
@@ -43,6 +45,8 @@ protected:
 
 private:
 			BALMLayout*			fALMLayout;
+
+			uint32				_reserved[2];
 };
 
 

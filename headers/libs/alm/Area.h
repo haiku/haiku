@@ -112,6 +112,9 @@ private:
 			void				_UpdateMinSizeConstraint(BSize min);
 			void				_UpdateMaxSizeConstraint(BSize max);
 private:
+	friend class BALMLayout;
+	friend class RowColumnManager;
+
 			BLayoutItem*		fLayoutItem;
 			int32				fID;
 
@@ -141,10 +144,7 @@ private:
 			LinearProgramming::Constraint* fMaxContentHeight;
 			LinearProgramming::Constraint* fContentAspectRatioC;
 
-public:
-	friend class BALMLayout;
-	friend class RowColumnManager;
-
+			uint32				_reserved[2];
 };
 
 }	// namespace BALM
