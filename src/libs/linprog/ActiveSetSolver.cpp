@@ -149,7 +149,7 @@ EquationSystem::GaussianElimination()
 				break;
 			}
 			if (swapColumn == -1) {
-				printf("can't solve column %i\n", i);
+				TRACE("can't solve column %i\n", i);
 				return false;
 			}
 			SwapColumn(i, swapColumn);
@@ -350,7 +350,7 @@ solve(EquationSystem& system)
 			break;
 		}
 		if (negValueCol == -1) {
-			printf("can't solve\n");
+			TRACE("can't solve\n");
 			return false;
 		}
 
@@ -371,7 +371,7 @@ ActiveSetSolver::Solve()
 	int32 nVariables = fVariables.CountItems();
 
 	if (nVariables > nConstraints) {
-		printf("More variables then constraints! vars: %i, constraints: %i\n",
+		TRACE("More variables then constraints! vars: %i, constraints: %i\n",
 			(int)nVariables, (int)nConstraints);
 		return kInfeasible;
 	}
@@ -547,7 +547,7 @@ ActiveSetSolver::MinSize(Variable* width, Variable* height)
 	if (result == kUnbounded)
 		return kMinSize;
 	if (result != kOptimal)
-		printf("Could not solve the layout specification (%d). ", result);
+		TRACE("Could not solve the layout specification (%d). ", result);
 
 	return BSize(width->Value(), height->Value());
 }
@@ -573,7 +573,7 @@ ActiveSetSolver::MaxSize(Variable* width, Variable* height)
 	if (result == kUnbounded)
 		return kMaxSize;
 	if (result != kOptimal)
-		printf("Could not solve the layout specification (%d). ", result);
+		TRACE("Could not solve the layout specification (%d). ", result);
 
 	return BSize(width->Value(), height->Value());
 }

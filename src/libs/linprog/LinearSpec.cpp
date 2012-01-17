@@ -18,7 +18,7 @@
 using namespace LinearProgramming;
 
 
-#define DEBUG_LINEAR_SPECIFICATIONS
+// #define DEBUG_LINEAR_SPECIFICATIONS
 
 #ifdef DEBUG_LINEAR_SPECIFICATIONS
 #include <stdio.h>
