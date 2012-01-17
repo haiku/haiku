@@ -6,7 +6,6 @@
 #define	AREA_H
 
 
-#include <ObjectList.h>
 #include <Referenceable.h>
 #include <Rect.h>
 #include <Size.h>
@@ -137,7 +136,6 @@ private:
 			double				fContentAspectRatio;
 			RowColumnManager*	fRowColumnManager;
 
-			BObjectList<LinearProgramming::Constraint>	fConstraints;
 			LinearProgramming::Constraint* fMinContentWidth;
 			LinearProgramming::Constraint* fMaxContentWidth;
 			LinearProgramming::Constraint* fMinContentHeight;

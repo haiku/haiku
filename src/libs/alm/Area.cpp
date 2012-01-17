@@ -227,7 +227,6 @@ Area::SetContentAspectRatio(double ratio)
 	} else if (fContentAspectRatioC == NULL) {
 		fContentAspectRatioC = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight,
 			ratio, fTop, -ratio, fBottom, kEQ, 0.0);
-		fConstraints.AddItem(fContentAspectRatioC);
 	} else {
 		fContentAspectRatioC->SetLeftSide(-1.0, fLeft, 1.0, fRight, ratio,
 			fTop, -ratio, fBottom);
@@ -469,8 +468,11 @@ Area::Frame() const
  */
 Area::~Area()
 {
-	for (int32 i = 0; i < fConstraints.CountItems(); i++)
-		delete fConstraints.ItemAt(i);
+	delete fMinContentWidth;
+	delete fMaxContentWidth;
+	delete fMinContentHeight;
+	delete fMaxContentHeight;
+	delete fContentAspectRatioC;
 }
 
 
@@ -490,27 +492,21 @@ new_area_id()
 Area::Area(BLayoutItem* item)
 	:
 	fLayoutItem(item),
-
 	fLS(NULL),
 	fLeft(NULL),
 	fRight(NULL),
 	fTop(NULL),
 	fBottom(NULL),
-
 	fRow(NULL),
 	fColumn(NULL),
-
 	fShrinkPenalties(5, 5),
 	fGrowPenalties(5, 5),
-
 	fContentAspectRatio(-1),
 	fRowColumnManager(NULL),
-
 	fMinContentWidth(NULL),
 	fMaxContentWidth(NULL),
 	fMinContentHeight(NULL),
 	fMaxContentHeight(NULL),
-
 	fContentAspectRatioC(NULL)
 {
 	fID = new_area_id();
@@ -551,16 +547,14 @@ Area::_Init(LinearSpec* ls, XTab* left, YTab* top, XTab* right, YTab* bottom,
 	// really above the bottom y-tab
 	fMinContentWidth = ls->AddConstraint(-1.0, fLeft, 1.0, fRight, kGE, 0);
 	fMinContentHeight = ls->AddConstraint(-1.0, fTop, 1.0, fBottom, kGE, 0);
-
-	fConstraints.AddItem(fMinContentWidth);
-	fConstraints.AddItem(fMinContentHeight);
 }
 
 
 void
 Area::_Init(LinearSpec* ls, Row* row, Column* column, RowColumnManager* manager)
 {
-	_Init(ls, column->Left(), row->Top(), column->Right(), row->Bottom(), manager);
+	_Init(ls, column->Left(), row->Top(), column->Right(),
+		row->Bottom(), manager);
 
 	fRow = row;
 	fColumn = column;
@@ -615,12 +609,9 @@ Area::_UpdateMaxSizeConstraint(BSize max)
 		if (fMaxContentHeight == NULL) {
 			fMaxContentHeight = fLS->AddConstraint(-1.0, fTop, 1.0, fBottom,
 				kLE, max.Height());
-			fConstraints.AddItem(fMaxContentHeight);
 		} else
 			fMaxContentHeight->SetRightSide(max.Height());
-	}
-	else {
-		fConstraints.RemoveItem(fMaxContentHeight);
+	} else {
 		delete fMaxContentHeight;
 		fMaxContentHeight = NULL;
 	}
@@ -629,12 +620,9 @@ Area::_UpdateMaxSizeConstraint(BSize max)
 		if (fMaxContentWidth == NULL) {
 			fMaxContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight, kLE,
 				max.Width());
-			fConstraints.AddItem(fMaxContentWidth);
 		} else
 			fMaxContentWidth->SetRightSide(max.Width());
-	}
-	else {
-		fConstraints.RemoveItem(fMaxContentWidth);
+	} else {
 		delete fMaxContentWidth;
 		fMaxContentWidth = NULL;
 	}
