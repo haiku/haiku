@@ -30,6 +30,7 @@ extern "C" {
 #include "drivers/common/driverfuncs.h"
 #include "drivers/common/meta.h"
 #include "main/colormac.h"
+#include "main/cpuinfo.h"
 #include "main/buffers.h"
 #include "main/formats.h"
 #include "main/framebuffer.h"
@@ -600,60 +601,19 @@ MesaSoftwareRenderer::_Error(gl_context* ctx)
 const GLubyte*
 MesaSoftwareRenderer::_GetString(gl_context* ctx, GLenum name)
 {
+
 	switch (name) {
 		case GL_VENDOR:
 			return (const GLubyte*) "Mesa Project";
 		case GL_RENDERER: {
+			_mesa_get_cpu_features();
 			static char buffer[256] = { '\0' };
 
 			if (!buffer[0]) {
+				char* cpuInfo = _mesa_get_cpu_string();
 				// Let's build an renderer string
-				strncat(buffer, "Software Rasterizer", sizeof(buffer));
-
-				// Append any CPU-specific information.
-#ifdef USE_X86_ASM
-				if (_mesa_x86_cpu_features)
-					strncat(buffer, ", optimized for x86", sizeof(buffer));
-#ifdef USE_MMX_ASM
-				if (cpu_has_mmx) {
-					strncat(buffer, (cpu_has_mmxext) ? "/MMX+" : "/MMX",
-						sizeof(buffer));
-				}
-#endif
-#ifdef USE_3DNOW_ASM
-				if (cpu_has_3dnow) {
-					strncat(buffer, (cpu_has_3dnowext) ? "/3DNow!+" : "/3DNow!",
-						sizeof(buffer));
-				}
-#endif
-#ifdef USE_SSE_ASM
-				if (cpu_has_xmm) {
-					strncat(buffer, (cpu_has_xmm2) ? "/SSE2" : "/SSE",
-						sizeof(buffer));
-				}
-#endif
-
-#elif defined(USE_SPARC_ASM)
-
-				strncat(buffer, ", optimized for SPARC", sizeof(buffer));
-
-#elif defined(USE_PPC_ASM)
-
-				if (_mesa_ppc_cpu_features) {
-					strncat(buffer, (cpu_has_64) ? ", optimized for "
-						"PowerPC 64" : ", optimized for PowerPC",
-						sizeof(buffer));
-				}
-
-#ifdef USE_VMX_ASM
-				if (cpu_has_vmx)
-					strncat(buffer, "/Altivec", sizeof(buffer));
-#endif
-
-				if (! cpu_has_fpu)
-					strncat(buffer, "/No FPU", sizeof(buffer));
-#endif
-
+				sprintf(buffer, "Software Rasterizer for %s", cpuInfo);
+				free(cpuInfo);
 			}
 			return (const GLubyte*) buffer;
 		}

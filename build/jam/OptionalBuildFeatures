@@ -171,13 +171,18 @@ if $(HAIKU_BUILD_FEATURE_CLUCENE) {
 
 
 # Mesa
-local mesaBaseURL = http://pub.haikufire.com/mesa ;
+local mesaBaseURL = http://haiku-files.org/files/optional-packages ;
 if $(TARGET_ARCH) = x86 {
+	local glslObject ;
+	local galliumObjects ;
 	local zipFile ;
 	if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		HAIKU_MESA_FILE = mesa-8.0-devel-gcc4-x86.zip ;
+		#HAIKU_MESA_FILE = mesa-8.0dev-x86-gcc4-2012-01-17.zip ;
+		HAIKU_MESA_FILE = mesa-8.0devdbg-x86-gcc4-2012-01-17.zip ;
+		glslObject = lib.haiku/libglsl.a ;
+		galliumObjects = lib.haiku/libgallium.a ;
 	} else {
-		HAIKU_MESA_FILE = mesa-7.8.2-gcc2-x86.zip ;
+		HAIKU_MESA_FILE = mesa-7.8.2-x86-gcc2-2012-01-17.zip ;
 	}
 
 	zipFile = [ DownloadFile $(HAIKU_MESA_FILE)
@@ -189,24 +194,15 @@ if $(TARGET_ARCH) = x86 {
 	HAIKU_MESA_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_MESA_DIR)
 		: include/ : $(zipFile) : extracted-mesa ] ;
 
-	if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		HAIKU_MESA_LIBS = [ ExtractArchive $(HAIKU_MESA_DIR)
+	HAIKU_MESA_LIBS = [ ExtractArchive $(HAIKU_MESA_DIR)
 		:
-		src/mesa/libmesa.a
-		src/mapi/glapi/libglapi.a
-		lib/libGLU.a
+		lib.haiku/libglu.a
+		$(galliumObjects) 
+		lib.haiku/libglapi.a
+		$(glslObject)
+		lib.haiku/libmesa.a
 		: $(zipFile)
 		: extracted-mesa ] ;
-	} else {
-		# Older Mesa 7.8
-		HAIKU_MESA_LIBS = [ ExtractArchive $(HAIKU_MESA_DIR)
-		:
-		src/mesa/libmesa.a
-		src/mesa/libglapi.a
-		lib/libGLU.a
-		: $(zipFile)
-		: extracted-mesa ] ;
-	}
 
 	HAIKU_MESA_HEADERS = [ FDirName $(HAIKU_MESA_DIR) include ] ;
 

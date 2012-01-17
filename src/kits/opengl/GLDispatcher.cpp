@@ -67,10 +67,6 @@ extern "C" {
    return (dispatch->func) args
 
 
-#if __GNUC__ > 2
-#include "glapitemp.h"
-#endif
-
 #endif /* USE_X86_ASM */
 
 }

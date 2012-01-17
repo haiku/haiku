@@ -32,7 +32,7 @@ UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mapi glapi ] ;
 UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa glapi ] ;
 
 LINKFLAGS on libGL.so = [ on libGL.so return $(LINKFLAGS) ]
-	-Xlinker --strip-debug -Xlinker --whole-archive -Xlinker -zmuldefs ;
+	-Xlinker --whole-archive -Xlinker --no-undefined -fvisibility=default ;
 
 # For GCC2
 if $(HAIKU_GCC_VERSION[1]) < 3 {
@@ -41,15 +41,15 @@ if $(HAIKU_GCC_VERSION[1]) < 3 {
 
 
 SharedLibrary libGL.so : $(sources) :
+	# Glut
+	<opengl>glut.o
 
 	# Mesa libraries (from Mesa optional package):
 	$(HAIKU_MESA_LIBS)
 
-	# Glut
-	<opengl>glut.o
-
 	# External libraries:
-	be
 	game			# BWindowScreen needed by BGLScreen stub class
+	network
+	be
 	$(TARGET_LIBSTDC++)
 ;
