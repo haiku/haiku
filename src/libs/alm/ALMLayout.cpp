@@ -36,8 +36,8 @@ BALMLayout::BALMLayout(float hSpacing, float vSpacing, BALMLayout* friendLayout)
 	fRightInset(0),
 	fTopInset(0),
 	fBottomInset(0),
-	fHSpacing(hSpacing),
-	fVSpacing(vSpacing)
+	fHSpacing(BControlLook::ComposeSpacing(hSpacing)),
+	fVSpacing(BControlLook::ComposeSpacing(vSpacing))
 {
 	fSolver = friendLayout ? friendLayout->Solver() : &fOwnSolver;
 	fRowColumnManager = new RowColumnManager(fSolver);
