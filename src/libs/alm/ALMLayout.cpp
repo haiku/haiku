@@ -24,6 +24,27 @@ using namespace LinearProgramming;
 const BSize kUnsetSize(B_SIZE_UNSET, B_SIZE_UNSET);
 
 
+BALM::BALMLayout::BadLayoutPolicy::~BadLayoutPolicy()
+{
+}
+
+
+BALM::BALMLayout::DefaultPolicy::~DefaultPolicy()
+{
+}
+
+
+bool
+BALM::BALMLayout::DefaultPolicy::OnBadLayout(BALMLayout* layout)
+{
+	if (layout->Solver()->Result() == kInfeasible) {
+		debugger("BALMLayout failed to solve your layout!");
+		return false;
+	} else
+		return true;
+}
+
+
 /*!
  * Constructor.
  * Creates new layout engine.
@@ -37,7 +58,8 @@ BALMLayout::BALMLayout(float hSpacing, float vSpacing, BALMLayout* friendLayout)
 	fTopInset(0),
 	fBottomInset(0),
 	fHSpacing(BControlLook::ComposeSpacing(hSpacing)),
-	fVSpacing(BControlLook::ComposeSpacing(vSpacing))
+	fVSpacing(BControlLook::ComposeSpacing(vSpacing)),
+	fBadLayoutPolicy(new DefaultPolicy())
 {
 	fSolver = friendLayout ? friendLayout->Solver() : &fOwnSolver;
 	fRowColumnManager = new RowColumnManager(fSolver);
@@ -63,6 +85,7 @@ BALMLayout::BALMLayout(float hSpacing, float vSpacing, BALMLayout* friendLayout)
 BALMLayout::~BALMLayout()
 {
 	delete fRowColumnManager;
+	delete fBadLayoutPolicy;
 }
 
 
@@ -661,11 +684,30 @@ BALMLayout::Bottom() const
 }
 
 
+void
+BALMLayout::SetBadLayoutPolicy(BadLayoutPolicy* policy)
+{
+	if (fBadLayoutPolicy != policy)
+		delete fBadLayoutPolicy;
+	if (policy == NULL)
+		policy = new DefaultPolicy();
+	fBadLayoutPolicy = policy;
+}
+
+
+struct BALMLayout::BadLayoutPolicy*
+BALMLayout::GetBadLayoutPolicy() const
+{
+	return fBadLayoutPolicy;
+}
+
+
 /**
  * Gets minimum size.
  */
 BSize
-BALMLayout::BaseMinSize() {
+BALMLayout::BaseMinSize()
+{
 	if (fMinSize == kUnsetSize)
 		fMinSize = _CalculateMinSize();
 	return fMinSize;
@@ -755,18 +797,7 @@ BALMLayout::DoLayout()
 	Right()->SetRange(area.right, area.right);
 	Bottom()->SetRange(area.bottom, area.bottom);
 
-	fSolver->Solve();
-
-	// if new layout is infeasible, use previous layout
-	if (fSolver->Result() == kInfeasible)
-		return;
-
-	if (fSolver->Result() != kOptimal) {
-		fSolver->Save("failed-layout.txt");
-		printf("Could not solve the layout specification (%d). ",
-			fSolver->Result());
-		printf("Saved specification in file failed-layout.txt\n");
-	}
+	_TrySolve();
 
 	// set the calculated positions and sizes for every area
 	for (int32 i = 0; i < CountItems(); i++)
@@ -894,7 +925,11 @@ BALMLayout::_CalculateMinSize()
 	Right()->SetRange(0, 20000);
 	Bottom()->SetRange(0, 20000);
 
-	return fSolver->MinSize(Right(), Bottom());
+	BSize min(fSolver->MinSize(Right(), Bottom()));
+	ResultType result = fSolver->Result();
+	if (result != kUnbounded && result != kOptimal)
+		fBadLayoutPolicy->OnBadLayout(this);
+	return min;
 }
 
 
@@ -909,7 +944,11 @@ BALMLayout::_CalculateMaxSize()
 	Right()->SetRange(0, 20000);
 	Bottom()->SetRange(0, 20000);
 
-	return fSolver->MaxSize(Right(), Bottom());
+	BSize max(fSolver->MaxSize(Right(), Bottom()));
+	ResultType result = fSolver->Result();
+	if (result != kUnbounded && result != kOptimal)
+		fBadLayoutPolicy->OnBadLayout(this);
+	return max;
 }
 
 
@@ -924,15 +963,22 @@ BALMLayout::_CalculatePreferredSize()
 	Right()->SetRange(0, 20000);
 	Bottom()->SetRange(0, 20000);
 
-	fSolver->Solve();
-	if (fSolver->Result() != kOptimal) {
-		fSolver->Save("failed-layout.txt");
-		printf("Could not solve the layout specification (%d). "
-			"Saved specification in file failed-layout.txt", fSolver->Result());
-	}
+	_TrySolve();
 
 	return BSize(Right()->Value() - Left()->Value(),
 		Bottom()->Value() - Top()->Value());
+}
+
+
+bool
+BALMLayout::_TrySolve()
+{
+	fSolver->Solve();
+
+	if (fSolver->Result() != kOptimal) {
+		return fBadLayoutPolicy->OnBadLayout(this);
+	}
+	return true;
 }
 
 

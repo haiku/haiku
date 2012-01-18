@@ -102,6 +102,10 @@ public:
 									
 			bool				SaveLayout(BMessage* archive) const;
 			bool				RestoreLayout(const BMessage* archive);
+	struct BadLayoutPolicy;
+
+			void				SetBadLayoutPolicy(BadLayoutPolicy* policy);
+			BadLayoutPolicy*	GetBadLayoutPolicy() const;
 
 	virtual	BSize				BaseMinSize();
 	virtual	BSize				BaseMaxSize();
@@ -116,6 +120,18 @@ protected:
 
 	virtual	void				LayoutInvalidated(bool children);
 	virtual	void				DoLayout();
+
+public:
+	struct BadLayoutPolicy {
+		virtual ~BadLayoutPolicy();
+		/* return false to abandon layout, true to use layout */
+		virtual bool OnBadLayout(BALMLayout* layout) = 0;
+	};
+
+	struct DefaultPolicy : public BadLayoutPolicy {
+		virtual ~DefaultPolicy();
+		virtual bool OnBadLayout(BALMLayout* layout);
+	};
 
 private:
 
@@ -151,6 +167,8 @@ private:
 			BSize				_CalculateMaxSize();
 			BSize				_CalculatePreferredSize();
 
+			bool				_TrySolve();
+
 			LinearProgramming::LinearSpec*	fSolver;
 			LinearProgramming::LinearSpec	fOwnSolver;
 
@@ -175,6 +193,7 @@ private:
 
 			RowColumnManager*	fRowColumnManager;
 
+			BadLayoutPolicy*	fBadLayoutPolicy;
 			uint32				_reserved[5];
 };
 
