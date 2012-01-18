@@ -151,6 +151,17 @@ private:
 								BALMLayout(const BALMLayout&);
 			void				operator =(const BALMLayout&);
 
+	struct XTabRemover;
+	struct XTabRemoverFunc;
+
+	struct YTabRemover;
+	struct YTabRemoverFunc;
+
+	friend struct XTabRemover;
+	friend struct XTabRemoverFunc;
+
+	friend struct YTabRemover;
+	friend struct YTabRemoverFunc;
 
 	friend class XTab;
 	friend class YTab;
@@ -158,6 +169,9 @@ private:
 
 			float				InsetForTab(XTab* tab) const;
 			float				InsetForTab(YTab* tab) const;
+
+			void				_RemoveSelfFromTab(XTab* tab);
+			void				_RemoveSelfFromTab(YTab* tab);
 
 			BLayoutItem*		_LayoutItemToAdd(BView* view);
 

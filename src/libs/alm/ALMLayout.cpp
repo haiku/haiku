@@ -11,16 +11,68 @@
 
 #include <vector>
 
+#include <AutoDeleter.h>
 #include <ControlLook.h>
 
 #include "RowColumnManager.h"
 #include "ViewLayoutItem.h"
 
 
+using BPrivate::AutoDeleter;
 using namespace LinearProgramming;
 
 
 const BSize kUnsetSize(B_SIZE_UNSET, B_SIZE_UNSET);
+
+
+struct BALMLayout::XTabRemoverFunc {
+	void operator()(XTab* tab)
+	{
+		if (tab)
+			layout->_RemoveSelfFromTab(tab);
+	}
+
+	BALMLayout* layout;
+};
+
+
+struct BALMLayout::XTabRemover
+	: public AutoDeleter<XTab, BALMLayout::XTabRemoverFunc> {
+	
+	typedef AutoDeleter<XTab, BALMLayout::XTabRemoverFunc> Base;
+
+	XTabRemover(BALMLayout* layout, XTab* tab = NULL)
+		:
+		Base(tab)
+	{
+		fDelete.layout = layout;
+	}
+};
+
+
+struct BALMLayout::YTabRemoverFunc {
+	void operator()(YTab* tab)
+	{
+		if (tab)
+			layout->_RemoveSelfFromTab(tab);
+	}
+
+	BALMLayout* layout;
+};
+
+
+struct BALMLayout::YTabRemover
+	: public AutoDeleter<YTab, BALMLayout::YTabRemoverFunc> {
+	
+	typedef AutoDeleter<YTab, BALMLayout::YTabRemoverFunc> Base;
+
+	YTabRemover(BALMLayout* layout, YTab* tab = NULL)
+		:
+		Base(tab)
+	{
+		fDelete.layout = layout;
+	}
+};
 
 
 BALM::BALMLayout::BadLayoutPolicy::~BadLayoutPolicy()
@@ -105,6 +157,10 @@ BALMLayout::AddXTab()
 		return NULL;
 
 	fXTabList.AddItem(tab);
+	if (!tab->AddedToLayout(this)) {
+		fXTabList.RemoveItem(tab);
+		return NULL;
+	}
 	return tab;
 }
 
@@ -140,6 +196,10 @@ BALMLayout::AddYTab()
 		return NULL;
 
 	fYTabList.AddItem(tab);
+	if (!tab->AddedToLayout(this)) {
+		fYTabList.RemoveItem(tab);
+		return NULL;
+	}
 	return tab;
 }
 
@@ -480,6 +540,11 @@ Area*
 BALMLayout::AddItem(BLayoutItem* item, XTab* left, YTab* top, XTab* _right,
 	YTab* _bottom)
 {
+	if (!left->IsSuitableFor(this) || !top->IsSuitableFor(this)
+			|| (_right && !_right->IsSuitableFor(this))
+			|| (_bottom && !_bottom->IsSuitableFor(this)))
+		debugger("Tab added to unfriendly layout!");
+
 	BReference<XTab> right = _right;
 	if (right.Get() == NULL)
 		right = AddXTab();
@@ -487,16 +552,51 @@ BALMLayout::AddItem(BLayoutItem* item, XTab* left, YTab* top, XTab* _right,
 	if (bottom.Get() == NULL)
 		bottom = AddYTab();
 
-	// Area is added int ItemAdded
+		// TODO: make sure all tabs get into the lists
+	XTabRemover leftRemover(this);
+	if (!left->IsInLayout(this)) {
+		if (!left->AddedToLayout(this))
+			return NULL;
+		leftRemover.SetTo(left);
+	}
+
+	YTabRemover topRemover(this);
+	if (!top->IsInLayout(this)) {
+		if (!top->AddedToLayout(this))
+			return NULL;
+		topRemover.SetTo(top);
+	}
+
+	XTabRemover rightRemover(this);
+	if (_right != NULL && !right->IsInLayout(this)) {
+		if (!right->AddedToLayout(this))
+			return NULL;
+		rightRemover.SetTo(right);
+	}
+
+	YTabRemover bottomRemover(this);
+	if (_bottom != NULL && !bottom->IsInLayout(this)) {
+		if (!bottom->AddedToLayout(this))
+			return NULL;
+		bottomRemover.SetTo(bottom);
+	}
+			
+	// Area is added in ItemAdded
 	if (!BAbstractLayout::AddItem(-1, item))
 		return NULL;
 	Area* area = AreaFor(item);
-	if (!area)
+	if (!area) {
+		RemoveItem(item);
 		return NULL;
+	}
 
 	area->_Init(fSolver, left, top, right, bottom, fRowColumnManager);
-
 	fRowColumnManager->AddArea(area);
+
+	leftRemover.Detach();
+	rightRemover.Detach();
+	topRemover.Detach();
+	bottomRemover.Detach();
 	return area;
 }
 
@@ -904,6 +1004,20 @@ BALMLayout::InsetForTab(YTab* tab) const
 	if (tab == fBottom.Get())
 		return fBottomInset;
 	return fVSpacing / 2;
+}
+
+
+void
+BALMLayout::_RemoveSelfFromTab(XTab* tab)
+{
+	tab->LayoutLeaving(this);
+}
+
+
+void
+BALMLayout::_RemoveSelfFromTab(YTab* tab)
+{
+	tab->LayoutLeaving(this);
 }
 
 

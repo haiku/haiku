@@ -29,7 +29,14 @@ protected:
 								XTab(BALMLayout* layout);
 
 private:
-			BALMLayout*			fALMLayout;
+			struct BALMLayoutList;
+
+			bool				IsInLayout(BALMLayout* layout);
+			bool				AddedToLayout(BALMLayout* layout);
+			void				LayoutLeaving(BALMLayout* layout);
+			bool				IsSuitableFor(BALMLayout* layout);
+
+			BALMLayoutList*		fLayouts;
 
 			uint32				_reserved[2];
 };
@@ -44,7 +51,12 @@ protected:
 								YTab(BALMLayout* layout);
 
 private:
-			BALMLayout*			fALMLayout;
+			bool				IsInLayout(BALMLayout* layout);
+			bool				AddedToLayout(BALMLayout* layout);
+			void				LayoutLeaving(BALMLayout* layout);
+			bool				IsSuitableFor(BALMLayout* layout);
+
+			XTab::BALMLayoutList* fLayouts;
 
 			uint32				_reserved[2];
 };
