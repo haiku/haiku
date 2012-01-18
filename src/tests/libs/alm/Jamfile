@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src tests libs alm ;
 
-UseLibraryHeaders lp_solve linprog alm ;
+UseLibraryHeaders linprog alm ;
 UsePrivateHeaders shared ;
 
 
@@ -56,5 +56,5 @@ Application ALMComplexButtons :
 Application ALMBadLayout :
 	BadLayout.cpp
 	:
-	be liblpsolve55.so libalm.so $(TARGET_LIBSTDC++)
+	be libalm.so $(TARGET_LIBSTDC++)
 ;

@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src libs alm ;
 
 
-UseLibraryHeaders lp_solve linprog alm ;
+UseLibraryHeaders linprog alm ;
 UsePrivateHeaders shared ;
 UseHeaders [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) kits interface ] ;
 

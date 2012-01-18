@@ -11,7 +11,6 @@
 #include <new>
 #include <stdio.h>
 
-//#include "LPSolveInterface.h"
 #include "ActiveSetSolver.h"
 
 
@@ -45,7 +44,6 @@ LinearSpec::LinearSpec()
 	fResult(kError),
 	fSolvingTime(0)
 {
-	//fSolver = new LPSolveInterface(this);
 	fSolver = new ActiveSetSolver(this);
 }
 
