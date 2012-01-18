@@ -196,6 +196,7 @@ private:
 								int32 parameterID, uint32 rateMask);
 
 			status_t		_SetNodeInputFrameRate(float frameRate);
+			status_t		_SetNodeOutputFrameRate(float frameRate);
 			void			_UpdateInternalLatency(const media_format& format);
 
 private:

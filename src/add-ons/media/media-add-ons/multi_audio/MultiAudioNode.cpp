@@ -44,6 +44,7 @@ public:
 	BBuffer*			fBuffer;
 };
 
+
 class node_output {
 public:
 	node_output(media_output& output, media_format format);
@@ -62,8 +63,9 @@ public:
 };
 
 
-struct OutputFrameRateChangeCookie : public BReferenceable {
+struct FrameRateChangeCookie : public BReferenceable {
 	float	oldFrameRate;
+	uint32	id;
 };
 
 
@@ -71,6 +73,7 @@ struct sample_rate_info {
 	uint32		multiAudioRate;
 	const char*	name;
 };
+
 
 static const sample_rate_info kSampleRateInfos[] = {
 	{B_SR_8000,		"8000"},
@@ -438,16 +441,21 @@ MultiAudioNode::RequestCompleted(const media_request_info& info)
 	if (info.what != media_request_info::B_REQUEST_FORMAT_CHANGE)
 		return B_OK;
 
-	OutputFrameRateChangeCookie* cookie
-		= (OutputFrameRateChangeCookie*)info.user_data;
+	FrameRateChangeCookie* cookie
+		= (FrameRateChangeCookie*)info.user_data;
 	if (cookie == NULL)
 		return B_OK;
 
-	BReference<OutputFrameRateChangeCookie> cookieReference(cookie, true);
+	BReference<FrameRateChangeCookie> cookieReference(cookie, true);
 
 	// if the request failed, we reset the frame rate
 	if (info.status != B_OK) {
-		_SetNodeInputFrameRate(cookie->oldFrameRate);
+		if (cookie->id == PARAMETER_ID_INPUT_FREQUENCY) {
+			_SetNodeInputFrameRate(cookie->oldFrameRate);
+			if (fDevice->Description().output_rates & B_SR_SAME_AS_INPUT)
+				_SetNodeOutputFrameRate(cookie->oldFrameRate);
+		} else if (cookie->id == PARAMETER_ID_OUTPUT_FREQUENCY)
+			_SetNodeOutputFrameRate(cookie->oldFrameRate);
 
 		// TODO: If we have multiple connections, we should request to change
 		// the format back!
@@ -503,10 +511,10 @@ MultiAudioNode::AcceptFormat(const media_destination& dest,
 	format->u.raw_audio.format = channel->fPreferredFormat.u.raw_audio.format;
 	format->u.raw_audio.valid_bits = channel->fPreferredFormat.u.raw_audio.valid_bits;
 
-	format->u.raw_audio.frame_rate    = channel->fPreferredFormat.u.raw_audio.frame_rate;
+	format->u.raw_audio.frame_rate = channel->fPreferredFormat.u.raw_audio.frame_rate;
 	format->u.raw_audio.channel_count = channel->fPreferredFormat.u.raw_audio.channel_count;
-	format->u.raw_audio.byte_order    = B_MEDIA_HOST_ENDIAN;
-	format->u.raw_audio.buffer_size   = fDevice->BufferList().return_playback_buffer_size
+	format->u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
+	format->u.raw_audio.buffer_size = fDevice->BufferList().return_playback_buffer_size
 		* (format->u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
 		* format->u.raw_audio.channel_count;
 
@@ -1305,6 +1313,7 @@ MultiAudioNode::GetParameterValue(int32 id, bigtime_t* lastChange, void* value,
 	if (id == PARAMETER_ID_INPUT_FREQUENCY
 		|| id == PARAMETER_ID_OUTPUT_FREQUENCY) {
 		const multi_format_info& info = fDevice->FormatInfo();
+
 		uint32 rate = id == PARAMETER_ID_INPUT_FREQUENCY
 			? info.input.rate : info.output.rate;
 
@@ -1394,12 +1403,9 @@ MultiAudioNode::SetParameterValue(int32 id, bigtime_t performanceTime,
 	if (parameter == NULL)
 		return;
 
-	if (id == PARAMETER_ID_INPUT_FREQUENCY) {
-		// TODO: Support!
-		return;
-	}
-
-	if (id == PARAMETER_ID_OUTPUT_FREQUENCY) {
+	if (id == PARAMETER_ID_OUTPUT_FREQUENCY
+		|| (id == PARAMETER_ID_INPUT_FREQUENCY
+			&& (fDevice->Description().output_rates & B_SR_SAME_AS_INPUT))) {
 		uint32 rate;
 		if (size < sizeof(rate))
 			return;
@@ -1410,13 +1416,14 @@ MultiAudioNode::SetParameterValue(int32 id, bigtime_t performanceTime,
 
 		// create a cookie RequestCompleted() can get the old frame rate from,
 		// if anything goes wrong
-		OutputFrameRateChangeCookie* cookie
-			= new(std::nothrow) OutputFrameRateChangeCookie;
+		FrameRateChangeCookie* cookie
+			= new(std::nothrow) FrameRateChangeCookie;
 		if (cookie == NULL)
 			return;
 
 		cookie->oldFrameRate = fOutputPreferredFormat.u.raw_audio.frame_rate;
-		BReference<OutputFrameRateChangeCookie> cookieReference(cookie, true);
+		cookie->id = id;
+		BReference<FrameRateChangeCookie> cookieReference(cookie, true);
 
 		// NOTE: What we should do is call RequestFormatChange() for all
 		// connections and change the device's format in RequestCompleted().
@@ -1442,6 +1449,59 @@ MultiAudioNode::SetParameterValue(int32 id, bigtime_t performanceTime,
 			int32 changeTag = 0;
 			status_t error = RequestFormatChange(channel->fInput.source,
 				channel->fInput.destination, newFormat, NULL, &changeTag);
+			if (error == B_OK)
+				cookie->AcquireReference();
+		}
+
+		if (id != PARAMETER_ID_INPUT_FREQUENCY)
+			return;
+		//Do not return cause we should go in the next if
+	}
+
+	if (id == PARAMETER_ID_INPUT_FREQUENCY) {
+		uint32 rate;
+		if (size < sizeof(rate))
+			return;
+		memcpy(&rate, value, sizeof(rate));
+
+		if (rate == fInputPreferredFormat.u.raw_audio.frame_rate)
+			return;
+
+		// create a cookie RequestCompleted() can get the old frame rate from,
+		// if anything goes wrong
+		FrameRateChangeCookie* cookie
+			= new(std::nothrow) FrameRateChangeCookie;
+		if (cookie == NULL)
+			return;
+
+		cookie->oldFrameRate = fInputPreferredFormat.u.raw_audio.frame_rate;
+		cookie->id = id;
+		BReference<FrameRateChangeCookie> cookieReference(cookie, true);
+
+		// NOTE: What we should do is call RequestFormatChange() for all
+		// connections and change the device's format in RequestCompleted().
+		// Unfortunately we need the new buffer size first, which we only get
+		// from the device after changing the format. So we do that now and
+		// reset it in RequestCompleted(), if something went wrong. This causes
+		// the buffers we receive until then to be played incorrectly leading
+		// to unpleasant noise.
+		float frameRate = MultiAudio::convert_to_sample_rate(rate);
+		if (_SetNodeOutputFrameRate(frameRate) != B_OK)
+			return;
+
+		for (int32 i = 0; i < fOutputs.CountItems(); i++) {
+			node_output* channel = (node_output*)fOutputs.ItemAt(i);
+			if (channel->fOutput.source == media_source::null)
+				continue;
+
+			media_format newFormat = channel->fOutput.format;
+			newFormat.u.raw_audio.frame_rate = frameRate;
+			newFormat.u.raw_audio.buffer_size
+				= fInputPreferredFormat.u.raw_audio.buffer_size;
+
+			int32 changeTag = 0;
+			status_t error = RequestFormatChange(channel->fOutput.source,
+				channel->fOutput.destination, newFormat, NULL, &changeTag);
 			if (error == B_OK)
 				cookie->AcquireReference();
 		}
@@ -1506,11 +1566,16 @@ MultiAudioNode::MakeParameterWeb()
 	BParameterGroup* generalGroup = web->MakeGroup("General");
 
 	const multi_description& description = fDevice->Description();
-//	_CreateFrequencyParameterGroup(generalGroup, "Input",
-//		PARAMETER_ID_INPUT_FREQUENCY, description.input_rates);
-		// TODO: Enable when implemented correctly in SetParameterValue()!
-	_CreateFrequencyParameterGroup(generalGroup, "Output",
-		PARAMETER_ID_OUTPUT_FREQUENCY, description.output_rates);
+
+	if (description.output_rates & B_SR_SAME_AS_INPUT) {
+		_CreateFrequencyParameterGroup(generalGroup, "Input & Output",
+			PARAMETER_ID_INPUT_FREQUENCY, description.input_rates);
+	} else {
+		_CreateFrequencyParameterGroup(generalGroup, "Input",
+			PARAMETER_ID_INPUT_FREQUENCY, description.input_rates);
+		_CreateFrequencyParameterGroup(generalGroup, "Output",
+			PARAMETER_ID_OUTPUT_FREQUENCY, description.output_rates);
+	}
 
 	multi_mix_control* controls = fDevice->MixControlInfo().controls;
 
@@ -2357,6 +2422,58 @@ MultiAudioNode::_SetNodeInputFrameRate(float frameRate)
 
 	// update internal latency
 	_UpdateInternalLatency(fOutputPreferredFormat);
+
+	return B_OK;
+}
+
+
+status_t
+MultiAudioNode::_SetNodeOutputFrameRate(float frameRate)
+{
+	// check whether the frame rate is supported
+	uint32 multiAudioRate = MultiAudio::convert_from_sample_rate(frameRate);
+	if ((fDevice->Description().input_rates & multiAudioRate) == 0)
+		return B_BAD_VALUE;
+
+	BAutolock locker(fBufferLock);
+
+	// already set?
+	if (fDevice->FormatInfo().input.rate == multiAudioRate)
+		return B_OK;
+
+	// set the frame rate on the device
+	status_t error = fDevice->SetInputFrameRate(multiAudioRate);
+	if (error != B_OK)
+		return error;
+
+	// it went fine -- update all formats
+	fInputPreferredFormat.u.raw_audio.frame_rate = frameRate;
+	fInputPreferredFormat.u.raw_audio.buffer_size
+		= fDevice->BufferList().return_record_buffer_size
+			* (fInputPreferredFormat.u.raw_audio.format
+				& media_raw_audio_format::B_AUDIO_SIZE_MASK)
+			* fInputPreferredFormat.u.raw_audio.channel_count;
+
+	for (int32 i = 0; node_output* channel = (node_output*)fOutputs.ItemAt(i);
+			i++) {
+		channel->fPreferredFormat.u.raw_audio.frame_rate = frameRate;
+		channel->fPreferredFormat.u.raw_audio.buffer_size
+			= fInputPreferredFormat.u.raw_audio.buffer_size;
+
+		channel->fFormat.u.raw_audio.frame_rate = frameRate;
+		channel->fFormat.u.raw_audio.buffer_size
+			= fInputPreferredFormat.u.raw_audio.buffer_size;
+
+		channel->fOutput.format.u.raw_audio.frame_rate = frameRate;
+		channel->fOutput.format.u.raw_audio.buffer_size
+			= fInputPreferredFormat.u.raw_audio.buffer_size;
+	}
+
+	// make sure the time base is reset
+	fTimeComputer.SetFrameRate(frameRate);
+
+	// update internal latency
+	_UpdateInternalLatency(fInputPreferredFormat);
 
 	return B_OK;
 }
