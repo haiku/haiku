@@ -11,6 +11,7 @@
 
 #include <List.h>
 #include <OS.h>
+#include <Referenceable.h>
 #include <Size.h>
 #include <String.h>
 #include <SupportDefs.h>
@@ -62,7 +63,7 @@ protected:
 /*!
  * Specification of a linear programming problem.
  */
-class LinearSpec {
+class LinearSpec : public BReferenceable {
 public:
 								LinearSpec();
 	virtual						~LinearSpec();
