@@ -51,3 +51,10 @@ Application ALMComplexButtons :
 	:
 	be libalm.so $(TARGET_LIBSTDC++)
 ;
+
+
+Application ALMBadLayout :
+	BadLayout.cpp
+	:
+	be liblpsolve55.so libalm.so $(TARGET_LIBSTDC++)
+;
