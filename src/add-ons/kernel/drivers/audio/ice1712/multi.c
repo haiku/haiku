@@ -19,7 +19,7 @@
 #include "debug.h"
 
 
-#define AUTHORIZED_RATE (B_SR_SAME_AS_INPUT | B_SR_IS_GLOBAL | B_SR_96000 \
+#define AUTHORIZED_RATE (B_SR_SAME_AS_INPUT | B_SR_96000 \
 	| B_SR_88200 | B_SR_48000 | B_SR_44100)
 #define AUTHORIZED_SAMPLE_SIZE (B_FMT_32BIT)
 
@@ -165,7 +165,7 @@ ice1712_get_description(ice1712 *card, multi_description *data)
 			data->channels[chan].channel_id = chan;
 			data->channels[chan].kind = B_MULTI_OUTPUT_CHANNEL;
 			data->channels[chan].designations = B_CHANNEL_STEREO_BUS
-				| ((i & 1) == 0) ? B_CHANNEL_LEFT : B_CHANNEL_RIGHT;
+				| (((i & 1) == 0) ? B_CHANNEL_LEFT : B_CHANNEL_RIGHT);
 			data->channels[chan].connectors = 0;
 			chan++;
 		}
@@ -191,7 +191,7 @@ ice1712_get_description(ice1712 *card, multi_description *data)
 			data->channels[chan].channel_id = chan;
 			data->channels[chan].kind = B_MULTI_INPUT_CHANNEL;
 			data->channels[chan].designations = B_CHANNEL_STEREO_BUS
-				| ((i & 1) == 0) ? B_CHANNEL_LEFT : B_CHANNEL_RIGHT;
+				| (((i & 1) == 0) ? B_CHANNEL_LEFT : B_CHANNEL_RIGHT);
 			data->channels[chan].connectors = 0;
 			chan++;
 		}
@@ -337,6 +337,13 @@ ice1712_set_global_format(ice1712 *card, multi_format_info *data)
 	TRACE("Input Sampling Rate = %d\n", (int)data->input.rate);
 	TRACE("Output Sampling Rate = %d\n", (int)data->output.rate);
 
+	//We can't have a different rate for input and output
+	//so just wait to change our sample rate when
+	//media server will do what we need
+	//Lie to it and say we are living in wonderland
+	if (data->input.rate != data->output.rate)
+		return B_OK;
+
 	if (card->lock_source == B_MULTI_LOCK_INTERNAL) {
 		switch (data->output.rate) {
 			case B_SR_96000:
@@ -357,8 +364,6 @@ ice1712_set_global_format(ice1712 *card, multi_format_info *data)
 	i = read_mt_uint8(card, MT_SAMPLING_RATE_SELECT);
 	TRACE("New rate = %#x\n", i);
 
-	//We can't have a different rate for input and output
-	data->input.rate = data->output.rate;
 	return B_OK;
 }
 
@@ -1130,14 +1135,12 @@ ice1712_buffer_exchange(ice1712 *card, multi_buffer_info *data)
 	buffer_info.played_frames_count = card->frames_count;
 	buffer_info.playback_buffer_cycle = (card->buffer - 1)
 		% SWAPPING_BUFFERS; //Buffer played
-	buffer_info._reserved_0 = 0;
 
 	// Record buffers info
 	buffer_info.recorded_real_time = card->played_time;
 	buffer_info.recorded_frames_count = card->frames_count;
 	buffer_info.record_buffer_cycle = (card->buffer - 1)
 		% SWAPPING_BUFFERS; //Buffer filled
-	buffer_info._reserved_1 = card->total_output_channels;
 
 	unlock(cpu_status);
 
