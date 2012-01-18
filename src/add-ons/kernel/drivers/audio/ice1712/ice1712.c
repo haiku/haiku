@@ -18,6 +18,7 @@
 #include <image.h>
 #include <midi_driver.h>
 #include <string.h>
+#include <drivers/driver_settings.h>
 
 #include "ice1712.h"
 #include "ice1712_reg.h"
@@ -26,20 +27,14 @@
 #include "util.h"
 
 #include "debug.h"
-//------------------------------------------------------
-//------------------------------------------------------
 
 status_t init_hardware(void);
 status_t init_driver(void);
 void uninit_driver(void);
 const char **publish_devices(void);
 device_hooks *find_device(const char *);
-
-//------------------------------------------------------
-
+status_t load_settings(ice1712 *card);
 int32 ice_1712_int(void *arg);
-
-//------------------------------------------------------
 
 pci_module_info *pci;
 generic_mpu401_module *mpu401;
@@ -48,25 +43,10 @@ int32 num_cards = 0;
 ice1712 cards[NUM_CARDS];
 int32 num_names = 0;
 char *names[NUM_CARDS*20+1];
-
-//------------------------------------------------------
-//------------------------------------------------------
-
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
 #define HMULTI_AUDIO_DEV_PATH "audio/hmulti/ice1712"
-//#define HMULTI_AUDIO_DEV_PATH "audio/multi/ice1712"
 
-//------------------------------------------------------
-//------------------------------------------------------
-
-//void republish_devices(void);
-
-//extern image_id	load_kernel_addon(const char *path);
-//extern status_t	unload_kernel_addon(image_id imid);
-
-//------------------------------------------------------
-//------------------------------------------------------
 
 status_t
 init_hardware(void)
@@ -348,7 +328,7 @@ ice1712_setup(ice1712 *ice)
 	ice->sampling_rate = 0x08;
 	ice->buffer = 0;
 	ice->frames_count = 0;
-	ice->buffer_size = MAX_BUFFER_FRAMES;
+	ice->buffer_size = ice->settings.bufferSize;
 
 	ice->total_output_channels = ice->config.nb_DAC;
 	if (ice->config.spdif & SPDIF_OUT_PRESENT)
@@ -440,6 +420,9 @@ init_driver(void)
 					cards[num_cards].info.function, strerror(err));
 				continue;
 			}
+
+			load_settings(&cards[num_cards]);
+
 			if (ice1712_setup(&cards[num_cards]) != B_OK) {
 			//Vendor_ID and Device_ID has been modified
 				TRACE("Setup of ice1712 %d failed\n", (int)(num_cards + 1));
@@ -502,7 +485,6 @@ uninit_driver(void)
 	put_module(B_PCI_MODULE_NAME);
 }
 
-//------------------------------------------------------
 
 const char **
 publish_devices(void)
@@ -732,10 +714,39 @@ find_device(const char * name)
 	return NULL;
 }
 
-//-----------------------------------------------------------------------------
+status_t
+load_settings(ice1712 *card)
+{
+	// get driver settings
+	void *settings_handle = load_driver_settings("ice1712.settings");
+
+	//Use a large enough value for modern computer
+	card->settings.bufferSize = 512;
+
+	if (settings_handle != NULL) {
+		const char *item;
+		char *end;
+
+		item = get_driver_parameter(settings_handle, "buffer_size",
+			"512", "512");
+		if (item) {
+			uint32 value = strtoul(item, &end, 0);
+			if ((*end == '\0')
+				&& (value >= MIN_BUFFER_FRAMES)
+				&& (value <= MAX_BUFFER_FRAMES)) {
+					card->settings.bufferSize = value;
+			}
+		}
+
+		unload_driver_settings(settings_handle);
+	}
+
+	return B_OK;
+}
+
 
 status_t
-applySettings(ice1712 *card)
+apply_settings(ice1712 *card)
 {
 	int i;
 	uint16 val, mt30 = 0;
@@ -810,7 +821,7 @@ applySettings(ice1712 *card)
 	}
 	write_mt_uint16(card, MT_ROUTING_CONTROL_PSDOUT, mt30);
 	write_mt_uint32(card, MT_CAPTURED_DATA, mt34);
-	
+
 	//Digital output
 	if ((card->config.spdif & SPDIF_OUT_PRESENT) != 0) {
 		uint16 mt32 = 0;
@@ -836,6 +847,6 @@ applySettings(ice1712 *card)
 		write_mt_uint16(card, MT_ROUTING_CONTROL_SPDOUT, mt32);
 	}
 
-	
+
 	return B_OK;
 }

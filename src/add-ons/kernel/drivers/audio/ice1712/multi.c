@@ -21,7 +21,7 @@
 
 #define AUTHORIZED_RATE (B_SR_SAME_AS_INPUT | B_SR_96000 \
 	| B_SR_88200 | B_SR_48000 | B_SR_44100)
-#define AUTHORIZED_SAMPLE_SIZE (B_FMT_32BIT)
+#define AUTHORIZED_SAMPLE_SIZE (B_FMT_24BIT)
 
 #define MAX_CONTROL	32
 
@@ -381,18 +381,14 @@ get_combo_cb(ice1712 *card, uint32 index)
 			break;
 
 		case 1:
-			value = card->settings.bufferSize;
-			break;
-
-		case 2:
 			value = card->settings.outFormat;
 			break;
 
-		case 3:
+		case 2:
 			value = card->settings.emphasis;
 			break;
 
-		case 4:
+		case 3:
 			value = card->settings.copyMode;
 			break;
 	}
@@ -413,25 +409,16 @@ set_combo_cb(ice1712 *card, uint32 index, uint32 value)
 			break;
 
 		case 1:
-			if (value < 6) {
-				card->settings.bufferSize = value;
-//				card->buffer_size = 64 * (1 << value);
-//				ice1712_buffer_force_stop(card);
-//				start_DMA(card);
-			}
-			break;
-
-		case 2:
 			if (value < 2)
 				card->settings.outFormat = value;
 			break;
 
-		case 3:
+		case 2:
 			if (value < 3)
 				card->settings.emphasis = value;
 			break;
 
-		case 4:
+		case 3:
 			if (value < 3)
 				card->settings.copyMode = value;
 			break;
@@ -601,7 +588,7 @@ ice1712_set_mix(ice1712 *card, multi_mix_value_info *data)
 		}
 	}
 
-	return applySettings(card);
+	return apply_settings(card);
 }
 
 
@@ -615,16 +602,6 @@ ice1712_list_mix_channels(ice1712 *card, multi_mix_channel_info *data)
 static const char *Clock[] = {
 	"Internal",
 	"Digital",
-	NULL,
-};
-
-static const char *BufferSize[] = {
-	"64",
-	"128",
-	"256",
-	"512",
-	"1024",
-	"2048",
 	NULL,
 };
 
@@ -650,7 +627,6 @@ static const char *DigitalCopyMode[] = {
 
 static const char **SettingsGeneral[] = {
 	Clock,
-	BufferSize,
 	NULL,
 };
 
@@ -671,8 +647,8 @@ static const char *string_list[] = {
 
 	//General settings
 	"Master clock",
-	"Buffer size",
-	"Debug",
+	"reserved_0",
+	"reserved_1",
 
 	//Digital settings
 	"Output format",

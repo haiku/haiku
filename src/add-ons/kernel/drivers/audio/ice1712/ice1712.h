@@ -16,7 +16,7 @@
 #include "hmulti_audio.h"
 
 #define DRIVER_NAME "ice1712"
-#define VERSION "0.4"
+#define VERSION "0.5"
 
 #define ICE1712_VENDOR_ID			0x1412
 #define ICE1712_DEVICE_ID			0x1712
@@ -104,10 +104,10 @@ typedef struct ice1712_settings
 	channel_volume playback[ICE1712_HARDWARE_VOLUME];
 	channel_volume record[ICE1712_HARDWARE_VOLUME];
 
+	uint32 bufferSize;
+
 	//General Settings
 	uint8 clock; //an index
-	uint8 bufferSize; //an index
-	uint8 debugMode; //an index for debugging
 
 	//S/PDif Settings
 	uint8 outFormat; //an index
@@ -173,7 +173,7 @@ typedef struct ice1712
 	ice1712_settings	settings;
 } ice1712;
 
-status_t applySettings(ice1712 *card);
+status_t apply_settings(ice1712 *card);
 
 //For midi.c
 extern int32 num_cards;
