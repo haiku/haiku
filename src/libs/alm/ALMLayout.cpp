@@ -13,7 +13,6 @@
 
 #include <ControlLook.h>
 
-#include "ALMGroup.h"
 #include "RowColumnManager.h"
 #include "ViewLayoutItem.h"
 
@@ -61,7 +60,8 @@ BALMLayout::BALMLayout(float hSpacing, float vSpacing, BALMLayout* friendLayout)
 	fVSpacing(BControlLook::ComposeSpacing(vSpacing)),
 	fBadLayoutPolicy(new DefaultPolicy())
 {
-	fSolver = friendLayout ? friendLayout->Solver() : &fOwnSolver;
+	fSolver = friendLayout ? friendLayout->Solver() : new LinearSpec();
+	fSolver->AcquireReference();
 	fRowColumnManager = new RowColumnManager(fSolver);
 
 	fLeft = AddXTab();
@@ -86,6 +86,7 @@ BALMLayout::~BALMLayout()
 {
 	delete fRowColumnManager;
 	delete fBadLayoutPolicy;
+	fSolver->ReleaseReference();
 }
 
 

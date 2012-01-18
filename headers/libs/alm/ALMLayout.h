@@ -170,7 +170,6 @@ private:
 			bool				_TrySolve();
 
 			LinearProgramming::LinearSpec*	fSolver;
-			LinearProgramming::LinearSpec	fOwnSolver;
 
 			BReference<XTab>	fLeft;
 			BReference<XTab>	fRight;
