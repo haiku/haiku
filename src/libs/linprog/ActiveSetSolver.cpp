@@ -433,9 +433,14 @@ ActiveSetSolver::Solve()
 bool
 ActiveSetSolver::VariableAdded(Variable* variable)
 {
-	// TODO: error checks
-	fVariableGEConstraints.AddItem(NULL);
-	fVariableLEConstraints.AddItem(NULL);
+	if (fVariableGEConstraints.AddItem(NULL) == false)
+		return false;
+	if (fVariableLEConstraints.AddItem(NULL) == false) {
+		// clean up
+		int32 count = fVariableGEConstraints.CountItems();
+		fVariableGEConstraints.RemoveItemAt(count - 1);
+		return false;	
+	}
 	return true;
 }
 
@@ -443,8 +448,8 @@ ActiveSetSolver::VariableAdded(Variable* variable)
 bool
 ActiveSetSolver::VariableRemoved(Variable* variable)
 {
-	fVariableGEConstraints.RemoveItemAt(variable->Index());
-	fVariableLEConstraints.RemoveItemAt(variable->Index());
+	fVariableGEConstraints.RemoveItemAt(variable->GlobalIndex());
+	fVariableLEConstraints.RemoveItemAt(variable->GlobalIndex());
 	return true;
 }
 
@@ -454,7 +459,7 @@ ActiveSetSolver::VariableRangeChanged(Variable* variable)
 {
 	double min = variable->Min();
 	double max = variable->Max();
-	int32 variableIndex = variable->Index();
+	int32 variableIndex = variable->GlobalIndex();
 
 	Constraint* constraintGE = fVariableGEConstraints.ItemAt(variableIndex);
 	Constraint* constraintLE = fVariableLEConstraints.ItemAt(variableIndex);
