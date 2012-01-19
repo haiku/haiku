@@ -58,3 +58,10 @@ Application ALMBadLayout :
 	:
 	be libalm.so $(TARGET_LIBSTDC++)
 ;
+
+
+Application ALMNestedLayout :
+	NestedLayout.cpp
+	:
+	be libalm.so $(TARGET_LIBSTDC++)
+;
