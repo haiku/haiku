@@ -48,14 +48,6 @@ extern "C" {
 
 
 #define CALLED() //printf("CALLED %s\n",__PRETTY_FUNCTION__)
-
-#if defined(USE_X86_ASM)
-#include "x86/common_x86_asm.h"
-#endif
-
-#if defined(USE_PPC_ASM)
-#include "ppc/common_ppc_features.h"
-#endif
 }
 
 
