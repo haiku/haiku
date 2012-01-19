@@ -26,13 +26,21 @@ const BSize kUnsetSize(B_SIZE_UNSET, B_SIZE_UNSET);
 
 
 struct BALMLayout::XTabRemoverFunc {
+	XTabRemoverFunc()
+	{
+	}
+
 	void operator()(XTab* tab)
 	{
-		if (tab)
+		if (tab) {
 			layout->_RemoveSelfFromTab(tab);
+			if (index > 0)
+				layout->fXTabList.RemoveItemAt(index);
+		}
 	}
 
 	BALMLayout* layout;
+	int32 index;
 };
 
 
@@ -47,17 +55,30 @@ struct BALMLayout::XTabRemover
 	{
 		fDelete.layout = layout;
 	}
+
+	void SetIndexTo(int32 index)
+	{
+		fDelete.index = index;
+	}
 };
 
 
 struct BALMLayout::YTabRemoverFunc {
+	YTabRemoverFunc()
+	{
+	}
+
 	void operator()(YTab* tab)
 	{
-		if (tab)
+		if (tab) {
 			layout->_RemoveSelfFromTab(tab);
+			if (index > 0)
+				layout->fYTabList.RemoveItemAt(index);
+		}
 	}
 
 	BALMLayout* layout;
+	int32 index;
 };
 
 
@@ -71,6 +92,11 @@ struct BALMLayout::YTabRemover
 		Base(tab)
 	{
 		fDelete.layout = layout;
+	}
+
+	void SetIndexTo(int32 index)
+	{
+		fDelete.index = index;
 	}
 };
 
@@ -558,6 +584,10 @@ BALMLayout::AddItem(BLayoutItem* item, XTab* left, YTab* top, XTab* _right,
 		if (!left->AddedToLayout(this))
 			return NULL;
 		leftRemover.SetTo(left);
+
+		if (!fXTabList.AddItem(left, fXTabList.CountItems()))
+			return NULL;
+		leftRemover.SetIndexTo(fXTabList.CountItems() - 1);
 	}
 
 	YTabRemover topRemover(this);
@@ -565,6 +595,10 @@ BALMLayout::AddItem(BLayoutItem* item, XTab* left, YTab* top, XTab* _right,
 		if (!top->AddedToLayout(this))
 			return NULL;
 		topRemover.SetTo(top);
+
+		if (!fYTabList.AddItem(top, fYTabList.CountItems()))
+			return NULL;
+		topRemover.SetIndexTo(fYTabList.CountItems() - 1);
 	}
 
 	XTabRemover rightRemover(this);
@@ -572,6 +606,10 @@ BALMLayout::AddItem(BLayoutItem* item, XTab* left, YTab* top, XTab* _right,
 		if (!right->AddedToLayout(this))
 			return NULL;
 		rightRemover.SetTo(right);
+
+		if (!fXTabList.AddItem(right, fXTabList.CountItems()))
+			return NULL;
+		rightRemover.SetIndexTo(fXTabList.CountItems() - 1);
 	}
 
 	YTabRemover bottomRemover(this);
@@ -579,6 +617,10 @@ BALMLayout::AddItem(BLayoutItem* item, XTab* left, YTab* top, XTab* _right,
 		if (!bottom->AddedToLayout(this))
 			return NULL;
 		bottomRemover.SetTo(bottom);
+
+		if (!fYTabList.AddItem(bottom, fYTabList.CountItems()))
+			return NULL;
+		bottomRemover.SetIndexTo(fYTabList.CountItems() - 1);
 	}
 			
 	// Area is added in ItemAdded
