@@ -52,7 +52,6 @@ Application ALMComplexButtons :
 	be libalm.so $(TARGET_LIBSTDC++)
 ;
 
-
 Application ALMBadLayout :
 	BadLayout.cpp
 	:
@@ -62,6 +61,13 @@ Application ALMBadLayout :
 
 Application ALMNestedLayout :
 	NestedLayout.cpp
+	:
+	be libalm.so $(TARGET_LIBSTDC++)
+;
+
+
+Application ALMFriendLayout :
+	FriendLayout.cpp
 	:
 	be libalm.so $(TARGET_LIBSTDC++)
 ;
