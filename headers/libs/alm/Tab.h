@@ -17,18 +17,14 @@ namespace BALM {
 class BALMLayout;
 
 
-/**
- * Vertical grid line (x-tab).
- */
-class XTab : public Variable, public BReferenceable {
-public:
-	virtual						~XTab();
-
-protected:
-	friend	class				BALMLayout;
-								XTab(BALMLayout* layout);
-
+class TabBase {
 private:
+								TabBase();
+	virtual						~TabBase();
+
+			friend class BALMLayout;
+			friend class XTab;
+			friend class YTab;
 			struct BALMLayoutList;
 
 			bool				IsInLayout(BALMLayout* layout);
@@ -37,27 +33,33 @@ private:
 			bool				IsSuitableFor(BALMLayout* layout);
 
 			BALMLayoutList*		fLayouts;
+};
 
+
+/**
+ * Vertical grid line (x-tab).
+ */
+class XTab : public Variable, public TabBase, public BReferenceable {
+public:
+	virtual						~XTab();
+
+protected:
+	friend	class				BALMLayout;
+								XTab(BALMLayout* layout);
+
+private:
 			uint32				_reserved[2];
 };
 
 
-class YTab : public Variable, public BReferenceable {
+class YTab : public Variable, public TabBase, public BReferenceable {
 public:
 	virtual						~YTab();
 
 protected:
 	friend	class				BALMLayout;
 								YTab(BALMLayout* layout);
-
 private:
-			bool				IsInLayout(BALMLayout* layout);
-			bool				AddedToLayout(BALMLayout* layout);
-			void				LayoutLeaving(BALMLayout* layout);
-			bool				IsSuitableFor(BALMLayout* layout);
-
-			XTab::BALMLayoutList* fLayouts;
-
 			uint32				_reserved[2];
 };
 

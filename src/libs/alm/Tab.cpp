@@ -11,9 +11,10 @@
 
 
 using std::nothrow;
+using BALM::TabBase;
 
 
-struct XTab::BALMLayoutList {
+struct TabBase::BALMLayoutList {
 	BALMLayoutList(BALMLayout* _layout, BALMLayoutList* _next = NULL)
 		:
 		next(_next),
@@ -50,34 +51,27 @@ struct XTab::BALMLayoutList {
 };
 
 
-XTab::XTab(BALMLayout* layout)
+TabBase::TabBase()
 	:
-	Variable(layout->Solver()),
-	fLayouts(new BALMLayoutList(layout))
+	fLayouts(NULL)
 {
 }
 
 
-XTab::~XTab()
+TabBase::~TabBase()
 {
-	BALMLayoutList* layouts = fLayouts;
-	while (layouts) {
-		layouts->layout->fXTabList.RemoveItem(this);
-		layouts = layouts->next;
-	}
-	delete fLayouts;
 }
 
 
 bool
-XTab::IsInLayout(BALMLayout* layout)
+TabBase::IsInLayout(BALMLayout* layout)
 {
 	return fLayouts->HasLayout(layout);
 }
 
 
 bool
-XTab::AddedToLayout(BALMLayout* layout)
+TabBase::AddedToLayout(BALMLayout* layout)
 {
 	BALMLayoutList* newHead = new (nothrow) BALMLayoutList(layout, fLayouts);
 	if (newHead == NULL)
@@ -88,66 +82,52 @@ XTab::AddedToLayout(BALMLayout* layout)
 
 
 void
-XTab::LayoutLeaving(BALMLayout* layout)
+TabBase::LayoutLeaving(BALMLayout* layout)
 {
 	fLayouts = fLayouts->Remove(layout);
 }
 
 
 bool
-XTab::IsSuitableFor(BALMLayout* layout)
+TabBase::IsSuitableFor(BALMLayout* layout)
 {
 	return (fLayouts->layout->Solver() == layout->Solver());
 }
 
 
-YTab::YTab(BALMLayout* layout)
+XTab::XTab(BALMLayout* layout)
 	:
-	Variable(layout->Solver()),
-	fLayouts(new XTab::BALMLayoutList(layout))
+	Variable(layout->Solver())
 {
+	AddedToLayout(layout);
 }
 
 
-YTab::~YTab()
+XTab::~XTab()
 {
-	XTab::BALMLayoutList* layouts = fLayouts;
+	TabBase::BALMLayoutList* layouts = fLayouts;
 	while (layouts) {
-		layouts->layout->fYTabList.RemoveItem(this);
+		layouts->layout->fXTabList.RemoveItem(this);
 		layouts = layouts->next;
 	}
 	delete fLayouts;
 }
 
 
-bool
-YTab::IsInLayout(BALMLayout* layout)
+YTab::YTab(BALMLayout* layout)
+	:
+	Variable(layout->Solver())
 {
-	return fLayouts->HasLayout(layout);
+	AddedToLayout(layout);
 }
 
 
-bool
-YTab::AddedToLayout(BALMLayout* layout)
+YTab::~YTab()
 {
-	XTab::BALMLayoutList* newHead
-		= new (nothrow) XTab::BALMLayoutList(layout, fLayouts);
-	if (newHead == NULL)
-		return false;
-	fLayouts = newHead;
-	return true;
-}
-
-
-void
-YTab::LayoutLeaving(BALMLayout* layout)
-{
-	fLayouts = fLayouts->Remove(layout);
-}
-
-
-bool
-YTab::IsSuitableFor(BALMLayout* layout)
-{
-	return (fLayouts->layout->Solver() == layout->Solver());
+	TabBase::BALMLayoutList* layouts = fLayouts;
+	while (layouts) {
+		layouts->layout->fYTabList.RemoveItem(this);
+		layouts = layouts->next;
+	}
+	delete fLayouts;
 }
