@@ -25,80 +25,75 @@ using namespace LinearProgramming;
 const BSize kUnsetSize(B_SIZE_UNSET, B_SIZE_UNSET);
 
 
-struct BALMLayout::XTabRemoverFunc {
-	XTabRemoverFunc()
+namespace BALM {
+
+
+template <class T>
+struct BALMLayout::TabAddTransaction {
+	~TabAddTransaction()
 	{
+		if (fTab)
+			fLayout->_RemoveSelfFromTab(fTab);
+		if (fIndex > 0)
+			_TabList()->RemoveItemAt(fIndex);
 	}
 
-	void operator()(XTab* tab)
-	{
-		if (tab) {
-			layout->_RemoveSelfFromTab(tab);
-			if (index > 0)
-				layout->fXTabList.RemoveItemAt(index);
-		}
-	}
-
-	BALMLayout* layout;
-	int32 index;
-};
-
-
-struct BALMLayout::XTabRemover
-	: public AutoDeleter<XTab, BALMLayout::XTabRemoverFunc> {
-	
-	typedef AutoDeleter<XTab, BALMLayout::XTabRemoverFunc> Base;
-
-	XTabRemover(BALMLayout* layout, XTab* tab = NULL)
+	TabAddTransaction(BALMLayout* layout)
 		:
-		Base(tab)
+		fTab(NULL),
+		fLayout(layout),
+		fIndex(-1)
 	{
-		fDelete.layout = layout;
 	}
 
-	void SetIndexTo(int32 index)
+	bool AttempAdd(T* tab)
 	{
-		fDelete.index = index;
+		if (fLayout->_HasTabInLayout(tab))
+			return true;
+		if (!fLayout->_AddedTab(tab))
+			return false;
+		fTab = tab;
+
+		BObjectList<T>* tabList = _TabList();
+		int32 index = tabList->CountItems();
+		if (!tabList->AddItem(tab, index))
+			return false;
+		fIndex = index;
+		return true;
 	}
+
+	void Commit()
+	{
+		fTab = NULL;
+		fIndex = -1;
+	}
+
+private:
+	BObjectList<T>* _TabList();
+
+	T*				fTab;
+	BALMLayout*		fLayout;
+	int32			fIndex;
 };
 
 
-struct BALMLayout::YTabRemoverFunc {
-	YTabRemoverFunc()
-	{
-	}
-
-	void operator()(YTab* tab)
-	{
-		if (tab) {
-			layout->_RemoveSelfFromTab(tab);
-			if (index > 0)
-				layout->fYTabList.RemoveItemAt(index);
-		}
-	}
-
-	BALMLayout* layout;
-	int32 index;
-};
+template <>
+BObjectList<XTab>*
+BALMLayout::TabAddTransaction<XTab>::_TabList()
+{
+	return &fLayout->fXTabList;
+}
 
 
-struct BALMLayout::YTabRemover
-	: public AutoDeleter<YTab, BALMLayout::YTabRemoverFunc> {
-	
-	typedef AutoDeleter<YTab, BALMLayout::YTabRemoverFunc> Base;
+template <>
+BObjectList<YTab>*
+BALMLayout::TabAddTransaction<YTab>::_TabList()
+{
+	return &fLayout->fYTabList;
+}
 
-	YTabRemover(BALMLayout* layout, YTab* tab = NULL)
-		:
-		Base(tab)
-	{
-		fDelete.layout = layout;
-	}
 
-	void SetIndexTo(int32 index)
-	{
-		fDelete.index = index;
-	}
-};
+}; // end namespace BALM
 
 
 BALM::BALMLayout::BadLayoutPolicy::~BadLayoutPolicy()
@@ -578,51 +573,22 @@ BALMLayout::AddItem(BLayoutItem* item, XTab* left, YTab* top, XTab* _right,
 	if (bottom.Get() == NULL)
 		bottom = AddYTab();
 
-		// TODO: make sure all tabs get into the lists
-	XTabRemover leftRemover(this);
-	if (!left->IsInLayout(this)) {
-		if (!left->AddedToLayout(this))
-			return NULL;
-		leftRemover.SetTo(left);
+	TabAddTransaction<XTab> leftTabAdd(this);
+	if (!leftTabAdd.AttempAdd(left))
+		return NULL;
 
-		if (!fXTabList.AddItem(left, fXTabList.CountItems()))
-			return NULL;
-		leftRemover.SetIndexTo(fXTabList.CountItems() - 1);
-	}
+	TabAddTransaction<YTab> topTabAdd(this);
+	if (!topTabAdd.AttempAdd(top))
+		return NULL;
 
-	YTabRemover topRemover(this);
-	if (!top->IsInLayout(this)) {
-		if (!top->AddedToLayout(this))
-			return NULL;
-		topRemover.SetTo(top);
+	TabAddTransaction<XTab> rightTabAdd(this);
+	if (!rightTabAdd.AttempAdd(right))
+		return NULL;
 
-		if (!fYTabList.AddItem(top, fYTabList.CountItems()))
-			return NULL;
-		topRemover.SetIndexTo(fYTabList.CountItems() - 1);
-	}
+	TabAddTransaction<YTab> bottomTabAdd(this);
+	if (!bottomTabAdd.AttempAdd(bottom))
+		return NULL;
 
-	XTabRemover rightRemover(this);
-	if (_right != NULL && !right->IsInLayout(this)) {
-		if (!right->AddedToLayout(this))
-			return NULL;
-		rightRemover.SetTo(right);
-
-		if (!fXTabList.AddItem(right, fXTabList.CountItems()))
-			return NULL;
-		rightRemover.SetIndexTo(fXTabList.CountItems() - 1);
-	}
-
-	YTabRemover bottomRemover(this);
-	if (_bottom != NULL && !bottom->IsInLayout(this)) {
-		if (!bottom->AddedToLayout(this))
-			return NULL;
-		bottomRemover.SetTo(bottom);
-
-		if (!fYTabList.AddItem(bottom, fYTabList.CountItems()))
-			return NULL;
-		bottomRemover.SetIndexTo(fYTabList.CountItems() - 1);
-	}
-			
 	// Area is added in ItemAdded
 	if (!BAbstractLayout::AddItem(-1, item))
 		return NULL;
@@ -635,10 +601,10 @@ BALMLayout::AddItem(BLayoutItem* item, XTab* left, YTab* top, XTab* _right,
 	area->_Init(fSolver, left, top, right, bottom, fRowColumnManager);
 	fRowColumnManager->AddArea(area);
 
-	leftRemover.Detach();
-	rightRemover.Detach();
-	topRemover.Detach();
-	bottomRemover.Detach();
+	leftTabAdd.Commit();
+	topTabAdd.Commit();
+	rightTabAdd.Commit();
+	bottomTabAdd.Commit();
 	return area;
 }
 
@@ -1049,18 +1015,14 @@ BALMLayout::InsetForTab(YTab* tab) const
 }
 
 
-void
-BALMLayout::_RemoveSelfFromTab(XTab* tab)
-{
-	tab->LayoutLeaving(this);
-}
+void BALMLayout::_RemoveSelfFromTab(XTab* tab) { tab->LayoutLeaving(this); }
+void BALMLayout::_RemoveSelfFromTab(YTab* tab) { tab->LayoutLeaving(this); }
 
+bool BALMLayout::_HasTabInLayout(XTab* tab) { return tab->IsInLayout(this); }
+bool BALMLayout::_HasTabInLayout(YTab* tab) { return tab->IsInLayout(this); }
 
-void
-BALMLayout::_RemoveSelfFromTab(YTab* tab)
-{
-	tab->LayoutLeaving(this);
-}
+bool BALMLayout::_AddedTab(XTab* tab) { return tab->AddedToLayout(this); }
+bool BALMLayout::_AddedTab(YTab* tab) { return tab->AddedToLayout(this); }
 
 
 BLayoutItem*
