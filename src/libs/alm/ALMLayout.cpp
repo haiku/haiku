@@ -794,14 +794,15 @@ BALMLayout::DoLayout()
 
 	// Enforced absolute positions of Right and Bottom
 	BRect area(LayoutArea());
-	Right()->SetRange(area.right, area.right);
-	Bottom()->SetRange(area.bottom, area.bottom);
+	BSize size(area.Size());
+	Right()->SetRange(size.width, size.width);
+	Bottom()->SetRange(size.height, size.height);
 
 	_TrySolve();
 
 	// set the calculated positions and sizes for every area
 	for (int32 i = 0; i < CountItems(); i++)
-		AreaFor(ItemAt(i))->_DoLayout();
+		AreaFor(ItemAt(i))->_DoLayout(area.LeftTop());
 }
 
 

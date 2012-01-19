@@ -106,7 +106,7 @@ private:
 									Row* row, Column* column,
 									RowColumnManager* manager);
 
-			void				_DoLayout();
+			void				_DoLayout(const BPoint& offset);
 
 			void				_UpdateMinSizeConstraint(BSize min);
 			void				_UpdateMaxSizeConstraint(BSize max);

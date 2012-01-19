@@ -565,7 +565,7 @@ Area::_Init(LinearSpec* ls, Row* row, Column* column, RowColumnManager* manager)
  * Perform layout on the area.
  */
 void
-Area::_DoLayout()
+Area::_DoLayout(const BPoint& offset)
 {
 	// check if if we are initialized
 	if (!fLeft)
@@ -577,7 +577,7 @@ Area::_DoLayout()
 	areaFrame.top += TopInset();
 	areaFrame.bottom -= BottomInset();
 
-	fLayoutItem->AlignInFrame(areaFrame);
+	fLayoutItem->AlignInFrame(areaFrame.OffsetBySelf(offset));
 }
 
 
