@@ -144,7 +144,7 @@ copy_headers $haikuSourceDir/headers/posix $tmpIncludeDir/posix
 cd $gccObjDir
 CFLAGS="-O2" CXXFLAGS="-O2" $gccSourceDir/configure --prefix=$installDir \
 	--target=$haikuMachine --disable-nls --disable-shared \
-	--enable-languages=c,c++ \
+	--enable-languages=c,c++ --enable-lto --enable-frame-pointer \
 	--with-headers=$tmpIncludeDir --with-libs=$tmpLibDir \
 	$gccConfigureArgs || exit 1
 

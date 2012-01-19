@@ -529,8 +529,8 @@ acpi_configure_source_overrides(acpi_table_madt* madt)
 				if (info->SourceIrq != info->GlobalIrq) {
 					// we need a vector mapping
 					install_io_interrupt_handler(info->GlobalIrq,
-						&ioapic_source_override_handler, (void*)info->SourceIrq,
-						B_NO_ENABLE_COUNTER);
+						&ioapic_source_override_handler,
+						(void*)(addr_t)info->SourceIrq, B_NO_ENABLE_COUNTER);
 
 					sSourceOverrides[info->SourceIrq] = info->GlobalIrq;
 				}

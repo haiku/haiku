@@ -1185,22 +1185,22 @@ AUTO_SET_UP_CONFIG_VARIABLES +=
 
 
 # enable -Werror for certain parts of the source tree
-
-if $(HAIKU_GCC_VERSION[1]) = 2 {
-	rule EnableWerror dirTokens : scope {
-		AppendToConfigVar CCFLAGS : HAIKU_TOP $(dirTokens) : -Werror
-			: $(scope) ;
-		AppendToConfigVar C++FLAGS : HAIKU_TOP $(dirTokens) : -Werror
-			: $(scope) ;
-	}
-} else {
+HAIKU_WERRORFLAGS = ;
+if $(HAIKU_GCC_VERSION[1]) >= 4 {
 	# -Wuninitialized gives too many false positives.
-	rule EnableWerror dirTokens : scope {
-		AppendToConfigVar CCFLAGS : HAIKU_TOP $(dirTokens)
-			: -Werror -Wno-error=uninitialized : $(scope) ;
-		AppendToConfigVar C++FLAGS : HAIKU_TOP $(dirTokens)
-			: -Werror -Wno-error=uninitialized : $(scope) ;
+	HAIKU_WERRORFLAGS = -Wno-error=uninitialized ;
+
+	if $(HAIKU_GCC_VERSION[2]) >= 6 {
+		# TODO: remove the -Wno-unused-but-set-variable option
+		HAIKU_WERRORFLAGS += -Wno-unused-but-set-variable ;
 	}
+}
+
+rule EnableWerror dirTokens : scope {
+	AppendToConfigVar CCFLAGS : HAIKU_TOP $(dirTokens)
+		: -Werror $(HAIKU_WERRORFLAGS) : $(scope) ;
+	AppendToConfigVar C++FLAGS : HAIKU_TOP $(dirTokens)
+		: -Werror $(HAIKU_WERRORFLAGS) : $(scope) ;
 }
 
 # Work-around for GCC 2 problem -- despite -Wno-multichar it reports
