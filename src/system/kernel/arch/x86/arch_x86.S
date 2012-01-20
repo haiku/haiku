@@ -55,6 +55,12 @@ FUNCTION(i386_fxrstor):
 	ret
 FUNCTION_END(i386_fxrstor)
 
+/* void i386_noop_swap(void *old_fpu_state, const void *new_fpu_state); */
+FUNCTION(i386_noop_swap):
+	nop
+	ret
+FUNCTION_END(i386_noop_swap)
+
 /* void i386_fsave_swap(void *old_fpu_state, const void *new_fpu_state); */
 FUNCTION(i386_fnsave_swap):
 	movl	4(%esp),%eax

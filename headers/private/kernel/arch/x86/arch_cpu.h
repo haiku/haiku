@@ -334,6 +334,7 @@ void i386_fnsave(void* fpuState);
 void i386_fxsave(void* fpuState);
 void i386_frstor(const void* fpuState);
 void i386_fxrstor(const void* fpuState);
+void i386_noop_swap(void* oldFpuState, const void* newFpuState);
 void i386_fnsave_swap(void* oldFpuState, const void* newFpuState);
 void i386_fxsave_swap(void* oldFpuState, const void* newFpuState);
 uint32 x86_read_ebp();

@@ -300,13 +300,24 @@ x86_set_mtrrs(uint8 defaultType, const x86_mtrr_info* infos, uint32 count)
 
 
 extern "C" void
-init_sse(void)
+init_fpu(void)
 {
-	if (!x86_check_feature(IA32_FEATURE_SSE, FEATURE_COMMON)
-		|| !x86_check_feature(IA32_FEATURE_FXSR, FEATURE_COMMON)) {
-		// we don't have proper SSE support
+	if (!x86_check_feature(IA32_FEATURE_FPU, FEATURE_COMMON)) {
+		// No FPU... time to install one in your 386?
+		dprintf("Warning: CPU has no reported FPU.\n");
+		gX86SwapFPUFunc = i386_noop_swap;
 		return;
 	}
+
+	if (!x86_check_feature(IA32_FEATURE_SSE, FEATURE_COMMON)
+		|| !x86_check_feature(IA32_FEATURE_FXSR, FEATURE_COMMON)) {
+		dprintf("CPU has no SSE... just enabling FPU.\n");
+		// we don't have proper SSE support, just enable FPU
+		x86_write_cr0(x86_read_cr0() & ~(CR0_FPU_EMULATION | CR0_MONITOR_FPU));
+		gX86SwapFPUFunc = i386_fnsave_swap;
+		return;
+	}
+	dprintf("CPU has SSE... enabling FXSR and XMM.\n");
 
 	// enable OS support for SSE
 	x86_write_cr4(x86_read_cr4() | CR4_OS_FXSR | CR4_OS_XMM_EXCEPTION);
@@ -658,8 +669,8 @@ x86_double_fault_get_cpu(void)
 status_t
 arch_cpu_preboot_init_percpu(kernel_args *args, int cpu)
 {
-	x86_write_cr0(x86_read_cr0() & ~(CR0_FPU_EMULATION | CR0_MONITOR_FPU));
-	gX86SwapFPUFunc = i386_fnsave_swap;
+	// A simple nop FPU call until init_fpu
+	gX86SwapFPUFunc = i386_noop_swap;
 
 	// On SMP system we want to synchronize the CPUs' TSCs, so system_time()
 	// will return consistent values.
@@ -791,8 +802,8 @@ arch_cpu_init_post_vm(kernel_args *args)
 			DT_DATA_WRITEABLE, DPL_USER);
 	}
 
-	// setup SSE2/3 support
-	init_sse();
+	// setup FPU and SSE if supported
+	init_fpu();
 
 	return B_OK;
 }
