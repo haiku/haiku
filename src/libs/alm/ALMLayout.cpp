@@ -568,10 +568,11 @@ BALMLayout::AddItem(int32 index, BLayoutItem* item)
 
 
 Area*
-BALMLayout::AddItem(BLayoutItem* item, XTab* left, YTab* top, XTab* _right,
+BALMLayout::AddItem(BLayoutItem* item, XTab* _left, YTab* _top, XTab* _right,
 	YTab* _bottom)
 {
-	if (!left->IsSuitableFor(this) || !top->IsSuitableFor(this)
+	if ((_left && !_left->IsSuitableFor(this))
+			|| (_top && !_top->IsSuitableFor(this))
 			|| (_right && !_right->IsSuitableFor(this))
 			|| (_bottom && !_bottom->IsSuitableFor(this)))
 		debugger("Tab added to unfriendly layout!");
@@ -582,6 +583,12 @@ BALMLayout::AddItem(BLayoutItem* item, XTab* left, YTab* top, XTab* _right,
 	BReference<YTab> bottom = _bottom;
 	if (bottom.Get() == NULL)
 		bottom = AddYTab();
+	BReference<XTab> left = _left;
+	if (left.Get() == NULL)
+		left = AddXTab();
+	BReference<YTab> top = _top;
+	if (top.Get() == NULL)
+		top = AddYTab();
 
 	TabAddTransaction<XTab> leftTabAdd(this);
 	if (!leftTabAdd.AttempAdd(left))
