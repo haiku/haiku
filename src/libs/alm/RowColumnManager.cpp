@@ -138,16 +138,16 @@ RowColumnManager::_PreferredHeight(Row* row, double& weight)
 	double pref = 0;
 	for (int32 i = 0; i < row->fAreas.CountItems(); i++) {
 		BSize prefSize = row->fAreas.ItemAt(i)->Item()->PreferredSize();
-		if (prefSize.height > 0) {
-			nAreas++;
-			pref += prefSize.height;
-		}
+		if (prefSize.height <= 0)
+			continue;
+		nAreas++;
+		pref += prefSize.height;
 		double negPen = row->fAreas.ItemAt(i)->ShrinkPenalties().height;
 		if (negPen > 0)
 			weight += negPen;
 	}
 	if (nAreas == 0) {
-		pref = 0;
+		pref = -1;
 		weight = 1;
 	} else {
 		pref /= nAreas;
@@ -165,16 +165,17 @@ RowColumnManager::_PreferredWidth(Column* column, double& weight)
 	double pref = 0;
 	for (int32 i = 0; i < column->fAreas.CountItems(); i++) {
 		BSize prefSize = column->fAreas.ItemAt(i)->Item()->PreferredSize();
-		if (prefSize.width > 0) {
-			nAreas++;
-			pref += prefSize.width;
-		}
+		if (prefSize.width <= 0)
+			continue;
+		nAreas++;
+		pref += prefSize.width;
+
 		double negPen = column->fAreas.ItemAt(i)->ShrinkPenalties().height;
 		if (negPen > 0)
 			weight += negPen;
 	}
 	if (nAreas == 0) {
-		pref = 0;
+		pref = -1;
 		weight = 1;
 	} else {
 		pref /= nAreas;
