@@ -256,7 +256,7 @@ struct btrfs_dir_entry {
 	uint16 NameLength() const { return B_LENDIAN_TO_HOST_INT16(name_length); }
 	ino_t InodeID() const { return location.ObjectID(); }
 	uint16 Length() const
-		{ return sizeof(this) + NameLength() + DataLength(); }
+		{ return sizeof(*this) + NameLength() + DataLength(); }
 } _PACKED;
 
 struct btrfs_extent_data {
