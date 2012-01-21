@@ -388,13 +388,13 @@ keyboard_close(void *_cookie)
 
 		atomic_and(&ps2_device[PS2_DEVICE_KEYB].flags, ~PS2_FLAG_ENABLED);
 
-		if (cookie->is_reader)
-			sHasKeyboardReader = false;
-		if (cookie->is_debugger)
-			sHasDebugReader = false;
-
 		sKeyboardIds[0] = sKeyboardIds[1] = 0;
 	}
+
+	if (cookie->is_reader)
+		sHasKeyboardReader = false;
+	if (cookie->is_debugger) {
+		sHasDebugReader = false;
 
 	TRACE("ps2: keyboard_close done\n");
 	return B_OK;
