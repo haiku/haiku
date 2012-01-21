@@ -55,7 +55,7 @@ public:
 			int32					Timeout();
 			float					Width();
 
-			void					_ResizeAll();
+			void					_ShowHide();
 
 private:
 	friend class AppGroupView;

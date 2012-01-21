@@ -98,7 +98,7 @@ NotificationWindow::WorkspaceActivated(int32 /*workspace*/, bool active)
 {
 	// Ensure window is in the correct position
 	if (active)
-		_ResizeAll();
+		_ShowHide();
 }
 
 
@@ -187,7 +187,7 @@ NotificationWindow::MessageReceived(BMessage* message)
 
 					group->AddInfo(view);
 
-					_ResizeAll();
+					_ShowHide();
 
 					reply.AddInt32("error", B_OK);
 				} else
@@ -210,8 +210,6 @@ NotificationWindow::MessageReceived(BMessage* message)
 
 			if (it != fViews.end())
 				fViews.erase(it);
-
-			_ResizeAll();
 			break;
 		}
 		case kRemoveGroupView:
@@ -233,8 +231,7 @@ NotificationWindow::MessageReceived(BMessage* message)
 			if (GetLayout()->RemoveView(view))
 				delete view;
 
-			if (fAppViews.size() == 0)
-				Hide();
+			_ShowHide();
 			break;
 		}
 		default:
@@ -311,39 +308,14 @@ NotificationWindow::Width()
 
 
 void
-NotificationWindow::_ResizeAll()
+NotificationWindow::_ShowHide()
 {
-	appview_t::iterator aIt;
-	bool shouldHide = true;
-
-	for (aIt = fAppViews.begin(); aIt != fAppViews.end(); aIt++) {
-		AppGroupView* app = aIt->second;
-		if (app->HasChildren()) {
-			shouldHide = false;
-			break;
-		}
-	}
-
-	if (shouldHide) {
-		if (!IsHidden())
-			Hide();
+	if (fAppViews.empty() && !IsHidden()) {
+		Hide();
 		return;
 	}
 
-	for (aIt = fAppViews.begin(); aIt != fAppViews.end(); aIt++) {
-		AppGroupView* view = aIt->second;
-
-		if (!view->HasChildren()) {
-			if (!view->IsHidden())
-				view->Hide();
-		} else {
-			if (view->IsHidden())
-				view->Show();
-		}
-	}
-
 	SetPosition();
-
 	if (IsHidden())
 		Show();
 }
