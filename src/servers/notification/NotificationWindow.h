@@ -12,20 +12,17 @@
 #include <vector>
 #include <map>
 
-#include <Directory.h>
-#include <Deskbar.h>
-#include <Entry.h>
-#include <FindDirectory.h>
-#include <Message.h>
-#include <Notifications.h>
-#include <PropertyInfo.h>
+#include <AppFileInfo.h>
 #include <String.h>
 #include <Window.h>
 
 #include "NotificationView.h"
 
+
 class AppGroupView;
 class AppUsage;
+
+struct property_info;
 
 typedef std::map<BString, AppGroupView*> appview_t;
 typedef std::map<BString, AppUsage*> appfilter_t;

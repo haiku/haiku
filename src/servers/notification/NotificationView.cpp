@@ -13,18 +13,23 @@
  *		Adrien Destugues <pulkomandy@pulkomandy.ath.cx>
  */
 
-#include <ControlLook.h>
+
+#include "NotificationView.h"
+
+
+#include <Bitmap.h>
 #include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
-#include <Layout.h>
 #include <LayoutUtils.h>
+#include <MessageRunner.h>
 #include <Messenger.h>
+#include <Notification.h>
 #include <Path.h>
+#include <PropertyInfo.h>
 #include <Roster.h>
 #include <StatusBar.h>
 
-#include "NotificationView.h"
 #include "NotificationWindow.h"
+
 
 static const int kIconStripeWidth = 32;
 

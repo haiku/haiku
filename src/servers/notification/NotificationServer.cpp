@@ -8,6 +8,7 @@
 
 #include <Beep.h>
 #include <Notifications.h>
+#include <PropertyInfo.h>
 
 #include "NotificationWindow.h"
 #include "NotificationServer.h"

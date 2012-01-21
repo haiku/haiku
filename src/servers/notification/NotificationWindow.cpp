@@ -17,13 +17,15 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
+#include <Deskbar.h>
+#include <Directory.h>
 #include <File.h>
+#include <FindDirectory.h>
 #include <GroupLayout.h>
-#include <Layout.h>
 #include <NodeMonitor.h>
+#include <Notifications.h>
 #include <Path.h>
 #include <PropertyInfo.h>
-#include <private/interface/WindowPrivate.h>
 
 #include "AppGroupView.h"
 #include "AppUsage.h"

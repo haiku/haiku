@@ -100,7 +100,7 @@ AppGroupView::Draw(BRect updateRect)
 }
 
 
-	void
+void
 AppGroupView::MouseDown(BPoint point)
 {
 	if (fCloseRect.Contains(point)) {
