@@ -262,6 +262,8 @@ open_keyboards(int target, const char* start, struct keyboard* previous)
 					B_URGENT_DISPLAY_PRIORITY, keyboard);
 				if (keyboard->thread < 0) {
 					close(fd);
+					closedir(dir);
+					delete keyboard;
 					return NULL;
 				}
 
