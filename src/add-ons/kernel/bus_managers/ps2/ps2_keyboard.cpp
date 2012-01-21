@@ -393,7 +393,7 @@ keyboard_close(void *_cookie)
 
 	if (cookie->is_reader)
 		sHasKeyboardReader = false;
-	if (cookie->is_debugger) {
+	if (cookie->is_debugger)
 		sHasDebugReader = false;
 
 	TRACE("ps2: keyboard_close done\n");
