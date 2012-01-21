@@ -2,3 +2,5 @@ generated*
 build/jam/UserBuildConfig
 build/user_config_headers
 
+# ignore KDE backup files ending with a ~ 
+*~
