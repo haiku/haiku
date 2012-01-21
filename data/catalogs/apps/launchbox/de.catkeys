@@ -23,7 +23,7 @@ Failed to launch '%1'.\n\nError:	LaunchBox		'%1' konnte nicht gestartet werden.\
 Name Panel	LaunchBox		Namenspanel
 Add button here	LaunchBox		Feld hier einfügen
 Description for '%3'	LaunchBox		Beschreibung für '%3'
-Settings	LaunchBox		EInstellungen
+Settings	LaunchBox		Einstellungen
 Failed to launch 'something', error in Pad data.	LaunchBox		Start von 'irgendwas' fehlgeschlagen, Fehler in den Daten des Blocks.
 Pad %1	LaunchBox		Block %1
 Close	LaunchBox		Schließen

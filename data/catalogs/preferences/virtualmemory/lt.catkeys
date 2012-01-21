@@ -7,7 +7,7 @@ Physical memory: 	SettingsWindow		Fizinė atmintis:
 Changes will take effect on restart!	SettingsWindow		Kad pakeitimai įsigaliotų, reikia paleisti sistemą iš naujo!
 Defaults	SettingsWindow		Numatytai
 KB	SettingsWindow		KB
-Use volume:	SettingsWindow		Naudoti kaupiklį:
+Use volume:	SettingsWindow		Naudoti tomą:
 Insufficient space for a swap file.	SettingsWindow		Sukeitimų failui nepakanka vietos.
 Keep enabled	SettingsWindow		Palikti įjungtą
 Revert	SettingsWindow		Atšaukti pakeitimus

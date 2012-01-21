@@ -68,7 +68,7 @@ Does not handle file	OpenWithWindow		Kann die Datei nicht verarbeiten
 Arrange by	ContainerWindow		Icons ordnen nach
 Mount server error	AutoMounterSettings		Mountserver-Fehler
 Search	FindPanel		Suchen
-Preparing to empty Trash…	StatusWindow		Leeren des Papierkorbs wird vorbereitet...
+Preparing to empty Trash…	StatusWindow		Leeren des Papierkorbs wird vorbereitet…
 Disks	Model		Datenträger
 Create link	ContainerWindow		Verknüpfung erstellen
 develop	B_COMMON_DEVELOP_DIRECTORY		Programmierung
@@ -105,13 +105,13 @@ Invert selection	ContainerWindow		Auswahl umkehren
 Increase size	DeskWindow		Vergrößern
 Resize to fit	ContainerWindow		Optimale Größe
 %Ld bytes	WidgetAttributeText		%Ld Bytes
-Add printer…	ContainerWindow		Drucker hinzufügen...
+Add printer…	ContainerWindow		Drucker hinzufügen…
 Open	VolumeWindow		Öffnen
 New folder	ContainerWindow		Neuer Ordner
 Kind	ContainerWindow		Art
 rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	umzubenennen
 home	B_USER_DIRECTORY		Benutzer
-Select…	ContainerWindow		Auswählen...
+Select…	ContainerWindow		Auswählen…
 Copy to	ContainerWindow		Kopieren nach
 Move to Trash	ContainerWindow		In Papierkorb verschieben
 Move to	ContainerWindow		Verschieben nach
@@ -132,12 +132,12 @@ Clean up	VolumeWindow		Aufräumen
 OK	TrackerInitialState		OK
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		\"%name\" konnte nicht geöffnet werden. Die Datei ist fälschlicherweise als ausführbar gekennzeichnet.
 Add-ons	ContainerWindow		Add-ons
-Edit templates…	TemplatesMenu		Vorlagen bearbeiten...
+Edit templates…	TemplatesMenu		Vorlagen bearbeiten…
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Ein Objekt mit dem Namen \"%name\" existiert bereits in diesem Ordner. Soll es mit der Verknüpfung ersetzt werden, die gerade erstellt werden soll?
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Es ist nicht genug Speicherplatz auf dem Zieldatenträger frei, um die Auswahl zu kopieren.
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		\"%document\" konnte nicht mit der Anwendung \"%app\" geöffnet werden (%error).
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Es kann leider immer nur ein einzelnes Objekt gespeichert werden.
-Searching for disks to mount…	StatusWindow		Es werden Datenträger zum Einhängen gesucht...
+Searching for disks to mount…	StatusWindow		Es werden Datenträger zum Einhängen gesucht…
 New folder	FSUtils		Neuer Ordner
 Free space color	SettingsView		Farbe für freien Speicher
 Cut	ContainerWindow		Ausschneiden
@@ -148,7 +148,7 @@ Sorry, you can't copy items to the Trash.	FSClipBoard		Objekte können leider ni
 by attribute	FindPanel		nach Attribut
 Disk mounting during boot	AutoMounterSettings		Einhängen beim Systemstart
 New Query	FindPanel		Neue Query
-Preparing to move items…	StatusWindow		Verschieben wird vorbereitet...
+Preparing to move items…	StatusWindow		Verschieben wird vorbereitet…
 You cannot replace a file with a folder or a symbolic link.	FSUtils		Dateien können nicht mit Ordnern oder Verknüpfungen ersetzt werden.
 Unmount	InfoWindow		Aushängen
 no supporting apps	OpenWithWindow		keine unterstützenden Anwendungen
@@ -156,8 +156,8 @@ That name is already taken. Please type another one.	InfoWindow		Dieser Name wir
 Sorry, you can't create links in the Trash.	PoseView		Im Papierkorb können leider keine Verknüpfungen erstellt werden.
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Ein Objekt mit dem Namen \"%name\" existiert bereits in diesem Ordner und könnte\nObjekte mit gleichen Namen enthalten. Sollen sie mit denen des Ordners ersetzt werden, der %verb werden soll?
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Verknüpfe \"%name\" mit:
-Mount settings…	VolumeWindow		Einhänge-Einstellungen...
-Select…	VolumeWindow		Auswählen...
+Mount settings…	VolumeWindow		Einhänge-Einstellungen…
+Select…	VolumeWindow		Auswählen…
 All disks	FindPanel		Alle Datenträger
 Revert	TrackerSettingsWindow		Rückgängig
 Invert selection	QueryContainerWindow		Auswahl umkehren
@@ -166,7 +166,7 @@ Size	FindPanel		Größe
 1 item	CountView		1 Objekt
 Open parent	ContainerWindow		Eine Ebene höher
 Location:	InfoWindow		Ort:
-Edit favorites…	FilePanelPriv		Favoriten bearbeiten...
+Edit favorites…	FilePanelPriv		Favoriten bearbeiten…
 Create relative link	ContainerWindow		Relative Verknüpfung erstellen
 Copy	ContainerWindow		Kopieren
 Size	PoseView		Größe
@@ -183,7 +183,7 @@ You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould y
 Mini icon view	DeskWindow		Mini-Icon-Ansicht
 Error in regular expression:\n\n'%errstring'	PoseView		Fehler im regulären Ausdruck:\n\n'%errstring'
 Mount all	MountMenu		Alle einhängen
-calculating…	InfoWindow		Berechnung läuft...
+calculating…	InfoWindow		Berechnung läuft…
 Unmount	VolumeWindow		Aushängen
 Edit name	VolumeWindow		Umbenennen
 Mount all disks now	AutoMounterSettings		Alle Datenträger einhängen
@@ -195,7 +195,7 @@ Open	InfoWindow		Öffnen
 64 x 64	ContainerWindow		64 x 64
 Replace all	FSUtils		Alle ersetzen
 The application \"%appname\" does not support the type of document you are about to open. Are you sure you want to proceed? If you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Die Anwendung \"%appname\" unterstützt den Typ des zu öffnenden Dokuments nicht. Soll dennoch fortgefahren werden? Wenn die Anwendung den Typ eigentlich unterstützen müsste, sollte deren Autor gebeten werden, diesen Typ zur Liste der unterstützten Dokumente hinzuzufügen.
-Preparing to restore items…	StatusWindow		Wiederherstellen wird vorbereitet...
+Preparing to restore items…	StatusWindow		Wiederherstellen wird vorbereitet…
 Replace other file	WidgetAttributeText		Andere Datei ersetzen
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Einige der ausgewählten Objekte können nicht in den Papierkorb verschoben werden. Sollen sie stattdessen gelöscht werden? (Diese Aktion kann nicht rückgängig gemacht werden.)
 You cannot create a link to the root directory.	FSUtils		Auf das Root-Verzeichnis des Laufwerks kann keine Verknüpfung erstellt werden.
@@ -229,7 +229,7 @@ copy	FSUtils	filename copy	Kopie
 Temporary	FindPanel		Temporär
 Version	OpenWithWindow		Version
 Default application	InfoWindow		Standardanwendung
-Preparing to copy items…	StatusWindow		Kopieren wird vorbereitet...
+Preparing to copy items…	StatusWindow		Kopieren wird vorbereitet…
 Show folder location in title tab	SettingsView		Ordnerpfad im Fenstertitel zeigen
 Proceed	FSUtils		Fortfahren
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Manche Objekte in diesem Ordner heißen genauso wie Objekte, die gerade %verb werden sollen.\n\nSollen sie alle ersetzt werden, oder soll jedes Mal einzeln nachgefragt werden?
@@ -238,7 +238,7 @@ Error deleting items	FSUtils		Fehler beim Entfernen von Objekten
 Create relative link here	ContainerWindow		Relative Verknüpfung hier erstellen
 trash	B_TRASH_DIRECTORY		Papierkorb
 matches regular expression	SelectionWindow		entspricht regulärem Ausdruck
-Mount settings…	SettingsView		Einhänge-Einstellungen...
+Mount settings…	SettingsView		Einhänge-Einstellungen…
 Edit name	InfoWindow		Umbenennen
 Could not open \"%name\" (%error). 	FSUtils		\"%name\" konnte nicht geöffnet werden (%error).
 Paste	ContainerWindow		Einfügen
@@ -265,7 +265,7 @@ Add current folder	FilePanelPriv		Aktuellen Ordner hinzufügen
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" konnte nicht mit der Anwendung \"%app\" geöffnet werden (Fehlendes Symbol: %symbol).\n
 The target disk does not support creating links.	FSUtils		Der Zieldatenträger unterstützt das Erstellen von Verknüpfungen nicht.
 starts with	SelectionWindow		beginnt mit
-Preparing to delete items…	StatusWindow		Löschen wird vorbereitet...
+Preparing to delete items…	StatusWindow		Löschen wird vorbereitet…
 Enable type-ahead filtering	SettingsView		Filtern während der Eingabe
 Would you like to find a suitable application to open the file?	FSUtils		Soll nach einer geeigneten Anwendung gesucht werden, um die Datei zu öffnen?
 There was an error writing the attribute.	WidgetAttributeText		Fehler beim Schreiben des Attributs.
@@ -327,7 +327,7 @@ Current folder	ContainerWindow		Aktueller Ordner
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Der angegebene Name wird bereits von einem Ordner benutzt. Bitte einen anderen wählen.
 Clean up	ContainerWindow		Icons ausrichten
 after	FindPanel		nach
-Select…	QueryContainerWindow		Auswählen...
+Select…	QueryContainerWindow		Auswählen…
 link	FSUtils	filename link	Verknüpfung
 At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		Bei %func \nfind_directory() fehlgeschlagen \nGrund: %error
 The specified name is illegal. Please choose another name.	FilePanelPriv		Der angegebene Name ist nicht gültig. Bitte einen anderen wählen.
@@ -350,13 +350,13 @@ Don't automount	AutoMounterSettings		Nicht automatisch einhängen
 Save	FilePanelPriv		Speichern
 To: %dir	StatusWindow		Nach: %dir
 Window	FilePanelPriv		Fenster
-Find…	VolumeWindow		Suchen...
+Find…	VolumeWindow		Suchen…
 Edit name	FilePanelPriv		Umbenennen
 Size:	InfoWindow		Größe:
 Empty folder	SlowContextPopup		Leerer Ordner
 Open selection with:	OpenWithWindow		Auswahl öffnen mit:
 (%bytes bytes)	InfoWindow		(%bytes Bytes)
-Preparing to create links…	StatusWindow		Erstellen von Verknüpfungen wird vorbereitet...
+Preparing to create links…	StatusWindow		Erstellen von Verknüpfungen wird vorbereitet…
 Show navigator	SettingsView		Navigator zeigen
 Desktop	B_DESKTOP_DIRECTORY		Desktop
 List folders first	SettingsView		Ordner zuerst listen

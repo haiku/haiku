@@ -15,7 +15,7 @@ Install progress:  	InstallerWindow		Installationsverlauf:
 Starting Installation.	InstallProgress		Installation wird vorbereitet.
 This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Dies ist eine Alpha-Version! Es besteht ein hohes Risiko, dass wichtige Daten verloren gehen können. Man sollte seine Daten unbedingt regelmäßig sichern!\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		Soll die Installation wirklich abgebrochen werden?
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Soll tatsächlich auf das aktuelle Startlaufwerk installieren werden? Der Installer müsste dann hinterher den Rechner neustarten.
+Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Soll tatsächlich auf das aktuelle Startlaufwerk installiert werden? Der Installer müsste dann hinterher den Rechner neustarten.
 Quit Boot Manager	InstallerWindow		BootManager beenden
 Stop	InstallerWindow		Anhalten
 \t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n

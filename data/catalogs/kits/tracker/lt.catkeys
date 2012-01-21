@@ -22,7 +22,7 @@ Created	ContainerWindow		Sukūrimo data
 Error %error loading add-On %name.	ContainerWindow		Klaida %error įkeliant priedą „%name“.
 contains	SelectionWindow		savyje turi
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Apgailestaujame, tačiau į šakninį failų sistemos aplanką nieko rašyti neleidžiama.
-Show shared volumes on Desktop	SettingsView		Darbalaukyje rodyti bendrintus kaupiklius
+Show shared volumes on Desktop	SettingsView		Darbalaukyje rodyti bendrintus tomus
 Paste links	ContainerWindow		Įdėti nuorodas
 Name	OpenWithWindow		Pavadinimas
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Failo „%document“ nepavyko atverti, nes programa „%app“ yra Šiukšlinėje.
@@ -69,12 +69,12 @@ Arrange by	ContainerWindow		Rikiuoti pagal
 Mount server error	AutoMounterSettings		Tomų prijungimo tarnybos klaida
 Search	FindPanel		Ieškoti
 Preparing to empty Trash…	StatusWindow		Ruošiamasi tuštinti Šiukšlinę…
-Disks	Model		Diskai
+Disks	Model		Tomai
 Create link	ContainerWindow		Kurti nuorodą
 develop	B_COMMON_DEVELOP_DIRECTORY		Programavimas
 Decrease size	DeskWindow		Sumažinti
 Size	ContainerWindow		Dydis
-All disks	AutoMounterSettings		Visus kaupiklius
+All disks	AutoMounterSettings		Visus tomus
 Would you like to find some other suitable application?	FSUtils		Ar norėtumėte paieškoti kokios nors kitos tinkamos programos?
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Failo „%document“ nepavyko atverti programa „%app“ (trūksta bibliotekų: %library).\n
 no items	CountView		Objektų nėra
@@ -122,7 +122,7 @@ preferences	B_PREFERENCES_DIRECTORY		Nuostatos
 Cancel	FSUtils		Atsisakyti
 move	FSUtils	As in 'to move this folder...' (en) Um diesen Ordner zu verschieben...' (de)	perkelsite
 Edit name	ContainerWindow		Pervardinti
-Show volumes on Desktop	SettingsView		Rodyti kaupiklius darbalaukyje
+Show volumes on Desktop	SettingsView		Rodyti atskirus tomus
 KiB	WidgetAttributeText		KiB
 Error %error loading Add-On %name.	ContainerWindow		Klaida %error įkeliant priedą „%name“.
 Defaults	TrackerSettingsWindow		Numatytai
@@ -146,7 +146,7 @@ Resize to fit	QueryContainerWindow		Pritaikyti dydį prie turinio
 Desktop	TrackerSettingsWindow		Darbalaukis
 Sorry, you can't copy items to the Trash.	FSClipBoard		Deja, Šiukšlinėn objektų kopijuoti neleidžiama.
 by attribute	FindPanel		pagal požymį
-Disk mounting during boot	AutoMounterSettings		Įkeliant sistemą, prijungti kaupiklius:
+Disk mounting during boot	AutoMounterSettings		Įkeliant sistemą, prijungti tomus:
 New Query	FindPanel		Nauja užklausa
 Preparing to move items…	StatusWindow		Rengiamasi perkelti objektus…
 You cannot replace a file with a folder or a symbolic link.	FSUtils		Failo pakeisti aplanku arba simboline nuoroda negalima.
@@ -158,7 +158,7 @@ An item named \"%name\" already exists in this folder, and may contain\nitems wi
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Nukreipti „%name“ į:
 Mount settings…	VolumeWindow		Tomų prijungimo nuostatos…
 Select…	VolumeWindow		Pažymėti…
-All disks	FindPanel		Visuose kaupikliuose
+All disks	FindPanel		Visuose tomuose
 Revert	TrackerSettingsWindow		Atšaukti pakeitimus
 Invert selection	QueryContainerWindow		Invertuoti žymėjimą
 Execute	FilePermissionsView		Vykdyti
@@ -186,7 +186,7 @@ Mount all	MountMenu		Prijungti visus
 calculating…	InfoWindow		skaičiuojamas…
 Unmount	VolumeWindow		Atjungti
 Edit name	VolumeWindow		Pervardinti
-Mount all disks now	AutoMounterSettings		Prijungti visus kaupiklius dabar
+Mount all disks now	AutoMounterSettings		Prijungti visus tomus dabar
 Untitled bitmap	PoseView		Bevardis paveikslas
 of %items	StatusWindow		iš %items
 Description:	InfoWindow		Aprašas:
@@ -290,20 +290,20 @@ Move here	ContainerWindow		Perkelti čia
 File	FilePanelPriv		Failas
 Real name	ContainerWindow		Tikras vardas
 Error moving \"%name\"	FSUtils		Klaida perkeliant „%name“
-You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Objektus turėtumėte numesti ant vieno iš kaupiklių piktogramos lange „Kaupikliai“.
+You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Objektus turėtumėte numesti ant vieno iš tomų piktogramos Tomų lange.
 Cancel	WidgetAttributeText		Atsisakyti
 Could not find an application to open \"%name\" (%error). 	FSUtils		Nepavyko rasti programos, galinčios atverti „%name“ (%error).
 Create a Query template	FindPanel		Sukurti užklausos šabloną
-Previously mounted disks	AutoMounterSettings		Praėjusį kartą prijungtus kaupiklius
+Previously mounted disks	AutoMounterSettings		Praėjusį kartą prijungtus tomus
 %Ld B	WidgetAttributeText		%Ld B
 copying	FSUtils		kopijuojate
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Klaida kopijuojant aplanką „%name“:\n\t%error\nAr norite tęsti?
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	perkelsite
-Show Disks icon	SettingsView		Rodyti tomų piktogramą
+Show Disks icon	SettingsView		Rodyti Tomų piktogramą
 Mount	VolumeWindow		Prijungti
 Cancel	PoseView		Atsisakyti
 \n\t(%Ld bytes, 	FSUtils		\n\t(%Ld B, 
-You can't move or copy items to read-only volumes.	FSUtils		Perkelti ar kopijuoti objektų į kaupiklius, prijungtus tik skaitymui, negalima.
+You can't move or copy items to read-only volumes.	FSUtils		Perkelti ar kopijuoti objektų į tomus, prijungtus tik skaitymui, negalima.
 Unknown	FilePermissionsView		Nežinomas
 All files and folders	FindPanel		Visų failų ir aplankų
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Failo „%document“ nepavyko atverti (trūksta bibliotekų: %library).\n
@@ -337,16 +337,16 @@ Handles any file	OpenWithWindow		Palaiko visus failus
 Get info	FilePanelPriv		Savybės
 32 x 32	DeskWindow		32×32
 Cancel	FilePanelPriv		Atsisakyti
-Disks	DirMenu		Kaupikliai
+Disks	DirMenu		Tomai
 New folder %ld	FSUtils		Naujas aplankas %ld
-All BeOS disks	AutoMounterSettings		Visus „BeOS“ kaupiklius
+All BeOS disks	AutoMounterSettings		Visus „BeOS“ tomus
 Used space color	SettingsView		Užpildytos vietos spalva
 Sorry, could not create a new folder.	FSUtils		Deja, naujo aplanko sukurti nepavyko.
 multiple disks	FindPanel		keliuose diskuose
 Done	AutoMounterSettings		Užverti
-You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Objektus turite numesti į vieną iš tomų piktogramų Tomų lange.
+You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Objektus turėtumėte numesti ant vieno iš tomų piktogramos Tomų lange.
 Untitled clipping	PoseView		Bevardė iškarpa
-Don't automount	AutoMounterSettings		Automatiškai neprijunginėti
+Don't automount	AutoMounterSettings		Automatiškai neprijungti
 Save	FilePanelPriv		Įrašyti
 To: %dir	StatusWindow		Į: %dir
 Window	FilePanelPriv		Langas
@@ -433,7 +433,7 @@ If you %ifYouDoAction the config folder, %osName may not behave properly! Are yo
 Find…	ContainerWindow		Ieškti…
 Create a Query	FindPanel		Kurti užklausą
 Move to Trash	FSUtils		Išmesti Šiukšlinėn
-Automatic disk mounting	AutoMounterSettings		Automatiškai prijungti kaupiklius:
+Automatic disk mounting	AutoMounterSettings		Automatiškai prijungti tomus:
 Original name	ContainerWindow		Tikras vardas
 Find	FSUtils		Ieškoti
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Klaida kopijuojant failą „%name“:\n\t%error\n\nAr norite tęsti?

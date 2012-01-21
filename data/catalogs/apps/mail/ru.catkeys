@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-MAIL	1378960348
+1	russian	x-vnd.Be-MAIL	1799353819
 View	Mail		Вид
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Прикрепление атрибутов:
@@ -40,7 +40,6 @@ Find	Mail		Найти
 Preferences…	Mail		Настройки…
 Undo	Mail		Отменить
 Date:	Mail		Дата:
-Leave as New	Mail		Оставить как новое
 An error occurred trying to open this signature.	Mail		Возникла ошибка при попытке открытия этой подписи.
 No file attributes, just plain data	Mail		Без атрибутов, только данные
 Edit queries…	Mail		Изменить запросы…

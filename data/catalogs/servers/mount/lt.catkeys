@@ -1,17 +1,17 @@
 1	lithuanian	x-vnd.Haiku-mount_server	1422362183
 Mount read-only	AutoMounter		Prijungti tik skaitymui
-Error mounting volume:\n\n%s	AutoMounter		Klaida prijungiant kaupiklį:\n\n%s
+Error mounting volume:\n\n%s	AutoMounter		Klaida prijungiant tomą:\n\n%s
 Unmount error	AutoMounter		Atjungimo klaida
 Mount warning	AutoMounter		Prijugimo perspėjimas
 Mount read/write	AutoMounter		Prijungti skaitymui ir rašymui
-Mounting volume '%s'\n\n	AutoMounter		Prigijungiamas kaupiklis „%s“\n\n
+Mounting volume '%s'\n\n	AutoMounter		Prigijungiamas tomas „%s“\n\n
 Cancel	AutoMounter		Atsisakyti
-Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Nepavyko atjungti kaupiklio „%s“:\n\t%s\n\nAr atjungti privestinai?\n\nPastaba: jei kokia nors programa dabar ką nors į šį kaupiklį rašo, jį dabar atjungdami, rizikuojate prarasti duomenis.\n
-Could not unmount disk \"%s\":\n\t%s	AutoMounter		Nepavyko atjungti kaupiklio „%s“:\n\t%s
-Mounting volume <unnamed volume>\n\n	AutoMounter		Prijungiamas kaupiklis <nepavadintas kaupiklis>\n\n
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Nepavyko atjungti tomo „%s“:\n\t%s\n\nAr atjungti privestinai?\n\nPastaba: jei kokia nors programa dabar ką nors į šį tomą rašo, jį dabar atjungdami, rizikuojate prarasti duomenis.\n
+Could not unmount disk \"%s\":\n\t%s	AutoMounter		Nepavyko atjungti tomo „%s“:\n\t%s
+Mounting volume <unnamed volume>\n\n	AutoMounter		Prijungiamas bevardis tomas\n\n
 OK	AutoMounter		Gerai
-The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Failų sistema šiame kaupiklyje nėra „Haiku“ failų sistema. Rekomenduotina jį jungti tik skaitymo veiksena. Tai apsaugotų nuo galimo duomenų praradimo dėl „Haiku“ sistemos klaidų.
-Previous volumes mounted.	AutoMounter		Prijungti ankstesni kaupikliai.
+The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Failų sistema šiame tome nėra „Haiku“ failų sistema. Rekomenduotina jį jungti tik skaitymo veiksena. Tai apsaugotų nuo galimo duomenų praradimo dėl „Haiku“ sistemos klaidų.
+Previous volumes mounted.	AutoMounter		Prijungti ankstesni tomai.
 Mount error	AutoMounter		Prijungimo klaida
-It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Papildomus „Haiku“ kaupiklius patartina jungti tik skaitymo veiksena. Tai apsaugotų nuo galimo duomenų praradimo dėl „Haiku“ sistemos klaidų.
+It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Papildomus „Haiku“ tomus patartina jungti tik skaitymo veiksena. Tai apsaugotų nuo galimo duomenų praradimo dėl „Haiku“ sistemos klaidų.
 Force unmount	AutoMounter		Atjungti priverstinai

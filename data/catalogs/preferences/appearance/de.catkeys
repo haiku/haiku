@@ -24,7 +24,7 @@ Tooltip background	Colors tab		Tooltip - Hintergrund
 Selected menu item background	Colors tab		Menü - Hintergrund (ausgewählt)
 Antialiasing	APRWindow		Kantenglättung
 Navigation base	Colors tab		Navigation - Grundfarbe
-Window border	Colors tab		Fensterrahmen
+Window border	Colors tab		Fenster - Rahmen
 Window tab text	Colors tab		Reiter - Text
 Document text	Colors tab		Dokument - Text
 Navigation pulse	Colors tab		Navigation - Leuchtfarbe
@@ -40,7 +40,7 @@ Reduce colored edges filter strength:	AntialiasingSettingsView		Farbsaumfilter:
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Zur Vermeidung von möglichen Patentproblemen ist die Kombination von Subpixel-Kantenglättung und Glyph-Hinting deaktiviert. Um diese Funktion zu aktivieren, müssen spezielle Optionen im Konfigurationsheader der Freetype-Bibliothek freigeschaltet und anschließend Haiku neu kompiliert werden.
 Control text	Colors tab		Steuerelement - Text
 Tooltip text	Colors tab		Tooltip - Text
-Inactive window border	Colors tab		Fensterrahmen (inaktiv)
+Inactive window border	Colors tab		Fenster - Rahmen (inaktiv)
 Menu item text	Colors tab		Menü - Text
 LCD subpixel	AntialiasingSettingsView		LCD-Subpixel
 Selected menu item border	Colors tab		Menü - Rahmen (ausgewählt)

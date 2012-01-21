@@ -1,10 +1,11 @@
-1	german	x-vnd.Be-MAIL	1864344734
+1	german	x-vnd.Be-MAIL	2834665561
 View	Mail		Ansicht
 %d - Date	Mail		%d - Datum
 Attach attributes:	Mail		Attribute von Anhängen:
 Inconsistency occurred in the undo/redo buffer.	Mail		Es ist ein Fehler im Rückgängig/Wiederherstellen-Puffer aufgetreten.
 An error occurred trying to save the attachment.	Mail		Beim Speichern des Anhangs ist ein Fehler aufgetreten.
 Copy to new	Mail		In neue Nachricht kopieren
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Status 'New' belassen
 Edit	Mail		Bearbeiten
 Print	Mail		Drucken
 <none>	Mail		<kein>
@@ -40,7 +41,6 @@ Find	Mail		Suchen
 Preferences…	Mail		Einstellungen…
 Undo	Mail		Rückgängig
 Date:	Mail		Datum:
-Leave as New	Mail		Status 'New' belassen
 An error occurred trying to open this signature.	Mail		Beim Öffnen dieser Signatur ist ein Fehler aufgetreten.
 No file attributes, just plain data	Mail		Keine Dateiattribute, nur reine Daten
 Edit queries…	Mail		Queries bearbeiten…
@@ -64,6 +64,7 @@ Warn unencodable:	Mail		Warnung bei nicht-kodierbaren Zeichen:
 Quit	Mail		Beenden
 %n - Full name	Mail		%n - Voller Name
  Read 	Mail		 Gelesen 
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
 Trash	Mail		Löschen
 Default account:	Mail		Standardkonto:
 Size:	Mail		Größe:

@@ -12,7 +12,7 @@ Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		S
 %ld files added.	file:ZipOMaticWindow.cpp		%ld Dateien wurden hinzugefügt.
 Stopped	file:ZipOMaticWindow.cpp		Abgebrochen
 Archive	file:ZipperThread.cpp		Archiv
-Error creating archive	file:ZipOMaticWindow.cpp		Fehler bei Erzeugung des Archivs.
+Error creating archive	file:ZipOMaticWindow.cpp		Fehler beim Erzeugen des Archivs
 You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Es laufen %ld Zip-O-Matic-Instanzen.\n\n
-Archive created OK	file:ZipOMaticWindow.cpp		Archiv wurde fehlerfrei erzeugt.
+Archive created OK	file:ZipOMaticWindow.cpp		Archiv wurde fehlerfrei erzeugt
 Stop them	file:ZipOMatic.cpp		Abbrechen

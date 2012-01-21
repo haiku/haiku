@@ -11,7 +11,7 @@ Additional disk space required: 0.0 KiB	InstallerWindow		Papildomai reikės disk
 With GRUB it's: (hdN,n)\n\n	InstallerApp		„GRUB“ atveju jie įvardijami taip: (hdN,n)\n\n
 \tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	Nutraukti
-Install progress:  	InstallerWindow		Diegimo eiga: 
+Install progress:  	InstallerWindow		Įdiegiama: 
 Starting Installation.	InstallProgress		Diegimas pradedamas.
 This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Ši programinė įranga kol kas yra alfa kokybės! Tai reškia, jog ją naudojant, yra nemaža rizika prarasti svarbius duomenis. Įspėjame – dažnai darykitės atsargines kopijas!\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		Ar tikrai norite nutraukti diegimą?
@@ -55,7 +55,7 @@ The disk can't be mounted. Please choose a different disk.	InstallProgress		Šio
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku\" {\n
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Paleisti Diskų ženklintuvą, kuriuo galima\nskaidyti standžiuosius diskus ir kitus kaupiklius.\nSkaidinius galima suženklinti „Be“ failų sistema,\nkurią būtina naudoti „Haiku“ paleidimo skaidinyje.
 Show optional packages	InstallerWindow		Rodyti papildomus paketus
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Nerasta įdiegimui tinkamų skaidinių. Paruoškite ir suženklinkite kaip „Be File System“ bent vieną tomą.
+No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Nerasta įdiegimui tinkamų tomų. Paruoškite ir suženklinkite kaip „Be File System“ bent vieną tomą.
 Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		Be to, Jums teks paredaguoti dar vieną failą, kad paleidyklės meniu apskritai būtų rodomas:\n\n
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Pasirinkite paskirties diską „Haiku“ įdiegimui iš išskleidžiamojo meniu. Tada spustelėkite mygtuką „Pradėti“.
 Unknown Type	InstallProgress	Partition content type	tipas nežinomas

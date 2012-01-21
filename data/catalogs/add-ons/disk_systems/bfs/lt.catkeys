@@ -2,7 +2,7 @@
 Enable query support	BFS_Initialize_Parameter		Leisti užklausas
 2048 (Recommended)	BFS_Initialize_Parameter		2048 (rekomenduojamas)
 8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (daugiausia dideli failai)
-Disabling query support may speed up certain file system operations, but should only be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		Uždraudus užklausas, gali paspartėti kai kurios failų sistemos operacijos, tačiau tai turėtų būti daroma tik esant visiškai tikriems, kad užklausų nereikės.\nJeigu į kaupiklį ketinama diegti „Haiku“ ir iš jo šią sistemą leisti, užklausos turi būti leidžiamos.
+Disabling query support may speed up certain file system operations, but should only be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		Uždraudus užklausas, gali paspartėti kai kurios failų sistemos operacijos, tačiau tai turėtų būti daroma tik esant visiškai tikriems, kad užklausų nereikės.\nJeigu į tomą ketinama diegti „Haiku“ ir iš jo šią sistemą leisti, užklausos turi būti leidžiamos.
 1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (daugiausia maži failai)
 Blocksize:	BFS_Initialize_Parameter		Blokinio dydis:
 Name:	BFS_Initialize_Parameter		Pavadinimas:
