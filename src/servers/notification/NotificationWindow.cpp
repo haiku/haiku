@@ -100,7 +100,7 @@ NotificationWindow::WorkspaceActivated(int32 /*workspace*/, bool active)
 {
 	// Ensure window is in the correct position
 	if (active)
-		_ShowHide();
+		SetPosition();
 }
 
 
@@ -317,9 +317,10 @@ NotificationWindow::_ShowHide()
 		return;
 	}
 
-	SetPosition();
-	if (IsHidden())
+	if (IsHidden()) {
+		SetPosition();
 		Show();
+	}
 }
 
 
