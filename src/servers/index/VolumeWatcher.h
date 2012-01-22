@@ -21,7 +21,6 @@
 #include "AnalyserDispatcher.h"
 #include "CatchUpManager.h"
 #include "IndexServerAddOn.h"
-#include "ModifiedNotifications.h"
 
 
 class VolumeWatcher;
@@ -41,6 +40,8 @@ public:
 									ino_t node, dev_t nodeDevice);
 			void				StatChanged(ino_t node, dev_t device,
 									int32 statFields);
+
+			void				MessageReceived(BMessage* msg);
 private:
 			VolumeWatcher*		fVolumeWatcher;
 };
@@ -127,7 +128,6 @@ public:
 								VolumeWatcher(const BVolume& volume);
 								~VolumeWatcher();
 
-			void				MessageReceived(BMessage *message);
 			bool				StartWatching();
 			void				Stop();
 
@@ -157,7 +157,6 @@ private:
 
 			VolumeWorker*		fVolumeWorker;
 			CatchUpManager		fCatchUpManager;
-			ModfiedNotifications	fModfiedNotifications;
 };
 
 

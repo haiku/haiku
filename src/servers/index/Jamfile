@@ -10,7 +10,6 @@ Server index_server :
 	main.cpp
 	IndexServer.cpp
 	IndexServerAddOn.cpp
-	ModifiedNotifications.cpp
 	VolumeWatcher.cpp
 
 	# storage

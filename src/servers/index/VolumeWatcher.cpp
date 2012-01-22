@@ -74,6 +74,44 @@ WatchNameHandler::StatChanged(ino_t node, dev_t device, int32 statFields)
 }
 
 
+void
+WatchNameHandler::MessageReceived(BMessage* msg)
+{
+	if (msg->what == B_NODE_MONITOR) {
+		int32 opcode;
+		if (msg->FindInt32("opcode", &opcode) == B_OK) {
+			switch (opcode) {
+			case B_STAT_CHANGED: {
+				BString name;
+				entry_ref ref;
+				ino_t node;
+				int32 statFields;
+				msg->FindInt32("fields", &statFields);
+				if ((statFields & B_STAT_MODIFICATION_TIME) == 0)
+					break;
+				msg->FindInt32("device", &ref.device);
+				msg->FindInt64("node", &node);
+				msg->FindInt64("directory", &ref.directory);
+				msg->FindString("name", &name);
+
+				ref.set_name(name);
+
+				BPath path(&ref);
+				printf("stat changed node %i name %s %s\n", (int)node,
+					name.String(), path.Path());
+
+				fVolumeWatcher->fModifiedList.CurrentList()->push_back(ref);
+				fVolumeWatcher->_NewEntriesArrived();
+
+				break;
+			}
+			}
+		}
+	}
+	NodeMonitorHandler::MessageReceived(msg);
+}
+
+
 AnalyserDispatcher::AnalyserDispatcher(const char* name)
 	:
 	BLooper(name, B_LOW_PRIORITY),
@@ -408,33 +446,6 @@ VolumeWatcher::~VolumeWatcher()
 }
 
 
-void
-VolumeWatcher::MessageReceived(BMessage *message)
-{
-	int32 opcode;
-	switch (message->what) {
-		case B_QUERY_UPDATE:
-			message->FindInt32("opcode", &opcode);
-			if (opcode == B_ATTR_CHANGED || opcode == B_ENTRY_CREATED) {
-				const char *name;
-				ino_t directory;
-				dev_t device;
-				if ((message->FindString("name", &name) != B_OK) ||
-					(message->FindInt64("directory", &directory) != B_OK) ||
-					(message->FindInt32("device", &device) != B_OK))
-					break;
-				entry_ref ref(device, directory, name);
-				fModifiedList.CurrentList()->push_back(ref);
-				_NewEntriesArrived();
-			}
-			break;
-
-		default:
-			BLooper::MessageReceived(message);
-	}
-}
-
-
 bool
 VolumeWatcher::StartWatching()
 {
@@ -442,9 +453,7 @@ VolumeWatcher::StartWatching()
 
 	watch_volume(fVolume.Device(), B_WATCH_NAME | B_WATCH_STAT,
 		&fWatchNameHandler);
-	if (fModfiedNotifications.StartWatching(fVolume.Device(), real_time_clock(),
-		this) != B_OK)
-		return false;
+
 	// set the time after start watching to not miss anything
 	fVolumeWorker->SetWatchingStart(real_time_clock_usecs());
 
