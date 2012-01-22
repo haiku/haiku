@@ -9,22 +9,56 @@
 //! BPicture records a series of drawing instructions that can be "replayed" later.
 
 
-#include <AppServerLink.h>
-#include <PicturePlayer.h>
-#include <ServerProtocol.h>
-
-//#define DEBUG 1
-#include <Debug.h>
-#include <ByteOrder.h>
-#include <List.h>
-#include <Message.h>
 #include <Picture.h>
 
+#include <new>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <new>
+//#define DEBUG 1
+#include <ByteOrder.h>
+#include <Debug.h>
+#include <List.h>
+#include <Message.h>
+
+#include <AppServerLink.h>
+#include <Autolock.h>
+#include <ObjectList.h>
+#include <PicturePlayer.h>
+#include <ServerProtocol.h>
+
+#include "PicturePrivate.h"
+
+
+static BObjectList<BPicture> sPictureList;
+static BLocker sPictureListLock;
+
+
+void
+reconnect_pictures_to_app_server()
+{
+	BAutolock _(sPictureListLock);
+	for (int32 i = 0; i < sPictureList.CountItems(); i++) {
+		BPicture::Private picture(sPictureList.ItemAt(i));
+		picture.ReconnectToAppServer();
+	}
+}
+
+
+BPicture::Private::Private(BPicture* picture)
+	:
+	fPicture(picture)
+{
+}
+
+
+void
+BPicture::Private::ReconnectToAppServer()
+{
+	fPicture->_Upload();
+}
+
 
 struct _BPictureExtent_ {
 							_BPictureExtent_(const int32 &size = 0);
@@ -179,11 +213,16 @@ BPicture::_InitData()
 	fUsurped = NULL;
 
 	fExtent = new (std::nothrow) _BPictureExtent_;
+
+	BAutolock _(sPictureListLock);
+	sPictureList.AddItem(this);
 }
 
 
 BPicture::~BPicture()
 {
+	BAutolock _(sPictureListLock);
+	sPictureList.RemoveItem(this);
 	_DisposeData();
 }
 
@@ -385,8 +424,8 @@ BPicture::_AssertServerCopy()
 status_t
 BPicture::_Upload()
 {
-	ASSERT(fToken == -1);
-	ASSERT(fExtent->Data() != NULL);
+	if (fExtent == NULL || fExtent->Data() == NULL)
+		return B_BAD_VALUE;
 
 	BPrivate::AppServerLink link;
 

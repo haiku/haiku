@@ -3637,6 +3637,9 @@ BView::EndPicture()
 			fCurrentPicture = picture->StepDown();
 			picture->SetToken(token);
 
+			// TODO do this more efficient e.g. use a shared area and let the
+			// client write into it
+			picture->_Download();
 			return picture;
 		}
 	}

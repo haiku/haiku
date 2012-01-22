@@ -35,6 +35,7 @@ public:
 			status_t			Flatten(BDataIO* stream);
 			status_t			Unflatten(BDataIO* stream);
 
+	class Private;
 private:
 	// FBC padding and forbidden methods
 	virtual	void				_ReservedPicture1();
@@ -47,6 +48,7 @@ private:
 	friend class BWindow;
 	friend class BView;
 	friend class BPrintJob;
+	friend class Private;
 
 			void				_InitData();
 			void				_DisposeData();
@@ -70,7 +72,6 @@ private:
 
 			void				Usurp(BPicture* lameDuck);
 			BPicture*			StepDown();
-		
 
 private:
 			int32				fToken;
