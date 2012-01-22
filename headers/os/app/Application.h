@@ -122,6 +122,7 @@ private:
 			status_t			_SetupServerAllocator();
 			status_t			_InitGUIContext();
 			status_t			_ConnectToServer();
+			void				_ReconnectToServer();
 			bool				_QuitAllWindows(bool force);
 			bool				_WindowQuitLoop(bool quitFilePanels, bool force);
 			void				_ArgvReceived(BMessage* message);

@@ -165,11 +165,19 @@ is_app_showing_modal_window(team_id team)
 }
 
 
+static port_id sServerPort = -1;
+
+
+void
+invalidate_server_port()
+{
+	sServerPort = -1;
+}
+
+
 port_id
 get_app_server_port()
 {
-	static port_id sServerPort = -1;
-
 	if (sServerPort < 0) {
 		// No need for synchronization - in the worst case, we'll call
 		// find_port() twice.

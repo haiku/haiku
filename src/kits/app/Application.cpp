@@ -26,6 +26,7 @@
 #include <File.h>
 #include <Locker.h>
 #include <MessageRunner.h>
+#include <ObjectList.h>
 #include <Path.h>
 #include <PropertyInfo.h>
 #include <RegistrarDefs.h>
@@ -36,9 +37,11 @@
 #include <AppMisc.h>
 #include <AppServerLink.h>
 #include <AutoLocker.h>
+#include <BitmapPrivate.h>
 #include <DraggerPrivate.h>
 #include <LooperList.h>
 #include <MenuWindow.h>
+#include <PicturePrivate.h>
 #include <PortLink.h>
 #include <RosterPrivate.h>
 #include <ServerMemoryAllocator.h>
@@ -596,6 +599,12 @@ BApplication::MessageReceived(BMessage *message)
 			// (see _InitData())
 			be_roster->ActivateApp(Team());
 			break;
+
+		case kMsgAppServerRestarted:
+		{
+			_ReconnectToServer();
+			break;
+		}
 
 		default:
 			BLooper::MessageReceived(message);
@@ -1281,6 +1290,34 @@ BApplication::_ConnectToServer()
 
 	fServerReadOnlyMemory = base;
 	return B_OK;
+}
+
+
+void
+BApplication::_ReconnectToServer()
+{
+	delete_port(fServerLink->SenderPort());
+	delete_port(fServerLink->ReceiverPort());
+	invalidate_server_port();
+
+	if (_ConnectToServer() != B_OK)
+		debugger("Can't reconnect to app server!");
+
+	AutoLocker<BLooperList> listLock(gLooperList);
+	if (!listLock.IsLocked())
+		return;
+
+	uint32 count = gLooperList.CountLoopers();
+	for (uint32 i = 0; i < count ; i++) {
+		BWindow* window = dynamic_cast<BWindow*>(gLooperList.LooperAt(i));
+		if (window == NULL)
+			continue;
+		BMessenger windowMessenger(window);
+		windowMessenger.SendMessage(kMsgAppServerRestarted);
+	}
+
+	reconnect_bitmaps_to_app_server();
+	reconnect_pictures_to_app_server();
 }
 
 
