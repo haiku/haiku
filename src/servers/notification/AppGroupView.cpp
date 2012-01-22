@@ -52,6 +52,7 @@ AppGroupView::Draw(BRect updateRect)
 	// Draw the header background
 	if (be_control_look != NULL) {
 		SetHighColor(tint_color(menuColor, 1.22));
+		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		StrokeLine(bounds.LeftTop(), bounds.LeftBottom());
 		uint32 borders = BControlLook::B_TOP_BORDER
 			| BControlLook::B_BOTTOM_BORDER | BControlLook::B_RIGHT_BORDER;
