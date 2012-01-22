@@ -224,14 +224,19 @@ SocketConnection::Connect(const char* server, uint32 port)
 	if (status != B_OK)
 		return status;
 
+	TRACE("Server resolves to %s\n", address.ToString().String());
+
 	fSocket = socket(address.Family(), SOCK_STREAM, 0);
-	if (fSocket < 0)
+	if (fSocket < 0) {
+		TRACE("%s: Socket Error: %s\n", __func__, strerror(status));
 		return errno;
+	}
 
 	int result = connect(fSocket, address, address.Length());
 	if (result < 0) {
+		TRACE("%s: Connect Error: %s\n", __func__, strerror(result));
 		close(fSocket);
-		return errno;
+		return result;
 	}
 
 	TRACE("SocketConnection: connected\n");

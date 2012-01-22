@@ -345,8 +345,15 @@ IMAPInboundProtocol::Connect(const char* server, const char* username,
 	status_t status = fIMAPMailbox.Connect(server, username, password, useSSL,
 		port);
 	if (status != B_OK) {
-		statusMessage = "Failed to login: ";
-		statusMessage += fIMAPMailbox.CommandError();
+		if (fIMAPMailbox.CommandError().CountChars() > 0) {
+			// This was a IMAP error
+			statusMessage = "Failed to login: ";
+			statusMessage += fIMAPMailbox.CommandError();
+		} else {
+			// Probably a connection error
+			statusMessage = "Connection error: ";
+			statusMessage += strerror(status);
+		}
 		ShowError(statusMessage);
 		ResetProgress();
 		return status;
