@@ -15,6 +15,7 @@
 #include <AppServerLink.h>
 #include <MessagePrivate.h>
 #include <ObjectListPrivate.h>
+#include <RosterPrivate.h>
 
 #include <Autolock.h>
 #include <Deskbar.h>
@@ -599,6 +600,15 @@ InputServer::MessageReceived(BMessage* message)
 
 				}
 			}
+			return;
+		}
+
+		case kMsgAppServerRestarted:
+		{
+			BApplication::MessageReceived(message);
+			BPrivate::AppServerLink link;
+			link.StartMessage(AS_REGISTER_INPUT_SERVER);
+			link.Flush();
 			return;
 		}
 
