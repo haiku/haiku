@@ -43,6 +43,7 @@
 #include <MenuPrivate.h>
 #include <MessagePrivate.h>
 #include <PortLink.h>
+#include <RosterPrivate.h>
 #include <ServerProtocol.h>
 #include <TokenSpace.h>
 #include <ToolTipManager.h>
@@ -722,6 +723,58 @@ BWindow::MessageReceived(BMessage* msg)
 	if (!msg->HasSpecifiers()) {
 		if (msg->what == B_KEY_DOWN)
 			_KeyboardNavigation();
+
+		if (msg->what == (int32)kMsgAppServerRestarted) {
+			fLink->SetSenderPort(BApplication::Private::ServerLink()->SenderPort());
+
+			BPrivate::AppServerLink lockLink;
+				// we're talking to the server application using our own
+				// communication channel (fLink) - we better make sure no one
+				// interferes by locking that channel (which AppServerLink does
+				// implicetly)
+
+			fLink->StartMessage(AS_CREATE_WINDOW);
+
+			fLink->Attach<BRect>(fFrame);
+			fLink->Attach<uint32>((uint32)fLook);
+			fLink->Attach<uint32>((uint32)fFeel);
+			fLink->Attach<uint32>(fFlags);
+			fLink->Attach<uint32>(0);
+			fLink->Attach<int32>(_get_object_token_(this));
+			fLink->Attach<port_id>(fLink->ReceiverPort());
+			fLink->Attach<port_id>(fMsgPort);
+			fLink->AttachString(fTitle);
+
+			port_id sendPort;
+			int32 code;
+			if (fLink->FlushWithReply(code) == B_OK
+				&& code == B_OK
+				&& fLink->Read<port_id>(&sendPort) == B_OK) {
+				// read the frame size and its limits that were really
+				// enforced on the server side
+
+				fLink->Read<BRect>(&fFrame);
+				fLink->Read<float>(&fMinWidth);
+				fLink->Read<float>(&fMaxWidth);
+				fLink->Read<float>(&fMinHeight);
+				fLink->Read<float>(&fMaxHeight);
+
+				fMaxZoomWidth = fMaxWidth;
+				fMaxZoomHeight = fMaxHeight;
+			} else
+				sendPort = -1;
+
+			// Redirect our link to the new window connection
+			fLink->SetSenderPort(sendPort);
+
+			// connect all views to the server again
+			fTopView->_CreateSelf();
+
+			if (fShowLevel >= 1) {
+				fLink->StartMessage(AS_SHOW_WINDOW);
+				fLink->Flush();
+			}
+		}
 
 		return BLooper::MessageReceived(msg);
 	}
