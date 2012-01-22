@@ -13,6 +13,10 @@
 #include <Roster.h>
 
 
+const int32 kMsgAppServerRestarted = 'ASRe';
+const int32 kMsgRestartAppServer = 'ReAS';
+
+
 class BRoster::Private {
 	public:
 		Private() : fRoster(const_cast<BRoster*>(be_roster)) {}

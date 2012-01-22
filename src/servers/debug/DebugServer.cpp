@@ -25,6 +25,7 @@
 #include <Locale.h>
 #include <Path.h>
 
+#include <MessengerPrivate.h>
 #include <RegistrarDefs.h>
 #include <RosterPrivate.h>
 #include <Server.h>
@@ -865,8 +866,10 @@ TeamDebugHandler::_HandlerThread()
 		kill = true;
 	}
 
+	bool isGuiServer = _IsGUIServer();
+
 	// kill the team or hand it over to the debugger
-	thread_id debuggerThread;
+	thread_id debuggerThread = -1;
 	if (kill) {
 		// The team shall be killed. Since that is also the handling in case
 		// an error occurs while handing over the team to the debugger, we do
@@ -918,6 +921,22 @@ TeamDebugHandler::_HandlerThread()
 
 	// remove this handler from the roster and delete it
 	TeamDebugHandlerRoster::Default()->RemoveHandler(fTeam);
+
+	if (isGuiServer) {
+		// wait till debugging is done
+		status_t dummy;
+		wait_for_thread(debuggerThread, &dummy);
+
+		// find the registrar port
+		port_id rosterPort = find_port(BPrivate::get_roster_port_name());
+		port_info info;
+		BMessenger messenger;
+		if (rosterPort >= 0 && get_port_info(rosterPort, &info) == B_OK) {
+			BMessenger::Private(messenger).SetTo(info.team, rosterPort,
+				B_PREFERRED_TOKEN);
+		}
+		messenger.SendMessage(kMsgRestartAppServer);
+	}
 
 	delete this;
 

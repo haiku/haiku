@@ -59,6 +59,8 @@ public:
 			void			HandleLoadRecentLists(BMessage* request);
 			void			HandleSaveRecentLists(BMessage* request);
 
+			void			HandleRestartAppServer(BMessage* request);
+
 			void			ClearRecentDocuments();
 			void			ClearRecentFolders();
 			void			ClearRecentApps();
