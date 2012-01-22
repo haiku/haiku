@@ -221,22 +221,24 @@ SocketConnection::Connect(const char* server, uint32 port)
 
 	BNetworkAddress address;
 	status_t status = address.SetTo(server, port);
-	if (status != B_OK)
+	if (status != B_OK) {
+		TRACE("%s: Address Error: %s\n", __func__, strerror(status));
 		return status;
+	}
 
 	TRACE("Server resolves to %s\n", address.ToString().String());
 
 	fSocket = socket(address.Family(), SOCK_STREAM, 0);
 	if (fSocket < 0) {
-		TRACE("%s: Socket Error: %s\n", __func__, strerror(status));
+		TRACE("%s: Socket Error: %s\n", __func__, strerror(errno));
 		return errno;
 	}
 
 	int result = connect(fSocket, address, address.Length());
 	if (result < 0) {
-		TRACE("%s: Connect Error: %s\n", __func__, strerror(result));
+		TRACE("%s: Connect Error: %s\n", __func__, strerror(errno));
 		close(fSocket);
-		return result;
+		return errno;
 	}
 
 	TRACE("SocketConnection: connected\n");
