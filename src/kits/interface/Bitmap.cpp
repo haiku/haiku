@@ -32,6 +32,8 @@
 
 #include <ApplicationPrivate.h>
 #include <AppServerLink.h>
+#include <Autolock.h>
+#include <ObjectList.h>
 #include <ServerMemoryAllocator.h>
 #include <ServerProtocol.h>
 
@@ -40,6 +42,35 @@
 
 
 using namespace BPrivate;
+
+
+static BObjectList<BBitmap> sBitmapList;
+static BLocker sBitmapListLock;
+
+
+void
+reconnect_bitmaps_to_app_server()
+{
+	BAutolock _(sBitmapListLock);
+	for (int32 i = 0; i < sBitmapList.CountItems(); i++) {
+		BBitmap::Private bitmap(sBitmapList.ItemAt(i));
+		bitmap.ReconnectToAppServer();
+	}
+}
+
+
+BBitmap::Private::Private(BBitmap* bitmap)
+	:
+	fBitmap(bitmap)
+{
+}
+
+
+void
+BBitmap::Private::ReconnectToAppServer()
+{
+	fBitmap->_ReconnectToAppServer();
+}
 
 
 /*!	\brief Returns the number of bytes per row needed to store the actual
@@ -1087,6 +1118,9 @@ BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 				fAreaOffset = -1;
 				// NOTE: why not "0" in case of error?
 				fFlags = flags;
+			} else {
+				BAutolock _(sBitmapListLock);
+				sBitmapList.AddItem(this);
 			}
 		}
 		fWindow = NULL;
@@ -1157,6 +1191,9 @@ BBitmap::_CleanUp()
 		fArea = -1;
 		fServerToken = -1;
 		fAreaOffset = -1;
+
+		BAutolock _(sBitmapListLock);
+		sBitmapList.RemoveItem(this);
 	}
 	fBasePointer = NULL;
 }
@@ -1174,3 +1211,27 @@ BBitmap::_AssertPointer()
 	}
 }
 
+
+void
+BBitmap::_ReconnectToAppServer()
+{
+	BPrivate::AppServerLink link;
+
+	link.StartMessage(AS_RECONNECT_BITMAP);
+	link.Attach<BRect>(fBounds);
+	link.Attach<color_space>(fColorSpace);
+	link.Attach<uint32>(fFlags);
+	link.Attach<int32>(fBytesPerRow);
+	link.Attach<int32>(0);
+	link.Attach<int32>(fArea);
+	link.Attach<int32>(fAreaOffset);
+
+	status_t error;
+	if (link.FlushWithReply(error) == B_OK && error == B_OK) {
+		// server side success
+		// Get token
+		link.Read<int32>(&fServerToken);
+
+		link.Read<area_id>(&fServerArea);
+	}
+}

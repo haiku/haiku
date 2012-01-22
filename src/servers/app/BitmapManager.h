@@ -33,6 +33,11 @@ public:
 									int32 screen = B_MAIN_SCREEN_ID.id,
 									uint8* _allocationFlags = NULL);
 
+			ServerBitmap*		CloneFromClient(area_id clientArea,
+									int32 areaOffset, BRect bounds,
+									color_space space, uint32 flags,
+									int32 bytesPerRow = -1);
+
 			void				BitmapRemoved(ServerBitmap* bitmap);
 
 			void				SuspendOverlays();

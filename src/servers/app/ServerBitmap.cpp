@@ -59,8 +59,7 @@ using namespace BPrivate;
 ServerBitmap::ServerBitmap(BRect rect, color_space space, uint32 flags,
 		int32 bytesPerRow, screen_id screen)
 	:
-	fAllocator(NULL),
-	fAllocationCookie(NULL),
+	fMemory(NULL),
 	fOverlay(NULL),
 	fBuffer(NULL),
 	// WARNING: '1' is added to the width and height.
@@ -84,8 +83,7 @@ ServerBitmap::ServerBitmap(BRect rect, color_space space, uint32 flags,
 //! Copy constructor does not copy the buffer.
 ServerBitmap::ServerBitmap(const ServerBitmap* bitmap)
 	:
-	fAllocator(NULL),
-	fAllocationCookie(NULL),
+	fMemory(NULL),
 	fOverlay(NULL),
 	fBuffer(NULL),
 	fOwner(NULL)
@@ -108,9 +106,10 @@ ServerBitmap::ServerBitmap(const ServerBitmap* bitmap)
 
 ServerBitmap::~ServerBitmap()
 {
-	if (fAllocator != NULL)
-		fAllocator->Free(AllocationCookie());
-	else
+	if (fMemory != NULL) {
+		if (fMemory != &fClientMemory)
+			delete fMemory;
+	} else
 		delete[] fBuffer;
 
 	delete fOverlay;
@@ -162,8 +161,8 @@ ServerBitmap::ImportBits(const void *bits, int32 bitsLength, int32 bytesPerRow,
 area_id
 ServerBitmap::Area() const
 {
-	if (fAllocator != NULL)
-		return fAllocator->Area(AllocationCookie());
+	if (fMemory != NULL)
+		return fMemory->Area();
 
 	return B_ERROR;
 }
@@ -172,8 +171,8 @@ ServerBitmap::Area() const
 uint32
 ServerBitmap::AreaOffset() const
 {
-	if (fAllocator != NULL)
-		return fAllocator->AreaOffset(AllocationCookie());
+	if (fMemory != NULL)
+		return fMemory->AreaOffset();
 
 	return 0;
 }

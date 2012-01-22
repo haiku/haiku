@@ -35,8 +35,7 @@ typedef chunk_list::Iterator chunk_iterator;
 
 ClientMemoryAllocator::ClientMemoryAllocator(ServerApp* application)
 	:
-	fApplication(application),
-	fLock("client memory lock")
+	fApplication(application)
 {
 }
 
@@ -64,15 +63,8 @@ ClientMemoryAllocator::~ClientMemoryAllocator()
 }
 
 
-status_t
-ClientMemoryAllocator::InitCheck()
-{
-	return fLock.InitCheck() < B_OK ? fLock.InitCheck() : B_OK;
-}
-
-
 void*
-ClientMemoryAllocator::Allocate(size_t size, void** _address, bool& newArea)
+ClientMemoryAllocator::Allocate(size_t size, block** _address, bool& newArea)
 {
 	// Search best matching free block from the list
 
@@ -100,8 +92,8 @@ ClientMemoryAllocator::Allocate(size_t size, void** _address, bool& newArea)
 	if (best->size == size) {
 		// The simple case: the free block has exactly the size we wanted to have
 		fFreeBlocks.Remove(best);
-		*_address = best->base;
-		return best;
+		*_address = best;
+		return best->base;
 	}
 
 	// TODO: maybe we should have the user reserve memory in its object
@@ -118,18 +110,16 @@ ClientMemoryAllocator::Allocate(size_t size, void** _address, bool& newArea)
 	best->base += size;
 	best->size -= size;
 
-	*_address = usedBlock->base;
-	return usedBlock;
+	*_address = usedBlock;
+	return usedBlock->base;
 }
 
 
 void
-ClientMemoryAllocator::Free(void* cookie)
+ClientMemoryAllocator::Free(block* freeBlock)
 {
-	if (cookie == NULL)
+	if (freeBlock == NULL)
 		return;
-
-	struct block* freeBlock = (struct block*)cookie;
 
 	// search for an adjacent free block
 
@@ -185,49 +175,9 @@ ClientMemoryAllocator::Free(void* cookie)
 }
 
 
-area_id
-ClientMemoryAllocator::Area(void* cookie)
-{
-	struct block* block = (struct block*)cookie;
-
-	if (block != NULL)
-		return block->chunk->area;
-
-	return B_ERROR;
-}
-
-
-uint32
-ClientMemoryAllocator::AreaOffset(void* cookie)
-{
-	struct block* block = (struct block*)cookie;
-
-	if (block != NULL)
-		return block->base - block->chunk->base;
-
-	return 0;
-}
-
-
-bool
-ClientMemoryAllocator::Lock()
-{
-	return fLock.ReadLock();
-}
-
-
-void
-ClientMemoryAllocator::Unlock()
-{
-	fLock.ReadUnlock();
-}
-
-
 void
 ClientMemoryAllocator::Dump()
 {
-	AutoReadLocker locker(fLock);
-
 	debug_printf("Application %ld, %s: chunks:\n", fApplication->ClientTeam(),
 		fApplication->Signature());
 
@@ -333,3 +283,101 @@ ClientMemoryAllocator::_AllocateChunk(size_t size, bool& newArea)
 	return block;
 }
 
+
+ClientMemory::ClientMemory()
+	:
+	fBlock(NULL)
+{
+}
+
+
+ClientMemory::~ClientMemory()
+{
+	if (fBlock != NULL)
+		fAllocator->Free(fBlock);
+}
+
+
+void*
+ClientMemory::Allocate(ClientMemoryAllocator* allocator, size_t size,
+	bool& newArea)
+{
+	fAllocator = allocator;
+	return fAllocator->Allocate(size, &fBlock, newArea); 
+}
+
+
+area_id
+ClientMemory::Area()
+{
+	if (fBlock != NULL)
+		return fBlock->chunk->area;
+	return B_ERROR;
+}
+
+
+uint8*
+ClientMemory::Address()
+{
+	if (fBlock != NULL)
+		return fBlock->base;
+	return 0;
+}
+
+
+uint32
+ClientMemory::AreaOffset()
+{
+	if (fBlock != NULL)
+		return fBlock->base - fBlock->chunk->base;
+	return 0;
+}
+
+
+ClonedAreaMemory::ClonedAreaMemory()
+	:
+	fClonedArea(-1),
+	fOffset(0),
+	fBase(NULL)
+{
+}
+
+
+ClonedAreaMemory::~ClonedAreaMemory()
+{
+	if (fClonedArea >= 0)
+		delete_area(fClonedArea);
+}
+
+
+void*
+ClonedAreaMemory::Clone(area_id area, uint32 offset)
+{
+	fClonedArea = clone_area("server_memory", (void**)&fBase, B_ANY_ADDRESS,
+		B_READ_AREA | B_WRITE_AREA, area);
+	if (fBase == NULL)
+		return NULL;
+	fOffset = offset;
+	return Address();
+}
+
+
+area_id
+ClonedAreaMemory::Area()
+{
+	return fClonedArea;
+}
+
+
+uint8*
+ClonedAreaMemory::Address()
+{
+	return fBase + fOffset;
+}
+
+
+uint32
+ClonedAreaMemory::AreaOffset()
+{
+	return fOffset;
+}

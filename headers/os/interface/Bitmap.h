@@ -110,10 +110,12 @@ public:
 
 			BBitmap&			operator=(const BBitmap& source);
 
+	class Private;
 private:
 	friend class BView;
 	friend class BApplication;
 	friend class BPrivate::BPrivateScreen;
+	friend class Private;
 
 	virtual	status_t			Perform(perform_code d, void* arg);
 	virtual	void				_ReservedBitmap1();
@@ -126,6 +128,8 @@ private:
 									int32 bytesPerRow, screen_id screenID);
 			void				_CleanUp();
 			void				_AssertPointer();
+
+			void				_ReconnectToAppServer();
 
 private:
 			uint8*				fBasePointer;
