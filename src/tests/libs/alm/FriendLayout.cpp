@@ -2,6 +2,7 @@
  * Copyright 2007-2008, Christof Lutteroth, lutteroth@cs.auckland.ac.nz
  * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
  * Copyright 2010, Clemens Zeidler <haiku@clemens-zeidler.de>
+ * Copyright 2012, Haiku, Inc. 
  * Distributed under the terms of the MIT License.
  */
 
@@ -9,6 +10,7 @@
 #include <Button.h>
 #include <LayoutBuilder.h>
 #include <List.h>
+#include <Message.h>
 #include <Window.h>
 
 // include this for ALM
@@ -21,7 +23,13 @@ public:
 	FriendWindow(BRect frame) 
 		:
 		BWindow(frame, "ALM Friend Test", B_TITLED_WINDOW,
-			B_QUIT_ON_WINDOW_CLOSE | B_AUTO_UPDATE_SIZE_LIMITS)
+			B_QUIT_ON_WINDOW_CLOSE | B_AUTO_UPDATE_SIZE_LIMITS),
+		fLayout2(NULL),
+		fBoom(NULL),
+		fLeft(NULL),
+		fTop(NULL),
+		fRight(NULL),
+		fBottom(NULL)
 	{
 		BButton* button1 = _MakeButton("friends!");
 		BButton* button2 = _MakeButton("friends!");
@@ -44,26 +52,51 @@ public:
 				.AddToRight(button2, xTabs[1])
 				.AddToRight(button3, layout1->Right());
 
-		BALMLayout* layout2 = new BALMLayout(10, 10, layout1);
-		BView* almView2 = _MakeALMView(layout2);
+		fLayout2 = new BALMLayout(10, 10, layout1);
+		BView* almView2 = _MakeALMView(fLayout2);
 
-		BALM::BALMLayoutBuilder(layout2)
-			.Add(button4, layout2->Left(), layout2->Top(), xTabs[0])
+		BALM::BALMLayoutBuilder(fLayout2)
+			.Add(button4, fLayout2->Left(), fLayout2->Top(), xTabs[0])
 			.StartingAt(button4)
-				.AddBelow(button5, NULL, xTabs[0], xTabs[1])
-				.AddBelow(button6, layout2->Bottom(),
-					xTabs[0], layout2->Right());
+				.AddBelow(button5, NULL, xTabs[1], fLayout2->Right())
+				.AddBelow(button6, fLayout2->Bottom(), xTabs[0]);
+
+		fLeft = fLayout2->Left();
+		fBottom = fLayout2->BottomOf(button5);
+		fTop = fLayout2->BottomOf(button4);
+		fRight = xTabs[1];
 
 		BLayoutBuilder::Group<>(this, B_VERTICAL)
 			.Add(almView1)
 			.Add(almView2);
 	}
 
+
+	void MessageReceived(BMessage* message)
+	{
+		switch (message->what) {
+			case 'BOOM':
+				if (!fBoom) {
+					fBoom = _MakeButton("BOOM");
+					fLayout2->AddView(fBoom, fLeft, fTop,
+						fRight, fBottom);
+				} else {
+					if (fBoom->IsHidden(fBoom))
+						fBoom->Show();
+					else
+						fBoom->Hide();
+				}
+				break;
+			default:
+				BWindow::MessageReceived(message);
+		}
+	}
+
 private:
 	BButton* _MakeButton(const char* label)
 	{
-		BButton* button = new BButton(label);
-		button->SetExplicitMinSize(BSize(0, 50));
+		BButton* button = new BButton(label, new BMessage('BOOM'));
+		button->SetExplicitMinSize(BSize(10, 50));
 		button->SetExplicitMaxSize(BSize(500, 500));
 		button->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
 			B_ALIGN_USE_FULL_HEIGHT));
@@ -77,8 +110,12 @@ private:
 		return view;
 	}
 	
-	BALMLayout* fLayout;
-	BButton* button1;
+	BALMLayout* fLayout2;
+	BButton*	fBoom;
+	XTab*		fLeft;
+	YTab*		fTop;
+	XTab*		fRight;
+	YTab*		fBottom;
 };
 
 
