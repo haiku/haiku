@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-About	1133193730
+1	ukrainian	x-vnd.Haiku-About	3434348710
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d MiB заг.
 %d MiB used (%d%%)	AboutView		%d MiB викор. (%d%%)
@@ -20,7 +20,7 @@ Contributors:\n	AboutView		Співробітники:\n
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nВсі права застережені.
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. Всі права застережені.
 Copyright © 1990-2003 Wada Laboratory, the University of Tokyo.	AboutView		Copyright © 1990-2003 Wada Laboratory, університет Токіо.
-Copyright © 1991-2000 Silicon Graphics, Inc. SGI's Software FreeB license. All rights reserved.	AboutView		Copyright © 1991-2000 Silicon Graphics, Inc. Ліцензія SGI's Software FreeB. Всі права застережені.
+Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Copyright © 1991-2000 Silicon Graphics, Inc. Всі права застережені.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. Всі права застережені.
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView			Copyright © 1994-2008 Xiph.Org. Всі права застережені.
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. Це програмне забезпечення базується на роботах Independent JPEG Group.
@@ -64,7 +64,7 @@ MIT license. All rights reserved.	AboutView		Ліцензія MIT. Всі пра
 Memory:	AboutView		Пам’ять:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (засновнику проекту)\n\n
 Past maintainers:\n	AboutView		Попередні розробники:\n
-Portions of this software are copyright. Copyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		Це програмне забезпечення захищене авторськими правами. Copyright © 1996-2006 Проект FreeType . Всі права застережені.
+Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		Частина цього програмного забезпечення захищена авторським правом.\nCopyright © 1996-2006 The FreeType Project. Всі права застережені.
 Processor:	AboutView		Процесор:
 Revision	AboutView		Ревізія
 Source Code: 	AboutView		Код:
@@ -72,7 +72,7 @@ The BeGeistert team\n	AboutView		Команді BeGeistert\n
 The Haiku-Ports team\n	AboutView		Команді Haiku-Ports\n
 The Haikuware team and their bounty program\n	AboutView		Команді Haikuware з їхньою програмою заохочень\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Університету Окленда і Крістофу Люттероту\n\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT license%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView	%MIT license% isn't a variable and has to be translated.	Код  є унікальним для Haiku, особливо ядро і коди всіх додатків, котрі згадуються, поширюються за умовами ліцензії MIT. Деякі системні бібліотеки містять вторинні частини коду, що поширюються під умовами ліцензії LGPL. Авторські права дивись нижче.\n\n
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Код, що є унікальним для Haiku, особливо ядро та увесь код пов'язаний з програмами, надається за <ліцензією MIT>. Деякі системні бібліотеки містять код інших розробників, що надається за <ліцензією LGPL>. Авторські права на код інших розробників описані нижче.\n\n
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Авторські права коду Haiku є власністю Haiku, Inc. або сторонніх авторів про що згадується в коді. Haiku® і лого HAIKU ® є зареєстрованою торговою маркою Haiku, Inc.\n\n
 Time running:	AboutView		Час роботи:
 Translations:\n	AboutView		Переклади:\n

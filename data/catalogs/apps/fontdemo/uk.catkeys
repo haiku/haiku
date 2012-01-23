@@ -1,0 +1,22 @@
+1	ukrainian	x-vnd.Haiku-FontDemo	1769653414
+Antialiased text	ControlView		Згладжений текст
+Bounding boxes	ControlView		Обмежувальні прямокутники
+Controls	FontDemo		Керування
+Cycle fonts	ControlView		Показувати циклічно
+Drawing mode:	ControlView		Режим малювання
+Font:	ControlView		Шрифт:
+FontDemo	FontDemo		Перегляд шрифтів
+Haiku, Inc.	ControlView		Haiku, Inc.
+Haiku, Inc.	FontDemoView		Haiku, Inc.
+Outline:	ControlView		Контур:
+Outline: %d	ControlView		Контур: %d
+Rotation: %d	ControlView		Повертання: %d
+Rotation: 0	ControlView		Поворот: 0
+Shear: %d	ControlView		Зсув: %d
+Shear: 90	ControlView		Зсув: 90
+Size: %d	ControlView		Розмір: %d
+Size: 50	ControlView		Розмір: 50
+Spacing: %d	ControlView		Відстань: %d
+Spacing: 0	ControlView		Відстань: 0
+Stop cycling	ControlView		Зупинити цикл
+Text:	ControlView		Текст:

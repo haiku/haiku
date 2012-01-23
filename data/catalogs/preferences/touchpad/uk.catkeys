@@ -1,10 +1,20 @@
-1	ukrainian	x-vnd.Haiku-Touchpad	4054922715
+1	ukrainian	x-vnd.Haiku-Touchpad	607725922
+Acceleration	TouchpadPrefView		Прискорення
+Cancel	TouchpadPrefView		Скасувати
 Defaults	TouchpadPrefView		За замовчуванням
 Fast	TouchpadPrefView		Швидко
 High	TouchpadPrefView		Висока
+Horizontal	TouchpadPrefView		Горизонтальне
 Horizontal scrolling	TouchpadPrefView		Горизонтальна прокрутка
+OK	TouchpadPrefView		Гаразд
 Off	TouchpadPrefView		Низька
+Please confirm	TouchpadPrefView		Підтвердьте
 Revert	TouchpadPrefView		Повернути
 Scrolling	TouchpadPrefView		Прокрутка
+Sensitivity	TouchpadPrefView		Чутливість
 Slow	TouchpadPrefView		Повільно
+Tapping	TouchpadPrefView		Торкання
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Нова область прокручування дуже велика і може завадити працювати мишею. Ви дійсно хочете змінити її?
+Touchpad	System name		Тачпад
 Two finger scrolling	TouchpadPrefView		Прокрутка двома пальцями
+Vertical	TouchpadPrefView		Вертикальне

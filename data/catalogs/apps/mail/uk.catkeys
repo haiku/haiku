@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Be-MAIL	2276629278
+1	ukrainian	x-vnd.Be-MAIL	1459418301
 %d - Date	Mail		%d - Дата
 %e - E-mail address	Mail		%e - поштова адреса
 %e wrote:\\n	Mail			%e написано:\\n
@@ -47,6 +47,7 @@ E-mail draft could not be saved!	Mail		Чорновик листа не збер
 Edit	Mail		Редагувати
 Edit queries…	Mail		Редагувати запити…
 Edit signatures…	Mail		Редагувати підписи…
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Вкладення: %name% (Тип: %type%)
 Encoding:	Mail		Кодування:
 Expert	Mail		Експерт
 File	Mail		Файл
@@ -62,7 +63,7 @@ Include file attributes in attachments	Mail		Включити файлові а�
 Inconsistency occurred in the undo/redo buffer.	Mail		Невідповідність у буфері відміни/заміни.
 Initial spell check mode:	Mail		Режим перевірки правопису:
 Leave as '%s'	Mail		Зберегти як '%s'
-Leave as New	Mail		Зберегти як новий
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Зберегти як 'Нове'
 Leave same	Mail		Зберегти саме це
 Mail	System name		Пошта
 Mail couldn't find its dictionary.	Mail		Пошта не може знайти цього словника.
@@ -142,6 +143,7 @@ There is no installed handler for URL links.	Mail		Не встановлено �
 Title:	Mail		Назва:
 To:	Mail		До:
 Trash	Mail		Кошик
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding f	UTF-8
 Undo	Mail		Відмінити
 Unread	Mail		Нечитане
 Use default account	Mail		Використовувати аккаунт по замовчуванню

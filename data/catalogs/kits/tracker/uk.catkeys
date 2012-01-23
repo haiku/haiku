@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	1225921748
+1	ukrainian	x-vnd.Haiku-libtracker	360023500
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 %Ld B	WidgetAttributeText		%Ld B
 %Ld bytes	WidgetAttributeText		%Ld байтів
@@ -7,6 +7,8 @@
 %num items	CountView		%num елементів
 (%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		%SizeProcessed з %TotalSize, %BytesPerSecond/s)
 (%bytes bytes)	InfoWindow		(%bytes байтів)
+(Finish: %time - %finishtime left)	StatusWindow		(Завершено: %time - %finishtime залишилось)
+(Finish: %time - Over %finishtime left)	StatusWindow		(Закінчення: %time - Понад %finishtime залишилось)
 (Finish: %time)	StatusWindow		(Фініш: %time)
 1 item	CountView		1 елемент
 32 x 32	ContainerWindow		32 x 32
@@ -34,6 +36,7 @@ An item named \"%name\" already exists in this folder. Would you like to replace
 And	FindPanel		І
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Ви впевнені що хочете видалити вибрані елементи? Ця операція необоротна
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Ви впевнені що бажаєте копіювати або перемістити вибрані речі до цієї папки?
+Arrange by	ContainerWindow		Сортувати за
 Ask before delete	SettingsView		Спитати перед видаленням
 At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		В %func \nfind_directory() призупинено. \nПричина: %error
 Attributes	ContainerWindow		Атрибути
@@ -99,6 +102,7 @@ Delete	FilePanelPriv		Видалити
 Delete	PoseView		Видалити
 Deleting: 	StatusWindow		Видалення: 
 Description:	InfoWindow		Опис:
+Desktop	B_DESKTOP_DIRECTORY		Робочий стіл
 Desktop	Model		Робочий стіл
 Desktop	TrackerSettingsWindow		Робочий стіл
 Disk mount settings	AutoMounterSettings		Налаштування монтування дисків
@@ -163,6 +167,12 @@ Icon view	DeskWindow		У вигляді іконок
 Icon view	VolumeWindow		У вигляді іконок
 Identify	ContainerWindow		Визначити
 Identify	InfoWindow		визначити
+If you %ifYouDoAction the common folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Якщо ви %ifYouDoAction теку common, %osName може працювати неправильно! Ви впевнені, що хочете це зробити? Щоб все одно %toDoAction спільну теку, клацніть \"%toConfirmAction\", утримуючи натиснутим Shift.
+If you %ifYouDoAction the config folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"%toConfirmAction\".	FSUtils		Якщо ви %ifYouDoAction теку config, %osName може працювати неправильно! Ви впевнені, що хочете це зробити? Щоб все одно %toDoAction теку конфігурації, клацніть \"%toConfirmAction\".
+If you %ifYouDoAction the home folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Якщо ви %ifYouDoAction теку home, %osName може працювати неправильно! Ви впевнені, що хочете це зробити? Щоб все одно %toDoAction домашню теку, клацніть \"%toConfirmAction\", утримуючи натиснутим Shift.
+If you %ifYouDoAction the mime settings, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"%toConfirmAction\".	FSUtils		Якщо ви %ifYouDoAction параметри MIME, %osName може працювати неправильно! Ви впевнені, що хочете це зробити? Щоб все одно %toDoAction параметри MIME, клацніть \"%toConfirmAction\".
+If you %ifYouDoAction the settings folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"%toConfirmAction\".	FSUtils		Якщо ви %ifYouDoAction теку settings, %osName може працювати неправильно! Ви впевнені, що хочете це зробити? Щоб все одно %toDoAction теку параметрів, клацніть \"%toConfirmAction\".
+If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Якщо ви %ifYouDoAction  теку system або її вміст, ви не зможете завантажити %osName! Ви впевнені, що хочете це зробити? Щоб все одно %toDoAction системну теку або ї вміст, клацніть \"%toConfirmAction\", утримуючи натиснутим Shift.
 Ignore case	SelectionWindow		Ігнорувати регістр
 Include trash	FindPanel		Включаючи  Кошик
 Increase size	ContainerWindow		Збільшити розмір
@@ -202,6 +212,7 @@ Mount all disks now	AutoMounterSettings		Монтувати всі диски з
 Mount server error	AutoMounterSettings		Помилка сервера монтування
 Mount settings…	SettingsView		Налаштування монтування…
 Mount settings…	VolumeWindow		Налаштування монтування…
+Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Перемістити
 Move	PoseView		Перемістити
 Move here	ContainerWindow		Перемістити сюди
 Move to	ContainerWindow		Перемістити до
@@ -273,12 +284,15 @@ Prompt	FSUtils		Підказка
 Query name:	FindPanel		Ім'я запиту:
 Query template	FindPanel		Шаблон запиту
 Read	FilePermissionsView		Читати
+Real name	ContainerWindow		Справжнє ім'я
 Recalculate folder size	InfoWindow		Перерахувати розмір папки
 Recent documents	FavoritesMenu		Недавні документи
 Recent folders	ContainerWindow		Недавні папки
 Recent folders	FavoritesMenu		Недавні папки
 Relation	OpenWithWindow		Відношення
 Remove	FindPanel		Видалити
+Rename	InfoWindow	Button label, 'Rename' (en), 'Umbenennen' (de)	Перейменувати
+Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	Перейменувати
 Replace	FSUtils		Замінити
 Replace	FilePanelPriv		Замінити
 Replace all	FSUtils		Замінити все
@@ -288,6 +302,7 @@ Resize to fit	QueryContainerWindow		Припасувати
 Resize to fit	VolumeWindow		Припасувати
 Restore	ContainerWindow		Відновити
 Restoring: 	StatusWindow		Відновлення:
+Reverse order	ContainerWindow		Зворотний порядок
 Revert	TrackerSettingsWindow		Повернути
 Save	FilePanelPriv		Зберегти
 Save	FindPanel		Зберегти
@@ -353,6 +368,7 @@ There was an error resolving the link.	Tracker		Виникла проблема 
 There was an error writing the attribute.	WidgetAttributeText		Сталася помилка при записі атрибуту.
 TiB	WidgetAttributeText		TiB
 To: %dir	StatusWindow		До: %dir
+Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Нові шаблони Tracker
 Tracker preferences	TrackerSettingsWindow		Настройки Tracker
 Tracker status	StatusWindow		Стан Tracker'a
 Trash	Model		Кошик
@@ -391,19 +407,24 @@ You must have at least one attribute showing.	PoseView		Ви повинні ма
 \nShould this be fixed?	FSUtils		\nЧи треба це виправити?
 \n\t(%Ld bytes, 	FSUtils		\n\t(%Ld байтів,
 after	FindPanel		після
+apps	B_APPS_DIRECTORY		Програми
 before	FindPanel		до
 by attribute	FindPanel		за атрибутом
 by formula	FindPanel		за формулою
 by name	FindPanel		по імені
 calculating…	InfoWindow		розрахунок…
+common	B_COMMON_DIRECTORY		common
+config	B_USER_CONFIG_DIRECTORY		config
 contains	FindPanel		містить
 contains	SelectionWindow		вміст
 copy	FSUtils	filename copy	копія
 copying	FSUtils		копіювання
+develop	B_COMMON_DEVELOP_DIRECTORY		develop
 ends with	FindPanel		закінчити з
 ends with	SelectionWindow		закінчити з
 for %num files	InfoWindow		для %num файлів
 greater than	FindPanel		Більше ніж
+home	B_USER_DIRECTORY		home
 is	FindPanel		є
 is not	FindPanel		не є
 label too long	PoseView		Мітка занадто довга
@@ -411,12 +432,22 @@ less than	FindPanel		менше ніж
 link	FSUtils	filename link	Посилання
 matches regular expression	SelectionWindow		збігається з регулярним виразом
 matches wildcard expression	SelectionWindow		співпадає з підставленими виразами
+move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	перемістите
+move	FSUtils	As in 'to move this folder...' (en) Um diesen Ordner zu verschieben...' (de)	перемістити
 moving	FSUtils		переміщення
 multiple disks	FindPanel		Помножити диски
 no items	CountView		немає елементів
 no supporting apps	OpenWithWindow		немає підтримки додатків
 of %items	StatusWindow		з %items
+optional	/boot/optional		optional
 parent folder	NavMenu		батьківська папка
+preferences	B_PREFERENCES_DIRECTORY		настройки
+rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	перейменуєте
+rename	InfoWindow	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	перейменувати
+rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	перейменуєте
+rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	перейменувати
 save text	FilePanelPriv		зберегти текст
 starts with	FindPanel		Почати з
 starts with	SelectionWindow		починається з
+system	B_SYSTEM_DIRECTORY		system
+trash	B_TRASH_DIRECTORY		кошик

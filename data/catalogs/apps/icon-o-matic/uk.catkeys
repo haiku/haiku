@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.haiku-icon_o_matic	2326864078
+1	ukrainian	x-vnd.haiku-icon_o_matic	3736361491
 <modify path>	Icon-O-Matic-PathCmd		<змінити шлях>
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<нічого не переробляти>
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<нічого, щоб скасувати>
@@ -159,6 +159,7 @@ Save	Icon-O-Matic-Menu-Settings		Зберегти
 Save Icon	Dialog title		Зберегти Іконку
 Save as…	Icon-O-Matic-Menu-File		Зберегти як…
 Save changes to current icon?	Icon-O-Matic-Menu-Settings		Зберегти зміни для біжучої іконки?
+Save image	Icon-O-Matic-SavePanel		Зберегти зображення
 Saving your document failed!	Icon-O-Matic-Exporter		Збереження вашого документу призупинене!
 Scale	Icon-O-Matic-TransformationBoxStates		Масштаб
 Scale X	Icon-O-Matic-PropertyNames		Маштаб по X

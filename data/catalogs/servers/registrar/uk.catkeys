@@ -1,1 +1,23 @@
-1	ukrainian	application/x-vnd.Haiku-Registrar	0
+1	ukrainian	application/x-vnd.Haiku-Registrar	2599857937
+%action%?	ShutdownProcess		%action%?
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Програма \"%appName%\" припинила процес вимкнення.
+Asking \"%appName%\" to quit.	ShutdownProcess		Опитування \"%appName%\" про вихід.
+Asking background applications to quit.	ShutdownProcess		Опитування фонових програм про вихід.
+Asking other processes to quit.	ShutdownProcess		Опитування інших процесів про вихід.
+Cancel	ShutdownProcess		Скасувати
+Cancel shutdown	ShutdownProcess		Скасувати вимкнення
+Do you really want to restart the system?	ShutdownProcess		Ви справді хочете перезапустити систему?
+Do you really want to shut down the system?	ShutdownProcess		Ви справді хочете вимкнути систему?
+It's now safe to turn off the computer.	ShutdownProcess		Тепер можна вимкнути комп'ютер
+Kill application	ShutdownProcess		Знищити програму
+OK	ShutdownProcess		Гаразд
+Restart	ShutdownProcess		Перезапустити
+Restart system	ShutdownProcess		Перезапустити систему
+Restarting…	ShutdownProcess		Перезапуск...
+Shut down	ShutdownProcess		Вимкнути
+Shutdown aborted	ShutdownProcess		Вимкнення скасовано
+Shutdown status	ShutdownProcess		Стан вимкнення
+Shutting down…	ShutdownProcess		Вимкнення...
+System is shut down	ShutdownProcess		Система вимикається
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Програма \"%appName%\" може бути заблокована на модальній панелі.
+Tidying things up a bit.	ShutdownProcess		Ще деякі дрібниці.

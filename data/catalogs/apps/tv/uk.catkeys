@@ -1,6 +1,7 @@
-1	ukrainian	x-vnd.Haiku.TV	4095203425
+1	ukrainian	x-vnd.Haiku.TV	1995288111
 Always on top	MainWin		Завжди поверх усіх
 Channel	MainWin		Канали
+DVB - Digital Video Broadcasting TV	MainWin		DVB - цифрове ефірне ТБ
 Debug	MainWin		Налагоджуваня
 Error, connecting to interface failed:\n\n	MainWin		Помилка, підключення до інтерфейсу невдалось:\n\n
 Error, interface is busy:\n\n	MainWin		Помилка, інтерфейс занятий:\n\n
@@ -18,6 +19,7 @@ Scale to native size	MainWin		Маштабувати до вихідного р�
 Settings	MainWin		Налаштування
 Settings…	MainWin		Налаштування…
 TV	MainWin		ТБ
+TV	System name		Телебачення
 force 544 x 576, display aspect 4:3	MainWin		Примусово 544 x 576, співвідношення дисплею 4:3
 force 704 x 576, display aspect 4:3	MainWin		примусово 704 x 576, співвідношення дисплею 4:3
 force 720 x 576, display aspect 4:3	MainWin		Примусово 720 x 576, співвідношення дисплею 4:3

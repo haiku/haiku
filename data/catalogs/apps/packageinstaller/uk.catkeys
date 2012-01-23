@@ -1,0 +1,57 @@
+1	ukrainian	x-vnd.Haiku-PackageInstaller	2709408798
+%.1f GiB	PackageView		%.1f ГіБ
+%.1f KiB	PackageView		%.1f КіБ
+%.1f MiB	PackageView		%.1f МіБ
+%llu bytes	PackageView		%llu біт
+(%s free)	PackageView		(%s вільно)
+Abort	PackageInfo		Перервати
+Abort	PackageInstall		Перервати
+Abort	PackageView		Перервати
+Accept	PackageTextViewer		Прийняти
+All existing files will be replaced?	PackageView		Замінити всі наявні файли?
+All existing files will be skipped?	PackageView		Всі наявні файли будуть пропущуны?
+Ask again	PackageView		Запитати знову
+Continue	PackageInfo		Продовжити
+Continue	PackageInstall		Продовжити
+Continue	PackageTextViewer		Продовжити
+Decline	PackageTextViewer		Відхилити
+Disclaimer	PackageTextViewer		Відмова від гарантій
+Do you want to remember this decision for the rest of this installation?\n	PackageView		Запам'ятати цю відповідь до кінця встановлення?\n
+Done	PackageInstall		Зроблено
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Помилка (%s)! Неможливо відкрити \"%s\".\n
+Error while installing the package\n	PackageView		Помилка при встановленні пакунка
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Помилка! \"%s\" не є правильним шляхом.\n
+Finishing installation	PackageInstall		Завершення встановлення
+Image not loaded correctly	PackageImageViewer		Малюнок завантажився неправильно
+Install	PackageView		Встановити
+Install to:	PackageView		Встановити у:
+Installation progress	PackageView		Прогрес встановлення
+Installation type:	PackageView		Тип встановлення:
+Installing files and folders	PackageInstall		Встановлення файлів і тек
+Installing package	PackageStatus		Встановлення пакунку
+No installation type selected	PackageView		Не вибрано тип інсталяції
+No package available.	PackageInfo		Пакунок недоступний.
+No package selected.	PackageInfo		Не вибрано пакунок.
+OK	PackageView		Гаразд
+Other…	PackageView		Інший...
+Package installer	PackageView		Встановлювач пакунків
+PackageInstaller	System name		Встановлювач пакунків
+Preparing package	PackageInstall		Підготовка пакунка
+Replace	PackageView		Замінити
+Replace all	PackageView		Замінити всі
+Running post-installation scripts	PackageInstall		Запуск післяінсталяційного скрипта
+Skip	PackageView		Пропустити
+Skip all	PackageView		Пропустити всі
+Stop	PackageStatus		Зупинити
+The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Тека з ім'ям '%s' вже є у вказаному місці.\nЗамінити її текою з цього пакунку чи пропустити?
+The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Файл з ім'ям '%s' вже є у вказаному місці.\nЗамінити його файлом з цього пакунку чи пропустити?
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Схоже, що цей пакунок вже встановлено у вашій системі. Бажаєте вилучити його і продовжити встановлення?
+The installation of the package has been aborted.	PackageView		Встановлення пакунка перервано.
+The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Елемент з ім'ям '%s' вже є у вказаному місці.\nЗамінити його елементом з цього пакунку чи пропустити його?
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Файл пакунка не читається.\nОдна з можливих причин: він не є правильним файлом пакунка BeOS .pkg.
+The package you requested has been successfully installed on your system.	PackageView		Запитуваний пакунок успішно встановлено на вашій системі.
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Неможливо встановити даний пакунок у вашій системі. Проблема може бути пов'язана з файлом пакунка. Зверніться до постачальника пакунка.
+The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Скрипт з ім'ям '%s' вже є у вказаному місці.\nЗамінити його скриптом з цього пакунку чи пропустити ?
+The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		Символьне посилання з ім'ям '%s' вже є у вказаному місці.\nЗамінити його посиланням з цього пакунку чи пропустити його?
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Неправильний розмір пакунка. Можливо, пакунок пошкоджено або змінено після створення. Бажаєте продовжити?
+none	PackageView		жоден

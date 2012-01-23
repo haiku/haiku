@@ -1,16 +1,23 @@
-1	ukrainian	x-vnd.Haiku-SoundRecorder	150059956
+1	ukrainian	x-vnd.Haiku-SoundRecorder	2122042546
 Cannot connect to media server	RecorderWindow		Неможливо під'єднати медіа сервер
 Cannot connect to the selected sound input	RecorderWindow		Неможливо під'єднати вибраний аудіо вхід
 Cannot find an unused name to use for the new recording	RecorderWindow		Неможливо знайти невикористане і'мя для проведення нового запису
+Cannot find default audio hardware	RecorderWindow		Неможливо знайти звуковий пристрій за замовчуванням
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Неможливо знайти тимчасовий файл створений для збереження нового запису
 Cannot get the file to play	RecorderWindow		Неможливо отримати файл для відтворення
 Cannot open the temporary file created to hold the new recording	RecorderWindow		Неможливо відкрити тимчасовий файл створений для збереження нового запису
 Cannot recognize this file as a media file	RecorderWindow		Неможливо розпізнати файл як медіа
 Cannot record a sound that long	RecorderWindow		Неможливо записати довший звук
+Channels: 	RecorderWindow		Канали:
+Compression:	RecorderWindow		Компресія:
 Drop files here	SoundListView		Киньте файли сюди
+Duration:	RecorderWindow		Тривалість:
 File info	RecorderWindow		Інфо про файл
+File name:	RecorderWindow		І'мя файла:
+Format: 	RecorderWindow		Формат:
 Forward	RecorderWindow		Вперед
 Input	RecorderWindow		Вхід
+Input:	RecorderWindow		Вхід:
 Invalid audio files	RecorderWindow		Неправильні аудіо файли
 Loop	RecorderWindow		Петля
 None	RecorderWindow		Жоден
@@ -20,8 +27,12 @@ OK	RecorderWindow		Гаразд
 Play	RecorderWindow		Відтворити
 Record	RecorderWindow		Записати
 Rewind	RecorderWindow		Перемотка
+Sample rate: 	RecorderWindow		Частота дискретизації:
 Sample size: 	RecorderWindow		Розмір зразка:
 Save	RecorderWindow		Зберегти
 Some of the files don't appear to be audio files	RecorderWindow		Деякі з файлів виявилися не звуковими
-Sound List	RecorderWindow		Звуколист
+Sound List	RecorderWindow		Список звуку
+SoundRecorder	System name		Запис звуку
 Stop	RecorderWindow		Зупинити
+bits	RecorderWindow		бітів
+seconds	RecorderWindow		сек.

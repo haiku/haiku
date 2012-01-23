@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.haiku-screenshot	2217593453
+1	ukrainian	x-vnd.haiku-screenshot	1697748405
 Artwork folder	ScreenshotWindow		Папка Artwork
 Cancel	ScreenshotWindow		Відмінити
 Capture active window	ScreenshotWindow		Захопити активне вікно
@@ -16,8 +16,11 @@ Please select	ScreenshotWindow		Будь-ласка виберіть
 Save	ScreenshotWindow		Зберегти
 Save as:	ScreenshotWindow		Зберегти як:
 Save in:	ScreenshotWindow		Зберегти в:
+Screenshot	System name		Знімок екрану
+Select	ScreenshotWindow		Вибрати
 Settings…	ScreenshotWindow		Настройки…
 This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Цей файл цілковито присутній.\n Ви впевнені, що бажаєте переписати його?
 Translator Settings	ScreenshotWindow		Настройки транслятора
 overwrite	ScreenshotWindow		переписати
 screenshot	Screenshot	Base filename of screenshot files	знімок екрана
+seconds	ScreenshotWindow		секунд

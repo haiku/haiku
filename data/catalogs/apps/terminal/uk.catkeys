@@ -1,4 +1,5 @@
-1	ukrainian	x-vnd.Haiku-Terminal	3235811530
+1	ukrainian	x-vnd.Haiku-Terminal	2059530645
+%app% settings	Terminal PrefWindow	window title	Параметри %app%
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help друкувати цю довідку\n -t, --title              встановити заголовок вікна\n -f, --fullscreen запустити у повний екран\n
 Abort	Terminal Shell		Зупинити
 Appearance	Terminal PrefWindow		Зовн. вигляд
@@ -35,6 +36,7 @@ Find previous	Terminal TermWindow		Знайти попереднє
 Find…	Terminal TermWindow		Знайти…
 Font:	Terminal AppearancePrefView		Шрифт:
 Full screen	Terminal TermWindow		У повний екран
+Green on Black	Terminal colors schema		Зелене на чорному
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Термінал Haiku\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nВикористання: %s [ОПЦІЯ] [ОБОЛОНКА]\n
 Increase	Terminal TermWindow		Збільшити
 Insert path	Terminal TermView		Введіть шлях
@@ -53,7 +55,6 @@ OK	Terminal TermWindow		Гаразд
 Page setup…	Terminal TermWindow		Настройки друку…
 Paste	Terminal TermWindow		Вставити
 Print	Terminal TermWindow		Друк
-Print cancelled.	Terminal TermWindow		Друк відмінено.
 Quit	Terminal TermWindow		Вийти
 Really close?	Terminal TermWindow		Дійсно закрити?
 Save	Terminal PrefWindow		Зберегти
@@ -68,10 +69,12 @@ Set tab title	Terminal TermWindow		Встановити ім'я вкладки
 Set window title	Terminal TermWindow		Встановити ім'я вікна
 Settings	Terminal TermWindow		Настройки
 Settings…	Terminal TermWindow		Настройки…
+Shell 	Terminal TermWindow		Оболонка
 Size:	Terminal AppearancePrefView		Розмір:
-Switch Terminals	Terminal TermWindow		Переключити термінали
+Switch Terminals	Terminal TermWindow		Перемкнути термінали
 Tab title:	Terminal AppearancePrefView		Ім'я вкладки:
 Tab title:	Terminal TermWindow		Ім'я вкладки:
+Terminal	System name		Термінал
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Термінал не зміг запустити оболонку. Прикро.
 Text	Terminal AppearancePrefView		Текст
 Text encoding	Terminal TermWindow		Кодування тексту
@@ -82,6 +85,7 @@ The pattern specifying the current tab title. The following placeholders\ncan be
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Шаблон для імен вікон. Наступні заповнювачі\nможуть бути використані:\n
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон для поточного імені вікна. Наступні заповнювачі\nможуть бути використані:\n
 The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Шаблон для поточного імені вкладки. Наступні заповнювачі\nможуть бути використані:\n
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Процес \"%1\" надалі запущено.\nЯкщо Ви закриєте Terminal, процес буде вбито.
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Процес \"%1\" надалі запущено.\nIЯкщо Ви закриєте вкладку, процес буде вбито.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Невідома опція \"%s\"\n
 Use default	Terminal SetTitleWindow		Використати по замовчуванню
@@ -92,4 +96,7 @@ White on Black	Terminal colors schema		Білим по чорному
 Window size	Terminal TermWindow		Розмір вікна
 Window title:	Terminal AppearancePrefView		Ім'я вікна:
 Window title:	Terminal TermWindow		Ім'я вікна:
+Window title…	Terminal TermWindow		Заголовок вікна…
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tПоточний каталог активного процесу\n\t\t\tв поточній вкладці. Додатково можна вказати максимальну кількість компонентів шляху\n\t\t\t Наприклад '%2d' ніж 2 компоненти.\n\t%i\t-\tіндекс вікна.\n\t%p\t-\tІм'я активного процесу поточної вкладки.\n\t%%\t-\tІм'я поточної вкладки.\n\t%%\t-\tСимвол '%'.
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tПоточний каталог активного процесу.\n\t\t\tДодатково можна вказати максимальну кількість компонентів шляху\n\t\t\t Наприклад '%2d' ніж 2 компоненти.\n\t%i\t-\tіндекс вкладки.\n\t%p\t-\tІм'я активного процесу.\n\t%%\t-\tСимвол '%'.
 size	Terminal TermView		розмір

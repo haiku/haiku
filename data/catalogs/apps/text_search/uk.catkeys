@@ -1,5 +1,6 @@
-1	ukrainian	x-vnd.Haiku.TextSearch	581029554
+1	ukrainian	x-vnd.Haiku.TextSearch	1180598828
 %APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME невдалося відкрити одну або більше директорій.
+%s: Not enough room to escape the filename.	Grepper		%s: Недостатньо місця для відміни імені файлу.
 %s: There was a problem running grep.	Grepper		%s: проблема запуску grep.
 Actions	GrepWindow		Дії
 Cancel	GrepWindow		Відмінити
@@ -21,6 +22,7 @@ Please select the files you wish to keep searching.	GrepWindow		Будь лас�
 Quit	GrepWindow		Вийти
 Search	GrepWindow		Пошук
 Select all	GrepWindow		Вибрати все
+Set target…	GrepWindow		Встановити ціль…
 Settings	GrepWindow		Налаштування
 Show files in Tracker	GrepWindow		Показати файл у Tracker
 Show lines	GrepWindow		Показати лінії

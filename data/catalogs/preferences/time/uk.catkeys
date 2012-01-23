@@ -1,11 +1,44 @@
-1	ukrainian	x-vnd.Haiku-Time	3898857456
+1	ukrainian	x-vnd.Haiku-Time	3493650184
 <Other>	Time		<Інше>
+Add	Time		Додати
+Africa	Time		Африка
+America	Time		Америка
+Antarctica	Time		Антарктика
+Arctic	Time		Арктика
+Asia	Time		Азія
+Atlantic	Time		Атлантичний океан
+Australia	Time		Австралія
+Could not contact server	Time		Неможливо з'єднатися з сервером
+Could not create socket	Time		Неможливо створити комірку
 Current time:	Time		Поточний час:
+Date and time	Time		Дата і час
+Europe	Time		Європа
+GMT (UNIX compatible)	Time		GMT (сумісний з UNIX)
+Hardware clock set to:	Time		Апаратний годинник встановлено на:
+Indian	Time		Індія
+Local time (Windows compatible)	Time		Місцевий час (сумісний з Windows)
+Message receiving failed	Time		Не вдалось отримати повідомлення
+Network time	Time		Мережевий час
 OK	Time		Гаразд
+Pacific	Time		Тихий океан
 Preview time:	Time		Попередній час:
+Received invalid time	Time		Отримано неправильний час
+Remove	Time		Вилучити
+Reset	Time		Скинути
 Revert	Time		Повернути
+Sending request failed	Time		Не вдалося надіслати запит
 Set time zone	Time		Встановити часову зону
+Stop	Time		Зупинити
+Synchronize	Time		Синхронізувати
+Synchronize again	Time		Синхронізувати знову
+Synchronize at boot	Time		Синхронізувати завантаження
+The following error occured while synchronizing:r\n%s	Time		При синхронізації трапилась така помилка:r\n%s
+The following error occured while synchronizing:r\n%s: %s	Time		При синхронізації трапилась така помилка:r\n%s: %s
+Time	System name		Час
 Time	Time		Час
 Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date, Написаний:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nАвторські права 2004-2008, Haiku.
 Time zone	Time		Часова зона
+Try all servers	Time		Випробувати всі сервери
+Waiting for answer failed	Time		Відповідь не отримана
+\nNow: 	Time		\nЗараз:
 about	Time		про

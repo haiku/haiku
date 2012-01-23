@@ -1,6 +1,7 @@
-1	ukrainian	x-vnd.Haiku-TGATranslator	2221210336
+1	ukrainian	x-vnd.Haiku-TGATranslator	4159874267
 Ignore TGA alpha channel	TGAView		Ігнорувати альфа канал TGA
 Save with RLE Compression	TGAView		Зберегти зі стиском RLE
+TGA Image Translator	TGAView		Перетворювач зображень TGA
 TGA Settings	TGAMain		Настройки TGA
 TGA image translator	TGATranslator		Перетворювач зображеньTGA
 TGA images	TGATranslator		Зображення TGA

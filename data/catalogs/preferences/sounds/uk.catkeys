@@ -1,14 +1,17 @@
-1	ukrainian	x-vnd.Haiku-Sounds	2895089313
+1	ukrainian	x-vnd.Haiku-Sounds	3924145958
 <none>	HEventList		<жодного>
 <none>	HWindow		<жодного>
 About Sounds	SoundsHApp		Про Звуки
 Event	HEventList		Новина
+No such file or directory	HEventList		Немає такого файлу або папки
 OK	HEventList		Гаразд
 OK	HWindow		Гаразд
 OK	SoundsHApp		Гаразд
 Other…	HWindow		Інший…
+Play	HWindow		Відтворити
 Sound	HEventList		Звук
 Sound File:	HWindow		Звуковий файл:
+Sounds	System name		Звуки
 Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Звуки\n Принесено Вам :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n Оригінал від Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku
 Stop	HWindow		Зупинити
 This is not an audio file.	HWindow		Це не аудіо файл.

@@ -1,8 +1,6 @@
-1	ukrainian	x-vnd.Haiku-CharacterMap	4082916013
+1	ukrainian	x-vnd.Haiku-CharacterMap	2769564298
 Aegean numbers	UnicodeBlocks		Егейські номери
-Alphabetic presentation forms	UnicodeBlocks		Алфавітні форми презентацій
 Ancient Greek musical notation	UnicodeBlocks		Давньогрецький нотний запис
-Ancient Greek numbers	UnicodeBlocks		Давньогрецькі числа
 Ancient smbols	UnicodeBlocks		Давні символи
 Arabic	UnicodeBlocks		Арабська
 Arabic presentation forms A	UnicodeBlocks		Арабські форми презентацій А
@@ -16,12 +14,7 @@ Bengali	UnicodeBlocks		Бенгалі
 Block elements	UnicodeBlocks		Блок елементів
 Bopomofo	UnicodeBlocks		Бопомофо
 Bopomofo extended	UnicodeBlocks		Бопомофо розширена
-Box drawing	UnicodeBlocks		Зображення рамки
-Braille patterns	UnicodeBlocks		Матриці Брайля 
 Buginese	UnicodeBlocks		Бугінез
-Buhid	UnicodeBlocks		Бухід
-Byzantine musical symbols	UnicodeBlocks		Візантійські музичні символи
-CJK compatibility	UnicodeBlocks		CJK сумісність
 CJK compatibility forms	UnicodeBlocks		Форми CJK сумісності
 CJK compatibility ideographs	UnicodeBlocks		Сумісні ієрогліфи CJK
 CJK compatibility ideographs Supplement	UnicodeBlocks		Доповнення CJK-суміснісних ієрогліфів
@@ -30,54 +23,36 @@ CJK strokes	UnicodeBlocks		CJK наголоси
 CJK symbols and punctuation	UnicodeBlocks		CJK символи і знаки пунктуації
 CJK unified ideographs	UnicodeBlocks		CJK єдині ієрогліфи
 CJK unified ideographs extension A	UnicodeBlocks		CJK єдине розширення ієрогліфів А
-CJK unified ideographs extension B	UnicodeBlocks		CJK єдиного розширення ієрогліфів B
-Carian	UnicodeBlocks		Каріан
 Cham	UnicodeBlocks		Чам
-CharacterMap	System name		CharacterMap
 Cherokee	UnicodeBlocks		Черокі
 Clear	CharacterWindow		Очистити
 Code	CharacterWindow		Код
 Combining diacritical marks	UnicodeBlocks		Об'єднання діакритичних знаків
 Combining diacritical marks for symbols	UnicodeBlocks		Об'єднуючі діакритичні знаки для символів
-Combining diacritical marks supplement	UnicodeBlocks		Об'єднуючі доповнення діакритичних знаків
 Combining half marks	UnicodeBlocks		Об'єднуючі половини знаків
 Control pictures	UnicodeBlocks		Управління фотографіями
 Coptic	UnicodeBlocks		Коптська
-Copy as escaped byte string	CharacterView		Копіювати як пусту стрічку 
-Copy character	CharacterView		Копіювати символ
 Counting rod numerals	UnicodeBlocks		Підрахунок стрижня цифр
 Cuneiform	UnicodeBlocks		Клинопис
-Cuneiform numbers and punctuation	UnicodeBlocks		Клинописні цифри і знаки пунктуації
 Currency symbols	UnicodeBlocks		Символи валют
 Cypriot syllabary	UnicodeBlocks		Складові кіпрської
 Cyrillic	UnicodeBlocks		Кирилиця
 Cyrillic extended A	UnicodeBlocks		Кирилиця розширена А
-Cyrillic extended B	UnicodeBlocks		Розширення кирилиці B
 Cyrillic supplement	UnicodeBlocks		Доповнення до кирилиці
-Deseret	UnicodeBlocks		Десeрет
 Devanagari	UnicodeBlocks		Деванагарі
-Dingbats	UnicodeBlocks		Декоративні
-Domino tiles	UnicodeBlocks		Доміно-плитки
-Enclosed CJK letters and months	UnicodeBlocks		Закриті CJK букви і місяці
 Enclosed alphanumerics	UnicodeBlocks		Закриті літери, цифри
 Ethiopic	UnicodeBlocks		Ефіопська
 Ethiopic extended	UnicodeBlocks		Ефіопська розширена
-Ethiopic supplement	UnicodeBlocks		Доповнена ефіопська
 File	CharacterWindow		Файл
 Filter:	CharacterWindow		Фільтр:
 Font	CharacterWindow		Шрифт
 Font size:	CharacterWindow		Розмір шрифту:
 General punctuation	UnicodeBlocks		Знаки пунктуації
 Geometric shapes	UnicodeBlocks		Геометричні форми
-Georgian	UnicodeBlocks		Грузинська
 Georgian supplement	UnicodeBlocks		Грузинська варіант
 Glagotic	UnicodeBlocks		Глаготік
-Gothic	UnicodeBlocks		Готична
-Greek and Coptic	UnicodeBlocks		Грецька і коптська
 Greek extended	UnicodeBlocks		Грецька розширена
 Gujarati	UnicodeBlocks		Гуджараті
-Gurmukhi	UnicodeBlocks		Гурмукхи
-Halfwidth and fullwidth forms	UnicodeBlocks		Напівширинна і повноширинна форми
 Hangul Jamo	UnicodeBlocks		Хангуль Джамо
 Hangul compatibility Jamo	UnicodeBlocks		Хангиль сумісність Джамо
 Hangul syllables	UnicodeBlocks		Склади Хенгал
@@ -87,73 +62,38 @@ Hiragana	UnicodeBlocks		Хірагана
 IPA extensions	UnicodeBlocks		Розширення IPA
 Ideographic description characters	UnicodeBlocks		Символи ідеографічного опису
 Kanbun	UnicodeBlocks		Канбун
-Kangxi radicals	UnicodeBlocks		Радикали Кангксі
-Kannada	UnicodeBlocks		Каннада
 Katakana	UnicodeBlocks		Катакана
-Katakana phonetic extensions	UnicodeBlocks		Фонетичні розширення катакани
-Kayah Li	UnicodeBlocks		Кая Лі
 Kharoshthi	UnicodeBlocks		Харошті
 Khmer	UnicodeBlocks		Кхмерська
 Khmer symbols	UnicodeBlocks		 Кхмерські символи
-Lao	UnicodeBlocks		Лаоська
 Latin extended A	UnicodeBlocks		Розширена латиниця
-Latin extended B	UnicodeBlocks		Розширена латиниця B
 Latin extended C	UnicodeBlocks		Розширена латиниця C
-Latin extended D	UnicodeBlocks		Розширена латиниця D
 Latin extended additional	UnicodeBlocks		Розширена додаткова латиниця
 Latin-1 supplement	UnicodeBlocks		Латинська-1 варіант
 Lepcha	UnicodeBlocks		Лепха
 Letterlike symbols	UnicodeBlocks		Буквоподібні символи
-Limbu	UnicodeBlocks		Лімбу
 Linear B ideograms	UnicodeBlocks		Лінійні B ідеограми
 Linear B syllabary	UnicodeBlocks		Лінійні B складові
 Lycian	UnicodeBlocks		Лікійська
-Lydian	UnicodeBlocks		Лідійська
 Mahjong tiles	UnicodeBlocks		Маджонг плитки
-Malayalam	UnicodeBlocks		Малаялам
-Mathematical alphanumeric symbols	UnicodeBlocks		Математичні алфавітно-цифрові символи
 Mathematical operators	UnicodeBlocks		Математичні оператори
 Miscellaneous mathematical symbols A	UnicodeBlocks		Різні математичні символи
-Miscellaneous mathematical symbols B	UnicodeBlocks		Різні математичні символи B
-Miscellaneous symbols	UnicodeBlocks		Різні символи
-Miscellaneous symbols and arrows	UnicodeBlocks		Різні символи та стрілки
 Miscellaneous technical	UnicodeBlocks		Інші технічні
 Modifier tone letters	UnicodeBlocks		Модифікація тона літер
-Mongolian	UnicodeBlocks		Монгольська
-Muscial symbols	UnicodeBlocks		Muscial символи
-Myanmar	UnicodeBlocks		М'янми
-N'Ko	UnicodeBlocks		Нко
-New Tai Lue	UnicodeBlocks		Нові Тай Лю
+Musical symbols	UnicodeBlocks		Музичні символи
 Number forms	UnicodeBlocks		Форми цифр
 Ogham	UnicodeBlocks		Огам
 Ol Chiki	UnicodeBlocks		Ол Чікі
-Old Persian	UnicodeBlocks		Староперська
 Old italic	UnicodeBlocks		Старий курсив
-Optical character recognition	UnicodeBlocks		Оптичне розпізнавання символів
-Oriya	UnicodeBlocks		Орія
 Osmanya	UnicodeBlocks		Османія
-Phags-pa	UnicodeBlocks		Фагс-па
-Phaistos disc	UnicodeBlocks		Phaistos диск
-Phoenician	UnicodeBlocks		Фінікійська
 Phonetic extensions	UnicodeBlocks		Фонетичні розширення
-Phonetic extensions supplement	UnicodeBlocks		Доповнення фонетичних розширень
-Private use area	UnicodeBlocks		Приватна область використання
-Quit	CharacterWindow		Вихід
-Rejang	UnicodeBlocks		Реджанг
-Runic	UnicodeBlocks		Рунічний
-Saurashtra	UnicodeBlocks		Саураштра
-Shavian	UnicodeBlocks		Шавіан
-Show private blocks	CharacterWindow		Показати власні блоки
 Sinhala	UnicodeBlocks		Сингальська
 Small form variants	UnicodeBlocks		Варіанти малих форм
 Spacing modifier letters	UnicodeBlocks		Символи зміни букв
 Specials	UnicodeBlocks		Спеціальні
 Sundanese	UnicodeBlocks		Суданська
-Superscripts and subscripts	UnicodeBlocks		Верхні і нижні індекси
 Supplement punctuation	UnicodeBlocks		Доповнення пунктуації
-Supplemental arrows A	UnicodeBlocks		Додаткові стрілки A
 Supplemental arrows B	UnicodeBlocks		Додадкові стрілки B
-Supplemental mathematical operators	UnicodeBlocks		Додадкові математичні оператори
 Supplementary private use area A	UnicodeBlocks		Додаткові приватні використання галузі А
 Supplementary private use area B	UnicodeBlocks		Додаткові приватні використання галузі B
 Syloti Nagri	UnicodeBlocks		Сілоті Нагрі
@@ -162,20 +102,11 @@ Tagalog	UnicodeBlocks		Тагальська
 Tagbanwa	UnicodeBlocks		Тагбанва
 Tags	UnicodeBlocks		Теги
 Tai Le	UnicodeBlocks		Тай Ле
-Tai Xuan Jing symbols	UnicodeBlocks		Символи Тай Сюань Цзин
 Tamil	UnicodeBlocks		Тамільська
-Telugu	UnicodeBlocks		Телугу
 Thaana	UnicodeBlocks		Тана
-Thai	UnicodeBlocks		Тайська
-Tibetan	UnicodeBlocks		Тибетська
-Tifinagh	UnicodeBlocks		Тіфінаг
 Ugaritic	UnicodeBlocks		Угаритська
 Unified Canadian Aboriginal syllabics	UnicodeBlocks		Єдина складова канадських аборигенів
-Vai	UnicodeBlocks		Ваі
 Variation selectors	UnicodeBlocks		Селектори зміни
 Variation selectors supplement	UnicodeBlocks		Доповнення змінних селекторів
 Vertical forms	UnicodeBlocks		Вертикальні форми
 View	CharacterWindow		Вигляд
-Yi Radicals	UnicodeBlocks		Ї Радикали
-Yi syllables	UnicodeBlocks		Склади Yi
-Yijing hexagram symbols	UnicodeBlocks		Гексаграмні символи Yijing

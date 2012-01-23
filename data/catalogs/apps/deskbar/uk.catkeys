@@ -1,6 +1,7 @@
-1	ukrainian	x-vnd.Be-TSKB	4265681964
-<Be folder is empty>	BeMenu		<Папка Ве пуста>
-About this system	BeMenu		Про систему
+1	ukrainian	x-vnd.Be-TSKB	107564593
+<Deskbar folder is empty>	DeskbarMenu		<Тека Deskbar порожня>
+About Haiku	DeskbarMenu		Про Haiku
+About this system	DeskbarMenu		Про цю систему
 Always on top	PreferencesWindow		Завжди зверху
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Додатки
 Applications	PreferencesWindow		Додатки
@@ -12,34 +13,35 @@ Close all	WindowMenu		Закрити все
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Демо
 Deskbar	System name		Deskbar
 Deskbar preferences	PreferencesWindow		Налаштування Deskbar
-Deskbar preferences…	BeMenu		Налаштування Deskbar…
+Deskbar preferences…	DeskbarMenu		Налаштування Deskbar...
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Аплети екрану
 Edit menu…	PreferencesWindow		Редагувати меню…
 Expand new applications	PreferencesWindow		Розпакувати нові додатки
-Find…	BeMenu		Знайти…
+Find…	DeskbarMenu		Пошук...
 Hide all	WindowMenu		Сховати все
 Hide time	TimeView		Сховати час
 Menu	PreferencesWindow		Меню
-Mount	BeMenu		Змонтувати
+Mount	DeskbarMenu		Приєднати
 No windows	WindowMenu		Немає вікон
-Power off	BeMenu		Вимкнути
+Power off	DeskbarMenu		Вимкнути
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Настройки
 Quit application	WindowMenu		Вийти з додатку
-Recent applications	BeMenu		Недавні додатки
+Recent applications	DeskbarMenu		Останні програми
 Recent applications:	PreferencesWindow		Недавні додатки:
-Recent documents	BeMenu		Недавні документи
+Recent documents	DeskbarMenu		Останні документи
 Recent documents:	PreferencesWindow		Недавні документи:
-Recent folders	BeMenu		Недавні папки
+Recent folders	DeskbarMenu		Останні теки
 Recent folders:	PreferencesWindow		Недавні папки:
-Restart Tracker	BeMenu		Перезавантажити Tracker
-Restart system	BeMenu		Перезавантажити систему
+Restart Tracker	DeskbarMenu		Перезавантажити Tracker
+Restart system	DeskbarMenu		Перезавантажити систему
 Show Time	Tray		Показати час
 Show all	WindowMenu		Показати все
 Show application expander	PreferencesWindow		Показувати додаток expander
 Show calendar…	TimeView		Показати календар…
-Show replicants	BeMenu		Показати репліканти
+Show replicants	DeskbarMenu		Показати репліканти
 Show seconds	PreferencesWindow		Показати секунди
-Shutdown…	BeMenu		Вимкнути…
+Shutdown…	DeskbarMenu		Вимкнути...
 Sort running applications	PreferencesWindow		Сортувати додатки, що запущені
+Suspend	DeskbarMenu		Призупинити
 Tracker always first	PreferencesWindow		Tracker завжди перший
 Window	PreferencesWindow		Вікно

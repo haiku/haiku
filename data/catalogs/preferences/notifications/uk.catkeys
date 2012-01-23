@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Notifications	299049300
+1	ukrainian	x-vnd.Haiku-Notifications	3631903554
 Allowed	NotificationView		Дозволити
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Виникла помилка збереження настройок.\nМожливо, що закінчилось місце на диску.
 Application	NotificationView		Додаток
@@ -27,6 +27,7 @@ Mini icon	DisplayView		Міні іконки
 No	NotificationView		Ні
 Notifications	GeneralView		Повідомлення
 Notifications	NotificationView		Повідомлення
+Notifications	PrefletView		Повідомлення
 Notifications	System name		Notifications
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Повідомлення не можуть бути зупинені, бо сервер недоступний.
 OK	DisplayView		Гаразд

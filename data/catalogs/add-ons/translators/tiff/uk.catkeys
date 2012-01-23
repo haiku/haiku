@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-TIFFTranslator	2714642295
+1	ukrainian	x-vnd.Haiku-TIFFTranslator	292291870
 LZW	TIFFView		LZW
 None	TIFFView		Жоден
 RLE (Packbits)	TIFFView		RLE (Packbits)
@@ -9,5 +9,8 @@ TIFF image	TIFFTranslator		Зображення TIFF
 TIFF image translator	TIFFTranslator		Перетворювач зображень TIFF
 TIFF images	TIFFTranslator		Зображення TIFF
 TIFFTranslator Settings	TIFFTranslator		Настройки перетворювача TIFF
+Use Compression:	TIFFView		Використати зтиск:
 Version %d.%d.%d %s	TIFFView		Версія %d.%d.%d %s
 ZIP (Deflate)	TIFFView		ZIP (Deflate)
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		iВизначення заголовка tiff: неможливо встановити каталог\n
+identify_tiff_header: invalid document index\n	TIFFTranslator		Визначення заголовка tiff: неправильний показник документу\n

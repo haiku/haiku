@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-StyledEdit	27646739
+1	ukrainian	x-vnd.Haiku-StyledEdit	1508367857
 ???	LoadAlert		???
 Align	Menus		Вирівняти
 Black	Menus		Чорний
@@ -55,18 +55,23 @@ Redo typing	QuitAlert		Поновлення друку
 Replace	FindandReplaceWindow		Перемістити
 Replace all	FindandReplaceWindow		Замінити все
 Replace in all windows	FindandReplaceWindow		Замінити  у всіх вікнах
+Replace next	Menus		Замінити наступний
 Replace with:	FindandReplaceWindow		Перемістити з:
 Replace…	Menus		Перемістити…
 Revert to saved…	Menus		Повернутись до збереження…
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Повернутись до останньої версії \"%s\" ?
 Right	Menus		Вправо
 Save	Menus		Зберегти
 Save	QuitAlert		Зберегти
 Save	SaveAlert		Зберегти
 Save as…	Menus		Зберегти як…
+Save changes to the document \"%s\"? 	QuitAlert		Зберегти зміни в документі \"%s\" ?
 Search backwards	FindandReplaceWindow		Повторний пошук
 Select all	Menus		Вибрати все
 Size	Menus		Розмір
 Statistics…	Menus		Статистика…
+StyledEdit	System name		Редактор тексту StyledEdit
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Файл помічений, як такий, що є тільки для читання. Зберегти зміни в документі \"%s\"?
 Undo typing	QuitAlert		Відміна друку
 Untitled 	StyledEditWindow		Неназваний 
 Words:	Statistics		Слова:

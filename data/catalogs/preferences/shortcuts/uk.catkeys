@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Shortcuts	566164556
+1	ukrainian	x-vnd.Haiku-Shortcuts	621368175
 (Choose application with file requester)	ShortcutsWindow		(Виберіть програму з файлами запису)
 *Beep	ShortcutsWindow		*Сигнал
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Вставити Рядок \"Ваш текст тут\"
@@ -6,7 +6,7 @@
 *MouseButton 1	ShortcutsWindow		*Кнопка мишки 1
 *MouseDown	ShortcutsWindow		*Мишку вниз
 *MouseUp	ShortcutsWindow		*Мишку вгору
-*MoveMouse +20 +0	ShortcutsWindow		*Переміщення мишку +20 +0
+*MoveMouse +20 +0	ShortcutsWindow		*Переміщення мишки +20 +0
 *MoveMouseTo 50% 50%	ShortcutsWindow		*Переміщення мишки в 50% 50%
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Багато \"*Перемістити мишку до 100% 0\" \"*Кнопка мишки1\"
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*Відправити повідомлення додатку/x-vnd.Be-TRAK 'Tfnd'
@@ -19,6 +19,7 @@ Beep	ShortcutsSpec		Сигнал
 Cancel	ShortcutsWindow		Відмінити
 Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
 Don't save	ShortcutsWindow		Не зберігати
+Error, NULL state description?\n	ShortcutsSpec		Помилка, NULL опису стану?\n
 File	ShortcutsWindow		Файл
 InsertString	ShortcutsSpec		Вставити стрічку
 Key	ShortcutsWindow		Клавіша
@@ -43,6 +44,8 @@ Save KeySet as…	ShortcutsWindow		Зберегти список як…
 Select	ShortcutsWindow		Вибрати
 SendMessage	ShortcutsSpec		Відправити повідомлення
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Shortcuts	System name		Гарячі клавіші
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Не вдалося відкрити список гарячих клавіш!
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Ярлику невдалось розібрати ваш файл Ключів!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Не вдалося зберегти ваш файл список горячих клавіш!
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		не вдалося створити список горячих клавіш.

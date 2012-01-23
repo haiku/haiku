@@ -1,77 +1,35 @@
-1	ukrainian	x-vnd.Haiku-DriveSetup	1209826930
+1	ukrainian	x-vnd.Haiku-DriveSetup	1911470348
 %ld MiB	Support		%ld MiB
 <empty>	DiskView		<пусто>
 <empty>	PartitionList		<пусто>
-Active	PartitionList		Активний
-Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Ви впевнені що бажаєте видалити вибраний розділ?\n\nВсі дані на розділі будуть безповоротно втрачені!
-Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Ви впевнені , що бажаєте ініціалізувати розділ \"%s\"? Ви повинні будете відповісти повторно при запису на диск.
-Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Ви впевнені , що бажаєте ініціалізувати розділ? Ви повинні будете відповісти повторно при запису на диск.
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Ви впевнені що бажаєте записати зміни на диск зараз?\n\nВсі дані на диску %s будуть безповоротно втрачені!
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Ви впевнені що бажаєте записати зміни на диск зараз?\n\nВсі дані в розділі %s будуть безповоротно втрачені!
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Ви  впевнені, що бажаєте записати зміни на диск?\n\nВсі дані на розділі будуть безповоротно втрачені!
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте записати зміни на диск зараз?\n\nВсі дані на вибраному диску будуть безповоротно втрачені!
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте записати зміни на диск зараз?\n\nВсі дані на вибраному розділі будуть безповоротно втрачені!
-Cancel	CreateParamsPanel		Відмінити
-Cancel	InitParamsPanel		Відмінити
-Cancel	MainWindow		Відмінити
-Cannot delete the selected partition.	MainWindow		Неможливо видалити вибраний розділ.
-Continue	MainWindow		Продовжити
 Could not aquire partitioning information.	MainWindow		Неможливо відобразити інформацію про розмітку.
 Could not delete the selected partition.	MainWindow		Неможливо видалити вибраний розділ.
 Could not mount partition %s.	MainWindow		Неможливо підмонтувати розділ %s.
-Could not unmount partition %s.	MainWindow		Неможливо відмонтувати розділ %s.
-Create	CreateParamsPanel		Створити
-Create…	MainWindow		Створити…
-Creation of the partition has failed.	MainWindow		Створення розділу призупинено.
 Delete	MainWindow		Видалити
-Delete partition	MainWindow		Видалити розділ
-Device	DiskView		Пристрій
-Device	PartitionList		Пристрій
-Disk	MainWindow		Диск
-Disk system \"%s\"\" not found!	MainWindow		Системний диск \"%s\"\" не знайдено!
 DriveSetup	System name		DriveSetup
-Eject	MainWindow		Виштовхнути
-End: %ld MB	Support		Кінець: %ld MB
 Error: 	MainWindow	in any error alert	Помилка:
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Видалення розділу призупинене. Жодні зміни не були записані на диск.
 Failed to initialize the partition %s!\n	MainWindow		Призупинена ініціалізація розділу %s!\n
 Failed to initialize the partition. No changes have been written to disk.	MainWindow		Ініціалізація розділу призупинена. Жодні зміни не були записані на диск.
-File system	PartitionList		Файлова система
 Format (not implemented)	MainWindow		Форматування(не підтримується)
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Ініціалізація розділу %s призупинена. (Нічого не було записано на диск.)
 Initialize	InitParamsPanel		Ініціалізувати
 Initialize	MainWindow		Ініціалізація
-Mount	MainWindow		Змонтувати
-Mount all	MainWindow		Підмонтувати все
 Mounted at	PartitionList		Змонтувати на
 No disk devices have been recognized.	DiskView		Не розпізнано жодного дискового пристрою.
 OK	MainWindow		Гаразд
-Offset: %ld MB	Support		Початок: %ld MB
-Parameters	PartitionList		Параметри
-Partition	MainWindow		Розділ
 Partition %ld	DiskView		Розділ %ld
 Partition name:	CreateParamsPanel		Ім'я розділу:
-Partition size	CreateParamsPanel		Розмір розділу
 Partition type:	CreateParamsPanel		Тип розділу:
 Rescan	MainWindow		Пересканувати
 Select a partition from the list below.	DiskView		Виберіть розділ зі списку нижче.
-Size	PartitionList		Розмір
-Surface test (not implemented)	MainWindow		Тест поверхні (не реалізовано)
 The currently selected partition does not have a parent partition.	MainWindow		Поточний розділ не має батіківського розділу.
-The currently selected partition is not empty.	MainWindow		Поточний вибраний розділ не є пустим.
 The partition %s has been successfully initialized.\n	MainWindow		Розділ %s був успішно ініціалізований.\n
-The partition %s is already mounted.	MainWindow		Розділ %s повністю підмонтований.
 The partition %s is already unmounted.	MainWindow		Розділ %s повністю відмонтований.
-The partition %s is currently mounted.	MainWindow		Розділ %s повністю підмонтовано.
 The selected disk is read-only.	MainWindow		Вибраний диск тільки для читання.
-The selected partition does not contain a partitioning system.	MainWindow		Вибраний розділ не містить системної розмітки.
 There was an error acquiring the partition row.	MainWindow		Сталася помилка при одержанні параметрів розділу.
-There was an error preparing the disk for modifications.	MainWindow		Сталася помилка при підготовці диску до змін.
 There's no space on the partition where a child partition could be created.	MainWindow		Відсутнє місце в розділі , де ви бажаєте створити дочірній розділ.
 Unable to find the selected partition by ID.	MainWindow		Неможливо знайти розділ за ID.
-Unmount	MainWindow		Відмонтувати
-Validation of the given creation parameters failed.	MainWindow		Обгрунтування отриманих параметрів створення призупинене.
-Validation of the given initialization parameters failed.	MainWindow		Обгрунтування отриманих параметрів ініціалізації призупинене.
-Volume name	PartitionList		Ім'я тома
-Write changes	MainWindow		Записати зміни
 You need to select a partition entry from the list.	MainWindow		Ви повинні вибрати розділ зі списку.
