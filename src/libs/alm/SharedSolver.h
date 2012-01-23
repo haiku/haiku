@@ -37,18 +37,23 @@ public:
 
 			ResultType			ValidateMinSize();
 			ResultType			ValidateMaxSize();
+			ResultType			ValidatePreferredSize();
 			ResultType			ValidateLayout(BLayoutContext* context);
 private:
 			struct MinSizeValidator;
 			struct MaxSizeValidator;
+			struct PreferredSizeValidator;
 
 			friend struct MinSizeValidator;
 			friend struct MaxSizeValidator;
+			friend struct PreferredSizeValidator;
 
 			void				SetMaxSize(BALM::BALMLayout* layout,
 									const BSize& max);
 			void				SetMinSize(BALM::BALMLayout* layout,
 									const BSize& min);
+			void				SetPreferredSize(BALM::BALMLayout* layout,
+									const BSize& preferred);
 
 	virtual	void				LayoutContextLeft(BLayoutContext* context);
 
@@ -61,6 +66,7 @@ private:
 			bool				fConstraintsValid;
 			bool				fMinValid;
 			bool				fMaxValid;
+			bool				fPreferredValid;
 			bool				fLayoutValid;
 
 			BLayoutContext*		fLayoutContext;
@@ -69,6 +75,7 @@ private:
 
 			ResultType			fMinResult;
 			ResultType			fMaxResult;
+			ResultType			fPreferredResult;
 			ResultType			fLayoutResult;
 };
 

@@ -851,8 +851,11 @@ BALMLayout::BaseMaxSize()
 BSize
 BALMLayout::BasePreferredSize()
 {
-	fSolver->ValidateMinSize();
-	return fMinSize;
+	ResultType result = fSolver->ValidatePreferredSize();
+	if (result != kOptimal)
+		fBadLayoutPolicy->OnBadLayout(this, result, NULL);
+
+	return fPreferredSize;
 }
 
 

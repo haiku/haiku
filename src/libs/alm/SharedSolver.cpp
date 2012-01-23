@@ -91,11 +91,33 @@ struct SharedSolver::MaxSizeValidator : LayoutOperation {
 };
 
 
+struct SharedSolver::PreferredSizeValidator : LayoutOperation {
+	PreferredSizeValidator(BObjectList<BALMLayout>* layouts)
+		:
+		LayoutOperation(layouts)
+	{
+	}
+
+	void CallSolverMethod(LinearSpec* spec, VariableList* vars)
+	{
+		spec->Solve();
+	}
+
+	void Finalize(BALMLayout* layout, SharedSolver* solver)
+	{
+		float width = layout->Right()->Value() - layout->Left()->Value();
+		float height = layout->Top()->Value() - layout->Bottom()->Value();
+		solver->SetPreferredSize(layout, BSize(width, height));
+	}
+};
+
+
 SharedSolver::SharedSolver()
 	:
 	fConstraintsValid(false),
 	fMinValid(false),
 	fMaxValid(false),
+	fPreferredValid(false),
 	fLayoutValid(false),
 	fLayoutContext(NULL)
 {
@@ -127,6 +149,7 @@ SharedSolver::Invalidate(bool children)
 	fConstraintsValid = false;
 	fMinValid = false;
 	fMaxValid = false;
+	fPreferredValid = false;
 	fLayoutValid = false;
 
 	_SetContext(NULL);
@@ -192,6 +215,26 @@ SharedSolver::ValidateMaxSize()
 
 
 ResultType
+SharedSolver::ValidatePreferredSize()
+{
+	if (fPreferredValid)
+		return fPreferredResult;
+
+	_ValidateConstraints();
+
+	PreferredSizeValidator validator(&fLayouts);
+	validator.Validate(this);
+
+	fPreferredResult = fLinearSpec.Result();
+
+	fPreferredValid = true;
+	fLayoutValid = false;
+
+	return fPreferredResult;
+}
+
+
+ResultType
 SharedSolver::ValidateLayout(BLayoutContext* context)
 {
 	if (fLayoutValid && fLayoutContext == context)
@@ -224,6 +267,13 @@ void
 SharedSolver::SetMinSize(BALMLayout* layout, const BSize& min)
 {
 	layout->fMinSize = min;
+}
+
+
+void
+SharedSolver::SetPreferredSize(BALMLayout* layout, const BSize& preferred)
+{
+	layout->fPreferredSize = preferred;
 }
 
 
