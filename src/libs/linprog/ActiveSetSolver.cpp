@@ -293,6 +293,26 @@ EquationSystem::_EliminateColumn(int32 column, int32 startRow, int32 endRow)
 }
 
 
+namespace {
+
+
+Constraint*
+AddMinConstraint(LinearSpec* spec, Variable* var)
+{
+	return spec->AddConstraint(1, var, kEQ, 0, 5, 5);
+}
+
+
+Constraint*
+AddMaxConstraint(LinearSpec* spec, Variable* var)
+{
+	static const double kHugeValue = 32000;
+	return spec->AddConstraint(1, var, kEQ, kHugeValue, 5, 5);
+}
+
+};
+
+
 ActiveSetSolver::ActiveSetSolver(LinearSpec* linearSpec)
 	:
 	QPSolverInterface(linearSpec),
@@ -582,53 +602,14 @@ ActiveSetSolver::MaxSize(Variable* width, Variable* height)
 ResultType
 ActiveSetSolver::FindMaxs(const VariableList* variables)
 {
-	ConstraintList softConstraints;
-	_RemoveSoftConstraint(softConstraints);
-
-	const double kHugeValue = 32000;
-	ConstraintList maxConstraints;
-	for (int32 i = variables->CountItems() - 1; i >= 0; i--) {
-		maxConstraints.AddItem(fLinearSpec->AddConstraint(1,
-			variables->ItemAt(i), kEQ, kHugeValue, 5, 5));
-	}
-
-	ResultType result = Solve();
-
-	for (int32 i = maxConstraints.CountItems() - 1; i >= 0; i--)
-		fLinearSpec->RemoveConstraint(maxConstraints.ItemAt(i));
-
-	_AddSoftConstraint(softConstraints);
-
-	if (result != kOptimal)
-		TRACE("Could not solve the layout specification (%d). ", result);
-
-	return result;
+	return _FindWithConstraintsNoSoft(variables, AddMaxConstraint);
 }
 
 
 ResultType
 ActiveSetSolver::FindMins(const VariableList* variables)
 {
-	ConstraintList softConstraints;
-	_RemoveSoftConstraint(softConstraints);
-
-	ConstraintList minConstraints;
-	for (int32 i = variables->CountItems() - 1; i >= 0; i--) {
-		minConstraints.AddItem(fLinearSpec->AddConstraint(1,
-			variables->ItemAt(i), kEQ, 0, 5, 5));
-	}
-
-	ResultType result = Solve();
-
-	for (int32 i = minConstraints.CountItems() - 1; i >= 0; i--)
-		fLinearSpec->RemoveConstraint(minConstraints.ItemAt(i));
-
-	_AddSoftConstraint(softConstraints);
-
-	if (result != kOptimal)
-		TRACE("Could not solve the layout specification (%d). ", result);
-
-	return result;
+	return _FindWithConstraintsNoSoft(variables, AddMinConstraint);
 }
 
 
@@ -658,3 +639,28 @@ ActiveSetSolver::_AddSoftConstraint(const ConstraintList& list)
 	}
 }
 
+
+ResultType
+ActiveSetSolver::_FindWithConstraintsNoSoft(const VariableList* variables,
+	AddConstraintFunc constraintFunc)
+{
+	ConstraintList softConstraints;
+	_RemoveSoftConstraint(softConstraints);
+
+	ConstraintList constraints;
+	for (int32 i = variables->CountItems() - 1; i >= 0; i--) {
+		constraints.AddItem(constraintFunc(fLinearSpec, variables->ItemAt(i)));
+	}
+
+	ResultType result = Solve();
+
+	for (int32 i = constraints.CountItems() - 1; i >= 0; i--)
+		fLinearSpec->RemoveConstraint(constraints.ItemAt(i));
+
+	_AddSoftConstraint(softConstraints);
+
+	if (result != kOptimal)
+		TRACE("Could not solve the layout specification (%d). ", result);
+
+	return result;
+}

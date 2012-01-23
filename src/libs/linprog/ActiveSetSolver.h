@@ -77,9 +77,15 @@ public:
 			ResultType			FindMaxs(const VariableList* variables);
 			ResultType			FindMins(const VariableList* variables);
 
-public:
+private:
 			void				_RemoveSoftConstraint(ConstraintList& list);
 			void				_AddSoftConstraint(const ConstraintList& list);
+
+	typedef Constraint* (*AddConstraintFunc)(LinearSpec* spec, Variable* var);
+
+			ResultType			_FindWithConstraintsNoSoft(
+									const VariableList* variables,
+									AddConstraintFunc constraintFunc);
 
 	const	VariableList&		fVariables;
 	const	ConstraintList&		fConstraints;
