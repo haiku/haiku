@@ -69,8 +69,8 @@ RowColumnManager::RemoveArea(Area* area)
 		if (row->fAreas.CountItems() == 0) {
 			fRows.RemoveItem(row);
 			delete row;
-		}
-		_UpdateConstraints(row);
+		} else
+			_UpdateConstraints(row);
 	}
 
 	Column* column = area->fColumn;
@@ -80,8 +80,8 @@ RowColumnManager::RemoveArea(Area* area)
 		if (column->fAreas.CountItems() == 0) {
 			fColumns.RemoveItem(column);
 			delete column;
-		}
-		_UpdateConstraints(column);
+		} else
+			_UpdateConstraints(column);
 	}
 }
 
