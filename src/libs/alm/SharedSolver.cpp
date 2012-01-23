@@ -194,11 +194,17 @@ SharedSolver::ValidateLayout(BLayoutContext* context)
 	if (fLayoutValid && fLayoutContext == context)
 		return;
 
-	fConstraintsValid = false;
 	_SetContext(context);
 	_ValidateConstraints();
-	fLayoutResult = fLinearSpec.Solve();
 
+	for (int32 i = fLayouts.CountItems() - 1; i >= 0; i--) {
+		BALMLayout* layout = fLayouts.ItemAt(i);
+		BSize size(layout->LayoutArea().Size());
+		layout->Right()->SetRange(size.width, size.width);
+		layout->Bottom()->SetRange(size.height, size.height);
+	}
+
+	fLayoutResult = fLinearSpec.Solve();
 	fLayoutValid = true;
 }
 

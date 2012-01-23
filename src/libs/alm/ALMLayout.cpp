@@ -1016,12 +1016,6 @@ BALMLayout::UpdateConstraints(BLayoutContext* context)
 	for (int i = 0; i < CountItems(); i++)
 		AreaFor(ItemAt(i))->InvalidateSizeConstraints();
 	fRowColumnManager->UpdateConstraints();
-
-	if (context) {
-		BSize size(LayoutArea().Size());
-		Right()->SetRange(size.width, size.width);
-		Bottom()->SetRange(size.height, size.height);
-	}
 }
 
 
