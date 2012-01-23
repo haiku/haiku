@@ -26,6 +26,10 @@ using namespace LinearProgramming;
 const BSize kUnsetSize(B_SIZE_UNSET, B_SIZE_UNSET);
 
 
+int CompareXTabFunc(const XTab* tab1, const XTab* tab2);
+int CompareYTabFunc(const YTab* tab1, const YTab* tab2);
+
+
 namespace BALM {
 
 
@@ -136,6 +140,8 @@ BALMLayout::BALMLayout(float hSpacing, float vSpacing, BALMLayout* friendLayout)
 	fBottomInset(0),
 	fHSpacing(BControlLook::ComposeSpacing(hSpacing)),
 	fVSpacing(BControlLook::ComposeSpacing(vSpacing)),
+	fXTabsSorted(false),
+	fYTabsSorted(false),
 	fBadLayoutPolicy(new DefaultPolicy())
 {
 	fSolver = friendLayout ? friendLayout->fSolver : new SharedSolver();
@@ -190,6 +196,7 @@ BALMLayout::AddXTab()
 		fXTabList.RemoveItem(tab);
 		return NULL;
 	}
+	fXTabsSorted = false;
 	return tab;
 }
 
@@ -229,6 +236,7 @@ BALMLayout::AddYTab()
 		fYTabList.RemoveItem(tab);
 		return NULL;
 	}
+	fYTabsSorted = false;
 	return tab;
 }
 
@@ -248,21 +256,31 @@ BALMLayout::CountYTabs() const
 
 
 XTab*
-BALMLayout::XTabAt(int32 index) const
+BALMLayout::XTabAt(int32 index, bool ordered)
 {
+	if (ordered && !fXTabsSorted) {
+		Layout();
+		fXTabList.SortItems(CompareXTabFunc);
+		fXTabsSorted = true;
+	}
 	return fXTabList.ItemAt(index);
 }
 
 
 YTab*
-BALMLayout::YTabAt(int32 index) const
+BALMLayout::YTabAt(int32 index, bool ordered)
 {
+	if (ordered && !fYTabsSorted) {
+		Layout();
+		fYTabList.SortItems(CompareYTabFunc);
+		fYTabsSorted = true;
+	}
 	return fYTabList.ItemAt(index);
 }
 
 
-static int
-compare_x_tab_func(const XTab* tab1, const XTab* tab2)
+int
+CompareXTabFunc(const XTab* tab1, const XTab* tab2)
 {
 	if (tab1->Value() < tab2->Value())
 		return -1;
@@ -272,30 +290,14 @@ compare_x_tab_func(const XTab* tab1, const XTab* tab2)
 }
 
 
-static int
-compare_y_tab_func(const YTab* tab1, const YTab* tab2)
+int
+CompareYTabFunc(const YTab* tab1, const YTab* tab2)
 {
 	if (tab1->Value() < tab2->Value())
 		return -1;
 	else if (tab1->Value() == tab2->Value())
 		return 0;
 	return 1;
-}
-
-
-const XTabList&
-BALMLayout::OrderedXTabs()
-{
-	fXTabList.SortItems(compare_x_tab_func);
-	return fXTabList;
-}
-
-
-const YTabList&
-BALMLayout::OrderedYTabs()
-{
-	fYTabList.SortItems(compare_y_tab_func);
-	return fYTabList;
 }
 
 
@@ -882,6 +884,8 @@ BALMLayout::LayoutInvalidated(bool children)
 	fMinSize = kUnsetSize;
 	fMaxSize = kUnsetSize;
 	fPreferredSize = kUnsetSize;
+	fXTabsSorted = false;
+	fYTabsSorted = false;
 
 	fSolver->Invalidate(children);
 }
@@ -923,6 +927,9 @@ BALMLayout::DoLayout()
 	// set the calculated positions and sizes for every area
 	for (int32 i = 0; i < CountItems(); i++)
 		AreaFor(ItemAt(i))->_DoLayout(LayoutArea().LeftTop());
+
+	fXTabsSorted = false;
+	fYTabsSorted = false;
 }
 
 

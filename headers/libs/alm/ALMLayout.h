@@ -48,11 +48,8 @@ public:
 
 			int32				CountXTabs() const;
 			int32				CountYTabs() const;
-			XTab*				XTabAt(int32 index) const;
-			YTab*				YTabAt(int32 index) const;
-			/*! Order the tab list and return a reference to the list. */
-	const	XTabList&			OrderedXTabs();
-	const	YTabList&			OrderedYTabs();
+			XTab*				XTabAt(int32 index, bool ordered = false);
+			YTab*				YTabAt(int32 index, bool ordered = false);
 
 			Row*				AddRow(YTab* top, YTab* bottom);
 			Column*				AddColumn(XTab* left, XTab* right);
@@ -202,7 +199,10 @@ private:
 			float				fVSpacing;
 
 			XTabList			fXTabList;
+			bool				fXTabsSorted;
+
 			YTabList			fYTabList;
+			bool				fYTabsSorted;
 
 			RowColumnManager*	fRowColumnManager;
 
