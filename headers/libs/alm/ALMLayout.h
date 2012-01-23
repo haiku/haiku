@@ -129,12 +129,14 @@ public:
 	struct BadLayoutPolicy {
 		virtual ~BadLayoutPolicy();
 		/* return false to abandon layout, true to use layout */
-		virtual bool OnBadLayout(BALMLayout* layout) = 0;
+		virtual bool OnBadLayout(BALMLayout* layout,
+			LinearProgramming::ResultType result, BLayoutContext* context) = 0;
 	};
 
 	struct DefaultPolicy : public BadLayoutPolicy {
 		virtual ~DefaultPolicy();
-		virtual bool OnBadLayout(BALMLayout* layout);
+		virtual bool OnBadLayout(BALMLayout* layout,
+			LinearProgramming::ResultType result, BLayoutContext* context);
 	};
 
 private:

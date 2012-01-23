@@ -108,9 +108,13 @@ BALM::BALMLayout::DefaultPolicy::~DefaultPolicy()
 
 
 bool
-BALM::BALMLayout::DefaultPolicy::OnBadLayout(BALMLayout* layout)
+BALM::BALMLayout::DefaultPolicy::OnBadLayout(BALMLayout* layout,
+	ResultType result, BLayoutContext* context)
 {
-	if (layout->Solver()->Result() == kInfeasible) {
+	if (!context)
+		return true;
+
+	if (result == kInfeasible) {
 		debugger("BALMLayout failed to solve your layout!");
 		return false;
 	} else
@@ -821,7 +825,9 @@ BALMLayout::GetBadLayoutPolicy() const
 BSize
 BALMLayout::BaseMinSize()
 {
-	fSolver->ValidateMinSize();
+	ResultType result = fSolver->ValidateMinSize();
+	if (result != kOptimal && result != kUnbounded)
+		fBadLayoutPolicy->OnBadLayout(this, result, NULL);
 	return fMinSize;
 }
 
@@ -832,7 +838,9 @@ BALMLayout::BaseMinSize()
 BSize
 BALMLayout::BaseMaxSize()
 {
-	fSolver->ValidateMaxSize();
+	ResultType result = fSolver->ValidateMaxSize();
+	if (result != kOptimal && result != kUnbounded)
+		fBadLayoutPolicy->OnBadLayout(this, result, NULL);
 	return fMaxSize;
 }
 
@@ -902,7 +910,12 @@ BALMLayout::ItemRemoved(BLayoutItem* item, int32 fromIndex)
 void
 BALMLayout::DoLayout()
 {
-	fSolver->ValidateLayout(LayoutContext());
+	BLayoutContext* context = LayoutContext();
+	ResultType result = fSolver->ValidateLayout(context);
+	if (result != kOptimal
+			&& !fBadLayoutPolicy->OnBadLayout(this, result, context)) {
+		return;
+	}
 
 	// set the calculated positions and sizes for every area
 	for (int32 i = 0; i < CountItems(); i++)
