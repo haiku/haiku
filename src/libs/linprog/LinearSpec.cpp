@@ -496,6 +496,21 @@ LinearSpec::MaxSize(Variable* width, Variable* height)
 }
 
 
+
+ResultType
+LinearSpec::FindMins(const VariableList* variables)
+{
+	return fSolver->FindMins(variables);
+}
+
+
+ResultType
+LinearSpec::FindMaxs(const VariableList* variables)
+{
+	return fSolver->FindMaxs(variables);
+}
+
+
 bool
 LinearSpec::_CheckSummandList(SummandList* list)
 {

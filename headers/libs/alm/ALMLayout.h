@@ -17,6 +17,10 @@
 class BView;
 class BLayoutItem;
 
+namespace BPrivate {
+	class SharedSolver;
+};
+
 
 namespace BALM {
 
@@ -157,6 +161,7 @@ private:
 
 	template <class T>
 	friend class TabAddTransaction;
+	friend class BPrivate::SharedSolver;
 
 	friend class XTab;
 	friend class YTab;
@@ -164,6 +169,8 @@ private:
 
 			float				InsetForTab(XTab* tab) const;
 			float				InsetForTab(YTab* tab) const;
+
+			void				UpdateConstraints(BLayoutContext* context);
 
 			void				_RemoveSelfFromTab(XTab* tab);
 			void				_RemoveSelfFromTab(YTab* tab);
@@ -174,15 +181,7 @@ private:
 
 			BLayoutItem*		_LayoutItemToAdd(BView* view);
 
-			void				_UpdateAreaConstraints();
-
-			BSize				_CalculateMinSize();
-			BSize				_CalculateMaxSize();
-			BSize				_CalculatePreferredSize();
-
-			bool				_TrySolve();
-
-			LinearProgramming::LinearSpec*	fSolver;
+			BPrivate::SharedSolver* fSolver;
 
 			BReference<XTab>	fLeft;
 			BReference<XTab>	fRight;

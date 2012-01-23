@@ -15,6 +15,7 @@
 #include <ControlLook.h>
 
 #include "RowColumnManager.h"
+#include "SharedSolver.h"
 #include "ViewLayoutItem.h"
 
 
@@ -133,9 +134,10 @@ BALMLayout::BALMLayout(float hSpacing, float vSpacing, BALMLayout* friendLayout)
 	fVSpacing(BControlLook::ComposeSpacing(vSpacing)),
 	fBadLayoutPolicy(new DefaultPolicy())
 {
-	fSolver = friendLayout ? friendLayout->Solver() : new LinearSpec();
+	fSolver = friendLayout ? friendLayout->fSolver : new SharedSolver();
 	fSolver->AcquireReference();
-	fRowColumnManager = new RowColumnManager(fSolver);
+	fSolver->RegisterLayout(this);
+	fRowColumnManager = new RowColumnManager(Solver());
 
 	fLeft = AddXTab();
 	fRight = AddXTab();
@@ -159,6 +161,8 @@ BALMLayout::~BALMLayout()
 {
 	delete fRowColumnManager;
 	delete fBadLayoutPolicy;
+
+	fSolver->LayoutLeaving(this);
 	fSolver->ReleaseReference();
 }
 
@@ -174,7 +178,7 @@ BALMLayout::AddXTab()
 	BReference<XTab> tab(new(std::nothrow) XTab(this), true);
 	if (!tab)
 		return NULL;
-	if (!fSolver->AddVariable(tab))
+	if (!Solver()->AddVariable(tab))
 		return NULL;
 
 	fXTabList.AddItem(tab);
@@ -213,7 +217,7 @@ BALMLayout::AddYTab()
 	BReference<YTab> tab(new(std::nothrow) YTab(this), true);
 	if (tab.Get() == NULL)
 		return NULL;
-	if (!fSolver->AddVariable(tab))
+	if (!Solver()->AddVariable(tab))
 		return NULL;
 
 	fYTabList.AddItem(tab);
@@ -307,7 +311,7 @@ BALMLayout::AddRow(YTab* _top, YTab* _bottom)
 		top = AddYTab();
 	if (_bottom == NULL)
 		bottom = AddYTab();
-	return new(std::nothrow) Row(fSolver, top, bottom);
+	return new(std::nothrow) Row(Solver(), top, bottom);
 }
 
 
@@ -327,7 +331,7 @@ BALMLayout::AddColumn(XTab* _left, XTab* _right)
 		left = AddXTab();
 	if (_right == NULL)
 		right = AddXTab();
-	return new(std::nothrow) Column(fSolver, left, right);
+	return new(std::nothrow) Column(Solver(), left, right);
 }
 
 
@@ -598,7 +602,7 @@ BALMLayout::AddItem(BLayoutItem* item, XTab* left, YTab* top, XTab* _right,
 		return NULL;
 	}
 
-	area->_Init(fSolver, left, top, right, bottom, fRowColumnManager);
+	area->_Init(Solver(), left, top, right, bottom, fRowColumnManager);
 	fRowColumnManager->AddArea(area);
 
 	leftTabAdd.Commit();
@@ -618,7 +622,7 @@ BALMLayout::AddItem(BLayoutItem* item, Row* row, Column* column)
 	if (!area)
 		return NULL;
 
-	area->_Init(fSolver, row, column, fRowColumnManager);
+	area->_Init(Solver(), row, column, fRowColumnManager);
 
 	fRowColumnManager->AddArea(area);
 	return area;
@@ -817,8 +821,7 @@ BALMLayout::GetBadLayoutPolicy() const
 BSize
 BALMLayout::BaseMinSize()
 {
-	if (fMinSize == kUnsetSize)
-		fMinSize = _CalculateMinSize();
+	fSolver->ValidateMinSize();
 	return fMinSize;
 }
 
@@ -829,8 +832,7 @@ BALMLayout::BaseMinSize()
 BSize
 BALMLayout::BaseMaxSize()
 {
-	if (fMaxSize == kUnsetSize)
-		fMaxSize = _CalculateMaxSize();
+	fSolver->ValidateMaxSize();
 	return fMaxSize;
 }
 
@@ -841,9 +843,8 @@ BALMLayout::BaseMaxSize()
 BSize
 BALMLayout::BasePreferredSize()
 {
-	if (fPreferredSize == kUnsetSize)
-		fPreferredSize = _CalculatePreferredSize();
-	return fPreferredSize;
+	fSolver->ValidateMinSize();
+	return fMinSize;
 }
 
 
@@ -870,6 +871,8 @@ BALMLayout::LayoutInvalidated(bool children)
 	fMinSize = kUnsetSize;
 	fMaxSize = kUnsetSize;
 	fPreferredSize = kUnsetSize;
+
+	fSolver->Invalidate(children);
 }
 
 
@@ -899,26 +902,18 @@ BALMLayout::ItemRemoved(BLayoutItem* item, int32 fromIndex)
 void
 BALMLayout::DoLayout()
 {
-	_UpdateAreaConstraints();
-
-	// Enforced absolute positions of Right and Bottom
-	BRect area(LayoutArea());
-	BSize size(area.Size());
-	Right()->SetRange(size.width, size.width);
-	Bottom()->SetRange(size.height, size.height);
-
-	_TrySolve();
+	fSolver->ValidateLayout(LayoutContext());
 
 	// set the calculated positions and sizes for every area
 	for (int32 i = 0; i < CountItems(); i++)
-		AreaFor(ItemAt(i))->_DoLayout(area.LeftTop());
+		AreaFor(ItemAt(i))->_DoLayout(LayoutArea().LeftTop());
 }
 
 
 LinearSpec*
 BALMLayout::Solver() const
 {
-	return const_cast<LinearSpec*>(fSolver);
+	return fSolver->Solver();
 }
 
 
@@ -1015,6 +1010,21 @@ BALMLayout::InsetForTab(YTab* tab) const
 }
 
 
+void
+BALMLayout::UpdateConstraints(BLayoutContext* context)
+{
+	for (int i = 0; i < CountItems(); i++)
+		AreaFor(ItemAt(i))->InvalidateSizeConstraints();
+	fRowColumnManager->UpdateConstraints();
+
+	if (context) {
+		BSize size(LayoutArea().Size());
+		Right()->SetRange(size.width, size.width);
+		Bottom()->SetRange(size.height, size.height);
+	}
+}
+
+
 void BALMLayout::_RemoveSelfFromTab(XTab* tab) { tab->LayoutLeaving(this); }
 void BALMLayout::_RemoveSelfFromTab(YTab* tab) { tab->LayoutLeaving(this); }
 
@@ -1031,83 +1041,6 @@ BALMLayout::_LayoutItemToAdd(BView* view)
 	if (view->GetLayout())
 		return view->GetLayout();
 	return new(std::nothrow) BViewLayoutItem(view);
-}
-
-
-/**
- * Caculates the miminum size.
- */
-BSize
-BALMLayout::_CalculateMinSize()
-{
-	_UpdateAreaConstraints();
-
-	Right()->SetRange(0, 20000);
-	Bottom()->SetRange(0, 20000);
-
-	BSize min(fSolver->MinSize(Right(), Bottom()));
-	ResultType result = fSolver->Result();
-	if (result != kUnbounded && result != kOptimal)
-		fBadLayoutPolicy->OnBadLayout(this);
-	return min;
-}
-
-
-/**
- * Caculates the maximum size.
- */
-BSize
-BALMLayout::_CalculateMaxSize()
-{
-	_UpdateAreaConstraints();
-
-	Right()->SetRange(0, 20000);
-	Bottom()->SetRange(0, 20000);
-
-	BSize max(fSolver->MaxSize(Right(), Bottom()));
-	ResultType result = fSolver->Result();
-	if (result != kUnbounded && result != kOptimal)
-		fBadLayoutPolicy->OnBadLayout(this);
-	return max;
-}
-
-
-/**
- * Caculates the preferred size.
- */
-BSize
-BALMLayout::_CalculatePreferredSize()
-{
-	_UpdateAreaConstraints();
-
-	Right()->SetRange(0, 20000);
-	Bottom()->SetRange(0, 20000);
-
-	_TrySolve();
-
-	return BSize(Right()->Value() - Left()->Value(),
-		Bottom()->Value() - Top()->Value());
-}
-
-
-bool
-BALMLayout::_TrySolve()
-{
-	fSolver->Solve();
-
-	if (fSolver->Result() != kOptimal) {
-		return fBadLayoutPolicy->OnBadLayout(this);
-	}
-	return true;
-}
-
-
-void
-BALMLayout::_UpdateAreaConstraints()
-{
-	for (int i = 0; i < CountItems(); i++)
-		AreaFor(ItemAt(i))->InvalidateSizeConstraints();
-	fRowColumnManager->UpdateConstraints();
 }
 
 

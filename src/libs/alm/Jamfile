@@ -14,6 +14,7 @@ SharedLibrary libalm.so :
 	Column.cpp
 	Row.cpp
 	RowColumnManager.cpp
+	SharedSolver.cpp
 	Tab.cpp
 	:
 	liblinprog.a be $(TARGET_LIBSTDC++)

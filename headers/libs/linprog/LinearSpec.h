@@ -55,6 +55,9 @@ public:
 	virtual	BSize				MinSize(Variable* width, Variable* height) = 0;
 	virtual	BSize				MaxSize(Variable* width, Variable* height) = 0;
 
+	virtual	ResultType			FindMins(const VariableList* variables) = 0;
+	virtual	ResultType			FindMaxs(const VariableList* variables) = 0;
+
 protected:
 			LinearSpec*			fLinearSpec; 
 };
@@ -121,6 +124,9 @@ public:
 
 			BSize				MinSize(Variable* width, Variable* height);
 			BSize				MaxSize(Variable* width, Variable* height);
+
+			ResultType			FindMins(const VariableList* variables);
+			ResultType			FindMaxs(const VariableList* variables);
 
 			ResultType			Solve();
 			bool				Save(const char* fileName);

@@ -15,7 +15,7 @@
 #include "LayoutOptimizer.h"
 
 
-//#define DEBUG_ACTIVE_SOLVER
+// #define DEBUG_ACTIVE_SOLVER
 
 #ifdef DEBUG_ACTIVE_SOLVER
 #include <stdio.h>
@@ -576,6 +576,59 @@ ActiveSetSolver::MaxSize(Variable* width, Variable* height)
 		TRACE("Could not solve the layout specification (%d). ", result);
 
 	return BSize(width->Value(), height->Value());
+}
+
+
+ResultType
+ActiveSetSolver::FindMaxs(const VariableList* variables)
+{
+	ConstraintList softConstraints;
+	_RemoveSoftConstraint(softConstraints);
+
+	const double kHugeValue = 32000;
+	ConstraintList maxConstraints;
+	for (int32 i = variables->CountItems() - 1; i >= 0; i--) {
+		maxConstraints.AddItem(fLinearSpec->AddConstraint(1,
+			variables->ItemAt(i), kEQ, kHugeValue, 5, 5));
+	}
+
+	ResultType result = Solve();
+
+	for (int32 i = maxConstraints.CountItems() - 1; i >= 0; i--)
+		fLinearSpec->RemoveConstraint(maxConstraints.ItemAt(i));
+
+	_AddSoftConstraint(softConstraints);
+
+	if (result != kOptimal)
+		TRACE("Could not solve the layout specification (%d). ", result);
+
+	return result;
+}
+
+
+ResultType
+ActiveSetSolver::FindMins(const VariableList* variables)
+{
+	ConstraintList softConstraints;
+	_RemoveSoftConstraint(softConstraints);
+
+	ConstraintList minConstraints;
+	for (int32 i = variables->CountItems() - 1; i >= 0; i--) {
+		minConstraints.AddItem(fLinearSpec->AddConstraint(1,
+			variables->ItemAt(i), kEQ, 0, 5, 5));
+	}
+
+	ResultType result = Solve();
+
+	for (int32 i = minConstraints.CountItems() - 1; i >= 0; i--)
+		fLinearSpec->RemoveConstraint(minConstraints.ItemAt(i));
+
+	_AddSoftConstraint(softConstraints);
+
+	if (result != kOptimal)
+		TRACE("Could not solve the layout specification (%d). ", result);
+
+	return result;
 }
 
 

@@ -74,6 +74,9 @@ public:
 			BSize				MinSize(Variable* width, Variable* height);
 			BSize				MaxSize(Variable* width, Variable* height);
 
+			ResultType			FindMaxs(const VariableList* variables);
+			ResultType			FindMins(const VariableList* variables);
+
 public:
 			void				_RemoveSoftConstraint(ConstraintList& list);
 			void				_AddSoftConstraint(const ConstraintList& list);
