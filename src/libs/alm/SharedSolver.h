@@ -63,6 +63,10 @@ private:
 			bool				_IsMaxSet();
 			void				_ValidateConstraints();
 
+			template <class Validator>
+			void				_Validate(bool& isValid, ResultType& result);
+
+
 			bool				fConstraintsValid;
 			bool				fMinValid;
 			bool				fMaxValid;
