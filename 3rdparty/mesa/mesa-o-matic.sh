@@ -15,7 +15,7 @@ echo ""
 # These are the Mesa headers and libraries used by the opengl kit
 #   Headers are probed for dependencies, only specify ones referenced
 #   by the opengl kit.
-MESA_PRIVATE_HEADERS="glheader.h glapi.h glapitable.h glapitemp.h glapi_priv.h context.h driverfuncs.h meta.h colormac.h buffers.h framebuffer.h renderbuffer.h state.h version.h swrast.h swrast_setup.h tnl.h t_context.h t_pipeline.h vbo.h common_x86_asm.h common_ppc_features.h extensions.h s_spantemp.h s_renderbuffer.h formats.h cpuinfo.h"
+MESA_PRIVATE_HEADERS="glheader.h glapi.h glapitable.h glapitemp.h glapi_priv.h context.h driverfuncs.h meta.h colormac.h buffers.h framebuffer.h renderbuffer.h state.h version.h swrast.h swrast_setup.h tnl.h t_context.h t_pipeline.h vbo.h extensions.h s_spantemp.h s_renderbuffer.h formats.h cpuinfo.h"
 
 #######################################################################
 # END CONFIG DATA, Dragons below!
@@ -58,6 +58,8 @@ findInTree() {
 
 # Directories to search for matching headers
 MESA_INCLUDES="-I./include -I./src -I./src/mapi -I./src/mesa"
+MESA_DEFINES="-DUSE_X86_ASM -DUSE_PPC_ASM -DUSE_SPARC_ASM"
+MESA_DEFINES="$MESA_DEFINES -DUSE_MMX_ASM -DUSE_3DNOW_ASM -DUSE_SSE_ASM -DUSE_X86_64_ASM"
 
 ZIP_HEADERS=""
 echo "Collecting required Mesa private headers..."
@@ -68,7 +70,7 @@ do
 		# gcc2 isn't very good at -MM
 		setgcc gcc4
 	fi
-	HEADERS_RAW=`gcc -MM $MESA_INCLUDES $FOUND`
+	HEADERS_RAW=`gcc -MM $MESA_INCLUDES $MESA_DEFINES $FOUND`
 	if [[ $GCC_VER -eq 2 ]]; then
 		setgcc gcc2
 	fi
