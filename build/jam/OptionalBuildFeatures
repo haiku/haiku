@@ -177,8 +177,8 @@ if $(TARGET_ARCH) = x86 {
 	local galliumObjects ;
 	local zipFile ;
 	if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		#HAIKU_MESA_FILE = mesa-8.0dev-x86-gcc4-2012-01-17.zip ;
-		HAIKU_MESA_FILE = mesa-8.0devdbg-x86-gcc4-2012-01-17.zip ;
+		HAIKU_MESA_FILE = mesa-8.0dev-x86-gcc4-2012-01-23.zip ;
+		#HAIKU_MESA_FILE = mesa-8.0devdbg-x86-gcc4-2012-01-23.zip ;
 		glslObject = lib.haiku/libglsl.a ;
 		galliumObjects = lib.haiku/libgallium.a ;
 	} else {

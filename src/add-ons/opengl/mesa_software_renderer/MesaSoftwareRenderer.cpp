@@ -35,7 +35,6 @@ extern "C" {
 #include "main/formats.h"
 #include "main/framebuffer.h"
 #include "main/renderbuffer.h"
-#include "main/state.h"
 #include "swrast/swrast.h"
 #if __GNUC__ > 2
 #include "swrast/s_renderbuffer.h"
