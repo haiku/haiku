@@ -32,8 +32,9 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	CDRecord				- the command line CD writing tools
 #	Clockwerk				- native audio/video compositing
 #	CLucene					- indexed file search
-#	Curl					- a client that groks URLs
 #	CMake					- cross platform make
+#	Ctags					- exuberant ctags (source files indexing)
+#	Curl					- a client that groks URLs
 #	CVS						- the version control system
 #	Development				- more complete dev environment (including autotools)
 #	DevelopmentBase			- basic development environment (gcc, headers, libs,...)
@@ -433,6 +434,26 @@ if [ IsOptionalHaikuImagePackageAdded CMake ] {
 			InstallOptionalHaikuImagePackage
 				cmake-2.8.4-r1a3-x86-gcc2-2011-05-19.zip
 				: $(baseURL)/cmake-2.8.4-r1a3-x86-gcc2-2011-05-19.zip
+				: : true ;
+		}
+	}
+}
+
+
+# Ctags
+if [ IsOptionalHaikuImagePackageAdded Ctags ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Ctags available for $(TARGET_ARCH)" ;
+	} else {
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			InstallOptionalHaikuImagePackage
+				ctags-5.8-x86-gcc4-2012-01-23.zip
+				: $(baseURL)/ctags-5.8-x86-gcc4-2012-01-23.zip
+				: : true ;
+		} else {
+			InstallOptionalHaikuImagePackage
+				ctags-5.8-x86-gcc2-2010-05-24.zip
+				: $(baseURL)/ctags-5.8-x86-gcc2-2010-05-24.zip
 				: : true ;
 		}
 	}

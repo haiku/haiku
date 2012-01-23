@@ -243,7 +243,6 @@ SubInclude HAIKU_TOP src bin mail_utils ;
 SubInclude HAIKU_TOP src bin compress ;
 SubInclude HAIKU_TOP src bin consoled ;
 SubInclude HAIKU_TOP src bin coreutils ;
-SubInclude HAIKU_TOP src bin ctags ;
 SubInclude HAIKU_TOP src bin desklink ;
 SubInclude HAIKU_TOP src bin diffutils ;
 SubInclude HAIKU_TOP src bin findutils ;
