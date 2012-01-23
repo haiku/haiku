@@ -19,10 +19,15 @@ struct SharedSolver::MinSizeValidator {
 		spec->FindMins(vars);
 	}
 
-	inline void Finalize(BALMLayout* layout, SharedSolver* solver)
+	inline void Finalize(BALMLayout* layout, SharedSolver* solver,
+		ResultType solveResult)
 	{
-		solver->SetMinSize(layout, BSize(layout->Right()->Value(),
-			layout->Bottom()->Value()));
+		if (solveResult == LinearProgramming::kUnbounded) {
+			solver->SetMinSize(layout, BSize(0, 0));
+		} else {
+			solver->SetMinSize(layout, BSize(layout->Right()->Value(),
+				layout->Bottom()->Value()));
+		}
 	}
 };
 
@@ -33,10 +38,16 @@ struct SharedSolver::MaxSizeValidator {
 		spec->FindMaxs(vars);
 	}
 
-	inline void Finalize(BALMLayout* layout, SharedSolver* solver)
+	inline void Finalize(BALMLayout* layout, SharedSolver* solver,
+		ResultType solveResult)
 	{
-		solver->SetMaxSize(layout, BSize(layout->Right()->Value(),
-			layout->Bottom()->Value()));
+		if (solveResult == LinearProgramming::kUnbounded) {
+			solver->SetMaxSize(layout,
+				BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
+		} else {
+			solver->SetMaxSize(layout, BSize(layout->Right()->Value(),
+				layout->Bottom()->Value()));
+		}
 	}
 };
 
@@ -47,7 +58,8 @@ struct SharedSolver::PreferredSizeValidator {
 		spec->Solve();
 	}
 
-	inline void Finalize(BALMLayout* layout, SharedSolver* solver)
+	inline void Finalize(BALMLayout* layout, SharedSolver* solver,
+		ResultType solveResult)
 	{
 		float width = layout->Right()->Value() - layout->Left()->Value();
 		float height = layout->Top()->Value() - layout->Bottom()->Value();
@@ -238,11 +250,11 @@ SharedSolver::_Validate(bool& isValid, ResultType& result)
 	}
 
 	validator.CallSolverMethod(&fLinearSpec, &variables);
+	result = fLinearSpec.Result();
 
 	for (int32 i = fLayouts.CountItems() - 1; i >= 0; i--)
-		validator.Finalize(fLayouts.ItemAt(i), this);
+		validator.Finalize(fLayouts.ItemAt(i), this, result);
 
-	result = fLinearSpec.Result();
 	isValid = true;
 	fLayoutValid = false;
 }
