@@ -152,11 +152,11 @@ SharedSolver::LayoutLeaving(BALMLayout* layout)
 }
 
 
-void
+ResultType
 SharedSolver::ValidateMinSize()
 {
 	if (fMinValid)
-		return;
+		return fMinResult;
 
 	_ValidateConstraints();
 
@@ -167,14 +167,15 @@ SharedSolver::ValidateMinSize()
 
 	fMinValid = true;
 	fLayoutValid = false;
+	return fMinResult;
 }
 
 
-void
+ResultType
 SharedSolver::ValidateMaxSize()
 {
 	if (fMaxValid)
-		return;
+		return fMaxResult;
 
 	_ValidateConstraints();
 
@@ -185,14 +186,16 @@ SharedSolver::ValidateMaxSize()
 
 	fMaxValid = true;
 	fLayoutValid = false;
+
+	return fMaxResult;
 }
 
 
-void
+ResultType
 SharedSolver::ValidateLayout(BLayoutContext* context)
 {
 	if (fLayoutValid && fLayoutContext == context)
-		return;
+		return fLayoutResult;
 
 	_SetContext(context);
 	_ValidateConstraints();
@@ -206,6 +209,7 @@ SharedSolver::ValidateLayout(BLayoutContext* context)
 
 	fLayoutResult = fLinearSpec.Solve();
 	fLayoutValid = true;
+	return fLayoutResult;
 }
 
 

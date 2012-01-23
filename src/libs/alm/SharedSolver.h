@@ -35,9 +35,9 @@ public:
 			void				RegisterLayout(BALM::BALMLayout* layout);
 			void				LayoutLeaving(BALM::BALMLayout* layout);
 
-			void				ValidateMinSize();
-			void				ValidateMaxSize();
-			void				ValidateLayout(BLayoutContext* context);
+			ResultType			ValidateMinSize();
+			ResultType			ValidateMaxSize();
+			ResultType			ValidateLayout(BLayoutContext* context);
 private:
 			struct MinSizeValidator;
 			struct MaxSizeValidator;
