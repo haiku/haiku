@@ -18,7 +18,8 @@
 
 
 class BAlertPolicy : public BALMLayout::BadLayoutPolicy {
-	virtual bool OnBadLayout(BALMLayout* layout)
+	virtual bool OnBadLayout(BALMLayout* layout, ResultType result,
+		BLayoutContext* context)
 	{
 		BAlert* alert = new BAlert("layout failure", "layout failed!",
 							"sure");
