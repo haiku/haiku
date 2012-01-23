@@ -571,6 +571,9 @@ Area::_DoLayout(const BPoint& offset)
 	if (!fLeft)
 		return;
 
+	if (!fLayoutItem->IsVisible())
+		fLayoutItem->AlignInFrame(BRect(0, 0, -1, -1));
+
 	BRect areaFrame(Frame());
 	areaFrame.left += LeftInset();
 	areaFrame.right -= RightInset();
@@ -584,6 +587,12 @@ Area::_DoLayout(const BPoint& offset)
 void
 Area::_UpdateMinSizeConstraint(BSize min)
 {
+	if (!fLayoutItem->IsVisible()) {
+		fMinContentHeight->SetRightSide(-1);
+		fMinContentWidth->SetRightSide(-1);
+		return;
+	}
+
 	float width = 0.;
 	float height = 0.;
 	if (min.width > 0)
@@ -599,6 +608,12 @@ Area::_UpdateMinSizeConstraint(BSize min)
 void
 Area::_UpdateMaxSizeConstraint(BSize max)
 {
+	if (!fLayoutItem->IsVisible()) {
+		fMaxContentHeight->SetRightSide(B_SIZE_UNLIMITED);
+		fMaxContentWidth->SetRightSide(B_SIZE_UNLIMITED);
+		return;
+	}
+
 	max.width += LeftInset() + RightInset();
 	max.height += TopInset() + BottomInset();
 
