@@ -166,6 +166,13 @@ private:
 								{ return fDevice->BufferList().playback_buffers
 									[cycle][channel].stride; }
 
+			char*			_RecordBuffer(int32 cycle, int32 channel)
+								{ return fDevice->BufferList().record_buffers
+									[cycle][channel].base; }
+			uint32			_RecordStride(int32 cycle, int32 channel)
+								{ return fDevice->BufferList().record_buffers
+									[cycle][channel].stride; }
+
 			void			_WriteZeros(node_input& input, uint32 bufferCycle);
 			void			_FillWithZeros(node_input& input);
 			void			_FillNextBuffer(node_input& channel,
@@ -178,7 +185,7 @@ private:
 
 			void 			_AllocateBuffers(node_output& channel);
 			BBuffer* 		_FillNextBuffer(multi_buffer_info& info,
-								node_output& channel);
+								node_output& output);
 			void			_UpdateTimeSource(multi_buffer_info& info,
 								multi_buffer_info& oldInfo, node_input& input);
 

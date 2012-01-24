@@ -13,6 +13,7 @@ Addon hmulti_audio.media_addon :
 	MultiAudioDevice.cpp
 	MultiAudioNode.cpp
 	MultiAudioUtility.cpp
+	Resampler.cpp
 	TimeComputer.cpp
 	: be media $(TARGET_LIBSUPC++)
 ;
