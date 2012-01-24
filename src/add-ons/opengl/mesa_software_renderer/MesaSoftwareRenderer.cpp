@@ -48,15 +48,14 @@ extern "C" {
 
 #define TRACE_SOFTGL
 #ifdef TRACE_SOFTGL
-extern "C" void _sPrintf(const char* format, ...);
-#   define TRACE(x...) _sPrintf("MesaSoftwareRenderer: " x)
-#   define CALLED() printf("MesaSoftwareRenderer: %s\n", __PRETTY_FUNCTION__)
+#	define TRACE(x...) printf("MesaSoftwareRenderer: " x)
+#	define CALLED() printf("MesaSoftwareRenderer: %s\n", __PRETTY_FUNCTION__)
 #else
-#   define TRACE(x...)
+#	define TRACE(x...)
 #	define CALLED()
 #endif
 
-#define ERROR(x...) _sPrintf("MesaSoftwareRenderer: " x)
+#define ERROR(x...) printf("MesaSoftwareRenderer: " x)
 }
 
 
