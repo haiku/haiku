@@ -46,7 +46,17 @@ extern "C" {
 #include "vbo/vbo.h"
 
 
-#define CALLED() //printf("CALLED %s\n",__PRETTY_FUNCTION__)
+#define TRACE_SOFTGL
+#ifdef TRACE_SOFTGL
+extern "C" void _sPrintf(const char* format, ...);
+#   define TRACE(x...) _sPrintf("MesaSoftwareRenderer: " x)
+#   define CALLED() printf("MesaSoftwareRenderer: %s\n", __PRETTY_FUNCTION__)
+#else
+#   define TRACE(x...)
+#	define CALLED()
+#endif
+
+#define ERROR(x...) _sPrintf("MesaSoftwareRenderer: " x)
 }
 
 
@@ -250,6 +260,7 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView* view, ulong options,
 #endif
 
 	if (!fContext) {
+		ERROR("%s: Failed to create Mesa context!\n", __func__);
 		_mesa_destroy_visual(fVisual);
 		return;
 	}
@@ -278,33 +289,23 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView* view, ulong options,
 	_mesa_initialize_window_framebuffer(&fFrameBuffer->base, fVisual);
 
 	// Setup front render buffer
-	fFrontRenderBuffer = (struct msr_renderbuffer*)calloc(1,
-		sizeof(*fFrontRenderBuffer));
-	_mesa_init_renderbuffer(&fFrontRenderBuffer->base, 0);
-	fFrontRenderBuffer->active = true;
-	if (_SetupRenderBuffer(fFrontRenderBuffer, fColorSpace) != B_OK) {
-		free(fFrameBuffer);
+	fFrontRenderBuffer = _NewRenderBuffer(true);
+	if (fFrontRenderBuffer == NULL) {
 		_mesa_destroy_visual(fVisual);
 		return;
 	}
-	fFrontRenderBuffer->base.AllocStorage = _FrontRenderbufferStorage;
 	_mesa_add_renderbuffer(&fFrameBuffer->base, BUFFER_FRONT_LEFT,
 		&fFrontRenderBuffer->base);
 
 	// Setup back render buffer (if needed)
-	fBackRenderBuffer = (struct msr_renderbuffer*)calloc(1,
-		sizeof(*fBackRenderBuffer));
-	if (dblFlag) {
-		_mesa_init_renderbuffer(&fBackRenderBuffer->base, 0);
-
-		fBackRenderBuffer->active = true;
-		_SetupRenderBuffer(fBackRenderBuffer, fColorSpace);
-		fBackRenderBuffer->base.AllocStorage = _BackRenderbufferStorage;
-		fBackRenderBuffer->base.Delete = _DeleteBackBuffer;
+	if (fVisual->doubleBufferMode) {
+		fBackRenderBuffer = _NewRenderBuffer(false);
+		if (fBackRenderBuffer == NULL) {
+			_mesa_destroy_visual(fVisual);
+			return;
+		}
 		_mesa_add_renderbuffer(&fFrameBuffer->base, BUFFER_BACK_LEFT,
 			&fBackRenderBuffer->base);
-	} else {
-		fBackRenderBuffer->active = false;
 	}
 
 #if HAIKU_MESA_VER >= 709
@@ -372,7 +373,7 @@ MesaSoftwareRenderer::LockGL()
 	if (fColorSpace != colorSpace) {
 		fColorSpace = colorSpace;
 		_SetupRenderBuffer(fFrontRenderBuffer, fColorSpace);
-		if (fBackRenderBuffer->active)
+		if (fVisual->doubleBufferMode)
 			_SetupRenderBuffer(fBackRenderBuffer, fColorSpace);
 	}
 
@@ -554,12 +555,15 @@ MesaSoftwareRenderer::FrameResized(float width, float height)
 void
 MesaSoftwareRenderer::_AllocateBitmap()
 {
+	CALLED();
 	// allocate new size of back buffer bitmap
 	delete fBitmap;
 	fBitmap = NULL;
 
-	if (fWidth < 1 || fHeight < 1)
+	if (fWidth < 1 || fHeight < 1) {
+		TRACE("%s: Cannot allocate bitmap < 1x1!\n", __func__);
 		return;
+	}
 	BRect rect(0.0, 0.0, fWidth - 1, fHeight - 1);
 	fBitmap = new BBitmap(rect, fColorSpace);
 	for (uint i = 0; i < fHeight; i++) {
@@ -570,7 +574,7 @@ MesaSoftwareRenderer::_AllocateBitmap()
 	_mesa_resize_framebuffer(fContext, &fFrameBuffer->base, fWidth, fHeight);
 	fFrontRenderBuffer->base.Data = fBitmap->Bits();
 	fFrontRenderBuffer->size = fBitmap->BitsLength();
-	if (fBackRenderBuffer->active)
+	if (fVisual->doubleBufferMode)
 		fBackRenderBuffer->size = fBitmap->BitsLength();
 	fFrameBuffer->width = fWidth;
 	fFrameBuffer->height = fHeight;
@@ -694,6 +698,8 @@ MesaSoftwareRenderer::_FrontRenderbufferStorage(gl_context* ctx,
 	struct gl_renderbuffer* render, GLenum internalFormat,
 	GLuint width, GLuint height)
 {
+	CALLED();
+
 	render->Data = NULL;
 	render->Width = width;
 	render->Height = height;
@@ -732,12 +738,41 @@ MesaSoftwareRenderer::_Flush(gl_context* ctx)
 }
 
 
+struct msr_renderbuffer*
+MesaSoftwareRenderer::_NewRenderBuffer(bool front)
+{
+	CALLED();
+	struct msr_renderbuffer *msr
+		= (struct msr_renderbuffer*)calloc(1, sizeof *msr);
+
+	if (!msr) {
+		ERROR("%s: Failed calloc RenderBuffer\n", __func__);
+		return NULL;
+	}
+
+	_mesa_init_renderbuffer(&msr->base, 0);
+
+	if (_SetupRenderBuffer(msr, fColorSpace) != B_OK) {
+		free(msr);
+		return NULL;
+	}
+
+	if (front)
+		msr->base.AllocStorage = _FrontRenderbufferStorage;
+	else {
+		msr->base.AllocStorage = _BackRenderbufferStorage;
+		msr->base.Delete = _DeleteBackBuffer;
+	}
+
+	return msr;
+}
+
+
 status_t
 MesaSoftwareRenderer::_SetupRenderBuffer(
 	struct msr_renderbuffer* buffer, color_space colorSpace)
 {
-	if (!buffer->active)
-		return B_OK;
+	CALLED();
 
 	buffer->base.DataType = GL_UNSIGNED_BYTE;
 	buffer->base.Data = NULL;
@@ -831,6 +866,7 @@ MesaSoftwareRenderer::_SetupRenderBuffer(
 void
 MesaSoftwareRenderer::_DeleteBackBuffer(struct gl_renderbuffer* rb)
 {
+	CALLED();
 	free(rb->Data);
 	free(rb);
 }

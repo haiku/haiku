@@ -38,7 +38,6 @@ extern "C" {
 struct msr_renderbuffer {
 	struct gl_renderbuffer base;
 	uint32 size;
-	bool active;
 };
 
 
@@ -103,6 +102,8 @@ private:
 									GLenum internalFormat,
 									GLuint width, GLuint height);
 		static void				_Flush(gl_context *ctx);
+
+		struct msr_renderbuffer* _NewRenderBuffer(bool front);
 		status_t				_SetupRenderBuffer(struct msr_renderbuffer*
 									buffer, color_space colorSpace);
 		static void				_DeleteBackBuffer(struct gl_renderbuffer* rb);
