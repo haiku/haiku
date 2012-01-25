@@ -201,7 +201,7 @@ SharedSolver::SetPreferredSize(BALMLayout* layout, const BSize& preferred)
 void
 SharedSolver::LayoutContextLeft(BLayoutContext* context)
 {
-	_SetContext(NULL);
+	fLayoutContext = NULL;
 }
 
 
