@@ -9,8 +9,8 @@
 #include "GLDispatcher.h"
 
 
-BGLRenderer::BGLRenderer(BGLView *view, ulong glOptions,
-	BGLDispatcher *dispatcher)
+BGLRenderer::BGLRenderer(BGLView* view, ulong glOptions,
+	BGLDispatcher* dispatcher)
 	:
 	fRefCount(1),
 	fView(view),
@@ -66,14 +66,14 @@ BGLRenderer::Draw(BRect updateRect)
 
 
 status_t
-BGLRenderer::CopyPixelsOut(BPoint source, BBitmap *dest)
+BGLRenderer::CopyPixelsOut(BPoint source, BBitmap* dest)
 {
 	return B_ERROR;
 }
 
 
 status_t
-BGLRenderer::CopyPixelsIn(BBitmap *source, BPoint dest)
+BGLRenderer::CopyPixelsIn(BBitmap* source, BPoint dest)
 {
 	return B_ERROR;
 }
@@ -86,7 +86,7 @@ BGLRenderer::FrameResized(float width, float height)
 
 
 void
-BGLRenderer::DirectConnected(direct_buffer_info *info)
+BGLRenderer::DirectConnected(direct_buffer_info* info)
 {
 }
 
@@ -97,8 +97,8 @@ BGLRenderer::EnableDirectMode(bool enabled)
 }
 
 
-status_t BGLRenderer::_Reserved_Renderer_0(int32 n, void *p) { return B_ERROR; }
-status_t BGLRenderer::_Reserved_Renderer_1(int32 n, void *p) { return B_ERROR; }
-status_t BGLRenderer::_Reserved_Renderer_2(int32 n, void *p) { return B_ERROR; }
-status_t BGLRenderer::_Reserved_Renderer_3(int32 n, void *p) { return B_ERROR; }
-status_t BGLRenderer::_Reserved_Renderer_4(int32 n, void *p) { return B_ERROR; }
+status_t BGLRenderer::_Reserved_Renderer_0(int32 n, void* p) { return B_ERROR; }
+status_t BGLRenderer::_Reserved_Renderer_1(int32 n, void* p) { return B_ERROR; }
+status_t BGLRenderer::_Reserved_Renderer_2(int32 n, void* p) { return B_ERROR; }
+status_t BGLRenderer::_Reserved_Renderer_3(int32 n, void* p) { return B_ERROR; }
+status_t BGLRenderer::_Reserved_Renderer_4(int32 n, void* p) { return B_ERROR; }

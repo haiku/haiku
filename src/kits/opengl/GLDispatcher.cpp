@@ -29,12 +29,12 @@ extern "C" {
 #define NAME(func) gl##func
 
 #define DISPATCH(func, args, msg)					\
-	const struct _glapi_table *dispatch;					\
+	const struct _glapi_table* dispatch;					\
 	dispatch = _glapi_Dispatch ? _glapi_Dispatch : _glapi_get_dispatch();\
 	(dispatch->func) args
 
 #define RETURN_DISPATCH(func, args, msg) 				\
-	const struct _glapi_table *dispatch;					\
+	const struct _glapi_table* dispatch;					\
 	dispatch = _glapi_Dispatch ? _glapi_Dispatch : _glapi_get_dispatch();\
 	return (dispatch->func) args
 
@@ -59,7 +59,7 @@ BGLDispatcher::~BGLDispatcher()
 
 
 status_t
-BGLDispatcher::CheckTable(const struct _glapi_table *table)
+BGLDispatcher::CheckTable(const struct _glapi_table* table)
 {
 	_glapi_check_table(table ? table : _glapi_get_dispatch());
 	return B_OK;
@@ -67,7 +67,7 @@ BGLDispatcher::CheckTable(const struct _glapi_table *table)
 
 
 status_t
-BGLDispatcher::SetTable(struct _glapi_table *table)
+BGLDispatcher::SetTable(struct _glapi_table* table)
 {
 	_glapi_set_dispatch(table);
 	return B_OK;

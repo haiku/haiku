@@ -25,7 +25,7 @@
 
 
 struct glview_direct_info {
-	direct_buffer_info *direct_info;
+	direct_buffer_info* direct_info;
 	bool direct_connected;
 	bool enable_direct_mode;
 
@@ -101,7 +101,7 @@ BGLView::SwapBuffers(bool vSync)
 }
 
 
-BView *
+BView*
 BGLView::EmbeddedView()
 {
 	return NULL;
@@ -124,7 +124,7 @@ BGLView::GetGLProcAddress(const char* procName)
 
 
 status_t
-BGLView::CopyPixelsOut(BPoint source, BBitmap *dest)
+BGLView::CopyPixelsOut(BPoint source, BBitmap* dest)
 {
 	if (!fRenderer)
 		return B_ERROR;
@@ -137,7 +137,7 @@ BGLView::CopyPixelsOut(BPoint source, BBitmap *dest)
 
 
 status_t
-BGLView::CopyPixelsIn(BBitmap *source, BPoint dest)
+BGLView::CopyPixelsIn(BBitmap* source, BPoint dest)
 {
 	if (!fRenderer)
 		return B_ERROR;
@@ -185,7 +185,7 @@ BGLView::AttachedToWindow()
 	BView::AttachedToWindow();
 
 	fBounds = Bounds();
-	for (BView *view = this; view != NULL; view = view->Parent())
+	for (BView* view = this; view != NULL; view = view->Parent())
 		view->ConvertToParent(&fBounds);
 
 	fRenderer = fRoster->GetRenderer();
@@ -255,7 +255,7 @@ void
 BGLView::FrameResized(float width, float height)
 {
 	fBounds = Bounds();
-	for (BView *v = this; v; v = v->Parent())
+	for (BView* v = this; v; v = v->Parent())
 		v->ConvertToParent(&fBounds);
 
 	if (fRenderer) {
@@ -267,26 +267,26 @@ BGLView::FrameResized(float width, float height)
 		UnlockGL();
 	}
 
-   	BView::FrameResized(width, height);
+	BView::FrameResized(width, height);
 }
 
 
 status_t
-BGLView::Perform(perform_code d, void *arg)
+BGLView::Perform(perform_code d, void* arg)
 {
-   	return BView::Perform(d, arg);
+	return BView::Perform(d, arg);
 }
 
 
 status_t
-BGLView::Archive(BMessage *data, bool deep) const
+BGLView::Archive(BMessage* data, bool deep) const
 {
 	return BView::Archive(data, deep);
 }
 
 
 void
-BGLView::MessageReceived(BMessage *msg)
+BGLView::MessageReceived(BMessage* msg)
 {
 	BView::MessageReceived(msg);
 }
@@ -323,23 +323,23 @@ BGLView::Hide()
 }
 
 
-BHandler *
-BGLView::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
-	int32 form, const char *property)
+BHandler*
+BGLView::ResolveSpecifier(BMessage* msg, int32 index, BMessage* specifier,
+	int32 form, const char* property)
 {
 	return BView::ResolveSpecifier(msg, index, specifier, form, property);
 }
 
 
 status_t
-BGLView::GetSupportedSuites(BMessage *data)
+BGLView::GetSupportedSuites(BMessage* data)
 {
 	return BView::GetSupportedSuites(data);
 }
 
 
 void
-BGLView::DirectConnected(direct_buffer_info *info)
+BGLView::DirectConnected(direct_buffer_info* info)
 {
 	if (fClipInfo == NULL) {
 		fClipInfo = new (std::nothrow) glview_direct_info();
@@ -347,7 +347,7 @@ BGLView::DirectConnected(direct_buffer_info *info)
 			return;
 	}
 
-	direct_buffer_info *localInfo = fClipInfo->direct_info;
+	direct_buffer_info* localInfo = fClipInfo->direct_info;
 
 	switch (info->buffer_state & B_DIRECT_MODE_MASK) {
 		case B_DIRECT_START:
@@ -414,8 +414,8 @@ BGLView::_CallDirectConnected()
 	if (!fClipInfo)
 		return;
 
-	direct_buffer_info *localInfo = fClipInfo->direct_info;
-	direct_buffer_info *info = (direct_buffer_info *)malloc(
+	direct_buffer_info* localInfo = fClipInfo->direct_info;
+	direct_buffer_info* info = (direct_buffer_info*)malloc(
 		DIRECT_BUFFER_INFO_AREA_SIZE);
 	if (info == NULL)
 		return;
@@ -479,13 +479,11 @@ BGLView::BGLView(BRect rect, char* name, ulong resizingMode, ulong mode,
 
 
 #if 0
-
-
 // TODO: implement BGLScreen class...
 
 
 BGLScreen::BGLScreen(char* name, ulong screenMode, ulong options,
-		status_t *error, bool debug)
+		status_t* error, bool debug)
 	:
 	BWindowScreen(name, screenMode, error, debug)
 {
@@ -536,57 +534,58 @@ BGLScreen::ScreenConnected(bool enabled)
 void
 BGLScreen::FrameResized(float width, float height)
 {
-   return BWindowScreen::FrameResized(width, height);
+	return BWindowScreen::FrameResized(width, height);
 }
 
 
 status_t
-BGLScreen::Perform(perform_code d, void *arg)
+BGLScreen::Perform(perform_code d, void* arg)
 {
-   return BWindowScreen::Perform(d, arg);
+	return BWindowScreen::Perform(d, arg);
 }
 
 
 status_t
-BGLScreen::Archive(BMessage *data, bool deep) const
+BGLScreen::Archive(BMessage* data, bool deep) const
 {
-   return BWindowScreen::Archive(data, deep);
+	return BWindowScreen::Archive(data, deep);
 }
 
 
 void
-BGLScreen::MessageReceived(BMessage *msg)
+BGLScreen::MessageReceived(BMessage* msg)
 {
-   BWindowScreen::MessageReceived(msg);
+	BWindowScreen::MessageReceived(msg);
 }
 
 
 void
 BGLScreen::Show()
 {
-   BWindowScreen::Show();
+	BWindowScreen::Show();
 }
 
 
 void
 BGLScreen::Hide()
 {
-   BWindowScreen::Hide();
+	BWindowScreen::Hide();
 }
 
 
-BHandler *
-BGLScreen::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
-	int32 form, const char *property)
+BHandler*
+BGLScreen::ResolveSpecifier(BMessage* msg, int32 index, BMessage* specifier,
+	int32 form, const char* property)
 {
-   return BWindowScreen::ResolveSpecifier(msg, index, specifier, form, property);
+	return BWindowScreen::ResolveSpecifier(msg, index, specifier,
+		form, property);
 }
 
 
 status_t
-BGLScreen::GetSupportedSuites(BMessage *data)
+BGLScreen::GetSupportedSuites(BMessage* data)
 {
-   return BWindowScreen::GetSupportedSuites(data);
+	return BWindowScreen::GetSupportedSuites(data);
 }
 
 
@@ -600,10 +599,10 @@ void BGLScreen::_ReservedGLScreen5() {}
 void BGLScreen::_ReservedGLScreen6() {}
 void BGLScreen::_ReservedGLScreen7() {}
 void BGLScreen::_ReservedGLScreen8() {}
-
 #endif
 
-const char * color_space_name(color_space space)
+
+const char* color_space_name(color_space space)
 {
 #define C2N(a)	case a:	return #a
 
@@ -630,7 +629,7 @@ const char * color_space_name(color_space space)
 glview_direct_info::glview_direct_info()
 {
 	// TODO: See direct_window_data() in app_server's ServerWindow.cpp
-	direct_info = (direct_buffer_info *)calloc(1, DIRECT_BUFFER_INFO_AREA_SIZE);
+	direct_info = (direct_buffer_info*)calloc(1, DIRECT_BUFFER_INFO_AREA_SIZE);
 	direct_connected = false;
 	enable_direct_mode = false;
 }

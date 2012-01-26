@@ -21,12 +21,13 @@
 #include <string.h>
 
 
-extern "C" status_t _kern_get_safemode_option(const char *parameter,
-	char *buffer, size_t *_bufferSize);
+extern "C" status_t _kern_get_safemode_option(const char* parameter,
+	char* buffer, size_t* _bufferSize);
 
 
-GLRendererRoster::GLRendererRoster(BGLView *view, ulong options)
-	: fNextID(0),
+GLRendererRoster::GLRendererRoster(BGLView* view, ulong options)
+	:
+	fNextID(0),
 	fView(view),
 	fOptions(options),
 	fSafeMode(false),
@@ -78,7 +79,7 @@ GLRendererRoster::~GLRendererRoster()
 }
 
 
-BGLRenderer *
+BGLRenderer*
 GLRendererRoster::GetRenderer(int32 id)
 {
 	RendererMap::const_iterator iterator = fRenderers.find(id);
@@ -193,13 +194,13 @@ GLRendererRoster::CreateRenderer(const entry_ref& ref)
 	if (image < B_OK)
 		return image;
 
-	BGLRenderer *(*instantiate_renderer)
-		(BGLView *view, ulong options, BGLDispatcher *dispatcher);
+	BGLRenderer* (*instantiate_renderer)
+		(BGLView* view, ulong options, BGLDispatcher* dispatcher);
 
 	status = get_image_symbol(image, "instantiate_gl_renderer",
 		B_SYMBOL_TYPE_TEXT, (void**)&instantiate_renderer);
 	if (status == B_OK) {
-		BGLRenderer *renderer
+		BGLRenderer* renderer
 			= instantiate_renderer(fView, fOptions, new BGLDispatcher());
 		if (!renderer) {
 			unload_add_on(image);

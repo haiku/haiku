@@ -12,7 +12,7 @@
 
 
 struct renderer_item {
-	BGLRenderer	*renderer;
+	BGLRenderer* renderer;
 	entry_ref	ref;
 	ino_t		node;
 	image_id	image;
@@ -23,10 +23,10 @@ typedef std::map<renderer_id, renderer_item> RendererMap;
 
 class GLRendererRoster {
 	public:
-		GLRendererRoster(BGLView *view, ulong options);
+		GLRendererRoster(BGLView* view, ulong options);
 		virtual ~GLRendererRoster();
 
-		BGLRenderer *GetRenderer(int32 id = 0);
+		BGLRenderer* GetRenderer(int32 id = 0);
 
 	private:
 		void AddDefaultPaths();
@@ -37,7 +37,7 @@ class GLRendererRoster {
 
 		RendererMap	fRenderers;
 		int32		fNextID;
-		BGLView 	*fView;
+		BGLView*	fView;
 		ulong		fOptions;
 		bool		fSafeMode;
 		const char*	fABISubDirectory;
