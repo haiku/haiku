@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Philippe Houdoin <philippe.houdoin@free.fr>
  */
 
 

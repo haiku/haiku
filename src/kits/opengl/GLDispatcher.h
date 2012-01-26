@@ -1,9 +1,11 @@
 /*
+ * Copyright 1998-1999 Precision Insight, Inc., Cedar Park, Texas.
  * Copyright 2000-2012 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Brian Paul <brian.e.paul@gmail.com>
+ *		Philippe Houdoin <philippe.houdoin@free.fr>
  */
 #ifndef GLDISPATCHER_H
 #define GLDISPATCHER_H
