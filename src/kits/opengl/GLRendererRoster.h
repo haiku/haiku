@@ -1,12 +1,15 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2012, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _GLRENDERER_ROSTER_H
 #define _GLRENDERER_ROSTER_H
 
+
 #include <GLRenderer.h>
+
 #include <map>
+
 
 struct renderer_item {
 	BGLRenderer	*renderer;
@@ -16,6 +19,7 @@ struct renderer_item {
 };
 
 typedef std::map<renderer_id, renderer_item> RendererMap;
+
 
 class GLRendererRoster {
 	public:
@@ -39,5 +43,6 @@ class GLRendererRoster {
 		const char*	fABISubDirectory;
 
 };
+
 
 #endif	/* _GLRENDERER_ROSTER_H */

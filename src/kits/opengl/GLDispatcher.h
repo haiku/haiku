@@ -1,3 +1,10 @@
+/*
+ * Copyright 2000-2012 Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Brian Paul <brian.e.paul@gmail.com>
+ */
 #ifndef GLDISPATCHER_H
 #define GLDISPATCHER_H
 
@@ -11,6 +18,7 @@
 extern "C" {
 #include "glapi.h"
 }
+
 
 class BGLDispatcher
 {
@@ -26,7 +34,8 @@ class BGLDispatcher
 		void *					CurrentContext();
 
 		struct _glapi_table * 	Table();
-		status_t				CheckTable(const struct _glapi_table *dispatch = NULL);
+		status_t				CheckTable(
+									const struct _glapi_table *dispatch = NULL);
 		status_t				SetTable(struct _glapi_table *dispatch);
 		uint32					TableSize();
 
@@ -36,6 +45,7 @@ class BGLDispatcher
 		const _glapi_proc		AddressOf(const char *functionName);
 		uint32					OffsetOf(const char *functionName);
 };
+
 
 // Inlines methods
 inline void BGLDispatcher::SetCurrentContext(void * context)
@@ -87,8 +97,3 @@ inline uint32 BGLDispatcher::OffsetOf(const char *functionName)
 
 
 #endif	// GLDISPATCHER_H
-
-
-
-
-

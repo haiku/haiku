@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku. All rights reserved.
+ * Copyright 2006-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -22,6 +22,7 @@
 #include "DirectWindowPrivate.h"
 #include "GLDispatcher.h"
 #include "GLRendererRoster.h"
+
 
 struct glview_direct_info {
 	direct_buffer_info *direct_info;
