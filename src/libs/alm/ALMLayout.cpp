@@ -267,6 +267,13 @@ BALMLayout::XTabAt(int32 index, bool ordered)
 }
 
 
+XTab*
+BALMLayout::XTabAt(int32 index) const
+{
+	return fXTabList.ItemAt(index);
+}
+
+
 YTab*
 BALMLayout::YTabAt(int32 index, bool ordered)
 {
@@ -275,6 +282,13 @@ BALMLayout::YTabAt(int32 index, bool ordered)
 		fYTabList.SortItems(CompareYTabFunc);
 		fYTabsSorted = true;
 	}
+	return fYTabList.ItemAt(index);
+}
+
+
+YTab*
+BALMLayout::YTabAt(int32 index) const 
+{
 	return fYTabList.ItemAt(index);
 }
 
@@ -323,6 +337,8 @@ CompareYTabFunc(const YTab* tab1, const YTab* tab2)
 		return 0;
 	return 1;
 }
+
+
 
 
 /**

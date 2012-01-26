@@ -49,7 +49,10 @@ public:
 			int32				CountXTabs() const;
 			int32				CountYTabs() const;
 			XTab*				XTabAt(int32 index, bool ordered = false);
+			XTab*				XTabAt(int32 index) const;
 			YTab*				YTabAt(int32 index, bool ordered = false);
+			YTab*				YTabAt(int32 index) const;
+
 			int32				IndexOf(XTab* tab, bool ordered = false);
 			int32				IndexOf(YTab* tab, bool ordered = false);
 
