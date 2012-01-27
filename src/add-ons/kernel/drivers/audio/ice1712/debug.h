@@ -15,8 +15,8 @@
 #	undef TRACE
 #endif
 
-#define TRACE_MULTI_AUDIO
-#ifdef TRACE_MULTI_AUDIO
+//#define ICE1712_VERBOSE
+#ifdef ICE1712_VERBOSE
 #	define TRACE(a...) dprintf("\33[34mice1712:\33[0m " a)
 #else
 #	define TRACE(a...) ;

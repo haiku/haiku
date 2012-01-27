@@ -35,6 +35,7 @@ typedef enum product_t {
 #define NUM_CARDS					4
 #define MAX_ADC						12	// + the output of the Digital mixer
 #define MAX_DAC						10
+#define MAX_MIDI_INTERFACE			2
 #define SWAPPING_BUFFERS			2
 #define SAMPLE_SIZE					4
 #define MIN_BUFFER_FRAMES			64
@@ -62,13 +63,26 @@ typedef enum product_t {
 #define ICE1712_SAMPLERATE_88K2		0xB
 #define ICE1712_SAMPLERATE_44K1		0x8
 
+struct ice1712;
+
 typedef struct _midi_dev {
-	struct _ice1712_	*card;
-	void				*driver;
-	void				*cookie;
-	int32				count;
-	char				name[64];
+	struct ice1712	*card;
+	void			*mpu401device;
+	uint8			int_mask;
+	char			name[64];
 } midi_dev;
+
+void ice_1712_midi_interrupt_op(int32 op, void *data);
+status_t ice_1712_midi_open(const char *name,
+	uint32 flags, void **cookie);
+status_t ice_1712_midi_close(void *cookie);
+status_t ice_1712_midi_free(void *cookie);
+status_t ice_1712_midi_control(void *cookie,
+	uint32 op, void *data, size_t len);
+status_t ice_1712_midi_read(void *cookie,
+	off_t pos, void *data, size_t *len);
+status_t ice_1712_midi_write(void *cookie,
+	off_t pos, const void *data, size_t *len);
 
 typedef struct _codecCommLines
 {
@@ -120,7 +134,7 @@ typedef struct ice1712
 	pci_info info;
 	char name[128];
 
-	midi_dev midi_interf[2];
+	midi_dev midi_interf[MAX_MIDI_INTERFACE];
 
 	uint32 Controller;	//PCI_10
 	uint32 DDMA;		//PCI_14
@@ -164,6 +178,10 @@ status_t applySettings(ice1712 *card);
 //For midi.c
 extern int32 num_cards;
 extern ice1712 cards[NUM_CARDS];
+
+//CSS_INTERRUPT_MASK
+#define CCS_INTERRUPT_MIDI_1			0x80
+#define CCS_INTERRUPT_MIDI_2			0x20
 
 //???????
 #define GPIO_SPDIF_STATUS				0x02	//Status

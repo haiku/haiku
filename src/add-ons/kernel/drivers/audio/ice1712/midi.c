@@ -9,175 +9,140 @@
  * Distributed under the terms of the MIT license.
  */
 
+#include <midi_driver.h>
 #include <string.h>
 #include <stdlib.h>
 #include <signal.h>
 
 #include "ice1712.h"
+#include "ice1712_reg.h"
 #include "io.h"
-#include "midi_driver.h"
 #include "util.h"
-
 #include "debug.h"
 
 extern generic_mpu401_module * mpu401;
 
-void midi_interrupt_op(int32 op, void * data)
+
+void
+ice_1712_midi_interrupt_op(int32 op, void *data)
 {
-//	midi_dev * port = (midi_dev *)data;
-	if (op == B_MPU_401_ENABLE_CARD_INT)
-	{
-		// sample code
-		cpu_status cp;
-//		ddprintf(("sonic_vibes: B_MPU_401_ENABLE_CARD_INT\n"));
-		cp = disable_interrupts();
-//		acquire_spinlock(&port->card->hardware);
-//		increment_interrupt_handler(port->card);
-//		set_direct(port->card, 0x01, 0x00, 0x80);
-//		set_indirect(port->card, 0x2A, 0x04, 0xff);
-//		release_spinlock(&port->card->hardware);
-		restore_interrupts(cp);
+	cpu_status status;
+	uint8 int_status = 0;
+	midi_dev *midi = (midi_dev *)data;
 
-		//real code
-		cp = lock();
-//		emuxki_reg_write_32(&(port->card->config), EMU_INTE,
-//			  emuxki_reg_read_32(&(port->card->config), EMU_INTE) |
-//			  EMU_INTE_MIDITXENABLE | EMU_INTE_MIDIRXENABLE );
-		unlock(cp);
-	}
-	else if (op == B_MPU_401_DISABLE_CARD_INT)
-	{
-		// sample code
-		/* turn off MPU interrupts */
-		cpu_status cp;
-//		ddprintf(("sonic_vibes: B_MPU_401_DISABLE_CARD_INT\n"));
-		cp = disable_interrupts();
-//		acquire_spinlock(&port->card->hardware);
-//		set_direct(port->card, 0x01, 0x80, 0x80);*/
-		/* remove interrupt handler if necessary */
-//		decrement_interrupt_handler(port->card);
-//		release_spinlock(&port->card->hardware);
-		restore_interrupts(cp);
+	if (op == B_MPU_401_ENABLE_CARD_INT) {
+		status = lock();
 
-		//real code
-//		cpu_status status;
-		cp = lock();
-//		emuxki_reg_write_32(&port->card->config, EMU_INTE,
-//			  emuxki_reg_read_32(&port->card->config, EMU_INTE) &
-//			  ~ (EMU_INTE_MIDITXENABLE | EMU_INTE_MIDIRXENABLE ) );
-		unlock(cp);
+		int_status = read_ccs_uint8(midi->card, CCS_INTERRUPT_MASK);
+		int_status &= ~(midi->int_mask);
+		write_ccs_uint8(midi->card, CCS_INTERRUPT_MASK, int_status);
+
+		TRACE("B_MPU_401_ENABLE_CARD_INT: %s\n", midi->name);
+
+		unlock(status);
+	} else if (op == B_MPU_401_DISABLE_CARD_INT) {
+		status = lock();
+
+		int_status = read_ccs_uint8(midi->card, CCS_INTERRUPT_MASK);
+		int_status |= midi->int_mask;
+		write_ccs_uint8(midi->card, CCS_INTERRUPT_MASK, int_status);
+
+		TRACE("B_MPU_401_DISABLE_CARD_INT: %s\n", midi->name);
+
+		unlock(status);
 	}
+
+	TRACE("New mask status 0x%x\n", int_status);
 }
 
-static status_t midi_open(const char *name, uint32 flags, void **cookie);
-static status_t midi_close(void *cookie);
-static status_t midi_free(void *cookie);
-static status_t midi_control(void *cookie, uint32 op, void *data, size_t len);
-static status_t midi_read(void *cookie, off_t pos, void *data, size_t *len);
-static status_t midi_write(void *cookie, off_t pos, const void *data,
-                        size_t *len);
 
-device_hooks midi_hooks = {
-    &midi_open,
-    &midi_close,
-    &midi_free,
-    &midi_control,
-    &midi_read,
-    &midi_write,
-    NULL,		/* select */
-    NULL,		/* deselect */
-    NULL,		/* readv */
-    NULL		/* writev */
-};
-
-static status_t midi_open(const char * name, uint32 flags, void ** cookie)
+status_t
+ice_1712_midi_open(const char *name, uint32 flags, void **cookie)
 {
-	int i, ix, used_midi = -1;
-	int ret;
+	int midi, card;
+	status_t ret = ENODEV;
 
-	TRACE("midi_open()\n");
-
+	TRACE("**midi_open()\n");
 	*cookie = NULL;
-	for (ix = 0; ix < num_cards; ix++) {
-		for (i = 0; i < cards[ix].config.nb_MPU401; i++)
-			if (!strcmp(name, cards[ix].midi_interf[i].name)) {
-				used_midi = i;
+
+	for (card = 0; card < num_cards; card++) {
+		for (midi = 0; midi < cards[card].config.nb_MPU401; midi++) {
+			if (!strcmp(name, cards[card].midi_interf[midi].name)) {
+				midi_dev *dev = &(cards[card].midi_interf[midi]);
+				ret = (*mpu401->open_hook)(dev->mpu401device, flags, cookie);
+				if (ret >= B_OK) {
+					*cookie = dev->mpu401device;
+				}
 				break;
 			}
+		}
 	}
 
-	if (ix >= num_cards) {
-		TRACE("bad device\n");
-		return ENODEV;
-	}
-
-	TRACE("mpu401: %p  open(): %p  driver: %p\n", mpu401,
-            mpu401->open_hook, cards[ix].midi_interf[used_midi].driver);
-	ret = (*mpu401->open_hook)(cards[ix].midi_interf[used_midi].driver,
-            flags, cookie);
-	if (ret >= B_OK) {
-		cards[ix].midi_interf[used_midi].cookie = *cookie;
-		atomic_add(&cards[ix].midi_interf[used_midi].count, 1);
-	}
-	TRACE("mpu401: open returns %x / %p\n", ret, *cookie);
 	return ret;
-
 }
 
 
-static status_t midi_close(void * cookie)
+status_t
+ice_1712_midi_close(void* cookie)
 {
-	TRACE("midi_close()\n");
+	TRACE("**midi_close()\n");
 	return (*mpu401->close_hook)(cookie);
 }
 
 
-static status_t midi_free(void * cookie)
+status_t
+ice_1712_midi_free(void* cookie)
 {
-	int i, ix;
-	status_t f;
-	TRACE("midi_free()\n");
-	f = (*mpu401->free_hook)(cookie);
-	for (ix = 0; ix < num_cards; ix++) {
-		for (i = 0; i < cards[ix].config.nb_MPU401; i++)
-			if (cards[ix].midi_interf[i].cookie == cookie) {
-				if (atomic_add(&cards[ix].midi_interf[i].count, -1) == 1) {
-					cards[ix].midi_interf[i].cookie = NULL;
-					TRACE("cleared %p card %d\n", cookie, ix);
-				}
+	int midi, card;
+	status_t ret;
+
+	TRACE("**midi_free()\n");
+
+	ret = (*mpu401->free_hook)(cookie);
+
+	for (card = 0; card < num_cards; card++) {
+		for (midi = 0; midi < cards[card].config.nb_MPU401; midi++) {
+			if (cookie == cards[card].midi_interf[midi].mpu401device) {
+				cards[card].midi_interf[midi].mpu401device = NULL;
+				TRACE("Cleared %p card %d, midi %d\n", cookie, card, midi);
 				break;
 			}
+		}
 	}
-	TRACE("midi_free() done\n");
-	return f;
+
+	return ret;
 }
 
 
-static status_t midi_control(void * cookie, uint32 iop, void * data, size_t len)
+status_t
+ice_1712_midi_control(void* cookie,
+	uint32 iop, void* data, size_t len)
 {
+	TRACE("**midi_control()\n");
 	return (*mpu401->control_hook)(cookie, iop, data, len);
 }
 
 
-static status_t midi_read(void * cookie, off_t pos, void * ptr, size_t * nread)
+status_t
+ice_1712_midi_read(void * cookie, off_t pos, void * ptr, size_t * nread)
 {
-	return (*mpu401->read_hook)(cookie, pos, ptr, nread);
+	status_t ret = B_ERROR;
+
+	ret = (*mpu401->read_hook)(cookie, pos, ptr, nread);
+	//TRACE("**midi_read(%ld)\n", ret);
+
+	return ret;
 }
 
 
-static status_t midi_write(void * cookie, off_t pos, const void * ptr,
+status_t
+ice_1712_midi_write(void * cookie, off_t pos, const void * ptr,
         size_t * nwritten)
 {
-	return (*mpu401->write_hook)(cookie, pos, ptr, nwritten);
-}
+	status_t ret = B_ERROR;
 
+	ret = (*mpu401->write_hook)(cookie, pos, ptr, nwritten);
+	//TRACE("**midi_write(%ld)\n", ret);
 
-bool midi_interrupt(ice1712 *card)
-{
-	TRACE("midi_interrupt\n");
-	if (!card->midi_interf[0].driver) {
-//		kprintf("aiigh\n");
-		return false;
-	}
-	return (*mpu401->interrupt_hook)(card->midi_interf[0].driver);
+	return ret;
 }
