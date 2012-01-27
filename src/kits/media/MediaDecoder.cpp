@@ -15,7 +15,7 @@
 
 BMediaDecoder::BMediaDecoder()
  :	fDecoder(NULL),
- 	fInitStatus(B_OK)
+ 	fInitStatus(B_NO_INIT)
 {
 }
 
@@ -24,7 +24,7 @@ BMediaDecoder::BMediaDecoder(const media_format *in_format,
 							 const void *info,
 							 size_t info_size)
  :	fDecoder(NULL),
- 	fInitStatus(B_OK)
+ 	fInitStatus(B_NO_INIT)
 {
 	SetTo(in_format, info, info_size);
 }
@@ -32,7 +32,7 @@ BMediaDecoder::BMediaDecoder(const media_format *in_format,
 
 BMediaDecoder::BMediaDecoder(const media_codec_info *mci)
  :	fDecoder(NULL),
- 	fInitStatus(B_OK)
+ 	fInitStatus(B_NO_INIT)
 {
 	SetTo(mci);
 }
