@@ -1921,7 +1921,7 @@ BMediaRosterEx::RegisterNode(BMediaNode* node, media_addon_id addOnID,
 		BMediaAddOn* addon = node->AddOn(&testFlavorID);
 
 		ASSERT(addOnID == (addon != NULL ? addon->AddonID() : -1));
-		ASSERT(flavorID == testFlavorID);
+//		ASSERT(flavorID == testFlavorID);
 	);
 
 	server_register_node_request request;

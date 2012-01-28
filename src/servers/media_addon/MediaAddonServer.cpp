@@ -470,7 +470,7 @@ MediaAddonServer::_ScanAddOnFlavors(BMediaAddOn* addon)
 	int32 newFlavorCount = addon->CountFlavors();
 	info.flavor_count = newFlavorCount;
 
-	TRACE("%ld old flavors, %ld new flavors\n", oldflavorcount, newFlavorCount);
+	TRACE("%ld old flavors, %ld new flavors\n", oldFlavorCount, newFlavorCount);
 
 	// during the first update (i == 0), the server removes old dormant_flavor_infos
 	for (int i = 0; i < newFlavorCount; i++) {
@@ -720,7 +720,7 @@ MediaAddonServer::_InstantiatePhysicalInputsAndOutputs(AddOnInfo& info)
 			dormantNodeInfo.flavor_id = flavorinfo->internal_id;
 			strcpy(dormantNodeInfo.name, flavorinfo->name);
 
-			PRINT("MediaAddonServer::InstantiatePhysialInputsAndOutputs: "
+			TRACE("MediaAddonServer::InstantiatePhysialInputsAndOutputs: "
 				"\"%s\" is a physical input/output\n", flavorinfo->name);
 			status_t status = fMediaRoster->InstantiateDormantNode(
 				dormantNodeInfo, &node);
@@ -729,7 +729,7 @@ MediaAddonServer::_InstantiatePhysicalInputsAndOutputs(AddOnInfo& info)
 					"Couldn't instantiate node flavor, internal_id %ld, "
 					"name %s\n", flavorinfo->internal_id, flavorinfo->name);
 			} else {
-				PRINT("Node created!\n");
+				TRACE("Node created!\n");
 				info.active_flavors.push_back(node);
 			}
 		}
@@ -744,7 +744,7 @@ MediaAddonServer::_InstantiateAutostartFlavors(AddOnInfo& info)
 		return;
 
 	for (int32 index = 0;; index++) {
-		PRINT("trying autostart of node %ld, index %ld\n", info.id, index);
+		TRACE("trying autostart of node %ld, index %ld\n", info.id, index);
 
 		BMediaNode* node;
 		int32 internalID;

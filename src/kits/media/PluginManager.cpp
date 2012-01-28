@@ -241,7 +241,7 @@ PluginManager::DestroyWriter(Writer* writer)
 {
 	if (writer != NULL) {
 		TRACE("PluginManager::DestroyWriter(%p (plugin: %p))\n", writer,
-			reader->fMediaPlugin);
+			writer->fMediaPlugin);
 		// NOTE: We have to put the plug-in after deleting the writer,
 		// since otherwise we may actually unload the code for the
 		// destructor...

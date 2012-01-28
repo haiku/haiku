@@ -284,8 +284,7 @@ NodeManager::ReleaseNodeReference(media_node_id id, team_id team)
 status_t
 NodeManager::ReleaseNodeAll(media_node_id id)
 {
-	TRACE("NodeManager::ReleaseNodeAll enter: node %ld, team %ld\n", node.node,
-		team);
+	TRACE("NodeManager::ReleaseNodeAll enter: node %ld\n", id);
 
 	BAutolock _(this);
 	
