@@ -7,6 +7,7 @@
  *		Alexander von Gluck, kallisti5@unixzen.com
  */
 
+
 #include "accelerant.h"
 
 #include <AGP.h>

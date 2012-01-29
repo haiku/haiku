@@ -39,6 +39,7 @@ extern "C" void _sPrintf(const char* format, ...);
 
 #define ERROR(x...) _sPrintf("radeon_hd: " x)
 
+
 status_t
 create_mode_list(void)
 {
