@@ -15,4 +15,5 @@
 /* The published PCI bus interface device hooks */
 extern device_hooks gDeviceHooks;
 
+
 #endif	/* DEVICE_H */
