@@ -37,6 +37,7 @@ SimpleTest xsi_msg_queue_test1 : xsi_msg_queue_test1.cpp ;
 SimpleTest xsi_sem_test1 : xsi_sem_test1.cpp ;
 
 # wide character tests
+SimpleTest fwide_test : fwide_test.c ;
 SimpleTest gnulib-test-btowc : gnulib-test-btowc.c ;
 SimpleTest gnulib-test-mbrtowc : gnulib-test-mbrtowc.c ;
 #SimpleTest gnulib-test-mbsnrtowcs : gnulib-test-mbsnrtowcs.c ;
