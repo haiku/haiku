@@ -122,7 +122,7 @@
 	size_t inLen = inend - inptr;											\
 	mbstate_t *state = step_data->__statep;									\
 	size_t result 															\
-    	= __mbrtowc((wchar_t*)outptr, (const char*)inptr, inLen, state);	\
+		= __mbrtowc((wchar_t*)outptr, (const char*)inptr, inLen, state);	\
 	if (result == (size_t)-1) {									      		\
 		/* illegal character, skip it */									\
 		STANDARD_FROM_LOOP_ERR_HANDLER(1);									\
@@ -135,7 +135,7 @@
 	} else {																\
 		/* a character has been converted */								\
 		inptr += result;													\
-      	outptr += sizeof(wchar_t);											\
+		outptr += sizeof(wchar_t);											\
 	}																		\
 }
 #define LOOP_NEED_FLAGS
@@ -175,7 +175,7 @@
 	} else {																\
 		/* a character has been converted */								\
 		outptr += result;													\
-      	inptr += sizeof(wchar_t);											\
+		inptr += sizeof(wchar_t);											\
 	}																		\
 }
 #define LOOP_NEED_FLAGS

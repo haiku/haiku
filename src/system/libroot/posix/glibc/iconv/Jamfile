@@ -17,9 +17,5 @@ SubDirCcFlags -D_GNU_SOURCE -DUSE_IN_LIBIO ;
 
 MergeObject posix_gnu_iconv.o :
 	gconv_builtin.c
-	gconv_cache.c
-	gconv_conf.c
-	gconv_db.c
 	gconv_simple.c
-	gconv_trans.c
 ;

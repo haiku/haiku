@@ -42,14 +42,6 @@
 #ifdef __STDC__
 #include <stdlib.h>
 #endif
-#if 0
-#if _LIBC
-# include "../wcsmbs/wcsmbsload.h"
-# include "../iconv/gconv_charset.h"
-# include "../iconv/gconv_int.h"
-# include <shlib-compat.h>
-#endif
-#endif
 
 #ifdef _LIBC
 /*# define open(Name, Flags, Prot) __open (Name, Flags, Prot)
