@@ -1404,7 +1404,7 @@ AboutView::_CreateCreditsView()
 			"2003-2004 Electronic Font Open Laboratory (/efont/).",
 			COPYRIGHT_STRING "2003-2012 M+ FONTS PROJECT.",
 			COPYRIGHT_STRING "2006-2012 Daisuke SUZUKI.",
-			COPYRIGHT_STRING "2006-20012 Project Vine.",
+			COPYRIGHT_STRING "2006-2012 Project Vine.",
 			B_TRANSLATE("MIT license. All rights reserved."),
 			NULL)
 		.SetLicense("BSD (3-clause)")
