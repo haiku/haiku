@@ -1402,9 +1402,9 @@ AboutView::_CreateCreditsView()
 		.SetCopyrights(B_TRANSLATE(COPYRIGHT_STRING "1990-2003 Wada Laboratory,"
 			" the University of Tokyo."), COPYRIGHT_STRING
 			"2003-2004 Electronic Font Open Laboratory (/efont/).",
-			COPYRIGHT_STRING "2003-2008 M+ FONTS PROJECT.",
-			COPYRIGHT_STRING "2006-2009 Daisuke SUZUKI.",
-			COPYRIGHT_STRING "2006-2009 Project Vine.",
+			COPYRIGHT_STRING "2003-2012 M+ FONTS PROJECT.",
+			COPYRIGHT_STRING "2006-2012 Daisuke SUZUKI.",
+			COPYRIGHT_STRING "2006-20012 Project Vine.",
 			B_TRANSLATE("MIT license. All rights reserved."),
 			NULL)
 		.SetLicense("BSD (3-clause)")
