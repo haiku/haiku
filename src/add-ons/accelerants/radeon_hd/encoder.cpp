@@ -141,6 +141,7 @@ encoder_assign_crtc(uint8 crtcID)
 										= ASIC_INT_DIG6_ENCODER_ID;
 									break;
 							}
+							break;
 						case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DVO1:
 							args.v2.ucEncoderID = ASIC_INT_DVO_ENCODER_ID;
 							break;
