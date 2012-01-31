@@ -66,7 +66,7 @@ TabBase::~TabBase()
 bool
 TabBase::IsInLayout(BALMLayout* layout)
 {
-	return fLayouts->HasLayout(layout);
+	return fLayouts ? fLayouts->HasLayout(layout) : false;
 }
 
 
