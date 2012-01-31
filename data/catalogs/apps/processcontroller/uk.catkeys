@@ -1,48 +1,48 @@
 1	ukrainian	x-vnd.Haiku-ProcessController	2887520383
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
-About ProcessController…	ProcessController		Про ProcessController…
-Cancel	ProcessController		Відмінити
-Custom priority	ProcessController		Заданий приорітет
-Damned!	ProcessController		Жахливо!
-Debug this thread!	ProcessController		Відладнати цю нитку!
-Debug thread	ProcessController		Нитка відладки
-Display priority	ProcessController		Приорітет відображення
-Do you really want to kill the team \"%s\"?	ProcessController		Ви дійсно бажаєте вбити потік \"%s\"?
-Error saving file	ProcessController		Помилка при збереженні файлу
-Gone teams…	ProcessController		Запущені потоки…
-Idle priority	ProcessController		Idle priority
-Info	ProcessController		Дані
-Install in Deskbar	ProcessController		Встановити у Deskbar
-Kill this thread!	ProcessController		Вбити цю нитку!
-Live in the Deskbar	ProcessController		Помістити в Deskbar
-Low priority	ProcessController		Низький приорітет
-Lowest active priority	ProcessController		Найнижчий приорітет
 Memory usage	ProcessController		Використання пам'яті
-New Terminal	ProcessController		Новий Terminal
-Normal priority	ProcessController		Нормальний приорітет
-OK	ProcessController		Гаразд
-Ok!	ProcessController		Гаразд!
-Please confirm	ProcessController		Повторіть
-ProcessController	System name		ProcessController
-ProcessController is already installed in Deskbar.	ProcessController		ProcessController повністю встановлений у Deskbar.
-Processor %d	ProcessController		Процесор %d
-Quit an application	ProcessController		Вийти з додатка
-Quit application	ProcessController		Закрити додаток
-Real-time display priority	ProcessController		Приорітет реального часу
-Real-time priority	ProcessController		Приорітет реального часу
+Do you really want to kill the team \"%s\"?	ProcessController		Ви дійсно бажаєте вбити потік \"%s\"?
+Idle priority	ProcessController		Idle priority
 Restart Deskbar	ProcessController		Перезапустити Deskbar
-Restart Tracker	ProcessController		Перезапустити Tracker
-Run in window	ProcessController		Запустити у вікні
-System resources & caches…	ProcessController		Системні ресурси і кеші…
-That's no Fun!	ProcessController		Це не жарт!
-This is the last active processor...\nYou can't turn it off!	ProcessController		Це останній активний процесор...\nВи не можете його вимкнути!
+Custom priority	ProcessController		Заданий приорітет
+Debug thread	ProcessController		Нитка відладки
 This team is already gone…	ProcessController		Потік повністю запущений…
+Error saving file	ProcessController		Помилка при збереженні файлу
+Real-time priority	ProcessController		Приорітет реального часу
+Your setting file could not be saved!\n(%s)	ProcessController		Файл настройки не був збережений!\n(%s)
 This thread is already gone…	ProcessController		Ці нитки повністю запущені…
+Cancel	ProcessController		Відмінити
+Display priority	ProcessController		Приорітет відображення
+Run in window	ProcessController		Запустити у вікні
+Processor %d	ProcessController		Процесор %d
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+ProcessController is already installed in Deskbar.	ProcessController		ProcessController повністю встановлений у Deskbar.
+This is the last active processor...\nYou can't turn it off!	ProcessController		Це останній активний процесор...\nВи не можете його вимкнути!
+Info	ProcessController		Дані
+Quit application	ProcessController		Закрити додаток
+Low priority	ProcessController		Низький приорітет
+What do you want to do with the thread \"%s\"?	ProcessController		Що Ви бажаєте зробити з ниткою \"%s\"?
+Gone teams…	ProcessController		Запущені потоки…
+Lowest active priority	ProcessController		Найнижчий приорітет
+Restart Tracker	ProcessController		Перезапустити Tracker
+Live in the Deskbar	ProcessController		Помістити в Deskbar
+Kill this thread!	ProcessController		Вбити цю нитку!
+Debug this thread!	ProcessController		Відладнати цю нитку!
+Normal priority	ProcessController		Нормальний приорітет
+New Terminal	ProcessController		Новий Terminal
+Urgent priority	ProcessController		Терміновий приорітет
+About ProcessController…	ProcessController		Про ProcessController…
+Ok!	ProcessController		Гаразд!
+Quit an application	ProcessController		Вийти з додатка
+Install in Deskbar	ProcessController		Встановити у Deskbar
 Threads and CPU usage	ProcessController		Нитки і використання проц.
 Urgent display priority	ProcessController		Терміновий приорітет відображення
-Urgent priority	ProcessController		Терміновий приорітет
+OK	ProcessController		Гаразд
+Damned!	ProcessController		Жахливо!
 Usage: %s [-deskbar]\n	ProcessController		Використання: %s [-deskbar]\n
-What do you want to do with the thread \"%s\"?	ProcessController		Що Ви бажаєте зробити з ниткою \"%s\"?
+ProcessController	System name		ProcessController
+Real-time display priority	ProcessController		Приорітет реального часу
+Please confirm	ProcessController		Повторіть
 Yes, kill this team!	ProcessController		Так , вбити цей потік!
+System resources & caches…	ProcessController		Системні ресурси і кеші…
+That's no Fun!	ProcessController		Це не жарт!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Ви можете запустити ProcessController у вікні або встановити в Deskbar.
-Your setting file could not be saved!\n(%s)	ProcessController		Файл настройки не був збережений!\n(%s)

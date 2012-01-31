@@ -1,93 +1,92 @@
-1	ukrainian	x-vnd.Haiku.CodyCam	441085909
-Can't find an available connection to the video window	CodyCam		Неможливо знайти доступне вікно відео
-Cannot connect the video source to the video window	CodyCam		Неможливо підключити відео джерело до відео вікна
-Cannot create a video window	CodyCam		Неможливо створити вікно відео
-Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Не знайдено відео-джерело. Для використання CodyCam потрібна вебкамера.
+1	ukrainian	x-vnd.Haiku-CodyCam	3353004969
+Capturing Image…	VideoConsumer.cpp		Захоплення зображення…
+Every 30 seconds	CodyCam		Кожні 30 секунд
+File name:	CodyCam		Ім’я файлу:
+Last Capture: 	VideoConsumer.cpp		Останнє захоплення:
+Server login failed	VideoConsumer.cpp		Не вдалось з’єднатися з сервером
+Remote host has closed the connection.\n	FtpClient		Сервер закрив з’єднання.\n
+Login:	CodyCam		Логін:
+Format:	CodyCam		Формат:
+Every 2 hours	CodyCam		Кожні 2 години
+Closing the window\n	VideoConsumer.cpp		Закриття вікна\n
+login ID expected	CodyCam		вкажіть логін
+Rate:	CodyCam		Періодичність:
+JPEG image	CodyCam		Зображення JPEG
+Capture Rate Menu	CodyCam		Меню періодичності захоплення
+File %s # unterminated quote at end of file\n	SettingsHandler		Файл %s # невизначений запит в кінці файлу\n
+Password:	CodyCam		Пароль:
+Passive FTP	CodyCam		Пасивний FTP
+destination directory expected	CodyCam		вкажіть папку призначення
+password	CodyCam		пароль
+Directory:	CodyCam		Каталог:
+Every minute	CodyCam		Кожної хвилини
+read: %ld\n	SftpClient		читання: %ld\n
+Waiting…	CodyCam		Очікування…
+Logging in…	VideoConsumer.cpp		Авторизація…
+Server:	CodyCam		Сервер:
+server address expected	CodyCam		вкажіть адресу сервера
+Error creating output file	VideoConsumer.cpp		Помилка при створенні вихідного файла
+unrecognized upload client specified	CodyCam		 нерозпізнаний клієнт вивантаження
+File %s ; Line %ld # unterminated quote\n	SettingsHandler		Файл %s ; Рядок %ld # невизначений запит\n
+Output	CodyCam		Вивід
+Every 15 minutes	CodyCam		Кожні 15 хвилин
 Cannot find an available video stream	CodyCam		Неможливо знайти доступний поток відео
-Cannot find the media roster	CodyCam		Неможливо знайти медіа ростер
+Can't find an available connection to the video window	CodyCam		Неможливо знайти доступне вікно відео
+Transmitting…	VideoConsumer.cpp		Передача…
 Cannot get a time source	CodyCam		Неможливо отримати тривалість
+Every 8 hours	CodyCam		Кожні 8 годин
+Rename failed	VideoConsumer.cpp		Переіменування не вдалося
+Cannot start time source!	CodyCam		Неможливо почати відлік часу!
 Cannot register the video window	CodyCam		Неможливо зареєструвати вікно відео
-Cannot seek time source!	CodyCam		Неможливо звернутися до лічильника часу!
+Every 24 hours	CodyCam		Кожні 24 години
+unknown command	SettingsHandler		невідома команда
+Video settings	CodyCam		Налаштування відео
+Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Не знайдено відео-джерело. Для використання CodyCam потрібна вебкамера.
+still image filename expected	CodyCam		вкажіть назву зображення
+invalid upload client %ld\n	VideoConsumer.cpp		неналежний клієнт вивантаження %ld\n
+Every 15 seconds	CodyCam		Кожні 15 секунд
+Error writing output file	VideoConsumer.cpp		Помилка запису вихідного файлу
+image file format expected	CodyCam		вкажіть формат зображення
 Cannot set the time source for the video source	CodyCam		Неможливо встановити лічильник для джерела відео
+Type:	CodyCam		Тип:
 Cannot set the time source for the video window	CodyCam		Неможливо встановити лічильник для відео вікна
+Stop video	CodyCam		Зупинити відео
+Locking the window\n	VideoConsumer.cpp		Закриття вікна\n
+File %s; Line %ld # %s	SettingsHandler		Файл %s; Рядок %ld # %s
+Couldn't find requested directory on server	VideoConsumer.cpp		Неможливо знайти очікуваний каталог на сервері
+Renaming…	VideoConsumer.cpp		Переіменування…
+Local	CodyCam		Локальний
+Error setting type of output file	VideoConsumer.cpp		Помилка при заданні типу вихідного файлу
+upload client name expected	CodyCam		вкажіть ім’я клієнта вивантаження
+SFTP	CodyCam		SFTP
+Connected…	VideoConsumer.cpp		Підключення…
+PASS <suppressed>  (real password sent)\n	FtpClient		Пароль <прихований> (дійсний пароль відправлено)\n
+Every 5 minutes	CodyCam		Кожні 5 хвилин
+read: %d\n	SftpClient		читання: %d\n
+OK	CodyCam		Гаразд
+Capture controls	CodyCam		Керування захопленням
+Every hour	CodyCam		Кожну годину
+Cannot connect the video source to the video window	CodyCam		Неможливо підключити відео джерело до відео вікна
+capture rate expected	CodyCam		вкажіть періодичність захоплення
+Error getting initial latency for the capture node	CodyCam		Помилка при отриманні затримки для вузла захоплення
+Send to…	CodyCam		Відправити до…
+on or off expected	Settings	Do not translate 'on' and 'off'	 очікується включення або виключення
+Quit	CodyCam		Вийти
+cmd: '%s'\n	FtpClient		команда: '%s'\n
+Never	CodyCam		Ніколи
+Cannot create a video window	CodyCam		Неможливо створити вікно відео
+Every 10 minutes	CodyCam		Кожні 10 хвилин
 Cannot start the video source	CodyCam		Неможливо запустити джерело відео
 Cannot start the video window	CodyCam		Неможливо запустити вікно відео
-Cannot start time source!	CodyCam		Неможливо почати відлік часу!
-Capture Rate Menu	CodyCam		Меню періодичності захоплення
-Capture controls	CodyCam		Керування захопленням
-Capturing Image…	VideoConsumer.cpp		Захоплення зображення…
-Closing the window\n	VideoConsumer.cpp		Закриття вікна\n
-CodyCam	Application name		CodyCam
-Connected…	VideoConsumer.cpp		Підключення…
-Couldn't find requested directory on server	VideoConsumer.cpp		Неможливо знайти очікуваний каталог на сервері
-Directory:	CodyCam		Каталог:
-Error creating output file	VideoConsumer.cpp		Помилка при створенні вихідного файла
-Error getting initial latency for the capture node	CodyCam		Помилка при отриманні затримки для вузла захоплення
-Error setting type of output file	VideoConsumer.cpp		Помилка при заданні типу вихідного файлу
-Error writing output file	VideoConsumer.cpp		Помилка запису вихідного файлу
-Every 10 minutes	CodyCam		Кожні 10 хвилин
-Every 15 minutes	CodyCam		Кожні 15 хвилин
-Every 15 seconds	CodyCam		Кожні 15 секунд
-Every 2 hours	CodyCam		Кожні 2 години
-Every 24 hours	CodyCam		Кожні 24 години
-Every 30 minutes	CodyCam		Кожні 30 хвилин
-Every 30 seconds	CodyCam		Кожні 30 секунд
-Every 4 hours	CodyCam		Кожні 4 години
-Every 5 minutes	CodyCam		Кожні 5 хвилин
-Every 8 hours	CodyCam		Кожні 8 годин
-Every hour	CodyCam		Кожну годину
-Every minute	CodyCam		Кожної хвилини
-FTP	CodyCam		FTP
-File	CodyCam		Файл
-File %s # unterminated quote at end of file\n	SettingsHandler		Файл %s # невизначений запит в кінці файлу\n
-File %s ; Line %ld # unterminated quote\n	SettingsHandler		Файл %s ; Рядок %ld # невизначений запит\n
-File %s; Line %ld # %s	SettingsHandler		Файл %s; Рядок %ld # %s
-File name:	CodyCam		Ім’я файлу:
-File transmission failed	VideoConsumer.cpp		Передача файлу призупинена
-Format:	CodyCam		Формат:
-Image Format Menu	CodyCam		Меню формата зображення
-JPEG image	CodyCam		Зображення JPEG
-Last Capture: 	VideoConsumer.cpp		Останнє захоплення:
-Local	CodyCam		Локальний
-Locking the window\n	VideoConsumer.cpp		Закриття вікна\n
-Logging in…	VideoConsumer.cpp		Авторизація…
-Login:	CodyCam		Логін:
-Never	CodyCam		Ніколи
-OK	CodyCam		Гаразд
-Output	CodyCam		Вивід
-PASS <suppressed>  (real password sent)\n	FtpClient		Пароль <прихований> (дійсний пароль відправлено)\n
-Passive FTP	CodyCam		Пасивний FTP
-Password:	CodyCam		Пароль:
-Quit	CodyCam		Вийти
-Rate:	CodyCam		Періодичність:
-Remote host has closed the connection.\n	FtpClient		Сервер закрив з’єднання.\n
-Rename failed	VideoConsumer.cpp		Переіменування не вдалося
-Renaming…	VideoConsumer.cpp		Переіменування…
-SFTP	CodyCam		SFTP
-Send to…	CodyCam		Відправити до…
-Server login failed	VideoConsumer.cpp		Не вдалось з’єднатися з сервером
-Server:	CodyCam		Сервер:
-Start video	CodyCam		Запустити відео
-Stop video	CodyCam		Зупинити відео
-Transmitting…	VideoConsumer.cpp		Передача…
-Type:	CodyCam		Тип:
-Video settings	CodyCam		Налаштування відео
-Waiting…	CodyCam		Очікування…
-capture rate expected	CodyCam		вкажіть періодичність захоплення
-cmd: '%s'\n	FtpClient		команда: '%s'\n
-destination directory expected	CodyCam		вкажіть папку призначення
-image file format expected	CodyCam		вкажіть формат зображення
-invalid upload client %ld\n	VideoConsumer.cpp		неналежний клієнт вивантаження %ld\n
-login ID expected	CodyCam		вкажіть логін
-on or off expected	Settings	Do not translate 'on' and 'off'	 очікується включення або виключення
-password	CodyCam		пароль
 password expected	CodyCam		Очікується пароль
-read: %d\n	SftpClient		читання: %d\n
-read: %ld\n	SftpClient		читання: %ld\n
 reply: %d, %d\n	FtpClient		відповідь: %d, %d\n
+Cannot find the media roster	CodyCam		Неможливо знайти медіа ростер
+Every 4 hours	CodyCam		Кожні 4 години
+FTP	CodyCam		FTP
+File transmission failed	VideoConsumer.cpp		Передача файлу призупинена
+Cannot seek time source!	CodyCam		Неможливо звернутися до лічильника часу!
+File	CodyCam		Файл
+Image Format Menu	CodyCam		Меню формата зображення
+Every 30 minutes	CodyCam		Кожні 30 хвилин
 reply: '%s'\n	SftpClient		відповісти: '%s'\n
-server address expected	CodyCam		вкажіть адресу сервера
-still image filename expected	CodyCam		вкажіть назву зображення
-unknown command	SettingsHandler		невідома команда
-unrecognized upload client specified	CodyCam		 нерозпізнаний клієнт вивантаження
-upload client name expected	CodyCam		вкажіть ім’я клієнта вивантаження
+Start video	CodyCam		Запустити відео

@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Be-MAIL	2284738205
+1	lithuanian	x-vnd.Be-MAIL	1831526878
 View	Mail		Rodymas
 %d - Date	Mail		%d – data
 Attach attributes:	Mail		Pridedamų failų požymių įtraukimas:
@@ -63,6 +63,7 @@ Warn unencodable:	Mail		Įspėti apie kodavimo problemas:
 Quit	Mail		Baigti darbą
 %n - Full name	Mail		%n – pilnas vardas
  Read 	Mail		Perskaitytas
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
 Trash	Mail		Šiukšlinė
 Default account:	Mail		Numatytoji paskyra:
 Size:	Mail		Dydis:

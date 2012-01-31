@@ -1,34 +1,34 @@
 1	ukrainian	x-vnd.Haiku-LaunchBox	3016105370
-Add button here	LaunchBox		Додати кнопку тут
-Auto-raise	LaunchBox		Автоматичне спливання
-Bummer	LaunchBox		Помилка
-Cancel	LaunchBox		Відміна
-Clear button	LaunchBox		Очистити кнопку
-Clone	LaunchBox		Клонувати
-Close	LaunchBox		Закрити
-Description for '%3'	LaunchBox		Опис для '%3'
-Failed to launch '%1'.\n\nError:	LaunchBox		Призупинено запуск '%1'.\n\nПомилка:
-Failed to launch 'something', error in Pad data.	LaunchBox		Не вдалось запустити 'щось'. Помилка в даних панелі.
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Призупинено команду 'відкрити папку' для Tracker.\n\nПомилка:
-Horizontal layout	LaunchBox		Горизонтальне розташування
-Icon size	LaunchBox		Розмір Іконки
-Ignore double-click	LaunchBox		Ігнорувати подвійне натискання
-LaunchBox	System name		LaunchBox
-Name Panel	LaunchBox		Панель назви
 New	LaunchBox		Новий
-OK	LaunchBox		Гаразд
-Pad	LaunchBox		Панель 
-Pad %1	LaunchBox		Панель %1
-Pad 1	LaunchBox		Панель 1
-Quit	LaunchBox		Вийти
-Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Дійсно закрити цю панель?\n(Вона не збережеться.)
-Remove button	LaunchBox		Видалити кнопку
 Set description…	LaunchBox		Встановити Опис…
-Settings	LaunchBox		Настройки
+Vertical layout	LaunchBox		Вертикальне розташування
+OK	LaunchBox		Гаразд
+Pad 1	LaunchBox		Панель 1
+last chance	LaunchBox		остання спроба
+Quit	LaunchBox		Вийти
+Clear button	LaunchBox		Очистити кнопку
+LaunchBox	System name		LaunchBox
+Ignore double-click	LaunchBox		Ігнорувати подвійне натискання
+Auto-raise	LaunchBox		Автоматичне спливання
 Show on all workspaces	LaunchBox		Показати на всіх робочих просторах
 Show window border	LaunchBox		Показувати межі вікна
-Vertical layout	LaunchBox		Вертикальне розташування
-You can drag an icon here.	LaunchBox		Ви можете перемістити іконки сюди.
+Pad	LaunchBox		Панель 
+Icon size	LaunchBox		Розмір Іконки
+Bummer	LaunchBox		Помилка
+Cancel	LaunchBox		Відміна
+Remove button	LaunchBox		Видалити кнопку
+Horizontal layout	LaunchBox		Горизонтальне розташування
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nНе вдалось запустити програму з сигнатурою'%2'.\n\nПомилка:
-last chance	LaunchBox		остання спроба
+Failed to launch '%1'.\n\nError:	LaunchBox		Призупинено запуск '%1'.\n\nПомилка:
+Name Panel	LaunchBox		Панель назви
+Add button here	LaunchBox		Додати кнопку тут
+Description for '%3'	LaunchBox		Опис для '%3'
+Settings	LaunchBox		Настройки
+Failed to launch 'something', error in Pad data.	LaunchBox		Не вдалось запустити 'щось'. Помилка в даних панелі.
+Pad %1	LaunchBox		Панель %1
+Close	LaunchBox		Закрити
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Призупинено команду 'відкрити папку' для Tracker.\n\nПомилка:
+You can drag an icon here.	LaunchBox		Ви можете перемістити іконки сюди.
+Clone	LaunchBox		Клонувати
 launch popup	LaunchBox		Увімкнути спливаючі повідомлення
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Дійсно закрити цю панель?\n(Вона не збережеться.)

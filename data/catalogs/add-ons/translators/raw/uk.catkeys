@@ -1,9 +1,9 @@
 1	ukrainian	x-vnd.Haiku-RAWTranslator	1938728039
-%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	%s RAW образу
-Based on Dave Coffin's dcraw 8.63	ConfigView		На основі Dave Coffin's dcraw 8.63
-RAW Images	ConfigView		Зображення RAW
-RAW Settings	RAWTranslator main		Настройки RAW
-RAW image translator	RAWTranslator		Перетворювач зображень RAW
-RAW images	RAWTranslator		Зображення RAW
 RAWTranslator Settings	ConfigView		Настройки Перетворювача RAW
 Version %d.%d.%d, %s	ConfigView		Версія %d.%d.%d, %s
+RAW Images	ConfigView		Зображення RAW
+RAW image translator	RAWTranslator		Перетворювач зображень RAW
+RAW Settings	RAWTranslator main		Настройки RAW
+RAW images	RAWTranslator		Зображення RAW
+%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	%s RAW образу
+Based on Dave Coffin's dcraw 8.63	ConfigView		На основі Dave Coffin's dcraw 8.63

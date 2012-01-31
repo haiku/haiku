@@ -1,60 +1,60 @@
 1	ukrainian	x-vnd.Haiku-Mail	3957822883
-Account name:	Config Views		Ім'я аккаунта:
-Account name:	E-Mail		Ім'я акаунту:
-Account settings	AutoConfigWindow		Настройка аакунта
-Account settings	Config Views		Настройка аккаунта
-Accounts	Config Window		Аккаунти
-Add	Config Window		Додати
-Add filter	Config Views		Додати фільтр
-Always	Config Window		Завжди
-Apply	Config Window		Прийняти
-Back	AutoConfigWindow		Назад
-Check every	Config Window		Перевіряти кожні
-Choose Protocol	E-Mail		Вибрати протокол
-Create new account	AutoConfigWindow		Створити новий аккаунт
-E-mail	System name		Пошта
-E-mail address:	E-Mail		Адреса E-mail :
-Edit mailbox menu…	Config Window		Редагувати почтове меню…
-Enter a valid e-mail address.	AutoConfigWindow		Введіть дійсну поштову адресу.
-Error	Config Window		Помилка
-Error retrieving general settings: %s\n	Config Window		Помилка при відновленні основних настройок: %s\n
-Finish	AutoConfigWindow		Фініш
-Incoming	Config Window		Вхідні
-Incoming	E-Mail		Вхідні
-Incoming mail filters	Config Views		Вхідний поштовий фільтр
-Login name:	E-Mail		Логін:
 Mail checking	Config Window		Перевірка пошти
-Miscellaneous	Config Window		Змішаний
-Never	Config Window	show status window	Ніколи
-Next	AutoConfigWindow		Наступне
-OK	AutoConfigWindow		Гаразд
-OK	Config Views		Гаразд
-OK	Config Window		Гаразд
-Only when dial-up is connected	Config Window		Тільки при включеному діалапі
-Outgoing	Config Window		Вихідні
-Outgoing	E-Mail		Вихідні
-Outgoing mail filters	Config Views		Фільтри вихідної пошти
-Password:	E-Mail		Пароль:
-Real name:	Config Views		Справжнє ім'я:
-Real name:	E-Mail		Справжнє ім'я:
-Remove	Config Views		Видалити
-Remove	Config Window		Видалити
-Return address:	Config Views		Зворотня адреса:
-Revert	Config Window		Повернути
-Schedule outgoing mail when dial-up is disconnected	Config Window		Затримувати відправку вихідних при відключеному діалапі
-Server Name:	E-Mail		Ім'я серверу:
 Settings	Config Window		Налаштування
-Show connection status window:	Config Window		Показати вікно стану підключення:
-Start mail services on startup	Config Window		Запускати сервіс при старті
-The filter could not be moved. Deleting filter.	Config Views		Фільтр неможливо перемістити. Видалення фільтра.
-While sending	Config Window		Поки відправляється
+Never	Config Window	show status window	Ніколи
+Only when dial-up is connected	Config Window		Тільки при включеному діалапі
 While sending and receiving	Config Window		При відправці і отриманні
-\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nОсновні налаштування неможливо повернути.\n\nПомилка при відновленні налаштувань:\n%s\n
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nСтворіть новий аккаунт натиснувши кнопку Додати .\n\nВидаліть аккаунт при допомозі кнопки Видалити на вибраному пункті\n\nВиберіть пункт зі списку при необхідності змініть його налаштувань.
-\t\t· E-mail filters	Config Window		\t\t· поштові фільтри
-\t\t· Incoming	Config Window		\t\t· Вхідні
-\t\t· Outgoing	Config Window		\t\t· Вихідні
 days	Config Window		днів
+Incoming	Config Window		Вхідні
+OK	Config Window		Гаразд
+Start mail services on startup	Config Window		Запускати сервіс при старті
+E-mail address:	E-Mail		Адреса E-mail :
+Account name:	E-Mail		Ім'я акаунту:
+Account name:	Config Views		Ім'я аккаунта:
+Create new account	AutoConfigWindow		Створити новий аккаунт
+OK	Config Views		Гаразд
+The filter could not be moved. Deleting filter.	Config Views		Фільтр неможливо перемістити. Видалення фільтра.
+Revert	Config Window		Повернути
+Login name:	E-Mail		Логін:
+Incoming	E-Mail		Вхідні
+Password:	E-Mail		Пароль:
+Accounts	Config Window		Аккаунти
+Finish	AutoConfigWindow		Фініш
+Remove	Config Window		Видалити
+Miscellaneous	Config Window		Змішаний
+Show connection status window:	Config Window		Показати вікно стану підключення:
+Server Name:	E-Mail		Ім'я серверу:
+While sending	Config Window		Поки відправляється
+Schedule outgoing mail when dial-up is disconnected	Config Window		Затримувати відправку вихідних при відключеному діалапі
 hours	Config Window		годин
-minutes	Config Window		хвилин
+Enter a valid e-mail address.	AutoConfigWindow		Введіть дійсну поштову адресу.
+Add	Config Window		Додати
+Account settings	AutoConfigWindow		Настройка аакунта
+E-mail	System name		Пошта
 never	Config Window	mail checking frequency	ніколи
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nОсновні налаштування неможливо повернути.\n\nПомилка при відновленні налаштувань:\n%s\n
+Real name:	Config Views		Справжнє ім'я:
+\t\t· Outgoing	Config Window		\t\t· Вихідні
+Choose Protocol	E-Mail		Вибрати протокол
+Return address:	Config Views		Зворотня адреса:
+Edit mailbox menu…	Config Window		Редагувати почтове меню…
+Outgoing	E-Mail		Вихідні
+\t\t· E-mail filters	Config Window		\t\t· поштові фільтри
+Remove	Config Views		Видалити
+\t\t· Incoming	Config Window		\t\t· Вхідні
+Next	AutoConfigWindow		Наступне
+Check every	Config Window		Перевіряти кожні
+Back	AutoConfigWindow		Назад
+Incoming mail filters	Config Views		Вхідний поштовий фільтр
+Account settings	Config Views		Настройка аккаунта
+minutes	Config Window		хвилин
+Error retrieving general settings: %s\n	Config Window		Помилка при відновленні основних настройок: %s\n
+Real name:	E-Mail		Справжнє ім'я:
+Apply	Config Window		Прийняти
+Always	Config Window		Завжди
+OK	AutoConfigWindow		Гаразд
+Add filter	Config Views		Додати фільтр
+Outgoing	Config Window		Вихідні
+Outgoing mail filters	Config Views		Фільтри вихідної пошти
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nСтворіть новий аккаунт натиснувши кнопку Додати .\n\nВидаліть аккаунт при допомозі кнопки Видалити на вибраному пункті\n\nВиберіть пункт зі списку при необхідності змініть його налаштувань.
+Error	Config Window		Помилка

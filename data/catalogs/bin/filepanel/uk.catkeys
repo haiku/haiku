@@ -1,20 +1,20 @@
 1	ukrainian	x-vnd.mmu_man.filepanel	1802971238
-%s not a valid option\n	FilePanelApp		%s неправильна опція\n
-%s: UNIMPLEMENTED\n	FilePanelApp		%s: НЕРЕАЛІЗОВАНО\n
-%s: this option requires a parameter\n	FilePanelApp		%s: ця опція потребує параметру\n
--1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tдозволяє вибрати тільки 1 файл\n
--a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tнереалізовано\n
--d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\topen at <folder>\n
--f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tнереалізована\n
--h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tпоказує використання\n
--k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tтипи даних, які можуть бути відкрити: будь-яка комбінація з f, d, s (файл (по замовчуванню), директорія, посилання)\n
--l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tвживати панель загрузки (по замовчуванню)\n
--m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tробити панель модальною\n
--n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tвстановити ім'я по замовчуванню для збереження\n
--s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tвживати панель збереження\n
--t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tвстановити заголовок вікна\n
 display a load/save file panel\n	FilePanelApp		показати панель збереження/загрузки файлу\n
 options:\n	FilePanelApp		опції:\n
-short\tlong\tdescription\n	FilePanelApp		короткий\tдовгий\tопис\n
 usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		Використання: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tтипи даних, які можуть бути відкрити: будь-яка комбінація з f, d, s (файл (по замовчуванню), директорія, посилання)\n
 usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		Використання: %s [-h] [-d folder] [-l|-s] [-t ttl] [-1] [-m] [-a pattern] [-f pattern]\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\topen at <folder>\n
+%s not a valid option\n	FilePanelApp		%s неправильна опція\n
+short\tlong\tdescription\n	FilePanelApp		короткий\tдовгий\tопис\n
+%s: this option requires a parameter\n	FilePanelApp		%s: ця опція потребує параметру\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tвживати панель загрузки (по замовчуванню)\n
+-f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tнереалізована\n
+-s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tвживати панель збереження\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tвстановити ім'я по замовчуванню для збереження\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tробити панель модальною\n
+-h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tпоказує використання\n
+-a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tнереалізовано\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tдозволяє вибрати тільки 1 файл\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tвстановити заголовок вікна\n
+%s: UNIMPLEMENTED\n	FilePanelApp		%s: НЕРЕАЛІЗОВАНО\n

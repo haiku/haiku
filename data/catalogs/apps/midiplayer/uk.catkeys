@@ -1,19 +1,19 @@
 1	ukrainian	x-vnd.Haiku-MidiPlayer	4180509704
-Cavern	Main Window		Печера
-Closet	Main Window		Комірка
-Could not load song	Main Window		Не вдалося завантажити мелодію
-Drop MIDI file here	Scope View		Перемістити MIDI файл сюди
-Dungeon	Main Window		Підземелля
-Garage	Main Window		Гараж
-Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku MIDI Player 1.0.0 beta\n\nЦя крихітна програма\nвміє відтворювати тисячі\nпростих мелодій
-Igor's lab	Main Window		Лабораторія Ігоря
-Live input:	Main Window		Прямий вхід:
-MidiPlayer	System name		Програвач Midi
 None	Main Window		Жоден
+Live input:	Main Window		Прямий вхід:
+Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku MIDI Player 1.0.0 beta\n\nЦя крихітна програма\nвміє відтворювати тисячі\nпростих мелодій
+Stop	Main Window		Стоп
+Cavern	Main Window		Печера
+Volume:	Main Window		Гучність:
+Reverb:	Main Window		Реверберація:
 OK	Main Window		Гаразд
 Off	Main Window		Вимкнути
+Dungeon	Main Window		Підземелля
 Play	Main Window		Відтворити
-Reverb:	Main Window		Реверберація:
+Garage	Main Window		Гараж
+Closet	Main Window		Комірка
+MidiPlayer	System name		Програвач Midi
+Drop MIDI file here	Scope View		Перемістити MIDI файл сюди
+Igor's lab	Main Window		Лабораторія Ігоря
 Scope	Main Window		Осциллограф
-Stop	Main Window		Стоп
-Volume:	Main Window		Гучність:
+Could not load song	Main Window		Не вдалося завантажити мелодію

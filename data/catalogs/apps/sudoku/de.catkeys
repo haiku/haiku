@@ -1,14 +1,14 @@
 1	german	x-vnd.Haiku-Sudoku	2463385585
 Restore snapshot	SudokuWindow		Spielstand wiederherstellen
 Could not set Sudoku:\n%s\n	SudokuWindow		Sudoku konnte nicht erstellt werden:\n%s\n
-Export as…	SudokuWindow		Exportieren als...
+Export as…	SudokuWindow		Exportieren als…
 OK	SudokuWindow		OK
 New	SudokuWindow		Neu
 Abort	ProgressWindow		Abbrechen
 Sudoku	System name		Sudoku
 Could not open \"%s\":\n%s\n	SudokuWindow		\"%s\" konnte nicht geöffnet werden:\n%s\n
 Easy	SudokuWindow		Einfach
-Open file…	SudokuWindow		Datei öffnen...
+Open file…	SudokuWindow		Datei öffnen…
 Solve single field	SudokuWindow		Ein Feld lösen
 Solve	SudokuWindow		Auflösen
 Redo	SudokuWindow		Wiederholen

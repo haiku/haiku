@@ -1,20 +1,20 @@
 1	ukrainian	x-vnd.Haiku-VirtualMemory	688347876
-%Ld B	SettingsWindow		%Ld B
-Changes will take effect on restart!	SettingsWindow		Зміни настануть після перезавантаження!
-Current swap file size: 	SettingsWindow		Біжучий розмір свопа:
-Defaults	SettingsWindow		По замовчуванню
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Вимкнення віртуальної пам'яті, може мати небажаний вплив на стабільність системи, коли  вся доступна фізична пам'ять буде задіяна.\nВіртуальна пам"ять не впливає на продуктивність системи аж до цього моменту.\n\nДійсно хочете її вимкнути?
-Enable virtual memory	SettingsWindow		Віртуальна пам'ять
-GB	SettingsWindow		GB
-Insufficient space for a swap file.	SettingsWindow		Недостатньо місця для файлу підкачки.
-KB	SettingsWindow		KB
-Keep enabled	SettingsWindow		Зберегти включення
-MB	SettingsWindow		MB
-OK	VirtualMemoryApp		Гаразд
-Physical memory: 	SettingsWindow		Фізична пам'ять:
-Requested swap file size:	SettingsWindow		Розмір свопа, що запрошується:
-Revert	SettingsWindow		Повернути
 Turn off	SettingsWindow		Вимкнути
+GB	SettingsWindow		GB
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Вимкнення віртуальної пам'яті, може мати небажаний вплив на стабільність системи, коли  вся доступна фізична пам'ять буде задіяна.\nВіртуальна пам"ять не впливає на продуктивність системи аж до цього моменту.\n\nДійсно хочете її вимкнути?
+Requested swap file size:	SettingsWindow		Розмір свопа, що запрошується:
+Physical memory: 	SettingsWindow		Фізична пам'ять:
+Changes will take effect on restart!	SettingsWindow		Зміни настануть після перезавантаження!
+Defaults	SettingsWindow		По замовчуванню
+KB	SettingsWindow		KB
 Use volume:	SettingsWindow		Використати образ:
+Insufficient space for a swap file.	SettingsWindow		Недостатньо місця для файлу підкачки.
+Keep enabled	SettingsWindow		Зберегти включення
+Revert	SettingsWindow		Повернути
 VirtualMemory	System name		Віртуальна пам'ять
+Current swap file size: 	SettingsWindow		Біжучий розмір свопа:
+OK	VirtualMemoryApp		Гаразд
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Віртуальна пам'ять\n\tавтор Axel Dörfler\n\tCopyright 2005, Haiku.\nПереклад: Віктор Чумак aka 386sx\n
+Enable virtual memory	SettingsWindow		Віртуальна пам'ять
+MB	SettingsWindow		MB
+%Ld B	SettingsWindow		%Ld B

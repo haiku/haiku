@@ -21,7 +21,7 @@ Preparing package	PackageInstall		Paket wird vorbereitet
 No package available.	PackageInfo		Kein Paket verfügbar.
 none	PackageView		entfällt
 Stop	PackageStatus		Stopp
-Other…	PackageView		Andere...
+Other…	PackageView		Andere…
 No installation type selected	PackageView		Es wurde kein Installationstyp gewählt
 The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		Die Verknüpfung '%s' existiert bereits im Zielort.\nSoll sie mit der aus dem Paket ersetzt, oder übersprungen werden?
 Installing files and folders	PackageInstall		Dateien und Ordner werden installiert

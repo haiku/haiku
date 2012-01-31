@@ -1,7 +1,7 @@
 1	german	x-vnd.Haiku-PoorMan	1267330937
 Website location	PoorMan		Website-Adresse
 Error Server	PoorMan		Serverfehler
-Settings…	PoorMan		Einstellungen...
+Settings…	PoorMan		Einstellungen…
 Create PoorMan log	PoorMan		Logdatei erstellen
 Shutting down.\n	PoorMan		Herunterfahren.\n
 Hits: %lu	PoorMan		Zugriffe: %lu
@@ -43,7 +43,7 @@ Error Dir	PoorMan		Fehlerverzeichnis
 Select all	PoorMan		Alles auswählen
 File	PoorMan		Datei
 File Logging	PoorMan		In Datei loggen
-Save console selections as…	PoorMan		Auswahl der Konsole speichern als...
+Save console selections as…	PoorMan		Auswahl der Konsole speichern als…
 File logging	PoorMan		In Datei loggen
 Select web folder	PoorMan		Web-Ordner auswählen
 Logging view	PoorMan		Log-Ansicht
@@ -61,6 +61,6 @@ Cancel	PoorMan		Abbrechen
 Console logging	PoorMan		In Konsole loggen
 Cannot start the server	PoorMan		Der Server konnte nicht gestartet werden.
 Select	PoorMan		Auswählen
-Save console as…	PoorMan		Konsole speichern als...
+Save console as…	PoorMan		Konsole speichern als…
 PoorMan	System name		Webserver
 Console Logging	PoorMan		In Konsole loggen

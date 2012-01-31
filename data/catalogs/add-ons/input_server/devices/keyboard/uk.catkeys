@@ -1,10 +1,10 @@
 1	ukrainian	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
-(This team is a system component)	Team monitor		(Ця команда є системним компонентом)
-Cancel	Team monitor		Відмінити
-Force reboot	Team monitor		Примусове перезавантаження
-If the application will not quit you may have to kill it.	Team monitor		If the application will not quit you may have to kill it.
 Kill application	Team monitor		Вбити додаток
 Quit application	Team monitor		Закрити додаток
-Restart the desktop	Team monitor		Перезавантажити робочий стіл
 Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Виберіть додаток зі списку нижче і клікніть на кнопки 'Вбити додаток' і 'Закрити додаток' у випадку закриття її.\n\nУтримуйте CONTROL+ALT+DELETE для перезавантаження через %ld секунд.
+If the application will not quit you may have to kill it.	Team monitor		If the application will not quit you may have to kill it.
+Force reboot	Team monitor		Примусове перезавантаження
 Team monitor	Team monitor		Монітор команд
+(This team is a system component)	Team monitor		(Ця команда є системним компонентом)
+Restart the desktop	Team monitor		Перезавантажити робочий стіл
+Cancel	Team monitor		Відмінити

@@ -1,16 +1,16 @@
 1	ukrainian	x-vnd.Haiku-NewMailNotification	3624191291
 %num new message	filter		%num нове повідомлення
 %num new messages	filter		%num нових повідомлень
-Alert	ConfigView		Попередження
-Beep	ConfigView		Сигнал
-Central alert	ConfigView		Головне попередження
-Central beep	ConfigView		Головний сигнал
 Keyboard LEDs	ConfigView		Світлодіоди клавіатури
-Log window	ConfigView		Вікно логів
-Method:	ConfigView		Метод:
-New mails notification	ConfigView		Нові оголошення пошти
-New messages	filter		Нові повідомлення
-OK	filter		Гаразд
-You have %num new message for %name.	filter		Отримано %num нове повідомлення для %name.
 You have %num new messages for %name.	filter		Отримано %num нових повідомлень для %name.
+You have %num new message for %name.	filter		Отримано %num нове повідомлення для %name.
+Log window	ConfigView		Вікно логів
+Central beep	ConfigView		Головний сигнал
+Beep	ConfigView		Сигнал
+Method:	ConfigView		Метод:
+Central alert	ConfigView		Головне попередження
+Alert	ConfigView		Попередження
 none	ConfigView		жодного
+New messages	filter		Нові повідомлення
+New mails notification	ConfigView		Нові оголошення пошти
+OK	filter		Гаразд

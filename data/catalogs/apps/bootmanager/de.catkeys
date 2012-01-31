@@ -55,7 +55,7 @@ Backup Master Boot Record	BootManagerController	Title	Backup des Master-Boot-Rec
 Quit	DrivesPage	Button	Beenden
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Im nächsten Schritt wird das Bootmenü auf den Datenträger geschrieben. Wirklich fortfahren?
 The old Master Boot Record was successfully saved to %s.	BootManagerController		Der vorherige Master-Boot-Record (MBR) wurde unter %s gespeichert.
-Default Partition:	DefaultPartitionPage	Menu field label	Standard-Partition
+Default Partition:	DefaultPartitionPage	Menu field label	Standard-Partition:
 Partitions	DefaultPartitionPage	Pop up menu title	Partitionen
 BootManager	System name		Bootmanager
 Summary	BootManagerController	Title	Zusammenfassung

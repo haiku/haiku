@@ -1,23 +1,23 @@
 1	ukrainian	x-vnd.Be-POST	2300302075
-%num new message	DeskbarView		%num нов. повід.
-%num new message for %name\n	MailDaemon		%num нове повідомлення для %name\n
-%num new message.	MailDaemon		%num нове повідомлення.
-%num new messages	DeskbarView		%num нових повідомлень
-%num new messages for %name\n	MailDaemon		%num нових повідомлень для %name\n
-%num new messages.	MailDaemon		%num нових повід.
-<no accounts>	DeskbarView		<акаунти відсутні>
-Check for mail now	DeskbarView		Перевірити пошту зараз
-Check for mails only	DeskbarView		Перевірити тільки пошту
-Create new message…	DeskbarView		Створити нове повідомлення…
 Fetching mail for %name	Notifier		Отримання пошти для %name
-Mail daemon status log	MailDaemon		Лог стану почтового демона
-Mail status	MailDaemon		Стан пошти
-Mail status	Notifier		Стан пошти
-New Messages	MailDaemon		Нові повідомлення
-No new messages	DeskbarView		Немає нових повідомлень
-No new messages	MailDaemon		Немає нових повідомлень
-No new messages.	MailDaemon		Немає нових повідомлень.
-Preferences…	DeskbarView		Настройки…
+Check for mails only	DeskbarView		Перевірити тільки пошту
 Send pending mails	DeskbarView		Відправити чергову пошту 
-Sending mail for %name	Notifier		Відправка пошти для %name
+New Messages	MailDaemon		Нові повідомлення
+<no accounts>	DeskbarView		<акаунти відсутні>
+%num new messages	DeskbarView		%num нових повідомлень
+Mail status	MailDaemon		Стан пошти
 Shutdown mail services	DeskbarView		Закрити поштові сервіси
+%num new message	DeskbarView		%num нов. повід.
+Sending mail for %name	Notifier		Відправка пошти для %name
+Preferences…	DeskbarView		Настройки…
+%num new messages.	MailDaemon		%num нових повід.
+%num new message.	MailDaemon		%num нове повідомлення.
+Create new message…	DeskbarView		Створити нове повідомлення…
+%num new message for %name\n	MailDaemon		%num нове повідомлення для %name\n
+No new messages	MailDaemon		Немає нових повідомлень
+Check for mail now	DeskbarView		Перевірити пошту зараз
+No new messages	DeskbarView		Немає нових повідомлень
+%num new messages for %name\n	MailDaemon		%num нових повідомлень для %name\n
+Mail daemon status log	MailDaemon		Лог стану почтового демона
+No new messages.	MailDaemon		Немає нових повідомлень.
+Mail status	Notifier		Стан пошти

@@ -1,8 +1,8 @@
 1	ukrainian	x-vnd.Haiku-InstalledPackages	4131220089
-InstalledPackages	System name		Встановлення пакунків
 No package selected.	UninstallView		Пакунок не вибрано
-OK	UninstallView		Гаразд
-Package description	UninstallView		Опис пакунків
 Remove	UninstallView		Видалити
+Package description	UninstallView		Опис пакунків
+InstalledPackages	System name		Встановлення пакунків
 The package you selected has been successfully removed from your system.	UninstallView		Пакунок вибраний вами успішно видалений з системи.
+OK	UninstallView		Гаразд
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Вибраний пакунок не може бути видалений. Інформаційний файл встановленого пакунку може бути зіпсованим.

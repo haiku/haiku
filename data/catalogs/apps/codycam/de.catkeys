@@ -1,5 +1,5 @@
 1	german	x-vnd.Haiku-CodyCam	2416864674
-Capturing Image…	VideoConsumer.cpp		Bild wird aufgenommen...
+Capturing Image…	VideoConsumer.cpp		Bild wird aufgenommen…
 Every 30 seconds	CodyCam		Alle 30 Sekunden
 File name:	CodyCam		Dateiname:
 Last Capture: 	VideoConsumer.cpp		Letzte Aufnahme:
@@ -21,8 +21,8 @@ password	CodyCam		Passwort
 Directory:	CodyCam		Ordner:
 Every minute	CodyCam		Jede Minute
 read: %ld\n	SftpClient		gelesen: %ld\n
-Waiting…	CodyCam		Warten...
-Logging in…	VideoConsumer.cpp		Einloggen...
+Waiting…	CodyCam		Warten…
+Logging in…	VideoConsumer.cpp		Einloggen…
 Server:	CodyCam		Server:
 server address expected	CodyCam		Serveradresse erwartet
 Error creating output file	VideoConsumer.cpp		Fehler bei Erstellung der Ausgabedatei
@@ -32,7 +32,7 @@ Output	CodyCam		Ausgabe
 Every 15 minutes	CodyCam		Alle 15 Minuten
 Cannot find an available video stream	CodyCam		Es wurde kein verfügbarer Videostream gefunden.
 Can't find an available connection to the video window	CodyCam		Es wurde keine verfügbare Verbindung zum Videofenster gefunden.
-Transmitting…	VideoConsumer.cpp		Übertragen...
+Transmitting…	VideoConsumer.cpp		Übertragen…
 Cannot get a time source	CodyCam		Es konnte keine Zeitquelle gefunden werden.
 Every 8 hours	CodyCam		Alle 8 Stunden
 Rename failed	VideoConsumer.cpp		Umbenennen fehlgeschlagen
@@ -55,7 +55,7 @@ Stop video	CodyCam		Video anhalten
 Locking the window\n	VideoConsumer.cpp		Festsetzen des Fensters\n
 File %s; Line %ld # %s	SettingsHandler		Datei %s; Zeile %ld # %s
 Couldn't find requested directory on server	VideoConsumer.cpp		Das angefragte Verzeichnis konnte auf dem Server nicht gefunden werden.
-Renaming…	VideoConsumer.cpp		Umbenennen...
+Renaming…	VideoConsumer.cpp		Umbenennen…
 Local	CodyCam		Lokal
 Error setting type of output file	VideoConsumer.cpp		Fehler beim Setzen des Ausgabedateityps.
 upload client name expected	CodyCam		Name des Upload-Client erwartet

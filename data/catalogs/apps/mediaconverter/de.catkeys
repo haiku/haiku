@@ -5,7 +5,7 @@ No audio	Audio codecs list		Keine Tonspur
 Error	MediaConverter		Fehler
 Error loading a file	MediaConverter		Fehler beim Laden einer Datei
 File Error	MediaConverter-FileInfo		Dateifehler
-Open…	Menu		Öffnen...
+Open…	Menu		Öffnen…
 Start [ms]: 	MediaConverter		Anfang [ms]:
 Output file '%filename' created	MediaConverter		Ausgabedatei '%filename' erstellt
 Output format	MediaConverter		Ausgabeformat
@@ -39,7 +39,7 @@ Video:	MediaConverter-FileInfo		Video:
 %d bit 	MediaFileInfo		%d Bit
 Error creating '%filename'	MediaConverter		Fehler beim Erstellen von '%filename'
 Video quality not supported	MediaConverter		Videoqualität nicht einstellbar
-Cancelling…	MediaConverter		Abbruch...
+Cancelling…	MediaConverter		Abbruch…
 File details	MediaConverter		Dateidetails
 Select	MediaConverter		Auswählen
 Writing video track: %ld%% complete	MediaConverter		Videospur wird geschrieben: %ld%% fertig

@@ -1,9 +1,9 @@
 1	ukrainian	x-vnd.Haiku-SpamFilter	1975155212
-Add spam rating to start of subject	SpamFilterConfig		Додати позначку про спам на початку теми
-Close	SpamFilterConfig		Закрити
+or empty e-mail	SpamFilterConfig		або порожній лист
+Spam Filter (AGMS Bayesian)	SpamFilter		Спам-фільтр (AGMS Байєса)
 Genuine below and uncertain above:	SpamFilterConfig		Справжні - внизу, а сумнівні - вгорі
+Spam above:	SpamFilterConfig		Спам вгорі:
+Add spam rating to start of subject	SpamFilterConfig		Додати позначку про спам на початку теми
 Learn from all incoming e-mail	SpamFilterConfig		Вчитися за всією вхідною поштою
 Sorry, unable to launch the spamdbm program to let you edit the server settings.	SpamFilterConfig		Неможливо запустити програму spamdbm, яка дозволила б вам редагувати параметри сервера.
-Spam Filter (AGMS Bayesian)	SpamFilter		Спам-фільтр (AGMS Байєса)
-Spam above:	SpamFilterConfig		Спам вгорі:
-or empty e-mail	SpamFilterConfig		або порожній лист
+Close	SpamFilterConfig		Закрити

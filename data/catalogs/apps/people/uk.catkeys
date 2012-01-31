@@ -1,49 +1,49 @@
 1	ukrainian	x-vnd.Be-PEPL	2993050801
-%name% picture	People		%name% малюнок
-Address	People		Адреса
-Cancel	People		Відмінити
-City	People		Місто
-Close	People		Закрити
-Company	People		Компанія
-Configure attributes	People		Встановити атрибути
-Contact information for a person.	Long mimetype description		Контактна інформація особи
-Contact name	People		Контактне ім'я
-Copy	People		Копіювати
-Could not create %s.	People		Не вдалося створити %s.
-Country	People		Країна
-Cut	People		Вирізати
-Drop an image here,\nor use the contextual menu.	People		Перемістіть зображення сюди,\nабо використайте контекстне меню.
-E-mail	People		E-mail
 Edit	People		Редагувати
 Error	People		Помилка
-Fax	People		Факс
-File	People		Файл
-Group	People		Група
-Home phone	People		Домашній телефон
-Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Підключення префлету Типи Файлів призупинене.\n\nПомилка:
-Load image…	People		Завантажити зображення…
-Name	People		Ім'я
-New person	People		Нова персона
-New person…	People		Нова особа
-Nickname	People		Нік
-OK	People		Гаразд
-Paste	People		Вставити
-People	System name		Люди
-Person	Short mimetype description		Особа
-Quit	People		Вийти
-Redo	People		Переробити
-Remove image	People		Видалити зображення
-Revert	People		Повернути
-Save	People		Зберегти
-Save as…	People		Зберегти як…
-Save changes before quitting?	People		Зберегти настройки перед виходом?
-Select all	People		Вибрати всіх
-Sorry	People		Вибачте
-State	People		Держава
+City	People		Місто
 The file '%name%' could not be written.	People		Файл '%name%' не може бути записаний.
-URL	People		URL
-Undo	People		Cкасувати
-Unnamed person	People		Безіменна особа
-Work phone	People		Робочий телефон
-Zip	People		Індекс
 none	Groups list		нічого
+Configure attributes	People		Встановити атрибути
+Company	People		Компанія
+%name% picture	People		%name% малюнок
+Work phone	People		Робочий телефон
+People	System name		Люди
+New person	People		Нова персона
+Select all	People		Вибрати всіх
+File	People		Файл
+Unnamed person	People		Безіменна особа
+Could not create %s.	People		Не вдалося створити %s.
+Country	People		Країна
+Close	People		Закрити
+Group	People		Група
+Nickname	People		Нік
+Quit	People		Вийти
+Name	People		Ім'я
+Revert	People		Повернути
+Undo	People		Cкасувати
+E-mail	People		E-mail
+Save changes before quitting?	People		Зберегти настройки перед виходом?
+Load image…	People		Завантажити зображення…
+OK	People		Гаразд
+Remove image	People		Видалити зображення
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Підключення префлету Типи Файлів призупинене.\n\nПомилка:
+Home phone	People		Домашній телефон
+Save as…	People		Зберегти як…
+Redo	People		Переробити
+Paste	People		Вставити
+Drop an image here,\nor use the contextual menu.	People		Перемістіть зображення сюди,\nабо використайте контекстне меню.
+Save	People		Зберегти
+Person	Short mimetype description		Особа
+New person…	People		Нова особа
+Address	People		Адреса
+URL	People		URL
+Sorry	People		Вибачте
+Zip	People		Індекс
+Contact information for a person.	Long mimetype description		Контактна інформація особи
+Fax	People		Факс
+Contact name	People		Контактне ім'я
+Cut	People		Вирізати
+Cancel	People		Відмінити
+State	People		Держава
+Copy	People		Копіювати

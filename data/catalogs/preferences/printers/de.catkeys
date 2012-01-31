@@ -30,7 +30,7 @@ Blue	TestPageView		Blau
 1 pending job.	PrinterListView		1 offener Druckauftrag.
 Remove	PrintersWindow		Entfernen
 <pick one>	AddPrinterDialog		<auswählen>
-Add …	PrintersWindow		Hinzu...
+Add …	PrintersWindow		Hinzu…
 Print jobs for 	PrintersWindow		Druckaufträge für
 Failed	JobListView		Fehler
 %.2f KB	JobListView		%.2F KiB

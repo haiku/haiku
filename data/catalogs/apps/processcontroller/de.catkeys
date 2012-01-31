@@ -5,11 +5,11 @@ Idle priority	ProcessController		Leerlauf-Priorität
 Restart Deskbar	ProcessController		Deskbar neu starten
 Custom priority	ProcessController		Anwendungsspezifische Priorität
 Debug thread	ProcessController		Debug Thread
-This team is already gone…	ProcessController		Dieses Team existiert nicht mehr...
+This team is already gone…	ProcessController		Dieses Team existiert nicht mehr…
 Error saving file	ProcessController		Fehler beim Speichern der Datei
 Real-time priority	ProcessController		Echtzeit-Priorität
 Your setting file could not be saved!\n(%s)	ProcessController		Die Einstellungsdatei konnte nicht gespeichert werden.\n(%s)
-This thread is already gone…	ProcessController		Dieser Thread existiert nicht mehr...
+This thread is already gone…	ProcessController		Dieser Thread existiert nicht mehr…
 Cancel	ProcessController		Abbrechen
 Display priority	ProcessController		Anzeigen-Priorität
 Run in window	ProcessController		Im Fenster ausführen
@@ -21,7 +21,7 @@ Info	ProcessController		Info
 Quit application	ProcessController		Anwendung beenden
 Low priority	ProcessController		Niedrige Priorität
 What do you want to do with the thread \"%s\"?	ProcessController		Was soll mit dem Thread \"%s\" geschehen?
-Gone teams…	ProcessController		Verlorene Teams...
+Gone teams…	ProcessController		Verlorene Teams…
 Lowest active priority	ProcessController		Niedrigste aktive Priorität
 Restart Tracker	ProcessController		Tracker neu starten
 Live in the Deskbar	ProcessController		In der Deskbar laufen
@@ -30,7 +30,7 @@ Debug this thread!	ProcessController		Diesen Thread debuggen!
 Normal priority	ProcessController		Normale Priorität
 New Terminal	ProcessController		Neues Terminal
 Urgent priority	ProcessController		Hohe Priorität
-About ProcessController…	ProcessController		Über Systemmanager...
+About ProcessController…	ProcessController		Über Systemmanager…
 Ok!	ProcessController		OK
 Quit an application	ProcessController		Anwendung beenden
 Install in Deskbar	ProcessController		In Deskbar installieren
@@ -43,6 +43,6 @@ ProcessController	System name		Systemmanager
 Real-time display priority	ProcessController		Echtzeit-Anzeigen-Priorität
 Please confirm	ProcessController		Bitte bestätigen
 Yes, kill this team!	ProcessController		Ja, dieses Team beenden!
-System resources & caches…	ProcessController		Systemressourcen & Cache
+System resources & caches…	ProcessController		Systemressourcen & Cache…
 That's no Fun!	ProcessController		Nicht lustig!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Der Systemmanager kann im Fenster ausgeführt oder in der Deskbar installiert werden.

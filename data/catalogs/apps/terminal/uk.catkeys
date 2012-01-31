@@ -1,102 +1,101 @@
-1	ukrainian	x-vnd.Haiku-Terminal	2059530645
-%app% settings	Terminal PrefWindow	window title	Параметри %app%
--h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help друкувати цю довідку\n -t, --title              встановити заголовок вікна\n -f, --fullscreen запустити у повний екран\n
-Abort	Terminal Shell		Зупинити
-Appearance	Terminal PrefWindow		Зовн. вигляд
-Background	Terminal AppearancePrefView		Тло
-Black on White	Terminal colors schema		Чорним по білому
-Cancel	Terminal PrefWindow		Відміна
-Cancel	Terminal SetTitleWindow		Відміна
-Cancel	Terminal TermView		Відміна
-Cancel	Terminal TermWindow		Відміна
-Cannot execute \"%command\":\n\t%error	Terminal Shell		Неможливо виконати \"%command\":\n\t%error
-Change directory	Terminal TermView		Змінити каталог
-Clear all	Terminal TermWindow		Очистити все
-Close	Terminal TermWindow		Закрити
-Close active tab	Terminal TermWindow		Закрити активну вкладку
-Close other tabs	Terminal TermWindow		Закрити інші вкладки
-Close tab	Terminal TermWindow		Закрити вкладку
-Close window	Terminal TermWindow		Закрити вікно
-Color schema:	Terminal AppearancePrefView		Схема кольорів:
-Color:	Terminal AppearancePrefView		Колір:
-Confirm exit if active programs exist	Terminal AppearancePrefView		Підтверджувати вихід якщо присутні активні програми
-Copy	Terminal TermWindow		Копіювати
-Copy here	Terminal TermView		Копіювати сюди
-Create link here	Terminal TermView		Створити посилання сюди
-Custom	Terminal colors schema		Спеціальний
-Decrease	Terminal TermWindow		Зменшити
-Don't save	Terminal PrefWindow		Не зберігати
-Edit	Terminal TermWindow		Редагувати
-Edit tab title…	Terminal TermWindow		Редагувати ім'я вкладки…
-Error!	Terminal getString		Помилка!
-Find	Terminal FindWindow		Знайти
-Find failed	Terminal TermWindow		Пошук призупинено
-Find next	Terminal TermWindow		Знайти наступне
-Find previous	Terminal TermWindow		Знайти попереднє
-Find…	Terminal TermWindow		Знайти…
-Font:	Terminal AppearancePrefView		Шрифт:
-Full screen	Terminal TermWindow		У повний екран
-Green on Black	Terminal colors schema		Зелене на чорному
-Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Термінал Haiku\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nВикористання: %s [ОПЦІЯ] [ОБОЛОНКА]\n
-Increase	Terminal TermWindow		Збільшити
-Insert path	Terminal TermView		Введіть шлях
-Match case	Terminal FindWindow		Враховувати регістр
-Match word	Terminal FindWindow		Слово повністю
-Move here	Terminal TermView		Перемістити сюди
-New Terminal	Terminal TermWindow		Новий термінал
-New tab	Terminal TermWindow		Нова вкладка
-No search string was entered.	Terminal TermWindow		Стрічка для пошуку не введена.
+1	ukrainian	x-vnd.Haiku-Terminal	1054657081
 Not found.	Terminal TermWindow		Не знайдено.
-Nothing is selected.	Terminal TermWindow		Нічого не вибрано.
-OK	Terminal PrefWindow		Гаразд
-OK	Terminal SetTitleWindow		Гаразд
-OK	Terminal TermApp		Гаразд
-OK	Terminal TermWindow		Гаразд
-Page setup…	Terminal TermWindow		Настройки друку…
-Paste	Terminal TermWindow		Вставити
-Print	Terminal TermWindow		Друк
-Quit	Terminal TermWindow		Вийти
-Really close?	Terminal TermWindow		Дійсно закрити?
-Save	Terminal PrefWindow		Зберегти
-Save as default	Terminal TermWindow		Зберегти як по замовчуванню
-Save changes to this settings panel?	Terminal PrefWindow		Зберегти зміни для цих настройок панелі?
-Save to file…	Terminal PrefWindow		Зберегти у файл…
-Search forward	Terminal FindWindow		Шукати далі
-Select all	Terminal TermWindow		Вибрати все
-Selected background	Terminal AppearancePrefView		Вибрати тло
-Selected text	Terminal AppearancePrefView		Вибрати текст
-Set tab title	Terminal TermWindow		Встановити ім'я вкладки
-Set window title	Terminal TermWindow		Встановити ім'я вікна
-Settings	Terminal TermWindow		Настройки
-Settings…	Terminal TermWindow		Настройки…
-Shell 	Terminal TermWindow		Оболонка
-Size:	Terminal AppearancePrefView		Розмір:
 Switch Terminals	Terminal TermWindow		Перемкнути термінали
-Tab title:	Terminal AppearancePrefView		Ім'я вкладки:
-Tab title:	Terminal TermWindow		Ім'я вкладки:
-Terminal	System name		Термінал
+Change directory	Terminal TermView		Змінити каталог
+OK	Terminal TermWindow		Гаразд
+New Terminal	Terminal TermWindow		Новий термінал
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Термінал не зміг запустити оболонку. Прикро.
-Text	Terminal AppearancePrefView		Текст
-Text encoding	Terminal TermWindow		Кодування тексту
-Text not found.	Terminal TermWindow		Текст не знайдено.
 Text size	Terminal TermWindow		Розмір тексту
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Наступні процеси надалі запущені:\n\n\t%1\n\nЯкщо Ви закриєте Terminal, процеси буде вбито.
-The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон для поточної вкладки. Наступні заповнювачі\n можуть бути використані:\n
-The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Шаблон для імен вікон. Наступні заповнювачі\nможуть бути використані:\n
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон для поточного імені вікна. Наступні заповнювачі\nможуть бути використані:\n
-The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Шаблон для поточного імені вкладки. Наступні заповнювачі\nможуть бути використані:\n
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Процес \"%1\" надалі запущено.\nЯкщо Ви закриєте Terminal, процес буде вбито.
-The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Процес \"%1\" надалі запущено.\nIЯкщо Ви закриєте вкладку, процес буде вбито.
-Unrecognized option \"%s\"\n	Terminal arguments parsing		Невідома опція \"%s\"\n
-Use default	Terminal SetTitleWindow		Використати по замовчуванню
+Match case	Terminal FindWindow		Враховувати регістр
+Quit	Terminal TermWindow		Вийти
 Use default shell	Terminal Shell		Використати оболонку по замовчуванню
-Use selection	Terminal FindWindow		Використати вибране
-Use text:	Terminal FindWindow		Використати текст:
-White on Black	Terminal colors schema		Білим по чорному
-Window size	Terminal TermWindow		Розмір вікна
+Confirm exit if active programs exist	Terminal AppearancePrefView		Підтверджувати вихід якщо присутні активні програми
+The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон для поточної вкладки. Наступні заповнювачі\n можуть бути використані:\n
+Select all	Terminal TermWindow		Вибрати все
+Close tab	Terminal TermWindow		Закрити вкладку
+Custom	Terminal colors schema		Спеціальний
+Save to file…	Terminal PrefWindow		Зберегти у файл…
+OK	Terminal PrefWindow		Гаразд
+Black on White	Terminal colors schema		Чорним по білому
 Window title:	Terminal AppearancePrefView		Ім'я вікна:
+Font:	Terminal AppearancePrefView		Шрифт:
+Copy here	Terminal TermView		Копіювати сюди
+Really close?	Terminal TermWindow		Дійсно закрити?
+Copy	Terminal TermWindow		Копіювати
 Window title:	Terminal TermWindow		Ім'я вікна:
+Unrecognized option \"%s\"\n	Terminal arguments parsing		Невідома опція \"%s\"\n
+%app% settings	Terminal PrefWindow	window title	Параметри %app%
+Cancel	Terminal SetTitleWindow		Відміна
+Increase	Terminal TermWindow		Збільшити
+Settings	Terminal TermWindow		Настройки
+Window size	Terminal TermWindow		Розмір вікна
+Selected text	Terminal AppearancePrefView		Вибрати текст
+Find	Terminal FindWindow		Знайти
+Appearance	Terminal PrefWindow		Зовн. вигляд
+Tab title:	Terminal AppearancePrefView		Ім'я вкладки:
+The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Шаблон для поточного імені вкладки. Наступні заповнювачі\nможуть бути використані:\n
+Color schema:	Terminal AppearancePrefView		Схема кольорів:
+OK	Terminal SetTitleWindow		Гаразд
+Background	Terminal AppearancePrefView		Тло
+Use selection	Terminal FindWindow		Використати вибране
+Green on Black	Terminal colors schema		Зелене на чорному
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Процес \"%1\" надалі запущено.\nIЯкщо Ви закриєте вкладку, процес буде вбито.
+Size:	Terminal AppearancePrefView		Розмір:
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Неможливо виконати \"%command\":\n\t%error
+Full screen	Terminal TermWindow		У повний екран
 Window title…	Terminal TermWindow		Заголовок вікна…
+Page setup…	Terminal TermWindow		Настройки друку…
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Наступні процеси надалі запущені:\n\n\t%1\n\nЯкщо Ви закриєте Terminal, процеси буде вбито.
+Insert path	Terminal TermView		Введіть шлях
+Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Термінал Haiku\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nВикористання: %s [ОПЦІЯ] [ОБОЛОНКА]\n
+No search string was entered.	Terminal TermWindow		Стрічка для пошуку не введена.
+Don't save	Terminal PrefWindow		Не зберігати
+Set window title	Terminal TermWindow		Встановити ім'я вікна
+Terminal	System name		Термінал
+Close other tabs	Terminal TermWindow		Закрити інші вкладки
+Match word	Terminal FindWindow		Слово повністю
+Nothing is selected.	Terminal TermWindow		Нічого не вибрано.
+Text not found.	Terminal TermWindow		Текст не знайдено.
+Find…	Terminal TermWindow		Знайти…
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Процес \"%1\" надалі запущено.\nЯкщо Ви закриєте Terminal, процес буде вбито.
+Move here	Terminal TermView		Перемістити сюди
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tПоточний каталог активного процесу\n\t\t\tв поточній вкладці. Додатково можна вказати максимальну кількість компонентів шляху\n\t\t\t Наприклад '%2d' ніж 2 компоненти.\n\t%i\t-\tіндекс вікна.\n\t%p\t-\tІм'я активного процесу поточної вкладки.\n\t%%\t-\tІм'я поточної вкладки.\n\t%%\t-\tСимвол '%'.
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tПоточний каталог активного процесу.\n\t\t\tДодатково можна вказати максимальну кількість компонентів шляху\n\t\t\t Наприклад '%2d' ніж 2 компоненти.\n\t%i\t-\tіндекс вкладки.\n\t%p\t-\tІм'я активного процесу.\n\t%%\t-\tСимвол '%'.
+White on Black	Terminal colors schema		Білим по чорному
+Error!	Terminal getString		Помилка!
+New tab	Terminal TermWindow		Нова вкладка
+The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Шаблон для імен вікон. Наступні заповнювачі\nможуть бути використані:\n
+Selected background	Terminal AppearancePrefView		Вибрати тло
+Decrease	Terminal TermWindow		Зменшити
+Create link here	Terminal TermView		Створити посилання сюди
+Close	Terminal TermWindow		Закрити
+Text	Terminal AppearancePrefView		Текст
+Clear all	Terminal TermWindow		Очистити все
+Text encoding	Terminal TermWindow		Кодування тексту
 size	Terminal TermView		розмір
+Close window	Terminal TermWindow		Закрити вікно
+Save as default	Terminal TermWindow		Зберегти як по замовчуванню
+Set tab title	Terminal TermWindow		Встановити ім'я вкладки
+Settings…	Terminal TermWindow		Настройки…
+Abort	Terminal Shell		Зупинити
+Edit	Terminal TermWindow		Редагувати
+Color:	Terminal AppearancePrefView		Колір:
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон для поточного імені вікна. Наступні заповнювачі\nможуть бути використані:\n
+Print	Terminal TermWindow		Друк
+Use text:	Terminal FindWindow		Використати текст:
+Cancel	Terminal TermWindow		Відміна
+OK	Terminal TermApp		Гаразд
+Find failed	Terminal TermWindow		Пошук призупинено
+Search forward	Terminal FindWindow		Шукати далі
+Edit tab title…	Terminal TermWindow		Редагувати ім'я вкладки…
+Find previous	Terminal TermWindow		Знайти попереднє
+Tab title:	Terminal TermWindow		Ім'я вкладки:
+Find next	Terminal TermWindow		Знайти наступне
+Close active tab	Terminal TermWindow		Закрити активну вкладку
+Paste	Terminal TermWindow		Вставити
+Save changes to this settings panel?	Terminal PrefWindow		Зберегти зміни для цих настройок панелі?
+Cancel	Terminal PrefWindow		Відміна
+Shell 	Terminal TermWindow		Оболонка
+Save	Terminal PrefWindow		Зберегти
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tПоточний каталог активного процесу.\n\t\t\tДодатково можна вказати максимальну кількість компонентів шляху\n\t\t\t Наприклад '%2d' ніж 2 компоненти.\n\t%i\t-\tіндекс вкладки.\n\t%p\t-\tІм'я активного процесу.\n\t%%\t-\tСимвол '%'.
+Cancel	Terminal TermView		Відміна
+Use default	Terminal SetTitleWindow		Використати по замовчуванню

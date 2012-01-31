@@ -1,95 +1,95 @@
 1	ukrainian	x-vnd.Haiku-Devices	865240481
-ACPI Information	DeviceACPI		Інформація про ACPI
-ACPI Processor Namespace '%2'	DeviceACPI		Місце імені процесора ACPI '%2'
-ACPI System Bus	DeviceACPI		Шина системи ACPI
-ACPI System Indicator	DeviceACPI		Індикатор системи ACPI
-ACPI Thermal Zone	DeviceACPI		Теплова зона ACPI
-ACPI bus	Device		Шина ACPI
-ACPI bus	DevicesView		ШинаACPI
-ACPI controller	Device		ACPI контролер
-ACPI node '%1'	DeviceACPI		Вузол ACPI '%1'
-Array	DeviceSCSI		Масив
-Basic information	DevicesView		Основна інформація
-Bridge	Device		Міст
-Bridge	DeviceSCSI		Міст
-Bus	DevicesView		Шина
-Bus Information	Device		Інфо про шину
-CD-ROM	DeviceSCSI		CD-ROM
-Card Reader	DeviceSCSI		Кардрідер
-Category	DevicesView		Категорії
-Changer	DeviceSCSI		Ченджер
-Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Інфо про клас:\t\t\t\t: %classInfo%
-Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Дані класу:\t\t\t\t: %classInfo%
-Class info	DevicePCI		Інфо про клас
-Communication controller	Device		Контролер зв’язку
-Communications	DeviceSCSI		Комунікації
-Computer	Device		Комп’ютер
-Computer	DevicesView		Компютер
-Connection	DevicesView		Підключенню
-Detailed	DevicesView		Докладно
-Device	Device		Пристрій
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Ім'я пристрою\t\t\t\t: %Name%\nВиробник\t\t\t: %Manufacturer%\nВикор. драйвер \t\t\t\t: %DriverUsed%\nШляхи пристрою\t: %DevicePaths%
-Device class	DeviceSCSI		Клас приладу
-Device name	Device		Назва пристрою
-Device name	DeviceACPI		Ім'я пристрою
-Device name	DevicePCI		Ім'я пристрою
-Device name	DeviceSCSI		Ім'я пристрою
-Device name:	Device		Назва пристрою:
-Device paths	Device		Шляхи пристрою
-Device paths	DevicePCI		Шляхи пристрою
-Devices	DevicesView		Пристрої
-Devices	System name		Пристрої
-Disk Drive	DeviceSCSI		Дисковий привід
-Display controller	Device		Контролер дисплея
-Docking station	Device		Док-станція
-Driver used	Device		Використовує драйвер
-Driver used	DevicePCI		Використовує драйвер
-Enclosure	DeviceSCSI		Вкладення
-Encryption controller	Device		Контроллер шифрування
-Generate system information	DevicesView		Створення системної інформації
-Generic system peripheral	Device		Периферійні пристрої
-Graphics Peripheral	DeviceSCSI		Графічна периферія
-ISA bus	Device		ISA bus
-ISA bus	DevicesView		Шина ISA
-Input device controller	Device		Контролер ввідних пристроїв
-Intelligent controller	Device		Інтелектуальний контролер
-Manufacturer	Device		Виробник
-Manufacturer	DeviceACPI		Виробник
-Manufacturer	DevicePCI		Виробник
 Manufacturer	DeviceSCSI		Виробник
-Manufacturer:	Device		Виробник:
-Mass storage controller	Device		Контролер накопичувачів
-Memory controller	Device		Контролер пам’яті
-Multimedia controller	Device		Мультимедійний контролер
-Name	PropertyList		Імя
-Network controller	Device		Мережевий контролер
-None	Device		Жоден
-Not implemented	DeviceACPI		Не підтримується
-Not implemented	DevicePCI		Не підтримується
-Optical Drive	DeviceSCSI		Оптичний привід
 Order by:	DevicesView		Сортувати по:
-Other	DeviceSCSI		Інше
-PCI Information	DevicePCI		Інформація про PCI
-PCI bus	Device		ШинаPCI
-PCI bus	DevicesView		Шина PCI
+ACPI controller	Device		ACPI контролер
+Memory controller	Device		Контролер пам’яті
+Driver used	DevicePCI		Використовує драйвер
+CD-ROM	DeviceSCSI		CD-ROM
+ISA bus	Device		ISA bus
+ACPI bus	Device		Шина ACPI
+ISA bus	DevicesView		Шина ISA
+Docking station	Device		Док-станція
+Computer	Device		Комп’ютер
+Unknown device	Device		Невідомий пристрій
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Інфо про клас:\t\t\t\t: %classInfo%
+Processor	DeviceSCSI		Процесор
+RBC	DeviceSCSI		RBC
+Detailed	DevicesView		Докладно
+Category	DevicesView		Категорії
+Quit	DevicesView		Вийти
+Device paths	Device		Шляхи пристрою
+Scanner	DeviceSCSI		Сканер
 Printer	DeviceSCSI		Printer
 Processor	Device		Процесор
-Processor	DeviceSCSI		Процесор
-Quit	DevicesView		Вийти
-RBC	DeviceSCSI		RBC
-Refresh devices	DevicesView		Оновлення пристроїв
-Report compatibility	DevicesView		Повідомити про сумісність
-SCSI Information	DeviceSCSI		Дані SCSI
-Satellite communications controller	Device		Контроллер супутникового зв’язку
-Scanner	DeviceSCSI		Сканер
-Serial bus controller	Device		Контроллер послідовної шини
-Signal processing controller	Device		Контроллер обробки сигналів
-Tape Drive	DeviceSCSI		Стрічковий привід
-Unclassified device	Device		Некласифіковані пристрої
-Unknown	DevicePCI		Невідомий
-Unknown device	Device		Невідомий пристрій
-Unknown device	DevicesView		Невідомий пристрій
-Value	PropertyList		Значення
-Wireless controller	Device		Бездротовий контролер
-Worm	DeviceSCSI		Worm
+Optical Drive	DeviceSCSI		Оптичний привід
+ACPI Processor Namespace '%2'	DeviceACPI		Місце імені процесора ACPI '%2'
+Bridge	DeviceSCSI		Міст
 unknown	Device		невідомий
+ACPI Information	DeviceACPI		Інформація про ACPI
+Generic system peripheral	Device		Периферійні пристрої
+Not implemented	DevicePCI		Не підтримується
+Disk Drive	DeviceSCSI		Дисковий привід
+Not implemented	DeviceACPI		Не підтримується
+Device name	DevicePCI		Ім'я пристрою
+Display controller	Device		Контролер дисплея
+Mass storage controller	Device		Контролер накопичувачів
+Input device controller	Device		Контролер ввідних пристроїв
+Network controller	Device		Мережевий контролер
+Device class	DeviceSCSI		Клас приладу
+Device name	DeviceACPI		Ім'я пристрою
+Driver used	Device		Використовує драйвер
+Other	DeviceSCSI		Інше
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Ім'я пристрою\t\t\t\t: %Name%\nВиробник\t\t\t: %Manufacturer%\nВикор. драйвер \t\t\t\t: %DriverUsed%\nШляхи пристрою\t: %DevicePaths%
+ACPI Thermal Zone	DeviceACPI		Теплова зона ACPI
+Communications	DeviceSCSI		Комунікації
+Bus	DevicesView		Шина
+Communication controller	Device		Контролер зв’язку
+Manufacturer	DeviceACPI		Виробник
+PCI bus	Device		ШинаPCI
+ACPI System Indicator	DeviceACPI		Індикатор системи ACPI
+None	Device		Жоден
+PCI bus	DevicesView		Шина PCI
+Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Дані класу:\t\t\t\t: %classInfo%
+Basic information	DevicesView		Основна інформація
+PCI Information	DevicePCI		Інформація про PCI
+Manufacturer:	Device		Виробник:
+ACPI bus	DevicesView		ШинаACPI
+Changer	DeviceSCSI		Ченджер
+ACPI System Bus	DeviceACPI		Шина системи ACPI
+Devices	System name		Пристрої
+Worm	DeviceSCSI		Worm
+Multimedia controller	Device		Мультимедійний контролер
+Unknown	DevicePCI		Невідомий
+Device name:	Device		Назва пристрою:
+Computer	DevicesView		Компютер
+Value	PropertyList		Значення
+Report compatibility	DevicesView		Повідомити про сумісність
+Device	Device		Пристрій
+Signal processing controller	Device		Контроллер обробки сигналів
+Serial bus controller	Device		Контроллер послідовної шини
+Wireless controller	Device		Бездротовий контролер
+ACPI node '%1'	DeviceACPI		Вузол ACPI '%1'
+Device name	Device		Назва пристрою
+Manufacturer	Device		Виробник
+Name	PropertyList		Імя
+Manufacturer	DevicePCI		Виробник
+Intelligent controller	Device		Інтелектуальний контролер
+Satellite communications controller	Device		Контроллер супутникового зв’язку
+SCSI Information	DeviceSCSI		Дані SCSI
+Enclosure	DeviceSCSI		Вкладення
+Array	DeviceSCSI		Масив
+Bridge	Device		Міст
+Refresh devices	DevicesView		Оновлення пристроїв
+Unknown device	DevicesView		Невідомий пристрій
+Graphics Peripheral	DeviceSCSI		Графічна периферія
+Tape Drive	DeviceSCSI		Стрічковий привід
+Bus Information	Device		Інфо про шину
+Connection	DevicesView		Підключенню
+Generate system information	DevicesView		Створення системної інформації
+Encryption controller	Device		Контроллер шифрування
+Unclassified device	Device		Некласифіковані пристрої
+Device name	DeviceSCSI		Ім'я пристрою
+Card Reader	DeviceSCSI		Кардрідер
+Class info	DevicePCI		Інфо про клас
+Device paths	DevicePCI		Шляхи пристрою
+Devices	DevicesView		Пристрої

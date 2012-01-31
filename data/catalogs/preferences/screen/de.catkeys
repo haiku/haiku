@@ -2,13 +2,13 @@
 yes	Screen		Ja
 Use laptop panel:	Screen		Laptop-Panel verwenden:
 15 bits/pixel, 32768 colors	Screen		15 Bits/Pixel, 32768 Farben
-/other…	Screen		/andere...
+/other…	Screen		/andere…
 16 bits/pixel, 65536 colors	Screen		16 Bits/Pixel, 65535 Farben
 Revert	Screen		Anfangswerte
 Swap displays:	Screen		Bildschirme tauschen:
 Combine displays:	Screen		Bildschirme zusammenfassen
 Done	Screen		Fertig
-Set background…	Screen		Hintergrund einstellen...
+Set background…	Screen		Hintergrund einstellen…
 Undo	Screen		Rückgängig
 if needed	Screen		falls nötig
 Screen preferences by the Haiku team	Screen		Bildschirm Einstellungen, vom Haiku Team
@@ -32,7 +32,7 @@ Current workspace	Screen		Aktuelle Arbeitsfläche
 About	Screen		Über
 24 bits/pixel, 16 Million colors	Screen		24 Bits/Pixel, 16 Millionen Farben
 horizontally	Screen		horizontal
-Other…	Screen		Andere...
+Other…	Screen		Andere…
 Cancel	Screen		Abbrechen
 bits/pixel	Screen		Bits/Pixel
 Settings will revert in %seconds seconds.	Screen		Die Einstellungen werden in %seconds Sekunden zurückgesetzt.

@@ -1,29 +1,27 @@
-1	ukrainian	x-vnd.Haiku-Magnify	3748875992
-%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize pixels/pixel
-Add a crosshair	Magnify-Main		Додати перехрестя
+1	ukrainian	x-vnd.Haiku-Magnify	2227745383
+no clip msg\n	In console, when clipboard is empty after clicking Copy image		немає кліпу msg\n
+Make square	Magnify-Main		Задати площу
 Copy image	Magnify-Main		Копіювати зображення
-Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Копіювати/зберегти:\n copy - копіює поточне зображення в буфер обміну\n save - запитує у користувача файл який потрібно зберегти і записує його\n біти зображення\n
-Decrease pixel size	Magnify-Main		Зменшити розмір пікселів
-Decrease window size	Magnify-Main		Зменшити розмір вікна
-Freeze/Unfreeze image	Magnify-Main		заморозити/відморозити зображення
+Magnify help	Magnify-Help		Допомога Magnify
+usage: magnify [size] (magnify size * size pixels)\n	Console		Використання:  
+Stick coordinates	Magnify-Main		Вісь кординат
+Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Інформація:\n hide/show info - сховати/показати всі нові можливості\n заувага: при показі, з'явиться червона площа яка означає\n скільки пікселів rgb буде показано\n add/remove crosshairs - 2 перехрестя може бути додано (або знято)\n для надання допомоги у вирівнюванні чи розташуванні об'єктів .\n Перехрестки позначені синіми квадратами і лініями.\n hide/show grid - приховати/показати сітку, яка відокремлює кожен піксель\n
+Hide/Show grid	Magnify-Main		приховати/показати сітку
+magnify: size must be a multiple of 4\n	Console		збільшення: Розмір має бути кратним 4\n
 General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		Основне:\n 32 x 32 - Верхнє ліве число кількість видимих\n пікселів (ширина x висота)\n 8 pixels/pixel  - являє собою кількість пікселів які\n використовуются для збільшення пікселів\n R:152 G:52 B:10 - Значення RGB для пікселів під\n червоною площею\n
 Help	Magnify-Main		Допомога
-Hide/Show grid	Magnify-Main		приховати/показати сітку
-Hide/Show info	Magnify-Main		приховати/показати Інформацію
-Increase pixel size	Magnify-Main		Збільшити розмір пікселя
-Increase window size	Magnify-Main		Збільшити розмір вікна
-Info	Magnify-Main		Інформація
-Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Інформація:\n hide/show info - сховати/показати всі нові можливості\n заувага: при показі, з'явиться червона площа яка означає\n скільки пікселів rgb буде показано\n add/remove crosshairs - 2 перехрестя може бути додано (або знято)\n для надання допомоги у вирівнюванні чи розташуванні об'єктів .\n Перехрестки позначені синіми квадратами і лініями.\n hide/show grid - приховати/показати сітку, яка відокремлює кожен піксель\n
-Magnify	System name		Збільшення
-Magnify help	Magnify-Help		Допомога Magnify
-Make square	Magnify-Main		Задати площу
-Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Навігація:\n стрілочки - переміщують курсор вибору (rgb індикатора або перехрестя)\n довкола 1 пікселя за раз\n опція стрілочки - переміщає курсор 1 піксель за раз\n x зробіть вибір - поточний вибір має 'x' в собі\n
-Remove a crosshair	Magnify-Main		Зняти перехрестя
-Save image	Magnify-Main		Зберегти зображення
 Sizing/Resizing:\n  make square - sets the width and the height to the larger\n    of the two making a square image\n  increase/decrease window size - grows or shrinks the window\n    size by 4 pixels.\n    note: this window can also be resized to any size via the\n      resizing region of the window\n  increase/decrease pixel size - increases or decreases the number\n    of pixels used to magnify a 'real' pixel. Range is 1 to 16.\n	Magnify-Help		Sizing/Resizing:\nзадає площу- виставляє висоту і ширину більш\n ніж двох площ зображень\n increase/decrease window size - звужує розширює вікно\n розміром 4 пікселі.\n заувага: це вікно може також бути змінене до іншого \n зміною його меж\n increase/decrease pixel size - змінює число\n пікселів, що використовуються для збільшення реального пікселя. Діапазон від 1 до 16.\n
-Stick coordinates	Magnify-Main		Вісь кординат
-freeze - freezes/unfreezes magnification of whatever the\n    cursor is currently over\n	Magnify-Help		Замороження - заморозити/розморозити будь-яке збільшення незалежно\n від положення курсора\n
-magnify: size must be a multiple of 4\n	Console		збільшення: Розмір має бути кратним 4\n
-no clip msg\n	In console, when clipboard is empty after clicking Copy image		немає кліпу msg\n
-size must be > 4 and a multiple of 4\n	Console		розмір має  бути > 4 і кратний 4\n
-usage: magnify [size] (magnify size * size pixels)\n	Console		Використання:  	Magnify [розмір] (Розмір збільшення * розмір пікселів)\n
+Decrease pixel size	Magnify-Main		Зменшити розмір пікселів
+Magnify	System name		Збільшення
+%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize pixels/pixel
+Info	Magnify-Main		Інформація
+Remove a crosshair	Magnify-Main		Зняти перехрестя
+Freeze/Unfreeze image	Magnify-Main		заморозити/відморозити зображення
+Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Копіювати/зберегти:\n copy - копіює поточне зображення в буфер обміну\n save - запитує у користувача файл який потрібно зберегти і записує його\n біти зображення\n
+Hide/Show info	Magnify-Main		приховати/показати Інформацію
+Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Навігація:\n стрілочки - переміщують курсор вибору (rgb індикатора або перехрестя)\n довкола 1 пікселя за раз\n опція стрілочки - переміщає курсор 1 піксель за раз\n x зробіть вибір - поточний вибір має 'x' в собі\n
+Save image	Magnify-Main		Зберегти зображення
+Increase window size	Magnify-Main		Збільшити розмір вікна
+Decrease window size	Magnify-Main		Зменшити розмір вікна
+Increase pixel size	Magnify-Main		Збільшити розмір пікселя
+Add a crosshair	Magnify-Main		Додати перехрестя

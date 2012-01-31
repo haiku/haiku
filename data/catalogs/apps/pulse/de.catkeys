@@ -20,13 +20,13 @@ Frame color	ConfigView		Rahmenfarbe
 Mini mode	PrefsWindow		Mini-Modus
 OK	PulseApp		OK
 Bar colors	ConfigView		Balkenfarbe
-Settings…	PulseView		Einstellungen...
+Settings…	PulseView		Einstellungen…
 You can't disable the last active CPU.	PulseView		Die letzte aktive CPU kann nicht ausgeschaltet werden.
 Info	PulseApp		Info
 Info	CPUButton		Info
 OK	PulseView		OK
 Deskbar menu	CPUButton		Deskbar-Menü
-About Pulse…	PulseView		Über CPU-Anzeige...
+About Pulse…	PulseView		Über CPU-Anzeige…
 Deskbar mode	MiniPulseView		Deskbar-Modus
 Quit	MiniPulseView		Beenden
 Pulse	System name		CPU-Anzeige
@@ -38,7 +38,7 @@ Width of icon:	ConfigView		Balkenbreite:
 You can't disable the last active CPU.	CPUButton		Die letzte aktive CPU kann nicht ausgeschaltet werden.
 Normal mode	DeskbarPulseView		Normal-Modus
 OK	CPUButton		OK
-About Pulse…	CPUButton		Über CPU-Anzeige...
+About Pulse…	CPUButton		Über CPU-Anzeige…
 Removing from Deskbar failed.\n%s	DeskbarPulseView		Entfernen aus Deskbar fehlgeschlagen.\n%s
 Mini mode	NormalPulseView		Mini-Modus
 Info	DeskbarPulseView		Info

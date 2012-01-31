@@ -1,7 +1,7 @@
 1	ukrainian	x-vnd.Haiku-DeskCalc	1916192649
-Audio Feedback	CalcView		Озвучка віддачі
-Basic	CalcView		Основний
 Compact	CalcView		Компактний
-DeskCalc	System name		Калькулятор
-Enable Num Lock on startup	CalcView		Включати Num Lock при запуску
 Scientific	CalcView		Науковий
+DeskCalc	System name		Калькулятор
+Basic	CalcView		Основний
+Enable Num Lock on startup	CalcView		Включати Num Lock при запуску
+Audio Feedback	CalcView		Озвучка віддачі

@@ -1,16 +1,16 @@
 1	ukrainian	x-vnd.Haiku-TGATranslator	4159874267
-Ignore TGA alpha channel	TGAView		Ігнорувати альфа канал TGA
-Save with RLE Compression	TGAView		Зберегти зі стиском RLE
-TGA Image Translator	TGAView		Перетворювач зображень TGA
-TGA Settings	TGAMain		Настройки TGA
-TGA image translator	TGATranslator		Перетворювач зображеньTGA
-TGA images	TGATranslator		Зображення TGA
-TGATranslator Settings	TGATranslator		Настройки Перетворювача TGA
-Targa image (%d bits RLE colormap)	TGATranslator		Зображення Targa (палітра кольорів RLE %d біт)
-Targa image (%d bits RLE gray)	TGATranslator		Зображення Targa (сіре RLE %d біт)
-Targa image (%d bits RLE truecolor)	TGATranslator		Зображення Targa (повнокольрове RLE %d біт)
-Targa image (%d bits colormap)	TGATranslator		Зображення Targa ( палітра кольорів %d біт)
-Targa image (%d bits gray)	TGATranslator		Зображення Targa (у відтінках сірого %d біт)
 Targa image (%d bits truecolor)	TGATranslator		Зображення Targa (%d біт повнокольорове)
 Version %d.%d.%d %s	TGAView		Версія %d.%d.%d %s
+Ignore TGA alpha channel	TGAView		Ігнорувати альфа канал TGA
+Targa image (%d bits colormap)	TGATranslator		Зображення Targa ( палітра кольорів %d біт)
+TGA Image Translator	TGAView		Перетворювач зображень TGA
+Targa image (%d bits RLE colormap)	TGATranslator		Зображення Targa (палітра кольорів RLE %d біт)
+Targa image (%d bits gray)	TGATranslator		Зображення Targa (у відтінках сірого %d біт)
 Written by the Haiku Translation Kit Team	TGAView		Автори Haiku Translation Kit Team
+Targa image (%d bits RLE truecolor)	TGATranslator		Зображення Targa (повнокольрове RLE %d біт)
+TGA images	TGATranslator		Зображення TGA
+TGATranslator Settings	TGATranslator		Настройки Перетворювача TGA
+Save with RLE Compression	TGAView		Зберегти зі стиском RLE
+TGA image translator	TGATranslator		Перетворювач зображеньTGA
+Targa image (%d bits RLE gray)	TGATranslator		Зображення Targa (сіре RLE %d біт)
+TGA Settings	TGAMain		Настройки TGA

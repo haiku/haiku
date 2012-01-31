@@ -1,8 +1,8 @@
 1	ukrainian	x-vnd.Haiku-notification_server	906000487
-Couldn't start display settings monitor.\nLive filter changes disabled.	NotificationWindow		Неможливо запустити монітор параметрів дисплею.\nЗміна фільтру в реальному часі неможлива.
 Couldn't start filter monitor. Live filter changes disabled.	NotificationWindow		Неможливо запустити монітор фільтру. Зміна фільтру в реальному часі неможлива.
-Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Неможливо запустити монітор загальних параметрів.\nЗміна фільтру в реальному часі неможлива.
+Couldn't start display settings monitor.\nLive filter changes disabled.	NotificationWindow		Неможливо запустити монітор параметрів дисплею.\nЗміна фільтру в реальному часі неможлива.
 Darn.	NotificationWindow		Прокляття!
-Notification	NotificationWindow		Попередження
-OK	NotificationWindow		Гаразд
 Warning	NotificationWindow		Повідомлення
+OK	NotificationWindow		Гаразд
+Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Неможливо запустити монітор загальних параметрів.\nЗміна фільтру в реальному часі неможлива.
+Notification	NotificationWindow		Попередження

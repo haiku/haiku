@@ -1,9 +1,9 @@
 1	ukrainian	x-vnd.Haiku-RTFTranslator	526958155
-RTF Settings	main		Настройки RTF
+Version %d.%d.%d, %s	ConfigView		Версія %d.%d.%d, %s
 RTF text files	RTFTranslator		Текстові файли RTF
 RTF-Translator Settings	ConfigView		Настройки Перетворювача RTF
 Rich Text Format (RTF) files	ConfigView		Файли Rich Text Format (RTF)
+RTF Settings	main		Настройки RTF
+RichTextFormat file	RTFTranslator		Файл формату RichText
 Rich Text Format Translator	RTFTranslator		Перетворювач Rich Text Format
 Rich Text Format translator v%d.%d.%d %s	RTFTranslator		Перетворювач Rich Text Format v%d.%d.%d %s
-RichTextFormat file	RTFTranslator		Файл формату RichText
-Version %d.%d.%d, %s	ConfigView		Версія %d.%d.%d, %s

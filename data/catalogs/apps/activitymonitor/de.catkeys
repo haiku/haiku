@@ -16,7 +16,7 @@ Show legend	ActivityView		Legende anzeigen
 Text clipboard	DataSource		Text-Ablage
 Settings	ActivityWindow		Einstellungen
 Receiving	DataSource		Empfangen
-Settings…	ActivityWindow		Einstellungen...
+Settings…	ActivityWindow		Einstellungen…
 Ports	DataSource		Ports
 Page faults	DataSource		Seitenfehler
 Sending	DataSource		Senden

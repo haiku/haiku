@@ -42,7 +42,7 @@ Add Control Point	Icon-O-Matic-AddPointCmd		Kontrollpunkt hinzufügen
 Untitled	Icon-O-Matic-Main		Unbenannt
 Multi Set 	Multi Set (property name)		Mehrfach-Setzen
 any of the other lists to	Empty property list - 2nd line		einer der anderen Listen, um
-Save as…	Icon-O-Matic-Menu-File		Speichern als...
+Save as…	Icon-O-Matic-Menu-File		Speichern als…
 Change Color	Icon-O-Matic-SetColorCmd		Farbe ändern
 Style	Icon-O-Matic-Menus		Stil
 <modify path>	Icon-O-Matic-PathCmd		<Pfad ändern>
@@ -108,7 +108,7 @@ The text you are trying to import is quite long,are you sure?	Icon-O-Matic-Style
 Add	Icon-O-Matic-TransformersList		Hinzufügen
 Export Icon	Dialog title		Icon exportieren
 Color	Icon-O-Matic-StyleTypes		Farbe
-Settings…	Icon-O-Matic-SavePanel		Einstellungen...
+Settings…	Icon-O-Matic-SavePanel		Einstellungen…
 Remove	Icon-O-Matic-PathManipulator		Entfernen
 Radial	Icon-O-Matic-StyleTypes		Radial
 Perspective	Icon-O-Matic-TransformersList		Perspektive
@@ -117,7 +117,7 @@ Gradient	Icon-O-Matic-StyleTypes		Farbverlauf
 Min LOD	Icon-O-Matic-PropertyNames		Min. LOD
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON Attribut
 Invert selection	Icon-O-Matic-Properties		Auswahl umkehren
-Export as…	Icon-O-Matic-Menu-File		Exportieren als...
+Export as…	Icon-O-Matic-Menu-File		Exportieren als…
 Transformation	Transformation		Transformation
 Click on an object in	Empty property list - 1st line		Auf ein Objekt klicken in
 Move Transformers	Icon-O-Matic-MoveTransformersCmd		Transformatoren umsortieren
@@ -185,12 +185,12 @@ Reverse Path	Icon-O-Matic-ReversePathCmd		Pfad umkehren
 Scale	Icon-O-Matic-TransformationBoxStates		Skalieren
 Duplicate	Icon-O-Matic-PathsList		Duplizieren
 Save	Icon-O-Matic-Menu-File		Speichern
-Append…	Icon-O-Matic-Menu-File		Anhängen...
+Append…	Icon-O-Matic-Menu-File		Anhängen…
 Move Path	Icon-O-Matic-MovePathsCmd		Pfad umsortieren
 Overwrite	Icon-O-Matic-SVGExport		Überschreiben
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Formen einfrieren
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Kontrollpunkt trennen
-Open…	Icon-O-Matic-Menu-File		Öffnen...
+Open…	Icon-O-Matic-Menu-File		Öffnen…
 Options	Icon-O-Matic-Menus		Optionen
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Farbe (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Farbverlauf bearbeiten

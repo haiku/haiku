@@ -17,6 +17,6 @@ Configuring	NetworkStatusView		Konfigurierung läuft
 Address	NetworkStatusView		Adresse
 OK	NetworkStatusView		OK
 NetworkStatus	System name		Netzwerkstatus
-Open network preferences…	NetworkStatusView		Netzwerkeinstellungen öffnen...
+Open network preferences…	NetworkStatusView		Netzwerkeinstellungen öffnen…
 Could not join wireless network:\n	NetworkStatusView		Keine Verbindung zum Funknetzwerk:\n
 Quit	NetworkStatusView		Beenden

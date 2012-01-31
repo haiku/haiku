@@ -8,7 +8,7 @@ Subtitle size:	MediaPlayer-SettingsWindow		Untertitelgröße:
 Save Playlist	MediaPlayer-PlaylistWindow		Playliste speichern
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Keine der gewählten Dateien scheinen Mediadateien zu sein.
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Speichern der Playliste fehlgeschlagen.\n\nFehler:
-New player…	MediaPlayer-Main		Neuer Player...
+New player…	MediaPlayer-Main		Neuer Player…
 100% scale	MediaPlayer-Main		100% Zoom
 Subtitle placement:	MediaPlayer-SettingsWindow		Untertitelposition:
 Close	MediaPlayer-Main		Schließen
@@ -20,11 +20,11 @@ Track %d	MediaPlayer-Main		Track %d
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2,35 : 1 (Cinemascope)
 Medium	MediaPlayer-SettingsWindow		Mittel
 Close	MediaPlayer-PlaylistWindow		Schließen
-Open…	MediaPlayer-PlaylistWindow		Öffnen...
+Open…	MediaPlayer-PlaylistWindow		Öffnen…
 Toggle mute.	MediaPlayer-Main		Stumm umschalten.
 Undo	MediaPlayer-PlaylistWindow		Rückgängig
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Hardware-Overlay verwenden, falls verfügbar
-File info…	MediaPlayer-Main		Datei Info...
+File info…	MediaPlayer-Main		Datei Info…
 Pause playback.	MediaPlayer-Main		Wiedergabe anhalten.
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Eintrag entfernen
 Close window after playing audio	MediaPlayer-SettingsWindow		Fenster nach Audiowiedergabe schließen
@@ -49,7 +49,7 @@ Audio	MediaPlayer-Main		Audio
 Open Playlist	MediaPlayer-PlaylistWindow		Playliste öffnen
 MediaPlayer	System name		Media-Player
 OK	MediaPlayer-Main		OK
-Settings…	MediaPlayer-Main		Einstellungen...
+Settings…	MediaPlayer-Main		Einstellungen…
 MediaPlayer settings	MediaPlayer-SettingsWindow		Media-Player-Einstellungen
 Select all	MediaPlayer-PlaylistWindow		Alles auswählen
 Move Entry	MediaPlayer-MovePLItemsCmd		Eintrag verschieben
@@ -114,9 +114,9 @@ Open Clips	MediaPlayer-Main		Clips öffnen
 OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		keine
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Zeigt/Setzt die Lautstärke (0,0-2,0)
-Playlist…	MediaPlayer-Main		Playliste...
+Playlist…	MediaPlayer-Main		Playliste…
 <unknown>	PlaylistItem-author		<unbekannt>
-Save as…	MediaPlayer-PlaylistWindow		Speichern als...
+Save as…	MediaPlayer-PlaylistWindow		Speichern als…
 Copy Entries	MediaPlayer-CopyPLItemsCmd		Einträge kopieren
 Redo	MediaPlayer-PlaylistWindow		Wiederholen
 Always on top	MediaPlayer-Main		Immer im Vordergrund
@@ -126,7 +126,7 @@ Save	MediaPlayer-Main		Speichern
 Save	MediaPlayer-PlaylistWindow		Speichern
 Remove	MediaPlayer-PlaylistWindow		Entfernen
 Full screen	MediaPlayer-Main		Vollbild
-Open file…	MediaPlayer-Main		Öffne Datei...
+Open file…	MediaPlayer-Main		Öffne Datei…
 300% scale	MediaPlayer-Main		300% Zoom
 Bottom of screen	MediaPlayer-SettingsWindow		Unten im Fenster
 Save error	MediaPlayer-PlaylistWindow		Speichern ist fehlgeschlagen

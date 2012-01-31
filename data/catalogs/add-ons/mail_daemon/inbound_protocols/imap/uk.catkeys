@@ -1,9 +1,9 @@
 1	ukrainian	x-vnd.Haiku-IMAP	3892875357
-Apply	IMAPFolderConfig		Застосувати
 Destination:	imap_config		Позамовчуванню:
-Failed to fetch available storage.	IMAPFolderConfig		Призупинено отримання доступних масивів.
+status	IMAPFolderConfig		стан
+Apply	IMAPFolderConfig		Застосувати
+IMAP Folders	imap_config		Папки IMAP
 Fetching IMAP folders, have patience...	IMAPFolderConfig		Отримання папок IMAP, зачекайте ...
 IMAP Folders	IMAPFolderConfig		Папки IMAP
-IMAP Folders	imap_config		Папки IMAP
 Subcribe / Unsuscribe IMAP folders, have patience...	IMAPFolderConfig		Підписка/відписка для папок IMAP , зачекайте...
-status	IMAPFolderConfig		стан
+Failed to fetch available storage.	IMAPFolderConfig		Призупинено отримання доступних масивів.

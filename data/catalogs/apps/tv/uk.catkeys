@@ -1,27 +1,27 @@
 1	ukrainian	x-vnd.Haiku.TV	1995288111
-Always on top	MainWin		Завжди поверх усіх
+TV	MainWin		ТБ
 Channel	MainWin		Канали
-DVB - Digital Video Broadcasting TV	MainWin		DVB - цифрове ефірне ТБ
-Debug	MainWin		Налагоджуваня
-Error, connecting to interface failed:\n\n	MainWin		Помилка, підключення до інтерфейсу невдалось:\n\n
-Error, interface is busy:\n\n	MainWin		Помилка, інтерфейс занятий:\n\n
-Full screen	MainWin		Повний екран
+Settings…	MainWin		Налаштування…
 Interface	MainWin		Інтерфейс
 Keep aspect ratio	MainWin		Зберегти співвідношення
-Next channel	MainWin		Наступний канал
-No border	MainWin		Без рамки
-No menu	MainWin		Немає меню
-None	MainWin		Нічого
-OK	MainWin		Гаразд
 Previous channel	MainWin		Попередній канал
-Quit	MainWin		Вийти
-Scale to native size	MainWin		Маштабувати до вихідного розміру
 Settings	MainWin		Налаштування
-Settings…	MainWin		Налаштування…
-TV	MainWin		ТБ
 TV	System name		Телебачення
-force 544 x 576, display aspect 4:3	MainWin		Примусово 544 x 576, співвідношення дисплею 4:3
-force 704 x 576, display aspect 4:3	MainWin		примусово 704 x 576, співвідношення дисплею 4:3
-force 720 x 576, display aspect 4:3	MainWin		Примусово 720 x 576, співвідношення дисплею 4:3
-pixel aspect ratio	MainWin		Пропорції пікселя
+No border	MainWin		Без рамки
+Always on top	MainWin		Завжди поверх усіх
+OK	MainWin		Гаразд
+Quit	MainWin		Вийти
+Full screen	MainWin		Повний екран
+Debug	MainWin		Налагоджуваня
+Scale to native size	MainWin		Маштабувати до вихідного розміру
 unknown	MainWin		невідоме
+Next channel	MainWin		Наступний канал
+Error, interface is busy:\n\n	MainWin		Помилка, інтерфейс занятий:\n\n
+None	MainWin		Нічого
+force 704 x 576, display aspect 4:3	MainWin		примусово 704 x 576, співвідношення дисплею 4:3
+DVB - Digital Video Broadcasting TV	MainWin		DVB - цифрове ефірне ТБ
+force 544 x 576, display aspect 4:3	MainWin		Примусово 544 x 576, співвідношення дисплею 4:3
+pixel aspect ratio	MainWin		Пропорції пікселя
+No menu	MainWin		Немає меню
+Error, connecting to interface failed:\n\n	MainWin		Помилка, підключення до інтерфейсу невдалось:\n\n
+force 720 x 576, display aspect 4:3	MainWin		Примусово 720 x 576, співвідношення дисплею 4:3

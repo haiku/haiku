@@ -1,30 +1,30 @@
 1	ukrainian	x-vnd.Haiku-Media	1473363280
-<none>	Media views		<немає>
-Audio input:	Media views		Вхід звуку:
-Audio mixer	Media Window		Аудіо міксер
-Audio output:	Media views		Вивід аудіо:
-Audio settings	Media Window		Настройки звуку
-Channel:	Media views		Канал:
-Cleaning up.	Media Window		Очистити.
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Медіа сервер не запущено\n Зробити це?\n
 Couldn't add volume control in Deskbar: %s\n	Media views		Неможливо додати регулятор гучності в Deskbar: %s\n
-Couldn't remove volume control in Deskbar: %s\n	Media views		Неможливо видалити регулятор гучності з Deskbar: %s\n
-Defaults	Media views		По замовчуванню
-Done shutting down.	Media Window		Відбувається закриття.
-Media	System name		Mедіа
-OK	Media Window		Гаразд
-Quit	Media Window		Вихід
 Ready for use…	Media Window		Готовий для використання…
-Restart media services	Media views		Перезапустити медіа сервіси
-Restarting media services\nShutting down media server\n	Media Window		Перезапуск медіа сервісів\nЗакриття Медіа Сервера\n
-Restarting media services\nStarting media server…\n	Media Window		Перезапустити\nЗапуск Медіа Сервера…\n
-Show volume control on Deskbar	Media views		Показати регулятор гучності в Deskbar
-Start media server	Media Window		Запуск Медіа Сервера
-Starting media server…	Media Window		Запуск Медіа Сервера…
-Stopping media server…	Media Window		Зупинка Медіа Сервера…
-Telling media_addon_server to quit.	Media Window		Сказати медіасервер аддону про вихід.
-This hardware has no controls.	Media Window		Це залізо не регулюється.
 Video input:	Media views		Вхід відео:
-Video output:	Media views		Вивід відео:
-Video settings	Media Window		Налаштування відео
 Waiting for media_server to quit.	Media Window		Зачекайте  на вихід з Медіа Сервера.
+Cleaning up.	Media Window		Очистити.
+Defaults	Media views		По замовчуванню
+Stopping media server…	Media Window		Зупинка Медіа Сервера…
+Quit	Media Window		Вихід
+OK	Media Window		Гаразд
+Starting media server…	Media Window		Запуск Медіа Сервера…
+Done shutting down.	Media Window		Відбувається закриття.
+Video settings	Media Window		Налаштування відео
+Video output:	Media views		Вивід відео:
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Медіа сервер не запущено\n Зробити це?\n
+Restart media services	Media views		Перезапустити медіа сервіси
+Couldn't remove volume control in Deskbar: %s\n	Media views		Неможливо видалити регулятор гучності з Deskbar: %s\n
+Media	System name		Mедіа
+Telling media_addon_server to quit.	Media Window		Сказати медіасервер аддону про вихід.
+Audio mixer	Media Window		Аудіо міксер
+This hardware has no controls.	Media Window		Це залізо не регулюється.
+Audio output:	Media views		Вивід аудіо:
+Restarting media services\nStarting media server…\n	Media Window		Перезапустити\nЗапуск Медіа Сервера…\n
+Audio settings	Media Window		Настройки звуку
+Start media server	Media Window		Запуск Медіа Сервера
+Restarting media services\nShutting down media server\n	Media Window		Перезапуск медіа сервісів\nЗакриття Медіа Сервера\n
+<none>	Media views		<немає>
+Channel:	Media views		Канал:
+Show volume control on Deskbar	Media views		Показати регулятор гучності в Deskbar
+Audio input:	Media views		Вхід звуку:

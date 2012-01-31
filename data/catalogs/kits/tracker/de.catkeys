@@ -204,7 +204,7 @@ Resize to fit	VolumeWindow		Optimale Größe
 Could not find application \"%appname\"	OpenWithWindow		Die Anwendung \"%appname\" wurde nicht gefunden.
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Das ausgewählte Objekt kann nicht in den Papierkorb verschoben werden. Soll es stattdessen gelöscht werden? (Diese Aktion kann nicht rückgängig gemacht werden.)
 Invert	SelectionWindow		Umkehren
-Save Query as template…	FindPanel		Query als Vorlage speichern...
+Save Query as template…	FindPanel		Query als Vorlage speichern…
 rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	umbenannt
 Find	FindPanel		Suchen
 Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Verschieben
@@ -370,14 +370,14 @@ Modified	FindPanel		Geändert
 Error moving \"%name\" to Trash. (%error)	FSUtils		Fehler beim Verschieben von \"%name\" in den Papierkorb. (%error)
 You can't replace a folder with one of its sub-folders.	FSUtils		Ordner können nicht mit einem seiner Unterordner ersetzt werden.
 <No recent items>	FavoritesMenu		<Keine letzten Objekte>
-Preferences…	ContainerWindow		Einstellungen...
+Preferences…	ContainerWindow		Einstellungen…
 Move	PoseView		Verschieben
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Sollen die ausgewählten Objekte wirklich gelöscht werden? Diese Aktion kann nicht rückgängig gemacht werden.
 Add-ons	DeskWindow		Add-ons
 Name	FindPanel		Name
 And	FindPanel		Und
-Select…	DeskWindow		Auswählen...
+Select…	DeskWindow		Auswählen…
 Copy	FilePanelPriv		Kopieren
 Icon view	DeskWindow		Icon-Ansicht
 (Finish: %time - Over %finishtime left)	StatusWindow		(Fertig: %time - Noch über %finishtime)
@@ -391,7 +391,7 @@ Restore	ContainerWindow		Wiederherstellen
 Restoring: 	StatusWindow		Wiederherstellen von:
 system	B_SYSTEM_DIRECTORY		System
 Skip	FSUtils		Überspringen
-Settings…	MountMenu		Einstellungen...
+Settings…	MountMenu		Einstellungen…
 Error emptying Trash!	FSUtils		Fehler beim Leeren des Papierkorbs!
 Recent folders	FavoritesMenu		Letzte Ordner
 Close	ContainerWindow		Schließen
@@ -403,7 +403,7 @@ OK	FSUtils		OK
 Paste layout	ContainerWindow		Anordnung einfügen
 Select	InfoWindow		Auswählen
 Could not update permissions of file \"%name\". %error	FSUtils		Konnte die Berechtigungen der Datei \"%name\" nicht aktualisieren. %error
-Select…	FilePanelPriv		Auswählen...
+Select…	FilePanelPriv		Auswählen…
 Don't move files to Trash	SettingsView		Dateien nicht in den Papierkorb verschieben
 There was an error resolving the link.	Tracker		Fehler beim Auflösen der Verknüpfung.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
@@ -430,7 +430,7 @@ Edit Query template	FindPanel		Query-Vorlage bearbeiten
 Prompt	FSUtils		Nachfragen
 Edit query	ContainerWindow		Query bearbeiten
 If you %ifYouDoAction the config folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"%toConfirmAction\".	FSUtils		Wird der Konfigurations-Ordner %ifYouDoAction, kann %osName vielleicht nicht mehr fehlerfrei arbeiten! Um ihn dennoch %toDoAction, \"%toConfirmAction\" klicken.
-Find…	ContainerWindow		Suchen...
+Find…	ContainerWindow		Suchen…
 Create a Query	FindPanel		Query erstellen
 Move to Trash	FSUtils		In Papierkorb verschieben
 Automatic disk mounting	AutoMounterSettings		Automatisch Einhängen

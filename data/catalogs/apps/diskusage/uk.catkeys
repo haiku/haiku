@@ -1,24 +1,23 @@
-1	ukrainian	x-vnd.Haiku-DiskUsage	2324691237
-%a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
-%d file	Status View		%d файл
-%d files	Status View		%d файлів
-9999.99 GB	Status View		9999.99 
-Created	Info Window		Створено
-DiskUsage	System name		Використання дисків
-Free on %refName%	Scanner		Вільно на %refName%
-Get Info	Pie View		Інформація
+1	ukrainian	x-vnd.Haiku-DiskUsage	3634416251
+Scanning %refName%	Scanner		Сканування %refName%
+Size	Info Window		Розмір
+Rescan	Pie View		Пересканувати
+Rescan	Volume View		Пересканувати
+Outdated view	Pie View		Вікно перегляду
 Kind	Info Window		Тип
+file unavailable	Pie View		файл недоступний
+no supporting apps	Pie View		відсутні підтримувані додатки
+%d file	Status View		%d файл
+Path	Info Window		Шлях
+Scan	Status View		Сканувати
+9999.99 GB	Status View		9999.99 
+file unavailable	Status View		файл недоступний
+Get Info	Pie View		Інформація
+DiskUsage	System name		Використання дисків
+%d files	Status View		%d файлів
+Created	Info Window		Створено
 Modified	Info Window		Змінено
 Open	Pie View		Відкрити
 Open With	Pie View		Відкрити в
-Outdated view	Pie View		Вікно перегляду
-Path	Info Window		Шлях
-Rescan	Pie View		Пересканувати
-Rescan	Volume View		Пересканувати
-Scan	Status View		Сканувати
-Scanning %refName%	Scanner		Сканування %refName%
-Size	Info Window		Розмір
-file unavailable	Pie View		файл недоступний
-file unavailable	Status View		файл недоступний
-in %d files	Info Window		в %d файлах
-no supporting apps	Pie View		відсутні підтримувані додатки
+%a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
+Free on %refName%	Scanner		Вільно на %refName%

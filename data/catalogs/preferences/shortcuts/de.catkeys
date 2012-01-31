@@ -5,10 +5,10 @@ OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Die Tastenbelegung konnte nicht gespeichert werden.
 Cancel	ShortcutsWindow		Abbrechen
 InsertString	ShortcutsSpec		Zeichen einfügen
-Append KeySet…	ShortcutsWindow		Tastenbelegung anfügen...
+Append KeySet…	ShortcutsWindow		Tastenbelegung anfügen…
 Control	ShortcutsSpec	Name for modifier on keyboard	Steuerung
 Key	ShortcutsWindow		Taste
-Open KeySet…	ShortcutsWindow		Tastenbelegung öffnen...
+Open KeySet…	ShortcutsWindow		Tastenbelegung öffnen…
 MouseUp	ShortcutsSpec		Maustaste losgelassen
 Revert to saved	ShortcutsWindow		Gespeicherten Stand herstellen
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
@@ -41,7 +41,7 @@ Application	ShortcutsWindow		Anwendung
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 *Beep	ShortcutsWindow		*Piepton
 *MoveMouseTo 50% 50%	ShortcutsWindow		*Maus zur Bildschirmmitte bewegen
-Save KeySet as…	ShortcutsWindow		Tastenbelegung speichern unter...
+Save KeySet as…	ShortcutsWindow		Tastenbelegung speichern unter…
 Open	ShortcutsWindow		Öffnen
 Really quit without saving your changes?	ShortcutsWindow		Beenden ohne die Änderungen zu speichern?
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht gelesen werden.

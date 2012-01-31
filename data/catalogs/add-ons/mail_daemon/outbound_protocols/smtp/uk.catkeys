@@ -1,16 +1,16 @@
 1	ukrainian	x-vnd.Haiku-SMTP	2740407895
-. The server said:\n	smtp		. Сервер повідомив:\n
-. The server says:\n	smtp		Сервер відповідає:\n
-: Connection refused or host not found.	smtp		: Погане з'єднання або хост не знайдено
-Connecting to server…	smtp		З'єднання з сервером...
-Destination:	ConfigView		Призначення:
-ESMTP	ConfigView		ESMTP
-Error while logging in to %serv	smtp		Помилка з'єднання з %serv
-Error while opening connection to %serv	smtp		Помилка відкриття з'єднання з %serv
-None	ConfigView		Жоден
-POP3 authentication failed. The server said:\n	smtp		Аутентифікація POP3 не вдалась. Сервер повідомив:\n
-POP3 before SMTP	ConfigView		POP3 перед SMTP
 SMTP server:	ConfigView		SMTP-сервер:
-SSL	ConfigView		SSL
 STARTTLS	ConfigView		STARTTLS
+Error while logging in to %serv	smtp		Помилка з'єднання з %serv
 Unencrypted	ConfigView		Нешифроване
+. The server says:\n	smtp		Сервер відповідає:\n
+ESMTP	ConfigView		ESMTP
+Connecting to server…	smtp		З'єднання з сервером...
+Error while opening connection to %serv	smtp		Помилка відкриття з'єднання з %serv
+POP3 authentication failed. The server said:\n	smtp		Аутентифікація POP3 не вдалась. Сервер повідомив:\n
+Destination:	ConfigView		Призначення:
+: Connection refused or host not found.	smtp		: Погане з'єднання або хост не знайдено
+None	ConfigView		Жоден
+POP3 before SMTP	ConfigView		POP3 перед SMTP
+SSL	ConfigView		SSL
+. The server said:\n	smtp		. Сервер повідомив:\n

@@ -1,88 +1,88 @@
 1	ukrainian	x-vnd.Haiku-Bluetooth	3550394259
-#CommandFailed#Not Valid name	RemoteDevice		#Команду призупинено#Не діюче і'мя
-#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Не діюче і'мя
-#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Не діюче і'мя
-#ServerNotReady#Not Valid name	RemoteDevice		#Сервер не готовий#Не діюче і'мя
-(reserved)	DeviceClass		(зарезервовано)
-1-17% utilized	DeviceClass		1–17% використані
-17-33% utilized	DeviceClass		17–33% використано
-33-50% utilized	DeviceClass		33-50% використано
-50-67% utilized	DeviceClass		50–67% використано
-67-83% utilized	DeviceClass		67–83% використано
-83-99% utilized	DeviceClass		83–99% використано
-Audio	DeviceClass		Аудіо
-Audio/Video	DeviceClass		Аудіо/Відео
-Camcorder	DeviceClass		Відеокамера
-Camera	DeviceClass		Камера
-Capturing	DeviceClass		Захоплення
-Car audio	DeviceClass		Автомобільна електроніка
-Card reader	DeviceClass		Кардрідер
-Cellular	DeviceClass		Стільниковий
-Combo keyboard/pointing device	DeviceClass		Комбінована клавіатура/вказівний пристрій
-Common ISDN access	DeviceClass		Загальний доступ ISDN
-Computer	DeviceClass		Комп’ютер
-Controller	DeviceClass		Контролер
-Cordless	DeviceClass		Бездротовий
-Desktop workstation	DeviceClass		Настільна робоча станція
-Device conforms to the headset profile	DeviceClass		Пристрій відповідає профілю гарнітури
-Digitizer tablet	DeviceClass		Кодувальний планшет
 Display	DeviceClass		Дисплей
-Doll/Action figure	DeviceClass		Ляльки/Дійові фігури
-Fully available	DeviceClass		Повністю доступний
+Capturing	DeviceClass		Захоплення
+Printer	DeviceClass		Принтер
+Uncategorized	DeviceClass		Без рубрики
+1-17% utilized	DeviceClass		1–17% використані
+Positioning	DeviceClass		Позиціонування
+Rendering	DeviceClass		Рендерінг
+Phone	DeviceClass		Телефон
+17-33% utilized	DeviceClass		17–33% використано
+#ServerNotReady#Not Valid name	RemoteDevice		#Сервер не готовий#Не діюче і'мя
+Combo keyboard/pointing device	DeviceClass		Комбінована клавіатура/вказівний пристрій
+Controller	DeviceClass		Контролер
+No service available	DeviceClass		Немає доступних сервісів
+Wearable	DeviceClass	A wearable computer	Переносний Примітка: переносний комп'ютер
+Handheld	DeviceClass		Надолонний
+Invalid device class!\n	DeviceClass		Невірний клас приладу!\n
+Sensing device	DeviceClass		Чутливий елемент
+Computer	DeviceClass		Комп’ютер
+Cellular	DeviceClass		Стільниковий
+Microphone	DeviceClass		Мікрофон
+Unknown (reserved) minor device class	DeviceClass		Невідомий (зарезервований) незначний клас пристрою  
+Cordless	DeviceClass		Бездротовий
+Common ISDN access	DeviceClass		Загальний доступ ISDN
+83-99% utilized	DeviceClass		83–99% використано
+Scanner	DeviceClass		Сканер
 Game	DeviceClass		Гра
 Gamepad	DeviceClass		Геймпад
-Gaming/Toy	DeviceClass		Ігрові/іграшки
+(reserved)	DeviceClass		(зарезервовано)
+Desktop workstation	DeviceClass		Настільна робоча станція
+Audio/Video	DeviceClass		Аудіо/Відео
 Glasses	DeviceClass		Окуляри
-Handheld	DeviceClass		Надолонний
-Hands-free	DeviceClass		Вільні руки
-Headphones	DeviceClass		Навушники
-Helmet	DeviceClass		Шолом
-HiFi audio device	DeviceClass		HiFi аудіо-пристрій
-Imaging	DeviceClass		Зображення
-Information	DeviceClass		Інформація
-Invalid device class!\n	DeviceClass		Невірний клас приладу!\n
-Jacket	DeviceClass		Куртка
-Joystick	DeviceClass		Джойстик
 Keyboard	DeviceClass		Клавіатура
-LAN access	DeviceClass		Доступ до ЛВС
-Laptop	DeviceClass		Ноутбук
-Loudspeaker	DeviceClass		Гучномовець
+Camera	DeviceClass		Камера
 Major class: 	DeviceClass		Основний клас: 
-Microphone	DeviceClass		Мікрофон
-Minor class: 	DeviceClass		Малий клас: 
-Miscellaneous	DeviceClass		Різне
-Networking	DeviceClass		Мережа
-No service available	DeviceClass		Немає доступних сервісів
-Not implemented	RemoteDevice		Не реалізовано
-Object transfer	DeviceClass		Об'єкт передачі
-Pager	DeviceClass	A small radio device to receive short text messages	Пейджер Примітка: невеликий радіо-пристрій отримує короткі текстові повідомлення
-Palm	DeviceClass	A palm-held device	Надолонний пристрій
-Peripheral	DeviceClass		Периферійний
-Phone	DeviceClass		Телефон
-Pointing device	DeviceClass		Вказівний пристрій
-Portable audio	DeviceClass		Портативне аудіо
-Positioning	DeviceClass		Позиціонування
-Printer	DeviceClass		Принтер
-Remote control	DeviceClass		Віддалене управління
-Rendering	DeviceClass		Рендерінг
-Robot	DeviceClass		Робот
-SIM card reader	DeviceClass		Читач SIM-карти 
-Scanner	DeviceClass		Сканер
-Sensing device	DeviceClass		Чутливий елемент
-Server	DeviceClass		Сервер
-Service classes: 	DeviceClass		Класи служби: 
+50-67% utilized	DeviceClass		50–67% використано
+Card reader	DeviceClass		Кардрідер
 Set-top box	DeviceClass		Телеприставка
+Helmet	DeviceClass		Шолом
+Laptop	DeviceClass		Ноутбук
+Car audio	DeviceClass		Автомобільна електроніка
+SIM card reader	DeviceClass		Читач SIM-карти 
+Headphones	DeviceClass		Навушники
+Information	DeviceClass		Інформація
+Remote control	DeviceClass		Віддалене управління
+Service classes: 	DeviceClass		Класи служби: 
+Pager	DeviceClass	A small radio device to receive short text messages	Пейджер Примітка: невеликий радіо-пристрій отримує короткі текстові повідомлення
+Object transfer	DeviceClass		Об'єкт передачі
+Gaming/Toy	DeviceClass		Ігрові/іграшки
+Audio	DeviceClass		Аудіо
+Robot	DeviceClass		Робот
+Camcorder	DeviceClass		Відеокамера
+Digitizer tablet	DeviceClass		Кодувальний планшет
+Loudspeaker	DeviceClass		Гучномовець
+Joystick	DeviceClass		Джойстик
+LAN access	DeviceClass		Доступ до ЛВС
+Wrist watch	DeviceClass		Наручний годинник
+Minor class: 	DeviceClass		Малий клас: 
+Networking	DeviceClass		Мережа
+Portable audio	DeviceClass		Портативне аудіо
+Device conforms to the headset profile	DeviceClass		Пристрій відповідає профілю гарнітури
+Hands-free	DeviceClass		Вільні руки
+#CommandFailed#Not Valid name	RemoteDevice		#Команду призупинено#Не діюче і'мя
+Vehicle	DeviceClass		Автомобіль
+Palm	DeviceClass	A palm-held device	Надолонний пристрій
+Video display and loudspeaker	DeviceClass		Відео дисплей і гучномовець
+Peripheral	DeviceClass		Периферійний
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Не діюче і'мя
+Wired modem or voice gateway	DeviceClass		Дротовий модем або голосовий шлюз
+Jacket	DeviceClass		Куртка
+Unspecified	DeviceClass		Невказаний
+Fully available	DeviceClass		Повністю доступний
+67-83% utilized	DeviceClass		67–83% використано
+Not implemented	RemoteDevice		Не реалізовано
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Не діюче і'мя
+Server	DeviceClass		Сервер
+Video conferencing	DeviceClass		Відеоконференцзв’язок
+Video camera	DeviceClass		Відеокамера
+HiFi audio device	DeviceClass		HiFi аудіо-пристрій
 Smart phone	DeviceClass		Смартфон
 Telephony	DeviceClass		Телефонія
-Uncategorized	DeviceClass		Без рубрики
-Unknown (reserved) minor device class	DeviceClass		Невідомий (зарезервований) незначний клас пристрою  
-Unspecified	DeviceClass		Невказаний
+Doll/Action figure	DeviceClass		Ляльки/Дійові фігури
 VCR	DeviceClass		Відеомагнітофон
-Vehicle	DeviceClass		Автомобіль
-Video camera	DeviceClass		Відеокамера
-Video conferencing	DeviceClass		Відеоконференцзв’язок
-Video display and loudspeaker	DeviceClass		Відео дисплей і гучномовець
 Video monitor	DeviceClass		Відеомонітор
-Wearable	DeviceClass	A wearable computer	Переносний Примітка: переносний комп'ютер
-Wired modem or voice gateway	DeviceClass		Дротовий модем або голосовий шлюз
-Wrist watch	DeviceClass		Наручний годинник
+Pointing device	DeviceClass		Вказівний пристрій
+Miscellaneous	DeviceClass		Різне
+33-50% utilized	DeviceClass		33-50% використано
+Imaging	DeviceClass		Зображення

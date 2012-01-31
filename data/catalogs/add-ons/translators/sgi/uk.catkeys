@@ -1,13 +1,13 @@
 1	ukrainian	x-vnd.Haiku-SGITranslator	2222378389
-None	SGIView		Жодного
-RLE	SGIView		RLE
-SGI Settings	SGIMain		Настройки SGI
-SGI image	SGITranslator		Зображення SGI
-SGI image translator	SGITranslator		Перетворювач зображень SGI
-SGI image translator	SGIView		Перетворювач зображень SGI
-SGI images	SGITranslator		Зображення SGI
-SGITranslator Settings	SGITranslator		Настройки Перетворювача SGI
 Use compression:	SGIView		Використовувати зтиск:
 Version %d.%d.%d %s	SGIView		Версія %d.%d.%d %s
+SGITranslator Settings	SGITranslator		Настройки Перетворювача SGI
+None	SGIView		Жодного
+SGI images	SGITranslator		Зображення SGI
+SGI image translator	SGITranslator		Перетворювач зображень SGI
+SGI image	SGITranslator		Зображення SGI
+RLE	SGIView		RLE
+SGI Settings	SGIMain		Настройки SGI
 \n\nbased on GIMP SGI plugin v1.5:\n	SGIView		\n\nНа основі плагіна GIMP SGI v1.5:\n
 written by:\n	SGIView		автор:\n
+SGI image translator	SGIView		Перетворювач зображень SGI

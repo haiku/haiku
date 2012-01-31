@@ -1,29 +1,29 @@
 1	ukrainian	x-vnd.Haiku-ScreenSaver	215605989
-30 seconds	ScreenSaver		30 секунд
-Add…	ScreenSaver		Додати…
-Blackness	ScreenSaver		Чорнота
-Cancel	ScreenSaver		Відмінити
-Confirm password:	ScreenSaver		Підтвердіть пароль:
 Could not load screen saver	ScreenSaver		Не вдалося загрузити зберігач
-Display Power Management Signaling not available	ScreenSaver		Display Power Management Signaling not available
-Don't fade when	ScreenSaver		Не зникати коли
-Done	ScreenSaver		Готово
-Enable screensaver	ScreenSaver		Використати зберігач
-Fade now when	ScreenSaver		Зникнути зараз коли
-General	ScreenSaver		Основний
-No options available	ScreenSaver		Опції недоступні
-OK	ScreenSaver		Гаразд
-Password Window	ScreenSaver		Вікно паролю
-Password lock	ScreenSaver		Використати пароль
-Password:	ScreenSaver		Пароль:
-Passwords don't match. Please try again.	ScreenSaver		Пароль не збігаєтся. Будь ласка, спробуйте ще раз.
-Password…	ScreenSaver		Пароль…
-ScreenSaver	System name		Зберігач екрану
-Screensaver settings	ScreenSaver		Настройки зберігача
-Screensavers	ScreenSaver		Зберігачі екрану
+30 seconds	ScreenSaver		30 секунд
 Start screensaver	ScreenSaver		Запустити зберігач
-Test	ScreenSaver		Тест
-Turn off screen	ScreenSaver		Вимкнути екран
-Use custom password	ScreenSaver		Використовувати пароль користувача
-Use network password	ScreenSaver		Використовувати мережевий пароль
+Password…	ScreenSaver		Пароль…
+Password:	ScreenSaver		Пароль:
+Password lock	ScreenSaver		Використати пароль
+Add…	ScreenSaver		Додати…
+Screensavers	ScreenSaver		Зберігачі екрану
 mouse is here	ScreenSaver		мишка тут
+Display Power Management Signaling not available	ScreenSaver		Display Power Management Signaling not available
+ScreenSaver	System name		Зберігач екрану
+Test	ScreenSaver		Тест
+General	ScreenSaver		Основний
+Enable screensaver	ScreenSaver		Використати зберігач
+Cancel	ScreenSaver		Відмінити
+Turn off screen	ScreenSaver		Вимкнути екран
+No options available	ScreenSaver		Опції недоступні
+Password Window	ScreenSaver		Вікно паролю
+Fade now when	ScreenSaver		Зникнути зараз коли
+Screensaver settings	ScreenSaver		Настройки зберігача
+Passwords don't match. Please try again.	ScreenSaver		Пароль не збігаєтся. Будь ласка, спробуйте ще раз.
+OK	ScreenSaver		Гаразд
+Don't fade when	ScreenSaver		Не зникати коли
+Blackness	ScreenSaver		Чорнота
+Use custom password	ScreenSaver		Використовувати пароль користувача
+Done	ScreenSaver		Готово
+Confirm password:	ScreenSaver		Підтвердіть пароль:
+Use network password	ScreenSaver		Використовувати мережевий пароль

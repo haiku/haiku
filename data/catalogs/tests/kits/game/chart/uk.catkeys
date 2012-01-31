@@ -1,42 +1,40 @@
-1	ukrainian	x-vnd.Be.ChartDemo	819116577
-(high) 100% 	ChartWindow		(високий) 100%
-0.6 f/s  (logarythmic scale)	ChartWindow		0.6 f/s (логарифмічна шкала)
-2 threads	ChartWindow		2 потоки
-5% (low)	ChartWindow		5% (низький)
-600.0 f/s	ChartWindow		600.0 f/s
-Amas	ChartWindow		Amas
-Animation:	ChartWindow		Анімація:
-Auto demo	ChartWindow		Демонстрація
-Battle	ChartWindow		Битва
-Blue	ChartWindow		Блакитний
-CPU load	ChartWindow		Завантажені з процесора
-Chaos	ChartWindow		Хаос
-Chart	System name		Таблиця
-Colors	ChartWindow		Кольори
+1	ukrainian	x-vnd.Be.ChartDemo	557376150
+Slow rotation	ChartWindow		Повільне обертання
+Pink	ChartWindow		Рожевий
 Comet	ChartWindow		Комета
 DirectWindow	ChartWindow		Вікно
-Display:	ChartWindow		Показати:
-DrawBitmap	ChartWindow		Малюнок
-Fast motion	ChartWindow		Швидкий рух
-Frames/s	ChartWindow		Кадрів/с
-Free motion	ChartWindow		Вільний рух
-Full screen	ChartWindow		На весь екран
-Green	ChartWindow		Зелений
-LineArray	ChartWindow		Масив ліній
-None	ChartWindow		Жоден
-Novas	ChartWindow		Нові зорі
-Off	ChartWindow		Вимкнути
 Orange	ChartWindow		Оранжевий
-Pink	ChartWindow		Рожевий
-Red	ChartWindow		Червоний
 Refresh rate	ChartWindow		Оновити результат
-Slow motion	ChartWindow		Повільний рух
-Slow rotation	ChartWindow		Повільне обертання
-Space color	ChartWindow		Колір космосу
-Space:	ChartWindow		Космос:
-Special	ChartWindow		Особливий
-Spiral	ChartWindow		Спіраль
-Star density	ChartWindow		Щільність зірок
-Status	ChartWindow		Стан
-White	ChartWindow		Білий
+Blue	ChartWindow		Блакитний
+Colors	ChartWindow		Кольори
+Novas	ChartWindow		Нові зорі
+LineArray	ChartWindow		Масив ліній
+Free motion	ChartWindow		Вільний рух
+(high) 100% 	ChartWindow		(високий) 100%
+Green	ChartWindow		Зелений
+Amas	ChartWindow		Amas
+2 threads	ChartWindow		2 потоки
 Yellow	ChartWindow		Жовтий
+Off	ChartWindow		Вимкнути
+Chaos	ChartWindow		Хаос
+Full screen	ChartWindow		На весь екран
+Spiral	ChartWindow		Спіраль
+Slow motion	ChartWindow		Повільний рух
+Fast motion	ChartWindow		Швидкий рух
+Special	ChartWindow		Особливий
+Status	ChartWindow		Стан
+Star density	ChartWindow		Щільність зірок
+600.0 f/s	ChartWindow		600.0 f/s
+Display:	ChartWindow		Показати:
+Space color	ChartWindow		Колір космосу
+White	ChartWindow		Білий
+Chart	System name		Таблиця
+Animation:	ChartWindow		Анімація:
+Frames/s	ChartWindow		Кадрів/с
+Auto demo	ChartWindow		Демонстрація
+CPU load	ChartWindow		Завантажені з процесора
+DrawBitmap	ChartWindow		Малюнок
+Red	ChartWindow		Червоний
+None	ChartWindow		Жоден
+Battle	ChartWindow		Битва
+Space:	ChartWindow		Космос:
