@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -45,7 +45,7 @@
 <li><a href="../../en/applications/diskprobe.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="deskcalc.html">DeskCalc</a> 
+ «  <a href="deskcalc.html">電卓</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
 ::  <a href="diskusage.html">DriveUsage</a>  »
 </span></div>
@@ -56,27 +56,27 @@
 
 <h2><img src="../../images/apps-images/diskprobe-icon_64.png" alt="diskprobe-icon_64.png" width="64" height="64" />DiskProbe</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><span class="menu">アプリケーション (Applications)</span></td></tr>
-<tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/DiskProbe</span></td></tr>
-<tr><td>設定ファイル：</td><td></td><td><span class="path">~/config/settings/DiskProbe_data</span></td></tr>
+<tr><td>Deskbar メニュー:</td><td style="width:15px;"></td><td><span class="menu">Applications (アプリケーション)</span></td></tr>
+<tr><td>場所:</td><td></td><td><span class="path">/boot/system/apps/DiskProbe</span></td></tr>
+<tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/DiskProbe_data</span></td></tr>
 </table>
 <p><br /></p>
 <p>DiskProbe はファイル中やデバイスのデータをバイトレベルで観察、変更するための 16 進エディタです。大変低レベルのツールであるため、気を付けないとめちゃめちゃになってしまう可能性があります ！</p>
 <div class="box-warning">常にファイルのバックアップで作業するようにし、特にデバイスを直接操作する時は十分に注意してください。</div>
-<p>DiskProbe を起動すると、最初にファイルかデバイスのどちらで作業するか尋ねられるでしょう。その後、次のようなインターフェースが表示されます。</p>
+<p>DiskProbe を起動すると、最初にファイルかデバイスのどちらで作業するか求められるでしょう。その後、次のようなインターフェースが表示されます。</p>
 <p><img id="diskprobe" src="../images/apps-images/diskprobe.png" alt="diskprobe.png" /></p>
-<p>メインビューは常に一つのブロックのデータを示しています。 <span class="menu">表示 | ブロックサイズ</span> でそのサイズを調整できます。左には、ブロックの始まりからのオフセット、中央には、データの 16 進での表示が、右には ASCII シンボルでの表示があります。<br />
+<p>メインビューは常にひとつのブロックのデータを示しています。<span class="menu">表示 | ブロックサイズ (View | BlockSize)</span> でそのサイズを調整できます。左には、ブロックの始まりからのオフセット、中央には、データの 16 進での表示が、右には ASCII シンボルでの表示があります。<br />
 上にあるスライダーまたは、<span class="key">ALT</span> <span class="key">←</span>、および <span class="key">ALT</span> <span class="key">→</span> を使って、ブロックからブロックへと移動できます。また、<span class="key">TAB</span> を使って 16 進と ASCII コラムを切り換えることができます。</p>
-<p><span class="menu">ブロック | 選択値へ移動</span> は、選択部分を異なるエンディアン (および異なる基数) で表示するだけでなく、ジャンプするブロックへのオフセットとして選択部分を計算されます。位置がファイル/デバイスの外にあると、それは灰色になります。<br />
-ファイルシステムを調べるときがほとんどですが、これは便利な特徴です。なぜならファイルシステムはしばしば他のブロックへのポインタを含むからです。</p>
-<p>調べているファイルが属性を含む場合、<span class="menu">Attributes</span> メニューを使用することで新しい DiskProbe のウインドウで開き、そこですべての属性を開くことができます。以下は、<span class="app">AboutSystem</span> アプリケーションの著作権属性です。</p><p><img id="diskprobe-attribute" src="../images/apps-images/diskprobe-about-attr.png" alt="diskprobe-about-attr.png" /></p>
-<p><i>Raw Editor</i>は常に表示されますが、それに加えて属性の種類に応じて異なるエディタ・タブが表示されます。たとえば、文字列および MIME の種類のためのエディタや、ベクタアイコン属性のためのアイコンビューワなどがあります。</p>
+<p><span class="menu">ブロック | 選択値へ移動 (Block | Selection)</span> は、選択部分を異なるエンディアン (および異なる基数) で表示するだけでなく、ジャンプするブロックへのオフセットとして選択部分を計算されます。位置がファイル/デバイスの外にあると、それは灰色になります。<br />
+ファイルシステムを調べるときがほとんどですが、これは便利な特徴です。なぜならファイルシステムはしばしばほかのブロックへのポインタを含むからです。</p>
+<p>調べているファイルが属性を含む場合、<span class="menu">属性 (Attributes)</span> メニューを使用することで新しい DiskProbe のウィンドウで開き、そこですべての属性を開けます。以下は、<span class="app">AboutSystem</span> アプリケーションの著作権属性です。</p><p><img id="diskprobe-attribute" src="../images/apps-images/diskprobe-about-attr.png" alt="diskprobe-about-attr.png" /></p>
+<p><i>Raw エディター (Raw Editor)</i> は常に表示されますが、それに加えて属性の種類に応じて異なるエディタタブが表示されます。たとえば、文字列および MIME タイプのためのエディタや、ベクタアイコン属性のためのアイコンビューワがあります。</p>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="deskcalc.html">DeskCalc</a> 
+ «  <a href="deskcalc.html">電卓</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
 ::  <a href="diskusage.html">DriveUsage</a>  »
 </span></div>

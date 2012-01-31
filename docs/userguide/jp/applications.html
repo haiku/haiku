@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -45,9 +45,9 @@
 <li><a href="../en/applications.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="workshop-filetypes+attributes.html">ワークショップ</a> 
-::  <a href="contents.html" class="uplink">目次</a> 
-::  <a href="desktop-applets.html">デスクトップアプレット</a>  »
+ «  <a href="workshop-filetypes+attributes.html">Workshop</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="desktop-applets.html">Desktop Applets</a>  »
 </span></div>
 </div>
 
@@ -56,48 +56,48 @@
 
 <h1>アプリケーション</h1>
 
-<p>Haikuに付属しているアプリケーションの海に飛び込む前に、<a href="../../welcome/welcome_jp.html#software">Welcome</a>ページで触れたウェブサイトなどからあなたがダウンロードしたプログラムを、どのようにインストールまたはアンインストールすれば良いのか、もう少し詳しく見て行きましょう。</p>
-<div class="box-info">書庫ファイルの解凍とインストールは、Haikuの上でのみ行ってください。もし、例えばLinuxやWindowsといった他のオペレーティングシステムの上でパッケージを解凍したあと、できたフォルダを単にHaikuにコピーしただけでは、必要なファイル属性が失われてしまいます。というのは、これらのオペレーティングシステムでは、通常メタデータを取り扱うことができないからです。</div>
+<p>Haiku に付属しているアプリケーションの海に飛び込む前に、<a href="../../welcome/welcome_jp.html#software">Welcome</a> ページで触れたウェブサイトなどからダウンロードしたプログラムを、どのようにインストールまたはアンインストールすれば良いのか、もう少し詳しく見て行きましょう。</p>
+<div class="box-info">書庫ファイルの解凍とインストールは、Haiku 上でのみ行ってください。もし、たとえば、Linux やWindows といった他のオペレーティングシステムの上でパッケージを解凍したあと、できたフォルダーを単に Haiku にコピーしただけでは、必要なファイル属性が失われてしまいます。というのは、これらのオペレーティングシステムでは、通常メタデータを取り扱うことができないからです。</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="install" name="install">アプリケーションのインストール</a></h2>
-<p>Haikuのソフトウェアは必ず1つの書庫ファイルの形で提供されます。多くの場合はZIPファイルですが、古いBeOS用のパッケージについては、Software Valetと呼ばれるPKGフォーマットで提供される場合があります。Software Valetはインストール・スクリプトを自動的に実行できるように設計されているため、ファイルをダブルクリックしたあとは、インストール先フォルダを選択するだけで良く、必要な処理が自動的に行われます。<br />
-ソフトウェアがZIP形式の書庫ファイルである場合、そのファイルをダブルクリックすると、<span class="app">Expander</span>が開きますので、そこで解凍先を指定してファイルを解凍することができます。<a href="filesystem-layout.html">ファイルシステム・レイアウト</a>のトピックの中で解説されているように、解凍先は次のどちらかになります:</p>
+<p>Haiku のソフトウェアは必ず 1 つの書庫ファイルの形で提供されます。多くの場合は ZIP ファイルですが、古い BeOS 用のパッケージについては、Software Valet の PKG フォーマットで提供される場合があります。Software Valet はインストールスクリプトを自動的に実行できるように設計されているため、ファイルをダブルクリックしたあとは、インストール先フォルダーを選択するだけで良く、必要な処理が自動的に行われます。<br />
+ソフトウェアが ZIP 形式の書庫ファイルである場合、そのファイルをダブルクリックすると、<span class="app">ファイル解凍</span>が開くので、そこで解凍先を指定してファイルを解凍できます。<a href="filesystem-layout.html">ファイルシステムレイアウト</a>のトピックの中で解説されているように、解凍先は次のどちらかになります:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="path">/boot/common/apps/</span></td><td>   </td><td>すべてのユーザーが使用できるアプリケーション用</td></tr>
 <tr><td><span class="path">/boot/home/apps/</span></td><td>   </td><td>各個人のみが使用できるアプリケーション用</td></tr>
 </table>
-<p>もちろん、Haikuがマルチユーザーをサポートするようになって初めて、この区別が関係してきます。</p>
-<p>書庫ファイルが解凍されたら、新しく作成されたフォルダの中身を覗いてみましょう。多くの場合、ReadMeファイルや興味深いドキュメントが見つかります。</p>
-<p>さらに設定が必要になるプログラムもあります。例えば<a href="tracker-add-ons.html">Trackerアドオン</a>や<a href="preferences/datatranslations.html">Translators</a>、あるいはシステムを拡張する他のコンポーネントは、所定のフォルダに置く必要があります。あるいは、<span class="cli">install</span>といった小さなスクリプトファイル（多くの場合名前が<span class="cli">.sh</span>で終わります）が見つかるかもしれません。このファイルをダブルクリックするだけで、すべてが自動的に処理されます。<br />
-"<span class="cli">drag [filename] here...</span>"という名前の、正しいインストール先にリンクされたフォルダが見つかるかもしれません。その場合はその指示に従うだけで、インストールが完了します。</p>
-<p>しかしほとんどのケースでは上述のような作業は必要なく、ファイルを解凍するだけでインストールは完了します。<a href="deskbar.html">Deskbar</a>や<a href="desktop-applets/launchbox.html">LaunchBox</a>のトピックの中で、新しくインストールしたアプリケーションへのショートカットを追加する方法が解説されています。</p>
+<p>もちろん、Haiku がマルチユーザーをサポートするようになって初めて、この区別が関係してきます。</p>
+<p>書庫ファイルが解凍されたら、新しく作成されたフォルダーの中身を覗いてみましょう。多くの場合、ReadMe ファイルや興味深いドキュメントが見つかります。</p>
+<p>さらに設定が必要になるプログラムもあります。たとえば、<a href="tracker-add-ons.html">Tracker アドオン</a>、<a href="preferences/datatranslations.html">トランスレーター</a>、あるいはシステムを拡張する他のコンポーネントは、所定のフォルダーに置く必要があります。あるいは、<span class="cli">install</span> といった小さなスクリプトファイル (多くの場合名前は <span class="cli">.sh</span> で終わります) が見つかるかもしれません。このファイルをダブルクリックするだけで、すべてが自動的に処理されます。<br />
+"<span class="cli">drag [filename] here...</span>"　という名前の、正しいインストール先にリンクされたフォルダーが見つかるかもしれません。その場合はその指示に従うだけで、インストールが完了します。</p>
+<p>しかしほとんどのケースでは上述のような作業は必要なく、ファイルを解凍するだけでインストールは完了します。<a href="deskbar.html">Deskbar</a> や<a href="desktop-applets/launchbox.html">ランチャー</a>のトピックの中で、新しくインストールしたアプリケーションへのショートカットを追加する方法が解説されています。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="uninstall" name="uninstall">アプリケーションのアンインストール</a></h2>
-<p>もしインストール作業をインストール・スクリプトで行ったのであれば、おそらくアンインストール・スクリプトが用意されているでしょう。アンインストール・スクリプトが用意されている場合は、それをダブルクリックすれば作業は完了します。<br />
-アンインストール・スクリプトが用意されていない場合は、そのアプリケーションのフォルダを削除するだけで、アンインストール作業は完了します。</p>
-<p>もちろんこの方法では、設定が復元できるよう、あなたの<span class="path">~/config/settings</span>フォルダの中に設定ファイルが残されます。将来もう一度同じプログラムをインストールするときに備えて、あなたが現在の設定を保持しておきたいと思う場合には、この仕様は大変有効なものであるかもしれません。また、"<span class="cli">drag [filename] here...</span>"フォルダ方式でインストールを行った場合にも、設定ファイルが残ります。</p>
-<p>あるアプリケーションに関係するすべてのファイルをすばやく見つける方法の1つに、アプリケーション名の特徴的な部分に対して簡易検索を行う、というものがあります。これにより、そのアプリケーションのバイナリやインストールフォルダ、設定ファイル、Deskbar中の考えられるリンクなどが明らかになります。そのアプリケーションに関係するすべてのファイルを選択して削除するだけで、アンインストール作業は完了します。</p>
+<p>もしインストール作業をインストールスクリプトで行ったのであれば、同様にアンインストールスクリプトが用意されているでしょう。アンインストールスクリプトが用意されている場合は、それをダブルクリックすれば作業は完了します。<br />
+アンインストールスクリプトが用意されていない場合は、そのアプリケーションのフォルダーを削除するだけで、アンインストール作業は完了します。</p>
+<p>もちろんこの方法では、設定が復元できるよう、読者の <span class="path">~/config/settings</span> フォルダーの中に設定ファイルが残されます。将来もう一度同じプログラムをインストールするときに備えて、あなたが現在の設定を保持しておきたいと思う場合には、この仕様は大変有効なものであるかもしれません。また、"<span class="cli">drag [filename] here...</span>" フォルダー方式でインストールを行った場合にも、設定ファイルが残ります。</p>
+<p>あるアプリケーションに関係するすべてのファイルをすばやく見つける方法の 1 つに、アプリケーション名の特徴的な部分に対して簡易検索を行う、というものがあります。これにより、そのアプリケーションのバイナリやインストールフォルダー、設定ファイル、Deskbar 中の考えられるリンクなどが明らかになります。そのアプリケーションに関係するすべてのファイルを選択して削除するだけで、アンインストール作業は完了します。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="list-of-apps" name="list-of-apps">Haikuに付属するアプリケーション</a></h2>
-<p>Haikuには必要不可欠な様々なアプリケーションが付属しています。そのほとんどは小さなプログラムです。これらすべてのアプリケーションは、<span class="path">/boot/system/apps/</span>または<span class="path">/boot/common/apps/</span>にあります。多くのアプリケーションは、データファイルをダブルクリックすることで起動しますが（例えば、イメージファイルをダブルクリックするとShowImageが起動します）、そうでないアプリケーションについてはDeskbarの<span class="menu">Applications</span>メニューの中にあります。</p>
+<a id="list-of-apps" name="list-of-apps">Haiku に付属するアプリケーション</a></h2>
+<p>Haiku には必要不可欠なさまざまなアプリケーションが付属しています。そのほとんどは小さなプログラムです。これらすべてのアプリケーションは、<span class="path">/boot/system/apps/</span>、または <span class="path">/boot/common/apps/</span> にあります。多くのアプリケーションは、データファイルをダブルクリックすることで起動しますが (たとえば、イメージファイルをダブルクリックすると、ShowImage が起動します) 、そうでないアプリケーションについては Deskbar の <span class="menu">Applications</span> メニューの中にあります。</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td style="width:24px;"><img src="../images/apps-images/activitymonitor-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/activitymonitor.html">ActivityMonitor</a></td><td style="width:10px;"> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/activitymonitor-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/activitymonitor.html">利用状況モニター</a></td><td style="width:10px;"> </td>
 		<td valign="top">CPU やメモリの使用量といったシステムリソースを追跡するツールです。</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/bootmanager-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bootmanager.html">BootManager</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/bootmanager-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bootmanager.html">ブートマネージャー</a></td><td> </td>
 		<td valign="top">ドライブのマスターブートレコード (MBR) にブートメニューをインストールするためのツールです。</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/cdplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/cdplayer.html">CDPlayer</a></td><td> </td>
-		<td valign="top">音楽 CD のプレーヤーです。</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/charactermap-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/charactermap.html">CharacterMap</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/cdplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/cdplayer.html">CD プレーヤー</a></td><td> </td>
+		<td valign="top">音楽 CD プレーヤーです。</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/charactermap-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/charactermap.html">文字表</a></td><td> </td>
 		<td valign="top">Unicode の文字コードマップを表示するアプリケーションです。</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/codycam-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/codycam.html">CodyCam</a></td><td> </td>
 		<td valign="top">ウェブカメラで取得したイメージを定期的にサーバへアップロードするツールです。</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/deskcalc-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/deskcalc.html">DeskCalc</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/deskcalc-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/deskcalc.html">電卓</a></td><td> </td>
 		<td valign="top">電卓です。</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/diskprobe-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/diskprobe.html">DiskProbe</a></td><td> </td>
 		<td valign="top">ファイルやデバイスのための 16 進エディタです。</td></tr>
@@ -105,36 +105,36 @@
 		<td valign="top">ディスクの使用量を可視化するツールです。</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/drivesetup-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/drivesetup.html">DriveSetup</a></td><td> </td>
 		<td valign="top">ハードディスクのパーティションを編集するツールです。</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/expander-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/expander.html">Expander</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/expander-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/expander.html">ファイル解凍</a></td><td> </td>
 		<td valign="top">一般的な書庫ファイルを解凍するツールです。</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/icon-o-matic-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/icon-o-matic.html">Icon-O-Matic</a></td><td> </td>
 		<td valign="top">Haiku 用のベクターアイコンを作成するアプリです。</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/installer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/installer.html">Installer</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/installer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/installer.html">インストーラー</a></td><td> </td>
 		<td valign="top">Haiku をパーティションにインストールするためのツールです。</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/magnify-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/magnify.html">Magnify</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/magnify-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/magnify.html">拡大鏡</a></td><td> </td>
 		<td valign="top">マウスポインタ付近を拡大表示します。</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/mail-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mail.html">Mail</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/mail-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mail.html">メール</a></td><td> </td>
 		<td valign="top">電子メールクライアントです。</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/mediaplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mediaplayer.html">MediaPlayer</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/mediaplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mediaplayer.html">メディアプレーヤー</a></td><td> </td>
 		<td valign="top">サポートしている音声や動画ファイルを再生します。</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/midiplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/midiplayer.html">MidiPlayer</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/midiplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/midiplayer.html">MIDI プレーヤー</a></td><td> </td>
 		<td valign="top">MIDI ファイルを再生します。</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/packageinstaller-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/packageinstaller.html">PackageInstaller</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/packageinstaller-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/packageinstaller.html">パッケージインストーラー</a></td><td> </td>
 		<td valign="top">PKG 形式の BeOS パッケージ用のインストーラーです。</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/people-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/people.html">People</a></td><td> </td>
 		<td valign="top">連絡先マネージャーです。</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/poorman-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/poorman.html">PoorMan</a></td><td> </td>
-		<td valign="top">シンプルなウェブブラウザです。</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/screenshot-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/screenshot.html">Screenshot</a></td><td> </td>
+		<td valign="top">シンプルなウェブサーバーです。</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/screenshot-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/screenshot.html">スクリーンショット</a></td><td> </td>
 		<td valign="top">スクリーンショットを取得するためのツールです。</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/showimage-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/showimage.html">ShowImage</a></td><td> </td>
 		<td valign="top">シンプルな画像ビューアです。</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/soundrecorder-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/soundrecorder.html">SoundRecorder</a></td><td> </td>
+	<tr><td style="width:24px;"><img src="../images/apps-images/soundrecorder-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/soundrecorder.html">サウンドレコーダー</a></td><td> </td>
 		<td valign="top"><span style="color:silver">ライン入力やマイクから音声を録音するためのツールです。[<i>まだ用意されていません。</i>]</span></td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/stylededit-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/stylededit.html">StyledEdit</a></td><td> </td>
 		<td valign="top">シンプルなテキストエディタです。</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/terminal-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/terminal.html">Terminal</a></td><td> </td>
-		<td valign="top">bashへアクセスします。</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/terminal-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/terminal.html">ターミナル</a></td><td> </td>
+		<td valign="top">bash へアクセスします。</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/textsearch-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/textsearch.html">TextSearch</a></td><td> </td>
 		<td valign="top">テキストファイルの検索ツールです。</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/tv-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/tv.html">TV</a></td><td> </td>
@@ -145,8 +145,8 @@
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-apps" name="cli-apps">Haikuに付属するコマンドライン・アプリケーション</a></h2>
-<p>Bashシェルに付属するコマンドライン・ツールおよびPOSIX準拠のために必要な標準的なコマンドライン・ツールに加えて、特筆すべきHaiku固有のコマンドライン・ツールが存在します。これらコマンドは多くの場合、スクリプト化を行う上で役立ちます。<a href="bash-scripting.html">Bashとスクリプト処理</a>のトピックもご覧ください。</p>
+<a id="cli-apps" name="cli-apps">Haiku に付属するコマンドラインアプリケーション</a></h2>
+<p>Bash シェルに付属するコマンドラインツールおよび POSIX 準拠のために必要な標準的なコマンドラインツールに加えて、特筆すべき Haiku 固有のコマンドラインツールが存在します。これらコマンドは多くの場合、スクリプト化を行う上で役立ちます。<a href="bash-scripting.html">Bash とスクリプト処理</a>のトピックもご覧ください。</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 		<tr><td style="width:24px;"><img src="../images/apps-images/cli-app-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/list-cli-apps.html">すべてのコマンドラインアプリケーション</a></td><td> </td></tr>
 		<tr><td style="width:24px;"><img src="../images/apps-images/cli-app-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/cli-apps.html">Haiku 特有のコマンドラインアプリケーション</a></td><td> </td></tr>
@@ -155,20 +155,20 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="list-of-bundled-apps" name="list-of-bundled-apps">同梱されているアプリケーション</a></h2>
-<p>上に列挙されたプログラムはすべて、Haikuプロジェクトによってメンテナンスされます。これらプログラムに加えて、標準的なHaikuシステムにはいくつかの必要不可欠なアプリケーションが同梱されています。これらアプリケーションに対するバグ報告や機能のリクエストは、個々のアプリケーションのメンテナに報告してください。</p>
+<p>上に列挙されたプログラムはすべて、Haiku プロジェクトによってメンテナンスされます。これらプログラムに加えて、標準的な Haiku システムにはいくつかの必要不可欠なアプリケーションが同梱されています。これらアプリケーションに対するバグ報告や機能のリクエストは、個々のアプリケーションのメンテナに報告してください。</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 		<tr><td style="width:24px;"><img src="../images/apps-images/bepdf-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bepdf.html">BePDF</a></td><td style="width:10px;"> </td>
-		<td valign="top"><acronym title="Portable Document Format">PDF</acronym>ビューアです。</td></tr>
+		<td valign="top"><acronym title="Portable Document Format">PDF</acronym> ビューアです。</td></tr>
 <!--	<tr><td style="width:24px;"><img src="../images/apps-images/bezillabrowser-icon_16.png" alt="icon" width="16" height="16" /></td><td _translation_id="270"><a href="applications/bezillabrowser.html">BeZillaBrowser</a></td><td> </td>
 		<td valign="top" _translation_id="271">A web browser based on Mozilla's source code.</td></tr> -->
 	<tr><td style="width:24px;"><img src="../images/apps-images/pe-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/pe.html">Pe</a></td><td> </td>
 		<td valign="top">シンタックスハイライト等の機能を備えた高機能テキストエディタです。</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/vision-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/vision.html">Vision</a></td><td> </td>
-		<td valign="top"><acronym title="Internet Relay Chat">IRC</acronym>クライアントです。</td></tr>
+		<td valign="top"><acronym title="Internet Relay Chat">IRC</acronym> クライアントです。</td></tr>
 <!--	<tr><td style="width:24px;"><img src="../images/apps-images/vlc-icon_16.png" alt="icon" width="16" height="16" /></td><td _translation_id="276"><a href="applications/vlc.html">VLC media player</a></td><td> </td>
 		<td valign="top" _translation_id="277">VideoLAN's media player.</td></tr> -->
 	<tr><td style="width:24px;"><img src="../images/apps-images/wonderbrush-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/wonderbrush.html">WonderBrush</a></td><td> </td>
-		<td valign="top">YellowBiteのグラフィックプログラムです。</td></tr>
+		<td valign="top">YellowBite のグラフィックプログラムです。</td></tr>
 </table>
 
 </div>
@@ -176,9 +176,9 @@
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="workshop-filetypes+attributes.html">ワークショップ</a> 
-::  <a href="contents.html" class="uplink">目次</a> 
-::  <a href="desktop-applets.html">デスクトップアプレット</a>  »
+ «  <a href="workshop-filetypes+attributes.html">Workshop</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="desktop-applets.html">Desktop Applets</a>  »
 </span></div>
 </div>
 

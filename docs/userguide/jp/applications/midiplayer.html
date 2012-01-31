@@ -12,18 +12,19 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		thebowseat
+ *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>MIDIプレーヤー</title>
+	<title>MIDI プレーヤー</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -46,32 +47,30 @@
 <span>
  «  <a href="mediaplayer.html">メディアプレーヤー</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
-::  <a href="packageinstaller.html">PackageInstaller</a>  »
+::  <a href="packageinstaller.html">パッケージインストーラー</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
 
-<h2><img src="../../images/apps-images/midiplayer-icon_64.png" alt="midiplayer-icon_64.png" width="64" height="64" />MIDIプレーヤー</h2>
+<h2><img src="../../images/apps-images/midiplayer-icon_64.png" alt="midiplayer-icon_64.png" width="64" height="64" />MIDI プレーヤー (MidiPlayer)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><span class="menu">アプリケーション (Applications)</span></td></tr>
-<tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/MIDIプレーヤー</span></td></tr>
-<tr><td>設定ファイル：</td><td></td><td><span class="path">~/config/settings/MidiPlayerSettings</span></td></tr>
+<tr><td>Deskbar メニュー:</td><td style="width:15px;"></td><td><span class="menu">Applications (アプリケーション)</span></td></tr>
+<tr><td>場所:</td><td></td><td><span class="path">/boot/system/apps/MidiPlayer</span></td></tr>
+<tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/MidiPlayerSettings</span></td></tr>
 </table>
 <p><br /></p>
-<p>名前の通り、MIDIプレーヤーはMIDI音楽ファイルを再生するときに使われます。MIDIファイルは特別で、エンコードされたデジタル音楽は記録せず、音楽の説明を記録します (つまり、この音符をどのボリュームでどれだけ長く、楽器Xを使うなど)<br />
+<p>名前の通り、MIDI プレーヤーは、MIDI 音楽ファイルを再生するときに使われます。MIDI ファイルは特別で、エンコードされたデジタル音楽は記録せず、音楽の説明を記録します (つまり、この音符をどのボリュームでどれだけ長く、楽器 X を使うなど)<br />
 
-これはファイルサイズを少なくしますが、楽器ライブラリ (SoundFont) によって結果が大きく違います。さらに、 SoundFont は楽器のサンプル数と音質によってサイズが大きくなります。</p>
-<div class="box-info"><p>SoundFont のサイズはとても大きく、一部のユーザーしか必要ないので、 Haiku は SoundFont をインストールしません。必要な人のほとんどは高音質またはカスタム SoundFont をすでに持っています。<i>何か</i>が聞けるようになるためには、任意パッケージから無料でインストールできます。
-ターミナルで <tt>installoptionalpackage TimGMSoundFont</tt> と入力します。</p>
+これはファイルサイズを少なくしますが、楽器ライブラリ (SoundFont) によって結果が大きく違います。さらに、SoundFont は楽器のサンプル数と音質によってサイズが大きくなります。</p>
+<div class="box-info"><p>SoundFont のサイズはとても大きく、一部のユーザーしか必要としないので、Haiku は SoundFont をインストールしません。必要な人のほとんどは高音質またはカスタム SoundFont をすでに持っています。<i>何か</i>が聞けるようになるためには、オプショナルパッケージから無料でインストールできます。ターミナルで、<tt>installoptionalpackage TimGMSoundFont</tt> と入力します。</p>
 <p>
-他の SoundFont を再生するには <tt>/boot/system/data/synth</tt> にリンクを作成し、 big_synth.sy と名前をつけてください。
+ほかの SoundFont を再生するには、<tt>/boot/system/data/synth</tt> にリンクを作成し、big_synth.sy と名前を付けてください。
 </p></div>
 <img src="../images/apps-images/midiplayer.png" alt="midiplayer.png" />
-<p>MIDI プレーヤーのインターフェースはシンプルです。 
-MIDI ファイルをダブルクリックまたはドラッグ &amp; ドロップすると再生を開始します。スライダーで音量を調節し、 <span class="menu">リバーブ</span> ポップアップメニューでリバーブを追加します。
-スコープをオンにすると、オシロスコープの形のビジュアライザが上に表示されます。</p>
+<p>MIDI プレーヤーのインターフェースはシンプルです。
+MIDI ファイルをダブルクリックまたはドラッグ＆ドロップすると再生を開始します。スライダーで音量を調節し、<span class="menu">リバーブ (Reverb)</span> ポップアップメニューでリバーブを追加します。スコープをオンにすると、オシロスコープの形のビジュアライザが上に表示されます。</p>
 
 </div>
 </div>
@@ -80,7 +79,7 @@ MIDI ファイルをダブルクリックまたはドラッグ &amp; ドロッ�
 <div class="inner"><span>
  «  <a href="mediaplayer.html">メディアプレーヤー</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
-::  <a href="packageinstaller.html">PackageInstaller</a>  »
+::  <a href="packageinstaller.html">パッケージインストーラー</a>  »
 </span></div>
 </div>
 -->

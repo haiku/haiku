@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		helix84
+ *		Marek
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -22,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Používateľská príručka</span></div>
 </div>
 
 <div class="nav">
@@ -51,7 +52,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/stylededit-icon_64.png" alt="stylededit-icon_64.png" width="64" height="64" />StyledEdit</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -60,9 +60,9 @@
 <tr><td>Nastavenia:</td><td></td><td><i>žiadne</i></td></tr>
 </table>
 <p><br /></p>
-<p>StyledEdit is Haiku's simple text editor. Although it saves files in plain text format, additional attributes are written in order to have limited formatting capabilities when viewed with StyledEdit.</p>
+<p>StyleEdit je jednoduchý textový editor Haiku. Hoci ukladá súbory ako obyčajný text, zapisuje aj ďalšie atribúty tak, aby umožnil isté obmedzené možnosti formátovania pri prehliadaní v StyledEdit.</p>
 <img src="../images/apps-images/stylededit.png" alt="stylededit.png" />
-<p>If you're interested, this is what those additional attributes look like when examined in Terminal with <span class="cli">listattr</span>:</p>
+<p>Ak vás to zaujíma, takto vyzerajú ďalšie atribúty, keď si ich pozriete v Termináli príkazom <span class="cli">listattr</span>:</p>
 <pre class="terminal">~&gt; listattr /boot/home/Desktop/test.txt
 File: /boot/home/Desktop/test.txt
   Type         Size                 Name
@@ -74,10 +74,11 @@ MIME String         11  "BEOS:TYPE"
    Raw Data       1048  "styles"
 
 1071 bytes total in attributes.</pre>
-<p>As you can see, all the formatting options from StyledEdit's menu are present: line wrapping (on/off) and alignment (left/center/right), each in one attribute. Styles (font, size, color) of each letter mangled into another.</p>
-<div class="box-info">Because these attributes are a file system feature of BFS, this means that not only other platforms just see a plain text file, it also follows, that the formatting will be lost when a file is stored on a non-BFS partition. The above attributes are simply stripped and what's left is the ordinary, plain text file.</div>
-<p>In any case, it's a nice idea having the possibility of colored text in different fonts and sizes while still being a normal text file. A <span class="cli">ReadMe.txt</span>, for example, is therefore readable in a shell on any platform and still has a bit of style when viewed via double-click from Haiku.</p>
-<p>Actually using StyledEdit is so simple, we'll skip explaining every mundane menu item. Just write down your text then select the words you'd like to format and apply font, size and color from the <span class="menu">Font</span> menu. Line wrapping and alignment from the <span class="menu">Document</span> menu only work on the whole file.</p>
+<p>Ako môžte vidieť, sú tu prítomné všetky možnosti formátovania menu StyleEdit: zalamovanie riadkov (zapnuté/vypnuté) a zarovnanie (vľavo/v strede/vpravo), každé ako jeden atribút. Štýly (písmo, veľkosť, farba)  každého písmena natlačené v inom.</p>
+<div class="box-info">Pretože tieto atribúty sú výhodami súborového systému BFS, to znamená nielen, že iné platformy vidia iba obyčajný text, ale tiež z toho vyplýva, že formátovanie sa stratí, keď súbor uložíte na inom súborovom systéme ako BFS. Vyššie uvedené atribúty sa jednoducho odstránia, a to, čo zostalo, je len obyčajný, čistý textový súbor.</div>
+<p>V každom prípade, je obrý nápad mať možnosť farebného textu v rôznych písmach a veľkostiach, a pritom je to stále textový súbor.  <span class="cli">ReadMe.txt</span>, napríklad, je čitateľný v prostredí každej platformy a stále to má nejaký štýl, keď je zobrazený dvojitým kliknutím v Haiku.</p>
+<p>V skutočnosti používanie StyleEditu je jednoduché, preskočíme vysvetľovanie každej banálnej položky menu. Iba napíšte svoj text a potom vyberte slová, ktoré chcete upraviť a aplikujte písmo, veľkosť a farbu z ponuky  <span class="menu">Písmo</span>.
+Zalamovanie riadkov a zarovnanie z ponuky <span class="menu">Dokument</span> funguje iba na celý súbor.</p>
 
 </div>
 </div>

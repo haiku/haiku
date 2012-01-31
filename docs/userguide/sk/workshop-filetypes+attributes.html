@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		helix84
+ *		Marek
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -22,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Používateľská príručka</span></div>
 </div>
 
 <div class="nav">
@@ -44,175 +45,180 @@
 </ul>
 <span>
  «  <a href="queries.html">Požiadavky</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Obsah</a> 
 ::  <a href="applications.html">Aplikácie</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Index</td></tr>
 <tr class="index"><td>
-	<a href="#preparations">Preparations</a><br />
-	<a href="#custom-filetype">Creating a custom filetype</a><br />
-	<a href="#icon">Icon</a><br />
-        <a href="#file-recognition">File recognition</a><br />
-	<a href="#description">Description</a><br />
-	<a href="#pref_app">Preferred Application</a><br />
-	<a href="#extra_attribute">Extra Attributes</a><br />
-	<a href="#indexing">Indexing</a><br />
-	<a href="#filling-data">Filling in the data</a><br />
-	<a href="#query-db">Querying the database</a>
+	<a href="#preparations">Prípravy</a><br />
+	<a href="#custom-filetype">Vytváranie vlastného typu súboru</a><br />
+	<a href="#icon">Ikona</a><br />
+        <a href="#file-recognition">Rozpoznávanie súborov</a><br />
+	<a href="#description">Popis</a><br />
+	<a href="#pref_app">Preferované aplikácie</a><br />
+	<a href="#extra_attribute">Ďalšie atribúty</a><br />
+	<a href="#indexing">Indexovanie</a><br />
+	<a href="#filling-data">Vypĺňanie údajov</a><br />
+	<a href="#query-db">Prehľadávanie databázi</a>
 </td></tr>
 </table>
 
 <h1>Workshop: Typy súborov, atribúty, index a požiadavky</h1>
 
-<p>This is a workshop to show the use of <a href="attributes.html">Attributes</a>, <a href="queries.html">Queries</a>, the <a href="index.html">Index</a> and custom <a href="filetypes.html">Filetypes</a>. As an example, we build a database to keep track of our DVD library.</p>
+<p>Toto je workshop na ukázanie využitia <a href="attributes.html">Atribútov</a>, <a href="queries.html">Požiadaviek</a>, <a href="index.html">Indexu</a> a vlastných <a href="filetypes.html">Typov súborov</a>. Ako príklad si vytvoríme databázu na udržanie prehľadu vo vaších DVD.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="preparations" name="preparations">Preparations</a></h2>
-<p>Let's first decide what filetype and attributes would serve our needs. Originally, I wanted to use a Bookmark file with a link to the movie's IMdB page, but Haiku doesn't have a "bookmarkable" browser like BeOS' <span class="app">NetPositive</span> at the moment, so I came up with this: The file itself will be a JPEG image for the movie cover.<br />
-To that we add a couple of attributes. Here we have to decide if we want to query it later (then we have to add it to the index) and if so, what type of attribute it should be. Numbers (int, float) can be evaluated differently than text (&lt;/=/&gt; vs. is/contains/starts with).</p>
-<p>Here are the attributes I'd like to see for my DVDs:</p>
+<a id="preparations" name="preparations">Prípravy</a></h2>
+<p>Najprv sa rozhodnime aký typ súboru a aké atribúty poslúžia našim potrebám. Pôvodne som chcel použiť Záložkový súbor s odkazom na stránku IMdB, ale Haiku nemá momentálne prehliadač so „záložkami“ ako <span class="app">NetPositive</span> v BeOS, tak som vymyslel toto: Samotný súbor bude obrázok JPEG na obal DVD.<br />
+K tomu pridáme niekoľko atribútov. Tu sa musíme rozhodnúť, či budeme neskôr vyhľadávať súbory požiadavkami (potom musíme pridať index) a ak, tak aký typ atribútu by to mal byť. Čísla (int, float) možno vyhodnocovať inak ako text (&lt;/=/&gt; vs. je/obsahuje/začína).</p>
+<p>Tu sú atribúty, ktoré by som chcel vidieť pri mojich DVD:
+</p>
 <ul>
-<li>Movie title</li>
-<li>Genre</li>
-<li>URL to e.g. IMdB</li>
-<li>Director/Cast</li>
-<li>Plot</li>
-<li>My rating from 1 to 10</li>
-<li>Coordinates in my shelf, e.g. A2, B3, so I find the DVD also in Real Life :)</li>
-<li>If so, who's borrowed the disk...</li>
+<li>Názov filmu</li>
+<li>Žáner</li>
+<li>URL napr. na IMdB</li>
+<li>Režisér/obsadenie</li>
+<li>Zápletka</li>
+<li>Moje hodnotenie od 1 do 10</li>
+<li>Súradnice na mojej poličke napr. A2, B3, takže nájdem DVD aj v skutočnosti :)</li>
+<li>Ak si disk niekto požičal, tak kto...</li>
 </ul>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="custom-filetype" name="custom-filetype">Creating a custom filetype</a></h2>
-<p>Start the <span class="app">Filetypes</span> preferences, and click on the <span class="button">Add...</span> button below the hierarchical list on the left. A small dialog opens and you specify in which MIME Group your new filetype will reside. You can also create a completely new group. Let's put it into "<i>applications</i>" and set the "Internal Name" to <i>DVDdb</i>.</p>
+<a id="custom-filetype" name="custom-filetype">Vytváranie vlastného typu súboru</a></h2>
+<p>Zapnite nastavenia <span class="app">Typov súborov</span>, a kliknite na tlačidlo <span class="button">Pridať...</span> pod hierarchickým zoznamom naľavo. Otvorí sa malé okno a vyberiete si v akej skupine MIME bude váš nový typ súboru. Taktiež môžte vytvoriť úplne novú skupinu. Dajme ho do „<i>application</i>“ a nastavme "Interný názov" na <i>DVDdb</i>.</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-new-file-type.png" alt="filetypes-new-file-type.png" />
-<p>Now, a panel for your new DVDdb filetype opens:</p>
+<p>Teraz sa otvorí panel pre nový typ súboru DVDdb:</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-dvddb.png" alt="filetypes-dvddb.png" />
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="icon" name="icon">Icon</a></h3>
-<p>Double-click the icon well to open  <a href="applications/icon-o-matic.html">Icon-O-Matic</a> to design an icon for your filetype. You can also drag&amp;drop an icon from the icon well of another type, maybe as starting point for a modified version.</p>
+<a id="icon" name="icon">Ikona</a></h3>
+<p>Dvojitým kliknutím na ikonu otvoríte <a href="applications/icon-o-matic.html">Icon-O-Matic</a> na navrhnutie ikony pre váš typ súboru. Taktiež môžte pretiahnuť ikonu z iného typu, môžno ako začiatok pre upravenú verziu.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="file-recognition" name="file-recognition">File Recognition</a></h3>
-<p>You can add suffixes like .txt, .jpg, .mp3 to recognize files by their extention. Useful when working with files from systems without MIME typing. We don't need that for our example.</p>
+<a id="file-recognition" name="file-recognition">Rozpoznávanie súborov</a></h3>
+<p>Môžte pridať prípony ako .txt .jpg .mp3 na rozpoznanie súborov podľa ich prípony. Je to užitočné, keď pracujete so súbormi zo systému, ktorý nepoužíva typy MIME. To pre náš príklad nepotrebujeme.
+</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="description" name="description">Description</a></h3>
+<a id="description" name="description">Popis</a></h3>
 <ul>
-<li><i>Type name</i> - Appears e.g. in the Attribute menu of Tracker windows and the "Kind" attribute of a file.</li>
-<li><i>Description</i> - A bit more detailed description.</li>
+<li><i>Názov typu</i> - Zobrazuje sa napr. v okne Trackera v menu Atribúty a „Druh“ atribút súboru.</li>
+<li><i>Popis</i> - Trochu podrobnejší popis.</li>
 </ul>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="pref_app" name="pref_app">Preferred Application</a></h3>
-<p>This pop-up menu shows a list of all applications that can handle this particular filetype. From here you can choose which program should open this specific file when it's double-clicked.</p>
+<a id="pref_app" name="pref_app">Preferované aplikácie</a></h3>
+<p>Toto pop-up menu zobrazuje list všetkých aplikácií, ktoré môžu otvoriť tento konkrétny typ súboru.
+Odtiaľ môžete vybrať, ktorý program by sa mal spustiť, pri otvorení takéhoto súboru dvojitým kliknutím.</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="button">Vybrať...</span></td><td> </td><td>opens a file dialog where you choose the application to open with this filetype. Here, we set <span class="app">ShowImage</span> to display the DVD's cover.</td></tr>
-<tr><td class="onelinetop"><span class="button">Rovnaký ako...</span></td><td> </td><td>opens a file dialog where you choose any file that already has the preferred application set that you're looking for.</td></tr>
+<tr><td><span class="button">Vybrať...</span></td><td> </td><td>otvára okno, kde si môžete vybrať aplikáciu ktorá otvorí súbory tohoto typu. Tu nastavíme <span class="app">Prehliadač Obrázkov</span> pre zobrazenie obalu DVD.</td></tr>
+<tr><td class="onelinetop"><span class="button">Rovnaký ako...</span></td><td> </td><td>otvára okno, kde môžete vybrať akýkoľvek súbor ktorý už má vybranú tú preferovanú aplikáciu, ktorú potrebujete.</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="extra_attribute" name="extra_attribute">Extra Attributes</a></h3>
-<p>Here we enter all the custom attributes we decided on in our preparations. Clicking the <span class="button">Add...</span> button opens a panel:</p>
+<a id="extra_attribute" name="extra_attribute">Ďalšie atribúty</a></h3>
+<p>Sem zadáme všetky vlastné atribúty, ktoré sme si vybrali v našej príprave. Kliknutie na tlačidlo <span class="button">Pridať...</span> otvorí panel:</p>
 <img src="images/workshop-filetypes+attributes-images/filetype-extra-attribute.png" alt="filetype-extra-attribute.png" />
 <ul>
-<li><p><i>Attribute name</i> - Appears e.g. as the column heading in Tracker windows.</p></li>
-<li><p><i>Internal name</i> - Is used for indexing and querying the attribute.</p></li>
-<li><i>Type</i> - Defines the value the attribute can hold and therefore how it can be queried.
+<li><p><i>Názov atribútu</i> - Objavuje sa napr. ako nadpis stĺpca v okne Trackera.</p></li>
+<li><p><i>Vnútorný názov</i> - používa sa na indexovanie a vyhľadávanie atribútu.</p></li>
+<li><i>Typ</i> - Definuje hodnotu, ktorú môže dostať atribút a tiež ako môže na ňu klásť požiadavky.
     <ul>
-    <li><span class="menu">String</span> for normal text</li>
-    <li><span class="menu">Boolean</span> for binary data: 0 or 1</li>
-    <li><span class="menu">Integer</span> for integer numbers with different ranges:
+    <li><span class="menu">String</span> pre obyčajný text</li>
+    <li><span class="menu">Boolean</span> pre binárny údaj: 0 alebo 1</li>
+    <li><span class="menu">Integer</span> pre celé čísla s rôznym rozsahom:
         <ul>
         <li><span class="menu">8 bit</span>: ± 255</li>
-        <li><span class="menu">16 bit</span>: ± 65,535</li>
-        <li><span class="menu">32 bit</span>: ± 4,294,967,295</li>
-        <li><span class="menu">64 bit</span>: ± 18,446,744,073,709,551,615</li>
+        <li><span class="menu">16 bit</span>: ± 65 535</li>
+        <li><span class="menu">32 bit</span>: ± 4 294 967 295</li>
+        <li><span class="menu">64 bit</span>: ± 18 446 744 073 709 551 615</li>
         </ul>
     </li>
-    <li><span class="menu">Float</span> for floatingpoint numbers, single precision</li>
-    <li><span class="menu">Double</span> for floatingpoint numbers, double precision</li>
-    <li><span class="menu">Time</span> for time and date format</li>
+    <li><span class="menu">Float</span> pre desatinné čísla, s malou presnosťou</li>
+    <li><span class="menu">Double</span> pre desatinné čísla, dvojitá presnosť</li>
+    <li><span class="menu">Time</span> pre čas a dátum</li>
     </ul>
 </li>
 </ul>
 <ul>
-<li><i>Visible</i> - This checkbox determines if the attribute is visible in a Tracker window at all. Since the Tracker will be the interface to our DVD database, we check it and define its appearance with:<ul>
-    <li><span class="menu">Display as</span> - Leave on "Default". In the future more option will become available, e.g. a bar or stars for a rating etc.</li>
-    <li><span class="menu">Editable</span> - Determines if the attribute shall be editable in Tracker.</li>
-    <li><span class="menu">Width</span> - The default width of that attributes column in a Tracker window.</li>
-    <li><span class="menu">Alignment</span> - The attribute can be displayed left, center, or right aligned.</li>
+<li><i>Viditeľné</i> - toto zaškrtávacie políčko hovorí či je vôbec atribút viditeľný v okne Trackera. Keďže Tracker bude prostredie pre našu DVD databázu, zaškrtneme to a definujeme jeho zobrazenie s:<ul>
+    <li><span class="menu">Zobraziť ako</span> - Ponecháme „Default“. V budúcnosti bude dostupných viac možností, napr. panel alebo hviezdičky na hodnotenie atď.</li>
+    <li><span class="menu">Upravovateľné</span> - Hovorí či atribút bude upraviteľný v Trackery.</li>
+    <li><span class="menu">Šírka</span> - Predvolená šírka stĺpca atribútu v okne Trackeru.</li>
+    <li><span class="menu">Zarovnanie</span> - Atribút môže byť zarovnaný vľavo, v strede alebo vpravo.</li>
 </ul></li></ul>
-<p>Now, insert all the info for our attributes:</p>
+<p>Teraz vložme všetky informácie pre naše atribúty:</p>
 <table summary="DVDdb Attributes" cellpadding="10" border="1">
-<tr><th>Internal Name</th><th>Attribute type</th><th>indexed?</th><th>Description</th></tr>
-<tr><td>DVDdb:title</td>	<td>text</td>		<td>yes</td>	<td>Movie title</td></tr>
-<tr><td>DVDdb:genre</td>	<td>text</td>		<td>yes</td>	<td>Genre</td></tr>
-<tr><td>DVDdb:url</td>		<td>text</td>		<td>no</td>	<td>URL</td></tr>
-<tr><td>DVDdb:cast</td>		<td>text</td>		<td>yes</td>	<td>Director/Cast</td></tr>
-<tr><td>DVDdb:plot</td>		<td>text</td>		<td>no</td>	<td>Plot</td></tr>
-<tr><td>DVDdb:rating</td>	<td>int-32</td>		<td>yes</td>	<td>Rating 1 to 10</td></tr>
-<tr><td>DVDdb:coord</td>	<td>text</td>		<td>no</td>	<td>Shelf</td></tr>
-<tr><td>DVDdb:lent</td>		<td>text</td>		<td>yes</td>	<td>Lent to</td></tr>
+<tr><th>Vnútorný názov</th><th>Typ atribútu</th><th>indexované?</th><th>Popis</th></tr>
+<tr><td>DVDdb:title</td>	<td>text</td>		<td>áno</td>	<td>Názov filmu</td></tr>
+<tr><td>DVDdb:genre</td>	<td>text</td>		<td>áno</td>	<td>Žáner</td></tr>
+<tr><td>DVDdb:url</td>		<td>text</td>		<td>nie</td>	<td>URL</td></tr>
+<tr><td>DVDdb:cast</td>		<td>text</td>		<td>áno</td>	<td>Režisér/obsadenie</td></tr>
+<tr><td>DVDdb:plot</td>		<td>text</td>		<td>nie</td>	<td>Zápletka</td></tr>
+<tr><td>DVDdb:rating</td>	<td>int-32</td>		<td>áno</td>	<td>Hodnotenie 1 až 10</td></tr>
+<tr><td>DVDdb:coord</td>	<td>text</td>		<td>nie</td>	<td>Polička</td></tr>
+<tr><td>DVDdb:lent</td>		<td>text</td>		<td>áno</td>	<td>Požičané komu</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="indexing" name="indexing">Indexing</a></h2>
-<p>Before we start entering data in our little DVD database, we should add certain attributes to the <a href="index.html">Index</a>. Only indexed attributes can use Haiku's fast <a href="queries.html">Queries</a>.<br />
-So, what will we be searching in the future? We probably won't ask "What's in the B4 coordinate in my shelf?" or "Does the IMdB URL or the plot of the movie contain the word 'pope-shenooda'?".</p>
-<p>This leaves these attributes:</p>
+<a id="indexing" name="indexing">Indexovanie</a></h2>
+<p>Predtým ako začneme zadávať data do našej databáze DVD, mali by sme pridať určité atribúty do <a href="index.html">Indexu</a>. Iba indexované atribúty možno použiť rýchle <a href="queries.html">Požiadavky</a> Haiku.<br />
+Tak, čo budeme v budúcnosti hľadať? Pravdepodobne sa nebudeme pýtať „čo je na súradnici B4 v mojej poličke?“ alebo „obsahuje IMdB URL alebo zápletka filmu slovo 'pope-shenooda'?“.</p>
+<p>To necháva tieto atribúty:</p>
 <table summary="Attribute Type" cellpadding="10" border="1">
-<tr><th>Internal Name</th><th>Attribute type</th></tr>
+<tr><th>Vnútorný názov</th><th>Typ atribútu</th></tr>
 <tr><td>DVDdb:title</td><td>text</td></tr>
 <tr><td>DVDdb:genre</td><td>text</td></tr>
 <tr><td>DVDdb:cast</td><td>text</td></tr>
 <tr><td>DVDdb:rating</td><td>int-32</td></tr>
 </table>
 
-<p>To index them, we open a Terminal and simply add one attribute after the other:</p>
+<p>Aby sme ich zindexovali, otvoríme Terminál a jednoducho pridáme jeden atribút po druhom:</p>
 <pre class="terminal">mkindex -t string DVDdb:title
 mkindex -t string DVDdb:genre
 mkindex -t string DVDdb:cast
 mkindex -t int DVDdb:rating</pre>
-<p>The <span class="cli">-t</span> option defines the type of attribute, which is "string" for all but the rating, which is an integer number.</p>
+<p>Možnosť <span class="cli">-t</span> definuje typ atribútu, ktorý je reťazec (string) pre všetky okrem hodnotenia, ktoré je celé číslo (integer).</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="filling-data" name="filling-data">Filling in the data</a></h2>
-<p>Now, everything's set and we can begin putting some data into our base.<br />
-Since our basic file is a cover image, we go to some online resource like IMdB, look for our first movie and save the cover or movie poster in a new folder where we want to keep our DVDdb files.</p>
-<p>Opening that folder we see a typical Tracker window with one JPEG in it. Right-clicking it, we change its filetype to <tt>application/DVDdb</tt> with the <span class="app">Filetype Addon</span>. There's more info on this in the <a href="filetypes.html">Filetypes</a> document.</p>
-<p>Now, we activate all our DVDdb attributes from the <span class="menu">Attributes</span> menu of the Tracker window and rearrange the columns to our taste:</p>
+<a id="filling-data" name="filling-data">Vypĺňanie údajov</a> </h2>
+<p>Teraz, keď je je všetko nastavené, môžme začať vypĺňať nejaké údaje.
+Keďže náš základný súbor je obrázok obalu, pôjdeme na online zdroje ako IMdB, vyhľadáme náš prvý film a uložíme obal alebo plagát do nového priečinka, kde chceme mať naše súbory DVDdb.</p>
+<p>Po otvorení priečinku vidíme typické okno s jedným JPEG obrázkom.Pravým kliknutím zmeníme typ súboru na <tt>application/DVDdb</tt> s <span class="app">Doplnkom Typy súborov</span>. Viac informácii k tomu nájdete v dokumente <a href="filetypes.html">Typy súborov</a>.</p>
+<p>Teraz aktivujeme všetky atribúty našej DVDfb
+z <span class="menu">Atribúty</span> menu okna Trackera a popresúvame stĺpce ako chceme.</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-dvddb-empty.png" alt="filetypes-dvddb-empty.png" />
-<p>By clicking on a yet empty attribute (or pressing <span class="key">ALT</span> <span class="key">E</span>) we enter editing mode and fill each attribute. With <span class="key">TAB</span> and <span class="key">SHIFT</span> <span class="key">TAB</span> you can navigate between attributes.</p>
-<p>In our example, we usually start with a downloaded JPG cover and change its type to applications/DVDdb. There's another elegant way to produce a file to work with. Just copy an empty file of our filetype to <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span> and rename it to DVDdb.</p>
-<p>Right-clicking into a Tracker window, you'll find a new entry under <span class="menu">New...</span> besides the default "New folder".</p>
+<p>Kliknutím na zatiaľ prázdny atribút (alebo stlačením
+ <span class="key">ALT</span> <span class="key">E</span>) vstúpime do  režimu úprav a vyplníme všetky údaje. Klávesmi <span class="key">TAB</span> a <span class="key">SHIFT</span> <span class="key">TAB</span> sa môžete pohybovať medzi atribútmi.</p>
+<p>V našom príklade zvyčajne začneme so stiahnutím JPG obalu a zmenením jeho typu na applications/DVDdb. Je tu aj iný elegantný spôsob ako vytvoriť súbor, s ktorým budeme pracovať. Jednoducho skopírujte prázdny súbor nášho typu do <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span> a premenujete ho na DVDdb.</p>
+<p>Kliknutím pravým tlačidlom v okne nájdete novú možnosť v <span class="menu">Nový...</span> okrem základného „Nový priečinok“.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="query-db" name="query-db">Querying the database</a></h2>
-<p>Several hours of grunt work later, we have a nice little database that you can query to find all your Christina Ricci movies that have a 7+ rating...  :)</p>
-<p>You can assign a sensible attribute layout for query results of a specific filetype.<br />
-Open the folder containing your DVDdb files and arrange the attributes how you'd like to have query results presented. Copy this layout with <span class="menu">Attributes | Copy layout</span>.</p>
-<p>Open <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, create a new folder and rename it to <i>group/filetype</i>, replacing slashes with underscores; in our case "applications_DVDdb".</p>
-<p>Open the new folder and paste in the layout with <span class="menu">Attributes | Paste layout</span>. Voilà:</p>
+<a id="query-db" name="query-db">Prehľadávanie databáze</a></h2>
+<p>Po niekoľkých hodinách ťažkej práce máme peknú malú databázu, ktorú môžte prehľadávať aby ste našli všetky vaše filmy Christiny Ricciovej, ktorých hodnotenie je 7 a viac :)</p>
+<p>Môžete priradiť rozumné rozloženie atribútu pre výsledky požiadavky na konkrétny typ súboru. <br />
+Otvorte priečinok obsahujúci vaše DVDdb súbory a upravte atribúty tak, ako chcete mať zobrazované výsledky vyhľadávania. Skopírujte toto rozloženie s <span class="menu">Atribúty | Kopírovať rozloženie</span>.</p>
+<p>Otvorte <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, vytvorte nový priečinok a premenujte ho na <i>group/filetype</i>, nahraďte medzery podtržítkami; v našom prípade "applications_DVDdb".</p>
+<p>Otvorte nový priečinok a vložte rozloženie s
+<span class="menu">Atribúty | Vložiť rozloženie</span>. Voilà:</p>
 <img src="images/workshop-filetypes+attributes-images/query-dvddb.png" alt="query-dvddb.png" />
 
 </div>
@@ -221,7 +227,7 @@ Open the folder containing your DVDdb files and arrange the attributes how you'd
 <div class="nav">
 <div class="inner"><span>
  «  <a href="queries.html">Požiadavky</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Obsah</a> 
 ::  <a href="applications.html">Aplikácie</a>  »
 </span></div>
 </div>

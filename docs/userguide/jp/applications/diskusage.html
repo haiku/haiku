@@ -12,6 +12,7 @@
  * Translators:
  *		hiromu1996
  *		log-1
+ *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -23,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -55,26 +56,26 @@
 
 <h2><img src="../../images/apps-images/diskusage-icon_64.png" alt="diskusage-icon_64.png" width="64" height="64" />DiskUsage</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><span class="menu">アプリケーション (Applications)</span></td></tr>
-<tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/DiskUsage</span></td></tr>
-<tr><td>設定ファイル：</td><td></td><td><span class="path">~/config/settings/DiskUsage</span></td></tr>
+<tr><td>Deskbar メニュー:</td><td style="width:15px;"></td><td><span class="menu">Applications (アプリケーション)</span></td></tr>
+<tr><td>場所:</td><td></td><td><span class="path">/boot/system/apps/DiskUsage</span></td></tr>
+<tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/DiskUsage</span></td></tr>
 </table>
 <p><br /></p>
-<p>DiskUsageはディスクの容量がどのように使われているのかをグラフィカルに表示します。<br />
+<p>DiskUsage はディスクの容量がどのように使われているのかをグラフィカルに表示します。<br />
 <i>「ディスク容量がどこに費やされているの?」</i>といったことがわかる便利なツールです。</p>
 <p><img id="diskusage" src="../images/apps-images/diskusage.png" alt="diskusage.png" /></p>
-<p>同心円のそれぞれがファイルシステムの階層を表しています。上記のように、一番中心の円が<span class="path">/boot/home/</span>フォルダーを、そのすぐ外側の円形のブロックが<span class="path">/boot/home/</span>以下のファイルやフォルダを示しています。ファイルシステムの階層が深くなるごとに円形のブロックが外側に追加されていくので、深い階層のフォルダの情報を見るためにはウィンドウサイズを変更する必要があるかもしれません。</p>
-<p>図の上に、マウントされている中からディスクを切り替えるポップアップメニューがあります。ディスクの使用量を表示するにはスキャンが必要ですが、バックグラウンドでディスクをスキャンがしている間に、他のディスクについて見るということも可能です。</p>
+<p>同心円のそれぞれがファイルシステムの階層を表しています。上記のように、一番中心の円が <span class="path">/boot/home/</span> フォルダーを、そのすぐ外側の円形のブロックが <span class="path">/boot/home/</span> 以下のファイルやフォルダーを示しています。ファイルシステムの階層が深くなるごとに円形のブロックが外側に追加されていくので、深い階層のフォルダーの情報を見るためにはウィンドウサイズを変更する必要があるかもしれません。</p>
+<p>図の上に、マウントされているディスクを切り替えるポップアップメニューがあります。ディスクの使用量を表示するにはスキャンが必要ですが、バックグラウンドでディスクをスキャンしている間に、ほかのディスクについて見るということも可能です。</p>
 <div class="box-info"><ul>
-<li>図で角度が2゜に満たないサイズのファイルやフォルダは表示されません。</li>
-<li>フォルダ内のファイルの数には、サブフォルダ内のファイルの数も含まれていて、フォルダもファイルと同じように数えられます。</li>
+<li>図で角度が 2゜に満たないサイズのファイルやフォルダーは表示されません。</li>
+<li>フォルダー内のファイルの数には、サブフォルダー内のファイルの数も含まれていて、フォルダーもファイルと同じように数えられます。</li>
 <li>使用量にはシンボリックリンクは含まれません。</li>
 </ul></div>
-<p>マウスをあるブロックの上に重ねると、ポインタの下の部分のファイルやフォルダの情報が一番下のステータスバーに表示されます。</p>
-<p>右クリックでコンテキストメニューが表示され、それぞれ<span class="menu">情報を表示</span>・<span class="menu">開く</span>・<span class="menu">アプリケーションで開く</span>・<span class="menu">再スキャン</span>となっています。<br />
-左クリックで、そのファイルやフォルダを中心に持ってくることができます。<br />
+<p>マウスをあるブロックの上に重ねると、ポインタの下の部分のファイルやフォルダーの情報が一番下のステータスバーに表示されます。</p>
+<p>右クリックでコンテキストメニューが表示され、それぞれ、<span class="menu">情報を表示 (Get Info)</span>、(Tracker で) <span class="menu">開く (Open)</span>、<span class="menu">アプリケーションで開く (Open With)</span>、<span class="menu">再スキャン (Rescan)</span> となっています。<br />
+左クリックで、そのファイルやフォルダーを中心に持ってくることができます。<br />
 中心の円で左クリックをすると、表示されている階層がひとつ上がります。</p>
-<p>ドラッグすることで、ファイルとフォルダをDiskUsageから他のアプリケーションやデスクトップ、Trackerにコピーすることができます。同様に、ディスクやフォルダをDiskUsageのウィンドウにドロップすることでそこの使用量が中心に表示されます。</p>
+<p>ファイルとフォルダーを DiskUsage からドラッグすることで、ほかのアプリケーション、デスクトップ、またはTracker にコピーできます。同様に、ディスクやフォルダーを DiskUsage のウィンドウにドロップすることで、その使用量が中心に表示されます。</p>
 
 </div>
 </div>

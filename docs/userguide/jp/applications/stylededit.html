@@ -12,18 +12,19 @@
  * Translators:
  *		thebowseat
  *		log-1
+ *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>テキストエディター</title>
+	<title>StyledEdit</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -53,16 +54,16 @@
 <div id="content">
 <div>
 
-<h2><img src="../../images/apps-images/stylededit-icon_64.png" alt="stylededit-icon_64.png" width="64" height="64" />テキストエディター</h2>
+<h2><img src="../../images/apps-images/stylededit-icon_64.png" alt="stylededit-icon_64.png" width="64" height="64" />StyledEdit</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><span class="menu">アプリケーション (Applications)</span></td></tr>
-<tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/テキストエディター</span></td></tr>
-<tr><td>設定ファイル：</td><td></td><td><i>なし</i></td></tr>
+<tr><td>Deskbar メニュー:</td><td style="width:15px;"></td><td><span class="menu">Applications (アプリケーション)</span></td></tr>
+<tr><td>場所:</td><td></td><td><span class="path">/boot/system/apps/StyledEdit</span></td></tr>
+<tr><td>設定ファイル:</td><td></td><td><i>無し</i></td></tr>
 </table>
 <p><br /></p>
-<p>StyledEdit はHaikuのシンプルなテキストエディターです。 StyledEdit はファイルを普通のテキスト形式で保存しますが、StyledEdit で表示したときに限定的なフォーマット機能を実現するために、追加の属性が書き込まれます。</p>
+<p>StyledEdit はHaiku のシンプルなテキストエディタです。StyledEdit はファイルを普通のテキスト形式で保存しますが、StyledEdit で表示したときに限定的なフォーマット機能を実現するために、追加の属性が書き込まれます。</p>
 <img src="../images/apps-images/stylededit.png" alt="stylededit.png" />
-<p>興味があれば、ターミナルで <span class="cli">listattr</span> を使うと属性はこのように表示されます：</p>
+<p>興味があれば、ターミナルで <span class="cli">listattr</span> を使うと属性はこのように表示されます。</p>
 <pre class="terminal">~&gt; listattr /boot/home/Desktop/test.txt
 File: /boot/home/Desktop/test.txt
   Type         Size                 Name
@@ -74,11 +75,10 @@ MIME String         11  "BEOS:TYPE"
    Raw Data       1048  "styles"
 
 1071 bytes total in attributes.</pre>
-<p>この通り、テキストエディターのメニューからのフォーマットオプションはすべて表示されています：
-ワードラップ (オン/オフ) と配置 (左、中央、右) がそれぞれ一つの属性に入っています。文字のスタイル (フォント、サイズ、色) も別の属性に入っています。</p>
-<div class="box-info">これらの属性はBFSのファイルシステムの機能なので、ほかのプラットフォームはただのテキストファイルと認識することだけでなく、BFS以外のパーティションにファイルを保存するとフォーマットが消えてしまいます。上記の属性はただ取り除かれ、普通のテキストファイルが残ります。</div>
-<p>いずれにしても、普通のテキストファイルであっても異なるフォントやサイズで書かれた色つきのテキストを持つことを可能にするというのは、すてきなアイディアです。例えば、ReadMe.txt はこの仕組みによってどんなプラットフォーム上でもシェルで読むことができますし、その状態でもなおかつ Haiku からダブルクリックで開いた場合には、ちょっとだけど書式の内容を保持しているのです。</p>
-<p>テキストエディターを使用するのはすごく簡単なので、メニューアイテムを一つ一つ説明するのは飛ばします。テキストを書き、フォーマットしたいテキストを選択して <span class="menu">フォント</span> メニューからフォント、サイズと色を変更してください。 <span class="menu">ドキュメント</span> メニューのワードラップと配置はファイル全体にしか適用できません。</p>
+<p>この通り、StyledEdit のメニューからのフォーマットオプションはすべて表示されています。ワードラップ (オン / オフ) と配置 (左、中央、右) がそれぞれ一つの属性に入っています。文字のスタイル (フォント、サイズ、色) も別の属性に入っています。</p>
+<div class="box-info">これらの属性は BFS のファイルシステムの機能なので、ほかのプラットフォームはただのテキストファイルと認識することだけでなく、BFS 以外のパーティションにファイルを保存するとフォーマットが消えてしまいます。上記の属性はただ取り除かれ、普通のテキストファイルが残ります。</div>
+<p>いずれにしても、普通のテキストファイルであっても異なるフォントやサイズで書かれた色つきのテキストを持つことを可能にするというのは、すてきなアイデアです。たとえば、ReadMe.txt はこの仕組みによってどんなプラットフォーム上でもシェルで読むことができますし、その状態でもなおかつ Haiku からダブルクリックで開いた場合には、少しだけ書式の内容を保持しているのです。</p>
+<p>StyledEdit を使用するのはすごく簡単なので、メニューアイテムをひとつひとつ説明するのは飛ばします。テキストを書き、フォーマットしたいテキストを選択して、<span class="menu">フォント (Font)</span> メニューからフォント、サイズと色を変更してください。<span class="menu">ドキュメント (Document)</span> メニューのワードラップと配置はファイル全体にしか適用できません。</p>
 
 </div>
 </div>

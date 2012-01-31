@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		thebowseat
+ *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -22,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -44,155 +45,150 @@
 </ul>
 <span>
  «  <a href="teammonitor.html">チームモニター</a> 
-::  <a href="contents.html" class="uplink">目次</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="tracker-add-ons.html">Tracker アドオン</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>インデックス</td></tr>
 <tr class="index"><td>
 	<a href="#mounting-volumes">ボリュームのマウント</a><br />
-	<a href="#navigating">ナビゲート</a><br />
+	<a href="#navigating">ナビゲーション</a><br />
 	<a href="#appearance">外観</a><br />
-	<a href="#tracker-preferences">Tracker 設定</a><br />
-	<a href="#working-with-files">ファイルの操作</a><br />
-	<a href="#transaction-status">操作状態</a>
+	<a href="#tracker-preferences">Tracker 環境設定</a><br />
+	<a href="#working-with-files">ファイル操作</a><br />
+	<a href="#transaction-status">処理状況</a>
 </td></tr>
 </table>
 
 <h1>Tracker</h1>
 
-<p>The Tracker is the graphical interface to all your files. It lets you create new files and folders or find, launch or rename as well as copy or delete existing ones.</p>
-<p>Being an application like any other (the Desktop with its icons is really just a fullscreen window in the background), Tracker appears with its windows in the Deskbar and can be quit and restarted. The easiest way to quit and restart a crashed or frozen Tracker (or a wayward Deskbar) is to call the <a href="teammonitor.html">Team Monitor</a>.</p>
+<p>Tracker はすべてのファイルへのグラフィカルインタフェースです。それは新しいファイルおよびフォルダーの作成や、検索、起動や名前の編集の他に、既存のファイルのコピーや削除も行います。</p>
+<p>ほかのアプリケーションと同様に (アイコンを備えたデスクトップは実際に単にうしろにあるフルスクリーンウィンドウです)、Tracker はそのウィンドウとともに Deskbar 上に現れ、終了および再起動ができます。クラッシュやフリーズした Tracker (あるいは不安定な Deskbar) を終了して再起動するもっとも簡単な方法は、<a href="teammonitor.html">チームモニター</a>を呼び出すことです。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="mounting-volumes" name="mounting-volumes">ボリュームのマウント</a></h2>
-<p>In order to access a harddisk, CD, USB stick etc., you first have to mount the volume, that is, let the system know it's there. This is done with a right-click on the Desktop or an already mounted volume (like the boot disk) and choosing the volume from the <span class="menu">Mount</span> submenu. You find the same <span class="menu">Mount</span> menu in the Deskbar.</p>
+<p>ハードディスク、CD、USB スティック等にアクセスするためには、まずボリュームをマウントしなければなりません、すなわち、システムにそれがそこにあることを知らせます。ボリュームのマウントはデスクトップあるいはマウント済のボリューム (ブートディスク等) を右クリックして <span class="menu">マウント (Mount)</span> サブメニューからボリュームを選択することで行われます。Deskbar に同様のマウントメニューが見つかります。</p>
 <img src="images/tracker-images/mount-settings.png" alt="drill-down.png" />
-<p>There are also <span class="menu">Settings</span> so you don't have to mount everything manually after every bootup.<br />
-The above settings will automatically mount any storage device you connect/insert and also mount all disks on bootup that were mounted previously.</p>
-<div class="box-warning">Before you disconnect e.g. a harddrive or USB stick, make sure you have successfully unmounted the volume. This guarantees that all data transfer has finished. Otherwise you may lose data or corrupt the disk!</div>
+<p>また、<span class="menu">設定 (Settings)</span> もあるので、起動ごとにすべてを手動でマウントする必要はありません。上図の設定は、接続や挿入されたあらゆる記憶装置を自動的にマウントし、以前にマウントされたすべてのディスクを起動時にマウントするでしょう。</p>
+<div class="box-warning">ハードドライブや USB スティック等を取り外す前に、ボリュームが正しくアンマウントしたことを確かめてください (これはデータ転送がすべて終了したことを保証します)。そうしないと、データを失うか、あるいはディスクを破損するかもしれません。</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="navigating" name="navigating">ナビゲート</a></h2>
-<p>By default, when you double-click a folder, Tracker opens a new window while leaving the parent window open. This can quickly lead to an overcrowded desktop.<br />
-You can prevent that by holding down the <span class="key">OPT</span> key, which automatically closes the parent window.<br />
-This is also true for keyboard navigation. For more on that, see topic <a href="keyboard-shortcuts.html">Shortcuts and key combinations</a>.</p>
-<p>Moving through your folders is one of Trackers main purposes, just like the file managers on other platforms. Haiku's Tracker has some unique features that will help you doing that efficiently.</p>
+<a id="navigating" name="navigating">ナビゲーション</a></h2>
+<p>デフォルトでは、フォルダーをダブルクリックすると、Tracker は親ウィンドウを開いたままで新しいウィンドウを開きます。これではすぐに散らかったデスクトップになってしまいます。<br />
+<span class="key">OPT</span> キーを押すことでこれを防ぐことができます。つまり、自動的に親ウィンドウを閉じます。<br />
+これはまた、キーボードナビゲーションでも当てはまります。さらに詳しくは、<a href="keyboard-shortcuts.html">ショートカットやキーの組み合わせ</a>のトピックを見てください。</p>
+<p>Tracker の主な目的の 1 つは、ほかのプラットフォーム上のファイルマネージャと同様にフォルダーを移動することです。Haiku の Tracker には、効率的に移動を支援するいくつかの独自の特徴があります。</p>
 
 <h3>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="drill-down" name="drill-down">Drilling down the submenus</a></h3>
-<p>Instead of double-clicking your way down folder after folder, there's a better way to drill down:</p>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="drill-down" name="drill-down">サブメニューのドリルダウン</a></h3>
+<p>ダブルクリックで次々とフォルダー階層を降りて行く代わりに、ドリルダウンするもっとよい方法があります。</p>
 <img src="images/tracker-images/drill-down.png" alt="drill-down.png" />
 <!-- screenshot needs updating to show /boot/system/documentation -->
-<p>Right-click onto a folder, and at the top of the usual context menu you'll find a submenu of the current folder that let's you navigate down a level. Just move down the hierarchy until you find the file or folder you're looking for and click on it to open it. The above shows the contents of the folder <span class="path">/boot/home/config/</span>.<br />
-If you do the above while dragging a file with you, it will be moved to where you eventually drop it.</p>
-<p>A similar method can be used from any Tracker window:</p>
+<p>フォルダー上で右クリックすると、通常のコンテキストメニューの一番上に現在のフォルダーのサブメニューが見つかります。それはフォルダーの 1 階層下へ移動します。捜しているファイルかフォルダーを見つけてそれをクリックで開くまで、階層を下って移動してください。上の図は、フォルダー <span class="path">/boot/home/config/</span> の内容を表示しています。<br />
+ファイルをドラッグしながら行う場合、ファイルは最後にドロップした所に移動するでしょう。</p>
+<p>同様の方法は、Tracker の任意のウィンドウから使用できます。</p>
 <img src="images/tracker-images/window-drill-down.png" alt="window-drill-down.png" />
-<p>Click on the area in the lower left, where the number of items is listed, and you'll get submenus for every level above your current location. From there you can drill down through the folders as usual.</p>
-<p>Note, that the Desktop is always the topmost level as that is where Tracker shows mounted volumes. So, if you want to go to another disk, you first have to navigate to the top (Desktop) and cross over to your other disk from there.</p><br />
-<p>You'll get the same submenu-navigating when you drag a file over a folder. After a short while of hovering, a submenu pops up and you can drill down to your destination. If you initiated the drag with the right mousebutton, you can choose between copying, moving or linking the file when you release the mouse.</p>
+<p>項目の数を表示している左下のエリアをクリックすると、現在のフォルダーの上の階層にあるフォルダーのサブメニューが見つかるでしょう。そこから、いつも通りフォルダーを経由してドリルダウンできます。</p>
+<p>デスクトップは、常に階層のトップレベルであり、Tracker がマウントされたボリュームを表示する場所であることに注意してください。したがって、別のディスクに移動したければ、まずにトップレベル (デスクトップ) へ移動し、そこからディスクへ移動する必要があります。</p><br />
+<p>ファイルをフォルダーにドラッグした時にも同様のサブメニューナビゲートができるでしょう。フォルダー上でしばらく留まると、サブメニューがポップアップし目的地へドリルダウンできます。もし右マウスボタンを押してドラッグを始めた場合は、ボタンを離した時に、ファイルのコピー、移動、またはリンクから選択できます。</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="type-ahead" name="type-ahead">Jumping to files with type-ahead</a></h3>
-<p>You may be familiar with the concept from file managers of other operating systems: typing the first few letters of a filename will jump to the first file matching these starting characters. Haiku took the idea a step further. If there isn't a file starting with those letters it will jump to the first file including the string anywhere in its name. And if there's nothing with the string in its filename, the attributes are searched next.</p>
+<a id="type-ahead" name="type-ahead">先行入力でファイルにジャンプする</a></h3>
+<p>ほかのオペレーティングシステムのファイルマネージャでこのコンセプトは良く知っているかもしれません。ファイル名の最初の数文字をタイプすると、これらの文字に最初に一致するファイルにジャンプします。Haiku はそのアイデアを一歩進めました。これらの文字で始まるファイルが無いときは、ファイル名に文字列を含む最初のファイルにジャンプします。ファイル名中に文字列が無い場合は、次に属性が検索されます。</p>
 <img src="images/tracker-images/window-type-ahead.png" alt="window-type-ahead.png" />
-<p>In the above example, there are many files starting with "Haiku logo", rendering simpler approaches to typing ahead quite useless. In Haiku however, typing "web" jumps right to its first occurence in "Haiku logo - website". The characters you enter appear in the bottom left corner where you normally find the item count of all files in the folder. A second after entering a character, the display jumps back to normal and you're ready for a new type ahead search.</p>
+<p>上の例では、"Haiku logo" で始まるたくさんのファイルがあるので、単純な先行入力は無駄です。しかし、Haiku では、"web" とタイプすることで、最初のファイルである、"Haiku logo - website" に正確にジャンプします。タイプされた文字は左下 (通常、フォルダー中の全ファイルの数が表示される場所) に表示されます。１ 秒後に元の表示に戻り、新しい先行入力検索を開始できます。</p>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="type-ahead-filter" name="type-ahead-filter">Type-ahead filtering</a></h3>
-<p>Instead of jumping to a file while typing, there's also the option to filter out all files not matching your type-ahead string. This can improve clarity dramatically, especially when dealing with crowded folders. By using <span class="key">SHIFT</span> <span class="key">SPACE</span> as delimiter, you can even filter on multiple strings.<br />
-Contrary to type-ahead jumping, the filtering will stick until you press <span class="key">ESC</span> or close the window (or leave the folder if you're using Single Window Navigation).<br />
-This type-ahead filtering is set in the <a href="#tracker-preferences.html">Tracker preferences</a>.</p>
+<a id="type-ahead-filter" name="type-ahead-filter">先行入力フィルター</a></h3>
+<p>入力中にジャンプする代わりに、先行入力文字列に一致しないファイルを取り除くオプションもあリます。特に、ファイルが多すぎるフォルダーの場合、これは透明度を著しく改善します。<span class="key">SHIFT</span> <span class="key">SPACE</span> を区切りとして使うことで、複数の文字列でフィルターすることさえできます。<br />
+先行入力ジャンプと異なり、フィルタリングは<span class="key">ESC</span> を押すか、ウィンドウを閉じる (または、シングルウィンドウナビゲーションモードのときはフォルダーを去る) までは有効です。<br />
+この先行入力フィルタリングは、<a href="#tracker-preferences.html">Tracker preferences</a> 中で設定されます。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="appearance" name="appearance">外観</a></h2>
 <img src="images/tracker-images/window-menu.png" alt="window-menu.png" />
-<p>Tracker windows offer three different viewing modes from the <span class="menu">Window</span> menu:</p>
+<p>Tracker ウィンドウは <span class="menu">ウィンドウ (Window)</span> メニューから、3 つの表示モードを提供します。</p>
 <ul>
-<li><p><span class="menu">Icon view</span> (<span class="key">ALT</span> <span class="key">1</span>) - Big icons, you can change the size from the submenu or in/decrease their size with <span class="key">ALT</span> <span class="key">+</span>/<span class="key">-</span>.</p></li>
-<li><p><span class="menu">Mini icon view</span> (<span class="key">ALT</span> <span class="key">2</span>) - Small icons.</p></li>
-<li><p><span class="menu">List view</span> (<span class="key">ALT</span> <span class="key">3</span>) - A detailed list of your files enabling you to show/hide available <i>attributes</i>. (See topic <a href="attributes.html">Attributes</a>.)</p></li>
+<li><p><span class="menu">アイコン表示 (Icon view)</span> (<span class="key">ALT</span> <span class="key">1</span>) - 大きいアイコン表示です。サブメニューからサイズを変更できます。また、<span class="key">ALT</span> <span class="key">+</span>/<span class="key">-</span> で、アイコンのサイズを大きくまたは小さくできます。</p></li>
+<li><p><span class="menu">ミニアイコン表示 (Mini icon view)</span> (<span class="key">ALT</span> <span class="key">2</span>) - 小さいアイコン表示です。</p></li>
+<li><p><span class="menu">一覧表示 (List view)</span> (<span class="key">ALT</span> <span class="key">3</span>) - ファイルを詳細リストで表示します。また、利用可能な<i>属性</i>を表示 / 非表示にできます (<a href="attributes.html">属性</a>のトピックを見てください)。</p></li>
 </ul>
-<p>The <span class="menu">Window</span> menu offers a number of other functions:</p>
+<p><span class="menu">ウィンドウ (Window)</span> メニューはほかに多くの機能を提供します。</p>
 <ul>
-<li><p><span class="menu">Resize window</span> (<span class="key">ALT</span> <span class="key">Y</span>) - Resizes the window to its ideal size.</p></li>
-<li><p><span class="menu">Arrange by...</span> - Only available in Icon or Mini icon view, a submenu allows to set the sorting order to various properties:</p>
+<li><p><span class="menu">最適な表示サイズに変更 (Resize to fit)</span> (<span class="key">ALT</span> <span class="key">Y</span>) - ウィンドウを望ましいサイズにリサイズします。</p></li>
+<li><p><span class="menu">並べ換え (Arrange by)</span> - アイコンモード、またはミニアイコンモードでのみ利用できます。サブメニューによりさまざまなプロパティでの並び替えができます。</p>
 	<ul>
-	<li><p><span class="menu">Name</span>, <span class="menu">Real name</span>, <span class="menu">Size</span>, <span class="menu">Modified</span>, <span class="menu">Created</span>, <span class="menu">Kind</span>, <span class="menu">Location</span>, <span class="menu">Permissions</span></p></li>
-	<li><p><span class="menu">Reverse order</span> - Inverts the sorting order</p></li>
-	<li _translation_id="4339"><p><span class="menu">Clean up</span> (<span class="key">ALT</span> <span class="key">K</span>) - Aligns all icons to an invisible grid. Hold down <span class="key">SHIFT</span> and the menu becomes <span class="menu">Clean up all</span> which additionally sorts all icons according to the above selected criterium.</p></li>
+	<li><p><span class="menu">名前 (Name)</span>、<span class="menu">実名 (Real name)</span>、<span class="menu">サイズ (Size)</span>、<span class="menu">更新日時 (Modified)</span>、<span class="menu">作成日時 (Created)</span>、<span class="menu">種類 (Kind)</span>, <span class="menu">場所 (Location)</span>、<span class="menu">アクセス許可 (Permissions)</span></p></li>
+	<li><p><span class="menu">逆順にする (Reverse order)</span> - 並び替えを逆順にします</p></li>
+	<li _translation_id="4339"><p><span class="menu">アイコンの整列 (Clean up)</span> (<span class="key">ALT</span> <span class="key">K</span>) - すべてのアイコンを見えないグリッドに整列させます。<span class="key">SHIFT</span> を押しながら選択すると、メニューは <span class="menu">すべてを整列 (Clean up all)</span> となり、整列に加えて、すべてのアイコンを上記で選択されたキーで並び替えます。</p></li>
 	</ul></li>
-<li><p><span class="menu">Select...</span> (<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">A</span>) - Select files according to a <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression">regular expression</a>.</p></li>
-<li><p><span class="menu">Close</span> (<span class="key">ALT</span> <span class="key">W</span>) - Closes the window. Hold down <span class="key">SHIFT</span> and the menu becomes <span class="menu">Close all</span> which closes every Tracker window.</p></li>
-<li><p><span class="menu">Close all in workspace</span> (<span class="key">ALT</span> <span class="key">Q</span>) - Closes every Tracker window in the current workspace. A useful shortcut if you forgot to hold the <span class="key">OPT</span> key while clicking through folders and all those still open Tracker windows clutter your workspace.</p></li>
+<li><p><span class="menu">選択… (Select...)</span> (<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">A</span>) - ファイルを<a href="http://ja.wikipedia.org/wiki/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE" class="external free" title="Wikipedia: Regular expression">正規表現</a>で選択します。</p></li>
+<li><p><span class="menu">閉じる (Close)</span> (<span class="key">ALT</span> <span class="key">W</span>) - ウィンドウを閉じます。<span class="key">SHIFT</span> を押しながら選択すると、メニューは <span class="menu">すべて閉じる (Close all)</span> となり、すべての Tracker ウィンドウを閉じます。</p></li>
+<li><p><span class="menu">ワークスペース内のすべてを閉じる (Close all in workspace)</span> (<span class="key">ALT</span> <span class="key">Q</span>) - 現在のワークスペース中のすべての Tracker ウィンドウを閉じます。フォルダーをクリックする時に <span class="key">OPT</span> キーを押し忘れ、結果として開いた Tracker ウィンドウでワークスペースが散らかった場合に便利です。</p></li>
 </ul>
-<p>Sometimes you just want to rearrange a few icons without doing a complete <span class="menu">Clean up</span> (<span class="key">ALT</span> <span class="key">K</span>). In that case, you select these icons and start to drag them to their new location. Before you drop them there, keep <span class="key">ALT</span> pressed. This will align the icons to the invisible grid.</p>
-<p>The rest of the functions are pretty self-explanatory, leaving the Tracker preferences.</p>
+<p>しばしば、少しのアイコンを完全な <span class="menu">アイコンの整列 (Clean up)</span> (<span class="key">ALT</span> <span class="key">K</span>) を使わずに再整列したい場合があります。その場合、アイコンを選択して、新しい場所へドラッグします。アイコンをドロップする前に <span class="key">ALT</span> キーを押し続けます。これによりアイコンは見えないグリッドに整列されます。</p>
+<p>その他の機能は、Tracker 設定を除いて説明を要しない物です。</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="tracker-preferences" name="tracker-preferences">Tracker 設定</a></h3>
-<p><span class="menu">Window | Preferences...</span> opens a panel that offers a number of settings that, where not obvious, should become clear once tried out. Since all settings are applied live, you'll immediately see the changes.
-<br />So, in short, the not so obvious settings:</p>
+<a id="tracker-preferences" name="tracker-preferences">Tracker 環境設定</a></h3>
+<p><span class="menu">ウィンドウ (Window) | 設定… (Preferences...)</span> は、多くの設定項目を提供するパネルを開きます。それらは読んでわかる物では有りませんが、一度試せば明らかになるはずです。すべての設定はライブで適用されるので、変更した結果はすぐに見られるでしょう。<br />
+それでは、わかりにくい設定を手短に。</p>
 <ul>
-<li><p><span class="menu">Desktop</span> - Decide if all mounted disks appear directly on the Desktop or in a window after clicking a single Disk icon sitting on the Desktop.</p></li>
-<li><p><span class="menu">Windows</span> - You can set <span class="menu">Single window navigation</span>, i.e. a double-clicked folder doesn't open in its own window, but inside the already open window instead, replacing the view of it's parent folder. This is not the same as clicking while holding the <span class="key">OPT</span> key, as described above, because you'll lose the per window saved position and size.
-<br /><br /></p>
+<li><p><span class="menu">デスクトップ (Desktop)</span> - マウントされたディスクを、すべてデスクトップに表示するか、またはデスクトップ上の単独のディスク (Disks) アイコンをクリックして表示されるウィンドウ中に表示するかを決めます。</p></li>
+<li><p><span class="menu">ウィンドウ (Windows)</span> - <span class="menu">シングルウィンドウナビゲーション (Single window navigation)</span> を設定できます。つまり、フォルダーをダブルクリックすると、それ自身のウィンドウを開く代わりにすでに開いているウィンドウの中に開きます。これは上記の <span class="key">OPT</span> キーを押しながらクリックするのとは違います。なぜなら、ウィンドウごとに保存された位置やサイズを失うからです。<br /><br /></p>
 <img src="images/tracker-images/tracker-preferences-navigator.png" alt="tracker-preferences-navigator.png" />
-<p>Before you switch Tracker to Single Window Navigation mode, because that may feel more familiar to you, we recommend giving the menu based browsing a try first, as that may actually work much faster for you after getting used to. On the other hand, single window browsing offers a <i>Navigator</i> where you can enter or copy &amp; paste a path name and use back, forward and up buttons.</p> 
-<p>Activating <span class="menu">Type-ahead filtering</span> will filter the contents of a Tracker window while you type to only display the files matching your string in their name or any currently displayed attribute. See <a href="#type-ahead-filter">above</a>.</p></li>
-<li><p><span class="menu">Trash</span> - Set the behavior when deleting a file.</p></li>
-<li><p><span class="menu">Volume icons</span> - Set the color of an optional indicator of free space that's shown besides a disk's icon.</p></li>
+<p>シングルウィンドウナビゲーションモードへ Tracker を切り替える前に、よりなじんでいるかもしれないので、まずはメニューベースのブラウジングを試して見ることを勧めます。メニューベースに慣れた後では、実際にはるかに速く動作するかもしれません。一方、シングルウィンドウブラウズは<i>ナビゲーター</i>を提供します。そこには、パス名を入力したりコピー＆ペーストできます。また、戻る、進む、および上の階層へ移動のボタンを使用できます。</p> 
+<p> <span class="menu">先行入力フィルターを有効にする (Enable type-ahead filtering)</span>  を有効にすると、入力している間、入力文字列がファイル名または表示されている属性にマッチするファイルだけを表示するように、Tracker ウィンドウの内容をフィルタリングします。<a href="#type-ahead-filter">上記を</a>見てください。</p></li>
+<li><p><span class="menu">ごみ箱 (Trash)</span> - ファイルを削除する時の振る舞いを設定します。</p></li>
+<li><p><span class="menu">ディスクアイコン (Volume icons)</span> - ディスクアイコンの横に表示される空き容量表示の有無や色を設定します。</p></li>
 </ul>
-<p>This panel, by the way, is also available as <span class="app">Tracker</span> from Deskbar's <span class="menu">Preferences</span>.</p>
+<p>ところで、このパネルは Deskbar <span class="menu">プレファレンス</span> の <span class="app">Tracker</span>  としても利用できます。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="working-with-files" name="working-with-files">ファイルの操作</a></h2>
-<p>When invoked on a selected file, most of the <span class="menu">File</span> menu commands are also offered in the context menu by right-clicking that file.</p>
-<p>As usual the commands are pretty clear.</p>
+<a id="working-with-files" name="working-with-files">ファイル操作</a></h2>
+<p>ファイルを選択したときに呼び出される <span class="menu">ファイル (File)</span> メニューコマンドのほとんどは、そのファイルを右クリックしたときに呼ばれるコンテキストメニュー中にも表示されます。</p>
+<p>例によって、コマンドの使い方はかなり明白なものです。</p>
 <ul>
-<li><p><span class="menu">Find...</span> - Find a file or folder. See topic <a href="queries.html">Query</a> for more info.</p></li>
-<li><p><span class="menu">New</span> - Create a new folder or any other file based on a <i>template</i>.
-<br /><br /></p>
+<li><p><span class="menu">検索… (Find...)</span> - ファイルまたはフォルダーを検索します。より多くの情報を得るために<a href="queries.html">クエリ</a>のトピックを見てください。</p></li>
+<li><p><span class="menu">新規作成 (New)</span> - 新しいフォルダー、または<i>テンプレート</i>に基づいたファイルを作成します。<br /><br /></p>
 <img src="images/tracker-images/new-menu.png" alt="new-menu.png" />
-<p>Choosing <span class="menu">Edit templates...</span> opens the folder <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span>. Creating a file in that folder will offer its filetype with the file's name and other attributes as template in the <span class="menu">New</span> menu. Here, there's a file "Text" with the filetype <tt>text/plain</tt>. See topic <a href="filetypes.html">Filetypes</a> for more info.</p></li>
-<li><p><span class="menu">Open with...</span> - A submenu offers all applications that can handle this filetype.
-<br /><br /></p>
+<p><span class="menu">雛形を編集… (Edit templates...)</span> を選択すると、<span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span> フォルダーを開きます。そのフォルダーにファイルを作成すると、<span class="menu">新規作成 (New)</span> メニューのテンプレートとしてファイルの名前およびほかの属性を持ったファイルタイプを提供するでしょう。ここでは、ファイルタイプが <tt>text/plain</tt> であるファイル "Text" があります。より多くの情報については、<a href="filetypes.html">ファイルタイプ</a>のトピックを見てください。</p></li>
+<li><p><span class="menu">指定アプリケーションで開く… (Open with...)</span> - このサブメニューは、このファイルタイプを扱うことができるアプリケーションをすべて表示します。<br /><br /></p>
 <img src="images/tracker-images/open-with.png" alt="open-with.png" />
 
-<p>The preferred application that would open the file when double-clicked, is checkmarked. This submenu lists first those applications that can handle the exact filetype, in this case it's a text file, the type <tt>text/plain</tt>. Next come all applications that can handle that supertype in general, here <tt>text/*</tt>. Last in the list are those that can deal with any file. If you don't click on an app in the submenu, but on the <span class="menu">Open with...</span> entry instead, a panel opens:</p>
+<p>ファイルがダブルクリックされた時に、ファイルを開く優先アプリケーションにチェックマークがつきます。このサブメニューは最初に正確なファイルタイプ (この場合、タイプ <tt>text/plain</tt> であるテキストファイル) を扱うことができるアプリケーションをリストします。次に、ここで一般にそのスーパータイプ (ここでは <tt>text/*</tt>) を扱うことができるすべてのアプリケーションが,、最後に、任意のファイルに対処できるものがリストに入ります。サブメニュー中のアプリケーション名ではなく、<span class="menu">指定アプリケーションで開く… (Open with...)</span> をクリックする場合、代わりにパネルが開きます。</p>
 <br /><br />
 <img src="images/tracker-images/open-with-preferred.png" alt="open-with-preferred" />
-<p>Here you'll again find the programs that were listed in the submenu. By selecting one and clicking the <span class="button">Open and make preferred</span> button, you changed the preferred application for every file of that filetype, here <tt>text/plain</tt>.</p></li>
-<li><span class="menu">Get info</span>
+<p>ここで、再びサブメニューにプログラムのリストを見つけるでしょう。1　つを選択して、<span class="button">関連づけて開く (Open and make preferred)</span> ボタンをクリックすると、そのファイルタイプ (ここでは <tt>text/plain</tt>) を持つすべてのファイルに対する優先アプリケーションを変更できます。</p></li>
+<li><span class="menu">詳細情報… (Get info)</span>
 <br /><br />
 <img src="images/tracker-images/get-info.png" alt="get-info" />
-<p>The panel presents info on the selected file and lets you set the default application and, after you expanded that part of the panel, permissions and owner. Clicking on the path will open it in a Tracker window.</p></li>
-<li><p><span class="menu">Edit name</span>, <span class="menu">Duplicate</span> and <span class="menu">Move to trash</span> - lets you rename or duplicate a file or put the selected file(s) to the trash.</p></li>
-<li><p><span class="menu">Move to</span>, <span class="menu">Copy to</span> and <span class="menu">Create link</span> - lets you move, copy or link the selected file(s) using the submenu navigating method. Holding <span class="key">SHIFT</span> while invoking the menu offers the option to create a relative link.</p></li>
-<li><p><span class="menu">Cut</span>, <span class="menu">Copy</span> and <span class="menu">Paste</span> - lets you cut, copy and paste files using the clipboard. By holding <span class="key">SHIFT</span> while invoking the menu you can <span class="menu">Copy/Cut more</span> files, maybe from another folder that you can paste somewhere else later. Also, while holding <span class="key">SHIFT</span> you can paste the copied files in the clipboard as links.</p></li>
-<li><p><span class="menu">Identify</span> - will sniff out and set the type of files if they didn't have one before, e.g. if you transferred a file with <span class="cli">wget</span> which doesn't set a filetype itself. Holding <span class="key">SHIFT</span> while invoking the menu changes the item to <span class="menu">Force identify</span> which identifies the filetype and corrects it if it was false before.</p></li>
-<li><p><span class="menu">Add-Ons</span> - offers you every generic Tracker add-on and those that can handle the selected file(s). See topic <a href="tracker-add-ons.html">Tracker Add-ons</a> for more information.</p></li>
+<p>パネルは、選択されたファイルの情報の表示、およびデフォルトアプリケーションの設定が行えます。また、パネルの一部を拡げると、ファイルのパーミッションおよび所有者を設定できます。パスをクリックすると、Tracker ウィンドウ中にファイルを開きます。</p></li>
+<li><p><span class="menu">名前の変更 (Edit name)</span>, <span class="menu">複製 (Duplicate)</span>、および <span class="menu">ごみ箱に捨てる (Move to Trash)</span> - ファイル名の編集、ファイルの複製、または選択したファイルをごみ箱へ移動できます。</p></li>
+<li><p><span class="menu">指定先に移動 (Move to)</span>、<span class="menu">指定先にコピー (Copy to)</span>、および <span class="menu">指定先にリンクを作成 (Create link)</span> - サブメニューナビゲーション方法を使用して、選択したファイルの移動、コピー、またはリンクができます。メニューを起動する間に <span class="key">SHIFT</span> を押し続けると、相対リンクを作成するオプションを提供します。</p></li>
+<li><p><span class="menu">切り取り (Cut)</span>、<span class="menu">コピー (Copy)</span>、および <span class="menu">貼り付け (Paste)</span> - クリップボードを使ってファイルのカット、コピー、そしてペーストができます。メニューを起動する間に <span class="key">SHIFT</span> を押し続けることによって、おそらく別のフォルダーからファイルを <span class="menu">さらにコピー / 切り取り (Copy/Cut more)</span> でき、後でほかのどこかにペーストできます。さらに、<span class="key">SHIFT</span> を押し続ける間、クリップボードにコピーされたファイルをリンクとしてペーストできます。</p></li>
+<li><p><span class="menu">ファイル形式を判別 (Identify)</span> - ファイルタイプを見つけ出して、たとえば、<span class="cli">wget</span> でファイルを転送した場合のように、ファイルがファイルタイプを持っていなければ、セットするでしょう。メニューを起動する間に <span class="key">SHIFT</span> を押していると、メニューは <span class="menu">ファイル形式を判別 (Force identify)</span> に変わります。これは、ファイルタイプを識別し、誤りだった場合は修正します。</p></li>
+<li><p><span class="menu">アドオン (Add-ons)</span> - すべての一般的な Tracker アドオンと、選択されたファイルを扱えるアドオンを表示します。詳しくは、<a href="tracker-add-ons.html">Tracker アドオン</a>のトピックを見てください。</p></li>
 </ul>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="transaction-status" name="transaction-status">操作状態</a></h2>
-<p>When you copy, move or delete files, Tracker shows its progress with a status window. If you initiate more than one transaction, each job gets its own status display.</p>
+<a id="transaction-status" name="transaction-status">処理状況</a></h2>
+<p>ファイルをコピー、移動、または削除する場合、Tracker は進行状況をステータスウィンドウで表示します。1 つ以上の処理を始めた場合、ジョブ毎に状態が表示されます。</p>
 <img src="images/tracker-images/transaction-status.png" alt="transaction-status.png" />
-<p>To the right are two buttons to pause or stop a transaction entirely. Sometimes it can be useful to temporarily pause a large transaction. For example, you may need to quickly launch a large application. Copying large amounts of data chokes your harddisk's IO bandwidth and thus delays your workflow.</p>
+<p>右側に、処理を休止あるいは完全に止めるための 2 個のボタンがあります。時々、大きな処理を一時的に休止することは有用かもしれません。たとえば、大きなアプリケーションを速く起動する必要があるかもしれません。大量のデータのコピーはあなたのハードディスクの I/O 帯域幅を詰まらせ、したがってワークフローを遅らせます。</p>
 
 </div>
 </div>
@@ -200,7 +196,7 @@ This type-ahead filtering is set in the <a href="#tracker-preferences.html">Trac
 <div class="nav">
 <div class="inner"><span>
  «  <a href="teammonitor.html">チームモニター</a> 
-::  <a href="contents.html" class="uplink">目次</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="tracker-add-ons.html">Tracker アドオン</a>  »
 </span></div>
 </div>

@@ -12,6 +12,7 @@
  * Translators:
  *		thebowseat
  *		log-1
+ *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -23,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -53,23 +54,23 @@
 <div id="content">
 <div>
 
-<h2><img src="../../images/apps-images/screenshot-icon_64.png" alt="screenshot-icon_64.png" width="64" height="64" />スクリーンショット</h2>
+<h2><img src="../../images/apps-images/screenshot-icon_64.png" alt="screenshot-icon_64.png" width="64" height="64" />スクリーンショット (Screenshot)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><span class="menu">アプリケーション (Applications)</span></td></tr>
-<tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/Screenshot</span><br />
+<tr><td>Deskbar メニュー:</td><td style="width:15px;"></td><td><span class="menu">Applications (アプリケーション)</span></td></tr>
+<tr><td>場所:</td><td></td><td><span class="path">/boot/system/apps/Screenshot</span><br />
 <span class="path">/bin/screenshot</span></td></tr>
-<tr><td>設定ファイル：</td><td></td><td><span class="path">~/config/settings/screenshot</span></td></tr>
+<tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/screenshot</span></td></tr>
 </table>
 <p><br /></p>
-<p>スクリーンショットはスクリーンショットアプリケーションを起動するか <span class="key">PRINT</span> キーを押すことで撮ることができます。</p>
+<p>スクリーンショットは、スクリーンショットアプリケーションを起動するか、<span class="key">PRINT</span> キーを押すことで撮ることができます。</p>
 <p><img id="sreenshot" src="../images/apps-images/screenshot.png" alt="screenshot.png" /></p>
-<p>スクリーンショットパネルの中ではスクリーン全体を撮るかアクティブなウィンドウだけをとるか選べ、ウィンドウの境界とマウスを入れるかどうか選べます。さらにスクリーンショットを撮る前の延長時間も設定できます。</p>
-<p>その下に名前、フォーマットと <span class="button">保存</span> をクリックしたときの保存場所を指定します。ファイルをディスクに保存せず、 <span class="button">クリップボードにコピー</span> してほかのアプリケーションに直接貼り付けるか、 <span class="button">新しいスクリーンショット</span> を撮ることもできます。</p>
+<p>スクリーンショットパネルの中ではスクリーン全体を撮るかアクティブなウィンドウだけを撮るか選べ、ウィンドウの境界とマウスを入れるかどうか選べます。さらにスクリーンショットを撮る前の延長時間も設定できます。</p>
+<p>その下に名前、フォーマットと <span class="button">保存 (Save)</span> をクリックしたときの保存場所を指定します。ファイルをディスクに保存せず、<span class="button">クリップボードにコピー (Copy to clipboard)</span> してほかのアプリケーションに直接貼り付けるか、<span class="button">新しいスクリーンショット (New screenshot)</span> を撮ることもできます。</p>
 <p>設定はすべて記憶されるので、次にスクリーンショットを撮る時に便利なキーボードショートカットを使えます：</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="key">PRINT</span></td><td style="width:15px;"></td><td>遅延時間なしでスクリーンショットを撮り、スクリーンショットパネルを開きます。</td></tr>
-<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">PRINT</span></td><td></td><td>最後に用いた設定を引き継いで、静かに（パネルを開かずに）スクリーンショットを撮影します。</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">PRINT</span></td><td></td><td>同様に保存された設定で静かにスクリーンショットを撮影しますが、それをファイルとして保存する代わりに、ただクリップボードにコピーします。</td></tr>
+<tr><td><span class="key">PRINT</span></td><td style="width:15px;"></td><td>すぐにスクリーンショットを撮り、スクリーンショットパネルを開きます。</td></tr>
+<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">PRINT</span></td><td></td><td>最後に用いた設定を引き継いで、静かに (パネルを開かずに) スクリーンショットを撮影します。</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">PRINT</span></td><td></td><td>同様に保存された設定で静かにスクリーンショットを撮影しますが、それをファイルとして保存する代わりに、クリップボードにコピーします。</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -81,8 +82,8 @@
 
 screenshot [OPTIONS] [FILE]  スクリーンのビットマップを作成します
 
-FILE は silent mode のときに使われる保存場所/ファイル名です。 存在するファイルは警告なしに上書きされます。
-FILE が指定されてない場合スクリーンショットはユーザーのホームディレクトリにデフォルトの名前で保存されます。
+FILE は、silent mode のときに使われる保存場所 / ファイル名です。存在するファイルは警告無しに上書きされます。
+FILE が指定されてない場合、スクリーンショットはユーザーのホームディレクトリにデフォルトの名前で保存されます。
 
 オプション
   -m, --mouse-pointer   マウスポインタを含める

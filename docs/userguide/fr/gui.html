@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2011, Haiku. All rights reserved.
+ * Copyright 2008-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -22,7 +22,7 @@
 <body>
 
 <div id="banner">
-<div><span>Guide de l’utilisateur</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -43,14 +43,25 @@
 <li><a href="../en/gui.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="filesystem-layout.html">Structure du système de fichiers</a> 
-::  <a href="contents.html" class="uplink">Sommaire</a> 
-::  <a href="workspaces.html">Espaces de travail</a>  »
+ «  <a href="filesystem-layout.html">Filesystem layout</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="workspaces.html">Workspaces</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td>
+		<a href="#move-resize">Déplacer et retailler facilement</a><br />
+                <a href="#stack-tile">Empiler &amp; juxtaposer</a><br />
+                <a href="#open-save-panel">Dialogues d'ouverture et de fermeture</a><br />
+                <a href="#replicants">Réplicants</a>
+    </td></tr>
+</table>
 
 <h1>L'interface graphique de Haiku</h1>
 
@@ -70,13 +81,32 @@
 </ol>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="move-resize" name="move-resize">Une manière rapide de déplacer ou redimensionner les fenêtres</a></h2>
+<a id="move-resize" name="move-resize">Une manière rapide de déplacer ou retailler les fenêtres</a></h2>
 <p>Le déplacement et le redimensionnement des fenêtres est une partie importante de l’interaction avec les applications qui s'exécutent simultanément. Plutôt que de viser le petit onglet jaune du titre, ou la bordure de fenêtre encore plus fine, il existe un moyen plus pratique pour déplacer une fenêtre. De même, le petit coin de redimensionnement  a une autre limitation : Il permet seulement un redimensionnement de l'angle inférieur droit.</p>
 <p>Pour répondre à ces questions, Haiku fournit une solution élégante pour manipuler les fenêtres à l'aide de la combinaison des touches <span class="key">CTRL</span> <span class="key">ALT</span> et la souris. Référez-vous au chapitre <a href="keyboard-shortcuts.html#general">Raccourcis claviers</a> pour d'autres combinaisons
 de touches concernant la gestion des fenêtres.</p>
 <img src="images/gui-images/resizing.png" alt="resizing.png" />
 <p>L’enfoncement des touches <span class="key">CTRL</span> <span class="key">CMD</span> enfoncées mettra en évidence les bordures les plus proches du pointeur de la fenêtre dans laquelle se trouve la souris. Déplacez la souris vers une autre bordure pour changer de cible. Cliquez avec le <i>bouton droit de la souris</i> puis faites la glisser pour redimensionner la fenêtre au niveau des bordure en surbrillance.</p>
 <p>En maintenant les touches <span class="key">CTRL</span> <span class="key">CMD</span> enfoncées, cliquez avec le <i>bouton gauche de souris</i> n'importe où dans une fenêtre, puis faites glisser la souris pour déplacer la fenêtre. Un simple clic avec le <i>bouton droit de la souris</i> envoie la fenêtre en arrière plan.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="stack-tile" name="stack-tile">Empiler &amp; juxtaposer</a></h2>
+<p>Haiku's user interface provides a unique feature that puts the fact that windows have a yellow tab instead of a full-width title bar to perfect use. It's called "Stack &amp; Tile".<br />
+In the example below, a Tracker window with bookmarks is tiled to the left of a WebPositive window, which itself is stacked with another Tracker window showing the source folder <tt>haiku</tt>. In this animation, the user clicks on the tabs of the stacked windows to alternately bring one or  the other to the front.</p> 
+<img src="images/gui-images/gui-s+t.gif" alt="gui-s+t.gif" />
+<p>Connected like this, the group of windows can be moved and resized together - a nice arrangement to work in a more project centric environment. Instead of looking for the right browser window with documentation, editor and Tracker windows and maybe a related email concerning one project you are currently working on, just stack&amp;tile them together.</p>
+<p>Doing the actual arranging of windows is easy: Hold down <span class="key">OPT</span> while dragging a window by its tab close to another window's tab or border until it's highlighted and release the mouse button.</p>
+<p>Stack &amp; Tile consists of two related parts.</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><img src="images/gui-images/gui-stacking.png" alt="gui-stacking.png" /></td><td width="10"></td>
+<td><p>"<i>Stacking</i>" is putting windows on top of each other, automatically moving the yellow tabs into position.<br />
+While holding <span class="key">OPT</span>, tabs change color when they overlap; drop the window to establish the stacking.</p></td></tr></table>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2" vspace="10">
+<tr><td><img src="images/gui-images/gui-tiling.png" alt="gui-tilinging.png" /></td><td></td>
+<td><p>"<i>Tiling</i>" means gluing windows horizontally or vertically together.<br />
+Again, while holding <span class="key">OPT</span>, the borders that'll fuse together when you drop the window change color when brought near each other.</p></td></tr></table>
+<p>Separation is done in the same way, by holding <span class="key">OPT</span> while dragging a window by its tab out of the group.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -126,9 +156,9 @@ Un clic droit sur la poignée d'un Réplicant ouvrira un menu contextuel, où <s
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="filesystem-layout.html">Structure du système de fichiers</a> 
-::  <a href="contents.html" class="uplink">Sommaire</a> 
-::  <a href="workspaces.html">Espaces de travail</a>  »
+ «  <a href="filesystem-layout.html">Filesystem layout</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="workspaces.html">Workspaces</a>  »
 </span></div>
 </div>
 

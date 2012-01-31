@@ -12,6 +12,7 @@
  * Translators:
  *		hiromu1996
  *		log-1
+ *		mt
  *
 -->
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -23,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -44,21 +45,21 @@
 <li><a href="../../en/applications/icon-o-matic.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="expander.html">Expander</a> 
+ «  <a href="expander.html">ファイル解凍</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
-::  <a href="installer.html">インストーラー (Installer)</a>  »
+::  <a href="installer.html">インストーラー</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>インデックス</td></tr>
-<tr class="index"><td><a href="#bitmap-vector">BeOS bitmap vs. Haiku vector icons</a><br />
+<tr class="index"><td><a href="#bitmap-vector">BeOS ビットマップアイコン vs. Haiku ベクトルアイコン</a><br />
                 <a href="#icons-attributes">ファイルの属性としてのアイコン</a><br />
-                <a href="#i-o-m">Icon-O-Maticでアイコンをつくる</a><br />
+                <a href="#i-o-m">Icon-O-Matic でアイコンを作成する</a><br />
                   <a href="#i-o-m-path">パス</a><br />
                   <a href="#i-o-m-shape">シェイプ</a><br />
                   <a href="#i-o-m-style">スタイル</a><br />
@@ -70,27 +71,27 @@
 <h2><img src="../../images/apps-images/icon-o-matic-icon_64.png" alt="icon-o-matic-icon_64.png" width="64" height="64" />Icon-O-Matic</h2>
 
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><span class="menu">アプリケーション (Applications)</span></td></tr>
-<tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/Icon-O-Matic</span></td></tr>
-<tr><td>設定ファイル：</td><td></td><td><span class="path">~/config/settings/Icon-O-Matic</span></td></tr>
+<tr><td>Deskbar メニュー:</td><td style="width:15px;"></td><td><span class="menu">Applications (アプリケーション)</span></td></tr>
+<tr><td>場所:</td><td></td><td><span class="path">/boot/system/apps/Icon-O-Matic</span></td></tr>
+<tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/Icon-O-Matic</span></td></tr>
 </table>
 
 <p><br /></p>
 
-<p>Icon-O-Maticでのアイコン作成についての話の前に、少しHaikuのアイコンの話があります。</p>
+<p>Icon-O-Matic でのアイコン作成についての話の前に、少し Haiku のアイコンの話があります。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="bitmap-vector" name="bitmap-vector">BeOS bitmap vs. Haiku vector icons</a></h2>
-<p>BeOSとは違い、Haikuはビットマップアイコンではなくベクトルアイコンを採用しています。Haiku Vector Icon Format (HVIF)はファイルサイズの最適化と高速なレンダリングを目的に開発されました。なので、たいていの場合でHaikuのアイコンはビットマップや一般的なSVG形式よりも<i>非常に</i>小さなサイズになっています。また、HaikuのアイコンはBeOSのビットマップアイコンとは異なり、色が8ビット(256色)に限られていません。<br />
-例えばTerminalのアイコンは以下のようになっています:</p>
+<a id="bitmap-vector" name="bitmap-vector">BeOS ビットマップアイコン vs. Haiku ベクトルアイコン</a></h2>
+<p>BeOS とは違い、Haiku はビットマップアイコンではなくベクトルアイコンを採用しています。Haiku Vector Icon Format (HVIF) はファイルサイズの最適化と高速なレンダリングを目的に開発されました。なので、たいていの場合で、Haiku のアイコンはビットマップや一般的な SVG 形式よりも<i>非常に</i>小さなサイズになっています。また、Haiku のアイコンは BeOS のビットマップアイコンとは異なり、色が 8 ビット (256 色) に限られていません。<br />
+たとえば、ターミナルのアイコンは以下のようになっています:</p>
 <table border="0" cellpadding="10">
         <tr align="center"><td><b>ビットマップアイコン</b></td><td><b>SVG</b></td><td><b>HVIF</b></td></tr>
         <tr align="center"><td><img src="../../images/apps-images/i-o-m-terminal-bitmap32.png" alt="i-o-m-terminal-bitmap32" width="32" height="32" /> <img src="../../images/apps-images/i-o-m-terminal-bitmap16.png" alt="i-o-m-terminal-bitmap16" width="16" height="16" /></td><td style="width:100px"><img src="../../images/apps-images/terminal-icon_32.png" alt="terminal-icon_32" width="32" height="32" /></td><td><img src="../../images/apps-images/terminal-icon_32.png" alt="terminal-icon_32" width="32" height="32" /></td></tr>
         <tr align="center"><td>1,024 byte<br />+ 256 byte</td><td> 7,192 byte </td><td> 768 byte </td></tr>
 </table>
-<p>BeOSのビットマップアイコンはリストやアイコンビューモードでもきれいに見えるように16x16と32x32の2種類のサイズが用意されています。</p>
-<p>ベクトルアイコンでは、このような仕組みは必要ありません。ベクトルアイコンは数百バイトの容量だけで、ビットマップよりもきれいに拡大縮小することができます。</p>
+<p>BeOS のビットマップアイコンはリストやアイコンビューモードでもきれいに見えるように 16x16 と 32x32 の 2 種類のサイズが用意されています。</p>
+<p>ベクトルアイコンでは、このような仕組みは必要ありません。ベクトルアイコンは数百バイトの容量だけで、ビットマップよりもきれいに拡大縮小できます。</p>
 <table border="0" cellpadding="10">
         <tr align="center"><td> </td><td><b>16x16</b></td><td><b>32x32</b></td><td><b>64x64</b></td><td><b>128x128</b></td></tr>
         <tr align="center"><td><b>ビットマップアイコン</b></td>
@@ -109,35 +110,35 @@
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="icons-attributes" name="icons-attributes">ファイルの属性としてのアイコン</a></h2>
-<p>アイコンはファイルの属性として設定されます。ですが、Tracker でアイコンが表示されるように全てのファイルにを設定する必要はありません。例えば、データファイルはファイルタイプに応じたアイコンが表示されます。全体のファイルタイプに対するアイコンを設定するには、<span class="app">FileTypes</span>を使用してください。また、個々のファイルにアイコンを設定するには、<span class="app">FileType add-on</span>を使用してください。詳しいは<a href="../filetypes.html">Filetypes</a>をご覧ください。</p>
-<div class="box-info">アイコンはメタデータの格納をサポートしているファイルシステムでしか保存できません。ですから、ファイルをBFSのパーティションから移動させるときにアイコンなどの属性を保持させておくには、zipなどでアーカイブしてください。</div>
+<p>アイコンはファイルの属性として設定されます。ですが、Tracker でアイコンが表示されるようにすべてのファイルを設定する必要はありません。たとえば、データファイルはファイルタイプに応じたアイコンが表示されます。全体のファイルタイプに対するアイコンを設定するには、<span class="app">FileTypes</span>を使用してください。また、個々のファイルにアイコンを設定するには、<span class="app">FileType アドオン</span>を使用してください。詳しいは<a href="../filetypes.html">ファイルタイプ</a>を見てください。</p>
+<div class="box-info">アイコンはメタデータの格納をサポートしているファイルシステムでしか保存できません。ですから、ファイルを BFS のパーティションから移動させるときにアイコンなどの属性を保持させておくには、zip などでアーカイブしてください。</div>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="i-o-m" name="i-o-m">Icon-O-Maticでアイコンをつくる</a></h2>
-<p>Icon-O-MaticはHaikuのアイコンエディタで、HVIF, SVG, PNGの形式での保存をサポートしています。既存のファイルのアイコンを直接保存することも可能ですし、開発者向けにアイコンデータをファイルに出力させることもできます。このアプリケーションはHVIF形式に最適化されているので、HVIFの内部仕様を編集することができます。</p>
-<p>他の一般的なベクトルグラフィックソフトとは異なり、パスや輪郭線の幅、塗りの色などを個々に調整する必要はありません。リストからオブジェクト(シェイプ)や色(スタイル)を選択して、プロパティを設定することで描画することができます。このパーツの再利用を行う仕組みはデザインに制約が課しますが、HVIFの効率性を高めています。<br />
-例えば、パスを再利用することでいくつかのオブジェクトを一つのパスからまとめて変更することができるようになります。パスを変更するだけでオブジェクトの影も自動的に調整される、といったことも可能になります。</p>
+<a id="i-o-m" name="i-o-m">Icon-O-Matic でアイコンをつくる</a></h2>
+<p>Icon-O-Matic は Haiku のアイコンエディタで、HVIF、SVG、PNG の形式での保存をサポートしています。既存のファイルのアイコンを直接保存することも可能ですし、開発者向けにアイコンデータをファイルに出力させることもできます。このアプリケーションは HVIF 形式に最適化されているので、HVIF の内部仕様を編集できます。</p>
+<p>ほかの一般的なベクトルグラフィックソフトとは異なり、パスや輪郭線の幅、塗りの色などを個々に調整する必要はありません。リストからオブジェクト (シェイプ) や色 (スタイル) を選択して、プロパティを設定することで描画できます。このパーツの再利用を行う仕組みはデザインに制約が課しますが、HVIF の効率性を高めています。<br />
+たとえば、パスを再利用することでいくつかのオブジェクトを一つのパスからまとめて変更することができます。パスを変更するだけでオブジェクトの影も自動的に調整される、といったことも可能になります。</p>
 
 <p>下の画像が、Icon-O-Maticのウィンドウの概観です。</p>
 <img src="../images/apps-images/i-o-m-overview.png" alt="i-o-m-overview.png" />
 
-<p>キャンバスにオブジェクトを作るには、<span class="menu">シェイプ</span>メニューからシェイプとパスとスタイルを選ぶ必要があります。すべてのオブジェクト(パス, シェイプ, スタイル, Transformer)の要素のリストがそれぞれ用意されていて、<span class="menu">プロパティ</span>メニューから要素のオプションを設定することができます。</p>
+<p>キャンバスにオブジェクトを作るには、<span class="menu">シェイプ</span>メニューからシェイプとパスとスタイルを選ぶ必要があります。すべてのオブジェクト(パス, シェイプ, スタイル, Transformer)の要素のリストがそれぞれ用意されていて、<span class="menu">プロパティ</span>メニューから要素のオプションを設定できます。</p>
 
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="i-o-m-path" name="i-o-m-path">パス</a></h3>
-<p>パスはいくつかの点が直線かベジェ曲線で繋げられて構成されます。点の追加や変更を行う際には、パスのリストから変更するパスを選択して下さい。</p>
+<p>パスはいくつかの点が直線かベジェ曲線で繋げられて構成されます。点の追加や変更を行う際には、パスのリストから変更するパスを選択してください。</p>
 
-<p>キャンバスでクリックをすると最初の点が決められます。パスを作っていくときに、クリックで点を追加していくと直線で、クリックしたままドラッグするようにマウスを動かしていくと曲線で点が結ばれていきます。当然、あとから直線と曲線を変更することもできます。</p>
+<p>キャンバスでクリックをすると最初の点が決まります。パスを作っていくときに、クリックで点を追加していくと直線で、クリックしたままドラッグするようにマウスを動かしていくと曲線で点が結ばれていきます。当然、あとから直線と曲線を変更することもできます。</p>
 
 <img src="../../images/apps-images/i-o-m-path-ab.png" alt="i-o-m-path-ab" />
 
-<p>「A」の状態から「B」へ変更するには、直線を曲線へと変更させる必要があります。<span class="key">ALT</span>を押しながら点をクリックするとハンドルが表示されます。ハンドルは対称的に動くので、片方のハンドルがもう片方の動きに追従する形で調整されていきます。直線を曲線にするには、<span class="key">ALT</span>を押しながらハンドルを動かして調整していきます。逆に、直線に戻すには<span class="key">ALT</span>を押しながら点をクリックしてください。</p>
+<p>「A」の状態から「B」へ変更するには、直線を曲線へと変更させる必要があります。<span class="key">ALT</span> を押しながら点をクリックするとハンドルが表示されます。ハンドルは対称的に動くので、片方のハンドルがもう片方の動きに追従する形で調整されていきます。直線を曲線にするには、<span class="key">ALT</span>  を押しながらハンドルを動かして調整していきます。逆に、直線に戻すには、<span class="key">ALT</span> を押しながら点をクリックしてください。</p>
 
-<p>ドラッグアンドドロップで点を移動することができます。<span class="key">SHIFT</span>を押しながら四角形を書くようにして複数の点を選択することもできます。選択された点は赤い枠で囲まれます。<br />
-パスに点を追加するには、2点間の線上をクリックします。また、パスから点を削除するには<span class="key">DEL</span>を押すか、<span class="key">CTRL</span>を押しながら点をクリックします。</p>
+<p>ドラッグ＆ドロップで点を移動できます。<span class="key">SHIFT</span> を押しながら四角形を書くようにして複数の点を選択することもできます。選択された点は赤い枠で囲まれます。<br />
+パスに点を追加するには、2 点間の線上をクリックします。また、パスから点を削除するには<span class="key">DEL</span> を押すか、<span class="key">CTRL</span> を押しながら点をクリックします。</p>
 
 <p>マウスポインタは現在のモードを示しています。</p>
 <table summary="Mouse pointer states, Path" border="0" cellpadding="10">
@@ -162,8 +163,8 @@
 <table summary="Path context" border="0" cellspacing="0" cellpadding="2">
 <tr><td class="onelinetop"><span class="menu">Select all</span></td><td style="width:70px"><span class="key">ALT</span> <span class="key">A</span></td><td>Selects all points of the current path.</td></tr>
 <tr><td><span class="menu">変更する</span></td><td><span class="key">ALT</span> <span class="key">T</span></td><td>選択された点がすべてトランスフォームボックスでまとめられて、移動、サイズ変更、回転を一気に行うことができます。ちょうど後で説明されるシェイプのような働きをします。</td></tr>
-<tr><td><span class="menu">分割</span></td><td></td><td>点が同じ座標に位置するように2つに分けられます。</td></tr>
-<tr><td><span class="menu">反転</span></td><td></td><td>選択された点が180°回転します。直線では変化が起こりません。</td></tr>
+<tr><td><span class="menu">分割</span></td><td></td><td>点が同じ座標に位置するように 2 つに分けられます。</td></tr>
+<tr><td><span class="menu">反転</span></td><td></td><td>選択された点が 180° 回転します。直線では変化が起こりません。</td></tr>
 <tr><td><span class="menu">削除</span></td><td><span class="key">DEL</span></td><td>選択された点を削除します</td></tr>
 </table>
 
@@ -171,25 +172,25 @@
 <p><span class="menu">パス</span>のメニューには<span class="menu">四角形を追加</span>・<span class="menu">円を追加</span>・<span class="menu">複製</span>・<span class="menu">削除</span>などの明快なエントリがたくさんあるので、説明が必要なものだけ紹介します。</p>
 
 <table summary="Path menu" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">反転</span></td><td style="width:15px;"></td><td>パスが「閉じていない」場合(パスのプロパティを参照)、キャンバスをクリックすると点が作られて最後に作られた点と繋げられます。ですが、「反転」を押すと、作った点が一番最初の点と繋げられるようになります。</td></tr>
+<tr><td><span class="menu">反転</span></td><td style="width:15px;"></td><td>パスが「閉じていない」場合(パスのプロパティを参照)、キャンバスをクリックすると点が作られて最後に作られた点と繋げられます。ですが、「反転」を押すと、作った点が最初の点と繋げられるようになります。</td></tr>
 <tr><td><span class="menu">クリーンアップ</span></td><td></td><td>冗長な点を削除する機能で、SVGを開くときに有用です。</td></tr>
-<tr><td class="onelinetop"><span class="menu">インデックスを順に辿る</span></td><td><span class="key">ALT</span> <span class="key">R</span></td><td>閉じていないパスの線で結ばれていない部分が順に移って行きます。例えば、パスが⊂のような形をしていたなら、形は次のように移っていきます: ⊂ ∩ ⊃ ∪</td></tr>
+<tr><td class="onelinetop"><span class="menu">インデックスを順に辿る</span></td><td><span class="key">ALT</span> <span class="key">R</span></td><td>閉じていないパスの線で結ばれていない部分が順に移って行きます。たとえば、パスが⊂のような形をしていたなら、形は次のように移っていきます: ⊂ ∩ ⊃ ∪</td></tr>
 <tr><td class="onelinetop"><span class="menu">インデックスを逆順に辿る</span></td><td><span class="key">ALT</span> <span class="key">SHIFT</span> <span class="key">R</span></td><td>上と同じ事を逆順で行います。</td></tr>
 </table>
 
 <h4><a id="i-o-m-path-properties" name="i-o-m-path-properties">パスのプロパティ</a></h4>
-<p>ウィンドウの下部にある<span class="menu">プロパティ</span>メニューで現在選択されているオブジェクトの設定を行えます。パスは次の2つの設定ができます:<span class="menu">名前</span>, <span class="menu">閉じている</span></p>
+<p>ウィンドウの下部にある<span class="menu">プロパティ</span>メニューで現在選択されているオブジェクトの設定を行えます。パスは次の 2 つの設定ができます:<span class="menu">名前</span>, <span class="menu">閉じている</span></p>
 
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="i-o-m-shape" name="i-o-m-shape">シェイプ</a></h3>
 <p>シェイプはいくつかのパスとスタイルの集合として、キャンバスではオブジェクトのように表されます。パスとスタイルのグルーピングは、シェイプを選択した状態で、それぞれのリストのチェックボックスから設定できます。</p>
-<p>シェイプは、パスやスタイルがどのように適応されるか、例えば、塗りつぶすのか輪郭線だけ色を塗るのか(Transformerが使われますが、詳しくは後述)などを決めていくことで形作られます。また、シェイプをつかうと、パスを操作することなく回転やサイズ変更などができるようになります(1つのパスだけを操作することもできます)。</p>
+<p>シェイプは、パスやスタイルがどのように適応されるか、たとえば、塗りつぶすのか輪郭線だけ色を塗るのか (Transformerが使われますが、詳しくは後述) などを決めていくことで形作られます。また、シェイプをつかうと、パスを操作することなく回転やサイズ変更などができるようになります (1 つのパスだけを操作することもできます)。</p>
 
 <img src="../../images/apps-images/i-o-m-shape.png" alt="i-o-m-shape" />
 
-<p>シェイプがリストから選択されると、シェイプの周りに四角形があらわれます。その四角形を操作することで移動やサイズ変更、真ん中の点(この点を移動させることもできます)を中心に回転させるなどを行うことができます。<span class="key">SHIFT</span>を押しながら操作することで、移動の方向を限定したり、サイズ変更の際に縦横比を変えないようにしたり、回転の際に45°単位で回転するようにしたりすることができます。
+<p>シェイプがリストから選択されると、シェイプの周りに四角形が現れます。その四角形を操作することで移動やサイズ変更、真ん中の点 (この点を移動させることもできます) を中心に回転させるなどを行うことができます。<span class="key">SHIFT</span> を押しながら操作することで、移動の方向を限定したり、サイズ変更の際に縦横比を変えないようにしたり、回転の際に 45° 単位で回転するようにしたりできます。
 <br />
 マウスポインタで現在のモードが表されます。</p>
 <table summary="Mouse pointer states, Shape" border="0" cellpadding="10">
@@ -212,17 +213,17 @@
 <h4><a id="i-o-m-shape-menu" name="i-o-m-path-menu">シェイプのメニュー</a></h4>
 <p><span class="menu">シェイプ</span>のメニューには<span class="menu">空のシェイプを追加する</span>・<span class="menu">パスとともに追加</span>・<span class="menu">スタイルと共に追加</span>・<span class="menu">パスとスタイルつきで追加</span>・<span class="menu">複製</span>・<span class="menu">削除</span>といったものの他にこのようなエントリがあります。</p>
 <table summary="Shape menu" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">変形をリセット</span></td><td style="width:15px;"></td><td>シェイプに対する全ての移動、サイズ変更、回転を元に戻します。</td></tr>
+<tr><td><span class="menu">変形をリセット</span></td><td style="width:15px;"></td><td>シェイプに対するすべての移動、サイズ変更、回転を元に戻します。</td></tr>
 <tr><td class="onelinetop"><span class="menu">変形を維持する</span></td><td></td><td>シェイプを変形させたときに、パスはもともとの場所から動きません。もし、パスを2つ以上つかっているなら、<span class="menu">オプション | グリッドに沿う</span>を正確に点をうつために使っていることでしょう。<br />
-「変形を維持する」を使うと、「変形をリセット」してもその時点までしかもどらなくなります。</td></tr>
+「変形を維持する」を使うと、「変形をリセット」してもその時点までしか戻らなくなります。</td></tr>
 </table>
 
 <h4><a id="i-o-m-shape-properties" name="i-o-m-shape-properties">シェイプのプロパティ</a></h4>
 <p><span class="menu">名前</span>の他に<span class="menu">プロパティ</span>にはこんな設定があります。</p>
 
 <table summary="Shape properties" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Min LOD</span></td><td></td><td>Level of Detailの最小値</td></tr>
-<tr><td><span class="menu">Max LOD</span></td><td></td><td>Level of Detailの最大値</td></tr>
+<tr><td><span class="menu">Min LOD</span></td><td></td><td>Level of Detail の最小値</td></tr>
+<tr><td><span class="menu">Max LOD</span></td><td></td><td>Level of Detail の最大値</td></tr>
 </table>
 
 <h5><a id="i-o-m-shape-lod" name="i-o-m-shape-lod">Level of Detail (LOD)</a></h5>
@@ -233,12 +234,12 @@
                 <td><img src="../../images/apps-images/i-o-m-lod-icon_32.png" alt="i-o-m-lod-icon_32" width="32" height="32" /></td>
                 <td><img src="../../images/apps-images/i-o-m-lod-icon_64.png" alt="i-o-m-lod-icon_64" width="64" height="64" /></td></tr>
 </table>
-<p>BeVexedのアイコンを見てもらうと、16pxのバージョンには数字が書かれていないのがわかるはずです。これは「Level of Detail」によって設定されています。<br />
-LODを使用することで、サイズにあわせて見えやすくすることが可能です。大きなアイコンは遠くからでもはっきり見えるように、小さなアイコンは識別しやすいようにすることができるのです。</p>
-<p>LOD1.0は64pxのサイズのアイコンを意味します。LODはアイコンのサイズを64pxで割った数で表されます。例えば16pxのサイズのアイコンのLODは16/64 = 0.25となります。LODが<span class="menu">Min LOD</span>より小さいときや<span class="menu">Max LOD</span>より大きいときにシェイプを表示させないように設定できます。</p>
-<p>もし<span class="menu">Min LOD</span>を0.0に、<span class="menu">Max LOD</span>を0.5に設定したとすると、そのシェイプはアイコンサイズが32pxより小さいか<i>等しい</i>時にのみ表示されます。32pxの時に表示したくないならば<span class="menu">Max LOD</span>を0.49にする必要があります。</p>
-<p>LODはシェイプの表示/非表示を切り替えるだけでなく、サイズによって輪郭線の幅を変えるなどということもできます。同じシェイプをコピーして、一部だけ変更してそれぞれに異なるLODを指定すればいいのです。無意識のうちにLODが重複するように設定してしまわないようにご注意ください。<br />
-例えば、以下の例ではShape 1は48pxより小さいサイズの時に、Shape 2は48px以上のサイズで表示されます(LOD: 48/64 = 0.75)。</p>
+<p>BeVexed のアイコンを見てもらうと、16px のバージョンには数字が書かれていないのがわかるはずです。これは「Level of Detail」によって設定されています。<br />
+LOD を使用することで、サイズにあわせて見えやすくすることが可能です。大きなアイコンは遠くからでもはっきり見えるように、小さなアイコンは識別しやすいようにすることができるのです。</p>
+<p>LOD 1.0 は 64px のサイズのアイコンを意味します。LOD はアイコンのサイズを 64px で割った数で表されます。たとえば、16px のサイズのアイコンの LOD は 16/64 = 0.25 となります。LOD が <span class="menu">Min LOD</span> より小さいときや、<span class="menu">Max LOD</span> より大きいときにシェイプを表示させないように設定できます。</p>
+<p><span class="menu">Min LOD</span> を 0.0 に、<span class="menu">Max LOD</span> を 0.5 に設定したとすると、そのシェイプはアイコンサイズが 32px より小さいか<i>等しい</i>時にのみ表示されます。32px の時に表示したくないならば、<span class="menu">Max LOD</span> を 0.49 にする必要があります。</p>
+<p>LOD はシェイプの表示 / 非表示を切り替えるだけでなく、サイズによって輪郭線の幅を変えるなどということもできます。同じシェイプをコピーして、一部だけ変更してそれぞれに異なる LOD を指定すればいいのです。無意識のうちに LOD が重複するように設定してしまわないようにご注意ください。<br />
+たとえば、以下の例では Shape 1 は 48px より小さいサイズの時に、Shape 2 は 48px 以上のサイズで表示されます (LOD: 48/64 = 0.75)。</p>
 
 <table summary="LOD values example" border="0" cellpadding="5">
 <tr align="center"><td></td><td colspan="2"><b>OK</b></td><td style="width:25px" rowspan="6"></td><td colspan="2"><b>Not OK!</b></td></tr>
@@ -254,12 +255,12 @@ LODを使用することで、サイズにあわせて見えやすくするこ�
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="i-o-m-style" name="i-o-m-style">スタイル</a></h3>
 <p>スタイルはある一つの色か数種類の色によるグラデーションとして表されます。<br />
-<span class="menu">見本</span>の下にある色の他に、現在の色をクリックすることで色をあわせて作り出すことができます。また、色のスライダーの下にアルファチャンネル(透明度)のスライダーがあります。</p>
+<span class="menu">見本</span>の下にある色の他に、現在の色をクリックすることで色をあわせて作り出すことができます。また、色のスライダーの下にアルファチャンネル (透明度) のスライダーがあります。</p>
 <img src="../images/apps-images/i-o-m-gradients.png" alt="i-o-m-gradients" />
-<p>色をスタイルのリストにドラッグアンドドロップすることで、簡単に色を混ぜて新しいスタイルをつくることができます。</p>
-<p>グラデーションを使用するなら、タイプを<span class="menu">ライナー</span>・<span class="menu">ラジアル</span>・<span class="menu">ダイアモンド</span>・<span class="menu">コニカル</span>から選び、始まりと終わりの色を選んでください。<span class="menu">見本</span>から色をグラデーションへドラッグアンドドロップすることで選択することができます。<br />
-もちろん、インジケーターを移動させてグラデーションをあなたの好きなように変化させることができます。また、色を追加するために、グラデーションをダブルクリックすることでインジケーターを追加することができます。<span class="key">DEL</span>を押すことでインジケーターを消すことができます。</p>
-<p>キャンバスでグラデーションの適応範囲を表すボックスをシェイプと同じように動かしたり、サイズ変更したり、回転させたりすることができます。</p>
+<p>色をスタイルのリストにドラッグ＆ドロップすることで、簡単に色を混ぜて新しいスタイルをつくることができます。</p>
+<p>グラデーションを使用するなら、タイプを<span class="menu">ライナー</span>・<span class="menu">ラジアル</span>・<span class="menu">ダイアモンド</span>・<span class="menu">コニカル</span>から選び、始まりと終わりの色を選んでください。<span class="menu">見本</span>から色をグラデーションへドラッグ＆ドロップすることで選択できます。<br />
+もちろん、インジケーターを移動させてグラデーションをあなたの好きなように変化させることができます。また、色を追加するために、グラデーションをダブルクリックすることでインジケーターを追加できます。<span class="key">DEL</span> を押すことでインジケーターを消せます。</p>
+<p>キャンバスでグラデーションの適応範囲を表すボックスをシェイプと同じように動かしたり、サイズ変更したり、回転させたりできます。</p>
 
 <h4><a id="i-o-m-style-menu" name="i-o-m-style-menu">スタイルのメニュー</a></h4>
 <p><span class="menu">スタイル</span>のメニューには<span class="menu">追加</span>・<span class="menu">複製</span>・<span class="menu">削除</span>・<span class="menu">変形をリセット</span>といったエントリがあります。</p>
@@ -271,23 +272,23 @@ LODを使用することで、サイズにあわせて見えやすくするこ�
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="i-o-m-transformer" name="i-o-m-transformer">Transformer</a></h3>
-<p>Transformerを使うとシェイプの見た目を変化させることができます。トラックが戦闘ロボットになるような、そんな劇的な効果があるわけではないですが....</p>
+<p>Transformer を使うとシェイプの見た目を変化させることができます。トラックが戦闘ロボットになるような、そんな劇的な効果があるわけではないですが....</p>
 
-<h4><a id="i-o-m-transformer-menu" name="i-o-m-transformer-menu">Transformerのメニュー</a></h4>
+<h4><a id="i-o-m-transformer-menu" name="i-o-m-transformer-menu">Transformer のメニュー</a></h4>
 <table summary=" Transformer Add menu" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="menu">コンター</span></td><td></td><td>シェイプにアウトラインを追加する。</td></tr>
 <tr><td><span class="menu">ストローク</span></td><td></td><td>シェイプ全体にスタイルを適用させるのではなく、パスの部分のみに適用させるように変更します。</td></tr>
 </table>
 
-<p>それぞれ種類のTransformerに対し、異なるプロパティが用意されています。</p>
+<p>それぞれ種類の Transformer に対し、異なるプロパティが用意されています。</p>
 
-<h4><a id="i-o-m-transformer-properties" name="i-o-m-transformer-properties">Transformerのプロパティ</a></h4>
+<h4><a id="i-o-m-transformer-properties" name="i-o-m-transformer-properties">Transformer のプロパティ</a></h4>
 <p><span class="menu">プロパティ</span>には<span class="menu">名前</span>や<span class="menu">幅</span>の他に、以下のような項目があります。</p>
 <table summary="Transformer properties" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="menu">頂点</span></td><td style="width:15px;"></td><td><i>ストロークのみ</i>。線の終端の形状を次のうちから選択できます: <span class="menu">Butt</span>・<span class="menu">Square</span>・<span class="menu">Round</span></td></tr>
-<tr><td><span class="menu">向きを検出する</span></td><td></td><td><i>コンターのみ</i>。Transformerを作用させる場所をパスの内側にするか外側するか、選択できます。</td></tr>
+<tr><td><span class="menu">向きを検出する</span></td><td></td><td><i>コンターのみ</i>。Transformer を作用させる場所をパスの内側にするか外側するか、選択できます。</td></tr>
 <tr><td><span class="menu">結合</span></td><td></td><td>線の接続部の形を次のうちから選択できます: <span class="menu">Miter</span>, <span class="menu">Round</span> or <span class="menu">Bevel</span>.</td></tr>
-<tr><td><span class="menu">マイターリミット</span></td><td></td><td>上の<span class="menu">結合</span>を"Miter"に設定している時のみ、接続部の見た目を設定することができます。</td></tr>
+<tr><td><span class="menu">マイターリミット</span></td><td></td><td>上の<span class="menu">結合</span>を"Miter"に設定している時のみ、接続部の見た目を設定できます。</td></tr>
 </table>
 
 
@@ -295,16 +296,16 @@ LODを使用することで、サイズにあわせて見えやすくするこ�
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="i-o-m-save" name="i-o-m-save">アイコンを保存する</a></h3>
 <p>トップにあるメニューバーには<span class="menu">ファイル</span>・<span class="menu">編集</span>・<span class="menu">オプション</span>のエントリがあります。使い方はほとんど自明なので、保存方法についてのみ説明します。</p>
-<p><span class="menu">ファイル | 別名で保存...</span>を使用すると、パスやシェイプやスタイルなどの追加情報を含んだIcon-O-Maticのフォーマットで保存されます。追加情報は実際のアイコンとして使用する際に削除されます。「パス/シェイプ/スタイル」という名前で変更ごとにファイルを保存するよりは、この形式で保存したほうがバックアップに向いているでしょう。</p>
+<p><span class="menu">ファイル | 別名で保存...</span>を使用すると、パスやシェイプやスタイルなどの追加情報を含んだ Icon-O-Matic のフォーマットで保存されます。追加情報は実際のアイコンとして使用する際に削除されます。「パス/シェイプ/スタイル」という名前で変更ごとにファイルを保存するよりは、この形式で保存したほうがバックアップに向いているでしょう。</p>
 
 <p><span class="menu">ファイル | 別形式でエクスポート...</span>を押すと保存パネルが開きます。真ん中のポップアップメニューで保存形式を以下の選択肢から選ぶことができます。</p>
 <table summary="file formats" border="0" cellspacing="0" cellpadding="2">
-<tr><td>HVIF</td><td style="width:15px;"></td><td>Haiku Vector Icon Formatとして保存する</td></tr>
+<tr><td>HVIF</td><td style="width:15px;"></td><td>Haiku Vector Icon Format として保存する</td></tr>
 <tr><td>HVIF RDef</td><td></td><td>開発者向けのリソースファイルとして保存する</td></tr>
 <tr><td>HVIF ソースコード</td><td></td><td>開発者向けのソースコードとして保存する</td></tr>
-<tr><td>SVG</td><td></td><td>SVGとして保存する</td></tr>
-<tr><td>PNG</td><td></td><td>64pxのサイズのSVGとして保存する</td></tr>
-<tr><td>PNG セット</td><td></td><td>16, 32, 64pxのサイズのSVGとして設定する</td></tr>
+<tr><td>SVG</td><td></td><td>SVG として保存する</td></tr>
+<tr><td>PNG</td><td></td><td>64px のサイズの SVG として保存する</td></tr>
+<tr><td>PNG セット</td><td></td><td>16, 32, 64px のサイズの SVG として設定する</td></tr>
 <tr><td>BEOS:ICON 属性</td><td></td><td>ファイルを選択し、直接アイコンを設定する</td></tr>
 <tr><td>META:ICON 属性</td><td></td><td>ファイルを選択し、メタデータとしてアイコンを設定する</td></tr>
 </table>
@@ -313,15 +314,15 @@ LODを使用することで、サイズにあわせて見えやすくするこ�
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="i-o-m-tips" name="i-o-m-tips">Tips &amp; Tricks</a></h3>
-<p>Icon-O-Maticを使う上でのいくつかの注意点とTips:</p>
+<p>Icon-O-Matic を使う上でのいくつかの注意点とTips:</p>
 <ul>
-<li><p>Haikuのアイコンに関する重要な特徴(展望や色、影など)について学ぶには<a href="http://svn.haiku-os.org/haiku/haiku/trunk/docs/icon_guidelines/index.html">Icon Guidelines</a>をお読みください。</p></li>
-<li><p>ファイルサイズを小さくするためにできるだけパスの使用を少なくしてください。また、できるだけパスを再利用して、シェイプやTransformerで調整するようにしてください。グラデーションを賢く使用することも重要です。</p></li>
-<li><p>パスを編集するときは、できるだけ<span class="menu">オプション | グリッドに沿う</span>を使用してください。<span class="menu">64x64</span>で点を配置するとファイルサイズが小さくなります。点を細かく配置するときにはこのモードを使用するといいでしょう。また、点をだいたいの位置の配置して形作っていくときには<span class="menu">16x16</span>のモードを使用するといいでしょう。</p></li>
-<li><p>16x16のサイズでもきちんと表示されるかチェックしておいてください。細かく設定するにはシェイプの<a href="#i-o-m-shape-lod">Level Of Detail</a>の設定を使うかもしれません。</p></li>
-<li><p>Icon-O-Maticではテキストボックスの機能はないですが、簡単にテキストを表示させることができます。StyleEditのようなテキストエディタをつかってフォントタイプとスタイルを設定し、Icon-O-Maticにドラッグアンドドロップかコピーアンドペーストすればいいのです。文字の形のパスとシェイプが自動で作られます。</p></li>
+<li><p>Haiku のアイコンに関する重要な特徴 (展望や色、影など) について学ぶには、<a href="http://svn.haiku-os.org/haiku/haiku/trunk/docs/icon_guidelines/index.html">Icon Guidelines</a> をお読みください。</p></li>
+<li><p>ファイルサイズを小さくするためにできるだけパスの使用を少なくしてください。また、できるだけパスを再利用して、シェイプや Transformer で調整するようにしてください。グラデーションを賢く使用することも重要です。</p></li>
+<li><p>パスを編集するときは、できるだけ<span class="menu">オプション | グリッドに沿う</span>を使用してください。<span class="menu">64x64</span> で点を配置するとファイルサイズが小さくなります。点を細かく配置するときにはこのモードを使用するといいでしょう。また、点をだいたいの位置の配置して形作っていくときには <span class="menu">16x16</span> のモードを使用するといいでしょう。</p></li>
+<li><p>16x16 のサイズでもきちんと表示されるかチェックしておいてください。細かく設定するにはシェイプの <a href="#i-o-m-shape-lod">Level Of Detail</a> の設定を使うかもしれません。</p></li>
+<li><p>Icon-O-Matic ではテキストボックスの機能はないですが、簡単にテキストを表示させることができます。StyleEdit のようなテキストエディタをつかってフォントタイプとスタイルを設定し、Icon-O-Matic にドラッグアンドドロップかコピーアンドペーストすればいいのです。文字の形のパスとシェイプが自動で作られます。</p></li>
 <li><p>ひとつのシェイプにいくつかのパスが含まれるとき、パスの重なっている部分は相殺されます。また、あるパスが別のパスの内部に完全に入っている場合は、その部分が穴になります。</p></li>
-<li><p>マウスホイールを使って、キャンバスの拡大縮小ができます。マウスの真ん中のボタンでドラッグするか、<span class="key">SPACE</span>を押しながら左ボタンでドラッグすると、パニングされます。</p></li>
+<li><p>マウスホイールを使って、キャンバスの拡大縮小ができます。マウスの真ん中のボタンでドラッグするか、<span class="key">SPACE</span> を押しながら左ボタンでドラッグすると、パニングされます。</p></li>
 </ul>
 
 
@@ -345,9 +346,9 @@ LODを使用することで、サイズにあわせて見えやすくするこ�
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="expander.html">Expander</a> 
+ «  <a href="expander.html">ファイル解凍</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
-::  <a href="installer.html">インストーラー (Installer)</a>  »
+::  <a href="installer.html">インストーラー</a>  »
 </span></div>
 </div>
 

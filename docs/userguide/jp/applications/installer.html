@@ -18,13 +18,13 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>インストーラー (Installer)</title>
+	<title>インストーラー</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -47,41 +47,41 @@
 <span>
  «  <a href="icon-o-matic.html">Icon-O-Matic</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
-::  <a href="magnify.html">Magnify</a>  »
+::  <a href="magnify.html">拡大鏡</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
 
-<h2><img src="../../images/apps-images/installer-icon_64.png" alt="installer-icon_64.png" width="64" height="64" />Installer</h2>
+<h2><img src="../../images/apps-images/installer-icon_64.png" alt="installer-icon_64.png" width="64" height="64" />インストーラー (Installer)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><span class="menu">アプリケーション (Applications)</span></td></tr>
-<tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/Installer</span></td></tr>
-<tr><td>設定ファイル：</td><td></td><td><i>なし</i></td></tr>
+<tr><td>Deskbar メニュー:</td><td style="width:15px;"></td><td><span class="menu">Applications (アプリケーション)</span></td></tr>
+<tr><td>場所:</td><td></td><td><span class="path">/boot/system/apps/Installer</span></td></tr>
+<tr><td>設定ファイル:</td><td></td><td><i>無し</i></td></tr>
 </table>
 <p><br /></p>
-<p>InstallerはHaikuを別のボリュームにコピーするのに使用します。<br />
-起動と共にウィンドウに注意事項が表示されるので、よくお読みください。 </p>
+<p>インストーラー (Installer) は Haiku を別のボリュームにコピーするのに使用します。<br />
+起動とともにウィンドウに注意事項が表示されるので、よくお読みください。 </p>
 <ul>
-<li><p>まだ開発途中のソフトウェアです。バックアップを取っておくか、あとから苦しむことになるか・・・</p></li>
-<li><p>Installerを使用する前にパーティションを作成しておく必要があります。パーティション編集には、HaikuのDriveSetupが安定するまで<a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> のようなツールを使ったほうがいいかもしれません。</p></li>
-<li>Haikuは<a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>ブートマネージャーに手動で設定することができます。詳しくは<a href="http://www.haiku-os.org/get-haiku/installation-guide">online guide</a>をご覧ください。</li>
+<li><p>まだ開発途中のソフトウェアです。バックアップを取っておくか、あとから苦しむことになるか…</p></li>
+<li><p>インストーラーを使用する前にパーティションを作成しておく必要があります。パーティション編集には、Haiku の DriveSetup が安定するまで <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> のようなツールを使ったほうがいいかもしれません。</p></li>
+<li>Haiku は、<a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a> ブートマネージャーに手動で設定できます。詳しくは <a href="http://www.haiku-os.org/get-haiku/installation-guide">online guide</a> をご覧ください。</li>
 </ul>
 <p><br /><br /></p>
-<p>注意事項に同意して<span class="button">続ける</span>を押すと、以下のようなメインウィンドウが表示されます:</p>
+<p>注意事項に同意して<span class="button">続ける (Continue)</span> を押すと、以下のようなメインウィンドウが表示されます:</p>
 <img src="../images/apps-images/installer.png" alt="installer.png" />
-<p>1つ目のポップアップメニューで、Haikuのインストール元を指定します。例えば、すでにHaikuがインストールされたディスクや、インストールCD/USBドライブなどが当てはまります。<br />
-2つ目のポップアップメニューで、インストール先を指定します。これは完全に上書きされます。また、あらかじめGPartedのようなパーティショニングツールでパーティションを作っておく必要があります。</p>
-<p><i>オプショナルパッケージを表示</i>のメニューを展開すると、Haikuに追加でインストールするソフトウェアを選択できます。</p>
-<p>インストールプロセスを開始する前に、正しいインストール先が選択されているか、最終確認をしてください。<span class="button">Setup partitions...</span>をクリックすると<a href="drivesetup.html">DriveSetup</a>が開きます。</p>
-<p><span class="button">開始</span> を押すと、インストールプロセスが開始します。このプロセスでは基本的に<span class="path">home/</span>と<span class="path">common/</span>以外のファイルをインストール先にコピーされます。そして、インストール先のボリュームを起動可能に設定します。</p>
+<p>1 つ目のポップアップメニューで、Haiku のインストール元を指定します。たとえば、すでに Haiku がインストールされたディスクや、インストール CD / USB ドライブなどが当てはまります。<br />
+2 つ目のポップアップメニューで、インストール先を指定します。これは完全に上書きされます。また、あらかじめ GParted のようなパーティショニングツールでパーティションを作っておく必要があります。</p>
+<p><i>オプショナルパッケージを表示</i>のメニューを展開すると、Haiku に追加でインストールするソフトウェアを選択できます。</p>
+<p>インストールプロセスを開始する前に、正しいインストール先が選択されているか、最終確認をしてください。<span class="button">パーティションの設定… (Set up partitions…)</span> をクリックすると、<a href="drivesetup.html">DriveSetup</a> が開きます。</p>
+<p><span class="button">開始 (Begin)</span> を押すと、インストールプロセスが開始します。このプロセスでは基本的に <span class="path">home/</span>と<span class="path">common/</span> 以外のファイルをインストール先にコピーし、インストール先のボリュームを起動可能に設定します。</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tools" name="tools">ツール</a></h2>
-<p>インストールが完了すると、パーティションは自動的に起動可能に設定されます。ですが、他のオペレーティングシステムやパーティショニングツールがパーティションのブートセクタを書き換えてしまうことがあるかもしれません。その際はインストールCDから起動して、Installerの<span class="menu">インストール先: インストール先の選択</span>の部分でHaikuのパーティションを選択した後に、<span class="menu">ツール</span>の<span class="menu">ブートセクターを書き込む</span>からパーティションを起動可能に再設定してください。</p>
-<p><span class="menu">ツール</span>の他のメニューは<span class="menu">ブートセクターの設定</span>で、起動するオペレーティングシステムの選択をするメニューをブートセクタに書き込むために使われています。詳しくは、<a href="bootmanager.html">ブートマネージャー</a>をお読みください。<br />
-もし既にGRUBのようなブートマネージャーを利用して手動でHaikuのエントリを追加した場合や、Haikuしかそのマシンで実行しない場合は、<span class="app">ブートマネージャー</span>を使用する必要はありません。</p>
+<p>インストールが完了すると、パーティションは自動的に起動可能に設定されます。ですが、ほかのオペレーティングシステムやパーティショニングツールがパーティションのブートセクタを書き換えてしまうことがあるかもしれません。その際はインストール CD から起動して、インストーラーの<span class="menu">インストール先: インストール先の選択 (Onto: Please choose target)</span> の部分で、Haiku のパーティションを選択した後に、<span class="menu">ツール (Tools)</span> の<span class="menu">ブートセクターを書き込む (Write boot sector)</span> からパーティションを起動可能に再設定してください。</p>
+<p><span class="menu">ツール (Tools)</span> の他のメニューは<span class="menu">ブートメニューの設定 (Set up boot menu)</span>で、起動するオペレーティングシステムの選択をするメニューをブートセクタに書き込むために使われています。詳しくは、<a href="bootmanager.html">ブートマネージャー</a>をお読みください。<br />
+すでに GRUB のようなブートマネージャーを利用して手動で Haiku のエントリを追加した場合や、Haiku しかそのマシンで実行しない場合は、<span class="app">ブートマネージャー</span>を使用する必要はありません。</p>
 
 
 </div>
@@ -91,7 +91,7 @@
 <div class="inner"><span>
  «  <a href="icon-o-matic.html">Icon-O-Matic</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
-::  <a href="magnify.html">Magnify</a>  »
+::  <a href="magnify.html">拡大鏡</a>  »
 </span></div>
 </div>
 

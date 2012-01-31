@@ -11,18 +11,19 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		hiromu1996
+ *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>VirtualMemory</title>
+	<title>仮想メモリー</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -43,29 +44,29 @@
 <li><a href="../../en/preferences/virtualmemory.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="touchpad.html">Touchpad</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a>
+ «  <a href="touchpad.html">タッチパッド</a> 
+::  <a href="../preferences.html" class="uplink">Preferences (プレファレンス)</a>
 </span></div>
 </div>
 
 <div id="content">
 <div>
 
-<h2><img src="../../images/prefs-images/virtualmemory-icon_64.png" alt="virtualmemory-icon_64.png" width="64" height="64" />VirtualMemory</h2>
+<h2><img src="../../images/prefs-images/virtualmemory-icon_64.png" alt="virtualmemory-icon_64.png" width="64" height="64" />仮想メモリー (VirtualMemory)</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
-<tr><td>場所：</td><td></td><td><span class="path">/boot/system/preferences/VirtualMemory</span></td></tr>
-<tr><td>設定ファイル：</td><td></td><td><span class="path">~/config/settings/kernel/drivers/virtual_memory</span><br />
+<tr><td>Deskbar メニュー:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
+<tr><td>場所:</td><td></td><td><span class="path">/boot/system/preferences/VirtualMemory</span></td></tr>
+<tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/kernel/drivers/virtual_memory</span><br />
 <span class="path">~/config/settings/VM_data</span> - ここに設定が保存されます。</td></tr>
 </table>
-<p>Virtual memoryを設定すると、メモリが不足している場合にハードディスクにスワッピングすることができます。<br />RAMが大量に使用できる場合は、Virtual memoryを設定する必要はないでしょう。</p>
+<p>仮想メモリーを設定すると、メモリが不足している場合にハードディスクにスワッピングできます。<br />RAM が大量に使用できる場合は、仮想メモリーを設定する必要はないでしょう。</p>
 <img src="../images/prefs-images/virtualmemory.png" alt="virtualmemory.png" />
-<p>必要に応じて、物理メモリより大きいサイズを設定することができます。<br />一般的なサイズのハードディスクでは、物理メモリのサイズだけ割り当てても問題ないでしょう。<br />空き領域が少なくなってきたなら、すぐに割当量を調節することができます。その場合は<a href="../applications/diskusage.html">DiskUsage</a>でハードディスクの使用率を確認するといいでしょう。</p>
-<p>通常はブートパーティションにスワップファイルが書きこまれます。<br />スワップインやスワップアウトによってよくハードディスクがスラッシング状態に陥ってしまうなら、スワップファイル用に別のハードディスクを使うこともできます。ただし、同じディスクにパーティションをつくってそこをスワップに使用しても、状態は改善されません。<br />
-RAMの量を増やすのが1番有効な方法であることをお忘れなく。</p>
+<p>必要に応じて、物理メモリより大きいサイズを設定できます。<br />一般的なサイズのハードディスクでは、物理メモリのサイズだけ割り当てても問題ないでしょう。<br />空き領域が少なくなってきたなら、すぐに割り当て量を調節できます。その場合は、<a href="../applications/diskusage.html">DiskUsage</a> でハードディスクの使用率を確認するといいでしょう。</p>
+<p>通常はブートパーティションにスワップファイルが書きこまれます。スワップインやスワップアウトによってよくハードディスクがスラッシング状態に陥ってしまうなら、スワップファイル用に別のハードディスクを使うこともできます。ただし、同じディスクにパーティションを作成してそこをスワップに使用しても、状態は改善されません。<br />
+RAM の量を増やすのが一番有効な方法であることをお忘れなく。</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">デフォルト</span></td><td> </td><td>すべての項目をデフォルト値に戻します。</td></tr>
-<tr><td><span class="button">元に戻す</span></td><td> </td><td>VirtualMemoryが起動された時点で有効だった設定に戻します。</td></tr>
+<tr><td><span class="button">デフォルト (Defaults)</span></td><td> </td><td>すべてをデフォルト値にリセットします。</td></tr>
+<tr><td><span class="button">元に戻す (Revert)</span></td><td> </td><td>仮想メモリーが起動された時点で有効だった設定に戻します。</td></tr>
 </table>
 
 </div>
@@ -74,8 +75,8 @@ RAMの量を増やすのが1番有効な方法であることをお忘れなく�
 <!--
 <div class="nav">
 <div class="inner"><span>
- «  <a href="touchpad.html">Touchpad</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a>
+ «  <a href="touchpad.html">タッチパッド</a> 
+::  <a href="../preferences.html" class="uplink">Preferences (プレファレンス)</a>
 </span></div>
 </div>
 -->

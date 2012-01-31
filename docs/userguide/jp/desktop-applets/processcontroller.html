@@ -18,13 +18,13 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>ProcessController</title>
+	<title>プロセスコントローラー</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -46,7 +46,7 @@
 </ul>
 <span>
  «  <a href="powerstatus.html">PowerStatus</a> 
-::  <a href="../desktop-applets.html" class="uplink">デスクトップアプレット</a> 
+::  <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
 ::  <a href="workspaces.html">ワークスペース</a>  »
 </span></div>
 </div>
@@ -54,29 +54,29 @@
 <div id="content">
 <div>
 
-<h2><img src="../../images/desktop-applets-images/processcontroller-icon_64.png" alt="processcontroller-icon_64.png" width="64" height="64" />ProcessController</h2>
+<h2><img src="../../images/desktop-applets-images/processcontroller-icon_64.png" alt="processcontroller-icon_64.png" width="64" height="64" />プロセスコントローラー (ProcessController)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><span class="menu">デスクトップアプレット</span></td></tr>
-<tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/ProcessController</span></td></tr>
-<tr><td>設定ファイル：</td><td></td><td><i>なし</i></td></tr>
+<tr><td>Deskbar メニュー:</td><td style="width:15px;"></td><td><span class="menu">Desktop Applets (デスクトップアプレット)</span></td></tr>
+<tr><td>場所:</td><td></td><td><span class="path">/boot/system/apps/ProcessController</span></td></tr>
+<tr><td>設定ファイル:</td><td></td><td><i>無し</i></td></tr>
 </table>
 
-<p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />ProcessController の目的は CPU と物理メモリの使用率を表示することです。それぞれのチームの観察、優先度の設定、クラッシュの場合に終了もできます。複数の CPU があると個々の CPU を有効・無効もできます。TrackerとDeskbar のクラッシュの場合に ProcessController のメニュから再起動することができます。</p>
+<p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />プロセスコントローラー (ProcessController) の目的は CPU と物理メモリの使用率を表示することです。それぞれのチームの観察、優先度の設定、クラッシュの場合に終了もできます。複数の CPU があると、個々の CPU を有効・無効にできます。Tracker と Deskbar のクラッシュの場合に、プロセスコントローラーのメニューから再起動できます。</p>
 <p>左側の計器はそれぞれの CPU の使用率を表して右側の計器はメモリ使用量を表します。計器の数はシステムの CPU の数によってあります。</p>
-<p>ProcessController はまだ実行していない場合に、起動するときにウィンドウモードまたは Deskbar モードを選択してください。ウィンドウモードで、ウインドウのサイズを変更して、<a href="../gui.html#replicants">Replicant</a>を使って Desktop にドラッグすることもできます。<br />
-ProcessController はコンテキストメニュで使います。<br />
-コンテキストメニューの <span class="menu">Live in the Deskbar</span> のチェックボックスをオフにすると、ProcessController は Deskbar から削除されます。</p>
-<h2>Quit an application</h2>
+<p>プロセスコントローラーをまだ実行していない場合に、起動するときにウィンドウモードまたは Deskbar モードを選択してください。ウィンドウモードで、ウィンドウのサイズを変更して、<a href="../gui.html#replicants">レプリカント</a>を使ってデスクトップにドラッグすることもできます。<br />
+プロセスコントローラーはコンテキストメニューで使います。<br />
+コンテキストメニューの <span class="menu">Deskbar 中で動作 (Live in the Deskbar)</span> のチェックボックスをオフにすると、プロセスコントローラーは Deskbar から削除されます。</p>
+<h2>アプリケーションを終了</h2>
 <img src="../images/processcontroller-images/quit.png" alt="ProcessController - Quit an application" />
-<p>アプリケーションを終了するには、<span class="menu">Quit an application</span> メニューでアプリケーション名をクリックしてください。この方法は強制終了ではなくて、「閉じる」ボタンをクリックみたいな方法です。でも、システムのプロセス （サーバーとデーモン） を終了しないように注意してください。その場合にシステム全体の実行の停止の可能性があります。</p>
+<p>アプリケーションを終了するには、<span class="menu">アプリケーションを終了 (Quit an application)</span> メニューでアプリケーション名をクリックしてください。これは、強制終了ではなく、「閉じる」ボタンをクリックするのと同様の正しいアプリケーションの終了方法です。しかし、システムのプロセス (サーバーとデーモン) を終了しないように注意してください。その場合には、システム全体の実行が停止する可能性があります。</p>
 <h2>メモリ使用量</h2>
 <img src="../images/processcontroller-images/memory.png" alt="ProcessController - Memory usage" />
 <p>メモリ使用量の観察はかなり不正確です。</p>
-<p>このメニューはシステムでのチームのメモリ使用量を観察できます。チーム名のそばに二つの列がある。1番目の列は書き込み可能メモリの量で、2番目は読み込み専用メモリ（例えば共用ライブラリ）込みすべてのメモリ量です。</p>
-<p>一番目の行、<i>System resources &amp; caches...</i> はシステムおよびすべてのアプリケーションで使用されているメモリの数を表示します。青いバーの長さはコンピュータの物理メモリの数によります。次の行はそれぞれのプロセスを使用しているメモリの数を表示します。注：バーの長さはメモリを使用している部分だけによります。</p>
+<p>このメニューはシステムでのチームのメモリ使用量を観察できます。チーム名のそばに 2 つの列がある。1 番目の列は書き込み可能メモリの量で、2 番目は読み込み専用メモリ (たとえば共用ライブラリ) 込みのメモリ量です。</p>
+<p>一番目の行、<i>システムリソースとキャッシュ… (System resources &amp; caches...)</i> はシステムおよびすべてのアプリケーションで使用されているメモリの数を表示します。青いバーの長さはコンピュータの物理メモリの数によります。次の行はそれぞれのプロセスを使用しているメモリの数を表示します。注：バーの長さはメモリを使用している部分だけによります。</p>
 <table>
 		<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>特定のアプリケーションだけが使用しているメモリ (書き込み権限あり)</td></tr>
-		<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>読み取り空間のメモリを含む (他のアプリケーションと共有可能)</td></tr>
+		<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>読み取り空間のメモリを含む (ほかのアプリケーションと共有可能)</td></tr>
 </table>
 
 <h2>スレッドと CPU 使用率</h2>
@@ -98,7 +98,7 @@ ProcessController はコンテキストメニュで使います。<br />
 <div class="nav">
 <div class="inner"><span>
 «  <a href="powerstatus.html">PowerStatus</a> 
-::  <a href="../desktop-applets.html" class="uplink">デスクトップアプレット</a> 
+::  <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
 ::  <a href="workspaces.html">ワークスペース</a>  »
 </span></div>
 </div>

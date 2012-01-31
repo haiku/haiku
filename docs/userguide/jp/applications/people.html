@@ -12,6 +12,7 @@
  * Translators:
  *		thebowseat
  *		log-1
+ *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -23,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -44,7 +45,7 @@
 <li><a href="../../en/applications/people.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="packageinstaller.html">PackageInstaller</a> 
+ «  <a href="packageinstaller.html">パッケージインストーラー</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
 ::  <a href="poorman.html">PoorMan</a>  »
 </span></div>
@@ -55,31 +56,29 @@
 
 <h2><img src="../../images/apps-images/people-icon_64.png" alt="people-icon_64.png" width="64" height="64" />People</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><span class="menu">アプリケーション (Applications)</span></td></tr>
-<tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/People</span></td></tr>
-<tr><td>設定ファイル：</td><td></td><td><span class="path">~/config/settings/People_data</span></td></tr>
+<tr><td>Deskbar メニュー:</td><td style="width:15px;"></td><td><span class="menu">Applications (アプリケーション)</span></td></tr>
+<tr><td>場所:</td><td></td><td><span class="path">/boot/system/apps/People</span></td></tr>
+<tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/People_data</span></td></tr>
 </table>
 <p><br /></p>
-<p>People  Haikuファイルシステムの<a href="../attributes.html">属性</a> を使用してアドレスなどの連絡情報を記録するシンプルな連絡データベースです。連絡先情報の一つ一つが一つの属性付きの Person ファイルに保存されます。すべてインデックスされ、 <a href="../queries.html">クエリ</a> で検索可能です。</p>
+<p>People は、Haiku ファイルシステムの<a href="../attributes.html">属性</a>を使用してアドレスなどの連絡情報を記録するシンプルな連絡データベースです。連絡先情報のひとつひとつが一つの属性付きの Person ファイルに保存されます。すべてインデックスされ、<a href="../queries.html">クエリ</a>で検索可能です。</p>
 
 <img src="../images/apps-images/people.png" alt="people.png" />
 
-<p>下にあるグループ属性で連絡先を一つ又は複数のグループに割り当てることができます。例えば、あるプロジェクトに取り組んでいる複数の人に”大量メール”するときに役に立ちます。ポップアップメニューは存在しているグループすべてを表示します。もし連絡先が複数のグループに割り当てられている場合、グループ名は ”<tt>,</tt>” で区切ってあります。</p>
+<p>下にあるグループ属性で、連絡先を一つまたは複数のグループに割り当てることができます。たとえば、あるプロジェクトに取り組んでいる複数の人に "大量メール" するときに役に立ちます。ポップアップメニューは存在しているグループすべてを表示します。連絡先が複数のグループに割り当てられている場合、グループ名は  ”<tt>,</tt>” で区切られます。</p>
 
-<p>これらの Person ファイルは普通は <span class="path">/boot/home/people/</span> に保存されています。すべての連絡先のリストを見るには、連絡先フォルダを開き、属性をすべて表示してください。
-Person ファイルを別のフォルダーで整理したい場合は、クエリを使って連絡先全てを一つのウィンドウに表示してください。</p>
+<p>これらの Person ファイルは普通は <span class="path">/boot/home/people/</span> に保存されています。すべての連絡先のリストを見るには、連絡先フォルダーを開き、属性をすべて表示してください。Person ファイルを別のフォルダーで整理することを選んだ場合は、クエリを使って連絡先すべてを一つのウィンドウに表示してください。</p>
 
 <img src="../images/apps-images/people-files.png" alt="people-files.png" />
 
-<p>これらのファイルは他のファイルみたいに扱ってください：
-属性で並び替えることもでき (<span class="key">SHIFT</span> を押しながらクリックで二回目の並び替えができます)、もちろん連絡先を削除、複製や名前を変更することもできます。連絡先の全部も直接編集することができます：属性にクリック ( <span class="key">ALT</span> <span class="key">E</span>) してファイルの名前を変更するみたいに編集してください。編集モードに入ったら、 <span class="key">TAB</span> と <span class="key">SHIFT</span> <span class="key">TAB</span> で列から列へ移動します。</p>
+<p>これらのファイルはほかのファイルと同様に扱えます：属性で並び替えることもでき (<span class="key">SHIFT</span> を押しながらクリックで二回目の並び替えができます)、もちろん連絡先を削除、複製や名前を変更することもできます。連絡先情報でさえもすべて直接編集できます：属性にクリック (<span class="key">ALT</span> <span class="key">E</span>) してファイルの名前を変更するみたいに編集してください。編集モードに入ったら、<span class="key">TAB</span> と <span class="key">SHIFT</span> <span class="key">TAB</span> で列から列へ移動します。</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="packageinstaller.html">PackageInstaller</a> 
+ «  <a href="packageinstaller.html">パッケージインストーラー</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
 ::  <a href="poorman.html">PoorMan</a>  »
 </span></div>

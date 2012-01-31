@@ -11,18 +11,19 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		log-1
+ *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Bashとスクリプト処理</title>
+	<title>Bash とスクリプト処理</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -43,8 +44,8 @@
 <li><a href="../en/bash-scripting.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="preferences.html">Preferences</a> 
-::  <a href="contents.html" class="uplink">目次</a> 
+ «  <a href="preferences.html">Preferences (プレファレンス)</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 <!-- ::  <a href="filesystem-layout.html">ファイルシステムの設計</a>  » -->
 </span></div>
 </div>
@@ -52,56 +53,56 @@
 <div id="content">
 <div>
 
-<h1>Bashとスクリプト処理</h1>
+<h1>Bash とスクリプト処理</h1>
 
-<p>「スクリプト処理」とは、複数のコマンドを並べて書き、「スクリプト」と呼ばれるテキスト・ファイルとして保存することにより処理を自動化する方法のことです。スクリプトを走らせる度に、あたかも<a href="applications/terminal.html">Terminal</a>でそれらコマンドを1つ1つ手で打ち込んでいるようにコマンドが実行されます。<br />
+<p>「スクリプト処理」とは、複数のコマンドを並べて書き、「スクリプト」と呼ばれるテキストファイルとして保存することにより処理を自動化する方法のことです。スクリプトを走らせるたびに、あたかも<a href="applications/terminal.html">ターミナル</a>でそれらコマンドをひとつひとつ手で打ち込んでいるようにコマンドが実行されます。<br />
 スクリプトは、単に数個のコマンドをある特定の順番で実行するものから、複雑なタスクを処理するための高度なコードのかたまりまで、多岐にわたります。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="bash" name="bash">Bash</a></h2>
-<p>そもそもスクリプトはそれを解釈するシェルに大きく依存するため、まずはHaikuで使用されているBASHに精通する必要があります。BASHは広く使用されているシェルであるため、オンライン上に資料が豊富に存在します。すばらしいドキュメントの1つに、Johan Jansson氏の<a href="http://www.beforever.com/bashtut.htm" class="printurl">Introduction to bash - a tutorial for bash under BeOS</a>があります。</p>
+<p>そもそもスクリプトはそれを解釈するシェルに大きく依存するため、まずは Haiku で使用されている BASH に精通する必要があります。BASH は広く使用されているシェルであるため、オンライン上に資料が豊富に存在します。すばらしいドキュメントの 1 つに、Johan Jansson 氏の <a href="http://www.beforever.com/bashtut.htm" class="printurl">Introduction to bash - a tutorial for bash under BeOS</a> があります。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="scripting-bible" name="scripting-bible">スクリプト処理のための必読書</a></h2>
-<p>シェル内で作業するためのいくつかの基礎を学んだあとは、スクリプト処理の世界にゆっくりと歩み出しましょう。このときも、本屋と同じくらい豊富なチュートリアルやリファレンスをオンライン上で見つけられるでしょう。Haikuにほぼピッタリの非常にすばらしい入門編に、オンラインで入手可能なScot Hacker氏によるBeOSの必読書の<a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting1.html" class="printurl">Scripting Chapter</a> (<a href="http://www.birdhouse.org/beos/bible/bos/BeOS.scripting.PDF">PDF, 900kb</a>)があります。</p>
+<p>シェル内で作業するためのいくつかの基礎を学んだあとは、スクリプト処理の世界にゆっくりと歩み出しましょう。このときも、本屋と同じくらい豊富なチュートリアルやリファレンスをオンライン上で見つけられるでしょう。Haiku にほぼピッタリの非常にすばらしい入門編に、オンラインで入手可能な Scot Hacker 氏による BeOS の必読書の <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting1.html" class="printurl">Scripting Chapter</a> (<a href="http://www.birdhouse.org/beos/bible/bos/BeOS.scripting.PDF">PDF, 900kb</a>) があります。</p>
 
 <h2>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="user-scripts" name="user-scripts">Haikuにおけるスクリプト</a></h2>
-<p>Haikuでは、当然のことながらシステムもまたスクリプト処理を使用しています。起動とシャット・ダウンはスクリプト処理手続きの典型です。はじめから定義されたこれら手続きは、特定のユーザー・スクリプトを用いてユーザーが拡張することができます。<br />
-もしこれらユーザー・スクリプトがまだ存在しない場合は、手動でこれらファイルを作成する必要があります。ユーザー・スクリプトが存在する場合は、処理を実行したい場所に必要なコマンドを追加するだけで済みます。</p>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="user-scripts" name="user-scripts">Haiku におけるスクリプト</a></h2>
+<p>Haiku では、当然のことながらシステムもまたスクリプト処理を使用しています。起動とシャットダウンはスクリプト処理手続きの典型です。始めから定義されたこれら手続きは、特定のユーザースクリプトを用いてユーザーが拡張できます。<br />
+もしこれらユーザースクリプトがまだ存在しない場合は、手動でこれらファイルを作成する必要があります。ユーザースクリプトが存在する場合は、処理を実行したい場所に必要なコマンドを追加するだけで済みます。</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="userbootscript" name="userbootscript">UserBootscript</a></h3>
-<p>システムの起動プロセスが完了すると、<span class="path">/boot/home/config/boot/UserBootscript</span>が実行されます。例えば次のように、システムが起動した直後に毎回いくつかのプログラムを自動起動させることができます:</p>
-<pre># LaunchBox を起動する
+<p>システムの起動プロセスが完了すると、<span class="path">/boot/home/config/boot/UserBootscript</span> が実行されます。たとえば次のように、システムが起動した直後に毎回いくつかのプログラムを自動起動させることができます:</p>
+<pre># ランチャーを起動する
 /boot/system/apps/LaunchBox &amp;
 
-# Workspaces アプレットを起動する
+# ワークスペースアプレットを起動する
 /boot/system/apps/Workspaces &amp;</pre>
-<p>コマンドをバックグラウンド・プロセスとして実行するために、コマンドの末尾は"<tt>&amp;</tt>"で終わらせることを覚えておいてください。さもなくばそのコマンドが完了するまで(この例では、起動したアプリケーションが再度閉じられるまで)スクリプトが停止してしまいます。</p>
+<p>コマンドをバックグラウンドプロセスとして実行するために、コマンドの末尾は "<tt>&amp;</tt>" で終わらせることを覚えておいてください。そうしなければ、そのコマンドが完了するまで (この例では、起動したアプリケーションが再度閉じられるまで) スクリプトが停止してしまいます。</p>
 
-<p>システムの起動時にアプリケーションを起動させるための、上記とは違うシンプルな方法の1つに、それらアプリケーションへのリンクを<span class="path">/boot/home/config/boot/launch</span>ディレクトリに置くという方法があります。この方法は、自動起動させたいアプリケーションを右クリックして、<span class="menu">Create Link</span>にマウスカーソルを合わせたあと、前述のディレクトリへ<a href="tracker.html#navigating">ナビゲート</a>することで簡単に実現できます。</p>
+<p>システムの起動時にアプリケーションを起動させるための、上記とは違うシンプルな方法の 1 つに、それらアプリケーションへのリンクを <span class="path">/boot/home/config/boot/launch</span> ディレクトリに置くという方法があります。この方法は、自動起動させたいアプリケーションを右クリックして、<span class="menu">指定先にリンクを作成 (Create Link)</span> にマウスカーソルを合わせたあと、前述のディレクトリへ<a href="tracker.html#navigating">ナビゲート</a>することで簡単に実現できます。</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="usershutdownscript" name="usershutdownscript">UserShutdownScript</a></h3>
-<p><span class="path">/boot/home/config/boot/UserShutdownScript</span>はシャットダウン・プロセスの最初のステップで実行されます。このスクリプトが0でない終了ステータスを返すと、シャットダウンは中断されます。</p>
+<p><span class="path">/boot/home/config/boot/UserShutdownScript</span> はシャットダウンプロセスの最初のステップで実行されます。このスクリプトが 0 でない終了ステータスを返すと、シャットダウンは中断されます。</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="usershutdownfinishscript" name="usershutdownfinishscript">UserShutdownFinishScript</a></h3>
-<p><span class="path">/boot/home/config/boot/UserShutdownFinishScript</span>はシャットダウンの最終ステップで実行されます。このスクリプトが実行されるときには、システムの大部分が終了していることに注意してください。</p>
+<p><span class="path">/boot/home/config/boot/UserShutdownFinishScript</span> はシャットダウンの最終ステップで実行されます。このスクリプトが実行されるときには、システムの大部分が終了していることに注意してください。</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="preferences.html">Preferences</a> 
-::  <a href="contents.html" class="uplink">目次</a> 
+ «  <a href="preferences.html">Preferences (プレファレンス)</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 <!-- ::  <a href="filesystem-layout.html">ファイルシステムの設計</a>  » -->
 </span></div>
 </div>

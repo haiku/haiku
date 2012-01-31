@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2011, Haiku. All rights reserved.
+ * Copyright 2008-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Používateľská príručka</span></div>
 </div>
 
 <div class="nav">
@@ -45,13 +45,23 @@
 </ul>
 <span>
  «  <a href="filesystem-layout.html">Rozloženie súborového systému Haiku</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="workspaces.html">Workspaces</a>  »
+::  <a href="contents.html" class="uplink">Obsah</a> 
+::  <a href="workspaces.html">Pracovné plochy</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
+<div class="box-info">Preklad tejto stránky zatiaľ nie je dokončený. Dovtedy sa nedokončené časti zobrazia v anglickom origináli.</div>
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td>
+		<a href="#move-resize">Easy moving and resizing</a><br />
+                <a href="#stack-tile">Stack &amp; Tile</a><br />
+                <a href="#open-save-panel">Open and save panels</a><br />
+                <a href="#replicants">Replicants</a></td></tr>
+</table>
 
 <h1>Používateľské rozhranie Haiku</h1>
 
@@ -78,6 +88,25 @@
 <img src="images/gui-images/resizing.png" alt="resizing.png" />
 <p>Držanie <span class="key">CTRL</span> <span class="key">ALT</span> zvýrazní okraje najbližšie pri kurzore. Presúvaním myši môžete meniť zvýraznené okraje. Držaním  <i>pravého tlačidla myši</i> ťahaním meníte veľkosť okna pozdĺž vyznačených okrajov.</p>
 <p>Držaním <span class="key">CTRL</span> <span class="key">ALT</span> a ťahaním  <i>ľavým tlačidlom myši</i> hocikde vrámci okna ním môžete hýbať. Rýchlym kliknutím <i>pravým tlačidlom myši</i> vrátite okno do jeho pôvodnej pozície.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="stack-tile" name="stack-tile">Stack &amp; Tile</a></h2>
+<p>Haiku's user interface provides a unique feature that puts the fact that windows have a yellow tab instead of a full-width title bar to perfect use. It's called "Stack &amp; Tile".<br />
+In the example below, a Tracker window with bookmarks is tiled to the left of a WebPositive window, which itself is stacked with another Tracker window showing the source folder <tt>haiku</tt>. In this animation, the user clicks on the tabs of the stacked windows to alternately bring one or  the other to the front.</p> 
+<img src="images/gui-images/gui-s+t.gif" alt="gui-s+t.gif" />
+<p>Connected like this, the group of windows can be moved and resized together - a nice arrangement to work in a more project centric environment. Instead of looking for the right browser window with documentation, editor and Tracker windows and maybe a related email concerning one project you are currently working on, just stack&amp;tile them together.</p>
+<p>Doing the actual arranging of windows is easy: Hold down <span class="key">OPT</span> while dragging a window by its tab close to another window's tab or border until it's highlighted and release the mouse button.</p>
+<p>Stack &amp; Tile consists of two related parts.</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><img src="images/gui-images/gui-stacking.png" alt="gui-stacking.png" /></td><td width="10"></td>
+<td><p>"<i>Stacking</i>" is putting windows on top of each other, automatically moving the yellow tabs into position.<br />
+While holding <span class="key">OPT</span>, tabs change color when they overlap; drop the window to establish the stacking.</p></td></tr></table>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2" vspace="10">
+<tr><td><img src="images/gui-images/gui-tiling.png" alt="gui-tilinging.png" /></td><td></td>
+<td><p>"<i>Tiling</i>" means gluing windows horizontally or vertically together.<br />
+Again, while holding <span class="key">OPT</span>, the borders that'll fuse together when you drop the window change color when brought near each other.</p></td></tr></table>
+<p>Separation is done in the same way, by holding <span class="key">OPT</span> while dragging a window by its tab out of the group.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -124,8 +153,8 @@ Pravým kliknutím na rúčku replikanta vyvoláte menu s možnosťami zobraziť
 <div class="nav">
 <div class="inner"><span>
  «  <a href="filesystem-layout.html">Rozloženie súborového systému Haiku</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="workspaces.html">Workspaces</a>  »
+::  <a href="contents.html" class="uplink">Obsah</a> 
+::  <a href="workspaces.html">Pracovné plochy</a>  »
 </span></div>
 </div>
 

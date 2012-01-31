@@ -22,7 +22,7 @@
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -45,7 +45,7 @@
 <span>
  «  <a href="activitymonitor.html">ActivityMonitor</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
-::  <a href="cdplayer.html">CDPlayer</a>  »
+::  <a href="cdplayer.html">CD プレーヤー</a>  »
 </span></div>
 </div>
 
@@ -55,9 +55,9 @@
 <h2><img src="../../images/apps-images/bootmanager-icon_64.png" alt="bootmanager-icon_64.png" width="64" height="64" />ブートマネージャー (BootManager)
 </h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><i>メニューにはありません。通常、インストーラーの<span class="menu">ツール</span>メニューから呼び出されます。</i></td></tr>
-<tr><td>場所：</td><td></td><td><span class="path">/boot/system/apps/BootManager</span></td></tr>
-<tr><td>設定ファイル：</td><td></td><td><i>無し。</i><br />MBR のバックアップはデフォルトで <span class="path">~/config/settings/bootman/</span> に保存されます。</td></tr>
+<tr><td>Deskbar メニュー:</td><td style="width:15px;"></td><td><i>メニューにはありません。通常、インストーラーの<span class="menu">ツール</span>メニューから呼び出されます。</i></td></tr>
+<tr><td>場所:</td><td></td><td><span class="path">/boot/system/apps/BootManager</span></td></tr>
+<tr><td>設定ファイル:</td><td></td><td><i>無し。</i><br />MBR のバックアップはデフォルトで <span class="path">~/config/settings/bootman/</span> に保存されます。</td></tr>
 </table>
 <p><br /></p>
 <p>Haiku のパーティションを GRUB のような既存のブートマネージャーに追加しない場合、ブートマネージャーはマスターブートレコード (MBR) に以下の図のような小さなブートメニューをインストールできます。</p>
@@ -74,7 +74,7 @@
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a name="2-backup" id="2-backup">マスターブートレコード (MBR) のバックアップ
 </a></h2>
-<p>なにか調子が悪くなった場合や、再びブートメニューを削除したい場合に備えて、直ちにマスターブートレコード (MBR) が保存されます。これは明らかに重要なステップなので、例えば以前の実験分のような、ほかの MBR バックアップをうっかり上書きしないよう確認してください。</p>
+<p>なにか調子が悪くなった場合や、再びブートメニューを削除する場合に備えて、直ちにマスターブートレコード (MBR) が保存されます。これは明らかに重要なステップなので、たとえば以前の実験分のような、ほかの MBR バックアップをうっかり上書きしないよう確認してください。</p>
 <img src="../images/apps-images/bootmanager-2.png" alt="bootmanager-2.png" /> 
 <img src="../images/apps-images/bootmanager-3.png" alt="bootmanager-3.png" />
 <p>単に、バックアップファイル "<tt>MBR</tt>" の保存先を選択するか、デフォルトのパスのままにするかです。<span class="button">次へ (Next)</span> を押した後に、バックアップが成功したかどうかの確認が表示されます。</p>
@@ -84,13 +84,13 @@
 <img src="../images/apps-images/bootmanager-4.png" alt="bootmanager-4.png" /> 
 <img src="../images/apps-images/bootmanager-5.png" alt="bootmanager-5.png" />
 <p>次に、インストール先ドライブ上のすべてのパーティションのリストを提示されます。チェックマークを入れることで、どの項目をブートメニューに表示するか決定します。テキストボックスで項目名を変更できます。</p>
-<p>次いで、ポップアップメニューから、デフォルトでどのパーティションから起動するかを選択し、その下のスライダーでがデフォルトで起動までの時間を設定します。ここで、 "<i>すぐに (Immediately)</i>" はブートメニューを完全にスキップし、 "<i>永久 (Never)</i>" はブートメニューでストップします。タイムアウト設定は、起動時に <span class="key">ALT</span> を押すことで無効にできます。</p>
+<p>次いで、ポップアップメニューから、デフォルトでどのパーティションから起動するかを選択し、その下のスライダーでがデフォルトで起動までの時間を設定します。ここで、"<i>すぐに (Immediately)</i>" はブートメニューを完全にスキップし、"<i>永久 (Never)</i>" はブートメニューでストップします。タイムアウト設定は、起動時に <span class="key">ALT</span> を押すことで無効にできます。</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a name="4-mbr" id="4-mbr">ブートメニューの書き込み</a></h2>
 <img src="../images/apps-images/bootmanager-6.png" alt="bootmanager-6.png" /> 
 <img src="../images/apps-images/bootmanager-7.png" alt="bootmanager-7.png" />
-<p>ブートメニューが MBR に書き込まれる前に、設定の概要が表示され、次に作業を中止する最後のチャンスがあります。しかし、慌てないでください。MBR のバックアップを安全に保存していれば、変更は容易に戻せます。めちゃくちゃになってしまったとしても、いつでも Haiku インストールl CD や USB ステックから立ち上げて、 MBR バックアップをブートマネージャーを使って書き戻せます。</p>
+<p>ブートメニューが MBR に書き込まれる前に、設定の概要が表示され、次に作業を中止する最後のチャンスがあります。しかし、慌てないでください。MBR のバックアップを安全に保存していれば、変更は容易に戻せます。めちゃくちゃになってしまったとしても、いつでも Haiku インストールl CD や USB ステックから立ち上げて、MBR バックアップをブートマネージャーを使って書き戻せます。</p>
 
 </div>
 </div>
@@ -99,7 +99,7 @@
 <div class="inner"><span>
  «  <a href="activitymonitor.html">ActivityMonitor</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
-::  <a href="cdplayer.html">CDPlayer</a>  »
+::  <a href="cdplayer.html">CD プレーヤー</a>  »
 </span></div>
 </div>
 

@@ -13,6 +13,7 @@
  *		Kentaro Ozeki
  *		satashun
  *		log-1
+ *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -24,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -46,7 +47,7 @@
 </ul>
 <span>
  «  <a href="tracker-add-ons.html">Tracker アドオン</a> 
-::  <a href="contents.html" class="uplink">目次</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="filetypes.html">ファイルタイプ</a>  »
 </span></div>
 </div>
@@ -65,51 +66,52 @@
 
 <h1>Deskbar</h1>
 
-<p>Deskbar は小さなパネルで、デフォルトでは画面右上の角に配置されています。これは Windows における「スタート」ボタンの Haiku 版です。アプリケーションや設定を開くための Deskbar メニューと、時計やその他のツールを表示するトレイを持ち、実行しているプログラムの一覧をその下に表示します。</p>
+<p>Deskbar は小さなパネルで、デフォルトでは画面右上の角に配置されています。これは、Windows における「スタート」ボタンの Haiku 版です。アプリケーションや設定を開くための Deskbar メニューと、時計やその他のツールを表示するトレイを持ち、実行しているプログラムの一覧をその下に表示します。</p>
 <img src="images/deskbar-images/positions.png" alt="positions" />
-<p>トレイの片側にある凸の部分をつかんで新しい位置にドラッグ＆ドロップすると、画面の角、上部あるいは下部に Deskbar を動かすことができます。 Deskbar メニューに凸の部分をドラッグ＆ドロップすることで、バーを小さく折り畳むこともできます。</p>
+<p>トレイの片側にある凸の部分をつかんで新しい位置にドラッグ＆ドロップすると、画面の角、上部あるいは下部に Deskbar を動かすことができます。Deskbar メニューに凸の部分をドラッグ＆ドロップすることで、バーを小さく折りたたむこともできます。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="deskbar-menu" name="deskbar-menu">Deskbar メニュー</a></h2>
-<p>Deskbar の上部をクリックするとメニューが開きます：</p>
+<p>Deskbar の上部をクリックするとメニューが開きます。</p>
 <img src="images/deskbar-images/deskbar.png" alt="deskbar.png" />
 <ul>
-<li><p><b>About This System...</b> - システムについての基本的な情報と、Haiku プロジェクトのライセンスやクレジットを表示します。</p></li>
+<li><p><b>このシステムについて (About This System)</b> - システムについての基本的な情報と、Haiku プロジェクトのライセンスやクレジットを表示します。</p></li>
 
-<li><p><b>Find...</b> - <a href="queries.html">Query</a> ダイアログを開きます。</p></li>
-<li><p><b>Show Replicants</b> - 小さなウィジェットである<a href="gui.html#replicants">レプリカント</a>の表示/非表示を切り替えます。ドラッグ操作、削除、コンテキストメニューへのアクセスができます。</p></li>
-<li><p><b>Mount</b> - デスクトップを右クリックした際に呼び出されるものと同様のオプションを提供します。 （ <a href="tracker.html#mounting-volumes">ボリュームのマウント</a> を参照してください）</p></li>
-<li><p><b>Deskbar Preferences...</b> - Deskbar を設定するためのパネルを開きます。（下を参照してください）</p></li>
-<li><p><b>Shutdown</b> - <span class="menu">Restart System</span> か <span class="menu">Powe Off</span> を選んで実行します。</p></li>
-<li><p><b>Recent Documents, Folders, Applications</b> - 最近利用したドキュメント、フォルダ、アプリケーションの一覧です。（下の <span class="menu"> Deskbar の設定</span> を参照してください）</p></li>
-<li><p><b>Applications, Demos, Deskbar Applets, Preferences</b> - インストール済みのアプリケーション、デモ、アプレットと設定の一覧です。（下の <span class="menu"> Deskbar の設定</span> を参照してください）</p></li>
+<li><p><b>検索… (Find...)</b> - <a href="queries.html">クエリ</a>ダイアログを開きます。</p></li>
+<li><p><b>レプリカントを表示 (Show Replicants)</b> - 小さなウィジェットである<a href="gui.html#replicants">レプリカント</a>の表示  / 非表示を切り替えます。ドラッグ操作、削除、コンテキストメニューへのアクセスができます。</p></li>
+<li><p><b>マウント (Mount)</b> - デスクトップを右クリックした際に呼び出されるものと同様のオプションを提供します。(<a href="tracker.html#mounting-volumes">ボリュームのマウント</a>を参照してください)</p></li>
+<li><p><b>Deskbar の設定 (Deskbar Preferences)</b> - Deskbar を設定するためのパネルを開きます。(下を参照してください)</p></li>
+<li><p><b>シャットダウン… (Shutdown...)</b> - <span class="menu">システムを再起動 (Restart System)</span> か <span class="menu">電源を切る (Power Off)</span> を選んで実行します。</p></li>
+<li><p><b>最近使ったドキュメント、フォルダー、アプリケーション (Recent Documents, Folders, Applications)</b> - 最近利用したドキュメント、フォルダー、アプリケーションの一覧です (下の <span class="menu"> Deskbar の設定</span> を参照してください)。</p></li>
+<li><p><b>Applications、Demos、Deskbar Applets、Preferences</b> - インストール済みのアプリケーション、デモ、アプレットと設定の一覧です。（下の <span class="menu"> Deskbar の設定</span> を参照してください）</p></li>
 </ul>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>Deskbar の設定</h3>
 <img src="images/deskbar-images/configure.png" alt="configure.png" />
 <ul>
-<li><p><b>Menu</b><br />
-Deskbar のメニューに表示する最近利用したドキュメント、フォルダ、アプリケーションの数を指定、あるいはすべて表示するように設定できます。 <br />
-<span class="button">Edit Menu...</span>  ボタンは <span class="path">/boot/home/config/be/</span> フォルダを開きます。フォルダには Deskbar で表示されるファイルとフォルダが置かれています。初期設定では <span class="menu">Applications</span> 、 <span class="menu">Demos</span> 、 <span class="menu">Deskbar Applets</span> と<span class="menu">Preferences</span> になっています。<br />
-このファイルにアプリケーションへのリンクやドキュメント、クエリをコピー、削除することで、項目を追加、削除することができます。</p>
-<p>単にファイルやフォルダをドラッグして、 Deskbar 内の配置したい位置にドロップすることもできます。</p></li>
-<li><p><b>Window （ウィンドウ）</b></p>
+<li><p><b>メニュー (Menu)</b><br />
+Deskbar のメニューに表示する最近利用したドキュメント、フォルダー、アプリケーションの数を指定、あるいはすべて表示するように設定できます。 <br />
+<span class="button">メニューの編集… (Edit Menu...)</span>  ボタンは <span class="path">/boot/home/config/be/</span> フォルダーを開きます。フォルダーには Deskbar で表示されるファイルとフォルダーが置かれています。初期設定では <span class="menu">Applications</span>、<span class="menu">Demos</span>、<span class="menu">Deskbar Applets</span>、および <span class="menu">Preferences</span> になっています。<br />
+このファイルにアプリケーションへのリンクやドキュメント、クエリをコピー、削除することで、項目を追加または削除できます。</p>
+<p>単にファイルやフォルダーをドラッグして、Deskbar 内の配置したい位置にドロップすることもできます。</p></li>
+<li><p><b>Window  (ウィンドウ)</b></p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Always on top</span></td><td> </td><td>Deskbar が常に最前面に来ます。</td></tr>
-<tr><td><span class="menu">Auto raise</span></td><td> </td><td>Deskbar にマウスポインターが触れると前面に来ます。</td></tr>
+<tr><td><span class="menu">常に手前に (Always on top)</span></td><td> </td><td>Deskbar が常に最前面に来ます。</td></tr>
+<tr><td><span class="menu">マウスオーバーで手前に (Auto-raise)</span></td><td> </td><td>Deskbar にマウスポインターが触れると前面に来ます。</td></tr>
+<tr><td><span class="menu">自動的に隠す (Auto-hide)</span></td><td> </td><td>Deskbar は数ピクセルに縮小し、マウスポインタがタッチした時だけ現れます。</td></tr>
 </table></li>
-<li><p><b>Applications （アプリケーション）</b></p>
+<li><p><b>Applications (アプリケーション)</b></p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Sort running applications</span></td><td> </td><td>実行中のアプリケーションの一覧をアルファベット順に並べ替えます。</td></tr>
-<tr><td><span class="menu">Tracker always first</span></td><td> </td><td>アルファベット順に並べ替えた後も、トラッカーの項目を常に一覧の先頭に配置します。</td></tr>
-<tr><td class="onelinetop"><span class="menu">Show application expander</span></td><td> </td><td>指定プログラムの全ウィンドウを表示／非表示にする、小さなウィジェットを提供します。</td></tr>
-<tr><td><span class="menu">Expand new applications</span></td><td> </td><td>新しく起動したプログラムのウィンドウを自動的に開きます。</td></tr>
+<tr><td><span class="menu">実行中のアプリケーションを名前順に並び換える (Sort running applications)</span></td><td> </td><td>実行中のアプリケーションの一覧をアルファベット順に並べ替えます。</td></tr>
+<tr><td><span class="menu">Tracker を常時先頭に表示 (Tracker always first)</span></td><td> </td><td>アルファベット順に並べ替えた後も、トラッカーの項目を常に一覧の先頭に配置します。</td></tr>
+<tr><td class="onelinetop"><span class="menu">エキスパンダーを表示 (Show application expander)</span></td><td> </td><td>指定プログラムの全ウィンドウを表示 / 非表示にする、小さなウィジェットを提供します。</td></tr>
+<tr><td><span class="menu">新しいアプリケーションを展開表示 (Expand new applications)</span></td><td> </td><td>新しく起動したプログラムのウィンドウを自動的に開きます。</td></tr>
 </table></li>
-<li><p><b>時計</b></p>
+<li><p><b>日付と時刻 (Clock)</b></p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Show seconds</span> （秒を表示）</td><td> </td><td>時計に秒を表示します。</td></tr>
+<tr><td><span class="menu">時刻に秒を表示 (Show seconds)</span> </td><td> </td><td>時計に秒を表示します。</td></tr>
 </table></li>
 </ul>
 
@@ -117,16 +119,16 @@ Deskbar のメニューに表示する最近利用したドキュメント、フ
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tray" name="tray">トレイ</a></h2>
 <img src="images/deskbar-images/calendar.png" alt="calendar.png" />
-<p>トレイに配置されているもののひとつに時計があります。時計にカーソルを合わせると、ツールチップに日付が表示されます。左クリックでカレンダーが表示されます。時計の表示／非表示を切り替えるには、時計を右クリックするか <a href="preferences/time.html">Time</a> の設定を起動してください。</p>
-<p>どのプログラムもユーザーにインターフェースを提供するためトレイにアイコンをインストールできます。例えば電子メールシステムでは、未読メールがある時は異なったシンボルを表示します。さらに、メールの作成や確認などを行うためにコンテキストメニューを提供します。 <span class="app">ProcessController</span> はトレイのアイコンを情報（ CPU ／メモリ使用状況）の表示とコンテキストメニューの提供に用いる例です。</p>
+<p>トレイに配置されているもののひとつに時計があります。時計にカーソルを合わせると、ツールチップに日付が表示されます。左クリックでカレンダーが表示されます。時計の表示 / 非表示を切り替えるには、時計を右クリックするか、<a href="preferences/time.html">日付と時間</a>プレファレンスを起動してください。</p>
+<p>どのプログラムもユーザーにインターフェースを提供するためトレイにアイコンをインストールできます。たとえば電子メールシステムでは、未読メールがある時は異なったシンボルを表示します。さらに、メールの作成や確認などを行うためにコンテキストメニューを提供します。<span class="app">プロセスコントローラー</span>はトレイのアイコンを情報 (CPU / メモリ使用状況) の表示とコンテキストメニューの提供に用いる例です。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="list-of-apps" name="list-of-apps">実行しているプログラムの一覧</a></h2>
 <img src="images/deskbar-images/list-of-apps.png" alt="list-of-apps.png" />
-<p>Deskbar の項目をクリックし、サブメニューからウィンドウを選ぶことで、実行中のアプリケーションを選択することができます。右クリックでウィンドウや項目のアプリケーションを最小化、あるいは閉じることができます。</p>
-<p>Deskbar の設定でエキスパンダーを有効にしている場合、アプリケーションのウィンドウの一覧を展開／折りたたみできます。</p>
-<p>すべてのアプリケーションのウィンドウの前には、状態の情報を示すシンボルが付いています。明るいシンボルはウィンドウが可視であること、暗いものは最小化されていることを意味します。シンボルの前に引かれている3本の線は、 ウィンドウが現在のワークスペースにないことを示しています。</p>
+<p>Deskbar の項目をクリックし、サブメニューからウィンドウを選ぶことで、実行中のアプリケーションを選択できます。右クリックでウィンドウや項目のアプリケーションを最小化、あるいは閉じることができます。</p>
+<p>Deskbar の設定でエキスパンダーを有効にしている場合、アプリケーションのウィンドウの一覧を展開 / 折りたたみできます。</p>
+<p>すべてのアプリケーションのウィンドウの前には、状態の情報を示すシンボルが付いています。明るいシンボルはウィンドウが可視であること、暗いものは最小化されていることを意味します。シンボルの前に引かれている 3 本の線は、ウィンドウが現在のワークスペースにないことを示しています。</p>
 
 </div>
 </div>
@@ -134,7 +136,7 @@ Deskbar のメニューに表示する最近利用したドキュメント、フ
 <div class="nav">
 <div class="inner"><span>
  «  <a href="tracker-add-ons.html">Tracker アドオン</a> 
-::  <a href="contents.html" class="uplink">目次</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="filetypes.html">ファイルタイプ</a>  »
 </span></div>
 </div>

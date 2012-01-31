@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -54,16 +54,15 @@
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
-<h2><img src="../../images/prefs-images/locale-icon_64.png" alt="locale-icon_64.png" width="64" height="64" />ロケール</h2>
+<h2><img src="../../images/prefs-images/locale-icon_64.png" alt="locale-icon_64.png" width="64" height="64" />ロケール (Locale)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
-<tr><td>場所：</td><td></td><td><span class="path">/boot/system/preferences/Locale</span></td></tr>
-<tr><td>設定ファイル：</td><td></td><td><span class="path">~/config/settings/Locale settings</span></td></tr>
+<tr><td>Deskbar メニュー:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
+<tr><td>場所:</td><td></td><td><span class="path">/boot/system/preferences/Locale</span></td></tr>
+<tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/Locale settings</span></td></tr>
 </table>
 <p><br /></p>
-<p>Haiku ローカライズシステムは、テキストを訳文に置き換えることだけでなく、数値、日付、および時間をロケール設定に合うやり方でフォーマットするような複雑なタスクを含んでいます。</p>
+<p>Haiku のローカライズシステムは、テキストを訳文に置き換えることだけでなく、数値、日付、および時間をロケール設定に合うやり方で書式設定するような複雑なタスクを含んでいます。</p>
 <div class="box-info">もし、翻訳の手助けをしたい、または訳文のない言語の翻訳を始めたいなら、<a href="http://www.freelists.org/list/haiku-i18n">Haiku-i18n メーリングリスト</a>で連絡をとってください。日本語訳については、Haiku-i18n-jp メーリングリストに連絡してください。</div>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>言語</h2>
@@ -75,17 +74,17 @@
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>書式設定</h2>
 <p><span class="menu">書式設定 (Formatting)</span> タブでは、日付、時刻、数値、および通貨のフォーマットを優先言語の設定とは独立して設定できます。</p>
 <img src="../images/prefs-images/locale-formatting.png" alt="locale-formatting.png" />
-<p>You may be a Spanish fellow located in the Italian speaking part of Switzerland. So, you'd prefer your system in Spanish, but numbers and currency formatted like at work: Swiss/Italian.<br />
-If you're more comfortable with your Spanish names for days and months (think of the modified dates of files, for example), you can override this time-specific formatting with the checkbox at the top to <span class="menu">Use month/day-names from preferred language</span>.</p>
-<p>Granted, the above example is maybe not the most common scenario, but it demonstrates the flexibility of the system.</p>
+<p>あなたは、イタリアのスイス語圏に住むスペイン人かもしれません。なので、システムの言語はスペイン語にしたいでしょう。しかし、数字と通貨は職場のようにスイス/イタリアの書式にします。<br />
+もし、スペイン語の日付および月名により満足していれば (例として、ファイルの修正日を考えてください) 、この時間特有の書式を一番上にある <span class="menu">優先する言語の月/日の名前を使用する (Use month/day-names from preferred language)</span> チェックボックスを使って上書きできます。</p>
+<p>たしかに、上記の例はよくある例ではないかもしれませんが、システムの柔軟性を示しています。</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>オプション</h2>
-<p>The last tab provides an option that will <span class="menu">Translate application and folder names in Deskbar and Tracker</span>. Disable the checkbox if you prefer the graphical interface localized, while retaining the original English names for preference panels, applications and standard folder names.</p>
+<p>最後のタブには、 <span class="menu">Deskbar と Tracker 中のアプリケーション名とフォルダー名を翻訳する。 (Translate application and folder names in Deskbar and Tracker)</span> オプションがあります。もし、グラフィカルインターフェースはローカライズして、プレファレンスパネル、アプリケーション、または標準のフォルダー名を元の英語のままにしておきたい場合は、チェックボックスを無効にしてください。</p>
 <p><br /> </p>
-<p>Changes are applied immediately, though currently running applications may require to be closed and restarted before showing the new setting.</p>
+<p>変更は直ちに適用されます。しかし、実行中のアプリケーションは、新しい設定を表示する前に終了して再起動が必要になるかもしれません。</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">Defaults</span></td><td> </td><td>resets everything to default values.</td></tr>
-<tr><td><span class="button">Revert</span></td><td> </td><td>brings back the settings that were active when you started the Locale preferences.</td></tr>
+<tr><td><span class="button">デフォルト (Defaults)</span></td><td> </td><td>すべてをデフォルト値にリセットします。</td></tr>
+<tr><td><span class="button">元に戻す (Revert)</span></td><td> </td><td>ロケールプリファレンスを起動したときに有効であった設定に戻します。</td></tr>
 </table>
 
 </div>
@@ -94,7 +93,7 @@ If you're more comfortable with your Spanish names for days and months (think of
 <div class="nav">
 <div class="inner"><span>
  «  <a href="keymap.html">キーマップ</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
+::  <a href="../preferences.html" class="uplink">Preferences (プレファレンス)</a> 
 ::  <a href="media.html">メディア</a>  »
 </span></div>
 </div>

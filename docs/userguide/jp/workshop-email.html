@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Workshop: Managing Email</title>
+	<title>ワークショップ: メールの管理</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -50,93 +52,92 @@
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>インデックス</td></tr>
 <tr class="index"><td>
-	<a href="#mailsystem">Haiku's mail system</a><br />
-	<a href="#statuses">Using custom statuses</a><br />
-	<a href="#queries">Using queries</a><br />
-	<a href="#tips">More tips</a>
+	<a href="#mailsystem">Haiku のメールシステム</a><br />
+	<a href="#statuses">カスタムステータスを使う</a><br />
+	<a href="#queries">クエリを使う</a><br />
+	<a href="#tips">追加の小技</a>
 </td></tr>
 </table>
 
-<h1>Workshop: Managing Email</h1>
+<h1>ワークショップ: メールの管理</h1>
 
-<p>This workshop takes a look on how to manage email under Haiku. It assumes that the email services are correctly configured with the <a href="preferences/e-mail.html">E-Mail</a> preferences and you're familiar with the basic features of the <a href="applications/mail.html">Mail</a> application.</p>
+<p>このワークショップでは、Haiku 環境下で電子メールを管理する方法について調べます。電子メールサービスが<a href="preferences/e-mail.html">メール</a>プレファレンスで正しく設定されており、読者が<a href="applications/mail.html">メール</a>アプリケーションの基本的な特徴を理解していることを仮定しています。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="mailsystem" name="mailsystem">Haiku's mail system</a></h2>
-<p>If you come to Haiku from other operating systems, you're probably used to big applications like MS Outlook or Mozilla's Thunderbird. You have to configure them by entering all the info on mail server addresses etc. and they use their own contacts database. They take care of sending and fetching email and store them in some big special file.<br />
-Changing you email client can be a hassle with quite some ex/importing and converting going on. Using more than one client in parallel to check out what else is available is also not without the occasional kerfuffle.</p>
-<p>Haiku's mail system is different. It breaks down into smaller separate modules.</p>
-<p>There's the <span class="app">mail_daemon</span> that takes care of the communication with your mail servers. The <a href="preferences/e-mail.html">E-Mail</a> preferences is the one central point to configure your email accounts and how often they're checked, for example.</p>
-<p>Every message that is fetched or sent is saved as one single email file, with its header information (like sender, subject, date) and status (like New, Replied, Sent) in BFS attributes. This enables searching/filtering them with Haiku's fast queries.</p>
+<a id="mailsystem" name="mailsystem">Haiku のメールシステム</a></h2>
+<p>もし、読者がほかのオペレーティングシステムから Haiku へやってきたとしたら、おそらく、MS Outlook や Mozilla の Thunderbird のような大きなアプリケーションを使っていたでしょう。それらはメールサーバーのアドレスなどの、すべての情報を入力する必要があり、また、それらは独自のコンタクトデータベースを使用しています。それらはメールの送信や受信を管理し、いくつかの特別なファイルに保管します。<br />
+電子メールクライアントを変更することは、いくつかのエクスポート / インポート、および変換が進行する面倒なことになることがあります。他になにか使えるものを調べるために、同時に一つ以上のクライアントを使うことも、たまに問題が起こります。</p>
+<p>Haiku のメールシステムはそれらとは異なったものです。それは、より小さな別々のモジュールに分かれています。</p>
+<p>メールサーバとの通信を管理する、<span class="app">mail_daemon</span> があります。<a href="preferences/e-mail.html">メール</a>プレファレンスは、読者の電子メールアカウント、およびたとえば、メールをチェックする頻度を設定する中心の一つです。</p>
+<p>受信または送信されたすべてのメールは、ひとつの電子メールファイルとして保存されます。ファイルには、BFS 属性中に、ヘッダ情報 (l差出人 (sender)、表題 (subject)、日付(date) のような)、およびステータス (新規 (New)、受信済 (Replied)、送信済 (Sent) のような) を持っています。このことにより、Haiku のすばやいクエリで、メールを検索 / フィルタリングすることができます。</p>
 <img src="images/workshop-email-images/browsing.png" alt="browsing.png" /> 
-<p>With every email being in a separate file, viewing them becomes just as easy as browsing through a folder (or query result) of images with <a href="applications/showimage.html">ShowImage</a>. Leaving the Tracker window open, you'll see the moving selection of the currently viewed file while you use the previous/next button to move through them.<br />
-As they are independent files, using a viewer other than Haiku's <a href="applications/mail.html">Mail</a> causes no problems whatsoever.</p>
-<p>Similarly, creating a new message results in just another file that is handed to the mail_daemon that takes care of sending it off. Contact management is deferred to the <a href="applications/people.html">People</a> application.</p>
-<p>In a nutshell, where other mail clients do everything, from communicating with the mail servers to providing a view with all your mails and tools to search and filter them, Haiku uses a chain of smaller tools and general file management:</p>
+<p>あらゆる電子メールが別々のファイルであるので、それらを閲覧することは,フォルダー内の、(またはクエリの結果の) 画像ファイルを <a href="applications/showimage.html">ShowImage</a> でブラウズするのと同じぐらい容易なことです。Tracker ウィンドウを開いたままにしておくと、移動のために、前へ / 次へボタンを使うたびに、現在見ているファイルの選択が移動するのが見えるでしょう。<br />
+それらは別々のファイルなので、Haiku の <a href="applications/mail.html">メール</a>以外のビューアを使ってもまったく問題ありません。</p>
+<p>同様に、新規メッセージの作成は、メール送信を管理する mail_daemon によって扱われるありふれたファイルの作成となります。コンタクト情報は、 <a href="applications/people.html">People</a> アプリケーションに従います。</p>
+<p>一言で言えば、ほかのメールクライアントが、メールサーバーとの通信からすべてのメールへのビュー、およびそれらを検索およびフィルタリングするためのツールの提供に至るまで、あらゆることができる場所です。Haiku は一連の小さなツールと、一般的なファイル管理を使います。</p>
 <ul>
-<li><p>The <span class="app">mail_daemon</span> to fetch/send mail and save them as normal files.</p></li>
-<li><p>Tracker windows and queries to find and show email files.</p></li>
-<li><p>The <span class="app">Mail</span> application to view email files and create new messages relying on system-wide contact management by the <span class="app">People</span> app.</p></li>
+<li><p><span class="app">mail_daemon</span> は、メールの受信 / 送信をして、普通のファイルに保存するためのものです。</p></li>
+<li><p>Tracker ウィンドウおよびクエリは、電子メールファイルを検索および表示するためのものです。</p></li>
+<li><p><span class="app">メール</span>アプリケーションは、電子メールファイルを閲覧し、<span class="app">People</span> アプリケーションによるシステム全体に渡るコンタクト管理にしたがって、新規メッセージを作成するためのものです。</p></li>
 </ul>
-<p>Especially using Tracker and queries to manage emails is a powerful idea. The experience you gain can be transferred to any other problem that is dealing with files. Be it images, music, video, contacts or any other documents, using Tracker is at the core of all file managing.<br />
-Also, improvements in any of these system areas benefit not just emailing, but all applications that make use of them.</p>
+<p>特に、Tracker およびクエリを使って電子メールを管理することは強力なアイデアです。得られる経験は、ファイル操作のあらゆる問題に転換できます。それが、画像、音楽、ビデオ、コンタクト、またはどんな書類でも、Tracker の使用は、ファイル管理のコアとなります。<br />
+同様に、これらのシステムエリアの改良は、電子メールだけでなく、それらを利用するすべてのアプリケーションに役立ちます。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="status" name="status">Using custom statuses</a></h2>
-<p>When you browse through your newly arrived email, you may want to come back to some of them later to think about it in more depth. While you could use Mail's menu <span class="menu">Close and | Leave as New</span> to keep them in your "<i>New messages</i>" query, things tend to pile up that way...</p>
-<p>One solution is of course to just start a reply and save it as draft. But if you don't expect to write a reply and just want to re-read the mail later, that isn't ideal.</p>
+<a id="status" name="status">カスタムステータスを使う</a></h2>
+<p>新着の電子メールをブラウズする場合、さらに詳しくそれに関して考えるように、後でそれらのうちのいくつかに戻りたいと思うかもしれません。それらを"<i>New messages</i>" クエリ中に維持するために、メールのメニュー<span class="menu">閉じる (Close and) | 「新着」のままにする (Leave as New)</span> を使用できましたが、その方法を積み重ねる傾向があります…)</p>
+<p>ひとつの解決法は、もちろん、単に返答を始めて、下書きとして保存することです。しかし、読者が返事を書くつもりがなく、後でメールを再度ただ読みたいだけならば、それは理想的ではありません。</p>
 <img src="images/workshop-email-images/status.png" alt="status.png" /> 
-<p>Better use <span class="menu">Close and | Set to...</span> to create a new status and use that to categorize your mail. For example, you could call the status "<i>Later</i>", and then query for that when you find more time.<br />
-Or you use different statuses for specific projects. For example, I created a status "<i>HUG</i>" (for "Haiku user guide") under which I collect every mail that may influence the contents of the user guide, like commit messages about code changes that alter or introduce some feature or anything else I feel could improve the user guide.<br />
-In any case, try to keep the status name short. That way it always fits in a normally wide "Status" column in Tracker.</p>
-<p>You don't have to open an email with the <span class="app">Mail</span> application to set its status. With the Tracker add-ons <span class="app">Mark as Read </span> and <span class="app">Mark as...</span> you can select some email files and set their status in one go.</p>
+<p>さらに良い、<span class="menu"> 閉じる (Close and) | 他の属性に変更… (Set to...)</span> の使用は、新しいステータスを作成し、メールを分類するためにそれを使用するためです。たとえば、ステータスを、"<i>後で (Later)</i>" と呼ぶことができ、それから、より多くの時間が取れたときに、そのためにクエリを実行することができました。<br />
+あるいは、特定のプロジェクトのために、別のステータスを使用します。たとえば、ステータス "<i>HUG</i>" ("Haiku ユーザーガイド" 用) を作成し、そこに、ユーザーガイドのコンテンツに影響をおよぼすかもしれないすべてのメールを集めます。それらは、いくつかの機能を変更または導入する、コードの変更に関するコミットメッセージのようなメール、または、ユーザーガイドを改善すると感じるあらゆるメールです。<br />
+どんな場合でも、ステータス名を短くするように努めてください。その方が、常にTracker 中で通常の幅の "Status" 列に適合します。</p>
+<p>そのステータスをセットするために、<span class="app">メール</span>アプリケーションで電子メールを開く必要はありません。Tracker アドオン、<span class="app">Mark as Read </span> および<span class="app"> Mark as...</span> で、いくつかの電子メールファイルを選択し、一回でそれらのステータスをセットすることができます。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="queries" name="queries">Using queries</a></h2>
-<p>Sure, you specify a folder to store all your email, you can open it et voilà,  there's all you mail. But over time the folder becomes crowded and showing all will take longer and longer as thousands of files and their attributes have to be parsed and sorted. Also, most of the time you don't really care about two year old emails of Nigerian princes and their inheritory trouble ...</p>
-<div class="box-info">A lot of time when populating a folder is spent on putting files read from disk into the correct sorting order and displaying that in the window. If you do have to open a folder with a huge number of files, you can shorten the wait by making the Tracker window "invisible", i.e. either minimize it or change to another workspace. Watch <a href="applications/processcontroller.html">ProcessController</a> to see how it affects CPU usage.</div>
-<p><a href="queries.html">Queries</a>, to the rescue!</p>
-<p>By using queries, you can narrow down the view of your mails. Actually, the mailbox icon in the Deskbar uses queries.</p>
+<a id="queries" name="queries">クエリを使う</a></h2>
+<p>確かに、電子メールをすべて格納するためにフォルダーを指定します、しかもそれを開けることができます。 そこに読者のメールのすべてがあります。しかし、時間とともに、フォルダーは込み入ってきます。そして、すべてを表示することは何千ものファイルのようにますます長くかかり、それらの属性を解析し、ソートしなければなりません。同様に、大抵の場合、2 年前のナイジェリアの王子およびそれらの相続問題の電子メールに実際に関心がありません…</p>
+<div class="box-info">フォルダーを読み込むとき、多くの時間が、ディスクから読み込まれたファイルを正しい並び順にし、それらをウィンドウ中に表示することに費やされます。非常に多くのファイルがあるフォルダーを開く必要があるならば、Tracker ウィンドウを、"不可視 (invisible)" にすることで待ち時間を短くすることができます、つまり、ウィンドウを最小化するか、あるいは別のワークスペースへ変更するかのいずれかです。それがどのように CPU 使用率に影響するか確かめるためには、<a href="applications/processcontroller.html">プロセスコントローラー</a>を観察してください。</div>
+<p><a href="queries.html">クエリ</a>、救出!</p>
+<p>クエリを使うことで、メールの表示を限定できます。実際、Deskbar 中のメールボックスアイコンはクエリを使っています。</p>
 <img src="images/workshop-email-images/daemon-in-deskbar.png" alt="daemon-in-deskbar.png" /> 
-<p>The <span class="menu">Open Draft</span> submenu does a query for the status "<i>Draft</i>", which is set by <span class="app">Mail</span> when you save a message.</p>
-<p><span class="menu">Open Inbox Folder</span> and <span class="menu">Open Mail Folder</span> are just links to regular folders (and not very useful in my opinion).</p>
-<p>The <span class="menu"># new messages</span> submenu is populated by a query for email with the status "<i>New</i>" (that same query is used to change the mailbox icon to show some letters in it, by the way).</p>
+<p><span class="menu">下書きを開く (Open Draft)</span> サブメニューは、ステータス "<i>Draft (下書き)</i>" に対するクエリを行います。このステータスは、メッセージを保存したときに、<span class="app">メール</span>によって、ユーザーがメッセージを保存したときにセットされます。</p>
+<p><span class="menu">Open Inbox Folder</span> および <span class="menu">Open Mail Folder</span> は、単に普通のフォルダーへのリンクです (私見ではあまり便利ではありません)。</p>
+<p><span class="menu"># 通の新着メッセージがあります (# new messages)</span> サブメニューは、ステータス "<i>New (新着)</i>" に対するクエリによって現れます (ところで、同じクエリがメールボックスにメールがあることを示すため、メールボックスアイコンを変更するのに使われます)。</p>
 
-<p>You can add your own queries (or folders, applications, scripts etc.) to that context menu too, by putting them or links to them into <span class="path">~/config/settings/Mail/Menu Links</span>.</p>
-<div class="box-info">The query <span class="path">~/config/settings/Mail/mailbox</span> is a special case: It is executed when left-clicking the mailbox icon in the Deskbar. If you want to change that behavior, you can replace it with any other file (or link to a file), just name it "<i>mailbox</i>". It doesn't have to be a query, a link to a folder of queries or a script or application works just as well.</div>
+<p>独自のクエリ (または、フォルダー、アプリケーション、スクリプトなど) をそのコンテキストメニューに追加できます。それら、またはそれらへのリンクを、<span class="path">~/config/settings/Mail/Menu Links</span> に入れてください。</p>
+<div class="box-info">クエリ、<span class="path">~/config/settings/Mail/mailbox</span> は特例です。それは、Deskbar 内のメールボックスアイコンを左クリックしたときに実行されます。もしその振る舞いを変えたいなら、それをほかのどんなファイル (またはファイルへのリンク) に置き換えることができます。それには、単にファイル名を "<i>mailbox</i>" とするだけです。それはクエリである必要はありません。クエリのフォルダーへのリンク、スクリプト、またはアプリケーションでも同様に動作します。</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="query-examples" name="query-examples">Query examples</a></h3>
-<p>Here are a few examples of useful queries:</p>
+<a id="query-examples" name="query-examples">クエリのサンプル</a></h3>
+<p>便利なクエリの少しの例を以下に示します。</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="10">
 <tr align="center"><td><img src="images/workshop-email-images/query-1.png" alt="query-1.png" /><br />
-This finds all mails with the custom status "<i>Later</i>".</td>
+これは、カスタムステータス "<i>Later</i>" を持つメールをすべて検索します。</td>
 <td><img src="images/workshop-email-images/query-2.png" alt="query-2.png" /><br />
-This finds all mails of the past 2 days.</td></tr>
+これは、過去 2 日間のメールをすべて検索します。</td></tr>
 
 <tr align="center"><td><img src="images/workshop-email-images/query-3.png" alt="query-3.png" /><br />
-This finds all mails by Ingo Weinhold of the past 2 weeks.</td>
+これは、過去 2 週間に Ingo Weinhold から来たメールをすべて検索します。</td>
 <td><img src="images/workshop-email-images/query-4.png" alt="query-4.png" /><br />
-This finds all posts from the Haiku commit list of the past 12 hours.</td></tr>
+これは、過去 12 時間に、Haiku commit list に投稿されたものをすべて検索します。</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="tips" name="tips">More tips</a></h2>
+<a id="tips" name="tips">追加の小技</a></h2>
 <ul>
-<li><p>If you don't save a query as "<i>Query</i>" but as "<i>Query template</i>", invoking it won't show the result window, but the Find... window instead. That way you can easily exchange the search string for the subject or sender, for example, or change a "<i>2 days</i>" time limit to "<i>3 days</i>".</p></li>
-<li><p>Activating "type-ahead filtering" in <a href="tracker.html#tracker-preferences">Tracker's preferences</a> allows you to very quickly filter a query result even further. Often it's enough to query for all mails of the last 3 days and go with type-ahead filtering from there. The big advantage is, that you don't have to exactly specify which attribute to search for, as all displayed are considered when filtering.</p></li>
-<li><p><a href="http://haikuware.com/directory/view-details/utilities/desktop-accessories/relatedmail">RelatedMail</a> is a nifty little application that will query for all mails with the same subject/sender/time-frame etc. of a dropped email. Kind of what the <span class="menu">Queries</span> menu in the <span class="app">Mail</span> app is supposed to do.</p></li>
+<li><p>クエリを、"<i>クエリ</i>" で保存せず、 "<i>クエリテンプレート</i>" として保存するなら、その起動は結果ウィンドウではなく、検索…ウィンドウとなるでしょう。そのほうが、件名、または送信元に対する検索文字列の交換や、たとえば、 "<i>2 days</i>" タイムリミットを "<i>3 days</i>" に変更することが容易にできます。</p></li>
+<li><p> <a href="tracker.html#tracker-preferences">Tracke 設定</a>で、"先行入力フィルタリング (type-ahead filtering)" を有効にすると、さらにもっとクエリの結果を素早くフィルタリングできます。たいてい、すべてのメールを過去 3 日間でクエリし、そこから先行入力フィルタリングで進むだけで充分です。大きな利点は、正確にどの属性で検索するか正確に指定する必要がないことです。フィルタリング中は、表示されている属性がすべて考慮されます。</p></li>
+<li><p><a href="http://haikuware.com/directory/view-details/utilities/desktop-accessories/relatedmail">RelatedMail</a> は、送信済電子メールの同じ主題 / 送り手 / 時間枠などですべてのメールに対してクエリするすてきな小さなアプリケーションです。一種の、<span class="app">メールl</span>アプリケーションの<span class="menu">クエリ (Queries)</span> メニューが行うはずのものです。</p></li>
 </ul>
 
 </div>
@@ -145,7 +146,7 @@ This finds all posts from the Haiku commit list of the past 12 hours.</td></tr>
 <div class="nav">
 <div class="inner"><span>
  «  <a href="queries.html">クエリ</a> 
-::  <a href="contents.html" class="uplink">目次</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="applications.html">アプリケーション</a>  »
 </span></div>
 </div>

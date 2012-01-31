@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2011, Haiku. All rights reserved.
+ * Copyright 2008-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,18 +12,19 @@
  * Translators:
  *		Kentaro Ozeki
  *		log-1
+ *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Haiku の GUI</title>
+	<title>Haiku のグラフィカルユーザーインターフェース</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -45,7 +46,7 @@
 </ul>
 <span>
  «  <a href="filesystem-layout.html">ファイルシステムの設計</a> 
-::  <a href="contents.html" class="uplink">目次</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="workspaces.html">ワークスペース</a>  »
 </span></div>
 </div>
@@ -53,78 +54,107 @@
 <div id="content">
 <div>
 
-<h1>Haiku の GUI</h1>
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>インデックス</td></tr>
+<tr class="index"><td>
+		<a href="#move-resize">すばやくウィンドウを移動またはリサイズする方法</a><br />
+                <a href="#stack-tile">Stack &amp; Tile</a><br />
+                <a href="#open-save-panel">読み込み・保存パネル</a><br />
+                <a href="#replicants">レプリカント</a></td></tr>
+</table>
 
-<p>Haiku のグラフィカルユーザインタフェースはシステムと統合されています。 Unix ベースのオペレーティングシステムとは異なり、独立したウインドウマネージャを持っていないので、コンソールモードで直接ブートすることはできません。Haiku はデスクトップユーザに主眼を置いているので、ただ単純にコンソールモードは必要でないと考えられています。</p>
-<p>おそらく他のグラフィカルな環境で使ったことがあると思われる、メニュー、右クリックでのコンテキストメニュー、ドラッグ＆ドロップといった標準的な動作はスキップして、代わりに Haiku の GUI に特有のものをいくつか見てみましょう。</p>
+<h1>Haiku のグラフィカルユーザーインターフェース</h1>
+
+<p>Haiku のグラフィカルユーザインタフェースはシステムと統合されています。Unix ベースのオペレーティングシステムとは異なり、独立したウィンドウマネージャを持っていないので、コンソールモードで直接ブートすることはできません。Haiku はデスクトップユーザに主眼を置いているので、ただ単純にコンソールモードは必要でないと考えられています。</p>
+<p>おそらくほかのグラフィカルな環境で使ったことがあると思われる、メニュー、右クリックでのコンテキストメニュー、ドラッグ＆ドロップといった標準的な動作はスキップして、代わりに Haiku のグラフィカルユーザインタフェースに特有のものをいくつか見てみましょう。</p>
 <img src="images/gui-images/gui.png" alt="gui.png" />
-<p> Haiku の GUI に関して、分かりにくく説明を必要とする部分はごくわずかです。</p>
+<p> Haiku のグラフィカルユーザインタフェースに関して、分かりにくく説明を必要とする部分はごくわずかです。</p>
 <ol>
 <li><p>Deskbar は Haiku の「スタート」メニューとタスクバーです。トピック <a href="deskbar.html">Deskbar</a> を参照してください。</p></li>
 <li>黄色いタブは単にプログラム名やドキュメントのファイル名を表示する以上の働きをします:
-<ul><li> <span class="key">SHIFT</span> キーを押しながらドラッグすると、タブを別の位置に移動できます。これにより、多くのウインドウを積み重ねても、名前つきタブによって簡単にウインドウにアクセスできるようになります。</li>
-<li>ウインドウのタブをダブルクリックすることでウインドウを最小化できます。 <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span> で同様の操作が可能です。最小化したウインドウは <a href="deskbar.html">Deskbar</a> や <a href="twitcher.html">Twitcher</a> 内のそれぞれの項目からアクセスできます。</li>
-<li>タブ（またはウインドウの枠）を右クリックして、ウインドウを最背面に送ることができます。</li></ul></li>
+<ul><li> <span class="key">SHIFT</span> キーを押しながらドラッグすると、タブを別の位置に移動できます。これにより、多くのウィンドウを積み重ねても、名前つきタブによって簡単にウィンドウにアクセスできるようになります。</li>
+<li>ウィンドウのタブをダブルクリックすることでウィンドウを最小化できます。<span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span> で同様の操作が可能です。最小化したウィンドウは <a href="deskbar.html">Deskbar</a> や <a href="twitcher.html">Twitcher</a> 内のそれぞれの項目からアクセスできます。</li>
+<li>タブ (またはウィンドウの枠) を右クリックして、ウィンドウを最背面に送ることができます。</li></ul></li>
 <li><p>「閉じる」ボタン。</p></li>
-<li><p>「ズーム」ボタン （または <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span> ）。ほとんどのアプリケーションではウインドウを最大化します。しかし必ずしもそうなるわけではなく、例えば、 Tracker のウインドウでは、ウィンドウの内容の表示に最適なサイズにリサイズします。</p></li>
-<li><p>リサイズコーナー。ここ以外のウインドウ枠をドラッグするとウインドウが移動します。</p></li>
+<li><p>「ズーム」ボタン (または <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span> )。ほとんどのアプリケーションではウィンドウを最大化します。しかし必ずしもそうなるわけではなく、たとえば、Tracker のウィンドウでは、ウィンドウの内容の表示に最適なサイズにリサイズします。</p></li>
+<li><p>リサイズコーナー。ここ以外のウィンドウ枠をドラッグするとウィンドウが移動します。</p></li>
 </ol>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="move-resize" name="move-resize">素早くウィンドウを移動またはリサイズする方法</a></h2>
-<p>ウィンドウの移動やリサイズは同時に実行している複数のアプリケーションを取り扱う操作の大部分を占めます。黄色の小さいタイトルタブや、もっと細いウィンドウの枠を使う代わりに、より簡単にウィンドウを動かす方法があります。 また、リサイズコーナーは小さい上に、右下の角からその方向にしかリサイズできないという制約があります。</p>
-<p>こうした問題に対処するために、 Haiku は <span class="key">CTRL</span> <span class="key">ALT</span> （ウィンドウを管理するキーの組み合わせ）とマウスを使った素晴らしい解決策を提供しています。ウィンドウ管理に関連するもっと多くのショートカットについては<a href="keyboard-shortcuts.html#general">ショートカットやキーの組み合わせ</a>の章も参照してください。</p>
+<a id="move-resize" name="move-resize">すばやくウィンドウを移動またはリサイズする方法</a></h2>
+<p>ウィンドウの移動やリサイズは同時に実行している複数のアプリケーションを取り扱う操作の大部分を占めます。黄色の小さいタイトルタブや、もっと細いウィンドウの枠を使う代わりに、より簡単にウィンドウを動かす方法があります。また、リサイズコーナーは小さい上に、右下の角からその方向にしかリサイズできないという制約があります。</p>
+<p>こうした問題に対処するために、Haiku は <span class="key">CTRL</span> <span class="key">ALT</span>  (ウィンドウを管理するキーの組み合わせ) とマウスを使ったすばらしい解決策を提供しています。ウィンドウ管理に関連するもっと多くのショートカットについては、<a href="keyboard-shortcuts.html#general">ショートカットやキーの組み合わせ</a>の章も参照してください。</p>
 <img src="images/gui-images/resizing.png" alt="resizing.png" />
-<p><span class="key">CTRL</span> <span class="key">ALT</span> を押し続けるとマウスポインタに最も近いウィンドウの枠がハイライトされます。対象を変更するにはマウスを他の枠の方向に動かします。<i>右マウスボタン</i>でクリックしてドラッグすると、ハイライトされた枠に沿ってウィンドウをリサイズできます。</p>
-<p><span class="key">CTRL</span> <span class="key">ALT</span> を押しながら<i>左マウスボタン</i>でウィンドウの任意の場所をクリックしてドラッグすると、 ウィンドウを動かすことができます。元の位置に戻すには、<i>右マウスボタン</i>で素早くクリックします。</p>
+<p><span class="key">CTRL</span> <span class="key">ALT</span> を押し続けるとマウスポインタにもっとも近いウィンドウの枠がハイライトされます。対象を変更するにはマウスをほかの枠の方向に動かします。<i>右マウスボタン</i>でクリックしてドラッグすると、ハイライトされた枠に沿ってウィンドウをリサイズできます。</p>
+<p><span class="key">CTRL</span> <span class="key">ALT</span> を押しながら<i>左マウスボタン</i>でウィンドウの任意の場所をクリックしてドラッグすると、ウィンドウを動かせます。元の位置に戻すには、<i>右マウスボタン</i>ですばやくクリックします。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="open-save-panel" name="open-save-panel">読込・保存パネル</a></h2>
-<p>どのようなアプリケーションでも、ファイルを開いたり保存したりする際は以下のようなパネルが開きます：</p>
+<a id="stack-tile" name="stack-tile">Stack &amp; Tile (スタック＆タイル)</a></h2>
+<p>Haiku のユーザーインターフェースは、ウィンドウがフルサイズのタイトルバーの代わりに黄色のタブを持っているという事実を、完全な利用とするユニークな特徴を提供します。それは、"Stack &amp; Tile (スタック＆タイル)" と呼ばれます。<br />
+以下の例において、ブックマークを表示した Tracker ウィンドウが、WebPositive ウィンドウの左側にタイルします。WebPositive ウィンドウ自体は、ソースフォルダー  <tt>haiku</tt> を表示する別の Tracker ウィンドウとスタックしています。
+このアニメーションでは、交互に 1 つまたは他方を正面へ持って来るために、ユーザはスタックしたウィンドウのタブをクリックします。</p> 
+<img src="images/gui-images/gui-s+t.gif" alt="gui-s+t.gif" />
+<p>このようにつながっているので、ウィンドウのグループは同時に移動、およびリサイズできます。よりプロジェクト中心の環境で作業するよい配置です。右側のドキュメントとweb ブラウザーウィンドウの代わりに、エディターと Tracker ウィンドウ、そしておそらく作業中のプロジェクトに関する関連する電子メールを、それらと一緒に stack&amp;tile できます。</p>
+<p>ウィンドウを実際に配置することは容易です。別のウィンドウのタブか枠の近くまでウィンドウをタブでドラッグしながら、ウィンドウが強調されるまで、<span class="key">OPT</span> を押してください。それから、マウスボタンを離します。</p>
+<p>Stack &amp; Tile は、2 つの関連する部分から成ります。</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><img src="images/gui-images/gui-stacking.png" alt="gui-stacking.png" /></td><td width="10"></td>
+<td><p>"<i>Stacking (スタック)</i>" は、ウィンドウを互いの上に置くことです。黄色のタブは自動的に所定の位置につきます。<br />
+<span class="key">OPT</span> を押しながらタブを重ねると、色が変わります。次に、ウィンドウにドロップして、スタックします。</p></td></tr></table>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2" vspace="10">
+<tr><td><img src="images/gui-images/gui-tiling.png" alt="gui-tilinging.png" /></td><td></td>
+<td><p>"<i>Tiling (タイル)</i>" は、ウィンドウを水平方向、または垂直方向に互いをくっつけることです。<br />
+先と同様に、<span class="key">OPT</span> を押しながら、ウィンドウを互いに近づけたとき、色が変わったウィンドウをドロップすれば、ウィンドウ枠は互いにくっつくでしょう。</p></td></tr></table>
+<p>分離は同じように行えます。ウィンドウをタブでドラッグ中に <span class="key">OPT</span> を押せば、グループの外に出ます。</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="open-save-panel" name="open-save-panel">読み込み・保存パネル</a></h2>
+<p>どのようなアプリケーションでも、ファイルを開いたり保存したりする際は以下のようなパネルが開きます。</p>
 <img src="images/gui-images/open-save.png" alt="open-save.png" />
-<p>パネルは一般的な要素をすべて備えています：現在のフォルダ下のファイル選択リスト、保存パネルではファイル名を入力するテキストフィールドと、異なるファイル形式のためのポップアップメニュー、そしてその設定です。<br />
-ファイル選択リストの上にあるポップアップメニューで親フォルダに移動できます。</p>
-<p>ファイルを開く場所の Tracker ウインドウをすでに開いていれば、そのファイルやフォルダ表現（ Tracker メニューバーの右端のフォルダアイコン）をパネルにドラッグすることができます。これによって、その新しい場所にパネルを変更できます。</p>
+<p>パネルは一般的な要素をすべて備えています。現在のフォルダー下のファイル選択リスト、保存パネルではファイル名を入力するテキストフィールドと、異なるファイル形式のためのポップアップメニュー、そしてその設定です。<br />
+ファイル選択リストの上にあるポップアップメニューで親フォルダーに移動できます。</p>
+<p>ファイルを開く場所の Tracker ウィンドウをすでに開いていれば、そのファイルやフォルダー表現 (Tracker メニューバーの右端のフォルダーアイコン) をパネルにドラッグできます。これによって、その新しい場所にパネルを変更できます。</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="open-save-shortcuts" name="open-save-shortcuts">キーボードショートカット</a></h3>
-<p>Tracker で利用されるショートカットの多くが、読込パネルと保存パネルでも利用できます。<span class="menu">ファイル</span>メニューを使っても利用できるコマンドに加えて、いくつか分かりにくいコマンドがあります：</p>
+<p>Tracker で利用されるショートカットの多くが、読み込みパネルと保存パネルでも利用できます。<span class="menu">ファイル</span>メニューを使っても利用できるコマンドに加えて、いくつか分かりにくいコマンドがあります。</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td>新しいフォルダを作成します。</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">E</span></td><td></td><td>選択した項目の名前を変更することができます。</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:24px;"></td><td>親フォルダに移動します。</td></tr>
-<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> または <span class="key">ENTER</span></td><td></td><td>選択したフォルダに移動します。</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td></td><td>Desktop に移動します。</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td></td><td>ホームフォルダに移動します。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td>新しいフォルダーを作成します。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">E</span></td><td></td><td>選択した項目の名前を変更できます。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:24px;"></td><td>親フォルダーに移動します。</td></tr>
+<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> または <span class="key">ENTER</span></td><td></td><td>選択したフォルダーに移動します。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td></td><td>デスクトップに移動します。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td></td><td>ホームフォルダーに移動します。</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="favorites-recent" name="favorites-recent">Favorites および Recent フォルダ</a></h3>
-<p>読込パネルと保存パネルにある <span class="menu">Favorites</span> メニューは、最近訪れたフォルダと、独自に設定できるお気に入りの場所を利用できるようにします。小さな矢印で示されているように、これらの場所からサブメニューを通じてさらに下の階層に移ることができます。</p>
+<a id="favorites-recent" name="favorites-recent">Favorites および Recent フォルダー</a></h3>
+<p>読み込みパネルと保存パネルにある <span class="menu">お気に入り (Favorites)</span> メニューは、最近訪れたフォルダーと、独自に設定できるお気に入りの場所を利用できるようにします。小さな矢印で示されているように、これらの場所からサブメニューを通じてさらに下の階層に移動できます。</p>
 <img src="images/gui-images/favorites.png" alt="favorites.png" />
-<p>お気に入りを追加するには、目的地へ移動して、 <span class="menu">Favorites | Add current folder</span> を選択します。すべての Open / Save パネルにそれが表示されるようになります。お気に入りを削除するためには、 <span class="menu">Favorites | Configure favorites...</span> を選んで、その項目を削除してください。<br />
-お気に入りはすべて <span class="path">/boot/home/config/settings/Tracker/Go/</span> に保持されているので、そこに直接ファイルやフォルダへのリンクを追加または削除しても同様です。</p>
+<p>お気に入りを追加するには、目的地へ移動して、<span class="menu">お気に入り | このフォルダーを追加 (Favorites | Add current folder)</span> を選択します。すべての Open / Save パネルにそれが表示されるようになります。お気に入りを削除するためには、<span class="menu">お気に入りお気に入りの編集… (Favorites | Configure favorites..).</span> を選んで、その項目を削除してください。<br />
+お気に入りはすべて <span class="path">/boot/home/config/settings/Tracker/Go/</span> に保持されているので、そこに直接ファイルやフォルダーへのリンクを追加または削除しても同様です。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="replicants" name="replicants">Replicant</a></h2>
-<p>Replicant は、アプリケーションに内蔵されている、他のプログラムと統合可能な部分です。 Deskbar の <span class="menu">Show replicants</span> がオンの状態のとき、アプリケーションの Replicant 化可能な部分は通常、右下にある小さなハンドルによって見分けることができます：</p>
+<a id="replicants" name="replicants">レプリカント</a></h2>
+<p>レプリカント (Replicant) は、アプリケーションに内蔵されている、ほかのプログラムと統合可能な部分です。Deskbar の <span class="menu">レプリカントを表示 (Show replicants)</span> がオンの状態のとき、アプリケーションのレプリカント化可能な部分は通常、右下にある小さなハンドルによって見分けることができます。</p>
 <img src="../images/gui-images/replicant.png" alt="replicant.png" />
-<p>Replicant に対応する場所で最も目立つのはデスクトップです： 小さいハンドルをそこにドラッグ＆ドロップするだけで、それをデスクトップの一部にできます。レプリカント元のアプリケーションは、動作のために起動する必要はありません。
-Replicant ハンドル上で右クリックすると、元のアプリケーションの <span class="menu">About</span> ウインドウと <span class="menu">Remove replicant</span> へのコンテキストメニューを表示します。</p>
-<div class="box-info">万が一デスクトップ上の Replicant に問題が生じて取り除くことができなくなった場合は、 <span class="path">~/config/settings/Tracker/tracker_shelf</span> を削除してください。残念ながら、この操作では<i>すべての</i> Replicant をデスクトップ上から取り除くことになります。</div>
-<p>Replicant 化可能なアプリケーションの例として、 <a href="applications/activitymonitor.html">ActivityMonitor</a> のグラフ、 <a href="workspaces.html">Workspaces applet</a> や <a href="applications/deskcalc.html">DeskCalc</a> があります。</p>
+<p>レプリカントに対応する場所でもっとも目立つのはデスクトップです。小さいハンドルをそこにドラッグ＆ドロップするだけで、それをデスクトップの一部にできます。レプリカント元のアプリケーションを動作のために起動する必要はありません。
+レプリカントハンドル上で右クリックすると、元のアプリケーションの <span class="menu">About</span> ウィンドウと、<span class="menu">レプリカントを削除 (Remove replicant)</span> へのコンテキストメニューを表示します。</p>
+<div class="box-info">万が一デスクトップ上のレプリカントに問題が生じて取り除くことができなくなった場合は、<span class="path">~/config/settings/Tracker/tracker_shelf</span> を削除してください。残念ながら、この操作では<i>すべての</i>レプリカントをデスクトップ上から取り除くことになります。</div>
+<p>レプリカント化可能なアプリケーションの例として、<a href="applications/activitymonitor.html">利用状況モニター</a>のグラフ、<a href="workspaces.html">ワークスペースアプレット</a>、または<a href="applications/deskcalc.html">電卓</a>があります。</p>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
  «  <a href="filesystem-layout.html">ファイルシステムの設計</a> 
-::  <a href="contents.html" class="uplink">目次</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="workspaces.html">ワークスペース</a>  »
 </span></div>
 </div>

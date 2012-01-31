@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		helix84
+ *		Marek
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -22,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Používateľská príručka</span></div>
 </div>
 
 <div class="nav">
@@ -51,7 +52,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/textsearch-icon_64.png" alt="textsearch-icon_64.png" width="64" height="64" />Hľadanie textu</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -60,31 +60,30 @@
 <tr><td>Nastavenia:</td><td></td><td><span class="path">~/config/settings/TextSearch</span></td></tr>
 </table>
 <p><br /></p>
-<p>TextSearch looks for a string in text files. Typically it is invoked from <a href="../tracker-add-ons.html">Tracker's Add-on</a> context menu on the selection of files or folders you want to search.</p>
+<p>Hľadanie textu vyhľadáva reťazec v textových súboroch. Typicky to je spustený z kontextového menu <a href="../tracker-add-ons.html">Doplnkov Trackera</a>  pre výber súborov alebo zložiek, ktoré chcete prehľadávať.</p>
 
 <img src="../images/apps-images/textsearch.png" alt="textsearch.png" />
 
-<p>You enter a search string in the text box on top and hit <span class="key">RETURN</span> or click <span class="button">Search</span> to start. If <span class="menu">Show lines</span> is checked, the hits are automatically expanded to show the lines of the file containing the search string.</p>
+<p>Zadajte hľadaný reťazec do textového poľa hore a stlačte <span class="key">RETURN</span> alebo kliknite na <span class="button">Hľadať</span>. Ak je <span class="menu">Zobrazovať riadky</span> zaškrtnuté, zhody sú automaticky roztvorené, aby ukázali riadky súboru zahŕňajuceho hľadný reťazec.</p>
 
-<p>Only a few words on some of the otherwise self-explaining menu items:</p>
+<p>Len pár slov o niektorých inak intuitívnych položiek ponuky:</p>
 <table summary="menus" border="0" cellpadding="2" cellspacing="0">
-<tr><td colspan="5"><h3>File menu</h3></td></tr>
-<tr><td class="onelinetop"><span class="menu">New window</span></td><td></td><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Opens a new window where you can enter another string and search through the same files/folders.
-</td></tr>
-<tr><td><span class="menu">Set target...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Lets you choose a new set of files and folders to search through.</td></tr>
-<tr><td colspan="5"><h3>Action menu</h3></td></tr>
-<tr><td><span class="menu">Trim selection</span></td><td></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Removes all entries from the list that are not currently selected.</td></tr>
-<tr><td><span class="menu">Open selection</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>Opens the currently selected files with their preferred application (same as a double-click). If it's a text editor supporting it (like Pe), you can jump to the exact line the search string was found.</td></tr>
-<tr><td><span class="menu">Open files in Tracker</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>Opens the location of the currently selected files in Tracker.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Copy text to clipboard</span></td><td></td><td><span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Copies the current selection to the clipboard.</td></tr>
-<tr><td colspan="5"><h3>Settings menu</h3></td></tr>
-<tr><td colspan="3" class="onelinetop"><span class="menu">Skip folders starting with a dot</span></td><td> </td><td>This is useful when working in a "unixy" environment, where often administrative files are hidden inside "<tt>.folders/</tt>". Source versioning systems like SVN and CVS are examples of applications using this and are also widely used in Haiku.</td></tr>
-<tr><td colspan="3"><span class="menu">Escape search text</span></td><td> </td><td>TextSearch uses the command line tool <span class="cli">grep</span>. For it, special characters like <tt>'"*\$?!</tt> and spaces have to be escaped with a <tt>\</tt>. Deactivating this setting means you have to do this yourself, but in exchange grants you the power of <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">regular expressions</a>.</td></tr>
-<tr><td colspan="3"><span class="menu">Text files only</span></td><td> </td><td>TextSearch is currently only useful for finding strings in plain text files. Deactivating this setting will have it look through any kind of file anyway.</td></tr>
-<tr><td colspan="5"><h3>History menu</h3></td></tr>
-<tr><td colspan="4"></td><td>Contains recently used search strings.</td></tr>
-<tr><td colspan="5"><h3>Encoding menu</h3></td></tr>
-<tr><td colspan="4"></td><td>Lets you choose different character encodings if needed.</td></tr>
+<tr><td colspan="5"><h3>Ponuka Súbor</h3></td></tr>
+<tr><td class="onelinetop"><span class="menu">Nové okno</span></td><td></td><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Otvára nové okno, kde môžte zadať ďalší reťazec a prehľadávať tie isté priečinky/súbory.</td></tr>
+<tr><td><span class="menu">Nastaviť cieľ...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Umožňuje zvoliť novú sadu súborov a priečinkov prehľadávať ich.</td></tr>
+<tr><td colspan="5"><h3>Ponuka Operácie</h3></td></tr>
+<tr><td><span class="menu">Orezať výber</span></td><td></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Odstráni všetky záznamy zo zoznamu, ktoré nie sú momentálne vybrané.</td></tr>
+<tr><td><span class="menu">Otvoriť výber</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>Otvorí vybrané súbory s ich preferovanú aplikáciu (rovnaké ako dvojklik). Ak to v textový editor podporuje (napr. Pe), môžete skočiť na presný riadok, kde bol hľadaný reťazec nájdený.</td></tr>
+<tr><td><span class="menu">Zobraziť súbory v Trackeri</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>Otvára miesto, kde sa nachádzajú práve vybrané súbory.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Skopírovať text do schránky</span></td><td></td><td><span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Skopíruje aktuálny výber do schránky.</td></tr>
+<tr><td colspan="5"><h3>Ponuka Nastavenia</h3></td></tr>
+<tr><td colspan="3" class="onelinetop"><span class="menu">Preskakovať priečinky začínajúce bodkou</span></td><td> </td><td>To je užitočné pri práci v "unixovom" prostredí, kde sú administratívne súbory často skryté vnútri "<tt>.priečinkoch/</tt>". Systémy zdrojových verzií ako SVN a CVS sú príklady aplikácií používajúcich to a sú tiež široko používané v Haiku.</td></tr>
+<tr><td colspan="3"><span class="menu">Vložiť únikové klauzuly do hľadaného textu</span></td><td> </td><td>Hľadanie textu používa nástroj príkazového riadku <span class="cli">grep</span>. Pre to, špeciálne znaky ako <tt>'"*\$?!</tt> a medzery musia odchádzať s <tt>\</tt>. Deaktivovanie tohto nastavenia znamená že to musíte robiť sami, ale maniesto toho vám garantuje silu <a href="http://sk.wikipedia.org/wiki/Regul%C3%A1rny_v%C3%BDraz" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">regulárnych výrazov</a>.</td></tr>
+<tr><td colspan="3"><span class="menu">Iba textové súbory</span></td><td> </td><td>Hľadanie textu je v súčasnej dobe jediný užitočný nástroj pre hľadanie reťazcov v textových súboroch. Deaktivácia tohto nastavenia prehľadá všetky typy súborov.</td></tr>
+<tr><td colspan="5"><h3>Ponuka História</h3></td></tr>
+<tr><td colspan="4"></td><td>Obsahuje nedávno hľadané reťazce.</td></tr>
+<tr><td colspan="5"><h3>Ponuka Kódovanie</h3></td></tr>
+<tr><td colspan="4"></td><td>Vyberte si iné kódovanie znakov ak je to potrebné.</td></tr>
 </table>
 </div>
 </div>

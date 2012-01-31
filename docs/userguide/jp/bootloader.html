@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		log-1
+ *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -22,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -45,7 +46,7 @@
 <span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-    <a href="contents.html" class="uplink">目次</a> 
+    <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="filesystem-layout.html">ファイルシステムの設計</a>  »
 </span></div>
 </div>
@@ -55,13 +56,13 @@
 
 <h1>ブートローダー</h1>
 
-<p>ハードウェア周りに問題が生じた場合や、Haikuを2つ以上インストールしていて(おそらくインストールCD上あるいはUSBメモリ上のHaiku)、そのいずれかを選択したい場合にHaikuのブートローダーは役立ちます。<br />
-また、あるソフトウェア・コンポーネントをインストールしたもののそれが正しく動作せず、システムの起動を妨げてしまうような状況で、そのコンポーネントを再度削除するのにもHaikuのブートローダーは役立ちます。後で述べるように、<i>Disable user add-ons</i>オプションを有効にすると、ドライバーといったユーザーがインストールしたコンポーネントを読み込まずにHaikuが起動します。</p>
-<p>ブートローダーのオプションに入るには、Haikuの起動プロセスが始まる前に<span class="key">SHIFT</span>キーを押しっぱなしにする必要があります。ブートマネージャーがインストールされている場合は、Haikuのブート・エントリーを実行する前に<span class="key">SHIFT</span>を押し続ける動作を始めても構いません。Haikuがそのマシンの唯一のオペレーティング・システムである場合、BIOSからのブート・メッセージがまだ表示されている状態からSHIFTキーを押し続ける動作を始めることができます。</p>
+<p>ハードウェア周りに問題が生じた場合や、Haiku を 2 つ以上インストールしていて (おそらくインストール CD 上あるいは USB メモリ上の Haiku)、そのいずれかを選択する場合に、Haiku のブートローダーは役立ちます。<br />
+また、あるソフトウェアコンポーネントをインストールしたもののそれが正しく動作せず、システムの起動を妨げてしまうような状況で、そのコンポーネントを再度削除するのにも Haiku のブートローダーは役立ちます。後で述べるように、<i>Disable user add-ons</i> オプションを有効にすると、ドライバーといったユーザーがインストールしたコンポーネントを読み込まずに Haiku が起動します。</p>
+<p>ブートローダーのオプションに入るには、Haiku の起動プロセスが始まる前に <span class="key">SHIFT</span> キーを押しっぱなしにする必要があります。ブートマネージャーがインストールされている場合は、Haiku のブートエントリーを実行する前に <span class="key">SHIFT</span> を押し続ける動作を始めても構いません。Haiku がそのマシンの唯一のオペレーティングシステムである場合、BIOS からのブートメッセージがまだ表示されている状態から SHIFT キー を押し続ける動作を始めることができます。</p>
 <p><br /></p>
-<p>ブートローダーのオプションに入ると、次の4つのメニューが表示されます:</p>
+<p>ブートローダーのオプションに入ると、次の 4 つのメニューが表示されます:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
-<tr><td><b>Select boot volume</b></td><td> </td><td>インストールされたHaikuのうち、どれを起動するのか選択します。</td></tr>
+<tr><td><b>Select boot volume</b></td><td> </td><td>インストールされた Haiku のうち、どれを起動するのか選択します。</td></tr>
 <tr><td><b>Select safe mode options</b><br />
 </td><td> </td><td>ハードウェア周りに問題が生じた場合に試してみるべきオプションがいくつかあります。選択バーをあるオプションに移動させると、画面の下部に短い説明が表示されます。
 <p><i>- Safe mode</i><br />
@@ -75,30 +76,30 @@
 <i>- Disable ACPI</i>
 </p></td></tr>
 <tr><td><b>Select debug options</b><br />
-</td><td> </td><td>これを選択すると、いくつかのデバッグするのに役立つオプションや、バグ報告のために詳細な情報を取得するのに役立つオプションが現れます。ここでも、各オプションに関する短い説明が画面の下部に表示されます。
+</td><td> </td><td>これを選択すると、デバッグに役立ついくつかのオプションや、バグ報告のために詳細な情報を取得するのに役立つオプションが現れます。ここでも、各オプションに関する短い説明が画面の下部に表示されます。
 <p><i>- Enable serial debug output</i><br />
 <i>- Enable on screen debug output</i><br />
 <i>- Enable debug syslog</i>
 </p>
-<p>"debug syslog"を有効にした場合、クラッシュ後にソフトウェア・リセットを行うと、次の追加のオプションが表示されます:</p>
+<p>"debug syslog" を有効にした場合、クラッシュ後にソフトウェアリセットを行うと、次の追加のオプションが表示されます:</p>
 <p><i>- Display syslog from previous session</i><br />
 <i>- Save syslog from previous session</i>
 </p></td></tr>
-<tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td><i>Use fail-safe video mode</i>を有効にしなければならないときに、解像度と色深度を設定することができます。</td></tr>
+<tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td><i>Use fail-safe video mode</i> を有効にしなければならないときに、解像度と色深度を設定できます。</td></tr>
 </table>
 <p><br /></p>
-<p>1つ以上のオプションを有効にしてメイン・メニューに戻り、起動を続行すると、このブート・スクリーンが表示されます:</p>
+<p>1 つ以上のオプションを有効にしてメインメニューに戻り、起動を続行すると、このブートスクリーンが表示されます:</p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
 <p>すべてが順調に進むと、各シンボルが次々に点灯して行きます。<br />
-異なるシンボルは大まかに次のブート・ステージに対応します:</p>
+異なるシンボルは大まかに次のブートステージに対応します:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><b>原子</b></td><td style="width:10px;"> </td><td>モジュールの初期化。</td></tr>
-	<tr><td><b>ディスク + 虫眼鏡</b></td><td> </td><td>rootfs (<span class="path">/</span>)の作成とdevfs (<span class="path">/dev</span>)のマウント。</td></tr>
-	<tr><td><b>プラグ・イン カード</b></td><td> </td><td>デバイス・マネージャーの初期化。</td></tr>
-	<tr><td><b>ブート・ディスク</b></td><td> </td><td>起動ディスクのマウント。</td></tr>
-	<tr><td><b>ICチップ</b></td><td> </td><td>CPU固有のモジュールの読み込み。</td></tr>
-	<tr><td><b>フォルダ</b></td><td> </td><td>サブシステムの最終初期化。</td></tr>
+	<tr><td><b>ディスク + 虫眼鏡</b></td><td> </td><td>rootfs (<span class="path">/</span>) の作成と devfs (<span class="path">/dev</span>) のマウント。</td></tr>
+	<tr><td><b>プラグインカード</b></td><td> </td><td>デバイスマネージャーの初期化。</td></tr>
+	<tr><td><b>ブートディスク</b></td><td> </td><td>起動ディスクのマウント。</td></tr>
+	<tr><td><b>IC チップ</b></td><td> </td><td>CPU 固有のモジュールの読み込み。</td></tr>
+	<tr><td><b>フォルダー</b></td><td> </td><td>サブシステムの最終初期化。</td></tr>
 	<tr><td><b>ロケット</b></td><td> </td><td>起動スクリプトによるシステムの起動。</td></tr>
 </table>
 
@@ -109,7 +110,7 @@
 <div class="inner"><span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-    <a href="contents.html" class="uplink">目次</a> 
+    <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="filesystem-layout.html">ファイルシステムの設計</a>  »
 </span></div>
 </div>

@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Workshop: Filetypes, Attributes, Index and Queries</title>
+	<title>ワークショップ: ファイルタイプ、属性、インデックス、およびクエリ</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -42,101 +44,100 @@
 </ul>
 <span>
  «  <a href="queries.html">クエリ</a> 
-::  <a href="contents.html" class="uplink">目次</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="applications.html">アプリケーション</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>インデックス</td></tr>
 <tr class="index"><td>
-	<a href="#preparations">Preparations</a><br />
-	<a href="#custom-filetype">Creating a custom filetype</a><br />
-	<a href="#icon">Icon</a><br />
-        <a href="#file-recognition">File recognition</a><br />
-	<a href="#description">Description</a><br />
-	<a href="#pref_app">Preferred Application</a><br />
-	<a href="#extra_attribute">Extra Attributes</a><br />
-	<a href="#indexing">Indexing</a><br />
-	<a href="#filling-data">Filling in the data</a><br />
-	<a href="#query-db">Querying the database</a>
+	<a href="#preparations">準備</a><br />
+	<a href="#custom-filetype">カスタムファイルタイプの作成</a><br />
+	<a href="#icon">アイコン</a><br />
+        <a href="#file-recognition">ファイルの認識</a><br />
+	<a href="#description">説明</a><br />
+	<a href="#pref_app">優先アプリケーション</a><br />
+	<a href="#extra_attribute">拡張属性</a><br />
+	<a href="#indexing">インデックス付け</a><br />
+	<a href="#filling-data">データを埋める</a><br />
+	<a href="#query-db">データベースにクエリを行う</a>
 </td></tr>
 </table>
 
-<h1>Workshop: Filetypes, Attributes, Index and Queries</h1>
+<h1>ワークショップ: ファイルタイプ、属性、インデックス、およびクエリ</h1>
 
-<p>This is a workshop to show the use of <a href="attributes.html">Attributes</a>, <a href="queries.html">Queries</a>, the <a href="index.html">Index</a> and custom <a href="filetypes.html">Filetypes</a>. As an example, we build a database to keep track of our DVD library.</p>
+<p>このワークショップは、<a href="attributes.html">属性 (Attribute)</a>、<a href="queries.html">クエリ (Query)</a>、<a href="index.html">インデックス (Index)</a>、およびカスタム<a href="filetypes.html">ファイルタイプ (Filetype)</a> の使い方を説明します。例として、DVD ライブラリーを記録するデータベースを作成します。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="preparations" name="preparations">Preparations</a></h2>
-<p>Let's first decide what filetype and attributes would serve our needs. Originally, I wanted to use a Bookmark file with a link to the movie's IMdB page, but Haiku doesn't have a "bookmarkable" browser like BeOS' <span class="app">NetPositive</span> at the moment, so I came up with this: The file itself will be a JPEG image for the movie cover.<br />
-To that we add a couple of attributes. Here we have to decide if we want to query it later (then we have to add it to the index) and if so, what type of attribute it should be. Numbers (int, float) can be evaluated differently than text (&lt;/=/&gt; vs. is/contains/starts with).</p>
-<p>Here are the attributes I'd like to see for my DVDs:</p>
+<a id="preparations" name="preparations">準備</a></h2>
+<p>最初に、どのようなファイルタイプおよび属性が私たちのニーズを満たすか決定しましょう。元々、私は映画の IMdB ページへのリンクを備えたブックマークファイルを使用したかったが、当時 Haiku は BeOS の <span class="app">NetPositive</span> のような「ブックマークを付けられる」ブラウザを持っていませんでした。それで、私はこれを思い付きました: ファイル自身は映画のカバーの JPEG イメージにします。<br />
+そのファイルに 2、3 の属性を加えます。後でそれをクエリするかどうか (次に、インデックスにそれを加えなければなりません) 決定しなければなりません。また、クエリをするなら、属性がどのような型であるべきかを決定しなければなりません。数 (整数、小数) は、テキストとは異なる評価をされます(例： &lt;/=/&gt; 対 等しい/を含む/で始まる)。</p>
+<p>以下は、DVD について見たい属性です:</p>
 <ul>
-<li>Movie title</li>
-<li>Genre</li>
-<li>URL to e.g. IMdB</li>
-<li>Director/Cast</li>
-<li>Plot</li>
-<li>My rating from 1 to 10</li>
-<li>Coordinates in my shelf, e.g. A2, B3, so I find the DVD also in Real Life :)</li>
-<li>If so, who's borrowed the disk...</li>
+<li>映画のタイトル (Movie title)</li>
+<li>ジャンル (Genre)</li>
+<li>URL 例：IMdBへのURL</li>
+<li>監督/キャスト (Director/Cast)</li>
+<li>あらすじ (Plot)</li>
+<li>1 から 10 までの点数 (Rating)</li>
+<li>棚の座標 (例：A2, B3)、実生活でもこれによって DVD を探します :)</li>
+<li>もしそうならば、誰が DVD を借りたか…</li>
 </ul>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="custom-filetype" name="custom-filetype">Creating a custom filetype</a></h2>
-<p>Start the <span class="app">Filetypes</span> preferences, and click on the <span class="button">Add...</span> button below the hierarchical list on the left. A small dialog opens and you specify in which MIME Group your new filetype will reside. You can also create a completely new group. Let's put it into "<i>applications</i>" and set the "Internal Name" to <i>DVDdb</i>.</p>
+<a id="custom-filetype" name="custom-filetype">カスタムファイルタイプの作成</a></h2>
+<p><span class="app">ファイルタイプ (Filetypes)</span> プレファレンスを立ち上げて、左の階層化リストの下にある <span class="button">追加… (Add...)</span> ボタンをクリックします。小さなダイアログが開くので、そこで新しいファイルタイプがどの MINE グループに属するか決めます。また、まったく新しいグループを作成することもできます。では、ファイルタイプを "<i>applications</i>" のグループに入れて、"内部名 (Internal Name)" を DVDdb にしましょう。</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-new-file-type.png" alt="filetypes-new-file-type.png" />
-<p>Now, a panel for your new DVDdb filetype opens:</p>
+<p>さて、新しい DVDdb ファイルタイプ用のダイアログが開きます。</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-dvddb.png" alt="filetypes-dvddb.png" />
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="icon" name="icon">Icon</a></h3>
-<p>Double-click the icon well to open  <a href="applications/icon-o-matic.html">Icon-O-Matic</a> to design an icon for your filetype. You can also drag&amp;drop an icon from the icon well of another type, maybe as starting point for a modified version.</p>
+<a id="icon" name="icon">アイコン (Icon)</a></h3>
+<p>アイコン (Icon) をダブルクリックすると、<a href="applications/icon-o-matic.html">Icon-O-Matic</a> が立上り、ユーザーのファイルタイプ用アイコンをデザインできます。また、別のタイプのアイコンウェルからアイコンをドラッグ＆ドロップできます。これはたぶん、修正版のスタートポイントとなるでしょう。</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="file-recognition" name="file-recognition">File Recognition</a></h3>
-<p>You can add suffixes like .txt, .jpg, .mp3 to recognize files by their extention. Useful when working with files from systems without MIME typing. We don't need that for our example.</p>
+<a id="file-recognition" name="file-recognition">ファイルの認識 (File Recognition)</a></h3>
+<p>.txt、.jpg、.mp3 のような拡張子をつけて、ファイルを識別できます。MINE タイプ付けの無いシステムからのファイルを使用する時に便利です。今回の例では必要ありません。</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="description" name="description">Description</a></h3>
+<a id="description" name="description">説明 (Description)</a></h3>
 <ul>
-<li><i>Type name</i> - Appears e.g. in the Attribute menu of Tracker windows and the "Kind" attribute of a file.</li>
-<li><i>Description</i> - A bit more detailed description.</li>
+<li><i>タイプ名 (Type name)</i> - 例として、Tracker ウインドウの 属性 (Attribute) メニューおよび、ファイルの "種類 (Kind)" 属性に現れます。</li>
+<li><i>説明 (Description)</i> - さらに詳しい説明。</li>
 </ul>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="pref_app" name="pref_app">Preferred Application</a></h3>
-<p>This pop-up menu shows a list of all applications that can handle this particular filetype. From here you can choose which program should open this specific file when it's double-clicked.</p>
+<a id="pref_app" name="pref_app">優先アプリケーション (Preferred Application)</a></h3>
+<p>このポップアップメニューは特定のファイルタイプを扱えるすべてのアプリケーションのリストを示します。ここから、この特定のファイルがダブルクリックされた時にどのプログラムで開くかを選択できます。</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="button">選択… (Select...)</span></td><td> </td><td>opens a file dialog where you choose the application to open with this filetype. Here, we set <span class="app">ShowImage</span> to display the DVD's cover.</td></tr>
-<tr><td class="onelinetop"><span class="button">このタイプと同様… (Same as...)</span></td><td> </td><td>opens a file dialog where you choose any file that already has the preferred application set that you're looking for.</td></tr>
+<tr><td><span class="button">選択… (Select...)</span></td><td> </td><td>ファイルダイアログを開いて、そこからこのファイルタイプを開くためのアプリケーションを選択します。ここでは DVD のカバーを開くために、<span class="app">ShowImage</span> を設定します。</td></tr>
+<tr><td class="onelinetop"><span class="button">このタイプと同様… (Same as...)</span></td><td> </td><td>ファイルダイアログを開いて、求める優先アプリケーションのセットを持ったファイルを選択します。</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="extra_attribute" name="extra_attribute">Extra Attributes</a></h3>
-<p>Here we enter all the custom attributes we decided on in our preparations. Clicking the <span class="button">Add...</span> button opens a panel:</p>
+<a id="extra_attribute" name="extra_attribute">拡張属性 (Extra Attributes)</a></h3>
+<p>ここで、準備の所で決定したすべてのカスタム属性を入力します。<span class="button">追加… (Add...)</span> ボタンをクリックするとパネルが開きます。</p>
 <img src="images/workshop-filetypes+attributes-images/filetype-extra-attribute.png" alt="filetype-extra-attribute.png" />
 <ul>
-<li><p><i>Attribute name</i> - Appears e.g. as the column heading in Tracker windows.</p></li>
-<li><p><i>Internal name</i> - Is used for indexing and querying the attribute.</p></li>
-<li><i>Type</i> - Defines the value the attribute can hold and therefore how it can be queried.
+<li><p><i>属性の名前 (Attribute name)</i> - たとえば、Tracker ウィンドウの列ヘッダに表示されます。</p></li>
+<li><p><i>内部名 (Internal name)</i> - 属性のインデックス付け、およびクエリに使われます。</p></li>
+<li><i>タイプ (Type)</i> - 属性が持つ値を定義します。それによって、どのようにクエリされるかが決まります
     <ul>
-    <li><span class="menu">String</span> for normal text</li>
-    <li><span class="menu">Boolean</span> for binary data: 0 or 1</li>
-    <li><span class="menu">Integer</span> for integer numbers with different ranges:
+    <li><span class="menu">String</span> 通常のテキスト用</li>
+    <li><span class="menu">Boolean</span> バイナリデータ用: 0 または 1</li>
+    <li><span class="menu">Integer</span> 異なる範囲の整数値用:
         <ul>
         <li><span class="menu">8 bit</span>: ± 255</li>
         <li><span class="menu">16 bit</span>: ± 65,535</li>
@@ -144,73 +145,71 @@ To that we add a couple of attributes. Here we have to decide if we want to quer
         <li><span class="menu">64 bit</span>: ± 18,446,744,073,709,551,615</li>
         </ul>
     </li>
-    <li><span class="menu">Float</span> for floatingpoint numbers, single precision</li>
-    <li><span class="menu">Double</span> for floatingpoint numbers, double precision</li>
-    <li><span class="menu">Time</span> for time and date format</li>
-    </ul>
-</li>
+    <li><span class="menu">Float</span> 単精度浮動小数値用</li>
+    <li><span class="menu">Double</span> 倍精度浮動小数値用</li>
+    <li><span class="menu">Time</span> 時間と日付のフォーマット用</li>
+    </ul></li>
 </ul>
 <ul>
-<li><i>Visible</i> - This checkbox determines if the attribute is visible in a Tracker window at all. Since the Tracker will be the interface to our DVD database, we check it and define its appearance with:<ul>
-    <li><span class="menu">Display as</span> - Leave on "Default". In the future more option will become available, e.g. a bar or stars for a rating etc.</li>
-    <li><span class="menu">Editable</span> - Determines if the attribute shall be editable in Tracker.</li>
-    <li><span class="menu">Width</span> - The default width of that attributes column in a Tracker window.</li>
-    <li><span class="menu">Alignment</span> - The attribute can be displayed left, center, or right aligned.</li>
+<li><i>表示する (Visible)</i> - このチェックボックスは、属性が Tracker ウィンドウでそもそも表示できるかどうか決定します。Tracker は DVD データベースのインタフェースなので、これをチェックし、以下の項目で外観を定義します。<ul>
+    <li><span class="menu">表示形式 (Display as)</span> - "Default" のままにしてください。将来、採点用のバーや星などのより多くのオプションが利用できるでしょう。</li>
+    <li><span class="menu">編集可能 (Editable)</span> - Tracker 上で属性が編集できるかどうか決定します。</li>
+    <li><span class="menu">幅 (Width)</span> - Tracker ウインドウの属性行のデフォルト幅。</li>
+    <li><span class="menu">配置 (Alignment)</span> - 属性は左寄せ、中央寄せ、または右寄せで表示できます。</li>
 </ul></li></ul>
-<p>Now, insert all the info for our attributes:</p>
+<p>では、属性の情報をすべて挿入しましょう。</p>
 <table summary="DVDdb Attributes" cellpadding="10" border="1">
-<tr><th>Internal Name</th><th>Attribute type</th><th>indexed?</th><th>Description</th></tr>
-<tr><td>DVDdb:title</td>	<td>text</td>		<td>yes</td>	<td>Movie title</td></tr>
-<tr><td>DVDdb:genre</td>	<td>text</td>		<td>yes</td>	<td>Genre</td></tr>
-<tr><td>DVDdb:url</td>		<td>text</td>		<td>no</td>	<td>URL</td></tr>
-<tr><td>DVDdb:cast</td>		<td>text</td>		<td>yes</td>	<td>Director/Cast</td></tr>
-<tr><td>DVDdb:plot</td>		<td>text</td>		<td>no</td>	<td>Plot</td></tr>
-<tr><td>DVDdb:rating</td>	<td>int-32</td>		<td>yes</td>	<td>Rating 1 to 10</td></tr>
-<tr><td>DVDdb:coord</td>	<td>text</td>		<td>no</td>	<td>Shelf</td></tr>
-<tr><td>DVDdb:lent</td>		<td>text</td>		<td>yes</td>	<td>Lent to</td></tr>
+<tr><th>内部名</th><th>属性のタイプ</th><th>インデックス付け</th><th>説明</th></tr>
+<tr><td>DVDdb:title</td>	<td>text</td>		<td>はい</td>	<td>映画のタイトル (Movie title)</td></tr>
+<tr><td>DVDdb:genre</td>	<td>text</td>		<td>はい</td>	<td>ジャンル (Genre)</td></tr>
+<tr><td>DVDdb:url</td>		<td>text</td>		<td>いいえ</td>	<td>URL</td></tr>
+<tr><td>DVDdb:cast</td>		<td>text</td>		<td>はい</td>	<td>監督/キャスト (Director/Cast)</td></tr>
+<tr><td>DVDdb:plot</td>		<td>text</td>		<td>いいえ</td>	<td>あらすじ (Plot)</td></tr>
+<tr><td>DVDdb:rating</td>	<td>int-32</td>		<td>はい</td>	<td>1 から 10 までの点数</td></tr>
+<tr><td>DVDdb:coord</td>	<td>text</td>		<td>いいえ</td>	<td>棚</td></tr>
+<tr><td>DVDdb:lent</td>		<td>text</td>		<td>はい</td>	<td>貸出先</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="indexing" name="indexing">Indexing</a></h2>
-<p>Before we start entering data in our little DVD database, we should add certain attributes to the <a href="index.html">Index</a>. Only indexed attributes can use Haiku's fast <a href="queries.html">Queries</a>.<br />
-So, what will we be searching in the future? We probably won't ask "What's in the B4 coordinate in my shelf?" or "Does the IMdB URL or the plot of the movie contain the word 'pope-shenooda'?".</p>
-<p>This leaves these attributes:</p>
+<a id="indexing" name="indexing">インデックス付け</a></h2>
+<p>私たちの小さな DVD データベースにデータを入力する前に、一部の属性に<a href="index.html">インデックス</a>を付けなければなりません。インデックスの付いた属性だけが、Haiku の素早い<a href="queries.html">クエリ</a>を使えます。<br />さて、今後何を検索するでしょうか？たぶん、「棚の B4 座標には何があるか？」や「映画の IMdB URL やあらすじに' pope-shenooda' と言う言葉を含むか?」は尋ねないでしょう。</p>
+<p>次の属性が残ります。</p>
 <table summary="Attribute Type" cellpadding="10" border="1">
-<tr><th>Internal Name</th><th>Attribute type</th></tr>
+<tr><th>内部名</th><th>属性のタイプ</th></tr>
 <tr><td>DVDdb:title</td><td>text</td></tr>
 <tr><td>DVDdb:genre</td><td>text</td></tr>
 <tr><td>DVDdb:cast</td><td>text</td></tr>
 <tr><td>DVDdb:rating</td><td>int-32</td></tr>
 </table>
 
-<p>To index them, we open a Terminal and simply add one attribute after the other:</p>
+<p>これらにインデックスを付けるには、Terminal を立ち上げて、単に次々に属性に追加していきます。</p>
 <pre class="terminal">mkindex -t string DVDdb:title
 mkindex -t string DVDdb:genre
 mkindex -t string DVDdb:cast
 mkindex -t int DVDdb:rating</pre>
-<p>The <span class="cli">-t</span> option defines the type of attribute, which is "string" for all but the rating, which is an integer number.</p>
+<p><span class="cli">-t</span> オプションは属性の型を定義します。int (整数) である rating 以外は、"string (文字列)" となります。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="filling-data" name="filling-data">Filling in the data</a></h2>
-<p>Now, everything's set and we can begin putting some data into our base.<br />
-Since our basic file is a cover image, we go to some online resource like IMdB, look for our first movie and save the cover or movie poster in a new folder where we want to keep our DVDdb files.</p>
-<p>Opening that folder we see a typical Tracker window with one JPEG in it. Right-clicking it, we change its filetype to <tt>application/DVDdb</tt> with the <span class="app">Filetype Addon</span>. There's more info on this in the <a href="filetypes.html">Filetypes</a> document.</p>
-<p>Now, we activate all our DVDdb attributes from the <span class="menu">Attributes</span> menu of the Tracker window and rearrange the columns to our taste:</p>
+<a id="filling-data" name="filling-data">データを埋める</a></h2>
+<p>さて、すべてが設定されたので、データベースにデータを入れ始めることができます。<br />
+基本のファイルはカバーイメージなので、IMdB のようなオンラインリソースへ行き、最初の映画を探してカバーまたは映画のポスターを DVDdb のファイルを保持したい新規フォルダーに保存します。</p>
+<p>フォルダーを開くと、JPEG ファイルが 1 つある標準的な Tracker ウィンドウが見えます。JPEG ファイルを右クリックして、<span class="app">Filetype アドオン</span>を使って、ファイルタイプを <tt>application/DVDdb</tt> に変更します。<a href="filetypes.html">ファイルタイプ</a>のドキュメントにこれについて詳しい情報があります。</p>
+<p>さて、Tracker ウインドウの <span class="menu">属性 (Attributes)</span> メニューから、DVDdb の属性をすべて有効にします。そして、好きなように Tracker の列を再構成します。</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-dvddb-empty.png" alt="filetypes-dvddb-empty.png" />
-<p>By clicking on a yet empty attribute (or pressing <span class="key">ALT</span> <span class="key">E</span>) we enter editing mode and fill each attribute. With <span class="key">TAB</span> and <span class="key">SHIFT</span> <span class="key">TAB</span> you can navigate between attributes.</p>
-<p>In our example, we usually start with a downloaded JPG cover and change its type to applications/DVDdb. There's another elegant way to produce a file to work with. Just copy an empty file of our filetype to <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span> and rename it to DVDdb.</p>
-<p>Right-clicking into a Tracker window, you'll find a new entry under <span class="menu">New...</span> besides the default "New folder".</p>
+<p>まだ空の属性をクリックする (または <span class="key">ALT</span> <span class="key">E</span> を押す) ことで、編集モードに入り、それぞれの属性を満たします。<span class="key">TAB</span> および <span class="key">SHIFT</span> <span class="key">TAB</span> によって、属性間を移動できます。</p>
+<p>今回の例では、通常ダウンロードした JPEG カバーでスタートし、そしてそのタイプを applications/DVDdb に変更します。動作するファイルを作成する、別のエレガントなやりかたがあります。私たちが定義したファイルタイプを持つ空のファイルを <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span> にコピーし、それを DVDdb にリネームします。</p>
+<p>Tracker ウィンドウ中で右クリックすると、<span class="menu">新規… (New...)</span> メニューのデフォルトである、"新規フォルダー (New folder)" の下に新たな項目を見つけるでしょう。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="query-db" name="query-db">Querying the database</a></h2>
-<p>Several hours of grunt work later, we have a nice little database that you can query to find all your Christina Ricci movies that have a 7+ rating...  :)</p>
-<p>You can assign a sensible attribute layout for query results of a specific filetype.<br />
-Open the folder containing your DVDdb files and arrange the attributes how you'd like to have query results presented. Copy this layout with <span class="menu">Attributes | Copy layout</span>.</p>
-<p>Open <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, create a new folder and rename it to <i>group/filetype</i>, replacing slashes with underscores; in our case "applications_DVDdb".</p>
-<p>Open the new folder and paste in the layout with <span class="menu">Attributes | Paste layout</span>. Voilà:</p>
+<a id="query-db" name="query-db">データベースにクエリを行う</a></h2>
+<p>数時間の単調な仕事の後、クエリによって、すべての Christina Ricci 映画で 7+ の点数があるものを見つけられる小さく素敵なデータベースがあります… :)</p>
+<p>特定のファイルタイプのクエリ結果にふさわしい属性レイアウトを割り当てることができます。<br />
+DVDdb ファイルを含んでいるフォルダーを開き、クエリ結果をどのように示したいかに従い、属性を整えます。このレイアウトを、<span class="menu">属性 | レイアウトをコピー (Attributes | Copy layout)</span> によってコピーします。</p>
+<p><span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span> を開いて、新規フォルダーを作成し、それを <i>group/filetype</i> にリネームします。ここで、/ はアンダースコアに置き換えます。今回の例では、"applications_DVDdb" となります。</p>
+<p>新規フォルダーを開いて、レイアウトを<span class="menu">属性 | レイアウトを貼り付ける (Attributes | Paste layout)</span> によって、中にペーストします。いかが結果です！</p>
 <img src="images/workshop-filetypes+attributes-images/query-dvddb.png" alt="query-dvddb.png" />
 
 </div>
@@ -219,7 +218,7 @@ Open the folder containing your DVDdb files and arrange the attributes how you'd
 <div class="nav">
 <div class="inner"><span>
  «  <a href="queries.html">クエリ</a> 
-::  <a href="contents.html" class="uplink">目次</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="applications.html">アプリケーション</a>  »
 </span></div>
 </div>

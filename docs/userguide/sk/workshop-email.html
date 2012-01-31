@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		helix84
+ *		Marek
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -22,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Používateľská príručka</span></div>
 </div>
 
 <div class="nav">
@@ -52,7 +53,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -67,78 +67,77 @@
 
 <h1>Workshop: Spravovanie emailov</h1>
 
-<p>This workshop takes a look on how to manage email under Haiku. It assumes that the email services are correctly configured with the <a href="preferences/e-mail.html">E-Mail</a> preferences and you're familiar with the basic features of the <a href="applications/mail.html">Mail</a> application.</p>
+<p>Tento workshop nám ukáže ako spravovať emaily v Haiku. Predpokladáme, že služby emailu sú správne nakonfigurované v <a href="preferences/e-mail.html">E-Mail</a> nastaveniach a ste oboznámený so základnými znakmi aplikácie <a href="applications/mail.html">Pošta</a>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="mailsystem" name="mailsystem">Poštový systém Haiku</a></h2>
-<p>If you come to Haiku from other operating systems, you're probably used to big applications like MS Outlook or Mozilla's Thunderbird. You have to configure them by entering all the info on mail server addresses etc. and they use their own contacts database. They take care of sending and fetching email and store them in some big special file.<br />
-Changing you email client can be a hassle with quite some ex/importing and converting going on. Using more than one client in parallel to check out what else is available is also not without the occasional kerfuffle.</p>
-<p>Haiku's mail system is different. It breaks down into smaller separate modules.</p>
-<p>There's the <span class="app">mail_daemon</span> that takes care of the communication with your mail servers. The <a href="preferences/e-mail.html">E-Mail</a> preferences is the one central point to configure your email accounts and how often they're checked, for example.</p>
-<p>Every message that is fetched or sent is saved as one single email file, with its header information (like sender, subject, date) and status (like New, Replied, Sent) in BFS attributes. This enables searching/filtering them with Haiku's fast queries.</p>
+<p>Ak prídete do Haiku z iných operačných systémov, pravdepodobne ste zvyknutý na veľké aplikácie ako MS Outlook alebo Mozilla Thunderbird. Musíte ich nastaviť zadaním všetkých informácií o poštovom serveri atď. a používajú svoje vlastné databázy kontaktov. Starajú sa o posielanie a prijímanie emailov a ich ukladanie v nejakom veľkom špeciálnom súbore.<br />
+Zmena vášho poštového klienta môže byť otravná s nutnosťou ex/importovať a konvertovať. Používanie viac ako jedného klienta naraz, aby ste zistili, čo iné je dostupné, sa tiež nezaobíde bez občasného zmätku.</p>
+<p>Poštový systém Haiku je iný. Je rozdelený na dva menšie samostatné moduly.</p>
+<p>O komunikáciu s vašími poštovými servermi sa stará <span class="app">mail_daemon</span>. Nastavenia <a href="preferences/e-mail.html">E-mailu</a> sú centrálny bod pre konfiguráciu emailových účtov a napríklad, ako často sa kontrolujú nové správy v nich.</p>
+<p>Každá správa, ktorá je stiahnutá alebo odoslaná sa ukladá do samostatného emailového súboru, ktorý je hlavná informácia (ako odosielateľ, predmet, dátum) a stavu (ako Nové, Odpovede, Odoslané) v atribútoch BFS. To dovoľuje vyhľadávanie/filtrovanie pomocou rýchlych požiadaviek Haiku.</p>
 <img src="images/workshop-email-images/browsing.png" alt="browsing.png" /> 
-<p>With every email being in a separate file, viewing them becomes just as easy as browsing through a folder (or query result) of images with <a href="applications/showimage.html">ShowImage</a>. Leaving the Tracker window open, you'll see the moving selection of the currently viewed file while you use the previous/next button to move through them.<br />
-As they are independent files, using a viewer other than Haiku's <a href="applications/mail.html">Mail</a> causes no problems whatsoever.</p>
-<p>Similarly, creating a new message results in just another file that is handed to the mail_daemon that takes care of sending it off. Contact management is deferred to the <a href="applications/people.html">People</a> application.</p>
-<p>In a nutshell, where other mail clients do everything, from communicating with the mail servers to providing a view with all your mails and tools to search and filter them, Haiku uses a chain of smaller tools and general file management:</p>
+<p>So všetkými emailami v samostatných súboroch, ich zobazovanie je potom také jednoduché ako prechádzanie cez priečinok (alebo výsledky požiadaviek) obrázkov s <a href="applications/showimage.html">Prehliadačom Obrázkov</a>. Nechajte okno Trackera otvorené, uvididíte pohybujúci sa výber aktuálne zobrazených súborov, keď použijete tlačidlá predchádzajúci/ďalší na prechádzanie. <br />
+Keďže sú to nezávislé súbory, používanie prehliadača iného ako Haiku <a href="applications/mail.html">Pošta</a> nerobí žiaden problém.</p>
+<p>Podobne, vytváranie výsledkov novej správy iba v inom súbore, ktorý je podaný mail_daemonu, ktorý sa stará o odoslanie. Správa kontaktov je ponechaná aplikácii <a href="applications/people.html">Ľudia</a>.</p>
+<p>V kocke, kde iní poštoví klienti robia všetko od komunikácie s poštovými servermi po zobrazovanie všetkej vašej pošty a nástroje na ich vyhľadávanie a filtrovanie, Haiku používa niekoľko menších nástrojov a základnú správu súborov:</p>
 <ul>
-<li><p>The <span class="app">mail_daemon</span> to fetch/send mail and save them as normal files.</p></li>
-<li><p>Tracker windows and queries to find and show email files.</p></li>
-<li><p>The <span class="app">Mail</span> application to view email files and create new messages relying on system-wide contact management by the <span class="app">People</span> app.</p></li>
+<li><p><span class="app">mail_daemon</span> na prijatie/odoslanie pošty a jej uloženie vo forme bežných súborov.</p></li>
+<li><p>Okná Trackera a požiadavky na nájdenie a zobrazenie súborov emailu.</p></li>
+<li><p>Aplikácia <span class="app">Pošta</span>  na zobrazenie emailových súborov a vytvorenie nových správ spoliehajúcich sa na celý systém kontaktov, ktorý spravuje aplikácia <span class="app">Ľudia</span>.</p></li>
 </ul>
-<p>Especially using Tracker and queries to manage emails is a powerful idea. The experience you gain can be transferred to any other problem that is dealing with files. Be it images, music, video, contacts or any other documents, using Tracker is at the core of all file managing.<br />
-Also, improvements in any of these system areas benefit not just emailing, but all applications that make use of them.</p>
+<p>Predovšetkým použitie Trackera a požiadaviek na správu emailov je dobrý nápad. Skúsenosti, ktoré získate, sa dajú využiť pri iných problémoch so súbormi. Či sú to obrázky, hudba, video, kontakty alebo akékoľvek iné dokumenty, sú jadrom všetkej správy súborov. <br /> Tiež, zlepšenie v niektorej z týchto systémových oblastí zlepšujú nielen e-mail, ale všetky aplikácie, ktoré ich využívajú.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="status" name="status">Používateľom definované stavy</a></h2>
-<p>When you browse through your newly arrived email, you may want to come back to some of them later to think about it in more depth. While you could use Mail's menu <span class="menu">Close and | Leave as New</span> to keep them in your "<i>New messages</i>" query, things tend to pile up that way...</p>
-<p>One solution is of course to just start a reply and save it as draft. But if you don't expect to write a reply and just want to re-read the mail later, that isn't ideal.</p>
+<p>Keď prechádzate cez vašu novú poštu, možno sa chcete vrátiť k niektorým emailom neskôr, viac o nich porozmýšľať. Hoci by ste mohli použiť menu Pošty <span class="menu"> Zavrieť a | Ponechať ako nový</span>, aby ste ich ponechali vo vašej požiadavke „<i>Nové správy</i>“, veci majú tendenciu týmto spôsobom sa hromadiť...</p>
+<p>Jedno riešenie je samozrejme začať písať odpoveď a uložiť ju v rozpísaných. Ale ak sa nechystáte poslať odpoveď a iba si chcete neskôr znovu prečítať email, nie je to ideálne.</p>
 <img src="images/workshop-email-images/status.png" alt="status.png" /> 
-<p>Better use <span class="menu">Close and | Set to...</span> to create a new status and use that to categorize your mail. For example, you could call the status "<i>Later</i>", and then query for that when you find more time.<br />
-Or you use different statuses for specific projects. For example, I created a status "<i>HUG</i>" (for "Haiku user guide") under which I collect every mail that may influence the contents of the user guide, like commit messages about code changes that alter or introduce some feature or anything else I feel could improve the user guide.<br />
-In any case, try to keep the status name short. That way it always fits in a normally wide "Status" column in Tracker.</p>
-<p>You don't have to open an email with the <span class="app">Mail</span> application to set its status. With the Tracker add-ons <span class="app">Mark as Read </span> and <span class="app">Mark as...</span> you can select some email files and set their status in one go.</p>
+<p>Radšej použite <span class="menu">Zavrieť a | Nastaviť na...</span> na vytvorenie nového stavu a použite ho na kategorizovanie emailov. Napríklad, môžte stav nazvať „<i>Neskôr</i>“ a potom oň požiadať, keď si nájdete viac času .<br />
+Alebo môžete použiť rôzne stavy pre rôzne projekty. Napríklad, vytvoril som stav „<i>HUG</i>“ (pre „používateľskú príručku Haiku“) pod ktorou som zozbieral všetky emaily, ktoré môžu ovplyvniť obsah používateľskej príručky, ako začleňovacie správy o zmenách kódu, ktoré menia alebo zavádzajú nejakú funkciu alebo niečo, čo cítim že by mohlo zlepšiť používateľskú príručku.<br />
+V každom prípade, snažte sa, aby názov stavu bol krátky. Takto sa vždy zmestí do stĺpca „Stav“ s bežnou šírkou v Trackeri.</p>
+<p>Nemusíte otvárať emaily aplikáciou <span class="app">Pošta</span>, aby ste nastavili ich stav. Doplnkami Trackera  <span class="app">Označiť ako prečítané </span>a <span class="app">Označiť ako...</span> môžte označiť niektorý súbor emailu a nastaviť ich stav naraz.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="queries" name="queries">Používanie požiadaviek</a></h2>
-<p>Sure, you specify a folder to store all your email, you can open it et voilà,  there's all you mail. But over time the folder becomes crowded and showing all will take longer and longer as thousands of files and their attributes have to be parsed and sorted. Also, most of the time you don't really care about two year old emails of Nigerian princes and their inheritory trouble ...</p>
-<div class="box-info">A lot of time when populating a folder is spent on putting files read from disk into the correct sorting order and displaying that in the window. If you do have to open a folder with a huge number of files, you can shorten the wait by making the Tracker window "invisible", i.e. either minimize it or change to another workspace. Watch <a href="applications/processcontroller.html">ProcessController</a> to see how it affects CPU usage.</div>
-<p><a href="queries.html">Queries</a>, to the rescue!</p>
-<p>By using queries, you can narrow down the view of your mails. Actually, the mailbox icon in the Deskbar uses queries.</p>
+<p>Samozrejme, môžte si vybrať priečinok na uloženie vašej pošty, môžte ho otvoriť a voilà, tu je vaša pošta. Ale časom sa priečinok preplní a zobrazenie všetkého trvá dlhšie a dlhšie ako tisíce súborov a ich atribúty treba analyzovať a zoradiť. Väčšinou sa naozaj nestaráte o dva roky staré e-maily od nigérijských princov a ich problémy s dedičstvom...</p>
+<div class="box-info">Veľa času počas plnenia adresára sa strávi pri vkladaní súborov čítaných z disku do správneho poradia a ich zobrazenie v okne. Ak musíte otvoriť priečinok s veľkým množstvom súborov, môžte si skrátiť čakanie urobením okna Trackera „neviditeľným“ alebo ho minimalizovať alebo prepnúť na inú pracovnú plochu. Sledujte <a href="applications/processcontroller.html">Monitor aktivity</a>, aby ste videli ako to ovplyvňuje využitie CPU. </div>
+<p><a href="queries.html">Požiadavky</a>, na pomoc!</p>
+<p>Použitím požiadaviek môžte zúžiť zobrazenie vašej pošty. V podstate, ikona poštovej schránky v Paneli používa požiadavky.</p>
 <img src="images/workshop-email-images/daemon-in-deskbar.png" alt="daemon-in-deskbar.png" /> 
-<p>The <span class="menu">Open Draft</span> submenu does a query for the status "<i>Draft</i>", which is set by <span class="app">Mail</span> when you save a message.</p>
-<p><span class="menu">Open Inbox Folder</span> and <span class="menu">Open Mail Folder</span> are just links to regular folders (and not very useful in my opinion).</p>
-<p>The <span class="menu"># new messages</span> submenu is populated by a query for email with the status "<i>New</i>" (that same query is used to change the mailbox icon to show some letters in it, by the way).</p>
+<p><span class="menu">Otvoriť rozpísané</span> podmenu spustí požiadavku pre stavu „<i>Rozpísané</i>“, ktorá je nastavená <span class="app">Poštou</span>, keď uložíte správu.</p>
+<p><span class="menu">Otvoriť priečinok Doručené</span> a <span class="menu">Otvoriť priečinok Pošta</span> sú iba odkazy na obyčajné priečinky (a podľa mňa nie veľmi užitočné)</p>
+<p><span class="menu"># nová poštová správa</span> podmenu je obsadené požiadavkou na email so stavom „<i>Nové</i>“ (mimochodom, rovnaká požiadavka sa používa na zmenu ikony poštovej schránky, aby v sebe zobrazovala nejaké písmená)</p>
 
-<p>You can add your own queries (or folders, applications, scripts etc.) to that context menu too, by putting them or links to them into <span class="path">~/config/settings/Mail/Menu Links</span>.</p>
-<div class="box-info">The query <span class="path">~/config/settings/Mail/mailbox</span> is a special case: It is executed when left-clicking the mailbox icon in the Deskbar. If you want to change that behavior, you can replace it with any other file (or link to a file), just name it "<i>mailbox</i>". It doesn't have to be a query, a link to a folder of queries or a script or application works just as well.</div>
+<p>Do tohto kontextového menu môžte pridať aj svoje vlastné požiadavky (alebo priečinky, aplikácie, skripty atď.), ich pridaním alebo pridaním odkazov na nich do <span class="path">~/config/settings/Mail/Menu Links</span>.</p>
+<div class="box-info">Požiadavka <span class="path">~/config/settings/Mail/mailbox</span> je špeciálny prípad: Spustí sa pri kliknutí na ikonu poštovej stránky v Paneli. Ak chcete zmeniť toto správanie, môžte ho nahradiť iným súborom (alebo odkazom na súbor, jednoducho ho pomenujte „<i>mailbox</i>“. Nemusí to byť požiadavka, odkaz na priečinok požiadaviek alebo skript alebo aplikácia tiež funguje.</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="query-examples" name="query-examples">Príklady požiadaviek</a></h3>
-<p>Here are a few examples of useful queries:</p>
+<p>Tu je niekoľko príkladov užitočných požiadaviek:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="10">
 <tr align="center"><td><img src="images/workshop-email-images/query-1.png" alt="query-1.png" /><br />
-This finds all mails with the custom status "<i>Later</i>".</td>
+Toto nájde všetku poštu s vlastným stavom „<i>Neskôr</i>“.</td>
 <td><img src="images/workshop-email-images/query-2.png" alt="query-2.png" /><br />
-This finds all mails of the past 2 days.</td></tr>
+Toto nájde všetku poštu za posledné 2 dni.</td></tr>
 
 <tr align="center"><td><img src="images/workshop-email-images/query-3.png" alt="query-3.png" /><br />
-This finds all mails by Ingo Weinhold of the past 2 weeks.</td>
+Toto nájde všetku poštu od Inga Weinholda za posledné 2 týždne.</td>
 <td><img src="images/workshop-email-images/query-4.png" alt="query-4.png" /><br />
-This finds all posts from the Haiku commit list of the past 12 hours.</td></tr>
+Toto nájde všetky príspevky zo zoznamu udalostí  Haiku za posledných 12 hodín.</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tips" name="tips">Ďalšie tipy</a></h2>
 <ul>
-<li><p>If you don't save a query as "<i>Query</i>" but as "<i>Query template</i>", invoking it won't show the result window, but the Find... window instead. That way you can easily exchange the search string for the subject or sender, for example, or change a "<i>2 days</i>" time limit to "<i>3 days</i>".</p></li>
-<li><p>Activating "type-ahead filtering" in <a href="tracker.html#tracker-preferences">Tracker's preferences</a> allows you to very quickly filter a query result even further. Often it's enough to query for all mails of the last 3 days and go with type-ahead filtering from there. The big advantage is, that you don't have to exactly specify which attribute to search for, as all displayed are considered when filtering.</p></li>
-<li><p><a href="http://haikuware.com/directory/view-details/utilities/desktop-accessories/relatedmail">RelatedMail</a> is a nifty little application that will query for all mails with the same subject/sender/time-frame etc. of a dropped email. Kind of what the <span class="menu">Queries</span> menu in the <span class="app">Mail</span> app is supposed to do.</p></li>
+<li><p>Ak neuložíte požiadavku ako „<i>Požiadavka</i>“ ale ako „<i>šablóna Požiadavky</i>“, nezobrazí sa výsledné okno ale okno Nájsť... Takto môžte napríklad, jednoducho vymeniť hľadaný reťazec za predmet alebo odosielateľa alebo zmeniť časový limit „<i>2 dni</i>“ na „<i>3 dni</i>“.</p></li>
+<li><p> Aktivácia, „filtra počas písania“ v <a href="tracker.html#tracker-preferences">Predvoľbách Trackera </a> povoľuje veľmi rýchle filtrovanie výsledkov požiadaviek ešte viac. Často to stačí na žiadanie všetkých mailov za posledné 3 dni a ísť tam so zadávacím filtrovaním. Veľká výhoda je, že nemusíte vyberať, ktorý atribút prehľadávate, všetky zobrazené sú zahrnuté vo vyhľadávaní. </p></li>
+<li><p><a href="http://haikuware.com/directory/view-details/utilities/desktop-accessories/relatedmail">RelatedMail</a> je malá šikovná aplikácia, ktorá požiada o všetku poštu s rovnakým predmetom/odosielateľ/časovým rámcom atď. daných emailov. Niečo ako má robiť menu <span class="menu">Požiadavky</span> v aplikácii <span class="app">Pošta</span>.</p></li>
 </ul>
 
 </div>
@@ -147,7 +146,7 @@ This finds all posts from the Haiku commit list of the past 12 hours.</td></tr>
 <div class="nav">
 <div class="inner"><span>
  «  <a href="queries.html">Požiadavky</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Obsah</a> 
 ::  <a href="applications.html">Aplikácie</a>  »
 </span></div>
 </div>

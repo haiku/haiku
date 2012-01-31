@@ -13,6 +13,7 @@
  *		satashun
  *		Kentaro Ozeki
  *		log-1
+ *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -24,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -46,7 +47,7 @@
 </ul>
 <span>
  «  <a href="attributes.html">属性</a> 
-::  <a href="contents.html" class="uplink">目次</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="queries.html">クエリ</a>  »
 </span></div>
 </div>
@@ -56,14 +57,14 @@
 
 <h1>インデックス</h1>
 
-<p><a href="attributes.html">属性</a>と<a href="queries.html">クエリ</a>は Haiku の重要な特徴です。属性はそれだけで便利ですが、クエリが追加的なファイルの情報を表示するためには、属性をインデックス化する必要があります。 インデックスは属性をルックアップテーブルに置くので、クエリはきわめて高速になります。<br />
-インデックスはファイルシステムの一部であり、ボリューム／パーティション毎に別々に保存されます。</p>
+<p><a href="attributes.html">属性</a>と<a href="queries.html">クエリ</a>は Haiku の重要な特徴です。属性はそれだけで便利ですが、クエリが追加的なファイルの情報を表示するためには、属性をインデックス化する必要があります。インデックスは属性をルックアップテーブルに置くので、クエリはきわめて高速になります。<br />
+インデックスはファイルシステムの一部であり、ボリューム / パーティションごとに別々に保存されます。</p>
 
 <h2>ターミナルにおけるインデックスコマンド</h2> 
-<p>インデックスを管理するためのコマンドがいくつかあります：</p>
+<p>インデックスを管理するためのコマンドがいくつかあります。</p>
 <ul> 
-<li><b>lsindex</b> - 現在のボリューム／パーティションに対するインデックス化された属性を表示します。<br />
-以下は標準でインデックス化されている属性です：</li>
+<li><b>lsindex</b> - 現在のボリューム / パーティションに対するインデックス化された属性を表示します。<br />
+以下は標準でインデックス化されている属性です。</li>
 </ul>
 <pre class="terminal"> ~ -&gt;lsindex 
 BEOS:APP_SIG 
@@ -106,12 +107,12 @@ name
 size 
 </pre>
 <ul>
-<li><b>mkindex</b> - ボリューム／パーティションのインデックスに属性を追加します。</li>
+<li><b>mkindex</b> - ボリューム / パーティションのインデックスに属性を追加します。</li>
 </ul>
 <pre>使い方: mkindex [オプション] &lt;属性&gt; 
 指定された属性に新しいインデックスを作ります。
  
-  -d, --volume=PATH     インデックスが追加されるボリュームのパス、 
+  -d, --volume=PATH     インデックスが追加されるボリュームのパス、
                         標準では現在のボリュームに追加されます。
   -t, --type=TYPE       インデックス化された属性のタイプ  "int", 
                         "llong", "string", "float",  "double"　のうちのどれかひとつ。
@@ -123,7 +124,7 @@ size
 <p>指定された属性を持ったファイルが<b>新規に</b>作成される場合にのみ、自動的にインデックスに追加されます！<br />
 既存のファイルは、コピーして、そのあと元のファイルを消すことによって手動で追加する必要があります。あるいは <span class="cli">reindex</span> コマンドを使うこともできます。 </p>
 <ul>
-<li><b>reindex</b> - ボリューム／パーティションの新たに作られたインデックスに既存のファイルの属性を追加します。</li>
+<li><b>reindex</b> - ボリューム / パーティションの新たに作られたインデックスに既存のファイルの属性を追加します。</li>
 </ul>
 <pre>使い方: reindex [-rvf] attr &lt;ファイル名　と／または　ディレクトリのリスト&gt; 
   -r    再帰的にディレクトリを辿ります
@@ -133,19 +134,19 @@ size
 
 </pre>
 <ul>
-<li><b>rmindex</b> - ボリューム／パーティションのインデックスから属性を削除します。</li>
+<li><b>rmindex</b> - ボリューム / パーティションのインデックスから属性を削除します。</li>
 </ul>
 <pre>使い方: rmindex [オプション]... INDEX_NAME 
  
 ディスクボリュームから INDEX_NAME という名前のインデックスを削除します。
-これを行ってしまうと、 INDEX_NAME 属性のファイルを探すためにクエリシステムを使うことはできません。
+これを行ってしまうと、INDEX_NAME 属性のファイルを探すためにクエリシステムを使うことはできません。
  
   -d, --volume=PATH     インデックスを削除するボリュームのパス
   -h, --help            ヘルプを表示して終了します 
   -p, --pattern         INDEX_NAME がパターンである場合 
   -v, --verbose         削除されるインデックスについての情報を表示します
  
-INDEX_NAME はファイル属性の名前です。 
+INDEX_NAME はファイル属性の名前です。
  
 もしボリュームが指定されなければ、現在のディレクトリのボリュームが対象になります。</pre>
 
@@ -155,7 +156,7 @@ INDEX_NAME はファイル属性の名前です。
 <div class="nav">
 <div class="inner"><span>
  «  <a href="attributes.html">属性</a> 
-::  <a href="contents.html" class="uplink">目次</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="queries.html">クエリ</a>  »
 </span></div>
 </div>

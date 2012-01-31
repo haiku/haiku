@@ -17,13 +17,13 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>スクリーン</title>
+	<title>画面</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -44,8 +44,8 @@
 <li><a href="../../en/preferences/screen.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="printers.html">Printers</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
+ «  <a href="printers.html">プリンター</a> 
+::  <a href="../preferences.html" class="uplink">Preferences (プレファレンス)</a> 
 ::  <a href="screensaver.html">スクリーンセーバー</a>  »
 </span></div>
 </div>
@@ -53,30 +53,30 @@
 <div id="content">
 <div>
 
-<h2><img src="../../images/prefs-images/screen-icon_64.png" alt="screen-icon_64.png" width="64" height="64" />スクリーン</h2>
+<h2><img src="../../images/prefs-images/screen-icon_64.png" alt="screen-icon_64.png" width="64" height="64" />画面 (Screen)</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar メニュー：</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
-<tr><td>場所：</td><td></td><td><span class="path">/boot/system/preferences/Screen</span></td></tr>
-<tr><td>設定ファイル：</td><td></td><td><span class="path">~/config/settings/system/app_server/workspaces</span><br />
-<span class="path">~/config/settings/kernel/drivers/vesa</span> - VESAモードのみで動作します<br />
+<tr><td>Deskbar メニュー:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
+<tr><td>場所:</td><td></td><td><span class="path">/boot/system/preferences/Screen</span></td></tr>
+<tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/system/app_server/workspaces</span><br />
+<span class="path">~/config/settings/kernel/drivers/vesa</span> - VESA モードのみで動作します<br />
 <span class="path">~/config/settings/Screen_data</span> - ここに設定が保存されます</td></tr>
 </table>
-<p>それぞれの<a href="../workspaces.html">ワークスペース</a>で解像度と色深度を設定することができます。</p>
+<p>それぞれの<a href="../workspaces.html">ワークスペース</a>で解像度と色深度を設定できます。</p>
 <img src="../images/prefs-images/screen.png" alt="screen.png" />
 <p>一番上のポップアップメニューで、設定をすべてのワークスペースに適用するのか、もしくは現在のワークスペースにのみ適用するのかを選択します。その下のポップアップメニューにグラフィックカードに対応した解像度と色深度が表示されます。</p>
-<p><span class="button">Apply</span>を押すと、グラフィックモードが変更されます。そして、警告が表示されて、変更を保存するか、破棄するかを問われます。12秒以内に返答しなければ、自動的に前の設定に戻ります。 もしモニタが設定に対応していなければ、警告は見えないでしょう。</p>
-<p>左側では、ワークスペースの列と行の数を変更できます。<span class="button">Set Background...</span>を押すと<a href="backgrounds.html">Backgrounds</a>が起動します。</p>
-<p><span class="button">Revert</span>を押すと、Screen起動時の設定に戻します。</p>
-<div class="box-info">Haiku の VESA モードは大変よく動作しますが、いくつかの制限に遭遇するかもしれません。ワイドスクリーンディスプレイはネイティブの解像度で動作せず、結果としていくらか不鮮明な画像となるでしょう。また、利用できる色深度とリプレッシュレートにも制限があるかもしれません。</div>
-<p>左下のボタンで、ワークスペースの数の設定ができ、また、それらを行列に配置できます。そして、<a href="backgrounds.html">Backgrounds</a>  プレファレンスを起動できます。</p>
+<p><span class="button">適用 (Apply)</span> を押すと、グラフィックモードが変更されます。そして、警告が表示されて、変更を保存するか、破棄するかを問われます。12 秒以内に返答しなければ、自動的に前の設定に戻ります。モニタが設定に対応していなければ、警告は見えないでしょう。</p>
+<p>左側には、報告された製造者とモデル、およびそのdpi (dots per inch) での解像度がある、ユーザーの画面の説明があります。マウスポインタをその上に持ってくると、ドライバーでサポートされていれば、グラフィックカードの名前をツールチップで表示します。カードがサポートされてなければ、"VESA" と表示します。VESA は、ほとんどのハードウェアで動作する高速な代替手段です。</p>
+<p><span class="button">元に戻す (Revert)</span> を押すと、画面プレファレンス起動時の設定に戻します。</p>
+<div class="box-info">Haiku の VESA モードは大変よく動作しますが、いくつかの制限に遭遇するかもしれません。ワイドスクリーンディスプレイはネイティブ解像度で動作せず、結果としていくらか不鮮明な画像となるでしょう。また、利用できる色深度とリプレッシュレートにも制限があるかもしれません。</div>
+<p>左下のボタンで、ワークスペースの数の設定ができ、およびそれらを行列に配置できます。また、<a href="backgrounds.html">背景</a>プレファレンスを起動できます。</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="printers.html">Printers</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
+ «  <a href="printers.html">プリンター</a> 
+::  <a href="../preferences.html" class="uplink">Preferences (プレファレンス)</a> 
 ::  <a href="screensaver.html">スクリーンセーバー</a>  »
 </span></div>
 </div>
