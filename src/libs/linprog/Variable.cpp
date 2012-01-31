@@ -325,6 +325,7 @@ Variable::RemoveReference()
  */
 Variable::~Variable()
 {
-	fLS->RemoveVariable(this, false);
+	if (fLS)
+		fLS->RemoveVariable(this, false);
 }
 

@@ -93,6 +93,9 @@ LinearSpec::AddVariable(Variable* variable)
 	if (!fVariables.AddItem(variable))
 		return false;
 
+	if (variable->fLS == NULL)
+		variable->fLS = this;
+
 	if (!fSolver->VariableAdded(variable)) {
 		fVariables.RemoveItem(variable);
 		return false;
