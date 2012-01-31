@@ -13,9 +13,14 @@
 #include "LinearSpec.h"
 
 
+class BMessage;
+
 namespace BALM {
 	class BALMLayout;
 };
+
+
+using BALM::BALMLayout;
 
 
 
@@ -32,13 +37,16 @@ public:
 			LinearSpec*			Solver() const;
 			ResultType			Result();
 
-			void				RegisterLayout(BALM::BALMLayout* layout);
-			void				LayoutLeaving(BALM::BALMLayout* layout);
+			void				RegisterLayout(BALMLayout* layout);
+			void				LayoutLeaving(const BALMLayout* layout);
 
 			ResultType			ValidateMinSize();
 			ResultType			ValidateMaxSize();
 			ResultType			ValidatePreferredSize();
 			ResultType			ValidateLayout(BLayoutContext* context);
+
+			status_t			AddFriendReferences(const BALMLayout* layout,
+									BMessage* archive, const char* field);
 private:
 			struct MinSizeValidator;
 			struct MaxSizeValidator;

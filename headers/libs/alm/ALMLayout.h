@@ -39,6 +39,7 @@ public:
 								BALMLayout(float hSpacing = 0.0f,
 									float vSpacing = 0.0f,
 									BALMLayout* friendLayout = NULL);
+								BALMLayout(BMessage* archive);
 	virtual						~BALMLayout();
 
 			BReference<XTab>	AddXTab();
@@ -118,11 +119,22 @@ public:
 	virtual	BSize				BasePreferredSize();
 	virtual	BAlignment			BaseAlignment();
 
+	virtual	status_t 			Archive(BMessage* into, bool deep = true) const;
+	static 	BArchivable*		Instantiate(BMessage* archive);
+
 	virtual	status_t			Perform(perform_code d, void* arg);
 
 protected:
 	virtual	bool				ItemAdded(BLayoutItem* item, int32 atIndex);
 	virtual	void				ItemRemoved(BLayoutItem* item, int32 fromIndex);
+
+	virtual status_t			ItemArchived(BMessage* into, BLayoutItem* item,
+									int32 index) const;
+	virtual	status_t			ItemUnarchived(const BMessage* from,
+									BLayoutItem* item, int32 index);
+
+	virtual	status_t 			AllUnarchived(const BMessage* archive);
+	virtual	status_t 			AllArchived(BMessage* archive) const;
 
 	virtual	void				LayoutInvalidated(bool children);
 	virtual	void				DoLayout();
@@ -184,6 +196,7 @@ private:
 			bool				_AddedTab(YTab* tab);
 
 			BLayoutItem*		_LayoutItemToAdd(BView* view);
+			void				_SetSolver(BPrivate::SharedSolver* solver);
 
 			BPrivate::SharedSolver* fSolver;
 

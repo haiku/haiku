@@ -124,9 +124,9 @@ SharedSolver::RegisterLayout(BALMLayout* layout)
 
 
 void
-SharedSolver::LayoutLeaving(BALMLayout* layout)
+SharedSolver::LayoutLeaving(const BALMLayout* layout)
 {
-	fLayouts.RemoveItem(layout);
+	fLayouts.RemoveItem(const_cast<BALMLayout*>(layout));
 	Invalidate(false);
 }
 
@@ -174,6 +174,23 @@ SharedSolver::ValidateLayout(BLayoutContext* context)
 	fLayoutResult = fLinearSpec.Solve();
 	fLayoutValid = true;
 	return fLayoutResult;
+}
+
+
+status_t
+SharedSolver::AddFriendReferences(const BALMLayout* layout, BMessage* archive,
+	const char* field)
+{
+	status_t err = B_OK;
+	BArchiver archiver(archive);
+	for (int32 i = fLayouts.CountItems() - 1; i >= 0 && err == B_OK; i--) {
+		BALMLayout* current = fLayouts.ItemAt(i);
+		if (current == layout)
+			continue;
+		if (archiver.IsArchived(current))
+			err = archiver.AddArchivable(field, current);
+	}
+	return err;
 }
 
 

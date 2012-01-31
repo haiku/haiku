@@ -58,6 +58,14 @@ TabBase::TabBase()
 }
 
 
+TabBase::TabBase(BMessage* archive)
+	:
+	BArchivable(BUnarchiver::PrepareArchive(archive))
+{
+	BUnarchiver(archive).Finish(B_OK);
+}
+
+
 TabBase::~TabBase()
 {
 }
@@ -103,6 +111,15 @@ XTab::XTab(BALMLayout* layout)
 }
 
 
+XTab::XTab(BMessage* archive)
+	:
+	Variable(NULL),
+	TabBase(BUnarchiver::PrepareArchive(archive))
+{
+	BUnarchiver(archive).Finish(B_OK);
+}
+
+
 XTab::~XTab()
 {
 	TabBase::BALMLayoutList* layouts = fLayouts;
@@ -114,11 +131,29 @@ XTab::~XTab()
 }
 
 
+BArchivable*
+XTab::Instantiate(BMessage* archive)
+{
+	if (validate_instantiation(archive, "BALM::XTab"))
+		return new XTab(archive);
+	return NULL;
+}
+
+
 YTab::YTab(BALMLayout* layout)
 	:
 	Variable(layout->Solver())
 {
 	AddedToLayout(layout);
+}
+
+
+YTab::YTab(BMessage* archive)
+	:
+	Variable(NULL),
+	TabBase(BUnarchiver::PrepareArchive(archive))
+{
+	BUnarchiver(archive).Finish(B_OK);
 }
 
 
@@ -130,4 +165,13 @@ YTab::~YTab()
 		layouts = layouts->next;
 	}
 	delete fLayouts;
+}
+
+
+BArchivable*
+YTab::Instantiate(BMessage* archive)
+{
+	if (validate_instantiation(archive, "BALM::YTab"))
+		return new YTab(archive);
+	return NULL;
 }

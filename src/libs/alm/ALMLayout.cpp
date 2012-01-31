@@ -26,8 +26,20 @@ using namespace LinearProgramming;
 const BSize kUnsetSize(B_SIZE_UNSET, B_SIZE_UNSET);
 
 
+namespace {
+
+const char* kFriendField = "BALMLayout:friends";
+const char* kXTabsField = "BALMLayout:xtabs";
+const char* kYTabsField = "BALMLayout:ytabs";
+const char* kTabsField = "BALMLayout:item:tabs";
+const char* kMyTabsField = "BALMLayout:tabs";
+const char* kInsetsField = "BALMLayout:insets";
+const char* kSpacingField = "BALMLayout:spacing";
+
 int CompareXTabFunc(const XTab* tab1, const XTab* tab2);
 int CompareYTabFunc(const YTab* tab1, const YTab* tab2);
+
+};
 
 
 namespace BALM {
@@ -144,10 +156,7 @@ BALMLayout::BALMLayout(float hSpacing, float vSpacing, BALMLayout* friendLayout)
 	fYTabsSorted(false),
 	fBadLayoutPolicy(new DefaultPolicy())
 {
-	fSolver = friendLayout ? friendLayout->fSolver : new SharedSolver();
-	fSolver->AcquireReference();
-	fSolver->RegisterLayout(this);
-	fRowColumnManager = new RowColumnManager(Solver());
+	_SetSolver(friendLayout ? friendLayout->fSolver : new SharedSolver());
 
 	fLeft = AddXTab();
 	fRight = AddXTab();
@@ -167,13 +176,68 @@ BALMLayout::BALMLayout(float hSpacing, float vSpacing, BALMLayout* friendLayout)
 }
 
 
+BALMLayout::BALMLayout(BMessage* archive)
+	:
+	BAbstractLayout(BUnarchiver::PrepareArchive(archive)),
+	fSolver(NULL),
+	fLeft(NULL),
+	fRight(NULL),
+	fTop(NULL),
+	fBottom(NULL),
+	fMinSize(kUnsetSize),
+	fMaxSize(kUnsetSize),
+	fPreferredSize(kUnsetSize),
+	fXTabsSorted(false),
+	fYTabsSorted(false),
+	fBadLayoutPolicy(new DefaultPolicy())
+{
+	BUnarchiver unarchiver(archive);
+
+	BRect insets;
+	status_t err = archive->FindRect(kInsetsField, &insets);
+	if (err != B_OK) {
+		unarchiver.Finish(err);
+		return;
+	}
+
+	fLeftInset = insets.left;
+	fRightInset = insets.right;
+	fTopInset = insets.top;
+	fBottomInset = insets.bottom;
+
+
+	BSize spacing;
+	err = archive->FindSize(kSpacingField, &spacing);
+	if (err != B_OK) {
+		unarchiver.Finish(err);
+		return;
+	}
+
+	fHSpacing = spacing.width;
+	fVSpacing = spacing.height;
+
+	int32 tabCount = 0;
+	archive->GetInfo(kXTabsField, NULL, &tabCount);
+	for (int32 i = 0; i < tabCount && err == B_OK; i++)
+		err = unarchiver.EnsureUnarchived(kXTabsField, i);
+
+	archive->GetInfo(kYTabsField, NULL, &tabCount);
+	for (int32 i = 0; i < tabCount && err == B_OK; i++)
+		err = unarchiver.EnsureUnarchived(kYTabsField, i);
+
+	unarchiver.Finish(err);
+}
+
+
 BALMLayout::~BALMLayout()
 {
 	delete fRowColumnManager;
 	delete fBadLayoutPolicy;
 
-	fSolver->LayoutLeaving(this);
-	fSolver->ReleaseReference();
+	if (fSolver) {
+		fSolver->LayoutLeaving(this);
+		fSolver->ReleaseReference();
+	}
 }
 
 
@@ -317,6 +381,9 @@ BALMLayout::IndexOf(YTab* tab, bool ordered)
 }
 
 
+namespace {
+
+
 int
 CompareXTabFunc(const XTab* tab1, const XTab* tab2)
 {
@@ -339,6 +406,7 @@ CompareYTabFunc(const YTab* tab1, const YTab* tab2)
 }
 
 
+}; // end anonymous namespace
 
 
 /**
@@ -921,6 +989,202 @@ BALMLayout::BaseAlignment()
 }
 
 
+status_t
+BALMLayout::Archive(BMessage* into, bool deep) const
+{
+	BArchiver archiver(into);
+	status_t err = BAbstractLayout::Archive(into, deep);
+	if (err != B_OK)
+		return archiver.Finish(err);
+
+	BRect insets(fLeftInset, fTopInset, fRightInset, fBottomInset);
+	err = into->AddRect(kInsetsField, insets);
+	if (err != B_OK)
+		return archiver.Finish(err);
+
+	BSize spacing(fHSpacing, fVSpacing);
+	err = into->AddSize(kSpacingField, spacing);
+	if (err != B_OK)
+		return archiver.Finish(err);
+
+	if (deep) {
+		for (int32 i = CountXTabs() - 1; i >= 0 && err == B_OK; i--)
+			err = archiver.AddArchivable(kXTabsField, XTabAt(i));
+
+		for (int32 i = CountYTabs() - 1; i >= 0 && err == B_OK; i--)
+			err = archiver.AddArchivable(kYTabsField, YTabAt(i));
+	}
+
+	if (err == B_OK)
+		err = archiver.AddArchivable(kMyTabsField, fLeft);
+	if (err == B_OK)
+		err = archiver.AddArchivable(kMyTabsField, fTop);
+	if (err == B_OK)
+		err = archiver.AddArchivable(kMyTabsField, fRight);
+	if (err == B_OK)
+		err = archiver.AddArchivable(kMyTabsField, fBottom);
+
+	return archiver.Finish(err);
+}
+
+
+BArchivable*
+BALMLayout::Instantiate(BMessage* from)
+{
+	if (validate_instantiation(from, "BALM::BALMLayout"))
+		return new BALMLayout(from);
+	return NULL;
+}
+
+
+status_t
+BALMLayout::ItemArchived(BMessage* into, BLayoutItem* item, int32 index) const
+{
+	BArchiver archiver(into);
+	status_t err = BAbstractLayout::ItemArchived(into, item, index);
+	if (err != B_OK)
+		return err;
+
+	Area* area = AreaFor(item);
+	err = archiver.AddArchivable(kTabsField, area->Left());
+	if (err == B_OK)
+		archiver.AddArchivable(kTabsField, area->Top());
+	if (err == B_OK)
+		archiver.AddArchivable(kTabsField, area->Right());
+	if (err == B_OK)
+		archiver.AddArchivable(kTabsField, area->Bottom());
+
+	return err;
+}
+
+
+status_t
+BALMLayout::ItemUnarchived(const BMessage* from, BLayoutItem* item,
+	int32 index)
+{
+	BUnarchiver unarchiver(from);
+	status_t err = BAbstractLayout::ItemUnarchived(from, item, index);
+	if (err != B_OK)
+		return err;
+
+	Area* area = AreaFor(item);
+
+	XTab* left;
+	XTab* right;
+	YTab* bottom;
+	YTab* top;
+	err = unarchiver.FindObject(kTabsField, index * 4, left);
+	if (err == B_OK)
+		err = unarchiver.FindObject(kTabsField, index * 4 + 1, top);
+	if (err == B_OK)
+		err = unarchiver.FindObject(kTabsField, index * 4 + 2, right);
+	if (err == B_OK)
+		err = unarchiver.FindObject(kTabsField, index * 4 + 3, bottom);
+	
+	if (err == B_OK) {
+		area->_Init(Solver(), left, top, right, bottom, fRowColumnManager);
+		fRowColumnManager->AddArea(area);
+	}
+	return err;
+}
+
+
+status_t
+BALMLayout::AllUnarchived(const BMessage* archive)
+{
+	BUnarchiver unarchiver(archive);
+
+	status_t err = B_OK;
+	if (fSolver == NULL) {
+		_SetSolver(new SharedSolver());
+
+		int32 friendCount = 0;
+		archive->GetInfo(kFriendField, NULL, &friendCount);
+		for (int32 i = 0; i < friendCount; i++) {
+			BALMLayout* layout;
+			err = unarchiver.FindObject(kFriendField, i,
+				BUnarchiver::B_DONT_ASSUME_OWNERSHIP, layout);
+			if (err != B_OK)
+				return err;
+
+			layout->_SetSolver(fSolver);
+		}
+	}
+
+	LinearSpec* spec = Solver();
+	int32 tabCount = 0;
+	archive->GetInfo(kXTabsField, NULL, &tabCount);
+	for (int32 i = 0; i < tabCount && err == B_OK; i++) {
+		XTab* tab;
+		err = unarchiver.FindObject(kXTabsField, i,
+			BUnarchiver::B_DONT_ASSUME_OWNERSHIP, tab);
+		spec->AddVariable(tab);
+		TabAddTransaction<XTab> adder(this);
+		if (adder.AttempAdd(tab))
+			adder.Commit();
+		else
+			err = B_NO_MEMORY;
+	}
+
+	archive->GetInfo(kYTabsField, NULL, &tabCount);
+	for (int32 i = 0; i < tabCount; i++) {
+		YTab* tab;
+		unarchiver.FindObject(kYTabsField, i,
+			BUnarchiver::B_DONT_ASSUME_OWNERSHIP, tab);
+		spec->AddVariable(tab);
+		TabAddTransaction<YTab> adder(this);
+		if (adder.AttempAdd(tab))
+			adder.Commit();
+		else
+			err = B_NO_MEMORY;
+	}
+
+
+	if (err == B_OK) {
+		XTab* leftTab = NULL;
+		err = unarchiver.FindObject(kMyTabsField, 0, leftTab);
+		fLeft = leftTab;
+	}
+
+	if (err == B_OK) {
+		YTab* topTab = NULL;
+		err = unarchiver.FindObject(kMyTabsField, 1, topTab);
+		fTop = topTab;
+	}
+
+	if (err == B_OK) {
+		XTab* rightTab = NULL;
+		err = unarchiver.FindObject(kMyTabsField, 2, rightTab);
+		fRight = rightTab;
+	}
+
+	if (err == B_OK) {
+		YTab* bottomTab = NULL;
+		err = unarchiver.FindObject(kMyTabsField, 3, bottomTab);
+		fBottom = bottomTab;
+	}
+
+	if (err == B_OK) {
+		fLeft->SetRange(0, 0);
+		fTop->SetRange(0, 0);
+
+   		err = BAbstractLayout::AllUnarchived(archive);
+	}
+	return err;
+}
+
+
+status_t
+BALMLayout::AllArchived(BMessage* archive) const
+{
+	status_t err = BAbstractLayout::AllArchived(archive);
+
+	if (err == B_OK)
+		err = fSolver->AddFriendReferences(this, archive, kFriendField);
+	return err;
+}
+
+
 /**
  * Invalidates the layout.
  * Resets minimum/maximum/preferred size.
@@ -934,7 +1198,8 @@ BALMLayout::LayoutInvalidated(bool children)
 	fXTabsSorted = false;
 	fYTabsSorted = false;
 
-	fSolver->Invalidate(children);
+	if (fSolver)
+		fSolver->Invalidate(children);
 }
 
 
@@ -1105,6 +1370,16 @@ BALMLayout::_LayoutItemToAdd(BView* view)
 	if (view->GetLayout())
 		return view->GetLayout();
 	return new(std::nothrow) BViewLayoutItem(view);
+}
+
+
+void
+BALMLayout::_SetSolver(SharedSolver* solver)
+{
+	fSolver = solver;
+	fSolver->AcquireReference();
+	fSolver->RegisterLayout(this);
+	fRowColumnManager = new RowColumnManager(Solver());
 }
 
 

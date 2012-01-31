@@ -6,6 +6,7 @@
 #define	X_TAB_H
 
 
+#include <Archivable.h>
 #include <Referenceable.h>
 
 #include "Variable.h"
@@ -17,9 +18,10 @@ namespace BALM {
 class BALMLayout;
 
 
-class TabBase {
+class TabBase : public BArchivable {
 private:
 								TabBase();
+								TabBase(BMessage* archive);
 	virtual						~TabBase();
 
 			friend class BALMLayout;
@@ -43,11 +45,13 @@ class XTab : public Variable, public TabBase, public BReferenceable {
 public:
 	virtual						~XTab();
 
+	static 	BArchivable*		Instantiate(BMessage* archive);
 protected:
 	friend	class				BALMLayout;
 								XTab(BALMLayout* layout);
 
 private:
+								XTab(BMessage* archive);
 			uint32				_reserved[2];
 };
 
@@ -56,10 +60,12 @@ class YTab : public Variable, public TabBase, public BReferenceable {
 public:
 	virtual						~YTab();
 
+	static 	BArchivable*		Instantiate(BMessage* archive);
 protected:
 	friend	class				BALMLayout;
 								YTab(BALMLayout* layout);
 private:
+								YTab(BMessage* archive);
 			uint32				_reserved[2];
 };
 
