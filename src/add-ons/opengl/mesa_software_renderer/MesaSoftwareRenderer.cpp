@@ -46,7 +46,7 @@ extern "C" {
 #include "vbo/vbo.h"
 
 
-#define TRACE_SOFTGL
+//#define TRACE_SOFTGL
 #ifdef TRACE_SOFTGL
 #	define TRACE(x...) printf("MesaSoftwareRenderer: " x)
 #	define CALLED() printf("MesaSoftwareRenderer: %s\n", __PRETTY_FUNCTION__)
@@ -219,7 +219,7 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView* view, ulong options,
 	fColorSpace = BScreen(GLView()->Window()).ColorSpace();
 
 	// We force single buffering for the time being
-	options &= !BGL_DOUBLE;
+	options &= ~BGL_DOUBLE;
 
 	const GLboolean rgbFlag = ((options & BGL_INDEX) == 0);
 	const GLboolean alphaFlag = ((options & BGL_ALPHA) == BGL_ALPHA);
