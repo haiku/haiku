@@ -182,6 +182,8 @@ printf("CopyFile - cancled\n");
 		if (read < 0) {
 			ret = (status_t)read;
 			fprintf(stderr, "Failed to read data: %s\n", strerror(ret));
+			delete buffer;
+			delete destination;
 			break;
 		}
 
