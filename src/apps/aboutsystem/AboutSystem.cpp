@@ -169,10 +169,13 @@ static const Translation gTranslations[] =
 	{ "ja",
 		"Satoshi Eguchi\n"
 		"Shota Fukumori\n"
+		"hiromu1996\n"
 		"Hironori Ichimiya\n"
 		"Jorge G. Mare - Koki\n"
 		"Takashi Murai\n"
+		"nolze\n"
 		"SHINTA\n"
+		"thebowseat\n"
 		"Hiroyuki Tsutsumi\n"
 		"Hiromu Yakura\n"
 		"The JPBE.net user group\n"
