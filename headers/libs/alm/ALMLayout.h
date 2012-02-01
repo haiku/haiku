@@ -140,17 +140,26 @@ protected:
 	virtual	void				DoLayout();
 
 public:
-	struct BadLayoutPolicy {
-		virtual ~BadLayoutPolicy();
+	struct BadLayoutPolicy : public BArchivable {
+								BadLayoutPolicy();
+								BadLayoutPolicy(BMessage* archive);
+		virtual					~BadLayoutPolicy();
 		/* return false to abandon layout, true to use layout */
-		virtual bool OnBadLayout(BALMLayout* layout,
-			LinearProgramming::ResultType result, BLayoutContext* context) = 0;
+		virtual bool			OnBadLayout(BALMLayout* layout,
+									LinearProgramming::ResultType result,
+									BLayoutContext* context) = 0;
 	};
 
 	struct DefaultPolicy : public BadLayoutPolicy {
-		virtual ~DefaultPolicy();
-		virtual bool OnBadLayout(BALMLayout* layout,
-			LinearProgramming::ResultType result, BLayoutContext* context);
+								DefaultPolicy();
+								DefaultPolicy(BMessage* archive);
+		virtual					~DefaultPolicy();
+		virtual bool			OnBadLayout(BALMLayout* layout,
+									LinearProgramming::ResultType result,
+									BLayoutContext* context);
+		virtual status_t		Archive(BMessage* message,
+									bool deep = false) const;
+		static BArchivable*		Instantiate(BMessage* message);
 	};
 
 private:

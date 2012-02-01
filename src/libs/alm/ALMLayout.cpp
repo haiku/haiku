@@ -29,6 +29,7 @@ const BSize kUnsetSize(B_SIZE_UNSET, B_SIZE_UNSET);
 namespace {
 
 const char* kFriendField = "BALMLayout:friends";
+const char* kBadLayoutPolicyField = "BALMLayout:policy";
 const char* kXTabsField = "BALMLayout:xtabs";
 const char* kYTabsField = "BALMLayout:ytabs";
 const char* kTabsField = "BALMLayout:item:tabs";
@@ -113,7 +114,31 @@ BALMLayout::TabAddTransaction<YTab>::_TabList()
 }; // end namespace BALM
 
 
+BALM::BALMLayout::BadLayoutPolicy::BadLayoutPolicy()
+{
+}
+
+
+BALM::BALMLayout::BadLayoutPolicy::BadLayoutPolicy(BMessage* archive)
+	:
+	BArchivable(archive)
+{
+}
+
+
 BALM::BALMLayout::BadLayoutPolicy::~BadLayoutPolicy()
+{
+}
+
+
+BALM::BALMLayout::DefaultPolicy::DefaultPolicy()
+{
+}
+
+
+BALM::BALMLayout::DefaultPolicy::DefaultPolicy(BMessage* archive)
+	:
+	BadLayoutPolicy(archive)
 {
 }
 
@@ -135,6 +160,22 @@ BALM::BALMLayout::DefaultPolicy::OnBadLayout(BALMLayout* layout,
 		return false;
 	} else
 		return true;
+}
+
+
+status_t
+BALM::BALMLayout::DefaultPolicy::Archive(BMessage* archive, bool deep) const
+{
+	return BadLayoutPolicy::Archive(archive, deep);
+}
+
+
+BArchivable*
+BALM::BALMLayout::DefaultPolicy::Instantiate(BMessage* archive)
+{
+	if (validate_instantiation(archive, "BALM::BALMLayout::DefaultPolicy"))
+		return new DefaultPolicy(archive);
+	return NULL;
 }
 
 
@@ -224,6 +265,9 @@ BALMLayout::BALMLayout(BMessage* archive)
 	archive->GetInfo(kYTabsField, NULL, &tabCount);
 	for (int32 i = 0; i < tabCount && err == B_OK; i++)
 		err = unarchiver.EnsureUnarchived(kYTabsField, i);
+
+	if (err == B_OK && archive->GetInfo(kBadLayoutPolicyField, NULL) == B_OK)
+		err = unarchiver.EnsureUnarchived(kBadLayoutPolicyField);
 
 	unarchiver.Finish(err);
 }
@@ -1013,6 +1057,8 @@ BALMLayout::Archive(BMessage* into, bool deep) const
 
 		for (int32 i = CountYTabs() - 1; i >= 0 && err == B_OK; i--)
 			err = archiver.AddArchivable(kYTabsField, YTabAt(i));
+
+		err = archiver.AddArchivable(kBadLayoutPolicyField, fBadLayoutPolicy);
 	}
 
 	if (err == B_OK)
@@ -1109,6 +1155,16 @@ BALMLayout::AllUnarchived(const BMessage* archive)
 
 			layout->_SetSolver(fSolver);
 		}
+	}
+
+	if (err != B_OK)
+		return err;
+
+	if (archive->GetInfo(kBadLayoutPolicyField, NULL) == B_OK) {
+		BadLayoutPolicy* policy;
+		err = unarchiver.FindObject(kBadLayoutPolicyField, policy);
+		if (err == B_OK)
+			SetBadLayoutPolicy(policy);
 	}
 
 	LinearSpec* spec = Solver();
