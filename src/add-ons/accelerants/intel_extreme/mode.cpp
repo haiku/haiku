@@ -645,6 +645,25 @@ intel_propose_display_mode(display_mode* target, const display_mode* low,
 {
 	TRACE(("intel_propose_display_mode()\n"));
 
+	// first search for the specified mode in the list, if no mode is found
+	// try to fix the target mode in sanitize_display_mode
+	// TODO: Only sanitize_display_mode should be used. However, at the moments
+	// the mode constraints are not optimal and do not work for all
+	// configurations.
+	for (uint32 i = 0; i < gInfo->shared_info->mode_count; i++) {
+		display_mode *mode = &gInfo->mode_list[i];
+		
+		// TODO: improve this, ie. adapt pixel clock to allowed values!!!
+		
+		if (target->virtual_width != mode->virtual_width
+		        || target->virtual_height != mode->virtual_height
+		        || target->space != mode->space)
+		        continue;
+		
+		*target = *mode;
+		return B_OK;
+	}
+
 	sanitize_display_mode(*target);
 
 	return is_display_mode_within_bounds(*target, *low, *high)
