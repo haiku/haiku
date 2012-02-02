@@ -1,0 +1,25 @@
+1	korean	x-vnd.Haiku-3DRendering	1539891217
+Attributes stack size:	Capabilities		속성 스택 크기:
+Auxiliary buffer(s):	Capabilities		보조 버퍼(들):
+Available	Extensions		가능한 것
+Capabilities	Capabilities		기능
+Extensions	Extensions		확장
+GLU version:	InfoView		GLU 버젼:
+GLUT API version:	InfoView		GLUT API  버젼:
+Information	InfoView		정보
+List stack size:	Capabilities		목록 스택 크기:
+Max. 2D texture size:	Capabilities		최대. 2D 텍스처 크기:
+Max. 3D texture size:	Capabilities		최대 3D 켁스처 크기:
+Max. clipping planes:	Capabilities		최대. 오려낸 면:
+Max. convolution:	Capabilities		최대. 합성곱:
+Max. evaluators equation order:	Capabilities		최대.평가 방정식 순서:
+Max. lights:	Capabilities		최대.조명:
+Max. recommended index elements:	Capabilities		최대.추천하는 색인 요소:
+Max. recommended vertex elements:	Capabilities		최대. 추천하는 꼭짓점 요소:
+Max. texture units:	Capabilities		최대. 텍스처 유닛:
+Model stack size:	Capabilities		모델 스택 크기:
+Name stack size:	Capabilities		이름 스택 크기:
+Projection stack size:	Capabilities		사영 스택 크기:
+Renderer name:	InfoView		렌더러 이름:
+Texture stack size:	Capabilities		텍스쳐 스택 크기:
+Vendor name:	InfoView		벤더 이름:

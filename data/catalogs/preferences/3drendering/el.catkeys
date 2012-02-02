@@ -1,0 +1,27 @@
+1	modern_greek	x-vnd.Haiku-3DRendering	209187778
+Attributes stack size:	Capabilities		Μέγεθος στοίβας ιδιοτήτων:
+Auxiliary buffer(s):	Capabilities		Βοηθητική ενδιάμεση μνήμη(-ες):
+Available	Extensions		Διαθέσιμο
+Capabilities	Capabilities		Δυνατότητες
+Extensions	Extensions		Επεκτάσεις
+GLU version:	InfoView		Έκδοση GLU:
+GLUT API version:	InfoView		Έκδοση GLUT API:
+Information	InfoView		Πληροφορία
+List stack size:	Capabilities		Μέγεθος στοίβας
+Max. 2D texture size:	Capabilities		Μέγιστος αριθμός υφών 2D:
+Max. 3D texture size:	Capabilities		Μέγιστος αριθμός υφών 3D:
+Max. clipping planes:	Capabilities		Μέγιστος αριθμός αξόνων:
+Max. convolution:	Capabilities		Μέγιστη περιέλιξη:
+Max. evaluators equation order:	Capabilities		Μέγιστη σειρά εξίσωσης αξιολογητών
+Max. lights:	Capabilities		Μέγιστος φωτισμός:
+Max. recommended index elements:	Capabilities		Μέγιστος αριθμός προτεινόμενων στοιχείων ευρετηρίου:
+Max. recommended vertex elements:	Capabilities		Μέγιστος αριθμός προτεινόμενων στοιχείων vertex:
+Max. texture units:	Capabilities		Μέγιστος αριθμός υφών:
+Model stack size:	Capabilities		Μέγεθος στοίβας μοντέλου:
+Name stack size:	Capabilities		Μέγεθος στοίβας ονόματος:
+3D Rendering	System name		3D Rendering
+GL version:	InfoView		Έκδοση GL:
+Projection stack size:	Capabilities		Μέγεθος στοίβας προβολής:
+Renderer name:	InfoView		Όνομα αποτυπωτή:
+Texture stack size:	Capabilities		Μέγεθος στοίβας υφών:
+Vendor name:	InfoView		Όνομα κατασκευαστή:

@@ -74,7 +74,7 @@ SYSTEM_APPS = AboutSystem ActivityMonitor $(X86_ONLY)BootManager CharacterMap
 ;
 SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations
 	<preference>Deskbar E-mail FileTypes Fonts Keyboard Keymap Locale Media
-	Mouse Network Notifications $(X86_ONLY)OpenGL Printers Screen ScreenSaver
+	Mouse Network Notifications $(X86_ONLY)3DRendering Printers Screen ScreenSaver
 	Shortcuts Sounds Time Touchpad <preference>Tracker VirtualMemory
 ;
 SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo $(X86_ONLY)GLTeapot

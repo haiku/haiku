@@ -1,0 +1,26 @@
+1	italian	x-vnd.Haiku-3DRendering	899836772
+Attributes stack size:	Capabilities		Dimensione stack attributi:
+Auxiliary buffer(s):	Capabilities		Buffer ausiliario/i:
+Available	Extensions		Disponibile
+Capabilities	Capabilities		Capacità:
+Extensions	Extensions		Estensioni
+GLU version:	InfoView		Versione GLU:
+GLUT API version:	InfoView		Versione API GLUT:
+Information	InfoView		Informazione
+List stack size:	Capabilities		Dimensione stack elenchi:
+Max. 2D texture size:	Capabilities		Dimensione massima texture 2D:
+Max. 3D texture size:	Capabilities		Dimensione massima texture 3D:
+Max. clipping planes:	Capabilities		Max. piani di clipping:
+Max. convolution:	Capabilities		Numero massimo di convoluzioni:
+Max. evaluators equation order:	Capabilities		Ordine massimo equazione di valutazione:
+Max. lights:	Capabilities		Numero massimo di luci:
+Max. recommended index elements:	Capabilities		Numero massimo elementi per indice:
+Max. recommended vertex elements:	Capabilities		Numero massimo elementi per vertice:
+Max. texture units:	Capabilities		Max. unità di texture:
+Model stack size:	Capabilities		Dimensione stack modelli:
+Name stack size:	Capabilities		Dimensione stack nomi:
+GL version:	InfoView		Versione GL:
+Projection stack size:	Capabilities		Dimensione stack proiezioni:
+Renderer name:	InfoView		Nome renderer:
+Texture stack size:	Capabilities		Dimensione stack texture:
+Vendor name:	InfoView		Produttore:

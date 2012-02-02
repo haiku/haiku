@@ -1,0 +1,35 @@
+SubDir HAIKU_TOP src preferences 3drendering ;
+SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
+
+# For GCC2
+if $(HAIKU_GCC_VERSION[1]) < 3 { 
+	SubDirC++Flags --no-warnings ;
+}
+
+
+UsePrivateHeaders interface ;
+
+Preference 3DRendering :
+	OpenGLApp.cpp
+	OpenGLWindow.cpp
+	OpenGLView.cpp
+	CapabilitiesView.cpp
+	ExtensionsList.cpp
+	ExtensionsView.cpp
+	InfoView.cpp
+	LogoView.cpp
+	: be GL translation libcolumnlistview.a $(HAIKU_LOCALE_LIBS)
+		$(TARGET_LIBSUPC++)
+	: 3DRendering.rdef
+	;
+
+DoCatalogs 3DRendering :
+    x-vnd.Haiku-3DRendering
+	:
+	CapabilitiesView.cpp
+	ExtensionsList.cpp
+	ExtensionsView.cpp
+	InfoView.cpp
+	OpenGLWindow.cpp
+;
+	

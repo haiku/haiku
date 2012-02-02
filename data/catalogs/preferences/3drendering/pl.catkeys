@@ -1,0 +1,26 @@
+1	polish	x-vnd.Haiku-3DRendering	899836772
+Attributes stack size:	Capabilities		Rozmiar stosu atrybutów:
+Auxiliary buffer(s):	Capabilities		Bufor(y) pomocnicze:
+Available	Extensions		Dostępne
+Capabilities	Capabilities		Możliwości
+Extensions	Extensions		Rozszerzenia
+GLU version:	InfoView		Wersja GLU:
+GLUT API version:	InfoView		Wersja API GLUT:
+Information	InfoView		Informacje
+List stack size:	Capabilities		Rozmiar stosu listy:
+Max. 2D texture size:	Capabilities		Maks. rozmiar tekstury 2D:
+Max. 3D texture size:	Capabilities		Maks. rozmiar tekstury 3D:
+Max. clipping planes:	Capabilities		Maks. liczba płaszczyzn przycinających:
+Max. convolution:	Capabilities		Maks. liczba splotów:
+Max. evaluators equation order:	Capabilities		Maks. kolejność równań oceniajacych:
+Max. lights:	Capabilities		Maks. liczba świateł:
+Max. recommended index elements:	Capabilities		Maks. rekomendowany indeks elementów:
+Max. recommended vertex elements:	Capabilities		Maks. rekomendowana liczba elementów wierzchołków:
+Max. texture units:	Capabilities		Maks. liczba jednostek teksturujących:
+Model stack size:	Capabilities		Rozmiar stosu modelu:
+Name stack size:	Capabilities		Rozmiar stosu nazw:
+GL version:	InfoView		Wersja GL:
+Projection stack size:	Capabilities		Rozmiar stosu projekcji:
+Renderer name:	InfoView		Nazwa renderera:
+Texture stack size:	Capabilities		Rozmiar stosu tekstur:
+Vendor name:	InfoView		Nazwa dostawcy:

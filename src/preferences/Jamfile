@@ -18,7 +18,7 @@ SubInclude HAIKU_TOP src preferences media ;
 SubInclude HAIKU_TOP src preferences mouse ;
 SubInclude HAIKU_TOP src preferences network ;
 SubInclude HAIKU_TOP src preferences notifications ;
-SubInclude HAIKU_TOP src preferences opengl ;
+SubInclude HAIKU_TOP src preferences 3drendering ;
 SubInclude HAIKU_TOP src preferences printers ;
 SubInclude HAIKU_TOP src preferences screen ;
 SubInclude HAIKU_TOP src preferences screensaver ;
