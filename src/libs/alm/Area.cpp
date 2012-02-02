@@ -231,7 +231,9 @@ Area::SetContentAspectRatio(double ratio)
 		fContentAspectRatioC->SetLeftSide(-1.0, fLeft, 1.0, fRight, ratio,
 			fTop, -ratio, fBottom);
 	}
-	fLayoutItem->Layout()->InvalidateLayout();
+	/* called during BALMLayout::ItemUnarchived */
+	if (BLayout* layout = fLayoutItem->Layout())
+		layout->InvalidateLayout();
 }
 
 

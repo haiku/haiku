@@ -32,10 +32,14 @@ const char* kSolverField = "BALMLayout:solver";
 const char* kBadLayoutPolicyField = "BALMLayout:policy";
 const char* kXTabsField = "BALMLayout:xtabs";
 const char* kYTabsField = "BALMLayout:ytabs";
-const char* kTabsField = "BALMLayout:item:tabs";
 const char* kMyTabsField = "BALMLayout:tabs";
 const char* kInsetsField = "BALMLayout:insets";
 const char* kSpacingField = "BALMLayout:spacing";
+
+const char* kTabsField = "BALMLayout:item:tabs";
+const char* kItemAspectRatio = "BALMLayout:item:aspect";
+const char* kItemPenalties = "BALMLayout:item:penalties";
+const char* kItemInsets = "BALMLayout:item:insets";
 
 int CompareXTabFunc(const XTab* tab1, const XTab* tab2);
 int CompareYTabFunc(const YTab* tab1, const YTab* tab2);
@@ -1098,6 +1102,16 @@ BALMLayout::ItemArchived(BMessage* into, BLayoutItem* item, int32 index) const
 		return err;
 
 	Area* area = AreaFor(item);
+	err = into->AddSize(kItemPenalties, area->fShrinkPenalties);
+	if (err == B_OK)
+		err = into->AddSize(kItemPenalties, area->fGrowPenalties);
+	if (err == B_OK)
+		err = into->AddSize(kItemInsets, area->fLeftTopInset);
+	if (err == B_OK)
+		err = into->AddSize(kItemInsets, area->fRightBottomInset);
+	if (err == B_OK)
+		err = into->AddDouble(kItemAspectRatio, area->fContentAspectRatio);
+
 	err = archiver.AddArchivable(kTabsField, area->Left());
 	if (err == B_OK)
 		archiver.AddArchivable(kTabsField, area->Top());
@@ -1120,7 +1134,6 @@ BALMLayout::ItemUnarchived(const BMessage* from, BLayoutItem* item,
 		return err;
 
 	Area* area = AreaFor(item);
-
 	XTab* left;
 	XTab* right;
 	YTab* bottom;
@@ -1133,10 +1146,33 @@ BALMLayout::ItemUnarchived(const BMessage* from, BLayoutItem* item,
 	if (err == B_OK)
 		err = unarchiver.FindObject(kTabsField, index * 4 + 3, bottom);
 	
+	if (err != B_OK)
+		return err;
+
+	area->_Init(Solver(), left, top, right, bottom, fRowColumnManager);
+	fRowColumnManager->AddArea(area);
+
+	err = from->FindSize(kItemPenalties, index * 2, &area->fShrinkPenalties);
+	if (err != B_OK)
+		return err;
+
+	err = from->FindSize(kItemPenalties, index * 2 + 1, &area->fGrowPenalties);
+	if (err != B_OK)
+		return err;
+
+	err = from->FindSize(kItemInsets, index * 2, &area->fLeftTopInset);
+	if (err != B_OK)
+		return err;
+
+	err = from->FindSize(kItemInsets, index * 2 + 1, &area->fRightBottomInset);
+
 	if (err == B_OK) {
-		area->_Init(Solver(), left, top, right, bottom, fRowColumnManager);
-		fRowColumnManager->AddArea(area);
+		double contentAspectRatio;
+		err = from->FindDouble(kItemAspectRatio, index, &contentAspectRatio);
+		if (err == B_OK)
+			area->SetContentAspectRatio(contentAspectRatio);
 	}
+
 	return err;
 }
 
