@@ -16,6 +16,11 @@ namespace LinearProgramming {
 };
 
 
+namespace BPrivate {
+	class SharedSolver;
+};
+
+
 namespace BALM {
 
 
@@ -37,6 +42,10 @@ public:
 			YTab*				Bottom() const;
 
 private:
+	friend class BALMLayout;
+	friend class BALM::RowColumnManager;
+	friend class BPrivate::SharedSolver;
+
 								Row(LinearProgramming::LinearSpec* ls,
 										YTab* top, YTab* bottom);
 
@@ -48,11 +57,6 @@ private:
 				// managed by RowColumnManager
 
 			BObjectList<Area>	fAreas;
-
-public:
-	friend class BALMLayout;
-	friend class BALM::RowColumnManager;
-	
 };
 
 }	// namespace BALM

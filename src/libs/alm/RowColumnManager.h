@@ -14,6 +14,11 @@
 #include "Tab.h"
 
 
+namespace BPrivate {
+	class SharedSolver;
+};
+
+
 namespace BALM {
 
 
@@ -41,6 +46,7 @@ public:
 			void				UpdateConstraints();
 			void				TabsChanged(Area* area);
 private:
+			friend class BPrivate::SharedSolver;
 			Row*				_FindRowFor(Area* area);
 			Column*				_FindColumnFor(Area* area);
 
@@ -52,7 +58,7 @@ private:
 			void				_UpdateConstraints(Row* row);
 			void				_UpdateConstraints(Column* column);
 
-			BObjectList<Row>		fRows;
+			BObjectList<Row>	fRows;
 			BObjectList<Column>	fColumns;
 
 			LinearSpec*			fLinearSpec;

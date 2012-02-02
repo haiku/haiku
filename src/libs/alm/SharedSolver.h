@@ -6,6 +6,9 @@
 #define _SHARED_SOLVER_H
 
 
+#include <set>
+
+#include <Archivable.h>
 #include <LayoutContext.h>
 #include <ObjectList.h>
 #include <Referenceable.h>
@@ -17,18 +20,20 @@ class BMessage;
 
 namespace BALM {
 	class BALMLayout;
+	class Area;
 };
 
-
 using BALM::BALMLayout;
-
+using BALM::Area;
 
 
 namespace BPrivate {
 
 
-class SharedSolver : BLayoutContextListener, public BReferenceable {
+class SharedSolver : BLayoutContextListener, public BReferenceable,
+	   public BArchivable {
 public:
+								SharedSolver(BMessage* archive);
 								SharedSolver();
 								~SharedSolver();
 
@@ -47,6 +52,13 @@ public:
 
 			status_t			AddFriendReferences(const BALMLayout* layout,
 									BMessage* archive, const char* field);
+
+			status_t			Archive(BMessage* archive, bool deep) const;
+			status_t			AllArchived(BMessage* archive) const;
+			status_t			AllUnarchived(const BMessage* archive);
+
+	static	BArchivable*		Instantiate(BMessage* archive);
+
 private:
 			struct MinSizeValidator;
 			struct MaxSizeValidator;
@@ -55,6 +67,14 @@ private:
 			friend struct MinSizeValidator;
 			friend struct MaxSizeValidator;
 			friend struct PreferredSizeValidator;
+
+
+	static	void				_AddConstraintsToSet(Area* area,
+									std::set<Constraint*>& constraints);
+	static	status_t			_AddConstraintToArchive(Constraint* constraint,
+									BMessage* archive);
+			status_t			_InstantiateConstraint(const void* rawData,
+									ssize_t numBytes, BUnarchiver& unarchiver);
 
 			void				SetMaxSize(BALM::BALMLayout* layout,
 									const BSize& max);

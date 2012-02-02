@@ -21,6 +21,10 @@ namespace LinearProgramming {
 	class Constraint;
 };
 
+namespace BPrivate {
+	class SharedSolver;
+};
+
 
 namespace BALM {
 
@@ -113,6 +117,7 @@ private:
 private:
 	friend class BALMLayout;
 	friend class RowColumnManager;
+	friend class BPrivate::SharedSolver;
 
 			BLayoutItem*		fLayoutItem;
 			int32				fID;

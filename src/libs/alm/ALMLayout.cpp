@@ -28,7 +28,7 @@ const BSize kUnsetSize(B_SIZE_UNSET, B_SIZE_UNSET);
 
 namespace {
 
-const char* kFriendField = "BALMLayout:friends";
+const char* kSolverField = "BALMLayout:solver";
 const char* kBadLayoutPolicyField = "BALMLayout:policy";
 const char* kXTabsField = "BALMLayout:xtabs";
 const char* kYTabsField = "BALMLayout:ytabs";
@@ -268,6 +268,9 @@ BALMLayout::BALMLayout(BMessage* archive)
 
 	if (err == B_OK && archive->GetInfo(kBadLayoutPolicyField, NULL) == B_OK)
 		err = unarchiver.EnsureUnarchived(kBadLayoutPolicyField);
+
+	if (err == B_OK)
+		err = unarchiver.EnsureUnarchived(kSolverField);
 
 	unarchiver.Finish(err);
 }
@@ -1062,6 +1065,9 @@ BALMLayout::Archive(BMessage* into, bool deep) const
 	}
 
 	if (err == B_OK)
+		err = archiver.AddArchivable(kSolverField, fSolver);
+
+	if (err == B_OK)
 		err = archiver.AddArchivable(kMyTabsField, fLeft);
 	if (err == B_OK)
 		err = archiver.AddArchivable(kMyTabsField, fTop);
@@ -1140,25 +1146,13 @@ BALMLayout::AllUnarchived(const BMessage* archive)
 {
 	BUnarchiver unarchiver(archive);
 
-	status_t err = B_OK;
-	if (fSolver == NULL) {
-		_SetSolver(new SharedSolver());
-
-		int32 friendCount = 0;
-		archive->GetInfo(kFriendField, NULL, &friendCount);
-		for (int32 i = 0; i < friendCount; i++) {
-			BALMLayout* layout;
-			err = unarchiver.FindObject(kFriendField, i,
-				BUnarchiver::B_DONT_ASSUME_OWNERSHIP, layout);
-			if (err != B_OK)
-				return err;
-
-			layout->_SetSolver(fSolver);
-		}
-	}
+	SharedSolver* solver;
+	status_t err = unarchiver.FindObject(kSolverField, solver);
 
 	if (err != B_OK)
 		return err;
+
+	_SetSolver(solver);
 
 	if (archive->GetInfo(kBadLayoutPolicyField, NULL) == B_OK) {
 		BadLayoutPolicy* policy;
@@ -1235,8 +1229,6 @@ BALMLayout::AllArchived(BMessage* archive) const
 {
 	status_t err = BAbstractLayout::AllArchived(archive);
 
-	if (err == B_OK)
-		err = fSolver->AddFriendReferences(this, archive, kFriendField);
 	return err;
 }
 
