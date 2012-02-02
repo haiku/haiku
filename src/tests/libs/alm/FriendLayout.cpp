@@ -11,11 +11,13 @@
 #include <LayoutBuilder.h>
 #include <List.h>
 #include <Message.h>
+#include <StringView.h>
 #include <Window.h>
 
 // include this for ALM
 #include "ALMLayout.h"
 #include "ALMLayoutBuilder.h"
+#include "LinearProgrammingTypes.h"
 
 
 class FriendWindow : public BWindow {
@@ -66,9 +68,17 @@ public:
 		fTop = fLayout2->BottomOf(button4);
 		fRight = xTabs[1];
 
+		layout1->AreaFor(button2)->SetContentAspectRatio(1.0f);
+		fLayout2->Solver()->AddConstraint(-1.0f, xTabs[0], 1.0f, xTabs[1],
+			LinearProgramming::kGE, 20.0f);
+
+		BButton* archiveButton = new BButton("clone", new BMessage('arcv'));
+		archiveButton->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
+				B_SIZE_UNSET));
 		BLayoutBuilder::Group<>(this, B_VERTICAL)
-			.Add(almView1)
-			.Add(almView2);
+			.Add(almView1->GetLayout())
+			.Add(almView2->GetLayout())
+			.Add(archiveButton);
 	}
 
 
@@ -87,6 +97,26 @@ public:
 						fBoom->Hide();
 				}
 				break;
+			case 'arcv': {
+				BView* view = GetLayout()->View();
+				BMessage archive;
+				status_t err = view->Archive(&archive, true);
+				BWindow* window = new BWindow(BRect(30, 30, 400, 400),
+					"ALM Friend Test Clone", B_TITLED_WINDOW,
+					B_QUIT_ON_WINDOW_CLOSE | B_AUTO_UPDATE_SIZE_LIMITS);
+				window->SetLayout(new BGroupLayout(B_VERTICAL));
+				BView* clone;
+				if (err == B_OK)
+					err = BUnarchiver::InstantiateObject(&archive, clone);
+				if (err != B_OK)
+					window->AddChild(new BStringView("", "An error occurred!"));
+				else {
+					window->AddChild(clone);
+				}
+				window->Show();
+
+				break;
+			}
 			default:
 				BWindow::MessageReceived(message);
 		}
