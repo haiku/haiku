@@ -83,6 +83,8 @@ TermParse::TermParse(int fd)
 	fBuffer(NULL),
 	fQuitting(true)
 {
+	memset(fReadBuffer, 0, READ_BUF_SIZE);
+	memset(fParserBuffer, 0, ESC_PARSER_BUFFER_SIZE);
 }
 
 

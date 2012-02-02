@@ -98,9 +98,20 @@ BasicTerminalBuffer::_CursorChanged()
 
 BasicTerminalBuffer::BasicTerminalBuffer()
 	:
+	fWidth(0),
+	fHeight(0),
+	fScrollTop(0),
+	fScrollBottom(0),
 	fScreen(NULL),
+	fScreenOffset(0),
 	fHistory(NULL),
-	fTabStops(NULL)
+	fSoftWrappedCursor(false),
+	fOverwriteMode(false),
+	fAlternateScreenActive(false),
+	fOriginMode(false),
+	fSavedOriginMode(false),
+	fTabStops(NULL),
+	fEncoding(M_UTF8)
 {
 }
 

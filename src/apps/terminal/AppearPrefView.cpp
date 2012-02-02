@@ -492,7 +492,9 @@ AppearancePrefView::_MakeMenu(uint32 msg, const char** items,
 		i++;
 	}
 
-	menu->FindItem(defaultItemName)->SetMarked(true);
+	BMenuItem* defaultItem = menu->FindItem(defaultItemName);
+	if (defaultItem)
+		defaultItem->SetMarked(true);
 
 	return menu;
 }

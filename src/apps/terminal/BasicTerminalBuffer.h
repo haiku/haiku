@@ -45,6 +45,11 @@ struct TerminalBufferDirtyInfo {
 		invalidateAll = false;
 		messageSent = false;
 	}
+
+	TerminalBufferDirtyInfo()
+	{
+		Reset();
+	}
 };
 
 

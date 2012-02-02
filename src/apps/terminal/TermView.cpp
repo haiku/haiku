@@ -1858,8 +1858,8 @@ TermView::MessageReceived(BMessage *msg)
 			int32 i;
 			int32 encodingID;
 			BMessage specifier;
-			msg->GetCurrentSpecifier(&i, &specifier);
-			if (!strcmp("encoding", specifier.FindString("property", i))){
+			if (msg->GetCurrentSpecifier(&i, &specifier) == B_OK
+				&& !strcmp("encoding", specifier.FindString("property", i))) {
 				msg->FindInt32 ("data", &encodingID);
 				SetEncoding(encodingID);
 				msg->SendReply(B_REPLY);
@@ -1873,8 +1873,8 @@ TermView::MessageReceived(BMessage *msg)
 		{
 			int32 i;
 			BMessage specifier;
-			msg->GetCurrentSpecifier(&i, &specifier);
-			if (!strcmp("encoding", specifier.FindString("property", i))){
+			if (msg->GetCurrentSpecifier(&i, &specifier) == B_OK
+				&& !strcmp("encoding", specifier.FindString("property", i))) {
 				BMessage reply(B_REPLY);
 				reply.AddInt32("result", Encoding());
 				msg->SendReply(&reply);
