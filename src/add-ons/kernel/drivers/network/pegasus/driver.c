@@ -450,8 +450,10 @@ pegasus_device_open(const char *name, uint32 flags,
 	if ((cookie = malloc (sizeof (driver_cookie))) == NULL)
 		return B_NO_MEMORY;
 
-	if ((err = acquire_sem(device->sem_lock)) != B_OK)
+	if ((err = acquire_sem(device->sem_lock)) != B_OK) {
+		free(cookie);
 		return err;
+	}
 	device->nonblocking = (flags & O_NONBLOCK) ? true : false;
 	
 	cookie->device = device;
