@@ -97,7 +97,7 @@ usb_support_descriptor supported_devices[] = {
 
 
 static const struct aue_type aue_devs[] = {
- {{ USB_VENDOR_3COM,		USB_PRODUCT_3COM_3C460B},         PII },
+ {{ USB_VENDOR_3COM,		USB_PRODUCT_3COM_3C460B},		 PII },
  {{ USB_VENDOR_ABOCOM,		USB_PRODUCT_ABOCOM_XX1},	  PNA|PII },
  {{ USB_VENDOR_ABOCOM,		USB_PRODUCT_ABOCOM_XX2},	  PII },
  {{ USB_VENDOR_ABOCOM,		USB_PRODUCT_ABOCOM_UFE1000},	  LSYS },
@@ -135,8 +135,8 @@ static const struct aue_type aue_devs[] = {
  {{ USB_VENDOR_ELECOM,		USB_PRODUCT_ELECOM_LDUSBTX3},	  LSYS },
  {{ USB_VENDOR_ELECOM,		USB_PRODUCT_ELECOM_LDUSBLTX},	  PII },
  {{ USB_VENDOR_ELSA,		USB_PRODUCT_ELSA_USB2ETHERNET},	  0 },
- {{ USB_VENDOR_HAWKING,		USB_PRODUCT_HAWKING_UF100},       PII },
- {{ USB_VENDOR_HP,		USB_PRODUCT_HP_HN210E},           PII },
+ {{ USB_VENDOR_HAWKING,		USB_PRODUCT_HAWKING_UF100},	   PII },
+ {{ USB_VENDOR_HP,			USB_PRODUCT_HP_HN210E},				PII },
  {{ USB_VENDOR_IODATA,		USB_PRODUCT_IODATA_USBETTX},	  0 },
  {{ USB_VENDOR_IODATA,		USB_PRODUCT_IODATA_USBETTXS},	  PII },
  {{ USB_VENDOR_KINGSTON,	USB_PRODUCT_KINGSTON_KNU101TX},   0 },
@@ -149,13 +149,13 @@ static const struct aue_type aue_devs[] = {
  {{ USB_VENDOR_MICROSOFT,	USB_PRODUCT_MICROSOFT_MN110},	  PII },
  {{ USB_VENDOR_MELCO,		USB_PRODUCT_MELCO_LUATX1},	  0 },
  {{ USB_VENDOR_MELCO,		USB_PRODUCT_MELCO_LUATX5},	  0 },
- {{ USB_VENDOR_MELCO,		USB_PRODUCT_MELCO_LUA2TX5},	  PII },
- {{ USB_VENDOR_NETGEAR,		USB_PRODUCT_NETGEAR_FA101},	  PII },
+ {{ USB_VENDOR_MELCO,		USB_PRODUCT_MELCO_LUA2TX5},		PII },
+ {{ USB_VENDOR_NETGEAR,		USB_PRODUCT_NETGEAR_FA101},		PII },
  {{ USB_VENDOR_SIEMENS,		USB_PRODUCT_SIEMENS_SPEEDSTREAM}, PII },
  {{ USB_VENDOR_SMARTBRIDGES,	USB_PRODUCT_SMARTBRIDGES_SMARTNIC},PII },
- {{ USB_VENDOR_SMC,		USB_PRODUCT_SMC_2202USB},	  0 },
- {{ USB_VENDOR_SMC,		USB_PRODUCT_SMC_2206USB},	  PII },
- {{ USB_VENDOR_SOHOWARE,	USB_PRODUCT_SOHOWARE_NUB100},	  0 },
+ {{ USB_VENDOR_SMC,			USB_PRODUCT_SMC_2202USB},		0 },
+ {{ USB_VENDOR_SMC,			USB_PRODUCT_SMC_2206USB},		PII },
+ {{ USB_VENDOR_SOHOWARE,	USB_PRODUCT_SOHOWARE_NUB100},	0 },
 };
 
 
@@ -185,14 +185,14 @@ create_device(const usb_device dev, const usb_interface_info *ii, uint16 ifno)
 
 	device->sem_lock = sem = create_sem(1, DRIVER_NAME "_lock");
 	if (sem < B_OK) {
-		DPRINTF_ERR("create_sem() failed %d\n", (int)sem);
+		DPRINTF_ERR("create_sem() failed 0x%lx\n", sem);
 		free(device);
 		return NULL;
 	}
 	
 	device->rx_sem = sem = create_sem(1, DRIVER_NAME"_receive");
 	if (sem < B_OK) {
-		DPRINTF_ERR("create_sem() failed %d\n", (int)sem);
+		DPRINTF_ERR("create_sem() failed 0x%lx\n", sem);
 		delete_sem(device->sem_lock);
 		free(device);
 		return NULL;
@@ -201,7 +201,7 @@ create_device(const usb_device dev, const usb_interface_info *ii, uint16 ifno)
 
 	device->rx_sem_cb = sem = create_sem(0, DRIVER_NAME"_receive_cb");
 	if (sem < B_OK) {
-		DPRINTF_ERR("create_sem() failed %d\n", (int)sem);
+		DPRINTF_ERR("create_sem() failed 0x%lx\n", sem);
 		delete_sem(device->rx_sem);
 		delete_sem(device->sem_lock);
 		free(device);
@@ -271,15 +271,16 @@ setup_endpoints(const usb_interface_info *uii, pegasus_dev *dev)
 	size_t ep = 0;
 	for(; ep < uii->endpoint_count; ep++){
 		usb_endpoint_descriptor *ed = uii->endpoint[ep].descr;
-		DPRINTF_INFO("try endpoint:%ld %lx %lx %lx\n", ep, (int32)ed->attributes, (int32)ed->endpoint_address, uii->endpoint[ep].handle);
+		DPRINTF_INFO("try endpoint:%ld %x %x %lx\n", ep, ed->attributes,
+			ed->endpoint_address, uii->endpoint[ep].handle);
 		if ((ed->attributes & USB_ENDPOINT_ATTR_MASK) == USB_ENDPOINT_ATTR_BULK) {
-			if ((ed->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN) == USB_ENDPOINT_ADDR_DIR_IN) {
+			if ((ed->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN)
+				== USB_ENDPOINT_ADDR_DIR_IN) {
 				epts[0]	= ep;
-			} else {
+			} else
 				epts[1] = ep;
-			}
-		} else {
-			if ((ed->attributes & USB_ENDPOINT_ATTR_MASK) == USB_ENDPOINT_ATTR_INTERRUPT)
+		} else if ((ed->attributes & USB_ENDPOINT_ATTR_MASK)
+				== USB_ENDPOINT_ATTR_INTERRUPT) {
 				epts[2] = ep;
 		}
 	}
@@ -352,9 +353,11 @@ pegasus_device_added(const usb_device dev, void **cookie)
 
 	dev_desc = usb->get_device_descriptor(dev);
 
-	DPRINTF_INFO("vendor ID 0x%04X, product ID 0x%04X\n", dev_desc->vendor_id, dev_desc->product_id);
+	DPRINTF_INFO("vendor ID 0x%04X, product ID 0x%04X\n", dev_desc->vendor_id,
+		dev_desc->product_id);
 
-	if ((conf = usb->get_nth_configuration(dev, DEFAULT_CONFIGURATION)) == NULL) {
+	if ((conf = usb->get_nth_configuration(dev, DEFAULT_CONFIGURATION)) 
+		== NULL) {
 		DPRINTF_ERR("cannot get default configuration\n");
 		return B_ERROR;
 	}
@@ -377,7 +380,7 @@ pegasus_device_added(const usb_device dev, void **cookie)
 	device->aue_vendor = dev_desc->vendor_id;
 	device->aue_product = dev_desc->product_id;
 	
-	for (i=0; i<sizeof(aue_devs)/sizeof(struct aue_type); i++)
+	for (i=0; i < sizeof(aue_devs) / sizeof(struct aue_type); i++)
 		if (aue_devs[i].aue_dev.vendor == dev_desc->vendor_id
 			&& aue_devs[i].aue_dev.product == dev_desc->product_id) {
 			device->aue_flags = aue_devs[i].aue_flags;		
@@ -445,9 +448,9 @@ pegasus_device_open(const char *name, uint32 flags,
 	ASSERT(out_cookie != NULL);
 	DPRINTF_INFO("open(%s)\n", name);
 
-	if ((device = search_device_info (name)) == NULL)
+	if ((device = search_device_info(name)) == NULL)
 		return B_ENTRY_NOT_FOUND;
-	if ((cookie = malloc (sizeof (driver_cookie))) == NULL)
+	if ((cookie = malloc(sizeof(driver_cookie))) == NULL)
 		return B_NO_MEMORY;
 
 	if ((err = acquire_sem(device->sem_lock)) != B_OK) {
