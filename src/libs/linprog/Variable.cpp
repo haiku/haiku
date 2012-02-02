@@ -137,12 +137,10 @@ Variable::SetMax(double max)
 void
 Variable::SetRange(double min, double max)
 {
-	if (!fIsValid)
-		return;
-
 	fMin = min;
 	fMax = max;
-	fLS->UpdateRange(this);
+	if (fIsValid)
+		fLS->UpdateRange(this);
 }
 
 
