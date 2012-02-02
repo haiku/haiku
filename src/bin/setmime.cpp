@@ -290,6 +290,7 @@ MimeAttribute::MimeAttribute(BMessage& msg, int32 index)
 MimeAttribute::MimeAttribute(TUserArgs& args)
 {
 	SyncWith(args);
+	fStatus = B_OK;
 }
 
 
@@ -367,6 +368,8 @@ MimeAttribute::Dump()
 	char c2 = (char)((type >> 16) & 0xFF);
 	char c3 = (char)((type >> 8) & 0xFF);
 	char c4 = (char)(type & 0xFF);
+	
+	ios::fmtflags flags = cout.flags();
 
 	cout << " \\" << endl << "\t\t" << kAttrType;
 	if (IsPrintableChar(c1) && IsPrintableChar(c2) &&
@@ -381,6 +384,8 @@ MimeAttribute::Dump()
 	cout << " \\" << endl << "\t\t" << kAttrViewable << " " << fViewable
 			<< " " << kAttrEditable << " " << fEditable
 			<< " " << kAttrExtra << " " << fExtra;
+	
+	cout.flags(flags);
 }
 
 
@@ -699,12 +704,16 @@ MimeType::_DumpIcon(uint8 *iconData, size_t iconSize)
 	int lineLimit = iconSize == B_MINI_ICON * B_MINI_ICON
 						? B_MINI_ICON : B_LARGE_ICON;
 
+	ios::fmtflags flags = cout.flags();
+
 	for (size_t i = 0; i < iconSize; i++) {
 		if (i % lineLimit == 0 && i != iconSize - 1)
 			cout << "\\" << endl;
 
 		cout << hex << setfill('0') << setw(2) << (uint16) iconData[i];
 	}
+
+	cout.flags(flags);
 }
 
 
