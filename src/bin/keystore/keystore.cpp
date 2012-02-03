@@ -7,6 +7,7 @@
  */
 
 
+#include <Application.h>
 #include <KeyStore.h>
 
 #include <stdio.h>
@@ -243,6 +244,8 @@ print_usage(const char* name)
 int
 main(int argc, char* argv[])
 {
+	BApplication app("application/x-vnd.Haiku-keystore-cli");
+
 	if (argc < 2)
 		return print_usage(argv[0]);
 
