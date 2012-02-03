@@ -11,8 +11,10 @@
 
 #include <stdio.h>
 
+#include <Catalog.h>
 #include <GLView.h>
 #include <LayoutBuilder.h>
+#include <Locale.h>
 #include <MenuField.h>
 #include <SpaceLayoutItem.h>
 #include <TabView.h>
@@ -20,6 +22,10 @@
 #include "CapabilitiesView.h"
 #include "ExtensionsView.h"
 #include "InfoView.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "OpenGLView"
 
 
 OpenGLView::OpenGLView()
@@ -34,20 +40,21 @@ OpenGLView::OpenGLView()
 
 	glView->LockGL();
 
-    BMenu* menu = new BMenu("Automatic");
+    BMenu* menu = new BMenu(B_TRANSLATE("Automatic"));
     menu->SetRadioMode(true);
     menu->SetLabelFromMarked(true);
-    menu->AddItem(new BMenuItem("Automatic",
+    menu->AddItem(new BMenuItem(B_TRANSLATE("Automatic"),
         new BMessage(MENU_AUTO_MESSAGE)));
     menu->AddSeparatorItem();
-    menu->AddItem(new BMenuItem("Force Software Rasterizer",
+    menu->AddItem(new BMenuItem(B_TRANSLATE("Software Rasterizer"),
         new BMessage(MENU_SWRAST_MESSAGE)));
-    menu->AddItem(new BMenuItem("Force Gallium Software Pipe",
+    menu->AddItem(new BMenuItem(B_TRANSLATE("Gallium Software Pipe"),
         new BMessage(MENU_SWPIPE_MESSAGE)));
-    menu->AddItem(new BMenuItem("Force Gallium LLVM Pipe",
+    menu->AddItem(new BMenuItem(B_TRANSLATE("Gallium LLVM Pipe"),
         new BMessage(MENU_SWLLVM_MESSAGE)));
     BMenuField* menuField = new BMenuField("renderer",
-        "3D Rendering Engine:", menu);
+        B_TRANSLATE("3D Rendering Engine:"), menu);
+	// TODO:  Set current Renderer
 	menuField->SetEnabled(false);
 
 	BTabView *tabView = new BTabView("tab view", B_WIDTH_FROM_LABEL);
