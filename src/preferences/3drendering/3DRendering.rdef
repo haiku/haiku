@@ -17,8 +17,6 @@ resource app_version {
 	long_info = "3D Rendering ©2009-2012 Haiku, Inc."
 };
 
-resource(1, "logo.png") #'PNG ' import "logo.png";
-
 resource vector_icon {
 	$"6E636966060500020006023B10B737F036BA1A993D466848C719BEBE20009192"
 	$"92FFD5D5D5020016023900000000000000003EE0004AE00048E0005EF884C702"

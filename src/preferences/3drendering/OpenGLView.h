@@ -13,6 +13,13 @@
 
 #include <GroupView.h>
 
+
+#define MENU_AUTO_MESSAGE	'auto'
+#define MENU_SWRAST_MESSAGE	'swrt'
+#define MENU_SWPIPE_MESSAGE	'swpi'
+#define MENU_SWLLVM_MESSAGE	'swll'
+
+
 class OpenGLView : public BGroupView {
 public:
     OpenGLView();

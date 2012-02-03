@@ -17,7 +17,6 @@ local sources =
 	ExtensionsList.cpp
 	ExtensionsView.cpp
 	InfoView.cpp
-	LogoView.cpp
 	;
 
 Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;

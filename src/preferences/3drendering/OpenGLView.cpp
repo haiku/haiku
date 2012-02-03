@@ -13,13 +13,13 @@
 
 #include <GLView.h>
 #include <LayoutBuilder.h>
+#include <MenuField.h>
 #include <SpaceLayoutItem.h>
 #include <TabView.h>
 
 #include "CapabilitiesView.h"
 #include "ExtensionsView.h"
 #include "InfoView.h"
-#include "LogoView.h"
 
 
 OpenGLView::OpenGLView()
@@ -34,7 +34,21 @@ OpenGLView::OpenGLView()
 
 	glView->LockGL();
 
-	LogoView *logoView = new LogoView();
+    BMenu* menu = new BMenu("Automatic");
+    menu->SetRadioMode(true);
+    menu->SetLabelFromMarked(true);
+    menu->AddItem(new BMenuItem("Automatic",
+        new BMessage(MENU_AUTO_MESSAGE)));
+    menu->AddSeparatorItem();
+    menu->AddItem(new BMenuItem("Force Software Rasterizer",
+        new BMessage(MENU_SWRAST_MESSAGE)));
+    menu->AddItem(new BMenuItem("Force Gallium Software Pipe",
+        new BMessage(MENU_SWPIPE_MESSAGE)));
+    menu->AddItem(new BMenuItem("Force Gallium LLVM Pipe",
+        new BMessage(MENU_SWLLVM_MESSAGE)));
+    BMenuField* menuField = new BMenuField("renderer",
+        "3D Rendering Engine:", menu);
+	menuField->SetEnabled(false);
 
 	BTabView *tabView = new BTabView("tab view", B_WIDTH_FROM_LABEL);
 	tabView->AddTab(new InfoView());
@@ -45,12 +59,12 @@ OpenGLView::OpenGLView()
 
 	GroupLayout()->SetSpacing(0);
 	BLayoutBuilder::Group<>(this)
-		.SetInsets(0, 0, 0, 0)
-		.Add(logoView)
+		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
+			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
+		.Add(menuField)
 		.AddGroup(B_HORIZONTAL)
 			.Add(tabView)
-			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
+			.SetInsets(0, B_USE_DEFAULT_SPACING, 0, 0);
 }
 
 
