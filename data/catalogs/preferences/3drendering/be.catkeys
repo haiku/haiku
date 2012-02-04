@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-3DRendering	209187778
+1	belarusian	x-vnd.Haiku-3DRendering	1539891217
 List stack size:	Capabilities		Памер стэку спісаў:
 Information	InfoView		Інфармацыя
 Max. clipping planes:	Capabilities		Макс. колькасць плоскасцяў адсячэння:
@@ -6,9 +6,7 @@ Max. texture units:	Capabilities		Макс. колькасць тэкстурн�
 Renderer name:	InfoView		Імя адлюстравальніка:
 Vendor name:	InfoView		Імя пастаўшчыка:
 Attributes stack size:	Capabilities		Памер стэку атрыбутаў:
-GL version:	InfoView		Версія GL:
 Name stack size:	Capabilities		Памер стэку імёнаў:
-3D Rendering	System name		3D Rendering
 Auxiliary buffer(s):	Capabilities		Дапаможны(я) буфер(ы)
 Max. recommended vertex elements:	Capabilities		Макс. рэкамендаваная колькасць вяршынных элементаў:
 GLU version:	InfoView		Версія GLU:

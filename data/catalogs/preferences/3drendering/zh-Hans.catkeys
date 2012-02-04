@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-3DRendering	209187778
+1	english	x-vnd.Haiku-3DRendering	1539891217
 List stack size:	Capabilities		列出堆栈大小：
 Information	InfoView		信息
 Max. clipping planes:	Capabilities		最大片段片面
@@ -6,9 +6,7 @@ Max. texture units:	Capabilities		最大文字单位
 Renderer name:	InfoView		渲染器名称：
 Vendor name:	InfoView		设备供应商：
 Attributes stack size:	Capabilities		属性堆栈大小：
-GL version:	InfoView		GL 版本：
 Name stack size:	Capabilities		名称堆栈大小：
-3D Rendering	System name		3D Rendering
 Auxiliary buffer(s):	Capabilities		辅助指令缓冲器：
 Max. recommended vertex elements:	Capabilities		最大推荐顶部单元
 GLU version:	InfoView		GLU 版本：

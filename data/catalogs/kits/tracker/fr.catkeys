@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	1977470516
+1	french	x-vnd.Haiku-libtracker	1676127148
 common	B_COMMON_DIRECTORY		commun
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Vue en icônes
@@ -47,7 +47,8 @@ Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttribut
 Clean up	DeskWindow		Nettoyer
 You cannot copy or move the root directory.	FSUtils		Vous ne pouvez ni copier, ni déplacer le répertoire racine.
 Invert selection	FilePanelPriv		Inverser la sélection
-save text	FilePanelPriv		Sauvegarder le texte
+Rename	InfoWindow	Button label, 'Rename' (en), 'Umbenennen' (de)	Renommer
+save text	FilePanelPriv		sauvegarder le texte
 Select all	FilePanelPriv		Sélectionner tout
 Link to:	InfoWindow		Lier à :
 Location	ContainerWindow		Emplacement
@@ -94,6 +95,7 @@ Add-ons	VolumeWindow		Extensions
 Sorry, you can't copy items to the Trash.	PoseView		Désolé, vous ne pouvez pas copier des éléments dans la Corbeille.
 List view	VolumeWindow		Vue en liste
 matches wildcard expression	SelectionWindow		correspond à l'expression générique
+rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	renommez
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Vous ne pouvez pas remplacer un dossier ou un lien symbolique par un fichier.
 Show space bars on volumes	SettingsView		Afficher la jauge d'espace sur les volumes
 Invert selection	ContainerWindow		Inverser la sélection
@@ -104,6 +106,7 @@ Add printer…	ContainerWindow		Ajouter une imprimante…
 Open	VolumeWindow		Ouvrir
 New folder	ContainerWindow		Nouveau dossier
 Kind	ContainerWindow		Nature
+rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	renommer
 home	B_USER_DIRECTORY		personnel
 Select…	ContainerWindow		Sélectionner…
 Copy to	ContainerWindow		Copier vers
@@ -113,6 +116,7 @@ Set new link target	InfoWindow		Définir la nouvelle cible du lien
 Save as Query template:	FindPanel		Enregistrer le modèle de requête :
 preferences	B_PREFERENCES_DIRECTORY		préférences
 Cancel	FSUtils		Annuler
+move	FSUtils	As in 'to move this folder...' (en) Um diesen Ordner zu verschieben...' (de)	déplacer
 Edit name	ContainerWindow		Éditer le nom
 Show volumes on Desktop	SettingsView		Afficher les volumes sur le bureau
 KiB	WidgetAttributeText		Kio
@@ -196,7 +200,9 @@ Could not find application \"%appname\"	OpenWithWindow		Impossible de trouver l'
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		L'élément sélectionné ne peut pas être envoyé à la Corbeille. Voulez vous le supprimer ? (Cette opération ne peut pas être rétablie.)
 Invert	SelectionWindow		Inverser
 Save Query as template…	FindPanel		Enregistrer le modèle de la requête…
+rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	renommez
 Find	FindPanel		Rechercher
+Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Déplacer
 Get info	ContainerWindow		Informations
 Error creating link to \"%name\".	FSUtils		Erreur à la création du lien vers « %name ».
 Select	SelectionWindow		Sélectionner
@@ -209,14 +215,14 @@ Group	FilePermissionsView		Groupe
 Version:	InfoWindow		Version :
 Created:	InfoWindow		Créé :
 \nShould this be fixed?	FSUtils		\nFaut-il le corriger ?
-Copying: 	StatusWindow		Copie :
+Copying: 	StatusWindow		Copie : 
 Capacity:	InfoWindow		Capacité :
 Delete	FilePanelPriv		Supprimer
 Save	FindPanel		Sauvegarder
 copy	FSUtils	filename copy	copie
 Temporary	FindPanel		Temporaire
 Version	OpenWithWindow		Version
-Default application	InfoWindow		Application par défaut 
+Default application	InfoWindow		Application par défaut
 Preparing to copy items…	StatusWindow		Copie des éléments en préparation…
 Show folder location in title tab	SettingsView		Afficher l'emplacement du dossier dans la barre de titre
 Proceed	FSUtils		Procéder
@@ -260,7 +266,8 @@ Recalculate folder size	InfoWindow		Recalculer la taille du dossier
 Unknown	WidgetAttributeText		Inconnu
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Impossible d'ouvrir « %document » (Il manque le symbole : %symbol).\n
 by name	FindPanel		par nom
-Creating links: 	StatusWindow		Création des liens :
+Creating links: 	StatusWindow		Création des liens : 
+Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	Renommer
 Paused: click to resume or stop	StatusWindow		En pause : cliquez pour reprendre ou arrêter
 Preferred for %type	OpenWithWindow		Préférence pour %type
 GiB	WidgetAttributeText		Gio
@@ -283,6 +290,7 @@ Previously mounted disks	AutoMounterSettings		Les disques montés précédemment
 %Ld B	WidgetAttributeText		%Ld o
 copying	FSUtils		copier
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Erreur à la copie du dossier « %name »:\n\t%error\n\nVoulez-vous continuer ?
+move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	déplacez
 Show Disks icon	SettingsView		Afficher l'icône des disques
 Mount	VolumeWindow		Monter
 Cancel	PoseView		Annuler
@@ -298,6 +306,7 @@ Permissions	ContainerWindow		Permissions
 moving	FSUtils		déplacement
 Identify	InfoWindow		Identifier
 Recent folders	ContainerWindow		Dossiers récents
+rename	InfoWindow	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	renommer
 Close all	ContainerWindow		Fermer tout
 Include trash	FindPanel		Inclure la corbeille
 Query template	FindPanel		Modèle de requête
@@ -400,7 +409,7 @@ starts with	FindPanel		commence par
 Increase size	ContainerWindow		Augmenter la taille
 is	FindPanel		est
 Attributes	ContainerWindow		Attributs
-Handles %type	OpenWithWindow		Support de  « %type »
+Handles %type	OpenWithWindow		Support de « %type »
 ends with	FindPanel		fini par
 New	ContainerWindow		Nouveau
 Name matches wildcard expression:###	SelectionWindow		Nom correspondant à l'expression générique : ###

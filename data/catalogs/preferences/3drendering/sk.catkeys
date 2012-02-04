@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-3DRendering	209187778
+1	slovak	x-vnd.Haiku-3DRendering	1539891217
 List stack size:	Capabilities		Veľkosť zásobníka zoznamu:
 Information	InfoView		Informácie
 Max. clipping planes:	Capabilities		Max. orezávacích rovín:
@@ -6,9 +6,7 @@ Max. texture units:	Capabilities		Max. textúrových jednotiek:
 Renderer name:	InfoView		Názov vykresľovača:
 Vendor name:	InfoView		Dodávateľ:
 Attributes stack size:	Capabilities		Veľkosť zásobníka atribútov:
-GL version:	InfoView		Verzia GL:
 Name stack size:	Capabilities		Veľkosť zásobníka názvov:
-3D Rendering	System name		3D Rendering
 Auxiliary buffer(s):	Capabilities		Pomocné buffre:
 Max. recommended vertex elements:	Capabilities		Max. odporúčaných prvkov vrcholov:
 GLU version:	InfoView		Verzia GLU:

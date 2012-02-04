@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-3DRendering	209187778
+1	dutch; flemish	x-vnd.Haiku-3DRendering	1539891217
 List stack size:	Capabilities		Lijst stackgrootte:
 Information	InfoView		Informatie
 Max. clipping planes:	Capabilities		Max. clippingvlakken:
@@ -6,9 +6,7 @@ Max. texture units:	Capabilities		Max. textuurunits:
 Renderer name:	InfoView		Renderernaam:
 Vendor name:	InfoView		Vendor-naam:
 Attributes stack size:	Capabilities		Stackgrootte-kenmerken:
-GL version:	InfoView		GL-versie:
 Name stack size:	Capabilities		Naam stackgrootte:
-3D Rendering	System name		3D Rendering
 Auxiliary buffer(s):	Capabilities		Hulpbuffer(s):
 Max. recommended vertex elements:	Capabilities		Max. aanbevolen vertex-elementen:
 GLU version:	InfoView		GLU versie:

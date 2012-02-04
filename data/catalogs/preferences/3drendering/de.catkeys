@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-3DRendering	209187778
+1	german	x-vnd.Haiku-3DRendering	1539891217
 List stack size:	Capabilities		Listen-Stackgröße:
 Information	InfoView		Informationen
 Max. clipping planes:	Capabilities		Max. Clipping-Ebenen:
@@ -6,9 +6,7 @@ Max. texture units:	Capabilities		Max. Textur-Einheiten:
 Renderer name:	InfoView		Renderer-Name:
 Vendor name:	InfoView		Herstellername:
 Attributes stack size:	Capabilities		Attribut-Stackgröße:
-GL version:	InfoView		GL-Version:
 Name stack size:	Capabilities		Namen-Stackgröße:
-3D Rendering	System name		3D Rendering
 Auxiliary buffer(s):	Capabilities		Auxiliary-Buffer:
 Max. recommended vertex elements:	Capabilities		Max. empfohlene Vertexelemente:
 GLU version:	InfoView		GLU-Version:

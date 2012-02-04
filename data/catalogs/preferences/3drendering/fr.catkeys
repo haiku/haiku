@@ -1,13 +1,11 @@
-1	french	x-vnd.Haiku-3DRendering	953276299
+1	french	x-vnd.Haiku-3DRendering	2283979738
 List stack size:	Capabilities		Taille de la pile de listes :
 Information	InfoView		Informations
 Max. clipping planes:	Capabilities		Nombre de plans de coupes :
 Renderer name:	InfoView		Nom du moteur de rendu :
 Vendor name:	InfoView		Nom du vendeur :
 Attributes stack size:	Capabilities		Taille de la pile d'attributs :
-GL version:	InfoView		Version d'GL :
 Name stack size:	Capabilities		Taille de la pile de noms :
-3D Rendering	System name		3D Rendering
 Auxiliary buffer(s):	Capabilities		Tampon(s) auxilliaire(s) :
 GLU version:	InfoView		Version de GLU :
 Model stack size:	Capabilities		Taille de la pile de modèles :

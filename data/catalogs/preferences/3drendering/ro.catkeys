@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-3DRendering	209187778
+1	romanian	x-vnd.Haiku-3DRendering	1539891217
 List stack size:	Capabilities		Dimensiunea stivei de liste:
 Information	InfoView		Informații
 Max. clipping planes:	Capabilities		Numărul max. de planuri de tăiere:
@@ -6,9 +6,7 @@ Max. texture units:	Capabilities		Numărul max. de unități de textură:
 Renderer name:	InfoView		Nume randor:
 Vendor name:	InfoView		Nume vânzător:
 Attributes stack size:	Capabilities		Dimensiunea stivei de atribute:
-GL version:	InfoView		Versiune GL:
 Name stack size:	Capabilities		Dimensiunea stivei de nume:
-3D Rendering	System name		3D Rendering
 Auxiliary buffer(s):	Capabilities		Amortizor(oare) auxiliar(e):
 Max. recommended vertex elements:	Capabilities		Numărul max. recomandat de elemente de zenit:
 GLU version:	InfoView		Versiune GLU:

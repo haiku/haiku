@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-3DRendering	209187778
+1	russian	x-vnd.Haiku-3DRendering	1539891217
 List stack size:	Capabilities		Размер стека списка:
 Information	InfoView		Информация
 Max. clipping planes:	Capabilities		Максимальное количество отсечений:
@@ -6,9 +6,7 @@ Max. texture units:	Capabilities		Максимальное количество 
 Renderer name:	InfoView		Название рендера:
 Vendor name:	InfoView		Имя поставщика:
 Attributes stack size:	Capabilities		Размер стека атрибутов:
-GL version:	InfoView		Версия GL:
 Name stack size:	Capabilities		Размер стекового имени:
-3D Rendering	System name		3D Rendering
 Auxiliary buffer(s):	Capabilities		Вспомогательных буферов:
 Max. recommended vertex elements:	Capabilities		Максимальное рекомендованное количество вершин:
 GLU version:	InfoView		Версия GLU:

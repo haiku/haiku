@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-3DRendering	209187778
+1	ukrainian	x-vnd.Haiku-3DRendering	1539891217
 List stack size:	Capabilities		Розмір стека списку:
 Information	InfoView		Інформація
 Max. clipping planes:	Capabilities		Максимальна кількість площин відсікання:
@@ -6,9 +6,7 @@ Max. texture units:	Capabilities		Максимальна кількість те
 Renderer name:	InfoView		Назва рендера:
 Vendor name:	InfoView		Ім'я постачальника:
 Attributes stack size:	Capabilities		Розмір стека атрибутів:
-GL version:	InfoView		Версія GL:
 Name stack size:	Capabilities		Розмір імені стека:
-3D Rendering	System name		3D Rendering
 Auxiliary buffer(s):	Capabilities		Допоміжний буфер(и):
 Max. recommended vertex elements:	Capabilities		Максимално рекомендована кількість вершин:
 GLU version:	InfoView		Версія GLU:
