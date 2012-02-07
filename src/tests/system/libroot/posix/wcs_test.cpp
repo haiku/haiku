@@ -2609,12 +2609,13 @@ void
 test_wcsftime(const char* locale, const wcsftime_data data[])
 {
 	setlocale(LC_TIME, locale);
+	setlocale(LC_CTYPE, locale);
 	printf("wcsftime for '%s'\n", locale);
 
 	time_t nowSecs = 1279391169;	// pure magic
 	tm* now = localtime(&nowSecs);
 	int problemCount = 0;
-	for(int i = 0; data[i].format != NULL; ++i) {
+	for (int i = 0; data[i].format != NULL; ++i) {
 		wchar_t buf[100];
 		wcsftime(buf, 100, data[i].format, now);
 		if (wcscmp(buf, data[i].result) != 0) {
@@ -2709,7 +2710,7 @@ test_wcsftime()
 	test_wcsftime("nl_NL", wcsftime_nl);
 
 	const wcsftime_data wcsftime_nb[] = {
-		{ L"%c", L"kl. 18:26:09 GMT lørdag 17. juli 2010" },
+		{ L"%c", L"kl. 18:26:09 GMT l\xF8rdag 17. juli 2010" },
 		{ L"%x", L"17. juli 2010" },
 		{ L"%X", L"18:26:09" },
 		{ L"%a", L"lør." },
@@ -3877,7 +3878,7 @@ test_sprintf(const char* locale, const sprintf_data data[])
 	printf("sprintf for '%s'\n", locale);
 
 	int problemCount = 0;
-	for(int i = 0; data[i].format != NULL; ++i) {
+	for (int i = 0; data[i].format != NULL; ++i) {
 		char buf[100];
 		if (strstr(data[i].format, "%ls") != NULL)
 			sprintf(buf, data[i].format, (wchar_t*)data[i].value);
@@ -3944,7 +3945,7 @@ test_swprintf(const char* locale, const swprintf_data data[])
 	printf("swprintf for '%s'\n", locale);
 
 	int problemCount = 0;
-	for(int i = 0; data[i].format != NULL; ++i) {
+	for (int i = 0; data[i].format != NULL; ++i) {
 		wchar_t buf[100];
 		if (wcsstr(data[i].format, L"%ls") != NULL)
 			swprintf(buf, 100, data[i].format, (wchar_t*)data[i].value);
@@ -4010,6 +4011,8 @@ main(void)
 	test_sprintf();
 	test_swprintf();
 
+	test_wcsftime();
+
 	test_wcpcpy();
 	test_wcscasecmp();
 	test_wcscat();
@@ -4018,7 +4021,6 @@ main(void)
 	test_wcscpy();
 	test_wcscspn();
 	test_wcsdup();
-	test_wcsftime();
 #ifdef __HAIKU__
 	test_wcslcat();
 	test_wcslcpy();
