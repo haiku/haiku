@@ -29,15 +29,11 @@ public:
 private:
 			void				_RemoveClient();
 			void				_ConfigureIPv4();
-			void				_ConfigureIPv6LinkLocal(bool add);
-			bool				_AddIPv6LinkLocal(int socket, const in6_addr &);
-			void				_RemoveIPv6LinkLocal(int socket, const in6_addr &);
 			void				_ReadyToRun();
 
 			BMessenger			fTarget;
 			BString				fDevice;
 			AutoconfigClient*	fCurrentClient;
-			uint8				fCurrentMac[6];
 };
 
 #endif	// AUTOCONFIG_LOOPER_H
