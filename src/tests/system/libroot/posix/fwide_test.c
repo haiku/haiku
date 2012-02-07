@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <locale.h>
 #include <stdio.h>
 #include <wchar.h>
 
@@ -37,6 +38,20 @@ main(int argc, char** argv)
 
 	fprintf(stdout, "%s", "this *should* be visible!\n");
 	fwprintf(stderr, L"%ls", L"this *should* be visible!\n");
+
+	setlocale(LC_ALL, "");
+
+	fprintf(stderr, "%s", "this should *not* be visible!\n");
+	fwprintf(stdout, L"%ls", L"this should *not* be visible!\n");
+
+	fprintf(stderr, "%ls", L"this should *not* be visible!\n");
+	fwprintf(stdout, L"%s", "this should *not* be visible!\n");
+
+	fprintf(stdout, "%ls", L"this *should* be visible! (äöúß)\n");
+	fwprintf(stderr, L"%s", "this *should* be visible! (äöúß)\n");
+
+	fprintf(stdout, "%s", "this *should* be visible! (äöúß)\n");
+	fwprintf(stderr, L"%ls", L"this *should* be visible! (äöúß)\n");
 
 	return 0;
 }
