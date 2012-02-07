@@ -28,6 +28,8 @@ private:
 		status_t					_ReadKeyStoreDatabase();
 		status_t					_WriteKeyStoreDatabase();
 
+		uint32						_AccessFlagsFor(uint32 command) const;
+
 		Keyring*					_FindKeyring(const BString& name);
 
 		status_t					_AddKeyring(const BString& name,

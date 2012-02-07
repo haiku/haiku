@@ -27,6 +27,31 @@ using namespace BPrivate;
 
 static const char* kKeyringKeysIdentifier = "Keyrings";
 
+static const uint32 kFlagGetKey						= 0x0001;
+static const uint32 kFlagEnumerateKeys				= 0x0002;
+static const uint32 kFlagAddKey						= 0x0004;
+static const uint32 kFlagRemoveKey					= 0x0008;
+static const uint32 kFlagAddKeyring					= 0x0010;
+static const uint32 kFlagRemoveKeyring				= 0x0020;
+static const uint32 kFlagEnumerateKeyrings			= 0x0040;
+static const uint32 kFlagSetMasterKey				= 0x0080;
+static const uint32 kFlagRemoveMasterKey			= 0x0100;
+static const uint32 kFlagAddKeyringsToMaster		= 0x0200;
+static const uint32 kFlagRemoveKeyringsFromMaster	= 0x0400;
+static const uint32 kFlagEnumerateMasterKeyrings	= 0x0800;
+static const uint32 kFlagQueryAccessibility			= 0x1000;
+static const uint32 kFlagRevokeAccess				= 0x2000;
+static const uint32 kFlagEnumerateApplications		= 0x4000;
+static const uint32 kFlagRemoveApplications			= 0x8000;
+
+static const uint32 kDefaultAppFlags = kFlagGetKey | kFlagEnumerateKeys
+	| kFlagAddKey | kFlagRemoveKey | kFlagAddKeyring | kFlagRemoveKeyring
+	| kFlagEnumerateKeyrings | kFlagSetMasterKey | kFlagRemoveMasterKey
+	| kFlagAddKeyringsToMaster | kFlagRemoveKeyringsFromMaster
+	| kFlagEnumerateMasterKeyrings | kFlagQueryAccessibility
+	| kFlagQueryAccessibility | kFlagRevokeAccess | kFlagEnumerateApplications
+	| kFlagRemoveApplications;
+
 
 KeyStoreServer::KeyStoreServer()
 	:
@@ -408,6 +433,48 @@ KeyStoreServer::_WriteKeyStoreDatabase()
 	}
 
 	return keyrings.Flatten(&fKeyStoreFile);
+}
+
+
+uint32
+KeyStoreServer::_AccessFlagsFor(uint32 command) const
+{
+	switch (command) {
+		case KEY_STORE_GET_KEY:
+			return kFlagGetKey;
+		case KEY_STORE_GET_NEXT_KEY:
+			return kFlagEnumerateKeys;
+		case KEY_STORE_ADD_KEY:
+			return kFlagAddKey;
+		case KEY_STORE_REMOVE_KEY:
+			return kFlagRemoveKey;
+		case KEY_STORE_ADD_KEYRING:
+			return kFlagAddKeyring;
+		case KEY_STORE_REMOVE_KEYRING:
+			return kFlagRemoveKeyring;
+		case KEY_STORE_GET_NEXT_KEYRING:
+			return kFlagEnumerateKeyrings;
+		case KEY_STORE_SET_MASTER_KEY:
+			return kFlagSetMasterKey;
+		case KEY_STORE_REMOVE_MASTER_KEY:
+			return kFlagRemoveMasterKey;
+		case KEY_STORE_ADD_KEYRING_TO_MASTER:
+			return kFlagAddKeyringsToMaster;
+		case KEY_STORE_REMOVE_KEYRING_FROM_MASTER:
+			return kFlagRemoveKeyringsFromMaster;
+		case KEY_STORE_GET_NEXT_MASTER_KEYRING:
+			return kFlagEnumerateMasterKeyrings;
+		case KEY_STORE_IS_KEYRING_ACCESSIBLE:
+			return kFlagQueryAccessibility;
+		case KEY_STORE_REVOKE_ACCESS:
+			return kFlagRevokeAccess;
+		case KEY_STORE_GET_NEXT_APPLICATION:
+			return kFlagEnumerateApplications;
+		case KEY_STORE_REMOVE_APPLICATION:
+			return kFlagRemoveApplications;
+	}
+
+	return 0;
 }
 
 
