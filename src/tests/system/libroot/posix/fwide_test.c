@@ -20,7 +20,7 @@ main(int argc, char** argv)
 		printf("PROBLEM: fwide(stdout, 0) = %d (expected -1)\n", result);
 	}
 
-	fwprintf(stderr, L"stderr should now be set to non-wide mode ...\n");
+	fwprintf(stderr, L"stderr should now be set to wide mode ...\n");
 	result = fwide(stderr, 0);
 	if (result != 1)
 	{
