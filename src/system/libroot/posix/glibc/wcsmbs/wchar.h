@@ -63,26 +63,20 @@ typedef unsigned int wint_t;
 
 #ifndef __mbstate_t_defined
 # define __mbstate_t_defined	1
-/* Conversion state information - for now a mixture between glibc's own idea of
+/* Conversion state information - for now a mixture between glibc's idea of
    mbstate_t and our own.  */
 typedef struct
 {
   void* converter;
   char charset[64];
+  unsigned int count;
+  char data[1024 + 8];	// 1024 bytes for data, 8 for alignment space
+  int __count;
   union
   {
-    unsigned int count;
-    int __count;
-  };
-  union
-  {
-	char data[1024 + 8];	// 1024 bytes for data, 8 for alignment space
-	union
-	{
-	  wint_t __wch;
-	  char __wchb[4];
-	} __value;		/* Value so far.  */
-  };
+    wint_t __wch;
+    char __wchb[4];
+  } __value;		/* Value so far.  */
 } __mbstate_t;
 #endif
 #undef __need_mbstate_t
