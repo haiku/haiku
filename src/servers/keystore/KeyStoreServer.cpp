@@ -6,6 +6,7 @@
 
 #include "KeyStoreServer.h"
 
+#include "AppAccessRequestWindow.h"
 #include "KeyRequestWindow.h"
 #include "Keyring.h"
 
@@ -97,6 +98,17 @@ KeyStoreServer::MessageReceived(BMessage* message)
 {
 	BMessage reply;
 	status_t result = B_UNSUPPORTED;
+	app_info callingAppInfo;
+
+	uint32 accessFlags = _AccessFlagsFor(message->what);
+	if (accessFlags == 0)
+		message->what = 0;
+
+	if (message->what != 0) {
+		result = _ResolveCallingApp(*message, callingAppInfo);
+		if (result != B_OK)
+			message->what = 0;
+	}
 
 	// Resolve the keyring for the relevant messages.
 	Keyring* keyring = NULL;
@@ -138,6 +150,16 @@ KeyStoreServer::MessageReceived(BMessage* message)
 							break;
 						}
 					}
+
+					status_t validateResult = _ValidateAppAccess(*keyring,
+						callingAppInfo, accessFlags);
+					if (validateResult != B_OK) {
+						result = validateResult;
+						message->what = 0;
+						break;
+					}
+
+					break;
 				}
 			}
 
@@ -493,6 +515,73 @@ KeyStoreServer::_ResolveCallingApp(const BMessage& message,
 		return B_ERROR;
 
 	return B_OK;
+}
+
+
+status_t
+KeyStoreServer::_ValidateAppAccess(Keyring& keyring, const app_info& appInfo,
+	uint32 accessFlags)
+{
+	BMessage appMessage;
+	BPath path(&appInfo.ref);
+	status_t result = keyring.FindApplication(appInfo.signature,
+		path.Path(), appMessage);
+	if (result != B_OK && result != B_ENTRY_NOT_FOUND)
+		return result;
+
+	// TODO: Implement running image checksum mechanism.
+	BString checksum = "dummy";
+
+	bool appIsNew = false;
+	bool appWasUpdated = false;
+	uint32 appFlags = 0;
+	BString appSum = "";
+	if (result == B_OK) {
+		if (appMessage.FindUInt32("flags", &appFlags) != B_OK
+			|| appMessage.FindString("checksum", &appSum) != B_OK) {
+			appIsNew = true;
+			appFlags = 0;
+		} else if (appSum != checksum) {
+			appWasUpdated = true;
+			appFlags = 0;
+		}
+	} else
+		appIsNew = true;
+
+	if ((accessFlags & appFlags) == accessFlags)
+		return B_OK;
+
+	bool allowAlways = false;
+	result = _RequestAppAccess(keyring.Name(), appInfo.signature, path.Path(),
+		appIsNew, appWasUpdated, accessFlags, allowAlways);
+	if (result != B_OK || !allowAlways)
+		return result;
+
+	appMessage.MakeEmpty();
+	appMessage.AddString("path", path.Path());
+	appMessage.AddUInt32("flags", accessFlags);
+	appMessage.AddString("checksum", checksum);
+
+	keyring.RemoveApplication(appInfo.signature, path.Path());
+	if (keyring.AddApplication(appInfo.signature, appMessage) == B_OK)
+		_WriteKeyStoreDatabase();
+
+	return B_OK;
+}
+
+
+status_t
+KeyStoreServer::_RequestAppAccess(const BString& keyringName,
+	const char* signature, const char* path, bool appIsNew, bool appWasUpdated,
+	uint32 accessFlags, bool& allowAlways)
+{
+	AppAccessRequestWindow* requestWindow
+		= new(std::nothrow) AppAccessRequestWindow(keyringName, signature, path,
+			appIsNew, appWasUpdated);
+	if (requestWindow == NULL)
+		return B_NO_MEMORY;
+
+	return requestWindow->RequestAppAccess(allowAlways);
 }
 
 

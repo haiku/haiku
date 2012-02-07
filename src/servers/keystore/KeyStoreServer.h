@@ -33,6 +33,16 @@ private:
 		status_t					_ResolveCallingApp(const BMessage& message,
 										app_info& callingAppInfo) const;
 
+		status_t					_ValidateAppAccess(Keyring& keyring,
+										const app_info& appInfo,
+										uint32 accessFlags);
+		status_t					_RequestAppAccess(
+										const BString& keyringName,
+										const char* signature,
+										const char* path, bool appIsNew,
+										bool appWasUpdated, uint32 accessFlags,
+										bool& allowAlways);
+
 		Keyring*					_FindKeyring(const BString& name);
 
 		status_t					_AddKeyring(const BString& name,
