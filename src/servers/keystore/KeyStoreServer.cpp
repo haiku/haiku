@@ -121,6 +121,8 @@ KeyStoreServer::MessageReceived(BMessage* message)
 		case KEY_STORE_REVOKE_ACCESS:
 		case KEY_STORE_ADD_KEYRING_TO_MASTER:
 		case KEY_STORE_REMOVE_KEYRING_FROM_MASTER:
+		case KEY_STORE_GET_NEXT_APPLICATION:
+		case KEY_STORE_REMOVE_APPLICATION:
 		{
 			BString keyringName;
 			if (message->FindString("keyring", &keyringName) != B_OK)
@@ -140,6 +142,8 @@ KeyStoreServer::MessageReceived(BMessage* message)
 				case KEY_STORE_ADD_KEY:
 				case KEY_STORE_REMOVE_KEY:
 				case KEY_STORE_ADD_KEYRING_TO_MASTER:
+				case KEY_STORE_GET_NEXT_APPLICATION:
+				case KEY_STORE_REMOVE_APPLICATION:
 				{
 					// These need keyring access to do anything.
 					while (!keyring->IsAccessible()) {
@@ -368,6 +372,44 @@ KeyStoreServer::MessageReceived(BMessage* message)
 			if (result == B_OK)
 				_WriteKeyStoreDatabase();
 
+			break;
+		}
+
+		case KEY_STORE_GET_NEXT_APPLICATION:
+		{
+			uint32 cookie;
+			if (message->FindUInt32("cookie", &cookie) != B_OK) {
+				result = B_BAD_VALUE;
+				break;
+			}
+
+			BString signature;
+			BString path;
+			result = keyring->GetNextApplication(cookie, signature, path);
+			if (result != B_OK)
+				break;
+
+			reply.AddUInt32("cookie", cookie);
+			reply.AddString("signature", signature);
+			reply.AddString("path", path);
+			result = B_OK;
+			break;
+		}
+
+		case KEY_STORE_REMOVE_APPLICATION:
+		{
+			const char* signature = NULL;
+			const char* path = NULL;
+
+			if (message->FindString("signature", &signature) != B_OK) {
+				result = B_BAD_VALUE;
+				break;
+			}
+
+			if (message->FindString("path", &path) != B_OK)
+				path = NULL;
+
+			result = keyring->RemoveApplication(signature, path);
 			break;
 		}
 
