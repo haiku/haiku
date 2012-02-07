@@ -93,7 +93,6 @@ MergeObject posix_gnu_libio.o :
 	vasprintf.c
 	vscanf.c
 	vsnprintf.c
-#	wfile_stubs.c
 
 	# wide character
 
@@ -127,72 +126,3 @@ MergeObject posix_gnu_libio.o :
 	wscanf.c
 	wstrops.c
 ;
-
-# use this to build a standalone libio.so
-# using libio.so, haiku's version of libstdc++.r4.so can be tested under R5.
-#SharedLibrary libio.so :
-#	clearerr.c
-#	clearerr_u.c
-#	fcloseall.c
-#	feof.c
-#	feof_u.c
-#	ferror.c
-#	ferror_u.c
-#	fileno.c
-#	filedoalloc.c
-#	fileops.c
-#	flockfile.c
-#	fputc.c
-#	fputc_u.c
-#	fseek.c
-#	fseeko.c
-#	ftello.c
-#	fwide.c
-#	genops.c
-#	getc.c
-#	getc_u.c
-#	getchar.c
-#	getchar_u.c
-#	iofclose.c
-#	iofdopen.c
-#	iofflush.c
-#	iofgets.c
-#	iofgets_u.c
-#	iofopen.c
-#	iofputs.c
-#	iofputs_u.c
-#	iofread.c
-#	iofread_u.c
-#	ioftell.c
-#	iofwrite.c
-#	iofwrite_u.c
-#	iofwide.c
-#	iogetdelim.c
-#	iogetline.c
-#	iogets.c
-#	iopadn.c
-#	iopopen.c
-#	ioputs.c
-#	ioseekoff.c
-#	ioseekpos.c
-#	iosetbuffer.c
-#	iosetvbuf.c
-#	ioungetc.c
-#	iovdprintf.c
-#	iovsprintf.c
-#	iovsscanf.c
-#	peekc.c
-#	putc.c
-#	putc_u.c
-#	putchar.c
-#	putchar_u.c
-#	rewind.c
-#	setbuf.c
-#	setlinebuf.c
-#	stdfiles.c
-#	stdio.c
-#	strops.c
-#	vasprintf.c
-#	vscanf.c
-#	vsnprintf.c
-#	wfile_stubs.c ;
