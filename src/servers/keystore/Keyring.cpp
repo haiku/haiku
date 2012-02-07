@@ -177,6 +177,16 @@ Keyring::RemoveApplication(const char* signature, const char* path)
 	if (!fAccessible)
 		return B_NOT_ALLOWED;
 
+	if (path == NULL) {
+		// We want all of the entries for this signature removed.
+		status_t result = fApplications.RemoveName(signature);
+		if (result != B_OK)
+			return B_ENTRY_NOT_FOUND;
+
+		fModified = true;
+		return B_OK;
+	}
+
 	int32 count;
 	type_code type;
 	if (fApplications.GetInfo(signature, &type, &count) != B_OK)
