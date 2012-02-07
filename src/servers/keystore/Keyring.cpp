@@ -10,7 +10,8 @@
 Keyring::Keyring(const char* name, const BMessage* keyMessage)
 	:
 	fName(name),
-	fAccessible(false)
+	fAccessible(false),
+	fModified(false)
 {
 	if (keyMessage != NULL)
 		Access(*keyMessage);
@@ -225,7 +226,12 @@ Keyring::AddKey(const BString& identifier, const BString& secondaryIdentifier,
 		return B_NAME_IN_USE;
 
 	// We're fine, just add the new key.
-	return fData.AddMessage(identifier, &keyMessage);
+	status_t result = fData.AddMessage(identifier, &keyMessage);
+	if (result != B_OK)
+		return result;
+
+	fModified = true;
+	return B_OK;
 }
 
 
@@ -250,7 +256,11 @@ Keyring::RemoveKey(const BString& identifier,
 		if (!candidate.HasSameData(keyMessage))
 			continue;
 
-		fData.RemoveData(identifier, i);
+		status_t result = fData.RemoveData(identifier, i);
+		if (result != B_OK)
+			return result;
+
+		fModified = true;
 		return B_OK;
 	}
 
@@ -275,6 +285,9 @@ Keyring::Compare(const BString* name, const Keyring* keyring)
 status_t
 Keyring::_EncryptToFlatBuffer()
 {
+	if (!fModified)
+		return B_OK;
+
 	if (!fAccessible)
 		return B_NOT_ALLOWED;
 
@@ -296,6 +309,7 @@ Keyring::_EncryptToFlatBuffer()
 
 	// TODO: Actually encrypt the flat buffer...
 
+	fModified = false;
 	return B_OK;
 }
 

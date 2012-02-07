@@ -54,6 +54,7 @@ private:
 		BMessage					fApplications;
 		BMessage					fKeyMessage;
 		bool						fAccessible;
+		bool						fModified;
 };
 
 
