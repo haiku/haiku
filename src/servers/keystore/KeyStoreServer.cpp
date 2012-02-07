@@ -415,9 +415,6 @@ KeyStoreServer::_ReadKeyStoreDatabase()
 status_t
 KeyStoreServer::_WriteKeyStoreDatabase()
 {
-	fKeyStoreFile.SetSize(0);
-	fKeyStoreFile.Seek(0, SEEK_SET);
-
 	BMessage keyrings;
 	if (fDefaultKeyring != NULL)
 		fDefaultKeyring->WriteToMessage(keyrings);
@@ -432,6 +429,8 @@ KeyStoreServer::_WriteKeyStoreDatabase()
 			return result;
 	}
 
+	fKeyStoreFile.SetSize(0);
+	fKeyStoreFile.Seek(0, SEEK_SET);
 	return keyrings.Flatten(&fKeyStoreFile);
 }
 
