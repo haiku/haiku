@@ -7,14 +7,13 @@
 #include "Keyring.h"
 
 
-Keyring::Keyring(const char* name, const BMessage& data,
-	const BMessage* keyMessage)
+Keyring::Keyring(const char* name, const BMessage* keyMessage)
 	:
 	fName(name),
-	fData(data),
-	fKeyMessage(*keyMessage),
-	fAccessible(keyMessage != NULL)
+	fAccessible(false)
 {
+	if (keyMessage != NULL)
+		Access(*keyMessage);
 }
 
 
@@ -24,9 +23,51 @@ Keyring::~Keyring()
 
 
 status_t
+Keyring::ReadFromMessage(const BMessage& message)
+{
+	ssize_t size;
+	const void* data;
+	status_t result = message.FindData(fName, B_RAW_TYPE, &data, &size);
+	if (result != B_OK)
+		return result;
+
+	if (size < 0)
+		return B_ERROR;
+
+	fFlatBuffer.SetSize(0);
+	ssize_t written = fFlatBuffer.WriteAt(0, data, size);
+	if (written != size) {
+		fFlatBuffer.SetSize(0);
+		return written < 0 ? written : B_ERROR;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+Keyring::WriteToMessage(BMessage& message)
+{
+	status_t result = _EncryptToFlatBuffer();
+	if (result != B_OK)
+		return result;
+
+	return message.AddData(fName, B_RAW_TYPE, fFlatBuffer.Buffer(),
+		fFlatBuffer.BufferLength());
+}
+
+
+status_t
 Keyring::Access(const BMessage& keyMessage)
 {
 	fKeyMessage = keyMessage;
+
+	status_t result = _DecryptFromFlatBuffer();
+	if (result != B_OK) {
+		fKeyMessage.MakeEmpty();
+		return result;
+	}
+
 	fAccessible = true;
 	return B_OK;
 }
@@ -35,7 +76,14 @@ Keyring::Access(const BMessage& keyMessage)
 void
 Keyring::RevokeAccess()
 {
+	if (!fAccessible)
+		return;
+
+	_EncryptToFlatBuffer();
+
 	fKeyMessage.MakeEmpty();
+	fData.MakeEmpty();
+	fApplications.MakeEmpty();
 	fAccessible = false;
 }
 
@@ -221,4 +269,60 @@ int
 Keyring::Compare(const BString* name, const Keyring* keyring)
 {
 	return strcmp(name->String(), keyring->Name());
+}
+
+
+status_t
+Keyring::_EncryptToFlatBuffer()
+{
+	if (!fAccessible)
+		return B_NOT_ALLOWED;
+
+	BMessage container;
+	status_t result = container.AddMessage("data", &fData);
+	if (result != B_OK)
+		return result;
+
+	result = container.AddMessage("applications", &fApplications);
+	if (result != B_OK)
+		return result;
+
+	fFlatBuffer.SetSize(0);
+	fFlatBuffer.Seek(0, SEEK_SET);
+
+	result = container.Flatten(&fFlatBuffer);
+	if (result != B_OK)
+		return result;
+
+	// TODO: Actually encrypt the flat buffer...
+
+	return B_OK;
+}
+
+
+status_t
+Keyring::_DecryptFromFlatBuffer()
+{
+	if (fFlatBuffer.BufferLength() == 0)
+		return B_OK;
+
+	// TODO: Actually decrypt the flat buffer...
+
+	BMessage container;
+	fFlatBuffer.Seek(0, SEEK_SET);
+	status_t result = container.Unflatten(&fFlatBuffer);
+	if (result != B_OK)
+		return result;
+
+	result = container.FindMessage("data", &fData);
+	if (result != B_OK)
+		return result;
+
+	result = container.FindMessage("applications", &fApplications);
+	if (result != B_OK) {
+		fData.MakeEmpty();
+		return result;
+	}
+
+	return B_OK;
 }

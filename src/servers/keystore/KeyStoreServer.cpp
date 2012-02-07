@@ -82,7 +82,7 @@ KeyStoreServer::KeyStoreServer()
 	_ReadKeyStoreDatabase();
 
 	if (fDefaultKeyring == NULL)
-		fDefaultKeyring = new(std::nothrow) Keyring("", BMessage());
+		fDefaultKeyring = new(std::nothrow) Keyring("");
 }
 
 
@@ -388,19 +388,17 @@ KeyStoreServer::_ReadKeyStoreDatabase()
 
 	int32 index = 0;
 	char* keyringName = NULL;
-	while (keyrings.GetInfo(B_MESSAGE_TYPE, index++, &keyringName,
-			NULL) == B_OK) {
-
-		BMessage keyringData;
-		if (keyrings.FindMessage(keyringName, &keyringData) != B_OK) {
-			printf("failed to retrieve keyring data for keyring \"%s\"\n",
-				keyringName);
+	while (keyrings.GetInfo(B_RAW_TYPE, index++, &keyringName, NULL) == B_OK) {
+		Keyring* keyring = new(std::nothrow) Keyring(keyringName);
+		if (keyring == NULL) {
+			printf("no memory for allocating keyring \"%s\"\n", keyringName);
 			continue;
 		}
 
-		Keyring* keyring = new(std::nothrow) Keyring(keyringName, keyringData);
-		if (keyring == NULL) {
-			printf("no memory for allocating keyring \"%s\"\n", keyringName);
+		status_t result = keyring->ReadFromMessage(keyrings);
+		if (result != B_OK) {
+			printf("failed to read keyring \"%s\" from data\n", keyringName);
+			delete keyring;
 			continue;
 		}
 
@@ -422,14 +420,16 @@ KeyStoreServer::_WriteKeyStoreDatabase()
 
 	BMessage keyrings;
 	if (fDefaultKeyring != NULL)
-		keyrings.AddMessage("", &fDefaultKeyring->Data());
+		fDefaultKeyring->WriteToMessage(keyrings);
 
 	for (int32 i = 0; i < fKeyrings.CountItems(); i++) {
 		Keyring* keyring = fKeyrings.ItemAt(i);
 		if (keyring == NULL)
 			continue;
 
-		keyrings.AddMessage(keyring->Name(), &keyring->Data());
+		status_t result = keyring->WriteToMessage(keyrings);
+		if (result != B_OK)
+			return result;
 	}
 
 	return keyrings.Flatten(&fKeyStoreFile);
@@ -494,7 +494,7 @@ KeyStoreServer::_AddKeyring(const BString& name, const BMessage& keyMessage)
 	if (_FindKeyring(name) != NULL)
 		return B_NAME_IN_USE;
 
-	Keyring* keyring = new(std::nothrow) Keyring(name, BMessage(), &keyMessage);
+	Keyring* keyring = new(std::nothrow) Keyring(name, &keyMessage);
 	if (keyring == NULL)
 		return B_NO_MEMORY;
 

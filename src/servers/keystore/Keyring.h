@@ -13,12 +13,12 @@
 class Keyring {
 public:
 									Keyring(const char* name,
-										const BMessage& data,
 										const BMessage* keyMessage = NULL);
 									~Keyring();
 
 		const char*					Name() const { return fName; }
-		const BMessage&				Data() const { return fData; }
+		status_t					ReadFromMessage(const BMessage& message);
+		status_t					WriteToMessage(BMessage& message);
 
 		status_t					Access(const BMessage& keyMessage);
 		void						RevokeAccess();
@@ -45,8 +45,13 @@ static	int							Compare(const BString* name,
 										const Keyring* keyring);
 
 private:
+		status_t					_EncryptToFlatBuffer();
+		status_t					_DecryptFromFlatBuffer();
+
 		BString						fName;
+		BMallocIO					fFlatBuffer;
 		BMessage					fData;
+		BMessage					fApplications;
 		BMessage					fKeyMessage;
 		bool						fAccessible;
 };
