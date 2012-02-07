@@ -104,6 +104,81 @@ Keyring::KeyMessage() const
 
 
 status_t
+Keyring::FindApplication(const char* signature, const char* path,
+	BMessage& appMessage)
+{
+	if (!fAccessible)
+		return B_NOT_ALLOWED;
+
+	int32 count;
+	type_code type;
+	if (fApplications.GetInfo(signature, &type, &count) != B_OK)
+		return B_ENTRY_NOT_FOUND;
+
+	for (int32 i = 0; i < count; i++) {
+		if (fApplications.FindMessage(signature, i, &appMessage) != B_OK)
+			continue;
+
+		BString appPath;
+		if (appMessage.FindString("path", &appPath) != B_OK)
+			continue;
+
+		if (appPath == path)
+			return B_OK;
+	}
+
+	appMessage.MakeEmpty();
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+status_t
+Keyring::AddApplication(const char* signature, const BMessage& appMessage)
+{
+	if (!fAccessible)
+		return B_NOT_ALLOWED;
+
+	status_t result = fApplications.AddMessage(signature, &appMessage);
+	if (result != B_OK)
+		return result;
+
+	fModified = true;
+	return B_OK;
+}
+
+
+status_t
+Keyring::RemoveApplication(const char* signature, const char* path)
+{
+	if (!fAccessible)
+		return B_NOT_ALLOWED;
+
+	int32 count;
+	type_code type;
+	if (fApplications.GetInfo(signature, &type, &count) != B_OK)
+		return B_ENTRY_NOT_FOUND;
+
+	for (int32 i = 0; i < count; i++) {
+		BMessage appMessage;
+		if (fApplications.FindMessage(signature, i, &appMessage) != B_OK)
+			return B_ERROR;
+
+		BString appPath;
+		if (appMessage.FindString("path", &appPath) != B_OK)
+			continue;
+
+		if (appPath == path) {
+			fApplications.RemoveData(signature, i);
+			fModified = true;
+			return B_OK;
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+status_t
 Keyring::FindKey(const BString& identifier, const BString& secondaryIdentifier,
 	bool secondaryIdentifierOptional, BMessage* _foundKeyMessage) const
 {

@@ -25,6 +25,13 @@ public:
 		bool						IsAccessible() const;
 		const BMessage&				KeyMessage() const;
 
+		status_t					FindApplication(const char* signature,
+										const char* path, BMessage& appMessage);
+		status_t					AddApplication(const char* signature,
+										const BMessage& appMessage);
+		status_t					RemoveApplication(const char* signature,
+										const char* path);
+
 		status_t					FindKey(const BString& identifier,
 										const BString& secondaryIdentifier,
 										bool secondaryIdentifierOptional,
