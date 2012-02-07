@@ -15,6 +15,7 @@
 #include <Entry.h>
 #include <FindDirectory.h>
 #include <Path.h>
+#include <Roster.h>
 #include <String.h>
 
 #include <new>
@@ -474,6 +475,24 @@ KeyStoreServer::_AccessFlagsFor(uint32 command) const
 	}
 
 	return 0;
+}
+
+
+status_t
+KeyStoreServer::_ResolveCallingApp(const BMessage& message,
+	app_info& callingAppInfo) const
+{
+	team_id callingTeam = message.ReturnAddress().Team();
+	status_t result = be_roster->GetRunningAppInfo(callingTeam,
+		&callingAppInfo);
+	if (result != B_OK)
+		return result;
+
+	// Do some sanity checks.
+	if (callingAppInfo.team != callingTeam)
+		return B_ERROR;
+
+	return B_OK;
 }
 
 

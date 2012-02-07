@@ -12,6 +12,7 @@
 #include <ObjectList.h>
 
 
+struct app_info;
 class Keyring;
 
 typedef BObjectList<Keyring> KeyringList;
@@ -29,6 +30,8 @@ private:
 		status_t					_WriteKeyStoreDatabase();
 
 		uint32						_AccessFlagsFor(uint32 command) const;
+		status_t					_ResolveCallingApp(const BMessage& message,
+										app_info& callingAppInfo) const;
 
 		Keyring*					_FindKeyring(const BString& name);
 
