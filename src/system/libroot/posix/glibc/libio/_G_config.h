@@ -44,6 +44,10 @@ typedef unsigned int wint_t;
 # ifdef _GLIBCPP_USE_WCHAR_T
 typedef struct
 {
+  void* __haiku_converter;
+  char __haiku_charset[64];
+  unsigned int __haiku_count;
+  char __haiku_data[1024 + 8];	// 1024 bytes for data, 8 for alignment space
   int count;
   wint_t value;
 } __c_mbstate_t;
