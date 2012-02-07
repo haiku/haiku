@@ -104,6 +104,30 @@ Keyring::KeyMessage() const
 
 
 status_t
+Keyring::GetNextApplication(uint32& cookie, BString& signature,
+	BString& path)
+{
+	char* nameFound = NULL;
+	status_t result = fApplications.GetInfo(B_MESSAGE_TYPE, cookie++,
+		&nameFound, NULL);
+	if (result != B_OK)
+		return B_ENTRY_NOT_FOUND;
+
+	BMessage appMessage;
+	result = fApplications.FindMessage(nameFound, &appMessage);
+	if (result != B_OK)
+		return B_ENTRY_NOT_FOUND;
+
+	result = appMessage.FindString("path", &path);
+	if (result != B_OK)
+		return B_ERROR;
+
+	signature = nameFound;
+	return B_OK;
+}
+
+
+status_t
 Keyring::FindApplication(const char* signature, const char* path,
 	BMessage& appMessage)
 {

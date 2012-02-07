@@ -25,6 +25,8 @@ public:
 		bool						IsAccessible() const;
 		const BMessage&				KeyMessage() const;
 
+		status_t					GetNextApplication(uint32& cookie,
+										BString& signature, BString& path);
 		status_t					FindApplication(const char* signature,
 										const char* path, BMessage& appMessage);
 		status_t					AddApplication(const char* signature,
