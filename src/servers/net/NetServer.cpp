@@ -911,6 +911,17 @@ NetServer::_ConfigureIPv6LinkLocal(const char* name)
 	BNetworkAddress localLinkMask("ffff:ffff:ffff:ffff::"); // 64
 	BNetworkAddress localLinkBroadcast("fe80::ffff:ffff:ffff:ffff");
 
+	if (interface.FindAddress(localLinkAddress) >= 0) {
+		// uhoh... already has a local link address
+
+		/*	TODO: Check for any local link scope addresses assigned to card
+			There isn't any flag at the moment though for address scope
+		*/
+		syslog(LOG_DEBUG, "%s: Local Link address already assigned to %s\n",
+			__func__, name);
+		return;
+	}
+
 	BNetworkInterfaceAddress interfaceAddress;
 	interfaceAddress.SetAddress(localLinkAddress);
 	interfaceAddress.SetMask(localLinkMask);
