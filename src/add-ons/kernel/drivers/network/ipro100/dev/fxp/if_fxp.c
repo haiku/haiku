@@ -87,7 +87,7 @@ MODULE_DEPEND(fxp, miibus, 1, 1, 1);
 #include "miibus_if.h"
 
 /*
- * NOTE!  On the Alpha, we have an alignment constraint.  The
+ * NOTE!  On !x86 we typically have an alignment constraint.  The
  * card DMAs the packet immediately following the RFA.  However,
  * the first thing in the packet is a 14-byte Ethernet header.
  * This means that the packet is misaligned.  To compensate,
@@ -521,7 +521,7 @@ fxp_attach(device_t dev)
 	    sc->revision != FXP_REV_82559S_A) {
 		fxp_read_eeprom(sc, &data, 10, 1);
 		if ((data & 0x20) != 0 &&
-		    pci_find_extcap(sc->dev, PCIY_PMG, &pmc) == 0)
+		    pci_find_cap(sc->dev, PCIY_PMG, &pmc) == 0)
 			sc->flags |= FXP_FLAG_WOLCAP;
 	}
 
@@ -675,7 +675,7 @@ fxp_attach(device_t dev)
 	}
 
 	error = bus_dmamem_alloc(sc->fxp_stag, (void **)&sc->fxp_stats,
-	    BUS_DMA_NOWAIT | BUS_DMA_ZERO, &sc->fxp_smap);
+	    BUS_DMA_NOWAIT | BUS_DMA_COHERENT | BUS_DMA_ZERO, &sc->fxp_smap);
 	if (error) {
 		device_printf(dev, "could not allocate stats DMA memory\n");
 		goto fail;
@@ -697,7 +697,7 @@ fxp_attach(device_t dev)
 	}
 
 	error = bus_dmamem_alloc(sc->cbl_tag, (void **)&sc->fxp_desc.cbl_list,
-	    BUS_DMA_NOWAIT | BUS_DMA_ZERO, &sc->cbl_map);
+	    BUS_DMA_NOWAIT | BUS_DMA_COHERENT | BUS_DMA_ZERO, &sc->cbl_map);
 	if (error) {
 		device_printf(dev, "could not allocate TxCB DMA memory\n");
 		goto fail;
@@ -722,7 +722,7 @@ fxp_attach(device_t dev)
 	}
 
 	error = bus_dmamem_alloc(sc->mcs_tag, (void **)&sc->mcsp,
-	    BUS_DMA_NOWAIT | BUS_DMA_ZERO, &sc->mcs_map);
+	    BUS_DMA_NOWAIT | BUS_DMA_COHERENT | BUS_DMA_ZERO, &sc->mcs_map);
 	if (error) {
 		device_printf(dev,
 		    "could not allocate multicast setup DMA memory\n");
@@ -1054,7 +1054,7 @@ fxp_suspend(device_t dev)
 	FXP_LOCK(sc);
 
 	ifp = sc->ifp;
-	if (pci_find_extcap(sc->dev, PCIY_PMG, &pmc) == 0) {
+	if (pci_find_cap(sc->dev, PCIY_PMG, &pmc) == 0) {
 		pmstat = pci_read_config(sc->dev, pmc + PCIR_POWER_STATUS, 2);
 		pmstat &= ~(PCIM_PSTAT_PME | PCIM_PSTAT_PMEENABLE);
 		if ((ifp->if_capenable & IFCAP_WOL_MAGIC) != 0) {
@@ -1088,7 +1088,7 @@ fxp_resume(device_t dev)
 
 	FXP_LOCK(sc);
 
-	if (pci_find_extcap(sc->dev, PCIY_PMG, &pmc) == 0) {
+	if (pci_find_cap(sc->dev, PCIY_PMG, &pmc) == 0) {
 		sc->flags &= ~FXP_FLAG_WOL;
 		pmstat = pci_read_config(sc->dev, pmc + PCIR_POWER_STATUS, 2);
 		/* Disable PME and clear PME status. */
@@ -1941,11 +1941,11 @@ fxp_intr_body(struct fxp_softc *sc, struct ifnet *ifp, uint8_t statack,
 				/* Adjust for appended checksum bytes. */
 				total_len -= 2;
 			}
-			if (total_len < sizeof(struct ether_header) ||
+			if (total_len < (int)sizeof(struct ether_header) ||
 			    total_len > (MCLBYTES - RFA_ALIGNMENT_FUDGE -
 			    sc->rfa_size) ||
 			    status & (FXP_RFA_STATUS_CRC |
-			    FXP_RFA_STATUS_ALIGN)) {
+			    FXP_RFA_STATUS_ALIGN | FXP_RFA_STATUS_OVERRUN)) {
 				m_freem(m);
 				fxp_add_rfabuf(sc, rxp);
 				continue;
@@ -2555,14 +2555,12 @@ fxp_ifmedia_upd(struct ifnet *ifp)
 {
 	struct fxp_softc *sc = ifp->if_softc;
 	struct mii_data *mii;
+		struct mii_softc	*miisc;
 
 	mii = device_get_softc(sc->miibus);
 	FXP_LOCK(sc);
-	if (mii->mii_instance) {
-		struct mii_softc	*miisc;
-		LIST_FOREACH(miisc, &mii->mii_phys, mii_list)
-			mii_phy_reset(miisc);
-	}
+	LIST_FOREACH(miisc, &mii->mii_phys, mii_list)
+		PHY_RESET(miisc);
 	mii_mediachg(mii);
 	FXP_UNLOCK(sc);
 	return (0);
@@ -2823,8 +2821,10 @@ fxp_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 
 	case SIOCADDMULTI:
 	case SIOCDELMULTI:
+		FXP_LOCK(sc);
 		if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0)
-			fxp_init(sc);
+			fxp_init_body(sc, 0);
+		FXP_UNLOCK(sc);
 		break;
 
 	case SIOCSIFMEDIA:
@@ -3012,8 +3012,10 @@ static uint32_t fxp_ucode_d101a[] = D101_A_RCVBUNDLE_UCODE;
 static uint32_t fxp_ucode_d101b0[] = D101_B0_RCVBUNDLE_UCODE;
 static uint32_t fxp_ucode_d101ma[] = D101M_B_RCVBUNDLE_UCODE;
 static uint32_t fxp_ucode_d101s[] = D101S_RCVBUNDLE_UCODE;
+#ifdef notyet
 static uint32_t fxp_ucode_d102[] = D102_B_RCVBUNDLE_UCODE;
 static uint32_t fxp_ucode_d102c[] = D102_C_RCVBUNDLE_UCODE;
+#endif
 static uint32_t fxp_ucode_d102e[] = D102_E_RCVBUNDLE_UCODE;
 
 #define UCODE(x)	x, sizeof(x)/sizeof(uint32_t)
@@ -3031,11 +3033,15 @@ static const struct ucode {
 	    D101M_CPUSAVER_DWORD, D101M_CPUSAVER_BUNDLE_MAX_DWORD },
 	{ FXP_REV_82559S_A, UCODE(fxp_ucode_d101s),
 	    D101S_CPUSAVER_DWORD, D101S_CPUSAVER_BUNDLE_MAX_DWORD },
+#ifdef notyet
 	{ FXP_REV_82550, UCODE(fxp_ucode_d102),
 	    D102_B_CPUSAVER_DWORD, D102_B_CPUSAVER_BUNDLE_MAX_DWORD },
 	{ FXP_REV_82550_C, UCODE(fxp_ucode_d102c),
 	    D102_C_CPUSAVER_DWORD, D102_C_CPUSAVER_BUNDLE_MAX_DWORD },
+#endif
 	{ FXP_REV_82551_F, UCODE(fxp_ucode_d102e),
+	    D102_E_CPUSAVER_DWORD, D102_E_CPUSAVER_BUNDLE_MAX_DWORD },
+	{ FXP_REV_82551_10, UCODE(fxp_ucode_d102e),
 	    D102_E_CPUSAVER_DWORD, D102_E_CPUSAVER_BUNDLE_MAX_DWORD },
 	{ 0, NULL, 0, 0, 0 }
 };

@@ -1,6 +1,6 @@
 /******************************************************************************
 
-  Copyright (c) 2001-2010, Intel Corporation 
+  Copyright (c) 2001-2011, Intel Corporation 
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without 
@@ -132,10 +132,9 @@
 
 /*
  * This parameter controls when the driver calls the routine to reclaim
- * transmit descriptors.
+ * transmit descriptors. Cleaning earlier seems a win.
  */
-#define IGB_TX_CLEANUP_THRESHOLD	(adapter->num_tx_desc / 8)
-#define IGB_TX_OP_THRESHOLD	(adapter->num_tx_desc / 32)
+#define IGB_TX_CLEANUP_THRESHOLD	(adapter->num_tx_desc / 2)
 
 /*
  * This parameter controls whether or not autonegotation is enabled.
@@ -180,8 +179,7 @@
 
 #define IGB_TX_PTHRESH			8
 #define IGB_TX_HTHRESH			1
-#define IGB_TX_WTHRESH			(((hw->mac.type == e1000_82576 || \
-					  hw->mac.type == e1000_vfadapt) && \
+#define IGB_TX_WTHRESH			((hw->mac.type != e1000_82575 && \
                                           adapter->msix_mem) ? 1 : 16)
 
 #define MAX_NUM_MULTICAST_ADDRESSES     128
@@ -299,6 +297,7 @@ struct tx_ring {
 	struct buf_ring		*br;
 #endif
 	bus_dma_tag_t		txtag;
+	struct task		txq_task;
 
 	u32			bytes;
 	u32			packets;
@@ -361,7 +360,7 @@ struct adapter {
 	struct resource *msix_mem;
 	struct resource	*res;
 	void		*tag;
-	u32		eims_mask;
+	u32		que_mask;
 
 	int		linkvec;
 	int		link_mask;
@@ -378,6 +377,7 @@ struct adapter {
 	struct mtx	core_mtx;
 	int		igb_insert_vlan_header;
         u16		num_queues;
+	u16		vf_ifp;  /* a VF interface */
 
 	eventhandler_tag vlan_attach;
 	eventhandler_tag vlan_detach;
@@ -396,10 +396,13 @@ struct adapter {
 	u32		shadow_vfta[IGB_VFTA_SIZE];
 
 	/* Info about the interface */
-	u8		link_active;
+	u16		link_active;
+	u16		fc;
 	u16		link_speed;
 	u16		link_duplex;
 	u32		smartspeed;
+	u32		dmac;
+	int		enable_aim;
 
 	/* Interface queues */
 	struct igb_queue	*queues;
@@ -481,6 +484,21 @@ struct igb_rx_buf {
 	bus_dmamap_t	pmap;	/* bus_dma map for packet */
 };
 
+/*
+** Find the number of unrefreshed RX descriptors
+*/
+static inline u16
+igb_rx_unrefreshed(struct rx_ring *rxr)
+{
+	struct adapter  *adapter = rxr->adapter;
+ 
+	if (rxr->next_to_check > rxr->next_to_refresh)
+		return (rxr->next_to_check - rxr->next_to_refresh - 1);
+	else
+		return ((adapter->num_rx_desc + rxr->next_to_check) -
+		    rxr->next_to_refresh - 1);
+}
+
 #define	IGB_CORE_LOCK_INIT(_sc, _name) \
 	mtx_init(&(_sc)->core_mtx, _name, "IGB Core Lock", MTX_DEF)
 #define	IGB_CORE_LOCK_DESTROY(_sc)	mtx_destroy(&(_sc)->core_mtx)
@@ -509,7 +527,7 @@ struct igb_rx_buf {
 	cur |= new;				\
 }
 
-#if __FreeBSD_version < 800504
+#if __FreeBSD_version >= 800000 && __FreeBSD_version < 800504
 static __inline int
 drbr_needs_enqueue(struct ifnet *ifp, struct buf_ring *br)
 {

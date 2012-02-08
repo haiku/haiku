@@ -133,6 +133,7 @@
 #define DEVICEID_MRVL_8039	0x4353
 #define DEVICEID_MRVL_8040	0x4354
 #define DEVICEID_MRVL_8040T	0x4355
+#define DEVICEID_MRVL_8042	0x4357
 #define DEVICEID_MRVL_8048	0x435A
 #define DEVICEID_MRVL_4360	0x4360
 #define DEVICEID_MRVL_4361	0x4361
@@ -143,6 +144,10 @@
 #define DEVICEID_MRVL_436A	0x436A
 #define DEVICEID_MRVL_436B	0x436B
 #define DEVICEID_MRVL_436C	0x436C
+#define DEVICEID_MRVL_436D	0x436D
+#define DEVICEID_MRVL_4370	0x4370
+#define DEVICEID_MRVL_4380	0x4380
+#define DEVICEID_MRVL_4381	0x4381
 
 /*
  * D-Link gigabit ethernet device ID
@@ -317,6 +322,9 @@
 #define PCI_OS_SPD_X66		1	/* PCI-X 66MHz Bus */
 #define PCI_OS_SPD_X100		2	/* PCI-X 100MHz Bus */
 #define PCI_OS_SPD_X133		3	/* PCI-X 133MHz Bus */
+
+/* PCI_OUR_REG_3	32 bit	Our Register 3 (Yukon-ECU only) */
+#define	PCI_CLK_MACSEC_DIS	BIT_17	/* Disable Clock MACSec. */
 
 /* PCI_OUR_REG_4	32 bit	Our Register 4 (Yukon-ECU only) */
 #define	PCI_TIMER_VALUE_MSK	(0xff<<16)	/* Bit 23..16:	Timer Value Mask */
@@ -619,8 +627,8 @@
 #define RX_GMF_FL_MSK	0x0c4c	/* 32 bit Rx GMAC FIFO Flush Mask */
 #define RX_GMF_FL_THR	0x0c50	/* 32 bit Rx GMAC FIFO Flush Threshold */
 #define RX_GMF_TR_THR	0x0c54	/* 32 bit Rx Truncation Threshold (Yukon-2) */
-#define	RX_GMF_UP_THR	0x0c58	/*  8 bit Rx Upper Pause Thr (Yukon-EC_U) */
-#define	RX_GMF_LP_THR	0x0c5a	/*  8 bit Rx Lower Pause Thr (Yukon-EC_U) */
+#define	RX_GMF_UP_THR	0x0c58	/* 16 bit Rx Upper Pause Thr (Yukon-EC_U) */
+#define	RX_GMF_LP_THR	0x0c5a	/* 16 bit Rx Lower Pause Thr (Yukon-EC_U) */
 #define RX_GMF_VLAN	0x0c5c	/* 32 bit Rx VLAN Type Register (Yukon-2) */
 #define RX_GMF_WP	0x0c60	/* 32 bit Rx GMAC FIFO Write Pointer */
 #define RX_GMF_WLEV	0x0c68	/* 32 bit Rx GMAC FIFO Write Level */
@@ -674,6 +682,7 @@
 /* ASF Subsystem Registers (Yukon-2 only) */
 #define B28_Y2_SMB_CONFIG	0x0e40	/* 32 bit ASF SMBus Config Register */
 #define B28_Y2_SMB_CSD_REG	0x0e44	/* 32 bit ASF SMB Control/Status/Data */
+#define B28_Y2_CPU_WDOG		0x0e48	/* 32 bit Watchdog Register */
 #define B28_Y2_ASF_IRQ_V_BASE	0x0e60	/* 32 bit ASF IRQ Vector Base */
 #define B28_Y2_ASF_STAT_CMD	0x0e68	/* 32 bit ASF Status and Command Reg */
 #define B28_Y2_ASF_HCU_CCSR	0x0e68	/* 32 bit ASF HCU CCSR (Yukon EX) */
@@ -826,6 +835,9 @@
 #define Y2_IS_CHK_RX2	BIT_10	/* Descriptor error Rx 2 */
 #define Y2_IS_CHK_TXS2	BIT_9	/* Descriptor error TXS 2 */
 #define Y2_IS_CHK_TXA2	BIT_8	/* Descriptor error TXA 2 */
+#define Y2_IS_PSM_ACK	BIT_7	/* PSM Ack (Yukon Optima) */
+#define Y2_IS_PTP_TIST	BIT_6	/* PTP TIme Stamp (Yukon Optima) */
+#define Y2_IS_PHY_QLNK	BIT_5	/* PHY Quick Link (Yukon Optima) */
 #define Y2_IS_IRQ_PHY1	BIT_4	/* Interrupt from PHY 1 */
 #define Y2_IS_IRQ_MAC1	BIT_3	/* Interrupt from MAC 1 */
 #define Y2_IS_CHK_RX1	BIT_2	/* Descriptor error Rx 1 */
@@ -890,6 +902,10 @@
 #define CHIP_ID_YUKON_EC	0xb6 /* Chip ID for YUKON-2 EC */
 #define CHIP_ID_YUKON_FE	0xb7 /* Chip ID for YUKON-2 FE */
 #define CHIP_ID_YUKON_FE_P	0xb8 /* Chip ID for YUKON-2 FE+ */
+#define CHIP_ID_YUKON_SUPR	0xb9 /* Chip ID for YUKON-2 Supreme */
+#define CHIP_ID_YUKON_UL_2	0xba /* Chip ID for YUKON-2 Ultra 2 */
+#define CHIP_ID_YUKON_UNKNOWN	0xbb
+#define CHIP_ID_YUKON_OPT	0xbc /* Chip ID for YUKON-2 Optima */
 
 #define	CHIP_REV_YU_XL_A0	0 /* Chip Rev. for Yukon-2 A0 */
 #define	CHIP_REV_YU_XL_A1	1 /* Chip Rev. for Yukon-2 A1 */
@@ -907,6 +923,10 @@
 
 #define	CHIP_REV_YU_EX_A0	1 /* Chip Rev. for Yukon-2 EX A0 */
 #define	CHIP_REV_YU_EX_B0	2 /* Chip Rev. for Yukon-2 EX B0 */
+
+#define	CHIP_REV_YU_SU_A0	0 /* Chip Rev. for Yukon-2 SUPR A0 */
+#define	CHIP_REV_YU_SU_B0	1 /* Chip Rev. for Yukon-2 SUPR B0 */
+#define	CHIP_REV_YU_SU_B1	3 /* Chip Rev. for Yukon-2 SUPR B1 */
 
 /*	B2_Y2_CLK_GATE	 8 bit	Clock Gating (Yukon-2 only) */
 #define Y2_STATUS_LNK2_INAC	BIT_7	/* Status Link 2 inactiv (0 = activ) */
@@ -1937,6 +1957,8 @@
 #define RX_TRUNC_OFF		BIT_26	/* disable packet truncation */
 #define RX_VLAN_STRIP_ON	BIT_25	/* enable  VLAN stripping */
 #define RX_VLAN_STRIP_OFF	BIT_24	/* disable VLAN stripping */
+#define GMF_RX_MACSEC_FLUSH_ON	BIT_23
+#define GMF_RX_MACSEC_FLUSH_OFF	BIT_22
 #define GMF_RX_OVER_ON		BIT_19	/* enable flushing on receive overrun */
 #define GMF_RX_OVER_OFF		BIT_18	/* disable flushing on receive overrun */
 #define GMF_ASF_RX_OVER_ON	BIT_17	/* enable flushing of ASF when overrun */
@@ -2357,6 +2379,7 @@ struct msk_chain_data {
 	bus_dmamap_t		msk_jumbo_rx_ring_map;
 	bus_dmamap_t		msk_jumbo_rx_sparemap;
 	uint16_t		msk_tso_mtu;
+	uint32_t		msk_last_csum;
 	int			msk_tx_prod;
 	int			msk_tx_cons;
 	int			msk_tx_cnt;
@@ -2400,6 +2423,8 @@ struct msk_ring_data {
 #define	MSK_PROC_DEFAULT	(MSK_RX_RING_CNT / 2)
 #define	MSK_PROC_MIN		30
 #define	MSK_PROC_MAX		(MSK_RX_RING_CNT - 1)
+
+#define	MSK_INT_HOLDOFF_DEFAULT	100
 
 #define	MSK_TX_TIMEOUT		5
 #define	MSK_PUT_WM	10
@@ -2463,14 +2488,16 @@ struct msk_hw_stats {
 struct msk_softc {
 	struct resource		*msk_res[1];	/* I/O resource */
 	struct resource_spec	*msk_res_spec;
-	struct resource		*msk_irq[2];	/* IRQ resources */
+	struct resource		*msk_irq[1];	/* IRQ resources */
 	struct resource_spec	*msk_irq_spec;
-	void			*msk_intrhand[2]; /* irq handler handle */
+	void			*msk_intrhand; /* irq handler handle */
 	device_t		msk_dev;
 	uint8_t			msk_hw_id;
 	uint8_t			msk_hw_rev;
 	uint8_t			msk_bustype;
 	uint8_t			msk_num_port;
+	int			msk_expcap;
+	int			msk_pcixcap;
 	int			msk_ramsize;	/* amount of SRAM on NIC */
 	uint32_t		msk_pmd;	/* physical media type */
 	uint32_t		msk_intrmask;
@@ -2489,10 +2516,9 @@ struct msk_softc {
 	bus_dmamap_t		msk_stat_map;
 	struct msk_stat_desc	*msk_stat_ring;
 	bus_addr_t		msk_stat_ring_paddr;
+	int			msk_int_holdoff;
 	int			msk_process_limit;
 	int			msk_stat_cons;
-	struct taskqueue	*msk_tq;
-	struct task		msk_int_task;
 	struct mtx		msk_mtx;
 };
 
@@ -2537,9 +2563,9 @@ struct msk_if_softc {
 	struct msk_ring_data	msk_rdata;
 	struct msk_softc	*msk_softc;	/* parent controller */
 	struct msk_hw_stats	msk_stats;
-	struct task		msk_tx_task;
 	int			msk_if_flags;
 	uint16_t		msk_vtag;	/* VLAN tag id. */
+	uint32_t		msk_csum;
 };
 
 #define MSK_TIMEOUT	1000

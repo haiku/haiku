@@ -26,7 +26,7 @@
 
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/sys/dev/bfe/if_bfe.c,v 1.54 2008/08/22 06:46:55 yongari Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -505,10 +505,11 @@ bfe_attach(device_t dev)
 	bfe_chip_reset(sc);
 	BFE_UNLOCK(sc);
 
-	if (mii_phy_probe(dev, &sc->bfe_miibus,
-				bfe_ifmedia_upd, bfe_ifmedia_sts)) {
-		device_printf(dev, "MII without any PHY!\n");
-		error = ENXIO;
+	error = mii_attach(dev, &sc->bfe_miibus, ifp, bfe_ifmedia_upd,
+	    bfe_ifmedia_sts, BMSR_DEFCAPMASK, sc->bfe_phyaddr, MII_OFFSET_ANY,
+	    0);
+	if (error != 0) {
+		device_printf(dev, "attaching PHYs failed\n");
 		goto fail;
 	}
 
@@ -631,8 +632,6 @@ bfe_miibus_readreg(device_t dev, int phy, int reg)
 	u_int32_t ret;
 
 	sc = device_get_softc(dev);
-	if (phy != sc->bfe_phyaddr)
-		return (0);
 	bfe_readphy(sc, reg, &ret);
 
 	return (ret);
@@ -644,8 +643,6 @@ bfe_miibus_writereg(device_t dev, int phy, int reg, int val)
 	struct bfe_softc *sc;
 
 	sc = device_get_softc(dev);
-	if (phy != sc->bfe_phyaddr)
-		return (0);
 	bfe_writephy(sc, reg, val);
 
 	return (0);
@@ -800,8 +797,6 @@ bfe_list_newbuf(struct bfe_softc *sc, int c)
 	int nsegs;
 
 	m = m_getcl(M_DONTWAIT, MT_DATA, M_PKTHDR);
-	if (m == NULL)
-		return (ENOBUFS);
 	m->m_len = m->m_pkthdr.len = MCLBYTES;
 
 	if (bus_dmamap_load_mbuf_sg(sc->bfe_rxmbuf_tag, sc->bfe_rx_sparemap,
@@ -1113,14 +1108,14 @@ bfe_set_rx_mode(struct bfe_softc *sc)
 		val |= BFE_RXCONF_ALLMULTI;
 	else {
 		val &= ~BFE_RXCONF_ALLMULTI;
-		IF_ADDR_LOCK(ifp);
+		if_maddr_rlock(ifp);
 		TAILQ_FOREACH(ifma, &ifp->if_multiaddrs, ifma_link) {
 			if (ifma->ifma_addr->sa_family != AF_LINK)
 				continue;
 			bfe_cam_write(sc,
 			    LLADDR((struct sockaddr_dl *)ifma->ifma_addr), i++);
 		}
-		IF_ADDR_UNLOCK(ifp);
+		if_maddr_runlock(ifp);
 	}
 
 	CSR_WRITE_4(sc, BFE_RXCONF, val);
@@ -1741,18 +1736,15 @@ bfe_ifmedia_upd(struct ifnet *ifp)
 {
 	struct bfe_softc *sc;
 	struct mii_data *mii;
+	struct mii_softc *miisc;
 	int error;
 
 	sc = ifp->if_softc;
 	BFE_LOCK(sc);
 
 	mii = device_get_softc(sc->bfe_miibus);
-	if (mii->mii_instance) {
-		struct mii_softc *miisc;
-		for (miisc = LIST_FIRST(&mii->mii_phys); miisc != NULL;
-				miisc = LIST_NEXT(miisc, mii_list))
-			mii_phy_reset(miisc);
-	}
+	LIST_FOREACH(miisc, &mii->mii_phys, mii_list)
+		PHY_RESET(miisc);
 	error = mii_mediachg(mii);
 	BFE_UNLOCK(sc);
 

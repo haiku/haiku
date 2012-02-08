@@ -1,4 +1,4 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network ipro100 dev ;
 
 SubInclude HAIKU_TOP src add-ons kernel drivers network ipro100 dev fxp ;
-SubInclude HAIKU_TOP src add-ons kernel drivers network ipro100 dev mii ;
+

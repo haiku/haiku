@@ -147,4 +147,8 @@ device_get_sysctl_tree(device_t dev)
 	return NULL;
 }
 
+devclass_t devclass_find(const char *classname);
+device_t devclass_get_device(devclass_t dc, int unit);
+int devclass_get_maxunit(devclass_t dc);
+
 #endif	/* _FBSD_COMPAT_SYS_BUS_H_ */

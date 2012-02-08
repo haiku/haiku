@@ -45,6 +45,7 @@ uint8_t pci_get_function(device_t dev);
 device_t pci_find_dbsf(uint32_t domain, uint8_t bus, uint8_t slot,
 	uint8_t func);
 
+int pci_find_cap(device_t dev, int capability, int *capreg);
 int pci_find_extcap(device_t dev, int capability, int *capreg);
 
 int pci_msi_count(device_t dev);

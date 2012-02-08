@@ -13,3 +13,8 @@ KernelStaticLibrary atl1_mii.a
 	atphy.c
 	;
 
+ObjectHdrs [ FGristFiles atphy$(SUFOBJ) ]
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) libs compat
+			freebsd_network ] ;
+Includes [ FGristFiles atphy.c ]
+	: <src!libs!compat!freebsd_network>miidevs.h ;

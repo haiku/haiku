@@ -12,3 +12,4 @@ arc4random(void)
 {
 	return random();
 }
+

@@ -29,7 +29,12 @@
  *	$FreeBSD: src/sys/dev/mii/inphyreg.h,v 1.1.38.1.6.1 2010/12/21 17:09:25 kensmith Exp $
  */
 
-#define MII_INPHY_SCR           0x10    /* status and control register */
-#define SCR_FLOWCTL		0x8000
-#define SCR_S100		0x0002	/* autonegotiated speed */
-#define SCR_FDX			0x0001	/* autonegotiated duplex */
+#ifndef _INPHYREG_H
+#define	_INPHYREG_H
+
+#define	MII_INPHY_SCR		0x10	/* status and control register */
+#define	SCR_FLOWCTL		0x8000
+#define	SCR_S100		0x0002	/* autonegotiated speed */
+#define	SCR_FDX			0x0001	/* autonegotiated duplex */
+
+#endif

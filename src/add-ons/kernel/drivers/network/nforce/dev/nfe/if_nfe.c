@@ -21,7 +21,7 @@
 /* Driver for NVIDIA nForce MCP Fast Ethernet and Gigabit Ethernet */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/sys/dev/nfe/if_nfe.c,v 1.30 2008/10/03 03:58:16 yongari Exp $");
+__FBSDID("$FreeBSD$");
 
 #ifdef HAVE_KERNEL_OPTION_HEADERS
 #include "opt_device_polling.h"
@@ -77,11 +77,12 @@ static int  nfe_detach(device_t);
 static int  nfe_suspend(device_t);
 static int  nfe_resume(device_t);
 static int nfe_shutdown(device_t);
+static int  nfe_can_use_msix(struct nfe_softc *);
 static void nfe_power(struct nfe_softc *);
 static int  nfe_miibus_readreg(device_t, int, int);
 static int  nfe_miibus_writereg(device_t, int, int, int);
 static void nfe_miibus_statchg(device_t);
-static void nfe_link_task(void *, int);
+static void nfe_mac_config(struct nfe_softc *, struct mii_data *);
 static void nfe_set_intr(struct nfe_softc *);
 static __inline void nfe_enable_intr(struct nfe_softc *);
 static __inline void nfe_disable_intr(struct nfe_softc *);
@@ -93,13 +94,13 @@ static __inline void nfe_discard_rxbuf(struct nfe_softc *, int);
 static __inline void nfe_discard_jrxbuf(struct nfe_softc *, int);
 static int nfe_newbuf(struct nfe_softc *, int);
 static int nfe_jnewbuf(struct nfe_softc *, int);
-static int  nfe_rxeof(struct nfe_softc *, int);
-static int  nfe_jrxeof(struct nfe_softc *, int);
+static int  nfe_rxeof(struct nfe_softc *, int, int *);
+static int  nfe_jrxeof(struct nfe_softc *, int, int *);
 static void nfe_txeof(struct nfe_softc *);
 static int  nfe_encap(struct nfe_softc *, struct mbuf **);
 static void nfe_setmulti(struct nfe_softc *);
-static void nfe_tx_task(void *, int);
 static void nfe_start(struct ifnet *);
+static void nfe_start_locked(struct ifnet *);
 static void nfe_watchdog(struct ifnet *);
 static void nfe_init(void *);
 static void nfe_init_locked(void *);
@@ -125,6 +126,8 @@ static int sysctl_hw_nfe_proc_limit(SYSCTL_HANDLER_ARGS);
 static void nfe_sysctl_node(struct nfe_softc *);
 static void nfe_stats_clear(struct nfe_softc *);
 static void nfe_stats_update(struct nfe_softc *);
+static void nfe_set_linkspeed(struct nfe_softc *);
+static void nfe_set_wol(struct nfe_softc *);
 
 #ifdef NFE_DEBUG
 static int nfedebug = 0;
@@ -348,7 +351,6 @@ nfe_attach(device_t dev)
 	mtx_init(&sc->nfe_mtx, device_get_nameunit(dev), MTX_NETWORK_LOCK,
 	    MTX_DEF);
 	callout_init_mtx(&sc->nfe_stat_ch, &sc->nfe_mtx, 0);
-	TASK_INIT(&sc->nfe_link_task, 0, nfe_link_task, sc);
 
 	pci_enable_busmaster(dev);
 
@@ -361,7 +363,7 @@ nfe_attach(device_t dev)
 		return (ENXIO);
 	}
 
-	if (pci_find_extcap(dev, PCIY_EXPRESS, &reg) == 0) {
+	if (pci_find_cap(dev, PCIY_EXPRESS, &reg) == 0) {
 		uint16_t v, width;
 
 		v = pci_read_config(dev, reg + 0x08, 2);
@@ -380,6 +382,13 @@ nfe_attach(device_t dev)
 			device_printf(sc->nfe_dev,
 			    "warning, negotiated width of link(x%d) != "
 			    "max. width of link(x%d)\n", width, v);
+	}
+
+	if (nfe_can_use_msix(sc) == 0) {
+		device_printf(sc->nfe_dev,
+		    "MSI/MSI-X capability black-listed, will use INTx\n"); 
+		msix_disable = 1;
+		msi_disable = 1;
 	}
 
 	/* Allocate interrupt */
@@ -544,7 +553,6 @@ nfe_attach(device_t dev)
 		error = ENOSPC;
 		goto fail;
 	}
-	TASK_INIT(&sc->nfe_tx_task, 1, nfe_tx_task, ifp);
 
 	/*
 	 * Allocate Tx and Rx rings.
@@ -567,7 +575,6 @@ nfe_attach(device_t dev)
 	ifp->if_start = nfe_start;
 	ifp->if_hwassist = 0;
 	ifp->if_capabilities = 0;
-	ifp->if_watchdog = NULL;
 	ifp->if_init = nfe_init;
 	IFQ_SET_MAXLEN(&ifp->if_snd, NFE_TX_RING_COUNT - 1);
 	ifp->if_snd.ifq_drv_maxlen = NFE_TX_RING_COUNT - 1;
@@ -585,8 +592,12 @@ nfe_attach(device_t dev)
 	if ((sc->nfe_flags & NFE_HW_VLAN) != 0) {
 		ifp->if_capabilities |= IFCAP_VLAN_HWTAGGING;
 		if ((ifp->if_capabilities & IFCAP_HWCSUM) != 0)
-			ifp->if_capabilities |= IFCAP_VLAN_HWCSUM;
+			ifp->if_capabilities |= IFCAP_VLAN_HWCSUM |
+			    IFCAP_VLAN_HWTSO;
 	}
+
+	if (pci_find_cap(dev, PCIY_PMG, &reg) == 0)
+		ifp->if_capabilities |= IFCAP_WOL_MAGIC;
 	ifp->if_capenable = ifp->if_capabilities;
 
 	/*
@@ -601,10 +612,11 @@ nfe_attach(device_t dev)
 #endif
 
 	/* Do MII setup */
-	if (mii_phy_probe(dev, &sc->nfe_miibus, nfe_ifmedia_upd,
-	    nfe_ifmedia_sts)) {
-		device_printf(dev, "MII without any phy!\n");
-		error = ENXIO;
+	error = mii_attach(dev, &sc->nfe_miibus, ifp, nfe_ifmedia_upd,
+	    nfe_ifmedia_sts, BMSR_DEFCAPMASK, MII_PHY_ANY, MII_OFFSET_ANY,
+	    MIIF_DOPAUSE);
+	if (error != 0) {
+		device_printf(dev, "attaching PHYs failed\n");
 		goto fail;
 	}
 	ether_ifattach(ifp, sc->eaddr);
@@ -666,8 +678,6 @@ nfe_detach(device_t dev)
 		ifp->if_flags &= ~IFF_UP;
 		NFE_UNLOCK(sc);
 		callout_drain(&sc->nfe_stat_ch);
-		taskqueue_drain(taskqueue_fast, &sc->nfe_tx_task);
-		taskqueue_drain(taskqueue_swi, &sc->nfe_link_task);
 		ether_ifdetach(ifp);
 	}
 
@@ -753,6 +763,7 @@ nfe_suspend(device_t dev)
 
 	NFE_LOCK(sc);
 	nfe_stop(sc->nfe_ifp);
+	nfe_set_wol(sc);
 	sc->nfe_suspended = 1;
 	NFE_UNLOCK(sc);
 
@@ -769,6 +780,7 @@ nfe_resume(device_t dev)
 	sc = device_get_softc(dev);
 
 	NFE_LOCK(sc);
+	nfe_power(sc);
 	ifp = sc->nfe_ifp;
 	if (ifp->if_flags & IFF_UP)
 		nfe_init_locked(sc);
@@ -776,6 +788,48 @@ nfe_resume(device_t dev)
 	NFE_UNLOCK(sc);
 
 	return (0);
+}
+
+
+static int
+nfe_can_use_msix(struct nfe_softc *sc)
+{
+	static struct msix_blacklist {
+		char	*maker;
+		char	*product;
+	} msix_blacklists[] = {
+		{ "ASUSTeK Computer INC.", "P5N32-SLI PREMIUM" }
+	};
+
+	struct msix_blacklist *mblp;
+	char *maker, *product;
+	int count, n, use_msix;
+
+	/*
+	 * Search base board manufacturer and product name table
+	 * to see this system has a known MSI/MSI-X issue.
+	 */
+	maker = getenv("smbios.planar.maker");
+	product = getenv("smbios.planar.product");
+	use_msix = 1;
+	if (maker != NULL && product != NULL) {
+		count = sizeof(msix_blacklists) / sizeof(msix_blacklists[0]);
+		mblp = msix_blacklists;
+		for (n = 0; n < count; n++) {
+			if (strcmp(maker, mblp->maker) == 0 &&
+			    strcmp(product, mblp->product) == 0) {
+				use_msix = 0;
+				break;
+			}
+			mblp++;
+		}
+	}
+	if (maker != NULL)
+		freeenv(maker);
+	if (product != NULL)
+		freeenv(product);
+
+	return (use_msix);
 }
 
 
@@ -807,37 +861,51 @@ static void
 nfe_miibus_statchg(device_t dev)
 {
 	struct nfe_softc *sc;
+	struct mii_data *mii;
+	struct ifnet *ifp;
+	uint32_t rxctl, txctl;
 
 	sc = device_get_softc(dev);
-	taskqueue_enqueue(taskqueue_swi, &sc->nfe_link_task);
+
+	mii = device_get_softc(sc->nfe_miibus);
+	ifp = sc->nfe_ifp;
+
+	sc->nfe_link = 0;
+	if ((mii->mii_media_status & (IFM_ACTIVE | IFM_AVALID)) ==
+	    (IFM_ACTIVE | IFM_AVALID)) {
+		switch (IFM_SUBTYPE(mii->mii_media_active)) {
+		case IFM_10_T:
+		case IFM_100_TX:
+		case IFM_1000_T:
+			sc->nfe_link = 1;
+			break;
+		default:
+			break;
+		}
+	}
+
+	nfe_mac_config(sc, mii);
+	txctl = NFE_READ(sc, NFE_TX_CTL);
+	rxctl = NFE_READ(sc, NFE_RX_CTL);
+	if (sc->nfe_link != 0 && (ifp->if_drv_flags & IFF_DRV_RUNNING) != 0) {
+		txctl |= NFE_TX_START;
+		rxctl |= NFE_RX_START;
+	} else {
+		txctl &= ~NFE_TX_START;
+		rxctl &= ~NFE_RX_START;
+	}
+	NFE_WRITE(sc, NFE_TX_CTL, txctl);
+	NFE_WRITE(sc, NFE_RX_CTL, rxctl);
 }
 
 
 static void
-nfe_link_task(void *arg, int pending)
+nfe_mac_config(struct nfe_softc *sc, struct mii_data *mii)
 {
-	struct nfe_softc *sc;
-	struct mii_data *mii;
-	struct ifnet *ifp;
-	uint32_t phy, seed, misc = NFE_MISC1_MAGIC, link = NFE_MEDIA_SET;
-	uint32_t gmask, rxctl, txctl, val;
+	uint32_t link, misc, phy, seed;
+	uint32_t val;
 
-	sc = (struct nfe_softc *)arg;
-
-	NFE_LOCK(sc);
-
-	mii = device_get_softc(sc->nfe_miibus);
-	ifp = sc->nfe_ifp;
-	if (mii == NULL || ifp == NULL) {
-		NFE_UNLOCK(sc);
-		return;
-	}
-
-	if (mii->mii_media_status & IFM_ACTIVE) {
-		if (IFM_SUBTYPE(mii->mii_media_active) != IFM_NONE)
-			sc->nfe_link = 1;
-	} else
-		sc->nfe_link = 0;
+	NFE_LOCK_ASSERT(sc);
 
 	phy = NFE_READ(sc, NFE_PHY_IFACE);
 	phy &= ~(NFE_PHY_HDX | NFE_PHY_100TX | NFE_PHY_1000T);
@@ -845,7 +913,10 @@ nfe_link_task(void *arg, int pending)
 	seed = NFE_READ(sc, NFE_RNDSEED);
 	seed &= ~NFE_SEED_MASK;
 
-	if (((mii->mii_media_active & IFM_GMASK) & IFM_FDX) == 0) {
+	misc = NFE_MISC1_MAGIC;
+	link = NFE_MEDIA_SET;
+
+	if ((IFM_OPTIONS(mii->mii_media_active) & IFM_FDX) == 0) {
 		phy  |= NFE_PHY_HDX;	/* half-duplex */
 		misc |= NFE_MISC1_HDX;
 	}
@@ -882,18 +953,19 @@ nfe_link_task(void *arg, int pending)
 	NFE_WRITE(sc, NFE_MISC1, misc);
 	NFE_WRITE(sc, NFE_LINKSPEED, link);
 
-	gmask = mii->mii_media_active & IFM_GMASK;
-	if ((gmask & IFM_FDX) != 0) {
+	if ((IFM_OPTIONS(mii->mii_media_active) & IFM_FDX) != 0) {
 		/* It seems all hardwares supports Rx pause frames. */
 		val = NFE_READ(sc, NFE_RXFILTER);
-		if ((gmask & IFM_FLAG0) != 0)
+		if ((IFM_OPTIONS(mii->mii_media_active) &
+		    IFM_ETH_RXPAUSE) != 0)
 			val |= NFE_PFF_RX_PAUSE;
 		else
 			val &= ~NFE_PFF_RX_PAUSE;
 		NFE_WRITE(sc, NFE_RXFILTER, val);
 		if ((sc->nfe_flags & NFE_TX_FLOW_CTRL) != 0) {
 			val = NFE_READ(sc, NFE_MISC1);
-			if ((gmask & IFM_FLAG1) != 0) {
+			if ((IFM_OPTIONS(mii->mii_media_active) &
+			    IFM_ETH_TXPAUSE) != 0) {
 				NFE_WRITE(sc, NFE_TX_PAUSE_FRAME,
 				    NFE_TX_PAUSE_FRAME_ENABLE);
 				val |= NFE_MISC1_TX_PAUSE;
@@ -917,20 +989,6 @@ nfe_link_task(void *arg, int pending)
 			NFE_WRITE(sc, NFE_MISC1, val);
 		}
 	}
-
-	txctl = NFE_READ(sc, NFE_TX_CTL);
-	rxctl = NFE_READ(sc, NFE_RX_CTL);
-	if (sc->nfe_link != 0 && (ifp->if_drv_flags & IFF_DRV_RUNNING) != 0) {
-		txctl |= NFE_TX_START;
-		rxctl |= NFE_RX_START;
-	} else {
-		txctl &= ~NFE_TX_START;
-		rxctl &= ~NFE_RX_START;
-	}
-	NFE_WRITE(sc, NFE_TX_CTL, txctl);
-	NFE_WRITE(sc, NFE_RX_CTL, rxctl);
-
-	NFE_UNLOCK(sc);
 }
 
 
@@ -1153,7 +1211,7 @@ nfe_alloc_jrx_ring(struct nfe_softc *sc, struct nfe_jrx_ring *ring)
 
 	/* Create DMA tag for jumbo Rx buffers. */
 	error = bus_dma_tag_create(sc->nfe_parent_tag,
-	    PAGE_SIZE, 0,			/* alignment, boundary */
+	    1, 0,				/* alignment, boundary */
 	    BUS_SPACE_MAXADDR,			/* lowaddr */
 	    BUS_SPACE_MAXADDR,			/* highaddr */
 	    NULL, NULL,				/* filter, filterarg */
@@ -1551,31 +1609,32 @@ nfe_free_tx_ring(struct nfe_softc *sc, struct nfe_tx_ring *ring)
 static poll_handler_t nfe_poll;
 
 
-static void
+static int
 nfe_poll(struct ifnet *ifp, enum poll_cmd cmd, int count)
 {
 	struct nfe_softc *sc = ifp->if_softc;
 	uint32_t r;
+	int rx_npkts = 0;
 
 	NFE_LOCK(sc);
 
 	if (!(ifp->if_drv_flags & IFF_DRV_RUNNING)) {
 		NFE_UNLOCK(sc);
-		return;
+		return (rx_npkts);
 	}
 
 	if (sc->nfe_framesize > MCLBYTES - ETHER_HDR_LEN)
-		nfe_jrxeof(sc, count);
+		rx_npkts = nfe_jrxeof(sc, count, &rx_npkts);
 	else
-		nfe_rxeof(sc, count);
+		rx_npkts = nfe_rxeof(sc, count, &rx_npkts);
 	nfe_txeof(sc);
 	if (!IFQ_DRV_IS_EMPTY(&ifp->if_snd))
-		taskqueue_enqueue_fast(sc->nfe_tq, &sc->nfe_tx_task);
+		nfe_start_locked(ifp);
 
 	if (cmd == POLL_AND_CHECK_STATUS) {
 		if ((r = NFE_READ(sc, sc->nfe_irq_status)) == 0) {
 			NFE_UNLOCK(sc);
-			return;
+			return (rx_npkts);
 		}
 		NFE_WRITE(sc, sc->nfe_irq_status, r);
 
@@ -1586,6 +1645,7 @@ nfe_poll(struct ifnet *ifp, enum poll_cmd cmd, int count)
 		}
 	}
 	NFE_UNLOCK(sc);
+	return (rx_npkts);
 }
 #endif /* DEVICE_POLLING */
 
@@ -1649,8 +1709,10 @@ nfe_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 			else {
 				NFE_LOCK(sc);
 				ifp->if_mtu = ifr->ifr_mtu;
-				if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0)
+				if (ifp->if_drv_flags & IFF_DRV_RUNNING) {
+					ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 					nfe_init_locked(sc);
+				}
 				NFE_UNLOCK(sc);
 			}
 		}
@@ -1713,19 +1775,38 @@ nfe_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 			}
 		}
 #endif /* DEVICE_POLLING */
-		if ((sc->nfe_flags & NFE_HW_CSUM) != 0 &&
-		    (mask & IFCAP_HWCSUM) != 0) {
-			ifp->if_capenable ^= IFCAP_HWCSUM;
-			if ((IFCAP_TXCSUM & ifp->if_capenable) != 0 &&
-			    (IFCAP_TXCSUM & ifp->if_capabilities) != 0)
+		if ((mask & IFCAP_WOL_MAGIC) != 0 &&
+		    (ifp->if_capabilities & IFCAP_WOL_MAGIC) != 0)
+			ifp->if_capenable ^= IFCAP_WOL_MAGIC;
+		if ((mask & IFCAP_TXCSUM) != 0 &&
+		    (ifp->if_capabilities & IFCAP_TXCSUM) != 0) {
+			ifp->if_capenable ^= IFCAP_TXCSUM;
+			if ((ifp->if_capenable & IFCAP_TXCSUM) != 0)
 				ifp->if_hwassist |= NFE_CSUM_FEATURES;
 			else
 				ifp->if_hwassist &= ~NFE_CSUM_FEATURES;
+		}
+		if ((mask & IFCAP_RXCSUM) != 0 &&
+		    (ifp->if_capabilities & IFCAP_RXCSUM) != 0) {
+			ifp->if_capenable ^= IFCAP_RXCSUM;
 			init++;
 		}
-		if ((sc->nfe_flags & NFE_HW_VLAN) != 0 &&
-		    (mask & IFCAP_VLAN_HWTAGGING) != 0) {
+		if ((mask & IFCAP_TSO4) != 0 &&
+		    (ifp->if_capabilities & IFCAP_TSO4) != 0) {
+			ifp->if_capenable ^= IFCAP_TSO4;
+			if ((IFCAP_TSO4 & ifp->if_capenable) != 0)
+				ifp->if_hwassist |= CSUM_TSO;
+			else
+				ifp->if_hwassist &= ~CSUM_TSO;
+		}
+		if ((mask & IFCAP_VLAN_HWTSO) != 0 &&
+		    (ifp->if_capabilities & IFCAP_VLAN_HWTSO) != 0)
+			ifp->if_capenable ^= IFCAP_VLAN_HWTSO;
+		if ((mask & IFCAP_VLAN_HWTAGGING) != 0 &&
+		    (ifp->if_capabilities & IFCAP_VLAN_HWTAGGING) != 0) {
 			ifp->if_capenable ^= IFCAP_VLAN_HWTAGGING;
+			if ((ifp->if_capenable & IFCAP_VLAN_HWTAGGING) == 0)
+				ifp->if_capenable &= ~IFCAP_VLAN_HWTSO;
 			init++;
 		}
 		/*
@@ -1735,28 +1816,17 @@ nfe_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 		 * VLAN stripping. So when we know Rx checksum offload is
 		 * disabled turn entire hardware VLAN assist off.
 		 */
-		if ((sc->nfe_flags & (NFE_HW_CSUM | NFE_HW_VLAN)) ==
-		    (NFE_HW_CSUM | NFE_HW_VLAN)) {
-			if ((ifp->if_capenable & IFCAP_RXCSUM) == 0)
-				ifp->if_capenable &= ~IFCAP_VLAN_HWTAGGING;
+		if ((ifp->if_capenable & IFCAP_RXCSUM) == 0) {
+			if ((ifp->if_capenable & IFCAP_VLAN_HWTAGGING) != 0)
+				init++;
+			ifp->if_capenable &= ~(IFCAP_VLAN_HWTAGGING |
+			    IFCAP_VLAN_HWTSO);
 		}
-
-		if ((sc->nfe_flags & NFE_HW_CSUM) != 0 &&
-		    (mask & IFCAP_TSO4) != 0) {
-			ifp->if_capenable ^= IFCAP_TSO4;
-			if ((IFCAP_TSO4 & ifp->if_capenable) != 0 &&
-			    (IFCAP_TSO4 & ifp->if_capabilities) != 0)
-				ifp->if_hwassist |= CSUM_TSO;
-			else
-				ifp->if_hwassist &= ~CSUM_TSO;
-		}
-
 		if (init > 0 && (ifp->if_drv_flags & IFF_DRV_RUNNING) != 0) {
 			ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 			nfe_init(sc);
 		}
-		if ((sc->nfe_flags & NFE_HW_VLAN) != 0)
-			VLAN_CAPABILITIES(ifp);
+		VLAN_CAPABILITIES(ifp);
 		break;
 	default:
 		error = ether_ioctl(ifp, cmd, data);
@@ -1819,21 +1889,21 @@ nfe_int_task(void *arg, int pending)
 
 	if ((ifp->if_drv_flags & IFF_DRV_RUNNING) == 0) {
 		NFE_UNLOCK(sc);
-		nfe_enable_intr(sc);
+		nfe_disable_intr(sc);
 		return;
 	}
 
 	domore = 0;
 	/* check Rx ring */
 	if (sc->nfe_framesize > MCLBYTES - ETHER_HDR_LEN)
-		domore = nfe_jrxeof(sc, sc->nfe_process_limit);
+		domore = nfe_jrxeof(sc, sc->nfe_process_limit, NULL);
 	else
-		domore = nfe_rxeof(sc, sc->nfe_process_limit);
+		domore = nfe_rxeof(sc, sc->nfe_process_limit, NULL);
 	/* check Tx ring */
 	nfe_txeof(sc);
 
 	if (!IFQ_DRV_IS_EMPTY(&ifp->if_snd))
-		taskqueue_enqueue_fast(sc->nfe_tq, &sc->nfe_tx_task);
+		nfe_start_locked(ifp);
 
 	NFE_UNLOCK(sc);
 
@@ -2015,7 +2085,7 @@ nfe_jnewbuf(struct nfe_softc *sc, int idx)
 
 
 static int
-nfe_rxeof(struct nfe_softc *sc, int count)
+nfe_rxeof(struct nfe_softc *sc, int count, int *rx_npktsp)
 {
 	struct ifnet *ifp = sc->nfe_ifp;
 	struct nfe_desc32 *desc32;
@@ -2023,9 +2093,10 @@ nfe_rxeof(struct nfe_softc *sc, int count)
 	struct nfe_rx_data *data;
 	struct mbuf *m;
 	uint16_t flags;
-	int len, prog;
+	int len, prog, rx_npkts;
 	uint32_t vtag = 0;
 
+	rx_npkts = 0;
 	NFE_LOCK_ASSERT(sc);
 
 	bus_dmamap_sync(sc->rxq.rx_desc_tag, sc->rxq.rx_desc_map,
@@ -2115,18 +2186,21 @@ nfe_rxeof(struct nfe_softc *sc, int count)
 		NFE_UNLOCK(sc);
 		(*ifp->if_input)(ifp, m);
 		NFE_LOCK(sc);
+		rx_npkts++;
 	}
 
 	if (prog > 0)
 		bus_dmamap_sync(sc->rxq.rx_desc_tag, sc->rxq.rx_desc_map,
 		    BUS_DMASYNC_PREREAD | BUS_DMASYNC_PREWRITE);
 
+	if (rx_npktsp != NULL)
+		*rx_npktsp = rx_npkts;
 	return (count > 0 ? 0 : EAGAIN);
 }
 
 
 static int
-nfe_jrxeof(struct nfe_softc *sc, int count)
+nfe_jrxeof(struct nfe_softc *sc, int count, int *rx_npktsp)
 {
 	struct ifnet *ifp = sc->nfe_ifp;
 	struct nfe_desc32 *desc32;
@@ -2134,9 +2208,10 @@ nfe_jrxeof(struct nfe_softc *sc, int count)
 	struct nfe_rx_data *data;
 	struct mbuf *m;
 	uint16_t flags;
-	int len, prog;
+	int len, prog, rx_npkts;
 	uint32_t vtag = 0;
 
+	rx_npkts = 0;
 	NFE_LOCK_ASSERT(sc);
 
 	bus_dmamap_sync(sc->jrxq.jrx_desc_tag, sc->jrxq.jrx_desc_map,
@@ -2227,12 +2302,15 @@ nfe_jrxeof(struct nfe_softc *sc, int count)
 		NFE_UNLOCK(sc);
 		(*ifp->if_input)(ifp, m);
 		NFE_LOCK(sc);
+		rx_npkts++;
 	}
 
 	if (prog > 0)
 		bus_dmamap_sync(sc->jrxq.jrx_desc_tag, sc->jrxq.jrx_desc_map,
 		    BUS_DMASYNC_PREREAD | BUS_DMASYNC_PREWRITE);
 
+	if (rx_npktsp != NULL)
+		*rx_npktsp = rx_npkts;
 	return (count > 0 ? 0 : EAGAIN);
 }
 
@@ -2357,19 +2435,18 @@ nfe_encap(struct nfe_softc *sc, struct mbuf **m_head)
 	m = *m_head;
 	cflags = flags = 0;
 	tso_segsz = 0;
-	if ((m->m_pkthdr.csum_flags & NFE_CSUM_FEATURES) != 0) {
+	if ((m->m_pkthdr.csum_flags & CSUM_TSO) != 0) {
+		tso_segsz = (uint32_t)m->m_pkthdr.tso_segsz <<
+		    NFE_TX_TSO_SHIFT;
+		cflags &= ~(NFE_TX_IP_CSUM | NFE_TX_TCP_UDP_CSUM);
+		cflags |= NFE_TX_TSO;
+	} else if ((m->m_pkthdr.csum_flags & NFE_CSUM_FEATURES) != 0) {
 		if ((m->m_pkthdr.csum_flags & CSUM_IP) != 0)
 			cflags |= NFE_TX_IP_CSUM;
 		if ((m->m_pkthdr.csum_flags & CSUM_TCP) != 0)
 			cflags |= NFE_TX_TCP_UDP_CSUM;
 		if ((m->m_pkthdr.csum_flags & CSUM_UDP) != 0)
 			cflags |= NFE_TX_TCP_UDP_CSUM;
-	}
-	if ((m->m_pkthdr.csum_flags & CSUM_TSO) != 0) {
-		tso_segsz = (uint32_t)m->m_pkthdr.tso_segsz <<
-		    NFE_TX_TSO_SHIFT;
-		cflags &= ~(NFE_TX_IP_CSUM | NFE_TX_TCP_UDP_CSUM);
-		cflags |= NFE_TX_TSO;
 	}
 
 	for (i = 0; i < nsegs; i++) {
@@ -2481,7 +2558,7 @@ nfe_setmulti(struct nfe_softc *sc)
 	bcopy(etherbroadcastaddr, addr, ETHER_ADDR_LEN);
 	bcopy(etherbroadcastaddr, mask, ETHER_ADDR_LEN);
 
-	IF_ADDR_LOCK(ifp);
+	if_maddr_rlock(ifp);
 	TAILQ_FOREACH(ifma, &ifp->if_multiaddrs, ifma_link) {
 		u_char *addrp;
 
@@ -2495,7 +2572,7 @@ nfe_setmulti(struct nfe_softc *sc)
 			mask[i] &= ~mcaddr;
 		}
 	}
-	IF_ADDR_UNLOCK(ifp);
+	if_maddr_runlock(ifp);
 
 	for (i = 0; i < ETHER_ADDR_LEN; i++) {
 		mask[i] |= addr[i];
@@ -2522,29 +2599,27 @@ done:
 
 
 static void
-nfe_tx_task(void *arg, int pending)
+nfe_start(struct ifnet *ifp)
 {
-	struct ifnet *ifp;
+	struct nfe_softc *sc = ifp->if_softc;
 
-	ifp = (struct ifnet *)arg;
-	nfe_start(ifp);
+	NFE_LOCK(sc);
+	nfe_start_locked(ifp);
+	NFE_UNLOCK(sc);
 }
 
-
 static void
-nfe_start(struct ifnet *ifp)
+nfe_start_locked(struct ifnet *ifp)
 {
 	struct nfe_softc *sc = ifp->if_softc;
 	struct mbuf *m0;
 	int enq;
 
-	NFE_LOCK(sc);
+	NFE_LOCK_ASSERT(sc);
 
 	if ((ifp->if_drv_flags & (IFF_DRV_RUNNING | IFF_DRV_OACTIVE)) !=
-	    IFF_DRV_RUNNING || sc->nfe_link == 0) {
-		NFE_UNLOCK(sc);
+	    IFF_DRV_RUNNING || sc->nfe_link == 0)
 		return;
-	}
 
 	for (enq = 0; !IFQ_DRV_IS_EMPTY(&ifp->if_snd);) {
 		IFQ_DRV_DEQUEUE(&ifp->if_snd, m0);
@@ -2574,8 +2649,6 @@ nfe_start(struct ifnet *ifp)
 		 */
 		sc->nfe_watchdog_timer = 5;
 	}
-
-	NFE_UNLOCK(sc);
 }
 
 
@@ -2593,7 +2666,7 @@ nfe_watchdog(struct ifnet *ifp)
 		if_printf(ifp, "watchdog timeout (missed Tx interrupts) "
 		    "-- recovering\n");
 		if (!IFQ_DRV_IS_EMPTY(&ifp->if_snd))
-			taskqueue_enqueue_fast(sc->nfe_tq, &sc->nfe_tx_task);
+			nfe_start_locked(ifp);
 		return;
 	}
 	/* Check if we've lost start Tx command. */
@@ -2738,7 +2811,8 @@ nfe_init_locked(void *xsc)
 	NFE_WRITE(sc, NFE_STATUS, sc->mii_phyaddr << 24 | NFE_STATUS_MAGIC);
 
 	NFE_WRITE(sc, NFE_SETUP_R4, NFE_R4_MAGIC);
-	NFE_WRITE(sc, NFE_WOL_CTL, NFE_WOL_MAGIC);
+	/* Disable WOL. */
+	NFE_WRITE(sc, NFE_WOL_CTL, 0);
 
 	sc->rxtxctl &= ~NFE_RXTX_BIT2;
 	NFE_WRITE(sc, NFE_RXTX_CTL, sc->rxtxctl);
@@ -2909,18 +2983,8 @@ nfe_tick(void *xsc)
 static int
 nfe_shutdown(device_t dev)
 {
-	struct nfe_softc *sc;
-	struct ifnet *ifp;
 
-	sc = device_get_softc(dev);
-
-	NFE_LOCK(sc);
-	ifp = sc->nfe_ifp;
-	nfe_stop(ifp);
-	/* nfe_reset(sc); */
-	NFE_UNLOCK(sc);
-
-	return (0);
+	return (nfe_suspend(dev));
 }
 
 
@@ -3013,7 +3077,7 @@ sysctl_hw_nfe_proc_limit(SYSCTL_HANDLER_ARGS)
 #define	NFE_SYSCTL_STAT_ADD32(c, h, n, p, d)	\
 	    SYSCTL_ADD_UINT(c, h, OID_AUTO, n, CTLFLAG_RD, p, 0, d)
 #define	NFE_SYSCTL_STAT_ADD64(c, h, n, p, d)	\
-	    SYSCTL_ADD_QUAD(c, h, OID_AUTO, n, CTLFLAG_RD, p, d)
+	    SYSCTL_ADD_UQUAD(c, h, OID_AUTO, n, CTLFLAG_RD, p, d)
 
 static void
 nfe_sysctl_node(struct nfe_softc *sc)
@@ -3080,7 +3144,7 @@ nfe_sysctl_node(struct nfe_softc *sc)
 	    &stats->rx_unicast, "Unicast Frames");
 	NFE_SYSCTL_STAT_ADD32(ctx, child, "multicast",
 	    &stats->rx_multicast, "Multicast Frames");
-	NFE_SYSCTL_STAT_ADD32(ctx, child, "brocadcast",
+	NFE_SYSCTL_STAT_ADD32(ctx, child, "broadcast",
 	    &stats->rx_broadcast, "Broadcast Frames");
 	if ((sc->nfe_flags & NFE_MIB_V2) != 0) {
 		NFE_SYSCTL_STAT_ADD64(ctx, child, "octets",
@@ -3203,4 +3267,112 @@ nfe_stats_update(struct nfe_softc *sc)
 		stats->tx_multicast += NFE_READ(sc, NFE_TX_MULTICAST);
 		stats->rx_broadcast += NFE_READ(sc, NFE_TX_BROADCAST);
 	}
+}
+
+
+static void
+nfe_set_linkspeed(struct nfe_softc *sc)
+{
+	struct mii_softc *miisc;
+	struct mii_data *mii;
+	int aneg, i, phyno;
+
+	NFE_LOCK_ASSERT(sc);
+
+	mii = device_get_softc(sc->nfe_miibus);
+	mii_pollstat(mii);
+	aneg = 0;
+	if ((mii->mii_media_status & (IFM_ACTIVE | IFM_AVALID)) ==
+	    (IFM_ACTIVE | IFM_AVALID)) {
+		switch IFM_SUBTYPE(mii->mii_media_active) {
+		case IFM_10_T:
+		case IFM_100_TX:
+			return;
+		case IFM_1000_T:
+			aneg++;
+			break;
+		default:
+			break;
+		}
+	}
+	miisc = LIST_FIRST(&mii->mii_phys);
+	phyno = miisc->mii_phy;
+	LIST_FOREACH(miisc, &mii->mii_phys, mii_list)
+		PHY_RESET(miisc);
+	nfe_miibus_writereg(sc->nfe_dev, phyno, MII_100T2CR, 0);
+	nfe_miibus_writereg(sc->nfe_dev, phyno,
+	    MII_ANAR, ANAR_TX_FD | ANAR_TX | ANAR_10_FD | ANAR_10 | ANAR_CSMA);
+	nfe_miibus_writereg(sc->nfe_dev, phyno,
+	    MII_BMCR, BMCR_RESET | BMCR_AUTOEN | BMCR_STARTNEG);
+	DELAY(1000);
+	if (aneg != 0) {
+		/*
+		 * Poll link state until nfe(4) get a 10/100Mbps link.
+		 */
+		for (i = 0; i < MII_ANEGTICKS_GIGE; i++) {
+			mii_pollstat(mii);
+			if ((mii->mii_media_status & (IFM_ACTIVE | IFM_AVALID))
+			    == (IFM_ACTIVE | IFM_AVALID)) {
+				switch (IFM_SUBTYPE(mii->mii_media_active)) {
+				case IFM_10_T:
+				case IFM_100_TX:
+					nfe_mac_config(sc, mii);
+					return;
+				default:
+					break;
+				}
+			}
+			NFE_UNLOCK(sc);
+			pause("nfelnk", hz);
+			NFE_LOCK(sc);
+		}
+		if (i == MII_ANEGTICKS_GIGE)
+			device_printf(sc->nfe_dev,
+			    "establishing a link failed, WOL may not work!");
+	}
+	/*
+	 * No link, force MAC to have 100Mbps, full-duplex link.
+	 * This is the last resort and may/may not work.
+	 */
+	mii->mii_media_status = IFM_AVALID | IFM_ACTIVE;
+	mii->mii_media_active = IFM_ETHER | IFM_100_TX | IFM_FDX;
+	nfe_mac_config(sc, mii);
+}
+
+
+static void
+nfe_set_wol(struct nfe_softc *sc)
+{
+	struct ifnet *ifp;
+	uint32_t wolctl;
+	int pmc;
+	uint16_t pmstat;
+
+	NFE_LOCK_ASSERT(sc);
+
+	if (pci_find_cap(sc->nfe_dev, PCIY_PMG, &pmc) != 0)
+		return;
+	ifp = sc->nfe_ifp;
+	if ((ifp->if_capenable & IFCAP_WOL_MAGIC) != 0)
+		wolctl = NFE_WOL_MAGIC;
+	else
+		wolctl = 0;
+	NFE_WRITE(sc, NFE_WOL_CTL, wolctl);
+	if ((ifp->if_capenable & IFCAP_WOL_MAGIC) != 0) {
+		nfe_set_linkspeed(sc);
+		if ((sc->nfe_flags & NFE_PWR_MGMT) != 0)
+			NFE_WRITE(sc, NFE_PWR2_CTL,
+			    NFE_READ(sc, NFE_PWR2_CTL) & ~NFE_PWR2_GATE_CLOCKS);
+		/* Enable RX. */
+		NFE_WRITE(sc, NFE_RX_RING_ADDR_HI, 0);
+		NFE_WRITE(sc, NFE_RX_RING_ADDR_LO, 0);
+		NFE_WRITE(sc, NFE_RX_CTL, NFE_READ(sc, NFE_RX_CTL) |
+		    NFE_RX_START);
+	}
+	/* Request PME if WOL is requested. */
+	pmstat = pci_read_config(sc->nfe_dev, pmc + PCIR_POWER_STATUS, 2);
+	pmstat &= ~(PCIM_PSTAT_PME | PCIM_PSTAT_PMEENABLE);
+	if ((ifp->if_capenable & IFCAP_WOL) != 0)
+		pmstat |= PCIM_PSTAT_PME | PCIM_PSTAT_PMEENABLE;
+	pci_write_config(sc->nfe_dev, pmc + PCIR_POWER_STATUS, pmstat, 2);
 }

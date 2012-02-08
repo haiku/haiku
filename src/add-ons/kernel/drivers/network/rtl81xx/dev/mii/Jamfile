@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network rtl81xx dev mii ;
 
-UseHeaders [ FDirName $(SUBDIR) .. .. ] : true ;
+UseHeaders [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
 	: true ;
 

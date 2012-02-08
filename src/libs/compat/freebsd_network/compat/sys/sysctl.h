@@ -18,6 +18,9 @@ struct sysctl_req {
 struct sysctl_ctx_list {
 };
 
+struct sysctl_oid_list {
+};
+
 
 #define SYSCTL_HANDLER_ARGS void *oidp, void *arg1, int arg2, \
 	struct sysctl_req *req
@@ -34,6 +37,7 @@ struct sysctl_ctx_list {
 #define	CTLTYPE_UINT	6	/* name describes an unsigned integer */
 #define	CTLTYPE_LONG	7	/* name describes a long */
 #define	CTLTYPE_ULONG	8	/* name describes an unsigned long */
+#define CTLTYPE_U64		9	/* name describes an unsigned 64-bit number */
 
 #define CTLFLAG_RD	0x80000000	/* Allow reads of variable */
 #define CTLFLAG_WR	0x40000000	/* Allow writes to the variable */
@@ -46,6 +50,7 @@ struct sysctl_ctx_list {
 #define CTLFLAG_SKIP	0x01000000	/* Skip this sysctl when listing */
 #define CTLMASK_SECURE	0x00F00000	/* Secure level */
 #define CTLFLAG_TUN	0x00080000	/* Tunable variable */
+#define CTLFLAG_MPSAFE  0x00040000	/* Handler is MP safe */
 #define CTLFLAG_RDTUN	(CTLFLAG_RD|CTLFLAG_TUN)
 
 
@@ -76,6 +81,7 @@ static inline int sysctl_handle_long(SYSCTL_HANDLER_ARGS) { return -1; }
 static inline int sysctl_handle_opaque(SYSCTL_HANDLER_ARGS) { return -1; }
 static inline int sysctl_handle_quad(SYSCTL_HANDLER_ARGS) { return -1; }
 static inline int sysctl_handle_int(SYSCTL_HANDLER_ARGS) { return -1; }
+static inline int sysctl_handle_64(SYSCTL_HANDLER_ARGS) { return -1; }
 static inline int sysctl_handle_string(SYSCTL_HANDLER_ARGS) { return -1; }
 
 
@@ -118,6 +124,11 @@ static inline int sysctl_handle_string(SYSCTL_HANDLER_ARGS) { return -1; }
 #define SYSCTL_ADD_QUAD(ctx, parent, nbr, name, access, ptr, descr)	\
 	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_QUAD|(access),	\
 	ptr, 0, sysctl_handle_quad, "Q", __DESCR(descr))
+
+#define SYSCTL_ADD_UQUAD(ctx, parent, nbr, name, access, ptr, descr)    \
+	sysctl_add_oid(ctx, parent, nbr, name,								\
+	CTLTYPE_U64 | CTLFLAG_MPSAFE | (access),							\
+	ptr, 0, sysctl_handle_64, "QU", __DESCR(descr))
 
 #define SYSCTL_ADD_OPAQUE(ctx, parent, nbr, name, access, ptr, len, fmt, descr) \
 	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_OPAQUE|(access), \

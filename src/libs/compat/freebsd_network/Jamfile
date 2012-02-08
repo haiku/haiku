@@ -29,6 +29,7 @@ KernelStaticLibrary libfreebsd_network.a :
 	fbsd_mbuf.c
 	fbsd_mbuf2.c
 	fbsd_mii.c
+	fbsd_mii_bitbang.c
 	fbsd_mii_physubr.c
 	fbsd_time.c
 	firmware.c
@@ -39,6 +40,7 @@ KernelStaticLibrary libfreebsd_network.a :
 	mutex.c
 	priv.cpp
 	synch.c
+	systm.c
 	taskqueue.c
 	unit.c
 	Unit.cpp

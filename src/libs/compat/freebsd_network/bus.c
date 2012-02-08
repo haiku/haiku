@@ -701,6 +701,13 @@ pci_enable_io(device_t dev, int space)
 
 
 int
+pci_find_cap(device_t dev, int capability, int *capreg)
+{
+	return pci_find_extcap(dev, capability, capreg);
+}
+
+
+int
 pci_find_extcap(device_t child, int capability, int *_capabilityRegister)
 {
 	uint8 capabilityPointer;

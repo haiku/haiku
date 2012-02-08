@@ -28,7 +28,7 @@
 /* Driver for Attansic Technology Corp. L1 Gigabit Ethernet. */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/sys/dev/age/if_age.c,v 1.6 2008/11/07 07:02:28 yongari Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -68,29 +68,11 @@ __FBSDID("$FreeBSD: src/sys/dev/age/if_age.c,v 1.6 2008/11/07 07:02:28 yongari E
 #include <machine/bus.h>
 #include <machine/in_cksum.h>
 
-#include "if_agereg.h"
-#include "if_agevar.h"
+#include <dev/age/if_agereg.h>
+#include <dev/age/if_agevar.h>
 
 /* "device miibus" required.  See GENERIC if you get errors here. */
 #include "miibus_if.h"
-
-/* Compat code for RELENG_7/RELENG_7_0. */
-#ifndef	IFCAP_WOL
-#define	IFCAP_WOL		0
-#define	IFCAP_WOL_MAGIC		0
-#define	IFCAP_WOL_MCAST		0
-#endif
-#ifndef	IFCAP_VLAN_HWTSO
-#define	IFCAP_VLAN_HWTSO	0
-#endif
-#if __FreeBSD_version < 700100
-#define	m_collapse(x, y, z)	m_defrag(x, y)
-#endif
-#define	AGE_CSUM_FEATURES	(CSUM_TCP | CSUM_UDP)
-
-#ifndef roundup
-#define roundup(x, y) ((((x)+((y)-1))/(y))*(y))
-#endif
 
 #define	AGE_CSUM_FEATURES	(CSUM_TCP | CSUM_UDP)
 
@@ -136,8 +118,8 @@ static void age_setwol(struct age_softc *);
 static int age_suspend(device_t);
 static int age_resume(device_t);
 static int age_encap(struct age_softc *, struct mbuf **);
-static void age_tx_task(void *, int);
 static void age_start(struct ifnet *);
+static void age_start_locked(struct ifnet *);
 static void age_watchdog(struct age_softc *);
 static int age_ioctl(struct ifnet *, u_long, caddr_t);
 static void age_mac_config(struct age_softc *);
@@ -228,8 +210,6 @@ age_miibus_readreg(device_t dev, int phy, int reg)
 	int i;
 
 	sc = device_get_softc(dev);
-	if (phy != sc->age_phyaddr)
-		return (0);
 
 	CSR_WRITE_4(sc, AGE_MDIO, MDIO_OP_EXECUTE | MDIO_OP_READ |
 	    MDIO_SUP_PREAMBLE | MDIO_CLK_25_4 | MDIO_REG_ADDR(reg));
@@ -259,8 +239,6 @@ age_miibus_writereg(device_t dev, int phy, int reg, int val)
 	int i;
 
 	sc = device_get_softc(dev);
-	if (phy != sc->age_phyaddr)
-		return (0);
 
 	CSR_WRITE_4(sc, AGE_MDIO, MDIO_OP_EXECUTE | MDIO_OP_WRITE |
 	    (val & MDIO_DATA_MASK) << MDIO_DATA_SHIFT |
@@ -323,10 +301,8 @@ age_mediachange(struct ifnet *ifp)
 	sc = ifp->if_softc;
 	AGE_LOCK(sc);
 	mii = device_get_softc(sc->age_miibus);
-	if (mii->mii_instance != 0) {
-		LIST_FOREACH(miisc, &mii->mii_phys, mii_list)
-			mii_phy_reset(miisc);
-	}
+	LIST_FOREACH(miisc, &mii->mii_phys, mii_list)
+		PHY_RESET(miisc);
 	error = mii_mediachg(mii);
 	AGE_UNLOCK(sc);
 
@@ -368,7 +344,7 @@ age_get_macaddr(struct age_softc *sc)
 		CSR_WRITE_4(sc, AGE_SPI_CTRL, reg);
 	}
 
-	if (pci_find_extcap(sc->age_dev, PCIY_VPD, &vpdc) == 0) {
+	if (pci_find_cap(sc->age_dev, PCIY_VPD, &vpdc) == 0) {
 		/*
 		 * PCI VPD capability found, let TWSI reload EEPROM.
 		 * This will set ethernet address of controller.
@@ -440,9 +416,6 @@ age_phy_reset(struct age_softc *sc)
 		reg = age_miibus_readreg(sc->age_dev, sc->age_phyaddr,
 		    ATPHY_CDTS);
 		if ((reg & PHY_CDTS_STAT_MASK) != PHY_CDTS_STAT_OPEN) {
-#if 1
-			device_printf(sc->age_dev, "link found!\n");
-#endif
 			linkup++;
 			break;
 		}
@@ -450,9 +423,6 @@ age_phy_reset(struct age_softc *sc)
 	age_miibus_writereg(sc->age_dev, sc->age_phyaddr, MII_BMCR,
 	    BMCR_RESET | BMCR_AUTOEN | BMCR_STARTNEG);
 	if (linkup == 0) {
-#if 1
-		device_printf(sc->age_dev, "waking up PHY\n");
-#endif
 		age_miibus_writereg(sc->age_dev, sc->age_phyaddr,
 		    ATPHY_DBG_ADDR, 0);
 		age_miibus_writereg(sc->age_dev, sc->age_phyaddr,
@@ -591,7 +561,7 @@ age_attach(device_t dev)
 
 
 	/* Get DMA parameters from PCIe device control register. */
-	if (pci_find_extcap(dev, PCIY_EXPRESS, &i) == 0) {
+	if (pci_find_cap(dev, PCIY_EXPRESS, &i) == 0) {
 		sc->age_flags |= AGE_FLAG_PCIE;
 		burst = pci_read_config(dev, i + 0x08, 2);
 		/* Max read request size. */
@@ -638,31 +608,32 @@ age_attach(device_t dev)
 	IFQ_SET_READY(&ifp->if_snd);
 	ifp->if_capabilities = IFCAP_HWCSUM | IFCAP_TSO4;
 	ifp->if_hwassist = AGE_CSUM_FEATURES | CSUM_TSO;
-	if (pci_find_extcap(dev, PCIY_PMG, &pmc) == 0) {
+	if (pci_find_cap(dev, PCIY_PMG, &pmc) == 0) {
 		sc->age_flags |= AGE_FLAG_PMCAP;
 		ifp->if_capabilities |= IFCAP_WOL_MAGIC | IFCAP_WOL_MCAST;
 	}
 	ifp->if_capenable = ifp->if_capabilities;
 
 	/* Set up MII bus. */
-	if ((error = mii_phy_probe(dev, &sc->age_miibus, age_mediachange,
-	    age_mediastatus)) != 0) {
-		device_printf(dev, "no PHY found!\n");
+	error = mii_attach(dev, &sc->age_miibus, ifp, age_mediachange,
+	    age_mediastatus, BMSR_DEFCAPMASK, sc->age_phyaddr, MII_OFFSET_ANY,
+	    0);
+	if (error != 0) {
+		device_printf(dev, "attaching PHYs failed\n");
 		goto fail;
 	}
 
 	ether_ifattach(ifp, sc->age_eaddr);
 
 	/* VLAN capability setup. */
-	ifp->if_capabilities |= IFCAP_VLAN_MTU;
-	ifp->if_capabilities |= IFCAP_VLAN_HWTAGGING | IFCAP_VLAN_HWCSUM;
+	ifp->if_capabilities |= IFCAP_VLAN_MTU | IFCAP_VLAN_HWTAGGING |
+	    IFCAP_VLAN_HWCSUM | IFCAP_VLAN_HWTSO;
 	ifp->if_capenable = ifp->if_capabilities;
 
 	/* Tell the upper layer(s) we support long frames. */
 	ifp->if_data.ifi_hdrlen = sizeof(struct ether_vlan_header);
 
 	/* Create local taskq. */
-	TASK_INIT(&sc->age_tx_task, 1, age_tx_task, ifp);
 	sc->age_tq = taskqueue_create_fast("age_taskq", M_WAITOK,
 	    taskqueue_thread_enqueue, &sc->age_tq);
 	if (sc->age_tq == NULL) {
@@ -719,7 +690,6 @@ age_detach(device_t dev)
 		AGE_UNLOCK(sc);
 		callout_drain(&sc->age_tick_ch);
 		taskqueue_drain(sc->age_tq, &sc->age_int_task);
-		taskqueue_drain(sc->age_tq, &sc->age_tx_task);
 		taskqueue_drain(taskqueue_swi, &sc->age_link_task);
 		ether_ifdetach(ifp);
 	}
@@ -1120,11 +1090,14 @@ again:
 	 * Create Tx/Rx buffer parent tag.
 	 * L1 supports full 64bit DMA addressing in Tx/Rx buffers
 	 * so it needs separate parent DMA tag.
+	 * XXX
+	 * It seems enabling 64bit DMA causes data corruption. Limit
+	 * DMA address space to 32bit.
 	 */
 	error = bus_dma_tag_create(
 	    bus_get_dma_tag(sc->age_dev), /* parent */
 	    1, 0,			/* alignment, boundary */
-	    BUS_SPACE_MAXADDR,		/* lowaddr */
+	    BUS_SPACE_MAXADDR_32BIT,	/* lowaddr */
 	    BUS_SPACE_MAXADDR,		/* highaddr */
 	    NULL, NULL,			/* filter, filterarg */
 	    BUS_SPACE_MAXSIZE_32BIT,	/* maxsize */
@@ -1357,7 +1330,7 @@ age_setwol(struct age_softc *sc)
 
 	AGE_LOCK_ASSERT(sc);
 
-	if (pci_find_extcap(sc->age_dev, PCIY_PMG, &pmc) != 0) {
+	if (pci_find_cap(sc->age_dev, PCIY_PMG, &pmc) != 0) {
 		CSR_WRITE_4(sc, AGE_WOL_CFG, 0);
 		/*
 		 * No PME capability, PHY power down.
@@ -1434,7 +1407,7 @@ age_setwol(struct age_softc *sc)
 				DELAY(1);
 #else				
 				pause("agelnk", hz);
-#endif				
+#endif
 				AGE_LOCK(sc);
 			}
 			if (i == MII_ANEGTICKS_GIGE)
@@ -1502,23 +1475,11 @@ age_resume(device_t dev)
 {
 	struct age_softc *sc;
 	struct ifnet *ifp;
-	uint16_t cmd;
 
 	sc = device_get_softc(dev);
 
 	AGE_LOCK(sc);
-	/*
-	 * Clear INTx emulation disable for hardwares that
-	 * is set in resume event. From Linux.
-	 */
-	cmd = pci_read_config(sc->age_dev, PCIR_COMMAND, 2);
-	if ((cmd & 0x0400) != 0) {
-		cmd &= ~0x0400;
-		pci_write_config(sc->age_dev, PCIR_COMMAND, cmd, 2);
-	}
-	AGE_UNLOCK(sc);
 	age_phy_reset(sc);
-	AGE_LOCK(sc);
 	ifp = sc->age_ifp;
 	if ((ifp->if_flags & IFF_UP) != 0)
 		age_init_locked(sc);
@@ -1605,6 +1566,7 @@ age_encap(struct age_softc *sc, struct mbuf **m_head)
 				*m_head = NULL;
 				return (ENOBUFS);
 			}
+			ip = (struct ip *)(mtod(m, char *) + ip_off);
 			tcp = (struct tcphdr *)(mtod(m, char *) + poff);
 			/*
 			 * L1 requires IP/TCP header size and offset as
@@ -1669,22 +1631,8 @@ age_encap(struct age_softc *sc, struct mbuf **m_head)
 	}
 
 	m = *m_head;
-	/* Configure Tx IP/TCP/UDP checksum offload. */
-	if ((m->m_pkthdr.csum_flags & AGE_CSUM_FEATURES) != 0) {
-		cflags |= AGE_TD_CSUM;
-		if ((m->m_pkthdr.csum_flags & CSUM_TCP) != 0)
-			cflags |= AGE_TD_TCPCSUM;
-		if ((m->m_pkthdr.csum_flags & CSUM_UDP) != 0)
-			cflags |= AGE_TD_UDPCSUM;
-		/* Set checksum start offset. */
-		cflags |= (poff << AGE_TD_CSUM_PLOADOFFSET_SHIFT);
-		/* Set checksum insertion position of TCP/UDP. */
-		cflags |= ((poff + m->m_pkthdr.csum_data) <<
-		    AGE_TD_CSUM_XSUMOFFSET_SHIFT);
-	}
-
-	/* Configure TSO. */
 	if ((m->m_pkthdr.csum_flags & CSUM_TSO) != 0) {
+		/* Configure TSO. */
 		if (poff + (tcp->th_off << 2) == m->m_pkthdr.len) {
 			/* Not TSO but IP/TCP checksum offload. */
 			cflags |= AGE_TD_IPCSUM | AGE_TD_TCPCSUM;
@@ -1700,6 +1648,18 @@ age_encap(struct age_softc *sc, struct mbuf **m_head)
 		/* Set IP/TCP header size. */
 		cflags |= ip->ip_hl << AGE_TD_IPHDR_LEN_SHIFT;
 		cflags |= tcp->th_off << AGE_TD_TSO_TCPHDR_LEN_SHIFT;
+	} else if ((m->m_pkthdr.csum_flags & AGE_CSUM_FEATURES) != 0) {
+		/* Configure Tx IP/TCP/UDP checksum offload. */
+		cflags |= AGE_TD_CSUM;
+		if ((m->m_pkthdr.csum_flags & CSUM_TCP) != 0)
+			cflags |= AGE_TD_TCPCSUM;
+		if ((m->m_pkthdr.csum_flags & CSUM_UDP) != 0)
+			cflags |= AGE_TD_UDPCSUM;
+		/* Set checksum start offset. */
+		cflags |= (poff << AGE_TD_CSUM_PLOADOFFSET_SHIFT);
+		/* Set checksum insertion position of TCP/UDP. */
+		cflags |= ((poff + m->m_pkthdr.csum_data) <<
+		    AGE_TD_CSUM_XSUMOFFSET_SHIFT);
 	}
 
 	/* Configure VLAN hardware tag insertion. */
@@ -1749,16 +1709,18 @@ age_encap(struct age_softc *sc, struct mbuf **m_head)
 }
 
 static void
-age_tx_task(void *arg, int pending)
+age_start(struct ifnet *ifp)
 {
-	struct ifnet *ifp;
+        struct age_softc *sc;
 
-	ifp = (struct ifnet *)arg;
-	age_start(ifp);
+	sc = ifp->if_softc;
+	AGE_LOCK(sc);
+	age_start_locked(ifp);
+	AGE_UNLOCK(sc);
 }
 
 static void
-age_start(struct ifnet *ifp)
+age_start_locked(struct ifnet *ifp)
 {
         struct age_softc *sc;
         struct mbuf *m_head;
@@ -1766,13 +1728,11 @@ age_start(struct ifnet *ifp)
 
 	sc = ifp->if_softc;
 
-	AGE_LOCK(sc);
+	AGE_LOCK_ASSERT(sc);
 
 	if ((ifp->if_drv_flags & (IFF_DRV_RUNNING | IFF_DRV_OACTIVE)) !=
-	    IFF_DRV_RUNNING || (sc->age_flags & AGE_FLAG_LINK) == 0) {
-		AGE_UNLOCK(sc);
+	    IFF_DRV_RUNNING || (sc->age_flags & AGE_FLAG_LINK) == 0)
 		return;
-	}
 
 	for (enq = 0; !IFQ_DRV_IS_EMPTY(&ifp->if_snd); ) {
 		IFQ_DRV_DEQUEUE(&ifp->if_snd, m_head);
@@ -1805,8 +1765,6 @@ age_start(struct ifnet *ifp)
 		/* Set a timeout in case the chip goes out to lunch. */
 		sc->age_watchdog_timer = AGE_TX_TIMEOUT;
 	}
-
-	AGE_UNLOCK(sc);
 }
 
 static void
@@ -1823,6 +1781,7 @@ age_watchdog(struct age_softc *sc)
 	if ((sc->age_flags & AGE_FLAG_LINK) == 0) {
 		if_printf(sc->age_ifp, "watchdog timeout (missed link)\n");
 		ifp->if_oerrors++;
+		ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 		age_init_locked(sc);
 		return;
 	}
@@ -1830,14 +1789,15 @@ age_watchdog(struct age_softc *sc)
 		if_printf(sc->age_ifp,
 		    "watchdog timeout (missed Tx interrupts) -- recovering\n");
 		if (!IFQ_DRV_IS_EMPTY(&ifp->if_snd))
-			taskqueue_enqueue(sc->age_tq, &sc->age_tx_task);
+			age_start_locked(ifp);
 		return;
 	}
 	if_printf(sc->age_ifp, "watchdog timeout\n");
 	ifp->if_oerrors++;
+	ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 	age_init_locked(sc);
 	if (!IFQ_DRV_IS_EMPTY(&ifp->if_snd))
-		taskqueue_enqueue(sc->age_tq, &sc->age_tx_task);
+		age_start_locked(ifp);
 }
 
 static int
@@ -1859,8 +1819,10 @@ age_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 		else if (ifp->if_mtu != ifr->ifr_mtu) {
 			AGE_LOCK(sc);
 			ifp->if_mtu = ifr->ifr_mtu;
-			if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0)
+			if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0) {
+				ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 				age_init_locked(sc);
+			}
 			AGE_UNLOCK(sc);
 		}
 		break;
@@ -1929,29 +1891,19 @@ age_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 		if ((mask & IFCAP_WOL_MAGIC) != 0 &&
 		    (ifp->if_capabilities & IFCAP_WOL_MAGIC) != 0)
 			ifp->if_capenable ^= IFCAP_WOL_MAGIC;
-
-		if ((mask & IFCAP_VLAN_HWTAGGING) != 0 &&
-		    (ifp->if_capabilities & IFCAP_VLAN_HWTAGGING) != 0) {
-			ifp->if_capenable ^= IFCAP_VLAN_HWTAGGING;
-			age_rxvlan(sc);
-		}
 		if ((mask & IFCAP_VLAN_HWCSUM) != 0 &&
 		    (ifp->if_capabilities & IFCAP_VLAN_HWCSUM) != 0)
 			ifp->if_capenable ^= IFCAP_VLAN_HWCSUM;
 		if ((mask & IFCAP_VLAN_HWTSO) != 0 &&
 		    (ifp->if_capabilities & IFCAP_VLAN_HWTSO) != 0)
 			ifp->if_capenable ^= IFCAP_VLAN_HWTSO;
-		/*
-		 * VLAN hardware tagging is required to do checksum
-		 * offload or TSO on VLAN interface. Checksum offload
-		 * on VLAN interface also requires hardware assistance
-		 * of parent interface.
-		 */
-		if ((ifp->if_capenable & IFCAP_TXCSUM) == 0)
-			ifp->if_capenable &= ~IFCAP_VLAN_HWCSUM;
-		if ((ifp->if_capenable & IFCAP_VLAN_HWTAGGING) == 0)
-			ifp->if_capenable &=
-			    ~(IFCAP_VLAN_HWTSO | IFCAP_VLAN_HWCSUM);
+		if ((mask & IFCAP_VLAN_HWTAGGING) != 0 &&
+		    (ifp->if_capabilities & IFCAP_VLAN_HWTAGGING) != 0) {
+			ifp->if_capenable ^= IFCAP_VLAN_HWTAGGING;
+			if ((ifp->if_capenable & IFCAP_VLAN_HWTAGGING) == 0)
+				ifp->if_capenable &= ~IFCAP_VLAN_HWTSO;
+			age_rxvlan(sc);
+		}
 		AGE_UNLOCK(sc);
 		VLAN_CAPABILITIES(ifp);
 		break;
@@ -2217,10 +2169,11 @@ age_int_task(void *arg, int pending)
 			if ((status & INTR_DMA_WR_TO_RST) != 0)
 				device_printf(sc->age_dev,
 				    "DMA write error! -- resetting\n");
+			ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 			age_init_locked(sc);
 		}
 		if (!IFQ_DRV_IS_EMPTY(&ifp->if_snd))
-			taskqueue_enqueue(sc->age_tq, &sc->age_tx_task);
+			age_start_locked(ifp);
 		if ((status & INTR_SMB) != 0)
 			age_stats_update(sc);
 	}
@@ -2473,6 +2426,8 @@ age_rxintr(struct age_softc *sc, int rr_prod, int count)
 	bus_dmamap_sync(sc->age_cdata.age_rr_ring_tag,
 	    sc->age_cdata.age_rr_ring_map,
 	    BUS_DMASYNC_POSTREAD | BUS_DMASYNC_POSTWRITE);
+	bus_dmamap_sync(sc->age_cdata.age_rx_ring_tag,
+	    sc->age_cdata.age_rx_ring_map, BUS_DMASYNC_POSTWRITE);
 
 	for (prog = 0; rr_cons != rr_prod; prog++) {
 		if (count <= 0)
@@ -2504,6 +2459,8 @@ age_rxintr(struct age_softc *sc, int rr_prod, int count)
 		/* Update the consumer index. */
 		sc->age_cdata.age_rr_cons = rr_cons;
 
+		bus_dmamap_sync(sc->age_cdata.age_rx_ring_tag,
+		    sc->age_cdata.age_rx_ring_map, BUS_DMASYNC_PREWRITE);
 		/* Sync descriptors. */
 		bus_dmamap_sync(sc->age_cdata.age_rr_ring_tag,
 		    sc->age_cdata.age_rr_ring_map,
@@ -2580,6 +2537,9 @@ age_init_locked(struct age_softc *sc)
 
 	ifp = sc->age_ifp;
 	mii = device_get_softc(sc->age_miibus);
+
+	if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0)
+		return;
 
 	/*
 	 * Cancel any pending I/O.
@@ -3027,8 +2987,7 @@ age_init_rx_ring(struct age_softc *sc)
 	}
 
 	bus_dmamap_sync(sc->age_cdata.age_rx_ring_tag,
-	    sc->age_cdata.age_rx_ring_map,
-	    BUS_DMASYNC_PREREAD | BUS_DMASYNC_PREWRITE);
+	    sc->age_cdata.age_rx_ring_map, BUS_DMASYNC_PREWRITE);
 
 	return (0);
 }
@@ -3168,15 +3127,15 @@ age_rxfilter(struct age_softc *sc)
 	/* Program new filter. */
 	bzero(mchash, sizeof(mchash));
 
-	IF_ADDR_LOCK(ifp);
+	if_maddr_rlock(ifp);
 	TAILQ_FOREACH(ifma, &sc->age_ifp->if_multiaddrs, ifma_link) {
 		if (ifma->ifma_addr->sa_family != AF_LINK)
 			continue;
-		crc = ether_crc32_le(LLADDR((struct sockaddr_dl *)
+		crc = ether_crc32_be(LLADDR((struct sockaddr_dl *)
 		    ifma->ifma_addr), ETHER_ADDR_LEN);
 		mchash[crc >> 31] |= 1 << ((crc >> 26) & 0x1f);
 	}
-	IF_ADDR_UNLOCK(ifp);
+	if_maddr_runlock(ifp);
 
 	CSR_WRITE_4(sc, AGE_MAR0, mchash[0]);
 	CSR_WRITE_4(sc, AGE_MAR1, mchash[1]);
@@ -3200,8 +3159,7 @@ sysctl_age_stats(SYSCTL_HANDLER_ARGS)
 		return (error);
 
 	sc = (struct age_softc *)arg1;
-	stats = &sc->age_stat; 
-#if 0
+	stats = &sc->age_stat;
 	printf("%s statistics:\n", device_get_nameunit(sc->age_dev));
 	printf("Transmit good frames : %ju\n",
 	    (uintmax_t)stats->tx_frames);
@@ -3302,7 +3260,6 @@ sysctl_age_stats(SYSCTL_HANDLER_ARGS)
 	    stats->rx_alignerrs);
 	printf("Receive frames dropped due to address filtering : %ju\n",
 	    (uint64_t)stats->rx_pkts_filtered);
-#endif
 
 	return (error);
 }

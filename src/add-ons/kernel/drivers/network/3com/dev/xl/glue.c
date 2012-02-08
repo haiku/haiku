@@ -18,8 +18,8 @@
 HAIKU_FBSD_DRIVER_GLUE(3com, xl, pci);
 
 extern driver_t *DRIVER_MODULE_NAME(bmtphy, miibus);
-extern driver_t *DRIVER_MODULE_NAME(xlphy, miibus);
 extern driver_t *DRIVER_MODULE_NAME(ukphy, miibus);
+extern driver_t *DRIVER_MODULE_NAME(xlphy, miibus);
 
 
 driver_t *
@@ -27,8 +27,8 @@ __haiku_select_miibus_driver(device_t dev)
 {
 	driver_t *drivers[] = {
 		DRIVER_MODULE_NAME(bmtphy, miibus),
-		DRIVER_MODULE_NAME(xlphy, miibus),
 		DRIVER_MODULE_NAME(ukphy, miibus),
+		DRIVER_MODULE_NAME(xlphy, miibus),
 		NULL
 	};
 
