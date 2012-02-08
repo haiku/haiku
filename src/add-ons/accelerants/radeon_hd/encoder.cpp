@@ -282,7 +282,15 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
 		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
-			if (info.dceMajor >= 4) {
+			if ((info.chipsetFlags & CHIP_APU) != 0) {
+				// aka DCE 4.1
+				// Setup DIG encoder
+				encoder_dig_setup(connectorIndex, pixelClock,
+					ATOM_ENCODER_CMD_SETUP);
+				// Enable DIG transmitter
+				transmitter_dig_setup(connectorIndex, pixelClock, 0, 0,
+					ATOM_TRANSMITTER_ACTION_ENABLE);
+			} else if (info.dceMajor >= 4) {
 				// Disable DIG transmitter
 				transmitter_dig_setup(connectorIndex, pixelClock, 0, 0,
 					ATOM_TRANSMITTER_ACTION_DISABLE);
@@ -316,7 +324,8 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 	}
 
 	if (gConnector[connectorIndex]->encoder.isExternal == true) {
-		if (info.dceMajor >= 4 && info.dceMinor >= 1) {
+		if ((info.chipsetFlags & CHIP_APU) != 0) {
+			// aka DCE 4.1
 			encoder_external_setup(connectorIndex, pixelClock,
 				EXTERNAL_ENCODER_ACTION_V3_ENCODER_SETUP);
 		} else {
@@ -1516,7 +1525,9 @@ encoder_dpms_set_dig(uint8 crtcID, int mode)
 	switch (mode) {
 		case B_DPMS_ON:
 			if (info.chipsetID == RADEON_RV710
-				|| info.chipsetID == RADEON_RV730) {
+				|| info.chipsetID == RADEON_RV730
+				|| (info.chipsetFlags & CHIP_APU) != 0
+				|| info.dceMajor >= 5) {
 				transmitter_dig_setup(connectorIndex, pll->pixelClock, 0, 0,
 					ATOM_TRANSMITTER_ACTION_ENABLE);
 			} else {
@@ -1549,8 +1560,13 @@ encoder_dpms_set_dig(uint8 crtcID, int mode)
 		case B_DPMS_STAND_BY:
 		case B_DPMS_SUSPEND:
 		case B_DPMS_OFF:
-			transmitter_dig_setup(connectorIndex, pll->pixelClock, 0, 0,
-				ATOM_TRANSMITTER_ACTION_DISABLE_OUTPUT);
+			if ((info.chipsetFlags & CHIP_APU) != 0 || info.dceMajor >= 5) {
+				transmitter_dig_setup(connectorIndex, pll->pixelClock, 0, 0,
+					ATOM_TRANSMITTER_ACTION_DISABLE);
+			} else {
+				transmitter_dig_setup(connectorIndex, pll->pixelClock, 0, 0,
+					ATOM_TRANSMITTER_ACTION_DISABLE_OUTPUT);
+			}
 			if (connector_is_dp(connectorIndex)) {
 				if (info.dceMajor >= 4) {
 					encoder_dig_setup(connectorIndex, pll->pixelClock,
