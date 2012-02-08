@@ -57,7 +57,7 @@ public:
 
   /* Get or set the minimum delay between sending out successive buffers.
    * Although the StreamManager automatically shuts down when there
-   * are no more subscribers, setting the minumum delay can prevent
+   * are no more subscribers, setting the minimum delay can prevent
    * prevent runaway streams.  A zero or negative value means no
    * delay.
    */

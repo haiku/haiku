@@ -83,7 +83,7 @@ Unregister(const BMessenger& notifyHandler, const media_node& node,
 }
 
 
-/*!	Transmits the error code specified by \a what to anyone who's receiving
+/*!	Transmits the error code specified by \a what to anyone whose receiving
 	notifications from this node. If \a info isn't \c NULL, it's used as a
 	model message for the error notification message.
 	The message field "be:node_id" will contain the node ID.

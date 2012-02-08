@@ -858,7 +858,7 @@ BTextView::FrameResized(float width, float height)
 
 
 /*! \brief Highlight/unhighlight the selection when the view gets
-		or looses the focus.
+		or loses the focus.
 	\param focusState The focus state: true, if the view is getting the focus,
 		false otherwise.
 */

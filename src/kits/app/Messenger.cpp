@@ -203,7 +203,7 @@ BMessenger::Target(BLooper** _looper) const
 
 	\see BLooper::Lock() for details.
 
-	\return \c true, if the looper could be locked sucessfully, \c false, if
+	\return \c true, if the looper could be locked successfully, \c false, if
 			the messenger is not properly initialized, the target is remote,
 			or the targeted looper is invalid.
 */
@@ -232,7 +232,7 @@ BMessenger::LockTarget() const
 	\see BLooper::LockWithTimeout() for details.
 
 	\return
-	- \c B_OK, if the looper could be locked sucessfully,
+	- \c B_OK, if the looper could be locked successfully,
 	- \c B_BAD_VALUE, if the messenger is not properly initialized,
 	  the target is remote, or the targeted looper is invalid,
 	- other error codes returned by BLooper::LockWithTimeout().

@@ -402,7 +402,7 @@ BApplication::_InitData(const char *signature, bool initGUI, status_t *_error)
 			// TODO: When BLooper::AddMessage() is done, use that instead of
 			// PostMessage().
 
-			DBG(OUT("info: BApplication sucessfully registered.\n"));
+			DBG(OUT("info: BApplication successfully registered.\n"));
 
 			if (__libc_argc > 1) {
 				BMessage argvMessage(B_ARGV_RECEIVED);

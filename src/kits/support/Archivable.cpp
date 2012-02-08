@@ -786,7 +786,7 @@ find_instantiation_func(BMessage* archive)
 }
 
 
-// BArchivable binary compatability
+// BArchivable binary compatibility
 #if __GNUC__ == 2
 
 
