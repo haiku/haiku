@@ -73,6 +73,34 @@ Device::~Device()
 }
 
 
+BString
+Device::GetName()
+{
+	return fAttributeMap[B_TRANSLATE("Device name")];
+}
+
+
+BString
+Device::GetManufacturer()
+{
+	return fAttributeMap[B_TRANSLATE("Manufacturer")];
+}
+
+
+BString
+Device::GetDriverUsed()
+{
+	return fAttributeMap[B_TRANSLATE("Driver used")];
+}
+
+
+BString
+Device::GetDevPathsPublished()
+{
+	return fAttributeMap[B_TRANSLATE("Device paths")];
+}
+
+
 void
 Device::SetAttribute(const BString& name, const BString& value)
 {
