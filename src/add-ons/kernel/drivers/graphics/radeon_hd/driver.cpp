@@ -251,14 +251,16 @@ const struct supported_device {
 	{0x671C, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD CAYMAN"},
 	{0x671F, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD 6900"},
 	//  Antilles
-	{0x671d, 5, 0, RADEON_ANTILLES, CHIP_STD, "Radeon HD 6990"}
+	{0x671d, 5, 0, RADEON_ANTILLES, CHIP_STD, "Radeon HD 6990"},
 
 	// Marketing Names: Radeon HD 74xx - HD 79xx
-	// Introduced: 2011?
+	// Introduced: Late 2011
 	// Codename: Southern Islands
 	//  Lombok
 	//  Thames
 	//  Tahiti
+	{0x679A, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD 7950"},
+	{0x6798, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD 7970"}
 	//  New Zealand
 };
 
