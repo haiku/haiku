@@ -1,16 +1,17 @@
-/* 
- * Copyright 2001-2007, Haiku Inc.
+/*
+ * Copyright 2001-2012 Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
  * Authors:
  *		Christopher ML Zumwalt May (zummy@users.sf.net)
  *		Jérôme Duval
- * 
- * Distributed under the terms of the MIT License.
  */
 
-#include <string.h>
+
+#include <PushGameSound.h>
 
 #include <List.h>
-#include <PushGameSound.h>
+#include <string.h>
 
 #include "GSUtility.h"
 
@@ -18,7 +19,7 @@
 BPushGameSound::BPushGameSound(size_t inBufferFrameCount,
 	const gs_audio_format *format, size_t inBufferCount,
 	BGameSoundDevice *device)
- 	:
+	:
 	BStreamingGameSound(inBufferFrameCount, format, inBufferCount, device),
 	fLockPos(0),
 	fPlayPos(0)
@@ -26,11 +27,11 @@ BPushGameSound::BPushGameSound(size_t inBufferFrameCount,
 	fPageLocked = new BList;
 
 	size_t frameSize = get_sample_size(format->format) * format->channel_count;
-	
+
 	fPageCount = inBufferCount;
-	fPageSize = frameSize * inBufferFrameCount;	
+	fPageSize = frameSize * inBufferFrameCount;
 	fBufferSize = fPageSize * fPageCount;
-	
+
 	fBuffer = new char[fBufferSize];
 }
 
@@ -57,28 +58,28 @@ BPushGameSound::~BPushGameSound()
 
 BPushGameSound::lock_status
 BPushGameSound::LockNextPage(void **out_pagePtr, size_t *out_pageSize)
-{	
+{
 	// the user can not lock every page
 	if (fPageLocked->CountItems() > fPageCount - 3)
 		return lock_failed;
-	
+
 	// the user cann't lock a page being played
 	if (fLockPos < fPlayPos
 		&& fLockPos + fPageSize > fPlayPos)
 		return lock_failed;
-	
+
 	// lock the page
 	char * lockPage = &fBuffer[fLockPos];
 	fPageLocked->AddItem(lockPage);
-	
+
 	// move the locker to the next page
 	fLockPos += fPageSize;
 	if (fLockPos > fBufferSize)
 		fLockPos = 0;
-	
+
 	*out_pagePtr = lockPage;
 	*out_pageSize = fPageSize;
-	
+
 	return lock_ok;
 }
 
@@ -119,7 +120,7 @@ BPushGameSound::Clone() const
 	gs_audio_format format = Format();
 	size_t frameSize = get_sample_size(format.format) * format.channel_count;
 	size_t bufferFrameCount = fPageSize / frameSize;
-	
+
 	return new BPushGameSound(bufferFrameCount, &format, fPageCount, Device());
 }
 
@@ -133,8 +134,7 @@ BPushGameSound::Perform(int32 selector, void *data)
 
 status_t
 BPushGameSound::SetParameters(size_t inBufferFrameCount,
-							  const gs_audio_format *format,
-							  size_t inBufferCount)
+	const gs_audio_format *format, size_t inBufferCount)
 {
 	return B_UNSUPPORTED;
 }
@@ -150,65 +150,66 @@ BPushGameSound::SetStreamHook(void (*hook)(void * inCookie, void * inBuffer,
 
 void
 BPushGameSound::FillBuffer(void *inBuffer, size_t inByteCount)
-{	
+{
 	size_t bytes = inByteCount;
-	
+
 	if (!BytesReady(&bytes))
 		return;
-	
+
 	if (fPlayPos + bytes > fBufferSize) {
 		size_t remainder = fBufferSize - fPlayPos;
 			// Space left in buffer
 		char * buffer = (char*)inBuffer;
-		
+
 		// fill the buffer with the samples left at the end of our buffer
 		memcpy(buffer, &fBuffer[fPlayPos], remainder);
 		fPlayPos = 0;
-		
+
 		// fill the remainder of the buffer by looping to the start
 		// of the buffer if it isn't locked
 		bytes -= remainder;
 		if (BytesReady(&bytes)) {
 			memcpy(&buffer[remainder], fBuffer, bytes);
 			fPlayPos += bytes;
-		}	
+		}
 	} else {
 		memcpy(inBuffer, &fBuffer[fPlayPos], bytes);
 		fPlayPos += bytes;
 	}
-	
+
 	BStreamingGameSound::FillBuffer(inBuffer, inByteCount);
 }
 
 
 bool
 BPushGameSound::BytesReady(size_t * bytes)
-{	
+{
 	if (fPageLocked->CountItems() <= 0)
 		return true;
-	
+
 	size_t start = fPlayPos;
 	size_t ready = fPlayPos;
 	int32 page = int32(start / fPageSize);
-	
+
 	// return if there is nothing to do
-	if (fPageLocked->HasItem(&fBuffer[page * fPageSize])) 
+	if (fPageLocked->HasItem(&fBuffer[page * fPageSize]))
 		return false;
-	
+
 	while (ready < *bytes) {
 		ready += fPageSize;
 		page = int32(ready / fPageSize);
-		
+
 		if (fPageLocked->HasItem(&fBuffer[page * fPageSize])) {
 			// we have found a locked page
 			*bytes = ready - start - (ready - page * fPageSize);
 			return true;
 		}
-	}	
-	
+	}
+
 	// all of the bytes are ready
 	return true;
 }
+
 
 /* unimplemented for protection of the user:
  *
@@ -384,5 +385,3 @@ BPushGameSound::_Reserved_BPushGameSound_23(int32 arg, ...)
 {
 	return B_ERROR;
 }
-
-

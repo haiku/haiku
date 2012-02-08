@@ -23,32 +23,35 @@
 //	Author:			Christopher ML Zumwalt May (zummy@users.sf.net)
 //	Description:	Utility functions used by sound system
 //------------------------------------------------------------------------------
-
 #ifndef _GAMESOUND_UTILITY_H
 #define _GAMESOUND_UTILITY_H
+
 
 #include <GameSoundDefs.h>
 #include <MediaDefs.h>
 
 
-struct _gs_ramp 
+struct _gs_ramp
 {
 	float inc;
 	float orignal;
-	float* value; 
-	
+	float* value;
+
 	float frame_total;
 	float frame_inc;
-	 
+
 	float frame_count;
 	float frame_inc_count;
-	
+
 	bigtime_t duration;
 };
 
-_gs_ramp* 	InitRamp(float* value, float set, float frames, bigtime_t duration);
-bool 		ChangeRamp(_gs_ramp* ramp);
-size_t		get_sample_size(int32 format);
-void 		media_to_gs_format(gs_audio_format * dest, media_raw_audio_format * source);
+
+_gs_ramp* InitRamp(float* value, float set, float frames, bigtime_t duration);
+bool ChangeRamp(_gs_ramp* ramp);
+size_t get_sample_size(int32 format);
+void media_to_gs_format(gs_audio_format* dest,
+	media_raw_audio_format* source);
+
 
 #endif

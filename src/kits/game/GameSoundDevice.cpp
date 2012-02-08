@@ -26,6 +26,9 @@
 //					this time. Use at your own risk.
 //------------------------------------------------------------------------------
 
+
+#include "GameSoundDevice.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -33,15 +36,15 @@
 #include <Autolock.h>
 #include <List.h>
 #include <Locker.h>
-#include <MediaRoster.h>
 #include <MediaAddOn.h>
-#include <TimeSource.h>
+#include <MediaRoster.h>
 #include <MediaTheme.h>
+#include <TimeSource.h>
 
-#include "GSUtility.h"
-#include "GameSoundDevice.h"
 #include "GameSoundBuffer.h"
 #include "GameProducer.h"
+#include "GSUtility.h"
+
 
 // BGameSoundDevice definitions ------------------------------------
 const int32 kInitSoundCount = 32;

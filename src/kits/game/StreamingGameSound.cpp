@@ -25,29 +25,33 @@
 //					(data not known beforehand) game sounds.
 //------------------------------------------------------------------------------
 
-#include "GameSoundDevice.h"
+
 #include "StreamingGameSound.h"
+
+#include "GameSoundDevice.h"
 
 
 BStreamingGameSound::BStreamingGameSound(size_t inBufferFrameCount,
-										 const gs_audio_format *format,
-										 size_t inBufferCount,
-										 BGameSoundDevice *device)
- 	:	BGameSound(device),
- 		fStreamHook(NULL),
- 		fStreamCookie(NULL)
+	const gs_audio_format *format, size_t inBufferCount,
+	BGameSoundDevice *device)
+	:
+	BGameSound(device),
+	fStreamHook(NULL),
+	fStreamCookie(NULL)
 {
 	if (InitCheck() == B_OK) {
-		status_t error = SetParameters(inBufferFrameCount, format, inBufferCount);
+		status_t error = SetParameters(inBufferFrameCount, format,
+			inBufferCount);
 		SetInitError(error);
-	}	
+	}
 }
 
 
 BStreamingGameSound::BStreamingGameSound(BGameSoundDevice *device)
- 	:	BGameSound(device),
- 		fStreamHook(NULL),
- 		fStreamCookie(NULL)
+	:
+	BGameSound(device),
+	fStreamHook(NULL),
+	fStreamCookie(NULL)
 {
 }
 
@@ -65,12 +69,12 @@ BStreamingGameSound::Clone() const
 
 
 status_t
-BStreamingGameSound::SetStreamHook(void (*hook)(void * inCookie, void * inBuffer, size_t inByteCount, BStreamingGameSound * me),
-								   void * cookie)
+BStreamingGameSound::SetStreamHook(void (*hook)(void* inCookie, void* inBuffer,
+	size_t inByteCount, BStreamingGameSound * me), void * cookie)
 {
 	fStreamHook = hook;
 	fStreamCookie = cookie;
-	
+
 	return B_OK;
 }
 
@@ -79,20 +83,19 @@ void
 BStreamingGameSound::FillBuffer(void *inBuffer,
 								size_t inByteCount)
 {
-	if (fStreamHook) 
+	if (fStreamHook)
 		(fStreamHook)(fStreamCookie, inBuffer, inByteCount, this);
 }
 
 
 status_t
-BStreamingGameSound::Perform(int32 selector,
-							 void *data)
+BStreamingGameSound::Perform(int32 selector, void *data)
 {
 	return B_ERROR;
 }
 
 
-status_t			
+status_t
 BStreamingGameSound::SetAttributes(gs_attribute * inAttributes,
 									size_t inAttributeCount)
 {
@@ -102,14 +105,13 @@ BStreamingGameSound::SetAttributes(gs_attribute * inAttributes,
 
 status_t
 BStreamingGameSound::SetParameters(size_t inBufferFrameCount,
-						  const gs_audio_format *format,
-						  size_t inBufferCount)
+	const gs_audio_format *format, size_t inBufferCount)
 {
 	gs_id sound;
 	status_t error = Device()->CreateBuffer(&sound, this, format,
 		inBufferFrameCount, inBufferCount);
 	if (error != B_OK) return error;
-	
+
 	return BGameSound::Init(sound);
 }
 
@@ -302,5 +304,3 @@ BStreamingGameSound::_Reserved_BStreamingGameSound_23(int32 arg, ...)
 {
 	return B_ERROR;
 }
-
-
