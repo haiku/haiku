@@ -863,29 +863,17 @@ NetServer::_ConfigureIPv6LinkLocal(const char* name)
 	BNetworkInterface interface(name);
 	BNetworkAddress link;
 	status_t result = interface.GetHardwareAddress(link);
-	if (result != B_OK)
+
+	if (result != B_OK || link.LinkLevelAddressLength() != 6)
 		return;
 
-	BString macString = link.ToString();
-
-	int32 macLength = macString.Length();
-	if (macLength != 17) {
-		syslog(LOG_DEBUG, "%s: MacAddress length (%" B_PRIu32 ") for interface"
-			" '%s' is invalid\n", __func__, macLength, name);
-		return;
-	}
-
-	uint8 mac[6];
-	char* macBuffer = macString.LockBuffer(macLength);
-	sscanf(macBuffer, "%2hhx:%2hhx:%2hhx:%2hhx:%2hhx:%2hhx",
-		&mac[0], &mac[1], &mac[2], &mac[3], &mac[4], &mac[5]);
-	macString.UnlockBuffer(macLength);
+	const uint8* mac = link.LinkLevelAddress();
 
 	// Check for a few failure situations
 	static const char zeroMac[6] = {0, 0, 0, 0, 0, 0};
 	static const char fullMac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-	if (memcmp(macBuffer, zeroMac, 6) == 0
-		|| memcmp(macBuffer, fullMac, 6) == 0) {
+	if (memcmp(mac, zeroMac, 6) == 0
+		|| memcmp(mac, fullMac, 6) == 0) {
 		// Mac address is all 0 or all FF's
 		syslog(LOG_DEBUG, "%s: MacAddress for interface '%s' is invalid.",
 			__func__, name);
