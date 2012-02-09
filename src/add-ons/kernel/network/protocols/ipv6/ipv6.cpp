@@ -62,7 +62,7 @@ struct IPv6Header {
 
 	uint8 ProtocolVersion() const { return header.ip6_vfc & IPV6_VERSION_MASK; }
 	uint8 ServiceType() const { return ntohl(header.ip6_flow) >> 20;}
- 	uint16 PayloadLength() const { return ntohs(header.ip6_plen); }
+	uint16 PayloadLength() const { return ntohs(header.ip6_plen); }
 	const in6_addr& Dst() const { return header.ip6_dst; }
 	const in6_addr& Src() const { return header.ip6_src; }
 	uint8 NextHeader() const { return header.ip6_nxt; }
@@ -73,6 +73,7 @@ struct IPv6Header {
 typedef DoublyLinkedList<struct net_buffer,
 	DoublyLinkedListCLink<struct net_buffer> > FragmentList;
 
+
 // TODO: make common fragmentation interface for both address families
 struct ipv6_packet_key {
 	in6_addr	source;
@@ -81,6 +82,7 @@ struct ipv6_packet_key {
 	uint32		id;
 	uint32		protocol;
 };
+
 
 class FragmentPacket {
 public:
@@ -142,6 +144,7 @@ struct FragmentHashDefinition {
 	}
 };
 
+
 typedef BOpenHashTable<FragmentHashDefinition, false, true> FragmentTable;
 
 
@@ -151,8 +154,8 @@ public:
 							RawSocket(net_socket* socket);
 };
 
-typedef DoublyLinkedList<RawSocket> RawSocketList;
 
+typedef DoublyLinkedList<RawSocket> RawSocketList;
 
 typedef MulticastGroupInterface<IPv6Multicast> IPv6GroupInterface;
 typedef MulticastFilter<IPv6Multicast> IPv6MulticastFilter;
@@ -521,18 +524,21 @@ dump_ipv6_header(IPv6Header &header)
 
 
 /*!	Attempts to re-assemble fragmented packets.
-	\return B_OK if everything went well; if it could reassemble the packet, \a _buffer
-		will point to its buffer, otherwise, it will be \c NULL.
+	\return B_OK if everything went well; if it could reassemble the packet,
+		\a _buffer will point to its buffer, otherwise, it will be \c NULL.
 	\return various error codes if something went wrong (mostly B_NO_MEMORY)
 */
 static status_t
-reassemble_fragments(const IPv6Header &header, net_buffer** _buffer, uint16 offset)
+reassemble_fragments(const IPv6Header &header, net_buffer** _buffer,
+	uint16 offset)
 {
 	net_buffer* buffer = *_buffer;
 	status_t status;
 
 	ip6_frag fragmentHeader;
-	status = gBufferModule->read(buffer, offset, &fragmentHeader, sizeof(ip6_frag));
+	status = gBufferModule->read(buffer, offset, &fragmentHeader,
+		sizeof(ip6_frag));
+
 	if (status != B_OK)
 		return status;
 
@@ -645,8 +651,8 @@ send_fragments(ipv6_protocol* protocol, struct net_route* route,
 		bool lastFragment = bytesLeft == 0;
 
 		bufferHeader->header.ip6_nxt = IPPROTO_FRAGMENT;
-		bufferHeader->header.ip6_plen =
-			htons(fragmentLength + extensionHeadersLength);
+		bufferHeader->header.ip6_plen
+			= htons(fragmentLength + extensionHeadersLength);
 		bufferHeader.Sync();
 
 		ip6_frag fragmentHeader;
@@ -707,7 +713,7 @@ send_fragments(ipv6_protocol* protocol, struct net_route* route,
 
 static status_t
 deliver_multicast(net_protocol_module_info* module, net_buffer* buffer,
- 	bool deliverToRaw, net_interface *interface)
+	bool deliverToRaw, net_interface *interface)
 {
 	sockaddr_in6* multicastAddr = (sockaddr_in6*)buffer->destination;
 
@@ -733,7 +739,7 @@ deliver_multicast(net_protocol_module_info* module, net_buffer* buffer,
 
 static status_t
 deliver_multicast(net_protocol_module_info* module, net_buffer* buffer,
- 	bool deliverToRaw)
+	bool deliverToRaw)
 {
 	if (module->deliver_data == NULL)
 		return B_OK;
@@ -1061,7 +1067,7 @@ ipv6_getsockopt(net_protocol* _protocol, int level, int option, void* value,
 {
 	ipv6_protocol* protocol = (ipv6_protocol*)_protocol;
 
- 	if (level == IPPROTO_IPV6) {
+	if (level == IPPROTO_IPV6) {
 		// TODO: support more of these options
 
 		if (option == IPV6_MULTICAST_HOPS) {
@@ -1097,7 +1103,7 @@ ipv6_setsockopt(net_protocol* _protocol, int level, int option,
 {
 	ipv6_protocol* protocol = (ipv6_protocol*)_protocol;
 
- 	if (level == IPPROTO_IPV6) {
+	if (level == IPPROTO_IPV6) {
 		// TODO: support more of these options
 
 		if (option == IPV6_MULTICAST_IF) {
@@ -1155,8 +1161,8 @@ ipv6_setsockopt(net_protocol* _protocol, int level, int option,
 			if (user_memcpy(&mreq, value, sizeof(ipv6_mreq)) != B_OK)
 				return B_BAD_ADDRESS;
 
-			return ipv6_delta_membership(protocol, option, mreq.ipv6mr_interface,
-				&mreq.ipv6mr_multiaddr, NULL);
+			return ipv6_delta_membership(protocol, option,
+				mreq.ipv6mr_interface, &mreq.ipv6mr_multiaddr, NULL);
 		}
 
 		dprintf("IPv6::setsockopt(): set unknown option: %d\n", option);
@@ -1179,7 +1185,7 @@ ipv6_bind(net_protocol* protocol, const sockaddr* _address)
 	// only INADDR_ANY and addresses of local interfaces are accepted:
 	if (IN6_IS_ADDR_UNSPECIFIED(&address->sin6_addr)
 		|| IN6_IS_ADDR_MULTICAST(&address->sin6_addr)
- 		|| sDatalinkModule->is_local_address(sDomain, _address, NULL, NULL)) {
+		|| sDatalinkModule->is_local_address(sDomain, _address, NULL, NULL)) {
 		memcpy(&protocol->socket->address, address, sizeof(sockaddr_in6));
 		protocol->socket->address.ss_len = sizeof(sockaddr_in6);
 			// explicitly set length, as our callers can't be trusted to
@@ -1229,7 +1235,7 @@ ip6_select_hoplimit(net_protocol* _protocol, net_buffer* buffer)
 	if (protocol) {
 		return isMulticast ? protocol->multicast_time_to_live
 			: protocol->time_to_live;
- 	}
+	}
 	return isMulticast ? kDefaultMulticastTTL : kDefaultTTL;
 }
 
@@ -1261,7 +1267,7 @@ ipv6_send_routed_data(net_protocol* _protocol, struct net_route* route,
 		return EDESTADDRREQ;
 
 	if (IN6_IS_ADDR_MULTICAST(&destination.sin6_addr))
- 		buffer->flags |= MSG_MCAST;
+		buffer->flags |= MSG_MCAST;
 
 	uint16 dataLength = buffer->size;
 
@@ -1295,8 +1301,8 @@ ipv6_send_routed_data(net_protocol* _protocol, struct net_route* route,
 	// write the checksum for ICMPv6 sockets
 	if (protocolNumber == IPPROTO_ICMPV6
 		&& dataLength >= sizeof(struct icmp6_hdr)) {
-		NetBufferField<uint16,
-			sizeof(ip6_hdr) + offsetof(icmp6_hdr, icmp6_cksum)>
+		NetBufferField<uint16, sizeof(ip6_hdr)
+			+ offsetof(icmp6_hdr, icmp6_cksum)>
 			icmpChecksum(buffer);
 		// first make sure the existing checksum is zero
 		*icmpChecksum = 0;
@@ -1338,7 +1344,7 @@ ipv6_send_data(net_protocol* _protocol, net_buffer* buffer)
 		&& protocol->multicast_address != NULL) {
 		net_interface_address* address = sDatalinkModule->get_interface_address(
 			protocol->multicast_address);
- 		if (address == NULL || (address->interface->flags & IFF_UP) == 0) {
+		if (address == NULL || (address->interface->flags & IFF_UP) == 0) {
 			sDatalinkModule->put_interface_address(address);
 			return EADDRNOTAVAIL;
 		}
@@ -1482,7 +1488,9 @@ ipv6_receive_data(net_buffer* buffer)
 		return status;
 
 	// check for fragmentation
-	uint16 fragmentHeaderOffset = header.GetHeaderOffset(buffer, IPPROTO_FRAGMENT);
+	uint16 fragmentHeaderOffset
+		= header.GetHeaderOffset(buffer, IPPROTO_FRAGMENT);
+
 	if (fragmentHeaderOffset != 0) {
 		// this is a fragment
 		TRACE("  ipv6_receive_data(): Found a Fragment!");
@@ -1565,7 +1573,7 @@ ipv6_process_ancillary_data_no_container(net_protocol* _protocol,
 		if (msgControlLen < CMSG_SPACE(sizeof(int)))
 			return B_NO_MEMORY;
 
-		// use some default value (64 at the moment) when extracting the real one fails
+		// use some default value (64 at the moment) when the real one fails
 		int hopLimit = IPV6_DEFHLIM;
 
 		if (gBufferModule->stored_header_length(buffer)
@@ -1604,7 +1612,7 @@ ipv6_process_ancillary_data_no_container(net_protocol* _protocol,
 		struct in6_pktinfo pi;
 		memcpy(&pi.ipi6_addr,
 			&((struct sockaddr_in6*)buffer->destination)->sin6_addr,
-		 	sizeof(struct in6_addr));
+			sizeof(struct in6_addr));
 		if (buffer->interface_address != NULL
 			&& buffer->interface_address->interface != NULL)
 			pi.ipi6_ifindex = buffer->interface_address->interface->index;
