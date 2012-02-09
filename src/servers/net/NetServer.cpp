@@ -849,10 +849,6 @@ NetServer::_BringUpInterfaces()
 void
 NetServer::_ConfigureIPv6LinkLocal(const char* name)
 {
-	// Don't touch the loopback device
-	if (!strncmp(name, "loop", 4))
-		return;
-
 	int socket = ::socket(AF_INET6, SOCK_DGRAM, 0);
 	if (socket < 0) {
 		// No ipv6 support, skip
@@ -861,6 +857,11 @@ NetServer::_ConfigureIPv6LinkLocal(const char* name)
 	close(socket);
 
 	BNetworkInterface interface(name);
+
+	// Don't touch the loopback device
+	if ((interface.Flags() & IFF_LOOPBACK) != 0)
+		return;
+
 	BNetworkAddress link;
 	status_t result = interface.GetHardwareAddress(link);
 
