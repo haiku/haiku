@@ -98,7 +98,7 @@ GameSoundBuffer::GameSoundBuffer(const gs_audio_format * format)
 }
 
 
-// Play must stop before the distructor is called; otherwise, a fatel
+// Play must stop before the distructor is called; otherwise, a fatal
 // error occures if the playback is in a subclass.
 GameSoundBuffer::~GameSoundBuffer()
 {

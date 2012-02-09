@@ -195,7 +195,7 @@ BGameSoundDevice::ReleaseBuffer(gs_id sound)
 
 	if (fSounds[sound - 1]) {
 		// We must stop playback befor destroying the sound or else
-		// we may receive fatel errors.
+		// we may receive fatal errors.
 		fSounds[sound - 1]->StopPlaying();
 
 		delete fSounds[sound - 1];
