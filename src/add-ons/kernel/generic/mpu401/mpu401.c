@@ -10,6 +10,7 @@
 *  mpu401.c
 */
 
+
 #include <ISA.h>
 #include <KernelExport.h>
 #include <OS.h>
@@ -19,6 +20,7 @@
 #include <string.h>
 #include "debug.h"
 #include "mpu401_priv.h"
+
 
 /* ----------
 	midi_create_device -
@@ -54,6 +56,8 @@ create_device(int port, void ** out_storage, uint32 workarounds,
 
 	return B_OK;
 }
+
+
 /*-----------------------------*/
 /*  Version 2 of mpu401 module */
 /*-----------------------------*/
@@ -112,6 +116,7 @@ delete_device(void * storage)
 	return B_OK;
 }
 
+
 /* ----------
 	midi_open - handle open() calls
 ----- */
@@ -131,10 +136,10 @@ midi_open(void * storage, uint32 flags, void ** out_cookie)
 	// the undocumented V2 module is not complete
 	// we will allow the device to be created since some drivers depend on it
 	// but will return an error if the actual midi device is opened:
-	if ( mpu_device->V2 == TRUE)
+	if (mpu_device->V2 == TRUE)
 		return B_ERROR;
 
-	switch (mpu_device->workarounds){
+	switch (mpu_device->workarounds) {
 		case 0x11020004: // Still required for Creative Audigy, Audigy2
 		case 0x11020005:
 		case 0:
@@ -153,7 +158,7 @@ midi_open(void * storage, uint32 flags, void ** out_cookie)
 				mpu_device->workarounds, MPU401_UART);
 			snooze(30000);
 			ack_byte = Read_MPU401(mpu_device->addrport, UARTDATA,
-				mpu_device->workarounds );
+				mpu_device->workarounds);
 			PRINT(("port cmd ack is 0x%x\n", ack_byte));
 			*out_cookie = mpu_device;
 			break;
@@ -175,7 +180,7 @@ midi_open(void * storage, uint32 flags, void ** out_cookie)
 				mpu_device->workarounds, MPU401_UART);
 			snooze(30000);
 			ack_byte = Read_MPU401(mpu_device->addrport, UARTDATA,
-				mpu_device->workarounds );
+				mpu_device->workarounds);
 			PRINT(("port cmd ack is 0x%x\n", ack_byte));
 			break;
 		case 1:
@@ -197,8 +202,8 @@ midi_open(void * storage, uint32 flags, void ** out_cookie)
 
 	// clear midi-in buffer
 	mbuf_bytes = 0;
-	mbuf_current=0;
-	mbuf_start=0;
+	mbuf_current = 0;
+	mbuf_start = 0;
 
   	//Enable midi interrupts
 	mpu_device->interrupt_op(B_MPU_401_ENABLE_CARD_INT, mpu_device->card);
@@ -211,6 +216,7 @@ midi_open(void * storage, uint32 flags, void ** out_cookie)
 	}
 	return B_ERROR;
 }
+
 
 /* ----------
 	midi_close - handle close() calls
@@ -236,6 +242,7 @@ midi_close(void * cookie)
 	return B_OK;
 }
 
+
 /* ----------
 	midi_free - free up allocated memory
 ----- */
@@ -245,6 +252,7 @@ midi_free(void * cookie)
 	LOG(("midi_free()\n"));
 	return B_OK;
 }
+
 
 /* ----------
 	midi_control - handle control() calls
@@ -279,8 +287,8 @@ midi_read(void *cookie, off_t pos, void *buffer, size_t *num_bytes)
  	data = (unsigned char*)buffer;
  	count = *(num_bytes);
 
-	i=0;
-	*num_bytes=0;
+	i = 0;
+	*num_bytes = 0;
 	bestat = acquire_sem_etc(mpu_device->readsemaphore, 1,
 		B_CAN_INTERRUPT, 0);
 	if (bestat == B_INTERRUPTED) {
@@ -299,7 +307,7 @@ midi_read(void *cookie, off_t pos, void *buffer, size_t *num_bytes)
 		if (mbuf_start >= (MBUF_ELEMENTS-1))
 			mbuf_start = 0; //wraparound of ringbuffer
 		*num_bytes = 1; // How many bytes are being returned in buffer
-		if (mbuf_bytes>0)
+		if (mbuf_bytes > 0)
 			mbuf_bytes--; // bytes read from buffer, so decrement buffer count
    		unlock(status);
    		//PRINT(("bytes in buffer: %d\n",mbuf_bytes));
@@ -307,6 +315,7 @@ midi_read(void *cookie, off_t pos, void *buffer, size_t *num_bytes)
 
 	return B_OK;
 }
+
 
 /* ----------
 	midi_write - handle write() calls
@@ -327,7 +336,7 @@ midi_write(void * cookie, off_t pos, const void * data, size_t * num_bytes)
 		(int)count, mpu_device->addrport, mpu_device->workarounds));*/
 
 	acquire_sem(mpu_device->writesemaphore);
-	for (i=0; i<count; i++) {
+	for (i = 0; i < count; i++) {
 		// wait until device is ready
 		while ((Read_MPU401(mpu_device->addrport, UARTCMD,
 					mpu_device->workarounds) & MPU401_OK2WR));
@@ -341,6 +350,8 @@ midi_write(void * cookie, off_t pos, const void * data, size_t * num_bytes)
 
 	return B_OK;
 }
+
+
 /* ----------
 	interrupt_hook - handle interrupts for mpu401 data
 ----- */
@@ -379,6 +390,7 @@ interrupt_hook(void * cookie)
 	/* No midi data from this interrupt */
 	return FALSE; //B_UNHANDLED_INTERRUPT
 }
+
 
 /*-----------------------------------------------------------------*/
 
@@ -432,20 +444,20 @@ Write_MPU401(unsigned int addrport, const char cmdtype,
 
 	/* Only for deep debugging..will slow things down */
 	//PRINT(("write workaround 0x%x at addr: 0x%x\n",workarounds,addrport));
-	switch (workarounds)  {
+	switch (workarounds) {
 		case 0x11020004: /* Creative Audigy Gameport */
-			regptr = (((I_MPU1 + cmdtype ) << 16) & PTR_ADDRESS_MASK);
+			regptr = (((I_MPU1 + cmdtype) << 16) & PTR_ADDRESS_MASK);
 			status = lock();
 			gPCI->write_io_32(addrport + D_PTR, regptr); /*DATA or CMD */
-			gPCI->write_io_32(addrport + D_DATA, mpudatabyte );
+			gPCI->write_io_32(addrport + D_DATA, mpudatabyte);
 			unlock(status);
 			break;
 
 		case 0x11020005: /* Creative Audigy LiveDrive */
-			regptr = (((I_MPU2 + cmdtype ) << 16) & PTR_ADDRESS_MASK);
+			regptr = (((I_MPU2 + cmdtype) << 16) & PTR_ADDRESS_MASK);
 			status = lock();
 			gPCI->write_io_32(addrport + D_PTR, regptr); /*DATA2 or CMD2 */
-			gPCI->write_io_32(addrport + D_DATA, mpudatabyte );
+			gPCI->write_io_32(addrport + D_DATA, mpudatabyte);
 			unlock(status);
 			break;
 
