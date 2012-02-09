@@ -66,6 +66,7 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 
 private:
+			bool				_IsValidFamily(uint32 family);
 			bool				_IsValidInterface(BNetworkInterface& interface);
 			void				_RemoveInvalidInterfaces();
 			status_t			_RemoveInterface(const char* name);
@@ -82,6 +83,7 @@ private:
 			void				_ConfigureInterfaces(
 									BMessage* _missingDevice = NULL);
 			void				_ConfigureIPv6LinkLocal(const char* name);
+
 			void				_BringUpInterfaces();
 			void				_StartServices();
 			status_t			_HandleDeviceMonitor(BMessage* message);
@@ -378,6 +380,22 @@ NetServer::MessageReceived(BMessage* message)
 }
 
 
+/*!	Checks if provided address family is valid.
+	Families include AF_INET, AF_INET6, AF_APPLETALK, etc
+*/
+bool
+NetServer::_IsValidFamily(uint32 family)
+{
+	// Mostly verifies add-on is present
+	int socket = ::socket(family, SOCK_DGRAM, 0);
+	if (socket < 0) {
+		return false;
+	}
+	close(socket);
+	return true;
+}
+
+
 /*!	Checks if an interface is valid, that is, if it has an address in any
 	family, and, in case of ethernet, a hardware MAC address.
 */
@@ -532,7 +550,7 @@ NetServer::_ConfigureInterface(BMessage& message)
 		}
 	}
 
-	// Set up IPv6 Link Local
+	// Set up IPv6 Link Local address (based on MAC, if not loopback)
 	_ConfigureIPv6LinkLocal(name);
 
 	BMessage addressMessage;
@@ -805,14 +823,12 @@ void
 NetServer::_BringUpInterfaces()
 {
 	// we need a socket to talk to the networking stack
-	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
-	if (socket < 0) {
+	if (!_IsValidFamily(AF_INET)) {
 		fprintf(stderr, "%s: The networking stack doesn't seem to be "
 			"available.\n", Name());
 		Quit();
 		return;
 	}
-	close(socket);
 
 	_RemoveInvalidInterfaces();
 
@@ -827,11 +843,18 @@ NetServer::_BringUpInterfaces()
 		// there is no loopback interface, create one
 		BMessage interface;
 		interface.AddString("device", "loop");
-		BMessage address;
-		address.AddString("family", "inet");
-		address.AddString("address", "127.0.0.1");
-		interface.AddMessage("address", &address);
+		BMessage v4address;
+		v4address.AddString("family", "inet");
+		v4address.AddString("address", "127.0.0.1");
+		interface.AddMessage("address", &v4address);
 
+		// Check for IPv6 support and add ::1
+		if (_IsValidFamily(AF_INET6)) {
+			BMessage v6address;
+			v6address.AddString("family", "inet6");
+			v6address.AddString("address", "::1");
+			interface.AddMessage("address", &v6address);
+		}
 		_ConfigureInterface(interface);
 	}
 
@@ -846,19 +869,19 @@ NetServer::_BringUpInterfaces()
 }
 
 
+/*!	Configure the link local address based on the network card's MAC address
+	if this isn't a loopback device.
+*/
 void
 NetServer::_ConfigureIPv6LinkLocal(const char* name)
 {
-	int socket = ::socket(AF_INET6, SOCK_DGRAM, 0);
-	if (socket < 0) {
-		// No ipv6 support, skip
+	// Check for IPv6 support
+	if (!_IsValidFamily(AF_INET6))
 		return;
-	}
-	close(socket);
 
 	BNetworkInterface interface(name);
 
-	// Don't touch the loopback device
+	// Lets make sure this is *not* the loopback interface
 	if ((interface.Flags() & IFF_LOOPBACK) != 0)
 		return;
 
