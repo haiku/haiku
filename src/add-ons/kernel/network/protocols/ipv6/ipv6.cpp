@@ -38,16 +38,15 @@
 #include <utility>
 
 
-#define TRACE_IPV6
+//#define TRACE_IPV6
 #ifdef TRACE_IPV6
-#	define TRACE(format, args...) \
-		dprintf("IPv6 [%llu] " format "\n", system_time() , ##args)
-#	define TRACE_SK(protocol, format, args...) \
-		dprintf("IPv6 [%llu] %p " format "\n", system_time(), \
-			protocol , ##args)
+	#define TRACE(format, args...) \
+		dprintf("IPv6 [%llu] " format "\n", system_time(), ##args)
+	#define TRACE_SK(protocol, format, args...) \
+		dprintf("IPv6 [%llu] %p " format "\n", system_time(), protocol, ##args)
 #else
-#	define TRACE(args...)		do { } while (0)
-#	define TRACE_SK(args...)	do { } while (0)
+	#define TRACE(args...)
+	#define TRACE_SK(args...)
 #endif
 
 
@@ -1317,8 +1316,8 @@ ipv6_send_routed_data(net_protocol* _protocol, struct net_route* route,
 	}
 
 	char addrbuf[INET6_ADDRSTRLEN];
-	TRACE_SK(protocol, "  SendRoutedData(): destination: %s",
-		ip6_sprintf(&destination.sin6_addr, addrbuf));
+	ip6_sprintf(&destination.sin6_addr, addrbuf);
+	TRACE_SK(protocol, "  SendRoutedData(): destination: %s", addrbuf);
 
 	uint32 mtu = route->mtu ? route->mtu : interface->mtu;
 	if (buffer->size > mtu) {
@@ -1460,11 +1459,13 @@ ipv6_receive_data(net_buffer* buffer)
 				&buffer->interface_address, &matchedAddressType)
 			&& !sDatalinkModule->is_local_link_address(sDomain, true,
 				buffer->destination, &buffer->interface_address)) {
+
 			char srcbuf[INET6_ADDRSTRLEN];
 			char dstbuf[INET6_ADDRSTRLEN];
+			ip6_sprintf(&header.Src(), srcbuf);
+			ip6_sprintf(&header.Dst(), dstbuf);
 			TRACE("  ipv6_receive_data(): packet was not for us %s -> %s",
-				ip6_sprintf(&header.Src(), srcbuf),
-				ip6_sprintf(&header.Dst(), dstbuf));
+				srcbuf, dstbuf);
 
 			// TODO: Send ICMPv6 error: Host unreachable
 			return B_ERROR;
