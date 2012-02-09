@@ -200,7 +200,8 @@ bool
 LinearSpec::RemoveConstraint(Constraint* constraint, bool deleteConstraint)
 {
 	fSolver->ConstraintRemoved(constraint);
-	fConstraints.RemoveItem(constraint);
+	if (!fConstraints.RemoveItem(constraint))
+		return false;
 	constraint->fIsValid = false;
 
 	SummandList* leftSide = constraint->LeftSide();
