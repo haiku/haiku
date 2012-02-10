@@ -388,9 +388,9 @@ NetServer::_IsValidFamily(uint32 family)
 {
 	// Mostly verifies add-on is present
 	int socket = ::socket(family, SOCK_DGRAM, 0);
-	if (socket < 0) {
+	if (socket < 0)
 		return false;
-	}
+
 	close(socket);
 	return true;
 }
@@ -823,7 +823,7 @@ void
 NetServer::_BringUpInterfaces()
 {
 	// we need a socket to talk to the networking stack
-	if (!_IsValidFamily(AF_INET)) {
+	if (!_IsValidFamily(AF_LINK)) {
 		fprintf(stderr, "%s: The networking stack doesn't seem to be "
 			"available.\n", Name());
 		Quit();
