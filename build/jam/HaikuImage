@@ -581,6 +581,7 @@ AddBootModuleSymlinksToHaikuImage
 	$(X86_ONLY)ide_isa
 	<usb>uhci <usb>ohci <usb>ehci
 	scsi_cd scsi_disk usb_disk
+	efi_gpt
 	intel
 	bfs
 ;
