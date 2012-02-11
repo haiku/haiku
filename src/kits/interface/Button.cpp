@@ -177,7 +177,6 @@ BButton::Draw(BRect updateRect)
 	rgb_color buttonBgColor = tint_color(panelBgColor, B_LIGHTEN_1_TINT);
 	rgb_color lightColor;
 	rgb_color maxLightColor;
-	rgb_color maxShadowColor = tint_color(panelBgColor, B_DARKEN_MAX_TINT);
 
 	rgb_color dark1BorderColor;
 	rgb_color dark2BorderColor;

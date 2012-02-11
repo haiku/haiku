@@ -440,7 +440,6 @@ BTextControl::Draw(BRect updateRect)
 	rgb_color noTint = ui_color(B_PANEL_BACKGROUND_COLOR);
 	rgb_color lighten1 = tint_color(noTint, B_LIGHTEN_1_TINT);
 	rgb_color lighten2 = tint_color(noTint, B_LIGHTEN_2_TINT);
-	rgb_color lightenMax = tint_color(noTint, B_LIGHTEN_MAX_TINT);
 	rgb_color darken1 = tint_color(noTint, B_DARKEN_1_TINT);
 	rgb_color darken2 = tint_color(noTint, B_DARKEN_2_TINT);
 	rgb_color darken4 = tint_color(noTint, B_DARKEN_4_TINT);

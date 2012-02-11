@@ -3661,12 +3661,9 @@ BTextView::_HandleAlphaKey(const char *bytes, int32 numBytes)
 		undoBuffer->InputCharacter(numBytes);
 	}
 
-	bool erase = fSelStart != fText->Length();
-
 	if (fSelStart != fSelEnd) {
 		Highlight(fSelStart, fSelEnd);
 		DeleteText(fSelStart, fSelEnd);
-		erase = true;
 	}
 
 	if (fAutoindent && numBytes == 1 && *bytes == B_ENTER) {
@@ -3706,7 +3703,6 @@ BTextView::_Refresh(int32 fromOffset, int32 toOffset, bool scroll)
 	int32 toLine = _LineAt(toOffset);
 	int32 saveFromLine = fromLine;
 	int32 saveToLine = toLine;
-	float saveLineHeight = LineHeight(fromLine);
 
 	_RecalculateLineBreaks(&fromLine, &toLine);
 
@@ -3736,12 +3732,6 @@ BTextView::_Refresh(int32 fromOffset, int32 toOffset, bool scroll)
 	int32 toVisible = _LineAt(BPoint(0.0f, bounds.bottom));
 	fromLine = max_c(fromVisible, fromLine);
 	toLine = min_c(toLine, toVisible);
-
-	int32 drawOffset = fromOffset;
-	if (LineHeight(fromLine) != saveLineHeight
-		|| newHeight < saveHeight || fromLine < saveFromLine
-		|| fAlignment != B_ALIGN_LEFT)
-		drawOffset = (*fLines)[fromLine]->offset;
 
 	_AutoResize(false);
 

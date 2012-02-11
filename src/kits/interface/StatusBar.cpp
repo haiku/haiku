@@ -772,14 +772,7 @@ BStatusBar::_SetTextData(BString& text, const char* source,
 	if (text == source)
 		return;
 
-	float oldWidth;
-	if (rightAligned)
-		oldWidth = Bounds().right - fTextDivider;
-	else
-		oldWidth = fTextDivider;
-
 	bool oldHasText = _HasText();
-
 	text = source;
 
 	BString newString;
@@ -787,17 +780,6 @@ BStatusBar::_SetTextData(BString& text, const char* source,
 		newString << text << combineWith;
 	else
 		newString << combineWith << text;
-
-	float newWidth = ceilf(StringWidth(newString.String()));
-		// might still be smaller in Draw(), but we use it
-		// only for the invalidation rect here
-
-	// determine which part of the view needs an update
-	float invalidateWidth = max_c(newWidth, oldWidth);
-
-	float position = 0.0;
-	if (rightAligned)
-		position = Bounds().right - invalidateWidth;
 
 	if (oldHasText != _HasText())
 		InvalidateLayout();
