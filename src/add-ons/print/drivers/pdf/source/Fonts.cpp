@@ -347,7 +347,7 @@ static status_t ttf_get_fontname(const char * path, char * fontname, size_t fn_s
 	uint16		nb_tables, nb_records;
 	uint16		i;
 	uint32		tag;
-	uint32		checksum, table_offset, length;
+	uint32		table_offset;
 	uint32		strings_offset;
 	char		family_name[256];
 	char		face_name[256];
@@ -378,10 +378,8 @@ static status_t ttf_get_fontname(const char * path, char * fontname, size_t fn_s
 
     for (i = 0; i < nb_tables; ++i) {
 		tag				= ttf_get_uint32(ttf);
-		checksum		= ttf_get_uint32(ttf);
 		table_offset	= ttf_get_uint32(ttf);
-		length			= ttf_get_uint32(ttf);
-	    
+		
 		if (tag == TRUETTYPE_TABLE_NAME_TAG)
 			break;
 	}
@@ -407,12 +405,11 @@ static status_t ttf_get_fontname(const char * path, char * fontname, size_t fn_s
 	names_found = 0;
 
 	for (i = 0; i < nb_records; ++i) {
-		uint16	platform_id, encoding_id, language_id, name_id;
+		uint16	platform_id, encoding_id, name_id;
 		uint16	string_len, string_offset;
 
 		platform_id		= ttf_get_uint16(ttf);
 		encoding_id		= ttf_get_uint16(ttf);
-		language_id		= ttf_get_uint16(ttf);
 		name_id			= ttf_get_uint16(ttf);
 		string_len		= ttf_get_uint16(ttf);
 		string_offset	= ttf_get_uint16(ttf);
