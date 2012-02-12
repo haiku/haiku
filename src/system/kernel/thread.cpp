@@ -793,10 +793,8 @@ create_thread_user_stack(Team* team, Thread* thread, void* _stackBase,
 		if (stackSize < MIN_USER_STACK_SIZE)
 			return B_BAD_VALUE;
 
-		stackBase -= TLS_SIZE;
-	}
-
-	if (stackBase == NULL) {
+		stackSize -= TLS_SIZE;
+	} else {
 		// No user-defined stack -- allocate one. For non-main threads the stack
 		// will be between USER_STACK_REGION and the main thread stack area. For
 		// a main thread the position is fixed.
