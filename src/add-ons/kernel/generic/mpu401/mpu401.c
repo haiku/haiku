@@ -279,13 +279,11 @@ midi_read(void *cookie, off_t pos, void *buffer, size_t *num_bytes)
 
 	unsigned char *data;
 	unsigned int i;
-	size_t count;
 	cpu_status status;
 	status_t bestat;
 	mpu401device *mpu_device = (mpu401device *)cookie;
 
  	data = (unsigned char*)buffer;
- 	count = *(num_bytes);
 
 	i = 0;
 	*num_bytes = 0;
@@ -358,7 +356,6 @@ midi_write(void * cookie, off_t pos, const void * data, size_t * num_bytes)
 static bool
 interrupt_hook(void * cookie)
 {
-	status_t bestat;
 	mpu401device *mpu_device = (mpu401device *)cookie;
 
 	/* Only for deep debugging..will slow things down */
@@ -381,8 +378,7 @@ interrupt_hook(void * cookie)
 		mbuf_current++; /* pointer to next blank byte */
 		mbuf_bytes++; /* increment count of midi data bytes */
 
-		bestat = release_sem_etc(mpu_device->readsemaphore, 1,
-					B_DO_NOT_RESCHEDULE);
+		release_sem_etc(mpu_device->readsemaphore, 1, B_DO_NOT_RESCHEDULE);
 
 		return TRUE; //B_INVOKE_SCHEDULER
 	}

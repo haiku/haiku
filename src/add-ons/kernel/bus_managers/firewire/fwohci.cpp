@@ -780,6 +780,7 @@ fwohci_timeout(void *arg)
 	struct fwohci_softc *sc;
 
 	sc = (struct fwohci_softc *)arg;
+	(void)sc;
 }
 
 uint32_t

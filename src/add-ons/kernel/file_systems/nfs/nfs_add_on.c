@@ -856,7 +856,6 @@ fs_release_vnode(fs_volume *_volume, fs_vnode *node, bool r)
 static status_t
 fs_walk(fs_volume *_volume, fs_vnode *_base, const char *file, ino_t *vnid)
 {
-	bool isLink;
 	fs_node *dummy;
 	status_t result;
 	fs_nspace *ns;
@@ -866,10 +865,9 @@ fs_walk(fs_volume *_volume, fs_vnode *_base, const char *file, ino_t *vnid)
 	ns = _volume->private_volume;
 	base = _base->private_node;
 
-	if (!strcmp(".", file)) {
+	if (!strcmp(".", file))
 		*vnid = base->vnid;
-		isLink = false;
-	} else {
+	else {
 		fs_node *newNode = (fs_node *)malloc(sizeof(fs_node));
 		struct stat st;
 
@@ -884,8 +882,6 @@ fs_walk(fs_volume *_volume, fs_vnode *_base, const char *file, ino_t *vnid)
 		*vnid = newNode->vnid;
 
 		insert_node(ns, newNode);
-
-		isLink = S_ISLNK(st.st_mode);
 	}
 
 	if ((result = get_vnode (_volume, *vnid, (void **)&dummy)) < B_OK)
@@ -2371,12 +2367,12 @@ fs_symlink(fs_volume *_volume, fs_vnode *_dir, const char *name,
 	}
 
 	status = XDRInPacketGetInt32(&reply);
-
 /*	if (status!=NFS_OK)
 		return map_nfs_to_system_error(status);
 
 	ignore status here, weird thing, nfsservers that is
 */
+	(void)status;
 
 	result = nfs_lookup(ns, &dir->fhandle, name, &fhandle, &st);
 

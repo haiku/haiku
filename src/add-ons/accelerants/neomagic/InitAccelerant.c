@@ -260,13 +260,12 @@ a buffer at least ACCELERANT_CLONE_INFO_SIZE() bytes in length.
 void GET_ACCELERANT_CLONE_INFO(void *data)
 {
 	nm_device_name dn;
-	status_t result;
 
 	/* call the kernel driver to get the device name */	
 	dn.magic = NM_PRIVATE_DATA_MAGIC;
 	/* store the returned info directly into the passed buffer */
 	dn.name = (char *)data;
-	result = ioctl(fd, NM_DEVICE_NAME, &dn, sizeof(dn));
+	ioctl(fd, NM_DEVICE_NAME, &dn, sizeof(dn));
 }
 
 /*

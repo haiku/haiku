@@ -6,6 +6,7 @@
 	Rudolf Cornelissen 4/2003-1/2006
 */
 
+
 #define MODULE_BIT 0x00200000
 
 #include "acc_std.h"
@@ -14,20 +15,20 @@
 	Enable/Disable interrupts.  Just a wrapper around the
 	ioctl() to the kernel driver.
 */
-static void interrupt_enable(bool flag)
+static void
+interrupt_enable(bool flag)
 {
-	status_t result;
 	nm_set_bool_state sbs;
 
-	if (si->ps.int_assigned)
-	{
+	if (si->ps.int_assigned) {
 		/* set the magic number so the driver knows we're for real */
 		sbs.magic = NM_PRIVATE_DATA_MAGIC;
 		sbs.do_it = flag;
 		/* contact driver and get a pointer to the registers and shared data */
-		result = ioctl(fd, NM_RUN_INTERRUPTS, &sbs, sizeof(sbs));
+		ioctl(fd, NM_RUN_INTERRUPTS, &sbs, sizeof(sbs));
 	}
 }
+
 
 /* First validate the mode, then call lots of bit banging stuff to set the mode(s)! */
 status_t SET_DISPLAY_MODE(display_mode *mode_to_set) 

@@ -772,19 +772,17 @@ UHCI::CheckDebugTransfer(DebugTransfer *transfer, bool &_stillPending)
 	}
 
 	if (transferOK) {
-		size_t actualLength = 0;
 		uint8 lastDataToggle = 0;
 		if (transfer->TransferPipe()->Direction() == Pipe::In) {
 			// data to read out
 			iovec *vector = transfer->Vector();
 			size_t vectorCount = transfer->VectorCount();
 
-			actualLength = ReadDescriptorChain(transfer->firstDescriptor,
+			ReadDescriptorChain(transfer->firstDescriptor,
 				vector, vectorCount, &lastDataToggle);
 		} else {
 			// read the actual length that was sent
-			actualLength = ReadActualLength(transfer->firstDescriptor,
-				&lastDataToggle);
+			ReadActualLength(transfer->firstDescriptor, &lastDataToggle);
 		}
 
 		transfer->TransferPipe()->SetDataToggle(lastDataToggle == 0);

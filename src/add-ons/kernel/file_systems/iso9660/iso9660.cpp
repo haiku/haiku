@@ -292,7 +292,6 @@ parse_rock_ridge(iso9660_volume* volume, iso9660_inode* node, char* buffer,
 	char* slName = NULL;
 	uint16 altNameSize = 0;
 	uint16 slNameSize = 0;
-	uint8 slFlags = 0;
 	uint8 length = 0;
 	bool done = false;
 
@@ -358,7 +357,6 @@ parse_rock_ridge(iso9660_volume* volume, iso9660_inode* node, char* buffer,
 			case 'SL':
 			{
 				uint8 bytePos = 3;
-				uint8 lastCompFlag = 0;
 				uint8 addPos = 0;
 				bool slDone = false;
 				bool useSeparator = true;
@@ -368,9 +366,10 @@ parse_rock_ridge(iso9660_volume* volume, iso9660_inode* node, char* buffer,
 				TRACE(("Current length is %u\n", slNameSize));
 				//kernel_debugger("");
 				node->attr.slVer = *(uint8*)(buffer + bytePos++);
-				slFlags = *(uint8*)(buffer + bytePos++);
-
+#if TRACE_ISO9660
+				uint8 slFlags = *(uint8*)(buffer + bytePos++);
 				TRACE(("sl flags are %u\n", slFlags));
+#endif
 				while (!slDone && bytePos < length) {
 					uint8 compFlag = *(uint8*)(buffer + bytePos++);
 					uint8 compLen = *(uint8*)(buffer + bytePos++);
@@ -453,7 +452,6 @@ parse_rock_ridge(iso9660_volume* volume, iso9660_inode* node, char* buffer,
 					}
 					if (slName != NULL)
 						slName[slNameSize] = '\0';
-					lastCompFlag = compFlag;
 					bytePos += compLen;
 					TRACE(("Current sl name is \'%s\'\n", slName));
 				}
@@ -573,7 +571,7 @@ ISOMount(const char *path, uint32 flags, iso9660_volume **_newVolume,
 	off_t offset = 0x8000;
 	ssize_t retval;
 	partition_info partitionInfo;
-	int deviceBlockSize, multiplier;
+	int deviceBlockSize;
 	iso9660_volume *volume;
 
 	(void)flags;
@@ -642,8 +640,10 @@ ISOMount(const char *path, uint32 flags, iso9660_volume **_newVolume,
 				volume->id = ISO_ROOTNODE_ID;
 				TRACE(("ISO9660: volume->blockSize = %d\n", volume->logicalBlkSize[FS_DATA_FORMAT]));
 
-				multiplier = deviceBlockSize / volume->logicalBlkSize[FS_DATA_FORMAT];
+#if TRACE_ISO9660
+				int multiplier = deviceBlockSize / volume->logicalBlkSize[FS_DATA_FORMAT];
 				TRACE(("ISOMount: block size multiplier is %d\n", multiplier));
+#endif
 
 				// if the session is on a real device, size != 0
 				if (partitionInfo.size != 0) {

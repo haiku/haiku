@@ -109,11 +109,9 @@ walk_volume_recognition_sequence(int device, off_t offset, uint32 blockSize,
 		return B_ERROR;
 	}
 
-	bool foundISO = false;
 	bool foundExtended = false;
 	bool foundECMA167 = false;
 	bool foundECMA168 = false;
-	bool foundBoot = false;
 	for (uint32 block = 16; true; block++) {
 		off_t address = (offset + block) << blockShift;
 		TRACE(("walk_volume_recognition_sequence: block = %ld, "
@@ -124,7 +122,6 @@ walk_volume_recognition_sequence(int device, off_t offset, uint32 blockSize,
 				= (volume_structure_descriptor_header *)(chunk.Data());
 			if (descriptor->id_matches(kVSDID_ISO)) {
 				TRACE(("found ISO9660 descriptor\n"));
-				foundISO = true;
 			} else if (descriptor->id_matches(kVSDID_BEA)) {
 				TRACE(("found BEA descriptor\n"));
 				foundExtended = true;
@@ -139,7 +136,6 @@ walk_volume_recognition_sequence(int device, off_t offset, uint32 blockSize,
 				foundECMA167 = true;
 			} else if (descriptor->id_matches(kVSDID_BOOT)) {
 				TRACE(("found boot descriptor\n"));
-				foundBoot = true;
 			} else if (descriptor->id_matches(kVSDID_ECMA168)) {
 				TRACE(("found ECMA-168 descriptor\n"));
 				foundECMA168 = true;

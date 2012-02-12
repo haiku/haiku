@@ -1189,13 +1189,11 @@ bfs_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 		newDirectory->ID(), newName);
 
 	// update the name only when they differ
-	bool nameUpdated = false;
 	if (strcmp(oldName, newName)) {
 		status = inode->SetName(transaction, newName);
 		if (status == B_OK) {
 			Index index(volume);
 			index.UpdateName(transaction, oldName, newName, inode);
-			nameUpdated = true;
 		}
 	}
 

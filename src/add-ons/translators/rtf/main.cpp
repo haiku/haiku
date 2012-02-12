@@ -57,7 +57,7 @@ main(int argc, char** argv)
 			convert_to_plain_text(header, output);
 		}
 
-		return 1;
+		return result;
 	}
 
 	BApplication app("application/x-vnd.Haiku-RTFTranslator");

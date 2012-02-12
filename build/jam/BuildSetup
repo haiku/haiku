@@ -1222,7 +1222,7 @@ if $(HAIKU_NO_WERROR) != 1 {
 #	EnableWerror src add-ons accelerants nvidia ;
 	EnableWerror src add-ons accelerants nvidia_gpgpu ;
 #	EnableWerror src add-ons accelerants radeon ;
-	EnableWerror src add-ons accelerants radeon_hd ;
+#	EnableWerror src add-ons accelerants radeon_hd ;
 	EnableWerror src add-ons accelerants s3 ;
 	EnableWerror src add-ons accelerants skeleton ;
 	EnableWerror src add-ons accelerants vesa ;
@@ -1239,7 +1239,7 @@ if $(HAIKU_NO_WERROR) != 1 {
 	EnableWerror src add-ons kernel bus_managers agp_gart ;
 	EnableWerror src add-ons kernel bus_managers ata ;
 	EnableWerror src add-ons kernel bus_managers config_manager ;
-	EnableWerror src add-ons kernel bus_managers firewire ;
+#	EnableWerror src add-ons kernel bus_managers firewire ;
 	EnableWerror src add-ons kernel bus_managers isa ;
 	EnableWerror src add-ons kernel bus_managers pci ;
 #	EnableWerror src add-ons kernel bus_managers ps2 ; # gcc2
@@ -1352,10 +1352,10 @@ if $(HAIKU_NO_WERROR) != 1 {
 	EnableWerror src add-ons translators rtf ;
 	EnableWerror src add-ons translators sgi ;
 	EnableWerror src add-ons translators shared ;
-	EnableWerror src add-ons translators stxt ;
+#	EnableWerror src add-ons translators stxt ;
 	EnableWerror src add-ons translators tga ;
 	EnableWerror src add-ons translators tiff ;
-	EnableWerror src add-ons translators wonderbrush ;
+#	EnableWerror src add-ons translators wonderbrush ;
 	EnableWerror src add-ons print ;
 	EnableWerror src bin package ;
 	EnableWerror src apps ;

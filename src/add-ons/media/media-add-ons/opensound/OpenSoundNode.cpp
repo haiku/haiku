@@ -2143,7 +2143,7 @@ return B_OK;
 
 //	char oldValues[128];
 	char newValues[128];
-	size_t oldValuesSize;
+//	size_t oldValuesSize;
 	size_t newValuesSize;
 
 	for (int i = 0; i < mixer->CountExtInfos(); i++) {
@@ -2177,7 +2177,7 @@ return B_OK;
 //		if (!parameter)
 //			continue;
 
-		oldValuesSize = 128;
+//		oldValuesSize = 128;
 		newValuesSize = 128;
 		bigtime_t last;
 //		TRACE("OpenSoundNode::%s: comparing mixer control %d\n",

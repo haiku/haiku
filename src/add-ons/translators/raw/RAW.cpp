@@ -951,7 +951,7 @@ DCRaw::_ScaleColors()
 	if (fProgressMonitor != NULL)
 		fProgressMonitor("Scale Colors", 5, fProgressData);
 
-	int dblack, c, val, sum[8];
+	int c, val, sum[8];
 	uint32 row, col, x, y;
 	double dsum[8], dmin, dmax;
 	float scale_mul[4];
@@ -1020,7 +1020,9 @@ DCRaw::_ScaleColors()
 	if (fMeta.pre_multipliers[3] == 0)
 		fMeta.pre_multipliers[3] = fColors < 4 ? fMeta.pre_multipliers[1] : 1;
 
-	dblack = fMeta.black;
+#if 0
+	int dblack = fMeta.black;
+#endif
 	if (fThreshold)
 		_WaveletDenoise();
 

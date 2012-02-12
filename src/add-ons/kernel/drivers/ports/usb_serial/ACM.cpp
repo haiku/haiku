@@ -26,7 +26,6 @@ ACMDevice::AddDevice(const usb_configuration_info *config)
 	uint8 slaveIndex = 0;
 	usb_cdc_cm_functional_descriptor* cmDesc = NULL;
 	usb_cdc_union_functional_descriptor* unionDesc = NULL;
-	usb_cdc_acm_functional_descriptor* acmDesc = NULL;
 
 	// Search ACM Communication Interface
 	for (size_t i = 0; i < config->interface_count && status < B_OK; i++) {
@@ -46,7 +45,6 @@ ACMDevice::AddDevice(const usb_configuration_info *config)
 					break;
 
 				case USB_CDC_ACM_FUNCTIONAL_DESCRIPTOR:
-					acmDesc = (usb_cdc_acm_functional_descriptor*)generic;
 					break;
 
 				case USB_CDC_UNION_FUNCTIONAL_DESCRIPTOR:
