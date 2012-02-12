@@ -2590,7 +2590,6 @@ dir_vnode_to_path(struct vnode* vnode, char* buffer, size_t bufferSize,
 		char nameBuffer[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
 		char* name = &((struct dirent*)nameBuffer)->d_name[0];
 		struct vnode* parentVnode;
-		ino_t parentID;
 
 		// lookup the parent vnode
 		if (vnode == ioContext->root) {
@@ -2613,7 +2612,6 @@ dir_vnode_to_path(struct vnode* vnode, char* buffer, size_t bufferSize,
 			if (Vnode* coveredVnode = get_covered_vnode(parentVnode)) {
 				put_vnode(parentVnode);
 				parentVnode = coveredVnode;
-				parentID = parentVnode->id;
 			}
 		}
 

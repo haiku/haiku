@@ -2296,7 +2296,9 @@ page_writer(void* /*unused*/)
 {
 	const uint32 kNumPages = 256;
 	uint32 writtenPages = 0;
+#ifdef TRACE_VM_PAGE
 	bigtime_t lastWrittenTime = 0;
+#endif
 	bigtime_t pageCollectionTime = 0;
 	bigtime_t pageWritingTime = 0;
 
@@ -2440,13 +2442,15 @@ page_writer(void* /*unused*/)
 		// debug output only...
 		writtenPages += numPages;
 		if (writtenPages >= 1024) {
+#ifdef TRACE_VM_PAGE
 			bigtime_t now = system_time();
 			TRACE(("page writer: wrote 1024 pages (total: %llu ms, "
 				"collect: %llu ms, write: %llu ms)\n",
 				(now - lastWrittenTime) / 1000,
 				pageCollectionTime / 1000, pageWritingTime / 1000));
-			writtenPages -= 1024;
 			lastWrittenTime = now;
+#endif
+			writtenPages -= 1024;
 			pageCollectionTime = 0;
 			pageWritingTime = 0;
 		}

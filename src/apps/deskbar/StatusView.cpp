@@ -1283,7 +1283,6 @@ TDragRegion::Draw(BRect)
 	rgb_color hilite = tint_color(menuColor, B_DARKEN_1_TINT);
 	rgb_color ldark = tint_color(menuColor, 1.02);
 	rgb_color dark = tint_color(menuColor, B_DARKEN_2_TINT);
-	rgb_color vdark = tint_color(menuColor, B_DARKEN_3_TINT);
 	rgb_color vvdark = tint_color(menuColor, B_DARKEN_4_TINT);
 	rgb_color light = tint_color(menuColor, B_LIGHTEN_2_TINT);
 

@@ -136,7 +136,6 @@ TBarView::Draw(BRect)
 	BRect bounds(Bounds());
 
 	rgb_color hilite = tint_color(ViewColor(), B_DARKEN_1_TINT);
-	rgb_color light = tint_color(ViewColor(), B_LIGHTEN_2_TINT);
 
 	SetHighColor(hilite);
 	if (AcrossTop())

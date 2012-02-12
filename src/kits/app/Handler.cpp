@@ -223,6 +223,8 @@ BHandler::MessageReceived(BMessage *message)
 			const char *prop;
 
 			status_t err = message->GetCurrentSpecifier(&cur, &specifier, &form, &prop);
+			if (err != B_OK)
+				break;
 			bool known = false;
 			if (cur < 0 || (strcmp(prop, "Messenger") == 0)) {
 				err = reply.AddMessenger("result", this);

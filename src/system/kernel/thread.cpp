@@ -1878,7 +1878,6 @@ thread_exit(void)
 	Thread* thread = thread_get_current_thread();
 	Team* team = thread->team;
 	Team* kernelTeam = team_get_kernel_team();
-	thread_id parentID = -1;
 	status_t status;
 	struct thread_debug_info debugInfo;
 	team_id teamID = team->id;
@@ -1997,9 +1996,6 @@ thread_exit(void)
 
 		if (deleteTeam) {
 			Team* parent = team->parent;
-
-			// remember who our parent was so we can send a signal
-			parentID = parent->id;
 
 			// Set the team job control state to "dead" and detach the job
 			// control entry from our team struct.

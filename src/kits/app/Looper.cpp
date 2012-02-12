@@ -1363,7 +1363,7 @@ BLooper::resolve_specifier(BHandler* target, BMessage* message)
 	// (e.g., the 3rd button on the 4th view)
 	do {
 		err = message->GetCurrentSpecifier(&index, &specifier, &form, &property);
-		if (err) {
+		if (err != B_OK) {
 			BMessage reply(B_REPLY);
 			reply.AddInt32("error", err);
 			message->SendReply(&reply);
@@ -1381,7 +1381,7 @@ BLooper::resolve_specifier(BHandler* target, BMessage* message)
 
 		// Get current specifier index (may change in ResolveSpecifier())
 		err = message->GetCurrentSpecifier(&index);
-	} while (newTarget && newTarget != target && !err && index >= 0);
+	} while (newTarget && newTarget != target && err == B_OK && index >= 0);
 
 	return newTarget;
 }
