@@ -15,7 +15,9 @@ echo ""
 # These are the Mesa headers and libraries used by the opengl kit
 #   Headers are probed for dependencies, only specify ones referenced
 #   by the opengl kit.
-MESA_PRIVATE_HEADERS="glheader.h glapi.h glapitable.h glapitemp.h glapi_priv.h context.h driverfuncs.h meta.h colormac.h buffers.h framebuffer.h renderbuffer.h state.h version.h swrast.h swrast_setup.h tnl.h t_context.h t_pipeline.h vbo.h extensions.h s_spantemp.h s_renderbuffer.h formats.h cpuinfo.h"
+MESA_PRIVATE_HEADERS="glheader.h glapi.h glapitable.h glapitemp.h glapi_priv.h context.h driverfuncs.h meta.h colormac.h buffers.h framebuffer.h renderbuffer.h state.h version.h swrast.h swrast_setup.h tnl.h t_context.h t_pipeline.h vbo.h extensions.h s_spantemp.h s_renderbuffer.h s_context.h formats.h cpuinfo.h"
+
+DEBUG=0
 
 #######################################################################
 # END CONFIG DATA, Dragons below!
@@ -39,6 +41,8 @@ MESA_TOP="$1"
 
 GCC_VER=`gcc -v 2>&1 | tail -1 | awk '{print $3}' | cut -d. -f1`
 MESA_VER=`cat $MESA_TOP/Makefile |grep VERSION\= | cut -d= -f2`
+
+DATESTAMP=`date +"%Y-%m-%d"`
 
 echo "Bundling gcc$GCC_VER build of Mesa $MESA_VER..."
 
@@ -90,13 +94,17 @@ do
 	cp $i lib.haiku/
 done
 
-# Disabled as to give the choice to the user ah-la stripOptionalPackageDebugSymbols
-#echo "Stripping debug symbols from Mesa libraries..."
-#find lib.haiku -exec strip --strip-debug {} \; ;
+if [[ $DEBUG -eq 0 ]]; then
+echo "Stripping debug symbols from Mesa libraries..."
+find lib.haiku -exec strip --strip-debug {} \; ;
+MESADBG=""
+else
+MESADBG="dbg"
+fi
 
 echo "Creating Mesa OptionalPackage..."
 PLATFORM=$( uname -m )
-ZIP_FILENAME="../mesa-$MESA_VER-gcc$GCC_VER-x86.zip"
+ZIP_FILENAME="../mesa-${MESA_VER}${MESADBG}-x86-gcc${GCC_VER}-${DATESTAMP}.zip"
 zip -r -9 $ZIP_FILENAME $ZIP_HEADERS ./include/GL/* ./lib.haiku/*
 
 echo "Great Success! $ZIP_FILENAME created."
