@@ -55,7 +55,6 @@
 #include <vm/VMCache.h>
 
 #include "EntryCache.h"
-#include "FDPath.h"
 #include "fifo.h"
 #include "IORequest.h"
 #include "unused_vnodes.h"
@@ -5108,9 +5107,6 @@ vfs_init(kernel_args* args)
 {
 	vnode::StaticInit();
 
-	if (init_fd_paths_hash_table() == false)
-		panic("vfs_init: error creating vnode to paths hash table\n");
-
 	struct vnode dummyVnode;
 	sVnodeTable = hash_init(VNODE_HASH_TABLE_SIZE,
 		offset_of_member(dummyVnode, next), &vnode_compare, &vnode_hash);
@@ -5254,8 +5250,6 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 			if (fd >= 0)
 				putter.Detach();
 
-			insert_fd_path(vnode, fd, kernel, directory->id, name);
-
 			return fd;
 		}
 
@@ -5288,10 +5282,8 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 	}
 
 	int fd = get_new_fd(FDTYPE_FILE, NULL, vnode, cookie, openMode, kernel);
-	if (fd >= 0) {
-		insert_fd_path(vnode, fd, kernel, directory->id, name);
+	if (fd >= 0)
 		return fd;
-	}
 
 	status = fd;
 
@@ -5431,30 +5423,7 @@ file_open_entry_ref(dev_t mountID, ino_t directoryID, const char* name,
 	} else
 		put_vnode(vnode);
 
-	insert_fd_path(vnode, newFD, kernel, directoryID, name);
-
 	return newFD;
-}
-
-
-static const char*
-leaf(const char* path)
-{
-	if (path == NULL)
-		return NULL;
-
-	int32 pathLength = strlen(path);
-	if (pathLength > B_FILE_NAME_LENGTH)
-		return NULL;
-	// only "/" has trailing slashes -- then we have to return the complete
-	// buffer, as we have to do in case there are no slashes at all
-	if (pathLength != 1 || path[0] != '/') {
-		for (int32 i = pathLength - 1; i >= 0; i--) {
-			if (path[i] == '/')
-				return path + i + 1;
-		}
-	}
-	return path;
 }
 
 
@@ -5466,8 +5435,6 @@ file_open(int fd, char* path, int openMode, bool kernel)
 	FUNCTION(("file_open: fd: %d, entry path = '%s', omode %d, kernel %d\n",
 		fd, path, openMode, kernel));
 
-	// extract the leaf here because path get screed later
-	const char* name = leaf(path);
 	// get the vnode matching the vnode + path combination
 	struct vnode* vnode;
 	ino_t parentID;
@@ -5489,8 +5456,6 @@ file_open(int fd, char* path, int openMode, bool kernel)
 			vnode->device, parentID, vnode->id, NULL);
 	} else
 		put_vnode(vnode);
-
-	insert_fd_path(vnode, newFD, kernel, parentID, name);
 
 	return newFD;
 }
@@ -5525,9 +5490,6 @@ file_free_fd(struct file_descriptor* descriptor)
 
 	if (vnode != NULL) {
 		FS_CALL(vnode, free_cookie, descriptor->cookie);
-
-		remove_fd_path(descriptor);
-
 		put_vnode(vnode);
 	}
 }

@@ -26,7 +26,6 @@
 #include <util/KMessage.h>
 #include <util/list.h>
 
-#include "FDPath.h"
 #include "node_monitor_private.h"
 
 
@@ -690,8 +689,6 @@ NodeMonitorService::NotifyEntryMoved(dev_t device, ino_t fromDirectory,
 	dev_t nodeDevice = device;
 	vfs_resolve_vnode_to_covering_vnode(device, node, &nodeDevice, &node);
 
-	move_fd_path(device, node, fromName, toDirectory, toName);
-
 	RecursiveLocker locker(fRecursiveLock);
 
 	// get the lists of all interested listeners
@@ -763,17 +760,6 @@ NodeMonitorService::NotifyStatChanged(dev_t device, ino_t node,
 	message.AddInt64("node", node);
 	message.AddInt32("fields", statFields);		// Haiku only
 
-	read_lock_fd_paths();
-	fd_paths* fsPaths = lookup_fd_paths(device, node);
-	if (fsPaths != NULL) {
-		PathInfoList::Iterator it(&fsPaths->paths);
-		for (PathInfo* info = it.Next(); info != NULL; info = it.Next()) {
-			message.AddInt64("directory", info->directory);
-			message.AddString("name", info->filename);
-		}
-	}
-	read_unlock_fd_paths();
-
 	return _SendNotificationMessage(message, interestedListeners,
 		interestedListenerCount);
 }
@@ -820,17 +806,6 @@ NodeMonitorService::NotifyAttributeChanged(dev_t device, ino_t node,
 	message.AddInt64("node", node);
 	message.AddString("attr", attribute);
 	message.AddInt32("cause", cause);		// Haiku only
-
-	read_lock_fd_paths();
-	fd_paths* fsPaths = lookup_fd_paths(device, node);
-	if (fsPaths != NULL) {
-		PathInfoList::Iterator it(&fsPaths->paths);
-		for (PathInfo* info = it.Next(); info != NULL; info = it.Next()) {
-			message.AddInt64("directory", info->directory);
-			message.AddString("name", info->filename);
-		}
-	}
-	read_unlock_fd_paths();
 
 	return _SendNotificationMessage(message, interestedListeners,
 		interestedListenerCount);
