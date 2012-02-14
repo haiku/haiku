@@ -6,6 +6,7 @@
 
 #include <sys/bus.h>
 #include <sys/kernel.h>
+#include <sys/rman.h>
 
 #include <net/if.h>
 #include <net/ethernet.h>

@@ -64,7 +64,7 @@ const char *ieee80211_mgt_subtype_name[] = {
 	"assoc_req",	"assoc_resp",	"reassoc_req",	"reassoc_resp",
 	"probe_req",	"probe_resp",	"reserved#6",	"reserved#7",
 	"beacon",	"atim",		"disassoc",	"auth",
-	"deauth",	"action",	"reserved#14",	"reserved#15"
+	"deauth",	"action",	"action_noack",	"reserved#15"
 };
 const char *ieee80211_ctl_subtype_name[] = {
 	"reserved#0",	"reserved#1",	"reserved#2",	"reserved#3",
@@ -207,6 +207,21 @@ ieee80211_proto_vattach(struct ieee80211vap *vap)
 		const struct ieee80211_rateset *rs = &ic->ic_sup_rates[i];
 
 		vap->iv_txparms[i].ucastrate = IEEE80211_FIXED_RATE_NONE;
+
+		/*
+		 * Setting the management rate to MCS 0 assumes that the
+		 * BSS Basic rate set is empty and the BSS Basic MCS set
+		 * is not.
+		 *
+		 * Since we're not checking this, default to the lowest
+		 * defined rate for this mode.
+		 *
+		 * At least one 11n AP (DLINK DIR-825) is reported to drop
+		 * some MCS management traffic (eg BA response frames.)
+		 *
+		 * See also: 9.6.0 of the 802.11n-2009 specification.
+		 */
+#ifdef	NOTYET
 		if (i == IEEE80211_MODE_11NA || i == IEEE80211_MODE_11NG) {
 			vap->iv_txparms[i].mgmtrate = 0 | IEEE80211_RATE_MCS;
 			vap->iv_txparms[i].mcastrate = 0 | IEEE80211_RATE_MCS;
@@ -216,6 +231,9 @@ ieee80211_proto_vattach(struct ieee80211vap *vap)
 			vap->iv_txparms[i].mcastrate = 
 			    rs->rs_rates[0] & IEEE80211_RATE_VAL;
 		}
+#endif
+		vap->iv_txparms[i].mgmtrate = rs->rs_rates[0] & IEEE80211_RATE_VAL;
+		vap->iv_txparms[i].mcastrate = rs->rs_rates[0] & IEEE80211_RATE_VAL;
 		vap->iv_txparms[i].maxretry = IEEE80211_TXMAX_DEFAULT;
 	}
 	vap->iv_roaming = IEEE80211_ROAMING_AUTO;
@@ -878,6 +896,15 @@ ieee80211_wme_initparams_locked(struct ieee80211vap *vap)
 		return;
 
 	/*
+	 * Clear the wme cap_info field so a qoscount from a previous
+	 * vap doesn't confuse later code which only parses the beacon
+	 * field and updates hardware when said field changes.
+	 * Otherwise the hardware is programmed with defaults, not what
+	 * the beacon actually announces.
+	 */
+	wme->wme_wmeChanParams.cap_info = 0;
+
+	/*
 	 * Select mode; we can be called early in which case we
 	 * always use auto mode.  We know we'll be called when
 	 * entering the RUN state with bsschan setup properly
@@ -1474,6 +1501,11 @@ ieee80211_csa_startswitch(struct ieee80211com *ic,
 	ieee80211_notify_csa(ic, c, mode, count);
 }
 
+/*
+ * Complete the channel switch by transitioning all CSA VAPs to RUN.
+ * This is called by both the completion and cancellation functions
+ * so each VAP is placed back in the RUN state and can thus transmit.
+ */
 static void
 csa_completeswitch(struct ieee80211com *ic)
 {
@@ -1491,15 +1523,27 @@ csa_completeswitch(struct ieee80211com *ic)
  * Complete an 802.11h channel switch started by ieee80211_csa_startswitch.
  * We clear state and move all vap's in CSA state to RUN state
  * so they can again transmit.
+ *
+ * Although this may not be completely correct, update the BSS channel
+ * for each VAP to the newly configured channel. The setcurchan sets
+ * the current operating channel for the interface (so the radio does
+ * switch over) but the VAP BSS isn't updated, leading to incorrectly
+ * reported information via ioctl.
  */
 void
 ieee80211_csa_completeswitch(struct ieee80211com *ic)
 {
+	struct ieee80211vap *vap;
+
 	IEEE80211_LOCK_ASSERT(ic);
 
 	KASSERT(ic->ic_flags & IEEE80211_F_CSAPENDING, ("csa not pending"));
 
 	ieee80211_setcurchan(ic, ic->ic_csa_newchan);
+	TAILQ_FOREACH(vap, &ic->ic_vaps, iv_next)
+		if (vap->iv_state == IEEE80211_S_CSA)
+			vap->iv_bss->ni_chan = ic->ic_curchan;
+
 	csa_completeswitch(ic);
 }
 

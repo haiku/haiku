@@ -57,8 +57,11 @@ __FBSDID("$FreeBSD$");
 #include <net80211/ieee80211_wds.h>
 #include <net80211/ieee80211_mesh.h>
 
-#ifdef INET
+#if defined(INET) || defined(INET6)
 #include <netinet/in.h> 
+#endif
+
+#ifdef INET
 #include <netinet/if_ether.h>
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
@@ -66,6 +69,8 @@ __FBSDID("$FreeBSD$");
 #ifdef INET6
 #include <netinet/ip6.h>
 #endif
+
+#include <security/mac/mac_framework.h>
 
 #define	ETHER_HEADER_COPY(dst, src) \
 	memcpy(dst, src, sizeof(struct ether_header))
@@ -396,14 +401,101 @@ ieee80211_output(struct ifnet *ifp, struct mbuf *m,
 		senderr(ENETDOWN);
 	}
 	vap = ifp->if_softc;
+	/*
+	 * Hand to the 802.3 code if not tagged as
+	 * a raw 802.11 frame.
+	 */
+	if (dst->sa_family != AF_IEEE80211)
+		return vap->iv_output(ifp, m, dst, ro);
+#ifdef MAC
+	error = mac_ifnet_check_transmit(ifp, m);
+	if (error)
+		senderr(error);
+#endif
+	if (ifp->if_flags & IFF_MONITOR)
+		senderr(ENETDOWN);
+	if (!IFNET_IS_UP_RUNNING(ifp))
+		senderr(ENETDOWN);
+	if (vap->iv_state == IEEE80211_S_CAC) {
+		IEEE80211_DPRINTF(vap,
+		    IEEE80211_MSG_OUTPUT | IEEE80211_MSG_DOTH,
+		    "block %s frame in CAC state\n", "raw data");
+		vap->iv_stats.is_tx_badstate++;
+		senderr(EIO);		/* XXX */
+	} else if (vap->iv_state == IEEE80211_S_SCAN)
+		senderr(EIO);
+	/* XXX bypass bridge, pfil, carp, etc. */
 
-	return vap->iv_output(ifp, m, dst, ro);
+	if (m->m_pkthdr.len < sizeof(struct ieee80211_frame_ack))
+		senderr(EIO);	/* XXX */
+	wh = mtod(m, struct ieee80211_frame *);
+	if ((wh->i_fc[0] & IEEE80211_FC0_VERSION_MASK) !=
+	    IEEE80211_FC0_VERSION_0)
+		senderr(EIO);	/* XXX */
 
+	/* locate destination node */
+	switch (wh->i_fc[1] & IEEE80211_FC1_DIR_MASK) {
+	case IEEE80211_FC1_DIR_NODS:
+	case IEEE80211_FC1_DIR_FROMDS:
+		ni = ieee80211_find_txnode(vap, wh->i_addr1);
+		break;
+	case IEEE80211_FC1_DIR_TODS:
+	case IEEE80211_FC1_DIR_DSTODS:
+		if (m->m_pkthdr.len < sizeof(struct ieee80211_frame))
+			senderr(EIO);	/* XXX */
+		ni = ieee80211_find_txnode(vap, wh->i_addr3);
+		break;
+	default:
+		senderr(EIO);	/* XXX */
+	}
+	if (ni == NULL) {
+		/*
+		 * Permit packets w/ bpf params through regardless
+		 * (see below about sa_len).
+		 */
+		if (dst->sa_len == 0)
+			senderr(EHOSTUNREACH);
+		ni = ieee80211_ref_node(vap->iv_bss);
+	}
+
+	/*
+	 * Sanitize mbuf for net80211 flags leaked from above.
+	 *
+	 * NB: This must be done before ieee80211_classify as
+	 *     it marks EAPOL in frames with M_EAPOL.
+	 */
+	m->m_flags &= ~M_80211_TX;
+
+	/* calculate priority so drivers can find the tx queue */
+	/* XXX assumes an 802.3 frame */
+	if (ieee80211_classify(ni, m))
+		senderr(EIO);		/* XXX */
+
+	ifp->if_opackets++;
+	IEEE80211_NODE_STAT(ni, tx_data);
+	if (IEEE80211_IS_MULTICAST(wh->i_addr1)) {
+		IEEE80211_NODE_STAT(ni, tx_mcast);
+		m->m_flags |= M_MCAST;
+	} else
+		IEEE80211_NODE_STAT(ni, tx_ucast);
+	/* NB: ieee80211_encap does not include 802.11 header */
+	IEEE80211_NODE_STAT_ADD(ni, tx_bytes, m->m_pkthdr.len);
+
+	/*
+	 * NB: DLT_IEEE802_11_RADIO identifies the parameters are
+	 * present by setting the sa_len field of the sockaddr (yes,
+	 * this is a hack).
+	 * NB: we assume sa_data is suitably aligned to cast.
+	 */
+	return vap->iv_ic->ic_raw_xmit(ni, m,
+	    (const struct ieee80211_bpf_params *)(dst->sa_len ?
+		dst->sa_data : NULL));
 bad:
 	if (m != NULL)
 		m_freem(m);
+	if (ni != NULL)
+		ieee80211_free_node(ni);
 	ifp->if_oerrors++;
-
 	return error;
 #undef senderr
 }
@@ -424,6 +516,7 @@ ieee80211_send_setup(
 {
 #define	WH4(wh)	((struct ieee80211_frame_addr4 *)wh)
 	struct ieee80211vap *vap = ni->ni_vap;
+	struct ieee80211_tx_ampdu *tap;
 	struct ieee80211_frame *wh = mtod(m, struct ieee80211_frame *);
 	ieee80211_seq seqno;
 
@@ -491,9 +584,15 @@ ieee80211_send_setup(
 	}
 	*(uint16_t *)&wh->i_dur[0] = 0;
 
-	seqno = ni->ni_txseqs[tid]++;
-	*(uint16_t *)&wh->i_seq[0] = htole16(seqno << IEEE80211_SEQ_SEQ_SHIFT);
-	M_SEQNO_SET(m, seqno);
+	tap = &ni->ni_tx_ampdu[TID_TO_WME_AC(tid)];
+	if (tid != IEEE80211_NONQOS_TID && IEEE80211_AMPDU_RUNNING(tap))
+		m->m_flags |= M_AMPDU_MPDU;
+	else {
+		seqno = ni->ni_txseqs[tid]++;
+		*(uint16_t *)&wh->i_seq[0] =
+		    htole16(seqno << IEEE80211_SEQ_SEQ_SHIFT);
+		M_SEQNO_SET(m, seqno);
+	}
 
 	if (IEEE80211_IS_MULTICAST(wh->i_addr1))
 		m->m_flags |= M_MCAST;
@@ -2693,6 +2792,8 @@ ieee80211_beacon_update(struct ieee80211_node *ni,
 	struct ieee80211com *ic = ni->ni_ic;
 	int len_changed = 0;
 	uint16_t capinfo;
+	struct ieee80211_frame *wh;
+	ieee80211_seq seqno;
 
 	IEEE80211_LOCK(ic);
 	/*
@@ -2723,6 +2824,12 @@ ieee80211_beacon_update(struct ieee80211_node *ni,
 		IEEE80211_UNLOCK(ic);
 		return 1;		/* just assume length changed */
 	}
+
+	wh = mtod(m, struct ieee80211_frame *);
+	seqno = ni->ni_txseqs[IEEE80211_NONQOS_TID]++;
+	*(uint16_t *)&wh->i_seq[0] =
+		htole16(seqno << IEEE80211_SEQ_SEQ_SHIFT);
+	M_SEQNO_SET(m, seqno);
 
 	/* XXX faster to recalculate entirely or just changes? */
 	capinfo = ieee80211_getcapinfo(vap, ni->ni_chan);
@@ -2834,13 +2941,13 @@ ieee80211_beacon_update(struct ieee80211_node *ni,
 				bo->bo_tim_trailer += adjust;
 				bo->bo_erp += adjust;
 				bo->bo_htinfo += adjust;
-#ifdef IEEE80211_SUPERG_SUPPORT
+#ifdef IEEE80211_SUPPORT_SUPERG
 				bo->bo_ath += adjust;
 #endif
-#ifdef IEEE80211_TDMA_SUPPORT
+#ifdef IEEE80211_SUPPORT_TDMA
 				bo->bo_tdma += adjust;
 #endif
-#ifdef IEEE80211_MESH_SUPPORT
+#ifdef IEEE80211_SUPPORT_MESH
 				bo->bo_meshconf += adjust;
 #endif
 				bo->bo_appie += adjust;
@@ -2888,13 +2995,13 @@ ieee80211_beacon_update(struct ieee80211_node *ni,
 				bo->bo_erp += sizeof(*csa);
 				bo->bo_htinfo += sizeof(*csa);
 				bo->bo_wme += sizeof(*csa);
-#ifdef IEEE80211_SUPERG_SUPPORT
+#ifdef IEEE80211_SUPPORT_SUPERG
 				bo->bo_ath += sizeof(*csa);
 #endif
-#ifdef IEEE80211_TDMA_SUPPORT
+#ifdef IEEE80211_SUPPORT_TDMA
 				bo->bo_tdma += sizeof(*csa);
 #endif
-#ifdef IEEE80211_MESH_SUPPORT
+#ifdef IEEE80211_SUPPORT_MESH
 				bo->bo_meshconf += sizeof(*csa);
 #endif
 				bo->bo_appie += sizeof(*csa);

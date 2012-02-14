@@ -232,6 +232,8 @@ static devclass_t iwi_devclass;
 
 DRIVER_MODULE(iwi, pci, iwi_driver, iwi_devclass, 0, 0);
 
+MODULE_VERSION(iwi, 1);
+
 static __inline uint8_t
 MEM_READ_1(struct iwi_softc *sc, uint32_t addr)
 {
@@ -397,11 +399,11 @@ iwi_attach(device_t dev)
 	val = iwi_read_prom_word(sc, IWI_EEPROM_MAC + 2);
 	macaddr[4] = val & 0xff;
 	macaddr[5] = val >> 8;
-
+	
 	bands = 0;
 	setbit(&bands, IEEE80211_MODE_11B);
 	setbit(&bands, IEEE80211_MODE_11G);
-	if (pci_get_device(dev) >= 0x4223)
+	if (pci_get_device(dev) >= 0x4223) 
 		setbit(&bands, IEEE80211_MODE_11A);
 	ieee80211_init_channels(ic, NULL, &bands);
 
@@ -570,7 +572,7 @@ iwi_alloc_cmd_ring(struct iwi_softc *sc, struct iwi_cmd_ring *ring, int count)
 
 	error = bus_dma_tag_create(bus_get_dma_tag(sc->sc_dev), 4, 0,
 	    BUS_SPACE_MAXADDR_32BIT, BUS_SPACE_MAXADDR, NULL, NULL,
-	    count * IWI_CMD_DESC_SIZE, 1, count * IWI_CMD_DESC_SIZE, 0,
+	    count * IWI_CMD_DESC_SIZE, 1, count * IWI_CMD_DESC_SIZE, 0, 
 	    NULL, NULL, &ring->desc_dmat);
 	if (error != 0) {
 		device_printf(sc->sc_dev, "could not create desc DMA tag\n");
@@ -615,7 +617,7 @@ iwi_free_cmd_ring(struct iwi_softc *sc, struct iwi_cmd_ring *ring)
 	}
 
 	if (ring->desc_dmat != NULL)
-		bus_dma_tag_destroy(ring->desc_dmat);
+		bus_dma_tag_destroy(ring->desc_dmat);	
 }
 
 static int
@@ -632,7 +634,7 @@ iwi_alloc_tx_ring(struct iwi_softc *sc, struct iwi_tx_ring *ring, int count,
 
 	error = bus_dma_tag_create(bus_get_dma_tag(sc->sc_dev), 4, 0,
 	    BUS_SPACE_MAXADDR_32BIT, BUS_SPACE_MAXADDR, NULL, NULL,
-	    count * IWI_TX_DESC_SIZE, 1, count * IWI_TX_DESC_SIZE, 0, NULL,
+	    count * IWI_TX_DESC_SIZE, 1, count * IWI_TX_DESC_SIZE, 0, NULL, 
 	    NULL, &ring->desc_dmat);
 	if (error != 0) {
 		device_printf(sc->sc_dev, "could not create desc DMA tag\n");
@@ -911,7 +913,7 @@ iwi_node_free(struct ieee80211_node *ni)
 	sc->sc_node_free(ni);
 }
 
-/*
+/* 
  * Convert h/w rate code to IEEE rate code.
  */
 static int
@@ -2937,7 +2939,7 @@ iwi_auth_and_assoc(struct iwi_softc *sc, struct ieee80211vap *vap)
 		 * key setup.  This typically is due to a user app bug
 		 * but if we blindly grab the key the firmware will
 		 * barf so avoid it for now.
-		 */
+		 */ 
 		if (vap->iv_def_txkey != IEEE80211_KEYIX_NONE)
 			assoc->auth |= vap->iv_def_txkey << 4;
 
@@ -3519,14 +3521,14 @@ iwi_ledattach(struct iwi_softc *sc)
 	SYSCTL_ADD_PROC(ctx, SYSCTL_CHILDREN(tree), OID_AUTO,
 		"softled", CTLTYPE_INT | CTLFLAG_RW, sc, 0,
 		iwi_sysctl_softled, "I", "enable/disable software LED support");
-	SYSCTL_ADD_INT(ctx, SYSCTL_CHILDREN(tree), OID_AUTO,
+	SYSCTL_ADD_UINT(ctx, SYSCTL_CHILDREN(tree), OID_AUTO,
 		"ledpin", CTLFLAG_RW, &sc->sc_ledpin, 0,
 		"pin setting to turn activity LED on");
-	SYSCTL_ADD_INT(ctx, SYSCTL_CHILDREN(tree), OID_AUTO,
+	SYSCTL_ADD_UINT(ctx, SYSCTL_CHILDREN(tree), OID_AUTO,
 		"ledidle", CTLFLAG_RW, &sc->sc_ledidle, 0,
 		"idle time for inactivity LED (ticks)");
 	/* XXX for debugging */
-	SYSCTL_ADD_INT(ctx, SYSCTL_CHILDREN(tree), OID_AUTO,
+	SYSCTL_ADD_UINT(ctx, SYSCTL_CHILDREN(tree), OID_AUTO,
 		"nictype", CTLFLAG_RD, &sc->sc_nictype, 0,
 		"NIC type from EEPROM");
 

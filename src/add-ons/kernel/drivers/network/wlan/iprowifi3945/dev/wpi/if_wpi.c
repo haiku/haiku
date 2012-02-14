@@ -29,7 +29,7 @@ __FBSDID("$FreeBSD$");
  * state and told to load boot firmware. The boot firmware loads an init and a
  * main  binary firmware image into SRAM on the card via DMA.
  * Once the firmware is loaded, the driver/hw then
- * communicate by way of circular dma rings via the the SRAM to the firmware.
+ * communicate by way of circular dma rings via the SRAM to the firmware.
  *
  * There is 6 memory rings. 1 command ring, 1 rx data ring & 4 tx data rings.
  * The 4 tx data rings allow for prioritization QoS.
@@ -181,7 +181,7 @@ static uint32_t	wpi_mem_read(struct wpi_softc *, uint16_t);
 static void	wpi_mem_write(struct wpi_softc *, uint16_t, uint32_t);
 static void	wpi_mem_write_region_4(struct wpi_softc *, uint16_t,
 		    const uint32_t *, int);
-static int	wpi_read_prom_data(struct wpi_softc *, uint32_t, void *, int);
+static uint16_t	wpi_read_prom_data(struct wpi_softc *, uint32_t, void *, int);
 static int	wpi_alloc_fwmem(struct wpi_softc *);
 static void	wpi_free_fwmem(struct wpi_softc *);
 static int	wpi_load_firmware(struct wpi_softc *);
@@ -272,6 +272,8 @@ static driver_t wpi_driver = {
 static devclass_t wpi_devclass;
 
 DRIVER_MODULE(wpi, pci, wpi_driver, wpi_devclass, 0, 0);
+
+MODULE_VERSION(wpi, 1);
 
 static const uint8_t wpi_ridx_to_plcp[] = {
 	/* OFDM: IEEE Std 802.11a-1999, pp. 14 Table 80 */
@@ -488,7 +490,7 @@ wpi_attach(device_t dev)
 	struct wpi_softc *sc = device_get_softc(dev);
 	struct ifnet *ifp;
 	struct ieee80211com *ic;
-	int ac, error, result, supportsa = 1;
+	int ac, error, supportsa = 1;
 	uint32_t tmp;
 	const struct wpi_ident *ident;
 	uint8_t macaddr[IEEE80211_ADDR_LEN];
@@ -545,9 +547,6 @@ wpi_attach(device_t dev)
 	sc->sc_sh = rman_get_bushandle(sc->mem);
 
 	sc->irq_rid = 0;
-	if ((result = pci_msi_count(dev)) == 1 &&
-	    pci_alloc_msi(dev, &result) == 0)
-		sc->irq_rid = 1;
 	sc->irq = bus_alloc_resource_any(dev, SYS_RES_IRQ, &sc->irq_rid,
 	    RF_ACTIVE | RF_SHAREABLE);
 	if (sc->irq == NULL) {
@@ -747,8 +746,6 @@ wpi_detach(device_t dev)
 	if (sc->irq != NULL) {
 		bus_teardown_intr(dev, sc->irq, sc->sc_ih);
 		bus_release_resource(dev, SYS_RES_IRQ, sc->irq_rid, sc->irq);
-		if (sc->irq_rid == 1)
-			pci_release_msi(dev);
 	}
 
 	if (sc->mem != NULL)
@@ -964,7 +961,7 @@ wpi_alloc_rx_ring(struct wpi_softc *sc, struct wpi_rx_ring *ring)
 		goto fail;
 	}
 
-        error = bus_dma_tag_create(bus_get_dma_tag(sc->sc_dev), 1, 0,
+        error = bus_dma_tag_create(bus_get_dma_tag(sc->sc_dev), 1, 0, 
 	    BUS_SPACE_MAXADDR_32BIT,
             BUS_SPACE_MAXADDR, NULL, NULL, MJUMPAGESIZE, 1,
             MJUMPAGESIZE, BUS_DMA_NOWAIT, NULL, NULL, &ring->data_dmat);
@@ -1009,7 +1006,7 @@ wpi_alloc_rx_ring(struct wpi_softc *sc, struct wpi_rx_ring *ring)
 			error = ENOMEM;	/* XXX unique code */
 			goto fail;
 		}
-		bus_dmamap_sync(ring->data_dmat, data->map,
+		bus_dmamap_sync(ring->data_dmat, data->map, 
 		    BUS_DMASYNC_PREWRITE);
 
 		data->m = m;
@@ -1364,7 +1361,7 @@ wpi_mem_write_region_4(struct wpi_softc *sc, uint16_t addr,
  * using the traditional bit-bang method. Data is read up until len bytes have
  * been obtained.
  */
-static int
+static uint16_t
 wpi_read_prom_data(struct wpi_softc *sc, uint32_t addr, void *data, int len)
 {
 	int ntries;
@@ -2308,7 +2305,7 @@ wpi_mrr_setup(struct wpi_softc *sc)
 	}
 
 	/* setup MRR for control frames */
-	mrr.which = htole32(WPI_MRR_CTL);
+	mrr.which = WPI_MRR_CTL;
 	error = wpi_cmd(sc, WPI_CMD_MRR_SETUP, &mrr, sizeof mrr, 0);
 	if (error != 0) {
 		device_printf(sc->sc_dev,
@@ -2317,7 +2314,7 @@ wpi_mrr_setup(struct wpi_softc *sc)
 	}
 
 	/* setup MRR for data frames */
-	mrr.which = htole32(WPI_MRR_DATA);
+	mrr.which = WPI_MRR_DATA;
 	error = wpi_cmd(sc, WPI_CMD_MRR_SETUP, &mrr, sizeof mrr, 0);
 	if (error != 0) {
 		device_printf(sc->sc_dev,

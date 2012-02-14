@@ -140,6 +140,7 @@ struct ieee80211com {
 	uint32_t		ic_flags_ven;	/* vendor state flags */
 	uint32_t		ic_caps;	/* capabilities */
 	uint32_t		ic_htcaps;	/* HT capabilities */
+	uint32_t		ic_htextcaps;	/* HT extended capabilities */
 	uint32_t		ic_cryptocaps;	/* crypto capabilities */
 	uint8_t			ic_modecaps[2];	/* set of mode capabilities */
 	uint8_t			ic_promisc;	/* vap's needing promisc mode */
@@ -192,8 +193,8 @@ struct ieee80211com {
 	struct ieee80211_dfs_state ic_dfs;	/* DFS state */
 
 	struct ieee80211_scan_state *ic_scan;	/* scan state */
-	long long	ic_lastdata;	/* time of last data frame */
-	long long	ic_lastscan;	/* time last scan completed */
+	int			ic_lastdata;	/* time of last data frame */
+	int			ic_lastscan;	/* time last scan completed */
 
 	/* NB: this is the union of all vap stations/neighbors */
 	int			ic_max_keyix;	/* max h/w key index */
@@ -213,8 +214,10 @@ struct ieee80211com {
 	uint16_t		ic_ht40_sta_assoc;/* HT40 stations associated */
 	uint8_t			ic_curhtprotmode;/* HTINFO bss state */
 	enum ieee80211_protmode	ic_htprotmode;	/* HT protection mode */
-	long long		ic_lastnonerp;	/* last time non-ERP sta noted*/
-	long long		ic_lastnonht;	/* last time non-HT sta noted */
+	int			ic_lastnonerp;	/* last time non-ERP sta noted*/
+	int			ic_lastnonht;	/* last time non-HT sta noted */
+	uint8_t			ic_rxstream;    /* # RX streams */
+	uint8_t			ic_txstream;    /* # TX streams */
 
 	/* optional state for Atheros SuperG protocol extensions */
 	struct ieee80211_superg	*ic_superg;
@@ -307,6 +310,8 @@ struct ieee80211com {
 				    int status, int baparamset, int batimeout);
 	void			(*ic_addba_stop)(struct ieee80211_node *,
 				    struct ieee80211_tx_ampdu *);
+	void			(*ic_addba_response_timeout)(struct ieee80211_node *,
+				    struct ieee80211_tx_ampdu *);
 	/* BAR response received */
 	void			(*ic_bar_response)(struct ieee80211_node *,
 				    struct ieee80211_tx_ampdu *, int status);
@@ -316,7 +321,7 @@ struct ieee80211com {
 				    int batimeout, int baseqctl);
 	void			(*ic_ampdu_rx_stop)(struct ieee80211_node *,
 				    struct ieee80211_rx_ampdu *);
-	uint64_t		ic_spare[8];
+	uint64_t		ic_spare[7];
 };
 
 struct ieee80211_aclator;
@@ -343,6 +348,7 @@ struct ieee80211vap {
 	uint32_t		iv_flags_ven;	/* vendor state flags */
 	uint32_t		iv_caps;	/* capabilities */
 	uint32_t		iv_htcaps;	/* HT capabilities */
+	uint32_t		iv_htextcaps;	/* HT extended capabilities */
 	enum ieee80211_opmode	iv_opmode;	/* operation mode */
 	enum ieee80211_state	iv_state;	/* state machine state */
 	enum ieee80211_state	iv_nstate;	/* pending state */
@@ -576,7 +582,7 @@ struct ieee80211vap {
 
 #define	IEEE80211_FHT_BITS \
 	"\20\1NONHT_PR" \
-	"\23GF\24HT\25AMDPU_TX\26AMPDU_TX" \
+	"\23GF\24HT\25AMPDU_TX\26AMPDU_TX" \
 	"\27AMSDU_TX\30AMSDU_RX\31USEHT40\32PUREN\33SHORTGI20\34SHORTGI40" \
 	"\35HTCOMPAT\36RIFS\37STBC_TX\40STBC_RX"
 
@@ -635,6 +641,10 @@ struct ieee80211vap {
 #define	IEEE80211_HTC_HT	0x00040000	/* CAPABILITY: HT operation */
 #define	IEEE80211_HTC_SMPS	0x00080000	/* CAPABILITY: MIMO power save*/
 #define	IEEE80211_HTC_RIFS	0x00100000	/* CAPABILITY: RIFS support */
+#define	IEEE80211_HTC_RXUNEQUAL	0x00200000	/* CAPABILITY: RX unequal MCS */
+#define	IEEE80211_HTC_RXMCS32	0x00400000	/* CAPABILITY: MCS32 support */
+#define	IEEE80211_HTC_TXUNEQUAL	0x00800000	/* CAPABILITY: TX unequal MCS */
+#define	IEEE80211_HTC_TXMCS32	0x01000000	/* CAPABILITY: MCS32 suport */
 
 #define	IEEE80211_C_HTCAP_BITS \
 	"\20\1LDPC\2CHWIDTH40\5GREENFIELD\6SHORTGI20\7SHORTGI40\10TXSTBC" \
