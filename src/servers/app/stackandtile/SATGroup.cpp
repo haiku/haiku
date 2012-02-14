@@ -487,6 +487,11 @@ WindowArea::_UnsetNeighbourCorner(Corner* neighbour, Corner* opponent)
 void
 WindowArea::_MoveToSAT(SATWindow* triggerWindow)
 {
+	SATWindow* topWindow = TopWindow();
+	// if there is no window in the group we are done
+	if (topWindow == NULL)
+		return;
+
 	int32 workspace = triggerWindow->GetWindow()->CurrentWorkspace();
 	Desktop* desktop = triggerWindow->GetWindow()->Desktop();
 
@@ -495,7 +500,6 @@ WindowArea::_MoveToSAT(SATWindow* triggerWindow)
 		RightVar()->Value() - kMakePositiveOffset,
 		BottomVar()->Value() - kMakePositiveOffset);
 
-	SATWindow* topWindow = TopWindow();
 	topWindow->AdjustSizeLimits(frameSAT);
 
 	BRect frame = topWindow->CompleteWindowFrame();
