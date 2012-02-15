@@ -292,7 +292,7 @@ function BuildBroadcomFWCutter()
 
 	# Download additonal files for building b43-fwcutter.
 	cd b43-fwcutter-012
-	local baseURL='http://svn.haiku-os.org/haiku/haiku/trunk/src/system/libroot/posix/glibc'
+	local baseURL='http://cgit.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc'
 	DownloadFileIfNotCached ${baseURL}/string/byteswap.h byteswap.h $dir
 	if [ $result -gt 0 ]; then
 		return $result
