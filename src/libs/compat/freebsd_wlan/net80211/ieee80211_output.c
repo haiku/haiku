@@ -401,6 +401,10 @@ ieee80211_output(struct ifnet *ifp, struct mbuf *m,
 		senderr(ENETDOWN);
 	}
 	vap = ifp->if_softc;
+
+#ifdef __HAIKU__
+	return vap->iv_output(ifp, m, dst, ro);
+#else
 	/*
 	 * Hand to the 802.3 code if not tagged as
 	 * a raw 802.11 frame.
@@ -490,6 +494,7 @@ ieee80211_output(struct ifnet *ifp, struct mbuf *m,
 	return vap->iv_ic->ic_raw_xmit(ni, m,
 	    (const struct ieee80211_bpf_params *)(dst->sa_len ?
 		dst->sa_data : NULL));
+#endif
 bad:
 	if (m != NULL)
 		m_freem(m);
