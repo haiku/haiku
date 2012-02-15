@@ -33,10 +33,9 @@
 #	define TRACE(x) ;
 #endif
 
+
 static uint32 sCPUAPICIds[B_MAX_CPU_COUNT];
 static uint32 sAPICVersions[B_MAX_CPU_COUNT];
-
-extern "C" void init_fpu(void);
 
 
 static int32
@@ -108,7 +107,7 @@ arch_smp_per_cpu_init(kernel_args *args, int32 cpu)
 	apic_per_cpu_init(args, cpu);
 
 	// setup FPU and SSE if supported
-	init_fpu();
+	x86_init_fpu();
 
 	return B_OK;
 }
