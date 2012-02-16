@@ -38,6 +38,7 @@
 #define ERROR(x...) dprintf("radeon_hd: " x)
 
 
+// Must match chipset families in radeon_hd.h
 static const char radeon_chip_name[][16] = {
 	"R420",
 	"R423",
@@ -79,7 +80,8 @@ static const char radeon_chip_name[][16] = {
 	"Cayman",
 	"Antilles",
 	"Lombok",
-	"Thames",
+	"Cape Verde",
+	"Pitcairn",
 	"Tahiti",
 	"New Zealand"
 };

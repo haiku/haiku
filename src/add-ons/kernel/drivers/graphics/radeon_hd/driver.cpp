@@ -257,7 +257,10 @@ const struct supported_device {
 	// Introduced: Late 2011
 	// Codename: Southern Islands
 	//  Lombok
-	//  Thames
+	//  Cape Verde
+	{0x683F, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD 7750"},
+	{0x683D, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD 7770"},
+	//  Pitcairn
 	//  Tahiti
 	{0x679A, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD 7950"},
 	{0x6798, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD 7970"}
