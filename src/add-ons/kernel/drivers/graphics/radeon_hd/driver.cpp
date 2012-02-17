@@ -80,6 +80,7 @@ const struct supported_device {
 	// Marketing Names: Radeon HD 24xx - HD 42xx
 	// Introduced: 2006
 	// Codename: Pele
+	// Process: 55 nm
 	{0x94c7, 2, 0, RADEON_RV610, CHIP_STD, "Radeon HD 2350"},
 	{0x94c1, 2, 0, RADEON_RV610, CHIP_IGP, "Radeon HD 2400"},
 	{0x94c3, 2, 0, RADEON_RV610, CHIP_STD, "Radeon HD 2400"},
@@ -131,6 +132,7 @@ const struct supported_device {
 	// Marketing Names: Radeon HD 4330 - HD 4890, HD 51xx, HD 5xxV
 	// Introduced: 2008
 	// Codename: Wekiva
+	// Process: 55 nm
 	//	Radeon 4330		- RV710
 	{0x954f, 3, 2, RADEON_RV710, CHIP_IGP, "Radeon HD 4300"},
 	{0x9552, 3, 2, RADEON_RV710, CHIP_IGP, "Radeon HD 4300"},
@@ -157,6 +159,7 @@ const struct supported_device {
 	// Marketing Names: Radeon HD 54xx ~ HD 63xx
 	// Introduced: 2009
 	// Codename: Evergreen
+	// Process: 40 nm
 	//  Cedar
 	{0x68e1, 4, 0, RADEON_CEDAR, CHIP_STD, "Radeon HD 5430"},
 	{0x68f9, 4, 0, RADEON_CEDAR, CHIP_STD, "Radeon HD 5450"},
@@ -204,6 +207,7 @@ const struct supported_device {
 	// Radeon HD 64xx - HD 69xx
 	// Introduced: 2010
 	// Codename: Nothern Islands
+	// Process: 40 nm
 	//  Caicos
 	{0x6760, 5, 0, RADEON_CAICOS, CHIP_MOBILE, "Radeon HD 6470M"},
 	{0x6761, 5, 0, RADEON_CAICOS, CHIP_MOBILE, "Radeon HD 6430M"},
@@ -217,6 +221,8 @@ const struct supported_device {
 	{0x6770, 5, 0, RADEON_CAICOS, CHIP_STD, "Radeon HD 6400"},
 	{0x6778, 5, 0, RADEON_CAICOS, CHIP_STD, "Radeon HD CAICOS"},
 	{0x6779, 5, 0, RADEON_CAICOS, CHIP_STD, "Radeon HD 6450"},
+	{0x68fa, 5, 0, RADEON_CAICOS, CHIP_STD, "Radeon HD 7350"},
+	{0x68f9, 5, 0, RADEON_CAICOS, CHIP_STD, "Radeon HD 7350"},
 	//  Turks
 	{0x6740, 5, 0, RADEON_TURKS, CHIP_MOBILE, "Radeon HD 6770M"},
 	{0x6741, 5, 0, RADEON_TURKS, CHIP_MOBILE, "Radeon HD 6650M"},
@@ -230,7 +236,7 @@ const struct supported_device {
 	{0x6749, 5, 0, RADEON_TURKS, CHIP_STD, "FirePro v4900"},
 	{0x6750, 5, 0, RADEON_TURKS, CHIP_STD, "Radeon HD 6500"},
 	{0x6758, 5, 0, RADEON_TURKS, CHIP_STD, "Radeon HD 6670"},
-	{0x6759, 5, 0, RADEON_TURKS, CHIP_STD, "Radeon HD 6570"},
+	{0x6759, 5, 0, RADEON_TURKS, CHIP_STD, "Radeon HD 6570/7570"},
 	//  Barts
 	{0x673e, 5, 0, RADEON_BARTS, CHIP_STD, "Radeon HD 6790"},
 	{0x6739, 5, 0, RADEON_BARTS, CHIP_STD, "Radeon HD 6850"},
@@ -256,12 +262,17 @@ const struct supported_device {
 	// Marketing Names: Radeon HD 74xx - HD 79xx
 	// Introduced: Late 2011
 	// Codename: Southern Islands
+	// Process: 28 nm
 	//  Lombok
 	//  Cape Verde
 	{0x683f, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD 7750"},
 	{0x683d, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD 7770"},
 	//  Pitcairn
+	//	- 7790
+	//	- 7850
+	//	- 7870
 	//  Tahiti
+	//	- 7890
 	{0x679a, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD 7950"},
 	{0x6798, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD 7970"}
 	//  New Zealand
