@@ -248,8 +248,8 @@ const struct supported_device {
 	{0x6709, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD CAYMAN"},
 	{0x6718, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD 6970"},
 	{0x6719, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD 6950"},
-	{0x671C, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD CAYMAN"},
-	{0x671F, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD 6900"},
+	{0x671c, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD CAYMAN"},
+	{0x671f, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD 6900"},
 	//  Antilles
 	{0x671d, 5, 0, RADEON_ANTILLES, CHIP_STD, "Radeon HD 6990"},
 
@@ -258,11 +258,11 @@ const struct supported_device {
 	// Codename: Southern Islands
 	//  Lombok
 	//  Cape Verde
-	{0x683F, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD 7750"},
-	{0x683D, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD 7770"},
+	{0x683f, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD 7750"},
+	{0x683d, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD 7770"},
 	//  Pitcairn
 	//  Tahiti
-	{0x679A, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD 7950"},
+	{0x679a, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD 7950"},
 	{0x6798, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD 7970"}
 	//  New Zealand
 };
