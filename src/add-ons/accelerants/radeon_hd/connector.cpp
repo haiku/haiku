@@ -125,9 +125,10 @@ connector_read_edid(uint32 connectorIndex, edid1_info* edid)
 		return false;
 
 	if (gConnector[connectorIndex]->type == VIDEO_CONNECTOR_LVDS) {
-		// we should call connector_read_edid_lvds at some point
 		ERROR("%s: LCD panel detected (LVDS), sending VESA EDID!\n",
 			__func__);
+		// TODO: connector_read_edid_lvds doesn't do anything yet
+		connector_read_edid_lvds(connectorIndex, edid);
 		memcpy(edid, &gInfo->shared_info->edid_info, sizeof(struct edid1_info));
 		return true;
 	}
@@ -153,7 +154,6 @@ connector_read_edid(uint32 connectorIndex, edid1_info* edid)
 }
 
 
-#if 0
 bool
 connector_read_edid_lvds(uint32 connectorIndex, edid1_info* edid)
 {
@@ -162,11 +162,19 @@ connector_read_edid_lvds(uint32 connectorIndex, edid1_info* edid)
 	int index = GetIndexIntoMasterTable(DATA, LVDS_Info);
 	uint16 offset;
 
-	if (atom_parse_data_header(gAtomContexg, index, NULL,
+	union atomLVDSInfo {
+		struct _ATOM_LVDS_INFO info;
+		struct _ATOM_LVDS_INFO_V12 info_12;
+	};
+
+	if (atom_parse_data_header(gAtomContext, index, NULL,
 		&dceMajor, &dceMinor, &offset) == B_OK) {
-		lvdsInfo = (union lvds_info*)(gAtomContext->bios + offset);
+
+		union atomLVDSInfo* lvdsInfo
+			= (union atomLVDSInfo*)(gAtomContext->bios + offset);
 
 		display_timing timing;
+
 		// Pixel Clock
 		timing.pixel_clock
 			= B_LENDIAN_TO_HOST_INT16(lvdsInfo->info.sLCDTiming.usPixClk) * 10;
@@ -216,10 +224,18 @@ connector_read_edid_lvds(uint32 connectorIndex, edid1_info* edid)
 			timing.flags |= MODE_FLAG_DBLSCAN;
 		#endif
 
-		// TODO: generate a fake EDID with information above
+		// TODO: generate a fake EDID with information above. For now just dump
+
+		TRACE("%s: %" B_PRIu32 " %" B_PRIu16 " %" B_PRIu16 " %" B_PRIu16 " %" B_PRIu16
+			" %" B_PRIu16 " %" B_PRIu16 " %" B_PRIu16 " %" B_PRIu16 "\n",
+			__func__, timing.pixel_clock, timing.h_display, timing.h_sync_start,
+			timing.h_sync_end, timing.h_total, timing.v_display, timing.v_sync_start,
+			timing.v_sync_end, timing.v_total);
+
+		return true;
 	}
+	return false;
 }
-#endif
 
 
 status_t
