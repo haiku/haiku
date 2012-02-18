@@ -171,7 +171,8 @@ InfoWin::InfoWin(BPoint leftTop, Controller* controller)
 	BRect rect = Bounds();
 
 	// accomodate for big fonts
-	float div = max_c(2 * 32, be_plain_font->StringWidth("Display Mode") + 10);
+	float div = max_c(2 * 32, be_plain_font->StringWidth(
+		B_TRANSLATE("Display Mode")) + 10);
 
 	fInfoView = new InfoView(rect, "background", div);
 	fInfoView->SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
@@ -307,7 +308,8 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 	status_t err;
 	// video track format information
 	if ((which & INFO_VIDEO) && fController->VideoTrackCount() > 0) {
-		fLabelsView->Insert("Video\n\n\n");
+		BString label = B_TRANSLATE("Video");
+		fLabelsView->Insert(label << "\n\n\n");
 		BString s;
 		media_format format;
 		media_raw_video_format videoFormat;
@@ -319,28 +321,32 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 			media_codec_info mci;
 			err = fController->GetVideoCodecInfo(&mci);
 			if (err < B_OK) {
-				s << "Haiku Media Kit: " << strerror(err);
+				s << B_TRANSLATE("Haiku Media Kit: ") << strerror(err);
 				if (format.user_data_type == B_CODEC_TYPE_INFO) {
-					s << (char *)format.user_data << " (not supported)";
+					s << (char *)format.user_data << " "
+						<< B_TRANSLATE("(not supported)");
 				}
 			} else
 				s << mci.pretty_name; //<< "(" << mci.short_name << ")";
 		} else if (format.type == B_MEDIA_RAW_VIDEO) {
 			videoFormat = format.u.raw_video;
-			s << "raw video";
+			s << B_TRANSLATE("raw video");
 		} else
-			s << "unknown format";
+			s << B_TRANSLATE("unknown format");
 		s << "\n";
 		s << format.Width() << " x " << format.Height();
 		// encoded has output as 1st field...
-		s << ", " << videoFormat.field_rate << " fps";
-		s << "\n\n";
+		char fpsString[20];
+		snprintf(fpsString, sizeof(fpsString), B_TRANSLATE("%f fps"),
+			videoFormat.field_rate);
+		s << ", " << fpsString << "\n\n";
 		fContentsView->Insert(s.String());
 	}
 
 	// audio track format information
 	if ((which & INFO_AUDIO) && fController->AudioTrackCount() > 0) {
-		fLabelsView->Insert("Audio\n\n\n");
+		BString label = B_TRANSLATE("Audio");
+		fLabelsView->Insert(label << "\n\n\n");
 		BString s;
 		media_format format;
 		media_raw_audio_format audioFormat;
@@ -354,44 +360,59 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 			media_codec_info mci;
 			err = fController->GetAudioCodecInfo(&mci);
 			if (err < 0) {
-				s << "Haiku Media Kit: " << strerror(err);
+				s << B_TRANSLATE("Haiku Media Kit: ") << strerror(err);
 				if (format.user_data_type == B_CODEC_TYPE_INFO) {
-					s << (char *)format.user_data << " (not supported)";
+					s << (char *)format.user_data << " "
+						<< B_TRANSLATE("(not supported)");
 				}
 			} else
 				s << mci.pretty_name; //<< "(" << mci.short_name << ")";
 		} else if (format.type == B_MEDIA_RAW_AUDIO) {
 			audioFormat = format.u.raw_audio;
-			s << "raw audio";
+			s << B_TRANSLATE("raw audio");
 		} else
-			s << "unknown format";
+			s << B_TRANSLATE("unknown format");
 		s << "\n";
 		uint32 bitsPerSample = 8 * (audioFormat.format
 			& media_raw_audio_format::B_AUDIO_SIZE_MASK);
 		uint32 channelCount = audioFormat.channel_count;
 		float sr = audioFormat.frame_rate;
 
-		if (bitsPerSample > 0)
-			s << bitsPerSample << " Bit ";
+		if (bitsPerSample > 0) {
+			char bitString[20];
+			snprintf(bitString, sizeof(bitString), B_TRANSLATE("%d Bit"),
+				bitsPerSample);
+			s << bitString << " ";
+		}
 		if (channelCount == 1)
-			s << "Mono";
+			s << B_TRANSLATE("Mono");
 		else if (channelCount == 2)
-			s << "Stereo";
-		else
-			s << channelCount << " Channels";
+			s << B_TRANSLATE("Stereo");
+		else {
+			char channelString[20];
+			snprintf(channelString, sizeof(channelString),
+				B_TRANSLATE("%d Channels"), channelCount);
+			s << channelString;
+		}
 		s << ", ";
-		if (sr > 0.0)
-			s << sr / 1000;
-		else
-			s << "??";
-		s<< " kHz";
+		if (sr > 0.0) {
+			char rateString[20];
+			snprintf(rateString, sizeof(rateString),
+				B_TRANSLATE("%d kHz"), sr / 1000);
+			s << rateString;
+		} else {
+			BString rateString = B_TRANSLATE("%d kHz");
+			rateString.ReplaceFirst("%d", "??");
+			s << rateString;
+		}
 		s << "\n\n";
 		fContentsView->Insert(s.String());
 	}
 
 	// statistics
 	if ((which & INFO_STATS) && fController->HasFile()) {
-		fLabelsView->Insert("Duration\n");
+		BString label = B_TRANSLATE("Duration");
+		fLabelsView->Insert(label << "\n");
 		BString s;
 		bigtime_t d = fController->TimeDuration();
 		bigtime_t v;
@@ -411,18 +432,22 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 		v = d / 1000;
 		s << v;
 		if (hours)
-			s << " h";
+			s << " " << B_TRANSLATE_COMMENT("h", "Hours");
 		else
-			s << " min";
+			s << " " << B_TRANSLATE_COMMENT("min", "Minutes");
 		s << "\n";
 		fContentsView->Insert(s.String());
 		// TODO: demux/video/audio/... perfs (Kb/s)
 
-		fLabelsView->Insert("Display mode\n");
-		if (fController->IsOverlayActive())
-			fContentsView->Insert("Overlay\n");
-		else
-			fContentsView->Insert("DrawBitmap\n");
+		BString content = B_TRANSLATE("Display mode");
+		fLabelsView->Insert(content << "\n");
+		if (fController->IsOverlayActive()) {
+			content = B_TRANSLATE("Overlay");
+			fContentsView->Insert(content << "\n");
+		} else {
+			content = B_TRANSLATE("DrawBitmap");
+			fContentsView->Insert(content << "\n");
+		}
 
 		fLabelsView->Insert("\n");
 		fContentsView->Insert("\n");
@@ -440,7 +465,8 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 			media_file_format fileFormat;
 			BString s;
 			if (fController->GetFileFormatInfo(&fileFormat) == B_OK) {
-				fLabelsView->Insert("Container\n");
+				BString label = B_TRANSLATE("Container");
+				fLabelsView->Insert(label << "\n");
 				s << fileFormat.pretty_name;
 				s << "\n";
 				fContentsView->Insert(s.String());
@@ -448,16 +474,17 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 					iconSet = fInfoView->SetIcon(fileFormat.mime_type) == B_OK;
 			} else
 				fContentsView->Insert("\n");
-			fLabelsView->Insert("Location\n");
+			BString label = B_TRANSLATE("Location");
+			fLabelsView->Insert(label << "\n");
 			if (fController->GetLocation(&s) < B_OK)
-				s = "<unknown>";
+				s = B_TRANSLATE("<unknown>");
 			s << "\n";
 			fContentsView->Insert(s.String());
 			if (fController->GetName(&s) < B_OK)
-				s = "<unnamed media>";
+				s = B_TRANSLATE("<unnamed media>");
 			fFilenameView->SetText(s.String());
 		} else {
-			fFilenameView->SetText("<no media>");
+			fFilenameView->SetText(B_TRANSLATE("<no media>"));
 		}
 		if (!iconSet)
 			fInfoView->SetGenericIcon();
@@ -466,7 +493,8 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 	if ((which & INFO_COPYRIGHT) && fController->HasFile()) {
 		BString s;
 		if (fController->GetCopyright(&s) == B_OK && s.Length() > 0) {
-			fLabelsView->Insert("Copyright\n\n");
+			BString label = B_TRANSLATE("Copyright");
+			fLabelsView->Insert(label << "\n\n");
 			s << "\n\n";
 			fContentsView->Insert(s.String());
 		}
