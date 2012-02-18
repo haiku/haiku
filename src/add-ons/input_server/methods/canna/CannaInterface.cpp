@@ -593,14 +593,14 @@ SERIAL_PRINT(( "CannaInterface: GenerateKouhoStr() revPos = %d, revLen = %d, mod
 			    && kouhoRevLine != -1)
 			|| current_mode == CANNA_MODE_TourokuDicMode
 			|| current_mode == CANNA_MODE_BushuMode) {
-			// remove first index
-			memmove(kouhoUTF, kouhoUTF + 2, kouhoUTFLen - 1);
+			// remove first index (3 bytes)
+			memmove(kouhoUTF, kouhoUTF + 3, kouhoUTFLen - 2);
 
-			// convert full-space to LF
+			// convert full width space and following 3 bytes index to LF
 			while ((index = strstr(kouhoUTF, "\xe3\x80\x80")) != NULL) {
 				*index = '\x0a';
 				len = strlen(index);
-				memmove(index + 1, index + 5, len - 4);
+				memmove(index + 1, index + 6, len - 5);
 			}
 			kouhoUTFLen = strlen(kouhoUTF);
 		}

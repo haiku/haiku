@@ -33,8 +33,8 @@ KouhoWindow::KouhoWindow( BFont *font, BLooper *looper )
 
 	font_family family;
 	font_style style;
-	strcpy( family, "Haru" );
-	strcpy( style, "Regular" );
+	strcpy( family, "VL PGothic" );
+	strcpy( style, "regular" );
 	indexfont.SetFamilyAndStyle( family, style );
 	indexfont.SetSize( 10 );
 
@@ -271,8 +271,7 @@ void KouhoView::HighlightLine( int32 line )
 		highlightRect = region.RectAt( 0 );
 		//extend highlihght region to right end
 		highlightRect.right = Bounds().right;
-		Invalidate( highlightRect );
-
+		Invalidate();
 	}
 
 }
