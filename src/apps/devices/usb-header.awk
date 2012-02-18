@@ -47,7 +47,7 @@ BEGIN {
 	# store vendor ID for possible devices afterwards
 	vendorid = $1
 	vendor = substr($0, 7)
-	gsub( /\"/, "\\\"", vendor )
+	gsub( /\"/, "&&", vendor )
 
 	printf formatting "\t{ 0x" vendorid ", \"" vendor "\" }" > ofile
 }
@@ -56,8 +56,8 @@ BEGIN {
 /^\t[[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]] / { 
 
 	device = substr($0, 8)
-	gsub( /\\/, "\\\\", device )
-	gsub( /\"/, "\\\"", device )
+	gsub( /\\/, "&&", device )
+	gsub( /\"/, "&&", device )
 
 	# store device ID for possible devices afterwards
 	deviceid = $1
