@@ -82,7 +82,7 @@ actions USBHeaderGen1
 }
 
 local usbidsFile = [ DownloadFile usb.ids
-			: http://www.linux-usb.org/usb.ids ] ;
+			: http://www.haiku-files.org/files/usb.ids ] ;
 
 USBHeaderGen [ FGristFiles usbhdr.h ] : $(usbidsFile) : usb-header.awk ;
 
