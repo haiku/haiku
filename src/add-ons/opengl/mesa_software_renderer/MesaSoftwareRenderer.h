@@ -16,6 +16,7 @@
 #ifndef MESASOFTWARERENDERER_H
 #define MESASOFTWARERENDERER_H
 
+
 #include "GLRenderer.h"
 
 extern "C" {
@@ -91,6 +92,7 @@ private:
 		static	const GLubyte*	_GetString(gl_context* ctx, GLenum name);
 		static	void			_Viewport(gl_context* ctx, GLint x, GLint y,
 									GLsizei w, GLsizei h);
+				void			_CheckResize();
 		static	void			_UpdateState(gl_context* ctx, GLuint newState);
 		static	void 			_ClearFront(gl_context* ctx);
 		static	GLboolean		_FrontRenderbufferStorage(gl_context* ctx,

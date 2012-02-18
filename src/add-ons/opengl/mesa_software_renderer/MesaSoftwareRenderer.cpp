@@ -388,14 +388,7 @@ MesaSoftwareRenderer::LockGL()
 			_SetupRenderBuffer(fBackRenderBuffer, fColorSpace);
 	}
 
-	if (fBitmap && fNewWidth == fWidth
-		&& fNewHeight == fHeight)
-		return;
-
-	fWidth = fNewWidth;
-	fHeight = fNewHeight;
-
-	_AllocateBitmap();
+	_CheckResize();
 }
 
 
@@ -404,9 +397,6 @@ MesaSoftwareRenderer::UnlockGL()
 {
 	CALLED();
 	_mesa_make_current(fContext, NULL, NULL);
-	if ((fOptions & BGL_DOUBLE) == 0) {
-		SwapBuffers();
-	}
 	BGLRenderer::UnlockGL();
 }
 
@@ -560,6 +550,25 @@ MesaSoftwareRenderer::FrameResized(float width, float height)
 	BAutolock lock(fInfoLocker);
 	fNewWidth = (GLuint)width;
 	fNewHeight = (GLuint)height;
+	_CheckResize();
+}
+
+
+void
+MesaSoftwareRenderer::_CheckResize()
+{
+	CALLED();
+
+	if (fBitmap && fNewWidth == fWidth
+		&& fNewHeight == fHeight) {
+		return;
+	}
+
+	fHeight = fNewHeight;
+	fWidth = fNewWidth;
+	_mesa_resize_framebuffer(fContext, &fFrameBuffer->base, fWidth, fHeight);
+
+	_AllocateBitmap();
 }
 
 
@@ -575,6 +584,7 @@ MesaSoftwareRenderer::_AllocateBitmap()
 		TRACE("%s: Cannot allocate bitmap < 1x1!\n", __func__);
 		return;
 	}
+
 	BRect rect(0.0, 0.0, fWidth - 1, fHeight - 1);
 	fBitmap = new BBitmap(rect, fColorSpace);
 	for (uint i = 0; i < fHeight; i++) {
@@ -582,13 +592,12 @@ MesaSoftwareRenderer::_AllocateBitmap()
 			+ i * fBitmap->BytesPerRow());
 	}
 
-	_mesa_resize_framebuffer(fContext, &fFrameBuffer->base, fWidth, fHeight);
-	fFrontRenderBuffer->base.Data = fBitmap->Bits();
 	fFrontRenderBuffer->size = fBitmap->BitsLength();
 	if (fVisual->doubleBufferMode)
 		fBackRenderBuffer->size = fBitmap->BitsLength();
-	fFrameBuffer->width = fWidth;
-	fFrameBuffer->height = fHeight;
+	TRACE("%s: Bitmap Size: %" B_PRIu32 "\n", __func__, fBitmap->BitsLength());
+
+	fFrontRenderBuffer->base.Data = fBitmap->Bits();
 }
 
 
@@ -727,10 +736,16 @@ MesaSoftwareRenderer::_BackRenderbufferStorage(gl_context* ctx,
 	struct gl_renderbuffer* render, GLenum internalFormat,
 	GLuint width, GLuint height)
 {
+	CALLED();
 	struct msr_renderbuffer* mrb = msr_renderbuffer(render);
+
 	free(render->Data);
 	_FrontRenderbufferStorage(ctx, render, internalFormat, width, height);
+
+	if (mrb->size)
+		ERROR("%s: suspicious malloc of 0 bytes.\n", __func__);
 	render->Data = malloc(mrb->size);
+
 	return GL_TRUE;
 }
 
