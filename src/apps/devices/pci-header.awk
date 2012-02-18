@@ -56,6 +56,7 @@ BEGIN {
 /^\t[[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]] / { 
 
 	device = substr($0, 8)
+	gsub( /\\/, "\\\\", device )
 	gsub( /\"/, "\\\"", device )
 
 	# store device ID for possible devices afterwards

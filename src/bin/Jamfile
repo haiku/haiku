@@ -198,7 +198,9 @@ StdBinCommands
 	: be libdevice.so : $(haiku-utils_rsrc) ;
 
 ObjectHdrs [ FGristFiles listusb$(SUFOBJ) ]
-	: [ FDirName $(SUBDIR) $(DOTDOT) add-ons kernel bus_managers usb ] ;
+	: [ FDirName $(SUBDIR) $(DOTDOT) add-ons kernel bus_managers usb ] 
+		[ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) apps devices ] ;
+Includes [ FGristFiles listusb.cpp ] : <src!apps!devices>usbhdr.h ;
 
 # standard commands that need libbluetooth.so, due the Bluetooth Kit
 StdBinCommands

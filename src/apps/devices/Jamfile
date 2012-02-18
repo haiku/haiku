@@ -19,28 +19,30 @@ rule ISAPnPHeaderGen
 
 actions ISAPnPHeaderGen1
 {
-	grep '^PNP[[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]] '  $(2[1]) | gawk -f $(2[2]) > $(1) ;
+	grep '^PNP[[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]] '  $(2[1]) \
+| gawk -f $(2[2]) > $(1) ;
 }
 
 ISAPnPHeaderGen [ FGristFiles isapnpids.h ] : isapnp_devids.txt : devlist2h.awk ;
 
-rule USBHeaderGen
+rule USBDevsHeaderGen
 {
 	SEARCH on $(2) = $(SEARCH_SOURCE) ;
 	SEARCH on $(3) = $(SEARCH_SOURCE) ;
 
 	Depends $(1) : $(2) $(3) ;
 	MakeLocateArch $(<) ;
-	USBHeaderGen1 $(1) : $(2) $(3) ;
+	USBDevsHeaderGen1 $(1) : $(2) $(3) ;
 	LocalClean clean : $(<) ;
 }
 
-actions USBHeaderGen1
+actions USBDevsHeaderGen1
 {
 	gawk -v HEADERFILE=$(1[1]) -v DATAFILE=$(1[2]) -f $(2[2]) $(2[1])
 }
 
-USBHeaderGen [ FGristFiles usbdevs.h usbdevs_data.h ] : usbdevs : usb_devlist2h.awk ;
+USBDevsHeaderGen [ FGristFiles usbdevs.h usbdevs_data.h ] : usbdevs
+	: usb_devlist2h.awk ;
 
 rule PCIHeaderGen
 {
@@ -62,6 +64,27 @@ local pciidsFile = [ DownloadFile pci.ids
 			: http://www.haiku-files.org/files/pci.ids ] ;
 
 PCIHeaderGen [ FGristFiles pcihdr.h ] : $(pciidsFile) : pci-header.awk ;
+
+rule USBHeaderGen
+{
+	SEARCH on $(2) = $(SEARCH_SOURCE) ;
+	SEARCH on $(3) = $(SEARCH_SOURCE) ;
+
+	Depends $(1) : $(2) $(3) ;
+	MakeLocateArch $(<) ;
+	USBHeaderGen1 $(1) : $(2) $(3) ;
+	LocalClean clean : $(<) ;
+}
+
+actions USBHeaderGen1
+{
+	gawk -v HEADERFILE=$(1) -f $(2[2]) $(2[1])
+}
+
+local usbidsFile = [ DownloadFile usb.ids
+			: http://www.linux-usb.org/usb.ids ] ;
+
+USBHeaderGen [ FGristFiles usbhdr.h ] : $(usbidsFile) : usb-header.awk ;
 
 Application Devices :
 	DevicesApplication.cpp
@@ -91,7 +114,5 @@ DoCatalogs Devices :
 	Device.cpp
 ;
 
-Includes [ FGristFiles DevicesInfo.cpp ] : [ FGristFiles isapnpids.h usbdevs.h
-	usbdevs_data.h ] ;
-Includes [ FGristFiles ConfigurationWindow.cpp ] : [ FGristFiles pcihdr.h ] ;
+Includes [ FGristFiles DevicePCI.cpp ] : [ FGristFiles pcihdr.h ] ;
 
