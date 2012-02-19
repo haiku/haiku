@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku.
+ * Copyright 2001-2012, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -5818,8 +5818,12 @@ _ReservedView10__5BView(BView* view)
 }
 
 
+#endif	// __GNUC__ == 2
+
+
 extern "C" bool
-_ReservedView11__5BView(BView* view, BPoint point, BToolTip** _toolTip)
+B_IF_GCC_2(_ReservedView11__5BView, _ZN5BView15_ReservedView11Ev)(
+	BView* view, BPoint point, BToolTip** _toolTip)
 {
 	// GetToolTipAt()
 	perform_data_get_tool_tip_at data;
@@ -5831,37 +5835,13 @@ _ReservedView11__5BView(BView* view, BPoint point, BToolTip** _toolTip)
 
 
 extern "C" void
-_ReservedView12__5BView(BView* view)
+B_IF_GCC_2(_ReservedView12__5BView, _ZN5BView15_ReservedView12Ev)(
+	BView* view)
 {
 	// LayoutChanged();
 	view->Perform(PERFORM_CODE_LAYOUT_CHANGED, NULL);
 }
 
-
-#elif __GNUC__ > 2
-
-
-extern "C" bool
-_ZN5BView15_ReservedView11Ev(BView* view, BPoint point, BToolTip** _toolTip)
-{
-	// GetToolTipAt()
-	perform_data_get_tool_tip_at data;
-	data.point = point;
-	data.tool_tip = _toolTip;
-	view->Perform(PERFORM_CODE_GET_TOOL_TIP_AT, &data);
-	return data.return_value;
-}
-
-
-extern "C" void
-_ZN5BView15_ReservedView12Ev(BView* view)
-{
-	// LayoutChanged();
-	view->Perform(PERFORM_CODE_LAYOUT_CHANGED, NULL);
-}
-
-
-#endif	// __GNUC__ > 2
 
 void BView::_ReservedView13() {}
 void BView::_ReservedView14() {}
