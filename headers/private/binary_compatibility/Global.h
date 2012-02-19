@@ -1,10 +1,17 @@
 /*
  * Copyright 2008, Oliver Tappe, zooey@hirschkaefer.de.
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _BINARY_COMPATIBILITY_GLOBAL_H_
 #define _BINARY_COMPATIBILITY_GLOBAL_H_
+
+
+#if __GNUC__ == 2
+#	define B_IF_GCC_2(ifBlock, elseBlock)	ifBlock
+#else
+#	define B_IF_GCC_2(ifBlock, elseBlock)	elseBlock
+#endif
 
 
 // method codes
