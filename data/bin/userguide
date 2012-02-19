@@ -1,7 +1,7 @@
 #!/bin/bash
 
 userGuideURL="\
-	http://svn.haiku-os.org/haiku/haiku/trunk/docs/userguide/en/contents.html"
+	http://cgit.haiku-os.org/haiku/plain/docs/userguide/en/contents.html"
 userGuideDir=/boot/system/documentation/userguide/
 userGuide=$userGuideDir/en/contents.html
 localizedUserGuide=$userGuideDir/"$LANG"/contents.html

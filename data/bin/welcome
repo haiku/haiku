@@ -1,7 +1,7 @@
 #!/bin/bash
 
 welcomeURL="\
-	http://svn.haiku-os.org/haiku/haiku/trunk/docs/welcome/welcome_en.html"
+	http://cgit.haiku-os.org/haiku/plain/docs/welcome/welcome_en.html"
 welcomeDir=/boot/system/documentation/welcome/
 welcomeFile=$welcomeDir/welcome_en.html
 localizedWelcomeFile=$welcomeDir/welcome_"$LANG".html
