@@ -5853,6 +5853,14 @@ _ZN5BView15_ReservedView11Ev(BView* view, BPoint point, BToolTip** _toolTip)
 }
 
 
+extern "C" void
+_ZN5BView15_ReservedView12Ev(BView* view)
+{
+	// LayoutChanged();
+	view->Perform(PERFORM_CODE_LAYOUT_CHANGED, NULL);
+}
+
+
 #endif	// __GNUC__ > 2
 
 void BView::_ReservedView13() {}
