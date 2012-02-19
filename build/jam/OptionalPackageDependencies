@@ -26,6 +26,7 @@ OptionalPackageDependencies Neon : LibXML2 ;
 OptionalPackageDependencies NetFS : UserlandFS ;
 OptionalPackageDependencies NetSurf : OpenSSL Curl LibXML2 LibIconv Libmng ;
 OptionalPackageDependencies OpenSSH : OpenSSL ;
+OptionalPackageDependencies OpenSSL : CARootCertificates ;
 OptionalPackageDependencies Paladin : CCache Fastdep ;
 OptionalPackageDependencies Pe : PCRE ;
 OptionalPackageDependencies SDLLibs : XiphLibs libmad libmikmod Libmng libmodplug physfs ;

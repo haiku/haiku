@@ -353,6 +353,14 @@ if [ IsOptionalHaikuImagePackageAdded Bzip ] {
 }
 
 
+# CARootCertificates
+if [ IsOptionalHaikuImagePackageAdded CARootCertificates ] {
+	InstallOptionalHaikuImagePackage cert.zip
+		: $(baseURL)/cert.zip
+		: common data ssl ;
+}
+
+
 # CCache
 if [ IsOptionalHaikuImagePackageAdded CCache ] {
 	if $(TARGET_ARCH) != x86 {
