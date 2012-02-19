@@ -1506,21 +1506,11 @@ BTabView::operator=(const BTabView&)
 
 //	#pragma mark - binary compatibility
 
-#if __GNUC__ < 3
 
 extern "C" void
-_ReservedTabView1__8BTabView(BTabView* tabView, border_style border)
+B_IF_GCC_2(_ReservedTabView1__8BTabView, _ZN8BTabView17_ReservedTabView1Ev)(
+	BTabView* tabView, border_style border)
 {
 	tabView->BTabView::SetBorder(border);
 }
-
-#else // __GNUC__ >= 3
-
-extern "C" void
-_ZN8BTabView17_ReservedTabView1Ev(BTabView* tabView, border_style border)
-{
-	tabView->BTabView::SetBorder(border);
-}
-
-#endif // __GNUC__ >= 3
 
