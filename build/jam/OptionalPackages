@@ -357,7 +357,7 @@ if [ IsOptionalHaikuImagePackageAdded Bzip ] {
 # CARootCertificates
 if [ IsOptionalHaikuImagePackageAdded CARootCertificates ] {
 	InstallOptionalHaikuImagePackage cert-2012-12-19.zip
-		: $(baseURL)/cert-2012-12-19.zip
+		: $(baseURL)/cert-2012-02-19.zip
 		: common data ssl ;
 }
 
