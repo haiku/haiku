@@ -121,16 +121,10 @@ connector_read_edid(uint32 connectorIndex, edid1_info* edid)
 {
 	// ensure things are sane
 	uint32 gpioID = gConnector[connectorIndex]->gpioID;
-	if (gGPIOInfo[gpioID]->valid == false)
+	if (gGPIOInfo[gpioID]->valid == false) {
+		ERROR("%s: invalid gpio %" B_PRIu32 " for connector %" B_PRIu32 "\n",
+			__func__, gpioID, connectorIndex);
 		return false;
-
-	if (gConnector[connectorIndex]->type == VIDEO_CONNECTOR_LVDS) {
-		ERROR("%s: LCD panel detected (LVDS), sending VESA EDID!\n",
-			__func__);
-		// TODO: connector_read_edid_lvds doesn't do anything yet
-		connector_read_edid_lvds(connectorIndex, edid);
-		memcpy(edid, &gInfo->shared_info->edid_info, sizeof(struct edid1_info));
-		return true;
 	}
 
 	i2c_bus bus;
@@ -155,7 +149,7 @@ connector_read_edid(uint32 connectorIndex, edid1_info* edid)
 
 
 bool
-connector_read_edid_lvds(uint32 connectorIndex, edid1_info* edid)
+connector_read_mode_lvds(uint32 connectorIndex, display_mode* mode)
 {
 	uint8 dceMajor;
 	uint8 dceMinor;
@@ -224,8 +218,15 @@ connector_read_edid_lvds(uint32 connectorIndex, edid1_info* edid)
 			timing.flags |= MODE_FLAG_DBLSCAN;
 		#endif
 
-		// TODO: generate a fake EDID with information above. For now just dump
+		mode->timing = timing;
+		mode->h_display_start = 0;
+		mode->v_display_start = 0;
+		mode->virtual_width = timing.h_display;
+		mode->virtual_height = timing.v_display;
 
+		// Assume 32-bit color
+		mode->space = B_RGB32_LITTLE;
+		
 		TRACE("%s: %" B_PRIu32 " %" B_PRIu16 " %" B_PRIu16 " %" B_PRIu16 " %" B_PRIu16
 			" %" B_PRIu16 " %" B_PRIu16 " %" B_PRIu16 " %" B_PRIu16 "\n",
 			__func__, timing.pixel_clock, timing.h_display, timing.h_sync_start,

@@ -69,9 +69,6 @@ struct accelerant_info {
 	struct fb_info	fb;	// used for frame buffer info within MC
 
 	volatile uint32	dpms_mode;		// current driver dpms mode
-
-	// LVDS panel mode passed from the bios/startup.
-	display_mode	lvds_panel_mode;
 };
 
 
@@ -173,6 +170,7 @@ typedef struct {
 	uint32			hfreq_max;
 	uint32			hfreq_min;
 	edid1_info		edid_info;
+	display_mode	preferredMode;
 } display_info;
 
 

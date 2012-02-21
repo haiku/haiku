@@ -256,13 +256,30 @@ detect_displays()
 		if (displayIndex >= MAX_DISPLAY)
 			continue;
 
+		// TODO: As DP aux transactions don't work yet, just use LVDS as a hack
+		#if 0
 		if (gConnector[id]->encoder.isDPBridge == true) {
-			// if this is a DisplayPort Bridge, setup ddc on bus
+			// If this is a DisplayPort Bridge, setup ddc on bus
+			// TRAVIS (LVDS) or NUTMEG (VGA)
 			TRACE("%s: is bridge, performing bridge DDC setup\n", __func__);
-			encoder_external_setup(id, 0, EXTERNAL_ENCODER_ACTION_V3_DDC_SETUP);
+			encoder_external_setup(id, 23860,
+				EXTERNAL_ENCODER_ACTION_V3_DDC_SETUP);
+		} else if (gConnector[id]->type == VIDEO_CONNECTOR_LVDS) {
+		#endif
+		if (gConnector[id]->type == VIDEO_CONNECTOR_LVDS) {
+			// If plain (non-DP) laptop LVDS, read mode info from AtomBIOS
+			//TRACE("%s: non-DP laptop LVDS detected\n", __func__);
+			gDisplay[displayIndex]->active
+				= connector_read_mode_lvds(id,
+					&gDisplay[displayIndex]->preferredMode);
 		}
 
-		if (connector_read_edid(id, &gDisplay[displayIndex]->edid_info)) {
+		if (gDisplay[displayIndex]->active == false) {
+			TRACE("%s: bit-banging ddc for edid on connector %" B_PRIu32 "\n",
+				__func__, id);
+			// Lets try bit-banging edid from connector
+			gDisplay[displayIndex]->active =
+				connector_read_edid(id, &gDisplay[displayIndex]->edid_info);
 
 			if (gConnector[id]->encoder.type == VIDEO_ENCODER_TVDAC
 				|| gConnector[id]->encoder.type == VIDEO_ENCODER_DAC) {
@@ -271,23 +288,36 @@ detect_displays()
 				if (encoder_analog_load_detect(id) != true) {
 					TRACE("%s: no analog load on EDID valid connector "
 						"#%" B_PRIu32 "\n", __func__, id);
-					continue;
+					gDisplay[displayIndex]->active = false;
 				}
 			}
+		}
 
-			gDisplay[displayIndex]->active = true;
-			gDisplay[displayIndex]->connectorIndex = id;
-				// set physical connector index from gConnector
+		if (gDisplay[displayIndex]->active != true) {
+			// Nothing interesting here, move along
+			continue;
+		}
 
-			init_registers(gDisplay[displayIndex]->regs, displayIndex);
+		// We found a valid / active display
 
+		gDisplay[displayIndex]->connectorIndex = id;
+			// Populate physical connector index from gConnector
+
+		init_registers(gDisplay[displayIndex]->regs, displayIndex);
+
+		if (gDisplay[displayIndex]->preferredMode.virtual_width > 0) {
+			// Found a single preferred mode
+			gDisplay[displayIndex]->found_ranges = false;
+		} else {
+			// Use edid data and pull ranges
 			if (detect_crt_ranges(displayIndex) == B_OK)
 				gDisplay[displayIndex]->found_ranges = true;
-			displayIndex++;
 		}
+
+		displayIndex++;
 	}
 
-	// fallback if no edid monitors were found
+	// fallback if no active monitors were found
 	if (displayIndex == 0) {
 		ERROR("%s: ERROR: 0 attached monitors were found on display connectors."
 			" Injecting first connector as a last resort.\n", __func__);

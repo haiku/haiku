@@ -32,6 +32,7 @@ uint32 radeon_accelerant_mode_count(void);
 status_t radeon_get_mode_list(display_mode* dm);
 status_t radeon_set_display_mode(display_mode* mode);
 status_t radeon_get_display_mode(display_mode* currentMode);
+status_t radeon_get_preferred_mode(display_mode* preferredMode);
 status_t radeon_get_frame_buffer_config(frame_buffer_config* config);
 status_t radeon_get_pixel_clock_limits(display_mode* mode,
 	uint32* low, uint32* high);

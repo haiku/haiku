@@ -85,6 +85,27 @@ radeon_get_mode_list(display_mode* modeList)
 
 
 status_t
+radeon_get_preferred_mode(display_mode* preferredMode)
+{
+	TRACE("%s\n", __func__);
+
+	// TODO: Argh!  Which display? :)
+	uint8_t crtc = 0;
+
+	if (gDisplay[crtc]->preferredMode.virtual_width > 0
+		&& gDisplay[crtc]->preferredMode.virtual_height > 0) {
+		TRACE("%s: preferred mode was found for display %" B_PRIu8 "\n",
+			__func__, crtc);
+		memcpy(preferredMode, &gDisplay[crtc]->preferredMode,
+			sizeof(gDisplay[crtc]->preferredMode));
+		return B_OK;
+	}
+
+	return B_ERROR;
+}
+
+
+status_t
 radeon_get_edid_info(void* info, size_t size, uint32* edid_version)
 {
 	// TODO: multi-monitor?  for now we use VESA edid
