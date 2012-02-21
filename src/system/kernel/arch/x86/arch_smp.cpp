@@ -73,10 +73,11 @@ i386_smp_error_interrupt(void *data)
 status_t
 arch_smp_init(kernel_args *args)
 {
-	TRACE(("arch_smp_init: entry\n"));
+	TRACE(("%s: entry\n", __func__));
 
 	if (!apic_available()) {
 		// if we don't have an apic we can't do smp
+		TRACE(("%s: apic not available for smp\n", __func__));
 		return B_OK;
 	}
 

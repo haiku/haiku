@@ -26,6 +26,7 @@
 #include <vm/VMAddressSpace.h>
 
 #include <arch_system_info.h>
+#include <arch/x86/apic.h>
 #include <arch/x86/selector.h>
 #include <boot/kernel_args.h>
 
@@ -801,6 +802,10 @@ arch_cpu_init_post_vm(kernel_args *args)
 		set_segment_descriptor(&gGDT[TLS_BASE_SEGMENT + i], 0, TLS_SIZE,
 			DT_DATA_WRITEABLE, DPL_USER);
 	}
+
+	if (!apic_available())
+		x86_init_fpu();
+	// else fpu gets set up in smp code
 
 	return B_OK;
 }
