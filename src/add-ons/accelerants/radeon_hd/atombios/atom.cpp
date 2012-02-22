@@ -969,9 +969,10 @@ atom_op_test(atom_exec_context *ctx, int *ptr, int arg)
 	uint32 dst, src;
 	dst = atom_get_dst(ctx, arg, attr, ptr, NULL, 1);
 	src = atom_get_src(ctx, attr, ptr);
+	// logic is reversed
 	ctx->ctx->cs_equal = ((dst & src) == 0);
 	TRACE("%s: 0x%" B_PRIX32 " and 0x%" B_PRIX32 " are %s\n", __func__,
-		dst, src, ctx->ctx->cs_equal ? "EQ" : "NE");
+		dst, src, ctx->ctx->cs_equal ? "NE" : "EQ");
 }
 
 
