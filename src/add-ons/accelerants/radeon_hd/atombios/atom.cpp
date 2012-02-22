@@ -661,9 +661,8 @@ atom_op_jump(atom_exec_context *ctx, int *ptr, int arg)
 	if (execute) {
 		if (ctx->last_jump == (ctx->start + target)) {
 			if (ctx->last_jump_count > ATOM_OP_JMP_TIMEOUT) {
-				ERROR("%s: DANGER! AtomBIOS stuck in loop"
-					" for more then %d jumps... abort!\n",
-					__func__, ATOM_OP_JMP_TIMEOUT);
+				ERROR("%s: Error: AtomBIOS stuck in loop for more then %d"
+					" jumps... abort!\n", __func__, ATOM_OP_JMP_TIMEOUT);
 				ctx->abort = true;
 			} else {
 				ctx->last_jump_count++;
@@ -1160,15 +1159,19 @@ atom_execute_table_locked(atom_context *ctx, int index, uint32 * params)
 	debug_depth++;
 	while (1) {
 		op = CU8(ptr++);
-		if (op < ATOM_OP_NAMES_CNT) {
-			TRACE("%s: %s (0x%" B_PRIX16 ")\n", __func__,
-				atom_op_names[op], ptr - 1);
-		} else
-			TRACE("%s: unknown (0x%" B_PRIX16 ")\n", __func__, ptr - 1);
+		const char* operationName;
+
+		if (op < ATOM_OP_NAMES_CNT)
+			operationName = atom_op_names[op];
+		else
+			operationName = "UNKNOWN";
+
+		TRACE("%s: %s @ 0x%" B_PRIX16 "\n", __func__, operationName, ptr - 1);
 
 		if (ectx.abort == true) {
-			ERROR("AtomBios parser was aborted executing (0x%" B_PRIX16 ")\n",
-				ptr - 1);
+			ERROR("%s: AtomBIOS parser aborted calling operation %s"
+				" (0x%" B_PRIX8 ") @ 0x%" B_PRIX16 "\n", __func__,
+				operationName, op, ptr - 1);
 			free(ectx.ws);
 			return B_ERROR;
 		}
@@ -1203,6 +1206,16 @@ atom_execute_table(atom_context *ctx, int index, uint32 *params)
 	/* reset io mode */
 	ctx->io_mode = ATOM_IO_MM;
 	status_t result = atom_execute_table_locked(ctx, index, params);
+	if (result != B_OK) {
+		const char* tableName;
+		if (index < ATOM_TABLE_NAMES_CNT)
+			tableName = atom_table_names[index];
+		else
+			tableName = "Unknown"; 
+			
+		ERROR("%s: AtomBIOS parser was aborted in table %s (0x%" B_PRIX8 ")\n",
+			__func__, tableName, index);
+	}
 
 	release_sem(ctx->exec_sem);
 	return result;
