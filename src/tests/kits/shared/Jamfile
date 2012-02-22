@@ -3,4 +3,14 @@ SubDir HAIKU_TOP src tests kits shared ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
+UsePrivateHeaders shared ;
+
+UnitTestLib libsharedtest.so :
+	SharedTestAddon.cpp
+
+	NaturalCompareTest.cpp
+
+	: be libshared.a $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
+;
+
 SubInclude HAIKU_TOP src tests kits shared shake_filter ;
