@@ -49,23 +49,14 @@ AppGroupView::Draw(BRect updateRect)
 	bounds.bottom = bounds.top + kHeaderSize;
 
 	// Draw the header background
-	if (be_control_look != NULL) {
-		SetHighColor(tint_color(menuColor, 1.22));
-		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-		StrokeLine(bounds.LeftTop(), bounds.LeftBottom());
-		uint32 borders = BControlLook::B_TOP_BORDER
-			| BControlLook::B_BOTTOM_BORDER | BControlLook::B_RIGHT_BORDER;
+	SetHighColor(tint_color(menuColor, 1.22));
+	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	StrokeLine(bounds.LeftTop(), bounds.LeftBottom());
+	uint32 borders = BControlLook::B_TOP_BORDER
+		| BControlLook::B_BOTTOM_BORDER | BControlLook::B_RIGHT_BORDER;
 
-		be_control_look->DrawButtonBackground(this, bounds, bounds, menuColor,
-			0, borders);
-	} else {
-		SetHighColor(vlight);
-		StrokeLine(bounds.LeftTop(), bounds.RightTop());
-		StrokeLine(BPoint(bounds.left, bounds.top + 1), bounds.LeftBottom());
-		SetHighColor(hilite);
-		StrokeLine(BPoint(bounds.left + 1, bounds.bottom),
-			bounds.RightBottom());
-	}
+	be_control_look->DrawButtonBackground(this, bounds, bounds, menuColor,
+		0, borders);
 
 	// Draw the buttons
 	fCollapseRect.top = (kHeaderSize - kExpandSize) / 2;
@@ -79,54 +70,10 @@ AppGroupView::Draw(BRect updateRect)
 	fCloseRect.left = fCloseRect.right - kCloseSize;
 	fCloseRect.bottom = fCloseRect.top + kCloseSize;
 
-	if (be_control_look != NULL) {
-		uint32 arrowDirection = fCollapsed
-			? BControlLook::B_DOWN_ARROW : BControlLook::B_UP_ARROW;
-		be_control_look->DrawArrowShape(this, fCollapseRect, fCollapseRect,
-			LowColor(), arrowDirection, 0, B_DARKEN_3_TINT);
-	} else {
-		rgb_color outlineColor = {80, 80, 80, 255};
-		rgb_color middleColor = {200, 200, 200, 255};
-
-		SetDrawingMode(B_OP_OVER);
-
-		if (fCollapsed) {
-			BeginLineArray(6);
-
-			AddLine(BPoint(fCollapseRect.left + 3, fCollapseRect.top + 1),
-					BPoint(fCollapseRect.left + 3, fCollapseRect.bottom - 1), outlineColor);
-			AddLine(BPoint(fCollapseRect.left + 3, fCollapseRect.top + 1),
-					BPoint(fCollapseRect.left + 7, fCollapseRect.top + 5), outlineColor);
-			AddLine(BPoint(fCollapseRect.left + 7, fCollapseRect.top + 5),
-					BPoint(fCollapseRect.left + 3, fCollapseRect.bottom - 1), outlineColor);
-
-			AddLine(BPoint(fCollapseRect.left + 4, fCollapseRect.top + 3),
-					BPoint(fCollapseRect.left + 4, fCollapseRect.bottom - 3), middleColor);
-			AddLine(BPoint(fCollapseRect.left + 5, fCollapseRect.top + 4),
-					BPoint(fCollapseRect.left + 5, fCollapseRect.bottom - 4), middleColor);
-			AddLine(BPoint(fCollapseRect.left + 5, fCollapseRect.top + 5),
-					BPoint(fCollapseRect.left + 6, fCollapseRect.top + 5), middleColor);
-			EndLineArray();
-		} else {
-			// expanded state
-
-			BeginLineArray(6);
-			AddLine(BPoint(fCollapseRect.left + 1, fCollapseRect.top + 3),
-					BPoint(fCollapseRect.right - 3, fCollapseRect.top + 3), outlineColor);
-			AddLine(BPoint(fCollapseRect.left + 1, fCollapseRect.top + 3),
-					BPoint(fCollapseRect.left + 5, fCollapseRect.top + 7), outlineColor);
-			AddLine(BPoint(fCollapseRect.left + 5, fCollapseRect.top + 7),
-					BPoint(fCollapseRect.right - 3, fCollapseRect.top + 3), outlineColor);
-
-			AddLine(BPoint(fCollapseRect.left + 3, fCollapseRect.top + 4),
-					BPoint(fCollapseRect.right - 5, fCollapseRect.top + 4), middleColor);
-			AddLine(BPoint(fCollapseRect.left + 4, fCollapseRect.top + 5),
-					BPoint(fCollapseRect.right - 6, fCollapseRect.top + 5), middleColor);
-			AddLine(BPoint(fCollapseRect.left + 5, fCollapseRect.top + 5),
-					BPoint(fCollapseRect.left + 5, fCollapseRect.top + 6), middleColor);
-			EndLineArray();
-		}
-	}
+	uint32 arrowDirection = fCollapsed
+		? BControlLook::B_DOWN_ARROW : BControlLook::B_UP_ARROW;
+	be_control_look->DrawArrowShape(this, fCollapseRect, fCollapseRect,
+		LowColor(), arrowDirection, 0, B_DARKEN_3_TINT);
 
 	SetPenSize(kPenSize);
 
