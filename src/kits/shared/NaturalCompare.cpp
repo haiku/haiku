@@ -88,6 +88,11 @@ NormalizeNumberChunks(natural_chunk& a, natural_chunk& b)
 int
 NaturalCompare(const char* stringA, const char* stringB)
 {
+	if (stringA == NULL)
+		return stringB == NULL ? 0 : -1;
+	if (stringB == NULL)
+		return 1;
+
 	natural_chunk a;
 	natural_chunk b;
 
