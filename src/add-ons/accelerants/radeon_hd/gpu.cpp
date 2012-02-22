@@ -524,3 +524,36 @@ radeon_gpu_irq_setup()
 
 	return B_ERROR;
 }
+
+
+status_t
+radeon_gpu_ss_disable()
+{
+	TRACE("%s called\n", __func__);
+
+	radeon_shared_info &info = *gInfo->shared_info;
+	uint32 ssControl;
+
+	if (info.chipsetID >= RADEON_CEDAR) {
+		// PLL1
+		ssControl = Read32(OUT, EVERGREEN_P1PLL_SS_CNTL);
+		ssControl &= ~EVERGREEN_PxPLL_SS_EN;
+		Write32(OUT, EVERGREEN_P1PLL_SS_CNTL, ssControl);
+		// PLL2
+		ssControl = Read32(OUT, EVERGREEN_P2PLL_SS_CNTL);
+		ssControl &= ~EVERGREEN_PxPLL_SS_EN;
+		Write32(OUT, EVERGREEN_P2PLL_SS_CNTL, ssControl);
+	} else if (info.chipsetID >= RADEON_RS600) {
+		// PLL1
+		ssControl = Read32(OUT, AVIVO_P1PLL_INT_SS_CNTL);
+		ssControl &= ~1;
+		Write32(OUT, AVIVO_P1PLL_INT_SS_CNTL, ssControl);
+		// PLL2
+		ssControl = Read32(OUT, AVIVO_P2PLL_INT_SS_CNTL);
+		ssControl &= ~1;
+		Write32(OUT, AVIVO_P2PLL_INT_SS_CNTL, ssControl);
+	} else
+		return B_ERROR;
+
+	return B_OK;
+}

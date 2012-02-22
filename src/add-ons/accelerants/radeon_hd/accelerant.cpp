@@ -263,6 +263,9 @@ radeon_init_accelerant(int device)
 
 	radeon_init_bios(gInfo->rom);
 
+	// disable spread spectrum as it requires lots of extra calculations
+	radeon_gpu_ss_disable();
+
 	// find GPIO pins from AtomBIOS
 	gpio_probe();
 

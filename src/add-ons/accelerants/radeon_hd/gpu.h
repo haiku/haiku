@@ -176,6 +176,7 @@ void radeon_gpu_mc_resume(struct gpu_state *gpuState);
 uint32 radeon_gpu_mc_idlecheck();
 status_t radeon_gpu_mc_setup();
 status_t radeon_gpu_irq_setup();
+status_t radeon_gpu_ss_disable();
 
 
 #endif
