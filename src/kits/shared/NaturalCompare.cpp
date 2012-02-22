@@ -49,38 +49,29 @@ FetchNaturalChunk(natural_chunk& chunk, const char* source)
 		return pos;
 	}
 
-	// skip leading zeros and whitespace characters
+	// Skip leading zeros and whitespace characters
 	int32 skip = 0;
 	while (source[0] == '0' || isspace(source[0])) {
 		source++;
 		skip++;
 	}
 
-	// number chunk (stop at next white space)
+	// Number chunk (stop at next white space)
 	int32 pos = 0;
-	while (isdigit(source[pos]) && source[pos] != '\0') {
+	while (isdigit(source[pos])) {
 		pos++;
 	}
-	strlcpy(&chunk.buffer[sizeof(chunk.buffer) - 1 - pos], source, pos + 1);
+
+	strlcpy(chunk.buffer, source, pos + 1);
 	chunk.length = pos;
 
-	return pos + skip;
-}
-
-
-//! Makes sure both number strings have the same size
-inline void
-NormalizeNumberChunks(natural_chunk& a, natural_chunk& b)
-{
-	if (a.length > b.length) {
-		memset(&b.buffer[sizeof(b.buffer) - 1 - a.length], ' ',
-			a.length - b.length);
-		b.length = a.length;
-	} else if (b.length > a.length) {
-		memset(&a.buffer[sizeof(a.buffer) - 1 - b.length], ' ',
-			b.length - a.length);
-		a.length = b.length;
+	// Skip trailing whitespace as well
+	while (isspace(source[pos])) {
+		source++;
+		skip++;
 	}
+
+	return pos + skip;
 }
 
 
@@ -138,11 +129,13 @@ NaturalCompare(const char* stringA, const char* stringB)
 				return result;
 		} else {
 			// Number chunks - they are compared as strings to allow an
-			// arbitrary number of digits.
-			NormalizeNumberChunks(a, b);
+			// almost arbitrary number of digits.
+			if (a.length > b.length)
+				return 1;
+			if (a.length < b.length)
+				return -1;
 
-			int result = strcmp(a.buffer - 1 + sizeof(a.buffer) - a.length,
-				b.buffer - 1 + sizeof(b.buffer) - b.length);
+			int result = strcmp(a.buffer, b.buffer);
 			if (result != 0)
 				return result;
 		}
