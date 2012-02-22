@@ -1476,10 +1476,7 @@ encoder_dpms_set(uint8 crtcID, int mode)
 			else
 				index = GetIndexIntoMasterTable(COMMAND, DAC2OutputControl);
 			break;
-		default:
-			ERROR("%s: Unknown encoder object! (%" B_PRIu16 ")\n",
-				__func__, encoderID);
-			return;
+		// default, none on purpose
 	}
 
 	switch (mode) {
