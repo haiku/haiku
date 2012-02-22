@@ -50,6 +50,9 @@ pll_limit_probe(pll_info* pll)
 		return B_ERROR;
 	}
 
+	TRACE("%s: table %" B_PRIu8 ".%" B_PRIu8 "\n", __func__,
+		tableMajor, tableMinor);
+
 	union atomFirmwareInfo {
 		ATOM_FIRMWARE_INFO info;
 		ATOM_FIRMWARE_INFO_V1_2 info_12;
@@ -342,14 +345,7 @@ pll_adjust(pll_info* pll, uint8 crtcID)
 	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
 	uint32 encoderMode = display_get_encoder_mode(connectorIndex);
 	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
-	bool dpBridge = false;
-
-	if ((encoderFlags & (ATOM_DEVICE_LCD_SUPPORT | ATOM_DEVICE_DFP_SUPPORT))
-		|| gConnector[connectorIndex]->encoder.isDPBridge) {
-		TRACE("%s: external DP bridge detected!\n", __func__);
-		dpBridge = true;
-	}
-
+	bool dpBridge = gConnector[connectorIndex]->encoder.isDPBridge;
 
 	if (info.dceMajor >= 3) {
 
@@ -361,6 +357,9 @@ pll_adjust(pll_info* pll, uint8 crtcID)
 			!= B_OK) {
 			return B_ERROR;
 		}
+
+		TRACE("%s: table %" B_PRIu8 ".%" B_PRIu8 "\n", __func__,
+			tableMajor, tableMinor);
 
 		// Prepare arguments for AtomBIOS call
 		union adjustPixelClock {
@@ -499,6 +498,9 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 
 	int index = GetIndexIntoMasterTable(COMMAND, SetPixelClock);
 	atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor);
+
+	TRACE("%s: table %" B_PRIu8 ".%" B_PRIu8 "\n", __func__,
+		tableMajor, tableMinor);
 
 	uint32 bitsPerColor = 8;
 		// TODO: Digital Depth, EDID 1.4+ on digital displays
