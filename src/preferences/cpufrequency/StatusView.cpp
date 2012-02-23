@@ -14,6 +14,7 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Deskbar.h>
 #include <GroupLayout.h>
 #include <Locale.h>
@@ -590,9 +591,13 @@ StatusView::Draw(BRect updateRect)
 	GetFontHeight(&fontHeight);
 	float height = fontHeight.ascent + fontHeight.descent;
 
-	MovePenTo(0, height);
-
-	DrawString(fFreqString.String());
+	if (be_control_look != NULL)
+		be_control_look->DrawLabel(this, fFreqString.String(),
+			this->ViewColor(), 0, BPoint(0, height));
+	else {
+		MovePenTo(0, height);
+		DrawString(fFreqString.String());
+	}
 }
 
 
