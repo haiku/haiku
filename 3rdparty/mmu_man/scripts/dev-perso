@@ -167,4 +167,74 @@ dev() {
 
 complete -W complete -W "$(dev)" dev
 
+_devup_notify() {
+	echo "#### $*" >&2
+}
+
+devup() {
+	if [ $# -lt 1 ]; then 
+		#ls $DEVROOT/*/.profile | sed 's,.*/\([^/]*\)/.profile,\1,'
+		for f in "$DEVROOT/"*; do
+			test -e "$f/.profile" || continue
+			grep "^# AUTOUP$" "$f/.profile" > /dev/null 2>&1 || continue
+			p="${f##*/}"
+			_devup_notify "Updating $p..."
+			devup "$p" && _devup_notify "Updated $p: OK" || (_devup_notify "Updating $p: Error: $?"; read)
+		done
+		return 0
+	fi
+
+	# subshell!!!
+	(
+
+	export DEVPROJ="$1"
+	if [ ! -d "$DEVROOT/$1" ]; then
+		echo "invalid project name '$1'"
+		return 1
+	fi
+
+	# change to the project root folder
+	cd "$DEVROOT/$1"
+
+	# lower priority so background builds don't slow the GUI too much
+	case "$OSTYPE" in
+	beos|haiku)
+		prio $$ 1
+		;;
+	darwin10.*)
+		renice 3 $$
+		;;
+	linux-*)
+		# linux doesn't really need it much
+		#renice 3 $$
+		;;
+	esac
+
+	DEVUPCMD=""
+
+	# source the specific profile file
+	test -f .profile && . .profile
+
+	# make sure the update action is the first found in history.
+	if [ -z "$DEVUPCMD" ]; then
+		test -d .svn && DEVUPCMD="svn up"
+		test -d .bzr && DEVUPCMD="bzr update"
+		test -d .hg && DEVUPCMD="hg pull"
+		test -d .git && DEVUPCMD="git pull"
+		test -d CVS && DEVUPCMD="cvs up -d"
+		test -n "$P4PORT" && DEVUPCMD="p4 sync"
+	fi
+
+	test -n "$DEVUPCMD" || return 7
+
+	# run the update command...
+	eval "$DEVUPCMD"
+
+	return $?
+	)
+
+	return $?
+}
+
+complete -W complete -W "$(dev)" devup
 
