@@ -86,6 +86,10 @@ VolumeWindow::MessageReceived(BMessage *msg)
 			} else
 				Quit();
 			break;
+		
+		case B_QUIT_REQUESTED:
+			Quit();
+			break;
 
 		default:
 			BWindow::MessageReceived(msg);
