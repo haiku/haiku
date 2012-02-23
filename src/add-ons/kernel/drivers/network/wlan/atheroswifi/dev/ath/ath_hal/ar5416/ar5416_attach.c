@@ -296,11 +296,16 @@ ar5416Attach(uint16_t devid, HAL_SOFTC sc,
 	HAL_INI_INIT(&AH5416(ah)->ah_ini_addac, ar5416Addac, 2);
 
 	if (! IS_5416V2_2(ah)) {		/* Owl 2.1/2.0 */
+#ifndef __HAIKU__
 		ath_hal_printf(ah, "[ath] Enabling CLKDRV workaround for AR5416 < v2.2\n");
+#endif
 		struct ini {
 			uint32_t	*data;		/* NB: !const */
 			int		rows, cols;
 		};
+#ifdef __HAIKU__
+		ath_hal_printf(ah, "[ath] Enabling CLKDRV workaround for AR5416 < v2.2\n");
+#endif
 		/* override CLKDRV value */
 		OS_MEMCPY(&AH5416(ah)[1], ar5416Addac, sizeof(ar5416Addac));
 		AH5416(ah)->ah_ini_addac.data = (uint32_t *) &AH5416(ah)[1];

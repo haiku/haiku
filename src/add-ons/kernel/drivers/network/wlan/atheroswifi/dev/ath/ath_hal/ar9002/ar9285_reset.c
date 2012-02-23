@@ -352,8 +352,13 @@ ar9285SetBoardValues(struct ath_hal *ah, const struct ieee80211_channel *chan)
 	if (AR_SREV_9271(ah) || AR_SREV_KITE(ah)) {
 		uint8_t bb_desired_scale = (pModal->bb_scale_smrt_antenna & EEP_4K_BB_DESIRED_SCALE_MASK);
 		if ((eep->baseEepHeader.txGainType == 0) && (bb_desired_scale != 0)) {
+#ifndef __HAIKU__
 			ath_hal_printf(ah, "[ath]: adjusting cck tx gain factor\n");
+#endif
 			uint32_t pwrctrl, mask, clr;
+#ifdef __HAIKU__
+			ath_hal_printf(ah, "[ath]: adjusting cck tx gain factor\n");
+#endif
 
 			mask = (1<<0) | (1<<5) | (1<<10) | (1<<15) | (1<<20) | (1<<25);
 			pwrctrl = mask * bb_desired_scale;
