@@ -870,7 +870,6 @@ MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList,
 	StatStruct deststat;
 	BVolume volume(srcVolumeDevice);
 	entry_ref destRef;
-	const entry_ref *destRefToCheck = NULL;
 
 	bool destIsTrash = false;
 	BDirectory destDir;
@@ -885,7 +884,6 @@ MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList,
 	// if we're not passed a destEntry then we are supposed to move to trash
 	if (destEntry != NULL) {
 		destEntry->GetRef(&destRef);
-		destRefToCheck = &destRef;
 
 		destDir.SetTo(destEntry);
 		destDir.GetStat(&deststat);
@@ -913,7 +911,6 @@ MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList,
 		destDirToCheck = &destDir;
 
 		entry.GetRef(&destRef);
-		destRefToCheck = &destRef;
 	}
 
 	// change the move mode if needed

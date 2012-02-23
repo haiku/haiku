@@ -190,10 +190,8 @@ MountMenu::AddDynamicItem(add_state)
 	// by the autoMounter because they do not show up in the /dev tree
 	BVolumeRoster volumeRoster;
 	BVolume volume;
-	bool needSeparator = false;
 	while (volumeRoster.GetNextVolume(&volume) == B_OK) {
 		if (volume.IsShared()) {
-			needSeparator = true;
 			BBitmap *icon = new BBitmap(BRect(0, 0, 15, 15), B_CMAP8);
 			fs_info info;
 			if (fs_stat_dev(volume.Device(), &info) != B_OK) {

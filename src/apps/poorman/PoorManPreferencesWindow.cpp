@@ -218,17 +218,12 @@ PoorManPreferencesWindow::SelectWebDir(BMessage * message)
 	const char	* name;
 	BPath		path;
 	BEntry		entry;
-	status_t	err = B_OK;
 
-	err = message->FindRef("refs", &ref) != B_OK;
-	//if (err = message->FindRef("directory", &ref) != B_OK)
-		//return err;
-	err = message->FindString("name", &name) != B_OK;
-	//if (err = message->FindString("name", &name) != B_OK)
-	//	;//return err;
-	err = entry.SetTo(&ref) != B_OK;
-	//if (err = entry.SetTo(&ref) != B_OK)
-	//	;//return err;
+	if (message->FindRef("refs", &ref) != B_OK
+		|| message->FindString("name", &name) != B_OK
+		|| entry.SetTo(&ref) != B_OK) {
+		return;
+	}
 	entry.GetPath(&path);
 
 	PRINT(("DIR: %s\n", path.Path()));

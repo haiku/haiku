@@ -174,7 +174,7 @@ main(int argc, char **argv)
 		switch (mode) {
 			case kList:
 				if ((id != -1 && id != info.team)
-					|| pattern != NULL && !strstr(info.args, pattern))
+					|| (pattern != NULL && !strstr(info.args, pattern)))
 					continue;
 				print_fds(info);
 				break;

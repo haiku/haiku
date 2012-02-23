@@ -634,7 +634,6 @@ VideoProducer::_FrameGeneratorThread()
 		bigtime_t waitUntil = 0;
 		bigtime_t nextWaitUntil = 0;
 		int32 playingDirection = 0;
-		int32 playingMode = 0;
 		int64 playlistFrame = 0;
 		switch (err) {
 			case B_OK: {
@@ -645,7 +644,6 @@ VideoProducer::_FrameGeneratorThread()
 				// get the times for the current and the next frame
 				performanceTime = fManager->TimeForFrame(fFrame);
 				nextPerformanceTime = fManager->TimeForFrame(fFrame + 1);
-				playingMode = fManager->PlayModeAtFrame(fFrame);
 				waitUntil = TimeSource()->RealTimeFor(fPerformanceTimeBase
 					+ performanceTime, fBufferLatency);
 				nextWaitUntil = TimeSource()->RealTimeFor(fPerformanceTimeBase

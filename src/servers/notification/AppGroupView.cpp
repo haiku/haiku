@@ -45,7 +45,6 @@ AppGroupView::Draw(BRect updateRect)
 	rgb_color menuColor = ViewColor();
 	BRect bounds = Bounds();
 	rgb_color hilite = tint_color(menuColor, B_DARKEN_1_TINT);
-	rgb_color dark = tint_color(menuColor, B_DARKEN_2_TINT);
 	rgb_color vlight = tint_color(menuColor, B_LIGHTEN_2_TINT);
 	bounds.bottom = bounds.top + kHeaderSize;
 

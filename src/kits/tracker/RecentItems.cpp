@@ -284,11 +284,11 @@ BRecentItemsList::GetNextMenuItem(const BMessage *fileOpenInvokeMessage,
 				// open the model, if it ain't open already
 
 			PoseInfo poseInfo;
-			ssize_t size = -1;
 
-			if (result->Node())
-				size = result->Node()->ReadAttr(kAttrPoseInfo, B_RAW_TYPE, 0,
+			if (result->Node()) {
+				result->Node()->ReadAttr(kAttrPoseInfo, B_RAW_TYPE, 0,
 					&poseInfo, sizeof(poseInfo));
+			}
 
 			result->CloseNode();
 

@@ -320,12 +320,12 @@ BSlowContextMenu::AddNextItem()
 		return true;
 	}
 
-	ssize_t size = -1;
 	PoseInfo poseInfo;
 
-	if (model.Node()) 
-		size = model.Node()->ReadAttr(kAttrPoseInfo, B_RAW_TYPE, 0,
+	if (model.Node())  {
+		model.Node()->ReadAttr(kAttrPoseInfo, B_RAW_TYPE, 0,
 			&poseInfo, sizeof(poseInfo));
+	}
 
 	model.CloseNode();
 	
@@ -384,11 +384,11 @@ BSlowContextMenu::NewModelItem(Model *model, const BMessage *invokeMessage,
 				// open the model, if it ain't open already
 					
 			PoseInfo poseInfo;
-			ssize_t size = -1;
 			
-			if (result->Node()) 
-				size = result->Node()->ReadAttr(kAttrPoseInfo, B_RAW_TYPE, 0,
+			if (result->Node()) {
+				result->Node()->ReadAttr(kAttrPoseInfo, B_RAW_TYPE, 0,
 					&poseInfo, sizeof(poseInfo));
+			}
 	
 			result->CloseNode();
 

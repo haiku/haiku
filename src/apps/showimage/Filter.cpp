@@ -731,7 +731,7 @@ Scaler::Dither(int32 fromRow, int32 toRow)
 {
 	BBitmap* src;
 	BBitmap* dest;
-	intType destW, destH;
+	intType destW;
 	intType x, y;
 
 	uchar* srcBits;
@@ -759,7 +759,6 @@ Scaler::Dither(int32 fromRow, int32 toRow)
 	ASSERT(src->Bounds().IntegerHeight() == dest->Bounds().IntegerHeight());
 
 	destW = dest->Bounds().IntegerWidth();
-	destH = dest->Bounds().IntegerHeight();
 
 	srcBits = (uchar*)src->Bits();
 	srcBPR = src->BytesPerRow();

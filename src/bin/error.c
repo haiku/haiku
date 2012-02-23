@@ -310,7 +310,6 @@ print_error(char *number)
 
 	if (end[0]) {
 		// not a number, check names
-		int i;
 		struct error_pair *p = kErrorNames;
 		while (p->name && strcmp(p->name, number))
 			p++;

@@ -544,8 +544,8 @@ TTracker::InstallIndices()
 void
 TTracker::InstallIndices(dev_t device)
 {
-	status_t error = fs_create_index(device, kAttrQueryLastChange, B_INT32_TYPE, 0);
-	error = fs_create_index(device, "_trk/recentQuery", B_INT32_TYPE, 0);
+	fs_create_index(device, kAttrQueryLastChange, B_INT32_TYPE, 0);
+	fs_create_index(device, "_trk/recentQuery", B_INT32_TYPE, 0);
 }
 
 

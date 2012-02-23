@@ -131,9 +131,10 @@ status_t
 KUndoBuffer::AddUndo(const char* text, int32 length, int32 offset,
 	undo_type history, int32 cursor_pos)
 {
-	if (fNoTouch) return B_OK;
+	if (fNoTouch)
+		return B_OK;
 
-	status_t status;
+	status_t status = B_OK;
 
 	if (fNewItem || (fIndex < CountItems()) || (CountItems()==0)) {
 		status = NewUndo(text, length, offset, history, cursor_pos);
@@ -167,7 +168,7 @@ KUndoBuffer::AddUndo(const char* text, int32 length, int32 offset,
 		}
 	}
 
-	return B_OK;
+	return status;
 }
 
 

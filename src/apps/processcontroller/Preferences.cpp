@@ -89,14 +89,13 @@ Preferences::~Preferences()
 {
 	if (fSavePreferences) {
 		BFile file;
-		status_t set = B_ERROR;
 		if (fSettingsFile)
 			file.SetTo(fSettingsFile, B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
 		else {
 			BPath prefpath;
 			if (find_directory(B_USER_SETTINGS_DIRECTORY, &prefpath, true) == B_OK) {
 				BDirectory prefdir(prefpath.Path());
-				set = prefdir.CreateFile(fName, &file, false);
+				prefdir.CreateFile(fName, &file, false);
 			}
 		}
 

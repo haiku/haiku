@@ -538,7 +538,6 @@ void CLVColumnLabelView::ShiftDragGroup(int32 NewPos)
 	int32 NumberOfGroups = fDragGroups.CountItems();
 	int32 GroupCounter;
 	CLVDragGroup* ThisGroup;
-	int32 NumberOfColumnsInGroup;
 	int32 ColumnCounter;
 	BList NewDisplayList;
 
@@ -548,8 +547,6 @@ void CLVColumnLabelView::ShiftDragGroup(int32 NewPos)
 		if(GroupCounter != fDragGroup)
 		{
 			ThisGroup = (CLVDragGroup*)fDragGroups.ItemAt(GroupCounter);
-			NumberOfColumnsInGroup = ThisGroup->GroupStopDispListIndex -
-				ThisGroup->GroupStartDispListIndex + 1;
 			for(ColumnCounter = ThisGroup->GroupStartDispListIndex; ColumnCounter <=
 				ThisGroup->GroupStopDispListIndex; ColumnCounter++)
 			NewDisplayList.AddItem(fDisplayList->ItemAt(ColumnCounter));
@@ -557,7 +554,6 @@ void CLVColumnLabelView::ShiftDragGroup(int32 NewPos)
 	}
 	//Copy the group into the new position
 	ThisGroup = (CLVDragGroup*)fDragGroups.ItemAt(fDragGroup);
-	NumberOfColumnsInGroup = ThisGroup->GroupStopDispListIndex - ThisGroup->GroupStartDispListIndex + 1;
 	for(ColumnCounter = ThisGroup->GroupStartDispListIndex; ColumnCounter <=
 		ThisGroup->GroupStopDispListIndex; ColumnCounter++)
 	NewDisplayList.AddItem(fDisplayList->ItemAt(ColumnCounter));
@@ -567,8 +563,6 @@ void CLVColumnLabelView::ShiftDragGroup(int32 NewPos)
 		if(GroupCounter != fDragGroup)
 		{
 			ThisGroup = (CLVDragGroup*)fDragGroups.ItemAt(GroupCounter);
-			NumberOfColumnsInGroup = ThisGroup->GroupStopDispListIndex -
-				ThisGroup->GroupStartDispListIndex + 1;
 			for(ColumnCounter = ThisGroup->GroupStartDispListIndex; ColumnCounter <=
 				ThisGroup->GroupStopDispListIndex; ColumnCounter++)
 			NewDisplayList.AddItem(fDisplayList->ItemAt(ColumnCounter));

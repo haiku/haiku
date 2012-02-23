@@ -433,10 +433,12 @@ FindWindow::SaveQueryAsAttributes(BNode *file, BEntry *entry, bool queryTemplate
 			ssize_t size = message.FlattenedSize();
 			BString buffer;
 			status_t result = message.Flatten(buffer.LockBuffer(size), size);
-			ASSERT(result == B_OK);
-			result = file->WriteAttr(kAttrQueryVolume, B_MESSAGE_TYPE, 0,
-				buffer.String(), (size_t)size);
-			ASSERT(result == size);
+			if (result == B_OK) {
+				if (file->WriteAttr(kAttrQueryVolume, B_MESSAGE_TYPE, 0,
+					buffer.String(), (size_t)size) != size) {
+					return B_IO_ERROR;
+				}
+			}
 			buffer.UnlockBuffer();
 		}
 		// default to query for everything
@@ -2068,10 +2070,10 @@ FindPanel::SaveWindowState(BNode *node, bool editTemplate)
 				ssize_t size = message.FlattenedSize();
 				char *buffer = new char[size];
 				status_t result = message.Flatten(buffer, size);
-				ASSERT(result == B_OK);
-				result = node->WriteAttr(kAttrQueryInitialAttrs, B_MESSAGE_TYPE, 0,
-					buffer, (size_t)size);
-				ASSERT(result == size);
+				if (result == B_OK) {
+					node->WriteAttr(kAttrQueryInitialAttrs, B_MESSAGE_TYPE, 0,
+						buffer, (size_t)size);
+				}
 				delete [] buffer;
 			}
 			break;

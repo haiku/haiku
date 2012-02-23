@@ -361,7 +361,7 @@ TermParse::EscParse()
 {
 	int top;
 	int bottom;
-	int cs96 = 0;
+//	int cs96 = 0;
 	uchar curess = 0;
 
 	char cbuf[4] = { 0 };
@@ -586,7 +586,7 @@ TermParse::EscParse()
 				case CASE_GSETS:
 					/* ESC $ ? */
 					parsestate = gCS96GroundTable;
-					cs96 = 1;
+					//		cs96 = 1;
 					break;
 
 				case CASE_SCS_STATE:

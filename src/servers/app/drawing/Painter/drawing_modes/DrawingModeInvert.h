@@ -17,6 +17,7 @@
 	pixel32 _p; \
 	_p.data32 = *(uint32*)d; \
 	BLEND(d, 255 - _p.data8[2], 255 - _p.data8[1], 255 - _p.data8[0], a); \
+	(void)_p; \
 }
 
 // ASSIGN_INVERT

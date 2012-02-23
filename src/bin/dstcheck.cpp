@@ -112,11 +112,9 @@ main(int argc, char **argv)
 	}
 
 	strcat(path, "/time_dststatus");
-	bool newFile = false;
 	bool dst = false;
 	int fd = open(path, O_RDWR | O_EXCL | O_CREAT, S_IRUSR | S_IWUSR);
 	if (fd < 0) {
-		newFile = false;
 		fd = open(path, O_RDWR);
 		if (fd < 0) {
 			perror("couldn't open dst status settings file");

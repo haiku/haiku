@@ -1550,9 +1550,8 @@ TTextView::MouseDown(BPoint where)
 				BMenuItem *menuItem;
 				BPopUpMenu menu("Words", false, false);
 
-				int32 matchCount;
 				for (int32 i = 0; i < gDictCount; i++)
-					matchCount = gWords[i]->FindBestMatches(&matches,
+					gWords[i]->FindBestMatches(&matches,
 						srcWord.String());
 
 				if (matches.CountItems()) {

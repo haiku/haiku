@@ -350,24 +350,18 @@ cleanup: ;
 status_t PoorManServer::_HandleGet(httpd_conn* hc)
 {
 	PRINT(("HandleGet() called\n"));
-	
-	off_t length;
+
 	ssize_t bytesRead;
 	uint8* buf;
 	BString log;
-	
+
 	BFile file(hc->expnfilename, B_READ_ONLY);
 	if (file.InitCheck() != B_OK)
 		return B_ERROR;
-	
+
 	buf = new uint8[POOR_MAN_BUF_SIZE];
 	if (buf == NULL)
 		return B_ERROR;
-	
-	if (hc->got_range == 1)
-		length = hc->last_byte_index + 1 - hc->first_byte_index;
-	else 
-		length = hc->sb.st_size;
 	
 	static_cast<PoorManApplication*>(be_app)->GetPoorManWindow()->SetHits(
 		static_cast<PoorManApplication*>(be_app)->
