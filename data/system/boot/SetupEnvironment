@@ -49,6 +49,14 @@ else
 	export ADDON_PATH="%A/add-ons:/boot/common/add-ons:/boot/system/add-ons"
 fi
 
+# Locale
+export LC_MESSAGES=`locale -m`
+export LC_NUMERIC=`locale -f`
+export LC_TIME=`locale -t`
+export LC_COLLATE=$LC_MESSAGES
+export LC_CTYPE=$LC_MESSAGES
+export LC_MONETARY=$LC_NUMERIC
+
 # media kit
 if [ -f $HOME/config/settings/use_old_audio ]
 then
