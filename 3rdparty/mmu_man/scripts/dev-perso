@@ -56,7 +56,7 @@
 if [ -z "$DEVROOT" ]; then
 	DRLIST="$HOME/devel /Data /work /Volumes/Data/devel"
 	for d in $DRLIST; do
-		test -d $d && DEVROOT=$d && break;
+		test -d "$d" && DEVROOT="$d" && break;
 	done
 fi
 export DEVROOT
@@ -64,14 +64,14 @@ export DEVROOT
 # automagically find password files
 PWLIST="/Data /fat32 $HOME"
 for d in $PWLIST; do
-	test -d $d/PASSWDS && PASSWDS=$d/PASSWDS && break;
+	test -d "$d/PASSWDS" && PASSWDS="$d/PASSWDS" && break;
 done
 export PASSWDS
 
 # svn sometimes forgets about vi and wants me to use nano...
 #export EDITOR=vim
 
-function dev() {
+dev() {
 	if [ $# -lt 1 ]; then 
 		#ls $DEVROOT/*/.profile | sed 's,.*/\([^/]*\)/.profile,\1,'
 		for f in "$DEVROOT/"*; do test -e "$f/.profile" || continue; echo ${f##*/}; done
@@ -89,12 +89,16 @@ function dev() {
 		mkdir "$DEVROOT/$1" && touch "$DEVROOT/$1/.profile"
 		# fallback
 	fi
+
 	export DEVPROJ="$1"
 	if [ ! -d "$DEVROOT/$1" ]; then
 		echo "invalid project name '$1'"
 		return 1
 	fi
+
+	# change to the project root folder
 	cd "$DEVROOT/$1"
+
 	# use a specific history file
 	export HISTFILE="$DEVROOT/$1/.bash_history"
 	# and bump up the history limits
@@ -103,6 +107,10 @@ function dev() {
 	export HISTCONTROL=ignoreboth
 	# and force loading the new histfile
 	history -r
+
+	# force default locale so that compiler errors and such are reported in english
+	#export LC_ALL=C.UTF-8
+
 	# set the prompt
 	# cf. http://tldp.org/HOWTO/Bash-Prompt-HOWTO/
 	NICEPS1='\[\033[1m\][\u@\h \w]\[\033[0m\]\$ '
@@ -122,6 +130,7 @@ function dev() {
 		export PROMPT_COMMAND='echo -en "\033]0;['$1':${PWD##*/}]\a"'
 		;;
 	esac
+
 	# lower priority so background builds don't slow the GUI too much
 	case "$OSTYPE" in
 	beos|haiku)
@@ -135,7 +144,9 @@ function dev() {
 		#renice 3 $$
 		;;
 	esac
-	
+
+	DEVUPCMD=""
+
 	# source the specific profile file
 	test -f .profile && . .profile
 
@@ -143,12 +154,15 @@ function dev() {
 	test -z "$EDITOR" -a -z "$SVN_EDITOR" && export EDITOR=vim
 	
 	# make sure the update action is the first found in history.
-	test -d .svn && history -s svn up
-	test -d .bzr && history -s bzr update
-	test -d .hg && history -s hg pull
-	test -d .git && history -s git pull
-	test -d CVS && history -s cvs up -d
-	test -n "$P4PORT" && history -s p4 sync
+	if [ -z "$DEVUPCMD" ]; then
+		test -d .svn && DEVUPCMD="svn up"
+		test -d .bzr && DEVUPCMD="bzr update"
+		test -d .hg && DEVUPCMD="hg pull"
+		test -d .git && DEVUPCMD="git pull"
+		test -d CVS && DEVUPCMD="cvs up -d"
+		test -n "$P4PORT" && DEVUPCMD="p4 sync"
+	fi
+	test -n "$DEVUPCMD" && history -s "$DEVUPCMD"
 }
 
 complete -W complete -W "$(dev)" dev
