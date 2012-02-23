@@ -4,6 +4,8 @@
  */
 #include <ControlLook.h>
 
+#include "ContainerWindow.h"
+
 #include <stdio.h>
 
 #include <Control.h>
@@ -12,14 +14,19 @@
 #include <Shape.h>
 #include <String.h>
 #include <View.h>
+#include <Window.h>
 
 namespace BPrivate {
 
 static const float kEdgeBevelLightTint = 0.59;
 static const float kEdgeBevelShadowTint = 1.0735;
+const rgb_color kWhite = (rgb_color){255, 255, 255, 255};
+const rgb_color kBlack = (rgb_color){0, 0, 0, 255};
 
 
-BControlLook::BControlLook()
+BControlLook::BControlLook():
+	fCachedOutline(false),
+	fCachedWorkspace(-1)
 {
 }
 
@@ -1832,25 +1839,120 @@ BControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 	// setup the text color
 	// TODO: Should either use the ui_color(B_CONTROL_TEXT_COLOR) here,
 	// or elliminate that constant alltogether (stippi: +1).
-	rgb_color color;
-	if (base.red + base.green + base.blue > 128 * 3)
-		color = tint_color(base, B_DARKEN_MAX_TINT);
+
+	BWindow* window = view->Window();
+	bool isDesktop = window
+		&& window->Feel() == kPrivateDesktopWindowFeel
+		&& window->Look() == kPrivateDesktopWindowLook
+		&& view->Parent()
+		&& view->Parent()->Parent() == NULL
+		&& (flags & B_IGNORE_OUTLINE) == 0;
+
+	rgb_color	low;
+	rgb_color	color;
+	rgb_color	glowColor;
+
+	if (isDesktop)
+		low = view->Parent()->ViewColor();
 	else
-		color = tint_color(base, B_LIGHTEN_MAX_TINT);
+		low = base;
+
+	if (low.red + low.green + low.blue > 128 * 3) {
+		color = tint_color(low, B_DARKEN_MAX_TINT);
+		glowColor = kWhite;
+	} else {
+		color = tint_color(low, B_LIGHTEN_MAX_TINT);
+		glowColor = kBlack;
+	}
 
 	if (flags & B_DISABLED) {
-		color.red = (uint8)(((int32)base.red + color.red + 1) / 2);
-		color.green = (uint8)(((int32)base.green + color.green + 1) / 2);
-		color.blue = (uint8)(((int32)base.blue + color.blue + 1) / 2);
+		color.red = (uint8)(((int32)low.red + color.red + 1) / 2);
+		color.green = (uint8)(((int32)low.green + color.green + 1) / 2);
+		color.blue = (uint8)(((int32)low.blue + color.blue + 1) / 2);
+	}
+
+	drawing_mode oldMode = view->DrawingMode();
+
+	// check if the drawing occurs on the desktop
+	if (isDesktop) {
+		
+		if (fCachedWorkspace != current_workspace()) {
+
+			int8 indice = 0;
+			int32 mask;
+			bool tmpOutline;
+			while (fBackgroundInfo.FindInt32("be:bgndimginfoworkspaces",
+					indice, &mask) == B_OK
+				&& fBackgroundInfo.FindBool("be:bgndimginfoerasetext",
+					indice, &tmpOutline) == B_OK) {
+
+				if (((1 << current_workspace()) & mask) != 0) {
+					fCachedOutline = tmpOutline;
+					fCachedWorkspace = current_workspace();
+					break;
+				}
+				indice++;
+			}
+		}
+		
+		if (fCachedOutline) {
+			BFont font;
+			view->GetFont(&font);
+
+			view->SetDrawingMode(B_OP_ALPHA);
+			view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
+			// Draw glow or outline
+			if (glowColor == kWhite) {
+					font.SetFalseBoldWidth(2.0);
+					view->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
+
+					glowColor.alpha = 30;
+					view->SetHighColor(glowColor);
+					view->DrawString(label, where);
+	
+					font.SetFalseBoldWidth(1.0);
+					view->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
+
+					glowColor.alpha = 65;
+					view->SetHighColor(glowColor);
+					view->DrawString(label, where);
+
+					font.SetFalseBoldWidth(0.0);
+					view->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
+
+			} else if (glowColor == kBlack) {
+					font.SetFalseBoldWidth(1.0);
+					view->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
+
+					glowColor.alpha = 30;
+					view->SetHighColor(glowColor);
+					view->DrawString(label, where);
+
+					font.SetFalseBoldWidth(0.0);
+					view->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
+
+					glowColor.alpha = 200;
+					view->SetHighColor(glowColor);
+					view->DrawString(label, BPoint(where.x + 1, where.y + 1));
+			}
+		}
 	}
 
 	view->SetHighColor(color);
-	drawing_mode oldMode = view->DrawingMode();
+	
 	view->SetDrawingMode(B_OP_OVER);
 
 	view->DrawString(label, where);
 
 	view->SetDrawingMode(oldMode);
+}
+
+
+void
+BControlLook::SetBackgroundInfo(BMessage msg)
+{
+	fBackgroundInfo = msg;
+	fCachedWorkspace = -1;
 }
 
 

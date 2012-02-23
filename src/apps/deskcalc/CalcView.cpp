@@ -416,6 +416,7 @@ CalcView::Draw(BRect updateRect)
 					flags |= BControlLook::B_BLEND_FRAME;
 				if (key->flags != 0)
 					flags |= BControlLook::B_ACTIVATED;
+				flags |= BControlLook::B_IGNORE_OUTLINE;
 
 				be_control_look->DrawButtonFrame(this, frame, updateRect,
 					fBaseColor, fBaseColor, flags);

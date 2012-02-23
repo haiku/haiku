@@ -27,6 +27,9 @@ SetSubDirSupportedPlatforms haiku libbe_test ;
 UseLibraryHeaders agg ;
 UsePrivateHeaders app input print interface libbe shared support tracker ;
 
+UseHeaders [ FDirName $(HAIKU_TOP) src kits tracker ] ;
+
+
 SEARCH_SOURCE += [ FDirName $(SUBDIR) textview_support ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) layouter ] ;
 

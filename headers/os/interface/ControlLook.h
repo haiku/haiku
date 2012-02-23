@@ -70,6 +70,7 @@ public:
 		B_HOVER				= 1 << 3,
 		B_DISABLED			= 1 << 4,
 		B_DEFAULT_BUTTON	= 1 << 5,
+		B_IGNORE_OUTLINE	= 1 << 6,
 
 		B_BLEND_FRAME		= 1 << 16
 	};
@@ -271,6 +272,8 @@ public:
 									const rgb_color& base, uint32 flags,
 									const BPoint& where);
 
+			void				SetBackgroundInfo(BMessage msg);
+
 protected:
 			void				_DrawButtonFrame(BView* view, BRect& rect,
 									const BRect& updateRect,
@@ -362,6 +365,11 @@ protected:
 									const rgb_color& bevelTopColor,
 									const rgb_color& bevelRightColor,
 									const BGradientLinear& fillGradient);
+private:
+			bool				fCachedOutline;
+			int32				fCachedWorkspace;
+			BMessage			fBackgroundInfo;
+		
 };
 
 extern BControlLook* be_control_look;

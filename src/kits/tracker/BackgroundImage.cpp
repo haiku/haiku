@@ -36,6 +36,7 @@ All rights reserved.
 //
 
 #include <Bitmap.h>
+#include <ControlLook.h>
 #include <Node.h>
 #include <TranslationKit.h>
 #include <View.h>
@@ -95,6 +96,10 @@ BackgroundImage::GetBackgroundImage(const BNode *node, bool isDesktop)
 			}
 		} else
 			break;
+
+		if (be_control_look != NULL && isDesktop) {
+			be_control_look->SetBackgroundInfo(container);
+		}
 
 		container.FindInt32(kBackgroundImageInfoWorkspaces, index, (int32 *)&workspaces);
 		container.FindInt32(kBackgroundImageInfoMode, index, (int32 *)&mode);
