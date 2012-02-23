@@ -43,7 +43,8 @@ print_formatting_conventions()
 {
 	BFormattingConventions conventions;
 	BLocale::Default()->GetFormattingConventions(&conventions);
-	printf("%s_%s.UTF-8\n", conventions.LanguageCode(), conventions.CountryCode());
+	printf("%s_%s.UTF-8\n", conventions.LanguageCode(),
+		conventions.CountryCode());
 }
 
 
@@ -52,7 +53,8 @@ usage(int status)
 {
 	printf("Usage: %s [-lcf]\n"
 		"  -l, --language\tPrint the currently set preferred language\n"
-		"  -c, --ctype\t\tPrint the LC_CTYPE value based on the preferred language\n"
+		"  -c, --ctype\t\tPrint the LC_CTYPE value based on the preferred"
+			" language\n"
 		"  -f, --format\t\tPrint the formatting convention language\n"
 		"  -h, --help\t\tDisplay this help and exit\n",
 		kProgramName);
@@ -97,4 +99,3 @@ main(int argc, char **argv)
 
 	return 0;
 }
-
