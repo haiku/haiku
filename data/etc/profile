@@ -17,13 +17,12 @@ export HISTFILESIZE=50
 export HISTCONTROL=ignoredups
 
 # Locale
-export LANG=`locale -l`
-export LC_CTYPE=`locale -c`
-export LC_TIME=`locale -f`
-export LC_NUMERIC=$LC_TIME
-export LC_COLLATE=$LC_TIME
-export LC_MONETARY=$LC_TIME
-export LC_MESSAGES=$LC_TIME
+export LC_MESSAGES=`locale -m`
+export LC_NUMERIC=`locale -f`
+export LC_TIME=`locale -t`
+export LC_COLLATE=$LC_MESSAGES
+export LC_CTYPE=$LC_MESSAGES
+export LC_MONETARY=$LC_NUMERIC
 
 alias ls="ls --color"
 alias ll="ls -lA"

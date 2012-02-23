@@ -49,13 +49,28 @@ print_formatting_conventions()
 
 
 void
+print_time_conventions()
+{
+	BFormattingConventions conventions;
+	BLocale::Default()->GetFormattingConventions(&conventions);
+	if (conventions.UseStringsFromPreferredLanguage()) {
+		printf("%s_%s.UTF-8@strings=messages\n", conventions.LanguageCode(),
+			conventions.CountryCode());
+	} else {
+		printf("%s_%s.UTF-8\n", conventions.LanguageCode(),
+			conventions.CountryCode());
+	}
+}
+
+
+void
 usage(int status)
 {
-	printf("Usage: %s [-lcf]\n"
+	printf("Usage: %s [-lfmt]\n"
 		"  -l, --language\tPrint the currently set preferred language\n"
-		"  -c, --ctype\t\tPrint the LC_CTYPE value based on the preferred"
-			" language\n"
-		"  -f, --format\t\tPrint the formatting convention language\n"
+		"  -f, --format\t\tPrint the formatting-related locale\n"
+		"  -m, --message\t\tPrint the message-related locale\n"
+		"  -t, --time\t\tPrint the time-related locale\n"
 		"  -h, --help\t\tDisplay this help and exit\n",
 		kProgramName);
 
@@ -68,23 +83,28 @@ main(int argc, char **argv)
 {
 	static struct option const longopts[] = {
 		{"language", no_argument, 0, 'l'},
-		{"ctype", no_argument, 0, 'c'},
 		{"format", no_argument, 0, 'f'},
+		{"message", no_argument, 0, 'm'},
+		{"time", no_argument, 0, 't'},
 		{"help", no_argument, 0, 'h'},
 		{NULL}
 	};
 
 	int c;
-	while ((c = getopt_long(argc, argv, "lcfh", longopts, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "lcfmth", longopts, NULL)) != -1) {
 		switch (c) {
 			case 'l':
 				printf("%s\n", preferred_language().String());
 				break;
-			case 'c':
-				printf("%s.UTF-8\n", preferred_language().String());
-				break;
 			case 'f':
 				print_formatting_conventions();
+				break;
+			case 'c':	// for compatibility, we used to use 'c' for ctype
+			case 'm':
+				printf("%s.UTF-8\n", preferred_language().String());
+				break;
+			case 't':
+				print_time_conventions();
 				break;
 			case 'h':
 				usage(0);
