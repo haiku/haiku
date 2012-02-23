@@ -69,6 +69,7 @@ static const struct ath_hal_private ar5212hal = {{
 	.ah_procTxDesc			= ar5212ProcTxDesc,
 	.ah_getTxIntrQueue		= ar5212GetTxIntrQueue,
 	.ah_reqTxIntrDesc 		= ar5212IntrReqTxDesc,
+	.ah_getTxCompletionRates	= ar5212GetTxCompletionRates,
 
 	/* RX Functions */
 	.ah_getRxDP			= ar5212GetRxDP,
@@ -84,7 +85,8 @@ static const struct ath_hal_private ar5212hal = {{
 	.ah_setRxFilter			= ar5212SetRxFilter,
 	.ah_setupRxDesc			= ar5212SetupRxDesc,
 	.ah_procRxDesc			= ar5212ProcRxDesc,
-	.ah_rxMonitor			= ar5212AniPoll,
+	.ah_rxMonitor			= ar5212RxMonitor,
+	.ah_aniPoll			= ar5212AniPoll,
 	.ah_procMibEvent		= ar5212ProcessMibIntr,
 
 	/* Misc Functions */
@@ -125,6 +127,13 @@ static const struct ath_hal_private ar5212hal = {{
 	.ah_getCTSTimeout		= ar5212GetCTSTimeout,
 	.ah_setDecompMask               = ar5212SetDecompMask,
 	.ah_setCoverageClass            = ar5212SetCoverageClass,
+	.ah_setQuiet			= ar5212SetQuiet,
+
+	/* DFS Functions */
+	.ah_enableDfs			= ar5212EnableDfs,
+	.ah_getDfsThresh		= ar5212GetDfsThresh,
+	.ah_procRadarEvent		= ar5212ProcessRadarEvent,
+	.ah_isFastClockEnabled		= ar5212IsFastClockEnabled,
 
 	/* Key Cache Functions */
 	.ah_getKeyCacheSize		= ar5212GetKeyCacheSize,
@@ -142,6 +151,7 @@ static const struct ath_hal_private ar5212hal = {{
 	.ah_beaconInit			= ar5212BeaconInit,
 	.ah_setStationBeaconTimers	= ar5212SetStaBeaconTimers,
 	.ah_resetStationBeaconTimers	= ar5212ResetStaBeaconTimers,
+	.ah_getNextTBTT			= ar5212GetNextTBTT,
 
 	/* Interrupt Functions */
 	.ah_isInterruptPending		= ar5212IsInterruptPending,
@@ -201,6 +211,9 @@ ar5212AniSetup(struct ath_hal *ah)
 		ar5212AniAttach(ah, &tmp, &tmp, AH_TRUE);
 	} else
 		ar5212AniAttach(ah, &aniparams, &aniparams, AH_TRUE);
+
+	/* Set overridable ANI methods */
+	AH5212(ah)->ah_aniControl = ar5212AniControl;
 }
 
 /*
@@ -248,6 +261,9 @@ ar5212InitState(struct ath_hal_5212 *ahp, uint16_t devid, HAL_SOFTC sc,
 	ahp->ah_acktimeout = (u_int) -1;
 	ahp->ah_ctstimeout = (u_int) -1;
 	ahp->ah_sifstime = (u_int) -1;
+	ahp->ah_txTrigLev = INIT_TX_FIFO_THRESHOLD,
+	ahp->ah_maxTxTrigLev = MAX_TX_FIFO_THRESHOLD,
+
 	OS_MEMCPY(&ahp->ah_bssidmask, defbssidmask, IEEE80211_ADDR_LEN);
 #undef N
 }
@@ -291,7 +307,8 @@ ar5212IsMacSupported(uint8_t macVersion, uint8_t macRev)
  */
 static struct ath_hal *
 ar5212Attach(uint16_t devid, HAL_SOFTC sc,
-	HAL_BUS_TAG st, HAL_BUS_HANDLE sh, HAL_STATUS *status)
+	HAL_BUS_TAG st, HAL_BUS_HANDLE sh, uint16_t *eepromdata,
+	HAL_STATUS *status)
 {
 #define	AH_EEPROM_PROTECT(ah) \
 	(AH_PRIVATE(ah)->ah_ispcie)? AR_EEPROM_PROTECT_PCIE : AR_EEPROM_PROTECT)
@@ -302,13 +319,13 @@ ar5212Attach(uint16_t devid, HAL_SOFTC sc,
 	uint16_t eeval;
 	HAL_STATUS ecode;
 
-	HALDEBUG(AH_NULL, HAL_DEBUG_ATTACH, "%s: sc %p st %p sh %p\n",
+	HALDEBUG_G(AH_NULL, HAL_DEBUG_ATTACH, "%s: sc %p st %p sh %p\n",
 	    __func__, sc, (void*) st, (void*) sh);
 
 	/* NB: memory is returned zero'd */
 	ahp = ath_hal_malloc(sizeof (struct ath_hal_5212));
 	if (ahp == AH_NULL) {
-		HALDEBUG(AH_NULL, HAL_DEBUG_ANY,
+		HALDEBUG_G(AH_NULL, HAL_DEBUG_ANY,
 		    "%s: cannot allocate memory for state block\n", __func__);
 		*status = HAL_ENOMEM;
 		return AH_NULL;
@@ -853,6 +870,9 @@ ar5212FillCapabilityInfo(struct ath_hal *ah)
 			;
 	if (AH_PRIVATE(ah)->ah_macVersion < AR_SREV_VERSION_GRIFFIN)
 		pCap->halIntrMask &= ~HAL_INT_TBTT;
+
+	pCap->hal4kbSplitTransSupport = AH_TRUE;
+	pCap->halHasRxSelfLinkedTail = AH_TRUE;
 
 	return AH_TRUE;
 #undef IS_COBRA

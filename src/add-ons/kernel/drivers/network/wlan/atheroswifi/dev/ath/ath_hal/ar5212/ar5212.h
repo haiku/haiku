@@ -143,7 +143,7 @@ typedef struct RfHalFuncs {
 		      int16_t *minPower, int16_t *maxPower,
 		      const struct ieee80211_channel *, uint16_t *rfXpdGain);
 	HAL_BOOL  (*getChannelMaxMinPower)(struct ath_hal *ah,
-		      const struct ieee80211_channel *,
+		      const const struct ieee80211_channel *,
 		      int16_t *maxPow, int16_t *minPow);
 	int16_t	  (*getNfAdjust)(struct ath_hal *, const HAL_CHANNEL_INTERNAL*);
 } RF_HAL_FUNCS;
@@ -320,13 +320,19 @@ struct ath_hal_5212 {
 	struct ar5212AniState	*ah_curani;	/* cached last reference */
 	struct ar5212AniState	ah_ani[AH_MAXCHAN]; /* per-channel state */
 
+	/* AR5416 uses some of the AR5212 ANI code; these are the ANI methods */
+	HAL_BOOL	(*ah_aniControl) (struct ath_hal *, HAL_ANI_CMD cmd, int param);
+
 	/*
 	 * Transmit power state.  Note these are maintained
 	 * here so they can be retrieved by diagnostic tools.
 	 */
 	uint16_t	*ah_pcdacTable;
 	u_int		ah_pcdacTableSize;
-	uint16_t	ah_ratesArray[16];
+	uint16_t	ah_ratesArray[37];
+
+	uint8_t		ah_txTrigLev;		/* current Tx trigger level */
+	uint8_t		ah_maxTxTrigLev;	/* max tx trigger level */
 };
 #define	AH5212(_ah)	((struct ath_hal_5212 *)(_ah))
 
@@ -424,6 +430,7 @@ extern	void ar5212BeaconInit(struct ath_hal *ah,
 extern	void ar5212ResetStaBeaconTimers(struct ath_hal *ah);
 extern	void ar5212SetStaBeaconTimers(struct ath_hal *ah,
 		const HAL_BEACON_STATE *);
+extern	uint64_t ar5212GetNextTBTT(struct ath_hal *);
 
 extern	HAL_BOOL ar5212IsInterruptPending(struct ath_hal *ah);
 extern	HAL_BOOL ar5212GetPendingInterrupts(struct ath_hal *ah, HAL_INT *);
@@ -459,6 +466,7 @@ extern	void ar5212WriteAssocid(struct ath_hal *ah, const uint8_t *bssid,
 		uint16_t assocId);
 extern	uint32_t ar5212GetTsf32(struct ath_hal *ah);
 extern	uint64_t ar5212GetTsf64(struct ath_hal *ah);
+extern	void ar5212SetTsf64(struct ath_hal *ah, uint64_t tsf64);
 extern	void ar5212ResetTsf(struct ath_hal *ah);
 extern	void ar5212SetBasicRate(struct ath_hal *ah, HAL_RATE_SET *pSet);
 extern	uint32_t ar5212GetRandomSeed(struct ath_hal *ah);
@@ -499,6 +507,8 @@ extern	HAL_BOOL ar5212SetCapability(struct ath_hal *, HAL_CAPABILITY_TYPE,
 extern	HAL_BOOL ar5212GetDiagState(struct ath_hal *ah, int request,
 		const void *args, uint32_t argsize,
 		void **result, uint32_t *resultsize);
+extern	HAL_STATUS ar5212SetQuiet(struct ath_hal *ah, uint32_t period,
+		uint32_t duration, uint32_t nextStart, HAL_QUIET_FLAG flag);
 
 extern	HAL_BOOL ar5212SetPowerMode(struct ath_hal *ah, HAL_POWER_MODE mode,
 		int setChip);
@@ -586,6 +596,8 @@ extern	HAL_STATUS ar5212ProcTxDesc(struct ath_hal *ah,
 		struct ath_desc *, struct ath_tx_status *);
 extern  void ar5212GetTxIntrQueue(struct ath_hal *ah, uint32_t *);
 extern  void ar5212IntrReqTxDesc(struct ath_hal *ah, struct ath_desc *);
+extern	HAL_BOOL ar5212GetTxCompletionRates(struct ath_hal *ah,
+		const struct ath_desc *ds0, int *rates, int *tries);
 
 extern	const HAL_RATE_TABLE *ar5212GetRateTable(struct ath_hal *, u_int mode);
 
@@ -601,8 +613,19 @@ struct ath_rx_status;
 extern	void ar5212AniPhyErrReport(struct ath_hal *ah,
 		const struct ath_rx_status *rs);
 extern	void ar5212ProcessMibIntr(struct ath_hal *, const HAL_NODE_STATS *);
-extern	void ar5212AniPoll(struct ath_hal *, const HAL_NODE_STATS *,
+extern	void ar5212RxMonitor(struct ath_hal *, const HAL_NODE_STATS *,
 			     const struct ieee80211_channel *);
+extern	void ar5212AniPoll(struct ath_hal *, const struct ieee80211_channel *);
 extern	void ar5212AniReset(struct ath_hal *, const struct ieee80211_channel *,
 		HAL_OPMODE, int);
+
+extern	HAL_BOOL ar5212IsNFCalInProgress(struct ath_hal *ah);
+extern	HAL_BOOL ar5212WaitNFCalComplete(struct ath_hal *ah, int i);
+extern	void ar5212EnableDfs(struct ath_hal *ah, HAL_PHYERR_PARAM *pe);
+extern	void ar5212GetDfsThresh(struct ath_hal *ah, HAL_PHYERR_PARAM *pe);
+extern	HAL_BOOL ar5212ProcessRadarEvent(struct ath_hal *ah,
+	    struct ath_rx_status *rxs, uint64_t fulltsf, const char *buf,
+	    HAL_DFS_EVENT *event);
+extern	HAL_BOOL ar5212IsFastClockEnabled(struct ath_hal *ah);
+
 #endif	/* _ATH_AR5212_H_ */

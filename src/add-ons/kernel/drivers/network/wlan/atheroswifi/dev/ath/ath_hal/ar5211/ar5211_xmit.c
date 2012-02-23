@@ -345,8 +345,9 @@ ar5211ResetTxQueue(struct ath_hal *ah, u_int q)
 			| AR_Q_MISC_CBR_INCR_DIS0 | AR_Q_MISC_RDYTIME_EXP_POLICY);
 
 		value = (ahp->ah_beaconInterval
-			- (ath_hal_sw_beacon_response_time - ath_hal_dma_beacon_response_time)
-			- ath_hal_additional_swba_backoff) * 1024;
+			- (ah->ah_config.ah_sw_beacon_response_time
+			        - ah->ah_config.ah_dma_beacon_response_time)
+			- ah->ah_config.ah_additional_swba_backoff) * 1024;
 		OS_REG_WRITE(ah, AR_QRDYTIMECFG(q), value | AR_Q_RDYTIMECFG_EN);
 
 		/* Configure DCU for CAB */
@@ -660,3 +661,13 @@ ar5211GetTxIntrQueue(struct ath_hal *ah, uint32_t *txqs)
 {
 	return;
 }
+
+/*
+ * Retrieve the rate table from the given TX completion descriptor
+ */
+HAL_BOOL
+ar5211GetTxCompletionRates(struct ath_hal *ah, const struct ath_desc *ds0, int *rates, int *tries)
+{
+	return AH_FALSE;
+}
+

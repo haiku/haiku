@@ -24,14 +24,18 @@
 
 #include "ah_eeprom_v4k.h"		/* XXX for tx/rx gain */
 
-#include "ar5416/ar9280.h"
-#include "ar5416/ar9285.h"
+#include "ar9002/ar9280.h"
+#include "ar9002/ar9285.h"
 #include "ar5416/ar5416reg.h"
 #include "ar5416/ar5416phy.h"
 
-#include "ar5416/ar9285.ini"
-#include "ar5416/ar9285v2.ini"
-#include "ar5416/ar9280v2.ini"		/* XXX ini for tx/rx gain */
+#include "ar9002/ar9285.ini"
+#include "ar9002/ar9285v2.ini"
+#include "ar9002/ar9280v2.ini"		/* XXX ini for tx/rx gain */
+
+#include "ar9002/ar9285_cal.h"
+#include "ar9002/ar9285_phy.h"
+#include "ar9002/ar9285_diversity.h"
 
 static const HAL_PERCAL_DATA ar9280_iq_cal = {		/* single sample */
 	.calName = "IQ", .calType = IQ_MISMATCH_CAL,
@@ -70,8 +74,33 @@ static void ar9285WriteIni(struct ath_hal *ah,
 static void
 ar9285AniSetup(struct ath_hal *ah)
 {
-	/* NB: disable ANI for reliable RIFS rx */
-	ar5212AniAttach(ah, AH_NULL, AH_NULL, AH_FALSE);
+	/*
+	 * These are the parameters from the AR5416 ANI code;
+	 * they likely need quite a bit of adjustment for the
+	 * AR9285.
+	 */
+        static const struct ar5212AniParams aniparams = {
+                .maxNoiseImmunityLevel  = 4,    /* levels 0..4 */
+                .totalSizeDesired       = { -55, -55, -55, -55, -62 },
+                .coarseHigh             = { -14, -14, -14, -14, -12 },
+                .coarseLow              = { -64, -64, -64, -64, -70 },
+                .firpwr                 = { -78, -78, -78, -78, -80 },
+                .maxSpurImmunityLevel   = 2,
+                .cycPwrThr1             = { 2, 4, 6 },
+                .maxFirstepLevel        = 2,    /* levels 0..2 */
+                .firstep                = { 0, 4, 8 },
+                .ofdmTrigHigh           = 500,
+                .ofdmTrigLow            = 200,
+                .cckTrigHigh            = 200,
+                .cckTrigLow             = 100,
+                .rssiThrHigh            = 40,
+                .rssiThrLow             = 7,
+                .period                 = 100,
+        };
+	/* NB: disable ANI noise immmunity for reliable RIFS rx */
+	AH5416(ah)->ah_ani_function &= ~(1 << HAL_ANI_NOISE_IMMUNITY_LEVEL);
+
+        ar5416AniAttach(ah, &aniparams, &aniparams, AH_TRUE);
 }
 
 /*
@@ -79,7 +108,8 @@ ar9285AniSetup(struct ath_hal *ah)
  */
 static struct ath_hal *
 ar9285Attach(uint16_t devid, HAL_SOFTC sc,
-	HAL_BUS_TAG st, HAL_BUS_HANDLE sh, HAL_STATUS *status)
+	HAL_BUS_TAG st, HAL_BUS_HANDLE sh, uint16_t *eepromdata,
+	HAL_STATUS *status)
 {
 	struct ath_hal_9285 *ahp9285;
 	struct ath_hal_5212 *ahp;
@@ -88,13 +118,13 @@ ar9285Attach(uint16_t devid, HAL_SOFTC sc,
 	HAL_STATUS ecode;
 	HAL_BOOL rfStatus;
 
-	HALDEBUG(AH_NULL, HAL_DEBUG_ATTACH, "%s: sc %p st %p sh %p\n",
+	HALDEBUG_G(AH_NULL, HAL_DEBUG_ATTACH, "%s: sc %p st %p sh %p\n",
 	    __func__, sc, (void*) st, (void*) sh);
 
 	/* NB: memory is returned zero'd */
 	ahp9285 = ath_hal_malloc(sizeof (struct ath_hal_9285));
 	if (ahp9285 == AH_NULL) {
-		HALDEBUG(AH_NULL, HAL_DEBUG_ANY,
+		HALDEBUG_G(AH_NULL, HAL_DEBUG_ANY,
 		    "%s: cannot allocate memory for state block\n", __func__);
 		*status = HAL_ENOMEM;
 		return AH_NULL;
@@ -106,6 +136,8 @@ ar9285Attach(uint16_t devid, HAL_SOFTC sc,
 
 	/* XXX override with 9285 specific state */
 	/* override 5416 methods for our needs */
+	AH5416(ah)->ah_initPLL = ar9280InitPLL;
+
 	ah->ah_setAntennaSwitch		= ar9285SetAntennaSwitch;
 	ah->ah_configPCIE		= ar9285ConfigPCIE;
 	ah->ah_setTxPower		= ar9285SetTransmitPower;
@@ -121,6 +153,8 @@ ar9285Attach(uint16_t devid, HAL_SOFTC sc,
 	AH5416(ah)->ah_writeIni		= ar9285WriteIni;
 	AH5416(ah)->ah_rx_chainmask	= AR9285_DEFAULT_RXCHAINMASK;
 	AH5416(ah)->ah_tx_chainmask	= AR9285_DEFAULT_TXCHAINMASK;
+	
+	ahp->ah_maxTxTrigLev		= MAX_TX_FIFO_THRESHOLD >> 1;
 
 	if (!ar5416SetResetReg(ah, HAL_RESET_POWER_ON)) {
 		/* reset chip */
@@ -161,6 +195,12 @@ ar9285Attach(uint16_t devid, HAL_SOFTC sc,
 		    ar9285PciePhy_clkreq_always_on_L1, 2);
 	}
 	ar5416AttachPCIE(ah);
+
+	/* Attach methods that require MAC version/revision info */
+	if (AR_SREV_KITE_12_OR_LATER(ah))
+		AH5416(ah)->ah_cal_initcal      = ar9285InitCalHardware;
+	if (AR_SREV_KITE_11_OR_LATER(ah))
+		AH5416(ah)->ah_cal_pacal        = ar9002_hw_pa_cal;
 
 	ecode = ath_hal_v4kEepromAttach(ah);
 	if (ecode != HAL_OK)
@@ -218,15 +258,27 @@ ar9285Attach(uint16_t devid, HAL_SOFTC sc,
 
 	HAL_INI_INIT(&ahp9285->ah_ini_rxgain, ar9280Modes_original_rxgain_v2,
 	    6);
+
+	if (AR_SREV_9285E_20(ah))
+		ath_hal_printf(ah, "[ath] AR9285E_20 detected; using XE TX gain tables\n");
+
 	/* setup txgain table */
 	switch (ath_hal_eepromGet(ah, AR_EEP_TXGAIN_TYPE, AH_NULL)) {
 	case AR5416_EEP_TXGAIN_HIGH_POWER:
-		HAL_INI_INIT(&ahp9285->ah_ini_txgain,
-		    ar9285Modes_high_power_tx_gain_v2, 6);
+		if (AR_SREV_9285E_20(ah))
+			HAL_INI_INIT(&ahp9285->ah_ini_txgain,
+			    ar9285Modes_XE2_0_high_power, 6);
+		else
+			HAL_INI_INIT(&ahp9285->ah_ini_txgain,
+			    ar9285Modes_high_power_tx_gain_v2, 6);
 		break;
 	case AR5416_EEP_TXGAIN_ORIG:
-		HAL_INI_INIT(&ahp9285->ah_ini_txgain,
-		    ar9285Modes_original_tx_gain_v2, 6);
+		if (AR_SREV_9285E_20(ah))
+			HAL_INI_INIT(&ahp9285->ah_ini_txgain,
+			    ar9285Modes_XE2_0_normal_power, 6);
+		else
+			HAL_INI_INIT(&ahp9285->ah_ini_txgain,
+			    ar9285Modes_original_tx_gain_v2, 6);
 		break;
 	default:
 		HALASSERT(AH_FALSE);
@@ -241,6 +293,16 @@ ar9285Attach(uint16_t devid, HAL_SOFTC sc,
 		goto bad;
 	}
 
+	/* Print out whether the EEPROM settings enable AR9285 diversity */
+	if (ar9285_check_div_comb(ah)) {
+		ath_hal_printf(ah, "[ath] Enabling diversity for Kite\n");
+		ah->ah_rxAntCombDiversity = ar9285_ant_comb_scan;
+	}
+
+	/* Disable 11n for the AR2427 */
+	if (devid == AR2427_DEVID_PCIE)
+		AH_PRIVATE(ah)->ah_caps.halHTSupport = AH_FALSE;
+
 	ecode = ath_hal_eepromGet(ah, AR_EEP_MACADDR, ahp->ah_macaddr);
 	if (ecode != HAL_OK) {
 		HALDEBUG(ah, HAL_DEBUG_ANY,
@@ -251,6 +313,11 @@ ar9285Attach(uint16_t devid, HAL_SOFTC sc,
 	/* Read Reg Domain */
 	AH_PRIVATE(ah)->ah_currentRD =
 	    ath_hal_eepromGet(ah, AR_EEP_REGDMN_0, AH_NULL);
+	/*
+         * For Kite and later chipsets, the following bits are not
+	 * programmed in EEPROM and so are set as enabled always.
+	 */
+	AH_PRIVATE(ah)->ah_currentRDext = AR9285_RDEXT_DEFAULT;
 
 	/*
 	 * ah_miscMode is populated by ar5416FillCapabilityInfo()
@@ -259,9 +326,16 @@ ar9285Attach(uint16_t devid, HAL_SOFTC sc,
 	 * placed into hardware.
 	 */
 	if (ahp->ah_miscMode != 0)
-		OS_REG_WRITE(ah, AR_MISC_MODE, ahp->ah_miscMode);
+		OS_REG_WRITE(ah, AR_MISC_MODE, OS_REG_READ(ah, AR_MISC_MODE) | ahp->ah_miscMode);
 
 	ar9285AniSetup(ah);			/* Anti Noise Immunity */
+
+	/* Setup noise floor min/max/nominal values */
+	AH5416(ah)->nf_2g.max = AR_PHY_CCA_MAX_GOOD_VAL_9285_2GHZ;
+	AH5416(ah)->nf_2g.min = AR_PHY_CCA_MIN_GOOD_VAL_9285_2GHZ;
+	AH5416(ah)->nf_2g.nominal = AR_PHY_CCA_NOM_VAL_9285_2GHZ;
+	/* XXX no 5ghz values? */
+
 	ar5416InitNfHistBuff(AH5416(ah)->ah_cal.nfCalHist);
 
 	HALDEBUG(ah, HAL_DEBUG_ATTACH, "%s: return\n", __func__);
@@ -313,7 +387,6 @@ ar9285WriteIni(struct ath_hal *ah, const struct ieee80211_channel *chan)
 	}
 	regWrites = ath_hal_ini_write(ah, &AH5212(ah)->ah_ini_common,
 	    1, regWrites);
-
 }
 
 /*
@@ -334,55 +407,35 @@ ar9285FillCapabilityInfo(struct ath_hal *ah)
 #if 0
 	pCap->halWowMatchPatternDword = AH_TRUE;
 #endif
+	/* AR9285 has 2 antennas but is a 1x1 stream device */
+	pCap->halTxStreams = 1;
+	pCap->halRxStreams = 1;
+
 	pCap->halCSTSupport = AH_TRUE;
 	pCap->halRifsRxSupport = AH_TRUE;
 	pCap->halRifsTxSupport = AH_TRUE;
 	pCap->halRtsAggrLimit = 64*1024;	/* 802.11n max */
 	pCap->halExtChanDfsSupport = AH_TRUE;
+	pCap->halUseCombinedRadarRssi = AH_TRUE;
 #if 0
 	/* XXX bluetooth */
 	pCap->halBtCoexSupport = AH_TRUE;
 #endif
 	pCap->halAutoSleepSupport = AH_FALSE;	/* XXX? */
-#if 0
 	pCap->hal4kbSplitTransSupport = AH_FALSE;
-#endif
+	/* Disable this so Block-ACK works correctly */
+	pCap->halHasRxSelfLinkedTail = AH_FALSE;
+	pCap->halMbssidAggrSupport = AH_TRUE;  
+	pCap->hal4AddrAggrSupport = AH_TRUE;
+
+	if (AR_SREV_KITE_12_OR_LATER(ah))
+		pCap->halPSPollBroken = AH_FALSE;
+
+	/* Only RX STBC supported */
 	pCap->halRxStbcSupport = 1;
-	pCap->halTxStbcSupport = 1;
+	pCap->halTxStbcSupport = 0;
 
 	return AH_TRUE;
-}
-
-HAL_BOOL
-ar9285SetAntennaSwitch(struct ath_hal *ah, HAL_ANT_SETTING settings)
-{
-#define ANTENNA0_CHAINMASK    0x1
-#define ANTENNA1_CHAINMASK    0x2
-	struct ath_hal_5416 *ahp = AH5416(ah);
-
-	/* Antenna selection is done by setting the tx/rx chainmasks approp. */
-	switch (settings) {
-	case HAL_ANT_FIXED_A:
-		/* Enable first antenna only */
-		ahp->ah_tx_chainmask = ANTENNA0_CHAINMASK;
-		ahp->ah_rx_chainmask = ANTENNA0_CHAINMASK;
-		break;
-	case HAL_ANT_FIXED_B:
-		/* Enable second antenna only, after checking capability */
-		if (AH_PRIVATE(ah)->ah_caps.halTxChainMask > ANTENNA1_CHAINMASK)
-			ahp->ah_tx_chainmask = ANTENNA1_CHAINMASK;
-		ahp->ah_rx_chainmask = ANTENNA1_CHAINMASK;
-		break;
-	case HAL_ANT_VARIABLE:
-		/* Restore original chainmask settings */
-		/* XXX */
-		ahp->ah_tx_chainmask = AR5416_DEFAULT_TXCHAINMASK;
-		ahp->ah_rx_chainmask = AR5416_DEFAULT_RXCHAINMASK;
-		break;
-	}
-	return AH_TRUE;
-#undef ANTENNA0_CHAINMASK
-#undef ANTENNA1_CHAINMASK
 }
 
 static const char*
@@ -390,6 +443,9 @@ ar9285Probe(uint16_t vendorid, uint16_t devid)
 {
 	if (vendorid == ATHEROS_VENDOR_ID && devid == AR9285_DEVID_PCIE)
 		return "Atheros 9285";
+	if (vendorid == ATHEROS_VENDOR_ID && (devid == AR2427_DEVID_PCIE))
+		return "Atheros 2427";
+
 	return AH_NULL;
 }
 AH_CHIP(AR9285, ar9285Probe, ar9285Attach);

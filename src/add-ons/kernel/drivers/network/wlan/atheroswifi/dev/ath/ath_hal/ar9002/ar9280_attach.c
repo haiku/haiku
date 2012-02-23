@@ -24,12 +24,13 @@
 
 #include "ah_eeprom_v14.h"		/* XXX for tx/rx gain */
 
-#include "ar5416/ar9280.h"
+#include "ar9002/ar9280.h"
 #include "ar5416/ar5416reg.h"
 #include "ar5416/ar5416phy.h"
 
-#include "ar5416/ar9280v1.ini"
-#include "ar5416/ar9280v2.ini"
+#include "ar9002/ar9280v1.ini"
+#include "ar9002/ar9280v2.ini"
+#include "ar9002/ar9280_olc.h"
 
 static const HAL_PERCAL_DATA ar9280_iq_cal = {		/* single sample */
 	.calName = "IQ", .calType = IQ_MISMATCH_CAL,
@@ -41,14 +42,14 @@ static const HAL_PERCAL_DATA ar9280_iq_cal = {		/* single sample */
 static const HAL_PERCAL_DATA ar9280_adc_gain_cal = {	/* single sample */
 	.calName = "ADC Gain", .calType = ADC_GAIN_CAL,
 	.calNumSamples	= MIN_CAL_SAMPLES,
-	.calCountMax	= PER_MIN_LOG_COUNT,
+	.calCountMax	= PER_MAX_LOG_COUNT,
 	.calCollect	= ar5416AdcGainCalCollect,
 	.calPostProc	= ar5416AdcGainCalibration
 };
 static const HAL_PERCAL_DATA ar9280_adc_dc_cal = {	/* single sample */
 	.calName = "ADC DC", .calType = ADC_DC_CAL,
 	.calNumSamples	= MIN_CAL_SAMPLES,
-	.calCountMax	= PER_MIN_LOG_COUNT,
+	.calCountMax	= PER_MAX_LOG_COUNT,
 	.calCollect	= ar5416AdcDcCalCollect,
 	.calPostProc	= ar5416AdcDcCalibration
 };
@@ -68,16 +69,80 @@ static void ar9280WriteIni(struct ath_hal *ah,
 static void
 ar9280AniSetup(struct ath_hal *ah)
 {
-	/* NB: disable ANI for reliable RIFS rx */
-	ar5212AniAttach(ah, AH_NULL, AH_NULL, AH_FALSE);
+	/*
+	 * These are the parameters from the AR5416 ANI code;
+	 * they likely need quite a bit of adjustment for the
+	 * AR9280.
+	 */
+        static const struct ar5212AniParams aniparams = {
+                .maxNoiseImmunityLevel  = 4,    /* levels 0..4 */
+                .totalSizeDesired       = { -55, -55, -55, -55, -62 },
+                .coarseHigh             = { -14, -14, -14, -14, -12 },
+                .coarseLow              = { -64, -64, -64, -64, -70 },
+                .firpwr                 = { -78, -78, -78, -78, -80 },
+                .maxSpurImmunityLevel   = 2,
+                .cycPwrThr1             = { 2, 4, 6 },
+                .maxFirstepLevel        = 2,    /* levels 0..2 */
+                .firstep                = { 0, 4, 8 },
+                .ofdmTrigHigh           = 500,
+                .ofdmTrigLow            = 200,
+                .cckTrigHigh            = 200,
+                .cckTrigLow             = 100,
+                .rssiThrHigh            = 40,
+                .rssiThrLow             = 7,
+                .period                 = 100,
+        };
+	/* NB: disable ANI noise immmunity for reliable RIFS rx */
+	AH5416(ah)->ah_ani_function &= ~(1 << HAL_ANI_NOISE_IMMUNITY_LEVEL);
+
+        /* NB: ANI is not enabled yet */
+        ar5416AniAttach(ah, &aniparams, &aniparams, AH_TRUE);
 }
+
+void
+ar9280InitPLL(struct ath_hal *ah, const struct ieee80211_channel *chan)
+{
+	uint32_t pll = SM(0x5, AR_RTC_SOWL_PLL_REFDIV);
+
+	if (AR_SREV_MERLIN_20(ah) &&
+	    chan != AH_NULL && IEEE80211_IS_CHAN_5GHZ(chan)) {
+		/*
+		 * PLL WAR for Merlin 2.0/2.1
+		 * When doing fast clock, set PLL to 0x142c
+		 * Else, set PLL to 0x2850 to prevent reset-to-reset variation 
+		 */
+		pll = IS_5GHZ_FAST_CLOCK_EN(ah, chan) ? 0x142c : 0x2850;
+	} else if (AR_SREV_MERLIN_10_OR_LATER(ah)) {
+		pll = SM(0x5, AR_RTC_SOWL_PLL_REFDIV);
+		if (chan != AH_NULL) {
+			if (IEEE80211_IS_CHAN_HALF(chan))
+				pll |= SM(0x1, AR_RTC_SOWL_PLL_CLKSEL);
+			else if (IEEE80211_IS_CHAN_QUARTER(chan))
+				pll |= SM(0x2, AR_RTC_SOWL_PLL_CLKSEL);
+			if (IEEE80211_IS_CHAN_5GHZ(chan))
+				pll |= SM(0x28, AR_RTC_SOWL_PLL_DIV);
+			else
+				pll |= SM(0x2c, AR_RTC_SOWL_PLL_DIV);
+		} else
+			pll |= SM(0x2c, AR_RTC_SOWL_PLL_DIV);
+	}
+
+	OS_REG_WRITE(ah, AR_RTC_PLL_CONTROL, pll);
+	OS_DELAY(RTC_PLL_SETTLE_DELAY);
+	OS_REG_WRITE(ah, AR_RTC_SLEEP_CLK, AR_RTC_SLEEP_DERIVED_CLK);
+}
+
+/* XXX shouldn't be here! */
+#define	EEP_MINOR(_ah) \
+	(AH_PRIVATE(_ah)->ah_eeversion & AR5416_EEP_VER_MINOR_MASK)
 
 /*
  * Attach for an AR9280 part.
  */
 static struct ath_hal *
 ar9280Attach(uint16_t devid, HAL_SOFTC sc,
-	HAL_BUS_TAG st, HAL_BUS_HANDLE sh, HAL_STATUS *status)
+	HAL_BUS_TAG st, HAL_BUS_HANDLE sh, uint16_t *eepromdata,
+	HAL_STATUS *status)
 {
 	struct ath_hal_9280 *ahp9280;
 	struct ath_hal_5212 *ahp;
@@ -85,14 +150,16 @@ ar9280Attach(uint16_t devid, HAL_SOFTC sc,
 	uint32_t val;
 	HAL_STATUS ecode;
 	HAL_BOOL rfStatus;
+	int8_t pwr_table_offset;
+	uint8_t pwr;
 
-	HALDEBUG(AH_NULL, HAL_DEBUG_ATTACH, "%s: sc %p st %p sh %p\n",
+	HALDEBUG_G(AH_NULL, HAL_DEBUG_ATTACH, "%s: sc %p st %p sh %p\n",
 	    __func__, sc, (void*) st, (void*) sh);
 
 	/* NB: memory is returned zero'd */
 	ahp9280 = ath_hal_malloc(sizeof (struct ath_hal_9280));
 	if (ahp9280 == AH_NULL) {
-		HALDEBUG(AH_NULL, HAL_DEBUG_ANY,
+		HALDEBUG_G(AH_NULL, HAL_DEBUG_ANY,
 		    "%s: cannot allocate memory for state block\n", __func__);
 		*status = HAL_ENOMEM;
 		return AH_NULL;
@@ -104,6 +171,8 @@ ar9280Attach(uint16_t devid, HAL_SOFTC sc,
 
 	/* XXX override with 9280 specific state */
 	/* override 5416 methods for our needs */
+	AH5416(ah)->ah_initPLL = ar9280InitPLL;
+
 	ah->ah_setAntennaSwitch		= ar9280SetAntennaSwitch;
 	ah->ah_configPCIE		= ar9280ConfigPCIE;
 
@@ -115,6 +184,10 @@ ar9280Attach(uint16_t devid, HAL_SOFTC sc,
 
 	AH5416(ah)->ah_spurMitigate	= ar9280SpurMitigate;
 	AH5416(ah)->ah_writeIni		= ar9280WriteIni;
+	AH5416(ah)->ah_olcInit		= ar9280olcInit;
+	AH5416(ah)->ah_olcTempCompensation = ar9280olcTemperatureCompensation;
+	AH5416(ah)->ah_setPowerCalTable	= ar9280SetPowerCalTable;
+
 	AH5416(ah)->ah_rx_chainmask	= AR9280_DEFAULT_RXCHAINMASK;
 	AH5416(ah)->ah_tx_chainmask	= AR9280_DEFAULT_TXCHAINMASK;
 
@@ -213,7 +286,31 @@ ar9280Attach(uint16_t devid, HAL_SOFTC sc,
 		goto bad;
 	}
 
-	if (AR_SREV_MERLIN_20_OR_LATER(ah)) {
+	/* Enable fixup for AR_AN_TOP2 if necessary */
+	/*
+	 * The v14 EEPROM layer returns HAL_EIO if PWDCLKIND isn't supported
+	 * by the EEPROM version.
+	 *
+	 * ath9k checks the EEPROM minor version is >= 0x0a here, instead of
+	 * the abstracted EEPROM access layer.
+	 */
+	ecode = ath_hal_eepromGet(ah, AR_EEP_PWDCLKIND, &pwr);
+	if (AR_SREV_MERLIN_20_OR_LATER(ah) && ecode == HAL_OK && pwr == 0) {
+		printf("[ath] enabling AN_TOP2_FIXUP\n");
+		AH5416(ah)->ah_need_an_top2_fixup = 1;
+	}
+
+        /*
+         * Check whether the power table offset isn't the default.
+         * This can occur with eeprom minor V21 or greater on Merlin.
+         */
+	(void) ath_hal_eepromGet(ah, AR_EEP_PWR_TABLE_OFFSET, &pwr_table_offset);
+	if (pwr_table_offset != AR5416_PWR_TABLE_OFFSET_DB)
+		ath_hal_printf(ah, "[ath]: default pwr offset: %d dBm != EEPROM pwr offset: %d dBm; curves will be adjusted.\n",
+		    AR5416_PWR_TABLE_OFFSET_DB, (int) pwr_table_offset);
+
+	/* XXX check for >= minor ver 17 */
+	if (AR_SREV_MERLIN_20(ah)) {
 		/* setup rxgain table */
 		switch (ath_hal_eepromGet(ah, AR_EEP_RXGAIN_TYPE, AH_NULL)) {
 		case AR5416_EEP_RXGAIN_13dB_BACKOFF:
@@ -233,7 +330,9 @@ ar9280Attach(uint16_t devid, HAL_SOFTC sc,
 			goto bad;		/* XXX ? try to continue */
 		}
 	}
-	if (AR_SREV_MERLIN_20_OR_LATER(ah)) {
+
+	/* XXX check for >= minor ver 19 */
+	if (AR_SREV_MERLIN_20(ah)) {
 		/* setp txgain table */
 		switch (ath_hal_eepromGet(ah, AR_EEP_TXGAIN_TYPE, AH_NULL)) {
 		case AR5416_EEP_TXGAIN_HIGH_POWER:
@@ -268,6 +367,8 @@ ar9280Attach(uint16_t devid, HAL_SOFTC sc,
 	/* Read Reg Domain */
 	AH_PRIVATE(ah)->ah_currentRD =
 	    ath_hal_eepromGet(ah, AR_EEP_REGDMN_0, AH_NULL);
+	AH_PRIVATE(ah)->ah_currentRDext =
+	    ath_hal_eepromGet(ah, AR_EEP_REGDMN_1, AH_NULL);
 
 	/*
 	 * ah_miscMode is populated by ar5416FillCapabilityInfo()
@@ -276,9 +377,18 @@ ar9280Attach(uint16_t devid, HAL_SOFTC sc,
 	 * placed into hardware.
 	 */
 	if (ahp->ah_miscMode != 0)
-		OS_REG_WRITE(ah, AR_MISC_MODE, ahp->ah_miscMode);
+		OS_REG_WRITE(ah, AR_MISC_MODE, OS_REG_READ(ah, AR_MISC_MODE) | ahp->ah_miscMode);
 
 	ar9280AniSetup(ah);			/* Anti Noise Immunity */
+
+	/* Setup noise floor min/max/nominal values */
+	AH5416(ah)->nf_2g.max = AR_PHY_CCA_MAX_GOOD_VAL_9280_2GHZ;
+	AH5416(ah)->nf_2g.min = AR_PHY_CCA_MIN_GOOD_VAL_9280_2GHZ;
+	AH5416(ah)->nf_2g.nominal = AR_PHY_CCA_NOM_VAL_9280_2GHZ;
+	AH5416(ah)->nf_5g.max = AR_PHY_CCA_MAX_GOOD_VAL_9280_5GHZ;
+	AH5416(ah)->nf_5g.min = AR_PHY_CCA_MIN_GOOD_VAL_9280_5GHZ;
+	AH5416(ah)->nf_5g.nominal = AR_PHY_CCA_NOM_VAL_9280_5GHZ;
+
 	ar5416InitNfHistBuff(AH5416(ah)->ah_cal.nfCalHist);
 
 	HALDEBUG(ah, HAL_DEBUG_ATTACH, "%s: return\n", __func__);
@@ -308,6 +418,8 @@ ar9280WriteIni(struct ath_hal *ah, const struct ieee80211_channel *chan)
 {
 	u_int modesIndex, freqIndex;
 	int regWrites = 0;
+	int i;
+	const HAL_INI_ARRAY *ia;
 
 	/* Setup the indices for the next set of register array writes */
 	/* XXX Ignore 11n dynamic mode on the AR5416 for the moment */
@@ -332,10 +444,33 @@ ar9280WriteIni(struct ath_hal *ah, const struct ieee80211_channel *chan)
 	OS_REG_WRITE(ah, AR_PHY(0), 0x00000007);
 	OS_REG_WRITE(ah, AR_PHY_ADC_SERIAL_CTL, AR_PHY_SEL_INTERNAL_ADDAC);
 
-	/* XXX Merlin ini fixups */
-	/* XXX Merlin 100us delay for shift registers */
+	/*
+	 * This is unwound because at the moment, there's a requirement
+	 * for Merlin (and later, perhaps) to have a specific bit fixed
+	 * in the AR_AN_TOP2 register before writing it.
+	 */
+	ia = &AH5212(ah)->ah_ini_modes;
+#if 0
 	regWrites = ath_hal_ini_write(ah, &AH5212(ah)->ah_ini_modes,
 	    modesIndex, regWrites);
+#endif
+	HALASSERT(modesIndex < ia->cols);
+	for (i = 0; i < ia->rows; i++) {
+		uint32_t reg = HAL_INI_VAL(ia, i, 0);
+		uint32_t val = HAL_INI_VAL(ia, i, modesIndex);
+
+		if (reg == AR_AN_TOP2 && AH5416(ah)->ah_need_an_top2_fixup)
+			val &= ~AR_AN_TOP2_PWDCLKIND;
+
+		OS_REG_WRITE(ah, reg, val);
+
+		/* Analog shift register delay seems needed for Merlin - PR kern/154220 */
+		if (reg >= 0x7800 && reg < 0x7900)
+			OS_DELAY(100);
+
+		DMA_YIELD(regWrites);
+	}
+
 	if (AR_SREV_MERLIN_20_OR_LATER(ah)) {
 		regWrites = ath_hal_ini_write(ah, &AH9280(ah)->ah_ini_rxgain,
 		    modesIndex, regWrites);
@@ -674,30 +809,54 @@ ar9280FillCapabilityInfo(struct ath_hal *ah)
 #if 0
 	pCap->halWowMatchPatternDword = AH_TRUE;
 #endif
+	/* AR9280 is a 2x2 stream device */
+	pCap->halTxStreams = 2;
+	pCap->halRxStreams = 2;
+
 	pCap->halCSTSupport = AH_TRUE;
 	pCap->halRifsRxSupport = AH_TRUE;
 	pCap->halRifsTxSupport = AH_TRUE;
 	pCap->halRtsAggrLimit = 64*1024;	/* 802.11n max */
 	pCap->halExtChanDfsSupport = AH_TRUE;
+	pCap->halUseCombinedRadarRssi = AH_TRUE;
 #if 0
 	/* XXX bluetooth */
 	pCap->halBtCoexSupport = AH_TRUE;
 #endif
 	pCap->halAutoSleepSupport = AH_FALSE;	/* XXX? */
-#if 0
 	pCap->hal4kbSplitTransSupport = AH_FALSE;
-#endif
+	/* Disable this so Block-ACK works correctly */
+	pCap->halHasRxSelfLinkedTail = AH_FALSE;
+	pCap->halMbssidAggrSupport = AH_TRUE;
+	pCap->hal4AddrAggrSupport = AH_TRUE;
+
+	if (AR_SREV_MERLIN_20(ah)) {
+		pCap->halPSPollBroken = AH_FALSE;
+		/*
+		 * This just enables the support; it doesn't
+		 * state 5ghz fast clock will always be used.
+		 */
+		pCap->halSupportsFastClock5GHz = AH_TRUE;
+	}
 	pCap->halRxStbcSupport = 1;
 	pCap->halTxStbcSupport = 1;
+	pCap->halEnhancedDfsSupport = AH_TRUE;
 
 	return AH_TRUE;
 }
 
+/*
+ * This has been disabled - having the HAL flip chainmasks on/off
+ * when attempting to implement 11n disrupts things. For now, just
+ * leave this flipped off and worry about implementing TX diversity
+ * for legacy and MCS0-7 when 11n is fully functioning.
+ */
 HAL_BOOL
 ar9280SetAntennaSwitch(struct ath_hal *ah, HAL_ANT_SETTING settings)
 {
 #define ANTENNA0_CHAINMASK    0x1
 #define ANTENNA1_CHAINMASK    0x2
+#if 0
 	struct ath_hal_5416 *ahp = AH5416(ah);
 
 	/* Antenna selection is done by setting the tx/rx chainmasks approp. */
@@ -716,10 +875,15 @@ ar9280SetAntennaSwitch(struct ath_hal *ah, HAL_ANT_SETTING settings)
 	case HAL_ANT_VARIABLE:
 		/* Restore original chainmask settings */
 		/* XXX */
-		ahp->ah_tx_chainmask = AR5416_DEFAULT_TXCHAINMASK;
-		ahp->ah_rx_chainmask = AR5416_DEFAULT_RXCHAINMASK;
+		ahp->ah_tx_chainmask = AR9280_DEFAULT_TXCHAINMASK;
+		ahp->ah_rx_chainmask = AR9280_DEFAULT_RXCHAINMASK;
 		break;
 	}
+
+	HALDEBUG(ah, HAL_DEBUG_ANY, "%s: settings=%d, tx/rx chainmask=%d/%d\n",
+	    __func__, settings, ahp->ah_tx_chainmask, ahp->ah_rx_chainmask);
+
+#endif
 	return AH_TRUE;
 #undef ANTENNA0_CHAINMASK
 #undef ANTENNA1_CHAINMASK

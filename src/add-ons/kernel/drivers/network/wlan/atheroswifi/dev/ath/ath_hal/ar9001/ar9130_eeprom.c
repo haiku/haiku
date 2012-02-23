@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2008-2009 Sam Leffler, Errno Consulting
+ * Copyright (c) 2011 Adrian Chadd, Xenion Pty Ltd
+ * Copyright (c) 2010 Atheros Communications, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -15,31 +16,28 @@
  *
  * $FreeBSD$
  */
-#ifndef _ATH_AR9280_H_
-#define _ATH_AR9280_H_
+#include "opt_ah.h"
 
-#include "ar5416/ar5416.h"
+#include "ah.h"
+#include "ah_internal.h"
 
-struct ath_hal_9280 {
-	struct ath_hal_5416 ah_5416;
+#include "ar9001/ar9130_eeprom.h"
 
-	HAL_INI_ARRAY	ah_ini_xmodes;
-	HAL_INI_ARRAY	ah_ini_rxgain;
-	HAL_INI_ARRAY	ah_ini_txgain;
-};
-#define	AH9280(_ah)	((struct ath_hal_9280 *)(_ah))
+/* XXX this shouldn't be done here */
+/* This is in 16 bit words; not bytes -adrian */
+#define ATH_DATA_EEPROM_SIZE    2048
 
-#define	AR9280_DEFAULT_RXCHAINMASK	3
-#define	AR9285_DEFAULT_RXCHAINMASK	1
-#define	AR9280_DEFAULT_TXCHAINMASK	1
-#define	AR9285_DEFAULT_TXCHAINMASK	1
-
-HAL_BOOL ar9280RfAttach(struct ath_hal *, HAL_STATUS *);
-
-struct ath_hal;
-
-HAL_BOOL	ar9280SetAntennaSwitch(struct ath_hal *, HAL_ANT_SETTING);
-void		ar9280SpurMitigate(struct ath_hal *,
-    			const struct ieee80211_channel *);
-
-#endif	/* _ATH_AR9280_H_ */
+HAL_BOOL
+ar9130EepromRead(struct ath_hal *ah, u_int off, uint16_t *data)
+{
+	if (ah->ah_eepromdata == AH_NULL) {
+		HALDEBUG(ah, HAL_DEBUG_ANY, "%s: no eeprom data!\n", __func__);
+		return AH_FALSE;
+	}
+	if (off > ATH_DATA_EEPROM_SIZE) {
+		HALDEBUG(ah, HAL_DEBUG_ANY, "ar9130EepromRead: offset %x > %x\n", off, ATH_DATA_EEPROM_SIZE);
+		return AH_FALSE;
+	}
+	(*data) = ah->ah_eepromdata[off];
+	return AH_TRUE;
+}

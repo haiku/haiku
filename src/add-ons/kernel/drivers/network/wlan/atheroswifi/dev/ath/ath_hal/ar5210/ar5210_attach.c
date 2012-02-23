@@ -73,6 +73,7 @@ static const struct ath_hal_private ar5210hal = {{
 	.ah_procTxDesc			= ar5210ProcTxDesc,
 	.ah_getTxIntrQueue		= ar5210GetTxIntrQueue,
 	.ah_reqTxIntrDesc 		= ar5210IntrReqTxDesc,
+	.ah_getTxCompletionRates	= ar5210GetTxCompletionRates,
 
 	/* RX Functions */
 	.ah_getRxDP			= ar5210GetRxDP,
@@ -88,7 +89,8 @@ static const struct ath_hal_private ar5210hal = {{
 	.ah_setRxFilter			= ar5210SetRxFilter,
 	.ah_setupRxDesc			= ar5210SetupRxDesc,
 	.ah_procRxDesc			= ar5210ProcRxDesc,
-	.ah_rxMonitor			= ar5210AniPoll,
+	.ah_rxMonitor			= ar5210RxMonitor,
+	.ah_aniPoll			= ar5210AniPoll,
 	.ah_procMibEvent		= ar5210MibEvent,
 
 	/* Misc Functions */
@@ -146,6 +148,7 @@ static const struct ath_hal_private ar5210hal = {{
 	.ah_beaconInit			= ar5210BeaconInit,
 	.ah_setStationBeaconTimers	= ar5210SetStaBeaconTimers,
 	.ah_resetStationBeaconTimers	= ar5210ResetStaBeaconTimers,
+	.ah_getNextTBTT			= ar5210GetNextTBTT,
 
 	/* Interrupt Functions */
 	.ah_isInterruptPending		= ar5210IsInterruptPending,
@@ -169,7 +172,7 @@ static HAL_BOOL ar5210FillCapabilityInfo(struct ath_hal *ah);
  */
 static struct ath_hal *
 ar5210Attach(uint16_t devid, HAL_SOFTC sc, HAL_BUS_TAG st, HAL_BUS_HANDLE sh,
-	HAL_STATUS *status)
+	uint16_t *eepromdata, HAL_STATUS *status)
 {
 #define	N(a)	(sizeof(a)/sizeof(a[0]))
 	struct ath_hal_5210 *ahp;
@@ -179,14 +182,14 @@ ar5210Attach(uint16_t devid, HAL_SOFTC sc, HAL_BUS_TAG st, HAL_BUS_HANDLE sh,
 	HAL_STATUS ecode;
 	int i;
 
-	HALDEBUG(AH_NULL, HAL_DEBUG_ATTACH,
+	HALDEBUG_G(AH_NULL, HAL_DEBUG_ATTACH,
 	    "%s: devid 0x%x sc %p st %p sh %p\n", __func__, devid,
 	    sc, (void*) st, (void*) sh);
 
 	/* NB: memory is returned zero'd */
 	ahp = ath_hal_malloc(sizeof (struct ath_hal_5210));
 	if (ahp == AH_NULL) {
-		HALDEBUG(AH_NULL, HAL_DEBUG_ANY,
+		HALDEBUG_G(AH_NULL, HAL_DEBUG_ANY,
 		    "%s: no memory for state block\n", __func__);
 		ecode = HAL_ENOMEM;
 		goto bad;
@@ -374,6 +377,9 @@ ar5210FillCapabilityInfo(struct ath_hal *ah)
 			| HAL_INT_TX
 			| HAL_INT_FATAL
 			;
+
+	pCap->hal4kbSplitTransSupport = AH_TRUE;
+	pCap->halHasRxSelfLinkedTail = AH_TRUE;
 
 	ahpriv->ah_rxornIsFatal = AH_TRUE;
 	return AH_TRUE;

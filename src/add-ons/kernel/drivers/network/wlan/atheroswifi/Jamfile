@@ -22,6 +22,10 @@ Depends atheroswifi : atheroswifi_rate.o ;
 KernelAddon atheroswifi :
 	if_ath.c
 	if_ath_pci.c
+	if_ath_keycache.c
+	if_ath_sysctl.c
+	if_ath_tx.c
+	if_ath_tx_ht.c
 	glue.c
 	atheroswifi_hal.o
 	atheroswifi_rate.o
@@ -36,11 +40,15 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_hal ar5211 ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_hal ar5212 ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_hal ar5312 ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_hal ar5416 ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_hal ar9001 ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_hal ar9002 ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_dfs null ] ;
 
 KernelMergeObject atheroswifi_hal.o :
 	ah_osdep.c
 	ah.c
 	ah_regdomain.c
+	ah_eeprom_9287.c
 	ah_eeprom_v3.c
 
 	# AR5210 support
@@ -112,16 +120,31 @@ KernelMergeObject atheroswifi_hal.o :
 	ar5416_reset.c
 	ar5416_xmit.c
 
-	# AR9k support
-	ar9160_attach.c
-	ar9280.c
-	ar9280_attach.c
-	ar9285.c
-	ar9285_attach.c
-	ar9285_reset.c
-
 	# RF backend for 5416 and 9160
 	ar2133.c
+
+	# AR9001 and AR9002 support
+	ar9130_attach.c
+	ar9130_eeprom.c
+	ar9130_phy.c
+	ar9160_attach.c
+	ar9280_attach.c
+	ar9280_olc.c
+	ar9285_attach.c
+	ar9285_cal.c
+	ar9285_diversity.c
+	ar9285_phy.c
+	ar9285_reset.c
+	ar9287_attach.c
+	ar9287_cal.c
+	ar9287_olc.c
+	ar9287_reset.c
+
+	ar9280.c
+	ar9285.c
+	ar9287.c
+
+	dfs_null.c
 	;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_rate sample ] ;
