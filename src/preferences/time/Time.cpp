@@ -12,6 +12,7 @@
 
 #include "Time.h"
 
+#include <locale.h>
 #include <stdio.h>
 #include <unistd.h>
 
@@ -87,6 +88,8 @@ main(int argc, char** argv)
 				errorString);
 		}
 	} else {
+		setlocale(LC_ALL, "");
+
 		TimeApplication app;
 		setuid(0);
 		app.Run();

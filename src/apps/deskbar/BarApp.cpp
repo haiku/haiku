@@ -34,6 +34,7 @@ All rights reserved.
 */
 
 #include <Debug.h>
+#include <locale.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -80,6 +81,7 @@ static const color_space kIconFormat = B_RGBA32;
 int
 main()
 {
+	setlocale(LC_ALL, "");
 	TBarApp app;
 	app.Run();
 
@@ -441,7 +443,7 @@ TBarApp::MessageReceived(BMessage* message)
 			BarView()->HideDeskbar(fSettings.autoHide);
 			fBarWindow->Unlock();
 			break;
-			
+
 		case kTrackerFirst:
 			fSettings.trackerAlwaysFirst = !fSettings.trackerAlwaysFirst;
 
