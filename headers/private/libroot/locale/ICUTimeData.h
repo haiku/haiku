@@ -37,6 +37,8 @@ public:
 
 			const char*			GetLanginfo(int index);
 
+			const Locale&		ICULocaleForStrings() const;
+
 private:
 			status_t			_SetLCTimeEntries(const UnicodeString* strings,
 									char* destination, int entrySize,

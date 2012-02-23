@@ -69,19 +69,7 @@ ICUTimeData::SetTo(const Locale& locale, const char* posixLocaleName)
 		return result;
 
 	UErrorCode icuStatus = U_ZERO_ERROR;
-
-	// check if the date strings should be taken from the messages-locale
-	// or from the time-locale (default)
-	const Locale* symbolsLocale = &fLocale;
-	char stringsValue[16];
-	fLocale.getKeywordValue("strings", stringsValue, sizeof(stringsValue),
-		icuStatus);
-	if (U_SUCCESS(icuStatus) && strcasecmp(stringsValue, "messages") == 0)
-		symbolsLocale = &fMessagesData.ICULocale();
-	else
-		icuStatus = U_ZERO_ERROR;
-
-	DateFormatSymbols formatSymbols(*symbolsLocale, icuStatus);
+	DateFormatSymbols formatSymbols(ICULocaleForStrings(), icuStatus);
 	if (!U_SUCCESS(icuStatus))
 		return B_UNSUPPORTED;
 
@@ -267,6 +255,22 @@ ICUTimeData::GetLanginfo(int index)
 		default:
 			return "";
 	}
+}
+
+
+const Locale&
+ICUTimeData::ICULocaleForStrings() const
+{
+	// check if the date strings should be taken from the messages-locale
+	// or from the time-locale (default)
+	UErrorCode icuStatus = U_ZERO_ERROR;
+	char stringsValue[16];
+	fLocale.getKeywordValue("strings", stringsValue, sizeof(stringsValue),
+		icuStatus);
+	if (U_SUCCESS(icuStatus) && strcasecmp(stringsValue, "messages") == 0)
+		return fMessagesData.ICULocale();
+	else
+		return fLocale;
 }
 
 

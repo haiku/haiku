@@ -123,7 +123,7 @@ ICUTimeConversion::TZSet(const char* timeZoneID, const char* tz)
 		} else {
 			UnicodeString icuString;
 			fTimeZone->getDisplayName(i == 1, TimeZone::SHORT,
-				fTimeData.ICULocale(), icuString);
+				fTimeData.ICULocaleForStrings(), icuString);
 			CheckedArrayByteSink byteSink(fDataBridge->addrOfTZName[i],
 				sizeof(fTimeZoneID));
 			icuString.toUTF8(byteSink);
