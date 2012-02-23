@@ -34,7 +34,7 @@ ICULocaleBackend::ICULocaleBackend()
 	fMessagesData(fThreadLocalStorageKey),
 	fMonetaryData(fThreadLocalStorageKey, fLocaleConv),
 	fNumericData(fThreadLocalStorageKey, fLocaleConv),
-	fTimeData(fThreadLocalStorageKey, fLCTimeInfo),
+	fTimeData(fThreadLocalStorageKey, fLCTimeInfo, fMessagesData),
 	fTimeConversion(fTimeData)
 {
 }

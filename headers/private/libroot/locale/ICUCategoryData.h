@@ -31,6 +31,8 @@ public:
 			const char*			PosixLocaleName()
 									{ return fPosixLocaleName; }
 
+			const Locale&		ICULocale() const;
+
 protected:
 			status_t			_ConvertUnicodeStringToLocaleconvEntry(
 									const UnicodeString& string,
@@ -50,6 +52,14 @@ protected:
 private:
  			status_t			_SetupConverter();
 };
+
+
+inline
+const Locale&
+ICUCategoryData::ICULocale() const
+{
+	return fLocale;
+}
 
 
 }	// namespace Libroot

@@ -15,16 +15,19 @@
 
 #include <AutoDeleter.h>
 
+#include "ICUMessagesData.h"
 
 namespace BPrivate {
 namespace Libroot {
 
 
-ICUTimeData::ICUTimeData(pthread_key_t tlsKey, struct lc_time_t& lcTimeInfo)
+ICUTimeData::ICUTimeData(pthread_key_t tlsKey, struct lc_time_t& lcTimeInfo,
+	const ICUMessagesData& messagesData)
 	:
 	inherited(tlsKey),
 	fLCTimeInfo(lcTimeInfo),
-	fDataBridge(NULL)
+	fDataBridge(NULL),
+	fMessagesData(messagesData)
 {
 	for (int i = 0; i < 12; ++i) {
 		fLCTimeInfo.mon[i] = fMon[i];
@@ -66,7 +69,19 @@ ICUTimeData::SetTo(const Locale& locale, const char* posixLocaleName)
 		return result;
 
 	UErrorCode icuStatus = U_ZERO_ERROR;
-	DateFormatSymbols formatSymbols(fLocale, icuStatus);
+
+	// check if the date strings should be taken from the messages-locale
+	// or from the time-locale (default)
+	const Locale* symbolsLocale = &fLocale;
+	char stringsValue[16];
+	fLocale.getKeywordValue("strings", stringsValue, sizeof(stringsValue),
+		icuStatus);
+	if (U_SUCCESS(icuStatus) && strcasecmp(stringsValue, "messages") == 0)
+		symbolsLocale = &fMessagesData.ICULocale();
+	else
+		icuStatus = U_ZERO_ERROR;
+
+	DateFormatSymbols formatSymbols(*symbolsLocale, icuStatus);
 	if (!U_SUCCESS(icuStatus))
 		return B_UNSUPPORTED;
 
@@ -404,14 +419,6 @@ ICUTimeData::_SetLCTimePattern(DateFormat* format, char* destination,
 
 	return _ConvertUnicodeStringToLocaleconvEntry(posixPattern, destination,
 		destinationSize);
-}
-
-
-const Locale&
-ICUTimeData::ICULocale() const
-{
-	return fLocale;
-
 }
 
 
