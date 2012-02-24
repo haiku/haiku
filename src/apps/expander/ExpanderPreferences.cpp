@@ -6,6 +6,7 @@
 #include "ExpanderPreferences.h"
 #include <Box.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include <Locale.h>
@@ -60,44 +61,49 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 	fAutoShow = new BCheckBox("autoShow",
 		B_TRANSLATE("Automatically show contents listing"), NULL);
 
+	const float kSpacing = be_control_look->DefaultItemSpacing();
+
 	BView* view = new BGroupView();
 	view->SetLayout(new BGroupLayout(B_HORIZONTAL));
-	view->AddChild(BGroupLayoutBuilder(B_VERTICAL)
+	view->AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
 		.AddGroup(B_HORIZONTAL)
 			.Add(new BStringView("expansion", B_TRANSLATE("Expansion:")))
 			.AddGlue()
 		.End()
-		.AddGroup(B_VERTICAL, 1)
+		.AddGroup(B_VERTICAL, 0)
 			.Add(fAutoExpand)
 			.Add(fCloseWindow)
-			.SetInsets(10, 0, 0, 10)
+			.SetInsets(kSpacing, kSpacing / 2, 0, 0)
 		.End()
-		.AddGroup(B_HORIZONTAL)
+		.AddGroup(B_HORIZONTAL, 0)
 			.Add(new BStringView("destinationFolder",
 				B_TRANSLATE("Destination folder:")))
 			.AddGlue()
+			.SetInsets(0, kSpacing, 0, 0)
 		.End()
-		.AddGroup(B_VERTICAL, 1)
+		.AddGroup(B_VERTICAL, 0)
 			.Add(fLeaveDest)
 			.Add(fSameDest)
 			.Add(fDestUse)
-			.AddGroup(B_HORIZONTAL, 5)
+			.AddGroup(B_HORIZONTAL, 0)
 				.Add(fDestText, 0.8)
+				.AddStrut(be_control_look->DefaultLabelSpacing())
 				.Add(fSelect, 0.2)
-				.SetInsets(20, 0, 0, 0)
+				.SetInsets(kSpacing * 2, 0, 0, 0)
 			.End()
-			.SetInsets(10, 0, 0, 10)
+			.SetInsets(kSpacing, kSpacing / 2, 0, 0)
 		.End()
-		.AddGroup(B_HORIZONTAL)
+		.AddGroup(B_HORIZONTAL, 0)
 			.Add(new BStringView("other", B_TRANSLATE("Other:")))
 			.AddGlue()
+					.SetInsets(0, kSpacing / 2, 0, 0)
 		.End()
-		.AddGroup(B_VERTICAL, 1)
+		.AddGroup(B_VERTICAL, 0)
 			.Add(fOpenDest)
 			.Add(fAutoShow)
-			.SetInsets(10, 0, 0, 0)
+			.SetInsets(kSpacing, kSpacing / 2, 0, 0)
 		.End()
-		.SetInsets(10, 10, 10, 10)
+		.SetInsets(kSpacing, kSpacing, kSpacing, kSpacing)
 	);
 	box->AddChild(view);
 
@@ -110,12 +116,12 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 11)
 		.Add(box)
-		.AddGroup(B_HORIZONTAL, 10)
+		.AddGroup(B_HORIZONTAL, kSpacing)
 			.AddGlue()
 			.Add(cancel)
 			.Add(button)
 		.End()
-		.SetInsets(10, 10, 10, 10)
+		.SetInsets(kSpacing, kSpacing, kSpacing, kSpacing)
 	);
 
 	CenterOnScreen();
