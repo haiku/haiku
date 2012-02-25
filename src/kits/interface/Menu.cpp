@@ -2983,14 +2983,10 @@ get_menu_info(menu_info* info)
 }
 
 
-#if __GNUC__ == 2
-
-
 extern "C" void
-InvalidateLayout__5BMenub(BMenu* menu)
+B_IF_GCC_2(InvalidateLayout__5BMenub,_ZN5BMenu16InvalidateLayoutEb)(
+	BMenu* menu, bool descendants)
 {
 	menu->InvalidateLayout();
 }
 
-
-#endif
