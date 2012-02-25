@@ -401,12 +401,12 @@ if [ IsOptionalHaikuImagePackageAdded Clockwerk ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				Clockwerk-0.0.2-x86-gcc4-2010-10-13-1.zip
-				: $(baseURL)/Clockwerk-0.0.2-x86-gcc4-2010-10-13-1.zip ;
+				Clockwerk-0.0.2-x86-gcc4-2012-02-25.zip
+				: $(baseURL)/Clockwerk-0.0.2-x86-gcc4-2012-02-25.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				Clockwerk-0.0.2-x86-gcc2-2010-10-13-1.zip
-				: $(baseURL)/Clockwerk-0.0.2-x86-gcc2-2010-10-13-1.zip ;
+				Clockwerk-0.0.2-x86-gcc2-2012-02-25.zip
+				: $(baseURL)/Clockwerk-0.0.2-x86-gcc2-2012-02-25.zip ;
 		}
 		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/Clockwerk/Clockwerk ;
