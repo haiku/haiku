@@ -245,7 +245,8 @@ detect_displays()
 {
 	// reset known displays
 	for (uint32 id = 0; id < MAX_DISPLAY; id++) {
-		gDisplay[id]->active = false;
+		gDisplay[id]->attached = false;
+		gDisplay[id]->powered = false;
 		gDisplay[id]->found_ranges = false;
 	}
 
@@ -269,16 +270,16 @@ detect_displays()
 		if (gConnector[id]->type == VIDEO_CONNECTOR_LVDS) {
 			// If plain (non-DP) laptop LVDS, read mode info from AtomBIOS
 			//TRACE("%s: non-DP laptop LVDS detected\n", __func__);
-			gDisplay[displayIndex]->active
+			gDisplay[displayIndex]->attached
 				= connector_read_mode_lvds(id,
 					&gDisplay[displayIndex]->preferredMode);
 		}
 
-		if (gDisplay[displayIndex]->active == false) {
+		if (gDisplay[displayIndex]->attached == false) {
 			TRACE("%s: bit-banging ddc for edid on connector %" B_PRIu32 "\n",
 				__func__, id);
 			// Lets try bit-banging edid from connector
-			gDisplay[displayIndex]->active =
+			gDisplay[displayIndex]->attached =
 				connector_read_edid(id, &gDisplay[displayIndex]->edid_info);
 
 			if (gConnector[id]->encoder.type == VIDEO_ENCODER_TVDAC
@@ -288,17 +289,17 @@ detect_displays()
 				if (encoder_analog_load_detect(id) != true) {
 					TRACE("%s: no analog load on EDID valid connector "
 						"#%" B_PRIu32 "\n", __func__, id);
-					gDisplay[displayIndex]->active = false;
+					gDisplay[displayIndex]->attached = false;
 				}
 			}
 		}
 
-		if (gDisplay[displayIndex]->active != true) {
+		if (gDisplay[displayIndex]->attached != true) {
 			// Nothing interesting here, move along
 			continue;
 		}
 
-		// We found a valid / active display
+		// We found a valid / attached display
 
 		gDisplay[displayIndex]->connectorIndex = id;
 			// Populate physical connector index from gConnector
@@ -317,7 +318,7 @@ detect_displays()
 		displayIndex++;
 	}
 
-	// fallback if no active monitors were found
+	// fallback if no attached monitors were found
 	if (displayIndex == 0) {
 		ERROR("%s: ERROR: 0 attached monitors were found on display connectors."
 			" Injecting first connector as a last resort.\n", __func__);
@@ -325,7 +326,7 @@ detect_displays()
 			// skip TV DAC connectors as likely fallback isn't for TV
 			if (gConnector[id]->encoder.type == VIDEO_ENCODER_TVDAC)
 				continue;
-			gDisplay[0]->active = true;
+			gDisplay[0]->attached = true;
 			gDisplay[0]->connectorIndex = id;
 			init_registers(gDisplay[0]->regs, 0);
 			if (detect_crt_ranges(0) == B_OK)
@@ -333,6 +334,12 @@ detect_displays()
 			break;
 		}
 	}
+
+	// Initial boot state is the first two crtc's powered
+	if (gDisplay[0]->attached == true)
+		gDisplay[0]->powered = true;
+	if (gDisplay[1]->attached == true)
+		gDisplay[1]->powered = true;
 
 	return B_OK;
 }
@@ -343,12 +350,12 @@ debug_displays()
 {
 	TRACE("Currently detected monitors===============\n");
 	for (uint32 id = 0; id < MAX_DISPLAY; id++) {
-		ERROR("Display #%" B_PRIu32 " active = %s\n",
-			id, gDisplay[id]->active ? "true" : "false");
+		ERROR("Display #%" B_PRIu32 " attached = %s\n",
+			id, gDisplay[id]->attached ? "true" : "false");
 
 		uint32 connectorIndex = gDisplay[id]->connectorIndex;
 
-		if (gDisplay[id]->active) {
+		if (gDisplay[id]->attached) {
 			uint32 connectorType = gConnector[connectorIndex]->type;
 			uint32 encoderType = gConnector[connectorIndex]->encoder.type;
 			ERROR(" + connector ID:   %" B_PRIu32 "\n", connectorIndex);
@@ -412,6 +419,7 @@ void
 display_crtc_lock(uint8 crtcID, int command)
 {
 	TRACE("%s\n", __func__);
+
 	ENABLE_CRTC_PS_ALLOCATION args;
 	int index
 		= GetIndexIntoMasterTable(COMMAND, UpdateCRTC_DoubleBufferRegisters);
@@ -429,6 +437,7 @@ void
 display_crtc_blank(uint8 crtcID, int command)
 {
 	TRACE("%s\n", __func__);
+
 	BLANK_CRTC_PS_ALLOCATION args;
 	int index = GetIndexIntoMasterTable(COMMAND, BlankCRTC);
 
@@ -437,8 +446,7 @@ display_crtc_blank(uint8 crtcID, int command)
 	args.ucCRTC = crtcID;
 	args.ucBlanking = command;
 
-	// DEBUG: Radeon red to know when we are blanked :)
-	args.usBlackColorRCr = 255;
+	args.usBlackColorRCr = 0;
 	args.usBlackColorGY = 0;
 	args.usBlackColorBCb = 0;
 
@@ -459,6 +467,39 @@ display_crtc_scale(uint8 crtcID, display_mode* mode)
 	args.ucEnable = ATOM_SCALER_DISABLE;
 
 	atom_execute_table(gAtomContext, index, (uint32*)&args);
+}
+
+
+void
+display_crtc_dpms(uint8 crtcID, int mode)
+{
+
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	switch (mode) {
+        case B_DPMS_ON:
+			TRACE("%s: crtc %" B_PRIu8 " dpms powerup\n", __func__, crtcID);
+			if (gDisplay[crtcID]->attached == false)
+				return;
+			gDisplay[crtcID]->powered = true;
+			display_crtc_power(crtcID, ATOM_ENABLE);
+			if (info.dceMajor >= 3)
+				display_crtc_memreq(crtcID, ATOM_ENABLE);
+			display_crtc_blank(crtcID, ATOM_BLANKING_OFF);
+			break;
+        case B_DPMS_STAND_BY:
+        case B_DPMS_SUSPEND:
+        case B_DPMS_OFF:
+			TRACE("%s: crtc %" B_PRIu8 " dpms powerdown\n", __func__, crtcID);
+			if (gDisplay[crtcID]->attached == false)
+				return;
+			if (gDisplay[crtcID]->powered == true)
+				display_crtc_blank(crtcID, ATOM_BLANKING);
+			if (info.dceMajor >= 3)
+				display_crtc_memreq(crtcID, ATOM_DISABLE);
+			display_crtc_power(crtcID, ATOM_DISABLE);
+			gDisplay[crtcID]->powered = false;
+	}
 }
 
 

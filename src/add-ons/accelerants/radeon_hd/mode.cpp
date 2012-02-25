@@ -147,44 +147,9 @@ radeon_dpms_mode(void)
 void
 radeon_dpms_set(int mode)
 {
-	radeon_shared_info &info = *gInfo->shared_info;
+	for (uint8 id = 0; id < MAX_DISPLAY; id++)
+		display_crtc_dpms(id, mode);
 
-	switch (mode) {
-		case B_DPMS_ON:
-			TRACE("%s: ON\n", __func__);
-			for (uint8 id = 0; id < MAX_DISPLAY; id++) {
-				if (gDisplay[id]->active == false)
-					continue;
-				encoder_output_lock(true);
-				encoder_dpms_set(id, mode);
-				encoder_output_lock(false);
-				display_crtc_lock(id, ATOM_ENABLE);
-				display_crtc_power(id, ATOM_ENABLE);
-				if (info.dceMajor >= 3)
-					display_crtc_memreq(id, ATOM_ENABLE);
-				display_crtc_blank(id, ATOM_BLANKING_OFF);
-				display_crtc_lock(id, ATOM_DISABLE);
-			}
-			break;
-		case B_DPMS_STAND_BY:
-		case B_DPMS_SUSPEND:
-		case B_DPMS_OFF:
-			TRACE("%s: OFF\n", __func__);
-			for (uint8 id = 0; id < MAX_DISPLAY; id++) {
-				if (gDisplay[id]->active == false)
-					continue;
-				display_crtc_lock(id, ATOM_ENABLE);
-				display_crtc_blank(id, ATOM_BLANKING);
-				if (info.dceMajor >= 3)
-					display_crtc_memreq(id, ATOM_DISABLE);
-				display_crtc_power(id, ATOM_DISABLE);
-				display_crtc_lock(id, ATOM_DISABLE);
-				encoder_output_lock(true);
-				encoder_dpms_set(id, mode);
-				encoder_output_lock(false);
-			}
-			break;
-	}
 	gInfo->dpms_mode = mode;
 }
 
@@ -196,7 +161,7 @@ radeon_set_display_mode(display_mode* mode)
 
 	// Set mode on each display
 	for (uint8 id = 0; id < MAX_DISPLAY; id++) {
-		if (gDisplay[id]->active == false)
+		if (gDisplay[id]->attached == false)
 			continue;
 
 		uint16 connectorIndex = gDisplay[id]->connectorIndex;
@@ -213,10 +178,7 @@ radeon_set_display_mode(display_mode* mode)
 
 		// *** CRT controler prep
 		display_crtc_lock(id, ATOM_ENABLE);
-		display_crtc_blank(id, ATOM_BLANKING);
-		if (info.dceMajor >= 3)
-			display_crtc_memreq(id, ATOM_DISABLE);
-		display_crtc_power(id, ATOM_DISABLE);
+		display_crtc_dpms(id, B_DPMS_OFF);
 
 		// *** CRT controler mode set
 		// TODO: program SS
@@ -232,10 +194,7 @@ radeon_set_display_mode(display_mode* mode)
 		encoder_mode_set(id, mode->timing.pixel_clock);
 
 		// *** CRT controler commit
-		display_crtc_power(id, ATOM_ENABLE);
-		if (info.dceMajor >= 3)
-			display_crtc_memreq(id, ATOM_ENABLE);
-		display_crtc_blank(id, ATOM_BLANKING_OFF);
+		display_crtc_dpms(id, B_DPMS_ON);
 		display_crtc_lock(id, ATOM_DISABLE);
 
 		// *** encoder commit

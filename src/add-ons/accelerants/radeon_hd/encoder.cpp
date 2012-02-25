@@ -190,7 +190,7 @@ encoder_pick_dig(uint32 connectorIndex)
 	// obtain assigned CRT
 	uint32 crtcID;
 	for (crtcID = 0; crtcID < MAX_DISPLAY; crtcID++) {
-		if (gDisplay[crtcID]->active != true)
+		if (gDisplay[crtcID]->attached != true)
 			continue;
 		if (gDisplay[crtcID]->connectorIndex == connectorIndex)
 			break;

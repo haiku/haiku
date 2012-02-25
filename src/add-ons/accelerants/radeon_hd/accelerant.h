@@ -161,7 +161,8 @@ typedef struct {
 
 
 typedef struct {
-	bool			active;
+	bool			attached;
+	bool			powered;
 	uint32			connectorIndex; // matches connector id in connector_info
 	register_info*	regs;
 	bool			found_ranges;
