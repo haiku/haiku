@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Be.ChartDemo	1035062658
+1	lithuanian	x-vnd.Be.ChartDemo	986636897
 Slow rotation	ChartWindow		Lėtas sukimasis
 Pink	ChartWindow		Rožinė
 Comet	ChartWindow		Kometos
@@ -13,12 +13,13 @@ LineArray	ChartWindow		LineArray
 Free motion	ChartWindow		Laisvas judėjimas
 (high) 100% 	ChartWindow		(aukštas) 100% 
 Green	ChartWindow		Žalia
+Amas	ChartWindow		Spiečiai
 2 threads	ChartWindow		2 gijos
 Yellow	ChartWindow		Geltona
 Off	ChartWindow		Išjungta
 Chaos	ChartWindow		Chaosas
 Full screen	ChartWindow		Visas ekranas
-Spiral	ChartWindow		Spiralė
+Spiral	ChartWindow		Spiralės
 Slow motion	ChartWindow		Lėtas judėjimas
  5% (low)	ChartWindow		 5% (žemas)
 Fast motion	ChartWindow		Greitas judėjimas

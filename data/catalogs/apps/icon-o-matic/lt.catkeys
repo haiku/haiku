@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.haiku-icon_o_matic	2510150229
+1	lithuanian	x-vnd.haiku-icon_o_matic	3919647642
 Select All	Icon-O-Matic-PathManipulator		Pažymėti viską
 Add Style	Icon-O-Matic-AddStylesCmd		Pridėti stilių
 Color (#%02x%02x%02x)	Style name after dropping a color		Spalva (#%02x%02x%02x)
@@ -155,6 +155,7 @@ Snap to grid	Icon-O-Matic-Menu-Settings		Kibti prie tinklelio
 Remove	Icon-O-Matic-ShapesList		Pašalinti
 Yes	Icon-O-Matic-StyledTextImport		Taip
 Transformation	Icon-O-Matic-TransformersList		Transformacija
+Save image	Icon-O-Matic-SavePanel		Paveikslo įrašymas
 Add Styles	Icon-O-Matic-AddStylesCmd		Pridėti stilius
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		Pašalinti valdymo taškus
 Format	Icon-O-Matic-SavePanel		Formatas:

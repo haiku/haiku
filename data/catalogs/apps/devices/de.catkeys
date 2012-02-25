@@ -37,7 +37,7 @@ Input device controller	Device		Eingabegeräte-Kontroller
 Network controller	Device		Netzwerk-Controller
 Device class	DeviceSCSI		Geräteklasse
 Device name	DeviceACPI		Gerätename
-Driver used	Device		Treiber benutzt
+Driver used	Device		Treiber
 Other	DeviceSCSI		Andere
 Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Gerätename\t\t\t\t: %Name%\nHersteller\t\t\t: %Manufacturer%\nBenutzter Treiber\t\t\t\t: %DriverUsed%\nPfade für Treiber\t: %DevicePaths%
 ACPI Thermal Zone	DeviceACPI		ACPI Temperaturzone

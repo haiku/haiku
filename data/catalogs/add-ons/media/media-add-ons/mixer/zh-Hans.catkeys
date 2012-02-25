@@ -1,0 +1,9 @@
+1	english	x-vnd.Haiku-mixer.media_addon	1944364236
+Linear interpolation	AudioMixer		线性插补
+Output mapping	AudioMixer		输出映射
+not connected	AudioMixer		未连接
+dB	AudioMixer		分贝
+Input mapping	AudioMixer		输入映射
+Setup	AudioMixer		配置
+Allow output channel remapping	AudioMixer		启用输出频道重映射
+Physical input channels	AudioMixer		物理输入频道
