@@ -45,9 +45,8 @@ radeon_gpu_reset()
 	struct gpu_state gpuState;
 	radeon_gpu_mc_halt(&gpuState);
 
-	if (radeon_gpu_mc_idlecheck() > 0) {
-		ERROR("%s: Timeout waiting for MC to idle!\n", __func__);
-	}
+	if (radeon_gpu_mc_idlewait() != B_OK)
+		ERROR("%s: Couldn't idle memory controller!\n", __func__);
 
 	if (info.chipsetID < RADEON_CEDAR) {
 		Write32(OUT, CP_ME_CNTL, CP_ME_HALT);
@@ -175,7 +174,6 @@ radeon_gpu_mc_halt(gpu_state* gpuState)
 	gpuState->d2crtcControl = Read32(OUT, D2CRTC_CONTROL);
 
 	// halt all memory controller actions
-	Write32(OUT, D2CRTC_UPDATE_LOCK, 0);
 	Write32(OUT, VGA_RENDER_CONTROL, 0);
 	Write32(OUT, D1CRTC_UPDATE_LOCK, 1);
 	Write32(OUT, D2CRTC_UPDATE_LOCK, 1);
@@ -195,6 +193,7 @@ radeon_gpu_mc_resume(gpu_state* gpuState)
 	Write32(OUT, D1GRPH_SECONDARY_SURFACE_ADDRESS, gInfo->fb.vramStart);
 	Write32(OUT, D2GRPH_PRIMARY_SURFACE_ADDRESS, gInfo->fb.vramStart);
 	Write32(OUT, D2GRPH_SECONDARY_SURFACE_ADDRESS, gInfo->fb.vramStart);
+	// TODO: Evergreen high surface addresses?
 	Write32(OUT, VGA_MEMORY_BASE_ADDRESS, gInfo->fb.vramStart);
 
 	// Unlock host access
@@ -214,15 +213,23 @@ radeon_gpu_mc_resume(gpu_state* gpuState)
 }
 
 
-uint32
-radeon_gpu_mc_idlecheck()
+status_t
+radeon_gpu_mc_idlewait()
 {
 	uint32 idleStatus;
 
 	uint32 busyBits
 		= (VMC_BUSY | MCB_BUSY | MCDZ_BUSY | MCDY_BUSY | MCDX_BUSY | MCDW_BUSY);
-	if (!((idleStatus = Read32(MC, SRBM_STATUS)) & busyBits))
-		return 0;
+
+	uint32 tryCount;
+	// We give the gpu 0.5 seconds to become idle checking once every 500usec
+	for (tryCount = 0; tryCount < 1000; tryCount++) {
+		if (((idleStatus = Read32(MC, SRBM_STATUS)) & busyBits) == 0)
+			return B_OK;
+		snooze(500);
+	}
+
+	ERROR("%s: Couldn't idle SRBM!\n", __func__);
 
 	bool state;
 	state = (idleStatus & VMC_BUSY) != 0;
@@ -238,7 +245,7 @@ radeon_gpu_mc_idlecheck()
 	state = (idleStatus & MCDW_BUSY) != 0;
 	TRACE("%s: MCDW is %s\n", __func__, state ? "busy" : "idle");
 
-	return idleStatus;
+	return B_TIMED_OUT;
 }
 
 
@@ -261,11 +268,8 @@ radeon_gpu_mc_setup_r600()
 	struct gpu_state gpuState;
 	radeon_gpu_mc_halt(&gpuState);
 
-	uint32 idleState = radeon_gpu_mc_idlecheck();
-	if (idleState > 0) {
-		ERROR("%s: Modifying non-idle Memory Controller! "
-			" idlestate: 0x%" B_PRIX32 "\n", __func__, idleState);
-	}
+	if (radeon_gpu_mc_idlewait() != B_OK)
+		ERROR("%s: Modifying non-idle memory controller!\n", __func__);
 
 	// TODO: Memory Controller AGP
 	Write32(OUT, R600_MC_VM_SYSTEM_APERTURE_LOW_ADDR,
@@ -291,11 +295,9 @@ radeon_gpu_mc_setup_r600()
 	Write32(OUT, R600_MC_VM_AGP_TOP, 0x0FFFFFFF);
 	Write32(OUT, R600_MC_VM_AGP_BOT, 0x0FFFFFFF);
 
-	idleState = radeon_gpu_mc_idlecheck();
-	if (idleState > 0) {
-		ERROR("%s: Modifying non-idle Memory Controller! "
-			" idlestate: 0x%" B_PRIX32 "\n", __func__, idleState);
-	}
+	if (radeon_gpu_mc_idlewait() != B_OK)
+		ERROR("%s: Modifying non-idle memory controller!\n", __func__);
+
 	radeon_gpu_mc_resume(&gpuState);
 
 	// disable render control
@@ -326,11 +328,8 @@ radeon_gpu_mc_setup_r700()
 	struct gpu_state gpuState;
 	radeon_gpu_mc_halt(&gpuState);
 
-	uint32 idleState = radeon_gpu_mc_idlecheck();
-	if (idleState > 0) {
-		ERROR("%s: Modifying non-idle Memory Controller! "
-			" idlestate: 0x%" B_PRIX32 "\n", __func__, idleState);
-	}
+	if (radeon_gpu_mc_idlewait() != B_OK)
+		ERROR("%s: Modifying non-idle memory controller!\n", __func__);
 
 	Write32(OUT, VGA_HDP_CONTROL, VGA_MEMORY_DISABLE);
 
@@ -358,11 +357,9 @@ radeon_gpu_mc_setup_r700()
 	Write32(OUT, R700_MC_VM_AGP_TOP, 0x0FFFFFFF);
 	Write32(OUT, R700_MC_VM_AGP_BOT, 0x0FFFFFFF);
 
-	idleState = radeon_gpu_mc_idlecheck();
-	if (idleState > 0) {
-		ERROR("%s: Modifying non-idle Memory Controller! "
-			" idlestate: 0x%" B_PRIX32 "\n", __func__, idleState);
-	}
+	if (radeon_gpu_mc_idlewait() != B_OK)
+		ERROR("%s: Modifying non-idle memory controller!\n", __func__);
+
 	radeon_gpu_mc_resume(&gpuState);
 
 	// disable render control
@@ -391,11 +388,8 @@ radeon_gpu_mc_setup_evergreen()
 	struct gpu_state gpuState;
 	radeon_gpu_mc_halt(&gpuState);
 
-	uint32 idleState = radeon_gpu_mc_idlecheck();
-	if (idleState > 0) {
-		ERROR("%s: Modifying non-idle Memory Controller! "
-			" idlestate: 0x%" B_PRIX32 "\n", __func__, idleState);
-	}
+	if (radeon_gpu_mc_idlewait() != B_OK)
+		ERROR("%s: Modifying non-idle memory controller!\n", __func__);
 
 	Write32(OUT, VGA_HDP_CONTROL, VGA_MEMORY_DISABLE);
 
@@ -434,11 +428,9 @@ radeon_gpu_mc_setup_evergreen()
 	Write32(OUT, EVERGREEN_MC_VM_AGP_TOP, 0x0FFFFFFF);
 	Write32(OUT, EVERGREEN_MC_VM_AGP_BOT, 0x0FFFFFFF);
 
-	idleState = radeon_gpu_mc_idlecheck();
-	if (idleState > 0) {
-		ERROR("%s: Modifying non-idle Memory Controller! "
-			" idlestate: 0x%" B_PRIX32 "\n", __func__, idleState);
-	}
+	if (radeon_gpu_mc_idlewait() != B_OK)
+		ERROR("%s: Modifying non-idle memory controller!\n", __func__);
+
 	radeon_gpu_mc_resume(&gpuState);
 
 	// disable render control
