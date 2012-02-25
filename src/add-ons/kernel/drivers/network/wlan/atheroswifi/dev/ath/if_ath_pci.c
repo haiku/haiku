@@ -245,7 +245,11 @@ static device_method_t ath_pci_methods[] = {
 	{ 0,0 }
 };
 static driver_t ath_pci_driver = {
+#ifdef __HAIKU__
+	"ath_pci",
+#else
 	"ath",
+#endif
 	ath_pci_methods,
 	sizeof (struct ath_pci_softc)
 };

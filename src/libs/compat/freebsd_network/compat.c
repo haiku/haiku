@@ -323,8 +323,10 @@ device_add_child(device_t parent, const char *name, int unit)
 			snprintf(symbol, sizeof(symbol), "__fbsd_%s_%s", name,
 				parent->driver->name);
 			if (get_image_symbol(find_own_image(), symbol, B_SYMBOL_TYPE_DATA,
-					(void **)&driver) == B_OK)
+					(void **)&driver) == B_OK) {
 				child = new_device(*driver);
+			} else
+				device_printf(parent, "couldn't find symbol %s\n", symbol);
 		}
 	} else
 		child = new_device(NULL);
