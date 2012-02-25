@@ -147,8 +147,10 @@ radeon_dpms_mode(void)
 void
 radeon_dpms_set(int mode)
 {
-	for (uint8 id = 0; id < MAX_DISPLAY; id++)
+	for (uint8 id = 0; id < MAX_DISPLAY; id++) {
+		encoder_dpms_set(id, mode);
 		display_crtc_dpms(id, mode);
+	}
 
 	gInfo->dpms_mode = mode;
 }
