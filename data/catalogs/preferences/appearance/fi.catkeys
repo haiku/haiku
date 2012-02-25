@@ -1,51 +1,51 @@
 1	finnish	x-vnd.Haiku-Appearance	168322075
-About	DecorSettingsView		Ohjelmasta
-About Decorator	DecorSettingsView		Koristeluohjelmasta
-Antialiasing	APRWindow		Reunanpehmennys
-Antialiasing menu	AntialiasingSettingsView		Reunanpehmennysvalikko
-Antialiasing type:	AntialiasingSettingsView		Reunanpehmennystapa:
-Appearance	System name		Ulkoasuasetukset
-Choose Decorator	DecorSettingsView		Valitse koristelu
-Colors	APRWindow		Värit
-Control background	Colors tab		Kontrollin tausta
-Control border	Colors tab		Kontrollin reuna
 Control highlight	Colors tab		Kontrollin korostus
-Control text	Colors tab		Kontrollin teksti
-Defaults	APRWindow		Oletusasetukset
-Document background	Colors tab		Dokumentin tausta
-Document text	Colors tab		Dokumentin teksti
-Failure	Colors tab		Epäonnistuminen
-Glyph hinting:	AntialiasingSettingsView		Kirjoitusmerkin viimeistely:
-Grayscale	AntialiasingSettingsView		Harmaasävy
-Hinting menu	AntialiasingSettingsView		Vinkkausvalikko
-Inactive window border	Colors tab		Ei-aktiivinen ikkunaraja
-Inactive window tab	Colors tab		Epäaktiivisen ikkunakahvan väri
-Inactive window tab text	Colors tab		Epäaktiivisen ikkunakahvan tekstin väri
-LCD subpixel	AntialiasingSettingsView		LCD alipikseli
-Menu background	Colors tab		Valikon tausta
-Menu item text	Colors tab		Valikkovalinnan teksti
-Monospaced fonts only	AntialiasingSettingsView		Vain monospace-kirjasimet
-Navigation base	Colors tab		Navigoinnin pohja
-Navigation pulse	Colors tab		Navigoinnin välke
-OK	DecorSettingsView		Valmis
-Off	AntialiasingSettingsView		Pois päältä
-On	AntialiasingSettingsView		Päällä
-Panel background	Colors tab		Paneelin tausta
-Panel text	Colors tab		Paneelin teksti
-Reduce colored edges filter strength:	AntialiasingSettingsView		Vähennä värillisten reunojen suodatuksen vahvuutta:
-Revert	APRWindow		Palauta
-Selected menu item background	Colors tab		Valitun valikkovalinnan tausta
-Selected menu item border	Colors tab		Valitun valikkovalinnan reuna
-Selected menu item text	Colors tab		Valitun valikkovalinnan teksti
+Control border	Colors tab		Kontrollin reuna
+Antialiasing type:	AntialiasingSettingsView		Reunanpehmennystapa:
 Shadow	Colors tab		Varjo
+On	AntialiasingSettingsView		Päällä
+Defaults	APRWindow		Oletusasetukset
+Grayscale	AntialiasingSettingsView		Harmaasävy
 Shine	Colors tab		Hohto
-Strong	AntialiasingSettingsView		Vahva
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Alipikselipohjainen reunanpehmennys yhdistettynä kirjoitusmerkkiviimeistelyyn ei ole saatavilla tässä Haiku-versiossa patenttisyiden takia. Ominaisuuden saaminen käyttöön vaatii Haikun uudelleenkääntämistä ja eräiden optioiden aktivoimista libfreetype:n määrittelytiedostoissa.
+About	DecorSettingsView		Ohjelmasta
+Off	AntialiasingSettingsView		Pois päältä
+Choose Decorator	DecorSettingsView		Valitse koristelu
 Success	Colors tab		Onnistuminen
-Tooltip background	Colors tab		Työkaluvinkin tausta
-Tooltip text	Colors tab		Työkaluvinkin teksti
+Inactive window tab text	Colors tab		Epäaktiivisen ikkunakahvan tekstin väri
+About Decorator	DecorSettingsView		Koristeluohjelmasta
+Failure	Colors tab		Epäonnistuminen
+Hinting menu	AntialiasingSettingsView		Vinkkausvalikko
 Window Decorator	APRWindow		Ikkunakoristelu
 Window Decorator:	DecorSettingsView		Ikkunakoristelu:
-Window border	Colors tab		Ikkunaraja
+Document background	Colors tab		Dokumentin tausta
+Revert	APRWindow		Palauta
 Window tab	Colors tab		Ikkunakahva
+Tooltip background	Colors tab		Työkaluvinkin tausta
+Selected menu item background	Colors tab		Valitun valikkovalinnan tausta
+Antialiasing	APRWindow		Reunanpehmennys
+Navigation base	Colors tab		Navigoinnin pohja
+Window border	Colors tab		Ikkunaraja
 Window tab text	Colors tab		Ikkunakahvan teksti
+Document text	Colors tab		Dokumentin teksti
+Navigation pulse	Colors tab		Navigoinnin välke
+Selected menu item text	Colors tab		Valitun valikkovalinnan teksti
+Menu background	Colors tab		Valikon tausta
+OK	DecorSettingsView		Valmis
+Panel background	Colors tab		Paneelin tausta
+Colors	APRWindow		Värit
+Control background	Colors tab		Kontrollin tausta
+Inactive window tab	Colors tab		Epäaktiivisen ikkunakahvan väri
+Appearance	System name		Ulkoasuasetukset
+Reduce colored edges filter strength:	AntialiasingSettingsView		Vähennä värillisten reunojen suodatuksen vahvuutta:
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Alipikselipohjainen reunanpehmennys yhdistettynä kirjoitusmerkkiviimeistelyyn ei ole saatavilla tässä Haiku-versiossa patenttisyiden takia. Ominaisuuden saaminen käyttöön vaatii Haikun uudelleenkääntämistä ja eräiden optioiden aktivoimista libfreetype:n määrittelytiedostoissa.
+Control text	Colors tab		Kontrollin teksti
+Tooltip text	Colors tab		Työkaluvinkin teksti
+Inactive window border	Colors tab		Ei-aktiivinen ikkunaraja
+Menu item text	Colors tab		Valikkovalinnan teksti
+LCD subpixel	AntialiasingSettingsView		LCD alipikseli
+Selected menu item border	Colors tab		Valitun valikkovalinnan reuna
+Strong	AntialiasingSettingsView		Vahva
+Panel text	Colors tab		Paneelin teksti
+Monospaced fonts only	AntialiasingSettingsView		Vain monospace-kirjasimet
+Antialiasing menu	AntialiasingSettingsView		Reunanpehmennysvalikko
+Glyph hinting:	AntialiasingSettingsView		Kirjoitusmerkin viimeistely:

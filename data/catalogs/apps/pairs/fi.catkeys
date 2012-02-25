@@ -1,14 +1,14 @@
 1	finnish	x-vnd.Haiku-Pairs	1981673050
 %app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\ttekijä: Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nSait pelin valmiiksi %num% napsautuksella.\n
-Beginner (4x4)	PairsWindow		Aloittelija (4x4)
 Expert (8x8)	PairsWindow		Guru (8x8)
-Game	PairsWindow		Peli
-Intermediate (6x6)	PairsWindow		Keskitaso (6x6)
-New	PairsWindow		Uusi
-New game	PairsWindow		Uusi peli
-OK	PairsView		Valmis
-Pairs	System name		Parit
-Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Parit-ohjelma ei löydä riittävästi vektorikuvakkeita järjestelmästä; ohjelma tarvitsee vähintään %d kuvaketta.
-Quit	PairsWindow		Poistu
+Beginner (4x4)	PairsWindow		Aloittelija (4x4)
 Quit game	PairsWindow		Poistu pelistä
+Game	PairsWindow		Peli
 Size	PairsWindow		Koko
+New	PairsWindow		Uusi
+OK	PairsView		Valmis
+Intermediate (6x6)	PairsWindow		Keskitaso (6x6)
+Quit	PairsWindow		Poistu
+Pairs	System name		Parit
+New game	PairsWindow		Uusi peli
+Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Parit-ohjelma ei löydä riittävästi vektorikuvakkeita järjestelmästä; ohjelma tarvitsee vähintään %d kuvaketta.

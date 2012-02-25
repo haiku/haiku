@@ -1,26 +1,26 @@
 1	finnish	x-vnd.haiku-screenshot	1697748405
-Artwork folder	ScreenshotWindow		Taideteoskansio
-Cancel	ScreenshotWindow		Peru
-Capture active window	ScreenshotWindow		Kaappaa aktiivinen ikkuna
-Choose folder	ScreenshotWindow		Valitse kansio
-Choose folder...	ScreenshotWindow		Valitse kansio...
-Copy to clipboard	ScreenshotWindow		Kopioi leikepöydälle
-Delay:	ScreenshotWindow		Viive:
+seconds	ScreenshotWindow		sekuntia
 Desktop	ScreenshotWindow		Työpöytä
-Home folder	ScreenshotWindow		Kotikansio
-Include mouse pointer	ScreenshotWindow		Sisällytä hiiriosoitin
 Include window border	ScreenshotWindow		Sisällytä ikkunaraja
-Name:	ScreenshotWindow		Nimi:
-New screenshot	ScreenshotWindow		Uusi näytönkaappaus
-Please select	ScreenshotWindow		Valitse
-Save	ScreenshotWindow		Tallenna
-Save as:	ScreenshotWindow		Tallenna nimellä:
-Save in:	ScreenshotWindow		Tallenna kohteeseen:
 Screenshot	System name		Näytönkaappaus
 Select	ScreenshotWindow		Valitse
-Settings…	ScreenshotWindow		Asetukset...
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Tiedosto on jo olemassa.\n Oletko varma, etä haluat korvata sen?
-Translator Settings	ScreenshotWindow		Muunninasetukset
-overwrite	ScreenshotWindow		korvaa
+Capture active window	ScreenshotWindow		Kaappaa aktiivinen ikkuna
+Cancel	ScreenshotWindow		Peru
+Name:	ScreenshotWindow		Nimi:
+Choose folder	ScreenshotWindow		Valitse kansio
+Save	ScreenshotWindow		Tallenna
+Choose folder...	ScreenshotWindow		Valitse kansio...
+Please select	ScreenshotWindow		Valitse
+Save as:	ScreenshotWindow		Tallenna nimellä:
+Copy to clipboard	ScreenshotWindow		Kopioi leikepöydälle
+Save in:	ScreenshotWindow		Tallenna kohteeseen:
 screenshot	Screenshot	Base filename of screenshot files	näytönkaappaus
-seconds	ScreenshotWindow		sekuntia
+New screenshot	ScreenshotWindow		Uusi näytönkaappaus
+Artwork folder	ScreenshotWindow		Taideteoskansio
+Home folder	ScreenshotWindow		Kotikansio
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Tiedosto on jo olemassa.\n Oletko varma, etä haluat korvata sen?
+Settings…	ScreenshotWindow		Asetukset...
+overwrite	ScreenshotWindow		korvaa
+Delay:	ScreenshotWindow		Viive:
+Include mouse pointer	ScreenshotWindow		Sisällytä hiiriosoitin
+Translator Settings	ScreenshotWindow		Muunninasetukset

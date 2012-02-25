@@ -1,60 +1,60 @@
 1	finnish	x-vnd.Haiku-Mail	3957822883
-Account name:	Config Views		Tilin nimi:
-Account name:	E-Mail		Tilinimi:
-Account settings	AutoConfigWindow		Tiliasetukset
-Account settings	Config Views		Tiliasetukset
-Accounts	Config Window		Tilit
-Add	Config Window		Lisää
-Add filter	Config Views		Lisää suodatin
-Always	Config Window		Aina
-Apply	Config Window		Sovella
-Back	AutoConfigWindow		Takaisin
-Check every	Config Window		Tarkista joka
-Choose Protocol	E-Mail		Valitse yhteyskäytäntö
-Create new account	AutoConfigWindow		Luo uusi tili
-E-mail	System name		Sähköpostiasetukset
-E-mail address:	E-Mail		Sähköpostiosoite:
-Edit mailbox menu…	Config Window		Muokkaa sähköpostilaatikkovalikkoa...
-Enter a valid e-mail address.	AutoConfigWindow		Kirjoita kelvollinen sähköpostiosoite.
-Error	Config Window		Virhe
-Error retrieving general settings: %s\n	Config Window		Virhe noudettaessa yleisasetuksia: %s\n
-Finish	AutoConfigWindow		Valmis
-Incoming	Config Window		Tuleva
-Incoming	E-Mail		Tuleva
-Incoming mail filters	Config Views		Tulevan postin suodattimet
-Login name:	E-Mail		Kirjautumisnimi:
 Mail checking	Config Window		Sähköpostin tarkistus
-Miscellaneous	Config Window		Sekalaiset
-Never	Config Window	show status window	Ei koskaan
-Next	AutoConfigWindow		Seuraava
-OK	AutoConfigWindow		Valmis
-OK	Config Views		Valmis
-OK	Config Window		Valmis
-Only when dial-up is connected	Config Window		Vain kun valintayhteys on yhdistetty
-Outgoing	Config Window		Lähtevä
-Outgoing	E-Mail		Lähtevä
-Outgoing mail filters	Config Views		Lähtevän postin suodattimet
-Password:	E-Mail		Salasana:
-Real name:	Config Views		Oikea nimi:
-Real name:	E-Mail		Oikea nimi:
-Remove	Config Views		Poista
-Remove	Config Window		Poista
-Return address:	Config Views		Paluuosoite:
-Revert	Config Window		Palauta
-Schedule outgoing mail when dial-up is disconnected	Config Window		Aikatauluta lähtevä sähköposti kun valintayhteys ei ole kytketty
-Server Name:	E-Mail		Palvelinnimi:
 Settings	Config Window		Asetukset
-Show connection status window:	Config Window		Näytä yhteystilaikkuna:
-Start mail services on startup	Config Window		Käynnistä sähköpostipalvelut tietokoneen käynnistyksen yhteydessä
-The filter could not be moved. Deleting filter.	Config Views		Suodatinta ei voitu siirtää. Poistetaan suodatin.
-While sending	Config Window		Lähetettäessä
+Never	Config Window	show status window	Ei koskaan
+Only when dial-up is connected	Config Window		Vain kun valintayhteys on yhdistetty
 While sending and receiving	Config Window		Lähetettäessä ja vastaanotettaessa
-\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nYleisasetuksia ei voitu palauttaa.\n\nVirhe noudettaessa yleisasetuksia:\n%s\n
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nLuo uusi tili ”Lisää”-painikkeella.\n\nPoista tili ”Poista”-painikkella valitusta kohdasta.\n\nValitse kohde luettelosta sen asetusten muuttamiseksi.
-\t\t· E-mail filters	Config Window		\t\t· Sähköpostisuodattimet
-\t\t· Incoming	Config Window		\t\t· Tuleva
-\t\t· Outgoing	Config Window		\t\t· Lähtevä
 days	Config Window		päivä
+Incoming	Config Window		Tuleva
+OK	Config Window		Valmis
+Start mail services on startup	Config Window		Käynnistä sähköpostipalvelut tietokoneen käynnistyksen yhteydessä
+E-mail address:	E-Mail		Sähköpostiosoite:
+Account name:	E-Mail		Tilinimi:
+Account name:	Config Views		Tilin nimi:
+Create new account	AutoConfigWindow		Luo uusi tili
+OK	Config Views		Valmis
+The filter could not be moved. Deleting filter.	Config Views		Suodatinta ei voitu siirtää. Poistetaan suodatin.
+Revert	Config Window		Palauta
+Login name:	E-Mail		Kirjautumisnimi:
+Incoming	E-Mail		Tuleva
+Password:	E-Mail		Salasana:
+Accounts	Config Window		Tilit
+Finish	AutoConfigWindow		Valmis
+Remove	Config Window		Poista
+Miscellaneous	Config Window		Sekalaiset
+Show connection status window:	Config Window		Näytä yhteystilaikkuna:
+Server Name:	E-Mail		Palvelinnimi:
+While sending	Config Window		Lähetettäessä
+Schedule outgoing mail when dial-up is disconnected	Config Window		Aikatauluta lähtevä sähköposti kun valintayhteys ei ole kytketty
 hours	Config Window		tunti
-minutes	Config Window		minuutti
+Enter a valid e-mail address.	AutoConfigWindow		Kirjoita kelvollinen sähköpostiosoite.
+Add	Config Window		Lisää
+Account settings	AutoConfigWindow		Tiliasetukset
+E-mail	System name		Sähköpostiasetukset
 never	Config Window	mail checking frequency	ei koskaan
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nYleisasetuksia ei voitu palauttaa.\n\nVirhe noudettaessa yleisasetuksia:\n%s\n
+Real name:	Config Views		Oikea nimi:
+\t\t· Outgoing	Config Window		\t\t· Lähtevä
+Choose Protocol	E-Mail		Valitse yhteyskäytäntö
+Return address:	Config Views		Paluuosoite:
+Edit mailbox menu…	Config Window		Muokkaa sähköpostilaatikkovalikkoa...
+Outgoing	E-Mail		Lähtevä
+\t\t· E-mail filters	Config Window		\t\t· Sähköpostisuodattimet
+Remove	Config Views		Poista
+\t\t· Incoming	Config Window		\t\t· Tuleva
+Next	AutoConfigWindow		Seuraava
+Check every	Config Window		Tarkista joka
+Back	AutoConfigWindow		Takaisin
+Incoming mail filters	Config Views		Tulevan postin suodattimet
+Account settings	Config Views		Tiliasetukset
+minutes	Config Window		minuutti
+Error retrieving general settings: %s\n	Config Window		Virhe noudettaessa yleisasetuksia: %s\n
+Real name:	E-Mail		Oikea nimi:
+Apply	Config Window		Sovella
+Always	Config Window		Aina
+OK	AutoConfigWindow		Valmis
+Add filter	Config Views		Lisää suodatin
+Outgoing	Config Window		Lähtevä
+Outgoing mail filters	Config Views		Lähtevän postin suodattimet
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nLuo uusi tili ”Lisää”-painikkeella.\n\nPoista tili ”Poista”-painikkella valitusta kohdasta.\n\nValitse kohde luettelosta sen asetusten muuttamiseksi.
+Error	Config Window		Virhe

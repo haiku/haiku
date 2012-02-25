@@ -1,181 +1,181 @@
 1	finnish	x-vnd.Haiku-CharacterMap	2745781253
-Aegean numbers	UnicodeBlocks		Aegean-numerot
-Alphabetic presentation forms	UnicodeBlocks		Aakkosellinen esitysmuoto
-Ancient Greek musical notation	UnicodeBlocks		Antiikin kreikan nuottikirjoitus 
-Ancient Greek numbers	UnicodeBlocks		Antiikin kreikkalaiset numerot
-Ancient smbols	UnicodeBlocks		Antiikin symbolit
-Arabic	UnicodeBlocks		Arabialaiset kirjaimet
-Arabic presentation forms A	UnicodeBlocks		Arabian esitysmuoto A
-Arabic presentation forms B	UnicodeBlocks		Arabialainen esitysmuoto B
-Arabic supplement	UnicodeBlocks		Arabian täydennys
-Armenian	UnicodeBlocks		Armenian kieli
-Arrows	UnicodeBlocks		Nuolet
-Balinese	UnicodeBlocks		Bali
-Basic Latin	UnicodeBlocks		Peruslatin-kirjaimisto
-Bengali	UnicodeBlocks		Bengali
-Block elements	UnicodeBlocks		Lohkoelementit
-Bopomofo	UnicodeBlocks		Bopomofo
-Bopomofo extended	UnicodeBlocks		Bopomofo-laajennus
-Box drawing	UnicodeBlocks		Pseudografiikkamerkit
-Braille patterns	UnicodeBlocks		Braille-merkit
-Buginese	UnicodeBlocks		Bugin kieli
-Buhid	UnicodeBlocks		Buhid-skripti
-Byzantine musical symbols	UnicodeBlocks		Bysantin nuottikirjoitus
-CJK compatibility	UnicodeBlocks		CJK-yhteensopivuus
-CJK compatibility forms	UnicodeBlocks		ACJK-yhteensopivat muodot
-CJK compatibility ideographs	UnicodeBlocks		CJK-yhteesopivuusideogrammit
-CJK compatibility ideographs Supplement	UnicodeBlocks		CJK-yhteensopivuusideogrammitäydennys
-CJK radicals supplement	UnicodeBlocks		CJK-perustäydennys
-CJK strokes	UnicodeBlocks		CJK-piirrot
-CJK symbols and punctuation	UnicodeBlocks		CJK-symbolit ja välimerkit
-CJK unified ideographs	UnicodeBlocks		CJK-yhtenäiset ideogrammit
-CJK unified ideographs extension A	UnicodeBlocks		CJK-yhtenäinen ideogrammilaajennus A
-CJK unified ideographs extension B	UnicodeBlocks		CJK-yhdistetty ideograafinen laajennus B
-Carian	UnicodeBlocks		Carian
-Cham	UnicodeBlocks		Cham
-CharacterMap	System name		Merkkitaulukot
-Cherokee	UnicodeBlocks		Cherokee
-Clear	CharacterWindow		Nollaa
-Code	CharacterWindow		Koodi
-Combining diacritical marks	UnicodeBlocks		Yhdistetyt diakriittiset merkit
-Combining diacritical marks for symbols	UnicodeBlocks		Yhdistetyt diakriittiset merkit symboleille
-Combining diacritical marks supplement	UnicodeBlocks		Yhdistettyjen diakriittisten merkkien lisäys
-Combining half marks	UnicodeBlocks		Yhdistetyt puolimerkit
-Control pictures	UnicodeBlocks		Ohjainkuvat
-Coptic	UnicodeBlocks		Kopti
-Copy as escaped byte string	CharacterView		Kopioi koodinvaihtotavumerkkijonona
-Copy character	CharacterView		Kopioi merkki
-Counting rod numerals	UnicodeBlocks		Laskentatankonumerraalit
-Cuneiform	UnicodeBlocks		Nuolenpääkirjoitus
-Cuneiform numbers and punctuation	UnicodeBlocks		Nuolenpääkirjoituksen numerot ja välimerkit
-Currency symbols	UnicodeBlocks		Rahasymbolit
-Cypriot syllabary	UnicodeBlocks		Kyproslainen tavumerkistö
-Cyrillic	UnicodeBlocks		Kyrillinen kirjaimisto
-Cyrillic extended A	UnicodeBlocks		Kyrillinen laajennus A
-Cyrillic extended B	UnicodeBlocks		Kyrillinen laajennus B
-Cyrillic supplement	UnicodeBlocks		Kyrilliset laajennukset
-Deseret	UnicodeBlocks		Deseret-kieli
-Devanagari	UnicodeBlocks		Devanagari
-Dingbats	UnicodeBlocks		Dingbat-symbolit
-Domino tiles	UnicodeBlocks		Domino-laatat
-Enclosed CJK letters and months	UnicodeBlocks		Sisällytetyt CJK-kirjaimet ja kuukaudet
 Enclosed alphanumerics	UnicodeBlocks		Sisältyvät aakkosnumeeriset
-Ethiopic	UnicodeBlocks		Etiopialainen
-Ethiopic extended	UnicodeBlocks		Laajennetut etiopialaiset kirjaimet
-Ethiopic supplement	UnicodeBlocks		Etiopian täydennys
-File	CharacterWindow		Tiedosto
-Filter:	CharacterWindow		Suodatin:
-Font	CharacterWindow		Kirjasin
-Font size:	CharacterWindow		Kirjasinkoko:
-General punctuation	UnicodeBlocks		Yleiset välimerkit
-Geometric shapes	UnicodeBlocks		Geometriset muodot
-Georgian	UnicodeBlocks		Georgian kieli
-Georgian supplement	UnicodeBlocks		Georgian täydennys
-Glagotic	UnicodeBlocks		Glagoliittinen
-Gothic	UnicodeBlocks		Gootin kieli
-Greek and Coptic	UnicodeBlocks		Kreikkalainen ja koptilainen
-Greek extended	UnicodeBlocks		Kreikka-laajennus
-Gujarati	UnicodeBlocks		Gudžaratin kieli
-Gurmukhi	UnicodeBlocks		Gurmukhin aakkosto
-Halfwidth and fullwidth forms	UnicodeBlocks		Puolilevyiset ja kokolevyiset muodot
-Hangul Jamo	UnicodeBlocks		Hangul Jamo
-Hangul compatibility Jamo	UnicodeBlocks		Hangul-yhteensopiva Jamo
-Hangul syllables	UnicodeBlocks		Hangul-merkit
-Hanunoo	UnicodeBlocks		Hanunoo
-Hebrew	UnicodeBlocks		Hebrea
-Hiragana	UnicodeBlocks		Hiragana
-IPA extensions	UnicodeBlocks		IPA-laajennukset
-Ideographic description characters	UnicodeBlocks		Ideograafiset kuvausmerkit
-Kanbun	UnicodeBlocks		Kanbun
-Kangxi radicals	UnicodeBlocks		Kangxi-radikaalit
-Kannada	UnicodeBlocks		Kannada
-Katakana	UnicodeBlocks		Katakana
-Katakana phonetic extensions	UnicodeBlocks		Katakana foneettiset laajennukset
-Kayah Li	UnicodeBlocks		Kayah Li
-Kharoshthi	UnicodeBlocks		Kharoshthi
-Khmer	UnicodeBlocks		Khmerin kieli
-Khmer symbols	UnicodeBlocks		Khmerin symbolit
-Lao	UnicodeBlocks		Lao
-Latin extended A	UnicodeBlocks		Latin-laajennus A
-Latin extended B	UnicodeBlocks		Latin-laajennus B
-Latin extended C	UnicodeBlocks		Latin-laajennus C
-Latin extended D	UnicodeBlocks		Latin-laajennus D
-Latin extended additional	UnicodeBlocks		Latin-laajennuslisäys
-Latin-1 supplement	UnicodeBlocks		Latin-1 täydennys
-Lepcha	UnicodeBlocks		Lepcha
-Letterlike symbols	UnicodeBlocks		Kirjaimenkaltaiset symbolit
-Limbu	UnicodeBlocks		Limbun kieli
-Linear B ideograms	UnicodeBlocks		Lineaariset B-ideogrammit
-Linear B syllabary	UnicodeBlocks		Lineaarinen B-tavusto
-Lycian	UnicodeBlocks		Lyykian kieli
-Lydian	UnicodeBlocks		Lydian kieli
-Mahjong tiles	UnicodeBlocks		Mahjong-laatat
-Malayalam	UnicodeBlocks		Malayalam
-Mathematical alphanumeric symbols	UnicodeBlocks		Matemaattiset aakkosnumeeriset symbolit
-Mathematical operators	UnicodeBlocks		Matemaattiset operaattorit
-Miscellaneous mathematical symbols A	UnicodeBlocks		Sekalaiset matemaattiset symbolit A
-Miscellaneous mathematical symbols B	UnicodeBlocks		Sekalaiset matemaattiset symbolit B
-Miscellaneous symbols	UnicodeBlocks		Sekalaiset symbolit
-Miscellaneous symbols and arrows	UnicodeBlocks		Sekalaiset symbolit ja nuolet
-Miscellaneous technical	UnicodeBlocks		Sekalaiset tekniset
-Modifier tone letters	UnicodeBlocks		Määretoonikirjaimet
-Mongolian	UnicodeBlocks		Mongolian kieli
-Musical symbols	UnicodeBlocks		Musiikkisymbolit
-Myanmar	UnicodeBlocks		Burman kieli
-N'Ko	UnicodeBlocks		N'Ko-kieli
-New Tai Lue	UnicodeBlocks		Uusi Tai Lue
-Number forms	UnicodeBlocks		Numeromuodot
-Ogham	UnicodeBlocks		Ogham
-Ol Chiki	UnicodeBlocks		Santalin kirjaimet
-Old Persian	UnicodeBlocks		Vanha persia
-Old italic	UnicodeBlocks		Vanha italia
-Optical character recognition	UnicodeBlocks		Optinen merkkitunnistus
-Oriya	UnicodeBlocks		Orijan kieli
-Osmanya	UnicodeBlocks		Osmanya
-Phags-pa	UnicodeBlocks		Phags-pa
-Phaistos disc	UnicodeBlocks		Phaistoksen kiekko
-Phoenician	UnicodeBlocks		Foinikian kieli
-Phonetic extensions	UnicodeBlocks		Foneettiset laajennukset
-Phonetic extensions supplement	UnicodeBlocks		Foneettinen laajennustäydennys
-Private use area	UnicodeBlocks		Yksityinen käyttäjäalue
-Quit	CharacterWindow		Poistu
-Rejang	UnicodeBlocks		Rejang-kieli
-Runic	UnicodeBlocks		Riimukirjoitus
-Saurashtra	UnicodeBlocks		Saurashtra
-Shavian	UnicodeBlocks		Shavian
-Show private blocks	CharacterWindow		Näytä yksityislohkot
-Sinhala	UnicodeBlocks		Sinhalin kieli
-Small form variants	UnicodeBlocks		Pienet muotovariantit
-Spacing modifier letters	UnicodeBlocks		Tilamäärekirjaimet
-Specials	UnicodeBlocks		Erikoismerkit
-Sundanese	UnicodeBlocks		Sundan kieli
-Superscripts and subscripts	UnicodeBlocks		Yläindeksit ja alaindeksit
-Supplement punctuation	UnicodeBlocks		Täydentävät välimerkit
-Supplemental arrows A	UnicodeBlocks		Täydennysnuolet A
-Supplemental arrows B	UnicodeBlocks		Täydennysnuolet B
-Supplemental mathematical operators	UnicodeBlocks		Täydentävät matemaattiset operaattorit
-Supplementary private use area A	UnicodeBlocks		Lisäyksityiskäyttöalue A
-Supplementary private use area B	UnicodeBlocks		Täydennysyksityiskäyttöalue B
-Syloti Nagri	UnicodeBlocks		Sylhetin kieli
-Syriac	UnicodeBlocks		Syyrian kieli
-Tagalog	UnicodeBlocks		Tagalog
-Tagbanwa	UnicodeBlocks		Tagbanwa
-Tags	UnicodeBlocks		Tunnisteet
-Tai Le	UnicodeBlocks		Tai Le -skriptit
-Tai Xuan Jing symbols	UnicodeBlocks		Tai Xuan Jing -symbolit
-Tamil	UnicodeBlocks		Tamili
-Telugu	UnicodeBlocks		Telugun kieli
-Thaana	UnicodeBlocks		Thaana
-Thai	UnicodeBlocks		Thain kieli
-Tibetan	UnicodeBlocks		Tiibetin kieli
-Tifinagh	UnicodeBlocks		Tifinagh
-Ugaritic	UnicodeBlocks		Ugarin kieli
-Unified Canadian Aboriginal syllabics	UnicodeBlocks		Yhdistetty Kanadan alkuasukastavusto
-Vai	UnicodeBlocks		Vai-kieli
-Variation selectors	UnicodeBlocks		Muunteluvalitsimet
-Variation selectors supplement	UnicodeBlocks		Muunteluvalitsijatäydennys
-Vertical forms	UnicodeBlocks		Pystysuorat muodot
+Basic Latin	UnicodeBlocks		Peruslatin-kirjaimisto
 View	CharacterWindow		Näkymä
+Latin-1 supplement	UnicodeBlocks		Latin-1 täydennys
+Hebrew	UnicodeBlocks		Hebrea
+Georgian supplement	UnicodeBlocks		Georgian täydennys
+CJK unified ideographs	UnicodeBlocks		CJK-yhtenäiset ideogrammit
+Modifier tone letters	UnicodeBlocks		Määretoonikirjaimet
+Khmer	UnicodeBlocks		Khmerin kieli
+Supplementary private use area A	UnicodeBlocks		Lisäyksityiskäyttöalue A
+Hanunoo	UnicodeBlocks		Hanunoo
+Latin extended additional	UnicodeBlocks		Latin-laajennuslisäys
+Arabic presentation forms A	UnicodeBlocks		Arabian esitysmuoto A
+Greek extended	UnicodeBlocks		Kreikka-laajennus
+Linear B ideograms	UnicodeBlocks		Lineaariset B-ideogrammit
+Devanagari	UnicodeBlocks		Devanagari
+Armenian	UnicodeBlocks		Armenian kieli
+Glagotic	UnicodeBlocks		Glagoliittinen
+Mathematical operators	UnicodeBlocks		Matemaattiset operaattorit
+General punctuation	UnicodeBlocks		Yleiset välimerkit
+Miscellaneous technical	UnicodeBlocks		Sekalaiset tekniset
+Vertical forms	UnicodeBlocks		Pystysuorat muodot
+Ol Chiki	UnicodeBlocks		Santalin kirjaimet
+Arabic	UnicodeBlocks		Arabialaiset kirjaimet
+Ethiopic extended	UnicodeBlocks		Laajennetut etiopialaiset kirjaimet
+Arrows	UnicodeBlocks		Nuolet
+Font	CharacterWindow		Kirjasin
+Variation selectors supplement	UnicodeBlocks		Muunteluvalitsijatäydennys
+Gujarati	UnicodeBlocks		Gudžaratin kieli
+Cuneiform	UnicodeBlocks		Nuolenpääkirjoitus
+CJK radicals supplement	UnicodeBlocks		CJK-perustäydennys
+Balinese	UnicodeBlocks		Bali
+Cham	UnicodeBlocks		Cham
+Specials	UnicodeBlocks		Erikoismerkit
+CJK compatibility ideographs	UnicodeBlocks		CJK-yhteesopivuusideogrammit
+Phonetic extensions	UnicodeBlocks		Foneettiset laajennukset
+Khmer symbols	UnicodeBlocks		Khmerin symbolit
+Tagbanwa	UnicodeBlocks		Tagbanwa
+Kanbun	UnicodeBlocks		Kanbun
+Syriac	UnicodeBlocks		Syyrian kieli
+CJK compatibility ideographs Supplement	UnicodeBlocks		CJK-yhteensopivuusideogrammitäydennys
+Musical symbols	UnicodeBlocks		Musiikkisymbolit
+Hangul syllables	UnicodeBlocks		Hangul-merkit
+Coptic	UnicodeBlocks		Kopti
+Tai Le	UnicodeBlocks		Tai Le -skriptit
+Mahjong tiles	UnicodeBlocks		Mahjong-laatat
+Spacing modifier letters	UnicodeBlocks		Tilamäärekirjaimet
+Aegean numbers	UnicodeBlocks		Aegean-numerot
+CJK strokes	UnicodeBlocks		CJK-piirrot
+Old italic	UnicodeBlocks		Vanha italia
+Supplemental arrows B	UnicodeBlocks		Täydennysnuolet B
+Cyrillic extended A	UnicodeBlocks		Kyrillinen laajennus A
+Kharoshthi	UnicodeBlocks		Kharoshthi
+Combining half marks	UnicodeBlocks		Yhdistetyt puolimerkit
+Cyrillic	UnicodeBlocks		Kyrillinen kirjaimisto
+Katakana	UnicodeBlocks		Katakana
+Block elements	UnicodeBlocks		Lohkoelementit
+Clear	CharacterWindow		Nollaa
+Sundanese	UnicodeBlocks		Sundan kieli
+Miscellaneous mathematical symbols A	UnicodeBlocks		Sekalaiset matemaattiset symbolit A
+Cyrillic supplement	UnicodeBlocks		Kyrilliset laajennukset
+Small form variants	UnicodeBlocks		Pienet muotovariantit
+IPA extensions	UnicodeBlocks		IPA-laajennukset
+Thaana	UnicodeBlocks		Thaana
+Ogham	UnicodeBlocks		Ogham
+Combining diacritical marks for symbols	UnicodeBlocks		Yhdistetyt diakriittiset merkit symboleille
+Syloti Nagri	UnicodeBlocks		Sylhetin kieli
+Arabic supplement	UnicodeBlocks		Arabian täydennys
+Latin extended C	UnicodeBlocks		Latin-laajennus C
+Ancient smbols	UnicodeBlocks		Antiikin symbolit
+Bopomofo extended	UnicodeBlocks		Bopomofo-laajennus
+Lycian	UnicodeBlocks		Lyykian kieli
+Font size:	CharacterWindow		Kirjasinkoko:
+Osmanya	UnicodeBlocks		Osmanya
+Ethiopic	UnicodeBlocks		Etiopialainen
+Bengali	UnicodeBlocks		Bengali
+Supplementary private use area B	UnicodeBlocks		Täydennysyksityiskäyttöalue B
+CJK unified ideographs extension A	UnicodeBlocks		CJK-yhtenäinen ideogrammilaajennus A
+Filter:	CharacterWindow		Suodatin:
+Hangul compatibility Jamo	UnicodeBlocks		Hangul-yhteensopiva Jamo
+Ideographic description characters	UnicodeBlocks		Ideograafiset kuvausmerkit
+Arabic presentation forms B	UnicodeBlocks		Arabialainen esitysmuoto B
+CJK compatibility forms	UnicodeBlocks		ACJK-yhteensopivat muodot
+Hiragana	UnicodeBlocks		Hiragana
+Tagalog	UnicodeBlocks		Tagalog
+Control pictures	UnicodeBlocks		Ohjainkuvat
+Variation selectors	UnicodeBlocks		Muunteluvalitsimet
+Linear B syllabary	UnicodeBlocks		Lineaarinen B-tavusto
+Buginese	UnicodeBlocks		Bugin kieli
+Bopomofo	UnicodeBlocks		Bopomofo
+Code	CharacterWindow		Koodi
+Lepcha	UnicodeBlocks		Lepcha
+Sinhala	UnicodeBlocks		Sinhalin kieli
+Ancient Greek musical notation	UnicodeBlocks		Antiikin kreikan nuottikirjoitus 
+Geometric shapes	UnicodeBlocks		Geometriset muodot
+Letterlike symbols	UnicodeBlocks		Kirjaimenkaltaiset symbolit
+Hangul Jamo	UnicodeBlocks		Hangul Jamo
+Tamil	UnicodeBlocks		Tamili
+Currency symbols	UnicodeBlocks		Rahasymbolit
+Combining diacritical marks	UnicodeBlocks		Yhdistetyt diakriittiset merkit
+Supplement punctuation	UnicodeBlocks		Täydentävät välimerkit
+Unified Canadian Aboriginal syllabics	UnicodeBlocks		Yhdistetty Kanadan alkuasukastavusto
+Ugaritic	UnicodeBlocks		Ugarin kieli
+CJK symbols and punctuation	UnicodeBlocks		CJK-symbolit ja välimerkit
+File	CharacterWindow		Tiedosto
+Number forms	UnicodeBlocks		Numeromuodot
+Cherokee	UnicodeBlocks		Cherokee
+Tags	UnicodeBlocks		Tunnisteet
+Cypriot syllabary	UnicodeBlocks		Kyproslainen tavumerkistö
+Counting rod numerals	UnicodeBlocks		Laskentatankonumerraalit
+Latin extended A	UnicodeBlocks		Latin-laajennus A
+Miscellaneous symbols	UnicodeBlocks		Sekalaiset symbolit
+Saurashtra	UnicodeBlocks		Saurashtra
+Optical character recognition	UnicodeBlocks		Optinen merkkitunnistus
+Old Persian	UnicodeBlocks		Vanha persia
+Combining diacritical marks supplement	UnicodeBlocks		Yhdistettyjen diakriittisten merkkien lisäys
+Myanmar	UnicodeBlocks		Burman kieli
+Latin extended D	UnicodeBlocks		Latin-laajennus D
+Byzantine musical symbols	UnicodeBlocks		Bysantin nuottikirjoitus
+Oriya	UnicodeBlocks		Orijan kieli
+Tibetan	UnicodeBlocks		Tiibetin kieli
+Ancient Greek numbers	UnicodeBlocks		Antiikin kreikkalaiset numerot
+Vai	UnicodeBlocks		Vai-kieli
 Yi Radicals	UnicodeBlocks		Yi-radikaalit
+Cyrillic extended B	UnicodeBlocks		Kyrillinen laajennus B
+Quit	CharacterWindow		Poistu
+Braille patterns	UnicodeBlocks		Braille-merkit
+New Tai Lue	UnicodeBlocks		Uusi Tai Lue
+Runic	UnicodeBlocks		Riimukirjoitus
+Miscellaneous mathematical symbols B	UnicodeBlocks		Sekalaiset matemaattiset symbolit B
+Cuneiform numbers and punctuation	UnicodeBlocks		Nuolenpääkirjoituksen numerot ja välimerkit
+Private use area	UnicodeBlocks		Yksityinen käyttäjäalue
+CJK unified ideographs extension B	UnicodeBlocks		CJK-yhdistetty ideograafinen laajennus B
+Phags-pa	UnicodeBlocks		Phags-pa
+Kangxi radicals	UnicodeBlocks		Kangxi-radikaalit
+Dingbats	UnicodeBlocks		Dingbat-symbolit
+Tai Xuan Jing symbols	UnicodeBlocks		Tai Xuan Jing -symbolit
 Yi syllables	UnicodeBlocks		Yi-tavut
+Buhid	UnicodeBlocks		Buhid-skripti
+Telugu	UnicodeBlocks		Telugun kieli
+Superscripts and subscripts	UnicodeBlocks		Yläindeksit ja alaindeksit
+Thai	UnicodeBlocks		Thain kieli
+Deseret	UnicodeBlocks		Deseret-kieli
+Tifinagh	UnicodeBlocks		Tifinagh
+Gurmukhi	UnicodeBlocks		Gurmukhin aakkosto
+CharacterMap	System name		Merkkitaulukot
+Lao	UnicodeBlocks		Lao
+Gothic	UnicodeBlocks		Gootin kieli
+Limbu	UnicodeBlocks		Limbun kieli
+Rejang	UnicodeBlocks		Rejang-kieli
+Show private blocks	CharacterWindow		Näytä yksityislohkot
+Phoenician	UnicodeBlocks		Foinikian kieli
+Mongolian	UnicodeBlocks		Mongolian kieli
+Supplemental arrows A	UnicodeBlocks		Täydennysnuolet A
+Miscellaneous symbols and arrows	UnicodeBlocks		Sekalaiset symbolit ja nuolet
 Yijing hexagram symbols	UnicodeBlocks		Yijing-heksagrammisymbolit
+Supplemental mathematical operators	UnicodeBlocks		Täydentävät matemaattiset operaattorit
+Enclosed CJK letters and months	UnicodeBlocks		Sisällytetyt CJK-kirjaimet ja kuukaudet
+Kayah Li	UnicodeBlocks		Kayah Li
+Alphabetic presentation forms	UnicodeBlocks		Aakkosellinen esitysmuoto
+Halfwidth and fullwidth forms	UnicodeBlocks		Puolilevyiset ja kokolevyiset muodot
+Lydian	UnicodeBlocks		Lydian kieli
+Ethiopic supplement	UnicodeBlocks		Etiopian täydennys
+Latin extended B	UnicodeBlocks		Latin-laajennus B
+Box drawing	UnicodeBlocks		Pseudografiikkamerkit
+Mathematical alphanumeric symbols	UnicodeBlocks		Matemaattiset aakkosnumeeriset symbolit
+Copy character	CharacterView		Kopioi merkki
+Greek and Coptic	UnicodeBlocks		Kreikkalainen ja koptilainen
+Carian	UnicodeBlocks		Carian
+Georgian	UnicodeBlocks		Georgian kieli
+Phaistos disc	UnicodeBlocks		Phaistoksen kiekko
+Shavian	UnicodeBlocks		Shavian
+CJK compatibility	UnicodeBlocks		CJK-yhteensopivuus
+Malayalam	UnicodeBlocks		Malayalam
+N'Ko	UnicodeBlocks		N'Ko-kieli
+Kannada	UnicodeBlocks		Kannada
+Copy as escaped byte string	CharacterView		Kopioi koodinvaihtotavumerkkijonona
+Phonetic extensions supplement	UnicodeBlocks		Foneettinen laajennustäydennys
+Domino tiles	UnicodeBlocks		Domino-laatat
+Katakana phonetic extensions	UnicodeBlocks		Katakana foneettiset laajennukset

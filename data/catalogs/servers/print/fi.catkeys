@@ -1,54 +1,54 @@
 1	finnish	x-vnd.Be-PSRV	1761631281
-A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Tulostin tuolla nimellä on jo olemassa, mutta se ei ole ollenkaan käytettävissä! Korvataanko?
-A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Tulostin tuolla nimellä on jo olemassa, mutta sen ajuria ei voitu löytää! Korvataanko?
-A0	ConfigWindow	ISO 216 paper size	A0
-A1	ConfigWindow	ISO 216 paper size	A1
-A2	ConfigWindow	ISO 216 paper size	A2
-A3	ConfigWindow	ISO 216 paper size	A3
-A4	ConfigWindow	ISO 216 paper size	A4
-A5	ConfigWindow	ISO 216 paper size	A5
-A6	ConfigWindow	ISO 216 paper size	A6
-All pages	ConfigWindow		Kaikki sivut
-All pages, %1 copies	ConfigWindow		Kaikki sivut, %1 kopiota
-B5	ConfigWindow	ISO 216 paper size	B5
-Cancel	ConfigWindow		Peru
-Cancel	PrintServerApp		Peru
-Create a new printer	PrintServerApp Scripting		Luo uusi tulostin
-Delete a specific printer	PrintServerApp Scripting		Poista tietty tulostin
-Get comments about this printer	Printer Scripting		Hae kommentit tästä tulostimesta
-Get currently available ports/devices	Transport Scripting		Hae parhaillaan käytettävissä olevat portit/laitteet
-Get name of printer	Printer Scripting		Hae tulostimen nimi
-Get name of the printer add-on used for this printer	Printer Scripting		Hae tämän tulostimen käyttämän tulostinlisäosan nimi
-Get name of the transport add-on used for this printer	Printer Scripting		Hae tämän tulostimen käyttämän siirtolisäosan nimi
-Get name of transport	Transport Scripting		Hae siirron nimi
-Get the transport configuration for this printer	Printer Scripting		Hae siirtoasetukset tälle tulostimelle
-Landscape	ConfigWindow		Vaakasuora
-Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ledger-koko
-Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal-koko
-Letter	ConfigWindow	ANSI A (letter), a North American paper size	Letter-koko
-No	PrintServerApp		Ei
-OK	ConfigWindow		Valmis
-OK	PrintServerApp		Valmis
-Page %1 to %2	ConfigWindow		Sivu %1 ... %2
-Page %1 to %2, %3 copies	ConfigWindow		Sivu %1 ... %2, %3 kopiota
-Page setup	ConfigWindow		Sivuasetukset
-Page setup:	ConfigWindow		Sivuasetus:
-Paper setup:	ConfigWindow		Paperiasetukset:
-Portrait	ConfigWindow		Pystysuora
-Print setup	ConfigWindow		Tulostinasetukset
-Printer server	ConfigWindow		Tulostinpalvelin
-Printer:	ConfigWindow		Tulostin:
-Retrieve a specific printer	PrintServerApp Scripting		Nouda tietty tulostin
-Retrieve a specific transport	PrintServerApp Scripting		Nouda tietty siirto
-Retrieve or select the active printer	PrintServerApp Scripting		Nouda tai valitse käytössä oleva tulostin
-Return the number of available printers	PrintServerApp Scripting		Palauta käytettävissä olevien tulostimien lukumäärä
+Undefined	ConfigWindow		Määrittelemätön
 Return the number of available transports	PrintServerApp Scripting		Palauta käytettävissä olevien siirtojen lukumäärä
+Return the number of available printers	PrintServerApp Scripting		Palauta käytettävissä olevien tulostimien lukumäärä
+Get currently available ports/devices	Transport Scripting		Hae parhaillaan käytettävissä olevat portit/laitteet
+Retrieve or select the active printer	PrintServerApp Scripting		Nouda tai valitse käytössä oleva tulostin
+Cancel	PrintServerApp		Peru
+Retrieve a specific printer	PrintServerApp Scripting		Nouda tietty tulostin
+Page %1 to %2	ConfigWindow		Sivu %1 ... %2
+Get name of the printer add-on used for this printer	Printer Scripting		Hae tämän tulostimen käyttämän tulostinlisäosan nimi
+Page setup:	ConfigWindow		Sivuasetus:
+OK	ConfigWindow		Valmis
+Cancel	ConfigWindow		Peru
+Printer server	ConfigWindow		Tulostinpalvelin
+Page %1 to %2, %3 copies	ConfigWindow		Sivu %1 ... %2, %3 kopiota
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Tulostin tuolla nimellä on jo olemassa, mutta sen ajuria ei voitu löytää! Korvataanko?
+Yes	PrintServerApp		Kyllä
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ledger-koko
+Would you like to set one up now?	PrintServerApp		Haluaisitko asettaa yhden nyt?
+A6	ConfigWindow	ISO 216 paper size	A6
+Portrait	ConfigWindow		Pystysuora
+All pages	ConfigWindow		Kaikki sivut
+There is no default printer set up.	PrintServerApp		Ei ole olemassa tulostimen oletusasetusta.
+B5	ConfigWindow	ISO 216 paper size	B5
+A0	ConfigWindow	ISO 216 paper size	A0
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	Letter-koko
+Printer:	ConfigWindow		Tulostin:
+A2	ConfigWindow	ISO 216 paper size	A2
 Select a printer	ConfigWindow		Valitse tulostin
 Show configuration window	PrintServerApp Scripting		Näytä asetusikkuna
-Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid-koko
+A4	ConfigWindow	ISO 216 paper size	A4
+Get comments about this printer	Printer Scripting		Hae kommentit tästä tulostimesta
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Tulostin tuolla nimellä on jo olemassa, mutta se ei ole ollenkaan käytettävissä! Korvataanko?
+No	PrintServerApp		Ei
+Get the transport configuration for this printer	Printer Scripting		Hae siirtoasetukset tälle tulostimelle
+Landscape	ConfigWindow		Vaakasuora
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal-koko
 There are no printers set up.	PrintServerApp		Ei ole asetettavia tulostimia.
-There is no default printer set up.	PrintServerApp		Ei ole olemassa tulostimen oletusasetusta.
-Undefined	ConfigWindow		Määrittelemätön
+Get name of the transport add-on used for this printer	Printer Scripting		Hae tämän tulostimen käyttämän siirtolisäosan nimi
+All pages, %1 copies	ConfigWindow		Kaikki sivut, %1 kopiota
+Delete a specific printer	PrintServerApp Scripting		Poista tietty tulostin
+Create a new printer	PrintServerApp Scripting		Luo uusi tulostin
+OK	PrintServerApp		Valmis
+Print setup	ConfigWindow		Tulostinasetukset
+A1	ConfigWindow	ISO 216 paper size	A1
+Retrieve a specific transport	PrintServerApp Scripting		Nouda tietty siirto
+Get name of printer	Printer Scripting		Hae tulostimen nimi
+A3	ConfigWindow	ISO 216 paper size	A3
+Get name of transport	Transport Scripting		Hae siirron nimi
+A5	ConfigWindow	ISO 216 paper size	A5
 Would you like to make @ the default printer?	PrintServerApp		Haluaisitko tehdä @ oletustulostimeksi?
-Would you like to set one up now?	PrintServerApp		Haluaisitko asettaa yhden nyt?
-Yes	PrintServerApp		Kyllä
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid-koko
+Page setup	ConfigWindow		Sivuasetukset
+Paper setup:	ConfigWindow		Paperiasetukset:

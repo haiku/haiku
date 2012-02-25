@@ -1,49 +1,49 @@
 1	finnish	x-vnd.Be-PEPL	2993050801
-%name% picture	People		%name%-kuva
-Address	People		Osoite
-Cancel	People		Peru
-City	People		Kaupunki
-Close	People		Sulje
-Company	People		Yritys
-Configure attributes	People		Asetusattribuutit
-Contact information for a person.	Long mimetype description		Henkilön yhteystiedot
-Contact name	People		Yhteysnimi
-Copy	People		Kopioi
-Could not create %s.	People		Ei voitu luoda kohdetta %s.
-Country	People		Maa
-Cut	People		Leikkaa
-Drop an image here,\nor use the contextual menu.	People		Pudota kuva tänne, tai käytä\nlauseyhteydestä riippuvaa valikkoa.
-E-mail	People		Sähköposti
 Edit	People		Muokkaa
 Error	People		Virhe
-Fax	People		Faksi
-File	People		Tiedosto
-Group	People		Ryhmä
-Home phone	People		Kotipuhelin
-Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Tiedostotyyppi-asetusohjelman käynnistäminen Henkilö-attribuuttien asettamiseksi epäonnistui.\n\nVirhe: 
-Load image…	People		Lataa kuva…
-Name	People		Nimi
-New person	People		Uusi henkilö
-New person…	People		Uusi henkilö...
-Nickname	People		Lempinimi
-OK	People		Valmis
-Paste	People		Liitä
-People	System name		Ihmiset
-Person	Short mimetype description		Henkilö
-Quit	People		Poistu
-Redo	People		Tee uudelleen
-Remove image	People		Poista kuva
-Revert	People		Palauta
-Save	People		Tallenna
-Save as…	People		Tallenna nimellä...
-Save changes before quitting?	People		Tallennetaanko muutokset ennen poistumista?
-Select all	People		Valitse kaikki
-Sorry	People		Valitan
-State	People		Valtio
+City	People		Kaupunki
 The file '%name%' could not be written.	People		Tiedostoon ’%name%’ ei voitu kirjoittaa.
-URL	People		Verkko-osoite
-Undo	People		Peru
-Unnamed person	People		Nimetön henkilö
-Work phone	People		Työpuhelin
-Zip	People		Postinumero
 none	Groups list		ei mitään
+Configure attributes	People		Asetusattribuutit
+Company	People		Yritys
+%name% picture	People		%name%-kuva
+Work phone	People		Työpuhelin
+People	System name		Ihmiset
+New person	People		Uusi henkilö
+Select all	People		Valitse kaikki
+File	People		Tiedosto
+Unnamed person	People		Nimetön henkilö
+Could not create %s.	People		Ei voitu luoda kohdetta %s.
+Country	People		Maa
+Close	People		Sulje
+Group	People		Ryhmä
+Nickname	People		Lempinimi
+Quit	People		Poistu
+Name	People		Nimi
+Revert	People		Palauta
+Undo	People		Peru
+E-mail	People		Sähköposti
+Save changes before quitting?	People		Tallennetaanko muutokset ennen poistumista?
+Load image…	People		Lataa kuva…
+OK	People		Valmis
+Remove image	People		Poista kuva
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Tiedostotyyppi-asetusohjelman käynnistäminen Henkilö-attribuuttien asettamiseksi epäonnistui.\n\nVirhe: 
+Home phone	People		Kotipuhelin
+Save as…	People		Tallenna nimellä...
+Redo	People		Tee uudelleen
+Paste	People		Liitä
+Drop an image here,\nor use the contextual menu.	People		Pudota kuva tänne, tai käytä\nlauseyhteydestä riippuvaa valikkoa.
+Save	People		Tallenna
+Person	Short mimetype description		Henkilö
+New person…	People		Uusi henkilö...
+Address	People		Osoite
+URL	People		Verkko-osoite
+Sorry	People		Valitan
+Zip	People		Postinumero
+Contact information for a person.	Long mimetype description		Henkilön yhteystiedot
+Fax	People		Faksi
+Contact name	People		Yhteysnimi
+Cut	People		Leikkaa
+Cancel	People		Peru
+State	People		Valtio
+Copy	People		Kopioi

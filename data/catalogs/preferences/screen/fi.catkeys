@@ -1,52 +1,52 @@
 1	finnish	x-vnd.Haiku-Screen	2033930135
-%.1f Hz	Screen		%.1f Hz
-%sSerial no.: %s	Screen		%sSarjanumero.: %s
-/other…	Screen		/muut...
-15 bits/pixel, 32768 colors	Screen		15 bittiä/pikseli, 32768 väriä
-16 bits/pixel, 65536 colors	Screen		16 bittiä/pikseli, 65536 väriä
-24 bits/pixel, 16 Million colors	Screen		24 bittiä/pikseli, 16 miljoonaa väriä
-32 bits/pixel, 16 Million colors	Screen		32 bittiä/pikseli, 16 miljoonaa väriä
-8 bits/pixel, 256 colors	Screen		8 bittiä/pikseli, 256 väriä
-About	Screen		Ohjelmasta
-All workspaces	Screen		Kaikki työtilat
-Apply	Screen		Sovella
-Cancel	Screen		Peru
-Colors:	Screen		Värit:
-Columns:	Screen		Sarakkeet
-Combine displays:	Screen		Yhdistä näyttöjä:
-Could not write VESA mode settings file:\n\t	Screen		Ei voitu kirjoittaa VESA-tila-asetustiedostoa:\n\t
-Current workspace	Screen		Nykyinen työtila
-Do you wish to keep these settings?	Screen		Haluatko pitää nämä asetukset?
-Done	Screen		Valmis
-Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Vaakasuora taajuus:\t%lu - %lu kHz\nPystysuora taajuus:\t%lu - %lu Hz\n\nMaksimi pikselikello:\t%g MHz
-Hz	Screen		Hz
-Keep	Screen		Pidä
-OK	Screen		Valmis
-Other…	Screen		Muut...
-Refresh rate	Screen		Virkistystaajuus
-Refresh rate:	Screen		Virkistystaajuus:
-Resolution:	Screen		Erottelukyky:
-Revert	Screen		Palauta
-Rows:	Screen		Rivit:
-Screen	Screen		Näyttö
-Screen	System name		Näyttöasetukset
-Screen preferences by the Haiku team	Screen		Haiku-ryhmän näyttöasetukset
-Set background…	Screen		Aseta tausta...
-Settings will revert in %seconds seconds.	Screen		Asetukset palautuvat %seconds sekunnissa
-Swap displays:	Screen		Vaihda näyttöjä:
-The screen mode could not be set:\n\t%s\n	Screen		Näyttötilaa ei voitu asettaa:\n\t%s\n
-Type or use the left and right arrow keys.	Screen		Kirjoita tai käytä nuolinäppäimiä vasemmalle ja oikealle
-Undo	Screen		Peru
-Unknown mode	Screen		tuntematon tila
-Use laptop panel:	Screen		Käytä sylimikropaneelia
-Video format:	Screen		Videomuoto:
-Warning	Screen		Varoitus
-Workspaces	Screen		Työtilat
-always	Screen		aina
-bits/pixel	Screen		bittiä/pikseli
-disable	Screen		ota pois käytöstä
-horizontally	Screen		vaakasuoraan
-if needed	Screen		jos tarvittu
-no	Screen		ei
-vertically	Screen		pystysuoraan
 yes	Screen		kyllä
+Use laptop panel:	Screen		Käytä sylimikropaneelia
+15 bits/pixel, 32768 colors	Screen		15 bittiä/pikseli, 32768 väriä
+/other…	Screen		/muut...
+16 bits/pixel, 65536 colors	Screen		16 bittiä/pikseli, 65536 väriä
+Revert	Screen		Palauta
+Swap displays:	Screen		Vaihda näyttöjä:
+Combine displays:	Screen		Yhdistä näyttöjä:
+Done	Screen		Valmis
+Set background…	Screen		Aseta tausta...
+Undo	Screen		Peru
+if needed	Screen		jos tarvittu
+Screen preferences by the Haiku team	Screen		Haiku-ryhmän näyttöasetukset
+Screen	System name		Näyttöasetukset
+OK	Screen		Valmis
+Workspaces	Screen		Työtilat
+The screen mode could not be set:\n\t%s\n	Screen		Näyttötilaa ei voitu asettaa:\n\t%s\n
+no	Screen		ei
+Could not write VESA mode settings file:\n\t	Screen		Ei voitu kirjoittaa VESA-tila-asetustiedostoa:\n\t
+Type or use the left and right arrow keys.	Screen		Kirjoita tai käytä nuolinäppäimiä vasemmalle ja oikealle
+Warning	Screen		Varoitus
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Vaakasuora taajuus:\t%lu - %lu kHz\nPystysuora taajuus:\t%lu - %lu Hz\n\nMaksimi pikselikello:\t%g MHz
+Keep	Screen		Pidä
+Unknown mode	Screen		tuntematon tila
+disable	Screen		ota pois käytöstä
+Columns:	Screen		Sarakkeet
+All workspaces	Screen		Kaikki työtilat
+always	Screen		aina
+32 bits/pixel, 16 Million colors	Screen		32 bittiä/pikseli, 16 miljoonaa väriä
+Current workspace	Screen		Nykyinen työtila
+About	Screen		Ohjelmasta
+24 bits/pixel, 16 Million colors	Screen		24 bittiä/pikseli, 16 miljoonaa väriä
+horizontally	Screen		vaakasuoraan
+Other…	Screen		Muut...
+Cancel	Screen		Peru
+bits/pixel	Screen		bittiä/pikseli
+Settings will revert in %seconds seconds.	Screen		Asetukset palautuvat %seconds sekunnissa
+Refresh rate:	Screen		Virkistystaajuus:
+Hz	Screen		Hz
+Do you wish to keep these settings?	Screen		Haluatko pitää nämä asetukset?
+Rows:	Screen		Rivit:
+vertically	Screen		pystysuoraan
+Resolution:	Screen		Erottelukyky:
+Screen	Screen		Näyttö
+%.1f Hz	Screen		%.1f Hz
+8 bits/pixel, 256 colors	Screen		8 bittiä/pikseli, 256 väriä
+Apply	Screen		Sovella
+Refresh rate	Screen		Virkistystaajuus
+%sSerial no.: %s	Screen		%sSarjanumero.: %s
+Colors:	Screen		Värit:
+Video format:	Screen		Videomuoto:

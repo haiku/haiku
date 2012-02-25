@@ -1,20 +1,20 @@
 1	finnish	x-vnd.Haiku-VirtualMemory	688347876
-%Ld B	SettingsWindow		%Ld t
-Changes will take effect on restart!	SettingsWindow		Muutokset tulevat käyttöön uudelleenkäynnistyksen jälkeen!
-Current swap file size: 	SettingsWindow		Nykyisen näennäismuistitiedoston koko: 
-Defaults	SettingsWindow		Oletukset
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Virtuaalimuistin ottamisella pois käytöstä on odottamattomia vaikutuksia järjestelmän stabiilisuuteen silloin kun muisti on kerran käytetty loppuun.\nVirtuaalimuisti ei vaikuta järjestelmän suorituskykyyn kunnes tämä piste on saavutettu.\n\nOletko todella varma, että haluat ottaa sen pois päältä?
-Enable virtual memory	SettingsWindow		Ota virtuaalimuisti käyttöön
-GB	SettingsWindow		Gt
-Insufficient space for a swap file.	SettingsWindow		Näennäismuistitiedostolle ei ole riittävästi tilaa.
-KB	SettingsWindow		kt
-Keep enabled	SettingsWindow		Pidä käytössä
-MB	SettingsWindow		Mt
-OK	VirtualMemoryApp		Valmis
-Physical memory: 	SettingsWindow		Fyysista muistia: 
-Requested swap file size:	SettingsWindow		Pyydetty virtuaalimuistitiedoston koko:
-Revert	SettingsWindow		Palauta
 Turn off	SettingsWindow		Käännä pois päältä
+GB	SettingsWindow		Gt
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Virtuaalimuistin ottamisella pois käytöstä on odottamattomia vaikutuksia järjestelmän stabiilisuuteen silloin kun muisti on kerran käytetty loppuun.\nVirtuaalimuisti ei vaikuta järjestelmän suorituskykyyn kunnes tämä piste on saavutettu.\n\nOletko todella varma, että haluat ottaa sen pois päältä?
+Requested swap file size:	SettingsWindow		Pyydetty virtuaalimuistitiedoston koko:
+Physical memory: 	SettingsWindow		Fyysista muistia: 
+Changes will take effect on restart!	SettingsWindow		Muutokset tulevat käyttöön uudelleenkäynnistyksen jälkeen!
+Defaults	SettingsWindow		Oletukset
+KB	SettingsWindow		kt
 Use volume:	SettingsWindow		Käytä taltiota:
+Insufficient space for a swap file.	SettingsWindow		Näennäismuistitiedostolle ei ole riittävästi tilaa.
+Keep enabled	SettingsWindow		Pidä käytössä
+Revert	SettingsWindow		Palauta
 VirtualMemory	System name		Virtuaalimuistiasetukset
+Current swap file size: 	SettingsWindow		Nykyisen näennäismuistitiedoston koko: 
+OK	VirtualMemoryApp		Valmis
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Virtuaalimuistiasetukset\n\ttekijä: Axel Dörfler\n\tCopyright 2005, Haiku.\n
+Enable virtual memory	SettingsWindow		Ota virtuaalimuisti käyttöön
+MB	SettingsWindow		Mt
+%Ld B	SettingsWindow		%Ld t

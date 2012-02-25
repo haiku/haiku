@@ -1,27 +1,27 @@
 1	finnish	x-vnd.Haiku-mixer.media_addon	3450667169
+Input gain controls represent	AudioMixer		Tulovahvistusohjaimet esittää
+Linear interpolation	AudioMixer		Lineaarinen interpolointi
+Virtual output channels	AudioMixer		Virtuaaliset lähtökanavat
+Refuse output format changes	AudioMixer		Kiellä lähtömuodon muutokset
+Output mapping	AudioMixer		Lähtökuvaus
 Allow input channel remapping	AudioMixer		Salli tulokanavien uudelleenkuvaus
-Allow output channel remapping	AudioMixer		Salli lähtökanavien uudelleennäytteistys
+Resampling algorithm	AudioMixer		Uusintanäytealgoritmi
 Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		3 dB:n Vaimennussekoittajalähtö (kuten BeOS R5)
 Display balance control for stereo connections	AudioMixer		Näytä balanssiohjaus stereoyhteyksille
-Drop/repeat samples	AudioMixer		Pudota/toista näytteistys
-Gain	AudioMixer		Vahvistus
-Gain controls	AudioMixer		Vahvistusohjaimet
-Input channel destinations	AudioMixer		Tulokanavakohteet
-Input gain controls represent	AudioMixer		Tulovahvistusohjaimet esittää
-Input mapping	AudioMixer		Tulokuvaus
-Linear interpolation	AudioMixer		Lineaarinen interpolointi
-Master output	AudioMixer		Master-lähtö
-Mute	AudioMixer		Mykistä
-Output channel sources	AudioMixer		Lähtökanavalähteet
-Output mapping	AudioMixer		Lähtökuvaus
-Physical input channels	AudioMixer		Fyysiset tulokanavat
-Refuse input format changes	AudioMixer		Kiellä tulomuodon muutokset
-Refuse output format changes	AudioMixer		Kiellä lähtömuodon muutokset
-Resampling algorithm	AudioMixer		Uusintanäytealgoritmi
-Setup	AudioMixer		Asetus
-To master	AudioMixer		Master-laitteelle
 To output	AudioMixer		Lähtöön
-Use non linear gain sliders (like BeOS R5)	AudioMixer		Käytä ei-lineaarisia vahvistusliukukytkimiä (kuten BeOS R5)
-Virtual output channels	AudioMixer		Virtuaaliset lähtökanavat
-dB	AudioMixer		dB
 not connected	AudioMixer		ei ole yhdistetty
+Refuse input format changes	AudioMixer		Kiellä tulomuodon muutokset
+Drop/repeat samples	AudioMixer		Pudota/toista näytteistys
+Output channel sources	AudioMixer		Lähtökanavalähteet
+dB	AudioMixer		dB
+Gain controls	AudioMixer		Vahvistusohjaimet
+Input mapping	AudioMixer		Tulokuvaus
+Mute	AudioMixer		Mykistä
+Input channel destinations	AudioMixer		Tulokanavakohteet
+To master	AudioMixer		Master-laitteelle
+Master output	AudioMixer		Master-lähtö
+Setup	AudioMixer		Asetus
+Use non linear gain sliders (like BeOS R5)	AudioMixer		Käytä ei-lineaarisia vahvistusliukukytkimiä (kuten BeOS R5)
+Gain	AudioMixer		Vahvistus
+Allow output channel remapping	AudioMixer		Salli lähtökanavien uudelleennäytteistys
+Physical input channels	AudioMixer		Fyysiset tulokanavat

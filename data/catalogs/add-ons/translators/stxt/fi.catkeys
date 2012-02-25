@@ -1,8 +1,8 @@
 1	finnish	x-vnd.Haiku-STXTTranslator	4075159346
 Be styled text file	STXTTranslator		Be-tyylinen tekstitiedosto
+StyledEdit files translator	STXTTranslator		StyledEdit-tiedostomuunnin
 Plain text file	STXTTranslator		Pelkkä tekstitiedosto
-STXT Settings	STXTMain		STXT-asetukset
+StyledEdit files translator	STXTView		StyledEdit-tiedostomuunnin
 STXTTranslator Settings	STXTTranslator		STXT-muunninasetukset
 StyledEdit files	STXTTranslator		StyledEdit-tiedostot
-StyledEdit files translator	STXTTranslator		StyledEdit-tiedostomuunnin
-StyledEdit files translator	STXTView		StyledEdit-tiedostomuunnin
+STXT Settings	STXTMain		STXT-asetukset

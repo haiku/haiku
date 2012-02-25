@@ -1,34 +1,34 @@
 1	finnish	x-vnd.Haiku-LaunchBox	3016105370
-Add button here	LaunchBox		Lisää painike tänne
-Auto-raise	LaunchBox		Automaattisesti päällimmäinen
-Bummer	LaunchBox		Valmis
-Cancel	LaunchBox		Peru
-Clear button	LaunchBox		Nollaa painike
-Clone	LaunchBox		Klooni
-Close	LaunchBox		Sulje
-Description for '%3'	LaunchBox		Kohteen ’%3’ kuvaus
-Failed to launch '%1'.\n\nError:	LaunchBox		Sovelluksen ’%1’ käynnistys epäonnistui:\n\nVirhe:
-Failed to launch 'something', error in Pad data.	LaunchBox		’Jonkin’ käynnistäminen epäonnistui, virhe alustatiedoissa.
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Epäonnistuttiin lähettämään ’avaa kansio’-komento Seuraajalle.\n\nVirhe: 
-Horizontal layout	LaunchBox		Vaakasuora sijoittelu
-Icon size	LaunchBox		Kuvakekoko
-Ignore double-click	LaunchBox		Ohita kaksoisnapsautukset
-LaunchBox	System name		Käynnistysikkuna
-Name Panel	LaunchBox		Nimipaneeli
 New	LaunchBox		Uusi
-OK	LaunchBox		Valmis
-Pad	LaunchBox		Alusta
-Pad %1	LaunchBox		Alusta %1
-Pad 1	LaunchBox		Alusta 1
-Quit	LaunchBox		Poistu
-Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Haluatko todella sulkea alustan?\n(Alustaa ei muisteta.)
-Remove button	LaunchBox		Poista painike
 Set description…	LaunchBox		Aseta kuvaus...
-Settings	LaunchBox		Asetukset
+Vertical layout	LaunchBox		Pystysuora sijoittelu
+OK	LaunchBox		Valmis
+Pad 1	LaunchBox		Alusta 1
+last chance	LaunchBox		viimeinen mahdollisuus
+Quit	LaunchBox		Poistu
+Clear button	LaunchBox		Nollaa painike
+LaunchBox	System name		Käynnistysikkuna
+Ignore double-click	LaunchBox		Ohita kaksoisnapsautukset
+Auto-raise	LaunchBox		Automaattisesti päällimmäinen
 Show on all workspaces	LaunchBox		Näytä kaikki työtilat
 Show window border	LaunchBox		Näytä ikkunaraja
-Vertical layout	LaunchBox		Pystysuora sijoittelu
-You can drag an icon here.	LaunchBox		Voit raahata kuvakkeen tänne.
+Pad	LaunchBox		Alusta
+Icon size	LaunchBox		Kuvakekoko
+Bummer	LaunchBox		Valmis
+Cancel	LaunchBox		Peru
+Remove button	LaunchBox		Poista painike
+Horizontal layout	LaunchBox		Vaakasuora sijoittelu
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nAllekirjoituksella ’%2’ varustetun sovelluksen käynnistys epäonnistui.\n\nVirhe:
-last chance	LaunchBox		viimeinen mahdollisuus
+Failed to launch '%1'.\n\nError:	LaunchBox		Sovelluksen ’%1’ käynnistys epäonnistui:\n\nVirhe:
+Name Panel	LaunchBox		Nimipaneeli
+Add button here	LaunchBox		Lisää painike tänne
+Description for '%3'	LaunchBox		Kohteen ’%3’ kuvaus
+Settings	LaunchBox		Asetukset
+Failed to launch 'something', error in Pad data.	LaunchBox		’Jonkin’ käynnistäminen epäonnistui, virhe alustatiedoissa.
+Pad %1	LaunchBox		Alusta %1
+Close	LaunchBox		Sulje
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Epäonnistuttiin lähettämään ’avaa kansio’-komento Seuraajalle.\n\nVirhe: 
+You can drag an icon here.	LaunchBox		Voit raahata kuvakkeen tänne.
+Clone	LaunchBox		Klooni
 launch popup	LaunchBox		käynnistysponnahdusikkuna
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Haluatko todella sulkea alustan?\n(Alustaa ei muisteta.)

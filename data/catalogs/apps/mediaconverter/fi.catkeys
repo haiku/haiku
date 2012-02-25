@@ -1,68 +1,67 @@
-1	finnish	x-vnd.Haiku-MediaConverter	424866547
-%.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld kanava / %lld kehystä
-%.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld kehystä
+1	finnish	x-vnd.Haiku-MediaConverter	3564609505
+Video using parameters form settings	MediaConverter		Video käyttäen parametreja muotoasetuksiin
+Video encoding:	MediaConverter		Videokoodaus:
+No audio	Audio codecs list		Ei ääntä
+Error	MediaConverter		Virhe
+Error loading a file	MediaConverter		Virhe ladattaessa tiedostoa
+File Error	MediaConverter-FileInfo		Tiedostovirhe
+Open…	Menu		Avaa...
+Start [ms]: 	MediaConverter		Alku [ms]:
+Output file '%filename' created	MediaConverter		Tulostetiedosto ’%filename’ on luotu
+Output format	MediaConverter		Tulostemuoto
 %.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stereo / %lld kehystä
-%amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles-tiedostoja ei tunnistettu tuettuina mediatiedostoina:
-%d bit 	MediaFileInfo		%d bitti
+End   [ms]: 	MediaConverter		Loppu [ms]:
+MediaConverter	System name		Mediamuunnin
+No video	Video codecs list		Ei videota
+Duration:	MediaConverter-FileInfo		Kesto:
+OK	MediaConverter		Valmis
+Error writing audio frame %Ld	MediaConverter		Virhe kirjoitettaessa äänikehystä %Ld
+Error converting '%filename'	MediaConverter		Virhe muunnettaessa tiedostoa ’%filename’
+Low	MediaConverter		Alhainen
+Conversion completed	MediaConverter		Muunnos valmis
+Audio:	MediaConverter-FileInfo		Ääni:
+OK	MediaConverter-FileInfo		Valmis
+Source files	MediaConverter		Lähdetiedostot
+Cancelling	MediaConverter		Perutaan
 %d byte 	MediaFileInfo		%d tavu
+Error loading files	MediaConverter		Virhe ladattaessa tiedostoja
+Cancel	MediaConverter		Peru
+None available	Video codecs		Ei mitään saatavilla
+Conversion cancelled	MediaConverter		Muunnos peruttu
+No file selected	MediaConverter-FileInfo		Ei tiedostoa valittuna
+Error writing video frame %Ld	MediaConverter		Virhe kirjoitettaessa videokehystä %Ld
+Select this folder	MediaConverter		Valitse tämä kansio
+Continue	MediaConverter		Jatka
+Encoder parameters	MediaConverter-EncoderWindow		Koodausparametrit
+Video:	MediaConverter-FileInfo		Video:
 %u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2f kehystä per sekunti / %Ld kehystä
-An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Tapahtui virhe luettaessa tiedostotietoja.\n\nVirhe :
+%d bit 	MediaFileInfo		%d bitti
+Error creating '%filename'	MediaConverter		Virhe luotaessa tiedostoa ’%filename’
+Video quality not supported	MediaConverter		Videolaatua ei tueta
+Cancelling…	MediaConverter		Perutaan...
+File details	MediaConverter		Tiedoston yksityiskohdat
+Select	MediaConverter		Valitse
+Writing video track: %ld%% complete	MediaConverter		Kirjoitetaan videotiedostoa: %ld %% valmiina
+Quit	Menu		Poistu
+Preview	MediaConverter		Esikatselu
+File format:	MediaConverter		Tiedostomuoto:
+None available	Audio codecs		Ei mitään saatavilla
+MediaConverter+:SaveDirectory	MediaConverter		Mediamuunnin+:Tallenna hakemisto
+Error read audio frame %Ld	MediaConverter		Virhe luettaessa äänikehystä %Ld
+%.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld kanava / %lld kehystä
+Error launching: %strError%	MediaConverter		Virhe käynnistettäessä: %strError%
+High	MediaConverter		Korkea
+The file was not recognized as a supported media file:	MediaConverter		Tiedostoa ei tunnistettu tuettuna media-tiedostona:
+Drop media files onto this window	MediaConverter		Pudota mediatiedostot tähän ikkunaan
 Audio encoding:	MediaConverter		Äänikoodaus:
 Audio quality not supported	MediaConverter		Äänen laatua ei tueta
-Audio quality: %3d%%	MediaConverter		Äänen laatu: %3d%%
-Audio:	MediaConverter-FileInfo		Ääni:
-Cancel	MediaConverter		Peru
-Cancelling	MediaConverter		Perutaan
-Cancelling…	MediaConverter		Perutaan...
-Continue	MediaConverter		Jatka
-Conversion cancelled	MediaConverter		Muunnos peruttu
-Conversion completed	MediaConverter		Muunnos valmis
-Convert	MediaConverter		Muunna
-Drop media files onto this window	MediaConverter		Pudota mediatiedostot tähän ikkunaan
-Duration:	MediaConverter-FileInfo		Kesto:
-Encoder parameters	MediaConverter-EncoderWindow		Koodausparametrit
-End   [ms]: 	MediaConverter		Loppu [ms]:
-Error	MediaConverter		Virhe
-Error converting '%filename'	MediaConverter		Virhe muunnettaessa tiedostoa ’%filename’
-Error creating '%filename'	MediaConverter		Virhe luotaessa tiedostoa ’%filename’
-Error launching: %strError%	MediaConverter		Virhe käynnistettäessä: %strError%
-Error loading a file	MediaConverter		Virhe ladattaessa tiedostoa
-Error loading files	MediaConverter		Virhe ladattaessa tiedostoja
-Error read audio frame %Ld	MediaConverter		Virhe luettaessa äänikehystä %Ld
-Error read video frame %Ld	MediaConverter		Virheellisesti luettu videokehys %Ld
-Error writing audio frame %Ld	MediaConverter		Virhe kirjoitettaessa äänikehystä %Ld
-Error writing video frame %Ld	MediaConverter		Virhe kirjoitettaessa videokehystä %Ld
 File	Menu		Tiedosto
-File Error	MediaConverter-FileInfo		Tiedostovirhe
-File details	MediaConverter		Tiedoston yksityiskohdat
-File format:	MediaConverter		Tiedostomuoto:
-High	MediaConverter		Korkea
-Low	MediaConverter		Alhainen
-MediaConverter	System name		Mediamuunnin
-MediaConverter+:SaveDirectory	MediaConverter		Mediamuunnin+:Tallenna hakemisto
-No audio	Audio codecs list		Ei ääntä
-No file selected	MediaConverter-FileInfo		Ei tiedostoa valittuna
-No video	Video codecs list		Ei videota
-None available	Audio codecs		Ei mitään saatavilla
-None available	Video codecs		Ei mitään saatavilla
-OK	MediaConverter		Valmis
-OK	MediaConverter-FileInfo		Valmis
-Open…	Menu		Avaa...
-Output file '%filename' created	MediaConverter		Tulostetiedosto ’%filename’ on luotu
-Output folder	MediaConverter		Tulostekansio
-Output format	MediaConverter		Tulostemuoto
-Preview	MediaConverter		Esikatselu
-Quit	Menu		Poistu
-Select	MediaConverter		Valitse
-Select this folder	MediaConverter		Valitse tämä kansio
-Source files	MediaConverter		Lähdetiedostot
-Start [ms]: 	MediaConverter		Alku [ms]:
-The file was not recognized as a supported media file:	MediaConverter		Tiedostoa ei tunnistettu tuettuna media-tiedostona:
-Video encoding:	MediaConverter		Videokoodaus:
-Video quality not supported	MediaConverter		Videolaatua ei tueta
-Video quality: %3d%%	MediaConverter		Videolaatu: %3d%%
-Video using parameters form settings	MediaConverter		Video käyttäen parametreja muotoasetuksiin
-Video:	MediaConverter-FileInfo		Video:
+Convert	MediaConverter		Muunna
 Writing audio track: %ld%% complete	MediaConverter		Kirjoitetaan äänitiedostoa: %ld %% valmiina
-Writing video track: %ld%% complete	MediaConverter		Kirjoitetaan videotiedostoa: %ld %% valmiina
-seconds	MediaFileInfo		sekuntia
+Video quality: %3d%%	MediaConverter		Videolaatu: %3d%%
+Output folder	MediaConverter		Tulostekansio
+Audio quality: %3d%%	MediaConverter		Äänen laatu: %3d%%
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Tapahtui virhe luettaessa tiedostotietoja.\n\nVirhe :
+Error read video frame %Ld	MediaConverter		Virheellisesti luettu videokehys %Ld
+%amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles-tiedostoja ei tunnistettu tuettuina mediatiedostoina:
+%.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld kehystä

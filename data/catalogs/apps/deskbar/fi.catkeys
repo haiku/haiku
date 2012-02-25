@@ -1,47 +1,47 @@
 1	finnish	x-vnd.Be-TSKB	107564593
-<Deskbar folder is empty>	DeskbarMenu		<Työpöytäpalkkikansio on tyhjä>
-About Haiku	DeskbarMenu		Haikusta...
-About this system	DeskbarMenu		Tästä järjestelmästä
-Always on top	PreferencesWindow		Aina päällimmäisenä
-Applications	B_USER_DESKBAR_DIRECTORY/Applications		Sovellukset
-Applications	PreferencesWindow		Sovellukset
-Auto-hide	PreferencesWindow		Piilota automaattisesti
-Auto-raise	PreferencesWindow		Nosta automaattisesti
-Change time…	TimeView		Muuta aikaa...
-Clock	PreferencesWindow		Kello
-Close all	WindowMenu		Sulje kaikki
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Esittelyohjelmat
-Deskbar	System name		Työpöytäpalkki
-Deskbar preferences	PreferencesWindow		Työpöytäpalkin asetukset
-Deskbar preferences…	DeskbarMenu		Työpöytäpalkkiasetukset...
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Työpöytäappletit
-Edit menu…	PreferencesWindow		Muokkaa valikkoa...
-Expand new applications	PreferencesWindow		Laajenna uudet sovellukset
-Find…	DeskbarMenu		Etsi...
-Hide all	WindowMenu		Piilota kaikki
-Hide time	TimeView		Piilota aika
-Menu	PreferencesWindow		Valikko
-Mount	DeskbarMenu		Liitä
-No windows	WindowMenu		Ei ikkunoita
 Power off	DeskbarMenu		Sammuta virta
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Asetusohjelmat
-Quit application	WindowMenu		Poistu sovelluksesta
-Recent applications	DeskbarMenu		Äskettäiset sovellukset
-Recent applications:	PreferencesWindow		Äskettäiset sovellukset:
-Recent documents	DeskbarMenu		Äskettäiset asiakirjat
-Recent documents:	PreferencesWindow		Äskettäiset asiakirjat:
-Recent folders	DeskbarMenu		Äskettäiset kansiot
-Recent folders:	PreferencesWindow		Äskettäiset kansiot:
-Restart Tracker	DeskbarMenu		Käynnistä Seuraaja uudelleen
-Restart system	DeskbarMenu		Käynnistä järjestelmä uudelleen
-Show Time	Tray		Näytä aika
-Show all	WindowMenu		Näytä kaikki
-Show application expander	PreferencesWindow		Näytä sovelluslaajentaja
-Show calendar…	TimeView		Näytä kalenteri...
-Show replicants	DeskbarMenu		Näytä replikantit
-Show seconds	PreferencesWindow		Näytä sekunnit
-Shutdown…	DeskbarMenu		Sammuttaminen...
-Sort running applications	PreferencesWindow		Lajittele suoritettavat sovellukset
+Edit menu…	PreferencesWindow		Muokkaa valikkoa...
 Suspend	DeskbarMenu		Keskeytystila
-Tracker always first	PreferencesWindow		Seuraaja aina ensimmäisenä
+Applications	PreferencesWindow		Sovellukset
+About Haiku	DeskbarMenu		Haikusta...
+Recent documents:	PreferencesWindow		Äskettäiset asiakirjat:
+Recent applications	DeskbarMenu		Äskettäiset sovellukset
+Sort running applications	PreferencesWindow		Lajittele suoritettavat sovellukset
+Change time…	TimeView		Muuta aikaa...
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Sovellukset
+Find…	DeskbarMenu		Etsi...
 Window	PreferencesWindow		Ikkuna
+Menu	PreferencesWindow		Valikko
+Recent documents	DeskbarMenu		Äskettäiset asiakirjat
+Show seconds	PreferencesWindow		Näytä sekunnit
+Auto-hide	PreferencesWindow		Piilota automaattisesti
+Always on top	PreferencesWindow		Aina päällimmäisenä
+<Deskbar folder is empty>	DeskbarMenu		<Työpöytäpalkkikansio on tyhjä>
+Show all	WindowMenu		Näytä kaikki
+No windows	WindowMenu		Ei ikkunoita
+Deskbar	System name		Työpöytäpalkki
+Restart system	DeskbarMenu		Käynnistä järjestelmä uudelleen
+Auto-raise	PreferencesWindow		Nosta automaattisesti
+Hide time	TimeView		Piilota aika
+Recent folders:	PreferencesWindow		Äskettäiset kansiot:
+Show application expander	PreferencesWindow		Näytä sovelluslaajentaja
+Restart Tracker	DeskbarMenu		Käynnistä Seuraaja uudelleen
+Close all	WindowMenu		Sulje kaikki
+Deskbar preferences	PreferencesWindow		Työpöytäpalkin asetukset
+Mount	DeskbarMenu		Liitä
+Recent applications:	PreferencesWindow		Äskettäiset sovellukset:
+Shutdown…	DeskbarMenu		Sammuttaminen...
+Tracker always first	PreferencesWindow		Seuraaja aina ensimmäisenä
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Asetusohjelmat
+Recent folders	DeskbarMenu		Äskettäiset kansiot
+About this system	DeskbarMenu		Tästä järjestelmästä
+Show calendar…	TimeView		Näytä kalenteri...
+Deskbar preferences…	DeskbarMenu		Työpöytäpalkkiasetukset...
+Show Time	Tray		Näytä aika
+Expand new applications	PreferencesWindow		Laajenna uudet sovellukset
+Show replicants	DeskbarMenu		Näytä replikantit
+Clock	PreferencesWindow		Kello
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Esittelyohjelmat
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Työpöytäappletit
+Hide all	WindowMenu		Piilota kaikki
+Quit application	WindowMenu		Poistu sovelluksesta

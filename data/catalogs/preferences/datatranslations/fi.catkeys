@@ -1,18 +1,18 @@
 1	finnish	x-vnd.Haiku-DataTranslations	3820343452
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Kohde nimeltään ’%name’ on jo olemassa Translator-kansiossa! Pitäisikö olemassa oleva tietomuunnin korvata?
-Cancel	DataTranslations		Peru
-Could not install %s:\n%s	DataTranslations		Ei voitu asentaa %s:\n%s
 DataTranslations	System name		Tietomuunnosasetukset
-DataTranslations - Error	DataTranslations		Tietomuunnokset - Virhe
-DataTranslations - Note	DataTranslations		Tietomuunnokset - Ilmoitus
-Info	DataTranslations		tiedot
-Info:	DataTranslations		Tiedot:
+Cancel	DataTranslations		Peru
 Name:	DataTranslations		Nimi:
 Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Nimi: %s \nVersio: %ld.%ld.%ld\n\nTiedot:\n%s\n\nPolku:\n%s\n
-OK	DataTranslations		Valmis
-Overwrite	DataTranslations		Korvaa
-Path:	DataTranslations		Polku:
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Kohde ’%name’ ei näytä olevan tietomuunnin ja sitä ei asenneta.
-The new translator has been installed successfully.	DataTranslations		Uusi tietomuunnin on asennettu onnistuneesti.
+Could not install %s:\n%s	DataTranslations		Ei voitu asentaa %s:\n%s
 Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Käytä tätä ohjauspaneelia niiden oletusasetusten asettamiseksi, joita käytetään kun sovellus ei ole määritellyt muita asetuksia.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Kohde nimeltään ’%name’ on jo olemassa Translator-kansiossa! Pitäisikö olemassa oleva tietomuunnin korvata?
+DataTranslations - Note	DataTranslations		Tietomuunnokset - Ilmoitus
+Overwrite	DataTranslations		Korvaa
+Info:	DataTranslations		Tiedot:
+Info	DataTranslations		tiedot
+Path:	DataTranslations		Polku:
+The new translator has been installed successfully.	DataTranslations		Uusi tietomuunnin on asennettu onnistuneesti.
+DataTranslations - Error	DataTranslations		Tietomuunnokset - Virhe
+OK	DataTranslations		Valmis
 Version:	DataTranslations		Versio:

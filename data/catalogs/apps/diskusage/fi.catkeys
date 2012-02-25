@@ -1,24 +1,23 @@
-1	finnish	x-vnd.Haiku-DiskUsage	2324691237
-%a, %d %b %Y, %r	Info Window		%a, %d. %Bta %Y, %r
-%d file	Status View		%d tiedosto
-%d files	Status View		%d tiedostoa
-9999.99 GB	Status View		9999.99 gibitavua
-Created	Info Window		Luotu
-DiskUsage	System name		Levyasemakäyttö
-Free on %refName%	Scanner		Vapaata levyasemalla %refName%
-Get Info	Pie View		Hae tiedot
+1	finnish	x-vnd.Haiku-DiskUsage	3634416251
+Scanning %refName%	Scanner		Tutkitaan %refName%
+Size	Info Window		Koko
+Rescan	Pie View		Tutki uudelleen
+Rescan	Volume View		Tutki uudelleen
+Outdated view	Pie View		Vanhentunut näkymä
 Kind	Info Window		Tyyppi
+file unavailable	Pie View		tiedosto ei ole saatavilla
+no supporting apps	Pie View		ei tukevia sovelluksia
+%d file	Status View		%d tiedosto
+Path	Info Window		Polku
+Scan	Status View		Tutki
+9999.99 GB	Status View		9999.99 gibitavua
+file unavailable	Status View		tiedosto ei ole saatavilla
+Get Info	Pie View		Hae tiedot
+DiskUsage	System name		Levyasemakäyttö
+%d files	Status View		%d tiedostoa
+Created	Info Window		Luotu
 Modified	Info Window		Muokattu
 Open	Pie View		Avaa
 Open With	Pie View		Avaa sovelluksella
-Outdated view	Pie View		Vanhentunut näkymä
-Path	Info Window		Polku
-Rescan	Pie View		Tutki uudelleen
-Rescan	Volume View		Tutki uudelleen
-Scan	Status View		Tutki
-Scanning %refName%	Scanner		Tutkitaan %refName%
-Size	Info Window		Koko
-file unavailable	Pie View		tiedosto ei ole saatavilla
-file unavailable	Status View		tiedosto ei ole saatavilla
-in %d files	Info Window		%d tiedostossa
-no supporting apps	Pie View		ei tukevia sovelluksia
+%a, %d %b %Y, %r	Info Window		%a, %d. %Bta %Y, %r
+Free on %refName%	Scanner		Vapaata levyasemalla %refName%

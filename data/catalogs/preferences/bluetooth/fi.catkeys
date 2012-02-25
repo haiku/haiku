@@ -1,61 +1,60 @@
-1	finnish	x-vnd.Haiku-BluetoothPrefs	4055730587
-15 secs	Settings view		15 sekuntia
-61 secs	Settings view		61 sekuntia
+1	finnish	x-vnd.Haiku-BluetoothPrefs	2526531136
 About Bluetooth…	Window		Bluetooth-ohjelmasta…
-Add device to list	Inquiry panel		Lisää laite listalle
-Add…	Remote devices		Lisää…
-Always ask	Settings view		Kysy joka kerta
-As blocked	Remote devices		Estettynä
-Authenticate	Extended local device view		Todenna
-Bluetooth	System name		Bluetooth-asetukset
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Tarkista, että etälaitteen bluetoothominaisuudet on aktivoitu. Paina ’Kysely’ käynnistääksesi haun. Nimien noutoon tarvittavan ajan määrä ei ole tiedossa, mutta sen ei pitäisi viedä yli 3 sekuntia per laite. Myöhemmin voit lisätä ne päälistaasi, jossa pystyt yhdistämään ne.
-Connections & channels…	Window		Yhteys- ja kanavalista…
-Default inquiry time:	Settings view		Oletuskyselyn pituus:
-Defaults	Window		Oletusasetukset
-Desktop	Settings view		Työpöytäasetukset
-Disconnect	Remote devices		Katkaise yhteys
-Discoverable	Extended local device view		Paljastettava
-From all devices	Settings view		Kaikista laitteista
-Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetooth-järjestelmä, (ARCE)\n\nLuonut Oliver Ruiz Dorantes\n\nApuna ovat olleet:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nKiitos henkilöille, jotka auttoivat...\n\nLähettäen/lahjoittaen laitteistoa:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nTaloudellisesti:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nKorjauksilla:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTestaamalla:\n\t- Petter H. Juliussen\nJotka antoivat minulle kaiken tiedon:\n\t- the yellowTAB team
 Handheld	Settings view		Kädessäpidettävät
-Help	Window		Opaste
-Identify host as:	Settings view		Tunnista isäntä nimellä :
-Identify us as...	Settings view		Tunnista meidät nimellä...
-Incoming connections policy:	Settings view		Saapuvien yhteyksien sääntö :
-Inquiry	Inquiry panel		Tiedustelu
-Laptop	Settings view		Kannettava
-Local devices found on system:	Settings view		Järjestelmästä löydetyt paikalliset laitteet :
+Default inquiry time:	Settings view		Oletuskyselyn pituus:
 Manufacturer: 	Device View		Valmistaja:
-OK	main		Valmis
-Only from trusted devices	Settings view		Vain luotetuista laitteista
-Pair…	Remote devices		Parita…
-Pick LocalDevice...	Settings view		Valitse paikallinen laite...
-Policy...	Settings view		Sääntö...
-Quit	main		Poistu
-Refresh LocalDevices…	Window		Päivitä paikallisia laitteita…
+Add device to list	Inquiry panel		Lisää laite listalle
+Starting scan...	Inquiry panel		Aloitetaan etsintä...
+Show bluetooth console…	Window		Näytä bluetooth-pääteikkuna…
+Smart phone	Settings view		Älypuhelin
+Server	Settings view		Palvelin
+Stop bluetooth services…	Window		Pysäytä bluetoothpalvelut…
+Identify host as:	Settings view		Tunnista isäntä nimellä :
+View	Window		Näytä
 Refresh…	Remote devices		Päivitä…
+Pair…	Remote devices		Parita…
+Incoming connections policy:	Settings view		Saapuvien yhteyksien sääntö :
+From all devices	Settings view		Kaikista laitteista
+Show name	Extended local device view		Näytä nimi
+Local devices found on system:	Settings view		Järjestelmästä löydetyt paikalliset laitteet :
 Remaining %1 seconds	Inquiry panel		Jäljellä %1 sekuntia
-Remote devices	Window		Etälaitteet
+Server	Window		Palvelin
+Scanning completed.	Inquiry panel		Etsintä valmis.
+OK	main		Valmis
 Remote devices list…	Window		Etälaitelista…
 Remove	Remote devices		Poista
-Retrieving name of %1	Inquiry panel		Noudetaan %1-nimi
-Retrieving names...	Inquiry panel		Noudetaan nimiä...
-Revert	Window		Palauta
-Scanning completed.	Inquiry panel		Etsintä valmis.
-Scanning progress	Inquiry panel		Etsinnän edistyminen
-Server	Settings view		Palvelin
-Server	Window		Palvelin
-Service classes: 	Device View		Palveluluokat:
-Settings	Window		Asetukset
-Show bluetooth console…	Window		Näytä bluetooth-pääteikkuna…
-Show name	Extended local device view		Näytä nimi
-Smart phone	Settings view		Älypuhelin
-Start bluetooth services…	Window		Käynnistä bluetoothpalvelut…
+Quit	main		Poistu
+15 secs	Settings view		15 sekuntia
 Start please	main		Käynnistä
-Starting scan...	Inquiry panel		Aloitetaan etsintä...
-Stop bluetooth services…	Window		Pysäytä bluetoothpalvelut…
+Start bluetooth services…	Window		Käynnistä bluetoothpalvelut…
+Policy...	Settings view		Sääntö...
+61 secs	Settings view		61 sekuntia
+Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetooth-järjestelmä, (ARCE)\n\nLuonut Oliver Ruiz Dorantes\n\nApuna ovat olleet:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nKiitos henkilöille, jotka auttoivat...\n\nLähettäen/lahjoittaen laitteistoa:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nTaloudellisesti:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nKorjauksilla:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTestaamalla:\n\t- Petter H. Juliussen\nJotka antoivat minulle kaiken tiedon:\n\t- the yellowTAB team
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Paikallisia Bluetooth laitteita ei löydetty järjestelmästä
-View	Window		Näytä
+Identify us as...	Settings view		Tunnista meidät nimellä...
+As blocked	Remote devices		Estettynä
+Bluetooth	System name		Bluetooth-asetukset
+Disconnect	Remote devices		Katkaise yhteys
+Pick LocalDevice...	Settings view		Valitse paikallinen laite...
+Defaults	Window		Oletusasetukset
+Inquiry	Inquiry panel		Tiedustelu
+Desktop	Settings view		Työpöytäasetukset
+Revert	Window		Palauta
+Remote devices	Window		Etälaitteet
+Laptop	Settings view		Kannettava
+Discoverable	Extended local device view		Paljastettava
 Work offline	main		Erillistyöskentelyä
 bluetooth_server has not been found running on the system. Should be started, or stay offline	main		bluetooth_server-palvelin ei ollut käynnissä järjestelmässä. Se pitäisi käynnistää tai pysyä erillistyöskentelyssä
-packets: 	Device View		pakettia:
+Service classes: 	Device View		Palveluluokat:
+Connections & channels…	Window		Yhteys- ja kanavalista…
+Refresh LocalDevices…	Window		Päivitä paikallisia laitteita…
+Settings	Window		Asetukset
+Only from trusted devices	Settings view		Vain luotetuista laitteista
+Scanning progress	Inquiry panel		Etsinnän edistyminen
+Always ask	Settings view		Kysy joka kerta
+Retrieving name of %1	Inquiry panel		Noudetaan %1-nimi
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Tarkista, että etälaitteen bluetoothominaisuudet on aktivoitu. Paina ’Kysely’ käynnistääksesi haun. Nimien noutoon tarvittavan ajan määrä ei ole tiedossa, mutta sen ei pitäisi viedä yli 3 sekuntia per laite. Myöhemmin voit lisätä ne päälistaasi, jossa pystyt yhdistämään ne.
+Authenticate	Extended local device view		Todenna
+Retrieving names...	Inquiry panel		Noudetaan nimiä...
+Help	Window		Opaste
+Add…	Remote devices		Lisää…

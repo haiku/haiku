@@ -1,48 +1,43 @@
-1	finnish	x-vnd.Haiku-PowerStatus	2178654445
-About	PowerStatus		Ohjelmasta
-About…	PowerStatus		Ohjelmasta...
-Battery charging	PowerStatus		Akkulataus
-Battery discharging	PowerStatus		Akkulatauksen purkaminen
-Battery info	PowerStatus		Akkutiedot
-Battery info…	PowerStatus		Akkutiedot...
-Battery unused	PowerStatus		Akku käyttämätön
-Capacity granularity 1: 	PowerStatus		Kapasiteettirakeisuus 1:
-Capacity granularity 2: 	PowerStatus		Kapasiteettirakeisuus 2:
-Capacity: 	PowerStatus		Kapasiteetti:
-Current rate: 	PowerStatus		Virtamäärä:
-Damaged battery	PowerStatus		Vaurioitunut akku
+1	finnish	x-vnd.Haiku-PowerStatus	751886234
 Design capacity low warning: 	PowerStatus		Suunnittelukapasiteetti alhainen -varoitus
-Design capacity warning: 	PowerStatus		Suunnittelukapasiteettivaroitus:
-Design capacity: 	PowerStatus		Suunnittelukapasiteetti:
-Design voltage: 	PowerStatus		Suunnittelujännite:
-Empty battery slot	PowerStatus		Tyhjä akkulokero
-Extended battery info	PowerStatus		Laajennetut akkutiedot
-Install in Deskbar	PowerStatus		Asenna Työpöytäpalkkiin
-Last full charge: 	PowerStatus		Viimeinen täysi lataus:
-Model number: 	PowerStatus		Mallinumero:
-OEM info: 	PowerStatus		OEM-tiedot:
-OK	PowerStatus		Valmis
-Power status box	PowerStatus		Virtatilalaatikko
-PowerStatus	PowerStatus		Virtatila
-PowerStatus	System name		Virtatila
-PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		Virtatila\ntekijä: Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
-Quit	PowerStatus		Poistu
-Run in window	PowerStatus		Suorita ikkunassa
-Serial number: 	PowerStatus		Sarjanumero:
 Show percent	PowerStatus		Näytä prosenttiluku
-Show status icon	PowerStatus		Näytä tilakuvake
-Show text label	PowerStatus		Näytä tekstinimiö
-Show time	PowerStatus		Näytä aika
-Technology: 	PowerStatus		Teknologia:
+Design capacity: 	PowerStatus		Suunnittelukapasiteetti:
 Type: 	PowerStatus		Tyyppi:
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Voit suorittaa Virtatilan ikkunassa tai asentaa sen Työpöytäpalkkiin.
-charging	PowerStatus		ladataan
-discharging	PowerStatus		puretaan latausta
-mA	PowerStatus		mA
-mAh	PowerStatus		mAh
-mV	PowerStatus		mV
-mW	PowerStatus		mW
-mWh	PowerStatus		mWh
-no battery	PowerStatus		ei akkua
 non-rechargeable	PowerStatus		ei-uudelleenladattava
+Empty battery slot	PowerStatus		Tyhjä akkulokero
+Run in window	PowerStatus		Suorita ikkunassa
+About	PowerStatus		Ohjelmasta
+PowerStatus	System name		Virtatila
+PowerStatus	PowerStatus		Virtatila
+Battery info…	PowerStatus		Akkutiedot...
+Damaged battery	PowerStatus		Vaurioitunut akku
+Show time	PowerStatus		Näytä aika
+Last full charge: 	PowerStatus		Viimeinen täysi lataus:
+Battery unused	PowerStatus		Akku käyttämätön
+Extended battery info	PowerStatus		Laajennetut akkutiedot
+Current rate: 	PowerStatus		Virtamäärä:
+discharging	PowerStatus		puretaan latausta
+Show text label	PowerStatus		Näytä tekstinimiö
+About…	PowerStatus		Ohjelmasta...
+Model number: 	PowerStatus		Mallinumero:
+Install in Deskbar	PowerStatus		Asenna Työpöytäpalkkiin
+Capacity: 	PowerStatus		Kapasiteetti:
+Battery discharging	PowerStatus		Akkulatauksen purkaminen
+Serial number: 	PowerStatus		Sarjanumero:
+Capacity granularity 1: 	PowerStatus		Kapasiteettirakeisuus 1:
+OK	PowerStatus		Valmis
+OEM info: 	PowerStatus		OEM-tiedot:
+Design voltage: 	PowerStatus		Suunnittelujännite:
+PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		Virtatila\ntekijä: Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
+Battery charging	PowerStatus		Akkulataus
+Design capacity warning: 	PowerStatus		Suunnittelukapasiteettivaroitus:
+Battery info	PowerStatus		Akkutiedot
+Quit	PowerStatus		Poistu
 rechargeable	PowerStatus		uudelleenladattava
+charging	PowerStatus		ladataan
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Voit suorittaa Virtatilan ikkunassa tai asentaa sen Työpöytäpalkkiin.
+Power status box	PowerStatus		Virtatilalaatikko
+Show status icon	PowerStatus		Näytä tilakuvake
+Capacity granularity 2: 	PowerStatus		Kapasiteettirakeisuus 2:
+Technology: 	PowerStatus		Teknologia:
+no battery	PowerStatus		ei akkua

@@ -1,49 +1,48 @@
-1	finnish	x-vnd.Haiku-Expander	187676748
-Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Oletko varma, että haluat pysäyttää tämän arkiston\nlaajentamisen? Laajennetut alkiot eivät ehkä ole valmiita.
-Automatically expand files	ExpanderPreferences		Laajenna tiedostot automaattisesti
-Automatically show contents listing	ExpanderPreferences		Näytä sisältöluettelo automaattisesti
-Cancel	ExpanderPreferences		Peru
-Cancel	ExpanderWindow		Peru
-Close	ExpanderMenu		Sulje
-Close window when done expanding	ExpanderPreferences		Sulje ikkuna kun laajentaminen on tehty
-Continue	ExpanderWindow		Jatka
-Creating listing for '%s'	ExpanderWindow		Luodaan luettelo kohteelle ’%s’
-Destination	ExpanderWindow		Kohde
-Destination folder:	ExpanderPreferences		Kohdekansio:
-Error when expanding archive	ExpanderWindow		Virhe laajennettaessa arkistoa
+1	finnish	x-vnd.Haiku-Expander	1852295567
 Expand	ExpanderMenu		Laajenna
-Expand	ExpanderWindow		Laajenna
-Expander	System name		Laajentaja
-Expander settings	ExpanderPreferences		Laajentaja-asetukset
-Expander: Choose destination	DirectoryFilePanel		Laajentaja: Valitse kohde
+Close window when done expanding	ExpanderPreferences		Sulje ikkuna kun laajentaminen on tehty
+Set destination…	ExpanderMenu		Aseta kohde…
+Use:	ExpanderPreferences		Käyttö:
+File expanded	ExpanderWindow		Tiedosto laajennettu
+The destination is read only.	ExpanderWindow		Kohde on kirjoitussuojattu.
 Expander: Open	ExpanderWindow		Laajentaja: Avaa
+Expander settings	ExpanderPreferences		Laajentaja-asetukset
+Select current	DirectoryFilePanel		Valitse nykyinen
+Source	ExpanderWindow		Lähde
+Error when expanding archive	ExpanderWindow		Virhe laajennettaessa arkistoa
+Hide contents	ExpanderWindow		Piilota sisällöt
+Cancel	ExpanderWindow		Peru
+Automatically expand files	ExpanderPreferences		Laajenna tiedostot automaattisesti
+Creating listing for '%s'	ExpanderWindow		Luodaan luettelo kohteelle ’%s’
+Continue	ExpanderWindow		Jatka
+The destination folder does not exist.	ExpanderWindow		Kohdekansiota ei ole olemassa.
+Cancel	ExpanderPreferences		Peru
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Oletko varma, että haluat pysäyttää tämän arkiston\nlaajentamisen? Laajennetut alkiot eivät ehkä ole valmiita.
+Select	DirectoryFilePanel		Valitse
+Destination folder:	ExpanderPreferences		Kohdekansio:
+Same directory as source (archive) file	ExpanderPreferences		Sama hakemisto lähde(arkisto)tiedostona
 Expanding '%s'	ExpanderWindow		Laajennetaan ’%s’
 Expansion:	ExpanderPreferences		Laajentaminen:
-File	ExpanderMenu		Tiedosto
-File expanded	ExpanderWindow		Tiedosto laajennettu
-Hide contents	ExpanderWindow		Piilota sisällöt
-Leave destination folder path empty	ExpanderPreferences		Jätä kohdekansiopolku tyhjäksi
-OK	ExpanderPreferences		Valmis
-Open destination folder after extraction	ExpanderPreferences		Avaa kohdekansio purkamisen jälkeen
-Other:	ExpanderPreferences		Muut:
-Same directory as source (archive) file	ExpanderPreferences		Sama hakemisto lähde(arkisto)tiedostona
-Select	DirectoryFilePanel		Valitse
-Select	ExpanderPreferences		Valitse
-Select '%s'	DirectoryFilePanel		Valitse ’%s’
-Select current	DirectoryFilePanel		Valitse nykyinen
-Set destination…	ExpanderMenu		Aseta kohde…
-Set source…	ExpanderMenu		Aseta lähde…
 Settings	ExpanderMenu		Asetukset
 Settings…	ExpanderMenu		Asetukset…
-Show contents	ExpanderMenu		Näytä sisällöt
+Expander: Choose destination	DirectoryFilePanel		Laajentaja: Valitse kohde
+Select	ExpanderPreferences		Valitse
 Show contents	ExpanderWindow		Näytä sisällöt
-Source	ExpanderWindow		Lähde
-Stop	ExpanderMenu		Pysäytä
-Stop	ExpanderWindow		Pysäytä
-The destination folder does not exist.	ExpanderWindow		Kohdekansiota ei ole olemassa.
-The destination is not a folder.	ExpanderWindow		Kohde ei ole kansio.
-The destination is read only.	ExpanderWindow		Kohde on kirjoitussuojattu.
-The file doesn't exist	ExpanderWindow		Tiedostoa ei ole olemassa
+Automatically show contents listing	ExpanderPreferences		Näytä sisältöluettelo automaattisesti
+OK	ExpanderPreferences		Valmis
+Leave destination folder path empty	ExpanderPreferences		Jätä kohdekansiopolku tyhjäksi
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Kansio on joko siirretty, nimetty uudelleen tai sitä\nei tueta.
-Use:	ExpanderPreferences		Käyttö:
-is not supported	ExpanderWindow		ei ole tuettu
+The file doesn't exist	ExpanderWindow		Tiedostoa ei ole olemassa
+Stop	ExpanderMenu		Pysäytä
+File	ExpanderMenu		Tiedosto
+Other:	ExpanderPreferences		Muut:
+Expander	System name		Laajentaja
+Expand	ExpanderWindow		Laajenna
+Close	ExpanderMenu		Sulje
+The destination is not a folder.	ExpanderWindow		Kohde ei ole kansio.
+Open destination folder after extraction	ExpanderPreferences		Avaa kohdekansio purkamisen jälkeen
+Set source…	ExpanderMenu		Aseta lähde…
+Select '%s'	DirectoryFilePanel		Valitse ’%s’
+Show contents	ExpanderMenu		Näytä sisällöt
+Stop	ExpanderWindow		Pysäytä
+Destination	ExpanderWindow		Kohde

@@ -1,9 +1,9 @@
 1	finnish	x-vnd.Haiku-RAWTranslator	1938728039
-%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	%s RAW-kuva
-Based on Dave Coffin's dcraw 8.63	ConfigView		Perustuu Dave Coffinin ohjelmaan dcraw 8.63
-RAW Images	ConfigView		RAW-kuvat
-RAW Settings	RAWTranslator main		RAW-asetukset
-RAW image translator	RAWTranslator		RAW-kuvamuunnin
-RAW images	RAWTranslator		RAW-kuvat
 RAWTranslator Settings	ConfigView		RAW-muunninasetukset
 Version %d.%d.%d, %s	ConfigView		Versio %d.%d.%d, %s
+RAW Images	ConfigView		RAW-kuvat
+RAW image translator	RAWTranslator		RAW-kuvamuunnin
+RAW Settings	RAWTranslator main		RAW-asetukset
+RAW images	RAWTranslator		RAW-kuvat
+%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	%s RAW-kuva
+Based on Dave Coffin's dcraw 8.63	ConfigView		Perustuu Dave Coffinin ohjelmaan dcraw 8.63

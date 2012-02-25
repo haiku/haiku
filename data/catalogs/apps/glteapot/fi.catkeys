@@ -1,24 +1,24 @@
 1	finnish	x-vnd.Haiku-GLTeapot	2890609668
-Add a teapot	TeapotWindow		Lisää teekannu
-Backface culling	TeapotWindow		Taustakulman häivytys
-Blue	TeapotWindow		Sininen
-FPS display	TeapotWindow		FPS-näyttö
-File	TeapotWindow		Tiedosto
-Filled polygons	TeapotWindow		Täytetyt monikulmiot
-Fog	TeapotWindow		Sumu
-GLTeapot	System name		GL-teekannu
-Gouraud shading	TeapotWindow		Gouraud-varjostus
-Green	TeapotWindow		Vihreä
-Lighting	TeapotWindow		Valaistus
-Lights	TeapotWindow		Valot
-Lower left	TeapotWindow		Alempi vasen
-Off	TeapotWindow		Valot pois
-Options	TeapotWindow		Valitsimet
-Perspective	TeapotWindow		Perspektiivi
-Quit	TeapotWindow		Poistu
-Red	TeapotWindow		Punainen
-Right	TeapotWindow		Oikea
 Upper center	TeapotWindow		Ylempi keskikohta
+Lighting	TeapotWindow		Valaistus
+Off	TeapotWindow		Valot pois
+Lower left	TeapotWindow		Alempi vasen
 White	TeapotWindow		Valkoinen
 Yellow	TeapotWindow		Keltainen
+Blue	TeapotWindow		Sininen
+Gouraud shading	TeapotWindow		Gouraud-varjostus
+Quit	TeapotWindow		Poistu
+Filled polygons	TeapotWindow		Täytetyt monikulmiot
+Fog	TeapotWindow		Sumu
+Backface culling	TeapotWindow		Taustakulman häivytys
 Z-buffered	TeapotWindow		Z-puskuroitu
+File	TeapotWindow		Tiedosto
+Options	TeapotWindow		Valitsimet
+Perspective	TeapotWindow		Perspektiivi
+GLTeapot	System name		GL-teekannu
+Green	TeapotWindow		Vihreä
+Right	TeapotWindow		Oikea
+FPS display	TeapotWindow		FPS-näyttö
+Add a teapot	TeapotWindow		Lisää teekannu
+Red	TeapotWindow		Punainen
+Lights	TeapotWindow		Valot

@@ -1,80 +1,80 @@
 1	finnish	x-vnd.Haiku-StyledEdit	1508367857
+StyledEdit	System name		Tyylitetty editori
+Paste	Menus		Liitä
+OK	LoadAlert		Valmis
+File	Menus		Tiedosto
 ???	LoadAlert		???
-Align	Menus		Tasaa
-Black	Menus		Musta
-Blue	Menus		Sininen
-Bold	Menus		Lihavointi
+Lines:	Statistics		Rivejä:
+Italic	Menus		Kursivointi
+Left	Menus		Vasen
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Palauta viimeinen ”%s”-versio? 
+Search backwards	FindandReplaceWindow		Etsi taaksepäin
+Size	Menus		Koko
+Save	QuitAlert		Tallenna
+Page setup…	Menus		Sivuasetus...
+Print…	Menus		Tulosta...
 Can't undo	Menus		Ei voi perua
-Cancel	FindandReplaceWindow		Peru
-Cancel	QuitAlert		Peru
-Cancel	RevertToSavedAlert		Peru
+Save	Menus		Tallenna
+Replace with:	FindandReplaceWindow		Korvaa sisällöllä:
 Cancel	SaveAlert		Peru
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Ei voi palauttaa, tiedostoa ei löytynyt: ”%s”.
 Case-sensitive	FindandReplaceWindow		Kirjainkoosta riippuva
-Center	Menus		Keskitä
-Characters:	Statistics		Merkkejä:
-Close	Menus		Sulje
-Color	Menus		Väri
-Copy	Menus		Kopioi
-Cut	Menus		Leikkaa
-Cyan	Menus		Turkoosi
-Default	Open_and_SaveAsPanel		Oletus
-Document	Menus		Asiakirja
-Document statistics	Statistics		Asiakirjan tilastot
-Don't save	QuitAlert		Älä tallenna
-Don't save	SaveAlert		Älä tallenna
-Edit	Menus		Muokkaa
-Encoding	Open_and_SaveAsPanel		Koodaus
-Error loading \"%s\":\n\t%s	LoadAlert		Virhe ladattaessa ”%s”:\n\t%s
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Virhe ladattaessa ”%s”:\n\tTukematon muoto
-Error saving \"%s\":\n%s	SaveAlert		Virhe tallennettaessa ”%s”:\n%s
-File	Menus		Tiedosto
-Find	FindandReplaceWindow		Haku
-Find again	Menus		Hae uudelleen
-Find selection	Menus		Hakuvalinta
-Find:	FindandReplaceWindow		Haku:
-Find…	Menus		Hae…
-Font	Menus		Kirjasin
 Green	Menus		Vihreä
-Italic	Menus		Kursivointi
-Left	Menus		Vasen
-Lines:	Statistics		Rivejä:
+Revert to saved…	Menus		Palauta tallennettuun…
+Yellow	Menus		Keltainen
+Replace in all windows	FindandReplaceWindow		Korvaa kaikissa ikkunoissa
+Wrap lines	Menus		Rivitä
+Quit	Menus		Poistu
+Document statistics	Statistics		Asiakirjan tilastot
+Cancel	RevertToSavedAlert		Peru
+Document	Menus		Asiakirja
+Save changes to the document \"%s\"? 	QuitAlert		Tallenna muutokset asiakirjaan ”%s”? 
+Edit	Menus		Muokkaa
+Font	Menus		Kirjasin
+Replace all	FindandReplaceWindow		Korvaa kaikki
+Statistics…	Menus		Tilastot...
+Default	Open_and_SaveAsPanel		Oletus
+Replace next	Menus		Korvaa seuraava
+Cancel	FindandReplaceWindow		Peru
+Close	Menus		Sulje
+Save	SaveAlert		Tallenna
+Words:	Statistics		Sanoja:
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Virhe ladattaessa ”%s”:\n\tTukematon muoto
+OK	RevertToSavedAlert		Valmis
+Don't save	QuitAlert		Älä tallenna
+Align	Menus		Tasaa
+Color	Menus		Väri
+Red	Menus		Punainen
+Open…	Menus		Avaa…
+Center	Menus		Keskitä
+Blue	Menus		Sininen
+Cyan	Menus		Turkoosi
+OK	Statistics		Valmis
 Magenta	Menus		Punasininen
 New	Menus		Uusi
-OK	LoadAlert		Valmis
-OK	RevertToSavedAlert		Valmis
-OK	SaveAlert		Valmis
-OK	Statistics		Valmis
-Open…	Menus		Avaa…
-Page setup…	Menus		Sivuasetus...
-Paste	Menus		Liitä
-Print…	Menus		Tulosta...
-Quit	Menus		Poistu
-Red	Menus		Punainen
-Redo typing	QuitAlert		Toista kirjoitus
-Replace	FindandReplaceWindow		Korvaa
-Replace all	FindandReplaceWindow		Korvaa kaikki
-Replace in all windows	FindandReplaceWindow		Korvaa kaikissa ikkunoissa
-Replace next	Menus		Korvaa seuraava
-Replace with:	FindandReplaceWindow		Korvaa sisällöllä:
-Replace…	Menus		Korvaa…
-Revert to saved…	Menus		Palauta tallennettuun…
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Palauta viimeinen ”%s”-versio? 
-Right	Menus		Oikea
-Save	Menus		Tallenna
-Save	QuitAlert		Tallenna
-Save	SaveAlert		Tallenna
-Save as…	Menus		Tallenna nimellä...
-Save changes to the document \"%s\"? 	QuitAlert		Tallenna muutokset asiakirjaan ”%s”? 
-Search backwards	FindandReplaceWindow		Etsi taaksepäin
-Select all	Menus		Valitse kaikki
-Size	Menus		Koko
-Statistics…	Menus		Tilastot...
-StyledEdit	System name		Tyylitetty editori
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Tämä tiedosto on merkitty kirjoitussuojatuksi. Tallennetaanko muutokset asiakirjaan ”%s”? 
-Undo typing	QuitAlert		Peru kirjoitus
-Untitled 	StyledEditWindow		Otsikoton 
-Words:	Statistics		Sanoja:
-Wrap lines	Menus		Rivitä
 Wrap-around search	FindandReplaceWindow		Kierrätä haku alkuun
-Yellow	Menus		Keltainen
+Bold	Menus		Lihavointi
+Find selection	Menus		Hakuvalinta
+Find:	FindandReplaceWindow		Haku:
+Error saving \"%s\":\n%s	SaveAlert		Virhe tallennettaessa ”%s”:\n%s
+Copy	Menus		Kopioi
+Cut	Menus		Leikkaa
+Replace	FindandReplaceWindow		Korvaa
+Find again	Menus		Hae uudelleen
+Cancel	QuitAlert		Peru
+Find…	Menus		Hae…
+Select all	Menus		Valitse kaikki
+Don't save	SaveAlert		Älä tallenna
+Error loading \"%s\":\n\t%s	LoadAlert		Virhe ladattaessa ”%s”:\n\t%s
+Undo typing	QuitAlert		Peru kirjoitus
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Tämä tiedosto on merkitty kirjoitussuojatuksi. Tallennetaanko muutokset asiakirjaan ”%s”? 
+Black	Menus		Musta
+Untitled 	StyledEditWindow		Otsikoton 
+OK	SaveAlert		Valmis
+Find	FindandReplaceWindow		Haku
+Encoding	Open_and_SaveAsPanel		Koodaus
+Characters:	Statistics		Merkkejä:
+Save as…	Menus		Tallenna nimellä...
+Redo typing	QuitAlert		Toista kirjoitus
+Replace…	Menus		Korvaa…
+Right	Menus		Oikea

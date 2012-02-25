@@ -1,9 +1,9 @@
 1	finnish	x-vnd.Haiku-WonderBrushTranslator	491575314
-Version %d.%d.%d %s	WonderBrushView		Versio %d.%d.%d %s
-WBI Settings	WonderBrushMain		WBI-asetukset
-WBI Settings	WonderBrushTranslator		WBI-asetukset
-WonderBrush image	WonderBrushTranslator		WonderBrush-kuva
 WonderBrush image translator	WonderBrushTranslator		WonderBush-kuvamuunnin
-WonderBrush image translator	WonderBrushView		WonderBrush-kuvamuunnin
+WBI Settings	WonderBrushTranslator		WBI-asetukset
+WBI Settings	WonderBrushMain		WBI-asetukset
+Version %d.%d.%d %s	WonderBrushView		Versio %d.%d.%d %s
 WonderBrush images	WonderBrushTranslator		WonderBrush-kuvat
+WonderBrush image	WonderBrushTranslator		WonderBrush-kuva
+WonderBrush image translator	WonderBrushView		WonderBrush-kuvamuunnin
 written by:	WonderBrushView		tekijä:

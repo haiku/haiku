@@ -1,14 +1,14 @@
 1	finnish	x-vnd.Haiku-desklink	3053930521
-%g dB	MediaReplicant		%g dB
-%ld dB	VolumeControl		%ld dB
-Beep	MediaReplicant		Piip
 Control physical output	MediaReplicant		Ohjaa fyysistä tulostetta
 Couldn't launch 	MediaReplicant		Ei voitu käynnistää
-Media preferences…	MediaReplicant		Media-asetukset...
-No media server running	VolumeControl		Mediapalvelin ei ole käynnissä
 OK	MediaReplicant		Valmis
-Open MediaPlayer	MediaReplicant		Avaa mediasoitin
-Options	MediaReplicant		Valitsimet
 Sound preferences…	MediaReplicant		Ääniasetukset...
-Volume	VolumeControl		Äänenvoimakkuus
+%g dB	MediaReplicant		%g dB
+No media server running	VolumeControl		Mediapalvelin ei ole käynnissä
+Media preferences…	MediaReplicant		Media-asetukset...
+Open MediaPlayer	MediaReplicant		Avaa mediasoitin
 desklink	MediaReplicant		työpöytälinkki
+Options	MediaReplicant		Valitsimet
+%ld dB	VolumeControl		%ld dB
+Beep	MediaReplicant		Piip
+Volume	VolumeControl		Äänenvoimakkuus

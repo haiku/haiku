@@ -1,44 +1,44 @@
 1	finnish	x-vnd.Haiku-Time	3493650184
-<Other>	Time		<Muut>
-Add	Time		Lisää
-Africa	Time		Afrikka
-America	Time		Amerikka
-Antarctica	Time		Etelänapamanner
-Arctic	Time		Pohjoinen napaseutu
-Asia	Time		Aasia
-Atlantic	Time		Atlantin valtameri
-Australia	Time		Australia
-Could not contact server	Time		Ei voitu ottaa yhteyttä palvelimeen
-Could not create socket	Time		Ei voitu luoda pistoketta
-Current time:	Time		Nykyinen aika:
-Date and time	Time		Päivämäärä ja aika
-Europe	Time		Eurooppa
 GMT (UNIX compatible)	Time		Greenwichin aika (UNIX-yhteensopiva)
-Hardware clock set to:	Time		Laitteistokellon ajaksi asetettu:
-Indian	Time		Intia
+OK	Time		Valmis
+Asia	Time		Aasia
+\nNow: 	Time		\nNyt:
+Africa	Time		Afrikka
+Stop	Time		Pysäytä
+Could not contact server	Time		Ei voitu ottaa yhteyttä palvelimeen
+Australia	Time		Australia
+Preview time:	Time		Esikatseluaika:
+Synchronize	Time		Synkronoi
+Revert	Time		Palauta
+Pacific	Time		Tyyni valtameri
+Add	Time		Lisää
+Date and time	Time		Päivämäärä ja aika
+about	Time		Ohjelmasta
 Local time (Windows compatible)	Time		Paikallinen aika (Windows-yhteensopiva)
 Message receiving failed	Time		Viestin vastaanotto epäonnistui
-Network time	Time		Verkkoaika
-OK	Time		Valmis
-Pacific	Time		Tyyni valtameri
-Preview time:	Time		Esikatseluaika:
-Received invalid time	Time		Vastaanotettiin virheellinen aika
-Remove	Time		Poista
-Reset	Time		Nollaa
-Revert	Time		Palauta
-Sending request failed	Time		Pyynnön lähettäminen epäonnistui
 Set time zone	Time		Aseta aikavyöhyke
-Stop	Time		Pysäytä
-Synchronize	Time		Synkronoi
-Synchronize again	Time		Synkronoi uudelleen
-Synchronize at boot	Time		Synkronoi alkulatauksen yhteydessä
-The following error occured while synchronizing:r\n%s	Time		Seuraava virhe tapahtui synkronoinnin aikana:r\n%s
-The following error occured while synchronizing:r\n%s: %s	Time		Seuraava virhe tapahtui synkronoinnin aikana:r\n%s: %s
-Time	System name		Aika-asetukset
-Time	Time		Aika
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Päivämäärä & Aika, tekijät:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
-Time zone	Time		Aikavyöhyke
-Try all servers	Time		Yritä kaikkia palvelimia
 Waiting for answer failed	Time		Vastauksen odottaminen epäonnistui
-\nNow: 	Time		\nNyt:
-about	Time		Ohjelmasta
+Hardware clock set to:	Time		Laitteistokellon ajaksi asetettu:
+The following error occured while synchronizing:r\n%s	Time		Seuraava virhe tapahtui synkronoinnin aikana:r\n%s
+Europe	Time		Eurooppa
+Remove	Time		Poista
+Time	Time		Aika
+Indian	Time		Intia
+Sending request failed	Time		Pyynnön lähettäminen epäonnistui
+Arctic	Time		Pohjoinen napaseutu
+Time	System name		Aika-asetukset
+America	Time		Amerikka
+Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Päivämäärä & Aika, tekijät:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
+Reset	Time		Nollaa
+Synchronize at boot	Time		Synkronoi alkulatauksen yhteydessä
+Received invalid time	Time		Vastaanotettiin virheellinen aika
+Antarctica	Time		Etelänapamanner
+The following error occured while synchronizing:r\n%s: %s	Time		Seuraava virhe tapahtui synkronoinnin aikana:r\n%s: %s
+<Other>	Time		<Muut>
+Current time:	Time		Nykyinen aika:
+Try all servers	Time		Yritä kaikkia palvelimia
+Time zone	Time		Aikavyöhyke
+Could not create socket	Time		Ei voitu luoda pistoketta
+Synchronize again	Time		Synkronoi uudelleen
+Network time	Time		Verkkoaika
+Atlantic	Time		Atlantin valtameri

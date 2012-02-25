@@ -1,8 +1,8 @@
-1	finnish	application/x-vnd.Haiku-BFSAddOn	1074880496
-1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (Enimmäkseen pienet tiedostot)
+1	finnish	x-vnd.Haiku-BFSAddOn	1074880496
+Enable query support	BFS_Initialize_Parameter		Ota käyttöön kyselytuki
 2048 (Recommended)	BFS_Initialize_Parameter		2048 (Suositeltu)
 8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (Enimmäkseen laajat tiedostot)
-Blocksize:	BFS_Initialize_Parameter		Lohkokoko:
 Disabling query support may speed up certain file system operations, but should only be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		Kyselytuen ottaminen pois käytöstä nopeuttaa tiettyjä tiedostojärjestelmätoimia, mutta sitä pitäisi käyttää ainoastaan, jos ollaan ehdottoman varmoja, että kukaan ei tarvitse kyselyjä.\nKaikissa Haikun alkulataustaltioissa on oltava kysely käytössä.
-Enable query support	BFS_Initialize_Parameter		Ota käyttöön kyselytuki
+1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (Enimmäkseen pienet tiedostot)
+Blocksize:	BFS_Initialize_Parameter		Lohkokoko:
 Name:	BFS_Initialize_Parameter		Nimi:

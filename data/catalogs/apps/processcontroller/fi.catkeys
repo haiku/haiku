@@ -1,48 +1,48 @@
 1	finnish	x-vnd.Haiku-ProcessController	2887520383
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		© 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
-About ProcessController…	ProcessController		Ohjelmasta Prosessiohjain...
-Cancel	ProcessController		Peru
-Custom priority	ProcessController		Räätälöity prioriteetti
-Damned!	ProcessController		Kirottua!
-Debug this thread!	ProcessController		Vikajäljitä tätä säiettä!
-Debug thread	ProcessController		Vikajäljitä säiettä
-Display priority	ProcessController		Näyttöprioriteetti
-Do you really want to kill the team \"%s\"?	ProcessController		Haluatko todella tappaa ryhmän ”%s”?
-Error saving file	ProcessController		Virhe tallennettaessa tiedostoa
-Gone teams…	ProcessController		Poistuneet ryhmät...
-Idle priority	ProcessController		Joutokäyntiprioriteetti
-Info	ProcessController		Tiedot
-Install in Deskbar	ProcessController		Asenna Työpöytäpalkissa
-Kill this thread!	ProcessController		Tapa tämä säie!
-Live in the Deskbar	ProcessController		Suora lähetys Työpöytäpalkista
-Low priority	ProcessController		Alhainen prioriteetti
-Lowest active priority	ProcessController		Alhaisin aktiivinen prioriteetti
 Memory usage	ProcessController		Muistikäyttö
-New Terminal	ProcessController		Uusi pääteikkuna
-Normal priority	ProcessController		Normaaliprioriteetti
-OK	ProcessController		Valmis
-Ok!	ProcessController		Valmis!
-Please confirm	ProcessController		Vahvista
-ProcessController	System name		Prosessiohjain
-ProcessController is already installed in Deskbar.	ProcessController		Prosessiohjain on jo asennettu Työpöytäpalkkiin.
-Processor %d	ProcessController		Prosessori %d
-Quit an application	ProcessController		Poistu sovelluksesta
-Quit application	ProcessController		Poistu sovelluksesta
-Real-time display priority	ProcessController		Ajantasanäyttöprioriteetti
-Real-time priority	ProcessController		Ajantasaprioriteetti
+Do you really want to kill the team \"%s\"?	ProcessController		Haluatko todella tappaa ryhmän ”%s”?
+Idle priority	ProcessController		Joutokäyntiprioriteetti
 Restart Deskbar	ProcessController		Käynnistä Työpöytäpalkki uudelleen
-Restart Tracker	ProcessController		Käynnistä Seuraaja uudelleen
-Run in window	ProcessController		Suorita ikkunassa
-System resources & caches…	ProcessController		Järjestelmäresurssit ja välimuistit…
-That's no Fun!	ProcessController		Se ei ole hauskaa!
-This is the last active processor...\nYou can't turn it off!	ProcessController		Tämä on viimeinen toimiva prosessori...\nEt voi kääntää sitä pois päältä!
+Custom priority	ProcessController		Räätälöity prioriteetti
+Debug thread	ProcessController		Vikajäljitä säiettä
 This team is already gone…	ProcessController		Tämä ryhmä on jo poistunut...
+Error saving file	ProcessController		Virhe tallennettaessa tiedostoa
+Real-time priority	ProcessController		Ajantasaprioriteetti
+Your setting file could not be saved!\n(%s)	ProcessController		Asetustiedostoasi ei voitu tallentaa!\n(%s)
 This thread is already gone…	ProcessController		Tämä säie on jo poistunut...
+Cancel	ProcessController		Peru
+Display priority	ProcessController		Näyttöprioriteetti
+Run in window	ProcessController		Suorita ikkunassa
+Processor %d	ProcessController		Prosessori %d
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		© 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+ProcessController is already installed in Deskbar.	ProcessController		Prosessiohjain on jo asennettu Työpöytäpalkkiin.
+This is the last active processor...\nYou can't turn it off!	ProcessController		Tämä on viimeinen toimiva prosessori...\nEt voi kääntää sitä pois päältä!
+Info	ProcessController		Tiedot
+Quit application	ProcessController		Poistu sovelluksesta
+Low priority	ProcessController		Alhainen prioriteetti
+What do you want to do with the thread \"%s\"?	ProcessController		Mitä haluat tehdä säikeelle ”%s”?
+Gone teams…	ProcessController		Poistuneet ryhmät...
+Lowest active priority	ProcessController		Alhaisin aktiivinen prioriteetti
+Restart Tracker	ProcessController		Käynnistä Seuraaja uudelleen
+Live in the Deskbar	ProcessController		Suora lähetys Työpöytäpalkista
+Kill this thread!	ProcessController		Tapa tämä säie!
+Debug this thread!	ProcessController		Vikajäljitä tätä säiettä!
+Normal priority	ProcessController		Normaaliprioriteetti
+New Terminal	ProcessController		Uusi pääteikkuna
+Urgent priority	ProcessController		Kiireellinen prioriteetti
+About ProcessController…	ProcessController		Ohjelmasta Prosessiohjain...
+Ok!	ProcessController		Valmis!
+Quit an application	ProcessController		Poistu sovelluksesta
+Install in Deskbar	ProcessController		Asenna Työpöytäpalkissa
 Threads and CPU usage	ProcessController		Säikeet ja prosessorikäyttö
 Urgent display priority	ProcessController		Kiireellinen näyttöprioriteetti
-Urgent priority	ProcessController		Kiireellinen prioriteetti
+OK	ProcessController		Valmis
+Damned!	ProcessController		Kirottua!
 Usage: %s [-deskbar]\n	ProcessController		Käyttö: %s [-deskbar]\n
-What do you want to do with the thread \"%s\"?	ProcessController		Mitä haluat tehdä säikeelle ”%s”?
+ProcessController	System name		Prosessiohjain
+Real-time display priority	ProcessController		Ajantasanäyttöprioriteetti
+Please confirm	ProcessController		Vahvista
 Yes, kill this team!	ProcessController		Kyllä, tapa tämä ryhmä!
+System resources & caches…	ProcessController		Järjestelmäresurssit ja välimuistit…
+That's no Fun!	ProcessController		Se ei ole hauskaa!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Voit suorittaa Prosessiohjaimen ikkunassa tai asentaa sen Työpöytäpalkkiin.
-Your setting file could not be saved!\n(%s)	ProcessController		Asetustiedostoasi ei voitu tallentaa!\n(%s)

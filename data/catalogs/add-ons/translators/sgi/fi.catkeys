@@ -1,13 +1,13 @@
 1	finnish	x-vnd.Haiku-SGITranslator	2222378389
-None	SGIView		Ei mikään
-RLE	SGIView		RLE
-SGI Settings	SGIMain		SGI-asetukset
-SGI image	SGITranslator		SGI-kuva
-SGI image translator	SGITranslator		SGI-kuvamuunnin
-SGI image translator	SGIView		SGI-kuvamuunnin
-SGI images	SGITranslator		SGI-kuvat
-SGITranslator Settings	SGITranslator		SGI-muunninasetukset
 Use compression:	SGIView		Käytä tiivistystä:
 Version %d.%d.%d %s	SGIView		Versio %d.%d.%d %s
+SGITranslator Settings	SGITranslator		SGI-muunninasetukset
+None	SGIView		Ei mikään
+SGI images	SGITranslator		SGI-kuvat
+SGI image translator	SGITranslator		SGI-kuvamuunnin
+SGI image	SGITranslator		SGI-kuva
+RLE	SGIView		RLE
+SGI Settings	SGIMain		SGI-asetukset
 \n\nbased on GIMP SGI plugin v1.5:\n	SGIView		\n\nperustuu GIMP SGI -liitännäiseen v1.5:\n
 written by:\n	SGIView		tekijä:\n
+SGI image translator	SGIView		SGI-kuvamuunnin

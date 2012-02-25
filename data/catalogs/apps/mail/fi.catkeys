@@ -1,162 +1,32 @@
-1	finnish	x-vnd.Be-MAIL	35886147
+1	finnish	x-vnd.Be-MAIL	2668114830
+View	Mail		Näkymä
 %d - Date	Mail		%d - Päivämäärä
-%e - E-mail address	Mail		%e - Sähköpostiosoite
-%e wrote:\\n	Mail		%e kirjoitti:\\n
-%n - Full name	Mail		%n - Koko nimi
-(Address unavailable)	Mail		(Ei osoitetta)
-(Date unavailable)	Mail		(Ei päivämäärää)
-(Name unavailable)	Mail		(Ei nimeä)
-<none>	Mail		<ei mitään>
-Account from mail	Mail		Tili sähköpostiviestistä
-Account:	Mail		Tili:
-Accounts…	Mail		Tilit…
-Add	Mail		Lisää
-Add enclosure…	Mail		Lisää liite…
-Add signature	Mail		Lisää allekirjoitus
-An error occurred trying to open this signature.	Mail		Tapahtui virhe yritettäessä avata tätä allekirjoitusta.
-An error occurred trying to save the attachment.	Mail		Tapahtui virhe yritettäessä tallentaa liitettä.
-An error occurred trying to save this signature.	Mail		Tapahtui virhe yritettäessä tallentaa tämä allekirjoitus.
 Attach attributes:	Mail		Liittämisattribuutit:
-Attachments:	Mail		Liitteet: 
-Auto signature:	Mail		Automaattinen allekirjoitus:
+Inconsistency occurred in the undo/redo buffer.	Mail		Tapahtui epäjohdonmukaisuutta puskurin perumisen/uudelleentekemisen yhteydessä.
+An error occurred trying to save the attachment.	Mail		Tapahtui virhe yritettäessä tallentaa liitettä.
+Copy to new	Mail		Kopioi uuteen
+Edit	Mail		Muokkaa
+Print	Mail		Tulosta
+<none>	Mail		<ei mitään>
+New mail message	Mail		Uusi sähköpostiviesti
 Automatic	Mail		Automaattinen
 Automatically mark mail as read:	Mail		Merkitse sähköpostiviesti automaattisesti luetuksi:
-Bcc:	Mail		Piilokopio:
-Beginner	Mail		Aloittelija
-Button bar:	Mail		Painikepalkki:
-Cancel	Mail		Peru
-Cc:	Mail		Kopio:
-Check spelling	Mail		Oikolue
-Close	Mail		Sulje
-Close and 	Mail		Sulje ja 
-Colored quotes:	Mail		Väritetyt lainaukset:
-Copy	Mail		Kopioi
-Copy link location	Mail		Kopioi linkkisijainti
-Copy to new	Mail		Kopioi uuteen
-Couldn't open this signature. Sorry.	Mail		Ei voitu avata tätä allekirjoitusta.
-Cut	Mail		Leikkaa
-Date:	Mail		Päivämäärä:
-Decoding:	Mail		Koodauksen purku:
-Default account:	Mail		Oletustili:
-Delete	Mail		Poista
-Discard	Mail		Hylkää
-Do you wish to save this message as a draft before closing?	Mail		Haluatko tallentaa tämän viestin luonnoksena ennen sulkemista?
-Do you wish to send this message before closing?	Mail		Haluatko lähettää tämän viestin ennen sulkemista?
-Don't save	Mail		Älä tallenna
-E-mail draft could not be saved!	Mail		Sähköpostiviestiluonnosta ei voitu tallentaa!
-Edit	Mail		Muokkaa
-Edit queries…	Mail		Muokkaa kyselyjä…
-Edit signatures…	Mail		Muokkaa allekirjoituksia…
-Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Suljettu alue: %name% (Tyyppi: %type%)
-Encoding:	Mail		Koodaus:
-Expert	Mail		Asiantuntija
-File	Mail		Tiedosto
-Find	Mail		Haku
-Find again	Mail		Hae uudelleen
-Find…	Mail		Hae…
-Font:	Mail		Kirjasintyyppi:
-Forward	Mail		Toimittaa eteenpäin
-Forward without attachments	Mail		Lähetä edelleen ilman liitteitä
-From:	Mail		Lähettäjä:
-Hide	Mail		Piilota
-Include file attributes in attachments	Mail		Sisällytä tiedostoattribuutit liitteisiin
-Inconsistency occurred in the undo/redo buffer.	Mail		Tapahtui epäjohdonmukaisuutta puskurin perumisen/uudelleentekemisen yhteydessä.
-Initial spell check mode:	Mail		Alustava oikolukutila:
-Leave as '%s'	Mail		Jätä nimellä ’%s’
-Leave as New	Mail		Jätä uutena
-Leave same	Mail		Jätä samaksi
-Mail	System name		Sähköposti
-Mail couldn't find its dictionary.	Mail		Sähköposti ei löytänyt hakemistoaan.
-Mail preferences	Mail		Sähköpostietusijaisuudet
-Mailing	Mail		Postitus
-Message	Mail		Viesti
-Move to trash	Mail		Siirrä roskakoriin
-Need Tracker to move items to trash	Mail		Tarvitsee Seuraajaa siirtämään viestit roskakoriin
-New	Mail		Uusi
-New mail message	Mail		Uusi sähköpostiviesti
-Next	Mail		Seuraava
-Next message	Mail		Seuraava viesti
-No file attributes, just plain data	Mail		Ei tiedostoattribuutteja, vain pelkkää dataa
-No matches	Mail		Ei ole täsmääviä
-None	Mail		Ei mikään
-OK	Mail		Valmis
-Off	Mail		Pois päältä
-On	Mail		Päällä
-Only files can be added as attachments.	Mail		Vain tiedostoja voidaan lisätä liitteiksi.
-Open	Mail		Avaa
-Open attachment	Mail		Avaa liite
-Open draft	Mail		Avaa luonnos
-Open this link	Mail		Avaa tämä linkki
-Page setup…	Mail		Sivuasetukset…
-Paste	Mail		Liitä
-Preferences…	Mail		Asetukset…
-Previous	Mail		Edellinen
-Previous message	Mail		Edellinen viesti
-Print	Mail		Tulosta
-Print…	Mail		Tulosta…
-Put your favorite e-mail queries and query templates in this folder.	Mail		Laita suosikkisähköpostikyselysi ja kyselymallinteet tähän kansioon.
-Queries	Mail		Kyselyt
-Quit	Mail		Poistu
-Quote	Mail		Lainaus
-Random	Mail		Satunnainen
-Read 	Mail		Luettu
-Really delete this signature? This cannot be undone.	Mail		Haluatko todella poistaa allekirjoituksen? Tätä ei voida perua.
-Redo	Mail		Tee uudelleen
-Remove attachment	Mail		Poista liite
-Remove enclosure	Mail		Poista liite
-Remove quote	Mail		Poista lainaus
-Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Liitteiden poistamista edelleenlähetyksistä ei ole vielä toteutettu!\nSe ei toimi vielä oikein.
-Reply	Mail		Vastaa
-Reply account:	Mail		Vastaustili:
-Reply preamble:	Mail		Vastauksen esipuhe:
-Reply to all	Mail		Vastaa kaikille
-Reply to sender	Mail		Vastaa lähettäjälle
-Resend	Mail		Lähetä uudelleen
-Revert	Mail		Palauta
-Save	Mail		Tallenna
-Save address	Mail		Tallenna osoite
-Save as draft	Mail		Tallenna luonnoksena
-Save attachment…	Mail		Tallenna liite…
-Save changes to this signature?	Mail		Tallenna muutokset tähän allekirjoitukseen?
-Select all	Mail		Valitse kaikki
-Send	Mail		Lähetä
-Send message	Mail		Lähetä viesti
-Set to %s	Mail		Aseta vastaanottaja %s
-Set to Saved	Mail		Aseta tallennettuihin
-Set to…	Mail		Aseta kohteeseen…
-Show header	Mail		Näytä otsake
-Show icons & labels	Mail		Näytä kuvakkeet ja nimiöt
-Show icons only	Mail		Näytä vain kuvakkeet
-Show raw message	Mail		Näytä  raakaviesti
-Signature	Mail		Allekirjoitus
-Signature:	Mail		Allekirjoitus:
-Signatures	Mail		Allekirjoitukset
-Size:	Mail		Koko:
-Sorry	Mail		Valitan
-Sorry, could not find an application that supports the 'Person' data type.	Mail		Valitettavasti ei voitu löytää sovellusta, joka tukee ’Person’-datatyyppiä.
-Start now	Mail		Aloita nyt
-Subject:	Mail		Aihe:
-Text wrapping:	Mail		Tekstin vieritys:
-The mail_daemon could not be started:\n\t	Mail		Taustaprosessi mail_daemon ei voinut käynnistyä:\n\t
-The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Taustaprosessi mail_daemon ei ole toiminnassa. Viesti asetetaan jonoon ja lähetetään kun taustaprosessi mail_daemon käynnistyy.
-There is no installed handler for URL links.	Mail		Verkko-osoitelinkeille ei ole asennettua käsittelijää.
-Title:	Mail		Otsikko:
-To:	Mail		Vastaanottaja:
-Trash	Mail		Roskakori
-UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding f	UTF-8
-Undo	Mail		Peru
-Unread	Mail		Lukematon
-Use default account	Mail		Käytä oletustiliä
-User interface	Mail		Käyttäjäliitäntä
-View	Mail		Näkymä
-Warn unencodable:	Mail		Varoita koodaamattomista:
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Päätekstisi sisältää %ld merkkiä, joita ei voida koodata. Eri kirjaimisto olisi ehkä parempi? Napauttamalla Lähetä-painiketta lähetät sen kaikesta huolimatta (korvausmerkkiä käytetään koodauskelvottomien merkkien paikalla), tai valitse Peru takaisinpalaamista ja korjausyritystä varten.
-\\n - Newline	Mail		\\n - Rivinvaihto
-draft	B_USER_DIRECTORY/mail/draft		luonnos
 helpful message	Mail		hyödyllinen viesti
-in	B_USER_DIRECTORY/mail/in		tuleva
-mail	B_USER_DIRECTORY/mail		sähköposti
-out	B_USER_DIRECTORY/mail/out		lähtevä
-queries	B_USER_DIRECTORY/mail/queries		kyselyt
-sent	B_USER_DIRECTORY/mail/sent		lähetetty
+Colored quotes:	Mail		Väritetyt lainaukset:
+Subject:	Mail		Aihe:
+Reply to all	Mail		Vastaa kaikille
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Suljettu alue: %name% (Tyyppi: %type%)
+Show icons & labels	Mail		Näytä kuvakkeet ja nimiöt
+Remove attachment	Mail		Poista liite
+Button bar:	Mail		Painikepalkki:
 spam	B_USER_DIRECTORY/mail/spam		roskaposti
+Beginner	Mail		Aloittelija
+Don't save	Mail		Älä tallenna
+Expert	Mail		Asiantuntija
+Reply account:	Mail		Vastaustili:
+Discard	Mail		Hylkää
+Message	Mail		Viesti
+Reply to sender	Mail		Vastaa lähettäjälle
+There is no installed handler for URL links.	Mail		Verkko-osoitelinkeille ei ole asennettua käsittelijää.
+Signature	Mail		Allekirjoitus
+Find again	Mail		Hae uudelleen

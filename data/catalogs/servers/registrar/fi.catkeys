@@ -1,23 +1,23 @@
-1	finnish	application/x-vnd.Haiku-Registrar	2599857937
-%action%?	ShutdownProcess		%action%?
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Sovellus ”%appName%” on keskeyttänyt sammuttamisprosessin.
-Asking \"%appName%\" to quit.	ShutdownProcess		Pyydetään sovellusta ”%appName%” lopettamaan.
-Asking background applications to quit.	ShutdownProcess		Pyydetään taustasovelluksia lopettamaan.
-Asking other processes to quit.	ShutdownProcess		Pyydetään muita prosesseja lopettamaan.
-Cancel	ShutdownProcess		Peru
-Cancel shutdown	ShutdownProcess		Peru sammuttaminen
-Do you really want to restart the system?	ShutdownProcess		Haluatko todella käynnistää järjestelmän uudelleen?
-Do you really want to shut down the system?	ShutdownProcess		Haluatko todella sulkea järjestelmän?
-It's now safe to turn off the computer.	ShutdownProcess		Nyt on turvallista sulkea tietokone.
-Kill application	ShutdownProcess		Tuhoa sovellus
-OK	ShutdownProcess		Valmis
-Restart	ShutdownProcess		Käynnistä uudelleen
+1	finnish	x-vnd.haiku-registrar	2599857937
 Restart system	ShutdownProcess		Järjestelmän uudelleenkäynnistys
-Restarting…	ShutdownProcess		Käynnistetään uudelleen…
-Shut down	ShutdownProcess		Sammuta
-Shutdown aborted	ShutdownProcess		Lopettaminen keskeytetty
-Shutdown status	ShutdownProcess		Sammuttamistila
-Shutting down…	ShutdownProcess		Sammutetaan...
-System is shut down	ShutdownProcess		Järjestelmä on suljettu
 The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Sovellus ”%appName%” saattaa olla pakollisen paneelin estämä.
+OK	ShutdownProcess		Valmis
+System is shut down	ShutdownProcess		Järjestelmä on suljettu
+It's now safe to turn off the computer.	ShutdownProcess		Nyt on turvallista sulkea tietokone.
+Cancel	ShutdownProcess		Peru
+Do you really want to shut down the system?	ShutdownProcess		Haluatko todella sulkea järjestelmän?
+Asking other processes to quit.	ShutdownProcess		Pyydetään muita prosesseja lopettamaan.
+Asking \"%appName%\" to quit.	ShutdownProcess		Pyydetään sovellusta ”%appName%” lopettamaan.
+%action%?	ShutdownProcess		%action%?
+Shutdown aborted	ShutdownProcess		Lopettaminen keskeytetty
+Restarting…	ShutdownProcess		Käynnistetään uudelleen…
+Asking background applications to quit.	ShutdownProcess		Pyydetään taustasovelluksia lopettamaan.
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Sovellus ”%appName%” on keskeyttänyt sammuttamisprosessin.
 Tidying things up a bit.	ShutdownProcess		Siistitään paikkoja pikkuisen.
+Do you really want to restart the system?	ShutdownProcess		Haluatko todella käynnistää järjestelmän uudelleen?
+Shutdown status	ShutdownProcess		Sammuttamistila
+Cancel shutdown	ShutdownProcess		Peru sammuttaminen
+Kill application	ShutdownProcess		Tuhoa sovellus
+Shut down	ShutdownProcess		Sammuta
+Restart	ShutdownProcess		Käynnistä uudelleen
+Shutting down…	ShutdownProcess		Sammutetaan...

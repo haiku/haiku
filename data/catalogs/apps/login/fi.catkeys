@@ -1,21 +1,21 @@
 1	finnish	x-vnd.Haiku-Login	1678631300
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tKäynnistää itsemuokkaustilan työpöydän muokkaamisen sallimiseksi.\n
---nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tÄlä tee ikkunasta modaalista\n
-Desktop	Desktop Window		Työpöytä
-Error	Login App		Virhe
 Error: %1	Login App		Virhe: %1
-Halt	Login View		Keskeytä
 Hide password	Login View		Piilota salasana
-Info	Login App		Tiedot
+Desktop	Desktop Window		Työpöytä
 Invalid login!	Login View		Virheellinen kirjautuminen!
-Login application for Haiku\nUsage:\n	Login App		Kirjaa sovellus Haikulle\nKäyttö:\n
-Login:	Login View		Kirjaudu:
-OK	Login App		Valmis
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tKäynnistää itsemuokkaustilan työpöydän muokkaamisen sallimiseksi.\n
 OK	Login View		Valmis
-Password:	Login View		Salasana:
-Reboot	Login View		Alkulataa uudelleen
-Unimplemented	Login App		Toteuttamaton
-ValidateLogin: %s\n	Login App	A message returned from the ValidateLogin function. It can be \"B_OK\".	ValidateLogin: %s\n
-Welcome to Haiku	Login Window		Tervetuloa Haikuun
-You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Alt-Q).	Login App		Voit räätälöidä työpöytää, joka näytetään Kirjautumissovelluksen takana pudottamalla replikantin siihen.\n\nKun olet lopettanut poistu vain sovelluksesta (Alt-Q).
 error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	virhe %s\n
+Login:	Login View		Kirjaudu:
+Error	Login App		Virhe
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Alt-Q).	Login App		Voit räätälöidä työpöytää, joka näytetään Kirjautumissovelluksen takana pudottamalla replikantin siihen.\n\nKun olet lopettanut poistu vain sovelluksesta (Alt-Q).
+Unimplemented	Login App		Toteuttamaton
+Welcome to Haiku	Login Window		Tervetuloa Haikuun
+Reboot	Login View		Alkulataa uudelleen
+Login application for Haiku\nUsage:\n	Login App		Kirjaa sovellus Haikulle\nKäyttö:\n
+Info	Login App		Tiedot
+Halt	Login View		Keskeytä
+ValidateLogin: %s\n	Login App	A message returned from the ValidateLogin function. It can be \"B_OK\".	ValidateLogin: %s\n
+Password:	Login View		Salasana:
+OK	Login App		Valmis
+--nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tÄlä tee ikkunasta modaalista\n

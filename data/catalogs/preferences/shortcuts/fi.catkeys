@@ -1,52 +1,52 @@
 1	finnish	x-vnd.Haiku-Shortcuts	621368175
-(Choose application with file requester)	ShortcutsWindow		(Valitse sovellus tiedostohakijalla)
-*Beep	ShortcutsWindow		*Piip
-*InsertString \"Your Text Here\"	ShortcutsWindow		*Lisää merkkijono ”Tekstisi tänne”
-*LaunchHandler text/html	ShortcutsWindow		*Käynnistyskäsittelijä text/html
-*MouseButton 1	ShortcutsWindow		*Hiiripainike 1
-*MouseDown	ShortcutsWindow		*HiiriAlas
-*MouseUp	ShortcutsWindow		*HiiriYlös
-*MoveMouse +20 +0	ShortcutsWindow		*SiirräHiiri +20 +0
-*MoveMouseTo 50% 50%	ShortcutsWindow		*SiirräHiiriKohteeseen 50% 50%
-*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Moni ”*SiirräHiiriKohteeseen 100% 0” ”*Hiiripainike 1”
-*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*LähetäViesti application/x-vnd.Be-TRAK ’Tfnd’
-Add new shortcut	ShortcutsWindow		Lisää uusi pikanäppäin
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt-painike
-Append	ShortcutsWindow		Liitä
-Append KeySet…	ShortcutsWindow		Liitä KeySet-tiedosto…
-Application	ShortcutsWindow		Sovellus
-Beep	ShortcutsSpec		Piip
-Cancel	ShortcutsWindow		Peru
-Control	ShortcutsSpec	Name for modifier on keyboard	Control-painike
-Don't save	ShortcutsWindow		Älä tallenna
 Error, NULL state description?\n	ShortcutsSpec		Virhe, NULL-tilakuvaus?\n
-File	ShortcutsWindow		Tiedosto
-InsertString	ShortcutsSpec		LisääMerkkijono
-Key	ShortcutsWindow		Näppäin
-LaunchHandler	ShortcutsSpec		Käynnistyskäsittelijä
-MouseButton	ShortcutsSpec		HiiriPainike
-MouseDown	ShortcutsSpec		HiiriAlas
-MouseUp	ShortcutsSpec		HiiriYlös
 MoveMouse	ShortcutsSpec		SiirräHiirtä
-MoveMouseTo	ShortcutsSpec		SiirräHiiriKohteeseen
-Multi	ShortcutsSpec		Moni
 OK	ShortcutsWindow		Valmis
-Oh no	ShortcutsWindow		Oh ei
-Open	ShortcutsWindow		Avaa
-Open KeySet…	ShortcutsWindow		Avaa KeySet-tiedosto…
-Quit	ShortcutsWindow		Poistu
-Really quit without saving your changes?	ShortcutsWindow		Poistutko todella tallentamatta muutoksia?
-Remove selected shortcut	ShortcutsWindow		Poista valittu pikanäppäin
-Revert to saved	ShortcutsWindow		Palauta tallennettuun
-Save	ShortcutsWindow		Tallenna
-Save & apply	ShortcutsWindow		Tallenna ja sovella
-Save KeySet as…	ShortcutsWindow		Tallenna KeySet-tiedosto nimellä…
-Select	ShortcutsWindow		Valitse
-SendMessage	ShortcutsSpec		LähetäViesti
-Shift	ShortcutsSpec	Name for modifier on keyboard	Vaihto-painike
-Shortcuts	System name		Pikanäppäinasetukset
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Pikanäppäinasetukset ei kyennyt avaamaan KeySet-tiedostoa!
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Pikanäppäinasetukset ei kyennyt jäsentämään KeySet-tiedostoa!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Pikanäppäinsetukset eivät kyenneet tallentamaan KeySet-tiedostoa!
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Pikanäppäinasetukset eivät kyenneet tallentamaan keyset-tiedostoa.
+Cancel	ShortcutsWindow		Peru
+InsertString	ShortcutsSpec		LisääMerkkijono
+Append KeySet…	ShortcutsWindow		Liitä KeySet-tiedosto…
+Control	ShortcutsSpec	Name for modifier on keyboard	Control-painike
+Key	ShortcutsWindow		Näppäin
+Open KeySet…	ShortcutsWindow		Avaa KeySet-tiedosto…
+MouseUp	ShortcutsSpec		HiiriYlös
+Revert to saved	ShortcutsWindow		Palauta tallennettuun
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt-painike
+*InsertString \"Your Text Here\"	ShortcutsWindow		*Lisää merkkijono ”Tekstisi tänne”
+*MouseUp	ShortcutsWindow		*HiiriYlös
+(Choose application with file requester)	ShortcutsWindow		(Valitse sovellus tiedostohakijalla)
 Window	ShortcutsSpec	Name for modifier on keyboard	Ikkuna
+*LaunchHandler text/html	ShortcutsWindow		*Käynnistyskäsittelijä text/html
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Pikanäppäinasetukset ei kyennyt avaamaan KeySet-tiedostoa!
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Moni ”*SiirräHiiriKohteeseen 100% 0” ”*Hiiripainike 1”
+SendMessage	ShortcutsSpec		LähetäViesti
+MoveMouseTo	ShortcutsSpec		SiirräHiiriKohteeseen
+Save	ShortcutsWindow		Tallenna
+*MouseButton 1	ShortcutsWindow		*Hiiripainike 1
+*MoveMouse +20 +0	ShortcutsWindow		*SiirräHiiri +20 +0
+MouseDown	ShortcutsSpec		HiiriAlas
+Remove selected shortcut	ShortcutsWindow		Poista valittu pikanäppäin
+MouseButton	ShortcutsSpec		HiiriPainike
+Add new shortcut	ShortcutsWindow		Lisää uusi pikanäppäin
+Save & apply	ShortcutsWindow		Tallenna ja sovella
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*LähetäViesti application/x-vnd.Be-TRAK ’Tfnd’
+Append	ShortcutsWindow		Liitä
+File	ShortcutsWindow		Tiedosto
+Beep	ShortcutsSpec		Piip
+Quit	ShortcutsWindow		Poistu
+*MouseDown	ShortcutsWindow		*HiiriAlas
+Don't save	ShortcutsWindow		Älä tallenna
+Multi	ShortcutsSpec		Moni
+Application	ShortcutsWindow		Sovellus
+Shift	ShortcutsSpec	Name for modifier on keyboard	Vaihto-painike
+*Beep	ShortcutsWindow		*Piip
+*MoveMouseTo 50% 50%	ShortcutsWindow		*SiirräHiiriKohteeseen 50% 50%
+Save KeySet as…	ShortcutsWindow		Tallenna KeySet-tiedosto nimellä…
+Open	ShortcutsWindow		Avaa
+Really quit without saving your changes?	ShortcutsWindow		Poistutko todella tallentamatta muutoksia?
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Pikanäppäinasetukset ei kyennyt jäsentämään KeySet-tiedostoa!
+Select	ShortcutsWindow		Valitse
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Pikanäppäinsetukset eivät kyenneet tallentamaan KeySet-tiedostoa!
+Oh no	ShortcutsWindow		Oh ei
+LaunchHandler	ShortcutsSpec		Käynnistyskäsittelijä
+Shortcuts	System name		Pikanäppäinasetukset

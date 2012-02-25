@@ -1,102 +1,101 @@
-1	finnish	x-vnd.Haiku-Terminal	2059530645
-%app% settings	Terminal PrefWindow	window title	%app%-asetukset
--h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help tulosta tämä opaste\n -t, --title aseta ikkunan otsikko\n -f, --fullscreen aloita kokoruututilassa\n
-Abort	Terminal Shell		Keskeytä
-Appearance	Terminal PrefWindow		Ulkoasu
-Background	Terminal AppearancePrefView		Tausta
-Black on White	Terminal colors schema		Musta valkoisella
-Cancel	Terminal PrefWindow		Peru
-Cancel	Terminal SetTitleWindow		Peru
-Cancel	Terminal TermView		Peru
-Cancel	Terminal TermWindow		Peru
-Cannot execute \"%command\":\n\t%error	Terminal Shell		Ei voida suorittaa komentoa ”%command”:\n\t%error
-Change directory	Terminal TermView		Vaihda hakemistoa
-Clear all	Terminal TermWindow		Tyhjennä kaikki
-Close	Terminal TermWindow		Sulje
-Close active tab	Terminal TermWindow		Sulje käytössä oleva välilehti
-Close other tabs	Terminal TermWindow		Sulje muut välilehdet
-Close tab	Terminal TermWindow		Sulje välilehti
-Close window	Terminal TermWindow		Sulje ikkuna
-Color schema:	Terminal AppearancePrefView		Värikaavio:
-Color:	Terminal AppearancePrefView		Väri:
-Confirm exit if active programs exist	Terminal AppearancePrefView		Vahvista poistuminen, jos ohjelmia on käytössä
-Copy	Terminal TermWindow		Kopioi
-Copy here	Terminal TermView		Kopioi tänne
-Create link here	Terminal TermView		Luo linkki tänne
-Custom	Terminal colors schema		Räätälöity
-Decrease	Terminal TermWindow		Vähennä
-Don't save	Terminal PrefWindow		Älä tallenna
-Edit	Terminal TermWindow		Muokkaa
-Edit tab title…	Terminal TermWindow		Muokkaa välilehtiotsikkoa...
-Error!	Terminal getString		Virhe!
-Find	Terminal FindWindow		Etsi
-Find failed	Terminal TermWindow		Etsintä epäonnistui
-Find next	Terminal TermWindow		Löydä seuraava
-Find previous	Terminal TermWindow		Löydä edellinen
-Find…	Terminal TermWindow		Etsi...
-Font:	Terminal AppearancePrefView		Kirjasintyyppi:
-Full screen	Terminal TermWindow		Kokoruutunäyttö
-Green on Black	Terminal colors schema		Vihreä mustalla
-Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Pääteikkuna\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui ja Takashi Murai.\n\nKäyttö: %s [VALITSIN] [KOMENTOTULKKI]\n
-Increase	Terminal TermWindow		Kasvata
-Insert path	Terminal TermView		Lisää polku
-Match case	Terminal FindWindow		Kirjainkoosta riippuva
-Match word	Terminal FindWindow		Täsmäävä sana
-Move here	Terminal TermView		Siirrä tänne
-New Terminal	Terminal TermWindow		Uusi Pääteikkuna
-New tab	Terminal TermWindow		Uusi välilehti
-No search string was entered.	Terminal TermWindow		Hakumerkkijono ei kirjoitettu.
+1	finnish	x-vnd.Haiku-Terminal	1054657081
 Not found.	Terminal TermWindow		Ei löytynyt.
-Nothing is selected.	Terminal TermWindow		Mitään ei ole valittu.
-OK	Terminal PrefWindow		Valmis
-OK	Terminal SetTitleWindow		Valmis
-OK	Terminal TermApp		Valmis
-OK	Terminal TermWindow		Valmis
-Page setup…	Terminal TermWindow		Sivuasetus...
-Paste	Terminal TermWindow		Liitä
-Print	Terminal TermWindow		Tulosta
-Quit	Terminal TermWindow		Poistu
-Really close?	Terminal TermWindow		Suljetaanko todella?
-Save	Terminal PrefWindow		Tallenna
-Save as default	Terminal TermWindow		Tallenna oletuksena
-Save changes to this settings panel?	Terminal PrefWindow		Tallennetaan muutokset tähän asetuspaneeliin?
-Save to file…	Terminal PrefWindow		Tallenna tiedostoon…
-Search forward	Terminal FindWindow		Etsintä eteenpäin
-Select all	Terminal TermWindow		Valitse kaikki
-Selected background	Terminal AppearancePrefView		Valitse tausta
-Selected text	Terminal AppearancePrefView		Valittu teksti
-Set tab title	Terminal TermWindow		Aseta välilehtiotsikko
-Set window title	Terminal TermWindow		Aseta ikkunaotsikko
-Settings	Terminal TermWindow		Asetukset
-Settings…	Terminal TermWindow		Asetukset...
-Shell 	Terminal TermWindow		Komentoikkuna
-Size:	Terminal AppearancePrefView		Koko:
 Switch Terminals	Terminal TermWindow		Vaihda pääteikkunoita
-Tab title:	Terminal AppearancePrefView		Välilehtiotsikko:
-Tab title:	Terminal TermWindow		Välilehtiotsikko:
-Terminal	System name		Pääteikkuna
+Change directory	Terminal TermView		Vaihda hakemistoa
+OK	Terminal TermWindow		Valmis
+New Terminal	Terminal TermWindow		Uusi Pääteikkuna
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Pääteikkuna ei voinut käynnistää komentotulkkia.
-Text	Terminal AppearancePrefView		Teksti
-Text encoding	Terminal TermWindow		Tekstikoodaus
-Text not found.	Terminal TermWindow		Tekstiä ei löydy.
 Text size	Terminal TermWindow		Tekstikoko
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Seuraavia prosesseja suoritetaan edelleen:\n\n\t%1\n\nJos suljet pääteikkunan, prosessit tapetaan.
-The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Nykyisen välilehtiotsikon määrittävä malli. Seuraavia paikanpitäjiä\nvoidaan käyttää:\n
-The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Välilehtiotsikot määrittävä malli. Seuraavia paikanpitäjiä\nvoidaan käyttää:\n
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Ikkunaotsikon määrittävä malli. Seuraavia paikanpitäjiä\nvoidaan käyttää:\n
-The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Ikkunaotsikot määrittävä malli. Seuraavia paikanpitäjiä\nvoidaan käyttää:\n
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Prosessia ”%1” suoritetaan yhä.\nJos suljet pääteikkunan, prosessi tapetaan.
-The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Prosessia ”%1” suoritetaan yhä.\nJos suljet välilehden, prosessi tapetaan.
-Unrecognized option \"%s\"\n	Terminal arguments parsing		Tunnistamaton valitsin ”%s”\n
-Use default	Terminal SetTitleWindow		Käytä oletusta
+Match case	Terminal FindWindow		Kirjainkoosta riippuva
+Quit	Terminal TermWindow		Poistu
 Use default shell	Terminal Shell		Käytä oletuskomentotulkkia
-Use selection	Terminal FindWindow		Käyttövalinta
-Use text:	Terminal FindWindow		Käytä tekstiä:
-White on Black	Terminal colors schema		Valkoinen mustalla
-Window size	Terminal TermWindow		Ikkunakoko
+Confirm exit if active programs exist	Terminal AppearancePrefView		Vahvista poistuminen, jos ohjelmia on käytössä
+The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Nykyisen välilehtiotsikon määrittävä malli. Seuraavia paikanpitäjiä\nvoidaan käyttää:\n
+Select all	Terminal TermWindow		Valitse kaikki
+Close tab	Terminal TermWindow		Sulje välilehti
+Custom	Terminal colors schema		Räätälöity
+Save to file…	Terminal PrefWindow		Tallenna tiedostoon…
+OK	Terminal PrefWindow		Valmis
+Black on White	Terminal colors schema		Musta valkoisella
 Window title:	Terminal AppearancePrefView		Ikkunaotsikko:
+Font:	Terminal AppearancePrefView		Kirjasintyyppi:
+Copy here	Terminal TermView		Kopioi tänne
+Really close?	Terminal TermWindow		Suljetaanko todella?
+Copy	Terminal TermWindow		Kopioi
 Window title:	Terminal TermWindow		Ikkunaotsikko:
+Unrecognized option \"%s\"\n	Terminal arguments parsing		Tunnistamaton valitsin ”%s”\n
+%app% settings	Terminal PrefWindow	window title	%app%-asetukset
+Cancel	Terminal SetTitleWindow		Peru
+Increase	Terminal TermWindow		Kasvata
+Settings	Terminal TermWindow		Asetukset
+Window size	Terminal TermWindow		Ikkunakoko
+Selected text	Terminal AppearancePrefView		Valittu teksti
+Find	Terminal FindWindow		Etsi
+Appearance	Terminal PrefWindow		Ulkoasu
+Tab title:	Terminal AppearancePrefView		Välilehtiotsikko:
+The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Ikkunaotsikot määrittävä malli. Seuraavia paikanpitäjiä\nvoidaan käyttää:\n
+Color schema:	Terminal AppearancePrefView		Värikaavio:
+OK	Terminal SetTitleWindow		Valmis
+Background	Terminal AppearancePrefView		Tausta
+Use selection	Terminal FindWindow		Käyttövalinta
+Green on Black	Terminal colors schema		Vihreä mustalla
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Prosessia ”%1” suoritetaan yhä.\nJos suljet välilehden, prosessi tapetaan.
+Size:	Terminal AppearancePrefView		Koko:
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Ei voida suorittaa komentoa ”%command”:\n\t%error
+Full screen	Terminal TermWindow		Kokoruutunäyttö
 Window title…	Terminal TermWindow		Ikkunaotsikko...
+Page setup…	Terminal TermWindow		Sivuasetus...
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Seuraavia prosesseja suoritetaan edelleen:\n\n\t%1\n\nJos suljet pääteikkunan, prosessit tapetaan.
+Insert path	Terminal TermView		Lisää polku
+Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Pääteikkuna\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui ja Takashi Murai.\n\nKäyttö: %s [VALITSIN] [KOMENTOTULKKI]\n
+No search string was entered.	Terminal TermWindow		Hakumerkkijono ei kirjoitettu.
+Don't save	Terminal PrefWindow		Älä tallenna
+Set window title	Terminal TermWindow		Aseta ikkunaotsikko
+Terminal	System name		Pääteikkuna
+Close other tabs	Terminal TermWindow		Sulje muut välilehdet
+Match word	Terminal FindWindow		Täsmäävä sana
+Nothing is selected.	Terminal TermWindow		Mitään ei ole valittu.
+Text not found.	Terminal TermWindow		Tekstiä ei löydy.
+Find…	Terminal TermWindow		Etsi...
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Prosessia ”%1” suoritetaan yhä.\nJos suljet pääteikkunan, prosessi tapetaan.
+Move here	Terminal TermView		Siirrä tänne
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tKäynnissä olevan prosessin nykyinen työhakemisto\n\t\t\tnykyisessä välilehdessä. Valinnaisesti määriteltävien polkukomponenttien\n\t\t\tenimmäismäärä. Esim.: ’%2d’ kahdelle yleisimmälle komponentille.\n\t%i\t-\tIkkunan indeksi.\n\t%p\t-\tKäynnissä olevan prosessin nimi nykyisessä välilehdessä.\n\t%t\t-\tNykyisen välilehden otsikko.\n\t%%\t-\tMerkki ’%’.
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tKäynnissä olevan prosessin nykyinen työhakemisto.\n\t\t\tValinnaisesti määriteltävien polkukomponenttien\n\t\t\tenimmäismäärä. Esim.: ’%2d’ kahdelle yleisimmälle komponentille.\n\t%i\t-\tVälilehden indeksi.\n\t%p\t-\tKäytössä olevan prosessin nimi.\n\t%%\t-\tMerkki ’%’.
+White on Black	Terminal colors schema		Valkoinen mustalla
+Error!	Terminal getString		Virhe!
+New tab	Terminal TermWindow		Uusi välilehti
+The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Välilehtiotsikot määrittävä malli. Seuraavia paikanpitäjiä\nvoidaan käyttää:\n
+Selected background	Terminal AppearancePrefView		Valitse tausta
+Decrease	Terminal TermWindow		Vähennä
+Create link here	Terminal TermView		Luo linkki tänne
+Close	Terminal TermWindow		Sulje
+Text	Terminal AppearancePrefView		Teksti
+Clear all	Terminal TermWindow		Tyhjennä kaikki
+Text encoding	Terminal TermWindow		Tekstikoodaus
 size	Terminal TermView		koko
+Close window	Terminal TermWindow		Sulje ikkuna
+Save as default	Terminal TermWindow		Tallenna oletuksena
+Set tab title	Terminal TermWindow		Aseta välilehtiotsikko
+Settings…	Terminal TermWindow		Asetukset...
+Abort	Terminal Shell		Keskeytä
+Edit	Terminal TermWindow		Muokkaa
+Color:	Terminal AppearancePrefView		Väri:
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Ikkunaotsikon määrittävä malli. Seuraavia paikanpitäjiä\nvoidaan käyttää:\n
+Print	Terminal TermWindow		Tulosta
+Use text:	Terminal FindWindow		Käytä tekstiä:
+Cancel	Terminal TermWindow		Peru
+OK	Terminal TermApp		Valmis
+Find failed	Terminal TermWindow		Etsintä epäonnistui
+Search forward	Terminal FindWindow		Etsintä eteenpäin
+Edit tab title…	Terminal TermWindow		Muokkaa välilehtiotsikkoa...
+Find previous	Terminal TermWindow		Löydä edellinen
+Tab title:	Terminal TermWindow		Välilehtiotsikko:
+Find next	Terminal TermWindow		Löydä seuraava
+Close active tab	Terminal TermWindow		Sulje käytössä oleva välilehti
+Paste	Terminal TermWindow		Liitä
+Save changes to this settings panel?	Terminal PrefWindow		Tallennetaan muutokset tähän asetuspaneeliin?
+Cancel	Terminal PrefWindow		Peru
+Shell 	Terminal TermWindow		Komentoikkuna
+Save	Terminal PrefWindow		Tallenna
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tKäynnissä olevan prosessin nykyinen työhakemisto.\n\t\t\tValinnaisesti määriteltävien polkukomponenttien\n\t\t\tenimmäismäärä. Esim.: ’%2d’ kahdelle yleisimmälle komponentille.\n\t%i\t-\tVälilehden indeksi.\n\t%p\t-\tKäytössä olevan prosessin nimi.\n\t%%\t-\tMerkki ’%’.
+Cancel	Terminal TermView		Peru
+Use default	Terminal SetTitleWindow		Käytä oletusta

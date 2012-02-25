@@ -1,61 +1,59 @@
-1	finnish	x-vnd.Haiku.PoorMan	412131821
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Oletuswebbikansio luotiin osoitteeseen ”/boot/home/public_html”.\nVarmista, että HTML-tiedosto nimeltään ”index.html” on tuossa kansiossa.
-About PoorMan…	PoorMan		Ohjelmasta Köyhis...
+1	finnish	x-vnd.Haiku-PoorMan	1108606987
+Website location	PoorMan		Webbisivusijainti
+Error Server	PoorMan		Virhepalvelin
+Settings…	PoorMan		Asetukset...
+Create PoorMan log	PoorMan		Luo Köyhisloki
+Shutting down.\n	PoorMan		Lopetetaan.\n
+Hits: %lu	PoorMan		Osumia: %lu
+Web folder:	PoorMan		Webbikansio:
+Default	PoorMan		Oletus
+Save log console selection	PoorMan		Tallenna lokikonsolivalinta
+Run server	PoorMan		Käynnistä palvelin
+PoorMan settings	PoorMan		Köyhisasetukset
+Clear hit counter	PoorMan		Nollaa osumalaskuri
+Copy	PoorMan		Kopioi
+Max. simultaneous connections:	PoorMan		Enintään samanaikaisia yhteyksiä:
+Start page:	PoorMan		Aloitussivu:
+done.\n	PoorMan		valmis.\n
+Create	PoorMan		Luo
+Shutting down.	PoorMan		Lopetetaan.
+Website options	PoorMan		Webbisivuvalitsimet
+File Name	PoorMan		Tiedostonimi
+Clear console log	PoorMan		Nollaa konsoliloki
 Advanced	PoorMan		Lisäasetukset
+OK	PoorMan		Valmis
+Status: Stopped	PoorMan		Tila: Pysäytetty
+Dir Created	PoorMan		Hakemisto luotu
+Quit	PoorMan		Poistu
+Hits: 0	PoorMan		Osumia: 0
+Save log console	PoorMan		Tallenna lokikonsoli
+Edit	PoorMan		Muokkaa
+Directory: (none)	PoorMan		Hakemisto: (ei mitään)
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Valitse webissä julkaistava kansio.\n\nSinulla voi olla Köyhiksen luoma oletus ”public_html” kotikansiossasi.\nTai voi sen sijaan valita yhden omista kansioistasi.
+Log To Console	PoorMan		Kirjaa konsoliin
+Status: Running	PoorMan		Tila: Suoritetaan
+connections	PoorMan		yhteydet
+Controls	PoorMan		Ohjaimet
+Send file listing if there's no start page	PoorMan		Lähetä tiedostoluettelo, jos aloitussivua ei ole
+Error Dir	PoorMan		Virhehakemisto
+Select all	PoorMan		Valitse kaikki
+File	PoorMan		Tiedosto
+Save console selections as…	PoorMan		Tallenna konsolivalinnat nimellä...
+File logging	PoorMan		Tiedostolokikirjaus
+Select web folder	PoorMan		Valitse webbikansio
+Logging view	PoorMan		Kirjaamisnäkymä
+Logging	PoorMan		Kirjaaminen
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Oletuswebbikansio luotiin osoitteeseen ”/boot/home/public_html”.\nVarmista, että HTML-tiedosto nimeltään ”index.html” on tuossa kansiossa.
+Clear log file	PoorMan		Nolla lokitiedosto
+Log file name:	PoorMan		Lokitiedostonimi:
+Directory: 	PoorMan		Hakemisto:
+Log To File	PoorMan		Loki tiedostoon
+Done	PoorMan		Valmis
+Create log file	PoorMan		Luo lokitiedosto
+Starting up... 	PoorMan		Aloitetaan...
+Site	PoorMan		Sivusto
 Cancel	PoorMan		Peru
 Cannot start the server	PoorMan		Palvelinta ei voi käynnistää
-Clear console log	PoorMan		Nollaa konsoliloki
-Clear hit counter	PoorMan		Nollaa osumalaskuri
-Clear log file	PoorMan		Nolla lokitiedosto
-Console Logging	PoorMan		Konsolikirjaaminen
-Controls	PoorMan		Ohjaimet
-Copy	PoorMan		Kopioi
-Create	PoorMan		Luo
-Create PoorMan log	PoorMan		Luo Köyhisloki
-Create log file	PoorMan		Luo lokitiedosto
-Default	PoorMan		Oletus
-Dir Created	PoorMan		Hakemisto luotu
-Directory: 	PoorMan		Hakemisto:
-Directory: (none)	PoorMan		Hakemisto: (ei mitään)
-Done	PoorMan		Valmis
-Edit	PoorMan		Muokkaa
-Error Dir	PoorMan		Virhehakemisto
-Error Server	PoorMan		Virhepalvelin
-File	PoorMan		Tiedosto
-File Name	PoorMan		Tiedostonimi
-File logging	PoorMan		Tiedostolokikirjaus
-Hits: %lu	PoorMan		Osumia: %lu
-Hits: 0	PoorMan		Osumia: 0
-Log To Console	PoorMan		Kirjaa konsoliin
-Log To File	PoorMan		Loki tiedostoon
-Log file name:	PoorMan		Lokitiedostonimi:
-Logging	PoorMan		Kirjaaminen
-Logging view	PoorMan		Kirjaamisnäkymä
-Max. simultaneous connections:	PoorMan		Enintään samanaikaisia yhteyksiä:
-OK	PoorMan		Valmis
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Valitse webissä julkaistava kansio.\n\nSinulla voi olla Köyhiksen luoma oletus ”public_html” kotikansiossasi.\nTai voi sen sijaan valita yhden omista kansioistasi.
-PoorMan	System name		Köyhis
-PoorMan settings	PoorMan		Köyhisasetukset
-Quit	PoorMan		Poistu
-Run server	PoorMan		Käynnistä palvelin
-Save console as…	PoorMan		Tallenna konsoli nimellä...
-Save console selections as…	PoorMan		Tallenna konsolivalinnat nimellä...
-Save log console	PoorMan		Tallenna lokikonsoli
-Save log console selection	PoorMan		Tallenna lokikonsolivalinta
 Select	PoorMan		Valitse
-Select all	PoorMan		Valitse kaikki
-Select web folder	PoorMan		Valitse webbikansio
-Send file listing if there's no start page	PoorMan		Lähetä tiedostoluettelo, jos aloitussivua ei ole
-Settings…	PoorMan		Asetukset...
-Shutting down.	PoorMan		Lopetetaan.
-Shutting down.\n	PoorMan		Lopetetaan.\n
-Site	PoorMan		Sivusto
-Start page:	PoorMan		Aloitussivu:
-Starting up... 	PoorMan		Aloitetaan...
-Status: Running	PoorMan		Tila: Suoritetaan
-Status: Stopped	PoorMan		Tila: Pysäytetty
-Web folder:	PoorMan		Webbikansio:
-Website location	PoorMan		Webbisivusijainti
-Website options	PoorMan		Webbisivuvalitsimet
-connections	PoorMan		yhteydet
-done.\n	PoorMan		valmis.\n
+Save console as…	PoorMan		Tallenna konsoli nimellä...
+Console Logging	PoorMan		Konsolikirjaaminen

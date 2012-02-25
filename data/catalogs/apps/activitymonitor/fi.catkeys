@@ -1,48 +1,48 @@
 1	finnish	x-vnd.Haiku-ActivityMonitor	3704566709
-%.1f KB/s	DataSource		%.1f kt/s
-%.1f MB	DataSource		%.1f Mt
-%.1f faults/s	DataSource		%.1f vikaa/s
-%lld ms	SettingsWindow		%lld ms
-%lld sec.	SettingsWindow		%lld s
-ActivityMonitor	System name		Aktiviteettivalvonta
-Add graph	ActivityWindow		Lisää kuvaaja
-Additional items	ActivityView		Lisäkohteet
-Apps	DataSource		Sovellukset
-Block cache	DataSource		Lohkovälimuisti
-Block cache memory	DataSource		Lohkovälimuisti
-CPU	DataSource		Suoritin
-CPU usage	DataSource		Suoritinkäyttö
-CPU usage (combined)	DataSource		Suoritinkäyttö (yhdistetty)
-Cache	DataSource		Välimuisti
-Cached memory	DataSource		Välimuistitettu muisti
-File	ActivityWindow		Tiedosto
-Hide legend	ActivityView		Piilota merkin selitys
-MB	DataSource		Mt
-Media nodes	DataSource		Mediasolmut
-Memory	DataSource		Muisti
-Network receive	DataSource		Verkkovastaanotto
-Network send	DataSource		Verkkolähetys
 P-faults	DataSource		P-viat
-Page faults	DataSource		Sivuvirheet
-Ports	DataSource		Portit
-Quit	ActivityWindow		Poistu
-RX	DataSource	Shorter version for Receiving.	Vast.
-Raw clipboard	DataSource		Raakadataleikepöytä
+Media nodes	DataSource		Mediasolmut
+Threads	DataSource		Säikeet
+MB	DataSource		Mt
+Add graph	ActivityWindow		Lisää kuvaaja
+Teams	DataSource		Ryhmät
+Hide legend	ActivityView		Piilota merkin selitys
+Network send	DataSource		Verkkolähetys
+CPU usage (combined)	DataSource		Suoritinkäyttö (yhdistetty)
+CPU	DataSource		Suoritin
+Used memory	DataSource		Käytetty muisti
+Cached memory	DataSource		Välimuistitettu muisti
+Apps	DataSource		Sovellukset
+Show legend	ActivityView		Näytä merkin selitys
+Text clipboard	DataSource		Tekstileikepöytä
+Settings	ActivityWindow		Asetukset
 Receiving	DataSource		Vastaanotetaan
+Settings…	ActivityWindow		Asetukset...
+Ports	DataSource		Portit
+Page faults	DataSource		Sivuvirheet
+Sending	DataSource		Lähetetään
+Cache	DataSource		Välimuisti
+%.1f faults/s	DataSource		%.1f vikaa/s
+Update time interval:	SettingsWindow		Päivitä aikaväli:
+TX	DataSource	Shorter version for Sending	Läh.
+Quit	ActivityWindow		Poistu
+Block cache memory	DataSource		Lohkovälimuisti
 Remove graph	ActivityView		Poista kuvaaja
+%.1f MB	DataSource		%.1f Mt
+%lld sec.	SettingsWindow		%lld s
+%lld ms	SettingsWindow		%lld ms
+CPU usage	DataSource		Suoritinkäyttö
+Raw clipboard	DataSource		Raakadataleikepöytä
+Sems	DataSource		Opastimet
+ActivityMonitor	System name		Aktiviteettivalvonta
 Running applications	DataSource		Suoritetaan sovelluksia
 Semaphores	DataSource		Opastimet
-Sems	DataSource		Opastimet
-Sending	DataSource		Lähetetään
-Settings	ActivityWindow		Asetukset
-Settings…	ActivityWindow		Asetukset...
-Show legend	ActivityView		Näytä merkin selitys
-Swap	DataSource		Vaihda
+Block cache	DataSource		Lohkovälimuisti
 Swap space	DataSource		Vaihda tila
-TX	DataSource	Shorter version for Sending	Läh.
-Teams	DataSource		Ryhmät
-Text clipboard	DataSource		Tekstileikepöytä
-Threads	DataSource		Säikeet
-Update time interval:	SettingsWindow		Päivitä aikaväli:
-Used memory	DataSource		Käytetty muisti
+Swap	DataSource		Vaihda
+File	ActivityWindow		Tiedosto
 usage	DataSource		käyttö
+Additional items	ActivityView		Lisäkohteet
+Network receive	DataSource		Verkkovastaanotto
+%.1f KB/s	DataSource		%.1f kt/s
+Memory	DataSource		Muisti
+RX	DataSource	Shorter version for Receiving.	Vast.

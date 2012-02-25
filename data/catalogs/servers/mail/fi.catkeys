@@ -1,23 +1,23 @@
 1	finnish	x-vnd.Be-POST	2300302075
-%num new message	DeskbarView		%num uusi viesti
-%num new message for %name\n	MailDaemon		%num uusi viesti käyttäjälle %name\n
-%num new message.	MailDaemon		%num uusi viesti.
-%num new messages	DeskbarView		%num uutta viestiä
-%num new messages for %name\n	MailDaemon		%num uutta viestiä käyttäjälle %name\n
-%num new messages.	MailDaemon		%num uutta viestiä.
-<no accounts>	DeskbarView		<ei tiliä>
-Check for mail now	DeskbarView		Tarkista sähköposti nyt
-Check for mails only	DeskbarView		Tarkista vain sähköpostit
-Create new message…	DeskbarView		Luo uusi viesti...
 Fetching mail for %name	Notifier		Noudetaan sähköpostia vastaanottajalle %name
-Mail daemon status log	MailDaemon		Sähköpostitaustaohjelman tilaloki
-Mail status	MailDaemon		Sähköpostitila
-Mail status	Notifier		Sähköpostitila
-New Messages	MailDaemon		Uudet viestit
-No new messages	DeskbarView		Ei uusia viestejä
-No new messages	MailDaemon		Ei uusia viestejä
-No new messages.	MailDaemon		Ei uusia viestejä.
-Preferences…	DeskbarView		Asetukset...
+Check for mails only	DeskbarView		Tarkista vain sähköpostit
 Send pending mails	DeskbarView		Lähetä odottamassa olevat sähköpostit
-Sending mail for %name	Notifier		Lähetetään sähköpostia vastaanottajalle %name
+New Messages	MailDaemon		Uudet viestit
+<no accounts>	DeskbarView		<ei tiliä>
+%num new messages	DeskbarView		%num uutta viestiä
+Mail status	MailDaemon		Sähköpostitila
 Shutdown mail services	DeskbarView		Sulje sähköpostipalvelut
+%num new message	DeskbarView		%num uusi viesti
+Sending mail for %name	Notifier		Lähetetään sähköpostia vastaanottajalle %name
+Preferences…	DeskbarView		Asetukset...
+%num new messages.	MailDaemon		%num uutta viestiä.
+%num new message.	MailDaemon		%num uusi viesti.
+Create new message…	DeskbarView		Luo uusi viesti...
+%num new message for %name\n	MailDaemon		%num uusi viesti käyttäjälle %name\n
+No new messages	MailDaemon		Ei uusia viestejä
+Check for mail now	DeskbarView		Tarkista sähköposti nyt
+No new messages	DeskbarView		Ei uusia viestejä
+%num new messages for %name\n	MailDaemon		%num uutta viestiä käyttäjälle %name\n
+Mail daemon status log	MailDaemon		Sähköpostitaustaohjelman tilaloki
+No new messages.	MailDaemon		Ei uusia viestejä.
+Mail status	Notifier		Sähköpostitila

@@ -1,27 +1,27 @@
 1	finnish	x-vnd.Haiku.TV	1995288111
-Always on top	MainWin		Aina päällimmäisenä
+TV	MainWin		TV
 Channel	MainWin		Kanava
-DVB - Digital Video Broadcasting TV	MainWin		DVB - Digitaalinen videolähetystv
-Debug	MainWin		Vianjäljitys
-Error, connecting to interface failed:\n\n	MainWin		Virhe, yhdistäminen käyttöliittymään epäonnistui:\n\n
-Error, interface is busy:\n\n	MainWin		Virhe, käyttöliittymä on varattu:\n\n
-Full screen	MainWin		Kokoruutunäyttö
+Settings…	MainWin		Asetukset...
 Interface	MainWin		Käyttöliittymä
 Keep aspect ratio	MainWin		Säilytä kuvasuhde
-Next channel	MainWin		Seuraava kanava
-No border	MainWin		Ei rajoja
-No menu	MainWin		Ei valikkoa
-None	MainWin		Ei mitään
-OK	MainWin		Valmis
 Previous channel	MainWin		Edellinen kanava
-Quit	MainWin		Poistu
-Scale to native size	MainWin		Skaalaa alkuperäiseen kokoon
 Settings	MainWin		Asetukset
-Settings…	MainWin		Asetukset...
-TV	MainWin		TV
 TV	System name		TV
-force 544 x 576, display aspect 4:3	MainWin		pakota 544 x 576, näytön kuvasuhde 4:3
-force 704 x 576, display aspect 4:3	MainWin		pakota 704 x 576, näytön kuvasuhde 4:3
-force 720 x 576, display aspect 4:3	MainWin		pakota 730 x 576, näytön kuvasuhde 4:3
-pixel aspect ratio	MainWin		pikselin kuvasuhde
+No border	MainWin		Ei rajoja
+Always on top	MainWin		Aina päällimmäisenä
+OK	MainWin		Valmis
+Quit	MainWin		Poistu
+Full screen	MainWin		Kokoruutunäyttö
+Debug	MainWin		Vianjäljitys
+Scale to native size	MainWin		Skaalaa alkuperäiseen kokoon
 unknown	MainWin		tuntematon
+Next channel	MainWin		Seuraava kanava
+Error, interface is busy:\n\n	MainWin		Virhe, käyttöliittymä on varattu:\n\n
+None	MainWin		Ei mitään
+force 704 x 576, display aspect 4:3	MainWin		pakota 704 x 576, näytön kuvasuhde 4:3
+DVB - Digital Video Broadcasting TV	MainWin		DVB - Digitaalinen videolähetystv
+force 544 x 576, display aspect 4:3	MainWin		pakota 544 x 576, näytön kuvasuhde 4:3
+pixel aspect ratio	MainWin		pikselin kuvasuhde
+No menu	MainWin		Ei valikkoa
+Error, connecting to interface failed:\n\n	MainWin		Virhe, yhdistäminen käyttöliittymään epäonnistui:\n\n
+force 720 x 576, display aspect 4:3	MainWin		pakota 730 x 576, näytön kuvasuhde 4:3

@@ -1,57 +1,57 @@
 1	finnish	x-vnd.Haiku-PackageInstaller	2709408798
+Install to:	PackageView		Asenna kohteeseen:
+OK	PackageView		Valmis
+Accept	PackageTextViewer		Hyväksy
+Continue	PackageInstall		Jatka
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Pyydetyn paketin asentaminen järjestelmääsi epäonnistui. Tämä saattaa johtua kohdepakettitiedoston pulmasta. Ota yhteyttä tässä asiassa pakettijakelijaan.
+Image not loaded correctly	PackageImageViewer		Tiedostovedosta ei ladattu oikein
+No package selected.	PackageInfo		Yhtään pakettia ei ole valittu.
+Install	PackageView		Asenna
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Annettu paketti näyttää jo olevan asennettu järjestelmääsi. Haluaisitko poistaa nykyisen paketin ja jatkaa asennusta?
+Do you want to remember this decision for the rest of this installation?\n	PackageView		Haluatko muistaa tämän päätöksen loppuasennuksen aikana?
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Pakettitiedoston tiedostokoossa näyttää olevan täsmäämättömyys. Paketti voi olla rikkinäinen tai sitä on muokattu luomisen jälkeen. Haluatko yhä jatkaa?
+Error while installing the package\n	PackageView		Virhe asennettaessa pakettia\n
+Disclaimer	PackageTextViewer		Vastuuvapauslauseke
 %.1f GiB	PackageView		%.1f gibitavua
-%.1f KiB	PackageView		%.1f kibitavua
-%.1f MiB	PackageView		%.1f mebitavua
+The installation of the package has been aborted.	PackageView		Paketin asennus on keskeytetty.
+Done	PackageInstall		Valmis
+All existing files will be replaced?	PackageView		Korvataanko kaikki olemassa olevat tiedostot?
+Preparing package	PackageInstall		Valmistellaan pakettia
+No package available.	PackageInfo		Pakettia ei ole saatavilla.
+none	PackageView		ei mitään
+Stop	PackageStatus		Pysäytä
+Other…	PackageView		Muut...
+No installation type selected	PackageView		Asennustyyppiä ei ole valittu
+The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		Symbolinen linkki nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko linkki tämän paketin linkillä vai ohitetaanko se?
+Installing files and folders	PackageInstall		Asennetaan tiedostoja ja kansioita
+Package installer	PackageView		Paketin asennusohjelma
+Skip all	PackageView		Ohita kaikki
+The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Kohde nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko kohde vastaavalla tästä paketista vai ohitetaanko se?
+The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Skripti nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko se vastaavalla tästä paketista vai ohitetaanko se?
+Running post-installation scripts	PackageInstall		Suoritetaan jälkiasennusskriptit
 %llu bytes	PackageView		%llu tavua
+Skip	PackageView		Ohita
+%.1f MiB	PackageView		%.1f mebitavua
+The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Hakemisto nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko hakemisto vastaavalla tästä paketista vai ohitetaanko se?
+The package you requested has been successfully installed on your system.	PackageView		Pyytämäsi paketti on asennettu järjestelmääsi onnistuneesti.
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Virhe! ”%s” ei ole kelvollinen polku.\n
+Installation type:	PackageView		Asennustyyppi:
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Virhe (%s)! Ei voitu avata ”%s”.\n
+Finishing installation	PackageInstall		Lopetetaan asennus
+Installing package	PackageStatus		Asennetaan pakettia
+Ask again	PackageView		Kysy uudelleen
+Abort	PackageView		Keskeytä
+Replace all	PackageView		Korvaa kaikki
+Decline	PackageTextViewer		Kieltäydy
+The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Tiedosto nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko se vastaavalla tästä paketista vai ohitetaanko se?
+All existing files will be skipped?	PackageView		Kaikki olemassaolevat tiedostot ohitetaan?
+Continue	PackageInfo		Jatka
+%.1f KiB	PackageView		%.1f kibitavua
 (%s free)	PackageView		(%s vapaana)
 Abort	PackageInfo		Keskeytä
-Abort	PackageInstall		Keskeytä
-Abort	PackageView		Keskeytä
-Accept	PackageTextViewer		Hyväksy
-All existing files will be replaced?	PackageView		Korvataanko kaikki olemassa olevat tiedostot?
-All existing files will be skipped?	PackageView		Kaikki olemassaolevat tiedostot ohitetaan?
-Ask again	PackageView		Kysy uudelleen
-Continue	PackageInfo		Jatka
-Continue	PackageInstall		Jatka
-Continue	PackageTextViewer		Jatka
-Decline	PackageTextViewer		Kieltäydy
-Disclaimer	PackageTextViewer		Vastuuvapauslauseke
-Do you want to remember this decision for the rest of this installation?\n	PackageView		Haluatko muistaa tämän päätöksen loppuasennuksen aikana?
-Done	PackageInstall		Valmis
-Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Virhe (%s)! Ei voitu avata ”%s”.\n
-Error while installing the package\n	PackageView		Virhe asennettaessa pakettia\n
-Error! \"%s\" is not a valid path.\n	Packageinstaller main		Virhe! ”%s” ei ole kelvollinen polku.\n
-Finishing installation	PackageInstall		Lopetetaan asennus
-Image not loaded correctly	PackageImageViewer		Tiedostovedosta ei ladattu oikein
-Install	PackageView		Asenna
-Install to:	PackageView		Asenna kohteeseen:
-Installation progress	PackageView		Asennuksen eteneminen
-Installation type:	PackageView		Asennustyyppi:
-Installing files and folders	PackageInstall		Asennetaan tiedostoja ja kansioita
-Installing package	PackageStatus		Asennetaan pakettia
-No installation type selected	PackageView		Asennustyyppiä ei ole valittu
-No package available.	PackageInfo		Pakettia ei ole saatavilla.
-No package selected.	PackageInfo		Yhtään pakettia ei ole valittu.
-OK	PackageView		Valmis
-Other…	PackageView		Muut...
-Package installer	PackageView		Paketin asennusohjelma
 PackageInstaller	System name		Pakettiasennus
-Preparing package	PackageInstall		Valmistellaan pakettia
+Abort	PackageInstall		Keskeytä
+Continue	PackageTextViewer		Jatka
 Replace	PackageView		Korvaa
-Replace all	PackageView		Korvaa kaikki
-Running post-installation scripts	PackageInstall		Suoritetaan jälkiasennusskriptit
-Skip	PackageView		Ohita
-Skip all	PackageView		Ohita kaikki
-Stop	PackageStatus		Pysäytä
-The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Hakemisto nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko hakemisto vastaavalla tästä paketista vai ohitetaanko se?
-The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Tiedosto nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko se vastaavalla tästä paketista vai ohitetaanko se?
-The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Annettu paketti näyttää jo olevan asennettu järjestelmääsi. Haluaisitko poistaa nykyisen paketin ja jatkaa asennusta?
-The installation of the package has been aborted.	PackageView		Paketin asennus on keskeytetty.
-The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Kohde nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko kohde vastaavalla tästä paketista vai ohitetaanko se?
+Installation progress	PackageView		Asennuksen eteneminen
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Pakettitiedostoa ei kyetä lukemaan.\nYksi mahdollinen syy saattaa olla, että pyydetty tiedosto ei ole kelvollinen BeOS .pkg -paketti.
-The package you requested has been successfully installed on your system.	PackageView		Pyytämäsi paketti on asennettu järjestelmääsi onnistuneesti.
-The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Pyydetyn paketin asentaminen järjestelmääsi epäonnistui. Tämä saattaa johtua kohdepakettitiedoston pulmasta. Ota yhteyttä tässä asiassa pakettijakelijaan.
-The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Skripti nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko se vastaavalla tästä paketista vai ohitetaanko se?
-The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		Symbolinen linkki nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko linkki tämän paketin linkillä vai ohitetaanko se?
-There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Pakettitiedoston tiedostokoossa näyttää olevan täsmäämättömyys. Paketti voi olla rikkinäinen tai sitä on muokattu luomisen jälkeen. Haluatko yhä jatkaa?
-none	PackageView		ei mitään

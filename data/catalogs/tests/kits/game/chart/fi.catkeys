@@ -1,42 +1,40 @@
-1	finnish	x-vnd.Be.ChartDemo	819116577
-(high) 100% 	ChartWindow		(korkea) 100 %
-0.6 f/s  (logarythmic scale)	ChartWindow		0,6 f/s (logaritminen skaala)
-2 threads	ChartWindow		2 säiettä
-5% (low)	ChartWindow		5 % (alhainen)
-600.0 f/s	ChartWindow		600,0 f/s
-Amas	ChartWindow		Amas
-Animation:	ChartWindow		Animaatio:
-Auto demo	ChartWindow		Automaattinen esittely
-Battle	ChartWindow		Taistelu
-Blue	ChartWindow		Sininen
-CPU load	ChartWindow		Prosessorikuorma
-Chaos	ChartWindow		Kaaos
-Chart	System name		Taulukko
-Colors	ChartWindow		Värit
+1	finnish	x-vnd.Be.ChartDemo	557376150
+Slow rotation	ChartWindow		Hidas kierto
+Pink	ChartWindow		Vaaleanpunainen
 Comet	ChartWindow		Komeetta
 DirectWindow	ChartWindow		DirectWindow
-Display:	ChartWindow		Näyttö:
-DrawBitmap	ChartWindow		DrawBitmap
-Fast motion	ChartWindow		Nopea liike
-Frames/s	ChartWindow		Kehyksiä/s
-Free motion	ChartWindow		Vapaa liike
-Full screen	ChartWindow		Kokoruutu
-Green	ChartWindow		Vihreä
-LineArray	ChartWindow		LineArray
-None	ChartWindow		Ei mikään
-Novas	ChartWindow		Novat
-Off	ChartWindow		Pois käytöstä
 Orange	ChartWindow		Oranssi
-Pink	ChartWindow		Vaaleanpunainen
-Red	ChartWindow		Punainen
 Refresh rate	ChartWindow		Virkistystaajuus
-Slow motion	ChartWindow		Hidas liike
-Slow rotation	ChartWindow		Hidas kierto
-Space color	ChartWindow		Tilaväri
-Space:	ChartWindow		Avaruus:
-Special	ChartWindow		Erityinen
-Spiral	ChartWindow		Spiraali
-Star density	ChartWindow		Tähtitiheys
-Status	ChartWindow		Tila
-White	ChartWindow		Valkoinen
+Blue	ChartWindow		Sininen
+Colors	ChartWindow		Värit
+Novas	ChartWindow		Novat
+LineArray	ChartWindow		LineArray
+Free motion	ChartWindow		Vapaa liike
+(high) 100% 	ChartWindow		(korkea) 100 %
+Green	ChartWindow		Vihreä
+Amas	ChartWindow		Amas
+2 threads	ChartWindow		2 säiettä
 Yellow	ChartWindow		Keltainen
+Off	ChartWindow		Pois käytöstä
+Chaos	ChartWindow		Kaaos
+Full screen	ChartWindow		Kokoruutu
+Spiral	ChartWindow		Spiraali
+Slow motion	ChartWindow		Hidas liike
+Fast motion	ChartWindow		Nopea liike
+Special	ChartWindow		Erityinen
+Status	ChartWindow		Tila
+Star density	ChartWindow		Tähtitiheys
+600.0 f/s	ChartWindow		600,0 f/s
+Display:	ChartWindow		Näyttö:
+Space color	ChartWindow		Tilaväri
+White	ChartWindow		Valkoinen
+Chart	System name		Taulukko
+Animation:	ChartWindow		Animaatio:
+Frames/s	ChartWindow		Kehyksiä/s
+Auto demo	ChartWindow		Automaattinen esittely
+CPU load	ChartWindow		Prosessorikuorma
+DrawBitmap	ChartWindow		DrawBitmap
+Red	ChartWindow		Punainen
+None	ChartWindow		Ei mikään
+Battle	ChartWindow		Taistelu
+Space:	ChartWindow		Avaruus:

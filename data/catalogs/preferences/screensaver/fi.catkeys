@@ -1,29 +1,29 @@
 1	finnish	x-vnd.Haiku-ScreenSaver	215605989
-30 seconds	ScreenSaver		30 sekuntia
-Add…	ScreenSaver		Lisää...
-Blackness	ScreenSaver		Mustuus
-Cancel	ScreenSaver		Peru
-Confirm password:	ScreenSaver		Vahvista salasana:
 Could not load screen saver	ScreenSaver		Ei voitu ladata näytönsäästäjää
-Display Power Management Signaling not available	ScreenSaver		Näytön jännitesyötön hallinnan signalointi ei ole saatavilla
-Don't fade when	ScreenSaver		Älä häivytä kun
-Done	ScreenSaver		Valmis
-Enable screensaver	ScreenSaver		Ota käyttöön näytönsäästäjä
-Fade now when	ScreenSaver		Häivytä nyt kun
-General	ScreenSaver		Yleinen
-No options available	ScreenSaver		Valitsimia ei ole käytettävissä
-OK	ScreenSaver		Valmis
-Password Window	ScreenSaver		Salasanaikkuna
-Password lock	ScreenSaver		Salasanalukitus
-Password:	ScreenSaver		Salasana:
-Passwords don't match. Please try again.	ScreenSaver		Salasanat eivät täsmää. Yritä uudelleen.
-Password…	ScreenSaver		Salasana...
-ScreenSaver	System name		Näytönsäästäjäasetukset
-Screensaver settings	ScreenSaver		Näytönsäästäjän asetukset
-Screensavers	ScreenSaver		Näytönsäästäjät
+30 seconds	ScreenSaver		30 sekuntia
 Start screensaver	ScreenSaver		Käynnistä näytönsäästäjä
-Test	ScreenSaver		Testi
-Turn off screen	ScreenSaver		Käännä näyttö pois päältä
-Use custom password	ScreenSaver		Käytä räätälöityä salasanaa
-Use network password	ScreenSaver		Käytä verkkosalasanaa
+Password…	ScreenSaver		Salasana...
+Password:	ScreenSaver		Salasana:
+Password lock	ScreenSaver		Salasanalukitus
+Add…	ScreenSaver		Lisää...
+Screensavers	ScreenSaver		Näytönsäästäjät
 mouse is here	ScreenSaver		hiiri on täällä
+Display Power Management Signaling not available	ScreenSaver		Näytön jännitesyötön hallinnan signalointi ei ole saatavilla
+ScreenSaver	System name		Näytönsäästäjäasetukset
+Test	ScreenSaver		Testi
+General	ScreenSaver		Yleinen
+Enable screensaver	ScreenSaver		Ota käyttöön näytönsäästäjä
+Cancel	ScreenSaver		Peru
+Turn off screen	ScreenSaver		Käännä näyttö pois päältä
+No options available	ScreenSaver		Valitsimia ei ole käytettävissä
+Password Window	ScreenSaver		Salasanaikkuna
+Fade now when	ScreenSaver		Häivytä nyt kun
+Screensaver settings	ScreenSaver		Näytönsäästäjän asetukset
+Passwords don't match. Please try again.	ScreenSaver		Salasanat eivät täsmää. Yritä uudelleen.
+OK	ScreenSaver		Valmis
+Don't fade when	ScreenSaver		Älä häivytä kun
+Blackness	ScreenSaver		Mustuus
+Use custom password	ScreenSaver		Käytä räätälöityä salasanaa
+Done	ScreenSaver		Valmis
+Confirm password:	ScreenSaver		Vahvista salasana:
+Use network password	ScreenSaver		Käytä verkkosalasanaa

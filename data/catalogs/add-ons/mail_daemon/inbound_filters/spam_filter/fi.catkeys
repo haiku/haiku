@@ -1,9 +1,9 @@
 1	finnish	x-vnd.Haiku-SpamFilter	1975155212
-Add spam rating to start of subject	SpamFilterConfig		Lisää roskapostiarvosana aiheen alkuun
-Close	SpamFilterConfig		Sulje
+or empty e-mail	SpamFilterConfig		tai tyhjä sähköposti
+Spam Filter (AGMS Bayesian)	SpamFilter		Roskapostisuodatin (AGMS Bayesian)
 Genuine below and uncertain above:	SpamFilterConfig		Aito alla ja epävarma yllä:
+Spam above:	SpamFilterConfig		Roskaposti yllä:
+Add spam rating to start of subject	SpamFilterConfig		Lisää roskapostiarvosana aiheen alkuun
 Learn from all incoming e-mail	SpamFilterConfig		Opi kaikesta tulevasta sähköpostista
 Sorry, unable to launch the spamdbm program to let you edit the server settings.	SpamFilterConfig		Ei kyetä käynnistämään spamdb-ohjelmaa palvelinasetusten muokkaamiseksi.
-Spam Filter (AGMS Bayesian)	SpamFilter		Roskapostisuodatin (AGMS Bayesian)
-Spam above:	SpamFilterConfig		Roskaposti yllä:
-or empty e-mail	SpamFilterConfig		tai tyhjä sähköposti
+Close	SpamFilterConfig		Sulje

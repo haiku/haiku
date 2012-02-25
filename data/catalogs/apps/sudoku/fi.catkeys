@@ -1,34 +1,34 @@
 1	finnish	x-vnd.Haiku-Sudoku	2463385585
-Abort	ProgressWindow		Keskeytä
-Advanced	SudokuWindow		Guru
-Blank	SudokuWindow		Tyhjä
-Copy	SudokuWindow		Kopioi
-Could not open \"%s\":\n%s\n	SudokuWindow		Ei voitu avata kohdetta ”%s”:\n%s\n
-Could not set Sudoku:\n%s\n	SudokuWindow		Ei voitu asettaa Sudokua:\n%s\n
-Creating solvable field	SudokuGenerator		Luodaan ratkaistava kenttä
-Easy	SudokuWindow		Helppo
-Export as…	SudokuWindow		Vie nimellä...
-File	SudokuWindow		Tiedosto
-HTML	SudokuWindow		HTML
-Hard	SudokuWindow		Vaikea
-Help	SudokuWindow		Opaste
-Mark invalid values	SudokuWindow		Merkitse väärät arvot
-Mark valid hints	SudokuWindow		Merkitse kelvolliset vihjeet
-New	SudokuWindow		Uusi
-OK	SudokuWindow		Valmis
-Open file…	SudokuWindow		Avaa tiedosto...
-Progress monitor	ProgressWindow		Edistymisvalvonta
-Quit	SudokuWindow		Poistu
-Redo	SudokuWindow		Tee uudelleen
 Restore snapshot	SudokuWindow		Palauta kuvakaappaus
-Searching for removable values	SudokuGenerator		Etsitään poistettavia arvoja
-Snapshot current	SudokuWindow		Otan kuvakaappaus nykyisestä
-Solve	SudokuWindow		Ratkaise
-Solve single field	SudokuWindow		Ratkaise yksi kenttä
-Start again	SudokuWindow		Aloita uudelleen
+Could not set Sudoku:\n%s\n	SudokuWindow		Ei voitu asettaa Sudokua:\n%s\n
+Export as…	SudokuWindow		Vie nimellä...
+OK	SudokuWindow		Valmis
+New	SudokuWindow		Uusi
+Abort	ProgressWindow		Keskeytä
 Sudoku	System name		Sudoku
+Could not open \"%s\":\n%s\n	SudokuWindow		Ei voitu avata kohdetta ”%s”:\n%s\n
+Easy	SudokuWindow		Helppo
+Open file…	SudokuWindow		Avaa tiedosto...
+Solve single field	SudokuWindow		Ratkaise yksi kenttä
+Solve	SudokuWindow		Ratkaise
+Redo	SudokuWindow		Tee uudelleen
+File	SudokuWindow		Tiedosto
+Advanced	SudokuWindow		Guru
+Start again	SudokuWindow		Aloita uudelleen
+HTML	SudokuWindow		HTML
 Sudoku request	SudokuWindow		Sudoku-pyyntö
+Copy	SudokuWindow		Kopioi
+Mark valid hints	SudokuWindow		Merkitse kelvolliset vihjeet
 Sudoku solved - congratulations!\n	SudokuWindow		Sudoku ratkaistu - onneksi olkoon!\n
+Hard	SudokuWindow		Vaikea
+Snapshot current	SudokuWindow		Otan kuvakaappaus nykyisestä
 Text	SudokuWindow		Teksti
-Undo	SudokuWindow		Peru
+Creating solvable field	SudokuGenerator		Luodaan ratkaistava kenttä
 View	SudokuWindow		Näkymä
+Progress monitor	ProgressWindow		Edistymisvalvonta
+Mark invalid values	SudokuWindow		Merkitse väärät arvot
+Blank	SudokuWindow		Tyhjä
+Help	SudokuWindow		Opaste
+Searching for removable values	SudokuGenerator		Etsitään poistettavia arvoja
+Undo	SudokuWindow		Peru
+Quit	SudokuWindow		Poistu

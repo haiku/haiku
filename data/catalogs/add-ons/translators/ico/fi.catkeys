@@ -1,14 +1,14 @@
 1	finnish	x-vnd.Haiku-ICOTranslator	3151213372
 Cursor	ICOTranslator		Kohdistin
-Enforce valid icon sizes	ConfigView		Valvo kelvollisia kuvakekokoja
-ICO Settings	main		ICO-asetukset
-ICOTranslator Settings	ConfigView		Kuvakemuunninasetukset
-Icon	ICOTranslator		Kuvake
-Valid icon sizes are 16, 32, or 48	ConfigView		Kelvolliset kuvakekoot ovat 16, 32, tai 48
 Version %d.%d.%d, %s	ConfigView		Versio %d.%d.%d, %s
 Windows %s %ld bit image	ICOTranslator		Windows %s %ld-bittikuva
 Windows icon images	ConfigView		Windows-kuvakekuvat
-Windows icon images	ICOTranslator		Windows-kuvakekuvat
+Valid icon sizes are 16, 32, or 48	ConfigView		Kelvolliset kuvakekoot ovat 16, 32, tai 48
+Enforce valid icon sizes	ConfigView		Valvo kelvollisia kuvakekokoja
+ICO Settings	main		ICO-asetukset
 Windows icon translator	ICOTranslator		Windows-kuvakemuunnin
-Write 32 bit images on true color input	ConfigView		Kirjoita 32-bittiset kuvat true color-syötteeseen
 pixels in either direction.	ConfigView		pikseliä kummassakin suunnassa.
+Write 32 bit images on true color input	ConfigView		Kirjoita 32-bittiset kuvat true color-syötteeseen
+Icon	ICOTranslator		Kuvake
+ICOTranslator Settings	ConfigView		Kuvakemuunninasetukset
+Windows icon images	ICOTranslator		Windows-kuvakekuvat

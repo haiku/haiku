@@ -1,9 +1,9 @@
 1	finnish	x-vnd.Haiku-RTFTranslator	526958155
-RTF Settings	main		RTF-asetukset
+Version %d.%d.%d, %s	ConfigView		Versio %d.%d.%d, %s
 RTF text files	RTFTranslator		RTF-tekstitiedostot
 RTF-Translator Settings	ConfigView		RTF-muunninasetukset
 Rich Text Format (RTF) files	ConfigView		Rich Text -muotoiset (RTF) tiedostot
+RTF Settings	main		RTF-asetukset
+RichTextFormat file	RTFTranslator		RichTextFormat-tiedosto
 Rich Text Format Translator	RTFTranslator		Rich Text -muotomuunnin
 Rich Text Format translator v%d.%d.%d %s	RTFTranslator		Rich Text -muotomuunnin v%d.%d.%d %s
-RichTextFormat file	RTFTranslator		RichTextFormat-tiedosto
-Version %d.%d.%d, %s	ConfigView		Versio %d.%d.%d, %s

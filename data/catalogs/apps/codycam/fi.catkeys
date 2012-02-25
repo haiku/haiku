@@ -1,93 +1,92 @@
-1	finnish	x-vnd.Haiku.CodyCam	441085909
-Can't find an available connection to the video window	CodyCam		Ei voida löytää saatavilla olevaa yhteyttä videoikkunaan
-Cannot connect the video source to the video window	CodyCam		Ei voida yhdistää videolähdettä videoikkunaan
-Cannot create a video window	CodyCam		Ei voida luoda videoikkunaa
-Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Ei voi löytää videolähdettä. Tarvitset webbikameran Cody-kameraohjelman käyttämiseen.
+1	finnish	x-vnd.Haiku-CodyCam	3353004969
+Capturing Image…	VideoConsumer.cpp		Kaapataan kuva…
+Every 30 seconds	CodyCam		Joka 30. sekunti
+File name:	CodyCam		Tiedostonimi:
+Last Capture: 	VideoConsumer.cpp		Viimeisin kaappaus: 
+Server login failed	VideoConsumer.cpp		Kirjautuminen palvelimelle epäonnistui
+Remote host has closed the connection.\n	FtpClient		Etäpää sulki yhteyden.\n
+Login:	CodyCam		Kirjaudu:
+Format:	CodyCam		Muoto:
+Every 2 hours	CodyCam		Joka toinen tunti
+Closing the window\n	VideoConsumer.cpp		Suljetaan ikkuna\n
+login ID expected	CodyCam		odotettiin kirjautumistunnusta
+Rate:	CodyCam		Taajuus:
+JPEG image	CodyCam		JPEG-kuva
+Capture Rate Menu	CodyCam		Kaappaustaajusvalikko
+File %s # unterminated quote at end of file\n	SettingsHandler		Tiedosto %s # päättämätön lainaus tiedoston lopussa\n
+Password:	CodyCam		Salasana:
+Passive FTP	CodyCam		Passiivinen FTP
+destination directory expected	CodyCam		odotettiin kohdehakemistoa
+password	CodyCam		salasana
+Directory:	CodyCam		Hakemisto:
+Every minute	CodyCam		Joka minuutti
+read: %ld\n	SftpClient		luettu: %ld\n
+Waiting…	CodyCam		Odotetaan…
+Logging in…	VideoConsumer.cpp		Kirjaudutaan…
+Server:	CodyCam		Palvelin:
+server address expected	CodyCam		odotettiin palvelinosoitetta
+Error creating output file	VideoConsumer.cpp		Virhe luotaessa tulostetiedostoa
+unrecognized upload client specified	CodyCam		tunnistamaton lähetysasiakas määritetty
+File %s ; Line %ld # unterminated quote\n	SettingsHandler		Tiedosto %s ; Rivi %ld # päättämätön lainaus\n
+Output	CodyCam		Tuloste
+Every 15 minutes	CodyCam		Joka 15. minuutti
 Cannot find an available video stream	CodyCam		Ei voida löytää saatavilla olevaa video-vuota
-Cannot find the media roster	CodyCam		Ei kyetä löytämään medialuetteloa
+Can't find an available connection to the video window	CodyCam		Ei voida löytää saatavilla olevaa yhteyttä videoikkunaan
+Transmitting…	VideoConsumer.cpp		Siirretään…
 Cannot get a time source	CodyCam		Ei voida hakea aikalähdettä
+Every 8 hours	CodyCam		Joka 8. tunti
+Rename failed	VideoConsumer.cpp		Uudelleennimeäminen epäonnistui
+Cannot start time source!	CodyCam		Ei voida käynnistää aikalähdettä!
 Cannot register the video window	CodyCam		Ei voida rekisteröidä videoikkunaa
-Cannot seek time source!	CodyCam		Ei voida etsiä aikalähdettä!
+Every 24 hours	CodyCam		Joka 24. tunti
+unknown command	SettingsHandler		tuntematon komento
+Video settings	CodyCam		Video-asetukset
+Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Ei voi löytää videolähdettä. Tarvitset webbikameran Cody-kameraohjelman käyttämiseen.
+still image filename expected	CodyCam		odotettiin pysäytyskuvatiedostonimeä
+invalid upload client %ld\n	VideoConsumer.cpp		virheellinen lähetysasiakas %ld\n
+Every 15 seconds	CodyCam		Joka 15. sekunti
+Error writing output file	VideoConsumer.cpp		Virhe kirjoitettaessa tulostetiedostoa
+image file format expected	CodyCam		odotettiin kuvatiedostomuotoa
 Cannot set the time source for the video source	CodyCam		Ei voida asettaa aikalähdettä videolähteeseen
+Type:	CodyCam		Tyyppi:
 Cannot set the time source for the video window	CodyCam		Ei voida asettaa aikalähdettä videoikkunaan
+Stop video	CodyCam		Pysäytä video
+Locking the window\n	VideoConsumer.cpp		Lukitaan ikkuna\n
+File %s; Line %ld # %s	SettingsHandler		Tiedosto %s; Rivi %ld # %s
+Couldn't find requested directory on server	VideoConsumer.cpp		Ei kyetty löytämään pyydettyä hakemistoa palvelimelta
+Renaming…	VideoConsumer.cpp		Nimetään uudelleen…
+Local	CodyCam		Paikallinen
+Error setting type of output file	VideoConsumer.cpp		Virhe asetettaessa tulostetiedoston tyyppiä
+upload client name expected	CodyCam		odotettiin lähetysasiakasnimeä
+SFTP	CodyCam		SFTP
+Connected…	VideoConsumer.cpp		Yhdistetty…
+PASS <suppressed>  (real password sent)\n	FtpClient		PASS <vaimennettu>  (oikea salasana lähetetty)\n
+Every 5 minutes	CodyCam		Joka 5. minuutti
+read: %d\n	SftpClient		luettu: %d\n
+OK	CodyCam		Valmis
+Capture controls	CodyCam		Kaappausohjaimet
+Every hour	CodyCam		Joka tunti
+Cannot connect the video source to the video window	CodyCam		Ei voida yhdistää videolähdettä videoikkunaan
+capture rate expected	CodyCam		odotettiin kaappaustaajuutta
+Error getting initial latency for the capture node	CodyCam		Virhe haettaessa alkuviivettä kaappaussolmua varten
+Send to…	CodyCam		Lähetä kohteeseen…
+on or off expected	Settings	Do not translate 'on' and 'off'	odotettiin on tai off
+Quit	CodyCam		Poistu
+cmd: '%s'\n	FtpClient		komento: ’%s’\n
+Never	CodyCam		Ei koskaan
+Cannot create a video window	CodyCam		Ei voida luoda videoikkunaa
+Every 10 minutes	CodyCam		Joka 10. minuutti
 Cannot start the video source	CodyCam		Ei voida käynnistää videolähdettä
 Cannot start the video window	CodyCam		Ei voida käynnistää videoikkunaa
-Cannot start time source!	CodyCam		Ei voida käynnistää aikalähdettä!
-Capture Rate Menu	CodyCam		Kaappaustaajusvalikko
-Capture controls	CodyCam		Kaappausohjaimet
-Capturing Image…	VideoConsumer.cpp		Kaapataan kuva…
-Closing the window\n	VideoConsumer.cpp		Suljetaan ikkuna\n
-CodyCam	System name		Cody-kamera
-Connected…	VideoConsumer.cpp		Yhdistetty…
-Couldn't find requested directory on server	VideoConsumer.cpp		Ei kyetty löytämään pyydettyä hakemistoa palvelimelta
-Directory:	CodyCam		Hakemisto:
-Error creating output file	VideoConsumer.cpp		Virhe luotaessa tulostetiedostoa
-Error getting initial latency for the capture node	CodyCam		Virhe haettaessa alkuviivettä kaappaussolmua varten
-Error setting type of output file	VideoConsumer.cpp		Virhe asetettaessa tulostetiedoston tyyppiä
-Error writing output file	VideoConsumer.cpp		Virhe kirjoitettaessa tulostetiedostoa
-Every 10 minutes	CodyCam		Joka 10. minuutti
-Every 15 minutes	CodyCam		Joka 15. minuutti
-Every 15 seconds	CodyCam		Joka 15. sekunti
-Every 2 hours	CodyCam		Joka toinen tunti
-Every 24 hours	CodyCam		Joka 24. tunti
-Every 30 minutes	CodyCam		Joka 30. minuutti
-Every 30 seconds	CodyCam		Joka 30. sekunti
-Every 4 hours	CodyCam		Joka 4. tunti
-Every 5 minutes	CodyCam		Joka 5. minuutti
-Every 8 hours	CodyCam		Joka 8. tunti
-Every hour	CodyCam		Joka tunti
-Every minute	CodyCam		Joka minuutti
-FTP	CodyCam		FTP
-File	CodyCam		Tiedosto
-File %s # unterminated quote at end of file\n	SettingsHandler		Tiedosto %s # päättämätön lainaus tiedoston lopussa\n
-File %s ; Line %ld # unterminated quote\n	SettingsHandler		Tiedosto %s ; Rivi %ld # päättämätön lainaus\n
-File %s; Line %ld # %s	SettingsHandler		Tiedosto %s; Rivi %ld # %s
-File name:	CodyCam		Tiedostonimi:
-File transmission failed	VideoConsumer.cpp		Tiedostonsiirto epäonnistui
-Format:	CodyCam		Muoto:
-Image Format Menu	CodyCam		Kuvamuotovalikko
-JPEG image	CodyCam		JPEG-kuva
-Last Capture: 	VideoConsumer.cpp		Viimeisin kaappaus: 
-Local	CodyCam		Paikallinen
-Locking the window\n	VideoConsumer.cpp		Lukitaan ikkuna\n
-Logging in…	VideoConsumer.cpp		Kirjaudutaan…
-Login:	CodyCam		Kirjaudu:
-Never	CodyCam		Ei koskaan
-OK	CodyCam		Valmis
-Output	CodyCam		Tuloste
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <vaimennettu>  (oikea salasana lähetetty)\n
-Passive FTP	CodyCam		Passiivinen FTP
-Password:	CodyCam		Salasana:
-Quit	CodyCam		Poistu
-Rate:	CodyCam		Taajuus:
-Remote host has closed the connection.\n	FtpClient		Etäpää sulki yhteyden.\n
-Rename failed	VideoConsumer.cpp		Uudelleennimeäminen epäonnistui
-Renaming…	VideoConsumer.cpp		Nimetään uudelleen…
-SFTP	CodyCam		SFTP
-Send to…	CodyCam		Lähetä kohteeseen…
-Server login failed	VideoConsumer.cpp		Kirjautuminen palvelimelle epäonnistui
-Server:	CodyCam		Palvelin:
-Start video	CodyCam		Käynnistä video
-Stop video	CodyCam		Pysäytä video
-Transmitting…	VideoConsumer.cpp		Siirretään…
-Type:	CodyCam		Tyyppi:
-Video settings	CodyCam		Video-asetukset
-Waiting…	CodyCam		Odotetaan…
-capture rate expected	CodyCam		odotettiin kaappaustaajuutta
-cmd: '%s'\n	FtpClient		komento: ’%s’\n
-destination directory expected	CodyCam		odotettiin kohdehakemistoa
-image file format expected	CodyCam		odotettiin kuvatiedostomuotoa
-invalid upload client %ld\n	VideoConsumer.cpp		virheellinen lähetysasiakas %ld\n
-login ID expected	CodyCam		odotettiin kirjautumistunnusta
-on or off expected	Settings	Do not translate 'on' and 'off'	odotettiin on tai off
-password	CodyCam		salasana
 password expected	CodyCam		odotettiin salasanaa
-read: %d\n	SftpClient		luettu: %d\n
-read: %ld\n	SftpClient		luettu: %ld\n
 reply: %d, %d\n	FtpClient		vastaus: %d, %d\n
+Cannot find the media roster	CodyCam		Ei kyetä löytämään medialuetteloa
+Every 4 hours	CodyCam		Joka 4. tunti
+FTP	CodyCam		FTP
+File transmission failed	VideoConsumer.cpp		Tiedostonsiirto epäonnistui
+Cannot seek time source!	CodyCam		Ei voida etsiä aikalähdettä!
+File	CodyCam		Tiedosto
+Image Format Menu	CodyCam		Kuvamuotovalikko
+Every 30 minutes	CodyCam		Joka 30. minuutti
 reply: '%s'\n	SftpClient		vastaus: ’%s’\n
-server address expected	CodyCam		odotettiin palvelinosoitetta
-still image filename expected	CodyCam		odotettiin pysäytyskuvatiedostonimeä
-unknown command	SettingsHandler		tuntematon komento
-unrecognized upload client specified	CodyCam		tunnistamaton lähetysasiakas määritetty
-upload client name expected	CodyCam		odotettiin lähetysasiakasnimeä
+Start video	CodyCam		Käynnistä video

@@ -1,20 +1,20 @@
 1	finnish	x-vnd.Haiku-CPUFrequencyPref	3079996868
-CPU frequency status view	CPU Frequency View		Suoritintaajuuden tilanäkymä
-CPUFrequency	System name		Suoritintaajuusasetukset
-CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Suoritintaajuusasetukset\n\ttekijä: Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
-Defaults	Pref Window		Oletukset
-Dynamic performance	Status view		Dynaaminen suorituskyky
-Dynamic stepping	CPU Frequency View		Dynaaminen muutos
-High performance	Status view		Korkea suorituskyky
-Install replicant into Deskbar	CPU Frequency View		Asenna kopio Työpöytäpalkkiin
-Integration time [ms]: 	CPU Frequency View		Integraatioaika [ms]:
-Launching the CPU frequency preflet failed.\n\nError: 	Status view		Suoritintaajuuden asetusohjelman käynnistys epäonnistui.\n\nVirhe:
-Low energy	Status view		Matala energiankulutus
 Ok	Status view		Valmis
-Open Speedstep preferences…	Status view		Avaa nopeusaskelvalinnat...
-Quit	Status view		Poistu
-Revert	Pref Window		Palauta
+CPU frequency status view	CPU Frequency View		Suoritintaajuuden tilanäkymä
 Set state	Status view		Aseta tila
-Step up by CPU usage	Color Step View		Muuta ylöspäin tämän suorittimen käyttömäärän kohdalla:
+Defaults	Pref Window		Oletukset
+Install replicant into Deskbar	CPU Frequency View		Asenna kopio Työpöytäpalkkiin
+Quit	Status view		Poistu
+High performance	Status view		Korkea suorituskyky
 Stepping policy	CPU Frequency View		Muutostapa
+Dynamic performance	Status view		Dynaaminen suorituskyky
+Step up by CPU usage	Color Step View		Muuta ylöspäin tämän suorittimen käyttömäärän kohdalla:
+Dynamic stepping	CPU Frequency View		Dynaaminen muutos
 Stepping policy: 	CPU Frequency View		Muutostapa:
+Integration time [ms]: 	CPU Frequency View		Integraatioaika [ms]:
+Open Speedstep preferences…	Status view		Avaa nopeusaskelvalinnat...
+Revert	Pref Window		Palauta
+Low energy	Status view		Matala energiankulutus
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Suoritintaajuuden asetusohjelman käynnistys epäonnistui.\n\nVirhe:
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Suoritintaajuusasetukset\n\ttekijä: Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
+CPUFrequency	System name		Suoritintaajuusasetukset

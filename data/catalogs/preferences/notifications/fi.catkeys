@@ -1,50 +1,50 @@
 1	finnish	x-vnd.Haiku-Notifications	3631903554
-Allowed	NotificationView		Sallittu
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Tapahtui virhe tallennettaessa asetuksia.\nOn mahdollista, että levytila on loppunut.
-Application	NotificationView		Sovellus
-Applications	NotificationView		Sovellukset
-Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Et voi ottaa käyttöön ilmoituksia käynnistysaikana. Sinulla ei luultavasti ole kirjoitusoikeutta alkulatausasetushakemistoon.
-Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Ei voi tallentaa asetuksia. Sinulla ei luultavasti ole kirjoitusoikeutta alkulatausasetushakemistoon.
-Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Et voi tallentaa asetuksia. Sinulla ei luultavasti ole kirjoitusoikeutta asetushakemistoon tai levyasema on täynnä.
-Cannot disable notifications because the server can't be reached.	GeneralView		Ei voi ottaa pois käytöstä ilmoituksia, koska palvelinta ei tavoiteta.
-Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Ei voida ottaa käyttöön ilmoituksia, koska palvelinta ei löydy.\nTämä tarkoittaa, että InfoPopper-asennus ei ole onnistunut.
-Disable notifications	GeneralView		Ota ilmoitukset pois käytöstä
-Display	PrefletView		Näyttö
-Enable notifications	GeneralView		Ota käyttöön ilmoitukset
-Enable notifications at startup	GeneralView		Ota käyttöön ilmoitukset käynnistymisen yhteydessä
-Enabled	NotificationView		Otettu käyttöön
-Error	NotificationView		Virhe
-Events are not notified	GeneralView		Tapahtumia ei ole ilmoitettu
-Events are notified	GeneralView		Tapahtumista on ilmoitettu
-General	PrefletView		Yleistä
-Hide notifications from screen after	GeneralView		Piilota ilmoitukset näytöltä ajassa
-Icon size:	DisplayView		Kuvakekoko:
-Important	NotificationView		Tärkeä
-Information	NotificationView		Tiedot
-Large icon	DisplayView		Suuri kuvake
-Last Received	NotificationView		Viimeksi vastaanotettu
-Mini icon	DisplayView		Minikuvake
-No	NotificationView		Ei
 Notifications	GeneralView		Ilmoitukset
-Notifications	NotificationView		Ilmoitusasetukset
-Notifications	PrefletView		Ilmoitusasetukset
-Notifications	System name		Ilmoitusasetukset
-Notifications cannot be stopped, because the server can't be reached.	GeneralView		Ilmoituksia ei voi pysäyttää, koska palvelinta ei tavoiteta.
-OK	DisplayView		Valmis
-OK	GeneralView		Valmis
-OK	NotificationView		Valmis
-Progress	NotificationView		Edistyminen
+seconds of inactivity	GeneralView		joutilaisuussekunnit
 Revert	PrefletWin		Palauta
+Mini icon	DisplayView		Minikuvake
+Enable notifications	GeneralView		Ota käyttöön ilmoitukset
+Error	NotificationView		Virhe
+OK	GeneralView		Valmis
+Events are not notified	GeneralView		Tapahtumia ei ole ilmoitettu
 Save	PrefletWin		Tallenna
+Type	NotificationView		Tyyppi
+Notifications cannot be stopped, because the server can't be reached.	GeneralView		Ilmoituksia ei voi pysäyttää, koska palvelinta ei tavoiteta.
+Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Ei voida ottaa käyttöön ilmoituksia, koska palvelinta ei löydy.\nTämä tarkoittaa, että InfoPopper-asennus ei ole onnistunut.
+OK	NotificationView		Valmis
+Important	NotificationView		Tärkeä
+Cannot disable notifications because the server can't be reached.	GeneralView		Ei voi ottaa pois käytöstä ilmoituksia, koska palvelinta ei tavoiteta.
+Progress	NotificationView		Edistyminen
+Last Received	NotificationView		Viimeksi vastaanotettu
+General	PrefletView		Yleistä
+Display	PrefletView		Näyttö
+Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Et voi ottaa käyttöön ilmoituksia käynnistysaikana. Sinulla ei luultavasti ole kirjoitusoikeutta alkulatausasetushakemistoon.
 Search:	NotificationView		Etsintä:
-The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Ilmoituspalvelinta ei löytynyt. Tämä tarkoittaa, että InfoPopper-asennus ei ole onnistunut.
 The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		Ilmoituspalvelinta ei löytynyt.\nMahdollinen syy on, että asennusta ei ole tehty oikein
+Allowed	NotificationView		Sallittu
+Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Et voi tallentaa asetuksia. Sinulla ei luultavasti ole kirjoitusoikeutta asetushakemistoon tai levyasema on täynnä.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	DisplayView		Asetusten tallentamisessa oli pulma.\nOn mahdollista, että sinulla ei ole kirjoitusoikeutta asetushakemistoon.
+Yes	NotificationView		Kyllä
+Large icon	DisplayView		Suuri kuvake
+Icon size:	DisplayView		Kuvakekoko:
+Hide notifications from screen after	GeneralView		Piilota ilmoitukset näytöltä ajassa
+Disable notifications	GeneralView		Ota ilmoitukset pois käytöstä
+Notifications	System name		Ilmoitusasetukset
+Notifications	NotificationView		Ilmoitusasetukset
+No	NotificationView		Ei
+Title	NotificationView		Otsikko
+Information	NotificationView		Tiedot
+Window width:	DisplayView		Ikkunaleveys:
+Application	NotificationView		Sovellus
+Enabled	NotificationView		Otettu käyttöön
+OK	DisplayView		Valmis
+Unknown	NotificationView		Tuntematon
+Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Ei voi tallentaa asetuksia. Sinulla ei luultavasti ole kirjoitusoikeutta alkulatausasetushakemistoon.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Asetusten tallentamisessa oli pulma.\nOn mahdollista, että sinulla ei ole kirjoitusoikeutta asetushakemistoon.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Asetusten tallentamisessa oli pulma.\nOn mahdollista, että sinulla ei ole kirjoitusoikeutta asetushakemistoon.
-Title	NotificationView		Otsikko
-Type	NotificationView		Tyyppi
-Unknown	NotificationView		Tuntematon
-Window width:	DisplayView		Ikkunaleveys:
-Yes	NotificationView		Kyllä
-seconds of inactivity	GeneralView		joutilaisuussekunnit
+Enable notifications at startup	GeneralView		Ota käyttöön ilmoitukset käynnistymisen yhteydessä
+Notifications	PrefletView		Ilmoitusasetukset
+The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Ilmoituspalvelinta ei löytynyt. Tämä tarkoittaa, että InfoPopper-asennus ei ole onnistunut.
+Applications	NotificationView		Sovellukset
+Events are notified	GeneralView		Tapahtumista on ilmoitettu

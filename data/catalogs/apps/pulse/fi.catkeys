@@ -1,48 +1,48 @@
 1	finnish	x-vnd.Haiku-Pulse	2324471783
-%.2f GHz	NormalPulseView		%.2f GHz
-%ld MHz	NormalPulseView		%ld MHz
-%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\ntekijät: David Ramsey ja Arve Hjønnevåg\nPäivittäjä: Daniel Switkin\n
-About Pulse…	CPUButton		Ohjelmasta Pulssi...
-About Pulse…	PulseView		Ohjelmasta Pulssi...
-Active color	ConfigView		Käytössä oleva väri
-Bar colors	ConfigView		Palkkivärit
-CPU progress bar	NormalPulseView		Prosessorin edistymispalkki
-Defaults	PrefsWindow		Oletukset
-Deskbar	CPUButton		Työpöytäpalkki
-Deskbar menu	CPUButton		Työpöytäpalkkivalikko
-Deskbar mode	MiniPulseView		Työpöytäpalkkitila
-Deskbar mode	NormalPulseView		Työpöytäpalkkitila
-Deskbar mode	PrefsWindow		Työpöytäpalkkitila
-Error	PulseApp		Virhe
-Fade colors	ConfigView		Haalista värit
-Frame color	ConfigView		Kehysväri
-Idle color	ConfigView		Joutokäyntiväri
-Info	CPUButton		Tiedot
-Info	DeskbarPulseView		Tiedot
-Info	PulseApp		Tiedot
-Info	PulseView		Tiedot
-Installing in Deskbar failed\n%s	PulseApp		Asentaminen Työpöytäpalkkiin epäonnistui\n%s
-Mini mode	DeskbarPulseView		Minitila
-Mini mode	NormalPulseView		Minitila
-Mini mode	PrefsWindow		Minitila
-Normal mode	DeskbarPulseView		Normaalitila
-Normal mode	MiniPulseView		Normaalitila
-Normal mode	PrefsWindow		Normaalitila
-OK	CPUButton		Valmis
-OK	DeskbarPulseView		Valmis
 OK	PrefsWindow		Valmis
-OK	PulseApp		Valmis
-OK	PulseView		Valmis
-Pulse	NormalPulseView		Pulssi
-Pulse	PulseApp		Pulssi
-Pulse	System name		Pulssi
-Pulse settings	PulseWindow		Pulssi-asetukset
 Quit	DeskbarPulseView		Poistu
-Quit	MiniPulseView		Poistu
+Mini mode	DeskbarPulseView		Minitila
 Remove replicant	CPUButton		Poista replikantti
-Removing from Deskbar failed.\n%s	DeskbarPulseView		Poistaminen Työpöytäpalkista epäonnistui.\n%s
-Settings…	PulseView		Asetukset...
+Active color	ConfigView		Käytössä oleva väri
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Käyttö: Pulse [--mini] [-w leveys] [--width=leveys]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
+Fade colors	ConfigView		Haalista värit
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\ntekijät: David Ramsey ja Arve Hjønnevåg\nPäivittäjä: Daniel Switkin\n
+OK	DeskbarPulseView		Valmis
+Deskbar mode	PrefsWindow		Työpöytäpalkkitila
+%.2f GHz	NormalPulseView		%.2f GHz
+Normal mode	PrefsWindow		Normaalitila
+Defaults	PrefsWindow		Oletukset
+Normal mode	MiniPulseView		Normaalitila
+Error	PulseApp		Virhe
+Info	PulseView		Tiedot
+Deskbar	CPUButton		Työpöytäpalkki
+Frame color	ConfigView		Kehysväri
+Mini mode	PrefsWindow		Minitila
+OK	PulseApp		Valmis
+Bar colors	ConfigView		Palkkivärit
+Settings…	PulseView		Asetukset...
+You can't disable the last active CPU.	PulseView		Et voi ottaa pois käytöstä viimeistä käytössä olevaa prosessoria.
+Info	PulseApp		Tiedot
+Info	CPUButton		Tiedot
+OK	PulseView		Valmis
+Deskbar menu	CPUButton		Työpöytäpalkkivalikko
+About Pulse…	PulseView		Ohjelmasta Pulssi...
+Deskbar mode	MiniPulseView		Työpöytäpalkkitila
+Quit	MiniPulseView		Poistu
+Pulse	System name		Pulssi
+Pulse	NormalPulseView		Pulssi
+%ld MHz	NormalPulseView		%ld MHz
+Deskbar mode	NormalPulseView		Työpöytäpalkkitila
+Pulse	PulseApp		Pulssi
 Width of icon:	ConfigView		Kuvakkeen leveys:
 You can't disable the last active CPU.	CPUButton		Et voi ottaa pois käytöstä viimeistä käytössä olevaa prosessoria.
-You can't disable the last active CPU.	PulseView		Et voi ottaa pois käytöstä viimeistä käytössä olevaa prosessoria.
+Normal mode	DeskbarPulseView		Normaalitila
+OK	CPUButton		Valmis
+About Pulse…	CPUButton		Ohjelmasta Pulssi...
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Poistaminen Työpöytäpalkista epäonnistui.\n%s
+Mini mode	NormalPulseView		Minitila
+Info	DeskbarPulseView		Tiedot
+Pulse settings	PulseWindow		Pulssi-asetukset
+Idle color	ConfigView		Joutokäyntiväri
+Installing in Deskbar failed\n%s	PulseApp		Asentaminen Työpöytäpalkkiin epäonnistui\n%s
+CPU progress bar	NormalPulseView		Prosessorin edistymispalkki

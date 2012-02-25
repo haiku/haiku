@@ -1,77 +1,77 @@
 1	finnish	x-vnd.Haiku-DriveSetup	1209826930
-%ld MiB	Support		%ld mebitavua
-<empty>	DiskView		<tyhjä>
-<empty>	PartitionList		<tyhjä>
-Active	PartitionList		Aktiivinen
-Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat poistaa valitun osion?\n\nKaikki osion tiedot katoavat palauttamattomasti, jos teet niin!
-Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa osion ”%s”? Sinulta kysytään uudelleen ennen kuin muutokset kirjoitetaan levylle.
-Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa osion? Sinulta kysytään uudelleen ennen kuin muutokset kirjoitetaan levylle.
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki levyn %s tiedot katoavat palauttamattomasti, jos teet niin!
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki osion %s tiedot kadotetaan palauttamattomasti, jos teet niin!
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki osion tiedot katoavat palauttamattomasti, jos teet niin!
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki valitun osion tiedot katoavat palauttamattomasti, jos teet niin!
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki valitun osion tiedot katoavat palauttamattomasti, jos teet niin!
-Cancel	CreateParamsPanel		Peru
-Cancel	InitParamsPanel		Peru
-Cancel	MainWindow		Peru
-Cannot delete the selected partition.	MainWindow		Valittua osiota ei voida poistaa.
-Continue	MainWindow		Jatka
-Could not aquire partitioning information.	MainWindow		Ei voitu hakea osiointitietoja.
-Could not delete the selected partition.	MainWindow		Ei voitu poistaa valittua osiota.
-Could not mount partition %s.	MainWindow		Ei voitu liittää osiota %s.
-Could not unmount partition %s.	MainWindow		Ei voitu irrottaa osiota %s.
-Create	CreateParamsPanel		Luo
-Create…	MainWindow		Luo…
-Creation of the partition has failed.	MainWindow		Osion luominen epäonnistui.
+DriveSetup	System name		Levyasema-asetukset
 Delete	MainWindow		Poista
-Delete partition	MainWindow		Poista osio
-Device	DiskView		Laite
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki valitun osion tiedot katoavat palauttamattomasti, jos teet niin!
+Rescan	MainWindow		Etsi uudelleen
+OK	MainWindow		Valmis
+Could not aquire partitioning information.	MainWindow		Ei voitu hakea osiointitietoja.
+There's no space on the partition where a child partition could be created.	MainWindow		Osiolla ei ole mitään tilaa, johon olisi voitu luoda tytärosio.
+%ld MiB	Support		%ld mebitavua
+<empty>	PartitionList		<tyhjä>
+Unable to find the selected partition by ID.	MainWindow		Ei kyetä löytämään valittua osiota tunnisteen perusteella.
+Select a partition from the list below.	DiskView		Valitse osio alapuolella olevasta luettelosta.
+No disk devices have been recognized.	DiskView		Levyasemia ei  tunnistettu.
+The selected disk is read-only.	MainWindow		Valittu levy on kirjoitussuojattu.
+Partition name:	CreateParamsPanel		Osionimi:
+Initialize	InitParamsPanel		Alusta
+Could not mount partition %s.	MainWindow		Ei voitu liittää osiota %s.
+The partition %s is already unmounted.	MainWindow		Osio %s on jo liitetty.
+Failed to initialize the partition. No changes have been written to disk.	MainWindow		Osion alustus epäonnistui. Levylle ei ole kirjoitettu mitään muutoksia.
+Failed to delete the partition. No changes have been written to disk.	MainWindow		Osion poistaminen epäonnistui. Mitään muutoksia ei ole kirjoitettu levylle.
+Partition type:	CreateParamsPanel		Osiotyyppi:
+Could not delete the selected partition.	MainWindow		Ei voitu poistaa valittua osiota.
+Initialize	MainWindow		Alusta
+Error: 	MainWindow	in any error alert	Virhe: 
+Partition %ld	DiskView		Osio %ld
+The partition %s has been successfully initialized.\n	MainWindow		Osion %s alustus onnistui.\n
+<empty>	DiskView		<tyhjä>
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Osion %s alustus epäonnistui. (Mitään ei ole kirjoitettu levylle.)
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki osion tiedot katoavat palauttamattomasti, jos teet niin!
+Mounted at	PartitionList		Liittämispiste:
+Failed to initialize the partition %s!\n	MainWindow		Osion %s alustus epäonnistui!\n
+There was an error acquiring the partition row.	MainWindow		Osioriviä haettaessa syntyi virhe.
+You need to select a partition entry from the list.	MainWindow		Sinun täytyy valita osiorivi luettelosta.
+Format (not implemented)	MainWindow		Formatoi (ei ole toteutettu)
+The currently selected partition does not have a parent partition.	MainWindow		Nykyisellä valitulla osiolla ei ole yläosiota.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki valitun osion tiedot katoavat palauttamattomasti, jos teet niin!
+Offset: %ld MB	Support		Siirros: %ld mebitavua
+Write changes	MainWindow		Kirjoita muutokset
+There was an error preparing the disk for modifications.	MainWindow		Tapahtui virhe valmisteltaessa levyä muutoksia varten.
+The partition %s is already mounted.	MainWindow		Osio %s on jo liitetty.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki levyn %s tiedot katoavat palauttamattomasti, jos teet niin!
+Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat poistaa valitun osion?\n\nKaikki osion tiedot katoavat palauttamattomasti, jos teet niin!
+Create…	MainWindow		Luo…
+Disk system \"%s\"\" not found!	MainWindow		Levyjärjestelmää ”%s” ei löytynyt!
+Could not unmount partition %s.	MainWindow		Ei voitu irrottaa osiota %s.
+Mount	MainWindow		Liitä
+Create	CreateParamsPanel		Luo
 Device	PartitionList		Laite
 Disk	MainWindow		Levy
-Disk system \"%s\"\" not found!	MainWindow		Levyjärjestelmää ”%s” ei löytynyt!
-DriveSetup	System name		Levyasema-asetukset
-Eject	MainWindow		Poista asemasta
-End: %ld MB	Support		Loppu: %ld mebitavua
-Error: 	MainWindow	in any error alert	Virhe: 
-Failed to delete the partition. No changes have been written to disk.	MainWindow		Osion poistaminen epäonnistui. Mitään muutoksia ei ole kirjoitettu levylle.
-Failed to initialize the partition %s!\n	MainWindow		Osion %s alustus epäonnistui!\n
-Failed to initialize the partition. No changes have been written to disk.	MainWindow		Osion alustus epäonnistui. Levylle ei ole kirjoitettu mitään muutoksia.
-File system	PartitionList		Tiedostojärjestelmä
-Format (not implemented)	MainWindow		Formatoi (ei ole toteutettu)
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Osion %s alustus epäonnistui. (Mitään ei ole kirjoitettu levylle.)
-Initialize	InitParamsPanel		Alusta
-Initialize	MainWindow		Alusta
-Mount	MainWindow		Liitä
-Mount all	MainWindow		Liitä kaikki
-Mounted at	PartitionList		Liittämispiste:
-No disk devices have been recognized.	DiskView		Levyasemia ei  tunnistettu.
-OK	MainWindow		Valmis
-Offset: %ld MB	Support		Siirros: %ld mebitavua
-Parameters	PartitionList		Parametrit
-Partition	MainWindow		Osio
-Partition %ld	DiskView		Osio %ld
-Partition name:	CreateParamsPanel		Osionimi:
-Partition size	CreateParamsPanel		Osiokoko
-Partition type:	CreateParamsPanel		Osiotyyppi:
-Rescan	MainWindow		Etsi uudelleen
-Select a partition from the list below.	DiskView		Valitse osio alapuolella olevasta luettelosta.
-Size	PartitionList		Koko
-Surface test (not implemented)	MainWindow		Pintatesti (ei toteutettu)
-The currently selected partition does not have a parent partition.	MainWindow		Nykyisellä valitulla osiolla ei ole yläosiota.
-The currently selected partition is not empty.	MainWindow		Nykyinen valittu osio ei ole tyhjä.
-The partition %s has been successfully initialized.\n	MainWindow		Osion %s alustus onnistui.\n
-The partition %s is already mounted.	MainWindow		Osio %s on jo liitetty.
-The partition %s is already unmounted.	MainWindow		Osio %s on jo liitetty.
-The partition %s is currently mounted.	MainWindow		Osio %s on nykyisin liitetty.
-The selected disk is read-only.	MainWindow		Valittu levy on kirjoitussuojattu.
-The selected partition does not contain a partitioning system.	MainWindow		Valittu osio ei sisällä osiointijärjestelmää.
-There was an error acquiring the partition row.	MainWindow		Osioriviä haettaessa syntyi virhe.
-There was an error preparing the disk for modifications.	MainWindow		Tapahtui virhe valmisteltaessa levyä muutoksia varten.
-There's no space on the partition where a child partition could be created.	MainWindow		Osiolla ei ole mitään tilaa, johon olisi voitu luoda tytärosio.
-Unable to find the selected partition by ID.	MainWindow		Ei kyetä löytämään valittua osiota tunnisteen perusteella.
-Unmount	MainWindow		Irrota
-Validation of the given creation parameters failed.	MainWindow		Annettujen luontiparametrien todentaminen epäonnistui.
-Validation of the given initialization parameters failed.	MainWindow		Annettujen alustusparametrien todentaminen epäonnistui.
+Device	DiskView		Laite
+Active	PartitionList		Aktiivinen
 Volume name	PartitionList		Taltionimi
-Write changes	MainWindow		Kirjoita muutokset
-You need to select a partition entry from the list.	MainWindow		Sinun täytyy valita osiorivi luettelosta.
+Continue	MainWindow		Jatka
+Cannot delete the selected partition.	MainWindow		Valittua osiota ei voida poistaa.
+Mount all	MainWindow		Liitä kaikki
+Cancel	MainWindow		Peru
+Delete partition	MainWindow		Poista osio
+End: %ld MB	Support		Loppu: %ld mebitavua
+Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa osion ”%s”? Sinulta kysytään uudelleen ennen kuin muutokset kirjoitetaan levylle.
+Eject	MainWindow		Poista asemasta
+Partition	MainWindow		Osio
+File system	PartitionList		Tiedostojärjestelmä
+Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa osion? Sinulta kysytään uudelleen ennen kuin muutokset kirjoitetaan levylle.
+Validation of the given creation parameters failed.	MainWindow		Annettujen luontiparametrien todentaminen epäonnistui.
+Size	PartitionList		Koko
+Validation of the given initialization parameters failed.	MainWindow		Annettujen alustusparametrien todentaminen epäonnistui.
+The selected partition does not contain a partitioning system.	MainWindow		Valittu osio ei sisällä osiointijärjestelmää.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki osion %s tiedot kadotetaan palauttamattomasti, jos teet niin!
+The partition %s is currently mounted.	MainWindow		Osio %s on nykyisin liitetty.
+Partition size	CreateParamsPanel		Osiokoko
+Surface test (not implemented)	MainWindow		Pintatesti (ei toteutettu)
+Cancel	InitParamsPanel		Peru
+Cancel	CreateParamsPanel		Peru
+Parameters	PartitionList		Parametrit
+Creation of the partition has failed.	MainWindow		Osion luominen epäonnistui.
+The currently selected partition is not empty.	MainWindow		Nykyinen valittu osio ei ole tyhjä.
+Unmount	MainWindow		Irrota

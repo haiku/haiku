@@ -1,9 +1,9 @@
 1	finnish	x-vnd.Haiku-IMAP	3892875357
-Apply	IMAPFolderConfig		Sovella
 Destination:	imap_config		Kohde:
-Failed to fetch available storage.	IMAPFolderConfig		Saatavilla olevan tallennuspaikan noutaminen epäonnistui.
+status	IMAPFolderConfig		tila
+Apply	IMAPFolderConfig		Sovella
+IMAP Folders	imap_config		IMAP-kansiot
 Fetching IMAP folders, have patience...	IMAPFolderConfig		Noudetaan IMAP-kansioita, ole kärsivällinen...
 IMAP Folders	IMAPFolderConfig		IMAP-kansiot
-IMAP Folders	imap_config		IMAP-kansiot
 Subcribe / Unsuscribe IMAP folders, have patience...	IMAPFolderConfig		Tilaa IMAP-kansiot/ Lopeta IMAP-kansioiden tilaus, ole kärsivällinen... 
-status	IMAPFolderConfig		tila
+Failed to fetch available storage.	IMAPFolderConfig		Saatavilla olevan tallennuspaikan noutaminen epäonnistui.

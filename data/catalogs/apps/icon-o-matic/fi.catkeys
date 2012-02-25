@@ -1,201 +1,201 @@
 1	finnish	x-vnd.haiku-icon_o_matic	3736361491
-<modify path>	Icon-O-Matic-PathCmd		<muokkaa polkua>
-<nothing to redo>	Icon-O-Matic-Menu-Edit		<ei tehdä mitään uudelleen>
-<nothing to undo>	Icon-O-Matic-Menu-Edit		<ei mitään tehtävää>
-<unavailable>	Icon-O-Matic-StyleTypes		<ei ole käytettävissä>
-<unkown property>	Icon-O-Matic-PropertyNames		<tuntematon ominaisuus>
-Add	Icon-O-Matic-PathsList		Lisää
-Add	Icon-O-Matic-StylesList		Lisää
-Add	Icon-O-Matic-TransformersList		Lisää
-Add Control Point	Icon-O-Matic-AddPointCmd		Lisää ohjauspiste
-Add Path	Icon-O-Matic-AddPathsCmd		Lisää polku
-Add Paths	Icon-O-Matic-AddPathsCmd		Lisää polut
-Add Shape	Icon-O-Matic-AddShapesCmd		Lisää hahmo
-Add Shapes	Icon-O-Matic-AddShapesCmd		Lisää hahmoja
+Select All	Icon-O-Matic-PathManipulator		Valitse kaikki
 Add Style	Icon-O-Matic-AddStylesCmd		Lisää tyyli
-Add Styles	Icon-O-Matic-AddStylesCmd		Lisää tyylejä
-Add Transformer	Icon-O-Matic-AddTransformersCmd		Lisää muunnin
-Add Transformers	Icon-O-Matic-AddTransformersCmd		Lisää muuntimet
-Add circle	Icon-O-Matic-PathsList		Lisää ympyrä
-Add empty	Icon-O-Matic-ShapesList		Lisää tyhjä
-Add rect	Icon-O-Matic-PathsList		Lisää nelikulmio
-Add shape with path	Icon-O-Matic-Menu-Shape		Lisää hahmo polulla
-Add shape with path & style	Icon-O-Matic-Menu-Shape		Lisää hahmo polulla ja tyylillä
-Add shape with style	Icon-O-Matic-Menu-Shape		Lisää hahmo tyylillä
-Add with path	Icon-O-Matic-ShapesList		Lisää polulla
-Add with path & style	Icon-O-Matic-ShapesList		Lisää polulla ja tyylillä
-Add with style	Icon-O-Matic-ShapesList		Lisää tyylillä
-All	Icon-O-Matic-Properties		Kaikki
-Append…	Icon-O-Matic-Menu-File		Liitä...
-Assign Path	Icon-O-Matic-AddPathsCmd		Liitä polku
-Assign Paths	Icon-O-Matic-AddPathsCmd		Liitä polut
-Assign Style	Icon-O-Matic-AssignStyleCmd		Lisää tyyli
-BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON -attribuutti
-Bleep!	Exporter - Continue in error dialog		Sensuroi!
-Bummer	Cancel button - error alert		Valmis
-Cancel	Icon-O-Matic-ColorPicker		Peru
-Cancel	Icon-O-Matic-Menu-Settings		Peru
-Cancel	Icon-O-Matic-SVGExport		Peru
-Caps	Icon-O-Matic-PropertyNames		Isot kirjaimet
-Change Color	Icon-O-Matic-SetColorCmd		Vaihda väriä
-Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Nollaa polku
-Clean up	Icon-O-Matic-PathsList		Puhdista
-Click on a shape above	Empty transformers list - 1st line		Napsauta yllä olevaa hahmoa
-Click on an object in	Empty property list - 1st line		Napsauta objektia kohteessa
-Close	Icon-O-Matic-Menu-File		Sulje
-Closed	Icon-O-Matic-PropertyNames		Suljettu
-Color	Icon-O-Matic-PropertyNames		Väri
-Color	Icon-O-Matic-StyleTypes		Väri
-Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Väri (#%02x%02x%02x)
 Color (#%02x%02x%02x)	Style name after dropping a color		Väri (#%02x%02x%02x)
-Conic	Icon-O-Matic-StyleTypes		Kartiomainen
-Contour	Transformation		Ääriviiva
-Copy	Icon-O-Matic-Properties		Kopioi
-Detect Orient.	Icon-O-Matic-PropertyNames		Havaitse suunta.
-Diamond	Icon-O-Matic-StyleTypes		Vinoneliö
-Discard	Icon-O-Matic-Menu-Settings		Hylkää
-Duplicate	Icon-O-Matic-PathsList		Kaksoiskappele
-Duplicate	Icon-O-Matic-ShapesList		Kaksoiskappale
-Duplicate	Icon-O-Matic-StylesList		Kaksoiskappale
-Edit	Icon-O-Matic-Menus		Muokkaa
-Edit Gradient	Icon-O-Matic-SetGradientCmd		Muokkaa kaltevuutta
-Error: 	Icon-O-Matic-Exporter		Virhe:
-Error: 	Icon-O-Matic-Main		Virhe:
-Export	Icon-O-Matic-Menu-File		Vie
-Export Icon	Dialog title		Vie kuvake
-Export as…	Icon-O-Matic-Menu-File		Vie nimellä...
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Tiedoston ’%s’ avaaminen SVG-asiakirjana epäonnistui.\n\nVirhe: %s
-File	Icon-O-Matic-Menus		Tiedosto
-Flip	Icon-O-Matic-PathManipulator		Käännä ympäri
-Flip Control Point	Icon-O-Matic-FlipPointsCmd		Käännä ohjainpiste ympäri
-Flip Control Points	Icon-O-Matic-FlipPointsCmd		Käännä ohjauspisteet ympäri
-Format	Icon-O-Matic-SavePanel		Muoto
-Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Jähmetä hahmo
-Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Jähmetä hahmot
-Freeze transformation	Icon-O-Matic-ShapesList		Jähmetä muunnos
-Gradient	Icon-O-Matic-StyleTypes		Kaltevuus
-Gradient type	Icon-O-Matic-StyleTypes		Kaltevuustyyppi
-HVIF Source Code	Icon-O-Matic-SavePanel		HVIF-lähdekoodi
-Height	Icon-O-Matic-PropertyNames		Korkeus
-Icon-O-Matic	System name		Kuvakemaatti
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Kuvakemaatti ei ehkä tulkitse kaikkia tietoja SVG:stä ohjelmaa ladattaessa. Jos alkuperäinen tiedosto korvataan, nämä tiedot menetetään.
-Insert Control Point	Icon-O-Matic-InsertPointCmd		Lisää ohjainpiste
-Invert selection	Icon-O-Matic-Properties		Käännä valinta
-Joins	Icon-O-Matic-PropertyNames		Liitokset
-Linear	Icon-O-Matic-StyleTypes		Lineaarinen
-META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON -attribuutti
-Max LOD	Icon-O-Matic-PropertyNames		Maksimi LOD
-Min LOD	Icon-O-Matic-PropertyNames		Minimi LOD
-Miter Limit	Icon-O-Matic-PropertyNames		Kärkiraja
-Modify Control Point	Icon-O-Matic-ChangePointCmd		Muokkaa ohjauspistettä
-Move	Icon-O-Matic-TransformationBoxStates		Siirrä
-Move Path	Icon-O-Matic-MovePathsCmd		Siirrä polku
-Move Paths	Icon-O-Matic-MovePathsCmd		Siirrä polut
-Move Pivot	Icon-O-Matic-TransformationBoxStates		Siirrä napa
+Add	Icon-O-Matic-StylesList		Lisää
 Move Shape	Icon-O-Matic-MoveShapesCommand		Siirrä hahmo
-Move Shapes	Icon-O-Matic-MoveShapesCommand		Siirrä hahmoja
-Move Style	Icon-O-Matic-MoveStylesCmd		Siirrä tyyliä
-Move Styles	Icon-O-Matic-MoveStylesCmd		Siirrä tyylejä
-Move Transformer	Icon-O-Matic-MoveTransformersCmd		Siirrä muunnin
-Move Transformers	Icon-O-Matic-MoveTransformersCmd		Siirrä muuntimet
-Multi Paste Properties	Icon-O-Matic-Properties		Useita liittämisominaisuuksia
-Multi Set 	Multi Set (property name)		Useita asetuksia
-Multi paste	Icon-O-Matic-Properties		Useita liittämisiä
-Name	Icon-O-Matic-PropertyNames		Nimi
-New	Icon-O-Matic-Menu-File		Uusi
-No	Icon-O-Matic-StyledTextImport		Ei
-None	Icon-O-Matic-Properties		Ei mitään
-Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Tönäise ohjainpistettä
-Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Tönäise ohjauspisteitä
-OK	Icon-O-Matic-ColorPicker		Valmis
-OK	Icon-O-Matic-SVGImport		Valmis
-Off	Icon-O-Matic-Menu-Settings		Pois päältä
-Opacity	Icon-O-Matic-PropertyNames		Läpinäkymättömyys
 Opening the document failed!	Icon-O-Matic-Main		Asiakirjan avaaminen epäonnistui!
+Reset transformation	Icon-O-Matic-ShapesList		Nolla muunnokset
+Move Paths	Icon-O-Matic-MovePathsCmd		Siirrä polut
+None	Icon-O-Matic-Properties		Ei mitään
+New	Icon-O-Matic-Menu-File		Uusi
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Kuvakemaatti ei ehkä tulkitse kaikkia tietoja SVG:stä ohjelmaa ladattaessa. Jos alkuperäinen tiedosto korvataan, nämä tiedot menetetään.
+Paste Properties	Icon-O-Matic-Properties		Liittämisominaisuudet
+Stroke	Transformation		Piirto
+Save Icon	Dialog title		Tallenna kuvake
+Closed	Icon-O-Matic-PropertyNames		Suljettu
+Remove Path	Icon-O-Matic-RemovePathsCmd		Poista polku
+Add shape with path	Icon-O-Matic-Menu-Shape		Lisää hahmo polulla
+Select	Icon-O-Matic-Properties		Valitse
+Height	Icon-O-Matic-PropertyNames		Korkeus
+Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Poista muuntimet
+Width	Icon-O-Matic-PropertyNames		Leveys
+Transformation	Icon-O-Matic-TransformationBoxStates		Muunnokset
+Duplicate	Icon-O-Matic-ShapesList		Kaksoiskappale
+<unkown property>	Icon-O-Matic-PropertyNames		<tuntematon ominaisuus>
+Linear	Icon-O-Matic-StyleTypes		Lineaarinen
+Assign Path	Icon-O-Matic-AddPathsCmd		Liitä polku
+Move	Icon-O-Matic-TransformationBoxStates		Siirrä
+Flip Control Points	Icon-O-Matic-FlipPointsCmd		Käännä ohjauspisteet ympäri
+warning	Icon-O-Matic-SVGExport		varoitus
+Copy	Icon-O-Matic-Properties		Kopioi
+Miter Limit	Icon-O-Matic-PropertyNames		Kärkiraja
+OK	Icon-O-Matic-ColorPicker		Valmis
+Remove Control Point	Icon-O-Matic-RemovePointsCmd		Poista ohjauspiste
+Bleep!	Exporter - Continue in error dialog		Sensuroi!
+Add circle	Icon-O-Matic-PathsList		Lisää ympyrä
+Shorten	Icon-O-Matic-PropertyNames		Lyhennä
+bad news	Title of error alert		huonot uutiset
+Remove Paths	Icon-O-Matic-RemovePathsCmd		Poista polut
+Scale Y	Icon-O-Matic-PropertyNames		Skaalaa Y
+Add Control Point	Icon-O-Matic-AddPointCmd		Lisää ohjauspiste
+Untitled	Icon-O-Matic-Main		Otsikoton
+Multi Set 	Multi Set (property name)		Useita asetuksia
+any of the other lists to	Empty property list - 2nd line		mikä tahansa toisista luetteloista kohteeseen
+Save as…	Icon-O-Matic-Menu-File		Tallenna nimellä...
+Change Color	Icon-O-Matic-SetColorCmd		Vaihda väriä
+Style	Icon-O-Matic-Menus		Tyyli
+<modify path>	Icon-O-Matic-PathCmd		<muokkaa polkua>
 Opening the icon failed!	Icon-O-Matic-Main		Kuvakkeen avaaminen epäonnistui!
+Error: 	Icon-O-Matic-Main		Virhe:
+Rotate indices backwards	Icon-O-Matic-PathsList		Pyöritä osoittimia taaksepäin
+Name	Icon-O-Matic-PropertyNames		Nimi
+bad news	Icon-O-Matic-Exporter		huonoja uutisia
+<nothing to undo>	Icon-O-Matic-Menu-Edit		<ei mitään tehtävää>
+Off	Icon-O-Matic-Menu-Settings		Pois päältä
+Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Jähmetä hahmo
+PNG Set	Icon-O-Matic-SavePanel		PNG-asetus
+Joins	Icon-O-Matic-PropertyNames		Liitokset
+Remove Style	Icon-O-Matic-RemoveStylesCmd		Poista tyyli
+Scale X	Icon-O-Matic-PropertyNames		Skaalaa X
+Set 	Set (property name)		Aseta
+Cancel	Icon-O-Matic-SVGExport		Peru
+Add shape with style	Icon-O-Matic-Menu-Shape		Lisää hahmo tyylillä
+Remove Shape	Icon-O-Matic-RemoveShapesCmd		Poista hahmo
+Reverse	Icon-O-Matic-PathsList		Käänteinen
+HVIF Source Code	Icon-O-Matic-SavePanel		HVIF-lähdekoodi
+Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Nollaa muuntimet
+All	Icon-O-Matic-Properties		Kaikki
+Multi Paste Properties	Icon-O-Matic-Properties		Useita liittämisominaisuuksia
+Undo	Icon-O-Matic-Main		Peru
+Click on a shape above	Empty transformers list - 1st line		Napsauta yllä olevaa hahmoa
+Add Shape	Icon-O-Matic-AddShapesCmd		Lisää hahmo
+Contour	Transformation		Ääriviiva
+<nothing to redo>	Icon-O-Matic-Menu-Edit		<ei tehdä mitään uudelleen>
+Perspective	Transformation		Perspektiivi
+Move Transformer	Icon-O-Matic-MoveTransformersCmd		Siirrä muunnin
+Opacity	Icon-O-Matic-PropertyNames		Läpinäkymättömyys
+Add with path	Icon-O-Matic-ShapesList		Lisää polulla
+Gradient type	Icon-O-Matic-StyleTypes		Kaltevuustyyppi
+Icon-O-Matic	System name		Kuvakemaatti
+Cancel	Icon-O-Matic-Menu-Settings		Peru
+Modify Control Point	Icon-O-Matic-ChangePointCmd		Muokkaa ohjauspistettä
+Saving your document failed!	Icon-O-Matic-Exporter		Asiakirjan tallentaminen epäonnistui!
+edit it's properties here.	Empty property list - 3rd line		muokkaa sen ominaisuuksia täällä
+Split	Icon-O-Matic-PathManipulator		Halkaise
+Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Tönäise ohjauspisteitä
+Remove	Icon-O-Matic-StylesList		Poista
+Add with path & style	Icon-O-Matic-ShapesList		Lisää polulla ja tyylillä
+META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON -attribuutti
+Translation Y	Icon-O-Matic-PropertyNames		Muunnos Y
+Rotate	Icon-O-Matic-TransformationBoxStates		Pyöritä
+Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Poista muunnin
+Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Pyöritä polkuosoittimia
+Add Transformer	Icon-O-Matic-AddTransformersCmd		Lisää muunnin
+Remove	Icon-O-Matic-PathsList		Poista
+Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Tönäise ohjainpistettä
+Pick a color	Icon-O-Matic-ColorPicker		Poimi väri
+Quit	Icon-O-Matic-Menu-File		Poistu
+Export	Icon-O-Matic-Menu-File		Vie
+No	Icon-O-Matic-StyledTextImport		Ei
+Save changes to current icon?	Icon-O-Matic-Menu-Settings		Tallenna muutokset nykyiseen kuvakkeeseen?
+Rotate indices forwards	Icon-O-Matic-PathsList		Pyöritä osoittimia eteenpäin
+Unassign Path	Icon-O-Matic-UnassignPathCmd		Liittämätön polku
+load error	Icon-O-Matic-SVGImport		lataa virhe
+Move Shapes	Icon-O-Matic-MoveShapesCommand		Siirrä hahmoja
+Remove Styles	Icon-O-Matic-RemoveStylesCmd		Poista tyylejä
+The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		Teksti, jota yrität tuoda, on aika pitkä. Oletko varma?
+Add	Icon-O-Matic-TransformersList		Lisää
+Export Icon	Dialog title		Vie kuvake
+Color	Icon-O-Matic-StyleTypes		Väri
+Settings…	Icon-O-Matic-SavePanel		Asetukset...
+Remove	Icon-O-Matic-PathManipulator		Poista
+Radial	Icon-O-Matic-StyleTypes		Säteettäinen
+Perspective	Icon-O-Matic-TransformersList		Perspektiivi
+Add shape with path & style	Icon-O-Matic-Menu-Shape		Lisää hahmo polulla ja tyylillä
+Gradient	Icon-O-Matic-StyleTypes		Kaltevuus
+Min LOD	Icon-O-Matic-PropertyNames		Minimi LOD
+BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON -attribuutti
+Invert selection	Icon-O-Matic-Properties		Käännä valinta
+Export as…	Icon-O-Matic-Menu-File		Vie nimellä...
+Transformation	Transformation		Muodonmuutos
+Click on an object in	Empty property list - 1st line		Napsauta objektia kohteessa
+Move Transformers	Icon-O-Matic-MoveTransformersCmd		Siirrä muuntimet
+Move Styles	Icon-O-Matic-MoveStylesCmd		Siirrä tyylejä
+Reset transformation	Icon-O-Matic-StylesList		Nolla muunnokset
+Max LOD	Icon-O-Matic-PropertyNames		Maksimi LOD
+Transformer	Icon-O-Matic-Menus		Muunnin
+Flip	Icon-O-Matic-PathManipulator		Käännä ympäri
+Conic	Icon-O-Matic-StyleTypes		Kartiomainen
+Split Control Points	Icon-O-Matic-SplitPointsCmd		Halkaise ohjauspisteet
+Save	Icon-O-Matic-Menu-Settings		Tallenna
+Add empty	Icon-O-Matic-ShapesList		Lisää tyhjä
+Close	Icon-O-Matic-Menu-File		Sulje
+Cancel	Icon-O-Matic-ColorPicker		Peru
+Paste	Icon-O-Matic-Properties		Liitä
+Shape	Icon-O-Matic-Menus		Hahmo
+Translation X	Icon-O-Matic-PropertyNames		Muunnos X
+Properties	Icon-O-Matic-Menus		Ominaisuudet
+Move Pivot	Icon-O-Matic-TransformationBoxStates		Siirrä napa
+Path	Icon-O-Matic-Menus		Polku
+Freeze transformation	Icon-O-Matic-ShapesList		Jähmetä muunnos
+File	Icon-O-Matic-Menus		Tiedosto
+Error: 	Icon-O-Matic-Exporter		Virhe:
+Add Transformers	Icon-O-Matic-AddTransformersCmd		Lisää muuntimet
+Diamond	Icon-O-Matic-StyleTypes		Vinoneliö
+Path	Icon-O-Matic-PropertyNames		Polku
+Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Tiedoston ’%s’ avaaminen SVG-asiakirjana epäonnistui.\n\nVirhe: %s
+Discard	Icon-O-Matic-Menu-Settings		Hylkää
+Swatches	Icon-O-Matic-Menus		Palaset
+<unavailable>	Icon-O-Matic-StyleTypes		<ei ole käytettävissä>
+Rotation	Icon-O-Matic-PropertyNames		Kierto
+Add with style	Icon-O-Matic-ShapesList		Lisää tyylillä
+Add	Icon-O-Matic-PathsList		Lisää
+Add Shapes	Icon-O-Matic-AddShapesCmd		Lisää hahmoja
+Move Style	Icon-O-Matic-MoveStylesCmd		Siirrä tyyliä
+Bummer	Cancel button - error alert		Valmis
+Snap to grid	Icon-O-Matic-Menu-Settings		Kiinnity rasteriin
+Remove	Icon-O-Matic-ShapesList		Poista
+Yes	Icon-O-Matic-StyledTextImport		Kyllä
+Transformation	Icon-O-Matic-TransformersList		Muunnos
+Save image	Icon-O-Matic-SavePanel		Tallenna kuva
+Add Styles	Icon-O-Matic-AddStylesCmd		Lisää tyylejä
+Remove Control Points	Icon-O-Matic-RemovePointsCmd		Poista ohjainpisteet
+Format	Icon-O-Matic-SavePanel		Muoto
+Add rect	Icon-O-Matic-PathsList		Lisää nelikulmio
+Edit	Icon-O-Matic-Menus		Muokkaa
+Duplicate	Icon-O-Matic-StylesList		Kaksoiskappale
+Caps	Icon-O-Matic-PropertyNames		Isot kirjaimet
+Transform	Icon-O-Matic-PathManipulator		Muunna
+Add Paths	Icon-O-Matic-AddPathsCmd		Lisää polut
+Style type	Icon-O-Matic-StyleTypes		Tyylityyppi
+too big	Icon-O-Matic-StyledTextImport		liian iso
+Assign Style	Icon-O-Matic-AssignStyleCmd		Lisää tyyli
+Add Path	Icon-O-Matic-AddPathsCmd		Lisää polku
+Color	Icon-O-Matic-PropertyNames		Väri
+Insert Control Point	Icon-O-Matic-InsertPointCmd		Lisää ohjainpiste
+Flip Control Point	Icon-O-Matic-FlipPointsCmd		Käännä ohjainpiste ympäri
+Redo	Icon-O-Matic-Main		Tee uudelleen
+Assign Paths	Icon-O-Matic-AddPathsCmd		Liitä polut
+OK	Icon-O-Matic-SVGImport		Valmis
+Multi paste	Icon-O-Matic-Properties		Useita liittämisiä
+to attach transformers.	Empty transformers list - 2nd line		muuntimien liittämiseksi.
+Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Nollaa muunnos
+Reverse Path	Icon-O-Matic-ReversePathCmd		Käänteinen polku
+Scale	Icon-O-Matic-TransformationBoxStates		Skaalaa
+Duplicate	Icon-O-Matic-PathsList		Kaksoiskappele
+Save	Icon-O-Matic-Menu-File		Tallenna
+Append…	Icon-O-Matic-Menu-File		Liitä...
+Move Path	Icon-O-Matic-MovePathsCmd		Siirrä polku
+Overwrite	Icon-O-Matic-SVGExport		Korvaa
+Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Jähmetä hahmot
+Split Control Point	Icon-O-Matic-SplitPointsCmd		Halkaise ohjauspiste
 Open…	Icon-O-Matic-Menu-File		Avaa...
 Options	Icon-O-Matic-Menus		Valitsimet
-Overwrite	Icon-O-Matic-SVGExport		Korvaa
-PNG Set	Icon-O-Matic-SavePanel		PNG-asetus
-Paste	Icon-O-Matic-Properties		Liitä
-Paste Properties	Icon-O-Matic-Properties		Liittämisominaisuudet
-Path	Icon-O-Matic-Menus		Polku
-Path	Icon-O-Matic-PropertyNames		Polku
-Perspective	Icon-O-Matic-TransformersList		Perspektiivi
-Perspective	Transformation		Perspektiivi
-Pick a color	Icon-O-Matic-ColorPicker		Poimi väri
-Properties	Icon-O-Matic-Menus		Ominaisuudet
-Quit	Icon-O-Matic-Menu-File		Poistu
-Radial	Icon-O-Matic-StyleTypes		Säteettäinen
-Redo	Icon-O-Matic-Main		Tee uudelleen
-Remove	Icon-O-Matic-PathManipulator		Poista
-Remove	Icon-O-Matic-PathsList		Poista
-Remove	Icon-O-Matic-ShapesList		Poista
-Remove	Icon-O-Matic-StylesList		Poista
-Remove Control Point	Icon-O-Matic-RemovePointsCmd		Poista ohjauspiste
-Remove Control Points	Icon-O-Matic-RemovePointsCmd		Poista ohjainpisteet
-Remove Path	Icon-O-Matic-RemovePathsCmd		Poista polku
-Remove Paths	Icon-O-Matic-RemovePathsCmd		Poista polut
-Remove Shape	Icon-O-Matic-RemoveShapesCmd		Poista hahmo
-Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Poista hahmot
-Remove Style	Icon-O-Matic-RemoveStylesCmd		Poista tyyli
-Remove Styles	Icon-O-Matic-RemoveStylesCmd		Poista tyylejä
-Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Poista muunnin
-Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Poista muuntimet
-Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Nollaa muunnos
-Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Nollaa muuntimet
-Reset transformation	Icon-O-Matic-ShapesList		Nolla muunnokset
-Reset transformation	Icon-O-Matic-StylesList		Nolla muunnokset
-Reverse	Icon-O-Matic-PathsList		Käänteinen
-Reverse Path	Icon-O-Matic-ReversePathCmd		Käänteinen polku
-Rotate	Icon-O-Matic-TransformationBoxStates		Pyöritä
-Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Pyöritä polkuosoittimia
-Rotate indices backwards	Icon-O-Matic-PathsList		Pyöritä osoittimia taaksepäin
-Rotate indices forwards	Icon-O-Matic-PathsList		Pyöritä osoittimia eteenpäin
-Rotation	Icon-O-Matic-PropertyNames		Kierto
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Väri (#%02x%02x%02x)
+Edit Gradient	Icon-O-Matic-SetGradientCmd		Muokkaa kaltevuutta
+Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Nollaa polku
 Rounding	Icon-O-Matic-PropertyNames		Pyöristetään
-Save	Icon-O-Matic-Menu-File		Tallenna
-Save	Icon-O-Matic-Menu-Settings		Tallenna
-Save Icon	Dialog title		Tallenna kuvake
-Save as…	Icon-O-Matic-Menu-File		Tallenna nimellä...
-Save changes to current icon?	Icon-O-Matic-Menu-Settings		Tallenna muutokset nykyiseen kuvakkeeseen?
-Save image	Icon-O-Matic-SavePanel		Tallenna kuva
-Saving your document failed!	Icon-O-Matic-Exporter		Asiakirjan tallentaminen epäonnistui!
-Scale	Icon-O-Matic-TransformationBoxStates		Skaalaa
-Scale X	Icon-O-Matic-PropertyNames		Skaalaa X
-Scale Y	Icon-O-Matic-PropertyNames		Skaalaa Y
-Select	Icon-O-Matic-Properties		Valitse
-Select All	Icon-O-Matic-PathManipulator		Valitse kaikki
-Set 	Set (property name)		Aseta
-Settings…	Icon-O-Matic-SavePanel		Asetukset...
-Shape	Icon-O-Matic-Menus		Hahmo
-Shorten	Icon-O-Matic-PropertyNames		Lyhennä
-Snap to grid	Icon-O-Matic-Menu-Settings		Kiinnity rasteriin
-Split	Icon-O-Matic-PathManipulator		Halkaise
-Split Control Point	Icon-O-Matic-SplitPointsCmd		Halkaise ohjauspiste
-Split Control Points	Icon-O-Matic-SplitPointsCmd		Halkaise ohjauspisteet
-Stroke	Transformation		Piirto
-Style	Icon-O-Matic-Menus		Tyyli
-Style type	Icon-O-Matic-StyleTypes		Tyylityyppi
-Swatches	Icon-O-Matic-Menus		Palaset
-The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		Teksti, jota yrität tuoda, on aika pitkä. Oletko varma?
-Transform	Icon-O-Matic-PathManipulator		Muunna
-Transformation	Icon-O-Matic-TransformationBoxStates		Muunnokset
-Transformation	Icon-O-Matic-TransformersList		Muunnos
-Transformation	Transformation		Muodonmuutos
-Transformer	Icon-O-Matic-Menus		Muunnin
-Translation X	Icon-O-Matic-PropertyNames		Muunnos X
-Translation Y	Icon-O-Matic-PropertyNames		Muunnos Y
-Unassign Path	Icon-O-Matic-UnassignPathCmd		Liittämätön polku
-Undo	Icon-O-Matic-Main		Peru
-Untitled	Icon-O-Matic-Main		Otsikoton
-Width	Icon-O-Matic-PropertyNames		Leveys
-Yes	Icon-O-Matic-StyledTextImport		Kyllä
-any of the other lists to	Empty property list - 2nd line		mikä tahansa toisista luetteloista kohteeseen
-bad news	Icon-O-Matic-Exporter		huonoja uutisia
-bad news	Title of error alert		huonot uutiset
-edit it's properties here.	Empty property list - 3rd line		muokkaa sen ominaisuuksia täällä
-load error	Icon-O-Matic-SVGImport		lataa virhe
-to attach transformers.	Empty transformers list - 2nd line		muuntimien liittämiseksi.
-too big	Icon-O-Matic-StyledTextImport		liian iso
-warning	Icon-O-Matic-SVGExport		varoitus
+Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Poista hahmot
+Clean up	Icon-O-Matic-PathsList		Puhdista
+Detect Orient.	Icon-O-Matic-PropertyNames		Havaitse suunta.

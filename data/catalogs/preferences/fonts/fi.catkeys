@@ -1,12 +1,12 @@
 1	finnish	x-vnd.Haiku-Fonts	4164233892
-Bold font:	Font view		Lihavoitu kirjasin:
-Defaults	Main window		Oletusasetukset
-Fixed font:	Font view		Kiinteävälinen kirjasin:
-Fonts	System name		Kirjasinasetukset
-Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Kirjasinasetukset\n\tCopyright 2004-2005, Haiku.\n\n
-Menu font:	Font view		Valikkokirjasin:
-OK	main		Valmis
 Plain font:	Font view		Tavallinen kirjasin:
+Defaults	Main window		Oletusasetukset
+OK	main		Valmis
+Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Kirjasinasetukset\n\tCopyright 2004-2005, Haiku.\n\n
 Revert	Main window		Palauta
 Size:	Font Selection view		Koko:
+Menu font:	Font view		Valikkokirjasin:
+Fixed font:	Font view		Kiinteävälinen kirjasin:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Albert osti fagotin ja töräytti puhkuvan melodian.
+Bold font:	Font view		Lihavoitu kirjasin:
+Fonts	System name		Kirjasinasetukset
