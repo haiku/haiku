@@ -5627,11 +5627,9 @@ BTextView::TextTrackState::SimulateMouseMovement(BTextView *textView)
 }
 
 
-#if __GNUC__ == 2
-
-
 extern "C" void
-InvalidateLayout__9BTextViewb(BTextView* view, bool descendants)
+B_IF_GCC_2(InvalidateLayout__9BTextViewb,  _ZN9BTextView16InvalidateLayoutEb)(
+	BTextView* view, bool descendants)
 {
 	perform_data_layout_invalidated data;
 	data.descendants = descendants;
@@ -5639,5 +5637,3 @@ InvalidateLayout__9BTextViewb(BTextView* view, bool descendants)
 	view->Perform(PERFORM_CODE_LAYOUT_INVALIDATED, &data);
 }
 
-
-#endif
