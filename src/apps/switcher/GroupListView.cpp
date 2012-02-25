@@ -52,7 +52,7 @@ public:
 	}
 
 protected:
-	virtual	void DerivedLayoutItems()
+	virtual	void DoLayout()
 	{
 		// shouldn't ever be called?
 	}
