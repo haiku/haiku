@@ -2,6 +2,8 @@
  * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>
  * Distributed under the terms of the MIT License.
  */
+
+
 #include <ControlLook.h>
 
 #include "ContainerWindow.h"
@@ -1875,7 +1877,7 @@ BControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 
 	// check if the drawing occurs on the desktop
 	if (isDesktop) {
-		
+
 		if (fCachedWorkspace != current_workspace()) {
 
 			int8 indice = 0;
@@ -1894,7 +1896,7 @@ BControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 				indice++;
 			}
 		}
-		
+
 		if (fCachedOutline) {
 			BFont font;
 			view->GetFont(&font);
@@ -1909,7 +1911,7 @@ BControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 					glowColor.alpha = 30;
 					view->SetHighColor(glowColor);
 					view->DrawString(label, where);
-	
+
 					font.SetFalseBoldWidth(1.0);
 					view->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
 
@@ -1939,7 +1941,7 @@ BControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 	}
 
 	view->SetHighColor(color);
-	
+
 	view->SetDrawingMode(B_OP_OVER);
 
 	view->DrawString(label, where);
@@ -1949,9 +1951,9 @@ BControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 
 
 void
-BControlLook::SetBackgroundInfo(BMessage msg)
+BControlLook::SetBackgroundInfo(const BMessage& backgroundInfo)
 {
-	fBackgroundInfo = msg;
+	fBackgroundInfo = backgroundInfo;
 	fCachedWorkspace = -1;
 }
 

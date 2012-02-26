@@ -272,7 +272,8 @@ public:
 									const rgb_color& base, uint32 flags,
 									const BPoint& where);
 
-			void				SetBackgroundInfo(BMessage msg);
+			void				SetBackgroundInfo(
+									const BMessage& backgroundInfo);
 
 protected:
 			void				_DrawButtonFrame(BView* view, BRect& rect,
@@ -369,7 +370,8 @@ private:
 			bool				fCachedOutline;
 			int32				fCachedWorkspace;
 			BMessage			fBackgroundInfo;
-		
+
+			uint32				_reserved[20];
 };
 
 extern BControlLook* be_control_look;
