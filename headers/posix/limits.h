@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010 Haiku Inc. All rights reserved.
+ * Copyright 2001-2012 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _LIBC_LIMITS_H_
@@ -10,13 +10,6 @@
 #include <config/types.h>
 
 #include <float.h>		/* for DBL_DIG, FLT_DIG, etc */
-
-/* _GCC_LIMITS_H_ is defined by GCC's internal limits.h to avoid
- * collisions with any defines in this file.
- */
-#ifndef _GCC_LIMITS_H_
-#	include_next <limits.h>
-#endif
 
 #define LONGLONG_MIN    (-9223372036854775807LL - 1)  /* these are Be specific */
 #define LONGLONG_MAX    (9223372036854775807LL)
@@ -81,5 +74,12 @@
 #define _POSIX_DELAYTIMER_MAX	32
 
 #define _POSIX2_LINE_MAX		(2048)
+
+/* _GCC_LIMITS_H_ is defined by GCC's internal limits.h to avoid
+ * collisions with any defines in this file.
+ */
+#ifndef _GCC_LIMITS_H_
+#	include_next <limits.h>
+#endif
 
 #endif /* _LIBC_LIMITS_H_ */
