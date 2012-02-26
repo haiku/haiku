@@ -26,17 +26,18 @@
 const uint32 TIMEDALERT_UPDATE = 'taup';
 
 class TimedAlert : public BAlert {
-	public:
-		TimedAlert(const char *title, const char *text, const char *button1,
-			const char *button2 = NULL, const char *button3 = NULL,
-			button_width width = B_WIDTH_AS_USUAL, alert_type type = B_INFO_ALERT);
-		void MessageReceived(BMessage *);
-		void Show();
+public:
+	TimedAlert(const char *title, const char *text, const char *button1,
+		const char *button2 = NULL, const char *button3 = NULL,
+		button_width width = B_WIDTH_AS_USUAL,
+		alert_type type = B_INFO_ALERT);
+	void MessageReceived(BMessage *);
+	void Show();
 
-		static void GetLabel(BString &string);
+	static void GetLabel(BString &string);
 
-	private:
-		BMessageRunner *fRunner;
+private:
+	BMessageRunner *fRunner;
 };
 
 
@@ -53,7 +54,8 @@ TimedAlert::TimedAlert(const char *title, const char *text, const char *button1,
 void
 TimedAlert::Show()
 {
-	fRunner = new BMessageRunner(this, new BMessage(TIMEDALERT_UPDATE), 60000000);
+	fRunner
+		= new BMessageRunner(this, new BMessage(TIMEDALERT_UPDATE), 60000000);
 	SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
 	BAlert::Show();
 }
@@ -66,8 +68,9 @@ TimedAlert::MessageReceived(BMessage *msg)
 		BString string;
 		GetLabel(string);
 		TextView()->SetText(string.String());
-	} else
+	} else {
 		BAlert::MessageReceived(msg);
+	}
 }
 
 
@@ -106,7 +109,8 @@ main(int argc, char **argv)
 	localtime_r(&t, &tm);
 
 	char path[B_PATH_NAME_LENGTH];
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, -1, true, path, B_PATH_NAME_LENGTH) != B_OK) {
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, -1, true, path,
+			B_PATH_NAME_LENGTH) != B_OK) {
 		fprintf(stderr, "%s: can't find settings directory\n", argv[0]);
 		exit(1);
 	}
@@ -152,4 +156,3 @@ main(int argc, char **argv)
 
 	return 0;
 }
-
