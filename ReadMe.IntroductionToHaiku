@@ -110,25 +110,23 @@ there, you can view detailed reports and analysis of Haiku (and other open
 source software projects).
 
 
-Haiku Translation Assistant (HTA)
+Haiku Interface Translation
 ---------------------------------
-http://hta.polytect.org/
+http://i18n.haiku-os.org/pootle
 
 This is the current solution to assisting people in translating Haiku's
 on screen text to other languages. Consult the [haiku-i18n] mailing list
 for additional information: http://www.freelists.org/list/haiku-i18n
-
-Note: HTA is starting to be replaced by a Pootle based implementation.
-      That next-generation tool is http://i18n.haiku-os.org/pootle
 
 
 Haiku User Guide Translation
 ----------------------------
 http://i18n.haiku-os.org/userguide/
 
-Similar to HTA, this site is for coordinating the efforts of translating Haiku's
-User Guide and Welcome page to other spoken languages. Subscribe to the
-[haiku-doc] mailing list: http://www.freelists.org/list/haiku-doc
+Similar to the Haiku Interface Translation, this site is for coordinating the
+efforts of translating Haiku's User Guide and Welcome page to other spoken
+languages. Subscribe to the [haiku-doc] mailing list:
+http://www.freelists.org/list/haiku-doc
 
 
 HaikuPorts
