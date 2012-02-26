@@ -56,8 +56,8 @@ TimeApplication::AboutRequested()
 {
 	BAlert* alert = new BAlert(B_TRANSLATE("about"),
 		B_TRANSLATE(
-		"Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\t"
-		"Julun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku."),
+		"Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\t"
+		"Julun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku."),
 		B_TRANSLATE("OK"));
 	alert->Go();
 }
@@ -80,11 +80,10 @@ main(int argc, char** argv)
 			printf("Synchronization successful\r\n");
 		} else if (errorCode != 0) {
 			printf("The following error occured "
-				"while synchronizing:\r\n%s: %s\r\n",
+					"while synchronizing:\r\n%s: %s\r\n",
 				errorString, strerror(errorCode));
 		} else {
-			printf("The following error occured "
-				"while synchronizing:\r\n%s\r\n",
+			printf("The following error occured while synchronizing:\r\n%s\r\n",
 				errorString);
 		}
 	} else {
