@@ -1,35 +1,36 @@
-#!/bin/keymap -l
+#!/bin/keymap -s
 #
-#       Raw key numbering for 101 keyboard...
-#                                                                                        [sys]       [brk]
-#                                                                                         0x7e        0x7f
-# [esc]       [ f1] [ f2] [ f3] [ f4] [ f5] [ f6] [ f7] [ f8] [ f9] [f10] [f11] [f12]    [prn] [scr] [pau]
-#  0x01        0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d     0x0e  0x0f  0x10     K E Y P A D   K E Y S
+#	Raw key numbering for 102-key keyboard...
+#                                                                                          [sys]       [brk]
+#                                                                                           0x7e        0x7f
+# [esc]   [ f1] [ f2] [ f3] [ f4]    [ f5] [ f6] [ f7] [ f8]    [ f9] [f10] [f11] [f12]    [prn] [scr] [pau]
+#  0x01    0x02  0x03  0x04  0x05     0x06  0x07  0x08  0x09     0x0a  0x0b  0x0c  0x0d     0x0e  0x0f  0x10     K E Y P A D   K E Y S
 #
-# [ ` ] [ 1 ] [ 2 ] [ 3 ] [ 4 ] [ 5 ] [ 6 ] [ 7 ] [ 8 ] [ 9 ] [ 0 ] [ - ] [ = ] [bck]    [ins] [hme] [pup]    [num] [ / ] [ * ] [ - ]
-#  0x11  0x12  0x13  0x14  0x15  0x16  0x17  0x18  0x19  0x1a  0x1b  0x1c  0x1d  0x1e     0x1f  0x20  0x21     0x22  0x23  0x24  0x25
+# [ ` ] [ 1 ] [ 2 ] [ 3 ] [ 4 ] [ 5 ] [ 6 ] [ 7 ] [ 8 ] [ 9 ] [ 0 ] [ - ] [ = ] [ bck ]    [ins] [hme] [pup]    [num] [ / ] [ * ] [ - ]
+#  0x11  0x12  0x13  0x14  0x15  0x16  0x17  0x18  0x19  0x1a  0x1b  0x1c  0x1d   0x1e      0x1f  0x20  0x21     0x22  0x23  0x24  0x25
 #
-# [tab] [ q ] [ w ] [ e ] [ r ] [ t ] [ y ] [ u ] [ i ] [ o ] [ p ] [ [ ] [ ] ] [ \ ]    [del] [end] [pdn]    [ 7 ] [ 8 ] [ 9 ] [ + ]
-#  0x26  0x27  0x28  0x29  0x2a  0x2b  0x2c  0x2d  0x2e  0x2f  0x30  0x31  0x32  0x33     0x34  0x35  0x36     0x37  0x38  0x39  0x3a
+# [ tab ] [ q ] [ w ] [ e ] [ r ] [ t ] [ y ] [ u ] [ i ] [ o ] [ p ] [ [ ] [ ] ] [ \ ]    [del] [end] [pdn]    [ 7 ] [ 8 ] [ 9 ] [ + ]
+#   0x26   0x27  0x28  0x29  0x2a  0x2b  0x2c  0x2d  0x2e  0x2f  0x30  0x31  0x32  0x33     0x34  0x35  0x36     0x37  0x38  0x39  0x3a
 #
-# [cap] [ a ] [ s ] [ d ] [ f ] [ g ] [ h ] [ j ] [ k ] [ l ] [ ; ] [ ' ] [  enter  ]                         [ 4 ] [ 5 ] [ 6 ]
-#  0x3b  0x3c  0x3d  0x3e  0x3f  0x40  0x41  0x42  0x43  0x44  0x45  0x46     0x47                             0x48  0x49  0x4a
+# [ caps ] [ a ] [ s ] [ d ] [ f ] [ g ] [ h ] [ j ] [ k ] [ l ] [ ; ] [ ' ]  [ enter ]                         [ 4 ] [ 5 ] [ 6 ]
+#   0x3b    0x3c  0x3d  0x3e  0x3f  0x40  0x41  0x42  0x43  0x44  0x45  0x46     0x47                            0x48  0x49  0x4a
 #
-# [shift]     [ z ] [ x ] [ c ] [ v ] [ b ] [ n ] [ m ] [ , ] [ . ] [ / ]     [shift]          [ up]          [ 1 ] [ 2 ] [ 3 ] [ent]
-#   0x4b       0x4c  0x4d  0x4e  0x4f  0x50  0x51  0x52  0x53  0x54  0x55       0x56            0x57           0x58  0x59  0x5a  0x5b
+# [shft] [ \ ] [ z ] [ x ] [ c ] [ v ] [ b ] [ n ] [ m ] [ , ] [ . ] [ / ]    [ shift ]          [ up]          [ 1 ] [ 2 ] [ 3 ] [ent]
+#  0x4b   0x69  0x4c  0x4d  0x4e  0x4f  0x50  0x51  0x52  0x53  0x54  0x55       0x56             0x57           0x58  0x59  0x5a  0x5b
 #
-# [ctr]             [cmd]             [  space  ]             [cmd]             [ctr]    [lft] [dwn] [rgt]    [ 0 ] [ . ]
-#  0x5c              0x5d                 0x5e                 0x5f              0x60     0x61  0x62  0x63     0x64  0x65
+# [ ctrl ]          [ cmd ]             [ space ]             [ cmd ]          [ ctrl ]    [lft] [dwn] [rgt]    [ 0 ] [ . ]
+#   0x5c              0x5d                 0x5e                 0x5f             0x60       0x61  0x62  0x63     0x64  0x65
 #
-#       NOTE: On a Microsoft Natural Keyboard:
-#                       left option  = 0x66
-#                       right option = 0x67
-#                       menu key     = 0x68
-#       NOTE: On an Apple Extended Keyboard:
-#                       left option  = 0x66
-#                       right option = 0x67
-#                       keypad '='   = 0x6a
-#                       power key    = 0x6b
+#	NOTE: Key 0x69 does not exist on US keyboards
+#	NOTE: On a Microsoft Natural Keyboard:
+#			left option  = 0x66
+#			right option = 0x67
+#			menu key     = 0x68
+#	NOTE: On an Apple Extended Keyboard:
+#			left option  = 0x66
+#			right option = 0x67
+#			keypad '='   = 0x6a
+#			power key    = 0x6b
 Version = 3
 CapsLock = 0x3b
 ScrollLock = 0x0f
@@ -37,9 +38,9 @@ NumLock = 0x22
 LShift = 0x4b
 RShift = 0x56
 LCommand = 0x5d
-RCommand = 0x60
+RCommand = 0x67
 LControl = 0x5c
-RControl = 0x00
+RControl = 0x60
 LOption = 0x66
 ROption = 0x5f
 Menu = 0x68
@@ -76,7 +77,7 @@ Key 0x0d = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10  
 Key 0x0e = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
 Key 0x0f = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
 Key 0x10 = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
-Key 0x11 = '`'      '~'      ''       ' '      ''       '`'      '~'      ' '      ''       
+Key 0x11 = '`'      '~'      ''       0xc2b4   ''       '`'      '~'      0xc2b4   ''       
 Key 0x12 = 0xc485   0xc484   ''       '1'      '!'      0xc484   0xc485   '1'      '!'      
 Key 0x13 = 0xc48d   0xc48c   0x00     '2'      '@'      0xc48c   0xc48d   '2'      '@'      
 Key 0x14 = 0xc499   0xc498   ''       '3'      '#'      0xc498   0xc499   '3'      '#'      
@@ -87,7 +88,7 @@ Key 0x18 = 0xc5b3   0xc5b2   ''       '7'      '&'      0xc5b2   0xc5b3   '7'   
 Key 0x19 = 0xc5ab   0xc5aa   ''       '8'      '*'      0xc5aa   0xc5ab   '8'      '*'      
 Key 0x1a = 0xe2809e '('      ''       '9'      '('      0xe2809e '('      '9'      '('      
 Key 0x1b = 0xe2809c ')'      ''       '0'      ')'      0xe2809c ')'      '0'      ')'      
-Key 0x1c = '-'      '_'      0x1f     0xe28093 0xe28094 '-'      '_'      '-'      0xe28094 
+Key 0x1c = '-'      '_'      0x1f     0xe28093 ''       '-'      '_'      0xe28093 ''       
 Key 0x1d = 0xc5be   0xc5bd   ''       '='      '+'      0xc5bd   0xc5be   '='      '+'      
 Key 0x1e = 0x08     0x08     0x7f     0x08     0x08     0x08     0x08     0x08     0x08     
 Key 0x1f = 0x05     0x05     0x05     0x05     0x05     0x05     0x05     0x05     0x05     
@@ -120,7 +121,7 @@ Key 0x39 = 0x0b     '9'      0x0b     0x0b     '9'      0x0b     '9'      0x0b  
 Key 0x3a = '+'      '+'      '+'      '+'      '+'      '+'      '+'      '+'      '+'      
 Key 0x3b = ''       ''       ''       ''       ''       ''       ''       ''       ''       
 Key 0x3c = 'a'      'A'      0x01     ' '      ''       'A'      'a'      ' '      ''       
-Key 0x3d = 's'      'S'      0x13     ' '      ''       'S'      's'      ' '      ''       
+Key 0x3d = 's'      'S'      0x13     0xc2a7   ''       'S'      's'      0xc2a7   ''       
 Key 0x3e = 'd'      'D'      0x04     ' '      ''       'D'      'd'      ' '      ''       
 Key 0x3f = 'f'      'F'      0x06     ' '      ''       'F'      'f'      ' '      ''       
 Key 0x40 = 'g'      'G'      0x07     ' '      ''       'G'      'g'      ' '      ''       
@@ -153,7 +154,7 @@ Key 0x5a = 0x0c     '3'      0x0c     0x0c     '3'      0x0c     '3'      0x0c  
 Key 0x5b = 0x0a     0x0a     0x0a     0x0a     0x0a     0x0a     0x0a     0x0a     0x0a     
 Key 0x5c = ''       ''       ''       ''       ''       ''       ''       ''       ''       
 Key 0x5d = ''       ''       ''       ''       ''       ''       ''       ''       ''       
-Key 0x5e = ' '      ' '      0x00     ' '      ' '      ' '      ' '      ' '      ' '      
+Key 0x5e = ' '      ' '      0x00     0xc2a0   ' '      ' '      ' '      0xc2a0   ' '      
 Key 0x5f = ''       ''       ''       ''       ''       ''       ''       ''       ''       
 Key 0x60 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
 Key 0x61 = 0x1c     0x1c     0x1c     0x1c     0x1c     0x1c     0x1c     0x1c     0x1c     
