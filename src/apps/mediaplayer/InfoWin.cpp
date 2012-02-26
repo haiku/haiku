@@ -40,7 +40,7 @@
 #include "PlaylistItem.h"
 
 
-#define NAME "File Info"
+#define NAME "File info"
 #define MIN_WIDTH 400
 
 #define BASE_HEIGHT (32 + 32)
