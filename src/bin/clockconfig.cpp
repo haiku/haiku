@@ -1,6 +1,6 @@
 /*
  * Copyright 2004, Jérôme Duval, jerome.duval@free.fr.
- * Copyright 2010, Oliver Tappe <zooey@hirschkaefer.de>
+ * Copyright 2010, 2012, Oliver Tappe <zooey@hirschkaefer.de>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -11,6 +11,7 @@
 #include <OS.h>
 #include <Path.h>
 #include <String.h>
+#include <TimeZone.h>
 
 #include <syscalls.h>
 
@@ -63,21 +64,17 @@ setTimeZoneOffset(BPath path)
 		fprintf(stderr, "%s: unable to parse Time settings file\n", program);
 		return;
 	}
-	BString timeZoneName;
-	if (settings.FindString("timezone", &timeZoneName) != B_OK) {
+	BString timeZoneID;
+	if (settings.FindString("timezone", &timeZoneID) != B_OK) {
 		fprintf(stderr, "%s: no timezone found\n", program);
 		return;
 	}
-	int32 timeZoneOffset;
-	if (settings.FindInt32("offset", &timeZoneOffset) != B_OK) {
-		fprintf(stderr, "%s: no timezone offset found\n", program);
-		return;
-	}
+	int32 timeZoneOffset = BTimeZone(timeZoneID.String()).OffsetFromGMT();
 
-	_kern_set_timezone(timeZoneOffset, timeZoneName.String(),
-		timeZoneName.Length());
+	_kern_set_timezone(timeZoneOffset, timeZoneID.String(),
+		timeZoneID.Length());
 	printf("timezone is %s, offset is %ld seconds from GMT.\n",
-		timeZoneName.String(), timeZoneOffset);
+		timeZoneID.String(), timeZoneOffset);
 }
 
 

@@ -131,7 +131,6 @@ static const char* kPriorityAttr = "ADDON:priority";
 
 static const char* kLanguageField = "language";
 static const char* kTimezoneField = "timezone";
-static const char* kOffsetField = "offset";
 static const char* kTranslateFilesystemField = "filesys";
 
 
@@ -502,7 +501,7 @@ RosterData::_LoadLocaleSettings()
 		fDefaultLocale.SetFormattingConventions(conventions);
 
 		_SetPreferredLanguages(&settings);
-		
+
 		bool preferred;
 		if (settings.FindBool(kTranslateFilesystemField, &preferred) == B_OK)
 			_SetFilesystemTranslationPreferred(preferred);
@@ -687,16 +686,7 @@ RosterData::_AddDefaultFormattingConventionsToMessage(BMessage* message) const
 status_t
 RosterData::_AddDefaultTimeZoneToMessage(BMessage* message) const
 {
-	status_t status = message->AddString(kTimezoneField, fDefaultTimeZone.ID());
-
-	// add the offset, too, since that is used by clockconfig when setting
-	// up timezone state during boot
-	if (status == B_OK) {
-		status = message->AddInt32(kOffsetField,
-			fDefaultTimeZone.OffsetFromGMT());
-	}
-
-	return status;
+	return message->AddString(kTimezoneField, fDefaultTimeZone.ID());
 }
 
 

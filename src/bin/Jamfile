@@ -84,7 +84,6 @@ StdBinCommands
 	catattr.cpp
 	checkfs.cpp
 	clipboard.cpp
-	clockconfig.cpp
 	df.cpp
 	diskimage.cpp
 	dpms.cpp
@@ -131,6 +130,7 @@ StdBinCommands
 
 # commands that need libbe.so and liblocale.so
 StdBinCommands
+	clockconfig.cpp
 	query.cpp
 	: be $(HAIKU_LOCALE_LIBS) : $(haiku-utils_rsrc) ;
 
