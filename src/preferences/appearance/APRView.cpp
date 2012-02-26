@@ -37,9 +37,9 @@
 #define DECORATOR_CHANGED 'dcch'
 
 
-APRView::APRView(const char* name, uint32 flags)
+APRView::APRView(const char* name)
 	:
-	BView(name, flags),
+	BView(name, B_WILL_DRAW),
 	fDefaultSet(ColorSet::DefaultColorSet())
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -136,7 +136,7 @@ APRView::MessageReceived(BMessage *msg)
 
 		if (msg->FindData("RGBColor", (type_code)'RGBC', (const void**)&color,
 				&size) == B_OK) {
-			SetCurrentColor(*color);
+			_SetCurrentColor(*color);
 		}
 	}
 
@@ -145,7 +145,7 @@ APRView::MessageReceived(BMessage *msg)
 		{
 			// Received from the color fPicker when its color changes
 			rgb_color color = fPicker->ValueAsColor();
-			SetCurrentColor(color);
+			_SetCurrentColor(color);
 
 			Window()->PostMessage(kMsgUpdate);
 			break;
@@ -161,27 +161,7 @@ APRView::MessageReceived(BMessage *msg)
 
 			fWhich = item->ColorWhich();
 			rgb_color color = fCurrentSet.GetColor(fWhich);
-			SetCurrentColor(color);
-
-			Window()->PostMessage(kMsgUpdate);
-			break;
-		}
-		case REVERT_SETTINGS:
-		{
-			fCurrentSet = fPrevSet;
-
-			UpdateControls();
-			UpdateAllColors();
-
-			Window()->PostMessage(kMsgUpdate);
-			break;
-		}
-		case DEFAULT_SETTINGS:
-		{
-			fCurrentSet = ColorSet::DefaultColorSet();
-
-			UpdateControls();
-			UpdateAllColors();
+			_SetCurrentColor(color);
 
 			Window()->PostMessage(kMsgUpdate);
 			break;
@@ -205,6 +185,30 @@ APRView::LoadSettings()
 }
 
 
+void
+APRView::SetDefaults()
+{
+	fCurrentSet = ColorSet::DefaultColorSet();
+
+	_UpdateControls();
+	_UpdateAllColors();
+
+	Window()->PostMessage(kMsgUpdate);
+}
+
+
+void
+APRView::Revert()
+{
+	fCurrentSet = fPrevSet;
+
+	_UpdateControls();
+	_UpdateAllColors();
+
+	Window()->PostMessage(kMsgUpdate);
+}
+
+
 bool
 APRView::IsDefaultable()
 {
@@ -217,31 +221,43 @@ APRView::IsDefaultable()
 }
 
 
+bool
+APRView::IsRevertable()
+{
+	for (int32 i = 0; i < color_description_count(); i++) {
+		color_which which = get_color_description(i)->which;
+		if (fCurrentSet.GetColor(which) != fPrevSet.GetColor(which))
+			return true;
+	}
+	return false;
+}
+
+
 void
-APRView::UpdateAllColors()
+APRView::_SetCurrentColor(rgb_color color)
+{
+	fCurrentSet.SetColor(fWhich, color);
+	set_ui_color(fWhich, color);
+	_UpdateControls();
+}
+
+
+void
+APRView::_UpdateControls()
+{
+	rgb_color color = fCurrentSet.GetColor(fWhich);
+	fPicker->SetValue(color);
+	fColorWell->SetColor(color);
+	fColorWell->Invalidate();
+}
+
+
+void
+APRView::_UpdateAllColors()
 {
 	for (int32 i = 0; i < color_description_count(); i++) {
 		color_which which = get_color_description(i)->which;
 		rgb_color color = fCurrentSet.GetColor(which);
 		set_ui_color(which, color);
 	}
-}
-
-
-void
-APRView::SetCurrentColor(rgb_color color)
-{
-	fCurrentSet.SetColor(fWhich, color);
-	set_ui_color(fWhich, color);
-	UpdateControls();
-}
-
-
-void
-APRView::UpdateControls()
-{
-	rgb_color color = fCurrentSet.GetColor(fWhich);
-	fPicker->SetValue(color);
-	fColorWell->SetColor(color);
-	fColorWell->Invalidate();
 }

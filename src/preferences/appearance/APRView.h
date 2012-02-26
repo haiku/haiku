@@ -1,10 +1,11 @@
 /*
- * Copyright 2002-2008, Haiku. All rights reserved.
+ * Copyright 2002-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm (darkwyrm@earthlink.net)
  *		Rene Gollent (rene@gollent.com)
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 #ifndef APR_VIEW_H_
 #define APR_VIEW_H_
@@ -36,33 +37,39 @@ class APRWindow;
 
 class APRView : public BView {
 public:
-			APRView(const char *name, uint32 flags);
-			~APRView(void);
-	void	AttachedToWindow(void);
-	void	MessageReceived(BMessage *msg);
+								APRView(const char *name);
+	virtual						~APRView();
 
-	void	LoadSettings(void);
-	bool	IsDefaultable(void);
+	virtual	void				AttachedToWindow();
+	virtual	void				MessageReceived(BMessage *msg);
 
-protected:
+			void				LoadSettings();
 
-	void	SetCurrentColor(rgb_color color);
-	void	UpdateControls();
-	void	UpdateAllColors();
+			void				SetDefaults();
+			void				Revert();
 
-	BColorControl	*fPicker;
+			bool				IsDefaultable();
+			bool				IsRevertable();
 
-	BListView		*fAttrList;
+private:
+			void				_SetCurrentColor(rgb_color color);
+			void				_UpdateControls();
+			void				_UpdateAllColors();
 
-	color_which		fWhich;
+private:
+			BColorControl*		fPicker;
 
-	BScrollView		*fScrollView;
+			BListView*			fAttrList;
 
-	ColorWell		*fColorWell;
+			color_which			fWhich;
 
-	ColorSet		fCurrentSet;
-	ColorSet		fPrevSet;
-	ColorSet		fDefaultSet;
+			BScrollView*		fScrollView;
+
+			ColorWell*			fColorWell;
+
+			ColorSet			fCurrentSet;
+			ColorSet			fPrevSet;
+			ColorSet			fDefaultSet;
 };
 
 #endif

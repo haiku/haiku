@@ -7,6 +7,8 @@ Preference Appearance :
 	APRMain.cpp
 	AntialiasingSettingsView.cpp
 	DecorSettingsView.cpp
+	FontSelectionView.cpp
+	FontView.cpp
 	APRView.cpp
 	APRWindow.cpp
 	ColorSet.cpp
@@ -30,11 +32,13 @@ DoCatalogs Appearance :
 	x-vnd.Haiku-Appearance
 	:
 	AntialiasingSettingsView.cpp
-	DecorSettingsView.cpp
 	APRView.cpp
 	APRWindow.cpp
 	ColorSet.cpp
 	ColorWell.cpp
 	ColorWhichItem.cpp
+	DecorSettingsView.cpp
+	FontView.cpp
+	FontSelectionView.cpp
 ;
 

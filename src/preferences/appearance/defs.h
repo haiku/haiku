@@ -20,8 +20,6 @@
 #define APPEARANCE_APP_SIGNATURE "application/x-vnd.Haiku-Appearance"
 
 #define APPLY_SETTINGS 'aply'
-#define REVERT_SETTINGS 'rvrt'
-#define DEFAULT_SETTINGS 'dflt'
 #define TRY_SETTINGS 'trys'
 
 #define ATTRIBUTE_CHOSEN 'atch'

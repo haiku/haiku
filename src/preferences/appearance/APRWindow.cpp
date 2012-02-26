@@ -5,6 +5,7 @@
  * Authors:
  *		DarkWyrm (darkwyrm@earthlink.net)
  *		Alexander von Gluck, kallisti5@unixzen.com
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 
@@ -18,8 +19,11 @@
 #include <SpaceLayoutItem.h>
 #include <TabView.h>
 
+#include "AntialiasingSettingsView.h"
 #include "APRView.h"
+#include "DecorSettingsView.h"
 #include "defs.h"
+#include "FontView.h"
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -33,9 +37,9 @@ static const uint32 kMsgRevert = 'rvrt';
 APRWindow::APRWindow(BRect frame)
 	:
 	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("Appearance"), B_TITLED_WINDOW,
-		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS, B_ALL_WORKSPACES)
+		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS | B_QUIT_ON_WINDOW_CLOSE,
+		B_ALL_WORKSPACES)
 {
-
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
 	fDefaultsButton = new BButton("defaults", B_TRANSLATE("Defaults"),
@@ -46,22 +50,22 @@ APRWindow::APRWindow(BRect frame)
 
 	BTabView* tabView = new BTabView("tabview", B_WIDTH_FROM_LABEL);
 
-	fAntialiasingSettings = new AntialiasingSettingsView(
-		B_TRANSLATE("Antialiasing"));
+	fFontSettings = new FontView(B_TRANSLATE("Fonts"));
+
+	fColorsView = new APRView(B_TRANSLATE("Colors"));
 
 	fDecorSettings = new DecorSettingsView(
 		B_TRANSLATE("Window Decorator"));
 
-	fColorsView = new APRView(B_TRANSLATE("Colors"), B_WILL_DRAW);
+	fAntialiasingSettings = new AntialiasingSettingsView(
+		B_TRANSLATE("Antialiasing"));
 
+	tabView->AddTab(fFontSettings);
 	tabView->AddTab(fColorsView);
-	tabView->AddTab(fAntialiasingSettings);
 	tabView->AddTab(fDecorSettings);
+	tabView->AddTab(fAntialiasingSettings);
 
-	fDefaultsButton->SetEnabled(fColorsView->IsDefaultable()
-		|| fAntialiasingSettings->IsDefaultable()
-		|| fDecorSettings->IsDefaultable());
-	fRevertButton->SetEnabled(false);
+	_UpdateButtons();
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
 		.Add(tabView)
@@ -81,23 +85,25 @@ APRWindow::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 		case kMsgUpdate:
-			fDefaultsButton->SetEnabled(fColorsView->IsDefaultable()
-								|| fAntialiasingSettings->IsDefaultable());
-			fRevertButton->SetEnabled(true);
+			_UpdateButtons();
 			break;
+
 		case kMsgSetDefaults:
-			fColorsView -> MessageReceived(new BMessage(DEFAULT_SETTINGS));
+			fFontSettings->SetDefaults();
+			fColorsView->SetDefaults();
 			fAntialiasingSettings->SetDefaults();
-			fDefaultsButton->SetEnabled(false);
-			fRevertButton->SetEnabled(true);
+			fDecorSettings->SetDefaults();
+
+			_UpdateButtons();
 			break;
 
 		case kMsgRevert:
-			fColorsView -> MessageReceived(new BMessage(REVERT_SETTINGS));
+			fColorsView->Revert();
 			fAntialiasingSettings->Revert();
-			fDefaultsButton->SetEnabled(fColorsView->IsDefaultable()
-								|| fAntialiasingSettings->IsDefaultable());
-			fRevertButton->SetEnabled(false);
+			fFontSettings->Revert();
+			fDecorSettings->Revert();
+
+			_UpdateButtons();
 			break;
 
 		default:
@@ -107,9 +113,37 @@ APRWindow::MessageReceived(BMessage *message)
 }
 
 
-bool
-APRWindow::QuitRequested(void)
+void
+APRWindow::_UpdateButtons()
 {
-	be_app->PostMessage(B_QUIT_REQUESTED);
-	return(true);
+	fDefaultsButton->SetEnabled(_IsDefaultable());
+	fRevertButton->SetEnabled(_IsRevertable());
+}	
+
+
+bool
+APRWindow::_IsDefaultable() const
+{
+//	printf("fonts defaultable: %d\n", fFontSettings->IsDefaultable());
+//	printf("colors defaultable: %d\n", fColorsView->IsDefaultable());
+//	printf("AA defaultable: %d\n", fAntialiasingSettings->IsDefaultable());
+//	printf("decor defaultable: %d\n", fDecorSettings->IsDefaultable());
+	return fColorsView->IsDefaultable()
+		|| fFontSettings->IsDefaultable()
+		|| fAntialiasingSettings->IsDefaultable()
+		|| fDecorSettings->IsDefaultable();
+}
+
+
+bool
+APRWindow::_IsRevertable() const
+{
+//	printf("fonts revertable: %d\n", fFontSettings->IsRevertable());
+//	printf("colors revertable: %d\n", fColorsView->IsRevertable());
+//	printf("AA revertable: %d\n", fAntialiasingSettings->IsRevertable());
+//	printf("decor revertable: %d\n", fDecorSettings->IsRevertable());
+	return fColorsView->IsRevertable()
+		|| fFontSettings->IsRevertable()
+		|| fAntialiasingSettings->IsRevertable()
+		|| fDecorSettings->IsRevertable();
 }
