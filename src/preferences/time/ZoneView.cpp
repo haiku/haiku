@@ -536,7 +536,7 @@ TimeZoneView::_UpdateCurrent()
 void
 TimeZoneView::_SetSystemTimeZone()
 {
-	/*	Set sytem timezone for all different API levels. How to do this?
+	/*	Set system timezone for all different API levels. How to do this?
 	 *	1) tell locale-roster about new default timezone
 	 *	2) tell kernel about new timezone offset
 	 */
