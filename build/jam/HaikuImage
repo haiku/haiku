@@ -73,7 +73,7 @@ SYSTEM_APPS = AboutSystem ActivityMonitor $(X86_ONLY)BootManager CharacterMap
 	TextSearch TV WebWatch Workspaces
 ;
 SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations
-	<preference>Deskbar E-mail FileTypes Fonts Keyboard Keymap Locale Media
+	<preference>Deskbar E-mail FileTypes Keyboard Keymap Locale Media
 	Mouse Network Notifications $(X86_ONLY)3DRendering Printers Screen ScreenSaver
 	Shortcuts Sounds Time Touchpad <preference>Tracker VirtualMemory
 ;
