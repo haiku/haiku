@@ -1,9 +1,10 @@
 /*
- *  Copyright 2010-2011 Haiku, Inc. All rights reserved.
+ *  Copyright 2010-2012 Haiku, Inc. All rights reserved.
  *  Distributed under the terms of the MIT license.
  *
  *	Authors:
  *		Alexander von Gluck, kallisti5@unixzen.com
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 
@@ -14,6 +15,7 @@
 
 #include <Alert.h>
 #include <Box.h>
+#include <Button.h>
 #include <Catalog.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
@@ -23,7 +25,6 @@
 #include <PopUpMenu.h>
 #include <Slider.h>
 #include <SpaceLayoutItem.h>
-#include <String.h>
 #include <TextView.h>
 
 #include "APRWindow.h"
@@ -92,39 +93,15 @@ DecorSettingsView::MessageReceived(BMessage *msg)
 		case kMsgSetDecor:
 		{
 			BString newDecor;
-			if (msg->FindString("decor", &newDecor) != B_OK)
-				break;
-
-			DecorInfoUtility* decorUtility
-				= new(std::nothrow) DecorInfoUtility();
-
-			if (decorUtility == NULL)
-				return;
-
-			DecorInfo* decor = decorUtility->FindDecorator(newDecor);
-			if (decor == NULL)
-				return;
-
-			fSavedDecor = fCurrentDecor;
-			fCurrentDecor = (char*)decor->Name().String();
-
-			decorUtility->SetDecorator(decor);
-
-			Window()->PostMessage(kMsgUpdate);
+			if (msg->FindString("decor", &newDecor) == B_OK)
+				_SetDecor(newDecor);
 			break;
 		}
 		case kMsgDecorInfo:
 		{
-			DecorInfoUtility* decorUtility
-				= new(std::nothrow) DecorInfoUtility();
-
-			if (decorUtility == NULL)
-				return;
-
-			BString decoratorName(fCurrentDecor);
-			DecorInfo* decor = decorUtility->FindDecorator(decoratorName);
+			DecorInfo* decor = fDecorUtility.FindDecorator(fCurrentDecor);
 			if (decor == NULL)
-				return;
+				break;
 
 			BString authorsText(decor->Authors().String());
 			authorsText.ReplaceAll(", ", "\n    ");
@@ -146,11 +123,12 @@ DecorSettingsView::MessageReceived(BMessage *msg)
 			infoAlert->SetShortcut(0, B_ESCAPE); 
 			infoAlert->Go(); 
 
-			Window()->PostMessage(kMsgUpdate);
 			break;
 		}
+
 		default:
 			BView::MessageReceived(msg);
+			break;
 	}
 }
 
@@ -159,18 +137,11 @@ void
 DecorSettingsView::_BuildDecorMenu()
 {
 	fDecorMenu = new BPopUpMenu(B_TRANSLATE("Choose Decorator"));
-	DecorInfo* decorator = NULL;
 
 	// collect the current system decor settings
-	DecorInfoUtility* decorUtility = new(std::nothrow) DecorInfoUtility();
-
-	if (decorUtility == NULL) {
-		return;
-	}
-
-	int32 count = decorUtility->CountDecorators();
+	int32 count = fDecorUtility.CountDecorators();
 	for (int32 i = 0; i < count; ++i) {
-		decorator = decorUtility->DecoratorAt(i);
+		DecorInfo* decorator = fDecorUtility.DecoratorAt(i);
 		if (decorator == NULL) {
 			fprintf(stderr, "Decorator : error NULL entry @ %li / %li\n",
 				i, count);
@@ -186,18 +157,41 @@ DecorSettingsView::_BuildDecorMenu()
 
 		fDecorMenu->AddItem(item);
 	}
-	fCurrentDecor = (char*)decorUtility->CurrentDecorator()->Name().String();
-	delete decorUtility;
 
-	_SetCurrentDecor();
+	_AdoptToCurrentDecor();
 }
 
 
 void
-DecorSettingsView::_SetCurrentDecor()
+DecorSettingsView::_SetDecor(const BString& name)
 {
-	BMenuItem *item = fDecorMenu->FindItem(fCurrentDecor);
-	BString currDecor = fCurrentDecor;
+	_SetDecor(fDecorUtility.FindDecorator(name));
+}	
+
+
+void
+DecorSettingsView::_SetDecor(DecorInfo* decorInfo)
+{
+	if (fDecorUtility.SetDecorator(decorInfo) == B_OK) {
+		_AdoptToCurrentDecor();
+		Window()->PostMessage(kMsgUpdate);
+	}
+}	
+
+
+void
+DecorSettingsView::_AdoptToCurrentDecor()
+{
+	fCurrentDecor = fDecorUtility.CurrentDecorator()->Name();
+	if (fSavedDecor.Length() == 0)
+		fSavedDecor = fCurrentDecor;
+	_AdoptInterfaceToCurrentDecor();
+}
+
+void
+DecorSettingsView::_AdoptInterfaceToCurrentDecor()
+{
+	BMenuItem* item = fDecorMenu->FindItem(fCurrentDecor);
 	if (item != NULL)
 		item->SetMarked(true);
 }
@@ -206,23 +200,14 @@ DecorSettingsView::_SetCurrentDecor()
 void
 DecorSettingsView::SetDefaults()
 {
-	DecorInfoUtility* decorUtility
-		= new(std::nothrow) DecorInfoUtility();
-
-	if (decorUtility == NULL)
-		return;
-	DecorInfo* defaultDecorator(decorUtility->DefaultDecorator());
-	decorUtility->SetDecorator(defaultDecorator);
-	_BuildDecorMenu();
-
-	delete decorUtility;
+	_SetDecor(fDecorUtility.DefaultDecorator());
 }
 
 
 bool
 DecorSettingsView::IsDefaultable()
 {
-	return true;
+	return fCurrentDecor != fDecorUtility.DefaultDecorator()->Name();
 }
 
 
@@ -236,7 +221,5 @@ DecorSettingsView::IsRevertable()
 void
 DecorSettingsView::Revert()
 {
-	if (!IsRevertable())
-		return;
+	_SetDecor(fSavedDecor);
 }
-
