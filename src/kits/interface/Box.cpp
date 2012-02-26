@@ -874,11 +874,9 @@ BBox::_ValidateLayoutData()
 }
 
 
-#if __GNUC__ == 2
-
-
 extern "C" void
-InvalidateLayout__4BBoxb(BBox* box, bool descendants)
+B_IF_GCC_2(InvalidateLayout__4BBoxb, _ZN4BBox16InvalidateLayoutEb)(
+	BBox* box, bool descendants)
 {
 	perform_data_layout_invalidated data;
 	data.descendants = descendants;
@@ -886,5 +884,3 @@ InvalidateLayout__4BBoxb(BBox* box, bool descendants)
 	box->Perform(PERFORM_CODE_LAYOUT_INVALIDATED, &data);
 }
 
-
-#endif

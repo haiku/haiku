@@ -454,11 +454,9 @@ BStringView::_ValidatePreferredSize()
 }
 
 
-#if __GNUC__ == 2
-
-
 extern "C" void
-InvalidateLayout__11BStringViewb(BView* view, bool descendants)
+B_IF_GCC_2(InvalidateLayout__11BStringViewb,
+	_ZN11BStringView16InvalidateLayoutEb)(BView* view, bool descendants)
 {
 	perform_data_layout_invalidated data;
 	data.descendants = descendants;
@@ -466,5 +464,3 @@ InvalidateLayout__11BStringViewb(BView* view, bool descendants)
 	view->Perform(PERFORM_CODE_LAYOUT_INVALIDATED, &data);
 }
 
-
-#endif

@@ -1511,11 +1511,9 @@ BMenuField::MenuBarLayoutItem::Instantiate(BMessage* from)
 }
 
 
-#if __GNUC__ == 2
-
-
 extern "C" void
-InvalidateLayout__10BMenuFieldb(BMenuField* field, bool descendants)
+B_IF_GCC_2(InvalidateLayout__10BMenuFieldb, _ZN10BMenuField16InvalidateLayoutEb)(
+	BMenuField* field, bool descendants)
 {
 	perform_data_layout_invalidated data;
 	data.descendants = descendants;
@@ -1523,5 +1521,3 @@ InvalidateLayout__10BMenuFieldb(BMenuField* field, bool descendants)
 	field->Perform(PERFORM_CODE_LAYOUT_INVALIDATED, &data);
 }
 
-
-#endif

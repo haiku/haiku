@@ -898,11 +898,9 @@ void BScrollView::_ReservedScrollView3() {}
 void BScrollView::_ReservedScrollView4() {}
 
 
-#if __GNUC__ == 2
-
-
 extern "C" void
-InvalidateLayout__11BScrollViewb(BScrollView* view, bool descendants)
+B_IF_GCC_2(InvalidateLayout__11BScrollViewb,
+	_ZN11BScrollView16InvalidateLayoutEb)(BScrollView* view, bool descendants)
 {
 	perform_data_layout_invalidated data;
 	data.descendants = descendants;
@@ -910,5 +908,3 @@ InvalidateLayout__11BScrollViewb(BScrollView* view, bool descendants)
 	view->Perform(PERFORM_CODE_LAYOUT_INVALIDATED, &data);
 }
 
-
-#endif
