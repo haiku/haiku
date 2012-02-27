@@ -931,22 +931,23 @@ PCI::ClearDeviceStatus(PCIBus *bus, bool dumpStatus)
 		// Clear and dump PCI device status
 		uint16 status = ReadConfig(dev->domain, dev->bus, dev->device,
 			dev->function, PCI_status, 2);
-		WriteConfig(dev->domain, dev->bus, dev->device, dev->function, PCI_status,
-			2, status);
+		WriteConfig(dev->domain, dev->bus, dev->device, dev->function,
+			PCI_status, 2, status);
 		if (dumpStatus) {
-			kprintf("domain %u, bus %u, dev %2u, func %u, PCI device status 0x%04x\n",
-				dev->domain, dev->bus, dev->device, dev->function, status);
-			if (status & (1 << 15))
+			kprintf("domain %u, bus %u, dev %2u, func %u, PCI device status "
+				"0x%04x\n", dev->domain, dev->bus, dev->device, dev->function,
+				status);
+			if (status & PCI_status_parity_error_detected)
 				kprintf("  Detected Parity Error\n");
-			if (status & (1 << 14))
+			if (status & PCI_status_serr_signalled)
 				kprintf("  Signalled System Error\n");
-			if (status & (1 << 13))
+			if (status & PCI_status_master_abort_received)
 				kprintf("  Received Master-Abort\n");
-			if (status & (1 << 12))
+			if (status & PCI_status_target_abort_received)
 				kprintf("  Received Target-Abort\n");
-			if (status & (1 << 11))
+			if (status & PCI_status_target_abort_signalled)
 				kprintf("  Signalled Target-Abort\n");
-			if (status & (1 << 8))
+			if (status & PCI_status_parity_signalled)
 				kprintf("  Master Data Parity Error\n");
 		}
 
@@ -958,19 +959,20 @@ PCI::ClearDeviceStatus(PCIBus *bus, bool dumpStatus)
 			WriteConfig(dev->domain, dev->bus, dev->device, dev->function,
 				PCI_secondary_status, 2, secondaryStatus);
 			if (dumpStatus) {
-				kprintf("domain %u, bus %u, dev %2u, func %u, PCI bridge secondary status 0x%04x\n",
-					dev->domain, dev->bus, dev->device, dev->function, secondaryStatus);
-				if (secondaryStatus & (1 << 15))
+				kprintf("domain %u, bus %u, dev %2u, func %u, PCI bridge "
+					"secondary status 0x%04x\n", dev->domain, dev->bus,
+					dev->device, dev->function, secondaryStatus);
+				if (secondaryStatus & PCI_status_parity_error_detected)
 					kprintf("  Detected Parity Error\n");
-				if (secondaryStatus & (1 << 14))
+				if (secondaryStatus & PCI_status_serr_signalled)
 					kprintf("  Received System Error\n");
-				if (secondaryStatus & (1 << 13))
+				if (secondaryStatus & PCI_status_master_abort_received)
 					kprintf("  Received Master-Abort\n");
-				if (secondaryStatus & (1 << 12))
+				if (secondaryStatus & PCI_status_target_abort_received)
 					kprintf("  Received Target-Abort\n");
-				if (secondaryStatus & (1 << 11))
+				if (secondaryStatus & PCI_status_target_abort_signalled)
 					kprintf("  Signalled Target-Abort\n");
-				if (secondaryStatus & (1 << 8))
+				if (secondaryStatus & PCI_status_parity_signalled)
 					kprintf("  Data Parity Reported\n");
 			}
 
@@ -980,9 +982,10 @@ PCI::ClearDeviceStatus(PCIBus *bus, bool dumpStatus)
 			WriteConfig(dev->domain, dev->bus, dev->device, dev->function,
 				PCI_bridge_control, 2, bridgeControl);
 			if (dumpStatus) {
-				kprintf("domain %u, bus %u, dev %2u, func %u, PCI bridge control 0x%04x\n",
-					dev->domain, dev->bus, dev->device, dev->function, bridgeControl);
-				if (bridgeControl & (1 << 10)) {
+				kprintf("domain %u, bus %u, dev %2u, func %u, PCI bridge "
+					"control 0x%04x\n", dev->domain, dev->bus, dev->device,
+					dev->function, bridgeControl);
+				if (bridgeControl & PCI_bridge_discard_timer_status) {
 					kprintf("  bridge-control: Discard Timer Error\n");
 				}
 			}
