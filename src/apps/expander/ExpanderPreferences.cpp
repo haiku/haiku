@@ -7,8 +7,7 @@
 #include <Box.h>
 #include <Catalog.h>
 #include <ControlLook.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <Path.h>
 #include <Screen.h>
@@ -26,13 +25,31 @@ const uint32 MSG_DESTSELECT = 'mDes';
 #define B_TRANSLATE_CONTEXT "ExpanderPreferences"
 
 ExpanderPreferences::ExpanderPreferences(BMessage *settings)
-	: BWindow(BRect(0, 0, 325, 305), "Expander", B_MODAL_WINDOW,
-		B_NOT_CLOSABLE | B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS),
+	: BWindow(BRect(0, 0, 325, 305), B_TRANSLATE("Expander settings"),
+		B_FLOATING_WINDOW_LOOK,	B_FLOATING_APP_WINDOW_FEEL, B_NOT_CLOSABLE
+			| B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fSettings(settings),
 	fUsePanel(NULL)
 {
-	BBox* box = new BBox("background");
-	box->SetLabel(B_TRANSLATE("Expander settings"));
+	const float kSpacing = be_control_look->DefaultItemSpacing();
+
+	BBox* settingsBox = new BBox(B_PLAIN_BORDER, NULL);
+	BGroupLayout* settingsLayout = new BGroupLayout(B_VERTICAL, kSpacing / 2);
+	settingsBox->SetLayout(settingsLayout);
+	BBox* buttonBox = new BBox(B_PLAIN_BORDER, NULL);
+	BGroupLayout* buttonLayout = new BGroupLayout(B_HORIZONTAL, kSpacing / 2);
+	buttonBox->SetLayout(buttonLayout);
+
+	BStringView *expansionLabel = new BStringView("stringViewExpansion",
+		B_TRANSLATE("Expansion"));
+	expansionLabel->SetFont(be_bold_font);
+	BStringView *destinationLabel = new BStringView("stringViewDestination",
+		B_TRANSLATE("Destination folder"));
+	destinationLabel->SetFont(be_bold_font);
+	BStringView *otherLabel = new BStringView("stringViewOther",
+		B_TRANSLATE("Other"));
+	otherLabel->SetFont(be_bold_font);
+
 
 	fAutoExpand = new BCheckBox("autoExpand",
 		B_TRANSLATE("Automatically expand files"), NULL);
@@ -61,68 +78,61 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 	fAutoShow = new BCheckBox("autoShow",
 		B_TRANSLATE("Automatically show contents listing"), NULL);
 
-	const float kSpacing = be_control_look->DefaultItemSpacing();
-
-	BView* view = new BGroupView();
-	view->SetLayout(new BGroupLayout(B_HORIZONTAL));
-	view->AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
-		.AddGroup(B_HORIZONTAL)
-			.Add(new BStringView("expansion", B_TRANSLATE("Expansion:")))
-			.AddGlue()
-		.End()
-		.AddGroup(B_VERTICAL, 0)
-			.Add(fAutoExpand)
-			.Add(fCloseWindow)
-			.SetInsets(kSpacing, kSpacing / 2, 0, 0)
-		.End()
-		.AddGroup(B_HORIZONTAL, 0)
-			.Add(new BStringView("destinationFolder",
-				B_TRANSLATE("Destination folder:")))
-			.AddGlue()
-			.SetInsets(0, kSpacing, 0, 0)
-		.End()
-		.AddGroup(B_VERTICAL, 0)
-			.Add(fLeaveDest)
-			.Add(fSameDest)
-			.Add(fDestUse)
-			.AddGroup(B_HORIZONTAL, 0)
-				.Add(fDestText, 0.8)
-				.AddStrut(be_control_look->DefaultLabelSpacing())
-				.Add(fSelect, 0.2)
-				.SetInsets(kSpacing * 2, 0, 0, 0)
-			.End()
-			.SetInsets(kSpacing, kSpacing / 2, 0, 0)
-		.End()
-		.AddGroup(B_HORIZONTAL, 0)
-			.Add(new BStringView("other", B_TRANSLATE("Other:")))
-			.AddGlue()
-					.SetInsets(0, kSpacing / 2, 0, 0)
-		.End()
-		.AddGroup(B_VERTICAL, 0)
-			.Add(fOpenDest)
-			.Add(fAutoShow)
-			.SetInsets(kSpacing, kSpacing / 2, 0, 0)
-		.End()
-		.SetInsets(kSpacing, kSpacing, kSpacing, kSpacing)
-	);
-	box->AddChild(view);
-
-	BButton* button = new BButton("OKButton", B_TRANSLATE("OK"),
+	BButton* okbutton = new BButton("OKButton", B_TRANSLATE("OK"),
 		new BMessage(MSG_OK));
-	button->MakeDefault(true);
+	okbutton->MakeDefault(true);
 	BButton* cancel = new BButton("CancelButton", B_TRANSLATE("Cancel"),
 		new BMessage(MSG_CANCEL));
 
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 11)
-		.Add(box)
-		.AddGroup(B_HORIZONTAL, kSpacing)
-			.AddGlue()
-			.Add(cancel)
-			.Add(button)
+	// Build the layout
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.AddGroup(settingsLayout)
+			.AddGroup(B_HORIZONTAL)
+				.Add(expansionLabel)
+				.AddGlue()
+			.End()
+			.AddGroup(B_VERTICAL, 0)
+				.Add(fAutoExpand)
+				.Add(fCloseWindow)
+				.SetInsets(kSpacing, 0, 0, 0)
+			.End()
+			.AddGroup(B_HORIZONTAL, 0)
+				.Add(destinationLabel)
+				.AddGlue()
+				.SetInsets(0, kSpacing, 0, 0)
+			.End()
+			.AddGroup(B_VERTICAL, 0)
+				.Add(fLeaveDest)
+				.Add(fSameDest)
+				.Add(fDestUse)
+				.AddGroup(B_HORIZONTAL, 0)
+					.Add(fDestText, 0.8)
+					.AddStrut(be_control_look->DefaultLabelSpacing())
+					.Add(fSelect, 0.2)
+					.SetInsets(kSpacing * 2, 0, kSpacing / 2, 0)
+				.End()
+				.SetInsets(kSpacing, 0, 0, 0)
+			.End()
+			.AddGroup(B_HORIZONTAL, 0)
+				.Add(otherLabel)
+				.AddGlue()
+				.SetInsets(0, kSpacing / 2, 0, 0)
+			.End()
+			.AddGroup(B_VERTICAL, 0)
+				.Add(fOpenDest)
+				.Add(fAutoShow)
+				.SetInsets(kSpacing, 0, 0, 0)
+			.End()
+			.SetInsets(kSpacing, kSpacing, kSpacing, kSpacing)
 		.End()
-		.SetInsets(kSpacing, kSpacing, kSpacing, kSpacing)
-	);
+		.AddGroup(buttonLayout)
+			.AddGroup(B_HORIZONTAL, kSpacing)
+				.AddGlue()
+				.Add(cancel)
+				.Add(okbutton)
+			.End()
+			.SetInsets(kSpacing, kSpacing, kSpacing, kSpacing)
+		.End();
 
 	CenterOnScreen();
 
