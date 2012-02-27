@@ -32,19 +32,36 @@ static void
 print_pci2pci_bridge_info(const pci_info *info, bool verbose)
 {
 	TRACE(("PCI:   subsystem_id %04x, subsystem_vendor_id %04x\n",
-			info->u.h1.subsystem_id, info->u.h1.subsystem_vendor_id));
-	TRACE(("PCI:   primary_bus %02x, secondary_bus %02x, subordinate_bus %02x, secondary_latency %02x\n",
-			info->u.h1.primary_bus, info->u.h1.secondary_bus, info->u.h1.subordinate_bus, info->u.h1.secondary_latency));
-	TRACE(("PCI:   io_base_upper_16  %04x, io_base  %02x\n",
-			info->u.h1.io_base_upper16, info->u.h1.io_base));
-	TRACE(("PCI:   io_limit_upper_16 %04x, io_limit %02x\n",
-			info->u.h1.io_limit_upper16, info->u.h1.io_limit));
-	TRACE(("PCI:   memory_base %04x, memory_limit %04x\n",
-			info->u.h1.memory_base, info->u.h1.memory_limit));
-	TRACE(("PCI:   prefetchable_memory_base_upper32  %08lx, prefetchable_memory_base  %04x\n",
-		info->u.h1.prefetchable_memory_base_upper32, info->u.h1.prefetchable_memory_base));
-	TRACE(("PCI:   prefetchable_memory_limit_upper32 %08lx, prefetchable_memory_limit %04x\n",
-		info->u.h1.prefetchable_memory_limit_upper32, info->u.h1.prefetchable_memory_limit));
+		info->u.h1.subsystem_id, info->u.h1.subsystem_vendor_id));
+	TRACE(("PCI:   primary_bus %02x, secondary_bus %02x, subordinate_bus %02x,"
+		" secondary_latency %02x\n", info->u.h1.primary_bus,
+		info->u.h1.secondary_bus, info->u.h1.subordinate_bus, info->u.h1.secondary_latency));
+	uint32 io_base = ((uint32)info->u.h1.io_base & 0xf0) << 8;
+	if (info->u.h1.io_base & 1)
+		 io_base += ((uint32)info->u.h1.io_base_upper16 << 16);
+	uint32 io_limit = (((uint32)info->u.h1.io_limit & 0xf0) << 8) + 0xfff;
+	if (info->u.h1.io_limit & 1)
+		 io_limit += info->u.h1.io_limit_upper16 << 16;
+	TRACE(("PCI:   I/O window %04lx-%04lx\n", io_base, io_limit));
+	uint32 memory_base = ((uint32)info->u.h1.memory_base & 0xfff0) << 16;
+	uint32 memory_limit = (((uint32)info->u.h1.memory_limit & 0xfff0) << 16)
+		+ 0xfffff;
+	TRACE(("PCI:   memory window %04lx-%04lx\n", memory_base, memory_limit));
+	uint64 prefetchable_memory_base =
+		((uint32)info->u.h1.prefetchable_memory_base & 0xfff0) << 16;
+	if (info->u.h1.prefetchable_memory_base & 1) {
+		prefetchable_memory_base +=
+			(uint64)info->u.h1.prefetchable_memory_base_upper32 << 32;
+	}
+	uint64 prefetchable_memory_limit =
+		(((uint32)info->u.h1.prefetchable_memory_limit & 0xfff0) << 16)
+		+ 0xfffff;
+	if (info->u.h1.prefetchable_memory_limit & 1) {
+		prefetchable_memory_limit +=
+			(uint64)info->u.h1.prefetchable_memory_limit_upper32 << 32;
+	}
+	TRACE(("PCI:   prefetchable memory window %016llx-%016llx\n",
+		prefetchable_memory_base, prefetchable_memory_limit));
 	TRACE(("PCI:   bridge_control %04x, secondary_status %04x\n",
 			info->u.h1.bridge_control, info->u.h1.secondary_status));
 	TRACE(("PCI:   interrupt_line %02x, interrupt_pin %02x\n",
