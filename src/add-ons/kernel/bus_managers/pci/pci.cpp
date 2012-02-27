@@ -892,16 +892,21 @@ PCI::_ConfigureBridges(PCIBus *bus)
 			// Enable: Parity Error Response, SERR, Master Abort Mode, Discard
 			// Timer SERR
 			// Clear: Discard Timer Status
-			bridgeControlNew |= (1 << 0) | (1 << 1) | (1 << 5) | (1 << 10)
-				| (1 << 11);
+			bridgeControlNew |= PCI_bridge_parity_error_response
+				| PCI_bridge_serr | PCI_bridge_master_abort
+				| PCI_bridge_discard_timer_status
+				| PCI_bridge_discard_timer_serr;
 			// Set discard timer to 2^15 PCI clocks
-			bridgeControlNew &= ~((1 << 8) | (1 << 9));
+			bridgeControlNew &= ~(PCI_bridge_primary_discard_timeout
+				| PCI_bridge_secondary_discard_timeout);
 			WriteConfig(dev->domain, dev->bus, dev->device, dev->function,
 				PCI_bridge_control, 2, bridgeControlNew);
 			bridgeControlNew = ReadConfig(dev->domain, dev->bus, dev->device,
 				dev->function, PCI_bridge_control, 2);
-			dprintf("PCI: dom %u, bus %u, dev %2u, func %u, changed PCI bridge control from 0x%04x to 0x%04x\n",
-				dev->domain, dev->bus, dev->device, dev->function, bridgeControlOld, bridgeControlNew);
+			dprintf("PCI: dom %u, bus %u, dev %2u, func %u, changed PCI bridge"
+				" control from 0x%04x to 0x%04x\n", dev->domain, dev->bus,
+				dev->device, dev->function, bridgeControlOld,
+				bridgeControlNew);
 		}
 
 		if (dev->child)

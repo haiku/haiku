@@ -655,6 +655,19 @@ struct pci_module_info {
 #define PCI_pin_d               0x04
 #define PCI_pin_max             0x04
 
+/** PCI bridge control register bits */
+#define PCI_bridge_parity_error_response	0x0001	/* 1/0 Parity Error Response */
+#define PCI_bridge_serr						0x0002	/* 1/0 SERR# en/disabled */
+#define PCI_bridge_isa						0x0004	/* 1/0 ISA en/disabled */
+#define PCI_bridge_vga						0x0008	/* 1/0 VGA en/disabled */
+#define PCI_bridge_master_abort				0x0020	/* 1/0 Master Abort mode */
+#define PCI_bridge_secondary_bus_reset		0x0040	/* 1/0 Secondary bus reset */
+#define PCI_bridge_secondary_bus_fastback	0x0080	/* 1/0 fast back-to-back en/disabled */
+#define PCI_bridge_primary_discard_timeout	0x0100	/* 1/0 primary discard timeout */
+#define PCI_bridge_secondary_discard_timeout	0x0200	/* 1/0 secondary discard timeout */
+#define PCI_bridge_discard_timer_status		0x0400	/* 1/0 discard timer status */
+#define PCI_bridge_discard_timer_serr		0x0800	/* 1/0 discard timer serr */
+
 /** PCI Capability Codes */
 #define PCI_cap_id_reserved	0x00
 #define PCI_cap_id_pm		0x01      /* Power management */
