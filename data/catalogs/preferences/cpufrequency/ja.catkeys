@@ -1,20 +1,20 @@
 1	japanese	x-vnd.Haiku-CPUFrequencyPref	3079996868
-CPU frequency status view	CPU Frequency View		CPU 周波数ビュー
-CPUFrequency	System name		CPUFrequency
-CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPUFrequency\n\tClemens Zeidler 作\n\tCopyright 2009, Haiku, Inc.\n
-Defaults	Pref Window		デフォルト
-Dynamic performance	Status view		ダイナミックパッフォーマンス
-Dynamic stepping	CPU Frequency View		ダイナミックステッピング
-High performance	Status view		ハイパフォーマンス
-Install replicant into Deskbar	CPU Frequency View		レプリカントを Deskbar に表示
-Integration time [ms]: 	CPU Frequency View		積分時間 [ms]：
-Launching the CPU frequency preflet failed.\n\nError: 	Status view		CPUFrequency の起動に失敗しました。\n\nエラー：
-Low energy	Status view		省電力モード
 Ok	Status view		Ok
-Open Speedstep preferences…	Status view		Open Speedstep の設定…
-Quit	Status view		終了
-Revert	Pref Window		元に戻す
+CPU frequency status view	CPU Frequency View		CPU 周波数ビュー
 Set state	Status view		設定
-Step up by CPU usage	Color Step View		CPU 負荷に応じてステップアップ
+Defaults	Pref Window		デフォルト
+Install replicant into Deskbar	CPU Frequency View		レプリカントを Deskbar に表示
+Quit	Status view		終了
+High performance	Status view		ハイパフォーマンス
 Stepping policy	CPU Frequency View		ステッピングポリシー
+Dynamic performance	Status view		ダイナミックパッフォーマンス
+Step up by CPU usage	Color Step View		CPU 負荷に応じてステップアップ
+Dynamic stepping	CPU Frequency View		ダイナミックステッピング
 Stepping policy: 	CPU Frequency View		ステッピングポリシー
+Integration time [ms]: 	CPU Frequency View		積分時間 [ms]：
+Open Speedstep preferences…	Status view		Open Speedstep の設定…
+Revert	Pref Window		元に戻す
+Low energy	Status view		省電力モード
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		CPU 周波数の起動に失敗しました。\n\nエラー：
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPU 周波数\n\tClemens Zeidler 作\n\tCopyright 2009, Haiku, Inc.\n
+CPUFrequency	System name		CPU 周波数

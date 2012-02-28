@@ -1,8 +1,8 @@
 1	japanese	x-vnd.Haiku-PCXTranslator	1002061545
-PCX %lu bit image	PCXTranslator		PCX %lu ビットイメージ
 PCX Settings	main		PCX 設定
+PCX translator	PCXTranslator		PCX トランスレーター
+Version %d.%d.%d, %s	ConfigView		バージョン %d.%d.%d, %s
+PCXTranslator Settings	ConfigView		PCX トランスレーター設定
+PCX %lu bit image	PCXTranslator		PCX %lu ビットイメージ
 PCX images	ConfigView		PCX イメージ
 PCX images	PCXTranslator		PCX イメージ
-PCX translator	PCXTranslator		PCX トランスレーター
-PCXTranslator Settings	ConfigView		PCX トランスレーター設定
-Version %d.%d.%d, %s	ConfigView		バージョン %d.%d.%d, %s

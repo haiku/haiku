@@ -1,52 +1,50 @@
-1	japanese	x-vnd.Haiku-Notifications	3818404871
-Above icon	DisplayView		アイコンの上
-Allowed	NotificationView		許可された
+1	japanese	x-vnd.Haiku-Notifications	3631903554
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		設定ファイルの保存中にエラーが発生しました。\nおそらく、ディスク容量が不足しています。
-Application	NotificationView		アプリケーション
-Applications	NotificationView		アプリケーション
-Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		起動時に通知を有効にできませんでした。おそらく、boot settings ディレクトリの書き込み権限がありません。
-Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		設定を保存できません。おそらく、boot settings ディレクトリに書き込み権限がありません。
-Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		設定を保存できません。おそらく、setingsディレクトリに書き込み権限が無いか、ディレクトリまたはディスクがいっぱいです。
-Cannot disable notifications because the server can't be reached.	GeneralView		サーバーと通信できないので通知を無効にできません。
-Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		サーバーが見つからないので通知を有効にできません。\nこれは、InfoPopper のインストールがうまく完了していないことを示しています。
-Disable notifications	GeneralView		通知を無効にする
-Display	PrefletView		表示設定
-Enable notifications	GeneralView		通知を有効にする
-Enable notifications at startup	GeneralView		起動時に通知を有効にする
-Enabled	NotificationView		有効
-Error	NotificationView		エラー
-Events are not notified	GeneralView		イベントは通知されません
-Events are notified	GeneralView		イベントは通知されます
-General	PrefletView		一般設定
-Hide notifications from screen after	GeneralView		通知はなにもしないと
-Icon size:	DisplayView		アイコンサイズ：
-Important	NotificationView		重要
-Information	NotificationView		情報
-Large icon	DisplayView		大きいアイコン
-Last Received	NotificationView		最終受信時刻
-Mini icon	DisplayView		小さいアイコン
-No	NotificationView		いいえ
 Notifications	GeneralView		通知
-Notifications	NotificationView		通知
-Notifications	System name		通知
-Notifications cannot be stopped, because the server can't be reached.	GeneralView		サーバーと通信できないので通知を止めることができません。
-OK	DisplayView		OK
-OK	GeneralView		OK
-OK	NotificationView		OK
-Progress	NotificationView		進行状況
+seconds of inactivity	GeneralView		秒後に画面から隠されます。
 Revert	PrefletWin		元に戻す
-Right of icon	DisplayView		アイコンの右側
+Mini icon	DisplayView		小さいアイコン
+Enable notifications	GeneralView		通知を有効にする
+Error	NotificationView		エラー
+OK	GeneralView		OK
+Events are not notified	GeneralView		イベントは通知されません
 Save	PrefletWin		保存
+Type	NotificationView		タイプ
+Notifications cannot be stopped, because the server can't be reached.	GeneralView		サーバーと通信できないので通知を止めることができません。
+Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		サーバーが見つからないので通知を有効にできません。\nこれは、InfoPopper のインストールがうまく完了していないことを示しています。
+OK	NotificationView		OK
+Important	NotificationView		重要
+Cannot disable notifications because the server can't be reached.	GeneralView		サーバーと通信できないので通知を無効にできません。
+Progress	NotificationView		進行状況
+Last Received	NotificationView		最終受信時刻
+General	PrefletView		一般設定
+Display	PrefletView		表示設定
+Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		起動時に通知を有効にできませんでした。おそらく、boot settings ディレクトリの書き込み権限がありません。
 Search:	NotificationView		検索:
-The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		通知サーバーが見つかりません。これは、InfoPopper のインストールがうまく完了していないことを示しています。
 The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		通知サーバーが見つかりません。\nおそらくインストールが正しく行われていないことが原因です。
+Allowed	NotificationView		許可された
+Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		設定を保存できません。おそらく、setingsディレクトリに書き込み権限が無いか、ディレクトリまたはディスクがいっぱいです。
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	DisplayView		設定の保存時に問題があります。\nおそらく、settings ディレクトリに書き込み権限がありません。
+Yes	NotificationView		はい
+Large icon	DisplayView		大きいアイコン
+Icon size:	DisplayView		アイコンサイズ：
+Hide notifications from screen after	GeneralView		通知はなにもしないと
+Disable notifications	GeneralView		通知を無効にする
+Notifications	System name		通知
+Notifications	NotificationView		通知
+No	NotificationView		いいえ
+Title	NotificationView		タイトル
+Information	NotificationView		情報
+Window width:	DisplayView		ウインドウの幅：
+Application	NotificationView		アプリケーション
+Enabled	NotificationView		有効
+OK	DisplayView		OK
+Unknown	NotificationView		不明
+Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		設定を保存できません。おそらく、boot settings ディレクトリに書き込み権限がありません。
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		設定の保存時に問題があります。\nおそらく、settings ディレクトリに書き込み権限がありません。
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		設定の保存時に問題があります。\nおそらく、settings ディレクトリに書き込み権限がありません。
-Title	NotificationView		タイトル
-Title position:	DisplayView		タイトルの位置：
-Type	NotificationView		タイプ
-Unknown	NotificationView		不明
-Window width:	DisplayView		ウインドウの幅：
-Yes	NotificationView		はい
-seconds of inactivity	GeneralView		秒後に画面から隠されます。
+Enable notifications at startup	GeneralView		起動時に通知を有効にする
+Notifications	PrefletView		通知
+The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		通知サーバーが見つかりません。これは、InfoPopper のインストールがうまく完了していないことを示しています。
+Applications	NotificationView		アプリケーション
+Events are notified	GeneralView		イベントは通知されます

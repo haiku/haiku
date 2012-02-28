@@ -1,15 +1,15 @@
 1	japanese	x-vnd.Haiku-GIFTranslator	829368084
-Automatic (from alpha channel)	GIFView		アルファチャンネルより自動設定
-Be Bitmap Format (GIFTranslator)	GIFTranslator		Be ビットマップフォーマット (GIFTranslator)
-BeOS system	GIFView		BeOSシステムカラー
-Colors	GIFView		色数
-GIF Settings	GIFTranslator		GIF設定
-GIF image	GIFTranslator		GIF イメージ
-Greyscale	GIFView		グレイスケール
+Websafe	GIFView		Webセーフカラー
+Write interlaced images	GIFView		インターレースイメージを書き出す
 Optimal	GIFView		最適化
+Greyscale	GIFView		グレースケール
+Be Bitmap Format (GIFTranslator)	GIFTranslator		Be ビットマップフォーマット (GIFTranslator)
+GIF image	GIFTranslator		GIF イメージ
+Write transparent images	GIFView		透過イメージを書き出す
 Palette	GIFView		パレット
 Use RGB color	GIFView		RGBで指定
 Use dithering	GIFView		ディザリングする
-Websafe	GIFView		Webセーフカラー
-Write interlaced images	GIFView		インターレースイメージを書き出す
-Write transparent images	GIFView		透過イメージを書き出す
+GIF Settings	GIFTranslator		GIF設定
+BeOS system	GIFView		BeOSシステムカラー
+Automatic (from alpha channel)	GIFView		アルファチャンネルより自動設定
+Colors	GIFView		色数

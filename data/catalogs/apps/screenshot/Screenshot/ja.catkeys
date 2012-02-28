@@ -1,26 +1,26 @@
 1	japanese	x-vnd.haiku-screenshot	1697748405
-Artwork folder	ScreenshotWindow		アートワークフォルダ
-Cancel	ScreenshotWindow		中止
-Capture active window	ScreenshotWindow		アクティブウインドウのみ
-Choose folder	ScreenshotWindow		フォルダを選択
-Choose folder...	ScreenshotWindow		フォルダを選択...
-Copy to clipboard	ScreenshotWindow		クリップボードにコピー
-Delay:	ScreenshotWindow		遅延時間
+seconds	ScreenshotWindow		秒
 Desktop	ScreenshotWindow		デスクトップ
-Home folder	ScreenshotWindow		ホームフォルダ
-Include mouse pointer	ScreenshotWindow		マウスポインターも取り込む
 Include window border	ScreenshotWindow		ウインドウ境界線も取り込む
-Name:	ScreenshotWindow		ファイル名：
-New screenshot	ScreenshotWindow		新しいスクリーンショット
-Please select	ScreenshotWindow		選択してください
-Save	ScreenshotWindow		保存
-Save as:	ScreenshotWindow		ファイル形式：
-Save in:	ScreenshotWindow		保存場所：
 Screenshot	System name		スクリーンショット
 Select	ScreenshotWindow		選択
-Settings…	ScreenshotWindow		設定...
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		同じ名前のファイルは既に存在します。\n上書きしますか？
-Translator Settings	ScreenshotWindow		Translator設定
-overwrite	ScreenshotWindow		上書き
+Capture active window	ScreenshotWindow		アクティブウインドウのみ
+Cancel	ScreenshotWindow		中止
+Name:	ScreenshotWindow		ファイル名：
+Choose folder	ScreenshotWindow		フォルダを選択
+Save	ScreenshotWindow		保存
+Choose folder...	ScreenshotWindow		フォルダを選択...
+Please select	ScreenshotWindow		選択してください
+Save as:	ScreenshotWindow		ファイル形式：
+Copy to clipboard	ScreenshotWindow		クリップボードにコピー
+Save in:	ScreenshotWindow		保存場所：
 screenshot	Screenshot	Base filename of screenshot files	スクリーンショット
-seconds	ScreenshotWindow		秒
+New screenshot	ScreenshotWindow		新しいスクリーンショット
+Artwork folder	ScreenshotWindow		アートワークフォルダ
+Home folder	ScreenshotWindow		ホームフォルダ
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		同じ名前のファイルは既に存在します。\n上書きしますか？
+Settings…	ScreenshotWindow		設定...
+overwrite	ScreenshotWindow		上書き
+Delay:	ScreenshotWindow		遅延時間
+Include mouse pointer	ScreenshotWindow		マウスポインターも取り込む
+Translator Settings	ScreenshotWindow		Translator設定

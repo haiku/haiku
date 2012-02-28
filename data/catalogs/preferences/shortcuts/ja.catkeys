@@ -1,52 +1,52 @@
 1	japanese	x-vnd.Haiku-Shortcuts	621368175
-(Choose application with file requester)	ShortcutsWindow		(ファイルリクエスタと共にアプリケーションを選択)
-*Beep	ShortcutsWindow		*Beep
-*InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"テキストをここに\"
-*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
-*MouseButton 1	ShortcutsWindow		*MouseButton 1
-*MouseDown	ShortcutsWindow		*MouseDown
-*MouseUp	ShortcutsWindow		*MouseUp
-*MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
-*MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%
-*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
-*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
-Add new shortcut	ShortcutsWindow		新規作成
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
-Append	ShortcutsWindow		追加
-Append KeySet…	ShortcutsWindow		キーセットの追加…
-Application	ShortcutsWindow		アプリケーション
-Beep	ShortcutsSpec		Beep
-Cancel	ShortcutsWindow		中止
-Control	ShortcutsSpec	Name for modifier on keyboard	Control
-Don't save	ShortcutsWindow		保存しない
 Error, NULL state description?\n	ShortcutsSpec		エラー, 記述がありません?\n
-File	ShortcutsWindow		ファイル
-InsertString	ShortcutsSpec		InsertString
-Key	ShortcutsWindow		Key
-LaunchHandler	ShortcutsSpec		LaunchHandler
-MouseButton	ShortcutsSpec		MouseButton
-MouseDown	ShortcutsSpec		MouseDown
-MouseUp	ShortcutsSpec		MouseUp
 MoveMouse	ShortcutsSpec		MoveMouse
-MoveMouseTo	ShortcutsSpec		MoveMouseTo
-Multi	ShortcutsSpec		Multi
 OK	ShortcutsWindow		OK
-Oh no	ShortcutsWindow		Oh no
-Open	ShortcutsWindow		開く
-Open KeySet…	ShortcutsWindow		キーセットを開く…
-Quit	ShortcutsWindow		終了
-Really quit without saving your changes?	ShortcutsWindow		本当に変更を保存せずに終了してよいですか?
-Remove selected shortcut	ShortcutsWindow		選択部を削除
-Revert to saved	ShortcutsWindow		前回保存したときの状態に戻す
-Save	ShortcutsWindow		保存
-Save & apply	ShortcutsWindow		保存して適用
-Save KeySet as…	ShortcutsWindow		キーセットを名前をつけて保存…
-Select	ShortcutsWindow		選択
-SendMessage	ShortcutsSpec		SendMessage
-Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
-Shortcuts	System name		キーボードショートカット
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		キーセットファイルを開けませんでした！
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		キーセットファイルを解析できませんでした。
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		キーセットファイルを保存できませんでした!
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		キーセットを保存できませんでした。
+Cancel	ShortcutsWindow		中止
+InsertString	ShortcutsSpec		InsertString
+Append KeySet…	ShortcutsWindow		キーセットの追加…
+Control	ShortcutsSpec	Name for modifier on keyboard	Control
+Key	ShortcutsWindow		Key
+Open KeySet…	ShortcutsWindow		キーセットを開く…
+MouseUp	ShortcutsSpec		MouseUp
+Revert to saved	ShortcutsWindow		前回保存したときの状態に戻す
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"テキストをここに\"
+*MouseUp	ShortcutsWindow		*MouseUp
+(Choose application with file requester)	ShortcutsWindow		(ファイルリクエスタと共にアプリケーションを選択)
 Window	ShortcutsSpec	Name for modifier on keyboard	Window
+*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		キーセットファイルを開けませんでした！
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
+SendMessage	ShortcutsSpec		SendMessage
+MoveMouseTo	ShortcutsSpec		MoveMouseTo
+Save	ShortcutsWindow		保存
+*MouseButton 1	ShortcutsWindow		*MouseButton 1
+*MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
+MouseDown	ShortcutsSpec		MouseDown
+Remove selected shortcut	ShortcutsWindow		選択部を削除
+MouseButton	ShortcutsSpec		MouseButton
+Add new shortcut	ShortcutsWindow		新規作成
+Save & apply	ShortcutsWindow		保存して適用
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
+Append	ShortcutsWindow		追加
+File	ShortcutsWindow		ファイル
+Beep	ShortcutsSpec		Beep
+Quit	ShortcutsWindow		終了
+*MouseDown	ShortcutsWindow		*MouseDown
+Don't save	ShortcutsWindow		保存しない
+Multi	ShortcutsSpec		Multi
+Application	ShortcutsWindow		アプリケーション
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+*Beep	ShortcutsWindow		*Beep
+*MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%
+Save KeySet as…	ShortcutsWindow		キーセットを名前をつけて保存…
+Open	ShortcutsWindow		開く
+Really quit without saving your changes?	ShortcutsWindow		本当に変更を保存せずに終了してよいですか?
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		キーセットファイルを解析できませんでした。
+Select	ShortcutsWindow		選択
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		キーセットファイルを保存できませんでした!
+Oh no	ShortcutsWindow		Oh no
+LaunchHandler	ShortcutsSpec		LaunchHandler
+Shortcuts	System name		キーボードショートカット

@@ -1,16 +1,16 @@
 1	japanese	x-vnd.Haiku-TIFFTranslator	292291870
 LZW	TIFFView		LZW
-None	TIFFView		無圧縮
-RLE (Packbits)	TIFFView		RLE (Packbits)
-TIFF Image Translator	TIFFView		TIFF イメージトランスレーター
-TIFF Library:	TIFFView		TIFFライブラリ:
-TIFF Settings	TIFFMain		TIFF設定
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: couldn't set directory\n
 TIFF image	TIFFTranslator		TIFF イメージ
-TIFF image translator	TIFFTranslator		TIFF イメージトランスレーター
+TIFF Library:	TIFFView		TIFFライブラリ:
+TIFF Image Translator	TIFFView		TIFF イメージトランスレーター
+None	TIFFView		無圧縮
 TIFF images	TIFFTranslator		TIFFイメージ
 TIFFTranslator Settings	TIFFTranslator		TIFF トランスレーター設定
-Use Compression:	TIFFView		圧縮方法：
-Version %d.%d.%d %s	TIFFView		バージョン %d.%d.%d %s
-ZIP (Deflate)	TIFFView		ZIP (Deflate)
-identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: couldn't set directory\n
+TIFF image translator	TIFFTranslator		TIFF イメージトランスレーター
+RLE (Packbits)	TIFFView		RLE (Packbits)
+TIFF Settings	TIFFMain		TIFF 設定
 identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: invalid document index\n
+ZIP (Deflate)	TIFFView		ZIP (Deflate)
+Version %d.%d.%d %s	TIFFView		バージョン %d.%d.%d %s
+Use Compression:	TIFFView		圧縮方法：

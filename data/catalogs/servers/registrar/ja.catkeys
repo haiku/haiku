@@ -1,23 +1,23 @@
-1	japanese	application/x-vnd.Haiku-Registrar	2599857937
-%action%?	ShutdownProcess		%action%?
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		\"%appName%\" がシャットダウンプロセスを中断しました。
-Asking \"%appName%\" to quit.	ShutdownProcess		\"%appName%\"に終了を要求しています。
-Asking background applications to quit.	ShutdownProcess		バックグランドアプリケーションに終了を要求しています。
-Asking other processes to quit.	ShutdownProcess		プロセスに終了を要求しています。
-Cancel	ShutdownProcess		キャンセル
-Cancel shutdown	ShutdownProcess		シャットダウンを中止
-Do you really want to restart the system?	ShutdownProcess		本当にシステムを再起動してよいですか?
-Do you really want to shut down the system?	ShutdownProcess		本当にシステムをシャットダウンしてよいですか?
-It's now safe to turn off the computer.	ShutdownProcess		コンピュータの電源を切断しても安全です。 
-Kill application	ShutdownProcess		強制終了
-OK	ShutdownProcess		OK
-Restart	ShutdownProcess		再起動
+1	japanese	x-vnd.haiku-registrar	2599857937
 Restart system	ShutdownProcess		システムを再起動
-Restarting…	ShutdownProcess		再起動中…
-Shut down	ShutdownProcess		シャットダウン
-Shutdown aborted	ShutdownProcess		シャットダウンが中断されました。
-Shutdown status	ShutdownProcess		シャットダウンの状態
-Shutting down…	ShutdownProcess		シャットダウン中…
-System is shut down	ShutdownProcess		システムがシャットダウンされました
 The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		\"%appName%\"がモーダルパネルでブロックしているかもしれません。
+OK	ShutdownProcess		OK
+System is shut down	ShutdownProcess		システムがシャットダウンされました
+It's now safe to turn off the computer.	ShutdownProcess		コンピュータの電源を切断しても安全です。 
+Cancel	ShutdownProcess		キャンセル
+Do you really want to shut down the system?	ShutdownProcess		本当にシステムをシャットダウンしてよいですか?
+Asking other processes to quit.	ShutdownProcess		プロセスに終了を要求しています。
+Asking \"%appName%\" to quit.	ShutdownProcess		\"%appName%\"に終了を要求しています。
+%action%?	ShutdownProcess		%action%?
+Shutdown aborted	ShutdownProcess		シャットダウンが中断されました。
+Restarting…	ShutdownProcess		再起動中…
+Asking background applications to quit.	ShutdownProcess		バックグランドアプリケーションに終了を要求しています。
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		\"%appName%\" がシャットダウンプロセスを中断しました。
 Tidying things up a bit.	ShutdownProcess		少し片付け中です。
+Do you really want to restart the system?	ShutdownProcess		本当にシステムを再起動してよいですか?
+Shutdown status	ShutdownProcess		シャットダウンの状態
+Cancel shutdown	ShutdownProcess		シャットダウンを中止
+Kill application	ShutdownProcess		強制終了
+Shut down	ShutdownProcess		シャットダウン
+Restart	ShutdownProcess		再起動
+Shutting down…	ShutdownProcess		シャットダウン中…

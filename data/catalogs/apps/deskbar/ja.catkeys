@@ -1,45 +1,47 @@
-1	japanese	x-vnd.Be-TSKB	4265681964
-<Be folder is empty>	BeMenu		<Haiku メニューフォルダーは空です>
-About this system	BeMenu		このシステムについて
-Always on top	PreferencesWindow		常に手前に
-Applications	B_USER_DESKBAR_DIRECTORY/Applications		アプリケーション
-Applications	PreferencesWindow		アプリケーション
-Auto-hide	PreferencesWindow		自動的に隠す
-Auto-raise	PreferencesWindow		マウスオーバーで手前に
-Change time…	TimeView		日付と時刻の設定…
-Clock	PreferencesWindow		日付と時刻
-Close all	WindowMenu		すべて閉じる
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		デモ
-Deskbar	System name		Deskbar
-Deskbar preferences	PreferencesWindow		Deskbar の設定
-Deskbar preferences…	BeMenu		Deskbar の設定…
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		デスクトップアプレット
+1	japanese	x-vnd.Be-TSKB	107564593
+Power off	DeskbarMenu		電源を切る
 Edit menu…	PreferencesWindow		メニューの編集…
-Expand new applications	PreferencesWindow		アプリケーション起動時展開表示
-Find…	BeMenu		検索…
-Hide all	WindowMenu		すべてを隠す
-Hide time	TimeView		時刻を隠す
-Menu	PreferencesWindow		メニュー
-Mount	BeMenu		マウント
-No windows	WindowMenu		ウィンドウ無し
-Power off	BeMenu		電源を切る
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		環境設定
-Quit application	WindowMenu		アプリケーションを終了
-Recent applications	BeMenu		最近使ったアプリケーション
-Recent applications:	PreferencesWindow		最近使ったアプリケーション
-Recent documents	BeMenu		最近使ったドキュメント
+Suspend	DeskbarMenu		サスペンド
+Applications	PreferencesWindow		アプリケーション
+About Haiku	DeskbarMenu		Haiku について
 Recent documents:	PreferencesWindow		最近使ったドキュメント
-Recent folders	BeMenu		最近開いたフォルダー
-Recent folders:	PreferencesWindow		最近開いたフォルダー：
-Restart Tracker	BeMenu		Tracker を実行
-Restart system	BeMenu		再起動
-Show Time	Tray		時刻を表示する
-Show all	WindowMenu		すべて表示
-Show application expander	PreferencesWindow		エキスパンダーを表示
-Show calendar…	TimeView		カレンダーの表示…
-Show replicants	BeMenu		レプリカントを表示
-Show seconds	PreferencesWindow		時刻に秒を表示
-Shutdown…	BeMenu		システムの終了…
-Sort running applications	PreferencesWindow		名前順に並び換える
-Tracker always first	PreferencesWindow		Trackerを先頭に表示
+Recent applications	DeskbarMenu		最近使ったアプリケーション
+Sort running applications	PreferencesWindow		実行中のアプリケーションを名前順に並び換える
+Change time…	TimeView		日付と時刻の設定…
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		アプリケーション
+Find…	DeskbarMenu		検索…
 Window	PreferencesWindow		ウィンドウ
+Menu	PreferencesWindow		メニュー
+Recent documents	DeskbarMenu		最近使ったドキュメント
+Show seconds	PreferencesWindow		時刻に秒を表示
+Auto-hide	PreferencesWindow		自動的に隠す
+Always on top	PreferencesWindow		常に手前に
+<Deskbar folder is empty>	DeskbarMenu		<Deskbar フォルダーは空です>
+Show all	WindowMenu		すべて表示
+No windows	WindowMenu		ウィンドウ無し
+Deskbar	System name		Deskbar
+Restart system	DeskbarMenu		システムを再起動
+Auto-raise	PreferencesWindow		マウスオーバーで手前に
+Hide time	TimeView		時刻を隠す
+Recent folders:	PreferencesWindow		最近開いたフォルダー：
+Show application expander	PreferencesWindow		エキスパンダーを表示
+Restart Tracker	DeskbarMenu		Tracker を再起動
+Close all	WindowMenu		すべて閉じる
+Deskbar preferences	PreferencesWindow		Deskbar の設定
+Mount	DeskbarMenu		マウント
+Recent applications:	PreferencesWindow		最近使ったアプリケーション
+Shutdown…	DeskbarMenu		シャットダウン…
+Tracker always first	PreferencesWindow		Tracker を常時先頭に表示
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		環境設定
+Recent folders	DeskbarMenu		最近使ったフォルダー
+About this system	DeskbarMenu		このシステムについて
+Show calendar…	TimeView		カレンダーの表示…
+Deskbar preferences…	DeskbarMenu		Deskbar の設定…
+Show Time	Tray		時刻を表示する
+Expand new applications	PreferencesWindow		新しいアプリケーションを展開表示
+Show replicants	DeskbarMenu		レプリカントを表示
+Clock	PreferencesWindow		日付と時刻
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		デモ
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		デスクトップアプレット
+Hide all	WindowMenu		すべてを隠す
+Quit application	WindowMenu		アプリケーションを終了

@@ -1,22 +1,31 @@
-1	japanese	x-vnd.Haiku-Keymap	1259868356
-(Current)	Keymap window		(使用中キーマップ)
-Acute trigger	Keymap window		アキュートアクセントのトリガー
-Circumflex trigger	Keymap window		サーカムフレックスのトリガー
-Diaeresis trigger	Keymap window		ウムラウトのトリガー
-File	Keymap window		ファイル
-Font	Keymap window		フォント
-Grave trigger	Keymap window		グレイヴアクセントのトリガー
-Keymap	System name		キーマップ
-Layout	Keymap window		レイアウト
-Open…	Keymap window		開く…
-Quit	Keymap window		終了
-Revert	Keymap window		元に戻す
-Sample and clipboard:	Keymap window		サンプル＆クリップボード
-Save as…	Keymap window		名前をつけて保存…
-Select dead keys	Keymap window		デッドキーの選択
-Switch shortcut keys	Keymap window		ショートカットキーのスイッチ
-Switch shortcut keys to Haiku mode	Keymap window		ショートカットキースイッチを Haiku モードにする
-Switch shortcut keys to Windows/Linux mode	Keymap window		ショートカットキースイッチを Windows/Linux モードにする
-System:	Keymap window		システム：
+1	japanese	x-vnd.Haiku-Keymap	3895282621
+Caps Lock:	Modifier Keys window		Caps Lock キー：
+OK	Modifier Keys window		OK
 Tilde trigger	Keymap window		チルダのトリガー
+Modifier Keys	Modifier Keys window		修飾キー
+Grave trigger	Keymap window		グレイヴアクセントのトリガー
+Select dead keys	Keymap window		デッドキーの選択
+Option:	Modifier Keys window		オプションキー：
+Revert	Modifier Keys window		元に戻す
+Quit	Keymap window		終了
+Switch shortcut keys to Haiku mode	Keymap window		ショートカットキースイッチを Haiku モードにする
+Circumflex trigger	Keymap window		サーカムフレックスのトリガー
+Cancel	Modifier Keys window		キャンセル
+Diaeresis trigger	Keymap window		ウムラウトのトリガー
+Open…	Keymap window		開く…
+System:	Keymap window		システム：
+Switch shortcut keys	Keymap window		ショートカットキーのスイッチ
+Set Modifier Keys…	Keymap window		修飾キーを設定…
 User:	Keymap window		ユーザー：
+Control:	Modifier Keys window		コントロールキー：
+Sample and clipboard:	Keymap window		サンプル＆クリップボード
+Layout	Keymap window		レイアウト
+Switch shortcut keys to Windows/Linux mode	Keymap window		ショートカットキースイッチを Windows/Linux モードにする
+Revert	Keymap window		元に戻す
+Save as…	Keymap window		名前をつけて保存…
+File	Keymap window		ファイル
+(Current)	Keymap window		(使用中キーマップ)
+Font	Keymap window		フォント
+Keymap	System name		キーマップ
+Command:	Modifier Keys window		コマンドキー：
+Acute trigger	Keymap window		アキュートアクセントのトリガー

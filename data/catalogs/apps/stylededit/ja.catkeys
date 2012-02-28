@@ -1,79 +1,80 @@
-1	japanese	x-vnd.Haiku-StyledEdit	3620825125
+1	japanese	x-vnd.Haiku-StyledEdit	1508367857
+StyledEdit	System name		StyledEdit
+Paste	Menus		貼り付け
+OK	LoadAlert		OK
+File	Menus		ファイル
 ???	LoadAlert		???
-Align	Menus		配置
-Black	Menus		黒
-Blue	Menus		青
-Bold	Menus		太字
+Lines:	Statistics		行数:
+Italic	Menus		イタリック
+Left	Menus		左揃え
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		\"%s\" を最後に保存した内容へ戻しますか？
+Search backwards	FindandReplaceWindow		逆方向検索
+Size	Menus		サイズ
+Save	QuitAlert		保存
+Page setup…	Menus		ページ設定…
+Print…	Menus		印刷…
 Can't undo	Menus		元に戻せません
-Cancel	FindandReplaceWindow		中止
-Cancel	QuitAlert		中止
-Cancel	RevertToSavedAlert		中止
+Save	Menus		保存
+Replace with:	FindandReplaceWindow		置換：
 Cancel	SaveAlert		中止
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		\"%s\" ファイルが存在しないため、読み込めませんでした。
 Case-sensitive	FindandReplaceWindow		大文字/小文字を区別
-Center	Menus		中央揃え
-Characters:	Statistics		文字数:
-Close	Menus		閉じる
-Color	Menus		色
-Copy	Menus		コピー
-Cut	Menus		切り取り
-Cyan	Menus		水色
-Default	Open_and_SaveAsPanel		デフォルト
-Document	Menus		ドキュメント
-Document statistics	Statistics		ドキュメント統計
-Don't save	QuitAlert		保存しない
-Don't save	SaveAlert		保存しない
-Edit	Menus		編集
-Encoding	Open_and_SaveAsPanel		文字コード
-Error loading \"%s\":\n\t%s	LoadAlert		\"%s\" を読み込み中にエラー発生：\n\t%s
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		\"%s\" を読み込み中に不明なエラー発生：\n\tフォーマットがサポートされていません。
-Error saving \"%s\":\n%s	SaveAlert		\"%s\" を保存中エラーが発生しました：\n%s
-File	Menus		ファイル
-Find	FindandReplaceWindow		検索
-Find again	Menus		次を検索
-Find selection	Menus		選択範囲を検索
-Find:	FindandReplaceWindow		検索：
-Find…	Menus		検索…
-Font	Menus		フォント
 Green	Menus		緑
-Italic	Menus		イタリック
-Left	Menus		左揃え
-Lines:	Statistics		行数:
+Revert to saved…	Menus		最新保存版に戻す…
+Yellow	Menus		黄
+Replace in all windows	FindandReplaceWindow		すべてのウィンドウで置換
+Wrap lines	Menus		ワードラップ
+Quit	Menus		終了
+Document statistics	Statistics		ドキュメント統計
+Cancel	RevertToSavedAlert		中止
+Document	Menus		ドキュメント
+Save changes to the document \"%s\"? 	QuitAlert		\"%s\" が変更されましたが、保存されていません。終了前に保存しますか?
+Edit	Menus		編集
+Font	Menus		フォント
+Replace all	FindandReplaceWindow		すべて置換
+Statistics…	Menus		統計...
+Default	Open_and_SaveAsPanel		デフォルト
+Replace next	Menus		次を置換
+Cancel	FindandReplaceWindow		中止
+Close	Menus		閉じる
+Save	SaveAlert		保存
+Words:	Statistics		単語数:
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		\"%s\" を読み込み中に不明なエラー発生：\n\tフォーマットがサポートされていません。
+OK	RevertToSavedAlert		Ok
+Don't save	QuitAlert		保存しない
+Align	Menus		配置
+Color	Menus		色
+Red	Menus		赤
+Open…	Menus		開く…
+Center	Menus		中央揃え
+Blue	Menus		青
+Cyan	Menus		水色
+OK	Statistics		OK
 Magenta	Menus		紫
 New	Menus		新規作成
-OK	LoadAlert		OK
-OK	RevertToSavedAlert		Ok
-OK	SaveAlert		Ok
-OK	Statistics		OK
-Open…	Menus		開く…
-Page setup…	Menus		ページ設定…
-Paste	Menus		貼り付け
-Print…	Menus		印刷…
-Quit	Menus		終了
-Red	Menus		赤
-Redo typing	QuitAlert		やり直し
-Replace	FindandReplaceWindow		置換
-Replace all	FindandReplaceWindow		すべて置換
-Replace in all windows	FindandReplaceWindow		すべてのウィンドウで置換
-Replace next	Menus		次を置換
-Replace with:	FindandReplaceWindow		置換：
-Replace…	Menus		置換…
-Revert to saved…	Menus		最新保存版に戻す…
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		\"%s\" を最後に保存した内容へ戻しますか？
-Right	Menus		右揃え
-Save	Menus		保存
-Save	QuitAlert		保存
-Save	SaveAlert		保存
-Save as…	Menus		名前をつけて保存…
-Save changes to the document \"%s\"? 	QuitAlert		\"%s\" が変更されましたが、保存されていません。終了前に保存しますか?
-Search backwards	FindandReplaceWindow		逆方向検索
-Select all	Menus		すべて選択
-Size	Menus		サイズ
-Statistics…	Menus		統計...
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		このファイルは読み取り専用です。変更を\"%s\"ドキュメントに保存しますか？
-Undo typing	QuitAlert		元に戻す
-Untitled 	StyledEditWindow		無題
-Words:	Statistics		単語数:
-Wrap lines	Menus		ワードラップ
 Wrap-around search	FindandReplaceWindow		ラップアラウンド検索
-Yellow	Menus		黄
+Bold	Menus		太字
+Find selection	Menus		選択範囲を検索
+Find:	FindandReplaceWindow		検索：
+Error saving \"%s\":\n%s	SaveAlert		\"%s\" を保存中エラーが発生しました：\n%s
+Copy	Menus		コピー
+Cut	Menus		切り取り
+Replace	FindandReplaceWindow		置換
+Find again	Menus		次を検索
+Cancel	QuitAlert		中止
+Find…	Menus		検索…
+Select all	Menus		すべて選択
+Don't save	SaveAlert		保存しない
+Error loading \"%s\":\n\t%s	LoadAlert		\"%s\" を読み込み中にエラー発生：\n\t%s
+Undo typing	QuitAlert		元に戻す
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		このファイルは読み取り専用です。変更を\"%s\"ドキュメントに保存しますか？
+Black	Menus		黒
+Untitled 	StyledEditWindow		無題
+OK	SaveAlert		Ok
+Find	FindandReplaceWindow		検索
+Encoding	Open_and_SaveAsPanel		文字コード
+Characters:	Statistics		文字数:
+Save as…	Menus		名前をつけて保存…
+Redo typing	QuitAlert		やり直し
+Replace…	Menus		置換…
+Right	Menus		右揃え

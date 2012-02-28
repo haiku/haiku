@@ -1,8 +1,8 @@
 1	japanese	x-vnd.Haiku-ReadOnlyBootPrompt	2544294242
 Custom	BootPromptWindow		カスタム
-Desktop (Live-CD)	BootPromptWindow		デスクトップ (ライブ CD)
-Keymap	BootPromptWindow		キーマップ
-Language	BootPromptWindow		言語
-Run Installer	BootPromptWindow		インストーラーを実行
 Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Haikuを試用して頂きありがとうございます。Haikuのことを気に入って頂ければ幸いです。\n\n左欄からご希望の言語とキーマップの選択がすぐできます。あとで、デスクトップからこれらの設定をすぐに簡単に変更できます。\n\nインストーラーを実行しますか、それともライブCDモードでデスクトップを起動しますか？\n\n注釈：Haikuアプリケーションや他のコンポーネントのロケール化は進行中のため、翻訳されていない部分が表示されることや翻訳がおかしいことがあります。Haikuの翻訳にご協力したい方は、haiku-i18n-jp MLにてご連絡ください（http://freelists.org/list/haiku-i18n-jp）。\n
+Desktop (Live-CD)	BootPromptWindow		デスクトップ (ライブ CD)
+Language	BootPromptWindow		言語
 Welcome to Haiku!	BootPromptWindow		Haiku へようこそ！
+Run Installer	BootPromptWindow		インストーラーを実行
+Keymap	BootPromptWindow		キーマップ

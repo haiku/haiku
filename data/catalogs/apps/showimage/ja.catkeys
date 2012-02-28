@@ -1,61 +1,62 @@
-1	japanese	x-vnd.Haiku-ShowImage	1784579482
-%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS 秒
-Browse	Menus		閲覧
-Cancel	ClosePrompt		中止
-Clear selection	Menus		選択解除
-Close	ClosePrompt		閉じる
-Close	Menus		閉じる
-Close document	ClosePrompt		ファイルを閉じる
-Copy	Menus		コピー
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		画像ファイルを読み込めません！ ファイルまたは画像トランスレータが存在しません。
-DPI:	PrintOptionsWindow		解像度 (DPI)：
-Edit	Menus		編集
+1	japanese	x-vnd.Haiku-ShowImage	886873119
+Use as background…	Menus		デスクトップの背景にする…
 File	Menus		ファイル
-First page	Menus		最初のページ
-Fit image to page	PrintOptionsWindow		画像を用紙サイズにあわせる
-Fit to window	Menus		ウィンドウに合わせる
-Flip left to right	Menus		左右反転
-Flip top to bottom	Menus		上下反転
+Slide delay	Menus		スライド間隔
+Selection mode	Menus		選択モード
+Zoom in	Menus		ズームイン
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		画像ファイル '%s' が変更されています。保存せずに閉じますか？
+Page setup…	Menus		ページ設定…
+Print…	Menus		印刷…
+OK	SaveToFile		Ok
+Previous page	Menus		前のページ
+View	Menus		表示
 Full screen	Menus		全画面表示
 Go to page	Menus		指定ページへ
-Height: 	PrintOptionsWindow		高さ：
-High-quality zooming	Menus		高画質ズーム
-Image	Menus		画像
-Job setup	PrintOptionsWindow		ジョブ設定
-Last page	Menus		最後のページ
-Leave full screen	Menus		全画面表示から戻る
-Next file	Menus		次のファイル
-Next page	Menus		次のページ
-OK	Alerts		OK
-OK	SaveToFile		Ok
-Open…	Menus		開く...
-Original size	Menus		原寸に戻す
-Page setup…	Menus		ページ設定…
-Previous file	Menus		前のファイル
-Previous page	Menus		前のページ
-Print options	PrintOptionsWindow		印刷オプション
-Print…	Menus		印刷…
-Progress monitor	ProgressWindow		進捗状況モニター
-Quit	Menus		終了
-Rating	Menus		評価
-Resize to (in 1/72 inches):	PrintOptionsWindow		リサイズ (1/72 インチ)：
-Rotate clockwise	Menus		時計まわりに 90° 回転
-Rotate counterclockwise	Menus		反時計まわりに 90° 回転
-Save as…	Menus		ファイル形式を選んで保存…
-Select all	Menus		すべて選択
-Selection mode	Menus		選択モード
-Show caption in full screen mode	Menus		全画面表示モードでキャプションを表示
-Show tool bar	Menus		ツールバーを表示
-Slide delay	Menus		スライド間隔
-Slide show	Menus		スライドショー
-Stretch to window	Menus		ウィンドウの大きさに広げる
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		「%s」の %d ページが変更されました。それでもファイルを閉じますか？
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		画像ファイル '%s' が変更されています。保存せずに閉じますか？
-The file '%s' could not be written.	SaveToFile		画像ファイル「%s」を保存できませんでした。
-Undo	Menus		元に戻す
-Use as background…	Menus		デスクトップの背景にする…
-View	Menus		表示
-Width:	PrintOptionsWindow		幅：
-Zoom factor in %:	PrintOptionsWindow		ズーム倍率 (%)：
-Zoom in	Menus		ズームイン
 Zoom out	Menus		ズームアウト
+Quit	Menus		終了
+Rotate counterclockwise	Menus		反時計まわりに 90° 回転
+High-quality zooming	Menus		高画質ズーム
+Browse	Menus		閲覧
+Edit	Menus		編集
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		画像ファイルを読み込めません！ ファイルまたは画像トランスレータが存在しません。
+First page	Menus		最初のページ
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		'%s' の %d ページが変更されました。それでもファイルを閉じますか？
+%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS 秒
+Leave full screen	Menus		全画面表示から戻る
+Close	Menus		閉じる
+Close	ClosePrompt		閉じる
+Undo	Menus		元に戻す
+Resize to (in 1/72 inches):	PrintOptionsWindow		リサイズ (1/72 インチ)：
+Rating	Menus		評価
+Flip left to right	Menus		左右反転
+Show caption in full screen mode	Menus		全画面表示モードでキャプションを表示
+DPI:	PrintOptionsWindow		解像度 (DPI)：
+Open…	Menus		開く...
+Next file	Menus		次のファイル
+Clear selection	Menus		選択解除
+Close document	ClosePrompt		ファイルを閉じる
+Height: 	PrintOptionsWindow		高さ：
+The file '%s' could not be written.	SaveToFile		画像ファイル '%s' を保存できませんでした。
+Cancel	ClosePrompt		中止
+Show tool bar	Menus		ツールバーを表示
+Fit to window	Menus		ウィンドウに合わせる
+Print options	PrintOptionsWindow		印刷オプション
+Copy	Menus		コピー
+Progress monitor	ProgressWindow		進捗状況モニター
+Last page	Menus		最後のページ
+Stretch to window	Menus		ウィンドウの大きさに広げる
+Previous file	Menus		前のファイル
+ShowImage	System name		画像ビューワ
+Slide show	Menus		スライドショー
+Fit image to page	PrintOptionsWindow		画像を用紙サイズに合わせる
+Flip top to bottom	Menus		上下反転
+Select all	Menus		すべて選択
+Zoom factor in %:	PrintOptionsWindow		ズーム倍率 (%)：
+Width:	PrintOptionsWindow		幅：
+Image	Menus		画像
+OK	Alerts		OK
+Rotate clockwise	Menus		時計まわりに 90° 回転
+Job setup	PrintOptionsWindow		ジョブ設定
+Original size	Menus		原寸に戻す
+Next page	Menus		次のページ
+Save as…	Menus		ファイル形式を選んで保存…

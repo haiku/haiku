@@ -1,8 +1,8 @@
 1	japanese	x-vnd.Haiku-HVIFTranslator	813066125
-HVIF Settings	HVIFMain		HVIF設定
-HVIF icons	HVIFTranslator		HVIFアイコン
-HVIFTranslator Settings	HVIFTranslator		HVIFTranslator 設定
-Native Haiku icon format translator	HVIFView		Haiku 専用アイコン形式のトランスレータ
-Native Haiku vector icon translator	HVIFTranslator		Haiku 専用ベクターアイコン用トランスレータ
+HVIF icons	HVIFTranslator		HVIF アイコン
 Render size:	HVIFView		描画サイズ：
+HVIFTranslator Settings	HVIFTranslator		HVIFTranslator 設定
+Native Haiku vector icon translator	HVIFTranslator		Haiku ベクターアイコン用トランスレータ
+Native Haiku icon format translator	HVIFView		Haiku アイコン形式のトランスレータ
+HVIF Settings	HVIFMain		HVIF 設定
 Version %d.%d.%d, %s	HVIFView		バージョン %d.%d.%d, %s

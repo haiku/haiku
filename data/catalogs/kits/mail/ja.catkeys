@@ -1,10 +1,10 @@
 1	japanese	x-vnd.Haiku-libmail	161731481
-Connection type:	ProtocolConfigView		接続タイプ：
-Leave mail on server	ProtocolConfigView		受信後もサーバーにメールを保存する
-Login type:	ProtocolConfigView		認証方法：
-Mail server:	ProtocolConfigView		サーバー名　
 Partially download messages larger than	ProtocolConfigView		より大きいメッセージは部分ダウンロードする
 Password:	ProtocolConfigView		パスワード：
 Remove mail from server when deleted	ProtocolConfigView		ローカルから削除されたらメールをサーバーから削除
+Mail server:	ProtocolConfigView		サーバー名　
 Select…	MailKit		選択…
+Connection type:	ProtocolConfigView		接続タイプ：
+Leave mail on server	ProtocolConfigView		受信後もサーバーにメールを保存する
 Username:	ProtocolConfigView		ユーザーID：
+Login type:	ProtocolConfigView		認証方法：

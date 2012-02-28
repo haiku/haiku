@@ -1,36 +1,44 @@
-1	japanese	x-vnd.Haiku-Time	453699369
-<Other>	Time		<その他>
-Add	Time		追加
-Could not contact server	Time		サーバーに接続できませんでした。
-Could not create socket	Time		ソケットを作成できませんでした。
-Current time:	Time		現在時刻：
-Date and time	Time		日付と時間
-Etc	Time		Etc
-GMT	Time		グリニッジ標準時
-Hardware clock set to:	Time		ハードウェアクロックを設定:
-Local time	Time		現地時間
-Message receiving failed	Time		メッセージの取得に失敗しました
-Network time	Time		ネットワークタイム
+1	japanese	x-vnd.Haiku-Time	3493650184
+GMT (UNIX compatible)	Time		GMT (UNIX 互換)
 OK	Time		OK
-Preview time:	Time		プレビュー：
-Received invalid time	Time		不正な時間を受け取りました
-Remove	Time		削除
-Reset	Time		リセット
-Revert	Time		元に戻す
-Sending request failed	Time		リクエストの送信に失敗しました
-Set time zone	Time		タイムゾーンを設定
-Stop	Time		中断
-Synchronize	Time		同期
-Synchronize again	Time		再同期
-Synchronize at boot	Time		システム起動時に同期する
-The following error occured while synchronizing:r\n%s	Time		同期中に次のエラーが発生しました:\n%s
-The following error occured while synchronizing:r\n%s: %s	Time		同期中に次のエラーが発生しました\n%s: %s
-This setting controls how Haiku will display your time based on how\ntime is measured in the computer's hardware clock. Windows is usually\nset to local time, meaning the hardware clock is measured in the same\ntime as the configured time zone. When this is set to GMT it means the\nhardware clock is measured based on GMT and Haiku will adjust the time\nit shows based on the configured time zone.	Time		この設定は、時間がコンピューターのハードウェアクロックで計られる方法\nに基づいて、Haikuがどのように時刻を表示するかをコントロールします。\nWIndowsは常にローカルタイムに設定します。つまり、設定された\nタイムゾーンと同様にハードウェアクロックが測定される事を意味します。\nGMTに設定された場合は、ハードウェアクロックはGMTベースで測定\nされ、Haikuは設定されたタイムゾーンに基づいて、表示する時間を調整\nするでしょう。
-Time	System name		日付と時間
-Time	Time		日付と時間
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date 作者:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
-Time zone	Time		タイムゾーン
-Try all servers	Time		すべてのサーバーを試す
-Waiting for answer failed	Time		返答待ちに失敗しました
+Asia	Time		アジア
 \nNow: 	Time		 \n現在：
+Africa	Time		アフリカ
+Stop	Time		中断
+Could not contact server	Time		サーバーに接続できませんでした。
+Australia	Time		オーストラリア
+Preview time:	Time		プレビュー：
+Synchronize	Time		同期
+Revert	Time		元に戻す
+Pacific	Time		太平洋
+Add	Time		追加
+Date and time	Time		日付と時間
 about	Time		このソフトウェアについて
+Local time (Windows compatible)	Time		現地時刻 (Windows 互換)
+Message receiving failed	Time		メッセージの取得に失敗しました
+Set time zone	Time		タイムゾーンを設定
+Waiting for answer failed	Time		返答待ちに失敗しました
+Hardware clock set to:	Time		ハードウェアクロックを設定:
+The following error occured while synchronizing:r\n%s	Time		同期中に次のエラーが発生しました:\n%s
+Europe	Time		ヨーロッパ
+Remove	Time		削除
+Time	Time		日付と時間
+Indian	Time		インド
+Sending request failed	Time		リクエストの送信に失敗しました
+Arctic	Time		北極
+Time	System name		日付と時間
+America	Time		アメリカ
+Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date 作者:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
+Reset	Time		リセット
+Synchronize at boot	Time		システム起動時に同期する
+Received invalid time	Time		不正な時間を受け取りました
+Antarctica	Time		南極
+The following error occured while synchronizing:r\n%s: %s	Time		同期中に次のエラーが発生しました\n%s: %s
+<Other>	Time		<その他>
+Current time:	Time		現在時刻：
+Try all servers	Time		すべてのサーバーを試す
+Time zone	Time		タイムゾーン
+Could not create socket	Time		ソケットを作成できませんでした。
+Synchronize again	Time		再同期
+Network time	Time		ネットワークタイム
+Atlantic	Time		大西洋

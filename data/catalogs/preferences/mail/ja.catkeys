@@ -1,60 +1,60 @@
 1	japanese	x-vnd.Haiku-Mail	3957822883
-Account name:	Config Views		アカウント名:
-Account name:	E-Mail		アカウント名:
-Account settings	AutoConfigWindow		アカウント設定
-Account settings	Config Views		アカウント設定
-Accounts	Config Window		アカウント
-Add	Config Window		追加
-Add filter	Config Views		フィルターを追加
-Always	Config Window		常に
-Apply	Config Window		適用
-Back	AutoConfigWindow		前へ
-Check every	Config Window		メールを
-Choose Protocol	E-Mail		プロトコルを選択してください
-Create new account	AutoConfigWindow		新規アカウント作成
-E-mail	System name		メール
-E-mail address:	E-Mail		E-mail アドレス
-Edit mailbox menu…	Config Window		メールボックスメニューの編集…
-Enter a valid e-mail address.	AutoConfigWindow		有効な E-mail アドレスを入力してください。
-Error	Config Window		エラー
-Error retrieving general settings: %s\n	Config Window		一般設定の読み取り時に次のエラーが発生しました: %s\n
-Finish	AutoConfigWindow		完了
-Incoming	Config Window		受信
-Incoming	E-Mail		受信
-Incoming mail filters	Config Views		受信メールフィルター
-Login name:	E-Mail		ログイン名:
 Mail checking	Config Window		メールチェック
-Miscellaneous	Config Window		その他
-Never	Config Window	show status window	表示しない
-Next	AutoConfigWindow		次へ
-OK	AutoConfigWindow		OK
-OK	Config Views		OK
-OK	Config Window		OK
-Only when dial-up is connected	Config Window		ダイアルアップ接続のときのみ
-Outgoing	Config Window		送信
-Outgoing	E-Mail		送信
-Outgoing mail filters	Config Views		送信メールフイルター
-Password:	E-Mail		パスワード:
-Real name:	Config Views		本名：
-Real name:	E-Mail		実名：
-Remove	Config Views		削除
-Remove	Config Window		削除
-Return address:	Config Views		返信先アドレス：
-Revert	Config Window		元に戻す
-Schedule outgoing mail when dial-up is disconnected	Config Window		ダイアルアップ接続が切断した時に送信メールを予約する
-Server Name:	E-Mail		サーバ名:
 Settings	Config Window		設定
-Show connection status window:	Config Window		通信状況ウインドウを表示
-Start mail services on startup	Config Window		起動時にメールサービスを開始する
-The filter could not be moved. Deleting filter.	Config Views		フィルターを移動できませんでした。削除します。
-While sending	Config Window		送信中に
+Never	Config Window	show status window	表示しない
+Only when dial-up is connected	Config Window		ダイアルアップ接続のときのみ
 While sending and receiving	Config Window		送受信中に
-\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\n一般設定をもとに戻せませんでした。\n\n読み取り時に次のエラーが発生しました:\n%s\n
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\n追加ボタンで新規アカウントを作成してください。\n\n削除ボタンで選択したアカウントを削除してください。\n\nリストのアイテムを選択して、設定を変更してください。
-\t\t· E-mail filters	Config Window		\t\t· メールフィルタ
-\t\t· Incoming	Config Window		\t\t· 受信
-\t\t· Outgoing	Config Window		\t\t· 送信
 days	Config Window		日毎にチェック
+Incoming	Config Window		受信
+OK	Config Window		OK
+Start mail services on startup	Config Window		起動時にメールサービスを開始する
+E-mail address:	E-Mail		E-mail アドレス
+Account name:	E-Mail		アカウント名:
+Account name:	Config Views		アカウント名:
+Create new account	AutoConfigWindow		新規アカウント作成
+OK	Config Views		OK
+The filter could not be moved. Deleting filter.	Config Views		フィルターを移動できませんでした。削除します。
+Revert	Config Window		元に戻す
+Login name:	E-Mail		ログイン名:
+Incoming	E-Mail		受信
+Password:	E-Mail		パスワード:
+Accounts	Config Window		アカウント
+Finish	AutoConfigWindow		完了
+Remove	Config Window		削除
+Miscellaneous	Config Window		その他
+Show connection status window:	Config Window		通信状況ウインドウを表示
+Server Name:	E-Mail		サーバ名:
+While sending	Config Window		送信中に
+Schedule outgoing mail when dial-up is disconnected	Config Window		ダイアルアップ接続が切断した時に送信メールを予約する
 hours	Config Window		時間毎にチェック
-minutes	Config Window		分毎にチェック
+Enter a valid e-mail address.	AutoConfigWindow		有効な E-mail アドレスを入力してください。
+Add	Config Window		追加
+Account settings	AutoConfigWindow		アカウント設定
+E-mail	System name		メール
 never	Config Window	mail checking frequency	手動でチェック
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\n一般設定をもとに戻せませんでした。\n\n読み取り時に次のエラーが発生しました:\n%s\n
+Real name:	Config Views		本名：
+\t\t· Outgoing	Config Window		\t\t· 送信
+Choose Protocol	E-Mail		プロトコルを選択してください
+Return address:	Config Views		返信先アドレス：
+Edit mailbox menu…	Config Window		メールボックスメニューの編集…
+Outgoing	E-Mail		送信
+\t\t· E-mail filters	Config Window		\t\t· メールフィルタ
+Remove	Config Views		削除
+\t\t· Incoming	Config Window		\t\t· 受信
+Next	AutoConfigWindow		次へ
+Check every	Config Window		メールを
+Back	AutoConfigWindow		前へ
+Incoming mail filters	Config Views		受信メールフィルター
+Account settings	Config Views		アカウント設定
+minutes	Config Window		分毎にチェック
+Error retrieving general settings: %s\n	Config Window		一般設定の読み取り時に次のエラーが発生しました: %s\n
+Real name:	E-Mail		実名：
+Apply	Config Window		適用
+Always	Config Window		常に
+OK	AutoConfigWindow		OK
+Add filter	Config Views		フィルターを追加
+Outgoing	Config Window		送信
+Outgoing mail filters	Config Views		送信メールフイルター
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\n追加ボタンで新規アカウントを作成してください。\n\n削除ボタンで選択したアカウントを削除してください。\n\nリストのアイテムを選択して、設定を変更してください。
+Error	Config Window		エラー

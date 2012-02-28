@@ -1,12 +1,12 @@
 1	japanese	x-vnd.Haiku-HPGSTranslator	3633584048
 Based on HPGS (http://hpgs.berlios.de)	ConfigView		HPGS (http://hpgs.berlios.de) に基づく
-Error: Cannot imbue plot device to reader: %s\n	HPGSTranslator		エラー: リーダーにプロットデバイスを埋め込むことができません: %s\n
+Version %d.%d.%d, %s	ConfigView		バージョン %d.%d.%d, %s
 Error: Cannot process plot data %s\n	HPGSTranslator		エラー: プロットデータ %s を処理できません\n
 HPGS image	HPGSTranslator		HPGS イメージ
-HPGS image translator	HPGSTranslator		HPGS イメージ・トランスレータ
+HPGSTranslator Settings	ConfigView		HPGSTranslator 設定
+Error: Cannot imbue plot device to reader: %s\n	HPGSTranslator		エラー: リーダーにプロットデバイスを埋め込むことができません: %s\n
 HPGS images	ConfigView		HPGS イメージ
 HPGS images	HPGSTranslator		HPGS イメージ
-HPGSTranslator Settings	ConfigView		HPGSTranslator 設定
-Version %d.%d.%d, %s	ConfigView		バージョン %d.%d.%d, %s
-Write error %s\n	HPGSTranslator		書き込みエラー %s\n
 no hpgs\n	HPGSTranslator		hpgs がありません\n
+HPGS image translator	HPGSTranslator		HPGS イメージトランスレータ
+Write error %s\n	HPGSTranslator		書き込みエラー %s\n

@@ -1,33 +1,33 @@
 1	japanese	x-vnd.Haiku.TextSearch	1180598828
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME は１つ以上のフォルダーを開けませんでした。
 %s: Not enough room to escape the filename.	Grepper		%s: ファイル名をエスケープする余裕がありません。
-%s: There was a problem running grep.	Grepper		%s: grepの動作中に問題が起こりました。
-Actions	GrepWindow		アクション
-Cancel	GrepWindow		検索中止
-Case-sensitive	GrepWindow		大文字小文字を区別
-Close	GrepWindow		閉じる
-Copy text to clipboard	GrepWindow		テキストをクリップボードにコピー
-Encoding	GrepWindow		文字コード
-Escape search text	GrepWindow		検索文字をエスケープする
-File	GrepWindow		ファイル
-Follow symbolic links	GrepWindow		シンボリックリンクに従う
-History	GrepWindow		検索履歴
-Look in sub-folders	GrepWindow		サブフォルダーも調べる
-New window	GrepWindow		新規ウインドウ
-OK	GrepWindow		OK
-Open files in Pe	GrepWindow		Pe で開く
-Open selection	GrepWindow		選択部を開く
-Please select the files you wish to have selected for you in Tracker.	GrepWindow		Tracker で選択するファイルを選んでください。
-Please select the files you wish to keep searching.	GrepWindow		検索したいファイルを選択してください。
-Quit	GrepWindow		終了
-Search	GrepWindow		検索開始
-Select all	GrepWindow		すべて選択
-Set target…	GrepWindow		ターゲットの指定
-Settings	GrepWindow		設定
-Show files in Tracker	GrepWindow		Tracker でファイルを選択
-Show lines	GrepWindow		行を表示
-Skip folders starting with a dot	GrepWindow		ドットで始まるフォルダーを無視する
-Text files only	GrepWindow		テキストファイルのみ
-TextSearch	GrepWindow		テキスト検索
-The unselected files will be removed from the list.	GrepWindow		選択されなかったファイルはリストから除かれます。
 Trim to selection	GrepWindow		選択部のみ残す
+Follow symbolic links	GrepWindow		シンボリックリンクに従う
+Close	GrepWindow		閉じる
+Cancel	GrepWindow		検索中止
+The unselected files will be removed from the list.	GrepWindow		選択されなかったファイルはリストから除かれます。
+Set target…	GrepWindow		ターゲットの指定
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Tracker で選択するファイルを選んでください。
+Open files in Pe	GrepWindow		Pe で開く
+Copy text to clipboard	GrepWindow		テキストをクリップボードにコピー
+Settings	GrepWindow		設定
+Select all	GrepWindow		すべて選択
+OK	GrepWindow		OK
+Skip folders starting with a dot	GrepWindow		ドットで始まるフォルダーを無視する
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME は１つ以上のフォルダーを開けませんでした。
+Escape search text	GrepWindow		検索文字をエスケープする
+Search	GrepWindow		検索開始
+Open selection	GrepWindow		選択部を開く
+Look in sub-folders	GrepWindow		サブフォルダーも調べる
+Actions	GrepWindow		アクション
+File	GrepWindow		ファイル
+Encoding	GrepWindow		文字コード
+History	GrepWindow		検索履歴
+%s: There was a problem running grep.	Grepper		%s: grepの動作中に問題が起こりました。
+New window	GrepWindow		新規ウィンドウ
+Please select the files you wish to keep searching.	GrepWindow		検索したいファイルを選択してください。
+TextSearch	GrepWindow		テキスト検索
+Quit	GrepWindow		終了
+Show files in Tracker	GrepWindow		Tracker でファイルを選択
+Case-sensitive	GrepWindow		大文字小文字を区別
+Text files only	GrepWindow		テキストファイルのみ
+Show lines	GrepWindow		行を表示

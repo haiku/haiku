@@ -1,73 +1,71 @@
-1	japanese	x-vnd.Haiku-Devices	1943893993
-ACPI Information	DeviceACPI		ACPI情報
-ACPI Processor Namespace '%2'	DeviceACPI		ACPIプロセッサーネームスペース '%2'
-ACPI System Bus	DeviceACPI		ACPIシステムバス
-ACPI System Indicator	DeviceACPI		ACPIシステムインジケーター 
-ACPI Thermal Zone	DeviceACPI		ACPIサーマルゾーン
-ACPI bus	Device		ACPIバス
-ACPI bus	DevicesView		ACPIバス
-ACPI controller	Device		ACPIコントローラー
-ACPI node '%1'	DeviceACPI		ACPIノード '%1'
-Basic information	DevicesView		基本情報
-Bridge	Device		ブリッジ
-Bus	DevicesView		バス
-Bus Information	Device		バス情報
-Category	DevicesView		カテゴリー順
-Class Info:\t\t\t\t: %classInfo%	DeviceACPI		クラス情報:\t\t\t\t: %classInfo%
-Class info	DevicePCI		クラス情報
-Communication controller	Device		通信コントローラー
-Computer	Device		コンピューター
-Computer	DevicesView		コンピューター
-Connection	DevicesView		接続順
-Detailed	DevicesView		詳細
-Device	Device		デバイス
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		デバイス名\t\t\t\t: %Name%\n製造元\t\t\t: %Manufacturer%\n使用されているドライバー\t\t\t\t: %DriverUsed%\nデバイスパス\t: %DevicePaths%
-Device name	Device		デバイス名
-Device name	DeviceACPI		デバイス名
-Device name	DevicePCI		デバイス名
-Device name:	Device		デバイス名：
-Device paths	Device		デバイスパス
-Device paths	DevicePCI		デバイスパス
-Devices	DevicesView		デバイス
-Devices	System name		デバイス
-Display controller	Device		ディスプレイコントローラー
-Docking station	Device		ドッキングステーション
-Driver used	Device		使用ドライバー
-Driver used	DevicePCI		使用されているデバイス
-Encryption controller	Device		暗号化コントローラー
-Generate system information	DevicesView		システム情報を作成
-Generic system peripheral	Device		システム周辺機器
-ISA bus	Device		ISAバス
-ISA bus	DevicesView		ISAバス
-Input device controller	Device		入力デバイスコントローラー
-Intelligent controller	Device		インテリジェントコントローラー
-Manufacturer	Device		メーカー
-Manufacturer	DeviceACPI		製造元
-Manufacturer	DevicePCI		製造元
-Manufacturer:	Device		メーカー：
-Mass storage controller	Device		大容量記憶コントローラー
-Memory controller	Device		メモリコントローラー
-Multimedia controller	Device		マルチメディアコントローラー
-Name	PropertyList		名前
-Network controller	Device		ネットワークコントローラー
-None	Device		無し
-Not implemented	DeviceACPI		未実装
-Not implemented	DevicePCI		未実装
+1	japanese	x-vnd.Haiku-Devices	1533788248
+Manufacturer	DeviceSCSI		製造元
 Order by:	DevicesView		並び順：
-PCI Information	DevicePCI		PCI情報
-PCI bus	Device		PCIバス
-PCI bus	DevicesView		PCIバス
-Processor	Device		プロセッサー
-Quit	DevicesView		終了
-Refresh devices	DevicesView		デバイスの更新
-Report compatibility	DevicesView		互換性レポート
-Satellite communications controller	Device		衛星通信コントローラー
-Serial bus controller	Device		シリアルバスコントローラー
-Signal processing controller	Device		信号処理コントローラー
-Unclassified device	Device		未登録デバイス
-Unknown	DevicePCI		不明
+ACPI controller	Device		ACPI コントローラー
+Memory controller	Device		メモリコントローラー
+Driver used	DevicePCI		使用されているデバイス
+CD-ROM	DeviceSCSI		CD-ROM
+ISA bus	Device		ISA バス
+ACPI bus	Device		ACPI バス
+ISA bus	DevicesView		ISA バス
+Docking station	Device		ドッキングステーション
+Computer	Device		コンピューター
 Unknown device	Device		不明なデバイス
-Unknown device	DevicesView		不明なデバイス
-Value	PropertyList		値
-Wireless controller	Device		ワイヤレスコントローラー
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		クラス情報:\t\t\t\t: %classInfo%
+Processor	DeviceSCSI		プロセッサー
+RBC	DeviceSCSI		RBC
+Detailed	DevicesView		詳細
+Category	DevicesView		カテゴリー順
+Quit	DevicesView		終了
+Device paths	Device		デバイスパス
+Scanner	DeviceSCSI		スキャナ
+Printer	DeviceSCSI		プリンター
+Processor	Device		プロセッサー
+Optical Drive	DeviceSCSI		光学ドライブ
+ACPI Processor Namespace '%2'	DeviceACPI		ACPI プロセッサーネームスペース '%2'
+Bridge	DeviceSCSI		ブリッジ
 unknown	Device		不明
+ACPI Information	DeviceACPI		ACPI 情報
+Generic system peripheral	Device		システム周辺機器
+Not implemented	DevicePCI		未実装
+Disk Drive	DeviceSCSI		ディスクドライブ
+Not implemented	DeviceACPI		未実装
+Device name	DevicePCI		デバイス名
+Display controller	Device		ディスプレイコントローラー
+Mass storage controller	Device		大容量記憶コントローラー
+Input device controller	Device		入力デバイスコントローラー
+Network controller	Device		ネットワークコントローラー
+Device class	DeviceSCSI		デバイスクラス
+Device name	DeviceACPI		デバイス名
+Driver used	Device		使用ドライバー
+Other	DeviceSCSI		その他
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		デバイス名\t\t\t\t: %Name%\n製造元\t\t\t: %Manufacturer%\n使用されているドライバー\t\t\t\t: %DriverUsed%\nデバイスパス\t: %DevicePaths%
+ACPI Thermal Zone	DeviceACPI		ACPI サーマルゾーン
+Communications	DeviceSCSI		通信
+Bus	DevicesView		バス
+Communication controller	Device		通信コントローラー
+Manufacturer	DeviceACPI		製造元
+PCI bus	Device		PCI バス
+ACPI System Indicator	DeviceACPI		ACPI システムインジケーター 
+None	Device		無し
+PCI bus	DevicesView		PCI バス
+Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		クラス情報：\t\t\t\t: %classInfo%
+Basic information	DevicesView		基本情報
+PCI Information	DevicePCI		PCI 情報
+Manufacturer:	Device		メーカー：
+ACPI bus	DevicesView		ACPI バス
+Changer	DeviceSCSI		チェンジャー
+ACPI System Bus	DeviceACPI		ACPI システムバス
+Devices	System name		デバイス
+Worm	DeviceSCSI		Worm
+Multimedia controller	Device		マルチメディアコントローラー
+Unknown	DevicePCI		不明
+Device name:	Device		デバイス名：
+Computer	DevicesView		コンピューター
+Value	PropertyList		値
+Report compatibility	DevicesView		互換性レポート
+Device	Device		デバイス
+Signal processing controller	Device		信号処理コントローラー
+Serial bus controller	Device		シリアルバスコントローラー
+Wireless controller	Device		ワイヤレスコントローラー
+ACPI node '%1'	DeviceACPI		ACPI ノード '%1'

@@ -1,38 +1,34 @@
-1	japanese	x-vnd.Haiku-SoundRecorder	2122042546
-Cannot connect to media server	RecorderWindow		メディアサーバーに接続できません
-Cannot connect to the selected sound input	RecorderWindow		指定したサウンド出力に接続できません
-Cannot find an unused name to use for the new recording	RecorderWindow		新規レコーディングに使用する未使用の名前が見つかりません
+1	japanese	x-vnd.Haiku-SoundRecorder	3266675535
+Loop	RecorderWindow		繰り返し
 Cannot find default audio hardware	RecorderWindow		デフォルトのオーディアハードウェアが見つかりません
 Cannot find the temporary file created to hold the new recording	RecorderWindow		新規レコーディングを保存する一時ファイルが見つかりません
-Cannot get the file to play	RecorderWindow		再生するファイルが得られません
-Cannot open the temporary file created to hold the new recording	RecorderWindow		新規レコーディングを保存する一時ファイルを開けません
-Cannot recognize this file as a media file	RecorderWindow		ファイルをメディアファイルとして認識できません
-Cannot record a sound that long	RecorderWindow		その長さのサウンドは録音できません
-Channels: 	RecorderWindow		チャンネル:
-Compression:	RecorderWindow		圧縮：
-Drop files here	SoundListView		ここにファイルをドロップしてください
-Duration:	RecorderWindow		再生時間:
-File info	RecorderWindow		ファイル情報
-File name:	RecorderWindow		ファイル名:
-Format: 	RecorderWindow		フォーマット：
-Forward	RecorderWindow		送る
-Input	RecorderWindow		入力
-Input:	RecorderWindow		入力:
-Invalid audio files	RecorderWindow		不正なオーディオファイル
-Loop	RecorderWindow		繰り返し
-None	RecorderWindow		無し
-None of the files appear to be audio files	RecorderWindow		ファイルはオーディオファイルで無いようです
 Nothing to play	RecorderWindow		再生するものがない
-OK	RecorderWindow		OK
-Play	RecorderWindow		再生
-Record	RecorderWindow		録音
-Rewind	RecorderWindow		巻き戻し
-Sample rate: 	RecorderWindow		サンプルレート:
-Sample size: 	RecorderWindow		ビット深度:
-Save	RecorderWindow		保存
 Some of the files don't appear to be audio files	RecorderWindow		ファイルのいくつかはオーディオファイルでは無いようです。
-Sound List	RecorderWindow		サウンドリスト
-SoundRecorder	System name		サウンドレコーダー
+File info	RecorderWindow		ファイル情報
+Drop files here	SoundListView		ここにファイルをドロップしてください
+Input	RecorderWindow		入力
 Stop	RecorderWindow		停止
-bits	RecorderWindow		ビット
-seconds	RecorderWindow		秒
+Sound List	RecorderWindow		サウンドリスト
+Rewind	RecorderWindow		巻き戻し
+Sample rate:	RecorderWindow		サンプルレート:
+Invalid audio files	RecorderWindow		不正なオーディオファイル
+OK	RecorderWindow		OK
+Cannot open the temporary file created to hold the new recording	RecorderWindow		新規レコーディングを保存する一時ファイルを開けません
+None of the files appear to be audio files	RecorderWindow		ファイルはオーディオファイルで無いようです
+Input:	RecorderWindow		入力:
+Forward	RecorderWindow		送る
+Play	RecorderWindow		再生
+SoundRecorder	System name		サウンドレコーダー
+None	RecorderWindow		無し
+Record	RecorderWindow		録音
+Sample size: 	RecorderWindow		ビット深度:
+Cannot recognize this file as a media file	RecorderWindow		ファイルをメディアファイルとして認識できません
+Format: 	RecorderWindow		フォーマット：
+File name: 	RecorderWindow		ファイル名:
+Cannot connect to the selected sound input	RecorderWindow		指定したサウンド出力に接続できません
+Cannot get the file to play	RecorderWindow		再生するファイルが得られません
+Cannot record a sound that long	RecorderWindow		その長さのサウンドは録音できません
+Duration:	RecorderWindow		再生時間:
+Compression:	RecorderWindow		圧縮：
+Cannot find an unused name to use for the new recording	RecorderWindow		新規レコーディングに使用する未使用の名前が見つかりません
+Channels: 	RecorderWindow		チャンネル:

@@ -1,29 +1,29 @@
 1	japanese	x-vnd.Haiku-ScreenSaver	215605989
-30 seconds	ScreenSaver		30 秒
-Add…	ScreenSaver		追加...
-Blackness	ScreenSaver		Blackness
-Cancel	ScreenSaver		取り消し
-Confirm password:	ScreenSaver		パスワード(再度):
 Could not load screen saver	ScreenSaver		スクリーンセーバーを実行出来ません
-Display Power Management Signaling not available	ScreenSaver		DPMS (Display Power Management Signaling) は利用できません
-Don't fade when	ScreenSaver		フェードしない
-Done	ScreenSaver		完了
-Enable screensaver	ScreenSaver		スクリーンセーバーを有効にする
-Fade now when	ScreenSaver		フェードする
-General	ScreenSaver		一般
-No options available	ScreenSaver		設定がありません
-OK	ScreenSaver		Ok
-Password Window	ScreenSaver		パスワードウィンドウ
-Password lock	ScreenSaver		パスワードロック
-Password:	ScreenSaver		パスワード:
-Passwords don't match. Please try again.	ScreenSaver		パスワードが違います。再度試してください
-Password…	ScreenSaver		パスワード...
-ScreenSaver	System name		スクリーンセーバー
-Screensaver settings	ScreenSaver		スクリーンセーバー設定
-Screensavers	ScreenSaver		スクリーンセーバー
+30 seconds	ScreenSaver		30 秒
 Start screensaver	ScreenSaver		スクリーンセーバーを開始
-Test	ScreenSaver		テスト
-Turn off screen	ScreenSaver		画面を消す
-Use custom password	ScreenSaver		独自のパスワードを使う
-Use network password	ScreenSaver		ネットワークパスワードを使用
+Password…	ScreenSaver		パスワード...
+Password:	ScreenSaver		パスワード:
+Password lock	ScreenSaver		パスワードロック
+Add…	ScreenSaver		追加...
+Screensavers	ScreenSaver		スクリーンセーバー
 mouse is here	ScreenSaver		マウスの位置
+Display Power Management Signaling not available	ScreenSaver		DPMS (Display Power Management Signaling) は利用できません
+ScreenSaver	System name		スクリーンセーバー
+Test	ScreenSaver		テスト
+General	ScreenSaver		一般
+Enable screensaver	ScreenSaver		スクリーンセーバーを有効にする
+Cancel	ScreenSaver		取り消し
+Turn off screen	ScreenSaver		画面を消す
+No options available	ScreenSaver		設定がありません
+Password Window	ScreenSaver		パスワードウィンドウ
+Fade now when	ScreenSaver		フェードする
+Screensaver settings	ScreenSaver		スクリーンセーバー設定
+Passwords don't match. Please try again.	ScreenSaver		パスワードが違います。再度試してください
+OK	ScreenSaver		Ok
+Don't fade when	ScreenSaver		フェードしない
+Blackness	ScreenSaver		Blackness
+Use custom password	ScreenSaver		独自のパスワードを使う
+Done	ScreenSaver		完了
+Confirm password:	ScreenSaver		パスワード(再度):
+Use network password	ScreenSaver		ネットワークパスワードを使用

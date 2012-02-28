@@ -1,34 +1,34 @@
-1	japanese	x-vnd.Haiku-LaunchBox	1440389990
-Add button here	LaunchBox		ここにボタンを追加
-Auto-raise	LaunchBox		自動的に前面へ
-Bummer	LaunchBox		失敗
-Cancel	LaunchBox		キャンセル
-Clear button	LaunchBox		ボタンを消去
-Clone	LaunchBox		複製
-Close	LaunchBox		閉じる
-Description for '%3'	LaunchBox		'%3' の説明
-Failed to launch '%1'.\n\nError: 	LaunchBox		'%1' の起動に失敗しました。\n\nエラー:
-Failed to launch 'something',error in Pad data.	LaunchBox		Padデータ中にエラーがあります。'something'の起動に失敗しました。
-Failed to launch application with signature '%2'.\n\nError: 	LaunchBox		アプリケーション(シグネチャ '%2')の起動に失敗しました。\n\nエラー:
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Tracker への 'open folder' コマンドの送信に失敗しました。\n\nエラー:
-Horizontal layout	LaunchBox		水平配置
-Icon size	LaunchBox		アイコンサイズ
-Ignore double-click	LaunchBox		ダブルクリックを無視する
-LaunchBox	System name		LaunchBox
-Name Panel	LaunchBox		名前パネル
+1	japanese	x-vnd.Haiku-LaunchBox	3016105370
 New	LaunchBox		新規作成
-OK	LaunchBox		OK
-Pad	LaunchBox		パッド
-Pad %1	LaunchBox		パッド %1
-Pad 1	LaunchBox		パッド 1
-Quit	LaunchBox		終了
-Really close this pad?\n(The pad will not be remembered.)	LaunchBox		このパッドを閉じてよろしいですか?\n(パッドは記憶されません。)
-Remove button	LaunchBox		ボタンを削除
 Set description…	LaunchBox		説明の作成…
-Settings	LaunchBox		設定
+Vertical layout	LaunchBox		垂直配置
+OK	LaunchBox		OK
+Pad 1	LaunchBox		パッド 1
+last chance	LaunchBox		最後のチャンス
+Quit	LaunchBox		終了
+Clear button	LaunchBox		ボタンを消去
+LaunchBox	System name		ランチャー
+Ignore double-click	LaunchBox		ダブルクリックを無視する
+Auto-raise	LaunchBox		自動的に前面へ
 Show on all workspaces	LaunchBox		すべてのワークスペースに表示
 Show window border	LaunchBox		ウィンドウ枠を表示
-Vertical layout	LaunchBox		垂直配置
+Pad	LaunchBox		パッド
+Icon size	LaunchBox		アイコンサイズ
+Bummer	LaunchBox		失敗
+Cancel	LaunchBox		キャンセル
+Remove button	LaunchBox		ボタンを削除
+Horizontal layout	LaunchBox		水平配置
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nアプリケーション (シグネチャ '%2') の起動に失敗しました。\n\nエラー:
+Failed to launch '%1'.\n\nError:	LaunchBox		'%1' の起動に失敗しました。\n\nエラー:
+Name Panel	LaunchBox		名前パネル
+Add button here	LaunchBox		ここにボタンを追加
+Description for '%3'	LaunchBox		'%3' の説明
+Settings	LaunchBox		設定
+Failed to launch 'something', error in Pad data.	LaunchBox		'something' の起動に失敗しました。パッドデータ中にエラーがあります。
+Pad %1	LaunchBox		パッド %1
+Close	LaunchBox		閉じる
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Tracker への 'open folder' コマンドの送信に失敗しました。\n\nエラー:
 You can drag an icon here.	LaunchBox		ここにアイコンをドラッグしてください
-last chance	LaunchBox		最後のチャンス
+Clone	LaunchBox		複製
 launch popup	LaunchBox		ポップアップを起動
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		このパッドを閉じてよろしいですか?\n(パッドは記憶されません。)

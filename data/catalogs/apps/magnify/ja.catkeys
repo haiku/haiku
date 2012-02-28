@@ -1,30 +1,27 @@
-1	japanese	x-vnd.Haiku-Magnify	1706330138
-%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize ピクセル/ピクセル
-Add a crosshair	Magnify-Main		十字カーソルを追加
+1	japanese	x-vnd.Haiku-Magnify	2227745383
+no clip msg\n	In console, when clipboard is empty after clicking Copy image		クリップボードにコピーされていません\n
+Make square	Magnify-Main		正方形を作成
 Copy image	Magnify-Main		イメージをコピー
-Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		コピー/保存:\n コピー - 現在の画像をクリップボードに保存します\n 保存 - 保存先のファイルダイアログを出して\n 画像のビット列を書き込みます\n
-Decrease pixel size	Magnify-Main		ピクセルサイズを小さく
-Decrease window size	Magnify-Main		ウインドウを小さく
-Freeze/Unfreeze image	Magnify-Main		イメージを固定/固定解除
+Magnify help	Magnify-Help		拡大鏡のヘルプ
+usage: magnify [size] (magnify size * size pixels)\n	Console		usage: magnify [size] (magnify size * size pixels)\n
+Stick coordinates	Magnify-Main		座標を固定
+Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		情報:\n 情報の表示/非表示 - これらの新機能を表示または非表示にします\n 注意: 表示時には、ピクセルを指し示す赤い四角が現れて、\n その rgb 値が表示されます。\n 十字カーソルを追加/削除 - オブジェクトの位置合わせや配置のために\n 2 個の十字カーソルを追加できます (または削除できます)。\n カーソルは青い四角と線で表示されます。\n グリッドの表示/非表示 - それぞれのピクセルを隔てるグリッドを表示または非表示にします。\n
+Hide/Show grid	Magnify-Main		グリッドの表示 / 非表示
+magnify: size must be a multiple of 4\n	Console		拡大鏡: サイズは 4 の倍数でなければなりません\n
 General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		一般:\n 32 x 32 – 左上の数値は見えているピクセルの数です。\n(幅 x 高さ)\n 8 ピクセル/ピクセル – 1つのピクセルを拡大するのに\n使用する ピクセル数を示します。\n R:152 G:52 B:10 – 赤い四角のところにあるピクセルの\n RGB 値です。\n
 Help	Magnify-Main		ヘルプ
-Hide/Show grid	Magnify-Main		グリッドの表示/非表示
-Hide/Show info	Magnify-Main		情報の表示/非表示
-Increase pixel size	Magnify-Main		ピクセルサイズを大きく
-Increase window size	Magnify-Main		ウインドウを大きく
-Info	Magnify-Main		情報
-Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		情報:\n 情報の表示/非表示 - これらの新機能を表示または非表示にします\n 注意: 表示時には、ピクセルを指し示す赤い四角が現れて、\n その rgb 値が表示されます。\n 十字カーソルを追加/削除 - オブジェクトの位置合わせや配置のために\n 2 個の十字カーソルを追加できます (または削除できます)。\n カーソルは青い四角と線で表示されます。\n グリッドの表示/非表示 - それぞれのピクセルを隔てるグリッドを表示または非表示にします。\n
-Magnify	System name		拡大鏡
-Magnify help	Magnify-Help		拡大鏡のヘルプ
-Make square	Magnify-Main		正方形を作成
-Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		ナビゲーション:\n 矢印キー - 現在の選択部 (rgb インジケーターまたは十字カーソル)\n を一度に 1 ピクセル移動します\n オプション + 矢印キー - マウスの位置を一度に 1 ピクセル移動します\n x は選択部にマークします - 現在の選択部には 'x' がつきます\n
-Remove a crosshair	Magnify-Main		十字カーソルを削除
-Save image	Magnify-Main		イメージの保存
 Sizing/Resizing:\n  make square - sets the width and the height to the larger\n    of the two making a square image\n  increase/decrease window size - grows or shrinks the window\n    size by 4 pixels.\n    note: this window can also be resized to any size via the\n      resizing region of the window\n  increase/decrease pixel size - increases or decreases the number\n    of pixels used to magnify a 'real' pixel. Range is 1 to 16.\n	Magnify-Help		サイズ変更:\n 正方形にする - 幅と高さのうち大きい方の値を設定して\n 正方形の画像を作成します。\n ウィンドウサイズを大きく/小さくする - 4ピクセル刻みでウィンドウ\n サイズを増減させます。\n - 補足: ウィンドウ部分のサイズを変更することでこのウィンドウのサイズを\n 任意の大きさに変更することもできます。\n ピクセルサイズを増やす/減らす - '実際の' 1ピクセルを何ピクセルで拡大表示するのか、そのピクセル数を\n増やす、または減らします。範囲は1から16までです。\n
-Stick coordinates	Magnify-Main		座標を固定
-freeze - freezes/unfreezes magnification of whatever the\n    cursor is currently over\n	Magnify-Help		固定 - カーソル位置の拡大表示を\n固定/固定解除します。\n
-magnify: size must be a multiple of 4\n	Console		拡大鏡: サイズは4の倍数でなければなりません\n
-no clip msg\n	In console, when clipboard is empty after clicking Copy image		クリップボードにコピーされていません\n
-size must be > 4 and a multiple of 4\n	Console		size must be > 4 and a multiple of 4\n
-size must be > 4 and a multiple of 4\n	Console		サイズは4より大きな4の倍数でなければなりません\n
-usage: magnify [size] (magnify size * size pixels)\n	Console		使い方: magnify [size] (ウィンドウサイズ * ピクセルサイズ)\n
+Decrease pixel size	Magnify-Main		ピクセルサイズを小さく
+Magnify	System name		拡大鏡
+%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize ピクセル/ピクセル
+Info	Magnify-Main		情報
+Remove a crosshair	Magnify-Main		十字カーソルを削除
+Freeze/Unfreeze image	Magnify-Main		イメージを固定 / 固定解除
+Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		コピー/保存:\n コピー - 現在の画像をクリップボードに保存します\n 保存 - 保存先のファイルダイアログを出して\n 画像のビット列を書き込みます\n
+Hide/Show info	Magnify-Main		情報の表示 / 非表示
+Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		ナビゲーション:\n 矢印キー - 現在の選択部 (rgb インジケーターまたは十字カーソル)\n を一度に 1 ピクセル移動します\n オプション + 矢印キー - マウスの位置を一度に 1 ピクセル移動します\n x は選択部にマークします - 現在の選択部には 'x' がつきます\n
+Save image	Magnify-Main		イメージの保存
+Increase window size	Magnify-Main		ウィンドウを大きく
+Decrease window size	Magnify-Main		ウィンドウを小さく
+Increase pixel size	Magnify-Main		ピクセルサイズを大きく
+Add a crosshair	Magnify-Main		十字カーソルを追加

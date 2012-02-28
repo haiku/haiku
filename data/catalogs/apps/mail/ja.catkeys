@@ -1,160 +1,32 @@
-1	japanese	x-vnd.Be-MAIL	2276629278
+1	japanese	x-vnd.Be-MAIL	3642307033
+View	Mail		表示
 %d - Date	Mail		%d - 日付
-%e - E-mail address	Mail		%e - メールアドレス
-%e wrote:\\n	Mail		%e は書きました:\\n
-%n - Full name	Mail		%n - 名前
-(Address unavailable)	Mail		(アドレスが利用できません)
-(Date unavailable)	Mail		(日付が利用できません)
-(Name unavailable)	Mail		(名前が利用できません)
-<none>	Mail		<無し>
-Account from mail	Mail		メッセージを受信したアカウント
-Account:	Mail		アカウント：
-Accounts…	Mail		アカウントの設定…
-Add	Mail		追加
-Add enclosure…	Mail		添付ファイルを追加…
-Add signature	Mail		署名を追加
-An error occurred trying to open this signature.	Mail		この署名を開くときにエラーが発生しました。
-An error occurred trying to save the attachment.	Mail		添付ファイルの保存の際にエラーが発生しました。 
-An error occurred trying to save this signature.	Mail		署名を保存しようとした時にエラーが発生しました。
 Attach attributes:	Mail		属性の添付：
-Attachments:	Mail		添付ファイル：
-Auto signature:	Mail		署名の自動的追加：
+Inconsistency occurred in the undo/redo buffer.	Mail		Undo/Redo バッファに不一致が発生しました。
+An error occurred trying to save the attachment.	Mail		添付ファイルの保存の際にエラーが発生しました。 
+Copy to new	Mail		新規メッセージにコピー
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	'New' のままにする
+Edit	Mail		編集
+Print	Mail		印刷
+<none>	Mail		<無し>
+New mail message	Mail		新規メッセージ
 Automatic	Mail		自動
 Automatically mark mail as read:	Mail		メールを自動的に既読に設定：
-Bcc:	Mail		Bcc:
-Beginner	Mail		初心者
-Button bar:	Mail		ボタンバー：
-Cancel	Mail		中止
-Cc:	Mail		Cc:
-Check spelling	Mail		スペルチェック
-Close	Mail		閉じる
-Close and 	Mail		閉じる
-Colored quotes:	Mail		引用部分の着色：
-Copy	Mail		コピー
-Copy link location	Mail		このリンクのアドレスをコピー
-Copy to new	Mail		新規メッセージにコピー
-Couldn't open this signature. Sorry.	Mail		この署名を開くことはできませんでした。
-Cut	Mail		切り取り
-Date:	Mail		日付：
-Decoding:	Mail		文字コード：
-Default account:	Mail		標準アカウント：
-Delete	Mail		削除
-Discard	Mail		破棄
-Do you wish to save this message as a draft before closing?	Mail		メッセージを閉じる前に下書きとして保存しますか？
-Do you wish to send this message before closing?	Mail		閉じる前にこのメッセージを送信しますか？
-Don't save	Mail		保存しない
-E-mail draft could not be saved!	Mail		下書きが保存できませんでした。
-Edit	Mail		編集
-Edit queries…	Mail		クエリフォルダーを開く…
-Edit signatures…	Mail		署名の編集…
-Encoding:	Mail		文字コード：
-Expert	Mail		上級者
-File	Mail		ファイル
-Find	Mail		検索
-Find again	Mail		次を検索
-Find…	Mail		検索…
-Font:	Mail		フォント：
-Forward	Mail		転送
-Forward without attachments	Mail		転送 (添付ファイル含まない)
-From:	Mail		差出人：
-Hide	Mail		隠す
-Include file attributes in attachments	Mail		添付ファイルにファイル属性を含む
-Inconsistency occurred in the undo/redo buffer.	Mail		Undo/Redo バッファに不一致が発生しました。
-Initial spell check mode:	Mail		スペルチェックモード：
-Leave as '%s'	Mail		「%s」のままにする
-Leave as New	Mail		「新着」のままにする
-Leave same	Mail		変更しません
-Mail	System name		メール
-Mail couldn't find its dictionary.	Mail		スペルチェック用辞書データが見つかりません。
-Mail preferences	Mail		Mail の設定
-Mailing	Mail		メールの設定
-Message	Mail		メッセージ
-Move to trash	Mail		ごみ箱に捨てる
-Need Tracker to move items to trash	Mail		メッセージを削除するには Tracker が必要です。
-New	Mail		新規
-New mail message	Mail		新規メッセージ
-Next	Mail		次へ
-Next message	Mail		次のメッセージ
-No file attributes, just plain data	Mail		ファイル属性を付けない（データのみ）
-No matches	Mail		一致しません
-None	Mail		無し
-OK	Mail		OK
-Off	Mail		オフ
-On	Mail		オン
-Only files can be added as attachments.	Mail		添付できるのは、ファイルのみです。
-Open	Mail		開く
-Open attachment	Mail		添付ファイルを開く
-Open draft	Mail		下書きを開く
-Open this link	Mail		このリンクを開く
-Page setup…	Mail		ページ設定…
-Paste	Mail		貼り付け
-Preferences…	Mail		メールの設定…
-Previous	Mail		前
-Previous message	Mail		前のメッセージ
-Print	Mail		印刷
-Print…	Mail		印刷…
-Put your favorite e-mail queries and query templates in this folder.	Mail		お気に入りの電子メールクエリーとクエリーテンプレートをこのフォルダに入れてください。
-Queries	Mail		クエリ
-Quit	Mail		終了
-Quote	Mail		引用符をつける
-Random	Mail		ランダム
-Read 	Mail		既読
-Really delete this signature? This cannot be undone.	Mail		署名を削除しますか？削除した書名は復元できませんので、ご注意ください。
-Redo	Mail		やり直し
-Remove attachment	Mail		添付ファイルを削除
-Remove enclosure	Mail		添付ファイルを削除
-Remove quote	Mail		引用を削除
-Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		転送メールから添付ファイルを削除する機能はまだ実装されていません。
-Reply	Mail		返信
-Reply account:	Mail		返信アカウント：
-Reply preamble:	Mail		返信の前書き：
-Reply to all	Mail		全員に返信
-Reply to sender	Mail		差出人に返信
-Resend	Mail		再送信
-Revert	Mail		戻す
-Save	Mail		保存
-Save address	Mail		アドレスを保存
-Save as draft	Mail		下書きとして保存
-Save attachment…	Mail		添付ファイルを保存…
-Save changes to this signature?	Mail		署名の変更を確定し保存しますか？
-Select all	Mail		全て選択
-Send	Mail		送信
-Send message	Mail		メッセージを送信
-Set to %s	Mail		「%s」に設定
-Set to Saved	Mail		「保存済み」に設定
-Set to…	Mail		他の属性に変更…
-Show header	Mail		ヘッダーを表示
-Show icons & labels	Mail		アイコンとラベル
-Show icons only	Mail		アイコンのみ
-Show raw message	Mail		生のメッセージを表示
-Signature	Mail		署名
-Signature:	Mail		署名:
-Signatures	Mail		署名の編集
-Size:	Mail		フォントサイズ：
-Sorry	Mail		失礼
-Sorry, could not find an application that supports the 'Person' data type.	Mail		People データ形式をサポートするアプリケーションが見つかりませんでした。
-Start now	Mail		直に起動
-Subject:	Mail		件名：
-Text wrapping:	Mail		文字列の折り返し：
-The mail_daemon could not be started:\n\t	Mail		メールサービス（mail_daemon）を起動できませんでした。
-The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		メールサービスが起動されていないため、このメッセージは処理待ちとなり、メールサービス起動後に処理されます。
-There is no installed handler for URL links.	Mail		URL リンク用ハンドラがインストールされていません。
-Title:	Mail		署名の名称：
-To:	Mail		宛先：
-Trash	Mail		削除
-Undo	Mail		元に戻す
-Unread	Mail		未読
-Use default account	Mail		標準アカウントを使う
-User interface	Mail		インターフェースの設定
-View	Mail		表示
-Warn unencodable:	Mail		文字コード不一致通知：
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		メッセージ本文には %ld 個エンコードできない文字があります。他の文字セットを使うと修正される可能性があります。そのまま送信する場合、「送信」ボタンを押してください（代用文字が Unicode 化可能な文字に代わって使われます）。文字セットを変更する場合、「中止」ボタンを押して下さい。
-\\n - Newline	Mail		\\n - 改行
-draft	B_USER_DIRECTORY/mail/draft		下書き
 helpful message	Mail		有益なメッセージ
-in	B_USER_DIRECTORY/mail/in		受信トレイ
-mail	B_USER_DIRECTORY/mail		メール
-out	B_USER_DIRECTORY/mail/out		送信トレイ
-queries	B_USER_DIRECTORY/mail/queries		クエリ
-sent	B_USER_DIRECTORY/mail/sent		送信済みメール
+Colored quotes:	Mail		引用部分の着色：
+Subject:	Mail		件名：
+Reply to all	Mail		全員に返信
+Show icons & labels	Mail		アイコンとラベル
+Remove attachment	Mail		添付ファイルを削除
+Button bar:	Mail		ボタンバー：
 spam	B_USER_DIRECTORY/mail/spam		スパム
+Beginner	Mail		初心者
+Don't save	Mail		保存しない
+Expert	Mail		上級者
+Reply account:	Mail		返信アカウント：
+Discard	Mail		破棄
+Message	Mail		メッセージ
+Reply to sender	Mail		差出人に返信
+There is no installed handler for URL links.	Mail		URL リンク用ハンドラがインストールされていません。
+Signature	Mail		署名
+Find again	Mail		次を検索

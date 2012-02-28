@@ -1,181 +1,181 @@
-1	japanese	x-vnd.Haiku-CharacterMap	4082916013
-Aegean numbers	UnicodeBlocks		エーゲ数字
-Alphabetic presentation forms	UnicodeBlocks		アルファベット表示形
-Ancient Greek musical notation	UnicodeBlocks		古代ギリシャ記譜法
-Ancient Greek numbers	UnicodeBlocks		古代ギリシャ数字
-Ancient smbols	UnicodeBlocks		古代記号
-Arabic	UnicodeBlocks		アラビア文字
-Arabic presentation forms A	UnicodeBlocks		アラビア表示形A
-Arabic presentation forms B	UnicodeBlocks		アラビア表示形A
-Arabic supplement	UnicodeBlocks		アラビア文字補助
-Armenian	UnicodeBlocks		アルメニア文字
-Arrows	UnicodeBlocks		矢印
-Balinese	UnicodeBlocks		バリ文字
-Basic Latin	UnicodeBlocks		基本ラテン文字
-Bengali	UnicodeBlocks		ベンガル文字
-Block elements	UnicodeBlocks		ブロック要素
-Bopomofo	UnicodeBlocks		注音字母
-Bopomofo extended	UnicodeBlocks		注音字母拡張
-Box drawing	UnicodeBlocks		罫線素辺
-Braille patterns	UnicodeBlocks		点字図形
-Buginese	UnicodeBlocks		ブギ文字
-Buhid	UnicodeBlocks		ブヒッド文字
-Byzantine musical symbols	UnicodeBlocks		ビザンティン様式音楽記号
-CJK compatibility	UnicodeBlocks		CJK互換用文字
-CJK compatibility forms	UnicodeBlocks		CJK互換形
-CJK compatibility ideographs	UnicodeBlocks		CJK互換漢字
-CJK compatibility ideographs Supplement	UnicodeBlocks		CJK互換漢字補助
-CJK radicals supplement	UnicodeBlocks		CJK部首補助
-CJK strokes	UnicodeBlocks		CJK字画
-CJK symbols and punctuation	UnicodeBlocks		CJKの記号及び句読点
-CJK unified ideographs	UnicodeBlocks		CJK統合漢字
-CJK unified ideographs extension A	UnicodeBlocks		CJK統合漢字拡張A
-CJK unified ideographs extension B	UnicodeBlocks		CJK統合漢字拡張B
-Carian	UnicodeBlocks		カリア文字
-Cham	UnicodeBlocks		チャム文字
-CharacterMap	System name		文字表
-Cherokee	UnicodeBlocks		チェロキー文字
-Clear	CharacterWindow		クリアー
-Code	CharacterWindow		コード
-Combining diacritical marks	UnicodeBlocks		ダイアクリティカルマーク(合成可能)
-Combining diacritical marks for symbols	UnicodeBlocks		記号用結合分音記号
-Combining diacritical marks supplement	UnicodeBlocks		結合分音記号補助
-Combining half marks	UnicodeBlocks		半記号(合成可能)
-Control pictures	UnicodeBlocks		制御機能用記号
-Coptic	UnicodeBlocks		コプト文字
-Copy as escaped byte string	CharacterView		エスケープされた数値としてコピー
-Copy character	CharacterView		文字をコピー
-Counting rod numerals	UnicodeBlocks		算木
-Cuneiform	UnicodeBlocks		楔形文字
-Cuneiform numbers and punctuation	UnicodeBlocks		楔形文字数字と句読点
-Currency symbols	UnicodeBlocks		通貨記号
-Cypriot syllabary	UnicodeBlocks		キプロス文字音節
-Cyrillic	UnicodeBlocks		キリール文字
-Cyrillic extended A	UnicodeBlocks		キリル文字拡張A
-Cyrillic extended B	UnicodeBlocks		キリール文字拡張B
-Cyrillic supplement	UnicodeBlocks		キリール文字補助
-Deseret	UnicodeBlocks		デゼレット文字
-Devanagari	UnicodeBlocks		デーヴァナーガリー文字
-Dingbats	UnicodeBlocks		装飾記号
-Domino tiles	UnicodeBlocks		ドミノ牌
-Enclosed CJK letters and months	UnicodeBlocks		囲みCJK文字・月
+1	japanese	x-vnd.Haiku-CharacterMap	2745781253
 Enclosed alphanumerics	UnicodeBlocks		囲み英数字
-Ethiopic	UnicodeBlocks		エチオピア文字
-Ethiopic extended	UnicodeBlocks		エチオピア文字
-Ethiopic supplement	UnicodeBlocks		エチオピア文字補足
-File	CharacterWindow		ファイル
-Filter:	CharacterWindow		フィルター:
-Font	CharacterWindow		フォント
-Font size:	CharacterWindow		フォントサイズ:
-General punctuation	UnicodeBlocks		一般句読点
-Geometric shapes	UnicodeBlocks		幾何学模様
-Georgian	UnicodeBlocks		グルジア文字
-Georgian supplement	UnicodeBlocks		グルジア文字補助
-Glagotic	UnicodeBlocks		グラゴール文字
-Gothic	UnicodeBlocks		ゴート文字
-Greek and Coptic	UnicodeBlocks		ギリシア文字及びコプト文字
-Greek extended	UnicodeBlocks		ギリシャ拡張文字
-Gujarati	UnicodeBlocks		グジャラーティ文字
-Gurmukhi	UnicodeBlocks		グルムキー文字
-Halfwidth and fullwidth forms	UnicodeBlocks		半角・全角形
-Hangul Jamo	UnicodeBlocks		ハングル字母
-Hangul compatibility Jamo	UnicodeBlocks		ハングル字母
-Hangul syllables	UnicodeBlocks		ハングル音節文字
-Hanunoo	UnicodeBlocks		ハヌノオ文字
-Hebrew	UnicodeBlocks		ヘブライ文字
-Hiragana	UnicodeBlocks		ひらがな
-IPA extensions	UnicodeBlocks		IPA拡張
-Ideographic description characters	UnicodeBlocks		漢字構成記述文字
-Kanbun	UnicodeBlocks		漢文
-Kangxi radicals	UnicodeBlocks		康煕部首
-Kannada	UnicodeBlocks		カンナダ文字
-Katakana	UnicodeBlocks		カタカナ
-Katakana phonetic extensions	UnicodeBlocks		カタカナ発音拡張
-Kayah Li	UnicodeBlocks		カヤー文字
-Kharoshthi	UnicodeBlocks		カローシュティー文字
-Khmer	UnicodeBlocks		クメール文字
-Khmer symbols	UnicodeBlocks		クメール記号
-Lao	UnicodeBlocks		ラオ文字
-Latin extended A	UnicodeBlocks		ラテン文字拡張A
-Latin extended B	UnicodeBlocks		ラテン文字拡張B
-Latin extended C	UnicodeBlocks		ラテン文字拡張C
-Latin extended D	UnicodeBlocks		ラテン文字拡張D
-Latin extended additional	UnicodeBlocks		ラテン拡張追加
-Latin-1 supplement	UnicodeBlocks		ラテン1補助
-Lepcha	UnicodeBlocks		レプチャ文字
-Letterlike symbols	UnicodeBlocks		文字様記号
-Limbu	UnicodeBlocks		リンブ文字
-Linear B ideograms	UnicodeBlocks		線文字B音節
-Linear B syllabary	UnicodeBlocks		線文字B音節
-Lycian	UnicodeBlocks		リキア文字
-Lydian	UnicodeBlocks		リディア文字
-Mahjong tiles	UnicodeBlocks		麻雀牌
-Malayalam	UnicodeBlocks		マラヤーラム文字
-Mathematical alphanumeric symbols	UnicodeBlocks		数学用英数字記号
-Mathematical operators	UnicodeBlocks		数学記号
-Miscellaneous mathematical symbols A	UnicodeBlocks		各種数学記号A
-Miscellaneous mathematical symbols B	UnicodeBlocks		各種数学記号B
-Miscellaneous symbols	UnicodeBlocks		その他の記号
-Miscellaneous symbols and arrows	UnicodeBlocks		各種記号と矢印
-Miscellaneous technical	UnicodeBlocks		その他の技術用記号
-Modifier tone letters	UnicodeBlocks		声調修飾文字
-Mongolian	UnicodeBlocks		モンゴル文字
-Muscial symbols	UnicodeBlocks		音楽記号
-Myanmar	UnicodeBlocks		ミャンマー文字
-N'Ko	UnicodeBlocks		マネンカ文字
-New Tai Lue	UnicodeBlocks		新タイ・ルー文字
-Number forms	UnicodeBlocks		数字に準じるもの
-Ogham	UnicodeBlocks		オーム文字
-Ol Chiki	UnicodeBlocks		オル・チキ文字
-Old Persian	UnicodeBlocks		古ペルシャ文字
-Old italic	UnicodeBlocks		古イタリア文字
-Optical character recognition	UnicodeBlocks		光学的認識
-Oriya	UnicodeBlocks		オリヤー文字
-Osmanya	UnicodeBlocks		オスマン文字
-Phags-pa	UnicodeBlocks		パスパ文字
-Phaistos disc	UnicodeBlocks		ファイストスの円盤の文字
-Phoenician	UnicodeBlocks		フェニキア文字
-Phonetic extensions	UnicodeBlocks		発音拡張
-Phonetic extensions supplement	UnicodeBlocks		発音拡張補助
-Private use area	UnicodeBlocks		私用領域
-Quit	CharacterWindow		終了
-Rejang	UnicodeBlocks		ルジャン文字
-Runic	UnicodeBlocks		ルーン文字
-Saurashtra	UnicodeBlocks		サウラーシュトラ文字
-Shavian	UnicodeBlocks		シェイヴィアン文字
-Show private blocks	CharacterWindow		プライベートブロックの表示
-Sinhala	UnicodeBlocks		シンハラ文字
-Small form variants	UnicodeBlocks		小字形
-Spacing modifier letters	UnicodeBlocks		前進を伴う修飾文字
-Specials	UnicodeBlocks		特殊用途文字
-Sundanese	UnicodeBlocks		スンダ文字
-Superscripts and subscripts	UnicodeBlocks		上付き・下付き
-Supplement punctuation	UnicodeBlocks		補助句読点
-Supplemental arrows A	UnicodeBlocks		補助矢印A
-Supplemental arrows B	UnicodeBlocks		補助矢印B
-Supplemental mathematical operators	UnicodeBlocks		補助数学演算記号
-Supplementary private use area A	UnicodeBlocks		補助私用領域A
-Supplementary private use area B	UnicodeBlocks		補助私用領域B
-Syloti Nagri	UnicodeBlocks		シロティ・ナグリ文字
-Syriac	UnicodeBlocks		シリア文字
-Tagalog	UnicodeBlocks		タガログ文字
-Tagbanwa	UnicodeBlocks		タグバンワ文字
-Tags	UnicodeBlocks		言語タグ
-Tai Le	UnicodeBlocks		タイ・レ文字
-Tai Xuan Jing symbols	UnicodeBlocks		太玄経記号
-Tamil	UnicodeBlocks		タミル文字
-Telugu	UnicodeBlocks		テルグ文字
-Thaana	UnicodeBlocks		ターナ文字
-Thai	UnicodeBlocks		タイ文字
-Tibetan	UnicodeBlocks		チベット文字
-Tifinagh	UnicodeBlocks		ティフナグ文字
-Ugaritic	UnicodeBlocks		ウガリト文字
-Unified Canadian Aboriginal syllabics	UnicodeBlocks		統合カナダ先住民音節
-Vai	UnicodeBlocks		ヴァイ文字
-Variation selectors	UnicodeBlocks		異体字セレクター
-Variation selectors supplement	UnicodeBlocks		異体字セレクタ補助
-Vertical forms	UnicodeBlocks		縦書き用句読点
+Basic Latin	UnicodeBlocks		基本ラテン文字
 View	CharacterWindow		表示
+Latin-1 supplement	UnicodeBlocks		ラテン1補助
+Hebrew	UnicodeBlocks		ヘブライ文字
+Georgian supplement	UnicodeBlocks		グルジア文字補助
+CJK unified ideographs	UnicodeBlocks		CJK統合漢字
+Modifier tone letters	UnicodeBlocks		声調修飾文字
+Khmer	UnicodeBlocks		クメール文字
+Supplementary private use area A	UnicodeBlocks		補助私用領域A
+Hanunoo	UnicodeBlocks		ハヌノオ文字
+Latin extended additional	UnicodeBlocks		ラテン拡張追加
+Arabic presentation forms A	UnicodeBlocks		アラビア表示形A
+Greek extended	UnicodeBlocks		ギリシャ拡張文字
+Linear B ideograms	UnicodeBlocks		線文字B音節
+Devanagari	UnicodeBlocks		デーヴァナーガリー文字
+Armenian	UnicodeBlocks		アルメニア文字
+Glagotic	UnicodeBlocks		グラゴール文字
+Mathematical operators	UnicodeBlocks		数学記号
+General punctuation	UnicodeBlocks		一般句読点
+Miscellaneous technical	UnicodeBlocks		その他の技術用記号
+Vertical forms	UnicodeBlocks		縦書き用句読点
+Ol Chiki	UnicodeBlocks		オル・チキ文字
+Arabic	UnicodeBlocks		アラビア文字
+Ethiopic extended	UnicodeBlocks		エチオピア文字
+Arrows	UnicodeBlocks		矢印
+Font	CharacterWindow		フォント
+Variation selectors supplement	UnicodeBlocks		異体字セレクタ補助
+Gujarati	UnicodeBlocks		グジャラーティ文字
+Cuneiform	UnicodeBlocks		楔形文字
+CJK radicals supplement	UnicodeBlocks		CJK部首補助
+Balinese	UnicodeBlocks		バリ文字
+Cham	UnicodeBlocks		チャム文字
+Specials	UnicodeBlocks		特殊用途文字
+CJK compatibility ideographs	UnicodeBlocks		CJK互換漢字
+Phonetic extensions	UnicodeBlocks		発音拡張
+Khmer symbols	UnicodeBlocks		クメール記号
+Tagbanwa	UnicodeBlocks		タグバンワ文字
+Kanbun	UnicodeBlocks		漢文
+Syriac	UnicodeBlocks		シリア文字
+CJK compatibility ideographs Supplement	UnicodeBlocks		CJK互換漢字補助
+Musical symbols	UnicodeBlocks		演奏記号
+Hangul syllables	UnicodeBlocks		ハングル音節文字
+Coptic	UnicodeBlocks		コプト文字
+Tai Le	UnicodeBlocks		タイ・レ文字
+Mahjong tiles	UnicodeBlocks		麻雀牌
+Spacing modifier letters	UnicodeBlocks		前進を伴う修飾文字
+Aegean numbers	UnicodeBlocks		エーゲ数字
+CJK strokes	UnicodeBlocks		CJK字画
+Old italic	UnicodeBlocks		古イタリア文字
+Supplemental arrows B	UnicodeBlocks		補助矢印B
+Cyrillic extended A	UnicodeBlocks		キリル文字拡張A
+Kharoshthi	UnicodeBlocks		カローシュティー文字
+Combining half marks	UnicodeBlocks		半記号(合成可能)
+Cyrillic	UnicodeBlocks		キリール文字
+Katakana	UnicodeBlocks		カタカナ
+Block elements	UnicodeBlocks		ブロック要素
+Clear	CharacterWindow		クリアー
+Sundanese	UnicodeBlocks		スンダ文字
+Miscellaneous mathematical symbols A	UnicodeBlocks		各種数学記号A
+Cyrillic supplement	UnicodeBlocks		キリール文字補助
+Small form variants	UnicodeBlocks		小字形
+IPA extensions	UnicodeBlocks		IPA拡張
+Thaana	UnicodeBlocks		ターナ文字
+Ogham	UnicodeBlocks		オーム文字
+Combining diacritical marks for symbols	UnicodeBlocks		記号用結合分音記号
+Syloti Nagri	UnicodeBlocks		シロティ・ナグリ文字
+Arabic supplement	UnicodeBlocks		アラビア文字補助
+Latin extended C	UnicodeBlocks		ラテン文字拡張C
+Ancient smbols	UnicodeBlocks		古代記号
+Bopomofo extended	UnicodeBlocks		注音字母拡張
+Lycian	UnicodeBlocks		リキア文字
+Font size:	CharacterWindow		フォントサイズ:
+Osmanya	UnicodeBlocks		オスマン文字
+Ethiopic	UnicodeBlocks		エチオピア文字
+Bengali	UnicodeBlocks		ベンガル文字
+Supplementary private use area B	UnicodeBlocks		補助私用領域B
+CJK unified ideographs extension A	UnicodeBlocks		CJK統合漢字拡張A
+Filter:	CharacterWindow		フィルター:
+Hangul compatibility Jamo	UnicodeBlocks		ハングル字母
+Ideographic description characters	UnicodeBlocks		漢字構成記述文字
+Arabic presentation forms B	UnicodeBlocks		アラビア表示形B
+CJK compatibility forms	UnicodeBlocks		CJK互換形
+Hiragana	UnicodeBlocks		ひらがな
+Tagalog	UnicodeBlocks		タガログ文字
+Control pictures	UnicodeBlocks		制御機能用記号
+Variation selectors	UnicodeBlocks		異体字セレクター
+Linear B syllabary	UnicodeBlocks		線文字B音節
+Buginese	UnicodeBlocks		ブギ文字
+Bopomofo	UnicodeBlocks		注音字母
+Code	CharacterWindow		コード
+Lepcha	UnicodeBlocks		レプチャ文字
+Sinhala	UnicodeBlocks		シンハラ文字
+Ancient Greek musical notation	UnicodeBlocks		古代ギリシャ記譜法
+Geometric shapes	UnicodeBlocks		幾何学模様
+Letterlike symbols	UnicodeBlocks		文字様記号
+Hangul Jamo	UnicodeBlocks		ハングル字母
+Tamil	UnicodeBlocks		タミル文字
+Currency symbols	UnicodeBlocks		通貨記号
+Combining diacritical marks	UnicodeBlocks		ダイアクリティカルマーク(合成可能)
+Supplement punctuation	UnicodeBlocks		補助句読点
+Unified Canadian Aboriginal syllabics	UnicodeBlocks		統合カナダ先住民音節
+Ugaritic	UnicodeBlocks		ウガリト文字
+CJK symbols and punctuation	UnicodeBlocks		CJKの記号及び句読点
+File	CharacterWindow		ファイル
+Number forms	UnicodeBlocks		数字に準じるもの
+Cherokee	UnicodeBlocks		チェロキー文字
+Tags	UnicodeBlocks		言語タグ
+Cypriot syllabary	UnicodeBlocks		キプロス文字音節
+Counting rod numerals	UnicodeBlocks		算木数字
+Latin extended A	UnicodeBlocks		ラテン文字拡張A
+Miscellaneous symbols	UnicodeBlocks		その他の記号
+Saurashtra	UnicodeBlocks		サウラーシュトラ文字
+Optical character recognition	UnicodeBlocks		光学的文字認識
+Old Persian	UnicodeBlocks		古ペルシャ文字
+Combining diacritical marks supplement	UnicodeBlocks		結合分音記号補助
+Myanmar	UnicodeBlocks		ミャンマー文字
+Latin extended D	UnicodeBlocks		ラテン文字拡張D
+Byzantine musical symbols	UnicodeBlocks		ビザンティン様式音楽記号
+Oriya	UnicodeBlocks		オリヤー文字
+Tibetan	UnicodeBlocks		チベット文字
+Ancient Greek numbers	UnicodeBlocks		古代ギリシャ数字
+Vai	UnicodeBlocks		ヴァイ文字
 Yi Radicals	UnicodeBlocks		イ文字部首
+Cyrillic extended B	UnicodeBlocks		キリール文字拡張B
+Quit	CharacterWindow		終了
+Braille patterns	UnicodeBlocks		点字図形
+New Tai Lue	UnicodeBlocks		新タイ・ルー文字
+Runic	UnicodeBlocks		ルーン文字
+Miscellaneous mathematical symbols B	UnicodeBlocks		各種数学記号B
+Cuneiform numbers and punctuation	UnicodeBlocks		楔形文字数字と句読点
+Private use area	UnicodeBlocks		私用領域
+CJK unified ideographs extension B	UnicodeBlocks		CJK統合漢字拡張B
+Phags-pa	UnicodeBlocks		パスパ文字
+Kangxi radicals	UnicodeBlocks		康煕部首
+Dingbats	UnicodeBlocks		装飾記号
+Tai Xuan Jing symbols	UnicodeBlocks		太玄経記号
 Yi syllables	UnicodeBlocks		イ文字
+Buhid	UnicodeBlocks		ブヒッド文字
+Telugu	UnicodeBlocks		テルグ文字
+Superscripts and subscripts	UnicodeBlocks		上付き・下付き
+Thai	UnicodeBlocks		タイ文字
+Deseret	UnicodeBlocks		デゼレット文字
+Tifinagh	UnicodeBlocks		ティフナグ文字
+Gurmukhi	UnicodeBlocks		グルムキー文字
+CharacterMap	System name		文字表
+Lao	UnicodeBlocks		ラオ文字
+Gothic	UnicodeBlocks		ゴート文字
+Limbu	UnicodeBlocks		リンブ文字
+Rejang	UnicodeBlocks		ルジャン文字
+Show private blocks	CharacterWindow		プライベートブロックの表示
+Phoenician	UnicodeBlocks		フェニキア文字
+Mongolian	UnicodeBlocks		モンゴル文字
+Supplemental arrows A	UnicodeBlocks		補助矢印A
+Miscellaneous symbols and arrows	UnicodeBlocks		各種記号と矢印
 Yijing hexagram symbols	UnicodeBlocks		易経記号
+Supplemental mathematical operators	UnicodeBlocks		補助数学演算記号
+Enclosed CJK letters and months	UnicodeBlocks		囲みCJK文字・月
+Kayah Li	UnicodeBlocks		カヤー文字
+Alphabetic presentation forms	UnicodeBlocks		アルファベット表示形
+Halfwidth and fullwidth forms	UnicodeBlocks		半角・全角形
+Lydian	UnicodeBlocks		リディア文字
+Ethiopic supplement	UnicodeBlocks		エチオピア文字補足
+Latin extended B	UnicodeBlocks		ラテン文字拡張B
+Box drawing	UnicodeBlocks		罫線素辺
+Mathematical alphanumeric symbols	UnicodeBlocks		数学用英数字記号
+Copy character	CharacterView		文字をコピー
+Greek and Coptic	UnicodeBlocks		ギリシア文字及びコプト文字
+Carian	UnicodeBlocks		カリア文字
+Georgian	UnicodeBlocks		グルジア文字
+Phaistos disc	UnicodeBlocks		ファイストスの円盤の文字
+Shavian	UnicodeBlocks		シェイヴィアン文字
+CJK compatibility	UnicodeBlocks		CJK互換用文字
+Malayalam	UnicodeBlocks		マラヤーラム文字
+N'Ko	UnicodeBlocks		マネンカ文字
+Kannada	UnicodeBlocks		カンナダ文字
+Copy as escaped byte string	CharacterView		エスケープされた数値としてコピー
+Phonetic extensions supplement	UnicodeBlocks		発音拡張補助
+Domino tiles	UnicodeBlocks		ドミノ牌
+Katakana phonetic extensions	UnicodeBlocks		カタカナ発音拡張

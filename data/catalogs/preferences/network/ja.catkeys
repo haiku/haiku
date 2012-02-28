@@ -1,21 +1,21 @@
 1	japanese	x-vnd.Haiku-Network	2324385456
-<no wireless networks found>	EthernetSettingsView		<ワイヤレスネットワークが見つかりません>
-Adapter:	EthernetSettingsView		ネットワークアダプター：
-Apply	EthernetSettingsView		適用
-Auto-configuring failed: 	EthernetSettingsView		自動設定に失敗しました：
 Choose automatically	EthernetSettingsView		自動選択
-DHCP	EthernetSettingsView		自動 (DHCP)
-DNS #1:	EthernetSettingsView		プライマリ DNS サーバー：
-DNS #2:	EthernetSettingsView		セカンダリ DNS サーバー：
-Disabled	EthernetSettingsView		無効
-Domain:	EthernetSettingsView		ドメイン：
 Gateway:	EthernetSettingsView		ゲートウェイ：
-IP address:	EthernetSettingsView		IP アドレス：
-Mode:	EthernetSettingsView		モード：
 Netmask:	EthernetSettingsView		サブネットマスク：
-Network	System name		ネットワーク
-Network:	EthernetSettingsView		ネットワーク:
+DHCP	EthernetSettingsView		自動 (DHCP)
+DNS #2:	EthernetSettingsView		セカンダリ DNS サーバー：
+Apply	EthernetSettingsView		適用
 OK	EthernetSettingsView		Ok
+DNS #1:	EthernetSettingsView		プライマリ DNS サーバー：
+IP address:	EthernetSettingsView		IP アドレス：
+Adapter:	EthernetSettingsView		ネットワークアダプター：
+Domain:	EthernetSettingsView		ドメイン：
 Revert	EthernetSettingsView		元に戻す
-Static	EthernetSettingsView		固定 IP
+<no wireless networks found>	EthernetSettingsView		<ワイヤレスネットワークが見つかりません>
+Network	System name		ネットワーク
+Mode:	EthernetSettingsView		モード：
+Network:	EthernetSettingsView		ネットワーク:
 The net_server needs to run for the auto configuration!	EthernetSettingsView		自動設定するには net_server が起動している必要があります！
+Disabled	EthernetSettingsView		無効
+Auto-configuring failed: 	EthernetSettingsView		自動設定に失敗しました：
+Static	EthernetSettingsView		固定 IP

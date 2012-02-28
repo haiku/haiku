@@ -1,6 +1,7 @@
-1	japanese	x-vnd.Haiku-SpamFilter	1421456256
+1	japanese	x-vnd.Haiku-SpamFilter	1119442397
+or empty e-mail	SpamFilterConfig		または空のメール
+Spam Filter (AGMS Bayesian)	SpamFilter		スパムフィルター (AGMS Bayesian)
 Add spam rating to start of subject	SpamFilterConfig		件名の最初にスパムの格付けを加える
-Close	SpamFilterConfig		閉じる
 Learn from all incoming e-mail	SpamFilterConfig		受信メールすべてから学習する
 Sorry, unable to launch the spamdbm program to let you edit the server settings.	SpamFilterConfig		すみません、サーバー設定編集のための spamdbm プログラムを起動できませんでした。
-Spam Filter (AGMS Bayesian)	SpamFilter		スパムフィルター (AGMS Bayesian)
+Close	SpamFilterConfig		閉じる

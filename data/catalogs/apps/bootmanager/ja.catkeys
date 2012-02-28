@@ -1,65 +1,65 @@
 1	japanese	x-vnd.Haiku-BootManager	3014946856
-About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	%disk にある %file でマスターブートレコード (MBR) を修復します。よろしいですか？
-About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		ブートメニューをディスクに書き込みます。続けてよろしいですか？
-About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		以下のブートメニューを起動ディスク (%s) に書き込みます。続ける前に以下の情報が正しいか確認してください。
-After five seconds	DefaultPartitionPage		5秒
-After four seconds	DefaultPartitionPage		4秒
-After one minute	DefaultPartitionPage		1分
-After one second	DefaultPartitionPage		1秒
-After three seconds	DefaultPartitionPage		3秒
+The boot manager has been successfully installed on your system.	BootManagerController		ブートマネージャーがシステムに正常にインストールされました。
 After two seconds	DefaultPartitionPage		2秒
-An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		ブートメニューを書き込む際エラーが発生しました。マスターブートレコードが破壊されている可能性があるので、すぐに MBR を修復してください。
+Uninstall Boot Manager	UninstallPage	Title	ブートメニューをアンインストール
 At least one partition must be selected!	BootManagerController		少なくとも１つのパーティションが選択されていなければなりません。
-Back	BootManagerController	Button	戻る
-Backup Master Boot Record	BootManagerController	Title	マスターブートレコードのバックアップ
-Boot Manager is unable to read the partition table!	BootManagerController		ブートマネージャーはパーティションテーブルを読み込めません。
-BootManager	System name		ブートマネージャー
-Cannot access!	DrivesPage	Cannot install	アクセスできません
-Default Partition	DefaultPartitionPage	Title	デフォルトパーティション
-Default Partition:	DefaultPartitionPage	Menu field label	デフォルトパーティション：
-Done	BootManagerController	Button	完了
-Drives	DrivesPage	Title	ドライブ
-Error reading partition table	BootManagerController	Title	パーティションテーブルの読み込み中にエラー発生
-File:	FileSelectionPage	Text control label	ファイル：
+The old Master Boot Record could not be saved to %s	BootManagerController		古いマスターブートレコード (MBR) を %s に保存できませんでした。
+Restore MBR	BootManagerController	Button	MBR を修復
 Hard Drive	DrivesPage	Default disk name	Hard Drive
-Immediately	DefaultPartitionPage		すぐに
-Install	DrivesPage	Button	インストール
-Installation of boot menu completed	BootManagerController	Title	ブートメニューのインストールが完了
-Installation of boot menu failed	BootManagerController	Title	ブートメニューのインストールに失敗しました
-Never	DefaultPartitionPage		永久
-Next	WizardView	Button	次へ
-No space available!	DrivesPage	Cannot install	空き領域がありません。
-OK	BootManagerController	Button	OK
-Old Master Boot Record Saved failure	BootManagerController	Title	古いマスターブートレコードの保存に失敗しました
-Old Master Boot Record saved	BootManagerController	Title	古いマスターブートレコードが保存されました。
-Partition table not compatible	BootManagerController	Title	互換性のないパーティションテーブルです
-Partitions	DefaultPartitionPage	Pop up menu title	パーティション
+USB Drive	DrivesPage	Default disk name	USBドライブ
+The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		起動デバイスのマスターブートレコード (MBR):\n\t%s\n をディスクに保存します。ここで、マスターブートレコードの情報を保存するファイルを指定してください。\n\nなお、インストール中に何か問題が発生したり、ブートメニューを削除したい時には、このブートマネージャーを使って、アンインストールしてください。
+About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	%disk にある %file でマスターブートレコード (MBR) を修復します。よろしいですか？
+An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		ブートメニューを書き込む際エラーが発生しました。マスターブートレコードが破壊されている恐れがあるので、すぐに MBR を修復してください。
 Partitions	PartitionsPage	Title	パーティション
+Timeout: %s	DefaultPartitionPage		待ち時間： %s
+Select	FileSelectionPage	Button	選択
+Cannot access!	DrivesPage	Cannot install	アクセスできません
+Uninstall boot manager	BootManagerController	Title	ブートマネージャーを削除
+After four seconds	DefaultPartitionPage		4秒
+Uninstallation of boot menu failed	BootManagerController	Title	ブートマネージャーの削除に失敗しました。
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		修復に使うマスターブートレコード (MBR) ファイルを指定してください。これはブートマネージャーが初めてインストールされた時に作成されたものです。
-Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		 修復に使うマスターブートレコード (MBR) ファイルを指定してください。これはブートマネージャーが初めてインストールされた時に作成されたものです。
+Next	WizardView	Button	次へ
+Uninstallation of boot menu completed	BootManagerController	Title	ブートマネージャーの削除が完了しました
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		ブートマネージャーをインストールまたは削除するドライブを選択してください。
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		デフォルトパーティションと起動するまでの待ち時間を指定してください。\nユーザーが別のパーティションを選択しない限り、システムはデフォルトパーティションから起動します。待ち時間を「永久」にすることで、起動する度にパーティションが選択できるようになります。\n待ち時間を無効にするには、「ALT」キーを押したままシステムを起動してください。
-Previous	WizardView	Button	前へ
-Quit	DrivesPage	Button	終了
-Restore MBR	BootManagerController	Button	MBR を修復
-Select	FileSelectionPage	Button	選択
-Summary	BootManagerController	Title	概要
-The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		起動デバイスのマスターブートレコード (MBR):\n\t%s\n をディスクに保存します。ここで、マスターブートレコードの情報を保存するファイルを指定してください。\n\nなお、インストール中に何か問題が発生したり、ブートメニューを削除したい時には、このブートマネージャーを使って、アンインストールしてください。
-The Master Boot Record could not be restored!	BootManagerController		マスターブートレコードは修復されませんでした。
-The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		起動デバイス (%s) のマスターブートレコードは %s から正常に修復されました。
-The boot manager has been successfully installed on your system.	BootManagerController		ブートマネージャーがシステムにインストールされました。
-The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		下記のパーティションが検出されました。ブートメニューに表示するパーティションにチェックを入れてください。ブートメニューに表示するパーティションの名前を入力することもできます(注意: ローマ字半角のみで入力してください)。
-The old Master Boot Record could not be saved to %s	BootManagerController		古いマスターブートレコード (MBR) を %s に保存できませんでした。
-The old Master Boot Record was successfully saved to %s.	BootManagerController		古いマスターブートレコードは%sに保存されました。
+After one second	DefaultPartitionPage		1秒
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		起動ハードディスクのパーティションテーブルはブートマネージャーと互換性はありません。\nブートマネージャーは第一パーティションの前に 2 KB のスペースが必要です。
-Timeout: %s	DefaultPartitionPage		待ち時間： %s
-USB Drive	DrivesPage	Default disk name	USBドライブ
-Uninstall	DrivesPage	Button	削除
-Uninstall Boot Manager	UninstallPage	Title	ブートメニューをアンインストール
-Uninstall boot manager	BootManagerController	Title	ブートマネージャーを削除
-Uninstallation of boot menu completed	BootManagerController	Title	ブートマネージャーの削除が完了しました
-Uninstallation of boot menu failed	BootManagerController	Title	ブートマネージャーの削除に失敗しました。
-Unknown	LegacyBootMenu	Text is shown for an unknown partition type	不明
-Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	無名パーティション %d
-Update	DrivesPage	Button	更新
+The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		下記のパーティションが検出されました。ブートメニューに表示するパーティションにチェックを入れてください。ブートメニューに表示するパーティションの名前を入力することもできます(注意: 英数半角のみで入力してください)。
+After one minute	DefaultPartitionPage		1分
+The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		起動デバイス (%DISK) のマスターブートレコードは %FILE から正常に修復されました。
 Write boot menu	BootManagerController	Button	ブートメニューを書き込む
+The Master Boot Record could not be restored!	BootManagerController		マスターブートレコードは修復されませんでした。
+Uninstall	DrivesPage	Button	削除
+Default Partition	DefaultPartitionPage	Title	デフォルトパーティション
+After five seconds	DefaultPartitionPage		5秒後
+Back	BootManagerController	Button	戻る
+Installation of boot menu completed	BootManagerController	Title	ブートメニューのインストールが完了
+Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Unnamed %d
+File:	FileSelectionPage	Text control label	ファイル：
+Previous	WizardView	Button	前へ
+Install	DrivesPage	Button	インストール
+About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		以下のブートメニューを起動ディスク (%s) に書き込みます。続ける前に以下の情報が正しいか確認してください。
+Unknown	LegacyBootMenu	Text is shown for an unknown partition type	不明なパーティション
+Update	DrivesPage	Button	更新
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		修復に使うマスターブートレコード (MBR) ファイルを指定してください。これはブートマネージャーが最初にインストールされた時に作成されたものです。
+Old Master Boot Record Saved failure	BootManagerController	Title	旧マスターブートレコードの保存に失敗しました
+Drives	DrivesPage	Title	ドライブ
+No space available!	DrivesPage	Cannot install	空き領域がありません。
+Never	DefaultPartitionPage		永久
+Partition table not compatible	BootManagerController	Title	互換性のないパーティションテーブルです
+Old Master Boot Record saved	BootManagerController	Title	旧マスターブートレコードが保存されました。
+Boot Manager is unable to read the partition table!	BootManagerController		ブートマネージャーはパーティションテーブルを読み込めません。
+Error reading partition table	BootManagerController	Title	パーティションテーブルの読み込み中にエラー発生
+Installation of boot menu failed	BootManagerController	Title	ブートメニューのインストールに失敗しました
+Backup Master Boot Record	BootManagerController	Title	マスターブートレコードのバックアップ
+Quit	DrivesPage	Button	終了
+About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		ブートメニューをディスクに書き込みます。続けてよろしいですか？
+The old Master Boot Record was successfully saved to %s.	BootManagerController		古いマスターブートレコードは%sに正常に保存されました。
+Default Partition:	DefaultPartitionPage	Menu field label	デフォルトパーティション：
+Partitions	DefaultPartitionPage	Pop up menu title	パーティション
+BootManager	System name		ブートマネージャー
+Summary	BootManagerController	Title	概要
+OK	BootManagerController	Button	OK
+Immediately	DefaultPartitionPage		すぐに
+Done	BootManagerController	Button	完了
+After three seconds	DefaultPartitionPage		3秒

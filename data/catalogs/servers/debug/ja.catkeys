@@ -1,0 +1,4 @@
+1	japanese	x-vnd.Haiku-debug_server	1035915338
+OK	DebugServer		OK
+Debug	DebugServer		デバッグ
+The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		アプリケーション:\n\n %app\n\nは、エラーのため続行できません。Haiku はアプリケーションを終了し、後始末をします。

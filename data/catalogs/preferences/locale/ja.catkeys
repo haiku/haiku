@@ -1,31 +1,31 @@
 1	japanese	x-vnd.Haiku-Locale	1488345554
-12 hour	TimeFormatSettings		12 時間
-24 hour	TimeFormatSettings		24時間
 Available languages	Locale Preflet Window		使用可能な言語
-Cancel	Locale Preflet Window		中止
-Currency	TimeFormatSettings		通貨
-Date	TimeFormatSettings		日付
-Defaults	Locale Preflet Window		デフォルト
-Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		変更を有効にするために、DeskbarとTrackerを再起動する必要があります。今すぐ再起動してよいですか?
-Formatting	Locale Preflet Window		書式設定
-Full format:	TimeFormatSettings		完全な形式:
-Language	Locale Preflet Window		言語
-Locale	Locale Preflet		ロケール
-Locale	Locale Preflet Window		ロケール
-Locale	System name		ロケール
-Long format:	TimeFormatSettings		長い形式：
-Medium format:	TimeFormatSettings		中位の形式:
 Negative:	TimeFormatSettings		負表記:
-Numbers	TimeFormatSettings		数字
-OK	Locale Preflet Window		OK
-Options	Locale Preflet Window		オプション
-Positive:	TimeFormatSettings		正表記:
-Preferred languages	Locale Preflet Window		言語の優先順位
-Restart	Locale Preflet Window		再起動
-Revert	Locale Preflet Window		元に戻す
-Short format:	TimeFormatSettings		短い形式：
-Time	TimeFormatSettings		時刻
-Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		DeskbarとTracker中のアプリケーション名とフォルダー名を翻訳する。
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		使用できる言語が見つかりません！このプレフレットは使用できません！
-Use month/day-names from preferred language	TimeFormatSettings		優先する言語の月/日の名前を使用する
 already chosen	LanguageListView		すでに選択済
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		使用できる言語が見つかりません！このプレフレットは使用できません！
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		変更を有効にするために、DeskbarとTrackerを再起動する必要があります。今すぐ再起動してよいですか?
+Long format:	TimeFormatSettings		長い形式：
+Currency	TimeFormatSettings		通貨
+Locale	System name		ロケール
+Short format:	TimeFormatSettings		短い形式：
+Language	Locale Preflet Window		言語
+Preferred languages	Locale Preflet Window		言語の優先順位
+Use month/day-names from preferred language	TimeFormatSettings		優先する言語の月/日の名前を使用する
+Formatting	Locale Preflet Window		書式設定
+Locale	Locale Preflet Window		ロケール
+Numbers	TimeFormatSettings		数字
+24 hour	TimeFormatSettings		24時間
+OK	Locale Preflet Window		OK
+Restart	Locale Preflet Window		再起動
+Full format:	TimeFormatSettings		完全な形式:
+Defaults	Locale Preflet Window		デフォルト
+Cancel	Locale Preflet Window		中止
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Deskbar と Tracker 中のアプリケーション名とフォルダー名を翻訳する。
+Revert	Locale Preflet Window		元に戻す
+Medium format:	TimeFormatSettings		中位の形式:
+12 hour	TimeFormatSettings		12 時間
+Time	TimeFormatSettings		時刻
+Date	TimeFormatSettings		日付
+Positive:	TimeFormatSettings		正表記:
+Locale	Locale Preflet		ロケール
+Options	Locale Preflet Window		オプション

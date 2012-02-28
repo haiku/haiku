@@ -1,24 +1,24 @@
 1	japanese	x-vnd.Haiku-GLTeapot	2890609668
-Add a teapot	TeapotWindow		ティーポットを追加
-Backface culling	TeapotWindow		バックフェースカリング
-Blue	TeapotWindow		青
-FPS display	TeapotWindow		FPSを表示
-File	TeapotWindow		ファイル
-Filled polygons	TeapotWindow		ポリゴンを塗りつぶす
-Fog	TeapotWindow		フォグ
-GLTeapot	System name		GLTeapot
-Gouraud shading	TeapotWindow		グローシェーディング
-Green	TeapotWindow		緑
-Lighting	TeapotWindow		Lighting
-Lights	TeapotWindow		光源
-Lower left	TeapotWindow		左隅
-Off	TeapotWindow		オフ
-Options	TeapotWindow		オプション
-Perspective	TeapotWindow		パースペクティブ
-Quit	TeapotWindow		終了
-Red	TeapotWindow		赤
-Right	TeapotWindow		右
 Upper center	TeapotWindow		上中央
+Lighting	TeapotWindow		Lighting
+Off	TeapotWindow		オフ
+Lower left	TeapotWindow		左隅
 White	TeapotWindow		白
 Yellow	TeapotWindow		黄
+Blue	TeapotWindow		青
+Gouraud shading	TeapotWindow		グローシェーディング
+Quit	TeapotWindow		終了
+Filled polygons	TeapotWindow		ポリゴンを塗りつぶす
+Fog	TeapotWindow		フォグ
+Backface culling	TeapotWindow		バックフェースカリング
 Z-buffered	TeapotWindow		Z バッファーを使用
+File	TeapotWindow		ファイル
+Options	TeapotWindow		オプション
+Perspective	TeapotWindow		パースペクティブ
+GLTeapot	System name		GLTeapot
+Green	TeapotWindow		緑
+Right	TeapotWindow		右
+FPS display	TeapotWindow		FPSを表示
+Add a teapot	TeapotWindow		ティーポットを追加
+Red	TeapotWindow		赤
+Lights	TeapotWindow		光源

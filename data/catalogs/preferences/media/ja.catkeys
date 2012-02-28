@@ -1,30 +1,30 @@
 1	japanese	x-vnd.Haiku-Media	1473363280
-<none>	Media views		<無し>
-Audio input:	Media views		オーディオ入力：
-Audio mixer	Media Window		オーディオミキサー
-Audio output:	Media views		オーディオ出力：
-Audio settings	Media Window		オーディオ設定
-Channel:	Media views		チャンネル：
-Cleaning up.	Media Window		整理中…
-Could not connect to the media server.\nWould you like to start it ?	Media Window		メディアサーバーに接続できませんでした。\nメディアサーバーを起動しますか？
 Couldn't add volume control in Deskbar: %s\n	Media views		音量コントロールを Deskbar に追加できませんでした： %s\n
-Couldn't remove volume control in Deskbar: %s\n	Media views		音量コントロールを Deskbar から削除できませんでした： %s\n
-Defaults	Media views		デフォルト
-Done shutting down.	Media Window		シャットダウン完了。
-Media	System name		メディア
-OK	Media Window		OK
-Quit	Media Window		終了
 Ready for use…	Media Window		使用可能…
-Restart media services	Media views		メディアサービスを再起動
-Restarting media services\nShutting down media server\n	Media Window		メディアサービスを再起動しています\nメディアサーバーを終了します…\n
-Restarting media services\nStarting media server…\n	Media Window		メディアサービスを再起動します\nメディアサービスを起動中…\n
-Show volume control on Deskbar	Media views		音量コントロールを Deskbar に表示
-Start media server	Media Window		メディアサーバーの起動
-Starting media server…	Media Window		メディアサーバーを再起動中…
-Stopping media server…	Media Window		メディアサーバーを終了しています…
-Telling media_addon_server to quit.	Media Window		media_addon_server を終了させようとしています。
-This hardware has no controls.	Media Window		このハードウエアにはコントロールがありません。
 Video input:	Media views		ビデオ入力：
-Video output:	Media views		ビデオ出力：
-Video settings	Media Window		ビデオ設定
 Waiting for media_server to quit.	Media Window		media_server の終了を待機中…
+Cleaning up.	Media Window		整理中…
+Defaults	Media views		デフォルト
+Stopping media server…	Media Window		メディアサーバーを終了しています…
+Quit	Media Window		終了
+OK	Media Window		OK
+Starting media server…	Media Window		メディアサーバーを再起動中…
+Done shutting down.	Media Window		シャットダウン完了。
+Video settings	Media Window		ビデオ設定
+Video output:	Media views		ビデオ出力：
+Could not connect to the media server.\nWould you like to start it ?	Media Window		メディアサーバーに接続できませんでした。\nメディアサーバーを起動しますか？
+Restart media services	Media views		メディアサービスを再起動
+Couldn't remove volume control in Deskbar: %s\n	Media views		音量コントロールを Deskbar から削除できませんでした： %s\n
+Media	System name		メディア
+Telling media_addon_server to quit.	Media Window		media_addon_server を終了させようとしています。
+Audio mixer	Media Window		オーディオミキサー
+This hardware has no controls.	Media Window		このハードウエアにはコントロールがありません。
+Audio output:	Media views		オーディオ出力：
+Restarting media services\nStarting media server…\n	Media Window		メディアサービスを再起動します\nメディアサービスを起動中…\n
+Audio settings	Media Window		オーディオ設定
+Start media server	Media Window		メディアサーバーの起動
+Restarting media services\nShutting down media server\n	Media Window		メディアサービスを再起動しています\nメディアサーバーを終了します…\n
+<none>	Media views		<無し>
+Channel:	Media views		チャンネル：
+Show volume control on Deskbar	Media views		音量コントロールを Deskbar に表示
+Audio input:	Media views		オーディオ入力：

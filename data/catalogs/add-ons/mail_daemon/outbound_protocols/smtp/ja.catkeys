@@ -1,13 +1,16 @@
-1	japanese	x-vnd.Haiku-SMTP	1052586247
-. The server said:\n	smtp		サーバーからのメッセージです\n
-. The server says:\n	smtp		サーバーからのメッセージです\n
-: Connection refused or host not found.	smtp		接続が拒否されたかサーバーが見つかりません。
-Connecting to server…	smtp		接続中...
-Destination:	ConfigView		メッセージの保存先：
-ESMTP	ConfigView		ESMTP
-Error while logging in to %serv	smtp		%serv へのログイン中にエラーが発生しました
-Error while opening connection to %serv	smtp		%serv への接続中にエラーが発生しました
-None	ConfigView		無し
-POP3 authentication failed. The server said:\n	smtp		POP3認証に失敗しました。\n
-POP3 before SMTP	ConfigView		送信前に受信する
+1	japanese	x-vnd.Haiku-SMTP	2740407895
 SMTP server:	ConfigView		SMTPサーバー：
+STARTTLS	ConfigView		STARTTLS
+Error while logging in to %serv	smtp		%serv へのログイン中にエラーが発生しました
+Unencrypted	ConfigView		非暗号化
+. The server says:\n	smtp		サーバーからのメッセージです\n
+ESMTP	ConfigView		ESMTP
+Connecting to server…	smtp		接続中...
+Error while opening connection to %serv	smtp		%serv への接続中にエラーが発生しました
+POP3 authentication failed. The server said:\n	smtp		POP3認証に失敗しました。\n
+Destination:	ConfigView		メッセージの保存先：
+: Connection refused or host not found.	smtp		接続が拒否されたかサーバーが見つかりません。
+None	ConfigView		無し
+POP3 before SMTP	ConfigView		送信前に受信する
+SSL	ConfigView		SSL
+. The server said:\n	smtp		サーバーからのメッセージです\n

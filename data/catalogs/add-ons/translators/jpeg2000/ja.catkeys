@@ -1,13 +1,13 @@
 1	japanese	x-vnd.Haiku-JPEG2000Translator	547915409
-About	JPEG2000Translator		JPEG2000 Translators Add-on について
-Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Be ビットマップフォーマット (JPEG2000Translator)
-High	JPEG2000Translator		高い
+Write	JPEG2000Translator		書き出し
 JPEG2000 images	JPEG2000Translator		JPEG2000イメージ
-Low	JPEG2000Translator		低い
 Output only codestream (.jpc)	JPEG2000Translator		Codestreamのみ出力 (.jpc)
+Write black-and-white images as RGB24	JPEG2000Translator		モノクロイメージをRGB24として書き出す
 Output quality	JPEG2000Translator		出力品質
 Read	JPEG2000Translator		読み取り
-Read greyscale images as RGB32	JPEG2000Translator		グレイスケールイメージをRGB32として読み込む
-Write	JPEG2000Translator		書き出し
-Write black-and-white images as RGB24	JPEG2000Translator		モノクロイメージをRGB24として書き出す
 ©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nJasPerライブラリベース:\n© 1999-2000, Image Power, Inc.および\nブリティッシュ・コロンビア大学(カナダ).\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\n「チュートリアル」にImageMagickのjp2コーデックが使用されています.\n\thttp://www.imagemagick.org/\n
+Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Be ビットマップフォーマット (JPEG2000Translator)
+Low	JPEG2000Translator		低い
+About	JPEG2000Translator		JPEG2000 Translators Add-on について
+High	JPEG2000Translator		高い
+Read greyscale images as RGB32	JPEG2000Translator		グレースケールイメージをRGB32として読み込む

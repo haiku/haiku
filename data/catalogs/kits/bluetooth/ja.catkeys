@@ -1,88 +1,88 @@
 1	japanese	x-vnd.Haiku-Bluetooth	3550394259
-#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#無効な名前です
-#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#無効な名前です
-#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#無効な名前です
-#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#無効な名前です
-(reserved)	DeviceClass		(予約済)
-1-17% utilized	DeviceClass		1-17% 利用
-17-33% utilized	DeviceClass		17-33% 利用
-33-50% utilized	DeviceClass		33-50% 利用
-50-67% utilized	DeviceClass		50-67% 利用
-67-83% utilized	DeviceClass		67-83% 利用
-83-99% utilized	DeviceClass		83-99% 利用
-Audio	DeviceClass		音声
-Audio/Video	DeviceClass		音声/映像
-Camcorder	DeviceClass		ビデオカメラ
-Camera	DeviceClass		カメラ
-Capturing	DeviceClass		キャプチャリング
-Car audio	DeviceClass		カー・オーディオ
-Card reader	DeviceClass		カードリーダー
-Cellular	DeviceClass		携帯電話
-Combo keyboard/pointing device	DeviceClass		キーボードとポインティングデバイス
-Common ISDN access	DeviceClass		一般的な ISDN 接続
-Computer	DeviceClass		コンピュータ
-Controller	DeviceClass		コントローラー
-Cordless	DeviceClass		コードレス
-Desktop workstation	DeviceClass		デスクトップ ワークステーション
-Device conforms to the headset profile	DeviceClass		デバイスはヘッドセットプロファイルが利用できます
-Digitizer tablet	DeviceClass		タブレット
 Display	DeviceClass		ディスプレイ
-Doll/Action figure	DeviceClass		フィギュア
-Fully available	DeviceClass		全て有効
+Capturing	DeviceClass		キャプチャリングデバイス
+Printer	DeviceClass		プリンター
+Uncategorized	DeviceClass		未分類
+1-17% utilized	DeviceClass		1-17% 利用
+Positioning	DeviceClass		位置
+Rendering	DeviceClass		描画
+Phone	DeviceClass		電話
+17-33% utilized	DeviceClass		17-33% 利用
+#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#無効な名前です
+Combo keyboard/pointing device	DeviceClass		キーボードとポインティングデバイス
+Controller	DeviceClass		コントローラー
+No service available	DeviceClass		サービスが有効ではありません
+Wearable	DeviceClass	A wearable computer	ウェアラブル
+Handheld	DeviceClass		ハンドヘルド
+Invalid device class!\n	DeviceClass		無効なデバイスクラスです!\n
+Sensing device	DeviceClass		センサー
+Computer	DeviceClass		コンピュータ
+Cellular	DeviceClass		携帯電話
+Microphone	DeviceClass		マイク
+Unknown (reserved) minor device class	DeviceClass		不明 (予約済) の副デバイスクラス
+Cordless	DeviceClass		コードレス
+Common ISDN access	DeviceClass		一般的な ISDN 接続
+83-99% utilized	DeviceClass		83-99% 利用
+Scanner	DeviceClass		スキャナー
 Game	DeviceClass		ゲーム
 Gamepad	DeviceClass		ゲームパッド
-Gaming/Toy	DeviceClass		ゲーム/玩具
+(reserved)	DeviceClass		(予約済)
+Desktop workstation	DeviceClass		デスクトップ ワークステーション
+Audio/Video	DeviceClass		音声/映像
 Glasses	DeviceClass		メガネ
-Handheld	DeviceClass		ハンドヘルド
-Hands-free	DeviceClass		ハンズフリー
-Headphones	DeviceClass		ヘッドホン
-Helmet	DeviceClass		ヘルメット
-HiFi audio device	DeviceClass		HiFi オーディオ機器
-Imaging	DeviceClass		イメージ
-Information	DeviceClass		情報
-Invalid device class!\n	DeviceClass		無効なデバイスクラスです!\n
-Jacket	DeviceClass		ジャケット
-Joystick	DeviceClass		ジョイスティック
 Keyboard	DeviceClass		キーボード
-LAN access	DeviceClass		LAN 接続
-Laptop	DeviceClass		ラップトップ
-Loudspeaker	DeviceClass		拡声器
+Camera	DeviceClass		カメラ
 Major class: 	DeviceClass		主クラス:
-Microphone	DeviceClass		マイク
-Minor class: 	DeviceClass		副クラス:
-Miscellaneous	DeviceClass		複数
-Networking	DeviceClass		ネットワーク接続
-No service available	DeviceClass		サービスが有効ではありません
-Not implemented	RemoteDevice		未実装
-Object transfer	DeviceClass		オブジェクト転送
-Pager	DeviceClass	A small radio device to receive short text messages	ポケットベル
-Palm	DeviceClass	A palm-held device	Palm
-Peripheral	DeviceClass		周辺機器
-Phone	DeviceClass		電話
-Pointing device	DeviceClass		ポインティングデバイス
-Portable audio	DeviceClass		ポータブルオーディオ
-Positioning	DeviceClass		位置
-Printer	DeviceClass		プリンター
-Remote control	DeviceClass		リモコン
-Rendering	DeviceClass		描画
-Robot	DeviceClass		ロボット
-SIM card reader	DeviceClass		SIM カードリーダー
-Scanner	DeviceClass		スキャナー
-Sensing device	DeviceClass		センサー
-Server	DeviceClass		サーバー
-Service classes: 	DeviceClass		サービスクラス:
+50-67% utilized	DeviceClass		50-67% 利用
+Card reader	DeviceClass		カードリーダー
 Set-top box	DeviceClass		セットトップボックス
+Helmet	DeviceClass		ヘルメット
+Laptop	DeviceClass		ラップトップ
+Car audio	DeviceClass		カー・オーディオ
+SIM card reader	DeviceClass		SIM カードリーダー
+Headphones	DeviceClass		ヘッドホン
+Information	DeviceClass		情報
+Remote control	DeviceClass		リモコン
+Service classes: 	DeviceClass		サービスクラス:
+Pager	DeviceClass	A small radio device to receive short text messages	ポケットベル
+Object transfer	DeviceClass		オブジェクト転送
+Gaming/Toy	DeviceClass		ゲーム/玩具
+Audio	DeviceClass		音声
+Robot	DeviceClass		ロボット
+Camcorder	DeviceClass		ビデオカメラ
+Digitizer tablet	DeviceClass		タブレット
+Loudspeaker	DeviceClass		拡声器
+Joystick	DeviceClass		ジョイスティック
+LAN access	DeviceClass		LAN 接続
+Wrist watch	DeviceClass		腕時計
+Minor class: 	DeviceClass		副クラス:
+Networking	DeviceClass		ネットワーク接続
+Portable audio	DeviceClass		ポータブルオーディオ
+Device conforms to the headset profile	DeviceClass		デバイスはヘッドセットプロファイルに適合します
+Hands-free	DeviceClass		ハンズフリー
+#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#無効な名前です
+Vehicle	DeviceClass		自動車
+Palm	DeviceClass	A palm-held device	Palm
+Video display and loudspeaker	DeviceClass		ビデオディスプレイと拡声器
+Peripheral	DeviceClass		周辺機器
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#無効な名前です
+Wired modem or voice gateway	DeviceClass		有線モデムかボイスゲートウェイ
+Jacket	DeviceClass		ジャケット
+Unspecified	DeviceClass		未分類
+Fully available	DeviceClass		すべて有効
+67-83% utilized	DeviceClass		67-83% 利用
+Not implemented	RemoteDevice		未実装
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#無効な名前です
+Server	DeviceClass		サーバー
+Video conferencing	DeviceClass		ビデオ会議
+Video camera	DeviceClass		ビデオカメラ
+HiFi audio device	DeviceClass		HiFi オーディオ機器
 Smart phone	DeviceClass		スマートフォン
 Telephony	DeviceClass		電話通信
-Uncategorized	DeviceClass		未分類
-Unknown (reserved) minor device class	DeviceClass		不明 (予約済) の副デバイスクラス
-Unspecified	DeviceClass		未分類
+Doll/Action figure	DeviceClass		フィギュア
 VCR	DeviceClass		ビデオデッキ
-Vehicle	DeviceClass		自動車
-Video camera	DeviceClass		ビデオカメラ
-Video conferencing	DeviceClass		ビデオ会議
-Video display and loudspeaker	DeviceClass		ビデオディスプレイと拡声器
 Video monitor	DeviceClass		ビデオモニター
-Wearable	DeviceClass	A wearable computer	ウェアラブル
-Wired modem or voice gateway	DeviceClass		有線モデムかボイスゲートウェイ
-Wrist watch	DeviceClass		腕時計
+Pointing device	DeviceClass		ポインティングデバイス
+Miscellaneous	DeviceClass		その他
+33-50% utilized	DeviceClass		33-50% 利用
+Imaging	DeviceClass		イメージングデバイス
