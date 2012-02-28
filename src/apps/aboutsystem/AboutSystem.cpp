@@ -90,6 +90,7 @@ static const Translation gTranslations[] =
 {
 	{ "ar",
 		"Khaled Berraoui - khallebal\n"
+		"Kendhia\n"
 	},
 	{ "be",
 		"Michael Bulash\n"
@@ -110,8 +111,10 @@ static const Translation gTranslations[] =
 		"Mirko Israel\n"
 		"leszek\n"
 		"Christian Morgenroth\n"
+		"Aleksas Pantechovskis\n"
 		"Joachim Seemer - Humdinger\n"
 		"Matthias Spreiter\n"
+		"Ivaylo Tsenkov\n"
 		"svend\n"
 	},
 	{ "el",
@@ -135,6 +138,7 @@ static const Translation gTranslations[] =
 	{ "fi",
 		"Jorma Karvonen - Karvjorm\n"
 		"Jaakko Leikas - Garjala\n"
+		"Slavi Stefanov Sotirov\n"
 	},
 	{ "fr",
 		"Jean-Loïc Charroud\n"
@@ -144,6 +148,7 @@ static const Translation gTranslations[] =
 	},
 	{ "hi",
 		"Abhishek Arora\n"
+		"Dhruwat Bhagat\n"
 		"Jayneil Dalal\n"
 		"Atharva Lath\n"
 	},
@@ -203,8 +208,14 @@ static const Translation gTranslations[] =
 	},
 	{ "ro",
 		"Victor Carbune\n"
+		"Silviu Dureanu\n"
+		"Alexsander Krustev\n"
+		"Danca Monica\n"
 		"Florentina Mușat\n"
 		"Dragos Serban\n"
+		"Hedeș Cristian Teodor\n"
+		"Ivaylo Tsenkov\n"
+		"Călinescu Valentin\n"
 	},
 	{ "ru",
 		"Tatyana Fursic - iceid\n"
@@ -214,6 +225,9 @@ static const Translation gTranslations[] =
 		"Reznikov Sergei - Diver\n"
 		"Michael Smirnov\n"
 		"Vladimir Vasilenko\n"
+	},
+	{ "sk",
+		"Ivan Masár\n"
 	},
 	{ "sr",
 		"Nikola Miljković\n"
@@ -226,7 +240,11 @@ static const Translation gTranslations[] =
 		"Victor Widell\n"
 	},
 	{ "tr",
+		"Hüseyin Aksu\n"
+		"Halil İbrahim Azak\n"
 		"Aras Ergus\n"
+		"Enes Burhan Kuran\n"
+		"Ali Rıza Nazlı\n"
 	},
 	{ "uk",
 		"Mariya Pilipchuk\n"
