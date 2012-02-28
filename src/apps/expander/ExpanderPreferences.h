@@ -27,8 +27,8 @@ public:
 	virtual void 		MessageReceived(BMessage* msg);
 
 private:
-	void				_LoadSettings();
-	void				_SaveSettings();
+	void				_ReadSettings();
+	void				_WriteSettings();
 
 	BButton				*fSelect;
 	BCheckBox			*fAutoExpand, *fCloseWindow, *fAutoShow, *fOpenDest;

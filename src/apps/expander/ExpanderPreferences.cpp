@@ -141,21 +141,38 @@ ExpanderPreferences::ExpanderPreferences(BMessage* settings)
 
 	CenterOnScreen();
 
+	_ReadSettings();
+}
+
+
+ExpanderPreferences::~ExpanderPreferences()
+{
+	if (fUsePanel && fUsePanel->RefFilter())
+		delete fUsePanel->RefFilter();
+
+	delete fUsePanel;
+}
+
+
+void
+ExpanderPreferences::_ReadSettings()
+{
 	bool automatically_expand_files;
 	bool close_when_done;
 	int8 destination_folder;
 	entry_ref ref;
 	bool open_destination_folder;
 	bool show_contents_listing;
-	if ((settings->FindBool("automatically_expand_files", &automatically_expand_files) == B_OK)
-		&& automatically_expand_files)
+	if ((fSettings->FindBool("automatically_expand_files",
+			&automatically_expand_files) == B_OK)
+				&& automatically_expand_files)
 		fAutoExpand->SetValue(B_CONTROL_ON);
 
-	if ((settings->FindBool("close_when_done", &close_when_done) == B_OK)
-		&& close_when_done)
+	if ((fSettings->FindBool("close_when_done", &close_when_done) == B_OK)
+			&& close_when_done)
 		fCloseWindow->SetValue(B_CONTROL_ON);
 
-	if (settings->FindInt8("destination_folder", &destination_folder) == B_OK) {
+	if (fSettings->FindInt8("destination_folder", &destination_folder) == B_OK) {
 		switch (destination_folder) {
 			case 0x63:
 				fSameDest->SetValue(B_CONTROL_ON);
@@ -171,7 +188,7 @@ ExpanderPreferences::ExpanderPreferences(BMessage* settings)
 		}
 	}
 
-	if (settings->FindRef("destination_folder_use", &fRef) == B_OK) {
+	if (fSettings->FindRef("destination_folder_use", &fRef) == B_OK) {
 		BEntry entry(&fRef);
 		if (entry.Exists()) {
 			BPath path(&entry);
@@ -179,22 +196,33 @@ ExpanderPreferences::ExpanderPreferences(BMessage* settings)
 		}
 	}
 
-	if ((settings->FindBool("open_destination_folder", &open_destination_folder) == B_OK)
-		&& open_destination_folder)
+	if ((fSettings->FindBool("open_destination_folder",
+			&open_destination_folder) == B_OK)
+				&& open_destination_folder)
 		fOpenDest->SetValue(B_CONTROL_ON);
 
-	if ((settings->FindBool("show_contents_listing", &show_contents_listing) == B_OK)
-		&& show_contents_listing)
+	if ((fSettings->FindBool("show_contents_listing",
+			&show_contents_listing) == B_OK)
+				&& show_contents_listing)
 		fAutoShow->SetValue(B_CONTROL_ON);
 }
 
 
-ExpanderPreferences::~ExpanderPreferences()
+void
+ExpanderPreferences::_WriteSettings()
 {
-	if (fUsePanel && fUsePanel->RefFilter())
-		delete fUsePanel->RefFilter();
-
-	delete fUsePanel;
+	fSettings->ReplaceBool("automatically_expand_files",
+		fAutoExpand->Value() == B_CONTROL_ON);
+	fSettings->ReplaceBool("close_when_done",
+		fCloseWindow->Value() == B_CONTROL_ON);
+	fSettings->ReplaceInt8("destination_folder",
+		(fSameDest->Value() == B_CONTROL_ON) ? 0x63
+		: ((fLeaveDest->Value() == B_CONTROL_ON) ? 0x66 : 0x65));
+	fSettings->ReplaceRef("destination_folder_use", &fRef);
+	fSettings->ReplaceBool("open_destination_folder",
+		fOpenDest->Value() == B_CONTROL_ON);
+	fSettings->ReplaceBool("show_contents_listing",
+		fAutoShow->Value() == B_CONTROL_ON);
 }
 
 
@@ -247,26 +275,15 @@ ExpanderPreferences::MessageReceived(BMessage* msg)
 			break;
 		}
 		case MSG_CANCEL:
+			_ReadSettings();
 			Hide();
 			break;
-			
+
 		case MSG_OK:
-		{
-			fSettings->ReplaceBool("automatically_expand_files",
-				fAutoExpand->Value() == B_CONTROL_ON);
-			fSettings->ReplaceBool("close_when_done",
-				fCloseWindow->Value() == B_CONTROL_ON);
-			fSettings->ReplaceInt8("destination_folder",
-				(fSameDest->Value() == B_CONTROL_ON) ? 0x63
-				: ((fLeaveDest->Value() == B_CONTROL_ON) ? 0x66 : 0x65));
-			fSettings->ReplaceRef("destination_folder_use", &fRef);
-			fSettings->ReplaceBool("open_destination_folder",
-				fOpenDest->Value() == B_CONTROL_ON);
-			fSettings->ReplaceBool("show_contents_listing",
-				fAutoShow->Value() == B_CONTROL_ON);
+			_WriteSettings();
 			Hide();
 			break;
-		}
+
 		default:
 			break;
 	}
