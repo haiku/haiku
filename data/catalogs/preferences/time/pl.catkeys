@@ -1,12 +1,40 @@
-1	polish	x-vnd.Haiku-Time	2504086546
+1	polish	x-vnd.Haiku-Time	3748045865
+GMT (UNIX compatible)	Time		GMT (kompatybilne z UNIX'em)
+OK	Time		OK
+Asia	Time		Azja
+\nNow: 	Time		\nTeraz:
+Africa	Time		Afryka
+Stop	Time		Stop
+Could not contact server	Time		Nie udało się skontaktować z serwerem
+Australia	Time		Australia
+Preview time:	Time		Czas podglądu:
+Synchronize	Time		Synchronizuj
+Revert	Time		Przywróć
+Pacific	Time		Pacyfik
+Add	Time		Dodaj
+Date and time	Time		Data i czas
+about	Time		o
+Local time (Windows compatible)	Time		Czas lokalny (kompatybilne z Windowsem)
+Message receiving failed	Time		Odbiór wiadomości nie powiódł się
+Set time zone	Time		Ustaw strefę czasową
+Waiting for answer failed	Time		Oczekiwanie na odpowiedź nie powiodło się
+Hardware clock set to:	Time		Zegar sprzętowy ustawiony na:
+The following error occured while synchronizing:r\n%s	Time		Wystąpił błąd podczas synchronizacji:r\n%s
+Europe	Time		Europa
+Remove	Time		Usuń
+Time	Time		Czas
+Indian	Time		Indie
+Arctic	Time		Arktyka
+Time	System name		Czas
+America	Time		Ameryka
+Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date, autorstwa:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
+Reset	Time		Resetuj
+Synchronize at boot	Time		Synchronizuj przy rozruchu
+Antarctica	Time		Antarktyda
 <Other>	Time		<Inne>
 Current time:	Time		Aktualny czas:
-Etc	Time		Etc
-OK	Time		OK
-Preview time:	Time		Czas podglądu:
-Set time zone	Time		Ustaw strefę czasową
-Time	Time		Czas
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date, autorstwa:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
+Try all servers	Time		Wypróbuj wszystkie serwery
 Time zone	Time		Strefa czasowa
-\nNow: 	Time		\nTeraz:
-about	Time		o
+Synchronize again	Time		Synchronizuj ponownie
+Network time	Time		Czas z sieci
+Atlantic	Time		Atlantyk

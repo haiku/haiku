@@ -1,39 +1,39 @@
 1	polish	x-vnd.Be-PEPL	3107056777
-Address	People		Adres
-Cancel	People		Anuluj
+Edit	People		Edytuj
 City	People		Miasto
-Close	People		Zamknij
+none	Groups list		brak
 Company	People		Firma
-Contact information for a person.	Long mimetype description		Informacje kontaktowe osoby.
-Contact name	People		Imię i nazwisko
-Copy	People		Kopiuj
+Work phone	People		Telefon do pracy
+New person	People		Nowa osoba
+Select all	People		Zaznacz wszystkie
+File	People		Plik
 Could not create %s.	People		Nie można utworzyć %s.
 Country	People		Kraj
-Cut	People		Wytnij
-E-mail	People		E-mail
-Edit	People		Edytuj
-Fax	People		Faks
-File	People		Plik
+Close	People		Zamknij
 Group	People		Grupa
-Home phone	People		Telefon domowy
-Name	People		Imię i nazwisko
-New person	People		Nowa osoba
-New person…	People		Nowa osoba…
 Nickname	People		Pseudonim
-OK	People		OK
-Paste	People		Wklej
-Person	Short mimetype description		Osoba
 Quit	People		Wyjdź
-Redo	People		Powtórz
+Name	People		Imię i nazwisko
 Revert	People		Przywróć
-Save	People		Zapisz
-Save as…	People		Zapisz jako…
-Save changes before quitting?	People		Zapisać zmiany przed wyjściem?
-Select all	People		Zaznacz wszystkie
-Sorry	People		OK
-State	People		Województwo
-URL	People		Adres URL
 Undo	People		Cofnij
-Work phone	People		Telefon do pracy
+E-mail	People		E-mail
+Save changes before quitting?	People		Zapisać zmiany przed wyjściem?
+OK	People		OK
+Home phone	People		Telefon domowy
+Save as…	People		Zapisz jako…
+Redo	People		Powtórz
+Paste	People		Wklej
+Save	People		Zapisz
+Person	Short mimetype description		Osoba
+New person…	People		Nowa osoba…
+Address	People		Adres
+URL	People		Adres URL
+Sorry	People		OK
 Zip	People		Kod pocztowy
-none	Groups list		brak
+Contact information for a person.	Long mimetype description		Informacje kontaktowe osoby.
+Fax	People		Faks
+Contact name	People		Imię i nazwisko
+Cut	People		Wytnij
+Cancel	People		Anuluj
+State	People		Województwo
+Copy	People		Kopiuj

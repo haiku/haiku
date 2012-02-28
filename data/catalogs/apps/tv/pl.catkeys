@@ -1,26 +1,27 @@
-1	polish	x-vnd.Haiku.TV	2971561976
-Always on top	MainWin		Zawsze na wierzchu
+1	polish	x-vnd.Haiku.TV	1995288111
+TV	MainWin		Telewizja
 Channel	MainWin		Kanał
-DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
-Debug	MainWin		Debuguj
-Error, connecting to interface failed:\n\n	MainWin		Błąd, nie można podłączyć interfejsu:\n\n
-Error, interface is busy:\n\n	MainWin		Błąd, zajęty interfejs:\n\n
-Full screen	MainWin		Pełen ekran
+Settings…	MainWin		Ustawienia...
 Interface	MainWin		Interfejs
 Keep aspect ratio	MainWin		Utrzymaj proporcje
-Next channel	MainWin		Następny kanał
-No border	MainWin		Bez ramki
-No menu	MainWin		Bez menu
-None	MainWin		Puste
-OK	MainWin		OK
 Previous channel	MainWin		Poprzedni kanał
-Quit	MainWin		Wyjdź
-Scale to native size	MainWin		Zeskaluj do natywnego rozmiaru
 Settings	MainWin		Ustawienia
-Settings…	MainWin		Ustawienia...
-TV	MainWin		Telewizja
-force 544 x 576, display aspect 4:3	MainWin		wymuś 544 x 576, proporcje 4:3
-force 704 x 576, display aspect 4:3	MainWin		wymuś 704 x 576, proporcje 4:3
-force 720 x 576, display aspect 4:3	MainWin		wymuś 720 x 576, proporcje 4:3
-pixel aspect ratio	MainWin		Proporcje pikseli
+TV	System name		TV
+No border	MainWin		Bez ramki
+Always on top	MainWin		Zawsze na wierzchu
+OK	MainWin		OK
+Quit	MainWin		Wyjdź
+Full screen	MainWin		Pełen ekran
+Debug	MainWin		Debuguj
+Scale to native size	MainWin		Zeskaluj do natywnego rozmiaru
 unknown	MainWin		nieznany
+Next channel	MainWin		Następny kanał
+Error, interface is busy:\n\n	MainWin		Błąd, zajęty interfejs:\n\n
+None	MainWin		Puste
+force 704 x 576, display aspect 4:3	MainWin		wymuś 704 x 576, proporcje 4:3
+DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
+force 544 x 576, display aspect 4:3	MainWin		wymuś 544 x 576, proporcje 4:3
+pixel aspect ratio	MainWin		Proporcje pikseli
+No menu	MainWin		Bez menu
+Error, connecting to interface failed:\n\n	MainWin		Błąd, nie można podłączyć interfejsu:\n\n
+force 720 x 576, display aspect 4:3	MainWin		wymuś 720 x 576, proporcje 4:3

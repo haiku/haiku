@@ -1,35 +1,35 @@
 1	polish	x-vnd.Haiku-ProcessController	2207893417
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
-About ProcessController…	ProcessController		O ProcessController...
-Cancel	ProcessController		Anuluj
-Damned!	ProcessController		Cholera!
-Debug this thread!	ProcessController		Debuguj ten wątek!
-Debug thread	ProcessController		Debuguj wątek
-Do you really want to kill the team \"%s\"?	ProcessController		Czy na pewno chcesz zakończyć zespół \"%s\"?
-Error saving file	ProcessController		Błąd przy zapisywaniu pliku
-Gone teams…	ProcessController		Brakujące zespoły...
-Install in Deskbar	ProcessController		Zainstaluj w Deskbarze
-Kill this thread!	ProcessController		Zakończ ten wątek!
-Live in the Deskbar	ProcessController		Na bieżąco w Deskbarze
 Memory usage	ProcessController		Użycie pamięci
-New Terminal	ProcessController		Nowy terminal
-OK	ProcessController		OK
-Ok!	ProcessController		Ok!
-ProcessController is already installed in Deskbar.	ProcessController		ProcessController jest już zainstalowany w Deskbarze.
-Processor %d	ProcessController		Procesor %d
-Quit an application	ProcessController		Wyjdź z aplikacji
-Quit application	ProcessController		Zakończ aplikację
+Do you really want to kill the team \"%s\"?	ProcessController		Czy na pewno chcesz zakończyć zespół \"%s\"?
 Restart Deskbar	ProcessController		Zrestartuj Deskbar
-Restart Tracker	ProcessController		Zrestartuj Trackera
+Debug thread	ProcessController		Debuguj wątek
+This team is already gone…	ProcessController		Ten zespół nie jest już obecny...
+Error saving file	ProcessController		Błąd przy zapisywaniu pliku
+Your setting file could not be saved!\n(%s)	ProcessController		Twój plik ustawień nie może być zapisany!\n(%s)
+This thread is already gone…	ProcessController		Ten wątek nie jest już obecny...
+Cancel	ProcessController		Anuluj
 Run in window	ProcessController		Uruchom w oknie
+Processor %d	ProcessController		Procesor %d
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+ProcessController is already installed in Deskbar.	ProcessController		ProcessController jest już zainstalowany w Deskbarze.
+This is the last active processor...\nYou can't turn it off!	ProcessController		To jest ostatni aktywny procesor...\nNie możesz go wyłączyć!
+Quit application	ProcessController		Zakończ aplikację
+What do you want to do with the thread \"%s\"?	ProcessController		Co chcesz zrobić z wątkiem \"%s\"?
+Gone teams…	ProcessController		Brakujące zespoły...
+Restart Tracker	ProcessController		Zrestartuj Trackera
+Live in the Deskbar	ProcessController		Na bieżąco w Deskbarze
+Kill this thread!	ProcessController		Zakończ ten wątek!
+Debug this thread!	ProcessController		Debuguj ten wątek!
+New Terminal	ProcessController		Nowy terminal
+About ProcessController…	ProcessController		O ProcessController...
+Ok!	ProcessController		Ok!
+Quit an application	ProcessController		Wyjdź z aplikacji
+Install in Deskbar	ProcessController		Zainstaluj w Deskbarze
+Threads and CPU usage	ProcessController		Wątki oraz użycie CPU
+OK	ProcessController		OK
+Damned!	ProcessController		Cholera!
+Usage: %s [-deskbar]\n	ProcessController		Użycie: %s [-deskbar]\n
+Yes, kill this team!	ProcessController		Tak, zakończ ten zespół!
 System resources & caches…	ProcessController		Zasoby i bufory systemu...
 That's no Fun!	ProcessController		To nie zabawa!
-This is the last active processor...\nYou can't turn it off!	ProcessController		To jest ostatni aktywny procesor...\nNie możesz go wyłączyć!
-This team is already gone…	ProcessController		Ten zespół nie jest już obecny...
-This thread is already gone…	ProcessController		Ten wątek nie jest już obecny...
-Threads and CPU usage	ProcessController		Wątki oraz użycie CPU
-Usage: %s [-deskbar]\n	ProcessController		Użycie: %s [-deskbar]\n
-What do you want to do with the thread \"%s\"?	ProcessController		Co chcesz zrobić z wątkiem \"%s\"?
-Yes, kill this team!	ProcessController		Tak, zakończ ten zespół!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Możesz uruchomić ProcessController w oknie lub zainstalować go w Deskbarze.
-Your setting file could not be saved!\n(%s)	ProcessController		Twój plik ustawień nie może być zapisany!\n(%s)

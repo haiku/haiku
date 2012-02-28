@@ -1,17 +1,17 @@
 1	polish	x-vnd.Haiku-mount_server	1422362183
-Cancel	AutoMounter		Anuluj
-Could not unmount disk \"%s\":\n\t%s	AutoMounter		Nie można odmontować dysku \"%s\":\n\t%s
-Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Nie można odmontować dysku \"%s\":\n\t%s\n\nCzy wymusić odmontowanie?\n\nUwaga: Jeśli aplikacja zapisuje aktualnie dane na woluminie, odmontowanie go może skutkować utratą danych.\n
-Error mounting volume:\n\n%s	AutoMounter		Błąd montowania woluminu:\n\n%s
-Force unmount	AutoMounter		Wymuś odmontowanie
-It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Zalecne jest zamontowanie wszystkich dodatkowych dysków Haiku w trybie tylko do odczytu. Zapobiegnie to przypadkow utracie danych spowodowanej błędami w Haiku.
-Mount error	AutoMounter		Błąd montowania
 Mount read-only	AutoMounter		Montuj tylko do odczytu
-Mount read/write	AutoMounter		Montuj do odczytu/zapisu
+Error mounting volume:\n\n%s	AutoMounter		Błąd montowania woluminu:\n\n%s
+Unmount error	AutoMounter		Błąd odmontowywania
 Mount warning	AutoMounter		Ostrzeżenie montowania
+Mount read/write	AutoMounter		Montuj do odczytu/zapisu
 Mounting volume '%s'\n\n	AutoMounter		Montowanie woluminu '%s'\n\n
+Cancel	AutoMounter		Anuluj
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Nie można odmontować dysku \"%s\":\n\t%s\n\nCzy wymusić odmontowanie?\n\nUwaga: Jeśli aplikacja zapisuje aktualnie dane na woluminie, odmontowanie go może skutkować utratą danych.\n
+Could not unmount disk \"%s\":\n\t%s	AutoMounter		Nie można odmontować dysku \"%s\":\n\t%s
 Mounting volume <unnamed volume>\n\n	AutoMounter		Montowanie woluminu <nieznany wolumin>\n\n
 OK	AutoMounter		OK
-Previous volumes mounted.	AutoMounter		Poprzednie woluminy zamontowane.
 The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		System plików na tym woluminie nie jest systemem plików Haiku. Zalecane jest zamontowanie go w trybie tylko do odczytu. Zapobiegnie to przypadkow utracie danych spowodowanej błędami w Haiku.
-Unmount error	AutoMounter		Błąd odmontowywania
+Previous volumes mounted.	AutoMounter		Poprzednie woluminy zamontowane.
+Mount error	AutoMounter		Błąd montowania
+It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Zalecne jest zamontowanie wszystkich dodatkowych dysków Haiku w trybie tylko do odczytu. Zapobiegnie to przypadkow utracie danych spowodowanej błędami w Haiku.
+Force unmount	AutoMounter		Wymuś odmontowanie

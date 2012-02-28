@@ -1,4 +1,7 @@
-1	polish	x-vnd.Haiku-DeskCalc	1432606073
-Audio Feedback	CalcView		Wsparcie dźwiękowe
+1	polish	x-vnd.Haiku-DeskCalc	1916192649
+Compact	CalcView		Minimalny
+Scientific	CalcView		Naukowy
+DeskCalc	System name		DeskCalc
+Basic	CalcView		Prosty
 Enable Num Lock on startup	CalcView		Włącz Num Lock przy uruchamianiu
-Show keypad	CalcView		Pokaż klawiaturę
+Audio Feedback	CalcView		Wsparcie dźwiękowe

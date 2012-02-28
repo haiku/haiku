@@ -1,58 +1,58 @@
 1	polish	x-vnd.Haiku-ShowImage	2353125868
-%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekund
-Browse	Menus		Przeglądaj
-Cancel	ClosePrompt		Anuluj
-Clear selection	Menus		Wyczyść zaznaczenie
-Close	ClosePrompt		Zamknij
-Close	Menus		Zamknij
-Close document	ClosePrompt		Zamknij dokument
-Copy	Menus		Kopiuj
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nie można załadować obrazu! Prawdopodobnie niepoprawny plik lub nie istnieje translator.
-DPI:	PrintOptionsWindow		DPI:
-Edit	Menus		Edytuj
+Use as background…	Menus		Użyj jako tapety...
 File	Menus		Plik
-First page	Menus		Pierwsza strona
-Fit image to page	PrintOptionsWindow		Dopasuj obraz do strony
-Fit to window	Menus		Wpasuj w okno
-Flip left to right	Menus		Odbij z lewej na prawą
-Flip top to bottom	Menus		Odbij z góry na dół
+Slide delay	Menus		Opóźnienie
+Selection mode	Menus		Tryb zaznaczania
+Zoom in	Menus		Przybliż
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokument '%s' został zmieniony. Czy chcesz go zamknąć?
+Page setup…	Menus		Ustawienia strony...
+Print…	Menus		Drukuj...
+OK	SaveToFile		OK
+Previous page	Menus		Poprzednia strona
+View	Menus		Widok
 Full screen	Menus		Pełny ekran
 Go to page	Menus		Idź do strony
-Height: 	PrintOptionsWindow		Wysokość: 
-High-quality zooming	Menus		Zbliżenie wysokiej jakości
-Image	Menus		Obraz
-Job setup	PrintOptionsWindow		Ustawienia zadania
-Last page	Menus		Ostatnia strona
-Next file	Menus		Następny plik
-Next page	Menus		Następna strona
-OK	Alerts		OK
-OK	SaveToFile		OK
-Open…	Menus		Otwórz...
-Original size	Menus		Rozmiar oryginalny
-Page setup…	Menus		Ustawienia strony...
-Previous file	Menus		Poprzedni plik
-Previous page	Menus		Poprzednia strona
-Print options	PrintOptionsWindow		Ustawienia wydruku
-Print…	Menus		Drukuj...
-Progress monitor	ProgressWindow		Monitor postępu
-Quit	Menus		Wyjdź
-Resize to (in 1/72 inches):	PrintOptionsWindow		Ustaw rozmiar (w 1/72 cala):
-Rotate clockwise	Menus		Obróć zgodnie ze wskazówkami zegara
-Rotate counterclockwise	Menus		Obróć przeciwnie do ruchu wskazówek zegara
-Save as…	Menus		Zapisz jako...
-Select all	Menus		Zaznacz wszystko
-Selection mode	Menus		Tryb zaznaczania
-Show caption in full screen mode	Menus		Pokaż podpis w trybie pełnoekranowym
-Slide delay	Menus		Opóźnienie
-Slide show	Menus		Pokaż z opóźnieniem
-Stretch to window	Menus		Rozciągnij do okna
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokument '%s' (strona %d) został zmieniony. Czy chcesz go zamknąć?
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokument '%s' został zmieniony. Czy chcesz go zamknąć?
-The file '%s' could not be written.	SaveToFile		Nie można zapisać pliku '%s'.
-Undo	Menus		Cofnij
-Use as background…	Menus		Użyj jako tapety...
-View	Menus		Widok
-Width:	PrintOptionsWindow		Szerokość:
-Zoom factor in %:	PrintOptionsWindow		Współczynnik przybliżenia w %:
-Zoom in	Menus		Przybliż
 Zoom out	Menus		Oddal
+Quit	Menus		Wyjdź
+Rotate counterclockwise	Menus		Obróć przeciwnie do ruchu wskazówek zegara
+High-quality zooming	Menus		Zbliżenie wysokiej jakości
+Browse	Menus		Przeglądaj
+Edit	Menus		Edytuj
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nie można załadować obrazu! Prawdopodobnie niepoprawny plik lub nie istnieje translator.
+First page	Menus		Pierwsza strona
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokument '%s' (strona %d) został zmieniony. Czy chcesz go zamknąć?
+%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekund
+Close	Menus		Zamknij
+Close	ClosePrompt		Zamknij
+Undo	Menus		Cofnij
+Resize to (in 1/72 inches):	PrintOptionsWindow		Ustaw rozmiar (w 1/72 cala):
+Flip left to right	Menus		Odbij z lewej na prawą
+Show caption in full screen mode	Menus		Pokaż podpis w trybie pełnoekranowym
+DPI:	PrintOptionsWindow		DPI:
+Open…	Menus		Otwórz...
+Next file	Menus		Następny plik
+Clear selection	Menus		Wyczyść zaznaczenie
+Close document	ClosePrompt		Zamknij dokument
+Height: 	PrintOptionsWindow		Wysokość: 
+The file '%s' could not be written.	SaveToFile		Nie można zapisać pliku '%s'.
+Cancel	ClosePrompt		Anuluj
+Fit to window	Menus		Wpasuj w okno
+Print options	PrintOptionsWindow		Ustawienia wydruku
+Copy	Menus		Kopiuj
+Progress monitor	ProgressWindow		Monitor postępu
+Last page	Menus		Ostatnia strona
+Stretch to window	Menus		Rozciągnij do okna
+Previous file	Menus		Poprzedni plik
+Slide show	Menus		Pokaż z opóźnieniem
+Fit image to page	PrintOptionsWindow		Dopasuj obraz do strony
+Flip top to bottom	Menus		Odbij z góry na dół
+Select all	Menus		Zaznacz wszystko
+Zoom factor in %:	PrintOptionsWindow		Współczynnik przybliżenia w %:
+Width:	PrintOptionsWindow		Szerokość:
+Image	Menus		Obraz
+OK	Alerts		OK
+Rotate clockwise	Menus		Obróć zgodnie ze wskazówkami zegara
+Job setup	PrintOptionsWindow		Ustawienia zadania
+Original size	Menus		Rozmiar oryginalny
+Next page	Menus		Następna strona
+Save as…	Menus		Zapisz jako...

@@ -1,25 +1,25 @@
 1	polish	x-vnd.Haiku-Locale	2295953467
-12 hour	TimeFormatSettings		12 godzinny
-24 hour	TimeFormatSettings		24 godzinny
 Available languages	Locale Preflet Window		Dostępne języki
-Currency	TimeFormatSettings		Waluta
-Date	TimeFormatSettings		Data
-Defaults	Locale Preflet Window		Domyślne
-Formatting	Locale Preflet Window		Formatowanie
-Full format:	TimeFormatSettings		Pełny format:
-Language	Locale Preflet Window		Język
-Locale	Locale Preflet		Locale
-Locale	Locale Preflet Window		Ustawienia regionalne
-Long format:	TimeFormatSettings		Długi format:
-Medium format:	TimeFormatSettings		Średni format:
 Negative:	TimeFormatSettings		Negatywny:
-Numbers	TimeFormatSettings		Liczby
-OK	Locale Preflet Window		OK
-Positive:	TimeFormatSettings		Pozytywny:
-Preferred languages	Locale Preflet Window		Preferowane języki
-Revert	Locale Preflet Window		Przywróć
-Short format:	TimeFormatSettings		Krótki format:
-Time	TimeFormatSettings		Czas
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Nie można znaleźć żadnych języków! Nie możesz używać tego prefletu!
-Use month/day-names from preferred language	TimeFormatSettings		Użyj nazw dni i miesięcy z preferowanego języka
 already chosen	LanguageListView		już wybrano
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Nie można znaleźć żadnych języków! Nie możesz używać tego prefletu!
+Long format:	TimeFormatSettings		Długi format:
+Currency	TimeFormatSettings		Waluta
+Short format:	TimeFormatSettings		Krótki format:
+Language	Locale Preflet Window		Język
+Preferred languages	Locale Preflet Window		Preferowane języki
+Use month/day-names from preferred language	TimeFormatSettings		Użyj nazw dni i miesięcy z preferowanego języka
+Formatting	Locale Preflet Window		Formatowanie
+Locale	Locale Preflet Window		Ustawienia regionalne
+Numbers	TimeFormatSettings		Liczby
+24 hour	TimeFormatSettings		24 godzinny
+OK	Locale Preflet Window		OK
+Full format:	TimeFormatSettings		Pełny format:
+Defaults	Locale Preflet Window		Domyślne
+Revert	Locale Preflet Window		Przywróć
+Medium format:	TimeFormatSettings		Średni format:
+12 hour	TimeFormatSettings		12 godzinny
+Time	TimeFormatSettings		Czas
+Date	TimeFormatSettings		Data
+Positive:	TimeFormatSettings		Pozytywny:
+Locale	Locale Preflet		Locale

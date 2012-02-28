@@ -1,78 +1,78 @@
 1	polish	x-vnd.Haiku-StyledEdit	2399393207
+Paste	Menus		Wklej
+OK	LoadAlert		OK
+File	Menus		Plik
 ???	LoadAlert		???
-Align	Menus		Wyrównaj
-Black	Menus		Czarny
-Blue	Menus		Niebieski
-Bold	Menus		Pogrubienie
+Lines:	Statistics		Linie:
+Italic	Menus		Kursywa
+Left	Menus		Lewo
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Przywrócić ostatnią wersję \"%s\"? 
+Search backwards	FindandReplaceWindow		Szukaj wstecz
+Size	Menus		Rozmiar
+Save	QuitAlert		Zapisz
+Page setup…	Menus		Ustawienia strony...
+Print…	Menus		Drukuj...
 Can't undo	Menus		Nie można cofnąć
-Cancel	FindandReplaceWindow		Anuluj
-Cancel	QuitAlert		Anuluj
-Cancel	RevertToSavedAlert		Anuluj
+Save	Menus		Zapisz
+Replace with:	FindandReplaceWindow		Zamień na:
 Cancel	SaveAlert		Anuluj
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nie można przywrócić, nie znaleziono pliku: \"%s\".
 Case-sensitive	FindandReplaceWindow		Wielkość liter brana pod uwagę
-Center	Menus		Wyśrodkuj
-Characters:	Statistics		Znaków:
-Close	Menus		Zamknij
-Color	Menus		Kolor
-Copy	Menus		Kopiuj
-Cut	Menus		Wytnij
-Cyan	Menus		Cyjan
-Default	Open_and_SaveAsPanel		Domyślne
-Document	Menus		Dokument
-Document statistics	Statistics		Statystyki dokumentu
-Don't save	QuitAlert		Nie zapisuj
-Don't save	SaveAlert		Nie zapisuj
-Edit	Menus		Edytuj
-Encoding	Open_and_SaveAsPanel		Kodowanie
-Error loading \"%s\":\n\t%s	LoadAlert		Błąd podczas ładowania \"%s\":\n\t%s
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Błąd podczas otwierania \"%s\":\n\tFormat nieobsługiwany
-Error saving \"%s\":\n%s	SaveAlert		Błąd podczas zapisywania \"%s\":\n%s
-File	Menus		Plik
-Find	FindandReplaceWindow		Znajdź
-Find again	Menus		Znajdź następne
-Find selection	Menus		Znajdź zaznaczenie
-Find:	FindandReplaceWindow		Znajdź:
-Find…	Menus		Znajdź…
-Font	Menus		Czcionka
 Green	Menus		Zielony
-Italic	Menus		Kursywa
-Left	Menus		Lewo
-Lines:	Statistics		Linie:
+Revert to saved…	Menus		Przywróć zapisane…
+Yellow	Menus		Żółty
+Replace in all windows	FindandReplaceWindow		Zamień we wszystkich oknach
+Wrap lines	Menus		Zawijaj wiersze
+Quit	Menus		Wyjdź
+Document statistics	Statistics		Statystyki dokumentu
+Cancel	RevertToSavedAlert		Anuluj
+Document	Menus		Dokument
+Save changes to the document \"%s\"? 	QuitAlert		Zapisać zmiany w dokumencie \"%s\"? 
+Edit	Menus		Edytuj
+Font	Menus		Czcionka
+Replace all	FindandReplaceWindow		Zamień wszystkie
+Statistics…	Menus		Statystyki...
+Default	Open_and_SaveAsPanel		Domyślne
+Cancel	FindandReplaceWindow		Anuluj
+Close	Menus		Zamknij
+Save	SaveAlert		Zapisz
+Words:	Statistics		Słów:
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Błąd podczas otwierania \"%s\":\n\tFormat nieobsługiwany
+OK	RevertToSavedAlert		OK
+Don't save	QuitAlert		Nie zapisuj
+Align	Menus		Wyrównaj
+Color	Menus		Kolor
+Red	Menus		Czerwony
+Open…	Menus		Otwórz...
+Center	Menus		Wyśrodkuj
+Blue	Menus		Niebieski
+Cyan	Menus		Cyjan
+OK	Statistics		OK
 Magenta	Menus		Magenta
 New	Menus		Nowy
-OK	LoadAlert		OK
-OK	RevertToSavedAlert		OK
-OK	SaveAlert		OK
-OK	Statistics		OK
-Open…	Menus		Otwórz...
-Page setup…	Menus		Ustawienia strony...
-Paste	Menus		Wklej
-Print…	Menus		Drukuj...
-Quit	Menus		Wyjdź
-Red	Menus		Czerwony
-Redo typing	QuitAlert		Powtórz pisanie
-Replace	FindandReplaceWindow		Zamień
-Replace all	FindandReplaceWindow		Zamień wszystkie
-Replace in all windows	FindandReplaceWindow		Zamień we wszystkich oknach
-Replace with:	FindandReplaceWindow		Zamień na:
-Replace…	Menus		Zastąp…
-Revert to saved…	Menus		Przywróć zapisane…
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Przywrócić ostatnią wersję \"%s\"? 
-Right	Menus		Prawo
-Save	Menus		Zapisz
-Save	QuitAlert		Zapisz
-Save	SaveAlert		Zapisz
-Save as…	Menus		Zapisz jako...
-Save changes to the document \"%s\"? 	QuitAlert		Zapisać zmiany w dokumencie \"%s\"? 
-Search backwards	FindandReplaceWindow		Szukaj wstecz
-Select all	Menus		Zaznacz wszystko
-Size	Menus		Rozmiar
-Statistics…	Menus		Statystyki...
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Ten plik jest oznaczony jako tylko do odczytu. Zapisać zmiany w dokumencie \"%s\"? 
-Undo typing	QuitAlert		Cofnij pisanie
-Untitled 	StyledEditWindow		Bez tytułu
-Words:	Statistics		Słów:
-Wrap lines	Menus		Zawijaj wiersze
 Wrap-around search	FindandReplaceWindow		Szukanie owijające
-Yellow	Menus		Żółty
+Bold	Menus		Pogrubienie
+Find selection	Menus		Znajdź zaznaczenie
+Find:	FindandReplaceWindow		Znajdź:
+Error saving \"%s\":\n%s	SaveAlert		Błąd podczas zapisywania \"%s\":\n%s
+Copy	Menus		Kopiuj
+Cut	Menus		Wytnij
+Replace	FindandReplaceWindow		Zamień
+Find again	Menus		Znajdź następne
+Cancel	QuitAlert		Anuluj
+Find…	Menus		Znajdź…
+Select all	Menus		Zaznacz wszystko
+Don't save	SaveAlert		Nie zapisuj
+Error loading \"%s\":\n\t%s	LoadAlert		Błąd podczas ładowania \"%s\":\n\t%s
+Undo typing	QuitAlert		Cofnij pisanie
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Ten plik jest oznaczony jako tylko do odczytu. Zapisać zmiany w dokumencie \"%s\"? 
+Black	Menus		Czarny
+Untitled 	StyledEditWindow		Bez tytułu
+OK	SaveAlert		OK
+Find	FindandReplaceWindow		Znajdź
+Encoding	Open_and_SaveAsPanel		Kodowanie
+Characters:	Statistics		Znaków:
+Save as…	Menus		Zapisz jako...
+Redo typing	QuitAlert		Powtórz pisanie
+Replace…	Menus		Zastąp…
+Right	Menus		Prawo

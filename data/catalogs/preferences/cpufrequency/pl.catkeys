@@ -1,19 +1,20 @@
-1	polish	x-vnd.Haiku-CPUFrequencyPref	3974849433
-CPU frequency status view	CPU Frequency View		Widok częstotliwości taktowania procesora
-CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPUFrequency\n\tnapisane przez Clemensa Zeidlera\n\tCopyright 2009, Haiku, Inc.\n
-Defaults	Pref Window		Przywróć ustawienia domyślne
-Dynamic performance	Status view		Dynamicznie dopasowana wydajność
-Dynamic stepping	CPU Frequency View		Dynamiczne skalowanie
-High performance	Status view		Wysoka wydajność
-Install replicant into Deskbar	CPU Frequency View		Zainstaluj replikant na Panelu Pulpitu
-Integration time [ms]: 	CPU Frequency View		Czas integracji (w milisekundach):
-Launching the CPU frequency preflet failed.\n\nError: 	Status view		Uruchomienie prefletu częstotliwości procesora zakończyło się niepowodzeniem.\n\nBłąd: 
-Low energy	Status view		Oszczędna
+1	polish	x-vnd.Haiku-CPUFrequencyPref	3079996868
 Ok	Status view		OK
-Open Speedstep preferences…	Status view		Otwórz ustawienia Speedstep…
-Quit	Status view		Zamknij
-Revert	Pref Window		Przywróć poprzednie ustawienia
+CPU frequency status view	CPU Frequency View		Widok częstotliwości taktowania procesora
 Set state	Status view		Ustaw stan
-Step up by CPU usage	Color Step View		Ustawiaj taktowanie w zależności od obciążenia procesora
+Defaults	Pref Window		Przywróć ustawienia domyślne
+Install replicant into Deskbar	CPU Frequency View		Zainstaluj replikant na Panelu Pulpitu
+Quit	Status view		Zamknij
+High performance	Status view		Wysoka wydajność
 Stepping policy	CPU Frequency View		Polityka skalowania procesora
+Dynamic performance	Status view		Dynamicznie dopasowana wydajność
+Step up by CPU usage	Color Step View		Ustawiaj taktowanie w zależności od obciążenia procesora
+Dynamic stepping	CPU Frequency View		Dynamiczne skalowanie
 Stepping policy: 	CPU Frequency View		Polityka skalowania:
+Integration time [ms]: 	CPU Frequency View		Czas integracji (w milisekundach):
+Open Speedstep preferences…	Status view		Otwórz ustawienia Speedstep…
+Revert	Pref Window		Przywróć poprzednie ustawienia
+Low energy	Status view		Oszczędna
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Uruchomienie prefletu częstotliwości procesora zakończyło się niepowodzeniem.\n\nBłąd: 
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPUFrequency\n\tnapisane przez Clemensa Zeidlera\n\tCopyright 2009, Haiku, Inc.\n
+CPUFrequency	System name		Częstotliwość procesora

@@ -1,33 +1,33 @@
 1	polish	x-vnd.Haiku.TextSearch	1180598828
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME nie mógł otworzyć jednego lub więcej folderów.
 %s: Not enough room to escape the filename.	Grepper		%s: Nie wystarczająca ilość miejsca do zaeskejpowania nazwy pliku.
-%s: There was a problem running grep.	Grepper		%s: Pojawił się problem przy uruchamianiu grep.
-Actions	GrepWindow		Akcje
-Cancel	GrepWindow		Anuluj
-Case-sensitive	GrepWindow		Wielkość liter ma znaczenie
-Close	GrepWindow		Zamknij
-Copy text to clipboard	GrepWindow		Kopiuj tekst do schowka
-Encoding	GrepWindow		Kodowanie
-Escape search text	GrepWindow		Wyszukiwanie znaków wyjścia
-File	GrepWindow		Plik
-Follow symbolic links	GrepWindow		Podążaj za linkami symbolicznymi
-History	GrepWindow		Historia
-Look in sub-folders	GrepWindow		Szukaj w sub-folderach
-New window	GrepWindow		Nowe okno
-OK	GrepWindow		OK
-Open files in Pe	GrepWindow		Otwórz pliki w Pe
-Open selection	GrepWindow		Otwarte zaznaczenie
-Please select the files you wish to have selected for you in Tracker.	GrepWindow		Wybierz pliki które chcesz by zostały zaznaczone na Trackerze
-Please select the files you wish to keep searching.	GrepWindow		Wybierz pliki dla których chcesz kontynuować wyszukiwanie.
-Quit	GrepWindow		Wyjdź
-Search	GrepWindow		Szukaj
-Select all	GrepWindow		Zaznacz wszystko
-Set target…	GrepWindow		Ustaw cel...
-Settings	GrepWindow		Ustawienia
-Show files in Tracker	GrepWindow		Pokaż pliki na Trackerze
-Show lines	GrepWindow		Pokaż linie
-Skip folders starting with a dot	GrepWindow		Pomiń foldery zaczynające się od kropki
-Text files only	GrepWindow		Tylko pliki tekstowe
-TextSearch	GrepWindow		TextSearch
-The unselected files will be removed from the list.	GrepWindow		Niezaznaczone pliki zostaną usunięte z listy.
 Trim to selection	GrepWindow		Zredukuj do zawartości
+Follow symbolic links	GrepWindow		Podążaj za linkami symbolicznymi
+Close	GrepWindow		Zamknij
+Cancel	GrepWindow		Anuluj
+The unselected files will be removed from the list.	GrepWindow		Niezaznaczone pliki zostaną usunięte z listy.
+Set target…	GrepWindow		Ustaw cel...
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Wybierz pliki które chcesz by zostały zaznaczone na Trackerze
+Open files in Pe	GrepWindow		Otwórz pliki w Pe
+Copy text to clipboard	GrepWindow		Kopiuj tekst do schowka
+Settings	GrepWindow		Ustawienia
+Select all	GrepWindow		Zaznacz wszystko
+OK	GrepWindow		OK
+Skip folders starting with a dot	GrepWindow		Pomiń foldery zaczynające się od kropki
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME nie mógł otworzyć jednego lub więcej folderów.
+Escape search text	GrepWindow		Wyszukiwanie znaków wyjścia
+Search	GrepWindow		Szukaj
+Open selection	GrepWindow		Otwarte zaznaczenie
+Look in sub-folders	GrepWindow		Szukaj w sub-folderach
+Actions	GrepWindow		Akcje
+File	GrepWindow		Plik
+Encoding	GrepWindow		Kodowanie
+History	GrepWindow		Historia
+%s: There was a problem running grep.	Grepper		%s: Pojawił się problem przy uruchamianiu grep.
+New window	GrepWindow		Nowe okno
+Please select the files you wish to keep searching.	GrepWindow		Wybierz pliki dla których chcesz kontynuować wyszukiwanie.
+TextSearch	GrepWindow		TextSearch
+Quit	GrepWindow		Wyjdź
+Show files in Tracker	GrepWindow		Pokaż pliki na Trackerze
+Case-sensitive	GrepWindow		Wielkość liter ma znaczenie
+Text files only	GrepWindow		Tylko pliki tekstowe
+Show lines	GrepWindow		Pokaż linie

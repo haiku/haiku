@@ -1,28 +1,27 @@
-1	polish	x-vnd.Haiku-LaunchBox	1713579432
-Add button here	LaunchBox		Dodaj przycisk tutaj
-Auto-raise	LaunchBox		Auto-raise
-Bummer	LaunchBox		Bummer
-Cancel	LaunchBox		Anuluj
-Clear button	LaunchBox		Wyczyść przycisk
-Clone	LaunchBox		Klonuj
-Close	LaunchBox		Zamknij
-Failed to launch 'something',error in Pad data.	LaunchBox		Błąd przy uruchamianiu 'something',błąd w danych Pada.
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Błąd przy wysyłaniu komendy 'open folder' do Trackera.\n\nBłąd: 
-Horizontal layout	LaunchBox		Układ poziomy
-Icon size	LaunchBox		Rozmair ikony
-Ignore double-click	LaunchBox		Ignoruj dwuklik
-Name Panel	LaunchBox		Panel nazeweniczy
+1	polish	x-vnd.Haiku-LaunchBox	2733406748
 New	LaunchBox		Nowy
-OK	LaunchBox		OK
-Pad	LaunchBox		Pad
-Pad 1	LaunchBox		Pad 1
-Quit	LaunchBox		Wyjdź
-Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Na pewno zamknąć ten pad?\n(Pad nie zostanie zapamiętany.)
-Remove button	LaunchBox		Usuń przycisk
 Set description…	LaunchBox		Ustaw opis...
+Vertical layout	LaunchBox		Układ pionowy
+OK	LaunchBox		OK
+Pad 1	LaunchBox		Pad 1
+last chance	LaunchBox		ostatnia szansa
+Quit	LaunchBox		Wyjdź
+Clear button	LaunchBox		Wyczyść przycisk
+Ignore double-click	LaunchBox		Ignoruj dwuklik
+Auto-raise	LaunchBox		Auto-raise
 Show on all workspaces	LaunchBox		Pokaż na wszystkich przestrzeniach roboczych
 Show window border	LaunchBox		Pokaż obramowanie okna
-Vertical layout	LaunchBox		Układ pionowy
+Pad	LaunchBox		Pad
+Icon size	LaunchBox		Rozmair ikony
+Bummer	LaunchBox		Bummer
+Cancel	LaunchBox		Anuluj
+Remove button	LaunchBox		Usuń przycisk
+Horizontal layout	LaunchBox		Układ poziomy
+Name Panel	LaunchBox		Panel nazeweniczy
+Add button here	LaunchBox		Dodaj przycisk tutaj
+Close	LaunchBox		Zamknij
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Błąd przy wysyłaniu komendy 'open folder' do Trackera.\n\nBłąd: 
 You can drag an icon here.	LaunchBox		Możesz upuścić ikonę w tym miejscu.
-last chance	LaunchBox		ostatnia szansa
+Clone	LaunchBox		Klonuj
 launch popup	LaunchBox		uruchom pop-up
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Na pewno zamknąć ten pad?\n(Pad nie zostanie zapamiętany.)

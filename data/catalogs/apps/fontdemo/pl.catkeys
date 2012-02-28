@@ -1,0 +1,11 @@
+1	polish	x-vnd.Haiku-FontDemo	2720318319
+Size: 50	ControlView		Rozmiar: 50
+Haiku, Inc.	FontDemoView		Haiku, Inc.
+Rotation: %d	ControlView		Obrót: %d
+Font:	ControlView		Font:
+Rotation: 0	ControlView		Obrót: 0
+Drawing mode:	ControlView		Tryb rysowania:
+FontDemo	FontDemo		FontDemo
+Haiku, Inc.	ControlView		Haiku, Inc.
+Text:	ControlView		Tekst:
+Antialiased text	ControlView		Wygładzany tekst

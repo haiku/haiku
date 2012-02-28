@@ -1,36 +1,48 @@
-1	german	x-vnd.Haiku-MediaPlayer	138551800
+1	german	x-vnd.Haiku-MediaPlayer	192006282
+raw audio	MediaPlayer-InfoWin		Raw-Audio
+Location	MediaPlayer-InfoWin		Ort
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikanisch)
+%d kHz	MediaPlayer-InfoWin		%d kHz
 Stream settings	MediaPlayer-Main		Stream-Einstellungen
 <unknown>	PlaylistItem-album		<unbekannt>
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Die Datei '%filename' konnte nicht geöffnet werden.\n\n
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Bedienelemente im Vollbildmodus vergrößern
+Video	MediaPlayer-InfoWin		Video
 Subtitle size:	MediaPlayer-SettingsWindow		Untertitelgröße:
 Save Playlist	MediaPlayer-PlaylistWindow		Playliste speichern
+<no media>	MediaPlayer-InfoWin		<keine Mediadatei>
+(not supported)	MediaPlayer-InfoWin		(nicht unterstützt)
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Keine der gewählten Dateien scheinen Mediadateien zu sein.
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Speichern der Playliste fehlgeschlagen.\n\nFehler:
 New player…	MediaPlayer-Main		Neuer Player…
 100% scale	MediaPlayer-Main		100% Zoom
 Subtitle placement:	MediaPlayer-SettingsWindow		Untertitelposition:
 Close	MediaPlayer-Main		Schließen
+Display Mode	MediaPlayer-InfoWin		Anzeigemodus
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Einige Dateien konnten nicht in den Papierkorb verschoben werden.
+<unknown>	MediaPlayer-InfoWin		<unbekannt>
 Open	MediaPlayer-Main		Öffnen
 Next	MediaPlayer-Main		Nächster
 OK	MediaPlayer-SettingsWindow		OK
 Track %d	MediaPlayer-Main		Track %d
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2,35 : 1 (Cinemascope)
+Display mode	MediaPlayer-InfoWin		Anzeigemodus
 Medium	MediaPlayer-SettingsWindow		Mittel
 Close	MediaPlayer-PlaylistWindow		Schließen
+Stereo	MediaPlayer-InfoWin		Stereo
 Open…	MediaPlayer-PlaylistWindow		Öffnen…
 Toggle mute.	MediaPlayer-Main		Stumm umschalten.
 Undo	MediaPlayer-PlaylistWindow		Rückgängig
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Hardware-Overlay verwenden, falls verfügbar
 File info…	MediaPlayer-Main		Datei Info…
 Pause playback.	MediaPlayer-Main		Wiedergabe anhalten.
+Overlay	MediaPlayer-InfoWin		Overlay
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Eintrag entfernen
 Close window after playing audio	MediaPlayer-SettingsWindow		Fenster nach Audiowiedergabe schließen
 Full volume	MediaPlayer-SettingsWindow		Volle Lautstärke
 Drop files to play	MediaPlayer-Main		Dateien zum Abspielen hier fallen lassen
 TogglePlaying	MediaPlayer-Main		Abspielen umschalten
+Copyright	MediaPlayer-InfoWin		Copyright
 Cancel	MediaPlayer-SettingsWindow		Abbrechen
 Loop audio	MediaPlayer-SettingsWindow		Audio in Endlosschleife abspielen
 Nothing to Play	MediaPlayer-Main		Nichts abzuspielen
@@ -41,6 +53,7 @@ Start playing.	MediaPlayer-Main		Starte Wiedergabe.
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Für dieses Format ist kein Decoder installiert oder er hat Probleme mit der dieser Version des Formats.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Eintrag importieren
 Gets the URI of the currently playing item.	MediaPlayer-Main		Fragt die URI des gerade abgespielten Elements ab.
+%d Channels	MediaPlayer-InfoWin		%d Kanäle
 400% scale	MediaPlayer-Main		400% Zoom
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Speichern der Playliste fehlgeschlagen:\n\nFehler:
 Move Entries	MediaPlayer-MovePLItemsCmd		Einträge verschieben
@@ -48,14 +61,17 @@ Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Fehler beim Verschieben in d
 Audio	MediaPlayer-Main		Audio
 Open Playlist	MediaPlayer-PlaylistWindow		Playliste öffnen
 MediaPlayer	System name		Media-Player
+%f fps	MediaPlayer-InfoWin		%f Bilder/s
 OK	MediaPlayer-Main		OK
 Settings…	MediaPlayer-Main		Einstellungen…
 MediaPlayer settings	MediaPlayer-SettingsWindow		Media-Player-Einstellungen
+h	MediaPlayer-InfoWin	Hours	h
 Select all	MediaPlayer-PlaylistWindow		Alles auswählen
 Move Entry	MediaPlayer-MovePLItemsCmd		Eintrag verschieben
 Open	MediaPlayer-PlaylistWindow		Öffnen
 Stop playing.	MediaPlayer-Main		Wiedergabe stoppen.
-Error: 	MediaPlayer-RemovePLItemsCmd		Fehler:
+Error: 	MediaPlayer-RemovePLItemsCmd		Fehler: 
+Audio	MediaPlayer-InfoWin		Audio
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interner Fehler (falsche Nachrichtenstruktur). Speichern der Playliste fehlgeschlagen.
 Skip to the previous track.	MediaPlayer-Main		Zum vorigen Track springen.
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		Es ist ein interner Fehler in %app% aufgetreten. Die Datei konnte nicht geöffnet werden.
@@ -82,6 +98,7 @@ Attributes	MediaPlayer-Main		Attribute
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Es konnten nicht alle Dateien in den Papierkorb verschoben werden.
 <untitled>	PlaylistItem-title		<unbenannt>
 Track	Audio Track Menu		Track
+unknown format	MediaPlayer-InfoWin		unbekanntes Format
 <nothing to redo>	MediaPlayer-PlaylistWindow		<nichts zu wiederholen>
 Skip to the next track.	MediaPlayer-Main		Zum nächsten Track springen.
 Play	MediaPlayer-Main		Wiedergabe
@@ -92,7 +109,9 @@ Aspect ratio	MediaPlayer-Main		Seitenverhältnis
 Error: 	MediaPlayer-Main		Fehler:
 Large	MediaPlayer-SettingsWindow		Groß
 Bottom of video	MediaPlayer-SettingsWindow		Unten im Video
+DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
 Stop	MediaPlayer-Main		Stopp
+raw video	MediaPlayer-InfoWin		RAW-Video
 Volume of background clips	MediaPlayer-SettingsWindow		Wiedergabe im Hintergrund
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interner Fehler (Speicher reicht nicht aus). Speichern der Playliste fehlgeschlagen.
 Hide interface	MediaPlayer-Main		Oberfläche ausblenden
@@ -102,6 +121,8 @@ Move file to Trash	MediaPlayer-PlaylistWindow		In Papierkorb verschieben
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		Stumm
 Toggle pause/play.	MediaPlayer-Main		Pause/Wiedergabe umschalten.
+Haiku Media Kit: 	MediaPlayer-InfoWin		Haiku Media Kit: 
+min	MediaPlayer-InfoWin	Minutes	min
 Small	MediaPlayer-SettingsWindow		Klein
 Randomize	MediaPlayer-PlaylistWindow		Zufällige Reihenfolge
 Off	Subtitles menu		Aus
@@ -123,7 +144,9 @@ Always on top	MediaPlayer-Main		Immer im Vordergrund
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Eintrag in den Papierkorb verschieben
 Save	MediaPlayer-Main		Speichern
 <nothing to undo>	MediaPlayer-PlaylistWindow		<nichts rückgängig zu machen>
+Mono	MediaPlayer-InfoWin		Mono
 Save	MediaPlayer-PlaylistWindow		Speichern
+%d Bit	MediaPlayer-InfoWin		%d Bit
 Remove	MediaPlayer-PlaylistWindow		Entfernen
 Full screen	MediaPlayer-Main		Vollbild
 Open file…	MediaPlayer-Main		Öffne Datei…

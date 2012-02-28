@@ -1,25 +1,25 @@
 1	polish	x-vnd.haiku-screenshot	731699482
-Artwork folder	ScreenshotWindow		Folder na obrazki
-Cancel	ScreenshotWindow		Anuluj
-Capture active window	ScreenshotWindow		Przechwyć aktywne okno
-Choose folder	ScreenshotWindow		Wybierz folder
-Choose folder...	ScreenshotWindow		Wybierz folder...
-Copy to clipboard	ScreenshotWindow		Kopiuj do schowka
-Delay:	ScreenshotWindow		Opóźnienie:
-Desktop	ScreenshotWindow		Pulpit
-Home folder	ScreenshotWindow		Folder domowy
-Include mouse pointer	ScreenshotWindow		Pokaż wskaźnik myszy
-Include window border	ScreenshotWindow		Dołącz obramowanie okna
-Name:	ScreenshotWindow		Nazwa:
-New screenshot	ScreenshotWindow		Nowy zrzut ekranu
-Please select	ScreenshotWindow		Proszę wybrać
-Save	ScreenshotWindow		Zapisz
-Save as:	ScreenshotWindow		Zapisz jako:
-Save in:	ScreenshotWindow		Zapisz w:
-Select	ScreenshotWindow		Wybierz
-Settings…	ScreenshotWindow		Ustawienia...
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Plik już istnieje.\n Jesteś pewien, że chcesz go nadpisać?
-Translator Settings	ScreenshotWindow		Ustawienia Translatora
-overwrite	ScreenshotWindow		nadpisz
-screenshot	Screenshot	Base filename of screenshot files	screenshot
 seconds	ScreenshotWindow		sekund
+Desktop	ScreenshotWindow		Pulpit
+Include window border	ScreenshotWindow		Dołącz obramowanie okna
+Select	ScreenshotWindow		Wybierz
+Capture active window	ScreenshotWindow		Przechwyć aktywne okno
+Cancel	ScreenshotWindow		Anuluj
+Name:	ScreenshotWindow		Nazwa:
+Choose folder	ScreenshotWindow		Wybierz folder
+Save	ScreenshotWindow		Zapisz
+Choose folder...	ScreenshotWindow		Wybierz folder...
+Please select	ScreenshotWindow		Proszę wybrać
+Save as:	ScreenshotWindow		Zapisz jako:
+Copy to clipboard	ScreenshotWindow		Kopiuj do schowka
+Save in:	ScreenshotWindow		Zapisz w:
+screenshot	Screenshot	Base filename of screenshot files	screenshot
+New screenshot	ScreenshotWindow		Nowy zrzut ekranu
+Artwork folder	ScreenshotWindow		Folder na obrazki
+Home folder	ScreenshotWindow		Folder domowy
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Plik już istnieje.\n Jesteś pewien, że chcesz go nadpisać?
+Settings…	ScreenshotWindow		Ustawienia...
+overwrite	ScreenshotWindow		nadpisz
+Delay:	ScreenshotWindow		Opóźnienie:
+Include mouse pointer	ScreenshotWindow		Pokaż wskaźnik myszy
+Translator Settings	ScreenshotWindow		Ustawienia Translatora

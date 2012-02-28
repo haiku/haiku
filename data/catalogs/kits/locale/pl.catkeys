@@ -1,13 +1,13 @@
 1	polish	x-vnd.Haiku-libbe	1624661606
-%.2f TiB	StringForSize		%.2f TiB
+Close	AboutWindow		Zamknij
 %3.2f GiB	StringForSize		%3.2f GiB
+Written by:	AboutWindow		Napisany przez: 
 %3.2f KiB	StringForSize		%3.2f KiB
-%3.2f MiB	StringForSize		%3.2f MiB
 %d bytes	StringForSize		%d bajtów
 About…	AboutWindow		O...
-Blue:	ColorControl		Niebieski:
-Close	AboutWindow		Zamknij
-Copyright © %years% Haiku, Inc.	AboutWindow		Chroniony prawem autorskim © %years% Haiku, Inc.
 Green:	ColorControl		Zielony:
+Copyright © %years% Haiku, Inc.	AboutWindow		Chroniony prawem autorskim © %years% Haiku, Inc.
+%.2f TiB	StringForSize		%.2f TiB
 Red:	ColorControl		Czerwony:
-Written by:	AboutWindow		Napisany przez: 
+%3.2f MiB	StringForSize		%3.2f MiB
+Blue:	ColorControl		Niebieski:

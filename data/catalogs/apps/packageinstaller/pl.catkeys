@@ -1,0 +1,53 @@
+1	polish	x-vnd.Haiku-PackageInstaller	1001018750
+Install to:	PackageView		Zainstaluj w:
+OK	PackageView		OK
+Accept	PackageTextViewer		Akceptuj
+Continue	PackageInstall		Kontynuuj
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Żądany pakiet nie zainstalował się poprawnie w Twoim systemie. To może być problem ze ścieżkami docelowymi plików z pakietu. Proszę skontaktuj się z dystrybutorem paczki.
+Image not loaded correctly	PackageImageViewer		Obraz nie załadował się poprawnie
+No package selected.	PackageInfo		Żaden pakiet nie został wybrany.
+Install	PackageView		Instaluj
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Dany pakiet jest już zainstalowany w Twoim systemie. Czy chcesz by odinstalować istniejącą paczkę i kontynuować instalację?
+Do you want to remember this decision for the rest of this installation?\n	PackageView		Czy chcesz zapamiętać tę decyzję do końca instalacji?\n
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Prawdopodobnie pliki w pakiecie mają nieprawidłowy rozmiar. Pakiet może być uszkodzony, lub został zmodyfikowany po jego utworzeniu. Czy nadal chcesz kontynuować?
+Error while installing the package\n	PackageView		Błąd instalacji pakietu\n
+Disclaimer	PackageTextViewer		Oświadczenie
+%.1f GiB	PackageView		%.1f GiB
+The installation of the package has been aborted.	PackageView		Instalacja pakietu została przerwana.
+Done	PackageInstall		Gotowe
+All existing files will be replaced?	PackageView		Czy zastąpić wszystkie pliki?
+Preparing package	PackageInstall		Przygotowywanie pakietu
+No package available.	PackageInfo		Brak dostępnych pakietów.
+none	PackageView		brak
+Stop	PackageStatus		Stop
+Other…	PackageView		Inne...
+No installation type selected	PackageView		Sposób instalacji nie został wybrany
+Installing files and folders	PackageInstall		Instalowanie plików i folderów
+Package installer	PackageView		Instalator pakietów
+Skip all	PackageView		Pomiń wszystkie
+Running post-installation scripts	PackageInstall		Uruchamianie poinstalacyjnych skryptów
+%llu bytes	PackageView		%llu bajtów
+Skip	PackageView		Pomiń
+%.1f MiB	PackageView		%.1f MiB
+The package you requested has been successfully installed on your system.	PackageView		Żądany pakiet został poprawnie zainstalowany w Twoim systemie.
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Błąd! \"%s\" niepoprawna ścieżka.\n
+Installation type:	PackageView		Typ instalacji:
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Błąd (%s)! Nie można otworzyć \"%s\".\n
+Finishing installation	PackageInstall		Finalizacja instalacji
+Installing package	PackageStatus		Instalacja pakietu
+Ask again	PackageView		Zapytaj ponownie
+Abort	PackageView		Przerwij
+Replace all	PackageView		Zastąp wszystkie
+Decline	PackageTextViewer		Odmów
+The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Plik o nazwie '%s' istnieje już w podanej ścieżce.\nZastąpić ten plik plikiem z paczki, czy pominąć go?
+All existing files will be skipped?	PackageView		Czy pominąć wszystkie pliki?
+Continue	PackageInfo		Kontynuuj
+%.1f KiB	PackageView		%.1f KiB
+(%s free)	PackageView		(%s wolne)
+Abort	PackageInfo		Przerwij
+PackageInstaller	System name		InstalatorPakietów
+Abort	PackageInstall		Przerwij
+Continue	PackageTextViewer		Kontynuuj
+Replace	PackageView		Zastąp
+Installation progress	PackageView		Postęp instalacji
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Plik pakietu jest nie do odczytania.\nJedną z możliwości jest to, że żądany plik nie jest poprawnym pakietem .pkg systemu BeOS.

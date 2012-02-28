@@ -1,32 +1,18 @@
-1	polish	x-vnd.Haiku-Expander	1989232919
-Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Czy na pewno chcesz przerwać rozpakowywanie?\nRozpakowane dane będą najprawdopodobniej niekompletne.
-Cancel	ExpanderWindow		Anuluj
-Close	ExpanderMenu		Zamknij
-Continue	ExpanderWindow		Kontynuuj
-Destination	ExpanderWindow		Cel
-Error when expanding archive	ExpanderWindow		Wystąpił błąd podczas rozpakowywania archiwum
+1	polish	x-vnd.Haiku-Expander	2874834143
 Expand	ExpanderMenu		Rozpakuj
-Expand	ExpanderWindow		Rozpakuj
-Expander: Choose destination	DirectoryFilePanel		Expander: Wybierz folder docelowy
-Expander: Open	ExpanderWindow		Expander: Otwórz
-File	ExpanderMenu		Plik
-File expanded	ExpanderWindow		Plik rozpakowany
-Hide contents	ExpanderWindow		Ukryj zawartość
-Select	DirectoryFilePanel		Wybierz
-Select '%s'	DirectoryFilePanel		Wybierz '%s'
-Select current	DirectoryFilePanel		Wybierz obecny
 Set destination…	ExpanderMenu		Wybierz miejsce docelowe…
-Set source…	ExpanderMenu		Ustaw źródło…
+File expanded	ExpanderWindow		Plik rozpakowany
+The destination is read only.	ExpanderWindow		Nie można zapisywać w miejscu docelowym.
+Expander: Open	ExpanderWindow		Expander: Otwórz
+Select current	DirectoryFilePanel		Wybierz obecny
+Source	ExpanderWindow		Źródło
+Error when expanding archive	ExpanderWindow		Wystąpił błąd podczas rozpakowywania archiwum
+Hide contents	ExpanderWindow		Ukryj zawartość
+Cancel	ExpanderWindow		Anuluj
+Continue	ExpanderWindow		Kontynuuj
+The destination folder does not exist.	ExpanderWindow		Folder docelowy nie istnieje.
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Czy na pewno chcesz przerwać rozpakowywanie?\nRozpakowane dane będą najprawdopodobniej niekompletne.
+Select	DirectoryFilePanel		Wybierz
 Settings	ExpanderMenu		Ustawienia
 Settings…	ExpanderMenu		Ustawienia…
-Show contents	ExpanderMenu		Pokaż zawartość
-Show contents	ExpanderWindow		Pokaż zawartość
-Source	ExpanderWindow		Źródło
-Stop	ExpanderMenu		Przerwij
-Stop	ExpanderWindow		Zatrzymaj
-The destination folder does not exist.	ExpanderWindow		Folder docelowy nie istnieje.
-The destination is not a folder.	ExpanderWindow		Cel nie jest katalogiem.
-The destination is read only.	ExpanderWindow		Nie można zapisywać w miejscu docelowym.
-The file doesn't exist	ExpanderWindow		Plik nie istnieje
-The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Folder został przeniesony, została zmieniona jego nazwa\nlub nie jest obsługiwany.
-is not supported	ExpanderWindow		nie jest obsługiwany
+Expander: Choose destination	DirectoryFilePanel		Expander: Wybierz folder docelowy

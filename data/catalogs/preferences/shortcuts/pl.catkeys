@@ -1,51 +1,51 @@
 1	polish	x-vnd.Haiku-Shortcuts	2965605727
-(Choose application with file requester)	ShortcutsWindow		(Wybierz aplikację żądającą pliku)
-*Beep	ShortcutsWindow		*Beep
-*InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Tutaj umieść swój tekst\"
-*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
-*MouseButton 1	ShortcutsWindow		*MouseButton 1
-*MouseDown	ShortcutsWindow		*MouseDown
-*MouseUp	ShortcutsWindow		*MouseUp
-*MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
-*MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%
-*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
-*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
-Add new shortcut	ShortcutsWindow		Dodaj nowy skrót
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
-Append	ShortcutsWindow		Dodaj
-Append KeySet…	ShortcutsWindow		Dodaj KeySet...
-Application	ShortcutsWindow		Aplikacja
-Beep	ShortcutsSpec		Beep
-Cancel	ShortcutsWindow		Anuluj
-Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
-Don't save	ShortcutsWindow		Nie zapisuj
 Error, NULL state description?\n	ShortcutsSpec		Błąd, brak opisu stanu?\n
-File	ShortcutsWindow		Plik
-InsertString	ShortcutsSpec		InsertString
-Key	ShortcutsWindow		Przycisk
-LaunchHandler	ShortcutsSpec		LaunchHandler
-MouseButton	ShortcutsSpec		MouseButton
-MouseDown	ShortcutsSpec		MouseDown
-MouseUp	ShortcutsSpec		MouseUp
 MoveMouse	ShortcutsSpec		MoveMouse
-MoveMouseTo	ShortcutsSpec		MoveMouseTo
-Multi	ShortcutsSpec		Multi
 OK	ShortcutsWindow		OK
-Oh no	ShortcutsWindow		Och nie
-Open	ShortcutsWindow		Otwórz
-Open KeySet…	ShortcutsWindow		Otwórz KeySet....
-Quit	ShortcutsWindow		Wyjdź
-Really quit without saving your changes?	ShortcutsWindow		Wyjść nie zapisując zmian?
-Remove selected shortcut	ShortcutsWindow		Usuń zaznaczony skrót
-Revert to saved	ShortcutsWindow		Cofnięto do zapisu
-Save	ShortcutsWindow		Zapisz
-Save & apply	ShortcutsWindow		Zapisz i zastosuj
-Save KeySet as…	ShortcutsWindow		Zapisz KeySet jako...
-Select	ShortcutsWindow		Wybierz
-SendMessage	ShortcutsSpec		SendMessage
-Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Skróty nie zdołały otworzyć pliku KeySet!
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Skróty nie zdołały przetworzyć pliku Keyset!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Skróty nie zdołały zapisać pliku Keyset!
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Skróty nie mogły zapisać ustawienia klawiszy.
+Cancel	ShortcutsWindow		Anuluj
+InsertString	ShortcutsSpec		InsertString
+Append KeySet…	ShortcutsWindow		Dodaj KeySet...
+Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
+Key	ShortcutsWindow		Przycisk
+Open KeySet…	ShortcutsWindow		Otwórz KeySet....
+MouseUp	ShortcutsSpec		MouseUp
+Revert to saved	ShortcutsWindow		Cofnięto do zapisu
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Tutaj umieść swój tekst\"
+*MouseUp	ShortcutsWindow		*MouseUp
+(Choose application with file requester)	ShortcutsWindow		(Wybierz aplikację żądającą pliku)
 Window	ShortcutsSpec	Name for modifier on keyboard	Window
+*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Skróty nie zdołały otworzyć pliku KeySet!
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
+SendMessage	ShortcutsSpec		SendMessage
+MoveMouseTo	ShortcutsSpec		MoveMouseTo
+Save	ShortcutsWindow		Zapisz
+*MouseButton 1	ShortcutsWindow		*MouseButton 1
+*MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
+MouseDown	ShortcutsSpec		MouseDown
+Remove selected shortcut	ShortcutsWindow		Usuń zaznaczony skrót
+MouseButton	ShortcutsSpec		MouseButton
+Add new shortcut	ShortcutsWindow		Dodaj nowy skrót
+Save & apply	ShortcutsWindow		Zapisz i zastosuj
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
+Append	ShortcutsWindow		Dodaj
+File	ShortcutsWindow		Plik
+Beep	ShortcutsSpec		Beep
+Quit	ShortcutsWindow		Wyjdź
+*MouseDown	ShortcutsWindow		*MouseDown
+Don't save	ShortcutsWindow		Nie zapisuj
+Multi	ShortcutsSpec		Multi
+Application	ShortcutsWindow		Aplikacja
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+*Beep	ShortcutsWindow		*Beep
+*MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%
+Save KeySet as…	ShortcutsWindow		Zapisz KeySet jako...
+Open	ShortcutsWindow		Otwórz
+Really quit without saving your changes?	ShortcutsWindow		Wyjść nie zapisując zmian?
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Skróty nie zdołały przetworzyć pliku Keyset!
+Select	ShortcutsWindow		Wybierz
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Skróty nie zdołały zapisać pliku Keyset!
+Oh no	ShortcutsWindow		Och nie
+LaunchHandler	ShortcutsSpec		LaunchHandler

@@ -1,4 +1,4 @@
 1	polish	x-vnd.Haiku-notification_server	2675796741
-Notification	NotificationWindow		Powiadomienie
-OK	NotificationWindow		OK
 Warning	NotificationWindow		Ostrzeżenie
+OK	NotificationWindow		OK
+Notification	NotificationWindow		Powiadomienie

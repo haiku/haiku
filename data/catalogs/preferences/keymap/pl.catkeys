@@ -1,21 +1,21 @@
 1	polish	x-vnd.Haiku-Keymap	3858687220
-(Current)	Keymap window		(Bieżący)
-Acute trigger	Keymap window		Wywołanie ostre
+Tilde trigger	Keymap window		Wywołanie tyldy
+Grave trigger	Keymap window		Wywołanie ciężkie
+Select dead keys	Keymap window		Wybierz martwe klawisze
+Quit	Keymap window		Zakończ
+Switch shortcut keys to Haiku mode	Keymap window		Zmień klawisze skrótów w tryb Haiku
 Circumflex trigger	Keymap window		Wywołanie akcentu
 Diaeresis trigger	Keymap window		Wywołanie diarezy
-File	Keymap window		Plik
-Font	Keymap window		Czcionka
-Grave trigger	Keymap window		Wywołanie ciężkie
-Layout	Keymap window		Układ
 Open…	Keymap window		Otwórz…
-Quit	Keymap window		Zakończ
-Revert	Keymap window		Przywróć
-Sample and clipboard:	Keymap window		Przykład i schowek:
-Save as…	Keymap window		Zapisz jako…
-Select dead keys	Keymap window		Wybierz martwe klawisze
-Switch shortcut keys	Keymap window		Zmień klawisze skrótów
-Switch shortcut keys to Haiku mode	Keymap window		Zmień klawisze skrótów w tryb Haiku
-Switch shortcut keys to Windows/Linux mode	Keymap window		Zmień klawisze skrótów w tryb Windows/Linuks
 System:	Keymap window		System:
-Tilde trigger	Keymap window		Wywołanie tyldy
+Switch shortcut keys	Keymap window		Zmień klawisze skrótów
 User:	Keymap window		Użytkownik:
+Sample and clipboard:	Keymap window		Przykład i schowek:
+Layout	Keymap window		Układ
+Switch shortcut keys to Windows/Linux mode	Keymap window		Zmień klawisze skrótów w tryb Windows/Linuks
+Revert	Keymap window		Przywróć
+Save as…	Keymap window		Zapisz jako…
+File	Keymap window		Plik
+(Current)	Keymap window		(Bieżący)
+Font	Keymap window		Czcionka
+Acute trigger	Keymap window		Wywołanie ostre

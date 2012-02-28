@@ -1,27 +1,27 @@
-1	polish	x-vnd.Haiku-Magnify	3144246779
-%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize pikseli/piksel
-Add a crosshair	Magnify-Main		Dodaj celownik
-Copy image	Magnify-Main		Kopiuj obraz
-Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Kopiuj/Zapisz:\n kopiuj - kopiuje obecny obraz do schowka\n zapisz - pokazuje okno zapisu pliku, zawierającego \n obecny obraz\n
-Decrease pixel size	Magnify-Main		Zmniejsz rozmiar piksela
-Decrease window size	Magnify-Main		Zmniejsz rozmiar okna
-Freeze/Unfreeze image	Magnify-Main		Zamroź/odmroź obraz
-General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		Ogólne informacje:\n 32 x 32 - liczba w lewym górnym rogu to liczba\n pikseli (szerokość x wysokość)\n 8 pikseli/piksel - reprezentuje liczbę pikseli, które są używane\n do powiększenia jednego piksela\n R:152 G:52 B:10 - wartość koloru RGB piksela\n pod czerwonym kwadracikiem\n
-Hide/Show grid	Magnify-Main		Ukryj/Pokaż siatkę
-Hide/Show info	Magnify-Main		Ukryj/Pokaż informacje
-Increase pixel size	Magnify-Main		Powiększ rozmiar piksela
-Increase window size	Magnify-Main		Powiększ rozmiar okna
-Info	Magnify-Main		Informacje
-Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Informacje:\n ukryj/pokaż informacje - ukrywa/pokazuje te wszystkie nowe funkcje\n uwaga: podczas pokazywania pojawi się czerwony kwadracik,\n który wskazuje na piksel, którego kolor RGB zostanie pokazany\n dodaj/usuń celowniki - 2 celowniki mogą zostać dodane (lub\n usunięte), żeby pomóc w wyrównaniu i położeniu obiektów.\n Celowniki pokazują się jako niebieskie kwadraciki i niebieskie linie.\n ukryj/pokaż siatkę - ukrywa/pokazuje siatkę, która oddziela\n każdy piksel\n
-Magnify help	Magnify-Help		Pomoc
-Make square	Magnify-Main		Zrób kwadrat
-Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Nawigacja:\n klawisze strzałek - przesuwają obecne zaznaczenie (wskaźnik RGB\n lub celownik) o około 1 piksel na raz\n klawisz opcji (zazwyczaj Super lub prawy alt)+strzałka - przesuwa\n kursor myszy o 1 piksel\n x oznacza wybrów - obecnie wybrany wskaźnik/celownik ma w środku 'x'\n
-Remove a crosshair	Magnify-Main		Usuń celownik
-Save image	Magnify-Main		Zapisz obraz
-Sizing/Resizing:\n  make square - sets the width and the height to the larger\n    of the two making a square image\n  increase/decrease window size - grows or shrinks the window\n    size by 4 pixels.\n    note: this window can also be resized to any size via the\n      resizing region of the window\n  increase/decrease pixel size - increases or decreases the number\n    of pixels used to magnify a 'real' pixel. Range is 1 to 16.\n	Magnify-Help		Rozmiar:\n zrób kwadrat - zwiększa szerokość lub wysokość tak,\n aby powiększenie było kwadratowe\n powiększ/zmniejsz rozmiar okna - zwiększa lub zmniejsza rozmiar\n okna o 4 piksele.\n uwaga: rozmiar okna można oczywiście zmienić również\n przez przeciąganie obszaru w prawym dolnym rogu okna\n powiększ/zmniejsz rozmiar piksela - zwiększa lub zmniejsza liczbę\n pikseli użytych do wyświetlenia "prawdziwego" piksela.\n Zakres to od 1 do 16.\n
-Stick coordinates	Magnify-Main		Zablokuj współrzędne
-freeze - freezes/unfreezes magnification of whatever the\n    cursor is currently over\n	Magnify-Help		zamroź - zatrzymuje/wznawia powiększanie tego,\n nad czym obecnie znajduje się kursor\n
-magnify: size must be a multiple of 4\n	Console		magnify: rozmiar musi być wielokrotnością liczby 4\n
+1	polish	x-vnd.Haiku-Magnify	2227745383
 no clip msg\n	In console, when clipboard is empty after clicking Copy image		no clip msg\n
-size must be > 4 and a multiple of 4\n	Console		rozmiar musi być > 4 i być wielokrotnością liczby 4\n
+Make square	Magnify-Main		Zrób kwadrat
+Copy image	Magnify-Main		Kopiuj obraz
+Magnify help	Magnify-Help		Pomoc
 usage: magnify [size] (magnify size * size pixels)\n	Console		użycie: magnify [rozmiar] (rozmiar powiększenia * rozmiar piksela)\n
+Stick coordinates	Magnify-Main		Zablokuj współrzędne
+Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Informacje:\n ukryj/pokaż informacje - ukrywa/pokazuje te wszystkie nowe funkcje\n uwaga: podczas pokazywania pojawi się czerwony kwadracik,\n który wskazuje na piksel, którego kolor RGB zostanie pokazany\n dodaj/usuń celowniki - 2 celowniki mogą zostać dodane (lub\n usunięte), żeby pomóc w wyrównaniu i położeniu obiektów.\n Celowniki pokazują się jako niebieskie kwadraciki i niebieskie linie.\n ukryj/pokaż siatkę - ukrywa/pokazuje siatkę, która oddziela\n każdy piksel\n
+Hide/Show grid	Magnify-Main		Ukryj/Pokaż siatkę
+magnify: size must be a multiple of 4\n	Console		magnify: rozmiar musi być wielokrotnością liczby 4\n
+General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		Ogólne informacje:\n 32 x 32 - liczba w lewym górnym rogu to liczba\n pikseli (szerokość x wysokość)\n 8 pikseli/piksel - reprezentuje liczbę pikseli, które są używane\n do powiększenia jednego piksela\n R:152 G:52 B:10 - wartość koloru RGB piksela\n pod czerwonym kwadracikiem\n
+Help	Magnify-Main		Pomoc
+Sizing/Resizing:\n  make square - sets the width and the height to the larger\n    of the two making a square image\n  increase/decrease window size - grows or shrinks the window\n    size by 4 pixels.\n    note: this window can also be resized to any size via the\n      resizing region of the window\n  increase/decrease pixel size - increases or decreases the number\n    of pixels used to magnify a 'real' pixel. Range is 1 to 16.\n	Magnify-Help		Rozmiar:\n zrób kwadrat - zwiększa szerokość lub wysokość tak,\n aby powiększenie było kwadratowe\n powiększ/zmniejsz rozmiar okna - zwiększa lub zmniejsza rozmiar\n okna o 4 piksele.\n uwaga: rozmiar okna można oczywiście zmienić również\n przez przeciąganie obszaru w prawym dolnym rogu okna\n powiększ/zmniejsz rozmiar piksela - zwiększa lub zmniejsza liczbę\n pikseli użytych do wyświetlenia "prawdziwego" piksela.\n Zakres to od 1 do 16.\n
+Decrease pixel size	Magnify-Main		Zmniejsz rozmiar piksela
+Magnify	System name		Magnify
+%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize pikseli/piksel
+Info	Magnify-Main		Informacje
+Remove a crosshair	Magnify-Main		Usuń celownik
+Freeze/Unfreeze image	Magnify-Main		Zamroź/odmroź obraz
+Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Kopiuj/Zapisz:\n kopiuj - kopiuje obecny obraz do schowka\n zapisz - pokazuje okno zapisu pliku, zawierającego \n obecny obraz\n
+Hide/Show info	Magnify-Main		Ukryj/Pokaż informacje
+Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Nawigacja:\n klawisze strzałek - przesuwają obecne zaznaczenie (wskaźnik RGB\n lub celownik) o około 1 piksel na raz\n klawisz opcji (zazwyczaj Super lub prawy alt)+strzałka - przesuwa\n kursor myszy o 1 piksel\n x oznacza wybrów - obecnie wybrany wskaźnik/celownik ma w środku 'x'\n
+Save image	Magnify-Main		Zapisz obraz
+Increase window size	Magnify-Main		Powiększ rozmiar okna
+Decrease window size	Magnify-Main		Zmniejsz rozmiar okna
+Increase pixel size	Magnify-Main		Powiększ rozmiar piksela
+Add a crosshair	Magnify-Main		Dodaj celownik

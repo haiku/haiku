@@ -1,27 +1,27 @@
 1	polish	x-vnd.Haiku-Media	128032530
-<none>	Media views		<brak>
-Audio input:	Media views		Wejście dźwięku:
-Audio mixer	Media Window		Mikser audio
-Audio output:	Media views		Wyjście dźwięku:
-Audio settings	Media Window		Ustawienia dźwięku
-Channel:	Media views		Kanał:
-Cleaning up.	Media Window		Czyszczenie.
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Nie można połączyć się z serwerem multimediów.\nUruchomić go ponownie?
-Defaults	Media views		Domyślne
-Done shutting down.	Media Window		Skończono zamykanie.
-OK	Media Window		OK
-Quit	Media Window		Zakończ
 Ready for use…	Media Window		Gotowe do użycia…
-Restart media services	Media views		Ponowne uruchomienie usług multimedialnych
-Restarting media services\nShutting down media server\n	Media Window		Ponowne uruchamianie usług multimedialnych\nZamykanie serwera multimediów\n
-Restarting media services\nStarting media server…\n	Media Window		Ponowne uruchamianie usług multimedialnych\Uruchamianie serwera multimediów…\n
-Show volume control on Deskbar	Media views		Pokaż kontrolkę głośności na Deskbarze
-Start media server	Media Window		Uruchom serwer multimediów
-Starting media server…	Media Window		Uruchamianie serwera multimediów…
-Stopping media server…	Media Window		Zatrzymywanie serwera multimediów…
-Telling media_addon_server to quit.	Media Window		Powiadamianie media_addon_server, by się zakończył.
-This hardware has no controls.	Media Window		Ten sprzęt nie ma żadnych ustawień.
 Video input:	Media views		Wejście wideo:
-Video output:	Media views		Wyjście wideo:
-Video settings	Media Window		Ustawienia wideo
 Waiting for media_server to quit.	Media Window		Oczekiwanie na zakończenie działania media_server.
+Cleaning up.	Media Window		Czyszczenie.
+Defaults	Media views		Domyślne
+Stopping media server…	Media Window		Zatrzymywanie serwera multimediów…
+Quit	Media Window		Zakończ
+OK	Media Window		OK
+Starting media server…	Media Window		Uruchamianie serwera multimediów…
+Done shutting down.	Media Window		Skończono zamykanie.
+Video settings	Media Window		Ustawienia wideo
+Video output:	Media views		Wyjście wideo:
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Nie można połączyć się z serwerem multimediów.\nUruchomić go ponownie?
+Restart media services	Media views		Ponowne uruchomienie usług multimedialnych
+Telling media_addon_server to quit.	Media Window		Powiadamianie media_addon_server, by się zakończył.
+Audio mixer	Media Window		Mikser audio
+This hardware has no controls.	Media Window		Ten sprzęt nie ma żadnych ustawień.
+Audio output:	Media views		Wyjście dźwięku:
+Restarting media services\nStarting media server…\n	Media Window		Ponowne uruchamianie usług multimedialnych\Uruchamianie serwera multimediów…\n
+Audio settings	Media Window		Ustawienia dźwięku
+Start media server	Media Window		Uruchom serwer multimediów
+Restarting media services\nShutting down media server\n	Media Window		Ponowne uruchamianie usług multimedialnych\nZamykanie serwera multimediów\n
+<none>	Media views		<brak>
+Channel:	Media views		Kanał:
+Show volume control on Deskbar	Media views		Pokaż kontrolkę głośności na Deskbarze
+Audio input:	Media views		Wejście dźwięku:

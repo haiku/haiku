@@ -1,42 +1,51 @@
-1	polish	x-vnd.Haiku-Appearance	1227622574
-Antialiasing	APRWindow		Antyaliasing
-Antialiasing menu	AntialiasingSettingsView		Menu antyaliasingu
+1	polish	x-vnd.Haiku-Appearance	168322075
+Control highlight	Colors tab		Podkreślenie kontrolki
+Control border	Colors tab		Obramowanie kontrolki
 Antialiasing type:	AntialiasingSettingsView		Typ antyaliasingu:
+Shadow	Colors tab		Cień
+On	AntialiasingSettingsView		Włącz
+Defaults	APRWindow		Ustaw jako domyślne
+Grayscale	AntialiasingSettingsView		Odcienie szarości
+Shine	Colors tab		Połysk
+About	DecorSettingsView		O
+Off	AntialiasingSettingsView		Wyłącz
+Choose Decorator	DecorSettingsView		Wybierz Dekorator
+Success	Colors tab		Sukces
+Inactive window tab text	Colors tab		Tekst nieaktywnej zakładki okna
+About Decorator	DecorSettingsView		O Dekoratorze
+Failure	Colors tab		Niepowodzenie
+Hinting menu	AntialiasingSettingsView		Menu hintingu
+Window Decorator	APRWindow		Dekorator Okna
+Window Decorator:	DecorSettingsView		Dekorator Okna:
+Document background	Colors tab		Tło dokumentu
+Revert	APRWindow		Przywróć ustawienia
+Window tab	Colors tab		Zakładka okna
+Tooltip background	Colors tab		Tło podpowiedzi
+Selected menu item background	Colors tab		Tło zaznaczonego elementu menu
+Antialiasing	APRWindow		Antyaliasing
+Navigation base	Colors tab		Nawigacja
+Window border	Colors tab		Obramowanie okna
+Window tab text	Colors tab		Tekst zakładki okna
+Document text	Colors tab		Tekst dokumentu
+Navigation pulse	Colors tab		Puls nawigacji
+Selected menu item text	Colors tab		Tekst zaznaczonego elementu menu
+Menu background	Colors tab		Tło menu
+OK	DecorSettingsView		OK
+Panel background	Colors tab		Tło panelu
 Colors	APRWindow		Kolory
 Control background	Colors tab		Tło kontrolki
-Control border	Colors tab		Obramowanie kontrolki
-Control highlight	Colors tab		Podkreślenie kontrolki
-Control text	Colors tab		Tekst kontrolki
-Defaults	APRWindow		Ustaw jako domyślne
-Document background	Colors tab		Tło dokumentu
-Document text	Colors tab		Tekst dokumentu
-Failure	Colors tab		Niepowodzenie
-Glyph hinting:	AntialiasingSettingsView		Hintowanie czcionek:
-Grayscale	AntialiasingSettingsView		Odcienie szarości
-Hinting menu	AntialiasingSettingsView		Menu hintingu
 Inactive window tab	Colors tab		Nieaktywna zakładka okna
-Inactive window tab text	Colors tab		Tekst nieaktywnej zakładki okna
-LCD subpixel	AntialiasingSettingsView		Podpikselowe LCD
-Menu background	Colors tab		Tło menu
-Menu item text	Colors tab		Tekst elementu menu
-Monospaced fonts only	AntialiasingSettingsView		Tylko czcionki o stałej szerokości
-Navigation base	Colors tab		Nawigacja
-Navigation pulse	Colors tab		Puls nawigacji
-Off	AntialiasingSettingsView		Wyłącz
-On	AntialiasingSettingsView		Włącz
-Panel background	Colors tab		Tło panelu
-Panel text	Colors tab		Tekst panelu
+Appearance	System name		Wygląd
 Reduce colored edges filter strength:	AntialiasingSettingsView		Zmniejszenie siły kolorowych filtrów krawędzi:
-Revert	APRWindow		Przywróć ustawienia
-Selected menu item background	Colors tab		Tło zaznaczonego elementu menu
-Selected menu item border	Colors tab		Obramowanie zaznaczonego elementu menu
-Selected menu item text	Colors tab		Tekst zaznaczonego elementu menu
-Shadow	Colors tab		Cień
-Shine	Colors tab		Połysk
-Strong	AntialiasingSettingsView		Silny
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Antyaliasing podpikselowy w połączeniu z hintowaniem czcionek jest niedostępny w tym buildzie Haiku w celu uniknięcia problemów patentowych. Aby włączyć tę funkcjonalność, musisz zbudować Haiku samemu i włączyć niektóre opcje w pliku nagłówkowym biblioteki libfreetype.
-Success	Colors tab		Sukces
-Tooltip background	Colors tab		Tło podpowiedzi
+Control text	Colors tab		Tekst kontrolki
 Tooltip text	Colors tab		Tekst podpowiedzi
-Window tab	Colors tab		Zakładka okna
-Window tab text	Colors tab		Tekst zakładki okna
+Inactive window border	Colors tab		Nieaktywne obramowanie okna
+Menu item text	Colors tab		Tekst elementu menu
+LCD subpixel	AntialiasingSettingsView		Podpikselowe LCD
+Selected menu item border	Colors tab		Obramowanie zaznaczonego elementu menu
+Strong	AntialiasingSettingsView		Silny
+Panel text	Colors tab		Tekst panelu
+Monospaced fonts only	AntialiasingSettingsView		Tylko czcionki o stałej szerokości
+Antialiasing menu	AntialiasingSettingsView		Menu antyaliasingu
+Glyph hinting:	AntialiasingSettingsView		Hintowanie czcionek:

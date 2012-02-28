@@ -1,140 +1,31 @@
-1	polish	x-vnd.Be-MAIL	1344287101
-%d - Date	Mail		%d - Data
-%e - E-mail address	Mail		%e - Adres e-mail
-%n - Full name	Mail		%n - Pełna nazwa
-Account from mail	Mail		Konto z wiadomości
-Account:	Mail		Konto:
-Accounts…	Mail		Konta…
-Add	Mail		Dodaj
-Add enclosure…	Mail		Dodaj załącznik...
-Add signature	Mail		Dodaj sygnaturę
-An error occurred trying to open this signature.	Mail		Wystąpił błąd podczas próby otwarcia tej sygnatury.
-An error occurred trying to save the attachment.	Mail		Wystąpił błąd podczas zapisu załącznika.
-An error occurred trying to save this signature.	Mail		Wystąpił błąd podczas próby zapisania tej sygnatury.
-Attach attributes:	Mail		Dołączaj atrybuty:
-Attachments:	Mail		Załączniki: 
-Auto signature:	Mail		Automatyczna sygnatura:
-Automatically mark mail as read:	Mail		Automatycznie oznacz wiadomość jako przeczytaną:
-Bcc:	Mail		UDW:
-Beginner	Mail		Początkujący
-Button bar:	Mail		Pasek przycisków:
-Cancel	Mail		Anuluj
-Cc:	Mail		DW:
-Check spelling	Mail		Sprawdź pisownię
-Close	Mail		Zamknij
-Close and 	Mail		Zamknij i
-Colored quotes:	Mail		Kolorowe cytaty:
-Copy	Mail		Kopiuj
-Copy link location	Mail		Kopiuj adres docelowy
-Copy to new	Mail		Kopiuj do nowego
-Couldn't open this signature. Sorry.	Mail		Nie udało się otworzyć tej sygnatury.
-Cut	Mail		Wytnij
-Decoding:	Mail		Odszyfrowanie:
-Default account:	Mail		Domyślne konto:
-Delete	Mail		Usuń
-Discard	Mail		Odrzuć
-Do you wish to save this message as a draft before closing?	Mail		Czy chcesz zapisać tę wiadomość jako szkic przed zamknięciem?
-Do you wish to send this message before closing?	Mail		Czy chcesz wysłać tę wiadomość przed zamknięciem?
-Don't save	Mail		Nie zapisuj
-E-mail draft could not be saved!	Mail		Kopia robocza wiadomości nie mogła zostać zapisana!
-Edit	Mail		Edycja
-Edit queries…	Mail		Edytuj zapytania…
-Edit signatures…	Mail		Edycja sygnatur…
-Encoding:	Mail		Kodowanie:
-Expert	Mail		Ekspert
-File	Mail		Plik
-Find	Mail		Znajdź
-Find again	Mail		Znajdź ponownie
-Find…	Mail		Znajdź…
-Font:	Mail		Czcionka:
-Forward	Mail		Prześlij
-Forward without attachments	Mail		Prześlij dalej bez załączników
-From:	Mail		Od:
-Hide	Mail		Ukryj
-Include file attributes in attachments	Mail		Dołączaj atrybuty plików w załącznikach
-Inconsistency occurred in the undo/redo buffer.	Mail		Powstała niespójność pomiędzy buforem cofnij/powtórz
-Initial spell check mode:	Mail		Tryb wstępnej korekty:
-Leave as '%s'	Mail		Zostaw jako '%s'
-Leave as New	Mail		Pozostaw jako nową
-Leave same	Mail		Zostaw takie same
-Mail couldn't find its dictionary.	Mail		Mail nie mógł odnaleźć swojego słownika.
-Mail preferences	Mail		Ustawienia poczty
-Mailing	Mail		Wiadomości
-Message	Mail		Wiadomość
-Move to trash	Mail		Przenieś do kosza
-Need Tracker to move items to trash	Mail		Do usunięcia obiektów potrzebny jest Tracker
-New	Mail		Nowa
-New mail message	Mail		Nowa wiadomość
-Next	Mail		Następne
-Next message	Mail		Następna wiadomość
-No file attributes, just plain data	Mail		Brak atrybutów pliku, czyste dane
-None	Mail		Brak
-OK	Mail		OK
-Only files can be added as attachments.	Mail		Tylko pliki mogą zostać użyte jako załączniki.
-Open	Mail		Otwórz
-Open attachment	Mail		Otwórz załącznik
-Open draft	Mail		Otwórz szkic
-Open this link	Mail		Otwórz odnośnik
-Page setup…	Mail		Ustawienia strony…
-Paste	Mail		Wklej
-Preferences…	Mail		Ustawienia…
-Previous	Mail		Poprzedni
-Previous message	Mail		Poprzednia wiadomość
-Print	Mail		Drukuj
-Print…	Mail		Drukuj…
-Queries	Mail		Zapytania
-Quit	Mail		Zakończ
-Quote	Mail		Cytuj
-Random	Mail		Losowa
-Read 	Mail		Przeczytaj
-Really delete this signature? This cannot be undone.	Mail		Na pewno usunąć tę sygnaturę? Tego nie można cofnąć.
-Redo	Mail		Ponów
-Remove attachment	Mail		Usuń załącznik
-Remove enclosure	Mail		Usuń załącznik
-Remove quote	Mail		Usuń cytat
-Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Usuwanie załączników z wiadomości przesłanych dalej nie jest jeszcze zaimplementowane!\nTa funkcja nie działa jeszcze prawidłowo.
-Reply	Mail		Odpowiedz
-Reply account:	Mail		Konto odpowiedzi:
-Reply preamble:	Mail		Wstęp do odpowiedzi:
-Reply to all	Mail		Odpowiedz wszystkim
-Reply to sender	Mail		Odpowiedz nadawcy
-Resend	Mail		Wyślij ponownie
-Revert	Mail		Przywróć
-Save	Mail		Zapisz
-Save address	Mail		Zapisz adres
-Save as draft	Mail		Zapisz jako szkic
-Save attachment…	Mail		Zapisz załącznik…
-Save changes to this signature?	Mail		Zapisać zmiany dla tej sygnatury?
-Select all	Mail		Zaznacz wszystko
-Send	Mail		Wyślij
-Send message	Mail		Wyślij wiadomość
-Set to %s	Mail		Zmień na %s
-Set to Saved	Mail		Ustaw jako zapisane
-Set to…	Mail		Ustaw jako...
-Show header	Mail		Pokaż nagłówek
-Show icons & labels	Mail		Pokaż ikony i etykiety
-Show icons only	Mail		Pokaż tylko ikony
-Show raw message	Mail		Pokaż źródło wiadomości
-Signature	Mail		Sygnatura
-Signature:	Mail		Sygnatura:
-Signatures	Mail		Sygnatury
-Size:	Mail		Rozmiar:
-Sorry	Mail		Przepraszamy
-Sorry, could not find an application that supports the 'Person' data type.	Mail		Niestety, nie można odnaleźć aplikacji, która obsługuje typ danych 'Osoba'.
-Start now	Mail		Rozpocznij teraz
-Subject:	Mail		Temat:
-Text wrapping:	Mail		Zawijanie tekstu:
-The mail_daemon could not be started:\n\t	Mail		mail_daemon nie mógł zostać uruchomiony:\n\t
-The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		mail_daemon nie jest uruchomiony. Wiadomość została dodana do kolejki i czeka, aż zostanie on uruchomiony.
-There is no installed handler for URL links.	Mail		Brak zainstalowanego programu do obsługi skrótów URL.
-Title:	Mail		Tytuł:
-To:	Mail		Do:
-Trash	Mail		Kosz
-Undo	Mail		Cofnij
-Unread	Mail		Nieprzeczytane
-Use default account	Mail		Użyj konta domyślnego
-User interface	Mail		Interfejs użytkownika
+1	polish	x-vnd.Be-MAIL	3000981273
 View	Mail		Widok
-Warn unencodable:	Mail		Ostrzeżenie nierozszyfrowalne:
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Twój główny tekst zawiera %ld znaków, których nie można zapisać przy użyciu obecnego kodowania. Bardzo możliwe, że zmiana kodowania na inne mogłaby dać lepsze rezultaty. Naciśnij Wyślij, aby wysłać mimo to (znaki, których nie można zapisać zostaną zamienione na znak zastępczy), lub naciśnij Anuluj, by wrócić i spróbować to naprawić.
-\\n - Newline	Mail		\\n - Nowa linia
+%d - Date	Mail		%d - Data
+Attach attributes:	Mail		Dołączaj atrybuty:
+Inconsistency occurred in the undo/redo buffer.	Mail		Powstała niespójność pomiędzy buforem cofnij/powtórz
+An error occurred trying to save the attachment.	Mail		Wystąpił błąd podczas zapisu załącznika.
+Copy to new	Mail		Kopiuj do nowego
+Edit	Mail		Edycja
+Print	Mail		Drukuj
+<none>	Mail		<brak>
+New mail message	Mail		Nowa wiadomość
+Automatically mark mail as read:	Mail		Automatycznie oznacz wiadomość jako przeczytaną:
+helpful message	Mail		pomocna wiadomość
+Colored quotes:	Mail		Kolorowe cytaty:
+Subject:	Mail		Temat:
+Reply to all	Mail		Odpowiedz wszystkim
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Załącznik: %name% (Typ: %type%)
+Show icons & labels	Mail		Pokaż ikony i etykiety
+Remove attachment	Mail		Usuń załącznik
+Button bar:	Mail		Pasek przycisków:
+spam	B_USER_DIRECTORY/mail/spam		spam
+Beginner	Mail		Początkujący
+Don't save	Mail		Nie zapisuj
+Expert	Mail		Ekspert
+Reply account:	Mail		Konto odpowiedzi:
+Discard	Mail		Odrzuć
+Message	Mail		Wiadomość
+Reply to sender	Mail		Odpowiedz nadawcy
+There is no installed handler for URL links.	Mail		Brak zainstalowanego programu do obsługi skrótów URL.
+Signature	Mail		Sygnatura
+Find again	Mail		Znajdź ponownie

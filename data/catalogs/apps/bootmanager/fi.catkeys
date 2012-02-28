@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-BootManager	2264882596
+1	finnish	x-vnd.Haiku-BootManager	3014946856
 The boot manager has been successfully installed on your system.	BootManagerController		Alkulataushallinta on asennettu onnistuneesti järjestelmääsi.
 After two seconds	DefaultPartitionPage		Kahden sekunnin jälkeen
 Uninstall Boot Manager	UninstallPage	Title	Poista Alkulataushallinta
@@ -7,7 +7,7 @@ The old Master Boot Record could not be saved to %s	BootManagerController		Vanha
 Restore MBR	BootManagerController	Button	Palauta MBR
 Hard Drive	DrivesPage	Default disk name	Kiintolevy
 USB Drive	DrivesPage	Default disk name	USB-levyasema
-The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Alkulatauslaitteen Master Boot Record (MBR):\n\t%s\ntallennetaan nyt levylle. Valitse tiedosto, mihin MBR tallennetaan.\n\nJos jokin menee asennuksessa väärin tai jos haluat myöhemmin poistaa alkulatausvalikon, suorita yksinkertaisesti Alkulataushallinta-ohjelma ja valitse ’Poista’-valitsin.
+The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Alkulatauslaitteen Master Boot Record (MBR):\n\t %s\ntallennetaan nyt levylle. Valitse tiedosto, mihin MBR tallennetaan.\n\nJos jokin menee asennuksessa väärin tai jos haluat myöhemmin poistaa alkulatausvalikon, suorita yksinkertaisesti Alkulataushallinta-ohjelma ja valitse ’Poista’-valitsin.
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Levyn %disk Master Boot Record (MBR) palautetaan tiedostosta %file. Haluatko jatkaa?
 An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Tapahtui virhe kirjoitettaessa alkulatausvalikkoa. Master Boot Record saattaa olla vaurioitunut, sinun on palautettava MBR nyt!
 Partitions	PartitionsPage	Title	Osiot
@@ -17,10 +17,10 @@ Cannot access!	DrivesPage	Cannot install	Ei voi asentaa!
 Uninstall boot manager	BootManagerController	Title	Poista Alkulataushallinta
 After four seconds	DefaultPartitionPage		Neljän sekunnin jälkeen
 Uninstallation of boot menu failed	BootManagerController	Title	Alkulatausvalikon poistaminen epäonnistui
-Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Paikallista Master Boot Record (MBR) -tietueen tallennustiedosto, josta se voidaan palauttaa. Tämä on tiedosto, joka luotiin silloin kun Alkulataushallinta asennettiin ensimmäisen kerran.
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Paikallista Master Boot Record (MBR) -tietueen tallennustiedosto, josta MBR voidaan palauttaa. Tämä on tiedosto, joka luotiin silloin kun Alkulataushallinta asennettiin ensimmäisen kerran.
 Next	WizardView	Button	Seuraava
 Uninstallation of boot menu completed	BootManagerController	Title	Alkulatausvalikon poisto onnistui
-Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Valitse levyasema, johon haluat kohdistaa Alkuhallinnan asennuksen tai asennuksen poiston.
+Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Valitse levyasema, johon haluat kohdistaa Alkulataushallinnan asennuksen tai asennuksen poiston.
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Määritä oletusosio ja aikavalvonta.\nAlkulatausvalikko lataa oletusosion aikavalvonta-ajan kuluttua, jollet valitse muuta osiota. Voit valita myös alkulatausvalikon odottamaan toistaiseksi, kun valitset osiota.\nPitämällä ’ALT’-näppäin painettuna otat pois käytöstä aikavalvonnan alkulatauksen aikana.
 After one second	DefaultPartitionPage		Sekunnin jälkeen
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Ensimmäisen kiintolevyn osiotaulu ei ole yhteensopiva Alkulataushallinnan kanssa.\nAlkulataushallinta tarvitsee 2 kilotavua käytettävissä olevaa tilaa ennen ensimmäistä osiota.
@@ -41,8 +41,8 @@ Install	DrivesPage	Button	Asenna
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Seuraavaa alkulatausvalikkoa ollaan kirjoittamassa alkulatauslevylle (%s). Vahvista ennen jatkamista alla olevat tiedot.
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Tuntematon
 Update	DrivesPage	Button	Päivitä
-Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Paikallista Master Boot Record (MBR) -tietueen tallennustiedosto, josta se voidaan palauttaa. Tämä on tiedosto, joka luotiin silloin kun Alkulataushallinta asennettiin ensimmäisen kerran.
-Old Master Boot Record Saved failure	BootManagerController	Title	Vanhan Master Boot Record -tietueen tallennusvirhe
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Paikallista Master Boot Record (MBR) -tietueen tallennustiedosto, josta MBR voidaan palauttaa. Tämä on tiedosto, joka luotiin silloin kun Alkulataushallinta asennettiin ensimmäisen kerran.
+Old Master Boot Record Saved failure	BootManagerController	Title	Vanhan Master Boot Record -tietueen tallennushäiriö
 Drives	DrivesPage	Title	Levyasemat
 No space available!	DrivesPage	Cannot install	Tilaa ei ole käytettävissä!
 Never	DefaultPartitionPage		Ei koskaan
@@ -61,3 +61,5 @@ BootManager	System name		Alkulataushallinta
 Summary	BootManagerController	Title	Yhteenveto
 OK	BootManagerController	Button	Valmis
 Immediately	DefaultPartitionPage		Heti
+Done	BootManagerController	Button	Valmis
+After three seconds	DefaultPartitionPage		Kolmen sekunnin jälkeen

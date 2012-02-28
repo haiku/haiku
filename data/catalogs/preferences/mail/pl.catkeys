@@ -1,43 +1,43 @@
 1	polish	x-vnd.Haiku-Mail	3653676147
-Account name:	Config Views		Nazwa konta:
-Account name:	E-Mail		Nazwa konta:
-Account settings	Config Views		Ustawienia konta
-Accounts	Config Window		Konta
-Add	Config Window		Dodaj
-Add filter	Config Views		Dodaj filtr
-Always	Config Window		Zawsze
-Apply	Config Window		Zastosuj
-Check every	Config Window		Sprawdzaj co
-Choose Protocol	E-Mail		Wybierz protokół
-E-mail address:	E-Mail		Adres e-mail:
-Edit mailbox menu…	Config Window		Edytuj menu skrzynki pocztowej
-Error	Config Window		Błąd
-Error retrieving general settings: %s\n	Config Window		Błąd podczas odbierania globalnych ustawień: %s\n
-Incoming mail filters	Config Views		Filtry poczty przychodzącej
-Login name:	E-Mail		Login:
 Mail checking	Config Window		Sprawdzanie wiadomości
-Miscellaneous	Config Window		Inne
-OK	Config Views		OK
-OK	Config Window		OK
-Only when dial-up is connected	Config Window		Tylko podczas połączenia dial-up
-Outgoing mail filters	Config Views		Fltry poczty wychodzącej
-Password:	E-Mail		Hasło:
-Real name:	Config Views		Prawdziwe imię:
-Real name:	E-Mail		Prawdziwe imię:
-Remove	Config Views		Usuń
-Remove	Config Window		Usuń
-Return address:	Config Views		Adres zwrotny:
-Revert	Config Window		Przywróć
-Schedule outgoing mail when dial-up is disconnected	Config Window		Zaplanuj wysyłanie poczty wychodzącej, gdy połączenie dialup jest nieaktywne
-Server Name:	E-Mail		Nazwa serwera:
 Settings	Config Window		Ustawienia
-Show connection status window:	Config Window		Pokaż okno stanu połączenia:
-Start mail services on startup	Config Window		Włącz usługi wiadomości podczas uruchamiania
-The filter could not be moved. Deleting filter.	Config Views		Filtr nie mógł zostać przesunięty. Usuwanie filtru.
-While sending	Config Window		Podczas wysyłania
+Only when dial-up is connected	Config Window		Tylko podczas połączenia dial-up
 While sending and receiving	Config Window		Podczas wysyłania i odbierania
-\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nGlobalne ustawienia nie mogły zostać przywrócone.\n\nBłąd podczas przywracania globlnych ustawień:\n%s\n
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nUtwórz nowe konto naciskając przycisk Dodaj.\n\nUsuń konto za pomocą przycisku Usuń po zaznaczeniu elementu.
 days	Config Window		dni
+OK	Config Window		OK
+Start mail services on startup	Config Window		Włącz usługi wiadomości podczas uruchamiania
+E-mail address:	E-Mail		Adres e-mail:
+Account name:	E-Mail		Nazwa konta:
+Account name:	Config Views		Nazwa konta:
+OK	Config Views		OK
+The filter could not be moved. Deleting filter.	Config Views		Filtr nie mógł zostać przesunięty. Usuwanie filtru.
+Revert	Config Window		Przywróć
+Login name:	E-Mail		Login:
+Password:	E-Mail		Hasło:
+Accounts	Config Window		Konta
+Remove	Config Window		Usuń
+Miscellaneous	Config Window		Inne
+Show connection status window:	Config Window		Pokaż okno stanu połączenia:
+Server Name:	E-Mail		Nazwa serwera:
+While sending	Config Window		Podczas wysyłania
+Schedule outgoing mail when dial-up is disconnected	Config Window		Zaplanuj wysyłanie poczty wychodzącej, gdy połączenie dialup jest nieaktywne
 hours	Config Window		godzin
+Add	Config Window		Dodaj
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nGlobalne ustawienia nie mogły zostać przywrócone.\n\nBłąd podczas przywracania globlnych ustawień:\n%s\n
+Real name:	Config Views		Prawdziwe imię:
+Choose Protocol	E-Mail		Wybierz protokół
+Return address:	Config Views		Adres zwrotny:
+Edit mailbox menu…	Config Window		Edytuj menu skrzynki pocztowej
+Remove	Config Views		Usuń
+Check every	Config Window		Sprawdzaj co
+Incoming mail filters	Config Views		Filtry poczty przychodzącej
+Account settings	Config Views		Ustawienia konta
 minutes	Config Window		minut
+Error retrieving general settings: %s\n	Config Window		Błąd podczas odbierania globalnych ustawień: %s\n
+Real name:	E-Mail		Prawdziwe imię:
+Apply	Config Window		Zastosuj
+Always	Config Window		Zawsze
+Add filter	Config Views		Dodaj filtr
+Outgoing mail filters	Config Views		Fltry poczty wychodzącej
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nUtwórz nowe konto naciskając przycisk Dodaj.\n\nUsuń konto za pomocą przycisku Usuń po zaznaczeniu elementu.
+Error	Config Window		Błąd

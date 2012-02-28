@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-3DRendering	2471085226
+1	german	x-vnd.Haiku-3DRendering	1725618140
 List stack size:	Capabilities		Listen-Stackgröße:
 Information	InfoView		Informationen
 Max. clipping planes:	Capabilities		Max. Clipping-Ebenen:
@@ -20,6 +20,7 @@ GLUT API version:	InfoView		GLUT-API-Version:
 Texture stack size:	Capabilities		Texturen-Stackgröße:
 Max. evaluators equation order:	Capabilities		Max. Tiefe der Auswertungsformel:
 Max. 3D texture size:	Capabilities		Max. 3D-Texturgröße:
+3D Rendering	System name		3D-Rendering
 Capabilities	Capabilities		Leistungsdaten
 Max. recommended index elements:	Capabilities		Max. Anzahl empfohlener Indexelemente:
 Available	Extensions		Verfügbar

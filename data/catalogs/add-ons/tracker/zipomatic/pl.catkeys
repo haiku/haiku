@@ -1,17 +1,18 @@
-1	polish	x-vnd.haiku.zip-o-matic	829498916
-%ld files added.	file:ZipOMaticWindow.cpp		%ld plików dodanych.
+1	polish	x-vnd.haiku.zip-o-matic	2207848100
 1 file added.	file:ZipOMaticWindow.cpp		1 plik dodany.
-Archive	file:ZipperThread.cpp		Archiwum
-Archive created OK	file:ZipOMaticWindow.cpp		Archiwum stworzono pomyślnie
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Na pewno chcesz przerwać tworzenie tego archiwum?
-Continue	file:ZipOMaticWindow.cpp		Wznów
+Stop	file:ZipOMaticWindow.cpp		Zatrzymaj
 Creating archive: %s	file:ZipOMaticWindow.cpp		Tworzenie archiwum: %s
-Do you want to stop them?	file:ZipOMatic.cpp		Chcesz je zatrzymać?
-Error creating archive	file:ZipOMaticWindow.cpp		Błąd podczas tworzenia archiwum
+Continue	file:ZipOMaticWindow.cpp		Wznów
+Preparing to archive	file:ZipperThread.cpp		Przygotowanie do archiwizacji
+Drop files here.	file:ZipOMaticWindow.cpp		Przeciągnij pliki tutaj.
 Filename: %s	file:ZipOMaticWindow.cpp		Nazwa pliku: %s
 Let them continue	file:ZipOMatic.cpp		Pozwól im kontynuować
-Preparing to archive	file:ZipperThread.cpp		Przygotowanie do archiwizacji
-Stop	file:ZipOMaticWindow.cpp		Zatrzymaj
-Stop them	file:ZipOMatic.cpp		Zatrzymaj je
+Do you want to stop them?	file:ZipOMatic.cpp		Chcesz je zatrzymać?
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Na pewno chcesz przerwać tworzenie tego archiwum?
+%ld files added.	file:ZipOMaticWindow.cpp		%ld plików dodanych.
 Stopped	file:ZipOMaticWindow.cpp		Zatrzymane
+Archive	file:ZipperThread.cpp		Archiwum
+Error creating archive	file:ZipOMaticWindow.cpp		Błąd podczas tworzenia archiwum
 You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Masz %ld uruchomionych kopii Zip-O-Matic.\n\n
+Archive created OK	file:ZipOMaticWindow.cpp		Archiwum stworzono pomyślnie
+Stop them	file:ZipOMatic.cpp		Zatrzymaj je

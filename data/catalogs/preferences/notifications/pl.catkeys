@@ -1,17 +1,17 @@
 1	polish	x-vnd.Haiku-Notifications	3165901883
-Application	NotificationView		Aplikacja
-Applications	NotificationView		Aplikacje
-Disable notifications	GeneralView		Wyłącz powiadomienia
-Enable notifications at startup	GeneralView		Włącz powiadomienia podczas uruchamiania
 Error	NotificationView		Błąd
-Icon size:	DisplayView		Rozmiar ikon:
-Notifications	NotificationView		Powiadomienia
-OK	DisplayView		OK
 OK	GeneralView		OK
+Save	PrefletWin		Zapisz
 OK	NotificationView		OK
 Progress	NotificationView		Postęp
-Save	PrefletWin		Zapisz
 Search:	NotificationView		Szukaj:
+Yes	NotificationView		Tak
+Icon size:	DisplayView		Rozmiar ikon:
+Disable notifications	GeneralView		Wyłącz powiadomienia
+Notifications	NotificationView		Powiadomienia
+Application	NotificationView		Aplikacja
+OK	DisplayView		OK
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Wystąpił problem zapisu preferencji. \nMożliwe, że nie masz uprawnień zapisu w katalogu ustawień.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Wystąpił problem zapisu preferencji. \nMożliwe, że nie masz uprawnień zapisu w katalogu ustawień.
-Yes	NotificationView		Tak
+Enable notifications at startup	GeneralView		Włącz powiadomienia podczas uruchamiania
+Applications	NotificationView		Aplikacje

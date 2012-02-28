@@ -1,6 +1,14 @@
-1	polish	x-vnd.Haiku-CDPlayer	3757937427
+1	polish	x-vnd.Haiku-CDPlayer	592310631
+CDPlayer	System name		Odtwarzacz CD
+CD	CDPlayer		CD
+Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		Dysk: %ld:%.2ld / %ld:%.2ld
+OK	CDPlayer		OK
+Track %whichTrack%: %trackAt%	CDPlayer		Ścieżka %whichTrack%: %trackAt%
 Audio CD	CDPlayer		Audio CD
-CD drive is empty	CDPlayer		Napęd CD jest pusty
-Disc: --:-- / --:--	CDPlayer		Dysk: --:-- / --:--
 It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Prawdopodobnie w komputerze nie ma napędu CD lub nie ma oprogramowania do jego obsługi. Przepraszamy. 
+Track: %ld:%.2ld / %ld:%.2ld	CDPlayer		Ścieżka: %ld:%.2ld / %ld:%.2ld
+Track: 88:88 / 88:88	CDPlayer		Ścieżka: 88:88 / 88:88
 Track: --:-- / --:--	CDPlayer		Ścieżka: --:-- / --:--
+Disc: 88:88 / 88:88	CDPlayer		Dysk: 88:88 / 88:88
+Disc: --:-- / --:--	CDPlayer		Dysk: --:-- / --:--
+CD drive is empty	CDPlayer		Napęd CD jest pusty

@@ -1,45 +1,40 @@
-1	polish	x-vnd.Haiku-PowerStatus	1335646776
-About	PowerStatus		o
-About…	PowerStatus		O...
-Battery charging	PowerStatus		Ładowanie baterii
-Battery discharging	PowerStatus		Rozładowywanie baterii
-Battery info	PowerStatus		Informacje o baterii
-Battery info…	PowerStatus		Informacje o baterii...
-Battery unused	PowerStatus		Bateria nieużywana
-Capacity granularity 1: 	PowerStatus		Jednostka pojemności 1:
-Capacity granularity 2: 	PowerStatus		Jednostka pojemności 2:
-Capacity: 	PowerStatus		Pojemność:
-Current rate: 	PowerStatus		Aktualne tempo:
+1	polish	x-vnd.Haiku-PowerStatus	4203845861
 Design capacity low warning: 	PowerStatus		Ostrzerzenie o niskiej pojemności projektowej:
-Design capacity warning: 	PowerStatus		Ostrzeżenie o projektowej pojemności:
-Design capacity: 	PowerStatus		Pojemność projektowa:
-Design voltage: 	PowerStatus		Projektowe napięcie:
-Empty battery slot	PowerStatus		Gniazdo na baterie jest puste
-Extended battery info	PowerStatus		Rozszerzone informacje o baterii
-Install in Deskbar	PowerStatus		Zainstaluj w Deskbarze
-Last full charge: 	PowerStatus		Ostatnie pełne ładowanie:
-Model number: 	PowerStatus		Numer modelu:
-OEM info: 	PowerStatus		Informacje OEM:
-OK	PowerStatus		OK
-Power status box	PowerStatus		Pole ze statusem energii 
-PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\nautorstwa Axela Dörflera, Clemensa Zeidlera\nCopyright 2006, Haiku, Inc.\n
-Quit	PowerStatus		Wyjdź
-Run in window	PowerStatus		Uruchom w oknie
-Serial number: 	PowerStatus		Numer seryjny:
 Show percent	PowerStatus		Pokaż procent
-Show status icon	PowerStatus		Pokaż ikonę statusu
-Show text label	PowerStatus		Pokaż etykietę tekstu
-Show time	PowerStatus		Pokaż czas
-Technology: 	PowerStatus		Technologia:
+Design capacity: 	PowerStatus		Pojemność projektowa:
 Type: 	PowerStatus		Typ:
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Możesz uruchomić PowerStatus w oknie lub zainstalować go w Deskbarze
-charging	PowerStatus		ładowanie
-discharging	PowerStatus		Rozładowywanie
-mA	PowerStatus		mA
-mAh	PowerStatus		mAh
-mV	PowerStatus		mV
-mW	PowerStatus		mW
-mWh	PowerStatus		mWh
-no battery	PowerStatus		brak baterii
 non-rechargeable	PowerStatus		nieodnawialne
+Empty battery slot	PowerStatus		Gniazdo na baterie jest puste
+Run in window	PowerStatus		Uruchom w oknie
+About	PowerStatus		o
+Battery info…	PowerStatus		Informacje o baterii...
+Show time	PowerStatus		Pokaż czas
+Last full charge: 	PowerStatus		Ostatnie pełne ładowanie:
+Battery unused	PowerStatus		Bateria nieużywana
+Extended battery info	PowerStatus		Rozszerzone informacje o baterii
+Current rate: 	PowerStatus		Aktualne tempo:
+discharging	PowerStatus		Rozładowywanie
+Show text label	PowerStatus		Pokaż etykietę tekstu
+About…	PowerStatus		O...
+Model number: 	PowerStatus		Numer modelu:
+Install in Deskbar	PowerStatus		Zainstaluj w Deskbarze
+Capacity: 	PowerStatus		Pojemność:
+Battery discharging	PowerStatus		Rozładowywanie baterii
+Serial number: 	PowerStatus		Numer seryjny:
+Capacity granularity 1: 	PowerStatus		Jednostka pojemności 1:
+OK	PowerStatus		OK
+OEM info: 	PowerStatus		Informacje OEM:
+Design voltage: 	PowerStatus		Projektowe napięcie:
+PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\nautorstwa Axela Dörflera, Clemensa Zeidlera\nCopyright 2006, Haiku, Inc.\n
+Battery charging	PowerStatus		Ładowanie baterii
+Design capacity warning: 	PowerStatus		Ostrzeżenie o projektowej pojemności:
+Battery info	PowerStatus		Informacje o baterii
+Quit	PowerStatus		Wyjdź
 rechargeable	PowerStatus		odnawialna
+charging	PowerStatus		ładowanie
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Możesz uruchomić PowerStatus w oknie lub zainstalować go w Deskbarze
+Power status box	PowerStatus		Pole ze statusem energii 
+Show status icon	PowerStatus		Pokaż ikonę statusu
+Capacity granularity 2: 	PowerStatus		Jednostka pojemności 2:
+Technology: 	PowerStatus		Technologia:
+no battery	PowerStatus		brak baterii

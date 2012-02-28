@@ -1,31 +1,30 @@
-1	polish	x-vnd.Be-PRNT	407752036
-%.2f KB	JobListView		%.2f KB
-1 pending job.	PrinterListView		1 zadanie w toku.
-<pick one>	AddPrinterDialog		<wybierz jeden>
-Add	AddPrinterDialog		Dodaj
-Add printer	AddPrinterDialog		Dodaj drukarkę
-Add …	PrintersWindow		Dodaj ...
-Cancel	AddPrinterDialog		Anuluj
-Cancel job	PrintersWindow		Anuluj zadanie
-Completed	JobListView		Ukończono
-Connected to:	AddPrinterDialog		Podłączono do:
-Default Printer	PrinterListView		Domyślna drukarka
-Driver: %driver%	PrinterListView		Sterownik: %driver%
-Failed	JobListView		Nie wykonano
-Make default	PrintersWindow		Utwórz domyślny
-No pending jobs.	PrinterListView		Brak oczekujących zadań.
-No printer found!	TransportMenu		Nie znaleziono drukarek!
-Print jobs for 	PrintersWindow		Drukowanie dla
-Print jobs: No printer selected	PrintersWindow		Drukowanie: Nie wybrano drukarki
-Printer name:	AddPrinterDialog		Nazwa drukarki:
-Printer type:	AddPrinterDialog		Typ drukarki:
-Printers	PrintersWindow		Drukarki
-Processing	JobListView		W toku
-Remove	PrintersWindow		Usuń
-Restart job	PrintersWindow		Zrestartuj zadanie
-Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
-Unknown status	JobListView		Nieznany status
+1	polish	x-vnd.Be-PRNT	1248680853
 Waiting	JobListView		Oczekuję
 page	JobListView		strona
+Cancel	AddPrinterDialog		Anuluj
+Add printer	AddPrinterDialog		Dodaj drukarkę
+Printers	PrintersWindow		Drukarki
+Default Printer	PrinterListView		Domyślna drukarka
+Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
+No pending jobs.	PrinterListView		Brak oczekujących zadań.
 pages	JobListView		strony
-pending jobs.	PrinterListView		zadanie w toku.
+Processing	JobListView		W toku
+Printer name:	AddPrinterDialog		Nazwa drukarki:
+Driver: %driver%	PrinterListView		Sterownik: %driver%
+Restart job	PrintersWindow		Zrestartuj zadanie
+Add	AddPrinterDialog		Dodaj
+Make default	PrintersWindow		Utwórz domyślny
+Cancel job	PrintersWindow		Anuluj zadanie
+1 pending job.	PrinterListView		1 zadanie w toku.
+Remove	PrintersWindow		Usuń
+<pick one>	AddPrinterDialog		<wybierz jeden>
+Add …	PrintersWindow		Dodaj ...
+Print jobs for 	PrintersWindow		Drukowanie dla
+Failed	JobListView		Nie wykonano
+%.2f KB	JobListView		%.2f KB
+Completed	JobListView		Ukończono
+No printer found!	TransportMenu		Nie znaleziono drukarek!
+Print jobs: No printer selected	PrintersWindow		Drukowanie: Nie wybrano drukarki
+Unknown status	JobListView		Nieznany status
+Connected to:	AddPrinterDialog		Podłączono do:
+Printer type:	AddPrinterDialog		Typ drukarki:

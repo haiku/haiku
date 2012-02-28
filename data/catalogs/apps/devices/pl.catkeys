@@ -1,40 +1,61 @@
-1	polish	x-vnd.Haiku-Devices	2172461257
-ACPI Information	DeviceACPI		Informacja o ACPI
-ACPI controller	Device		Kontroler ACPI
-Basic information	DevicesView		Podstawowe informacje
-Bridge	Device		Most
-Bus	DevicesView		Magistrala
-Category	DevicesView		Kategoria
-Communication controller	Device		Kontroler komunikacji
-Computer	Device		Komputer
-Connection	DevicesView		Połączenie
-Detailed	DevicesView		Szczegółowy
-Device name	Device		Nazwa urządzenia
-Device name:	Device		Nazwa urządzenia:
-Device paths	Device		Ścieżki do urządzeń
-Devices	DevicesView		Urządzenia
-Display controller	Device		Kontroler ekranu
-Docking station	Device		Stacja dokująca
-Driver used	Device		Użyty sterownik
-Encryption controller	Device		Kontroler szyfrowania
-Generate system information	DevicesView		Wygeneruj informacje o systemie
-Generic system peripheral	Device		Generyczne urządzenie peryferyjne
-Input device controller	Device		Kontroler urządzenia wejścia
-Intelligent controller	Device		Inteligentny kontroler
-Manufacturer	Device		Producent
-Manufacturer:	Device		Producent:
-Mass storage controller	Device		Kontroler pamięci masowej
-Memory controller	Device		Kontroler pamięci
-Multimedia controller	Device		Kontroler multimediów
-Network controller	Device		Kontroler sieci
+1	polish	x-vnd.Haiku-Devices	3881769606
+Manufacturer	DeviceSCSI		Producent
 Order by:	DevicesView		Sortuj według:
-PCI Information	DevicePCI		Informacje o PCI
-Processor	Device		Procesor
+ACPI controller	Device		Kontroler ACPI
+Memory controller	Device		Kontroler pamięci
+Driver used	DevicePCI		Zastosowany sterownik
+CD-ROM	DeviceSCSI		CD-ROM
+ISA bus	Device		Magistrala ISA
+ACPI bus	Device		Magistrala ACPI
+ISA bus	DevicesView		Magistrala ISA
+Docking station	Device		Stacja dokująca
+Computer	Device		Komputer
+Unknown device	Device		Nieznane urządzenie
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Klasa:\t\t\t\t: %classInfo%
+Processor	DeviceSCSI		Procesor
+RBC	DeviceSCSI		RBC
+Detailed	DevicesView		Szczegółowy
+Category	DevicesView		Kategoria
 Quit	DevicesView		Wyjdź
-Refresh devices	DevicesView		Odśwież urządzenia
+Device paths	Device		Ścieżki do urządzeń
+Scanner	DeviceSCSI		Skaner
+Printer	DeviceSCSI		Drukarka
+Processor	Device		Procesor
+Optical Drive	DeviceSCSI		Napęd optyczny
+Bridge	DeviceSCSI		Mostek
+unknown	Device		nieznane
+ACPI Information	DeviceACPI		Informacja o ACPI
+Generic system peripheral	Device		Generyczne urządzenie peryferyjne
+Not implemented	DevicePCI		Nie zaimplementowano
+Disk Drive	DeviceSCSI		Dysk
+Not implemented	DeviceACPI		Nie zaimplementowano
+Device name	DevicePCI		Nazwa urządzenia
+Display controller	Device		Kontroler ekranu
+Mass storage controller	Device		Kontroler pamięci masowej
+Input device controller	Device		Kontroler urządzenia wejścia
+Network controller	Device		Kontroler sieci
+Device class	DeviceSCSI		Klasa urządzenia
+Device name	DeviceACPI		Nazwa urządzenia
+Driver used	Device		Użyty sterownik
+Other	DeviceSCSI		Inne
+Bus	DevicesView		Magistrala
+Communication controller	Device		Kontroler komunikacji
+Manufacturer	DeviceACPI		Producent
+PCI bus	Device		Magistrala PCI
+None	Device		Brak
+PCI bus	DevicesView		Magistrala PCI
+Basic information	DevicesView		Podstawowe informacje
+PCI Information	DevicePCI		Informacje o PCI
+Manufacturer:	Device		Producent:
+ACPI bus	DevicesView		Magistrala ACPI
+Devices	System name		Urządzenia
+Multimedia controller	Device		Kontroler multimediów
+Unknown	DevicePCI		Nieznane
+Device name:	Device		Nazwa urządzenia:
+Computer	DevicesView		Komputer
+Value	PropertyList		Wartość
 Report compatibility	DevicesView		Raport zgodności
-Satellite communications controller	Device		Kontroler komunikacji satelitarnej
-Serial bus controller	Device		Kontroler magistrali szeregowej
+Device	Device		Urządzenie
 Signal processing controller	Device		Kontroler przetwarzania sygnałów
-Unclassified device	Device		Nieznane urządzenie
+Serial bus controller	Device		Kontroler magistrali szeregowej
 Wireless controller	Device		Kontroler łączy bezprzewodowych

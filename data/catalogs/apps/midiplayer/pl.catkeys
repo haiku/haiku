@@ -1,18 +1,19 @@
-1	polish	x-vnd.Haiku-MidiPlayer	3885957623
-Cavern	Main Window		Grota
-Closet	Main Window		Szafa
-Could not load song	Main Window		Nie można załadować piosenki
-Drop MIDI file here	Scope View		Przeciągnij plik MIDI tutaj
-Dungeon	Main Window		Lochy
-Garage	Main Window		Garaż
-Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Odtwarzacz MIDI Haiku 1.0.0 beta\n\nTen mały program\npotrafi odtworzyć tysiące\nszykownych piosenek
-Igor's lab	Main Window		Labolatorium Igora
-Live input:	Main Window		Wejście Live:
+1	polish	x-vnd.Haiku-MidiPlayer	4180509704
 None	Main Window		Brak
+Live input:	Main Window		Wejście Live:
+Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Odtwarzacz MIDI Haiku 1.0.0 beta\n\nTen mały program\npotrafi odtworzyć tysiące\nszykownych piosenek
+Stop	Main Window		Zatrzymaj
+Cavern	Main Window		Grota
+Volume:	Main Window		Głośność:
+Reverb:	Main Window		Pogłos:
 OK	Main Window		OK
 Off	Main Window		Wyłącz
+Dungeon	Main Window		Lochy
 Play	Main Window		Odtwórz
-Reverb:	Main Window		Pogłos:
+Garage	Main Window		Garaż
+Closet	Main Window		Szafa
+MidiPlayer	System name		MidiPlayer
+Drop MIDI file here	Scope View		Przeciągnij plik MIDI tutaj
+Igor's lab	Main Window		Labolatorium Igora
 Scope	Main Window		Zakres
-Stop	Main Window		Zatrzymaj
-Volume:	Main Window		Głośność:
+Could not load song	Main Window		Nie można załadować piosenki

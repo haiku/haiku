@@ -1,0 +1,24 @@
+1	polish	x-vnd.Haiku-GLTeapot	2890609668
+Upper center	TeapotWindow		Górne
+Lighting	TeapotWindow		Oświetlenie
+Off	TeapotWindow		Wyłącz
+Lower left	TeapotWindow		Lewe
+White	TeapotWindow		Biały
+Yellow	TeapotWindow		Żółty
+Blue	TeapotWindow		Niebieski
+Gouraud shading	TeapotWindow		Cieniowanie Gourauda
+Quit	TeapotWindow		Wyjdź
+Filled polygons	TeapotWindow		Wypełnione wielokąty
+Fog	TeapotWindow		Mgła
+Backface culling	TeapotWindow		Usuwanie niewidocznych powierzchni
+Z-buffered	TeapotWindow		Buforowane Z
+File	TeapotWindow		Plik
+Options	TeapotWindow		Opcje
+Perspective	TeapotWindow		Perspektywa
+GLTeapot	System name		GLTeapot
+Green	TeapotWindow		Zielony
+Right	TeapotWindow		Prawe
+FPS display	TeapotWindow		Wyświetl FPS
+Add a teapot	TeapotWindow		Dodaj czajnik
+Red	TeapotWindow		Czerwony
+Lights	TeapotWindow		Światła

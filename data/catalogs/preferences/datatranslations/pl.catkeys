@@ -1,12 +1,13 @@
-1	polish	x-vnd.Haiku-DataTranslations	698538556
+1	polish	x-vnd.Haiku-DataTranslations	2301760066
 Cancel	DataTranslations		Anuluj
-DataTranslations - Error	DataTranslations		DataTranslations - Błąd
-DataTranslations - Note	DataTranslations		DataTranslations - uwaga
-Info	DataTranslations		informacja
-Info:	DataTranslations		Informacje:
 Name:	DataTranslations		Nazwa:
-OK	DataTranslations		OK
+Could not install %s:\n%s	DataTranslations		Nie można zainstalować %s:\n%s
+DataTranslations - Note	DataTranslations		DataTranslations - uwaga
 Overwrite	DataTranslations		Nadpisz
+Info:	DataTranslations		Informacje:
+Info	DataTranslations		informacja
 Path:	DataTranslations		Ścieżka:
 The new translator has been installed successfully.	DataTranslations		Nowy translator został prawidłowo zainstalowany.
+DataTranslations - Error	DataTranslations		DataTranslations - Błąd
+OK	DataTranslations		OK
 Version:	DataTranslations		Wersja:

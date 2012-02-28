@@ -1,13 +1,13 @@
 1	polish	x-vnd.Haiku-Keyboard	1078858058
+Written by Andrew Edward McCall	KeyboardApplication		Napisany przez Andrew Edward McCall
+Typing test area	KeyboardView		Strefa testowania pisania
 Defaults	KeyboardWindow		Domyślne
-Delay until key repeat	KeyboardView		Opóźnienie między powtórzeniem
-Fast	KeyboardView		Szybko
 Key repeat rate	KeyboardView		Szybkość powtarzania klawiszy
-Long	KeyboardView		Długo
-OK	KeyboardApplication		OK
 Revert	KeyboardWindow		Przywróć
-Short	KeyboardView		Krótko
+Delay until key repeat	KeyboardView		Opóźnienie między powtórzeniem
+OK	KeyboardApplication		OK
+Fast	KeyboardView		Szybko
 Slow	KeyboardView		Wolno
 Something has gone wrong!	KeyboardApplication		Coś poszło nie tak!
-Typing test area	KeyboardView		Strefa testowania pisania
-Written by Andrew Edward McCall	KeyboardApplication		Napisany przez Andrew Edward McCall
+Long	KeyboardView		Długo
+Short	KeyboardView		Krótko

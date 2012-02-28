@@ -1,54 +1,54 @@
 1	polish	x-vnd.Be-PSRV	1761631281
-A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Drukarka o tej nazwie już istnieje, ale nie jest użyteczna. Zastąpić?
-A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Drukarka o tej nazwie już istnieje, ale sterownik nie może zostać zlokalizowany. Zastąpić?
-A0	ConfigWindow	ISO 216 paper size	A0
-A1	ConfigWindow	ISO 216 paper size	A1
-A2	ConfigWindow	ISO 216 paper size	A2
-A3	ConfigWindow	ISO 216 paper size	A3 
-A4	ConfigWindow	ISO 216 paper size	A4
-A5	ConfigWindow	ISO 216 paper size	A5
-A6	ConfigWindow	ISO 216 paper size	A6
-All pages	ConfigWindow		Wszystkie strony
-All pages, %1 copies	ConfigWindow		Wszystkie strony, %1 kopii
-B5	ConfigWindow	ISO 216 paper size	B5
-Cancel	ConfigWindow		Anuluj
-Cancel	PrintServerApp		Anuluj
-Create a new printer	PrintServerApp Scripting		Stwórz nową drukarkę
-Delete a specific printer	PrintServerApp Scripting		Usuń daną drukarkę
-Get comments about this printer	Printer Scripting		Pokaż komentarze dla tej drukarki
-Get currently available ports/devices	Transport Scripting		Pokaż listę obecnie dostępnych portów/urządzeń
-Get name of printer	Printer Scripting		Pokaż nazwę drukarki
-Get name of the printer add-on used for this printer	Printer Scripting		Pokaż nazwę dodatku dla tej drukarki
-Get name of the transport add-on used for this printer	Printer Scripting		Pokaż nazwę dodatku do transportu dla tej drukarki
-Get name of transport	Transport Scripting		Pokaż nazwę transportu
-Get the transport configuration for this printer	Printer Scripting		Pokaż konfiguracje transportów dla tej drukarki
-Landscape	ConfigWindow		Pozioma
-Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Rejestr
-Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal
-Letter	ConfigWindow	ANSI A (letter), a North American paper size	List
-No	PrintServerApp		Nie
-OK	ConfigWindow		OK
-OK	PrintServerApp		OK
-Page %1 to %2	ConfigWindow		Strony %1 do %2
-Page %1 to %2, %3 copies	ConfigWindow		Strony %1 to %2, %3 kopie
-Page setup	ConfigWindow		Ustawienia strony
-Page setup:	ConfigWindow		Ustawienia strony:
-Paper setup:	ConfigWindow		Ustawienia papieru:
-Portrait	ConfigWindow		Pionowa
-Print setup	ConfigWindow		Ustawienia wydruku
-Printer server	ConfigWindow		Serwer drukujący
-Printer:	ConfigWindow		Drukarka:
-Retrieve a specific printer	PrintServerApp Scripting		Odzyskaj konkretną drukarkę
-Retrieve a specific transport	PrintServerApp Scripting		Odzyskaj konkretny transport
-Retrieve or select the active printer	PrintServerApp Scripting		Odzyskaj lub wybierz aktywną drukarkę
-Return the number of available printers	PrintServerApp Scripting		Zwróć liczbę dostępnych drukarek
+Undefined	ConfigWindow		Nieokreślone
 Return the number of available transports	PrintServerApp Scripting		Zwróć liczbę dostępnych transportów
+Return the number of available printers	PrintServerApp Scripting		Zwróć liczbę dostępnych drukarek
+Get currently available ports/devices	Transport Scripting		Pokaż listę obecnie dostępnych portów/urządzeń
+Retrieve or select the active printer	PrintServerApp Scripting		Odzyskaj lub wybierz aktywną drukarkę
+Cancel	PrintServerApp		Anuluj
+Retrieve a specific printer	PrintServerApp Scripting		Odzyskaj konkretną drukarkę
+Page %1 to %2	ConfigWindow		Strony %1 do %2
+Get name of the printer add-on used for this printer	Printer Scripting		Pokaż nazwę dodatku dla tej drukarki
+Page setup:	ConfigWindow		Ustawienia strony:
+OK	ConfigWindow		OK
+Cancel	ConfigWindow		Anuluj
+Printer server	ConfigWindow		Serwer drukujący
+Page %1 to %2, %3 copies	ConfigWindow		Strony %1 to %2, %3 kopie
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Drukarka o tej nazwie już istnieje, ale sterownik nie może zostać zlokalizowany. Zastąpić?
+Yes	PrintServerApp		Tak
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Rejestr
+Would you like to set one up now?	PrintServerApp		Czy chcesz ustawić jeden teraz?
+A6	ConfigWindow	ISO 216 paper size	A6
+Portrait	ConfigWindow		Pionowa
+All pages	ConfigWindow		Wszystkie strony
+There is no default printer set up.	PrintServerApp		Brak ustawionej domyślnej drukarki.
+B5	ConfigWindow	ISO 216 paper size	B5
+A0	ConfigWindow	ISO 216 paper size	A0
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	List
+Printer:	ConfigWindow		Drukarka:
+A2	ConfigWindow	ISO 216 paper size	A2
 Select a printer	ConfigWindow		Wybierz drukarkę
 Show configuration window	PrintServerApp Scripting		Pokaż okno konfiguracyjne
-Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid
+A4	ConfigWindow	ISO 216 paper size	A4
+Get comments about this printer	Printer Scripting		Pokaż komentarze dla tej drukarki
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Drukarka o tej nazwie już istnieje, ale nie jest użyteczna. Zastąpić?
+No	PrintServerApp		Nie
+Get the transport configuration for this printer	Printer Scripting		Pokaż konfiguracje transportów dla tej drukarki
+Landscape	ConfigWindow		Pozioma
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal
 There are no printers set up.	PrintServerApp		Brak ustawionej drukarki.
-There is no default printer set up.	PrintServerApp		Brak ustawionej domyślnej drukarki.
-Undefined	ConfigWindow		Nieokreślone
+Get name of the transport add-on used for this printer	Printer Scripting		Pokaż nazwę dodatku do transportu dla tej drukarki
+All pages, %1 copies	ConfigWindow		Wszystkie strony, %1 kopii
+Delete a specific printer	PrintServerApp Scripting		Usuń daną drukarkę
+Create a new printer	PrintServerApp Scripting		Stwórz nową drukarkę
+OK	PrintServerApp		OK
+Print setup	ConfigWindow		Ustawienia wydruku
+A1	ConfigWindow	ISO 216 paper size	A1
+Retrieve a specific transport	PrintServerApp Scripting		Odzyskaj konkretny transport
+Get name of printer	Printer Scripting		Pokaż nazwę drukarki
+A3	ConfigWindow	ISO 216 paper size	A3 
+Get name of transport	Transport Scripting		Pokaż nazwę transportu
+A5	ConfigWindow	ISO 216 paper size	A5
 Would you like to make @ the default printer?	PrintServerApp		Czy chcesz ustawić @ jako drukarkę domyslną?
-Would you like to set one up now?	PrintServerApp		Czy chcesz ustawić jeden teraz?
-Yes	PrintServerApp		Tak
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid
+Page setup	ConfigWindow		Ustawienia strony
+Paper setup:	ConfigWindow		Ustawienia papieru:

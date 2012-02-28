@@ -1,36 +1,37 @@
-1	polish	x-vnd.Haiku-ActivityMonitor	1437495034
-Add graph	ActivityWindow		Dodaj wykres
-Additional items	ActivityView		Dodatki
-Apps	DataSource		Aplikacje
-Block cache	DataSource		Blok pamięci cache
-Block cache memory	DataSource		Pamięć bloku cache
-CPU	DataSource		CPU
-CPU usage	DataSource		Użycie CPU
-CPU usage (combined)	DataSource		Użycie CPU (całkowite)
-Cache	DataSource		Cache
-Cached memory	DataSource		Pamięć cache
-File	ActivityWindow		Plik
-Hide legend	ActivityView		Ukryj legendę
-Media nodes	DataSource		Węzły multimedialne
-Memory	DataSource		Pamięć
-Network receive	DataSource		Odebrano
-Network send	DataSource		Wysłano
+1	polish	x-vnd.Haiku-ActivityMonitor	2708665631
 P-faults	DataSource		P-błędy
-Page faults	DataSource		Błędy stronicowania
-Ports	DataSource		Porty
-Quit	ActivityWindow		Wyjdź
+Media nodes	DataSource		Węzły multimedialne
+Threads	DataSource		Wątki
+MB	DataSource		MB
+Add graph	ActivityWindow		Dodaj wykres
+Teams	DataSource		Zespoły
+Hide legend	ActivityView		Ukryj legendę
+Network send	DataSource		Wysłano
+CPU usage (combined)	DataSource		Użycie CPU (całkowite)
+CPU	DataSource		CPU
+Used memory	DataSource		Użyta pamięć
+Cached memory	DataSource		Pamięć cache
+Apps	DataSource		Aplikacje
+Show legend	ActivityView		Pokaż legendę
+Settings	ActivityWindow		Ustawienia
 Receiving	DataSource		Otrzymano
+Settings…	ActivityWindow		Ustawienia...
+Ports	DataSource		Porty
+Page faults	DataSource		Błędy stronicowania
+Sending	DataSource		Wysyłanie
+Cache	DataSource		Cache
+Update time interval:	SettingsWindow		Częstotliwość odświeżania:
+Quit	ActivityWindow		Wyjdź
+Block cache memory	DataSource		Pamięć bloku cache
 Remove graph	ActivityView		Usuń wykres
+CPU usage	DataSource		Użycie CPU
+Sems	DataSource		Semy
 Running applications	DataSource		Uruchomione aplikacje
 Semaphores	DataSource		Semafory
-Sems	DataSource		Semy
-Sending	DataSource		Wysyłanie
-Settings	ActivityWindow		Ustawienia
-Settings…	ActivityWindow		Ustawienia...
-Show legend	ActivityView		Pokaż legendę
-Swap	DataSource		Swap
+Block cache	DataSource		Blok pamięci cache
 Swap space	DataSource		Przestrzeń wymiany
-Teams	DataSource		Zespoły
-Threads	DataSource		Wątki
-Update time interval:	SettingsWindow		Częstotliwość odświeżania:
-Used memory	DataSource		Użyta pamięć
+Swap	DataSource		Swap
+File	ActivityWindow		Plik
+Additional items	ActivityView		Dodatki
+Network receive	DataSource		Odebrano
+Memory	DataSource		Pamięć

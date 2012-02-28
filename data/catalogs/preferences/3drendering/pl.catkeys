@@ -1,26 +1,25 @@
-1	polish	x-vnd.Haiku-3DRendering	899836772
-Attributes stack size:	Capabilities		Rozmiar stosu atrybutów:
-Auxiliary buffer(s):	Capabilities		Bufor(y) pomocnicze:
-Available	Extensions		Dostępne
-Capabilities	Capabilities		Możliwości
-Extensions	Extensions		Rozszerzenia
-GLU version:	InfoView		Wersja GLU:
-GLUT API version:	InfoView		Wersja API GLUT:
-Information	InfoView		Informacje
+1	polish	x-vnd.Haiku-3DRendering	1539891217
 List stack size:	Capabilities		Rozmiar stosu listy:
-Max. 2D texture size:	Capabilities		Maks. rozmiar tekstury 2D:
-Max. 3D texture size:	Capabilities		Maks. rozmiar tekstury 3D:
+Information	InfoView		Informacje
 Max. clipping planes:	Capabilities		Maks. liczba płaszczyzn przycinających:
-Max. convolution:	Capabilities		Maks. liczba splotów:
-Max. evaluators equation order:	Capabilities		Maks. kolejność równań oceniajacych:
-Max. lights:	Capabilities		Maks. liczba świateł:
-Max. recommended index elements:	Capabilities		Maks. rekomendowany indeks elementów:
-Max. recommended vertex elements:	Capabilities		Maks. rekomendowana liczba elementów wierzchołków:
 Max. texture units:	Capabilities		Maks. liczba jednostek teksturujących:
-Model stack size:	Capabilities		Rozmiar stosu modelu:
-Name stack size:	Capabilities		Rozmiar stosu nazw:
-GL version:	InfoView		Wersja GL:
-Projection stack size:	Capabilities		Rozmiar stosu projekcji:
 Renderer name:	InfoView		Nazwa renderera:
-Texture stack size:	Capabilities		Rozmiar stosu tekstur:
 Vendor name:	InfoView		Nazwa dostawcy:
+Attributes stack size:	Capabilities		Rozmiar stosu atrybutów:
+Name stack size:	Capabilities		Rozmiar stosu nazw:
+Auxiliary buffer(s):	Capabilities		Bufor(y) pomocnicze:
+Max. recommended vertex elements:	Capabilities		Maks. rekomendowana liczba elementów wierzchołków:
+GLU version:	InfoView		Wersja GLU:
+Model stack size:	Capabilities		Rozmiar stosu modelu:
+Projection stack size:	Capabilities		Rozmiar stosu projekcji:
+Max. lights:	Capabilities		Maks. liczba świateł:
+Max. 2D texture size:	Capabilities		Maks. rozmiar tekstury 2D:
+Max. convolution:	Capabilities		Maks. liczba splotów:
+GLUT API version:	InfoView		Wersja API GLUT:
+Texture stack size:	Capabilities		Rozmiar stosu tekstur:
+Max. evaluators equation order:	Capabilities		Maks. kolejność równań oceniajacych:
+Max. 3D texture size:	Capabilities		Maks. rozmiar tekstury 3D:
+Capabilities	Capabilities		Możliwości
+Max. recommended index elements:	Capabilities		Maks. rekomendowany indeks elementów:
+Available	Extensions		Dostępne
+Extensions	Extensions		Rozszerzenia

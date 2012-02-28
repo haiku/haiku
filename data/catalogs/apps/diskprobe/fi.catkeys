@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-DiskProbe	2706202187
+1	finnish	x-vnd.Haiku-DiskProbe	2306672993
 File offset: 	ProbeView		Tiedostosiirros: 
 %ld (native)	ProbeView		%ld (alkuperäinen)
 64 bit unsigned value:	TypeEditors		64-bittinen etumerkitön arvo:
@@ -59,6 +59,7 @@ Boolean value:	TypeEditors		Boolean-arvo:
 8 bit palette	TypeEditors		8-bittinen paletti
 Fit	ProbeView	Size of fonts, fits to available room	Sopii
 Probe device	OpenWindow		Koesta laite
+ (native)	ProbeView		(alkuperäinen)
 Unknown format	TypeEditors		Tuntematon muoto
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Heksadesimaali
 MIME type:	TypeEditors		MIME-tyyppi:
