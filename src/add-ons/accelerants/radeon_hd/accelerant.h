@@ -154,6 +154,7 @@ typedef struct {
 	uint16		objectID;
 	uint32		type;
 	uint32		flags;
+	uint32		lvdsFlags;
 	uint16		gpioID;
 	struct encoder_info encoder;
 	// TODO struct radeon_hpd hpd;

@@ -195,8 +195,10 @@ connector_read_mode_lvds(uint32 connectorIndex, display_mode* mode)
 		// Who cares.
 		uint32 powerDelay
 			= B_LENDIAN_TO_HOST_INT16(lvdsInfo->info.usOffDelayInMs);
-		uint32 lcdMisc = lvdsInfo->info.ucLVDS_Misc;
 		#endif
+
+		// Store special lvds flags the encoder setup needs
+		gConnector[connectorIndex]->lvdsFlags = lvdsInfo->info.ucLVDS_Misc;
 
 		uint16 flags = B_LENDIAN_TO_HOST_INT16(
 			lvdsInfo->info.sLCDTiming.susModeMiscInfo.usAccess);

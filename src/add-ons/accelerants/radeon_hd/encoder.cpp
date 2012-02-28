@@ -397,6 +397,9 @@ encoder_digital_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 		return B_ERROR;
 	}
 
+	uint32 lvdsFlags = gConnector[connectorIndex]->lvdsFlags;
+	bool isHdmi = gConnector[connectorIndex]->encoder.isHDMI;
+
 	// Prepare AtomBIOS command arguments
 	union lvdsEncoderControl {
 		LVDS_ENCODER_CONTROL_PS_ALLOCATION    v1;
@@ -415,16 +418,15 @@ encoder_digital_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 			case 1:
 				args.v1.ucMisc = 0;
 				args.v1.ucAction = command;
-				if (0)	// TODO: HDMI?
+				if (isHdmi)
 					args.v1.ucMisc |= PANEL_ENCODER_MISC_HDMI_TYPE;
 				args.v1.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
 
 				if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
-					// TODO: laptop display support
-					//if (dig->lcd_misc & ATOM_PANEL_MISC_DUAL)
-					//	args.v1.ucMisc |= PANEL_ENCODER_MISC_DUAL;
-					//if (dig->lcd_misc & ATOM_PANEL_MISC_888RGB)
-					//	args.v1.ucMisc |= ATOM_PANEL_MISC_888RGB;
+					if ((lvdsFlags & ATOM_PANEL_MISC_DUAL) != 0)
+						args.v1.ucMisc |= PANEL_ENCODER_MISC_DUAL;
+					if ((lvdsFlags & ATOM_PANEL_MISC_888RGB) != 0)
+						args.v1.ucMisc |= ATOM_PANEL_MISC_888RGB;
 				} else {
 					//if (dig->linkb)
 					//	args.v1.ucMisc |= PANEL_ENCODER_MISC_TMDS_LINKB;
@@ -442,7 +444,7 @@ encoder_digital_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 					//if (dig->coherent_mode)
 					//	args.v2.ucMisc |= PANEL_ENCODER_MISC_COHERENT;
 				}
-				if (0) // TODO: HDMI?
+				if (isHdmi)
 					args.v2.ucMisc |= PANEL_ENCODER_MISC_HDMI_TYPE;
 				args.v2.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
 				args.v2.ucTruncate = 0;
@@ -450,26 +452,27 @@ encoder_digital_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 				args.v2.ucTemporal = 0;
 				args.v2.ucFRC = 0;
 				if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
-					// TODO: laptop display support
-					//if (dig->lcd_misc & ATOM_PANEL_MISC_DUAL)
-					//	args.v2.ucMisc |= PANEL_ENCODER_MISC_DUAL;
-					//if (dig->lcd_misc & ATOM_PANEL_MISC_SPATIAL) {
-					args.v2.ucSpatial = PANEL_ENCODER_SPATIAL_DITHER_EN;
-					//if (dig->lcd_misc & ATOM_PANEL_MISC_888RGB)
-					//	args.v2.ucSpatial |= PANEL_ENCODER_SPATIAL_DITHER_DEPTH;
-					//}
-					//if (dig->lcd_misc & ATOM_PANEL_MISC_TEMPORAL) {
-					//	args.v2.ucTemporal = PANEL_ENCODER_TEMPORAL_DITHER_EN;
-					//	if (dig->lcd_misc & ATOM_PANEL_MISC_888RGB) {
-					//		args.v2.ucTemporal
-					//			|= PANEL_ENCODER_TEMPORAL_DITHER_DEPTH;
-					//	}
-					//	if (((dig->lcd_misc >> ATOM_PANEL_MISC_GREY_LEVEL_SHIFT)
-					//		& 0x3) == 2) {
-					//		args.v2.ucTemporal
-					//			|= PANEL_ENCODER_TEMPORAL_LEVEL_4;
-					//	}
-					//}
+					if ((lvdsFlags & ATOM_PANEL_MISC_DUAL) != 0)
+						args.v2.ucMisc |= PANEL_ENCODER_MISC_DUAL;
+					if ((lvdsFlags & ATOM_PANEL_MISC_SPATIAL) != 0) {
+						args.v2.ucSpatial = PANEL_ENCODER_SPATIAL_DITHER_EN;
+						if ((lvdsFlags & ATOM_PANEL_MISC_888RGB) != 0) {
+							args.v2.ucSpatial
+								|= PANEL_ENCODER_SPATIAL_DITHER_DEPTH;
+						}
+					}
+	
+					if ((lvdsFlags & ATOM_PANEL_MISC_TEMPORAL) != 0)
+						args.v2.ucTemporal = PANEL_ENCODER_TEMPORAL_DITHER_EN;
+						if ((lvdsFlags & ATOM_PANEL_MISC_888RGB) != 0) {
+							args.v2.ucTemporal
+								|= PANEL_ENCODER_TEMPORAL_DITHER_DEPTH;
+						}
+						if (((lvdsFlags >> ATOM_PANEL_MISC_GREY_LEVEL_SHIFT)
+							& 0x3) == 2) {
+							args.v2.ucTemporal
+							|= PANEL_ENCODER_TEMPORAL_LEVEL_4;
+						}
 				} else {
 					//if (dig->linkb)
 					//	args.v2.ucMisc |= PANEL_ENCODER_MISC_TMDS_LINKB;
@@ -1436,18 +1439,18 @@ encoder_dpms_set(uint8 crtcID, int mode)
 		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
 			encoder_dpms_set_dig(crtcID, mode);
-			// We don't call OutputControl on DIG
 			return;
 		case ENCODER_OBJECT_ID_INTERNAL_DVO1:
 		case ENCODER_OBJECT_ID_INTERNAL_DDI:
 			index = GetIndexIntoMasterTable(COMMAND, DVOOutputControl);
 			break;
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DVO1:
-			// TODO: encoder dpms set newer cards
-			// If DCE5, dvo true
-			// If DCE3, dig true
-			// else...
-			index = GetIndexIntoMasterTable(COMMAND, DVOOutputControl);
+			if (info.dceMajor >= 5)
+				encoder_dpms_set_dvo(crtcID, mode);
+			else if (info.dceMajor >= 3)
+				encoder_dpms_set_dig(crtcID, mode);
+			else
+				index = GetIndexIntoMasterTable(COMMAND, DVOOutputControl);
 			break;
 		case ENCODER_OBJECT_ID_INTERNAL_LVDS:
 			index = GetIndexIntoMasterTable(COMMAND, LCD1OutputControl);
@@ -1624,6 +1627,13 @@ encoder_dpms_set_external(uint8 crtcID, int mode)
 			}
 			break;
 	}
+}
+
+
+void
+encoder_dpms_set_dvo(uint8 crtcID, int mode)
+{
+	ERROR("%s: TODO, dvo encoder dpms stub\n", __func__);
 }
 
 
