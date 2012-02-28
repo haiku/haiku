@@ -16,6 +16,7 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <CheckBox.h>
+#include <ControlLook.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
 #include <OptionPopUp.h>
@@ -39,11 +40,6 @@ enum {
 };
 
 
-#define SPACE 10
-#define SPACEING 7
-#define BUTTONHEIGHT 20
-
-
 SettingsWindow::SettingsWindow(BRect frame)
  	:
  	BWindow(frame, B_TRANSLATE("MediaPlayer settings"), B_FLOATING_WINDOW_LOOK,
@@ -51,11 +47,13 @@ SettingsWindow::SettingsWindow(BRect frame)
  		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
  			| B_AUTO_UPDATE_SIZE_LIMITS)
 {
+	const float kSpacing = be_control_look->DefaultItemSpacing();
+	
 	BBox* settingsBox = new BBox(B_PLAIN_BORDER, NULL);
-	BGroupLayout* settingsLayout = new BGroupLayout(B_VERTICAL, 5);
+	BGroupLayout* settingsLayout = new BGroupLayout(B_VERTICAL, kSpacing / 2);
 	settingsBox->SetLayout(settingsLayout);
 	BBox* buttonBox = new BBox(B_PLAIN_BORDER, NULL);
-	BGroupLayout* buttonLayout = new BGroupLayout(B_HORIZONTAL, 5);
+	BGroupLayout* buttonLayout = new BGroupLayout(B_HORIZONTAL, kSpacing / 2);
 	buttonBox->SetLayout(buttonLayout);
 
 	BStringView* playModeLabel = new BStringView("stringViewPlayMode",
@@ -136,27 +134,26 @@ SettingsWindow::SettingsWindow(BRect frame)
 		new BMessage(M_SETTINGS_SAVE));
 	okButton->MakeDefault(true);
 
-
 	// Build the layout
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.AddGroup(settingsLayout)
-			.SetInsets(5, 5, 15, 5)
+			.SetInsets(kSpacing, kSpacing, kSpacing * 2, 0)
 			.Add(playModeLabel)
 			.AddGroup(B_HORIZONTAL, 0)
-				.AddStrut(10)
+				.AddStrut(kSpacing)
 				.AddGroup(B_VERTICAL, 0)
 					.Add(fAutostartCB)
-					.AddGrid(5, 0)
-						.Add(BSpaceLayoutItem::CreateHorizontalStrut(10), 0, 0)
+					.AddGrid(kSpacing, 0)
+						.Add(BSpaceLayoutItem::CreateHorizontalStrut(kSpacing), 0, 0)
 						.Add(fCloseWindowMoviesCB, 1, 0)
-						.Add(BSpaceLayoutItem::CreateHorizontalStrut(10), 0, 1)
+						.Add(BSpaceLayoutItem::CreateHorizontalStrut(kSpacing), 0, 1)
 						.Add(fCloseWindowSoundsCB, 1, 1)
 					.End()
 					.Add(fLoopMoviesCB)
 					.Add(fLoopSoundsCB)
 				.End()
 			.End()
-			.AddStrut(5)
+			.AddStrut(kSpacing)
 
 			.Add(viewOptionsLabel)
 			.AddGroup(B_HORIZONTAL, 0)
@@ -169,7 +166,7 @@ SettingsWindow::SettingsWindow(BRect frame)
 					.Add(fSubtitlePlacementOP)
 				.End()
 			.End()
-			.AddStrut(5)
+			.AddStrut(kSpacing)
 
 			.Add(bgMoviesModeLabel)
 			.AddGroup(B_HORIZONTAL, 0)
@@ -180,10 +177,10 @@ SettingsWindow::SettingsWindow(BRect frame)
 					.Add(fMutedVolumeBGMoviesRB)
 				.End()
 			.End()
-			.AddStrut(5)
+			.AddStrut(kSpacing)
 		.End()
 		.AddGroup(buttonLayout)
-			.SetInsets(5)
+			.SetInsets(kSpacing)
 			.Add(fRevertB)
 			.AddGlue()
 			.Add(cancelButton)
