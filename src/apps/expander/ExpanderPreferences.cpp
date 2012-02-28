@@ -1,9 +1,12 @@
 /*
- * Copyright 2004-2006, Jérôme DUVAL. All rights reserved.
+ * Copyright 2004-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jérôme Duval
+ *		Humdinger <humdingerb@gmail.com>
  */
 
-#include "ExpanderPreferences.h"
 #include <Box.h>
 #include <Catalog.h>
 #include <ControlLook.h>
@@ -13,18 +16,21 @@
 #include <Screen.h>
 #include <StringView.h>
 
+#include "ExpanderPreferences.h"
+
 const uint32 MSG_OK			= 'mgOK';
 const uint32 MSG_CANCEL		= 'mCan';
-const uint32 MSG_LEAVEDEST = 'mLed';
-const uint32 MSG_SAMEDIR = 'mSad';
-const uint32 MSG_DESTUSE = 'mDeu';
-const uint32 MSG_DESTTEXT = 'mDet';
+const uint32 MSG_LEAVEDEST	= 'mLed';
+const uint32 MSG_SAMEDIR	= 'mSad';
+const uint32 MSG_DESTUSE	= 'mDeu';
+const uint32 MSG_DESTTEXT	= 'mDet';
 const uint32 MSG_DESTSELECT = 'mDes';
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "ExpanderPreferences"
 
-ExpanderPreferences::ExpanderPreferences(BMessage *settings)
+
+ExpanderPreferences::ExpanderPreferences(BMessage* settings)
 	: BWindow(BRect(0, 0, 325, 305), B_TRANSLATE("Expander settings"),
 		B_FLOATING_WINDOW_LOOK,	B_FLOATING_APP_WINDOW_FEEL, B_NOT_CLOSABLE
 			| B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
@@ -40,16 +46,15 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 	BGroupLayout* buttonLayout = new BGroupLayout(B_HORIZONTAL, kSpacing / 2);
 	buttonBox->SetLayout(buttonLayout);
 
-	BStringView *expansionLabel = new BStringView("stringViewExpansion",
+	BStringView* expansionLabel = new BStringView("stringViewExpansion",
 		B_TRANSLATE("Expansion"));
 	expansionLabel->SetFont(be_bold_font);
-	BStringView *destinationLabel = new BStringView("stringViewDestination",
+	BStringView* destinationLabel = new BStringView("stringViewDestination",
 		B_TRANSLATE("Destination folder"));
 	destinationLabel->SetFont(be_bold_font);
-	BStringView *otherLabel = new BStringView("stringViewOther",
+	BStringView* otherLabel = new BStringView("stringViewOther",
 		B_TRANSLATE("Other"));
 	otherLabel->SetFont(be_bold_font);
-
 
 	fAutoExpand = new BCheckBox("autoExpand",
 		B_TRANSLATE("Automatically expand files"), NULL);
@@ -219,26 +224,34 @@ ExpanderPreferences::MessageReceived(BMessage* msg)
 			break;
 		}
 		case B_REFS_RECEIVED:
+		{
 			if (msg->FindRef("refs", 0, &fRef) == B_OK) {
 				BEntry entry(&fRef, true);
 				BPath path(&entry);
 				fDestText->SetText(path.Path());
 			}
 			break;
+		}
 		case MSG_LEAVEDEST:
 		case MSG_SAMEDIR:
+		{
 			fDestText->SetEnabled(false);
 			fSelect->SetEnabled(false);
 			break;
+		}
 		case MSG_DESTUSE:
+		{
 			fDestText->SetEnabled(true);
 			fSelect->SetEnabled(true);
 			fDestText->TextView()->MakeEditable(false);
 			break;
+		}
 		case MSG_CANCEL:
 			Hide();
 			break;
+			
 		case MSG_OK:
+		{
 			fSettings->ReplaceBool("automatically_expand_files",
 				fAutoExpand->Value() == B_CONTROL_ON);
 			fSettings->ReplaceBool("close_when_done",
@@ -253,6 +266,7 @@ ExpanderPreferences::MessageReceived(BMessage* msg)
 				fAutoShow->Value() == B_CONTROL_ON);
 			Hide();
 			break;
+		}
 		default:
 			break;
 	}
