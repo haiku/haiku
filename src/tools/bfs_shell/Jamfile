@@ -33,9 +33,16 @@ if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	fsShellCommandLibs = $(HOST_NETWORK_LIBS) ;
 }
 
-UsePrivateHeaders storage ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers build ] : true ;
 
+if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers build os ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
+}
+
+UsePrivateHeaders shared storage ;
 UsePrivateHeaders fs_shell ;
+UseHeaders [ FDirName $(HAIKU_TOP) src tools fs_shell ] ;
 
 local bfsSource =
 	bfs_disk_system.cpp
@@ -57,6 +64,8 @@ BuildPlatformMergeObject <build>bfs.o : $(bfsSource) ;
 
 BuildPlatformMain <build>bfs_shell
 	:
+	additional_commands.cpp
+	command_checkfs.cpp
 	:
 	<build>bfs.o
 	<build>fs_shell.a $(libHaikuCompat) $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
