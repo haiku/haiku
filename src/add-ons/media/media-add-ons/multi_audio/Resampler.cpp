@@ -20,7 +20,7 @@
 
 Resampler::Resampler(uint32 sourceFormat, uint32 destFormat)
 	:
-	fFunc(NULL)
+	fFunc(&Resampler::_Void)
 {
 	PRINT(("Resampler() in 0x%x, out 0x%x\n", (unsigned int)sourceFormat,
 		(unsigned int)destFormat));
@@ -29,7 +29,7 @@ Resampler::Resampler(uint32 sourceFormat, uint32 destFormat)
 		case media_raw_audio_format::B_AUDIO_FLOAT:
 			switch (destFormat) {
 				case media_raw_audio_format::B_AUDIO_FLOAT:
-					fFunc = &Resampler::_CopyType2Type<float>;
+					fFunc = &Resampler::_CopyFloat2Float;
 					break;
 				case media_raw_audio_format::B_AUDIO_DOUBLE:
 					fFunc = &Resampler::_CopyFloat2Double;
@@ -55,7 +55,7 @@ Resampler::Resampler(uint32 sourceFormat, uint32 destFormat)
 					fFunc = &Resampler::_CopyDouble2Float;
 					break;
 				case media_raw_audio_format::B_AUDIO_DOUBLE:
-					fFunc = &Resampler::_CopyType2Type<double>;
+					fFunc = &Resampler::_CopyDouble2Double;
 					break;
 				case media_raw_audio_format::B_AUDIO_INT:
 					fFunc = &Resampler::_CopyDouble2Int;
@@ -81,7 +81,7 @@ Resampler::Resampler(uint32 sourceFormat, uint32 destFormat)
 					fFunc = &Resampler::_CopyInt2Double;
 					break;
 				case media_raw_audio_format::B_AUDIO_INT:
-					fFunc = &Resampler::_CopyType2Type<int32>;
+					fFunc = &Resampler::_CopyInt2Int;
 					break;
 				case media_raw_audio_format::B_AUDIO_SHORT:
 					fFunc = &Resampler::_CopyInt2Short;
@@ -107,7 +107,7 @@ Resampler::Resampler(uint32 sourceFormat, uint32 destFormat)
 					fFunc = &Resampler::_CopyShort2Int;
 					break;
 				case media_raw_audio_format::B_AUDIO_SHORT:
-					fFunc = &Resampler::_CopyType2Type<int16>;
+					fFunc = &Resampler::_CopyShort2Short;
 					break;
 				case media_raw_audio_format::B_AUDIO_UCHAR:
 					fFunc = &Resampler::_CopyShort2UChar;
@@ -133,7 +133,7 @@ Resampler::Resampler(uint32 sourceFormat, uint32 destFormat)
 					fFunc = &Resampler::_CopyUChar2Short;
 					break;
 				case media_raw_audio_format::B_AUDIO_UCHAR:
-					fFunc = &Resampler::_CopyType2Type<uint8>;
+					fFunc = &Resampler::_CopyUChar2UChar;
 					break;
 				case media_raw_audio_format::B_AUDIO_CHAR:
 					fFunc = &Resampler::_CopyUChar2Char;
@@ -159,7 +159,7 @@ Resampler::Resampler(uint32 sourceFormat, uint32 destFormat)
 					fFunc = &Resampler::_CopyChar2UChar;
 					break;
 				case media_raw_audio_format::B_AUDIO_CHAR:
-					fFunc = &Resampler::_CopyType2Type<int8>;
+					fFunc = &Resampler::_CopyChar2Char;
 					break;
 			}
 			break;
@@ -172,20 +172,20 @@ Resampler::~Resampler()
 }
 
 
-status_t
-Resampler::InitCheck() const
+void
+Resampler::_Void(const void *inputData, uint32 inputStride,
+	void *outputData, uint32 outputStride, uint32 sampleCount)
 {
-	return fFunc != NULL ? B_OK : B_ERROR;
+	
 }
 
 
-template<typename T>
 void
-Resampler::_CopyType2Type(const void *inputData, uint32 inputStride,
+Resampler::_CopyFloat2Float(const void *inputData, uint32 inputStride,
 	void *outputData, uint32 outputStride, uint32 sampleCount)
 {
 	while (sampleCount > 0) {
-		*(T*)outputData = *(const T*)inputData;
+		*(float*)outputData = *(const float*)inputData;
 
 		outputData = (void*)((uint8*)outputData + outputStride);
 		inputData = (void*)((uint8*)inputData + inputStride);
@@ -275,6 +275,21 @@ Resampler::_CopyDouble2Float(const void *inputData, uint32 inputStride,
 {
 	while (sampleCount > 0) {
 		*(float*)outputData = *(const double*)inputData;
+
+		outputData = (void*)((uint8*)outputData + outputStride);
+		inputData = (void*)((uint8*)inputData + inputStride);
+
+		sampleCount--;
+	}
+}
+
+
+void
+Resampler::_CopyDouble2Double(const void *inputData, uint32 inputStride,
+	void *outputData, uint32 outputStride, uint32 sampleCount)
+{
+	while (sampleCount > 0) {
+		*(double*)outputData = *(const double*)inputData;
 
 		outputData = (void*)((uint8*)outputData + outputStride);
 		inputData = (void*)((uint8*)inputData + inputStride);
@@ -390,6 +405,21 @@ Resampler::_CopyShort2Int(const void *inputData, uint32 inputStride,
 
 
 void
+Resampler::_CopyShort2Short(const void *inputData, uint32 inputStride,
+	void *outputData, uint32 outputStride, uint32 sampleCount)
+{
+	while (sampleCount > 0) {
+		*(int16*)outputData = *(const int16*)inputData;
+
+		outputData = (void*)((uint8*)outputData + outputStride);
+		inputData = (void*)((uint8*)inputData + inputStride);
+
+		sampleCount--;
+	}
+}
+
+
+void
 Resampler::_CopyShort2UChar(const void *inputData, uint32 inputStride,
 	void *outputData, uint32 outputStride, uint32 sampleCount)
 {
@@ -440,6 +470,21 @@ Resampler::_CopyInt2Double(const void *inputData, uint32 inputStride,
 {
 	while (sampleCount > 0) {
 		*(double*)outputData = *(const int32*)inputData / 2147483647.0;
+
+		outputData = (void*)((uint8*)outputData + outputStride);
+		inputData = (void*)((uint8*)inputData + inputStride);
+
+		sampleCount--;
+	}
+}
+
+
+void
+Resampler::_CopyInt2Int(const void *inputData, uint32 inputStride,
+	void *outputData, uint32 outputStride, uint32 sampleCount)
+{
+	while (sampleCount > 0) {
+		*(int32*)outputData = *(const int32*)inputData;
 
 		outputData = (void*)((uint8*)outputData + outputStride);
 		inputData = (void*)((uint8*)inputData + inputStride);
@@ -555,6 +600,21 @@ Resampler::_CopyUChar2Int(const void *inputData, uint32 inputStride,
 
 
 void
+Resampler::_CopyUChar2UChar(const void *inputData, uint32 inputStride,
+	void *outputData, uint32 outputStride, uint32 sampleCount)
+{
+	while (sampleCount > 0) {
+		*(uint8*)outputData = *(const uint8*)inputData;
+
+		outputData = (void*)((uint8*)outputData + outputStride);
+		inputData = (void*)((uint8*)inputData + inputStride);
+
+		sampleCount--;
+	}
+}
+
+
+void
 Resampler::_CopyUChar2Char(const void *inputData, uint32 inputStride,
 	void *outputData, uint32 outputStride, uint32 sampleCount)
 {
@@ -635,6 +695,21 @@ Resampler::_CopyChar2UChar(const void *inputData, uint32 inputStride,
 {
 	while (sampleCount > 0) {
 		*(uint8*)outputData = *(const int8*)inputData + 128;
+
+		outputData = (void*)((uint8*)outputData + outputStride);
+		inputData = (void*)((uint8*)inputData + inputStride);
+
+		sampleCount--;
+	}
+}
+
+
+void
+Resampler::_CopyChar2Char(const void *inputData, uint32 inputStride,
+	void *outputData, uint32 outputStride, uint32 sampleCount)
+{
+	while (sampleCount > 0) {
+		*(int8*)outputData = *(const int8*)inputData;
 
 		outputData = (void*)((uint8*)outputData + outputStride);
 		inputData = (void*)((uint8*)inputData + inputStride);

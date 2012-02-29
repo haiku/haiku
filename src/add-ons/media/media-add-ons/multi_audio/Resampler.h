@@ -25,7 +25,10 @@ public:
 
 protected:
 	//static functions for converting datas
-	template<typename T> void _CopyType2Type(const void *inputData,
+	void 					_Void(const void *inputData, uint32 inputStride,
+								void *outputData, uint32 outputStride,
+								uint32 sampleCount);
+	virtual  void			_CopyFloat2Float(const void *inputData,
 								uint32 inputStride, void *outputData,
 								uint32 outputStride, uint32 sampleCount);
 	virtual  void			_CopyFloat2Double(const void *inputData,
@@ -47,6 +50,9 @@ protected:
 	virtual  void			_CopyDouble2Float(const void *inputData,
 								uint32 inputStride, void *outputData,
 								uint32 outputStride, uint32 sampleCount);
+	virtual  void			_CopyDouble2Double(const void *inputData,
+								uint32 inputStride, void *outputData,
+								uint32 outputStride, uint32 sampleCount);
 	virtual  void			_CopyDouble2Short(const void *inputData,
 								uint32 inputStride, void *outputData,
 								uint32 outputStride, uint32 sampleCount);
@@ -64,6 +70,9 @@ protected:
 								uint32 inputStride, void *outputData,
 								uint32 outputStride, uint32 sampleCount);
 	virtual  void			_CopyInt2Double(const void *inputData,
+								uint32 inputStride, void *outputData,
+								uint32 outputStride, uint32 sampleCount);
+	virtual  void			_CopyInt2Int(const void *inputData,
 								uint32 inputStride, void *outputData,
 								uint32 outputStride, uint32 sampleCount);
 	virtual  void			_CopyInt2Short(const void *inputData,
@@ -85,6 +94,9 @@ protected:
 	virtual  void			_CopyShort2Int(const void *inputData,
 								uint32 inputStride, void *outputData,
 								uint32 outputStride, uint32 sampleCount);
+	virtual  void			_CopyShort2Short(const void *inputData,
+								uint32 inputStride, void *outputData,
+								uint32 outputStride, uint32 sampleCount);
 	virtual  void			_CopyShort2UChar(const void *inputData,
 								uint32 inputStride, void *outputData,
 								uint32 outputStride, uint32 sampleCount);
@@ -102,6 +114,9 @@ protected:
 								uint32 inputStride, void *outputData,
 								uint32 outputStride, uint32 sampleCount);
 	virtual  void			_CopyUChar2Int(const void *inputData,
+								uint32 inputStride, void *outputData,
+								uint32 outputStride, uint32 sampleCount);
+	virtual  void			_CopyUChar2UChar(const void *inputData,
 								uint32 inputStride, void *outputData,
 								uint32 outputStride, uint32 sampleCount);
 	virtual  void			_CopyUChar2Char(const void *inputData,
@@ -123,6 +138,9 @@ protected:
 	virtual  void			_CopyChar2UChar(const void *inputData,
 								uint32 inputStride, void *outputData,
 								uint32 outputStride, uint32 sampleCount);
+	virtual  void			_CopyChar2Char(const void *inputData,
+								uint32 inputStride, void *outputData,
+								uint32 outputStride, uint32 sampleCount);
 
 private:
 			void			(Resampler::*fFunc)(const void *inputData,
@@ -135,8 +153,6 @@ inline void
 Resampler::Resample(const void *inputData, uint32 inputStride,
 	void *outputData, uint32 outputStride, uint32 sampleCount)
 {
-	if (this->InitCheck() != B_OK)
-		return;
 	(this->*fFunc)(inputData, inputStride, outputData, outputStride,
 		sampleCount);
 }
