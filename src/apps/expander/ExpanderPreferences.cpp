@@ -31,9 +31,10 @@ const uint32 MSG_DESTSELECT = 'mDes';
 
 
 ExpanderPreferences::ExpanderPreferences(BMessage* settings)
-	: BWindow(BRect(0, 0, 325, 305), B_TRANSLATE("Expander settings"),
-		B_FLOATING_WINDOW_LOOK,	B_FLOATING_APP_WINDOW_FEEL, B_NOT_CLOSABLE
-			| B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
+	:
+	BWindow(BRect(0, 0, 325, 305), B_TRANSLATE("Expander settings"),
+		B_FLOATING_WINDOW_LOOK,	B_FLOATING_APP_WINDOW_FEEL, B_NOT_RESIZABLE
+			| B_NOT_CLOSABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fSettings(settings),
 	fUsePanel(NULL)
 {
@@ -234,8 +235,9 @@ ExpanderPreferences::MessageReceived(BMessage* msg)
 		{
 			if (!fUsePanel) {
 				BMessenger messenger(this);
-				fUsePanel = new DirectoryFilePanel(B_OPEN_PANEL, &messenger, NULL,
-					B_DIRECTORY_NODE, false, NULL, new DirectoryRefFilter(), true);
+				fUsePanel = new DirectoryFilePanel(B_OPEN_PANEL, &messenger,
+					NULL, B_DIRECTORY_NODE, false, NULL,
+					new DirectoryRefFilter(), true);
 			}
 			fUsePanel->Show();
 			break;
@@ -274,16 +276,25 @@ ExpanderPreferences::MessageReceived(BMessage* msg)
 			fDestText->TextView()->MakeEditable(false);
 			break;
 		}
+		case B_KEY_DOWN:
+		{
+			int32 index;
+			if (msg->FindInt32("key", &index) == B_OK && index != 1)
+				break;
+			// Falling through on ESC
+		}
 		case MSG_CANCEL:
+		{
 			_ReadSettings();
 			Hide();
 			break;
-
+		}
 		case MSG_OK:
+		{
 			_WriteSettings();
 			Hide();
 			break;
-
+		}
 		default:
 			break;
 	}
