@@ -1195,6 +1195,9 @@ command_ioctl(int argc, const char* const* argv)
 		return rootDir;
 
 	fssh_status_t status = _kern_ioctl(rootDir, atoi(argv[1]), NULL, 0);
+
+	_kern_close(rootDir);
+
 	if (status != FSSH_B_OK) {
 		fprintf(stderr, "Error: ioctl failed: %s\n", fssh_strerror(status));
 		return status;
