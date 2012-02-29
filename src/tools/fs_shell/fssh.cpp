@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "compatibility.h"
 
 #include "fssh.h"
@@ -1471,6 +1472,7 @@ standard_session(const char* device, const char* fsName, bool interactive)
 
 	// register commands
 	register_commands();
+	register_additional_commands();
 
 	// process commands
 	input_loop(interactive);

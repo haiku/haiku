@@ -4,9 +4,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers build ] : true ;
 
 if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers build os ] : true ;
-	#UseHeaders [ FDirName $(HAIKU_TOP) headers build os app ] : true ;
 	UseHeaders [ FDirName $(HAIKU_TOP) headers build os kernel ] : true ;
-	#UseHeaders [ FDirName $(HAIKU_TOP) headers build os interface ] : true ;
 	UseHeaders [ FDirName $(HAIKU_TOP) headers build os storage ] : true ;
 	UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
 }
@@ -80,6 +78,8 @@ BuildPlatformStaticLibrary <build>fs_shell.a :
 	$(externalCommandsSources)
 
 	fssh.cpp
+	fssh_additional_commands.cpp
+
 	: <build>fs_shell_kernel.o
 ;
 
