@@ -15,7 +15,6 @@ namespace FSShell {
 void
 register_additional_commands()
 {
-	puts("************************ HERE I AM!!!!!!!!!!!!!!!!!");
 	CommandManager::Default()->AddCommand(command_checkfs, "checkfs",
 		"check file system");
 }
