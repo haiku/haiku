@@ -35,6 +35,36 @@ extern "C" void _sPrintf(const char* format, ...);
 
 
 void
+encoder_init()
+{
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
+		if (gConnector[id]->valid == false)
+			continue;
+
+		switch (gConnector[id]->encoder.objectID) {
+			case ENCODER_OBJECT_ID_INTERNAL_UNIPHY:
+			case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
+			case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
+			case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
+				transmitter_dig_setup(id, 0, 0, 0,
+					ATOM_TRANSMITTER_ACTION_INIT);
+				break;
+			default:
+				break;
+		}
+
+		if ((info.chipsetFlags & CHIP_APU) != 0
+			&& gConnector[id]->encoder.isExternal) {
+			encoder_external_setup(id, 0,
+				EXTERNAL_ENCODER_ACTION_V3_ENCODER_INIT);
+		}
+	}
+}
+
+
+void
 encoder_assign_crtc(uint8 crtcID)
 {
 	TRACE("%s\n", __func__);
@@ -195,9 +225,6 @@ encoder_pick_dig(uint32 connectorIndex)
 		if (gDisplay[crtcID]->connectorIndex == connectorIndex)
 			break;
 	}
-
-	TRACE("%s: Found crtc %" B_PRIu32 " for connector %" B_PRIu32 "\n",
-		__func__, crtcID, connectorIndex);
 
 	bool linkB = gConnector[connectorIndex]->encoder.linkEnumeration
 		== GRAPH_OBJECT_ENUM_ID2 ? true : false;

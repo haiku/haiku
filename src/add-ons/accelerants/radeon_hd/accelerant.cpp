@@ -285,6 +285,9 @@ radeon_init_accelerant(int device)
 	// print found connectors
 	debug_connectors();
 
+	// setup encoders on each connector if needed
+	encoder_init();
+
 	// setup link on any DisplayPort connectors
 	dp_setup_connectors();
 

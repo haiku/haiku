@@ -11,6 +11,7 @@
 
 #include <SupportDefs.h>
 
+void encoder_init();
 
 void encoder_assign_crtc(uint8 crtcID);
 uint32 encoder_pick_dig(uint32 connectorIndex);
