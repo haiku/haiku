@@ -31,6 +31,8 @@
 
 #if defined(HAIKU_HOST_PLATFORM_FREEBSD)
 #	include "fs_freebsd.h"
+#elif defined(HAIKU_HOST_PLATFORM_DARWIN)
+#	include "fs_darwin.h"
 #endif
 
 
@@ -43,6 +45,13 @@ using namespace BPrivate;
 #	define haiku_host_platform_write	haiku_freebsd_write
 #	define haiku_host_platform_readv	haiku_freebsd_readv
 #	define haiku_host_platform_writev	haiku_freebsd_writev
+#	define HAIKU_HOST_STAT_ATIM(x)		((x).st_atimespec)
+#	define HAIKU_HOST_STAT_MTIM(x)		((x).st_mtimespec)
+#elif defined(HAIKU_HOST_PLATFORM_DARWIN)
+#	define haiku_host_platform_read		read
+#	define haiku_host_platform_write	write
+#	define haiku_host_platform_readv	readv
+#	define haiku_host_platform_writev	writev
 #	define HAIKU_HOST_STAT_ATIM(x)		((x).st_atimespec)
 #	define HAIKU_HOST_STAT_MTIM(x)		((x).st_mtimespec)
 #else
@@ -63,6 +72,139 @@ using namespace BPrivate;
 		}									\
 		return __result;					\
 	} while (0)
+
+
+#if defined(_HAIKU_BUILD_NO_FUTIMENS) || defined(_HAIKU_BUILD_NO_FUTIMENS)
+
+template<typename File>
+static int
+utimes_helper(File& file, const struct timespec times[2])
+{
+	if (times == NULL)
+		return file.SetTimes(NULL);
+
+	timeval timeBuffer[2];
+	timeBuffer[0].tv_sec = times[0].tv_sec;
+	timeBuffer[0].tv_usec = times[0].tv_nsec / 1000;
+	timeBuffer[1].tv_sec = times[1].tv_sec;
+	timeBuffer[1].tv_usec = times[1].tv_nsec / 1000;
+
+	if (times[0].tv_nsec == UTIME_OMIT || times[1].tv_nsec == UTIME_OMIT) {
+		struct stat st;
+		if (file.GetStat(st) != 0)
+			return -1;
+
+		if (times[0].tv_nsec == UTIME_OMIT && times[1].tv_nsec == UTIME_OMIT)
+			return 0;
+
+		if (times[0].tv_nsec == UTIME_OMIT) {
+			timeBuffer[0].tv_sec = st.st_atimespec.tv_sec;
+			timeBuffer[0].tv_usec = st.st_atimespec.tv_nsec / 1000;
+		}
+
+		if (times[1].tv_nsec == UTIME_OMIT) {
+			timeBuffer[1].tv_sec = st.st_mtimespec.tv_sec;
+			timeBuffer[1].tv_usec = st.st_mtimespec.tv_nsec / 1000;
+		}
+	}
+
+	if (times[0].tv_nsec == UTIME_NOW || times[1].tv_nsec == UTIME_NOW) {
+		timeval now;
+		gettimeofday(&now, NULL);
+
+		if (times[0].tv_nsec == UTIME_NOW)
+			timeBuffer[0] = now;
+
+		if (times[1].tv_nsec == UTIME_NOW)
+			timeBuffer[1] = now;
+	}
+
+	return file.SetTimes(timeBuffer);	
+}
+
+#endif	// _HAIKU_BUILD_NO_FUTIMENS || _HAIKU_BUILD_NO_FUTIMENS
+
+
+#ifdef _HAIKU_BUILD_NO_FUTIMENS
+
+struct FDFile {
+	FDFile(int fd)
+		:
+		fFD(fd)
+	{
+	}
+
+	int GetStat(struct stat& _st)
+	{
+		return fstat(fFD, &_st);
+	}
+
+	int SetTimes(const timeval times[2])
+	{
+		return futimes(fFD, times);
+	}
+
+private:
+	int fFD;
+};
+
+
+int
+futimens(int fd, const struct timespec times[2])
+{
+	FDFile file(fd);
+	return utimes_helper(file, times);
+}
+
+#endif	// _HAIKU_BUILD_NO_FUTIMENS
+
+#ifdef _HAIKU_BUILD_NO_FUTIMESAT
+
+int
+futimesat(int fd, const char *path, const struct timeval times[2]) {
+	FDFile file(fd);
+	return futimes(fd, times);
+}
+
+#endif	// _HAIKU_BUILD_NO_FUTIMESAT
+
+#ifdef _HAIKU_BUILD_NO_UTIMENSAT
+
+struct FDPathFile {
+	FDPathFile(int fd, const char* path, int flag)
+		:
+		fFD(fd),
+		fPath(path),
+		fFlag(flag)
+	{
+	}
+
+	int GetStat(struct stat& _st)
+	{
+		return fstatat(fFD, fPath, &_st, fFlag);
+	}
+
+	int SetTimes(const timeval times[2])
+	{
+		// TODO: fFlag (AT_SYMLINK_NOFOLLOW) is not supported here!
+		return futimesat(fFD, fPath, times);
+	}
+
+private:
+	int			fFD;
+	const char*	fPath;
+	int			fFlag;
+};
+
+
+int
+utimensat(int fd, const char* path, const struct timespec times[2], int flag)
+{
+	FDPathFile file(fd, path, flag);
+	return utimes_helper(file, times);
+}
+
+#endif	// _HAIKU_BUILD_NO_UTIMENSAT
 
 
 static status_t get_path(dev_t device, ino_t node, const char *name,
