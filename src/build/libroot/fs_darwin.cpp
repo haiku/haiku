@@ -97,3 +97,10 @@ linkat(int toFD, const char *toPath, int linkFD, const char *linkPath, int flag)
 {
 	return 0;
 }
+
+
+int
+futimesat(int fd, const char *path, const struct timeval times[2])
+{
+	return 0;
+}

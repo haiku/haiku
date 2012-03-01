@@ -158,16 +158,6 @@ futimens(int fd, const struct timespec times[2])
 
 #endif	// _HAIKU_BUILD_NO_FUTIMENS
 
-#ifdef _HAIKU_BUILD_NO_FUTIMESAT
-
-int
-futimesat(int fd, const char *path, const struct timeval times[2]) {
-	FDFile file(fd);
-	return futimes(fd, times);
-}
-
-#endif	// _HAIKU_BUILD_NO_FUTIMESAT
-
 #ifdef _HAIKU_BUILD_NO_UTIMENSAT
 
 struct FDPathFile {

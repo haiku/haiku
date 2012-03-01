@@ -22,9 +22,6 @@
 #	ifndef _HAIKU_BUILD_NO_FUTIMENS
 #		define _HAIKU_BUILD_NO_FUTIMENS		1
 #	endif
-#	ifndef _HAIKU_BUILD_NO_FUTIMESAT
-#		define _HAIKU_BUILD_NO_FUTIMESAT	1
-#	endif
 #	ifndef _HAIKU_BUILD_NO_UTIMENSAT
 #		define _HAIKU_BUILD_NO_UTIMENSAT	1
 #	endif

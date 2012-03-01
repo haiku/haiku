@@ -26,6 +26,9 @@ int renameat(int fromFD, const char* from, int toFD, const char* to);
 ssize_t readlinkat(int fd, const char *path, char *buffer, size_t bufferSize);
 int symlinkat(const char *toPath, int fd, const char *symlinkPath);
 int unlinkat(int fd, const char *path, int flag);
-int linkat(int toFD, const char *toPath, int linkFD, const char *linkPath, int flag);
+int linkat(int toFD, const char *toPath, int linkFD, const char *linkPath,
+		   int flag);
+
+int futimesat(int fd, const char *path, const struct timeval times[2]);
 
 #endif // FS_DARWIN_H
