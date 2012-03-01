@@ -473,7 +473,7 @@ done
 
 # check for case-sensitive filesystem if on darwin
 if [ $HOST_PLATFORM = "darwin" ]; then
-	diskutil info $(pwd) | grep -i "case-sensitive" > /dev/null
+	diskutil info $(pwd)/.. | grep -i "case-sensitive" > /dev/null
 	if [ $? != 0 ]; then
 		echo "You need a case-sensitive file-system to build Haiku."
 		echo "Please see the following guide on how to set one up:"
