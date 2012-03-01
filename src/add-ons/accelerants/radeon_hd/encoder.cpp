@@ -196,16 +196,21 @@ encoder_pick_dig(uint32 connectorIndex)
 			break;
 	}
 
+	TRACE("%s: Found crtc %" B_PRIu32 " for connector %" B_PRIu32 "\n",
+		__func__, crtcID, connectorIndex);
+
 	bool linkB = gConnector[connectorIndex]->encoder.linkEnumeration
 		== GRAPH_OBJECT_ENUM_ID2 ? true : false;
 
-	if (info.dceMajor >= 4) {
+	uint32 dceVersion = (info.dceMajor * 100) + info.dceMinor;
+
+	if (dceVersion >= 400) {
+		// APU
 		switch (info.chipsetID) {
 			case RADEON_PALM:
 				return linkB ? 1 : 0;
 			case RADEON_SUMO:
 			case RADEON_SUMO2:
-				// llano follows dce 3.2
 				return crtcID;
 		}
 
@@ -217,16 +222,14 @@ encoder_pick_dig(uint32 connectorIndex)
 			case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
 				return linkB ? 5 : 4;
 		}
-		ERROR("%s: picking DIG encoder on non-DIG dce 4+ encoder!\n", __func__);
-	} else if ((info.dceMajor >= 3) && (info.dceMinor >= 2)) {
-		// DCE 3.2 can drive any DIG encoder
-		return crtcID;
 	}
 
-	if (encoderID == ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA) {
-		// LVTMA can only be driven by DIG encoder 2
+	if (dceVersion >= 302)
+		return crtcID;
+
+	if (encoderID == ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA)
 		return 1;
-	}
+
 	return 0;
 }
 
