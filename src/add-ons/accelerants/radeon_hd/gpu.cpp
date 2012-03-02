@@ -457,9 +457,8 @@ radeon_gpu_mc_init()
 	if (gInfo->shared_info->frame_buffer_size > 0)
 		gInfo->fb.valid = true;
 
-	// TODO: 0 should be correct here... but it gets me vertical stripes
-	//uint64 vramBase = 0;
-	uint64 vramBase = gInfo->shared_info->frame_buffer_phys;
+	// This is the card internal location.
+	uint64 vramBase = 0;
 
 	if ((info.chipsetFlags & CHIP_IGP) != 0) {
 		vramBase = Read32(OUT, fbVMLocationReg) & 0xFFFF;
