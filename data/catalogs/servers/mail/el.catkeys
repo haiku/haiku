@@ -1,23 +1,23 @@
-1	modern_greek	x-vnd.Be-POST	2300302075
-%num new message	DeskbarView		%num νέο μήνυμα
-%num new message for %name\n	MailDaemon		%num καινούργια μηνύματα για %name\n
-%num new message.	MailDaemon		%num καινούργια μηνύματα.
-%num new messages	DeskbarView		%num νέα μηνύματα
-%num new messages for %name\n	MailDaemon		%num καινούργια μηνύματα για %name\n
-%num new messages.	MailDaemon		%num καινούργια μηνύματα.
-<no accounts>	DeskbarView		<κανένας λογαριασμός>
-Check for mail now	DeskbarView		Έλεγχος αλληλογραφίας τώρα
-Check for mails only	DeskbarView		Ελεγχος για νέα μηνύματα μόνο
-Create new message…	DeskbarView		Δημιουργία μηνύματος...
+1	greek, modern (1453-)	x-vnd.Be-POST	2300302075
 Fetching mail for %name	Notifier		Κατέβασμα μηνυμάτων από %name
-Mail daemon status log	MailDaemon		Κατάσταση του δέμονα αλληλογραφίας
-Mail status	MailDaemon		Κατάσταση αλληλογραφίας
-Mail status	Notifier		Κατάσταση αλληλογραφίας
-New Messages	MailDaemon		Νέα Μυνήματα
-No new messages	DeskbarView		Δεν υπάρχουν νέα μυνήματα.
-No new messages	MailDaemon		Δεν υπάρχουν νέα μυνήματα.
-No new messages.	MailDaemon		Δεν υπάρχουν νέα μυνήματα.
-Preferences…	DeskbarView		Επιλογές...
+Check for mails only	DeskbarView		Ελεγχος για νέα μηνύματα μόνο
 Send pending mails	DeskbarView		Αποστολή αλληλογραφίας στην ουρά
-Sending mail for %name	Notifier		Αποστολή μηνύματος από %name
+New Messages	MailDaemon		Νέα Μυνήματα
+<no accounts>	DeskbarView		<κανένας λογαριασμός>
+%num new messages	DeskbarView		%num νέα μηνύματα
+Mail status	MailDaemon		Κατάσταση αλληλογραφίας
 Shutdown mail services	DeskbarView		Κλείσιμο υπηρεσιών αλληλογραφίας
+%num new message	DeskbarView		%num νέο μήνυμα
+Sending mail for %name	Notifier		Αποστολή μηνύματος από %name
+Preferences…	DeskbarView		Επιλογές...
+%num new messages.	MailDaemon		%num καινούργια μηνύματα.
+%num new message.	MailDaemon		%num καινούργια μηνύματα.
+Create new message…	DeskbarView		Δημιουργία μηνύματος...
+%num new message for %name\n	MailDaemon		%num καινούργια μηνύματα για %name\n
+No new messages	MailDaemon		Δεν υπάρχουν νέα μυνήματα.
+Check for mail now	DeskbarView		Έλεγχος αλληλογραφίας τώρα
+No new messages	DeskbarView		Δεν υπάρχουν νέα μυνήματα.
+%num new messages for %name\n	MailDaemon		%num καινούργια μηνύματα για %name\n
+Mail daemon status log	MailDaemon		Κατάσταση του δέμονα αλληλογραφίας
+No new messages.	MailDaemon		Δεν υπάρχουν νέα μυνήματα.
+Mail status	Notifier		Κατάσταση αλληλογραφίας

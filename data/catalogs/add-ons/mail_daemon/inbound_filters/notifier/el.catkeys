@@ -1,16 +1,16 @@
-1	modern_greek	x-vnd.Haiku-NewMailNotification	3624191291
+1	greek, modern (1453-)	x-vnd.Haiku-NewMailNotification	3624191291
 %num new message	filter		%num νέο μήνυμα
 %num new messages	filter		%num νέα μυνήματα
-Alert	ConfigView		Ειδοποίηση
-Beep	ConfigView		Μπιπ
-Central alert	ConfigView		Κεντρική ειδοποίηση
-Central beep	ConfigView		Κεντρικός θόρυβος
 Keyboard LEDs	ConfigView		Φωτάκια πληκτρολογίου
-Log window	ConfigView		Παράθυρο ιστορικού
-Method:	ConfigView		Μέθοδος:
-New mails notification	ConfigView		Ειδοποίηση για email
-New messages	filter		Νέο μύνημα
-OK	filter		ΟΚ
-You have %num new message for %name.	filter		Έχεις %num νέο μύνημα από %name.
 You have %num new messages for %name.	filter		Έχεις %num νέα μυνήματα από %name.
+You have %num new message for %name.	filter		Έχεις %num νέο μύνημα από %name.
+Log window	ConfigView		Παράθυρο ιστορικού
+Central beep	ConfigView		Κεντρικός θόρυβος
+Beep	ConfigView		Μπιπ
+Method:	ConfigView		Μέθοδος:
+Central alert	ConfigView		Κεντρική ειδοποίηση
+Alert	ConfigView		Ειδοποίηση
 none	ConfigView		τίποτα
+New messages	filter		Νέο μύνημα
+New mails notification	ConfigView		Ειδοποίηση για email
+OK	filter		ΟΚ

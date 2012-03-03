@@ -1,29 +1,29 @@
-1	modern_greek	x-vnd.Haiku-ScreenSaver	215605989
-30 seconds	ScreenSaver		30 δευτερόλεπτα
-Add…	ScreenSaver		Προσθήκη
-Blackness	ScreenSaver		Σκοτεινότητα
-Cancel	ScreenSaver		Άκυρο
-Confirm password:	ScreenSaver		Επιβεβαίωση κωδικού:
+1	greek, modern (1453-)	x-vnd.Haiku-ScreenSaver	215605989
 Could not load screen saver	ScreenSaver		Δεν ήταν δυνατή η φόρτωση της προφύλαξης οθόνης
-Display Power Management Signaling not available	ScreenSaver		Η προβολή της σηματοδότησης διαχείρισης ενέργειας δεν είναι διαθέσιμη
-Don't fade when	ScreenSaver		Να μην εξαφανίζεται όταν
-Done	ScreenSaver		Έγινε
-Enable screensaver	ScreenSaver		Ενεργοποίηση προφύλαξης οθόνης
-Fade now when	ScreenSaver		Να εξαφανίζεται όταν
-General	ScreenSaver		Γενικά
-No options available	ScreenSaver		Μη διαθέσιμες επιλογές
-OK	ScreenSaver		Εντάξει
-Password Window	ScreenSaver		Κωδικός παραθύρου
-Password lock	ScreenSaver		Κωδικός κλειδώματος
-Password:	ScreenSaver		Κωδικός:
-Passwords don't match. Please try again.	ScreenSaver		Οι κωδικοί πρόσβασης δεν ταιριάζουν. Παρακαλώ δοκιμάστε ξανά.
-Password…	ScreenSaver		Κωδικός...
-ScreenSaver	System name		ScreenSaver
-Screensaver settings	ScreenSaver		Ρυθμίσεις προφύλαξης οθόνης
-Screensavers	ScreenSaver		Προφυλάξεις οθόνης
+30 seconds	ScreenSaver		30 δευτερόλεπτα
 Start screensaver	ScreenSaver		Εκκίνηση προφύλαξης οθόνης
-Test	ScreenSaver		Τέστ
-Turn off screen	ScreenSaver		Απενεργοποίηση οθόνης
-Use custom password	ScreenSaver		Χρήση προσαρμοσμένου κωδικού πρόσβασης
-Use network password	ScreenSaver		Χρήση κωδικού πρόσβασης μέσο δικτύου
+Password…	ScreenSaver		Κωδικός...
+Password:	ScreenSaver		Κωδικός:
+Password lock	ScreenSaver		Κωδικός κλειδώματος
+Add…	ScreenSaver		Προσθήκη
+Screensavers	ScreenSaver		Προφυλάξεις οθόνης
 mouse is here	ScreenSaver		το ποντίκι είναι εδώ
+Display Power Management Signaling not available	ScreenSaver		Η προβολή της σηματοδότησης διαχείρισης ενέργειας δεν είναι διαθέσιμη
+ScreenSaver	System name		ScreenSaver
+Test	ScreenSaver		Τέστ
+General	ScreenSaver		Γενικά
+Enable screensaver	ScreenSaver		Ενεργοποίηση προφύλαξης οθόνης
+Cancel	ScreenSaver		Άκυρο
+Turn off screen	ScreenSaver		Απενεργοποίηση οθόνης
+No options available	ScreenSaver		Μη διαθέσιμες επιλογές
+Password Window	ScreenSaver		Κωδικός παραθύρου
+Fade now when	ScreenSaver		Να εξαφανίζεται όταν
+Screensaver settings	ScreenSaver		Ρυθμίσεις προφύλαξης οθόνης
+Passwords don't match. Please try again.	ScreenSaver		Οι κωδικοί πρόσβασης δεν ταιριάζουν. Παρακαλώ δοκιμάστε ξανά.
+OK	ScreenSaver		Εντάξει
+Don't fade when	ScreenSaver		Να μην εξαφανίζεται όταν
+Blackness	ScreenSaver		Σκοτεινότητα
+Use custom password	ScreenSaver		Χρήση προσαρμοσμένου κωδικού πρόσβασης
+Done	ScreenSaver		Έγινε
+Confirm password:	ScreenSaver		Επιβεβαίωση κωδικού:
+Use network password	ScreenSaver		Χρήση κωδικού πρόσβασης μέσο δικτύου

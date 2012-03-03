@@ -1,18 +1,18 @@
-1	modern_greek	x-vnd.Haiku-DataTranslations	3820343452
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Ένα στοιχείο που ονομάζεται '%name' ήδη υπάρχει στον φάκελο Μεταφραστές!Να αντικατασταθεί ο υπάρχον μεταφραστής;
-Cancel	DataTranslations		Ακύρωση
-Could not install %s:\n%s	DataTranslations		Αδυναμία εγκατάστασης του %s:\n%s
+1	greek, modern (1453-)	x-vnd.Haiku-DataTranslations	3820343452
 DataTranslations	System name		Μεταφράσεις Δεδομένων
-DataTranslations - Error	DataTranslations		DataTranslations - Σφάλμα
-DataTranslations - Note	DataTranslations		DataTranslations - Σημείωση
-Info	DataTranslations		πληροφορίες
-Info:	DataTranslations		Πληροφορίες:
+Cancel	DataTranslations		Ακύρωση
 Name:	DataTranslations		Όνομα:
 Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Όνομα: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n
-OK	DataTranslations		Εντάξει
-Overwrite	DataTranslations		Αντικατάσταση
-Path:	DataTranslations		Διαδρομή:
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Το στοιχείο '%όνομα' δεν φαίνεται να είναι ένας Μεταφραστής και δεν θα εγκατασταθεί.
-The new translator has been installed successfully.	DataTranslations		Ο νέος μεταφραστής προστέθηκε με επιτυχία.
+Could not install %s:\n%s	DataTranslations		Αδυναμία εγκατάστασης του %s:\n%s
 Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Χρησιμοποιήστε αυτό τον πίνακα ελέγχου για να θέσετε τις προεπιλεγμένες τιμές για τους μεταφραστές, για να χρησιμοποιηθούν όταν δε θα καθοριστούν άλλες ρυθμίσεις απο μια εφαρμογή.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Ένα στοιχείο που ονομάζεται '%name' ήδη υπάρχει στον φάκελο Μεταφραστές!Να αντικατασταθεί ο υπάρχον μεταφραστής;
+DataTranslations - Note	DataTranslations		DataTranslations - Σημείωση
+Overwrite	DataTranslations		Αντικατάσταση
+Info:	DataTranslations		Πληροφορίες:
+Info	DataTranslations		πληροφορίες
+Path:	DataTranslations		Διαδρομή:
+The new translator has been installed successfully.	DataTranslations		Ο νέος μεταφραστής προστέθηκε με επιτυχία.
+DataTranslations - Error	DataTranslations		DataTranslations - Σφάλμα
+OK	DataTranslations		Εντάξει
 Version:	DataTranslations		Έκδοση:

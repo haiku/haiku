@@ -1,7 +1,3 @@
-1	modern_greek	x-vnd.Haiku-DeskCalc	1916192649
-Audio Feedback	CalcView		Ανατροφοδότηση Ήχου
-Basic	CalcView		Βασικό
+1	greek, modern (1453-)	x-vnd.Haiku-DeskCalc	1498939458
 Compact	CalcView		Συμπαγές
-DeskCalc	System name		Αριθμομηχανή
-Enable Num Lock on startup	CalcView		Ενεργοποίηση του Num Lock κατά την εκκίνηση
 Scientific	CalcView		Επιστημονικό

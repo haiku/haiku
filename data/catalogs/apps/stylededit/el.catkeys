@@ -1,80 +1,80 @@
-1	modern_greek	x-vnd.Haiku-StyledEdit	1508367857
+1	greek, modern (1453-)	x-vnd.Haiku-StyledEdit	1508367857
+StyledEdit	System name		StyledEdit
+Paste	Menus		Επικόλληση
+OK	LoadAlert		Εντάξει
+File	Menus		Αρχείο
 ???	LoadAlert		;;;
-Align	Menus		Στοίχιση
-Black	Menus		Μαύρο
-Blue	Menus		Μπλέ
-Bold	Menus		Έντονα
+Lines:	Statistics		Γραμμές:
+Italic	Menus		Πλάγια
+Left	Menus		Αριστερά
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Επαναφορά στην τελευταία έκδοση του \"%s\";
+Search backwards	FindandReplaceWindow		Αναζήτηση προς τα πίσω
+Size	Menus		Μέγεθος
+Save	QuitAlert		Αποθήκευση
+Page setup…	Menus		Διαμόρφωση σελίδας...
+Print…	Menus		Εκτύπωση...
 Can't undo	Menus		Αδυναμία Αναίρεσης
-Cancel	FindandReplaceWindow		Άκυρο
-Cancel	QuitAlert		Άκυρο
-Cancel	RevertToSavedAlert		Άκυρο
+Save	Menus		Αποθήκευση
+Replace with:	FindandReplaceWindow		Αντικατάσταση με:
 Cancel	SaveAlert		Άκυρο
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Δεν μπορεί να γίνει επαναφορά, το αρχείο δεν βρέθηκε: \"%s\".
 Case-sensitive	FindandReplaceWindow		Ταίριασμα πεζών/κεφαλαίων
-Center	Menus		Κέντρο
-Characters:	Statistics		Χαρακτήρες:
-Close	Menus		Κλείσιμο
-Color	Menus		Χρώμα
-Copy	Menus		Αντιγραφή
-Cut	Menus		Αποκοπή
-Cyan	Menus		Κυανό
-Default	Open_and_SaveAsPanel		Προκαθορισμένο
-Document	Menus		Έγγραφο
-Document statistics	Statistics		Στατιστικά εγγράφου
-Don't save	QuitAlert		Χωρίς αποθήκευση
-Don't save	SaveAlert		Χωρίς αποθήκευση
-Edit	Menus		Επεξεργασία
-Encoding	Open_and_SaveAsPanel		Κωδικοποίηση
-Error loading \"%s\":\n\t%s	LoadAlert		Σφάλμα φόρτωσης \"%s\":\n\t%s
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Σφάλμα φόρτωσης \"%s\":\n\tΜη υποστηριζόμενη μορφοποίηση
-Error saving \"%s\":\n%s	SaveAlert		Σφάλμα αποθήκευσης \"%s\":\n%s
-File	Menus		Αρχείο
-Find	FindandReplaceWindow		Εύρεση
-Find again	Menus		Εύρεση ξανά
-Find selection	Menus		Εύρεση επιλεγμένου
-Find:	FindandReplaceWindow		Εύρεση:
-Find…	Menus		Εύρεση...
-Font	Menus		Γραμματοσειρά
 Green	Menus		Πράσινο
-Italic	Menus		Πλάγια
-Left	Menus		Αριστερά
-Lines:	Statistics		Γραμμές:
+Revert to saved…	Menus		Επαναφορά στο αποθηκευμένο...
+Yellow	Menus		Κίτρινο
+Replace in all windows	FindandReplaceWindow		Αντικατάσταση σε όλα τα παράθυρα
+Wrap lines	Menus		Αναδίπλωση γραμμών
+Quit	Menus		Έξοδος
+Document statistics	Statistics		Στατιστικά εγγράφου
+Cancel	RevertToSavedAlert		Άκυρο
+Document	Menus		Έγγραφο
+Save changes to the document \"%s\"? 	QuitAlert		Να αποθηκευτούν οι αλλαγές στο έγγραφο \"%s\";
+Edit	Menus		Επεξεργασία
+Font	Menus		Γραμματοσειρά
+Replace all	FindandReplaceWindow		Αντικατάσταση όλων
+Statistics…	Menus		Στατιστικά…
+Default	Open_and_SaveAsPanel		Προκαθορισμένο
+Replace next	Menus		Αντικατάσταση επόμενου
+Cancel	FindandReplaceWindow		Άκυρο
+Close	Menus		Κλείσιμο
+Save	SaveAlert		Αποθήκευση
+Words:	Statistics		Λέξεις:
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Σφάλμα φόρτωσης \"%s\":\n\tΜη υποστηριζόμενη μορφοποίηση
+OK	RevertToSavedAlert		Εντάξει
+Don't save	QuitAlert		Χωρίς αποθήκευση
+Align	Menus		Στοίχιση
+Color	Menus		Χρώμα
+Red	Menus		Κόκκινο
+Open…	Menus		Άνοιγμα...
+Center	Menus		Κέντρο
+Blue	Menus		Μπλέ
+Cyan	Menus		Κυανό
+OK	Statistics		Εντάξει
 Magenta	Menus		Ματζέντα
 New	Menus		Νέο
-OK	LoadAlert		Εντάξει
-OK	RevertToSavedAlert		Εντάξει
-OK	SaveAlert		Εντάξει
-OK	Statistics		Εντάξει
-Open…	Menus		Άνοιγμα...
-Page setup…	Menus		Διαμόρφωση σελίδας...
-Paste	Menus		Επικόλληση
-Print…	Menus		Εκτύπωση...
-Quit	Menus		Έξοδος
-Red	Menus		Κόκκινο
-Redo typing	QuitAlert		Επανάληψη πληκτρολόγησης
-Replace	FindandReplaceWindow		Αντικατάσταση
-Replace all	FindandReplaceWindow		Αντικατάσταση όλων
-Replace in all windows	FindandReplaceWindow		Αντικατάσταση σε όλα τα παράθυρα
-Replace next	Menus		Αντικατάσταση επόμενου
-Replace with:	FindandReplaceWindow		Αντικατάσταση με:
-Replace…	Menus		Αντικατάσταση...
-Revert to saved…	Menus		Επαναφορά στο αποθηκευμένο...
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Επαναφορά στην τελευταία έκδοση του \"%s\";
-Right	Menus		Δεξιά
-Save	Menus		Αποθήκευση
-Save	QuitAlert		Αποθήκευση
-Save	SaveAlert		Αποθήκευση
-Save as…	Menus		Αποθήκευση ως...
-Save changes to the document \"%s\"? 	QuitAlert		Να αποθηκευτούν οι αλλαγές στο έγγραφο \"%s\";
-Search backwards	FindandReplaceWindow		Αναζήτηση προς τα πίσω
-Select all	Menus		Επιλογή όλων
-Size	Menus		Μέγεθος
-Statistics…	Menus		Στατιστικά…
-StyledEdit	System name		StyledEdit
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Το αρχείο είναι μόνο για ανάγνωση. Να αποθηκευτούν οι αλλαγές στο έγγραφο \"%s\";
-Undo typing	QuitAlert		Αναίρεση πληκτρολόγησης
-Untitled 	StyledEditWindow		Χωρίς τίτλο
-Words:	Statistics		Λέξεις:
-Wrap lines	Menus		Αναδίπλωση γραμμών
 Wrap-around search	FindandReplaceWindow		Κυκλική αναζήτηση
-Yellow	Menus		Κίτρινο
+Bold	Menus		Έντονα
+Find selection	Menus		Εύρεση επιλεγμένου
+Find:	FindandReplaceWindow		Εύρεση:
+Error saving \"%s\":\n%s	SaveAlert		Σφάλμα αποθήκευσης \"%s\":\n%s
+Copy	Menus		Αντιγραφή
+Cut	Menus		Αποκοπή
+Replace	FindandReplaceWindow		Αντικατάσταση
+Find again	Menus		Εύρεση ξανά
+Cancel	QuitAlert		Άκυρο
+Find…	Menus		Εύρεση...
+Select all	Menus		Επιλογή όλων
+Don't save	SaveAlert		Χωρίς αποθήκευση
+Error loading \"%s\":\n\t%s	LoadAlert		Σφάλμα φόρτωσης \"%s\":\n\t%s
+Undo typing	QuitAlert		Αναίρεση πληκτρολόγησης
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Το αρχείο είναι μόνο για ανάγνωση. Να αποθηκευτούν οι αλλαγές στο έγγραφο \"%s\";
+Black	Menus		Μαύρο
+Untitled 	StyledEditWindow		Χωρίς τίτλο
+OK	SaveAlert		Εντάξει
+Find	FindandReplaceWindow		Εύρεση
+Encoding	Open_and_SaveAsPanel		Κωδικοποίηση
+Characters:	Statistics		Χαρακτήρες:
+Save as…	Menus		Αποθήκευση ως...
+Redo typing	QuitAlert		Επανάληψη πληκτρολόγησης
+Replace…	Menus		Αντικατάσταση...
+Right	Menus		Δεξιά

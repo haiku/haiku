@@ -1,10 +1,10 @@
-1	modern_greek	x-vnd.Haiku-libmail	161731481
-Connection type:	ProtocolConfigView		Τύπος σύνδεσης:
-Leave mail on server	ProtocolConfigView		Να αφήνεται η αλληλογραφία στο server
-Login type:	ProtocolConfigView		Τύπος εισόδου:
-Mail server:	ProtocolConfigView		Mail server:
+1	greek, modern (1453-)	x-vnd.Haiku-libmail	161731481
 Partially download messages larger than	ProtocolConfigView		Μερικό κατέβασμα μηνυμάτων μεγαλύτερα από
 Password:	ProtocolConfigView		Κωδικός
 Remove mail from server when deleted	ProtocolConfigView		Αφαίρεση αλληλογραφίας από το server όταν διαγράφεται
+Mail server:	ProtocolConfigView		Mail server:
 Select…	MailKit		Επιλογή...
+Connection type:	ProtocolConfigView		Τύπος σύνδεσης:
+Leave mail on server	ProtocolConfigView		Να αφήνεται η αλληλογραφία στο server
 Username:	ProtocolConfigView		Όνομα χρήστη:
+Login type:	ProtocolConfigView		Τύπος εισόδου:

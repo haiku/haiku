@@ -1,121 +1,120 @@
-1	modern_greek	x-vnd.Haiku-Installer	3852628561
-%1ld of %2ld	InstallerWindow	number of files copied	%1ld από %2ld
-1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1) Εάν εγκαθιστάτε το Haiku σε πραγματικό υλικό μέρος (όχι μέσα σε μια εικονική μηχανή), συνιστάται να έχετε ήδη ετοιμάσει ένα διαμέρισμα σκληρού δίσκου. Το πρόγραμμα εκγατάστασης και το εργαλείο DriveSetup παρέχουν την αρχικοποίηση υπάρχουσων κατατμήσεων με το προεπιλεγμένο σύστημα αρχείων του Haiku, αλλά οι επιλογές για να αλλάξετε την πραγματική διάταξη των κατατμήσεων μπορεί να μην έχουν δοκιμαστεί σε μια αρκετά μεγάλη ποικιλία από συνθέσεις υπολογιστών οπότε δε συνιστούμε τη χρήση του.\n
-2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2) Το πρόγραμμα εγκατάστασης θα κάνει την κατάτμηση του Haiku να έχει δυνατότητα εκκίνησης, αλλά δεν λαμβάνει μέτρα για να ενσωματώσει το Haiku σε ένα υπάρχον μενού εκκίνησης. Εάν έχετε ήδη εγκαταστήσει το GRUB, μπορείτε να προσθέσετε Haiku στο μενού εκκίνησης του. Ανάλογα με ποια έκδοση του GRUB που χρησιμοποιείτε, αυτό γίνεται με διαφορετικό τρόπο.\n\n\n
-2.1) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
-2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" documentation, there is a link on the Desktop.\n\n	InstallerApp		3) Όταν με επιτυχία εκκινηθεί το Haiku, για πρώτη φορά, βεβαιωθείτε ότι έχετε διαβάσει την τεκμηρίωση \"Καλωσορίσματος\", υπάρχει ένας σύνδεσμος στην επιφάνεια εργασίας.\n\n
-<none>	InstallerWindow	No partition available	<κανένα>
-?? of ??	InstallerWindow	Unknown progress	;; από ;;
-???	InstallerWindow	Unknown currently copied item	???
-???	InstallerWindow	Unknown partition name	???
-Abort	InstallerWindow		Ακύρωση
-Additional disk space required: %s	InstallerWindow		Επιπλέον χώρος δίσκου που απαιτείται: %s
-Additional disk space required: 0.0 KiB	InstallerWindow		Απαιτείται επιπρόσθετος χώρος στο δίσκο: 0.0 KiB
-Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		Επίσης πρέπει να κάνετε αυτό για να δείτε το μενού έναρξης: \n\n
-All hard disks start with \"hd\".\n	InstallerApp		Όλοι οι δίσκοι ξεκινούν με  \"hd\".\n
-An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Παρουσιάστηκε ένα σφάλμα και η εγκατάσταση δεν ολοκληρώθηκε:\n\nΣφάλμα: %s
+1	greek, modern (1453-)	x-vnd.Haiku-Installer	3852628561
+So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Οπως στις άλλες καταχωρήσεις του μενού, στην κάτω μεριά του αρχείου προσθέστε κάτι ανάλογο των παρακάτω γραμμών:\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Είστε σίγουρος πως θέλετε να ακυρώσετε την εγκατάσταση και να επανεκκινήσετε το σύστημα;
+\t}\n\n	InstallerApp		\t}\n\n
+Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Το Πρόγραμμα Εγκατάστασης\n\γράφτηκε από τους Jérôme Duval και Stephan Aßmus\n\tΠνευματικά δικαιώματα 2005-2010, Haiku.\n\n
+Newer versions of GRUB use an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Οι νεότερες εκδόσεις του GRUB κάνουν χρήση ενός αρχείου ρυθμίσεων για επιπρόσθετες καταχωρίσεις στο boot μενού. Για την καταχώρισει τους στην αρχή, πρέπει να δημιουργήσετε/επεξεργαστείτε το αρχείο χρησιμοποιόντας τον αγαπημένο σας συντάκτης αρχείων από ένα Terminal σαν αυτον:\n\n
+Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Εδώ έχετε να σχολιάσετε τη γραμμή \"GRUB_HIDDEN_TIMEOUT = 0\" με την τοποθέτηση ενός \"#\" μπροστά του, ώστε να εμφανιστεί ουσιαστικά το μενού εκκίνησης.\n\n
+Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Η εγκατάσταση ολοκληρώθηκε. Ο τομέας εκκίνησης γράφτηκε στο '% s'. Πατήστε Έξοδος για να εγκαταλείψετε την εγκατάσταση ή επιλέξετε μία νέα μονάδα για να εκτελέσετε μια άλλη εγκατάσταση.
+Quit	InstallerApp		Έξοδος
+Additional disk space required: 0.0 KiB	InstallerWindow		Απαιτείται επιπρόσθετος χώρος στο δίσκο: 0.0 KiB
+With GRUB it's: (hdN,n)\n\n	InstallerApp		Στο GRUB είναι: (hdN,n)\n\n
+\tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
+Stop	InstallerWindow	In alert after pressing Stop	Τερματισμός εγκατάστασης
+Install progress:  	InstallerWindow		Πρόοδος εγκατάστασης:
+Starting Installation.	InstallProgress		Έναρξη Εγκατάστασης.
+This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Αυτό είναι λογισμικό σταδίου alpha (δοκιμαστικό)! Αυτό σημαίνει ότι υπάρχει υψηλός κίνδυνος απώλειας σημαντικών δεδομένων. Κάνετε συχνά αντίγραφα ασφαλείας! Σας έχουμε προειδοποιήσει.\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		Σίγουρα να ακυρωθεί η εγκατάσταση?
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Είστε σίγουρος ότι θέλετε να εγκαταστήσετε στον τρέχον δίσκο εκκίνησης; Το πρόγραμμα εγκατάστασης θα πρέπει να κάνει επανεκκίνηση το σύστημά σας εάν συνεχίσετε.
-Are you sure you want to to stop the installation?	InstallerWindow		Είστε σίγουρος ότι θέλετε να σταματήσετε την εγκατάσταση;
-Begin	InstallerWindow		Έναρξη
-Boot sector not written because of an internal error.	InstallProgress		Ο τομέας εκκίνησης δεν γράφτηκε λόγο ενός εσωτερικού σφάλματος.
-Boot sector successfully written.	InstallProgress		Ο τομέας εκκίνησης γράφτηκε επιτυχώς.
-BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Το BootManager, η εφαρμογή για τη ρύθμιση του μενού εκκίνησης του Haiku δε μπόρεσε να εκτελεστεί.
-Cancel	InstallProgress		Άκυρο
-Cancel	InstallerWindow		Άκυρο
-Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Επιλέξτε το δίσκο που θέλετε να εγκαταστήσετε από το αναδυόμενο μενού. Στη συνέχεια, κάντε κλικ στην \"Έναρξη\".
-Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Επιλέξτε την προέλευση και το δίσκο προορισμού από τα αναδυόμενα μενού. Στη συνέχεια, κάντε κλικ στην \"Έναρξη\".
-Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Επιλέξτε το δίσκο προέλευσης από το αναδυόμενο μενού. Στη συνέχεια, κάντε κλικ στην \"Έναρξη\".
-Collecting copy information.	InstallProgress		Συλλογή πληροφοριών αντιγραφής.
-Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Ρύθμιστε του /boot/grub/menu.lst εκτελώντας τον αγαπημένο σας επεξεργαστή κειμένου από ένα Τερματικό κάπως έτσι: \n\n
-Continue	InstallerApp		Συνέχεια
-Continue	InstallerWindow	In alert after pressing Stop	Συνέχεια
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Διαχείρηση Δίσκου, η εφαρμογή για να διαμορφώσετε κατατμήσεις δίσκων, δεν μπορεί να ξεκινήσει.
-Finally, you have to update the boot menu by entering:\n\n	InstallerApp		Τέλος, θα πρέπει να ανανεώστε το μενού εκκίνησης εισάγοντας:\n\n
-Finishing Installation.	InstallProgress		Τερματισμός Εγκατάστασης.
-GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		Το σχήμα ονομασίας GRUB εξακολουθεί να είναι: (HDN, n)\n\n
-
-Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Να περάσετε καλά και ευχαριστούμε που δοκιμάζετε το Haiku! Ελπίζουμε να σας αρέσει!
-Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Εδώ έχετε να σχολιάσετε τη γραμμή \"GRUB_HIDDEN_TIMEOUT = 0\" με την τοποθέτηση ενός \"#\" μπροστά του, ώστε να εμφανιστεί ουσιαστικά το μενού εκκίνησης.\n\n
-Hide optional packages	InstallerWindow		Απόκρυψη προαιρετικών πακέτων
-IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		ΣΗΜΑΝΤΙΚΕΣ ΠΛΗΡΟΦΟΡΙΕΣ ΠΡΙΝ ΤΗΝ ΕΓΚΑΤΑΣΤΑΣΗ ΤΟΥ HAIKU\n\n
-If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		Εάν δεν έχετε δημιουργήσει μια κατάτμηση ακόμα, απλά κάντε επανεκκίνηση, δημιουργήστε την κατάτμηση χρησιμοποιώντας όποιο εργαλείο αισθάνεστε πιο άνετα, και επανεκκίνηστε στο Haiku να συνεχίσετε την εγκατάσταση. Θα μπορούσατε για παράδειγμα, να χρησιμοποιήσετε το GParted Live-CD, που μπορεί  επίσης να αλλάξει το μέγεθος και τις υπάρχουσες κατατμήσεις για να δημιουργηθεί χώρος.\n\n\n
-Install anyway	InstallProgress		Εγκατάσταση οπωσδήποτε
-Install from:	InstallerWindow		Εγκατάσταση από:
-Install progress:  	InstallerWindow		Πρόοδος εγκατάστασης:
-Installation canceled.	InstallProgress		Η εγκατάσταση ακυρώθηκε.
-Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Η εγκατάσταση ολοκληρώθηκε. Ο τομέας εκκίνησης γράφτηκε στο '% s'. Πατήστε Έξοδος για να εγκαταλείψετε την εγκατάσταση ή επιλέξετε μία νέα μονάδα για να εκτελέσετε μια άλλη εγκατάσταση.
-Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Η εγκατάσταση ολοκληρώθηκε. Ο τομέας εκκίνησης έχει γραφτεί στο '%s'. Πατήστε Επανεκκίνηση για την επανεκκίνηση του υπολογιστή ή επιλέξτε ένα νέο τόμο για να πραγματοποιήσετε μια άλλη εγκατάσταση.
-Installer	System name		Πρόγραμμα εγκατάστασης
-Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Το Πρόγραμμα Εγκατάστασης\n\γράφτηκε από τους Jérôme Duval και Stephan Aßmus\n\tΠνευματικά δικαιώματα 2005-2010, Haiku.\n\n
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Ξεκινήστε το βοηθητικό πρόγραμμα Διαχείρηση Δίσκου για την κατάτμηση \nδιαθέσιμων σκληρών δίσκων και άλλων μέσων αποθήκευσης. \nΟι κατατμήσεις μπορoύν να αρχικοποιηθούν \nμε το σύστημα αρχείων BeFS το οποίο απαιτήται για μια Haiku κατάτμηση\n εκκίνησης.
-NOTE: While the naming strategy for hard disks is still as described under 2.1) the naming scheme for partitions has changed.\n\n	InstallerApp		Σημείωση: Ενώ η μέθοδος ονομασίας των δίσκων είναι η ίδια με το 2.1, το naming scheme έχει αλλάξει \n\n
-Newer versions of GRUB use an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Οι νεότερες εκδόσεις του GRUB κάνουν χρήση ενός αρχείου ρυθμίσεων για επιπρόσθετες καταχωρίσεις στο boot μενού. Για την καταχώρισει τους στην αρχή, πρέπει να δημιουργήσετε/επεξεργαστείτε το αρχείο χρησιμοποιόντας τον αγαπημένο σας συντάκτης αρχείων από ένα Terminal σαν αυτον:\n\n
-No optional packages available.	PackagesView		Δεν υπάρχουν διαθέσιμα προαιρετικά πακέτα.
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Δεν βρέθηκαν κατάλληλες κατατμήσεις για την εγκατάσταση. Παρακαλώ να ορίσετε κατατμήσεις και να αρχικοποιήσετε τουλάχιστον μια κατάτμηση με το σύστημα αρχείων BeFS.
-OK	InstallProgress		Εντάξει
-OK	InstallerApp		Εντάξει
-OK	InstallerWindow		Εντάξει
-Onto:	InstallerWindow		Επάνω σε:
-Performing installation.	InstallProgress		Η εγκατάσταση είναι σε εξέλιξη.
-Please choose target	InstallerWindow		Παρακαλώ επιλέξτε στόχο
-Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Παρακαλώ κλείστε το Διαχειριστή Εκκίνησης και τη Διαχείρηση Δίσκου, πριν κλείσετε το πρόγραμμα Εγκατάστασης.
-Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Παρακαλώ κλείστε το Διαχειριστή Εκκίνησης, πριν κλείσετε το πρόγραμμα Εγκατάστασης.
-Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Παρακαλώ κλείστε το παράθυρο Διαχείρηση Δίσκου πριν το κλείσιμο του παράθυρου προγράματος εγκατάστασης.
-Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Πατήστε το πλήκτρο Έναρξη για να εγκαταστήσετε από το '%1s' στο '%2s'.
-Quit	InstallerApp		Έξοδος
-Quit	InstallerWindow		Έξοδος
 Quit Boot Manager	InstallerWindow		Έξοδος από το Διαχειριστή Εκκίνησης
-Quit Boot Manager and DriveSetup	InstallerWindow		Έξοδος από το Διαχειριστή Εκκίνησης και από τη Διαχείρηση Δίσκου
-Quit DriveSetup	InstallerWindow		Έξοδος από το DriveSetup
-README	InstallerApp		README
-Restart	InstallerWindow		Επανεκκίνηση
-Restart system	InstallerWindow		Επανεκκίνηση συστήματος
-Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Σε εξέλιξη ο Διαχειριστής εκκίνησης και η Διαχείρηση Δίσκου...\n\nΚλείστε και τις δύο εφαρμογές για να συνεχίσετε την εγκατάσταση.
-Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Σε εξέλιξη ο Διαχειριστής εκκίνησης...\n\nΚλείστε το Διαχειριστή Εκκίνησης για να συνεχίσετε την εγκατάσταση.
-Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Σε εξέλιξη η Διαχείρηση Δίσκου…\n\nΚλείστε τη Διαχείρηση Δίσκου για να συνεχίσετε με την εγκατάσταση.
-Scanning for disks…	InstallerWindow		Εξέταση για δίσκους...
-Set up boot menu	InstallerWindow		Ρύθμιση μενού εκκίνησης
-Set up partitions…	InstallerWindow		Ρύθμιση κατατμήσεων...
-Show optional packages	InstallerWindow		Εμφάνιση προαιρετικών πακέτων
-So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Οπως στις άλλες καταχωρήσεις του μενού, στην κάτω μεριά του αρχείου προσθέστε κάτι ανάλογο των παρακάτω γραμμών:\n\n
-So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		Έτσι, κάτω από τον τίτλο που δεν πρέπει να επεξεργαστεί, να προσθέσετε κάτι παρόμοιο με αυτές τις γραμμές:\n\n
-Starting Installation.	InstallProgress		Έναρξη Εγκατάστασης.
 Stop	InstallerWindow		Τερματισμός
-Stop	InstallerWindow	In alert after pressing Stop	Τερματισμός εγκατάστασης
-The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Ο δίσκος προορισμού μπορεί να μην έχει αρκετό χώρο. Δοκιμάστε να επιλέξετε ένα διαφορετικό δίσκο ή επιλέξτε να μην εγκαταστήσετε προαιρετικά στοιχεία.
-The disk can't be mounted. Please choose a different disk.	InstallProgress		Ο δίσκος δεν μπορεί να προσαρτηθεί. Παρακαλώ επιλέξτε ένα διαφορετικό δίσκο.
-The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		Η πρώτη πραγματική κατάτμηση έχει πάντα τον αριθμό \"4\", ανεξάρτητα από τον αριθμό των πρωτευόντων διαμερισμάτων.\n\n	
-The mount point could not be retrieved.	InstallProgress		Το σημείο προσάρτησης δεν μπορεί να ανακτηθεί.
-The partition can't be mounted. Please choose a different partition.	InstallProgress		Η κατάτμηση δεν μπορεί να προσαρτηθεί. Παρακαλώ επιλέξτε μία διαφορετική κατάτμηση.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Το προεπιλεγμένο διαμέρισμα του δίσκου δεν είναι άδειο. Είστε σίγουροι ότι θέλετε να κάνετε την εγκατάσταση;\n\nΣημείωση: Ο φάκελος 'συστήματος' θα είναι μια καθαρή αντιγραφή από την πηγή εγκατάστασης, όλοι οι άλλοι φακέλοι, θα πρέπει να συγχωνευθούν, ενώ τα αρχεία και οι συνδέσμοι που υπάρχουν τόσο στην πηγή και την προεπιλεγμένη μονάδα θα αντικατασταθούν με την έκδοση της μονάδας εγκατάστασης.
-This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Αυτό είναι λογισμικό σταδίου alpha (δοκιμαστικό)! Αυτό σημαίνει ότι υπάρχει υψηλός κίνδυνος απώλειας σημαντικών δεδομένων. Κάνετε συχνά αντίγραφα ασφαλείας! Σας έχουμε προειδοποιήσει.\n\n\n
-Tools	InstallerWindow		Εργαλεία
-Try installing anyway	InstallProgress		Προσπάθεια εγκατάστασης οπωσδήποτε
-Unknown Type	InstallProgress	Partition content type	Άγνωστος τύπος
-Welcome to the Haiku Installer!\n\n	InstallerApp		Καλώς ήλθατε στην εγκατάστη του Haiku!\n\n
-With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		Με το grub 2 η πρώτη λογική κατάτμιση είναι παντα το 5, ανεξάρτητα του αριθμου των προταρχικών κατατμίσεων. \n\n
-With GRUB it's: (hdN,n)\n\n	InstallerApp		Στο GRUB είναι: (hdN,n)\n\n
-Write boot sector	InstallerWindow		Εγγραφή τομέα εκκίνησης
-Write boot sector to '%s'	InstallerWindow		Εγγραφή τομέα εκκίνησης σε '%s'
-You can see the correct partition in GParted for example.\n\n\n	InstallerApp		Μπορείτε να δείτε τη σωστή κατάτμιση στο Gparted για παράδειγμα. \n\n\n
-You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Δεν μπορείτε να εγκαταστήσετε τα περιεχόμενα του δίσκου επάνω στον ίδιο δίσκο. Παρακαλώ επιλέξτε ένα διαφορετικό δίσκο.
-You'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\n	InstallerApp		Θα παρατηρήσετε οτι το GRUB χρησιμοποιεί μια διαφορετική στρατηγική ονομασίας των σκληρών δίσκων σε σχέση με το Linux.\n\n
-\"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\" είναι ο αριθμόες του δίσκου, ξεκινώντας από το \"0\". \n
-\"n\" is the partition number, also starting with \"0\".\n	InstallerApp		\"n\" είναι ο αριθμός κατάτμησης, ξεκινά επίσης με \"0\".\n
-\"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\" είναι ο αριθμός κατάτμησης, με τον οποίο ο GBUB 2 εκκινείται με \"1\"\n
-\t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku on /dev/sda7\n
 \t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
-\t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
 \tchainloader\t\t+1\n\n	InstallerApp		\tchainloader\t\t+1\n\n
-\tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
-\trootnoverify\t\t(hd0,6)\n	InstallerApp		\trootnoverify\t\t(hd0,6)\n	 
-\tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <ο αγαπημένος σας συντάκτης αρχείων> /boot/grub/menu.lst\n\n
-\tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <ο αγαπημένος σας συντάκτης αρχείων> /etc/default/grub\n\n
-\tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsudo <ο αγαπημένος σας επεξεργαστής κειμένου> /etc/grub.d/40_custom\n\n
-\tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
-\ttitle\t\t\t\tHaiku\n	InstallerApp		\tτίτλος\t\t\t\tHaiku\n
-\t}\n\n	InstallerApp		\t}\n\n
+OK	InstallerApp		Εντάξει
+Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Επιλέξτε την προέλευση και το δίσκο προορισμού από τα αναδυόμενα μενού. Στη συνέχεια, κάντε κλικ στην \"Έναρξη\".
+\t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku on /dev/sda7\n
+Install from:	InstallerWindow		Εγκατάσταση από:
+%1ld of %2ld	InstallerWindow	number of files copied	%1ld από %2ld
+IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		ΣΗΜΑΝΤΙΚΕΣ ΠΛΗΡΟΦΟΡΙΕΣ ΠΡΙΝ ΤΗΝ ΕΓΚΑΤΑΣΤΑΣΗ ΤΟΥ HAIKU\n\n
+Continue	InstallerWindow	In alert after pressing Stop	Συνέχεια
+Write boot sector to '%s'	InstallerWindow		Εγγραφή τομέα εκκίνησης σε '%s'
+2.1) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
+Collecting copy information.	InstallProgress		Συλλογή πληροφοριών αντιγραφής.
+Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Επιλέξτε το δίσκο προέλευσης από το αναδυόμενο μενού. Στη συνέχεια, κάντε κλικ στην \"Έναρξη\".
+Quit Boot Manager and DriveSetup	InstallerWindow		Έξοδος από το Διαχειριστή Εκκίνησης και από τη Διαχείρηση Δίσκου
+Quit	InstallerWindow		Έξοδος
+Welcome to the Haiku Installer!\n\n	InstallerApp		Καλώς ήλθατε στην εγκατάστη του Haiku!\n\n
+Boot sector successfully written.	InstallProgress		Ο τομέας εκκίνησης γράφτηκε επιτυχώς.
+Performing installation.	InstallProgress		Η εγκατάσταση είναι σε εξέλιξη.
 scanning…	InstallerWindow		εξέταση...
+Set up boot menu	InstallerWindow		Ρύθμιση μενού εκκίνησης
+The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		Η πρώτη πραγματική κατάτμηση έχει πάντα τον αριθμό \"4\", ανεξάρτητα από τον αριθμό των πρωτευόντων διαμερισμάτων.\n\n
+GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		Το σχήμα ονομασίας GRUB εξακολουθεί να είναι: (HDN, n)\n\n
+\tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <ο αγαπημένος σας συντάκτης αρχείων> /boot/grub/menu.lst\n\n
+Abort	InstallerWindow		Ακύρωση
+Finishing Installation.	InstallProgress		Τερματισμός Εγκατάστασης.
+\tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <ο αγαπημένος σας συντάκτης αρχείων> /etc/default/grub\n\n
+Restart	InstallerWindow		Επανεκκίνηση
+README	InstallerApp		README
+The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Ο δίσκος προορισμού μπορεί να μην έχει αρκετό χώρο. Δοκιμάστε να επιλέξετε ένα διαφορετικό δίσκο ή επιλέξτε να μην εγκαταστήσετε προαιρετικά στοιχεία.
+Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Παρακαλώ κλείστε το Διαχειριστή Εκκίνησης και τη Διαχείρηση Δίσκου, πριν κλείσετε το πρόγραμμα Εγκατάστασης.
+Scanning for disks…	InstallerWindow		Εξέταση για δίσκους...
+2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
+The disk can't be mounted. Please choose a different disk.	InstallProgress		Ο δίσκος δεν μπορεί να προσαρτηθεί. Παρακαλώ επιλέξτε ένα διαφορετικό δίσκο.
+?? of ??	InstallerWindow	Unknown progress	;; από ;;
+\tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Ξεκινήστε το βοηθητικό πρόγραμμα Διαχείρηση Δίσκου για την κατάτμηση \nδιαθέσιμων σκληρών δίσκων και άλλων μέσων αποθήκευσης. \nΟι κατατμήσεις μπορoύν να αρχικοποιηθούν \nμε το σύστημα αρχείων BeFS το οποίο απαιτήται για μια Haiku κατάτμηση\n εκκίνησης.
+Show optional packages	InstallerWindow		Εμφάνιση προαιρετικών πακέτων
+No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Δεν βρέθηκαν κατάλληλες κατατμήσεις για την εγκατάσταση. Παρακαλώ να ορίσετε κατατμήσεις και να αρχικοποιήσετε τουλάχιστον μια κατάτμηση με το σύστημα αρχείων BeFS.
+Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		Επίσης πρέπει να κάνετε αυτό για να δείτε το μενού έναρξης: \n\n
+Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Επιλέξτε το δίσκο που θέλετε να εγκαταστήσετε από το αναδυόμενο μενού. Στη συνέχεια, κάντε κλικ στην \"Έναρξη\".
+Unknown Type	InstallProgress	Partition content type	Άγνωστος τύπος
+<none>	InstallerWindow	No partition available	<κανένα>
+\t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
+You'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\n	InstallerApp		Θα παρατηρήσετε οτι το GRUB χρησιμοποιεί μια διαφορετική στρατηγική ονομασίας των σκληρών δίσκων σε σχέση με το Linux.\n\n
+\"n\" is the partition number, also starting with \"0\".\n	InstallerApp		\"n\" είναι ο αριθμός κατάτμησης, ξεκινά επίσης με \"0\".\n
+Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Η εγκατάσταση ολοκληρώθηκε. Ο τομέας εκκίνησης έχει γραφτεί στο '%s'. Πατήστε Επανεκκίνηση για την επανεκκίνηση του υπολογιστή ή επιλέξτε ένα νέο τόμο για να πραγματοποιήσετε μια άλλη εγκατάσταση.
+Installation canceled.	InstallProgress		Η εγκατάσταση ακυρώθηκε.
+Installer	System name		Πρόγραμμα εγκατάστασης
+You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Δεν μπορείτε να εγκαταστήσετε τα περιεχόμενα του δίσκου επάνω στον ίδιο δίσκο. Παρακαλώ επιλέξτε ένα διαφορετικό δίσκο.
+???	InstallerWindow	Unknown currently copied item	???
+\"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\" είναι ο αριθμός κατάτμησης, με τον οποίο ο GBUB 2 εκκινείται με \"1\"\n
+Quit DriveSetup	InstallerWindow		Έξοδος από το DriveSetup
+\"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\" είναι ο αριθμόες του δίσκου, ξεκινώντας από το \"0\". \n
+Hide optional packages	InstallerWindow		Απόκρυψη προαιρετικών πακέτων
+Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Παρακαλώ κλείστε το παράθυρο Διαχείρηση Δίσκου πριν το κλείσιμο του παράθυρου προγράματος εγκατάστασης.
+Restart system	InstallerWindow		Επανεκκίνηση συστήματος
+OK	InstallerWindow		Εντάξει
+Set up partitions…	InstallerWindow		Ρύθμιση κατατμήσεων...
+The partition can't be mounted. Please choose a different partition.	InstallProgress		Η κατάτμηση δεν μπορεί να προσαρτηθεί. Παρακαλώ επιλέξτε μία διαφορετική κατάτμηση.
+Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Σε εξέλιξη ο Διαχειριστής εκκίνησης...\n\nΚλείστε το Διαχειριστή Εκκίνησης για να συνεχίσετε την εγκατάσταση.
+Install anyway	InstallProgress		Εγκατάσταση οπωσδήποτε
+An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Παρουσιάστηκε ένα σφάλμα και η εγκατάσταση δεν ολοκληρώθηκε:\n\nΣφάλμα: %s
+\trootnoverify\t\t(hd0,6)\n	InstallerApp		\trootnoverify\t\t(hd0,6)\n
+Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Πατήστε το πλήκτρο Έναρξη για να εγκαταστήσετε από το '%1s' στο '%2s'.
+Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Σε εξέλιξη η Διαχείρηση Δίσκου…\n\nΚλείστε τη Διαχείρηση Δίσκου για να συνεχίσετε με την εγκατάσταση.
+Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Να περάσετε καλά και ευχαριστούμε που δοκιμάζετε το Haiku! Ελπίζουμε να σας αρέσει!
+OK	InstallProgress		Εντάξει
+Please choose target	InstallerWindow		Παρακαλώ επιλέξτε στόχο
+???	InstallerWindow	Unknown partition name	???
+1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1) Εάν εγκαθιστάτε το Haiku σε πραγματικό υλικό μέρος (όχι μέσα σε μια εικονική μηχανή), συνιστάται να έχετε ήδη ετοιμάσει ένα διαμέρισμα σκληρού δίσκου. Το πρόγραμμα εκγατάστασης και το εργαλείο DriveSetup παρέχουν την αρχικοποίηση υπάρχουσων κατατμήσεων με το προεπιλεγμένο σύστημα αρχείων του Haiku, αλλά οι επιλογές για να αλλάξετε την πραγματική διάταξη των κατατμήσεων μπορεί να μην έχουν δοκιμαστεί σε μια αρκετά μεγάλη ποικιλία από συνθέσεις υπολογιστών οπότε δε συνιστούμε τη χρήση του.\n
+2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2) Το πρόγραμμα εγκατάστασης θα κάνει την κατάτμηση του Haiku να έχει δυνατότητα εκκίνησης, αλλά δεν λαμβάνει μέτρα για να ενσωματώσει το Haiku σε ένα υπάρχον μενού εκκίνησης. Εάν έχετε ήδη εγκαταστήσει το GRUB, μπορείτε να προσθέσετε Haiku στο μενού εκκίνησης του. Ανάλογα με ποια έκδοση του GRUB που χρησιμοποιείτε, αυτό γίνεται με διαφορετικό τρόπο.\n\n\n
+Begin	InstallerWindow		Έναρξη
+Finally, you have to update the boot menu by entering:\n\n	InstallerApp		Τέλος, θα πρέπει να ανανεώστε το μενού εκκίνησης εισάγοντας:\n\n
+If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		Εάν δεν έχετε δημιουργήσει μια κατάτμηση ακόμα, απλά κάντε επανεκκίνηση, δημιουργήστε την κατάτμηση χρησιμοποιώντας όποιο εργαλείο αισθάνεστε πιο άνετα, και επανεκκίνηστε στο Haiku να συνεχίσετε την εγκατάσταση. Θα μπορούσατε για παράδειγμα, να χρησιμοποιήσετε το GParted Live-CD, που μπορεί  επίσης να αλλάξει το μέγεθος και τις υπάρχουσες κατατμήσεις για να δημιουργηθεί χώρος.\n\n\n
+With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		Με το grub 2 η πρώτη λογική κατάτμιση είναι παντα το 5, ανεξάρτητα του αριθμου των προταρχικών κατατμίσεων. \n\n
+Write boot sector	InstallerWindow		Εγγραφή τομέα εκκίνησης
+Cancel	InstallerWindow		Άκυρο
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Διαχείρηση Δίσκου, η εφαρμογή για να διαμορφώσετε κατατμήσεις δίσκων, δεν μπορεί να ξεκινήσει.
+No optional packages available.	PackagesView		Δεν υπάρχουν διαθέσιμα προαιρετικά πακέτα.
+All hard disks start with \"hd\".\n	InstallerApp		Όλοι οι δίσκοι ξεκινούν με  \"hd\".\n
+Continue	InstallerApp		Συνέχεια
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" documentation, there is a link on the Desktop.\n\n	InstallerApp		3) Όταν με επιτυχία εκκινηθεί το Haiku, για πρώτη φορά, βεβαιωθείτε ότι έχετε διαβάσει την τεκμηρίωση \"Καλωσορίσματος\", υπάρχει ένας σύνδεσμος στην επιφάνεια εργασίας.\n\n
+BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Το BootManager, η εφαρμογή για τη ρύθμιση του μενού εκκίνησης του Haiku δε μπόρεσε να εκτελεστεί.
+Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Ρύθμιστε του /boot/grub/menu.lst εκτελώντας τον αγαπημένο σας επεξεργαστή κειμένου από ένα Τερματικό κάπως έτσι: \n\n
+Boot sector not written because of an internal error.	InstallProgress		Ο τομέας εκκίνησης δεν γράφτηκε λόγο ενός εσωτερικού σφάλματος.
+Additional disk space required: %s	InstallerWindow		Επιπλέον χώρος δίσκου που απαιτείται: %s
+NOTE: While the naming strategy for hard disks is still as described under 2.1) the naming scheme for partitions has changed.\n\n	InstallerApp		Σημείωση: Ενώ η μέθοδος ονομασίας των δίσκων είναι η ίδια με το 2.1, το naming scheme έχει αλλάξει \n\n
+Cancel	InstallProgress		Άκυρο
+Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Σε εξέλιξη ο Διαχειριστής εκκίνησης και η Διαχείρηση Δίσκου...\n\nΚλείστε και τις δύο εφαρμογές για να συνεχίσετε την εγκατάσταση.
+Try installing anyway	InstallProgress		Προσπάθεια εγκατάστασης οπωσδήποτε
+So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		Έτσι, κάτω από τον τίτλο που δεν πρέπει να επεξεργαστεί, να προσθέσετε κάτι παρόμοιο με αυτές τις γραμμές:\n\n
+Are you sure you want to to stop the installation?	InstallerWindow		Είστε σίγουρος ότι θέλετε να σταματήσετε την εγκατάσταση;
+Onto:	InstallerWindow		Επάνω σε:
+Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Παρακαλώ κλείστε το Διαχειριστή Εκκίνησης, πριν κλείσετε το πρόγραμμα Εγκατάστασης.
+Tools	InstallerWindow		Εργαλεία
+The mount point could not be retrieved.	InstallProgress		Το σημείο προσάρτησης δεν μπορεί να ανακτηθεί.
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Το προεπιλεγμένο διαμέρισμα του δίσκου δεν είναι άδειο. Είστε σίγουροι ότι θέλετε να κάνετε την εγκατάσταση;\n\nΣημείωση: Ο φάκελος 'συστήματος' θα είναι μια καθαρή αντιγραφή από την πηγή εγκατάστασης, όλοι οι άλλοι φακέλοι, θα πρέπει να συγχωνευθούν, ενώ τα αρχεία και οι συνδέσμοι που υπάρχουν τόσο στην πηγή και την προεπιλεγμένη μονάδα θα αντικατασταθούν με την έκδοση της μονάδας εγκατάστασης.
+You can see the correct partition in GParted for example.\n\n\n	InstallerApp		Μπορείτε να δείτε τη σωστή κατάτμιση στο Gparted για παράδειγμα. \n\n\n
+\ttitle\t\t\t\tHaiku\n	InstallerApp		\tτίτλος\t\t\t\tHaiku\n
+\tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsudo <ο αγαπημένος σας επεξεργαστής κειμένου> /etc/grub.d/40_custom\n\n

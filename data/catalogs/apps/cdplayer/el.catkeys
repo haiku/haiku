@@ -1,14 +1,14 @@
-1	modern_greek	x-vnd.Haiku-CDPlayer	592310631
-Audio CD	CDPlayer		CD Ήχου
-CD	CDPlayer		CD
-CD drive is empty	CDPlayer		Η μονάδα CD είναι άδεια
+1	greek, modern (1453-)	x-vnd.Haiku-CDPlayer	592310631
 CDPlayer	System name		CDPlayer
+CD	CDPlayer		CD
 Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		Δίσκος: %ld:%.2ld / %ld:%.2ld
-Disc: --:-- / --:--	CDPlayer		Δίσκος: --:-- / --:--
-Disc: 88:88 / 88:88	CDPlayer		Δίσκος: 88:88 / 88:88
-It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Φαίνεται πως δεν υπάρχουν μονάδες CD στον υπολογιστή σας ή πως δεν υπάρχει το κατάλληλο λογισμικό συστήματος να υποστηρίξει μια. Λυπούμαστε πολύ.
 OK	CDPlayer		Εντάξει
 Track %whichTrack%: %trackAt%	CDPlayer		Κομμάτι %όποιο Κομμάτι%: %Κομμάτι Στο%
+Audio CD	CDPlayer		CD Ήχου
+It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Φαίνεται πως δεν υπάρχουν μονάδες CD στον υπολογιστή σας ή πως δεν υπάρχει το κατάλληλο λογισμικό συστήματος να υποστηρίξει μια. Λυπούμαστε πολύ.
 Track: %ld:%.2ld / %ld:%.2ld	CDPlayer		Κομμάτι: %ld:%.2ld / %ld:%.2ld
-Track: --:-- / --:--	CDPlayer		Κομμάτι: --:-- / --:--
 Track: 88:88 / 88:88	CDPlayer		Κομμάτι: 88:88 / 88:88
+Track: --:-- / --:--	CDPlayer		Κομμάτι: --:-- / --:--
+Disc: 88:88 / 88:88	CDPlayer		Δίσκος: 88:88 / 88:88
+Disc: --:-- / --:--	CDPlayer		Δίσκος: --:-- / --:--
+CD drive is empty	CDPlayer		Η μονάδα CD είναι άδεια

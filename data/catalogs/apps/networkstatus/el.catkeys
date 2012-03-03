@@ -1,23 +1,22 @@
-1	modern_greek	x-vnd.Haiku-NetworkStatus	853756860
-%ifaceName information:\n	NetworkStatusView		%ifaceΠληροφορίες ονόματος:\n	 
-<no wireless networks found>	NetworkStatusView		<δε βρέθηκαν ασύρματα δίκτυα>	 
-Address	NetworkStatusView		Διεύθυνση
-Broadcast	NetworkStatusView		Αναμετάδοση
-Configuring	NetworkStatusView		Ρύθμιση
-Could not join wireless network:\n	NetworkStatusView		Αδυναμία σύνδεσης στο ασύρματο δίκτυο:\n	 
+1	greek, modern (1453-)	x-vnd.Haiku-NetworkStatus	853756860
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Κατάσταση Δικτύου επιλογές:\n\t--deskbar\tπροσθέτει αυτόματα την κατάσταση δικτύου στη μπάρα εργασιών\n\t--help\t\εκτυπώνει αυτές τις πληροφορίες και έξοδος\n
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Μπορείτε να εκτελέσετε το NetworkStatus σε ένα παράθυρο ή να το εγκαταστήσετε στη Deskbar.
+<no wireless networks found>	NetworkStatusView		<δε βρέθηκαν ασύρματα δίκτυα>
+Run in window	NetworkStatus		Εκτέλεση σε παράθυρο 
+No link	NetworkStatusView		Χωρίς σύνδεσμο
 Install in Deskbar	NetworkStatus		Εγκατάσταση στη Deskbar
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Η εκκίνηση του δικτύου preflet απέτυχε.\n\nΣφάλμα:
-Netmask	NetworkStatusView		Μάσκα Δικτύου
-NetworkStatus	System name		NetworkStatus	 
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Κατάσταση Δικτύου επιλογές:\n\t--deskbar\tπροσθέτει αυτόματα την κατάσταση δικτύου στη μπάρα εργασιών\n\t--help\t\εκτυπώνει αυτές τις πληροφορίες και έξοδος\n
 NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		Κατάσταση δικτύου\n\tγράφτηκε από τους %1 and Hugo Santos\n\t%2, Haiku, Inc.\n
-No link	NetworkStatusView		Χωρίς σύνδεσμο
-No stateful configuration	NetworkStatusView		Καμία stateful ρύθμιση
-OK	NetworkStatusView		Εντάξει
-Open network preferences…	NetworkStatusView		Άνοιγμα προτιμήσεων δικτύου...
-Quit	NetworkStatusView		Έξοδος
-Ready	NetworkStatusView		Έτοιμο
-Run in window	NetworkStatus		Εκτέλεση σε παράθυρο 
+Netmask	NetworkStatusView		Μάσκα Δικτύου
+Broadcast	NetworkStatusView		Αναμετάδοση
 Unknown	NetworkStatusView		Άγνωστο
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Μπορείτε να εκτελέσετε το NetworkStatus σε ένα παράθυρο ή να το εγκαταστήσετε στη Deskbar.	
-
+Ready	NetworkStatusView		Έτοιμο
+No stateful configuration	NetworkStatusView		Καμία stateful ρύθμιση
+%ifaceName information:\n	NetworkStatusView		%ifaceΠληροφορίες ονόματος:\n
+Configuring	NetworkStatusView		Ρύθμιση
+Address	NetworkStatusView		Διεύθυνση
+OK	NetworkStatusView		Εντάξει
+NetworkStatus	System name		NetworkStatus
+Open network preferences…	NetworkStatusView		Άνοιγμα προτιμήσεων δικτύου...
+Could not join wireless network:\n	NetworkStatusView		Αδυναμία σύνδεσης στο ασύρματο δίκτυο:\n
+Quit	NetworkStatusView		Έξοδος

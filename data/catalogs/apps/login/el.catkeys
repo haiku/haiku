@@ -1,21 +1,21 @@
-1	modern_greek	x-vnd.Haiku-Login	1678631300
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tΆνοιγμα της λειτουργίας μορφοποίησης για την παραμετροποίηση της επιφάνειας εργασίας
---nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tΜην κάνετε το παράθυρο modal\n
-Desktop	Desktop Window		Επιφάνεια εργασίας
-Error	Login App		Σφάλμα
+1	greek, modern (1453-)	x-vnd.Haiku-Login	1678631300
 Error: %1	Login App		Σφάλμα: %1
-Halt	Login View		Παύση
 Hide password	Login View		Κρύψιμο κωδικού
-Info	Login App		Πληροφορίες
+Desktop	Desktop Window		Επιφάνεια εργασίας
 Invalid login!	Login View		Μη έγκυρη είσοδος!
-Login application for Haiku\nUsage:\n	Login App		Εφαρμογή εισόδου για το Haiku\nΧρήση:\n
-Login:	Login View		Είσοδος
-OK	Login App		ΟΚ
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tΆνοιγμα της λειτουργίας μορφοποίησης για την παραμετροποίηση της επιφάνειας εργασίας
 OK	Login View		ΟΚ
-Password:	Login View		Κωδικός:
-Reboot	Login View		Επανεκκίνηση
-Unimplemented	Login App		Μη υλοποιημένο
-ValidateLogin: %s\n	Login App	A message returned from the ValidateLogin function. It can be \"B_OK\".	ValidateLogin: %s\n Note: Ένα μήνυμα από την συνάρτηση ValidateLogin function. Μπορεί να είναι \"B_OK\".
-Welcome to Haiku	Login Window		Καλώς ορίσατε στο Haiku
-You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Alt-Q).	Login App		Μπορείτε να παραμετροποιήσετε την επιφάνεια εργασίας πίσω από την εφαρμογή εισόδου πετώντας replicants πάνω της. \n\Όταν τελειώσετε κλείστε την εφαρμογή
 error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	Σφάλμα %s\n Σημείωση:  return message από το fDesktopShelf->Save(). Μπορεί να είναι \"B_OK\"
+Login:	Login View		Είσοδος
+Error	Login App		Σφάλμα
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Alt-Q).	Login App		Μπορείτε να παραμετροποιήσετε την επιφάνεια εργασίας πίσω από την εφαρμογή εισόδου πετώντας replicants πάνω της. \n\Όταν τελειώσετε κλείστε την εφαρμογή
+Unimplemented	Login App		Μη υλοποιημένο
+Welcome to Haiku	Login Window		Καλώς ορίσατε στο Haiku
+Reboot	Login View		Επανεκκίνηση
+Login application for Haiku\nUsage:\n	Login App		Εφαρμογή εισόδου για το Haiku\nΧρήση:\n
+Info	Login App		Πληροφορίες
+Halt	Login View		Παύση
+ValidateLogin: %s\n	Login App	A message returned from the ValidateLogin function. It can be \"B_OK\".	ValidateLogin: %s\n Note: Ένα μήνυμα από την συνάρτηση ValidateLogin function. Μπορεί να είναι \"B_OK\".
+Password:	Login View		Κωδικός:
+OK	Login App		ΟΚ
+--nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tΜην κάνετε το παράθυρο modal\n

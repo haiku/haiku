@@ -1,25 +1,25 @@
-1	modern_greek	x-vnd.Haiku-Backgrounds	3513602073
-All workspaces	Main View		Σε όλες τις επιφάνειες εργασίας
-Apply	Main View		Εφαρμογή
+1	greek, modern (1453-)	x-vnd.Haiku-Backgrounds	3513602073
 Backgrounds	System name		Φόντο
-Center	Main View		Στο κέντρο
-Current workspace	Main View		Τρέχουσα επιφάνεια εργασίας
+X:	Main View		Χ:
+Resolution: 	Image Filepanel		Ανάλυση: 
+pick one	Main View		διαλέξτε ένα
 Default	Main View		Προκαθορισμένο
-Default folder	Main View		Προκαθορισμένος φάκελος
-Folder: 	Main View		Φάκελος:
-Icon label outline	Main View		Περίγραμμα ετικέτας εικονιδίου
-Image:	Main View		Εικόνα:
+Center	Main View		Στο κέντρο
 Manual	Main View		Χειρονακτικά
+Default folder	Main View		Προκαθορισμένος φάκελος
+Revert	Main View		Επαναφορά
 None	Main View		Κανένα
-Other folder…	Main View		Άλλος φάκελος...
+All workspaces	Main View		Σε όλες τις επιφάνειες εργασίας
+Icon label outline	Main View		Περίγραμμα ετικέτας εικονιδίου
 Other…	Main View		Άλλο…
+Current workspace	Main View		Τρέχουσα επιφάνεια εργασίας
+Folder: 	Main View		Φάκελος:
+Apply	Main View		Εφαρμογή
+Other folder…	Main View		Άλλος φάκελος...
+Y:	Main View		Υ:
+Tile	Main View		Παράθεση
+Select	Main View		Επιλογή
+Scale to fit	Main View		Προσαρμογή
 Placement:	Main View		Τοποθέτηση:
 Preview	Main View		Προεπισκόπηση
-Resolution: 	Image Filepanel		Ανάλυση: 
-Revert	Main View		Επαναφορά
-Scale to fit	Main View		Προσαρμογή
-Select	Main View		Επιλογή
-Tile	Main View		Παράθεση
-X:	Main View		Χ:
-Y:	Main View		Υ:
-pick one	Main View		διαλέξτε ένα
+Image:	Main View		Εικόνα:
