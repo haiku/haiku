@@ -34,22 +34,44 @@ faccessat(int fd, const char* path, int accessMode, int flag)
 		return -1;
 	}
 
-	if (fd == AT_FDCWD || (path && path[0] == '/')) {
-		// fd is set to AT_FDCWD or path is absolute, call access()
+	if (path && path[0] == '/') {
+		// path is absolute, call access() ignoring fd
 		return access(path, accessMode);
+	}
+
+	if (!fd) {
+		// fd is not a valid file descriptor
+		errno = EBADF;
+		return -1;
+	}
+
+	if (fd == AT_FDCWD) {
+		// fd is set to AT_FDCWD, call access()
+		return access(path, accessMode);
+	}
+
+	struct stat mystat;
+	if (fstat(fd, &mystat) < 0) {
+		// failed to grab stat information, fstat sets errno
+		return -1;
+	}
+
+	if ((mystat.st_mode & S_IFDIR) != 0) {
+		// fd does not point to a directory
+		errno = ENOTDIR;
+		return -1;
 	}
 
 	char *dirpath;
 	dirpath = (char *)malloc(MAXPATHLEN);
 	if (dirpath == NULL) {
+		// ran out of memory allocating dirpath
 		errno = ENOMEM;
 		return -1;
 	}
 
-	int status = fcntl(fd, F_GETPATH, dirpath);
-	if (status < 0) {
-		// failed to get the path of fd
-		errno = status;
+	if (fcntl(fd, F_GETPATH, dirpath) < 0) {
+		// failed to get the path of fd, fcntl sets errno
 		return -1;
 	}
 
