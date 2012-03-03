@@ -1,110 +1,62 @@
-1	norwegian_bokmål	x-vnd.Haiku-DiskProbe	2098097078
-15 bit	TypeEditors		15-bit
-16 bit	TypeEditors		16-bit
-16 bit signed value:	TypeEditors		16-bit verdi med fortegn:
-16 bit unsigned value:	TypeEditors		16-bit verdi uten fortegn:
-32 bit	TypeEditors		32-bit
-32 bit signed value:	TypeEditors		32-bit verdi med fortegn:
-32 bit size or status:	TypeEditors		32-bit størrelse eller status:
-32 bit unsigned pointer:	TypeEditors		32-bit peker uten fortegn:
-32 bit unsigned value:	TypeEditors		32-bit verdi uten fortegn:
-64 bit signed value:	TypeEditors		64-bit verdi med fortegn:
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DiskProbe	2585427111
 64 bit unsigned value:	TypeEditors		64-bit verdi uten fortegn
-8 bit palette	TypeEditors		8-bit palett
-8 bit signed value:	TypeEditors		8-bit verdi med fortegn
-8 bit unsigned value:	TypeEditors		8-bit verdi uten fortegn
-Add	ProbeView		Legg til
-Attribute	AttributeWindow		Attributt
-Attribute	ProbeView		Attributt
-Attribute type: 	ProbeView		Attributtype
-Attribute: 	ProbeView		Attributt:
-Attributes	ProbeView		Attributter
-Back	ProbeView		Tilbake
-Block	ProbeView		Blokk
-Block %Ld (0x%Lx)	ProbeView		Blokk %Ld (0x%Lx)
-Block 0x%Lx	ProbeView		Blokk 0x%Lx
-Block: 	ProbeView		Blokk:
-Bookmarks	ProbeView		Bokmerker
-Boolean	TypeEditors	This is the type of editor	Boolsk
-Boolean editor	TypeEditors		Boolsk editor
-Boolean value:	TypeEditors		Boolsk verdi:
-Cancel	AttributeWindow		Avbryt
-Cancel	OpenWindow		Avbryt
-Cancel	ProbeView		Avbryt
-Case sensitive	FindWindow		Skill mellom store og små bokstaver
-Close	AttributeWindow		Lukk
-Close	FileWindow		Lukk
-Close	ProbeView		Lukk
-Contents:	TypeEditors		Innhold:
-Copy	ProbeView		Kopier
-Could not find search string.	ProbeView		Kunne ikke finne søkestrengen
-Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Kunne ikke åpne \"%s\":\n%s
-Could not open file \"%s\": %s\n	DiskProbe		Kunne ikke åpne filen \"%s\": %s\n
-Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Kunne ikke lese bilde
-Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Desimal
-Device	ProbeView		Enhet
-Device: 	ProbeView		Enhet
-DiskProbe	System name		Diskinspektør
-Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Vil du virkelig fjerne attributten \"%s\" fra filen \"%s\"?\n\nDu kan ikke angre denne handlingen.
-Don't save	ProbeView		Ikke lagre
-Edit	ProbeView		Rediger
-Examine device:	OpenWindow		Undersøk enhet
-File	FileWindow		Fil
-File	ProbeView		Fil
-File: 	ProbeView		Fil:
-Find	FindWindow		Finn
 Find again	ProbeView		Finn påny
-Find…	ProbeView		Finn...
-Fit	ProbeView	Size of fonts, fits to available room	Juster
-Floating-point value:	TypeEditors		Flyttallverdi
-Font size	ProbeView		Fontstørrelse
-Grayscale	TypeEditors		Gråtone
-Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
-Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadesimal
-Icon	TypeEditors		Ikon
-Icon view	TypeEditors		Ikonvisning
-Image	TypeEditors	This is the type of view	Bilde
-Image view	TypeEditors	Image means here a picture file, not a disk image.	Bildevisning
-MIME type editor	TypeEditors		MIME-type editor
-MIME type:	TypeEditors		MIME-type:
-Message	TypeEditors	This is the type of view	Melding
-Message View	TypeEditors		Meldingsvisning
-Mode:	FindWindow		Modus:
-New…	FileWindow		Ny...
-Next	ProbeView		Neste
-No type editor available	AttributeWindow		Ingen type editor tilgjengelig
-Number	TypeEditors	This is the type of editor	Tall
-Number editor	TypeEditors		Tall-editor
-Number:	TypeEditors		Nummer:
-OK	DiskProbe		OK
-OK	ProbeView		OK
-Open device	FileWindow		Åpne enhet
-Open file…	FileWindow		Åpne fil...
-PNG format	TypeEditors		PNG-format
-Page setup…	ProbeView		Sideoppsett...
-Paste	ProbeView		Lim inn
-Previous	ProbeView		Forrige
-Print…	ProbeView		Skriv ut...
-Probe device	OpenWindow		Test enhet
-Quit	FileWindow		Slutt
-Remove	AttributeWindow		Fjern
-Remove from file	AttributeWindow		Fjern fra fil
-Save	ProbeView		Lagre
-Save changes before closing?	ProbeView		Lagre endringer før lukking?
-Select all	ProbeView		Velg alle
-Selection	ProbeView		Utvalg
-Stop	ProbeView		Stopp
-String editor	TypeEditors		Streng-editor
 Text	FindWindow		Tekst
-Text	TypeEditors	This is the type of editor	Tekst
-Type editor	AttributeWindow		Type editor
-Type editor	AttributeWindow		Type-editor
-Type editor	ProbeView		Type-editor
-Type editor not supported	ProbeView		Type-editor ikke støttet
-Undo	ProbeView		Angre
-Unknown format	TypeEditors		Ukjent format
-Unknown type	TypeEditors		Ukjent type
-Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Skriving til fil feilet:\n%s\n\nAlle endringer vil gå tapt når du avslutter.
-none	ProbeView	No attributes	ingen
-of 	ProbeView		av
+Find…	ProbeView		Finn...
+Case sensitive	FindWindow		Skill mellom store og små bokstaver
+Cancel	OpenWindow		Avbryt
+Close	AttributeWindow		Lukk
+File	ProbeView		Fil
+Attribute	ProbeView		Attributt
+Floating-point value:	TypeEditors		Flyttallverdi
+16 bit	TypeEditors		16-bit
+Attributes	ProbeView		Attributter
+Selection	ProbeView		Utvalg
+DiskProbe	System name		Diskinspektør
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	hva: '%.4s'\n\n
+File	FileWindow		Fil
+OK	DiskProbe		OK
+Boolean	TypeEditors	This is the type of editor	Boolsk
+Paste	ProbeView		Lim inn
+PNG format	TypeEditors		PNG-format
+Font size	ProbeView		Fontstørrelse
+Attribute type: 	ProbeView		Attributtype
+Attribute	AttributeWindow		Attributt
+8 bit signed value:	TypeEditors		8-bit verdi med fortegn
+Number:	TypeEditors		Nummer:
+Save	ProbeView		Lagre
+Stop	ProbeView		Stopp
+Number editor	TypeEditors		Tall-editor
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
+No type editor available	AttributeWindow		Ingen type editor tilgjengelig
+Device: 	ProbeView		Enhet
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Vil du virkelig fjerne attributten \"%s\" fra filen \"%s\"?\n\nDu kan ikke angre denne handlingen.
+Text	TypeEditors	This is the type of editor	Tekst
+8 bit unsigned value:	TypeEditors		8-bit verdi uten fortegn
+Block	ProbeView		Blokk
+Back	ProbeView		Tilbake
+Device	ProbeView		Enhet
+Unknown type	TypeEditors		Ukjent type
+Block 0x%Lx	ProbeView		Blokk 0x%Lx
+Quit	FileWindow		Slutt
+Undo	ProbeView		Angre
+Close	ProbeView		Lukk
+Number	TypeEditors	This is the type of editor	Tall
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Desimal
+16 bit signed value:	TypeEditors		16-bit verdi med fortegn:
+String editor	TypeEditors		Streng-editor
+Boolean editor	TypeEditors		Boolsk editor
+Copy	ProbeView		Kopier
+none	ProbeView	No attributes	ingen
+Boolean value:	TypeEditors		Boolsk verdi:
+32 bit size or status:	TypeEditors		32-bit størrelse eller status:
+8 bit palette	TypeEditors		8-bit palett
+Fit	ProbeView	Size of fonts, fits to available room	Juster
+Probe device	OpenWindow		Test enhet
+Unknown format	TypeEditors		Ukjent format
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadesimal
+MIME type:	TypeEditors		MIME-type:
+Page setup…	ProbeView		Sideoppsett...
+New…	FileWindow		Ny...
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Kunne ikke lese bilde
+Save changes before closing?	ProbeView		Lagre endringer før lukking?

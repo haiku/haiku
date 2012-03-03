@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-SystemLogger	57960782
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-SystemLogger	57960782
 %s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nDenne demonen har ansvar for å registrere alle systemmeldinger og skrive dem til systemloggen i \"%s\".\n\n
 OK	SyslogDaemon		OK
 Syslog Daemon	SyslogDaemon		Syslog Daemon

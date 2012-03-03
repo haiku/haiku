@@ -1,0 +1,16 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-SMTP	2740407895
+SMTP server:	ConfigView		SMTP  server:
+STARTTLS	ConfigView		STARTTLS
+Error while logging in to %serv	smtp		Feil ved innlogging til % serv
+Unencrypted	ConfigView		Ukryptert
+. The server says:\n	smtp		. Serveren sier:\n
+ESMTP	ConfigView		ESMTP
+Connecting to server…	smtp		Kobler til server...
+Error while opening connection to %serv	smtp		Feil ved opening kontakt til % serv
+POP3 authentication failed. The server said:\n	smtp		POP3 autentisering feilet. Server sa:\n
+Destination:	ConfigView		Destinasjon:
+: Connection refused or host not found.	smtp		: Tilkobling avist eller vert ikke funnet.
+None	ConfigView		Ingen
+POP3 before SMTP	ConfigView		POP3 før SMPT
+SSL	ConfigView		SSL
+. The server said:\n	smtp		. Serveren sa:\n

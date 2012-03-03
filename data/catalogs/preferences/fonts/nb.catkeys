@@ -1,12 +1,12 @@
-1	norwegian_bokmål	x-vnd.Haiku-Fonts	4164233892
-Bold font:	Font view		Fet skrifttype:
-Defaults	Main window		Standardinnstillinger
-Fixed font:	Font view		Fast skrifttype:
-Fonts	System name		Skrifttyper
-Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Skrifttyper\n\tOpphavsrett  2004-2005, Haiku.\n\n
-Menu font:	Font view		Menyskrifttype:
-OK	main		OK
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Fonts	4164233892
 Plain font:	Font view		Normal skrifttype:
+Defaults	Main window		Standardinnstillinger
+OK	main		OK
+Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Skrifttyper\n\tOpphavsrett  2004-2005, Haiku.\n\n
 Revert	Main window		Tilbakestill
 Size:	Font Selection view		Størrelse:
+Menu font:	Font view		Menyskrifttype:
+Fixed font:	Font view		Fast skrifttype:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Du åt ca. fire wienerpølser og tok taxi hjem fra byen med ære fra quizen
+Bold font:	Font view		Fet skrifttype:
+Fonts	System name		Skrifttyper

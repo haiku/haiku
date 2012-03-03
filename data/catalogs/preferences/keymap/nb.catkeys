@@ -1,18 +1,18 @@
-1	norwegian_bokmål	x-vnd.Haiku-Keymap	2457049402
-(Current)	Keymap window		(gjeldende)
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Keymap	2457049402
+Tilde trigger	Keymap window		Tildeutløser
+Select dead keys	Keymap window		Velg døde taster
+Quit	Keymap window		Avslutt
+Switch shortcut keys to Haiku mode	Keymap window		Bytt snarveitaster til Haiku-modus
+Open…	Keymap window		Åpne...
+System:	Keymap window		System:
+Switch shortcut keys	Keymap window		Bytt snarveitaster
+User:	Keymap window		Bruker:
+Sample and clipboard:	Keymap window		Prøve og utklippstavle:
+Layout	Keymap window		Layout
+Switch shortcut keys to Windows/Linux mode	Keymap window		Bytt snarveitaster til Windows/Linux-modus
+Revert	Keymap window		Tilbakestill
+Save as…	Keymap window		Lagre som...
 File	Keymap window		Fil
+(Current)	Keymap window		(gjeldende)
 Font	Keymap window		Font
 Keymap	System name		Tastaturkart
-Layout	Keymap window		Layout
-Open…	Keymap window		Åpne...
-Quit	Keymap window		Avslutt
-Revert	Keymap window		Tilbakestill
-Sample and clipboard:	Keymap window		Prøve og utklippstavle:
-Save as…	Keymap window		Lagre som...
-Select dead keys	Keymap window		Velg døde taster
-Switch shortcut keys	Keymap window		Bytt snarveitaster
-Switch shortcut keys to Haiku mode	Keymap window		Bytt snarveitaster til Haiku-modus
-Switch shortcut keys to Windows/Linux mode	Keymap window		Bytt snarveitaster til Windows/Linux-modus
-System:	Keymap window		System:
-Tilde trigger	Keymap window		Tildeutløser
-User:	Keymap window		Bruker:

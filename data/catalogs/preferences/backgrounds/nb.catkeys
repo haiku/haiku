@@ -1,25 +1,25 @@
-1	norwegian_bokmål	x-vnd.Haiku-Backgrounds	3513602073
-All workspaces	Main View		Alle arbeidsområder
-Apply	Main View		Bruk
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Backgrounds	3513602073
 Backgrounds	System name		Skrivebordsbakgrunn
-Center	Main View		Sentrer
-Current workspace	Main View		Gjeldende arbeidsområde
+X:	Main View		X:
+Resolution: 	Image Filepanel		Oppløsning: 
+pick one	Main View		velg én
 Default	Main View		Standard
-Default folder	Main View		Standardmappe
-Folder: 	Main View		Mappe: 
-Icon label outline	Main View		Markert ikontekst
-Image:	Main View		Bilde:
+Center	Main View		Sentrer
 Manual	Main View		Manuell
+Default folder	Main View		Standardmappe
+Revert	Main View		Tilbakestill
 None	Main View		Ingen
-Other folder…	Main View		Annen mappe…
+All workspaces	Main View		Alle arbeidsområder
+Icon label outline	Main View		Markert ikontekst
 Other…	Main View		Annen…
+Current workspace	Main View		Gjeldende arbeidsområde
+Folder: 	Main View		Mappe: 
+Apply	Main View		Bruk
+Other folder…	Main View		Annen mappe…
+Y:	Main View		Y:
+Tile	Main View		Side om side
+Select	Main View		Velg
+Scale to fit	Main View		Tilpass til skjerm
 Placement:	Main View		Plassering:
 Preview	Main View		Forhåndsvis
-Resolution: 	Image Filepanel		Oppløsning: 
-Revert	Main View		Tilbakestill
-Scale to fit	Main View		Tilpass til skjerm
-Select	Main View		Velg
-Tile	Main View		Side om side
-X:	Main View		X:
-Y:	Main View		Y:
-pick one	Main View		velg én
+Image:	Main View		Bilde:

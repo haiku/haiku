@@ -1,9 +1,9 @@
-1	norwegian_bokmål	x-vnd.Haiku-BMPTranslator	2497639570
-BMP Settings	BMPMain		BMP-innstillinger
-BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	BMP-bilde (MS format, %d bits
-BMP image (OS/2 format, %d bits)	BMPTranslator		BMP-bilde (OS/2 format, %d bits)
-BMP image translator	BMPTranslator		BMP-bildeoversetter
-BMP image translator	BMPView		BMP-bildeoversetter
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-BMPTranslator	2497639570
 BMP images	BMPTranslator		BMP-bilder
 BMPTranslator Settings	BMPTranslator		Innstillinger for BMP-oversetteren
+BMP image (OS/2 format, %d bits)	BMPTranslator		BMP-bilde (OS/2 format, %d bits)
+BMP image translator	BMPView		BMP-bildeoversetter
+BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	BMP-bilde (MS format, %d bits
+BMP Settings	BMPMain		BMP-innstillinger
 Version %d.%d.%d, %s	BMPView		Versjon %d.%d.%d, %s
+BMP image translator	BMPTranslator		BMP-bildeoversetter

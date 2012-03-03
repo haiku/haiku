@@ -1,49 +1,27 @@
-1	norwegian_bokmål	x-vnd.Haiku-Expander	187676748
-Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Er du sikker på at du vil stoppe utpakkingen av dette\narkivet? De utpakkede filene kan være ufullstendige.
-Automatically expand files	ExpanderPreferences		Pakk ut automatisk
-Automatically show contents listing	ExpanderPreferences		Vis innhold automatisk
-Cancel	ExpanderPreferences		Avbryt
-Cancel	ExpanderWindow		Avbryt
-Close	ExpanderMenu		Lukk
-Close window when done expanding	ExpanderPreferences		Lukk vinduet når utpakkingen er ferdig
-Continue	ExpanderWindow		Fortsett
-Creating listing for '%s'	ExpanderWindow		Lager liste over '%s'
-Destination	ExpanderWindow		Mål
-Destination folder:	ExpanderPreferences		Målmappe
-Error when expanding archive	ExpanderWindow		Feil ved utpakking av arkiv
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Expander	101544763
 Expand	ExpanderMenu		Pakk ut
-Expand	ExpanderWindow		Pakk ut
-Expander	System name		Arkivåpner
-Expander settings	ExpanderPreferences		Innstillinger for Arkivåpner
-Expander: Choose destination	DirectoryFilePanel		Arkivåpner: Velg mål
-Expander: Open	ExpanderWindow		Arkivåpner: Åpne
-Expanding '%s'	ExpanderWindow		Pakker ut '%s'
-Expansion:	ExpanderPreferences		Utpakking:
-File	ExpanderMenu		Fil
-File expanded	ExpanderWindow		Fil pakket ut
-Hide contents	ExpanderWindow		Skjul innhold
-Leave destination folder path empty	ExpanderPreferences		La stien til målmappen være tom
-OK	ExpanderPreferences		OK
-Open destination folder after extraction	ExpanderPreferences		Åpne målmappen etter utpakking
-Other:	ExpanderPreferences		Annet:
-Same directory as source (archive) file	ExpanderPreferences		Samme mappe som kildefilen (arkivet)
-Select	DirectoryFilePanel		Velg
-Select	ExpanderPreferences		Velg
-Select '%s'	DirectoryFilePanel		Velg '%s'
-Select current	DirectoryFilePanel		Velg gjeldende
+Close window when done expanding	ExpanderPreferences		Lukk vinduet når utpakkingen er ferdig
 Set destination…	ExpanderMenu		Velg mål…
-Set source…	ExpanderMenu		Velg kilde…
+Use:	ExpanderPreferences		Bruk:
+File expanded	ExpanderWindow		Fil pakket ut
+The destination is read only.	ExpanderWindow		Målet er skrivebeskyttet
+Expander: Open	ExpanderWindow		Arkivåpner: Åpne
+Expander settings	ExpanderPreferences		Innstillinger for Arkivåpner
+Select current	DirectoryFilePanel		Velg gjeldende
+Source	ExpanderWindow		Kilde
+Error when expanding archive	ExpanderWindow		Feil ved utpakking av arkiv
+Hide contents	ExpanderWindow		Skjul innhold
+Cancel	ExpanderWindow		Avbryt
+Automatically expand files	ExpanderPreferences		Pakk ut automatisk
+Creating listing for '%s'	ExpanderWindow		Lager liste over '%s'
+Continue	ExpanderWindow		Fortsett
+The destination folder does not exist.	ExpanderWindow		Målmappen eksisterer ikke.
+Cancel	ExpanderPreferences		Avbryt
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Er du sikker på at du vil stoppe utpakkingen av dette\narkivet? De utpakkede filene kan være ufullstendige.
+Select	DirectoryFilePanel		Velg
+Same directory as source (archive) file	ExpanderPreferences		Samme mappe som kildefilen (arkivet)
+Expanding '%s'	ExpanderWindow		Pakker ut '%s'
 Settings	ExpanderMenu		Innstillinger
 Settings…	ExpanderMenu		Innstillinger…
-Show contents	ExpanderMenu		Vis innhold
-Show contents	ExpanderWindow		Vis innhold
-Source	ExpanderWindow		Kilde
-Stop	ExpanderMenu		Avbryt
-Stop	ExpanderWindow		Stopp
-The destination folder does not exist.	ExpanderWindow		Målmappen eksisterer ikke.
-The destination is not a folder.	ExpanderWindow		Målet er ikke en mappe.
-The destination is read only.	ExpanderWindow		Målet er skrivebeskyttet
-The file doesn't exist	ExpanderWindow		Filen finnes ikke
-The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Mappen ble enten flyttet, gitt nytt navn eller\n ikke støttet
-Use:	ExpanderPreferences		Bruk:
-is not supported	ExpanderWindow		støttes ikke
+Expander: Choose destination	DirectoryFilePanel		Arkivåpner: Velg mål
+Select	ExpanderPreferences		Velg

@@ -1,14 +1,14 @@
-1	norwegian_bokmål	x-vnd.mmu_man.filepanel	1239922405
-%s not a valid option\n	FilePanelApp		%s ugyldig valg\n
-%s: UNIMPLEMENTED\n	FilePanelApp		%s: IKKE IMPLEMENTERT\n
-%s: this option requires a parameter\n	FilePanelApp		%s: dette valget krever et parameter\n
--1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\ttillat kun én fil å bli valgt\n
--d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tåpne i <mappe>\n
--f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tikke implementert\n
--h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tvis bruk\n
--n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tsett standardnavn for lagring\n
--t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tsett Filpanel-vindustittel\n
+1	bokmål, norwegian; norwegian bokmål	x-vnd.mmu_man.filepanel	1239922405
 display a load/save file panel\n	FilePanelApp		vis panel for åpning/lagring av filer\n
 options:\n	FilePanelApp		valgmuligheter:\n
-short\tlong\tdescription\n	FilePanelApp		kort\tlang\tbeskrivelse\n
 usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		bruksmåte: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tåpne i <mappe>\n
+%s not a valid option\n	FilePanelApp		%s ugyldig valg\n
+short\tlong\tdescription\n	FilePanelApp		kort\tlang\tbeskrivelse\n
+%s: this option requires a parameter\n	FilePanelApp		%s: dette valget krever et parameter\n
+-f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tikke implementert\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tsett standardnavn for lagring\n
+-h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tvis bruk\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\ttillat kun én fil å bli valgt\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tsett Filpanel-vindustittel\n
+%s: UNIMPLEMENTED\n	FilePanelApp		%s: IKKE IMPLEMENTERT\n

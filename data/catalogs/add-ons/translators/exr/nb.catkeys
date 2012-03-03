@@ -1,9 +1,9 @@
-1	norwegian_bokmål	x-vnd.Haiku-EXRTranslator	3390292316
-Based on OpenEXR (http://www.openexr.com)	ConfigView		Basert på OpenEXR (http://www.openexr.com)
-EXR Images	ConfigView		EXR Bilder
-EXR Images	EXRTranslator		EXR Bilder
-EXR Settings	main		EXR Innstillinger
-EXR image	EXRTranslator		EXR bilde
-EXR image translator	EXRTranslator		EXR bildeoversetter
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-EXRTranslator	3390292316
 Version %d.%d.%d, %s	ConfigView		Versjon %d.%d.%d, %s
+EXR image translator	EXRTranslator		EXR bildeoversetter
+Based on OpenEXR (http://www.openexr.com)	ConfigView		Basert på OpenEXR (http://www.openexr.com)
+EXR Settings	main		EXR Innstillinger
+EXR Images	EXRTranslator		EXR Bilder
 a division of Lucasfilm Entertainment Company Ltd	ConfigView		en avdeling av Lucasfilm Entertainment Company Ltd
+EXR Images	ConfigView		EXR Bilder
+EXR image	EXRTranslator		EXR bilde

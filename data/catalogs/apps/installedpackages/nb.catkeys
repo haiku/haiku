@@ -1,8 +1,8 @@
-1	norwegian_bokmål	x-vnd.Haiku-InstalledPackages	4131220089
-InstalledPackages	System name		Installerte pakker
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-InstalledPackages	4131220089
 No package selected.	UninstallView		Ingen pakke er valgt
-OK	UninstallView		OK
-Package description	UninstallView		Pakkebeskrivelse
 Remove	UninstallView		Fjern
+Package description	UninstallView		Pakkebeskrivelse
+InstalledPackages	System name		Installerte pakker
 The package you selected has been successfully removed from your system.	UninstallView		Fjerning av pakken du valgte fra systemet var vellykket.
+OK	UninstallView		OK
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Den valgte pakken ble ikke fjernet fra systemet. Filen med pakkeinformasjon kan ha vært ødelagt.

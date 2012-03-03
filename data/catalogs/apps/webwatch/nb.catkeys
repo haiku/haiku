@@ -1,6 +1,6 @@
-1	norwegian_bokmål	x-vnd.mahlzeit.webwatch	1164039487
-About	WatchView		Om
+1	bokmål, norwegian; norwegian bokmål	x-vnd.mahlzeit.webwatch	1164039487
+WebWatch	System name		WebWatch
 OK	WatchView		OK
 Quit	WatchView		Avslutt
-WebWatch	System name		WebWatch
+About	WatchView		Om
 WebWatch %1\nAn internet time clock for your Deskbar\n\nCreated by Matthijs Hollemans\nmahlzeit@users.sourceforge.net\n\nThanks to Jason Parks for his help.\n	WatchView		WebWatch %1\nEt Internett-tidsur for Deskbar\n\nLaget av Matthijs Hollemans\nmahlzeit@users.sourceforge.net\n\nTakk til Jason Parks for hjelpen.\n

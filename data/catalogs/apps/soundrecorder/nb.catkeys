@@ -1,37 +1,34 @@
-1	norwegian_bokmål	x-vnd.Haiku-SoundRecorder	231450805
-Cannot connect to media server	RecorderWindow		Kan ikke koble til media server
-Cannot connect to the selected sound input	RecorderWindow		Kan ikke koble til valgt lyd-input
-Cannot find an unused name to use for the new recording	RecorderWindow		Kan ikke finne et ubrukt navn til bruk for den nye innspillingen
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-SoundRecorder	3266675535
+Loop	RecorderWindow		Loop
 Cannot find default audio hardware	RecorderWindow		Kan ikke finne forhåndsvalgt maskinvare for lyd
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Kan ikke finne den midlertidige filen som ble opprettet for å inneholde den nye innspillingen
-Cannot get the file to play	RecorderWindow		Kan ikke få filen til å spille av
-Cannot open the temporary file created to hold the new recording	RecorderWindow		Kan ikke åpne den midlertidige filen som ble opprettet for å inneholde den nye innspillingen
-Cannot recognize this file as a media file	RecorderWindow		Kan ikke gjenkjenne denne filen som en mediafil
-Cannot record a sound that long	RecorderWindow		Kan ikke ta opp en så lang lyd
-Channels: 	RecorderWindow		Kanaler:
-Compression:	RecorderWindow		Komprimering:
-Drop files here	SoundListView		Slipp filene her
-Duration:	RecorderWindow		Varighet:
-File info	RecorderWindow		Filinformasjon
-File name:	RecorderWindow		Filnavn:
-Format: 	RecorderWindow		Format:
-Forward	RecorderWindow		Fremover
-Input	RecorderWindow		Input
-Input:	RecorderWindow		Input:
-Invalid audio files	RecorderWindow		Ugyldige lydfiler
-Loop	RecorderWindow		Loop
-None	RecorderWindow		Ingen
-None of the files appear to be audio files	RecorderWindow		Ingen av filene ser ut til å være lydfiler
 Nothing to play	RecorderWindow		Ingenting å spille
-OK	RecorderWindow		OK
-Play	RecorderWindow		Spill
-Record	RecorderWindow		Opptak
-Rewind	RecorderWindow		Spol tilbake
-Sample size: 	RecorderWindow		Utvalgsstørrelse
-Save	RecorderWindow		Lagre
 Some of the files don't appear to be audio files	RecorderWindow		Noen av filene ser ikke ut til å være lydfiler
-Sound List	RecorderWindow		Lydliste
-SoundRecorder	System name		Lydopptaker
+File info	RecorderWindow		Filinformasjon
+Drop files here	SoundListView		Slipp filene her
+Input	RecorderWindow		Input
 Stop	RecorderWindow		Stopp
-bits	RecorderWindow		bit
-seconds	RecorderWindow		sekunder
+Sound List	RecorderWindow		Lydliste
+Rewind	RecorderWindow		Spol tilbake
+Sample rate:	RecorderWindow		Samplingsfrekvens
+Invalid audio files	RecorderWindow		Ugyldige lydfiler
+OK	RecorderWindow		OK
+Cannot open the temporary file created to hold the new recording	RecorderWindow		Kan ikke åpne den midlertidige filen som ble opprettet for å inneholde den nye innspillingen
+None of the files appear to be audio files	RecorderWindow		Ingen av filene ser ut til å være lydfiler
+Input:	RecorderWindow		Input:
+Forward	RecorderWindow		Fremover
+Play	RecorderWindow		Spill
+SoundRecorder	System name		Lydopptaker
+None	RecorderWindow		Ingen
+Record	RecorderWindow		Opptak
+Sample size: 	RecorderWindow		Utvalgsstørrelse
+Cannot recognize this file as a media file	RecorderWindow		Kan ikke gjenkjenne denne filen som en mediafil
+Format: 	RecorderWindow		Format:
+File name: 	RecorderWindow		Filnavn:
+Cannot connect to the selected sound input	RecorderWindow		Kan ikke koble til valgt lyd-input
+Cannot get the file to play	RecorderWindow		Kan ikke få filen til å spille av
+Cannot record a sound that long	RecorderWindow		Kan ikke ta opp en så lang lyd
+Duration:	RecorderWindow		Varighet:
+Compression:	RecorderWindow		Komprimering:
+Cannot find an unused name to use for the new recording	RecorderWindow		Kan ikke finne et ubrukt navn til bruk for den nye innspillingen
+Channels: 	RecorderWindow		Kanaler:
