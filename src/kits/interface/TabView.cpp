@@ -522,7 +522,7 @@ BTabView::AllUnarchived(const BMessage* archive)
 
 	BUnarchiver unarchiver(archive);
 
-	int32 tabCount;	
+	int32 tabCount;
 	archive->GetInfo("_l_items", NULL, &tabCount);
 	for (int32 i = 0; i < tabCount && err == B_OK; i++) {
 		BTab* tab;
@@ -1284,10 +1284,8 @@ BTabView::SetTabHeight(float height)
 	if (fTabHeight == height)
 		return;
 
-	fContainerView->MoveBy(0.0f, height - fTabHeight);
-	fContainerView->ResizeBy(0.0f, height - fTabHeight);
-
 	fTabHeight = height;
+	_LayoutContainerView(GetLayout() != NULL);
 
 	Invalidate();
 }
