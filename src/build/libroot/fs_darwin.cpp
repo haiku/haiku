@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/param.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -18,8 +19,47 @@
 int
 faccessat(int fd, const char* path, int accessMode, int flag)
 {
-	errno = ENOSYS;
-	return -1;
+	if ((flag & AT_EACCESS) == 0) {
+		// Perform access checks using the effective user and group IDs
+		// CURRENTLY UNSUPPORTED
+		errno = ENOTSUP;
+		return -1;
+	}
+
+	if ((flag & AT_SYMLINK_NOFOLLOW) == 0) {
+		// do not dereference, instead return information about the link
+		// itself
+		// CURRENTLY UNSUPPORTED
+		errno = ENOTSUP;
+		return -1;
+	}
+
+	if (fd == AT_FDCWD || (path && path[0] == '/')) {
+		// fd is set to AT_FDCWD or path is absolute, call access()
+		return access(path, accessMode);
+	}
+
+	char *dirpath;
+	dirpath = (char *)malloc(MAXPATHLEN);
+	if (dirpath == NULL) {
+		errno = ENOMEM;
+		return -1;
+	}
+
+	int status = fcntl(fd, F_GETPATH, dirpath);
+	if (status < 0) {
+		// failed to get the path of fd
+		errno = status;
+		return -1;
+	}
+
+	if (strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
+		// full path is too long, set errno and return
+		errno = ENAMETOOLONG;
+		return -1;
+	}
+
+	return access(dirpath, accessMode);
 }
 
 
