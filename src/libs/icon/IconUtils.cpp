@@ -384,11 +384,17 @@ bigtime_t startTime = system_time();
 		return B_BAD_TYPE;
 
 	// chicken out on unrealisticly large attributes
-	if (attrInfo.size > 16 * 1024)
+	if (attrInfo.size > 512 * 1024)
 		return B_BAD_VALUE;
 
-	uint8 buffer[attrInfo.size];
-	ssize_t read = node->ReadAttr(attrName, attrType, 0, buffer, attrInfo.size);
+	uint8* buffer = new(std::nothrow) uint8[attrInfo.size];
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+
+	ArrayDeleter<uint8> _(buffer);
+
+	ssize_t read = node->ReadAttr(attrName, attrType, 0, buffer,
+		attrInfo.size);
 	if (read != attrInfo.size)
 		return B_ERROR;
 
