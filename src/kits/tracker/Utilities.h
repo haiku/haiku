@@ -72,8 +72,8 @@ class BPose;
 class BPoseView;
 
 // global variables
-extern const rgb_color kBlack;
-extern const rgb_color kWhite;
+static const rgb_color kBlack = {0, 0, 0, 255};
+static const rgb_color kWhite = {255, 255, 255 ,255};
 
 const int64 kHalfKBSize = 512;
 const int64 kKBSize = 1024;

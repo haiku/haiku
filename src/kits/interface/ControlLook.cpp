@@ -22,8 +22,6 @@ namespace BPrivate {
 
 static const float kEdgeBevelLightTint = 0.59;
 static const float kEdgeBevelShadowTint = 1.0735;
-const rgb_color kWhite = (rgb_color){255, 255, 255, 255};
-const rgb_color kBlack = (rgb_color){0, 0, 0, 255};
 
 
 BControlLook::BControlLook():
