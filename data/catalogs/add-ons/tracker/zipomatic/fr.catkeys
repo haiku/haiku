@@ -9,7 +9,7 @@ Filename: %s	file:ZipOMaticWindow.cpp		Nom de fichier : %s
 Let them continue	file:ZipOMatic.cpp		Les laisser continuer
 Do you want to stop them?	file:ZipOMatic.cpp		Voulez-vous les arrêter ?
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Êtes-vous sur de vouloir interrompre la création de cette archive ?
-%ld files added.	file:ZipOMaticWindow.cpp		%ld fichiers ajoutés
+%ld files added.	file:ZipOMaticWindow.cpp		%ld fichiers ajoutés.
 Stopped	file:ZipOMaticWindow.cpp		Arrêté
 Archive	file:ZipperThread.cpp		Archive
 Error creating archive	file:ZipOMaticWindow.cpp		Erreur de création de l'archive

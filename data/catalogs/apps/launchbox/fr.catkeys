@@ -18,7 +18,7 @@ Bummer	LaunchBox		Zut
 Cancel	LaunchBox		Annuler
 Remove button	LaunchBox		Ôter le boutton
 Horizontal layout	LaunchBox		Disposition horizontale
-Failed to launch '%1'.\n\nError:	LaunchBox		Impossible de lancer « %1 ».\n\nErreur : 
+Failed to launch '%1'.\n\nError:	LaunchBox		Impossible de lancer « %1 ».\n\nErreur :
 Name Panel	LaunchBox		Nom du panneau
 Add button here	LaunchBox		Ajouter un bouton ici
 Description for '%3'	LaunchBox		Description for « %3 »

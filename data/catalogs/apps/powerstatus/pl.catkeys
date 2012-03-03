@@ -1,40 +1,46 @@
-1	polish	x-vnd.Haiku-PowerStatus	4203845861
-Design capacity low warning: 	PowerStatus		Ostrzerzenie o niskiej pojemności projektowej:
+1	polish	x-vnd.Haiku-PowerStatus	485408110
+Design capacity low warning: 	PowerStatus		Ostrzeżenie o niskiej pojemności projektowej: 
 Show percent	PowerStatus		Pokaż procent
-Design capacity: 	PowerStatus		Pojemność projektowa:
-Type: 	PowerStatus		Typ:
+Design capacity: 	PowerStatus		Pojemność projektowa: 
+ mW	PowerStatus		 mW
+Type: 	PowerStatus		Typ: 
 non-rechargeable	PowerStatus		nieodnawialne
 Empty battery slot	PowerStatus		Gniazdo na baterie jest puste
+ mV	PowerStatus		 mV
 Run in window	PowerStatus		Uruchom w oknie
-About	PowerStatus		o
-Battery info…	PowerStatus		Informacje o baterii...
+About	PowerStatus		O programie
+ mWh	PowerStatus		 mWh
+Battery info…	PowerStatus		Informacje o baterii…
+Damaged battery	PowerStatus		Uszkodzona bateria
 Show time	PowerStatus		Pokaż czas
-Last full charge: 	PowerStatus		Ostatnie pełne ładowanie:
+Last full charge: 	PowerStatus		Ostatnie pełne ładowanie: 
 Battery unused	PowerStatus		Bateria nieużywana
 Extended battery info	PowerStatus		Rozszerzone informacje o baterii
-Current rate: 	PowerStatus		Aktualne tempo:
+ mA	PowerStatus		 mA
+Current rate: 	PowerStatus		Aktualne tempo: 
 discharging	PowerStatus		Rozładowywanie
 Show text label	PowerStatus		Pokaż etykietę tekstu
-About…	PowerStatus		O...
-Model number: 	PowerStatus		Numer modelu:
+About…	PowerStatus		O…
+Model number: 	PowerStatus		Numer modelu: 
 Install in Deskbar	PowerStatus		Zainstaluj w Deskbarze
-Capacity: 	PowerStatus		Pojemność:
+ mAh	PowerStatus		 mAh
+Capacity: 	PowerStatus		Pojemność: 
 Battery discharging	PowerStatus		Rozładowywanie baterii
-Serial number: 	PowerStatus		Numer seryjny:
-Capacity granularity 1: 	PowerStatus		Jednostka pojemności 1:
+Serial number: 	PowerStatus		Numer seryjny: 
+Capacity granularity 1: 	PowerStatus		Jednostka pojemności 1: 
 OK	PowerStatus		OK
-OEM info: 	PowerStatus		Informacje OEM:
-Design voltage: 	PowerStatus		Projektowe napięcie:
+OEM info: 	PowerStatus		Informacje OEM: 
+Design voltage: 	PowerStatus		Projektowe napięcie: 
 PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\nautorstwa Axela Dörflera, Clemensa Zeidlera\nCopyright 2006, Haiku, Inc.\n
 Battery charging	PowerStatus		Ładowanie baterii
-Design capacity warning: 	PowerStatus		Ostrzeżenie o projektowej pojemności:
+Design capacity warning: 	PowerStatus		Ostrzeżenie o projektowej pojemności: 
 Battery info	PowerStatus		Informacje o baterii
 Quit	PowerStatus		Wyjdź
 rechargeable	PowerStatus		odnawialna
 charging	PowerStatus		ładowanie
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Możesz uruchomić PowerStatus w oknie lub zainstalować go w Deskbarze
-Power status box	PowerStatus		Pole ze statusem energii 
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Możesz uruchomić PowerStatus w oknie lub zainstalować go w Deskbarze.
+Power status box	PowerStatus		Pole ze statusem energii
 Show status icon	PowerStatus		Pokaż ikonę statusu
-Capacity granularity 2: 	PowerStatus		Jednostka pojemności 2:
-Technology: 	PowerStatus		Technologia:
+Capacity granularity 2: 	PowerStatus		Jednostka pojemności 2: 
+Technology: 	PowerStatus		Technologia: 
 no battery	PowerStatus		brak baterii

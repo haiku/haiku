@@ -5,8 +5,8 @@ Follow symbolic links	GrepWindow		Podążaj za linkami symbolicznymi
 Close	GrepWindow		Zamknij
 Cancel	GrepWindow		Anuluj
 The unselected files will be removed from the list.	GrepWindow		Niezaznaczone pliki zostaną usunięte z listy.
-Set target…	GrepWindow		Ustaw cel...
-Please select the files you wish to have selected for you in Tracker.	GrepWindow		Wybierz pliki które chcesz by zostały zaznaczone na Trackerze
+Set target…	GrepWindow		Ustaw cel…
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Wybierz pliki które chcesz by zostały zaznaczone na Trackerze.
 Open files in Pe	GrepWindow		Otwórz pliki w Pe
 Copy text to clipboard	GrepWindow		Kopiuj tekst do schowka
 Settings	GrepWindow		Ustawienia

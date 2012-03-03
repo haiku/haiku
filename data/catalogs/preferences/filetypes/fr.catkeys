@@ -22,7 +22,7 @@ Could not change attributes	Attribute Window		Impossible de modifier les attribu
 Could not retrieve preferred application of this file	Preferred App Menu		L'application préférée de ce fichier n'a pas pu être récupérée
 Beta	Application Types Window		Bêta
 Extensions:	FileTypes Window		Extensions :
-Select same preferred application as	FileTypes Window		choisir la même application préférée que pour 
+Select same preferred application as	FileTypes Window		Choisir la même application préférée que pour
 Save	Application Type Window		Enregistrer
 Could not retrieve application signature	Preferred App Menu		Impossible de récupérer la signature d'application
 Add	Extension Window		Ajouter
@@ -80,8 +80,8 @@ Quit	FileTypes Window		Quitter
 Select preferred application	FileType Window		Selectionner l'application préférée
 Single launch	Application Type Window		Instance unique
 Golden master	Application Types Window		Candidate
-%s file type	FileType Window		Type du fichier %s
-The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		l'application « %s » ne supporte pas ce type de fichier.\nÊtes-vous sûr de vouloir l'associer quand même ?
+%s file type	FileType Window		Type de fichier %s
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		L'application « %s » ne supporte pas ce type de fichier.\nÊtes-vous sûr de vouloir l'associer quand même ?
 Type:	Attribute Window		Type :
 Removing uninstalled application types	Application Types Window		Retrait des types d'applications désinstallées
 Done	Attribute Window		Terminé

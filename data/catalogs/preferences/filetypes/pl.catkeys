@@ -1,5 +1,5 @@
-1	polish	x-vnd.Haiku-FileTypes	1624004105
-Application types…	FileTypes Window		Typy aplikacji...
+1	polish	x-vnd.Haiku-FileTypes	473999706
+Application types…	FileTypes Window		Typy aplikacji…
 Description:	Application Types Window		Opis:
 Args only	Application Type Window		Tylko argumenty
 Recognition rule is not valid:\n\n	FileTypes Window		Zasada rozpoznawania jest nieprawidłowa:\n\n
@@ -15,7 +15,7 @@ Choose type	Type List Window		Wybierz typ
 New file type	New File Type Window		Nowy typ pliku
 Rule:	FileTypes Window		Zasada:
 Add icon…	Icon View		Dodaj ikonę…
-Multiple files from \"%s\" file type	FileType Window		Wiele plików z typu pliku \"%s"
+Multiple files from \"%s\" file type	FileType Window		Wiele plików z typu pliku \"%s\"
 Do you want to save the changes?	Application Type Window		Czy chcesz zapisać zmiany?
 File type	FileType Window		Typ pliku
 Could not change attributes	Attribute Window		Nie można zmienić atrybutów
@@ -45,30 +45,36 @@ FileTypes request	Preferred App Menu		Żądanie FileTypes
 Could not open file	FileType Window		Nie można otworzyć pliku
 Description:	FileTypes Window		Opis:
 File	FileTypes Window		Plik
+Name:	Application Types Window		Nazwa:
 Group name:	New File Type Window		Nazwa grupy:
 Preferred application	FileType Window		Preferowana aplikacja
+Progress	Application Types Window		Postęp
 File	Application Type Window		Plik
 Version:	Application Type Window		Wersja:
-Select…	FileTypes Window		Wybierz:
+Select…	FileTypes Window		Wybierz…
 FileTypes request	FileTypes		Żądanie FileTypes
-Open…	FileTypes Window		Otwórz...
-Select…	FileType Window		Wybierz...
-Same as…	FileType Window	The same APPLICATION as ...	Taki sam jak...
+Open…	FileTypes Window		Otwórz…
+Select…	FileType Window		Wybierz…
+Launch	Application Types Window		Uruchom
+Same as…	FileType Window	The same APPLICATION as ...	Taki sam jak…
+Abort	Application Types Window		Przerwij
 FileTypes	FileTypes		FileTypes
 OK	FileTypes		OK
 Extra attributes	FileTypes Window		Dodatkowe atrybuty
 Development	Application Type Window		Rozwój
+Edit…	Application Types Window		Edycja…
 Icon	FileType Window		Ikona
 Final	Application Types Window		Finalna
 Development	Application Types Window		Rozwój
 Open file	FileTypes		Otwórz plik
 Special:	Attribute Window		Specjalne:
 Alpha	Application Type Window		Alpha
-Add…	FileTypes Window		Dodaj...
+Add…	FileTypes Window		Dodaj…
 Signature:	Application Type Window		Sygnatura:
 Quit, don't save	Application Type Window		Wyjdź i nie zapisuj
 Add…	Application Type Window		Dodaj…
 [Multiple files] file types	FileType Window		[Wiele plików] typów plików
+Information	Application Types Window		Informacje
 Gamma	Application Types Window		Gamma
 Quit	FileTypes Window		Zamknij
 Select preferred application	FileType Window		Wybierz preferowaną aplikację
@@ -77,15 +83,18 @@ Golden master	Application Types Window		Golden master
 %s file type	FileType Window		typ pliku %s
 The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Program \"%s\" nie obsługuje tego typu plików.\nCzy chcesz go ustawić mimo to?
 Type:	Attribute Window		Typ:
+Removing uninstalled application types	Application Types Window		Usuwanie typów odinstalowanych aplikacji
 Done	Attribute Window		Gotowe
 Set Preferred Application	Preferred App Menu		Ustaw preferowaną aplikację
 no icon	FileTypes Window		brak ikony
 Alpha	Application Types Window		Alpha
+Version	Application Types Window		Wersja
 Background app	Application Type Window		Aplikacja działająca w tle
 Add new group	New File Type Window		Dodaj nową grupę
+Move down	FileTypes Window		Przesuń w dół
 Cancel	Application Type Window		Anuluj
 Settings	FileTypes Window		Ustawienia
-New resource file…	FileTypes Window		Nowy plik zasobów...
+New resource file…	FileTypes Window		Nowy plik zasobów…
 Cancel	New File Type Window		Anuluj
 Icon	FileTypes Window		Ikona
 Extension:	Extension Window		Rozszerzenie:
@@ -94,14 +103,17 @@ Internal name:	FileTypes Window		Wewnętrzna nazwa:
 Add	Attribute Window		Dodaj
 Close	Application Type Window		Zamknij
 File recognition	FileTypes Window		Rozpoznawanie pliku
+Remove uninstalled	Application Types Window		Usuń odinstalowane
 Center	Attribute Window	Attribute column alignment in Tracker	Do środka
 Golden master	Application Type Window		Golden master
 Could not open \"%s\":\n%s	FileTypes		Nie można otworzyć \"%s\":\n%s
 Alignment:	Attribute Window		Wyrównanie:
 Left	Attribute Window	Attribute column alignment in Tracker	Do lewej
 Cancel	Extension Window		Anuluj
+Path:	Application Types Window		Ścieżka:
 Application flags	Application Type Window		Flagi aplikacji
 Cancel	Type List Window		Anuluj
+Move up	FileTypes Window		Przesuń w górę
 Description	FileTypes Window		Opis
 Save request	Application Type Window		Zapisz żądanie
 Beta	Application Type Window		Beta
@@ -111,13 +123,16 @@ Attribute name:	Attribute Window		Nazwa atrybutów:
 Extension	Extension Window		Rozszerzenie
 Add type	New File Type Window		Dodaj typ
 Internal name:	Attribute Window		Nazwa wewnętrzna:
+Show in Tracker…	Application Types Window		Pokaż w Trackerze…
 Final	Application Type Window		Finalna
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Szerokość:
 Display as:	Attribute Window	Tracker offers different display modes for attributes.	Wyświetl jako:
 This file type already exists	New File Type Window		Ten typ pliku już istnieje
-Same as…	FileTypes Window		Taki sam jak...
+Same as…	FileTypes Window		Taki sam jak…
 Exclusive launch	Application Type Window		Wyłączne uruchomienie
+%ld Application type%s could be removed.	Application Types Window		%ld Aplikacja typu%s może zostać usunięta.
 FileTypes	System name		FileTypes
+Application types	Application Types Window		Typy aplikacji
 Could not remove file type: %s\n	FileTypes Window		Nie można usunąć typu pliku: %s\n
 Signature:	Application Types Window		Sygnatura:
 Gamma	Application Type Window		Gamma
@@ -136,7 +151,7 @@ Short description:	Application Type Window		Krótki opis:
 File could not be opened	Preferred App Menu		Nie można otworzyć pliku
 Could not change file extensions	Extension Window		Nie można zmienić rozszerzeń plików
 Edit icon…	Icon View		Edytuj ikonę…
-Same as…	FileType Window	The same TYPE as ...	Taki sam jak...
+Same as…	FileType Window	The same TYPE as ...	Taki sam jak…
 Save into resource file…	Application Type Window		Zapisz do pliku zasobów…
 Visible	Attribute Window		Widoczne
 Could not install file type	New File Type Window		Nie można zainstalować typu plików

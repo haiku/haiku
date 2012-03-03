@@ -1,15 +1,23 @@
-1	polish	x-vnd.Haiku-Keymap	3858687220
+1	polish	x-vnd.Haiku-Keymap	3895282621
+Caps Lock:	Modifier Keys window		Caps Lock:
+OK	Modifier Keys window		OK
 Tilde trigger	Keymap window		Wywołanie tyldy
+Modifier Keys	Modifier Keys window		Klawisze Modyfikujące
 Grave trigger	Keymap window		Wywołanie ciężkie
 Select dead keys	Keymap window		Wybierz martwe klawisze
+Option:	Modifier Keys window		Opcja:
+Revert	Modifier Keys window		Przywróć
 Quit	Keymap window		Zakończ
 Switch shortcut keys to Haiku mode	Keymap window		Zmień klawisze skrótów w tryb Haiku
 Circumflex trigger	Keymap window		Wywołanie akcentu
+Cancel	Modifier Keys window		Anuluj
 Diaeresis trigger	Keymap window		Wywołanie diarezy
 Open…	Keymap window		Otwórz…
 System:	Keymap window		System:
 Switch shortcut keys	Keymap window		Zmień klawisze skrótów
+Set Modifier Keys…	Keymap window		Ustaw Klawisze Modyfikujące…
 User:	Keymap window		Użytkownik:
+Control:	Modifier Keys window		Kontrol:
 Sample and clipboard:	Keymap window		Przykład i schowek:
 Layout	Keymap window		Układ
 Switch shortcut keys to Windows/Linux mode	Keymap window		Zmień klawisze skrótów w tryb Windows/Linuks
@@ -18,4 +26,6 @@ Save as…	Keymap window		Zapisz jako…
 File	Keymap window		Plik
 (Current)	Keymap window		(Bieżący)
 Font	Keymap window		Czcionka
+Keymap	System name		Układ klawiatury
+Command:	Modifier Keys window		Polecenie:
 Acute trigger	Keymap window		Wywołanie ostre

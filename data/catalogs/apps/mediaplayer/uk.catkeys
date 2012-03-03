@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-MediaPlayer	138551800
+1	ukrainian	x-vnd.Haiku-MediaPlayer	986711925
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Амер.)
 Stream settings	MediaPlayer-Main		Настройки потоку
 <unknown>	PlaylistItem-album		<невідомий>
@@ -134,4 +134,3 @@ Rating	MediaPlayer-Main		Рейтинг
 Playlist	MediaPlayer-PlaylistWindow		Список відтворення
 Lock Peaks	MediaPlayer-PeakView		Блокувати Піки
 Low volume	MediaPlayer-SettingsWindow		Мала гучність
-File Info	MediaPlayer-InfoWin		Про файл

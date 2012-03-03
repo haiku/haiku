@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Time	3493650184
+1	german	x-vnd.Haiku-Time	1859841283
 GMT (UNIX compatible)	Time		GMT (Unix-kompatibel)
 OK	Time		OK
 Asia	Time		Asien
@@ -28,7 +28,6 @@ Sending request failed	Time		Sendeanfrage fehlgeschlagen
 Arctic	Time		Arktis
 Time	System name		Datum & Zeit
 America	Time		Amerika
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Datum & Zeit\n\n\tvon Andrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
 Reset	Time		Reset
 Synchronize at boot	Time		Synchronisieren beim Hochfahren
 Received invalid time	Time		Ungültige Zeit erhalten

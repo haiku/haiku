@@ -1,27 +1,36 @@
-1	french	x-vnd.Haiku-Time	2926970495
+1	french	x-vnd.Haiku-Time	3165129636
 OK	Time		OK
+Asia	Time		Asie
 \nNow: 	Time		\nMaintenant, il est : 
+Africa	Time		Afrique
 Stop	Time		Arrêter
 Could not contact server	Time		Impossible de contacter le serveur
+Australia	Time		Australie
 Preview time:	Time		Aperçu de l'heure :
 Synchronize	Time		Synchroniser
 Revert	Time		Rétablir
+Pacific	Time		Pacifique
 Add	Time		Ajouter
 Date and time	Time		Date et heure
 about	Time		À propos
+Local time (Windows compatible)	Time		Heure locale (compatible Windows)
 Message receiving failed	Time		La réception du message a échoué
 Set time zone	Time		Régler le fuseau horaire
 Waiting for answer failed	Time		L'attente d'une réponse a échoué
 Hardware clock set to:	Time		L'horloge matérielle est réglée sur :
 The following error occured while synchronizing:r\n%s	Time		L'erreur suivante est survenue lors de la synchronisation :\n%s
+Europe	Time		Europe
 Remove	Time		Retirer
 Time	Time		Heure
+Indian	Time		Indien
 Sending request failed	Time		L'envoi d'une requête a échoué
+Arctic	Time		Arctique
 Time	System name		Heure
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Date & Heure, écrit par :\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
+America	Time		Amérique
 Reset	Time		Réinitialiser
 Synchronize at boot	Time		Synchroniser au démarrage
 Received invalid time	Time		Une heure non valide a été reçue
+Antarctica	Time		Antarctique
 The following error occured while synchronizing:r\n%s: %s	Time		L'erreur suivante est survenue lors de la synchronisation :\n%s : %s
 <Other>	Time		<Autre>
 Current time:	Time		Heure actuelle :
@@ -30,3 +39,4 @@ Time zone	Time		Fuseau horaire
 Could not create socket	Time		Impossible de créer le socket
 Synchronize again	Time		Synchroniser à nouveau
 Network time	Time		Heure réseau
+Atlantic	Time		Atlantique

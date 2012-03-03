@@ -1,11 +1,12 @@
-1	polish	x-vnd.Haiku-Fonts	2475492793
+1	polish	x-vnd.Haiku-Fonts	4164233892
 Plain font:	Font view		Zwykła czcionka:
 Defaults	Main window		Domyślne
 OK	main		OK
-Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Czcionki\n\tCopyright 2004-2010, Haiku.\n\n
+Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Czcionki\n\tCopyright 2004-2005, Haiku.\n\n
 Revert	Main window		Przywróć
 Size:	Font Selection view		Rozmiar:
 Menu font:	Font view		Czcionka menu:
 Fixed font:	Font view		Stała czcionka:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Zażółć gęślą jaźń.
 Bold font:	Font view		Czcionka pogrubiona:
+Fonts	System name		Czcionki

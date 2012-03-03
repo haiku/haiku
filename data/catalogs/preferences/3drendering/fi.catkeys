@@ -1,7 +1,8 @@
-1	finnish	x-vnd.Haiku-3DRendering	1539891217
+1	finnish	x-vnd.Haiku-3DRendering	1725618140
 List stack size:	Capabilities		Luettelopinon koko:
 Information	InfoView		Tiedot
 Max. clipping planes:	Capabilities		Maksimileikkaustasot:
+GL version:	InfoView		GL-versio:
 Max. texture units:	Capabilities		Maksimitekstuuriyksiköt:
 Renderer name:	InfoView		Renderointinimi:
 Vendor name:	InfoView		Myyjänimi:
@@ -19,6 +20,7 @@ GLUT API version:	InfoView		GLUT API -versio:
 Texture stack size:	Capabilities		Tekstuuripinokoko:
 Max. evaluators equation order:	Capabilities		Maksimievaloijan yhtälöjärjestys:
 Max. 3D texture size:	Capabilities		3D-tekstuurin enimmäiskoko:
+3D Rendering	System name		3D-renderointi
 Capabilities	Capabilities		Kapasiteetit
 Max. recommended index elements:	Capabilities		Suositeltujen indeksielementtien enimmäismäärä:
 Available	Extensions		Käytettävissä oleva

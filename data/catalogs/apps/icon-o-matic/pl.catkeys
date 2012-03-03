@@ -1,4 +1,4 @@
-1	polish	x-vnd.haiku-icon_o_matic	2736160201
+1	polish	x-vnd.haiku-icon_o_matic	3736361491
 Select All	Icon-O-Matic-PathManipulator		Zaznacz wszystko
 Add Style	Icon-O-Matic-AddStylesCmd		Dodanie stylu
 Color (#%02x%02x%02x)	Style name after dropping a color		Kolor (#%02x%02x%02x)
@@ -11,6 +11,7 @@ None	Icon-O-Matic-Properties		Nic
 New	Icon-O-Matic-Menu-File		Nowy
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Gdy Icon-O-Matic otwierał plik SVG, nie mógł przetworzyć wszystkich danych. Po nadpisaniu oryginalnego pliku, te informacje zostaną utracone.
 Paste Properties	Icon-O-Matic-Properties		Wklej właściwości
+Stroke	Transformation		Kreska
 Save Icon	Dialog title		Zapisz ikonę
 Closed	Icon-O-Matic-PropertyNames		Zamknij
 Remove Path	Icon-O-Matic-RemovePathsCmd		Usunięcie ścieżki
@@ -39,14 +40,14 @@ Remove Paths	Icon-O-Matic-RemovePathsCmd		Usunięcie ścieżek
 Scale Y	Icon-O-Matic-PropertyNames		Skala Y
 Add Control Point	Icon-O-Matic-AddPointCmd		Dodaj punkt kontrolny
 Untitled	Icon-O-Matic-Main		Bez nazwy
-Multi Set 	Multi Set (property name)		Ustaw wiele
+Multi Set 	Multi Set (property name)		Ustaw wiele 
 any of the other lists to	Empty property list - 2nd line		listy, żeby edytować
 Save as…	Icon-O-Matic-Menu-File		Zapisz jako…
 Change Color	Icon-O-Matic-SetColorCmd		Zmianę koloru
 Style	Icon-O-Matic-Menus		Styl
 <modify path>	Icon-O-Matic-PathCmd		<modyfikacja ścieżki>
 Opening the icon failed!	Icon-O-Matic-Main		Otwieranie ikony nie powiodło się!
-Error: 	Icon-O-Matic-Main		Błąd:
+Error: 	Icon-O-Matic-Main		Błąd: 
 Rotate indices backwards	Icon-O-Matic-PathsList		Obróć indeksy do tyłu
 Name	Icon-O-Matic-PropertyNames		Nazwa
 bad news	Icon-O-Matic-Exporter		złe wieści
@@ -57,7 +58,7 @@ PNG Set	Icon-O-Matic-SavePanel		Seria plików PNG
 Joins	Icon-O-Matic-PropertyNames		Połączenie
 Remove Style	Icon-O-Matic-RemoveStylesCmd		Usunięcie stylu
 Scale X	Icon-O-Matic-PropertyNames		Skala X
-Set 	Set (property name)		Ustaw
+Set 	Set (property name)		Ustaw 
 Cancel	Icon-O-Matic-SVGExport		Anuluj
 Add shape with style	Icon-O-Matic-Menu-Shape		Dodaj kształt ze stylem
 Remove Shape	Icon-O-Matic-RemoveShapesCmd		Usunięcie kształtu
@@ -139,7 +140,7 @@ Move Pivot	Icon-O-Matic-TransformationBoxStates		Przesunięcie osi
 Path	Icon-O-Matic-Menus		Ścieżka
 Freeze transformation	Icon-O-Matic-ShapesList		Zamroź transformację
 File	Icon-O-Matic-Menus		Plik
-Error: 	Icon-O-Matic-Exporter		Błąd:
+Error: 	Icon-O-Matic-Exporter		Błąd: 
 Add Transformers	Icon-O-Matic-AddTransformersCmd		Dodanie transformatorów
 Diamond	Icon-O-Matic-StyleTypes		Diament
 Path	Icon-O-Matic-PropertyNames		Ścieżka
@@ -197,4 +198,4 @@ Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Czyszczenie ścieżki
 Rounding	Icon-O-Matic-PropertyNames		Zaokrąglenie
 Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Usunięcie kształtów
 Clean up	Icon-O-Matic-PathsList		Wyczyść
-Detect Orient.	Icon-O-Matic-PropertyNames		Wykrywanie orientacji
+Detect Orient.	Icon-O-Matic-PropertyNames		Wykrywanie orientacji.

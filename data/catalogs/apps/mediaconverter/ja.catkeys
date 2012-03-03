@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-MediaConverter	3564609505
+1	japanese	x-vnd.Haiku-MediaConverter	296071315
 Video using parameters form settings	MediaConverter		設定のパラメータを使ったビデオ
 Video encoding:	MediaConverter		ビデオエンコーディング：
 No audio	Audio codecs list		オーディオ無し
@@ -21,6 +21,7 @@ Low	MediaConverter		低い
 Conversion completed	MediaConverter		変換が終了しました
 Audio:	MediaConverter-FileInfo		オーディオ：
 OK	MediaConverter-FileInfo		OK
+ seconds	MediaFileInfo		秒
 Source files	MediaConverter		ソースファイル
 Cancelling	MediaConverter		キャンセル中
 %d byte 	MediaFileInfo		%d バイト

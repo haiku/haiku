@@ -1,6 +1,6 @@
-1	polish	x-vnd.Haiku-LaunchBox	2733406748
+1	polish	x-vnd.Haiku-LaunchBox	788598362
 New	LaunchBox		Nowy
-Set description…	LaunchBox		Ustaw opis...
+Set description…	LaunchBox		Ustaw opis…
 Vertical layout	LaunchBox		Układ pionowy
 OK	LaunchBox		OK
 Pad 1	LaunchBox		Pad 1
@@ -19,6 +19,7 @@ Remove button	LaunchBox		Usuń przycisk
 Horizontal layout	LaunchBox		Układ poziomy
 Name Panel	LaunchBox		Panel nazeweniczy
 Add button here	LaunchBox		Dodaj przycisk tutaj
+Pad %1	LaunchBox		Pad %1
 Close	LaunchBox		Zamknij
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Błąd przy wysyłaniu komendy 'open folder' do Trackera.\n\nBłąd: 
 You can drag an icon here.	LaunchBox		Możesz upuścić ikonę w tym miejscu.

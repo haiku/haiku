@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Expander	2537908460
+1	lithuanian	x-vnd.Haiku-Expander	1072439789
 Expand	ExpanderMenu		Išskleisti
 Close window when done expanding	ExpanderPreferences		Viską išskleidus, užverti langą
 Set destination…	ExpanderMenu		Paskirties vieta…
@@ -20,10 +20,8 @@ The destination folder does not exist.	ExpanderWindow		Paskirties aplankas neegz
 Cancel	ExpanderPreferences		Atsisakyti
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Ar tikrai norite nutraukti šio archyvo išskleidimą? Gali būti, kad išskleisti dar ne visi elementai.
 Select	DirectoryFilePanel		Parinkti
-Destination folder:	ExpanderPreferences		Numatytasis paskirties aplankas:
 Same directory as source (archive) file	ExpanderPreferences		Aplankas, kuriame yra išskleidžiamas archyvas
 Expanding '%s'	ExpanderWindow		Išskleidžiamas archyvas „%s“
-Expansion:	ExpanderPreferences		Išskleidimas:
 Settings	ExpanderMenu		Nuostatos
 Settings…	ExpanderMenu		Nuostatos…
 Expander: Choose destination	DirectoryFilePanel		Skleidiklis: parinkite paskirties vietą
@@ -36,7 +34,6 @@ The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Aplankas
 The file doesn't exist	ExpanderWindow		Failas neegzistuoja
 Stop	ExpanderMenu		Nutraukti
 File	ExpanderMenu		Failas
-Other:	ExpanderPreferences		Kita:
 Expander	System name		Skleidiklis
 Expand	ExpanderWindow		Išskleisti
 Close	ExpanderMenu		Užverti

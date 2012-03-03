@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Devices	1533788248
+1	japanese	x-vnd.Haiku-Devices	2035016937
 Manufacturer	DeviceSCSI		製造元
 Order by:	DevicesView		並び順：
 ACPI controller	Device		ACPI コントローラー
@@ -69,3 +69,19 @@ Signal processing controller	Device		信号処理コントローラー
 Serial bus controller	Device		シリアルバスコントローラー
 Wireless controller	Device		ワイヤレスコントローラー
 ACPI node '%1'	DeviceACPI		ACPI ノード '%1'
+Device name	Device		デバイス名
+Manufacturer	Device		製造元
+Manufacturer	DevicePCI		製造元
+Intelligent controller	Device		インテリジェントコントローラ
+Satellite communications controller	Device		衛星通信コントローラ
+SCSI Information	DeviceSCSI		SCSI 情報
+Bridge	Device		ブリッジ
+Unknown device	DevicesView		不明なデバイス
+Tape Drive	DeviceSCSI		テープドライブ
+Bus Information	Device		バス情報
+Encryption controller	Device		暗号化コントローラ
+Device name	DeviceSCSI		デバイス名
+Card Reader	DeviceSCSI		カードリーダー
+Class info	DevicePCI		クラス情報
+Device paths	DevicePCI		デバイスパス
+Devices	DevicesView		デバイス

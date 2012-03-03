@@ -1,10 +1,19 @@
-1	polish	x-vnd.Haiku-Touchpad	4054922715
+1	polish	x-vnd.Haiku-Touchpad	2206557856
 Scrolling	TouchpadPrefView		Przewijanie
+Touchpad	System name		Touchpad
 Revert	TouchpadPrefView		Przywróć
+Please confirm	TouchpadPrefView		Proszę potwierdź
 Two finger scrolling	TouchpadPrefView		Przewijanie dwoma palcami
 Defaults	TouchpadPrefView		Domyślne
 Slow	TouchpadPrefView		Wolno
+Vertical	TouchpadPrefView		Pionowe
 High	TouchpadPrefView		Wysoka
 Horizontal scrolling	TouchpadPrefView		Poziome przewijanie
 Fast	TouchpadPrefView		Szybko
+OK	TouchpadPrefView		OK
+Acceleration	TouchpadPrefView		Przyspieszenie
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Nowy obszar przewijania jest bardzo duży i może utrudniać normalne operacje myszką. Czy na pewno chcesz  to zmienić?
+Horizontal	TouchpadPrefView		Poziome
 Off	TouchpadPrefView		Wyłącz
+Sensitivity	TouchpadPrefView		Czułość
+Cancel	TouchpadPrefView		Anuluj

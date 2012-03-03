@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Mail	3957822883
+1	finnish	x-vnd.Haiku-Mail	2592587573
 Mail checking	Config Window		Sähköpostin tarkistus
 Settings	Config Window		Asetukset
 Never	Config Window	show status window	Ei koskaan
@@ -6,6 +6,7 @@ Only when dial-up is connected	Config Window		Vain kun valintayhteys on yhdistet
 While sending and receiving	Config Window		Lähetettäessä ja vastaanotettaessa
 days	Config Window		päivä
 Incoming	Config Window		Tuleva
+Server name:	E-Mail		Palvelinnimi:
 OK	Config Window		Valmis
 Start mail services on startup	Config Window		Käynnistä sähköpostipalvelut tietokoneen käynnistyksen yhteydessä
 E-mail address:	E-Mail		Sähköpostiosoite:

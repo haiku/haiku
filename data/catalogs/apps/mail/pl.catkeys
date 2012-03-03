@@ -1,8 +1,8 @@
-1	polish	x-vnd.Be-MAIL	3000981273
+1	polish	x-vnd.Be-MAIL	524266098
 View	Mail		Widok
 %d - Date	Mail		%d - Data
 Attach attributes:	Mail		Dołączaj atrybuty:
-Inconsistency occurred in the undo/redo buffer.	Mail		Powstała niespójność pomiędzy buforem cofnij/powtórz
+Inconsistency occurred in the undo/redo buffer.	Mail		Powstała niespójność pomiędzy buforem cofnij/powtórz.
 An error occurred trying to save the attachment.	Mail		Wystąpił błąd podczas zapisu załącznika.
 Copy to new	Mail		Kopiuj do nowego
 Edit	Mail		Edycja
@@ -29,3 +29,7 @@ Reply to sender	Mail		Odpowiedz nadawcy
 There is no installed handler for URL links.	Mail		Brak zainstalowanego programu do obsługi skrótów URL.
 Signature	Mail		Sygnatura
 Find again	Mail		Znajdź ponownie
+Signature:	Mail		Sygnatura:
+Print…	Mail		Drukuj…
+Signatures	Mail		Sygnaturki
+An error occurred trying to save this signature.	Mail		Wystąpił błąd podczas próby zapisu sygnaturki.

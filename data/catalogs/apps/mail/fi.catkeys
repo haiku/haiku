@@ -1,10 +1,11 @@
-1	finnish	x-vnd.Be-MAIL	2668114830
+1	finnish	x-vnd.Be-MAIL	2834665561
 View	Mail		Näkymä
 %d - Date	Mail		%d - Päivämäärä
 Attach attributes:	Mail		Liittämisattribuutit:
 Inconsistency occurred in the undo/redo buffer.	Mail		Tapahtui epäjohdonmukaisuutta puskurin perumisen/uudelleentekemisen yhteydessä.
 An error occurred trying to save the attachment.	Mail		Tapahtui virhe yritettäessä tallentaa liitettä.
 Copy to new	Mail		Kopioi uuteen
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Jätä arvoksi ’New’
 Edit	Mail		Muokkaa
 Print	Mail		Tulosta
 <none>	Mail		<ei mitään>
@@ -30,3 +31,133 @@ Reply to sender	Mail		Vastaa lähettäjälle
 There is no installed handler for URL links.	Mail		Verkko-osoitelinkeille ei ole asennettua käsittelijää.
 Signature	Mail		Allekirjoitus
 Find again	Mail		Hae uudelleen
+Bcc:	Mail		Piilokopio:
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Päätekstisi sisältää %ld koodaamatonta merkkiä. Ehkä eri merkistö toimisi paremmin? Napauta Lähetä-painiketta sen lähettämiseksi silti (korvausmerkkejä käytetään koodaamattomien merkkien paikalla), tai valitse Peru palataksesi ja yritä korjata se.
+Signature:	Mail		Allekirjoitus
+Save changes to this signature?	Mail		Tallennetaanko muutokset tähän allekirjoitukseen?
+Cc:	Mail		Kopio:
+Off	Mail		Pois päältä
+Find	Mail		Etsi
+Preferences…	Mail		Asetukset…
+Undo	Mail		Peru
+Date:	Mail		Päivämäärä:
+An error occurred trying to open this signature.	Mail		Tapahtui virhe yritettäessä avata tätä allekirjiotusta.
+No file attributes, just plain data	Mail		Ei tiedostoattribuutteja, vain pelkkiä tietoja
+Edit queries…	Mail		Muokkaa kyselyjä…
+queries	B_USER_DIRECTORY/mail/queries		kyselyt
+Paste	Mail		Liitä
+in	B_USER_DIRECTORY/mail/in		kohteessa
+Save attachment…	Mail		Tallenna liitteet…
+Include file attributes in attachments	Mail		Sisällytä tiedostoattribuutit liitteisiin
+OK	Mail		Valmis
+Send	Mail		Lähetä
+Show icons only	Mail		Näytä vain kuvakkeet
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Liitteiden poistamista edelleenlähetetyistä sähköpostiviesteistä ei ole vielä toteutettu!\nSe ei vielä toimi oikein.
+Hide	Mail		Piilota
+Forward without attachments	Mail		Lähetä edelleen ilman liitteitä
+Previous	Mail		Edellinen 
+Redo	Mail		Tee uudelleen
+Add enclosure…	Mail		Lisää liite…
+Mail	System name		Sähköposti
+Print…	Mail		Tulosta…
+Warn unencodable:	Mail		Varoita koodaamattomista:
+Quit	Mail		Poistu
+%n - Full name	Mail		%n - Koko nimi
+ Read 	Mail		Lue
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
+Trash	Mail		Roskakori
+Default account:	Mail		Oletustili:
+Size:	Mail		Koko:
+Account from mail	Mail		Tili sähköpostiviestistä
+Edit signatures…	Mail		Muokkaa allekirjoituksia…
+New	Mail		Uusi
+Attachments: 	Mail		Liitteet:
+On	Mail		Päällä
+Set to %s	Mail		Aseta arvoksi %s
+Forward	Mail		Lähetä edelleen
+E-mail draft could not be saved!	Mail		Sähköpostiviestiluonnosta ei voitu tallentaa!
+%e wrote:\\n	Mail		%e kirjoitti:\\n
+To:	Mail		Vastaanottaja:
+Only files can be added as attachments.	Mail		Vain tiedostoja voi lisätä liitteiksi.
+Previous message	Mail		Edellinen viesti
+Attachments:	Mail		Liitteet:
+Title:	Mail		Otsikko:
+Find…	Mail		Etsi…
+Accounts…	Mail		Tilit…
+Mail preferences	Mail		Sähköpostiasetukset
+Initial spell check mode:	Mail		Alusta oikolukutila:
+Leave same	Mail		Jätä sama
+Page setup…	Mail		Sivuasetukset…
+Text wrapping:	Mail		Tekstin rivitys:
+Revert	Mail		Palauta
+File	Mail		Tiedosto
+mail	B_USER_DIRECTORY/mail		sähköposti
+None	Mail		Ei mitään
+(Name unavailable)	Mail		(Nimi ei ole saatavilla)
+Copy link location	Mail		Kopioi linkkisijainti
+out	B_USER_DIRECTORY/mail/out		lähtevä
+Show header	Mail		Näytä otsake
+%e - E-mail address	Mail		%e - Sähköpostiosoite
+Resend	Mail		Lähetä uudelleen
+Show raw message	Mail		Näytä raakaviesti
+\\n - Newline	Mail		\\n- Rivinvaihto
+Start now	Mail		Aloita nyt
+Close	Mail		Sulje
+No matches	Mail		Ei täsmäyksiä
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Taustaprosessi mail_daemon ei ole käynnissä. Viesti laitetaan jonoon ja lähetetään, kun mail_daemon käynnistyy.
+Really delete this signature? This cannot be undone.	Mail		Poistetaanko tämä allekirjiotus todella? Tätä ei voida perua.
+Open	Mail		Avaa
+draft	B_USER_DIRECTORY/mail/draft		luonnos
+Quote	Mail		Lainaus
+Add	Mail		Lisää
+Next message	Mail		Seuraava viesti
+User interface	Mail		Käyttöliittymä
+Cancel	Mail		Peru
+Send message	Mail		Lähetä viesti
+Remove enclosure	Mail		Poista liite
+Account:	Mail		Tili:
+Decoding:	Mail		Purkaminen:
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Ei voitu löytää sovellusta, joka tukee ’Person’-tietotyyppiä
+Do you wish to send this message before closing?	Mail		Haluatko lähettää tämän viestin ennen sulkemista?
+Delete	Mail		Poista
+Leave as '%s'	Mail		Jätä arvoksi ’%s’
+Copy	Mail		Kopioi
+Mail couldn't find its dictionary.	Mail		Sähköpostisovellus ei löytänyt sanakirjaansa.
+Reply preamble:	Mail		Vastausesipuhe:
+Signatures	Mail		Allekirjoitukset
+Next	Mail		Seuraava
+Set to…	Mail		Aseta arvoon…
+Use default account	Mail		Käytä oletustiliä
+Sorry	Mail		Valitan
+Encoding:	Mail		Koodaus:
+Font:	Mail		Kirjasin:
+(Address unavailable)	Mail		(Osoite ei ole saatavilla)
+Save address	Mail		Tallenna osoite
+Queries	Mail		Kyselyt
+Do you wish to save this message as a draft before closing?	Mail		Haluatko tallentaa tämän viestin luonnoksena ennen sulkemista?
+Save	Mail		Tallenna
+Random	Mail		Satunnainen
+Close and 	Mail		Sulje ja
+Save as draft	Mail		Tallenna luonnoksena
+The mail_daemon could not be started:\n\t	Mail		Taustaprosessia mail_daemon ei voitu käynnistää:\n\t
+Open attachment	Mail		Avaa liite
+sent	B_USER_DIRECTORY/mail/sent		lähetetty
+(Date unavailable)	Mail		(Päivämäärä ei ole saatavilla)
+Put your favorite e-mail queries and query templates in this folder.	Mail		Laita suosikkisähköpostikyselysi ja kyselymallinteet tähän kansioon.
+Reply	Mail		Vastaa
+From:	Mail		Lähettäjä:
+Couldn't open this signature. Sorry.	Mail		Ei voitu avata tätä allekirjoitusta.
+Open draft	Mail		Avaa luonnos
+Cut	Mail		Leikkaa
+Check spelling	Mail		Oikolue
+Set to Saved	Mail		Aseta tallennetuksi
+Open this link	Mail		Avaa tämä linkki
+Auto signature:	Mail		Automaattiallekirjoitus:
+Add signature	Mail		Lisää allekirjoitus
+Need Tracker to move items to trash	Mail		Tarvitsee Seuraajan siirtämään kohteita roskakoriin
+Mailing	Mail		Lähetetään sähköpostia
+Unread	Mail		Lukematta
+Remove quote	Mail		Poista lainaus
+Move to trash	Mail		Siirrä roskakoriin
+Select all	Mail		Valitse kaikki
+An error occurred trying to save this signature.	Mail		Tapahtui virhe yritettäessä tallentaa tätä allekirjoitusta.

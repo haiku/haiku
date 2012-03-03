@@ -7,12 +7,12 @@ It's now safe to turn off the computer.	ShutdownProcess		Vous pouvez maintenant 
 Cancel	ShutdownProcess		Annuler
 Do you really want to shut down the system?	ShutdownProcess		Voulez-vous vraiment éteindre le système ?
 Asking other processes to quit.	ShutdownProcess		Arrêt demandé aux autres processus.
-Asking \"%appName%\" to quit.	ShutdownProcess		Arrêt demandé à « %appName% ».
+Asking \"%appName%\" to quit.	ShutdownProcess		Arrêt de « %appName% » demandé.
 %action%?	ShutdownProcess		%action% ?
 Shutdown aborted	ShutdownProcess		Extinction interrompue
 Restarting…	ShutdownProcess		Redémarrage…
-Asking background applications to quit.	ShutdownProcess		Arrêt demandé aux tâches de fond
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		L'application « %appName% » a interrompu le traitement d'arrêt.
+Asking background applications to quit.	ShutdownProcess		Arrêt des tâches de fond demandé.
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		L'application « %appName% » a interrompu le processus d'arrêt.
 Tidying things up a bit.	ShutdownProcess		On calme un peu les choses.
 Do you really want to restart the system?	ShutdownProcess		Voulez-vous vraiment redémarrer le système ?
 Shutdown status	ShutdownProcess		État de l'extinction

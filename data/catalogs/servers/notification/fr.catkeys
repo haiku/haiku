@@ -1,5 +1,5 @@
 1	french	x-vnd.Haiku-notification_server	906000487
-Couldn't start filter monitor. Live filter changes disabled.	NotificationWindow		Impossible de démarrer la surveillance des filtres\nLes changements de filtres dynamique sont désactivés.
+Couldn't start filter monitor. Live filter changes disabled.	NotificationWindow		Impossible de démarrer la surveillance des filtres.\nLes changements de filtres dynamique sont désactivés.
 Couldn't start display settings monitor.\nLive filter changes disabled.	NotificationWindow		Impossible de démarrer la surveillance des écrans de réglages\nLes changements de filtres dynamique sont désactivés.
 Darn.	NotificationWindow		Zut.
 Warning	NotificationWindow		Avertissement

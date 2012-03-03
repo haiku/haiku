@@ -1,8 +1,8 @@
-1	polish	x-vnd.Haiku-Time	3748045865
+1	polish	x-vnd.Haiku-Time	1859841283
 GMT (UNIX compatible)	Time		GMT (kompatybilne z UNIX'em)
 OK	Time		OK
 Asia	Time		Azja
-\nNow: 	Time		\nTeraz:
+\nNow: 	Time		\nTeraz: 
 Africa	Time		Afryka
 Stop	Time		Stop
 Could not contact server	Time		Nie udało się skontaktować z serwerem
@@ -24,17 +24,20 @@ Europe	Time		Europa
 Remove	Time		Usuń
 Time	Time		Czas
 Indian	Time		Indie
+Sending request failed	Time		Wysyłanie żądania nie powiodło się
 Arctic	Time		Arktyka
 Time	System name		Czas
 America	Time		Ameryka
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date, autorstwa:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
 Reset	Time		Resetuj
 Synchronize at boot	Time		Synchronizuj przy rozruchu
+Received invalid time	Time		Odebrano niepoprawny czas
 Antarctica	Time		Antarktyda
+The following error occured while synchronizing:r\n%s: %s	Time		Wystąpił błąd podczas synchronizacji:r\n%s: %s
 <Other>	Time		<Inne>
 Current time:	Time		Aktualny czas:
 Try all servers	Time		Wypróbuj wszystkie serwery
 Time zone	Time		Strefa czasowa
+Could not create socket	Time		Nie można utworzyć gniazda
 Synchronize again	Time		Synchronizuj ponownie
 Network time	Time		Czas z sieci
 Atlantic	Time		Atlantyk

@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Devices	3881769606
+1	polish	x-vnd.Haiku-Devices	3412361771
 Manufacturer	DeviceSCSI		Producent
 Order by:	DevicesView		Sortuj według:
 ACPI controller	Device		Kontroler ACPI
@@ -44,6 +44,7 @@ Manufacturer	DeviceACPI		Producent
 PCI bus	Device		Magistrala PCI
 None	Device		Brak
 PCI bus	DevicesView		Magistrala PCI
+Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Klasa:\t\t\t\t: %classInfo%
 Basic information	DevicesView		Podstawowe informacje
 PCI Information	DevicePCI		Informacje o PCI
 Manufacturer:	Device		Producent:
@@ -59,3 +60,13 @@ Device	Device		Urządzenie
 Signal processing controller	Device		Kontroler przetwarzania sygnałów
 Serial bus controller	Device		Kontroler magistrali szeregowej
 Wireless controller	Device		Kontroler łączy bezprzewodowych
+Device name	Device		Nazwa urządzenia
+Manufacturer	Device		Producent
+Manufacturer	DevicePCI		Producent
+SCSI Information	DeviceSCSI		Informacje o SCSI
+Bridge	Device		Mostek
+Unknown device	DevicesView		Nieznane urządzenie
+Bus Information	Device		Informacje o szynie
+Device name	DeviceSCSI		Nazwa urządzenia
+Device paths	DevicePCI		Ścieżki do urządzeń
+Devices	DevicesView		Urządzenia

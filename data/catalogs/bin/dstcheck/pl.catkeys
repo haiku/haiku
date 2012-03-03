@@ -1,4 +1,6 @@
-1	polish	x-vnd.Haiku-cmd-dstconfig	1891332014
+1	polish	x-vnd.Haiku-cmd-dstconfig	2337923203
+Use this time	dstcheck		Użyj tym razem
 Ask me later	dstcheck		Zapytaj mnie później
-Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		Uwaga!\n\nZ powodu zmiany czasu letniego, Twój komputer może być opóźniony o godzinę.\nTak właśnie wydaje się komputerowi.
-.\n\nIs this the correct time?	dstcheck		.\n\n Czy podany czas jest poprawny?
+Manually adjust time…	dstcheck		Ręcznie dostosuj czas…
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		Uwaga!\n\nZ powodu zmiany czasu letniego, Twój komputer może być opóźniony o godzinę.\nTak właśnie wydaje się komputerowi
+.\n\nIs this the correct time?	dstcheck		.\n\nCzy podany czas jest poprawny?

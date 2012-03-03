@@ -1,17 +1,22 @@
-1	finnish	x-vnd.Haiku-SoundRecorder	3266675535
+1	finnish	x-vnd.Haiku-SoundRecorder	2149017672
 Loop	RecorderWindow		Silmukka
 Cannot find default audio hardware	RecorderWindow		Ei kyetä löytämään oletusäänilaitetta
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Ei kyetä löytämään tilapäistä tiedostoa, joka luotiin säilyttämään uusi äänitys.
+Sample size:	RecorderWindow		Näytekoko:
 Nothing to play	RecorderWindow		Ei mitään soitettavaa
+Duration: 	RecorderWindow		Kesto:
 Some of the files don't appear to be audio files	RecorderWindow		Jotkut tiedostot eivät tunnu olevan äänitiedostoja
 File info	RecorderWindow		Tiedostotiedot
 Drop files here	SoundListView		Pudota tiedostot tänne
 Input	RecorderWindow		Syöte
 Stop	RecorderWindow		Pysäytä
+Format:	RecorderWindow		Muoto:
 Sound List	RecorderWindow		Ääniluettelo
+Compression: 	RecorderWindow		Tiivistys:
 Rewind	RecorderWindow		Takaisinkelaus
 Sample rate:	RecorderWindow		Näytetaajuus:
 Invalid audio files	RecorderWindow		Virheelliset äänitiedostot
+ seconds	RecorderWindow		sekuntia
 OK	RecorderWindow		Valmis
 Cannot open the temporary file created to hold the new recording	RecorderWindow		Ei kyetä avaamaan tilapäistä tiedostoa, joka luotiin säilyttämään uusi äänitys
 None of the files appear to be audio files	RecorderWindow		Mitkään tiedostoista eivät näytä olevan äänitiedostoja
@@ -19,6 +24,8 @@ Input:	RecorderWindow		Syöte:
 Forward	RecorderWindow		Eteenpäin
 Play	RecorderWindow		Soita
 SoundRecorder	System name		Äänitalletin
+Channels:	RecorderWindow		Kanavat;
+ bits	RecorderWindow		bittiä
 None	RecorderWindow		Ei mitään
 Record	RecorderWindow		Äänitä
 Sample size: 	RecorderWindow		Näytekoko:
@@ -32,3 +39,7 @@ Duration:	RecorderWindow		Kesto:
 Compression:	RecorderWindow		Tiivistys:
 Cannot find an unused name to use for the new recording	RecorderWindow		Ei kyetä löytämää käyttämätöntä nimeä käytettäväksi uuteen äänitykseen
 Channels: 	RecorderWindow		Kanavat
+Save	RecorderWindow		Tallenna
+Sample rate: 	RecorderWindow		Näytetaajuus:
+Cannot connect to media server	RecorderWindow		Ei voi yhdistää mediapalvelimeen
+File name:	RecorderWindow		Tiedostonimi:

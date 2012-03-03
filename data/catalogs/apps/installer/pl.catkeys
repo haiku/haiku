@@ -1,10 +1,10 @@
-1	polish	x-vnd.Haiku-Installer	1976247847
+1	polish	x-vnd.Haiku-Installer	957598907
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Więc za innymi wpisami na samym dole pliku, dodaj coś podobnego do tych linii:\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Na pewno chcesz przerwać instalację i uruchomić ponownie system?
 \t}\n\n	InstallerApp		\t}\n\n
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Instalator\n\tnapisany przez Jérôme Duval oraz Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Newer versions of GRUB use an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Nowe wersje GRUBa, korzystają z dodatkowego pliku konfiguracyjnego, aby dodawać własne wpisy do menu rozruchu. Aby dodać je na górę, musisz utworzyć/edytować plik poprzez uruchomienie ulubionego edytora z Terminala w taki sposób:\n\n
-Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Tutaj musisz "zakomentarzować" linię \"GRUB_HIDDEN_TIMEOUT=0\" przez postawienie znaku \"#\" na początku linii, aby właściwie móc wyświetlić menu rozruchu.\n\n
+Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Tutaj musisz zakomentować linię \"GRUB_HIDDEN_TIMEOUT=0\" przez postawienie znaku \"#\" na początku linii, aby właściwie móc wyświetlić menu rozruchu.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Zakończono instalację. Sektor rozruchowy został zapisany do '%s'. Należy nacisnąć Zamknij, aby opuścić instalator lub wybrać nowy wolumin docelowy w celu przeprowadzenia następnej instalacji.
 Quit	InstallerApp		Zamknij
 Additional disk space required: 0.0 KiB	InstallerWindow		Wymagana dodatkowa przestrzeń na dysku: 0.0 KB
@@ -20,7 +20,7 @@ Stop	InstallerWindow		Zatrzymaj
 \t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
 \tchainloader\t\t+1\n\n	InstallerApp		\tchainloader\t\t+1\n\n
 OK	InstallerApp		OK
-Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Proszę wybrać dysk źródłowy i docelowy z menu podręcznego i nacisnąć  \"Instaluj\".
+Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Proszę wybrać dysk źródłowy i docelowy z menu podręcznego i nacisnąć \"Instaluj\".
 \t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku na /dev/sda7\n
 Install from:	InstallerWindow		Instaluj z:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld z %2ld
@@ -37,7 +37,7 @@ Boot sector successfully written.	InstallProgress		Sektor rozruchowy został pom
 Performing installation.	InstallProgress		Wykonywanie instalacji.
 scanning…	InstallerWindow		skanowanie…
 Set up boot menu	InstallerWindow		Konfiguruj menu rozruchu
-The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		Pierwsza partycja logiczna ma zawsze numer \"4\", niezależnie od liczby partycji podstawowych.
+The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		Pierwsza partycja logiczna ma zawsze numer \"4\", niezależnie od liczby partycji podstawowych.\n\n
 GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		Sposób nazewnictwa GRUBa to wciąż: (hdN,n)\n\n
 \tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <twój ulubiony edytor tekstu> /boot/grub/menu.lst\n\n
 Finishing Installation.	InstallProgress		Kończenie instalacji.
@@ -50,7 +50,7 @@ Scanning for disks…	InstallerWindow		Skanowanie w poszukiwaniu dysków…
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Dysk nie może zostać zamontowany. Proszę spróbować wybrać inny dysk.
 ?? of ??	InstallerWindow	Unknown progress	?? z ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Uruchomia narzędzie DriveSetup służące do partycjonowania\ndostępnych dysków i innych nośników.\nPartycje mogą zostać zainicjalizowane systemem plików\nBe File System, potrzebnym do poprawnego działania systemu Haiku.
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Uruchomia narzędzie DriveSetup służące do partycjonowania\ndostępnych dysków i innych nośników.\nPartycje mogą zostać zainicjalizowane systemem plików\nBe File System, potrzebnym do poprawnego działania\nsystemu Haiku.
 Show optional packages	InstallerWindow		Wyświetl pakiety opcjonalne
 No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Nie znaleziono partycji odpowiednich dla przeprowadzenia instalacji. Należy skonfigurować partycje i zainicjalizować przynajmniej jedną z nich systemem plików Be File System.
 Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		Dodatkowo musisz edytować inny plik, aby pozwolić na wyświetlenie menu rozruchu:\n\n
@@ -76,3 +76,5 @@ Running Boot Manager…\n\nClose Boot Manager to continue with the installation.
 OK	InstallProgress		OK
 ???	InstallerWindow	Unknown partition name	???
 Continue	InstallerApp		Kontynuuj
+Additional disk space required: %s	InstallerWindow		Wymagana dodatkowa przestrzeń na dysku: %s
+\tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsudo <twój ulubiony edytor tekstu> /etc/grub.d/40_custom\n\n

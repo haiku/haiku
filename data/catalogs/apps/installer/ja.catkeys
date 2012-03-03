@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Installer	776781734
+1	japanese	x-vnd.Haiku-Installer	3691915477
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		したがって、Haikuを GRUBメニューに追加するには、ファイルの最後に下記のような記述をしてください。\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		インストールを中止して、システムを再起動しますか？
 \t}\n\n	InstallerApp		\t}\n\n
@@ -78,3 +78,7 @@ OK	InstallerWindow		OK
 Set up partitions…	InstallerWindow		パーティションの設定…
 The partition can't be mounted. Please choose a different partition.	InstallProgress		このパーティションをマウントできません。他のパーティションを選択してください。
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		ブートマネージャー実行中…\n\nインストールを続けるには、ブートマネージャーを閉じてください。
+OK	InstallProgress		OK
+???	InstallerWindow	Unknown partition name	???
+Continue	InstallerApp		続ける
+Are you sure you want to to stop the installation?	InstallerWindow		本当にインストールを中断してよいですか ?

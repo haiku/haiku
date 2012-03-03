@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-MediaPlayer	682972955
+1	lithuanian	x-vnd.Haiku-MediaPlayer	1531133080
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikietiškas)
 Stream settings	MediaPlayer-Main		Kaip nurodyta sraute
 <unknown>	PlaylistItem-album		<nežinomas>
@@ -132,4 +132,3 @@ Rating	MediaPlayer-Main		Įvertinimas
 Playlist	MediaPlayer-PlaylistWindow		Grojaraštis
 Lock Peaks	MediaPlayer-PeakView		Užfiksuoti maksimumus
 Low volume	MediaPlayer-SettingsWindow		Dalinis
-File Info	MediaPlayer-InfoWin		Failo savybės

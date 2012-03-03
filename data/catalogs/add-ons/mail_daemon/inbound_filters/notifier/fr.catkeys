@@ -1,9 +1,10 @@
-1	french	x-vnd.Haiku-NewMailNotification	667397289
+1	french	x-vnd.Haiku-NewMailNotification	3624191291
 %num new message	filter		%num nouveau message
 %num new messages	filter		%num nouveaux messages
 Keyboard LEDs	ConfigView		LEDs du clavier
 You have %num new messages for %name.	filter		Vous avez %num nouveaux messages pour %name.
 You have %num new message for %name.	filter		Vous avez %num nouveau message pour %name.
+Log window	ConfigView		Fenêtre de connexion
 Central beep	ConfigView		Sonnerie générale
 Beep	ConfigView		Sonnerie
 Method:	ConfigView		Méthode :

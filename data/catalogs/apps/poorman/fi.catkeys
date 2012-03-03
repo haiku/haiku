@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-PoorMan	1108606987
+1	finnish	x-vnd.Haiku-PoorMan	1267330937
 Website location	PoorMan		Webbisivusijainti
 Error Server	PoorMan		Virhepalvelin
 Settings…	PoorMan		Asetukset...
@@ -24,13 +24,17 @@ Advanced	PoorMan		Lisäasetukset
 OK	PoorMan		Valmis
 Status: Stopped	PoorMan		Tila: Pysäytetty
 Dir Created	PoorMan		Hakemisto luotu
+Log to file	PoorMan		Loki tiedostoon
 Quit	PoorMan		Poistu
 Hits: 0	PoorMan		Osumia: 0
 Save log console	PoorMan		Tallenna lokikonsoli
 Edit	PoorMan		Muokkaa
+Create Log File	PoorMan		Luo lokitiedosto
+Log to console	PoorMan		Kirjaa pääteikkunaan
 Directory: (none)	PoorMan		Hakemisto: (ei mitään)
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Valitse webissä julkaistava kansio.\n\nSinulla voi olla Köyhiksen luoma oletus ”public_html” kotikansiossasi.\nTai voi sen sijaan valita yhden omista kansioistasi.
 Log To Console	PoorMan		Kirjaa konsoliin
+Connections	PoorMan		Yhteydet
 Status: Running	PoorMan		Tila: Suoritetaan
 connections	PoorMan		yhteydet
 Controls	PoorMan		Ohjaimet
@@ -38,6 +42,7 @@ Send file listing if there's no start page	PoorMan		Lähetä tiedostoluettelo, j
 Error Dir	PoorMan		Virhehakemisto
 Select all	PoorMan		Valitse kaikki
 File	PoorMan		Tiedosto
+File Logging	PoorMan		Tiedostolokikirjaus
 Save console selections as…	PoorMan		Tallenna konsolivalinnat nimellä...
 File logging	PoorMan		Tiedostolokikirjaus
 Select web folder	PoorMan		Valitse webbikansio
@@ -53,7 +58,9 @@ Create log file	PoorMan		Luo lokitiedosto
 Starting up... 	PoorMan		Aloitetaan...
 Site	PoorMan		Sivusto
 Cancel	PoorMan		Peru
+Console logging	PoorMan		Pääteikkunakirjaaminen
 Cannot start the server	PoorMan		Palvelinta ei voi käynnistää
 Select	PoorMan		Valitse
 Save console as…	PoorMan		Tallenna konsoli nimellä...
+PoorMan	System name		Köyhis
 Console Logging	PoorMan		Konsolikirjaaminen

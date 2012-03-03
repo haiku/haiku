@@ -1,11 +1,17 @@
-1	polish	x-vnd.Haiku-FontDemo	2720318319
+1	polish	x-vnd.Haiku-FontDemo	446183650
+Outline:	ControlView		Kontur:
 Size: 50	ControlView		Rozmiar: 50
+Spacing: 0	ControlView		Odstęp: 0
 Haiku, Inc.	FontDemoView		Haiku, Inc.
 Rotation: %d	ControlView		Obrót: %d
+Spacing: %d	ControlView		Odstęp: %d
 Font:	ControlView		Font:
 Rotation: 0	ControlView		Obrót: 0
 Drawing mode:	ControlView		Tryb rysowania:
 FontDemo	FontDemo		FontDemo
 Haiku, Inc.	ControlView		Haiku, Inc.
+Outline: %d	ControlView		Kontur: %d
 Text:	ControlView		Tekst:
 Antialiased text	ControlView		Wygładzany tekst
+Bounding boxes	ControlView		Obwiednia
+Size: %d	ControlView		Rozmiar: %d

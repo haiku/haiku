@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DiskUsage	3634416251
+1	japanese	x-vnd.Haiku-DiskUsage	3399777733
 Scanning %refName%	Scanner		%refName%をスキャン中
 Size	Info Window		サイズ
 Rescan	Pie View		再スキャン
@@ -14,6 +14,7 @@ Scan	Status View		スキャン
 file unavailable	Status View		利用できないファイル
 Get Info	Pie View		情報を表示
 DiskUsage	System name		DiskUsage
+ in %d files	Info Window		%d 個のファイル中
 %d files	Status View		%d 個のファイル
 Created	Info Window		作成日時
 Modified	Info Window		更新日時

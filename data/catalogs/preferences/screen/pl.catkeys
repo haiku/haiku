@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Screen	954862017
+1	polish	x-vnd.Haiku-Screen	2033930135
 yes	Screen		tak
 Use laptop panel:	Screen		Użyj ekranu laptopa:
 15 bits/pixel, 32768 colors	Screen		15 bitów/piksel, 32768 kolorów
@@ -12,12 +12,14 @@ Set background…	Screen		Ustaw tło…
 Undo	Screen		Cofnij
 if needed	Screen		jeśli potrzeba
 Screen preferences by the Haiku team	Screen		Ustawienia ekranu. Stworzone przez zespół Haiku
+Screen	System name		Ekran
 OK	Screen		OK
 Workspaces	Screen		Obszary robocze
 The screen mode could not be set:\n\t%s\n	Screen		Tryb ekranu nie może zostać ustawiony:\n\t%s\n
 no	Screen		nie
 Could not write VESA mode settings file:\n\t	Screen		Nie można zapisać pliku ustawień trybu VESA:\n\t
 Type or use the left and right arrow keys.	Screen		Wpisz lub użyj strzałki w lewo i w prawo.
+Warning	Screen		Ostrzeżenie
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Częstotliwość pozioma:\t%lu - %lu kHz\nCzęstotliwość pionowa:\t%lu - %lu Hz\n\nMaksymalne taktowanie piksela:\t%g MHz
 Keep	Screen		Zachowaj
 Unknown mode	Screen		Nieznany tryb

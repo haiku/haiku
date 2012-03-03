@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Mail	3957822883
+1	japanese	x-vnd.Haiku-Mail	2592587573
 Mail checking	Config Window		メールチェック
 Settings	Config Window		設定
 Never	Config Window	show status window	表示しない
@@ -6,6 +6,7 @@ Only when dial-up is connected	Config Window		ダイアルアップ接続のと�
 While sending and receiving	Config Window		送受信中に
 days	Config Window		日毎にチェック
 Incoming	Config Window		受信
+Server name:	E-Mail		サーバ名:
 OK	Config Window		OK
 Start mail services on startup	Config Window		起動時にメールサービスを開始する
 E-mail address:	E-Mail		E-mail アドレス

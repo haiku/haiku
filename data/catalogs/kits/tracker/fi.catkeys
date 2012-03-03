@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	360023500
+1	finnish	x-vnd.Haiku-libtracker	1319179540
 common	B_COMMON_DIRECTORY		yhteinen
 OK	WidgetAttributeText		Valmis
 Icon view	VolumeWindow		Kuvakenäkymä
@@ -19,6 +19,7 @@ Invert selection	VolumeWindow		Käänteinen valinta
 Recent documents	FavoritesMenu		Äskettäiset asiakirjat
 Modified	QueryPoseView		Muokattu
 Created	ContainerWindow		Luotu
+Error %error loading add-On %name.	ContainerWindow		Virhe %error ladattaessa lisäosaa %name.
 contains	SelectionWindow		sisältää
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Et voi tallentaa asioita järjestelmäsi root-kansioon.
 Show shared volumes on Desktop	SettingsView		Näytä jaetut taltiot työpöydällä

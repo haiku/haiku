@@ -1,4 +1,4 @@
-1	japanese	x-vnd.haiku-screenshot	1697748405
+1	japanese	x-vnd.haiku-screenshot	1721618877
 seconds	ScreenshotWindow		秒
 Desktop	ScreenshotWindow		デスクトップ
 Include window border	ScreenshotWindow		ウインドウ境界線も取り込む
@@ -9,6 +9,7 @@ Cancel	ScreenshotWindow		中止
 Name:	ScreenshotWindow		ファイル名：
 Choose folder	ScreenshotWindow		フォルダを選択
 Save	ScreenshotWindow		保存
+Overwrite	ScreenshotWindow		上書き
 Choose folder...	ScreenshotWindow		フォルダを選択...
 Please select	ScreenshotWindow		選択してください
 Save as:	ScreenshotWindow		ファイル形式：

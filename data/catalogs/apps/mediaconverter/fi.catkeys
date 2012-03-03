@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MediaConverter	3564609505
+1	finnish	x-vnd.Haiku-MediaConverter	296071315
 Video using parameters form settings	MediaConverter		Video käyttäen parametreja muotoasetuksiin
 Video encoding:	MediaConverter		Videokoodaus:
 No audio	Audio codecs list		Ei ääntä
@@ -21,6 +21,7 @@ Low	MediaConverter		Alhainen
 Conversion completed	MediaConverter		Muunnos valmis
 Audio:	MediaConverter-FileInfo		Ääni:
 OK	MediaConverter-FileInfo		Valmis
+ seconds	MediaFileInfo		sekuntia
 Source files	MediaConverter		Lähdetiedostot
 Cancelling	MediaConverter		Perutaan
 %d byte 	MediaFileInfo		%d tavu

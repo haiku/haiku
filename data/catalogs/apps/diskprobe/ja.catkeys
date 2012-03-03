@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DiskProbe	1743725622
+1	japanese	x-vnd.Haiku-DiskProbe	3313935694
 File offset: 	ProbeView		ファイルオフセット：
 %ld (native)	ProbeView		%ld (ネイティブ)
 64 bit unsigned value:	TypeEditors		符号なし 64 ビット値：
@@ -68,3 +68,16 @@ DiskProbe request	AttributeWindow		DiskProbe リクエスト
 Could not read image	TypeEditors	Image means here a picture file, not a disk image.	イメージを読み込めませんでした
 BlockSize	ProbeView	A menu item, a shortened form from 'block size'. This is in the same menu windowthan 'Base' and 'Font size'	ブロックサイズ
 Save changes before closing?	ProbeView		閉じる前に保存しますか?
+DiskProbe request	ProbeView		DiskProbe リクエスト
+Close	FileWindow		閉じる
+64 bit signed value:	TypeEditors		符号なし 64 ビット値：
+OK	ProbeView		OK
+32 bit unsigned value:	TypeEditors		符号なし 32 ビット値：
+Cancel	AttributeWindow		中止
+Select all	ProbeView		すべて選択
+15 bit	TypeEditors		15 ビット
+16 bit unsigned value:	TypeEditors		符号無し 16 ビット値：
+Cancel	ProbeView		中止
+Grayscale	TypeEditors		グレースケール
+32 bit signed value:	TypeEditors		符号つき 32 ビット値:
+DiskProbe request	DiskProbe		DiskProbe リクエスト
