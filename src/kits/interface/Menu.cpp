@@ -1466,7 +1466,7 @@ BMenu::_InitData(BMessage* archive)
 		archive->FindFloat("_maxwidth", &fMaxContentWidth);
 
 		BMessage msg;
-			for (int32 i = 0; archive->FindMessage("_items", i, &msg) == B_OK; i++) {
+		for (int32 i = 0; archive->FindMessage("_items", i, &msg) == B_OK; i++) {
 			BArchivable* object = instantiate_object(&msg);
 			if (BMenuItem* item = dynamic_cast<BMenuItem*>(object)) {
 				BRect bounds;
