@@ -620,7 +620,6 @@ unlinkat(int fd, const char *path, int flag)
 	if (path && path[0] == '/') {
 		// path is absolute, call rmdir() or unlink() ignoring fd
 		return (flag & AT_REMOVEDIR) == 0 ? rmdir(path) : unlink(path);
-		return unlink(path);
 	}
 
 	if (!fd) {
