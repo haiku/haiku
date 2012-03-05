@@ -13,7 +13,9 @@
 #define AT_SYMLINK_FOLLOW	0x02	/* linkat() */
 #define AT_REMOVEDIR		0x04	/* unlinkat() */
 #define AT_EACCESS			0x08	/* faccessat() */
+#define AT_NO_AUTOMOUNT		0x10	/* fstatat */
 
+int eaccess(const char* path, int accessMode);
 int faccessat(int fd, const char* path, int accessMode, int flag);
 int fchmodat(int fd, const char* path, mode_t mode, int flag);
 int fchownat(int fd, const char* path, uid_t owner, gid_t group, int flag);
