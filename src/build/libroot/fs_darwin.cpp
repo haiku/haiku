@@ -617,8 +617,55 @@ symlinkat(const char *toPath, int fd, const char *symlinkPath)
 int
 unlinkat(int fd, const char *path, int flag)
 {
-	errno = ENOSYS;
-	return -1;
+	if (path && path[0] == '/') {
+		// path is absolute, call rmdir() or unlink() ignoring fd
+		return (flag & AT_REMOVEDIR) == 0 ? rmdir(path) : unlink(path);
+		return unlink(path);
+	}
+
+	if (!fd) {
+		// fd is not a valid file descriptor
+		errno = EBADF;
+		return -1;
+	}
+
+	if (fd == AT_FDCWD) {
+		// fd is set to AT_FDCWD, call rmdir() or unlink()
+		return (flag & AT_REMOVEDIR) == 0 ? rmdir(path) : unlink(path);
+	}
+
+	struct stat dirst;
+	if (fstat(fd, &dirst) < 0) {
+		// failed to grab stat information, fstat() sets errno
+		return -1;
+	}
+
+	if ((dirst.st_mode & S_IFDIR) != 0) {
+		// fd does not point to a directory
+		errno = ENOTDIR;
+		return -1;
+	}
+
+	char *dirpath;
+	dirpath = (char *)malloc(MAXPATHLEN);
+	if (dirpath == NULL) {
+		// ran out of memory allocating dirpath
+		errno = ENOMEM;
+		return -1;
+	}
+
+	if (fcntl(fd, F_GETPATH, dirpath) < 0) {
+		// failed to get the path of fd, fcntl sets errno
+		return -1;
+	}
+
+	if (strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
+		// full path is too long, set errno and return
+		errno = ENAMETOOLONG;
+		return -1;
+	}
+
+	return (flag & AT_REMOVEDIR) == 0 ? rmdir(path) : unlink(path);
 }
 
 
