@@ -10,6 +10,7 @@
 #define NETWORK_STATUS_VIEW_H
 
 
+#include <Notification.h>
 #include <ObjectList.h>
 #include <View.h>
 
