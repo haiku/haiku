@@ -563,8 +563,54 @@ readlinkat(int fd, const char *path, char *buffer, size_t bufferSize)
 int
 symlinkat(const char *toPath, int fd, const char *symlinkPath)
 {
-	errno = ENOSYS;
-	return -1;
+	if (symlinkPath && symlinkPath[0] == '/') {
+		// symlinkPath is absolute, call symlink() ignoring fd
+		return symlink(toPath, symlinkPath);
+	}
+
+	if (!fd) {
+		// fd is not a valid file descriptor
+		errno = EBADF;
+		return -1;
+	}
+
+	if (fd == AT_FDCWD) {
+		// fd is set to AT_FDCWD, call symlink()
+		return symlink(toPath, symlinkPath);
+	}
+
+	struct stat dirst;
+	if (fstat(fd, &dirst) < 0) {
+		// failed to grab stat information, fstat() sets errno
+		return -1;
+	}
+
+	if ((dirst.st_mode & S_IFDIR) != 0) {
+		// fd does not point to a directory
+		errno = ENOTDIR;
+		return -1;
+	}
+
+	char *dirpath;
+	dirpath = (char *)malloc(MAXPATHLEN);
+	if (dirpath == NULL) {
+		// ran out of memory allocating dirpath
+		errno = ENOMEM;
+		return -1;
+	}
+
+	if (fcntl(fd, F_GETPATH, dirpath) < 0) {
+		// failed to get the path of fd, fcntl sets errno
+		return -1;
+	}
+
+	if (strlcat(dirpath, symlinkPath, MAXPATHLEN) > MAXPATHLEN) {
+		// full path is too long, set errno and return
+		errno = ENAMETOOLONG;
+		return -1;
+	}
+
+	return symlink(dirpath, symlinkPath);
 }
 
 
