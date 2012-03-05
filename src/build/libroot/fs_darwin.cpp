@@ -509,8 +509,54 @@ renameat(int fromFD, const char* from, int toFD, const char* to)
 ssize_t
 readlinkat(int fd, const char *path, char *buffer, size_t bufferSize)
 {
-	errno = ENOSYS;
-	return -1;
+	if (path && path[0] == '/') {
+		// path is absolute, call readlink() ignoring fd
+		return readlink(path, buffer, bufferSize);
+	}
+
+	if (!fd) {
+		// fd is not a valid file descriptor
+		errno = EBADF;
+		return -1;
+	}
+
+	if (fd == AT_FDCWD) {
+		// fd is set to AT_FDCWD, call readlink()
+		return readlink(path, buffer, bufferSize);
+	}
+
+	struct stat dirst;
+	if (fstat(fd, &dirst) < 0) {
+		// failed to grab stat information, fstat() sets errno
+		return -1;
+	}
+
+	if ((dirst.st_mode & S_IFDIR) != 0) {
+		// fd does not point to a directory
+		errno = ENOTDIR;
+		return -1;
+	}
+
+	char *dirpath;
+	dirpath = (char *)malloc(MAXPATHLEN);
+	if (dirpath == NULL) {
+		// ran out of memory allocating dirpath
+		errno = ENOMEM;
+		return -1;
+	}
+
+	if (fcntl(fd, F_GETPATH, dirpath) < 0) {
+		// failed to get the path of fd, fcntl sets errno
+		return -1;
+	}
+
+	if (strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
+		// full path is too long, set errno and return
+		errno = ENAMETOOLONG;
+		return -1;
+	}
+
+	return readlink(dirpath, buffer, bufferSize);
 }
 
 
