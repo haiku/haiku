@@ -501,8 +501,100 @@ mknodat(int fd, const char *path, mode_t mode, dev_t dev)
 int
 renameat(int fromFD, const char* from, int toFD, const char* to)
 {
-	errno = ENOSYS;
-	return -1;
+	bool fromIsAbsolute = false;
+	bool toIsAbsolute = false;
+
+	if (from && from[0] == '/')
+		fromIsAbsolute = true;
+
+	if (to && to[0] == '/')
+		toIsAbsolute = true;
+
+	if (fromIsAbsolute && toIsAbsolute) {
+		// from and to are absolute, call rename() ignoring the fd's
+		return rename(from, to);
+	}
+
+	if ((!fromIsAbsolute && !fromFD) || (!toIsAbsolute && !toFD)) {
+		// from is not an absolute path and fromFD is not a valid file
+		// descriptor or to is not an absolute path and toFD is not a
+		// valid file descriptor
+		errno = EBADF;
+		return -1;
+	}
+
+	char *fromDirPath;
+	char *toDirPath;
+
+	if (fromIsAbsolute || fromFD == AT_FDCWD)
+		fromDirPath = const_cast<char *>(from);
+	else {
+		fromDirPath = (char *)malloc(MAXPATHLEN);
+		if (fromDirPath == NULL) {
+			// ran out of memory allocating fromDirPath
+			errno = ENOMEM;
+			return -1;
+		}
+
+		struct stat dirst;
+		if (fstat(fromFD, &dirst) < 0) {
+			// failed to grab stat information, fstat() sets errno
+			return -1;
+		}
+
+		if ((dirst.st_mode & S_IFDIR) != 0) {
+			// fd does not point to a directory
+			errno = ENOTDIR;
+			return -1;
+		}
+
+		if (fcntl(fromFD, F_GETPATH, fromDirPath) < 0) {
+			// failed to get the path of fromFD, fcntl sets errno
+			return -1;
+		}
+
+		if (strlcat(fromDirPath, from, MAXPATHLEN) > MAXPATHLEN) {
+			// full path is too long, set errno and return
+			errno = ENAMETOOLONG;
+			return -1;
+		}
+	}
+
+	if (toIsAbsolute || toFD == AT_FDCWD)
+		toDirPath = const_cast<char *>(to);
+	else {
+		toDirPath = (char *)malloc(MAXPATHLEN);
+		if (toDirPath == NULL) {
+			// ran out of memory allocating toDirPath
+			errno = ENOMEM;
+			return -1;
+		}
+
+		struct stat dirst;
+		if (fstat(toFD, &dirst) < 0) {
+			// failed to grab stat information, fstat() sets errno
+			return -1;
+		}
+
+		if ((dirst.st_mode & S_IFDIR) != 0) {
+			// fd does not point to a directory
+			errno = ENOTDIR;
+			return -1;
+		}
+
+		if (fcntl(toFD, F_GETPATH, toDirPath) < 0) {
+			// failed to get the path of toFD, fcntl sets errno
+			return -1;
+		}
+
+		if (strlcat(toDirPath, to, MAXPATHLEN) > MAXPATHLEN) {
+			// full path is too long, set errno and return
+			errno = ENAMETOOLONG;
+			return -1;
+		}
+	}
+
+	return rename(fromDirPath, toDirPath);
 }
 
 
