@@ -704,7 +704,7 @@ add_boot_volume_menu(Directory* bootVolume)
 
 	menu->AddItem(item = new(nothrow) MenuItem("Rescan volumes"));
 	item->SetHelpText("Please insert a Haiku CD-ROM or attach a USB disk - "
-		"depending on your system, you can then boot from them.");
+		"depending on your system, you can then boot from there.");
 	item->SetType(MENU_ITEM_NO_CHOICE);
 	if (count == 0)
 		item->Select(true);
@@ -865,7 +865,7 @@ add_debug_menu()
 	item->SetData("serial_debug_output");
 	item->SetType(MENU_ITEM_MARKABLE);
 	item->SetHelpText("Turns on forwarding the syslog output to the serial "
-		"interface.");
+		"interface (115200, 8N1).");
 
 	menu->AddItem(item
 		= new(nothrow) MenuItem("Enable on screen debug output"));
