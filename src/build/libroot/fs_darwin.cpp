@@ -82,7 +82,7 @@ faccessat(int fd, const char* path, int accessMode, int flag)
 		return -1;
 	}
 
-	if (path && path[0] == '/') {
+	if (path != NULL && path[0] == '/') {
 		// path is absolute, call access() ignoring fd
 		return (flag & AT_EACCESS) == 0 ? eaccess(path, accessMode)
 			: access(path, accessMode);
@@ -153,7 +153,7 @@ fchmodat(int fd, const char* path, mode_t mode, int flag)
 		return -1;
 	}
 
-	if (path && path[0] == '/') {
+	if (path != NULL && path[0] == '/') {
 		// path is absolute, call chmod() ignoring fd
 		return chmod(path, mode);
 	}
@@ -222,7 +222,7 @@ fchownat(int fd, const char* path, uid_t owner, gid_t group, int flag)
 		return -1;
 	}
 
-	if (path && path[0] == '/') {
+	if (path != NULL && path[0] == '/') {
 		// path is absolute, call chown() ignoring fd
 		return chown(path, owner, group);
 	}
@@ -295,7 +295,7 @@ fstatat(int fd, const char *path, struct stat *st, int flag)
 		return -1;
 	}
 
-	if (path && path[0] == '/') {
+	if (path != NULL && path[0] == '/') {
 		// path is absolute, call stat() ignoring fd
 		return stat(path, st);
 	}
@@ -352,7 +352,7 @@ fstatat(int fd, const char *path, struct stat *st, int flag)
 int
 mkdirat(int fd, const char *path, mode_t mode)
 {
-	if (path && path[0] == '/') {
+	if (path != NULL && path[0] == '/') {
 		// path is absolute, call mkdir() ignoring fd
 		return mkdir(path, mode);
 	}
@@ -409,7 +409,7 @@ mkdirat(int fd, const char *path, mode_t mode)
 int
 mkfifoat(int fd, const char *path, mode_t mode)
 {
-	if (path && path[0] == '/') {
+	if (path != NULL && path[0] == '/') {
 		// path is absolute, call mkfifo() ignoring fd
 		return mkfifo(path, mode);
 	}
@@ -466,7 +466,7 @@ mkfifoat(int fd, const char *path, mode_t mode)
 int
 mknodat(int fd, const char *path, mode_t mode, dev_t dev)
 {
-	if (path && path[0] == '/') {
+	if (path != NULL && path[0] == '/') {
 		// path is absolute, call mknod() ignoring fd
 		return mknod(path, mode, dev);
 	}
@@ -524,10 +524,10 @@ renameat(int oldFD, const char* oldPath, int newFD, const char* newPath)
 	bool oldPathIsAbsolute = false;
 	bool newPathIsAbsolute = false;
 
-	if (oldPath && oldPath[0] == '/')
+	if (oldPath != NULL && oldPath[0] == '/')
 		oldPathIsAbsolute = true;
 
-	if (newPath && newPath[0] == '/')
+	if (newPath != NULL && newPath[0] == '/')
 		newPathIsAbsolute = true;
 
 	if (oldPathIsAbsolute && newPathIsAbsolute) {
@@ -630,7 +630,7 @@ renameat(int oldFD, const char* oldPath, int newFD, const char* newPath)
 ssize_t
 readlinkat(int fd, const char *path, char *buffer, size_t bufferSize)
 {
-	if (path && path[0] == '/') {
+	if (path != NULL && path[0] == '/') {
 		// path is absolute, call readlink() ignoring fd
 		return readlink(path, buffer, bufferSize);
 	}
@@ -687,7 +687,7 @@ readlinkat(int fd, const char *path, char *buffer, size_t bufferSize)
 int
 symlinkat(const char *toPath, int fd, const char *symlinkPath)
 {
-	if (symlinkPath && symlinkPath[0] == '/') {
+	if (symlinkPath != NULL && symlinkPath[0] == '/') {
 		// symlinkPath is absolute, call symlink() ignoring fd
 		return symlink(toPath, symlinkPath);
 	}
@@ -744,7 +744,7 @@ symlinkat(const char *toPath, int fd, const char *symlinkPath)
 int
 unlinkat(int fd, const char *path, int flag)
 {
-	if (path && path[0] == '/') {
+	if (path != NULL && path[0] == '/') {
 		// path is absolute, call rmdir() or unlink() ignoring fd
 		return (flag & AT_REMOVEDIR) == 0 ? rmdir(path) : unlink(path);
 	}
@@ -815,10 +815,10 @@ linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 	bool oldPathIsAbsolute = false;
 	bool newPathIsAbsolute = false;
 
-	if (oldPath && oldPath[0] == '/')
+	if (oldPath != NULL && oldPath[0] == '/')
 		oldPathIsAbsolute = true;
 
-	if (newPath && newPath[0] == '/')
+	if (newPath != NULL && newPath[0] == '/')
 		newPathIsAbsolute = true;
 
 	if (oldPathIsAbsolute && newPathIsAbsolute) {
@@ -920,7 +920,7 @@ linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 int
 futimesat(int fd, const char *path, const struct timeval times[2])
 {
-	if (path && path[0] == '/') {
+	if (path != NULL && path[0] == '/') {
 		// path is absolute, call utimes() ignoring fd
 		return utimes(path, times);
 	}
