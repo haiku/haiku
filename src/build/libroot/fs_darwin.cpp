@@ -761,10 +761,113 @@ unlinkat(int fd, const char *path, int flag)
 
 
 int
-linkat(int toFD, const char *toPath, int linkFD, const char *linkPath, int flag)
+linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
+	   int flag)
 {
-	errno = ENOSYS;
-	return -1;
+	if ((flag & AT_SYMLINK_FOLLOW) == 0) {
+		// Dereference oldPath
+		// CURRENTLY UNSUPPORTED
+		errno = ENOTSUP;
+		return -1;
+	} else if (flag != 0) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	bool oldIsAbsolute = false;
+	bool newIsAbsolute = false;
+
+	if (oldPath && oldPath[0] == '/')
+		oldIsAbsolute = true;
+
+	if (newPath && newPath[0] == '/')
+		newIsAbsolute = true;
+
+	if (oldIsAbsolute && newIsAbsolute) {
+		// oldPath and newPath are both absolute, call link() ignoring the fd's
+		return link(oldPath, newPath);
+	}
+
+	if ((!oldIsAbsolute && !oldFD) || (!newIsAbsolute && !newFD)) {
+		// oldPath is not an absolute path and oldFD is not a valid file
+		// descriptor or newPath is not an absolute path and newFD is not a
+		// valid file descriptor
+		errno = EBADF;
+		return -1;
+	}
+
+	char *oldDirPath;
+	char *newDirPath;
+
+	if (oldIsAbsolute || oldFD == AT_FDCWD)
+		oldDirPath = const_cast<char *>(oldPath);
+	else {
+		oldDirPath = (char *)malloc(MAXPATHLEN);
+		if (oldDirPath == NULL) {
+			// ran out of memory allocating oldDirPath
+			errno = ENOMEM;
+			return -1;
+		}
+
+		struct stat dirst;
+		if (fstat(oldFD, &dirst) < 0) {
+			// failed to grab stat information, fstat() sets errno
+			return -1;
+		}
+
+		if ((dirst.st_mode & S_IFDIR) != 0) {
+			// fd does not point to a directory
+			errno = ENOTDIR;
+			return -1;
+		}
+
+		if (fcntl(oldFD, F_GETPATH, oldDirPath) < 0) {
+			// failed to get the path of oldFD, fcntl sets errno
+			return -1;
+		}
+
+		if (strlcat(oldDirPath, oldPath, MAXPATHLEN) > MAXPATHLEN) {
+			// full path is too long, set errno and return
+			errno = ENAMETOOLONG;
+			return -1;
+		}
+	}
+
+	if (newIsAbsolute || newFD == AT_FDCWD)
+		newDirPath = const_cast<char *>(newPath);
+	else {
+		newDirPath = (char *)malloc(MAXPATHLEN);
+		if (newDirPath == NULL) {
+			// ran out of memory allocating newDirPath
+			errno = ENOMEM;
+			return -1;
+		}
+
+		struct stat dirst;
+		if (fstat(newFD, &dirst) < 0) {
+			// failed to grab stat information, fstat() sets errno
+			return -1;
+		}
+
+		if ((dirst.st_mode & S_IFDIR) != 0) {
+			// fd does not point to a directory
+			errno = ENOTDIR;
+			return -1;
+		}
+
+		if (fcntl(newFD, F_GETPATH, newDirPath) < 0) {
+			// failed to get the path of newFD, fcntl sets errno
+			return -1;
+		}
+
+		if (strlcat(newDirPath, newPath, MAXPATHLEN) > MAXPATHLEN) {
+			// full path is too long, set errno and return
+			errno = ENAMETOOLONG;
+			return -1;
+		}
+	}
+
+	return link(oldDirPath, newDirPath);
 }
 
 
