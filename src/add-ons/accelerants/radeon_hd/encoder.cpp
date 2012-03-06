@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2012, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -491,7 +491,7 @@ encoder_digital_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 								|= PANEL_ENCODER_SPATIAL_DITHER_DEPTH;
 						}
 					}
-	
+
 					if ((lvdsFlags & ATOM_PANEL_MISC_TEMPORAL) != 0)
 						args.v2.ucTemporal = PANEL_ENCODER_TEMPORAL_DITHER_EN;
 						if ((lvdsFlags & ATOM_PANEL_MISC_888RGB) != 0) {
@@ -889,6 +889,8 @@ encoder_analog_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 bool
 encoder_analog_load_detect(uint32 connectorIndex)
 {
+	TRACE("%s\n", __func__);
+
 	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
 
@@ -983,6 +985,7 @@ status_t
 transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 	uint8 laneNumber, uint8 laneSet, int command)
 {
+	TRACE("%s\n", __func__);
 
 	uint16 encoderID = gConnector[connectorIndex]->encoder.objectID;
 	int index;
@@ -1003,6 +1006,11 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 			return B_ERROR;
 	}
 
+	if (index < 0) {
+		ERROR("%s: GetIndexIntoMasterTable failed!\n", __func__);
+		return B_ERROR;
+	}
+
 	uint8 tableMajor;
 	uint8 tableMinor;
 
@@ -1019,6 +1027,9 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 	};
 	union digTransmitterControl args;
 	memset(&args, 0, sizeof(args));
+
+	TRACE("%s: table %" B_PRIu8 ".%" B_PRIu8 "\n", __func__,
+		tableMajor, tableMinor);
 
 	int connectorObjectID
 		= (gConnector[connectorIndex]->objectID & OBJECT_ID_MASK)
@@ -1374,6 +1385,8 @@ encoder_crtc_scratch(uint8 crtcID)
 void
 encoder_dpms_scratch(uint8 crtcID, bool power)
 {
+	TRACE("%s\n", __func__);
+
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 
