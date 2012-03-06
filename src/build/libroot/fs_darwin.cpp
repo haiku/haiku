@@ -106,7 +106,7 @@ faccessat(int fd, const char* path, int accessMode, int flag)
 		return -1;
 	}
 
-	if ((dirst.st_mode & S_IFDIR) != 0) {
+	if ((dirst.st_mode & S_IFDIR) == 0) {
 		// fd does not point to a directory
 		errno = ENOTDIR;
 		return -1;
@@ -175,7 +175,7 @@ fchmodat(int fd, const char* path, mode_t mode, int flag)
 		return -1;
 	}
 
-	if ((dirst.st_mode & S_IFDIR) != 0) {
+	if ((dirst.st_mode & S_IFDIR) == 0) {
 		// fd does not point to a directory
 		errno = ENOTDIR;
 		return -1;
@@ -244,7 +244,7 @@ fchownat(int fd, const char* path, uid_t owner, gid_t group, int flag)
 		return -1;
 	}
 
-	if ((dirst.st_mode & S_IFDIR) != 0) {
+	if ((dirst.st_mode & S_IFDIR) == 0) {
 		// fd does not point to a directory
 		errno = ENOTDIR;
 		return -1;
@@ -312,7 +312,7 @@ fstatat(int fd, const char *path, struct stat *st, int flag)
 		return -1;
 	}
 
-	if ((dirst.st_mode & S_IFDIR) != 0) {
+	if ((dirst.st_mode & S_IFDIR) == 0) {
 		// fd does not point to a directory
 		errno = ENOTDIR;
 		return -1;
@@ -369,7 +369,7 @@ mkdirat(int fd, const char *path, mode_t mode)
 		return -1;
 	}
 
-	if ((dirst.st_mode & S_IFDIR) != 0) {
+	if ((dirst.st_mode & S_IFDIR) == 0) {
 		// fd does not point to a directory
 		errno = ENOTDIR;
 		return -1;
@@ -426,7 +426,7 @@ mkfifoat(int fd, const char *path, mode_t mode)
 		return -1;
 	}
 
-	if ((dirst.st_mode & S_IFDIR) != 0) {
+	if ((dirst.st_mode & S_IFDIR) == 0) {
 		// fd does not point to a directory
 		errno = ENOTDIR;
 		return -1;
@@ -483,7 +483,7 @@ mknodat(int fd, const char *path, mode_t mode, dev_t dev)
 		return -1;
 	}
 
-	if ((dirst.st_mode & S_IFDIR) != 0) {
+	if ((dirst.st_mode & S_IFDIR) == 0) {
 		// fd does not point to a directory
 		errno = ENOTDIR;
 		return -1;
@@ -550,7 +550,7 @@ renameat(int oldFD, const char* oldPath, int newFD, const char* newPath)
 			return -1;
 		}
 
-		if ((dirst.st_mode & S_IFDIR) != 0) {
+		if ((dirst.st_mode & S_IFDIR) == 0) {
 			// oldFd does not point to a directory
 			errno = ENOTDIR;
 			return -1;
@@ -586,7 +586,7 @@ renameat(int oldFD, const char* oldPath, int newFD, const char* newPath)
 			return -1;
 		}
 
-		if ((dirst.st_mode & S_IFDIR) != 0) {
+		if ((dirst.st_mode & S_IFDIR) == 0) {
 			// newFD does not point to a directory
 			errno = ENOTDIR;
 			return -1;
@@ -647,7 +647,7 @@ readlinkat(int fd, const char *path, char *buffer, size_t bufferSize)
 		return -1;
 	}
 
-	if ((dirst.st_mode & S_IFDIR) != 0) {
+	if ((dirst.st_mode & S_IFDIR) == 0) {
 		// fd does not point to a directory
 		errno = ENOTDIR;
 		return -1;
@@ -704,7 +704,7 @@ symlinkat(const char *toPath, int fd, const char *symlinkPath)
 		return -1;
 	}
 
-	if ((dirst.st_mode & S_IFDIR) != 0) {
+	if ((dirst.st_mode & S_IFDIR) == 0) {
 		// fd does not point to a directory
 		errno = ENOTDIR;
 		return -1;
@@ -761,7 +761,7 @@ unlinkat(int fd, const char *path, int flag)
 		return -1;
 	}
 
-	if ((dirst.st_mode & S_IFDIR) != 0) {
+	if ((dirst.st_mode & S_IFDIR) == 0) {
 		// fd does not point to a directory
 		errno = ENOTDIR;
 		return -1;
@@ -841,7 +841,7 @@ linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 			return -1;
 		}
 
-		if ((dirst.st_mode & S_IFDIR) != 0) {
+		if ((dirst.st_mode & S_IFDIR) == 0) {
 			// fd does not point to a directory
 			errno = ENOTDIR;
 			return -1;
@@ -877,7 +877,7 @@ linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 			return -1;
 		}
 
-		if ((dirst.st_mode & S_IFDIR) != 0) {
+		if ((dirst.st_mode & S_IFDIR) == 0) {
 			// fd does not point to a directory
 			errno = ENOTDIR;
 			return -1;
@@ -937,7 +937,7 @@ futimesat(int fd, const char *path, const struct timeval times[2])
 		return -1;
 	}
 
-	if ((dirst.st_mode & S_IFDIR) != 0) {
+	if ((dirst.st_mode & S_IFDIR) == 0) {
 		// fd does not point to a directory
 		errno = ENOTDIR;
 		return -1;
