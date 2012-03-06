@@ -1,0 +1,32 @@
+Some early bootloader information from Raspberry Pi foundation...
+
+Setting up the boot partition
+
+partition 1 -- FAT32, bootable flag, type 'c'
+partition 2 -- os, whatever
+
+The boot partition must contain the following files,
+get them from one of the official images:
+
+* bootcode.bin : 2nd stage bootloader, starts with SDRAM disabled
+* loader.bin : 3rd stage bootloader, starts with SDRAM enabled
+* start.elf: The GPU binary firmware image, provided by the foundation.
+* kernel.img: The OS kernel to load on the ARM processor.
+  Normally this is Linux - see instructions for compiling a kernel.
+* cmdline.txt: Parameters passed to the kernel on boot.
+
+Optional files:
+* config.txt: A configuration file read by the GPU.
+  Use this to override set the video mode, alter system clock speeds,
+  voltages, etc.
+* vlls directory: Additional GPU code, e.g. extra codecs.
+  Not present in the initial release.
+
+Additional GPU firmware images, rename over start.elf to use them:
+* arm128_start.elf : 128M ARM, 128M GPU split
+  - use this for heavy 3D work, possibly also required for some video decoding)
+* arm192_start.elf : 192M ARM, 64M GPU split
+  - this is the default
+* arm224_start.elf : 224M ARM, 32M GPU split
+  - (use this for Linux only with no 3D or video processing.
+    Its enough for the 1080p framebuffer, but not much else)
