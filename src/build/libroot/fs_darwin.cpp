@@ -125,15 +125,16 @@ faccessat(int fd, const char* path, int accessMode, int flag)
 		return -1;
 	}
 
-	if (strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
+	if (strlcat(dirpath, "/", MAXPATHLEN) > MAXPATHLEN
+		|| strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
 		// full path is too long, set errno and return
 		errno = ENAMETOOLONG;
 		free(dirpath);
 		return -1;
 	}
 
-	int status = (flag & AT_EACCESS) != 0 ? eaccess(path, accessMode)
-		: access(path, accessMode);
+	int status = (flag & AT_EACCESS) != 0 ? eaccess(dirpath, accessMode)
+		: access(dirpath, accessMode);
 	free(dirpath);
 	return status;
 }
@@ -195,7 +196,8 @@ fchmodat(int fd, const char* path, mode_t mode, int flag)
 		return -1;
 	}
 
-	if (strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
+	if (strlcat(dirpath, "/", MAXPATHLEN) > MAXPATHLEN
+		|| strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
 		// full path is too long, set errno and return
 		errno = ENAMETOOLONG;
 		free(dirpath);
@@ -263,7 +265,8 @@ fchownat(int fd, const char* path, uid_t owner, gid_t group, int flag)
 		return -1;
 	}
 
-	if (strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
+	if (strlcat(dirpath, "/", MAXPATHLEN) > MAXPATHLEN
+		|| strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
 		// full path is too long, set errno and return
 		errno = ENAMETOOLONG;
 		free(dirpath);
@@ -331,7 +334,8 @@ fstatat(int fd, const char *path, struct stat *st, int flag)
 		return -1;
 	}
 
-	if (strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
+	if (strlcat(dirpath, "/", MAXPATHLEN) > MAXPATHLEN
+		|| strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
 		// full path is too long, set errno and return
 		errno = ENAMETOOLONG;
 		free(dirpath);
@@ -388,7 +392,8 @@ mkdirat(int fd, const char *path, mode_t mode)
 		return -1;
 	}
 
-	if (strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
+	if (strlcat(dirpath, "/", MAXPATHLEN) > MAXPATHLEN
+		|| strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
 		// full path is too long, set errno and return
 		errno = ENAMETOOLONG;
 		free(dirpath);
@@ -445,7 +450,8 @@ mkfifoat(int fd, const char *path, mode_t mode)
 		return -1;
 	}
 
-	if (strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
+	if (strlcat(dirpath, "/", MAXPATHLEN) > MAXPATHLEN
+		|| strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
 		// full path is too long, set errno and return
 		errno = ENAMETOOLONG;
 		free(dirpath);
@@ -502,7 +508,8 @@ mknodat(int fd, const char *path, mode_t mode, dev_t dev)
 		return -1;
 	}
 
-	if (strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
+	if (strlcat(dirpath, "/", MAXPATHLEN) > MAXPATHLEN
+		|| strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
 		// full path is too long, set errno and return
 		errno = ENAMETOOLONG;
 		free(dirpath);
@@ -569,7 +576,8 @@ renameat(int oldFD, const char* oldPath, int newFD, const char* newPath)
 			return -1;
 		}
 
-		if (strlcat(oldDirPath, oldPath, MAXPATHLEN) > MAXPATHLEN) {
+		if (strlcat(oldDirPath, "/", MAXPATHLEN) > MAXPATHLEN
+			|| strlcat(oldDirPath, oldPath, MAXPATHLEN) > MAXPATHLEN) {
 			// full path is too long, set errno and return
 			errno = ENAMETOOLONG;
 			free(oldDirPath);
@@ -605,7 +613,8 @@ renameat(int oldFD, const char* oldPath, int newFD, const char* newPath)
 			return -1;
 		}
 
-		if (strlcat(newDirPath, newPath, MAXPATHLEN) > MAXPATHLEN) {
+		if (strlcat(newDirPath, "/", MAXPATHLEN) > MAXPATHLEN
+			|| strlcat(newDirPath, newPath, MAXPATHLEN) > MAXPATHLEN) {
 			// full path is too long, set errno and return
 			errno = ENAMETOOLONG;
 			free(newDirPath);
@@ -666,7 +675,8 @@ readlinkat(int fd, const char *path, char *buffer, size_t bufferSize)
 		return -1;
 	}
 
-	if (strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
+	if (strlcat(dirpath, "/", MAXPATHLEN) > MAXPATHLEN
+		|| strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
 		// full path is too long, set errno and return
 		errno = ENAMETOOLONG;
 		free(dirpath);
@@ -723,7 +733,8 @@ symlinkat(const char *toPath, int fd, const char *symlinkPath)
 		return -1;
 	}
 
-	if (strlcat(dirpath, symlinkPath, MAXPATHLEN) > MAXPATHLEN) {
+	if (strlcat(dirpath, "/", MAXPATHLEN) > MAXPATHLEN
+		|| strlcat(dirpath, symlinkPath, MAXPATHLEN) > MAXPATHLEN) {
 		// full path is too long, set errno and return
 		errno = ENAMETOOLONG;
 		free(dirpath);
@@ -780,7 +791,8 @@ unlinkat(int fd, const char *path, int flag)
 		return -1;
 	}
 
-	if (strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
+	if (strlcat(dirpath, "/", MAXPATHLEN) > MAXPATHLEN
+		|| strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
 		// full path is too long, set errno and return
 		errno = ENAMETOOLONG;
 		free(dirpath);
@@ -860,7 +872,8 @@ linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 			free(oldDirPath);
 		}
 
-		if (strlcat(oldDirPath, oldPath, MAXPATHLEN) > MAXPATHLEN) {
+		if (strlcat(oldDirPath, "/", MAXPATHLEN) > MAXPATHLEN
+			|| strlcat(oldDirPath, oldPath, MAXPATHLEN) > MAXPATHLEN) {
 			// full path is too long, set errno and return
 			errno = ENAMETOOLONG;
 			free(oldDirPath);
@@ -896,7 +909,8 @@ linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 			return -1;
 		}
 
-		if (strlcat(newDirPath, newPath, MAXPATHLEN) > MAXPATHLEN) {
+		if (strlcat(newDirPath, "/", MAXPATHLEN) > MAXPATHLEN
+			|| strlcat(newDirPath, newPath, MAXPATHLEN) > MAXPATHLEN) {
 			// full path is too long, set errno and return
 			errno = ENAMETOOLONG;
 			return -1;
@@ -956,7 +970,8 @@ futimesat(int fd, const char *path, const struct timeval times[2])
 		return -1;
 	}
 
-	if (strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
+	if (strlcat(dirpath, "/", MAXPATHLEN) > MAXPATHLEN
+		|| strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
 		// full path is too long, set errno and return
 		errno = ENAMETOOLONG;
 		free(dirpath);
