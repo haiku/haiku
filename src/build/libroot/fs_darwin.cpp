@@ -112,8 +112,7 @@ faccessat(int fd, const char* path, int accessMode, int flag)
 		return -1;
 	}
 
-	char *dirpath;
-	dirpath = (char *)malloc(MAXPATHLEN);
+	char *dirpath = (char *)malloc(MAXPATHLEN);
 	if (dirpath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
@@ -122,17 +121,21 @@ faccessat(int fd, const char* path, int accessMode, int flag)
 
 	if (fcntl(fd, F_GETPATH, dirpath) < 0) {
 		// failed to get the path of fd, fcntl sets errno
+		free(dirpath);
 		return -1;
 	}
 
 	if (strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
 		// full path is too long, set errno and return
 		errno = ENAMETOOLONG;
+		free(dirpath);
 		return -1;
 	}
 
-	return (flag & AT_EACCESS) == 0 ? eaccess(path, accessMode)
+	int status = (flag & AT_EACCESS) == 0 ? eaccess(path, accessMode)
 		: access(path, accessMode);
+	free(dirpath);
+	return status;
 }
 
 
@@ -178,26 +181,30 @@ fchmodat(int fd, const char* path, mode_t mode, int flag)
 		return -1;
 	}
 
-	char *dirpath;
-	dirpath = (char *)malloc(MAXPATHLEN);
+	char *dirpath = (char *)malloc(MAXPATHLEN);
 	if (dirpath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
+		free(dirpath);
 		return -1;
 	}
 
 	if (fcntl(fd, F_GETPATH, dirpath) < 0) {
 		// failed to get the path of fd, fcntl sets errno
+		free(dirpath);
 		return -1;
 	}
 
 	if (strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
 		// full path is too long, set errno and return
 		errno = ENAMETOOLONG;
+		free(dirpath);
 		return -1;
 	}
 
-	return chmod(dirpath, mode);
+	int status = chmod(dirpath, mode);
+	free(dirpath);
+	return status;
 }
 
 
@@ -243,8 +250,7 @@ fchownat(int fd, const char* path, uid_t owner, gid_t group, int flag)
 		return -1;
 	}
 
-	char *dirpath;
-	dirpath = (char *)malloc(MAXPATHLEN);
+	char *dirpath = (char *)malloc(MAXPATHLEN);
 	if (dirpath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
@@ -253,16 +259,20 @@ fchownat(int fd, const char* path, uid_t owner, gid_t group, int flag)
 
 	if (fcntl(fd, F_GETPATH, dirpath) < 0) {
 		// failed to get the path of fd, fcntl sets errno
+		free(dirpath);
 		return -1;
 	}
 
 	if (strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
 		// full path is too long, set errno and return
 		errno = ENAMETOOLONG;
+		free(dirpath);
 		return -1;
 	}
 
-	return chown(dirpath, owner, group);
+	int status = chown(dirpath, owner, group);
+	free(dirpath);
+	return status;
 }
 
 
@@ -313,8 +323,7 @@ fstatat(int fd, const char *path, struct stat *st, int flag)
 		return -1;
 	}
 
-	char *dirpath;
-	dirpath = (char *)malloc(MAXPATHLEN);
+	char *dirpath = (char *)malloc(MAXPATHLEN);
 	if (dirpath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
@@ -323,16 +332,20 @@ fstatat(int fd, const char *path, struct stat *st, int flag)
 
 	if (fcntl(fd, F_GETPATH, dirpath) < 0) {
 		// failed to get the path of fd, fcntl sets errno
+		free(dirpath);
 		return -1;
 	}
 
 	if (strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
 		// full path is too long, set errno and return
 		errno = ENAMETOOLONG;
+		free(dirpath);
 		return -1;
 	}
 
-	return stat(dirpath, st);
+	int status = stat(dirpath, st);
+	free(dirpath);
+	return status;
 }
 
 
@@ -367,8 +380,7 @@ mkdirat(int fd, const char *path, mode_t mode)
 		return -1;
 	}
 
-	char *dirpath;
-	dirpath = (char *)malloc(MAXPATHLEN);
+	char *dirpath = (char *)malloc(MAXPATHLEN);
 	if (dirpath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
@@ -377,16 +389,20 @@ mkdirat(int fd, const char *path, mode_t mode)
 
 	if (fcntl(fd, F_GETPATH, dirpath) < 0) {
 		// failed to get the path of fd, fcntl sets errno
+		free(dirpath);
 		return -1;
 	}
 
 	if (strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
 		// full path is too long, set errno and return
 		errno = ENAMETOOLONG;
+		free(dirpath);
 		return -1;
 	}
 
-	return mkdir(dirpath, mode);
+	int status = mkdir(dirpath, mode);
+	free(dirpath);
+	return status;
 }
 
 
@@ -421,8 +437,7 @@ mkfifoat(int fd, const char *path, mode_t mode)
 		return -1;
 	}
 
-	char *dirpath;
-	dirpath = (char *)malloc(MAXPATHLEN);
+	char *dirpath = (char *)malloc(MAXPATHLEN);
 	if (dirpath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
@@ -431,16 +446,20 @@ mkfifoat(int fd, const char *path, mode_t mode)
 
 	if (fcntl(fd, F_GETPATH, dirpath) < 0) {
 		// failed to get the path of fd, fcntl sets errno
+		free(dirpath);
 		return -1;
 	}
 
 	if (strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
 		// full path is too long, set errno and return
 		errno = ENAMETOOLONG;
+		free(dirpath);
 		return -1;
 	}
 
-	return mkfifo(dirpath, mode);
+	int status = mkfifo(dirpath, mode);
+	free(dirpath);
+	return status;
 }
 
 
@@ -475,8 +494,7 @@ mknodat(int fd, const char *path, mode_t mode, dev_t dev)
 		return -1;
 	}
 
-	char *dirpath;
-	dirpath = (char *)malloc(MAXPATHLEN);
+	char *dirpath = (char *)malloc(MAXPATHLEN);
 	if (dirpath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
@@ -485,12 +503,14 @@ mknodat(int fd, const char *path, mode_t mode, dev_t dev)
 
 	if (fcntl(fd, F_GETPATH, dirpath) < 0) {
 		// failed to get the path of fd, fcntl sets errno
+		free(dirpath);
 		return -1;
 	}
 
 	if (strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
 		// full path is too long, set errno and return
 		errno = ENAMETOOLONG;
+		free(dirpath);
 		return -1;
 	}
 
@@ -529,13 +549,6 @@ renameat(int fromFD, const char* from, int toFD, const char* to)
 	if (fromIsAbsolute || fromFD == AT_FDCWD)
 		fromDirPath = const_cast<char *>(from);
 	else {
-		fromDirPath = (char *)malloc(MAXPATHLEN);
-		if (fromDirPath == NULL) {
-			// ran out of memory allocating fromDirPath
-			errno = ENOMEM;
-			return -1;
-		}
-
 		struct stat dirst;
 		if (fstat(fromFD, &dirst) < 0) {
 			// failed to grab stat information, fstat() sets errno
@@ -548,14 +561,23 @@ renameat(int fromFD, const char* from, int toFD, const char* to)
 			return -1;
 		}
 
+		fromDirPath = (char *)malloc(MAXPATHLEN);
+		if (fromDirPath == NULL) {
+			// ran out of memory allocating fromDirPath
+			errno = ENOMEM;
+			return -1;
+		}
+
 		if (fcntl(fromFD, F_GETPATH, fromDirPath) < 0) {
 			// failed to get the path of fromFD, fcntl sets errno
+			free(fromDirPath);
 			return -1;
 		}
 
 		if (strlcat(fromDirPath, from, MAXPATHLEN) > MAXPATHLEN) {
 			// full path is too long, set errno and return
 			errno = ENAMETOOLONG;
+			free(fromDirPath);
 			return -1;
 		}
 	}
@@ -563,13 +585,6 @@ renameat(int fromFD, const char* from, int toFD, const char* to)
 	if (toIsAbsolute || toFD == AT_FDCWD)
 		toDirPath = const_cast<char *>(to);
 	else {
-		toDirPath = (char *)malloc(MAXPATHLEN);
-		if (toDirPath == NULL) {
-			// ran out of memory allocating toDirPath
-			errno = ENOMEM;
-			return -1;
-		}
-
 		struct stat dirst;
 		if (fstat(toFD, &dirst) < 0) {
 			// failed to grab stat information, fstat() sets errno
@@ -582,19 +597,33 @@ renameat(int fromFD, const char* from, int toFD, const char* to)
 			return -1;
 		}
 
+		toDirPath = (char *)malloc(MAXPATHLEN);
+		if (toDirPath == NULL) {
+			// ran out of memory allocating toDirPath
+			errno = ENOMEM;
+			return -1;
+		}
+
 		if (fcntl(toFD, F_GETPATH, toDirPath) < 0) {
 			// failed to get the path of toFD, fcntl sets errno
+			free(toDirPath);
 			return -1;
 		}
 
 		if (strlcat(toDirPath, to, MAXPATHLEN) > MAXPATHLEN) {
 			// full path is too long, set errno and return
 			errno = ENAMETOOLONG;
+			free(toDirPath);
 			return -1;
 		}
 	}
 
-	return rename(fromDirPath, toDirPath);
+	int status = rename(fromDirPath, toDirPath);
+	if (!fromIsAbsolute && fromFD != AT_FDCWD)
+		free(fromDirPath);
+	if (!toIsAbsolute && toFD != AT_FDCWD)
+		free(toDirPath);
+	return status;
 }
 
 
@@ -629,8 +658,7 @@ readlinkat(int fd, const char *path, char *buffer, size_t bufferSize)
 		return -1;
 	}
 
-	char *dirpath;
-	dirpath = (char *)malloc(MAXPATHLEN);
+	char *dirpath = (char *)malloc(MAXPATHLEN);
 	if (dirpath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
@@ -639,16 +667,20 @@ readlinkat(int fd, const char *path, char *buffer, size_t bufferSize)
 
 	if (fcntl(fd, F_GETPATH, dirpath) < 0) {
 		// failed to get the path of fd, fcntl sets errno
+		free(dirpath);
 		return -1;
 	}
 
 	if (strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
 		// full path is too long, set errno and return
 		errno = ENAMETOOLONG;
+		free(dirpath);
 		return -1;
 	}
 
-	return readlink(dirpath, buffer, bufferSize);
+	int status = readlink(dirpath, buffer, bufferSize);
+	free(dirpath);
+	return status;
 }
 
 
@@ -683,8 +715,7 @@ symlinkat(const char *toPath, int fd, const char *symlinkPath)
 		return -1;
 	}
 
-	char *dirpath;
-	dirpath = (char *)malloc(MAXPATHLEN);
+	char *dirpath = (char *)malloc(MAXPATHLEN);
 	if (dirpath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
@@ -693,16 +724,20 @@ symlinkat(const char *toPath, int fd, const char *symlinkPath)
 
 	if (fcntl(fd, F_GETPATH, dirpath) < 0) {
 		// failed to get the path of fd, fcntl sets errno
+		free(dirpath);
 		return -1;
 	}
 
 	if (strlcat(dirpath, symlinkPath, MAXPATHLEN) > MAXPATHLEN) {
 		// full path is too long, set errno and return
 		errno = ENAMETOOLONG;
+		free(dirpath);
 		return -1;
 	}
 
-	return symlink(dirpath, symlinkPath);
+	int status = symlink(dirpath, symlinkPath);
+	free(dirpath);
+	return status;
 }
 
 
@@ -737,8 +772,7 @@ unlinkat(int fd, const char *path, int flag)
 		return -1;
 	}
 
-	char *dirpath;
-	dirpath = (char *)malloc(MAXPATHLEN);
+	char *dirpath = (char *)malloc(MAXPATHLEN);
 	if (dirpath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
@@ -747,16 +781,20 @@ unlinkat(int fd, const char *path, int flag)
 
 	if (fcntl(fd, F_GETPATH, dirpath) < 0) {
 		// failed to get the path of fd, fcntl sets errno
+		free(dirpath);
 		return -1;
 	}
 
 	if (strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
 		// full path is too long, set errno and return
 		errno = ENAMETOOLONG;
+		free(dirpath);
 		return -1;
 	}
 
-	return (flag & AT_REMOVEDIR) == 0 ? rmdir(path) : unlink(path);
+	int status = (flag & AT_REMOVEDIR) == 0 ? rmdir(path) : unlink(path);
+	free(dirpath);
+	return status;
 }
 
 
@@ -802,13 +840,6 @@ linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 	if (oldIsAbsolute || oldFD == AT_FDCWD)
 		oldDirPath = const_cast<char *>(oldPath);
 	else {
-		oldDirPath = (char *)malloc(MAXPATHLEN);
-		if (oldDirPath == NULL) {
-			// ran out of memory allocating oldDirPath
-			errno = ENOMEM;
-			return -1;
-		}
-
 		struct stat dirst;
 		if (fstat(oldFD, &dirst) < 0) {
 			// failed to grab stat information, fstat() sets errno
@@ -821,14 +852,23 @@ linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 			return -1;
 		}
 
+		oldDirPath = (char *)malloc(MAXPATHLEN);
+		if (oldDirPath == NULL) {
+			// ran out of memory allocating oldDirPath
+			errno = ENOMEM;
+			return -1;
+		}
+
 		if (fcntl(oldFD, F_GETPATH, oldDirPath) < 0) {
 			// failed to get the path of oldFD, fcntl sets errno
 			return -1;
+			free(oldDirPath);
 		}
 
 		if (strlcat(oldDirPath, oldPath, MAXPATHLEN) > MAXPATHLEN) {
 			// full path is too long, set errno and return
 			errno = ENAMETOOLONG;
+			free(oldDirPath);
 			return -1;
 		}
 	}
@@ -836,13 +876,6 @@ linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 	if (newIsAbsolute || newFD == AT_FDCWD)
 		newDirPath = const_cast<char *>(newPath);
 	else {
-		newDirPath = (char *)malloc(MAXPATHLEN);
-		if (newDirPath == NULL) {
-			// ran out of memory allocating newDirPath
-			errno = ENOMEM;
-			return -1;
-		}
-
 		struct stat dirst;
 		if (fstat(newFD, &dirst) < 0) {
 			// failed to grab stat information, fstat() sets errno
@@ -855,8 +888,16 @@ linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 			return -1;
 		}
 
+		newDirPath = (char *)malloc(MAXPATHLEN);
+		if (newDirPath == NULL) {
+			// ran out of memory allocating newDirPath
+			errno = ENOMEM;
+			return -1;
+		}
+
 		if (fcntl(newFD, F_GETPATH, newDirPath) < 0) {
 			// failed to get the path of newFD, fcntl sets errno
+			free(newDirPath);
 			return -1;
 		}
 
@@ -867,7 +908,12 @@ linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 		}
 	}
 
-	return link(oldDirPath, newDirPath);
+	int status = link(oldDirPath, newDirPath);
+	if (!oldIsAbsolute && oldFD != AT_FDCWD)
+		free(oldDirPath);
+	if (!newIsAbsolute && newFD != AT_FDCWD)
+		free(newDirPath);
+	return status;
 }
 
 
@@ -902,8 +948,7 @@ futimesat(int fd, const char *path, const struct timeval times[2])
 		return -1;
 	}
 
-	char *dirpath;
-	dirpath = (char *)malloc(MAXPATHLEN);
+	char *dirpath = (char *)malloc(MAXPATHLEN);
 	if (dirpath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
@@ -912,14 +957,18 @@ futimesat(int fd, const char *path, const struct timeval times[2])
 
 	if (fcntl(fd, F_GETPATH, dirpath) < 0) {
 		// failed to get the path of fd, fcntl sets errno
+		free(dirpath);
 		return -1;
 	}
 
 	if (strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
 		// full path is too long, set errno and return
 		errno = ENAMETOOLONG;
+		free(dirpath);
 		return -1;
 	}
 
-	return utimes(dirpath, times);
+	int status = utimes(dirpath, times);
+	free(dirpath);
+	return status;
 }
