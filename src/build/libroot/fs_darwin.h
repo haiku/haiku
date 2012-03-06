@@ -23,7 +23,7 @@ int fstatat(int fd, const char *path, struct stat *st, int flag);
 int mkdirat(int fd, const char *path, mode_t mode);
 int mkfifoat(int fd, const char *path, mode_t mode);
 int mknodat(int fd, const char *name, mode_t mode, dev_t dev);
-int renameat(int fromFD, const char* from, int toFD, const char* to);
+int renameat(int oldFD, const char* oldPath, int newFD, const char* newPath);
 
 ssize_t readlinkat(int fd, const char *path, char *buffer, size_t bufferSize);
 int symlinkat(const char *toPath, int fd, const char *symlinkPath);

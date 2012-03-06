@@ -519,110 +519,110 @@ mknodat(int fd, const char *path, mode_t mode, dev_t dev)
 
 
 int
-renameat(int fromFD, const char* from, int toFD, const char* to)
+renameat(int oldFD, const char* oldPath, int newFD, const char* newPath)
 {
-	bool fromIsAbsolute = false;
-	bool toIsAbsolute = false;
+	bool oldPathIsAbsolute = false;
+	bool newPathIsAbsolute = false;
 
-	if (from && from[0] == '/')
-		fromIsAbsolute = true;
+	if (oldPath && oldPath[0] == '/')
+		oldPathIsAbsolute = true;
 
-	if (to && to[0] == '/')
-		toIsAbsolute = true;
+	if (newPath && newPath[0] == '/')
+		newPathIsAbsolute = true;
 
-	if (fromIsAbsolute && toIsAbsolute) {
-		// from and to are absolute, call rename() ignoring the fd's
-		return rename(from, to);
+	if (oldPathIsAbsolute && newPathIsAbsolute) {
+		// oldPath and newPath are absolute, call rename() ignoring the fd's
+		return rename(oldPath, newPath);
 	}
 
-	if ((!fromIsAbsolute && !fromFD) || (!toIsAbsolute && !toFD)) {
-		// from is not an absolute path and fromFD is not a valid file
-		// descriptor or to is not an absolute path and toFD is not a
+	if ((!oldPathIsAbsolute && !oldFD) || (!newPathIsAbsolute && !newFD)) {
+		// oldPath is not an absolute path and oldFD is not a valid file
+		// descriptor or newPath is not an absolute path and newFD is not a
 		// valid file descriptor
 		errno = EBADF;
 		return -1;
 	}
 
-	char *fromDirPath;
-	char *toDirPath;
+	char *oldDirPath;
+	char *newDirPath;
 
-	if (fromIsAbsolute || fromFD == AT_FDCWD)
-		fromDirPath = const_cast<char *>(from);
+	if (oldPathIsAbsolute || oldFD == AT_FDCWD)
+		oldDirPath = const_cast<char *>(oldPath);
 	else {
 		struct stat dirst;
-		if (fstat(fromFD, &dirst) < 0) {
+		if (fstat(oldFD, &dirst) < 0) {
 			// failed to grab stat information, fstat() sets errno
 			return -1;
 		}
 
 		if ((dirst.st_mode & S_IFDIR) != 0) {
-			// fd does not point to a directory
+			// oldFd does not point to a directory
 			errno = ENOTDIR;
 			return -1;
 		}
 
-		fromDirPath = (char *)malloc(MAXPATHLEN);
-		if (fromDirPath == NULL) {
-			// ran out of memory allocating fromDirPath
+		oldDirPath = (char *)malloc(MAXPATHLEN);
+		if (oldDirPath == NULL) {
+			// ran out of memory allocating oldDirPath
 			errno = ENOMEM;
 			return -1;
 		}
 
-		if (fcntl(fromFD, F_GETPATH, fromDirPath) < 0) {
-			// failed to get the path of fromFD, fcntl sets errno
-			free(fromDirPath);
+		if (fcntl(oldFD, F_GETPATH, oldDirPath) < 0) {
+			// failed to get the path of oldFD, fcntl sets errno
+			free(oldDirPath);
 			return -1;
 		}
 
-		if (strlcat(fromDirPath, from, MAXPATHLEN) > MAXPATHLEN) {
+		if (strlcat(oldDirPath, oldPath, MAXPATHLEN) > MAXPATHLEN) {
 			// full path is too long, set errno and return
 			errno = ENAMETOOLONG;
-			free(fromDirPath);
+			free(oldDirPath);
 			return -1;
 		}
 	}
 
-	if (toIsAbsolute || toFD == AT_FDCWD)
-		toDirPath = const_cast<char *>(to);
+	if (newPathIsAbsolute || newFD == AT_FDCWD)
+		newDirPath = const_cast<char *>(newPath);
 	else {
 		struct stat dirst;
-		if (fstat(toFD, &dirst) < 0) {
+		if (fstat(newFD, &dirst) < 0) {
 			// failed to grab stat information, fstat() sets errno
 			return -1;
 		}
 
 		if ((dirst.st_mode & S_IFDIR) != 0) {
-			// fd does not point to a directory
+			// newFD does not point to a directory
 			errno = ENOTDIR;
 			return -1;
 		}
 
-		toDirPath = (char *)malloc(MAXPATHLEN);
-		if (toDirPath == NULL) {
-			// ran out of memory allocating toDirPath
+		newDirPath = (char *)malloc(MAXPATHLEN);
+		if (newDirPath == NULL) {
+			// ran out of memory allocating newDirPath
 			errno = ENOMEM;
 			return -1;
 		}
 
-		if (fcntl(toFD, F_GETPATH, toDirPath) < 0) {
-			// failed to get the path of toFD, fcntl sets errno
-			free(toDirPath);
+		if (fcntl(newFD, F_GETPATH, newDirPath) < 0) {
+			// failed to get the path of newFD, fcntl sets errno
+			free(newDirPath);
 			return -1;
 		}
 
-		if (strlcat(toDirPath, to, MAXPATHLEN) > MAXPATHLEN) {
+		if (strlcat(newDirPath, newPath, MAXPATHLEN) > MAXPATHLEN) {
 			// full path is too long, set errno and return
 			errno = ENAMETOOLONG;
-			free(toDirPath);
+			free(newDirPath);
 			return -1;
 		}
 	}
 
-	int status = rename(fromDirPath, toDirPath);
-	if (!fromIsAbsolute && fromFD != AT_FDCWD)
-		free(fromDirPath);
-	if (!toIsAbsolute && toFD != AT_FDCWD)
-		free(toDirPath);
+	int status = rename(oldDirPath, newDirPath);
+	if (!oldPathIsAbsolute && oldFD != AT_FDCWD)
+		free(oldDirPath);
+	if (!newPathIsAbsolute && newFD != AT_FDCWD)
+		free(newDirPath);
 	return status;
 }
 
@@ -812,21 +812,21 @@ linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 		return -1;
 	}
 
-	bool oldIsAbsolute = false;
-	bool newIsAbsolute = false;
+	bool oldPathIsAbsolute = false;
+	bool newPathIsAbsolute = false;
 
 	if (oldPath && oldPath[0] == '/')
-		oldIsAbsolute = true;
+		oldPathIsAbsolute = true;
 
 	if (newPath && newPath[0] == '/')
-		newIsAbsolute = true;
+		newPathIsAbsolute = true;
 
-	if (oldIsAbsolute && newIsAbsolute) {
+	if (oldPathIsAbsolute && newPathIsAbsolute) {
 		// oldPath and newPath are both absolute, call link() ignoring the fd's
 		return link(oldPath, newPath);
 	}
 
-	if ((!oldIsAbsolute && !oldFD) || (!newIsAbsolute && !newFD)) {
+	if ((!oldPathIsAbsolute && !oldFD) || (!newPathIsAbsolute && !newFD)) {
 		// oldPath is not an absolute path and oldFD is not a valid file
 		// descriptor or newPath is not an absolute path and newFD is not a
 		// valid file descriptor
@@ -837,7 +837,7 @@ linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 	char *oldDirPath;
 	char *newDirPath;
 
-	if (oldIsAbsolute || oldFD == AT_FDCWD)
+	if (oldPathIsAbsolute || oldFD == AT_FDCWD)
 		oldDirPath = const_cast<char *>(oldPath);
 	else {
 		struct stat dirst;
@@ -873,7 +873,7 @@ linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 		}
 	}
 
-	if (newIsAbsolute || newFD == AT_FDCWD)
+	if (newPathIsAbsolute || newFD == AT_FDCWD)
 		newDirPath = const_cast<char *>(newPath);
 	else {
 		struct stat dirst;
@@ -909,9 +909,9 @@ linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 	}
 
 	int status = link(oldDirPath, newDirPath);
-	if (!oldIsAbsolute && oldFD != AT_FDCWD)
+	if (!oldPathIsAbsolute && oldFD != AT_FDCWD)
 		free(oldDirPath);
-	if (!newIsAbsolute && newFD != AT_FDCWD)
+	if (!newPathIsAbsolute && newFD != AT_FDCWD)
 		free(newDirPath);
 	return status;
 }
