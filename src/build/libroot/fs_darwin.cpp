@@ -279,14 +279,6 @@ fchownat(int fd, const char* path, uid_t owner, gid_t group, int flag)
 int
 fstatat(int fd, const char *path, struct stat *st, int flag)
 {
-	if ((flag & AT_NO_AUTOMOUNT) == 0) {
-		// Don't automount the terminal ("basename") component of pathname if
-		// it is a directory that is an automount point.
-		// CURRENTLY UNSUPPORTED
-		errno = ENOTSUP;
-		return -1;
-	}
-
 	if ((flag & AT_SYMLINK_NOFOLLOW) == 0) {
 		// do not dereference, instead return information about the link
 		// itself

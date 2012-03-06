@@ -5,15 +5,21 @@
 #ifndef FS_DARWIN_H
 #define FS_DARWIN_H
 
-/* flags for the *at() functions */
-#define AT_FDCWD		(-1)		/* CWD FD for the *at() functions */
+/*
+ * Magic value that specify the use of the current working directory
+ * to determine the target of relative file paths in the openat() and
+ * similar syscalls.
+ */
+#define AT_FDCWD			-100	/* CWD FD for the *at() functions */
 
-#define AT_SYMLINK_NOFOLLOW	0x01	/* fstatat(), fchmodat(), fchownat(),
+/*
+ * Miscellaneous flags for the *at() syscalls.
+ */
+#define AT_EACCESS			0x100	/* faccessat() */
+#define AT_SYMLINK_NOFOLLOW	0x200	/* fstatat(), fchmodat(), fchownat(),
 										utimensat() */
-#define AT_SYMLINK_FOLLOW	0x02	/* linkat() */
-#define AT_REMOVEDIR		0x04	/* unlinkat() */
-#define AT_EACCESS			0x08	/* faccessat() */
-#define AT_NO_AUTOMOUNT		0x10	/* fstatat */
+#define AT_SYMLINK_FOLLOW	0x400	/* linkat() */
+#define AT_REMOVEDIR		0x800	/* unlinkat() */
 
 int eaccess(const char* path, int accessMode);
 int faccessat(int fd, const char* path, int accessMode, int flag);
