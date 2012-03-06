@@ -74,7 +74,7 @@ eaccess(const char* path, int accessMode)
 int
 faccessat(int fd, const char* path, int accessMode, int flag)
 {
-	if ((flag & AT_SYMLINK_NOFOLLOW) == 0) {
+	if ((flag & AT_SYMLINK_NOFOLLOW) != 0) {
 		// do not dereference, instead return information about the link
 		// itself
 		// CURRENTLY UNSUPPORTED
@@ -84,7 +84,7 @@ faccessat(int fd, const char* path, int accessMode, int flag)
 
 	if (path != NULL && path[0] == '/') {
 		// path is absolute, call access() ignoring fd
-		return (flag & AT_EACCESS) == 0 ? eaccess(path, accessMode)
+		return (flag & AT_EACCESS) != 0 ? eaccess(path, accessMode)
 			: access(path, accessMode);
 	}
 
@@ -96,7 +96,7 @@ faccessat(int fd, const char* path, int accessMode, int flag)
 
 	if (fd == AT_FDCWD) {
 		// fd is set to AT_FDCWD, call access()
-		return (flag & AT_EACCESS) == 0 ? eaccess(path, accessMode)
+		return (flag & AT_EACCESS) != 0 ? eaccess(path, accessMode)
 			: access(path, accessMode);
 	}
 
@@ -132,7 +132,7 @@ faccessat(int fd, const char* path, int accessMode, int flag)
 		return -1;
 	}
 
-	int status = (flag & AT_EACCESS) == 0 ? eaccess(path, accessMode)
+	int status = (flag & AT_EACCESS) != 0 ? eaccess(path, accessMode)
 		: access(path, accessMode);
 	free(dirpath);
 	return status;
@@ -142,7 +142,7 @@ faccessat(int fd, const char* path, int accessMode, int flag)
 int
 fchmodat(int fd, const char* path, mode_t mode, int flag)
 {
-	if ((flag & AT_SYMLINK_NOFOLLOW) == 0) {
+	if ((flag & AT_SYMLINK_NOFOLLOW) != 0) {
 		// do not dereference, instead return information about the link
 		// itself
 		// CURRENTLY UNSUPPORTED
@@ -211,7 +211,7 @@ fchmodat(int fd, const char* path, mode_t mode, int flag)
 int
 fchownat(int fd, const char* path, uid_t owner, gid_t group, int flag)
 {
-	if ((flag & AT_SYMLINK_NOFOLLOW) == 0) {
+	if ((flag & AT_SYMLINK_NOFOLLOW) != 0) {
 		// do not dereference, instead return information about the link
 		// itself
 		// CURRENTLY UNSUPPORTED
@@ -279,7 +279,7 @@ fchownat(int fd, const char* path, uid_t owner, gid_t group, int flag)
 int
 fstatat(int fd, const char *path, struct stat *st, int flag)
 {
-	if ((flag & AT_SYMLINK_NOFOLLOW) == 0) {
+	if ((flag & AT_SYMLINK_NOFOLLOW) != 0) {
 		// do not dereference, instead return information about the link
 		// itself
 		// CURRENTLY UNSUPPORTED
@@ -741,7 +741,7 @@ unlinkat(int fd, const char *path, int flag)
 {
 	if (path != NULL && path[0] == '/') {
 		// path is absolute, call rmdir() or unlink() ignoring fd
-		return (flag & AT_REMOVEDIR) == 0 ? rmdir(path) : unlink(path);
+		return (flag & AT_REMOVEDIR) != 0 ? rmdir(path) : unlink(path);
 	}
 
 	if (!fd) {
@@ -752,7 +752,7 @@ unlinkat(int fd, const char *path, int flag)
 
 	if (fd == AT_FDCWD) {
 		// fd is set to AT_FDCWD, call rmdir() or unlink()
-		return (flag & AT_REMOVEDIR) == 0 ? rmdir(path) : unlink(path);
+		return (flag & AT_REMOVEDIR) != 0 ? rmdir(path) : unlink(path);
 	}
 
 	struct stat dirst;
@@ -787,7 +787,7 @@ unlinkat(int fd, const char *path, int flag)
 		return -1;
 	}
 
-	int status = (flag & AT_REMOVEDIR) == 0 ? rmdir(path) : unlink(path);
+	int status = (flag & AT_REMOVEDIR) != 0 ? rmdir(path) : unlink(path);
 	free(dirpath);
 	return status;
 }
@@ -797,7 +797,7 @@ int
 linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 	   int flag)
 {
-	if ((flag & AT_SYMLINK_FOLLOW) == 0) {
+	if ((flag & AT_SYMLINK_FOLLOW) != 0) {
 		// Dereference oldPath
 		// CURRENTLY UNSUPPORTED
 		errno = ENOTSUP;
