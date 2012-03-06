@@ -285,6 +285,9 @@ fstatat(int fd, const char *path, struct stat *st, int flag)
 		// CURRENTLY UNSUPPORTED
 		errno = ENOTSUP;
 		return -1;
+	} else if (flag != 0) {
+		errno = EINVAL;
+		return -1;
 	}
 
 	if (path != NULL && path[0] == '/') {
