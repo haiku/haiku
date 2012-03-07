@@ -1,6 +1,6 @@
 /*
  * Copyright 2007, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2008-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2012, Axel Dörfler, axeld@pinc-software.de.
  *
  * Distributed under the terms of the MIT License.
  */
@@ -233,11 +233,11 @@ BFSPartitionHandle::Repair(bool checkOnly)
 	struct check_control result;
 	memset(&result, 0, sizeof(result));
 	result.magic = BFS_IOCTL_CHECK_MAGIC;
-	result.flags = !checkOnly ? BFS_FIX_BITMAP_ERRORS : 0;
+	result.flags = 0;
 	if (!checkOnly) {
 		//printf("will fix any severe errors!\n");
-		result.flags |= BFS_REMOVE_WRONG_TYPES | BFS_REMOVE_INVALID
-			| BFS_FIX_NAME_MISMATCHES;
+		result.flags |= BFS_FIX_BITMAP_ERRORS | BFS_REMOVE_WRONG_TYPES
+			| BFS_REMOVE_INVALID | BFS_FIX_NAME_MISMATCHES | BFS_FIX_BPLUSTREES;
 	}
 
 	// start checking
@@ -256,18 +256,20 @@ BFSPartitionHandle::Repair(bool checkOnly)
 
 		if (result.errors) {
 			printf("%s (inode = %lld)", result.name, result.inode);
-			if (result.errors & BFS_MISSING_BLOCKS)
+			if ((result.errors & BFS_MISSING_BLOCKS) != 0)
 				printf(", some blocks weren't allocated");
-			if (result.errors & BFS_BLOCKS_ALREADY_SET)
+			if ((result.errors & BFS_BLOCKS_ALREADY_SET) != 0)
 				printf(", has blocks already set");
-			if (result.errors & BFS_INVALID_BLOCK_RUN)
+			if ((result.errors & BFS_INVALID_BLOCK_RUN) != 0)
 				printf(", has invalid block run(s)");
-			if (result.errors & BFS_COULD_NOT_OPEN)
+			if ((result.errors & BFS_COULD_NOT_OPEN) != 0)
 				printf(", could not be opened");
-			if (result.errors & BFS_WRONG_TYPE)
+			if ((result.errors & BFS_WRONG_TYPE) != 0)
 				printf(", has wrong type");
-			if (result.errors & BFS_NAMES_DONT_MATCH)
+			if ((result.errors & BFS_NAMES_DONT_MATCH) != 0)
 				printf(", names don't match");
+			if ((result.errors & BFS_INVALID_BPLUSTREE) != 0)
+				printf(", invalid b+tree");
 			putchar('\n');
 		}
 		if ((result.mode & (S_INDEX_DIR | 0777)) == S_INDEX_DIR)
@@ -290,7 +292,7 @@ BFSPartitionHandle::Repair(bool checkOnly)
 
 	close(fd);
 
-	printf("\t%" B_PRIu64 " nodes checked,\n\t%" B_PRIu64 " blocks not "
+	printf("        %" B_PRIu64 " nodes checked,\n\t%" B_PRIu64 " blocks not "
 		"allocated,\n\t%" B_PRIu64 " blocks already set,\n\t%" B_PRIu64
 		" blocks could be freed\n\n", counter, result.stats.missing,
 		result.stats.already_set, result.stats.freed);
