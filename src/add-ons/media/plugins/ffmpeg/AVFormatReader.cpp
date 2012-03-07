@@ -255,7 +255,7 @@ StreamBase::Open()
 	if (buffer == NULL)
 		return B_NO_MEMORY;
 
-	size_t probeSize = 2048;
+	size_t probeSize = 8192;
 	AVProbeData probeData;
 	probeData.filename = "";
 	probeData.buf = buffer;
@@ -417,10 +417,10 @@ StreamBase::FrameRate() const
 	// TODO: Find a way to always calculate a correct frame rate...
 	double frameRate = 1.0;
 	switch (fStream->codec->codec_type) {
-		case CODEC_TYPE_AUDIO:
+		case AVMEDIA_TYPE_AUDIO:
 			frameRate = (double)fStream->codec->sample_rate;
 			break;
-		case CODEC_TYPE_VIDEO:
+		case AVMEDIA_TYPE_VIDEO:
 			if (fStream->avg_frame_rate.den && fStream->avg_frame_rate.num)
 				frameRate = av_q2d(fStream->avg_frame_rate);
 			else if (fStream->r_frame_rate.den && fStream->r_frame_rate.num)
@@ -734,7 +734,7 @@ StreamBase::GetNextChunk(const void** chunkBuffer,
 				break;
 			case B_MEDIA_ENCODED_AUDIO:
 				mediaHeader->u.encoded_audio.buffer_flags
-					= (fPacket.flags & PKT_FLAG_KEY) ? B_MEDIA_KEY_FRAME : 0;
+					= (fPacket.flags & AV_PKT_FLAG_KEY) ? B_MEDIA_KEY_FRAME : 0;
 				break;
 			case B_MEDIA_RAW_VIDEO:
 				mediaHeader->u.raw_video.line_count
@@ -742,7 +742,7 @@ StreamBase::GetNextChunk(const void** chunkBuffer,
 				break;
 			case B_MEDIA_ENCODED_VIDEO:
 				mediaHeader->u.encoded_video.field_flags
-					= (fPacket.flags & PKT_FLAG_KEY) ? B_MEDIA_KEY_FRAME : 0;
+					= (fPacket.flags & AV_PKT_FLAG_KEY) ? B_MEDIA_KEY_FRAME : 0;
 				mediaHeader->u.encoded_video.line_count
 					= fFormat.u.encoded_video.output.display.line_count;
 				break;
