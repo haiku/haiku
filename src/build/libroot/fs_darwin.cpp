@@ -206,16 +206,16 @@ fchownat(int fd, const char* path, uid_t owner, gid_t group, int flag)
 		return -1;
 	}
 
-	if (fd < 0) {
-		// Invalid file descriptor
-		errno = EBADF;
-		return -1;
-	}
-
 	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
 		// call chown() ignoring fd
 		return (flag & AT_SYMLINK_NOFOLLOW) != 0 ? lchown(path, owner, group)
 			: chown(path, owner, group);
+	}
+
+	if (fd < 0) {
+		// Invalid file descriptor
+		errno = EBADF;
+		return -1;
 	}
 
 	char *fullPath = (char *)malloc(MAXPATHLEN);
