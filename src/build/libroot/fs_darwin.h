@@ -21,7 +21,6 @@
 #define AT_SYMLINK_FOLLOW	0x400	/* linkat() */
 #define AT_REMOVEDIR		0x800	/* unlinkat() */
 
-int eaccess(const char* path, int accessMode);
 int faccessat(int fd, const char* path, int accessMode, int flag);
 int fchmodat(int fd, const char* path, mode_t mode, int flag);
 int fchownat(int fd, const char* path, uid_t owner, gid_t group, int flag);
@@ -32,7 +31,7 @@ int mknodat(int fd, const char *name, mode_t mode, dev_t dev);
 int renameat(int oldFD, const char* oldPath, int newFD, const char* newPath);
 
 ssize_t readlinkat(int fd, const char *path, char *buffer, size_t bufferSize);
-int symlinkat(const char *toPath, int fd, const char *symlinkPath);
+int symlinkat(const char *oldPath, int fd, const char *newPath);
 int unlinkat(int fd, const char *path, int flag);
 int linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 	int flag);

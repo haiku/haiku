@@ -17,6 +17,38 @@
 #include <unistd.h>
 
 
+int get_path(int fd, const char* path, char** fullPath);
+int eaccess(const char* path, int accessMode);
+
+
+int
+get_path(int fd, const char* path, char** fullPath)
+{
+	struct stat dirst;
+	if (fstat(fd, &dirst) < 0) {
+		// failed to grab stat information, fstat() sets errno
+		return -1;
+	}
+
+	if ((dirst.st_mode & S_IFDIR) == 0) {
+		// fd does not point to a directory
+		errno = ENOTDIR;
+		return -1;
+	}
+
+	if (fcntl(fd, F_GETPATH, *fullPath) < 0) {
+		// failed to get the path of fd, fcntl sets errno
+		return -1;
+	}
+
+	if (strlcat(*fullPath, "/", MAXPATHLEN) > MAXPATHLEN
+		|| strlcat(*fullPath, path, MAXPATHLEN) > MAXPATHLEN) {
+		// full path is too long, set errno and return
+		errno = ENAMETOOLONG;
+		return -1;
+	}
+}
+
 int
 eaccess(const char* path, int accessMode)
 {
@@ -82,60 +114,27 @@ faccessat(int fd, const char* path, int accessMode, int flag)
 		return -1;
 	}
 
-	if (path != NULL && path[0] == '/') {
-		// path is absolute, call access() ignoring fd
+	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
+		// call access() ignoring fd
 		return (flag & AT_EACCESS) != 0 ? eaccess(path, accessMode)
 			: access(path, accessMode);
 	}
 
-	if (!fd) {
-		// fd is not a valid file descriptor
-		errno = EBADF;
-		return -1;
-	}
-
-	if (fd == AT_FDCWD) {
-		// fd is set to AT_FDCWD, call access()
-		return (flag & AT_EACCESS) != 0 ? eaccess(path, accessMode)
-			: access(path, accessMode);
-	}
-
-	struct stat dirst;
-	if (fstat(fd, &dirst) < 0) {
-		// failed to grab stat information, fstat() sets errno
-		return -1;
-	}
-
-	if ((dirst.st_mode & S_IFDIR) == 0) {
-		// fd does not point to a directory
-		errno = ENOTDIR;
-		return -1;
-	}
-
-	char *dirpath = (char *)malloc(MAXPATHLEN);
-	if (dirpath == NULL) {
+	char *fullPath = (char *)malloc(MAXPATHLEN);
+	if (fullPath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
 		return -1;
 	}
 
-	if (fcntl(fd, F_GETPATH, dirpath) < 0) {
-		// failed to get the path of fd, fcntl sets errno
-		free(dirpath);
+	if (get_path(fd, path, &fullPath) < 0) {
+		free(fullPath);
 		return -1;
 	}
 
-	if (strlcat(dirpath, "/", MAXPATHLEN) > MAXPATHLEN
-		|| strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
-		// full path is too long, set errno and return
-		errno = ENAMETOOLONG;
-		free(dirpath);
-		return -1;
-	}
-
-	int status = (flag & AT_EACCESS) != 0 ? eaccess(dirpath, accessMode)
-		: access(dirpath, accessMode);
-	free(dirpath);
+	int status = (flag & AT_EACCESS) != 0 ? eaccess(fullPath, accessMode)
+		: access(fullPath, accessMode);
+	free(fullPath);
 	return status;
 }
 
@@ -154,58 +153,25 @@ fchmodat(int fd, const char* path, mode_t mode, int flag)
 		return -1;
 	}
 
-	if (path != NULL && path[0] == '/') {
-		// path is absolute, call chmod() ignoring fd
+	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
+		// call chmod() ignoring fd
 		return chmod(path, mode);
 	}
 
-	if (!fd) {
-		// fd is not a valid file descriptor
-		errno = EBADF;
-		return -1;
-	}
-
-	if (fd == AT_FDCWD) {
-		// fd is set to AT_FDCWD, call chmod()
-		return chmod(path, mode);
-	}
-
-	struct stat dirst;
-	if (fstat(fd, &dirst) < 0) {
-		// failed to grab stat information, fstat() sets errno
-		return -1;
-	}
-
-	if ((dirst.st_mode & S_IFDIR) == 0) {
-		// fd does not point to a directory
-		errno = ENOTDIR;
-		return -1;
-	}
-
-	char *dirpath = (char *)malloc(MAXPATHLEN);
-	if (dirpath == NULL) {
+	char *fullPath = (char *)malloc(MAXPATHLEN);
+	if (fullPath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
-		free(dirpath);
 		return -1;
 	}
 
-	if (fcntl(fd, F_GETPATH, dirpath) < 0) {
-		// failed to get the path of fd, fcntl sets errno
-		free(dirpath);
+	if (get_path(fd, path, &fullPath) < 0) {
+		free(fullPath);
 		return -1;
 	}
 
-	if (strlcat(dirpath, "/", MAXPATHLEN) > MAXPATHLEN
-		|| strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
-		// full path is too long, set errno and return
-		errno = ENAMETOOLONG;
-		free(dirpath);
-		return -1;
-	}
-
-	int status = chmod(dirpath, mode);
-	free(dirpath);
+	int status = chmod(fullPath, mode);
+	free(fullPath);
 	return status;
 }
 
@@ -224,57 +190,25 @@ fchownat(int fd, const char* path, uid_t owner, gid_t group, int flag)
 		return -1;
 	}
 
-	if (path != NULL && path[0] == '/') {
-		// path is absolute, call chown() ignoring fd
+	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
+		// call chown() ignoring fd
 		return chown(path, owner, group);
 	}
 
-	if (!fd) {
-		// fd is not a valid file descriptor
-		errno = EBADF;
-		return -1;
-	}
-
-	if (fd == AT_FDCWD) {
-		// fd is set to AT_FDCWD, call access()
-		return chown(path, owner, group);
-	}
-
-	struct stat dirst;
-	if (fstat(fd, &dirst) < 0) {
-		// failed to grab stat information, fstat() sets errno
-		return -1;
-	}
-
-	if ((dirst.st_mode & S_IFDIR) == 0) {
-		// fd does not point to a directory
-		errno = ENOTDIR;
-		return -1;
-	}
-
-	char *dirpath = (char *)malloc(MAXPATHLEN);
-	if (dirpath == NULL) {
+	char *fullPath = (char *)malloc(MAXPATHLEN);
+	if (fullPath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
 		return -1;
 	}
 
-	if (fcntl(fd, F_GETPATH, dirpath) < 0) {
-		// failed to get the path of fd, fcntl sets errno
-		free(dirpath);
+	if (get_path(fd, path, &fullPath) < 0) {
+		free(fullPath);
 		return -1;
 	}
 
-	if (strlcat(dirpath, "/", MAXPATHLEN) > MAXPATHLEN
-		|| strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
-		// full path is too long, set errno and return
-		errno = ENAMETOOLONG;
-		free(dirpath);
-		return -1;
-	}
-
-	int status = chown(dirpath, owner, group);
-	free(dirpath);
+	int status = chown(fullPath, owner, group);
+	free(fullPath);
 	return status;
 }
 
@@ -293,57 +227,25 @@ fstatat(int fd, const char *path, struct stat *st, int flag)
 		return -1;
 	}
 
-	if (path != NULL && path[0] == '/') {
+	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
 		// path is absolute, call stat() ignoring fd
 		return stat(path, st);
 	}
 
-	if (!fd) {
-		// fd is not a valid file descriptor
-		errno = EBADF;
-		return -1;
-	}
-
-	if (fd == AT_FDCWD) {
-		// fd is set to AT_FDCWD, call stat()
-		return stat(path, st);
-	}
-
-	struct stat dirst;
-	if (fstat(fd, &dirst) < 0) {
-		// failed to grab stat information, fstat() sets errno
-		return -1;
-	}
-
-	if ((dirst.st_mode & S_IFDIR) == 0) {
-		// fd does not point to a directory
-		errno = ENOTDIR;
-		return -1;
-	}
-
-	char *dirpath = (char *)malloc(MAXPATHLEN);
-	if (dirpath == NULL) {
+	char *fullPath = (char *)malloc(MAXPATHLEN);
+	if (fullPath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
 		return -1;
 	}
 
-	if (fcntl(fd, F_GETPATH, dirpath) < 0) {
-		// failed to get the path of fd, fcntl sets errno
-		free(dirpath);
+	if (get_path(fd, path, &fullPath) < 0) {
+		free(fullPath);
 		return -1;
 	}
 
-	if (strlcat(dirpath, "/", MAXPATHLEN) > MAXPATHLEN
-		|| strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
-		// full path is too long, set errno and return
-		errno = ENAMETOOLONG;
-		free(dirpath);
-		return -1;
-	}
-
-	int status = stat(dirpath, st);
-	free(dirpath);
+	int status = stat(fullPath, st);
+	free(fullPath);
 	return status;
 }
 
@@ -351,57 +253,25 @@ fstatat(int fd, const char *path, struct stat *st, int flag)
 int
 mkdirat(int fd, const char *path, mode_t mode)
 {
-	if (path != NULL && path[0] == '/') {
-		// path is absolute, call mkdir() ignoring fd
+	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
+		// call mkdir() ignoring fd
 		return mkdir(path, mode);
 	}
 
-	if (!fd) {
-		// fd is not a valid file descriptor
-		errno = EBADF;
-		return -1;
-	}
-
-	if (fd == AT_FDCWD) {
-		// fd is set to AT_FDCWD, call mkdir()
-		return mkdir(path, mode);
-	}
-
-	struct stat dirst;
-	if (fstat(fd, &dirst) < 0) {
-		// failed to grab stat information, fstat() sets errno
-		return -1;
-	}
-
-	if ((dirst.st_mode & S_IFDIR) == 0) {
-		// fd does not point to a directory
-		errno = ENOTDIR;
-		return -1;
-	}
-
-	char *dirpath = (char *)malloc(MAXPATHLEN);
-	if (dirpath == NULL) {
+	char *fullPath = (char *)malloc(MAXPATHLEN);
+	if (fullPath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
 		return -1;
 	}
 
-	if (fcntl(fd, F_GETPATH, dirpath) < 0) {
-		// failed to get the path of fd, fcntl sets errno
-		free(dirpath);
+	if (get_path(fd, path, &fullPath) < 0) {
+		free(fullPath);
 		return -1;
 	}
 
-	if (strlcat(dirpath, "/", MAXPATHLEN) > MAXPATHLEN
-		|| strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
-		// full path is too long, set errno and return
-		errno = ENAMETOOLONG;
-		free(dirpath);
-		return -1;
-	}
-
-	int status = mkdir(dirpath, mode);
-	free(dirpath);
+	int status = mkdir(fullPath, mode);
+	free(fullPath);
 	return status;
 }
 
@@ -409,57 +279,25 @@ mkdirat(int fd, const char *path, mode_t mode)
 int
 mkfifoat(int fd, const char *path, mode_t mode)
 {
-	if (path != NULL && path[0] == '/') {
-		// path is absolute, call mkfifo() ignoring fd
+	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
+		// call mkfifo() ignoring fd
 		return mkfifo(path, mode);
 	}
 
-	if (!fd) {
-		// fd is not a valid file descriptor
-		errno = EBADF;
-		return -1;
-	}
-
-	if (fd == AT_FDCWD) {
-		// fd is set to AT_FDCWD, call mkfifo()
-		return mkfifo(path, mode);
-	}
-
-	struct stat dirst;
-	if (fstat(fd, &dirst) < 0) {
-		// failed to grab stat information, fstat() sets errno
-		return -1;
-	}
-
-	if ((dirst.st_mode & S_IFDIR) == 0) {
-		// fd does not point to a directory
-		errno = ENOTDIR;
-		return -1;
-	}
-
-	char *dirpath = (char *)malloc(MAXPATHLEN);
-	if (dirpath == NULL) {
+	char *fullPath = (char *)malloc(MAXPATHLEN);
+	if (fullPath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
 		return -1;
 	}
 
-	if (fcntl(fd, F_GETPATH, dirpath) < 0) {
-		// failed to get the path of fd, fcntl sets errno
-		free(dirpath);
+	if (get_path(fd, path, &fullPath) < 0) {
+		free(fullPath);
 		return -1;
 	}
 
-	if (strlcat(dirpath, "/", MAXPATHLEN) > MAXPATHLEN
-		|| strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
-		// full path is too long, set errno and return
-		errno = ENAMETOOLONG;
-		free(dirpath);
-		return -1;
-	}
-
-	int status = mkfifo(dirpath, mode);
-	free(dirpath);
+	int status = mkfifo(fullPath, mode);
+	free(fullPath);
 	return status;
 }
 
@@ -467,166 +305,83 @@ mkfifoat(int fd, const char *path, mode_t mode)
 int
 mknodat(int fd, const char *path, mode_t mode, dev_t dev)
 {
-	if (path != NULL && path[0] == '/') {
-		// path is absolute, call mknod() ignoring fd
+	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
+		// call mknod() ignoring fd
 		return mknod(path, mode, dev);
 	}
 
-	if (!fd) {
-		// fd is not a valid file descriptor
-		errno = EBADF;
-		return -1;
-	}
-
-	if (fd == AT_FDCWD) {
-		// fd is set to AT_FDCWD, call mknod()
-		return mknod(path, mode, dev);
-	}
-
-	struct stat dirst;
-	if (fstat(fd, &dirst) < 0) {
-		// failed to grab stat information, fstat() sets errno
-		return -1;
-	}
-
-	if ((dirst.st_mode & S_IFDIR) == 0) {
-		// fd does not point to a directory
-		errno = ENOTDIR;
-		return -1;
-	}
-
-	char *dirpath = (char *)malloc(MAXPATHLEN);
-	if (dirpath == NULL) {
+	char *fullPath = (char *)malloc(MAXPATHLEN);
+	if (fullPath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
 		return -1;
 	}
 
-	if (fcntl(fd, F_GETPATH, dirpath) < 0) {
-		// failed to get the path of fd, fcntl sets errno
-		free(dirpath);
+	if (get_path(fd, path, &fullPath) < 0) {
+		free(fullPath);
 		return -1;
 	}
 
-	if (strlcat(dirpath, "/", MAXPATHLEN) > MAXPATHLEN
-		|| strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
-		// full path is too long, set errno and return
-		errno = ENAMETOOLONG;
-		free(dirpath);
-		return -1;
-	}
-
-	return mknod(dirpath, mode, dev);
+	int status = mknod(fullPath, mode, dev);
+	free(fullPath);
+	return status;
 }
 
 
 int
 renameat(int oldFD, const char* oldPath, int newFD, const char* newPath)
 {
-	bool oldPathIsAbsolute = false;
-	bool newPathIsAbsolute = false;
+	bool ignoreOldFD = false;
+	bool ignoreNewFD = false;
 
-	if (oldPath != NULL && oldPath[0] == '/')
-		oldPathIsAbsolute = true;
+	if (oldFD == AT_FDCWD || oldPath != NULL && oldPath[0] == '/')
+		ignoreOldFD = true;
 
-	if (newPath != NULL && newPath[0] == '/')
-		newPathIsAbsolute = true;
+	if (newFD == AT_FDCWD || newPath != NULL && newPath[0] == '/')
+		ignoreNewFD = true;
 
-	if (oldPathIsAbsolute && newPathIsAbsolute) {
-		// oldPath and newPath are absolute, call rename() ignoring the fd's
+	if (ignoreOldFD && ignoreNewFD) {
+		// call rename() ignoring the fd's
 		return rename(oldPath, newPath);
 	}
 
-	if ((!oldPathIsAbsolute && !oldFD) || (!newPathIsAbsolute && !newFD)) {
-		// oldPath is not an absolute path and oldFD is not a valid file
-		// descriptor or newPath is not an absolute path and newFD is not a
-		// valid file descriptor
-		errno = EBADF;
-		return -1;
-	}
+	char *oldFullPath;
+	char *newFullPath;
 
-	char *oldDirPath;
-	char *newDirPath;
-
-	if (oldPathIsAbsolute || oldFD == AT_FDCWD)
-		oldDirPath = const_cast<char *>(oldPath);
-	else {
-		struct stat dirst;
-		if (fstat(oldFD, &dirst) < 0) {
-			// failed to grab stat information, fstat() sets errno
-			return -1;
-		}
-
-		if ((dirst.st_mode & S_IFDIR) == 0) {
-			// oldFd does not point to a directory
-			errno = ENOTDIR;
-			return -1;
-		}
-
-		oldDirPath = (char *)malloc(MAXPATHLEN);
-		if (oldDirPath == NULL) {
-			// ran out of memory allocating oldDirPath
+	if (!ignoreOldFD) {
+		oldFullPath = (char *)malloc(MAXPATHLEN);
+		if (oldFullPath == NULL) {
+			// ran out of memory allocating oldFullPath
 			errno = ENOMEM;
 			return -1;
 		}
 
-		if (fcntl(oldFD, F_GETPATH, oldDirPath) < 0) {
-			// failed to get the path of oldFD, fcntl sets errno
-			free(oldDirPath);
-			return -1;
-		}
-
-		if (strlcat(oldDirPath, "/", MAXPATHLEN) > MAXPATHLEN
-			|| strlcat(oldDirPath, oldPath, MAXPATHLEN) > MAXPATHLEN) {
-			// full path is too long, set errno and return
-			errno = ENAMETOOLONG;
-			free(oldDirPath);
+		if (get_path(oldFD, oldPath, &oldFullPath) < 0) {
+			free(oldFullPath);
 			return -1;
 		}
 	}
 
-	if (newPathIsAbsolute || newFD == AT_FDCWD)
-		newDirPath = const_cast<char *>(newPath);
-	else {
-		struct stat dirst;
-		if (fstat(newFD, &dirst) < 0) {
-			// failed to grab stat information, fstat() sets errno
-			return -1;
-		}
-
-		if ((dirst.st_mode & S_IFDIR) == 0) {
-			// newFD does not point to a directory
-			errno = ENOTDIR;
-			return -1;
-		}
-
-		newDirPath = (char *)malloc(MAXPATHLEN);
-		if (newDirPath == NULL) {
-			// ran out of memory allocating newDirPath
+	if (!ignoreNewFD) {
+		newFullPath = (char *)malloc(MAXPATHLEN);
+		if (newFullPath == NULL) {
+			// ran out of memory allocating newFullPath
 			errno = ENOMEM;
 			return -1;
 		}
 
-		if (fcntl(newFD, F_GETPATH, newDirPath) < 0) {
-			// failed to get the path of newFD, fcntl sets errno
-			free(newDirPath);
-			return -1;
-		}
-
-		if (strlcat(newDirPath, "/", MAXPATHLEN) > MAXPATHLEN
-			|| strlcat(newDirPath, newPath, MAXPATHLEN) > MAXPATHLEN) {
-			// full path is too long, set errno and return
-			errno = ENAMETOOLONG;
-			free(newDirPath);
+		if (get_path(newFD, newPath, &newFullPath) < 0) {
+			free(newFullPath);
 			return -1;
 		}
 	}
 
-	int status = rename(oldDirPath, newDirPath);
-	if (!oldPathIsAbsolute && oldFD != AT_FDCWD)
-		free(oldDirPath);
-	if (!newPathIsAbsolute && newFD != AT_FDCWD)
-		free(newDirPath);
+	int status = rename(ignoreOldFD ? oldPath : oldFullPath,
+		ignoreNewFD ? newPath : newFullPath);
+	if (!ignoreOldFD)
+		free(oldFullPath);
+	if (!ignoreNewFD)
+		free(newFullPath);
 	return status;
 }
 
@@ -634,115 +389,51 @@ renameat(int oldFD, const char* oldPath, int newFD, const char* newPath)
 ssize_t
 readlinkat(int fd, const char *path, char *buffer, size_t bufferSize)
 {
-	if (path != NULL && path[0] == '/') {
-		// path is absolute, call readlink() ignoring fd
+	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
+		// call readlink() ignoring fd
 		return readlink(path, buffer, bufferSize);
 	}
 
-	if (!fd) {
-		// fd is not a valid file descriptor
-		errno = EBADF;
-		return -1;
-	}
-
-	if (fd == AT_FDCWD) {
-		// fd is set to AT_FDCWD, call readlink()
-		return readlink(path, buffer, bufferSize);
-	}
-
-	struct stat dirst;
-	if (fstat(fd, &dirst) < 0) {
-		// failed to grab stat information, fstat() sets errno
-		return -1;
-	}
-
-	if ((dirst.st_mode & S_IFDIR) == 0) {
-		// fd does not point to a directory
-		errno = ENOTDIR;
-		return -1;
-	}
-
-	char *dirpath = (char *)malloc(MAXPATHLEN);
-	if (dirpath == NULL) {
+	char *fullPath = (char *)malloc(MAXPATHLEN);
+	if (fullPath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
 		return -1;
 	}
 
-	if (fcntl(fd, F_GETPATH, dirpath) < 0) {
-		// failed to get the path of fd, fcntl sets errno
-		free(dirpath);
+	if (get_path(fd, path, &fullPath) < 0) {
+		free(fullPath);
 		return -1;
 	}
 
-	if (strlcat(dirpath, "/", MAXPATHLEN) > MAXPATHLEN
-		|| strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
-		// full path is too long, set errno and return
-		errno = ENAMETOOLONG;
-		free(dirpath);
-		return -1;
-	}
-
-	int status = readlink(dirpath, buffer, bufferSize);
-	free(dirpath);
+	int status = readlink(fullPath, buffer, bufferSize);
+	free(fullPath);
 	return status;
 }
 
 
 int
-symlinkat(const char *toPath, int fd, const char *symlinkPath)
+symlinkat(const char *oldPath, int fd, const char *newPath)
 {
-	if (symlinkPath != NULL && symlinkPath[0] == '/') {
-		// symlinkPath is absolute, call symlink() ignoring fd
-		return symlink(toPath, symlinkPath);
+	if (fd == AT_FDCWD || newPath != NULL && newPath[0] == '/') {
+		// call symlink() ignoring fd
+		return symlink(oldPath, newPath);
 	}
 
-	if (!fd) {
-		// fd is not a valid file descriptor
-		errno = EBADF;
-		return -1;
-	}
-
-	if (fd == AT_FDCWD) {
-		// fd is set to AT_FDCWD, call symlink()
-		return symlink(toPath, symlinkPath);
-	}
-
-	struct stat dirst;
-	if (fstat(fd, &dirst) < 0) {
-		// failed to grab stat information, fstat() sets errno
-		return -1;
-	}
-
-	if ((dirst.st_mode & S_IFDIR) == 0) {
-		// fd does not point to a directory
-		errno = ENOTDIR;
-		return -1;
-	}
-
-	char *dirpath = (char *)malloc(MAXPATHLEN);
-	if (dirpath == NULL) {
+	char *oldFullPath = (char *)malloc(MAXPATHLEN);
+	if (oldFullPath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
 		return -1;
 	}
 
-	if (fcntl(fd, F_GETPATH, dirpath) < 0) {
-		// failed to get the path of fd, fcntl sets errno
-		free(dirpath);
+	if (get_path(fd, oldPath, &oldFullPath) < 0) {
+		free(oldFullPath);
 		return -1;
 	}
 
-	if (strlcat(dirpath, "/", MAXPATHLEN) > MAXPATHLEN
-		|| strlcat(dirpath, symlinkPath, MAXPATHLEN) > MAXPATHLEN) {
-		// full path is too long, set errno and return
-		errno = ENAMETOOLONG;
-		free(dirpath);
-		return -1;
-	}
-
-	int status = symlink(dirpath, symlinkPath);
-	free(dirpath);
+	int status = symlink(oldFullPath, newPath);
+	free(oldFullPath);
 	return status;
 }
 
@@ -750,57 +441,26 @@ symlinkat(const char *toPath, int fd, const char *symlinkPath)
 int
 unlinkat(int fd, const char *path, int flag)
 {
-	if (path != NULL && path[0] == '/') {
-		// path is absolute, call rmdir() or unlink() ignoring fd
+	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
+		// call rmdir() or unlink() ignoring fd
 		return (flag & AT_REMOVEDIR) != 0 ? rmdir(path) : unlink(path);
 	}
 
-	if (!fd) {
-		// fd is not a valid file descriptor
-		errno = EBADF;
-		return -1;
-	}
-
-	if (fd == AT_FDCWD) {
-		// fd is set to AT_FDCWD, call rmdir() or unlink()
-		return (flag & AT_REMOVEDIR) != 0 ? rmdir(path) : unlink(path);
-	}
-
-	struct stat dirst;
-	if (fstat(fd, &dirst) < 0) {
-		// failed to grab stat information, fstat() sets errno
-		return -1;
-	}
-
-	if ((dirst.st_mode & S_IFDIR) == 0) {
-		// fd does not point to a directory
-		errno = ENOTDIR;
-		return -1;
-	}
-
-	char *dirpath = (char *)malloc(MAXPATHLEN);
-	if (dirpath == NULL) {
+	char *fullPath = (char *)malloc(MAXPATHLEN);
+	if (fullPath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
 		return -1;
 	}
 
-	if (fcntl(fd, F_GETPATH, dirpath) < 0) {
-		// failed to get the path of fd, fcntl sets errno
-		free(dirpath);
+	if (get_path(fd, path, &fullPath) < 0) {
+		free(fullPath);
 		return -1;
 	}
 
-	if (strlcat(dirpath, "/", MAXPATHLEN) > MAXPATHLEN
-		|| strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
-		// full path is too long, set errno and return
-		errno = ENAMETOOLONG;
-		free(dirpath);
-		return -1;
-	}
-
-	int status = (flag & AT_REMOVEDIR) != 0 ? rmdir(path) : unlink(path);
-	free(dirpath);
+	int status = (flag & AT_REMOVEDIR) != 0 ? rmdir(fullPath)
+		: unlink(fullPath);
+	free(fullPath);
 	return status;
 }
 
@@ -819,109 +479,57 @@ linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 		return -1;
 	}
 
-	bool oldPathIsAbsolute = false;
-	bool newPathIsAbsolute = false;
+	bool ignoreOldFD = false;
+	bool ignoreNewFD = false;
 
-	if (oldPath != NULL && oldPath[0] == '/')
-		oldPathIsAbsolute = true;
+	if (oldFD == AT_FDCWD || oldPath != NULL && oldPath[0] == '/')
+		ignoreOldFD = true;
 
-	if (newPath != NULL && newPath[0] == '/')
-		newPathIsAbsolute = true;
+	if (newFD == AT_FDCWD || newPath != NULL && newPath[0] == '/')
+		ignoreNewFD = true;
 
-	if (oldPathIsAbsolute && newPathIsAbsolute) {
-		// oldPath and newPath are both absolute, call link() ignoring the fd's
+	if (ignoreOldFD && ignoreNewFD) {
+		// call link() ignoring the fd's
 		return link(oldPath, newPath);
 	}
 
-	if ((!oldPathIsAbsolute && !oldFD) || (!newPathIsAbsolute && !newFD)) {
-		// oldPath is not an absolute path and oldFD is not a valid file
-		// descriptor or newPath is not an absolute path and newFD is not a
-		// valid file descriptor
-		errno = EBADF;
-		return -1;
-	}
+	char *oldFullPath;
+	char *newFullPath;
 
-	char *oldDirPath;
-	char *newDirPath;
-
-	if (oldPathIsAbsolute || oldFD == AT_FDCWD)
-		oldDirPath = const_cast<char *>(oldPath);
-	else {
-		struct stat dirst;
-		if (fstat(oldFD, &dirst) < 0) {
-			// failed to grab stat information, fstat() sets errno
-			return -1;
-		}
-
-		if ((dirst.st_mode & S_IFDIR) == 0) {
-			// fd does not point to a directory
-			errno = ENOTDIR;
-			return -1;
-		}
-
-		oldDirPath = (char *)malloc(MAXPATHLEN);
-		if (oldDirPath == NULL) {
-			// ran out of memory allocating oldDirPath
+	if (!ignoreOldFD) {
+		oldFullPath = (char *)malloc(MAXPATHLEN);
+		if (oldFullPath == NULL) {
+			// ran out of memory allocating oldFullPath
 			errno = ENOMEM;
 			return -1;
 		}
 
-		if (fcntl(oldFD, F_GETPATH, oldDirPath) < 0) {
-			// failed to get the path of oldFD, fcntl sets errno
-			return -1;
-			free(oldDirPath);
-		}
-
-		if (strlcat(oldDirPath, "/", MAXPATHLEN) > MAXPATHLEN
-			|| strlcat(oldDirPath, oldPath, MAXPATHLEN) > MAXPATHLEN) {
-			// full path is too long, set errno and return
-			errno = ENAMETOOLONG;
-			free(oldDirPath);
+		if (get_path(oldFD, oldPath, &oldFullPath) < 0) {
+			free(oldFullPath);
 			return -1;
 		}
 	}
 
-	if (newPathIsAbsolute || newFD == AT_FDCWD)
-		newDirPath = const_cast<char *>(newPath);
-	else {
-		struct stat dirst;
-		if (fstat(newFD, &dirst) < 0) {
-			// failed to grab stat information, fstat() sets errno
-			return -1;
-		}
-
-		if ((dirst.st_mode & S_IFDIR) == 0) {
-			// fd does not point to a directory
-			errno = ENOTDIR;
-			return -1;
-		}
-
-		newDirPath = (char *)malloc(MAXPATHLEN);
-		if (newDirPath == NULL) {
-			// ran out of memory allocating newDirPath
+	if (!ignoreNewFD) {
+		newFullPath = (char *)malloc(MAXPATHLEN);
+		if (newFullPath == NULL) {
+			// ran out of memory allocating newFullPath
 			errno = ENOMEM;
 			return -1;
 		}
 
-		if (fcntl(newFD, F_GETPATH, newDirPath) < 0) {
-			// failed to get the path of newFD, fcntl sets errno
-			free(newDirPath);
-			return -1;
-		}
-
-		if (strlcat(newDirPath, "/", MAXPATHLEN) > MAXPATHLEN
-			|| strlcat(newDirPath, newPath, MAXPATHLEN) > MAXPATHLEN) {
-			// full path is too long, set errno and return
-			errno = ENAMETOOLONG;
+		if (get_path(newFD, newPath, &newFullPath) < 0) {
+			free(newFullPath);
 			return -1;
 		}
 	}
 
-	int status = link(oldDirPath, newDirPath);
-	if (!oldPathIsAbsolute && oldFD != AT_FDCWD)
-		free(oldDirPath);
-	if (!newPathIsAbsolute && newFD != AT_FDCWD)
-		free(newDirPath);
+	int status = link(ignoreOldFD ? oldPath : oldFullPath,
+		ignoreNewFD ? newPath : newFullPath);
+	if (!ignoreOldFD)
+		free(oldFullPath);
+	if (!ignoreNewFD)
+		free(newFullPath);
 	return status;
 }
 
@@ -929,56 +537,24 @@ linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 int
 futimesat(int fd, const char *path, const struct timeval times[2])
 {
-	if (path != NULL && path[0] == '/') {
-		// path is absolute, call utimes() ignoring fd
+	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
+		// call utimes() ignoring fd
 		return utimes(path, times);
 	}
 
-	if (!fd) {
-		// fd is not a valid file descriptor
-		errno = EBADF;
-		return -1;
-	}
-
-	if (fd == AT_FDCWD) {
-		// fd is set to AT_FDCWD, call utimes()
-		return utimes(path, times);
-	}
-
-	struct stat dirst;
-	if (fstat(fd, &dirst) < 0) {
-		// failed to grab stat information, fstat() sets errno
-		return -1;
-	}
-
-	if ((dirst.st_mode & S_IFDIR) == 0) {
-		// fd does not point to a directory
-		errno = ENOTDIR;
-		return -1;
-	}
-
-	char *dirpath = (char *)malloc(MAXPATHLEN);
-	if (dirpath == NULL) {
+	char *fullPath = (char *)malloc(MAXPATHLEN);
+	if (fullPath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
 		return -1;
 	}
 
-	if (fcntl(fd, F_GETPATH, dirpath) < 0) {
-		// failed to get the path of fd, fcntl sets errno
-		free(dirpath);
+	if (get_path(fd, path, &fullPath) < 0) {
+		free(fullPath);
 		return -1;
 	}
 
-	if (strlcat(dirpath, "/", MAXPATHLEN) > MAXPATHLEN
-		|| strlcat(dirpath, path, MAXPATHLEN) > MAXPATHLEN) {
-		// full path is too long, set errno and return
-		errno = ENAMETOOLONG;
-		free(dirpath);
-		return -1;
-	}
-
-	int status = utimes(dirpath, times);
-	free(dirpath);
+	int status = utimes(fullPath, times);
+	free(fullPath);
 	return status;
 }
