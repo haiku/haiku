@@ -860,6 +860,8 @@ encoder_analog_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 {
 	TRACE("%s\n", __func__);
 
+	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+
 	int index = 0;
 	DAC_ENCODER_CONTROL_PS_ALLOCATION args;
 	memset(&args, 0, sizeof(args));
@@ -876,9 +878,21 @@ encoder_analog_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 	}
 
 	args.ucAction = command;
-	args.ucDacStandard = ATOM_DAC1_PS2;
-		// TODO: or ATOM_DAC1_CV if ATOM_DEVICE_CV_SUPPORT
-		// TODO: or ATOM_DAC1_PAL or ATOM_DAC1_NTSC if else
+
+	if ((encoderFlags & ATOM_DEVICE_CRT_SUPPORT) != 0)
+		args.ucDacStandard = ATOM_DAC1_PS2;
+	else if ((encoderFlags & ATOM_DEVICE_CV_SUPPORT) != 0)
+		args.ucDacStandard = ATOM_DAC1_CV;
+	else {
+		TRACE("%s: TODO, hardcoded NTSC TV support\n", __func__);
+		if (1) {
+			// NTSC, NTSC_J, PAL 60
+			args.ucDacStandard = ATOM_DAC1_NTSC;
+		} else {
+			// PAL, SCART. SECAM, PAL_CN
+			args.ucDacStandard = ATOM_DAC1_PAL;
+		}
+	}
 
 	args.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
 
