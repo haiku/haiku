@@ -204,7 +204,7 @@ fchownat(int fd, const char* path, uid_t owner, gid_t group, int flag)
 	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
 		// call chown() ignoring fd
 		return (flag & AT_SYMLINK_NOFOLLOW) != 0 ? lchown(path, owner, group)
-			: (chown(path, owner, group);
+			: chown(path, owner, group);
 	}
 
 	char *fullPath = (char *)malloc(MAXPATHLEN);
@@ -220,7 +220,7 @@ fchownat(int fd, const char* path, uid_t owner, gid_t group, int flag)
 	}
 
 	int status = (flag & AT_SYMLINK_NOFOLLOW) != 0
-		? lchown(fullPath, owner, group) : (chown(fullPath, owner, group);
+		? lchown(fullPath, owner, group) : chown(fullPath, owner, group);
 	free(fullPath);
 	return status;
 }
@@ -229,20 +229,16 @@ fchownat(int fd, const char* path, uid_t owner, gid_t group, int flag)
 int
 fstatat(int fd, const char *path, struct stat *st, int flag)
 {
-	if ((flag & AT_SYMLINK_NOFOLLOW) != 0) {
-		// do not dereference, instead return information about the link
-		// itself
-		// CURRENTLY UNSUPPORTED
-		errno = ENOTSUP;
-		return -1;
-	} else if (flag != 0) {
+	if ((flag & AT_SYMLINK_NOFOLLOW) == 0 && flag != 0) {
+		// invalid flag
 		errno = EINVAL;
 		return -1;
 	}
 
 	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
-		// path is absolute, call stat() ignoring fd
-		return stat(path, st);
+		// call stat() or lstat() ignoring fd
+		return (flag & AT_SYMLINK_NOFOLLOW) != 0 ? lstat(path, st)
+			: stat(path, st);
 	}
 
 	if (fd < 0) {
@@ -263,7 +259,8 @@ fstatat(int fd, const char *path, struct stat *st, int flag)
 		return -1;
 	}
 
-	int status = stat(fullPath, st);
+	int status = (flag & AT_SYMLINK_NOFOLLOW) != 0 ? lstat(fullPath, st)
+		: stat(fullPath, st);
 	free(fullPath);
 	return status;
 }
