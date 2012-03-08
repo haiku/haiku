@@ -120,6 +120,12 @@ faccessat(int fd, const char* path, int accessMode, int flag)
 			: access(path, accessMode);
 	}
 
+	if (fd < 0) {
+		// Invalid file descriptor
+		errno = EBADF;
+		return -1;
+	}
+
 	char *fullPath = (char *)malloc(MAXPATHLEN);
 	if (fullPath == NULL) {
 		// ran out of memory allocating dirpath
@@ -158,6 +164,12 @@ fchmodat(int fd, const char* path, mode_t mode, int flag)
 		return chmod(path, mode);
 	}
 
+	if (fd < 0) {
+		// Invalid file descriptor
+		errno = EBADF;
+		return -1;
+	}
+
 	char *fullPath = (char *)malloc(MAXPATHLEN);
 	if (fullPath == NULL) {
 		// ran out of memory allocating dirpath
@@ -187,6 +199,12 @@ fchownat(int fd, const char* path, uid_t owner, gid_t group, int flag)
 		return -1;
 	} else if (flag != 0) {
 		errno = EINVAL;
+		return -1;
+	}
+
+	if (fd < 0) {
+		// Invalid file descriptor
+		errno = EBADF;
 		return -1;
 	}
 
@@ -232,6 +250,12 @@ fstatat(int fd, const char *path, struct stat *st, int flag)
 		return stat(path, st);
 	}
 
+	if (fd < 0) {
+		// Invalid file descriptor
+		errno = EBADF;
+		return -1;
+	}
+
 	char *fullPath = (char *)malloc(MAXPATHLEN);
 	if (fullPath == NULL) {
 		// ran out of memory allocating dirpath
@@ -256,6 +280,12 @@ mkdirat(int fd, const char *path, mode_t mode)
 	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
 		// call mkdir() ignoring fd
 		return mkdir(path, mode);
+	}
+
+	if (fd < 0) {
+		// Invalid file descriptor
+		errno = EBADF;
+		return -1;
 	}
 
 	char *fullPath = (char *)malloc(MAXPATHLEN);
@@ -284,6 +314,12 @@ mkfifoat(int fd, const char *path, mode_t mode)
 		return mkfifo(path, mode);
 	}
 
+	if (fd < 0) {
+		// Invalid file descriptor
+		errno = EBADF;
+		return -1;
+	}
+
 	char *fullPath = (char *)malloc(MAXPATHLEN);
 	if (fullPath == NULL) {
 		// ran out of memory allocating dirpath
@@ -308,6 +344,12 @@ mknodat(int fd, const char *path, mode_t mode, dev_t dev)
 	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
 		// call mknod() ignoring fd
 		return mknod(path, mode, dev);
+	}
+
+	if (fd < 0) {
+		// Invalid file descriptor
+		errno = EBADF;
+		return -1;
 	}
 
 	char *fullPath = (char *)malloc(MAXPATHLEN);
@@ -349,6 +391,12 @@ renameat(int oldFD, const char* oldPath, int newFD, const char* newPath)
 	char *newFullPath;
 
 	if (!ignoreOldFD) {
+		if (oldFD < 0) {
+			// Invalid file descriptor
+			errno = EBADF;
+			return -1;
+		}
+
 		oldFullPath = (char *)malloc(MAXPATHLEN);
 		if (oldFullPath == NULL) {
 			// ran out of memory allocating oldFullPath
@@ -363,6 +411,12 @@ renameat(int oldFD, const char* oldPath, int newFD, const char* newPath)
 	}
 
 	if (!ignoreNewFD) {
+		if (newFD < 0) {
+			// Invalid file descriptor
+			errno = EBADF;
+			return -1;
+		}
+
 		newFullPath = (char *)malloc(MAXPATHLEN);
 		if (newFullPath == NULL) {
 			// ran out of memory allocating newFullPath
@@ -394,6 +448,12 @@ readlinkat(int fd, const char *path, char *buffer, size_t bufferSize)
 		return readlink(path, buffer, bufferSize);
 	}
 
+	if (fd < 0) {
+		// Invalid file descriptor
+		errno = EBADF;
+		return -1;
+	}
+
 	char *fullPath = (char *)malloc(MAXPATHLEN);
 	if (fullPath == NULL) {
 		// ran out of memory allocating dirpath
@@ -420,6 +480,12 @@ symlinkat(const char *oldPath, int fd, const char *newPath)
 		return symlink(oldPath, newPath);
 	}
 
+	if (fd < 0) {
+		// Invalid file descriptor
+		errno = EBADF;
+		return -1;
+	}
+
 	char *oldFullPath = (char *)malloc(MAXPATHLEN);
 	if (oldFullPath == NULL) {
 		// ran out of memory allocating dirpath
@@ -444,6 +510,12 @@ unlinkat(int fd, const char *path, int flag)
 	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
 		// call rmdir() or unlink() ignoring fd
 		return (flag & AT_REMOVEDIR) != 0 ? rmdir(path) : unlink(path);
+	}
+
+	if (fd < 0) {
+		// Invalid file descriptor
+		errno = EBADF;
+		return -1;
 	}
 
 	char *fullPath = (char *)malloc(MAXPATHLEN);
@@ -497,6 +569,12 @@ linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 	char *newFullPath;
 
 	if (!ignoreOldFD) {
+		if (oldFD < 0) {
+			// Invalid file descriptor
+			errno = EBADF;
+			return -1;
+		}
+
 		oldFullPath = (char *)malloc(MAXPATHLEN);
 		if (oldFullPath == NULL) {
 			// ran out of memory allocating oldFullPath
@@ -511,6 +589,12 @@ linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 	}
 
 	if (!ignoreNewFD) {
+		if (newFD < 0) {
+			// Invalid file descriptor
+			errno = EBADF;
+			return -1;
+		}
+
 		newFullPath = (char *)malloc(MAXPATHLEN);
 		if (newFullPath == NULL) {
 			// ran out of memory allocating newFullPath
@@ -540,6 +624,12 @@ futimesat(int fd, const char *path, const struct timeval times[2])
 	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
 		// call utimes() ignoring fd
 		return utimes(path, times);
+	}
+
+	if (fd < 0) {
+		// Invalid file descriptor
+		errno = EBADF;
+		return -1;
 	}
 
 	char *fullPath = (char *)malloc(MAXPATHLEN);
