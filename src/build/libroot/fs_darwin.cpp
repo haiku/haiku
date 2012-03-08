@@ -106,6 +106,12 @@ eaccess(const char* path, int accessMode)
 int
 faccessat(int fd, const char* path, int accessMode, int flag)
 {
+	if ((flag & AT_EACCESS) == 0 && flag != 0) {
+		// invalid flag
+		errno = EINVAL;
+		return -1;
+	}
+
 	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
 		// call access() ignoring fd
 		return (flag & AT_EACCESS) != 0 ? eaccess(path, accessMode)
@@ -183,13 +189,8 @@ fchmodat(int fd, const char* path, mode_t mode, int flag)
 int
 fchownat(int fd, const char* path, uid_t owner, gid_t group, int flag)
 {
-	if ((flag & AT_SYMLINK_NOFOLLOW) != 0) {
-		// do not dereference, instead return information about the link
-		// itself
-		// CURRENTLY UNSUPPORTED
-		errno = ENOTSUP;
-		return -1;
-	} else if (flag != 0) {
+	if ((flag & AT_SYMLINK_NOFOLLOW) == 0 && flag != 0) {
+		// invalid flag
 		errno = EINVAL;
 		return -1;
 	}
@@ -202,7 +203,8 @@ fchownat(int fd, const char* path, uid_t owner, gid_t group, int flag)
 
 	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
 		// call chown() ignoring fd
-		return chown(path, owner, group);
+		return (flag & AT_SYMLINK_NOFOLLOW) != 0 ? lchown(path, owner, group)
+			: (chown(path, owner, group);
 	}
 
 	char *fullPath = (char *)malloc(MAXPATHLEN);
@@ -217,7 +219,8 @@ fchownat(int fd, const char* path, uid_t owner, gid_t group, int flag)
 		return -1;
 	}
 
-	int status = chown(fullPath, owner, group);
+	int status = (flag & AT_SYMLINK_NOFOLLOW) != 0
+		? lchown(fullPath, owner, group) : (chown(fullPath, owner, group);
 	free(fullPath);
 	return status;
 }
