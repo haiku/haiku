@@ -312,14 +312,13 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
 		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
-			if ((info.chipsetFlags & CHIP_APU) != 0) {
-				// aka DCE 4.1
+			if ((info.chipsetFlags & CHIP_APU) != 0
+				|| info.dceMajor >= 5) {
 				// Setup DIG encoder
 				encoder_dig_setup(connectorIndex, pixelClock,
 					ATOM_ENCODER_CMD_SETUP);
-				// Enable DIG transmitter
-				transmitter_dig_setup(connectorIndex, pixelClock, 0, 0,
-					ATOM_TRANSMITTER_ACTION_ENABLE);
+				encoder_dig_setup(connectorIndex, pixelClock,
+					ATOM_ENCODER_CMD_SETUP_PANEL_MODE);
 			} else if (info.dceMajor >= 4) {
 				// Disable DIG transmitter
 				transmitter_dig_setup(connectorIndex, pixelClock, 0, 0,
