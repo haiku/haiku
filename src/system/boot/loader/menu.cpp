@@ -865,7 +865,7 @@ add_debug_menu()
 	item->SetData("serial_debug_output");
 	item->SetType(MENU_ITEM_MARKABLE);
 	item->SetHelpText("Turns on forwarding the syslog output to the serial "
-		"interface (115200, 8N1).");
+		"interface (default: 115200, 8N1).");
 
 	menu->AddItem(item
 		= new(nothrow) MenuItem("Enable on screen debug output"));
