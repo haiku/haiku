@@ -228,12 +228,13 @@ connector_read_mode_lvds(uint32 connectorIndex, display_mode* mode)
 
 		// Assume 32-bit color
 		mode->space = B_RGB32_LITTLE;
-		
-		TRACE("%s: %" B_PRIu32 " %" B_PRIu16 " %" B_PRIu16 " %" B_PRIu16 " %" B_PRIu16
-			" %" B_PRIu16 " %" B_PRIu16 " %" B_PRIu16 " %" B_PRIu16 "\n",
-			__func__, timing.pixel_clock, timing.h_display, timing.h_sync_start,
-			timing.h_sync_end, timing.h_total, timing.v_display, timing.v_sync_start,
-			timing.v_sync_end, timing.v_total);
+
+		TRACE("%s: %" B_PRIu32 " %" B_PRIu16 " %" B_PRIu16 " %" B_PRIu16
+			" %" B_PRIu16  " %" B_PRIu16 " %" B_PRIu16 " %" B_PRIu16
+			" %" B_PRIu16 "\n", __func__, timing.pixel_clock, timing.h_display,
+			timing.h_sync_start, timing.h_sync_end, timing.h_total,
+			timing.v_display, timing.v_sync_start, timing.v_sync_end,
+			timing.v_total);
 
 		return true;
 	}
