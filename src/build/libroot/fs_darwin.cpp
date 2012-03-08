@@ -37,13 +37,13 @@ get_path(int fd, const char* path, char** fullPath)
 	}
 
 	if (fcntl(fd, F_GETPATH, *fullPath) < 0) {
-		// failed to get the path of fd, fcntl sets errno
+		// failed to get the path of fd, fcntl() sets errno
 		return -1;
 	}
 
 	if (strlcat(*fullPath, "/", MAXPATHLEN) > MAXPATHLEN
 		|| strlcat(*fullPath, path, MAXPATHLEN) > MAXPATHLEN) {
-		// full path is too long, set errno and return
+		// full path is too long
 		errno = ENAMETOOLONG;
 		return -1;
 	}
@@ -57,7 +57,7 @@ eaccess(const char* path, int accessMode)
 
 	struct stat st;
 	if (stat(path, &st) < 0) {
-		// failed to get stat information on path
+		// failed to get stat information on path, stat() sets errno
 		return -1;
 	}
 
@@ -106,7 +106,7 @@ eaccess(const char* path, int accessMode)
 int
 faccessat(int fd, const char* path, int accessMode, int flag)
 {
-	if ((flag & AT_EACCESS) == 0 && flag != 0) {
+	if (flag != AT_EACCESS && flag != 0) {
 		// invalid flag
 		errno = EINVAL;
 		return -1;
@@ -152,20 +152,16 @@ fchmodat(int fd, const char* path, mode_t mode, int flag)
 		return -1;
 	}
 
-	if ((flag & AT_SYMLINK_NOFOLLOW) != 0) {
-		// do not dereference, instead return information about the link
-		// itself
-		// CURRENTLY UNSUPPORTED
-		errno = ENOTSUP;
-		return -1;
-	} else if (flag != 0) {
-		errno = EINVAL;
-		return -1;
-	}
-
 	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
 		// call chmod() ignoring fd
-		return chmod(path, mode);
+		if ((flag & AT_SYMLINK_NOFOLLOW) != 0) {
+			// fake lchmod() with open() and fchmod()
+			int symlinkfd = open(path, O_RDONLY | O_SYMLINK);
+			int status = fchmod(symlinkfd, mode);
+			close(symlinkfd);
+			return status;
+		} else
+			return chmod(path, mode);
 	}
 
 	if (fd < 0) {
@@ -189,7 +185,7 @@ fchmodat(int fd, const char* path, mode_t mode, int flag)
 	int status;
 
 	if ((flag & AT_SYMLINK_NOFOLLOW) != 0) {
-		// Since there is no lchmod(), fake it with open() and fchmod()
+		// fake lchmod() with open() and fchmod()
 		int fullfd = open(fullPath, O_RDONLY | O_SYMLINK);
 		status = fchmod(fullfd, mode);
 		close(fullfd);
