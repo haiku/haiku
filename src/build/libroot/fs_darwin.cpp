@@ -30,7 +30,7 @@ get_path(int fd, const char* path, char** fullPath)
 		return -1;
 	}
 
-	if ((dirst.st_mode & S_IFDIR) == 0) {
+	if (!S_ISDIR(dirst.st_mode)) {
 		// fd does not point to a directory
 		errno = ENOTDIR;
 		return -1;
@@ -106,14 +106,6 @@ eaccess(const char* path, int accessMode)
 int
 faccessat(int fd, const char* path, int accessMode, int flag)
 {
-	if ((flag & AT_SYMLINK_NOFOLLOW) != 0) {
-		// do not dereference, instead return information about the link
-		// itself
-		// CURRENTLY UNSUPPORTED
-		errno = ENOTSUP;
-		return -1;
-	}
-
 	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
 		// call access() ignoring fd
 		return (flag & AT_EACCESS) != 0 ? eaccess(path, accessMode)
