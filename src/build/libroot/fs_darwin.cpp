@@ -146,6 +146,12 @@ faccessat(int fd, const char* path, int accessMode, int flag)
 int
 fchmodat(int fd, const char* path, mode_t mode, int flag)
 {
+	if ((flag & AT_SYMLINK_NOFOLLOW) == 0 && flag != 0) {
+		// invalid flag
+		errno = EINVAL;
+		return -1;
+	}
+
 	if ((flag & AT_SYMLINK_NOFOLLOW) != 0) {
 		// do not dereference, instead return information about the link
 		// itself
@@ -180,7 +186,16 @@ fchmodat(int fd, const char* path, mode_t mode, int flag)
 		return -1;
 	}
 
-	int status = chmod(fullPath, mode);
+	int status;
+
+	if ((flag & AT_SYMLINK_NOFOLLOW) != 0) {
+		// Since there is no lchmod(), fake it with open() and fchmod()
+		int fullfd = open(fullPath, O_RDONLY | O_SYMLINK);
+		status = fchmod(fullfd, mode);
+		close(fullfd);
+	} else
+		status = chmod(fullPath, mode);
+
 	free(fullPath);
 	return status;
 }
@@ -499,6 +514,12 @@ symlinkat(const char *oldPath, int fd, const char *newPath)
 int
 unlinkat(int fd, const char *path, int flag)
 {
+	if ((flag & AT_REMOVEDIR) == 0 && flag != 0) {
+		// invalid flag
+		errno = EINVAL;
+		return -1;
+	}
+
 	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
 		// call rmdir() or unlink() ignoring fd
 		return (flag & AT_REMOVEDIR) != 0 ? rmdir(path) : unlink(path);
