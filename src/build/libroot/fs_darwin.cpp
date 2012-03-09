@@ -47,6 +47,8 @@ get_path(int fd, const char* path, char** fullPath)
 		errno = ENAMETOOLONG;
 		return -1;
 	}
+
+	return 0;
 }
 
 int
@@ -146,7 +148,7 @@ faccessat(int fd, const char* path, int accessMode, int flag)
 int
 fchmodat(int fd, const char* path, mode_t mode, int flag)
 {
-	if ((flag & AT_SYMLINK_NOFOLLOW) == 0 && flag != 0) {
+	if (flag != AT_SYMLINK_NOFOLLOW && flag != 0) {
 		// invalid flag
 		errno = EINVAL;
 		return -1;
@@ -200,7 +202,7 @@ fchmodat(int fd, const char* path, mode_t mode, int flag)
 int
 fchownat(int fd, const char* path, uid_t owner, gid_t group, int flag)
 {
-	if ((flag & AT_SYMLINK_NOFOLLOW) == 0 && flag != 0) {
+	if (flag != AT_SYMLINK_NOFOLLOW && flag != 0) {
 		// invalid flag
 		errno = EINVAL;
 		return -1;
@@ -240,7 +242,7 @@ fchownat(int fd, const char* path, uid_t owner, gid_t group, int flag)
 int
 fstatat(int fd, const char *path, struct stat *st, int flag)
 {
-	if ((flag & AT_SYMLINK_NOFOLLOW) == 0 && flag != 0) {
+	if (flag != AT_SYMLINK_NOFOLLOW && flag != 0) {
 		// invalid flag
 		errno = EINVAL;
 		return -1;
@@ -510,7 +512,7 @@ symlinkat(const char *oldPath, int fd, const char *newPath)
 int
 unlinkat(int fd, const char *path, int flag)
 {
-	if ((flag & AT_REMOVEDIR) == 0 && flag != 0) {
+	if (flag != AT_REMOVEDIR && flag != 0) {
 		// invalid flag
 		errno = EINVAL;
 		return -1;
