@@ -1,4 +1,4 @@
-1	polish	x-vnd.haiku-registrar	4157925197
+1	polish	x-vnd.haiku-registrar	3411469591
 Restart system	ShutdownProcess		Restartuj system
 OK	ShutdownProcess		OK
 It's now safe to turn off the computer.	ShutdownProcess		Teraz można bezpiecznie wyłączyć komputer.
@@ -7,4 +7,5 @@ Do you really want to shut down the system?	ShutdownProcess		Czy naprawdę chces
 Asking other processes to quit.	ShutdownProcess		Sprawdzanie innych procesów w celu zamknięcia.
 Asking \"%appName%\" to quit.	ShutdownProcess		Sprawdzanie \"%appName%\" w celu zamknięcia.
 Shutdown aborted	ShutdownProcess		Zamknięcie przerwane
-Restarting…	ShutdownProcess		Restartowanie...
+Restarting…	ShutdownProcess		Restartowanie…
+Do you really want to restart the system?	ShutdownProcess		Czy na pewno chcesz ponownie uruchomić system?

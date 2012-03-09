@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Time	3493650184
+1	belarusian	x-vnd.Haiku-Time	1859841283
 GMT (UNIX compatible)	Time		GMT (як у UNIX)
 OK	Time		ОК
 Asia	Time		Азія
@@ -28,7 +28,6 @@ Sending request failed	Time		Немагчыма адаслаць запыт.
 Arctic	Time		Арктыка
 Time	System name		Дата і Час
 America	Time		Амерыка
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date, аўтары:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
 Reset	Time		Скінуць
 Synchronize at boot	Time		Сінхранізаваць падчас старту
 Received invalid time	Time		Атрыманы несапраўдны час

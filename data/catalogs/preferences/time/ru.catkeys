@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Time	2106196689
+1	russian	x-vnd.Haiku-Time	472387788
 OK	Time		ОК
 Asia	Time		Азия
 \nNow: 	Time		\nСейчас: 
@@ -26,7 +26,6 @@ Sending request failed	Time		Не удалось отправить запрос
 Arctic	Time		Арктика
 Time	System name		Время
 America	Time		Америка
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date, разработал:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
 Reset	Time		Сбросить
 Synchronize at boot	Time		Синхронизировать при загрузке
 Received invalid time	Time		Получено неверное время

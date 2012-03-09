@@ -3,7 +3,7 @@ SMTP server:	ConfigView		Serwer SMTP:
 Error while logging in to %serv	smtp		Błąd podczas logowania do %serv
 Unencrypted	ConfigView		Nieszyfrowany
 . The server says:\n	smtp		. Serwer mówi:\n
-Connecting to server…	smtp		Łączenie ze serwerem...
+Connecting to server…	smtp		Łączenie ze serwerem…
 Error while opening connection to %serv	smtp		Błąd podczas otwierania połączenia do %serv
 POP3 authentication failed. The server said:\n	smtp		Nieudane uwierzytelnianie POP3. Serwer odpowiedział:\n
 Destination:	ConfigView		Przeznaczenie:

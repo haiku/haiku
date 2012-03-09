@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Time	3493650184
+1	finnish	x-vnd.Haiku-Time	1859841283
 GMT (UNIX compatible)	Time		Greenwichin aika (UNIX-yhteensopiva)
 OK	Time		Valmis
 Asia	Time		Aasia
@@ -28,7 +28,6 @@ Sending request failed	Time		Pyynnön lähettäminen epäonnistui
 Arctic	Time		Pohjoinen napaseutu
 Time	System name		Aika-asetukset
 America	Time		Amerikka
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Päivämäärä & Aika, tekijät:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
 Reset	Time		Nollaa
 Synchronize at boot	Time		Synkronoi alkulatauksen yhteydessä
 Received invalid time	Time		Vastaanotettiin virheellinen aika

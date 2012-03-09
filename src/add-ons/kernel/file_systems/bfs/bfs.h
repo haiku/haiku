@@ -99,7 +99,7 @@ struct disk_super_block {
 	off_t LogEnd() const { return BFS_ENDIAN_TO_HOST_INT64(log_end); }
 
 	// implemented in Volume.cpp:
-	bool IsValid();
+	bool IsValid() const;
 	void Initialize(const char *name, off_t numBlocks, uint32 blockSize);
 } _PACKED;
 

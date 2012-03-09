@@ -1,15 +1,16 @@
-1	norwegian_bokmål	x-vnd.Haiku-TGATranslator	2221210336
-Ignore TGA alpha channel	TGAView		Ignorer TGA alfakanal
-Save with RLE Compression	TGAView		Lagre med RLE-komprimering
-TGA Settings	TGAMain		TGA-innstillinger
-TGA image translator	TGATranslator		TGA-bildeoversetter
-TGA images	TGATranslator		TGA-bilder
-TGATranslator Settings	TGATranslator		TGA-oversetterinstillinger
-Targa image (%d bits RLE colormap)	TGATranslator		Targa-bilde (%d bit RLE colormap)
-Targa image (%d bits RLE gray)	TGATranslator		Targa-bilde (%d bit RLE grå)
-Targa image (%d bits RLE truecolor)	TGATranslator		Targa-bilde (%d bit RLE truecolor)
-Targa image (%d bits colormap)	TGATranslator		Targa-bilde (%d bit colormap)
-Targa image (%d bits gray)	TGATranslator		Targa-bilde (%d bit gråtone)
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-TGATranslator	4159874267
 Targa image (%d bits truecolor)	TGATranslator		Targa-bilde (%d bit truecolor)
 Version %d.%d.%d %s	TGAView		Versjon %d.%d.%d %s
+Ignore TGA alpha channel	TGAView		Ignorer TGA alfakanal
+Targa image (%d bits colormap)	TGATranslator		Targa-bilde (%d bit colormap)
+TGA Image Translator	TGAView		TGA Bilde translator
+Targa image (%d bits RLE colormap)	TGATranslator		Targa-bilde (%d bit RLE colormap)
+Targa image (%d bits gray)	TGATranslator		Targa-bilde (%d bit gråtone)
 Written by the Haiku Translation Kit Team	TGAView		Skrevet av Haikus Translation Kit-team
+Targa image (%d bits RLE truecolor)	TGATranslator		Targa-bilde (%d bit RLE truecolor)
+TGA images	TGATranslator		TGA-bilder
+TGATranslator Settings	TGATranslator		TGA-oversetterinstillinger
+Save with RLE Compression	TGAView		Lagre med RLE-komprimering
+TGA image translator	TGATranslator		TGA-bildeoversetter
+Targa image (%d bits RLE gray)	TGATranslator		Targa-bilde (%d bit RLE grå)
+TGA Settings	TGAMain		TGA-innstillinger

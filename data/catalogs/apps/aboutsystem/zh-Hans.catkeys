@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-About	867678185
+1	english	x-vnd.Haiku-About	3434348710
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		版权 © 1999-2010 Gutenprint 的所有编写者。版权所有。
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (和他的 NewOS 内核)\n
 BSD (4-clause)	AboutView		BSD（4-条款）
@@ -24,6 +24,7 @@ Processor:	AboutView		处理器：
 Kernel:	AboutView		内核：
 BSD (3-clause)	AboutView		BSD（3-条款）
 Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		版权 © 2001-2002 Thomas Broyer，Charlie Bozeman 与 Daniel Veillard。版权所有。
+Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		本软件部分享有版权。\n版权所有 © 1996-2006 FreeType 项目。保留所有权利。
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Haiku 代码的版权是 Haiku, Inc. ，或代码中注明的原作者的财产。Haiku® 和 Haiku logo® 是Haiku, Inc.的注册商标。\n\n
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		版权 © 1987-1988 Digital Equipment Corporation，Maynard, Massachusetts。\n版权所有。
 %total MiB total, %inaccessible MiB inaccessible	AboutView		总计 %total MiB， 禁用 %inaccessible MiB。 
@@ -72,10 +73,13 @@ Copyright © 2002-2008 Alexander L. Roshal. All rights reserved.	AboutView		版�
 Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		版权 © 2003-2006 Intel Corporation。版权所有。
 %ld MHz	AboutView		%ld MHz
 Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		版权 © 1997-2006 PDFlib GmbH 与 Thomas Merz。版权所有。 \nPDFlib 和 PDFlib logo 是 PDFlib GmbH 的注册商标。
+Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		版权所有 © 1991-2000 Silicon Graphic, Inc。保留所有权利。
 Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		包含来自 GNU 项目的软件，它们在 GPL 和 LGPL 协议下发布：\n GNU C 库，GNU 核心工具，diffutils，findutils，sharutils，gawk，bison，m4，make，gdb，wget，ncurses，termcap，Bourne Again Shell。\n版权 © The Free Software Foundation。
+MIT license. All rights reserved.	AboutView		MIT 授权。保留所有权利。
 [Click a license name to read the respective license.]\n\n	AboutView		[点击阅读下述协议。]\n\n
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		版权 © 2007 Ralink Technology Corporation。版权所有。
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		版权 © 1990-2002 Info-ZIP。版权所有。
 License: 	AboutView		协议: 
+2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2011 基于 Generalized Timing Formula，由 Andy Ritger 完成。
 GCC %d Hybrid	AboutView		GCC %d Hybird
 Translations:\n	AboutView		翻译：\n

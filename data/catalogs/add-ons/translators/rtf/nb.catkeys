@@ -1,9 +1,9 @@
-1	norwegian_bokmål	x-vnd.Haiku-RTFTranslator	526958155
-RTF Settings	main		RTF-innstillinger
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-RTFTranslator	526958155
+Version %d.%d.%d, %s	ConfigView		Versjon %d.%d.%d, %s
 RTF text files	RTFTranslator		RTF-tekstfiler
 RTF-Translator Settings	ConfigView		RTF-oversetterinnstillinger
 Rich Text Format (RTF) files	ConfigView		Filer i rikt tekstformat (RTF)
+RTF Settings	main		RTF-innstillinger
+RichTextFormat file	RTFTranslator		Fil i rikt tekstformat (RTF)
 Rich Text Format Translator	RTFTranslator		Rikt tekstfomatoversetter
 Rich Text Format translator v%d.%d.%d %s	RTFTranslator		Rikt tekstformatoversetter v%d.%d.%d %s
-RichTextFormat file	RTFTranslator		Fil i rikt tekstformat (RTF)
-Version %d.%d.%d, %s	ConfigView		Versjon %d.%d.%d, %s

@@ -1,24 +1,24 @@
-1	norwegian_bokmål	x-vnd.Haiku-Mouse	1033564338
-...by Andrew Edward McCall	MouseApplication		...av Andrew Edward McCall
-1-Button	SettingsView		1 knapp
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Mouse	1033564338
+Mouse type:	SettingsView		Type mus:
+Warp	SettingsView		Teleporter
 2-Button	SettingsView		2 knapper
-3-Button	SettingsView		3 knapper
-Accept first click	SettingsView		Godta første klikk
+Double-click test area	SettingsView		Test dobbeltklikk her.
+Revert	MouseWindow		Tilbakestill
+...by Andrew Edward McCall	MouseApplication		...av Andrew Edward McCall
+Mouse acceleration	SettingsView		Akselerasjon
 Click to focus	SettingsView		Klikk for å gi fokus
 Click to focus and raise	SettingsView		Klikk for å fokusere og bringe frem
-Defaults	MouseWindow		Standardinnstillinger
-Dig Deal	MouseApplication		Digg
-Double-click speed	SettingsView		Dobbeltklikkhastighet
-Double-click test area	SettingsView		Test dobbeltklikk her.
-Fast	SettingsView		Rask
-Focus follows mouse	SettingsView		Fokus følger musepeker
+3-Button	SettingsView		3 knapper
+Mouse speed	SettingsView		Hastighet
 Focus mode:	SettingsView		Fokusmetode:
 Instant warp	SettingsView		Umiddelbar teleportering
-Mouse	System name		Mus
-Mouse acceleration	SettingsView		Akselerasjon
-Mouse speed	SettingsView		Hastighet
-Mouse type:	SettingsView		Type mus:
+Dig Deal	MouseApplication		Digg
+1-Button	SettingsView		1 knapp
+Double-click speed	SettingsView		Dobbeltklikkhastighet
+Defaults	MouseWindow		Standardinnstillinger
+Focus follows mouse	SettingsView		Fokus følger musepeker
+Accept first click	SettingsView		Godta første klikk
+Fast	SettingsView		Rask
 Normal	SettingsView		Normal
-Revert	MouseWindow		Tilbakestill
+Mouse	System name		Mus
 Slow	SettingsView		Langsom
-Warp	SettingsView		Teleporter

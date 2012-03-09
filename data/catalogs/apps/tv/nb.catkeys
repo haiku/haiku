@@ -1,22 +1,27 @@
-1	norwegian_bokmål	x-vnd.Haiku.TV	400912834
-Always on top	MainWin		Alltid øverst
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku.TV	1995288111
+TV	MainWin		TV
 Channel	MainWin		Kanal
-DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
-Debug	MainWin		Debug
-Error, interface is busy:\n\n	MainWin		Feil, grensesnitt er opptatt:\n\n
-Full screen	MainWin		Fullskjerm
+Settings…	MainWin		Innstillinger
 Interface	MainWin		Grensesnitt
 Keep aspect ratio	MainWin		Behold høyde/bredde-forhold
-Next channel	MainWin		Neste kanal
-No border	MainWin		Ingen vinduskant
-No menu	MainWin		Ingen meny
-None	MainWin		Ingen
-OK	MainWin		OK
 Previous channel	MainWin		Forrige kanal
-Quit	MainWin		Avslutt
-Scale to native size	MainWin		Skaler til normal størrelse
 Settings	MainWin		Innstillinger
-Settings…	MainWin		Innstillinger
-TV	MainWin		TV
 TV	System name		TV
+No border	MainWin		Ingen vinduskant
+Always on top	MainWin		Alltid øverst
+OK	MainWin		OK
+Quit	MainWin		Avslutt
+Full screen	MainWin		Fullskjerm
+Debug	MainWin		Debug
+Scale to native size	MainWin		Skaler til normal størrelse
 unknown	MainWin		ukjent
+Next channel	MainWin		Neste kanal
+Error, interface is busy:\n\n	MainWin		Feil, grensesnitt er opptatt:\n\n
+None	MainWin		Ingen
+force 704 x 576, display aspect 4:3	MainWin		tving 704 x 576, vis aspektet 4:3
+DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
+force 544 x 576, display aspect 4:3	MainWin		tving 544 x 576, vis aspektet 4:3
+pixel aspect ratio	MainWin		piksel-aspekt ratioet
+No menu	MainWin		Ingen meny
+Error, connecting to interface failed:\n\n	MainWin		Feil, tilkobling til grensesnittet feilet:\n\n
+force 720 x 576, display aspect 4:3	MainWin		tving 720 x 576, vis aspektet 4:3

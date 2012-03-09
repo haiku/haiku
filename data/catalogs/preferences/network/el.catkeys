@@ -1,21 +1,21 @@
-1	modern_greek	x-vnd.Haiku-Network	2324385456
-<no wireless networks found>	EthernetSettingsView		<δε βρέθηκαν ασύρματα δίκτυα>	 
-Adapter:	EthernetSettingsView		Προσαρμογέας:
-Apply	EthernetSettingsView		Εφαρμογή
-Auto-configuring failed: 	EthernetSettingsView		Η αυτόματη-ρύθμιση απέτυχε:
+1	greek, modern (1453-)	x-vnd.Haiku-Network	2324385456
 Choose automatically	EthernetSettingsView		Επιλογή αυτόματα
-DHCP	EthernetSettingsView		DHCP
-DNS #1:	EthernetSettingsView		DNS #1:
-DNS #2:	EthernetSettingsView		DNS #2:
-Disabled	EthernetSettingsView		Απενεργοποιημένο
-Domain:	EthernetSettingsView		Τομέας:
 Gateway:	EthernetSettingsView		Πύλη:
-IP address:	EthernetSettingsView		Διεύθυνση IP:
-Mode:	EthernetSettingsView		Λειτουργία:
 Netmask:	EthernetSettingsView		Μάσκα Δικτύου:
-Network	System name		Network	 
-Network:	EthernetSettingsView		Δίκτυο:	 
+DHCP	EthernetSettingsView		DHCP
+DNS #2:	EthernetSettingsView		DNS #2:
+Apply	EthernetSettingsView		Εφαρμογή
 OK	EthernetSettingsView		Εντάξει
+DNS #1:	EthernetSettingsView		DNS #1:
+IP address:	EthernetSettingsView		Διεύθυνση IP:
+Adapter:	EthernetSettingsView		Προσαρμογέας:
+Domain:	EthernetSettingsView		Τομέας:
 Revert	EthernetSettingsView		Επαναφορά
-Static	EthernetSettingsView		Στατική
+<no wireless networks found>	EthernetSettingsView		<δε βρέθηκαν ασύρματα δίκτυα>
+Network	System name		Network
+Mode:	EthernetSettingsView		Λειτουργία:
+Network:	EthernetSettingsView		Δίκτυο:
 The net_server needs to run for the auto configuration!	EthernetSettingsView		Πρέπει να εκτελεστεί ο εξυπηρετητής_δικτύου για την αυτόματη ρύθμιση των παραμέτρων!
+Disabled	EthernetSettingsView		Απενεργοποιημένο
+Auto-configuring failed: 	EthernetSettingsView		Η αυτόματη-ρύθμιση απέτυχε:
+Static	EthernetSettingsView		Στατική

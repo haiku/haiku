@@ -1,0 +1,82 @@
+# Raspberry Pi board-specific definitions
+
+HAIKU_BOARD_DESCRIPTION = "Raspberry Pi" ;
+
+#
+# Various hardcoded addresses
+#
+
+# load address for haiku_loader
+HAIKU_BOARD_LOADER_BASE = 0x32000000 ;
+# entry points (raw binary, and netbsd loader emulation)
+HAIKU_BOARD_LOADER_ENTRY_RAW = 0x32000000 ;
+HAIKU_BOARD_LOADER_ENTRY_NBSD = 0x32000008 ;
+
+# load address for haiku_loader uimage
+# (must be different than real load address)
+HAIKU_BOARD_LOADER_UIBASE = 0x34000000 ;
+
+HAIKU_BOARD_LOADER_STACK_BASE = 0x34000000 ;
+
+#
+# Flash image
+#
+
+# u-boot binary image filename, to build the flash image
+# XXX: Locate it somehow (for now just put it in generated/)
+#HAIKU_BOARD_UBOOT_IMAGE ?= u-boot-verdex-400-r1604.bin ;
+#HAIKU_BOARD_UBOOT_IMAGE_URL = 
+#	http://www.gumstix.net/feeds/u-boot/u-boot-verdex-400-r1604.bin ;
+
+
+#
+# mmc/SD image
+#
+
+# in MB
+HAIKU_BOARD_SDIMAGE_SIZE = 256 ;
+
+# in MB
+HAIKU_BOARD_SDIMAGE_FAT_SIZE = 32 ;
+
+# offset in blocks XXX: FIXME
+# (autodetect from sfdisk or use cylinder count for fat size)
+#HAIKU_BOARD_SDIMAGE_BFS_OFFSET = ;
+
+# autoboot script
+HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME = uImage.bin ;
+
+HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT = "\
+if mmcinit; then \
+	neo backlight off; \
+	fatload mmc 0 $(HAIKU_BOARD_LOADER_UIBASE) haiku_loader_nbsd.ub; \
+	neo backlight on; \
+	bootm $(HAIKU_BOARD_LOADER_UIBASE); \
+fi" ;
+
+HAIKU_BOARD_SDIMAGE_FILES = 
+	haiku_loader
+	haiku_loader.ub
+	haiku_loader_nbsd.ub
+	$(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME)
+;
+
+
+#
+# gcc flags for the specific cpu
+#
+
+TARGET_KERNEL_CCFLAGS += -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=softfp ;
+TARGET_KERNEL_C++FLAGS += -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=softfp ;
+TARGET_CCFLAGS += -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=softfp ;
+TARGET_C++FLAGS += -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=softfp ;
+
+# Workaround for ld using 32k for alignment despite forcing it in the config...
+# should definitely not be needed!
+TARGET_KERNEL_LINKFLAGS +=
+	-Wl,-z -Wl,max-page-size=0x1000
+	-Wl,-z -Wl,common-page-size=0x1000 ;
+TARGET_LINKFLAGS +=
+	-Wl,-z -Wl,max-page-size=0x1000
+	-Wl,-z -Wl,common-page-size=0x1000 ;
+

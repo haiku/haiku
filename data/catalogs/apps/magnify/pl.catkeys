@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Magnify	2227745383
+1	polish	x-vnd.Haiku-Magnify	3515889001
 no clip msg\n	In console, when clipboard is empty after clicking Copy image		no clip msg\n
 Make square	Magnify-Main		Zrób kwadrat
 Copy image	Magnify-Main		Kopiuj obraz
@@ -24,4 +24,5 @@ Save image	Magnify-Main		Zapisz obraz
 Increase window size	Magnify-Main		Powiększ rozmiar okna
 Decrease window size	Magnify-Main		Zmniejsz rozmiar okna
 Increase pixel size	Magnify-Main		Powiększ rozmiar piksela
+  size must be > 4 and a multiple of 4\n	Console		  rozmiar musi być > 4 i być wielokrotnością liczby 4\n
 Add a crosshair	Magnify-Main		Dodaj celownik

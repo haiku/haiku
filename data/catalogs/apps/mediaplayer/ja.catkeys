@@ -1,9 +1,11 @@
-1	japanese	x-vnd.Haiku-MediaPlayer	138551800
+1	japanese	x-vnd.Haiku-MediaPlayer	2854745242
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (American)
+%d kHz	MediaPlayer-InfoWin		%d kHz
 Stream settings	MediaPlayer-Main		ストリーム設定
 <unknown>	PlaylistItem-album		<不明>
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		ファイル'%filename'を開けません\n\n
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		フルスクリーン表示時にコントロールを拡大する
+Video	MediaPlayer-InfoWin		ビデオ
 Subtitle size:	MediaPlayer-SettingsWindow		サブタイトルのサイズ：
 Save Playlist	MediaPlayer-PlaylistWindow		プレイリストを保存
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		再生しようとしているファイルはメディアファイルではないようです。
@@ -13,6 +15,7 @@ New player…	MediaPlayer-Main		新規プレイヤー...
 Subtitle placement:	MediaPlayer-SettingsWindow		サブタイトルの位置：
 Close	MediaPlayer-Main		閉じる
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		いくつかのファイルはごみ箱に移動できませんでした。
+<unknown>	MediaPlayer-InfoWin		<不明>
 Open	MediaPlayer-Main		開く
 Next	MediaPlayer-Main		次
 OK	MediaPlayer-SettingsWindow		OK
@@ -56,6 +59,7 @@ Move Entry	MediaPlayer-MovePLItemsCmd		項目の移動
 Open	MediaPlayer-PlaylistWindow		開く
 Stop playing.	MediaPlayer-Main		再生を停止
 Error: 	MediaPlayer-RemovePLItemsCmd		エラー:
+Audio	MediaPlayer-InfoWin		オーディオ
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部エラー (不正なメッセージ)。プレイリストの保存に失敗しました。
 Skip to the previous track.	MediaPlayer-Main		前のトラックに飛ぶ
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% の内部エラーです。ファイルは開けませんでした。
@@ -134,4 +138,3 @@ Rating	MediaPlayer-Main		評価
 Playlist	MediaPlayer-PlaylistWindow		プレイリスト
 Lock Peaks	MediaPlayer-PeakView		ピークを固定
 Low volume	MediaPlayer-SettingsWindow		低音量
-File Info	MediaPlayer-InfoWin		ファイル情報

@@ -2,7 +2,7 @@
 Enclosed alphanumerics	UnicodeBlocks		Alphanumériques cerclés
 Basic Latin	UnicodeBlocks		Latin basic
 View	CharacterWindow		Vue
-Latin-1 supplement	UnicodeBlocks		Supplément Latin-1 
+Latin-1 supplement	UnicodeBlocks		Supplément Latin-1
 Hebrew	UnicodeBlocks		Hébreu
 Georgian supplement	UnicodeBlocks		Supplément géorgien
 CJK unified ideographs	UnicodeBlocks		Idéogrammes unifiés CJC
@@ -52,13 +52,13 @@ Supplemental arrows B	UnicodeBlocks		Suppléments B de Flèches
 Cyrillic extended A	UnicodeBlocks		Cyrillique étendu A
 Kharoshthi	UnicodeBlocks		Kharochthî
 Combining half marks	UnicodeBlocks		Demi-signes combinatoires
-Cyrillic	UnicodeBlocks		Cyrillique 
+Cyrillic	UnicodeBlocks		Cyrillique
 Katakana	UnicodeBlocks		Katakana
 Block elements	UnicodeBlocks		Pavés
 Clear	CharacterWindow		Nettoyer
 Sundanese	UnicodeBlocks		Soudanais
 Miscellaneous mathematical symbols A	UnicodeBlocks		Divers symboles mathématiques A
-Cyrillic supplement	UnicodeBlocks		Supplément cyrillique 
+Cyrillic supplement	UnicodeBlocks		Supplément cyrillique
 Small form variants	UnicodeBlocks		Petites variantes de forme
 IPA extensions	UnicodeBlocks		Phonétique international étendu
 Thaana	UnicodeBlocks		Thâna

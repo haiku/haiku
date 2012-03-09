@@ -14,7 +14,7 @@ Controller	DeviceClass		Contrôleur
 No service available	DeviceClass		Aucun service disponible
 Wearable	DeviceClass	A wearable computer	Vêtement
 Handheld	DeviceClass		Ordinateur de poche
-Invalid device class!\n	DeviceClass		Classe de périphérique invalide!\n
+Invalid device class!\n	DeviceClass		Classe de périphérique invalide !\n
 Sensing device	DeviceClass		Dispositif de détection
 Computer	DeviceClass		Ordinateur
 Cellular	DeviceClass		Mobile
@@ -23,16 +23,16 @@ Unknown (reserved) minor device class	DeviceClass		Classe mineure inconnue (rés
 Cordless	DeviceClass		Sans fil
 Common ISDN access	DeviceClass		Accès Numéris
 83-99% utilized	DeviceClass		83 à 99% utilisés
-Scanner	DeviceClass		Scanner
+Scanner	DeviceClass		Scanneur
 Game	DeviceClass		Jeu
 Gamepad	DeviceClass		Manette de jeu
 (reserved)	DeviceClass		(réservé)
 Desktop workstation	DeviceClass		Station de travail
-Audio/Video	DeviceClass		Audio/Video
+Audio/Video	DeviceClass		Audio/Vidéo
 Glasses	DeviceClass		Lunettes
 Keyboard	DeviceClass		Clavier
 Camera	DeviceClass		Appareil photo
-Major class: 	DeviceClass		Classe majeure :
+Major class: 	DeviceClass		Classe majeure : 
 50-67% utilized	DeviceClass		50 à 67% utilisés
 Card reader	DeviceClass		Lecteur de carte
 Set-top box	DeviceClass		Décodeur TV
@@ -43,7 +43,7 @@ SIM card reader	DeviceClass		Lecteur de carte SIM
 Headphones	DeviceClass		Écouteurs
 Information	DeviceClass		Information
 Remote control	DeviceClass		Télécommande
-Service classes: 	DeviceClass		Classe de service :
+Service classes: 	DeviceClass		Classe de service : 
 Pager	DeviceClass	A small radio device to receive short text messages	Radiomessagerie
 Object transfer	DeviceClass		Transfert d'objet
 Gaming/Toy	DeviceClass		Jouet
@@ -55,10 +55,10 @@ Loudspeaker	DeviceClass		Haut-parleur
 Joystick	DeviceClass		Joystick
 LAN access	DeviceClass		Accès LAN
 Wrist watch	DeviceClass		Montre
-Minor class: 	DeviceClass		Classe mineure :
+Minor class: 	DeviceClass		Classe mineure : 
 Networking	DeviceClass		Réseau
 Portable audio	DeviceClass		Baladeur
-Device conforms to the headset profile	DeviceClass		Le périphérique est conforme aux profils d'applications Bluetooth
+Device conforms to the headset profile	DeviceClass		Le périphérique est compatible avec le profil casque
 Hands-free	DeviceClass		Kit mains-libres
 #CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Nom invalide
 Vehicle	DeviceClass		Véhicule

@@ -1,14 +1,14 @@
-1	norwegian_bokmål	x-vnd.Haiku-Keyboard	1711838804
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Keyboard	1711838804
+Written by Andrew Edward McCall	KeyboardApplication		Skrevet av Andrew Edward McCall
+Typing test area	KeyboardView		Testfelt
 Defaults	KeyboardWindow		Standardinnstillinger
-Delay until key repeat	KeyboardView		Forsinkelse før tast repeteres
-Fast	KeyboardView		Rask
 Key repeat rate	KeyboardView		Repetisjonshastighet 
-Keyboard	System name		Tastatur
-Long	KeyboardView		Lang
-OK	KeyboardApplication		OK
 Revert	KeyboardWindow		Tilbakestill
-Short	KeyboardView		Kort
+Delay until key repeat	KeyboardView		Forsinkelse før tast repeteres
+Keyboard	System name		Tastatur
+OK	KeyboardApplication		OK
+Fast	KeyboardView		Rask
 Slow	KeyboardView		Langsom
 Something has gone wrong!	KeyboardApplication		Noe gikk galt!
-Typing test area	KeyboardView		Testfelt
-Written by Andrew Edward McCall	KeyboardApplication		Skrevet av Andrew Edward McCall
+Long	KeyboardView		Lang
+Short	KeyboardView		Kort

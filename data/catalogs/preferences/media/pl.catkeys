@@ -1,4 +1,5 @@
-1	polish	x-vnd.Haiku-Media	128032530
+1	polish	x-vnd.Haiku-Media	1473363280
+Couldn't add volume control in Deskbar: %s\n	Media views		Nie można dodać sterowania głośnością w Deskbarze: %s\n
 Ready for use…	Media Window		Gotowe do użycia…
 Video input:	Media views		Wejście wideo:
 Waiting for media_server to quit.	Media Window		Oczekiwanie na zakończenie działania media_server.
@@ -11,13 +12,15 @@ Starting media server…	Media Window		Uruchamianie serwera multimediów…
 Done shutting down.	Media Window		Skończono zamykanie.
 Video settings	Media Window		Ustawienia wideo
 Video output:	Media views		Wyjście wideo:
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Nie można połączyć się z serwerem multimediów.\nUruchomić go ponownie?
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Nie można połączyć się z serwerem multimediów.\nUruchomić go ponownie ?
 Restart media services	Media views		Ponowne uruchomienie usług multimedialnych
+Couldn't remove volume control in Deskbar: %s\n	Media views		Nie można usunąć sterowania głośnością w Deskbarze: %s\n
+Media	System name		Nośnik
 Telling media_addon_server to quit.	Media Window		Powiadamianie media_addon_server, by się zakończył.
 Audio mixer	Media Window		Mikser audio
 This hardware has no controls.	Media Window		Ten sprzęt nie ma żadnych ustawień.
 Audio output:	Media views		Wyjście dźwięku:
-Restarting media services\nStarting media server…\n	Media Window		Ponowne uruchamianie usług multimedialnych\Uruchamianie serwera multimediów…\n
+Restarting media services\nStarting media server…\n	Media Window		Ponowne uruchamianie usług multimedialnych\nUruchamianie serwera multimediów…\n
 Audio settings	Media Window		Ustawienia dźwięku
 Start media server	Media Window		Uruchom serwer multimediów
 Restarting media services\nShutting down media server\n	Media Window		Ponowne uruchamianie usług multimedialnych\nZamykanie serwera multimediów\n

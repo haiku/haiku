@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2012, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  *
  * Roughly based on 'btlib' written by Marcus J. Ranum - it shares
@@ -36,8 +36,10 @@ public:
 	void
 	Check(const char* message)
 	{
-		if (fNode->CheckIntegrity(fSize) < B_OK)
+		if (fNode->CheckIntegrity(fSize) != B_OK) {
 			dprintf("%s: %s\n", fText, message);
+			DEBUGGER(("NodeChecker integrity check failed!"));
+		}
 	}
 
 private:
@@ -46,6 +48,132 @@ private:
 	const char*				fText;
 };
 #endif
+
+
+class BitmapArray {
+public:
+								BitmapArray(size_t numBits);
+								~BitmapArray();
+
+			status_t			InitCheck() const;
+
+			bool				IsSet(size_t index) const;
+			void				Set(size_t index, bool set);
+
+			size_t				CountSet() const { return fCountSet; }
+
+private:
+			uint8*				fBitmap;
+			size_t				fSize;
+			size_t				fCountSet;
+};
+
+
+struct TreeCheck {
+	TreeCheck(BPlusTree* tree)
+		:
+		fLevelCount(0),
+		fFreeCount(0),
+		fNodeSize(tree->NodeSize()),
+		fMaxLevels(tree->fHeader.MaxNumberOfLevels()),
+		fFoundErrors(0),
+		fVisited(tree->Stream()->Size() / tree->NodeSize()),
+		fVisitedFragment(tree->Stream()->Size() / tree->NodeSize())
+	{
+		fPreviousOffsets = (off_t*)malloc(
+			sizeof(off_t) * tree->fHeader.MaxNumberOfLevels());
+		if (fPreviousOffsets != NULL) {
+			for (size_t i = 0; i < fMaxLevels; i++)
+				fPreviousOffsets[i] = BPLUSTREE_NULL;
+		}
+	}
+
+	~TreeCheck()
+	{
+		free(fPreviousOffsets);
+	}
+
+	status_t InitCheck() const
+	{
+		if (fPreviousOffsets == NULL)
+			return B_NO_MEMORY;
+
+		status_t status = fVisited.InitCheck();
+		if (status != B_OK)
+			return status;
+
+		return fVisitedFragment.InitCheck();
+	}
+
+	bool Visited(off_t offset) const
+	{
+		return fVisited.IsSet(offset / fNodeSize);
+	}
+
+	void SetVisited(off_t offset)
+	{
+		fVisited.Set(offset / fNodeSize, true);
+	}
+
+	size_t VisitedCount() const
+	{
+		return fVisited.CountSet();
+	}
+
+	bool VisitedFragment(off_t offset) const
+	{
+		return fVisitedFragment.IsSet(offset / fNodeSize);
+	}
+
+	void SetVisitedFragment(off_t offset)
+	{
+		fVisitedFragment.Set(offset / fNodeSize, true);
+	}
+
+	uint32 MaxLevels() const
+	{
+		return fLevelCount;
+	}
+
+	void SetLevel(uint32 level)
+	{
+		if (fLevelCount < level)
+			fLevelCount = level;
+	}
+
+	off_t PreviousOffset(uint32 level)
+	{
+		return fPreviousOffsets[level];
+	}
+
+	void SetPreviousOffset(uint32 level, off_t offset)
+	{
+		fPreviousOffsets[level] = offset;
+	}
+
+	void FoundError()
+	{
+		fFoundErrors++;
+	}
+
+	bool ErrorsFound()
+	{
+		return fFoundErrors != 0;
+	}
+
+private:
+			uint32				fLevelCount;
+			uint32				fFreeCount;
+			uint32				fNodeSize;
+			uint32				fMaxLevels;
+			uint32				fFoundErrors;
+			BitmapArray			fVisited;
+			BitmapArray			fVisitedFragment;
+			off_t*				fPreviousOffsets;
+};
+
+
+// #pragma mark -
 
 
 // Node Caching for the BPlusTree class
@@ -474,10 +602,7 @@ BPlusTree::SetTo(Inode* stream)
 		// we can't change the header since we don't have a transaction
 		//fHeader.maximum_size = HOST_ENDIAN_TO_BFS_INT64(stream->Size());
 	}
-	if (fHeader.Magic() != BPLUSTREE_MAGIC
-		|| (fHeader.RootNode() % fHeader.NodeSize()) != 0
-		|| !fHeader.IsValidLink(fHeader.RootNode())
-		|| !fHeader.IsValidLink(fHeader.FreeNode())) {
+	if (!fHeader.IsValid()) {
 #ifdef DEBUG
 		dump_bplustree_header(&fHeader);
 		dump_block((const char*)&fHeader, 128);
@@ -519,6 +644,70 @@ status_t
 BPlusTree::InitCheck()
 {
 	return fStatus;
+}
+
+
+status_t
+BPlusTree::Validate(bool repair, bool& _errorsFound)
+{
+	TreeCheck check(this);
+	if (check.InitCheck() != B_OK)
+		return B_NO_MEMORY;
+
+	check.SetVisited(0);
+
+	// Walk the free nodes
+
+	CachedNode cached(this);
+	off_t freeOffset = fHeader.FreeNode();
+	while (freeOffset > 0) {
+		const bplustree_node* node = cached.SetTo(freeOffset, false);
+		if (node == NULL)
+			return B_IO_ERROR;
+
+		if (check.Visited(freeOffset)) {
+			dprintf("inode %" B_PRIdOFF ": free node at %" B_PRIdOFF
+				" circular!\n", fStream->BlockNumber(), freeOffset);
+			break;
+		}
+
+		check.SetVisited(freeOffset);
+
+		if (node->OverflowLink() != BPLUSTREE_FREE) {
+			dprintf("inode %" B_PRIdOFF ": free node at %" B_PRIdOFF
+				" misses free mark!\n", fStream->BlockNumber(), freeOffset);
+		}
+		freeOffset = node->LeftLink();
+	}
+
+	// Iterate over the complete tree recursively
+
+	const bplustree_node* root = cached.SetTo(fHeader.RootNode(), true);
+	if (root == NULL)
+		return B_IO_ERROR;
+
+	status_t status = _ValidateChildren(check, 0, fHeader.RootNode(), NULL, 0,
+		root);
+
+	if (check.ErrorsFound())
+		_errorsFound = true;
+
+	if (status != B_OK)
+		return status;
+
+	if (check.MaxLevels() + 1 != fHeader.MaxNumberOfLevels()) {
+		dprintf("inode %" B_PRIdOFF ": found %" B_PRIu32 " max levels, "
+			"declared %" B_PRIu32 "!\n", fStream->BlockNumber(),
+			check.MaxLevels(), fHeader.MaxNumberOfLevels());
+	}
+
+	if (check.VisitedCount() != fHeader.MaximumSize() / fNodeSize) {
+		dprintf("inode %" B_PRIdOFF ": visited %" B_PRIuSIZE " from %" B_PRIdOFF
+			" nodes.\n", fStream->BlockNumber(),
+			check.VisitedCount(), fHeader.MaximumSize() / fNodeSize);
+	}
+
+	return B_OK;
 }
 
 
@@ -671,7 +860,7 @@ BPlusTree::_FindKey(const bplustree_node* node, const uint8* key,
 	uint16 keyLength, uint16* _index, off_t* _next)
 {
 #ifdef DEBUG
-		NodeChecker checker(node, fNodeSize, "find");
+	NodeChecker checker(node, fNodeSize, "find");
 #endif
 
 	if (node->all_key_count == 0) {
@@ -834,9 +1023,8 @@ BPlusTree::_InsertDuplicate(Transaction& transaction, CachedNode& cached,
 
 		if (bplustree_node::LinkType(oldValue)
 				== BPLUSTREE_DUPLICATE_FRAGMENT) {
-			bplustree_node* duplicate
-				= cachedDuplicate.SetToWritable(transaction,
-				bplustree_node::FragmentOffset(oldValue), false);
+			bplustree_node* duplicate = cachedDuplicate.SetToWritable(
+				transaction, bplustree_node::FragmentOffset(oldValue), false);
 			if (duplicate == NULL)
 				return B_IO_ERROR;
 
@@ -1937,6 +2125,211 @@ BPlusTree::Find(const uint8* key, uint16 keyLength, off_t* _value)
 }
 
 
+status_t
+BPlusTree::_ValidateChildren(TreeCheck& check, uint32 level, off_t offset,
+	const uint8* largestKey, uint16 largestKeyLength,
+	const bplustree_node* parent)
+{
+	if (parent->CheckIntegrity(fNodeSize) != B_OK) {
+		dprintf("inode %" B_PRIdOFF ": node %" B_PRIdOFF " integrity check "
+			"failed!\n", fStream->BlockNumber(), offset);
+		check.FoundError();
+		return B_OK;
+	}
+	if (level >= fHeader.MaxNumberOfLevels()) {
+		dprintf("inode %" B_PRIdOFF ": maximum level surpassed at %" B_PRIdOFF
+			"!\n", fStream->BlockNumber(), offset);
+		check.FoundError();
+		return B_OK;
+	}
+
+	check.SetLevel(level);
+
+	if (check.Visited(offset)) {
+		dprintf("inode %" B_PRIdOFF ": node %" B_PRIdOFF " already visited!\n",
+			fStream->BlockNumber(), offset);
+		check.FoundError();
+		return B_OK;
+	}
+
+	check.SetVisited(offset);
+
+	uint32 count = parent->NumKeys();
+	off_t* values = parent->Values();
+	off_t lastOffset = check.PreviousOffset(level);
+	CachedNode cached(this);
+
+	for (uint32 i = 0; i < count; i++) {
+		uint16 keyLength;
+		uint8* key = parent->KeyAt(i, &keyLength);
+		if (largestKey != NULL) {
+			int result = compareKeys(fHeader.DataType(), key, keyLength,
+				largestKey, largestKeyLength);
+			if (result >= 0) {
+				dprintf("inode %" B_PRIdOFF ": node %" B_PRIdOFF " key %"
+					B_PRIu32 " larger than it should!\n",
+					fStream->BlockNumber(), offset, i);
+				check.FoundError();
+			}
+		}
+
+		off_t childOffset = values[i];
+		if (bplustree_node::IsDuplicate(childOffset)) {
+			// Walk the duplicate nodes
+			off_t duplicateOffset = bplustree_node::FragmentOffset(childOffset);
+			off_t lastDuplicateOffset = BPLUSTREE_NULL;
+
+			while (duplicateOffset != BPLUSTREE_NULL) {
+				const bplustree_node* node
+					= cached.SetTo(duplicateOffset, false);
+				if (node == NULL)
+					return B_IO_ERROR;
+
+				bool isFragmentNode = bplustree_node::LinkType(childOffset)
+					== BPLUSTREE_DUPLICATE_FRAGMENT;
+				bool isKnownFragment = isFragmentNode
+					&& check.VisitedFragment(duplicateOffset);
+
+				if (!isKnownFragment && check.Visited(duplicateOffset)) {
+					dprintf("inode %" B_PRIdOFF ": duplicate node at %"
+						B_PRIdOFF " already visited!\n", fStream->BlockNumber(),
+						duplicateOffset);
+					check.FoundError();
+					break;
+				}
+
+				// Fragment nodes may be visited more than once from different
+				// places
+				if (!check.Visited(duplicateOffset))
+					check.SetVisited(duplicateOffset);
+				if (!isKnownFragment && isFragmentNode)
+					check.SetVisitedFragment(duplicateOffset);
+
+				duplicate_array* array;
+				uint32 maxSize;
+				if (isFragmentNode) {
+					array = node->FragmentAt(
+						bplustree_node::FragmentIndex(childOffset));
+					maxSize = NUM_FRAGMENT_VALUES;
+				} else {
+					array = node->DuplicateArray();
+					maxSize = NUM_DUPLICATE_VALUES;
+				}
+
+				if (array->count == 0 || array->count > maxSize) {
+					dprintf("inode %" B_PRIdOFF ": duplicate at %" B_PRIdOFF
+						" has invalid array size %" B_PRIdOFF "!\n",
+						fStream->BlockNumber(), duplicateOffset, array->count);
+					check.FoundError();
+				} else {
+					// Simple check if the values in the array may be valid
+					for (int32 j = 0; j < array->count; j++) {
+						if (!fStream->GetVolume()->IsValidInodeBlock(
+								array->values[j])) {
+							dprintf("inode %" B_PRIdOFF ": duplicate at %"
+								B_PRIdOFF " contains invalid block %" B_PRIdOFF
+								" at %" B_PRId32 "!\n", fStream->BlockNumber(),
+								duplicateOffset, array->values[j], j);
+							check.FoundError();
+							break;
+						}
+					}
+				}
+
+				// A fragment node is not linked (and does not have valid links)
+				if (isFragmentNode)
+					break;
+
+				if (node->LeftLink() != lastDuplicateOffset) {
+					dprintf("inode %" B_PRIdOFF ": duplicate at %" B_PRIdOFF
+						" has wrong left link %" B_PRIdOFF ", expected %"
+						B_PRIdOFF "!\n", fStream->BlockNumber(),
+						duplicateOffset, node->LeftLink(), lastDuplicateOffset);
+					check.FoundError();
+				}
+
+				lastDuplicateOffset = duplicateOffset;
+				duplicateOffset = node->RightLink();
+			}
+		} else if (!parent->IsLeaf()) {
+			// Test a regular child node recursively
+			off_t nextOffset = parent->OverflowLink();
+			if (i < count - 1)
+				nextOffset = values[i + 1];
+
+			if (i == 0 && lastOffset != BPLUSTREE_NULL) {
+				// Test right link of the previous node
+				const bplustree_node* previous = cached.SetTo(lastOffset, true);
+				if (previous == NULL)
+					return B_IO_ERROR;
+
+				if (previous->RightLink() != childOffset) {
+					dprintf("inode %" B_PRIdOFF ": node at %" B_PRIdOFF " has "
+						"wrong right link %" B_PRIdOFF ", expected %" B_PRIdOFF
+						"!\n", fStream->BlockNumber(), lastOffset,
+						previous->RightLink(), childOffset);
+					check.FoundError();
+				}
+			}
+
+			status_t status = _ValidateChild(check, cached, level, childOffset,
+				lastOffset, nextOffset, key, keyLength);
+			if (status != B_OK)
+				return status;
+		} else if (!fStream->GetVolume()->IsValidInodeBlock(childOffset)) {
+			dprintf("inode %" B_PRIdOFF ": node at %" B_PRIdOFF " contains "
+				"invalid block %" B_PRIdOFF " at %" B_PRId32 "!\n",
+				fStream->BlockNumber(), offset, childOffset, i);
+			check.FoundError();
+		}
+
+		lastOffset = childOffset;
+	}
+
+	if (parent->OverflowLink() != BPLUSTREE_NULL) {
+		off_t childOffset = parent->OverflowLink();
+		status_t status = _ValidateChild(check, cached, level, childOffset,
+			lastOffset, 0, NULL, 0);
+		if (status != B_OK)
+			return status;
+
+		lastOffset = childOffset;
+	}
+
+	check.SetPreviousOffset(level, lastOffset);
+	return B_OK;
+}
+
+
+status_t
+BPlusTree::_ValidateChild(TreeCheck& check, CachedNode& cached, uint32 level,
+	off_t offset, off_t lastOffset, off_t nextOffset,
+	const uint8* key, uint16 keyLength)
+{
+	const bplustree_node* node = cached.SetTo(offset, true);
+	if (node == NULL)
+		return B_IO_ERROR;
+
+	if (node->LeftLink() != lastOffset) {
+		dprintf("inode %" B_PRIdOFF ": node at %" B_PRIdOFF " has "
+			"wrong left link %" B_PRIdOFF ", expected %" B_PRIdOFF
+			"!\n", fStream->BlockNumber(), offset, node->LeftLink(),
+			lastOffset);
+		check.FoundError();
+	}
+
+	if (nextOffset != 0 && node->RightLink() != nextOffset) {
+		dprintf("inode %" B_PRIdOFF ": node at %" B_PRIdOFF " has "
+			"wrong right link %" B_PRIdOFF ", expected %" B_PRIdOFF
+			"!\n", fStream->BlockNumber(), offset, node->RightLink(),
+			nextOffset);
+		check.FoundError();
+	}
+
+	return _ValidateChildren(check, level + 1, offset, key, keyLength, node);
+}
+
+
 //	#pragma mark -
 
 
@@ -2260,7 +2653,20 @@ TreeIterator::Dump()
 #endif
 
 
-//	#pragma mark -
+// #pragma mark -
+
+
+bool
+bplustree_header::IsValid() const
+{
+	return Magic() == BPLUSTREE_MAGIC
+		&& (RootNode() % NodeSize()) == 0
+		&& IsValidLink(RootNode())
+		&& IsValidLink(FreeNode());
+}
+
+
+// #pragma mark -
 
 
 void
@@ -2337,7 +2743,6 @@ bplustree_node::FragmentsUsed(uint32 nodeSize) const
 }
 
 
-#ifdef DEBUG
 status_t
 bplustree_node::CheckIntegrity(uint32 nodeSize) const
 {
@@ -2350,22 +2755,72 @@ bplustree_node::CheckIntegrity(uint32 nodeSize) const
 		if (key + length + sizeof(off_t) + sizeof(uint16)
 				> (uint8*)this + nodeSize
 			|| length > BPLUSTREE_MAX_KEY_LENGTH) {
-			dprintf("node %p, key %d\n", this, (int)i);
-			DEBUGGER(("invalid node: keys corrupted"));
+			dprintf("invalid node %p, key %d: keys corrupted\n", this, (int)i);
 			return B_BAD_DATA;
 		}
 		if (Values()[i] == -1) {
-			dprintf("node %p, value %d: %lld\n", this, (int)i, Values()[i]);
-			DEBUGGER(("invalid node: values corrupted"));
+			dprintf("invalid node %p, value %d: %lld: values corrupted\n",
+				this, (int)i, Values()[i]);
 			return B_BAD_DATA;
 		}
 	}
 	return B_OK;
 }
-#endif
 
 
-//	#pragma mark -
+// #pragma mark -
+
+
+BitmapArray::BitmapArray(size_t numBits)
+{
+	fSize = (numBits + 7) / 8;
+	fBitmap = (uint8*)calloc(fSize, 1);
+	fCountSet = 0;
+}
+
+
+BitmapArray::~BitmapArray()
+{
+	free(fBitmap);
+}
+
+
+status_t
+BitmapArray::InitCheck() const
+{
+	return fBitmap != NULL ? B_OK : B_NO_MEMORY;
+}
+
+
+bool
+BitmapArray::IsSet(size_t index) const
+{
+	uint32 byteIndex = index / 8;
+	if (byteIndex >= fSize)
+		return false;
+
+	return (fBitmap[byteIndex] & (1UL << (index & 0x7))) != 0;
+}
+
+
+void
+BitmapArray::Set(size_t index, bool set)
+{
+	uint32 byteIndex = index / 8;
+	if (byteIndex >= fSize)
+		return;
+
+	if (set) {
+		fBitmap[byteIndex] |= 1UL << (index & 0x7);
+		fCountSet++;
+	} else {
+		fBitmap[byteIndex] &= ~(1UL << (index & 0x7));
+		fCountSet--;
+	}
+}
+
+
+// #pragma mark -
 
 
 int32

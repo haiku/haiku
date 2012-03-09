@@ -1,6 +1,7 @@
-1	french	x-vnd.Haiku-SMTP	1467192431
+1	french	x-vnd.Haiku-SMTP	294421070
 SMTP server:	ConfigView		Serveur SMTP :
 Error while logging in to %serv	smtp		Erreur lors de la connexion à %serv
+. The server says:\n	smtp		. Le serveur indique :\n
 ESMTP	ConfigView		ESMTP
 Connecting to server…	smtp		Connexion au serveur…
 Destination:	ConfigView		Destination :
@@ -8,3 +9,4 @@ Destination:	ConfigView		Destination :
 None	ConfigView		Aucun
 POP3 before SMTP	ConfigView		POP3 avant SMTP
 SSL	ConfigView		SSL
+. The server said:\n	smtp		. Le serveur a indiqué :\n

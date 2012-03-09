@@ -1,11 +1,11 @@
 1	polish	x-vnd.Haiku-desklink	3053930521
 Control physical output	MediaReplicant		Zarządzaj wyjściem fizycznym
-Couldn't launch 	MediaReplicant		Nie można uruchomić
+Couldn't launch 	MediaReplicant		Nie można uruchomić 
 OK	MediaReplicant		OK
-Sound preferences…	MediaReplicant		Ustawienia dźwięku...
+Sound preferences…	MediaReplicant		Ustawienia dźwięku…
 %g dB	MediaReplicant		%g dB
 No media server running	VolumeControl		Brak uruchomionego serwera mediów
-Media preferences…	MediaReplicant		Ustawienia mediów...
+Media preferences…	MediaReplicant		Ustawienia mediów…
 Open MediaPlayer	MediaReplicant		Otwórz MediaPlayer
 desklink	MediaReplicant		Skrót pulpitu
 Options	MediaReplicant		Opcje

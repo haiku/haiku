@@ -1,20 +1,24 @@
-1	english	x-vnd.Haiku-PowerStatus	751886234
+1	english	x-vnd.Haiku-PowerStatus	3986536563
 Design capacity low warning: 	PowerStatus		设计低容量警告：
 Show percent	PowerStatus		显示百分比
 Design capacity: 	PowerStatus		设计容量：
+ mW	PowerStatus		毫瓦
 Type: 	PowerStatus		输入：
 non-rechargeable	PowerStatus		不可再充电
 Empty battery slot	PowerStatus		清理电池接口槽
+ mV	PowerStatus		毫伏
 Run in window	PowerStatus		在窗口中运行
 About	PowerStatus		关于
 PowerStatus	System name		电源状态
 PowerStatus	PowerStatus		电源状态
+ mWh	PowerStatus		兆瓦时
 Battery info…	PowerStatus		电池信息...
 Damaged battery	PowerStatus		电池损坏
 Show time	PowerStatus		显示时间
 Last full charge: 	PowerStatus		最近完全用完：
 Battery unused	PowerStatus		未使用电池
 Extended battery info	PowerStatus		附加电池信息
+ mA	PowerStatus		毫安
 Current rate: 	PowerStatus		当前速度：
 discharging	PowerStatus		放电
 Show text label	PowerStatus		显示文字标签

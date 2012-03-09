@@ -1,9 +1,10 @@
-1	french	x-vnd.Haiku-MediaPlayer	1952560558
+1	french	x-vnd.Haiku-MediaPlayer	1756510747
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Panoramique américain)
 Stream settings	MediaPlayer-Main		Réglages du flux
 <unknown>	PlaylistItem-album		<inconnu>
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Impossible d'ouvrir le fichier « %filename ».\n\n
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Agrandir les commandes en mode plein écran
+Video	MediaPlayer-InfoWin		Vidéo
 Subtitle size:	MediaPlayer-SettingsWindow		Taille des sous-titres :
 Save Playlist	MediaPlayer-PlaylistWindow		Enregistrer la liste de lecture
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Aucun des fichiers que vous voulez lire ne semble être un média.
@@ -13,6 +14,7 @@ New player…	MediaPlayer-Main		Nouveau lecteur…
 Subtitle placement:	MediaPlayer-SettingsWindow		Emplacement des sous-titres :
 Close	MediaPlayer-Main		Fermer
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Certains fichiers ne peuvent pas être envoyés à la corbeille
+<unknown>	MediaPlayer-InfoWin		<inconnu>
 Open	MediaPlayer-Main		Ouvrir
 Next	MediaPlayer-Main		Suivant
 OK	MediaPlayer-SettingsWindow		OK
@@ -39,7 +41,7 @@ Start playing.	MediaPlayer-Main		Commencer la lecture.
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Il n'existe pas de décodeur capable de prendre en charge ce format de fichier ou bien le décodeur a des soucis avec cette version spécifique du format.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Importer une entrée
 400% scale	MediaPlayer-Main		Échelle 400%
-Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		La sauvegarde de la liste de lecture a échoué :\n\nErreur :
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		La sauvegarde de la liste de lecture a échoué :\n\nErreur : 
 Move Entries	MediaPlayer-MovePLItemsCmd		Déplacer les entrées
 Audio	MediaPlayer-Main		Audio
 Open Playlist	MediaPlayer-PlaylistWindow		Ouvrir une liste de lecture
@@ -51,7 +53,8 @@ Select all	MediaPlayer-PlaylistWindow		Sélectionner tout
 Move Entry	MediaPlayer-MovePLItemsCmd		Déplacer l'entrée
 Open	MediaPlayer-PlaylistWindow		Ouvrir
 Stop playing.	MediaPlayer-Main		Arrêter la lecture.
-Error: 	MediaPlayer-RemovePLItemsCmd		Erreur :
+Error: 	MediaPlayer-RemovePLItemsCmd		Erreur : 
+Audio	MediaPlayer-InfoWin		Audio
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erreur interne (message incorrect). La liste de lecture n'a pas pu être sauvegardée.
 Skip to the previous track.	MediaPlayer-Main		Passer à la piste précédante
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% a rencontré une erreur interne. Le fichier n'a pas pu être ouvert.
@@ -84,7 +87,7 @@ Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Envoyer les entrées à 
 200% scale	MediaPlayer-Main		Échelle 200%
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Il semble que le serveur de médias ne soit pas en fonction.\nVoulez-vous le démarrer maintenant ?
 Aspect ratio	MediaPlayer-Main		Aspect proportionnel
-Error: 	MediaPlayer-Main		Erreur :
+Error: 	MediaPlayer-Main		Erreur : 
 Large	MediaPlayer-SettingsWindow		Large
 Bottom of video	MediaPlayer-SettingsWindow		Au bas de la vidéo
 Stop	MediaPlayer-Main		Arrêt
@@ -115,9 +118,9 @@ Copy Entries	MediaPlayer-CopyPLItemsCmd		Copier les entrées
 Redo	MediaPlayer-PlaylistWindow		Rétablir
 Always on top	MediaPlayer-Main		Toujours au dessus
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Envoyer l'entrée à la corbeille
-Save	MediaPlayer-Main		Enregistrer 
+Save	MediaPlayer-Main		Enregistrer
 <nothing to undo>	MediaPlayer-PlaylistWindow		<rien à rétablir>
-Save	MediaPlayer-PlaylistWindow		Enregistrer 
+Save	MediaPlayer-PlaylistWindow		Enregistrer
 Remove	MediaPlayer-PlaylistWindow		Retirer
 Full screen	MediaPlayer-Main		Plein écran
 Open file…	MediaPlayer-Main		Ouvrir un fichier…
@@ -127,4 +130,3 @@ Save error	MediaPlayer-PlaylistWindow		Enregistrer l'erreur
 Rating	MediaPlayer-Main		Évaluation
 Playlist	MediaPlayer-PlaylistWindow		Liste de lecture
 Low volume	MediaPlayer-SettingsWindow		Volume atténué
-File Info	MediaPlayer-InfoWin		Informations du fichier

@@ -1,14 +1,14 @@
-1	modern_greek	x-vnd.Haiku-desklink	3053930521
-%g dB	MediaReplicant		%g dB
-%ld dB	VolumeControl		%ld dB
-Beep	MediaReplicant		Μπιπ
+1	greek, modern (1453-)	x-vnd.Haiku-desklink	3053930521
 Control physical output	MediaReplicant		Έλεγχος φυσικής εξόδου
 Couldn't launch 	MediaReplicant		Δεν μπορεί να γίνει εκκίνηση
-Media preferences…	MediaReplicant		Προτιμήσεις πολυμέσων...
-No media server running	VolumeControl		Δεν τρέχει διακομιστής πολυμέσων
 OK	MediaReplicant		Εντάξει
-Open MediaPlayer	MediaReplicant		Ανοίξετε το MediaPlayer
-Options	MediaReplicant		Επιλογές
 Sound preferences…	MediaReplicant		Προτιμήσεις ήχου...
-Volume	VolumeControl		Ένταση
+%g dB	MediaReplicant		%g dB
+No media server running	VolumeControl		Δεν τρέχει διακομιστής πολυμέσων
+Media preferences…	MediaReplicant		Προτιμήσεις πολυμέσων...
+Open MediaPlayer	MediaReplicant		Ανοίξετε το MediaPlayer
 desklink	MediaReplicant		desklink
+Options	MediaReplicant		Επιλογές
+%ld dB	VolumeControl		%ld dB
+Beep	MediaReplicant		Μπιπ
+Volume	VolumeControl		Ένταση

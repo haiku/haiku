@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be.ChartDemo	557376150
+1	japanese	x-vnd.Be.ChartDemo	986636897
 Slow rotation	ChartWindow		遅い回転
 Pink	ChartWindow		ピンク
 Comet	ChartWindow		彗星
@@ -9,6 +9,7 @@ Blue	ChartWindow		青
 Colors	ChartWindow		色
 Novas	ChartWindow		新星
 LineArray	ChartWindow		LineArray
+ 0.6 f/s  (logarythmic scale)	ChartWindow		0.6 f/s (対数目盛)
 Free motion	ChartWindow		自由運動
 (high) 100% 	ChartWindow		(高) 100% 
 Green	ChartWindow		緑
@@ -20,6 +21,7 @@ Chaos	ChartWindow		カオス
 Full screen	ChartWindow		フルスクリーン
 Spiral	ChartWindow		渦巻
 Slow motion	ChartWindow		スローモーション
+ 5% (low)	ChartWindow		5% (低)
 Fast motion	ChartWindow		高速モーション
 Special	ChartWindow		スペシャル
 Status	ChartWindow		状況

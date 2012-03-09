@@ -1,6 +1,6 @@
-1	modern_greek	x-vnd.Haiku-cmd-dstconfig	2337923203
-.\n\nIs this the correct time?	dstcheck		.\n\nΕίναι αυτή η σωστή ώρα ;
-Ask me later	dstcheck		Υπενθυμίστε με αργότερα
-Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		Προσοχή!\n\nΛόγω της αλλαγής από τη θερινή ώρα, το ρολόι του υπολογιστή σας μπορεί να είναι μια ώρα λάθος.\nΟ υπολογιστής πιστεύει πως είναι
-Manually adjust time…	dstcheck		Χειροκίνητα όρισε την ώρα...
+1	greek, modern (1453-)	x-vnd.Haiku-cmd-dstconfig	2337923203
 Use this time	dstcheck		Χρησιμοποίησε αυτή την ώρα
+Ask me later	dstcheck		Υπενθυμίστε με αργότερα
+Manually adjust time…	dstcheck		Χειροκίνητα όρισε την ώρα...
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		Προσοχή!\n\nΛόγω της αλλαγής από τη θερινή ώρα, το ρολόι του υπολογιστή σας μπορεί να είναι μια ώρα λάθος.\nΟ υπολογιστής πιστεύει πως είναι
+.\n\nIs this the correct time?	dstcheck		.\n\nΕίναι αυτή η σωστή ώρα ;

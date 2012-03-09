@@ -1,8 +1,8 @@
-1	french	x-vnd.Haiku-CodyCam	2416864674
+1	french	x-vnd.Haiku-CodyCam	2499223827
 Capturing Image…	VideoConsumer.cpp		Capture d'une image…
 Every 30 seconds	CodyCam		Toutes les 30 secondes
 File name:	CodyCam		Nom du fichier :
-Last Capture: 	VideoConsumer.cpp		Dernière capture :
+Last Capture: 	VideoConsumer.cpp		Dernière capture : 
 Server login failed	VideoConsumer.cpp		Erreur de connexion au serveur
 Remote host has closed the connection.\n	FtpClient		L'hôte distant a fermé la connexion.\n
 Login:	CodyCam		Identifiant :
@@ -20,7 +20,7 @@ destination directory expected	CodyCam		dossier de destination attendu
 password	CodyCam		mot de passe
 Directory:	CodyCam		Dossier :
 Every minute	CodyCam		Toutes les minutes
-read: %ld\n	SftpClient		lire : %ldn
+read: %ld\n	SftpClient		lire : %ld\n
 Waiting…	CodyCam		Attente…
 Logging in…	VideoConsumer.cpp		Connexion…
 Server:	CodyCam		Serveur :
@@ -84,8 +84,7 @@ reply: %d, %d\n	FtpClient		Réponse : %d, %d\n
 Cannot find the media roster	CodyCam		Impossible de trouver le diagramme des médias
 Every 4 hours	CodyCam		Toutes les 4 heures
 FTP	CodyCam		FTP
-File transmission failed	VideoConsumer.cpp		Erreur dans la transmission du fichier 
-Cannot seek time source!	CodyCam		Impossible de se déplacer dans la référence de temps
+File transmission failed	VideoConsumer.cpp		Erreur dans la transmission du fichier
 File	CodyCam		Fichier
 Image Format Menu	CodyCam		Menu de formats d'images
 Every 30 minutes	CodyCam		Toutes les 30 minutes

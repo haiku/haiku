@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	1676127148
+1	french	x-vnd.Haiku-libtracker	3422331931
 common	B_COMMON_DIRECTORY		commun
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Vue en icônes
@@ -19,12 +19,13 @@ Invert selection	VolumeWindow		Inverser la sélection
 Recent documents	FavoritesMenu		Documents récents
 Modified	QueryPoseView		Modifié
 Created	ContainerWindow		Créé
+Error %error loading add-On %name.	ContainerWindow		Erreur %error au chargement de l'extension %name.
 contains	SelectionWindow		contient
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Désolé, vous ne pouvez rien sauvegarder à la racine de votre système.
 Show shared volumes on Desktop	SettingsView		Afficher les volumes partagés sur le Bureau
 Paste links	ContainerWindow		Coller les liens
 Name	OpenWithWindow		Nom
-Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Impossible d'ouvrir « %document », car l'application « %app » est dans la Corbeille.
+Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Impossible d'ouvrir « %document », car l'application « %app » est dans la Corbeille. 
 File	ContainerWindow		Fichier
 Handles any %type	OpenWithWindow		Manipule n'importe quel « %type »
 Delete	ContainerWindow		Supprimer
@@ -64,6 +65,7 @@ Empty Trash	ContainerWindow		Vider la Corbeille
 Name = %name	FindPanel	FindResultTitle	Nom = %name
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Êtes-vous sûr de vouloir déplacer ou copier l(es) élément(s) sélectionné(s) dans ce dossier ?
 Does not handle file	OpenWithWindow		Ne gère pas le fichier
+Arrange by	ContainerWindow		Trier par
 Mount server error	AutoMounterSettings		Erreur du serveur de montage
 Search	FindPanel		Chercher
 Preparing to empty Trash…	StatusWindow		Préparation au vidage de la Corbeille…
@@ -126,12 +128,12 @@ Defaults	TrackerSettingsWindow		Par défaut
 Mini icon view	ContainerWindow		Vue en petites icônes
 Clean up	VolumeWindow		Nettoyer
 OK	TrackerInitialState		OK
-Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Impossible d'ouvrir « %name ». Le fichier est marqué exécutable par erreur.
+Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Impossible d'ouvrir « %name ». Le fichier est marqué exécutable par erreur. 
 Add-ons	ContainerWindow		Extensions
 Edit templates…	TemplatesMenu		Éditer les modèles…
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Un élément nommé « %name » existe déjà dans ce dossier. Voulez vous le remplacer par le lien symbolique que vous créez ?
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Désolé, Il n'y a pas assez d'espace libre dans le volume cible pour copier la sélection.
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Impossible d'ouvrir « %document » avec l'application « %app » (%error).\n
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Impossible d'ouvrir « %document » avec l'application « %app » (%error). 
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Désolé, Il n'est pas permis de sauvegarder plus d'un élément.
 Searching for disks to mount…	StatusWindow		Recherche des disques à monter…
 New folder	FSUtils		Nouveau dossier
@@ -234,7 +236,7 @@ trash	B_TRASH_DIRECTORY		corbeille
 matches regular expression	SelectionWindow		correspond à l'expression régulière
 Mount settings…	SettingsView		Réglages du montage…
 Edit name	InfoWindow		Éditer le nom
-Could not open \"%name\" (%error). 	FSUtils		Impossible d'ouvrir « %name » (%error).
+Could not open \"%name\" (%error). 	FSUtils		Impossible d'ouvrir « %name » (%error). 
 Paste	ContainerWindow		Coller
 optional	/boot/optional		optionnel
 Modified:	InfoWindow		Modifié :
@@ -252,6 +254,7 @@ Cancel	Tracker		Annuler
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Désolé, vous ne pouvez pas modifier cet attribut.
 Name	ContainerWindow		Nom
 Disk mount settings	AutoMounterSettings		Réglages des montages de disques
+Reverse order	ContainerWindow		Ordre inverse
 48 x 48	DeskWindow		48 x 48
 OK	OpenWithWindow		OK
 Add current folder	FilePanelPriv		Ajouter le dossier courant
@@ -284,12 +287,12 @@ Real name	ContainerWindow		Nom réel
 Error moving \"%name\"	FSUtils		Erreur lors du déplacement de « %name »
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Vous devez déplacer des éléments sur une des icônes de disques de la fenêtre « Disques ».
 Cancel	WidgetAttributeText		Annuler
-Could not find an application to open \"%name\" (%error). 	FSUtils		Impossible de trouver une application pour ouvrir « %name » (%error).
+Could not find an application to open \"%name\" (%error). 	FSUtils		Impossible de trouver une application pour ouvrir « %name » (%error). 
 Create a Query template	FindPanel		Créer un modèle de requête
 Previously mounted disks	AutoMounterSettings		Les disques montés précédemment
 %Ld B	WidgetAttributeText		%Ld o
 copying	FSUtils		copier
-Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Erreur à la copie du dossier « %name »:\n\t%error\n\nVoulez-vous continuer ?
+Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Erreur à la copie du dossier « %name » :\n\t%error\n\nVoulez-vous continuer ?
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	déplacez
 Show Disks icon	SettingsView		Afficher l'icône des disques
 Mount	VolumeWindow		Monter
@@ -336,7 +339,7 @@ Used space color	SettingsView		Couleur de l'espace utilisé
 Sorry, could not create a new folder.	FSUtils		Désolé, impossible de créer un nouveau dossier.
 multiple disks	FindPanel		disques multiples
 Done	AutoMounterSettings		Fait
-You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Vous devez déplacer des éléments sur une des icônes de disques de la fenêtre « Disques ».
+You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Vous devez déposer les éléments sur une des icônes disques de la fenêtre « Disques ».
 Untitled clipping	PoseView		Extrait sans titre
 Don't automount	AutoMounterSettings		Ne pas monter automatiquement
 Save	FilePanelPriv		Sauvegarder

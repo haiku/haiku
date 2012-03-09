@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Expander	1852295567
+1	finnish	x-vnd.Haiku-Expander	1072439789
 Expand	ExpanderMenu		Laajenna
 Close window when done expanding	ExpanderPreferences		Sulje ikkuna kun laajentaminen on tehty
 Set destination…	ExpanderMenu		Aseta kohde…
@@ -6,6 +6,7 @@ Use:	ExpanderPreferences		Käyttö:
 File expanded	ExpanderWindow		Tiedosto laajennettu
 The destination is read only.	ExpanderWindow		Kohde on kirjoitussuojattu.
 Expander: Open	ExpanderWindow		Laajentaja: Avaa
+ is not supported	ExpanderWindow		ei ole tuettu
 Expander settings	ExpanderPreferences		Laajentaja-asetukset
 Select current	DirectoryFilePanel		Valitse nykyinen
 Source	ExpanderWindow		Lähde
@@ -19,10 +20,8 @@ The destination folder does not exist.	ExpanderWindow		Kohdekansiota ei ole olem
 Cancel	ExpanderPreferences		Peru
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Oletko varma, että haluat pysäyttää tämän arkiston\nlaajentamisen? Laajennetut alkiot eivät ehkä ole valmiita.
 Select	DirectoryFilePanel		Valitse
-Destination folder:	ExpanderPreferences		Kohdekansio:
 Same directory as source (archive) file	ExpanderPreferences		Sama hakemisto lähde(arkisto)tiedostona
 Expanding '%s'	ExpanderWindow		Laajennetaan ’%s’
-Expansion:	ExpanderPreferences		Laajentaminen:
 Settings	ExpanderMenu		Asetukset
 Settings…	ExpanderMenu		Asetukset…
 Expander: Choose destination	DirectoryFilePanel		Laajentaja: Valitse kohde
@@ -35,7 +34,6 @@ The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Kansio o
 The file doesn't exist	ExpanderWindow		Tiedostoa ei ole olemassa
 Stop	ExpanderMenu		Pysäytä
 File	ExpanderMenu		Tiedosto
-Other:	ExpanderPreferences		Muut:
 Expander	System name		Laajentaja
 Expand	ExpanderWindow		Laajenna
 Close	ExpanderMenu		Sulje

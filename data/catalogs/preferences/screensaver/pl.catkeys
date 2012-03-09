@@ -1,17 +1,23 @@
-1	polish	x-vnd.Haiku-ScreenSaver	799085334
+1	polish	x-vnd.Haiku-ScreenSaver	746331867
 Could not load screen saver	ScreenSaver		Nie można załadować wygaszacza ekranu
 30 seconds	ScreenSaver		30 sekund
-Password…	ScreenSaver		Hasło...
+Start screensaver	ScreenSaver		Uruchom wygaszacz ekranu
+Password…	ScreenSaver		Hasło…
 Password:	ScreenSaver		Hasło:
 Password lock	ScreenSaver		Blokada hasła
-Add…	ScreenSaver		Dodaj...
+Add…	ScreenSaver		Dodaj…
+Screensavers	ScreenSaver		Wygaszacze ekranu
 mouse is here	ScreenSaver		mysz jest tutaj
+ScreenSaver	System name		WygaszaczEkranu
 Test	ScreenSaver		Test
+General	ScreenSaver		Ogólne
+Enable screensaver	ScreenSaver		Włącz wygaszacz ekranu
 Cancel	ScreenSaver		Anuluj
 Turn off screen	ScreenSaver		Wyłącz ekran
 No options available	ScreenSaver		Brak dostępnych opcji
 Password Window	ScreenSaver		Okno z hasłem
 Fade now when	ScreenSaver		Zanikaj gdy
+Screensaver settings	ScreenSaver		Ustawienia wygaszacza ekranu
 Passwords don't match. Please try again.	ScreenSaver		Hasła nie zgadzają się. Proszę spróbować ponownie.
 OK	ScreenSaver		OK
 Don't fade when	ScreenSaver		Nie zanikaj gdy

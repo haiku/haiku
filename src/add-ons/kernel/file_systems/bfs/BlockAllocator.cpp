@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2012, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -1420,8 +1420,7 @@ BlockAllocator::CheckNextNode(check_control* control)
 				return B_OK;
 			}
 
-			// get iterator for the next directory
-
+			// Check directory
 			BPlusTree* tree = inode->Tree();
 			if (tree == NULL) {
 				FATAL(("check: could not open b+tree from inode at %" B_PRIdOFF
@@ -1432,6 +1431,7 @@ BlockAllocator::CheckNextNode(check_control* control)
 			fCheckCookie->parent = inode;
 			fCheckCookie->parent_mode = inode->Mode();
 
+			// get iterator for the next directory
 			fCheckCookie->iterator = new(std::nothrow) TreeIterator(tree);
 			if (fCheckCookie->iterator == NULL)
 				RETURN_ERROR(B_NO_MEMORY);
@@ -1915,6 +1915,18 @@ BlockAllocator::CheckInode(Inode* inode)
 
 			fCheckCookie->control.stats.double_indirect_array_blocks++;
 		}
+	}
+
+	if (inode->IsContainer()) {
+		bool errorsFound = false;
+		status_t status = inode->Tree()->Validate(
+			(fCheckCookie->control.flags & BFS_FIX_BPLUSTREES) != 0,
+			errorsFound);
+		if (errorsFound)
+			fCheckCookie->control.errors |= BFS_INVALID_BPLUSTREE;
+
+		if (status != B_OK)
+			return status;
 	}
 
 	return B_OK;

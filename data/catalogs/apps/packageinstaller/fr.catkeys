@@ -1,10 +1,11 @@
-1	french	x-vnd.Haiku-PackageInstaller	2709408798
+1	french	x-vnd.Haiku-PackageInstaller	1396489627
 Install to:	PackageView		Installer vers :
 OK	PackageView		OK
 Accept	PackageTextViewer		Accepter
 Continue	PackageInstall		Continuer
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Le paquet demandé n'a pas pu être installé sur votre système. Ce problème peut provenir d'un paquet corrompu. Veuillez vous adresser au distributeur du paquet.
 Image not loaded correctly	PackageImageViewer		Chargement incorrect de l'image
+Install 	PackageView		Installer
 No package selected.	PackageInfo		Aucun paquet sélectionné
 Install	PackageView		Installer
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Le paquet  semble être déjà installé sur votre système. Souhaitez-vous désinstaller le paquet actuel et continuer l'installation ?

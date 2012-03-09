@@ -1,38 +1,34 @@
-1	modern_greek	x-vnd.Haiku-SoundRecorder	2122042546
-Cannot connect to media server	RecorderWindow		Αδυναμία σύνδεσης με τον εξυπηρετητή πολυμέσων
-Cannot connect to the selected sound input	RecorderWindow		Αδυναμία σύνδεσης με την επιλεγμένη είσοδο ήχου
-Cannot find an unused name to use for the new recording	RecorderWindow		Αδυναμία εύρεσης αχρησιμοποίητου ονόματος για να χρησιμοποιηθεί στη νέα ηχογράφηση
+1	greek, modern (1453-)	x-vnd.Haiku-SoundRecorder	3266675535
+Loop	RecorderWindow		Βρόχος
 Cannot find default audio hardware	RecorderWindow		Αδυναμία εύρεσης προεπιλεγμένου υλικού ήχου
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Αδυναμία εύρεσης του προσωρινού αρχείου που δημιουργήθηκε για να κρατήσει τη νέα ηχογράφηση
-Cannot get the file to play	RecorderWindow		Αδυναμία εύρεσης του αρχείου για αναπαραγωγή
-Cannot open the temporary file created to hold the new recording	RecorderWindow		Αδυναμία ανοίγματος του προσωρινού αρχείου που δημιουργήθηκε για να κρατήσει τη νέα ηχογράφηση
-Cannot recognize this file as a media file	RecorderWindow		Δεν είναι δυνατή η αναγνώριση αυτού του αρχείου ως αρχείο πολυμέσων
-Cannot record a sound that long	RecorderWindow		Αδυναμία εγγραφής ήχου μεγάλης διάρκειας
-Channels: 	RecorderWindow		Κανάλια:
-Compression:	RecorderWindow		Συμπίεση:
-Drop files here	SoundListView		Σύρετε τα αρχεία εδώ
-Duration:	RecorderWindow		Διάρκεια:
-File info	RecorderWindow		Πληροφορίες αρχείου
-File name:	RecorderWindow		Όνομα αρχείου:
-Format: 	RecorderWindow		Μορφοποίηση:
-Forward	RecorderWindow		Προς τα εμπρός
-Input	RecorderWindow		Είσοδος
-Input:	RecorderWindow		Είσοδος:
-Invalid audio files	RecorderWindow		Άκυρα αρχεία ήχου
-Loop	RecorderWindow		Βρόχος
-None	RecorderWindow		Κανένα
-None of the files appear to be audio files	RecorderWindow		Κανένα από τα αρχεία δεν φαίνεται να είναι αρχεία ήχου
 Nothing to play	RecorderWindow		Δεν υπάρχει τίποτα για αναπαραγωγή
-OK	RecorderWindow		Εντάξει
-Play	RecorderWindow		Αναπαραγωγή
-Record	RecorderWindow		Εγγραφή
-Rewind	RecorderWindow		Προς τα πίσω
-Sample rate: 	RecorderWindow		Ρυθμός δειγματοληψίας:
-Sample size: 	RecorderWindow		Μέγεθος δειγματοληψίας:
-Save	RecorderWindow		Αποθήκευση
 Some of the files don't appear to be audio files	RecorderWindow		Ορισμένα από τα αρχεία δεν φαίνεται να είναι αρχεία ήχου
-Sound List	RecorderWindow		Λίστα ήχου
-SoundRecorder	System name		SoundRecorder
+File info	RecorderWindow		Πληροφορίες αρχείου
+Drop files here	SoundListView		Σύρετε τα αρχεία εδώ
+Input	RecorderWindow		Είσοδος
 Stop	RecorderWindow		Σταμάτα
-bits	RecorderWindow		bits
-seconds	RecorderWindow		δευτερόλεπτα
+Sound List	RecorderWindow		Λίστα ήχου
+Rewind	RecorderWindow		Προς τα πίσω
+Sample rate:	RecorderWindow		Ρυθμός δειγματοληψίας:
+Invalid audio files	RecorderWindow		Άκυρα αρχεία ήχου
+OK	RecorderWindow		Εντάξει
+Cannot open the temporary file created to hold the new recording	RecorderWindow		Αδυναμία ανοίγματος του προσωρινού αρχείου που δημιουργήθηκε για να κρατήσει τη νέα ηχογράφηση
+None of the files appear to be audio files	RecorderWindow		Κανένα από τα αρχεία δεν φαίνεται να είναι αρχεία ήχου
+Input:	RecorderWindow		Είσοδος:
+Forward	RecorderWindow		Προς τα εμπρός
+Play	RecorderWindow		Αναπαραγωγή
+SoundRecorder	System name		SoundRecorder
+None	RecorderWindow		Κανένα
+Record	RecorderWindow		Εγγραφή
+Sample size: 	RecorderWindow		Μέγεθος δειγματοληψίας:
+Cannot recognize this file as a media file	RecorderWindow		Δεν είναι δυνατή η αναγνώριση αυτού του αρχείου ως αρχείο πολυμέσων
+Format: 	RecorderWindow		Μορφοποίηση:
+File name: 	RecorderWindow		Όνομα αρχείου:
+Cannot connect to the selected sound input	RecorderWindow		Αδυναμία σύνδεσης με την επιλεγμένη είσοδο ήχου
+Cannot get the file to play	RecorderWindow		Αδυναμία εύρεσης του αρχείου για αναπαραγωγή
+Cannot record a sound that long	RecorderWindow		Αδυναμία εγγραφής ήχου μεγάλης διάρκειας
+Duration:	RecorderWindow		Διάρκεια:
+Compression:	RecorderWindow		Συμπίεση:
+Cannot find an unused name to use for the new recording	RecorderWindow		Αδυναμία εύρεσης αχρησιμοποίητου ονόματος για να χρησιμοποιηθεί στη νέα ηχογράφηση
+Channels: 	RecorderWindow		Κανάλια:

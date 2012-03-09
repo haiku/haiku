@@ -1,11 +1,11 @@
-1	polish	x-vnd.Haiku-PoorMan	1108606987
+1	polish	x-vnd.Haiku-PoorMan	1380190368
 Website location	PoorMan		Położenie strony
 Error Server	PoorMan		Błąd serwera
 Settings…	PoorMan		Ustawienia…
 Create PoorMan log	PoorMan		Utwórz log programu PoorMan
 Shutting down.\n	PoorMan		Wyłączanie.\n
 Hits: %lu	PoorMan		Odsłon: %lu
-Web folder:	PoorMan		Folder WWW
+Web folder:	PoorMan		Folder WWW:
 Default	PoorMan		Domyślny
 Save log console selection	PoorMan		Zapisz wybrany fragment logu konsoli
 Run server	PoorMan		Uruchom serwer
@@ -24,13 +24,17 @@ Advanced	PoorMan		Zaawansowane
 OK	PoorMan		OK
 Status: Stopped	PoorMan		Status: Wyłączony
 Dir Created	PoorMan		Katalog utworzono
+Log to file	PoorMan		Loguj do pliku
 Quit	PoorMan		Wyjdź
 Hits: 0	PoorMan		Odsłon: 0
 Save log console	PoorMan		Zapisz log konsoli
 Edit	PoorMan		Edytuj
+Create Log File	PoorMan		Utwórz plik log
+Log to console	PoorMan		Loguj do konsoli
 Directory: (none)	PoorMan		Folder: (brak)
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Proszę wybrać foler do opublikowania w sieci.\n\nMożesz pozwolić programowi PoorMan utworzyć folder \"public_html\"\nw folderze domowym lub wybrać swój własny folder.
 Log To Console	PoorMan		Loguj do konsoli
+Connections	PoorMan		Połączenia
 Status: Running	PoorMan		Status: Uruchomiony
 connections	PoorMan		połączenia
 Controls	PoorMan		Kontroluj
@@ -38,6 +42,7 @@ Send file listing if there's no start page	PoorMan		Wyślij listę plików jeśl
 Error Dir	PoorMan		Błąd katalogu
 Select all	PoorMan		Zaznacz wszystko
 File	PoorMan		Plik
+File Logging	PoorMan		Logowanie do pliku
 Save console selections as…	PoorMan		Zapisz wybrany fragment logu konsoli jako…
 File logging	PoorMan		Logowanie do pliku
 Select web folder	PoorMan		Wybierz folder WWW
@@ -46,13 +51,14 @@ Logging	PoorMan		Logowanie
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Domyślny folder WWW (\"/boot/home/public_html\") został utworzony. Upewnij się, że jest w nim plik HTML o nazwie \"index.html\".
 Clear log file	PoorMan		Wyczyść plik log
 Log file name:	PoorMan		Nazwa pliku log:
-Directory: 	PoorMan		Folder:
+Directory: 	PoorMan		Folder: 
 Log To File	PoorMan		Loguj do pliku
 Done	PoorMan		Gotowe
 Create log file	PoorMan		Utwórz plik log
-Starting up... 	PoorMan		Uruchamianie…
+Starting up... 	PoorMan		Uruchamianie... 
 Site	PoorMan		Strona
 Cancel	PoorMan		Anuluj
+Console logging	PoorMan		Logowanie w konsoli
 Cannot start the server	PoorMan		Nie można uruchomić serwera
 Select	PoorMan		Zaznacz
 Save console as…	PoorMan		Zapisz konsolę jako…

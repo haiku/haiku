@@ -1,8 +1,8 @@
 1	french	x-vnd.Haiku-PowerStatus	751886234
-Design capacity low warning: 	PowerStatus		Alerte de capacité nominale faible :
+Design capacity low warning: 	PowerStatus		Alerte de capacité nominale faible : 
 Show percent	PowerStatus		Afficher les pourcentages
-Design capacity: 	PowerStatus		Capacité nominale :
-Type: 	PowerStatus		Type :
+Design capacity: 	PowerStatus		Capacité nominale : 
+Type: 	PowerStatus		Type : 
 non-rechargeable	PowerStatus		non-rechargeable
 Empty battery slot	PowerStatus		Emplacement libre de batterie
 Run in window	PowerStatus		Exécuter en fenêtre
@@ -12,10 +12,10 @@ PowerStatus	PowerStatus		État d'énergie
 Battery info…	PowerStatus		Informations batteries…
 Damaged battery	PowerStatus		Batterie endommagée
 Show time	PowerStatus		Monter le temps
-Last full charge: 	PowerStatus		Dernière charge complète :
+Last full charge: 	PowerStatus		Dernière charge complète : 
 Battery unused	PowerStatus		Batterie inutilisée
 Extended battery info	PowerStatus		Informations additionnelles
-Current rate: 	PowerStatus		Consomation actuelle
+Current rate: 	PowerStatus		Consommation actuelle : 
 discharging	PowerStatus		sur batteries
 Show text label	PowerStatus		Afficher l'étiquette texte
 About…	PowerStatus		À propos…

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Terminal	1054657081
+1	japanese	x-vnd.Haiku-Terminal	1294209621
 Not found.	Terminal TermWindow		これ以上見つかりません。
 Switch Terminals	Terminal TermWindow		ターミナルを切替える
 Change directory	Terminal TermView		ディレクトリを変更
@@ -42,6 +42,7 @@ Green on Black	Terminal colors schema		黒地に緑文字
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		プロセス \"%1\" がまだ実行中です。\nタブを閉じると強制終了されます。
 Size:	Terminal AppearancePrefView		サイズ:
 Cannot execute \"%command\":\n\t%error	Terminal Shell		\"%command\" を実行できません:\n\t%error
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n
 Full screen	Terminal TermWindow		全画面表示
 Window title…	Terminal TermWindow		ウィンドウタイトル...
 Page setup…	Terminal TermWindow		ページ設定...

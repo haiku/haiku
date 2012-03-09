@@ -1,26 +1,31 @@
-1	finnish	x-vnd.Haiku-PowerStatus	751886234
+1	finnish	x-vnd.Haiku-PowerStatus	3419486861
 Design capacity low warning: 	PowerStatus		Suunnittelukapasiteetti alhainen -varoitus
 Show percent	PowerStatus		Näytä prosenttiluku
 Design capacity: 	PowerStatus		Suunnittelukapasiteetti:
+ mW	PowerStatus		mW
 Type: 	PowerStatus		Tyyppi:
 non-rechargeable	PowerStatus		ei-uudelleenladattava
 Empty battery slot	PowerStatus		Tyhjä akkulokero
+ mV	PowerStatus		 mV
 Run in window	PowerStatus		Suorita ikkunassa
 About	PowerStatus		Ohjelmasta
 PowerStatus	System name		Virtatila
 PowerStatus	PowerStatus		Virtatila
+ mWh	PowerStatus		mWh
 Battery info…	PowerStatus		Akkutiedot...
 Damaged battery	PowerStatus		Vaurioitunut akku
 Show time	PowerStatus		Näytä aika
 Last full charge: 	PowerStatus		Viimeinen täysi lataus:
 Battery unused	PowerStatus		Akku käyttämätön
 Extended battery info	PowerStatus		Laajennetut akkutiedot
+ mA	PowerStatus		mA
 Current rate: 	PowerStatus		Virtamäärä:
 discharging	PowerStatus		puretaan latausta
 Show text label	PowerStatus		Näytä tekstinimiö
 About…	PowerStatus		Ohjelmasta...
 Model number: 	PowerStatus		Mallinumero:
 Install in Deskbar	PowerStatus		Asenna Työpöytäpalkkiin
+ mAh	PowerStatus		mAh
 Capacity: 	PowerStatus		Kapasiteetti:
 Battery discharging	PowerStatus		Akkulatauksen purkaminen
 Serial number: 	PowerStatus		Sarjanumero:

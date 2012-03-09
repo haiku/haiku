@@ -1,23 +1,23 @@
-1	modern_greek	application/x-vnd.Haiku-Registrar	2599857937
-%action%?	ShutdownProcess		%action%;
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Η εφαρμογή \"%appName%\" ακύρωσε τη διαδικασία τερματισμού.
-Asking \"%appName%\" to quit.	ShutdownProcess		Αίτηση \"%appName%\" για τερματισμό.
-Asking background applications to quit.	ShutdownProcess		Αίτηση εφαρμογών παρασκηνίου για τερματισμό.
-Asking other processes to quit.	ShutdownProcess		Αίτηση άλλων διεργασιών για τερματισμό.
-Cancel	ShutdownProcess		Άκυρο
-Cancel shutdown	ShutdownProcess		Ακύρωση τερματισμού
-Do you really want to restart the system?	ShutdownProcess		Θέλετε σίγουρα να επανακκινήσετε το σύστημα;
-Do you really want to shut down the system?	ShutdownProcess		Θέλετε πραγματικά να επανεκκινήσετε το σύστημα;
-It's now safe to turn off the computer.	ShutdownProcess		Μπορείτε τώρα να κλείσετε με ασφάλεια τον υπολογιστή.
-Kill application	ShutdownProcess		Τερματισμός εφαρμογής
-OK	ShutdownProcess		Εντάξει
-Restart	ShutdownProcess		Επανεκκίνηση
+1	greek, modern (1453-)	x-vnd.haiku-registrar	2599857937
 Restart system	ShutdownProcess		Επανεκκίνηση συστήματος
-Restarting…	ShutdownProcess		Επανεκκίνηση...
-Shut down	ShutdownProcess		Τερματισμός
-Shutdown aborted	ShutdownProcess		Ο τερματισμός ακυρώθηκε
-Shutdown status	ShutdownProcess		Κατάσταση τερματισμού
-Shutting down…	ShutdownProcess		Τερματισμός...
-System is shut down	ShutdownProcess		Το σύστημα έχει τερματισει τη λειτουργία του.
 The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Η εφαρμογή \"%appName%\" μπορεί να αποκλειστεί σε ένα τυπικό πανελ.
+OK	ShutdownProcess		Εντάξει
+System is shut down	ShutdownProcess		Το σύστημα έχει τερματισει τη λειτουργία του.
+It's now safe to turn off the computer.	ShutdownProcess		Μπορείτε τώρα να κλείσετε με ασφάλεια τον υπολογιστή.
+Cancel	ShutdownProcess		Άκυρο
+Do you really want to shut down the system?	ShutdownProcess		Θέλετε πραγματικά να επανεκκινήσετε το σύστημα;
+Asking other processes to quit.	ShutdownProcess		Αίτηση άλλων διεργασιών για τερματισμό.
+Asking \"%appName%\" to quit.	ShutdownProcess		Αίτηση \"%appName%\" για τερματισμό.
+%action%?	ShutdownProcess		%action%;
+Shutdown aborted	ShutdownProcess		Ο τερματισμός ακυρώθηκε
+Restarting…	ShutdownProcess		Επανεκκίνηση...
+Asking background applications to quit.	ShutdownProcess		Αίτηση εφαρμογών παρασκηνίου για τερματισμό.
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Η εφαρμογή \"%appName%\" ακύρωσε τη διαδικασία τερματισμού.
 Tidying things up a bit.	ShutdownProcess		Γίνεται ένα γρήγορο συμμάζεμα.
+Do you really want to restart the system?	ShutdownProcess		Θέλετε σίγουρα να επανακκινήσετε το σύστημα;
+Shutdown status	ShutdownProcess		Κατάσταση τερματισμού
+Cancel shutdown	ShutdownProcess		Ακύρωση τερματισμού
+Kill application	ShutdownProcess		Τερματισμός εφαρμογής
+Shut down	ShutdownProcess		Τερματισμός
+Restart	ShutdownProcess		Επανεκκίνηση
+Shutting down…	ShutdownProcess		Τερματισμός...

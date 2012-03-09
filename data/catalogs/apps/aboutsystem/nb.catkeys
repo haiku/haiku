@@ -1,83 +1,80 @@
-1	norwegian_bokmål	x-vnd.Haiku-About	282658629
-%.2f GHz	AboutView		%.2f GHz
-%d MiB total	AboutView		%d MiB totalt
-%d MiB used (%d%%)	AboutView		%d MiB brukt (%d%%)
-%ld MHz	AboutView		%ld MHz
-%ld Processors:	AboutView		%ld prosessorer:
-%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB totalt, %inaccessible MiB utilgjengelig
-... and the many people making donations!\n\n	AboutView		... og til de mange som har bidratt med donasjoner!\n\n
-About this system	AboutWindow		Om dette systemet
-AboutSystem	System name		Om dette systemet
-BSD (2-clause)	AboutView		BSD (2-klausulersversjonen)
-BSD (3-clause)	AboutView		BSD (3-klausulersversjonen)
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-About	2298541253
+Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Opphavsrett © 1999-2010 av forfatterne av Gutenprint. Alle rettigheter reservert.
+Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (og hans NewOS-kjerne)\n
 BSD (4-clause)	AboutView		BSD (4-klausulersversjon)
+%ld Processors:	AboutView		%ld prosessorer:
+Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Opphavsrett © 2000 Jean-Pierre ervbefeL og Remi Lefebvre.
+Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Opphavsrett © 1996-2005 Julian R Seward. Alle rettigheter reservert.
+%d MiB total	AboutView		%d MiB totalt
+Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (prosjektstifter)\n\n
+The Haiku-Ports team\n	AboutView		Haiku-Ports-teamet\n
+Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Opphavsrett © 1998-2003 Daniel Veillard. Alle rettigheter reservert.
+%d MiB used (%d%%)	AboutView		%d MiB brukt (%d%%)
+Website, marketing & documentation:\n	AboutView		Nettside, markedsføring og dokumentasjon:\n
+AboutSystem	System name		Om dette systemet
+MIT (no promotion)	AboutView		MIT (ingen reklame)
+Copyright © 2003 Peter Hanappe and others.	AboutView		Opphavsrett © 2003 Peter Hanappe m.fl.
+Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Opphavsrett © 1994-1997 Mark Kilgard. Alle rettigheter reservert.
+Revision	AboutView		Revisjon
+Copyright © 2002-2005 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Opphavsrett © 2002-2005 Industrial Light & Magic, en avdeling av Lucas Digital Ltd. LLC.
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. og deres utviklerteam for å ha skapt BeOS!\n\n
+Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Opphavsrett © 1999-2000 Y.Takagi. Alle rettigheter reservert.
+Source Code: 	AboutView		Kildekode: 
+Processor:	AboutView		Prosessor:
+Kernel:	AboutView		Kjerne:
+BSD (3-clause)	AboutView		BSD (3-klausulersversjonen)
+Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Opphavsrett © 2001-2002 Thomas Broyer, Charlie Bozeman og Daniel Veillard. Alle rettigheter reservert.
+Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Opphavsrett © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAlle retigheter reservert.
+%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB totalt, %inaccessible MiB utilgjengelig
+Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Opphavsrett © 2000-2007 Fabrice Bellard, m.fl.
+Contributors:\n	AboutView		Bidragsytere:\n
+Unknown	AboutView		Ukjent
+Copyright © 2001-2003 Expat maintainers.	AboutView		Opphavsrett © 2001-2003 Expat-vedlikeholdere.
+Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Opphavsrett © 1999-2006 Brian Paul. Mesa3D Project. Alle rettigheter reservert.
+Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Opphavsrett © 2002-2004 Vivek Mohan. Alle rettigheter reservert.
+... and the many people making donations!\n\n	AboutView		... og til de mange som har bidratt med donasjoner!\n\n
+\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… og trolig flere vi har glemt å nevne (beklager!)\n\n
+%.2f GHz	AboutView		%.2f GHz
+Memory:	AboutView		Minne:
+Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Opphavsrett © 1996-1997 Jeff Prosise. Alle rettigheter reservert.
+Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Opphavsrett © 1994-2009, Thomas G. Lane, Guido Vollbeding. Denne programvaren er delvis basert på arbeidet til the Independent JPEG Group.
+Past maintainers:\n	AboutView		Forhenværende vedlikeholdere:\n
+\n\nSpecial thanks to:\n	AboutView		\n\nEn spesiell takk til:\n
+Licenses: 	AboutView		Lisenser: 
+Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Opphavsrett © 1995-2004 Jean-loup Gailly og Mark Adler.
+Google & their Google Summer of Code program\n	AboutView		Google & deres Google Summer of Code-program\n
+Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Opphavsrett © 2002-2003 Steve Lhomme. Alle rettigheter reservert.
+\nCopyrights\n\n	AboutView		\nOpphavsrettigheter\n\n
+Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Opphavsrett © 2007-2009 Marvell Semiconductor, Inc. Alle rettigheter reservert.
+Current maintainers:\n	AboutView		Nåværende vedlikeholdere:\n
+Copyright © 2006-2007 Intel Corporation. All rights reserved.	AboutView		Opphavsrett © 2006-2007 Intel Corporation. Alle rettigheter reservert.
+Time running:	AboutView		Oppetid:
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Inneholder programvare utviklet av the NetBSD Foundation, Inc. og dets bidragsytere:\nftp, tput\nOpphavsrett © 1996-2008 The NetBSD Foundation, Inc. Alle rettigheter reservert.
 Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Inneholder programvare fra FreeBSD-prosjektet, utgitt under BSD-lisensen:\ncal, ftpd, ping, telnet, telnetd, traceroute\nOpphavsrett © 1994-2008 The FreeBSD Project. Alle rettigheter reservert.
-Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Inneholder programvare fra GNU-prosjektet, utgitt under GPL- og LGPL-lisensene:\GNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nOpphavsrett © The Free Software Foundation.
-Contributors:\n	AboutView		Bidragsytere:\n
-Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Opphavsrett © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAlle retigheter reservert.
-Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Opphavsrett © 1990-2002 Info-ZIP. Alle rettigheter reservert.
-Copyright © 1990-2003 Wada Laboratory, the University of Tokyo.	AboutView		Opphavsrett © 1990-2003 Wada Laboratory, the University of Tokyo.
-Copyright © 1991-2000 Silicon Graphics, Inc. SGI's Software FreeB license. All rights reserved.	AboutView		Opphavsrett © 1991-2000 Silicon Graphics, Inc. SGIs Software FreeB license. Alle rettigheter reservert.
-Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Opphavsrett © 1994-1997 Mark Kilgard. Alle rettigheter reservert.
-Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Opphavsrett © 1994-2008 Xiph.Org. Alle rettigheter reservert.
-Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Opphavsrett © 1994-2009, Thomas G. Lane, Guido Vollbeding. Denne programvaren er delvis basert på arbeidet til the Independent JPEG Group.
-Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Opphavsrett © 1995, 1998-2001 Jef Poskanzer. Alle rettigheter reservert.
-Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Opphavsrett © 1995-2001 Lars Düning. Alle rettigheter reservert.
-Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Opphavsrett © 1995-2004 Jean-loup Gailly og Mark Adler.
-Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Opphavsrett © 1996-1997 Jeff Prosise. Alle rettigheter reservert.
-Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Opphavsrett © 1996-2005 Julian R Seward. Alle rettigheter reservert.
-Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		Opphavsrett © 1997-2006 PDFlib GmbH og Thomas Merz. Alle rettigheter reservert.\nPDFlib og PDFlib-logoen er registrerte varemerker tilhørende of PDFlib GmbH.
-Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Opphavsrett © 1998-2000 Thai Open Source Software Center Ltd og Clark Cooper.
-Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Opphavsrett © 1998-2003 Daniel Veillard. Alle rettigheter reservert.
-Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Opphavsrett © 1999-2000 Y.Takagi. Alle rettigheter reservert.
-Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Opphavsrett © 1999-2006 Brian Paul. Mesa3D Project. Alle rettigheter reservert.
-Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Opphavsrett © 1999-2007 Michael C. Ring. Alle rettigheter reservert.
-Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Opphavsrett © 1999-2010 av forfatterne av Gutenprint. Alle rettigheter reservert.
-Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Opphavsrett © 2000 Jean-Pierre ervbefeL og Remi Lefebvre.
-Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Opphavsrett © 2000-2007 Fabrice Bellard, m.fl.
-Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Opphavsrett © 2001-2002 Thomas Broyer, Charlie Bozeman og Daniel Veillard. Alle rettigheter reservert.
-Copyright © 2001-2003 Expat maintainers.	AboutView		Opphavsrett © 2001-2003 Expat-vedlikeholdere.
-Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Opphavsrett © 2002-2003 Steve Lhomme. Alle rettigheter reservert.
-Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Opphavsrett © 2002-2004 Vivek Mohan. Alle rettigheter reservert.
-Copyright © 2002-2005 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Opphavsrett © 2002-2005 Industrial Light & Magic, en avdeling av Lucas Digital Ltd. LLC.
-Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Opphavsrett © 2002-2006 Maxim Shemanarev (McSeem).
-Copyright © 2002-2008 Alexander L. Roshal. All rights reserved.	AboutView		Opphavsrett © 2002-2008 Alexander L. Roshal. Alle rettigheter reservert.
-Copyright © 2003 Peter Hanappe and others.	AboutView		Opphavsrett © 2003 Peter Hanappe m.fl.
-Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Opphavsrett © 2003-2006 Intel Corporation. Alle rettigheter reservert.
-Copyright © 2004-2005 Intel Corporation. All rights reserved.	AboutView		Opphavsret © 2004-2005 Intel Corporation. Alle rettigheter reservert.
-Copyright © 2006-2007 Intel Corporation. All rights reserved.	AboutView		Opphavsrett © 2006-2007 Intel Corporation. Alle rettigheter reservert.
-Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Opphavsrett © 2007 Ralink Technology Corporation. Alle rettigheter reservert.
-Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Opphavsrett © 2007-2009 Marvell Semiconductor, Inc. Alle rettigheter reservert.
-Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Opphavsrett © 2010-2011 Google Inc. Alle rettigheter reservert.
-Current maintainers:\n	AboutView		Nåværende vedlikeholdere:\n
-GCC %d Hybrid	AboutView		GCC %d Hybrid
-Google & their Google Summer of Code program\n	AboutView		Google & deres Google Summer of Code-program\n
-Kernel:	AboutView		Kjerne:
-License: 	AboutView		Lisens: 
-Licenses: 	AboutView		Lisenser: 
-MIT (no promotion)	AboutView		MIT (ingen reklame)
-MIT license. All rights reserved.	AboutView		MIT-lisens. Alle retigheter reservert.
-Memory:	AboutView		Minne:
-Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (prosjektstifter)\n\n
-Past maintainers:\n	AboutView		Forhenværende vedlikeholdere:\n
-Portions of this software are copyright. Copyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		Deler av denne programvaren er beskyttet av opphavsrettigheter. Opphavsrett © 1996-2006 The FreeType Project. Alle rettigheter reservert.
-Processor:	AboutView		Prosessor:
-Revision	AboutView		Revisjon
-Source Code: 	AboutView		Kildekode: 
-The BeGeistert team\n	AboutView		BeGeistert-teamet\n
-The Haiku-Ports team\n	AboutView		Haiku-Ports-teamet\n
 The Haikuware team and their bounty program\n	AboutView		Haikuware-teamet og deres dusørprogram\n
-The University of Auckland and Christof Lutteroth\n\n	AboutView		University of Auckland og Christof Lutteroth\n\n
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku™ and the HAIKU logo® are (registered) trademarks of Haiku, Inc.\n\n	AboutView		Opphavsretten til Haiku-koden tilhører Haiku, Inc. eller de respektive forfattere der det er uttrykkelig nevnt i kildekoden. Haiku™ og HAIKU-logoen® er (registrerte) varemerker tilhørende Haiku, Inc.\n\n
-Time running:	AboutView		Oppetid:
-Translations:\n	AboutView		Oversettelse:\n
-Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (og hans NewOS-kjerne)\n
-Unknown	AboutView		Ukjent
+Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Opphavsrett © 1995, 1998-2001 Jef Poskanzer. Alle rettigheter reservert.
+Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Opphavsrett © 2010-2011 Google Inc. Alle rettigheter reservert.
+About this system	AboutWindow		Om dette systemet
+BSD (2-clause)	AboutView		BSD (2-klausulersversjonen)
 Version:	AboutView		Versjon:
-Website, marketing & documentation:\n	AboutView		Nettside, markedsføring og dokumentasjon:\n
+Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Opphavsrett © 1994-2008 Xiph.Org. Alle rettigheter reservert.
+Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Opphavsrett © 1998-2000 Thai Open Source Software Center Ltd og Clark Cooper.
+Copyright © 2004-2005 Intel Corporation. All rights reserved.	AboutView		Opphavsret © 2004-2005 Intel Corporation. Alle rettigheter reservert.
+Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Opphavsrett © 2002-2006 Maxim Shemanarev (McSeem).
+Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Opphavsrett © 1999-2007 Michael C. Ring. Alle rettigheter reservert.
+The BeGeistert team\n	AboutView		BeGeistert-teamet\n
+The University of Auckland and Christof Lutteroth\n\n	AboutView		University of Auckland og Christof Lutteroth\n\n
+Copyright © 1990-2003 Wada Laboratory, the University of Tokyo.	AboutView		Opphavsrett © 1990-2003 Wada Laboratory, the University of Tokyo.
+Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Opphavsrett © 1995-2001 Lars Düning. Alle rettigheter reservert.
+Copyright © 2002-2008 Alexander L. Roshal. All rights reserved.	AboutView		Opphavsrett © 2002-2008 Alexander L. Roshal. Alle rettigheter reservert.
+Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Opphavsrett © 2003-2006 Intel Corporation. Alle rettigheter reservert.
+%ld MHz	AboutView		%ld MHz
+Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		Opphavsrett © 1997-2006 PDFlib GmbH og Thomas Merz. Alle rettigheter reservert.\nPDFlib og PDFlib-logoen er registrerte varemerker tilhørende of PDFlib GmbH.
+Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Inneholder programvare fra GNU-prosjektet, utgitt under GPL- og LGPL-lisensene:\GNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nOpphavsrett © The Free Software Foundation.
+MIT license. All rights reserved.	AboutView		MIT-lisens. Alle retigheter reservert.
 [Click a license name to read the respective license.]\n\n	AboutView		[Klikk på et lisensnavn for å lese de respektive lisensvilkårene.]\n\n
-\nCopyrights\n\n	AboutView		\nOpphavsrettigheter\n\n
-\n\nSpecial thanks to:\n	AboutView		\n\nEn spesiell takk til:\n
-\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… og trolig flere vi har glemt å nevne (beklager!)\n\n
+Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Opphavsrett © 2007 Ralink Technology Corporation. Alle rettigheter reservert.
+Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Opphavsrett © 1990-2002 Info-ZIP. Alle rettigheter reservert.
+License: 	AboutView		Lisens: 
+GCC %d Hybrid	AboutView		GCC %d Hybrid
+Translations:\n	AboutView		Oversettelse:\n

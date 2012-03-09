@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-MediaPlayer	138551800
+1	dutch; flemish	x-vnd.Haiku-MediaPlayer	986711925
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikaans)
 Stream settings	MediaPlayer-Main		Stream-instellingen
 <unknown>	PlaylistItem-album		<onbekend>
@@ -134,4 +134,3 @@ Rating	MediaPlayer-Main		Waardering
 Playlist	MediaPlayer-PlaylistWindow		Afspeellijst
 Lock Peaks	MediaPlayer-PeakView		Pieken fixeren
 Low volume	MediaPlayer-SettingsWindow		Laag volume
-File Info	MediaPlayer-InfoWin		Bestandsinfo

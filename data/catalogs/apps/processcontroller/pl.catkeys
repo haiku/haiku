@@ -3,10 +3,10 @@ Memory usage	ProcessController		Użycie pamięci
 Do you really want to kill the team \"%s\"?	ProcessController		Czy na pewno chcesz zakończyć zespół \"%s\"?
 Restart Deskbar	ProcessController		Zrestartuj Deskbar
 Debug thread	ProcessController		Debuguj wątek
-This team is already gone…	ProcessController		Ten zespół nie jest już obecny...
+This team is already gone…	ProcessController		Ten zespół nie jest już obecny…
 Error saving file	ProcessController		Błąd przy zapisywaniu pliku
 Your setting file could not be saved!\n(%s)	ProcessController		Twój plik ustawień nie może być zapisany!\n(%s)
-This thread is already gone…	ProcessController		Ten wątek nie jest już obecny...
+This thread is already gone…	ProcessController		Ten wątek nie jest już obecny…
 Cancel	ProcessController		Anuluj
 Run in window	ProcessController		Uruchom w oknie
 Processor %d	ProcessController		Procesor %d
@@ -15,13 +15,13 @@ ProcessController is already installed in Deskbar.	ProcessController		ProcessCon
 This is the last active processor...\nYou can't turn it off!	ProcessController		To jest ostatni aktywny procesor...\nNie możesz go wyłączyć!
 Quit application	ProcessController		Zakończ aplikację
 What do you want to do with the thread \"%s\"?	ProcessController		Co chcesz zrobić z wątkiem \"%s\"?
-Gone teams…	ProcessController		Brakujące zespoły...
+Gone teams…	ProcessController		Brakujące zespoły…
 Restart Tracker	ProcessController		Zrestartuj Trackera
 Live in the Deskbar	ProcessController		Na bieżąco w Deskbarze
 Kill this thread!	ProcessController		Zakończ ten wątek!
 Debug this thread!	ProcessController		Debuguj ten wątek!
 New Terminal	ProcessController		Nowy terminal
-About ProcessController…	ProcessController		O ProcessController...
+About ProcessController…	ProcessController		O ProcessController…
 Ok!	ProcessController		Ok!
 Quit an application	ProcessController		Wyjdź z aplikacji
 Install in Deskbar	ProcessController		Zainstaluj w Deskbarze
@@ -30,6 +30,6 @@ OK	ProcessController		OK
 Damned!	ProcessController		Cholera!
 Usage: %s [-deskbar]\n	ProcessController		Użycie: %s [-deskbar]\n
 Yes, kill this team!	ProcessController		Tak, zakończ ten zespół!
-System resources & caches…	ProcessController		Zasoby i bufory systemu...
+System resources & caches…	ProcessController		Zasoby i bufory systemu…
 That's no Fun!	ProcessController		To nie zabawa!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Możesz uruchomić ProcessController w oknie lub zainstalować go w Deskbarze.

@@ -8,7 +8,7 @@ Changes will take effect on restart!	SettingsWindow		Les changements seront pris
 Defaults	SettingsWindow		Par défaut
 KB	SettingsWindow		Ko
 Use volume:	SettingsWindow		Utiliser le volume :
-Insufficient space for a swap file.	SettingsWindow		Il n'y a as assez d'espace pour un fichier d'échange
+Insufficient space for a swap file.	SettingsWindow		Il n'y a as assez d'espace pour un fichier d'échange.
 Keep enabled	SettingsWindow		Laisser actif
 Revert	SettingsWindow		Défaire
 VirtualMemory	System name		Mémoire Virtuelle

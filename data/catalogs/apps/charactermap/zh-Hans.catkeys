@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-CharacterMap	1545664922
+1	english	x-vnd.Haiku-CharacterMap	2745781253
 Enclosed alphanumerics	UnicodeBlocks		封装字母数字
 Basic Latin	UnicodeBlocks		基本拉丁语
 View	CharacterWindow		视图
@@ -40,6 +40,7 @@ Tagbanwa	UnicodeBlocks		塔巴洼语
 Kanbun	UnicodeBlocks		汉文
 Syriac	UnicodeBlocks		叙利亚文
 CJK compatibility ideographs Supplement	UnicodeBlocks		CJK 兼容象形文字扩展
+Musical symbols	UnicodeBlocks		音乐符号
 Hangul syllables	UnicodeBlocks		朝鲜文音节
 Coptic	UnicodeBlocks		科普特语
 Tai Le	UnicodeBlocks		Tai Le

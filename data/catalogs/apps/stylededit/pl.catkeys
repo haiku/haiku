@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-StyledEdit	2399393207
+1	polish	x-vnd.Haiku-StyledEdit	3620825125
 Paste	Menus		Wklej
 OK	LoadAlert		OK
 File	Menus		Plik
@@ -10,8 +10,8 @@ Revert to the last version of \"%s\"? 	RevertToSavedAlert		Przywrócić ostatni�
 Search backwards	FindandReplaceWindow		Szukaj wstecz
 Size	Menus		Rozmiar
 Save	QuitAlert		Zapisz
-Page setup…	Menus		Ustawienia strony...
-Print…	Menus		Drukuj...
+Page setup…	Menus		Ustawienia strony…
+Print…	Menus		Drukuj…
 Can't undo	Menus		Nie można cofnąć
 Save	Menus		Zapisz
 Replace with:	FindandReplaceWindow		Zamień na:
@@ -31,8 +31,9 @@ Save changes to the document \"%s\"? 	QuitAlert		Zapisać zmiany w dokumencie \"
 Edit	Menus		Edytuj
 Font	Menus		Czcionka
 Replace all	FindandReplaceWindow		Zamień wszystkie
-Statistics…	Menus		Statystyki...
+Statistics…	Menus		Statystyki…
 Default	Open_and_SaveAsPanel		Domyślne
+Replace next	Menus		Zamień następne
 Cancel	FindandReplaceWindow		Anuluj
 Close	Menus		Zamknij
 Save	SaveAlert		Zapisz
@@ -43,7 +44,7 @@ Don't save	QuitAlert		Nie zapisuj
 Align	Menus		Wyrównaj
 Color	Menus		Kolor
 Red	Menus		Czerwony
-Open…	Menus		Otwórz...
+Open…	Menus		Otwórz…
 Center	Menus		Wyśrodkuj
 Blue	Menus		Niebieski
 Cyan	Menus		Cyjan
@@ -67,12 +68,12 @@ Error loading \"%s\":\n\t%s	LoadAlert		Błąd podczas ładowania \"%s\":\n\t%s
 Undo typing	QuitAlert		Cofnij pisanie
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Ten plik jest oznaczony jako tylko do odczytu. Zapisać zmiany w dokumencie \"%s\"? 
 Black	Menus		Czarny
-Untitled 	StyledEditWindow		Bez tytułu
+Untitled 	StyledEditWindow		Bez tytułu 
 OK	SaveAlert		OK
 Find	FindandReplaceWindow		Znajdź
 Encoding	Open_and_SaveAsPanel		Kodowanie
 Characters:	Statistics		Znaków:
-Save as…	Menus		Zapisz jako...
+Save as…	Menus		Zapisz jako…
 Redo typing	QuitAlert		Powtórz pisanie
 Replace…	Menus		Zastąp…
 Right	Menus		Prawo

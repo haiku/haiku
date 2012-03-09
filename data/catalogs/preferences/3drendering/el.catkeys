@@ -1,27 +1,25 @@
-1	modern_greek	x-vnd.Haiku-3DRendering	209187778
-Attributes stack size:	Capabilities		Μέγεθος στοίβας ιδιοτήτων:
-Auxiliary buffer(s):	Capabilities		Βοηθητική ενδιάμεση μνήμη(-ες):
-Available	Extensions		Διαθέσιμο
-Capabilities	Capabilities		Δυνατότητες
-Extensions	Extensions		Επεκτάσεις
-GLU version:	InfoView		Έκδοση GLU:
-GLUT API version:	InfoView		Έκδοση GLUT API:
-Information	InfoView		Πληροφορία
+1	greek, modern (1453-)	x-vnd.Haiku-3DRendering	1539891217
 List stack size:	Capabilities		Μέγεθος στοίβας
-Max. 2D texture size:	Capabilities		Μέγιστος αριθμός υφών 2D:
-Max. 3D texture size:	Capabilities		Μέγιστος αριθμός υφών 3D:
+Information	InfoView		Πληροφορία
 Max. clipping planes:	Capabilities		Μέγιστος αριθμός αξόνων:
-Max. convolution:	Capabilities		Μέγιστη περιέλιξη:
-Max. evaluators equation order:	Capabilities		Μέγιστη σειρά εξίσωσης αξιολογητών
-Max. lights:	Capabilities		Μέγιστος φωτισμός:
-Max. recommended index elements:	Capabilities		Μέγιστος αριθμός προτεινόμενων στοιχείων ευρετηρίου:
-Max. recommended vertex elements:	Capabilities		Μέγιστος αριθμός προτεινόμενων στοιχείων vertex:
 Max. texture units:	Capabilities		Μέγιστος αριθμός υφών:
-Model stack size:	Capabilities		Μέγεθος στοίβας μοντέλου:
-Name stack size:	Capabilities		Μέγεθος στοίβας ονόματος:
-3D Rendering	System name		3D Rendering
-GL version:	InfoView		Έκδοση GL:
-Projection stack size:	Capabilities		Μέγεθος στοίβας προβολής:
 Renderer name:	InfoView		Όνομα αποτυπωτή:
-Texture stack size:	Capabilities		Μέγεθος στοίβας υφών:
 Vendor name:	InfoView		Όνομα κατασκευαστή:
+Attributes stack size:	Capabilities		Μέγεθος στοίβας ιδιοτήτων:
+Name stack size:	Capabilities		Μέγεθος στοίβας ονόματος:
+Auxiliary buffer(s):	Capabilities		Βοηθητική ενδιάμεση μνήμη(-ες):
+Max. recommended vertex elements:	Capabilities		Μέγιστος αριθμός προτεινόμενων στοιχείων vertex:
+GLU version:	InfoView		Έκδοση GLU:
+Model stack size:	Capabilities		Μέγεθος στοίβας μοντέλου:
+Projection stack size:	Capabilities		Μέγεθος στοίβας προβολής:
+Max. lights:	Capabilities		Μέγιστος φωτισμός:
+Max. 2D texture size:	Capabilities		Μέγιστος αριθμός υφών 2D:
+Max. convolution:	Capabilities		Μέγιστη περιέλιξη:
+GLUT API version:	InfoView		Έκδοση GLUT API:
+Texture stack size:	Capabilities		Μέγεθος στοίβας υφών:
+Max. evaluators equation order:	Capabilities		Μέγιστη σειρά εξίσωσης αξιολογητών
+Max. 3D texture size:	Capabilities		Μέγιστος αριθμός υφών 3D:
+Capabilities	Capabilities		Δυνατότητες
+Max. recommended index elements:	Capabilities		Μέγιστος αριθμός προτεινόμενων στοιχείων ευρετηρίου:
+Available	Extensions		Διαθέσιμο
+Extensions	Extensions		Επεκτάσεις

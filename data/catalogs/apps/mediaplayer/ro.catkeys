@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-MediaPlayer	138551800
+1	romanian	x-vnd.Haiku-MediaPlayer	986711925
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (American)
 Stream settings	MediaPlayer-Main		Configurări flux
 <unknown>	PlaylistItem-album		<necunoscut>
@@ -134,4 +134,3 @@ Rating	MediaPlayer-Main		Apreciere
 Playlist	MediaPlayer-PlaylistWindow		Listă de redare
 Lock Peaks	MediaPlayer-PeakView		Blochează vârfuri
 Low volume	MediaPlayer-SettingsWindow		Volum redus
-File Info	MediaPlayer-InfoWin		Informații fișier

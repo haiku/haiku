@@ -1,78 +1,80 @@
-1	norwegian_bokmål	x-vnd.Haiku-StyledEdit	2066345342
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-StyledEdit	1508367857
+StyledEdit	System name		StyledEdit
+Paste	Menus		Lim inn
+OK	LoadAlert		OK
+File	Menus		Fil
 ???	LoadAlert		???
-Align	Menus		Juster
-Black	Menus		Svart
-Blue	Menus		Blå
-Bold	Menus		Fet
+Lines:	Statistics		Linjer:
+Italic	Menus		Kursiv
+Left	Menus		Venstre
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Tilbakestill til siste versjon av \"%s\"?
+Search backwards	FindandReplaceWindow		Søk bakover
+Size	Menus		Størrelse
+Save	QuitAlert		Lagre
+Page setup…	Menus		Sideoppsett...
+Print…	Menus		Skriv ut...
 Can't undo	Menus		Kan ikke angre
-Cancel	FindandReplaceWindow		Avbryt
-Cancel	QuitAlert		Avbryt
-Cancel	RevertToSavedAlert		Avbryt
+Save	Menus		Lagre
+Replace with:	FindandReplaceWindow		Erstatt med:
 Cancel	SaveAlert		Avbryt
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan ikke tilbakestille, filen \"%s\" ble ikke funnet.
 Case-sensitive	FindandReplaceWindow		Skiller mellom store og små bokstaver
-Center	Menus		Sentrer
-Characters:	Statistics		Bokstaver:
-Close	Menus		Lukk
-Color	Menus		Farge
-Copy	Menus		Kopier
-Cut	Menus		Klipp ut
-Cyan	Menus		Cyan
-Default	Open_and_SaveAsPanel		Standard
-Document	Menus		Dokument
-Document statistics	Statistics		Dokumentstatistikk
-Don't save	QuitAlert		Ikke lagre
-Don't save	SaveAlert		Ikke lagre
-Edit	Menus		Rediger
-Encoding	Open_and_SaveAsPanel		Koding
-Error loading \"%s\":\n\t%s	LoadAlert		Feil ved lasting av \"%s\":\n\t%s
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Feil ved lasting av \"%s\":\ntFormatet støttes ikke
-Error saving \"%s\":\n%s	SaveAlert		Feil ved lagring av \"%s\":\n%s
-File	Menus		Fil
-Find	FindandReplaceWindow		Finn
-Find again	Menus		Finn igjen
-Find selection	Menus		Finn valgt tekst
-Find:	FindandReplaceWindow		Finn:
-Find…	Menus		Finn…
-Font	Menus		Font
 Green	Menus		Grønn
-Italic	Menus		Kursiv
-Left	Menus		Venstre
-Lines:	Statistics		Linjer:
+Revert to saved…	Menus		Tilbakestill til lagret...
+Yellow	Menus		Gul
+Replace in all windows	FindandReplaceWindow		Erstatt i alle vinduer
+Wrap lines	Menus		Bryt tekst
+Quit	Menus		Avslutt
+Document statistics	Statistics		Dokumentstatistikk
+Cancel	RevertToSavedAlert		Avbryt
+Document	Menus		Dokument
+Save changes to the document \"%s\"? 	QuitAlert		Lagre endringer i dokumentet \"%s\"?
+Edit	Menus		Rediger
+Font	Menus		Font
+Replace all	FindandReplaceWindow		Erstatt alle
+Statistics…	Menus		Statistikk...
+Default	Open_and_SaveAsPanel		Standard
+Replace next	Menus		Erstatt neste
+Cancel	FindandReplaceWindow		Avbryt
+Close	Menus		Lukk
+Save	SaveAlert		Lagre
+Words:	Statistics		Ord:
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Feil ved lasting av \"%s\":\ntFormatet støttes ikke
+OK	RevertToSavedAlert		OK
+Don't save	QuitAlert		Ikke lagre
+Align	Menus		Juster
+Color	Menus		Farge
+Red	Menus		Rød
+Open…	Menus		Åpne...
+Center	Menus		Sentrer
+Blue	Menus		Blå
+Cyan	Menus		Cyan
+OK	Statistics		OK
 Magenta	Menus		Magenta
 New	Menus		Ny
-OK	LoadAlert		OK
-OK	RevertToSavedAlert		OK
-OK	SaveAlert		OK
-OK	Statistics		OK
-Open…	Menus		Åpne...
-Page setup…	Menus		Sideoppsett...
-Paste	Menus		Lim inn
-Print…	Menus		Skriv ut...
-Quit	Menus		Avslutt
-Red	Menus		Rød
-Redo typing	QuitAlert		Tilbakestill skriving
+Wrap-around search	FindandReplaceWindow		Wrap-around søk
+Bold	Menus		Fet
+Find selection	Menus		Finn valgt tekst
+Find:	FindandReplaceWindow		Finn:
+Error saving \"%s\":\n%s	SaveAlert		Feil ved lagring av \"%s\":\n%s
+Copy	Menus		Kopier
+Cut	Menus		Klipp ut
 Replace	FindandReplaceWindow		Erstatt
-Replace all	FindandReplaceWindow		Erstatt alle
-Replace in all windows	FindandReplaceWindow		Erstatt i alle vinduer
-Replace with:	FindandReplaceWindow		Erstatt med:
-Replace…	Menus		Erstatt...
-Revert to saved…	Menus		Tilbakestill til lagret...
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Tilbakestill til siste versjon av \"%s\"?
-Right	Menus		Høyre
-Save	Menus		Lagre
-Save	QuitAlert		Lagre
-Save	SaveAlert		Lagre
-Save as…	Menus		Lagre som...
-Save changes to the document \"%s\"? 	QuitAlert		Lagre endringer i dokumentet \"%s\"?
-Search backwards	FindandReplaceWindow		Søk bakover
+Find again	Menus		Finn igjen
+Cancel	QuitAlert		Avbryt
+Find…	Menus		Finn…
 Select all	Menus		Merk alle
-Size	Menus		Størrelse
-Statistics…	Menus		Statistikk...
-StyledEdit	System name		StyledEdit
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Filen er merket som skrivebeskyttet. Lagre endringer i dokumentet \"%s\"?
+Don't save	SaveAlert		Ikke lagre
+Error loading \"%s\":\n\t%s	LoadAlert		Feil ved lasting av \"%s\":\n\t%s
 Undo typing	QuitAlert		Angre skriving
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Filen er merket som skrivebeskyttet. Lagre endringer i dokumentet \"%s\"?
+Black	Menus		Svart
 Untitled 	StyledEditWindow		Uten navn
-Words:	Statistics		Ord:
-Wrap lines	Menus		Bryt tekst
-Yellow	Menus		Gul
+OK	SaveAlert		OK
+Find	FindandReplaceWindow		Finn
+Encoding	Open_and_SaveAsPanel		Koding
+Characters:	Statistics		Bokstaver:
+Save as…	Menus		Lagre som...
+Redo typing	QuitAlert		Tilbakestill skriving
+Replace…	Menus		Erstatt...
+Right	Menus		Høyre

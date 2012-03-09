@@ -5,7 +5,7 @@ Netmask:	EthernetSettingsView		Masque réseau :
 DHCP	EthernetSettingsView		DHCP
 DNS #2:	EthernetSettingsView		DNS n°2 :
 Apply	EthernetSettingsView		Appliquer
-OK	EthernetSettingsView		Ok
+OK	EthernetSettingsView		OK
 DNS #1:	EthernetSettingsView		DNS n°1 :
 IP address:	EthernetSettingsView		Adresse IP :
 Adapter:	EthernetSettingsView		Adaptateur :
@@ -17,5 +17,5 @@ Mode:	EthernetSettingsView		Mode :
 Network:	EthernetSettingsView		Réseau :
 The net_server needs to run for the auto configuration!	EthernetSettingsView		Le net_server doit être lancé pour la configuration automatique !
 Disabled	EthernetSettingsView		Désactivé
-Auto-configuring failed: 	EthernetSettingsView		Échec de la configuration automatique :
-Static	EthernetSettingsView		Static
+Auto-configuring failed: 	EthernetSettingsView		Échec de la configuration automatique : 
+Static	EthernetSettingsView		Statique

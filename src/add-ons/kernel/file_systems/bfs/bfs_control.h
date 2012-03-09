@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2001-2012, Axel Dörfler, axeld@pinc-software.de
  * This file may be used under the terms of the MIT License.
  */
 #ifndef BFS_CONTROL_H
@@ -78,6 +78,7 @@ struct check_control {
 	 * Also requires the B_FIX_BITMAP_ERRORS to be set.
 	 */
 #define BFS_FIX_NAME_MISMATCHES	8
+#define BFS_FIX_BPLUSTREES		16
 
 /* values for the errors field */
 #define BFS_MISSING_BLOCKS		1
@@ -86,6 +87,7 @@ struct check_control {
 #define	BFS_COULD_NOT_OPEN		8
 #define BFS_WRONG_TYPE			16
 #define BFS_NAMES_DONT_MATCH	32
+#define BFS_INVALID_BPLUSTREE	64
 
 /* check control magic value */
 #define BFS_IOCTL_CHECK_MAGIC	'BChk'

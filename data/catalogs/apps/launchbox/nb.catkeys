@@ -1,24 +1,24 @@
-1	norwegian_bokmål	x-vnd.Haiku-LaunchBox	800355931
-Add button here	LaunchBox		Legg til knapp her
-Auto-raise	LaunchBox		Automatisk heving
-Bummer	LaunchBox		Synd
-Cancel	LaunchBox		Avbryt
-Clone	LaunchBox		Klon
-Close	LaunchBox		Lukk
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Fei ved sending av 'open folder'-kommando til Tracker.\n\nFeil:
-Horizontal layout	LaunchBox		Horisontal utforming
-Icon size	LaunchBox		Ikonstørrelse
-Ignore double-click	LaunchBox		Ignorer dobbelklikk
-Name Panel	LaunchBox		Navnepanel
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-LaunchBox	800355931
 New	LaunchBox		Ny
-OK	LaunchBox		OK
-Quit	LaunchBox		Avslutt
-Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Vil du virkelig lukke denne padden?\n
-Remove button	LaunchBox		Fjern knapp
 Set description…	LaunchBox		Sett beskrivelse
-Settings	LaunchBox		Innstillinger
+Vertical layout	LaunchBox		Vertikal utforming
+OK	LaunchBox		OK
+last chance	LaunchBox		siste sjanse
+Quit	LaunchBox		Avslutt
+Ignore double-click	LaunchBox		Ignorer dobbelklikk
+Auto-raise	LaunchBox		Automatisk heving
 Show on all workspaces	LaunchBox		Vis på alle arbeidsområder
 Show window border	LaunchBox		Vis vinduskant
-Vertical layout	LaunchBox		Vertikal utforming
+Icon size	LaunchBox		Ikonstørrelse
+Bummer	LaunchBox		Synd
+Cancel	LaunchBox		Avbryt
+Remove button	LaunchBox		Fjern knapp
+Horizontal layout	LaunchBox		Horisontal utforming
+Name Panel	LaunchBox		Navnepanel
+Add button here	LaunchBox		Legg til knapp her
+Settings	LaunchBox		Innstillinger
+Close	LaunchBox		Lukk
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Fei ved sending av 'open folder'-kommando til Tracker.\n\nFeil:
 You can drag an icon here.	LaunchBox		Du kan dra et ikon hit.
-last chance	LaunchBox		siste sjanse
+Clone	LaunchBox		Klon
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Vil du virkelig lukke denne padden?\n

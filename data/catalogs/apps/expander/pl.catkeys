@@ -1,9 +1,10 @@
-1	polish	x-vnd.Haiku-Expander	2874834143
+1	polish	x-vnd.Haiku-Expander	1780652736
 Expand	ExpanderMenu		Rozpakuj
 Set destination…	ExpanderMenu		Wybierz miejsce docelowe…
 File expanded	ExpanderWindow		Plik rozpakowany
 The destination is read only.	ExpanderWindow		Nie można zapisywać w miejscu docelowym.
 Expander: Open	ExpanderWindow		Expander: Otwórz
+ is not supported	ExpanderWindow		 nie jest obsługiwany
 Select current	DirectoryFilePanel		Wybierz obecny
 Source	ExpanderWindow		Źródło
 Error when expanding archive	ExpanderWindow		Wystąpił błąd podczas rozpakowywania archiwum
@@ -11,8 +12,12 @@ Hide contents	ExpanderWindow		Ukryj zawartość
 Cancel	ExpanderWindow		Anuluj
 Continue	ExpanderWindow		Kontynuuj
 The destination folder does not exist.	ExpanderWindow		Folder docelowy nie istnieje.
+Cancel	ExpanderPreferences		Anuluj
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Czy na pewno chcesz przerwać rozpakowywanie?\nRozpakowane dane będą najprawdopodobniej niekompletne.
 Select	DirectoryFilePanel		Wybierz
 Settings	ExpanderMenu		Ustawienia
 Settings…	ExpanderMenu		Ustawienia…
 Expander: Choose destination	DirectoryFilePanel		Expander: Wybierz folder docelowy
+Select	ExpanderPreferences		Wybierz
+Expander	System name		Expander
+Expand	ExpanderWindow		Rozpakuj

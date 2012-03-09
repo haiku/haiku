@@ -32,7 +32,7 @@ Audio/Video	DeviceClass		Urządzenie audio/wideo
 Glasses	DeviceClass		Okulary cyfrowe
 Keyboard	DeviceClass		Klawiatura
 Camera	DeviceClass		Aparat
-Major class: 	DeviceClass		Klasa główna:
+Major class: 	DeviceClass		Klasa główna: 
 50-67% utilized	DeviceClass		50-67% wykorzystane
 Card reader	DeviceClass		Czytnik kart
 Set-top box	DeviceClass		Dekoder STB
@@ -43,7 +43,7 @@ SIM card reader	DeviceClass		Czytnik kart SIM
 Headphones	DeviceClass		Słuchawki
 Information	DeviceClass		Informacja
 Remote control	DeviceClass		Pilot
-Service classes: 	DeviceClass		Klasy usługi:
+Service classes: 	DeviceClass		Klasy usługi: 
 Pager	DeviceClass	A small radio device to receive short text messages	Pager
 Object transfer	DeviceClass		Urządzenie transferujące
 Gaming/Toy	DeviceClass		Zabawka
@@ -55,7 +55,7 @@ Loudspeaker	DeviceClass		Głośniki
 Joystick	DeviceClass		Joystick
 LAN access	DeviceClass		Urządzenie dostępowe LAN
 Wrist watch	DeviceClass		Zegarek na rękę
-Minor class: 	DeviceClass		Klasa drugorzędna:
+Minor class: 	DeviceClass		Klasa drugorzędna: 
 Networking	DeviceClass		Urządzenie sieciowe
 Portable audio	DeviceClass		Przenośne urządzenie audio
 Device conforms to the headset profile	DeviceClass		Urządzenie dopasowuje się do profilu słuchawek headset

@@ -228,12 +228,13 @@ connector_read_mode_lvds(uint32 connectorIndex, display_mode* mode)
 
 		// Assume 32-bit color
 		mode->space = B_RGB32_LITTLE;
-		
-		TRACE("%s: %" B_PRIu32 " %" B_PRIu16 " %" B_PRIu16 " %" B_PRIu16 " %" B_PRIu16
-			" %" B_PRIu16 " %" B_PRIu16 " %" B_PRIu16 " %" B_PRIu16 "\n",
-			__func__, timing.pixel_clock, timing.h_display, timing.h_sync_start,
-			timing.h_sync_end, timing.h_total, timing.v_display, timing.v_sync_start,
-			timing.v_sync_end, timing.v_total);
+
+		TRACE("%s: %" B_PRIu32 " %" B_PRIu16 " %" B_PRIu16 " %" B_PRIu16
+			" %" B_PRIu16  " %" B_PRIu16 " %" B_PRIu16 " %" B_PRIu16
+			" %" B_PRIu16 "\n", __func__, timing.pixel_clock, timing.h_display,
+			timing.h_sync_start, timing.h_sync_end, timing.h_total,
+			timing.v_display, timing.v_sync_start, timing.v_sync_end,
+			timing.v_total);
 
 		return true;
 	}
@@ -747,7 +748,9 @@ debug_connectors()
 			uint32 connectorType = gConnector[id]->type;
 			uint32 encoderType = gConnector[id]->encoder.type;
 			uint16 encoderID = gConnector[id]->encoder.objectID;
+			uint32 encoderFlags = gConnector[id]->encoder.flags;
 			uint16 gpioID = gConnector[id]->gpioID;
+
 			ERROR("Connector #%" B_PRIu32 ")\n", id);
 			ERROR(" + connector:      %s\n", get_connector_name(connectorType));
 			ERROR(" + gpio table id:  %" B_PRIu16 "\n", gpioID);
@@ -782,6 +785,59 @@ debug_connectors()
 			}
 			if (attribute == false)
 				ERROR("     * no extra attributes\n");
+
+			bool flags = false;
+			ERROR("   - flags:\n");
+			if ((encoderFlags & ATOM_DEVICE_CRT1_SUPPORT) != 0) {
+				ERROR("     * device CRT1 support\n");
+				flags = true;
+			}
+			if ((encoderFlags & ATOM_DEVICE_CRT2_SUPPORT) != 0) {
+				ERROR("     * device CRT2 support\n");
+				flags = true;
+			}
+			if ((encoderFlags & ATOM_DEVICE_LCD1_SUPPORT) != 0) {
+				ERROR("     * device LCD1 support\n");
+				flags = true;
+			}
+			if ((encoderFlags & ATOM_DEVICE_LCD2_SUPPORT) != 0) {
+				ERROR("     * device LCD2 support\n");
+				flags = true;
+			}
+			if ((encoderFlags & ATOM_DEVICE_TV1_SUPPORT) != 0) {
+				ERROR("     * device TV1 support\n");
+				flags = true;
+			}
+			if ((encoderFlags & ATOM_DEVICE_CV_SUPPORT) != 0) {
+				ERROR("     * device CV support\n");
+				flags = true;
+			}
+			if ((encoderFlags & ATOM_DEVICE_DFP1_SUPPORT) != 0) {
+				ERROR("     * device DFP1 support\n");
+				flags = true;
+			}
+			if ((encoderFlags & ATOM_DEVICE_DFP2_SUPPORT) != 0) {
+				ERROR("     * device DFP2 support\n");
+				flags = true;
+			}
+			if ((encoderFlags & ATOM_DEVICE_DFP3_SUPPORT) != 0) {
+				ERROR("     * device DFP3 support\n");
+				flags = true;
+			}
+			if ((encoderFlags & ATOM_DEVICE_DFP4_SUPPORT) != 0) {
+				ERROR("     * device DFP4 support\n");
+				flags = true;
+			}
+			if ((encoderFlags & ATOM_DEVICE_DFP5_SUPPORT) != 0) {
+				ERROR("     * device DFP5 support\n");
+				flags = true;
+			}
+			if ((encoderFlags & ATOM_DEVICE_DFP6_SUPPORT) != 0) {
+				ERROR("     * device DFP6 support\n");
+				flags = true;
+			}
+			if (flags == false)
+				ERROR("     * no known flags\n");
 		}
 	}
 	ERROR("==========================================\n");

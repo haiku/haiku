@@ -1,9 +1,9 @@
-1	modern_greek	x-vnd.Haiku-RTFTranslator	526958155
-RTF Settings	main		Ρυθμίσεις RTF 
+1	greek, modern (1453-)	x-vnd.Haiku-RTFTranslator	526958155
+Version %d.%d.%d, %s	ConfigView		Έκδοση %d.%d.%d, %s
 RTF text files	RTFTranslator		Αρχεία κειμένου RTF
 RTF-Translator Settings	ConfigView		Ρυθμίσεις Μεταφραστή-RTF
 Rich Text Format (RTF) files	ConfigView		Αρχεία Εμπλουτισμένου Κειμένου (RTF)
+RTF Settings	main		Ρυθμίσεις RTF 
+RichTextFormat file	RTFTranslator		Αρχείο Εμπλουτισμένοι Κειμένου
 Rich Text Format Translator	RTFTranslator		Μεταφραστής Εμπλουτισμένου Κειμένου
 Rich Text Format translator v%d.%d.%d %s	RTFTranslator		Μεταφραστής Εμπλουτισμένου Κειμένου v%d.%d.%d %s
-RichTextFormat file	RTFTranslator		Αρχείο Εμπλουτισμένοι Κειμένου
-Version %d.%d.%d, %s	ConfigView		Έκδοση %d.%d.%d, %s

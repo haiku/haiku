@@ -11,7 +11,7 @@ The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to dis
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Le programme est sur le point de restaurer l'enregistrement d'amorçage maître (MBR) de %disk à partir de %file. Voulez-vous continuer ?
 An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Une erreur est survenue lors de l'écriture du menu de démarrage. L'enregistrement d'amorçage maître (MBR) est probablement endommagé, vous devriez le restaurer maintenant !
 Partitions	PartitionsPage	Title	Partitions
-Timeout: %s	DefaultPartitionPage		délai d'expiration : %s
+Timeout: %s	DefaultPartitionPage		Délai d'expiration : %s
 Select	FileSelectionPage	Button	Selectionner
 Cannot access!	DrivesPage	Cannot install	Accès impossible !
 Uninstall boot manager	BootManagerController	Title	Désinstallation du gestionnaire d'amorçage
@@ -44,7 +44,7 @@ Update	DrivesPage	Button	Mettre à jour
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Veuillez indiquer le fichier de sauvegarde du MBR qui va servir à la restauration de celui-ci. C'est normalement le fichier qui a été crée lors de la première installation du gestionnaire de démarrage.
 Old Master Boot Record Saved failure	BootManagerController	Title	Echec lors de l'enregistrement de l'ancien MBR
 Drives	DrivesPage	Title	Disques
-No space available!	DrivesPage	Cannot install	Espace insuffisant
+No space available!	DrivesPage	Cannot install	Espace insuffisant !
 Never	DefaultPartitionPage		Jamais
 Partition table not compatible	BootManagerController	Title	Table des partitions incompatible
 Old Master Boot Record saved	BootManagerController	Title	L'ancien MBR a été sauvegardé
@@ -55,7 +55,7 @@ Backup Master Boot Record	BootManagerController	Title	Sauvegarde du MBR
 Quit	DrivesPage	Button	Quitter
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		vous êtes sur le point d'écrire le menu de démarrage sur le disque. Êtes-vous sûr de vouloir continuer ?
 The old Master Boot Record was successfully saved to %s.	BootManagerController		L'ancien MBR a été correctement sauvegardé dans le fichier %s.
-Default Partition:	DefaultPartitionPage	Menu field label	Partition par défaut
+Default Partition:	DefaultPartitionPage	Menu field label	Partition par défaut :
 Partitions	DefaultPartitionPage	Pop up menu title	Partitions
 BootManager	System name		Gestionnaire d'amorçage
 Summary	BootManagerController	Title	Récapitulatif

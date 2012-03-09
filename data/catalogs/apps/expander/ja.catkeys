@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Expander	3384644886
+1	japanese	x-vnd.Haiku-Expander	1439823135
 Expand	ExpanderMenu		解凍
 Close window when done expanding	ExpanderPreferences		解凍終了後ウィンドウを閉じる
 Set destination…	ExpanderMenu		解凍先を指定…
@@ -19,11 +19,11 @@ The destination folder does not exist.	ExpanderWindow		解凍先フォルダー�
 Cancel	ExpanderPreferences		キャンセル
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		倉庫ファイルの解凍はまだ完了していません。それでも中止しますか？
 Select	DirectoryFilePanel		選択
-Destination folder:	ExpanderPreferences		解凍先フォルダー：
 Same directory as source (archive) file	ExpanderPreferences		元ファイル (アーカイブ) と同じ
 Expanding '%s'	ExpanderWindow		'%s' を解凍中
-Expansion:	ExpanderPreferences		解凍：
 Settings	ExpanderMenu		設定
 Settings…	ExpanderMenu		設定…
 Expander: Choose destination	DirectoryFilePanel		ファイル解凍: 解凍先の選択
 Select	ExpanderPreferences		選択
+OK	ExpanderPreferences		OK
+Expand	ExpanderWindow		解凍

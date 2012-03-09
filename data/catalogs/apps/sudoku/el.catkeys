@@ -1,34 +1,34 @@
-1	modern_greek	x-vnd.Haiku-Sudoku	2463385585
-Abort	ProgressWindow		Ματαίωση
-Advanced	SudokuWindow		Προχωρημένο
-Blank	SudokuWindow		Κενό
-Copy	SudokuWindow		Αντιγραφή
-Could not open \"%s\":\n%s\n	SudokuWindow		Αδυναμία ανοίγματος του \"%s\":\n%s\n
-Could not set Sudoku:\n%s\n	SudokuWindow		Αδυναμία ορισμού του Sudoku:\n%s\n
-Creating solvable field	SudokuGenerator		Δημιουργία επιλύσιμου πεδίου
-Easy	SudokuWindow		Εύκολο
-Export as…	SudokuWindow		Εξαγωγή ως...
-File	SudokuWindow		Αρχείο
-HTML	SudokuWindow		HTML
-Hard	SudokuWindow		Δύσκολο
-Help	SudokuWindow		Βοήθεια
-Mark invalid values	SudokuWindow		Σημείωση λανθασμένων τιμών
-Mark valid hints	SudokuWindow		Σημείωση έγκυρων συμβουλών
-New	SudokuWindow		Νέο
-OK	SudokuWindow		Εντάξει
-Open file…	SudokuWindow		Άνοιγμα αρχείου...
-Progress monitor	ProgressWindow		Ελεγκης προόδου
-Quit	SudokuWindow		Έξοδος
-Redo	SudokuWindow		Επαναφορά
+1	greek, modern (1453-)	x-vnd.Haiku-Sudoku	2463385585
 Restore snapshot	SudokuWindow		Επαναφορά στιγμιότυπου
-Searching for removable values	SudokuGenerator		Αναζήτηση για αφαιρούμενες τιμές
-Snapshot current	SudokuWindow		Τρέχων στιγμιότυπο
-Solve	SudokuWindow		Λύση
-Solve single field	SudokuWindow		Επίλυση απλού πεδίου
-Start again	SudokuWindow		Εκκίνηση ξανά
+Could not set Sudoku:\n%s\n	SudokuWindow		Αδυναμία ορισμού του Sudoku:\n%s\n
+Export as…	SudokuWindow		Εξαγωγή ως...
+OK	SudokuWindow		Εντάξει
+New	SudokuWindow		Νέο
+Abort	ProgressWindow		Ματαίωση
 Sudoku	System name		Sudoku
+Could not open \"%s\":\n%s\n	SudokuWindow		Αδυναμία ανοίγματος του \"%s\":\n%s\n
+Easy	SudokuWindow		Εύκολο
+Open file…	SudokuWindow		Άνοιγμα αρχείου...
+Solve single field	SudokuWindow		Επίλυση απλού πεδίου
+Solve	SudokuWindow		Λύση
+Redo	SudokuWindow		Επαναφορά
+File	SudokuWindow		Αρχείο
+Advanced	SudokuWindow		Προχωρημένο
+Start again	SudokuWindow		Εκκίνηση ξανά
+HTML	SudokuWindow		HTML
 Sudoku request	SudokuWindow		Αίτηση Sudoku
+Copy	SudokuWindow		Αντιγραφή
+Mark valid hints	SudokuWindow		Σημείωση έγκυρων συμβουλών
 Sudoku solved - congratulations!\n	SudokuWindow		Το Sudoku λύθηκε - συγχαρητήρια!\n
+Hard	SudokuWindow		Δύσκολο
+Snapshot current	SudokuWindow		Τρέχων στιγμιότυπο
 Text	SudokuWindow		Κείμενο
-Undo	SudokuWindow		Αναίρεση
+Creating solvable field	SudokuGenerator		Δημιουργία επιλύσιμου πεδίου
 View	SudokuWindow		Προβολή
+Progress monitor	ProgressWindow		Ελεγκης προόδου
+Mark invalid values	SudokuWindow		Σημείωση λανθασμένων τιμών
+Blank	SudokuWindow		Κενό
+Help	SudokuWindow		Βοήθεια
+Searching for removable values	SudokuGenerator		Αναζήτηση για αφαιρούμενες τιμές
+Undo	SudokuWindow		Αναίρεση
+Quit	SudokuWindow		Έξοδος

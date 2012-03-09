@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Expander	1852295567
+1	french	x-vnd.Haiku-Expander	386826896
 Expand	ExpanderMenu		Décompresser
 Close window when done expanding	ExpanderPreferences		Fermer la fenêtre après l'extraction
 Set destination…	ExpanderMenu		Choisir la destination…
@@ -19,10 +19,8 @@ The destination folder does not exist.	ExpanderWindow		Le dossier de destination
 Cancel	ExpanderPreferences		Annuler
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Êtes vous sur de vouloir stopper la décompression cette\narchive? Les fichiers extraits seront peut être incomplets.
 Select	DirectoryFilePanel		Sélectionner
-Destination folder:	ExpanderPreferences		Dossier de destination :
 Same directory as source (archive) file	ExpanderPreferences		Même répertoire que le fichier source archivé
 Expanding '%s'	ExpanderWindow		Décompression de « %s »
-Expansion:	ExpanderPreferences		Décompression :
 Settings	ExpanderMenu		Réglages
 Settings…	ExpanderMenu		Réglages…
 Expander: Choose destination	DirectoryFilePanel		Expander : Choix de la destination
@@ -35,7 +33,6 @@ The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Le dossi
 The file doesn't exist	ExpanderWindow		Le fichier n'existe pas
 Stop	ExpanderMenu		Arrêt
 File	ExpanderMenu		Fichier
-Other:	ExpanderPreferences		Autre :
 Expander	System name		Décompresseur
 Expand	ExpanderWindow		Décompresser
 Close	ExpanderMenu		Fermer

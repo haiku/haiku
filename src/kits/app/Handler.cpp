@@ -222,11 +222,14 @@ BHandler::MessageReceived(BMessage *message)
 			int32 form;
 			const char *prop;
 
-			status_t err = message->GetCurrentSpecifier(&cur, &specifier, &form, &prop);
-			if (err != B_OK)
+			status_t err = message->GetCurrentSpecifier(&cur, &specifier,
+				&form, &prop);
+			if (err != B_OK && err != B_BAD_SCRIPT_SYNTAX)
 				break;
 			bool known = false;
-			if (cur < 0 || (strcmp(prop, "Messenger") == 0)) {
+			// B_BAD_SCRIPT_SYNTAX defaults to the Messenger property
+			if (err == B_BAD_SCRIPT_SYNTAX || cur < 0
+				|| (strcmp(prop, "Messenger") == 0)) {
 				err = reply.AddMessenger("result", this);
 				known = true;
 			} else if (strcmp(prop, "Suites") == 0) {

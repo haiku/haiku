@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-MediaPlayer	138551800
+1	slovak	x-vnd.Haiku-MediaPlayer	986711925
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (americký)
 Stream settings	MediaPlayer-Main		Nastavenia streamu
 <unknown>	PlaylistItem-album		<neznámy>
@@ -134,4 +134,3 @@ Rating	MediaPlayer-Main		Hodnotenie
 Playlist	MediaPlayer-PlaylistWindow		Zoznam stôp
 Lock Peaks	MediaPlayer-PeakView		Zamknúť špičky
 Low volume	MediaPlayer-SettingsWindow		Nízka hlasitosť
-File Info	MediaPlayer-InfoWin		Info o súbore

@@ -15,7 +15,7 @@ Apps	DataSource		Aplikacje
 Show legend	ActivityView		Pokaż legendę
 Settings	ActivityWindow		Ustawienia
 Receiving	DataSource		Otrzymano
-Settings…	ActivityWindow		Ustawienia...
+Settings…	ActivityWindow		Ustawienia…
 Ports	DataSource		Porty
 Page faults	DataSource		Błędy stronicowania
 Sending	DataSource		Wysyłanie

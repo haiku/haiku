@@ -1,24 +1,21 @@
-1	modern_greek	x-vnd.Haiku-JPEGTranslator	965709535
-About	JPEGTranslator		Περί
-Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Τύπος Be Bitmap(ΜεταφραστήςJPEG)	 
-High	JPEGTranslator		Υψηλή
-JPEG Library Error: %s\n	be_jerror		Σφάλμα Βιβλιοθήκης JPEG: %s\n	 
-JPEG Library Warning: %s\n	be_jerror		Προειδοποίηση Βιβλιοθήκης JPEG: %s\n	 
-JPEG images	JPEGTranslator		JPEG εικόνες
-Low	JPEGTranslator		Χαμηλή
-Make file smaller (sligthtly worse quality)	JPEGTranslator		Κάντε το αρχείο μικρότερο (ελαφρά χειρότερη ποιότητα)	
-
-None	JPEGTranslator		Κανένα
+1	greek, modern (1453-)	x-vnd.Haiku-JPEGTranslator	965709535
 Output quality	JPEGTranslator		Ποιότητα εξόδου
-Output smoothing strength	JPEGTranslator		Δύναμη εξόδου εξομάλυνσης
+JPEG images	JPEGTranslator		JPEG εικόνες
 Prevent colors 'washing out'	JPEGTranslator		Αποτρέψτε τα χρώματα από το 'ξεθώριασμα'
-Read	JPEGTranslator		Ανάγνωση
-Read greyscale images as RGB32	JPEGTranslator		Ανάγνωση γκρι εικόνων ως RGB32
-Show warning messages	JPEGTranslator		Εμφάνιση μηνυμάτων προειδοποίησης 
+JPEG Library Error: %s\n	be_jerror		Σφάλμα Βιβλιοθήκης JPEG: %s\n
 Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Χρησιμοποιήστε κώδικα CMYK με 0 για 100% κάλυψη μελανιού
-
-Use progressive compression	JPEGTranslator		Χρήση προοδευτικής συμπίεσης
+About	JPEGTranslator		Περί
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n
+Low	JPEGTranslator		Χαμηλή
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Κάντε το αρχείο μικρότερο (ελαφρά χειρότερη ποιότητα)
+None	JPEGTranslator		Κανένα
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Τύπος Be Bitmap(ΜεταφραστήςJPEG)
+Show warning messages	JPEGTranslator		Εμφάνιση μηνυμάτων προειδοποίησης 
+Output smoothing strength	JPEGTranslator		Δύναμη εξόδου εξομάλυνσης
+High	JPEGTranslator		Υψηλή
 Write	JPEGTranslator		Εγγραφή
 Write black-and-white images as RGB24	JPEGTranslator		Εγγραφή ασπρόμαυρων εικόνων ως RGB24
-©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	
-
+Read greyscale images as RGB32	JPEGTranslator		Ανάγνωση γκρι εικόνων ως RGB32
+Read	JPEGTranslator		Ανάγνωση
+JPEG Library Warning: %s\n	be_jerror		Προειδοποίηση Βιβλιοθήκης JPEG: %s\n
+Use progressive compression	JPEGTranslator		Χρήση προοδευτικής συμπίεσης

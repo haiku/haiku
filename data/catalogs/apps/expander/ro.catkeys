@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Expander	1852295567
+1	romanian	x-vnd.Haiku-Expander	386826896
 Expand	ExpanderMenu		Extinde
 Close window when done expanding	ExpanderPreferences		Închide fereastra atunci când s-a încheiat extinderea
 Set destination…	ExpanderMenu		Setează destinația…
@@ -19,10 +19,8 @@ The destination folder does not exist.	ExpanderWindow		Dosarul destinație nu ex
 Cancel	ExpanderPreferences		Anulează
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Ești sigur că vrei să oprești extinderea\nacestei arhive? Elementele dezarhivate pot fi incomplete.
 Select	DirectoryFilePanel		Selectează
-Destination folder:	ExpanderPreferences		Dosar destinație:
 Same directory as source (archive) file	ExpanderPreferences		Același dosar ca fișierul sursă (arhivă)
 Expanding '%s'	ExpanderWindow		Se extinde „%s”
-Expansion:	ExpanderPreferences		Expansiune:
 Settings	ExpanderMenu		Setări
 Settings…	ExpanderMenu		Setări…
 Expander: Choose destination	DirectoryFilePanel		Extensor: Alege destinația
@@ -35,7 +33,6 @@ The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Dosarul 
 The file doesn't exist	ExpanderWindow		Fișierul nu există
 Stop	ExpanderMenu		Oprește
 File	ExpanderMenu		Fișier
-Other:	ExpanderPreferences		Altele:
 Expander	System name		Extensor
 Expand	ExpanderWindow		Extinde
 Close	ExpanderMenu		Închide

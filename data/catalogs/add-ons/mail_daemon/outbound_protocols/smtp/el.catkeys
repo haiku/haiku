@@ -1,16 +1,16 @@
-1	modern_greek	x-vnd.Haiku-SMTP	2740407895
-. The server said:\n	smtp		Ο εξυπηρετητής αποκρίθηκε:\n
-. The server says:\n	smtp		Ο εξυπηρετητής αποκρίθηκε:\n
-: Connection refused or host not found.	smtp		: Η σύνδεση απορίφθηκε ή δε βρέθηκε διακομιστής.
-Connecting to server…	smtp		Σύνδεση στον εξυπηρετητή...
-Destination:	ConfigView		Προορισμός:
-ESMTP	ConfigView		ESMTP
-Error while logging in to %serv	smtp		Σφάλμα κατα τη σύνδεση στο %serv
-Error while opening connection to %serv	smtp		Σφάλμα κατά το άνοιγμα σύνδεσης στο %serv
-None	ConfigView		Κανένα
-POP3 authentication failed. The server said:\n	smtp		Η πιστοποίηση POP3 απέτυχε. Ο εξυπηρετητής αποκρίθηκε:\n
-POP3 before SMTP	ConfigView		POP3 πρίν από SMTP
+1	greek, modern (1453-)	x-vnd.Haiku-SMTP	2740407895
 SMTP server:	ConfigView		Εξυπηρετητής SMTP:
-SSL	ConfigView		SSL
 STARTTLS	ConfigView		STARTTLS
+Error while logging in to %serv	smtp		Σφάλμα κατα τη σύνδεση στο %serv
 Unencrypted	ConfigView		Μη κρυπτογραφημένο
+. The server says:\n	smtp		Ο εξυπηρετητής αποκρίθηκε:\n
+ESMTP	ConfigView		ESMTP
+Connecting to server…	smtp		Σύνδεση στον εξυπηρετητή...
+Error while opening connection to %serv	smtp		Σφάλμα κατά το άνοιγμα σύνδεσης στο %serv
+POP3 authentication failed. The server said:\n	smtp		Η πιστοποίηση POP3 απέτυχε. Ο εξυπηρετητής αποκρίθηκε:\n
+Destination:	ConfigView		Προορισμός:
+: Connection refused or host not found.	smtp		: Η σύνδεση απορίφθηκε ή δε βρέθηκε διακομιστής.
+None	ConfigView		Κανένα
+POP3 before SMTP	ConfigView		POP3 πρίν από SMTP
+SSL	ConfigView		SSL
+. The server said:\n	smtp		Ο εξυπηρετητής αποκρίθηκε:\n

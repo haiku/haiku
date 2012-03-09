@@ -1,28 +1,28 @@
-1	modern_greek	x-vnd.Haiku-libtextencoding	3062073902
-Chinese Big5	textencodings		Chinese Big5
-Chinese GB18030	textencodings		Chinese GB18030
-DOS Cyrillic	textencodings		DOS Cyrillic
-DOS Latin-US	textencodings		DOS Latin-US
-EUC Korean	textencodings		EUC Korean
-ISO Arabic	textencodings		ISO Arabic
-ISO Baltic	textencodings		ISO Baltic
-ISO Celtic	textencodings		ISO Celtic
-ISO Cyrillic	textencodings		ISO Cyrillic
-ISO East European	textencodings		ISO East European
+1	greek, modern (1453-)	x-vnd.Haiku-libtextencoding	3062073902
 ISO Greek	textencodings		ISO Greek
-ISO Hebrew	textencodings		ISO Hebrew
-ISO Latin 9	textencodings		ISO Latin 9
-ISO Nordic	textencodings		ISO Nordic
-ISO North European	textencodings		ISO North European
 ISO South European	textencodings		ISO South European
-ISO Turkish	textencodings		ISO Turkish
-ISO West European	textencodings		ISO West European
-Japanese EUC	textencodings		Japanese EUC
-Japanese JIS	textencodings		Japanese JIS
+Chinese Big5	textencodings		Chinese Big5
+ISO Hebrew	textencodings		ISO Hebrew
+ISO Arabic	textencodings		ISO Arabic
+ISO Latin 9	textencodings		ISO Latin 9
 Japanese Shift JIS	textencodings		Japanese Shift JIS
-KOI8-R Cyrillic	textencodings		KOI8-R Cyrillic
-Macintosh Roman	textencodings		Macintosh Roman
-Unicode	textencodings		Unicode
-Unicode (UCS-2)	textencodings		Unicode (UCS-2)
+DOS Cyrillic	textencodings		DOS Cyrillic
 Windows Cyrillic (CP 1251)	textencodings		Windows Cyrillic (CP 1251)
+Japanese EUC	textencodings		Japanese EUC
+Unicode	textencodings		Unicode
+Chinese GB18030	textencodings		Chinese GB18030
+ISO North European	textencodings		ISO North European
+ISO Celtic	textencodings		ISO Celtic
+Unicode (UCS-2)	textencodings		Unicode (UCS-2)
 Windows Latin-1 (CP 1252)	textencodings		Windows Latin-1 (CP 1252)
+Macintosh Roman	textencodings		Macintosh Roman
+ISO Turkish	textencodings		ISO Turkish
+Japanese JIS	textencodings		Japanese JIS
+KOI8-R Cyrillic	textencodings		KOI8-R Cyrillic
+ISO Baltic	textencodings		ISO Baltic
+ISO Nordic	textencodings		ISO Nordic
+EUC Korean	textencodings		EUC Korean
+ISO West European	textencodings		ISO West European
+ISO East European	textencodings		ISO East European
+DOS Latin-US	textencodings		DOS Latin-US
+ISO Cyrillic	textencodings		ISO Cyrillic

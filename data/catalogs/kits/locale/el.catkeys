@@ -1,34 +1,34 @@
-1	modern_greek	system	180647795
-%.2f TiB	StringForSize		%.2f TiB
-%3.2f GiB	StringForSize		%3.2f GiB
-%3.2f KiB	StringForSize		%3.2f KiB
-%3.2f MiB	StringForSize		%3.2f MiB
-%d bytes	StringForSize		%d bytes
-<empty>	Menu		<άδειο>
-About %app%	AboutMenuItem		Περί %app%
-About %app…	Dragger		Σχετικά με %app…
-About…	AboutWindow		Περί...
-Blue:	ColorControl		Μπλέ:
-Can't delete this replicant from its original application. Life goes on.	Dragger		Αδύνατη η διαγραφή της ρέπλικας από την αρχική θέση. Η ζωή συνεχίζεται.
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Αδυναμία δημιουργίας αντιγράφου για το \"%description\".\n%σφάλμα
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Αδύνατη η εύρεση της εφαρμογής. Δεν δόθηκε η υπογραφή της %error
+1	greek, modern (1453-)	x-vnd.Haiku-libbe	180647795
 Close	AboutWindow		Κλείσιμο
-Copy	TextView		Αντιγραφή
-Copyright © %years% Haiku, Inc.	AboutWindow		Πνευματικά δικαιώματα © %years% Haiku, Inc.
+%3.2f GiB	StringForSize		%3.2f GiB
+Written by:	AboutWindow		Γράφτηκε από τον:
+About %app%	AboutMenuItem		Περί %app%
 Cut	TextView		Αποκοπή
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Αδυναμία δημιουργίας αντιγράφου για το \"%description\".\n%σφάλμα
+Copy	TextView		Αντιγραφή
+%3.2f KiB	StringForSize		%3.2f KiB
+%d bytes	StringForSize		%d bytes
+About…	AboutWindow		Περί...
 Error	PrintJob		Σφάλμα
-Error	ZombieReplicantView		Σφάλμα
-Green:	ColorControl		Πράσινο:
 No Pages to print!	PrintJob		Δεν υπάρχουν σελίδες για εκτύπωση!
 OK	Dragger		Εντάξει
 OK	PrintJob		Εντάξει
-OK	ZombieReplicantView		Εντάξει
-Paste	TextView		Επικόλληση
-Print Server is not responding.	PrintJob		Ο Εξυπηρετητής εκτυπώσεων δεν ανταποκρίνεται.
-Red:	ColorControl		Κόκκινο:
-Redo	TextView		Ακύρωση αναίρεσης
+Green:	ColorControl		Πράσινο:
 Remove replicant	Dragger		Αφαίρεση αντιγράφου
+OK	ZombieReplicantView		Εντάξει
+Print Server is not responding.	PrintJob		Ο Εξυπηρετητής εκτυπώσεων δεν ανταποκρίνεται.
+Paste	TextView		Επικόλληση
+Copyright © %years% Haiku, Inc.	AboutWindow		Πνευματικά δικαιώματα © %years% Haiku, Inc.
+%.2f TiB	StringForSize		%.2f TiB
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Αδύνατη η εύρεση της εφαρμογής. Δεν δόθηκε η υπογραφή της %error
+Redo	TextView		Ακύρωση αναίρεσης
+<empty>	Menu		<άδειο>
 Select All	TextView		Επιλογή όλων
-Undo	TextView		Αναίρεση
 Warning	Dragger		Προειδοποίηση
-Written by:	AboutWindow		Γράφτηκε από τον:
+Undo	TextView		Αναίρεση
+Red:	ColorControl		Κόκκινο:
+%3.2f MiB	StringForSize		%3.2f MiB
+About %app…	Dragger		Σχετικά με %app…
+Error	ZombieReplicantView		Σφάλμα
+Blue:	ColorControl		Μπλέ:
+Can't delete this replicant from its original application. Life goes on.	Dragger		Αδύνατη η διαγραφή της ρέπλικας από την αρχική θέση. Η ζωή συνεχίζεται.

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-MediaConverter	3564609505
+1	english	x-vnd.Haiku-MediaConverter	296071315
 Video using parameters form settings	MediaConverter		视频参数表使用设置
 Video encoding:	MediaConverter		视频编码：
 No audio	Audio codecs list		无音频
@@ -21,6 +21,7 @@ Low	MediaConverter		低
 Conversion completed	MediaConverter		转换结束
 Audio:	MediaConverter-FileInfo		音频：
 OK	MediaConverter-FileInfo		确定
+ seconds	MediaFileInfo		秒
 Source files	MediaConverter		源文件
 Cancelling	MediaConverter		取消
 %d byte 	MediaFileInfo		%d 字节

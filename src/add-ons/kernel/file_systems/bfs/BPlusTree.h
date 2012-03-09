@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2012, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef B_PLUS_TREE_H
@@ -39,6 +39,7 @@ struct bplustree_header {
 
 	inline bool CheckNode(bplustree_node* node) const;
 	inline bool IsValidLink(off_t link) const;
+	bool IsValid() const;
 } _PACKED;
 
 #define BPLUSTREE_MAGIC 			0x69f6c2e8
@@ -107,9 +108,7 @@ struct bplustree_node {
 	static inline uint32		FragmentIndex(off_t link);
 	static inline uint32		MaxFragments(uint32 nodeSize);
 
-#ifdef DEBUG
 			status_t			CheckIntegrity(uint32 nodeSize) const;
-#endif
 } _PACKED;
 
 //#define BPLUSTREE_NODE 0
@@ -137,6 +136,7 @@ class BPlusTree;
 class TreeIterator;
 class CachedNode;
 class Inode;
+struct TreeCheck;
 
 // needed for searching (utilizing a stack)
 struct node_and_key {
@@ -211,7 +211,11 @@ public:
 			status_t			SetStream(Inode* stream);
 
 			status_t			InitCheck();
-			status_t			Validate();
+
+			size_t				NodeSize() const { return fNodeSize; }
+			Inode*				Stream() const { return fStream; }
+
+			status_t			Validate(bool repair, bool& _errorsFound);
 
 			status_t			Remove(Transaction& transaction,
 									const uint8* key, uint16 keyLength,
@@ -292,9 +296,20 @@ private:
 			void				_AddIterator(TreeIterator* iterator);
 			void				_RemoveIterator(TreeIterator* iterator);
 
+			status_t			_ValidateChildren(TreeCheck& check,
+									uint32 level, off_t offset,
+									const uint8* largestKey, uint16 keyLength,
+									const bplustree_node* parent);
+			status_t			_ValidateChild(TreeCheck& check,
+									CachedNode& cached, uint32 level,
+									off_t offset, off_t lastOffset,
+									off_t nextOffset, const uint8* key,
+									uint16 keyLength);
+
 private:
 			friend class TreeIterator;
 			friend class CachedNode;
+			friend class TreeCheck;
 
 			Inode*				fStream;
 			bplustree_header	fHeader;
@@ -309,8 +324,10 @@ private:
 
 //	#pragma mark - helper classes/functions
 
+
 extern int32 compareKeys(type_code type, const void* key1, int keyLength1,
 	const void* key2, int keyLength2);
+
 
 class TreeIterator : public SinglyLinkedListLinkImpl<TreeIterator> {
 public:

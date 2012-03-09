@@ -1,32 +1,32 @@
-1	norwegian_bokmål	x-vnd.Haiku-libbe	320832488
-%.2f TiB	StringForSize		%.2f TiB
-%3.2f GiB	StringForSize		%3.2f GiB
-%3.2f KiB	StringForSize		%3.2f KiB
-%3.2f MiB	StringForSize		%3.2f MiB
-%d bytes	StringForSize		%d byte
-<empty>	Menu		<tom>
-About %app%	AboutMenuItem		Om %app%
-About %app…	Dragger		Om %app...
-About…	AboutWindow		Om...
-Blue:	ColorControl		Blå:
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Kan ikke opprette replikanten for \"%description\".\n%error
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libbe	320832488
 Close	AboutWindow		Lukk
-Copy	TextView		Kopier
-Copyright © %years% Haiku, Inc.	AboutWindow		Opphavsrett © %years% Haiku, Inc.
+%3.2f GiB	StringForSize		%3.2f GiB
+Written by:	AboutWindow		Skrevet av:
+About %app%	AboutMenuItem		Om %app%
 Cut	TextView		Klipp ut
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Kan ikke opprette replikanten for \"%description\".\n%error
+Copy	TextView		Kopier
+%3.2f KiB	StringForSize		%3.2f KiB
+%d bytes	StringForSize		%d byte
+About…	AboutWindow		Om...
 Error	PrintJob		Feil
-Error	ZombieReplicantView		Feil
-Green:	ColorControl		Grønn:
 No Pages to print!	PrintJob		Ingen sider å skrive ut!
 OK	Dragger		OK
 OK	PrintJob		OK
-OK	ZombieReplicantView		OK
-Paste	TextView		Lim inn
-Print Server is not responding.	PrintJob		Print Server svarer ikke.
-Red:	ColorControl		Rød:
-Redo	TextView		Endre
+Green:	ColorControl		Grønn:
 Remove replicant	Dragger		Fjern replikant
+OK	ZombieReplicantView		OK
+Print Server is not responding.	PrintJob		Print Server svarer ikke.
+Paste	TextView		Lim inn
+Copyright © %years% Haiku, Inc.	AboutWindow		Opphavsrett © %years% Haiku, Inc.
+%.2f TiB	StringForSize		%.2f TiB
+Redo	TextView		Endre
+<empty>	Menu		<tom>
 Select All	TextView		Merk alle
-Undo	TextView		Tilbakestill
 Warning	Dragger		Advarsel
-Written by:	AboutWindow		Skrevet av:
+Undo	TextView		Tilbakestill
+Red:	ColorControl		Rød:
+%3.2f MiB	StringForSize		%3.2f MiB
+About %app…	Dragger		Om %app...
+Error	ZombieReplicantView		Feil
+Blue:	ColorControl		Blå:

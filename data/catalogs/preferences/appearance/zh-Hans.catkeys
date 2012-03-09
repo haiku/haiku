@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Appearance	432716834
+1	english	x-vnd.Haiku-Appearance	168322075
 Control highlight	Colors tab		控件亮度
 Control border	Colors tab		控件边界
 Antialiasing type:	AntialiasingSettingsView		抗锯齿类型:
@@ -12,6 +12,7 @@ Off	AntialiasingSettingsView		关闭
 Choose Decorator	DecorSettingsView		选择装饰
 Success	Colors tab		成功
 Inactive window tab text	Colors tab		激活窗口标签
+About Decorator	DecorSettingsView		关于 Decorator
 Failure	Colors tab		失败
 Hinting menu	AntialiasingSettingsView		提示菜单
 Window Decorator	APRWindow		窗口装饰
@@ -23,6 +24,7 @@ Tooltip background	Colors tab		工具提示背景
 Selected menu item background	Colors tab		选择菜单背景
 Antialiasing	APRWindow		抗锯齿
 Navigation base	Colors tab		快速导航
+Window border	Colors tab		窗口边框
 Window tab text	Colors tab		窗口标签文本
 Document text	Colors tab		文件文本
 Navigation pulse	Colors tab		导航引导
@@ -38,6 +40,7 @@ Reduce colored edges filter strength:	AntialiasingSettingsView		减小彩色边�
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		为了避免可能的版权争端，基于抗锯齿技术的“象形文字亚像素精度”显示在当前编译的 Haiku 中尚不可用。为了使用该特性，你必须自己进行 Haiku 的编译，并且只需在 libfreetype 设置头文件中使用相关的选项即可。
 Control text	Colors tab		控件文本
 Tooltip text	Colors tab		提示文本
+Inactive window border	Colors tab		禁用窗口边框
 Menu item text	Colors tab		菜单项文本
 LCD subpixel	AntialiasingSettingsView		LCD 亚像素精度
 Selected menu item border	Colors tab		选择菜单项边界

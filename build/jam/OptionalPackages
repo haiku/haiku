@@ -405,8 +405,8 @@ if [ IsOptionalHaikuImagePackageAdded Clockwerk ] {
 				: $(baseURL)/Clockwerk-0.0.2-x86-gcc4-2012-02-25.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				Clockwerk-0.0.2-x86-gcc2-2012-02-25.zip
-				: $(baseURL)/Clockwerk-0.0.2-x86-gcc2-2012-02-25.zip ;
+				Clockwerk-0.0.2-x86-gcc2-2012-03-04.zip
+				: $(baseURL)/Clockwerk-0.0.2-x86-gcc2-2012-03-04.zip ;
 		}
 		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/Clockwerk/Clockwerk ;

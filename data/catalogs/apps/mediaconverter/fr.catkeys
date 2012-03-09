@@ -10,7 +10,7 @@ Start [ms]: 	MediaConverter		Début [ms] :
 Output file '%filename' created	MediaConverter		Le fichier cible « %filename » a été créé
 Output format	MediaConverter		Format de sortie
 %.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stéréo / %Ld échantillons
-End   [ms]: 	MediaConverter		Fin [ms] :
+End   [ms]: 	MediaConverter		Fin [ms] : 
 MediaConverter	System name		MédiaConvertisseur
 No video	Video codecs list		Pas de vidéo
 Duration:	MediaConverter-FileInfo		Durée :

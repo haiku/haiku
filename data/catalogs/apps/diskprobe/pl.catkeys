@@ -1,10 +1,10 @@
-1	polish	x-vnd.Haiku-DiskProbe	1379284172
-File offset: 	ProbeView		Offset pliku:
+1	polish	x-vnd.Haiku-DiskProbe	2678989629
+File offset: 	ProbeView		Offset pliku: 
 %ld (native)	ProbeView		%ld (natywny)
 64 bit unsigned value:	TypeEditors		64-bitowa wartość typu unsigned:
 Find again	ProbeView		Wyszukaj ponownie
 Text	FindWindow		Tekstowy
-Find…	ProbeView		Wyszukaj...
+Find…	ProbeView		Wyszukaj…
 Case sensitive	FindWindow		Uwzględnij wielkość liter
 Cancel	OpenWindow		Anuluj
 Close	AttributeWindow		Zamknij
@@ -13,7 +13,7 @@ Attribute	ProbeView		Atrybut
 Floating-point value:	TypeEditors		Wartość typu floating-point:
 16 bit	TypeEditors		16-bitowy
 Attributes	ProbeView		Atrybuty
-Device offset: 	ProbeView		Offset urządzenia:
+Device offset: 	ProbeView		Offset urządzenia: 
 Selection	ProbeView		Zaznaczenie
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	Typ wiadomości: '%.4s'\n\n
 File	FileWindow		Plik
@@ -22,7 +22,7 @@ Boolean	TypeEditors	This is the type of editor	Typ boolowski
 Paste	ProbeView		Wklej
 PNG format	TypeEditors		format PNG
 Font size	ProbeView		Rozmiar czcionki
-Attribute type: 	ProbeView		Typ atrybutu:
+Attribute type: 	ProbeView		Typ atrybutu: 
 Attribute	AttributeWindow		Atrybut
 8 bit signed value:	TypeEditors		8-bitowa wartość typu signed:
 Number:	TypeEditors		Numer:
@@ -32,7 +32,7 @@ Number editor	TypeEditors		Edytor numeryczny
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Heksadecymalna
 No type editor available	AttributeWindow		Brak dostępnego edytora typu atrybutu
 Double precision floating-point value:	TypeEditors		Wartość typu double precision floating-point:
-Device: 	ProbeView		Urządzenie:
+Device: 	ProbeView		Urządzenie: 
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Czy jesteś pewien, że chcesz usunąć atrybut \"%s\" z pliku \"%s\"?\n\nTej operacji nie da się w przyszłości cofnąć.
 Text	TypeEditors	This is the type of editor	Typ tekstowy
 8 bit unsigned value:	TypeEditors		8-bitowa wartość typu unsigned:
@@ -57,17 +57,26 @@ Boolean value:	TypeEditors		Wartość typu boolean:
 8 bit palette	TypeEditors		8-bitowa paleta
 Fit	ProbeView	Size of fonts, fits to available room	Automatyczny
 Probe device	OpenWindow		Przeprowadź analizę
+ (native)	ProbeView		 (natywny)
 Unknown format	TypeEditors		Nieznany format
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Heksadecymalny
 MIME type:	TypeEditors		Typ MIME:
-Page setup…	ProbeView		Ustawienia strony wydruku...
-New…	FileWindow		Nowy...
+Page setup…	ProbeView		Ustawienia strony wydruku…
+New…	FileWindow		Nowy…
 DiskProbe request	AttributeWindow		Zapytanie Analizatora dysków
 Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Nie można odczytać pliku graficznego
 Save changes before closing?	ProbeView		Czy zapisać zmiany przed zakończeniem działania aplikacji?
 DiskProbe request	ProbeView		Zapytanie Analizatora dysków
+Next	ProbeView		Następny
 Close	FileWindow		Zamknij
+Attribute: 	ProbeView		Atrybut: 
+64 bit signed value:	TypeEditors		64-bitowa wartość typu signed:
 OK	ProbeView		OK
+32 bit unsigned value:	TypeEditors		32-bitowa wartość typu unsigned:
 Cancel	AttributeWindow		Anuluj
+Find	FindWindow		Wyszukaj
+15 bit	TypeEditors		15-bitowy
+16 bit unsigned value:	TypeEditors		16-bitowa wartość typu unsigned:
 Cancel	ProbeView		Anuluj
+32 bit signed value:	TypeEditors		32-bitowa wartość typu signed:
 DiskProbe request	DiskProbe		Zapytanie Analizatora dysków

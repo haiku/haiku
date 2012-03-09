@@ -46,7 +46,7 @@ Logging	PoorMan		Journalisation
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Un dossier Web par défaut a été créé à « /boot/home/public_html. »\nVérifiez qu'il existe un fichier HTML nommé « index.html » dans ce dossier.
 Clear log file	PoorMan		Vider le journal
 Log file name:	PoorMan		Nom du fichier de journalisation :
-Directory: 	PoorMan		Répertoire :
+Directory: 	PoorMan		Répertoire : 
 Log To File	PoorMan		Consigner vers le journal
 Done	PoorMan		Fait
 Create log file	PoorMan		Créer un journal

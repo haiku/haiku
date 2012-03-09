@@ -2,7 +2,7 @@
 Enable query support	BFS_Initialize_Parameter		Włącz obsługę zapytań
 2048 (Recommended)	BFS_Initialize_Parameter		2048 (Rekomendowane)
 8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (Większość dużych plików)
-Disabling query support may speed up certain file system operations, but should only be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		Wyłączenie obsługi zapytań może przyspieszyć niektóre operacje na plikach, ale powinno być stosowane tylko jeśli jest absolutnie pewne, że nie będzie potrzeby użycia zapytań. \nKażdy wolumin, który jest przeznaczony do uruchamiania Haiku musi mieć włączoną obsługę zapytań.
+Disabling query support may speed up certain file system operations, but should only be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		Wyłączenie obsługi zapytań może przyspieszyć niektóre operacje na plikach, ale powinno być stosowane tylko jeśli jest absolutnie pewne, że nie będzie potrzeby użycia zapytań.\nKażdy wolumin, który jest przeznaczony do uruchamiania Haiku musi mieć włączoną obsługę zapytań.
 1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (Większość małych plików)
 Blocksize:	BFS_Initialize_Parameter		Rozmiar bloku:
 Name:	BFS_Initialize_Parameter		Nazwa:

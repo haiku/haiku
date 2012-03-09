@@ -1,9 +1,11 @@
-1	english	x-vnd.Haiku-MediaPlayer	138551800
+1	english	x-vnd.Haiku-MediaPlayer	1546758421
+raw audio	MediaPlayer-InfoWin		原生音频
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1（美式）
 Stream settings	MediaPlayer-Main		流设置
 <unknown>	PlaylistItem-album		<未知>
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		无法打开 '%filename' 文件。\n\n
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		全屏模式比例控制
+Video	MediaPlayer-InfoWin		视频
 Subtitle size:	MediaPlayer-SettingsWindow		字幕大小：
 Save Playlist	MediaPlayer-PlaylistWindow		保存播放列表
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		所要播放的文件都不是媒体文件。
@@ -13,6 +15,7 @@ New player…	MediaPlayer-Main		新建播放器...
 Subtitle placement:	MediaPlayer-SettingsWindow		字幕布局：
 Close	MediaPlayer-Main		关闭
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		有些文件无法被移动到垃圾箱。
+<unknown>	MediaPlayer-InfoWin		<未知>
 Open	MediaPlayer-Main		打开
 Next	MediaPlayer-Main		下一个
 OK	MediaPlayer-SettingsWindow		确定
@@ -33,6 +36,7 @@ Drop files to play	MediaPlayer-Main		拖放文件以播放
 TogglePlaying	MediaPlayer-Main		播放切换
 Cancel	MediaPlayer-SettingsWindow		取消
 Loop audio	MediaPlayer-SettingsWindow		音频循环播放
+Container	MediaPlayer-InfoWin		容器
 Nothing to Play	MediaPlayer-Main		无播放内容
 Muted	MediaPlayer-SettingsWindow		静音
 Quit	MediaPlayer-Main		退出
@@ -41,6 +45,7 @@ Start playing.	MediaPlayer-Main		开始播放。
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		没有播放此文件格式的解码器，或者解码器与此版本的格式存在冲突。
 Import Entry	MediaPlayer-ImportPLItemsCmd		导入条目
 Gets the URI of the currently playing item.	MediaPlayer-Main		获取当前播放的项目的URI。
+%d Channels	MediaPlayer-InfoWin		%d 频道
 400% scale	MediaPlayer-Main		400％
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		播放列表保存失败：\n\n错误： 
 Move Entries	MediaPlayer-MovePLItemsCmd		移动条目
@@ -48,14 +53,17 @@ Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		移动到垃圾箱出错
 Audio	MediaPlayer-Main		音频
 Open Playlist	MediaPlayer-PlaylistWindow		打开播放列表
 MediaPlayer	System name		媒体播放器
+%f fps	MediaPlayer-InfoWin		%f fps
 OK	MediaPlayer-Main		确定
 Settings…	MediaPlayer-Main		设置...
 MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer 设置
+h	MediaPlayer-InfoWin	Hours	小时
 Select all	MediaPlayer-PlaylistWindow		全选
 Move Entry	MediaPlayer-MovePLItemsCmd		移动条目
 Open	MediaPlayer-PlaylistWindow		打开
 Stop playing.	MediaPlayer-Main		停止播放。
 Error: 	MediaPlayer-RemovePLItemsCmd		错误： 
+Audio	MediaPlayer-InfoWin		音频
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部错误（格式错误消息）。保存播放列表失败。
 Skip to the previous track.	MediaPlayer-Main		跳到上一个轨道。
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% 出现内部错误。文件无法打开。
@@ -82,17 +90,22 @@ Attributes	MediaPlayer-Main		属性
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		无法移动所有文件到垃圾桶。
 <untitled>	PlaylistItem-title		<无标题>
 Track	Audio Track Menu		轨道
+unknown format	MediaPlayer-InfoWin		未知格式
 <nothing to redo>	MediaPlayer-PlaylistWindow		<无重复内容>
 Skip to the next track.	MediaPlayer-Main		跳到下一个轨道
 Play	MediaPlayer-Main		播放
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		移动项目到垃圾箱
 200% scale	MediaPlayer-Main		200％
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		媒体服务器没有运行。\n 你要打开吗？
+Duration	MediaPlayer-InfoWin		次数
 Aspect ratio	MediaPlayer-Main		纵横比
 Error: 	MediaPlayer-Main		错误：
 Large	MediaPlayer-SettingsWindow		大
 Bottom of video	MediaPlayer-SettingsWindow		视频底部
+DrawBitmap	MediaPlayer-InfoWin		绘制位图
 Stop	MediaPlayer-Main		停止
+<unnamed media>	MediaPlayer-InfoWin		<未命名媒体>
+raw video	MediaPlayer-InfoWin		原生视频
 Volume of background clips	MediaPlayer-SettingsWindow		视频墙纸体积：
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部错误（内存不足）。保存播放列表失败。
 Hide interface	MediaPlayer-Main		隐藏界面
@@ -134,4 +147,3 @@ Rating	MediaPlayer-Main		评分
 Playlist	MediaPlayer-PlaylistWindow		播放列表
 Lock Peaks	MediaPlayer-PeakView		锁定采样
 Low volume	MediaPlayer-SettingsWindow		低音量
-File Info	MediaPlayer-InfoWin		文件信息
