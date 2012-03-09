@@ -388,6 +388,7 @@ BPlusTree::Remove(Transaction& transaction, const char* key, off_t value)
 	return Remove(transaction, (uint8*)key, strlen(key), value);
 }
 
+
 inline status_t
 BPlusTree::Insert(Transaction& transaction, const char* key, off_t value)
 {
@@ -395,6 +396,7 @@ BPlusTree::Insert(Transaction& transaction, const char* key, off_t value)
 		return B_BAD_TYPE;
 	return Insert(transaction, (uint8*)key, strlen(key), value);
 }
+
 
 inline status_t
 BPlusTree::Insert(Transaction& transaction, int32 key, off_t value)
@@ -404,6 +406,7 @@ BPlusTree::Insert(Transaction& transaction, int32 key, off_t value)
 	return Insert(transaction, (uint8*)&key, sizeof(key), value);
 }
 
+
 inline status_t
 BPlusTree::Insert(Transaction& transaction, uint32 key, off_t value)
 {
@@ -411,6 +414,7 @@ BPlusTree::Insert(Transaction& transaction, uint32 key, off_t value)
 		return B_BAD_TYPE;
 	return Insert(transaction, (uint8*)&key, sizeof(key), value);
 }
+
 
 inline status_t
 BPlusTree::Insert(Transaction& transaction, int64 key, off_t value)
@@ -420,6 +424,7 @@ BPlusTree::Insert(Transaction& transaction, int64 key, off_t value)
 	return Insert(transaction, (uint8*)&key, sizeof(key), value);
 }
 
+
 inline status_t
 BPlusTree::Insert(Transaction& transaction, uint64 key, off_t value)
 {
@@ -428,6 +433,7 @@ BPlusTree::Insert(Transaction& transaction, uint64 key, off_t value)
 	return Insert(transaction, (uint8*)&key, sizeof(key), value);
 }
 
+
 inline status_t
 BPlusTree::Insert(Transaction& transaction, float key, off_t value)
 {
@@ -435,6 +441,7 @@ BPlusTree::Insert(Transaction& transaction, float key, off_t value)
 		return B_BAD_TYPE;
 	return Insert(transaction, (uint8*)&key, sizeof(key), value);
 }
+
 
 inline status_t
 BPlusTree::Insert(Transaction& transaction, double key, off_t value)
@@ -454,6 +461,7 @@ TreeIterator::Rewind()
 	return Goto(BPLUSTREE_BEGIN);
 }
 
+
 inline status_t
 TreeIterator::GetNextEntry(void* key, uint16* keyLength, uint16 maxLength,
 	off_t* value, uint16* duplicate)
@@ -461,6 +469,7 @@ TreeIterator::GetNextEntry(void* key, uint16* keyLength, uint16 maxLength,
 	return Traverse(BPLUSTREE_FORWARD, key, keyLength, maxLength, value,
 		duplicate);
 }
+
 
 inline status_t
 TreeIterator::GetPreviousEntry(void* key, uint16* keyLength, uint16 maxLength,
@@ -590,5 +599,6 @@ bplustree_node::MaxFragments(uint32 nodeSize)
 {
 	return nodeSize / ((NUM_FRAGMENT_VALUES + 1) * sizeof(off_t));
 }
+
 
 #endif	// B_PLUS_TREE_H
