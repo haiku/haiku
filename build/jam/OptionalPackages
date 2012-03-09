@@ -30,6 +30,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	Bzip					- file archiving utility
 #	CCache					- fast compiler cache
 #	CDRecord				- the command line CD writing tools
+#	Clang					- the LLVM C and C++ compiler (llvm, libs, headers)
 #	Clockwerk				- native audio/video compositing
 #	CLucene					- indexed file search
 #	CMake					- cross platform make
@@ -390,6 +391,20 @@ if [ IsOptionalHaikuImagePackageAdded CDRecord ] {
 		InstallOptionalHaikuImagePackage
 			cdrtools-3.01a01-r1a3-x86-gcc2-2011-05-17.zip
 			: $(baseURL)/cdrtools-3.01a01-r1a3-x86-gcc2-2011-05-17.zip ;
+	}
+}
+
+
+# Clang
+if [ IsOptionalHaikuImagePackageAdded Clang ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Clang available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) < 4 && ! $(isHybridBuild) {
+		Echo "No optional package Clang available for GCC2" ;
+	} else {
+		InstallOptionalHaikuImagePackage
+			clang-3.0-x86-gcc4-2012-03-09.zip
+			: $(baseURL)/clang-3.0-x86-gcc4-2012-03-09.zip ;
 	}
 }
 
