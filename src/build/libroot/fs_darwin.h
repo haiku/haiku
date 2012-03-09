@@ -1,9 +1,11 @@
 /*
- * Copyright 2011, John Scipione, jscipione@gmail.com.
+ * Copyright 2005-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2012, John Scipione, jscipione@gmail.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef FS_DARWIN_H
 #define FS_DARWIN_H
+
 
 /*
  * Magic value that specify the use of the current working directory
@@ -37,5 +39,6 @@ int linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 	int flag);
 
 int futimesat(int fd, const char *path, const struct timeval times[2]);
+
 
 #endif // FS_DARWIN_H

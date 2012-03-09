@@ -1,7 +1,9 @@
 /*
- * Copyright 2011, John Scipione, jscipione@gmail.com.
+ * Copyright 2005-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2012, John Scipione, jscipione@gmail.com.
  * Distributed under the terms of the MIT License.
  */
+
 
 #include "fs_darwin.h"
 
@@ -50,6 +52,7 @@ get_path(int fd, const char* path, char** fullPath)
 
 	return 0;
 }
+
 
 int
 eaccess(const char* path, int accessMode)
@@ -126,7 +129,7 @@ faccessat(int fd, const char* path, int accessMode, int flag)
 		return -1;
 	}
 
-	char *fullPath = (char *)malloc(MAXPATHLEN);
+	char* fullPath = (char *)malloc(MAXPATHLEN);
 	if (fullPath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
@@ -172,7 +175,7 @@ fchmodat(int fd, const char* path, mode_t mode, int flag)
 		return -1;
 	}
 
-	char *fullPath = (char *)malloc(MAXPATHLEN);
+	char* fullPath = (char *)malloc(MAXPATHLEN);
 	if (fullPath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
@@ -220,7 +223,7 @@ fchownat(int fd, const char* path, uid_t owner, gid_t group, int flag)
 		return -1;
 	}
 
-	char *fullPath = (char *)malloc(MAXPATHLEN);
+	char* fullPath = (char *)malloc(MAXPATHLEN);
 	if (fullPath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
@@ -260,7 +263,7 @@ fstatat(int fd, const char *path, struct stat *st, int flag)
 		return -1;
 	}
 
-	char *fullPath = (char *)malloc(MAXPATHLEN);
+	char* fullPath = (char *)malloc(MAXPATHLEN);
 	if (fullPath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
@@ -293,7 +296,7 @@ mkdirat(int fd, const char *path, mode_t mode)
 		return -1;
 	}
 
-	char *fullPath = (char *)malloc(MAXPATHLEN);
+	char* fullPath = (char *)malloc(MAXPATHLEN);
 	if (fullPath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
@@ -325,7 +328,7 @@ mkfifoat(int fd, const char *path, mode_t mode)
 		return -1;
 	}
 
-	char *fullPath = (char *)malloc(MAXPATHLEN);
+	char* fullPath = (char *)malloc(MAXPATHLEN);
 	if (fullPath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
@@ -357,7 +360,7 @@ mknodat(int fd, const char *path, mode_t mode, dev_t dev)
 		return -1;
 	}
 
-	char *fullPath = (char *)malloc(MAXPATHLEN);
+	char* fullPath = (char *)malloc(MAXPATHLEN);
 	if (fullPath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
@@ -459,7 +462,7 @@ readlinkat(int fd, const char *path, char *buffer, size_t bufferSize)
 		return -1;
 	}
 
-	char *fullPath = (char *)malloc(MAXPATHLEN);
+	char* fullPath = (char *)malloc(MAXPATHLEN);
 	if (fullPath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
@@ -529,7 +532,7 @@ unlinkat(int fd, const char *path, int flag)
 		return -1;
 	}
 
-	char *fullPath = (char *)malloc(MAXPATHLEN);
+	char* fullPath = (char *)malloc(MAXPATHLEN);
 	if (fullPath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;
@@ -643,7 +646,7 @@ futimesat(int fd, const char *path, const struct timeval times[2])
 		return -1;
 	}
 
-	char *fullPath = (char *)malloc(MAXPATHLEN);
+	char* fullPath = (char *)malloc(MAXPATHLEN);
 	if (fullPath == NULL) {
 		// ran out of memory allocating dirpath
 		errno = ENOMEM;

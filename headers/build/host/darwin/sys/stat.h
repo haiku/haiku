@@ -1,6 +1,7 @@
 #ifndef _HAIKU_BUILD_COMPATIBILITY_DARWIN_SYS_STAT
 #define _HAIKU_BUILD_COMPATIBILITY_DARWIN_SYS_STAT
 
+
 #include_next <sys/stat.h>
 
 #include <sys/cdefs.h>
