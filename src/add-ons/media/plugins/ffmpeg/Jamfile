@@ -8,15 +8,20 @@ SubDirC++Flags -D__STDC_CONSTANT_MACROS -Wno-deprecated-declarations ;
 
 local sources =
 	AVCodecDecoder.cpp
- 	AVCodecEncoder.cpp
- 	AVFormatReader.cpp
- 	AVFormatWriter.cpp
- 	CodecTable.cpp
+	AVCodecEncoder.cpp
+	AVFormatReader.cpp
+	AVFormatWriter.cpp
+	CodecTable.cpp
 	DemuxerTable.cpp
 	EncoderTable.cpp
 	FFmpegPlugin.cpp
 	MuxerTable.cpp
 	CpuCapabilities.cpp
+	
+	gfx_conv_c.cpp
+	gfx_conv_c_lookup.cpp
+	gfx_conv_mmx.cpp
+	gfx_util.cpp
 	;
 
 
@@ -32,15 +37,11 @@ UseHeaders [ FDirName $(HAIKU_FFMPEG_HEADERS) libavutil ] ;
 UseHeaders [ FDirName $(HAIKU_FFMPEG_HEADERS) libswscale ] ;
 
 Addon ffmpeg :
- 	$(sources)
+	$(sources)
 
-	gfx_conv_c.cpp
-	gfx_conv_c_lookup.cpp
-	gfx_conv_mmx.cpp
- 	gfx_util.cpp
- 	yuvrgb_sse.nasm
- 	yuvrgb_sse2.nasm
- 	yuvrgb_ssse3.nasm
+	yuvrgb_sse.nasm
+	yuvrgb_sse2.nasm
+	yuvrgb_ssse3.nasm
 	:
 
 	# FFmpeg libraries (from FFmpeg optional package):
