@@ -19,12 +19,12 @@
 #include <unistd.h>
 
 
-int get_path(int fd, const char* path, char** fullPath);
+int get_path(int fd, const char* path, char fullPath[]);
 int eaccess(const char* path, int accessMode);
 
 
 int
-get_path(int fd, const char* path, char** fullPath)
+get_path(int fd, const char* path, char fullPath[])
 {
 	struct stat dirst;
 	if (fstat(fd, &dirst) < 0) {
@@ -38,13 +38,13 @@ get_path(int fd, const char* path, char** fullPath)
 		return -1;
 	}
 
-	if (fcntl(fd, F_GETPATH, *fullPath) < 0) {
+	if (fcntl(fd, F_GETPATH, fullPath) < 0) {
 		// failed to get the path of fd, fcntl() sets errno
 		return -1;
 	}
 
-	if (strlcat(*fullPath, "/", MAXPATHLEN) > MAXPATHLEN
-		|| strlcat(*fullPath, path, MAXPATHLEN) > MAXPATHLEN) {
+	if (strlcat(fullPath, "/", MAXPATHLEN) > MAXPATHLEN
+		|| strlcat(fullPath, path, MAXPATHLEN) > MAXPATHLEN) {
 		// full path is too long
 		errno = ENAMETOOLONG;
 		return -1;
@@ -129,22 +129,12 @@ faccessat(int fd, const char* path, int accessMode, int flag)
 		return -1;
 	}
 
-	char* fullPath = (char *)malloc(MAXPATHLEN);
-	if (fullPath == NULL) {
-		// ran out of memory allocating dirpath
-		errno = ENOMEM;
+	char fullPath[MAXPATHLEN];
+	if (get_path(fd, path, fullPath) < 0)
 		return -1;
-	}
 
-	if (get_path(fd, path, &fullPath) < 0) {
-		free(fullPath);
-		return -1;
-	}
-
-	int status = (flag & AT_EACCESS) != 0 ? eaccess(fullPath, accessMode)
+	return (flag & AT_EACCESS) != 0 ? eaccess(fullPath, accessMode)
 		: access(fullPath, accessMode);
-	free(fullPath);
-	return status;
 }
 
 
@@ -175,20 +165,11 @@ fchmodat(int fd, const char* path, mode_t mode, int flag)
 		return -1;
 	}
 
-	char* fullPath = (char *)malloc(MAXPATHLEN);
-	if (fullPath == NULL) {
-		// ran out of memory allocating dirpath
-		errno = ENOMEM;
+	char fullPath[MAXPATHLEN];
+	if (get_path(fd, path, fullPath) < 0)
 		return -1;
-	}
-
-	if (get_path(fd, path, &fullPath) < 0) {
-		free(fullPath);
-		return -1;
-	}
 
 	int status;
-
 	if ((flag & AT_SYMLINK_NOFOLLOW) != 0) {
 		// fake lchmod() with open() and fchmod()
 		int fullfd = open(fullPath, O_RDONLY | O_SYMLINK);
@@ -197,7 +178,6 @@ fchmodat(int fd, const char* path, mode_t mode, int flag)
 	} else
 		status = chmod(fullPath, mode);
 
-	free(fullPath);
 	return status;
 }
 
@@ -223,22 +203,12 @@ fchownat(int fd, const char* path, uid_t owner, gid_t group, int flag)
 		return -1;
 	}
 
-	char* fullPath = (char *)malloc(MAXPATHLEN);
-	if (fullPath == NULL) {
-		// ran out of memory allocating dirpath
-		errno = ENOMEM;
+	char fullPath[MAXPATHLEN];
+	if (get_path(fd, path, fullPath) < 0)
 		return -1;
-	}
 
-	if (get_path(fd, path, &fullPath) < 0) {
-		free(fullPath);
-		return -1;
-	}
-
-	int status = (flag & AT_SYMLINK_NOFOLLOW) != 0
-		? lchown(fullPath, owner, group) : chown(fullPath, owner, group);
-	free(fullPath);
-	return status;
+	return (flag & AT_SYMLINK_NOFOLLOW) != 0 ? lchown(fullPath, owner, group)
+		: chown(fullPath, owner, group);
 }
 
 
@@ -263,22 +233,12 @@ fstatat(int fd, const char *path, struct stat *st, int flag)
 		return -1;
 	}
 
-	char* fullPath = (char *)malloc(MAXPATHLEN);
-	if (fullPath == NULL) {
-		// ran out of memory allocating dirpath
-		errno = ENOMEM;
+	char fullPath[MAXPATHLEN];
+	if (get_path(fd, path, fullPath) < 0)
 		return -1;
-	}
 
-	if (get_path(fd, path, &fullPath) < 0) {
-		free(fullPath);
-		return -1;
-	}
-
-	int status = (flag & AT_SYMLINK_NOFOLLOW) != 0 ? lstat(fullPath, st)
+	return (flag & AT_SYMLINK_NOFOLLOW) != 0 ? lstat(fullPath, st)
 		: stat(fullPath, st);
-	free(fullPath);
-	return status;
 }
 
 
@@ -296,21 +256,11 @@ mkdirat(int fd, const char *path, mode_t mode)
 		return -1;
 	}
 
-	char* fullPath = (char *)malloc(MAXPATHLEN);
-	if (fullPath == NULL) {
-		// ran out of memory allocating dirpath
-		errno = ENOMEM;
+	char fullPath[MAXPATHLEN];
+	if (get_path(fd, path, fullPath) < 0)
 		return -1;
-	}
 
-	if (get_path(fd, path, &fullPath) < 0) {
-		free(fullPath);
-		return -1;
-	}
-
-	int status = mkdir(fullPath, mode);
-	free(fullPath);
-	return status;
+	return mkdir(fullPath, mode);
 }
 
 
@@ -328,21 +278,11 @@ mkfifoat(int fd, const char *path, mode_t mode)
 		return -1;
 	}
 
-	char* fullPath = (char *)malloc(MAXPATHLEN);
-	if (fullPath == NULL) {
-		// ran out of memory allocating dirpath
-		errno = ENOMEM;
+	char fullPath[MAXPATHLEN];
+	if (get_path(fd, path, fullPath) < 0)
 		return -1;
-	}
 
-	if (get_path(fd, path, &fullPath) < 0) {
-		free(fullPath);
-		return -1;
-	}
-
-	int status = mkfifo(fullPath, mode);
-	free(fullPath);
-	return status;
+	return mkfifo(fullPath, mode);
 }
 
 
@@ -360,21 +300,11 @@ mknodat(int fd, const char *path, mode_t mode, dev_t dev)
 		return -1;
 	}
 
-	char* fullPath = (char *)malloc(MAXPATHLEN);
-	if (fullPath == NULL) {
-		// ran out of memory allocating dirpath
-		errno = ENOMEM;
+	char fullPath[MAXPATHLEN];
+	if (get_path(fd, path, fullPath) < 0)
 		return -1;
-	}
 
-	if (get_path(fd, path, &fullPath) < 0) {
-		free(fullPath);
-		return -1;
-	}
-
-	int status = mknod(fullPath, mode, dev);
-	free(fullPath);
-	return status;
+	return mknod(fullPath, mode, dev);
 }
 
 
@@ -395,9 +325,7 @@ renameat(int oldFD, const char* oldPath, int newFD, const char* newPath)
 		return rename(oldPath, newPath);
 	}
 
-	char *oldFullPath;
-	char *newFullPath;
-
+	char oldFullPath[MAXPATHLEN];
 	if (!ignoreOldFD) {
 		if (oldFD < 0) {
 			// Invalid file descriptor
@@ -405,19 +333,11 @@ renameat(int oldFD, const char* oldPath, int newFD, const char* newPath)
 			return -1;
 		}
 
-		oldFullPath = (char *)malloc(MAXPATHLEN);
-		if (oldFullPath == NULL) {
-			// ran out of memory allocating oldFullPath
-			errno = ENOMEM;
+		if (get_path(oldFD, oldPath, oldFullPath) < 0)
 			return -1;
-		}
-
-		if (get_path(oldFD, oldPath, &oldFullPath) < 0) {
-			free(oldFullPath);
-			return -1;
-		}
 	}
 
+	char newFullPath[MAXPATHLEN];
 	if (!ignoreNewFD) {
 		if (newFD < 0) {
 			// Invalid file descriptor
@@ -425,26 +345,12 @@ renameat(int oldFD, const char* oldPath, int newFD, const char* newPath)
 			return -1;
 		}
 
-		newFullPath = (char *)malloc(MAXPATHLEN);
-		if (newFullPath == NULL) {
-			// ran out of memory allocating newFullPath
-			errno = ENOMEM;
+		if (get_path(newFD, newPath, newFullPath) < 0)
 			return -1;
-		}
-
-		if (get_path(newFD, newPath, &newFullPath) < 0) {
-			free(newFullPath);
-			return -1;
-		}
 	}
 
-	int status = rename(ignoreOldFD ? oldPath : oldFullPath,
+	return rename(ignoreOldFD ? oldPath : oldFullPath,
 		ignoreNewFD ? newPath : newFullPath);
-	if (!ignoreOldFD)
-		free(oldFullPath);
-	if (!ignoreNewFD)
-		free(newFullPath);
-	return status;
 }
 
 
@@ -462,21 +368,11 @@ readlinkat(int fd, const char *path, char *buffer, size_t bufferSize)
 		return -1;
 	}
 
-	char* fullPath = (char *)malloc(MAXPATHLEN);
-	if (fullPath == NULL) {
-		// ran out of memory allocating dirpath
-		errno = ENOMEM;
+	char fullPath[MAXPATHLEN];
+	if (get_path(fd, path, fullPath) < 0)
 		return -1;
-	}
 
-	if (get_path(fd, path, &fullPath) < 0) {
-		free(fullPath);
-		return -1;
-	}
-
-	int status = readlink(fullPath, buffer, bufferSize);
-	free(fullPath);
-	return status;
+	return readlink(fullPath, buffer, bufferSize);
 }
 
 
@@ -494,21 +390,11 @@ symlinkat(const char *oldPath, int fd, const char *newPath)
 		return -1;
 	}
 
-	char *oldFullPath = (char *)malloc(MAXPATHLEN);
-	if (oldFullPath == NULL) {
-		// ran out of memory allocating dirpath
-		errno = ENOMEM;
+	char oldFullPath[MAXPATHLEN];
+	if (get_path(fd, oldPath, oldFullPath) < 0)
 		return -1;
-	}
 
-	if (get_path(fd, oldPath, &oldFullPath) < 0) {
-		free(oldFullPath);
-		return -1;
-	}
-
-	int status = symlink(oldFullPath, newPath);
-	free(oldFullPath);
-	return status;
+	return symlink(oldFullPath, newPath);
 }
 
 
@@ -532,22 +418,12 @@ unlinkat(int fd, const char *path, int flag)
 		return -1;
 	}
 
-	char* fullPath = (char *)malloc(MAXPATHLEN);
-	if (fullPath == NULL) {
-		// ran out of memory allocating dirpath
-		errno = ENOMEM;
+	char fullPath[MAXPATHLEN];
+	if (get_path(fd, path, fullPath) < 0)
 		return -1;
-	}
 
-	if (get_path(fd, path, &fullPath) < 0) {
-		free(fullPath);
-		return -1;
-	}
-
-	int status = (flag & AT_REMOVEDIR) != 0 ? rmdir(fullPath)
+	return (flag & AT_REMOVEDIR) != 0 ? rmdir(fullPath)
 		: unlink(fullPath);
-	free(fullPath);
-	return status;
 }
 
 
@@ -579,9 +455,7 @@ linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 		return link(oldPath, newPath);
 	}
 
-	char *oldFullPath;
-	char *newFullPath;
-
+	char oldFullPath[MAXPATHLEN];
 	if (!ignoreOldFD) {
 		if (oldFD < 0) {
 			// Invalid file descriptor
@@ -589,19 +463,11 @@ linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 			return -1;
 		}
 
-		oldFullPath = (char *)malloc(MAXPATHLEN);
-		if (oldFullPath == NULL) {
-			// ran out of memory allocating oldFullPath
-			errno = ENOMEM;
+		if (get_path(oldFD, oldPath, oldFullPath) < 0)
 			return -1;
-		}
-
-		if (get_path(oldFD, oldPath, &oldFullPath) < 0) {
-			free(oldFullPath);
-			return -1;
-		}
 	}
 
+	char newFullPath[MAXPATHLEN];
 	if (!ignoreNewFD) {
 		if (newFD < 0) {
 			// Invalid file descriptor
@@ -609,26 +475,12 @@ linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 			return -1;
 		}
 
-		newFullPath = (char *)malloc(MAXPATHLEN);
-		if (newFullPath == NULL) {
-			// ran out of memory allocating newFullPath
-			errno = ENOMEM;
+		if (get_path(newFD, newPath, newFullPath) < 0)
 			return -1;
-		}
-
-		if (get_path(newFD, newPath, &newFullPath) < 0) {
-			free(newFullPath);
-			return -1;
-		}
 	}
 
-	int status = link(ignoreOldFD ? oldPath : oldFullPath,
+	return link(ignoreOldFD ? oldPath : oldFullPath,
 		ignoreNewFD ? newPath : newFullPath);
-	if (!ignoreOldFD)
-		free(oldFullPath);
-	if (!ignoreNewFD)
-		free(newFullPath);
-	return status;
 }
 
 
@@ -646,19 +498,9 @@ futimesat(int fd, const char *path, const struct timeval times[2])
 		return -1;
 	}
 
-	char* fullPath = (char *)malloc(MAXPATHLEN);
-	if (fullPath == NULL) {
-		// ran out of memory allocating dirpath
-		errno = ENOMEM;
+	char fullPath[MAXPATHLEN];
+	if (get_path(fd, path, fullPath) < 0)
 		return -1;
-	}
 
-	if (get_path(fd, path, &fullPath) < 0) {
-		free(fullPath);
-		return -1;
-	}
-
-	int status = utimes(fullPath, times);
-	free(fullPath);
-	return status;
+	return utimes(fullPath, times);
 }
