@@ -16,6 +16,47 @@
 #include "Utility.h"
 
 
+/*!	Simple array used for the duplicate handling in the B+Tree. This is an
+	on disk structure.
+*/
+struct duplicate_array {
+	off_t	count;
+	off_t	values[0];
+
+	inline bool IsEmpty() const
+	{
+		return count == 0;
+	}
+
+	inline int32 Count() const
+	{
+		return (int32)BFS_ENDIAN_TO_HOST_INT64(count);
+	}
+
+	inline off_t ValueAt(uint32 index) const
+	{
+		return BFS_ENDIAN_TO_HOST_INT64(values[index]);
+	}
+
+	inline void SetValueAt(uint32 index, off_t value)
+	{
+		values[index] = HOST_ENDIAN_TO_BFS_INT64(value);
+	}
+
+	inline int32 Find(off_t value) const
+	{
+		int32 i;
+		return _FindInternal(value, i) ? i : -1;
+	}
+
+	void Insert(off_t value);
+	bool Remove(off_t value);
+
+private:
+	bool _FindInternal(off_t value, int32& index) const;
+} _PACKED;
+
+
 #ifdef DEBUG
 class NodeChecker {
 public:
@@ -991,7 +1032,7 @@ BPlusTree::_FindFreeDuplicateFragment(Transaction& transaction,
 		for (uint32 j = 0; j < num; j++) {
 			duplicate_array* array = fragment->FragmentAt(j);
 
-			if (array->count == 0) {
+			if (array->IsEmpty()) {
 				// found an unused fragment
 				*_fragment = cached.MakeWritable(transaction);
 				if (*_fragment == NULL)
@@ -1030,16 +1071,16 @@ BPlusTree::_InsertDuplicate(Transaction& transaction, CachedNode& cached,
 
 			duplicate_array* array = duplicate->FragmentAt(
 				bplustree_node::FragmentIndex(oldValue));
-			if (array->count > NUM_FRAGMENT_VALUES
-				|| array->count < 1) {
+			int32 arrayCount = array->Count();
+			if (arrayCount > NUM_FRAGMENT_VALUES || arrayCount < 1) {
 				FATAL(("insertDuplicate: Invalid array[%d] size in fragment "
-					"%" B_PRIdOFF " == %" B_PRIdOFF "!\n",
+					"%" B_PRIdOFF " == %" B_PRId32 "!\n",
 					(int)bplustree_node::FragmentIndex(oldValue),
-					bplustree_node::FragmentOffset(oldValue), array->count));
+					bplustree_node::FragmentOffset(oldValue), arrayCount));
 				return B_BAD_DATA;
 			}
 
-			if (array->count < NUM_FRAGMENT_VALUES) {
+			if (arrayCount < NUM_FRAGMENT_VALUES) {
 				array->Insert(value);
 			} else {
 				// Test if the fragment will be empty if we remove this key's
@@ -1071,10 +1112,9 @@ BPlusTree::_InsertDuplicate(Transaction& transaction, CachedNode& cached,
 
 					// Copy the array from the fragment node to the duplicate
 					// node and free the old entry (by zero'ing all values)
-					newDuplicate->overflow_link = HOST_ENDIAN_TO_BFS_INT64(
-						array->count);
+					newDuplicate->overflow_link = array->count;
 					memcpy(&newDuplicate->all_key_count, &array->values[0],
-						array->count * sizeof(off_t));
+						array->Count() * sizeof(off_t));
 					memset(array, 0, (NUM_FRAGMENT_VALUES + 1) * sizeof(off_t));
 
 					array = newDuplicate->DuplicateArray();
@@ -1097,6 +1137,7 @@ BPlusTree::_InsertDuplicate(Transaction& transaction, CachedNode& cached,
 
 		// search for free space in the duplicate nodes of that key
 		duplicate_array* array;
+		int32 arrayCount;
 		const bplustree_node* duplicate;
 		off_t duplicateOffset;
 		do {
@@ -1106,13 +1147,14 @@ BPlusTree::_InsertDuplicate(Transaction& transaction, CachedNode& cached,
 				return B_IO_ERROR;
 
 			array = duplicate->DuplicateArray();
-			if (array->count > NUM_DUPLICATE_VALUES || array->count < 0) {
+			arrayCount =array->Count();
+			if (arrayCount > NUM_DUPLICATE_VALUES || arrayCount < 0) {
 				FATAL(("removeDuplicate: Invalid array size in duplicate %"
-					B_PRIdOFF " == %" B_PRIdOFF "!\n", duplicateOffset,
-					array->count));
+					B_PRIdOFF " == %" B_PRId32 "!\n", duplicateOffset,
+					arrayCount));
 				return B_BAD_DATA;
 			}
-		} while (array->count >= NUM_DUPLICATE_VALUES
+		} while (arrayCount >= NUM_DUPLICATE_VALUES
 				&& (oldValue = duplicate->RightLink()) != BPLUSTREE_NULL);
 
 		bplustree_node* writableDuplicate
@@ -1120,7 +1162,7 @@ BPlusTree::_InsertDuplicate(Transaction& transaction, CachedNode& cached,
 		if (writableDuplicate == NULL)
 			return B_IO_ERROR;
 
-		if (array->count < NUM_DUPLICATE_VALUES) {
+		if (arrayCount < NUM_DUPLICATE_VALUES) {
 			array = writableDuplicate->DuplicateArray();
 			array->Insert(value);
 		} else {
@@ -1655,13 +1697,13 @@ BPlusTree::_RemoveDuplicate(Transaction& transaction,
 	if (bplustree_node::LinkType(oldValue) == BPLUSTREE_DUPLICATE_FRAGMENT) {
 		duplicate_array* array = duplicate->FragmentAt(
 			bplustree_node::FragmentIndex(oldValue));
+		int32 arrayCount = array->Count();
 
-		if (array->count > NUM_FRAGMENT_VALUES
-			|| array->count < 1) {
+		if (arrayCount > NUM_FRAGMENT_VALUES || arrayCount < 1) {
 			FATAL(("removeDuplicate: Invalid array[%d] size in fragment %"
-				B_PRIdOFF " == %" B_PRIdOFF "!\n",
+				B_PRIdOFF " == %" B_PRId32 "!\n",
 				(int)bplustree_node::FragmentIndex(oldValue), duplicateOffset,
-				array->count));
+				arrayCount));
 			return B_BAD_DATA;
 		}
 		if (!array->Remove(value)) {
@@ -1671,7 +1713,7 @@ BPlusTree::_RemoveDuplicate(Transaction& transaction,
 		}
 
 		// remove the array from the fragment node if it is empty
-		if (array->count == 1) {
+		if (arrayCount == 1) {
 			// set the link to the remaining value
 			if (cached.MakeWritable(transaction) == NULL)
 				return B_IO_ERROR;
@@ -1694,6 +1736,7 @@ BPlusTree::_RemoveDuplicate(Transaction& transaction,
 	// Remove value from a duplicate node!
 
 	duplicate_array* array = NULL;
+	int32 arrayCount = 0;
 
 	if (duplicate->LeftLink() != BPLUSTREE_NULL) {
 		FATAL(("invalid duplicate node: first left link points to %" B_PRIdOFF
@@ -1704,11 +1747,11 @@ BPlusTree::_RemoveDuplicate(Transaction& transaction,
 	// Search the duplicate nodes until the entry could be found (and removed)
 	while (duplicate != NULL) {
 		array = duplicate->DuplicateArray();
-		if (array->count > NUM_DUPLICATE_VALUES
-			|| array->count < 0) {
+		arrayCount = array->Count();
+
+		if (arrayCount > NUM_DUPLICATE_VALUES || arrayCount < 0) {
 			FATAL(("removeDuplicate: Invalid array size in duplicate %"
-				B_PRIdOFF " == %" B_PRIdOFF "!\n", duplicateOffset,
-				array->count));
+				B_PRIdOFF " == %" B_PRId32 "!\n", duplicateOffset, arrayCount));
 			return B_BAD_DATA;
 		}
 
@@ -1733,7 +1776,7 @@ BPlusTree::_RemoveDuplicate(Transaction& transaction,
 		off_t right = duplicate->RightLink();
 		bool isLast = left == BPLUSTREE_NULL && right == BPLUSTREE_NULL;
 
-		if ((isLast && array->count == 1) || array->count == 0) {
+		if ((isLast && arrayCount == 1) || arrayCount == 0) {
 			// Free empty duplicate page, link their siblings together, and
 			// update the duplicate link if needed (ie. when we either remove
 			// the last duplicate node or have a new first one)
@@ -1743,7 +1786,7 @@ BPlusTree::_RemoveDuplicate(Transaction& transaction,
 				if (cached.MakeWritable(transaction) == NULL)
 					return B_IO_ERROR;
 
-				if (array->count == 1) {
+				if (arrayCount == 1) {
 					// This is the last node, and there is only one value left;
 					// replace the duplicate link with that value, it's no
 					// duplicate anymore
@@ -1769,9 +1812,10 @@ BPlusTree::_RemoveDuplicate(Transaction& transaction,
 				// If the next node is the last node, we need to free that node
 				// and convert the duplicate entry back into a normal entry
 				array = duplicate->DuplicateArray();
+				arrayCount = array->Count();
 				if (right == BPLUSTREE_NULL
 					&& duplicate->LeftLink() == BPLUSTREE_NULL
-					&& array->count <= NUM_FRAGMENT_VALUES) {
+					&& arrayCount <= NUM_FRAGMENT_VALUES) {
 					duplicateOffset = left;
 					continue;
 				}
@@ -1784,15 +1828,16 @@ BPlusTree::_RemoveDuplicate(Transaction& transaction,
 				// Again, we may need to turn the duplicate entry back into a
 				// normal entry
 				array = duplicate->DuplicateArray();
+				arrayCount = array->Count();
 				if (left == BPLUSTREE_NULL
 					&& duplicate->RightLink() == BPLUSTREE_NULL
-					&& array->count <= NUM_FRAGMENT_VALUES) {
+					&& arrayCount <= NUM_FRAGMENT_VALUES) {
 					duplicateOffset = right;
 					continue;
 				}
 			}
 			return B_OK;
-		} else if (isLast && array->count <= NUM_FRAGMENT_VALUES) {
+		} else if (isLast && arrayCount <= NUM_FRAGMENT_VALUES) {
 			// If the number of entries fits in a duplicate fragment, then
 			// either find a free fragment node, or convert this node to a
 			// fragment node.
@@ -2173,7 +2218,7 @@ BPlusTree::_ValidateChildren(TreeCheck& check, uint32 level, off_t offset,
 			}
 		}
 
-		off_t childOffset = values[i];
+		off_t childOffset = BFS_ENDIAN_TO_HOST_INT64(values[i]);
 		if (bplustree_node::IsDuplicate(childOffset)) {
 			// Walk the duplicate nodes
 			off_t duplicateOffset = bplustree_node::FragmentOffset(childOffset);
@@ -2206,7 +2251,7 @@ BPlusTree::_ValidateChildren(TreeCheck& check, uint32 level, off_t offset,
 					check.SetVisitedFragment(duplicateOffset);
 
 				duplicate_array* array;
-				uint32 maxSize;
+				int32 maxSize;
 				if (isFragmentNode) {
 					array = node->FragmentAt(
 						bplustree_node::FragmentIndex(childOffset));
@@ -2215,21 +2260,22 @@ BPlusTree::_ValidateChildren(TreeCheck& check, uint32 level, off_t offset,
 					array = node->DuplicateArray();
 					maxSize = NUM_DUPLICATE_VALUES;
 				}
+				int32 arrayCount = array->Count();
 
-				if (array->count == 0 || array->count > maxSize) {
+				if (arrayCount < 1 || arrayCount > maxSize) {
 					dprintf("inode %" B_PRIdOFF ": duplicate at %" B_PRIdOFF
-						" has invalid array size %" B_PRIdOFF "!\n",
-						fStream->BlockNumber(), duplicateOffset, array->count);
+						" has invalid array size %" B_PRId32 "!\n",
+						fStream->BlockNumber(), duplicateOffset, arrayCount);
 					check.FoundError();
 				} else {
 					// Simple check if the values in the array may be valid
-					for (int32 j = 0; j < array->count; j++) {
+					for (int32 j = 0; j < arrayCount; j++) {
 						if (!fStream->GetVolume()->IsValidInodeBlock(
-								array->values[j])) {
+								array->ValueAt(j))) {
 							dprintf("inode %" B_PRIdOFF ": duplicate at %"
 								B_PRIdOFF " contains invalid block %" B_PRIdOFF
 								" at %" B_PRId32 "!\n", fStream->BlockNumber(),
-								duplicateOffset, array->values[j], j);
+								duplicateOffset, array->ValueAt(j), j);
 							check.FoundError();
 							break;
 						}
@@ -2255,7 +2301,7 @@ BPlusTree::_ValidateChildren(TreeCheck& check, uint32 level, off_t offset,
 			// Test a regular child node recursively
 			off_t nextOffset = parent->OverflowLink();
 			if (i < count - 1)
-				nextOffset = values[i + 1];
+				nextOffset = BFS_ENDIAN_TO_HOST_INT64(values[i + 1]);
 
 			if (i == 0 && lastOffset != BPLUSTREE_NULL) {
 				// Test right link of the previous node
@@ -2736,7 +2782,7 @@ bplustree_node::FragmentsUsed(uint32 nodeSize) const
 	uint32 used = 0;
 	for (uint32 i = 0; i < MaxFragments(nodeSize); i++) {
 		duplicate_array* array = FragmentAt(i);
-		if (array->count > 0 && ++used > 1)
+		if (array->Count() > 0 && ++used > 1)
 			return used;
 	}
 	return used;
@@ -2817,6 +2863,69 @@ BitmapArray::Set(size_t index, bool set)
 		fBitmap[byteIndex] &= ~(1UL << (index & 0x7));
 		fCountSet--;
 	}
+}
+
+
+// #pragma mark -
+
+
+bool
+duplicate_array::_FindInternal(off_t value, int32& index) const
+{
+	int32 min = 0, max = Count() - 1;
+	off_t cmp;
+	while (min <= max) {
+		index = (min + max) / 2;
+
+		cmp = ValueAt(index) - value;
+		if (cmp < 0)
+			min = index + 1;
+		else if (cmp > 0)
+			max = index - 1;
+		else
+			return true;
+	}
+	return false;
+}
+
+
+void
+duplicate_array::Insert(off_t value)
+{
+	// if there are more than 8 values in this array, use a
+	// binary search, if not, just iterate linearly to find
+	// the insertion point
+	int32 size = Count();
+	int32 i;
+	if (size > 8 ) {
+		if (!_FindInternal(value, i) && ValueAt(i) <= value)
+			i++;
+	} else {
+		for (i = 0; i < size; i++) {
+			if (ValueAt(i) > value)
+				break;
+		}
+	}
+
+	memmove(&values[i + 1], &values[i], (size - i) * sizeof(off_t));
+	values[i] = HOST_ENDIAN_TO_BFS_INT64(value);
+	count = HOST_ENDIAN_TO_BFS_INT64(size + 1);
+}
+
+
+bool
+duplicate_array::Remove(off_t value)
+{
+	int32 index = Find(value);
+	if (index == -1)
+		return false;
+
+	int32 newSize = Count() - 1;
+	memmove(&values[index], &values[index + 1],
+		(newSize - index) * sizeof(off_t));
+	count = HOST_ENDIAN_TO_BFS_INT64(newSize);
+
+	return true;
 }
 
 

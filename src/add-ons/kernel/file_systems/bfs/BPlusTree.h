@@ -57,8 +57,9 @@ enum bplustree_types {
 	BPLUSTREE_DOUBLE_TYPE	= 6
 };
 
-struct sorted_array;
-typedef sorted_array duplicate_array;
+
+struct duplicate_array;
+
 
 struct bplustree_node {
 			int64				left_link;
