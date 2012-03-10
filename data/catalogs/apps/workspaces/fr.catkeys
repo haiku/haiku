@@ -1,5 +1,5 @@
 1	french	x-vnd.Be-WORK	932379173
-Invalid argument: %s\n	Workspaces		Argument invalide : %sn
+Invalid argument: %s\n	Workspaces		Argument invalide : %s\n
 Quit	Workspaces		Quitter
 Workspaces	System name		Bureaux
 Change workspace count…	Workspaces		Changer le nombre de bureaux virtuels…

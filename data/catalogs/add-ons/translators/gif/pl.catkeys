@@ -1,0 +1,15 @@
+1	polish	x-vnd.Haiku-GIFTranslator	829368084
+Websafe	GIFView		Websafe
+Write interlaced images	GIFView		Zapisuj obrazy z przeplotem
+Optimal	GIFView		Optymalna
+Greyscale	GIFView		Odcienie szarości
+Be Bitmap Format (GIFTranslator)	GIFTranslator		Format Be Bitmap (GIFTranslator)
+GIF image	GIFTranslator		Obraz GIF
+Write transparent images	GIFView		Zapisuj informacje o przezroczystości
+Palette	GIFView		Paleta
+Use RGB color	GIFView		Używaj kolorów RGB
+Use dithering	GIFView		Używaj ditheringu
+GIF Settings	GIFTranslator		Ustawienia GIF
+BeOS system	GIFView		System BeOS
+Automatic (from alpha channel)	GIFView		Automatyczne (z kanału alpha)
+Colors	GIFView		Kolory

@@ -26,7 +26,7 @@ Battery discharging	PowerStatus		Consommation des batteries
 Serial number: 	PowerStatus		Numéro de série :
 Capacity granularity 1: 	PowerStatus		Granularité de charge 1 :
 OK	PowerStatus		OK
-OEM info: 	PowerStatus		Informations fabricant :
+OEM info: 	PowerStatus		Informations fabricant : 
 Design voltage: 	PowerStatus		Voltage nominal :
 PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		État d'énergie\nÉcrit par Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
 Battery charging	PowerStatus		Batterie en charge

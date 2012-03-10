@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-PoorMan	2873344043
+1	japanese	x-vnd.Haiku-PoorMan	1267330937
 Website location	PoorMan		ウエブサイトの場所
 Error Server	PoorMan		サーバーエラー
 Settings…	PoorMan		設定…
@@ -34,6 +34,7 @@ Log to console	PoorMan		コンソールにログを出力
 Directory: (none)	PoorMan		ディレクトリ: (無し)
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Web に公開するフォルダーを選択してください。\n\nPoorMan にデフォルトの \"public_html\" をホームフォルダー中に作成させることもできます。\nまたは、代わりにユーザーのフォルダーを指定することもできます。
 Log To Console	PoorMan		コンソールにログを出力
+Connections	PoorMan		接続
 Status: Running	PoorMan		状況： 実行中
 connections	PoorMan		接続
 Controls	PoorMan		コントロール

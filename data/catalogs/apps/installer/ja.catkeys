@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Installer	3691915477
+1	japanese	x-vnd.Haiku-Installer	3852628561
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		したがって、Haikuを GRUBメニューに追加するには、ファイルの最後に下記のような記述をしてください。\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		インストールを中止して、システムを再起動しますか？
 \t}\n\n	InstallerApp		\t}\n\n
@@ -78,7 +78,43 @@ OK	InstallerWindow		OK
 Set up partitions…	InstallerWindow		パーティションの設定…
 The partition can't be mounted. Please choose a different partition.	InstallProgress		このパーティションをマウントできません。他のパーティションを選択してください。
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		ブートマネージャー実行中…\n\nインストールを続けるには、ブートマネージャーを閉じてください。
+Install anyway	InstallProgress		それでもインストールする
+An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		エラーが発生しました。インストールは完了していません:\n\nエラー:  %s
+\trootnoverify\t\t(hd0,6)\n	InstallerApp		\trootnoverify\t\t(hd0,6)\n
+Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		'%1s' から '%2s' へのインストールを開始するには、開始ボタンを押してください。
+Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		DriveSetup は実行中です。\n\nDriveSetup を終了させてからインストールを続行してください。
+Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Haikuを試用して頂きありがとうございます。Haikuを堪能してください!そして、Haikuのことを気に入って頂ければ幸いです。
 OK	InstallProgress		OK
+Please choose target	InstallerWindow		インストール先の選択
 ???	InstallerWindow	Unknown partition name	???
+1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1) Haikuを(エミュレータでなく)実機にインストールする場合は、ハードディスクのパーティションを先に用意しておくことが望ましいです。インストーラーおよびDriveSetupツールには、Haikuファイルシステムによる既存のパーティションの初期化機能があります。しかし、パーティションを作成、変更するオプションは充分な多種多様のコンピュータの構成でテストされていないため、使用を勧めません。\n
+2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2) インストーラーは、Haikuのパーティションを起動可能にします。しかし、Haikuを既存のブートメニューに結合する機能はありません。すでにGRUBがインストールされている場合、ブートメニューにHaikuを追加できます。追加作業は、使用しているGRUBのバージョンによって異なります。\n\n\n
+Begin	InstallerWindow		開始
+Finally, you have to update the boot menu by entering:\n\n	InstallerApp		最後に、次のように入力して、ブートメニューをアップデートする必要があります。
+If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		まだパーティションを作成していなければ、再起動して、もっとも安心と思うツールでパーティションを作成してください。それから、Haikuで再起動して、インストールを続けてください。たとえば、GParted LiveCDを使えるでしょう。このツールでは既存のパーティションをリサイズして空きを作ることもできます。\n\n\n
+With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		GRUB2では、プライマリーパーティションの数にかかわらず、最初の論理パーティションはいつも\"5\"という数字が付きます。\n\n
+Write boot sector	InstallerWindow		ブートセクターを書き込む
+Cancel	InstallerWindow		中止
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		パーティションを設定するDriveSetupアプリケーションが起動できません。
+No optional packages available.	PackagesView		オプショナルパッケージはありません。
+All hard disks start with \"hd\".\n	InstallerApp		すべてのディスクは \"hd\" で始まります。\n
 Continue	InstallerApp		続ける
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" documentation, there is a link on the Desktop.\n\n	InstallerApp		3) はじめてHaikuの起動に成功した後、デスクトップにリンクされている\"Welcome\"ドキュメントを必ずお読みください。\n\n
+BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Haikuブートメニューを設定するアプリケーション、BootManagerを起動できませんでした。
+Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		/boot/grub/menu.lstを好みのエディタで設定します。ターミナルから以下のように入力してください。\n\n
+Boot sector not written because of an internal error.	InstallProgress		内部エラーが発生したため、ブートセクターは更新されていません。
+Additional disk space required: %s	InstallerWindow		必要な追加ディスク容量：%s
+NOTE: While the naming strategy for hard disks is still as described under 2.1) the naming scheme for partitions has changed.\n\n	InstallerApp		注意：ハードディスクの命名規則は、2.1)で記載されているものとまだ同じですが、パーティションの命名規則は変わっています。\n\n
+Cancel	InstallProgress		中止
+Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		ブートマネージャーと DriveSetup が実行中…\n\nインストールを続けるには、両アプリケーションを閉じてください。
+Try installing anyway	InstallProgress		それでもインストールを試みる
+So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		そのため、以下の見出しは編集する必要はありません。なにか似たものをこれらの行に追加してください。\n\n
 Are you sure you want to to stop the installation?	InstallerWindow		本当にインストールを中断してよいですか ?
+Onto:	InstallerWindow		インストール先：
+Please close the Boot Manager window before closing the Installer window.	InstallerWindow		ブートマネージャーウィンドウを閉じてから、インストーラーウィンドウを閉じてください。
+Tools	InstallerWindow		ツール
+The mount point could not be retrieved.	InstallProgress		マウントポイントを取得できませんでした。
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		インストール先パーティションにはデータがあります。それでもインストールしますか？\n\n注意：システムフォルダーはインストール元からそのままクリーンコピーされますが、その他のフォルダーはマージされ、両方のボリュームに存在するファイルやリンクはインストール元のバージョンで上書きされます。
+You can see the correct partition in GParted for example.\n\n\n	InstallerApp		正確なパーティションはGPartedなどで見られます。\n\n\n
+\ttitle\t\t\t\tHaiku\n	InstallerApp		\ttitle\t\t\t\tHaiku\n
+\tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsudo <好みのテキストエディタ> /boot/grub/menu.lst\n\n

@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Pulse	2431985712
+1	polish	x-vnd.Haiku-Pulse	2324471783
 OK	PrefsWindow		OK
 Quit	DeskbarPulseView		Wyjdź
 Mini mode	DeskbarPulseView		Tryb mini
@@ -6,11 +6,14 @@ Remove replicant	CPUButton		Usuń replikant
 Active color	ConfigView		Aktywny kolor
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Użycie: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
 Fade colors	ConfigView		Cieniowane colory
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nStworzone przez Davida Ramsey i Arve Hjønnevåg\nPoprawiony przez Daniela Switkin\n
 OK	DeskbarPulseView		OK
 Deskbar mode	PrefsWindow		Tryb Deskbar
+%.2f GHz	NormalPulseView		%.2f GHz
 Normal mode	PrefsWindow		Tryb normalny
 Defaults	PrefsWindow		Domyślne
 Normal mode	MiniPulseView		Tryb normalny
+Error	PulseApp		Błąd
 Info	PulseView		Informacje
 Deskbar	CPUButton		Deskbar
 Frame color	ConfigView		Kolor ramki

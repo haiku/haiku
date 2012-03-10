@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-MediaPlayer	1233225587
+1	german	x-vnd.Haiku-MediaPlayer	1460151958
 raw audio	MediaPlayer-InfoWin		Raw-Audio
 Location	MediaPlayer-InfoWin		Ort
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikanisch)
@@ -148,6 +148,7 @@ Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Eintrag in den Papierkorb 
 Save	MediaPlayer-Main		Speichern
 <nothing to undo>	MediaPlayer-PlaylistWindow		<nichts rückgängig zu machen>
 Mono	MediaPlayer-InfoWin		Mono
+File info	MediaPlayer-InfoWin		Datei-Info
 Save	MediaPlayer-PlaylistWindow		Speichern
 %d Bit	MediaPlayer-InfoWin		%d Bit
 Remove	MediaPlayer-PlaylistWindow		Entfernen

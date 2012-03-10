@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-ScreenSaver	746331867
+1	polish	x-vnd.Haiku-ScreenSaver	215605989
 Could not load screen saver	ScreenSaver		Nie można załadować wygaszacza ekranu
 30 seconds	ScreenSaver		30 sekund
 Start screensaver	ScreenSaver		Uruchom wygaszacz ekranu
@@ -8,6 +8,7 @@ Password lock	ScreenSaver		Blokada hasła
 Add…	ScreenSaver		Dodaj…
 Screensavers	ScreenSaver		Wygaszacze ekranu
 mouse is here	ScreenSaver		mysz jest tutaj
+Display Power Management Signaling not available	ScreenSaver		DPMS nie jest dostępne
 ScreenSaver	System name		WygaszaczEkranu
 Test	ScreenSaver		Test
 General	ScreenSaver		Ogólne

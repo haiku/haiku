@@ -1,5 +1,5 @@
-1	french	x-vnd.Haiku-MediaConverter	3564609505
-Video using parameters form settings	MediaConverter		La vidéo utilise les paramètres de réglages.
+1	french	x-vnd.Haiku-MediaConverter	296071315
+Video using parameters form settings	MediaConverter		La vidéo utilise les paramètres de réglages
 Video encoding:	MediaConverter		Encodage vidéo :
 No audio	Audio codecs list		Pas de son
 Error	MediaConverter		Erreur
@@ -21,9 +21,10 @@ Low	MediaConverter		Basse
 Conversion completed	MediaConverter		Conversion achevée
 Audio:	MediaConverter-FileInfo		Audio :
 OK	MediaConverter-FileInfo		OK
+ seconds	MediaFileInfo		 secondes
 Source files	MediaConverter		Fichiers sources
 Cancelling	MediaConverter		Annulation
-%d byte 	MediaFileInfo		%d octet
+%d byte 	MediaFileInfo		%d octets 
 Error loading files	MediaConverter		Erreur de chargement des fichiers
 Cancel	MediaConverter		Annuler
 None available	Video codecs		Aucun disponible
@@ -35,7 +36,7 @@ Continue	MediaConverter		Continuer
 Encoder parameters	MediaConverter-EncoderWindow		Paramètres d'encodage
 Video:	MediaConverter-FileInfo		Vidéo :
 %u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2fips / %Ld images
-%d bit 	MediaFileInfo		%d bit
+%d bit 	MediaFileInfo		%d bits 
 Error creating '%filename'	MediaConverter		Erreur à la création de « %filename »
 Video quality not supported	MediaConverter		Qualité vidéo non prise en charge
 Cancelling…	MediaConverter		Annulation…
@@ -46,7 +47,7 @@ Quit	Menu		Quitter
 Preview	MediaConverter		Aperçu
 File format:	MediaConverter		Format de fichier :
 None available	Audio codecs		Aucun disponible
-MediaConverter+:SaveDirectory	MediaConverter		MédiaConvertisseur : Dossier d'enregistrement
+MediaConverter+:SaveDirectory	MediaConverter		MédiaConvertisseur+ : Dossier d'enregistrement
 Error read audio frame %Ld	MediaConverter		Erreur de lecture de l'échantillons audio %Ld
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld canaux / %Ld échantillons
 Error launching: %strError%	MediaConverter		Erreur de lancement : %strError%

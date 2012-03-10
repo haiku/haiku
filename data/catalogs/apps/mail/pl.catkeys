@@ -1,14 +1,16 @@
-1	polish	x-vnd.Be-MAIL	524266098
+1	polish	x-vnd.Be-MAIL	1854424455
 View	Mail		Widok
 %d - Date	Mail		%d - Data
 Attach attributes:	Mail		Dołączaj atrybuty:
 Inconsistency occurred in the undo/redo buffer.	Mail		Powstała niespójność pomiędzy buforem cofnij/powtórz.
 An error occurred trying to save the attachment.	Mail		Wystąpił błąd podczas zapisu załącznika.
 Copy to new	Mail		Kopiuj do nowego
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Pozostaw jako "Nowe"
 Edit	Mail		Edycja
 Print	Mail		Drukuj
 <none>	Mail		<brak>
 New mail message	Mail		Nowa wiadomość
+Automatic	Mail		Automatyczne
 Automatically mark mail as read:	Mail		Automatycznie oznacz wiadomość jako przeczytaną:
 helpful message	Mail		pomocna wiadomość
 Colored quotes:	Mail		Kolorowe cytaty:
@@ -29,7 +31,112 @@ Reply to sender	Mail		Odpowiedz nadawcy
 There is no installed handler for URL links.	Mail		Brak zainstalowanego programu do obsługi skrótów URL.
 Signature	Mail		Sygnatura
 Find again	Mail		Znajdź ponownie
+Bcc:	Mail		Bcc:
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Twój główny tekst zawiera %ld niekodowalnych znaków. Być może inny zestaw znaków będzie lepiej działać? Wybierz Wyślij aby wysłać mimo wszystko (znak zastępczy będzie użyty w miejscach niekodowalnych znaków), lub wybierz Anuluj aby wrócić i poprawić to.
 Signature:	Mail		Sygnatura:
+Save changes to this signature?	Mail		Czy zapisać zmiany tej sygnaturki?
+Cc:	Mail		Cc:
+Off	Mail		Wyłącz
+Find	Mail		Znajdź
+Preferences…	Mail		Ustawienia…
+Undo	Mail		Cofnij
+Date:	Mail		Data:
+An error occurred trying to open this signature.	Mail		Wystąpił błąd podczas próby otwarcia tej sygnaturki.
+No file attributes, just plain data	Mail		Brak atrybutów pliku, tylko czyste dane
+Edit queries…	Mail		Edytuj zapytania…
+queries	B_USER_DIRECTORY/mail/queries		zapytania
+Paste	Mail		Wklej
+in	B_USER_DIRECTORY/mail/in		in
+Save attachment…	Mail		Zapisz załącznik…
+Include file attributes in attachments	Mail		Załączaj atrybuty plików w załącznikach
+OK	Mail		OK
+Send	Mail		Wyślij
+Show icons only	Mail		Pokaż tylko ikony
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Usuwanie załączników z przekazywanych wiadomości nie jest jeszcze zaimplementowane!\nTo nie będzie to jeszcze działać prawidłowo.
+Hide	Mail		Ukryj
+Forward without attachments	Mail		Przekaż bez załączników
+Previous	Mail		Poprzednie
+Redo	Mail		Ponów
+Add enclosure…	Mail		Dodaj załącznik…
+Mail	System name		Poczta
 Print…	Mail		Drukuj…
+Warn unencodable:	Mail		Ostrzegaj niekodowalne:
+Quit	Mail		Wyjdź
+%n - Full name	Mail		%n - Pełna nazwa
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
+Trash	Mail		Kosz
+Default account:	Mail		Domyślne konto
+Size:	Mail		Rozmiar:
+Edit signatures…	Mail		Edytuj sygnaturki…
+New	Mail		Nowy
+Attachments: 	Mail		Załączniki:
+On	Mail		Włącz
+E-mail draft could not be saved!	Mail		Szablon wiadomości nie mógł zostać zapisany!
+%e wrote:\\n	Mail		%e zapisano:\\n
+To:	Mail		Do:
+Only files can be added as attachments.	Mail		Tylko pliki mogą być dodane jako załączniki.
+Previous message	Mail		Poprzednia wiadomość
+Attachments:	Mail		Załączniki:
+Title:	Mail		Tytuł:
+Find…	Mail		Szukaj…
+Accounts…	Mail		Konta…
+Mail preferences	Mail		Ustawienia poczty
+Initial spell check mode:	Mail		Początkowy tryb sprawdzania pisowni:
+Page setup…	Mail		Ustawienia strony…
+Text wrapping:	Mail		Zawijanie tekstu:
+Revert	Mail		Przywróć
+File	Mail		Plik
+mail	B_USER_DIRECTORY/mail		poczta
+None	Mail		Brak
+(Name unavailable)	Mail		(Nazwa niedostępna)
+Copy link location	Mail		Kopiuj adres odnośnika
+out	B_USER_DIRECTORY/mail/out		out
+Show header	Mail		Pokaż nagłówek
+%e - E-mail address	Mail		%e - Adress e-mail
+Resend	Mail		Wyślij ponownie
+Show raw message	Mail		Pokaż źródło wiadomości
+Start now	Mail		Rozpocznij teraz
+Close	Mail		Zamknij
+No matches	Mail		Brak dopasowań
+Really delete this signature? This cannot be undone.	Mail		Czy usunąć naprawdę tę sygnaturkę? Tego nie da się cofnąć.
+Open	Mail		Otwórz
+draft	B_USER_DIRECTORY/mail/draft		draft
+Add	Mail		Dodaj
+Next message	Mail		Następna wiadomość
+User interface	Mail		Interfejs użytkownika
+Cancel	Mail		Anuluj
+Send message	Mail		Wyślij wiadomość
+Remove enclosure	Mail		Usuń załącznik
+Account:	Mail		Konto:
+Decoding:	Mail		Dekodowanie:
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Przepraszamy, nie można znaleźć aplikacji która wspiera typ danych "Osoba".
+Do you wish to send this message before closing?	Mail		Czy chcesz wysłać tę wiadomość przed zamknięciem?
+Delete	Mail		Usuń
+Leave as '%s'	Mail		Pozostaw jako '%s'
 Signatures	Mail		Sygnaturki
+Use default account	Mail		Użyj domyślnego konta
+Sorry	Mail		Przepraszamy
+Encoding:	Mail		Kodowanie:
+Font:	Mail		Czcionka:
+(Address unavailable)	Mail		(Adres niedostępny)
+Save address	Mail		Zapisz adres
+Queries	Mail		Zapytania
+Do you wish to save this message as a draft before closing?	Mail		Czy chcesz zapisać wiadomość jako szkic przed zamknięciem?
+Save	Mail		Zapisz
+Random	Mail		Losowe
+Close and 	Mail		Zamknij i
+Save as draft	Mail		Zapisz jako szkic
+The mail_daemon could not be started:\n\t	Mail		Nie można uruchomić mail_daemon:\n\t
+Open attachment	Mail		Otwórz załącznik
+sent	B_USER_DIRECTORY/mail/sent		sent
+(Date unavailable)	Mail		(Data niedostępna)
+Check spelling	Mail		Sprawdzanie pisowni
+Open this link	Mail		Otwórz ten odnośnik
+Auto signature:	Mail		Automatyczna sygnaturka:
+Add signature	Mail		Dodaj sygnaturkę
+Need Tracker to move items to trash	Mail		Potrzebujesz Trackera aby przenosić elementy do kosza
+Unread	Mail		Nieprzeczytane
+Remove quote	Mail		Usuń cytat
+Move to trash	Mail		Przenieś do kosza
+Select all	Mail		Zaznacz wszystko
 An error occurred trying to save this signature.	Mail		Wystąpił błąd podczas próby zapisu sygnaturki.

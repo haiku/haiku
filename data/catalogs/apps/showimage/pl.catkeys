@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-ShowImage	2353125868
+1	polish	x-vnd.Haiku-ShowImage	886873119
 Use as background…	Menus		Użyj jako tapety…
 File	Menus		Plik
 Slide delay	Menus		Opóźnienie
@@ -22,10 +22,12 @@ Could not load image! Either the file or an image translator for it does not exi
 First page	Menus		Pierwsza strona
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokument '%s' (strona %d) został zmieniony. Czy chcesz go zamknąć?
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekund
+Leave full screen	Menus		Opuść pełny ekran
 Close	Menus		Zamknij
 Close	ClosePrompt		Zamknij
 Undo	Menus		Cofnij
 Resize to (in 1/72 inches):	PrintOptionsWindow		Ustaw rozmiar (w 1/72 cala):
+Rating	Menus		Ocena
 Flip left to right	Menus		Odbij z lewej na prawą
 Show caption in full screen mode	Menus		Pokaż podpis w trybie pełnoekranowym
 DPI:	PrintOptionsWindow		DPI:
@@ -36,6 +38,7 @@ Close document	ClosePrompt		Zamknij dokument
 Height: 	PrintOptionsWindow		Wysokość: 
 The file '%s' could not be written.	SaveToFile		Nie można zapisać pliku '%s'.
 Cancel	ClosePrompt		Anuluj
+Show tool bar	Menus		Pokaż pasek narzędzi
 Fit to window	Menus		Wpasuj w okno
 Print options	PrintOptionsWindow		Ustawienia wydruku
 Copy	Menus		Kopiuj
@@ -43,6 +46,7 @@ Progress monitor	ProgressWindow		Monitor postępu
 Last page	Menus		Ostatnia strona
 Stretch to window	Menus		Rozciągnij do okna
 Previous file	Menus		Poprzedni plik
+ShowImage	System name		ShowImage
 Slide show	Menus		Pokaż z opóźnieniem
 Fit image to page	PrintOptionsWindow		Dopasuj obraz do strony
 Flip top to bottom	Menus		Odbij z góry na dół

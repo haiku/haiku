@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Time	1859841283
+1	polish	x-vnd.Haiku-Time	3249243267
 GMT (UNIX compatible)	Time		GMT (kompatybilne z UNIX'em)
 OK	Time		OK
 Asia	Time		Azja
@@ -7,7 +7,7 @@ Africa	Time		Afryka
 Stop	Time		Stop
 Could not contact server	Time		Nie udało się skontaktować z serwerem
 Australia	Time		Australia
-Preview time:	Time		Czas podglądu:
+Preview time:	Time		Podgląd czasu:
 Synchronize	Time		Synchronizuj
 Revert	Time		Przywróć
 Pacific	Time		Pacyfik
@@ -30,6 +30,7 @@ Time	System name		Czas
 America	Time		Ameryka
 Reset	Time		Resetuj
 Synchronize at boot	Time		Synchronizuj przy rozruchu
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date, napisany przez:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nPrawa zastrzeżone 2004-2012, Haiku.
 Received invalid time	Time		Odebrano niepoprawny czas
 Antarctica	Time		Antarktyda
 The following error occured while synchronizing:r\n%s: %s	Time		Wystąpił błąd podczas synchronizacji:r\n%s: %s

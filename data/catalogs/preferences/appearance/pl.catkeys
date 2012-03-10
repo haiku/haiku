@@ -1,4 +1,5 @@
-1	polish	x-vnd.Haiku-Appearance	168322075
+1	polish	x-vnd.Haiku-Appearance	2558216842
+Plain font:	Font view		Czcionka zwykła:
 Control highlight	Colors tab		Podkreślenie kontrolki
 Control border	Colors tab		Obramowanie kontrolki
 Antialiasing type:	AntialiasingSettingsView		Typ antyaliasingu:
@@ -31,15 +32,20 @@ Navigation pulse	Colors tab		Puls nawigacji
 Selected menu item text	Colors tab		Tekst zaznaczonego elementu menu
 Menu background	Colors tab		Tło menu
 OK	DecorSettingsView		OK
+Size:	Font Selection view		Rozmiar:
 Panel background	Colors tab		Tło panelu
+Menu font:	Font view		Czcionka menu:
 Colors	APRWindow		Kolory
 Control background	Colors tab		Tło kontrolki
 Inactive window tab	Colors tab		Nieaktywna zakładka okna
 Appearance	System name		Wygląd
+Fixed font:	Font view		Czcionka o stałej szerokości:
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Koń i żółw grali w kości z piękną ćmą u źródła.
 Reduce colored edges filter strength:	AntialiasingSettingsView		Zmniejszenie siły kolorowych filtrów krawędzi:
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Antyaliasing podpikselowy w połączeniu z hintowaniem czcionek jest niedostępny w tym buildzie Haiku w celu uniknięcia problemów patentowych. Aby włączyć tę funkcjonalność, musisz zbudować Haiku samemu i włączyć niektóre opcje w pliku nagłówkowym biblioteki libfreetype.
 Control text	Colors tab		Tekst kontrolki
 Tooltip text	Colors tab		Tekst podpowiedzi
+Bold font:	Font view		Czcionka pogrubiona:
 Inactive window border	Colors tab		Nieaktywne obramowanie okna
 Menu item text	Colors tab		Tekst elementu menu
 LCD subpixel	AntialiasingSettingsView		Podpikselowe LCD
@@ -48,4 +54,5 @@ Strong	AntialiasingSettingsView		Silny
 Panel text	Colors tab		Tekst panelu
 Monospaced fonts only	AntialiasingSettingsView		Tylko czcionki o stałej szerokości
 Antialiasing menu	AntialiasingSettingsView		Menu antyaliasingu
+Fonts	APRWindow		Czcionki
 Glyph hinting:	AntialiasingSettingsView		Hintowanie czcionek:

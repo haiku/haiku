@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Time	1859841283
+1	german	x-vnd.Haiku-Time	3249243267
 GMT (UNIX compatible)	Time		GMT (Unix-kompatibel)
 OK	Time		OK
 Asia	Time		Asien
@@ -30,6 +30,7 @@ Time	System name		Datum & Zeit
 America	Time		Amerika
 Reset	Time		Reset
 Synchronize at boot	Time		Synchronisieren beim Hochfahren
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Datum & Zeit\n\nvon\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Received invalid time	Time		Ungültige Zeit erhalten
 Antarctica	Time		Antarktis
 The following error occured while synchronizing:r\n%s: %s	Time		Beim Synchronisieren trat folgender Fehler auf:r\n%s: %s

@@ -1,34 +1,47 @@
-1	polish	x-vnd.Haiku-ProcessController	2207893417
+1	polish	x-vnd.Haiku-ProcessController	2887520383
 Memory usage	ProcessController		Użycie pamięci
 Do you really want to kill the team \"%s\"?	ProcessController		Czy na pewno chcesz zakończyć zespół \"%s\"?
+Idle priority	ProcessController		Priorytet bezczynności
 Restart Deskbar	ProcessController		Zrestartuj Deskbar
+Custom priority	ProcessController		Własny priorytet
 Debug thread	ProcessController		Debuguj wątek
 This team is already gone…	ProcessController		Ten zespół nie jest już obecny…
 Error saving file	ProcessController		Błąd przy zapisywaniu pliku
+Real-time priority	ProcessController		Priorytet czasu rzeczywistego
 Your setting file could not be saved!\n(%s)	ProcessController		Twój plik ustawień nie może być zapisany!\n(%s)
 This thread is already gone…	ProcessController		Ten wątek nie jest już obecny…
 Cancel	ProcessController		Anuluj
+Display priority	ProcessController		Priorytet wyświetlania
 Run in window	ProcessController		Uruchom w oknie
 Processor %d	ProcessController		Procesor %d
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 ProcessController is already installed in Deskbar.	ProcessController		ProcessController jest już zainstalowany w Deskbarze.
 This is the last active processor...\nYou can't turn it off!	ProcessController		To jest ostatni aktywny procesor...\nNie możesz go wyłączyć!
+Info	ProcessController		Informacja
 Quit application	ProcessController		Zakończ aplikację
+Low priority	ProcessController		Niski priorytet
 What do you want to do with the thread \"%s\"?	ProcessController		Co chcesz zrobić z wątkiem \"%s\"?
 Gone teams…	ProcessController		Brakujące zespoły…
+Lowest active priority	ProcessController		Najniższy aktywny priorytet
 Restart Tracker	ProcessController		Zrestartuj Trackera
 Live in the Deskbar	ProcessController		Na bieżąco w Deskbarze
 Kill this thread!	ProcessController		Zakończ ten wątek!
 Debug this thread!	ProcessController		Debuguj ten wątek!
+Normal priority	ProcessController		Normalny priorytet
 New Terminal	ProcessController		Nowy terminal
+Urgent priority	ProcessController		Pilny priorytet
 About ProcessController…	ProcessController		O ProcessController…
 Ok!	ProcessController		Ok!
 Quit an application	ProcessController		Wyjdź z aplikacji
 Install in Deskbar	ProcessController		Zainstaluj w Deskbarze
 Threads and CPU usage	ProcessController		Wątki oraz użycie CPU
+Urgent display priority	ProcessController		Pilny priorytet wyświetlania
 OK	ProcessController		OK
 Damned!	ProcessController		Cholera!
 Usage: %s [-deskbar]\n	ProcessController		Użycie: %s [-deskbar]\n
+ProcessController	System name		ProcessController
+Real-time display priority	ProcessController		Czasu rzeczywistego priorytet wyświetlania
+Please confirm	ProcessController		Proszę potwierdź
 Yes, kill this team!	ProcessController		Tak, zakończ ten zespół!
 System resources & caches…	ProcessController		Zasoby i bufory systemu…
 That's no Fun!	ProcessController		To nie zabawa!

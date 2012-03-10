@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libbe	2385191357
+1	polish	x-vnd.Haiku-libbe	180647795
 Close	AboutWindow		Zamknij
 %3.2f GiB	StringForSize		%3.2f GiB
 Written by:	AboutWindow		Napisany przez:
@@ -20,6 +20,7 @@ Print Server is not responding.	PrintJob		Serwer Wydruku nie odpowiada.
 Paste	TextView		Wklej
 Copyright © %years% Haiku, Inc.	AboutWindow		Chroniony prawem autorskim © %years% Haiku, Inc.
 %.2f TiB	StringForSize		%.2f TiB
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nie można zlokalizować aplikacji dla replikanta. Nie dostarczono podpisu aplikacji.\n%error
 Redo	TextView		Ponów
 <empty>	Menu		<puste>
 Select All	TextView		Zaznacz wszystko

@@ -1,4 +1,5 @@
-1	polish	x-vnd.Haiku-libtracker	726594447
+1	polish	x-vnd.Haiku-libtracker	1319179540
+common	B_COMMON_DIRECTORY		common
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Widok ikon
 Add-ons	FilePanelPriv		Wtyczki
@@ -24,7 +25,7 @@ Sorry, you can't save things at the root of your system.	FilePanelPriv		Przepras
 Show shared volumes on Desktop	SettingsView		Pokaż wspólne woluminy na Pulpicie
 Paste links	ContainerWindow		Wklej linki
 Name	OpenWithWindow		Nazwa
-Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Nie można otworzyć \"%document\" ponieważ aplikacja \"%app\ jest w Koszu. 
+Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Nie można otworzyć \"%document\" ponieważ aplikacja \"%app\" jest w Koszu. 
 File	ContainerWindow		Plik
 Handles any %type	OpenWithWindow		Obsługuje każdy %type
 Delete	ContainerWindow		Skasuj
@@ -47,24 +48,30 @@ Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttribut
 Clean up	DeskWindow		Wyczyść
 You cannot copy or move the root directory.	FSUtils		Nie możesz kopiować ani przenosić katalogu głównego.
 Invert selection	FilePanelPriv		Odwróć zaznaczenie
+Rename	InfoWindow	Button label, 'Rename' (en), 'Umbenennen' (de)	Zmień nazwę
 save text	FilePanelPriv		zapisz tekst
 Select all	FilePanelPriv		Zaznacz wszystko
 Link to:	InfoWindow		Link do:
 Location	ContainerWindow		Lokacja
 Location	QueryPoseView		Lokacja
+config	B_USER_CONFIG_DIRECTORY		config
+apps	B_APPS_DIRECTORY		apps
 Icon view	ContainerWindow		Widok ikon
 Size	QueryPoseView		Rozmiar
 Emptying Trash… 	StatusWindow		Opróżnianie Kosza… 
+Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Tracker New Templates
 Close all in workspace	ContainerWindow		Zamknij wszystko w przestrzeni roboczej
 Empty Trash	ContainerWindow		Wyczyść Kosz
 Name = %name	FindPanel	FindResultTitle	Nazwa = %name
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Jesteś pewien, że chcesz przenieść/skopiować pliki do tego folderu?
+Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Jesteś pewien, że chcesz przenieść lub skopiować pliki do tego folderu?
 Does not handle file	OpenWithWindow		Nie podtrzymuje pliku
+Arrange by	ContainerWindow		Ułóż według
 Mount server error	AutoMounterSettings		Błąd serwera montowania
 Search	FindPanel		Szukaj
 Preparing to empty Trash…	StatusWindow		Przygotowanie do opróżnienia Kosza…
 Disks	Model		Dyski
 Create link	ContainerWindow		Utwórz link
+develop	B_COMMON_DEVELOP_DIRECTORY		develop
 Decrease size	DeskWindow		Zmniejsz rozmiar
 Size	ContainerWindow		Rozmiar
 All disks	AutoMounterSettings		Wszystkie dyski
@@ -87,9 +94,11 @@ New folder	FilePanelPriv		Nowy folder
 %name info	InfoWindow	InfoWindow Title	%name informacje
 Favorites	FavoritesMenu		Ulubione
 Add-ons	VolumeWindow		Wtyczki
+(Finish: %time - %finishtime left)	StatusWindow		(Koniec: %time - %finishtime pozostało)
 Sorry, you can't copy items to the Trash.	PoseView		Przepraszamy, nie możesz skopiować elementu do kosza.
 List view	VolumeWindow		Widok listy
 matches wildcard expression	SelectionWindow		Odpowiada wieloznacznikowemu wyrażeniu
+rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	zmienisz nazwę
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Nie możesz podmienić folderu lub skrótu z użyciem pliku.
 Show space bars on volumes	SettingsView		Pokaż pasek zajętości miejsca na woluminie
 Invert selection	ContainerWindow		Odwróc zaznaczenie
@@ -100,6 +109,8 @@ Add printer…	ContainerWindow		Dodaj drukarkę…
 Open	VolumeWindow		Otwórz
 New folder	ContainerWindow		Nowy folder
 Kind	ContainerWindow		Rodzaj
+rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	zmień nazwę
+home	B_USER_DIRECTORY		home
 Select…	ContainerWindow		Zaznacz…
 Copy to	ContainerWindow		Kopiuj do
 Move to Trash	ContainerWindow		Przenieś do Kosza
@@ -159,6 +170,7 @@ Edit favorites…	FilePanelPriv		Edytuj ulubione…
 Create relative link	ContainerWindow		Utwórz wględny skrót
 Copy	ContainerWindow		Kopiuj
 Size	PoseView		Rozmiar
+If you %ifYouDoAction the home folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Jeśli %ifYouDoAction katalogu domowego, %osName może nie zachowywać się poprawnie! Czy na pewno chcesz to zrobić? Aby %toDoAction katalogu domowego mimo wszystko, przytrzymaj klawisz Shift i kliknij \"%toConfirmAction\".
 Location	OpenWithWindow		Lokacja
 Force identify	ContainerWindow		Identyfikuj
 Duplicate	ContainerWindow		Zduplikuj
@@ -193,6 +205,7 @@ Could not find application \"%appname\"	OpenWithWindow		Nie można odnaleźć ap
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Zaznaczony plik nie może zostać przeniesiony do kosza. Czy chcesz go usunąć zamiast tego? (Ta operacja nie może zostać cofnięta)
 Invert	SelectionWindow		Odwróć
 Save Query as template…	FindPanel		Zapisz zapytanie jako szablon…
+rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	zmienisz nazwę
 Find	FindPanel		Znajdź
 Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Przenieś
 Get info	ContainerWindow		Pobierz informacje
@@ -206,6 +219,7 @@ Name	PoseView		Nazwa
 Group	FilePermissionsView		Grupa
 Version:	InfoWindow		Wersja:
 Created:	InfoWindow		Stworzono:
+If you %ifYouDoAction the mime settings, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"%toConfirmAction\".	FSUtils		Jeśli %ifYouDoAction typ mime, %osName może nie zachowywać się poprawnie! Czy na pewno chcesz to zrobić? Aby %toDoAction typ mime mimo wszystko kliknij \"%toConfirmAction\".
 \nShould this be fixed?	FSUtils		\nCzy naprawić to?
 Copying: 	StatusWindow		Kopiowanie: 
 Capacity:	InfoWindow		Pojemność:
@@ -228,6 +242,7 @@ Mount settings…	SettingsView		Ustawienia montowania…
 Edit name	InfoWindow		Zmień nazwę
 Could not open \"%name\" (%error). 	FSUtils		Nie można otworzyć \"%name\" (%error). 
 Paste	ContainerWindow		Wklej
+optional	/boot/optional		optional
 Modified:	InfoWindow		Zmodyfikowano:
 Error moving \"%name\".	FSUtils		Błąd przy przenoszeniu \"%name\".
 TiB	WidgetAttributeText		TiB
@@ -243,6 +258,7 @@ Cancel	Tracker		Anuluj
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Nie możesz edytować tego atrybutu.
 Name	ContainerWindow		Nazwa
 Disk mount settings	AutoMounterSettings		Opcje montowania dysku
+Reverse order	ContainerWindow		Odwrócony porządek
 48 x 48	DeskWindow		48 x 48
 OK	OpenWithWindow		OK
 Add current folder	FilePanelPriv		Dodaj obecny folder
@@ -258,9 +274,11 @@ Unknown	WidgetAttributeText		Nieznany
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Nie można otworzyć \"%document\" (Brakujący symbol: %symbol). \n
 by name	FindPanel		od nazwy
 Creating links: 	StatusWindow		Tworzenie skrótów: 
+Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	Zmiana nazwy
 Paused: click to resume or stop	StatusWindow		Pauza: kliknij by kontynuować lub zatrzymać
 Preferred for %type	OpenWithWindow		Preferowane dla %type
 GiB	WidgetAttributeText		GiB
+If you %ifYouDoAction the common folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Jeśli %ifYouDoAction katalog common, %osName może nie zachowywać się poprawnie! Czy na pewno chcesz to zrobić? Aby %toDoAction katalog common mimo wszystko, przytrzymaj klawisz Shift i kliknij \"%toConfirmAction\".
 There was an error deleting \"%name\":\n\t%error	FSUtils		Pojawił się błąd przy usuwaniu \"%name\":\n\t%error
 Paste	FilePanelPriv		Wklej
 Copy more	ContainerWindow		Kopiuj więcej
@@ -270,6 +288,7 @@ Clean up all	ContainerWindow		Wyczyść wszystko
 New folder	TemplatesMenu		Nowy folder
 Move here	ContainerWindow		Przenieś tutaj
 File	FilePanelPriv		Plik
+Real name	ContainerWindow		Prawdziwe imię i nazwisko
 Error moving \"%name\"	FSUtils		Błąd przy przenoszeniu \"%name\"
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Musisz upuścić obiekty na jednej z ikon w oknie \"Disks\".
 Cancel	WidgetAttributeText		Anuluj
@@ -295,6 +314,7 @@ Permissions	ContainerWindow		Uprawnienia
 moving	FSUtils		przenoszenie
 Identify	InfoWindow		Zidentyfikuj
 Recent folders	ContainerWindow		Ostatnio otwierane foldery
+rename	InfoWindow	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	zmienić nazwę
 Close all	ContainerWindow		Zamknij wszystko
 Include trash	FindPanel		Uwzględnij kosz
 Query template	FindPanel		Szablon Zapytanie
@@ -360,6 +380,7 @@ And	FindPanel		I
 Select…	DeskWindow		Wybierz…
 Copy	FilePanelPriv		Kopiuj
 Icon view	DeskWindow		Widok ikon
+(Finish: %time - Over %finishtime left)	StatusWindow		(Koniec: %time - Pozostało %finishtime)
 Select all	QueryContainerWindow		Zaznacz wszystko
 Files cannot be moved or deleted from a read-only volume.	PoseView		Pliki nie mogą zostać przeniesione do woluminu tylko do odczytu.
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Pojawił się problem przy modyfikowaniu \"%name\". Plik może być zajęty lub otwarty przez inny proces.
@@ -368,6 +389,7 @@ Owner	FilePermissionsView		Właściciel
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Pojawił się problem przy zapisywaniu we wskazanej lokalizacji. Proszę podać inną lokalizację.
 Restore	ContainerWindow		Przywróć
 Restoring: 	StatusWindow		Przywracanie: 
+system	B_SYSTEM_DIRECTORY		system
 Skip	FSUtils		Pomiń
 Settings…	MountMenu		Ustawienia…
 Error emptying Trash!	FSUtils		Błąd przy opróżniania kosza!
@@ -385,6 +407,7 @@ Select…	FilePanelPriv		Wybierz…
 Don't move files to Trash	SettingsView		Nie przenoś plików do kosza
 There was an error resolving the link.	Tracker		Pojawił się problem przy przetwarzaniu skrótu.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
+If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Jeśli %ifYouDoAction folder systemowy lub jego zawartość, nie będziesz mógł uruchomić %osName! Czy na pewno chcesz to zrobić? Aby %toDoAction katalogu domowego mimo wszystko, przytrzymaj klawisz Shift i kliknij \"%toConfirmAction\".
 You can't move or copy the trash.	FSUtils		nie możesz przenieść ani skopiować kosza.
 ends with	SelectionWindow		kończy się na
 Volume icons	TrackerSettingsWindow		Ikony dysków
@@ -406,6 +429,7 @@ Modified	ContainerWindow		Zmodyfikowane
 Edit Query template	FindPanel		Edytuj szablon Zapytania
 Prompt	FSUtils		Ostrzegaj
 Edit query	ContainerWindow		Edytuj zapytanie
+If you %ifYouDoAction the config folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"%toConfirmAction\".	FSUtils		Jeśli %ifYouDoAction katalog config, %osName może nie zachowywać się poprawnie! Czy na pewno chcesz to zrobić? Aby %toDoAction katalog config mimo wszystko, kliknij  \"%toConfirmAction\".
 Find…	ContainerWindow		Znajdź…
 Create a Query	FindPanel		Stwórz zapytanie
 Move to Trash	FSUtils		Przenieś do kosza
@@ -424,6 +448,7 @@ Mount	ContainerWindow		Zamontuj
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used zajęte -- %free wolne)
 Cancel	FSClipBoard		Anuluj
 Cut more	ContainerWindow		Wytnij więcej
+If you %ifYouDoAction the settings folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"%toConfirmAction\".	FSUtils		Jeśli %ifYouDoAction katalog settings, %osName może nie zachowywać się poprawnie! Czy na pewno chcesz to zrobić? Aby %toDoAction katalog config mimo wszystko, kliknij \"%toConfirmAction\".
 Deleting: 	StatusWindow		Usuwanie: 
 Empty Trash	InfoWindow		Opróżnij kosz
 Add	FindPanel		Dodaj

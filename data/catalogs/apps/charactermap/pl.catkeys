@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-CharacterMap	800072856
+1	polish	x-vnd.Haiku-CharacterMap	2745781253
 Enclosed alphanumerics	UnicodeBlocks		Otoczone symbole alfanumeryczne
 Basic Latin	UnicodeBlocks		Podstawowy łaciński
 View	CharacterWindow		Widok
@@ -165,6 +165,7 @@ Ethiopic supplement	UnicodeBlocks		Uzupełnienie etiopskiego
 Latin extended B	UnicodeBlocks		Rozszerzony łaciński B
 Box drawing	UnicodeBlocks		Rysowanie ramek
 Mathematical alphanumeric symbols	UnicodeBlocks		Matematyczne symbole alfanumeryczne
+Copy character	CharacterView		Kopiuj znak
 Greek and Coptic	UnicodeBlocks		Grecki i koptyjski
 Carian	UnicodeBlocks		Karyjski
 Georgian	UnicodeBlocks		Gruziński
@@ -174,6 +175,7 @@ CJK compatibility	UnicodeBlocks		Znaki zgodności CJK
 Malayalam	UnicodeBlocks		Malajalam
 N'Ko	UnicodeBlocks		N'Ko
 Kannada	UnicodeBlocks		Kannada
+Copy as escaped byte string	CharacterView		Kopiuj jako zaeskejpowany łańcuch bajtów
 Phonetic extensions supplement	UnicodeBlocks		Uzupełnienie rozszerzeń fonetycznych
 Domino tiles	UnicodeBlocks		Klocki domina
 Katakana phonetic extensions	UnicodeBlocks		Rozszerzenia fonetyczne katakana

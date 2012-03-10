@@ -1,0 +1,15 @@
+1	polish	x-vnd.Haiku-MatchHeader	1205906732
+<Choose action>	ConfigView		<Wybierz akcję>
+has	ConfigView		ma
+Move to	ConfigView		Przenieś do
+Then	ConfigView		Następnie
+value (use REGEX: in from of regular expressions like *spam*)	ConfigView		wartość (używaj wyrażeń regularnych takich, jak *spam*)
+this field is based on the action	ConfigView		to pole bazuje na akcji
+Delete message	ConfigView		Usuń wiadomość
+Rule filter	RuleFilter		Filtr reguł
+<Choose account>	ConfigView		<Wybierz konto>
+Set flags to	ConfigView		Ustaw flagi na
+Set as read	ConfigView		Oznacz jako przeczytane
+Reply with	ConfigView		Odpowiedz z
+If	ConfigView		Jeśli
+header (e.g. Subject)	ConfigView		nagłówek (np. Tytuł)

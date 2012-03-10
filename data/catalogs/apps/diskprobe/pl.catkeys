@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-DiskProbe	2678989629
+1	polish	x-vnd.Haiku-DiskProbe	1689678213
 File offset: 	ProbeView		Offset pliku: 
 %ld (native)	ProbeView		%ld (natywny)
 64 bit unsigned value:	TypeEditors		64-bitowa wartość typu unsigned:
@@ -15,6 +15,7 @@ Floating-point value:	TypeEditors		Wartość typu floating-point:
 Attributes	ProbeView		Atrybuty
 Device offset: 	ProbeView		Offset urządzenia: 
 Selection	ProbeView		Zaznaczenie
+DiskProbe	System name		DiskProbe
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	Typ wiadomości: '%.4s'\n\n
 File	FileWindow		Plik
 OK	DiskProbe		OK
@@ -48,6 +49,7 @@ Number	TypeEditors	This is the type of editor	Typ numeryczny
 Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Decymalna
 16 bit signed value:	TypeEditors		16-bitowa wartość typu signed:
 String editor	TypeEditors		Edytor typu string
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	z 0x0
 64 bit signed offset:	TypeEditors		64-bitowy offset typu signed:
 Boolean editor	TypeEditors		Edytor typu boolowskiego
 Copy	ProbeView		Kopiuj
@@ -65,18 +67,47 @@ Page setup…	ProbeView		Ustawienia strony wydruku…
 New…	FileWindow		Nowy…
 DiskProbe request	AttributeWindow		Zapytanie Analizatora dysków
 Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Nie można odczytać pliku graficznego
+BlockSize	ProbeView	A menu item, a shortened form from 'block size'. This is in the same menu windowthan 'Base' and 'Font size'	RozmiarBloku
 Save changes before closing?	ProbeView		Czy zapisać zmiany przed zakończeniem działania aplikacji?
+Native: 0x%0*Lx	ProbeView		Natywne: 0x%0*Lx
 DiskProbe request	ProbeView		Zapytanie Analizatora dysków
+32 bit unsigned size:	TypeEditors		32-bitowa wartość typu unsigned:
+Open file…	FileWindow		Otwórz plik…
 Next	ProbeView		Następny
 Close	FileWindow		Zamknij
 Attribute: 	ProbeView		Atrybut: 
+Remove from file	AttributeWindow		Usuń z pliku
+Don't save	ProbeView		Nie zapisuj
+Previous	ProbeView		Poprzedni
 64 bit signed value:	TypeEditors		64-bitowa wartość typu signed:
+Icon	TypeEditors		Ikona
+Block: 	ProbeView		Blok: 
+Offset: 	ProbeView		Przesunięcie: 
 OK	ProbeView		OK
+Add	ProbeView		Dodaj
+Edit	ProbeView		Edycja
 32 bit unsigned value:	TypeEditors		32-bitowa wartość typu unsigned:
 Cancel	AttributeWindow		Anuluj
+MIME type editor	TypeEditors		Edytor typów MIME
+Swapped: %Ld (0x%0*Lx)	ProbeView		Zamienione: %Ld (0x%0*Lx)
 Find	FindWindow		Wyszukaj
+Remove	AttributeWindow		Usuń
+Print…	ProbeView		Wydrukuj…
+Block %Ld (0x%Lx)	ProbeView		Blok %Ld (0x%Lx)
+Image	TypeEditors	This is the type of view	Obraz
+Could not open file \"%s\": %s\n	DiskProbe		Nie można otworzyć pliku \"%s\": %s\n
+Select all	ProbeView		Zaznacz wszystko
 15 bit	TypeEditors		15-bitowy
 16 bit unsigned value:	TypeEditors		16-bitowa wartość typu unsigned:
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Widok
+Redo	ProbeView		Ponów
+File: 	ProbeView		Plik: 
+32 bit unsigned pointer:	TypeEditors		32-bitowy wskaźnik typu unsigned:
+of 	ProbeView		z
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Zapis do pliku nie powiódł się:\n%s\n\nWszystkie zmiany zostaną utracone jeśli wyjdziesz.
 Cancel	ProbeView		Anuluj
+Swapped: 0x%0*Lx	ProbeView		Zamienione: 0x%0*Lx
+Grayscale	TypeEditors		Skala szarości
 32 bit signed value:	TypeEditors		32-bitowa wartość typu signed:
 DiskProbe request	DiskProbe		Zapytanie Analizatora dysków
+Contents:	TypeEditors		Zawartość:

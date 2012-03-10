@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Time	1859841283
+1	japanese	x-vnd.Haiku-Time	3249243267
 GMT (UNIX compatible)	Time		GMT (UNIX 互換)
 OK	Time		OK
 Asia	Time		アジア
@@ -30,6 +30,7 @@ Time	System name		日付と時間
 America	Time		アメリカ
 Reset	Time		リセット
 Synchronize at boot	Time		システム起動時に同期する
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date  作者：\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Received invalid time	Time		不正な時間を受け取りました
 Antarctica	Time		南極
 The following error occured while synchronizing:r\n%s: %s	Time		同期中に次のエラーが発生しました\n%s: %s

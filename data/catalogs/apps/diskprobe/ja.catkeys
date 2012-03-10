@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DiskProbe	3313935694
+1	japanese	x-vnd.Haiku-DiskProbe	2593619007
 File offset: 	ProbeView		ファイルオフセット：
 %ld (native)	ProbeView		%ld (ネイティブ)
 64 bit unsigned value:	TypeEditors		符号なし 64 ビット値：
@@ -59,6 +59,7 @@ Boolean value:	TypeEditors		ブール値：
 8 bit palette	TypeEditors		8 ビットパレット
 Fit	ProbeView	Size of fonts, fits to available room	ビューに合わせる
 Probe device	OpenWindow		デバイスを調べる
+ (native)	ProbeView		(ネイティブ)
 Unknown format	TypeEditors		不明なフォーマット
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	16 進
 MIME type:	TypeEditors		MIME タイプ：
@@ -68,12 +69,31 @@ DiskProbe request	AttributeWindow		DiskProbe リクエスト
 Could not read image	TypeEditors	Image means here a picture file, not a disk image.	イメージを読み込めませんでした
 BlockSize	ProbeView	A menu item, a shortened form from 'block size'. This is in the same menu windowthan 'Base' and 'Font size'	ブロックサイズ
 Save changes before closing?	ProbeView		閉じる前に保存しますか?
+Type editor	AttributeWindow		タイプエディター
+Native: 0x%0*Lx	ProbeView		ネイティブ：0x%0*Lx
+Raw editor	AttributeWindow		Raw エディター
+Message View	TypeEditors		メッセージビュー
 DiskProbe request	ProbeView		DiskProbe リクエスト
+32 bit unsigned size:	TypeEditors		符号なし 32 ビット値：
+Flattened bitmap	TypeEditors		フラット化したビットマップ
+Open file…	FileWindow		ファイルを開く…
+Next	ProbeView		次へ
 Close	FileWindow		閉じる
+Attribute: 	ProbeView		属性：
+Remove from file	AttributeWindow		ファイルから削除
+Don't save	ProbeView		保存しない
+Previous	ProbeView		前へ
 64 bit signed value:	TypeEditors		符号なし 64 ビット値：
+Icon	TypeEditors		アイコン
+Block: 	ProbeView		ブロック：
+Examine device:	OpenWindow		デバイスを調べる：
+Offset: 	ProbeView		オフセット：
 OK	ProbeView		OK
+Add	ProbeView		追加
 32 bit unsigned value:	TypeEditors		符号なし 32 ビット値：
 Cancel	AttributeWindow		中止
+Remove	AttributeWindow		削除
+Print…	ProbeView		印刷…
 Select all	ProbeView		すべて選択
 15 bit	TypeEditors		15 ビット
 16 bit unsigned value:	TypeEditors		符号無し 16 ビット値：

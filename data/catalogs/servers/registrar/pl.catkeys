@@ -1,11 +1,23 @@
-1	polish	x-vnd.haiku-registrar	3411469591
+1	polish	x-vnd.haiku-registrar	2599857937
 Restart system	ShutdownProcess		Restartuj system
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Aplikacja\"%appName%\" może być zablokowana na modalnym panelu.
 OK	ShutdownProcess		OK
+System is shut down	ShutdownProcess		System jest zamknięty
 It's now safe to turn off the computer.	ShutdownProcess		Teraz można bezpiecznie wyłączyć komputer.
 Cancel	ShutdownProcess		Anuluj
 Do you really want to shut down the system?	ShutdownProcess		Czy naprawdę chcesz wyłączyć system?
 Asking other processes to quit.	ShutdownProcess		Sprawdzanie innych procesów w celu zamknięcia.
 Asking \"%appName%\" to quit.	ShutdownProcess		Sprawdzanie \"%appName%\" w celu zamknięcia.
+%action%?	ShutdownProcess		%action%?
 Shutdown aborted	ShutdownProcess		Zamknięcie przerwane
 Restarting…	ShutdownProcess		Restartowanie…
+Asking background applications to quit.	ShutdownProcess		Pytanie aplikacji działających w tle o zamknięcie.
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Aplikacja \"%appName%\" przerwała proces zamkniecia.
+Tidying things up a bit.	ShutdownProcess		Porządkowanie rzeczy.
 Do you really want to restart the system?	ShutdownProcess		Czy na pewno chcesz ponownie uruchomić system?
+Shutdown status	ShutdownProcess		Status zamykania
+Cancel shutdown	ShutdownProcess		Anulowanie zamknięcia
+Kill application	ShutdownProcess		Zabij aplikacje
+Shut down	ShutdownProcess		Zamknięcie systemu
+Restart	ShutdownProcess		Uruchom ponownie
+Shutting down…	ShutdownProcess		Zamykanie...

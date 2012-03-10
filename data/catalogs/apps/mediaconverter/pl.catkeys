@@ -1,0 +1,50 @@
+1	polish	x-vnd.Haiku-MediaConverter	1077524254
+Video encoding:	MediaConverter		Kodowanie wideo:
+No audio	Audio codecs list		Brak dźwięku
+Error	MediaConverter		Błąd
+Error loading a file	MediaConverter		Błąd ładowania pliku
+File Error	MediaConverter-FileInfo		Błąd pliku
+Open…	Menu		Otwórz…
+Start [ms]: 	MediaConverter		Początek [ms]:
+Output file '%filename' created	MediaConverter		Utworzono plik wynikowy '%filename' 
+Output format	MediaConverter		Format wyjściowy
+End   [ms]: 	MediaConverter		Koniec   [ms]: 
+MediaConverter	System name		MediaConverter
+No video	Video codecs list		Brak wideo
+Duration:	MediaConverter-FileInfo		Długość:
+OK	MediaConverter		OK
+Error converting '%filename'	MediaConverter		Błąd konwersji '%filename'
+Conversion completed	MediaConverter		Konwersja ukończona
+Audio:	MediaConverter-FileInfo		Dźwięk:
+OK	MediaConverter-FileInfo		OK
+ seconds	MediaFileInfo		sekundy
+Source files	MediaConverter		Pliki źródłowe
+Cancelling	MediaConverter		Anulowanie
+%d byte 	MediaFileInfo		%d bajt
+Error loading files	MediaConverter		Błąd wczytywania plików
+Cancel	MediaConverter		Anuluj
+Conversion cancelled	MediaConverter		Konwersja anulowana
+No file selected	MediaConverter-FileInfo		Nie wybrano pliku
+Select this folder	MediaConverter		Wybierz ten katalog
+Continue	MediaConverter		Kontynuuj
+Encoder parameters	MediaConverter-EncoderWindow		Parametry kodeka
+Video:	MediaConverter-FileInfo		Wideo:
+%u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2ffps / %Ld ramek
+%d bit 	MediaFileInfo		%d bit
+Error creating '%filename'	MediaConverter		Błąd tworzenia '%filename'
+Quit	Menu		Wyjdź
+Preview	MediaConverter		Podgląd
+File format:	MediaConverter		Format pliku:
+MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
+Error read audio frame %Ld	MediaConverter		Błąd odczytu ramki dźwięku %Ld
+%.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld kanał/ %lld ramek
+Error launching: %strError%	MediaConverter		Błąd uruchamiania: %strError%
+The file was not recognized as a supported media file:	MediaConverter		Plik nie został rozpoznany jako wspierany plik multimedialny:
+Drop media files onto this window	MediaConverter		Upuść pliki multimedialne do tego okna
+Audio encoding:	MediaConverter		Kodowanie dźwięku:
+Audio quality not supported	MediaConverter		Jakość dźwięku nie wspierana
+File	Menu		Plik
+Convert	MediaConverter		Konwertuj
+Video quality: %3d%%	MediaConverter		Jakość wideo: %3d%%
+Output folder	MediaConverter		Katalog wynikowy
+Audio quality: %3d%%	MediaConverter		Jakość dźwięku: %3d%%

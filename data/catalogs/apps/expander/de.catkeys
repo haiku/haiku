@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Expander	1072439789
+1	german	x-vnd.Haiku-Expander	2398100010
 Expand	ExpanderMenu		Entpacken
 Close window when done expanding	ExpanderPreferences		Fenster nach dem Entpacken schließen
 Set destination…	ExpanderMenu		Ziel wählen…
@@ -16,8 +16,11 @@ Cancel	ExpanderWindow		Abbrechen
 Automatically expand files	ExpanderPreferences		Archiv automatisch entpacken
 Creating listing for '%s'	ExpanderWindow		Dateiliste für '%s' wird erstellt
 Continue	ExpanderWindow		Fortsetzen
+Destination folder	ExpanderPreferences		Zielordner
 The destination folder does not exist.	ExpanderWindow		Der Zielordner existiert nicht.
+Other	ExpanderPreferences		Allgemeines
 Cancel	ExpanderPreferences		Abbrechen
+Expansion	ExpanderPreferences		Entpacken
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Soll das Entpacken wirklich abgebrochen werden? Die entpackten Dateien sind eventuell nicht vollständig.
 Select	DirectoryFilePanel		Auswählen
 Same directory as source (archive) file	ExpanderPreferences		Gleicher Ordner wie Quelldatei

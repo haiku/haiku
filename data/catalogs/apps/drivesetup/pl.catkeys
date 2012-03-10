@@ -1,4 +1,5 @@
-1	polish	x-vnd.Haiku-DriveSetup	568426562
+1	polish	x-vnd.Haiku-DriveSetup	1209826930
+DriveSetup	System name		DriveSetup
 Delete	MainWindow		Usuń
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Na pewno chcesz zapisać zmiany na dysk?\n\nWszystkie dane na wybranej partycji bedą bezpowrotnie utracone!
 Rescan	MainWindow		Przeskanuj

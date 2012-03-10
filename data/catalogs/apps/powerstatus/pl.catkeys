@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-PowerStatus	485408110
+1	polish	x-vnd.Haiku-PowerStatus	3419486861
 Design capacity low warning: 	PowerStatus		Ostrzeżenie o niskiej pojemności projektowej: 
 Show percent	PowerStatus		Pokaż procent
 Design capacity: 	PowerStatus		Pojemność projektowa: 
@@ -9,6 +9,8 @@ Empty battery slot	PowerStatus		Gniazdo na baterie jest puste
  mV	PowerStatus		 mV
 Run in window	PowerStatus		Uruchom w oknie
 About	PowerStatus		O programie
+PowerStatus	System name		PowerStatus
+PowerStatus	PowerStatus		PowerStatus
  mWh	PowerStatus		 mWh
 Battery info…	PowerStatus		Informacje o baterii…
 Damaged battery	PowerStatus		Uszkodzona bateria

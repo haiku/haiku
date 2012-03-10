@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	152904915
+1	english	x-vnd.Haiku-libtracker	518861418
 common	B_COMMON_DIRECTORY		常用
 OK	WidgetAttributeText		确定
 Icon view	VolumeWindow		图标视图
@@ -198,6 +198,7 @@ The selected item cannot be moved to the Trash. Would you like to delete it inst
 Invert	SelectionWindow		恢复
 Save Query as template…	FindPanel		保存查询为模板...
 Find	FindPanel		搜索
+Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	移动
 Get info	ContainerWindow		获取信息
 Error creating link to \"%name\".	FSUtils		创建至 \"%name\" 的链接出错。
 Select	SelectionWindow		选择

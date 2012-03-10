@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-MediaPlayer	2450363168
+1	polish	x-vnd.Haiku-MediaPlayer	2677289539
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerykańskie)
 Stream settings	MediaPlayer-Main		Ustawienia strumienia
 <unknown>	PlaylistItem-album		<nieznany>
@@ -114,6 +114,7 @@ Always on top	MediaPlayer-Main		Zawsze na wierzchu
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Usunięcie wpisu do Kosza
 Save	MediaPlayer-Main		Zapisz
 <nothing to undo>	MediaPlayer-PlaylistWindow		<nie ma czego cofnąć>
+File info	MediaPlayer-InfoWin		Informacja o pliku
 Save	MediaPlayer-PlaylistWindow		Zapisz
 Full screen	MediaPlayer-Main		Pełny ekran
 Open file…	MediaPlayer-Main		Otwórz plik…

@@ -5,4 +5,4 @@ Desktop (Live-CD)	BootPromptWindow		Рабочий стол (Live-CD)
 Language	BootPromptWindow		Язык
 Welcome to Haiku!	BootPromptWindow		Добро пожаловать в Haiku!
 Run Installer	BootPromptWindow		Запустить Установщик
-Keymap	BootPromptWindow		Раскладка
+Keymap	BootPromptWindow		Раскладка клавиатуры

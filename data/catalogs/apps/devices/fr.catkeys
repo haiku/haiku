@@ -1,4 +1,5 @@
-1	french	x-vnd.Haiku-Devices	1943893993
+1	french	x-vnd.Haiku-Devices	2109382396
+Manufacturer	DeviceSCSI		Fabricant
 Order by:	DevicesView		Trier par :
 ACPI controller	Device		Contrôleur ACPI
 Memory controller	Device		Contrôleur mémoire
@@ -10,12 +11,14 @@ Docking station	Device		Station d'accueil
 Computer	Device		Ordinateur
 Unknown device	Device		Périphérique inconnu
 Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Information de classe\t\t\t: %classInfo%
+Processor	DeviceSCSI		Microprocesseur
 Detailed	DevicesView		Détail
 Category	DevicesView		Catégorie
 Quit	DevicesView		Quitter
 Device paths	Device		Chemin des périphériques
 Processor	Device		Microprocesseur
 ACPI Processor Namespace '%2'	DeviceACPI		Espace de nom ACPI du processeur « %2 »
+Bridge	DeviceSCSI		Pont
 unknown	Device		inconnu
 ACPI Information	DeviceACPI		Informations ACPI
 Generic system peripheral	Device		Périphérique système générique
@@ -37,6 +40,7 @@ PCI bus	Device		Bus PCI
 ACPI System Indicator	DeviceACPI		Indicateur système ACPI
 None	Device		Aucun
 PCI bus	DevicesView		Bus PCI
+Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Information de classe\t\t\t: %classInfo%
 Basic information	DevicesView		Informations de base
 PCI Information	DevicePCI		Informations PCI
 Manufacturer:	Device		Fabricant :
@@ -60,6 +64,7 @@ Name	PropertyList		Nom
 Manufacturer	DevicePCI		Fabricant
 Intelligent controller	Device		Contrôleur intelligent
 Satellite communications controller	Device		Contrôleur de communications par satellite
+SCSI Information	DeviceSCSI		Informations SCSI
 Bridge	Device		Pont
 Refresh devices	DevicesView		Rafraichir les périphériques
 Unknown device	DevicesView		Périphérique inconnu
@@ -68,6 +73,7 @@ Connection	DevicesView		Connexion
 Generate system information	DevicesView		Générer les informations systèmes
 Encryption controller	Device		Contrôleur de chiffrement
 Unclassified device	Device		Périphérique inclassable
+Device name	DeviceSCSI		Nom du périphérique
 Class info	DevicePCI		Information de classe
 Device paths	DevicePCI		Chemin des périphériques
 Devices	DevicesView		Périphériques

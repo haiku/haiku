@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-MediaPlayer	2854745242
+1	japanese	x-vnd.Haiku-MediaPlayer	1242225182
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (American)
 %d kHz	MediaPlayer-InfoWin		%d kHz
 Stream settings	MediaPlayer-Main		ストリーム設定
@@ -8,12 +8,15 @@ Scale controls in full screen mode	MediaPlayer-SettingsWindow		フルスクリ�
 Video	MediaPlayer-InfoWin		ビデオ
 Subtitle size:	MediaPlayer-SettingsWindow		サブタイトルのサイズ：
 Save Playlist	MediaPlayer-PlaylistWindow		プレイリストを保存
+<no media>	MediaPlayer-InfoWin		<メディアはありません>
+(not supported)	MediaPlayer-InfoWin		(サポートされていません)
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		再生しようとしているファイルはメディアファイルではないようです。
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		プレイリストの保存に失敗しました:\n\nエラー:
 New player…	MediaPlayer-Main		新規プレイヤー...
 100% scale	MediaPlayer-Main		100% 表示
 Subtitle placement:	MediaPlayer-SettingsWindow		サブタイトルの位置：
 Close	MediaPlayer-Main		閉じる
+Display Mode	MediaPlayer-InfoWin		表示モード
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		いくつかのファイルはごみ箱に移動できませんでした。
 <unknown>	MediaPlayer-InfoWin		<不明>
 Open	MediaPlayer-Main		開く
@@ -21,21 +24,26 @@ Next	MediaPlayer-Main		次
 OK	MediaPlayer-SettingsWindow		OK
 Track %d	MediaPlayer-Main		トラック %d
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (シネマスコープ)
+Display mode	MediaPlayer-InfoWin		表示モード
 Medium	MediaPlayer-SettingsWindow		中
 Close	MediaPlayer-PlaylistWindow		閉じる
+Stereo	MediaPlayer-InfoWin		ステレオ
 Open…	MediaPlayer-PlaylistWindow		開く...
 Toggle mute.	MediaPlayer-Main		ミュートの切替え
 Undo	MediaPlayer-PlaylistWindow		元に戻す：
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		可能なら、ハードウェアビデオオーバーレイを使う
 File info…	MediaPlayer-Main		ファイルの情報...
 Pause playback.	MediaPlayer-Main		再生を一時停止する。
+Overlay	MediaPlayer-InfoWin		オーバーレイ
 Remove Entry	MediaPlayer-RemovePLItemsCmd		項目の削除
 Close window after playing audio	MediaPlayer-SettingsWindow		オーディオ再生終了後、ウインドウを閉じる
 Full volume	MediaPlayer-SettingsWindow		最大音量
 Drop files to play	MediaPlayer-Main		ファイルをドロップして再生してください。
 TogglePlaying	MediaPlayer-Main		再生のオン/オフ
+Copyright	MediaPlayer-InfoWin		著作権
 Cancel	MediaPlayer-SettingsWindow		取り消し
 Loop audio	MediaPlayer-SettingsWindow		オーディオを繰り返し再生
+Container	MediaPlayer-InfoWin		コンテナー
 Nothing to Play	MediaPlayer-Main		再生するものがありません
 Muted	MediaPlayer-SettingsWindow		ミュート
 Quit	MediaPlayer-Main		終了
@@ -44,6 +52,7 @@ Start playing.	MediaPlayer-Main		再生開始
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		ファイルフォーマットを扱うデコーダーがインストールされていません。または、デコーダーと特定のバージョンのフォーマットに問題があります。
 Import Entry	MediaPlayer-ImportPLItemsCmd		項目のインポート
 Gets the URI of the currently playing item.	MediaPlayer-Main		現在再生中項目の URI を取得します。
+%d Channels	MediaPlayer-InfoWin		%d チャンネル
 400% scale	MediaPlayer-Main		400% 表示
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		プレイリストの保存に失敗しました:\n\nエラー:
 Move Entries	MediaPlayer-MovePLItemsCmd		項目の移動
@@ -51,6 +60,7 @@ Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		ごみ箱への移動エラ�
 Audio	MediaPlayer-Main		オーディオ
 Open Playlist	MediaPlayer-PlaylistWindow		プレイリストを開く
 MediaPlayer	System name		メディアプレイヤー
+%f fps	MediaPlayer-InfoWin		%f fps
 OK	MediaPlayer-Main		OK
 Settings…	MediaPlayer-Main		設定...
 MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer 設定
@@ -86,6 +96,7 @@ Attributes	MediaPlayer-Main		属性
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		すべてのファイルをごみ箱に移動できませんでした。
 <untitled>	PlaylistItem-title		<無題>
 Track	Audio Track Menu		トラック
+unknown format	MediaPlayer-InfoWin		不明なフォーマット：
 <nothing to redo>	MediaPlayer-PlaylistWindow		<やり直すものがありません>
 Skip to the next track.	MediaPlayer-Main		次のトラックに飛ぶ
 Play	MediaPlayer-Main		再生
@@ -96,6 +107,7 @@ Aspect ratio	MediaPlayer-Main		アスペクト比
 Error: 	MediaPlayer-Main		エラー:
 Large	MediaPlayer-SettingsWindow		大
 Bottom of video	MediaPlayer-SettingsWindow		ビデオの下側
+DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
 Stop	MediaPlayer-Main		停止
 Volume of background clips	MediaPlayer-SettingsWindow		バックグラウンド再生時のボリューム
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部エラー (メモリ不足)。プレイリストの保存に失敗しました。
@@ -106,6 +118,7 @@ Move file to Trash	MediaPlayer-PlaylistWindow		ファイルをごみ箱に移動
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		ミュート
 Toggle pause/play.	MediaPlayer-Main		一時停止と再生の切替え
+Haiku Media Kit: 	MediaPlayer-InfoWin		Haiku メディアキット：
 Small	MediaPlayer-SettingsWindow		小
 Randomize	MediaPlayer-PlaylistWindow		ランダムに並べ替え
 Off	Subtitles menu		オフ
@@ -128,6 +141,7 @@ Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		項目をごみ箱へ移�
 Save	MediaPlayer-Main		保存
 <nothing to undo>	MediaPlayer-PlaylistWindow		<元に戻すものがありません>
 Save	MediaPlayer-PlaylistWindow		保存
+%d Bit	MediaPlayer-InfoWin		%d ビット
 Remove	MediaPlayer-PlaylistWindow		削除
 Full screen	MediaPlayer-Main		全画面表示
 Open file…	MediaPlayer-Main		ファイルを開く...
