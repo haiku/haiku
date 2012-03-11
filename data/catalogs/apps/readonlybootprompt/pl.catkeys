@@ -1,4 +1,5 @@
-1	polish	x-vnd.Haiku-ReadOnlyBootPrompt	1829836802
+1	polish	x-vnd.Haiku-ReadOnlyBootPrompt	2544294242
+Custom	BootPromptWindow		Własne
 Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Dziękujemy za wypróbowanie Haiku! Mamy nadzieję, że Ci się spodoba!\n\nMożesz wybrać swój język i układ klawiatury z listy po lewej stronie, które to zostaną następnie użyte. Możesz później łatwo zmienić oba ustawienia w ustawieniach Pulpitu.\n\nChcesz od razu przejść do instalatora, czy może kontynuować rozruch do Pulpitu?\n
 Desktop (Live-CD)	BootPromptWindow		Pulpit (Live-CD)
 Language	BootPromptWindow		Język

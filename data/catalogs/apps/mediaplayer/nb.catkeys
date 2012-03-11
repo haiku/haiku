@@ -1,105 +1,105 @@
-1	norwegian_bokmål	x-vnd.Haiku-MediaPlayer	2852236457
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MediaPlayer	2852236457
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikansk)
-100% scale	MediaPlayer-Main		100% skalert
-2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
-200% scale	MediaPlayer-Main		200% skalert
-300% scale	MediaPlayer-Main		300% skalert
-400% scale	MediaPlayer-Main		400% skalert
-50% scale	MediaPlayer-Main		50% skalert
-<nothing to redo>	MediaPlayer-PlaylistWindow		<ingenting å omgjøre>
-<nothing to undo>	MediaPlayer-PlaylistWindow		<ingenting å angre>
 <unknown>	PlaylistItem-album		<ukjent>
-<unknown>	PlaylistItem-author		<ukjent>
-<unnamed>	PlaylistItem-name		<uten navn>
-<untitled>	PlaylistItem-title		<uten navn>
-All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Ikke alle filene kunne flyttes til søppelkurven.
-Always on top	MediaPlayer-Main		Alltid øverst
-Audio	MediaPlayer-Main		Audio
-Audio track	MediaPlayer-Main		Lydspor
-Automatically start playing	MediaPlayer-SettingsWindow		Start avspilling automatisk
-Bottom of screen	MediaPlayer-SettingsWindow		Nederst i videoen
-Bottom of video	MediaPlayer-SettingsWindow		Nederst i videoen
-Cancel	MediaPlayer-SettingsWindow		Avbryt
-Close	MediaPlayer-Main		Lukk
-Close	MediaPlayer-PlaylistWindow		Lukk
-Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopier oppføring
-Drop files to play	MediaPlayer-Main		Slipp filer for å spille av
-Edit	MediaPlayer-PlaylistWindow		Rediger
-Error: 	MediaPlayer-Main		Feil:
-Error: 	MediaPlayer-RemovePLItemsCmd		Feil:
-File info…	MediaPlayer-Main		Filinformasjon...
-Full screen	MediaPlayer-Main		Fullskjerm
-Full volume	MediaPlayer-SettingsWindow		Fullt volum
-Gets the URI of the currently playing item.	MediaPlayer-Main		Hent URI av det som spiller nå
-Hide interface	MediaPlayer-Main		Skjul grensesnitt
-Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Internfeil (låsing feilet). Lagring av spilleliste feilet.
-Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Internfeil (misformet melding). Lagring av spilleliste feilet.
-Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Internfeil (tom for minne). Lagring av spilleliste feilet.
-It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Det ser ut som om mediaserveren ikke kjører.\nØnsker du å starte den?
-Large	MediaPlayer-SettingsWindow		Stor
-Low volume	MediaPlayer-SettingsWindow		Lavt volum
-MediaPlayer	System name		Mediaspiller
-MediaPlayer settings	MediaPlayer-SettingsWindow		Mediaspiller-innstillinger
-Medium	MediaPlayer-SettingsWindow		Medium
-Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Feil ved flytting til søppelkurv
-Mute	MediaPlayer-Main		Lydløs
-Muted	MediaPlayer-SettingsWindow		Lydløs
-New player…	MediaPlayer-Main		Ny spiller...
-Next	MediaPlayer-Main		Neste
-None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Ingen av filene du ville spille ser ut til å være mediafiler.
-Nothing to Play	MediaPlayer-Main		Ingenting å spille
-OK	MediaPlayer-Main		OK
-OK	MediaPlayer-PlaylistWindow		OK
-OK	MediaPlayer-RemovePLItemsCmd		OK
-OK	MediaPlayer-SettingsWindow		OK
-Off	Subtitles menu		Av
-Open	MediaPlayer-Main		Åpne
-Open	MediaPlayer-PlaylistWindow		Åpne
-Open Clips	MediaPlayer-Main		Åpne utklipp
-Open Playlist	MediaPlayer-PlaylistWindow		Åpne spilleliste
-Open file…	MediaPlayer-Main		Åpne fil...
-Open…	MediaPlayer-PlaylistWindow		Åpne...
-Pause	MediaPlayer-Main		Pause
-Play	MediaPlayer-Main		Spill
-Play mode	MediaPlayer-SettingsWindow		Spillemodus
-Playlist	MediaPlayer-PlaylistWindow		Spilleliste
-Playlist…	MediaPlayer-Main		Spilleliste...
-Prev	MediaPlayer-Main		Tilbake
-Quit	MediaPlayer-Main		Avslutt
-Randomize	MediaPlayer-PlaylistWindow		Tilfeldig
-Redo	MediaPlayer-PlaylistWindow		Omgjør
-Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Flytt oppføringene til søppelkurven
-Remove Entry	MediaPlayer-RemovePLItemsCmd		Fjern oppføring
-Revert	MediaPlayer-SettingsWindow		Tilbakestill
-Save	MediaPlayer-Main		Lagre
-Save	MediaPlayer-PlaylistWindow		Lagre
-Save Playlist	MediaPlayer-PlaylistWindow		Lagre spilleliste
-Save as…	MediaPlayer-PlaylistWindow		Lagre som...
-Save error	MediaPlayer-PlaylistWindow		Lagringsfeil
-Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Lagring av spilleliste mislyktes.\n\nFeilmelding:
-Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Lagring av spilleliste feilet:\n\nFeilmelding:
-Settings…	MediaPlayer-Main		Innstillinger...
-Skip to the next track.	MediaPlayer-Main		Hopp til neste spor
-Skip to the previous track.	MediaPlayer-Main		Hopp tilbake til forrige spor
-Small	MediaPlayer-SettingsWindow		Liten
-Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Noen filer kunne ikke flyttes til søppelkurven
-Start media server	MediaPlayer-Main		Start mediaserver
-Start playing.	MediaPlayer-Main		Start avspilling.
-Stop	MediaPlayer-Main		Stopp
-Stop playing.	MediaPlayer-Main		Stopp avspilling
-Subtitles	MediaPlayer-Main		Teksting
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Filen '%filename' kunne ikke åpnes.\n\n
-There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Det var ingen dekoder installert til å håndtere filformatet, eller så har dekoderen problemer med den spesifikke versjonen av formatet.
-Toggle mute.	MediaPlayer-Main		Lydløs
-Toggle pause/play.	MediaPlayer-Main		Velg pause/spill
-Track	Audio Track Menu		Spor
-Track	Video Track Menu		Spor
+Save Playlist	MediaPlayer-PlaylistWindow		Lagre spilleliste
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Ingen av filene du ville spille ser ut til å være mediafiler.
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Lagring av spilleliste mislyktes.\n\nFeilmelding:
+New player…	MediaPlayer-Main		Ny spiller...
+100% scale	MediaPlayer-Main		100% skalert
+Close	MediaPlayer-Main		Lukk
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Noen filer kunne ikke flyttes til søppelkurven
+Open	MediaPlayer-Main		Åpne
+Next	MediaPlayer-Main		Neste
+OK	MediaPlayer-SettingsWindow		OK
 Track %d	MediaPlayer-Main		Spor %d
-URI	MediaPlayer-Main		URI
+2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
+Medium	MediaPlayer-SettingsWindow		Medium
+Close	MediaPlayer-PlaylistWindow		Lukk
+Open…	MediaPlayer-PlaylistWindow		Åpne...
+Toggle mute.	MediaPlayer-Main		Lydløs
 Undo	MediaPlayer-PlaylistWindow		Angre
+File info…	MediaPlayer-Main		Filinformasjon...
+Remove Entry	MediaPlayer-RemovePLItemsCmd		Fjern oppføring
+Full volume	MediaPlayer-SettingsWindow		Fullt volum
+Drop files to play	MediaPlayer-Main		Slipp filer for å spille av
+Cancel	MediaPlayer-SettingsWindow		Avbryt
+Nothing to Play	MediaPlayer-Main		Ingenting å spille
+Muted	MediaPlayer-SettingsWindow		Lydløs
+Quit	MediaPlayer-Main		Avslutt
 Video	MediaPlayer-Main		Video
-Video track	MediaPlayer-Main		Videospor
-View options	MediaPlayer-SettingsWindow		Se valg
+Start playing.	MediaPlayer-Main		Start avspilling.
+There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Det var ingen dekoder installert til å håndtere filformatet, eller så har dekoderen problemer med den spesifikke versjonen av formatet.
+Gets the URI of the currently playing item.	MediaPlayer-Main		Hent URI av det som spiller nå
+400% scale	MediaPlayer-Main		400% skalert
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Lagring av spilleliste feilet:\n\nFeilmelding:
+Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Feil ved flytting til søppelkurv
+Audio	MediaPlayer-Main		Audio
+Open Playlist	MediaPlayer-PlaylistWindow		Åpne spilleliste
+MediaPlayer	System name		Mediaspiller
+OK	MediaPlayer-Main		OK
+Settings…	MediaPlayer-Main		Innstillinger...
+MediaPlayer settings	MediaPlayer-SettingsWindow		Mediaspiller-innstillinger
+Open	MediaPlayer-PlaylistWindow		Åpne
+Stop playing.	MediaPlayer-Main		Stopp avspilling
+Error: 	MediaPlayer-RemovePLItemsCmd		Feil:
+Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Internfeil (misformet melding). Lagring av spilleliste feilet.
+Skip to the previous track.	MediaPlayer-Main		Hopp tilbake til forrige spor
+OK	MediaPlayer-RemovePLItemsCmd		OK
+50% scale	MediaPlayer-Main		50% skalert
+Subtitles	MediaPlayer-Main		Teksting
+Prev	MediaPlayer-Main		Tilbake
 Volume	MediaPlayer-Main		Volum
-none	Audio track menu		ingen
+Audio track	MediaPlayer-Main		Lydspor
+Pause	MediaPlayer-Main		Pause
+Automatically start playing	MediaPlayer-SettingsWindow		Start avspilling automatisk
+Track	Video Track Menu		Spor
+Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Internfeil (låsing feilet). Lagring av spilleliste feilet.
+View options	MediaPlayer-SettingsWindow		Se valg
+Play mode	MediaPlayer-SettingsWindow		Spillemodus
+Video track	MediaPlayer-Main		Videospor
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Ikke alle filene kunne flyttes til søppelkurven.
+<untitled>	PlaylistItem-title		<uten navn>
+Track	Audio Track Menu		Spor
+<nothing to redo>	MediaPlayer-PlaylistWindow		<ingenting å omgjøre>
+Skip to the next track.	MediaPlayer-Main		Hopp til neste spor
+Play	MediaPlayer-Main		Spill
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Flytt oppføringene til søppelkurven
+200% scale	MediaPlayer-Main		200% skalert
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Det ser ut som om mediaserveren ikke kjører.\nØnsker du å starte den?
+Error: 	MediaPlayer-Main		Feil:
+Large	MediaPlayer-SettingsWindow		Stor
+Bottom of video	MediaPlayer-SettingsWindow		Nederst i videoen
+Stop	MediaPlayer-Main		Stopp
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Internfeil (tom for minne). Lagring av spilleliste feilet.
+Hide interface	MediaPlayer-Main		Skjul grensesnitt
+Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopier oppføring
 none	Subtitles menu		ingen
+URI	MediaPlayer-Main		URI
+Mute	MediaPlayer-Main		Lydløs
+Toggle pause/play.	MediaPlayer-Main		Velg pause/spill
+Small	MediaPlayer-SettingsWindow		Liten
+Randomize	MediaPlayer-PlaylistWindow		Tilfeldig
+Off	Subtitles menu		Av
+Revert	MediaPlayer-SettingsWindow		Tilbakestill
+Edit	MediaPlayer-PlaylistWindow		Rediger
+Start media server	MediaPlayer-Main		Start mediaserver
+<unnamed>	PlaylistItem-name		<uten navn>
+Open Clips	MediaPlayer-Main		Åpne utklipp
+OK	MediaPlayer-PlaylistWindow		OK
+none	Audio track menu		ingen
+Playlist…	MediaPlayer-Main		Spilleliste...
+<unknown>	PlaylistItem-author		<ukjent>
+Save as…	MediaPlayer-PlaylistWindow		Lagre som...
+Redo	MediaPlayer-PlaylistWindow		Omgjør
+Always on top	MediaPlayer-Main		Alltid øverst
+Save	MediaPlayer-Main		Lagre
+<nothing to undo>	MediaPlayer-PlaylistWindow		<ingenting å angre>
+Save	MediaPlayer-PlaylistWindow		Lagre
+Full screen	MediaPlayer-Main		Fullskjerm
+Open file…	MediaPlayer-Main		Åpne fil...
+300% scale	MediaPlayer-Main		300% skalert
+Bottom of screen	MediaPlayer-SettingsWindow		Nederst i videoen
+Save error	MediaPlayer-PlaylistWindow		Lagringsfeil
+Playlist	MediaPlayer-PlaylistWindow		Spilleliste
+Low volume	MediaPlayer-SettingsWindow		Lavt volum

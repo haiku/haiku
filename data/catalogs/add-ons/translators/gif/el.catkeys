@@ -1,15 +1,15 @@
-1	modern_greek	x-vnd.Haiku-GIFTranslator	829368084
-Automatic (from alpha channel)	GIFView		Αυτόματη (από το άλφα κανάλι)
-Be Bitmap Format (GIFTranslator)	GIFTranslator		Να είναι μορφή bitmap (Μεταφραστής GIF)
-BeOS system	GIFView		Σύστημα BeOS
-Colors	GIFView		Χρώματα
-GIF Settings	GIFTranslator		Επιλογές GIF
-GIF image	GIFTranslator		Εικόνα GIF
-Greyscale	GIFView		Αποχρώσεις του γκρι
+1	greek, modern (1453-)	x-vnd.Haiku-GIFTranslator	829368084
+Websafe	GIFView		Ασφαλή πλοήγηση
+Write interlaced images	GIFView		Γράψτε συνενωμένες εικόνες
 Optimal	GIFView		Ιδανικό
+Greyscale	GIFView		Αποχρώσεις του γκρι
+Be Bitmap Format (GIFTranslator)	GIFTranslator		Να είναι μορφή bitmap (Μεταφραστής GIF)
+GIF image	GIFTranslator		Εικόνα GIF
+Write transparent images	GIFView		Συνθέστε διαφανείς εικόνες
 Palette	GIFView		Παλέτα
 Use RGB color	GIFView		Χρώματα RGB
 Use dithering	GIFView		Χρήση πρόσμειξης
-Websafe	GIFView		Ασφαλή πλοήγηση
-Write interlaced images	GIFView		Γράψτε συνενωμένες εικόνες
-Write transparent images	GIFView		Συνθέστε διαφανείς εικόνες
+GIF Settings	GIFTranslator		Επιλογές GIF
+BeOS system	GIFView		Σύστημα BeOS
+Automatic (from alpha channel)	GIFView		Αυτόματη (από το άλφα κανάλι)
+Colors	GIFView		Χρώματα

@@ -3,13 +3,13 @@ The boot manager has been successfully installed on your system.	BootManagerCont
 After two seconds	DefaultPartitionPage		Za dwie sekundy
 Uninstall Boot Manager	UninstallPage	Title	Odinstalowywanie Menedżera Rozruchu
 At least one partition must be selected!	BootManagerController		Conajmniej jedna partycja musi zostać wybrana!
-The old Master Boot Record could not be saved to %s	BootManagerController		Nie można zachować poprzedniego MBR jako %s 
+The old Master Boot Record could not be saved to %s	BootManagerController		Nie można zachować poprzedniego MBR jako %s
 Restore MBR	BootManagerController	Button	Przywróć MBR
 Hard Drive	DrivesPage	Default disk name	Dysk Twardy
 USB Drive	DrivesPage	Default disk name	Dysk USB
 The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		MBR startowego urządzenia:\n\t%s\n zostanie zachowany. Proszę wybrać plik do którego zapisać MBR.\n\nJeśli wystąpi problem podczas instalacji lub jeśli później zechcesz usunąć menu startowe, poprostu uruchom program bootman i wybierz opcję 'Odinstaluj'.
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Zostanie przywrócony MBR urządzenia %disk z pliku %file. Czy chcesz kontynuować?
-An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Wystąpił błąd podczas zapisu menu startowego. MBR może być uszkodzony, natychmiast należy przywrócić MBR! 
+An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Wystąpił błąd podczas zapisu menu startowego. MBR może być uszkodzony, natychmiast należy przywrócić MBR!
 Partitions	PartitionsPage	Title	Partycje
 Timeout: %s	DefaultPartitionPage		Limit czasu: %s
 Select	FileSelectionPage	Button	Wybierz
@@ -24,7 +24,7 @@ Please select the drive you want the boot manager to be installed to or uninstal
 After one second	DefaultPartitionPage		Za chwilę
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Tablica partycji pierwszego dysku nie jest kompatybilna z Menedżerem rozruchu.\nMenedżer rozruchu wymaga 2KB wolnego miejsca na dysku przed pierwszą partycją.
 After one minute	DefaultPartitionPage		Za minutę
-The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		MBR urządzenia (%DISK) został pomyślnie przywrócony z pliku %FILE
+The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		MBR urządzenia (%DISK) został pomyślnie przywrócony z pliku %FILE.
 Write boot menu	BootManagerController	Button	Zapisz menu startowe
 The Master Boot Record could not be restored!	BootManagerController		Główny Rekord Startowy nie mógł zostać odtworzony!
 Uninstall	DrivesPage	Button	Odinstaluj
@@ -40,20 +40,20 @@ About to write the following boot menu to the boot disk (%s). Please verify the 
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Nieznana
 Update	DrivesPage	Button	Aktualizuj
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Wybierz plik z zachowanym MBR. Będzie to plik utworzony podczas pierwszej instalacji menedżera rozruchu.
-Old Master Boot Record Saved failure	BootManagerController	Title	Problem z zapisem poprzedniego MBR.
+Old Master Boot Record Saved failure	BootManagerController	Title	Problem z zapisem poprzedniego MBR
 Drives	DrivesPage	Title	Dyski
 No space available!	DrivesPage	Cannot install	Brak miejsca!
 Never	DefaultPartitionPage		Nigdy
 Partition table not compatible	BootManagerController	Title	Tablica partycji jest niekompatybilna
-Old Master Boot Record saved	BootManagerController	Title	Poprzedni MBR został zapisany.
+Old Master Boot Record saved	BootManagerController	Title	Poprzedni MBR został zapisany
 Boot Manager is unable to read the partition table!	BootManagerController		Menedżer Rozruchu nie jest w stanie odczytać tablicy partycji!
 Error reading partition table	BootManagerController	Title	Błąd odczytu tablicy partycji
-Installation of boot menu failed	BootManagerController	Title	Instalacja menu rozruchowego nie powiodła się.
+Installation of boot menu failed	BootManagerController	Title	Instalacja menu rozruchowego nie powiodła się
 Backup Master Boot Record	BootManagerController	Title	Kopia zapasowa MBR
 Quit	DrivesPage	Button	Zamknij
-About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Informacje o zapisie menu rozruchowego na dysk. Kontynuować ? 
+About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Informacje o zapisie menu rozruchowego na dysk. Kontynuować?
 The old Master Boot Record was successfully saved to %s.	BootManagerController		Poprzedni MBR został zapisany: %s.
-Default Partition:	DefaultPartitionPage	Menu field label	Partycja Domyślna
+Default Partition:	DefaultPartitionPage	Menu field label	Partycja Domyślna:
 Partitions	DefaultPartitionPage	Pop up menu title	Partycje
 BootManager	System name		Menedżer Rozruchu
 Summary	BootManagerController	Title	Podsumowanie

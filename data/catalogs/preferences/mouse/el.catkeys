@@ -1,24 +1,24 @@
-1	modern_greek	x-vnd.Haiku-Mouse	1033564338
-...by Andrew Edward McCall	MouseApplication		...από τον Andrew Edward McCall
-1-Button	SettingsView		1-Πλήκτρο
+1	greek, modern (1453-)	x-vnd.Haiku-Mouse	1033564338
+Mouse type:	SettingsView		Τύπος ποντικιού:
+Warp	SettingsView		Στρέβλωση
 2-Button	SettingsView		2-Πλήκτρα
-3-Button	SettingsView		3-Πλήκτρα
-Accept first click	SettingsView		Αποδοχή πρώτου κλικ
+Double-click test area	SettingsView		Περιοχή δοκιμής διπλού-πατήματος
+Revert	MouseWindow		Επαναφορά
+...by Andrew Edward McCall	MouseApplication		...από τον Andrew Edward McCall
+Mouse acceleration	SettingsView		Επιτάχυνση ποντικιού
 Click to focus	SettingsView		Κάντε κλικ για να εστιάσει
 Click to focus and raise	SettingsView		Κάντε κλικ για να εστιάσει και να ανυψωθεί 
-Defaults	MouseWindow		Προεπιλογές
-Dig Deal	MouseApplication		Ένδειξη δείκτη
-Double-click speed	SettingsView		Ταχύτητα διπλού κλικ
-Double-click test area	SettingsView		Περιοχή δοκιμής διπλού-πατήματος
-Fast	SettingsView		Γρήγορα
-Focus follows mouse	SettingsView		Η εστίαση ακολουθεί το ποντίκι
+3-Button	SettingsView		3-Πλήκτρα
+Mouse speed	SettingsView		Ταχύτητα ποντικιού
 Focus mode:	SettingsView		Λειτουργία εστίασης:
 Instant warp	SettingsView		Στιγμιαία στρέβλωση
-Mouse	System name		Mouse
-Mouse acceleration	SettingsView		Επιτάχυνση ποντικιού
-Mouse speed	SettingsView		Ταχύτητα ποντικιού
-Mouse type:	SettingsView		Τύπος ποντικιού:
+Dig Deal	MouseApplication		Ένδειξη δείκτη
+1-Button	SettingsView		1-Πλήκτρο
+Double-click speed	SettingsView		Ταχύτητα διπλού κλικ
+Defaults	MouseWindow		Προεπιλογές
+Focus follows mouse	SettingsView		Η εστίαση ακολουθεί το ποντίκι
+Accept first click	SettingsView		Αποδοχή πρώτου κλικ
+Fast	SettingsView		Γρήγορα
 Normal	SettingsView		Κανονικά
-Revert	MouseWindow		Επαναφορά
+Mouse	System name		Mouse
 Slow	SettingsView		Αργά
-Warp	SettingsView		Στρέβλωση

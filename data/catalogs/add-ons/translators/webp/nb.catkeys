@@ -1,7 +1,25 @@
-1	norwegian_bokmål	x-vnd.Haiku-WebPTranslator	1423533669
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-WebPTranslator	3630570850
+Compression method:	ConfigView		Kompresjonsmetode:
+Based on libwebp v0.1,	ConfigView		Basert på libwebp v0.1,
+Preset	ConfigView		Forhåndsinstilling
 WebP Images	ConfigView		WebP-bilder
-WebP Settings	main		WebP-innstillinger
-WebP image	WebPTranslator		WebP-bilde
-WebP image translator	WebPTranslator		WebP-bildeoversetter
 WebP images	WebPTranslator		WebP-bilder
 WebPTranslator Settings	ConfigView		WebP-oversetterinnstillinger
+Output quality:	ConfigView		Output kvalitet:
+WebP Settings	main		WebP-innstillinger
+Text	ConfigView		Tekst
+Slower but better	ConfigView		Tregere, men bedre
+WebP image	WebPTranslator		WebP-bilde
+©2010-2011 Haiku Inc.	ConfigView		©2010-2011 Haiku A/S
+Output preset:	ConfigView		Output forhåndsinstilling:
+Picture	ConfigView		Bilde
+Low	ConfigView		Lav
+High	ConfigView		Høy
+Drawing	ConfigView		Tegning
+Default	ConfigView		Standard
+Fast	ConfigView		Rask
+Photo	ConfigView		Foto
+Preprocessing filter	ConfigView		Forhåndsbehandling Filter
+©2010-2011 Google Inc.	ConfigView		©2010-2011 Google A/S
+WebP image translator	WebPTranslator		WebP-bildeoversetter
+Icon	ConfigView		Ikon

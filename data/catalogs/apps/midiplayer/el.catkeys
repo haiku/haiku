@@ -1,19 +1,19 @@
-1	modern_greek	x-vnd.Haiku-MidiPlayer	4180509704
-Cavern	Main Window		Σπήλαιο
-Closet	Main Window		Θάλαμος
-Could not load song	Main Window		Αδυναμία φόρτωσης της μελωδίας
-Drop MIDI file here	Scope View		Αφήστε τα αρχεία MIDI εδώ
-Dungeon	Main Window		Dungeon
-Garage	Main Window		Γκαράζ
-Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku MIDI Player 1.0.0 beta\n\nΑυτό το μικρό πρόγραμμα\nμπορεί να παίξει χιλιάδες \nμουσικές μελωδίες
-Igor's lab	Main Window		Εργαστήριο του Igor
-Live input:	Main Window		Live είσοδος:
-MidiPlayer	System name		MidiPlayer
+1	greek, modern (1453-)	x-vnd.Haiku-MidiPlayer	4180509704
 None	Main Window		Κανένα
+Live input:	Main Window		Live είσοδος:
+Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku MIDI Player 1.0.0 beta\n\nΑυτό το μικρό πρόγραμμα\nμπορεί να παίξει χιλιάδες \nμουσικές μελωδίες
+Stop	Main Window		Διακοπή
+Cavern	Main Window		Σπήλαιο
+Volume:	Main Window		Ένταση:
+Reverb:	Main Window		Αντήχηση:
 OK	Main Window		Εντάξει
 Off	Main Window		Κλειστό
+Dungeon	Main Window		Dungeon
 Play	Main Window		Αναπαραγωγή
-Reverb:	Main Window		Αντήχηση:
+Garage	Main Window		Γκαράζ
+Closet	Main Window		Θάλαμος
+MidiPlayer	System name		MidiPlayer
+Drop MIDI file here	Scope View		Αφήστε τα αρχεία MIDI εδώ
+Igor's lab	Main Window		Εργαστήριο του Igor
 Scope	Main Window		Επισκόπηση
-Stop	Main Window		Διακοπή
-Volume:	Main Window		Ένταση:
+Could not load song	Main Window		Αδυναμία φόρτωσης της μελωδίας

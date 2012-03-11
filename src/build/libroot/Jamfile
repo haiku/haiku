@@ -50,6 +50,10 @@ if $(HOST_PLATFORM) = freebsd {
 	hostPlatformSources = fs_freebsd.cpp ;
 }
 
+if $(HOST_PLATFORM) = darwin {
+	hostPlatformSources = fs_darwin.cpp ;
+}
+
 local librootSources =
 	atomic.cpp
 	byteorder.cpp

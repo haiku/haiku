@@ -1,15 +1,17 @@
-1	polish	x-vnd.Haiku-MediaPlayer	3494573104
+1	polish	x-vnd.Haiku-MediaPlayer	2677289539
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerykańskie)
 Stream settings	MediaPlayer-Main		Ustawienia strumienia
 <unknown>	PlaylistItem-album		<nieznany>
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Plik '%filename' nie może być otwarty.\n\n
+Video	MediaPlayer-InfoWin		Wideo
 Save Playlist	MediaPlayer-PlaylistWindow		Zapisz listę odtwarzania
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Żaden z plików, które chciałeś otworzyć, nie wygląda na plik multimedialny.
-Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Zapisywanie listy odtwarzania nie powiodło się.\n\nBłąd:
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Zapisywanie listy odtwarzania nie powiodło się.\n\nBłąd: 
 New player…	MediaPlayer-Main		Nowy odtwarzacz…
 100% scale	MediaPlayer-Main		100% skali
 Close	MediaPlayer-Main		Zamknij
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Kilka plików nie mogło być przeniesionych do Kosza.
+<unknown>	MediaPlayer-InfoWin		<nieznany>
 Open	MediaPlayer-Main		Otwórz
 Next	MediaPlayer-Main		Następny
 OK	MediaPlayer-SettingsWindow		OK
@@ -37,7 +39,7 @@ There is no decoder installed to handle the file format, or the decoder has trou
 Import Entry	MediaPlayer-ImportPLItemsCmd		Import wpisu
 Gets the URI of the currently playing item.	MediaPlayer-Main		Pobiera adres URI obecnie odtwarzanego pliku.
 400% scale	MediaPlayer-Main		400% skali
-Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Zapisywanie listy odtwarzania nie powiodło się:\n\nBłąd:
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Zapisywanie listy odtwarzania nie powiodło się:\n\nBłąd: 
 Move Entries	MediaPlayer-MovePLItemsCmd		Przeniesienie wpisów
 Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Błąd przenoszenia do Kosza
 Audio	MediaPlayer-Main		Dźwięk
@@ -48,7 +50,8 @@ MediaPlayer settings	MediaPlayer-SettingsWindow		Ustawienia programu MediaPlayer
 Move Entry	MediaPlayer-MovePLItemsCmd		Przeniesienie wpisu
 Open	MediaPlayer-PlaylistWindow		Otwórz
 Stop playing.	MediaPlayer-Main		Zatrzymaj odtwarzanie.
-Error: 	MediaPlayer-RemovePLItemsCmd		Błąd:
+Error: 	MediaPlayer-RemovePLItemsCmd		Błąd: 
+Audio	MediaPlayer-InfoWin		Dźwięk
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Błąd wewnętrzny (nieprawidłowa wiadomość). Zapisywanie listy odtwarzania nie powiodło się.
 Skip to the previous track.	MediaPlayer-Main		Przeskocz do poprzedniego utworu.
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Płynnie skaluj filmy (tryb bez nakładki)
@@ -77,9 +80,9 @@ Skip to the next track.	MediaPlayer-Main		Przeskocz do następnego utworu.
 Play	MediaPlayer-Main		Odtwórz
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Usunięcie wpisów do Kosza
 200% scale	MediaPlayer-Main		200% skali
-It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Wygląda na to, że serwer mediów nie jest włączony.\nCzy chcesz go uruchomić?
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Wygląda na to, że serwer mediów nie jest włączony.\nCzy chcesz go uruchomić ?
 Aspect ratio	MediaPlayer-Main		Proporcje
-Error: 	MediaPlayer-Main		Błąd:
+Error: 	MediaPlayer-Main		Błąd: 
 Large	MediaPlayer-SettingsWindow		Duże
 Bottom of video	MediaPlayer-SettingsWindow		Na dole obrazu
 Stop	MediaPlayer-Main		Zatrzymaj
@@ -101,7 +104,7 @@ Start media server	MediaPlayer-Main		Uruchom serwer mediów
 Open Clips	MediaPlayer-Main		Otwórz pliki
 OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		brak
-Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Pobiera/ustawia głośność (0.0-2.0)
+Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Pobiera/ustawia głośność (0.0-2.0).
 Playlist…	MediaPlayer-Main		Lista odtwarzania…
 <unknown>	PlaylistItem-author		<nieznany>
 Save as…	MediaPlayer-PlaylistWindow		Zapisz jako…
@@ -111,6 +114,7 @@ Always on top	MediaPlayer-Main		Zawsze na wierzchu
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Usunięcie wpisu do Kosza
 Save	MediaPlayer-Main		Zapisz
 <nothing to undo>	MediaPlayer-PlaylistWindow		<nie ma czego cofnąć>
+File info	MediaPlayer-InfoWin		Informacja o pliku
 Save	MediaPlayer-PlaylistWindow		Zapisz
 Full screen	MediaPlayer-Main		Pełny ekran
 Open file…	MediaPlayer-Main		Otwórz plik…

@@ -1,4 +1,5 @@
-1	german	x-vnd.Haiku-Appearance	168322075
+1	german	x-vnd.Haiku-Appearance	2558216842
+Plain font:	Font view		Normal:
 Control highlight	Colors tab		Steuerelement - Ausgewählt
 Control border	Colors tab		Steuerelement - Rahmen
 Antialiasing type:	AntialiasingSettingsView		Kantenglättungstyp:
@@ -31,15 +32,20 @@ Navigation pulse	Colors tab		Navigation - Leuchtfarbe
 Selected menu item text	Colors tab		Menü - Text (ausgewählt)
 Menu background	Colors tab		Menü - Hintergrund
 OK	DecorSettingsView		OK
+Size:	Font Selection view		Größe:
 Panel background	Colors tab		Oberfläche - Hintergrund
+Menu font:	Font view		Menü:
 Colors	APRWindow		Farben
 Control background	Colors tab		Steuerelement - Hintergrund
 Inactive window tab	Colors tab		Reiter (inaktiv)
 Appearance	System name		Erscheinungsbild
+Fixed font:	Font view		Feste Breite:
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Franz jagt im total verwahrlosten Taxi quer durch Bayern.
 Reduce colored edges filter strength:	AntialiasingSettingsView		Farbsaumfilter:
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Zur Vermeidung von möglichen Patentproblemen ist die Kombination von Subpixel-Kantenglättung und Glyph-Hinting deaktiviert. Um diese Funktion zu aktivieren, müssen spezielle Optionen im Konfigurationsheader der Freetype-Bibliothek freigeschaltet und anschließend Haiku neu kompiliert werden.
 Control text	Colors tab		Steuerelement - Text
 Tooltip text	Colors tab		Tooltip - Text
+Bold font:	Font view		Fett:
 Inactive window border	Colors tab		Fenster - Rahmen (inaktiv)
 Menu item text	Colors tab		Menü - Text
 LCD subpixel	AntialiasingSettingsView		LCD-Subpixel
@@ -48,4 +54,5 @@ Strong	AntialiasingSettingsView		Stark
 Panel text	Colors tab		Fenster - Text
 Monospaced fonts only	AntialiasingSettingsView		Nur nicht-proportionale Schriften
 Antialiasing menu	AntialiasingSettingsView		Kantenglättungs-Menü
+Fonts	APRWindow		Schriftarten
 Glyph hinting:	AntialiasingSettingsView		Glyph-Hinting:

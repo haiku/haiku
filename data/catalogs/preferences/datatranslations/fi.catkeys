@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-DataTranslations	3820343452
+1	finnish	x-vnd.Haiku-DataTranslations	458105477
 DataTranslations	System name		Tietomuunnosasetukset
 Cancel	DataTranslations		Peru
 Name:	DataTranslations		Nimi:
@@ -14,5 +14,6 @@ Info	DataTranslations		tiedot
 Path:	DataTranslations		Polku:
 The new translator has been installed successfully.	DataTranslations		Uusi tietomuunnin on asennettu onnistuneesti.
 DataTranslations - Error	DataTranslations		Tietomuunnokset - Virhe
+Ok	DataTranslations		Valmis
 OK	DataTranslations		Valmis
 Version:	DataTranslations		Versio:

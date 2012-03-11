@@ -1,21 +1,21 @@
-1	norwegian_bokmål	x-vnd.Be-PSRV	3878243268
-All pages	ConfigWindow		Alle sider
-Cancel	ConfigWindow		Avbryt
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-PSRV	3878243268
+Undefined	ConfigWindow		Udefinert
 Cancel	PrintServerApp		Avbryt
-Landscape	ConfigWindow		Liggende
-No	PrintServerApp		Nei
-OK	ConfigWindow		OK
-OK	PrintServerApp		OK
-Page setup	ConfigWindow		Sideinnstillinger
 Page setup:	ConfigWindow		Sideoppsett
-Paper setup:	ConfigWindow		Papirinnstillinger
+OK	ConfigWindow		OK
+Cancel	ConfigWindow		Avbryt
+Yes	PrintServerApp		Ja
+Would you like to set one up now?	PrintServerApp		Ønsker du å installere en nå?
 Portrait	ConfigWindow		Stående
-Print setup	ConfigWindow		Skriverinnstillinger
+All pages	ConfigWindow		Alle sider
+There is no default printer set up.	PrintServerApp		Ingen standardskriver er satt opp.
 Printer:	ConfigWindow		Skriver:
 Select a printer	ConfigWindow		Velg en skriver
+No	PrintServerApp		Nei
+Landscape	ConfigWindow		Liggende
 There are no printers set up.	PrintServerApp		Ingen skriver er installert.
-There is no default printer set up.	PrintServerApp		Ingen standardskriver er satt opp.
-Undefined	ConfigWindow		Udefinert
+OK	PrintServerApp		OK
+Print setup	ConfigWindow		Skriverinnstillinger
 Would you like to make @ the default printer?	PrintServerApp		Ønsker du å sette @ som standardskriver?
-Would you like to set one up now?	PrintServerApp		Ønsker du å installere en nå?
-Yes	PrintServerApp		Ja
+Page setup	ConfigWindow		Sideinnstillinger
+Paper setup:	ConfigWindow		Papirinnstillinger

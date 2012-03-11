@@ -81,9 +81,6 @@ namespace BPrivate {
 
 const float kExactMatchScore = INFINITY;
 
-const rgb_color	kBlack = {0, 0, 0, 255};
-const rgb_color	kWhite = {255, 255, 255, 255};
-
 
 bool gLocalizedNamePreferred;
 

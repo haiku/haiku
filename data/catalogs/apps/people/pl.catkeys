@@ -1,12 +1,18 @@
-1	polish	x-vnd.Be-PEPL	3107056777
+1	polish	x-vnd.Be-PEPL	3427346862
 Edit	People		Edytuj
+Error	People		Błąd
 City	People		Miasto
+The file '%name%' could not be written.	People		Plik '%name%' nie mógł zostać zapisany.
 none	Groups list		brak
+Configure attributes	People		Konfiguracja atrybutów
 Company	People		Firma
+%name% picture	People		%name% zdjęcie
 Work phone	People		Telefon do pracy
+People	System name		Osoby
 New person	People		Nowa osoba
 Select all	People		Zaznacz wszystkie
 File	People		Plik
+Unnamed person	People		Nienazwana osoba
 Could not create %s.	People		Nie można utworzyć %s.
 Country	People		Kraj
 Close	People		Zamknij
@@ -18,11 +24,14 @@ Revert	People		Przywróć
 Undo	People		Cofnij
 E-mail	People		E-mail
 Save changes before quitting?	People		Zapisać zmiany przed wyjściem?
+Load image…	People		Wczytaj obraz…
 OK	People		OK
+Remove image	People		Usuń obraz
 Home phone	People		Telefon domowy
 Save as…	People		Zapisz jako…
 Redo	People		Powtórz
 Paste	People		Wklej
+Drop an image here,\nor use the contextual menu.	People		Opuść obraz tutaj,\nlub użyj menu kontekstowego.
 Save	People		Zapisz
 Person	Short mimetype description		Osoba
 New person…	People		Nowa osoba…

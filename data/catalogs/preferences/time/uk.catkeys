@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Time	3493650184
+1	ukrainian	x-vnd.Haiku-Time	1859841283
 GMT (UNIX compatible)	Time		GMT (сумісний з UNIX)
 OK	Time		Гаразд
 Asia	Time		Азія
@@ -28,7 +28,6 @@ Sending request failed	Time		Не вдалося надіслати запит
 Arctic	Time		Арктика
 Time	System name		Час
 America	Time		Америка
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date, Написаний:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nАвторські права 2004-2008, Haiku.
 Reset	Time		Скинути
 Synchronize at boot	Time		Синхронізувати завантаження
 Received invalid time	Time		Отримано неправильний час

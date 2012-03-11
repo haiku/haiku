@@ -1,20 +1,22 @@
-1	polish	x-vnd.Haiku-NetworkStatus	3960527345
+1	polish	x-vnd.Haiku-NetworkStatus	853756860
 NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Opcje Stanu sieci:\n\t--deskbar\tautomatycznie dodaj replikant do Deskbaru\n\t--help\t\tdrukuj informacje i wyjdź\n
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Możesz uruchomić NetworkStatus w osobnym oknie lub w Deskbarze.
 <no wireless networks found>	NetworkStatusView		<nie odnaleziono sieci bezprzewodowych>
 Run in window	NetworkStatus		Uruchom w oknie
 No link	NetworkStatusView		Brak połączenia
 Install in Deskbar	NetworkStatus		Zainstaluj w Deskbarze
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		Uruchamianie prefletu sieci nie powiodło się.\n\nBłąd:
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Uruchamianie prefletu sieci nie powiodło się.\n\nBłąd: 
 NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		Stan sieci\n\tnapisany przez %1 i Hugo Santos\n\t%2, Haiku, Inc.\n
 Netmask	NetworkStatusView		Maska sieciowa
 Broadcast	NetworkStatusView		Nadawanie
 Unknown	NetworkStatusView		Nieznany
 Ready	NetworkStatusView		Gotowy
 No stateful configuration	NetworkStatusView		Brak pełnej konfiguracji
+%ifaceName information:\n	NetworkStatusView		informacje o %ifaceName:\n
 Configuring	NetworkStatusView		Konfigurowanie
 Address	NetworkStatusView		Adres
 OK	NetworkStatusView		OK
-Open network preferences…	NetworkStatusView		Otwórz opcje sieci...
+NetworkStatus	System name		StatusSieci
+Open network preferences…	NetworkStatusView		Otwórz opcje sieci…
 Could not join wireless network:\n	NetworkStatusView		Nie można połączyć się z siecią bezprzewodową:\n
 Quit	NetworkStatusView		Zamknij

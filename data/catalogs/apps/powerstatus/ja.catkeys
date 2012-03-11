@@ -1,26 +1,31 @@
-1	japanese	x-vnd.Haiku-PowerStatus	751886234
+1	japanese	x-vnd.Haiku-PowerStatus	3419486861
 Design capacity low warning: 	PowerStatus		定格容量の低下警告:
 Show percent	PowerStatus		パーセントを表示
 Design capacity: 	PowerStatus		定格容量:
+ mW	PowerStatus		 mW
 Type: 	PowerStatus		タイプ:
 non-rechargeable	PowerStatus		再充電不能
 Empty battery slot	PowerStatus		バッテリースロットが空です
+ mV	PowerStatus		 mV
 Run in window	PowerStatus		ウインドウモードで起動
 About	PowerStatus		このソフトウェアについて
 PowerStatus	System name		電源状態
 PowerStatus	PowerStatus		電源状態
+ mWh	PowerStatus		 mWh
 Battery info…	PowerStatus		バッテリー情報...
 Damaged battery	PowerStatus		損傷したバッテリー
 Show time	PowerStatus		時間を表示
 Last full charge: 	PowerStatus		現在の最大容量
 Battery unused	PowerStatus		使用していないバッテリー
 Extended battery info	PowerStatus		拡張バッテリー情報
+ mA	PowerStatus		 mA
 Current rate: 	PowerStatus		電流:
 discharging	PowerStatus		放電中
 Show text label	PowerStatus		テキストラベル表示
 About…	PowerStatus		このソフトウェアについて…
 Model number: 	PowerStatus		モデルナンバー:
 Install in Deskbar	PowerStatus		Deskbarにインストール
+ mAh	PowerStatus		 mAh
 Capacity: 	PowerStatus		容量:
 Battery discharging	PowerStatus		放電中
 Serial number: 	PowerStatus		シリアルナンバー:

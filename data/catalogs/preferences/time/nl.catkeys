@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Time	3493650184
+1	dutch; flemish	x-vnd.Haiku-Time	1859841283
 GMT (UNIX compatible)	Time		GMT (UNIX-compatibel)
 OK	Time		Oké
 Asia	Time		Azië
@@ -28,7 +28,6 @@ Sending request failed	Time		Het verzenden van het verzoek is mislukt
 Arctic	Time		Arctica
 Time	System name		Tijd
 America	Time		Amerika
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date, door:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
 Reset	Time		Terugzetten
 Synchronize at boot	Time		Synchroniseren bij het opstarten
 Received invalid time	Time		Ongeldige tijd ontvangen

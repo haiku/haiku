@@ -1,0 +1,9 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-SpamFilter	1975155212
+or empty e-mail	SpamFilterConfig		eller tom e-post
+Spam Filter (AGMS Bayesian)	SpamFilter		Spamfilter (AGMS Bayesian)
+Genuine below and uncertain above:	SpamFilterConfig		Ekte under og usikker over:
+Spam above:	SpamFilterConfig		Spam over:
+Add spam rating to start of subject	SpamFilterConfig		Legg til vurdering til start av emne
+Learn from all incoming e-mail	SpamFilterConfig		Lær fra alle innkommende e-poster
+Sorry, unable to launch the spamdbm program to let you edit the server settings.	SpamFilterConfig		Beklager, klarer ikke å lansere spamdbm programmet for å la deg redigere server settingene.
+Close	SpamFilterConfig		Lukk

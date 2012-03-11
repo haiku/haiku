@@ -1,51 +1,52 @@
-1	norwegian_bokmål	x-vnd.Haiku-Shortcuts	1209107675
-*Beep	ShortcutsWindow		*Bip
-*InsertString \"Your Text Here\"	ShortcutsWindow		*SettInnStreng \"Din Tekst Her\"
-*LaunchHandler text/html	ShortcutsWindow		*OppstartsHåndterer text/html
-*MouseButton 1	ShortcutsWindow		*MuseKnapp 1
-*MouseDown	ShortcutsWindow		*MusNed
-*MouseUp	ShortcutsWindow		*MusOpp
-*MoveMouse +20 +0	ShortcutsWindow		*FlyttMus +20 +0
-*MoveMouseTo 50% 50%	ShortcutsWindow		*FlyttMusTil 50% 50%
-*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"FlyttMusTil 100% 0\" \"*MuseKnapp 1\"
-*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMelding application/x-vnd.Be-TRAK 'Tfnd'
-Add new shortcut	ShortcutsWindow		Legg til ny snarvei
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
-Append	ShortcutsWindow		Bruk
-Append KeySet…	ShortcutsWindow		Bruk sett med hurtigtaster
-Application	ShortcutsWindow		Program
-Beep	ShortcutsSpec		Bip
-Cancel	ShortcutsWindow		Avbryt
-Control	ShortcutsSpec	Name for modifier on keyboard	Control
-Don't save	ShortcutsWindow		Ikke lagre
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Shortcuts	621368175
 Error, NULL state description?\n	ShortcutsSpec		Feil, NULL-state beskrivelse?\n
-File	ShortcutsWindow		Fil
-InsertString	ShortcutsSpec		SettInnStreng
-Key	ShortcutsWindow		Tast
-LaunchHandler	ShortcutsSpec		Oppstartshåndterer
-MouseButton	ShortcutsSpec		MuseKnapp
-MouseDown	ShortcutsSpec		MusNed
-MouseUp	ShortcutsSpec		MusOpp
 MoveMouse	ShortcutsSpec		FlyttMus
-MoveMouseTo	ShortcutsSpec		FlyttMusTil
-Multi	ShortcutsSpec		Multi
 OK	ShortcutsWindow		OK
-Oh no	ShortcutsWindow		Å, nei
-Open	ShortcutsWindow		Åpne
-Open KeySet…	ShortcutsWindow		Åpne sett med hurtigtaster
-Quit	ShortcutsWindow		Avslutt
-Really quit without saving your changes?	ShortcutsWindow		Vil du virkelig avslutte uten å lagre endringene?
-Remove selected shortcut	ShortcutsWindow		Fjern merket hurtigtast
-Revert to saved	ShortcutsWindow		Tilbakestill til lagret
-Save	ShortcutsWindow		Lagre
-Save & apply	ShortcutsWindow		Lagre & bruk
-Save KeySet as…	ShortcutsWindow		Lagre sett med hurtigtaster som...
-Select	ShortcutsWindow		Velg
-SendMessage	ShortcutsSpec		SendMelding
-Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
-Shortcuts	System name		Hurtigtaster
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Hurtigtaster kunne ikke åpne ditt sett med hurtigtaster!
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Hurtigtaster kunne ikke tolke filen din med hurtigtaster!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Hurtigtaster klarte ikke å lagre filen din med hurtigtaster!
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Hurtigtaster klarte ikke å lagre ditt sett med hurtigtaster
+Cancel	ShortcutsWindow		Avbryt
+InsertString	ShortcutsSpec		SettInnStreng
+Append KeySet…	ShortcutsWindow		Bruk sett med hurtigtaster
+Control	ShortcutsSpec	Name for modifier on keyboard	Control
+Key	ShortcutsWindow		Tast
+Open KeySet…	ShortcutsWindow		Åpne sett med hurtigtaster
+MouseUp	ShortcutsSpec		MusOpp
+Revert to saved	ShortcutsWindow		Tilbakestill til lagret
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+*InsertString \"Your Text Here\"	ShortcutsWindow		*SettInnStreng \"Din Tekst Her\"
+*MouseUp	ShortcutsWindow		*MusOpp
+(Choose application with file requester)	ShortcutsWindow		(Velg program med fil-etterspørsel)
 Window	ShortcutsSpec	Name for modifier on keyboard	Windows
+*LaunchHandler text/html	ShortcutsWindow		*OppstartsHåndterer text/html
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Hurtigtaster kunne ikke åpne ditt sett med hurtigtaster!
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"FlyttMusTil 100% 0\" \"*MuseKnapp 1\"
+SendMessage	ShortcutsSpec		SendMelding
+MoveMouseTo	ShortcutsSpec		FlyttMusTil
+Save	ShortcutsWindow		Lagre
+*MouseButton 1	ShortcutsWindow		*MuseKnapp 1
+*MoveMouse +20 +0	ShortcutsWindow		*FlyttMus +20 +0
+MouseDown	ShortcutsSpec		MusNed
+Remove selected shortcut	ShortcutsWindow		Fjern merket hurtigtast
+MouseButton	ShortcutsSpec		MuseKnapp
+Add new shortcut	ShortcutsWindow		Legg til ny snarvei
+Save & apply	ShortcutsWindow		Lagre & bruk
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMelding application/x-vnd.Be-TRAK 'Tfnd'
+Append	ShortcutsWindow		Bruk
+File	ShortcutsWindow		Fil
+Beep	ShortcutsSpec		Bip
+Quit	ShortcutsWindow		Avslutt
+*MouseDown	ShortcutsWindow		*MusNed
+Don't save	ShortcutsWindow		Ikke lagre
+Multi	ShortcutsSpec		Multi
+Application	ShortcutsWindow		Program
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+*Beep	ShortcutsWindow		*Bip
+*MoveMouseTo 50% 50%	ShortcutsWindow		*FlyttMusTil 50% 50%
+Save KeySet as…	ShortcutsWindow		Lagre sett med hurtigtaster som...
+Open	ShortcutsWindow		Åpne
+Really quit without saving your changes?	ShortcutsWindow		Vil du virkelig avslutte uten å lagre endringene?
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Hurtigtaster kunne ikke tolke filen din med hurtigtaster!
+Select	ShortcutsWindow		Velg
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Hurtigtaster klarte ikke å lagre filen din med hurtigtaster!
+Oh no	ShortcutsWindow		Å, nei
+LaunchHandler	ShortcutsSpec		Oppstartshåndterer
+Shortcuts	System name		Hurtigtaster

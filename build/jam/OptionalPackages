@@ -30,6 +30,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	Bzip					- file archiving utility
 #	CCache					- fast compiler cache
 #	CDRecord				- the command line CD writing tools
+#	Clang					- the LLVM C and C++ compiler (llvm, libs, headers)
 #	Clockwerk				- native audio/video compositing
 #	CLucene					- indexed file search
 #	CMake					- cross platform make
@@ -356,8 +357,8 @@ if [ IsOptionalHaikuImagePackageAdded Bzip ] {
 
 # CARootCertificates
 if [ IsOptionalHaikuImagePackageAdded CARootCertificates ] {
-	InstallOptionalHaikuImagePackage cert-2012-02-19.zip
-		: $(baseURL)/cert-2012-02-19.zip
+	InstallOptionalHaikuImagePackage cert-2012-03-10.zip
+		: $(baseURL)/cert-2012-03-10.zip
 		: common data ssl ;
 }
 
@@ -394,6 +395,20 @@ if [ IsOptionalHaikuImagePackageAdded CDRecord ] {
 }
 
 
+# Clang
+if [ IsOptionalHaikuImagePackageAdded Clang ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Clang available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) < 4 && ! $(isHybridBuild) {
+		Echo "No optional package Clang available for GCC2" ;
+	} else {
+		InstallOptionalHaikuImagePackage
+			clang-3.0-x86-gcc4-2012-03-09.zip
+			: $(baseURL)/clang-3.0-x86-gcc4-2012-03-09.zip ;
+	}
+}
+
+
 # Clockwerk
 if [ IsOptionalHaikuImagePackageAdded Clockwerk ] {
 	if $(TARGET_ARCH) != x86 {
@@ -405,8 +420,8 @@ if [ IsOptionalHaikuImagePackageAdded Clockwerk ] {
 				: $(baseURL)/Clockwerk-0.0.2-x86-gcc4-2012-02-25.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				Clockwerk-0.0.2-x86-gcc2-2012-02-25.zip
-				: $(baseURL)/Clockwerk-0.0.2-x86-gcc2-2012-02-25.zip ;
+				Clockwerk-0.0.2-x86-gcc2-2012-03-04.zip
+				: $(baseURL)/Clockwerk-0.0.2-x86-gcc2-2012-03-04.zip ;
 		}
 		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/Clockwerk/Clockwerk ;

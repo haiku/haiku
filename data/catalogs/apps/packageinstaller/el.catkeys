@@ -1,57 +1,57 @@
-1	modern_greek	x-vnd.Haiku-PackageInstaller	2709408798
+1	greek, modern (1453-)	x-vnd.Haiku-PackageInstaller	2709408798
+Install to:	PackageView		Εγκατάσταση στο:
+OK	PackageView		Εντάξει
+Accept	PackageTextViewer		Αποδοχή
+Continue	PackageInstall		Συνέχεια
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Το ζητούμενο πακέτο απέτυχε να εγκατασταθεί στο σύστημσ σας. Αυτο μπορεί να είναι ένα πρόβλημα με το αρχείο πακέτου προορισμού. Παρακαλώ συζητήστε για αυτό το πρόβλημα με το διανομέα του πακέτου.
+Image not loaded correctly	PackageImageViewer		Η εικόνα δε φορτώθηκε σωστά
+No package selected.	PackageInfo		Δεν επιλέχθηκε πακέτο.
+Install	PackageView		Εγκατάσταση
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Το ζητούμενο πακέτο φαίνεται να είναι ήδη εγκατεστημένο στο υστημα σας. Θα θέλατε να απεγκαταστήσετε το υπάρχων πακέτο και να συνεχίσετε την εγκατάσταση;
+Do you want to remember this decision for the rest of this installation?\n	PackageView		Θέλετε να απομνημονευτεί η συγκεκριμένη απόφαση για την υπόλοιπη διαδικασία της εγκατάστασης;\n
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Φαίνεται  να υπάρχει μια σύγχηση του μεγέθους αρχείου στο αρχείο πακέτου. Το πακέτο μπορεί να είναι καταστραμμένο ή να έχει τροποποιηθεί έπειτα από τη δημιουργία του. Θέλετε οπωσδήποτε να συνεχίσετε;
+Error while installing the package\n	PackageView		Σφάλμα κατά την εγκατάσταση του πακέτου\n
+Disclaimer	PackageTextViewer		Disclaimer
 %.1f GiB	PackageView		%.1f GiB
-%.1f KiB	PackageView		%.1f KiB
-%.1f MiB	PackageView		%.1f MiB
+The installation of the package has been aborted.	PackageView		Η εγκατάσταση αυτού του πακέτου ματαιώθηκε.
+Done	PackageInstall		Έγινε
+All existing files will be replaced?	PackageView		Όλα τα υπάρχοντα αρχεία θα αντικατασταθούν;
+Preparing package	PackageInstall		Προετοιμασία πακέτου
+No package available.	PackageInfo		Δεν υπάρχει διαθέσιμο πακέτο.
+none	PackageView		κανένα
+Stop	PackageStatus		Διακοπή
+Other…	PackageView		Άλλο...
+No installation type selected	PackageView		Δεν επιλέχθηκε τύπος εγκατάστασης
+The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		Ο συμβολιζόμενος σύνδεσμος '%s' υπάρχει ήδη στο ζητούμενο μονοπάτι.\nΝα αντικατασταθεί ο συμβολιζόμενος σύνδεσμος με ένα από αυτο το πακέτο ή να γίνει παράβλεψη;
+Installing files and folders	PackageInstall		Εγκατάσταση αρχείων και φακέλων
+Package installer	PackageView		Εγκαταστάτης πακέτων
+Skip all	PackageView		Παράβλεψη όλων
+The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Το στοιχείο '%s' υπάρχει ήδη στο ζητούμενο μονοπάτι.\nΝα αντικατασταθεί το στοιχείο με ένα από αυτο το πακέτο ή να γίνει παράβλεψη;
+The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Το script '%s' υπάρχει ήδη στο ζητούμενο μονοπάτι.\nΝα αντικατασταθεί το script με ένα από αυτο το πακέτο ή να γίνει παράβλεψη;
+Running post-installation scripts	PackageInstall		Εκτέλεση script πριν την εγκατάσταση
 %llu bytes	PackageView		%llu bytes
+Skip	PackageView		Παράλειψη
+%.1f MiB	PackageView		%.1f MiB
+The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Ο κατάλογος '%s' υπάρχει ήδη στο ζητούμενο μονοπάτι.\nΝα αντικατασταθεί ο κατάλογος με έναν από αυτο το πακέτο ή να γίνει παράβλεψη;
+The package you requested has been successfully installed on your system.	PackageView		Το πακέτο που ζητήσατε εγκαταστάθηκε επιτυχός στο σύστημα σας.
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Σφάλμα! Το \"%s\ δεν είναι μια έγκυρη διαδρομή.\n
+Installation type:	PackageView		Τύπος εγκατάστασης:
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Σφάλμα(%s)! Αδυναμία ανοίγματος του \"%s\".\n
+Finishing installation	PackageInstall		Ολοκλήρωση εγκατάστασης
+Installing package	PackageStatus		Εγκατάσταση πακέτου
+Ask again	PackageView		Ερώτηση ξανά
+Abort	PackageView		Ματαίωση
+Replace all	PackageView		Αντικατάσταση όλων
+Decline	PackageTextViewer		Απόρριψη
+The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Το αρχείο '%s' υπάρχει ήδη στο ζητούμενο μονοπάτι.\nΝα αντικατασταθεί το αρχείο με ένα από αυτο το πακέτο ή να γίνει παράβλεψη;
+All existing files will be skipped?	PackageView		Όλα τα υπάρχοντα αρχεία θα παραβλεφθούν;
+Continue	PackageInfo		Συνέχεια
+%.1f KiB	PackageView		%.1f KiB
 (%s free)	PackageView		(%s ελεύθερα)
 Abort	PackageInfo		Ματαίωση
-Abort	PackageInstall		Ματαίωση
-Abort	PackageView		Ματαίωση
-Accept	PackageTextViewer		Αποδοχή
-All existing files will be replaced?	PackageView		Όλα τα υπάρχοντα αρχεία θα αντικατασταθούν;
-All existing files will be skipped?	PackageView		Όλα τα υπάρχοντα αρχεία θα παραβλεφθούν;
-Ask again	PackageView		Ερώτηση ξανά
-Continue	PackageInfo		Συνέχεια
-Continue	PackageInstall		Συνέχεια
-Continue	PackageTextViewer		Συνέχεια
-Decline	PackageTextViewer		Απόρριψη
-Disclaimer	PackageTextViewer		Disclaimer
-Do you want to remember this decision for the rest of this installation?\n	PackageView		Θέλετε να απομνημονευτεί η συγκεκριμένη απόφαση για την υπόλοιπη διαδικασία της εγκατάστασης;\n
-Done	PackageInstall		Έγινε
-Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Σφάλμα(%s)! Αδυναμία ανοίγματος του \"%s\".\n
-Error while installing the package\n	PackageView		Σφάλμα κατά την εγκατάσταση του πακέτου\n
-Error! \"%s\" is not a valid path.\n	Packageinstaller main		Σφάλμα! Το \"%s\ δεν είναι μια έγκυρη διαδρομή.\n
-Finishing installation	PackageInstall		Ολοκλήρωση εγκατάστασης
-Image not loaded correctly	PackageImageViewer		Η εικόνα δε φορτώθηκε σωστά
-Install	PackageView		Εγκατάσταση
-Install to:	PackageView		Εγκατάσταση στο:
-Installation progress	PackageView		Πρόοδος εγκατάστασης
-Installation type:	PackageView		Τύπος εγκατάστασης:
-Installing files and folders	PackageInstall		Εγκατάσταση αρχείων και φακέλων
-Installing package	PackageStatus		Εγκατάσταση πακέτου
-No installation type selected	PackageView		Δεν επιλέχθηκε τύπος εγκατάστασης
-No package available.	PackageInfo		Δεν υπάρχει διαθέσιμο πακέτο.
-No package selected.	PackageInfo		Δεν επιλέχθηκε πακέτο.
-OK	PackageView		Εντάξει
-Other…	PackageView		Άλλο...
-Package installer	PackageView		Εγκαταστάτης πακέτων
 PackageInstaller	System name		PackageInstaller
-Preparing package	PackageInstall		Προετοιμασία πακέτου
+Abort	PackageInstall		Ματαίωση
+Continue	PackageTextViewer		Συνέχεια
 Replace	PackageView		Αντικατάσταση
-Replace all	PackageView		Αντικατάσταση όλων
-Running post-installation scripts	PackageInstall		Εκτέλεση script πριν την εγκατάσταση
-Skip	PackageView		Παράλειψη
-Skip all	PackageView		Παράβλεψη όλων
-Stop	PackageStatus		Διακοπή
-The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Ο κατάλογος '%s' υπάρχει ήδη στο ζητούμενο μονοπάτι.\nΝα αντικατασταθεί ο κατάλογος με έναν από αυτο το πακέτο ή να γίνει παράβλεψη;
-The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Το αρχείο '%s' υπάρχει ήδη στο ζητούμενο μονοπάτι.\nΝα αντικατασταθεί το αρχείο με ένα από αυτο το πακέτο ή να γίνει παράβλεψη;
-The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Το ζητούμενο πακέτο φαίνεται να είναι ήδη εγκατεστημένο στο υστημα σας. Θα θέλατε να απεγκαταστήσετε το υπάρχων πακέτο και να συνεχίσετε την εγκατάσταση;
-The installation of the package has been aborted.	PackageView		Η εγκατάσταση αυτού του πακέτου ματαιώθηκε.
-The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Το στοιχείο '%s' υπάρχει ήδη στο ζητούμενο μονοπάτι.\nΝα αντικατασταθεί το στοιχείο με ένα από αυτο το πακέτο ή να γίνει παράβλεψη;
+Installation progress	PackageView		Πρόοδος εγκατάστασης
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Το αρχείο πακέτου δεν είναι αναγνώσιμο.\nΈνας από τους πιθανούς λόγους για αυτό είναι οτι μπορεί το ζητούμενο πακέτο να μην είναι ένα έγκυρο πακέτο .pkg του BeOS.
-The package you requested has been successfully installed on your system.	PackageView		Το πακέτο που ζητήσατε εγκαταστάθηκε επιτυχός στο σύστημα σας.
-The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Το ζητούμενο πακέτο απέτυχε να εγκατασταθεί στο σύστημσ σας. Αυτο μπορεί να είναι ένα πρόβλημα με το αρχείο πακέτου προορισμού. Παρακαλώ συζητήστε για αυτό το πρόβλημα με το διανομέα του πακέτου.
-The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Το script '%s' υπάρχει ήδη στο ζητούμενο μονοπάτι.\nΝα αντικατασταθεί το script με ένα από αυτο το πακέτο ή να γίνει παράβλεψη;
-The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		Ο συμβολιζόμενος σύνδεσμος '%s' υπάρχει ήδη στο ζητούμενο μονοπάτι.\nΝα αντικατασταθεί ο συμβολιζόμενος σύνδεσμος με ένα από αυτο το πακέτο ή να γίνει παράβλεψη;
-There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Φαίνεται  να υπάρχει μια σύγχηση του μεγέθους αρχείου στο αρχείο πακέτου. Το πακέτο μπορεί να είναι καταστραμμένο ή να έχει τροποποιηθεί έπειτα από τη δημιουργία του. Θέλετε οπωσδήποτε να συνεχίσετε;
-none	PackageView		κανένα

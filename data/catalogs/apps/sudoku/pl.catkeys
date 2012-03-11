@@ -1,14 +1,14 @@
-1	polish	x-vnd.Haiku-Sudoku	2862671735
+1	polish	x-vnd.Haiku-Sudoku	2463385585
 Restore snapshot	SudokuWindow		Przywróć migawkę
 Could not set Sudoku:\n%s\n	SudokuWindow		Nie można ustawić Sudoku:\n%s\n
-Export as…	SudokuWindow		Eksportuj jako...
+Export as…	SudokuWindow		Eksportuj jako…
 OK	SudokuWindow		OK
 New	SudokuWindow		Nowy
 Abort	ProgressWindow		Przerwij
 Sudoku	System name		Sudoku
 Could not open \"%s\":\n%s\n	SudokuWindow		Nie można otworzyć \"%s\":\n%s\n
 Easy	SudokuWindow		Łatwy
-Open file…	SudokuWindow		Otwórz plik...
+Open file…	SudokuWindow		Otwórz plik…
 Solve single field	SudokuWindow		Rozwiąż pojedyncze pole
 Solve	SudokuWindow		Rozwiąż
 Redo	SudokuWindow		Ponów
@@ -16,6 +16,7 @@ File	SudokuWindow		Plik
 Advanced	SudokuWindow		Zaawansowany
 Start again	SudokuWindow		Rozpocznij jeszcze raz
 HTML	SudokuWindow		HTML
+Sudoku request	SudokuWindow		Żądanie Sudoku
 Copy	SudokuWindow		Kopiuj
 Mark valid hints	SudokuWindow		Oznacz prawidłowe podpowiedzi
 Sudoku solved - congratulations!\n	SudokuWindow		Sudoku rozwiązane - gratulacje!\n

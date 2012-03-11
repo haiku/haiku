@@ -211,6 +211,42 @@ if $(TARGET_ARCH) = x86 {
 }
 
 
+# FFmpeg
+local ffmpegBaseURL = http://haiku-files.org/files/optional-packages ;
+if $(TARGET_ARCH) = x86 {
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		HAIKU_FFMPEG_FILE = ffmpeg-0.10-x86-gcc4-2012-02-19.zip ;
+	} else {
+		HAIKU_FFMPEG_FILE = ffmpeg-0.10-x86-gcc2-2012-03-07.zip ;
+	}
+
+	local zipFile = [ DownloadFile $(HAIKU_FFMPEG_FILE)
+		: $(ffmpegBaseURL)/$(HAIKU_FFMPEG_FILE) ] ;
+
+	HAIKU_FFMPEG_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_FFMPEG_FILE:B) ] ;
+
+	HAIKU_FFMPEG_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_FFMPEG_DIR)
+		: common/include/ : $(zipFile) : extracted-ffmpeg ] ;
+
+	HAIKU_FFMPEG_LIBS = [ ExtractArchive $(HAIKU_FFMPEG_DIR)
+		:
+		common/lib/libavformat.a
+		common/lib/libavcodec.a
+		common/lib/libavdevice.a
+		common/lib/libavfilter.a
+		common/lib/libswscale.a
+		common/lib/libavutil.a
+		: $(zipFile)
+		: extracted-ffmpeg ] ;
+
+	HAIKU_FFMPEG_HEADERS = [ FDirName $(HAIKU_FFMPEG_DIR) common include ] ;
+
+} else {
+	Echo "FFMpeg support not available on $(TARGET_ARCH)" ;
+}
+
+
 # TagLib
 
 # Automatically install the TagLib feature, when the optional TagLib optional

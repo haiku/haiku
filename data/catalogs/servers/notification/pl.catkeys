@@ -1,4 +1,8 @@
-1	polish	x-vnd.Haiku-notification_server	2675796741
+1	polish	x-vnd.Haiku-notification_server	906000487
+Couldn't start filter monitor. Live filter changes disabled.	NotificationWindow		Nie można uruchomić monitora filtrów. Rezydujący filtr zmian wyłączony.
+Couldn't start display settings monitor.\nLive filter changes disabled.	NotificationWindow		Nie można uruchomić monitora ustawień wyświetlania.\nRezydujący filtr zmian wyłączony.
+Darn.	NotificationWindow		A niech to szlag.
 Warning	NotificationWindow		Ostrzeżenie
 OK	NotificationWindow		OK
+Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Nie można uruchomić monitora ustawień ogólnych.\nRezydujący filtr zmian wyłączony.
 Notification	NotificationWindow		Powiadomienie

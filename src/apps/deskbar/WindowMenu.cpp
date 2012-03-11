@@ -116,7 +116,8 @@ TWindowMenu::AttachedToWindow()
 
 	int32 parentMenuItems = 0;
 
-	for (int32 i = 0; i < fTeam->CountItems(); i++) {
+	int32 teamCount = fTeam->CountItems();
+	for (int32 i = 0; i < teamCount; i++) {
 		team_id theTeam = (team_id)fTeam->ItemAt(i);
 		int32 tokenCount = 0;
 		int32* tokens = get_token_list(theTeam, &tokenCount);
@@ -130,7 +131,11 @@ TWindowMenu::AttachedToWindow()
 				&& (wInfo->show_hide_level <= 0 || wInfo->is_mini)) {
 				// Don't add new items if we're expanded. We've already done
 				// this, they've just been moved.
-				for (int32 addIndex = 0; addIndex < CountItems(); addIndex++) {
+				int32 numItems = CountItems();
+
+				// Find first item that sorts alphabetically after this window,
+				// so we know where to put it
+				for (int32 addIndex = 0; addIndex < numItems; addIndex++) {
 					TWindowMenuItem* item
 						= static_cast<TWindowMenuItem*>(ItemAt(addIndex));
 					if (item != NULL

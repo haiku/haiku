@@ -1,32 +1,32 @@
-1	modern_greek	x.vnd.OBOS-Inspector	2075781936
-Active Translators	ImageWindow		Ενεργοί Μεταφραστές
-Active Translators	InspectorApp		Ενεργοί Μεταφραστές
-Bummer	ImageWindow		Κρίμα
-File	ImageWindow		Αρχείο
-First Page	ImageWindow		Πρώτη Σελίδα
-Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Εικόνα: %1\nΚενό Χρώματος: %2 (%3)\nΔιαστάσεις: %4 x %5\nBytes ανα γραμμή: %6\nΣυνολικά Bytes: %7\n\nΠληροφορίες εξακρίβωσεις:\nID γραμματοσειρά: %8\nMIME Τύπος: %9\nΤύπος: '%10' (%11)\nΜεταφραστής ID: %12\nΓκρούπ: '%13' (%14)\nΠοιότητα: %15\nΙκανότητα: %16\n\nΕπέκταση Πληροφορίες:\n
-Info	ImageWindow		Πληροφορίες
-Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Πληροφορίες Win. Σημειώση: Το παρακάτω παράθυρο έχει περιορισμένο μέγεθος τίτλου, λόγο αυτού το 'Info Win' έχει περιοριστεί. 
-Last Page	ImageWindow		Τελευταία Σελίδα
-Next Page	ImageWindow		Επόμενη Σελίδα
+1	greek, modern (1453-)	x.vnd.OBOS-Inspector	2075781936
+User Translators	ActiveTranslatorsWindow		Μεταφραστές Χρήστη
 No image available to save.	ImageWindow		Δεν υπάρχει διαθέσιμη εικόνα για αποθήκευση.
-Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Αριθμός αρχείων: %1\n\nΜεταφραστής σε χρήση:\nΌνομα: %2\nΠληροφορία: %3\nΈκδοση: %4\n
-OK	ImageView		ΟΚ
-OK	ImageWindow		ΟΚ
-Open...	ImageWindow		Άνοιγμα...
-Previous Page	ImageWindow		Προηγούμενη Σελίδα
-Quit	ImageWindow		Έξοδος
-Save feature not implemented yet.	ImageWindow		Η δυνατότητα αποθήκευσης δεν έχει υλοποιηθεί ακόμα.
-Save...	ImageWindow		Αποθήκευση...
-Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Επιλεγμένο έγγραφο: %1\n\nΜεταφραστής σε χρήση:\nΌνομα: %2\nΠληροφορίες: %3\nΈκδοση: %4\n
-Sorry, unable to load the image.	ImageView		Λυπούμαστε, δεν είναι δυνατή η φόρτωση της εικόνας. 
 Sorry, unable to write the image file.	ImageView		Συγγνώμη, αδύνατη η εγγραφή της εικόνας
+Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Αριθμός αρχείων: %1\n\nΜεταφραστής σε χρήση:\nΌνομα: %2\nΠληροφορία: %3\nΈκδοση: %4\n
+\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nΤύπος: '%1' (%2)\nΓκρούπ: '%3' (%4)\nΠοιότητα: %5\nΙκανότητα: %6\nMIME Type: %7\nΌνομα: %8\n
+Bummer	ImageWindow		Κρίμα
+Last Page	ImageWindow		Τελευταία Σελίδα
+\nInput Formats:	ImageView		\nΦόρμες Εισόδου:
+Sorry, unable to load the image.	ImageView		Λυπούμαστε, δεν είναι δυνατή η φόρτωση της εικόνας. 
+Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Πληροφορίες Win. Σημειώση: Το παρακάτω παράθυρο έχει περιορισμένο μέγεθος τίτλου, λόγο αυτού το 'Info Win' έχει περιοριστεί. 
+Active Translators	InspectorApp		Ενεργοί Μεταφραστές
+Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Εικόνα: %1\nΚενό Χρώματος: %2 (%3)\nΔιαστάσεις: %4 x %5\nBytes ανα γραμμή: %6\nΣυνολικά Bytes: %7\n\nΠληροφορίες εξακρίβωσεις:\nID γραμματοσειρά: %8\nMIME Τύπος: %9\nΤύπος: '%10' (%11)\nΜεταφραστής ID: %12\nΓκρούπ: '%13' (%14)\nΠοιότητα: %15\nΙκανότητα: %16\n\nΕπέκταση Πληροφορίες:\n
+\nOutput Formats:	ImageView		\nΦόρμες Εξόδου
+Save feature not implemented yet.	ImageWindow		Η δυνατότητα αποθήκευσης δεν έχει υλοποιηθεί ακόμα.
+First Page	ImageWindow		Πρώτη Σελίδα
+Next Page	ImageWindow		Επόμενη Σελίδα
+Open...	ImageWindow		Άνοιγμα...
+\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nΜεταφραστής σε χρήση:\nΌνομα: %1\nΠληροφορίες: %2\nΈκδοση: %3\n
+Save...	ImageWindow		Αποθήκευση...
+Info	ImageWindow		Πληροφορίες
+OK	ImageWindow		ΟΚ
+Window	ImageWindow		Παράθυρο
+Quit	ImageWindow		Έξοδος
+Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Επιλεγμένο έγγραφο: %1\n\nΜεταφραστής σε χρήση:\nΌνομα: %2\nΠληροφορίες: %3\nΈκδοση: %4\n
+Active Translators	ImageWindow		Ενεργοί Μεταφραστές
+View	ImageWindow		Προβολή
+Previous Page	ImageWindow		Προηγούμενη Σελίδα
+OK	ImageView		ΟΚ
 System Translators	ActiveTranslatorsWindow		Μεταφραστές του συστήματος
 Unknown	ImageView		Άγνωστο
-User Translators	ActiveTranslatorsWindow		Μεταφραστές Χρήστη
-View	ImageWindow		Προβολή
-Window	ImageWindow		Παράθυρο
-\nInput Formats:	ImageView		\nΦόρμες Εισόδου:
-\nOutput Formats:	ImageView		\nΦόρμες Εξόδου
-\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nΜεταφραστής σε χρήση:\nΌνομα: %1\nΠληροφορίες: %2\nΈκδοση: %3\n
-\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nΤύπος: '%1' (%2)\nΓκρούπ: '%3' (%4)\nΠοιότητα: %5\nΙκανότητα: %6\nMIME Type: %7\nΌνομα: %8\n
+File	ImageWindow		Αρχείο

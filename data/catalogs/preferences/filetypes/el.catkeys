@@ -1,157 +1,157 @@
-1	modern_greek	x-vnd.Haiku-FileTypes	473999706
-%1 application type	Application Type Window		τύπος εφαρμογής %1
-%ld Application type%s could be removed.	Application Types Window		%ld Ο τύπος εφαρμογής%s μπορεί να αφαιρεθεί.
-%s file type	FileType Window		%s τύπος αρχείου
-(from application)	FileTypes Window		(από την εφαρμογή)
-(from super type)	FileTypes Window		(από υπέρ τύπο)
-Abort	Application Types Window		Ακύρωση
-Add	Attribute Window		Προσθήκη
-Add	Extension Window		Προσθήκη
-Add group	New File Type Window		Προσθήκη ομάδας
-Add icon…	Icon View		Προσθήκη εικονίδιου...
-Add new group	New File Type Window		Προσθήκη νέας ομάδας
-Add type	New File Type Window		Προσθήκη τύπου
-Add…	Application Type Window		Προσθήκη...
-Add…	FileTypes Window		Προσθήκη...
-Alignment:	Attribute Window		Ευθυγράμμιση:
-Alpha	Application Type Window		Άλφα
-Alpha	Application Types Window		Άλφα
-Application flags	Application Type Window		Σημαίες εφαρμογής
-Application type	Application Type Window		Τύπος εφαρμογής
-Application types	Application Types Window		Τύποι εφαρμογής
+1	greek, modern (1453-)	x-vnd.Haiku-FileTypes	473999706
 Application types…	FileTypes Window		Τύποι εφαρμογής...
-Args only	Application Type Window		Μόνο παράμετροι
-Attribute	Attribute Window		Ιδιότητα
-Attribute name:	Attribute Window		Όνομα ιδιότητας:
-Background app	Application Type Window		Εφαρμογή παρασκηνίου
-Beta	Application Type Window		Βήτα
-Beta	Application Types Window		Βήτα
-Cancel	Application Type Window		Άκυρο
-Cancel	Attribute Window		Άκυρο
-Cancel	Extension Window		Άκυρο
-Cancel	FileTypes Window		Άκυρο
-Cancel	New File Type Window		Άκυρο
-Cancel	Preferred App Menu		Άκυρο
-Cancel	Type List Window		Άκυρο
-Center	Attribute Window	Attribute column alignment in Tracker	Κέντρο
-Choose type	Type List Window		Επιλογή τύπου
-Close	Application Type Window		Κλείσιμο
-Could not change attributes	Attribute Window		Δεν ήταν δυνατή η αλλαγή των ιδιοτήτων
-Could not change file extensions	Extension Window		Δεν μπορείτε να αλλάξετε τις επεκτάσεις αρχείων
-Could not install file type	New File Type Window		Δεν μπορεί να γίνει εγκατάσταση του τύπου αρχείου
-Could not open \"%s\":\n%s	FileTypes		Αδυναμία ανοίγματος \"%s\":\n%s
-Could not open file	FileType Window		Αδυναμία ανοίγματος του αρχείου
-Could not remove file type: %s\n	FileTypes Window		Δεν μπορείτε να διαγράψετε το τύπο αρχείου: %s\n
-Could not retrieve application signature	Preferred App Menu		Αδυναμία ανάκτησης υπογραφής της εφαρμογής
-Could not retrieve preferred application of this file	Preferred App Menu		Αδυναμία ανάκτησης προτεινόμενης εφαρμογής του αρχείου
-Could not set preferred application	FileTypes Window		Αδυναμία ορισμού προτεινόμενης εφαρμογής
-Default application	FileType Window		Προεπιλεγμένη εφαρμογή
-Description	FileTypes Window		Περιγραφή
 Description:	Application Types Window		Περιγραφή:
-Description:	FileTypes Window		Περιγραφή:
-Development	Application Type Window		Υπό ανάπτυξη
-Development	Application Types Window		Ανάπτυξη
-Display as:	Attribute Window	Tracker offers different display modes for attributes.	Εμφάνιση ως:
-Do you want to save the changes?	Application Type Window		Θέλετε να αποθηκεύσετε τις αλλαγές;
-Done	Attribute Window		Ολοκληρώθηκε
-Done	Extension Window		Ολοκληρώθηκε
-Done	Type List Window		Ολοκληρώθηκε
-Edit icon…	Icon View		Επεξεργασία εικονίδιου...
-Editable	Attribute Window	If Tracker allows to edit this attribute.	Επεξεργάσιμο
-Edit…	Application Types Window		Επεξεργασία
-Exclusive launch	Application Type Window		Αποκλειστή εκκίνηση
-Extension	Extension Window		Επέκταση
-Extension:	Extension Window		Επέκταση:
-Extensions:	FileTypes Window		Επεκτάσεις:
-Extra attributes	FileTypes Window		Επιπλέον ιδιότητες
-File	Application Type Window		Αρχείο
-File	FileTypes Window		Αρχείο
-File could not be opened	Preferred App Menu		Το αρχείο δεν μπoρεί να ανοιχτεί
-File recognition	FileTypes Window		Αναγνώριση αρχείου
-File type	FileType Window		Τύπος αρχείου
-FileTypes	FileTypes		Τύποι Αρχείων
-FileTypes	System name		Τύποι αρχείων
-FileTypes request	FileTypes		Αίτηση Τύποι Αρχείων
-FileTypes request	FileTypes Window		Αίτημα του FileTypes
-FileTypes request	Preferred App Menu		Αίτηση Τύποι Αρχείων
-Final	Application Type Window		Τελικό
-Final	Application Types Window		Τελικός
-Gamma	Application Type Window		Γάμα
-Gamma	Application Types Window		Γάμμα
-Golden master	Application Type Window		Χρυσή έκδοση
-Golden master	Application Types Window		Χρυσό προτεύον
-Group name:	New File Type Window		Όνομα ομάδας:
-Group:	New File Type Window		Ομάδα:
-Icon	Application Type Window		Εικονίδιο
-Icon	FileType Window		Εικονίδιο
-Icon	FileTypes Window		Εικονίδιο
-Information	Application Types Window		Πληροφορίες
-Internal name:	Attribute Window		Εσωτερικό όνομα:
-Internal name:	FileTypes Window		Εσωτερικό όνομα:
-Internal name:	New File Type Window		Εσωτερικό όνομα:
-Launch	Application Types Window		Άνοιγμα
-Left	Attribute Window	Attribute column alignment in Tracker	Αριστερά
-Long description:	Application Type Window		Εκτεταμένη περιγραφή
-Move down	FileTypes Window		Κίνηση επάνω
-Move up	FileTypes Window		Κίνηση κάτω
-Multiple files from \"%s\" file type	FileType Window		Πολλαπλά αρχεία από \"%s\" τύπος αρχείου
-Multiple launch	Application Type Window		Πολλαπλή εκκίνηση
-Name:	Application Types Window		Όνομα:
-New file type	New File Type Window		Νέος τύπος αρχείου
-New resource file…	FileTypes Window		Νέο αρχείο πόρων...
-None	FileTypes Window		Κανένα
-OK	FileTypes		Εντάξει
-Open file	FileTypes		Άνοιγμα αρχείου
-Open…	FileTypes Window		Άνοιγμα...
-Path:	Application Types Window		Διαδρομή:
-Preferred application	FileType Window		Προτεινόμενη εφαρμογή
-Preferred application	FileTypes Window		Προτεινόμενη εφαρμογή
-Progress	Application Types Window		Πρόοδος
-Quit	FileTypes Window		Έξοδος
-Quit, don't save	Application Type Window		Έξοδος, χωρίς αποθήκευση
+Args only	Application Type Window		Μόνο παράμετροι
 Recognition rule is not valid:\n\n	FileTypes Window		Ο κανόνας αναγνώρισης δεν έγκυρος:\n\n
+Add group	New File Type Window		Προσθήκη ομάδας
 Remove	Application Type Window		Διαγραφή
-Remove	FileTypes Window		Διαγραφή
-Remove icon	Icon View		Διαγραφή εικονίδιου
-Remove uninstalled	Application Types Window		Αφαίρεση απεγκατεστημένων
-Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Διαγράφοντας ένα τύπο αρχείου, δεν θα μπορείτε να το επαναφέρετε.\nΕίστε σίγουρος ότι θέλετε να το διαγράψετε;
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Διαγράφοντας ένα υπέρ τύπο, δεν θα μπορείτε να το επαναφέρετε.\n Όλοι οι τύποι αρχείων που ανήκουν σε αυτό το υπέρ τύπο θα χαθούν!\n\nΕίστε σίγουρος ότι θέλετε να το κάνετε αυτό; Για να καταργήσετε ολόκληρη την ομάδα, κρατήστε πατημένο το πλήκτρο Shift και πατήστε το \"Διαγραφή\".
-Removing uninstalled application types	Application Types Window		Αφαίρεση απεγκατεστημένων τύπων εφαρμογών
-Right	Attribute Window	Attribute column alignment in Tracker	Δεξιά
-Rule:	FileTypes Window		Κανόνας:
-Same as…	FileType Window	The same APPLICATION as ...	Ίδιο με...
-Same as…	FileType Window	The same TYPE as ...	Ίδιο με...
-Same as…	FileTypes Window		Ίδιο με...
-Save	Application Type Window		Αποθήκευση
-Save into resource file…	Application Type Window		Αποθήκευση μέσα στο αρχείο πόρου...
-Save request	Application Type Window		Αποθήκευση αίτησης
-Select preferred application	FileType Window		Επιλογή προτεινόμενης εφαρμογής
-Select preferred application	FileTypes Window		Επιλογή προτεινόμενης εφαρμογής
-Select same preferred application as	FileType Window		Επιλογή ίδιας προτεινόμενης εφαρμογής ως
-Select same preferred application as	FileTypes Window		Επιλογή της ίδιας προτεινόμενης εφαρμογής ως
 Select same type as	FileType Window		Επιλογή ίδιου τύπου ως
-Select…	FileType Window		Επιλογή...
-Select…	FileTypes Window		Επιλογή...
-Set Preferred Application	Preferred App Menu		Ορισμός Προτεινόμενης Εφαρμογής
-Settings	FileTypes Window		Ρυθμίσεις
-Short description:	Application Type Window		Σύντομη περιγραφή
-Show icons in list	FileTypes Window		Εμφάνιση εικονιδίων σε λίστα
-Show in Tracker…	Application Types Window		Προβολή στον τράκερ
-Show recognition rule	FileTypes Window		Εμφάνιση κανόνα αναγνώρισης
-Signature:	Application Type Window		Υπογραφή:
-Signature:	Application Types Window		Υπογραφή
-Single launch	Application Type Window		Απλή εκκίνηση
-Special:	Attribute Window		Ειδικό:
+Remove icon	Icon View		Διαγραφή εικονίδιου
 Supported types	Application Type Window		Υποστηριζόμενοι τύποι
-The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Η εφαρμογή \"%s\" δεν υποστηρίζει αυτό το τύπο αρχείου.\nΕίστε σίγουροι ότι θέλετε να το θέσετε οπωσδήποτε;
-This file type already exists	New File Type Window		Αυτός ο τύπος αρχείου υπάρχει ήδη
+Show icons in list	FileTypes Window		Εμφάνιση εικονιδίων σε λίστα
 Type name:	FileTypes Window		Όνομα τύπου:
-Type:	Attribute Window		Τύπος:
-Version	Application Types Window		ΈΚδοση
-Version info	Application Type Window		Πληροφορίες έκδοσης
+Internal name:	New File Type Window		Εσωτερικό όνομα:
+Choose type	Type List Window		Επιλογή τύπου
+New file type	New File Type Window		Νέος τύπος αρχείου
+Rule:	FileTypes Window		Κανόνας:
+Add icon…	Icon View		Προσθήκη εικονίδιου...
+Multiple files from \"%s\" file type	FileType Window		Πολλαπλά αρχεία από \"%s\" τύπος αρχείου
+Do you want to save the changes?	Application Type Window		Θέλετε να αποθηκεύσετε τις αλλαγές;
+File type	FileType Window		Τύπος αρχείου
+Could not change attributes	Attribute Window		Δεν ήταν δυνατή η αλλαγή των ιδιοτήτων
+Could not retrieve preferred application of this file	Preferred App Menu		Αδυναμία ανάκτησης προτεινόμενης εφαρμογής του αρχείου
+Beta	Application Types Window		Βήτα
+Extensions:	FileTypes Window		Επεκτάσεις:
+Select same preferred application as	FileTypes Window		Επιλογή της ίδιας προτεινόμενης εφαρμογής ως
+Save	Application Type Window		Αποθήκευση
+Could not retrieve application signature	Preferred App Menu		Αδυναμία ανάκτησης υπογραφής της εφαρμογής
+Add	Extension Window		Προσθήκη
+Select same preferred application as	FileType Window		Επιλογή ίδιας προτεινόμενης εφαρμογής ως
+Cancel	Attribute Window		Άκυρο
+Icon	Application Type Window		Εικονίδιο
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Διαγράφοντας ένα τύπο αρχείου, δεν θα μπορείτε να το επαναφέρετε.\nΕίστε σίγουρος ότι θέλετε να το διαγράψετε;
+Editable	Attribute Window	If Tracker allows to edit this attribute.	Επεξεργάσιμο
+Multiple launch	Application Type Window		Πολλαπλή εκκίνηση
+(from application)	FileTypes Window		(από την εφαρμογή)
+Could not set preferred application	FileTypes Window		Αδυναμία ορισμού προτεινόμενης εφαρμογής
+Group:	New File Type Window		Ομάδα:
+%1 application type	Application Type Window		τύπος εφαρμογής %1
+Done	Extension Window		Ολοκληρώθηκε
+Application type	Application Type Window		Τύπος εφαρμογής
+Done	Type List Window		Ολοκληρώθηκε
+Attribute	Attribute Window		Ιδιότητα
+Show recognition rule	FileTypes Window		Εμφάνιση κανόνα αναγνώρισης
+FileTypes request	Preferred App Menu		Αίτηση Τύποι Αρχείων
+Could not open file	FileType Window		Αδυναμία ανοίγματος του αρχείου
+Description:	FileTypes Window		Περιγραφή:
+File	FileTypes Window		Αρχείο
+Name:	Application Types Window		Όνομα:
+Group name:	New File Type Window		Όνομα ομάδας:
+Preferred application	FileType Window		Προτεινόμενη εφαρμογή
+Progress	Application Types Window		Πρόοδος
+File	Application Type Window		Αρχείο
 Version:	Application Type Window		Έκδοση:
-Version:	Application Types Window		Έκδοση
-Visible	Attribute Window		Ορατό
-Width:	Attribute Window	Default column width in Tracker for this attribute.	Πλάτος:
+Select…	FileTypes Window		Επιλογή...
+FileTypes request	FileTypes		Αίτηση Τύποι Αρχείων
+Open…	FileTypes Window		Άνοιγμα...
+Select…	FileType Window		Επιλογή...
+Launch	Application Types Window		Άνοιγμα
+Same as…	FileType Window	The same APPLICATION as ...	Ίδιο με...
+Abort	Application Types Window		Ακύρωση
+FileTypes	FileTypes		Τύποι Αρχείων
+OK	FileTypes		Εντάξει
+Extra attributes	FileTypes Window		Επιπλέον ιδιότητες
+Development	Application Type Window		Υπό ανάπτυξη
+Edit…	Application Types Window		Επεξεργασία
+Icon	FileType Window		Εικονίδιο
+Final	Application Types Window		Τελικός
+Development	Application Types Window		Ανάπτυξη
+Open file	FileTypes		Άνοιγμα αρχείου
+Special:	Attribute Window		Ειδικό:
+Alpha	Application Type Window		Άλφα
+Add…	FileTypes Window		Προσθήκη...
+Signature:	Application Type Window		Υπογραφή:
+Quit, don't save	Application Type Window		Έξοδος, χωρίς αποθήκευση
+Add…	Application Type Window		Προσθήκη...
 [Multiple files] file types	FileType Window		[Πολλαπλά αρχεία] τύποι αρχείων
+Information	Application Types Window		Πληροφορίες
+Gamma	Application Types Window		Γάμμα
+Quit	FileTypes Window		Έξοδος
+Select preferred application	FileType Window		Επιλογή προτεινόμενης εφαρμογής
+Single launch	Application Type Window		Απλή εκκίνηση
+Golden master	Application Types Window		Χρυσό προτεύον
+%s file type	FileType Window		%s τύπος αρχείου
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Η εφαρμογή \"%s\" δεν υποστηρίζει αυτό το τύπο αρχείου.\nΕίστε σίγουροι ότι θέλετε να το θέσετε οπωσδήποτε;
+Type:	Attribute Window		Τύπος:
+Removing uninstalled application types	Application Types Window		Αφαίρεση απεγκατεστημένων τύπων εφαρμογών
+Done	Attribute Window		Ολοκληρώθηκε
+Set Preferred Application	Preferred App Menu		Ορισμός Προτεινόμενης Εφαρμογής
 no icon	FileTypes Window		χωρίς εικονίδιο
+Alpha	Application Types Window		Άλφα
+Version	Application Types Window		ΈΚδοση
+Background app	Application Type Window		Εφαρμογή παρασκηνίου
+Add new group	New File Type Window		Προσθήκη νέας ομάδας
+Move down	FileTypes Window		Κίνηση επάνω
+Cancel	Application Type Window		Άκυρο
+Settings	FileTypes Window		Ρυθμίσεις
+New resource file…	FileTypes Window		Νέο αρχείο πόρων...
+Cancel	New File Type Window		Άκυρο
+Icon	FileTypes Window		Εικονίδιο
+Extension:	Extension Window		Επέκταση:
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Διαγράφοντας ένα υπέρ τύπο, δεν θα μπορείτε να το επαναφέρετε.\n Όλοι οι τύποι αρχείων που ανήκουν σε αυτό το υπέρ τύπο θα χαθούν!\n\nΕίστε σίγουρος ότι θέλετε να το κάνετε αυτό; Για να καταργήσετε ολόκληρη την ομάδα, κρατήστε πατημένο το πλήκτρο Shift και πατήστε το \"Διαγραφή\".
+Internal name:	FileTypes Window		Εσωτερικό όνομα:
+Add	Attribute Window		Προσθήκη
+Close	Application Type Window		Κλείσιμο
+File recognition	FileTypes Window		Αναγνώριση αρχείου
+Remove uninstalled	Application Types Window		Αφαίρεση απεγκατεστημένων
+Center	Attribute Window	Attribute column alignment in Tracker	Κέντρο
+Golden master	Application Type Window		Χρυσή έκδοση
+Could not open \"%s\":\n%s	FileTypes		Αδυναμία ανοίγματος \"%s\":\n%s
+Alignment:	Attribute Window		Ευθυγράμμιση:
+Left	Attribute Window	Attribute column alignment in Tracker	Αριστερά
+Cancel	Extension Window		Άκυρο
+Path:	Application Types Window		Διαδρομή:
+Application flags	Application Type Window		Σημαίες εφαρμογής
+Cancel	Type List Window		Άκυρο
+Move up	FileTypes Window		Κίνηση κάτω
+Description	FileTypes Window		Περιγραφή
+Save request	Application Type Window		Αποθήκευση αίτησης
+Beta	Application Type Window		Βήτα
+None	FileTypes Window		Κανένα
+Remove	FileTypes Window		Διαγραφή
+Attribute name:	Attribute Window		Όνομα ιδιότητας:
+Extension	Extension Window		Επέκταση
+Add type	New File Type Window		Προσθήκη τύπου
+Internal name:	Attribute Window		Εσωτερικό όνομα:
+Show in Tracker…	Application Types Window		Προβολή στον τράκερ
+Final	Application Type Window		Τελικό
+Width:	Attribute Window	Default column width in Tracker for this attribute.	Πλάτος:
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	Εμφάνιση ως:
+This file type already exists	New File Type Window		Αυτός ο τύπος αρχείου υπάρχει ήδη
+Same as…	FileTypes Window		Ίδιο με...
+Exclusive launch	Application Type Window		Αποκλειστή εκκίνηση
+%ld Application type%s could be removed.	Application Types Window		%ld Ο τύπος εφαρμογής%s μπορεί να αφαιρεθεί.
+FileTypes	System name		Τύποι αρχείων
+Application types	Application Types Window		Τύποι εφαρμογής
+Could not remove file type: %s\n	FileTypes Window		Δεν μπορείτε να διαγράψετε το τύπο αρχείου: %s\n
+Signature:	Application Types Window		Υπογραφή
+Gamma	Application Type Window		Γάμα
+Cancel	Preferred App Menu		Άκυρο
+Cancel	FileTypes Window		Άκυρο
+Select preferred application	FileTypes Window		Επιλογή προτεινόμενης εφαρμογής
+Right	Attribute Window	Attribute column alignment in Tracker	Δεξιά
+Default application	FileType Window		Προεπιλεγμένη εφαρμογή
+Long description:	Application Type Window		Εκτεταμένη περιγραφή
+FileTypes request	FileTypes Window		Αίτημα του FileTypes
+Version info	Application Type Window		Πληροφορίες έκδοσης
+(from super type)	FileTypes Window		(από υπέρ τύπο)
+Version:	Application Types Window		Έκδοση
+Preferred application	FileTypes Window		Προτεινόμενη εφαρμογή
+Short description:	Application Type Window		Σύντομη περιγραφή
+File could not be opened	Preferred App Menu		Το αρχείο δεν μπoρεί να ανοιχτεί
+Could not change file extensions	Extension Window		Δεν μπορείτε να αλλάξετε τις επεκτάσεις αρχείων
+Edit icon…	Icon View		Επεξεργασία εικονίδιου...
+Same as…	FileType Window	The same TYPE as ...	Ίδιο με...
+Save into resource file…	Application Type Window		Αποθήκευση μέσα στο αρχείο πόρου...
+Visible	Attribute Window		Ορατό
+Could not install file type	New File Type Window		Δεν μπορεί να γίνει εγκατάσταση του τύπου αρχείου

@@ -1,61 +1,60 @@
-1	modern_greek	x-vnd.Haiku-BluetoothPrefs	4055730587
-15 secs	Settings view		15 δευτερόλεπτα
-61 secs	Settings view		61 δευτερόλεπτα
+1	greek, modern (1453-)	x-vnd.Haiku-BluetoothPrefs	2526531136
 About Bluetooth…	Window		Περί Bluetooth...
-Add device to list	Inquiry panel		Προσθήκη συσκευής στη λίστα
-Add…	Remote devices		Προσθήκη…
-Always ask	Settings view		Πάντα ρώτα
-As blocked	Remote devices		Ως αποκλεισμένο
-Authenticate	Extended local device view		Αναγνώριση
-Bluetooth	System name		Bluetooth
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Ελέγξτε αν οι bluetooth δυνατότητες τις απομακρυσμένης συσκευής είναι ενεργές. Πατήστε ''Έρευνα'' για να ξεκινήσει η σάρωση. Ο απαιτούμενος χρόνος για την ανάκτηση των ονομάτων είναι άγνωστος, ωστόσο δεν πρέπει να πάρει πάνω από 3 δευτερόπλεπτα σε κάθε συσκευή. Ύστερα θα είστε σε θέση να τα προσθέσετε στην κύρια λίστα, οπού θα μπορείτε να τα ομαδοποιήσετε.
-Connections & channels…	Window		Συνδέσεις & κανάλια…
-Default inquiry time:	Settings view		Προκαθορισμένος χρόνος έρευνας:
-Defaults	Window		Προεπιλογές
-Desktop	Settings view		Επιφάνεια εργασίας
-Disconnect	Remote devices		Αποσύνδεση
-Discoverable	Extended local device view		Ορατό
-From all devices	Settings view		Από όλες τις συσκευές
-Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetooth system, (ARCE)\n\nΔημιουργημένο από τον Oliver Ruiz Dorantes\n\nΜε την υποστήριξη των:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nΕυχαριστώ όλους τους υπόλοιπους που βοήθησαν...\n\nΥλικό μέρος που απεστάλη/παραχωρήθηκε:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nΜε τις διορθώσεις του κώδικα από τους:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nΑυτοί που μου έδωσαν την τεχνογνωσία:\n\t- Η ομάδα του yellowTAB 
 Handheld	Settings view		Φορητός
-Help	Window		Βοήθεια
-Identify host as:	Settings view		Αναγνώριση ξενιστή ως:
-Identify us as...	Settings view		Αναγνωρίστε μας ως...
-Incoming connections policy:	Settings view		Εισερχόμενες συνδέσεις πολιτικής:
-Inquiry	Inquiry panel		Αίτηση
-Laptop	Settings view		Φορητός Υπολογιστής
-Local devices found on system:	Settings view		Τοπικές συσκευές που βρέθηκαν στο σύστημα:
+Default inquiry time:	Settings view		Προκαθορισμένος χρόνος έρευνας:
 Manufacturer: 	Device View		Κατασκευαστής:
-OK	main		Εντάξει
-Only from trusted devices	Settings view		Μόνο από αξιόπιστες συσκευές
-Pair…	Remote devices		Ζευγάρι...
-Pick LocalDevice...	Settings view		Επιλογή τοπικής συσκευής
-Policy...	Settings view		Πολιτική...
-Quit	main		Έξοδος
-Refresh LocalDevices…	Window		Ανανέωση τοπικών συσκευών
+Add device to list	Inquiry panel		Προσθήκη συσκευής στη λίστα
+Starting scan...	Inquiry panel		Έναρξη σάρωσης...
+Show bluetooth console…	Window		Εμφάνιση κονσόλας bluetooth...
+Smart phone	Settings view		Smart phone
+Server	Settings view		Εξυπηρετητής
+Stop bluetooth services…	Window		Διακοπή υπηρεσιών bluetooth...
+Identify host as:	Settings view		Αναγνώριση ξενιστή ως:
+View	Window		Προβολή
 Refresh…	Remote devices		Ανανέωση…
+Pair…	Remote devices		Ζευγάρι...
+Incoming connections policy:	Settings view		Εισερχόμενες συνδέσεις πολιτικής:
+From all devices	Settings view		Από όλες τις συσκευές
+Show name	Extended local device view		Εμφάνιση ονόματος
+Local devices found on system:	Settings view		Τοπικές συσκευές που βρέθηκαν στο σύστημα:
 Remaining %1 seconds	Inquiry panel		Απομένουν %1 δευτερόλεπτα
-Remote devices	Window		Απομακρυσμένες συσκευές
+Server	Window		Εξυπηρετητής
+Scanning completed.	Inquiry panel		Η ανίχνευση ολοκληρώθηκε.
+OK	main		Εντάξει
 Remote devices list…	Window		Κατάλογος απομακρυσμένων συσκευών...
 Remove	Remote devices		Αφαίρεσε
-Retrieving name of %1	Inquiry panel		Ανάκτηση ονόματος του %1
-Retrieving names...	Inquiry panel		Ανάκτηση ονομάτων...
-Revert	Window		Επαναφορά
-Scanning completed.	Inquiry panel		Η ανίχνευση ολοκληρώθηκε.
-Scanning progress	Inquiry panel		Πρόοδος σάρωσης
-Server	Settings view		Εξυπηρετητής
-Server	Window		Εξυπηρετητής
-Service classes: 	Device View		Κατηγορίες υπηρεσιών:
-Settings	Window		Ρυθμίσεις
-Show bluetooth console…	Window		Εμφάνιση κονσόλας bluetooth...
-Show name	Extended local device view		Εμφάνιση ονόματος
-Smart phone	Settings view		Smart phone
-Start bluetooth services…	Window		Έναρξη υπηρεσιών bluetooth...
+Quit	main		Έξοδος
+15 secs	Settings view		15 δευτερόλεπτα
 Start please	main		Ξεκίνα παρακαλώ
-Starting scan...	Inquiry panel		Έναρξη σάρωσης...
-Stop bluetooth services…	Window		Διακοπή υπηρεσιών bluetooth...
+Start bluetooth services…	Window		Έναρξη υπηρεσιών bluetooth...
+Policy...	Settings view		Πολιτική...
+61 secs	Settings view		61 δευτερόλεπτα
+Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetooth system, (ARCE)\n\nΔημιουργημένο από τον Oliver Ruiz Dorantes\n\nΜε την υποστήριξη των:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nΕυχαριστώ όλους τους υπόλοιπους που βοήθησαν...\n\nΥλικό μέρος που απεστάλη/παραχωρήθηκε:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nΜε τις διορθώσεις του κώδικα από τους:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nΑυτοί που μου έδωσαν την τεχνογνωσία:\n\t- Η ομάδα του yellowTAB 
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Δεν υπάρχει καμία τοπική συσκευή Bluetooth που να έχει καταχωρηθεί στο σύστημα.
-View	Window		Προβολή
+Identify us as...	Settings view		Αναγνωρίστε μας ως...
+As blocked	Remote devices		Ως αποκλεισμένο
+Bluetooth	System name		Bluetooth
+Disconnect	Remote devices		Αποσύνδεση
+Pick LocalDevice...	Settings view		Επιλογή τοπικής συσκευής
+Defaults	Window		Προεπιλογές
+Inquiry	Inquiry panel		Αίτηση
+Desktop	Settings view		Επιφάνεια εργασίας
+Revert	Window		Επαναφορά
+Remote devices	Window		Απομακρυσμένες συσκευές
+Laptop	Settings view		Φορητός Υπολογιστής
+Discoverable	Extended local device view		Ορατό
 Work offline	main		Λειτούργησε εκτός σύνδεσης
 bluetooth_server has not been found running on the system. Should be started, or stay offline	main		Ο bluetooth_server δε βρέθηκε να εκτελείται στο σύστημα. Θα έπρεπε να έχει ξεκινήσει, ή να είχε μείνει αποσυνδεδεμένος.
-packets: 	Device View		πακέτα:
+Service classes: 	Device View		Κατηγορίες υπηρεσιών:
+Connections & channels…	Window		Συνδέσεις & κανάλια…
+Refresh LocalDevices…	Window		Ανανέωση τοπικών συσκευών
+Settings	Window		Ρυθμίσεις
+Only from trusted devices	Settings view		Μόνο από αξιόπιστες συσκευές
+Scanning progress	Inquiry panel		Πρόοδος σάρωσης
+Always ask	Settings view		Πάντα ρώτα
+Retrieving name of %1	Inquiry panel		Ανάκτηση ονόματος του %1
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Ελέγξτε αν οι bluetooth δυνατότητες τις απομακρυσμένης συσκευής είναι ενεργές. Πατήστε ''Έρευνα'' για να ξεκινήσει η σάρωση. Ο απαιτούμενος χρόνος για την ανάκτηση των ονομάτων είναι άγνωστος, ωστόσο δεν πρέπει να πάρει πάνω από 3 δευτερόπλεπτα σε κάθε συσκευή. Ύστερα θα είστε σε θέση να τα προσθέσετε στην κύρια λίστα, οπού θα μπορείτε να τα ομαδοποιήσετε.
+Authenticate	Extended local device view		Αναγνώριση
+Retrieving names...	Inquiry panel		Ανάκτηση ονομάτων...
+Help	Window		Βοήθεια
+Add…	Remote devices		Προσθήκη…

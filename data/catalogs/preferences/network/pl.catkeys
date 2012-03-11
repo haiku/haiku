@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Network	3810742593
+1	polish	x-vnd.Haiku-Network	2324385456
 Choose automatically	EthernetSettingsView		Wybierz automatycznie
 Gateway:	EthernetSettingsView		Brama domyślna:
 Netmask:	EthernetSettingsView		Maska sieci:
@@ -12,6 +12,7 @@ Adapter:	EthernetSettingsView		Karta sieciowa:
 Domain:	EthernetSettingsView		Domena:
 Revert	EthernetSettingsView		Przywróć
 <no wireless networks found>	EthernetSettingsView		<nie znaleziono żadnych sieci bezprzewodowych>
+Network	System name		Sieć
 Mode:	EthernetSettingsView		Typ adresu:
 Network:	EthernetSettingsView		Sieć:
 The net_server needs to run for the auto configuration!	EthernetSettingsView		Serwer sieci (net_server) musi być uruchomiony dla automatycznej konfiguracji!

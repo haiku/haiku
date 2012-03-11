@@ -4,38 +4,48 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders media shared ;
 
-SubDirHdrs [ FDirName $(SUBDIR) libavcodec ] ;
-SubDirHdrs [ FDirName $(SUBDIR) libavformat ] ;
-SubDirHdrs [ FDirName $(SUBDIR) libavutil ] ;
-SubDirHdrs [ FDirName $(SUBDIR) libswscale ] ;
+SubDirC++Flags -D__STDC_CONSTANT_MACROS -Wno-deprecated-declarations ;
 
-SubDirC++Flags -D__STDC_CONSTANT_MACROS ;
-
-Addon ffmpeg :
- 	AVCodecDecoder.cpp
- 	AVCodecEncoder.cpp
- 	AVFormatReader.cpp
- 	AVFormatWriter.cpp
- 	CodecTable.cpp
+local sources =
+	AVCodecDecoder.cpp
+	AVCodecEncoder.cpp
+	AVFormatReader.cpp
+	AVFormatWriter.cpp
+	CodecTable.cpp
 	DemuxerTable.cpp
 	EncoderTable.cpp
 	FFmpegPlugin.cpp
 	MuxerTable.cpp
 	CpuCapabilities.cpp
-
+	
 	gfx_conv_c.cpp
 	gfx_conv_c_lookup.cpp
 	gfx_conv_mmx.cpp
- 	gfx_util.cpp
- 	yuvrgb_sse.nasm
- 	yuvrgb_sse2.nasm
- 	yuvrgb_ssse3.nasm
+	gfx_util.cpp
+	;
+
+
+SubDirSysHdrs $(HAIKU_FFMPEG_HEADERS) ;
+Includes [ FGristFiles $(sources) ] : $(HAIKU_FFMPEG_HEADERS_DEPENDENCY) ;
+
+UseHeaders [ FDirName $(HAIKU_FFMPEG_HEADERS) ] ;
+UseHeaders [ FDirName $(HAIKU_FFMPEG_HEADERS) libavcodec ] ;
+UseHeaders [ FDirName $(HAIKU_FFMPEG_HEADERS) libavdevice ] ;
+UseHeaders [ FDirName $(HAIKU_FFMPEG_HEADERS) libavfilter ] ;
+UseHeaders [ FDirName $(HAIKU_FFMPEG_HEADERS) libavformat ] ;
+UseHeaders [ FDirName $(HAIKU_FFMPEG_HEADERS) libavutil ] ;
+UseHeaders [ FDirName $(HAIKU_FFMPEG_HEADERS) libswscale ] ;
+
+Addon ffmpeg :
+	$(sources)
+
+	yuvrgb_sse.nasm
+	yuvrgb_sse2.nasm
+	yuvrgb_ssse3.nasm
 	:
-	libavformat.a
-	libavcodec.a
-	libavcodec_$(TARGET_ARCH).a
-	libavutil.a
-	libswscale.a
+
+	# FFmpeg libraries (from FFmpeg optional package):
+	$(HAIKU_FFMPEG_LIBS)
 
 	libvorbis_ffmpeg.a
 	libspeex_ffmpeg.a
@@ -44,9 +54,10 @@ Addon ffmpeg :
 	libbz2_ffmpeg.a
 
 	be
-	libmedia.so
+	media
 	libz.a
 	$(TARGET_LIBSUPC++)
+	$(TARGET_NETWORK_LIBS)
 ;
 
 # FFmpeg libs configuration is in the config.h header. Architecture specific
@@ -112,12 +123,8 @@ if $(HAIKU_INCLUDE_GPL_ADDONS) = 1 {
 
 HAIKU_FFMPEG_DEFINES = [ FDefines $(HAIKU_FFMPEG_DEFINES) ] ;
 
-SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libavcodec ;
-SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libavformat ;
-SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libavutil ;
 SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libbz2 ;
 SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libogg ;
-SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libswscale ;
 SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libspeex ;
 SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libtheora ;
 SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libvorbis ;

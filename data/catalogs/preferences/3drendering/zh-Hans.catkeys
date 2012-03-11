@@ -1,7 +1,8 @@
-1	english	x-vnd.Haiku-3DRendering	1539891217
+1	english	x-vnd.Haiku-3DRendering	1725618140
 List stack size:	Capabilities		列出堆栈大小：
 Information	InfoView		信息
 Max. clipping planes:	Capabilities		最大片段片面
+GL version:	InfoView		GL 版本：
 Max. texture units:	Capabilities		最大文字单位
 Renderer name:	InfoView		渲染器名称：
 Vendor name:	InfoView		设备供应商：
@@ -19,6 +20,7 @@ GLUT API version:	InfoView		GLUT API 版本：
 Texture stack size:	Capabilities		纹理堆栈大小
 Max. evaluators equation order:	Capabilities		最大评估方程次数
 Max. 3D texture size:	Capabilities		最大3维文本面积
+3D Rendering	System name		三维绘制
 Capabilities	Capabilities		兼容性
 Max. recommended index elements:	Capabilities		最大推荐索引单元
 Available	Extensions		可用

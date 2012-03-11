@@ -1,16 +1,16 @@
-1	modern_greek	x-vnd.Haiku-TGATranslator	4159874267
-Ignore TGA alpha channel	TGAView		Αγνοήση καναλιού TGA άλφα 
-Save with RLE Compression	TGAView		Αποθήκευση με RLE συμπίεση
-TGA Image Translator	TGAView		Μεταφραστής εικόνων TGA
-TGA Settings	TGAMain		TGA Ρυθμίσεις
-TGA image translator	TGATranslator		Μεταφραστής εικόνας TGA
-TGA images	TGATranslator		TGA εικόνες
-TGATranslator Settings	TGATranslator		Ρυθμίσεις μεταφραστή TGA 
-Targa image (%d bits RLE colormap)	TGATranslator		Εικόνα Targa (%d bits RLE colormap)
-Targa image (%d bits RLE gray)	TGATranslator		Εικόνα Targa (%d bits RLE gray)
-Targa image (%d bits RLE truecolor)	TGATranslator		Εικόνα Targa (%d bits RLE truecolor)
-Targa image (%d bits colormap)	TGATranslator		Εικόνα Targa (%d bits colormap)
-Targa image (%d bits gray)	TGATranslator		Εικόνα Targa (%d bits gray)
+1	greek, modern (1453-)	x-vnd.Haiku-TGATranslator	4159874267
 Targa image (%d bits truecolor)	TGATranslator		Εικόνα Targa (%d bits truecolor)
 Version %d.%d.%d %s	TGAView		Έκδοση %d.%d.%d %s
+Ignore TGA alpha channel	TGAView		Αγνοήση καναλιού TGA άλφα 
+Targa image (%d bits colormap)	TGATranslator		Εικόνα Targa (%d bits colormap)
+TGA Image Translator	TGAView		Μεταφραστής εικόνων TGA
+Targa image (%d bits RLE colormap)	TGATranslator		Εικόνα Targa (%d bits RLE colormap)
+Targa image (%d bits gray)	TGATranslator		Εικόνα Targa (%d bits gray)
 Written by the Haiku Translation Kit Team	TGAView		Γράφτηκε από την ομάδα του Haiku Translation Kit 
+Targa image (%d bits RLE truecolor)	TGATranslator		Εικόνα Targa (%d bits RLE truecolor)
+TGA images	TGATranslator		TGA εικόνες
+TGATranslator Settings	TGATranslator		Ρυθμίσεις μεταφραστή TGA 
+Save with RLE Compression	TGAView		Αποθήκευση με RLE συμπίεση
+TGA image translator	TGATranslator		Μεταφραστής εικόνας TGA
+Targa image (%d bits RLE gray)	TGATranslator		Εικόνα Targa (%d bits RLE gray)
+TGA Settings	TGAMain		TGA Ρυθμίσεις

@@ -1,15 +1,14 @@
-1	modern_greek	x-vnd.Haiku-Pairs	1981673050
-%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\tδημιουργημένο από τον Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYΈχετε ολοκληρώσει το παιχνίδι σε %num% κλικ.\n 	
-
-Beginner (4x4)	PairsWindow		Αρχάριος (4x4)
+1	greek, modern (1453-)	x-vnd.Haiku-Pairs	1981673050
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\tδημιουργημένο από τον Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYΈχετε ολοκληρώσει το παιχνίδι σε %num% κλικ.\n 
 Expert (8x8)	PairsWindow		Προχωρημένος (8x8)
-Game	PairsWindow		Παιχνίδι
-Intermediate (6x6)	PairsWindow		Ενδιάμεσος (6x6)
-New	PairsWindow		Νέο
-New game	PairsWindow		Νέο παιχνίδι
-OK	PairsView		Εντάξει
-Pairs	System name		Pairs
-Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Τα Ζεύγη δεν βρίσκουν αρκετά διανυσματικά εικονίδια στο σύστημα, χρειάζονται τουλάχιστον %d.
-Quit	PairsWindow		Έξοδος
+Beginner (4x4)	PairsWindow		Αρχάριος (4x4)
 Quit game	PairsWindow		Έξοδος παιχνιδιού
+Game	PairsWindow		Παιχνίδι
 Size	PairsWindow		Μέγεθος
+New	PairsWindow		Νέο
+OK	PairsView		Εντάξει
+Intermediate (6x6)	PairsWindow		Ενδιάμεσος (6x6)
+Quit	PairsWindow		Έξοδος
+Pairs	System name		Pairs
+New game	PairsWindow		Νέο παιχνίδι
+Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Τα Ζεύγη δεν βρίσκουν αρκετά διανυσματικά εικονίδια στο σύστημα, χρειάζονται τουλάχιστον %d.

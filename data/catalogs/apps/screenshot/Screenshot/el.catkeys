@@ -1,26 +1,26 @@
-1	modern_greek	x-vnd.haiku-screenshot	1697748405
-Artwork folder	ScreenshotWindow		Φάκελος γραφικών
-Cancel	ScreenshotWindow		Άκυρο
-Capture active window	ScreenshotWindow		Σύλληψη ενεργού παραθύρου
-Choose folder	ScreenshotWindow		Επιλογή καταλόγου
-Choose folder...	ScreenshotWindow		Επιλογή καταλόγου...
-Copy to clipboard	ScreenshotWindow		Αντιγραφή στο πρόχειρο
-Delay:	ScreenshotWindow		Καθυστέρηση:
+1	greek, modern (1453-)	x-vnd.haiku-screenshot	1697748405
+seconds	ScreenshotWindow		δευτερόλεπτα
 Desktop	ScreenshotWindow		Επιφάνεια εργασίας
-Home folder	ScreenshotWindow		Αρχικός φάκελος
-Include mouse pointer	ScreenshotWindow		Συμπεριλάβετε το δείκτη του ποντικιού
 Include window border	ScreenshotWindow		Περίληψη συνόρων παραθύρου
-Name:	ScreenshotWindow		Όνομα:
-New screenshot	ScreenshotWindow		Νέο στιγμιότυπο οθόνης
-Please select	ScreenshotWindow		Παρακαλώ επιλέξτε
-Save	ScreenshotWindow		Αποθήκευση
-Save as:	ScreenshotWindow		Αποθήκευση ως:
-Save in:	ScreenshotWindow		Αποθήκευση στο:
 Screenshot	System name		Screenshot
 Select	ScreenshotWindow		Επιλογή
-Settings…	ScreenshotWindow		Ρυθμίσεις...
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Αυτό το αρχείο υπάρχει ήδη.\nΕίστε βέβαιοι ότι θα θέλατε να το αντικαταστήσετε;
-Translator Settings	ScreenshotWindow		Ρυθμίσεις μεταφραστή
-overwrite	ScreenshotWindow		αντικατάσταση
+Capture active window	ScreenshotWindow		Σύλληψη ενεργού παραθύρου
+Cancel	ScreenshotWindow		Άκυρο
+Name:	ScreenshotWindow		Όνομα:
+Choose folder	ScreenshotWindow		Επιλογή καταλόγου
+Save	ScreenshotWindow		Αποθήκευση
+Choose folder...	ScreenshotWindow		Επιλογή καταλόγου...
+Please select	ScreenshotWindow		Παρακαλώ επιλέξτε
+Save as:	ScreenshotWindow		Αποθήκευση ως:
+Copy to clipboard	ScreenshotWindow		Αντιγραφή στο πρόχειρο
+Save in:	ScreenshotWindow		Αποθήκευση στο:
 screenshot	Screenshot	Base filename of screenshot files	στιγμιότυπο οθόνης
-seconds	ScreenshotWindow		δευτερόλεπτα
+New screenshot	ScreenshotWindow		Νέο στιγμιότυπο οθόνης
+Artwork folder	ScreenshotWindow		Φάκελος γραφικών
+Home folder	ScreenshotWindow		Αρχικός φάκελος
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Αυτό το αρχείο υπάρχει ήδη.\nΕίστε βέβαιοι ότι θα θέλατε να το αντικαταστήσετε;
+Settings…	ScreenshotWindow		Ρυθμίσεις...
+overwrite	ScreenshotWindow		αντικατάσταση
+Delay:	ScreenshotWindow		Καθυστέρηση:
+Include mouse pointer	ScreenshotWindow		Συμπεριλάβετε το δείκτη του ποντικιού
+Translator Settings	ScreenshotWindow		Ρυθμίσεις μεταφραστή

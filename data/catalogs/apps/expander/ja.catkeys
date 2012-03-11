@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Expander	3384644886
+1	japanese	x-vnd.Haiku-Expander	2398100010
 Expand	ExpanderMenu		解凍
 Close window when done expanding	ExpanderPreferences		解凍終了後ウィンドウを閉じる
 Set destination…	ExpanderMenu		解凍先を指定…
@@ -6,6 +6,7 @@ Use:	ExpanderPreferences		パスを指定：
 File expanded	ExpanderWindow		ファイル解凍が完了しました
 The destination is read only.	ExpanderWindow		解凍先は読み取り専用です
 Expander: Open	ExpanderWindow		ファイル解凍: 開く
+ is not supported	ExpanderWindow		はサポートされてません
 Expander settings	ExpanderPreferences		ファイル解凍設定
 Select current	DirectoryFilePanel		このフォルダーを選択
 Source	ExpanderWindow		書庫ファイル
@@ -15,15 +16,34 @@ Cancel	ExpanderWindow		中止
 Automatically expand files	ExpanderPreferences		自動的にファイルを解凍する
 Creating listing for '%s'	ExpanderWindow		'%s' のリストを作成中
 Continue	ExpanderWindow		続ける
+Destination folder	ExpanderPreferences		解凍先フォルダー
 The destination folder does not exist.	ExpanderWindow		解凍先フォルダーは存在しません。
+Other	ExpanderPreferences		その他
 Cancel	ExpanderPreferences		キャンセル
+Expansion	ExpanderPreferences		解凍
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		倉庫ファイルの解凍はまだ完了していません。それでも中止しますか？
 Select	DirectoryFilePanel		選択
-Destination folder:	ExpanderPreferences		解凍先フォルダー：
 Same directory as source (archive) file	ExpanderPreferences		元ファイル (アーカイブ) と同じ
 Expanding '%s'	ExpanderWindow		'%s' を解凍中
-Expansion:	ExpanderPreferences		解凍：
 Settings	ExpanderMenu		設定
 Settings…	ExpanderMenu		設定…
 Expander: Choose destination	DirectoryFilePanel		ファイル解凍: 解凍先の選択
 Select	ExpanderPreferences		選択
+Show contents	ExpanderWindow		内容を表示
+Automatically show contents listing	ExpanderPreferences		内容リストを自動的に表示
+OK	ExpanderPreferences		OK
+Leave destination folder path empty	ExpanderPreferences		パスを空にしておく
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		指定されたフォルダーが移動されたか、名前が変更されたか、\nサポートされていません。
+The file doesn't exist	ExpanderWindow		ファイルは存在しません
+Stop	ExpanderMenu		中止
+File	ExpanderMenu		ファイル
+Expander	System name		ファイル解凍
+Expand	ExpanderWindow		解凍
+Close	ExpanderMenu		閉じる
+The destination is not a folder.	ExpanderWindow		解凍先はフォルダーではありません。
+Open destination folder after extraction	ExpanderPreferences		解凍後に解凍先フォルダーを開く
+Set source…	ExpanderMenu		書庫ファイルを指定…
+Select '%s'	DirectoryFilePanel		'%s' を選択
+Show contents	ExpanderMenu		内容を表示
+Stop	ExpanderWindow		中止
+Destination	ExpanderWindow		解凍先

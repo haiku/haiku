@@ -1,45 +1,45 @@
-1	norwegian_bokmål	x-vnd.Haiku-ProcessController	3558892819
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
-About ProcessController…	ProcessController		Om Prosessbehandler...
-Cancel	ProcessController		Avbryt
-Custom priority	ProcessController		Egendefinert prioritet
-Damned!	ProcessController		Farsken!
-Debug this thread!	ProcessController		Feilsøk denne tråden!
-Debug thread	ProcessController		Feilsøkingstråd
-Do you really want to kill the team \"%s\"?	ProcessController		Vil du virkelige ta drepe lag \"%s\"?
-Error saving file	ProcessController		Feil ved lagring av fil
-Gone teams…	ProcessController		Forsvunnet lag
-Info	ProcessController		Info
-Install in Deskbar	ProcessController		Installer i Deskbar
-Kill this thread!	ProcessController		Drep denne tråden!
-Live in the Deskbar	ProcessController		Lev i Deskbar
-Low priority	ProcessController		Lav prioritet
-Lowest active priority	ProcessController		Laveste aktive prioritet
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-ProcessController	3558892819
 Memory usage	ProcessController		Minnebruk
-New Terminal	ProcessController		Ny Terminal
-Normal priority	ProcessController		Normal prioritet
-OK	ProcessController		OK
-Ok!	ProcessController		Ok!
-Please confirm	ProcessController		Vennligst bekreft
-ProcessController	System name		Prosessbehandler
-ProcessController is already installed in Deskbar.	ProcessController		Prosessbehandler er allerede installert i Deskbar
-Processor %d	ProcessController		Prosessor %d
-Quit an application	ProcessController		Avslutt en applikasjon
-Quit application	ProcessController		Avslutt program
-Real-time display priority	ProcessController		Sanntids visningsprioritet
+Do you really want to kill the team \"%s\"?	ProcessController		Vil du virkelige ta drepe lag \"%s\"?
 Restart Deskbar	ProcessController		Start Deskbar på nytt
-Restart Tracker	ProcessController		Start Tracker på nytt
-Run in window	ProcessController		Kjør i vindu
-System resources & caches…	ProcessController		Systemressurser & buffere
-That's no Fun!	ProcessController		Ikke morsomt!
-This is the last active processor...\nYou can't turn it off!	ProcessController		Dette er den siste aktive prosessen...\nDu kan ikke skru den av!
+Custom priority	ProcessController		Egendefinert prioritet
+Debug thread	ProcessController		Feilsøkingstråd
 This team is already gone…	ProcessController		Laget er allerede borte...
+Error saving file	ProcessController		Feil ved lagring av fil
+Your setting file could not be saved!\n(%s)	ProcessController		Innstillingsfilen kunne ikke lagres!\n(%s)
 This thread is already gone…	ProcessController		Tråden er allerede borte...
+Cancel	ProcessController		Avbryt
+Run in window	ProcessController		Kjør i vindu
+Processor %d	ProcessController		Prosessor %d
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+ProcessController is already installed in Deskbar.	ProcessController		Prosessbehandler er allerede installert i Deskbar
+This is the last active processor...\nYou can't turn it off!	ProcessController		Dette er den siste aktive prosessen...\nDu kan ikke skru den av!
+Info	ProcessController		Info
+Quit application	ProcessController		Avslutt program
+Low priority	ProcessController		Lav prioritet
+What do you want to do with the thread \"%s\"?	ProcessController		Hva vil du gjøre med tråden \"%s\"?
+Gone teams…	ProcessController		Forsvunnet lag
+Lowest active priority	ProcessController		Laveste aktive prioritet
+Restart Tracker	ProcessController		Start Tracker på nytt
+Live in the Deskbar	ProcessController		Lev i Deskbar
+Kill this thread!	ProcessController		Drep denne tråden!
+Debug this thread!	ProcessController		Feilsøk denne tråden!
+Normal priority	ProcessController		Normal prioritet
+New Terminal	ProcessController		Ny Terminal
+Urgent priority	ProcessController		Høy prioritet
+About ProcessController…	ProcessController		Om Prosessbehandler...
+Ok!	ProcessController		Ok!
+Quit an application	ProcessController		Avslutt en applikasjon
+Install in Deskbar	ProcessController		Installer i Deskbar
 Threads and CPU usage	ProcessController		Tråder og CPU-bruk
 Urgent display priority	ProcessController		Høy visningsprioritet
-Urgent priority	ProcessController		Høy prioritet
+OK	ProcessController		OK
+Damned!	ProcessController		Farsken!
 Usage: %s [-deskbar]\n	ProcessController		Bruksmåte: %s [-deskbar]\n
-What do you want to do with the thread \"%s\"?	ProcessController		Hva vil du gjøre med tråden \"%s\"?
+ProcessController	System name		Prosessbehandler
+Real-time display priority	ProcessController		Sanntids visningsprioritet
+Please confirm	ProcessController		Vennligst bekreft
 Yes, kill this team!	ProcessController		Ja, drep dette laget!
+System resources & caches…	ProcessController		Systemressurser & buffere
+That's no Fun!	ProcessController		Ikke morsomt!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Du kan kjøre Prosessbehandler i et vindu eller installere det på Deskbar.
-Your setting file could not be saved!\n(%s)	ProcessController		Innstillingsfilen kunne ikke lagres!\n(%s)

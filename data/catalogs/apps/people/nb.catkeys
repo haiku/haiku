@@ -1,48 +1,48 @@
-1	norwegian_bokmål	x-vnd.Be-PEPL	382829331
-%name% picture	People		%name% bilde
-Address	People		Adresse
-Cancel	People		Avbryt
-City	People		By
-Close	People		Lukk
-Company	People		Firma
-Configure attributes	People		Konfigurer attributter
-Contact information for a person.	Long mimetype description		Kontaktinformasjon for en person
-Contact name	People		Kontaktnavn
-Copy	People		Kopier
-Could not create %s.	People		Kunne ikke opprette %s.
-Country	People		Land
-Cut	People		Klipp ut
-Drop an image here,\nor use the contextual menu.	People		Slipp et bilde her,\neller bruk kontekstmenyen.
-E-mail	People		E-post
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-PEPL	382829331
 Edit	People		Rediger
 Error	People		Feil
-Fax	People		Faks
-File	People		Fil
-Group	People		Gruppe
-Home phone	People		Hjemmetelefon
-Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Kunne ikke starte Filtyper for å konfigurere personattributter.\n\nFeil:
-Load image…	People		Last bilde...
-Name	People		Navn
-New person	People		Ny person
-New person…	People		Ny person...
-Nickname	People		Kallenavn
-OK	People		OK
-Paste	People		Lim inn
-Person	Short mimetype description		Person
-Quit	People		Avslutt
-Redo	People		Tilbakestill
-Remove image	People		Fjern bilde
-Revert	People		Tilbakestill
-Save	People		Lagre
-Save as…	People		Lagre som...
-Save changes before quitting?	People		Lagre endringer før avslutning?
-Select all	People		Velg alt
-Sorry	People		Beklager
-State	People		Fylke
+City	People		By
 The file '%name%' could not be written.	People		Filen '%name%' kunne ikke skrives.
-URL	People		URL
-Undo	People		Angre
-Unnamed person	People		Ikke navngitt person
-Work phone	People		Arbeidstelefon
-Zip	People		Postnummer
 none	Groups list		ingen
+Configure attributes	People		Konfigurer attributter
+Company	People		Firma
+%name% picture	People		%name% bilde
+Work phone	People		Arbeidstelefon
+New person	People		Ny person
+Select all	People		Velg alt
+File	People		Fil
+Unnamed person	People		Ikke navngitt person
+Could not create %s.	People		Kunne ikke opprette %s.
+Country	People		Land
+Close	People		Lukk
+Group	People		Gruppe
+Nickname	People		Kallenavn
+Quit	People		Avslutt
+Name	People		Navn
+Revert	People		Tilbakestill
+Undo	People		Angre
+E-mail	People		E-post
+Save changes before quitting?	People		Lagre endringer før avslutning?
+Load image…	People		Last bilde...
+OK	People		OK
+Remove image	People		Fjern bilde
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Kunne ikke starte Filtyper for å konfigurere personattributter.\n\nFeil:
+Home phone	People		Hjemmetelefon
+Save as…	People		Lagre som...
+Redo	People		Tilbakestill
+Paste	People		Lim inn
+Drop an image here,\nor use the contextual menu.	People		Slipp et bilde her,\neller bruk kontekstmenyen.
+Save	People		Lagre
+Person	Short mimetype description		Person
+New person…	People		Ny person...
+Address	People		Adresse
+URL	People		URL
+Sorry	People		Beklager
+Zip	People		Postnummer
+Contact information for a person.	Long mimetype description		Kontaktinformasjon for en person
+Fax	People		Faks
+Contact name	People		Kontaktnavn
+Cut	People		Klipp ut
+Cancel	People		Avbryt
+State	People		Fylke
+Copy	People		Kopier

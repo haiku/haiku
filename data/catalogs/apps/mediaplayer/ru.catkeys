@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MediaPlayer	138551800
+1	russian	x-vnd.Haiku-MediaPlayer	986711925
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Американский)
 Stream settings	MediaPlayer-Main		Настройки потока
 <unknown>	PlaylistItem-album		<неизвестно>
@@ -134,4 +134,3 @@ Rating	MediaPlayer-Main		Рейтинг
 Playlist	MediaPlayer-PlaylistWindow		Плейлист
 Lock Peaks	MediaPlayer-PeakView		Зафиксировать пики
 Low volume	MediaPlayer-SettingsWindow		На низкой громкости
-File Info	MediaPlayer-InfoWin		Информация о файле

@@ -34,7 +34,7 @@ You need to select a partition entry from the list.	MainWindow		Sélectionnez d'
 Format (not implemented)	MainWindow		Format (non implémenté)
 The currently selected partition does not have a parent partition.	MainWindow		La partition sélectionnée n'a pas de partition parente.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Êtes-vous sur de vouloir enregistrer les changements sur le disque ?\n\nToutes les données du disque seront définitivement perdues si vous le faites !
-Offset: %ld MB	Support		Décalage : %ld Mo
+Offset: %ld MB	Support		Déplacement : %ld Mo
 Write changes	MainWindow		Enregistrer les modifications
 There was an error preparing the disk for modifications.	MainWindow		Une erreur est survenue pendant la préparation des modifications du disque.
 The partition %s is already mounted.	MainWindow		La partition %s est déjà montée.

@@ -1,48 +1,52 @@
-1	norwegian_bokmål	x-vnd.Haiku-Screen	2172975069
-%.1f Hz	Screen		%.1f Hz
-%sSerial no.: %s	Screen		%sSerienummer: %s
-/other…	Screen		/andre...
-15 bits/pixel, 32768 colors	Screen		15-bits/piksel, 32768 farger
-16 bits/pixel, 65536 colors	Screen		16-bits/piksel, 65536 farger
-24 bits/pixel, 16 Million colors	Screen		24-bits/piksel, 16 Millioner farger
-32 bits/pixel, 16 Million colors	Screen		32-bits/piksel, 16 Millioner farger
-8 bits/pixel, 256 colors	Screen		8-bits/piksel, 256 farger
-About	Screen		Om
-All workspaces	Screen		Alle arbeidsområder
-Apply	Screen		Bruk
-Cancel	Screen		Avbryt
-Colors:	Screen		Farger:
-Columns:	Screen		Kolonner:
-Could not write VESA mode settings file:\n\t	Screen		Kunne ikke skrive innstillingsfil for VESA-modus:\n\t
-Current workspace	Screen		Nåværende arbeidsområde
-Do you wish to keep these settings?	Screen		Ønsker du å beholde disse innstillingene?
-Done	Screen		Ferdig
-Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Horisontal frekvens:\t%lu - %lu kHz\nVertikal frekvens:\t%lu - %lu Hz\n\nMaksimum pikselklokke:\t%g MHz
-Hz	Screen		Hz
-Keep	Screen		Behold
-OK	Screen		OK
-Other…	Screen		Andre...
-Resolution:	Screen		Oppløsning:
-Revert	Screen		Tilbakestill
-Rows:	Screen		Rader:
-Screen	Screen		Skjerm
-Screen	System name		Skjerm
-Screen preferences by the Haiku team	Screen		Skjerminnstillinger av Haiku-teamet
-Set background…	Screen		Sett bakgrunn...
-Settings will revert in %seconds seconds.	Screen		Innstillingene vil bli tilbakestilt om %seconds sekunder.
-The screen mode could not be set:\n\t%s\n	Screen		Skjermmoduset kunne ikke bli satt:\n\t%s\n
-Type or use the left and right arrow keys.	Screen		Skriv eller bruk høyre og venstre piltaster
-Undo	Screen		Angre
-Unknown mode	Screen		Ukjent modus
-Use laptop panel:	Screen		Bruk panel på bærbar
-Video format:	Screen		Videoformat:
-Warning	Screen		Advarsel
-Workspaces	Screen		Arbeidsområder
-always	Screen		alltid
-bits/pixel	Screen		bits/piksel
-disable	Screen		deaktiver
-horizontally	Screen		horisontalt
-if needed	Screen		hvis nødvendig
-no	Screen		nei
-vertically	Screen		vertikalt
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Screen	2033930135
 yes	Screen		ja
+Use laptop panel:	Screen		Bruk panel på bærbar
+15 bits/pixel, 32768 colors	Screen		15-bits/piksel, 32768 farger
+/other…	Screen		/andre...
+16 bits/pixel, 65536 colors	Screen		16-bits/piksel, 65536 farger
+Revert	Screen		Tilbakestill
+Swap displays:	Screen		Bytt skjerm:
+Combine displays:	Screen		Kombiner skjerm:
+Done	Screen		Ferdig
+Set background…	Screen		Sett bakgrunn...
+Undo	Screen		Angre
+if needed	Screen		hvis nødvendig
+Screen preferences by the Haiku team	Screen		Skjerminnstillinger av Haiku-teamet
+Screen	System name		Skjerm
+OK	Screen		OK
+Workspaces	Screen		Arbeidsområder
+The screen mode could not be set:\n\t%s\n	Screen		Skjermmoduset kunne ikke bli satt:\n\t%s\n
+no	Screen		nei
+Could not write VESA mode settings file:\n\t	Screen		Kunne ikke skrive innstillingsfil for VESA-modus:\n\t
+Type or use the left and right arrow keys.	Screen		Skriv eller bruk høyre og venstre piltaster
+Warning	Screen		Advarsel
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Horisontal frekvens:\t%lu - %lu kHz\nVertikal frekvens:\t%lu - %lu Hz\n\nMaksimum pikselklokke:\t%g MHz
+Keep	Screen		Behold
+Unknown mode	Screen		Ukjent modus
+disable	Screen		deaktiver
+Columns:	Screen		Kolonner:
+All workspaces	Screen		Alle arbeidsområder
+always	Screen		alltid
+32 bits/pixel, 16 Million colors	Screen		32-bits/piksel, 16 Millioner farger
+Current workspace	Screen		Nåværende arbeidsområde
+About	Screen		Om
+24 bits/pixel, 16 Million colors	Screen		24-bits/piksel, 16 Millioner farger
+horizontally	Screen		horisontalt
+Other…	Screen		Andre...
+Cancel	Screen		Avbryt
+bits/pixel	Screen		bits/piksel
+Settings will revert in %seconds seconds.	Screen		Innstillingene vil bli tilbakestilt om %seconds sekunder.
+Refresh rate:	Screen		Oppfriskningsratie:
+Hz	Screen		Hz
+Do you wish to keep these settings?	Screen		Ønsker du å beholde disse innstillingene?
+Rows:	Screen		Rader:
+vertically	Screen		vertikalt
+Resolution:	Screen		Oppløsning:
+Screen	Screen		Skjerm
+%.1f Hz	Screen		%.1f Hz
+8 bits/pixel, 256 colors	Screen		8-bits/piksel, 256 farger
+Apply	Screen		Bruk
+Refresh rate	Screen		oppfriskningsrate
+%sSerial no.: %s	Screen		%sSerienummer: %s
+Colors:	Screen		Farger:
+Video format:	Screen		Videoformat:

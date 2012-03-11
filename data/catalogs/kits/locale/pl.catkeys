@@ -1,13 +1,34 @@
-1	polish	x-vnd.Haiku-libbe	1624661606
+1	polish	x-vnd.Haiku-libbe	180647795
 Close	AboutWindow		Zamknij
 %3.2f GiB	StringForSize		%3.2f GiB
-Written by:	AboutWindow		Napisany przez: 
+Written by:	AboutWindow		Napisany przez:
+About %app%	AboutMenuItem		O %app%
+Cut	TextView		Wytnij
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nie można stworzyć replikanta dla \"%description\".\n%error
+Copy	TextView		Skopiuj
 %3.2f KiB	StringForSize		%3.2f KiB
 %d bytes	StringForSize		%d bajtów
-About…	AboutWindow		O...
+About…	AboutWindow		O…
+Error	PrintJob		Błąd
+No Pages to print!	PrintJob		Brak Stron do wydrukowania!
+OK	Dragger		OK
+OK	PrintJob		OK
 Green:	ColorControl		Zielony:
+Remove replicant	Dragger		Usuń replikant
+OK	ZombieReplicantView		OK
+Print Server is not responding.	PrintJob		Serwer Wydruku nie odpowiada.
+Paste	TextView		Wklej
 Copyright © %years% Haiku, Inc.	AboutWindow		Chroniony prawem autorskim © %years% Haiku, Inc.
 %.2f TiB	StringForSize		%.2f TiB
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nie można zlokalizować aplikacji dla replikanta. Nie dostarczono podpisu aplikacji.\n%error
+Redo	TextView		Ponów
+<empty>	Menu		<puste>
+Select All	TextView		Zaznacz wszystko
+Warning	Dragger		Ostrzeżenie
+Undo	TextView		Cofnij
 Red:	ColorControl		Czerwony:
 %3.2f MiB	StringForSize		%3.2f MiB
+About %app…	Dragger		O %app…
+Error	ZombieReplicantView		Błąd
 Blue:	ColorControl		Niebieski:
+Can't delete this replicant from its original application. Life goes on.	Dragger		Nie można usunąć tego replikanta z jego oryginalnej aplikacji. Życie toczy się dalej.

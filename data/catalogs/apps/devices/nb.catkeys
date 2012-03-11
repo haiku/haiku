@@ -1,73 +1,56 @@
-1	norwegian_bokmål	x-vnd.Haiku-Devices	1943893993
-ACPI Information	DeviceACPI		ACPI-informasjon
-ACPI Processor Namespace '%2'	DeviceACPI		ACPI-prosessor-navnerom '%2'
-ACPI System Bus	DeviceACPI		ACPI-systembuss
-ACPI System Indicator	DeviceACPI		ACPI-systemindikator
-ACPI Thermal Zone	DeviceACPI		ACPI-temperaturområde
-ACPI bus	Device		ACPI-buss
-ACPI bus	DevicesView		ACPI-buss
-ACPI controller	Device		ACPI-kontroller
-ACPI node '%1'	DeviceACPI		ACPI-node '%1'
-Basic information	DevicesView		Basisinformasjon
-Bridge	Device		Bro
-Bus	DevicesView		Buss
-Bus Information	Device		Bussinformasjon
-Category	DevicesView		Kategori
-Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Klasseinformasjon:\t\t\t\t: %classInfo%
-Class info	DevicePCI		Klasseinformasjon
-Communication controller	Device		Kommunikasjonskontroller
-Computer	Device		Datamaskin
-Computer	DevicesView		Datamaskin
-Connection	DevicesView		Tilkobling
-Detailed	DevicesView		Detaljert
-Device	Device		Enhet
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Enhetsnavn\t\t\t\t: %Name%\nProdusent\t\t\t: %Manufacturer%\nDriver brukt\t\t\t\t: %DriverUsed%\nEnhetssti\t: %DevicePaths%
-Device name	Device		Enhetsnavn
-Device name	DeviceACPI		Enhetsnavn
-Device name	DevicePCI		Enhetsnavn
-Device name:	Device		Enhetsnavn:
-Device paths	Device		Enhetsti
-Device paths	DevicePCI		Enhetsstier
-Devices	DevicesView		Enheter
-Devices	System name		Maskinvare
-Display controller	Device		Skjermkontroller
-Docking station	Device		Dokkingstasjon
-Driver used	Device		Driver brukt
-Driver used	DevicePCI		Driver brukt
-Encryption controller	Device		Krypteringskontroller
-Generate system information	DevicesView		Generer systeminformasjon
-Generic system peripheral	Device		Generisk ekstern enhet
-ISA bus	Device		ISA-buss
-ISA bus	DevicesView		ISA-buss
-Input device controller	Device		Inndata enhetskontroller
-Intelligent controller	Device		Intelligent kontroller
-Manufacturer	Device		Produsent
-Manufacturer	DeviceACPI		Produsent
-Manufacturer	DevicePCI		Produsent
-Manufacturer:	Device		Produsent:
-Mass storage controller	Device		Masselagringsenhet
-Memory controller	Device		Minnekontroller
-Multimedia controller	Device		Multimediakontroller
-Name	PropertyList		Navn
-Network controller	Device		Nettverkskontroller
-None	Device		Ingen
-Not implemented	DeviceACPI		Ikke implementert
-Not implemented	DevicePCI		Ikke implementert
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Devices	4021276649
 Order by:	DevicesView		Sorter etter:
-PCI Information	DevicePCI		PCI-informasjon
-PCI bus	Device		PCI-buss
-PCI bus	DevicesView		PCI-buss
-Processor	Device		Prosessor
-Quit	DevicesView		Avslutt
-Refresh devices	DevicesView		Oppdater enheter
-Report compatibility	DevicesView		Rapporter kompatibilitet
-Satellite communications controller	Device		Satellittkommunikasjonskontroller
-Serial bus controller	Device		Seriellbusskontroller
-Signal processing controller	Device		Signalbehandlingskontroller
-Unclassified device	Device		Uklassifisert enhet
-Unknown	DevicePCI		Ukjent
+ACPI controller	Device		ACPI-kontroller
+Memory controller	Device		Minnekontroller
+Driver used	DevicePCI		Driver brukt
+ISA bus	Device		ISA-buss
+ACPI bus	Device		ACPI-buss
+ISA bus	DevicesView		ISA-buss
+Docking station	Device		Dokkingstasjon
+Computer	Device		Datamaskin
 Unknown device	Device		Ukjent enhet
-Unknown device	DevicesView		Ukjent enhet
-Value	PropertyList		Verdi
-Wireless controller	Device		Trådløs kontroller
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Klasseinformasjon:\t\t\t\t: %classInfo%
+Detailed	DevicesView		Detaljert
+Category	DevicesView		Kategori
+Quit	DevicesView		Avslutt
+Device paths	Device		Enhetsti
+Processor	Device		Prosessor
+ACPI Processor Namespace '%2'	DeviceACPI		ACPI-prosessor-navnerom '%2'
 unknown	Device		ukjent
+ACPI Information	DeviceACPI		ACPI-informasjon
+Generic system peripheral	Device		Generisk ekstern enhet
+Not implemented	DevicePCI		Ikke implementert
+Not implemented	DeviceACPI		Ikke implementert
+Device name	DevicePCI		Enhetsnavn
+Display controller	Device		Skjermkontroller
+Mass storage controller	Device		Masselagringsenhet
+Input device controller	Device		Inndata enhetskontroller
+Network controller	Device		Nettverkskontroller
+Device name	DeviceACPI		Enhetsnavn
+Driver used	Device		Driver brukt
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Enhetsnavn\t\t\t\t: %Name%\nProdusent\t\t\t: %Manufacturer%\nDriver brukt\t\t\t\t: %DriverUsed%\nEnhetssti\t: %DevicePaths%
+ACPI Thermal Zone	DeviceACPI		ACPI-temperaturområde
+Bus	DevicesView		Buss
+Communication controller	Device		Kommunikasjonskontroller
+Manufacturer	DeviceACPI		Produsent
+PCI bus	Device		PCI-buss
+ACPI System Indicator	DeviceACPI		ACPI-systemindikator
+None	Device		Ingen
+PCI bus	DevicesView		PCI-buss
+Basic information	DevicesView		Basisinformasjon
+PCI Information	DevicePCI		PCI-informasjon
+Manufacturer:	Device		Produsent:
+ACPI bus	DevicesView		ACPI-buss
+ACPI System Bus	DeviceACPI		ACPI-systembuss
+Devices	System name		Maskinvare
+Multimedia controller	Device		Multimediakontroller
+Unknown	DevicePCI		Ukjent
+Device name:	Device		Enhetsnavn:
+Computer	DevicesView		Datamaskin
+Value	PropertyList		Verdi
+Report compatibility	DevicesView		Rapporter kompatibilitet
+Device	Device		Enhet
+Signal processing controller	Device		Signalbehandlingskontroller
+Serial bus controller	Device		Seriellbusskontroller
+Wireless controller	Device		Trådløs kontroller
+ACPI node '%1'	DeviceACPI		ACPI-node '%1'

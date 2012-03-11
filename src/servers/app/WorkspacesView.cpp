@@ -277,7 +277,7 @@ WorkspacesView::_DrawWorkspace(DrawingEngine* drawingEngine,
 {
 	BRect rect = _WorkspaceAt(index);
 
-	Workspace workspace(*Window()->Desktop(), index);
+	Workspace workspace(*Window()->Desktop(), index, true);
 	bool workspaceActive = workspace.IsCurrent();
 	if (workspaceActive) {
 		// draw active frame

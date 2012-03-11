@@ -1,0 +1,14 @@
+1	polish	x-vnd.Haiku-ICOTranslator	3151213372
+Cursor	ICOTranslator		Kursor
+Version %d.%d.%d, %s	ConfigView		Wersja %d.%d.%d, %s
+Windows %s %ld bit image	ICOTranslator		Obraz Windows %s, %ld bitów
+Windows icon images	ConfigView		Ikony Windows
+Valid icon sizes are 16, 32, or 48	ConfigView		Dopuszczalne rozmiary ikon to 16, 32 lub 48
+Enforce valid icon sizes	ConfigView		Wymuś prawidłowe rozmiary ikon
+ICO Settings	main		Ustawienia ICO
+Windows icon translator	ICOTranslator		Translator ikon Windows
+pixels in either direction.	ConfigView		piksli w dowolnym kierunku.
+Write 32 bit images on true color input	ConfigView		Zapisuj 32-bitowe obrazy na wejściu True Color
+Icon	ICOTranslator		Ikona
+ICOTranslator Settings	ConfigView		Ustawienia translatora Ikon Windows
+Windows icon images	ICOTranslator		Ikony Windows

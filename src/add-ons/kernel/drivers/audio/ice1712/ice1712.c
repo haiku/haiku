@@ -263,7 +263,7 @@ ice1712_setup(ice1712 *ice)
 			ice->CommLines.data_in = 0;
 			ice->CommLines.data_out = DELTA66_DOUT;
 			ice->CommLines.cs_mask = DELTA66_CLK | DELTA66_DOUT
-				| DELTA66_CODEC_CS_0 | DELTA66_CODEC_CS_1;
+				| DELTA66_CS_MASK;
 			break;
 		case ICE1712_SUBDEVICE_DELTA410 :
 		case ICE1712_SUBDEVICE_AUDIOPHILE_2496 :
@@ -272,7 +272,7 @@ ice1712_setup(ice1712 *ice)
 			ice->CommLines.data_in = AP2496_DIN;
 			ice->CommLines.data_out = AP2496_DOUT;
 			ice->CommLines.cs_mask = AP2496_CLK | AP2496_DIN
-				| AP2496_DOUT | AP2496_SPDIF_CS | AP2496_CODEC_CS;
+				| AP2496_DOUT | AP2496_CS_MASK;
 			break;
 		case ICE1712_SUBDEVICE_DELTA1010 :
 		case ICE1712_SUBDEVICE_DELTA1010LT :
@@ -286,8 +286,8 @@ ice1712_setup(ice1712 *ice)
 			ice->CommLines.clock = VX442_CLK;
 			ice->CommLines.data_in = VX442_DIN;
 			ice->CommLines.data_out = VX442_DOUT;
-			ice->CommLines.cs_mask = VX442_SPDIF_CS | VX442_CODEC_CS_0
-				| VX442_CODEC_CS_1;
+			ice->CommLines.cs_mask = VX442_CLK | VX442_DIN | VX442_DOUT
+				| VX442_CS_MASK;
 			break;
 	}
 

@@ -1,10 +1,11 @@
-1	finnish	x-vnd.Haiku-PackageInstaller	2709408798
+1	finnish	x-vnd.Haiku-PackageInstaller	1396489627
 Install to:	PackageView		Asenna kohteeseen:
 OK	PackageView		Valmis
 Accept	PackageTextViewer		Hyväksy
 Continue	PackageInstall		Jatka
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Pyydetyn paketin asentaminen järjestelmääsi epäonnistui. Tämä saattaa johtua kohdepakettitiedoston pulmasta. Ota yhteyttä tässä asiassa pakettijakelijaan.
 Image not loaded correctly	PackageImageViewer		Tiedostovedosta ei ladattu oikein
+Install 	PackageView		Asenna
 No package selected.	PackageInfo		Yhtään pakettia ei ole valittu.
 Install	PackageView		Asenna
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Annettu paketti näyttää jo olevan asennettu järjestelmääsi. Haluaisitko poistaa nykyisen paketin ja jatkaa asennusta?

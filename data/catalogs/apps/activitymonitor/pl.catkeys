@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-ActivityMonitor	2708665631
+1	polish	x-vnd.Haiku-ActivityMonitor	3704566709
 P-faults	DataSource		P-błędy
 Media nodes	DataSource		Węzły multimedialne
 Threads	DataSource		Wątki
@@ -13,25 +13,36 @@ Used memory	DataSource		Użyta pamięć
 Cached memory	DataSource		Pamięć cache
 Apps	DataSource		Aplikacje
 Show legend	ActivityView		Pokaż legendę
+Text clipboard	DataSource		Schowek tekstowy
 Settings	ActivityWindow		Ustawienia
 Receiving	DataSource		Otrzymano
-Settings…	ActivityWindow		Ustawienia...
+Settings…	ActivityWindow		Ustawienia…
 Ports	DataSource		Porty
 Page faults	DataSource		Błędy stronicowania
 Sending	DataSource		Wysyłanie
 Cache	DataSource		Cache
+%.1f faults/s	DataSource		%.1f błędów/s
 Update time interval:	SettingsWindow		Częstotliwość odświeżania:
+TX	DataSource	Shorter version for Sending	TX
 Quit	ActivityWindow		Wyjdź
 Block cache memory	DataSource		Pamięć bloku cache
 Remove graph	ActivityView		Usuń wykres
+%.1f MB	DataSource		%.1f MB
+%lld sec.	SettingsWindow		%lld sek.
+%lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		Użycie CPU
+Raw clipboard	DataSource		Surowy schowek
 Sems	DataSource		Semy
+ActivityMonitor	System name		Monitor Aktywności
 Running applications	DataSource		Uruchomione aplikacje
 Semaphores	DataSource		Semafory
 Block cache	DataSource		Blok pamięci cache
 Swap space	DataSource		Przestrzeń wymiany
 Swap	DataSource		Swap
 File	ActivityWindow		Plik
+usage	DataSource		zużycie
 Additional items	ActivityView		Dodatki
 Network receive	DataSource		Odebrano
+%.1f KB/s	DataSource		%.1f KB/s
 Memory	DataSource		Pamięć
+RX	DataSource	Shorter version for Receiving.	RX

@@ -546,8 +546,29 @@ NetworkStatusView::_Update(bool force)
 		}
 	}
 
-	if (fStatus != oldStatus)
+	if (fStatus != oldStatus) {
+		// A little notification on major status changes for primary interface
+		BNotification notification(B_INFORMATION_NOTIFICATION);
+		notification.SetGroup(B_TRANSLATE("Network Status"));
+		notification.SetTitle(interface.Name());
+		notification.SetMessageID(interface.Name());
+		notification.SetIcon(fBitmaps[fStatus]);
+		if (fStatus == kStatusConnecting) {
+			notification.SetContent(B_TRANSLATE("Connecting..."));
+			notification.Send();
+		} else if (fStatus == kStatusReady && oldStatus == kStatusConnecting) {
+			notification.SetContent(B_TRANSLATE("Connection Established"));
+			notification.Send();
+		} else if (fStatus == kStatusNoLink && oldStatus == kStatusConnecting) {
+			notification.SetContent(B_TRANSLATE("Connection Failed"));
+			notification.Send();
+		} else if (fStatus == kStatusNoLink && oldStatus == kStatusReady) {
+			notification.SetContent(B_TRANSLATE("Disconnected"));
+			notification.Send();
+		}
+
 		Invalidate();
+	}
 }
 
 

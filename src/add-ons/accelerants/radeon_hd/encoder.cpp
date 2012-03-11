@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2012, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -312,14 +312,13 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
 		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
-			if ((info.chipsetFlags & CHIP_APU) != 0) {
-				// aka DCE 4.1
+			if ((info.chipsetFlags & CHIP_APU) != 0
+				|| info.dceMajor >= 5) {
 				// Setup DIG encoder
 				encoder_dig_setup(connectorIndex, pixelClock,
 					ATOM_ENCODER_CMD_SETUP);
-				// Enable DIG transmitter
-				transmitter_dig_setup(connectorIndex, pixelClock, 0, 0,
-					ATOM_TRANSMITTER_ACTION_ENABLE);
+				encoder_dig_setup(connectorIndex, pixelClock,
+					ATOM_ENCODER_CMD_SETUP_PANEL_MODE);
 			} else if (info.dceMajor >= 4) {
 				// Disable DIG transmitter
 				transmitter_dig_setup(connectorIndex, pixelClock, 0, 0,
@@ -491,7 +490,7 @@ encoder_digital_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 								|= PANEL_ENCODER_SPATIAL_DITHER_DEPTH;
 						}
 					}
-	
+
 					if ((lvdsFlags & ATOM_PANEL_MISC_TEMPORAL) != 0)
 						args.v2.ucTemporal = PANEL_ENCODER_TEMPORAL_DITHER_EN;
 						if ((lvdsFlags & ATOM_PANEL_MISC_888RGB) != 0) {
@@ -860,6 +859,8 @@ encoder_analog_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 {
 	TRACE("%s\n", __func__);
 
+	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+
 	int index = 0;
 	DAC_ENCODER_CONTROL_PS_ALLOCATION args;
 	memset(&args, 0, sizeof(args));
@@ -876,9 +877,21 @@ encoder_analog_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 	}
 
 	args.ucAction = command;
-	args.ucDacStandard = ATOM_DAC1_PS2;
-		// TODO: or ATOM_DAC1_CV if ATOM_DEVICE_CV_SUPPORT
-		// TODO: or ATOM_DAC1_PAL or ATOM_DAC1_NTSC if else
+
+	if ((encoderFlags & ATOM_DEVICE_CRT_SUPPORT) != 0)
+		args.ucDacStandard = ATOM_DAC1_PS2;
+	else if ((encoderFlags & ATOM_DEVICE_CV_SUPPORT) != 0)
+		args.ucDacStandard = ATOM_DAC1_CV;
+	else {
+		TRACE("%s: TODO, hardcoded NTSC TV support\n", __func__);
+		if (1) {
+			// NTSC, NTSC_J, PAL 60
+			args.ucDacStandard = ATOM_DAC1_NTSC;
+		} else {
+			// PAL, SCART. SECAM, PAL_CN
+			args.ucDacStandard = ATOM_DAC1_PAL;
+		}
+	}
 
 	args.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
 
@@ -889,6 +902,8 @@ encoder_analog_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 bool
 encoder_analog_load_detect(uint32 connectorIndex)
 {
+	TRACE("%s\n", __func__);
+
 	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
 
@@ -983,6 +998,7 @@ status_t
 transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 	uint8 laneNumber, uint8 laneSet, int command)
 {
+	TRACE("%s\n", __func__);
 
 	uint16 encoderID = gConnector[connectorIndex]->encoder.objectID;
 	int index;
@@ -1003,6 +1019,11 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 			return B_ERROR;
 	}
 
+	if (index < 0) {
+		ERROR("%s: GetIndexIntoMasterTable failed!\n", __func__);
+		return B_ERROR;
+	}
+
 	uint8 tableMajor;
 	uint8 tableMinor;
 
@@ -1019,6 +1040,9 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 	};
 	union digTransmitterControl args;
 	memset(&args, 0, sizeof(args));
+
+	TRACE("%s: table %" B_PRIu8 ".%" B_PRIu8 "\n", __func__,
+		tableMajor, tableMinor);
 
 	int connectorObjectID
 		= (gConnector[connectorIndex]->objectID & OBJECT_ID_MASK)
@@ -1374,6 +1398,8 @@ encoder_crtc_scratch(uint8 crtcID)
 void
 encoder_dpms_scratch(uint8 crtcID, bool power)
 {
+	TRACE("%s\n", __func__);
+
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 

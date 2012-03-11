@@ -1,11 +1,12 @@
-1	norwegian_bokmål	x-vnd.Be-WORK	815230684
-About Workspaces…	Workspaces		Om Arbeidsområder
-Always on top	Workspaces		Alltid øverst
-Auto-raise	Workspaces		Bring til forgrunnen automatisk
-Change workspace count…	Workspaces		Endre antall arbeidsområder...
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-WORK	932379173
 Invalid argument: %s\n	Workspaces		Ugyldig argument: %s\n
-OK	Workspaces		OK
 Quit	Workspaces		Avslutt
-Show window border	Workspaces		Vis vinduskant
 Workspaces	System name		Arbeidsområder
+Change workspace count…	Workspaces		Endre antall arbeidsområder...
+About Workspaces…	Workspaces		Om Arbeidsområder
 Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Workspaces\nskrevet av %1, og %2.\n\nOpphavsrett %3, Haiku.\n\nSend vinduer bakerst ved bruk av ALT-knappen. Flytt vinduer foran ved å bruke CTRL-knappen
+Show window border	Workspaces		Vis vinduskant
+Auto-raise	Workspaces		Bring til forgrunnen automatisk
+OK	Workspaces		OK
+Always on top	Workspaces		Alltid øverst
+Show window tab	Workspaces		Vis vindu fane

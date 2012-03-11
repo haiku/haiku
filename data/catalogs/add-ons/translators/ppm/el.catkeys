@@ -1,31 +1,31 @@
-1	modern_greek	x-vnd.Haiku-PPMTranslator	2886727868
+1	greek, modern (1453-)	x-vnd.Haiku-PPMTranslator	2886727868
+PPM Settings	PPMMain		Ρυθμίσεις PPM 
 Based on PPMTranslator sample code	PPMTranslator		Βασισμένο σε δείγμα κώδικα του PPM μεταφραστή
-Be Bitmap Format (PPMTranslator)	PPMTranslator		Μορφή Be Bitmap (Μεταφραστής PPM)
-Bitmap 1 bit	PPMTranslator		Bitmap 1 bit
+OK	PPMMain		Εντάξει
+Grayscale 8 bits	PPMTranslator		Κλίμακα του Γκρι 8 bits
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 bits
+PPM image	PPMTranslator		PPM εικόνα
+RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 bits
+PPM Image Translator	PPMTranslator		Μεταφραστής εικόνας PPM
+Be Bitmap Format (PPMTranslator)	PPMTranslator		Μορφή Be Bitmap (Μεταφραστής PPM)
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bits
 CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 bits
-Grayscale 8 bits	PPMTranslator		Κλίμακα του Γκρι 8 bits
-Input Color Space	PPMTranslator		Διάστημα εισαγωγής χρώματος
-None	PPMTranslator		Κανένα
-OK	PPMMain		Εντάξει
-PPM Image Translator	PPMTranslator		Μεταφραστής εικόνας PPM
-PPM Settings	PPMMain		Ρυθμίσεις PPM 
-PPM image	PPMTranslator		PPM εικόνα
-PPMTranslator Settings	PPMTranslator		Ρυθμίσεις μεταφραστή PPM
-RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 bits
+bits/space	PPMTranslator		bits/διάστημα
+RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 bits big-endian
+RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 bits big-endian
+Version %d.%d.%d %s	PPMTranslator		Έκδοση %d.%d.%d %s
 RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 bits big-endian
 RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 bits
-RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 bits big-endian
-RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 bits
-RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 bits big-endian
-RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 bits
-RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 bits big-endian
+Write ASCII	PPMTranslator		Εγγραφή ASCII
 RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 bits
+None	PPMTranslator		Κανένα
+RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 bits big-endian
+RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 bits
+Bitmap 1 bit	PPMTranslator		Bitmap 1 bit
 RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 bits big-endian
+Input Color Space	PPMTranslator		Διάστημα εισαγωγής χρώματος
+RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 bits
 Sample code copyright 1999, Be Incorporated	PPMTranslator		Δείγμα κώδικα copyright 1999, Be Incorporated
+PPMTranslator Settings	PPMTranslator		Ρυθμίσεις μεταφραστή PPM
 Something is wrong with the PPMTranslator!	PPMMain		Κάτι δεν πάει καλά με τον μεταφραστή PPM!
 System palette 8 bits	PPMTranslator		Παλέτα συστήματος 8 bits
-Version %d.%d.%d %s	PPMTranslator		Έκδοση %d.%d.%d %s
-Write ASCII	PPMTranslator		Εγγραφή ASCII
-bits/space	PPMTranslator		bits/διάστημα

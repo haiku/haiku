@@ -68,7 +68,7 @@ Installation canceled.	InstallProgress		Installation annulée.
 Installer	System name		Installeur
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Vous ne pouvez pas installer le contenu d'un disque sur lui-même. Sélectionnez un autre disque.
 ???	InstallerWindow	Unknown currently copied item	???
-\"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\" est le numéro de la partition, numérotée à partir de « 1 » avec GRUB 2\n
+\"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		« n » est le numéro de la partition, numérotée à partir de « 1 » avec GRUB 2\n
 Quit DriveSetup	InstallerWindow		Quitter le Gestionnaire de Disques
 \"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		« N » est le numéro du disque dur, numéroté à partir de « 0 ».\n
 Hide optional packages	InstallerWindow		Cacher les paquets optionnels

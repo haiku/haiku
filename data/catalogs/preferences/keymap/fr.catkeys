@@ -1,11 +1,12 @@
-1	french	x-vnd.Haiku-Keymap	300845166
-Caps Lock:	Modifier Keys window		Verr. Maj. :
-OK	Modifier Keys window		Ok
+1	french	x-vnd.Haiku-Keymap	3895282621
+Caps Lock:	Modifier Keys window		Verrouillage des majuscules :
+OK	Modifier Keys window		OK
 Tilde trigger	Keymap window		Tilde
 Modifier Keys	Modifier Keys window		Touches modificatrices
 Grave trigger	Keymap window		Accent grave
 Select dead keys	Keymap window		Sélection des touches mortes
 Option:	Modifier Keys window		Option :
+Revert	Modifier Keys window		Défaire
 Quit	Keymap window		Quitter
 Switch shortcut keys to Haiku mode	Keymap window		Basculer les touches de raccourcis en mode Haiku
 Circumflex trigger	Keymap window		Accent circonflexe
@@ -16,6 +17,7 @@ System:	Keymap window		Système :
 Switch shortcut keys	Keymap window		Basculer les touches de raccourcis
 Set Modifier Keys…	Keymap window		Définir les modificateurs de touches…
 User:	Keymap window		Utilisateur :
+Control:	Modifier Keys window		Contrôle :
 Sample and clipboard:	Keymap window		Exemple et presse-papier :
 Layout	Keymap window		Disposition
 Switch shortcut keys to Windows/Linux mode	Keymap window		Basculer les touches de raccourcis en mode Linux/Windows

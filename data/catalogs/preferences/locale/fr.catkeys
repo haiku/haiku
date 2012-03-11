@@ -2,7 +2,7 @@
 Available languages	Locale Preflet Window		Langues disponibles
 Negative:	TimeFormatSettings		Négatif :
 already chosen	LanguageListView		déjà choisi
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		La liste des langages disponibles est introuvable, ce preflet est donc inutilisable !
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Impossible de trouver les langages disponibles ! Ce preflet n'est pas utilisable !
 Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Le Tracker et la Deskbar ont besoin d'être redémarrés pour prendre en compte cette modification. Souhaitez-vous les redémarrer maintenant ?
 Long format:	TimeFormatSettings		Format long :
 Currency	TimeFormatSettings		Devise

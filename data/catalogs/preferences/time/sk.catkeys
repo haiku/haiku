@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Time	3493650184
+1	slovak	x-vnd.Haiku-Time	1859841283
 GMT (UNIX compatible)	Time		GMT (kompatibilné s Unixom)
 OK	Time		OK
 Asia	Time		Ázia
@@ -28,7 +28,6 @@ Sending request failed	Time		Odoslanie požiadavky zlyhalo
 Arctic	Time		Arktída
 Time	System name		Čas
 America	Time		Amerika
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Dátum a čas, napísali:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
 Reset	Time		Obnoviť
 Synchronize at boot	Time		Synchronizovať pri štarte
 Received invalid time	Time		Prijatý neplatný čas

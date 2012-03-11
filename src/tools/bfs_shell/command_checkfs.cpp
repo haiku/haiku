@@ -37,7 +37,7 @@ command_checkfs(int argc, const char* const* argv)
 	result.flags = 0;
 	if (!checkOnly) {
 		result.flags |= BFS_FIX_BITMAP_ERRORS | BFS_REMOVE_WRONG_TYPES
-			| BFS_REMOVE_INVALID | BFS_FIX_NAME_MISMATCHES /*| BFS_FIX_BPLUSTREES*/;
+			| BFS_REMOVE_INVALID | BFS_FIX_NAME_MISMATCHES | BFS_FIX_BPLUSTREES;
 	}
 
 	// start checking
@@ -70,8 +70,8 @@ command_checkfs(int argc, const char* const* argv)
 				fssh_dprintf(", has wrong type");
 			if ((result.errors & BFS_NAMES_DONT_MATCH) != 0)
 				fssh_dprintf(", names don't match");
-//			if ((result.errors & BFS_INVALID_BPLUSTREE) != 0)
-//				fssh_dprintf(", invalid b+tree");
+			if ((result.errors & BFS_INVALID_BPLUSTREE) != 0)
+				fssh_dprintf(", invalid b+tree");
 			fssh_dprintf("\n");
 		}
 		if ((result.mode & (S_INDEX_DIR | 0777)) == S_INDEX_DIR)
@@ -95,8 +95,8 @@ command_checkfs(int argc, const char* const* argv)
 
 	_kern_close(rootDir);
 
-	fssh_dprintf("\t%" B_PRIu64 " nodes checked,\n\t%" B_PRIu64 " blocks not "
-		"allocated,\n\t%" B_PRIu64 " blocks already set,\n\t%" B_PRIu64
+	fssh_dprintf("        %" B_PRIu64 " nodes checked,\n\t%" B_PRIu64 " blocks "
+		"not allocated,\n\t%" B_PRIu64 " blocks already set,\n\t%" B_PRIu64
 		" blocks could be freed\n\n", counter, result.stats.missing,
 		result.stats.already_set, result.stats.freed);
 	fssh_dprintf("\tfiles\t\t%" B_PRIu64 "\n\tdirectories\t%" B_PRIu64 "\n"

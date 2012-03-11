@@ -1,34 +1,34 @@
-1	modern_greek	x-vnd.Haiku-LaunchBox	3016105370
-Add button here	LaunchBox		Προσθέστε κουμπί εδώ
-Auto-raise	LaunchBox		Αυτόματη ανύψωση
-Bummer	LaunchBox		Κρίμα
-Cancel	LaunchBox		Άκυρο
-Clear button	LaunchBox		Πλήκτρο καθαρισμού
-Clone	LaunchBox		Κλείσιμο
-Close	LaunchBox		Κλείσιμο
-Description for '%3'	LaunchBox		Description for '%3'
-Failed to launch '%1'.\n\nError:	LaunchBox		Αδυναμία εκτέλεσης του '%1'.\n\nΣφάλμα:
-Failed to launch 'something', error in Pad data.	LaunchBox		Αδυναμία εκκίνησης του 'κάποιου', σφάλμα στα δεδομένα της σημείωσης.
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Αποτυχία εντολής `ανοιχτός φάκελος` στο Tracker.\n\nΛαθος 
-Horizontal layout	LaunchBox		Οριζόντια διάταξη
-Icon size	LaunchBox		Μέγεθος εικονιδίου
-Ignore double-click	LaunchBox		Αγνοήστε διπλό κλίκ
-LaunchBox	System name		LaunchBox
-Name Panel	LaunchBox		Όνομα πάνελ
+1	greek, modern (1453-)	x-vnd.Haiku-LaunchBox	3016105370
 New	LaunchBox		Νέο
-OK	LaunchBox		ΟΚ
-Pad	LaunchBox		Pad
-Pad %1	LaunchBox		Pad %1
-Pad 1	LaunchBox		Pad 1
-Quit	LaunchBox		Έξοδος
-Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Σίγουρα θέλετε να κλείσετε ταυτό το σημείωμα;\n(το σημείωμα δε θα απομνημονευτεί)
-Remove button	LaunchBox		Αφαιρέστε το κουμπί
 Set description…	LaunchBox		Όριστε περιγραφή
-Settings	LaunchBox		Ρυθμίσεις
+Vertical layout	LaunchBox		Κάθετη διάταξη
+OK	LaunchBox		ΟΚ
+Pad 1	LaunchBox		Pad 1
+last chance	LaunchBox		Τελευταία ευκαιρία
+Quit	LaunchBox		Έξοδος
+Clear button	LaunchBox		Πλήκτρο καθαρισμού
+LaunchBox	System name		LaunchBox
+Ignore double-click	LaunchBox		Αγνοήστε διπλό κλίκ
+Auto-raise	LaunchBox		Αυτόματη ανύψωση
 Show on all workspaces	LaunchBox		Εμφάνιση όλων των χώρων εργασίας
 Show window border	LaunchBox		Εμφάνιση συνόρων παραθύρου
-Vertical layout	LaunchBox		Κάθετη διάταξη
-You can drag an icon here.	LaunchBox		Μπορείτε να μετακινήσετε το εικονίδιο εδώ.
+Pad	LaunchBox		Pad
+Icon size	LaunchBox		Μέγεθος εικονιδίου
+Bummer	LaunchBox		Κρίμα
+Cancel	LaunchBox		Άκυρο
+Remove button	LaunchBox		Αφαιρέστε το κουμπί
+Horizontal layout	LaunchBox		Οριζόντια διάταξη
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nΑδυναμία εκτέλεσης της εφαρμογής με υπογραφή '%2'.\n\nΣφάλμα:
-last chance	LaunchBox		Τελευταία ευκαιρία
+Failed to launch '%1'.\n\nError:	LaunchBox		Αδυναμία εκτέλεσης του '%1'.\n\nΣφάλμα:
+Name Panel	LaunchBox		Όνομα πάνελ
+Add button here	LaunchBox		Προσθέστε κουμπί εδώ
+Description for '%3'	LaunchBox		Description for '%3'
+Settings	LaunchBox		Ρυθμίσεις
+Failed to launch 'something', error in Pad data.	LaunchBox		Αδυναμία εκκίνησης του 'κάποιου', σφάλμα στα δεδομένα της σημείωσης.
+Pad %1	LaunchBox		Pad %1
+Close	LaunchBox		Κλείσιμο
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Αποτυχία εντολής `ανοιχτός φάκελος` στο Tracker.\n\nΛαθος 
+You can drag an icon here.	LaunchBox		Μπορείτε να μετακινήσετε το εικονίδιο εδώ.
+Clone	LaunchBox		Κλείσιμο
 launch popup	LaunchBox		Ξεκίνησει αναδυόμενου
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Σίγουρα θέλετε να κλείσετε ταυτό το σημείωμα;\n(το σημείωμα δε θα απομνημονευτεί)

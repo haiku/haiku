@@ -1,43 +1,31 @@
-1	norwegian_bokmål	x-vnd.Be-TSKB	2472557472
-<Be folder is empty>	BeMenu		<Be-mappen er tom>
-Always on top	PreferencesWindow		Alltid øverst
-Applications	B_USER_DESKBAR_DIRECTORY/Applications		B_USER_DESKBAR_DIRECTORY/Programmer
-Applications	PreferencesWindow		Programmer
-Auto-raise	PreferencesWindow		Fremhev automatisk
-Change time…	TimeView		Still klokken...
-Clock	PreferencesWindow		Klokke
-Close all	WindowMenu		Lukk alle
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		B_USER_DESKBAR_DIRECTORY/Demoer
-Deskbar	System name		Deskbar
-Deskbar preferences	PreferencesWindow		Innstillinger for Deskbar
-Deskbar preferences…	BeMenu		Innstillinger for Deskbar...
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		B_USER_DESKBAR_DIRECTORY/Skrivebordsverktøy
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-TSKB	2159206862
 Edit menu…	PreferencesWindow		Rediger meny...
-Expand new applications	PreferencesWindow		Pakk ut nye programmer
-Find…	BeMenu		Finn...
-Hide all	WindowMenu		Skjul alle
-Hide time	TimeView		Skjul klokken
-Menu	PreferencesWindow		Meny
-Mount	BeMenu		Monter
-No windows	WindowMenu		Ingen vinduer
-Power off	BeMenu		Slå av
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		B_USER_DESKBAR_DIRECTORY/Innstillinger
-Quit application	WindowMenu		Avslutt program
-Recent applications	BeMenu		Nylig brukte programmer
-Recent applications:	PreferencesWindow		Nylig brukte programmer
-Recent documents	BeMenu		Nylig brukte dokumenter
+Applications	PreferencesWindow		Programmer
 Recent documents:	PreferencesWindow		Nylig brukte dokumenter
-Recent folders	BeMenu		Nylig brukte mapper
-Recent folders:	PreferencesWindow		Nylig brukte mapper:
-Restart Tracker	BeMenu		Start Tracker på nytt
-Restart system	BeMenu		Start systemet på nytt
-Show Time	Tray		Vis klokken
-Show all	WindowMenu		Vis alle
-Show application expander	PreferencesWindow		Vis Arkivåpner-programmet
-Show calendar…	TimeView		Vis kalender...
-Show replicants	BeMenu		Vis replikanter
-Show seconds	PreferencesWindow		Vis sekunder
-Shutdown…	BeMenu		Avslutt...
 Sort running applications	PreferencesWindow		Sorter kjørende programmer
-Tracker always first	PreferencesWindow		Tracker alltid først
+Change time…	TimeView		Still klokken...
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		B_USER_DESKBAR_DIRECTORY/Programmer
 Window	PreferencesWindow		Vindu
+Menu	PreferencesWindow		Meny
+Show seconds	PreferencesWindow		Vis sekunder
+Always on top	PreferencesWindow		Alltid øverst
+Show all	WindowMenu		Vis alle
+No windows	WindowMenu		Ingen vinduer
+Deskbar	System name		Deskbar
+Auto-raise	PreferencesWindow		Fremhev automatisk
+Hide time	TimeView		Skjul klokken
+Recent folders:	PreferencesWindow		Nylig brukte mapper:
+Show application expander	PreferencesWindow		Vis Arkivåpner-programmet
+Close all	WindowMenu		Lukk alle
+Deskbar preferences	PreferencesWindow		Innstillinger for Deskbar
+Recent applications:	PreferencesWindow		Nylig brukte programmer
+Tracker always first	PreferencesWindow		Tracker alltid først
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		B_USER_DESKBAR_DIRECTORY/Innstillinger
+Show calendar…	TimeView		Vis kalender...
+Show Time	Tray		Vis klokken
+Expand new applications	PreferencesWindow		Pakk ut nye programmer
+Clock	PreferencesWindow		Klokke
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		B_USER_DESKBAR_DIRECTORY/Demoer
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		B_USER_DESKBAR_DIRECTORY/Skrivebordsverktøy
+Hide all	WindowMenu		Skjul alle
+Quit application	WindowMenu		Avslutt program

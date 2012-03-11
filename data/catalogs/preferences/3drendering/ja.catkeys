@@ -1,7 +1,8 @@
-1	japanese	x-vnd.Haiku-3DRendering	1539891217
+1	japanese	x-vnd.Haiku-3DRendering	1725618140
 List stack size:	Capabilities		リストスタックサイズ:
 Information	InfoView		情報
 Max. clipping planes:	Capabilities		最大クリッププレーン数:
+GL version:	InfoView		GL バージョン:
 Max. texture units:	Capabilities		最大テクスチャユニット数:
 Renderer name:	InfoView		レンダラ名:
 Vendor name:	InfoView		ベンダー名:
@@ -19,6 +20,7 @@ GLUT API version:	InfoView		GLUT API バージョン:
 Texture stack size:	Capabilities		テクスチャスタックサイズ:
 Max. evaluators equation order:	Capabilities		最大評価関数オーダー:
 Max. 3D texture size:	Capabilities		最大 3D テクスチャサイズ:
+3D Rendering	System name		3D レンダリング
 Capabilities	Capabilities		性能
 Max. recommended index elements:	Capabilities		最大推奨インデックス要素:
 Available	Extensions		利用可能

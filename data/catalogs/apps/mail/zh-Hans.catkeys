@@ -1,4 +1,4 @@
-1	english	x-vnd.Be-MAIL	1770407339
+1	english	x-vnd.Be-MAIL	1495323310
 View	Mail		查看
 %d - Date	Mail		%d - 日期
 Attach attributes:	Mail		附加属性：
@@ -15,6 +15,7 @@ helpful message	Mail		帮助消息
 Colored quotes:	Mail		彩色：
 Subject:	Mail		主题：
 Reply to all	Mail		全部回复
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	附件：%name%（类型：%type%）
 Show icons & labels	Mail		显示图标和标签
 Remove attachment	Mail		删除附件
 Button bar:	Mail		按钮栏：
@@ -61,6 +62,8 @@ Print…	Mail		打印中…
 Warn unencodable:	Mail		无法识别的编码类型警告:
 Quit	Mail		退出
 %n - Full name	Mail		%n - 全名
+ Read 	Mail		阅读
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
 Trash	Mail		垃圾箱
 Default account:	Mail		默认账户：
 Size:	Mail		大小：

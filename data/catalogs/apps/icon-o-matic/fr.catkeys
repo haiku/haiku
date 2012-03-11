@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-icon_o_matic	492420399
+1	french	x-vnd.haiku-icon_o_matic	3302636941
 Select All	Icon-O-Matic-PathManipulator		Sélectionner tout
 Add Style	Icon-O-Matic-AddStylesCmd		Ajouter un style
 Color (#%02x%02x%02x)	Style name after dropping a color		Couleur (#%02x%02x%02x)
@@ -26,6 +26,7 @@ Copy	Icon-O-Matic-Properties		Copier
 OK	Icon-O-Matic-ColorPicker		OK
 Remove Control Point	Icon-O-Matic-RemovePointsCmd		Enlever le point de contrôle
 Add circle	Icon-O-Matic-PathsList		Ajouter un cercle
+bad news	Title of error alert		mauvaises nouvelles
 Remove Paths	Icon-O-Matic-RemovePathsCmd		Enlever les chemins
 Add Control Point	Icon-O-Matic-AddPointCmd		Ajouter un point de contrôle
 Save as…	Icon-O-Matic-Menu-File		Enregistrer sous…
@@ -33,7 +34,7 @@ Change Color	Icon-O-Matic-SetColorCmd		Changer la couleur
 Style	Icon-O-Matic-Menus		Style
 <modify path>	Icon-O-Matic-PathCmd		<modifier le chemin>
 Opening the icon failed!	Icon-O-Matic-Main		L'ouverture de l'icône a échoué !
-Error: 	Icon-O-Matic-Main		Erreur :
+Error: 	Icon-O-Matic-Main		Erreur : 
 Name	Icon-O-Matic-PropertyNames		Nom
 bad news	Icon-O-Matic-Exporter		mauvaises nouvelles
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<rien à annuler>
@@ -79,6 +80,7 @@ Gradient	Icon-O-Matic-StyleTypes		Dégradé
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Attribut BEOS:ICON
 Export as…	Icon-O-Matic-Menu-File		Exporter sous…
 Transformation	Transformation		Transformation
+Reset transformation	Icon-O-Matic-StylesList		Annuler la transformation
 Conic	Icon-O-Matic-StyleTypes		Conique
 Split Control Points	Icon-O-Matic-SplitPointsCmd		Diviser les points de contrôle
 Save	Icon-O-Matic-Menu-Settings		Sauvegarder
@@ -90,7 +92,7 @@ Properties	Icon-O-Matic-Menus		Propriétés
 Move Pivot	Icon-O-Matic-TransformationBoxStates		Déplacer le pivot
 Path	Icon-O-Matic-Menus		Chemin
 File	Icon-O-Matic-Menus		Fichier
-Error: 	Icon-O-Matic-Exporter		Erreur :
+Error: 	Icon-O-Matic-Exporter		Erreur : 
 Diamond	Icon-O-Matic-StyleTypes		Diamant
 Path	Icon-O-Matic-PropertyNames		Chemin
 Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Impossible d'ouvrir le fichier « %s » en tant que document SVG.\n\nError : %s

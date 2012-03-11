@@ -1,25 +1,25 @@
-1	modern_greek	x-vnd.Haiku-WebPTranslator	3630570850
-Based on libwebp v0.1,	ConfigView		Βασισμένο στο libwebp v0.1,
+1	greek, modern (1453-)	x-vnd.Haiku-WebPTranslator	3630570850
 Compression method:	ConfigView		Μέθοδος συμπίεσης:
-Default	ConfigView		Προεπιλεγμένο
-Drawing	ConfigView		Σχεδίαση
-Fast	ConfigView		Γρήγορο
-High	ConfigView		Υψηλή
-Icon	ConfigView		Εικονίδιο
-Low	ConfigView		Χαμηλή
-Output preset:	ConfigView		Προεπιλογή εξόδου:
-Output quality:	ConfigView		Ποιότητα εξόδου:
-Photo	ConfigView		Φωτογραφία
-Picture	ConfigView		Εικόνα
-Preprocessing filter	ConfigView		Φίλτρο προεπεξεργασίας
+Based on libwebp v0.1,	ConfigView		Βασισμένο στο libwebp v0.1,
 Preset	ConfigView		Προεπιλογή
-Slower but better	ConfigView		Αργότερο αλλά καλύτερο
-Text	ConfigView		Κείμενο
 WebP Images	ConfigView		Εικόνες WebP 
-WebP Settings	main		Ρυθμίσεις WebP
-WebP image	WebPTranslator		Εικόνα WebP
-WebP image translator	WebPTranslator		Μεταφραστής εικόνας WebP
 WebP images	WebPTranslator		Εικόνες WebP 
 WebPTranslator Settings	ConfigView		Ρυθμίσεις μεταφραστή WebP
-©2010-2011 Google Inc.	ConfigView		©2010-2011 Google Inc.
+Output quality:	ConfigView		Ποιότητα εξόδου:
+WebP Settings	main		Ρυθμίσεις WebP
+Text	ConfigView		Κείμενο
+Slower but better	ConfigView		Αργότερο αλλά καλύτερο
+WebP image	WebPTranslator		Εικόνα WebP
 ©2010-2011 Haiku Inc.	ConfigView		©2010-2011 Haiku Inc.
+Output preset:	ConfigView		Προεπιλογή εξόδου:
+Picture	ConfigView		Εικόνα
+Low	ConfigView		Χαμηλή
+High	ConfigView		Υψηλή
+Drawing	ConfigView		Σχεδίαση
+Default	ConfigView		Προεπιλεγμένο
+Fast	ConfigView		Γρήγορο
+Photo	ConfigView		Φωτογραφία
+Preprocessing filter	ConfigView		Φίλτρο προεπεξεργασίας
+©2010-2011 Google Inc.	ConfigView		©2010-2011 Google Inc.
+WebP image translator	WebPTranslator		Μεταφραστής εικόνας WebP
+Icon	ConfigView		Εικονίδιο

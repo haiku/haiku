@@ -1,16 +1,16 @@
-1	norwegian_bokmål	x-vnd.Haiku-TIFFTranslator	292291870
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-TIFFTranslator	292291870
 LZW	TIFFView		LZW
-None	TIFFView		Ingen
-RLE (Packbits)	TIFFView		RLE (Packbits)
-TIFF Image Translator	TIFFView		TIFF-bildeoversetter
-TIFF Library:	TIFFView		TIFF-bibliotek
-TIFF Settings	TIFFMain		TIFF-innstillinger
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: kunne ikke sette mappe\n
 TIFF image	TIFFTranslator		TIF-bilde
-TIFF image translator	TIFFTranslator		TIFF-bildeoversetter
+TIFF Library:	TIFFView		TIFF-bibliotek
+TIFF Image Translator	TIFFView		TIFF-bildeoversetter
+None	TIFFView		Ingen
 TIFF images	TIFFTranslator		TIFF-bilder
 TIFFTranslator Settings	TIFFTranslator		TIFF-oversetterinstillinger
-Use Compression:	TIFFView		Bruk komprimering:
-Version %d.%d.%d %s	TIFFView		Versjon %d.%d.%d %s
-ZIP (Deflate)	TIFFView		ZIP (Komprimer)
-identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: kunne ikke sette mappe\n
+TIFF image translator	TIFFTranslator		TIFF-bildeoversetter
+RLE (Packbits)	TIFFView		RLE (Packbits)
+TIFF Settings	TIFFMain		TIFF-innstillinger
 identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: ugyldig dokumentindeks\n
+ZIP (Deflate)	TIFFView		ZIP (Komprimer)
+Version %d.%d.%d %s	TIFFView		Versjon %d.%d.%d %s
+Use Compression:	TIFFView		Bruk komprimering:

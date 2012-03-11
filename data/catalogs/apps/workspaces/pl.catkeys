@@ -1,10 +1,14 @@
-1	polish	x-vnd.Be-WORK	2212178173
+1	polish	x-vnd.Be-WORK	4170489135
 Invalid argument: %s\n	Workspaces		Nieprawidłowy argument: %s\n
 Quit	Workspaces		Wyjdź
-Change workspace count…	Workspaces		Zmień liczbę przestrzeni roboczych...
-About Workspaces…	Workspaces		O Workspaces...
+Workspaces	System name		Workspaces
+Change workspace count…	Workspaces		Zmień liczbę przestrzeni roboczych…
+Remove replicant	Workspaces		Usuń replikant
+About Workspaces…	Workspaces		O Workspaces…
 Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Workspaces\n autorstwa %1, i %2.\n\nCopyright %3, Haiku.\n\nPrześlij okna za pomocą przycisku Option. Przesuń okna na wierzch za pomocą przycisku Control.\n
 Show window border	Workspaces		Pokaż ramkę okna
-Auto-raise	Workspaces		Auto-raise
+Auto-raise	Workspaces		Auto-zwijanie
 OK	Workspaces		OK
 Always on top	Workspaces		Zawsze na wierzchu
+Live in the Deskbar	Workspaces		Rezyduje w Deskbarze
+Show window tab	Workspaces		Pokaż okno zakładki

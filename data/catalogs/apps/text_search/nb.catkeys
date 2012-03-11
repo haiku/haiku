@@ -1,31 +1,33 @@
-1	norwegian_bokmål	x-vnd.Haiku.TextSearch	627370365
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME kunne ikke åpne én eller flere mapper.
-%s: There was a problem running grep.	Grepper		%s: Det var et problem under kjøring av grep
-Actions	GrepWindow		Handlinger
-Cancel	GrepWindow		Avbryt
-Case-sensitive	GrepWindow		Skill mellom store og små bokstaver
-Close	GrepWindow		Lukk
-Copy text to clipboard	GrepWindow		Kopier tekst til utklippstavle
-Encoding	GrepWindow		Koding
-File	GrepWindow		Fil
-Follow symbolic links	GrepWindow		Følg symbolske lenker
-History	GrepWindow		Historie
-Look in sub-folders	GrepWindow		Se i undermapper
-New window	GrepWindow		Nytt vindu
-OK	GrepWindow		OK
-Open files in Pe	GrepWindow		Åpne filer i Pe
-Open selection	GrepWindow		Åpne valgte
-Please select the files you wish to have selected for you in Tracker.	GrepWindow		Vennligst velg filene du ønsker å ha valg for deg i Tracker.
-Please select the files you wish to keep searching.	GrepWindow		Vennligst velg filene du ønsker å fortsette å søke gjennom.
-Quit	GrepWindow		Avslutt
-Search	GrepWindow		Søk
-Select all	GrepWindow		Merk alle
-Set target…	GrepWindow		Sett mål...
-Settings	GrepWindow		Innstillinger
-Show files in Tracker	GrepWindow		Vis filer i Tracker
-Show lines	GrepWindow		Vis linjer
-Skip folders starting with a dot	GrepWindow		Hopp over mapper som starter med punktum
-Text files only	GrepWindow		Kun tekstfiler
-TextSearch	GrepWindow		Tekstsøk
-The unselected files will be removed from the list.	GrepWindow		De filene som ikke er merket vil bli fjernet fra listen.
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku.TextSearch	1180598828
+%s: Not enough room to escape the filename.	Grepper		%s: Ikke nok rom til å avslutte filenavnet.
 Trim to selection	GrepWindow		beskjær til utvalg
+Follow symbolic links	GrepWindow		Følg symbolske lenker
+Close	GrepWindow		Lukk
+Cancel	GrepWindow		Avbryt
+The unselected files will be removed from the list.	GrepWindow		De filene som ikke er merket vil bli fjernet fra listen.
+Set target…	GrepWindow		Sett mål...
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Vennligst velg filene du ønsker å ha valg for deg i Tracker.
+Open files in Pe	GrepWindow		Åpne filer i Pe
+Copy text to clipboard	GrepWindow		Kopier tekst til utklippstavle
+Settings	GrepWindow		Innstillinger
+Select all	GrepWindow		Merk alle
+OK	GrepWindow		OK
+Skip folders starting with a dot	GrepWindow		Hopp over mapper som starter med punktum
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME kunne ikke åpne én eller flere mapper.
+Escape search text	GrepWindow		Forlat søketekst
+Search	GrepWindow		Søk
+Open selection	GrepWindow		Åpne valgte
+Look in sub-folders	GrepWindow		Se i undermapper
+Actions	GrepWindow		Handlinger
+File	GrepWindow		Fil
+Encoding	GrepWindow		Koding
+History	GrepWindow		Historie
+%s: There was a problem running grep.	Grepper		%s: Det var et problem under kjøring av grep
+New window	GrepWindow		Nytt vindu
+Please select the files you wish to keep searching.	GrepWindow		Vennligst velg filene du ønsker å fortsette å søke gjennom.
+TextSearch	GrepWindow		Tekstsøk
+Quit	GrepWindow		Avslutt
+Show files in Tracker	GrepWindow		Vis filer i Tracker
+Case-sensitive	GrepWindow		Skill mellom store og små bokstaver
+Text files only	GrepWindow		Kun tekstfiler
+Show lines	GrepWindow		Vis linjer

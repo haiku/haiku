@@ -1,1 +1,12 @@
-1	polish	x-vnd.Haiku-HPGSTranslator	0
+1	polish	x-vnd.Haiku-HPGSTranslator	3633584048
+Based on HPGS (http://hpgs.berlios.de)	ConfigView		Oparte o HPGS (http://hpgs.berlios.de)
+Version %d.%d.%d, %s	ConfigView		Wersja %d.%d.%d, %s
+Error: Cannot process plot data %s\n	HPGSTranslator		Błąd: Nie można przetworzyć danych wykresu %s\n
+HPGS image	HPGSTranslator		Obraz HPGS
+HPGSTranslator Settings	ConfigView		Ustawienia translatora HPGS
+Error: Cannot imbue plot device to reader: %s\n	HPGSTranslator		Błąd: Nie można nasycić urządzenia kreślenia do czytnika: %s\n
+HPGS images	ConfigView		Obrazy HPGS
+HPGS images	HPGSTranslator		Obrazy HPGS
+no hpgs\n	HPGSTranslator		brak hpgs\n
+HPGS image translator	HPGSTranslator		Translator obrazów HPGS
+Write error %s\n	HPGSTranslator		Błąd zapisu %s\n

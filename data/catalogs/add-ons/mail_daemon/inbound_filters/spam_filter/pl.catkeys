@@ -1,0 +1,9 @@
+1	polish	x-vnd.Haiku-SpamFilter	1975155212
+or empty e-mail	SpamFilterConfig		lub pusty e-mail
+Spam Filter (AGMS Bayesian)	SpamFilter		Filtr spamu (AGMS Bayesian)
+Genuine below and uncertain above:	SpamFilterConfig		Oryginalny poniżej i niepewne powyżej:
+Spam above:	SpamFilterConfig		Spam powyżej:
+Add spam rating to start of subject	SpamFilterConfig		Dodaj ocenę spamu na początek tytyłu
+Learn from all incoming e-mail	SpamFilterConfig		Ucz się ze wszystkich przychodzących wiadomości
+Sorry, unable to launch the spamdbm program to let you edit the server settings.	SpamFilterConfig		Przepraszamy, nie udało się uruchomić programu spamdbm, aby pozwolić na edycję ustawień serwera.
+Close	SpamFilterConfig		Zamknij

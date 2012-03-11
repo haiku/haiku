@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be.ChartDemo	557376150
+1	finnish	x-vnd.Be.ChartDemo	986636897
 Slow rotation	ChartWindow		Hidas kierto
 Pink	ChartWindow		Vaaleanpunainen
 Comet	ChartWindow		Komeetta
@@ -9,6 +9,7 @@ Blue	ChartWindow		Sininen
 Colors	ChartWindow		Värit
 Novas	ChartWindow		Novat
 LineArray	ChartWindow		LineArray
+ 0.6 f/s  (logarythmic scale)	ChartWindow		0,6 f/s (logaritminen skaala)
 Free motion	ChartWindow		Vapaa liike
 (high) 100% 	ChartWindow		(korkea) 100 %
 Green	ChartWindow		Vihreä
@@ -20,6 +21,7 @@ Chaos	ChartWindow		Kaaos
 Full screen	ChartWindow		Kokoruutu
 Spiral	ChartWindow		Spiraali
 Slow motion	ChartWindow		Hidas liike
+ 5% (low)	ChartWindow		5 % (alhainen)
 Fast motion	ChartWindow		Nopea liike
 Special	ChartWindow		Erityinen
 Status	ChartWindow		Tila

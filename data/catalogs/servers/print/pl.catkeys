@@ -45,7 +45,7 @@ Print setup	ConfigWindow		Ustawienia wydruku
 A1	ConfigWindow	ISO 216 paper size	A1
 Retrieve a specific transport	PrintServerApp Scripting		Odzyskaj konkretny transport
 Get name of printer	Printer Scripting		Pokaż nazwę drukarki
-A3	ConfigWindow	ISO 216 paper size	A3 
+A3	ConfigWindow	ISO 216 paper size	A3
 Get name of transport	Transport Scripting		Pokaż nazwę transportu
 A5	ConfigWindow	ISO 216 paper size	A5
 Would you like to make @ the default printer?	PrintServerApp		Czy chcesz ustawić @ jako drukarkę domyslną?

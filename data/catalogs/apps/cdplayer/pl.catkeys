@@ -5,7 +5,7 @@ Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		Dysk: %ld:%.2ld / %ld:%.2ld
 OK	CDPlayer		OK
 Track %whichTrack%: %trackAt%	CDPlayer		Ścieżka %whichTrack%: %trackAt%
 Audio CD	CDPlayer		Audio CD
-It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Prawdopodobnie w komputerze nie ma napędu CD lub nie ma oprogramowania do jego obsługi. Przepraszamy. 
+It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Prawdopodobnie w komputerze nie ma napędu CD lub nie ma oprogramowania do jego obsługi. Przepraszamy.
 Track: %ld:%.2ld / %ld:%.2ld	CDPlayer		Ścieżka: %ld:%.2ld / %ld:%.2ld
 Track: 88:88 / 88:88	CDPlayer		Ścieżka: 88:88 / 88:88
 Track: --:-- / --:--	CDPlayer		Ścieżka: --:-- / --:--

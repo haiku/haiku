@@ -1,24 +1,23 @@
-1	modern_greek	x-vnd.Haiku-DiskUsage	2324691237
-%a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
-%d file	Status View		%d αρχείο
-%d files	Status View		%d αρχεία
-9999.99 GB	Status View		9999.99 GB
-Created	Info Window		Δημιουργήθηκε
-DiskUsage	System name		Χρήση Δίσκου
-Free on %refName%	Scanner		Ελεύθερα στο %refName%
-Get Info	Pie View		Πάρε Πληροφορίες
+1	greek, modern (1453-)	x-vnd.Haiku-DiskUsage	3634416251
+Scanning %refName%	Scanner		Σάρωση %refName%
+Size	Info Window		Μέγεθος
+Rescan	Pie View		Σάρωσε Ξανά
+Rescan	Volume View		Σάρωσε Ξανά
+Outdated view	Pie View		Παλιά άποψη
 Kind	Info Window		Είδος
+file unavailable	Pie View		μη διαθέσιμο αρχείο
+no supporting apps	Pie View		καμιά υποστηριζόμενη εφαρμογή
+%d file	Status View		%d αρχείο
+Path	Info Window		Διαδρομή
+Scan	Status View		Σάρωση
+9999.99 GB	Status View		9999.99 GB
+file unavailable	Status View		μη διαθέσιμο αρχείο
+Get Info	Pie View		Πάρε Πληροφορίες
+DiskUsage	System name		Χρήση Δίσκου
+%d files	Status View		%d αρχεία
+Created	Info Window		Δημιουργήθηκε
 Modified	Info Window		Τροποποιήθηκε
 Open	Pie View		Άνοιγμα
 Open With	Pie View		Άνοιγμα Με
-Outdated view	Pie View		Παλιά άποψη
-Path	Info Window		Διαδρομή
-Rescan	Pie View		Σάρωσε Ξανά
-Rescan	Volume View		Σάρωσε Ξανά
-Scan	Status View		Σάρωση
-Scanning %refName%	Scanner		Σάρωση %refName%
-Size	Info Window		Μέγεθος
-file unavailable	Pie View		μη διαθέσιμο αρχείο
-file unavailable	Status View		μη διαθέσιμο αρχείο
-in %d files	Info Window		στα %d αρχεία
-no supporting apps	Pie View		καμιά υποστηριζόμενη εφαρμογή
+%a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
+Free on %refName%	Scanner		Ελεύθερα στο %refName%

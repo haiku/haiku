@@ -2754,17 +2754,17 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<uint32>(&index);
 
 			fLink.StartMessage(B_OK);
-			fDesktop->Lock();
+			fDesktop->LockSingleWindow();
 
 			// we're nice to our children (and also take the default case
 			// into account which asks for the current workspace)
 			if (index >= (uint32)kMaxWorkspaces)
 				index = fDesktop->CurrentWorkspace();
 
-			Workspace workspace(*fDesktop, index);
+			Workspace workspace(*fDesktop, index, true);
 			fLink.Attach<rgb_color>(workspace.Color());
 
-			fDesktop->Unlock();
+			fDesktop->UnlockSingleWindow();
 			fLink.Flush();
 			break;
 		}
@@ -2782,7 +2782,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (link.Read<bool>(&makeDefault) != B_OK)
 				break;
 
-			fDesktop->Lock();
+			fDesktop->LockAllWindows();
 
 			// we're nice to our children (and also take the default case
 			// into account which asks for the current workspace)
@@ -2792,7 +2792,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			Workspace workspace(*fDesktop, index);
 			workspace.SetColor(color, makeDefault);
 
-			fDesktop->Unlock();
+			fDesktop->UnlockAllWindows();
 			break;
 		}
 

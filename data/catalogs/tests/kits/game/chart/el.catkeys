@@ -1,42 +1,40 @@
-1	modern_greek	x-vnd.Be.ChartDemo	819116577
-(high) 100% 	ChartWindow		(ψηλά) 100%
-0.6 f/s  (logarythmic scale)	ChartWindow		0.6 f/s (λογαριθμική κλίμακα)
-2 threads	ChartWindow		2 τμήματα
-5% (low)	ChartWindow		5% (χαμηλά)
-600.0 f/s	ChartWindow		600.0 f/s
-Amas	ChartWindow		Σωρός
-Animation:	ChartWindow		Ζωηρότητα:
-Auto demo	ChartWindow		Αυτόματη επίδειξη
-Battle	ChartWindow		Μάχη
-Blue	ChartWindow		Μπλέ
-CPU load	ChartWindow		Φόρτωση CPU
-Chaos	ChartWindow		Χάος
-Chart	System name		Διάγραμμα
-Colors	ChartWindow		Χρώματα
+1	greek, modern (1453-)	x-vnd.Be.ChartDemo	557376150
+Slow rotation	ChartWindow		Αργή περιστροφή
+Pink	ChartWindow		Ρόζ
 Comet	ChartWindow		Κομήτης
 DirectWindow	ChartWindow		Απευθείας Παράθυρο
-Display:	ChartWindow		Οθόνη:
-DrawBitmap	ChartWindow		DrawBitmap
-Fast motion	ChartWindow		Γρήγορη κίνηση
-Frames/s	ChartWindow		Frames/s
-Free motion	ChartWindow		Ελεύθερη κίνηση
-Full screen	ChartWindow		Πλήρης οθόνη
-Green	ChartWindow		Πράσινο
-LineArray	ChartWindow		Γραμμή Array
-None	ChartWindow		Κανένα
-Novas	ChartWindow		Novas
-Off	ChartWindow		Εκτός
 Orange	ChartWindow		Πορτοκαλί
-Pink	ChartWindow		Ρόζ
-Red	ChartWindow		Κόκκινο
 Refresh rate	ChartWindow		Ρυθμός ανανέωσης
-Slow motion	ChartWindow		Αργή Κίνηση
-Slow rotation	ChartWindow		Αργή περιστροφή
-Space color	ChartWindow		Χρώμα διαστήματος
-Space:	ChartWindow		Διάστημα:
-Special	ChartWindow		Ειδικό
-Spiral	ChartWindow		Spiral
-Star density	ChartWindow		Πυκνώτητα αστέρων
-Status	ChartWindow		Κατάσταση
-White	ChartWindow		Λευκο
+Blue	ChartWindow		Μπλέ
+Colors	ChartWindow		Χρώματα
+Novas	ChartWindow		Novas
+LineArray	ChartWindow		Γραμμή Array
+Free motion	ChartWindow		Ελεύθερη κίνηση
+(high) 100% 	ChartWindow		(ψηλά) 100%
+Green	ChartWindow		Πράσινο
+Amas	ChartWindow		Σωρός
+2 threads	ChartWindow		2 τμήματα
 Yellow	ChartWindow		Κίτρινο
+Off	ChartWindow		Εκτός
+Chaos	ChartWindow		Χάος
+Full screen	ChartWindow		Πλήρης οθόνη
+Spiral	ChartWindow		Spiral
+Slow motion	ChartWindow		Αργή Κίνηση
+Fast motion	ChartWindow		Γρήγορη κίνηση
+Special	ChartWindow		Ειδικό
+Status	ChartWindow		Κατάσταση
+Star density	ChartWindow		Πυκνώτητα αστέρων
+600.0 f/s	ChartWindow		600.0 f/s
+Display:	ChartWindow		Οθόνη:
+Space color	ChartWindow		Χρώμα διαστήματος
+White	ChartWindow		Λευκο
+Chart	System name		Διάγραμμα
+Animation:	ChartWindow		Ζωηρότητα:
+Frames/s	ChartWindow		Frames/s
+Auto demo	ChartWindow		Αυτόματη επίδειξη
+CPU load	ChartWindow		Φόρτωση CPU
+DrawBitmap	ChartWindow		DrawBitmap
+Red	ChartWindow		Κόκκινο
+None	ChartWindow		Κανένα
+Battle	ChartWindow		Μάχη
+Space:	ChartWindow		Διάστημα:

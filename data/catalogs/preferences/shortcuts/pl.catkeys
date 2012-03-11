@@ -1,14 +1,14 @@
-1	polish	x-vnd.Haiku-Shortcuts	2965605727
+1	polish	x-vnd.Haiku-Shortcuts	621368175
 Error, NULL state description?\n	ShortcutsSpec		Błąd, brak opisu stanu?\n
 MoveMouse	ShortcutsSpec		MoveMouse
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Skróty nie mogły zapisać ustawienia klawiszy.
 Cancel	ShortcutsWindow		Anuluj
 InsertString	ShortcutsSpec		InsertString
-Append KeySet…	ShortcutsWindow		Dodaj KeySet...
+Append KeySet…	ShortcutsWindow		Dodaj KeySet…
 Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
 Key	ShortcutsWindow		Przycisk
-Open KeySet…	ShortcutsWindow		Otwórz KeySet....
+Open KeySet…	ShortcutsWindow		Otwórz KeySet…
 MouseUp	ShortcutsSpec		MouseUp
 Revert to saved	ShortcutsWindow		Cofnięto do zapisu
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
@@ -41,7 +41,7 @@ Application	ShortcutsWindow		Aplikacja
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 *Beep	ShortcutsWindow		*Beep
 *MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%
-Save KeySet as…	ShortcutsWindow		Zapisz KeySet jako...
+Save KeySet as…	ShortcutsWindow		Zapisz KeySet jako…
 Open	ShortcutsWindow		Otwórz
 Really quit without saving your changes?	ShortcutsWindow		Wyjść nie zapisując zmian?
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Skróty nie zdołały przetworzyć pliku Keyset!
@@ -49,3 +49,4 @@ Select	ShortcutsWindow		Wybierz
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Skróty nie zdołały zapisać pliku Keyset!
 Oh no	ShortcutsWindow		Och nie
 LaunchHandler	ShortcutsSpec		LaunchHandler
+Shortcuts	System name		Skróty klawiszowe

@@ -1,10 +1,10 @@
-1	norwegian_bokmål	x-vnd.Haiku-HPGSTranslator	3081638323
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-HPGSTranslator	3081638323
 Based on HPGS (http://hpgs.berlios.de)	ConfigView		Basert på HPGS (http://hpgs.berlios.de)
+Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
 HPGS image	HPGSTranslator		HPGS-bilde
-HPGS image translator	HPGSTranslator		HPGS-bildeoversetter
+HPGSTranslator Settings	ConfigView		HPGS-oversetterinnstillinger
 HPGS images	ConfigView		HPGS-bilder
 HPGS images	HPGSTranslator		HPGS-bilder
-HPGSTranslator Settings	ConfigView		HPGS-oversetterinnstillinger
-Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
-Write error %s\n	HPGSTranslator		Skriving feilet %s\n
 no hpgs\n	HPGSTranslator		ingen hpgs\n
+HPGS image translator	HPGSTranslator		HPGS-bildeoversetter
+Write error %s\n	HPGSTranslator		Skriving feilet %s\n

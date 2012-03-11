@@ -7,7 +7,7 @@ usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]      
 -d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\totwórz w <folder>\n
 %s not a valid option\n	FilePanelApp		%s nie jest prawidłową operacją\n
 short\tlong\tdescription\n	FilePanelApp		krótki\tdługi\topis\n
-%s: this option requires a parameter\n	FilePanelApp		%%s: ta opcja wymaga podania parametru\n
+%s: this option requires a parameter\n	FilePanelApp		%s: ta opcja wymaga podania parametru\n
 -l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tskorzystaj z wczytania FilePanel (domyślne)\n
 -f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tniezaimplementowane\n
 -s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tskorzystaj z zapisania FilePanel\n

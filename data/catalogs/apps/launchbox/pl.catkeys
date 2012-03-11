@@ -1,12 +1,13 @@
-1	polish	x-vnd.Haiku-LaunchBox	2733406748
+1	polish	x-vnd.Haiku-LaunchBox	3016105370
 New	LaunchBox		Nowy
-Set description…	LaunchBox		Ustaw opis...
+Set description…	LaunchBox		Ustaw opis…
 Vertical layout	LaunchBox		Układ pionowy
 OK	LaunchBox		OK
 Pad 1	LaunchBox		Pad 1
 last chance	LaunchBox		ostatnia szansa
 Quit	LaunchBox		Wyjdź
 Clear button	LaunchBox		Wyczyść przycisk
+LaunchBox	System name		LaunchBox
 Ignore double-click	LaunchBox		Ignoruj dwuklik
 Auto-raise	LaunchBox		Auto-raise
 Show on all workspaces	LaunchBox		Pokaż na wszystkich przestrzeniach roboczych
@@ -17,8 +18,14 @@ Bummer	LaunchBox		Bummer
 Cancel	LaunchBox		Anuluj
 Remove button	LaunchBox		Usuń przycisk
 Horizontal layout	LaunchBox		Układ poziomy
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nNie udało uruchomić się aplikacji z sygnaturą '%2'.\n\nBłąd:
+Failed to launch '%1'.\n\nError:	LaunchBox		Nie udało uruchomić się '%1'.\n\nBłąd:
 Name Panel	LaunchBox		Panel nazeweniczy
 Add button here	LaunchBox		Dodaj przycisk tutaj
+Description for '%3'	LaunchBox		Opis dla '%3'
+Settings	LaunchBox		Ustawienia
+Failed to launch 'something', error in Pad data.	LaunchBox		Nie udało uruchomić się "czegoś", błąd w danych Pad.
+Pad %1	LaunchBox		Pad %1
 Close	LaunchBox		Zamknij
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Błąd przy wysyłaniu komendy 'open folder' do Trackera.\n\nBłąd: 
 You can drag an icon here.	LaunchBox		Możesz upuścić ikonę w tym miejscu.

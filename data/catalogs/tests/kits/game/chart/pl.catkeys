@@ -1,23 +1,42 @@
-1	polish	x-vnd.Be.ChartDemo	2709059284
+1	polish	x-vnd.Be.ChartDemo	986636897
 Slow rotation	ChartWindow		Powolny obrót
 Pink	ChartWindow		Różowy
+Comet	ChartWindow		Kometa
+DirectWindow	ChartWindow		DirectWindow
 Orange	ChartWindow		Pomarańczowy
 Refresh rate	ChartWindow		Częstotliwość odświeżania
 Blue	ChartWindow		Niebieski
 Colors	ChartWindow		Kolory
+Novas	ChartWindow		Novas
+LineArray	ChartWindow		TablicaLinii
+ 0.6 f/s  (logarythmic scale)	ChartWindow		 0.6 f/s  (skala logarytmiczna)
+Free motion	ChartWindow		Swobodne poruszanie
+(high) 100% 	ChartWindow		(wysoki) 100% 
 Green	ChartWindow		Zielony
+Amas	ChartWindow		Amas
 2 threads	ChartWindow		2 wątki
 Yellow	ChartWindow		Żółty
 Off	ChartWindow		Wyłączony
 Chaos	ChartWindow		Chaos
 Full screen	ChartWindow		Pełny ekran
-Status	ChartWindow		Status
+Spiral	ChartWindow		Spirala
+Slow motion	ChartWindow		Zwolnione tempo
+ 5% (low)	ChartWindow		 5% (niski)
+Fast motion	ChartWindow		Szybkie poruszanie
+Special	ChartWindow		Specjalne
+Status	ChartWindow		Stan
+Star density	ChartWindow		Gęstość gwiazd
 600.0 f/s	ChartWindow		600.0 kl/s
+Display:	ChartWindow		Wyświetl:
+Space color	ChartWindow		Przestrzeń kolorów
 White	ChartWindow		Biały
 Chart	System name		Wykres
 Animation:	ChartWindow		Animacja:
 Frames/s	ChartWindow		Klatek/s
+Auto demo	ChartWindow		Auto demo
 CPU load	ChartWindow		Obciążenie CPU
+DrawBitmap	ChartWindow		DrawBitmap
 Red	ChartWindow		Czerwony
 None	ChartWindow		Brak
 Battle	ChartWindow		Bitwa
+Space:	ChartWindow		Przestrzeń:

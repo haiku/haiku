@@ -133,7 +133,7 @@ SYSTEM_ADD_ONS_TRANSLATORS = BMPTranslator EXRTranslator GIFTranslator
 SYSTEM_ADD_ONS_LOCALE_CATALOGS = <catalog-addon>zeta <catalog-addon>plaintext ;
 SYSTEM_ADD_ONS_MEDIA = cortex_audioadapter.media_addon
 	cortex_flanger.media_addon
-	dvb.media_addon
+	$(X86_ONLY)dvb.media_addon
 	hmulti_audio.media_addon
 	mixer.media_addon
 	opensound.media_addon

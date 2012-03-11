@@ -1,20 +1,20 @@
-1	modern_greek	x-vnd.Haiku-CPUFrequencyPref	3079996868
-CPU frequency status view	CPU Frequency View		Συχνότητα επεξεργαστή προβολή κατάστασης
-CPUFrequency	System name		Συχνότητα της CPU
-CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Συχνότητα Επεξεργαστή\n\tγράφτηκε από τον Clemens Zeidler\n\tΠνευματικά δικαιώματα 2009, Haiku, Inc.\n
-Defaults	Pref Window		Προεπιλογές
-Dynamic performance	Status view		Δυναμική επίδοση
-Dynamic stepping	CPU Frequency View		Δυναμικός βηματισμός
-High performance	Status view		Υψηλή επίδοση
-Install replicant into Deskbar	CPU Frequency View		Εγκατάσταση αντίγραφου στη Μπάρα εργασιών
-Integration time [ms]: 	CPU Frequency View		Χρόνος ολοκλήρωσης [ms]:
-Launching the CPU frequency preflet failed.\n\nError: 	Status view		Απέτυχε η εκκίνηση του preflet Συχνότητα επεξεργαστή.\n\nΣφάλμα:
-Low energy	Status view		Χαμηλή ενέργεια
+1	greek, modern (1453-)	x-vnd.Haiku-CPUFrequencyPref	3079996868
 Ok	Status view		Εντάξει
-Open Speedstep preferences…	Status view		Άνοιγμα προτιμήσεων Ταχύτητα βήματος
-Quit	Status view		Έξοδος
-Revert	Pref Window		Επαναφορά
+CPU frequency status view	CPU Frequency View		Συχνότητα επεξεργαστή προβολή κατάστασης
 Set state	Status view		Ορισμός κατάστασης
-Step up by CPU usage	Color Step View		Αύξηση με χρήση της CPU
+Defaults	Pref Window		Προεπιλογές
+Install replicant into Deskbar	CPU Frequency View		Εγκατάσταση αντίγραφου στη Μπάρα εργασιών
+Quit	Status view		Έξοδος
+High performance	Status view		Υψηλή επίδοση
 Stepping policy	CPU Frequency View		Πολιτική βηματισμού
+Dynamic performance	Status view		Δυναμική επίδοση
+Step up by CPU usage	Color Step View		Αύξηση με χρήση της CPU
+Dynamic stepping	CPU Frequency View		Δυναμικός βηματισμός
 Stepping policy: 	CPU Frequency View		Πολιτική βηματισμού:
+Integration time [ms]: 	CPU Frequency View		Χρόνος ολοκλήρωσης [ms]:
+Open Speedstep preferences…	Status view		Άνοιγμα προτιμήσεων Ταχύτητα βήματος
+Revert	Pref Window		Επαναφορά
+Low energy	Status view		Χαμηλή ενέργεια
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Απέτυχε η εκκίνηση του preflet Συχνότητα επεξεργαστή.\n\nΣφάλμα:
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Συχνότητα Επεξεργαστή\n\tγράφτηκε από τον Clemens Zeidler\n\tΠνευματικά δικαιώματα 2009, Haiku, Inc.\n
+CPUFrequency	System name		Συχνότητα της CPU

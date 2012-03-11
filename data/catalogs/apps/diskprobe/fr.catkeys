@@ -1,5 +1,5 @@
-1	french	x-vnd.Haiku-DiskProbe	2706202187
-File offset: 	ProbeView		Déplacement dans le fichier :
+1	french	x-vnd.Haiku-DiskProbe	2306672993
+File offset: 	ProbeView		Déplacement dans le fichier : 
 %ld (native)	ProbeView		%ld (natif)
 64 bit unsigned value:	TypeEditors		Valeur non signée sur 64 bits :
 Find again	ProbeView		Chercher encore
@@ -13,7 +13,7 @@ Attribute	ProbeView		Attribut
 Floating-point value:	TypeEditors		Valeur en virgule flottante :
 16 bit	TypeEditors		16 bits
 Attributes	ProbeView		Attributs
-Device offset: 	ProbeView		Déplacement dans le périphérique :
+Device offset: 	ProbeView		Déplacement dans le périphérique : 
 Selection	ProbeView		Sélection
 DiskProbe	System name		Sondeur Disque
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	quoi : '%.4s'\n\n
@@ -23,17 +23,17 @@ Boolean	TypeEditors	This is the type of editor	Booléen
 Paste	ProbeView		Coller
 PNG format	TypeEditors		Format PNG
 Font size	ProbeView		Taille de la police
-Attribute type: 	ProbeView		Type d'attribut :
+Attribute type: 	ProbeView		Type d'attribut : 
 Attribute	AttributeWindow		Attribut
 8 bit signed value:	TypeEditors		Valeur signée sur 8 bits :
 Number:	TypeEditors		Nombre :
 Save	ProbeView		Enregistrer
 Stop	ProbeView		Arrêt
 Number editor	TypeEditors		Éditeur de nombre
-Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexa
 No type editor available	AttributeWindow		Pas d'éditeur disponible pour ce type d'attribut
 Double precision floating-point value:	TypeEditors		Valeur en virgule flottante double précision :
-Device: 	ProbeView		Périphérique :
+Device: 	ProbeView		Périphérique : 
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Êtes-vous sûr de vouloir supprimer l'attribut « %s » du fichier « %s » ?\n\nVous ne pourrez pas annuler cette action.
 Text	TypeEditors	This is the type of editor	Texte
 8 bit unsigned value:	TypeEditors		Valeur non signée sur 8 bits :
@@ -56,9 +56,10 @@ Copy	ProbeView		Copier
 none	ProbeView	No attributes	aucun
 Boolean value:	TypeEditors		Valeur booléenne :
 32 bit size or status:	TypeEditors		Taille ou statut sur 32 bits :
-8 bit palette	TypeEditors		Palette 8 bits :
+8 bit palette	TypeEditors		Palette 8 bits
 Fit	ProbeView	Size of fonts, fits to available room	Utiliser l'espace
 Probe device	OpenWindow		Examiner le périphérique
+ (native)	ProbeView		 (natif)
 Unknown format	TypeEditors		Format inconnu
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Héxadécimal
 MIME type:	TypeEditors		Type MIME :
@@ -78,15 +79,15 @@ Flattened bitmap	TypeEditors		Matriciel plat
 Open file…	FileWindow		Ouvrir un fichier…
 Next	ProbeView		Suivant
 Close	FileWindow		Fermer
-Attribute: 	ProbeView		Attribut :
+Attribute: 	ProbeView		Attribut : 
 Remove from file	AttributeWindow		Supprimer du fichier
 Don't save	ProbeView		Ne pas sauvegarder
 Previous	ProbeView		Précédent
 64 bit signed value:	TypeEditors		Valeur signée sur 64 bits :
 Icon	TypeEditors		Icône
-Block: 	ProbeView		Bloc :
-Examine device:	OpenWindow		Examiner le périphérique
-Offset: 	ProbeView		Déplacement :
+Block: 	ProbeView		Bloc : 
+Examine device:	OpenWindow		Examiner le périphérique :
+Offset: 	ProbeView		Déplacement : 
 OK	ProbeView		OK
 Add	ProbeView		Ajouter
 Edit	ProbeView		Éditer
@@ -115,11 +116,11 @@ Mode:	FindWindow		Mode :
 Open device	FileWindow		Ouvrir le périphérique
 Could not find search string.	ProbeView		La chaîne recherchée n'a pas été trouvée.
 16 bit unsigned value:	TypeEditors		Valeur non signée sur 16 bits :
-Attribute offset: 	ProbeView		Offset dans l'attribut :
+Attribute offset: 	ProbeView		Déplacement dans l'attribut : 
 View	ProbeView	This is the last menubar item 'File Edit Block View'	Vue
 Redo	ProbeView		Rétablir
-File: 	ProbeView		Fichier :
-32 bit unsigned pointer:	TypeEditors		Pointeur non signé sur 32 bits:
+File: 	ProbeView		Fichier : 
+32 bit unsigned pointer:	TypeEditors		Pointeur non signé sur 32 bits :
 of 	ProbeView		sur 
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		L'écriture dans le fichier a échouée:\n%s\n\nToutes les modifications effectuées seront perdues lorsque vous quitterez l'application.
 32 bit	TypeEditors		32 bits

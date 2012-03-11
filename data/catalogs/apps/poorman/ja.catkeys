@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-PoorMan	1108606987
+1	japanese	x-vnd.Haiku-PoorMan	1267330937
 Website location	PoorMan		ウエブサイトの場所
 Error Server	PoorMan		サーバーエラー
 Settings…	PoorMan		設定…
@@ -24,13 +24,17 @@ Advanced	PoorMan		詳細設定
 OK	PoorMan		OK
 Status: Stopped	PoorMan		状況： 停止中
 Dir Created	PoorMan		ディレクトリが作成されました
+Log to file	PoorMan		ファイルにログを出力
 Quit	PoorMan		終了
 Hits: 0	PoorMan		ヒット: 0
 Save log console	PoorMan		ログコンソールを保存
 Edit	PoorMan		編集
+Create Log File	PoorMan		ログファイルの作成
+Log to console	PoorMan		コンソールにログを出力
 Directory: (none)	PoorMan		ディレクトリ: (無し)
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Web に公開するフォルダーを選択してください。\n\nPoorMan にデフォルトの \"public_html\" をホームフォルダー中に作成させることもできます。\nまたは、代わりにユーザーのフォルダーを指定することもできます。
 Log To Console	PoorMan		コンソールにログを出力
+Connections	PoorMan		接続
 Status: Running	PoorMan		状況： 実行中
 connections	PoorMan		接続
 Controls	PoorMan		コントロール
@@ -38,6 +42,7 @@ Send file listing if there's no start page	PoorMan		スタートページがな�
 Error Dir	PoorMan		ディレクトリエラー
 Select all	PoorMan		すべて選択
 File	PoorMan		ファイル
+File Logging	PoorMan		ファイルロギング
 Save console selections as…	PoorMan		コンソールの選択部を保存…
 File logging	PoorMan		ファイルロギング
 Select web folder	PoorMan		選択
@@ -53,7 +58,9 @@ Create log file	PoorMan		作成
 Starting up... 	PoorMan		起動中です…
 Site	PoorMan		サイト
 Cancel	PoorMan		中止
+Console logging	PoorMan		コンソールロギング
 Cannot start the server	PoorMan		サーバーを開始できません
 Select	PoorMan		選択
 Save console as…	PoorMan		コンソールを別名で保存…
+PoorMan	System name		PoorMan
 Console Logging	PoorMan		コンソールロギング

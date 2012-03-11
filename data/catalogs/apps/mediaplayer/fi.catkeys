@@ -1,38 +1,51 @@
-1	finnish	x-vnd.Haiku-MediaPlayer	138551800
+1	finnish	x-vnd.Haiku-MediaPlayer	1233225587
+raw audio	MediaPlayer-InfoWin		Raakaääni
+Location	MediaPlayer-InfoWin		Sijainti
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikkalainen)
+%d kHz	MediaPlayer-InfoWin		%d kHz
 Stream settings	MediaPlayer-Main		Virta-asetukset
 <unknown>	PlaylistItem-album		<tuntematon>
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Tiedostoa ’%filename’ ei voitu avata.\n\n
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Skaalausohjaimet kokonäyttötilassa
+Video	MediaPlayer-InfoWin		Video
 Subtitle size:	MediaPlayer-SettingsWindow		Aliotsikkokoko:
 Save Playlist	MediaPlayer-PlaylistWindow		Tallenna soittoluettelo
+<no media>	MediaPlayer-InfoWin		<ei mediaa>
+(not supported)	MediaPlayer-InfoWin		(ei ole tuettu)
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Mikään tiedostoista, jotka olisit halunnut soittaa, ei näytä olevan mediatiedostoja.
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Soittoluettelon tallentaminen epäonnistui.\n\nVirhe:
 New player…	MediaPlayer-Main		Uusi soitin...
 100% scale	MediaPlayer-Main		100 % skaala
 Subtitle placement:	MediaPlayer-SettingsWindow		Aliotsikon sijainti:
 Close	MediaPlayer-Main		Sulje
+Display Mode	MediaPlayer-InfoWin		Näyttötila
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Joitakin tiedostoja ei voitu siirtää roskakoriin.
+<unknown>	MediaPlayer-InfoWin		<tuntematon>
 Open	MediaPlayer-Main		Avaa
 Next	MediaPlayer-Main		Seuraava
 OK	MediaPlayer-SettingsWindow		Valmis
 Track %d	MediaPlayer-Main		Kappale %d
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
+Display mode	MediaPlayer-InfoWin		Näyttötila
 Medium	MediaPlayer-SettingsWindow		Media
 Close	MediaPlayer-PlaylistWindow		Sulje
+Stereo	MediaPlayer-InfoWin		Stereo
 Open…	MediaPlayer-PlaylistWindow		Avaa...
 Toggle mute.	MediaPlayer-Main		Vuorottele mykistystilaa
 Undo	MediaPlayer-PlaylistWindow		Peru
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Käytä laitteistovideokerrostusta, jos se on käytettävissä
 File info…	MediaPlayer-Main		Tiedostotiedot...
 Pause playback.	MediaPlayer-Main		Tauota toisto.
+Overlay	MediaPlayer-InfoWin		Kerrostus
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Poista kappale
 Close window after playing audio	MediaPlayer-SettingsWindow		Sulje ikkuna äänitiedoston soittamisen jälkeen
 Full volume	MediaPlayer-SettingsWindow		Täysi äänenvoimakkuus
 Drop files to play	MediaPlayer-Main		Pudota soitettavat tiedostot
 TogglePlaying	MediaPlayer-Main		Vuorottele soittamista
+Copyright	MediaPlayer-InfoWin		Copyright
 Cancel	MediaPlayer-SettingsWindow		Peru
 Loop audio	MediaPlayer-SettingsWindow		Äänitiedostosilmukka
+Container	MediaPlayer-InfoWin		Säiliö
 Nothing to Play	MediaPlayer-Main		Ei mitään soitettavaa
 Muted	MediaPlayer-SettingsWindow		Mykistetty
 Quit	MediaPlayer-Main		Poistu
@@ -41,6 +54,7 @@ Start playing.	MediaPlayer-Main		Aloita soittaminen
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Tätä tiedostomuotoa käsittelevää dekooderia ei ole asennettu, tai dekooderilla on vaikeuksia tietyn muotoversion kanssa.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Tuo kappale
 Gets the URI of the currently playing item.	MediaPlayer-Main		Hakee parhaillaan soitettavan kappaleen Internet-resurssin tunnusosoitetta.
+%d Channels	MediaPlayer-InfoWin		%d kanavaa
 400% scale	MediaPlayer-Main		400 % skaala
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Soittoluettelo tallentaminen epäonnistui:\n\nVirhe:
 Move Entries	MediaPlayer-MovePLItemsCmd		Siirrä kappaleita
@@ -48,14 +62,17 @@ Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Siirrä roskakoriin
 Audio	MediaPlayer-Main		Ääni
 Open Playlist	MediaPlayer-PlaylistWindow		Avaa soittoluettelo
 MediaPlayer	System name		Mediasoitin
+%f fps	MediaPlayer-InfoWin		%f fps
 OK	MediaPlayer-Main		Valmis
 Settings…	MediaPlayer-Main		Asetukset...
 MediaPlayer settings	MediaPlayer-SettingsWindow		Mediasoitinasetukset
+h	MediaPlayer-InfoWin	Hours	h
 Select all	MediaPlayer-PlaylistWindow		Valitse kaikki
 Move Entry	MediaPlayer-MovePLItemsCmd		Siirrä kappale
 Open	MediaPlayer-PlaylistWindow		Avaa
 Stop playing.	MediaPlayer-Main		Lopeta soittaminen.
 Error: 	MediaPlayer-RemovePLItemsCmd		Virhe:
+Audio	MediaPlayer-InfoWin		Ääni
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Sisäinen virhe (vääränmuotoinen viesti). Soittoluettelon tallentaminen epäonnistui.
 Skip to the previous track.	MediaPlayer-Main		Hyppää edellisen kappaleen yli
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% kohtasi sisäisen virheen. Tiedostoa ei kyetty avaamaan.
@@ -82,17 +99,22 @@ Attributes	MediaPlayer-Main		Attribuutit
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Kaikkia tiedostoja ei voitu siirtää roskakoriin.
 <untitled>	PlaylistItem-title		<otsikoton>
 Track	Audio Track Menu		Kappale
+unknown format	MediaPlayer-InfoWin		tuntematon muoto
 <nothing to redo>	MediaPlayer-PlaylistWindow		<ei mitään uudelleensuoritettavaa>
 Skip to the next track.	MediaPlayer-Main		Hyppää seuraavan kappaleen yli.
 Play	MediaPlayer-Main		Soita
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Siirrä kappaleita roskakoriin
 200% scale	MediaPlayer-Main		200 % skaala
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Näyttää kuin mediapalvelin ei olisi käynnisssä.\nHaluaisitko käynnistää sen ?
+Duration	MediaPlayer-InfoWin		Kesto
 Aspect ratio	MediaPlayer-Main		Kuvasuhde
 Error: 	MediaPlayer-Main		Virhe:
 Large	MediaPlayer-SettingsWindow		Laaja
 Bottom of video	MediaPlayer-SettingsWindow		Videon alareuna
+DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
 Stop	MediaPlayer-Main		Pysäytä
+<unnamed media>	MediaPlayer-InfoWin		<nimeämätön media>
+raw video	MediaPlayer-InfoWin		raakavideo
 Volume of background clips	MediaPlayer-SettingsWindow		Taustavideoleikkeen voimakkuus
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Sisäinen virhe (muisti loppui). Soittoluettelon tallentaminen epäonnistui.
 Hide interface	MediaPlayer-Main		Piilota käyttöliittymä
@@ -102,6 +124,8 @@ Move file to Trash	MediaPlayer-PlaylistWindow		Siirrä tiedosto roskakoriin
 URI	MediaPlayer-Main		Internet-resurssin tunnus
 Mute	MediaPlayer-Main		Mykistä
 Toggle pause/play.	MediaPlayer-Main		Vuorottele tauko/soita -tiloja.
+Haiku Media Kit: 	MediaPlayer-InfoWin		Haiku Media Kit: 
+min	MediaPlayer-InfoWin	Minutes	min
 Small	MediaPlayer-SettingsWindow		Pieni
 Randomize	MediaPlayer-PlaylistWindow		Satunnaista
 Off	Subtitles menu		Pois päältä
@@ -123,7 +147,9 @@ Always on top	MediaPlayer-Main		Aina päällimmäisenä
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Poista kappale roskakoriin
 Save	MediaPlayer-Main		Tallenna
 <nothing to undo>	MediaPlayer-PlaylistWindow		<ei mitään tehtävää>
+Mono	MediaPlayer-InfoWin		Mono
 Save	MediaPlayer-PlaylistWindow		Tallenna
+%d Bit	MediaPlayer-InfoWin		%d-bittinen
 Remove	MediaPlayer-PlaylistWindow		Poista
 Full screen	MediaPlayer-Main		Kokoruutunäyttö
 Open file…	MediaPlayer-Main		Avaa tiedosto...
@@ -134,4 +160,3 @@ Rating	MediaPlayer-Main		Aset arvosana
 Playlist	MediaPlayer-PlaylistWindow		Soittoluettelo
 Lock Peaks	MediaPlayer-PeakView		Lukitse huiput
 Low volume	MediaPlayer-SettingsWindow		Alenna äänenvoimakkuutta
-File Info	MediaPlayer-InfoWin		Tiedostotiedot

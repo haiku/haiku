@@ -1,167 +1,167 @@
-1	norwegian_bokmål	x-vnd.haiku-icon_o_matic	209862233
-<modify path>	Icon-O-Matic-PathCmd		<endre sti>
-<nothing to redo>	Icon-O-Matic-Menu-Edit		<ingenting å omgjøre>
-<nothing to undo>	Icon-O-Matic-Menu-Edit		<ingenting å angre på>
-<unavailable>	Icon-O-Matic-StyleTypes		<utilgjengelig>
-<unkown property>	Icon-O-Matic-PropertyNames		<ukjent egenskap>
-Add	Icon-O-Matic-PathsList		Legg til
-Add	Icon-O-Matic-StylesList		Legg til
-Add	Icon-O-Matic-TransformersList		Legg til
-Add Control Point	Icon-O-Matic-AddPointCmd		Legg til kontrollpunkt
-Add Path	Icon-O-Matic-AddPathsCmd		Legg til sti
-Add Paths	Icon-O-Matic-AddPathsCmd		Legg til stier
-Add Shape	Icon-O-Matic-AddShapesCmd		Legg til form
-Add Shapes	Icon-O-Matic-AddShapesCmd		Legg til former
+1	bokmål, norwegian; norwegian bokmål	x-vnd.haiku-icon_o_matic	209862233
+Select All	Icon-O-Matic-PathManipulator		Velg alle
 Add Style	Icon-O-Matic-AddStylesCmd		Legg til stil
-Add Styles	Icon-O-Matic-AddStylesCmd		Legg til stiler
-Add Transformer	Icon-O-Matic-AddTransformersCmd		Legg til omformer
-Add Transformers	Icon-O-Matic-AddTransformersCmd		Legg til omformer
-Add circle	Icon-O-Matic-PathsList		Legg til sirkel
-Add empty	Icon-O-Matic-ShapesList		Legg til tom
-Add rect	Icon-O-Matic-PathsList		Legg til rektangel
-Add shape with path	Icon-O-Matic-Menu-Shape		Legg til form med sti
-Add shape with path & style	Icon-O-Matic-Menu-Shape		Legg til form med sti & stil
-Add shape with style	Icon-O-Matic-Menu-Shape		Legg til form med stil
-Add with path	Icon-O-Matic-ShapesList		Legg til med sti
-Add with path & style	Icon-O-Matic-ShapesList		Legg til med sti & stil
-Add with style	Icon-O-Matic-ShapesList		Legg til med stil
-All	Icon-O-Matic-Properties		Alle
-Append…	Icon-O-Matic-Menu-File		Bruk...
-Assign Paths	Icon-O-Matic-AddPathsCmd		Bruk stier
-Assign Style	Icon-O-Matic-AssignStyleCmd		Bruk stil
-BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON-atributt
-Bleep!	Exporter - Continue in error dialog		Bip!
-Bummer	Cancel button - error alert		Synd
-Cancel	Icon-O-Matic-ColorPicker		Avbryt
-Cancel	Icon-O-Matic-SVGExport		Avbryt
-Change Color	Icon-O-Matic-SetColorCmd		Endre farge
-Clean up	Icon-O-Matic-PathsList		Rydd opp
-Click on a shape above	Empty transformers list - 1st line		Klikk på en form ovenfor
-Click on an object in	Empty property list - 1st line		Klikk på et objekt i
-Closed	Icon-O-Matic-PropertyNames		Lukket
-Color	Icon-O-Matic-PropertyNames		Farge
-Color	Icon-O-Matic-StyleTypes		Farge
-Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Farge (#%02x%02x%02x)
 Color (#%02x%02x%02x)	Style name after dropping a color		Farge (#%02x%02x%02x)
-Conic	Icon-O-Matic-StyleTypes		Kjeglesnitt
-Contour	Transformation		Kontur
-Copy	Icon-O-Matic-Properties		Kopier
-Diamond	Icon-O-Matic-StyleTypes		Diamant
-Duplicate	Icon-O-Matic-PathsList		Dupliser
-Duplicate	Icon-O-Matic-ShapesList		Dupliser
-Duplicate	Icon-O-Matic-StylesList		Dupliser
-Edit	Icon-O-Matic-Menus		Rediger
-Edit Gradient	Icon-O-Matic-SetGradientCmd		Endre gradient
-Error: 	Icon-O-Matic-Exporter		Feil:
-Error: 	Icon-O-Matic-Main		Feil:
-Export	Icon-O-Matic-Menu-File		Eksporter
-Export Icon	Dialog title		Eksporter ikon
-Export as…	Icon-O-Matic-Menu-File		Eksporter som...
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Klarte ikke å åpne filen '%s' som et SVG-dokument.\n\nFeilmelding: %s
-File	Icon-O-Matic-Menus		Fil
-Flip	Icon-O-Matic-PathManipulator		Flipp
-Flip Control Point	Icon-O-Matic-FlipPointsCmd		Vend kontrollpunkt
-Format	Icon-O-Matic-SavePanel		Format
-Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Frys form
-Gradient	Icon-O-Matic-StyleTypes		Gradient
-Gradient type	Icon-O-Matic-StyleTypes		Gradient-type
-HVIF Source Code	Icon-O-Matic-SavePanel		HVIF-kildekode
-Height	Icon-O-Matic-PropertyNames		Høyde
-Icon-O-Matic	System name		Icon-O-Matic
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Det kan være Icon-O-Matic ikke fikk tolket alle data fra SVG når den ble lastet. Ved å overskrive den orginale filen, vil denne informasjonen bli tapt.
-Insert Control Point	Icon-O-Matic-InsertPointCmd		Sett inn kontrollpunkt
-Linear	Icon-O-Matic-StyleTypes		Linær
-META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON-atributt
-Modify Control Point	Icon-O-Matic-ChangePointCmd		Endre kontrollpunkt
-Move	Icon-O-Matic-TransformationBoxStates		Flytt
-Move Path	Icon-O-Matic-MovePathsCmd		Flytt sti
-Move Paths	Icon-O-Matic-MovePathsCmd		Flytt stier
-Move Pivot	Icon-O-Matic-TransformationBoxStates		Flytt midtpunkt
+Add	Icon-O-Matic-StylesList		Legg til
 Move Shape	Icon-O-Matic-MoveShapesCommand		Flytt form
-Move Shapes	Icon-O-Matic-MoveShapesCommand		Flytt former
-Move Style	Icon-O-Matic-MoveStylesCmd		Flytt stil
-Move Styles	Icon-O-Matic-MoveStylesCmd		Flytt stiler
-Move Transformer	Icon-O-Matic-MoveTransformersCmd		Flytt omformer
-Move Transformers	Icon-O-Matic-MoveTransformersCmd		Flytt omformere
-Multi Paste Properties	Icon-O-Matic-Properties		Lim inn flere egenskaper
-Multi paste	Icon-O-Matic-Properties		Lim inn flere
-Name	Icon-O-Matic-PropertyNames		Navn
-New	Icon-O-Matic-Menu-File		Ny
-No	Icon-O-Matic-StyledTextImport		Nei
-None	Icon-O-Matic-Properties		Ingen
-OK	Icon-O-Matic-ColorPicker		OK
-OK	Icon-O-Matic-SVGImport		OK
-Opacity	Icon-O-Matic-PropertyNames		Gjennomsiktighet
 Opening the document failed!	Icon-O-Matic-Main		Åpning av dokument mislyktes!
+Reset transformation	Icon-O-Matic-ShapesList		Tilbakestill omforming
+Move Paths	Icon-O-Matic-MovePathsCmd		Flytt stier
+None	Icon-O-Matic-Properties		Ingen
+New	Icon-O-Matic-Menu-File		Ny
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Det kan være Icon-O-Matic ikke fikk tolket alle data fra SVG når den ble lastet. Ved å overskrive den orginale filen, vil denne informasjonen bli tapt.
+Paste Properties	Icon-O-Matic-Properties		Lim inn egenskaper
+Save Icon	Dialog title		Lagre ikon
+Closed	Icon-O-Matic-PropertyNames		Lukket
+Remove Path	Icon-O-Matic-RemovePathsCmd		Fjern sti
+Add shape with path	Icon-O-Matic-Menu-Shape		Legg til form med sti
+Select	Icon-O-Matic-Properties		Velg
+Height	Icon-O-Matic-PropertyNames		Høyde
+Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Fjern omformere
+Width	Icon-O-Matic-PropertyNames		Bredde
+Transformation	Icon-O-Matic-TransformationBoxStates		Omforming
+Duplicate	Icon-O-Matic-ShapesList		Dupliser
+<unkown property>	Icon-O-Matic-PropertyNames		<ukjent egenskap>
+Linear	Icon-O-Matic-StyleTypes		Linær
+Move	Icon-O-Matic-TransformationBoxStates		Flytt
+warning	Icon-O-Matic-SVGExport		advarsel
+Copy	Icon-O-Matic-Properties		Kopier
+OK	Icon-O-Matic-ColorPicker		OK
+Remove Control Point	Icon-O-Matic-RemovePointsCmd		Fjern kontrollpunkt
+Bleep!	Exporter - Continue in error dialog		Bip!
+Add circle	Icon-O-Matic-PathsList		Legg til sirkel
+Shorten	Icon-O-Matic-PropertyNames		Forkort
+bad news	Title of error alert		dårlige nyheter
+Remove Paths	Icon-O-Matic-RemovePathsCmd		Fjern stier
+Scale Y	Icon-O-Matic-PropertyNames		Skaler Y
+Add Control Point	Icon-O-Matic-AddPointCmd		Legg til kontrollpunkt
+Save as…	Icon-O-Matic-Menu-File		Lagre som...
+Change Color	Icon-O-Matic-SetColorCmd		Endre farge
+Style	Icon-O-Matic-Menus		Stil
+<modify path>	Icon-O-Matic-PathCmd		<endre sti>
 Opening the icon failed!	Icon-O-Matic-Main		Åpning av ikonet mislyktes!
+Error: 	Icon-O-Matic-Main		Feil:
+Name	Icon-O-Matic-PropertyNames		Navn
+bad news	Icon-O-Matic-Exporter		dårlige nyheter
+<nothing to undo>	Icon-O-Matic-Menu-Edit		<ingenting å angre på>
+Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Frys form
+PNG Set	Icon-O-Matic-SavePanel		PNG-sett
+Remove Style	Icon-O-Matic-RemoveStylesCmd		Fjern stil
+Scale X	Icon-O-Matic-PropertyNames		Skaler X
+Set 	Set (property name)		Sett
+Cancel	Icon-O-Matic-SVGExport		Avbryt
+Add shape with style	Icon-O-Matic-Menu-Shape		Legg til form med stil
+Remove Shape	Icon-O-Matic-RemoveShapesCmd		Fjern form
+Reverse	Icon-O-Matic-PathsList		Reverser
+HVIF Source Code	Icon-O-Matic-SavePanel		HVIF-kildekode
+Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Fjern omforminger
+All	Icon-O-Matic-Properties		Alle
+Multi Paste Properties	Icon-O-Matic-Properties		Lim inn flere egenskaper
+Undo	Icon-O-Matic-Main		Angre
+Click on a shape above	Empty transformers list - 1st line		Klikk på en form ovenfor
+Add Shape	Icon-O-Matic-AddShapesCmd		Legg til form
+Contour	Transformation		Kontur
+<nothing to redo>	Icon-O-Matic-Menu-Edit		<ingenting å omgjøre>
+Perspective	Transformation		Perspektiv
+Move Transformer	Icon-O-Matic-MoveTransformersCmd		Flytt omformer
+Opacity	Icon-O-Matic-PropertyNames		Gjennomsiktighet
+Add with path	Icon-O-Matic-ShapesList		Legg til med sti
+Gradient type	Icon-O-Matic-StyleTypes		Gradient-type
+Icon-O-Matic	System name		Icon-O-Matic
+Modify Control Point	Icon-O-Matic-ChangePointCmd		Endre kontrollpunkt
+Saving your document failed!	Icon-O-Matic-Exporter		Lagring av dokumentet mislyktes!
+edit it's properties here.	Empty property list - 3rd line		rediger dens egenskaper her
+Split	Icon-O-Matic-PathManipulator		Splitt
+Remove	Icon-O-Matic-StylesList		Fjern
+Add with path & style	Icon-O-Matic-ShapesList		Legg til med sti & stil
+META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON-atributt
+Rotate	Icon-O-Matic-TransformationBoxStates		Roter
+Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Fjern omformer
+Add Transformer	Icon-O-Matic-AddTransformersCmd		Legg til omformer
+Remove	Icon-O-Matic-PathsList		Fjern
+Pick a color	Icon-O-Matic-ColorPicker		Velg en farge
+Quit	Icon-O-Matic-Menu-File		Avslutt
+Export	Icon-O-Matic-Menu-File		Eksporter
+No	Icon-O-Matic-StyledTextImport		Nei
+Unassign Path	Icon-O-Matic-UnassignPathCmd		Fjern sti
+load error	Icon-O-Matic-SVGImport		lastefeil
+Move Shapes	Icon-O-Matic-MoveShapesCommand		Flytt former
+Remove Styles	Icon-O-Matic-RemoveStylesCmd		Fjern stiler
+The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		Teksten du prøver å importere er temmelig lang, er du sikker?
+Add	Icon-O-Matic-TransformersList		Legg til
+Export Icon	Dialog title		Eksporter ikon
+Color	Icon-O-Matic-StyleTypes		Farge
+Settings…	Icon-O-Matic-SavePanel		Innstillinger...
+Remove	Icon-O-Matic-PathManipulator		Fjern
+Radial	Icon-O-Matic-StyleTypes		Radial
+Perspective	Icon-O-Matic-TransformersList		Perspektiv
+Add shape with path & style	Icon-O-Matic-Menu-Shape		Legg til form med sti & stil
+Gradient	Icon-O-Matic-StyleTypes		Gradient
+BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON-atributt
+Export as…	Icon-O-Matic-Menu-File		Eksporter som...
+Click on an object in	Empty property list - 1st line		Klikk på et objekt i
+Move Transformers	Icon-O-Matic-MoveTransformersCmd		Flytt omformere
+Move Styles	Icon-O-Matic-MoveStylesCmd		Flytt stiler
+Reset transformation	Icon-O-Matic-StylesList		Tilbakestill omforminger
+Transformer	Icon-O-Matic-Menus		Omformer
+Flip	Icon-O-Matic-PathManipulator		Flipp
+Conic	Icon-O-Matic-StyleTypes		Kjeglesnitt
+Split Control Points	Icon-O-Matic-SplitPointsCmd		Splitt kontrollpunkter
+Add empty	Icon-O-Matic-ShapesList		Legg til tom
+Cancel	Icon-O-Matic-ColorPicker		Avbryt
+Paste	Icon-O-Matic-Properties		Lim inn
+Shape	Icon-O-Matic-Menus		Form
+Properties	Icon-O-Matic-Menus		Egenskaper
+Move Pivot	Icon-O-Matic-TransformationBoxStates		Flytt midtpunkt
+Path	Icon-O-Matic-Menus		Sti
+File	Icon-O-Matic-Menus		Fil
+Error: 	Icon-O-Matic-Exporter		Feil:
+Add Transformers	Icon-O-Matic-AddTransformersCmd		Legg til omformer
+Diamond	Icon-O-Matic-StyleTypes		Diamant
+Path	Icon-O-Matic-PropertyNames		Sti
+Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Klarte ikke å åpne filen '%s' som et SVG-dokument.\n\nFeilmelding: %s
+<unavailable>	Icon-O-Matic-StyleTypes		<utilgjengelig>
+Rotation	Icon-O-Matic-PropertyNames		Rotasjon
+Add with style	Icon-O-Matic-ShapesList		Legg til med stil
+Add	Icon-O-Matic-PathsList		Legg til
+Add Shapes	Icon-O-Matic-AddShapesCmd		Legg til former
+Move Style	Icon-O-Matic-MoveStylesCmd		Flytt stil
+Bummer	Cancel button - error alert		Synd
+Remove	Icon-O-Matic-ShapesList		Fjern
+Yes	Icon-O-Matic-StyledTextImport		Ja
+Transformation	Icon-O-Matic-TransformersList		Omforming
+Add Styles	Icon-O-Matic-AddStylesCmd		Legg til stiler
+Remove Control Points	Icon-O-Matic-RemovePointsCmd		Fjern kontrollpunkt
+Format	Icon-O-Matic-SavePanel		Format
+Add rect	Icon-O-Matic-PathsList		Legg til rektangel
+Edit	Icon-O-Matic-Menus		Rediger
+Duplicate	Icon-O-Matic-StylesList		Dupliser
+Transform	Icon-O-Matic-PathManipulator		Omform
+Add Paths	Icon-O-Matic-AddPathsCmd		Legg til stier
+Style type	Icon-O-Matic-StyleTypes		Stiltype
+too big	Icon-O-Matic-StyledTextImport		for stor
+Assign Style	Icon-O-Matic-AssignStyleCmd		Bruk stil
+Add Path	Icon-O-Matic-AddPathsCmd		Legg til sti
+Color	Icon-O-Matic-PropertyNames		Farge
+Insert Control Point	Icon-O-Matic-InsertPointCmd		Sett inn kontrollpunkt
+Flip Control Point	Icon-O-Matic-FlipPointsCmd		Vend kontrollpunkt
+Redo	Icon-O-Matic-Main		Tilbakestill
+Assign Paths	Icon-O-Matic-AddPathsCmd		Bruk stier
+OK	Icon-O-Matic-SVGImport		OK
+Multi paste	Icon-O-Matic-Properties		Lim inn flere
+to attach transformers.	Empty transformers list - 2nd line		for å legge til omformere
+Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Tilbakestill omforming
+Scale	Icon-O-Matic-TransformationBoxStates		Skaler
+Duplicate	Icon-O-Matic-PathsList		Dupliser
+Save	Icon-O-Matic-Menu-File		Lagre
+Append…	Icon-O-Matic-Menu-File		Bruk...
+Move Path	Icon-O-Matic-MovePathsCmd		Flytt sti
+Overwrite	Icon-O-Matic-SVGExport		Overskriv
+Split Control Point	Icon-O-Matic-SplitPointsCmd		Splitt kontrollpunkt
 Open…	Icon-O-Matic-Menu-File		Åpne...
 Options	Icon-O-Matic-Menus		Valg
-Overwrite	Icon-O-Matic-SVGExport		Overskriv
-PNG Set	Icon-O-Matic-SavePanel		PNG-sett
-Paste	Icon-O-Matic-Properties		Lim inn
-Paste Properties	Icon-O-Matic-Properties		Lim inn egenskaper
-Path	Icon-O-Matic-Menus		Sti
-Path	Icon-O-Matic-PropertyNames		Sti
-Perspective	Icon-O-Matic-TransformersList		Perspektiv
-Perspective	Transformation		Perspektiv
-Pick a color	Icon-O-Matic-ColorPicker		Velg en farge
-Properties	Icon-O-Matic-Menus		Egenskaper
-Quit	Icon-O-Matic-Menu-File		Avslutt
-Radial	Icon-O-Matic-StyleTypes		Radial
-Redo	Icon-O-Matic-Main		Tilbakestill
-Remove	Icon-O-Matic-PathManipulator		Fjern
-Remove	Icon-O-Matic-PathsList		Fjern
-Remove	Icon-O-Matic-ShapesList		Fjern
-Remove	Icon-O-Matic-StylesList		Fjern
-Remove Control Point	Icon-O-Matic-RemovePointsCmd		Fjern kontrollpunkt
-Remove Control Points	Icon-O-Matic-RemovePointsCmd		Fjern kontrollpunkt
-Remove Path	Icon-O-Matic-RemovePathsCmd		Fjern sti
-Remove Paths	Icon-O-Matic-RemovePathsCmd		Fjern stier
-Remove Shape	Icon-O-Matic-RemoveShapesCmd		Fjern form
-Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Fjern former
-Remove Style	Icon-O-Matic-RemoveStylesCmd		Fjern stil
-Remove Styles	Icon-O-Matic-RemoveStylesCmd		Fjern stiler
-Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Fjern omformer
-Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Fjern omformere
-Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Tilbakestill omforming
-Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Fjern omforminger
-Reset transformation	Icon-O-Matic-ShapesList		Tilbakestill omforming
-Reset transformation	Icon-O-Matic-StylesList		Tilbakestill omforminger
-Reverse	Icon-O-Matic-PathsList		Reverser
-Rotate	Icon-O-Matic-TransformationBoxStates		Roter
-Rotation	Icon-O-Matic-PropertyNames		Rotasjon
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Farge (#%02x%02x%02x)
+Edit Gradient	Icon-O-Matic-SetGradientCmd		Endre gradient
 Rounding	Icon-O-Matic-PropertyNames		Runding
-Save	Icon-O-Matic-Menu-File		Lagre
-Save Icon	Dialog title		Lagre ikon
-Save as…	Icon-O-Matic-Menu-File		Lagre som...
-Saving your document failed!	Icon-O-Matic-Exporter		Lagring av dokumentet mislyktes!
-Scale	Icon-O-Matic-TransformationBoxStates		Skaler
-Scale X	Icon-O-Matic-PropertyNames		Skaler X
-Scale Y	Icon-O-Matic-PropertyNames		Skaler Y
-Select	Icon-O-Matic-Properties		Velg
-Select All	Icon-O-Matic-PathManipulator		Velg alle
-Set 	Set (property name)		Sett
-Settings…	Icon-O-Matic-SavePanel		Innstillinger...
-Shape	Icon-O-Matic-Menus		Form
-Shorten	Icon-O-Matic-PropertyNames		Forkort
-Split	Icon-O-Matic-PathManipulator		Splitt
-Split Control Point	Icon-O-Matic-SplitPointsCmd		Splitt kontrollpunkt
-Split Control Points	Icon-O-Matic-SplitPointsCmd		Splitt kontrollpunkter
-Style	Icon-O-Matic-Menus		Stil
-Style type	Icon-O-Matic-StyleTypes		Stiltype
-The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		Teksten du prøver å importere er temmelig lang, er du sikker?
-Transform	Icon-O-Matic-PathManipulator		Omform
-Transformation	Icon-O-Matic-TransformationBoxStates		Omforming
-Transformation	Icon-O-Matic-TransformersList		Omforming
-Transformer	Icon-O-Matic-Menus		Omformer
-Unassign Path	Icon-O-Matic-UnassignPathCmd		Fjern sti
-Undo	Icon-O-Matic-Main		Angre
-Width	Icon-O-Matic-PropertyNames		Bredde
-Yes	Icon-O-Matic-StyledTextImport		Ja
-bad news	Icon-O-Matic-Exporter		dårlige nyheter
-bad news	Title of error alert		dårlige nyheter
-edit it's properties here.	Empty property list - 3rd line		rediger dens egenskaper her
-load error	Icon-O-Matic-SVGImport		lastefeil
-to attach transformers.	Empty transformers list - 2nd line		for å legge til omformere
-too big	Icon-O-Matic-StyledTextImport		for stor
-warning	Icon-O-Matic-SVGExport		advarsel
+Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Fjern former
+Clean up	Icon-O-Matic-PathsList		Rydd opp

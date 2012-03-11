@@ -1,11 +1,10 @@
-1	modern_greek	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
-(This team is a system component)	Team monitor		(This team is a system component)	 
-Cancel	Team monitor		Ακύρωση
-Force reboot	Team monitor		Εξαναγκαστική επανεκκίνηση
-If the application will not quit you may have to kill it.	Team monitor		If the application will not quit you may have to kill it.	
-
+1	greek, modern (1453-)	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
 Kill application	Team monitor		Σκότωμα διεργασίας
 Quit application	Team monitor		Κλείσημο εφαρμογής
-Restart the desktop	Team monitor		Επαννεκίνηση
 Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Επιλέξτε μια εφαρμογή από την παραπάνω λίστα και κάντε κλικ σε ένα από τα πλήκτρα 'Τερματισμός εφαρμογής' και 'Έξοδος εφαρμογής' με σκοπό να την κλείσετε.\n\nΚρατήστε πατημένα τα CONTROL+ALT+DELETE για %ld δευτερόλεπτα για να γίνει επανεκκίνηση.
+If the application will not quit you may have to kill it.	Team monitor		If the application will not quit you may have to kill it.
+Force reboot	Team monitor		Εξαναγκαστική επανεκκίνηση
 Team monitor	Team monitor		Οθόνη ομάδας
+(This team is a system component)	Team monitor		(This team is a system component)
+Restart the desktop	Team monitor		Επαννεκίνηση
+Cancel	Team monitor		Ακύρωση

@@ -48,7 +48,7 @@ Get name of printer	Printer Scripting		Obtenir le nom de l'imprimante
 A3	ConfigWindow	ISO 216 paper size	A3
 Get name of transport	Transport Scripting		Obtenir le nom de la liaison
 A5	ConfigWindow	ISO 216 paper size	A5
-Would you like to make @ the default printer?	PrintServerApp		Voudriez-vous faire de @, l'imprimante par défaut ?
+Would you like to make @ the default printer?	PrintServerApp		Voulez-vous faire de @, l'imprimante par défaut ?
 Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloïd
 Page setup	ConfigWindow		Mise en page
 Paper setup:	ConfigWindow		Choix du papier :

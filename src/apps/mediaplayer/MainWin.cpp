@@ -156,6 +156,10 @@ static property_info sPropertyInfo[] = {
 		B_TRANSLATE("Gets the URI of the currently playing item."), 0,
 		{ B_STRING_TYPE }
 	},
+	{ B_TRANSLATE("ToggleFullscreen"), { B_EXECUTE_PROPERTY },
+		{ B_DIRECT_SPECIFIER, 0 },
+		B_TRANSLATE("Toggle fullscreen."), 0
+	},
 	{ 0, { 0 }, { 0 }, 0, 0 }
 };
 
@@ -531,6 +535,10 @@ MainWin::MessageReceived(BMessage* msg)
 					}
 					break;
 				}
+
+				case 9:
+					PostMessage(M_TOGGLE_FULLSCREEN);
+					break;
 
 				default:
 					return BWindow::MessageReceived(msg);
@@ -1243,6 +1251,7 @@ MainWin::ResolveSpecifier(BMessage* message, int32 index, BMessage* specifier,
 		case 6:
 		case 7:
 		case 8:
+		case 9:
 			return this;
 	}
 

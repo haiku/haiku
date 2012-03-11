@@ -1,88 +1,88 @@
-1	norwegian_bokmål	x-vnd.Haiku-Bluetooth	3550394259
-#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Ugyldig navn
-#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Ikke gyldig navn
-#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Ikke gyldig navn
-#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Ugyldig navn
-(reserved)	DeviceClass		(reservert)
-1-17% utilized	DeviceClass		1-17% i bruk
-17-33% utilized	DeviceClass		17-33% i bruk
-33-50% utilized	DeviceClass		33-50% i bruk
-50-67% utilized	DeviceClass		50-67% i bruk
-67-83% utilized	DeviceClass		67-83% i bruk
-83-99% utilized	DeviceClass		83-99% i bruk
-Audio	DeviceClass		Audio
-Audio/Video	DeviceClass		Audio/Video
-Camcorder	DeviceClass		Videokamera
-Camera	DeviceClass		Kamera
-Capturing	DeviceClass		Tar opp
-Car audio	DeviceClass		Bilstereo
-Card reader	DeviceClass		Kortleser
-Cellular	DeviceClass		Mobil
-Combo keyboard/pointing device	DeviceClass		Kombinert tastatur/pekeenhet
-Common ISDN access	DeviceClass		Vanlig ISDN-tilgang
-Computer	DeviceClass		Datamaskin
-Controller	DeviceClass		Kontroller
-Cordless	DeviceClass		Trådløs
-Desktop workstation	DeviceClass		Arbeidsstasjon
-Device conforms to the headset profile	DeviceClass		Enhet er kompatibel med hodetelefon-profilen
-Digitizer tablet	DeviceClass		Grafisk tablet
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Bluetooth	3550394259
 Display	DeviceClass		Skjerm
-Doll/Action figure	DeviceClass		Dukke/Actionfigur
-Fully available	DeviceClass		Fullt tilgjengelig
+Capturing	DeviceClass		Tar opp
+Printer	DeviceClass		Skriver
+Uncategorized	DeviceClass		Ukategorisert
+1-17% utilized	DeviceClass		1-17% i bruk
+Positioning	DeviceClass		Plassering
+Rendering	DeviceClass		Gjengivelse
+Phone	DeviceClass		Telefon
+17-33% utilized	DeviceClass		17-33% i bruk
+#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Ugyldig navn
+Combo keyboard/pointing device	DeviceClass		Kombinert tastatur/pekeenhet
+Controller	DeviceClass		Kontroller
+No service available	DeviceClass		Ingen tjeneste tilgjengelig
+Wearable	DeviceClass	A wearable computer	Datamaskin til å ha på kroppen
+Handheld	DeviceClass		Håndholdt
+Invalid device class!\n	DeviceClass		Ugyldig enhetstype!\n
+Sensing device	DeviceClass		Sensor
+Computer	DeviceClass		Datamaskin
+Cellular	DeviceClass		Mobil
+Microphone	DeviceClass		Mikrofon
+Unknown (reserved) minor device class	DeviceClass		Ukjent (reservert) liten enhetstype
+Cordless	DeviceClass		Trådløs
+Common ISDN access	DeviceClass		Vanlig ISDN-tilgang
+83-99% utilized	DeviceClass		83-99% i bruk
+Scanner	DeviceClass		Skanner
 Game	DeviceClass		Spill
 Gamepad	DeviceClass		Spillkontroll
-Gaming/Toy	DeviceClass		Spill/Leke
+(reserved)	DeviceClass		(reservert)
+Desktop workstation	DeviceClass		Arbeidsstasjon
+Audio/Video	DeviceClass		Audio/Video
 Glasses	DeviceClass		Briller
-Handheld	DeviceClass		Håndholdt
-Hands-free	DeviceClass		Hands-free
-Headphones	DeviceClass		Øretelefoner
-Helmet	DeviceClass		Hjelm
-HiFi audio device	DeviceClass		HiFi lydenhet
-Imaging	DeviceClass		Bildebehandling
-Information	DeviceClass		Informasjon
-Invalid device class!\n	DeviceClass		Ugyldig enhetstype!\n
-Jacket	DeviceClass		Omslag
-Joystick	DeviceClass		Joystick
 Keyboard	DeviceClass		Tastatur
-LAN access	DeviceClass		LAN-tilgang
-Laptop	DeviceClass		Bærbar datamaskin
-Loudspeaker	DeviceClass		Høyttaler
+Camera	DeviceClass		Kamera
 Major class: 	DeviceClass		Større klasse:
-Microphone	DeviceClass		Mikrofon
-Minor class: 	DeviceClass		Mindre klasse:
-Miscellaneous	DeviceClass		Diverse
-Networking	DeviceClass		Nettverk
-No service available	DeviceClass		Ingen tjeneste tilgjengelig
-Not implemented	RemoteDevice		Ikke implementert
-Object transfer	DeviceClass		Objektoverføring
-Pager	DeviceClass	A small radio device to receive short text messages	Personsøker
-Palm	DeviceClass	A palm-held device	Palm
-Peripheral	DeviceClass		Tilkoblet enhet
-Phone	DeviceClass		Telefon
-Pointing device	DeviceClass		Pekeenhet
-Portable audio	DeviceClass		Bærbar audio
-Positioning	DeviceClass		Plassering
-Printer	DeviceClass		Skriver
-Remote control	DeviceClass		Fjernkontroll
-Rendering	DeviceClass		Gjengivelse
-Robot	DeviceClass		Robot
-SIM card reader	DeviceClass		SIM-kortleser
-Scanner	DeviceClass		Skanner
-Sensing device	DeviceClass		Sensor
-Server	DeviceClass		Tjener
-Service classes: 	DeviceClass		Service-klasser:
+50-67% utilized	DeviceClass		50-67% i bruk
+Card reader	DeviceClass		Kortleser
 Set-top box	DeviceClass		TV-mottaker
+Helmet	DeviceClass		Hjelm
+Laptop	DeviceClass		Bærbar datamaskin
+Car audio	DeviceClass		Bilstereo
+SIM card reader	DeviceClass		SIM-kortleser
+Headphones	DeviceClass		Øretelefoner
+Information	DeviceClass		Informasjon
+Remote control	DeviceClass		Fjernkontroll
+Service classes: 	DeviceClass		Service-klasser:
+Pager	DeviceClass	A small radio device to receive short text messages	Personsøker
+Object transfer	DeviceClass		Objektoverføring
+Gaming/Toy	DeviceClass		Spill/Leke
+Audio	DeviceClass		Audio
+Robot	DeviceClass		Robot
+Camcorder	DeviceClass		Videokamera
+Digitizer tablet	DeviceClass		Grafisk tablet
+Loudspeaker	DeviceClass		Høyttaler
+Joystick	DeviceClass		Joystick
+LAN access	DeviceClass		LAN-tilgang
+Wrist watch	DeviceClass		Armbåndsur
+Minor class: 	DeviceClass		Mindre klasse:
+Networking	DeviceClass		Nettverk
+Portable audio	DeviceClass		Bærbar audio
+Device conforms to the headset profile	DeviceClass		Enhet er kompatibel med hodetelefon-profilen
+Hands-free	DeviceClass		Hands-free
+#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Ugyldig navn
+Vehicle	DeviceClass		Kjøretøy
+Palm	DeviceClass	A palm-held device	Palm
+Video display and loudspeaker	DeviceClass		Videofremviser og høyttaler
+Peripheral	DeviceClass		Tilkoblet enhet
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Ikke gyldig navn
+Wired modem or voice gateway	DeviceClass		Kablet modem eller lydport
+Jacket	DeviceClass		Omslag
+Unspecified	DeviceClass		Uspesifisert
+Fully available	DeviceClass		Fullt tilgjengelig
+67-83% utilized	DeviceClass		67-83% i bruk
+Not implemented	RemoteDevice		Ikke implementert
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Ikke gyldig navn
+Server	DeviceClass		Tjener
+Video conferencing	DeviceClass		Videokonferanse
+Video camera	DeviceClass		Videokamera
+HiFi audio device	DeviceClass		HiFi lydenhet
 Smart phone	DeviceClass		Smarttelefon
 Telephony	DeviceClass		Telefoni
-Uncategorized	DeviceClass		Ukategorisert
-Unknown (reserved) minor device class	DeviceClass		Ukjent (reservert) liten enhetstype
-Unspecified	DeviceClass		Uspesifisert
+Doll/Action figure	DeviceClass		Dukke/Actionfigur
 VCR	DeviceClass		Videospiller
-Vehicle	DeviceClass		Kjøretøy
-Video camera	DeviceClass		Videokamera
-Video conferencing	DeviceClass		Videokonferanse
-Video display and loudspeaker	DeviceClass		Videofremviser og høyttaler
 Video monitor	DeviceClass		Videomonitor
-Wearable	DeviceClass	A wearable computer	Datamaskin til å ha på kroppen
-Wired modem or voice gateway	DeviceClass		Kablet modem eller lydport
-Wrist watch	DeviceClass		Armbåndsur
+Pointing device	DeviceClass		Pekeenhet
+Miscellaneous	DeviceClass		Diverse
+33-50% utilized	DeviceClass		33-50% i bruk
+Imaging	DeviceClass		Bildebehandling

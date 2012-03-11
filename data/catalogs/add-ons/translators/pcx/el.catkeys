@@ -1,8 +1,8 @@
-1	modern_greek	x-vnd.Haiku-PCXTranslator	1002061545
-PCX %lu bit image	PCXTranslator		PCX %lu bit εικόνα
+1	greek, modern (1453-)	x-vnd.Haiku-PCXTranslator	1002061545
 PCX Settings	main		Ρυθμίσεις PCX 
+PCX translator	PCXTranslator		Μεταφραστής PCX
+Version %d.%d.%d, %s	ConfigView		Έκδοση %d.%d.%d, %s
+PCXTranslator Settings	ConfigView		Ρυθμίσεις μεταφραστή PCX
+PCX %lu bit image	PCXTranslator		PCX %lu bit εικόνα
 PCX images	ConfigView		Εικόνες PCX
 PCX images	PCXTranslator		Εικόνες PCX
-PCX translator	PCXTranslator		Μεταφραστής PCX
-PCXTranslator Settings	ConfigView		Ρυθμίσεις μεταφραστή PCX
-Version %d.%d.%d, %s	ConfigView		Έκδοση %d.%d.%d, %s

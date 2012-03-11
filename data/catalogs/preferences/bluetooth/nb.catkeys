@@ -1,61 +1,60 @@
-1	norwegian_bokmål	x-vnd.Haiku-BluetoothPrefs	4055730587
-15 secs	Settings view		15 sekunder
-61 secs	Settings view		61 sekunder
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-BluetoothPrefs	2526531136
 About Bluetooth…	Window		Om Blåtann…
-Add device to list	Inquiry panel		Legg enhet til i listen
-Add…	Remote devices		Legg til…
-Always ask	Settings view		Spør alltid
-As blocked	Remote devices		Som blokkert
-Authenticate	Extended local device view		Autentiser
-Bluetooth	System name		Blåtann
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Sjekk at blåtannfunksjonen i dine fjernenheter er aktivert. Trykk "Oppslag" for å begynne å skanne. Den nødvendige tiden for å motta navnene er ukjent, men det burde ikke ta mer enn 3 sekunder per enhet. Etterpå kan du legge dem til din hovedliste, hvor du kan pare dem sammen.
-Connections & channels…	Window		Tilkoblinger & kanaler...
-Default inquiry time:	Settings view		Standard forespørselstid:
-Defaults	Window		Standardinnstillinger
-Desktop	Settings view		Skrivebord
-Disconnect	Remote devices		Koble fra
-Discoverable	Extended local device view		Synlig
-From all devices	Settings view		Fra alle enheter
-Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Blåtannsystem, (ARCE)\n\nSkapt av Oliver Ruiz Dorantes\n\nMed støtte fra:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nTakk til individene som har hjelpet...\n\nSending/donasjoner av maskinvare:\n\t- enry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nØkonomisk:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nMed patcher:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- yellowTAB-teamet
 Handheld	Settings view		Håndholdt
-Help	Window		Hjelp
-Identify host as:	Settings view		Identifiser verten som:
-Identify us as...	Settings view		Identifiser oss som...
-Incoming connections policy:	Settings view		Retningslinjer for inkommende tilkoblinger:
-Inquiry	Inquiry panel		Oppslag
-Laptop	Settings view		Bærbar
-Local devices found on system:	Settings view		Lokale enheter funnet på systemet:
+Default inquiry time:	Settings view		Standard forespørselstid:
 Manufacturer: 	Device View		Produsent:
-OK	main		OK
-Only from trusted devices	Settings view		Kun fra betrodde enheter
-Pair…	Remote devices		Par...
-Pick LocalDevice...	Settings view		Velg lokal enhet
-Policy...	Settings view		Regler...
-Quit	main		Avslutt
-Refresh LocalDevices…	Window		Oppdater lokale enheter...
+Add device to list	Inquiry panel		Legg enhet til i listen
+Starting scan...	Inquiry panel		Starter søk...
+Show bluetooth console…	Window		Vis blåtannkonsoll...
+Smart phone	Settings view		Smarttelefon
+Server	Settings view		Tjener
+Stop bluetooth services…	Window		Stopp blåtanntjenester…
+Identify host as:	Settings view		Identifiser verten som:
+View	Window		Vis
 Refresh…	Remote devices		Oppdater…
+Pair…	Remote devices		Par...
+Incoming connections policy:	Settings view		Retningslinjer for inkommende tilkoblinger:
+From all devices	Settings view		Fra alle enheter
+Show name	Extended local device view		Vis navn
+Local devices found on system:	Settings view		Lokale enheter funnet på systemet:
 Remaining %1 seconds	Inquiry panel		Gjenstår %1 sekunder
-Remote devices	Window		Fjernenheter
+Server	Window		Tjener
+Scanning completed.	Inquiry panel		Søk fullført.
+OK	main		OK
 Remote devices list…	Window		Fjernenhetsliste
 Remove	Remote devices		Fjern
-Retrieving name of %1	Inquiry panel		Henter navn på %1
-Retrieving names...	Inquiry panel		Mottar navn...
-Revert	Window		Tilbakestill
-Scanning completed.	Inquiry panel		Søk fullført.
-Scanning progress	Inquiry panel		Skannefremgang
-Server	Settings view		Tjener
-Server	Window		Tjener
-Service classes: 	Device View		Service-klasser:
-Settings	Window		Innstillinger
-Show bluetooth console…	Window		Vis blåtannkonsoll...
-Show name	Extended local device view		Vis navn
-Smart phone	Settings view		Smarttelefon
-Start bluetooth services…	Window		Start blåtanntjenester...
+Quit	main		Avslutt
+15 secs	Settings view		15 sekunder
 Start please	main		Begynn
-Starting scan...	Inquiry panel		Starter søk...
-Stop bluetooth services…	Window		Stopp blåtanntjenester…
+Start bluetooth services…	Window		Start blåtanntjenester...
+Policy...	Settings view		Regler...
+61 secs	Settings view		61 sekunder
+Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Blåtannsystem, (ARCE)\n\nSkapt av Oliver Ruiz Dorantes\n\nMed støtte fra:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nTakk til individene som har hjelpet...\n\nSending/donasjoner av maskinvare:\n\t- enry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nØkonomisk:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nMed patcher:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- yellowTAB-teamet
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Det er ingen lokal blåtannenhet registrert på systemet.
-View	Window		Vis
+Identify us as...	Settings view		Identifiser oss som...
+As blocked	Remote devices		Som blokkert
+Bluetooth	System name		Blåtann
+Disconnect	Remote devices		Koble fra
+Pick LocalDevice...	Settings view		Velg lokal enhet
+Defaults	Window		Standardinnstillinger
+Inquiry	Inquiry panel		Oppslag
+Desktop	Settings view		Skrivebord
+Revert	Window		Tilbakestill
+Remote devices	Window		Fjernenheter
+Laptop	Settings view		Bærbar
+Discoverable	Extended local device view		Synlig
 Work offline	main		Arbeid offline
 bluetooth_server has not been found running on the system. Should be started, or stay offline	main		bluetooth_server ser ikke ut til å kjøre på systemet. Bør startes på nytt, eller forbli offline
-packets: 	Device View		pakker:
+Service classes: 	Device View		Service-klasser:
+Connections & channels…	Window		Tilkoblinger & kanaler...
+Refresh LocalDevices…	Window		Oppdater lokale enheter...
+Settings	Window		Innstillinger
+Only from trusted devices	Settings view		Kun fra betrodde enheter
+Scanning progress	Inquiry panel		Skannefremgang
+Always ask	Settings view		Spør alltid
+Retrieving name of %1	Inquiry panel		Henter navn på %1
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Sjekk at blåtannfunksjonen i dine fjernenheter er aktivert. Trykk "Oppslag" for å begynne å skanne. Den nødvendige tiden for å motta navnene er ukjent, men det burde ikke ta mer enn 3 sekunder per enhet. Etterpå kan du legge dem til din hovedliste, hvor du kan pare dem sammen.
+Authenticate	Extended local device view		Autentiser
+Retrieving names...	Inquiry panel		Mottar navn...
+Help	Window		Hjelp
+Add…	Remote devices		Legg til…

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-BluetoothPrefs	2526531136
+1	japanese	x-vnd.Haiku-BluetoothPrefs	3926935355
 About Bluetooth…	Window		Bluetoothについて…
 Handheld	Settings view		ハンドヘルド機器
 Default inquiry time:	Settings view		デフォルトの問い合わせ時間：
@@ -32,6 +32,7 @@ Policy...	Settings view		ポリシー…
 Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetoothシステム, (ARCE)\n\nOliver Ruiz Dorantes作\n\nその他の貢献者：\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\n次の方々にも感謝…\n\nハードウェアを提供していただいた方々:\n\t- Henry Jair Abril Florez (el Colombiano)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\n金銭的な支援をしていただいた方々:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nパッチ提供者：\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\n全ての知識を提供してくれた方：\n\t- yellowTABチーム
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		このシステムにはBluetoothローカルデバイスが登録されていません。
 Identify us as...	Settings view		自機名…
+ packets: 	Device View		パケット：
 As blocked	Remote devices		ブロック状態
 Bluetooth	System name		Bluetooth
 Disconnect	Remote devices		切断

@@ -1,20 +1,20 @@
-1	norwegian_bokmål	x-vnd.Haiku-VirtualMemory	688347876
-%Ld B	SettingsWindow		%Ld B
-Changes will take effect on restart!	SettingsWindow		Endringene vil tre i kraft etter omstart!
-Current swap file size: 	SettingsWindow		Nåværende størrelse på vekslefil: 
-Defaults	SettingsWindow		Standardinnstillinger
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Deaktivering av virtuelt minne vil kunne ha uønskede effekter på systemstabiliteten idet alt tilgjengelig minne har blitt brukt opp.\nVirtuelt minne påvirker ikke systemets ytelse før dette nivået nås.\n\nEr du sikker på at du ønsker å deaktivere denne tjenesten?
-Enable virtual memory	SettingsWindow		Aktiver virtuelt minne
-GB	SettingsWindow		GB
-Insufficient space for a swap file.	SettingsWindow		Ikke nok plass til vekselfil.
-KB	SettingsWindow		KB
-Keep enabled	SettingsWindow		Behold aktivert
-MB	SettingsWindow		MB
-OK	VirtualMemoryApp		OK
-Physical memory: 	SettingsWindow		Fysisk minne: 
-Requested swap file size:	SettingsWindow		Ønsket størrelse på vekselfil:
-Revert	SettingsWindow		Tilbakestill
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-VirtualMemory	688347876
 Turn off	SettingsWindow		Slå av
+GB	SettingsWindow		GB
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Deaktivering av virtuelt minne vil kunne ha uønskede effekter på systemstabiliteten idet alt tilgjengelig minne har blitt brukt opp.\nVirtuelt minne påvirker ikke systemets ytelse før dette nivået nås.\n\nEr du sikker på at du ønsker å deaktivere denne tjenesten?
+Requested swap file size:	SettingsWindow		Ønsket størrelse på vekselfil:
+Physical memory: 	SettingsWindow		Fysisk minne: 
+Changes will take effect on restart!	SettingsWindow		Endringene vil tre i kraft etter omstart!
+Defaults	SettingsWindow		Standardinnstillinger
+KB	SettingsWindow		KB
 Use volume:	SettingsWindow		Bruk volum:
+Insufficient space for a swap file.	SettingsWindow		Ikke nok plass til vekselfil.
+Keep enabled	SettingsWindow		Behold aktivert
+Revert	SettingsWindow		Tilbakestill
 VirtualMemory	System name		Virtuelt minne
+Current swap file size: 	SettingsWindow		Nåværende størrelse på vekslefil: 
+OK	VirtualMemoryApp		OK
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tskrevet av Axel Dörfler\n\tOpphavsrett 2005, Haiku.\n
+Enable virtual memory	SettingsWindow		Aktiver virtuelt minne
+MB	SettingsWindow		MB
+%Ld B	SettingsWindow		%Ld B

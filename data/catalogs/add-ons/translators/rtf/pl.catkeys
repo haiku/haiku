@@ -4,6 +4,6 @@ RTF text files	RTFTranslator		Pliki tekstowe RTF
 RTF-Translator Settings	ConfigView		Ustawienia Translatora RTF
 Rich Text Format (RTF) files	ConfigView		Pliki Rich Text Format (RTF)
 RTF Settings	main		Ustawienia RTF
-RichTextFormat file	RTFTranslator		plik RichTextFormat 
+RichTextFormat file	RTFTranslator		Plik RichTextFormat
 Rich Text Format Translator	RTFTranslator		Rich Text Format Translator
 Rich Text Format translator v%d.%d.%d %s	RTFTranslator		Rich Text Format translator v%d.%d.%d %s

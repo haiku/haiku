@@ -1,77 +1,77 @@
-1	norwegian_bokmål	x-vnd.Haiku-DriveSetup	1209826930
-%ld MiB	Support		%ld MiB
-<empty>	DiskView		<tom>
-<empty>	PartitionList		<tom>
-Active	PartitionList		Aktiv
-Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil slette den valgte partisjonen?\n\nAlle data på partisjonen vil gå tapt for godt hvis du gjør det!
-Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Er du sikker på at du vil initialisere partisjonen \"%s\"? Du vil bli spurt igjen før endringene blir skrevet til disken.
-Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Er du sikker på at du vil initialisere partisjonen? Du vil bli spurt igjen før endringene blir skrevet til disken.
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på disken %s vil gå tapt for godt hvis du gjør det!
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disk nå?\n\nAlle data på partisjonen %s vil gå tapt for godt hvis du gjør det!
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på partisjonen vil gå tapt for godt hvis du gjør det!
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på den valgte disken vil gå tapt for godt hvis du gjør det!
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på den valgte partisjonen vil gå tapt for godt hvis du gjør det!
-Cancel	CreateParamsPanel		Avbryt
-Cancel	InitParamsPanel		Avbryt
-Cancel	MainWindow		Avbryt
-Cannot delete the selected partition.	MainWindow		Kan ikke slette den valgte partisjonen.
-Continue	MainWindow		Fortsett
-Could not aquire partitioning information.	MainWindow		Kunne ikke innhente informasjon om partisjoneringen.
-Could not delete the selected partition.	MainWindow		Kunne ikke slette valgt partisjon.
-Could not mount partition %s.	MainWindow		Kunne ikke montere partisjonen %s
-Could not unmount partition %s.	MainWindow		Kunne ikke avmontere partisjon %s.
-Create	CreateParamsPanel		Opprett
-Create…	MainWindow		Opprett…
-Creation of the partition has failed.	MainWindow		Opprettelse av partisjonen feilet.
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DriveSetup	1209826930
+DriveSetup	System name		Diskoppsett
 Delete	MainWindow		Slett
-Delete partition	MainWindow		Slett partisjon
-Device	DiskView		Enhet
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på den valgte partisjonen vil gå tapt for godt hvis du gjør det!
+Rescan	MainWindow		Skann på nytt
+OK	MainWindow		OK
+Could not aquire partitioning information.	MainWindow		Kunne ikke innhente informasjon om partisjoneringen.
+There's no space on the partition where a child partition could be created.	MainWindow		Det er ingen plass på partisjonen der en underpartisjon kan opprettes.
+%ld MiB	Support		%ld MiB
+<empty>	PartitionList		<tom>
+Unable to find the selected partition by ID.	MainWindow		Kan ikke finne den valgte partisjonen ved hjelp av ID.
+Select a partition from the list below.	DiskView		Velg en partisjon fra listen nedenfor.
+No disk devices have been recognized.	DiskView		Ingen disker ble gjenkjent.
+The selected disk is read-only.	MainWindow		Den valgte disken er skrivebeskyttet.
+Partition name:	CreateParamsPanel		Partisjonsnavn:
+Initialize	InitParamsPanel		Initialiser
+Could not mount partition %s.	MainWindow		Kunne ikke montere partisjonen %s
+The partition %s is already unmounted.	MainWindow		Partisjonen %s er allerede avmontert.
+Failed to initialize the partition. No changes have been written to disk.	MainWindow		Klarte ikke å initialisere partisjonen. Ingen endringer er skrevet til disken.
+Failed to delete the partition. No changes have been written to disk.	MainWindow		Klarte ikke å slette partisjonen. Ingen endringer er skrevet til disken.
+Partition type:	CreateParamsPanel		Partisjonstype:
+Could not delete the selected partition.	MainWindow		Kunne ikke slette valgt partisjon.
+Initialize	MainWindow		Initialiser
+Error: 	MainWindow	in any error alert	Feil: 
+Partition %ld	DiskView		Partisjon %ld
+The partition %s has been successfully initialized.\n	MainWindow		Initialisering av partisjonen %s var vellykket.\n
+<empty>	DiskView		<tom>
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisering av partisjonen %s var mislykket. (ingenting ble skrevet til disken.)
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på partisjonen vil gå tapt for godt hvis du gjør det!
+Mounted at	PartitionList		Monteringspunkt
+Failed to initialize the partition %s!\n	MainWindow		Klarte ikke å initialisere partisjonen %s!\n
+There was an error acquiring the partition row.	MainWindow		Det var en feil ved tilegning av partisjonsrad.
+You need to select a partition entry from the list.	MainWindow		Du må velge en partisjon fra listen.
+Format (not implemented)	MainWindow		Formatere (ikke implementert)
+The currently selected partition does not have a parent partition.	MainWindow		Den valgte partisjonen har ingen forelderpartisjon.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på den valgte disken vil gå tapt for godt hvis du gjør det!
+Offset: %ld MB	Support		Offset: %ld MB
+Write changes	MainWindow		Skriv endringer
+There was an error preparing the disk for modifications.	MainWindow		Det oppsto en feil da disken skulle forberedes for endringer.
+The partition %s is already mounted.	MainWindow		Partisjonen %s er allerede montert.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på disken %s vil gå tapt for godt hvis du gjør det!
+Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil slette den valgte partisjonen?\n\nAlle data på partisjonen vil gå tapt for godt hvis du gjør det!
+Create…	MainWindow		Opprett…
+Disk system \"%s\"\" not found!	MainWindow		Disksystemet \"%s\"\" ble ikke funnet!
+Could not unmount partition %s.	MainWindow		Kunne ikke avmontere partisjon %s.
+Mount	MainWindow		Monter
+Create	CreateParamsPanel		Opprett
 Device	PartitionList		Enhet
 Disk	MainWindow		Disk
-Disk system \"%s\"\" not found!	MainWindow		Disksystemet \"%s\"\" ble ikke funnet!
-DriveSetup	System name		Diskoppsett
-Eject	MainWindow		Løs ut
-End: %ld MB	Support		Slutt: %ld MB
-Error: 	MainWindow	in any error alert	Feil: 
-Failed to delete the partition. No changes have been written to disk.	MainWindow		Klarte ikke å slette partisjonen. Ingen endringer er skrevet til disken.
-Failed to initialize the partition %s!\n	MainWindow		Klarte ikke å initialisere partisjonen %s!\n
-Failed to initialize the partition. No changes have been written to disk.	MainWindow		Klarte ikke å initialisere partisjonen. Ingen endringer er skrevet til disken.
-File system	PartitionList		Filsystem
-Format (not implemented)	MainWindow		Formatere (ikke implementert)
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisering av partisjonen %s var mislykket. (ingenting ble skrevet til disken.)
-Initialize	InitParamsPanel		Initialiser
-Initialize	MainWindow		Initialiser
-Mount	MainWindow		Monter
-Mount all	MainWindow		Monter alle
-Mounted at	PartitionList		Monteringspunkt
-No disk devices have been recognized.	DiskView		Ingen disker ble gjenkjent.
-OK	MainWindow		OK
-Offset: %ld MB	Support		Offset: %ld MB
-Parameters	PartitionList		Parametre
-Partition	MainWindow		Partisjon
-Partition %ld	DiskView		Partisjon %ld
-Partition name:	CreateParamsPanel		Partisjonsnavn:
-Partition size	CreateParamsPanel		Partisjonsstørrelse
-Partition type:	CreateParamsPanel		Partisjonstype:
-Rescan	MainWindow		Skann på nytt
-Select a partition from the list below.	DiskView		Velg en partisjon fra listen nedenfor.
-Size	PartitionList		Størrelse
-Surface test (not implemented)	MainWindow		Overflatetest (ikke implementert)
-The currently selected partition does not have a parent partition.	MainWindow		Den valgte partisjonen har ingen forelderpartisjon.
-The currently selected partition is not empty.	MainWindow		Den valgte partisjonen er ikke tom.
-The partition %s has been successfully initialized.\n	MainWindow		Initialisering av partisjonen %s var vellykket.\n
-The partition %s is already mounted.	MainWindow		Partisjonen %s er allerede montert.
-The partition %s is already unmounted.	MainWindow		Partisjonen %s er allerede avmontert.
-The partition %s is currently mounted.	MainWindow		Partisjonen %s er montert
-The selected disk is read-only.	MainWindow		Den valgte disken er skrivebeskyttet.
-The selected partition does not contain a partitioning system.	MainWindow		Den valgte partisjonen inneholder ikke et partisjoneringssystem.
-There was an error acquiring the partition row.	MainWindow		Det var en feil ved tilegning av partisjonsrad.
-There was an error preparing the disk for modifications.	MainWindow		Det oppsto en feil da disken skulle forberedes for endringer.
-There's no space on the partition where a child partition could be created.	MainWindow		Det er ingen plass på partisjonen der en underpartisjon kan opprettes.
-Unable to find the selected partition by ID.	MainWindow		Kan ikke finne den valgte partisjonen ved hjelp av ID.
-Unmount	MainWindow		Avmonter
-Validation of the given creation parameters failed.	MainWindow		Mislykket validering av de oppgitte opprettingsparametrene.
-Validation of the given initialization parameters failed.	MainWindow		Mislykket validering av de oppgitte initialiseringsparametrene.
+Device	DiskView		Enhet
+Active	PartitionList		Aktiv
 Volume name	PartitionList		Volumnavn
-Write changes	MainWindow		Skriv endringer
-You need to select a partition entry from the list.	MainWindow		Du må velge en partisjon fra listen.
+Continue	MainWindow		Fortsett
+Cannot delete the selected partition.	MainWindow		Kan ikke slette den valgte partisjonen.
+Mount all	MainWindow		Monter alle
+Cancel	MainWindow		Avbryt
+Delete partition	MainWindow		Slett partisjon
+End: %ld MB	Support		Slutt: %ld MB
+Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Er du sikker på at du vil initialisere partisjonen \"%s\"? Du vil bli spurt igjen før endringene blir skrevet til disken.
+Eject	MainWindow		Løs ut
+Partition	MainWindow		Partisjon
+File system	PartitionList		Filsystem
+Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Er du sikker på at du vil initialisere partisjonen? Du vil bli spurt igjen før endringene blir skrevet til disken.
+Validation of the given creation parameters failed.	MainWindow		Mislykket validering av de oppgitte opprettingsparametrene.
+Size	PartitionList		Størrelse
+Validation of the given initialization parameters failed.	MainWindow		Mislykket validering av de oppgitte initialiseringsparametrene.
+The selected partition does not contain a partitioning system.	MainWindow		Den valgte partisjonen inneholder ikke et partisjoneringssystem.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disk nå?\n\nAlle data på partisjonen %s vil gå tapt for godt hvis du gjør det!
+The partition %s is currently mounted.	MainWindow		Partisjonen %s er montert
+Partition size	CreateParamsPanel		Partisjonsstørrelse
+Surface test (not implemented)	MainWindow		Overflatetest (ikke implementert)
+Cancel	InitParamsPanel		Avbryt
+Cancel	CreateParamsPanel		Avbryt
+Parameters	PartitionList		Parametre
+Creation of the partition has failed.	MainWindow		Opprettelse av partisjonen feilet.
+The currently selected partition is not empty.	MainWindow		Den valgte partisjonen er ikke tom.
+Unmount	MainWindow		Avmonter

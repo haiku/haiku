@@ -1,34 +1,32 @@
-1	norwegian_bokmål	x-vnd.Haiku-Notifications	4086870962
-Above icon	DisplayView		Over ikon
-Allowed	NotificationView		Tillatt
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Notifications	2661343760
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		En feil oppsto da innstillingene skulle lagres.\nDet er mulig disken begynner å bli full.
-Application	NotificationView		Program
-Applications	NotificationView		Programmer
-Display	PrefletView		Vis
-Enable notifications	GeneralView		Aktiver meldinger
-Enabled	NotificationView		Aktivert
-Error	NotificationView		Feil
-General	PrefletView		Generelt
-Icon size:	DisplayView		Ikonstørrelse:
-Important	NotificationView		Viktig
-Information	NotificationView		Informasjon
-Large icon	DisplayView		Stort ikon
-Last Received	NotificationView		Sist mottatt
-Mini icon	DisplayView		Mini-ikon
-No	NotificationView		Nei
 Notifications	GeneralView		Meldinger
-Notifications	System name		Meldinger
-OK	DisplayView		OK
-OK	GeneralView		OK
-OK	NotificationView		OK
-Progress	NotificationView		Fremdrift
-Revert	PrefletWin		Tilbakestill
-Right of icon	DisplayView		Høyre for ikon
-Save	PrefletWin		Lagre
-Search:	NotificationView		Søk:
-Title	NotificationView		Tittel
-Type	NotificationView		Type
-Unknown	NotificationView		Ukjent
-Window width:	DisplayView		Vindubredde:
-Yes	NotificationView		Ja
 seconds of inactivity	GeneralView		sekunder med inaktivitet
+Revert	PrefletWin		Tilbakestill
+Mini icon	DisplayView		Mini-ikon
+Enable notifications	GeneralView		Aktiver meldinger
+Error	NotificationView		Feil
+OK	GeneralView		OK
+Save	PrefletWin		Lagre
+Type	NotificationView		Type
+OK	NotificationView		OK
+Important	NotificationView		Viktig
+Progress	NotificationView		Fremdrift
+Last Received	NotificationView		Sist mottatt
+General	PrefletView		Generelt
+Display	PrefletView		Vis
+Search:	NotificationView		Søk:
+Allowed	NotificationView		Tillatt
+Yes	NotificationView		Ja
+Large icon	DisplayView		Stort ikon
+Icon size:	DisplayView		Ikonstørrelse:
+Notifications	System name		Meldinger
+No	NotificationView		Nei
+Title	NotificationView		Tittel
+Information	NotificationView		Informasjon
+Window width:	DisplayView		Vindubredde:
+Application	NotificationView		Program
+Enabled	NotificationView		Aktivert
+OK	DisplayView		OK
+Unknown	NotificationView		Ukjent
+Applications	NotificationView		Programmer

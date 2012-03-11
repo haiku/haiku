@@ -8,7 +8,6 @@
 
 extern "C" {
 	#include "avcodec.h"
-	#include "libavformat/internal.h"
 	#include "avformat.h"
 }
 

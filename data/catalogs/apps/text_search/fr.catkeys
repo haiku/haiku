@@ -22,10 +22,10 @@ Actions	GrepWindow		Actions
 File	GrepWindow		Fichier
 Encoding	GrepWindow		Encodage
 History	GrepWindow		Historique
-%s: There was a problem running grep.	Grepper		%s : une erreur est survenue en exécutant grep.
+%s: There was a problem running grep.	Grepper		%s : Une erreur est survenue en exécutant grep.
 New window	GrepWindow		Nouvelle fenêtre
 Please select the files you wish to keep searching.	GrepWindow		Veuillez sélectionnez les fichiers dans lesquels vous souhaitez continuer à scruter.
-TextSearch	GrepWindow		TextSearch
+TextSearch	GrepWindow		Recherche Texte
 Quit	GrepWindow		Quitter
 Show files in Tracker	GrepWindow		Montrer les fichiers dans le Tracker
 Case-sensitive	GrepWindow		Sensible à la casse

@@ -1,10 +1,11 @@
-1	polish	x-vnd.Haiku-PackageInstaller	1001018750
+1	polish	x-vnd.Haiku-PackageInstaller	1396489627
 Install to:	PackageView		Zainstaluj w:
 OK	PackageView		OK
 Accept	PackageTextViewer		Akceptuj
 Continue	PackageInstall		Kontynuuj
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Żądany pakiet nie zainstalował się poprawnie w Twoim systemie. To może być problem ze ścieżkami docelowymi plików z pakietu. Proszę skontaktuj się z dystrybutorem paczki.
 Image not loaded correctly	PackageImageViewer		Obraz nie załadował się poprawnie
+Install 	PackageView		Instaluj 
 No package selected.	PackageInfo		Żaden pakiet nie został wybrany.
 Install	PackageView		Instaluj
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Dany pakiet jest już zainstalowany w Twoim systemie. Czy chcesz by odinstalować istniejącą paczkę i kontynuować instalację?
@@ -20,15 +21,19 @@ Preparing package	PackageInstall		Przygotowywanie pakietu
 No package available.	PackageInfo		Brak dostępnych pakietów.
 none	PackageView		brak
 Stop	PackageStatus		Stop
-Other…	PackageView		Inne...
+Other…	PackageView		Inne…
 No installation type selected	PackageView		Sposób instalacji nie został wybrany
+The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		Dowiązanie symboliczne o nazwie '%s' już istnieje w podanej ścieżce.\nZastąpić dowiązanie tym z pakietu czy pominąć?
 Installing files and folders	PackageInstall		Instalowanie plików i folderów
 Package installer	PackageView		Instalator pakietów
 Skip all	PackageView		Pomiń wszystkie
+The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Element o nazwie '%s' już istnieje w podanej ścieżce.\nZastąpić element tym z pakietu czy pominąć?
+The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Skrypt o nazwie '%s' już istnieje w podanej ścieżce.\nZastąpić skrypt tym z pakietu czy pominąć?
 Running post-installation scripts	PackageInstall		Uruchamianie poinstalacyjnych skryptów
 %llu bytes	PackageView		%llu bajtów
 Skip	PackageView		Pomiń
 %.1f MiB	PackageView		%.1f MiB
+The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Katalog o nazwie '%s' już istnieje w podanej ścieżce.\nZastąpić katalog tym z pakietu czy pominąć?
 The package you requested has been successfully installed on your system.	PackageView		Żądany pakiet został poprawnie zainstalowany w Twoim systemie.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Błąd! \"%s\" niepoprawna ścieżka.\n
 Installation type:	PackageView		Typ instalacji:

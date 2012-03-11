@@ -1,6 +1,7 @@
-1	polish	x-vnd.Haiku-CharacterMap	20061360
+1	polish	x-vnd.Haiku-CharacterMap	2745781253
 Enclosed alphanumerics	UnicodeBlocks		Otoczone symbole alfanumeryczne
 Basic Latin	UnicodeBlocks		Podstawowy łaciński
+View	CharacterWindow		Widok
 Latin-1 supplement	UnicodeBlocks		Uzupełnienie Latin-1
 Hebrew	UnicodeBlocks		Hebrajski
 Georgian supplement	UnicodeBlocks		Uzupełnienie gruzińskiego
@@ -24,6 +25,7 @@ Ol Chiki	UnicodeBlocks		Ol Chiki
 Arabic	UnicodeBlocks		Arabski
 Ethiopic extended	UnicodeBlocks		Rozszerzony etiopski
 Arrows	UnicodeBlocks		Strzałki
+Font	CharacterWindow		Czcionka
 Variation selectors supplement	UnicodeBlocks		Dodatkowe przełączniki wariantów glifów
 Gujarati	UnicodeBlocks		Gudżarati
 Cuneiform	UnicodeBlocks		Pismo klinowe
@@ -38,6 +40,7 @@ Tagbanwa	UnicodeBlocks		Tagbanwa
 Kanbun	UnicodeBlocks		Kanbun
 Syriac	UnicodeBlocks		Syryjski
 CJK compatibility ideographs Supplement	UnicodeBlocks		Dodatkowe ideogramy zgodności CJK
+Musical symbols	UnicodeBlocks		Symbole muzyczne
 Hangul syllables	UnicodeBlocks		Sylaby Hangyl
 Coptic	UnicodeBlocks		Koptyjski
 Tai Le	UnicodeBlocks		Tai le
@@ -86,6 +89,7 @@ Variation selectors	UnicodeBlocks		Przełączniki wariantów glifów
 Linear B syllabary	UnicodeBlocks		Sylabariusz pisma linearnego B
 Buginese	UnicodeBlocks		Bugiński
 Bopomofo	UnicodeBlocks		Bopomofo
+Code	CharacterWindow		Kod
 Lepcha	UnicodeBlocks		Lepczowski
 Sinhala	UnicodeBlocks		Sinhala
 Ancient Greek musical notation	UnicodeBlocks		Starożytna grecka notacja muzyczna
@@ -99,6 +103,7 @@ Supplement punctuation	UnicodeBlocks		Dodatkowe znaki interpunkcyjne
 Unified Canadian Aboriginal syllabics	UnicodeBlocks		Ujednolicony sylabariusz rdzennych Kanadyjczyków
 Ugaritic	UnicodeBlocks		Ugarycki
 CJK symbols and punctuation	UnicodeBlocks		Symbole i znaki interpunkcyjne CJK
+File	CharacterWindow		Plik
 Number forms	UnicodeBlocks		Formy liczbowe
 Cherokee	UnicodeBlocks		Czirokeski
 Tags	UnicodeBlocks		Znaczniki
@@ -139,6 +144,7 @@ Thai	UnicodeBlocks		Tajski
 Deseret	UnicodeBlocks		Deseret
 Tifinagh	UnicodeBlocks		Tifinagh
 Gurmukhi	UnicodeBlocks		Gurmukhi
+CharacterMap	System name		TablicaZnaków
 Lao	UnicodeBlocks		Laotański
 Gothic	UnicodeBlocks		Gocki
 Limbu	UnicodeBlocks		Limbu
@@ -159,6 +165,7 @@ Ethiopic supplement	UnicodeBlocks		Uzupełnienie etiopskiego
 Latin extended B	UnicodeBlocks		Rozszerzony łaciński B
 Box drawing	UnicodeBlocks		Rysowanie ramek
 Mathematical alphanumeric symbols	UnicodeBlocks		Matematyczne symbole alfanumeryczne
+Copy character	CharacterView		Kopiuj znak
 Greek and Coptic	UnicodeBlocks		Grecki i koptyjski
 Carian	UnicodeBlocks		Karyjski
 Georgian	UnicodeBlocks		Gruziński
@@ -168,6 +175,7 @@ CJK compatibility	UnicodeBlocks		Znaki zgodności CJK
 Malayalam	UnicodeBlocks		Malajalam
 N'Ko	UnicodeBlocks		N'Ko
 Kannada	UnicodeBlocks		Kannada
+Copy as escaped byte string	CharacterView		Kopiuj jako zaeskejpowany łańcuch bajtów
 Phonetic extensions supplement	UnicodeBlocks		Uzupełnienie rozszerzeń fonetycznych
 Domino tiles	UnicodeBlocks		Klocki domina
 Katakana phonetic extensions	UnicodeBlocks		Rozszerzenia fonetyczne katakana

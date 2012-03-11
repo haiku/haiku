@@ -10,8 +10,8 @@ Stepping policy	CPU Frequency View		Polityka skalowania procesora
 Dynamic performance	Status view		Dynamicznie dopasowana wydajność
 Step up by CPU usage	Color Step View		Ustawiaj taktowanie w zależności od obciążenia procesora
 Dynamic stepping	CPU Frequency View		Dynamiczne skalowanie
-Stepping policy: 	CPU Frequency View		Polityka skalowania:
-Integration time [ms]: 	CPU Frequency View		Czas integracji (w milisekundach):
+Stepping policy: 	CPU Frequency View		Polityka skalowania: 
+Integration time [ms]: 	CPU Frequency View		Czas integracji (w milisekundach): 
 Open Speedstep preferences…	Status view		Otwórz ustawienia Speedstep…
 Revert	Pref Window		Przywróć poprzednie ustawienia
 Low energy	Status view		Oszczędna

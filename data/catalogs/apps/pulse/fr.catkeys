@@ -30,7 +30,7 @@ About Pulse…	PulseView		À propos de Pulsation…
 Deskbar mode	MiniPulseView		Mode Deskbar
 Quit	MiniPulseView		Quitter
 Pulse	System name		Pulsation
-Pulse	NormalPulseView		Pulse
+Pulse	NormalPulseView		Pulsation
 %ld MHz	NormalPulseView		%ld MHz
 Deskbar mode	NormalPulseView		Mode Deskbar
 Pulse	PulseApp		Pulsation
@@ -39,7 +39,7 @@ You can't disable the last active CPU.	CPUButton		Vous ne pouvez pas désactiver
 Normal mode	DeskbarPulseView		Mode normal
 OK	CPUButton		OK
 About Pulse…	CPUButton		À propos de Pulsation…
-Removing from Deskbar failed.\n%s	DeskbarPulseView		Échec du retrait de la Deskbar\n%s
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Échec du retrait de la Deskbar.\n%s
 Mini mode	NormalPulseView		Mode miniature
 Info	DeskbarPulseView		Informations
 Pulse settings	PulseWindow		Réglages de Pulsation

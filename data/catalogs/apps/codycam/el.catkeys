@@ -1,93 +1,92 @@
-1	modern_greek	x-vnd.Haiku.CodyCam	441085909
-Can't find an available connection to the video window	CodyCam		Αδυναμία εύρεση μιας διαθέσιμης σύνδεσης στο παράθυρο του βίντεο
-Cannot connect the video source to the video window	CodyCam		Αδυναμία σύνδεσης της προέλευσης βίντεο με το παράθυρο βίντεο
-Cannot create a video window	CodyCam		Αδυναμία δημιουργίας παράθυρου βίντεο
-Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Αδυναμία εύρεσης προέλευσης βίντεο. Χρειάζεστε μια web κάμερα για να χρησιμοποιήσετε το πρόγραμμα CodyCam.
+1	greek, modern (1453-)	x-vnd.Haiku-CodyCam	3353004969
+Capturing Image…	VideoConsumer.cpp		Σύλληψη Εικόνας...
+Every 30 seconds	CodyCam		Κάθε 30 δευτερόλεπτα
+File name:	CodyCam		Όνομα αρχείου:
+Last Capture: 	VideoConsumer.cpp		Τελευταία Σύλληψη:
+Server login failed	VideoConsumer.cpp		Η σύνδεση στον εξυπηρετητή απέτυχε
+Remote host has closed the connection.\n	FtpClient		Ο απομακρυσμένος υπολογιστής έκλεισε τη σύνδεση.\n
+Login:	CodyCam		Όνομα χρήστη:
+Format:	CodyCam		Μορφοποίηση:
+Every 2 hours	CodyCam		Κάθε 2 ώρες
+Closing the window\n	VideoConsumer.cpp		Κλείσιμο του παράθυρου\n
+login ID expected	CodyCam		αναμενόμενο ID σύνδεσης
+Rate:	CodyCam		Ρυθμός:
+JPEG image	CodyCam		Εικόνα JPEG
+Capture Rate Menu	CodyCam		Μενού Ρυθμού Σύλληψης
+File %s # unterminated quote at end of file\n	SettingsHandler		Αρχείο %s # ατερμάτιστο εισαγωγικό στο τέλος του αρχείου\n
+Password:	CodyCam		Κωδικός:
+Passive FTP	CodyCam		Παθητικό FTP
+destination directory expected	CodyCam		προβλεπόμενος κατάλογος προορισμού
+password	CodyCam		κωδικός
+Directory:	CodyCam		Κατάλογος:
+Every minute	CodyCam		Κάθε λεπτό
+read: %ld\n	SftpClient		ανάγνωση: %ld\n
+Waiting…	CodyCam		Περιμένετε...
+Logging in…	VideoConsumer.cpp		Γίνετε σύνδεση...
+Server:	CodyCam		Εξυπηρετητής:
+server address expected	CodyCam		αναμενόμενη διεύθυνση διακομιστή
+Error creating output file	VideoConsumer.cpp		Σφάλμα κατά τη δημιουργία αρχείου εξόδου
+unrecognized upload client specified	CodyCam		άγνωστος προβλέπομενος upload client
+File %s ; Line %ld # unterminated quote\n	SettingsHandler		Αρχείο %s ; Σειρά %ld # ατερμάτιστο εισαγωγικό\n
+Output	CodyCam		Έξοδος
+Every 15 minutes	CodyCam		Κάθε 15 λεπτά
 Cannot find an available video stream	CodyCam		Αδυναμία εύρεσης διαθέσιμης ροής βίντεο
-Cannot find the media roster	CodyCam		Αδυναμία εύρεσης του ρόστερ των πολυμέσων
+Can't find an available connection to the video window	CodyCam		Αδυναμία εύρεση μιας διαθέσιμης σύνδεσης στο παράθυρο του βίντεο
+Transmitting…	VideoConsumer.cpp		Μεταδίδεται...
 Cannot get a time source	CodyCam		Αδυναμία εύρεσης πηγής χρόνου
+Every 8 hours	CodyCam		Κάθε 8 ώρες
+Rename failed	VideoConsumer.cpp		Η μετονομασία απέτυχε
+Cannot start time source!	CodyCam		Αδυναμία εκίνησης πηγής χρόνου!
 Cannot register the video window	CodyCam		Αδυναμία εγγραφής του παραθύρου βίντεο
-Cannot seek time source!	CodyCam		Αδυναμία επιδίωξης της προέλευσης ώρας
+Every 24 hours	CodyCam		Κάθε 24 ώρες
+unknown command	SettingsHandler		άγνωστη εντολή
+Video settings	CodyCam		Ρυθμίσεις βίντεο
+Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Αδυναμία εύρεσης προέλευσης βίντεο. Χρειάζεστε μια web κάμερα για να χρησιμοποιήσετε το πρόγραμμα CodyCam.
+still image filename expected	CodyCam		προβλεπόμενο όνομα αρχείου εικόνας
+invalid upload client %ld\n	VideoConsumer.cpp		λανθασμένος upload client %ld\n
+Every 15 seconds	CodyCam		Κάθε 15 δευτερόλεπτα
+Error writing output file	VideoConsumer.cpp		Σφάλμα κατά την εγγραφή στο αρχείο εξόδου
+image file format expected	CodyCam		αναμενόμενος τύπος αρχείου εικόνας
 Cannot set the time source for the video source	CodyCam		Αδυναμία τοποθέτησης της προέλευσης χρόνου στο βίντεο
+Type:	CodyCam		Τύπος:
 Cannot set the time source for the video window	CodyCam		Αδυναμία τοποθέτησης της προέλευσης χρόνου στο παράθυρο βίντεο
+Stop video	CodyCam		Σταμάτα το βίντεο
+Locking the window\n	VideoConsumer.cpp		Κλείδωμα παράθυρου\n
+File %s; Line %ld # %s	SettingsHandler		Αρχείο %s; Γραμμή %ld # %s
+Couldn't find requested directory on server	VideoConsumer.cpp		Αδυναμία εύρεσης του ζητούμενου καταλόγου στο διακομιστή
+Renaming…	VideoConsumer.cpp		Μετονομασία...
+Local	CodyCam		Τοπικά
+Error setting type of output file	VideoConsumer.cpp		Σφάλμα ρύθμισης τύπου του εξαγόμενου αρχείου
+upload client name expected	CodyCam		αναμενόμενο όνομα του upload client
+SFTP	CodyCam		SFTP
+Connected…	VideoConsumer.cpp		Συνδέθηκε...
+PASS <suppressed>  (real password sent)\n	FtpClient		ΚΩΔΙΚΟΣ <suppressed> (εστάλη ο πραγματικός κωδικός)\n
+Every 5 minutes	CodyCam		κάθε 5 λεπτά
+read: %d\n	SftpClient		ανάγνωση: %d\n
+OK	CodyCam		Εντάξει
+Capture controls	CodyCam		Έλεγχος σύλληψης
+Every hour	CodyCam		Κάθε ώρα
+Cannot connect the video source to the video window	CodyCam		Αδυναμία σύνδεσης της προέλευσης βίντεο με το παράθυρο βίντεο
+capture rate expected	CodyCam		αναμενόμενος ρυθμός σύλληψης
+Error getting initial latency for the capture node	CodyCam		Αδυναμία ανάκτησης κατηγορίας για την διαδικασία σύλληψης
+Send to…	CodyCam		Αποστολή στο...
+on or off expected	Settings	Do not translate 'on' and 'off'	αναμενόμενο on ή off
+Quit	CodyCam		Έξοδος
+cmd: '%s'\n	FtpClient		cmd: '%s'\n
+Never	CodyCam		Ποτέ
+Cannot create a video window	CodyCam		Αδυναμία δημιουργίας παράθυρου βίντεο
+Every 10 minutes	CodyCam		Κάθε 10 λεπτά
 Cannot start the video source	CodyCam		Αδυναμία εκκίνησης της προέλευσης βίντεο
 Cannot start the video window	CodyCam		Αδυναμία εκκίνησης του παράθυρου βίντεο
-Cannot start time source!	CodyCam		Αδυναμία εκίνησης πηγής χρόνου!
-Capture Rate Menu	CodyCam		Μενού Ρυθμού Σύλληψης
-Capture controls	CodyCam		Έλεγχος σύλληψης
-Capturing Image…	VideoConsumer.cpp		Σύλληψη Εικόνας...
-Closing the window\n	VideoConsumer.cpp		Κλείσιμο του παράθυρου\n
-CodyCam	System name		CodyCam
-Connected…	VideoConsumer.cpp		Συνδέθηκε...
-Couldn't find requested directory on server	VideoConsumer.cpp		Αδυναμία εύρεσης του ζητούμενου καταλόγου στο διακομιστή
-Directory:	CodyCam		Κατάλογος:
-Error creating output file	VideoConsumer.cpp		Σφάλμα κατά τη δημιουργία αρχείου εξόδου
-Error getting initial latency for the capture node	CodyCam		Αδυναμία ανάκτησης κατηγορίας για την διαδικασία σύλληψης
-Error setting type of output file	VideoConsumer.cpp		Σφάλμα ρύθμισης τύπου του εξαγόμενου αρχείου
-Error writing output file	VideoConsumer.cpp		Σφάλμα κατά την εγγραφή στο αρχείο εξόδου
-Every 10 minutes	CodyCam		Κάθε 10 λεπτά
-Every 15 minutes	CodyCam		Κάθε 15 λεπτά
-Every 15 seconds	CodyCam		Κάθε 15 δευτερόλεπτα
-Every 2 hours	CodyCam		Κάθε 2 ώρες
-Every 24 hours	CodyCam		Κάθε 24 ώρες
-Every 30 minutes	CodyCam		Κάθε 30 λεπτά
-Every 30 seconds	CodyCam		Κάθε 30 δευτερόλεπτα
-Every 4 hours	CodyCam		Κάθε 4 ώρες
-Every 5 minutes	CodyCam		κάθε 5 λεπτά
-Every 8 hours	CodyCam		Κάθε 8 ώρες
-Every hour	CodyCam		Κάθε ώρα
-Every minute	CodyCam		Κάθε λεπτό
-FTP	CodyCam		FTP
-File	CodyCam		Αρχείο
-File %s # unterminated quote at end of file\n	SettingsHandler		Αρχείο %s # ατερμάτιστο εισαγωγικό στο τέλος του αρχείου\n
-File %s ; Line %ld # unterminated quote\n	SettingsHandler		Αρχείο %s ; Σειρά %ld # ατερμάτιστο εισαγωγικό\n
-File %s; Line %ld # %s	SettingsHandler		Αρχείο %s; Γραμμή %ld # %s
-File name:	CodyCam		Όνομα αρχείου:
-File transmission failed	VideoConsumer.cpp		Η μεταφορά του αρχείου απέτυχε
-Format:	CodyCam		Μορφοποίηση:
-Image Format Menu	CodyCam		Μενού μορφοποίησης εικόνας
-JPEG image	CodyCam		Εικόνα JPEG
-Last Capture: 	VideoConsumer.cpp		Τελευταία Σύλληψη:
-Local	CodyCam		Τοπικά
-Locking the window\n	VideoConsumer.cpp		Κλείδωμα παράθυρου\n
-Logging in…	VideoConsumer.cpp		Γίνετε σύνδεση...
-Login:	CodyCam		Όνομα χρήστη:
-Never	CodyCam		Ποτέ
-OK	CodyCam		Εντάξει
-Output	CodyCam		Έξοδος
-PASS <suppressed>  (real password sent)\n	FtpClient		ΚΩΔΙΚΟΣ <suppressed> (εστάλη ο πραγματικός κωδικός)\n
-Passive FTP	CodyCam		Παθητικό FTP
-Password:	CodyCam		Κωδικός:
-Quit	CodyCam		Έξοδος
-Rate:	CodyCam		Ρυθμός:
-Remote host has closed the connection.\n	FtpClient		Ο απομακρυσμένος υπολογιστής έκλεισε τη σύνδεση.\n
-Rename failed	VideoConsumer.cpp		Η μετονομασία απέτυχε
-Renaming…	VideoConsumer.cpp		Μετονομασία...
-SFTP	CodyCam		SFTP
-Send to…	CodyCam		Αποστολή στο...
-Server login failed	VideoConsumer.cpp		Η σύνδεση στον εξυπηρετητή απέτυχε
-Server:	CodyCam		Εξυπηρετητής:
-Start video	CodyCam		Εκκίνηση βίντεο
-Stop video	CodyCam		Σταμάτα το βίντεο
-Transmitting…	VideoConsumer.cpp		Μεταδίδεται...
-Type:	CodyCam		Τύπος:
-Video settings	CodyCam		Ρυθμίσεις βίντεο
-Waiting…	CodyCam		Περιμένετε...
-capture rate expected	CodyCam		αναμενόμενος ρυθμός σύλληψης
-cmd: '%s'\n	FtpClient		cmd: '%s'\n
-destination directory expected	CodyCam		προβλεπόμενος κατάλογος προορισμού
-image file format expected	CodyCam		αναμενόμενος τύπος αρχείου εικόνας
-invalid upload client %ld\n	VideoConsumer.cpp		λανθασμένος upload client %ld\n
-login ID expected	CodyCam		αναμενόμενο ID σύνδεσης
-on or off expected	Settings	Do not translate 'on' and 'off'	αναμενόμενο on ή off
-password	CodyCam		κωδικός
 password expected	CodyCam		αναμενόμενος κωδικός
-read: %d\n	SftpClient		ανάγνωση: %d\n
-read: %ld\n	SftpClient		ανάγνωση: %ld\n
 reply: %d, %d\n	FtpClient		επανάληψη: %d, %d\n
+Cannot find the media roster	CodyCam		Αδυναμία εύρεσης του ρόστερ των πολυμέσων
+Every 4 hours	CodyCam		Κάθε 4 ώρες
+FTP	CodyCam		FTP
+File transmission failed	VideoConsumer.cpp		Η μεταφορά του αρχείου απέτυχε
+Cannot seek time source!	CodyCam		Αδυναμία επιδίωξης της προέλευσης ώρας
+File	CodyCam		Αρχείο
+Image Format Menu	CodyCam		Μενού μορφοποίησης εικόνας
+Every 30 minutes	CodyCam		Κάθε 30 λεπτά
 reply: '%s'\n	SftpClient		επανάληψη: '%s'\n
-server address expected	CodyCam		αναμενόμενη διεύθυνση διακομιστή
-still image filename expected	CodyCam		προβλεπόμενο όνομα αρχείου εικόνας
-unknown command	SettingsHandler		άγνωστη εντολή
-unrecognized upload client specified	CodyCam		άγνωστος προβλέπομενος upload client
-upload client name expected	CodyCam		αναμενόμενο όνομα του upload client
+Start video	CodyCam		Εκκίνηση βίντεο

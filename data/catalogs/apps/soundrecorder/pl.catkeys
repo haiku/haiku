@@ -1,33 +1,45 @@
-1	polish	x-vnd.Haiku-SoundRecorder	3092747695
+1	polish	x-vnd.Haiku-SoundRecorder	2149017672
 Loop	RecorderWindow		Pętla
 Cannot find default audio hardware	RecorderWindow		Nie można odnaleść domyślnego urządzenia audio
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Nie można zlokalizować pliku tymczasowego przechowującego nowe nagrania
+Sample size:	RecorderWindow		Rozmiar próbki:
 Nothing to play	RecorderWindow		Nic do otworzenia
+Duration: 	RecorderWindow		Czas trwania: 
 Some of the files don't appear to be audio files	RecorderWindow		Część plików nie jest rozpoznawana jako pliki audio
 File info	RecorderWindow		Informacje o pliku
 Drop files here	SoundListView		Upuść pliki tutaj
 Input	RecorderWindow		Wejście
 Stop	RecorderWindow		Zatrzymaj
+Format:	RecorderWindow		Format:
 Sound List	RecorderWindow		Lista dzwięków
+Compression: 	RecorderWindow		Kompresja: 
 Rewind	RecorderWindow		Przewiń
 Sample rate:	RecorderWindow		Tempo próbki:
 Invalid audio files	RecorderWindow		Nieprawidłowe pliki audio
+ seconds	RecorderWindow		 sekund
 OK	RecorderWindow		OK
 Cannot open the temporary file created to hold the new recording	RecorderWindow		Nie można odnaleść pliku tymczasowego przechowującego nowe nagrania
 None of the files appear to be audio files	RecorderWindow		Żaden z tych plików nie jest rozpoznawany jako plik audio
 Input:	RecorderWindow		Wejście:
 Forward	RecorderWindow		Do przodu
 Play	RecorderWindow		Odtwórz
+SoundRecorder	System name		SoundRecorder
+Channels:	RecorderWindow		Kanały:
+ bits	RecorderWindow		 bity
 None	RecorderWindow		Puste
 Record	RecorderWindow		Nagranie
-Sample size: 	RecorderWindow		Rozmiar próbki:
+Sample size: 	RecorderWindow		Rozmiar próbki: 
 Cannot recognize this file as a media file	RecorderWindow		Ten plik nie jest rozpoznawany jako plik multimedialny
-Format: 	RecorderWindow		Format:
-File name: 	RecorderWindow		Nazwa pliku:
+Format: 	RecorderWindow		Format: 
+File name: 	RecorderWindow		Nazwa pliku: 
 Cannot connect to the selected sound input	RecorderWindow		Nie można podłączyć się do wskazanego źródła audio
 Cannot get the file to play	RecorderWindow		Nie można załadować pliku do odtworzenia
 Cannot record a sound that long	RecorderWindow		Nie można nagrać dźwięku tej długości
 Duration:	RecorderWindow		Czas trwania:
 Compression:	RecorderWindow		Kompresja:
 Cannot find an unused name to use for the new recording	RecorderWindow		Nie można odnaleść wolnej nazwy dla tego nagrania
-Channels: 	RecorderWindow		Kanały:
+Channels: 	RecorderWindow		Kanały: 
+Save	RecorderWindow		Zapisz
+Sample rate: 	RecorderWindow		Próbkowanie: 
+Cannot connect to media server	RecorderWindow		Nie można się połączyć z serwerem mediów
+File name:	RecorderWindow		Nazwa pliku:

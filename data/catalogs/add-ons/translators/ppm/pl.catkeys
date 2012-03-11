@@ -1,0 +1,31 @@
+1	polish	x-vnd.Haiku-PPMTranslator	2886727868
+PPM Settings	PPMMain		Ustawienia PPM
+Based on PPMTranslator sample code	PPMTranslator		Oparte na przykładowym kodzie źródłowym translatora PPM
+OK	PPMMain		OK
+Grayscale 8 bits	PPMTranslator		8-bitowa skala szarości
+CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 bity
+PPM image	PPMTranslator		Obraz PPM
+RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1, 16 bitów
+PPM Image Translator	PPMTranslator		Translator obrazów PPM
+Be Bitmap Format (PPMTranslator)	PPMTranslator		Format Be Bitmap (Translator PPM)
+CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8, 32 bity
+CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8, 32 bity
+bits/space	PPMTranslator		bity/przestrzeń
+RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8, 32 bity, Big Endian
+RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5, 16 bitów, Big Endian
+Version %d.%d.%d %s	PPMTranslator		Wersja %d.%d.%d %s
+RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5, 16 bitów, Big Endian
+RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5, 16 bitów
+Write ASCII	PPMTranslator		Zapisz ASCII
+RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8, 32 bity
+None	PPMTranslator		Brak
+RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1, 16 bitów, Big Endian
+RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5, 16 bitów
+Bitmap 1 bit	PPMTranslator		Jednobitowa bitmapa
+RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8, 32 bity, Big Endian
+Input Color Space	PPMTranslator		Wejściowa przestrzeń barw
+RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8, 32 bity
+Sample code copyright 1999, Be Incorporated	PPMTranslator		Przykładowy kod źródłowy, copyright 1999, Be Incorporated
+PPMTranslator Settings	PPMTranslator		Ustawienia translatora PPM
+Something is wrong with the PPMTranslator!	PPMMain		Coś poszło nie tak w PPM Translatorze!
+System palette 8 bits	PPMTranslator		Paleta systemowa, 8 bitów
