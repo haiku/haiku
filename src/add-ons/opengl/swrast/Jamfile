@@ -1,0 +1,56 @@
+SubDir HAIKU_TOP src add-ons opengl swrast ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os opengl ] : true ;
+		# We need our public GL headers also when not compiling for Haiku.
+}
+
+
+{
+	local defines ;
+	defines = BEOS_THREADS GNU_ASSEMBLER ;
+
+	if $(TARGET_ARCH) = x86 {
+		defines += USE_X86_ASM USE_MMX_ASM USE_3DNOW_ASM USE_SSE_ASM ;
+	} else if $(TARGET_ARCH) = ppc {
+		# Not yet supported, as current Mesa3D PPC assembly is Linux-dependent!
+		# defines += USE_PPC_ASM ;
+	} else if $(TARGET_ARCH) = sparc {
+		defines += USE_SPARC_ASM ;
+	}
+
+	# For GCC2
+	local flags ;
+	if $(HAIKU_GCC_VERSION[1]) < 3 {
+		flags = --no-warnings ;
+	}
+
+	SubDirC++Flags [ FDefines $(defines) ] $(flags) ;
+}
+
+
+local sources = MesaSoftwareRenderer.cpp ;
+
+UsePrivateHeaders interface ;
+SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
+Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) include ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa main ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mapi ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mapi glapi ] ;
+
+# For older versions of Mesa
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa glapi ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa tnl ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa x86 ] ;
+
+Addon Mesa\ Software\ Renderer :
+	MesaSoftwareRenderer.cpp :
+	libGL.so
+	be
+	$(TARGET_LIBSUPC++)
+;

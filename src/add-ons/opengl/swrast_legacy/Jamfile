@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons opengl mesa_software_renderer ;
+SubDir HAIKU_TOP src add-ons opengl swrast_legacy ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
