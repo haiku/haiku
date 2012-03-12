@@ -47,10 +47,10 @@ Addon ffmpeg :
 	# FFmpeg libraries (from FFmpeg optional package):
 	$(HAIKU_FFMPEG_LIBS)
 
-	libvorbis_ffmpeg.a
-	libspeex_ffmpeg.a
-	libtheora_ffmpeg.a
-	libogg_ffmpeg.a
+	$(HAIKU_SPEEX_LIBS)
+	$(HAIKU_LIBTHEORA_LIBS)
+	$(HAIKU_LIBVORBIS_LIBS)
+	$(HAIKU_LIBOGG_LIBS)
 	libbz2_ffmpeg.a
 
 	be
@@ -60,71 +60,5 @@ Addon ffmpeg :
 	$(TARGET_NETWORK_LIBS)
 ;
 
-# FFmpeg libs configuration is in the config.h header. Architecture specific
-# defines have been commented out there and are being defined here instead.
-# NOTE: These are intentionally global variables, so we can re-use them in
-# sub-folders.
-HAIKU_FFMPEG_DEFINES = HAVE_AV_CONFIG_H _FILE_OFFSET_BITS=64
-	_LARGEFILE_SOURCE ;
-HAIKU_FFMPEG_USE_MMX = 1 ;
-HAIKU_FFMPEG_USE_MMX2 = 1 ;
-HAIKU_FFMPEG_USE_SSE = 1 ;
-HAIKU_FFMPEG_USE_SSSE3 = 1 ;
-HAIKU_FFMPEG_USE_AMD3DNOW = 1 ;
-HAIKU_FFMPEG_USE_AMD3DNOWEXT = 1 ;
-HAIKU_FFMPEG_GCC_EXTRA_FLAGS = ;
-if $(HAIKU_GCC_VERSION[1]) >= 3 {
-	HAIKU_FFMPEG_GCC_EXTRA_FLAGS = -fomit-frame-pointer -fno-pic
-		-fno-math-errno -fno-signed-zeros -fno-tree-vectorize  ;
-} else {
-	HAIKU_FFMPEG_GCC_EXTRA_FLAGS = -fomit-frame-pointer -fPIC ;
-	HAIKU_FFMPEG_USE_SSE = 0 ;
-}
-
-if $(TARGET_ARCH) = x86 {
-	HAIKU_FFMPEG_DEFINES += ARCH_X86=1 ARCH_X86_32=1 ;
-	HAIKU_FFMPEG_DEFINES += ARCH_PPC=0 ;
-	HAIKU_FFMPEG_DEFINES += ARCH_SPARC=0 ;
-	HAIKU_FFMPEG_DEFINES += HAVE_AMD3DNOW=$(HAIKU_FFMPEG_USE_AMD3DNOW) ;
-	HAIKU_FFMPEG_DEFINES += HAVE_AMD3DNOWEXT=$(HAIKU_FFMPEG_USE_AMD3DNOWEXT) ;
-	HAIKU_FFMPEG_DEFINES += HAVE_BIGENDIAN=0 ;
-	HAIKU_FFMPEG_DEFINES += HAVE_MMX=$(HAIKU_FFMPEG_USE_MMX) ;
-	HAIKU_FFMPEG_DEFINES += HAVE_MMX2=$(HAIKU_FFMPEG_USE_MMX2) ;
-	HAIKU_FFMPEG_DEFINES += HAVE_SSE=$(HAIKU_FFMPEG_USE_SSE) ;
-	HAIKU_FFMPEG_DEFINES += HAVE_SSSE3=$(HAIKU_FFMPEG_USE_SSSE3) ;
-	HAIKU_FFMPEG_DEFINES += HAVE_ALTIVEC=0 ;
-	HAIKU_FFMPEG_DEFINES += HAVE_VIS=0 ;
-} else if $(TARGET_ARCH) = ppc {
-	HAIKU_FFMPEG_DEFINES += ARCH_X86=0 ARCH_X86_32=0 ;
-	HAIKU_FFMPEG_DEFINES += ARCH_PPC=1 ;
-	HAIKU_FFMPEG_DEFINES += ARCH_SPARC=0 ;
-	HAIKU_FFMPEG_DEFINES += HAVE_AMD3DNOW=0 HAVE_AMD3DNOWEXT=0 ;
-	HAIKU_FFMPEG_DEFINES += HAVE_MMX=0 HAVE_MMX2=0 HAVE_SSE=0 HAVE_SSSE3=0 ;
-	HAIKU_FFMPEG_DEFINES += HAVE_ALTIVEC=1 ;
-	HAIKU_FFMPEG_DEFINES += HAVE_BIGENDIAN=1 ;
-	HAIKU_FFMPEG_DEFINES += HAVE_VIS=0 ;
-} else if $(TARGET_ARCH) = sparc {
-	HAIKU_FFMPEG_DEFINES += ARCH_X86=0 ARCH_X86_32=0 ;
-	HAIKU_FFMPEG_DEFINES += ARCH_PPC=0 ;
-	HAIKU_FFMPEG_DEFINES += ARCH_SPARC=1 ;
-	HAIKU_FFMPEG_DEFINES += HAVE_AMD3DNOW=0 HAVE_AMD3DNOWEXT=0 ;
-	HAIKU_FFMPEG_DEFINES += HAVE_MMX=0 HAVE_MMX2=0 HAVE_SSE=0 HAVE_SSSE3=0 ;
-	HAIKU_FFMPEG_DEFINES += HAVE_ALTIVEC=0 ;
-	HAIKU_FFMPEG_DEFINES += HAVE_BIGENDIAN=1 ;
-	HAIKU_FFMPEG_DEFINES += HAVE_VIS=1 ;
-}
-
-if $(HAIKU_INCLUDE_GPL_ADDONS) = 1 {
-	HAIKU_FFMPEG_DEFINES += CONFIG_GPL=1 ;
-} else {
-	HAIKU_FFMPEG_DEFINES += CONFIG_GPL=0 ;
-}
-
-
-HAIKU_FFMPEG_DEFINES = [ FDefines $(HAIKU_FFMPEG_DEFINES) ] ;
-
 SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libbz2 ;
-SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libogg ;
-SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libspeex ;
-SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libtheora ;
-SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libvorbis ;
+

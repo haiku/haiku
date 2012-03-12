@@ -212,22 +212,54 @@ if $(TARGET_ARCH) = x86 {
 
 
 # FFmpeg
-local ffmpegBaseURL = http://haiku-files.org/files/optional-packages ;
+local ffmpegBaseURL = http://haiku-files.org/files/optional-packages/lib ;
 if $(TARGET_ARCH) = x86 {
 	if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		HAIKU_FFMPEG_FILE = ffmpeg-0.10-x86-gcc4-2012-02-19.zip ;
+		HAIKU_FFMPEG_FILE = ffmpeg-0.10-x86-gcc4-2012-03-12.zip ;
+		HAIKU_SPEEX_FILE = speex-1.2rc1-x86-gcc4-2012-03-12.zip ;
+		HAIKU_LIBTHEORA_FILE = libtheora-1.1.1-x86-gcc4-2012-03-12.zip ;
+		HAIKU_LIBVORBIS_FILE = libvorbis-1.3.2-x86-gcc4-2012-03-12.zip ;
+		HAIKU_LIBOGG_FILE = libogg-1.3.0-x86-gcc4-2012-03-12.zip ;
 	} else {
-		HAIKU_FFMPEG_FILE = ffmpeg-0.10-x86-gcc2-2012-03-07.zip ;
+		HAIKU_FFMPEG_FILE = ffmpeg-0.10-x86-gcc2-2012-03-11.zip ;
+		HAIKU_SPEEX_FILE = speex-1.2rc1-x86-gcc2-2012-03-11.zip ;
+		HAIKU_LIBTHEORA_FILE = libtheora-1.1.1-x86-gcc2-2012-03-11.zip ;
+		HAIKU_LIBVORBIS_FILE = libvorbis-1.3.2-x86-gcc2-2012-03-11.zip ;
+		HAIKU_LIBOGG_FILE = libogg-1.3.0-x86-gcc2-2012-03-11.zip ;
 	}
 
-	local zipFile = [ DownloadFile $(HAIKU_FFMPEG_FILE)
+	local ffmpegZipFile = [ DownloadFile $(HAIKU_FFMPEG_FILE)
 		: $(ffmpegBaseURL)/$(HAIKU_FFMPEG_FILE) ] ;
+	local speexZipFile = [ DownloadFile $(HAIKU_SPEEX_FILE)
+		: $(ffmpegBaseURL)/$(HAIKU_SPEEX_FILE) ] ;
+	local libtheoraZipFile = [ DownloadFile $(HAIKU_LIBTHEORA_FILE)
+		: $(ffmpegBaseURL)/$(HAIKU_LIBTHEORA_FILE) ] ;
+	local libvorbisZipFile = [ DownloadFile $(HAIKU_LIBVORBIS_FILE)
+		: $(ffmpegBaseURL)/$(HAIKU_LIBVORBIS_FILE) ] ;
+	local liboggZipFile = [ DownloadFile $(HAIKU_LIBOGG_FILE)
+		: $(ffmpegBaseURL)/$(HAIKU_LIBOGG_FILE) ] ;
 
 	HAIKU_FFMPEG_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
 		$(HAIKU_FFMPEG_FILE:B) ] ;
+	HAIKU_SPEEX_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_SPEEX_FILE:B) ] ;
+	HAIKU_LIBTHEORA_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_LIBTHEORA_FILE:B) ] ;
+	HAIKU_LIBVORBIS_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_LIBVORBIS_FILE:B) ] ;
+	HAIKU_LIBOGG_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_LIBOGG_FILE:B) ] ;
 
 	HAIKU_FFMPEG_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_FFMPEG_DIR)
-		: common/include/ : $(zipFile) : extracted-ffmpeg ] ;
+		: common/include/ : $(ffmpegZipFile) : extracted-ffmpeg ] ;
+	HAIKU_SPEEX_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_SPEEX_DIR)
+		: common/include/ : $(speexZipFile) : extracted-speex ] ;
+	HAIKU_LIBTHEORA_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_LIBTHEORA_DIR)
+		: common/include/ : $(libtheoraZipFile) : extracted-libtheora ] ;
+	HAIKU_LIBVORBIS_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_LIBVORBIS_DIR)
+		: common/include/ : $(libvorbisZipFile) : extracted-libvorbis ] ;
+	HAIKU_LIBOGG_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_LIBOGG_DIR)
+		: common/include/ : $(liboggZipFile) : extracted-libogg ] ;
 
 	HAIKU_FFMPEG_LIBS = [ ExtractArchive $(HAIKU_FFMPEG_DIR)
 		:
@@ -237,10 +269,49 @@ if $(TARGET_ARCH) = x86 {
 		common/lib/libavfilter.a
 		common/lib/libswscale.a
 		common/lib/libavutil.a
-		: $(zipFile)
+		: $(ffmpegZipFile)
 		: extracted-ffmpeg ] ;
+	Depends $(HAIKU_FFMPEG_LIBS) : $(HAIKU_FFMPEG_HEADERS_DEPENDENCY) ;
+
+	HAIKU_SPEEX_LIBS = [ ExtractArchive $(HAIKU_SPEEX_DIR)
+		:
+		common/lib/libspeex.a
+		: $(speexZipFile)
+		: extracted-speex ] ;
+	Depends $(HAIKU_SPEEX_LIBS) : $(HAIKU_SPEEX_HEADERS_DEPENDENCY) ;
+
+	HAIKU_LIBTHEORA_LIBS = [ ExtractArchive $(HAIKU_LIBTHEORA_DIR)
+		:
+		common/lib/libtheora.a
+		common/lib/libtheoradec.a
+		common/lib/libtheoraenc.a
+		: $(libtheoraZipFile)
+		: extracted-libtheora ] ;
+	Depends $(HAIKU_LIBTHEORA_LIBS) : $(HAIKU_LIBTHEORA_HEADERS_DEPENDENCY) ;
+
+
+	HAIKU_LIBVORBIS_LIBS = [ ExtractArchive $(HAIKU_LIBVORBIS_DIR)
+		:
+		common/lib/libvorbis.a
+		common/lib/libvorbisenc.a
+		: $(libvorbisZipFile)
+		: extracted-libvorbis ] ;
+	Depends $(HAIKU_LIBVORBIS_LIBS) : $(HAIKU_LIBVORBIS_HEADERS_DEPENDENCY) ;
+
+
+	HAIKU_LIBOGG_LIBS = [ ExtractArchive $(HAIKU_LIBOGG_DIR)
+		:
+		common/lib/libogg.a
+		: $(liboggZipFile)
+		: extracted-libogg ] ;
+	Depends $(HAIKU_LIBOGG_LIBS) : $(HAIKU_LIBOGG_HEADERS_DEPENDENCY) ;
+
 
 	HAIKU_FFMPEG_HEADERS = [ FDirName $(HAIKU_FFMPEG_DIR) common include ] ;
+	HAIKU_SPEEX_HEADERS = [ FDirName $(HAIKU_SPEEX_DIR) common include ] ;
+	HAIKU_LIBTHEORA_HEADERS = [ FDirName $(HAIKU_LIBTHEORA_DIR) common include ] ;
+	HAIKU_LIBVORBIS_HEADERS = [ FDirName $(HAIKU_LIBVORBIS_DIR) common include ] ;
+	HAIKU_LIBOGG_HEADERS = [ FDirName $(HAIKU_LIBOGG_DIR) common include ] ;
 
 } else {
 	Echo "FFMpeg support not available on $(TARGET_ARCH)" ;
