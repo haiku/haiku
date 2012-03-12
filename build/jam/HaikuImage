@@ -589,10 +589,19 @@ AddBootModuleSymlinksToHaikuImage
 # add-ons
 AddFilesToHaikuImage system add-ons accelerants
 	: $(SYSTEM_ADD_ONS_ACCELERANTS) ;
+
+# OpenGL renderers
 if $(TARGET_ARCH) = x86 {
-	AddFilesToHaikuHybridImage system add-ons opengl
-		: Mesa\ Software\ Renderer : : true ;
+	if $(HAIKU_GCC_VERSION[1]) = 2 {
+		AddFilesToHaikuHybridImage system add-ons opengl
+			: Legacy\ Software\ Rasterizer : : true ;
+	} else {
+		AddFilesToHaikuHybridImage system add-ons opengl
+			: Software\ Rasterizer : : true ;
+		# Future Gallium3d
+	}
 }
+
 AddFilesToHaikuHybridImage system add-ons Translators
 	: $(SYSTEM_ADD_ONS_TRANSLATORS) : : true ;
 AddFilesToHaikuImage system add-ons locale catalogs
