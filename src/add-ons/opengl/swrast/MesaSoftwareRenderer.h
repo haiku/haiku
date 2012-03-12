@@ -20,20 +20,9 @@
 #include "GLRenderer.h"
 
 extern "C" {
-#include "main/version.h"
-#define HAIKU_MESA_VER (MESA_MAJOR * 100) + MESA_MINOR
-
 #include "context.h"
-
-#if HAIKU_MESA_VER >= 712
+#include "main/version.h"
 #include "swrast/s_chan.h"
-#endif
-
-
-#if HAIKU_MESA_VER <= 711
-#define gl_context GLcontext
-#define gl_config GLvisual
-#endif
 
 
 struct msr_renderbuffer {
