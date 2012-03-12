@@ -1,14 +1,8 @@
 SubDir HAIKU_TOP src add-ons opengl ;
 
 # Haiku Mesa Software Rasterizer
-if $(HAIKU_GCC_VERSION[1]) >= 4 {
-	# Mainline Mesa
-	SubInclude HAIKU_TOP src add-ons opengl swrast ;
-} else {
-	# Mesa 7.8.2
-	SubInclude HAIKU_TOP src add-ons opengl swrast_legacy ;
-}
-
+SubInclude HAIKU_TOP src add-ons opengl swrast ;
+SubInclude HAIKU_TOP src add-ons opengl swrast_legacy ;
 
 # SubInclude HAIKU_TOP src add-ons opengl nvidia ;
 # SubInclude HAIKU_TOP src add-ons opengl radeon ;
