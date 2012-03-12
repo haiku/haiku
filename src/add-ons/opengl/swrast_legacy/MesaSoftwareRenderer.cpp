@@ -595,6 +595,8 @@ MesaSoftwareRenderer::_AllocateBitmap()
 	fFrontRenderBuffer->size = fBitmap->BitsLength();
 	if (fVisual->doubleBufferMode)
 		fBackRenderBuffer->size = fBitmap->BitsLength();
+	fFrameBuffer->width = fWidth;
+	fFrameBuffer->height = fHeight;
 	TRACE("%s: Bitmap Size: %" B_PRIu32 "\n", __func__, fBitmap->BitsLength());
 
 	fFrontRenderBuffer->base.Data = fBitmap->Bits();
