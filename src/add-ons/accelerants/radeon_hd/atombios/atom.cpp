@@ -39,7 +39,7 @@
  * Number of repeat AtomBIOS jmp operations
  * before bailing due to stuck in a loop
  */
-#define ATOM_OP_JMP_TIMEOUT 128
+#define ATOM_OP_JMP_TIMEOUT 512
 
 // *** Tracing
 #undef TRACE
