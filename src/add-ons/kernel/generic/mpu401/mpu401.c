@@ -279,7 +279,7 @@ midi_read(void *cookie, off_t pos, void *buffer, size_t *num_bytes)
 
 	unsigned char *data;
 	unsigned int i;
-	cpu_status status;
+	cpu_status status __attribute__((unused));
 	status_t bestat;
 	mpu401device *mpu_device = (mpu401device *)cookie;
 
@@ -298,8 +298,13 @@ midi_read(void *cookie, off_t pos, void *buffer, size_t *num_bytes)
 		*num_bytes = 1;
 		return B_INTERRUPTED;
 	} else {
+#ifdef __HAIKU__
+		if (user_memcpy(data+i, &(mpubuffer[mbuf_start]),
+			sizeof(unsigned char)) == B_OK) {
+#else
 		status = lock();
 		*(data+i) = mpubuffer[mbuf_start];
+#endif
 		i++;
 		mbuf_start++; // pointer to data in ringbuffer
 		if (mbuf_start >= (MBUF_ELEMENTS-1))
@@ -307,7 +312,11 @@ midi_read(void *cookie, off_t pos, void *buffer, size_t *num_bytes)
 		*num_bytes = 1; // How many bytes are being returned in buffer
 		if (mbuf_bytes > 0)
 			mbuf_bytes--; // bytes read from buffer, so decrement buffer count
+#ifdef __HAIKU__
+		}
+#else
    		unlock(status);
+#endif
    		//PRINT(("bytes in buffer: %d\n",mbuf_bytes));
 	}
 
