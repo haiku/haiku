@@ -904,6 +904,20 @@ encoder_analog_load_detect(uint32 connectorIndex)
 {
 	TRACE("%s\n", __func__);
 
+	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
+
+	if (encoder_is_external(encoderID))
+		return encoder_dig_load_detect(connectorIndex);
+
+	return encoder_dac_load_detect(connectorIndex);
+}
+
+
+bool
+encoder_dac_load_detect(uint32 connectorIndex)
+{
+	TRACE("%s\n", __func__);
+
 	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
 
@@ -990,6 +1004,46 @@ encoder_analog_load_detect(uint32 connectorIndex)
 		}
 
 	}
+	return false;
+}
+
+
+bool
+encoder_dig_load_detect(uint32 connectorIndex)
+{
+	TRACE("%s\n", __func__);
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	if (info.dceMajor < 4) {
+		ERROR("%s: Strange: External DIG encoder on DCE < 4?\n", __func__);
+		return false;
+	}
+
+	encoder_external_setup(connectorIndex, 0,
+		EXTERNAL_ENCODER_ACTION_V3_DACLOAD_DETECTION);
+
+	uint32 biosScratch0 = Read32(OUT, R600_BIOS_0_SCRATCH);
+
+	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+
+	if ((encoderFlags & ATOM_DEVICE_CRT1_SUPPORT) != 0)
+		if ((biosScratch0 & ATOM_S0_CRT1_MASK) != 0)
+			return true;
+	if ((encoderFlags & ATOM_DEVICE_CRT2_SUPPORT) != 0)
+		if ((biosScratch0 & ATOM_S0_CRT2_MASK) != 0)
+			return true;
+	if ((encoderFlags & ATOM_DEVICE_CV_SUPPORT) != 0)
+		if ((biosScratch0 & (ATOM_S0_CV_MASK | ATOM_S0_CV_MASK_A)) != 0)
+			return true;
+	if ((encoderFlags & ATOM_DEVICE_TV1_SUPPORT) != 0) {
+		if ((biosScratch0
+			& (ATOM_S0_TV1_COMPOSITE | ATOM_S0_TV1_COMPOSITE_A)) != 0)
+			return true; /* Composite connected */
+		else if ((biosScratch0
+			& (ATOM_S0_TV1_SVIDEO | ATOM_S0_TV1_SVIDEO_A)) != 0)
+			return true; /* S-Video connected */
+	}
+
 	return false;
 }
 
