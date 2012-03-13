@@ -1,6 +1,13 @@
 SubDir HAIKU_TOP src apps 3dmov ;
+SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
+
+# For GCC2
+if $(HAIKU_GCC_VERSION[1]) < 3 {
+	SubDirC++Flags --no-warnings ;
+}
+
 
 Application 3DMov :
 	Application.cpp
