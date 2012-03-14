@@ -323,7 +323,7 @@ dp_aux_set_i2c_byte(uint32 hwPin, uint16 address, uint8* data, bool end)
 uint32
 dp_get_link_clock(uint32 connectorIndex)
 {
-	uint16 encoderID = gConnector[connectorIndex]->encoder.objectID;
+	uint16 encoderID = gConnector[connectorIndex]->encoder->objectID;
 
 	if (encoderID == ENCODER_OBJECT_ID_NUTMEG)
 		return 270000;
@@ -690,7 +690,7 @@ dp_link_train(uint8 crtcID, display_mode* mode)
 	}
 
 	uint32 linkEnumeration
-		= gConnector[connectorIndex]->encoder.linkEnumeration;
+		= gConnector[connectorIndex]->encoder->linkEnumeration;
 	uint32 gpioID = gConnector[connectorIndex]->gpioID;
 	uint32 hwPin = gGPIOInfo[gpioID]->hwPin;
 

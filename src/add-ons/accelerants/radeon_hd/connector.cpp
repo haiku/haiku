@@ -439,18 +439,18 @@ connector_probe_legacy()
 		uint32 encoderObject = encoder_object_lookup((1 << i), dac);
 		uint32 encoderID = (encoderObject & OBJECT_ID_MASK) >> OBJECT_ID_SHIFT;
 
+		encoder_info* encoder = gConnector[connectorIndex]->encoder;
+
 		gConnector[connectorIndex]->valid = true;
-		gConnector[connectorIndex]->encoder.flags = (1 << i);
-		gConnector[connectorIndex]->encoder.valid = true;
-		gConnector[connectorIndex]->encoder.objectID = encoderID;
-		gConnector[connectorIndex]->encoder.type
-			= encoder_type_lookup(encoderID, (1 << i));
-		gConnector[connectorIndex]->encoder.isExternal
-			= encoder_is_external(encoderID);
+		encoder->flags = (1 << i);
+		encoder->valid = true;
+		encoder->objectID = encoderID;
+		encoder->type = encoder_type_lookup(encoderID, (1 << i));
+		encoder->isExternal = encoder_is_external(encoderID);
 
 		connector_attach_gpio(connectorIndex, ci.sucI2cId.ucAccess);
 
-		pll_limit_probe(&gConnector[connectorIndex]->encoder.pll);
+		pll_limit_probe(&encoder->pll);
 
 		connectorIndex++;
 	}
@@ -579,12 +579,14 @@ connector_probe()
 				//	= (B_LENDIAN_TO_HOST_INT16(path->usGraphicObjIds[j]) &
 				//	ENUM_ID_MASK) >> ENUM_ID_SHIFT;
 				uint8 graphicObjectType
-					= (B_LENDIAN_TO_HOST_INT16(path->usGraphicObjIds[j]) &
-					OBJECT_TYPE_MASK) >> OBJECT_TYPE_SHIFT;
+					= (B_LENDIAN_TO_HOST_INT16(path->usGraphicObjIds[j])
+					& OBJECT_TYPE_MASK) >> OBJECT_TYPE_SHIFT;
 
 				if (graphicObjectType == GRAPH_OBJECT_TYPE_ENCODER) {
 					// Found an encoder
 					// TODO: it may be possible to have more then one encoder
+					encoder_info* encoder = connector->encoder;
+
 					int32 k;
 					for (k = 0; k < encoderObject->ucNumberOfObjects; k++) {
 						uint16 encoderObjectRaw
@@ -629,20 +631,19 @@ connector_probe()
 								continue;
 							}
 
-							// Set up found connector
-							connector->encoder.valid = true;
-							connector->encoder.flags = connectorFlags;
-							connector->encoder.objectID = encoderID;
-							connector->encoder.type = encoderType;
-							connector->encoder.linkEnumeration
+							encoder->valid = true;
+							encoder->flags = connectorFlags;
+							encoder->objectID = encoderID;
+							encoder->type = encoderType;
+							encoder->linkEnumeration
 								= (encoderObjectRaw & ENUM_ID_MASK)
 									>> ENUM_ID_SHIFT;
-							connector->encoder.isExternal
+							encoder->isExternal
 								= encoder_is_external(encoderID);
-							connector->encoder.isDPBridge
+							encoder->isDPBridge
 								= encoder_is_dp_bridge(encoderID);
 
-							pll_limit_probe(&connector->encoder.pll);
+							pll_limit_probe(&encoder->pll);
 						}
 					}
 					// END if object is encoder
@@ -701,18 +702,18 @@ connector_probe()
 			connector->type = connectorType;
 			connector->objectID = connectorObjectID;
 
-			connector->encoder.isTV = false;
-			connector->encoder.isHDMI = false;
+			connector->encoder->isTV = false;
+			connector->encoder->isHDMI = false;
 
 			switch (connectorType) {
 				case VIDEO_CONNECTOR_COMPOSITE:
 				case VIDEO_CONNECTOR_SVIDEO:
 				case VIDEO_CONNECTOR_9DIN:
-					connector->encoder.isTV = true;
+					connector->encoder->isTV = true;
 					break;
 				case VIDEO_CONNECTOR_HDMIA:
 				case VIDEO_CONNECTOR_HDMIB:
-					connector->encoder.isHDMI = true;
+					connector->encoder->isHDMI = true;
 					break;
 			}
 
@@ -729,7 +730,7 @@ connector_is_dp(uint32 connectorIndex)
 {
 	if (gConnector[connectorIndex]->type == VIDEO_CONNECTOR_DP
 		|| gConnector[connectorIndex]->type == VIDEO_CONNECTOR_EDP
-		|| gConnector[connectorIndex]->encoder.isDPBridge == true) {
+		|| gConnector[connectorIndex]->encoder->isDPBridge == true) {
 		return true;
 	}
 	return false;
@@ -743,9 +744,10 @@ debug_connectors()
 	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
 		if (gConnector[id]->valid == true) {
 			uint32 connectorType = gConnector[id]->type;
-			uint32 encoderType = gConnector[id]->encoder.type;
-			uint16 encoderID = gConnector[id]->encoder.objectID;
-			uint32 encoderFlags = gConnector[id]->encoder.flags;
+			encoder_info* encoder = gConnector[id]->encoder;
+			uint32 encoderType = encoder->type;
+			uint16 encoderID = encoder->objectID;
+			uint32 encoderFlags = encoder->flags;
 			uint16 gpioID = gConnector[id]->gpioID;
 
 			ERROR("Connector #%" B_PRIu32 ")\n", id);
@@ -760,23 +762,23 @@ debug_connectors()
 			ERROR("   - type:         %s\n",
 				encoder_name_lookup(encoderID));
 			ERROR("   - enumeration:  %" B_PRIu32 "\n",
-				gConnector[id]->encoder.linkEnumeration);
+				encoder->linkEnumeration);
 
 			bool attribute = false;
 			ERROR("   - attributes:\n");
-			if (gConnector[id]->encoder.isExternal == true) {
+			if (encoder->isExternal == true) {
 				attribute = true;
 				ERROR("     * is external\n");
 			}
-			if (gConnector[id]->encoder.isHDMI == true) {
+			if (encoder->isHDMI == true) {
 				attribute = true;
 				ERROR("     * is HDMI\n");
 			}
-			if (gConnector[id]->encoder.isTV == true) {
+			if (encoder->isTV == true) {
 				attribute = true;
 				ERROR("     * is TV\n");
 			}
-			if (gConnector[id]->encoder.isDPBridge == true) {
+			if (encoder->isDPBridge == true) {
 				attribute = true;
 				ERROR("     * is DisplayPort bridge\n");
 			}
