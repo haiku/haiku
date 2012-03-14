@@ -1,4 +1,5 @@
-1	dutch; flemish	x-vnd.Haiku-NetworkStatus	853756860
+1	dutch; flemish	x-vnd.Haiku-NetworkStatus	581822564
+Connection Established	NetworkStatusView		Verbinding tot stand gebracht
 NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		NetwerkStatus-opties:\n\t--deskbar\tvoeg automatisch een replicant toe aan Deskbar\n\t--help\t\tprint deze info en exit\n
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		U kunt NetwerkStatus in een venster uitvoeren, of in Deskbar installeren
 <no wireless networks found>	NetworkStatusView		<geen draadloze netwerken gevonden>
@@ -10,6 +11,8 @@ NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatu
 Netmask	NetworkStatusView		Netwerkmasker
 Broadcast	NetworkStatusView		Broadcast
 Unknown	NetworkStatusView		Onbekend
+Network Status	NetworkStatusView		Netwerkstatus
+Connection Failed	NetworkStatusView		Verbinding mislukt
 Ready	NetworkStatusView		Gereed
 No stateful configuration	NetworkStatusView		Geen stateful-configuratie
 %ifaceName information:\n	NetworkStatusView		%ifaceName informatie:\n
@@ -17,6 +20,8 @@ Configuring	NetworkStatusView		Bezig met instellen
 Address	NetworkStatusView		Adres
 OK	NetworkStatusView		Oké
 NetworkStatus	System name		Netwerkstatus
+Disconnected	NetworkStatusView		Niet verbonden
 Open network preferences…	NetworkStatusView		Open netwerkvoorkeuren...
 Could not join wireless network:\n	NetworkStatusView		Kon niet aansluiten bij draadloos netwerk:\n
+Connecting...	NetworkStatusView		Bezig met verbinden…
 Quit	NetworkStatusView		Afsluiten

@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-DiskProbe	1689678213
+1	polish	x-vnd.Haiku-DiskProbe	2306672993
 File offset: 	ProbeView		Offset pliku: 
 %ld (native)	ProbeView		%ld (natywny)
 64 bit unsigned value:	TypeEditors		64-bitowa wartość typu unsigned:
@@ -69,9 +69,13 @@ DiskProbe request	AttributeWindow		Zapytanie Analizatora dysków
 Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Nie można odczytać pliku graficznego
 BlockSize	ProbeView	A menu item, a shortened form from 'block size'. This is in the same menu windowthan 'Base' and 'Font size'	RozmiarBloku
 Save changes before closing?	ProbeView		Czy zapisać zmiany przed zakończeniem działania aplikacji?
+Type editor	AttributeWindow		Edytor typów
 Native: 0x%0*Lx	ProbeView		Natywne: 0x%0*Lx
+Raw editor	AttributeWindow		Edytor raw
+Message View	TypeEditors		Widok wiadomości
 DiskProbe request	ProbeView		Zapytanie Analizatora dysków
 32 bit unsigned size:	TypeEditors		32-bitowa wartość typu unsigned:
+Flattened bitmap	TypeEditors		Spłaszczona bitmapa
 Open file…	FileWindow		Otwórz plik…
 Next	ProbeView		Następny
 Close	FileWindow		Zamknij
@@ -82,12 +86,19 @@ Previous	ProbeView		Poprzedni
 64 bit signed value:	TypeEditors		64-bitowa wartość typu signed:
 Icon	TypeEditors		Ikona
 Block: 	ProbeView		Blok: 
+Examine device:	OpenWindow		Zbadaj urządzenie:
 Offset: 	ProbeView		Przesunięcie: 
 OK	ProbeView		OK
 Add	ProbeView		Dodaj
 Edit	ProbeView		Edycja
+Native: %Ld (0x%0*Lx)	ProbeView		Natywnie: %Ld (0x%0*Lx)
 32 bit unsigned value:	TypeEditors		32-bitowa wartość typu unsigned:
+Message	TypeEditors	This is the type of view	Komunikat
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Nie można otworzyć \"%s\":\n%s
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Podstawowy
+Image view	TypeEditors	Image means here a picture file, not a disk image.	Wyświetlanie obrazu
 Cancel	AttributeWindow		Anuluj
+Type editor not supported	ProbeView		Edytor typów nie wspierany
 MIME type editor	TypeEditors		Edytor typów MIME
 Swapped: %Ld (0x%0*Lx)	ProbeView		Zamienione: %Ld (0x%0*Lx)
 Find	FindWindow		Wyszukaj
@@ -97,17 +108,26 @@ Block %Ld (0x%Lx)	ProbeView		Blok %Ld (0x%Lx)
 Image	TypeEditors	This is the type of view	Obraz
 Could not open file \"%s\": %s\n	DiskProbe		Nie można otworzyć pliku \"%s\": %s\n
 Select all	ProbeView		Zaznacz wszystko
+Probe file…	OpenWindow		Zbadaj plik…
+Icon view	TypeEditors		Widok ikon
+Bookmarks	ProbeView		Ulubione
+Mode:	FindWindow		Tryb:
 15 bit	TypeEditors		15-bitowy
+Open device	FileWindow		Otwórz urządzenie
+Could not find search string.	ProbeView		Nie można znaleźć ciągu wyszukiwania.
 16 bit unsigned value:	TypeEditors		16-bitowa wartość typu unsigned:
+Attribute offset: 	ProbeView		Przesunięcie atrybutu:
 View	ProbeView	This is the last menubar item 'File Edit Block View'	Widok
 Redo	ProbeView		Ponów
 File: 	ProbeView		Plik: 
 32 bit unsigned pointer:	TypeEditors		32-bitowy wskaźnik typu unsigned:
 of 	ProbeView		z
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Zapis do pliku nie powiódł się:\n%s\n\nWszystkie zmiany zostaną utracone jeśli wyjdziesz.
+32 bit	TypeEditors		32 bity
 Cancel	ProbeView		Anuluj
 Swapped: 0x%0*Lx	ProbeView		Zamienione: 0x%0*Lx
 Grayscale	TypeEditors		Skala szarości
 32 bit signed value:	TypeEditors		32-bitowa wartość typu signed:
 DiskProbe request	DiskProbe		Zapytanie Analizatora dysków
+Type editor	ProbeView		Edytor typów
 Contents:	TypeEditors		Zawartość:

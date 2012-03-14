@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-MAIL	3642307033
+1	japanese	x-vnd.Be-MAIL	3674714390
 View	Mail		表示
 %d - Date	Mail		%d - 日付
 Attach attributes:	Mail		属性の添付：
@@ -16,6 +16,7 @@ helpful message	Mail		有益なメッセージ
 Colored quotes:	Mail		引用部分の着色：
 Subject:	Mail		件名：
 Reply to all	Mail		全員に返信
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	添付ファイル: %name% (タイプ: %type%)
 Show icons & labels	Mail		アイコンとラベル
 Remove attachment	Mail		添付ファイルを削除
 Button bar:	Mail		ボタンバー：
@@ -30,3 +31,61 @@ Reply to sender	Mail		差出人に返信
 There is no installed handler for URL links.	Mail		URL リンク用ハンドラがインストールされていません。
 Signature	Mail		署名
 Find again	Mail		次を検索
+Bcc:	Mail		Bcc:
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		メッセージ本文には %ld 個エンコードできない文字があります。他の文字セットを使うと修正される可能性があります。そのまま送信する場合、「送信」ボタンを押してください（代用文字が Unicode 化可能な文字に代わって使われます）。文字セットを変更する場合、「中止」ボタンを押して下さい。
+Signature:	Mail		署名:
+Save changes to this signature?	Mail		署名の変更を確定し保存しますか？
+Cc:	Mail		Cc:
+Off	Mail		オフ
+Find	Mail		検索
+Preferences…	Mail		メールの設定…
+Undo	Mail		元に戻す
+Date:	Mail		日付：
+An error occurred trying to open this signature.	Mail		この署名を開くときにエラーが発生しました。
+No file attributes, just plain data	Mail		ファイル属性を付けない（データのみ）
+Edit queries…	Mail		クエリフォルダーを開く…
+queries	B_USER_DIRECTORY/mail/queries		クエリ
+Paste	Mail		貼り付け
+in	B_USER_DIRECTORY/mail/in		受信トレイ
+Save attachment…	Mail		添付ファイルを保存…
+Include file attributes in attachments	Mail		添付ファイルにファイル属性を含む
+OK	Mail		OK
+Send	Mail		送信
+Show icons only	Mail		アイコンのみ
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		転送メールから添付ファイルを削除する機能はまだ実装されていません。\nまだ正しく動作しないでしょう。
+Hide	Mail		隠す
+Forward without attachments	Mail		転送 (添付ファイルを含まない)
+Previous	Mail		前
+Redo	Mail		やり直し
+Add enclosure…	Mail		添付ファイルを追加…
+Mail	System name		メール
+Print…	Mail		印刷…
+Warn unencodable:	Mail		文字コード不一致通知：
+Quit	Mail		終了
+%n - Full name	Mail		%n - 名前
+ Read 	Mail		既読
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
+Trash	Mail		ごみ箱
+Default account:	Mail		標準アカウント：
+Size:	Mail		サイズ:
+Account from mail	Mail		メッセージを受信したアカウント
+Edit signatures…	Mail		署名の編集…
+New	Mail		新規
+Attachments: 	Mail		添付ファイル：
+On	Mail		オン
+%e wrote:\\n	Mail		%e は書きました:\\n
+To:	Mail		To:
+Only files can be added as attachments.	Mail		添付できるのは、ファイルのみです。
+Previous message	Mail		前のメッセージ
+Attachments:	Mail		添付ファイル:
+Title:	Mail		署名の名称：
+Find…	Mail		検索…
+Accounts…	Mail		アカウントの設定…
+Mail preferences	Mail		メールの設定
+Copy link location	Mail		このリンクのアドレスをコピー
+out	B_USER_DIRECTORY/mail/out		送信トレイ
+Show header	Mail		ヘッダーを表示
+%e - E-mail address	Mail		%e - メールアドレス
+Resend	Mail		再送信
+Show raw message	Mail		生のメッセージを表示
+\\n - Newline	Mail		\\n - 改行

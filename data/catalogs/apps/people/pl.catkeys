@@ -1,4 +1,4 @@
-1	polish	x-vnd.Be-PEPL	3427346862
+1	polish	x-vnd.Be-PEPL	2993050801
 Edit	People		Edytuj
 Error	People		Błąd
 City	People		Miasto
@@ -27,6 +27,7 @@ Save changes before quitting?	People		Zapisać zmiany przed wyjściem?
 Load image…	People		Wczytaj obraz…
 OK	People		OK
 Remove image	People		Usuń obraz
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Uruchomienie prefletu FileTypes aby skonfigurować atrybuty Person nie powiodło się.\n\nBłąd: 
 Home phone	People		Telefon domowy
 Save as…	People		Zapisz jako…
 Redo	People		Powtórz

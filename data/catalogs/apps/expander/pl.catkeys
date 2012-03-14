@@ -1,23 +1,49 @@
-1	polish	x-vnd.Haiku-Expander	1780652736
+1	polish	x-vnd.Haiku-Expander	2398100010
 Expand	ExpanderMenu		Rozpakuj
+Close window when done expanding	ExpanderPreferences		Zamknij okno po zakończeniu rozpakowywania
 Set destination…	ExpanderMenu		Wybierz miejsce docelowe…
+Use:	ExpanderPreferences		Użyj:
 File expanded	ExpanderWindow		Plik rozpakowany
 The destination is read only.	ExpanderWindow		Nie można zapisywać w miejscu docelowym.
 Expander: Open	ExpanderWindow		Expander: Otwórz
  is not supported	ExpanderWindow		 nie jest obsługiwany
+Expander settings	ExpanderPreferences		Ustawienia Expandera
 Select current	DirectoryFilePanel		Wybierz obecny
 Source	ExpanderWindow		Źródło
 Error when expanding archive	ExpanderWindow		Wystąpił błąd podczas rozpakowywania archiwum
 Hide contents	ExpanderWindow		Ukryj zawartość
 Cancel	ExpanderWindow		Anuluj
+Automatically expand files	ExpanderPreferences		Automatycznie rozpakuj pliki
+Creating listing for '%s'	ExpanderWindow		Tworzenie listy dla '%s'
 Continue	ExpanderWindow		Kontynuuj
+Destination folder	ExpanderPreferences		Katalog docelowy
 The destination folder does not exist.	ExpanderWindow		Folder docelowy nie istnieje.
+Other	ExpanderPreferences		Inne
 Cancel	ExpanderPreferences		Anuluj
+Expansion	ExpanderPreferences		Rozpakowywanie
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Czy na pewno chcesz przerwać rozpakowywanie?\nRozpakowane dane będą najprawdopodobniej niekompletne.
 Select	DirectoryFilePanel		Wybierz
+Same directory as source (archive) file	ExpanderPreferences		Ten sam katalog co w plik w archiwum źródłowym
+Expanding '%s'	ExpanderWindow		Rozpakowywanie '%s'
 Settings	ExpanderMenu		Ustawienia
 Settings…	ExpanderMenu		Ustawienia…
 Expander: Choose destination	DirectoryFilePanel		Expander: Wybierz folder docelowy
 Select	ExpanderPreferences		Wybierz
+Show contents	ExpanderWindow		Pokaż zawartość
+Automatically show contents listing	ExpanderPreferences		Automatycznie pokazuje listę zawartości
+OK	ExpanderPreferences		OK
+Leave destination folder path empty	ExpanderPreferences		Pozostaw katalog docelowy pusty
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Katalog został albo przeniesiony albo przemianowany,\nlub nie jest wspierane.
+The file doesn't exist	ExpanderWindow		Plik nie istnieje
+Stop	ExpanderMenu		Zatrzymaj
+File	ExpanderMenu		Plik
 Expander	System name		Expander
 Expand	ExpanderWindow		Rozpakuj
+Close	ExpanderMenu		Zamknij
+The destination is not a folder.	ExpanderWindow		Cel nie jest katalogiem.
+Open destination folder after extraction	ExpanderPreferences		Otwórz katalog docelowy po rozpakowaniu
+Set source…	ExpanderMenu		Ustaw źródło…
+Select '%s'	DirectoryFilePanel		Wybierz '%s'
+Show contents	ExpanderMenu		Pokaż zawartość
+Stop	ExpanderWindow		Zatrzymaj
+Destination	ExpanderWindow		Cel
