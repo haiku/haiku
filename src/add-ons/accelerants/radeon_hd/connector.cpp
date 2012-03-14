@@ -567,6 +567,8 @@ connector_probe()
 				continue;
 			}
 
+			connector_info* connector = gConnector[connectorIndex];
+
 			int32 j;
 			for (j = 0; j < ((B_LENDIAN_TO_HOST_INT16(path->usSize) - 8) / 2);
 				j++) {
@@ -628,24 +630,19 @@ connector_probe()
 							}
 
 							// Set up found connector
-							gConnector[connectorIndex]->encoder.valid
-								= true;
-							gConnector[connectorIndex]->encoder.flags
-								= connectorFlags;
-							gConnector[connectorIndex]->encoder.objectID
-								= encoderID;
-							gConnector[connectorIndex]->encoder.type
-								= encoderType;
-							gConnector[connectorIndex]->encoder.linkEnumeration
+							connector->encoder.valid = true;
+							connector->encoder.flags = connectorFlags;
+							connector->encoder.objectID = encoderID;
+							connector->encoder.type = encoderType;
+							connector->encoder.linkEnumeration
 								= (encoderObjectRaw & ENUM_ID_MASK)
 									>> ENUM_ID_SHIFT;
-							gConnector[connectorIndex]->encoder.isExternal
+							connector->encoder.isExternal
 								= encoder_is_external(encoderID);
-							gConnector[connectorIndex]->encoder.isDPBridge
+							connector->encoder.isDPBridge
 								= encoder_is_dp_bridge(encoderID);
 
-							pll_limit_probe(
-								&gConnector[connectorIndex]->encoder.pll);
+							pll_limit_probe(&connector->encoder.pll);
 						}
 					}
 					// END if object is encoder
@@ -699,23 +696,23 @@ connector_probe()
 
 			// TODO: aux chan transactions
 
-			gConnector[connectorIndex]->valid = true;
-			gConnector[connectorIndex]->flags = connectorFlags;
-			gConnector[connectorIndex]->type = connectorType;
-			gConnector[connectorIndex]->objectID = connectorObjectID;
+			connector->valid = true;
+			connector->flags = connectorFlags;
+			connector->type = connectorType;
+			connector->objectID = connectorObjectID;
 
-			gConnector[connectorIndex]->encoder.isTV = false;
-			gConnector[connectorIndex]->encoder.isHDMI = false;
+			connector->encoder.isTV = false;
+			connector->encoder.isHDMI = false;
 
 			switch (connectorType) {
 				case VIDEO_CONNECTOR_COMPOSITE:
 				case VIDEO_CONNECTOR_SVIDEO:
 				case VIDEO_CONNECTOR_9DIN:
-					gConnector[connectorIndex]->encoder.isTV = true;
+					connector->encoder.isTV = true;
 					break;
 				case VIDEO_CONNECTOR_HDMIA:
 				case VIDEO_CONNECTOR_HDMIB:
-					gConnector[connectorIndex]->encoder.isHDMI = true;
+					connector->encoder.isHDMI = true;
 					break;
 			}
 
