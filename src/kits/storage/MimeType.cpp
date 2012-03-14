@@ -1152,25 +1152,25 @@ BMimeType::GetWildcardApps(BMessage *wild_ones)
 bool
 BMimeType::IsValid(const char *string)
 {
-	if (!string)
+	if (string == NULL)
 		return false;
-		
-	bool foundSlash = false;		
-	int len = strlen(string);
+
+	bool foundSlash = false;
+	size_t len = strlen(string);
 	if (len >= B_MIME_TYPE_LENGTH || len == 0)
 		return false;
-		
-	for (int i = 0; i < len; i++) {
+
+	for (size_t i = 0; i < len; i++) {
 		char ch = string[i];
 		if (ch == '/') {
-			if (foundSlash || i == 0 || i == len-1)
+			if (foundSlash || i == 0 || i == len - 1)
 				return false;
 			else
 				foundSlash = true;
 		} else if (!isValidMimeChar(ch)) {
 			return false;
 		}
-	}	
+	}
 	return true;
 }
 
