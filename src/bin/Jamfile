@@ -293,4 +293,4 @@ SubInclude HAIKU_TOP src bin network ;
 SubInclude HAIKU_TOP src bin unzip ;
 SubInclude HAIKU_TOP src bin zip ;
 SubInclude HAIKU_TOP src bin gzip ;
-SubInclude HAIKU_TOP src bin bzip2 ;
+
