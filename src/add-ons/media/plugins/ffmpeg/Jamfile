@@ -51,6 +51,7 @@ Addon ffmpeg :
 	$(HAIKU_LIBTHEORA_LIBS)
 	$(HAIKU_LIBVORBIS_LIBS)
 	$(HAIKU_LIBOGG_LIBS)
+	$(HAIKU_LIBVPX_LIBS)
 	libbz2_ffmpeg.a
 
 	be
