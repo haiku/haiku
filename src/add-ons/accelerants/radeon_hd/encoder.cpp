@@ -1069,8 +1069,12 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 			index = GetIndexIntoMasterTable(COMMAND, LVTMATransmitterControl);
 			break;
 		default:
-			ERROR("%s: called on non-dig encoder!\n", __func__);
-			return B_ERROR;
+			// Multiple encoders can be wired to a single connector
+			// An example is UNIPHY -> DP -> TRAVIS -> LVDS
+			ERROR("%s: BUG: guessing UNIPHY as this isn't a dig encoder!\n",
+				__func__);
+			index = GetIndexIntoMasterTable(COMMAND, UNIPHYTransmitterControl);
+			break;
 	}
 
 	if (index < 0) {

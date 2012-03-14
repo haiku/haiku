@@ -136,6 +136,7 @@
 #define DP_INTERLANE_ALIGN_DONE				(1 << 0)
 #define DP_DOWNSTREAM_PORT_STATUS_CHANGED	(1 << 6)
 #define DP_LINK_STATUS_UPDATED				(1 << 7)
+#define DP_LINK_STATUS_SIZE					6
 
 #define DP_SINK_STATUS						0x205
 

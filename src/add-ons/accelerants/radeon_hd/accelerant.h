@@ -14,6 +14,7 @@
 #include <edid.h>
 
 #include "atom.h"
+#include "displayport_reg.h"
 #include "encoder.h"
 #include "mode.h"
 #include "pll.h"
@@ -126,11 +127,22 @@ typedef struct {
 
 typedef struct {
 	bool	valid;
+	uint32	connectorIndex;
+
+	uint32	auxPin; // normally GPIO pin on GPU
 
 	uint8	config[8]; // DP configuration data
 	uint8	sinkType;
 	uint8	clock;
 	int		laneCount;
+
+	bool	trainingUseEncoder;
+
+	uint8	trainingAttempts;
+	uint8	trainingSet[4];
+	int		trainingReadInterval;
+	uint8 	linkStatus[DP_LINK_STATUS_SIZE];
+
 	bool	eDPOn;
 } dp_info;
 

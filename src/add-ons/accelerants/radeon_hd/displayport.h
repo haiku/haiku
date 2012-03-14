@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include <SupportDefs.h>
 
+#include "accelerant.h"
 #include "displayport_reg.h"
 
 
@@ -32,6 +33,7 @@ uint32 dp_get_link_clock_decode(uint32 dpLinkClock);
 
 void dp_setup_connectors();
 status_t dp_link_train(uint8 crtcID, display_mode* mode);
+status_t dp_link_train_cr(dp_info* dp);
 
 
 #endif /* RADEON_HD_DISPLAYPORT_H */
