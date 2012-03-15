@@ -119,21 +119,24 @@ BMimeType::~BMimeType()
 	Nevertheless it is a very bad idea to use another supertype.
 	The supplied MIME string is copied; the caller retains the ownership.
 	\param mimeType The MIME string.
-	\return
-	- \c B_OK: Everything went fine.
-	- \c B_BAD_VALUE: \c NULL or invalid \a mimeString.
-	- \c B_NO_MEMORY: Insufficient memory to copy the MIME string.
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_INIT \c NULL \a mimeType string.
+	\retval B_BAD_VALUE Invalid \a mimeType string.
+	\retval B_NO_MEMORY Insufficient memory to copy the MIME string.
 */
 status_t
 BMimeType::SetTo(const char *mimeType)
 {
-	if (!mimeType || !BMimeType::IsValid(mimeType)) {
+	if (mimeType == NULL) {
+		Unset();
+	} else if (!BMimeType::IsValid(mimeType)) {
 		fCStatus = B_BAD_VALUE;
 	} else {
 		Unset();
 		fType = new(std::nothrow) char[strlen(mimeType) + 1];
 		if (fType) {
-			strcpy(fType, mimeType);
+			strlcpy(fType, mimeType, B_MIME_TYPE_LENGTH);
 			fCStatus = B_OK;
 		} else {
 			fCStatus = B_NO_MEMORY;
@@ -199,8 +202,8 @@ BMimeType::IsSupertypeOnly() const
 	if (fCStatus == B_OK) {
 		// We assume here fCStatus will be B_OK *only* if
 		// the MIME string is valid
-		int len = strlen(fType);
-		for (int i = 0; i < len; i++) {
+		size_t len = strlen(fType);
+		for (size_t i = 0; i < len; i++) {
 			if (fType[i] == '/')
 				return false;
 		}
@@ -225,47 +228,51 @@ BMimeType::IsInstalled() const
 }
 
 // GetSupertype
-/*!	\brief Returns the supertype of the MIME type represented by this object.
+/*!	\brief Gets the supertype of the MIME type represented by this object.
 	The supplied object is initialized to this object's supertype. If this
 	BMimeType is not properly initialized, the supplied object will be Unset().
 	\param superType A pointer to the BMimeType object that shall be
 		   initialized to this object's supertype.
-	\return
-	- \c B_OK: Everything went fine.
-	- \c B_BAD_VALUE: \c NULL \a superType, this object is not initialized,
-	  or this object <i> is </i> a supertype.
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a superType, this object is not initialized,
+		or this object is a supertype only.
 */
 status_t
 BMimeType::GetSupertype(BMimeType *superType) const
 {
-	if (!superType)
+	if (superType == NULL)
 		return B_BAD_VALUE;
-	superType->Unset();
 
-	status_t err = (fCStatus == B_OK ? B_OK : B_BAD_VALUE);
-	if (!err) {
-		int len = strlen(fType);
-		int i;
-		for (i = 0; i < len; i++) {
+	superType->Unset();
+	status_t status = fCStatus == B_OK ? B_OK : B_BAD_VALUE;
+	if (status == B_OK) {
+		size_t len = strlen(fType);
+		size_t i = 0;
+		for (; i < len; i++) {
 			if (fType[i] == '/')
 				break;
 		}
-		if (i == len)
-			err = B_BAD_VALUE;		// IsSupertypeOnly() == true
-		else {
+		if (i == len) {
+			// object is a supertype only
+			status = B_BAD_VALUE;
+		} else {
 			char superMime[B_MIME_TYPE_LENGTH];
 			strncpy(superMime, fType, i);
 			superMime[i] = 0;
-			err = superType->SetTo(superMime);
+			status = superType->SetTo(superMime) == B_OK ? B_OK : B_BAD_VALUE;
 		}
 	}
-	return err;
+
+	return status;
 }
 
 // ==
 /*!	\brief Returns whether this and the supplied MIME type are equal.
 	Two BMimeType objects are said to be equal if they represent the same
 	MIME string, ignoring case, or if both are not initialized.
+	\warning In BeOS R5 two uninitialized BMimeType objects were not
+		considered to be equal, in Haiku they are.
 	\param type The BMimeType to be compared with.
 	\return \c true, if the objects are equal, \c false otherwise.
 */
@@ -285,6 +292,8 @@ BMimeType::operator==(const BMimeType &type) const
 	A BMimeType objects equals a MIME string, if its MIME string equals the
 	latter one, ignoring case, or if it is uninitialized and the MIME string
 	is \c NULL.
+	\warning In BeOS R5 an uninitialized BMimeType object was not
+		considered to be equal to \c NULL, in Haiku it is.
 	\param type The MIME string to be compared with.
 	\return \c true, if the MIME types are equal, \c false otherwise.
 */
@@ -1130,9 +1139,8 @@ BMimeType::IsValid(const char *string)
 	if (len >= B_MIME_TYPE_LENGTH || len == 0)
 		return false;
 
-	char ch;
 	for (size_t i = 0; i < len; i++) {
-		ch = string[i];
+		char ch = string[i];
 		if (ch == '/') {
 			if (foundSlash || i == 0 || i == len - 1)
 				return false;
