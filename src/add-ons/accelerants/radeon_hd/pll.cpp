@@ -300,7 +300,7 @@ pll_setup_flags(pll_info* pll, uint8 crtcID)
 {
 	radeon_shared_info &info = *gInfo->shared_info;
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	uint32 encoderFlags = gConnector[connectorIndex]->encoder->flags;
+	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 
 	if ((info.dceMajor >= 3 && info.dceMinor >= 2)
 		&& pll->pixelClock > 200000) {
@@ -342,10 +342,10 @@ pll_adjust(pll_info* pll, uint8 crtcID)
 		// original as pixel_clock will be adjusted
 
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	uint32 encoderID = gConnector[connectorIndex]->encoder->objectID;
+	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
 	uint32 encoderMode = display_get_encoder_mode(connectorIndex);
-	uint32 encoderFlags = gConnector[connectorIndex]->encoder->flags;
-	bool dpBridge = gConnector[connectorIndex]->encoder->isDPBridge;
+	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+	bool dpBridge = gConnector[connectorIndex]->encoder.isDPBridge;
 
 	if (info.dceMajor >= 3) {
 
@@ -481,7 +481,7 @@ status_t
 pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 {
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	pll_info* pll = &gConnector[connectorIndex]->encoder->pll;
+	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
 
 	pll->pixelClock = pixelClock;
 	pll->id = pllID;
@@ -553,7 +553,7 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 			// if (ss_enabled && (ss->type & ATOM_EXTERNAL_SS_MASK))
 			// 	args.v3.ucMiscInfo |= PIXEL_CLOCK_MISC_REF_DIV_SRC;
 			args.v3.ucTransmitterId
-				= gConnector[connectorIndex]->encoder->objectID;
+				= gConnector[connectorIndex]->encoder.objectID;
 			args.v3.ucEncoderMode = display_get_encoder_mode(connectorIndex);
 			break;
 		case 5:
@@ -578,7 +578,7 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 					break;
 			}
 			args.v5.ucTransmitterID
-				= gConnector[connectorIndex]->encoder->objectID;
+				= gConnector[connectorIndex]->encoder.objectID;
 			args.v5.ucEncoderMode
 				= display_get_encoder_mode(connectorIndex);
 			args.v5.ucPpll = pllID;
@@ -610,7 +610,7 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 					break;
 			}
 			args.v6.ucTransmitterID
-				= gConnector[connectorIndex]->encoder->objectID;
+				= gConnector[connectorIndex]->encoder.objectID;
 			args.v6.ucEncoderMode = display_get_encoder_mode(connectorIndex);
 			args.v6.ucPpll = pllID;
 			break;

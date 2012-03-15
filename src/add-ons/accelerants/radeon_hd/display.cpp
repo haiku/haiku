@@ -282,8 +282,8 @@ detect_displays()
 			gDisplay[displayIndex]->attached =
 				connector_read_edid(id, &gDisplay[displayIndex]->edid_info);
 
-			if (gConnector[id]->encoder->type == VIDEO_ENCODER_TVDAC
-				|| gConnector[id]->encoder->type == VIDEO_ENCODER_DAC) {
+			if (gConnector[id]->encoder.type == VIDEO_ENCODER_TVDAC
+				|| gConnector[id]->encoder.type == VIDEO_ENCODER_DAC) {
 				// analog? with valid EDID? lets make sure there is load.
 				// There is only one ddc communications path on DVI-I
 				if (encoder_analog_load_detect(id) != true) {
@@ -324,7 +324,7 @@ detect_displays()
 			" Injecting first connector as a last resort.\n", __func__);
 		for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
 			// skip TV DAC connectors as likely fallback isn't for TV
-			if (gConnector[id]->encoder->type == VIDEO_ENCODER_TVDAC)
+			if (gConnector[id]->encoder.type == VIDEO_ENCODER_TVDAC)
 				continue;
 			gDisplay[0]->attached = true;
 			gDisplay[0]->connectorIndex = id;
@@ -357,7 +357,7 @@ debug_displays()
 
 		if (gDisplay[id]->attached) {
 			uint32 connectorType = gConnector[connectorIndex]->type;
-			uint32 encoderType = gConnector[connectorIndex]->encoder->type;
+			uint32 encoderType = gConnector[connectorIndex]->encoder.type;
 			ERROR(" + connector ID:   %" B_PRIu32 "\n", connectorIndex);
 			ERROR(" + connector type: %s\n", get_connector_name(connectorType));
 			ERROR(" + encoder type:   %s\n", get_encoder_name(encoderType));

@@ -43,7 +43,7 @@ encoder_init()
 		if (gConnector[id]->valid == false)
 			continue;
 
-		switch (gConnector[id]->encoder->objectID) {
+		switch (gConnector[id]->encoder.objectID) {
 			case ENCODER_OBJECT_ID_INTERNAL_UNIPHY:
 			case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
 			case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
@@ -56,7 +56,7 @@ encoder_init()
 		}
 
 		if ((info.chipsetFlags & CHIP_APU) != 0
-			&& gConnector[id]->encoder->isExternal) {
+			&& gConnector[id]->encoder.isExternal) {
 			encoder_external_setup(id, 0,
 				EXTERNAL_ENCODER_ACTION_V3_ENCODER_INIT);
 		}
@@ -79,8 +79,8 @@ encoder_assign_crtc(uint8 crtcID)
 		return;
 
 	uint16 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	uint16 encoderID = gConnector[connectorIndex]->encoder->objectID;
-	uint16 encoderFlags = gConnector[connectorIndex]->encoder->flags;
+	uint16 encoderID = gConnector[connectorIndex]->encoder.objectID;
+	uint16 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 
 	// Prepare AtomBIOS command arguments
 	union crtcSourceParam {
@@ -215,7 +215,7 @@ encoder_pick_dig(uint32 connectorIndex)
 {
 	TRACE("%s\n", __func__);
 	radeon_shared_info &info = *gInfo->shared_info;
-	uint32 encoderID = gConnector[connectorIndex]->encoder->objectID;
+	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
 
 	// obtain assigned CRT
 	uint32 crtcID;
@@ -226,7 +226,7 @@ encoder_pick_dig(uint32 connectorIndex)
 			break;
 	}
 
-	bool linkB = gConnector[connectorIndex]->encoder->linkEnumeration
+	bool linkB = gConnector[connectorIndex]->encoder.linkEnumeration
 		== GRAPH_OBJECT_ENUM_ID2 ? true : false;
 
 	uint32 dceVersion = (info.dceMajor * 100) + info.dceMinor;
@@ -268,7 +268,7 @@ encoder_apply_quirks(uint8 crtcID)
 	radeon_shared_info &info = *gInfo->shared_info;
 	register_info* regs = gDisplay[crtcID]->regs;
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	uint16 encoderFlags = gConnector[connectorIndex]->encoder->flags;
+	uint16 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 
 	// Setting the scaler clears this on some chips...
 	if (info.dceMajor >= 3
@@ -286,9 +286,9 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 	TRACE("%s\n", __func__);
 	radeon_shared_info &info = *gInfo->shared_info;
 	uint32 connectorIndex = gDisplay[id]->connectorIndex;
-	uint16 encoderFlags = gConnector[connectorIndex]->encoder->flags;
+	uint16 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 
-	switch (gConnector[connectorIndex]->encoder->objectID) {
+	switch (gConnector[connectorIndex]->encoder.objectID) {
 		case ENCODER_OBJECT_ID_INTERNAL_DAC1:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1:
 		case ENCODER_OBJECT_ID_INTERNAL_DAC2:
@@ -352,7 +352,7 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 			break;
 	}
 
-	if (gConnector[connectorIndex]->encoder->isExternal == true) {
+	if (gConnector[connectorIndex]->encoder.isExternal == true) {
 		if ((info.chipsetFlags & CHIP_APU) != 0) {
 			// aka DCE 4.1
 			encoder_external_setup(connectorIndex, pixelClock,
@@ -370,7 +370,7 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 status_t
 encoder_tv_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 {
-	uint16 encoderFlags = gConnector[connectorIndex]->encoder->flags;
+	uint16 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 
 	TV_ENCODER_CONTROL_PS_ALLOCATION args;
 	memset(&args, 0, sizeof(args));
@@ -398,9 +398,9 @@ encoder_digital_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 	TRACE("%s\n", __func__);
 
 	int index = 0;
-	uint16 encoderFlags = gConnector[connectorIndex]->encoder->flags;
+	uint16 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 
-	switch (gConnector[connectorIndex]->encoder->objectID) {
+	switch (gConnector[connectorIndex]->encoder.objectID) {
 		case ENCODER_OBJECT_ID_INTERNAL_LVDS:
 			index = GetIndexIntoMasterTable(COMMAND, LVDSEncoderControl);
 			break;
@@ -427,7 +427,7 @@ encoder_digital_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 	}
 
 	uint32 lvdsFlags = gConnector[connectorIndex]->lvdsFlags;
-	bool isHdmi = gConnector[connectorIndex]->encoder->isHDMI;
+	bool isHdmi = gConnector[connectorIndex]->encoder.isHDMI;
 
 	// Prepare AtomBIOS command arguments
 	union lvdsEncoderControl {
@@ -560,10 +560,10 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 	union digEncoderControl args;
 	memset(&args, 0, sizeof(args));
 
-	uint32 encoderID = gConnector[connectorIndex]->encoder->objectID;
-	bool isDPBridge = gConnector[connectorIndex]->encoder->isDPBridge;
+	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
+	bool isDPBridge = gConnector[connectorIndex]->encoder.isDPBridge;
 
-	bool linkB = gConnector[connectorIndex]->encoder->linkEnumeration
+	bool linkB = gConnector[connectorIndex]->encoder.linkEnumeration
 		== GRAPH_OBJECT_ENUM_ID2 ? true : false;
 
 	// determine DP panel mode
@@ -579,7 +579,7 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 		panelMode = DP_PANEL_MODE_EXTERNAL_DP_MODE;
 
 	#if 0
-	uint32 encoderID = gConnector[connectorIndex]->encoder->objectID;
+	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
 	if (gConnector[connectorIndex]->type == VIDEO_CONNECTOR_EDP) {
 		uint8 temp = dpcd_read_reg(hwPin, DP_EDP_CONFIGURATION_CAP);
 		if ((temp & 1) != 0)
@@ -786,7 +786,7 @@ encoder_external_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 					}
 
 					uint16 encoderFlags
-						= gConnector[connectorIndex]->encoder->flags;
+						= gConnector[connectorIndex]->encoder.flags;
 					switch ((encoderFlags & ENUM_ID_MASK) >> ENUM_ID_SHIFT) {
 						case GRAPH_OBJECT_ENUM_ID1:
 							TRACE("%s: external encoder 1\n", __func__);
@@ -859,13 +859,13 @@ encoder_analog_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 {
 	TRACE("%s\n", __func__);
 
-	uint32 encoderFlags = gConnector[connectorIndex]->encoder->flags;
+	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 
 	int index = 0;
 	DAC_ENCODER_CONTROL_PS_ALLOCATION args;
 	memset(&args, 0, sizeof(args));
 
-	switch (gConnector[connectorIndex]->encoder->objectID) {
+	switch (gConnector[connectorIndex]->encoder.objectID) {
 		case ENCODER_OBJECT_ID_INTERNAL_DAC1:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1:
 			index = GetIndexIntoMasterTable(COMMAND, DAC1EncoderControl);
@@ -904,7 +904,7 @@ encoder_analog_load_detect(uint32 connectorIndex)
 {
 	TRACE("%s\n", __func__);
 
-	uint32 encoderID = gConnector[connectorIndex]->encoder->objectID;
+	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
 
 	if (encoder_is_external(encoderID))
 		return encoder_dig_load_detect(connectorIndex);
@@ -918,8 +918,8 @@ encoder_dac_load_detect(uint32 connectorIndex)
 {
 	TRACE("%s\n", __func__);
 
-	uint32 encoderFlags = gConnector[connectorIndex]->encoder->flags;
-	uint32 encoderID = gConnector[connectorIndex]->encoder->objectID;
+	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
 
 	if ((encoderFlags & ATOM_DEVICE_TV_SUPPORT) == 0
 		&& (encoderFlags & ATOM_DEVICE_CV_SUPPORT) == 0
@@ -1024,7 +1024,7 @@ encoder_dig_load_detect(uint32 connectorIndex)
 
 	uint32 biosScratch0 = Read32(OUT, R600_BIOS_0_SCRATCH);
 
-	uint32 encoderFlags = gConnector[connectorIndex]->encoder->flags;
+	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 
 	if ((encoderFlags & ATOM_DEVICE_CRT1_SUPPORT) != 0)
 		if ((biosScratch0 & ATOM_S0_CRT1_MASK) != 0)
@@ -1054,7 +1054,7 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 {
 	TRACE("%s\n", __func__);
 
-	uint16 encoderID = gConnector[connectorIndex]->encoder->objectID;
+	uint16 encoderID = gConnector[connectorIndex]->encoder.objectID;
 	int index;
 	switch (encoderID) {
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DVO1:
@@ -1105,13 +1105,13 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 	int connectorObjectID
 		= (gConnector[connectorIndex]->objectID & OBJECT_ID_MASK)
 			>> OBJECT_ID_SHIFT;
-	uint32 encoderObjectID = gConnector[connectorIndex]->encoder->objectID;
+	uint32 encoderObjectID = gConnector[connectorIndex]->encoder.objectID;
 	uint32 digEncoderID = encoder_pick_dig(connectorIndex);
 
-	pll_info* pll = &gConnector[connectorIndex]->encoder->pll;
+	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
 
 	bool isDP = connector_is_dp(connectorIndex);
-	bool linkB = gConnector[connectorIndex]->encoder->linkEnumeration
+	bool linkB = gConnector[connectorIndex]->encoder.linkEnumeration
 		== GRAPH_OBJECT_ENUM_ID2 ? true : false;
 
 	uint8 dpClock = 0;
@@ -1191,7 +1191,7 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 
 					if (isDP)
 						args.v1.ucConfig |= ATOM_TRANSMITTER_CONFIG_COHERENT;
-					else if ((gConnector[connectorIndex]->encoder->flags
+					else if ((gConnector[connectorIndex]->encoder.flags
 						& ATOM_DEVICE_DFP_SUPPORT) != 0) {
 						if (1) {
 							// if coherentMode, i've only ever seen it true
@@ -1244,7 +1244,7 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 					if (isDP) {
 						args.v2.acConfig.fCoherentMode = 1;
 						args.v2.acConfig.fDPConnector = 1;
-					} else if ((gConnector[connectorIndex]->encoder->flags
+					} else if ((gConnector[connectorIndex]->encoder.flags
 						& ATOM_DEVICE_DFP_SUPPORT) != 0) {
 						if (1) {
 							// if coherentMode, i've only ever seen it true
@@ -1311,7 +1311,7 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 
 					if (isDP)
 						args.v3.acConfig.fCoherentMode = 1;
-					else if ((gConnector[connectorIndex]->encoder->flags
+					else if ((gConnector[connectorIndex]->encoder.flags
 						& ATOM_DEVICE_DFP_SUPPORT) != 0) {
 						if (1) {
 							// if coherentMode, i've only ever seen it true
@@ -1382,7 +1382,7 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 
 					if (isDP)
 						args.v4.acConfig.fCoherentMode = 1;
-					else if ((gConnector[connectorIndex]->encoder->flags
+					else if ((gConnector[connectorIndex]->encoder.flags
 						& ATOM_DEVICE_DFP_SUPPORT) != 0) {
 						if (1) {
 							// if coherentMode, i've only ever seen it true
@@ -1410,7 +1410,7 @@ encoder_crtc_scratch(uint8 crtcID)
 	TRACE("%s\n", __func__);
 
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	uint32 encoderFlags = gConnector[connectorIndex]->encoder->flags;
+	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 
 	// TODO: r500
 	uint32 biosScratch3 = Read32(OUT, R600_BIOS_3_SCRATCH);
@@ -1459,7 +1459,7 @@ encoder_dpms_scratch(uint8 crtcID, bool power)
 	TRACE("%s\n", __func__);
 
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	uint32 encoderFlags = gConnector[connectorIndex]->encoder->flags;
+	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 
 	// TODO: r500
 	uint32 biosScratch2 = Read32(OUT, R600_BIOS_2_SCRATCH);
@@ -1540,8 +1540,8 @@ encoder_dpms_set(uint8 crtcID, int mode)
 	memset(&args, 0, sizeof(args));
 
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	uint32 encoderFlags = gConnector[connectorIndex]->encoder->flags;
-	uint16 encoderID = gConnector[connectorIndex]->encoder->objectID;
+	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+	uint16 encoderID = gConnector[connectorIndex]->encoder.objectID;
 
 	switch (encoderID) {
 		case ENCODER_OBJECT_ID_INTERNAL_TMDS1:
@@ -1637,8 +1637,8 @@ encoder_dpms_set_dig(uint8 crtcID, int mode)
 
 	radeon_shared_info &info = *gInfo->shared_info;
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	uint32 encoderFlags = gConnector[connectorIndex]->encoder->flags;
-	pll_info* pll = &gConnector[connectorIndex]->encoder->pll;
+	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
 
 	switch (mode) {
 		case B_DPMS_ON:
@@ -1713,7 +1713,7 @@ encoder_dpms_set_external(uint8 crtcID, int mode)
 
 	radeon_shared_info &info = *gInfo->shared_info;
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	pll_info* pll = &gConnector[connectorIndex]->encoder->pll;
+	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
 
 	switch (mode) {
 		case B_DPMS_ON:
