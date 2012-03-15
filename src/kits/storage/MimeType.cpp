@@ -29,7 +29,6 @@ using namespace BPrivate;
 
 // Private helper functions
 static bool isValidMimeChar(const char ch);
-static status_t toLower(const char *str, char *result);
 
 using namespace BPrivate::Storage::Mime;
 using namespace std;
@@ -65,26 +64,6 @@ isValidMimeChar(const char ch)
 		&& ch != '='
 		&& ch != '\\'
 		&& ch != 127;	// DEL
-}
-
-
-/*!
-	Returns a lowercase version of str in result. Result must
-	be preallocated and is assumed to be of adequate length.
-*/
-static status_t
-toLower(const char *str, char *result)
-{
-	if (!str || !result)
-		return B_BAD_VALUE;
-
-	int len = strlen(str);
-	int i;
-	for (i = 0; i < len; i++) {
-		result[i] = tolower(str[i]);
-	}
-	result[i] = 0;
-	return B_OK;
 }
 
 
@@ -285,7 +264,7 @@ BMimeType::GetSupertype(BMimeType *superType) const
 
 // ==
 /*!	\brief Returns whether this and the supplied MIME type are equal.
-	Two BMimeType objects are said to be equal, if they represent the same
+	Two BMimeType objects are said to be equal if they represent the same
 	MIME string, ignoring case, or if both are not initialized.
 	\param type The BMimeType to be compared with.
 	\return \c true, if the objects are equal, \c false otherwise.
@@ -293,21 +272,12 @@ BMimeType::GetSupertype(BMimeType *superType) const
 bool
 BMimeType::operator==(const BMimeType &type) const
 {
-	char lower1[B_MIME_TYPE_LENGTH];
-	char lower2[B_MIME_TYPE_LENGTH];
-	
-	if (InitCheck() == B_OK && type.InitCheck() == B_OK) {
-		status_t err = toLower(Type(), lower1);
-		if (!err)
-			err = toLower(type.Type(), lower2);
-		if (!err) 
-			err = (strcmp(lower1, lower2) == 0 ? B_OK : B_ERROR);
-		return err == B_OK;
-	} else if (InitCheck() == B_NO_INIT && type.InitCheck() == B_NO_INIT) {
+	if (InitCheck() == B_NO_INIT && type.InitCheck() == B_NO_INIT)
 		return true;
-	} else {
-		return false;
-	}
+	else if (InitCheck() == B_OK && type.InitCheck() == B_OK)
+		return strcasecmp(Type(), type.Type()) == 0;
+
+	return false;
 }
 
 // ==
@@ -1160,8 +1130,9 @@ BMimeType::IsValid(const char *string)
 	if (len >= B_MIME_TYPE_LENGTH || len == 0)
 		return false;
 
+	char ch;
 	for (size_t i = 0; i < len; i++) {
-		char ch = string[i];
+		ch = string[i];
 		if (ch == '/') {
 			if (foundSlash || i == 0 || i == len - 1)
 				return false;
