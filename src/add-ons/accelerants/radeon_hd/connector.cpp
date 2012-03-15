@@ -701,21 +701,6 @@ connector_probe()
 			connector->type = connectorType;
 			connector->objectID = connectorObjectID;
 
-			connector->encoder.isTV = false;
-			connector->encoder.isHDMI = false;
-
-			switch (connectorType) {
-				case VIDEO_CONNECTOR_COMPOSITE:
-				case VIDEO_CONNECTOR_SVIDEO:
-				case VIDEO_CONNECTOR_9DIN:
-					connector->encoder.isTV = true;
-					break;
-				case VIDEO_CONNECTOR_HDMIA:
-				case VIDEO_CONNECTOR_HDMIB:
-					connector->encoder.isHDMI = true;
-					break;
-			}
-
 			connectorIndex++;
 		} // END for each valid connector
 	} // end for each display path
@@ -767,14 +752,6 @@ debug_connectors()
 			if (gConnector[id]->encoder.isExternal == true) {
 				attribute = true;
 				ERROR("     * is external\n");
-			}
-			if (gConnector[id]->encoder.isHDMI == true) {
-				attribute = true;
-				ERROR("     * is HDMI\n");
-			}
-			if (gConnector[id]->encoder.isTV == true) {
-				attribute = true;
-				ERROR("     * is TV\n");
 			}
 			if (gConnector[id]->encoder.isDPBridge == true) {
 				attribute = true;

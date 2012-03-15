@@ -155,8 +155,6 @@ struct encoder_info {
 	uint32		linkEnumeration; // ex. linkb == GRAPH_OBJECT_ENUM_ID2
 	bool		isExternal;
 	bool		isDPBridge;
-	bool		isHDMI;
-	bool		isTV;
 	struct pll_info	pll;
 };
 

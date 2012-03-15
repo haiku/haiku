@@ -427,7 +427,12 @@ encoder_digital_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 	}
 
 	uint32 lvdsFlags = gConnector[connectorIndex]->lvdsFlags;
-	bool isHdmi = gConnector[connectorIndex]->encoder.isHDMI;
+
+	bool isHdmi = false;
+	if (gConnector[connectorIndex]->type == VIDEO_CONNECTOR_HDMIA
+		|| gConnector[connectorIndex]->type == VIDEO_CONNECTOR_HDMIB) {
+		isHdmi = true;
+	}
 
 	// Prepare AtomBIOS command arguments
 	union lvdsEncoderControl {
