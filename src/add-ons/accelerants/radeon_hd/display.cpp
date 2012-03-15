@@ -259,7 +259,7 @@ detect_displays()
 
 		// TODO: As DP aux transactions don't work yet, just use LVDS as a hack
 		#if 0
-		if (gConnector[id]->encoder.isDPBridge == true) {
+		if (gConnector[id]->encoderExternal.isDPBridge == true) {
 			// If this is a DisplayPort Bridge, setup ddc on bus
 			// TRAVIS (LVDS) or NUTMEG (VGA)
 			TRACE("%s: is bridge, performing bridge DDC setup\n", __func__);

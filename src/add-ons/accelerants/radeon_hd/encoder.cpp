@@ -535,6 +535,7 @@ status_t
 encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 {
 	radeon_shared_info &info = *gInfo->shared_info;
+	connector_info* connector = gConnector[connectorIndex];
 
 	int index = 0;
 	if (info.dceMajor >= 4)
@@ -566,16 +567,14 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 	union digEncoderControl args;
 	memset(&args, 0, sizeof(args));
 
-	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
-	bool isDPBridge = gConnector[connectorIndex]->encoder.isDPBridge;
-
-	bool linkB = gConnector[connectorIndex]->encoder.linkEnumeration
+	bool isDPBridge = connector->encoderExternal.isDPBridge;
+	bool linkB = connector->encoder.linkEnumeration
 		== GRAPH_OBJECT_ENUM_ID2 ? true : false;
 
 	// determine DP panel mode
 	uint32 panelMode;
 	if (info.dceMajor >= 4 && isDPBridge) {
-		if (encoderID == ENCODER_OBJECT_ID_NUTMEG)
+		if (connector->encoderExternal.objectID == ENCODER_OBJECT_ID_NUTMEG)
 			panelMode = DP_PANEL_MODE_INTERNAL_DP1_MODE;
 		else {
 			// aka ENCODER_OBJECT_ID_TRAVIS or VIDEO_CONNECTOR_EDP
@@ -615,7 +614,7 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 				args.v1.ucConfig |= ATOM_ENCODER_CONFIG_DPLINKRATE_2_70GHZ;
 			}
 
-			switch (encoderID) {
+			switch (connector->encoder.objectID) {
 				case ENCODER_OBJECT_ID_INTERNAL_UNIPHY:
 					args.v1.ucConfig = ATOM_ENCODER_CONFIG_V2_TRANSMITTER1;
 					break;

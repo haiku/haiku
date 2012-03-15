@@ -342,10 +342,15 @@ pll_adjust(pll_info* pll, uint8 crtcID)
 		// original as pixel_clock will be adjusted
 
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
+	connector_info* connector = gConnector[connectorIndex];
+
+	uint32 encoderID = connector->encoder.objectID;
 	uint32 encoderMode = display_get_encoder_mode(connectorIndex);
-	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
-	bool dpBridge = gConnector[connectorIndex]->encoder.isDPBridge;
+	uint32 encoderFlags = connector->encoder.flags;
+
+	uint32 externalEncoderID = 0;
+	if (connector->encoderExternal.isDPBridge)
+		externalEncoderID = connector->encoderExternal.objectID;
 
 	if (info.dceMajor >= 3) {
 
@@ -434,8 +439,7 @@ pll_adjust(pll_info* pll, uint8 crtcID)
 							}
 						}
 
-						args.v3.sInput.ucExtTransmitterID
-							= dpBridge ? encoderID : 0;
+						args.v3.sInput.ucExtTransmitterID = externalEncoderID;
 
 						atom_execute_table(gAtomContext, index, (uint32*)&args);
 
