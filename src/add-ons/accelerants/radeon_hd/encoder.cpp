@@ -55,10 +55,11 @@ encoder_init()
 				break;
 		}
 
-		if ((info.chipsetFlags & CHIP_APU) != 0
-			&& gConnector[id]->encoder.isExternal) {
-			encoder_external_setup(id, 0,
-				EXTERNAL_ENCODER_ACTION_V3_ENCODER_INIT);
+		if ((info.chipsetFlags & CHIP_APU) != 0) {
+			if (gConnector[id]->encoderExternal.valid == true) {
+				encoder_external_setup(id, 0,
+					EXTERNAL_ENCODER_ACTION_V3_ENCODER_INIT);
+			}
 		}
 	}
 }
@@ -352,7 +353,7 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 			break;
 	}
 
-	if (gConnector[connectorIndex]->encoder.isExternal == true) {
+	if (gConnector[connectorIndex]->encoderExternal.valid == true) {
 		if ((info.chipsetFlags & CHIP_APU) != 0) {
 			// aka DCE 4.1
 			encoder_external_setup(connectorIndex, pixelClock,
@@ -709,6 +710,15 @@ encoder_external_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 {
 	TRACE("%s\n", __func__);
 
+	encoder_info* encoder
+		= &gConnector[connectorIndex]->encoderExternal;
+
+	if (encoder->valid != true) {
+		ERROR("%s: connector %" B_PRIu32 " doesn't have a valid "
+			"external encoder!", __func__, connectorIndex);
+		return B_ERROR;
+	}
+
 	uint8 tableMajor;
 	uint8 tableMinor;
 
@@ -790,8 +800,8 @@ encoder_external_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 						args.v3.sExtEncoder.ucLaneNum = 4;
 					}
 
-					uint16 encoderFlags
-						= gConnector[connectorIndex]->encoder.flags;
+					uint16 encoderFlags = encoder->flags;
+
 					switch ((encoderFlags & ENUM_ID_MASK) >> ENUM_ID_SHIFT) {
 						case GRAPH_OBJECT_ENUM_ID1:
 							TRACE("%s: external encoder 1\n", __func__);
@@ -909,9 +919,7 @@ encoder_analog_load_detect(uint32 connectorIndex)
 {
 	TRACE("%s\n", __func__);
 
-	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
-
-	if (encoder_is_external(encoderID))
+	if (gConnector[connectorIndex]->encoderExternal.valid == true)
 		return encoder_dig_load_detect(connectorIndex);
 
 	return encoder_dac_load_detect(connectorIndex);
@@ -1074,12 +1082,8 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 			index = GetIndexIntoMasterTable(COMMAND, LVTMATransmitterControl);
 			break;
 		default:
-			// Multiple encoders can be wired to a single connector
-			// An example is UNIPHY -> DP -> TRAVIS -> LVDS
-			ERROR("%s: BUG: guessing UNIPHY as this isn't a dig encoder!\n",
-				__func__);
-			index = GetIndexIntoMasterTable(COMMAND, UNIPHYTransmitterControl);
-			break;
+			ERROR("%s: BUG: dig setup run on non-dig encoder!\n", __func__);
+			return B_ERROR;
 	}
 
 	if (index < 0) {
@@ -1116,7 +1120,7 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
 
 	bool isDP = connector_is_dp(connectorIndex);
-	bool linkB = gConnector[connectorIndex]->encoder.linkEnumeration
+	bool linkB = gConnector[connectorIndex]->encoderExternal.linkEnumeration
 		== GRAPH_OBJECT_ENUM_ID2 ? true : false;
 
 	uint8 dpClock = 0;
