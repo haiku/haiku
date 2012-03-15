@@ -145,17 +145,18 @@ DumpConfiguration(const BUSBConfiguration *configuration)
 static void
 DumpInfo(BUSBDevice &device, bool verbose)
 {
-	if (!verbose) {
-		printf("%04x:%04x /dev/bus/usb%s \"%s\" \"%s\" ver. %04x\n",
-			device.VendorID(), device.ProductID(), device.Location(),
-			device.ManufacturerString(), device.ProductString(),
-			device.Version());
-		return;
-	}
-
 	const char *vendorName = NULL, *deviceName = NULL;
 	usb_get_vendor_info(device.VendorID(), &vendorName);
 	usb_get_device_info(device.VendorID(), device.ProductID(), &deviceName);
+
+	if (!verbose) {
+		printf("%04x:%04x /dev/bus/usb%s \"%s\" \"%s\" ver. %04x\n",
+			device.VendorID(), device.ProductID(), device.Location(),
+			vendorName ? vendorName : device.ManufacturerString(),
+			deviceName ? deviceName : device.ProductString(),
+			device.Version());
+		return;
+	}
 
 	printf("[Device /dev/bus/usb%s]\n", device.Location());
 	printf("    Class .................. 0x%02x (%s)\n", device.Class(),
