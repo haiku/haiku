@@ -1,4 +1,5 @@
-1	dutch; flemish	x-vnd.Haiku-Appearance	168322075
+1	dutch; flemish	x-vnd.Haiku-Appearance	2558216842
+Plain font:	Font view		Standaardlettertype:
 Control highlight	Colors tab		Keuze-accent
 Control border	Colors tab		Keuzerand
 Antialiasing type:	AntialiasingSettingsView		Anti-aliasingtype:
@@ -31,15 +32,20 @@ Navigation pulse	Colors tab		Puls navigatie
 Selected menu item text	Colors tab		Tekst geselecteerd menu-item
 Menu background	Colors tab		Achtergrond menu
 OK	DecorSettingsView		OK
+Size:	Font Selection view		Grootte:
 Panel background	Colors tab		Achtergrond paneel
+Menu font:	Font view		Lettertype voor menu:
 Colors	APRWindow		Kleuren
 Control background	Colors tab		Achtergrond keuze
 Inactive window tab	Colors tab		Niet-actieve venstertab
 Appearance	System name		Uiterlijk
+Fixed font:	Font view		Vast lettertype:
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Pa's wijze lynx bezag vroom het fikse aquaduct.
 Reduce colored edges filter strength:	AntialiasingSettingsView		Reductie filtersterkte gekleurde randen:
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Subpixelgebaseerde anti-aliasing in combinatie met gliefsuggesties is niet beschikbaar in deze Haikucompilatie om mogelijke patentproblemen te vermijden. Om deze functie in te schakelen, moet je Haiku zelf compileren en bepaalde opties in de configuratieheader van libfreetype kiezen.
 Control text	Colors tab		Tekst keuze
 Tooltip text	Colors tab		Tekst Tooltip
+Bold font:	Font view		Vet lettertype:
 Inactive window border	Colors tab		Rand van een inactief venster
 Menu item text	Colors tab		Tekst menu-item
 LCD subpixel	AntialiasingSettingsView		LCD-subpixel
@@ -48,4 +54,5 @@ Strong	AntialiasingSettingsView		Sterk
 Panel text	Colors tab		Tekst paneel
 Monospaced fonts only	AntialiasingSettingsView		Alleen niet-proportionele lettertypes
 Antialiasing menu	AntialiasingSettingsView		Anti-aliasing menu
+Fonts	APRWindow		Lettertypen
 Glyph hinting:	AntialiasingSettingsView		Glyph hinting:

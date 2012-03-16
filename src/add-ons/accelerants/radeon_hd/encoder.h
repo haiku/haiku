@@ -30,6 +30,8 @@ status_t encoder_tv_setup(uint32 connectorIndex,
 	uint32 pixelClock, int command);
 
 bool encoder_analog_load_detect(uint32 connectorIndex);
+bool encoder_dac_load_detect(uint32 connectorIndex);
+bool encoder_dig_load_detect(uint32 connectorIndex);
 void encoder_output_lock(bool lock);
 status_t transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 	uint8 laneNumber, uint8 laneSet, int command);

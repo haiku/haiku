@@ -259,7 +259,7 @@ detect_displays()
 
 		// TODO: As DP aux transactions don't work yet, just use LVDS as a hack
 		#if 0
-		if (gConnector[id]->encoder.isDPBridge == true) {
+		if (gConnector[id]->encoderExternal.isDPBridge == true) {
 			// If this is a DisplayPort Bridge, setup ddc on bus
 			// TRAVIS (LVDS) or NUTMEG (VGA)
 			TRACE("%s: is bridge, performing bridge DDC setup\n", __func__);
@@ -477,7 +477,7 @@ display_crtc_dpms(uint8 crtcID, int mode)
 	radeon_shared_info &info = *gInfo->shared_info;
 
 	switch (mode) {
-        case B_DPMS_ON:
+		case B_DPMS_ON:
 			TRACE("%s: crtc %" B_PRIu8 " dpms powerup\n", __func__, crtcID);
 			if (gDisplay[crtcID]->attached == false)
 				return;
@@ -487,9 +487,9 @@ display_crtc_dpms(uint8 crtcID, int mode)
 				display_crtc_memreq(crtcID, ATOM_ENABLE);
 			display_crtc_blank(crtcID, ATOM_BLANKING_OFF);
 			break;
-        case B_DPMS_STAND_BY:
-        case B_DPMS_SUSPEND:
-        case B_DPMS_OFF:
+		case B_DPMS_STAND_BY:
+		case B_DPMS_SUSPEND:
+		case B_DPMS_OFF:
 			TRACE("%s: crtc %" B_PRIu8 " dpms powerdown\n", __func__, crtcID);
 			if (gDisplay[crtcID]->attached == false)
 				return;

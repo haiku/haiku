@@ -27,7 +27,7 @@ if $(HAIKU_ATA_STACK) = 1 {
 	IDE_ONLY = "" ;
 }
 
-SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bzip2
+SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep
 	cal cat catattr checkfs checkitout chgrp chmod chop chown chroot cksum clear
 	clockconfig cmp collectcatkeys comm compress copyattr CortexAddOnHost cp
 	csplit cut date dc dd desklink df diff diff3 dircolors dirname
@@ -401,7 +401,6 @@ for linkTarget in $(SYSTEM_DEMOS) {
 		: /boot/system/demos/$(linkTarget) : $(linkTarget) ;
 }
 
-AddSymlinkToHaikuImage system bin : bzip2 : bunzip2 ;
 AddSymlinkToHaikuImage system bin : less : more ;
 AddSymlinkToHaikuImage system bin : gzip : gunzip ;
 AddSymlinkToHaikuImage system bin : gzip : zcat ;
@@ -589,10 +588,19 @@ AddBootModuleSymlinksToHaikuImage
 # add-ons
 AddFilesToHaikuImage system add-ons accelerants
 	: $(SYSTEM_ADD_ONS_ACCELERANTS) ;
+
+# OpenGL renderers
 if $(TARGET_ARCH) = x86 {
-	AddFilesToHaikuHybridImage system add-ons opengl
-		: Mesa\ Software\ Renderer : : true ;
+	if $(HAIKU_GCC_VERSION[1]) = 2 {
+		AddFilesToHaikuHybridImage system add-ons opengl
+			: Legacy\ Software\ Rasterizer : : true ;
+	} else {
+		AddFilesToHaikuHybridImage system add-ons opengl
+			: Software\ Rasterizer : : true ;
+		# Future Gallium3d
+	}
 }
+
 AddFilesToHaikuHybridImage system add-ons Translators
 	: $(SYSTEM_ADD_ONS_TRANSLATORS) : : true ;
 AddFilesToHaikuImage system add-ons locale catalogs

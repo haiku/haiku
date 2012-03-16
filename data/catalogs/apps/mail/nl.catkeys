@@ -1,10 +1,11 @@
-1	dutch; flemish	x-vnd.Be-MAIL	2284738205
+1	dutch; flemish	x-vnd.Be-MAIL	2834665561
 View	Mail		Bekijken
 %d - Date	Mail		%d - Datum
 Attach attributes:	Mail		Attributen bijvoegen:
 Inconsistency occurred in the undo/redo buffer.	Mail		Er is een onregelmatigheid ontstaan in het herstel- /herhaalbuffer.
 An error occurred trying to save the attachment.	Mail		Er is een fout ontstaan bij het opslaan van de bijlage.
 Copy to new	Mail		Kopiëren naar nieuw
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Behouden als 'Nieuw'
 Edit	Mail		Aanpassen
 Print	Mail		Afdrukken
 <none>	Mail		<geen>
@@ -63,6 +64,7 @@ Warn unencodable:	Mail		Waarschuwen oncodeerbaar:
 Quit	Mail		Afsluiten
 %n - Full name	Mail		%n - Volledige naam
  Read 	Mail		Lezen
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
 Trash	Mail		Prullenbak
 Default account:	Mail		Standaard-account:
 Size:	Mail		Grootte:

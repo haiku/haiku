@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Magnify	3515889001
+1	polish	x-vnd.Haiku-Magnify	283320408
 no clip msg\n	In console, when clipboard is empty after clicking Copy image		no clip msg\n
 Make square	Magnify-Main		Zrób kwadrat
 Copy image	Magnify-Main		Kopiuj obraz
@@ -6,6 +6,7 @@ Magnify help	Magnify-Help		Pomoc
 usage: magnify [size] (magnify size * size pixels)\n	Console		użycie: magnify [rozmiar] (rozmiar powiększenia * rozmiar piksela)\n
 Stick coordinates	Magnify-Main		Zablokuj współrzędne
 Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Informacje:\n ukryj/pokaż informacje - ukrywa/pokazuje te wszystkie nowe funkcje\n uwaga: podczas pokazywania pojawi się czerwony kwadracik,\n który wskazuje na piksel, którego kolor RGB zostanie pokazany\n dodaj/usuń celowniki - 2 celowniki mogą zostać dodane (lub\n usunięte), żeby pomóc w wyrównaniu i położeniu obiektów.\n Celowniki pokazują się jako niebieskie kwadraciki i niebieskie linie.\n ukryj/pokaż siatkę - ukrywa/pokazuje siatkę, która oddziela\n każdy piksel\n
+  freeze - freezes/unfreezes magnification of whatever the\n    cursor is currently over\n	Magnify-Help		zamrażanie - zamraża/odmraża powiększenie tego co\nnad czym jest aktualnie kursor\n
 Hide/Show grid	Magnify-Main		Ukryj/Pokaż siatkę
 magnify: size must be a multiple of 4\n	Console		magnify: rozmiar musi być wielokrotnością liczby 4\n
 General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		Ogólne informacje:\n 32 x 32 - liczba w lewym górnym rogu to liczba\n pikseli (szerokość x wysokość)\n 8 pikseli/piksel - reprezentuje liczbę pikseli, które są używane\n do powiększenia jednego piksela\n R:152 G:52 B:10 - wartość koloru RGB piksela\n pod czerwonym kwadracikiem\n

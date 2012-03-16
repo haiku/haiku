@@ -1,4 +1,4 @@
-1	polish	x-vnd.Be-MAIL	1854424455
+1	polish	x-vnd.Be-MAIL	2834665561
 View	Mail		Widok
 %d - Date	Mail		%d - Data
 Attach attributes:	Mail		Dołączaj atrybuty:
@@ -63,14 +63,18 @@ Print…	Mail		Drukuj…
 Warn unencodable:	Mail		Ostrzegaj niekodowalne:
 Quit	Mail		Wyjdź
 %n - Full name	Mail		%n - Pełna nazwa
+ Read 	Mail		Przeczytane
 UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
 Trash	Mail		Kosz
 Default account:	Mail		Domyślne konto
 Size:	Mail		Rozmiar:
+Account from mail	Mail		Konto z poczty
 Edit signatures…	Mail		Edytuj sygnaturki…
 New	Mail		Nowy
 Attachments: 	Mail		Załączniki:
 On	Mail		Włącz
+Set to %s	Mail		Ustaw dla: %s
+Forward	Mail		Przekaż
 E-mail draft could not be saved!	Mail		Szablon wiadomości nie mógł zostać zapisany!
 %e wrote:\\n	Mail		%e zapisano:\\n
 To:	Mail		Do:
@@ -82,6 +86,7 @@ Find…	Mail		Szukaj…
 Accounts…	Mail		Konta…
 Mail preferences	Mail		Ustawienia poczty
 Initial spell check mode:	Mail		Początkowy tryb sprawdzania pisowni:
+Leave same	Mail		Pozostaw bez zmian
 Page setup…	Mail		Ustawienia strony…
 Text wrapping:	Mail		Zawijanie tekstu:
 Revert	Mail		Przywróć
@@ -95,12 +100,15 @@ Show header	Mail		Pokaż nagłówek
 %e - E-mail address	Mail		%e - Adress e-mail
 Resend	Mail		Wyślij ponownie
 Show raw message	Mail		Pokaż źródło wiadomości
+\\n - Newline	Mail		\\n - Nowa linia
 Start now	Mail		Rozpocznij teraz
 Close	Mail		Zamknij
 No matches	Mail		Brak dopasowań
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Mail_daemon nie jest uruchomiony. Ta wiadomość została została zakolejkowana i będzie wysłana po uruchomieniu mail_daemon.
 Really delete this signature? This cannot be undone.	Mail		Czy usunąć naprawdę tę sygnaturkę? Tego nie da się cofnąć.
 Open	Mail		Otwórz
 draft	B_USER_DIRECTORY/mail/draft		draft
+Quote	Mail		Cytowanie
 Add	Mail		Dodaj
 Next message	Mail		Następna wiadomość
 User interface	Mail		Interfejs użytkownika
@@ -113,7 +121,12 @@ Sorry, could not find an application that supports the 'Person' data type.	Mail	
 Do you wish to send this message before closing?	Mail		Czy chcesz wysłać tę wiadomość przed zamknięciem?
 Delete	Mail		Usuń
 Leave as '%s'	Mail		Pozostaw jako '%s'
+Copy	Mail		Skopiuj
+Mail couldn't find its dictionary.	Mail		Poczta nie może znaleźć swojego słownika.
+Reply preamble:	Mail		Preambuła odpowiedzi:
 Signatures	Mail		Sygnaturki
+Next	Mail		Następne
+Set to…	Mail		Ustaw do…
 Use default account	Mail		Użyj domyślnego konta
 Sorry	Mail		Przepraszamy
 Encoding:	Mail		Kodowanie:
@@ -130,11 +143,19 @@ The mail_daemon could not be started:\n\t	Mail		Nie można uruchomić mail_daemo
 Open attachment	Mail		Otwórz załącznik
 sent	B_USER_DIRECTORY/mail/sent		sent
 (Date unavailable)	Mail		(Data niedostępna)
+Put your favorite e-mail queries and query templates in this folder.	Mail		Umieść swoje ulubione zapytania wiadomości i szablony zapytań w tym katalogu.
+Reply	Mail		Odpowiedź
+From:	Mail		Od:
+Couldn't open this signature. Sorry.	Mail		Nie można otworzyć tej sygnaturki. Przepraszamy.
+Open draft	Mail		Otwórz szkic
+Cut	Mail		Wytnij
 Check spelling	Mail		Sprawdzanie pisowni
+Set to Saved	Mail		Ustaw do Zapisanych
 Open this link	Mail		Otwórz ten odnośnik
 Auto signature:	Mail		Automatyczna sygnaturka:
 Add signature	Mail		Dodaj sygnaturkę
 Need Tracker to move items to trash	Mail		Potrzebujesz Trackera aby przenosić elementy do kosza
+Mailing	Mail		Pocztowe
 Unread	Mail		Nieprzeczytane
 Remove quote	Mail		Usuń cytat
 Move to trash	Mail		Przenieś do kosza

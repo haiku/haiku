@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-About	1711927511
+1	polish	x-vnd.Haiku-About	3434348710
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 przez autorów Gutenprint. Wszelkie prawa zastrzeżone.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (i jego kernela NewOS)\n
 BSD (4-clause)	AboutView		BSD (4-klauzulowa licencja BSD)
@@ -52,6 +52,7 @@ Current maintainers:\n	AboutView		Obecni współpracownicy:\n
 Copyright © 2006-2007 Intel Corporation. All rights reserved.	AboutView		Copyright © 2006-2007 Intel Corporation. Wszelkie prawa zastrzeżone.
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Kod, który jest unikalny dla Haiku, w szczególności jądro i cały kod z którymi aplikacje mogą być skonsolidowane, jest rozpowszechniany na <licencji MIT>. Niektóre biblioteki systemowe zawierają kod stron trzecich rozpowszechniany na <licencji LGPL>. Możesz poznać prawa autorskie kodu stron trzecich poniżej.\n\n
 Time running:	AboutView		Czas działania:
+Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Zawiera oprogramowanie wytworzone przez NetBSD Foundation, Inc. oraz ich współpracowników:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. Wszelkie prawa zastrzeżone.
 Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Zawiera oprogramowanie z Projektu FreeBSD, wydanego na licencji BSD:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. Wszelkie prawa zastrzeżone.
 The Haikuware team and their bounty program\n	AboutView		Zespółu Haikuware i ich program nagród\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. Wszelkie prawa zastrzeżone.
@@ -71,11 +72,14 @@ Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Copyright �
 Copyright © 2002-2008 Alexander L. Roshal. All rights reserved.	AboutView		Copyright © 2002-2008 Alexander L. Roshal. Wszelkie prawa zastrzeżone.
 Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyright © 2003-2006 Intel Corporation. Wszelkie prawa zastrzeżone.
 %ld MHz	AboutView		%ld MHz
+Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		Copyright © 1997-2006 PDFlib GmbH i Thomas Merz. Wszelkie prawa zastrzeżone.\nPDFlib i PDFlib logo są zastrzeżonymi znakami towarowymi PDFlib GmbH.
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Copyright © 1991-2000 Silicon Graphics, Inc. Wszelkie prawa zastrzeżone.
+Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Zawiera opragramowanie z GNU Project, wydanego na licencjach GPL i LGPL:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.
 MIT license. All rights reserved.	AboutView		MIT license. Wszelkie prawa zastrzeżone.
 [Click a license name to read the respective license.]\n\n	AboutView		[Kliknij na nazwę licencji, aby wyświetlić jej treść.]\n\n
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Copyright © 2007 Ralink Technology Corporation. Wszelkie prawa zastrzeżone.
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. Wszelkie prawa zastrzeżone.
 License: 	AboutView		Licencja: 
+2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 by Andy Ritger bazując na the Generalized Timing Formula
 GCC %d Hybrid	AboutView		GCC %d Hybrid
 Translations:\n	AboutView		Tłumaczenie:\n

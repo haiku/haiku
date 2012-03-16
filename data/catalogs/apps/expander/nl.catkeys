@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Expander	1072439789
+1	dutch; flemish	x-vnd.Haiku-Expander	2398100010
 Expand	ExpanderMenu		Uitpakken
 Close window when done expanding	ExpanderPreferences		Sluit dit venster wanneer het uitpakken klaar is
 Set destination…	ExpanderMenu		Bepaal doel…
@@ -16,8 +16,11 @@ Cancel	ExpanderWindow		Annuleren
 Automatically expand files	ExpanderPreferences		Bestanden automatisch uitpakken
 Creating listing for '%s'	ExpanderWindow		Creëren van een overzicht voor '%s'
 Continue	ExpanderWindow		Doorgaan
+Destination folder	ExpanderPreferences		Doelmap
 The destination folder does not exist.	ExpanderWindow		De doelmap bestaat niet.
+Other	ExpanderPreferences		Andere
 Cancel	ExpanderPreferences		Annuleren
+Expansion	ExpanderPreferences		Uitpakken
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Bent u zeker dat u het uitpakken van het archief wilt stoppen? De uitgepakte items zijn mogelijk niet compleet.
 Select	DirectoryFilePanel		Selecteren
 Same directory as source (archive) file	ExpanderPreferences		Dezelfde map als het bronbestand (archief)

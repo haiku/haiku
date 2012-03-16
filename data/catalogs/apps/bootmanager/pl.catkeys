@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-BootManager	2288144283
+1	polish	x-vnd.Haiku-BootManager	3014946856
 The boot manager has been successfully installed on your system.	BootManagerController		Menedżer rozruchu został poprawnie zainstalowany na Twoim komputerze.
 After two seconds	DefaultPartitionPage		Za dwie sekundy
 Uninstall Boot Manager	UninstallPage	Title	Odinstalowywanie Menedżera Rozruchu
@@ -21,8 +21,10 @@ Please locate the Master Boot Record (MBR) save file to restore from. This is th
 Next	WizardView	Button	Dalej
 Uninstallation of boot menu completed	BootManagerController	Title	Odinstalowywanie menu rozruchu zostało zakończone
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Proszę wybierz dysk na który chcesz by menu rozruchu zostało zainstalowane, albo odinstalowane z niego.
+Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Proszę wskazać partycję domyślną i limit czasu.\nMenu rozruchowe załaduje domyślną partycję po przekroczeniu limitu czasu chyba, że wybierzesz inną partycję. Menu rozruchowe może czekać w nieskończoność do czasu aż wybierzesz partycję.\nPrzytrzymaj wciśnięty "ALT" aby wyłączyć limit czasu podczas startu systemu.
 After one second	DefaultPartitionPage		Za chwilę
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Tablica partycji pierwszego dysku nie jest kompatybilna z Menedżerem rozruchu.\nMenedżer rozruchu wymaga 2KB wolnego miejsca na dysku przed pierwszą partycją.
+The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Następujące partycje zostały wykryte. Zaznacz pole wyboru obok partycji aby były włączone w menu rozruchowym. Można także ustawić nazwy partycji jak chcesz aby pojawiły się w menu rozruchowym.
 After one minute	DefaultPartitionPage		Za minutę
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		MBR urządzenia (%DISK) został pomyślnie przywrócony z pliku %FILE.
 Write boot menu	BootManagerController	Button	Zapisz menu startowe

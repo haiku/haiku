@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-MediaPlayer	1460151958
+1	german	x-vnd.Haiku-MediaPlayer	1392487766
 raw audio	MediaPlayer-InfoWin		Raw-Audio
 Location	MediaPlayer-InfoWin		Ort
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikanisch)
@@ -133,6 +133,8 @@ Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Einträge zufällig anordnen
 Revert	MediaPlayer-SettingsWindow		Ausgangswerte
 Edit	MediaPlayer-PlaylistWindow		Bearbeiten
 Start media server	MediaPlayer-Main		Mediaserver starten
+Toggle fullscreen.	MediaPlayer-Main		Vollbild
+ToggleFullscreen	MediaPlayer-Main		Vollbild
 <unnamed>	PlaylistItem-name		<unbenannt>
 Open Clips	MediaPlayer-Main		Clips öffnen
 OK	MediaPlayer-PlaylistWindow		OK

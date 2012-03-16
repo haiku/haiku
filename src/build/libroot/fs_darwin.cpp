@@ -19,11 +19,12 @@
 #include <unistd.h>
 
 
-int get_path(int fd, const char* path, char fullPath[]);
-int eaccess(const char* path, int accessMode);
+// Private helper functions
+static int get_path(int fd, const char* path, char fullPath[]);
+static int eaccess(const char* path, int accessMode);
 
 
-int
+static int
 get_path(int fd, const char* path, char fullPath[])
 {
 	struct stat dirst;
@@ -54,7 +55,7 @@ get_path(int fd, const char* path, char fullPath[])
 }
 
 
-int
+static int
 eaccess(const char* path, int accessMode)
 {
 	uid_t uid = geteuid();

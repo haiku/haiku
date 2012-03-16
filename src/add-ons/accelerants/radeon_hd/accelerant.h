@@ -14,6 +14,7 @@
 #include <edid.h>
 
 #include "atom.h"
+#include "displayport_reg.h"
 #include "encoder.h"
 #include "mode.h"
 #include "pll.h"
@@ -126,11 +127,22 @@ typedef struct {
 
 typedef struct {
 	bool	valid;
+	uint32	connectorIndex;
+
+	uint32	auxPin; // normally GPIO pin on GPU
 
 	uint8	config[8]; // DP configuration data
 	uint8	sinkType;
 	uint8	clock;
 	int		laneCount;
+
+	bool	trainingUseEncoder;
+
+	uint8	trainingAttempts;
+	uint8	trainingSet[4];
+	int		trainingReadInterval;
+	uint8 	linkStatus[DP_LINK_STATUS_SIZE];
+
 	bool	eDPOn;
 } dp_info;
 
@@ -143,8 +155,6 @@ struct encoder_info {
 	uint32		linkEnumeration; // ex. linkb == GRAPH_OBJECT_ENUM_ID2
 	bool		isExternal;
 	bool		isDPBridge;
-	bool		isHDMI;
-	bool		isTV;
 	struct pll_info	pll;
 };
 
@@ -157,6 +167,7 @@ typedef struct {
 	uint32		lvdsFlags;
 	uint16		gpioID;
 	struct encoder_info encoder;
+	struct encoder_info encoderExternal;
 	// TODO struct radeon_hpd hpd;
 } connector_info;
 

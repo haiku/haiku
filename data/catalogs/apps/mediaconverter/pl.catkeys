@@ -1,4 +1,5 @@
-1	polish	x-vnd.Haiku-MediaConverter	1077524254
+1	polish	x-vnd.Haiku-MediaConverter	296071315
+Video using parameters form settings	MediaConverter		Wideo używa parametrów z ustawień
 Video encoding:	MediaConverter		Kodowanie wideo:
 No audio	Audio codecs list		Brak dźwięku
 Error	MediaConverter		Błąd
@@ -8,12 +9,15 @@ Open…	Menu		Otwórz…
 Start [ms]: 	MediaConverter		Początek [ms]:
 Output file '%filename' created	MediaConverter		Utworzono plik wynikowy '%filename' 
 Output format	MediaConverter		Format wyjściowy
+%.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stereo / %lld ramek
 End   [ms]: 	MediaConverter		Koniec   [ms]: 
 MediaConverter	System name		MediaConverter
 No video	Video codecs list		Brak wideo
 Duration:	MediaConverter-FileInfo		Długość:
 OK	MediaConverter		OK
+Error writing audio frame %Ld	MediaConverter		Błąd  zapisu ramki dźwięku %Ld
 Error converting '%filename'	MediaConverter		Błąd konwersji '%filename'
+Low	MediaConverter		Niska
 Conversion completed	MediaConverter		Konwersja ukończona
 Audio:	MediaConverter-FileInfo		Dźwięk:
 OK	MediaConverter-FileInfo		OK
@@ -23,8 +27,10 @@ Cancelling	MediaConverter		Anulowanie
 %d byte 	MediaFileInfo		%d bajt
 Error loading files	MediaConverter		Błąd wczytywania plików
 Cancel	MediaConverter		Anuluj
+None available	Video codecs		Brak
 Conversion cancelled	MediaConverter		Konwersja anulowana
 No file selected	MediaConverter-FileInfo		Nie wybrano pliku
+Error writing video frame %Ld	MediaConverter		Błąd zapisywania ramki wideo %Ld
 Select this folder	MediaConverter		Wybierz ten katalog
 Continue	MediaConverter		Kontynuuj
 Encoder parameters	MediaConverter-EncoderWindow		Parametry kodeka
@@ -32,19 +38,31 @@ Video:	MediaConverter-FileInfo		Wideo:
 %u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2ffps / %Ld ramek
 %d bit 	MediaFileInfo		%d bit
 Error creating '%filename'	MediaConverter		Błąd tworzenia '%filename'
+Video quality not supported	MediaConverter		Jakość wideo nie wspierana
+Cancelling…	MediaConverter		Anulowanie…
+File details	MediaConverter		Szczegóły pliku
+Select	MediaConverter		Wybierz
+Writing video track: %ld%% complete	MediaConverter		Zapisywanie ścieżki wideo: %ld%% ukończono
 Quit	Menu		Wyjdź
 Preview	MediaConverter		Podgląd
 File format:	MediaConverter		Format pliku:
+None available	Audio codecs		Brak
 MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
 Error read audio frame %Ld	MediaConverter		Błąd odczytu ramki dźwięku %Ld
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld kanał/ %lld ramek
 Error launching: %strError%	MediaConverter		Błąd uruchamiania: %strError%
+High	MediaConverter		Wysoka
 The file was not recognized as a supported media file:	MediaConverter		Plik nie został rozpoznany jako wspierany plik multimedialny:
 Drop media files onto this window	MediaConverter		Upuść pliki multimedialne do tego okna
 Audio encoding:	MediaConverter		Kodowanie dźwięku:
 Audio quality not supported	MediaConverter		Jakość dźwięku nie wspierana
 File	Menu		Plik
 Convert	MediaConverter		Konwertuj
+Writing audio track: %ld%% complete	MediaConverter		Zapisywanie ścieżek dźwiękowych:  %ld%% ukończono
 Video quality: %3d%%	MediaConverter		Jakość wideo: %3d%%
 Output folder	MediaConverter		Katalog wynikowy
 Audio quality: %3d%%	MediaConverter		Jakość dźwięku: %3d%%
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Wystąpił błąd podczas odczytu informacji o pliku.\n\nBłąd : 
+Error read video frame %Ld	MediaConverter		Błąd odczytu ramki  wideo %Ld
+%amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles plików nie zostało rozpoznanych jako wspierane pliki multimedialne:
+%.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld ramek

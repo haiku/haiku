@@ -445,8 +445,10 @@ connector_probe_legacy()
 		gConnector[connectorIndex]->encoder.objectID = encoderID;
 		gConnector[connectorIndex]->encoder.type
 			= encoder_type_lookup(encoderID, (1 << i));
-		gConnector[connectorIndex]->encoder.isExternal
-			= encoder_is_external(encoderID);
+
+		// TODO: Eval external encoders on legacy connector probe
+		gConnector[connectorIndex]->encoderExternal.valid = false;
+		// encoder_is_external(encoderID);
 
 		connector_attach_gpio(connectorIndex, ci.sucI2cId.ucAccess);
 
@@ -567,6 +569,8 @@ connector_probe()
 				continue;
 			}
 
+			connector_info* connector = gConnector[connectorIndex];
+
 			int32 j;
 			for (j = 0; j < ((B_LENDIAN_TO_HOST_INT16(path->usSize) - 8) / 2);
 				j++) {
@@ -582,7 +586,6 @@ connector_probe()
 
 				if (graphicObjectType == GRAPH_OBJECT_TYPE_ENCODER) {
 					// Found an encoder
-					// TODO: it may be possible to have more then one encoder
 					int32 k;
 					for (k = 0; k < encoderObject->ucNumberOfObjects; k++) {
 						uint16 encoderObjectRaw
@@ -627,25 +630,41 @@ connector_probe()
 								continue;
 							}
 
-							// Set up found connector
-							gConnector[connectorIndex]->encoder.valid
-								= true;
-							gConnector[connectorIndex]->encoder.flags
-								= connectorFlags;
-							gConnector[connectorIndex]->encoder.objectID
-								= encoderID;
-							gConnector[connectorIndex]->encoder.type
-								= encoderType;
-							gConnector[connectorIndex]->encoder.linkEnumeration
-								= (encoderObjectRaw & ENUM_ID_MASK)
-									>> ENUM_ID_SHIFT;
-							gConnector[connectorIndex]->encoder.isExternal
-								= encoder_is_external(encoderID);
-							gConnector[connectorIndex]->encoder.isDPBridge
-								= encoder_is_dp_bridge(encoderID);
+							// External encoders are behind DVO or UNIPHY
+							if(encoder_is_external(encoderID)) {
+								encoder_info* encoder
+									= &connector->encoderExternal;
+								encoder->isExternal = true;
 
-							pll_limit_probe(
-								&gConnector[connectorIndex]->encoder.pll);
+								// Set up found connector
+								encoder->valid = true;
+								encoder->flags = connectorFlags;
+								encoder->objectID = encoderID;
+								encoder->type = encoderType;
+								encoder->linkEnumeration
+									= (encoderObjectRaw & ENUM_ID_MASK)
+										>> ENUM_ID_SHIFT;
+								encoder->isDPBridge
+									= encoder_is_dp_bridge(encoderID);
+
+								pll_limit_probe(&encoder->pll);
+							} else {
+								encoder_info* encoder
+									= &connector->encoder;
+								encoder->isExternal = false;
+
+								// Set up found connector
+								encoder->valid = true;
+								encoder->flags = connectorFlags;
+								encoder->objectID = encoderID;
+								encoder->type = encoderType;
+								encoder->linkEnumeration
+									= (encoderObjectRaw & ENUM_ID_MASK)
+										>> ENUM_ID_SHIFT;
+								encoder->isDPBridge = false;
+
+								pll_limit_probe(&encoder->pll);
+							}
 						}
 					}
 					// END if object is encoder
@@ -699,25 +718,10 @@ connector_probe()
 
 			// TODO: aux chan transactions
 
-			gConnector[connectorIndex]->valid = true;
-			gConnector[connectorIndex]->flags = connectorFlags;
-			gConnector[connectorIndex]->type = connectorType;
-			gConnector[connectorIndex]->objectID = connectorObjectID;
-
-			gConnector[connectorIndex]->encoder.isTV = false;
-			gConnector[connectorIndex]->encoder.isHDMI = false;
-
-			switch (connectorType) {
-				case VIDEO_CONNECTOR_COMPOSITE:
-				case VIDEO_CONNECTOR_SVIDEO:
-				case VIDEO_CONNECTOR_9DIN:
-					gConnector[connectorIndex]->encoder.isTV = true;
-					break;
-				case VIDEO_CONNECTOR_HDMIA:
-				case VIDEO_CONNECTOR_HDMIB:
-					gConnector[connectorIndex]->encoder.isHDMI = true;
-					break;
-			}
+			connector->valid = true;
+			connector->flags = connectorFlags;
+			connector->type = connectorType;
+			connector->objectID = connectorObjectID;
 
 			connectorIndex++;
 		} // END for each valid connector
@@ -730,11 +734,20 @@ connector_probe()
 bool
 connector_is_dp(uint32 connectorIndex)
 {
-	if (gConnector[connectorIndex]->type == VIDEO_CONNECTOR_DP
-		|| gConnector[connectorIndex]->type == VIDEO_CONNECTOR_EDP
-		|| gConnector[connectorIndex]->encoder.isDPBridge == true) {
+	connector_info* connector = gConnector[connectorIndex];
+
+	// Traditional DisplayPort connector
+	if (connector->type == VIDEO_CONNECTOR_DP
+		|| connector->type == VIDEO_CONNECTOR_EDP) {
 		return true;
 	}
+
+	// DisplayPort bridge on external encoder
+	if (connector->encoderExternal.valid == true
+		&& connector->encoderExternal.isDPBridge == true) {
+		return true;
+	}
+
 	return false;
 }
 
@@ -746,98 +759,96 @@ debug_connectors()
 	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
 		if (gConnector[id]->valid == true) {
 			uint32 connectorType = gConnector[id]->type;
-			uint32 encoderType = gConnector[id]->encoder.type;
-			uint16 encoderID = gConnector[id]->encoder.objectID;
-			uint32 encoderFlags = gConnector[id]->encoder.flags;
 			uint16 gpioID = gConnector[id]->gpioID;
 
 			ERROR("Connector #%" B_PRIu32 ")\n", id);
-			ERROR(" + connector:      %s\n", get_connector_name(connectorType));
-			ERROR(" + gpio table id:  %" B_PRIu16 "\n", gpioID);
-			ERROR(" + gpio hw pin:    0x%" B_PRIX32 "\n",
+			ERROR(" + connector:          %s\n", get_connector_name(connectorType));
+			ERROR(" + gpio table id:      %" B_PRIu16 "\n", gpioID);
+			ERROR(" + gpio hw pin:        0x%" B_PRIX32 "\n",
 				gGPIOInfo[gpioID]->hwPin);
-			ERROR(" + gpio valid:     %s\n",
+			ERROR(" + gpio valid:         %s\n",
 				gGPIOInfo[gpioID]->valid ? "true" : "false");
-			ERROR(" + encoder:        %s\n", get_encoder_name(encoderType));
-			ERROR("   - id:           %" B_PRIu16 "\n", encoderID);
-			ERROR("   - type:         %s\n",
-				encoder_name_lookup(encoderID));
-			ERROR("   - enumeration:  %" B_PRIu32 "\n",
-				gConnector[id]->encoder.linkEnumeration);
 
-			bool attribute = false;
-			ERROR("   - attributes:\n");
-			if (gConnector[id]->encoder.isExternal == true) {
-				attribute = true;
-				ERROR("     * is external\n");
-			}
-			if (gConnector[id]->encoder.isHDMI == true) {
-				attribute = true;
-				ERROR("     * is HDMI\n");
-			}
-			if (gConnector[id]->encoder.isTV == true) {
-				attribute = true;
-				ERROR("     * is TV\n");
-			}
-			if (gConnector[id]->encoder.isDPBridge == true) {
-				attribute = true;
-				ERROR("     * is DisplayPort bridge\n");
-			}
-			if (attribute == false)
-				ERROR("     * no extra attributes\n");
+			encoder_info* encoder = &gConnector[id]->encoder;
+			ERROR(" + encoder:            %s\n", get_encoder_name(encoder->type));
+			ERROR("   - id:               %" B_PRIu16 "\n", encoder->objectID);
+			ERROR("   - type:             %s\n",
+				encoder_name_lookup(encoder->objectID));
+			ERROR("   - enumeration:      %" B_PRIu32 "\n",
+				encoder->linkEnumeration);
 
+			encoder = &gConnector[id]->encoderExternal;
+
+			ERROR("   - is bridge:        %s\n",
+				encoder->valid ? "true" : "false");
+				
+			if (!encoder->valid)
+				ERROR("   + external encoder: none\n");
+			else {
+			ERROR("   + external encoder: %s\n",
+					get_encoder_name(encoder->type));
+				ERROR("     - valid:          true\n");
+				ERROR("     - id:             %" B_PRIu16 "\n",
+					encoder->objectID);
+				ERROR("     - type:           %s\n",
+					encoder_name_lookup(encoder->objectID));
+				ERROR("     - enumeration:    %" B_PRIu32 "\n",
+					encoder->linkEnumeration);
+			}
+
+			uint32 encoderFlags = gConnector[id]->encoder.flags;
 			bool flags = false;
-			ERROR("   - flags:\n");
+			ERROR(" + flags:\n");
 			if ((encoderFlags & ATOM_DEVICE_CRT1_SUPPORT) != 0) {
-				ERROR("     * device CRT1 support\n");
+				ERROR("   * device CRT1 support\n");
 				flags = true;
 			}
 			if ((encoderFlags & ATOM_DEVICE_CRT2_SUPPORT) != 0) {
-				ERROR("     * device CRT2 support\n");
+				ERROR("   * device CRT2 support\n");
 				flags = true;
 			}
 			if ((encoderFlags & ATOM_DEVICE_LCD1_SUPPORT) != 0) {
-				ERROR("     * device LCD1 support\n");
+				ERROR("   * device LCD1 support\n");
 				flags = true;
 			}
 			if ((encoderFlags & ATOM_DEVICE_LCD2_SUPPORT) != 0) {
-				ERROR("     * device LCD2 support\n");
+				ERROR("   * device LCD2 support\n");
 				flags = true;
 			}
 			if ((encoderFlags & ATOM_DEVICE_TV1_SUPPORT) != 0) {
-				ERROR("     * device TV1 support\n");
+				ERROR("   * device TV1 support\n");
 				flags = true;
 			}
 			if ((encoderFlags & ATOM_DEVICE_CV_SUPPORT) != 0) {
-				ERROR("     * device CV support\n");
+				ERROR("   * device CV support\n");
 				flags = true;
 			}
 			if ((encoderFlags & ATOM_DEVICE_DFP1_SUPPORT) != 0) {
-				ERROR("     * device DFP1 support\n");
+				ERROR("   * device DFP1 support\n");
 				flags = true;
 			}
 			if ((encoderFlags & ATOM_DEVICE_DFP2_SUPPORT) != 0) {
-				ERROR("     * device DFP2 support\n");
+				ERROR("   * device DFP2 support\n");
 				flags = true;
 			}
 			if ((encoderFlags & ATOM_DEVICE_DFP3_SUPPORT) != 0) {
-				ERROR("     * device DFP3 support\n");
+				ERROR("   * device DFP3 support\n");
 				flags = true;
 			}
 			if ((encoderFlags & ATOM_DEVICE_DFP4_SUPPORT) != 0) {
-				ERROR("     * device DFP4 support\n");
+				ERROR("   * device DFP4 support\n");
 				flags = true;
 			}
 			if ((encoderFlags & ATOM_DEVICE_DFP5_SUPPORT) != 0) {
-				ERROR("     * device DFP5 support\n");
+				ERROR("   * device DFP5 support\n");
 				flags = true;
 			}
 			if ((encoderFlags & ATOM_DEVICE_DFP6_SUPPORT) != 0) {
-				ERROR("     * device DFP6 support\n");
+				ERROR("   * device DFP6 support\n");
 				flags = true;
 			}
 			if (flags == false)
-				ERROR("     * no known flags\n");
+				ERROR("   * no known flags\n");
 		}
 	}
 	ERROR("==========================================\n");

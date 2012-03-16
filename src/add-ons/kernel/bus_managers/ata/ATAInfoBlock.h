@@ -338,7 +338,17 @@ typedef struct ata_device_infoblock {
 		word_160_supported						: 1
 	);
 
-	uint16	word_161_175_reserved_compact_flash_assoc[15];
+	uint16	word_161_167_reserved_compact_flash_assoc[7];
+	LBITFIELD2(
+		device_nominal_form_factor				: 4,
+		word_168_bits_4_15_reserved				: 12
+	);
+	LBITFIELD2(
+		data_set_management_support				: 1,
+		word_169_bits_1_15_reserved				: 15
+	);
+	uint16	additional_product_identifier[4];
+	uint16	word_174_175_reserved[2];
 	uint16	current_media_serial_number[30];
 	uint16	word_206_208_reserved[3];
 

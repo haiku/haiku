@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Devices	3412361771
+1	polish	x-vnd.Haiku-Devices	865240481
 Manufacturer	DeviceSCSI		Producent
 Order by:	DevicesView		Sortuj według:
 ACPI controller	Device		Kontroler ACPI
@@ -22,6 +22,7 @@ Scanner	DeviceSCSI		Skaner
 Printer	DeviceSCSI		Drukarka
 Processor	Device		Procesor
 Optical Drive	DeviceSCSI		Napęd optyczny
+ACPI Processor Namespace '%2'	DeviceACPI		ACPI Processor Namespace '%2'
 Bridge	DeviceSCSI		Mostek
 unknown	Device		nieznane
 ACPI Information	DeviceACPI		Informacja o ACPI
@@ -38,10 +39,14 @@ Device class	DeviceSCSI		Klasa urządzenia
 Device name	DeviceACPI		Nazwa urządzenia
 Driver used	Device		Użyty sterownik
 Other	DeviceSCSI		Inne
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Nazwa urządzenia\t\t\t\t: %Name%\nProducent\t\t\t: %Manufacturer%\nUżyty sterownik\t\t\t\t: %DriverUsed%\nŚcieżki urządzenia\t: %DevicePaths%
+ACPI Thermal Zone	DeviceACPI		ACPI Thermal Zone
+Communications	DeviceSCSI		Komunikacja
 Bus	DevicesView		Magistrala
 Communication controller	Device		Kontroler komunikacji
 Manufacturer	DeviceACPI		Producent
 PCI bus	Device		Magistrala PCI
+ACPI System Indicator	DeviceACPI		ACPI Wskaźnik Systemowy
 None	Device		Brak
 PCI bus	DevicesView		Magistrala PCI
 Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Klasa:\t\t\t\t: %classInfo%
@@ -49,7 +54,10 @@ Basic information	DevicesView		Podstawowe informacje
 PCI Information	DevicePCI		Informacje o PCI
 Manufacturer:	Device		Producent:
 ACPI bus	DevicesView		Magistrala ACPI
+Changer	DeviceSCSI		Zmieniarka
+ACPI System Bus	DeviceACPI		ACPI Szyna Systemowa
 Devices	System name		Urządzenia
+Worm	DeviceSCSI		Worm
 Multimedia controller	Device		Kontroler multimediów
 Unknown	DevicePCI		Nieznane
 Device name:	Device		Nazwa urządzenia:
@@ -60,13 +68,28 @@ Device	Device		Urządzenie
 Signal processing controller	Device		Kontroler przetwarzania sygnałów
 Serial bus controller	Device		Kontroler magistrali szeregowej
 Wireless controller	Device		Kontroler łączy bezprzewodowych
+ACPI node '%1'	DeviceACPI		ACPI węzeł '%1'
 Device name	Device		Nazwa urządzenia
 Manufacturer	Device		Producent
+Name	PropertyList		Nazwa
 Manufacturer	DevicePCI		Producent
+Intelligent controller	Device		Kontroler inteligentny
+Satellite communications controller	Device		Kontroler komunikacji satelitarnej
 SCSI Information	DeviceSCSI		Informacje o SCSI
+Enclosure	DeviceSCSI		Załącznik
+Array	DeviceSCSI		Macierz
 Bridge	Device		Mostek
+Refresh devices	DevicesView		Odśwież urządzenia
 Unknown device	DevicesView		Nieznane urządzenie
+Graphics Peripheral	DeviceSCSI		Grafika obwodowa
+Tape Drive	DeviceSCSI		Napęd taśmowy
 Bus Information	Device		Informacje o szynie
+Connection	DevicesView		Połączenie
+Generate system information	DevicesView		Wygeneruj informacje systemowe
+Encryption controller	Device		Kontroler szyfrowania
+Unclassified device	Device		Niesklasyfikowane urządzenie
 Device name	DeviceSCSI		Nazwa urządzenia
+Card Reader	DeviceSCSI		Czytnik kart
+Class info	DevicePCI		Informacja klasy
 Device paths	DevicePCI		Ścieżki do urządzeń
 Devices	DevicesView		Urządzenia

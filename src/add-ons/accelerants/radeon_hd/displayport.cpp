@@ -11,7 +11,6 @@
 
 #include <Debug.h>
 
-#include "accelerant.h"
 #include "accelerant_protos.h"
 #include "connector.h"
 #include "mode.h"
@@ -403,12 +402,15 @@ dp_setup_connectors()
 		}
 
 		uint32 gpioID = gConnector[index]->gpioID;
-		uint32 hwPin = gGPIOInfo[gpioID]->hwPin;
+
+		uint32 auxPin = gGPIOInfo[gpioID]->hwPin;
+		gDPInfo[index]->auxPin = auxPin;
+		gDPInfo[index]->connectorIndex = index;
 
 		uint8 auxMessage[25];
 		int result;
 
-		result = dp_aux_read(hwPin, DP_DPCD_REV, auxMessage, 8, 0);
+		result = dp_aux_read(auxPin, DP_DPCD_REV, auxMessage, 8, 0);
 		if (result > 0) {
 			gDPInfo[index]->valid = true;
 			memcpy(gDPInfo[index]->config, auxMessage, 8);
@@ -419,14 +421,255 @@ dp_setup_connectors()
 }
 
 
+static bool
+dp_get_link_status(dp_info* dp)
+{
+	int result = dp_aux_read(dp->auxPin, DP_LANE0_1_STATUS,
+		dp->linkStatus, DP_LINK_STATUS_SIZE, 100);
+
+	if (result <= 0) {
+		ERROR("%s: DisplayPort link status failed\n", __func__);
+		return false;
+	}
+
+	return true;
+}
+
+
+static uint8
+dp_get_lane_status(dp_info* dp, int lane)
+{
+	int i = DP_LANE0_1_STATUS + (lane >> 1);
+	int s = (lane & 1) * 4;
+	uint8 l = dp->linkStatus[i - DP_LANE0_1_STATUS];
+	return (l >> s) & 0xf;
+}
+
+
+static bool
+dp_clock_recovery_ok(dp_info* dp)
+{
+	int lane;
+	uint8 laneStatus;
+
+	for (lane = 0; lane < dp->laneCount; lane++) {
+		laneStatus = dp_get_lane_status(dp, lane);
+		if ((laneStatus & DP_LANE_CR_DONE) == 0)
+			return false;
+	}
+	return true;
+}
+
+
+static void
+dp_update_vs_emph(dp_info* dp)
+{
+	// Set initial vs and emph on source
+	transmitter_dig_setup(dp->connectorIndex, dp->clock, 0, dp->trainingSet[0],
+		ATOM_TRANSMITTER_ACTION_SETUP_VSEMPH);
+
+	// Set vs and emph on the sink
+	dp_aux_write(dp->auxPin, DP_TRAINING_LANE0_SET,
+		dp->trainingSet, dp->laneCount, 0);
+}
+
+
+static uint8
+dp_get_adjust_request_voltage(dp_info* dp, int lane)
+{
+	int i = DP_ADJUST_REQUEST_LANE0_1 + (lane >> 1);
+	int s = (((lane & 1) != 0) ? DP_ADJUST_VOLTAGE_SWING_LANE1_SHIFT
+		: DP_ADJUST_VOLTAGE_SWING_LANE0_SHIFT);
+	uint8 l = dp->linkStatus[i - DP_LANE0_1_STATUS];
+
+	return ((l >> s) & 0x3) << DP_TRAIN_VOLTAGE_SWING_SHIFT;
+}
+
+
+static uint8
+dp_get_adjust_request_pre_emphasis(dp_info* dp, int lane)
+{
+	int i = DP_ADJUST_REQUEST_LANE0_1 + (lane >> 1);
+	int s = (((lane & 1) != 0) ? DP_ADJUST_PRE_EMPHASIS_LANE1_SHIFT
+		: DP_ADJUST_PRE_EMPHASIS_LANE0_SHIFT);
+	uint8 l = dp->linkStatus[i - DP_LANE0_1_STATUS];
+
+	return ((l >> s) & 0x3) << DP_TRAIN_PRE_EMPHASIS_SHIFT;
+}
+
+
+#define DP_VOLTAGE_MAX         DP_TRAIN_VOLTAGE_SWING_1200
+#define DP_PRE_EMPHASIS_MAX    DP_TRAIN_PRE_EMPHASIS_9_5
+
+
+static void
+dp_get_adjust_train(dp_info* dp)
+{
+	TRACE("%s\n", __func__);
+
+	const char* voltageNames[] = {
+		"0.4V", "0.6V", "0.8V", "1.2V"
+	};
+	const char* preEmphasisNames[] = {
+		"0dB", "3.5dB", "6dB", "9.5dB"
+	};
+
+	uint8 voltage = 0;
+	uint8 preEmphasis = 0;
+	int lane;
+
+	for (lane = 0; lane < dp->laneCount; lane++) {
+		uint8 laneVoltage = dp_get_adjust_request_voltage(dp, lane);
+		uint8 lanePreEmphasis = dp_get_adjust_request_pre_emphasis(dp, lane);
+
+		TRACE("%s: Requested %s at %s for lane %d\n", __func__,
+			preEmphasisNames[lanePreEmphasis >> DP_TRAIN_PRE_EMPHASIS_SHIFT],
+			voltageNames[laneVoltage >> DP_TRAIN_VOLTAGE_SWING_SHIFT],
+			lane);
+
+		if (laneVoltage > voltage)
+			voltage = laneVoltage;
+		if (lanePreEmphasis > preEmphasis)
+			preEmphasis = lanePreEmphasis;
+	}
+
+	if (voltage >= DP_VOLTAGE_MAX)
+		voltage |= DP_TRAIN_MAX_SWING_REACHED;
+
+	if (preEmphasis >= DP_PRE_EMPHASIS_MAX)
+		preEmphasis |= DP_TRAIN_MAX_PRE_EMPHASIS_REACHED;
+
+	for (lane = 0; lane < 4; lane++)
+		dp->trainingSet[lane] = voltage | preEmphasis;
+}
+
+
+static void
+dp_set_tp(dp_info* dp, int trainingPattern)
+{
+	TRACE("%s\n", __func__);
+
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	int rawTrainingPattern = 0;
+
+	/* set training pattern on the source */
+	if (info.dceMajor >= 4 || !dp->trainingUseEncoder) {
+		switch (trainingPattern) {
+			case DP_TRAINING_PATTERN_1:
+				rawTrainingPattern = ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN1;
+				break;
+			case DP_TRAINING_PATTERN_2:
+				rawTrainingPattern = ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN2;
+				break;
+			case DP_TRAINING_PATTERN_3:
+				rawTrainingPattern = ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN3;
+				break;
+		}
+		// TODO: PixelClock 0 ok?
+		encoder_dig_setup(dp->connectorIndex, 0, rawTrainingPattern);
+	} else {
+		ERROR("%s: TODO: dp_encoder_service\n", __func__);
+		return;
+		#if 0
+		switch (trainingPattern) {
+			case DP_TRAINING_PATTERN_1:
+				rawTrainingPattern = 0;
+				break;
+			case DP_TRAINING_PATTERN_2:
+				rawTrainingPattern = 1;
+				break;
+		}
+		radeon_dp_encoder_service(dp_info->rdev,
+			ATOM_DP_ACTION_TRAINING_PATTERN_SEL, dp_info->dp_clock,
+			dp_info->enc_id, rawTrainingPattern);
+		#endif
+	}
+
+	// Enable training pattern on the sink
+	dpcd_reg_write(dp->auxPin, DP_TRAINING_PATTERN_SET, trainingPattern);
+}
+
+
+status_t
+dp_link_train_cr(dp_info* dp)
+{
+	TRACE("%s\n", __func__);
+
+	// Display Port Clock Recovery Training
+
+	bool clockRecovery = false;
+	uint8 voltage = 0xff;
+	int lane;
+
+	dp_set_tp(dp, DP_TRAINING_PATTERN_1);
+	memset(dp->trainingSet, 0, 4);
+	dp_update_vs_emph(dp);
+
+	while (1) {
+		if (dp->trainingReadInterval == 0)
+			snooze(100);
+		else
+			snooze(1000 * 4 * dp->trainingReadInterval);
+
+		if (!dp_get_link_status(dp))
+			break;
+
+		if (dp_clock_recovery_ok(dp)) {
+			clockRecovery = true;
+			break;
+		}
+
+		for (lane = 0; lane < dp->laneCount; lane++) {
+			if ((dp->trainingSet[lane] & DP_TRAIN_MAX_SWING_REACHED) == 0)
+				break;
+		}
+
+		if (lane == dp->laneCount) {
+			ERROR("%s: clock recovery reached max voltage\n", __func__);
+			break;
+		}
+
+		if ((dp->trainingSet[0] & DP_TRAIN_VOLTAGE_SWING_MASK) == voltage) {
+			dp->trainingAttempts++;
+			if (dp->trainingAttempts >= 5) {
+				ERROR("%s: clock recovery tried 5 times\n", __func__);
+				break;
+			}
+		} else
+			dp->trainingAttempts = 0;
+
+		voltage = dp->trainingSet[0] & DP_TRAIN_VOLTAGE_SWING_MASK;
+
+		// Compute new trainingSet as requested by sink
+		dp_get_adjust_train(dp);
+
+		dp_update_vs_emph(dp);
+	}
+
+	if (!clockRecovery) {
+		ERROR("%s: clock recovery failed\n", __func__);
+		return B_ERROR;
+	}
+
+	TRACE("%s: clock recovery at voltage %d pre-emphasis %d\n",
+		__func__, dp->trainingSet[0] & DP_TRAIN_VOLTAGE_SWING_MASK,
+		(dp->trainingSet[0] & DP_TRAIN_PRE_EMPHASIS_MASK)
+		>> DP_TRAIN_PRE_EMPHASIS_SHIFT);
+	return B_OK;
+}
+
+
 status_t
 dp_link_train(uint8 crtcID, display_mode* mode)
 {
 	TRACE("%s\n", __func__);
 
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	if (gDPInfo[connectorIndex]->valid != true) {
-		ERROR("%s: started on non-DisplayPort connector #%" B_PRIu32 "\n",
+	dp_info* dp = gDPInfo[connectorIndex];
+
+	if (dp->valid != true) {
+		ERROR("%s: started on invalid DisplayPort connector #%" B_PRIu32 "\n",
 			__func__, connectorIndex);
 		return B_ERROR;
 	}
@@ -436,13 +679,13 @@ dp_link_train(uint8 crtcID, display_mode* mode)
 	uint8 tableMajor;
 	uint8 tableMinor;
 
-	bool dpUseEncoder = true;
+	dp->trainingUseEncoder = true;
 	if (atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor)
 		== B_OK) {
 		if (tableMinor > 1) {
 			// The AtomBIOS DPEncoderService greater then 1.1 can't program the
 			// training pattern properly.
-			dpUseEncoder = false;
+			dp->trainingUseEncoder = false;
 		}
 	}
 
@@ -461,22 +704,24 @@ dp_link_train(uint8 crtcID, display_mode* mode)
 	else
 		dpEncoderID |= ATOM_DP_CONFIG_LINK_A;
 
-	//uint8 dpReadInterval = dpcd_reg_read(hwPin, DP_TRAINING_AUX_RD_INTERVAL);
+	dp->trainingReadInterval
+		= dpcd_reg_read(hwPin, DP_TRAINING_AUX_RD_INTERVAL);
+
 	uint8 sandbox = dpcd_reg_read(hwPin, DP_MAX_LANE_COUNT);
 
 	radeon_shared_info &info = *gInfo->shared_info;
-	bool dpTPS3Supported = false;
-	if (info.dceMajor >= 5 && (sandbox & DP_TPS3_SUPPORTED) != 0)
-		dpTPS3Supported = true;
+	//bool dpTPS3Supported = false;
+	//if (info.dceMajor >= 5 && (sandbox & DP_TPS3_SUPPORTED) != 0)
+	//	dpTPS3Supported = true;
 
-	// DisplayPort training initialization
+	// *** DisplayPort link training initialization
 
 	// Power up the DP sink
-	if (gDPInfo[connectorIndex]->config[0] >= 0x11)
+	if (dp->config[0] >= 0x11)
 		dpcd_reg_write(hwPin, DP_SET_POWER, DP_SET_POWER_D0);
 
 	// Possibly enable downspread on the sink
-	if ((gDPInfo[connectorIndex]->config[3] & 0x1) != 0)
+	if ((dp->config[3] & 0x1) != 0)
 		dpcd_reg_write(hwPin, DP_DOWNSPREAD_CTRL, DP_SPREAD_AMP_0_5);
 	else
 		dpcd_reg_write(hwPin, DP_DOWNSPREAD_CTRL, 0);
@@ -484,16 +729,16 @@ dp_link_train(uint8 crtcID, display_mode* mode)
 	encoder_dig_setup(connectorIndex, mode->timing.pixel_clock,
 		ATOM_ENCODER_CMD_SETUP_PANEL_MODE);
 
-	if (gDPInfo[connectorIndex]->config[0] >= 0x11)
+	if (dp->config[0] >= 0x11)
 		sandbox |= DP_LANE_COUNT_ENHANCED_FRAME_EN;
 	dpcd_reg_write(hwPin, DP_LANE_COUNT_SET, sandbox);
 
 	// Set the link rate on the DP sink
-	sandbox = dp_get_link_clock_encode(gDPInfo[connectorIndex]->clock);
+	sandbox = dp_get_link_clock_encode(dp->clock);
 	dpcd_reg_write(hwPin, DP_LINK_BW_SET, sandbox);
 
 	// Start link training on source
-	if (info.dceMajor >= 4 || !dpUseEncoder) {
+	if (info.dceMajor >= 4 || !dp->trainingUseEncoder) {
 		encoder_dig_setup(connectorIndex, mode->timing.pixel_clock,
 			ATOM_ENCODER_CMD_DP_LINK_TRAINING_START);
 	} else {
@@ -501,21 +746,23 @@ dp_link_train(uint8 crtcID, display_mode* mode)
 			__func__);
 	}
 
-	/* disable the training pattern on the sink */
+	// Disable the training pattern on the sink
 	dpcd_reg_write(hwPin, DP_TRAINING_PATTERN_SET,
 		DP_TRAINING_PATTERN_DISABLE);
 
-	// TODO: dp_link_train_cr
+	dp_link_train_cr(dp);
 	// TODO: dp_link_train_ce
 
+
+	// *** DisplayPort link training finish
 	snooze(400);
 
-	/* disable the training pattern on the sink */
+	// Disable the training pattern on the sink
 	dpcd_reg_write(hwPin, DP_TRAINING_PATTERN_SET,
 		DP_TRAINING_PATTERN_DISABLE);
 
-	/* disable the training pattern on the source */
-	if (info.dceMajor >= 4 || !dpUseEncoder) {
+	// Disable the training pattern on the source
+	if (info.dceMajor >= 4 || !dp->trainingUseEncoder) {
 		encoder_dig_setup(connectorIndex, mode->timing.pixel_clock,
 			ATOM_ENCODER_CMD_DP_LINK_TRAINING_COMPLETE);
 	} else {

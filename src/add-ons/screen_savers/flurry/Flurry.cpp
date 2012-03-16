@@ -351,7 +351,7 @@ Flurry::StartSaver(BView* view, bool preview)
 void
 Flurry::StopSaver()
 {
-	if (fFlurryView)
+	if (fFlurryView != NULL)
 		fFlurryView->EnableDirectMode(false);
 }
 
@@ -366,10 +366,13 @@ Flurry::DirectDraw(int32 frame)
 void
 Flurry::DirectConnected(direct_buffer_info* info)
 {
-	if (fFlurryView) {
+	// Enable or disable direct rendering
+	#if 1
+	if (fFlurryView != NULL) {
 		fFlurryView->DirectConnected(info);
 		fFlurryView->EnableDirectMode(true);
 	}
+	#endif
 }
 
 

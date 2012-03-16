@@ -55,10 +55,11 @@ encoder_init()
 				break;
 		}
 
-		if ((info.chipsetFlags & CHIP_APU) != 0
-			&& gConnector[id]->encoder.isExternal) {
-			encoder_external_setup(id, 0,
-				EXTERNAL_ENCODER_ACTION_V3_ENCODER_INIT);
+		if ((info.chipsetFlags & CHIP_APU) != 0) {
+			if (gConnector[id]->encoderExternal.valid == true) {
+				encoder_external_setup(id, 0,
+					EXTERNAL_ENCODER_ACTION_V3_ENCODER_INIT);
+			}
 		}
 	}
 }
@@ -352,7 +353,7 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 			break;
 	}
 
-	if (gConnector[connectorIndex]->encoder.isExternal == true) {
+	if (gConnector[connectorIndex]->encoderExternal.valid == true) {
 		if ((info.chipsetFlags & CHIP_APU) != 0) {
 			// aka DCE 4.1
 			encoder_external_setup(connectorIndex, pixelClock,
@@ -427,7 +428,12 @@ encoder_digital_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 	}
 
 	uint32 lvdsFlags = gConnector[connectorIndex]->lvdsFlags;
-	bool isHdmi = gConnector[connectorIndex]->encoder.isHDMI;
+
+	bool isHdmi = false;
+	if (gConnector[connectorIndex]->type == VIDEO_CONNECTOR_HDMIA
+		|| gConnector[connectorIndex]->type == VIDEO_CONNECTOR_HDMIB) {
+		isHdmi = true;
+	}
 
 	// Prepare AtomBIOS command arguments
 	union lvdsEncoderControl {
@@ -529,6 +535,7 @@ status_t
 encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 {
 	radeon_shared_info &info = *gInfo->shared_info;
+	connector_info* connector = gConnector[connectorIndex];
 
 	int index = 0;
 	if (info.dceMajor >= 4)
@@ -560,16 +567,14 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 	union digEncoderControl args;
 	memset(&args, 0, sizeof(args));
 
-	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
-	bool isDPBridge = gConnector[connectorIndex]->encoder.isDPBridge;
-
-	bool linkB = gConnector[connectorIndex]->encoder.linkEnumeration
+	bool isDPBridge = connector->encoderExternal.isDPBridge;
+	bool linkB = connector->encoder.linkEnumeration
 		== GRAPH_OBJECT_ENUM_ID2 ? true : false;
 
 	// determine DP panel mode
 	uint32 panelMode;
 	if (info.dceMajor >= 4 && isDPBridge) {
-		if (encoderID == ENCODER_OBJECT_ID_NUTMEG)
+		if (connector->encoderExternal.objectID == ENCODER_OBJECT_ID_NUTMEG)
 			panelMode = DP_PANEL_MODE_INTERNAL_DP1_MODE;
 		else {
 			// aka ENCODER_OBJECT_ID_TRAVIS or VIDEO_CONNECTOR_EDP
@@ -609,7 +614,7 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 				args.v1.ucConfig |= ATOM_ENCODER_CONFIG_DPLINKRATE_2_70GHZ;
 			}
 
-			switch (encoderID) {
+			switch (connector->encoder.objectID) {
 				case ENCODER_OBJECT_ID_INTERNAL_UNIPHY:
 					args.v1.ucConfig = ATOM_ENCODER_CONFIG_V2_TRANSMITTER1;
 					break;
@@ -704,6 +709,15 @@ encoder_external_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 {
 	TRACE("%s\n", __func__);
 
+	encoder_info* encoder
+		= &gConnector[connectorIndex]->encoderExternal;
+
+	if (encoder->valid != true) {
+		ERROR("%s: connector %" B_PRIu32 " doesn't have a valid "
+			"external encoder!", __func__, connectorIndex);
+		return B_ERROR;
+	}
+
 	uint8 tableMajor;
 	uint8 tableMinor;
 
@@ -785,8 +799,8 @@ encoder_external_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 						args.v3.sExtEncoder.ucLaneNum = 4;
 					}
 
-					uint16 encoderFlags
-						= gConnector[connectorIndex]->encoder.flags;
+					uint16 encoderFlags = encoder->flags;
+
 					switch ((encoderFlags & ENUM_ID_MASK) >> ENUM_ID_SHIFT) {
 						case GRAPH_OBJECT_ENUM_ID1:
 							TRACE("%s: external encoder 1\n", __func__);
@@ -904,6 +918,18 @@ encoder_analog_load_detect(uint32 connectorIndex)
 {
 	TRACE("%s\n", __func__);
 
+	if (gConnector[connectorIndex]->encoderExternal.valid == true)
+		return encoder_dig_load_detect(connectorIndex);
+
+	return encoder_dac_load_detect(connectorIndex);
+}
+
+
+bool
+encoder_dac_load_detect(uint32 connectorIndex)
+{
+	TRACE("%s\n", __func__);
+
 	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
 
@@ -994,6 +1020,46 @@ encoder_analog_load_detect(uint32 connectorIndex)
 }
 
 
+bool
+encoder_dig_load_detect(uint32 connectorIndex)
+{
+	TRACE("%s\n", __func__);
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	if (info.dceMajor < 4) {
+		ERROR("%s: Strange: External DIG encoder on DCE < 4?\n", __func__);
+		return false;
+	}
+
+	encoder_external_setup(connectorIndex, 0,
+		EXTERNAL_ENCODER_ACTION_V3_DACLOAD_DETECTION);
+
+	uint32 biosScratch0 = Read32(OUT, R600_BIOS_0_SCRATCH);
+
+	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+
+	if ((encoderFlags & ATOM_DEVICE_CRT1_SUPPORT) != 0)
+		if ((biosScratch0 & ATOM_S0_CRT1_MASK) != 0)
+			return true;
+	if ((encoderFlags & ATOM_DEVICE_CRT2_SUPPORT) != 0)
+		if ((biosScratch0 & ATOM_S0_CRT2_MASK) != 0)
+			return true;
+	if ((encoderFlags & ATOM_DEVICE_CV_SUPPORT) != 0)
+		if ((biosScratch0 & (ATOM_S0_CV_MASK | ATOM_S0_CV_MASK_A)) != 0)
+			return true;
+	if ((encoderFlags & ATOM_DEVICE_TV1_SUPPORT) != 0) {
+		if ((biosScratch0
+			& (ATOM_S0_TV1_COMPOSITE | ATOM_S0_TV1_COMPOSITE_A)) != 0)
+			return true; /* Composite connected */
+		else if ((biosScratch0
+			& (ATOM_S0_TV1_SVIDEO | ATOM_S0_TV1_SVIDEO_A)) != 0)
+			return true; /* S-Video connected */
+	}
+
+	return false;
+}
+
+
 status_t
 transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 	uint8 laneNumber, uint8 laneSet, int command)
@@ -1015,7 +1081,7 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 			index = GetIndexIntoMasterTable(COMMAND, LVTMATransmitterControl);
 			break;
 		default:
-			ERROR("%s: called on non-dig encoder!\n", __func__);
+			ERROR("%s: BUG: dig setup run on non-dig encoder!\n", __func__);
 			return B_ERROR;
 	}
 
@@ -1053,7 +1119,7 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
 
 	bool isDP = connector_is_dp(connectorIndex);
-	bool linkB = gConnector[connectorIndex]->encoder.linkEnumeration
+	bool linkB = gConnector[connectorIndex]->encoderExternal.linkEnumeration
 		== GRAPH_OBJECT_ENUM_ID2 ? true : false;
 
 	uint8 dpClock = 0;
@@ -1495,7 +1561,7 @@ encoder_dpms_set(uint8 crtcID, int mode)
 		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
 			encoder_dpms_set_dig(crtcID, mode);
-			return;
+			break;
 		case ENCODER_OBJECT_ID_INTERNAL_DVO1:
 		case ENCODER_OBJECT_ID_INTERNAL_DDI:
 			index = GetIndexIntoMasterTable(COMMAND, DVOOutputControl);
@@ -1538,18 +1604,19 @@ encoder_dpms_set(uint8 crtcID, int mode)
 		// default, none on purpose
 	}
 
-	switch (mode) {
-		case B_DPMS_ON:
-			args.ucAction = ATOM_ENABLE;
-			break;
-		case B_DPMS_STAND_BY:
-		case B_DPMS_SUSPEND:
-		case B_DPMS_OFF:
-			args.ucAction = ATOM_DISABLE;
-			break;
-	}
-
+	// If we have an index, we need to execute a table.
 	if (index >= 0) {
+		switch (mode) {
+			case B_DPMS_ON:
+				args.ucAction = ATOM_ENABLE;
+				break;
+			case B_DPMS_STAND_BY:
+			case B_DPMS_SUSPEND:
+			case B_DPMS_OFF:
+				args.ucAction = ATOM_DISABLE;
+				break;
+		}
+
 		atom_execute_table(gAtomContext, index, (uint32*)&args);
 		if (info.dceMajor < 5) {
 			if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
@@ -1561,13 +1628,8 @@ encoder_dpms_set(uint8 crtcID, int mode)
 		}
 	}
 
-	/* TODO: I feel as though what is below may be incorrect...
-	 * AMD: the ext encoder will only show up in conjunction with an internal
-	 * encoder, the pipeline generally looks like crtc -> dvo -> ext encoder
-	 * or crtc -> uniphy -> ext encoder
-	 */
-
-	if (encoder_is_external(encoderID))
+	// If an external encoder exists, we should flip it on as well
+	if (gConnector[connectorIndex]->encoderExternal.valid == true)
 		encoder_dpms_set_external(crtcID, mode);
 }
 
@@ -1655,7 +1717,7 @@ encoder_dpms_set_external(uint8 crtcID, int mode)
 
 	radeon_shared_info &info = *gInfo->shared_info;
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
+	pll_info* pll = &gConnector[connectorIndex]->encoderExternal.pll;
 
 	switch (mode) {
 		case B_DPMS_ON:
