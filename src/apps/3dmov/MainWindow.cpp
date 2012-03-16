@@ -187,6 +187,8 @@ void MainWindow :: MessageReceived(BMessage *message)
 */
 bool MainWindow :: QuitRequested()
 {
+	if (fCurrentView != NULL)
+		fCurrentView->EnableDirectMode(false);
 	//be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
 }
@@ -198,19 +200,9 @@ bool MainWindow :: QuitRequested()
 */
 void MainWindow :: DirectConnected(direct_buffer_info *info)
 {
-	switch (info->buffer_state & B_DIRECT_MODE_MASK)
-	{
-		// start a direct screen connection.
-		case B_DIRECT_START :
-			break;
-		// stop a direct screen connection.
-		case B_DIRECT_STOP :
-			break;
-		// modify the state of a direct screen connection.
-		case B_DIRECT_MODIFY :
-			break;
-	default :
-		break;
+	if (fCurrentView != NULL) {
+		fCurrentView->DirectConnected(info);
+		fCurrentView->EnableDirectMode(true);
 	}
 }
 
