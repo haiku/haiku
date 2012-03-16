@@ -59,7 +59,8 @@ class NetworkStatusView : public BView {
 
 		BObjectList<BString> fInterfaces;
 		bool			fInDeskbar;
-		BBitmap*		fBitmaps[kStatusCount];
+		BBitmap*		fTrayIcons[kStatusCount];
+		BBitmap*		fNotifyIcons[kStatusCount];
 		int32			fStatus;
 };
 
