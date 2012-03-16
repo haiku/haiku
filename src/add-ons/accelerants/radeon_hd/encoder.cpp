@@ -1561,7 +1561,7 @@ encoder_dpms_set(uint8 crtcID, int mode)
 		case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
 			encoder_dpms_set_dig(crtcID, mode);
-			return;
+			break;
 		case ENCODER_OBJECT_ID_INTERNAL_DVO1:
 		case ENCODER_OBJECT_ID_INTERNAL_DDI:
 			index = GetIndexIntoMasterTable(COMMAND, DVOOutputControl);
@@ -1604,18 +1604,19 @@ encoder_dpms_set(uint8 crtcID, int mode)
 		// default, none on purpose
 	}
 
-	switch (mode) {
-		case B_DPMS_ON:
-			args.ucAction = ATOM_ENABLE;
-			break;
-		case B_DPMS_STAND_BY:
-		case B_DPMS_SUSPEND:
-		case B_DPMS_OFF:
-			args.ucAction = ATOM_DISABLE;
-			break;
-	}
-
+	// If we have an index, we need to execute a table.
 	if (index >= 0) {
+		switch (mode) {
+			case B_DPMS_ON:
+				args.ucAction = ATOM_ENABLE;
+				break;
+			case B_DPMS_STAND_BY:
+			case B_DPMS_SUSPEND:
+			case B_DPMS_OFF:
+				args.ucAction = ATOM_DISABLE;
+				break;
+		}
+
 		atom_execute_table(gAtomContext, index, (uint32*)&args);
 		if (info.dceMajor < 5) {
 			if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
@@ -1627,13 +1628,8 @@ encoder_dpms_set(uint8 crtcID, int mode)
 		}
 	}
 
-	/* TODO: I feel as though what is below may be incorrect...
-	 * AMD: the ext encoder will only show up in conjunction with an internal
-	 * encoder, the pipeline generally looks like crtc -> dvo -> ext encoder
-	 * or crtc -> uniphy -> ext encoder
-	 */
-
-	if (encoder_is_external(encoderID))
+	// If an external encoder exists, we should flip it on as well
+	if (gConnector[connectorIndex]->encoderExternal.valid == true)
 		encoder_dpms_set_external(crtcID, mode);
 }
 
@@ -1721,7 +1717,7 @@ encoder_dpms_set_external(uint8 crtcID, int mode)
 
 	radeon_shared_info &info = *gInfo->shared_info;
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
+	pll_info* pll = &gConnector[connectorIndex]->encoderExternal.pll;
 
 	switch (mode) {
 		case B_DPMS_ON:
