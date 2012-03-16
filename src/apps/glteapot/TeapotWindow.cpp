@@ -213,10 +213,15 @@ TeapotWindow::QuitRequested()
 void
 TeapotWindow::DirectConnected(direct_buffer_info* info)
 {
+	// TODO: Direct rendering causes the mouse to flicker due
+	// to the lack of a Hardware Cursor, however without
+	// it the teapot freezes on mouse move. (bug?)
+	#if 1
 	if (fObjectView != NULL) {
 		fObjectView->DirectConnected(info);
 		fObjectView->EnableDirectMode(true);
 	}
+	#endif
 }
 
 
