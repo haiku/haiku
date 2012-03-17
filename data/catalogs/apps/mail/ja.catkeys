@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-MAIL	3674714390
+1	japanese	x-vnd.Be-MAIL	1742262728
 View	Mail		表示
 %d - Date	Mail		%d - 日付
 Attach attributes:	Mail		属性の添付：
@@ -73,6 +73,9 @@ Edit signatures…	Mail		署名の編集…
 New	Mail		新規
 Attachments: 	Mail		添付ファイル：
 On	Mail		オン
+Set to %s	Mail		「%s」に設定
+Forward	Mail		転送
+E-mail draft could not be saved!	Mail		下書きが保存できませんでした。
 %e wrote:\\n	Mail		%e は書きました:\\n
 To:	Mail		To:
 Only files can be added as attachments.	Mail		添付できるのは、ファイルのみです。
@@ -82,6 +85,15 @@ Title:	Mail		署名の名称：
 Find…	Mail		検索…
 Accounts…	Mail		アカウントの設定…
 Mail preferences	Mail		メールの設定
+Initial spell check mode:	Mail		スペルチェックモード：
+Leave same	Mail		変更しません
+Page setup…	Mail		ページ設定…
+Text wrapping:	Mail		文字列の折り返し：
+Revert	Mail		戻す
+File	Mail		ファイル
+mail	B_USER_DIRECTORY/mail		メール
+None	Mail		無し
+(Name unavailable)	Mail		(名前が利用できません)
 Copy link location	Mail		このリンクのアドレスをコピー
 out	B_USER_DIRECTORY/mail/out		送信トレイ
 Show header	Mail		ヘッダーを表示
@@ -89,3 +101,27 @@ Show header	Mail		ヘッダーを表示
 Resend	Mail		再送信
 Show raw message	Mail		生のメッセージを表示
 \\n - Newline	Mail		\\n - 改行
+Start now	Mail		直ちに起動
+Close	Mail		閉じる
+No matches	Mail		一致しません
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		メールサービスが起動されていないため、このメッセージは処理待ちとなりメールサービス起動後に処理されます。
+Really delete this signature? This cannot be undone.	Mail		署名を削除しますか？削除した書名は復元できませんので、ご注意ください。
+Open	Mail		開く
+Sorry, could not find an application that supports the 'Person' data type.	Mail		People データ形式をサポートするアプリケーションが見つかりませんでした。
+Do you wish to send this message before closing?	Mail		閉じる前にこのメッセージを送信しますか？
+Delete	Mail		削除
+Leave as '%s'	Mail		「%s」のままにする
+Copy	Mail		コピー
+Mail couldn't find its dictionary.	Mail		スペルチェック用辞書データが見つかりません。
+Reply preamble:	Mail		返信の前書き：
+Signatures	Mail		署名
+Next	Mail		次へ
+Save	Mail		保存
+Random	Mail		ランダム
+Close and 	Mail		閉じる
+Save as draft	Mail		下書きとして保存
+The mail_daemon could not be started:\n\t	Mail		メールサービス (mail_daemon) を起動できませんでした。\n\t
+Open attachment	Mail		添付ファイルを開く
+sent	B_USER_DIRECTORY/mail/sent		送信済みメール
+(Date unavailable)	Mail		(日付が利用できません)
+Put your favorite e-mail queries and query templates in this folder.	Mail		お気に入りの電子メールクエリーとクエリーテンプレートをこのフォルダーに入れてください。
