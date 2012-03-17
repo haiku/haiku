@@ -10,23 +10,22 @@
  */
 
 
-#include <KernelExport.h>
-#include <Drivers.h>
-#include <Errors.h>
-#include <OS.h>
-#include <fcntl.h>
-#include <image.h>
-#include <midi_driver.h>
-#include <string.h>
-#include <drivers/driver_settings.h>
-
 #include "ice1712.h"
 #include "ice1712_reg.h"
 #include "io.h"
 #include "multi.h"
 #include "util.h"
 
-#include "debug.h"
+#include <KernelExport.h>
+#include <Drivers.h>
+#include <OS.h>
+#include <midi_driver.h>
+#include <drivers/driver_settings.h>
+
+#include <fcntl.h>
+#include <stdlib.h>
+#include <string.h>
+
 
 status_t init_hardware(void);
 status_t init_driver(void);
@@ -135,7 +134,7 @@ ice_1712_int(void *arg)
 static status_t
 ice1712_setup(ice1712 *ice)
 {
-	int result, i;
+	int i;
 	uint8 reg8 = 0;
 	uint16 mute;
 
@@ -151,7 +150,7 @@ ice1712_setup(ice1712 *ice)
 	write_ccs_uint8(ice, CCS_CONTROL_STATUS, 0x01);
 	snooze(200000);
 
-	result = read_eeprom(ice, ice->eeprom_data);
+	read_eeprom(ice, ice->eeprom_data);
 
 /*	TRACE("EEprom -> ");
 	for (i = 0; i < 32; i++)

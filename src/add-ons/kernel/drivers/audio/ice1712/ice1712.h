@@ -12,8 +12,11 @@
 #define _ICE1712_H_
 
 
-#include <PCI.h>
+#include "debug.h"
 #include "hmulti_audio.h"
+
+#include <PCI.h>
+
 
 #define DRIVER_NAME "ice1712"
 #define VERSION "0.5"

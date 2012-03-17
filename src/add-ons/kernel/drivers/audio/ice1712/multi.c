@@ -332,10 +332,8 @@ ice1712_get_global_format(ice1712 *card, multi_format_info *data)
 status_t
 ice1712_set_global_format(ice1712 *card, multi_format_info *data)
 {
-	uint8 i;
-
-	TRACE("Input Sampling Rate = %d\n", (int)data->input.rate);
-	TRACE("Output Sampling Rate = %d\n", (int)data->output.rate);
+	TRACE("Input Sampling Rate = %d\n", data->input.rate);
+	TRACE("Output Sampling Rate = %d\n", data->output.rate);
 
 	//We can't have a different rate for input and output
 	//so just wait to change our sample rate when
@@ -361,8 +359,7 @@ ice1712_set_global_format(ice1712 *card, multi_format_info *data)
 		}
 		write_mt_uint8(card, MT_SAMPLING_RATE_SELECT, card->sampling_rate);
 	}
-	i = read_mt_uint8(card, MT_SAMPLING_RATE_SELECT);
-	TRACE("New rate = %#x\n", i);
+	TRACE("New rate = %#x\n", read_mt_uint8(card, MT_SAMPLING_RATE_SELECT));
 
 	return B_OK;
 }
