@@ -374,6 +374,21 @@ debug_displays()
 uint32
 display_get_encoder_mode(uint32 connectorIndex)
 {
+	// Is external DisplayPort Bridge?
+	if (gConnector[connectorIndex]->encoderExternal.valid == true
+		&& gConnector[connectorIndex]->encoderExternal.isDPBridge == true) {
+		return ATOM_ENCODER_MODE_DP;
+	}
+
+	// DVO Encoders (should be bridges)
+	switch (gConnector[connectorIndex]->encoder.objectID) {
+		case ENCODER_OBJECT_ID_INTERNAL_DVO1:
+		case ENCODER_OBJECT_ID_INTERNAL_DDI:
+		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DVO1:
+			return ATOM_ENCODER_MODE_DVO;
+	}
+
+	// Normal encoder situations
 	switch (gConnector[connectorIndex]->type) {
 		case VIDEO_CONNECTOR_DVII:
 		case VIDEO_CONNECTOR_HDMIB: /* HDMI-B is DL-DVI; analog works fine */
@@ -401,7 +416,7 @@ display_get_encoder_mode(uint32 connectorIndex)
 			// }
 			// TODO: if audio detected on edid and DCE4, ATOM_ENCODER_MODE_DVI
 			//        if audio detected on edid not DCE4, ATOM_ENCODER_MODE_HDMI
-			return ATOM_ENCODER_MODE_DVI;
+			return ATOM_ENCODER_MODE_DP;
 		case VIDEO_CONNECTOR_EDP:
 			return ATOM_ENCODER_MODE_DP;
 		case VIDEO_CONNECTOR_DVIA:
