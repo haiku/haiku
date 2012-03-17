@@ -50,6 +50,8 @@ public:
 			int32				CountYTabs() const;
 			XTab*				XTabAt(int32 index, bool ordered = false);
 			YTab*				YTabAt(int32 index, bool ordered = false);
+			int32				IndexOf(XTab* tab, bool ordered = false);
+			int32				IndexOf(YTab* tab, bool ordered = false);
 
 			Row*				AddRow(YTab* top, YTab* bottom);
 			Column*				AddColumn(XTab* left, XTab* right);

@@ -279,6 +279,30 @@ BALMLayout::YTabAt(int32 index, bool ordered)
 }
 
 
+int32
+BALMLayout::IndexOf(XTab* tab, bool ordered)
+{
+	if (ordered && !fXTabsSorted) {
+		Layout();
+		fXTabList.SortItems(CompareXTabFunc);
+		fXTabsSorted = true;
+	}
+	return fXTabList.IndexOf(tab);
+}
+
+
+int32
+BALMLayout::IndexOf(YTab* tab, bool ordered)
+{
+	if (ordered && !fYTabsSorted) {
+		Layout();
+		fYTabList.SortItems(CompareYTabFunc);
+		fYTabsSorted = true;
+	}
+	return fYTabList.IndexOf(tab);
+}
+
+
 int
 CompareXTabFunc(const XTab* tab1, const XTab* tab2)
 {
