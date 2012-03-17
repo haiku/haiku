@@ -785,7 +785,6 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 	AddHeaderDirectoryToHaikuImage compatibility gnu : gnu ;
 
 	# third party libs headers
-	AddHeaderDirectoryToHaikuImage libs freetype2 : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs jpeg : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs ncurses : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs png : 3rdparty ;

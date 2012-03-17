@@ -42,7 +42,6 @@ include [ FDirName $(HAIKU_BUILD_RULES_DIR) CommandLineArguments ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) ConfigRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) DocumentationRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) FileRules ] ;
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) FreetypeRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) HeadersRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) KernelRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) ImageRules ] ;
