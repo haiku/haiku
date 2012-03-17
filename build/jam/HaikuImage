@@ -84,7 +84,6 @@ SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo $(X86_ONLY)GLTeapot
 SYSTEM_LIBS =
 	libbe.so libbsd.so libbnetapi.so
 	libdebug.so libdevice.so
-	libfreetype.so
 	libgame.so $(X86_ONLY)libGL.so libgnu.so
 	libjpeg.so
 	liblocale.so
@@ -96,6 +95,7 @@ SYSTEM_LIBS =
 	libtextencoding.so libtiff.so libtracker.so libtranslation.so
 	libz.so
 	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
+	$(HAIKU_FREETYPE_CURRENT_LIB)
 ;
 PRIVATE_SYSTEM_LIBS =
 	libalm.so
@@ -315,6 +315,12 @@ SYSTEM_LIBS_ALIASES =
 	libnetapi.so
 	$(SYSTEM_LIBS_LIBGL_ALIASES)
 ;
+
+# libfreetype.so links to the current freetype lib
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_FREETYPE_CURRENT_LIB:BS)
+	: $(HAIKU_FREETYPE_CURRENT_LINK) : : true ;
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_FREETYPE_CURRENT_LINK)
+	: libfreetype.so : : true ;
 
 # servers
 AddFilesToHaikuImage system servers : $(SYSTEM_SERVERS) ;

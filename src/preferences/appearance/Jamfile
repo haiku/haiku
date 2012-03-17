@@ -1,7 +1,10 @@
 SubDir HAIKU_TOP src preferences appearance ;
 
 UsePrivateHeaders app interface [ FDirName servers app ] ;
-UseFreeTypeHeaders ;
+UseHeaders $(HAIKU_FREETYPE_HEADERS) : true ;
+
+Includes [ FGristFiles AntialiasingSettingsView.cpp ]
+	: $(HAIKU_FREETYPE_HEADERS_DEPENDENCY) ;
 
 Preference Appearance :
 	APRMain.cpp

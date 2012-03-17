@@ -6,8 +6,6 @@ UsePrivateHeaders app graphics input interface kernel shared storage support ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app stackandtile ] ;
-UseFreeTypeHeaders ;
-
 
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app decorator ] ;
 local decorator_src =
@@ -28,6 +26,12 @@ local font_src =
 	FontManager.cpp
 	FontStyle.cpp
 	;
+
+UseHeaders $(HAIKU_FREETYPE_HEADERS) : true ;
+Includes [ FGristFiles AppServer.cpp Desktop.cpp DesktopSettings.cpp
+	ServerApp.cpp ServerPicture.cpp $(decorator_src) $(font_src) ]
+	: $(HAIKU_FREETYPE_HEADERS_DEPENDENCY) ;
+
 
 Server app_server :
 	Angle.cpp
@@ -80,7 +84,7 @@ Server app_server :
 	# libraries
 	:
 	libtranslation.so libbe.so libbnetapi.so
-	libasdrawing.a libasremote.a libpainter.a libagg.a libfreetype.so
+	libasdrawing.a libasremote.a libpainter.a libagg.a $(HAIKU_FREETYPE_LIB)
 	libstackandtile.a liblinprog.a libtextencoding.so libshared.a
 	$(TARGET_LIBSTDC++)
 
