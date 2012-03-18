@@ -2,8 +2,9 @@
 #
 # setgcc [ <arch> ] [ <gcc> ]
 
-abiDir=/boot/develop/abi/
+abiDir=/boot/develop/abi
 abiLink=$abiDir/current
+libDir=/boot/develop/lib
 
 usage()
 {
@@ -13,7 +14,7 @@ Usage: $0 [ <arch> ] [ <gcc> ]
 Sets the current gcc version, respectively prints it, if no arguments are
 given.
 
-  <arch>  - The architecture to set. Supported values: "x86".
+  <arch>  - The architecture to set. Supported values: "x86", "ppc".
   <gcc>   - The major gcc version to set. Supported values: "gcc2", "gcc4".
 
 EOF
@@ -46,6 +47,7 @@ while [ $# -gt 0 ]; do
 	case $1 in
 		-h,--help)	usage; exit;;
 		x86)		arch=$1;;
+		ppc)		arch=$1;;
 		gcc2|gcc4)	gcc=$1;;
 		*)			usage; exit 1;;
 	esac
@@ -76,8 +78,8 @@ if [ -z "$gcc" ]; then
 	fi
 fi
 
-# check whether the gcc exits
-if [ ! -e $abiDir/$arch/$gcc/tools/current/bin/gcc ]; then
+# check whether the gcc exists
+if [ ! -e $abiDir/$arch/$gcc/tools/current/bin/*gcc ]; then
 	echo "Can't set GCC $arch/$gcc -- not installed." >&2
 	exit 1
 fi
@@ -85,5 +87,12 @@ fi
 # create the symlink
 ( rm $abiLink && ln -sf $arch/$gcc $abiLink ) || {
 	echo "Failed to set GCC $arch/$gcc." >&2
+	exit 1
+}
+
+# create the lib symlink
+libLink=$libDir/$arch
+( rm -f $libLink && ln -sf $abiDir/$arch/$gcc/lib $libLink ) || {
+	echo "Failed to set lib $arch/$gcc." >&2
 	exit 1
 }
