@@ -369,6 +369,9 @@ parse_rock_ridge(iso9660_volume* volume, iso9660_inode* node, char* buffer,
 #if TRACE_ISO9660
 				uint8 slFlags = *(uint8*)(buffer + bytePos++);
 				TRACE(("sl flags are %u\n", slFlags));
+#else
+				// skip symlink flags
+				++bytePos;
 #endif
 				while (!slDone && bytePos < length) {
 					uint8 compFlag = *(uint8*)(buffer + bytePos++);
