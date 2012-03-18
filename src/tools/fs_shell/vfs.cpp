@@ -12,6 +12,7 @@
 
 #include <new>
 #include <stdlib.h>
+#include <string.h>
 
 #include "fd.h"
 #include "fssh_atomic.h"
@@ -2408,10 +2409,11 @@ vfs_lookup_vnode(fssh_mount_id mountID, fssh_vnode_id vnodeID, void **_vnode)
 
 
 fssh_status_t
-vfs_get_fs_node_from_path(fssh_fs_volume *volume, const char *path, bool kernel, void **_node)
+vfs_get_fs_node_from_path(fssh_fs_volume *volume, const char *path,
+	bool kernel, void **_node)
 {
-	TRACE(("vfs_get_fs_node_from_path(mountID = %ld, path = \"%s\", kernel %d)\n",
-		mountID, path, kernel));
+	TRACE(("vfs_get_fs_node_from_path(volume = %p (%ld), path = \"%s\", "
+		"kernel %d)\n", volume, volume->id, path, kernel));
 
 	KPath pathBuffer(FSSH_B_PATH_NAME_LENGTH + 1);
 	if (pathBuffer.InitCheck() != FSSH_B_OK)
