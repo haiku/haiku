@@ -1,14 +1,14 @@
 /*
  * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2012, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione <jscipione@gmail.com>
  */
 
 
 #include <ControlLook.h>
-
-#include "ContainerWindow.h"
-
-#include <stdio.h>
 
 #include <Control.h>
 #include <GradientLinear.h>
@@ -18,7 +18,11 @@
 #include <View.h>
 #include <Window.h>
 
+#include "ContainerWindow.h"
+
+
 namespace BPrivate {
+
 
 static const float kEdgeBevelLightTint = 0.59;
 static const float kEdgeBevelShadowTint = 1.0735;
@@ -108,8 +112,31 @@ BControlLook::DrawButtonFrame(BView* view, BRect& rect, const BRect& updateRect,
 	const rgb_color& base, const rgb_color& background, uint32 flags,
 	uint32 borders)
 {
-	_DrawButtonFrame(view, rect, updateRect, base, background, 1.0, 1.0, flags,
-		borders);
+	_DrawButtonFrame(view, rect, updateRect, 0.0f, 0.0f, 0.0f, 0.0f, base,
+		background, 1.0, 1.0, flags, borders);
+}
+
+
+void
+BControlLook::DrawButtonFrame(BView* view, BRect& rect, const BRect& updateRect,
+	float radius, const rgb_color& base, const rgb_color& background, uint32 flags,
+	uint32 borders)
+{
+	_DrawButtonFrame(view, rect, updateRect, radius, radius, radius, radius,
+		base, background, 1.0, 1.0, flags, borders);
+}
+
+
+void
+BControlLook::DrawButtonFrame(BView* view, BRect& rect,
+	const BRect& updateRect, float leftTopRadius, float rightTopRadius,
+	float leftBottomRadius, float rightBottomRadius, const rgb_color& base,
+	const rgb_color& background, uint32 flags,
+	uint32 borders)
+{
+	_DrawButtonFrame(view, rect, updateRect, leftTopRadius, rightTopRadius,
+		leftBottomRadius, rightBottomRadius, base, background,
+		1.0, 1.0, flags, borders);
 }
 
 
@@ -118,98 +145,30 @@ BControlLook::DrawButtonBackground(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	uint32 borders, enum orientation orientation)
 {
-	if (!rect.IsValid() || !updateRect.Intersects(rect))
-		return;
+	_DrawButtonBackground(view, rect, updateRect, 0.0f, 0.0f, 0.0f, 0.0f,
+		base, flags, borders, orientation);
+}
 
-	// the surface edges
 
-	// colors
-	rgb_color buttonBgColor = tint_color(base, B_LIGHTEN_1_TINT);
-	rgb_color maxLightColor;
+void
+BControlLook::DrawButtonBackground(BView* view, BRect& rect,
+	const BRect& updateRect, float radius, const rgb_color& base, uint32 flags,
+	uint32 borders, enum orientation orientation)
+{
+	_DrawButtonBackground(view, rect, updateRect, radius, radius, radius,
+		radius, base, flags, borders, orientation);
+}
 
-	rgb_color bevelColor1;
-	rgb_color bevelColor2;
 
-	if ((flags & B_DISABLED) == 0) {
-		maxLightColor = tint_color(base, 0.2);
-		bevelColor1 = tint_color(base, 1.08);
-		bevelColor2 = base;
-	} else {
-		maxLightColor = tint_color(base, 0.7);
-		bevelColor1 = base;
-		bevelColor2 = buttonBgColor;
-		buttonBgColor = maxLightColor;
-	}
-
-	if (flags & B_ACTIVATED) {
-		view->BeginLineArray(4);
-
-		bevelColor1 = tint_color(bevelColor1, B_DARKEN_1_TINT);
-		bevelColor2 = tint_color(bevelColor2, B_DARKEN_1_TINT);
-
-		// shadow along left/top borders
-		if (borders & B_LEFT_BORDER) {
-			view->AddLine(BPoint(rect.left, rect.top),
-				BPoint(rect.left, rect.bottom), bevelColor1);
-			rect.left++;
-		}
-		if (borders & B_TOP_BORDER) {
-			view->AddLine(BPoint(rect.left, rect.top),
-				BPoint(rect.right, rect.top), bevelColor1);
-			rect.top++;
-		}
-
-		// softer shadow along left/top borders
-		if (borders & B_LEFT_BORDER) {
-			view->AddLine(BPoint(rect.left, rect.top),
-				BPoint(rect.left, rect.bottom), bevelColor2);
-			rect.left++;
-		}
-		if (borders & B_TOP_BORDER) {
-			view->AddLine(BPoint(rect.left, rect.top),
-				BPoint(rect.right, rect.top), bevelColor2);
-			rect.top++;
-		}
-
-		view->EndLineArray();
-	} else {
-		_DrawFrame(view, rect,
-			maxLightColor, maxLightColor,
-			bevelColor1, bevelColor1,
-			buttonBgColor, buttonBgColor, borders);
-	}
-
-	// the actual surface top
-
-	float topTint = 0.49;
-	float middleTint1 = 0.62;
-	float middleTint2 = 0.76;
-	float bottomTint = 0.90;
-
-	if (flags & B_ACTIVATED) {
-		topTint = 1.11;
-		bottomTint = 1.08;
-	}
-
-	if (flags & B_DISABLED) {
-		topTint = (topTint + B_NO_TINT) / 2;
-		middleTint1 = (middleTint1 + B_NO_TINT) / 2;
-		middleTint2 = (middleTint2 + B_NO_TINT) / 2;
-		bottomTint = (bottomTint + B_NO_TINT) / 2;
-	} else if (flags & B_HOVER) {
-		static const float kHoverTintFactor = 0.85;
-		topTint *= kHoverTintFactor;
-		middleTint1 *= kHoverTintFactor;
-		middleTint2 *= kHoverTintFactor;
-		bottomTint *= kHoverTintFactor;
-	}
-
-	if (flags & B_ACTIVATED) {
-		_FillGradient(view, rect, base, topTint, bottomTint, orientation);
-	} else {
-		_FillGlossyGradient(view, rect, base, topTint, middleTint1,
-			middleTint2, bottomTint, orientation);
-	}
+void
+BControlLook::DrawButtonBackground(BView* view, BRect& rect,
+	const BRect& updateRect, float leftTopRadius, float rightTopRadius,
+	float leftBottomRadius, float rightBottomRadius, const rgb_color& base,
+	uint32 flags, uint32 borders, enum orientation orientation)
+{
+	_DrawButtonBackground(view, rect, updateRect, leftTopRadius,
+		rightTopRadius, leftBottomRadius, rightBottomRadius, base, flags,
+		borders, orientation);
 }
 
 
@@ -218,7 +177,7 @@ BControlLook::DrawMenuBarBackground(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	uint32 borders)
 {
-	if (!rect.IsValid() || !updateRect.Intersects(rect))
+	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
 
 	// the surface edges
@@ -227,7 +186,7 @@ BControlLook::DrawMenuBarBackground(BView* view, BRect& rect,
 	float topTint;
 	float bottomTint;
 
-	if (flags & B_ACTIVATED) {
+	if ((flags & B_ACTIVATED) != 0) {
 		rgb_color bevelColor1 = tint_color(base, 1.40);
 		rgb_color bevelColor2 = tint_color(base, 1.25);
 
@@ -254,8 +213,7 @@ BControlLook::DrawMenuBarBackground(BView* view, BRect& rect,
 			borders);
 	}
 
-	// the actual surface top
-
+	// draw surface top
 	_FillGradient(view, rect, base, topTint, bottomTint);
 }
 
@@ -265,8 +223,31 @@ BControlLook::DrawMenuFieldFrame(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base,
 	const rgb_color& background, uint32 flags, uint32 borders)
 {
-	_DrawButtonFrame(view, rect, updateRect, base, background, 0.6, 1.0, flags,
-		borders);
+	_DrawButtonFrame(view, rect, updateRect, 0.0f, 0.0f, 0.0f, 0.0f, base,
+		background, 0.6, 1.0, flags, borders);
+}
+
+
+void
+BControlLook::DrawMenuFieldFrame(BView* view, BRect& rect,
+	const BRect& updateRect, float radius, const rgb_color& base,
+	const rgb_color& background, uint32 flags, uint32 borders)
+{
+	_DrawButtonFrame(view, rect, updateRect, radius, radius, radius, radius,
+		base, background, 0.6, 1.0, flags, borders);
+}
+
+
+void
+BControlLook::DrawMenuFieldFrame(BView* view, BRect& rect,
+	const BRect& updateRect, float leftTopRadius,
+	float rightTopRadius, float leftBottomRadius,
+	float rightBottomRadius, const rgb_color& base,
+	const rgb_color& background, uint32 flags, uint32 borders)
+{
+	_DrawButtonFrame(view, rect, updateRect, leftTopRadius, rightTopRadius,
+		leftBottomRadius, rightBottomRadius, base, background, 0.6, 1.0,
+		flags, borders);
 }
 
 
@@ -275,124 +256,59 @@ BControlLook::DrawMenuFieldBackground(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, bool popupIndicator,
 	uint32 flags)
 {
-	if (popupIndicator) {
-		BRect leftRect(rect);
-		leftRect.right -= 10;
-
-		BRect rightRect(rect);
-		rightRect.left = rightRect.right - 9;
-
-		DrawMenuFieldBackground(view, leftRect, updateRect, base, flags,
-			B_LEFT_BORDER | B_TOP_BORDER | B_BOTTOM_BORDER);
-
-		rgb_color indicatorBase;
-		rgb_color markColor;
-		if (flags & B_DISABLED) {
-			indicatorBase = tint_color(base, 1.05);
-			markColor = tint_color(base, 1.35);
-		} else {
-			indicatorBase = tint_color(base, 1.12);
-			markColor = tint_color(base, 1.65);
-		}
-
-		DrawMenuFieldBackground(view, rightRect, updateRect, indicatorBase,
-			flags, B_RIGHT_BORDER | B_TOP_BORDER | B_BOTTOM_BORDER);
-
-		// popup marker
-		BPoint center(roundf((rightRect.left + rightRect.right) / 2.0),
-					  roundf((rightRect.top + rightRect.bottom) / 2.0));
-		BPoint triangle[3];
-		triangle[0] = center + BPoint(-2.5, -0.5);
-		triangle[1] = center + BPoint(2.5, -0.5);
-		triangle[2] = center + BPoint(0.0, 2.0);
-
-		uint32 viewFlags = view->Flags();
-		view->SetFlags(viewFlags | B_SUBPIXEL_PRECISE);
-
-		view->SetHighColor(markColor);
-		view->FillTriangle(triangle[0], triangle[1], triangle[2]);
-
-		view->SetFlags(viewFlags);
-
-		rect = leftRect;
-	} else {
-		DrawMenuFieldBackground(view, rect, updateRect, base, flags);
-	}
+	_DrawMenuFieldBackgroundOutside(view, rect, updateRect,
+		0.0f, 0.0f, 0.0f, 0.0f, base, popupIndicator, flags);
 }
+
 
 void
 BControlLook::DrawMenuFieldBackground(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	uint32 borders)
 {
-	if (!rect.IsValid() || !updateRect.Intersects(rect))
-		return;
-
-	// the surface edges
-
-	// colors
-	rgb_color cornerColor = tint_color(base, 0.85);
-	rgb_color bevelColor1 = tint_color(base, 0.3);
-	rgb_color bevelColor2 = tint_color(base, 0.5);
-	rgb_color bevelColor3 = tint_color(base, 1.03);
-
-	if (flags & B_DISABLED) {
-		cornerColor = tint_color(base, 0.8);
-		bevelColor1 = tint_color(base, 0.7);
-		bevelColor2 = tint_color(base, 0.8);
-		bevelColor3 = tint_color(base, 1.01);
-	} else {
-		cornerColor = tint_color(base, 0.85);
-		bevelColor1 = tint_color(base, 0.3);
-		bevelColor2 = tint_color(base, 0.5);
-		bevelColor3 = tint_color(base, 1.03);
-	}
-
-	_DrawFrame(view, rect,
-		bevelColor2, bevelColor1,
-		bevelColor3, bevelColor3,
-		cornerColor, cornerColor,
-		borders);
-
-	// the actual surface top
-
-	float topTint = 0.49;
-	float middleTint1 = 0.62;
-	float middleTint2 = 0.76;
-	float bottomTint = 0.90;
-
-	if (flags & B_DISABLED) {
-		topTint = (topTint + B_NO_TINT) / 2;
-		middleTint1 = (middleTint1 + B_NO_TINT) / 2;
-		middleTint2 = (middleTint2 + B_NO_TINT) / 2;
-		bottomTint = (bottomTint + B_NO_TINT) / 2;
-	} else if (flags & B_HOVER) {
-		static const float kHoverTintFactor = 0.85;
-		topTint *= kHoverTintFactor;
-		middleTint1 *= kHoverTintFactor;
-		middleTint2 *= kHoverTintFactor;
-		bottomTint *= kHoverTintFactor;
-	}
-
-	_FillGlossyGradient(view, rect, base, topTint, middleTint1,
-		middleTint2, bottomTint);
+	_DrawMenuFieldBackgroundInside(view, rect, updateRect,
+		0.0f, 0.0f, 0.0f, 0.0f, base, flags, borders);
 }
+
+
+void
+BControlLook::DrawMenuFieldBackground(BView* view, BRect& rect,
+	const BRect& updateRect, float radius, const rgb_color& base,
+	bool popupIndicator, uint32 flags)
+{
+	_DrawMenuFieldBackgroundOutside(view, rect, updateRect, radius, radius,
+		radius, radius, base, popupIndicator, flags);
+}
+
+
+void
+BControlLook::DrawMenuFieldBackground(BView* view, BRect& rect,
+	const BRect& updateRect, float leftTopRadius, float rightTopRadius,
+	float leftBottomRadius, float rightBottomRadius, const rgb_color& base,
+	bool popupIndicator, uint32 flags)
+{
+	_DrawMenuFieldBackgroundOutside(view, rect, updateRect, leftTopRadius,
+		rightTopRadius, leftBottomRadius, rightBottomRadius, base,
+		popupIndicator, flags);
+}
+
 
 void
 BControlLook::DrawMenuBackground(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	uint32 borders)
 {
-	if (!rect.IsValid() || !updateRect.Intersects(rect))
+	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
 
-	// the surface edges
-
-	rgb_color bevelLightColor;
-	rgb_color bevelShadowColor;
+	// surface top color
 	rgb_color background = tint_color(base, 0.75);
 
-	if (flags & B_DISABLED) {
+	// inner bevel colors
+	rgb_color bevelLightColor;
+	rgb_color bevelShadowColor;
+
+	if ((flags & B_DISABLED) != 0) {
 		bevelLightColor = tint_color(background, 0.80);
 		bevelShadowColor = tint_color(background, 1.07);
 	} else {
@@ -400,13 +316,13 @@ BControlLook::DrawMenuBackground(BView* view, BRect& rect,
 		bevelShadowColor = tint_color(background, 1.12);
 	}
 
+	// draw inner bevel
 	_DrawFrame(view, rect,
 		bevelLightColor, bevelLightColor,
 		bevelShadowColor, bevelShadowColor,
 		borders);
 
-	// the actual surface top
-
+	// draw surface top
 	view->SetHighColor(background);
 	view->FillRect(rect);
 }
@@ -417,20 +333,19 @@ BControlLook::DrawMenuItemBackground(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	uint32 borders)
 {
-	if (!rect.IsValid() || !updateRect.Intersects(rect))
+	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
 
-	// the surface edges
-
+	// surface edges
 	float topTint;
 	float bottomTint;
 	rgb_color selectedColor = base;
 
-	if (flags & B_ACTIVATED) {
+	if ((flags & B_ACTIVATED) != 0) {
 		topTint = 0.9;
 		bottomTint = 1.05;
 		selectedColor = tint_color(base, 1.26);
-	} else if (flags & B_DISABLED) {
+	} else if ((flags & B_DISABLED) != 0) {
 		topTint = 0.80;
 		bottomTint = 1.07;
 	} else {
@@ -441,13 +356,13 @@ BControlLook::DrawMenuItemBackground(BView* view, BRect& rect,
 	rgb_color bevelLightColor = tint_color(selectedColor, topTint);
 	rgb_color bevelShadowColor = tint_color(selectedColor, bottomTint);
 
+	// draw surface edges
 	_DrawFrame(view, rect,
 		bevelLightColor, bevelLightColor,
 		bevelShadowColor, bevelShadowColor,
 		borders);
 
-	// the actual surface top
-
+	// draw surface top
 	view->SetLowColor(selectedColor);
 //	_FillGradient(view, rect, selectedColor, topTint, bottomTint);
 	_FillGradient(view, rect, selectedColor, bottomTint, topTint);
@@ -518,12 +433,12 @@ BControlLook::DrawCheckBox(BView* view, BRect& rect, const BRect& updateRect,
 	rgb_color dark2BorderColor;
 	rgb_color navigationColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
 
-	if (flags & B_DISABLED) {
+	if ((flags & B_DISABLED) != 0) {
 		_DrawOuterResessedFrame(view, rect, base, 0.0, 1.0, flags);
 
 		dark1BorderColor = tint_color(base, 1.15);
 		dark2BorderColor = tint_color(base, 1.15);
-	} else if (flags & B_CLICKED) {
+	} else if ((flags & B_CLICKED) != 0) {
 		dark1BorderColor = tint_color(base, 1.50);
 		dark2BorderColor = tint_color(base, 1.48);
 
@@ -539,7 +454,7 @@ BControlLook::DrawCheckBox(BView* view, BRect& rect, const BRect& updateRect,
 		dark2BorderColor = tint_color(base, 1.38);
 	}
 
-	if (flags & B_FOCUSED) {
+	if ((flags & B_FOCUSED) != 0) {
 		dark1BorderColor = navigationColor;
 		dark2BorderColor = navigationColor;
 	}
@@ -548,7 +463,7 @@ BControlLook::DrawCheckBox(BView* view, BRect& rect, const BRect& updateRect,
 		dark1BorderColor, dark1BorderColor,
 		dark2BorderColor, dark2BorderColor);
 
-	if (flags & B_DISABLED) {
+	if ((flags & B_DISABLED) != 0) {
 		_FillGradient(view, rect, base, 0.4, 0.2);
 	} else {
 		_FillGradient(view, rect, base, 0.15, 0.0);
@@ -580,11 +495,11 @@ BControlLook::DrawRadioButton(BView* view, BRect& rect, const BRect& updateRect,
 	rgb_color bevelShadow;
 	rgb_color navigationColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
 
-	if (flags & B_DISABLED) {
+	if ((flags & B_DISABLED) != 0) {
 		borderColor = tint_color(base, 1.15);
 		bevelLight = base;
 		bevelShadow = base;
-	} else if (flags & B_CLICKED) {
+	} else if ((flags & B_CLICKED) != 0) {
 		borderColor = tint_color(base, 1.50);
 		bevelLight = borderColor;
 		bevelShadow = borderColor;
@@ -594,7 +509,7 @@ BControlLook::DrawRadioButton(BView* view, BRect& rect, const BRect& updateRect,
 		bevelShadow = tint_color(base, 1.11);
 	}
 
-	if (flags & B_FOCUSED) {
+	if ((flags & B_FOCUSED) != 0) {
 		borderColor = navigationColor;
 	}
 
@@ -615,7 +530,7 @@ BControlLook::DrawRadioButton(BView* view, BRect& rect, const BRect& updateRect,
 
 	float topTint;
 	float bottomTint;
-	if (flags & B_DISABLED) {
+	if ((flags & B_DISABLED) != 0) {
 		topTint = 0.4;
 		bottomTint = 0.2;
 	} else {
@@ -659,7 +574,7 @@ BControlLook::DrawScrollBarBackground(BView* view, BRect& rect,
 	float darkEdge2Tint;
 	float shadowTint;
 
-	if (flags & B_DISABLED) {
+	if ((flags & B_DISABLED) != 0) {
 		gradient1Tint = 0.9;
 		gradient2Tint = 0.8;
 		darkEdge1Tint = B_DARKEN_2_TINT;
@@ -767,7 +682,7 @@ BControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 	if (border == B_FANCY_BORDER)
 		_DrawOuterResessedFrame(view, rect, base, 1.0, 1.0, flags, borders);
 
-	if (flags & B_FOCUSED) {
+	if ((flags & B_FOCUSED) != 0) {
 		rgb_color focusColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
 		_DrawFrame(view, rect, focusColor, focusColor, focusColor, focusColor,
 			borders);
@@ -849,7 +764,7 @@ BControlLook::DrawArrowShape(BView* view, BRect& rect, const BRect& updateRect,
 			break;
 	}
 	// offset triangle if down
-	if (flags & B_ACTIVATED)
+	if ((flags & B_ACTIVATED) != 0)
 		view->MovePenTo(BPoint(1, 1));
 	else
 		view->MovePenTo(BPoint(0, 0));
@@ -859,7 +774,7 @@ BControlLook::DrawArrowShape(BView* view, BRect& rect, const BRect& updateRect,
 	arrowShape.LineTo(tri2);
 	arrowShape.LineTo(tri3);
 
-	if (flags & B_DISABLED)
+	if ((flags & B_DISABLED) != 0)
 		tint = (tint + B_NO_TINT + B_NO_TINT) / 3;
 
 	view->SetHighColor(tint_color(base, tint));
@@ -931,8 +846,6 @@ BControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 		orientation);
 
 	view->PopState();
-
-	view->ConstrainClippingRegion(NULL);
 }
 
 
@@ -983,7 +896,7 @@ BControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 	uint8 frameLightAlpha;
 	uint8 frameShadowAlpha;
 
-	if (flags & B_DISABLED) {
+	if ((flags & B_DISABLED) != 0) {
 		edgeLightTint = 1.0;
 		edgeShadowTint = 1.0;
 		frameLightTint = 1.20;
@@ -1020,7 +933,7 @@ BControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 
 	drawing_mode oldMode = view->DrawingMode();
 
-	if (flags & B_BLEND_FRAME) {
+	if ((flags & B_BLEND_FRAME) != 0) {
 		edgeLightColor = (rgb_color){ 255, 255, 255, edgeLightAlpha };
 		edgeShadowColor = (rgb_color){ 0, 0, 0, edgeShadowAlpha };
 		frameLightColor = (rgb_color){ 0, 0, 0, frameLightAlpha };
@@ -1095,7 +1008,7 @@ BControlLook::DrawSliderThumb(BView* view, BRect& rect, const BRect& updateRect,
 	rgb_color frameShadowColor;
 	rgb_color shadowColor = (rgb_color){ 0, 0, 0, 60 };
 
-	if (flags & B_FOCUSED) {
+	if ((flags & B_FOCUSED) != 0) {
 		// focused
 		frameLightColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
 		frameShadowColor = frameLightColor;
@@ -1104,7 +1017,7 @@ BControlLook::DrawSliderThumb(BView* view, BRect& rect, const BRect& updateRect,
 		float frameLightTint;
 		float frameShadowTint;
 
-		if (flags & B_DISABLED) {
+		if ((flags & B_DISABLED) != 0) {
 			frameLightTint = 1.30;
 			frameShadowTint = 1.35;
 			shadowColor.alpha = 30;
@@ -1194,12 +1107,12 @@ BControlLook::DrawSliderTriangle(BView* view, BRect& rect,
 	float middleTint2 = 0.76;
 	float bottomTint = 0.90;
 
-	if (flags & B_DISABLED) {
+	if ((flags & B_DISABLED) != 0) {
 		topTint = (topTint + B_NO_TINT) / 2;
 		middleTint1 = (middleTint1 + B_NO_TINT) / 2;
 		middleTint2 = (middleTint2 + B_NO_TINT) / 2;
 		bottomTint = (bottomTint + B_NO_TINT) / 2;
-	} else if (flags & B_HOVER) {
+	} else if ((flags & B_HOVER) != 0) {
 		static const float kHoverTintFactor = 0.85;
 		topTint *= kHoverTintFactor;
 		middleTint1 *= kHoverTintFactor;
@@ -1207,7 +1120,7 @@ BControlLook::DrawSliderTriangle(BView* view, BRect& rect,
 		bottomTint *= kHoverTintFactor;
 	}
 
-	if (flags & B_FOCUSED) {
+	if ((flags & B_FOCUSED) != 0) {
 		// focused
 		frameLightColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
 		frameShadowColor = frameLightColor;
@@ -1216,7 +1129,7 @@ BControlLook::DrawSliderTriangle(BView* view, BRect& rect,
 		float frameLightTint;
 		float frameShadowTint;
 
-		if (flags & B_DISABLED) {
+		if ((flags & B_DISABLED) != 0) {
 			frameLightTint = 1.30;
 			frameShadowTint = 1.35;
 			shadowColor.alpha = 30;
@@ -1282,7 +1195,7 @@ BControlLook::DrawSliderTriangle(BView* view, BRect& rect,
 	shape.Close();
 
 	BGradientLinear gradient;
-	if (flags & B_DISABLED) {
+	if ((flags & B_DISABLED) != 0) {
 		_MakeGradient(gradient, rect, fill, topTint, bottomTint);
 	} else {
 		_MakeGlossyGradient(gradient, rect, fill, topTint, middleTint1,
@@ -1306,7 +1219,7 @@ BControlLook::DrawSliderHashMarks(BView* view, BRect& rect,
 	rgb_color lightColor;
 	rgb_color darkColor;
 
-	if (flags & B_DISABLED) {
+	if ((flags & B_DISABLED) != 0) {
 		lightColor = tint_color(base, 0.9);
 		darkColor = tint_color(base, 1.07);
 	} else {
@@ -1393,6 +1306,17 @@ BControlLook::DrawActiveTab(BView* view, BRect& rect, const BRect& updateRect,
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
 
+	// clipping constraints for the view
+	BRegion clipping;
+	view->GetClippingRegion(&clipping);
+
+	// intersect constraints with updateRect
+	BRegion updateClipping(updateRect);
+	clipping.IntersectWith(&updateClipping);
+
+	// clip to the intersection
+	view->ConstrainClippingRegion(&clipping);
+
 	rgb_color edgeShadowColor;
 	rgb_color edgeLightColor;
 	rgb_color frameShadowColor;
@@ -1403,52 +1327,56 @@ BControlLook::DrawActiveTab(BView* view, BRect& rect, const BRect& updateRect,
 	fillGradient.SetStart(rect.LeftTop() + BPoint(3, 3));
 	fillGradient.SetEnd(rect.LeftBottom() + BPoint(3, -3));
 
-	if (flags & B_DISABLED) {
-		edgeShadowColor = base;
+	if ((flags & B_DISABLED) != 0) {
 		edgeLightColor = base;
-		frameShadowColor = tint_color(base, 1.30);
+		edgeShadowColor = base;
 		frameLightColor = tint_color(base, 1.25);
-		bevelShadowColor = tint_color(base, 1.07);
+		frameShadowColor = tint_color(base, 1.30);
 		bevelLightColor = tint_color(base, 0.8);
+		bevelShadowColor = tint_color(base, 1.07);
 		fillGradient.AddColor(tint_color(base, 0.85), 0);
 		fillGradient.AddColor(base, 255);
 	} else {
-		edgeShadowColor = tint_color(base, 1.03);
 		edgeLightColor = tint_color(base, 0.80);
-		frameShadowColor = tint_color(base, 1.30);
+		edgeShadowColor = tint_color(base, 1.03);
 		frameLightColor = tint_color(base, 1.30);
-		bevelShadowColor = tint_color(base, 1.07);
+		frameShadowColor = tint_color(base, 1.30);
 		bevelLightColor = tint_color(base, 0.6);
+		bevelShadowColor = tint_color(base, 1.07);
 		fillGradient.AddColor(tint_color(base, 0.75), 0);
 		fillGradient.AddColor(tint_color(base, 1.03), 255);
 	}
 
-	static const float kRoundCornerRadius = 4;
+	static const float kRoundCornerRadius = 4.0f;
 
-	// left/top corner
-	BRect cornerRect(rect);
-	cornerRect.right = cornerRect.left + kRoundCornerRadius;
-	cornerRect.bottom = cornerRect.top + kRoundCornerRadius;
+	// left top corner dimensions
+	BRect leftTopCorner(rect);
+	leftTopCorner.right = floorf(leftTopCorner.left + kRoundCornerRadius);
+	leftTopCorner.bottom = floorf(rect.top + kRoundCornerRadius);
+	clipping.Exclude(leftTopCorner);
 
-	BRegion clipping(rect);
-	clipping.Exclude(cornerRect);
+	// draw the left top corner
+	_DrawRoundCornerLeftTop(view, leftTopCorner, updateRect, base,
+		edgeShadowColor, frameLightColor, bevelLightColor,
+		fillGradient);
 
-	_DrawRoundCornerLeftTop(view, cornerRect, updateRect, base, edgeShadowColor,
-		frameLightColor, bevelLightColor, fillGradient);
+	// right top corner dimensions
+	BRect rightTopCorner(rect);
+	rightTopCorner.right = floorf(rect.right);
+	rightTopCorner.left = floorf(rightTopCorner.right - kRoundCornerRadius);
+	rightTopCorner.bottom = floorf(rect.top + kRoundCornerRadius);
+	clipping.Exclude(rightTopCorner);
 
-	// left/top corner
-	cornerRect.right = rect.right;
-	cornerRect.left = cornerRect.right - kRoundCornerRadius;
+	// draw the right top corner
+	_DrawRoundCornerRightTop(view, rightTopCorner, updateRect, base,
+		edgeShadowColor, edgeLightColor, frameLightColor,
+		frameShadowColor, bevelLightColor, bevelShadowColor,
+		fillGradient);
 
-	clipping.Exclude(cornerRect);
-
-	_DrawRoundCornerRightTop(view, cornerRect, updateRect, base, edgeShadowColor,
-		edgeLightColor, frameLightColor, frameShadowColor, bevelLightColor,
-		bevelShadowColor, fillGradient);
-
-	// rest of frame and fill
+	// clip out the corners
 	view->ConstrainClippingRegion(&clipping);
 
+	// draw the rest of frame and fill
 	_DrawFrame(view, rect, edgeShadowColor, edgeShadowColor, edgeLightColor,
 		edgeLightColor,
 		borders & (B_LEFT_BORDER | B_TOP_BORDER | B_RIGHT_BORDER));
@@ -1465,6 +1393,7 @@ BControlLook::DrawActiveTab(BView* view, BRect& rect, const BRect& updateRect,
 
 	view->FillRect(rect, fillGradient);
 
+	// reset clipping constraints
 	view->ConstrainClippingRegion(NULL);
 }
 
@@ -1486,22 +1415,22 @@ BControlLook::DrawInactiveTab(BView* view, BRect& rect, const BRect& updateRect,
 	fillGradient.SetStart(rect.LeftTop() + BPoint(3, 3));
 	fillGradient.SetEnd(rect.LeftBottom() + BPoint(3, -3));
 
-	if (flags & B_DISABLED) {
-		edgeShadowColor = base;
+	if ((flags & B_DISABLED) != 0) {
 		edgeLightColor = base;
-		frameShadowColor = tint_color(base, 1.30);
+		edgeShadowColor = base;
 		frameLightColor = tint_color(base, 1.25);
-		bevelShadowColor = tint_color(base, 1.07);
+		frameShadowColor = tint_color(base, 1.30);
 		bevelLightColor = tint_color(base, 0.8);
+		bevelShadowColor = tint_color(base, 1.07);
 		fillGradient.AddColor(tint_color(base, 0.85), 0);
 		fillGradient.AddColor(base, 255);
 	} else {
-		edgeShadowColor = tint_color(base, 1.03);
 		edgeLightColor = tint_color(base, 0.80);
-		frameShadowColor = tint_color(base, 1.30);
+		edgeShadowColor = tint_color(base, 1.03);
 		frameLightColor = tint_color(base, 1.30);
-		bevelShadowColor = tint_color(base, 1.17);
+		frameShadowColor = tint_color(base, 1.30);
 		bevelLightColor = tint_color(base, 1.10);
+		bevelShadowColor = tint_color(base, 1.17);
 		fillGradient.AddColor(tint_color(base, 1.12), 0);
 		fillGradient.AddColor(tint_color(base, 1.08), 255);
 	}
@@ -1537,6 +1466,9 @@ BControlLook::DrawSplitter(BView* view, BRect& rect, const BRect& updateRect,
 	const rgb_color& base, enum orientation orientation, uint32 flags,
 	uint32 borders)
 {
+	if (!rect.IsValid() || !rect.Intersects(updateRect))
+		return;
+
 	rgb_color background;
 	if ((flags & (B_CLICKED | B_ACTIVATED)) != 0)
 		background = tint_color(base, B_DARKEN_1_TINT);
@@ -1652,7 +1584,7 @@ BControlLook::DrawBorder(BView* view, BRect& rect, const BRect& updateRect,
 		return;
 
 	rgb_color scrollbarFrameColor = tint_color(base, B_DARKEN_2_TINT);
-	if (flags & B_FOCUSED)
+	if ((flags & B_FOCUSED) != 0)
 		scrollbarFrameColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
 
 	if (border == B_FANCY_BORDER)
@@ -1671,7 +1603,7 @@ BControlLook::DrawRaisedBorder(BView* view, BRect& rect,
 	rgb_color lightColor;
 	rgb_color shadowColor;
 
-	if (flags & B_DISABLED) {
+	if ((flags & B_DISABLED) != 0) {
 		lightColor = base;
 		shadowColor = base;
 	} else {
@@ -1696,15 +1628,15 @@ BControlLook::DrawTextControlBorder(BView* view, BRect& rect,
 	rgb_color dark2BorderColor;
 	rgb_color navigationColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
 
-	if (flags & B_DISABLED) {
+	if ((flags & B_DISABLED) != 0) {
 		_DrawOuterResessedFrame(view, rect, base, 0.0, 1.0, flags, borders);
 
-		if (flags & B_BLEND_FRAME)
+		if ((flags & B_BLEND_FRAME) != 0)
 			dark1BorderColor = (rgb_color){ 0, 0, 0, 40 };
 		else
 			dark1BorderColor = tint_color(base, 1.15);
 		dark2BorderColor = dark1BorderColor;
-	} else if (flags & B_CLICKED) {
+	} else if ((flags & B_CLICKED) != 0) {
 		dark1BorderColor = tint_color(base, 1.50);
 		dark2BorderColor = tint_color(base, 1.49);
 
@@ -1717,7 +1649,7 @@ BControlLook::DrawTextControlBorder(BView* view, BRect& rect,
 	} else {
 		_DrawOuterResessedFrame(view, rect, base, 0.6, 1.0, flags, borders);
 
-		if (flags & B_BLEND_FRAME) {
+		if ((flags & B_BLEND_FRAME) != 0) {
 			dark1BorderColor = (rgb_color){ 0, 0, 0, 102 };
 			dark2BorderColor = (rgb_color){ 0, 0, 0, 97 };
 		} else {
@@ -1726,12 +1658,12 @@ BControlLook::DrawTextControlBorder(BView* view, BRect& rect,
 		}
 	}
 
-	if ((flags & B_DISABLED) == 0 && (flags & B_FOCUSED)) {
+	if ((flags & B_DISABLED) == 0 && (flags & B_FOCUSED) != 0) {
 		dark1BorderColor = navigationColor;
 		dark2BorderColor = navigationColor;
 	}
 
-	if (flags & B_BLEND_FRAME) {
+	if ((flags & B_BLEND_FRAME) != 0) {
 		drawing_mode oldMode = view->DrawingMode();
 		view->SetDrawingMode(B_OP_ALPHA);
 
@@ -1865,7 +1797,7 @@ BControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 		glowColor = kBlack;
 	}
 
-	if (flags & B_DISABLED) {
+	if ((flags & B_DISABLED) != 0) {
 		color.red = (uint8)(((int32)low.red + color.red + 1) / 2);
 		color.green = (uint8)(((int32)low.green + color.green + 1) / 2);
 		color.blue = (uint8)(((int32)low.blue + color.blue + 1) / 2);
@@ -1873,11 +1805,9 @@ BControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 
 	drawing_mode oldMode = view->DrawingMode();
 
-	// check if the drawing occurs on the desktop
 	if (isDesktop) {
-
+		// drawing occurs on the desktop
 		if (fCachedWorkspace != current_workspace()) {
-
 			int8 indice = 0;
 			int32 mask;
 			bool tmpOutline;
@@ -1903,47 +1833,43 @@ BControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 			view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
 			// Draw glow or outline
 			if (glowColor == kWhite) {
-					font.SetFalseBoldWidth(2.0);
-					view->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
+				font.SetFalseBoldWidth(2.0);
+				view->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
 
-					glowColor.alpha = 30;
-					view->SetHighColor(glowColor);
-					view->DrawString(label, where);
+				glowColor.alpha = 30;
+				view->SetHighColor(glowColor);
+				view->DrawString(label, where);
 
-					font.SetFalseBoldWidth(1.0);
-					view->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
+				font.SetFalseBoldWidth(1.0);
+				view->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
 
-					glowColor.alpha = 65;
-					view->SetHighColor(glowColor);
-					view->DrawString(label, where);
+				glowColor.alpha = 65;
+				view->SetHighColor(glowColor);
+				view->DrawString(label, where);
 
-					font.SetFalseBoldWidth(0.0);
-					view->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
-
+				font.SetFalseBoldWidth(0.0);
+				view->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
 			} else if (glowColor == kBlack) {
-					font.SetFalseBoldWidth(1.0);
-					view->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
+				font.SetFalseBoldWidth(1.0);
+				view->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
 
-					glowColor.alpha = 30;
-					view->SetHighColor(glowColor);
-					view->DrawString(label, where);
+				glowColor.alpha = 30;
+				view->SetHighColor(glowColor);
+				view->DrawString(label, where);
 
-					font.SetFalseBoldWidth(0.0);
-					view->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
+				font.SetFalseBoldWidth(0.0);
+				view->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
 
-					glowColor.alpha = 200;
-					view->SetHighColor(glowColor);
-					view->DrawString(label, BPoint(where.x + 1, where.y + 1));
+				glowColor.alpha = 200;
+				view->SetHighColor(glowColor);
+				view->DrawString(label, BPoint(where.x + 1, where.y + 1));
 			}
 		}
 	}
 
 	view->SetHighColor(color);
-
 	view->SetDrawingMode(B_OP_OVER);
-
 	view->DrawString(label, where);
-
 	view->SetDrawingMode(oldMode);
 }
 
@@ -1961,92 +1887,152 @@ BControlLook::SetBackgroundInfo(const BMessage& backgroundInfo)
 
 void
 BControlLook::_DrawButtonFrame(BView* view, BRect& rect,
-	const BRect& updateRect, const rgb_color& base, const rgb_color& background,
-	float contrast, float brightness, uint32 flags, uint32 borders)
+	const BRect& updateRect, float leftTopRadius, float rightTopRadius,
+	float leftBottomRadius, float rightBottomRadius, const rgb_color& base,
+	const rgb_color& background, float contrast, float brightness,
+	uint32 flags, uint32 borders)
 {
-	// colors
-	rgb_color dark1BorderColor;
-	rgb_color dark2BorderColor;
+	if (!rect.IsValid() || !rect.Intersects(updateRect))
+		return;
 
-	if ((flags & B_DISABLED) == 0) {
-		if (flags & B_BLEND_FRAME) {
-			dark1BorderColor = (rgb_color){ 0, 0, 0, 75 };
-			dark2BorderColor = (rgb_color){ 0, 0, 0, 95 };
-		} else {
-			dark1BorderColor = tint_color(base, 1.33);
-			dark2BorderColor = tint_color(base, 1.45);
-		}
+	// clipping constraints for the view
+	BRegion clipping;
+	view->GetClippingRegion(&clipping);
 
-		if (flags & B_DEFAULT_BUTTON) {
-			// TODO: B_BLEND_FRAME
-			dark2BorderColor = tint_color(dark1BorderColor, 1.5);
-			dark1BorderColor = tint_color(dark1BorderColor, 1.35);
-		}
-	} else {
-		// TODO: B_BLEND_FRAME
-		dark1BorderColor = tint_color(base, 1.147);
-		dark2BorderColor = tint_color(base, 1.24);
+	// intersect constraints with updateRect
+	BRegion updateClipping(updateRect);
+	clipping.IntersectWith(&updateClipping);
 
-		if (flags & B_DEFAULT_BUTTON) {
-			dark1BorderColor = tint_color(dark1BorderColor, 1.14);
-			dark2BorderColor = tint_color(dark1BorderColor, 1.12);
-		}
-	}
+	// clip to the intersection
+	view->ConstrainClippingRegion(&clipping);
 
-	if (flags & B_ACTIVATED) {
-		rgb_color temp = dark2BorderColor;
-		dark2BorderColor = dark1BorderColor;
-		dark1BorderColor = temp;
-	}
+	// outer edge colors
+	rgb_color edgeLightColor;
+	rgb_color edgeShadowColor;
 
-	// indicate focus by changing main button border
-	if (flags & B_FOCUSED) {
-		dark1BorderColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
-		dark2BorderColor = dark1BorderColor;
-	}
+	// default button frame color
+	// TODO: B_BLEND_FRAME
+	float defaultIndicatorTint = 1.2;
+	if ((flags & B_DISABLED) != 0)
+		defaultIndicatorTint = (B_NO_TINT + defaultIndicatorTint) / 2;
 
-	if (flags & B_DEFAULT_BUTTON) {
-		// TODO: B_BLEND_FRAME
-		float focusTint = 1.2;
-		if (flags & B_DISABLED)
-			focusTint = (B_NO_TINT + focusTint) / 2;
+	rgb_color defaultIndicatorColor = tint_color(base, defaultIndicatorTint);
+	rgb_color cornerBgColor = background;
 
-		rgb_color focusColor = tint_color(base, focusTint);
+	if ((flags & B_DEFAULT_BUTTON) != 0) {
+		// draw default button indicator
+		edgeLightColor = _EdgeLightColor(defaultIndicatorColor,
+			contrast * ((flags & B_DISABLED) != 0 ? 0.3 : 0.8),
+			brightness * ((flags & B_DISABLED) != 0 ? 1.0 : 0.9), flags);
+		edgeShadowColor = _EdgeShadowColor(defaultIndicatorColor,
+			contrast * ((flags & B_DISABLED) != 0 ? 0.3 : 0.8),
+			brightness * ((flags & B_DISABLED) != 0 ? 1.0 : 0.9), flags);
+
+		cornerBgColor = defaultIndicatorColor;
+
+		view->SetHighColor(background);
+		view->FillRect(rect);
 		view->SetHighColor(base);
+		view->StrokeRoundRect(rect, leftTopRadius, leftTopRadius);
+		rect.InsetBy(1, 1);
 
-		view->StrokeRect(rect);
-		rect.InsetBy(1.0, 1.0);
+		view->SetHighColor(defaultIndicatorColor);
+		view->StrokeRoundRect(rect, leftTopRadius, leftTopRadius);
+		rect.InsetBy(1, 1);
 
-		view->SetHighColor(focusColor);
-		view->StrokeRect(rect);
-		rect.InsetBy(1.0, 1.0);
-		view->StrokeRect(rect);
-		rect.InsetBy(1.0, 1.0);
-
-		// bevel around external border
-		_DrawOuterResessedFrame(view, rect, focusColor,
-			contrast * (((flags & B_DISABLED) ? 0.3 : 0.8)),
-			brightness * (((flags & B_DISABLED) ? 1.0 : 0.9)),
-			flags, borders);
+		view->StrokeRoundRect(rect, leftTopRadius, leftTopRadius);
+		rect.InsetBy(1, 1);
 	} else {
-		// bevel around external border
-		_DrawOuterResessedFrame(view, rect, background,
-			contrast * ((flags & B_DISABLED) ? 0.0 : 1.0), brightness * 1.0,
-			flags, borders);
+		edgeLightColor = _EdgeLightColor(background,
+			contrast * ((flags & B_DISABLED) != 0 ? 0.0 : 1.0),
+			brightness * 1.0, flags);
+		edgeShadowColor = _EdgeShadowColor(background,
+			contrast * (flags & B_DISABLED) != 0 ? 0.0 : 1.0,
+			brightness * 1.0, flags);
 	}
 
-	if (flags & B_BLEND_FRAME) {
+	// frame colors
+	rgb_color frameLightColor  = _FrameLightColor(base, flags);
+	rgb_color frameShadowColor = _FrameShadowColor(base, flags);
+
+	// rounded corners
+
+	if ((borders & B_LEFT_BORDER) != 0 && (borders & B_TOP_BORDER) != 0
+		&& leftTopRadius > 0) {
+		// draw left top rounded corner
+		BRect leftTopCorner(floorf(rect.left), floorf(rect.top),
+			floorf(rect.left + leftTopRadius),
+			floorf(rect.top + leftTopRadius));
+		clipping.Exclude(leftTopCorner);
+		_DrawRoundCornerFrameLeftTop(view, leftTopCorner, updateRect,
+			cornerBgColor, edgeShadowColor, frameLightColor);
+	}
+
+	if ((borders & B_TOP_BORDER) != 0 && (borders & B_RIGHT_BORDER) != 0
+		&& rightTopRadius > 0) {
+		// draw right top rounded corner
+		BRect rightTopCorner(floorf(rect.right - rightTopRadius),
+			floorf(rect.top), floorf(rect.right),
+			floorf(rect.top + rightTopRadius));
+		clipping.Exclude(rightTopCorner);
+		_DrawRoundCornerFrameRightTop(view, rightTopCorner, updateRect,
+			cornerBgColor, edgeShadowColor, edgeLightColor,
+			frameLightColor, frameShadowColor);
+	}
+
+	if ((borders & B_LEFT_BORDER) != 0 && (borders & B_BOTTOM_BORDER) != 0
+		&& leftBottomRadius > 0) {
+		// draw left bottom rounded corner
+		BRect leftBottomCorner(floorf(rect.left),
+			floorf(rect.bottom - leftBottomRadius),
+			floorf(rect.left + leftBottomRadius), floorf(rect.bottom));
+		clipping.Exclude(leftBottomCorner);
+		_DrawRoundCornerFrameLeftBottom(view, leftBottomCorner, updateRect,
+			cornerBgColor, edgeShadowColor, edgeLightColor,
+			frameLightColor, frameShadowColor);
+	}
+
+	if ((borders & B_RIGHT_BORDER) != 0 && (borders & B_BOTTOM_BORDER) != 0
+		&& rightBottomRadius > 0) {
+		// draw right bottom rounded corner
+		BRect rightBottomCorner(floorf(rect.right - rightBottomRadius),
+			floorf(rect.bottom - rightBottomRadius), floorf(rect.right),
+			floorf(rect.bottom));
+		clipping.Exclude(rightBottomCorner);
+		_DrawRoundCornerFrameRightBottom(view, rightBottomCorner,
+			updateRect, cornerBgColor, edgeLightColor, frameShadowColor);
+	}
+
+	// clip out the corners
+	view->ConstrainClippingRegion(&clipping);
+
+	// draw outer edge
+	if ((flags & B_DEFAULT_BUTTON) != 0) {
+		_DrawOuterResessedFrame(view, rect, defaultIndicatorColor,
+			contrast * ((flags & B_DISABLED) != 0 ? 0.3 : 0.8),
+			brightness * ((flags & B_DISABLED) != 0 ? 1.0 : 0.9),
+			flags, borders);
+	} else {
+		_DrawOuterResessedFrame(view, rect, background,
+			contrast * ((flags & B_DISABLED) != 0 ? 0.0 : 1.0),
+			brightness * 1.0, flags, borders);
+	}
+
+	// draw frame
+	if ((flags & B_BLEND_FRAME) != 0) {
 		drawing_mode oldDrawingMode = view->DrawingMode();
 		view->SetDrawingMode(B_OP_ALPHA);
 
-		_DrawFrame(view, rect, dark1BorderColor, dark1BorderColor,
-			dark2BorderColor, dark2BorderColor, borders);
+		_DrawFrame(view, rect, frameLightColor, frameLightColor,
+			frameShadowColor, frameShadowColor, borders);
 
 		view->SetDrawingMode(oldDrawingMode);
 	} else {
-		_DrawFrame(view, rect, dark1BorderColor, dark1BorderColor,
-			dark2BorderColor, dark2BorderColor, borders);
+		_DrawFrame(view, rect, frameLightColor, frameLightColor,
+			frameShadowColor, frameShadowColor, borders);
 	}
+
+	view->ConstrainClippingRegion(NULL);
 }
 
 
@@ -2055,48 +2041,23 @@ BControlLook::_DrawOuterResessedFrame(BView* view, BRect& rect,
 	const rgb_color& base, float contrast, float brightness, uint32 flags,
 	uint32 borders)
 {
-	if (flags & B_BLEND_FRAME) {
+	rgb_color edgeLightColor = _EdgeLightColor(base, contrast,
+		brightness, flags);
+	rgb_color edgeShadowColor = _EdgeShadowColor(base, contrast,
+		brightness, flags);
+
+	if ((flags & B_BLEND_FRAME) != 0) {
 		// assumes the background has already been painted
 		drawing_mode oldDrawingMode = view->DrawingMode();
 		view->SetDrawingMode(B_OP_ALPHA);
 
-		uint8 alpha = uint8(20 * contrast);
-		uint32 white = uint8(255 * brightness);
-
-		rgb_color borderBevelShadow = (rgb_color){ 0, 0, 0, alpha };
-		rgb_color borderBevelLight = (rgb_color){ white, white, white, alpha };
-
-		_DrawFrame(view, rect, borderBevelShadow, borderBevelShadow,
-			borderBevelLight, borderBevelLight, borders);
+		_DrawFrame(view, rect, edgeShadowColor, edgeShadowColor,
+			edgeLightColor, edgeLightColor, borders);
 
 		view->SetDrawingMode(oldDrawingMode);
 	} else {
-		// colors
-		float tintLight = kEdgeBevelLightTint;
-		float tintShadow = kEdgeBevelShadowTint;
-
-		if (contrast == 0.0) {
-			tintLight = B_NO_TINT;
-			tintShadow = B_NO_TINT;
-		} else if (contrast != 1.0) {
-			tintLight = B_NO_TINT + (tintLight - B_NO_TINT) * contrast;
-			tintShadow = B_NO_TINT + (tintShadow - B_NO_TINT) * contrast;
-		}
-
-		rgb_color borderBevelShadow = tint_color(base, tintShadow);
-		rgb_color borderBevelLight = tint_color(base, tintLight);
-
-		if (brightness < 1.0) {
-			borderBevelShadow.red = uint8(borderBevelShadow.red * brightness);
-			borderBevelShadow.green = uint8(borderBevelShadow.green * brightness);
-			borderBevelShadow.blue = uint8(borderBevelShadow.blue * brightness);
-			borderBevelLight.red = uint8(borderBevelLight.red * brightness);
-			borderBevelLight.green = uint8(borderBevelLight.green * brightness);
-			borderBevelLight.blue = uint8(borderBevelLight.blue * brightness);
-		}
-
-		_DrawFrame(view, rect, borderBevelShadow, borderBevelShadow,
-			borderBevelLight, borderBevelLight, borders);
+		_DrawFrame(view, rect, edgeShadowColor, edgeShadowColor,
+			edgeLightColor, edgeLightColor, borders);
 	}
 }
 
@@ -2188,135 +2149,714 @@ BControlLook::_DrawFrame(BView* view, BRect& rect, const rgb_color& left,
 }
 
 
-//void
-//BControlLook::_DrawShadowFrame(BView* view, BRect& rect, const rgb_color& base,
-//	uint32 borders)
-//{
-//	view->BeginLineArray(4);
-//
-//	bevelColor1 = tint_color(base, 1.2);
-//	bevelColor2 = tint_color(base, 1.1);
-//
-//	// shadow along left/top borders
-//	if (rect.Height() > 0 && borders & B_LEFT_BORDER) {
-//		view->AddLine(BPoint(rect.left, rect.top),
-//			BPoint(rect.left, rect.bottom), bevelColor1);
-//		rect.left++;
-//	}
-//	if (rect.Width() > 0 && borders & B_TOP_BORDER) {
-//		view->AddLine(BPoint(rect.left, rect.top),
-//			BPoint(rect.right, rect.top), bevelColor1);
-//		rect.top++;
-//	}
-//
-//	// softer shadow along left/top borders
-//	if (rect.Height() > 0 && borders & B_LEFT_BORDER) {
-//		view->AddLine(BPoint(rect.left, rect.top),
-//			BPoint(rect.left, rect.bottom), bevelColor2);
-//		rect.left++;
-//	}
-//	if (rect.Width() > 0 && borders & B_TOP_BORDER) {
-//		view->AddLine(BPoint(rect.left, rect.top),
-//			BPoint(rect.right, rect.top), bevelColor2);
-//		rect.top++;
-//	}
-//
-//	view->EndLineArray();
-//}
-
-
 void
-BControlLook::_FillGradient(BView* view, const BRect& rect,
-	const rgb_color& base, float topTint, float bottomTint,
-	enum orientation orientation)
+BControlLook::_DrawButtonBackground(BView* view, BRect& rect,
+	const BRect& updateRect, float leftTopRadius, float rightTopRadius,
+	float leftBottomRadius, float rightBottomRadius, const rgb_color& base,
+	uint32 flags, uint32 borders, enum orientation orientation)
 {
-	BGradientLinear gradient;
-	_MakeGradient(gradient, rect, base, topTint, bottomTint, orientation);
-	view->FillRect(rect, gradient);
-}
+	if (!rect.IsValid() || !rect.Intersects(updateRect))
+		return;
 
+	// clipping constraints for the view
+	BRegion clipping;
+	view->GetClippingRegion(&clipping);
 
-void
-BControlLook::_FillGlossyGradient(BView* view, const BRect& rect,
-	const rgb_color& base, float topTint, float middle1Tint,
-	float middle2Tint, float bottomTint, enum orientation orientation)
-{
-	BGradientLinear gradient;
-	_MakeGlossyGradient(gradient, rect, base, topTint, middle1Tint,
-		middle2Tint, bottomTint, orientation);
-	view->FillRect(rect, gradient);
-}
+	// intersect constraints with updateRect
+	BRegion updateClipping(updateRect);
+	clipping.IntersectWith(&updateClipping);
 
+	// clip to the intersection
+	view->ConstrainClippingRegion(&clipping);
 
-void
-BControlLook::_MakeGradient(BGradientLinear& gradient, const BRect& rect,
-	const rgb_color& base, float topTint, float bottomTint,
-	enum orientation orientation) const
-{
-	gradient.AddColor(tint_color(base, topTint), 0);
-	gradient.AddColor(tint_color(base, bottomTint), 255);
-	gradient.SetStart(rect.LeftTop());
-	if (orientation == B_HORIZONTAL)
-		gradient.SetEnd(rect.LeftBottom());
+	// inner bevel colors
+	rgb_color bevelLightColor  = _BevelLightColor(base, flags);
+	rgb_color bevelShadowColor = _BevelShadowColor(base, flags);
+
+	// button background color
+	rgb_color buttonBgColor;
+	if ((flags & B_DISABLED) != 0)
+		buttonBgColor = tint_color(base, 0.7);
 	else
-		gradient.SetEnd(rect.RightTop());
-}
+		buttonBgColor = tint_color(base, B_LIGHTEN_1_TINT);
 
+	// surface top gradient
+	BGradientLinear fillGradient;
+	_MakeButtonGradient(fillGradient, rect, base, flags, orientation);
 
-void
-BControlLook::_MakeGlossyGradient(BGradientLinear& gradient, const BRect& rect,
-	const rgb_color& base, float topTint, float middle1Tint,
-	float middle2Tint, float bottomTint,
-	enum orientation orientation) const
-{
-	gradient.AddColor(tint_color(base, topTint), 0);
-	gradient.AddColor(tint_color(base, middle1Tint), 132);
-	gradient.AddColor(tint_color(base, middle2Tint), 136);
-	gradient.AddColor(tint_color(base, bottomTint), 255);
-	gradient.SetStart(rect.LeftTop());
-	if (orientation == B_HORIZONTAL)
-		gradient.SetEnd(rect.LeftBottom());
-	else
-		gradient.SetEnd(rect.RightTop());
-}
+	// rounded corners
 
-
-bool
-BControlLook::_RadioButtonAndCheckBoxMarkColor(const rgb_color& base,
-	rgb_color& color, uint32 flags) const
-{
-	if ((flags & (B_ACTIVATED | B_CLICKED)) == 0) {
-		// no mark to be drawn at all
-		return false;
+	if ((borders & B_LEFT_BORDER) != 0 && (borders & B_TOP_BORDER) != 0
+		&& leftTopRadius > 0) {
+		// draw left top rounded corner
+		BRect leftTopCorner(floorf(rect.left), floorf(rect.top),
+			floorf(rect.left + leftTopRadius - 2.0),
+			floorf(rect.top + leftTopRadius - 2.0));
+		clipping.Exclude(leftTopCorner);
+		_DrawRoundCornerBackgroundLeftTop(view, leftTopCorner, updateRect,
+			bevelLightColor, fillGradient);
 	}
 
-	// TODO: Get from UI settings
-	color.red = 27;
-	color.green = 82;
-	color.blue = 140;
+	if ((borders & B_TOP_BORDER) != 0 && (borders & B_RIGHT_BORDER) != 0
+		&& rightTopRadius > 0) {
+		// draw right top rounded corner
+		BRect rightTopCorner(floorf(rect.right - rightTopRadius + 2.0),
+			floorf(rect.top), floorf(rect.right),
+			floorf(rect.top + rightTopRadius - 2.0));
+		clipping.Exclude(rightTopCorner);
+		_DrawRoundCornerBackgroundRightTop(view, rightTopCorner,
+			updateRect, bevelLightColor, bevelShadowColor, fillGradient);
+	}
 
-	float mix = 1.0;
+	if ((borders & B_LEFT_BORDER) != 0 && (borders & B_BOTTOM_BORDER) != 0
+		&& leftBottomRadius > 0) {
+		// draw left bottom rounded corner
+		BRect leftBottomCorner(floorf(rect.left),
+			floorf(rect.bottom - leftBottomRadius + 2.0),
+			floorf(rect.left + leftBottomRadius - 2.0),
+			floorf(rect.bottom));
+		clipping.Exclude(leftBottomCorner);
+		_DrawRoundCornerBackgroundLeftBottom(view, leftBottomCorner,
+			updateRect, bevelLightColor, bevelShadowColor, fillGradient);
+	}
 
-	if (flags & B_DISABLED) {
-		// activated, but disabled
-		mix = 0.4;
-	} else if (flags & B_CLICKED) {
-		if (flags & B_ACTIVATED) {
-			// loosing activation
-			mix = 0.7;
-		} else {
-			// becoming activated
-			mix = 0.3;
+	if ((borders & B_RIGHT_BORDER) != 0 && (borders & B_BOTTOM_BORDER) != 0
+		&& rightBottomRadius > 0) {
+		// draw right bottom rounded corner
+		BRect rightBottomCorner(floorf(rect.right - rightBottomRadius + 2.0),
+			floorf(rect.bottom - rightBottomRadius + 2.0), floorf(rect.right),
+			floorf(rect.bottom));
+		clipping.Exclude(rightBottomCorner);
+		_DrawRoundCornerBackgroundRightBottom(view, rightBottomCorner,
+			updateRect, bevelShadowColor, fillGradient);
+	}
+
+	// clip out the corners
+	view->ConstrainClippingRegion(&clipping);
+
+	// draw inner bevel
+
+	if ((flags & B_ACTIVATED) != 0) {
+		view->BeginLineArray(4);
+
+		// shadow along left/top borders
+		if (borders & B_LEFT_BORDER) {
+			view->AddLine(BPoint(rect.left, rect.top),
+				BPoint(rect.left, rect.bottom), bevelLightColor);
+			rect.left++;
 		}
+		if (borders & B_TOP_BORDER) {
+			view->AddLine(BPoint(rect.left, rect.top),
+				BPoint(rect.right, rect.top), bevelLightColor);
+			rect.top++;
+		}
+
+		// softer shadow along left/top borders
+		if (borders & B_LEFT_BORDER) {
+			view->AddLine(BPoint(rect.left, rect.top),
+				BPoint(rect.left, rect.bottom), bevelShadowColor);
+			rect.left++;
+		}
+		if (borders & B_TOP_BORDER) {
+			view->AddLine(BPoint(rect.left, rect.top),
+				BPoint(rect.right, rect.top), bevelShadowColor);
+			rect.top++;
+		}
+
+		view->EndLineArray();
 	} else {
-		// simply activated
+		_DrawFrame(view, rect,
+			bevelLightColor, bevelLightColor,
+			bevelShadowColor, bevelShadowColor,
+			buttonBgColor, buttonBgColor, borders);
 	}
 
-	color.red = uint8(color.red * mix + base.red * (1.0 - mix));
-	color.green = uint8(color.green * mix + base.green * (1.0 - mix));
-	color.blue = uint8(color.blue * mix + base.blue * (1.0 - mix));
+	// fill in the background
+	view->FillRect(rect, fillGradient);
 
-	return true;
+	// reset clipping constraints
+	view->ConstrainClippingRegion(NULL);
+}
+
+
+void
+BControlLook::_DrawMenuFieldBackgroundOutside(BView* view, BRect& rect,
+	const BRect& updateRect, float leftTopRadius, float rightTopRadius,
+	float leftBottomRadius, float rightBottomRadius, const rgb_color& base,
+	bool popupIndicator, uint32 flags)
+{
+	if (!rect.IsValid() || !rect.Intersects(updateRect))
+		return;
+
+	if (popupIndicator) {
+		BRect leftRect(rect);
+		leftRect.right -= 10;
+
+		BRect rightRect(rect);
+		rightRect.left = rightRect.right - 9;
+
+		_DrawMenuFieldBackgroundInside(view, leftRect, updateRect,
+			leftTopRadius, 0.0f, leftBottomRadius, 0.0f, base, flags,
+			B_LEFT_BORDER | B_TOP_BORDER | B_BOTTOM_BORDER);
+
+		_DrawMenuFieldBackgroundInside(view, rightRect, updateRect,
+			0.0f, rightTopRadius, 0.0f, rightBottomRadius, base, flags,
+			B_TOP_BORDER | B_RIGHT_BORDER | B_BOTTOM_BORDER);
+
+		// popup marker
+		BPoint center(roundf((rightRect.left + rightRect.right) / 2.0),
+					  roundf((rightRect.top + rightRect.bottom) / 2.0));
+		BPoint triangle[3];
+		triangle[0] = center + BPoint(-2.5, -0.5);
+		triangle[1] = center + BPoint(2.5, -0.5);
+		triangle[2] = center + BPoint(0.0, 2.0);
+
+		uint32 viewFlags = view->Flags();
+		view->SetFlags(viewFlags | B_SUBPIXEL_PRECISE);
+
+		rgb_color markColor;
+		if ((flags & B_DISABLED) != 0)
+			markColor = tint_color(base, 1.35);
+		else
+			markColor = tint_color(base, 1.65);
+
+		view->SetHighColor(markColor);
+		view->FillTriangle(triangle[0], triangle[1], triangle[2]);
+
+		// draw a line on the left of the popup frame
+		rgb_color bevelShadowColor = _BevelShadowColor(base, flags);
+		view->SetHighColor(bevelShadowColor);
+		BPoint leftTopCorner(floorf(rightRect.left - 1.0),
+			floorf(rightRect.top - 1.0));
+		BPoint leftBottomCorner(floorf(rightRect.left - 1.0),
+			floorf(rightRect.bottom + 1.0));
+		view->StrokeLine(leftTopCorner, leftBottomCorner);
+
+		view->SetFlags(viewFlags);
+
+		rect = leftRect;
+	} else {
+		_DrawMenuFieldBackgroundInside(view, rect, updateRect, leftTopRadius,
+			rightTopRadius, leftBottomRadius, rightBottomRadius, base, flags);
+	}
+}
+
+
+void
+BControlLook::_DrawMenuFieldBackgroundInside(BView* view, BRect& rect,
+	const BRect& updateRect, float leftTopRadius, float rightTopRadius,
+	float leftBottomRadius, float rightBottomRadius, const rgb_color& base,
+	uint32 flags, uint32 borders)
+{
+	if (!rect.IsValid() || !rect.Intersects(updateRect))
+		return;
+
+	// clipping constraints for the view
+	BRegion clipping;
+	view->GetClippingRegion(&clipping);
+
+	// intersect constraints with updateRect
+	BRegion updateClipping(updateRect);
+	clipping.IntersectWith(&updateClipping);
+
+	// clip to the intersection
+	view->ConstrainClippingRegion(&clipping);
+
+	// frame colors
+	rgb_color frameLightColor  = _FrameLightColor(base, flags);
+	rgb_color frameShadowColor = _FrameShadowColor(base, flags);
+
+	// indicator background color
+	rgb_color indicatorBase;
+	if ((borders & B_LEFT_BORDER) != 0)
+		indicatorBase = base;
+	else {
+		if ((flags & B_DISABLED) != 0)
+			indicatorBase = tint_color(base, 1.05);
+		else
+			indicatorBase = tint_color(base, 1.12);
+	}
+
+	// bevel colors
+	rgb_color cornerColor = tint_color(indicatorBase, 0.85);
+	rgb_color bevelColor1 = tint_color(indicatorBase, 0.3);
+	rgb_color bevelColor2 = tint_color(indicatorBase, 0.5);
+	rgb_color bevelColor3 = tint_color(indicatorBase, 1.03);
+
+	if ((flags & B_DISABLED) != 0) {
+		cornerColor = tint_color(indicatorBase, 0.8);
+		bevelColor1 = tint_color(indicatorBase, 0.7);
+		bevelColor2 = tint_color(indicatorBase, 0.8);
+		bevelColor3 = tint_color(indicatorBase, 1.01);
+	} else {
+		cornerColor = tint_color(indicatorBase, 0.85);
+		bevelColor1 = tint_color(indicatorBase, 0.3);
+		bevelColor2 = tint_color(indicatorBase, 0.5);
+		bevelColor3 = tint_color(indicatorBase, 1.03);
+	}
+
+	// surface top gradient
+	BGradientLinear fillGradient;
+	_MakeButtonGradient(fillGradient, rect, indicatorBase, flags);
+
+	// rounded corners
+
+	if ((borders & B_LEFT_BORDER) != 0 && (borders & B_TOP_BORDER) != 0
+		&& leftTopRadius > 0) {
+		// draw left top rounded corner
+		BRect leftTopCorner(floorf(rect.left), floorf(rect.top),
+			floorf(rect.left + leftTopRadius - 2.0),
+			floorf(rect.top + leftTopRadius - 2.0));
+		clipping.Exclude(leftTopCorner);
+
+		BRegion cornerClipping(leftTopCorner);
+		view->ConstrainClippingRegion(&cornerClipping);
+
+		BRect ellipseRect(leftTopCorner);
+		ellipseRect.InsetBy(-1.0, -1.0);
+		ellipseRect.right = ellipseRect.left + ellipseRect.Width() * 2;
+		ellipseRect.bottom = ellipseRect.top + ellipseRect.Height() * 2;
+
+		// draw the frame (again)
+		view->SetHighColor(frameLightColor);
+		view->FillEllipse(ellipseRect);
+
+		// draw the bevel and background
+		_DrawRoundCornerBackgroundLeftTop(view, leftTopCorner, updateRect,
+			bevelColor1, fillGradient);
+	}
+
+	if ((borders & B_TOP_BORDER) != 0 && (borders & B_RIGHT_BORDER) != 0
+		&& rightTopRadius > 0) {
+		// draw right top rounded corner
+		BRect rightTopCorner(floorf(rect.right - rightTopRadius + 2.0),
+			floorf(rect.top), floorf(rect.right),
+			floorf(rect.top + rightTopRadius - 2.0));
+		clipping.Exclude(rightTopCorner);
+
+		BRegion cornerClipping(rightTopCorner);
+		view->ConstrainClippingRegion(&cornerClipping);
+
+		BRect ellipseRect(rightTopCorner);
+		ellipseRect.InsetBy(-1.0, -1.0);
+		ellipseRect.left = ellipseRect.right - ellipseRect.Width() * 2;
+		ellipseRect.bottom = ellipseRect.top + ellipseRect.Height() * 2;
+
+		// draw the frame (again)
+		if (frameLightColor == frameShadowColor) {
+			view->SetHighColor(frameLightColor);
+			view->FillEllipse(ellipseRect);
+		} else {
+			BGradientLinear gradient;
+			gradient.AddColor(frameLightColor, 0);
+			gradient.AddColor(frameShadowColor, 255);
+			gradient.SetStart(rightTopCorner.LeftTop());
+			gradient.SetEnd(rightTopCorner.RightBottom());
+			view->FillEllipse(ellipseRect, gradient);
+		}
+
+		// draw the bevel and background
+		_DrawRoundCornerBackgroundRightTop(view, rightTopCorner, updateRect,
+			bevelColor1, bevelColor3, fillGradient);
+	}
+
+	if ((borders & B_LEFT_BORDER) != 0 && (borders & B_BOTTOM_BORDER) != 0
+		&& leftBottomRadius > 0) {
+		// draw left bottom rounded corner
+		BRect leftBottomCorner(floorf(rect.left),
+			floorf(rect.bottom - leftBottomRadius + 2.0),
+			floorf(rect.left + leftBottomRadius - 2.0),
+			floorf(rect.bottom));
+		clipping.Exclude(leftBottomCorner);
+
+		BRegion cornerClipping(leftBottomCorner);
+		view->ConstrainClippingRegion(&cornerClipping);
+
+		BRect ellipseRect(leftBottomCorner);
+		ellipseRect.InsetBy(-1.0, -1.0);
+		ellipseRect.right = ellipseRect.left + ellipseRect.Width() * 2;
+		ellipseRect.top = ellipseRect.bottom - ellipseRect.Height() * 2;
+
+		// draw the frame (again)
+		if (frameLightColor == frameShadowColor) {
+			view->SetHighColor(frameLightColor);
+			view->FillEllipse(ellipseRect);
+		} else {
+			BGradientLinear gradient;
+			gradient.AddColor(frameLightColor, 0);
+			gradient.AddColor(frameShadowColor, 255);
+			gradient.SetStart(leftBottomCorner.LeftTop());
+			gradient.SetEnd(leftBottomCorner.RightBottom());
+			view->FillEllipse(ellipseRect, gradient);
+		}
+
+		// draw the bevel and background
+		_DrawRoundCornerBackgroundLeftBottom(view, leftBottomCorner,
+			updateRect, bevelColor2, bevelColor3, fillGradient);
+	}
+
+	if ((borders & B_RIGHT_BORDER) != 0 && (borders & B_BOTTOM_BORDER) != 0
+		&& rightBottomRadius > 0) {
+		// draw right bottom rounded corner
+		BRect rightBottomCorner(floorf(rect.right - rightBottomRadius + 2.0),
+			floorf(rect.bottom - rightBottomRadius + 2.0), floorf(rect.right),
+			floorf(rect.bottom));
+		clipping.Exclude(rightBottomCorner);
+
+		BRegion cornerClipping(rightBottomCorner);
+		view->ConstrainClippingRegion(&cornerClipping);
+
+		BRect ellipseRect(rightBottomCorner);
+		ellipseRect.InsetBy(-1.0, -1.0);
+		ellipseRect.left = ellipseRect.right - ellipseRect.Width() * 2;
+		ellipseRect.top = ellipseRect.bottom - ellipseRect.Height() * 2;
+
+		// draw the frame (again)
+		view->SetHighColor(frameShadowColor);
+		view->FillEllipse(ellipseRect);
+
+		// draw the bevel and background
+		_DrawRoundCornerBackgroundRightBottom(view, rightBottomCorner,
+			updateRect, bevelColor3, fillGradient);
+	}
+
+	// clip out the corners
+	view->ConstrainClippingRegion(&clipping);
+
+	// draw the bevel
+	_DrawFrame(view, rect,
+		bevelColor2, bevelColor1,
+		bevelColor3, bevelColor3,
+		cornerColor, cornerColor,
+		borders);
+
+	// fill in the background
+	view->FillRect(rect, fillGradient);
+
+	// reset clipping constraints
+	view->ConstrainClippingRegion(NULL);
+}
+
+
+void
+BControlLook::_DrawRoundCornerLeftTop(BView* view, BRect& cornerRect,
+	const BRect& updateRect, const rgb_color& background,
+	const rgb_color& edgeColor, const rgb_color& frameColor,
+	const rgb_color& bevelColor, const BGradientLinear& fillGradient)
+{
+	_DrawRoundCornerFrameLeftTop(view, cornerRect, updateRect,
+		background, edgeColor, frameColor);
+	_DrawRoundCornerBackgroundLeftTop(view, cornerRect, updateRect,
+		bevelColor, fillGradient);
+}
+
+
+void
+BControlLook::_DrawRoundCornerFrameLeftTop(BView* view, BRect& cornerRect,
+	const BRect& updateRect, const rgb_color& background,
+	const rgb_color& edgeColor, const rgb_color& frameColor)
+{
+	// constrain clipping region to corner
+	BRegion clipping(cornerRect);
+	view->ConstrainClippingRegion(&clipping);
+
+	// background
+	view->SetHighColor(background);
+	view->FillRect(cornerRect);
+
+	// outer edge
+	BRect ellipseRect(cornerRect);
+	ellipseRect.right = ellipseRect.left + ellipseRect.Width() * 2;
+	ellipseRect.bottom = ellipseRect.top + ellipseRect.Height() * 2;
+
+	view->SetHighColor(edgeColor);
+	view->FillEllipse(ellipseRect);
+
+	// frame
+	ellipseRect.InsetBy(1, 1);
+	cornerRect.left++;
+	cornerRect.top++;
+	view->SetHighColor(frameColor);
+	view->FillEllipse(ellipseRect);
+
+	// prepare for bevel
+	cornerRect.left++;
+	cornerRect.top++;
+}
+
+
+void
+BControlLook::_DrawRoundCornerBackgroundLeftTop(BView* view, BRect& cornerRect,
+	const BRect& updateRect, const rgb_color& bevelColor,
+	const BGradientLinear& fillGradient)
+{
+	// constrain clipping region to corner
+	BRegion clipping(cornerRect);
+	view->ConstrainClippingRegion(&clipping);
+
+	BRect ellipseRect(cornerRect);
+	ellipseRect.right = ellipseRect.left + ellipseRect.Width() * 2;
+	ellipseRect.bottom = ellipseRect.top + ellipseRect.Height() * 2;
+
+	// bevel
+	view->SetHighColor(bevelColor);
+	view->FillEllipse(ellipseRect);
+
+	// gradient
+	ellipseRect.InsetBy(1, 1);
+	view->FillEllipse(ellipseRect, fillGradient);
+}
+
+
+void
+BControlLook::_DrawRoundCornerRightTop(BView* view, BRect& cornerRect,
+	const BRect& updateRect, const rgb_color& background,
+	const rgb_color& edgeTopColor, const rgb_color& edgeRightColor,
+	const rgb_color& frameTopColor, const rgb_color& frameRightColor,
+	const rgb_color& bevelTopColor, const rgb_color& bevelRightColor,
+	const BGradientLinear& fillGradient)
+{
+	_DrawRoundCornerFrameRightTop(view, cornerRect, updateRect,
+		background, edgeTopColor, edgeRightColor, frameTopColor,
+		frameRightColor);
+	_DrawRoundCornerBackgroundRightTop(view, cornerRect, updateRect,
+		bevelTopColor, bevelRightColor, fillGradient);
+}
+
+
+void
+BControlLook::_DrawRoundCornerFrameRightTop(BView* view, BRect& cornerRect,
+	const BRect& updateRect, const rgb_color& background,
+	const rgb_color& edgeTopColor, const rgb_color& edgeRightColor,
+	const rgb_color& frameTopColor, const rgb_color& frameRightColor)
+{
+	// constrain clipping region to corner
+	BRegion clipping(cornerRect);
+	view->ConstrainClippingRegion(&clipping);
+
+	// background
+	view->SetHighColor(background);
+	view->FillRect(cornerRect);
+
+	// outer edge
+	BRect ellipseRect(cornerRect);
+	ellipseRect.left = ellipseRect.right - ellipseRect.Width() * 2;
+	ellipseRect.bottom = ellipseRect.top + ellipseRect.Height() * 2;
+
+	BGradientLinear gradient;
+	gradient.AddColor(edgeTopColor, 0);
+	gradient.AddColor(edgeRightColor, 255);
+	gradient.SetStart(cornerRect.LeftTop());
+	gradient.SetEnd(cornerRect.RightBottom());
+	view->FillEllipse(ellipseRect, gradient);
+
+	// frame
+	ellipseRect.InsetBy(1, 1);
+	cornerRect.right--;
+	cornerRect.top++;
+	if (frameTopColor == frameRightColor) {
+		view->SetHighColor(frameTopColor);
+		view->FillEllipse(ellipseRect);
+	} else {
+		gradient.SetColor(0, frameTopColor);
+		gradient.SetColor(1, frameRightColor);
+		gradient.SetStart(cornerRect.LeftTop());
+		gradient.SetEnd(cornerRect.RightBottom());
+		view->FillEllipse(ellipseRect, gradient);
+	}
+
+	// prepare for bevel
+	cornerRect.right--;
+	cornerRect.top++;
+}
+
+
+void
+BControlLook::_DrawRoundCornerBackgroundRightTop(BView* view, BRect& cornerRect,
+	const BRect& updateRect, const rgb_color& bevelTopColor,
+	const rgb_color& bevelRightColor, const BGradientLinear& fillGradient)
+{
+	// constrain clipping region to corner
+	BRegion clipping(cornerRect);
+	view->ConstrainClippingRegion(&clipping);
+
+	BRect ellipseRect(cornerRect);
+	ellipseRect.left = ellipseRect.right - ellipseRect.Width() * 2;
+	ellipseRect.bottom = ellipseRect.top + ellipseRect.Height() * 2;
+
+	// bevel
+	BGradientLinear gradient;
+	gradient.AddColor(bevelTopColor, 0);
+	gradient.AddColor(bevelRightColor, 255);
+	gradient.SetStart(cornerRect.LeftTop());
+	gradient.SetEnd(cornerRect.RightBottom());
+	view->FillEllipse(ellipseRect, gradient);
+
+	// gradient
+	ellipseRect.InsetBy(1, 1);
+	view->FillEllipse(ellipseRect, fillGradient);
+}
+
+
+void
+BControlLook::_DrawRoundCornerLeftBottom(BView* view, BRect& cornerRect,
+	const BRect& updateRect, const rgb_color& background,
+	const rgb_color& edgeLeftColor, const rgb_color& edgeBottomColor,
+	const rgb_color& frameLeftColor, const rgb_color& frameBottomColor,
+	const rgb_color& bevelLeftColor, const rgb_color& bevelBottomColor,
+	const BGradientLinear& fillGradient)
+{
+	_DrawRoundCornerFrameLeftBottom(view, cornerRect, updateRect,
+		background, edgeLeftColor, edgeBottomColor, frameLeftColor,
+		frameBottomColor);
+	_DrawRoundCornerBackgroundLeftBottom(view, cornerRect, updateRect,
+		bevelLeftColor, bevelBottomColor, fillGradient);
+}
+
+
+void
+BControlLook::_DrawRoundCornerFrameLeftBottom(BView* view, BRect& cornerRect,
+	const BRect& updateRect, const rgb_color& background,
+	const rgb_color& edgeLeftColor, const rgb_color& edgeBottomColor,
+	const rgb_color& frameLeftColor, const rgb_color& frameBottomColor)
+{
+	// constrain clipping region to corner
+	BRegion clipping(cornerRect);
+	view->ConstrainClippingRegion(&clipping);
+
+	// background
+	view->SetHighColor(background);
+	view->FillRect(cornerRect);
+
+	// outer edge
+	BRect ellipseRect(cornerRect);
+	ellipseRect.right = ellipseRect.left + ellipseRect.Width() * 2;
+	ellipseRect.top = ellipseRect.bottom - ellipseRect.Height() * 2;
+
+	BGradientLinear gradient;
+	gradient.AddColor(edgeLeftColor, 0);
+	gradient.AddColor(edgeBottomColor, 255);
+	gradient.SetStart(cornerRect.LeftTop());
+	gradient.SetEnd(cornerRect.RightBottom());
+	view->FillEllipse(ellipseRect, gradient);
+
+	// frame
+	ellipseRect.InsetBy(1, 1);
+	cornerRect.left++;
+	cornerRect.bottom--;
+	if (frameLeftColor == frameBottomColor) {
+		view->SetHighColor(frameLeftColor);
+		view->FillEllipse(ellipseRect);
+	} else {
+		gradient.SetColor(0, frameLeftColor);
+		gradient.SetColor(1, frameBottomColor);
+		gradient.SetStart(cornerRect.LeftTop());
+		gradient.SetEnd(cornerRect.RightBottom());
+		view->FillEllipse(ellipseRect, gradient);
+	}
+
+	// prepare for bevel
+	cornerRect.left++;
+	cornerRect.bottom--;
+}
+
+
+void
+BControlLook::_DrawRoundCornerBackgroundLeftBottom(BView* view, BRect& cornerRect,
+	const BRect& updateRect, const rgb_color& bevelLeftColor,
+	const rgb_color& bevelBottomColor, const BGradientLinear& fillGradient)
+{
+	// constrain clipping region to corner
+	BRegion clipping(cornerRect);
+	view->ConstrainClippingRegion(&clipping);
+
+	BRect ellipseRect(cornerRect);
+	ellipseRect.right = ellipseRect.left + ellipseRect.Width() * 2;
+	ellipseRect.top = ellipseRect.bottom - ellipseRect.Height() * 2;
+
+	// bevel
+	BGradientLinear gradient;
+	gradient.AddColor(bevelLeftColor, 0);
+	gradient.AddColor(bevelBottomColor, 255);
+	gradient.SetStart(cornerRect.LeftTop());
+	gradient.SetEnd(cornerRect.RightBottom());
+	view->FillEllipse(ellipseRect, gradient);
+
+	// gradient
+	ellipseRect.InsetBy(1, 1);
+	view->FillEllipse(ellipseRect, fillGradient);
+
+	view->PopState();
+}
+
+
+void
+BControlLook::_DrawRoundCornerRightBottom(BView* view, BRect& cornerRect,
+	const BRect& updateRect, const rgb_color& background,
+	const rgb_color& edgeColor, const rgb_color& frameColor,
+	const rgb_color& bevelColor, const BGradientLinear& fillGradient)
+{
+	_DrawRoundCornerFrameRightBottom(view, cornerRect, updateRect,
+		background, edgeColor, frameColor);
+	_DrawRoundCornerBackgroundRightBottom(view, cornerRect, updateRect,
+		bevelColor, fillGradient);
+}
+
+
+void
+BControlLook::_DrawRoundCornerFrameRightBottom(BView* view, BRect& cornerRect,
+	const BRect& updateRect, const rgb_color& background,
+	const rgb_color& edgeColor, const rgb_color& frameColor)
+{
+	// constrain clipping region to corner
+	BRegion clipping(cornerRect);
+	view->ConstrainClippingRegion(&clipping);
+
+	// background
+	view->SetHighColor(background);
+	view->FillRect(cornerRect);
+
+	// outer edge
+	BRect ellipseRect(cornerRect);
+	ellipseRect.left = ellipseRect.right - ellipseRect.Width() * 2;
+	ellipseRect.top = ellipseRect.bottom - ellipseRect.Height() * 2;
+
+	view->SetHighColor(edgeColor);
+	view->FillEllipse(ellipseRect);
+
+	// frame
+	ellipseRect.InsetBy(1, 1);
+	cornerRect.right--;
+	cornerRect.bottom++;
+	view->SetHighColor(frameColor);
+	view->FillEllipse(ellipseRect);
+
+	// prepare for bevel
+	cornerRect.left++;
+	cornerRect.bottom--;
+}
+
+
+void
+BControlLook::_DrawRoundCornerBackgroundRightBottom(BView* view,
+	BRect& cornerRect, const BRect& updateRect, const rgb_color& bevelColor,
+	const BGradientLinear& fillGradient)
+{
+	// constrain clipping region to corner
+	BRegion clipping(cornerRect);
+	view->ConstrainClippingRegion(&clipping);
+
+	BRect ellipseRect(cornerRect);
+	ellipseRect.left = ellipseRect.right - ellipseRect.Width() * 2;
+	ellipseRect.top = ellipseRect.bottom - ellipseRect.Height() * 2;
+
+	// bevel
+	view->SetHighColor(bevelColor);
+	view->FillEllipse(ellipseRect);
+
+	// gradient
+	ellipseRect.InsetBy(1, 1);
+	view->FillEllipse(ellipseRect, fillGradient);
 }
 
 
@@ -2377,112 +2917,304 @@ BControlLook::_DrawRoundBarCorner(BView* view, BRect& rect,
 }
 
 
-void
-BControlLook::_DrawRoundCornerLeftTop(BView* view, BRect& rect,
-	const BRect& updateRect, const rgb_color& base, const rgb_color& edgeColor,
-	const rgb_color& frameColor, const rgb_color& bevelColor,
-	const BGradientLinear& fillGradient)
+rgb_color
+BControlLook::_EdgeLightColor(const rgb_color& base, float contrast,
+	float brightness, uint32 flags)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
-		return;
+	rgb_color edgeLightColor;
 
-	BRegion clipping(rect);
-	view->ConstrainClippingRegion(&clipping);
+	if ((flags & B_BLEND_FRAME) != 0) {
+		uint8 alpha = uint8(20 * contrast);
+		uint32 white = uint8(255 * brightness);
 
-	// background
-	view->SetHighColor(base);
-	view->FillRect(rect);
-
-	// outer edge
-	BRect ellipseRect(rect);
-	ellipseRect.right = ellipseRect.left + ellipseRect.Width() * 2;
-	ellipseRect.bottom = ellipseRect.top + ellipseRect.Height() * 2;
-
-	view->SetHighColor(edgeColor);
-	view->FillEllipse(ellipseRect);
-
-	// frame
-	ellipseRect.InsetBy(1, 1);
-	view->SetHighColor(frameColor);
-	view->FillEllipse(ellipseRect);
-
-	// bevel
-	ellipseRect.InsetBy(1, 1);
-	view->SetHighColor(bevelColor);
-	view->FillEllipse(ellipseRect);
-
-	// fill
-	ellipseRect.InsetBy(1, 1);
-	view->FillEllipse(ellipseRect, fillGradient);
-
-	view->ConstrainClippingRegion(NULL);
-}
-
-void
-BControlLook::_DrawRoundCornerRightTop(BView* view, BRect& rect,
-	const BRect& updateRect, const rgb_color& base,
-	const rgb_color& edgeTopColor, const rgb_color& edgeRightColor,
-	const rgb_color& frameTopColor, const rgb_color& frameRightColor,
-	const rgb_color& bevelTopColor, const rgb_color& bevelRightColor,
-	const BGradientLinear& fillGradient)
-{
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
-		return;
-
-	BRegion clipping(rect);
-	view->ConstrainClippingRegion(&clipping);
-
-	// background
-	view->SetHighColor(base);
-	view->FillRect(rect);
-
-	// outer edge
-	BRect ellipseRect(rect);
-	ellipseRect.left = ellipseRect.right - ellipseRect.Width() * 2;
-	ellipseRect.bottom = ellipseRect.top + ellipseRect.Height() * 2;
-
-	BGradientLinear gradient;
-	gradient.AddColor(edgeTopColor, 0);
-	gradient.AddColor(edgeRightColor, 255);
-	gradient.SetStart(rect.LeftTop());
-	gradient.SetEnd(rect.RightBottom());
-	view->FillEllipse(ellipseRect, gradient);
-
-	// frame
-	ellipseRect.InsetBy(1, 1);
-	rect.right--;
-	rect.top++;
-	if (frameTopColor == frameRightColor) {
-		view->SetHighColor(frameTopColor);
-		view->FillEllipse(ellipseRect);
+		edgeLightColor = (rgb_color){ white, white, white, alpha };
 	} else {
-		gradient.SetColor(0, frameTopColor);
-		gradient.SetColor(1, frameRightColor);
-		gradient.SetStart(rect.LeftTop());
-		gradient.SetEnd(rect.RightBottom());
-		view->FillEllipse(ellipseRect, gradient);
+		// colors
+		float tintLight = kEdgeBevelLightTint;
+
+		if (contrast == 0.0)
+			tintLight = B_NO_TINT;
+		else if (contrast != 1.0)
+			tintLight = B_NO_TINT + (tintLight - B_NO_TINT) * contrast;
+
+		edgeLightColor = tint_color(base, tintLight);
+
+		if (brightness < 1.0) {
+			edgeLightColor.red = uint8(edgeLightColor.red * brightness);
+			edgeLightColor.green = uint8(edgeLightColor.green * brightness);
+			edgeLightColor.blue = uint8(edgeLightColor.blue * brightness);
+		}
 	}
 
-	// bevel
-	ellipseRect.InsetBy(1, 1);
-	rect.right--;
-	rect.top++;
-	gradient.SetColor(0, bevelTopColor);
-	gradient.SetColor(1, bevelRightColor);
+	return edgeLightColor;
+}
+
+
+rgb_color
+BControlLook::_EdgeShadowColor(const rgb_color& base, float contrast,
+	float brightness, uint32 flags)
+{
+	rgb_color edgeShadowColor;
+
+	if ((flags & B_BLEND_FRAME) != 0) {
+		uint8 alpha = uint8(20 * contrast);
+		edgeShadowColor = (rgb_color){ 0, 0, 0, alpha };
+	} else {
+		float tintShadow = kEdgeBevelShadowTint;
+
+		if (contrast == 0.0)
+			tintShadow = B_NO_TINT;
+		else if (contrast != 1.0)
+			tintShadow = B_NO_TINT + (tintShadow - B_NO_TINT) * contrast;
+
+		edgeShadowColor = tint_color(base, tintShadow);
+
+		if (brightness < 1.0) {
+			edgeShadowColor.red = uint8(edgeShadowColor.red * brightness);
+			edgeShadowColor.green = uint8(edgeShadowColor.green * brightness);
+			edgeShadowColor.blue = uint8(edgeShadowColor.blue * brightness);
+		}
+	}
+
+	return edgeShadowColor;
+}
+
+
+rgb_color
+BControlLook::_FrameLightColor(const rgb_color& base, uint32 flags)
+{
+	if ((flags & B_FOCUSED) != 0)
+		return ui_color(B_KEYBOARD_NAVIGATION_COLOR);
+
+	if ((flags & B_ACTIVATED) != 0)
+		return _FrameShadowColor(base, flags & ~B_ACTIVATED);
+
+	rgb_color frameLightColor;
+
+	if ((flags & B_DISABLED) != 0) {
+		// TODO: B_BLEND_FRAME
+		frameLightColor = tint_color(base, 1.145);
+
+		if ((flags & B_DEFAULT_BUTTON) != 0)
+			frameLightColor = tint_color(frameLightColor, 1.14);
+	} else {
+		if ((flags & B_BLEND_FRAME) != 0)
+			frameLightColor = (rgb_color){ 0, 0, 0, 75 };
+		else
+			frameLightColor = tint_color(base, 1.33);
+
+		if ((flags & B_DEFAULT_BUTTON) != 0)
+			frameLightColor = tint_color(frameLightColor, 1.35);
+	}
+
+	return frameLightColor;
+}
+
+
+rgb_color
+BControlLook::_FrameShadowColor(const rgb_color& base, uint32 flags)
+{
+	if ((flags & B_FOCUSED) != 0)
+		return ui_color(B_KEYBOARD_NAVIGATION_COLOR);
+
+	if ((flags & B_ACTIVATED) != 0)
+		return _FrameLightColor(base, flags & ~B_ACTIVATED);
+
+	rgb_color frameShadowColor;
+
+	if ((flags & B_DISABLED) != 0) {
+		// TODO: B_BLEND_FRAME
+		frameShadowColor = tint_color(base, 1.24);
+
+		if ((flags & B_DEFAULT_BUTTON) != 0) {
+			frameShadowColor = tint_color(base, 1.145);
+			frameShadowColor = tint_color(frameShadowColor, 1.12);
+		}
+	} else {
+		if ((flags & B_DEFAULT_BUTTON) != 0) {
+			if ((flags & B_BLEND_FRAME) != 0)
+				frameShadowColor = (rgb_color){ 0, 0, 0, 75 };
+			else
+				frameShadowColor = tint_color(base, 1.33);
+
+			frameShadowColor = tint_color(frameShadowColor, 1.5);
+		} else {
+			if ((flags & B_BLEND_FRAME) != 0)
+				frameShadowColor = (rgb_color){ 0, 0, 0, 95 };
+			else
+				frameShadowColor = tint_color(base, 1.47);
+		}
+	}
+
+	return frameShadowColor;
+}
+
+
+rgb_color
+BControlLook::_BevelLightColor(const rgb_color& base, uint32 flags)
+{
+	rgb_color bevelLightColor = tint_color(base, 0.2);
+
+	if ((flags & B_DISABLED) != 0)
+		bevelLightColor = tint_color(base, B_LIGHTEN_1_TINT);
+
+	if ((flags & B_ACTIVATED) != 0)
+		bevelLightColor = tint_color(base, B_DARKEN_1_TINT);
+
+	return bevelLightColor;
+}
+
+
+rgb_color
+BControlLook::_BevelShadowColor(const rgb_color& base, uint32 flags)
+{
+	rgb_color bevelShadowColor = tint_color(base, 1.08);
+
+	if ((flags & B_DISABLED) != 0)
+		bevelShadowColor = base;
+
+	if ((flags & B_ACTIVATED) != 0)
+		bevelShadowColor = tint_color(base, B_DARKEN_1_TINT);
+
+	return bevelShadowColor;
+}
+
+
+void
+BControlLook::_FillGradient(BView* view, const BRect& rect,
+	const rgb_color& base, float topTint, float bottomTint,
+	enum orientation orientation)
+{
+	BGradientLinear gradient;
+	_MakeGradient(gradient, rect, base, topTint, bottomTint, orientation);
+	view->FillRect(rect, gradient);
+}
+
+
+void
+BControlLook::_FillGlossyGradient(BView* view, const BRect& rect,
+	const rgb_color& base, float topTint, float middle1Tint,
+	float middle2Tint, float bottomTint, enum orientation orientation)
+{
+	BGradientLinear gradient;
+	_MakeGlossyGradient(gradient, rect, base, topTint, middle1Tint,
+		middle2Tint, bottomTint, orientation);
+	view->FillRect(rect, gradient);
+}
+
+
+void
+BControlLook::_MakeGradient(BGradientLinear& gradient, const BRect& rect,
+	const rgb_color& base, float topTint, float bottomTint,
+	enum orientation orientation) const
+{
+	gradient.AddColor(tint_color(base, topTint), 0);
+	gradient.AddColor(tint_color(base, bottomTint), 255);
 	gradient.SetStart(rect.LeftTop());
-	gradient.SetEnd(rect.RightBottom());
-	view->FillEllipse(ellipseRect, gradient);
+	if (orientation == B_HORIZONTAL)
+		gradient.SetEnd(rect.LeftBottom());
+	else
+		gradient.SetEnd(rect.RightTop());
+}
 
-	// fill
-	ellipseRect.InsetBy(1, 1);
-	view->FillEllipse(ellipseRect, fillGradient);
 
-	view->ConstrainClippingRegion(NULL);
+void
+BControlLook::_MakeGlossyGradient(BGradientLinear& gradient, const BRect& rect,
+	const rgb_color& base, float topTint, float middle1Tint,
+	float middle2Tint, float bottomTint,
+	enum orientation orientation) const
+{
+	gradient.AddColor(tint_color(base, topTint), 0);
+	gradient.AddColor(tint_color(base, middle1Tint), 132);
+	gradient.AddColor(tint_color(base, middle2Tint), 136);
+	gradient.AddColor(tint_color(base, bottomTint), 255);
+	gradient.SetStart(rect.LeftTop());
+	if (orientation == B_HORIZONTAL)
+		gradient.SetEnd(rect.LeftBottom());
+	else
+		gradient.SetEnd(rect.RightTop());
+}
+
+
+void
+BControlLook::_MakeButtonGradient(BGradientLinear& gradient, BRect& rect,
+	const rgb_color& base, uint32 flags, enum orientation orientation) const
+{
+	float topTint = 0.49;
+	float middleTint1 = 0.62;
+	float middleTint2 = 0.76;
+	float bottomTint = 0.90;
+
+	if ((flags & B_ACTIVATED) != 0) {
+		topTint = 1.11;
+		bottomTint = 1.08;
+	}
+
+	if ((flags & B_DISABLED) != 0) {
+		topTint = (topTint + B_NO_TINT) / 2;
+		middleTint1 = (middleTint1 + B_NO_TINT) / 2;
+		middleTint2 = (middleTint2 + B_NO_TINT) / 2;
+		bottomTint = (bottomTint + B_NO_TINT) / 2;
+	} else if ((flags & B_HOVER) != 0) {
+		static const float kHoverTintFactor = 0.85;
+		topTint *= kHoverTintFactor;
+		middleTint1 *= kHoverTintFactor;
+		middleTint2 *= kHoverTintFactor;
+		bottomTint *= kHoverTintFactor;
+	}
+
+	if ((flags & B_ACTIVATED) != 0) {
+		_MakeGradient(gradient, rect, base, topTint, bottomTint, orientation);
+	} else {
+		_MakeGlossyGradient(gradient, rect, base, topTint, middleTint1,
+			middleTint2, bottomTint, orientation);
+	}
+}
+
+
+
+bool
+BControlLook::_RadioButtonAndCheckBoxMarkColor(const rgb_color& base,
+	rgb_color& color, uint32 flags) const
+{
+	if ((flags & (B_ACTIVATED | B_CLICKED)) == 0) {
+		// no mark to be drawn at all
+		return false;
+	}
+
+	// TODO: Get from UI settings
+	color.red = 27;
+	color.green = 82;
+	color.blue = 140;
+
+	float mix = 1.0;
+
+	if ((flags & B_DISABLED) != 0) {
+		// activated, but disabled
+		mix = 0.4;
+	} else if ((flags & B_CLICKED) != 0) {
+		if ((flags & B_ACTIVATED) != 0) {
+			// loosing activation
+			mix = 0.7;
+		} else {
+			// becoming activated
+			mix = 0.3;
+		}
+	} else {
+		// simply activated
+	}
+
+	color.red = uint8(color.red * mix + base.red * (1.0 - mix));
+	color.green = uint8(color.green * mix + base.green * (1.0 - mix));
+	color.blue = uint8(color.blue * mix + base.blue * (1.0 - mix));
+
+	return true;
 }
 
 
 // NOTE: May come from a add-on in the future. Initialized in
 // InterfaceDefs.cpp
 BControlLook* be_control_look = NULL;
+
 
 } // namespace BPrivate

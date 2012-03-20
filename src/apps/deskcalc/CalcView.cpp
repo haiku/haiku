@@ -419,10 +419,10 @@ CalcView::Draw(BRect updateRect)
 				flags |= BControlLook::B_IGNORE_OUTLINE;
 
 				be_control_look->DrawButtonFrame(this, frame, updateRect,
-					fBaseColor, fBaseColor, flags);
+					6.0f, fBaseColor, fBaseColor, flags);
 
 				be_control_look->DrawButtonBackground(this, frame, updateRect,
-					fBaseColor, flags);
+					6.0f, fBaseColor, flags);
 
 				be_control_look->DrawLabel(this, key->label, frame, updateRect,
 					fBaseColor, flags, BAlignment(B_ALIGN_HORIZONTAL_CENTER,
