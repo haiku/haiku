@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons decorators MacDecorator ;
 
-UseFreeTypeHeaders ;
+UseHeaders $(HAIKU_FREETYPE_HEADERS) : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app decorator ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;

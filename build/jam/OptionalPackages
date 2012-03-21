@@ -41,6 +41,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	DevelopmentBase			- basic development environment (gcc, headers, libs,...)
 #	DevelopmentJava			- JamVM, a Java Virtual machine, GNU Classpath, ECJ
 #	DevelopmentMin			- development headers, libs, tools, from sources only
+#	DevelopmentPowerPC			- Cross compiling environment for PowerPC
 #	Doxygen					- Generate documentation from source code
 #	Expat					- XML parsing libraries
 #	Fastdep					- fast dependency generator for C/C++ files
@@ -744,7 +745,7 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 
 	# symlinks for ABI abstraction
 	AddSymlinkToHaikuImage develop abi : $(arch)/$(abi) : current ;
-	AddSymlinkToHaikuImage develop lib : /boot/develop/abi/current/lib
+	AddSymlinkToHaikuImage develop lib : /boot/develop/abi/$(arch)/$(abi)/lib
 		: $(arch) ;
 	AddSymlinkToHaikuImage develop tools
 		: /boot/develop/abi/current/tools/current : gnupro ;
@@ -785,7 +786,6 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 	AddHeaderDirectoryToHaikuImage compatibility gnu : gnu ;
 
 	# third party libs headers
-	AddHeaderDirectoryToHaikuImage libs freetype2 : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs jpeg : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs ncurses : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs png : 3rdparty ;
@@ -801,6 +801,24 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 		CopyDirectoryToAlternativeGCCArchive $(abiDirTokens) headers
 			: [ FDirName $(HAIKU_TOP) headers cpp ] : : -x .svn ;
 	}
+}
+
+
+# DevelopmentPowerPC
+if [ IsOptionalHaikuImagePackageAdded DevelopmentPowerPC ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package DevelopmentPowerPC available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) < 4 && ! $(isHybridBuild) {
+		Echo "No optional package DevelopmentPowerPC available for gcc2" ;
+	} else {
+		InstallOptionalHaikuImagePackage
+			gcc-ppc-4.6.2-x86-gcc4-2012-03-17.zip
+			: $(baseURL)/gcc-ppc-4.6.2-x86-gcc4-2012-03-17.zip ;
+		InstallOptionalHaikuImagePackage
+			haiku-devlibs-ppc-gcc4-2012-03-18.zip
+			: $(baseURL)/haiku-devlibs-ppc-gcc4-2012-03-18.zip ;
+	}
+
 }
 
 

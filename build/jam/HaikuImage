@@ -84,7 +84,6 @@ SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo $(X86_ONLY)GLTeapot
 SYSTEM_LIBS =
 	libbe.so libbsd.so libbnetapi.so
 	libdebug.so libdevice.so
-	libfreetype.so
 	libgame.so $(X86_ONLY)libGL.so libgnu.so
 	libjpeg.so
 	liblocale.so
@@ -96,6 +95,7 @@ SYSTEM_LIBS =
 	libtextencoding.so libtiff.so libtracker.so libtranslation.so
 	libz.so
 	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
+	$(HAIKU_FREETYPE_CURRENT_LIB)
 ;
 PRIVATE_SYSTEM_LIBS =
 	libalm.so
@@ -161,14 +161,14 @@ SYSTEM_ADD_ONS_PRINT_TRANSPORT = HP\ JetDirect IPP LPR
 ;
 SYSTEM_ADD_ONS_SCREENSAVERS = Butterfly DebugNow $(X86_ONLY)Flurry
 	$(HAIKU_INCLUDE_TRADEMARKS)Haiku Icons IFS Leaves Message Spider ;
-SYSTEM_ADD_ONS_DRIVERS_AUDIO = auich auvia echo3g emuxki hda sis7018 ;
+SYSTEM_ADD_ONS_DRIVERS_AUDIO = auich auvia echo3g emuxki hda ice1712 sis7018 ;
 SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD = ; #cmedia usb_audio ;
 SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon $(X86_ONLY)nvidia
 	$(X86_ONLY)neomagic $(X86_ONLY)matrox $(X86_ONLY)intel_extreme
 	$(X86_ONLY)s3 $(X86_ONLY)vesa #$(X86_ONLY)via #$(X86_ONLY)vmware
 	$(X86_ONLY)ati $(X86_ONLY)3dfx $(X86_ONLY)radeon_hd
 ;
-SYSTEM_ADD_ONS_DRIVERS_MIDI = emuxki usb_midi ;
+SYSTEM_ADD_ONS_DRIVERS_MIDI = emuxki ice1712 usb_midi ;
 SYSTEM_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)atheros813x
 	$(X86_ONLY)ar81xx $(X86_ONLY)attansic_l1 $(X86_ONLY)attansic_l2
 	$(X86_ONLY)broadcom440x $(X86_ONLY)broadcom570x $(X86_ONLY)dec21xxx etherpci
@@ -315,6 +315,12 @@ SYSTEM_LIBS_ALIASES =
 	libnetapi.so
 	$(SYSTEM_LIBS_LIBGL_ALIASES)
 ;
+
+# libfreetype.so links to the current freetype lib
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_FREETYPE_CURRENT_LIB:BS)
+	: $(HAIKU_FREETYPE_CURRENT_LINK) : : true ;
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_FREETYPE_CURRENT_LINK)
+	: libfreetype.so : : true ;
 
 # servers
 AddFilesToHaikuImage system servers : $(SYSTEM_SERVERS) ;

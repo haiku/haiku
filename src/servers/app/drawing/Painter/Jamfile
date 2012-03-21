@@ -9,7 +9,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src servers app ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app font ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter drawing_modes ] ;
-UseFreeTypeHeaders ;
+UseHeaders $(HAIKU_FREETYPE_HEADERS) : true ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) drawing_modes ] ;
 

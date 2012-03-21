@@ -323,7 +323,7 @@ dp_aux_set_i2c_byte(uint32 hwPin, uint16 address, uint8* data, bool end)
 uint32
 dp_get_link_clock(uint32 connectorIndex)
 {
-	uint16 encoderID = gConnector[connectorIndex]->encoder.objectID;
+	uint16 encoderID = gConnector[connectorIndex]->encoderExternal.objectID;
 
 	if (encoderID == ENCODER_OBJECT_ID_NUTMEG)
 		return 270000;

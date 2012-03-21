@@ -215,14 +215,14 @@ if $(TARGET_ARCH) = x86 {
 local ffmpegBaseURL = http://haiku-files.org/files/optional-packages/lib ;
 if $(TARGET_ARCH) = x86 {
 	if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		HAIKU_FFMPEG_FILE = ffmpeg-0.10-x86-gcc4-2012-03-14.zip ;
+		HAIKU_FFMPEG_FILE = ffmpeg-0.10-x86-gcc4-2012-03-19.zip ;
 		HAIKU_SPEEX_FILE = speex-1.2rc1-x86-gcc4-2012-03-12.zip ;
 		HAIKU_LIBTHEORA_FILE = libtheora-1.1.1-x86-gcc4-2012-03-12.zip ;
 		HAIKU_LIBVORBIS_FILE = libvorbis-1.3.2-x86-gcc4-2012-03-12.zip ;
 		HAIKU_LIBOGG_FILE = libogg-1.3.0-x86-gcc4-2012-03-12.zip ;
 		HAIKU_LIBVPX_FILE = libvpx-1.0.0-x86-gcc4-2012-03-14.zip ;
 	} else {
-		HAIKU_FFMPEG_FILE = ffmpeg-0.10-x86-gcc2-2012-03-14.zip ;
+		HAIKU_FFMPEG_FILE = ffmpeg-0.10-x86-gcc2-2012-03-19.zip ;
 		HAIKU_SPEEX_FILE = speex-1.2rc1-x86-gcc2-2012-03-11.zip ;
 		HAIKU_LIBTHEORA_FILE = libtheora-1.1.1-x86-gcc2-2012-03-11.zip ;
 		HAIKU_LIBVORBIS_FILE = libvorbis-1.3.2-x86-gcc2-2012-03-11.zip ;
@@ -330,6 +330,49 @@ if $(TARGET_ARCH) = x86 {
 
 } else {
 	Echo "FFMpeg support not available on $(TARGET_ARCH)" ;
+}
+
+
+# Freetype
+local freetypeBaseURL = http://haiku-files.org/files/optional-packages/lib ;
+if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 {
+	if $(TARGET_ARCH) = ppc {
+		HAIKU_FREETYPE_FILE = freetype-2.4.6-ppc-gcc4-2012-03-17.zip ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		HAIKU_FREETYPE_FILE = freetype-2.4.6-x86-gcc4-2012-03-15.zip ;
+	} else {
+		HAIKU_FREETYPE_FILE = freetype-2.4.6-x86-gcc2-2012-03-15.zip ;
+	}
+
+	local freetypeZipFile = [ DownloadFile $(HAIKU_FREETYPE_FILE)
+		: $(freetypeBaseURL)/$(HAIKU_FREETYPE_FILE) ] ;
+
+	HAIKU_FREETYPE_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_FREETYPE_FILE:B) ] ;
+
+	HAIKU_FREETYPE_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_FREETYPE_DIR)
+		: develop/headers/3rdparty/freetype2 : $(freetypeZipFile)
+		: extracted-freetype ] ;
+
+	HAIKU_FREETYPE_LIB = [ ExtractArchive $(HAIKU_FREETYPE_DIR)
+		:
+		common/lib/libfreetype.so
+		: $(freetypeZipFile)
+		: extracted-freetype ] ;
+	HAIKU_FREETYPE_CURRENT_LIB = [ ExtractArchive $(HAIKU_FREETYPE_DIR)
+		:
+		common/lib/libfreetype.so.6.7.1
+		: $(freetypeZipFile)
+		: extracted-freetype ] ;
+	Depends $(HAIKU_FREETYPE_LIBS) : $(HAIKU_FREETYPE_HEADERS_DEPENDENCY) ;
+
+	HAIKU_FREETYPE_CURRENT_LINK = libfreetype.so.6 ;
+
+	HAIKU_FREETYPE_HEADERS = [ FDirName $(HAIKU_FREETYPE_DIR) develop
+		headers 3rdparty ] [ FDirName $(HAIKU_FREETYPE_DIR) develop
+		headers 3rdparty freetype2 ] ;
+} else {
+	Echo "Freetype support not available on $(TARGET_ARCH)" ;
 }
 
 

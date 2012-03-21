@@ -29,4 +29,8 @@
 #	define TRACE_VV(a...) ;
 #endif
 
+#define ASSERT(a) if (a) {} else TRACE("ASSERT failed! file = %s, line = %d\n",\
+	__FILE__,__LINE__)
+	
+
 #endif // _DEBUG_ICE1712_H_

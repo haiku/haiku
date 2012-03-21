@@ -248,7 +248,8 @@ VideoConsumer::CreateBuffers(const media_format& format)
 			fBufferMap[i] = buffer;
 		} else {
 			ERROR("VideoConsumer::CreateBuffers - ERROR CREATING VIDEO RING "
-				"BUFFER (%ld): %s\n", i, strerror(status));
+				"BUFFER (Index %ld Width %ld Height %ld Colorspace %d: %s\n",
+				i, width, height, colorSpace, strerror(status));
 			return status;
 		}	
 	}
