@@ -295,11 +295,14 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 		case ENCODER_OBJECT_ID_INTERNAL_DAC2:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC2:
 			encoder_analog_setup(connectorIndex, pixelClock, ATOM_ENABLE);
-			if ((encoderFlags
-				& (ATOM_DEVICE_TV_SUPPORT | ATOM_DEVICE_CV_SUPPORT)) != 0) {
-				encoder_tv_setup(connectorIndex, pixelClock, ATOM_ENABLE);
-			} else {
-				encoder_tv_setup(connectorIndex, pixelClock, ATOM_DISABLE);
+			if (info.dceMajor < 5) {
+				// TV encoder was dropped in DCE 5
+				if ((encoderFlags & ATOM_DEVICE_TV_SUPPORT != 0)
+					|| (encoderFlags & ATOM_DEVICE_CV_SUPPORT) != 0) {
+					encoder_tv_setup(connectorIndex, pixelClock, ATOM_ENABLE);
+				} else {
+					encoder_tv_setup(connectorIndex, pixelClock, ATOM_DISABLE);
+				}
 			}
 			break;
 		case ENCODER_OBJECT_ID_INTERNAL_TMDS1:
