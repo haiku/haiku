@@ -222,7 +222,7 @@ if $(TARGET_ARCH) = x86 {
 		HAIKU_LIBOGG_FILE = libogg-1.3.0-x86-gcc4-2012-03-12.zip ;
 		HAIKU_LIBVPX_FILE = libvpx-1.0.0-x86-gcc4-2012-03-14.zip ;
 	} else {
-		HAIKU_FFMPEG_FILE = ffmpeg-0.10-x86-gcc2-2012-03-19.zip ;
+		HAIKU_FFMPEG_FILE = ffmpeg-0.10-x86-gcc2-2012-03-22.zip ;
 		HAIKU_SPEEX_FILE = speex-1.2rc1-x86-gcc2-2012-03-11.zip ;
 		HAIKU_LIBTHEORA_FILE = libtheora-1.1.1-x86-gcc2-2012-03-11.zip ;
 		HAIKU_LIBVORBIS_FILE = libvorbis-1.3.2-x86-gcc2-2012-03-11.zip ;

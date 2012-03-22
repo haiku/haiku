@@ -106,10 +106,10 @@ AVCodecEncoder::~AVCodecEncoder()
 		fFrame->linesize[1] = 0;
 		fFrame->linesize[2] = 0;
 		fFrame->linesize[3] = 0;
-		free(fFrame);
+		av_free(fFrame);
 	}
 
-	free(fOwnContext);
+	av_free(fOwnContext);
 
 	delete[] fChunkBuffer;
 }

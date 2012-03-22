@@ -127,9 +127,9 @@ AVCodecDecoder::~AVCodecDecoder()
 	if (fCodecInitDone)
 		avcodec_close(fContext);
 
-	free(fOutputPicture);
-	free(fInputPicture);
-	free(fContext);
+	av_free(fOutputPicture);
+	av_free(fInputPicture);
+	av_free(fContext);
 
 #if USE_SWS_FOR_COLOR_SPACE_CONVERSION
 	if (fSwsContext != NULL)
