@@ -674,8 +674,8 @@ connector_probe()
 			}
 
 			// Set up information buses such as ddc
-			if ((connectorFlags
-				& (ATOM_DEVICE_TV_SUPPORT | ATOM_DEVICE_CV_SUPPORT)) == 0) {
+			if (((connectorFlags & ATOM_DEVICE_TV_SUPPORT) == 0)
+				&& (connectorFlags & ATOM_DEVICE_CV_SUPPORT) == 0) {
 				for (j = 0; j < connectorObject->ucNumberOfObjects; j++) {
 					if (B_LENDIAN_TO_HOST_INT16(path->usConnObjectId)
 						== B_LENDIAN_TO_HOST_INT16(
