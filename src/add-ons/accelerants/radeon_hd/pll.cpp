@@ -134,6 +134,177 @@ pll_limit_probe(pll_info* pll)
 }
 
 
+status_t
+pll_dp_ss_probe(pll_info* pll)
+{
+	uint8 tableMajor;
+	uint8 tableMinor;
+	uint16 headerOffset;
+	uint16 headerSize;
+
+	int index = GetIndexIntoMasterTable(DATA, PPLL_SS_Info);
+	if (atom_parse_data_header(gAtomContext, index, &headerSize,
+		&tableMajor, &tableMinor, &headerOffset) != B_OK) {
+		ERROR("%s: Couldn't parse data header\n", __func__);
+		return B_ERROR;
+	}
+
+	struct _ATOM_SPREAD_SPECTRUM_INFO *ss_info
+		= (struct _ATOM_SPREAD_SPECTRUM_INFO*)((uint16*)gAtomContext->bios
+		+ headerOffset);
+
+	int indices = (headerSize - sizeof(ATOM_COMMON_TABLE_HEADER))
+		/ sizeof(ATOM_SPREAD_SPECTRUM_ASSIGNMENT);
+
+	int i;
+	for (i = 0; i < indices; i++) {
+		if (ss_info->asSS_Info[i].ucSS_Id == pll->id) {
+			pll->ssPercentage = B_LENDIAN_TO_HOST_INT16(
+				ss_info->asSS_Info[i].usSpreadSpectrumPercentage);
+			pll->ssType = ss_info->asSS_Info[i].ucSpreadSpectrumType;
+			pll->ssStep = ss_info->asSS_Info[i].ucSS_Step;
+			pll->ssDelay = ss_info->asSS_Info[i].ucSS_Delay;
+			pll->ssRange = ss_info->asSS_Info[i].ucSS_Range;
+			pll->ssReferenceDiv
+				= ss_info->asSS_Info[i].ucRecommendedRef_Div;
+			return B_OK;
+		}
+	}
+
+	pll->ssPercentage = 0;
+	pll->ssType = 0;
+	pll->ssStep = 0;
+	pll->ssDelay = 0;
+	pll->ssRange = 0;
+	pll->ssReferenceDiv = 0;
+	return B_ERROR;
+}
+
+
+status_t
+pll_asic_ss_probe(pll_info* pll)
+{
+	uint8 tableMajor;
+	uint8 tableMinor;
+	uint16 headerOffset;
+	uint16 headerSize;
+
+	int index = GetIndexIntoMasterTable(DATA, ASIC_InternalSS_Info);
+	if (atom_parse_data_header(gAtomContext, index, &headerSize,
+		&tableMajor, &tableMinor, &headerOffset) != B_OK) {
+		ERROR("%s: Couldn't parse data header\n", __func__);
+		return B_ERROR;
+	}
+
+	union asicSSInfo {
+		struct _ATOM_ASIC_INTERNAL_SS_INFO info;
+		struct _ATOM_ASIC_INTERNAL_SS_INFO_V2 info_2;
+		struct _ATOM_ASIC_INTERNAL_SS_INFO_V3 info_3;
+	};
+
+	union asicSSInfo *ss_info
+		= (union asicSSInfo*)((uint16*)gAtomContext->bios + headerOffset);
+
+	int i;
+	int indices;
+	switch (tableMajor) {
+		case 1:
+			indices = (headerSize - sizeof(ATOM_COMMON_TABLE_HEADER))
+				/ sizeof(ATOM_ASIC_SS_ASSIGNMENT);
+
+			for (i = 0; i < indices; i++) {
+				if (ss_info->info.asSpreadSpectrum[i].ucClockIndication
+					!= pll->id) {
+					continue;
+				}
+				TRACE("%s: ss match found\n", __func__);
+				if (pll->pixelClock > B_LENDIAN_TO_HOST_INT32(
+					ss_info->info.asSpreadSpectrum[i].ulTargetClockRange)) {
+					TRACE("%s: pixelClock > targetClockRange!\n", __func__);
+					continue;
+				}
+
+				pll->ssPercentage = B_LENDIAN_TO_HOST_INT16(
+					ss_info->info.asSpreadSpectrum[i].usSpreadSpectrumPercentage
+					);
+
+				pll->ssType
+					= ss_info->info.asSpreadSpectrum[i].ucSpreadSpectrumMode;
+				pll->ssRate = B_LENDIAN_TO_HOST_INT16(
+					ss_info->info.asSpreadSpectrum[i].usSpreadRateInKhz);
+				return B_OK;
+			}
+			break;
+		case 2:
+			indices = (headerSize - sizeof(ATOM_COMMON_TABLE_HEADER))
+				/ sizeof(ATOM_ASIC_SS_ASSIGNMENT_V2);
+
+			for (i = 0; i < indices; i++) {
+				if (ss_info->info_2.asSpreadSpectrum[i].ucClockIndication
+					!= pll->id) {
+					continue;
+				}
+				TRACE("%s: ss match found\n", __func__);
+				if (pll->pixelClock > B_LENDIAN_TO_HOST_INT32(
+					ss_info->info_2.asSpreadSpectrum[i].ulTargetClockRange)) {
+					TRACE("%s: pixelClock > targetClockRange!\n", __func__);
+					continue;
+				}
+
+				pll->ssPercentage = B_LENDIAN_TO_HOST_INT16(
+					ss_info
+						->info_2.asSpreadSpectrum[i].usSpreadSpectrumPercentage
+					);
+
+				pll->ssType
+					= ss_info->info_2.asSpreadSpectrum[i].ucSpreadSpectrumMode;
+				pll->ssRate = B_LENDIAN_TO_HOST_INT16(
+					ss_info->info_2.asSpreadSpectrum[i].usSpreadRateIn10Hz);
+				return B_OK;
+			}
+			break;
+		case 3:
+			indices = (headerSize - sizeof(ATOM_COMMON_TABLE_HEADER))
+				/ sizeof(ATOM_ASIC_SS_ASSIGNMENT_V3);
+
+			for (i = 0; i < indices; i++) {
+				if (ss_info->info_3.asSpreadSpectrum[i].ucClockIndication
+					!= pll->id) {
+					continue;
+				}
+				TRACE("%s: ss match found\n", __func__);
+				if (pll->pixelClock > B_LENDIAN_TO_HOST_INT32(
+					ss_info->info_3.asSpreadSpectrum[i].ulTargetClockRange)) {
+					TRACE("%s: pixelClock > targetClockRange!\n", __func__);
+					continue;
+				}
+
+				pll->ssPercentage = B_LENDIAN_TO_HOST_INT16(
+					ss_info
+						->info_3.asSpreadSpectrum[i].usSpreadSpectrumPercentage
+					);
+
+				pll->ssType
+					= ss_info->info_3.asSpreadSpectrum[i].ucSpreadSpectrumMode;
+				pll->ssRate = B_LENDIAN_TO_HOST_INT16(
+					ss_info->info_3.asSpreadSpectrum[i].usSpreadRateIn10Hz);
+				return B_OK;
+			}
+			break;
+		default:
+			ERROR("%s: Unknown SS table version!\n", __func__);
+			return B_ERROR;
+	}
+
+	pll->ssPercentage = 0;
+	pll->ssType = 0;
+	pll->ssRate = 0;
+
+	ERROR("%s: No potential spread spectrum data found!\n", __func__);
+	return B_ERROR;
+}
+
+
 void
 pll_compute_post_divider(pll_info* pll)
 {
@@ -494,6 +665,12 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 	pll_compute(pll);
 		// compute dividers
 
+	pll_asic_ss_probe(pll);
+		// probe spread spectrum metrics (TODO: pll_dp_ss_probe)
+	display_crtc_ss(crtcID, ATOM_DISABLE);
+		// disable ss
+
+
 	uint8 tableMajor;
 	uint8 tableMinor;
 
@@ -624,5 +801,10 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 	TRACE("%s: set adjusted pixel clock %" B_PRIu32 " (was %" B_PRIu32 ")\n",
 		__func__, pll->pixelClock, pixelClock);
 
-	return atom_execute_table(gAtomContext, index, (uint32*)&args);
+	status_t result = atom_execute_table(gAtomContext, index, (uint32*)&args);
+
+	//display_crtc_ss(crtcID, ATOM_ENABLE);
+	// Not yet, lets avoid this.
+
+	return result;
 }
