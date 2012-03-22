@@ -191,8 +191,8 @@ pll_compute(pll_info* pll)
 
 	if ((pll->flags & PLL_USE_REF_DIV) != 0) {
 		TRACE("%s: using AtomBIOS reference divider\n", __func__);
-		return B_OK;
 	} else {
+		TRACE("%s: using minimum reference divider\n", __func__);
 		pll->referenceDiv = pll->minRefDiv;
 	}
 
@@ -335,7 +335,6 @@ pll_setup_flags(pll_info* pll, uint8 crtcID)
 status_t
 pll_adjust(pll_info* pll, uint8 crtcID)
 {
-	// TODO: PLL flags
 	radeon_shared_info &info = *gInfo->shared_info;
 
 	uint32 pixelClock = pll->pixelClock;
@@ -420,8 +419,6 @@ pll_adjust(pll_info* pll, uint8 crtcID)
 								= B_LENDIAN_TO_HOST_INT16(dpLinkSpeed / 10);
 						} else if ((encoderFlags & ATOM_DEVICE_DFP_SUPPORT)
 							!= 0) {
-							TRACE("%s: encoderFlags are DFP but not DP mode.\n",
-								__func__);
 							#if 0
 							if (encoderMode == ATOM_ENCODER_MODE_HDMI) {
 								/* deep color support */
