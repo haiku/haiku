@@ -1773,7 +1773,7 @@ encoder_output_lock(bool lock)
 }
 
 
-static const char* encoder_name_matrix[36] = {
+static const char* encoder_name_matrix[37] = {
 	"NONE",
 	"Internal Radeon LVDS",
 	"Internal Radeon TMDS1",
@@ -1809,7 +1809,8 @@ static const char* encoder_name_matrix[36] = {
 	"Internal Kaleidoscope UNIPHY1",
 	"Internal Kaleidoscope UNIPHY2",
 	"External Travis Bridge",
-	"External Nutmeg Bridge"
+	"External Nutmeg Bridge",
+	"Internal Kaleidoscope VCE"
 };
 
 
