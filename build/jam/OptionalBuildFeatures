@@ -364,7 +364,7 @@ if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 {
 		common/lib/libfreetype.so.6.7.1
 		: $(freetypeZipFile)
 		: extracted-freetype ] ;
-	Depends $(HAIKU_FREETYPE_LIBS) : $(HAIKU_FREETYPE_HEADERS_DEPENDENCY) ;
+	Depends $(HAIKU_FREETYPE_LIB) $(HAIKU_FREETYPE_CURRENT_LIB) : $(HAIKU_FREETYPE_HEADERS_DEPENDENCY) ;
 
 	HAIKU_FREETYPE_CURRENT_LINK = libfreetype.so.6 ;
 
