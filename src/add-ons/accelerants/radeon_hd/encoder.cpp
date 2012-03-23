@@ -297,7 +297,7 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 			encoder_analog_setup(connectorIndex, pixelClock, ATOM_ENABLE);
 			if (info.dceMajor < 5) {
 				// TV encoder was dropped in DCE 5
-				if ((encoderFlags & ATOM_DEVICE_TV_SUPPORT != 0)
+				if ((encoderFlags & ATOM_DEVICE_TV_SUPPORT) != 0
 					|| (encoderFlags & ATOM_DEVICE_CV_SUPPORT) != 0) {
 					encoder_tv_setup(connectorIndex, pixelClock, ATOM_ENABLE);
 				} else {

@@ -769,6 +769,136 @@ display_crtc_set_dtd(uint8 crtcID, display_mode* mode)
 
 
 void
+display_crtc_ss(uint8 crtcID, int command)
+{
+	TRACE("%s\n", __func__);
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	int index = GetIndexIntoMasterTable(COMMAND, EnableSpreadSpectrumOnPPLL);
+
+	if (command != ATOM_DISABLE) {
+		ERROR("%s: TODO: SS was enabled, however functionality incomplete\n",
+			__func__);
+		command = ATOM_DISABLE;
+	}
+
+	union enableSS {
+		ENABLE_LVDS_SS_PARAMETERS lvds_ss;
+		ENABLE_LVDS_SS_PARAMETERS_V2 lvds_ss_2;
+		ENABLE_SPREAD_SPECTRUM_ON_PPLL_PS_ALLOCATION v1;
+		ENABLE_SPREAD_SPECTRUM_ON_PPLL_V2 v2;
+		ENABLE_SPREAD_SPECTRUM_ON_PPLL_V3 v3;
+	};
+
+	union enableSS args;
+	memset(&args, 0, sizeof(args));
+
+	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
+	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
+
+	if (info.dceMajor >= 5) {
+		args.v3.usSpreadSpectrumAmountFrac = B_HOST_TO_LENDIAN_INT16(0);
+		args.v3.ucSpreadSpectrumType
+			= pll->ssType & ATOM_SS_CENTRE_SPREAD_MODE_MASK;
+		switch (pll->id) {
+			case ATOM_PPLL1:
+				args.v3.ucSpreadSpectrumType |= ATOM_PPLL_SS_TYPE_V3_P1PLL;
+				args.v3.usSpreadSpectrumAmount
+					= B_HOST_TO_LENDIAN_INT16(pll->ssAmount);
+				args.v3.usSpreadSpectrumStep
+					= B_HOST_TO_LENDIAN_INT16(pll->ssStep);
+				break;
+			case ATOM_PPLL2:
+				args.v3.ucSpreadSpectrumType |= ATOM_PPLL_SS_TYPE_V3_P2PLL;
+				args.v3.usSpreadSpectrumAmount
+					= B_HOST_TO_LENDIAN_INT16(pll->ssAmount);
+				args.v3.usSpreadSpectrumStep
+					= B_HOST_TO_LENDIAN_INT16(pll->ssStep);
+				break;
+			case ATOM_DCPLL:
+				args.v3.ucSpreadSpectrumType |= ATOM_PPLL_SS_TYPE_V3_DCPLL;
+				args.v3.usSpreadSpectrumAmount = B_HOST_TO_LENDIAN_INT16(0);
+				args.v3.usSpreadSpectrumStep = B_HOST_TO_LENDIAN_INT16(0);
+				break;
+			default:
+				ERROR("%s: BUG: Invalid PLL ID!\n", __func__);
+				return;
+		}
+		if (pll->ssPercentage == 0
+			|| ((pll->ssType & ATOM_EXTERNAL_SS_MASK) != 0)) {
+			command = ATOM_DISABLE;
+		}
+		args.v3.ucEnable = command;
+	} else if (info.dceMajor >= 4) {
+		args.v2.usSpreadSpectrumPercentage
+			= B_HOST_TO_LENDIAN_INT16(pll->ssPercentage);
+		args.v2.ucSpreadSpectrumType
+			= pll->ssType & ATOM_SS_CENTRE_SPREAD_MODE_MASK;
+		switch (pll->id) {
+			case ATOM_PPLL1:
+				args.v2.ucSpreadSpectrumType |= ATOM_PPLL_SS_TYPE_V2_P1PLL;
+				args.v2.usSpreadSpectrumAmount
+					= B_HOST_TO_LENDIAN_INT16(pll->ssAmount);
+				args.v2.usSpreadSpectrumStep
+					= B_HOST_TO_LENDIAN_INT16(pll->ssStep);
+				break;
+			case ATOM_PPLL2:
+				args.v2.ucSpreadSpectrumType |= ATOM_PPLL_SS_TYPE_V3_P2PLL;
+				args.v2.usSpreadSpectrumAmount
+					= B_HOST_TO_LENDIAN_INT16(pll->ssAmount);
+				args.v2.usSpreadSpectrumStep
+					= B_HOST_TO_LENDIAN_INT16(pll->ssStep);
+				break;
+			case ATOM_DCPLL:
+				args.v2.ucSpreadSpectrumType |= ATOM_PPLL_SS_TYPE_V3_DCPLL;
+				args.v2.usSpreadSpectrumAmount = B_HOST_TO_LENDIAN_INT16(0);
+				args.v2.usSpreadSpectrumStep = B_HOST_TO_LENDIAN_INT16(0);
+				break;
+			default:
+				ERROR("%s: BUG: Invalid PLL ID!\n", __func__);
+				return;
+		}
+		if (pll->ssPercentage == 0
+			|| ((pll->ssType & ATOM_EXTERNAL_SS_MASK) != 0)
+			|| (info.chipsetFlags & CHIP_APU) != 0 ) {
+			command = ATOM_DISABLE;
+		}
+		args.v2.ucEnable = command;
+	} else if (info.dceMajor >= 3) {
+		args.v1.usSpreadSpectrumPercentage
+			= B_HOST_TO_LENDIAN_INT16(pll->ssPercentage);
+		args.v1.ucSpreadSpectrumType
+			= pll->ssType & ATOM_SS_CENTRE_SPREAD_MODE_MASK;
+		args.v1.ucSpreadSpectrumStep = pll->ssStep;
+		args.v1.ucSpreadSpectrumDelay = pll->ssDelay;
+		args.v1.ucSpreadSpectrumRange = pll->ssRange;
+		args.v1.ucPpll = pll->id;
+		args.v1.ucEnable = command;
+	} else if (info.dceMajor >= 2) {
+		if ((command == ATOM_DISABLE) || (pll->ssPercentage == 0)
+			|| (pll->ssType & ATOM_EXTERNAL_SS_MASK)) {
+			// TODO: gpu_ss_disable needs pll id
+			radeon_gpu_ss_disable();
+			return;
+		}
+		args.lvds_ss_2.usSpreadSpectrumPercentage
+			= B_HOST_TO_LENDIAN_INT16(pll->ssPercentage);
+		args.lvds_ss_2.ucSpreadSpectrumType
+			= pll->ssType & ATOM_SS_CENTRE_SPREAD_MODE_MASK;
+		args.lvds_ss_2.ucSpreadSpectrumStep = pll->ssStep;
+		args.lvds_ss_2.ucSpreadSpectrumDelay = pll->ssDelay;
+		args.lvds_ss_2.ucSpreadSpectrumRange = pll->ssRange;
+		args.lvds_ss_2.ucEnable = command;
+	} else {
+		ERROR("%s: TODO: Old card SS control\n", __func__);
+		return;
+	}
+
+	atom_execute_table(gAtomContext, index, (uint32*)&args);
+}
+
+
+void
 display_crtc_power(uint8 crtcID, int command)
 {
 	TRACE("%s\n", __func__);

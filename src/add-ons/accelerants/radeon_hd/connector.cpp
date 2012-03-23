@@ -631,7 +631,7 @@ connector_probe()
 							}
 
 							// External encoders are behind DVO or UNIPHY
-							if(encoder_is_external(encoderID)) {
+							if (encoder_is_external(encoderID)) {
 								encoder_info* encoder
 									= &connector->encoderExternal;
 								encoder->isExternal = true;

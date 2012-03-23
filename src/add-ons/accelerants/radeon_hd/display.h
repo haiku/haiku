@@ -20,6 +20,7 @@ status_t detect_displays();
 void debug_displays();
 
 uint32 display_get_encoder_mode(uint32 connectorIndex);
+void display_crtc_ss(uint8 crtcID, int command);
 void display_crtc_lock(uint8 crtcID, int command);
 void display_crtc_blank(uint8 crtcID, int command);
 void display_crtc_dpms(uint8 crtcID, int mode);
