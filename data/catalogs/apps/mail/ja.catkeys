@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-MAIL	1742262728
+1	japanese	x-vnd.Be-MAIL	2834665561
 View	Mail		表示
 %d - Date	Mail		%d - 日付
 Attach attributes:	Mail		属性の添付：
@@ -107,6 +107,16 @@ No matches	Mail		一致しません
 The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		メールサービスが起動されていないため、このメッセージは処理待ちとなりメールサービス起動後に処理されます。
 Really delete this signature? This cannot be undone.	Mail		署名を削除しますか？削除した書名は復元できませんので、ご注意ください。
 Open	Mail		開く
+draft	B_USER_DIRECTORY/mail/draft		下書き
+Quote	Mail		引用符をつける
+Add	Mail		追加
+Next message	Mail		次のメッセージ
+User interface	Mail		インターフェースの設定
+Cancel	Mail		中止
+Send message	Mail		メッセージを送信
+Remove enclosure	Mail		添付ファイルを削除
+Account:	Mail		アカウント：
+Decoding:	Mail		文字コード：
 Sorry, could not find an application that supports the 'Person' data type.	Mail		People データ形式をサポートするアプリケーションが見つかりませんでした。
 Do you wish to send this message before closing?	Mail		閉じる前にこのメッセージを送信しますか？
 Delete	Mail		削除
@@ -116,6 +126,15 @@ Mail couldn't find its dictionary.	Mail		スペルチェック用辞書データ
 Reply preamble:	Mail		返信の前書き：
 Signatures	Mail		署名
 Next	Mail		次へ
+Set to…	Mail		他の属性に変更…
+Use default account	Mail		標準アカウントを使う
+Sorry	Mail		失礼
+Encoding:	Mail		文字コード：
+Font:	Mail		フォント：
+(Address unavailable)	Mail		(アドレスは利用できません)
+Save address	Mail		アドレスを保存
+Queries	Mail		クエリ
+Do you wish to save this message as a draft before closing?	Mail		メッセージを閉じる前に下書きとして保存しますか？
 Save	Mail		保存
 Random	Mail		ランダム
 Close and 	Mail		閉じる
@@ -125,3 +144,20 @@ Open attachment	Mail		添付ファイルを開く
 sent	B_USER_DIRECTORY/mail/sent		送信済みメール
 (Date unavailable)	Mail		(日付が利用できません)
 Put your favorite e-mail queries and query templates in this folder.	Mail		お気に入りの電子メールクエリーとクエリーテンプレートをこのフォルダーに入れてください。
+Reply	Mail		返信
+From:	Mail		差出人：
+Couldn't open this signature. Sorry.	Mail		この署名を開くことはできませんでした。
+Open draft	Mail		下書きを開く
+Cut	Mail		切り取り
+Check spelling	Mail		スペルチェック
+Set to Saved	Mail		「保存済み」に設定
+Open this link	Mail		このリンクを開く
+Auto signature:	Mail		署名の自動追加：
+Add signature	Mail		署名を追加
+Need Tracker to move items to trash	Mail		メッセージを削除するには Tracker が必要です。
+Mailing	Mail		メールの設定
+Unread	Mail		未読
+Remove quote	Mail		引用を削除
+Move to trash	Mail		ごみ箱に捨てる
+Select all	Mail		すべて選択
+An error occurred trying to save this signature.	Mail		署名の保存の際にエラーが発生しました。 
