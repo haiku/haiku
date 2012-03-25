@@ -473,16 +473,15 @@ pll_setup_flags(pll_info* pll, uint8 crtcID)
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 
-	if ((info.dceMajor >= 3 && info.dceMinor >= 2)
-		&& pll->pixelClock > 200000) {
-		pll->flags |= PLL_PREFER_HIGH_FB_DIV;
-	} else
-		pll->flags |= PLL_PREFER_LOW_REF_DIV;
+	uint32 dceVersion = (info.dceMajor * 100) + info.dceMinor;
 
+	if (dceVersion >= 302 && pll->pixelClock > 200000)
+		pll->flags |= PLL_PREFER_HIGH_FB_DIV;
+	else
+		pll->flags |= PLL_PREFER_LOW_REF_DIV;
 
 	if (info.chipsetID < RADEON_RV770)
 		pll->flags |= PLL_PREFER_MINM_OVER_MAXP;
-
 
 	if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
 		pll->flags |= PLL_IS_LCD;
@@ -530,6 +529,7 @@ pll_adjust(pll_info* pll, uint8 crtcID)
 		int index = GetIndexIntoMasterTable(COMMAND, AdjustDisplayPll);
 		if (atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor)
 			!= B_OK) {
+			ERROR("%s: Couldn't find AtomBIOS PLL adjustment\n", __func__);
 			return B_ERROR;
 		}
 
