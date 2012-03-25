@@ -17,7 +17,7 @@ void encoder_assign_crtc(uint8 crtcID);
 uint32 encoder_pick_dig(uint32 connectorIndex);
 
 void encoder_apply_quirks(uint8 crtcID);
-void encoder_mode_set(uint8 id, uint32 pixelClock);
+void encoder_mode_set(uint8 crtcID);
 status_t encoder_analog_setup(uint32 connectorIndex,
 	uint32 pixelClock, int command);
 status_t encoder_digital_setup(uint32 connectorIndex,

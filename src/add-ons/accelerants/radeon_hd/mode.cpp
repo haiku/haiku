@@ -193,7 +193,7 @@ radeon_set_display_mode(display_mode* mode)
 		display_crtc_scale(id, mode);
 
 		// *** encoder mode set
-		encoder_mode_set(id, mode->timing.pixel_clock);
+		encoder_mode_set(id);
 
 		// *** CRT controler commit
 		display_crtc_dpms(id, B_DPMS_ON);

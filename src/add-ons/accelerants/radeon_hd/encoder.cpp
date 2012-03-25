@@ -282,12 +282,16 @@ encoder_apply_quirks(uint8 crtcID)
 
 
 void
-encoder_mode_set(uint8 id, uint32 pixelClock)
+encoder_mode_set(uint8 crtcID)
 {
 	TRACE("%s\n", __func__);
 	radeon_shared_info &info = *gInfo->shared_info;
-	uint32 connectorIndex = gDisplay[id]->connectorIndex;
+	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	uint16 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
+
+	// Adjusted pixel clock (*NOT* original mode pixel clock)
+	uint32 pixelClock = pll->pixelClock;
 
 	switch (gConnector[connectorIndex]->encoder.objectID) {
 		case ENCODER_OBJECT_ID_INTERNAL_DAC1:
@@ -367,7 +371,7 @@ encoder_mode_set(uint8 id, uint32 pixelClock)
 		}
 	}
 
-	encoder_apply_quirks(id);
+	encoder_apply_quirks(crtcID);
 }
 
 
