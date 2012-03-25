@@ -40,14 +40,16 @@ static const uint32 kMsgUpdateModifier		= 'upmd';
 static const uint32 kMsgApplyModifiers 		= 'apmd';
 static const uint32 kMsgRevertModifiers		= 'rvmd';
 
+static int32 kInitialSwitchRight;
+
 
 #undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Modifier Keys window"
+#define B_TRANSLATE_CONTEXT "Modifier keys window"
 
 
 ModifierKeysWindow::ModifierKeysWindow()
 	:
-	BWindow(BRect(80, 50, 400, 260), B_TRANSLATE("Modifier Keys"),
+	BWindow(BRect(80, 50, 400, 260), B_TRANSLATE("Modifier keys"),
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
 		| B_AUTO_UPDATE_SIZE_LIMITS)
 {
@@ -65,23 +67,27 @@ ModifierKeysWindow::ModifierKeysWindow()
 		BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	BStringView* optionStringView
-		= new BStringView("option", B_TRANSLATE("Option:"));
+		= new BStringView("option", B_TRANSLATE("Win/Option:"));
 	optionStringView->SetExplicitMaxSize(
 		BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	BStringView* commandStringView
-		= new BStringView("command", B_TRANSLATE("Command:"));
+		= new BStringView("command", B_TRANSLATE("Alt/Command:"));
 	commandStringView->SetExplicitMaxSize(
 		BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
-	fCancelButton = new BButton("CancelButton", B_TRANSLATE("Cancel"),
+	fSwitchRight = new BCheckBox("switchRight",
+		B_TRANSLATE("Switch right Alt/Command and Win/Option keys"),
+		new BMessage(kMsgUpdateModifier));
+
+	fCancelButton = new BButton("cancelButton", B_TRANSLATE("Cancel"),
 		new BMessage(B_QUIT_REQUESTED));
 
 	fRevertButton = new BButton("revertButton", B_TRANSLATE("Revert"),
 		new BMessage(kMsgRevertModifiers));
 	fRevertButton->SetEnabled(false);
 
-	fOkButton = new BButton("OkButton", B_TRANSLATE("OK"),
+	fOkButton = new BButton("okButton", B_TRANSLATE("OK"),
 		new BMessage(kMsgApplyModifiers));
 	fOkButton->MakeDefault(true);
 
@@ -103,6 +109,7 @@ ModifierKeysWindow::ModifierKeysWindow()
 			.Add(_CreateCommandMenuField(), 1, 3)
 		)
 		.AddGlue()
+		.Add(fSwitchRight)
 		.AddGroup(B_HORIZONTAL, 10)
 			.Add(fCancelButton)
 			.AddGlue()
@@ -111,6 +118,10 @@ ModifierKeysWindow::ModifierKeysWindow()
 		.End()
 		.SetInsets(10, 10, 10, 10)
 	);
+
+	// TODO: Figure out a way to set this based on current modifiers
+	kInitialSwitchRight = B_CONTROL_OFF;
+	fSwitchRight->SetValue(kInitialSwitchRight);
 
 	CenterOnScreen();
 }
@@ -184,15 +195,23 @@ ModifierKeysWindow::MessageReceived(BMessage* message)
 					break;
 			}
 
-			fRevertButton->SetEnabled(memcmp(fCurrentMap, fSavedMap,
-				sizeof(key_map)));
+			fRevertButton->SetEnabled(
+				kInitialSwitchRight != fSwitchRight->Value()
+				|| memcmp(fCurrentMap, fSavedMap, sizeof(key_map)));
 			break;
 		}
 
-		// Ok button
+		// OK button
 		case kMsgApplyModifiers:
 		{
 			BMessage* updateModifiers = new BMessage(kMsgUpdateModifiers);
+
+			if (fSwitchRight->Value() != kInitialSwitchRight) {
+				int32 rightOptionKey = fCurrentMap->right_option_key;
+				int32 rightCommandKey = fCurrentMap->right_command_key;
+				fCurrentMap->right_option_key = rightCommandKey;
+				fCurrentMap->right_command_key = rightOptionKey;
+			}
 
 			if (fCurrentMap->caps_key != fSavedMap->caps_key)
 				updateModifiers->AddUInt32("caps_key", fCurrentMap->caps_key);
@@ -239,6 +258,8 @@ ModifierKeysWindow::MessageReceived(BMessage* message)
 
 		// Revert button
 		case kMsgRevertModifiers:
+			fSwitchRight->SetValue(kInitialSwitchRight);
+
 			memcpy(fCurrentMap, fSavedMap, sizeof(key_map));
 
 			_MarkMenuItems();
@@ -316,8 +337,7 @@ ModifierKeysWindow::_CreateOptionMenuField()
 		BMenuItem* item = new BMenuItem(B_TRANSLATE(_KeyToString(key)),
 			message);
 
-		if (fCurrentMap->left_option_key == _KeyToKeyCode(key)
-			&& fCurrentMap->right_option_key == _KeyToKeyCode(key, true))
+		if (fCurrentMap->left_option_key == _KeyToKeyCode(key))
 			item->SetMarked(true);
 
 		fOptionMenu->AddItem(item, key);
@@ -340,8 +360,7 @@ ModifierKeysWindow::_CreateCommandMenuField()
 		BMenuItem* item = new BMenuItem(B_TRANSLATE(_KeyToString(key)),
 			message);
 
-		if (fCurrentMap->left_command_key == _KeyToKeyCode(key)
-			&& fCurrentMap->right_command_key == _KeyToKeyCode(key, true))
+		if (fCurrentMap->left_command_key == _KeyToKeyCode(key))
 			item->SetMarked(true);
 
 		fCommandMenu->AddItem(item, key);

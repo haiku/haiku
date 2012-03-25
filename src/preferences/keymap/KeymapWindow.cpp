@@ -418,7 +418,7 @@ KeymapWindow::_CreateMenu()
 		new BMessage(kMsgMenuFileSaveAs)));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem(
-		B_TRANSLATE("Set Modifier Keys" B_UTF8_ELLIPSIS),
+		B_TRANSLATE("Set modifier keys" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgShowModifierKeysWindow)));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),

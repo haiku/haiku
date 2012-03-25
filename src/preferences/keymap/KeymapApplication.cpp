@@ -44,7 +44,7 @@ KeymapApplication::MessageReceived(BMessage* message)
 void
 KeymapApplication::_ShowModifierKeysWindow()
 {
-	if (fModifierKeysWindow)
+	if (fModifierKeysWindow != NULL)
 		fModifierKeysWindow->Activate();
 	else {
 		fModifierKeysWindow = new ModifierKeysWindow();

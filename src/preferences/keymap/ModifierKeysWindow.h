@@ -10,6 +10,7 @@
 
 
 #include <Button.h>
+#include <CheckBox.h>
 #include <InterfaceDefs.h>
 #include <MenuField.h>
 #include <PopUpMenu.h>
@@ -38,7 +39,9 @@ private:
 			BPopUpMenu*		fControlMenu;
 			BPopUpMenu*		fOptionMenu;
 			BPopUpMenu*		fCommandMenu;
-                            
+
+			BCheckBox*		fSwitchRight;
+
 			BButton*		fRevertButton;
 			BButton*		fCancelButton;
 			BButton*		fOkButton;
