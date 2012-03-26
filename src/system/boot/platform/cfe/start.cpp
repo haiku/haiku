@@ -23,7 +23,7 @@
 #define HEAP_SIZE 65536
 
 
-extern "C" void _start(uint64 handle, uint64 entry, uint32 _unused, 
+extern "C" uint32 _start(uint64 handle, uint64 entry, uint32 _unused, 
 	uint32 signature);
 extern "C" void start(uint64 cfeHandle, uint64 cfeEntry);
 
@@ -93,16 +93,17 @@ platform_boot_options(void)
 }
 
 
-extern "C" void
+extern "C" uint32
 _start(uint64 handle, uint64 entry, uint32 _unused, uint32 signature)
 {
 
 	if (signature != CFE_EPTSEAL)
-		return;//XXX:something?
+		return 123;//XXX:something?
 
 	clear_bss();
 	call_ctors();
 		// call C++ constructors before doing anything else
+	//return 456;
 
 	start(handle, entry);
 }
@@ -134,6 +135,10 @@ start(uint64 cfeHandle, uint64 cfeEntry)
 	determine_machine();
 #endif
 	console_init();
+
+	// XXX:FIXME: doesn't even land here.
+	dprintf("testing...\n");
+	while (true);
 
 #if 0//OF
 	if ((gMachine & MACHINE_QEMU) != 0)
