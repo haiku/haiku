@@ -113,7 +113,7 @@ mmap(void* address, size_t length, int protection, int flags, int fd,
 	int mapping = (flags & MAP_SHARED) != 0
 		? REGION_NO_PRIVATE_MAP : REGION_PRIVATE_MAP;
 
-	uint32 addressSpec = B_ANY_ADDRESS;
+	uint32 addressSpec = address == NULL ? B_ANY_ADDRESS : B_BASE_ADDRESS;
 	if ((flags & MAP_FIXED) != 0)
 		addressSpec = B_EXACT_ADDRESS;
 
