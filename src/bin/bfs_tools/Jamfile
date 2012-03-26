@@ -12,7 +12,7 @@ StdBinCommands
 	bfswhich.cpp
 	recover.cpp
 
-	: libbfs_tools.a be : $(haiku-utils_rsrc
+	: libbfs_tools.a be $(TARGET_LIBSTDC++) : $(haiku-utils_rsrc)
 ;
 
 SubInclude HAIKU_TOP src bin bfs_tools lib ;

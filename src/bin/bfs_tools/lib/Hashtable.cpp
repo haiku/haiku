@@ -192,7 +192,7 @@ void Hashtable::Rewind()
 
 
 void
-Hashtable::MakeEmpty(int8 keyMode = HASH_EMPTY_NONE,int8 valueMode = HASH_EMPTY_NONE)
+Hashtable::MakeEmpty(int8 keyMode,int8 valueMode)
 {
 	fModCount++;
 

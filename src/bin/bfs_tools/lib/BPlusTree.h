@@ -7,6 +7,8 @@
 
 #include <List.h>
 
+#include <string.h>
+
 #include "Cache.h"
 #include "bfs.h"
 
@@ -158,7 +160,7 @@ class BPlusTree {
 		bool		CheckNode(bplustree_node *node);
 
 	private:
-		friend NodeCache;
+		friend class NodeCache;
 		bplustree_node *Node(off_t nodeoffset,bool check = true);
 
 	private:

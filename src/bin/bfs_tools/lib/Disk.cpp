@@ -235,7 +235,7 @@ Disk::DumpBootBlockToFile()
 
 
 status_t 
-Disk::ScanForSuperBlock(off_t start = 0, off_t stop = -1)
+Disk::ScanForSuperBlock(off_t start, off_t stop)
 {
 	printf("Disk size %Ld bytes, %.2f GB\n", fSize, 1.0 * fSize / (1024*1024*1024));
 

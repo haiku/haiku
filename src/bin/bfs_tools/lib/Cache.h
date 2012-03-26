@@ -8,6 +8,8 @@
 
 #include <SupportDefs.h>
 
+#include <stdio.h>
+
 
 template<class T> class Cache
 {

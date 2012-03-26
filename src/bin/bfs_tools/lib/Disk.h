@@ -9,6 +9,8 @@
 #include <File.h>
 #include <Path.h>
 
+#include <string.h>
+
 #include "Bitmap.h"
 #include "bfs.h"
 #include "Cache.h"
