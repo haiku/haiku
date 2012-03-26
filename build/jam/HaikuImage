@@ -27,7 +27,7 @@ if $(HAIKU_ATA_STACK) = 1 {
 	IDE_ONLY = "" ;
 }
 
-SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep
+SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bfsinfo
 	cal cat catattr checkfs checkitout chgrp chmod chop chown chroot cksum clear
 	clockconfig cmp collectcatkeys comm compress copyattr CortexAddOnHost cp
 	csplit cut date dc dd desklink df diff diff3 dircolors dirname

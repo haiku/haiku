@@ -241,7 +241,7 @@ DoCatalogs filepanel
 SubInclude HAIKU_TOP src bin addattr ;
 SubInclude HAIKU_TOP src bin bash ;
 SubInclude HAIKU_TOP src bin bc ;
-SubInclude HAIKU_TOP src bin mail_utils ;
+SubInclude HAIKU_TOP src bin bfs_tools ;
 SubInclude HAIKU_TOP src bin compress ;
 SubInclude HAIKU_TOP src bin consoled ;
 SubInclude HAIKU_TOP src bin coreutils ;
@@ -261,6 +261,7 @@ SubInclude HAIKU_TOP src bin listdev ;
 SubInclude HAIKU_TOP src bin locale ;
 SubInclude HAIKU_TOP src bin makebootable ;
 #SubInclude HAIKU_TOP src bin makeudfimage ;
+SubInclude HAIKU_TOP src bin mail_utils ;
 SubInclude HAIKU_TOP src bin mkdos ;
 SubInclude HAIKU_TOP src bin mkfs ;
 SubInclude HAIKU_TOP src bin multiuser ;

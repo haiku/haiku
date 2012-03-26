@@ -1,0 +1,322 @@
+/*
+ * Copyright 2001-2010, pinc Software. All Rights Reserved.
+ */
+
+//!	BFS structure dump and helper functions
+
+#include "BPlusTree.h"
+#include "Inode.h"
+#include "dump.h"
+
+#include <File.h>
+#include <Mime.h>
+
+#include <stdio.h>
+#include <string.h>
+
+#define Print printf
+
+
+char *
+get_tupel(uint32 id)
+{
+	static unsigned char tupel[5];
+
+	tupel[0] = 0xff & (id >> 24);
+	tupel[1] = 0xff & (id >> 16);
+	tupel[2] = 0xff & (id >> 8);
+	tupel[3] = 0xff & (id);
+	tupel[4] = 0;
+	for (int16 i = 0;i < 4;i++)
+		if (tupel[i] < ' ' || tupel[i] > 128)
+			tupel[i] = '.';
+
+	return (char *)tupel;
+}
+
+
+void
+dump_block_run(const char *prefix, const block_run &run, const char *postfix)
+{
+	Print("%s(%ld, %d, %d)%s\n", prefix, run.allocation_group,
+		run.start, run.length, postfix);
+}
+
+
+void
+dump_super_block(const disk_super_block *superBlock)
+{
+	Print("disk_super_block:\n");
+	Print("  name           = %s\n", superBlock->name);
+	Print("  magic1         = %#08lx (%s) %s\n", superBlock->magic1,
+		get_tupel(superBlock->magic1),
+		superBlock->magic1 == SUPER_BLOCK_MAGIC1 ? "valid" : "INVALID");
+	Print("  fs_byte_order  = %#08lx (%s, %s endian)\n",
+		superBlock->fs_byte_order, get_tupel(superBlock->fs_byte_order),
+		superBlock->fs_byte_order == SUPER_BLOCK_FS_LENDIAN ? "little" : "big");
+	Print("  block_size     = %lu\n", superBlock->block_size);
+	Print("  block_shift    = %lu\n", superBlock->block_shift);
+	Print("  num_blocks     = %Lu\n", superBlock->num_blocks);
+	Print("  used_blocks    = %Lu\n", superBlock->used_blocks);
+	Print("  inode_size     = %lu\n", superBlock->inode_size);
+	Print("  magic2         = %#08lx (%s) %s\n", superBlock->magic2,
+		get_tupel(superBlock->magic2),
+		superBlock->magic2 == (int)SUPER_BLOCK_MAGIC2 ? "valid" : "INVALID");
+	Print("  blocks_per_ag  = %lu\n", superBlock->blocks_per_ag);
+	Print("  ag_shift       = %lu\n", superBlock->ag_shift);
+	Print("  num_ags        = %lu\n", superBlock->num_ags);
+	Print("  flags          = %#08lx (%s)\n", superBlock->flags,
+		get_tupel(superBlock->flags));
+	dump_block_run("  log_blocks     = ", superBlock->log_blocks);
+	Print("  log_start      = %Lu\n", superBlock->log_start);
+	Print("  log_end        = %Lu\n", superBlock->log_end);
+	Print("  magic3         = %#08lx (%s) %s\n", superBlock->magic3,
+		get_tupel(superBlock->magic3),
+		superBlock->magic3 == SUPER_BLOCK_MAGIC3 ? "valid" : "INVALID");
+	dump_block_run("  root_dir       = ", superBlock->root_dir);
+	dump_block_run("  indices        = ", superBlock->indices);
+}
+
+
+void
+dump_data_stream(const bfs_inode *inode, const data_stream *stream, bool showOffsets)
+{
+	Print("data_stream:\n");
+
+	off_t offset = 0;
+
+	for (int i = 0; i < NUM_DIRECT_BLOCKS; i++) {
+		if (!stream->direct[i].IsZero()) {
+			Print("  direct[%02d]                = ", i);
+
+			char buffer[256];
+			if (showOffsets)
+				snprintf(buffer, sizeof(buffer), " %16lld", offset);
+			else
+				buffer[0] = '\0';
+
+			dump_block_run("", stream->direct[i], buffer);
+
+			offset += stream->direct[i].length * inode->inode_size;
+		}
+	}
+	Print("  max_direct_range          = %Lu\n", stream->max_direct_range);
+
+	if (!stream->indirect.IsZero())
+		dump_block_run("  indirect                  = ", stream->indirect);
+
+	Print("  max_indirect_range        = %Lu\n", stream->max_indirect_range);
+
+	if (!stream->double_indirect.IsZero()) {
+		dump_block_run("  double_indirect           = ",
+			stream->double_indirect);
+	}
+
+	Print("  max_double_indirect_range = %Lu\n",
+		stream->max_double_indirect_range);
+	Print("  size                      = %Lu\n", stream->size);
+}
+
+
+void
+dump_inode(const Inode *nameNode, const bfs_inode *inode, bool showOffsets)
+{
+	if (nameNode != NULL)
+		Print("inode \"%s\":\n", nameNode->Name());
+	else
+		Print("inode:\n");
+
+	Print("  magic1             = %08lx (%s) %s\n",inode->magic1,
+			get_tupel(inode->magic1), (inode->magic1 == INODE_MAGIC1 ? "valid" : "INVALID"));
+	dump_block_run(	"  inode_num          = ",inode->inode_num);
+	Print("  uid                = %lu\n",inode->uid);
+	Print("  gid                = %lu\n",inode->gid);
+	Print("  mode               = %10lo (octal)\n",inode->mode);
+	Print("  flags              = %08lx\n",inode->flags);
+
+	time_t time;
+	time = (time_t)(inode->create_time >> 16);
+	Print("  create_time        = %s",ctime(&time));
+	time = (time_t)(inode->last_modified_time >> 16);
+	Print("  last_modified_time = %s",ctime(&time));
+
+	dump_block_run(	"  parent             = ",inode->parent);
+	dump_block_run(	"  attributes         = ",inode->attributes);
+	Print("  type               = %lu\n",inode->type);
+	Print("  inode_size         = %lu\n",inode->inode_size);
+	Print("  etc                = %#08lx\n",inode->etc);
+	Print("  short_symlink      = %s\n",
+		S_ISLNK(inode->mode) && (inode->flags & INODE_LONG_SYMLINK) == 0
+			? inode->short_symlink : "-");
+
+	dump_data_stream(inode, &inode->data, showOffsets);
+	Print("  --\n");
+#if 0
+	Print("  --\n  pad[0]             = %08lx\n", inode->pad[0]);
+	Print("  pad[1]             = %08lx\n", inode->pad[1]);
+	Print("  pad[2]             = %08lx\n", inode->pad[2]);
+	Print("  pad[3]             = %08lx\n", inode->pad[3]);
+#endif
+}
+
+
+void
+dump_small_data(Inode *inode)
+{
+	if (inode == NULL || inode->InodeBuffer() == NULL)
+		return;
+
+	small_data *item = NULL;
+
+	printf("small data section (max. %ld bytes):\n",
+		inode->InodeBuffer()->inode_size - sizeof(struct bfs_inode));
+
+	while (inode->GetNextSmallData(&item) == B_OK) {
+		printf("%#08lx (%s), name = \"%s\", ", item->type, get_tupel(item->type), item->Name());
+		if (item->type == FILE_NAME_TYPE
+			|| item->type == B_STRING_TYPE
+			|| item->type == B_MIME_STRING_TYPE)
+			printf("data = \"%s\", ", item->Data());
+
+		printf("%u bytes\n", item->data_size);
+	}
+}
+
+
+void
+dump_bplustree_header(const bplustree_header* header)
+{
+	printf("bplustree_header:\n");
+	printf("  magic                = %#08lx (%s) %s\n", header->magic,
+		get_tupel(header->magic),
+		header->magic == BPLUSTREE_MAGIC ? "valid" : "INVALID");
+	printf("  node_size            = %lu\n", header->node_size);
+	printf("  max_number_of_levels = %lu\n", header->max_number_of_levels);
+	printf("  data_type            = %lu\n", header->data_type);
+	printf("  root_node_pointer    = %Ld\n", header->root_node_pointer);
+	printf("  free_node_pointer    = %Ld\n", header->free_node_pointer);
+	printf("  maximum_size         = %Lu\n", header->maximum_size);
+}
+
+
+void
+dump_bplustree_node(const bplustree_node* node, const bplustree_header* header,
+	Disk* disk)
+{
+	Print("bplustree_node (%s node):\n",
+		node->overflow_link == BPLUSTREE_NULL ? "leaf" : "index");
+	Print("  left_link      = %Ld\n", node->left_link);
+	Print("  right_link     = %Ld\n", node->right_link);
+	Print("  overflow_link  = %Ld\n", node->overflow_link);
+	Print("  all_key_count  = %u\n", node->all_key_count);
+	Print("  all_key_length = %u\n", node->all_key_length);
+
+	if (header == NULL)
+		return;
+
+	if (node->all_key_count > node->all_key_length
+		|| uint32(node->all_key_count * 10) > (uint32)header->node_size) {
+		Print("\n");
+		dump_block((char *)node, header->node_size, sizeof(off_t));
+		return;
+	}
+
+	Print("\n");
+	for (int32 i = 0;i < node->all_key_count;i++) {
+		uint16 length;
+		char* key = (char *)node->KeyAt(i, &length);
+		if (length > 255) {
+			Print("  %2ld. Invalid length (%u)!!\n", i, length);
+			dump_block((char *)node, header->node_size, sizeof(off_t));
+			break;
+		}
+
+		char buffer[256];
+		memcpy(buffer, key, length);
+		buffer[length] = '\0';
+
+		off_t *value = node->Values() + i;
+		if ((uint32)value < (uint32)node || (uint32)value > (uint32)node + header->node_size)
+			Print("  %2ld. Invalid Offset!!\n",i);
+		else {
+			Print("  %2ld. ",i);
+			if (header->data_type == BPLUSTREE_STRING_TYPE)
+				Print("\"%s\"",buffer);
+			else if (header->data_type == BPLUSTREE_INT32_TYPE) {
+				Print("int32 = %ld (0x%lx)", *(int32 *)&buffer,
+					*(int32 *)&buffer);
+			} else if (header->data_type == BPLUSTREE_UINT32_TYPE) {
+				Print("uint32 = %lu (0x%lx)", *(uint32 *)&buffer,
+					*(uint32 *)&buffer);
+			} else if (header->data_type == BPLUSTREE_INT64_TYPE) {
+				Print("int64 = %Ld (0x%Lx)", *(int64 *)&buffer,
+					*(int64 *)&buffer);
+			} else
+				Print("???");
+
+			off_t offset = *value & 0x3fffffffffffffffLL;
+			Print(" (%d bytes) -> %Ld",length,offset);
+			if (disk != NULL) {
+				block_run run = disk->ToBlockRun(offset);
+				Print(" (%ld, %d)", run.allocation_group, run.start);
+			}
+			if (bplustree_node::LinkType(*value)
+					== BPLUSTREE_DUPLICATE_FRAGMENT) {
+				Print(" (duplicate fragment %Ld)\n", *value & 0x3ff);
+			} else if (bplustree_node::LinkType(*value)
+					== BPLUSTREE_DUPLICATE_NODE) {
+				Print(" (duplicate node)\n");
+			} else
+				Print("\n");
+		}
+	}
+}
+
+
+void
+dump_block(const char *buffer, uint32 size, int8 valueSize)
+{
+	const uint32 kBlockSize = 16;
+
+	for (uint32 i = 0; i < size;) {
+		uint32 start = i;
+
+		for (; i < start + kBlockSize; i++) {
+			if (!(i % 4))
+				Print(" ");
+
+			if (i >= size)
+				Print("  ");
+			else
+				Print("%02x", *(unsigned char *)(buffer + i));
+		}
+		Print("  ");
+
+		for (i = start; i < start + kBlockSize; i++) {
+			if (i < size) {
+				char c = *(buffer + i);
+
+				if (c < 30)
+					Print(".");
+				else
+					Print("%c",c);
+			}
+			else
+				break;
+		}
+
+		if (valueSize > 0) {
+			Print("  (");
+			for (uint32 offset = start; offset < start + kBlockSize;
+					offset += valueSize) {
+				if (valueSize == sizeof(off_t))
+					Print("%s%Ld", offset == start ? "" : ", ",
+						*(off_t *)(buffer + offset));
+			}
+			Print(")");
+		}
+
+		Print("\n");
+	}
+}
+

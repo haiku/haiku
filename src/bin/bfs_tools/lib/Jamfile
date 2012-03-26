@@ -1,0 +1,13 @@
+SubDir HAIKU_TOP src bin bfs_tools lib ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+StaticLibrary libbfs_tools.a :
+	bfs.cpp
+	Bitmap.cpp
+	BPlusTree.cpp
+	Disk.cpp
+	dump.cpp
+	Hashtable.cpp
+	Inode.cpp
+;

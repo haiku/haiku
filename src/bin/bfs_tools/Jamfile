@@ -1,0 +1,18 @@
+SubDir HAIKU_TOP src bin bfs_tools ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+SubDirHdrs $(HAIKU_TOP) src bin bfs_tools lib ;
+
+local haiku-utils_rsrc = [ FGristFiles haiku-utils.rsrc ] ;
+
+StdBinCommands
+	bfsinfo.cpp
+	chkindex.cpp
+	bfswhich.cpp
+	recover.cpp
+
+	: libbfs_tools.a be : $(haiku-utils_rsrc
+;
+
+SubInclude HAIKU_TOP src bin bfs_tools lib ;
