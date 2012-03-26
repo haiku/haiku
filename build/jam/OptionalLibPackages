@@ -324,8 +324,8 @@ if [ IsOptionalHaikuImagePackageAdded XiphLibs ] {
 			libvorbis-1.3.2-r1a3-x86-gcc4-2011-05-26.zip
 			: $(baseURL)/lib/libvorbis-1.3.2-r1a3-x86-gcc4-2011-05-26.zip ;
 		InstallOptionalHaikuImagePackage
-			speex-1.2-git-r1a3-x86-gcc4-2011-05-26.zip
-			: $(baseURL)/lib/speex-1.2-git-r1a3-x86-gcc4-2011-05-26.zip ;
+			speex-1.2rc1-x86-gcc4-2012-03-12.zip
+			: $(baseURL)/lib/speex-1.2rc1-x86-gcc4-2012-03-12.zip ;
 		InstallOptionalHaikuImagePackage
 			vorbis-tools-1.4.0-r1a3-x86-gcc4-2011-05-26.zip
 			: $(baseURL)/lib/vorbis-tools-1.4.0-r1a3-x86-gcc4-2011-05-26.zip ;
