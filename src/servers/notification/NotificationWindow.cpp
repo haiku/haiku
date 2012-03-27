@@ -520,6 +520,8 @@ NotificationWindow::_LoadDisplaySettings(bool startMonitor)
 
 	if (settings.FindFloat(kWidthName, &fWidth) != B_OK)
 		fWidth = kDefaultWidth;
+	GetLayout()->SetExplicitMaxSize(BSize(fWidth, B_SIZE_UNSET));
+	GetLayout()->SetExplicitMinSize(BSize(fWidth, B_SIZE_UNSET));
 
 	if (settings.FindInt32(kIconSizeName, &setting) != B_OK)
 		fIconSize = kDefaultIconSize;
