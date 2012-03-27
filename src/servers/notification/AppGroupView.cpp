@@ -206,7 +206,7 @@ AppGroupView::AddInfo(NotificationView* view)
 
 	if (IsHidden())
 		Show();
-	if (view->IsHidden() && !fCollapsed)
+	if (view->IsHidden(view) && !fCollapsed)
 		view->Show();
 }
 
