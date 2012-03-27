@@ -516,24 +516,19 @@ NotificationView::MessageID() const
 }
 
 
-BSize
+void
 NotificationView::_CalculateSize()
 {
-	BSize size;
-
-	size.width = 300;
-	size.height = fHeight;
+	float height = fHeight;
 
 	if (fNotification->Type() == B_PROGRESS_NOTIFICATION) {
 		font_height fh;
 		be_plain_font->GetHeight(&fh);
 		float fontHeight = fh.ascent + fh.descent + fh.leading;
-		size.height += 9 + (kSmallPadding * 2) + (kEdgePadding * 1)
+		height += 9 + (kSmallPadding * 2) + (kEdgePadding * 1)
 			+ fontHeight * 2;
 	}
 
-	SetExplicitMinSize(size);
-	SetExplicitMaxSize(size);
-
-	return size;
+	SetExplicitMinSize(BSize(0, height));
+	SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, height));
 }

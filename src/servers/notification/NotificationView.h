@@ -51,7 +51,7 @@ public:
 			const char*			MessageID() const;
 
 private:
-			BSize				_CalculateSize();
+			void				_CalculateSize();
 
 			struct LineInfo {
 				BFont	font;
