@@ -369,31 +369,6 @@ NotificationView::MouseDown(BPoint point)
 }
 
 
-/*
-BSize
-NotificationView::MinSize()
-{
-//	return BLayoutUtils::ComposeSize(ExplicitMinSize(), _CalculateSize());
-	return _CalculateSize();
-}
-
-
-BSize
-NotificationView::MaxSize()
-{
-	return _CalculateSize();
-}
-
-
-BSize
-NotificationView::PreferredSize()
-{
-	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(),
-		_CalculateSize());
-}
-*/
-
-
 BHandler*
 NotificationView::ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec,
 	int32 form, const char* prop)
