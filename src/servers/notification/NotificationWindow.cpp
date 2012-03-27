@@ -325,6 +325,17 @@ NotificationWindow::_ShowHide()
 
 
 void
+NotificationWindow::NotificationViewSwapped(NotificationView* stale,
+	NotificationView* fresh)
+{
+	views_t::iterator it = find(fViews.begin(), fViews.end(), stale);
+
+	if (it != fViews.end())
+		*it = fresh;
+}
+
+
+void
 NotificationWindow::SetPosition()
 {
 	Layout(true);

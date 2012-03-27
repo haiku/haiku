@@ -57,6 +57,10 @@ public:
 private:
 	friend class AppGroupView;
 
+			void					NotificationViewSwapped(
+										NotificationView* stale,
+										NotificationView* fresh);
+
 			void					SetPosition();
 			void					_LoadSettings(bool startMonitor = false);
 			void					_LoadAppFilters(bool startMonitor = false);

@@ -185,11 +185,10 @@ AppGroupView::AddInfo(NotificationView* view)
 
 		for (int32 i = 0; i < children; i++) {
 			if (id == fInfo[i]->MessageID()) {
-				// TODO: because NotificationWindow also tracks these
-				// views, we may be heading towards a use-after-free with
-				// this code.
-				GetLayout()->RemoveView(fInfo[i]);
-				delete fInfo[i];
+				NotificationView* oldView = fInfo[i];
+				fParent->NotificationViewSwapped(oldView, view);
+				GetLayout()->RemoveView(oldView);
+				delete oldView;
 				
 				fInfo[i] = view;
 				found = true;
