@@ -558,9 +558,10 @@ BFormattingConventions::Use24HourClock() const
 		GetTimeFormat(B_MEDIUM_TIME_FORMAT, format);
 		fCachedUse24HourClock
 			= FormatUsesAmPm(format) ? CLOCK_HOURS_12 : CLOCK_HOURS_24;
+		return fCachedUse24HourClock == CLOCK_HOURS_24;
 	}
 
-	return fCachedUse24HourClock == CLOCK_HOURS_24;
+	return fExplicitUse24HourClock == CLOCK_HOURS_24;
 }
 
 
