@@ -1,10 +1,11 @@
 /*
- * Copyright 2004-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2012, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Jérôme Duval
  *		Axel Dörfler, axeld@pinc-software.de.
+ *		John Scipione, jscipione@gmail.com.
  */
 
 
@@ -36,8 +37,8 @@ enum dead_key_index {
 };
 
 
-static const uint32 kModifierKeys = B_SHIFT_KEY | B_COMMAND_KEY | B_CONTROL_KEY
-	| B_CAPS_LOCK | B_OPTION_KEY | B_MENU_KEY;
+static const uint32 kModifierKeys = B_SHIFT_KEY | B_CAPS_LOCK | B_CONTROL_KEY
+	| B_OPTION_KEY | B_COMMAND_KEY | B_MENU_KEY;
 
 
 BKeymap::BKeymap()
@@ -365,8 +366,19 @@ BKeymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey,
 
 	// here we get the char size
 	*numBytes = fChars[offset];
-	if (!*numBytes)
-		return;
+	if (*numBytes <= 0) {
+		// if key is not mapped in the option table, fall-through.
+		if ((modifiers & B_OPTION_KEY) != 0) {
+			offset = Offset(keyCode, modifiers & ~B_OPTION_KEY);
+			if (offset < 0)
+				return;
+			// get the char size again
+			*numBytes = fChars[offset];
+			if (*numBytes <= 0)
+				return;
+		} else
+			return;
+	}
 
 	// here we take an potential active dead key
 	const int32* deadKey;
@@ -481,6 +493,10 @@ BKeymap::Offset(uint32 keyCode, uint32 modifiers, uint32* _table) const
 			offset = fKeys.caps_shift_map[keyCode];
 			table = B_CAPS_SHIFT_TABLE;
 			break;
+		case B_CONTROL_KEY:
+			offset = fKeys.control_map[keyCode];
+			table = B_CONTROL_TABLE;
+			break;
 		case B_OPTION_KEY:
 			offset = fKeys.option_map[keyCode];
 			table = B_OPTION_TABLE;
@@ -496,10 +512,6 @@ BKeymap::Offset(uint32 keyCode, uint32 modifiers, uint32* _table) const
 		case B_OPTION_KEY | B_SHIFT_KEY | B_CAPS_LOCK:
 			offset = fKeys.option_caps_shift_map[keyCode];
 			table = B_OPTION_CAPS_SHIFT_TABLE;
-			break;
-		case B_CONTROL_KEY:
-			offset = fKeys.control_map[keyCode];
-			table = B_CONTROL_TABLE;
 			break;
 		default:
 			offset = fKeys.normal_map[keyCode];

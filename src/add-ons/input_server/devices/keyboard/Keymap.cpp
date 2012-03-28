@@ -30,12 +30,12 @@ print_key(char* chars, int32 offset)
 	switch (size) {
 		case 0:
 			// Not mapped
-			printf("N/A");
+			fputs("N/A", stdout);
 			break;
 
 		case 1:
-			// 1-byte UTF-8/ASCII character
-			printf("%c", chars[offset]);
+			// single-byte UTF-8/ASCII character
+			fputc(chars[offset], stdout);
 			break;
 
 		default:
@@ -47,13 +47,13 @@ print_key(char* chars, int32 offset)
 
 			strncpy(str, &(chars[offset]), size);
 			str[size] = 0;
-			printf("%s", str);
+			fputs(str, stdout);
 			delete [] str;
 			break;
 		}
 	}
 
-	printf("\t");
+	fputs("\t", stdout);
 }
 
 
@@ -74,22 +74,25 @@ Keymap::~Keymap()
 void
 Keymap::DumpKeymap()
 {
-	// Print a chart of the normal, shift, option, and option+shift
-	// keys.
-	printf("Key #\tNormal\tShift\tCaps\tC+S\tOption\tO+S\tO+C\tO+C+S\tControl\n");
+	if (fKeys.version != 3)
+		return;
 
-	for (int i = 0; i < 128; i++) {
-		printf(" 0x%x\t", i);
+	// Print a chart of the normal, shift, control, option, option+shift,
+	// Caps, Caps+shift, Caps+option, and Caps+option+shift keys.
+	puts("Key #\tn\ts\tc\to\tos\tC\tCs\tCo\tCos\n");
+
+	for (uint8 i = 0; i < 128; i++) {
+		printf(" 0x%02x\t", i);
 		print_key(fChars, fKeys.normal_map[i]);
 		print_key(fChars, fKeys.shift_map[i]);
-		print_key(fChars, fKeys.caps_map[i]);
-		print_key(fChars, fKeys.caps_shift_map[i]);
+		print_key(fChars, fKeys.control_map[i]);
 		print_key(fChars, fKeys.option_map[i]);
 		print_key(fChars, fKeys.option_shift_map[i]);
+		print_key(fChars, fKeys.caps_map[i]);
+		print_key(fChars, fKeys.caps_shift_map[i]);
 		print_key(fChars, fKeys.option_caps_map[i]);
 		print_key(fChars, fKeys.option_caps_shift_map[i]);
-		print_key(fChars, fKeys.control_map[i]);
-		printf("\n");
+		fputs("\n", stdout);
 	}
 }
 

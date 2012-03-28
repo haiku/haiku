@@ -21,8 +21,8 @@
 #include <input_globals.h>
 
 
-static const uint32 kModifierKeys = B_SHIFT_KEY | B_COMMAND_KEY | B_CONTROL_KEY
-	| B_CAPS_LOCK | B_OPTION_KEY | B_MENU_KEY;
+static const uint32 kModifierKeys = B_SHIFT_KEY | B_CAPS_LOCK | B_CONTROL_KEY
+	| B_OPTION_KEY | B_COMMAND_KEY | B_MENU_KEY;
 
 
 static void
@@ -33,12 +33,12 @@ print_key(char *chars, int32 offset)
 	switch (size) {
 		case 0:
 			// Not mapped
-			printf("N/A");
+			fputs("N/A", stdout);
 			break;
 
 		case 1:
-			// 1-byte UTF-8/ASCII character
-			printf("%c", chars[offset]);
+			// single-byte UTF-8/ASCII character
+			fputc(chars[offset], stdout);
 			break;
 
 		default:
@@ -47,13 +47,13 @@ print_key(char *chars, int32 offset)
 			char *str = new char[size + 1];
 			strncpy(str, &chars[offset], size);
 			str[size] = 0;
-			printf("%s", str);
+			fputs(str, stdout);
 			delete[] str;
 			break;
 		}
 	}
 
-	printf("\t");
+	fputs("\t", stdout);
 }
 
 
@@ -93,22 +93,25 @@ Keymap::SetName(const char* name)
 void
 Keymap::DumpKeymap()
 {
-	// Print a chart of the normal, shift, option, and option+shift
-	// keys.
-	printf("Key #\tNormal\tShift\tCaps\tC+S\tOption\tO+S\tO+C\tO+C+S\t"
-		"Control\n");
-	for (int i = 0; i < 128; i++) {
-		printf(" 0x%x\t", i);
+	if (fKeys.version != 3)
+		return;
+
+	// Print a chart of the normal, shift, control, option, option+shift,
+	// Caps, Caps+shift, Caps+option, and Caps+option+shift keys.
+	puts("Key #\tn\ts\tc\to\tos\tC\tCs\tCo\tCos\n");
+
+	for (uint8 i = 0; i < 128; i++) {
+		printf(" 0x%02x\t", i);
 		print_key(fChars, fKeys.normal_map[i]);
 		print_key(fChars, fKeys.shift_map[i]);
-		print_key(fChars, fKeys.caps_map[i]);
-		print_key(fChars, fKeys.caps_shift_map[i]);
+		print_key(fChars, fKeys.control_map[i]);
 		print_key(fChars, fKeys.option_map[i]);
 		print_key(fChars, fKeys.option_shift_map[i]);
+		print_key(fChars, fKeys.caps_map[i]);
+		print_key(fChars, fKeys.caps_shift_map[i]);
 		print_key(fChars, fKeys.option_caps_map[i]);
 		print_key(fChars, fKeys.option_caps_shift_map[i]);
-		print_key(fChars, fKeys.control_map[i]);
-		printf("\n");
+		fputs("\n", stdout);
 	}
 }
 
@@ -190,12 +193,12 @@ Keymap::Save(const entry_ref& ref)
 status_t
 Keymap::SetModifier(uint32 keyCode, uint32 modifier)
 {
-	const uint32 kSingleKeys = B_LEFT_SHIFT_KEY | B_RIGHT_SHIFT_KEY
+	const uint32 kSingleModifierKeys = B_LEFT_SHIFT_KEY | B_RIGHT_SHIFT_KEY
 		| B_LEFT_COMMAND_KEY | B_RIGHT_COMMAND_KEY | B_LEFT_CONTROL_KEY
 		| B_RIGHT_CONTROL_KEY | B_LEFT_OPTION_KEY | B_RIGHT_OPTION_KEY;
 
-	if ((modifier & kSingleKeys) != 0)
-		modifier &= kSingleKeys;
+	if ((modifier & kSingleModifierKeys) != 0)
+		modifier &= kSingleModifierKeys;
 	else if ((modifier & kModifierKeys) != 0)
 		modifier &= kModifierKeys;
 
@@ -322,9 +325,9 @@ Keymap::SetDeadKeyTrigger(dead_key_index deadKeyIndex, const BString& trigger)
 			&fKeys.tilde_tables
 		};
 		*deadTables[deadKeyIndex - 1]
-			= B_CONTROL_TABLE | B_OPTION_CAPS_SHIFT_TABLE | B_OPTION_CAPS_TABLE
-				| B_OPTION_SHIFT_TABLE | B_OPTION_TABLE | B_CAPS_SHIFT_TABLE
-				| B_CAPS_TABLE | B_SHIFT_TABLE | B_NORMAL_TABLE;
+			= B_NORMAL_TABLE | B_SHIFT_TABLE | B_CONTROL_TABLE | B_OPTION_TABLE
+				| B_OPTION_SHIFT_TABLE | B_CAPS_TABLE | B_CAPS_SHIFT_TABLE
+				| B_OPTION_CAPS_TABLE | B_OPTION_CAPS_SHIFT_TABLE;
 
 		if (fModificationMessage != NULL)
 			fTarget.SendMessage(fModificationMessage);

@@ -32,7 +32,7 @@ KeymapApplication::MessageReceived(BMessage* message)
 		case kMsgCloseModifierKeysWindow:
 			fModifierKeysWindow = NULL;
 			break;
-		case kMsgUpdateModifiers:
+		case kMsgUpdateModifierKeys:
 			fWindow->PostMessage(message);
 			break;
 	}

@@ -276,8 +276,8 @@ BWindow::Shortcut::Matches(uint32 key, uint32 modifiers) const
 uint32
 BWindow::Shortcut::AllowedModifiers()
 {
-	return B_COMMAND_KEY | B_OPTION_KEY | B_SHIFT_KEY
-		| B_CONTROL_KEY | B_MENU_KEY;
+	return B_COMMAND_KEY | B_OPTION_KEY | B_SHIFT_KEY | B_CONTROL_KEY
+		| B_MENU_KEY;
 }
 
 
@@ -3749,6 +3749,7 @@ BWindow::_HandleKeyDown(BMessage* event)
 			message.AddBool("shortcut", true);
 
 			be_app->PostMessage(&message);
+			// eat the event
 			return true;
 		}
 

@@ -297,30 +297,33 @@ KeymapWindow::MessageReceived(BMessage* message)
 			_UpdateButtons();
 			break;
 
-		case kMsgUpdateModifiers:
+		case kMsgUpdateModifierKeys:
 		{
 			uint32 keycode;
 
-			if (message->FindUInt32("caps_key", &keycode) == B_OK)
-				fCurrentMap.Map().caps_key = keycode;
+			if (message->FindUInt32("left_shift_key", &keycode) == B_OK)
+				fCurrentMap.SetModifier(keycode, B_LEFT_SHIFT_KEY);
+
+			if (message->FindUInt32("right_shift_key", &keycode) == B_OK)
+				fCurrentMap.SetModifier(keycode, B_RIGHT_SHIFT_KEY);
 
 			if (message->FindUInt32("left_control_key", &keycode) == B_OK)
-				fCurrentMap.Map().left_control_key = keycode;
+				fCurrentMap.SetModifier(keycode, B_LEFT_CONTROL_KEY);
 
 			if (message->FindUInt32("right_control_key", &keycode) == B_OK)
-				fCurrentMap.Map().right_control_key = keycode;
+				fCurrentMap.SetModifier(keycode, B_RIGHT_CONTROL_KEY);
 
 			if (message->FindUInt32("left_option_key", &keycode) == B_OK)
-				fCurrentMap.Map().left_option_key = keycode;
+				fCurrentMap.SetModifier(keycode, B_LEFT_OPTION_KEY);
 
 			if (message->FindUInt32("right_option_key", &keycode) == B_OK)
-				fCurrentMap.Map().right_option_key = keycode;
+				fCurrentMap.SetModifier(keycode, B_RIGHT_OPTION_KEY);
 
 			if (message->FindUInt32("left_command_key", &keycode) == B_OK)
-				fCurrentMap.Map().left_command_key = keycode;
+				fCurrentMap.SetModifier(keycode, B_LEFT_COMMAND_KEY);
 
 			if (message->FindUInt32("right_command_key", &keycode) == B_OK)
-				fCurrentMap.Map().right_command_key = keycode;
+				fCurrentMap.SetModifier(keycode, B_RIGHT_COMMAND_KEY);
 
 			_UpdateButtons();
 			fKeyboardLayoutView->SetKeymap(&fCurrentMap);

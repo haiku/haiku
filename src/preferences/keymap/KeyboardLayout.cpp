@@ -99,6 +99,33 @@ KeyboardLayout::DefaultKeySize()
 int32
 KeyboardLayout::IndexForModifier(int32 modifier)
 {
+	switch(modifier) {
+		case B_CAPS_LOCK:
+			return 58;
+		case B_NUM_LOCK:
+			return 33;
+		case B_SCROLL_LOCK:
+			return 14;
+		case B_LEFT_SHIFT_KEY:
+			return 74;
+		case B_RIGHT_SHIFT_KEY:
+			return 85;
+		case B_LEFT_CONTROL_KEY:
+			return 91;
+		case B_RIGHT_CONTROL_KEY:
+			return 98;
+		case B_LEFT_OPTION_KEY:
+			return 92;
+		case B_RIGHT_OPTION_KEY:
+			return 96;
+		case B_LEFT_COMMAND_KEY:
+			return 93;
+		case B_RIGHT_COMMAND_KEY:
+			return 95;
+		case B_MENU_KEY:
+			return 97;
+	}
+
 	return 0;
 }
 

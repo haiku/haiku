@@ -23,7 +23,7 @@
 
 static const uint32 kMsgShowModifierKeysWindow = 'smkw';
 static const uint32 kMsgCloseModifierKeysWindow = 'hmkw';
-static const uint32 kMsgUpdateModifiers = 'upmd';
+static const uint32 kMsgUpdateModifierKeys = 'umks';
 
 
 class KeymapApplication : public BApplication {

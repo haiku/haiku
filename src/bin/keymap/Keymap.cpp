@@ -1,10 +1,11 @@
 /*
- * Copyright 2004-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2012, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Jérôme Duval
  *		Axel Dörfler, axeld@pinc-software.de.
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -68,7 +69,6 @@ const char keyPattern[] = "Key[[:space:]]+\\([[:alnum:]]+\\)[[:space:]]+="
 	"[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)"
 	"[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)"
 	"[[:space:]]+";
-
 
 const char acutePattern[] = "Acute[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)"
 	"[[:space:]]+=[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)[[:space:]]+";
@@ -163,24 +163,24 @@ struct re_pattern_buffer tildetabBuf;
 void
 dump_map(FILE* file, const char* name, int32* map)
 {
-	fprintf(file, "\t%s:{\n", name);
+	fprintf(file, "\t%s:\n\t{\n", name);
 
 	for (uint32 i = 0; i < 16; i++) {
-		fprintf(file, "\t\t");
+		fputs("\t\t", file);
 		for (uint32 j = 0; j < 8; j++) {
 			fprintf(file, "0x%04" B_PRIx32 ",%s", map[i * 8 + j],
 				j < 7 ? " " : "");
 		}
-		fprintf(file, "\n");
+		fputs("\n", file);
 	}
-	fprintf(file, "\t},\n");
+	fputs("\t},\n", file);
 }
 
 
 void
 dump_keys(FILE* file, const char* name, int32* keys)
 {
-	fprintf(file, "\t%s:{\n", name);
+	fprintf(file, "\t%s:\n\t{\n", name);
 
 	for (uint32 i = 0; i < 4; i++) {
 		fprintf(file, "\t\t");
@@ -188,9 +188,9 @@ dump_keys(FILE* file, const char* name, int32* keys)
 			fprintf(file, "0x%04" B_PRIx32 ",%s", keys[i * 8 + j],
 				j < 7 ? " " : "");
 		}
-		fprintf(file, "\n");
+		fputs("\n", file);
 	}
-	fprintf(file, "\t},\n");
+	fputs("\t},\n", file);
 }
 
 
@@ -229,99 +229,103 @@ Keymap::LoadSource(FILE* file)
 	reg_syntax_t syntax = RE_CHAR_CLASSES;
 	re_set_syntax(syntax);
 
-	const char* error = re_compile_pattern(versionPattern,
-		strlen(versionPattern), &versionBuf);
+	const char* error = NULL;
+
+	error = re_compile_pattern(versionPattern, strlen(versionPattern),
+		&versionBuf);
 	if (error)
-		fprintf(stderr, error);
+		fputs(error, stderr);
 	error = re_compile_pattern(capslockPattern, strlen(capslockPattern),
 		&capslockBuf);
 	if (error)
-		fprintf(stderr, error);
+		fputs(error, stderr);
 	error = re_compile_pattern(scrolllockPattern, strlen(scrolllockPattern),
 		&scrolllockBuf);
 	if (error)
-		fprintf(stderr, error);
+		fputs(error, stderr);
 	error = re_compile_pattern(numlockPattern, strlen(numlockPattern),
 		&numlockBuf);
 	if (error)
-		fprintf(stderr, error);
-	error = re_compile_pattern(lshiftPattern, strlen(lshiftPattern), &lshiftBuf);
+		fputs(error, stderr);
+	error = re_compile_pattern(lshiftPattern, strlen(lshiftPattern),
+		&lshiftBuf);
 	if (error)
-		fprintf(stderr, error);
-	error = re_compile_pattern(rshiftPattern, strlen(rshiftPattern), &rshiftBuf);
+		fputs(error, stderr);
+	error = re_compile_pattern(rshiftPattern, strlen(rshiftPattern),
+		&rshiftBuf);
 	if (error)
-		fprintf(stderr, error);
+		fputs(error, stderr);
 	error = re_compile_pattern(lcommandPattern, strlen(lcommandPattern),
 		&lcommandBuf);
 	if (error)
-		fprintf(stderr, error);
+		fputs(error, stderr);
 	error = re_compile_pattern(rcommandPattern, strlen(rcommandPattern),
 		&rcommandBuf);
 	if (error)
-		fprintf(stderr, error);
+		fputs(error, stderr);
 	error = re_compile_pattern(lcontrolPattern, strlen(lcontrolPattern),
 		&lcontrolBuf);
 	if (error)
-		fprintf(stderr, error);
+		fputs(error, stderr);
 	error = re_compile_pattern(rcontrolPattern, strlen(rcontrolPattern),
 		&rcontrolBuf);
 	if (error)
-		fprintf(stderr, error);
+		fputs(error, stderr);
 	error = re_compile_pattern(loptionPattern, strlen(loptionPattern),
 		&loptionBuf);
 	if (error)
-		fprintf(stderr, error);
+		fputs(error, stderr);
 	error = re_compile_pattern(roptionPattern, strlen(roptionPattern),
 		&roptionBuf);
 	if (error)
-		fprintf(stderr, error);
+		fputs(error, stderr);
 	error = re_compile_pattern(menuPattern, strlen(menuPattern), &menuBuf);
 	if (error)
-		fprintf(stderr, error);
-	error = re_compile_pattern(locksettingsPattern, strlen(locksettingsPattern),
-		&locksettingsBuf);
+		fputs(error, stderr);
+	error = re_compile_pattern(locksettingsPattern,
+		strlen(locksettingsPattern), &locksettingsBuf);
 	if (error)
-		fprintf(stderr, error);
+		fputs(error, stderr);
 	error = re_compile_pattern(keyPattern, strlen(keyPattern), &keyBuf);
-	if (error)
-		fprintf(stderr, error);
+		if (error)
+			fputs(error, stderr);
 	error = re_compile_pattern(acutePattern, strlen(acutePattern), &acuteBuf);
 	if (error)
-		fprintf(stderr, error);
+		fputs(error, stderr);
 	error = re_compile_pattern(gravePattern, strlen(gravePattern), &graveBuf);
 	if (error)
-		fprintf(stderr, error);
+		fputs(error, stderr);
 	error = re_compile_pattern(circumflexPattern, strlen(circumflexPattern),
 		&circumflexBuf);
 	if (error)
-		fprintf(stderr, error);
+		fputs(error, stderr);
 	error = re_compile_pattern(diaeresisPattern, strlen(diaeresisPattern),
 		&diaeresisBuf);
 	if (error)
-		fprintf(stderr, error);
+		fputs(error, stderr);
 	error = re_compile_pattern(tildePattern, strlen(tildePattern), &tildeBuf);
 	if (error)
-		fprintf(stderr, error);
+		fputs(error, stderr);
 	error = re_compile_pattern(acutetabPattern, strlen(acutetabPattern),
 		&acutetabBuf);
 	if (error)
-		fprintf(stderr, error);
+		fputs(error, stderr);
 	error = re_compile_pattern(gravetabPattern, strlen(gravetabPattern),
 		&gravetabBuf);
 	if (error)
-		fprintf(stderr, error);
+		fputs(error, stderr);
 	error = re_compile_pattern(circumflextabPattern,
 		strlen(circumflextabPattern), &circumflextabBuf);
 	if (error)
-		fprintf(stderr, error);
-	error = re_compile_pattern(diaeresistabPattern, strlen(diaeresistabPattern),
-		&diaeresistabBuf);
+		fputs(error, stderr);
+	error = re_compile_pattern(diaeresistabPattern,
+		strlen(diaeresistabPattern), &diaeresistabBuf);
 	if (error)
-		fprintf(stderr, error);
+		fputs(error, stderr);
 	error = re_compile_pattern(tildetabPattern, strlen(tildetabPattern),
 		&tildetabBuf);
 	if (error)
-		fprintf(stderr, error);
+		fputs(error, stderr);
 
 	// Read file
 
@@ -356,6 +360,7 @@ Keymap::LoadSource(FILE* file)
 		size_t length = strlen(buffer);
 
 		struct re_registers regs;
+
 		if (re_search(&versionBuf, buffer, length, 0, length, &regs) >= 0) {
 			sscanf(buffer + regs.start[1], "%" B_SCNu32, &fKeys.version);
 		} else if (re_search(&capslockBuf, buffer, length, 0, length, &regs)
@@ -399,7 +404,8 @@ Keymap::LoadSource(FILE* file)
 				>= 0) {
 			sscanf(buffer + regs.start[1], "0x%" B_SCNx32,
 				&fKeys.right_option_key);
-		} else if (re_search(&menuBuf, buffer, length, 0, length, &regs) >= 0) {
+		} else if (re_search(&menuBuf, buffer, length, 0, length, &regs)
+				>= 0) {
 			sscanf(buffer + regs.start[1], "0x%" B_SCNx32, &fKeys.menu_key);
 		} else if (re_search(&locksettingsBuf, buffer, length, 0, length, &regs)
 				>= 0) {
@@ -417,7 +423,8 @@ Keymap::LoadSource(FILE* file)
 				else if (!strncmp(start, "ScrollLock", length))
 					fKeys.lock_settings |= B_SCROLL_LOCK;
 			}
-		} else if (re_search(&keyBuf, buffer, length, 0, length, &regs) >= 0) {
+		} else if (re_search(&keyBuf, buffer, length, 0, length, &regs)
+				>= 0) {
 			uint32 keyCode;
 			if (sscanf(buffer + regs.start[1], "0x%" B_SCNx32, &keyCode) > 0) {
 				for (int i = 2; i <= 10; i++) {
@@ -425,12 +432,14 @@ Keymap::LoadSource(FILE* file)
 					_ComputeChars(buffer, regs, i, offset);
 				}
 			}
-		} else if (re_search(&acuteBuf, buffer, length, 0, length, &regs) >= 0) {
+		} else if (re_search(&acuteBuf, buffer, length, 0, length, &regs)
+				>= 0) {
 			for (int i = 1; i <= 2; i++) {
 				fKeys.acute_dead_key[acuteOffset++] = offset;
 				_ComputeChars(buffer, regs, i, offset);
 			}
-		} else if (re_search(&graveBuf, buffer, length, 0, length, &regs) >= 0) {
+		} else if (re_search(&graveBuf, buffer, length, 0, length, &regs)
+				>= 0) {
 			for (int i = 1; i <= 2; i++) {
 				fKeys.grave_dead_key[graveOffset++] = offset;
 				_ComputeChars(buffer, regs, i, offset);
@@ -613,13 +622,20 @@ Keymap::SaveAsCppHeader(const char* fileName, const char* mapName)
 	if (file == NULL)
 		return errno;
 
-	fprintf(file, "/*\n"
-		" * Haiku Keymap\n"
-		" * This file is generated automatically. Don't edit!\n"
-		" */\n\n");
-	fprintf(file, "#include <InterfaceDefs.h>\n\n");
+	fputs("/*\n"
+		" * Haiku Default System Keymap\n"
+		" * This file is automatically generated. Do not edit!\n"
+		" */\n", file);
+	fputs("#ifndef\t_SYSTEM_KEYMAP_H\n"
+		"#define\t_SYSTEM_KEYMAP_H\n\n\n", file);
+	fputs("#include <InterfaceDefs.h>\n\n\n", file);
+	fputs("#ifdef __cplusplus\n"
+		"extern \"C\" {\n"
+		"#endif\n\n", file);
 	fprintf(file, "const char *kSystemKeymapName = \"%s\";\n\n", name.String());
-	fprintf(file, "const key_map kSystemKeymap = {\n");
+	fputs("const key_map kSystemKeymap = {\n", file);
+
+	// version, default lock settings, modifier keys
 	fprintf(file, "\tversion:%" B_PRIu32 ",\n", fKeys.version);
 	fprintf(file, "\tcaps_key:0x%" B_PRIx32 ",\n", fKeys.caps_key);
 	fprintf(file, "\tscroll_key:0x%" B_PRIx32 ",\n", fKeys.scroll_key);
@@ -642,6 +658,7 @@ Keymap::SaveAsCppHeader(const char* fileName, const char* mapName)
 	fprintf(file, "\tmenu_key:0x%" B_PRIx32 ",\n", fKeys.menu_key);
 	fprintf(file, "\tlock_settings:0x%" B_PRIx32 ",\n", fKeys.lock_settings);
 
+	// maps
 	dump_map(file, "control_map", fKeys.control_map);
 	dump_map(file, "option_caps_shift_map", fKeys.option_caps_shift_map);
 	dump_map(file, "option_caps_map", fKeys.option_caps_map);
@@ -652,13 +669,14 @@ Keymap::SaveAsCppHeader(const char* fileName, const char* mapName)
 	dump_map(file, "shift_map", fKeys.shift_map);
 	dump_map(file, "normal_map", fKeys.normal_map);
 
+	// dead keys
 	dump_keys(file, "acute_dead_key", fKeys.acute_dead_key);
 	dump_keys(file, "grave_dead_key", fKeys.grave_dead_key);
-
 	dump_keys(file, "circumflex_dead_key", fKeys.circumflex_dead_key);
 	dump_keys(file, "dieresis_dead_key", fKeys.dieresis_dead_key);
 	dump_keys(file, "tilde_dead_key", fKeys.tilde_dead_key);
 
+	// dead key tables
 	fprintf(file, "\tacute_tables:0x%" B_PRIx32 ",\n", fKeys.acute_tables);
 	fprintf(file, "\tgrave_tables:0x%" B_PRIx32 ",\n", fKeys.grave_tables);
 	fprintf(file, "\tcircumflex_tables:0x%" B_PRIx32 ",\n",
@@ -667,23 +685,29 @@ Keymap::SaveAsCppHeader(const char* fileName, const char* mapName)
 		fKeys.dieresis_tables);
 	fprintf(file, "\ttilde_tables:0x%" B_PRIx32 ",\n", fKeys.tilde_tables);
 
-	fprintf(file, "};\n\n");
+	fputs("};\n\n", file);
 
-	fprintf(file, "const char kSystemKeyChars[] = {\n");
+	fputs("const char kSystemKeyChars[] = {\n", file);
+
 	for (uint32 i = 0; i < fCharsSize; i++) {
 		if (i % 10 == 0) {
 			if (i > 0)
-				fprintf(file, "\n");
-			fprintf(file, "\t");
+				fputs("\n", file);
+			fputs("\t", file);
 		} else
-			fprintf(file, " ");
+			fputs(" ", file);
 
 		fprintf(file, "0x%02x,", (uint8)fChars[i]);
 	}
-	fprintf(file, "\n};\n\n");
+	fputs("\n};\n\n", file);
 
-	fprintf(file, "const uint32 kSystemKeyCharsSize = %" B_PRIu32 ";\n",
+	fprintf(file, "const uint32 kSystemKeyCharsSize = %" B_PRIu32 ";\n\n",
 		fCharsSize);
+	fputs("#ifdef __cplusplus\n"
+		"}\n"
+		"#endif\n\n"
+		"#endif\t// _SYSTEM_KEYMAP_H\n", file);
+
 	fclose(file);
 
 	return B_OK;
@@ -742,7 +766,7 @@ Keymap::GetKey(const char* chars, int32 offset, char* buffer, size_t bufferSize)
 			return false;
 
 		case 1:
-			// 1-byte UTF-8/ASCII character
+			// single-byte UTF-8/ASCII character
 			if ((uint8)chars[offset] < 0x20 || (uint8)chars[offset] > 0x7e)
 				sprintf(string, "0x%02x", (uint8)chars[offset]);
 			else {
@@ -869,8 +893,9 @@ Keymap::_SaveSourceText(FILE* file)
 		"ROption = 0x%02" B_PRIx32 "\n"
 		"Menu = 0x%02" B_PRIx32 "\n",
 		fKeys.version, fKeys.caps_key, fKeys.scroll_key, fKeys.num_key,
-		fKeys.left_shift_key, fKeys.right_shift_key, fKeys.left_command_key,
-		fKeys.right_command_key, fKeys.left_control_key, fKeys.right_control_key,
+		fKeys.left_shift_key, fKeys.right_shift_key,
+		fKeys.left_command_key, fKeys.right_command_key,
+		fKeys.left_control_key, fKeys.right_control_key,
 		fKeys.left_option_key, fKeys.right_option_key, fKeys.menu_key);
 
 #if (defined(__BEOS__) || defined(__HAIKU__))
@@ -915,13 +940,15 @@ Keymap::_SaveSourceText(FILE* file)
 	}
 #endif
 
-	bytes += fprintf(file, "# Legend:\n"
+	bytes += fputs("# Legend:\n"
 		"#   n = Normal\n"
 		"#   s = Shift\n"
 		"#   c = Control\n"
 		"#   C = CapsLock\n"
 		"#   o = Option\n"
-		"# Key      n        s        c        o        os       C        Cs       Co       Cos     \n");
+		"# Key      n        s        c        o        os       "
+		"C        Cs       Co       Cos     \n", file);
+
 
 #if (defined(__BEOS__) || defined(__HAIKU__))
 	if (runs != NULL) {
@@ -952,9 +979,10 @@ Keymap::_SaveSourceText(FILE* file)
 		GetKey(fChars, fKeys.option_caps_map[i], optionCapsKey, 32);
 		GetKey(fChars, fKeys.option_caps_shift_map[i], optionCapsShiftKey, 32);
 
-		fprintf(file, "Key 0x%02x = %-9s%-9s%-9s%-9s%-9s%-9s%-9s%-9s%-9s\n", i,
-			normalKey, shiftKey, controlKey, optionKey, optionShiftKey, capsKey,
-			capsShiftKey, optionCapsKey, optionCapsShiftKey);
+		fprintf(file,
+			"Key 0x%02x = %-9s%-9s%-9s%-9s%-9s%-9s%-9s%-9s%-9s\n", i,
+			normalKey, shiftKey, controlKey, optionKey, optionShiftKey,
+			capsKey, capsShiftKey, optionCapsKey, optionCapsShiftKey);
 	}
 
 	int32* deadOffsets[] = {
@@ -994,25 +1022,25 @@ Keymap::_SaveSourceText(FILE* file)
 
 		fprintf(file, "%sTab = ", labels[i]);
 
-		if (deadTables[i] & B_NORMAL_TABLE)
-			fprintf(file, "Normal ");
-		if (deadTables[i] & B_SHIFT_TABLE)
-			fprintf(file, "Shift ");
-		if (deadTables[i] & B_CONTROL_TABLE)
-			fprintf(file, "Control ");
-		if (deadTables[i] & B_OPTION_TABLE)
-			fprintf(file, "Option ");
-		if (deadTables[i] & B_OPTION_SHIFT_TABLE)
-			fprintf(file, "Option-Shift ");
-		if (deadTables[i] & B_CAPS_TABLE)
-			fprintf(file, "CapsLock ");
-		if (deadTables[i] & B_CAPS_SHIFT_TABLE)
-			fprintf(file, "CapsLock-Shift ");
-		if (deadTables[i] & B_OPTION_CAPS_TABLE)
-			fprintf(file, "CapsLock-Option ");
-		if (deadTables[i] & B_OPTION_CAPS_SHIFT_TABLE)
-			fprintf(file, "CapsLock-Option-Shift ");
-		fprintf(file, "\n");
+		if ((deadTables[i] & B_NORMAL_TABLE) != 0)
+			fputs("Normal ", file);
+		if ((deadTables[i] & B_SHIFT_TABLE) != 0)
+			fputs("Shift ", file);
+		if ((deadTables[i] & B_CONTROL_TABLE) != 0)
+			fputs("Control ", file);
+		if ((deadTables[i] & B_OPTION_TABLE) != 0)
+			fputs("Option ", file);
+		if ((deadTables[i] & B_OPTION_SHIFT_TABLE) != 0)
+			fputs("Option-Shift ", file);
+		if ((deadTables[i] & B_CAPS_TABLE) != 0)
+			fputs("CapsLock ", file);
+		if ((deadTables[i] & B_CAPS_SHIFT_TABLE) != 0)
+			fputs("CapsLock-Shift ", file);
+		if ((deadTables[i] & B_OPTION_CAPS_TABLE) != 0)
+			fputs("CapsLock-Option ", file);
+		if ((deadTables[i] & B_OPTION_CAPS_SHIFT_TABLE) != 0)
+			fputs("CapsLock-Option-Shift ", file);
+		fputs("\n", file);
 	}
 }
 
@@ -1025,9 +1053,10 @@ Keymap::_ComputeChars(const char* buffer, struct re_registers& regs, int i,
 	char hexChars[12];
 	uint32 length = 0;
 
-	if (strncmp(buffer + regs.start[i], "''", regs.end[i] - regs.start[i]) == 0)
+	if (strncmp(buffer + regs.start[i], "''", regs.end[i] - regs.start[i])
+		== 0) {
 		length = 0;
-	else if (sscanf(buffer + regs.start[i], "'%s'", current) > 0) {
+	} else if (sscanf(buffer + regs.start[i], "'%s'", current) > 0) {
 		if (current[0] == '\\')
 			current[0] = current[1];
 		else if (current[0] == '\'')
