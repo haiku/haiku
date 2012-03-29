@@ -627,8 +627,8 @@ display_crtc_fb_set(uint8 crtcID, display_mode* mode)
 	}
 
 	// Align our framebuffer width
-	int widthAligned = mode->virtual_width;
-	int pitchMask = 0;
+	uint32 widthAligned = mode->virtual_width;
+	uint32 pitchMask = 0;
 
 	switch (bytesPerPixel) {
 		case 1:
@@ -645,6 +645,12 @@ display_crtc_fb_set(uint8 crtcID, display_mode* mode)
 	widthAligned += pitchMask;
 	widthAligned &= ~pitchMask;
 
+	TRACE("%s: fb: %" B_PRIu32 "x%" B_PRIu32 " (%" B_PRIu32 " bpp)\n", __func__,
+		mode->virtual_width, mode->virtual_height, bitsPerPixel);
+	TRACE("%s: fb pitch: %" B_PRIu32 " \n", __func__,
+		widthAligned * bytesPerPixel / 4);
+	TRACE("%s: fb width aligned: %" B_PRIu32 "\n", __func__,
+		widthAligned);
 
 	Write32(CRT, regs->grphSurfaceOffsetX, 0);
 	Write32(CRT, regs->grphSurfaceOffsetY, 0);
@@ -686,7 +692,7 @@ display_crtc_fb_set(uint8 crtcID, display_mode* mode)
 	}
 
 	// update shared info
-	gInfo->shared_info->bytes_per_row = mode->virtual_width * bytesPerPixel;
+	gInfo->shared_info->bytes_per_row = widthAligned * bytesPerPixel;
 	gInfo->shared_info->current_mode = *mode;
 	gInfo->shared_info->bits_per_pixel = bitsPerPixel;
 }
