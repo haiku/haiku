@@ -599,8 +599,6 @@ display_crtc_fb_set(uint8 crtcID, display_mode* mode)
 			break;
 	}
 
-	uint32 bytesPerRow = mode->virtual_width * bytesPerPixel;
-
 	Write32(OUT, regs->vgaControl, 0);
 
 	uint64 fbAddress = gInfo->fb.vramStart;
@@ -628,25 +626,45 @@ display_crtc_fb_set(uint8 crtcID, display_mode* mode)
 		Write32(CRT, regs->grphSwapControl, fbSwap);
 	}
 
+	// Align our framebuffer width
+	int widthAligned = mode->virtual_width;
+	int pitchMask = 0;
+
+	switch (bytesPerPixel) {
+		case 1:
+			pitchMask = 255;
+			break;
+		case 2:
+			pitchMask = 127;
+			break;
+		case 3:
+		case 4:
+			pitchMask = 63;
+			break;
+	}
+	widthAligned += pitchMask;
+	widthAligned &= ~pitchMask;
+
+
 	Write32(CRT, regs->grphSurfaceOffsetX, 0);
 	Write32(CRT, regs->grphSurfaceOffsetY, 0);
 	Write32(CRT, regs->grphXStart, 0);
 	Write32(CRT, regs->grphYStart, 0);
 	Write32(CRT, regs->grphXEnd, mode->virtual_width);
 	Write32(CRT, regs->grphYEnd, mode->virtual_height);
-	Write32(CRT, regs->grphPitch, (bytesPerRow / 4));
+	Write32(CRT, regs->grphPitch, widthAligned * bytesPerPixel / 4);
 
 	Write32(CRT, regs->grphEnable, 1);
 		// Enable Frame buffer
 
 	Write32(CRT, regs->modeDesktopHeight, mode->virtual_height);
 
-	uint32 viewport_w = mode->timing.h_display;
-	uint32 viewport_h = (mode->timing.v_display + 1) & ~1;
+	uint32 viewportWidth = mode->timing.h_display;
+	uint32 viewportHeight = (mode->timing.v_display + 1) & ~1;
 
 	Write32(CRT, regs->viewportStart, 0);
 	Write32(CRT, regs->viewportSize,
-		(viewport_w << 16) | viewport_h);
+		(viewportWidth << 16) | viewportHeight);
 
 	// Pageflip setup
 	if (info.dceMajor >= 4) {
@@ -668,7 +686,7 @@ display_crtc_fb_set(uint8 crtcID, display_mode* mode)
 	}
 
 	// update shared info
-	gInfo->shared_info->bytes_per_row = bytesPerRow;
+	gInfo->shared_info->bytes_per_row = mode->virtual_width * bytesPerPixel;
 	gInfo->shared_info->current_mode = *mode;
 	gInfo->shared_info->bits_per_pixel = bitsPerPixel;
 }
