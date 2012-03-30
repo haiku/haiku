@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2012, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef BLOCK_ALLOCATOR_H
@@ -78,8 +78,9 @@ private:
 
 	static	status_t		_Initialize(BlockAllocator* self);
 
+private:
 			Volume*			fVolume;
-			mutex			fLock;
+			recursive_lock	fLock;
 			AllocationGroup* fGroups;
 			int32			fNumGroups;
 			uint32			fBlocksPerGroup;

@@ -520,13 +520,13 @@ BlockAllocator::BlockAllocator(Volume* volume)
 	fCheckBitmap(NULL),
 	fCheckCookie(NULL)
 {
-	mutex_init(&fLock, "bfs allocator");
+	recursive_lock_init(&fLock, "bfs allocator");
 }
 
 
 BlockAllocator::~BlockAllocator()
 {
-	mutex_destroy(&fLock);
+	recursive_lock_destroy(&fLock);
 	delete[] fGroups;
 }
 
@@ -546,7 +546,7 @@ BlockAllocator::Initialize(bool full)
 	if (!full)
 		return B_OK;
 
-	mutex_lock(&fLock);
+	recursive_lock_lock(&fLock);
 		// the lock will be released by the _Initialize() method
 
 	thread_id id = spawn_kernel_thread((thread_func)BlockAllocator::_Initialize,
@@ -554,7 +554,7 @@ BlockAllocator::Initialize(bool full)
 	if (id < B_OK)
 		return _Initialize(this);
 
-	mutex_transfer_lock(&fLock, id);
+	recursive_lock_transfer_lock(&fLock, id);
 
 	return resume_thread(id);
 }
@@ -624,6 +624,7 @@ status_t
 BlockAllocator::_Initialize(BlockAllocator* allocator)
 {
 	// The lock must already be held at this point
+	RecursiveLocker locker(allocator->fLock, true);
 
 	Volume* volume = allocator->fVolume;
 	uint32 blocks = allocator->fBlocksPerGroup;
@@ -631,10 +632,8 @@ BlockAllocator::_Initialize(BlockAllocator* allocator)
 	off_t freeBlocks = 0;
 
 	uint32* buffer = (uint32*)malloc(blocks << blockShift);
-	if (buffer == NULL) {
-		mutex_unlock(&allocator->fLock);
+	if (buffer == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
-	}
 
 	AllocationGroup* groups = allocator->fGroups;
 	off_t offset = 1;
@@ -715,7 +714,6 @@ BlockAllocator::_Initialize(BlockAllocator* allocator)
 		volume->SuperBlock().used_blocks = HOST_ENDIAN_TO_BFS_INT64(usedBlocks);
 	}
 
-	mutex_unlock(&allocator->fLock);
 	return B_OK;
 }
 
@@ -725,7 +723,7 @@ BlockAllocator::Uninitialize()
 {
 	// We only have to make sure that the initializer thread isn't running
 	// anymore.
-	mutex_lock(&fLock);
+	recursive_lock_lock(&fLock);
 }
 
 
@@ -747,7 +745,7 @@ BlockAllocator::AllocateBlocks(Transaction& transaction, int32 groupIndex,
 		groupIndex, start, maximum, minimum));
 
 	AllocationBlock cached(fVolume);
-	MutexLocker lock(fLock);
+	RecursiveLocker lock(fLock);
 
 	uint32 bitsPerFullBlock = fVolume->BlockSize() << 3;
 
@@ -1005,7 +1003,7 @@ BlockAllocator::Allocate(Transaction& transaction, Inode* inode,
 status_t
 BlockAllocator::Free(Transaction& transaction, block_run run)
 {
-	MutexLocker lock(fLock);
+	RecursiveLocker lock(fLock);
 
 	int32 group = run.AllocationGroup();
 	uint16 start = run.Start();
@@ -1072,7 +1070,7 @@ void
 BlockAllocator::Fragment()
 {
 	AllocationBlock cached(fVolume);
-	MutexLocker lock(fLock);
+	RecursiveLocker lock(fLock);
 
 	// only leave 4 block holes
 	static const uint32 kMask = 0x0f0f0f0f;
@@ -1103,7 +1101,7 @@ void
 BlockAllocator::_CheckGroup(int32 groupIndex) const
 {
 	AllocationBlock cached(fVolume);
-	ASSERT_LOCKED_MUTEX(&fLock);
+	ASSERT_LOCKED_RECURSIVE(&fLock);
 
 	AllocationGroup& group = fGroups[groupIndex];
 
@@ -1202,16 +1200,12 @@ BlockAllocator::StartChecking(const check_control* control)
 	fVolume->GetJournal(0)->Lock(NULL, true);
 		// Lock the volume's journal
 
-	status_t status = mutex_lock(&fLock);
-	if (status != B_OK) {
-		fVolume->GetJournal(0)->Unlock(NULL, true);
-		return status;
-	}
+	recursive_lock_lock(&fLock);
 
 	size_t size = BitmapSize();
 	fCheckBitmap = (uint32*)malloc(size);
 	if (fCheckBitmap == NULL) {
-		mutex_unlock(&fLock);
+		recursive_lock_unlock(&fLock);
 		fVolume->GetJournal(0)->Unlock(NULL, true);
 		return B_NO_MEMORY;
 	}
@@ -1220,7 +1214,7 @@ BlockAllocator::StartChecking(const check_control* control)
 	if (fCheckCookie == NULL) {
 		free(fCheckBitmap);
 		fCheckBitmap = NULL;
-		mutex_unlock(&fLock);
+		recursive_lock_unlock(&fLock);
 		fVolume->GetJournal(0)->Unlock(NULL, true);
 
 		return B_NO_MEMORY;
@@ -1354,7 +1348,7 @@ BlockAllocator::StopChecking(check_control* control)
 	fCheckBitmap = NULL;
 	delete fCheckCookie;
 	fCheckCookie = NULL;
-	mutex_unlock(&fLock);
+	recursive_lock_unlock(&fLock);
 	fVolume->GetJournal(0)->Unlock(NULL, true);
 
 	return B_OK;
@@ -1518,7 +1512,8 @@ BlockAllocator::CheckNextNode(check_control* control)
 					// Rename the inode
 					Transaction transaction(fVolume, inode->BlockNumber());
 
-					// TODO: this may potentially need new blocks!
+					// Note, this may need extra blocks, but the inode will
+					// only be checked afterwards, so that it won't be lost
 					status = inode->SetName(transaction, name);
 					if (status == B_OK)
 						status = inode->WriteBack(transaction);
