@@ -708,7 +708,7 @@ BPlusTree::Validate(bool repair, bool& _errorsFound)
 
 		if (check.Visited(freeOffset)) {
 			dprintf("inode %" B_PRIdOFF ": free node at %" B_PRIdOFF
-				" circular!\n", fStream->BlockNumber(), freeOffset);
+				" circular!\n", fStream->ID(), freeOffset);
 			break;
 		}
 
@@ -716,7 +716,7 @@ BPlusTree::Validate(bool repair, bool& _errorsFound)
 
 		if (node->OverflowLink() != BPLUSTREE_FREE) {
 			dprintf("inode %" B_PRIdOFF ": free node at %" B_PRIdOFF
-				" misses free mark!\n", fStream->BlockNumber(), freeOffset);
+				" misses free mark!\n", fStream->ID(), freeOffset);
 		}
 		freeOffset = node->LeftLink();
 	}
@@ -738,14 +738,14 @@ BPlusTree::Validate(bool repair, bool& _errorsFound)
 
 	if (check.MaxLevels() + 1 != fHeader.MaxNumberOfLevels()) {
 		dprintf("inode %" B_PRIdOFF ": found %" B_PRIu32 " max levels, "
-			"declared %" B_PRIu32 "!\n", fStream->BlockNumber(),
-			check.MaxLevels(), fHeader.MaxNumberOfLevels());
+			"declared %" B_PRIu32 "!\n", fStream->ID(), check.MaxLevels(),
+			fHeader.MaxNumberOfLevels());
 	}
 
 	if (check.VisitedCount() != fHeader.MaximumSize() / fNodeSize) {
 		dprintf("inode %" B_PRIdOFF ": visited %" B_PRIuSIZE " from %" B_PRIdOFF
-			" nodes.\n", fStream->BlockNumber(),
-			check.VisitedCount(), fHeader.MaximumSize() / fNodeSize);
+			" nodes.\n", fStream->ID(), check.VisitedCount(),
+			fHeader.MaximumSize() / fNodeSize);
 	}
 
 	return B_OK;
@@ -2177,13 +2177,13 @@ BPlusTree::_ValidateChildren(TreeCheck& check, uint32 level, off_t offset,
 {
 	if (parent->CheckIntegrity(fNodeSize) != B_OK) {
 		dprintf("inode %" B_PRIdOFF ": node %" B_PRIdOFF " integrity check "
-			"failed!\n", fStream->BlockNumber(), offset);
+			"failed!\n", fStream->ID(), offset);
 		check.FoundError();
 		return B_OK;
 	}
 	if (level >= fHeader.MaxNumberOfLevels()) {
 		dprintf("inode %" B_PRIdOFF ": maximum level surpassed at %" B_PRIdOFF
-			"!\n", fStream->BlockNumber(), offset);
+			"!\n", fStream->ID(), offset);
 		check.FoundError();
 		return B_OK;
 	}
@@ -2192,7 +2192,7 @@ BPlusTree::_ValidateChildren(TreeCheck& check, uint32 level, off_t offset,
 
 	if (check.Visited(offset)) {
 		dprintf("inode %" B_PRIdOFF ": node %" B_PRIdOFF " already visited!\n",
-			fStream->BlockNumber(), offset);
+			fStream->ID(), offset);
 		check.FoundError();
 		return B_OK;
 	}
@@ -2213,7 +2213,7 @@ BPlusTree::_ValidateChildren(TreeCheck& check, uint32 level, off_t offset,
 			if (result >= 0) {
 				dprintf("inode %" B_PRIdOFF ": node %" B_PRIdOFF " key %"
 					B_PRIu32 " larger than it should!\n",
-					fStream->BlockNumber(), offset, i);
+					fStream->ID(), offset, i);
 				check.FoundError();
 			}
 		}
@@ -2237,7 +2237,7 @@ BPlusTree::_ValidateChildren(TreeCheck& check, uint32 level, off_t offset,
 
 				if (!isKnownFragment && check.Visited(duplicateOffset)) {
 					dprintf("inode %" B_PRIdOFF ": duplicate node at %"
-						B_PRIdOFF " already visited!\n", fStream->BlockNumber(),
+						B_PRIdOFF " already visited!\n", fStream->ID(),
 						duplicateOffset);
 					check.FoundError();
 					break;
@@ -2265,7 +2265,7 @@ BPlusTree::_ValidateChildren(TreeCheck& check, uint32 level, off_t offset,
 				if (arrayCount < 1 || arrayCount > maxSize) {
 					dprintf("inode %" B_PRIdOFF ": duplicate at %" B_PRIdOFF
 						" has invalid array size %" B_PRId32 "!\n",
-						fStream->BlockNumber(), duplicateOffset, arrayCount);
+						fStream->ID(), duplicateOffset, arrayCount);
 					check.FoundError();
 				} else {
 					// Simple check if the values in the array may be valid
@@ -2274,7 +2274,7 @@ BPlusTree::_ValidateChildren(TreeCheck& check, uint32 level, off_t offset,
 								array->ValueAt(j))) {
 							dprintf("inode %" B_PRIdOFF ": duplicate at %"
 								B_PRIdOFF " contains invalid block %" B_PRIdOFF
-								" at %" B_PRId32 "!\n", fStream->BlockNumber(),
+								" at %" B_PRId32 "!\n", fStream->ID(),
 								duplicateOffset, array->ValueAt(j), j);
 							check.FoundError();
 							break;
@@ -2289,8 +2289,8 @@ BPlusTree::_ValidateChildren(TreeCheck& check, uint32 level, off_t offset,
 				if (node->LeftLink() != lastDuplicateOffset) {
 					dprintf("inode %" B_PRIdOFF ": duplicate at %" B_PRIdOFF
 						" has wrong left link %" B_PRIdOFF ", expected %"
-						B_PRIdOFF "!\n", fStream->BlockNumber(),
-						duplicateOffset, node->LeftLink(), lastDuplicateOffset);
+						B_PRIdOFF "!\n", fStream->ID(), duplicateOffset,
+						node->LeftLink(), lastDuplicateOffset);
 					check.FoundError();
 				}
 
@@ -2312,8 +2312,8 @@ BPlusTree::_ValidateChildren(TreeCheck& check, uint32 level, off_t offset,
 				if (previous->RightLink() != childOffset) {
 					dprintf("inode %" B_PRIdOFF ": node at %" B_PRIdOFF " has "
 						"wrong right link %" B_PRIdOFF ", expected %" B_PRIdOFF
-						"!\n", fStream->BlockNumber(), lastOffset,
-						previous->RightLink(), childOffset);
+						"!\n", fStream->ID(), lastOffset, previous->RightLink(),
+						childOffset);
 					check.FoundError();
 				}
 			}
@@ -2325,7 +2325,7 @@ BPlusTree::_ValidateChildren(TreeCheck& check, uint32 level, off_t offset,
 		} else if (!fStream->GetVolume()->IsValidInodeBlock(childOffset)) {
 			dprintf("inode %" B_PRIdOFF ": node at %" B_PRIdOFF " contains "
 				"invalid block %" B_PRIdOFF " at %" B_PRId32 "!\n",
-				fStream->BlockNumber(), offset, childOffset, i);
+				fStream->ID(), offset, childOffset, i);
 			check.FoundError();
 		}
 
@@ -2359,16 +2359,14 @@ BPlusTree::_ValidateChild(TreeCheck& check, CachedNode& cached, uint32 level,
 	if (node->LeftLink() != lastOffset) {
 		dprintf("inode %" B_PRIdOFF ": node at %" B_PRIdOFF " has "
 			"wrong left link %" B_PRIdOFF ", expected %" B_PRIdOFF
-			"!\n", fStream->BlockNumber(), offset, node->LeftLink(),
-			lastOffset);
+			"!\n", fStream->ID(), offset, node->LeftLink(), lastOffset);
 		check.FoundError();
 	}
 
 	if (nextOffset != 0 && node->RightLink() != nextOffset) {
 		dprintf("inode %" B_PRIdOFF ": node at %" B_PRIdOFF " has "
 			"wrong right link %" B_PRIdOFF ", expected %" B_PRIdOFF
-			"!\n", fStream->BlockNumber(), offset, node->RightLink(),
-			nextOffset);
+			"!\n", fStream->ID(), offset, node->RightLink(), nextOffset);
 		check.FoundError();
 	}
 
