@@ -115,7 +115,6 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView* view, ulong options,
 	functions.UpdateState 	= _UpdateState;
 	functions.GetBufferSize = NULL;
 	functions.Error			= _Error;
-	functions.Viewport		= _Viewport;
 	functions.Flush			= _Flush;
 
 	// create core context
@@ -496,23 +495,6 @@ MesaSoftwareRenderer::_GetString(gl_context* ctx, GLenum name)
 
 
 void
-MesaSoftwareRenderer::_Viewport(gl_context* ctx, GLint x, GLint y, GLsizei w,
-	GLsizei h)
-{
-	CALLED();
-
-	// TODO
-	//gl_framebuffer* draw = ctx->WinSysDrawBuffer;
-	//gl_framebuffer* read = ctx->WinSysReadBuffer;
-
-	//struct swrast_renderbuffer* msr = haikuFrameBuffer(draw);
-
-	//_mesa_resize_framebuffer(ctx, draw, msr->width, msr->height);
-	//_mesa_resize_framebuffer(ctx, read, msr->width, msr->height);
-}
-
-
-void
 MesaSoftwareRenderer::_UpdateState(gl_context* ctx, GLuint new_state)
 {
 	if (!ctx)
@@ -535,6 +517,9 @@ MesaSoftwareRenderer::_RenderBufferStorage(gl_context* ctx,
 
 	render->Width = width;
 	render->Height = height;
+
+	struct swrast_renderbuffer *swRenderBuffer = swrast_renderbuffer(render);
+	swRenderBuffer->RowStride = width * _mesa_get_format_bytes(render->Format);
 
 	return GL_TRUE;
 }
@@ -568,7 +553,6 @@ MesaSoftwareRenderer::_NewRenderBuffer(bool front)
 
 	_mesa_init_renderbuffer(&swRenderBuffer->Base, 0);
 
-	//swRenderBuffer->Base.ClassID = OSMESA_RENDERBUFFER_CLASS;
 	swRenderBuffer->Base.RefCount = 1;
 	swRenderBuffer->Base.Delete = _RenderBufferDelete;
 	swRenderBuffer->Base.AllocStorage = _RenderBufferStorage;

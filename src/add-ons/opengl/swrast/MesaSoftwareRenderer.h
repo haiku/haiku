@@ -49,8 +49,6 @@ public:
 private:
 	static	void			_Error(gl_context* ctx);
 	static	const GLubyte*	_GetString(gl_context* ctx, GLenum name);
-	static	void			_Viewport(gl_context* ctx, GLint x, GLint y,
-								GLsizei w, GLsizei h);
 			void			_CheckResize();
 	static	void			_UpdateState(gl_context* ctx, GLuint newState);
 	static	void			_Flush(gl_context *ctx);
