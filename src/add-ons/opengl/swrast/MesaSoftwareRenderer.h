@@ -1,17 +1,11 @@
 /*
- * Copyright 2006-2008, Haiku. All rights reserved.
+ * Copyright 2006-2012, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Jérôme Duval, korli@users.berlios.de
  * 		Philippe Houdoin, philippe.houdoin@free.fr
  *		Artur Wyszynski, harakash@gmail.com
- */
-/*
- * Mesa 3-D graphics library
- * Version:  6.1
- *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
  */
 #ifndef MESASOFTWARERENDERER_H
 #define MESASOFTWARERENDERER_H

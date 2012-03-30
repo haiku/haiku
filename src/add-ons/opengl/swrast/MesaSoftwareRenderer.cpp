@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2011, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2012, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,12 +7,6 @@
  *		Philippe Houdoin, philippe.houdoin@free.fr
  *		Artur Wyszynski, harakash@gmail.com
  *		Alexander von Gluck, kallisti5@unixzen.com
- */
-/*
- * Mesa 3-D graphics library
- * Version:  6.1
- *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
  */
 
 
