@@ -1,0 +1,44 @@
+diff --git a/src/mesa/sources.mak b/src/mesa/sources.mak
+index c746b8a..09dc5f5 100644
+--- a/src/mesa/sources.mak
++++ b/src/mesa/sources.mak
+@@ -276,7 +276,6 @@ ASM_C_SOURCES =	\
+ 	x86/x86_xform.c \
+ 	x86/3dnow.c \
+ 	x86/sse.c \
+-	x86/rtasm/x86sse.c \
+ 	sparc/sparc.c \
+ 	x86-64/x86-64.c
+ 
+diff --git a/src/mesa/tnl/t_vertex_sse.c b/src/mesa/tnl/t_vertex_sse.c
+index e0141c3..1afaf78 100644
+--- a/src/mesa/tnl/t_vertex_sse.c
++++ b/src/mesa/tnl/t_vertex_sse.c
+@@ -36,7 +36,7 @@
+ 
+ #if defined(USE_SSE_ASM)
+ 
+-#include "x86/rtasm/x86sse.h"
++#include "rtasm/rtasm_x86sse.h"
+ #include "x86/common_x86_asm.h"
+ 
+ 
+@@ -356,7 +356,7 @@ static GLboolean build_vertex_emit( struct x86_program *p )
+    struct x86_reg vp0 = x86_make_reg(file_XMM, 1);
+    struct x86_reg vp1 = x86_make_reg(file_XMM, 2);
+    struct x86_reg temp2 = x86_make_reg(file_XMM, 3);
+-   GLubyte *fixup, *label;
++   GLuint fixup, label;
+ 
+    /* Push a few regs?
+     */
+@@ -658,7 +658,8 @@ void _tnl_generate_sse_emit( struct gl_context *ctx )
+    p.identity = x86_make_reg(file_XMM, 6);
+    p.chan0 = x86_make_reg(file_XMM, 7);
+ 
+-   if (!x86_init_func_size(&p.func, MAX_SSE_CODE_SIZE)) {
++   x86_init_func_size(&p.func, MAX_SSE_CODE_SIZE);
++   if (p.func.caps == 0) {
+       vtx->emit = NULL;
+       return;
+    }
