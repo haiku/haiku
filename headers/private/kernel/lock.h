@@ -274,6 +274,20 @@ mutex_transfer_lock(mutex* lock, thread_id thread)
 }
 
 
+static inline void
+recursive_lock_transfer_lock(recursive_lock* lock, thread_id thread)
+{
+	if (lock->recursion != 1)
+		panic("invalid recursion level for lock transfer!");
+
+#if KDEBUG
+	lock->lock.holder = thread;
+#else
+	lock->holder = thread;
+#endif
+}
+
+
 extern void lock_debug_init();
 
 #ifdef __cplusplus
