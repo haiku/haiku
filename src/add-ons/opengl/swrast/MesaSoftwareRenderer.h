@@ -53,7 +53,6 @@ private:
 								GLsizei w, GLsizei h);
 			void			_CheckResize();
 	static	void			_UpdateState(gl_context* ctx, GLuint newState);
-	static	void 			_ClearFront(gl_context* ctx);
 	static	void			_Flush(gl_context *ctx);
 
 	struct	swrast_renderbuffer* _NewRenderBuffer(bool front);
@@ -82,9 +81,6 @@ private:
 			struct gl_framebuffer* fFrameBuffer;
 			struct swrast_renderbuffer* fFrontRenderBuffer;
 			struct swrast_renderbuffer* fBackRenderBuffer;
-
-			GLchan 			fClearColor[4];	// buffer clear color
-			GLuint 			fClearIndex;	// buffer clear color index
 
 			GLuint			fWidth;
 			GLuint			fHeight;

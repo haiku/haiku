@@ -99,13 +99,6 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView* view, ulong options,
 {
 	CALLED();
 
-	fClearColor[BE_RCOMP] = 0;
-	fClearColor[BE_GCOMP] = 0;
-	fClearColor[BE_BCOMP] = 0;
-	fClearColor[BE_ACOMP] = 0;
-
-	fClearIndex = 0;
-
 	fColorSpace = BScreen(GLView()->Window()).ColorSpace();
 
 	// We force single buffering for the time being
@@ -545,51 +538,6 @@ MesaSoftwareRenderer::_UpdateState(gl_context* ctx, GLuint new_state)
 	_swsetup_InvalidateState(ctx, new_state);
 	_vbo_InvalidateState(ctx, new_state);
 	_tnl_InvalidateState(ctx, new_state);
-}
-
-
-void
-MesaSoftwareRenderer::_ClearFront(gl_context* ctx)
-{
-	CALLED();
-
-	MesaSoftwareRenderer* mr = (MesaSoftwareRenderer*)ctx->DriverCtx;
-	BGLView* bglview = mr->GLView();
-	assert(bglview);
-	BBitmap* bitmap = mr->fBitmap;
-	assert(bitmap);
-	GLuint* start = (GLuint*)bitmap->Bits();
-	size_t pixelSize = 0;
-	get_pixel_size_for(bitmap->ColorSpace(), &pixelSize, NULL, NULL);
-	const GLuint* clearPixelPtr = (const GLuint*)mr->fClearColor;
-	const GLuint clearPixel = B_LENDIAN_TO_HOST_INT32(*clearPixelPtr);
-
-	int x = ctx->DrawBuffer->_Xmin;
-	int y = ctx->DrawBuffer->_Ymin;
-	uint32 width = ctx->DrawBuffer->_Xmax - x;
-	uint32 height = ctx->DrawBuffer->_Ymax - y;
-	GLboolean all = (width == ctx->DrawBuffer->Width
-		&& height == ctx->DrawBuffer->Height);
-
-	if (all) {
-		const int numPixels = mr->fWidth * mr->fHeight;
-		if (clearPixel == 0) {
-			memset(start, 0, numPixels * pixelSize);
-		} else {
-			for (int i = 0; i < numPixels; i++) {
-				start[i] = clearPixel;
-			}
-		}
-	} else {
-		// XXX untested
-		start += y * mr->fWidth + x;
-		for (uint32 i = 0; i < height; i++) {
-			for (uint32 j = 0; j < width; j++) {
-				start[j] = clearPixel;
-			}
-			start += mr->fWidth;
-		}
-	}
 }
 
 
