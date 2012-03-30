@@ -82,4 +82,3 @@ private:
 };
 
 #endif	// MESASOFTWARERENDERER_H
-

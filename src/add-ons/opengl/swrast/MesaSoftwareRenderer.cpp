@@ -305,18 +305,18 @@ MesaSoftwareRenderer::CopyPixelsOut(BPoint location, BBitmap* bitmap)
 	sr = sr & dr.OffsetBySelf(location);
 	dr = sr.OffsetByCopy(-location.x, -location.y);
 
-	uint8* ps = (uint8*) fBitmap->Bits();
-	uint8* pd = (uint8*) bitmap->Bits();
+	uint8* ps = (uint8*)fBitmap->Bits();
+	uint8* pd = (uint8*)bitmap->Bits();
 	uint32* s;
 	uint32* d;
 	uint32 y;
-	for (y = (uint32) sr.top; y <= (uint32)sr.bottom; y++) {
+	for (y = (uint32)sr.top; y <= (uint32)sr.bottom; y++) {
 		s = (uint32*)(ps + y * fBitmap->BytesPerRow());
-		s += (uint32) sr.left;
+		s += (uint32)sr.left;
 
 		d = (uint32*)(pd + (y + (uint32)(dr.top - sr.top))
 			* bitmap->BytesPerRow());
-		d += (uint32) dr.left;
+		d += (uint32)dr.left;
 
 		memcpy(d, s, dr.IntegerWidth() * 4);
 	}
@@ -344,18 +344,18 @@ MesaSoftwareRenderer::CopyPixelsIn(BBitmap* bitmap, BPoint location)
 	sr = sr & dr.OffsetBySelf(location);
 	dr = sr.OffsetByCopy(-location.x, -location.y);
 
-	uint8* ps = (uint8*) bitmap->Bits();
-	uint8* pd = (uint8*) fBitmap->Bits();
+	uint8* ps = (uint8*)bitmap->Bits();
+	uint8* pd = (uint8*)fBitmap->Bits();
 	uint32* s;
 	uint32* d;
 	uint32 y;
-	for (y = (uint32) sr.top; y <= (uint32)sr.bottom; y++) {
+	for (y = (uint32)sr.top; y <= (uint32)sr.bottom; y++) {
 		s = (uint32*)(ps + y * bitmap->BytesPerRow());
-		s += (uint32) sr.left;
+		s += (uint32)sr.left;
 
 		d = (uint32*)(pd + (y + (uint32)(dr.top - sr.top))
 			* fBitmap->BytesPerRow());
-		d += (uint32) dr.left;
+		d += (uint32)dr.left;
 
 		memcpy(d, s, dr.IntegerWidth() * 4);
 	}
