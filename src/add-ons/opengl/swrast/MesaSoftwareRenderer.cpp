@@ -614,12 +614,9 @@ MesaSoftwareRenderer::_RenderBufferMap(gl_context *ctx,
 	GLbitfield mode, GLubyte **mapOut, GLint *rowStrideOut)
 {
 	if (rb->ClassID == HAIKU_SWRAST_RENDERBUFFER_CLASS) {
-		/* this is an OSMesa renderbuffer which wraps user memory */
 		struct swrast_renderbuffer *srb = swrast_renderbuffer(rb);
 		const GLuint bpp = _mesa_get_format_bytes(rb->Format);
-		GLint rowStride; /* in bytes */
-
-		rowStride = rb->Width * bpp;
+		GLint rowStride = rb->Width * bpp; // in Bytes
 
 		y = rb->Height - y - 1;
 
