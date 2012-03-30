@@ -1475,98 +1475,99 @@ BlockAllocator::CheckNextNode(check_control* control)
 			// TODO: maybe have a force parameter that actually does that.
 			// TODO: we also need to be able to repair broken B+trees!
 			return status;
-		} else {
-			// ignore "." and ".." entries
-			if (!strcmp(name, ".") || !strcmp(name, ".."))
-				continue;
+		}
 
-			// fill in the control data as soon as we have them
-			strlcpy(fCheckCookie->control.name, name, B_FILE_NAME_LENGTH);
-			fCheckCookie->control.inode = id;
-			fCheckCookie->control.errors = 0;
+		// ignore "." and ".." entries
+		if (!strcmp(name, ".") || !strcmp(name, ".."))
+			continue;
 
-			Vnode vnode(fVolume, id);
-			Inode* inode;
-			if (vnode.Get(&inode) != B_OK) {
-				FATAL(("Could not open inode ID %" B_PRIdINO "!\n", id));
-				fCheckCookie->control.errors |= BFS_COULD_NOT_OPEN;
+		// fill in the control data as soon as we have them
+		strlcpy(fCheckCookie->control.name, name, B_FILE_NAME_LENGTH);
+		fCheckCookie->control.inode = id;
+		fCheckCookie->control.errors = 0;
 
-				if ((fCheckCookie->control.flags & BFS_REMOVE_INVALID) != 0) {
-					status = _RemoveInvalidNode(fCheckCookie->parent,
-						fCheckCookie->iterator->Tree(), NULL, name);
-				} else
-					status = B_ERROR;
+		Vnode vnode(fVolume, id);
+		Inode* inode;
+		if (vnode.Get(&inode) != B_OK) {
+			FATAL(("Could not open inode ID %" B_PRIdINO "!\n", id));
+			fCheckCookie->control.errors |= BFS_COULD_NOT_OPEN;
 
-				fCheckCookie->control.status = status;
-				return B_OK;
-			}
+			if ((fCheckCookie->control.flags & BFS_REMOVE_INVALID) != 0) {
+				status = _RemoveInvalidNode(fCheckCookie->parent,
+					fCheckCookie->iterator->Tree(), NULL, name);
+			} else
+				status = B_ERROR;
 
-			// check if the inode's name is the same as in the b+tree
-			if (inode->IsRegularNode()) {
-				RecursiveLocker locker(inode->SmallDataLock());
-				NodeGetter node(fVolume, inode);
+			fCheckCookie->control.status = status;
+			return B_OK;
+		}
 
-				const char* localName = inode->Name(node.Node());
-				if (localName == NULL || strcmp(localName, name)) {
-					fCheckCookie->control.errors |= BFS_NAMES_DONT_MATCH;
-					FATAL(("Names differ: tree \"%s\", inode \"%s\"\n", name,
-						localName));
+		// check if the inode's name is the same as in the b+tree
+		if (inode->IsRegularNode()) {
+			RecursiveLocker locker(inode->SmallDataLock());
+			NodeGetter node(fVolume, inode);
 
-					if ((fCheckCookie->control.flags & BFS_FIX_NAME_MISMATCHES)
-							!= 0) {
-						// Rename the inode
-						Transaction transaction(fVolume, inode->BlockNumber());
+			const char* localName = inode->Name(node.Node());
+			if (localName == NULL || strcmp(localName, name)) {
+				fCheckCookie->control.errors |= BFS_NAMES_DONT_MATCH;
+				FATAL(("Names differ: tree \"%s\", inode \"%s\"\n", name,
+					localName));
 
-						status = inode->SetName(transaction, name);
-						if (status == B_OK)
-							status = inode->WriteBack(transaction);
-						if (status == B_OK)
-							status = transaction.Done();
-						if (status != B_OK) {
-							fCheckCookie->control.status = status;
-							return B_OK;
-						}
+				if ((fCheckCookie->control.flags & BFS_FIX_NAME_MISMATCHES)
+						!= 0) {
+					// Rename the inode
+					Transaction transaction(fVolume, inode->BlockNumber());
+
+					// TODO: this may potentially need new blocks!
+					status = inode->SetName(transaction, name);
+					if (status == B_OK)
+						status = inode->WriteBack(transaction);
+					if (status == B_OK)
+						status = transaction.Done();
+					if (status != B_OK) {
+						fCheckCookie->control.status = status;
+						return B_OK;
 					}
 				}
 			}
+		}
 
-			fCheckCookie->control.mode = inode->Mode();
+		fCheckCookie->control.mode = inode->Mode();
 
-			// Check for the correct mode of the node (if the mode of the
-			// file don't fit to its parent, there is a serious problem)
-			if (((fCheckCookie->parent_mode & S_ATTR_DIR) != 0
-					&& !inode->IsAttribute())
-				|| ((fCheckCookie->parent_mode & S_INDEX_DIR) != 0
-					&& !inode->IsIndex())
-				|| (is_directory(fCheckCookie->parent_mode)
-					&& !inode->IsRegularNode())) {
-				FATAL(("inode at %" B_PRIdOFF " is of wrong type: %o (parent "
-					"%o at %" B_PRIdOFF ")!\n", inode->BlockNumber(),
-					inode->Mode(), fCheckCookie->parent_mode,
-					fCheckCookie->parent->BlockNumber()));
+		// Check for the correct mode of the node (if the mode of the
+		// file don't fit to its parent, there is a serious problem)
+		if (((fCheckCookie->parent_mode & S_ATTR_DIR) != 0
+				&& !inode->IsAttribute())
+			|| ((fCheckCookie->parent_mode & S_INDEX_DIR) != 0
+				&& !inode->IsIndex())
+			|| (is_directory(fCheckCookie->parent_mode)
+				&& !inode->IsRegularNode())) {
+			FATAL(("inode at %" B_PRIdOFF " is of wrong type: %o (parent "
+				"%o at %" B_PRIdOFF ")!\n", inode->BlockNumber(),
+				inode->Mode(), fCheckCookie->parent_mode,
+				fCheckCookie->parent->BlockNumber()));
 
-				// if we are allowed to fix errors, we should remove the file
-				if ((fCheckCookie->control.flags & BFS_REMOVE_WRONG_TYPES) != 0
-					&& (fCheckCookie->control.flags & BFS_FIX_BITMAP_ERRORS)
-							!= 0) {
-					status = _RemoveInvalidNode(fCheckCookie->parent, NULL,
-						inode, name);
-				} else
-					status = B_ERROR;
+			// if we are allowed to fix errors, we should remove the file
+			if ((fCheckCookie->control.flags & BFS_REMOVE_WRONG_TYPES) != 0
+				&& (fCheckCookie->control.flags & BFS_FIX_BITMAP_ERRORS)
+						!= 0) {
+				status = _RemoveInvalidNode(fCheckCookie->parent, NULL,
+					inode, name);
+			} else
+				status = B_ERROR;
 
-				fCheckCookie->control.errors |= BFS_WRONG_TYPE;
-				fCheckCookie->control.status = status;
-				return B_OK;
-			}
+			fCheckCookie->control.errors |= BFS_WRONG_TYPE;
+			fCheckCookie->control.status = status;
+			return B_OK;
+		}
 
-			// push the directory on the stack so that it will be scanned later
-			if (inode->IsContainer() && !inode->IsIndex())
-				fCheckCookie->stack.Push(inode->BlockRun());
-			else {
-				// check it now
-				fCheckCookie->control.status = CheckInode(inode);
-				return B_OK;
-			}
+		// push the directory on the stack so that it will be scanned later
+		if (inode->IsContainer() && !inode->IsIndex())
+			fCheckCookie->stack.Push(inode->BlockRun());
+		else {
+			// check it now
+			fCheckCookie->control.status = CheckInode(inode);
+			return B_OK;
 		}
 	}
 	// is never reached
