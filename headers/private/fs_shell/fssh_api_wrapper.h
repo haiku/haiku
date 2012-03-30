@@ -1013,6 +1013,7 @@
 #define recursive_lock_trylock		fssh_recursive_lock_trylock
 #define recursive_lock_unlock		fssh_recursive_lock_unlock
 #define recursive_lock_get_recursion fssh_recursive_lock_get_recursion
+#define recursive_lock_transfer_lock fssh_recursive_lock_transfer_lock
 
 #define rw_lock_init				fssh_rw_lock_init
 #define rw_lock_init_etc			fssh_rw_lock_init_etc

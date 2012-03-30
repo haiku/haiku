@@ -61,6 +61,7 @@ extern fssh_status_t fssh_recursive_lock_lock(fssh_recursive_lock *lock);
 extern fssh_status_t fssh_recursive_lock_trylock(fssh_recursive_lock *lock);
 extern void fssh_recursive_lock_unlock(fssh_recursive_lock *lock);
 extern int32_t fssh_recursive_lock_get_recursion(fssh_recursive_lock *lock);
+extern void fssh_recursive_lock_transfer_lock(fssh_recursive_lock *lock, fssh_thread_id thread);
 
 extern void fssh_rw_lock_init(fssh_rw_lock* lock, const char* name);
 	// name is *not* cloned nor freed in rw_lock_destroy()
