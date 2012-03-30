@@ -75,114 +75,6 @@ extern const char* color_space_name(color_space space);
 #endif
 
 
-/**********************************************************************/
-/*****        Read/write spans/arrays of pixels                   *****/
-/**********************************************************************/
-extern "C" {
-
-/* 32-bit RGBA */
-#define NAME(PREFIX) PREFIX##_RGBA32
-#define RB_TYPE GLubyte
-#define SPAN_VARS \
-	MesaSoftwareRenderer* mr = (MesaSoftwareRenderer*)ctx->DriverCtx;
-#define INIT_PIXEL_PTR(P, X, Y) \
-	GLubyte* P = ((GLubyte**)mr->GetRows())[Y] + (X) * 4
-#define INC_PIXEL_PTR(P) P += 4
-#define STORE_PIXEL(DST, X, Y, VALUE) \
-	DST[BE_RCOMP] = VALUE[RCOMP];  \
-	DST[BE_GCOMP] = VALUE[GCOMP];  \
-	DST[BE_BCOMP] = VALUE[BCOMP];  \
-	DST[BE_ACOMP] = VALUE[ACOMP]
-#define STORE_PIXEL_RGB(DST, X, Y, VALUE) \
-	DST[BE_RCOMP] = VALUE[RCOMP];  \
-	DST[BE_GCOMP] = VALUE[GCOMP];  \
-	DST[BE_BCOMP] = VALUE[BCOMP];  \
-	DST[BE_ACOMP] = 255
-#define FETCH_PIXEL(DST, SRC) \
-	DST[RCOMP] = SRC[BE_RCOMP];  \
-	DST[GCOMP] = SRC[BE_GCOMP];  \
-	DST[BCOMP] = SRC[BE_BCOMP];  \
-	DST[ACOMP] = SRC[BE_ACOMP]
-#include "swrast/s_spantemp.h"
-
-/* 32-bit RGB */
-#define NAME(PREFIX) PREFIX##_RGB32
-#define RB_TYPE GLubyte
-#define SPAN_VARS \
-	MesaSoftwareRenderer* mr = (MesaSoftwareRenderer*)ctx->DriverCtx;
-#define INIT_PIXEL_PTR(P, X, Y) \
-	GLuint* P = (GLuint*)(((GLubyte**)mr->GetRows())[Y] + (X) * 4)
-#define INC_PIXEL_PTR(P) P += 1
-#define STORE_PIXEL(DST, X, Y, VALUE) \
-	*DST = ( ((VALUE[RCOMP]) << 16) | \
-		((VALUE[GCOMP]) << 8) | \
-		((VALUE[BCOMP]) ) )
-#define FETCH_PIXEL(DST, SRC) \
-	DST[RCOMP] = ((*SRC & 0x00ff0000) >> 16);  \
-	DST[GCOMP] = ((*SRC & 0x0000ff00) >> 8);  \
-	DST[BCOMP] = ((*SRC & 0x000000ff)); \
-	DST[ACOMP] = 0xff;
-#include "swrast/s_spantemp.h"
-
-/* 24-bit RGB */
-#define NAME(PREFIX) PREFIX##_RGB24
-#define RB_TYPE GLubyte
-#define SPAN_VARS \
-	MesaSoftwareRenderer* mr = (MesaSoftwareRenderer*)ctx->DriverCtx;
-#define INIT_PIXEL_PTR(P, X, Y) \
-	GLubyte* P = ((GLubyte**)mr->GetRows())[Y] + (X) * 3
-#define INC_PIXEL_PTR(P) P += 3
-#define STORE_PIXEL(DST, X, Y, VALUE) \
-	DST[BE_RCOMP] = VALUE[RCOMP]; \
-	DST[BE_GCOMP] = VALUE[GCOMP]; \
-	DST[BE_BCOMP] = VALUE[BCOMP];
-#define FETCH_PIXEL(DST, SRC) \
-	DST[RCOMP] = SRC[BE_RCOMP];  \
-	DST[GCOMP] = SRC[BE_GCOMP];  \
-	DST[BCOMP] = SRC[BE_BCOMP]; \
-	DST[ACOMP] = 0xff;
-#include "swrast/s_spantemp.h"
-
-/* 16-bit RGB */
-#define NAME(PREFIX) PREFIX##_RGB16
-#define RB_TYPE GLubyte
-#define SPAN_VARS \
-	MesaSoftwareRenderer* mr = (MesaSoftwareRenderer*)ctx->DriverCtx;
-#define INIT_PIXEL_PTR(P, X, Y) \
-	GLushort* P = (GLushort*)(((GLubyte**)mr->GetRows())[Y] + (X) * 2)
-#define INC_PIXEL_PTR(P) P += 1
-#define STORE_PIXEL(DST, X, Y, VALUE) \
-	*DST = ( (((VALUE[RCOMP]) & 0xf8) << 8) | \
-		(((VALUE[GCOMP]) & 0xfc) << 3) | \
-		(((VALUE[BCOMP])       ) >> 3) )
-#define FETCH_PIXEL(DST, SRC) \
-	DST[RCOMP] = ((*SRC & 0xf800) >> 8); \
-	DST[GCOMP] = ((*SRC & 0x07e0) >> 3); \
-	DST[BCOMP] = ((*SRC & 0x001f) << 3); \
-	DST[ACOMP] = 0xff
-#include "swrast/s_spantemp.h"
-
-/* 15-bit RGB */
-#define NAME(PREFIX) PREFIX##_RGB15
-#define RB_TYPE GLubyte
-#define SPAN_VARS \
-	MesaSoftwareRenderer* mr = (MesaSoftwareRenderer*)ctx->DriverCtx;
-#define INIT_PIXEL_PTR(P, X, Y) \
-	GLushort* P = (GLushort*)(((GLubyte**)mr->GetRows())[Y] + (X) * 2)
-#define INC_PIXEL_PTR(P) P += 1
-#define STORE_PIXEL(DST, X, Y, VALUE) \
-	*DST = ( (((VALUE[RCOMP]) & 0xf8) << 7) | \
-		(((VALUE[GCOMP]) & 0xf8) << 2) | \
-		(((VALUE[BCOMP])       ) >> 3) )
-#define FETCH_PIXEL(DST, SRC) \
-	DST[RCOMP] = ((*SRC & 0x7c00) >> 7); \
-	DST[GCOMP] = ((*SRC & 0x03e0) >> 2); \
-	DST[BCOMP] = ((*SRC & 0x001f) << 3); \
-	DST[ACOMP] = 0xff
-#include "swrast/s_spantemp.h"
-}
-
-
 extern "C" _EXPORT BGLRenderer*
 instantiate_gl_renderer(BGLView* view, ulong options,
 	BGLDispatcher* dispatcher)
@@ -793,47 +685,22 @@ MesaSoftwareRenderer::_SetupRenderBuffer(
 		case B_RGBA32:
 			buffer->base._BaseFormat = GL_RGBA;
 			buffer->base.Format = MESA_FORMAT_ARGB8888;
-
-			buffer->base.GetRow = get_row_RGBA32;
-			buffer->base.GetValues = get_values_RGBA32;
-			buffer->base.PutRow = put_row_RGBA32;
-			buffer->base.PutValues = put_values_RGBA32;
 			break;
 		case B_RGB32:
 			buffer->base._BaseFormat = GL_RGB;
 			buffer->base.Format = MESA_FORMAT_XRGB8888;
-
-			buffer->base.GetRow = get_row_RGB32;
-			buffer->base.GetValues = get_values_RGB32;
-			buffer->base.PutRow = put_row_RGB32;
-			buffer->base.PutValues = put_values_RGB32;
 			break;
 		case B_RGB24:
 			buffer->base._BaseFormat = GL_RGB;
 			buffer->base.Format = MESA_FORMAT_RGB888;
-
-			buffer->base.GetRow = get_row_RGB24;
-			buffer->base.GetValues = get_values_RGB24;
-			buffer->base.PutRow = put_row_RGB24;
-			buffer->base.PutValues = put_values_RGB24;
 			break;
 		case B_RGB16:
 			buffer->base._BaseFormat = GL_RGB;
 			buffer->base.Format = MESA_FORMAT_RGB565;
-
-			buffer->base.GetRow = get_row_RGB16;
-			buffer->base.GetValues = get_values_RGB16;
-			buffer->base.PutRow = put_row_RGB16;
-			buffer->base.PutValues = put_values_RGB16;
 			break;
 		case B_RGB15:
 			buffer->base._BaseFormat = GL_RGB;
 			buffer->base.Format = MESA_FORMAT_ARGB1555;
-
-			buffer->base.GetRow = get_row_RGB15;
-			buffer->base.GetValues = get_values_RGB15;
-			buffer->base.PutRow = put_row_RGB15;
-			buffer->base.PutValues = put_values_RGB15;
 			break;
 		default:
 			fprintf(stderr, "Unsupported screen color space %s\n",
