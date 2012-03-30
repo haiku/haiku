@@ -105,11 +105,12 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView* view, ulong options,
 	// Initialize device driver function table
 	_mesa_init_driver_functions(&functions);
 
-	functions.GetString 	= _GetString;
-	functions.UpdateState 	= _UpdateState;
+	functions.GetString = _GetString;
+	functions.UpdateState = _UpdateState;
+	functions.MapRenderbuffer = _RenderBufferMap;
 	functions.GetBufferSize = NULL;
-	functions.Error			= _Error;
-	functions.Flush			= _Flush;
+	functions.Error = _Error;
+	functions.Flush = _Flush;
 
 	// create core context
 	fContext = _mesa_create_context(API_OPENGL, fVisual, NULL,
@@ -423,6 +424,7 @@ void
 MesaSoftwareRenderer::_AllocateBitmap()
 {
 	CALLED();
+
 	// allocate new size of back buffer bitmap
 	delete fBitmap;
 	fBitmap = NULL;
@@ -434,14 +436,15 @@ MesaSoftwareRenderer::_AllocateBitmap()
 
 	BRect rect(0.0, 0.0, fWidth - 1, fHeight - 1);
 	fBitmap = new BBitmap(rect, fColorSpace);
-	//for (uint i = 0; i < fHeight; i++) {
-	//	fRowAddr[fHeight - i - 1] = (GLvoid *)((GLubyte *)fBitmap->Bits()
-	//		+ i * fBitmap->BytesPerRow());
-	//}
 
-	//fFrontRenderBuffer->size = fBitmap->BitsLength();
-	//if (fVisual->doubleBufferMode)
-	//	fBackRenderBuffer->size = fBitmap->BitsLength();
+	#if 0
+	// Used for platform optimized drawing
+	for (uint i = 0; i < fHeight; i++) {
+		fRowAddr[fHeight - i - 1] = (GLvoid *)((GLubyte *)fBitmap->Bits()
+			+ i * fBitmap->BytesPerRow());
+	}
+	#endif
+
 	fFrameBuffer->Width = fWidth;
 	fFrameBuffer->Height = fHeight;
 	TRACE("%s: Bitmap Size: %" B_PRIu32 "\n", __func__, fBitmap->BitsLength());
@@ -547,6 +550,7 @@ MesaSoftwareRenderer::_NewRenderBuffer(bool front)
 
 	_mesa_init_renderbuffer(&swRenderBuffer->Base, 0);
 
+	swRenderBuffer->Base.ClassID = HAIKU_SWRAST_RENDERBUFFER_CLASS;
 	swRenderBuffer->Base.RefCount = 1;
 	swRenderBuffer->Base.Delete = _RenderBufferDelete;
 	swRenderBuffer->Base.AllocStorage = _RenderBufferStorage;
@@ -566,7 +570,6 @@ MesaSoftwareRenderer::_SetupRenderBuffer(struct gl_renderbuffer* rb,
 {
 	CALLED();
 
-	//buffer->DataType = GL_UNSIGNED_BYTE;
 	rb->InternalFormat = GL_RGBA;
 
 	switch (colorSpace) {
@@ -597,6 +600,35 @@ MesaSoftwareRenderer::_SetupRenderBuffer(struct gl_renderbuffer* rb,
 			return B_ERROR;
 	}
 	return B_OK;
+}
+
+
+/*!	Y inverted Map RenderBuffer function
+	We use a BBitmap for storage which has Y inverted.
+	If the Mesa provided Map function ever allows external
+	control of this we can omit this function.
+*/
+void
+MesaSoftwareRenderer::_RenderBufferMap(gl_context *ctx,
+	struct gl_renderbuffer *rb, GLuint x, GLuint y, GLuint w, GLuint h,
+	GLbitfield mode, GLubyte **mapOut, GLint *rowStrideOut)
+{
+	if (rb->ClassID == HAIKU_SWRAST_RENDERBUFFER_CLASS) {
+		/* this is an OSMesa renderbuffer which wraps user memory */
+		struct swrast_renderbuffer *srb = swrast_renderbuffer(rb);
+		const GLuint bpp = _mesa_get_format_bytes(rb->Format);
+		GLint rowStride; /* in bytes */
+
+		rowStride = rb->Width * bpp;
+
+		y = rb->Height - y - 1;
+
+		*rowStrideOut = -rowStride;
+		*mapOut = (GLubyte *) srb->Buffer + y * rowStride + x * bpp;
+	} else {
+		_swrast_map_soft_renderbuffer(ctx, rb, x, y, w, h, mode,
+			mapOut, rowStrideOut);
+	}
 }
 
 

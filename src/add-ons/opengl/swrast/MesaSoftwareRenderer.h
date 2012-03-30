@@ -11,6 +11,9 @@
 #define MESASOFTWARERENDERER_H
 
 
+#define HAIKU_SWRAST_RENDERBUFFER_CLASS 0x737752 // swR
+
+
 #include "GLRenderer.h"
 
 extern "C" {
@@ -57,6 +60,11 @@ private:
 								struct gl_renderbuffer* render,
 								GLenum internalFormat,
 								GLuint width, GLuint height);
+	static	void			_RenderBufferMap(gl_context *ctx,
+								struct gl_renderbuffer *rb,
+								GLuint x, GLuint y, GLuint w, GLuint h,
+								GLbitfield mode, GLubyte **mapOut,
+								GLint *rowStrideOut);
 
 			void			_AllocateBitmap();
 			void			_CopyToDirect();
@@ -79,6 +87,8 @@ private:
 			GLuint 			fNewWidth;
 			GLuint			fNewHeight;
 			color_space		fColorSpace;
+
+			void*			fRowAddr[SWRAST_MAX_HEIGHT];
 };
 
 #endif	// MESASOFTWARERENDERER_H
