@@ -60,21 +60,6 @@ extern "C" {
 extern const char* color_space_name(color_space space);
 
 
-// BeOS component ordering for B_RGBA32 bitmap format
-#if B_HOST_IS_LENDIAN
-#define BE_RCOMP 2
-#define BE_GCOMP 1
-#define BE_BCOMP 0
-#define BE_ACOMP 3
-#else
-// Big Endian B_RGBA32 bitmap format
-#define BE_RCOMP 1
-#define BE_GCOMP 2
-#define BE_BCOMP 3
-#define BE_ACOMP 0
-#endif
-
-
 extern "C" _EXPORT BGLRenderer*
 instantiate_gl_renderer(BGLView* view, ulong options,
 	BGLDispatcher* dispatcher)
