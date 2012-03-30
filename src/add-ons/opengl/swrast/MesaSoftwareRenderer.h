@@ -29,68 +29,68 @@ extern "C" {
 
 class MesaSoftwareRenderer : public BGLRenderer {
 public:
-								MesaSoftwareRenderer(BGLView* view,
-									ulong bgl_options,
-									BGLDispatcher* dispatcher);
-		virtual					~MesaSoftwareRenderer();
+							MesaSoftwareRenderer(BGLView* view,
+								ulong bgl_options,
+								BGLDispatcher* dispatcher);
+	virtual					~MesaSoftwareRenderer();
 
-		virtual	void			LockGL();
-		virtual	void 			UnlockGL();
+	virtual	void			LockGL();
+	virtual	void 			UnlockGL();
 
-		virtual	void 			SwapBuffers(bool VSync = false);
-		virtual	void			Draw(BRect updateRect);
-		virtual	status_t		CopyPixelsOut(BPoint source, BBitmap* dest);
-		virtual	status_t		CopyPixelsIn(BBitmap* source, BPoint dest);
-		virtual void			FrameResized(float width, float height);
+	virtual	void 			SwapBuffers(bool VSync = false);
+	virtual	void			Draw(BRect updateRect);
+	virtual	status_t		CopyPixelsOut(BPoint source, BBitmap* dest);
+	virtual	status_t		CopyPixelsIn(BBitmap* source, BPoint dest);
+	virtual void			FrameResized(float width, float height);
 
-		virtual	void			EnableDirectMode(bool enabled);
-		virtual	void			DirectConnected(direct_buffer_info* info);
+	virtual	void			EnableDirectMode(bool enabled);
+	virtual	void			DirectConnected(direct_buffer_info* info);
 
 private:
-		static	void			_Error(gl_context* ctx);
-		static	const GLubyte*	_GetString(gl_context* ctx, GLenum name);
-		static	void			_Viewport(gl_context* ctx, GLint x, GLint y,
-									GLsizei w, GLsizei h);
-				void			_CheckResize();
-		static	void			_UpdateState(gl_context* ctx, GLuint newState);
-		static	void 			_ClearFront(gl_context* ctx);
-		static	void				_Flush(gl_context *ctx);
+	static	void			_Error(gl_context* ctx);
+	static	const GLubyte*	_GetString(gl_context* ctx, GLenum name);
+	static	void			_Viewport(gl_context* ctx, GLint x, GLint y,
+								GLsizei w, GLsizei h);
+			void			_CheckResize();
+	static	void			_UpdateState(gl_context* ctx, GLuint newState);
+	static	void 			_ClearFront(gl_context* ctx);
+	static	void			_Flush(gl_context *ctx);
 
-		struct	swrast_renderbuffer* _NewRenderBuffer(bool front);
-				status_t		_SetupRenderBuffer(struct gl_renderbuffer* rb,
-									color_space colorSpace);
+	struct	swrast_renderbuffer* _NewRenderBuffer(bool front);
+			status_t		_SetupRenderBuffer(struct gl_renderbuffer* rb,
+								color_space colorSpace);
 
 /* Mesa callbacks */
-		static	void			_RenderBufferDelete(struct gl_renderbuffer* rb);
-		static	GLboolean		_RenderBufferStorage(gl_context* ctx,
-									struct gl_renderbuffer* render,
-									GLenum internalFormat,
-									GLuint width, GLuint height);
+	static	void			_RenderBufferDelete(struct gl_renderbuffer* rb);
+	static	GLboolean		_RenderBufferStorage(gl_context* ctx,
+								struct gl_renderbuffer* render,
+								GLenum internalFormat,
+								GLuint width, GLuint height);
 
-		void					_AllocateBitmap();
-		void					_CopyToDirect();
+			void			_AllocateBitmap();
+			void			_CopyToDirect();
 
-		BBitmap*				fBitmap;
-		bool					fDirectModeEnabled;
-		direct_buffer_info*		fInfo;
-		BLocker					fInfoLocker;
-		ulong					fOptions;
+			BBitmap*		fBitmap;
+			bool			fDirectModeEnabled;
+			direct_buffer_info* fInfo;
+			BLocker			fInfoLocker;
+			ulong			fOptions;
 
-		gl_context*				fContext;
-		gl_config*				fVisual;
+			gl_context*		fContext;
+			gl_config*		fVisual;
 
-		struct gl_framebuffer*	fFrameBuffer;
-		struct swrast_renderbuffer* fFrontRenderBuffer;
-		struct swrast_renderbuffer* fBackRenderBuffer;
+			struct gl_framebuffer* fFrameBuffer;
+			struct swrast_renderbuffer* fFrontRenderBuffer;
+			struct swrast_renderbuffer* fBackRenderBuffer;
 
-		GLchan 					fClearColor[4];	// buffer clear color
-		GLuint 					fClearIndex;	// buffer clear color index
-		GLuint 					fWidth, fNewWidth;
-		GLuint					fHeight, fNewHeight;
-		color_space				fColorSpace;
+			GLchan 			fClearColor[4];	// buffer clear color
+			GLuint 			fClearIndex;	// buffer clear color index
 
-		//GLvoid*					fRowAddr[MAX_HEIGHT];
-			// address of first pixel in each image row
+			GLuint			fWidth;
+			GLuint			fHeight;
+			GLuint 			fNewWidth;
+			GLuint			fNewHeight;
+			color_space		fColorSpace;
 };
 
 #endif	// MESASOFTWARERENDERER_H
