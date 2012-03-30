@@ -23,35 +23,7 @@ extern "C" {
 #include "context.h"
 #include "main/version.h"
 #include "swrast/s_chan.h"
-
-
-struct msr_renderbuffer {
-	struct gl_renderbuffer base;
-	uint32 size;
-};
-
-
-static INLINE struct msr_renderbuffer*
-msr_renderbuffer(struct gl_renderbuffer* rb)
-{
-	return (struct msr_renderbuffer*)rb;
-}
-
-
-struct msr_framebuffer {
-	struct gl_framebuffer base;
-	uint32 width;
-	uint32 height;
-};
-
-
-static INLINE struct msr_framebuffer*
-msr_framebuffer(struct gl_framebuffer* rb)
-{
-	return (struct msr_framebuffer*)rb;
-}
-
-
+#include "swrast/s_context.h"
 }
 
 
@@ -71,8 +43,6 @@ public:
 		virtual	status_t		CopyPixelsIn(BBitmap* source, BPoint dest);
 		virtual void			FrameResized(float width, float height);
 
-				GLvoid**		GetRows() { return fRowAddr; }
-
 		virtual	void			EnableDirectMode(bool enabled);
 		virtual	void			DirectConnected(direct_buffer_info* info);
 
@@ -84,20 +54,18 @@ private:
 				void			_CheckResize();
 		static	void			_UpdateState(gl_context* ctx, GLuint newState);
 		static	void 			_ClearFront(gl_context* ctx);
-		static	GLboolean		_FrontRenderbufferStorage(gl_context* ctx,
-									struct gl_renderbuffer* render,
-									GLenum internalFormat,
-									GLuint width, GLuint height);
-		static	GLboolean		_BackRenderbufferStorage(gl_context* ctx,
-									struct gl_renderbuffer* render,
-									GLenum internalFormat,
-									GLuint width, GLuint height);
-		static void				_Flush(gl_context *ctx);
+		static	void				_Flush(gl_context *ctx);
 
-		struct msr_renderbuffer* _NewRenderBuffer(bool front);
-		status_t				_SetupRenderBuffer(struct msr_renderbuffer*
-									buffer, color_space colorSpace);
-		static void				_DeleteBackBuffer(struct gl_renderbuffer* rb);
+		struct	swrast_renderbuffer* _NewRenderBuffer(bool front);
+				status_t		_SetupRenderBuffer(struct gl_renderbuffer* rb,
+									color_space colorSpace);
+
+/* Mesa callbacks */
+		static	void			_RenderBufferDelete(struct gl_renderbuffer* rb);
+		static	GLboolean		_RenderBufferStorage(gl_context* ctx,
+									struct gl_renderbuffer* render,
+									GLenum internalFormat,
+									GLuint width, GLuint height);
 
 		void					_AllocateBitmap();
 		void					_CopyToDirect();
@@ -110,9 +78,10 @@ private:
 
 		gl_context*				fContext;
 		gl_config*				fVisual;
-		struct msr_framebuffer*	fFrameBuffer;
-		struct msr_renderbuffer*	fFrontRenderBuffer;
-		struct msr_renderbuffer*	fBackRenderBuffer;
+
+		struct gl_framebuffer*	fFrameBuffer;
+		struct swrast_renderbuffer* fFrontRenderBuffer;
+		struct swrast_renderbuffer* fBackRenderBuffer;
 
 		GLchan 					fClearColor[4];	// buffer clear color
 		GLuint 					fClearIndex;	// buffer clear color index
@@ -120,7 +89,7 @@ private:
 		GLuint					fHeight, fNewHeight;
 		color_space				fColorSpace;
 
-		GLvoid*					fRowAddr[MAX_HEIGHT];
+		//GLvoid*					fRowAddr[MAX_HEIGHT];
 			// address of first pixel in each image row
 };
 
