@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2012, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef INDEX_H
@@ -18,17 +18,17 @@ class Index {
 public:
 							Index(Volume* volume);
 							~Index();
-	
+
 			status_t		SetTo(const char* name);
 			void			Unset();
 
 			Inode*			Node() const { return fNode; };
 			uint32			Type();
 			size_t			KeySize();
-	
+
 			status_t		Create(Transaction& transaction, const char* name,
 								uint32 type);
-	
+
 			status_t		Update(Transaction& transaction, const char* name,
 								int32 type, const uint8* oldKey,
 								uint16 oldLength, const uint8* newKey,
@@ -45,7 +45,7 @@ public:
 			status_t		InsertSize(Transaction& transaction, Inode* inode);
 			status_t		RemoveSize(Transaction& transaction, Inode* inode);
 			status_t		UpdateSize(Transaction& transaction, Inode* inode);
-	
+
 			status_t		InsertLastModified(Transaction& transaction,
 								Inode* inode);
 			status_t		RemoveLastModified(Transaction& transaction,
@@ -58,9 +58,11 @@ private:
 							Index& operator=(const Index& other);
 								// no implementation
 
+private:
 			Volume*			fVolume;
 			Inode*			fNode;
 			const char*		fName;
 };
+
 
 #endif	// INDEX_H
