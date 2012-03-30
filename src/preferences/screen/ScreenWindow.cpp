@@ -1,11 +1,12 @@
 /*
- * Copyright 2001-2011, Haiku.
+ * Copyright 2001-2012, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Rafael Romo
  *		Stefano Ceccherini (burton666@libero.it)
  *		Andrew Bachmann
+ *		Rene Gollent, rene@gollent.com
  *		Thomas Kurschel
  *		Axel Dörfler, axeld@pinc-software.de
  *		Stephan Aßmus <superstippi@gmx.de>
@@ -171,6 +172,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 	fIsVesa(false),
 	fBootWorkspaceApplied(false),
 	fScreenMode(this),
+	fOtherRefresh(NULL),
 	fUndoScreenMode(this),
 	fModified(false)
 {
@@ -315,11 +317,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 		// This is a special case for drivers that only support a single
 		// frequency, like the VESA driver
 		BString name;
-		name << min << " " << B_TRANSLATE("Hz");
-
-		message = new BMessage(POP_REFRESH_MSG);
-		message->AddFloat("refresh", min);
-
+		refresh_rate_to_string(min, name);
 		fRefreshMenu->AddItem(item = new BMenuItem(name.String(), message));
 		item->SetEnabled(false);
 	} else {
@@ -663,28 +661,28 @@ ScreenWindow::_CheckRefreshMenu()
 void
 ScreenWindow::_UpdateRefreshControl()
 {
-	BString string;
-	refresh_rate_to_string(fSelected.refresh, string);
-
-	BMenuItem* item = fRefreshMenu->FindItem(string.String());
-	if (item) {
-		if (!item->IsMarked())
+	for (int32 i = 0; i < fRefreshMenu->CountItems(); i++) {
+		BMenuItem* item = fRefreshMenu->ItemAt(i);
+		if (item->Message()->FindFloat("refresh") == fSelected.refresh) {
 			item->SetMarked(true);
-
-		// "Other" items only contains a refresh rate when active
-		fOtherRefresh->SetLabel(B_TRANSLATE("Other" B_UTF8_ELLIPSIS));
-		return;
+			// "Other" items only contains a refresh rate when active
+			fOtherRefresh->SetLabel(B_TRANSLATE("Other" B_UTF8_ELLIPSIS));
+			return;
+		}
 	}
 
 	// this is a non-standard refresh rate
+	if (fOtherRefresh != NULL) {
+		fOtherRefresh->Message()->ReplaceFloat("refresh", fSelected.refresh);
+		fOtherRefresh->SetMarked(true);
 
-	fOtherRefresh->Message()->ReplaceFloat("refresh", fSelected.refresh);
-	fOtherRefresh->SetMarked(true);
+		BString string;
+		refresh_rate_to_string(fSelected.refresh, string);
+		fRefreshMenu->Superitem()->SetLabel(string.String());
 
-	fRefreshMenu->Superitem()->SetLabel(string.String());
-
-	string.Append(B_TRANSLATE("/other" B_UTF8_ELLIPSIS));
-	fOtherRefresh->SetLabel(string.String());
+		string.Append(B_TRANSLATE("/other" B_UTF8_ELLIPSIS));
+		fOtherRefresh->SetLabel(string.String());
+	}
 }
 
 
