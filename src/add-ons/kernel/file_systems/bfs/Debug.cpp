@@ -280,40 +280,19 @@ dump_inode(int argc, char** argv)
 	if (argc >= 3 && !strcmp(argv[1], "-b"))
 		block = true;
 
-	if (argc > 3 || !strcmp(argv[1], "--help")) {
-		kprintf("usage: bfsinode [-b] <ptr-to-inode> [<offset>]\n"
+	if (argc != 2 + (block ? 1 : 0) || !strcmp(argv[1], "--help")) {
+		kprintf("usage: bfsinode [-b] <ptr-to-inode>\n"
 			"  -b the address is regarded as pointer to a block instead of one "
-			"to an inode.\n"
-			"  If <offset> is given, the block_run containing the offset in "
-			"the data stream is printed -- this does not work with -b.\n");
+			"to an inode.\n");
 		return 0;
 	}
 
-	addr_t address = parse_expression(argv[block ? 2 : 1]);
+	addr_t address = parse_expression(argv[argc - 1]);
 	bfs_inode* node;
 	if (block)
 		node = (bfs_inode*)address;
 	else {
 		Inode* inode = (Inode*)address;
-
-		if (argc == 3) {
-			off_t offset = parse_expression(argv[2]);
-			if (offset < 0) {
-				kprintf("invalid offset %" B_PRIdOFF "\n", offset);
-				return 0;
-			}
-			off_t baseOffset;
-			block_run run;
-			status_t status = inode->FindBlockRun(offset, run, baseOffset);
-			if (status != B_OK) {
-				kprintf("find block run failed: %s\n", strerror(status));
-				return 0;
-			}
-
-			dump_block_run("block run:   ", run);
-			kprintf("base offset: %" B_PRIdOFF "\n", baseOffset);
-			return 0;
-		}
 
 		kprintf("INODE %p\n", inode);
 		kprintf("  rw lock:           %p\n", &inode->Lock());
@@ -394,7 +373,8 @@ static int
 dump_block_run_array(int argc, char** argv)
 {
 	if (argc < 2 || !strcmp(argv[1], "--help")) {
-		kprintf("usage: %s <ptr-to-array> [number-of-runs]\n", argv[0]);
+		kprintf("usage: %s <ptr-to-array> [number-of-runs] [block-size] "
+			"[start-offset] [search-offset]\n", argv[0]);
 		return 0;
 	}
 
@@ -403,9 +383,32 @@ dump_block_run_array(int argc, char** argv)
 	if (argc > 2)
 		count = parse_expression(argv[2]);
 
+	uint32 blockSize = 0;
+	if (argc > 3)
+		blockSize = parse_expression(argv[3]);
+
+	off_t offset = 0;
+	if (argc > 4)
+		offset = parse_expression(argv[4]);
+
+	off_t searchOffset = 0;
+	if (argc > 5)
+		searchOffset = parse_expression(argv[5]);
+
 	for (uint32 i = 0; i < count; i++) {
-		dprintf("[%3lu]  ", i);
+		if (blockSize != 0)
+			dprintf("[%3lu]  %10" B_PRIdOFF "  ", i, offset);
+		else
+			dprintf("[%3lu]  ", i);
+
+		uint32 size = runs[i].Length() * blockSize;
+		if (searchOffset != 0 && searchOffset >= offset
+			&& searchOffset < offset + size)
+			dprintf("*  ");
+
 		dump_block_run("", runs[i]);
+
+		offset += size;
 	}
 
 	return 0;
