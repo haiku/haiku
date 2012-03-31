@@ -29,7 +29,7 @@
 
 struct callback_info {
 	uint32				token;
-	CallbackFunction	callback;
+	RemoteHWInterface::CallbackFunction	callback;
 	void*				cookie;
 };
 

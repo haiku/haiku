@@ -22,8 +22,6 @@ class RemoteMessage;
 
 struct callback_info;
 
-typedef bool (*CallbackFunction)(void* cookie, RemoteMessage& message);
-
 
 class RemoteHWInterface : public HWInterface {
 public:
@@ -80,6 +78,8 @@ virtual	status_t					CopyBackToFront(const BRect& frame);
 		// drawing engine interface
 		StreamingRingBuffer*		ReceiveBuffer() { return fReceiveBuffer; }
 		StreamingRingBuffer*		SendBuffer() { return fSendBuffer; }
+
+typedef bool (*CallbackFunction)(void* cookie, RemoteMessage& message);
 
 		status_t					AddCallback(uint32 token,
 										CallbackFunction callback,
