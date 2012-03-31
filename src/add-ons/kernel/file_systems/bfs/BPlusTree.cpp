@@ -797,9 +797,12 @@ BPlusTree::MakeEmpty()
 
 		node->overflow_link = HOST_ENDIAN_TO_BFS_INT64((uint64)BPLUSTREE_FREE);
 
-		// It's not important to write it out in a single transaction
-		if (transaction.IsTooLarge())
-			transaction.Split();
+		// It's not important to write it out in a single transaction; just
+		// make sure it doesn't get too large
+		if (offset % (1024 * 1024) == 0) {
+			transaction.Done();
+			transaction.Start(fStream->GetVolume(), fStream->BlockNumber());
+		}
 	}
 
 	return transaction.Done();

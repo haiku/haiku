@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2012, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef JOURNAL_H
@@ -176,12 +176,6 @@ public:
 		}
 
 		return B_OK;
-	}
-
-	void Split()
-	{
-		cache_start_sub_transaction(fJournal->GetVolume()->BlockCache(),
-			fJournal->TransactionID());
 	}
 
 	Volume* GetVolume() const
