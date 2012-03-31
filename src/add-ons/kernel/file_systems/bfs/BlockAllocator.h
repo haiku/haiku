@@ -55,7 +55,7 @@ public:
 			status_t		CheckBlockRun(block_run run,
 								const char* type = NULL,
 								bool allocated = true);
-			status_t		CheckInode(Inode* inode);
+			status_t		CheckInode(Inode* inode, const char* name);
 
 			size_t			BitmapSize() const;
 
@@ -75,6 +75,12 @@ private:
 			bool			_IsValidCheckControl(const check_control* control);
 			bool			_CheckBitmapIsUsedAt(off_t block) const;
 			void			_SetCheckBitmapAt(off_t block);
+			status_t		_CheckInodeBlocks(Inode* inode, const char* name);
+			status_t		_FinishBitmapPass();
+			status_t		_PrepareIndices();
+			void			_FreeIndices();
+			status_t		_AddInodeToIndex(Inode* inode);
+			status_t		_WriteBackCheckBitmap();
 
 	static	status_t		_Initialize(BlockAllocator* self);
 

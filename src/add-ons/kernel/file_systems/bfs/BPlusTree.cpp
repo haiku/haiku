@@ -752,6 +752,57 @@ BPlusTree::Validate(bool repair, bool& _errorsFound)
 }
 
 
+status_t
+BPlusTree::MakeEmpty()
+{
+	// Put all nodes into the free list in order
+	Transaction transaction(fStream->GetVolume(), fStream->BlockNumber());
+
+	// Reset the header, and root node
+	CachedNode cached(this);
+	bplustree_header* header = cached.SetToWritableHeader(transaction);
+	if (header == NULL)
+		return B_IO_ERROR;
+
+	header->max_number_of_levels = HOST_ENDIAN_TO_BFS_INT32(1);
+	header->root_node_pointer = HOST_ENDIAN_TO_BFS_INT64(NodeSize());
+	if (fStream->Size() > NodeSize() * 2)
+		header->free_node_pointer = HOST_ENDIAN_TO_BFS_INT64(2 * NodeSize());
+	else {
+		header->free_node_pointer
+			= HOST_ENDIAN_TO_BFS_INT64((uint64)BPLUSTREE_NULL);
+	}
+
+	bplustree_node* node = cached.SetToWritable(transaction, NodeSize());
+	node->left_link = HOST_ENDIAN_TO_BFS_INT64((uint64)BPLUSTREE_NULL);
+	node->right_link = HOST_ENDIAN_TO_BFS_INT64((uint64)BPLUSTREE_NULL);
+	node->overflow_link = HOST_ENDIAN_TO_BFS_INT64((uint64)BPLUSTREE_NULL);
+	node->all_key_count = 0;
+	node->all_key_length = 0;
+
+	for (off_t offset = 2 * NodeSize(); offset < fStream->Size();
+			offset += NodeSize()) {
+		bplustree_node* node = cached.SetToWritable(transaction, offset, false);
+		if (node == NULL) {
+			dprintf("--> could not open %lld\n", offset);
+			return B_IO_ERROR;
+		}
+		if (offset < fStream->Size() - NodeSize())
+			node->left_link = HOST_ENDIAN_TO_BFS_INT64(offset + NodeSize());
+		else
+			node->left_link = HOST_ENDIAN_TO_BFS_INT64((uint64)BPLUSTREE_NULL);
+
+		node->overflow_link = HOST_ENDIAN_TO_BFS_INT64((uint64)BPLUSTREE_FREE);
+
+		// It's not important to write it out in a single transaction
+		if (transaction.IsTooLarge())
+			transaction.Split();
+	}
+
+	return transaction.Done();
+}
+
+
 int32
 BPlusTree::TypeCodeToKeyType(type_code code)
 {

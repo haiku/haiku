@@ -217,6 +217,7 @@ public:
 			Inode*				Stream() const { return fStream; }
 
 			status_t			Validate(bool repair, bool& _errorsFound);
+			status_t			MakeEmpty();
 
 			status_t			Remove(Transaction& transaction,
 									const uint8* key, uint16 keyLength,

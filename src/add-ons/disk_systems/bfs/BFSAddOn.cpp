@@ -247,6 +247,7 @@ BFSPartitionHandle::Repair(bool checkOnly)
 	uint64 attributeDirectories = 0, attributes = 0;
 	uint64 files = 0, directories = 0, indices = 0;
 	uint64 counter = 0;
+	uint32 previousPass = result.pass;
 
 	// check all files and report errors
 	while (ioctl(fd, BFS_IOCTL_CHECK_NEXT_NODE, &result,
@@ -254,34 +255,42 @@ BFSPartitionHandle::Repair(bool checkOnly)
 		if (++counter % 50 == 0)
 			printf("%9Ld nodes processed\x1b[1A\n", counter);
 
-		if (result.errors) {
-			printf("%s (inode = %lld)", result.name, result.inode);
-			if ((result.errors & BFS_MISSING_BLOCKS) != 0)
-				printf(", some blocks weren't allocated");
-			if ((result.errors & BFS_BLOCKS_ALREADY_SET) != 0)
-				printf(", has blocks already set");
-			if ((result.errors & BFS_INVALID_BLOCK_RUN) != 0)
-				printf(", has invalid block run(s)");
-			if ((result.errors & BFS_COULD_NOT_OPEN) != 0)
-				printf(", could not be opened");
-			if ((result.errors & BFS_WRONG_TYPE) != 0)
-				printf(", has wrong type");
-			if ((result.errors & BFS_NAMES_DONT_MATCH) != 0)
-				printf(", names don't match");
-			if ((result.errors & BFS_INVALID_BPLUSTREE) != 0)
-				printf(", invalid b+tree");
-			putchar('\n');
+		if (result.pass == BFS_CHECK_PASS_BITMAP) {
+			if (result.errors) {
+				printf("%s (inode = %lld)", result.name, result.inode);
+				if ((result.errors & BFS_MISSING_BLOCKS) != 0)
+					printf(", some blocks weren't allocated");
+				if ((result.errors & BFS_BLOCKS_ALREADY_SET) != 0)
+					printf(", has blocks already set");
+				if ((result.errors & BFS_INVALID_BLOCK_RUN) != 0)
+					printf(", has invalid block run(s)");
+				if ((result.errors & BFS_COULD_NOT_OPEN) != 0)
+					printf(", could not be opened");
+				if ((result.errors & BFS_WRONG_TYPE) != 0)
+					printf(", has wrong type");
+				if ((result.errors & BFS_NAMES_DONT_MATCH) != 0)
+					printf(", names don't match");
+				if ((result.errors & BFS_INVALID_BPLUSTREE) != 0)
+					printf(", invalid b+tree");
+				putchar('\n');
+			}
+
+			if ((result.mode & (S_INDEX_DIR | 0777)) == S_INDEX_DIR)
+				indices++;
+			else if (result.mode & S_ATTR_DIR)
+				attributeDirectories++;
+			else if (result.mode & S_ATTR)
+				attributes++;
+			else if (S_ISDIR(result.mode))
+				directories++;
+			else
+				files++;
+		} else if (result.pass == BFS_CHECK_PASS_INDEX) {
+			if (previousPass != result.pass) {
+				printf("Recreating broken index b+trees...\n");
+				previousPass = result.pass;
+			}
 		}
-		if ((result.mode & (S_INDEX_DIR | 0777)) == S_INDEX_DIR)
-			indices++;
-		else if (result.mode & S_ATTR_DIR)
-			attributeDirectories++;
-		else if (result.mode & S_ATTR)
-			attributes++;
-		else if (S_ISDIR(result.mode))
-			directories++;
-		else
-			files++;
 	}
 
 	// stop checking
