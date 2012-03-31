@@ -1812,8 +1812,10 @@ BPlusTree::_RemoveDuplicate(Transaction& transaction,
 			return B_BAD_DATA;
 		}
 
-		if (array->Remove(value))
+		if (array->Remove(value)) {
+			arrayCount--;
 			break;
+		}
 
 		if ((duplicateOffset = duplicate->RightLink()) == BPLUSTREE_NULL)
 			RETURN_ERROR(B_ENTRY_NOT_FOUND);
