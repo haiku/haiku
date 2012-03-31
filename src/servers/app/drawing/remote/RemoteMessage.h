@@ -227,7 +227,7 @@ RemoteMessage::Start(uint16 code)
 
 	Add(code);
 
-	uint32 sizeDummy;
+	uint32 sizeDummy = 0;
 	Add(sizeDummy);
 }
 
