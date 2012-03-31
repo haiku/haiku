@@ -1629,9 +1629,8 @@ BMenu::_Track(int* action, long start)
 		// first we check if mouse is inside a submenu,
 		// then if the mouse is inside this menu,
 		// then if it's over a super menu.
-		bool overSub = _OverSubmenu(fSelected, screenLocation);
-		item = _HitTestItems(location, B_ORIGIN);
-		if (overSub || fState == MENU_STATE_KEY_TO_SUBMENU) {
+		if (_OverSubmenu(fSelected, screenLocation)
+				|| fState == MENU_STATE_KEY_TO_SUBMENU) {
 			if (fState == MENU_STATE_TRACKING) {
 				// not if from R.Arrow
 				fState = MENU_STATE_TRACKING_SUBMENU;
@@ -1671,7 +1670,7 @@ BMenu::_Track(int* action, long start)
 				fState = MENU_STATE_TRACKING;
 			if (!LockLooper())
 				break;
-		} else if (item != NULL) {
+		} else if ((item = _HitTestItems(location, B_ORIGIN)) != NULL) {
 			_UpdateStateOpenSelect(item, location, navAreaRectAbove,
 				navAreaRectBelow, selectedTime, navigationAreaTime);
 			if (!releasedOnce)
