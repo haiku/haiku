@@ -13,6 +13,7 @@ SharedLibrary libkernelland_emu.so :
 	module.cpp
 	scheduler.cpp
 	slab.cpp
+	smp.cpp
 	vm.cpp
 
 	khash.cpp
