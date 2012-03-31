@@ -710,8 +710,8 @@ out:
 
 
 status_t
-get_symbol_at_address(void* address, image_id* _imageID, char* nameBuffer,
-	int32* _nameLength, int32* _type, void** _location)
+get_nearest_symbol_at_address(void* address, image_id* _imageID,
+	char** _imagePath, char** _symbolName, int32* _type, void** _location)
 {
 	rld_lock();
 
@@ -721,42 +721,57 @@ get_symbol_at_address(void* address, image_id* _imageID, char* nameBuffer,
 		return B_BAD_VALUE;
 	}
 
-	for (uint32 i = 0; i < HASHTABSIZE(image); i++) {
+	struct Elf32_Sym* foundSymbol = NULL;
+	addr_t foundLocation = (addr_t)NULL;
+
+	bool found = false;
+	for (uint32 i = 0; i < HASHTABSIZE(image) && !found; i++) {
 		for (int32 j = HASHBUCKETS(image)[i]; j != STN_UNDEF;
 				j = HASHCHAINS(image)[j]) {
 			struct Elf32_Sym *symbol = &image->syms[j];
 			addr_t location = symbol->st_value + image->regions[0].delta;
 
-			if (location <= (addr_t)address
-				&& location - 1 + symbol->st_size >= (addr_t)address) {
-				const char* symbolName = SYMNAME(image, symbol);
-				strlcpy(nameBuffer, symbolName, *_nameLength);
-				*_nameLength = strlen(symbolName);
+			if (location <= (addr_t)address	&& location >= foundLocation) {
+				foundSymbol = symbol;
+				foundLocation = location;
 
-				int32 type;
-				if (ELF32_ST_TYPE(symbol->st_info) == STT_FUNC)
-					type = B_SYMBOL_TYPE_TEXT;
-				else if (ELF32_ST_TYPE(symbol->st_info) == STT_OBJECT)
-					type = B_SYMBOL_TYPE_DATA;
-				else
-					type = B_SYMBOL_TYPE_ANY;
-					// TODO: check with the return types of that BeOS function
-
-				if (_imageID != NULL)
-					*_imageID = image->id;
-				if (_type != NULL)
-					*_type = type;
-				if (_location != NULL)
-					*_location = (void*)location;
-
-				rld_unlock();
-				return B_OK;
+				// jump out if we have an exact match
+				if (foundLocation == (addr_t)address) {
+					found = true;
+					break;
+				}
 			}
 		}
 	}
 
+	if (_imageID != NULL)
+		*_imageID = image->id;
+	if (_imagePath != NULL)
+		*_imagePath = image->path;
+
+	if (foundSymbol != NULL) {
+		*_symbolName = SYMNAME(image, foundSymbol);
+
+		if (_type != NULL) {
+			if (ELF32_ST_TYPE(foundSymbol->st_info) == STT_FUNC)
+				*_type = B_SYMBOL_TYPE_TEXT;
+			else if (ELF32_ST_TYPE(foundSymbol->st_info) == STT_OBJECT)
+				*_type = B_SYMBOL_TYPE_DATA;
+			else
+				*_type = B_SYMBOL_TYPE_ANY;
+			// TODO: check with the return types of that BeOS function
+		}
+
+		if (_location != NULL)
+			*_location = (void*)foundLocation;
+	} else {
+		*_symbolName = NULL;
+		if (_location != NULL)
+			*_location = NULL;
+	}
+
 	rld_unlock();
-	return B_BAD_VALUE;
+	return B_OK;
 }
 
 

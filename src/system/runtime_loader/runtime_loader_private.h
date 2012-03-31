@@ -65,8 +65,8 @@ image_id load_library(char const* path, uint32 flags, bool addOn,
 status_t unload_library(void* handle, image_id imageID, bool addOn);
 status_t get_nth_symbol(image_id imageID, int32 num, char* nameBuffer,
 	int32* _nameLength, int32* _type, void** _location);
-status_t get_symbol_at_address(void* address, image_id* _imageID,
-	char* nameBuffer, int32* _nameLength, int32* _type, void** _location);
+status_t get_nearest_symbol_at_address(void* address, image_id* _imageID,
+	char** _imagePath, char** _symbolName, int32* _type, void** _location);
 status_t get_symbol(image_id imageID, char const* symbolName, int32 symbolType,
 	bool recursive, image_id* _inImage, void** _location);
 status_t get_library_symbol(void* handle, void* caller, const char* symbolName,

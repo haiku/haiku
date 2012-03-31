@@ -36,8 +36,9 @@ struct rld_export {
 	status_t (*get_nth_image_symbol)(image_id imageID, int32 num,
 		char *symbolName, int32 *nameLength, int32 *symbolType,
 		void **_location);
-	status_t (*get_symbol_at_address)(void* address, image_id* _imageID,
-		char* nameBuffer, int32* _nameLength, int32* _type, void** _location);
+	status_t (*get_nearest_symbol_at_address)(void* address,
+		image_id* _imageID,	char** _imagePath, char** _symbolName,
+		int32* _type, void** _location);
 	status_t (*test_executable)(const char *path, char *interpreter);
 	status_t (*get_next_image_dependency)(image_id id, uint32 *cookie,
 		const char **_name);

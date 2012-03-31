@@ -51,7 +51,7 @@ struct rld_export gRuntimeLoader = {
 	get_symbol,
 	get_library_symbol,
 	get_nth_symbol,
-	get_symbol_at_address,
+	get_nearest_symbol_at_address,
 	test_executable,
 	get_next_image_dependency,
 
