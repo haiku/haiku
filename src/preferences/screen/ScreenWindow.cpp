@@ -310,15 +310,14 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 
 	fRefreshMenu = new BPopUpMenu("refresh rate", true, true);
 
-	BMessage *message;
-
 	float min, max;
 	if (fScreenMode.GetRefreshLimits(fActive, min, max) && min == max) {
 		// This is a special case for drivers that only support a single
 		// frequency, like the VESA driver
 		BString name;
 		refresh_rate_to_string(min, name);
-		fRefreshMenu->AddItem(item = new BMenuItem(name.String(), message));
+		BMenuItem *item = new BMenuItem(name.String(), NULL);
+		fRefreshMenu->AddItem(item);
 		item->SetEnabled(false);
 	} else {
 		monitor_info info;
@@ -334,16 +333,14 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 			BString name;
 			name << kRefreshRates[i] << " " << B_TRANSLATE("Hz");
 
-			message = new BMessage(POP_REFRESH_MSG);
+			BMessage *message = new BMessage(POP_REFRESH_MSG);
 			message->AddFloat("refresh", kRefreshRates[i]);
 
 			fRefreshMenu->AddItem(new BMenuItem(name.String(), message));
 		}
 
-		message = new BMessage(POP_OTHER_REFRESH_MSG);
-
 		fOtherRefresh = new BMenuItem(B_TRANSLATE("Other" B_UTF8_ELLIPSIS),
-			message);
+			new BMessage(POP_OTHER_REFRESH_MSG));
 		fRefreshMenu->AddItem(fOtherRefresh);
 	}
 
@@ -372,7 +369,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 			true, true);
 
 		for (int32 i = 0; i < kCombineModeCount; i++) {
-			message = new BMessage(POP_COMBINE_DISPLAYS_MSG);
+			BMessage *message = new BMessage(POP_COMBINE_DISPLAYS_MSG);
 			message->AddInt32("mode", kCombineModes[i].mode);
 
 			fCombineMenu->AddItem(new BMenuItem(kCombineModes[i].name,
@@ -389,7 +386,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 			true, true);
 
 		// !order is important - we rely that boolean value == idx
-		message = new BMessage(POP_SWAP_DISPLAYS_MSG);
+		BMessage *message = new BMessage(POP_SWAP_DISPLAYS_MSG);
 		message->AddBool("swap", false);
 		fSwapDisplaysMenu->AddItem(new BMenuItem(B_TRANSLATE("no"), message));
 
