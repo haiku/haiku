@@ -316,7 +316,9 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 		// frequency, like the VESA driver
 		BString name;
 		refresh_rate_to_string(min, name);
-		BMenuItem *item = new BMenuItem(name.String(), NULL);
+		BMessage *message = new BMessage(POP_REFRESH_MSG);
+		message->AddFloat("refresh", min);
+		BMenuItem *item = new BMenuItem(name.String(), message);
 		fRefreshMenu->AddItem(item);
 		item->SetEnabled(false);
 	} else {
