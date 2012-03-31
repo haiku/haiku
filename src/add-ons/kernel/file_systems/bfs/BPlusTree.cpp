@@ -776,7 +776,10 @@ BPlusTree::MakeEmpty()
 			= HOST_ENDIAN_TO_BFS_INT64((uint64)BPLUSTREE_NULL);
 	}
 
-	bplustree_node* node = cached.SetToWritable(transaction, NodeSize());
+	bplustree_node* node = cached.SetToWritable(transaction, NodeSize(), false);
+	if (node == NULL)
+		return B_IO_ERROR;
+
 	node->left_link = HOST_ENDIAN_TO_BFS_INT64((uint64)BPLUSTREE_NULL);
 	node->right_link = HOST_ENDIAN_TO_BFS_INT64((uint64)BPLUSTREE_NULL);
 	node->overflow_link = HOST_ENDIAN_TO_BFS_INT64((uint64)BPLUSTREE_NULL);
