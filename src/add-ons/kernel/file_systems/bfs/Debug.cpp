@@ -277,22 +277,43 @@ static int
 dump_inode(int argc, char** argv)
 {
 	bool block = false;
-	if (argc == 3 && !strcmp(argv[1], "-b"))
+	if (argc >= 3 && !strcmp(argv[1], "-b"))
 		block = true;
 
-	if (argc != 2 + (block ? 1 : 0) || !strcmp(argv[1], "--help")) {
-		kprintf("usage: bfsinode [-b] <ptr-to-inode>\n"
+	if (argc > 3 || !strcmp(argv[1], "--help")) {
+		kprintf("usage: bfsinode [-b] <ptr-to-inode> [<offset>]\n"
 			"  -b the address is regarded as pointer to a block instead of one "
-			"to an inode.\n");
+			"to an inode.\n"
+			"  If <offset> is given, the block_run containing the offset in "
+			"the data stream is printed -- this does not work with -b.\n");
 		return 0;
 	}
 
-	addr_t address = parse_expression(argv[argc - 1]);
+	addr_t address = parse_expression(argv[block ? 2 : 1]);
 	bfs_inode* node;
 	if (block)
 		node = (bfs_inode*)address;
 	else {
 		Inode* inode = (Inode*)address;
+
+		if (argc == 3) {
+			off_t offset = parse_expression(argv[2]);
+			if (offset < 0) {
+				kprintf("invalid offset %" B_PRIdOFF "\n", offset);
+				return 0;
+			}
+			off_t baseOffset;
+			block_run run;
+			status_t status = inode->FindBlockRun(offset, run, baseOffset);
+			if (status != B_OK) {
+				kprintf("find block run failed: %s\n", strerror(status));
+				return 0;
+			}
+
+			dump_block_run("block run:   ", run);
+			kprintf("base offset: %" B_PRIdOFF "\n", baseOffset);
+			return 0;
+		}
 
 		kprintf("INODE %p\n", inode);
 		kprintf("  rw lock:           %p\n", &inode->Lock());
