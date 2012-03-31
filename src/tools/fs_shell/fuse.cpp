@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <syslog.h>
+#include <unistd.h>
 
 #include "fssh.h"
 
@@ -479,40 +480,48 @@ fssh_fuse_session(const char* device, const char* mntPoint, const char* fsName,
 	if (ret != 0)
 		return ret;
 	
-	char* fuseOptions = NULL;
+	if (getuid() == 0 && geteuid() == 0 && getgid() == 0 && getegid() == 0) {
+		// only add FUSE options when user is root
 
-	// default FUSE options
-	char* fsNameOption = NULL;
-	if (fuse_opt_add_opt(&fuseOptions, "allow_other") < 0
-		|| asprintf(&fsNameOption, "fsname=%s", device) < 0
-		|| fuse_opt_add_opt(&fuseOptions, fsNameOption) < 0) {
-		unmount_volume(device, mntPoint);
-		return 1;
-	}
+		char* fuseOptions = NULL;
 
-	struct stat sbuf;
-	if ((stat(device, &sbuf) == 0) && S_ISBLK(sbuf.st_mode)) {
-		int blkSize = 512;
-		fssh_dev_t volumeID = get_volume_id();
-		if (volumeID >= 0) {
-			fssh_fs_info info;
-			if (_kern_read_fs_info(volumeID, &info) == FSSH_B_OK)
-				blkSize = info.block_size;
+		// default FUSE options
+		char* fsNameOption = NULL;
+		if (fuse_opt_add_opt(&fuseOptions, "allow_other") < 0
+			|| asprintf(&fsNameOption, "fsname=%s", device) < 0
+			|| fuse_opt_add_opt(&fuseOptions, fsNameOption) < 0) {
+			unmount_volume(device, mntPoint);
+			return 1;
 		}
 
-		char* blkSizeOption = NULL;
-		if (fuse_opt_add_opt(&fuseOptions, "blkdev") < 0
-			|| asprintf(&blkSizeOption, "blksize=%i", blkSize) < 0
-			|| fuse_opt_add_opt(&fuseOptions, blkSizeOption) < 0) {
+		struct stat sbuf;
+		if ((stat(device, &sbuf) == 0) && S_ISBLK(sbuf.st_mode)) {
+			int blkSize = 512;
+			fssh_dev_t volumeID = get_volume_id();
+			if (volumeID >= 0) {
+				fssh_fs_info info;
+				if (_kern_read_fs_info(volumeID, &info) == FSSH_B_OK)
+					blkSize = info.block_size;
+			}
+
+			char* blkSizeOption = NULL;
+			if (fuse_opt_add_opt(&fuseOptions, "blkdev") < 0
+				|| asprintf(&blkSizeOption, "blksize=%i", blkSize) < 0
+				|| fuse_opt_add_opt(&fuseOptions, blkSizeOption) < 0) {
+				unmount_volume(device, mntPoint);
+				return 1;
+			}
+		}
+
+		if (fuse_opt_add_arg(&fuseArgs, "-o") < 0
+			|| fuse_opt_add_arg(&fuseArgs, fuseOptions) < 0) {
 			unmount_volume(device, mntPoint);
 			return 1;
 		}
 	}
 
  	// Run the fuse_main() loop.
-	if (fuse_opt_add_arg(&fuseArgs, "-s") < 0
-		|| fuse_opt_add_arg(&fuseArgs, "-o") < 0
-		|| fuse_opt_add_arg(&fuseArgs, fuseOptions) < 0) {
+	if (fuse_opt_add_arg(&fuseArgs, "-s") < 0) {
 		unmount_volume(device, mntPoint);
 		return 1;
 	}
