@@ -39,6 +39,7 @@
 #if BFS_TRACING && !defined(BFS_SHELL)
 namespace BFSBlockTracing {
 
+
 class Allocate : public AbstractTraceEntry {
 public:
 	Allocate(block_run run)
@@ -57,8 +58,9 @@ public:
 	const block_run& Run() const { return fRun; }
 
 private:
-	block_run	fRun;
+			block_run			fRun;
 };
+
 
 class Free : public AbstractTraceEntry {
 public:
@@ -78,7 +80,7 @@ public:
 	const block_run& Run() const { return fRun; }
 
 private:
-	block_run	fRun;
+			block_run			fRun;
 };
 
 
@@ -118,12 +120,12 @@ public:
 	}
 
 private:
-	off_t		fBlock;
-	const uint8	*fData;
-	uint32		fStart;
-	uint32		fLength;
-	uint32		fSum;
-	const char*	fLabel;
+			off_t				fBlock;
+			const uint8*		fData;
+			uint32				fStart;
+			uint32				fLength;
+			uint32				fSum;
+			const char*			fLabel;
 };
 
 
@@ -146,11 +148,12 @@ public:
 	}
 
 private:
-	int32		fBlock;
-	uint32		fOldData;
-	uint32		fNewData;
-	const char*	fLabel;
+			int32				fBlock;
+			uint32				fOldData;
+			uint32				fNewData;
+			const char*			fLabel;
 };
+
 
 }	// namespace BFSBlockTracing
 
