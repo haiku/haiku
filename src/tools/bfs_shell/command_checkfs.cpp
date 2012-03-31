@@ -91,6 +91,7 @@ command_checkfs(int argc, const char* const* argv)
 			if (previousPass != result.pass) {
 				fssh_dprintf("Recreating broken index b+trees...\n");
 				previousPass = result.pass;
+				counter = 0;
 			}
 		}
 	}

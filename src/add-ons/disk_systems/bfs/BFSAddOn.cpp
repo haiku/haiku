@@ -289,6 +289,7 @@ BFSPartitionHandle::Repair(bool checkOnly)
 			if (previousPass != result.pass) {
 				printf("Recreating broken index b+trees...\n");
 				previousPass = result.pass;
+				counter = 0;
 			}
 		}
 	}
