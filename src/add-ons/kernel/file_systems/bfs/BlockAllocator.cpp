@@ -1360,8 +1360,14 @@ BlockAllocator::CheckNextNode(check_control* control)
 
 					fCheckCookie->pass = BFS_CHECK_PASS_INDEX;
 					fCheckCookie->control.pass = BFS_CHECK_PASS_INDEX;
+
+					status_t status = _PrepareIndices();
+					if (status != B_OK) {
+						fCheckCookie->control.status = status;
+						return status;
+					}
+
 					fCheckCookie->stack.Push(fVolume->Root());
-					_PrepareIndices();
 					continue;
 				}
 
@@ -2018,6 +2024,8 @@ BlockAllocator::_CheckInodeBlocks(Inode* inode, const char* name)
 status_t
 BlockAllocator::_PrepareIndices()
 {
+	int32 count = 0;
+
 	for (int32 i = 0; i < fCheckCookie->indices.CountItems(); i++) {
 		check_index* index = fCheckCookie->indices.Array()[i];
 		Vnode vnode(fVolume, index->run);
@@ -2041,9 +2049,10 @@ BlockAllocator::_PrepareIndices()
 
 		index->inode = inode;
 		vnode.Keep();
+		count++;
 	}
 
-	return B_OK;
+	return count == 0 ? B_ENTRY_NOT_FOUND : B_OK;
 }
 
 
