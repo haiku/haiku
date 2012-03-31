@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2012, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -400,6 +400,7 @@ Inode::~Inode()
 	delete fTree;
 
 	rw_lock_destroy(&fLock);
+	recursive_lock_destroy(&fSmallDataLock);
 }
 
 
