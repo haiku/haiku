@@ -1860,7 +1860,7 @@ BPlusTree::_RemoveDuplicate(Transaction& transaction,
 
 			status_t status = cachedDuplicate.Free(transaction,
 				duplicateOffset);
-			if (status < B_OK)
+			if (status != B_OK)
 				return status;
 
 			if (left != BPLUSTREE_NULL
@@ -1896,7 +1896,8 @@ BPlusTree::_RemoveDuplicate(Transaction& transaction,
 				}
 			}
 			return B_OK;
-		} else if (isLast && arrayCount <= NUM_FRAGMENT_VALUES) {
+		}
+		if (isLast && arrayCount <= NUM_FRAGMENT_VALUES) {
 			// If the number of entries fits in a duplicate fragment, then
 			// either find a free fragment node, or convert this node to a
 			// fragment node.
