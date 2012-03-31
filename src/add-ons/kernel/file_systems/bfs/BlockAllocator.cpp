@@ -2052,8 +2052,10 @@ BlockAllocator::_FreeIndices()
 {
 	for (int32 i = 0; i < fCheckCookie->indices.CountItems(); i++) {
 		check_index* index = fCheckCookie->indices.Array()[i];
-		put_vnode(fVolume->FSVolume(),
-			fVolume->ToVnode(index->inode->BlockRun()));
+		if (index->inode != NULL) {
+			put_vnode(fVolume->FSVolume(),
+				fVolume->ToVnode(index->inode->BlockRun()));
+		}
 	}
 	fCheckCookie->indices.MakeEmpty();
 }
