@@ -709,6 +709,9 @@ BPlusTree::Validate(bool repair, bool& _errorsFound)
 		if (check.Visited(freeOffset)) {
 			dprintf("inode %" B_PRIdOFF ": free node at %" B_PRIdOFF
 				" circular!\n", fStream->ID(), freeOffset);
+			// TODO: if 'repair' is true, we could collect all unvisited nodes
+			// at the end, and put the into the free list
+			check.FoundError();
 			break;
 		}
 
