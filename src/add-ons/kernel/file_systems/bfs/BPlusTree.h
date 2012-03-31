@@ -169,6 +169,9 @@ public:
 	}
 
 			const bplustree_node* SetTo(off_t offset, bool check = true);
+			status_t			SetTo(off_t offset,
+									const bplustree_node** _node,
+									bool check = true);
 			bplustree_node*		SetToWritable(Transaction& transaction,
 									off_t offset, bool check = true);
 			bplustree_node*		MakeWritable(Transaction& transaction);

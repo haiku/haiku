@@ -268,10 +268,19 @@ CachedNode::Unset()
 const bplustree_node*
 CachedNode::SetTo(off_t offset, bool check)
 {
-	if (fTree == NULL || fTree->fStream == NULL) {
-		REPORT_ERROR(B_BAD_VALUE);
-		return NULL;
-	}
+	const bplustree_node* node;
+	if (SetTo(offset, &node, check) == B_OK)
+		return node;
+
+	return NULL;
+}
+
+
+status_t
+CachedNode::SetTo(off_t offset, const bplustree_node** _node, bool check)
+{
+	if (fTree == NULL || fTree->fStream == NULL)
+		RETURN_ERROR(B_BAD_VALUE);
 
 	Unset();
 
@@ -281,7 +290,7 @@ CachedNode::SetTo(off_t offset, bool check)
 	if (offset > fTree->fHeader.MaximumSize() - fTree->fNodeSize
 		|| offset <= 0
 		|| (offset % fTree->fNodeSize) != 0)
-		return NULL;
+		RETURN_ERROR(B_BAD_VALUE);
 
 	if (InternalSetTo(NULL, offset) != NULL && check) {
 		// sanity checks (links, all_key_count)
@@ -289,10 +298,12 @@ CachedNode::SetTo(off_t offset, bool check)
 			FATAL(("invalid node [%p] read from offset %" B_PRIdOFF " (block %"
 				B_PRIdOFF "), inode at %" B_PRIdINO "\n", fNode, offset,
 				fBlockNumber, fTree->fStream->ID()));
-			return NULL;
+			return B_BAD_DATA;
 		}
 	}
-	return fNode;
+
+	*_node = fNode;
+	return B_OK;
 }
 
 
@@ -702,9 +713,18 @@ BPlusTree::Validate(bool repair, bool& _errorsFound)
 	CachedNode cached(this);
 	off_t freeOffset = fHeader.FreeNode();
 	while (freeOffset > 0) {
-		const bplustree_node* node = cached.SetTo(freeOffset, false);
-		if (node == NULL)
-			return B_IO_ERROR;
+		const bplustree_node* node;
+		status_t status = cached.SetTo(freeOffset, &node, false);
+		if (status != B_OK) {
+			if (status == B_IO_ERROR)
+				return B_IO_ERROR;
+
+			dprintf("inode %" B_PRIdOFF ": free node at %" B_PRIdOFF " could "
+				"not be read: %s\n", fStream->ID(), freeOffset,
+				strerror(status));
+			check.FoundError();
+			break;
+		}
 
 		if (check.Visited(freeOffset)) {
 			dprintf("inode %" B_PRIdOFF ": free node at %" B_PRIdOFF
@@ -726,12 +746,12 @@ BPlusTree::Validate(bool repair, bool& _errorsFound)
 
 	// Iterate over the complete tree recursively
 
-	const bplustree_node* root = cached.SetTo(fHeader.RootNode(), true);
-	if (root == NULL)
-		return B_IO_ERROR;
+	const bplustree_node* root;
+	status_t status = cached.SetTo(fHeader.RootNode(), &root, true);
+	if (status != B_OK)
+		return status;
 
-	status_t status = _ValidateChildren(check, 0, fHeader.RootNode(), NULL, 0,
-		root);
+	status = _ValidateChildren(check, 0, fHeader.RootNode(), NULL, 0, root);
 
 	if (check.ErrorsFound())
 		_errorsFound = true;
@@ -2292,10 +2312,18 @@ BPlusTree::_ValidateChildren(TreeCheck& check, uint32 level, off_t offset,
 			off_t lastDuplicateOffset = BPLUSTREE_NULL;
 
 			while (duplicateOffset != BPLUSTREE_NULL) {
-				const bplustree_node* node
-					= cached.SetTo(duplicateOffset, false);
-				if (node == NULL)
-					return B_IO_ERROR;
+				const bplustree_node* node;
+				status_t status = cached.SetTo(duplicateOffset, &node, false);
+				if (status != B_OK) {
+					if (status == B_IO_ERROR)
+						return B_IO_ERROR;
+
+					dprintf("inode %" B_PRIdOFF ": duplicate node at %"
+						B_PRIdOFF " could not be read: %s\n", fStream->ID(),
+						duplicateOffset, strerror(status));
+					check.FoundError();
+					break;
+				}
 
 				bool isFragmentNode = bplustree_node::LinkType(childOffset)
 					== BPLUSTREE_DUPLICATE_FRAGMENT;
@@ -2419,9 +2447,17 @@ BPlusTree::_ValidateChild(TreeCheck& check, CachedNode& cached, uint32 level,
 	off_t offset, off_t lastOffset, off_t nextOffset,
 	const uint8* key, uint16 keyLength)
 {
-	const bplustree_node* node = cached.SetTo(offset, true);
-	if (node == NULL)
-		return B_IO_ERROR;
+	const bplustree_node* node;
+	status_t status = cached.SetTo(offset, &node, true);
+	if (status != B_OK) {
+		if (status == B_IO_ERROR)
+			return B_IO_ERROR;
+
+		dprintf("inode %" B_PRIdOFF ": node at %" B_PRIdOFF " could not be "
+			"read: %s\n", fStream->ID(), offset, strerror(status));
+		check.FoundError();
+		return B_OK;
+	}
 
 	if (node->LeftLink() != lastOffset) {
 		dprintf("inode %" B_PRIdOFF ": node at %" B_PRIdOFF " has "
