@@ -1795,7 +1795,7 @@ BPlusTree::_RemoveDuplicate(Transaction& transaction,
 		}
 
 		// remove the array from the fragment node if it is empty
-		if (arrayCount == 1) {
+		if (--arrayCount == 1) {
 			// set the link to the remaining value
 			if (cached.MakeWritable(transaction) == NULL)
 				return B_IO_ERROR;
@@ -2331,9 +2331,11 @@ BPlusTree::_ValidateChildren(TreeCheck& check, uint32 level, off_t offset,
 					&& check.VisitedFragment(duplicateOffset);
 
 				if (!isKnownFragment && check.Visited(duplicateOffset)) {
-					dprintf("inode %" B_PRIdOFF ": duplicate node at %"
-						B_PRIdOFF " already visited!\n", fStream->ID(),
-						duplicateOffset);
+					dprintf("inode %" B_PRIdOFF ": %s node at %"
+						B_PRIdOFF " already visited, referenced from %"
+						B_PRIdOFF "!\n", fStream->ID(),
+						isFragmentNode ? "fragment" : "duplicate",
+						duplicateOffset, offset);
 					check.FoundError();
 					break;
 				}
