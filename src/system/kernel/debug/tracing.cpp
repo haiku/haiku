@@ -452,7 +452,7 @@ TracingMetaData::Create(TracingMetaData*& _metaData)
 	physical_address_restrictions physicalRestrictions = {};
 	area = create_area_etc(B_SYSTEM_TEAM, "tracing log",
 		kTraceOutputBufferSize + MAX_TRACE_SIZE, B_CONTIGUOUS,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, CREATE_AREA_DONT_WAIT,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, CREATE_AREA_DONT_WAIT, 0,
 		&virtualRestrictions, &physicalRestrictions,
 		(void**)&metaData->fTraceOutputBuffer);
 	if (area < 0)
@@ -503,8 +503,8 @@ TracingMetaData::_CreateMetaDataArea(bool findPrevious, area_id& _area,
 		physicalRestrictions.high_address = metaDataAddress + B_PAGE_SIZE;
 		area_id area = create_area_etc(B_SYSTEM_TEAM, "tracing metadata",
 			B_PAGE_SIZE, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
-			CREATE_AREA_DONT_CLEAR, &virtualRestrictions, &physicalRestrictions,
-			(void**)&metaData);
+			CREATE_AREA_DONT_CLEAR, 0, &virtualRestrictions,
+			&physicalRestrictions, (void**)&metaData);
 		if (area < 0)
 			continue;
 
@@ -567,7 +567,7 @@ TracingMetaData::_InitPreviousTracingData()
 		+ ROUNDUP(kTraceOutputBufferSize + MAX_TRACE_SIZE, B_PAGE_SIZE);
 	area_id area = create_area_etc(B_SYSTEM_TEAM, "tracing log",
 		kTraceOutputBufferSize + MAX_TRACE_SIZE, B_CONTIGUOUS,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, CREATE_AREA_DONT_CLEAR,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, CREATE_AREA_DONT_CLEAR, 0,
 		&virtualRestrictions, &physicalRestrictions, NULL);
 	if (area < 0) {
 		dprintf("Failed to init tracing meta data: Mapping tracing log "

@@ -627,7 +627,7 @@ MemoryManager::AllocateRaw(size_t size, uint32 flags, void*& _pages)
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 			((flags & CACHE_DONT_WAIT_FOR_MEMORY) != 0
 					? CREATE_AREA_DONT_WAIT : 0)
-				| CREATE_AREA_DONT_CLEAR,
+				| CREATE_AREA_DONT_CLEAR, 0,
 			&virtualRestrictions, &physicalRestrictions, &_pages);
 
 		status_t result = area >= 0 ? B_OK : area;

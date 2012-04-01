@@ -487,7 +487,7 @@ X86PagingMethodPAE::PhysicalPageSlotPool::AllocatePool(
 	physical_address_restrictions physicalRestrictions = {};
 	area_id dataArea = create_area_etc(B_SYSTEM_TEAM, "physical page pool",
 		PAGE_ALIGN(areaSize), B_FULL_LOCK,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, CREATE_AREA_DONT_WAIT,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, CREATE_AREA_DONT_WAIT, 0,
 		&virtualRestrictions, &physicalRestrictions, &data);
 	if (dataArea < 0)
 		return dataArea;

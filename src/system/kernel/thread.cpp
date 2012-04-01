@@ -524,6 +524,7 @@ ThreadCreationAttributes::ThreadCreationAttributes(thread_func function,
 	this->args2 = NULL;
 	this->stack_address = NULL;
 	this->stack_size = 0;
+	this->guard_size = 0;
 	this->pthread = NULL;
 	this->flags = 0;
 	this->team = team >= 0 ? team : team_get_kernel_team()->id;
@@ -781,14 +782,15 @@ init_thread_kernel_stack(Thread* thread, const void* data, size_t dataSize)
 
 static status_t
 create_thread_user_stack(Team* team, Thread* thread, void* _stackBase,
-	size_t stackSize, size_t additionalSize, char* nameBuffer)
+	size_t stackSize, size_t additionalSize, size_t guardSize,
+	char* nameBuffer)
 {
 	area_id stackArea = -1;
 	uint8* stackBase = (uint8*)_stackBase;
 
 	if (stackBase != NULL) {
 		// A stack has been specified. It must be large enough to hold the
-		// TLS space at least.
+		// TLS space at least. Guard pages are ignored for existing stacks.
 		STATIC_ASSERT(TLS_SIZE < MIN_USER_STACK_SIZE);
 		if (stackSize < MIN_USER_STACK_SIZE)
 			return B_BAD_VALUE;
@@ -799,20 +801,22 @@ create_thread_user_stack(Team* team, Thread* thread, void* _stackBase,
 		// will be between USER_STACK_REGION and the main thread stack area. For
 		// a main thread the position is fixed.
 
+		guardSize = PAGE_ALIGN(guardSize);
+
 		if (stackSize == 0) {
 			// Use the default size (a different one for a main thread).
 			stackSize = thread->id == team->id
 				? USER_MAIN_THREAD_STACK_SIZE : USER_STACK_SIZE;
 		} else {
 			// Verify that the given stack size is large enough.
-			if (stackSize < MIN_USER_STACK_SIZE - TLS_SIZE)
+			if (stackSize < MIN_USER_STACK_SIZE)
 				return B_BAD_VALUE;
 
 			stackSize = PAGE_ALIGN(stackSize);
 		}
-		stackSize += USER_STACK_GUARD_PAGES * B_PAGE_SIZE;
 
-		size_t areaSize = PAGE_ALIGN(stackSize + TLS_SIZE + additionalSize);
+		size_t areaSize = PAGE_ALIGN(guardSize + stackSize + TLS_SIZE
+			+ additionalSize);
 
 		snprintf(nameBuffer, B_OS_NAME_LENGTH, "%s_%" B_PRId32 "_stack",
 			thread->name, thread->id);
@@ -836,7 +840,7 @@ create_thread_user_stack(Team* team, Thread* thread, void* _stackBase,
 
 		stackArea = create_area_etc(team->id, nameBuffer,
 			areaSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA | B_STACK_AREA,
-			0, &virtualRestrictions, &physicalRestrictions,
+			0, guardSize, &virtualRestrictions, &physicalRestrictions,
 			(void**)&stackBase);
 		if (stackArea < 0)
 			return stackArea;
@@ -844,7 +848,11 @@ create_thread_user_stack(Team* team, Thread* thread, void* _stackBase,
 
 	// set the stack
 	ThreadLocker threadLocker(thread);
+#ifdef STACK_GROWS_DOWNWARDS
+	thread->user_stack_base = (addr_t)stackBase + guardSize;
+#else
 	thread->user_stack_base = (addr_t)stackBase;
+#endif
 	thread->user_stack_size = stackSize;
 	thread->user_stack_area = stackArea;
 
@@ -858,7 +866,7 @@ thread_create_user_stack(Team* team, Thread* thread, void* stackBase,
 {
 	char nameBuffer[B_OS_NAME_LENGTH];
 	return create_thread_user_stack(team, thread, stackBase, stackSize,
-		additionalSize, nameBuffer);
+		additionalSize, USER_STACK_GUARD_SIZE, nameBuffer);
 }
 
 
@@ -915,11 +923,16 @@ thread_create_thread(const ThreadCreationAttributes& attributes, bool kernel)
 	char stackName[B_OS_NAME_LENGTH];
 	snprintf(stackName, B_OS_NAME_LENGTH, "%s_%" B_PRId32 "_kstack",
 		thread->name, thread->id);
-	thread->kernel_stack_area = create_area(stackName,
-		(void **)&thread->kernel_stack_base, B_ANY_KERNEL_ADDRESS,
-		KERNEL_STACK_SIZE + KERNEL_STACK_GUARD_PAGES  * B_PAGE_SIZE,
-		B_FULL_LOCK,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_KERNEL_STACK_AREA);
+	virtual_address_restrictions virtualRestrictions = {};
+	virtualRestrictions.address_specification = B_ANY_KERNEL_ADDRESS;
+	physical_address_restrictions physicalRestrictions = {};
+
+	thread->kernel_stack_area = create_area_etc(B_SYSTEM_TEAM, stackName,
+		KERNEL_STACK_SIZE + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE,
+		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA
+			| B_KERNEL_STACK_AREA, 0, KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE,
+		&virtualRestrictions, &physicalRestrictions,
+		(void**)&thread->kernel_stack_base);
 
 	if (thread->kernel_stack_area < 0) {
 		// we're not yet part of a team, so we can just bail out
@@ -948,7 +961,8 @@ thread_create_thread(const ThreadCreationAttributes& attributes, bool kernel)
 		if (thread->user_stack_base == 0) {
 			status = create_thread_user_stack(team, thread,
 				attributes.stack_address, attributes.stack_size,
-				attributes.additional_stack_size, stackName);
+				attributes.additional_stack_size, attributes.guard_size,
+				stackName);
 			if (status != B_OK)
 				return status;
 		}

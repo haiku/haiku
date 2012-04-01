@@ -117,6 +117,8 @@ public:
 	inline	void				IncrementWiredPagesCount();
 	inline	void				DecrementWiredPagesCount();
 
+	virtual	int32				GuardSize()	{ return 0; }
+
 			void				AddConsumer(VMCache* consumer);
 
 			status_t			InsertAreaLocked(VMArea* area);

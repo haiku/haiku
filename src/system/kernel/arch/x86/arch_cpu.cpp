@@ -792,7 +792,7 @@ arch_cpu_init_post_vm(kernel_args* args)
 	physical_address_restrictions physicalRestrictions = {};
 	create_area_etc(B_SYSTEM_TEAM, "double fault stacks",
 		kDoubleFaultStackSize * smp_get_num_cpus(), B_FULL_LOCK,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, CREATE_AREA_DONT_WAIT,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, CREATE_AREA_DONT_WAIT, 0,
 		&virtualRestrictions, &physicalRestrictions,
 		(void**)&sDoubleFaultStacks);
 

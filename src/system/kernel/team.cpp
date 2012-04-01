@@ -1333,7 +1333,7 @@ create_team_user_data(Team* team)
 	virtualRestrictions.address_specification = B_BASE_ADDRESS;
 	physical_address_restrictions physicalRestrictions = {};
 	team->user_data_area = create_area_etc(team->id, "user area", size,
-		B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA, 0, &virtualRestrictions,
+		B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA, 0, 0, &virtualRestrictions,
 		&physicalRestrictions, &address);
 	if (team->user_data_area < 0)
 		return team->user_data_area;

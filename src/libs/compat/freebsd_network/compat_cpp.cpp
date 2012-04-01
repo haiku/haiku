@@ -37,7 +37,7 @@ _kernel_contigmalloc_cpp(const char* file, int line, size_t size,
 
 	void* address;
 	area_id area = create_area_etc(B_SYSTEM_TEAM, name, size, B_CONTIGUOUS,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, creationFlags,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, creationFlags, 0,
 		&virtualRestrictions, &physicalRestrictions, &address);
 	if (area < 0)
 		return NULL;
