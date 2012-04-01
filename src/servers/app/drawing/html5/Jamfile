@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src servers app drawing ;
+SubDir HAIKU_TOP src servers app drawing html5 ;
 
 UseLibraryHeaders agg ;
 UsePrivateHeaders app graphics interface kernel shared ;
@@ -7,27 +7,26 @@ UsePrivateSystemHeaders ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app font ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter drawing_modes ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter font_support ] ;
 UseHeaders $(HAIKU_FREETYPE_HEADERS) : true ;
 
-StaticLibrary libasdrawing.a :
-	AccelerantBuffer.cpp
-	AccelerantHWInterface.cpp
-	BitmapBuffer.cpp
-	drawing_support.cpp
-	DrawingEngine.cpp
-	MallocBuffer.cpp
-	UpdateQueue.cpp
-	PatternHandler.cpp
-	Overlay.cpp
+StaticLibrary libashtml5.a :
+	base64.cpp
 
-	BitmapHWInterface.cpp
-	BBitmapBuffer.cpp
-	HWInterface.cpp
+	#NetReceiver.cpp
+	#NetSender.cpp
+
+	HTML5DrawingEngine.cpp
+	CanvasEventStream.cpp
+	HTML5HWInterface.cpp
+	CanvasMessage.cpp
+
+	StreamingRingBuffer.cpp
+
+	WebHandler.cpp
+	WebServer.cpp
+	WebWorker.cpp
 ;
-
-SubInclude HAIKU_TOP src servers app drawing Painter ;
-SubInclude HAIKU_TOP src servers app drawing remote ;
-SubInclude HAIKU_TOP src servers app drawing html5 ;

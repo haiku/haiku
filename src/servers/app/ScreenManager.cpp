@@ -15,6 +15,7 @@
 #include "ServerConfig.h"
 
 #include "remote/RemoteHWInterface.h"
+#include "html5/HTML5HWInterface.h"
 
 #include <Autolock.h>
 #include <Entry.h>
@@ -109,7 +110,15 @@ ScreenManager::AcquireScreens(ScreenOwner* owner, int32* wishList,
 		// there's a specific target screen we want to initialize
 		// TODO: right now we only support remote screens, but we could
 		// also target specific accelerants to support other graphics cards
-		RemoteHWInterface* interface = new(nothrow) RemoteHWInterface(target);
+		HWInterface* interface;
+		/*
+		if (strncmp(target, "vnc:", 4) == 0)
+			interface = new(nothrow) VNCHWInterface(target);
+		else*/
+		if (strncmp(target, "html5:", 6) == 0)
+			interface = new(nothrow) HTML5HWInterface(target);
+		else
+			interface = new(nothrow) RemoteHWInterface(target);
 		if (interface != NULL) {
 			screen_item* item = _AddHWInterface(interface);
 			if (item != NULL && list.AddItem(item->screen)) {

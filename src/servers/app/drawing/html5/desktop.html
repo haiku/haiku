@@ -1,0 +1,29 @@
+<html>
+<!-- Haiku HTML5 desktop -->
+<!-- Loosely inspired by the Broadway GDK backend, just done differently -->
+<head>
+<title>Haiku</title>
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<style type="text/css">
+<!--
+/* basic style */
+body { background-color: #336698; }
+a:link { color:orange; }
+a:visited { color:darkorange; }
+a:hover { color:pink; }
+.haiku_online_form { color: white; }
+.haiku_online_disabled { color: grey; }
+.haiku_online_out { color: white; }
+.haiku_online_debug { color: orange; }
+.haiku_online_error { color: red; font-weight: bold; }
+-->
+</style>
+<script type="text/javascript" src="/haiku.js"></script>
+<link rel="shortcut icon" href="http://haiku-os.org/sites/haiku-os.org/themes/shijin/favicon.ico" type="image/x-icon" />
+</head>
+<body onload="onPageLoad()" onunload="onPageUnload()">
+<canvas id="desktop">Your browser does not support the &lt;canvas&gt; element, which is required.</canvas>
+<noscript>Your browser does not support javascript or javascript is disabled.</noscript>
+<div id="log"></div>
+</body>
+</html>
