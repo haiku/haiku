@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2012, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -22,6 +22,7 @@
 #include "pcihdr.h"
 #include "pci-utils.h"
 
+
 extern const char *__progname;
 
 #define DUMP_MODE	0
@@ -31,6 +32,7 @@ int gMode = USER_MODE;
 #define BUS_ISA		1
 #define BUS_PCI		2
 #define BUS_SCSI 	3
+
 
 static const char *
 get_scsi_device_type(uint8 type)
@@ -99,7 +101,7 @@ dump_attribute(struct device_attr_info *attr, int32 level)
 		default:
 			printf("raw data");
 	}
-	printf("\n");	
+	printf("\n");
 }
 
 
@@ -127,12 +129,12 @@ dump_nodes(device_node_cookie *node, uint8 level)
 	status_t err;
 	device_node_cookie child = *node;
 	dump_device(node, level);
-	
+
 	if (get_child(&child) != B_OK)
 		return;
 
 	do {
-		dump_nodes(&child, level+1);
+		dump_nodes(&child, level + 1);
 	} while ((err = get_next_child(&child)) == B_OK);
 
 }
@@ -166,7 +168,7 @@ display_device(device_node_cookie *node, uint8 level)
 	uint8 scsi_type = 255;
 	char scsi_vendor[64];
 	char scsi_product[64];
-	
+
 	const char *venShort;
 	const char *venFull;
 	const char *devShort;
@@ -185,7 +187,7 @@ display_device(device_node_cookie *node, uint8 level)
 			&& attr.type == B_UINT8_TYPE) {
 			scsi_path_id = attr.value.ui8;
 		} else if (!strcmp(attr.name, B_DEVICE_TYPE)
-			&& attr.type == B_UINT16_TYPE) 
+			&& attr.type == B_UINT16_TYPE)
 			pci_class_base_id = attr.value.ui8;
 		else if (!strcmp(attr.name, B_DEVICE_SUB_TYPE)
 			&& attr.type == B_UINT16_TYPE)
@@ -228,47 +230,53 @@ display_device(device_node_cookie *node, uint8 level)
 		else if (!strcmp(attr.name, PCI_DEVICE_SUBSYSTEM_ID_ITEM)
 			&& attr.type == B_UINT16_TYPE)
 			pci_subsystem_id = attr.value.ui16;*/
-		
+
 		attr.value.raw.data = data;
 		attr.value.raw.length = sizeof(data);
 	}
 
 	switch (bus) {
 		case BUS_ISA:
-			new_level=level+1;
+			new_level = level + 1;
 			break;
-		case BUS_PCI: 
+		case BUS_PCI:
 			printf("\n");
 			{
 				char classInfo[64];
-				get_class_info(pci_class_base_id, pci_class_sub_id, pci_class_api_id, classInfo, 64);
+				get_class_info(pci_class_base_id, pci_class_sub_id,
+					pci_class_api_id, classInfo, 64);
 				put_level(level);
-				printf("device %s [%x|%x|%x]\n", classInfo, pci_class_base_id, pci_class_sub_id, pci_class_api_id);
+				printf("device %s [%x|%x|%x]\n", classInfo, pci_class_base_id,
+					pci_class_sub_id, pci_class_api_id);
 			}
-			
+
 			put_level(level);
 			printf("  ");
 			get_vendor_info(pci_vendor_id, &venShort, &venFull);
 			if (!venShort && !venFull) {
 				printf("vendor %04x: Unknown\n", pci_vendor_id);
 			} else if (venShort && venFull) {
-				printf("vendor %04x: %s - %s\n", pci_vendor_id, venShort, venFull);
+				printf("vendor %04x: %s - %s\n", pci_vendor_id,
+					venShort, venFull);
 			} else {
-				printf("vendor %04x: %s\n", pci_vendor_id, venShort ? venShort : venFull);
+				printf("vendor %04x: %s\n", pci_vendor_id,
+					venShort ? venShort : venFull);
 			}
-		
+
 			put_level(level);
 			printf("  ");
-			get_device_info(pci_vendor_id, pci_device_id, pci_subsystem_vendor_id, pci_subsystem_id, 
-				&devShort, &devFull);
+			get_device_info(pci_vendor_id, pci_device_id,
+				pci_subsystem_vendor_id, pci_subsystem_id, &devShort, &devFull);
 			if (!devShort && !devFull) {
 				printf("device %04x: Unknown\n", pci_device_id);
 			} else if (devShort && devFull) {
-				printf("device %04x: %s (%s)\n", pci_device_id, devShort, devFull);
+				printf("device %04x: %s (%s)\n", pci_device_id,
+					devShort, devFull);
 			} else {
-				printf("device %04x: %s\n", pci_device_id, devShort ? devShort : devFull);
+				printf("device %04x: %s\n", pci_device_id,
+					devShort ? devShort : devFull);
 			}
-			new_level = level+1;
+			new_level = level + 1;
 			break;
 		case BUS_SCSI:
 			if (scsi_type == 255)
@@ -276,13 +284,13 @@ display_device(device_node_cookie *node, uint8 level)
 			put_level(level);
 			printf("  device [%x|%x]\n", scsi_target_id, scsi_target_lun);
 			put_level(level);
-			printf("  vendor %15s\tmodel %15s\ttype %s\n", scsi_vendor, 
-				scsi_product, get_scsi_device_type(scsi_type)); 
+			printf("  vendor %15s\tmodel %15s\ttype %s\n", scsi_vendor,
+				scsi_product, get_scsi_device_type(scsi_type));
 
-			new_level = level+1;
+			new_level = level + 1;
 			break;
 	}
-	
+
 	return new_level;
 }
 
@@ -296,7 +304,7 @@ display_nodes(device_node_cookie *node, uint8 level)
 
 	if (get_child(&child) != B_OK)
 		return;
-		
+
 	do {
 		display_nodes(&child, level);
 	} while ((err = get_next_child(&child)) == B_OK);
@@ -313,9 +321,9 @@ main(int argc, char **argv)
 		printf("Error initializing device manager (%s)\n", strerror(error));
 		return error;
 	}
-	
+
 	if (argc > 2)
-                usage();
+		usage();
 
 	if (argc == 2) {
 		if (!strcmp(argv[1], "-d")) {
