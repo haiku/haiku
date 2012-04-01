@@ -34,7 +34,6 @@ StdBinCommands
 	clear.c
 #	csplit.c
 	driveinfo.c
-#	echo.c
 	error.c
 	fortune.c
 	finddir.c
