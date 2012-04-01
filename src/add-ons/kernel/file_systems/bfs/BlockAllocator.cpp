@@ -2080,6 +2080,8 @@ BlockAllocator::_AddInodeToIndex(Inode* inode)
 		if (index->inode == NULL)
 			continue;
 
+		index->inode->WriteLockInTransaction(transaction);
+
 		BPlusTree* tree = index->inode->Tree();
 		if (tree == NULL)
 			return B_ERROR;
