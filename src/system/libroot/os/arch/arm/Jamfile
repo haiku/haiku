@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src system libroot os arch arm ;
+
+UsePrivateKernelHeaders ;
+UsePrivateSystemHeaders ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
+
+MergeObject os_arch_$(TARGET_ARCH).o :
+	atomic.S
+	byteorder.S
+	system_time.c
+	thread.c
+	time.c
+	tls.c
+
+	generic_system_time_nsecs.cpp
+;

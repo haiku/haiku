@@ -11,6 +11,8 @@ if $(TARGET_ARCH) = x86 {
 	PPC_ONLY = "" ;
 } else if $(TARGET_ARCH) = m68k {
 	M68K_ONLY = "" ;
+} else if $(TARGET_ARCH) = arm {
+	ARM_ONLY = "" ;
 }
 
 local GPL_ONLY = ;
