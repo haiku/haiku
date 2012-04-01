@@ -441,31 +441,21 @@ find_mount(fssh_mount_id id)
 static fssh_status_t
 get_mount(fssh_mount_id id, struct fs_mount **_mount)
 {
-	struct fs_mount *mount;
-	fssh_status_t status;
+	MutexLocker locker(&sMountMutex);
 
-	fssh_mutex_lock(&sMountMutex);
-
-	mount = find_mount(id);
-	if (mount) {
-		// ToDo: the volume is locked (against removal) by locking
-		//	its root node - investigate if that's a good idea
-		if (mount->root_vnode)
-			inc_vnode_ref_count(mount->root_vnode);
-		else {
-			// might have been called during a mount operation in which
-			// case the root node may still be NULL
-			mount = NULL;
-		}
-	} else
-		status = FSSH_B_BAD_VALUE;
-
-	fssh_mutex_unlock(&sMountMutex);
-
+	struct fs_mount *mount = find_mount(id);
 	if (mount == NULL)
-		return FSSH_B_BUSY;
+		return FSSH_B_BAD_VALUE;
 
+	if (mount->root_vnode == NULL) {
+		// might have been called during a mount operation in which
+		// case the root node may still be NULL
+		return FSSH_B_BUSY;
+	}
+
+	inc_vnode_ref_count(mount->root_vnode);
 	*_mount = mount;
+
 	return FSSH_B_OK;
 }
 
