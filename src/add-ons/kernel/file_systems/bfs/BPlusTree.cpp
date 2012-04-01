@@ -454,7 +454,7 @@ CachedNode::Free(Transaction& transaction, off_t offset)
 	off_t lastOffset = header->MaximumSize() - fTree->fNodeSize;
 	if (offset == lastOffset) {
 		status_t status = fTree->fStream->SetFileSize(transaction, lastOffset);
-		if (status < B_OK)
+		if (status != B_OK)
 			return status;
 
 		header->maximum_size = HOST_ENDIAN_TO_BFS_INT64(lastOffset);
@@ -501,7 +501,7 @@ CachedNode::Allocate(Transaction& transaction, bplustree_node** _node,
 
 	// allocate space for a new node
 	Inode* stream = fTree->fStream;
-	if ((status = stream->Append(transaction, fTree->fNodeSize)) < B_OK)
+	if ((status = stream->Append(transaction, fTree->fNodeSize)) != B_OK)
 		return status;
 
 	CachedNode cached(fTree);
@@ -593,7 +593,7 @@ BPlusTree::SetTo(Transaction& transaction, Inode* stream, int32 nodeSize)
 	if (header == NULL) {
 		// allocate space for new header + node!
 		fStatus = stream->SetFileSize(transaction, nodeSize * 2);
-		if (fStatus < B_OK)
+		if (fStatus != B_OK)
 			RETURN_ERROR(fStatus);
 
 		header = cached.SetToWritableHeader(transaction);
@@ -1188,7 +1188,7 @@ BPlusTree::_InsertDuplicate(Transaction& transaction, CachedNode& cached,
 					bplustree_node* newDuplicate;
 					status = cachedDuplicate.Allocate(transaction,
 						&newDuplicate, &offset);
-					if (status < B_OK)
+					if (status != B_OK)
 						RETURN_ERROR(status);
 
 					// Copy the array from the fragment node to the duplicate
@@ -1684,7 +1684,7 @@ BPlusTree::Insert(Transaction& transaction, const uint8* key, uint16 keyLength,
 				bplustree_node* root;
 				status_t status = cachedNewRoot.Allocate(transaction, &root,
 					&newRoot);
-				if (status < B_OK) {
+				if (status != B_OK) {
 					// The tree is most likely corrupted!
 					// But it's still sane at leaf level - we could set
 					// a flag in the header that forces the tree to be
@@ -1700,14 +1700,14 @@ BPlusTree::Insert(Transaction& transaction, const uint8* key, uint16 keyLength,
 			off_t otherOffset;
 			status_t status = cachedOther.Allocate(transaction, &other,
 				&otherOffset);
-			if (status < B_OK) {
+			if (status != B_OK) {
 				cachedNewRoot.Free(transaction, newRoot);
 				RETURN_ERROR(status);
 			}
 
 			if (_SplitNode(writableNode, nodeAndKey.nodeOffset, other,
 					otherOffset, &nodeAndKey.keyIndex, keyBuffer, &keyLength,
-					&value) < B_OK) {
+					&value) != B_OK) {
 				// free root node & other node here
 				cachedOther.Free(transaction, otherOffset);
 				cachedNewRoot.Free(transaction, newRoot);
@@ -1807,7 +1807,7 @@ BPlusTree::_RemoveDuplicate(Transaction& transaction,
 			if (duplicate->FragmentsUsed(fNodeSize) == 1) {
 				status_t status = cachedDuplicate.Free(transaction,
 					duplicateOffset);
-				if (status < B_OK)
+				if (status != B_OK)
 					return status;
 			} else
 				array->count = 0;
@@ -2566,7 +2566,7 @@ TreeIterator::Traverse(int8 direction, void* key, uint16* keyLength,
 	bool forward = direction == BPLUSTREE_FORWARD;
 
 	if (fCurrentNodeOffset == BPLUSTREE_NULL
-		&& Goto(forward ? BPLUSTREE_BEGIN : BPLUSTREE_END) < B_OK)
+		&& Goto(forward ? BPLUSTREE_BEGIN : BPLUSTREE_END) != B_OK)
 		RETURN_ERROR(B_ERROR);
 
 	// if the tree was emptied since the last call
