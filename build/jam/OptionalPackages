@@ -171,11 +171,11 @@ if [ IsOptionalHaikuImagePackageAdded Bazaar ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Bazaar available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		InstallOptionalHaikuImagePackage bzr-2.2.2-r1a3-x86-gcc4-2011-05-23.zip
-			: $(baseURL)/bzr-2.2.2-r1a3-x86-gcc4-2011-05-23.zip ;
+		InstallOptionalHaikuImagePackage bzr-2.6b1-x86-gcc4-2012-03-30.zip
+			: $(baseURL)/bzr-2.6b1-x86-gcc4-2012-03-30.zip ;
 	} else {
-		InstallOptionalHaikuImagePackage bzr-2.2.2-r1a3-x86-gcc2-2011-05-17.zip
-			: $(baseURL)/bzr-2.2.2-r1a3-x86-gcc2-2011-05-17.zip ;
+		InstallOptionalHaikuImagePackage bzr-2.6b1-x86-gcc2-2012-03-31.zip
+			: $(baseURL)/bzr-2.6b1-x86-gcc2-2012-03-31.zip ;
 	}
 }
 
@@ -571,8 +571,8 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 			: $(baseURL)/libtool-2.4-r1a3-x86-gcc4-2011-05-23.zip
 			: : true ;
 		InstallOptionalHaikuImagePackage
-			texinfo-4.13a-r1a3-x86-gcc4-2011-05-24.zip
-			: $(baseURL)/texinfo-4.13a-r1a3-x86-gcc4-2011-05-24.zip
+			texinfo-4.13a-x86-gcc4-2012-03-31.zip
+			: $(baseURL)/texinfo-4.13a-x86-gcc4-2012-03-31.zip
 			: : true ;
 	} else {
 		InstallOptionalHaikuImagePackage
@@ -588,8 +588,8 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 			: $(baseURL)/libtool-2.4-r1a3-x86-gcc2-2011-05-17.zip
 			: : true ;
 		InstallOptionalHaikuImagePackage
-			texinfo-4.13a-r1a3-x86-gcc2-2011-05-18.zip
-			: $(baseURL)/texinfo-4.13a-r1a3-x86-gcc2-2011-05-18.zip
+			texinfo-4.13a-x86-gcc2-2012-03-31.zip
+			: $(baseURL)/texinfo-4.13a-x86-gcc2-2012-03-31.zip
 			: : true ;
 	}
 }
@@ -1585,12 +1585,12 @@ if [ IsOptionalHaikuImagePackageAdded SQLite ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				sqlite-3.7.5-r1a3-x86-gcc4-2011-05-24.zip
-				: $(baseURL)/sqlite-3.7.5-r1a3-x86-gcc4-2011-05-24.zip ;
+				sqlite-3.7.7.1-x86-gcc4-2012-03-30.zip
+				: $(baseURL)/sqlite-3.7.7.1-x86-gcc4-2012-03-30.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				sqlite-3.7.5-r1a3-x86-gcc2-2011-05-17.zip
-				: $(baseURL)/sqlite-3.7.5-r1a3-x86-gcc2-2011-05-17.zip ;
+				sqlite-3.7.7.1-x86-gcc2-2012-03-31.zip
+				: $(baseURL)/sqlite-3.7.7.1-x86-gcc2-2012-03-31.zip ;
 		}
 	}
 }
