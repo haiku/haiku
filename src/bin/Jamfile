@@ -105,7 +105,6 @@ StdBinCommands
 	version.cpp
 	waitfor.cpp
 	WindowShade.cpp
-#	yes.cpp
 	: be : $(haiku-utils_rsrc) ;
 
 if $(TARGET_PLATFORM) = libbe_test {
