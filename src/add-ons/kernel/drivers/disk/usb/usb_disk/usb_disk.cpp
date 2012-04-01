@@ -463,6 +463,7 @@ usb_disk_request_sense(device_lun *lun)
 				TRACE_ALWAYS("request_sense: media changed\n");
 				lun->media_changed = true;
 				lun->media_present = true;
+				
 				return B_DEV_MEDIA_CHANGED;
 			}
 			// fall through
@@ -777,21 +778,17 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 				i, tries);
 			status_t ready = usb_disk_test_unit_ready(lun);
 			if (ready == B_OK || ready == B_DEV_NO_MEDIA) {
-				if (ready == B_OK) {
-					if (lun->device_type == B_CD)
-						lun->write_protected = true;
-					// TODO: check for write protection; disabled since
-					// some devices lock up when getting the mode sense
-					else if (/*usb_disk_mode_sense(lun) != B_OK*/true)
-						lun->write_protected = false;
+				if (lun->device_type == B_CD)
+					lun->write_protected = true;
+				// TODO: check for write protection; disabled since some
+				// devices lock up when getting the mode sense
+				else if (/*usb_disk_mode_sense(lun) != B_OK*/true)
+					lun->write_protected = false;
 
-					TRACE("usb lun %"B_PRIu8" ready. write protected = %c\n", i,
-						lun->write_protected ? 'y' : 'n');
+				TRACE("usb lun %"B_PRIu8" ready. write protected = %c%s\n", i,
+					lun->write_protected ? 'y' : 'n',
+					ready == B_DEV_NO_MEDIA ? " (no media inserted)" : "");
 
-					break;
-				}
-				TRACE("usb lun %"B_PRIu8" is ready... "
-					"but doesn't have any media inserted\n", i);
 				break;
 			}
 			TRACE("usb lun %"B_PRIu8" inquiry attempt %"B_PRIu32" failed\n",
