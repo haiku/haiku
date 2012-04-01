@@ -32,7 +32,6 @@ StdBinCommands
 	cal.c
 	chop.c
 	clear.c
-#	csplit.c
 	driveinfo.c
 	error.c
 	fortune.c
