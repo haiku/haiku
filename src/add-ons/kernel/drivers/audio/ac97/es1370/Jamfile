@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src add-ons kernel drivers audio ac97 es1370 ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
-UsePrivateHeaders libroot media ;
+UsePrivateHeaders libroot media system ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 KernelAddon es1370 :

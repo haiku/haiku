@@ -304,7 +304,6 @@ void
 es1370_stream_delete(es1370_stream *stream)
 {
 	cpu_status status;
-	int32 i;
 	LOG(("es1370_stream_delete\n"));
 	
 	es1370_stream_halt(stream);
@@ -438,7 +437,6 @@ static status_t
 es1370_setup(es1370_dev * card)
 {
 	status_t err = B_OK;
-	status_t rv;
 	unsigned char cmd;
 	
 	PRINT(("es1370_setup(%p)\n", card));
