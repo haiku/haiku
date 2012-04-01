@@ -85,7 +85,6 @@ StdBinCommands
 	diskimage.cpp
 	dpms.cpp
 	draggers.cpp
-#	factor.cpp
 	ffm.cpp
 	iroster.cpp
 	listattr.cpp
