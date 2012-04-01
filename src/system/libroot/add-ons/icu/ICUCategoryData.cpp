@@ -125,6 +125,7 @@ ICUCategoryData::_GetConverter(UConverter*& converterOut)
 		// charset no longer matches the converter, we need to dump it and
 		// create a new one
 		ucnv_close(tlsValue->converter);
+		tlsValue->converter = NULL;
 	}
 
 	// create a new converter for the current charset
