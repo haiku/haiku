@@ -25,7 +25,7 @@ static const char kHexAlphabet[16] = {'0', '1', '2', '3', '4', '5', '6', '7',
 
 
 ssize_t
-encode_base64(char *out, const char *in, off_t length)
+encode_base64(char *out, const char *in, off_t length, bool packed)
 {
 	uint32 concat;
 	int i = 0;
@@ -45,8 +45,12 @@ encode_base64(char *out, const char *in, off_t length)
 		out[k++] = kBase64Alphabet[(concat >> 12) & 63];
 		if ((i+1) < length)
 			out[k++] = kBase64Alphabet[(concat >> 6) & 63];
+		else if (!packed)
+			out[k++] = '=';
 		if ((i+2) < length)
 			out[k++] = kBase64Alphabet[concat & 63];
+		else if (!packed)
+			out[k++] = '=';
 	}
 
 	return k;

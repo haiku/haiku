@@ -8,7 +8,8 @@
 #include <ctype.h>
 
 
-extern ssize_t encode_base64(char *out, const char *in, off_t length);
+extern ssize_t encode_base64(char *out, const char *in, off_t length,
+	bool packed=false);
 extern ssize_t decode_base64(char *out, const char *in, off_t length);
 
 
