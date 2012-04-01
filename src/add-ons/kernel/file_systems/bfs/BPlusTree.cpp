@@ -577,6 +577,8 @@ BPlusTree::~BPlusTree()
 		iterator.Next()->Stop();
 
 	mutex_destroy(&fIteratorLock);
+
+	ASSERT(!fInTransaction);
 }
 
 
