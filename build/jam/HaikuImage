@@ -699,7 +699,7 @@ CopyDirectoryToHaikuImage system data
 	: "PDF Writer" : -x .svn -x Jamfile ;
 
 # Gutenprint data files
-CopyDirectoryToHaikuImage common data
+CopyDirectoryToHaikuImage system data
 	: [ FDirName $(HAIKU_TOP) src libs print libgutenprint src xml ]
 	: gutenprint : -x .svn -x *.c -x Makefile.am -x Makefile.in ;
 
