@@ -1,0 +1,36 @@
+SubDir HAIKU_TOP src add-ons screen_savers glife ;
+SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+# For GCC2
+if $(HAIKU_GCC_VERSION[1]) < 3 {
+    SubDirC++Flags --no-warnings ;
+}
+
+UsePrivateHeaders screen_saver ;
+	# For BuildScreenSaverDefaultSettingsView
+
+local sources =
+	GLifeSaver.cpp
+	GLifeView.cpp
+	GLifeGrid.cpp
+	GLifeConfig.cpp
+;
+
+Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+    # Dependency needed to trigger downloading/unzipping the package before
+    # compiling the files.
+
+AddResources GLife : GLife.rdef ;
+
+ScreenSaver GLife :
+	$(sources) : 
+	be screensaver GL $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+;
+
+DoCatalogs GLife :
+	x-vnd.Haiku-GLifeScreensaver
+	:
+	$(sources)
+;
