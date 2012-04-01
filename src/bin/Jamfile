@@ -55,7 +55,6 @@ StdBinCommands
 	unchop.c
 	uptime.cpp
 	vmstat.cpp
-#	whoami.c
 	: : $(haiku-utils_rsrc) ;
 
 # Commands which don't need another library that depend on
