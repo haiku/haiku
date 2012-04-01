@@ -18,6 +18,7 @@ public:
    virtual void   AttachedToWindow(void);
    virtual void   FrameResized(float newWidth, float newHeight);
    virtual void   MessageReceived(BMessage * msg);
+   virtual void   KeyDown(const char* bytes, int32 numBytes);
    
    void         Render(void);
    
@@ -132,6 +133,7 @@ void SampleGLView::AttachedToWindow(void)
    gInit();
    gReshape(width, height);
    UnlockGL();
+   MakeFocus();
 }
 
 
@@ -247,7 +249,24 @@ void SampleGLView::MessageReceived(BMessage * msg)
 	}
 }
 
-
+void SampleGLView::KeyDown(const char *bytes, int32 numBytes)
+{
+	static bool moved = false;
+	switch (bytes[0]) {
+	case B_SPACE:
+		if (moved) {
+			MoveBy(-30, -30);
+			moved = false;
+		} else {
+			MoveBy(30, 30);
+			moved = true;
+		}
+		break;
+	default:
+		BView::KeyDown(bytes, numBytes);
+		break;
+	}
+}
 
 int main(int argc, char *argv[])
 {
