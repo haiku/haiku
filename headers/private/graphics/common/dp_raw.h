@@ -70,12 +70,12 @@
 // DP Port Capability 0
 #define DP_PORT0_CAPABILITY0				0x0008 // Reg
 #define DP_PORT1_CAPABILITY0				0x000A // Reg
-#define DP_PORTX_CAPABILITY0_EN_EDID_MASK	0x0002 // Bool
-#define DP_PORTX_CAPABILITY0_EN_SECOND_MASK	0x0004 // Bool
+#define DP_PORT_CAPABILITY0_EN_EDID_MASK	0x0002 // Bool
+#define DP_PORT_CAPABILITY0_EN_SECOND_MASK	0x0004 // Bool
 // DP Port Capability 1
 #define DP_PORT0_CAPABILITY1				0x0009 // Reg
 #define DP_PORT1_CAPABILITY1				0x000B // Reg
-#define DP_PORT0_CAPABILITY1_BUF_SIZE_MASK	0x00FF // Size
+#define DP_PORT_CAPABILITY1_BUF_SIZE_MASK	0x00FF // Size
 	// (value + 1) * 32 bytes per lane
 
 /* *** DPCD Link Configuration Field (0x0100)         *** */
@@ -110,14 +110,16 @@
 #define DP_LINK_TRAIN_LANE1					0x0104 // Reg
 #define DP_LINK_TRAIN_LANE2					0x0105 // Reg
 #define DP_LINK_TRAIN_LANE3					0x0106 // Reg
-#define DP_LINK_TRAIN_LANEn_VCCSWING_MASK	0x0003 // Mask
-#define DP_LINK_TRAIN_LANEn_MAXSWING_MASK	0x0004 // Mask
-#define DP_LINK_TRAIN_LANEn_PREE_MASK		0x0018 // Mask
-#define DP_LINK_TRAIN_LANEn_MAXPREE_MASK	0x0020 // Mask
+#define DP_LINK_TRAIN_LANE_VCCSWING_SHIFT	0x0000 // Shift
+#define DP_LINK_TRAIN_LANE_VCCSWING_MASK	0x0003 // Mask
+#define DP_LINK_TRAIN_LANE_MAXSWING_MASK	0x0004 // Mask
+#define DP_LINK_TRAIN_LANE_PREE_MASK		0x0018 // Mask
+#define DP_LINK_TRAIN_LANE_PREE_SHIFT		0x0003 // Shift
+#define DP_LINK_TRAIN_LANE_MAXPREE_MASK		0x0020 // Mask
 // DP Down-spread Control (0x0107)
-#define DP_DOWNSPREAD_CTL					0x0107 // Reg
-#define DP_DOWNSPREAD_CTL_FREQ_MASK			0x0001 // Int
-#define DP_DOWNSPREAD_CTL_AMP_MASK			0x0010 // Int
+#define DP_DOWNSPREAD_CTRL					0x0107 // Reg
+#define DP_DOWNSPREAD_CTRL_FREQ_MASK		0x0001 // Int
+#define DP_DOWNSPREAD_CTRL_AMP_EN			0x0010 // Int
 // DP Main Link Channel Coding (0x0108)
 #define DP_MAIN_CHAN_CODE					0x0108 // Reg
 #define DP_MAIN_CHAN_CODE_EN_ANSI_MASK		0x0001 // Bool
