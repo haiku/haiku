@@ -17,8 +17,8 @@
 /* *** VESA DisplayPort Standard, rev 1.1, p112       *** */
 // DPCD Version (0x0)
 #define DP_DPCD_REV							0x0000 // Reg
-#define	DP_DPCD_REV_MINOR_MASK				0x000F // Int
-#define	DP_DPCD_REV_MAJOR_MASK				0x00F0 // Int
+#define DP_DPCD_REV_MINOR_MASK				0x000F // Int
+#define DP_DPCD_REV_MAJOR_MASK				0x00F0 // Int
 // DP Maximum Link Rate (0x1)
 #define DP_MAX_LINK_RATE					0x0001 // Reg
 #define DP_MAX_LINK_RATE_162				0x0006 // 1.62Ghz
