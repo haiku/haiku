@@ -311,7 +311,15 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 	fRefreshMenu = new BPopUpMenu("refresh rate", true, true);
 
 	float min, max;
-	if (fScreenMode.GetRefreshLimits(fActive, min, max) && min == max) {
+	if (fScreenMode.GetRefreshLimits(fActive, min, max) != B_OK) {
+		// if we couldn't obtain the refresh limits, reset to the default
+		// range. Constraints from detected monitors will fine-tune this
+		// later.
+		min = kRefreshRates[0];
+		max = kRefreshRates[kRefreshRateCount - 1];
+	}
+
+	if (min == max) {
 		// This is a special case for drivers that only support a single
 		// frequency, like the VESA driver
 		BString name;
