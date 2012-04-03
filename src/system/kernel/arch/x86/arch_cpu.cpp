@@ -70,6 +70,16 @@ static const struct cpu_vendor_info vendor_info[VENDOR_NUM] = {
 
 #define K8_CMPHALT				(K8_SMIONCMPHALT | K8_C1EONCMPHALT)
 
+/*
+ * 0 favors highest performance while 15 corresponds to the maximum energy
+ * savings. 7 means balance between performance and energy savings.
+ * Refer to Section 14.3.4 in <Intel 64 and IA-32 Architectures Software
+ * Developer's Manual Volume 3>  for details
+ */
+#define ENERGY_PERF_BIAS_PERFORMANCE	0
+#define ENERGY_PERF_BIAS_BALANCE		7
+#define ENERGY_PERF_BIAS_POWERSAVE		15
+
 struct set_mtrr_parameter {
 	int32	index;
 	uint64	base;
@@ -787,6 +797,16 @@ arch_cpu_init_percpu(kernel_args *args, int cpu)
 		else
 			gCpuIdleFunc = halt_idle;
 	}
+
+	if (x86_check_feature(IA32_FEATURE_EPB, FEATURE_6_ECX)) {
+		uint64 msr = x86_read_msr(IA32_MSR_ENERGY_PERF_BIAS);
+		if ((msr & 0xf) == ENERGY_PERF_BIAS_PERFORMANCE) {
+			msr &= ~0xf;
+			msr |= ENERGY_PERF_BIAS_BALANCE;
+			x86_write_msr(IA32_MSR_ENERGY_PERF_BIAS, msr);
+		}
+	}
+
 	return 0;
 }
 
