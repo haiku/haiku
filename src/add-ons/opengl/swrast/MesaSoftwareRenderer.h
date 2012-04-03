@@ -60,6 +60,10 @@ private:
 								struct gl_renderbuffer* render,
 								GLenum internalFormat,
 								GLuint width, GLuint height);
+	static	GLboolean		_RenderBufferStorageMalloc(gl_context* ctx,
+								struct gl_renderbuffer* render,
+								GLenum internalFormat,
+								GLuint width, GLuint height);
 	static	void			_RenderBufferMap(gl_context *ctx,
 								struct gl_renderbuffer *rb,
 								GLuint x, GLuint y, GLuint w, GLuint h,

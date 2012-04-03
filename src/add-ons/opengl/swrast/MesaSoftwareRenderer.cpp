@@ -516,7 +516,43 @@ MesaSoftwareRenderer::_RenderBufferStorage(gl_context* ctx,
 	render->Height = height;
 
 	struct swrast_renderbuffer *swRenderBuffer = swrast_renderbuffer(render);
+
 	swRenderBuffer->RowStride = width * _mesa_get_format_bytes(render->Format);
+
+	return GL_TRUE;
+}
+
+
+GLboolean
+MesaSoftwareRenderer::_RenderBufferStorageMalloc(gl_context* ctx,
+	struct gl_renderbuffer* render, GLenum internalFormat,
+	GLuint width, GLuint height)
+{
+	CALLED();
+
+	render->Width = width;
+	render->Height = height;
+
+	struct swrast_renderbuffer *swRenderBuffer = swrast_renderbuffer(render);
+
+	if (swRenderBuffer != NULL) {
+		free(swRenderBuffer->Buffer);
+		swRenderBuffer->RowStride
+			= width * _mesa_get_format_bytes(render->Format);
+
+		uint32 size = swRenderBuffer->RowStride * height;
+		TRACE("%s: Allocate %" B_PRIu32 " bytes for RenderBuffer\n",
+			__func__, size);
+		swRenderBuffer->Buffer = (GLubyte*)malloc(size);
+		if (!swRenderBuffer->Buffer) {
+			ERROR("%s: Memory allocation failure!\n", __func__);
+			return GL_FALSE;
+		}
+	} else {
+		ERROR("%s: Couldn't obtain software renderbuffer!\n",
+			__func__);
+		return GL_FALSE;
+	}
 
 	return GL_TRUE;
 }
@@ -553,7 +589,11 @@ MesaSoftwareRenderer::_NewRenderBuffer(bool front)
 	swRenderBuffer->Base.ClassID = HAIKU_SWRAST_RENDERBUFFER_CLASS;
 	swRenderBuffer->Base.RefCount = 1;
 	swRenderBuffer->Base.Delete = _RenderBufferDelete;
-	swRenderBuffer->Base.AllocStorage = _RenderBufferStorage;
+
+	if (!front)
+		swRenderBuffer->Base.AllocStorage = _RenderBufferStorageMalloc;
+	else
+		swRenderBuffer->Base.AllocStorage = _RenderBufferStorage;
 
 	if (_SetupRenderBuffer(&swRenderBuffer->Base, fColorSpace) != B_OK) {
 		free(swRenderBuffer);
@@ -633,6 +673,12 @@ void
 MesaSoftwareRenderer::_RenderBufferDelete(struct gl_renderbuffer* rb)
 {
 	CALLED();
+	if (rb != NULL) {
+		struct swrast_renderbuffer *swRenderBuffer
+			= swrast_renderbuffer(rb);
+		if (swRenderBuffer != NULL)
+			free(swRenderBuffer->Buffer);
+	}
 	free(rb);
 }
 
