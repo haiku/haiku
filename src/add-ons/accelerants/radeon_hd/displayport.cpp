@@ -470,7 +470,7 @@ dp_update_vs_emph(dp_info* dp)
 		ATOM_TRANSMITTER_ACTION_SETUP_VSEMPH);
 
 	// Set vs and emph on the sink
-	dp_aux_write(dp->auxPin, DP_LINK_TRAIN_LANE0,
+	dp_aux_write(dp->auxPin, DP_TRAIN_LANE0,
 		dp->trainingSet, dp->laneCount, 0);
 }
 
@@ -483,7 +483,7 @@ dp_get_adjust_request_voltage(dp_info* dp, int lane)
 		: DP_ADJUST_VOLTAGE_SWING_LANE0_SHIFT);
 	uint8 l = dp->linkStatus[i - DP_LANE0_1_STATUS];
 
-	return ((l >> s) & 0x3) << DP_LINK_TRAIN_LANE_VCCSWING_SHIFT;
+	return ((l >> s) & 0x3) << DP_TRAIN_VCC_SWING_SHIFT;
 }
 
 
@@ -495,12 +495,8 @@ dp_get_adjust_request_pre_emphasis(dp_info* dp, int lane)
 		: DP_ADJUST_PRE_EMPHASIS_LANE0_SHIFT);
 	uint8 l = dp->linkStatus[i - DP_LANE0_1_STATUS];
 
-	return ((l >> s) & 0x3) << DP_LINK_TRAIN_LANE_PREE_SHIFT;
+	return ((l >> s) & 0x3) << DP_TRAIN_PRE_EMPHASIS_SHIFT;
 }
-
-
-#define DP_VOLTAGE_MAX         DP_TRAIN_VOLTAGE_SWING_1200
-#define DP_PRE_EMPHASIS_MAX    DP_TRAIN_PRE_EMPHASIS_9_5
 
 
 static void
@@ -524,8 +520,8 @@ dp_get_adjust_train(dp_info* dp)
 		uint8 lanePreEmphasis = dp_get_adjust_request_pre_emphasis(dp, lane);
 
 		TRACE("%s: Requested %s at %s for lane %d\n", __func__,
-			preEmphasisNames[lanePreEmphasis >> DP_LINK_TRAIN_LANE_PREE_SHIFT],
-			voltageNames[laneVoltage >> DP_LINK_TRAIN_LANE_VCCSWING_SHIFT],
+			preEmphasisNames[lanePreEmphasis >> DP_TRAIN_PRE_EMPHASIS_SHIFT],
+			voltageNames[laneVoltage >> DP_TRAIN_VCC_SWING_SHIFT],
 			lane);
 
 		if (laneVoltage > voltage)
@@ -534,11 +530,13 @@ dp_get_adjust_train(dp_info* dp)
 			preEmphasis = lanePreEmphasis;
 	}
 
-	if (voltage >= DP_VOLTAGE_MAX)
-		voltage |= DP_TRAIN_MAX_SWING_REACHED;
+	// Check for maximum voltage and toggle max if reached
+	if (voltage >= DP_TRAIN_VCC_SWING_1200)
+		voltage |= DP_TRAIN_MAX_SWING_EN;
 
-	if (preEmphasis >= DP_PRE_EMPHASIS_MAX)
-		preEmphasis |= DP_TRAIN_MAX_PRE_EMPHASIS_REACHED;
+	// Check for maximum pre-emphasis and toggle max if reached
+	if (preEmphasis >= DP_TRAIN_PRE_EMPHASIS_9_5)
+		preEmphasis |= DP_TRAIN_MAX_EMPHASIS_EN;
 
 	for (lane = 0; lane < 4; lane++)
 		dp->trainingSet[lane] = voltage | preEmphasis;
@@ -557,13 +555,13 @@ dp_set_tp(dp_info* dp, int trainingPattern)
 	/* set training pattern on the source */
 	if (info.dceMajor >= 4 || !dp->trainingUseEncoder) {
 		switch (trainingPattern) {
-			case DP_LINK_TRAIN_PATTERN_1:
+			case DP_TRAIN_PATTERN_1:
 				rawTrainingPattern = ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN1;
 				break;
-			case DP_LINK_TRAIN_PATTERN_2:
+			case DP_TRAIN_PATTERN_2:
 				rawTrainingPattern = ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN2;
 				break;
-			case DP_LINK_TRAIN_PATTERN_3:
+			case DP_TRAIN_PATTERN_3:
 				rawTrainingPattern = ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN3;
 				break;
 		}
@@ -588,7 +586,7 @@ dp_set_tp(dp_info* dp, int trainingPattern)
 	}
 
 	// Enable training pattern on the sink
-	dpcd_reg_write(dp->auxPin, DP_LINK_TRAIN, trainingPattern);
+	dpcd_reg_write(dp->auxPin, DP_TRAIN, trainingPattern);
 }
 
 
@@ -603,7 +601,7 @@ dp_link_train_cr(dp_info* dp)
 	uint8 voltage = 0xff;
 	int lane;
 
-	dp_set_tp(dp, DP_LINK_TRAIN_PATTERN_1);
+	dp_set_tp(dp, DP_TRAIN_PATTERN_1);
 	memset(dp->trainingSet, 0, 4);
 	dp_update_vs_emph(dp);
 
@@ -622,7 +620,7 @@ dp_link_train_cr(dp_info* dp)
 		}
 
 		for (lane = 0; lane < dp->laneCount; lane++) {
-			if ((dp->trainingSet[lane] & DP_TRAIN_MAX_SWING_REACHED) == 0)
+			if ((dp->trainingSet[lane] & DP_TRAIN_MAX_SWING_EN) == 0)
 				break;
 		}
 
@@ -631,7 +629,7 @@ dp_link_train_cr(dp_info* dp)
 			break;
 		}
 
-		if ((dp->trainingSet[0] & DP_TRAIN_VOLTAGE_SWING_MASK) == voltage) {
+		if ((dp->trainingSet[0] & DP_TRAIN_VCC_SWING_MASK) == voltage) {
 			dp->trainingAttempts++;
 			if (dp->trainingAttempts >= 5) {
 				ERROR("%s: clock recovery tried 5 times\n", __func__);
@@ -640,7 +638,7 @@ dp_link_train_cr(dp_info* dp)
 		} else
 			dp->trainingAttempts = 0;
 
-		voltage = dp->trainingSet[0] & DP_TRAIN_VOLTAGE_SWING_MASK;
+		voltage = dp->trainingSet[0] & DP_TRAIN_VCC_SWING_MASK;
 
 		// Compute new trainingSet as requested by sink
 		dp_get_adjust_train(dp);
@@ -654,9 +652,9 @@ dp_link_train_cr(dp_info* dp)
 	}
 
 	TRACE("%s: clock recovery at voltage %d pre-emphasis %d\n",
-		__func__, dp->trainingSet[0] & DP_TRAIN_VOLTAGE_SWING_MASK,
-		(dp->trainingSet[0] & DP_LINK_TRAIN_LANE_PREE_MASK)
-		>> DP_LINK_TRAIN_LANE_PREE_SHIFT);
+		__func__, dp->trainingSet[0] & DP_TRAIN_VCC_SWING_MASK,
+		(dp->trainingSet[0] & DP_TRAIN_PRE_EMPHASIS_MASK)
+		>> DP_TRAIN_PRE_EMPHASIS_SHIFT);
 	return B_OK;
 }
 
@@ -718,7 +716,7 @@ dp_link_train(uint8 crtcID, display_mode* mode)
 	// *** DisplayPort link training initialization
 
 	// Power up the DP sink
-	if (dp->config[0] >= 0x11)
+	if (dp->config[0] >= DP_DPCD_REV_11)
 		dpcd_reg_write(hwPin, DP_SET_POWER, DP_SET_POWER_D0);
 
 	// Possibly enable downspread on the sink
@@ -730,8 +728,8 @@ dp_link_train(uint8 crtcID, display_mode* mode)
 	encoder_dig_setup(connectorIndex, mode->timing.pixel_clock,
 		ATOM_ENCODER_CMD_SETUP_PANEL_MODE);
 
-	if (dp->config[0] >= 0x11)
-		sandbox |= DP_ENHANCED_FRAME_EN_MASK;
+	if (dp->config[0] >= DP_DPCD_REV_11)
+		sandbox |= DP_ENHANCED_FRAME_EN;
 	dpcd_reg_write(hwPin, DP_LANE_COUNT, sandbox);
 
 	// Set the link rate on the DP sink
@@ -748,7 +746,7 @@ dp_link_train(uint8 crtcID, display_mode* mode)
 	}
 
 	// Disable the training pattern on the sink
-	dpcd_reg_write(hwPin, DP_LINK_TRAIN, DP_LINK_TRAIN_PATTERN_DISABLED);
+	dpcd_reg_write(hwPin, DP_TRAIN, DP_TRAIN_PATTERN_DISABLED);
 
 	dp_link_train_cr(dp);
 	// TODO: dp_link_train_ce
@@ -758,7 +756,7 @@ dp_link_train(uint8 crtcID, display_mode* mode)
 	snooze(400);
 
 	// Disable the training pattern on the sink
-	dpcd_reg_write(hwPin, DP_LINK_TRAIN, DP_LINK_TRAIN_PATTERN_DISABLED);
+	dpcd_reg_write(hwPin, DP_TRAIN, DP_TRAIN_PATTERN_DISABLED);
 
 	// Disable the training pattern on the source
 	if (info.dceMajor >= 4 || !dp->trainingUseEncoder) {

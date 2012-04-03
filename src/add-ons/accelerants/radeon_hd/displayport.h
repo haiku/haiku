@@ -17,6 +17,10 @@
 #include "displayport_reg.h"
 
 
+// Radeon HD specific DisplayPort Configuration Data
+#define DP_TRAINING_AUX_RD_INTERVAL 0x000e
+
+
 int dp_aux_write(uint32 hwPin, uint16 address, uint8* send,
 	uint8 sendBytes, uint8 delay);
 int dp_aux_read(uint32 hwPin, uint16 address, uint8* recv,

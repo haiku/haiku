@@ -18,37 +18,6 @@
 
 #define DP_TPS3_SUPPORTED					(1 << 6)
 
-#define DP_FORMAT_CONVERSION				(1 << 3)
-
-#define DP_TRAINING_AUX_RD_INTERVAL         0x00e
-
-#define DP_LINK_QUAL_PATTERN_DISABLE		(0 << 2)
-#define DP_LINK_QUAL_PATTERN_D10_2			(1 << 2)
-#define DP_LINK_QUAL_PATTERN_ERROR_RATE		(2 << 2)
-#define DP_LINK_QUAL_PATTERN_PRBS7			(3 << 2)
-#define DP_LINK_QUAL_PATTERN_MASK			(3 << 2)
-
-#define DP_SYMBOL_ERROR_COUNT_BOTH			(0 << 6)
-#define DP_SYMBOL_ERROR_COUNT_DISPARITY		(1 << 6)
-#define DP_SYMBOL_ERROR_COUNT_SYMBOL		(2 << 6)
-#define DP_SYMBOL_ERROR_COUNT_MASK			(3 << 6)
-
-#define DP_TRAIN_VOLTAGE_SWING_MASK			0x3
-#define DP_TRAIN_VOLTAGE_SWING_SHIFT		0
-#define DP_TRAIN_MAX_SWING_REACHED			(1 << 2)
-#define DP_TRAIN_VOLTAGE_SWING_400			(0 << 0)
-#define DP_TRAIN_VOLTAGE_SWING_600			(1 << 0)
-#define DP_TRAIN_VOLTAGE_SWING_800			(2 << 0)
-#define DP_TRAIN_VOLTAGE_SWING_1200			(3 << 0)
-
-#define DP_TRAIN_PRE_EMPHASIS_MASK			(3 << 3)
-#define DP_TRAIN_PRE_EMPHASIS_0				(0 << 3)
-#define DP_TRAIN_PRE_EMPHASIS_3_5			(1 << 3)
-#define DP_TRAIN_PRE_EMPHASIS_6				(2 << 3)
-#define DP_TRAIN_PRE_EMPHASIS_9_5			(3 << 3)
-
-#define DP_TRAIN_MAX_PRE_EMPHASIS_REACHED	(1 << 5)
-
 #define DP_LANE0_1_STATUS					0x202
 #define DP_LANE2_3_STATUS					0x203
 #define DP_LANE_CR_DONE						(1 << 0)
