@@ -516,6 +516,22 @@ dump_feature_string(int currentCPU, cpu_ent *cpu)
 		strlcat(features, "3dnowext ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_3DNOW)
 		strlcat(features, "3dnow ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_DTS)
+		strlcat(features, "dts ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_ITB)
+		strlcat(features, "itb ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_ARAT)
+		strlcat(features, "arat ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_PLN)
+		strlcat(features, "pln ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_ECMD)
+		strlcat(features, "ecmd ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_PTM)
+		strlcat(features, "ptm ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_6_ECX] & IA32_FEATURE_APERFMPERF)
+		strlcat(features, "aperfmperf ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_6_ECX] & IA32_FEATURE_EPB)
+		strlcat(features, "epb ", sizeof(features));
 
 	dprintf("CPU %d: features: %s\n", currentCPU, features);
 }
@@ -625,6 +641,9 @@ detect_cpu(int currentCPU)
 		get_current_cpuid(&cpuid, 0x80000001);
 		cpu->arch.feature[FEATURE_EXT_AMD] = cpuid.regs.edx; // edx
 	}
+	get_current_cpuid(&cpuid, 6);
+	cpu->arch.feature[FEATURE_6_EAX] = cpuid.regs.eax;
+	cpu->arch.feature[FEATURE_6_ECX] = cpuid.regs.ecx;
 
 #if DUMP_FEATURE_STRING
 	dump_feature_string(currentCPU, cpu);

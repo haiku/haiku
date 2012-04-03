@@ -37,7 +37,7 @@
 #define K8_MSR_IPM						0xc0010055
 
 // x86 features from cpuid eax 1, edx register
-// reference http://www.intel.com/assets/pdf/appnote/241618.pdf (Table 5-5)
+// reference http://www.intel.com/Assets/en_US/PDF/appnote/241618.pdf (Table 5-5)
 #define IA32_FEATURE_FPU	(1 << 0) // x87 fpu
 #define IA32_FEATURE_VME	(1 << 1) // virtual 8086
 #define IA32_FEATURE_DE		(1 << 2) // debugging extensions
@@ -72,7 +72,7 @@
 #define IA32_FEATURE_PBE	(1 << 31) // pending break enable
 
 // x86 features from cpuid eax 1, ecx register
-// reference http://www.intel.com/assets/pdf/appnote/241618.pdf (Table 5-4)
+// reference http://www.intel.com/Assets/en_US/PDF/appnote/241618.pdf (Table 5-4)
 #define IA32_FEATURE_EXT_SSE3		(1 << 0) // SSE3
 #define IA32_FEATURE_EXT_PCLMULQDQ	(1 << 1) // PCLMULQDQ Instruction
 #define IA32_FEATURE_EXT_DTES64		(1 << 2) // 64-Bit Debug Store
@@ -116,6 +116,20 @@
 #define IA32_FEATURE_AMD_EXT_LONG		(1 << 29) // long mode
 #define IA32_FEATURE_AMD_EXT_3DNOWEXT	(1 << 30) // 3DNow! extensions
 #define IA32_FEATURE_AMD_EXT_3DNOW		(1 << 31) // 3DNow!
+
+// x86 defined features from cpuid eax 6, eax register
+// reference http://www.intel.com/Assets/en_US/PDF/appnote/241618.pdf (Table 5-11)
+#define IA32_FEATURE_DTS	(1 << 0) //Digital Thermal Sensor
+#define IA32_FEATURE_ITB	(1 << 1) //Intel Turbo Boost Technology
+#define IA32_FEATURE_ARAT	(1 << 2) //Always running APIC Timer
+#define IA32_FEATURE_PLN	(1 << 4) //Power Limit Notification
+#define IA32_FEATURE_ECMD	(1 << 5) //Extended Clock Modulation Duty
+#define IA32_FEATURE_PTM	(1 << 6) //Package Thermal Management
+
+// x86 defined features from cpuid eax 6, ecx register
+// reference http://www.intel.com/Assets/en_US/PDF/appnote/241618.pdf (Table 5-11)
+#define IA32_FEATURE_APERFMPERF	(1 << 0) //IA32_APERF, IA32_MPERF
+#define IA32_FEATURE_EPB	(1 << 3) //IA32_ENERGY_PERF_BIAS
 
 // cr4 flags
 #define IA32_CR4_PAE					(1UL << 5)
@@ -280,6 +294,8 @@ enum x86_feature_type {
 	FEATURE_COMMON = 0,     // cpuid eax=1, ecx register
 	FEATURE_EXT,            // cpuid eax=1, edx register
 	FEATURE_EXT_AMD,        // cpuid eax=0x80000001, edx register (AMD)
+	FEATURE_6_EAX,          // cpuid eax=6, eax registers
+	FEATURE_6_ECX,          // cpuid eax=6, ecx registers
 
 	FEATURE_NUM
 };
