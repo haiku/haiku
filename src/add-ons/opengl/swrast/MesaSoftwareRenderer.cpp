@@ -179,8 +179,8 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView* view, ulong options,
 		fVisual->haveAccumBuffer, alphaFlag, GL_FALSE);
 
 	BRect bounds = view->Bounds();
-	fWidth = fNewWidth = (GLint)bounds.Width();
-	fHeight = fNewHeight = (GLint)bounds.Height();
+	fWidth = (GLint)bounds.Width();
+	fHeight = (GLint)bounds.Height();
 
 	// some stupid applications (Quake2) don't even think about calling LockGL()
 	// before using glGetString and its glGet*() friends...
@@ -221,11 +221,14 @@ MesaSoftwareRenderer::LockGL()
 
 	color_space colorSpace = BScreen(GLView()->Window()).ColorSpace();
 
+	GLuint width = fWidth;
+	GLuint height = fHeight;
+
 	BAutolock lock(fInfoLocker);
 	if (fDirectModeEnabled && fInfo != NULL) {
-		fNewWidth = fInfo->window_bounds.right
+		width = fInfo->window_bounds.right
 			- fInfo->window_bounds.left + 1;
-		fNewHeight = fInfo->window_bounds.bottom
+		height = fInfo->window_bounds.bottom
 			- fInfo->window_bounds.top + 1;
 	}
 
@@ -236,7 +239,7 @@ MesaSoftwareRenderer::LockGL()
 			_SetupRenderBuffer(&fBackRenderBuffer->Base, fColorSpace);
 	}
 
-	_CheckResize();
+	_CheckResize(width, height);
 }
 
 
@@ -396,25 +399,23 @@ void
 MesaSoftwareRenderer::FrameResized(float width, float height)
 {
 	BAutolock lock(fInfoLocker);
-	fNewWidth = (GLuint)width;
-	fNewHeight = (GLuint)height;
-	_CheckResize();
+	_CheckResize((GLuint)width, (GLuint)height);
 }
 
 
 void
-MesaSoftwareRenderer::_CheckResize()
+MesaSoftwareRenderer::_CheckResize(GLuint newWidth, GLuint newHeight)
 {
 	CALLED();
 
-	if (fBitmap && fNewWidth == fWidth
-		&& fNewHeight == fHeight) {
+	if (fBitmap && newWidth == fWidth
+		&& newHeight == fHeight) {
 		return;
 	}
 
-	fHeight = fNewHeight;
-	fWidth = fNewWidth;
-	_mesa_resize_framebuffer(fContext, fFrameBuffer, fWidth, fHeight);
+	_mesa_resize_framebuffer(fContext, fFrameBuffer, newWidth, newHeight);
+	fHeight = newHeight;
+	fWidth = newWidth;
 
 	_AllocateBitmap();
 }

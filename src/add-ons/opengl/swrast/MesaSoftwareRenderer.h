@@ -46,7 +46,7 @@ public:
 private:
 	static	void			_Error(gl_context* ctx);
 	static	const GLubyte*	_GetString(gl_context* ctx, GLenum name);
-			void			_CheckResize();
+			void			_CheckResize(GLuint newWidth, GLuint newHeight);
 	static	void			_UpdateState(gl_context* ctx, GLuint newState);
 	static	void			_Flush(gl_context *ctx);
 
@@ -88,8 +88,6 @@ private:
 
 			GLuint			fWidth;
 			GLuint			fHeight;
-			GLuint 			fNewWidth;
-			GLuint			fNewHeight;
 			color_space		fColorSpace;
 
 			void*			fRowAddr[SWRAST_MAX_HEIGHT];
