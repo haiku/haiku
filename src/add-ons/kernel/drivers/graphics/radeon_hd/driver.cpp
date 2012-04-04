@@ -139,6 +139,7 @@ const struct supported_device {
 	{0x9555, 3, 2, RADEON_RV710, CHIP_STD, "Radeon HD 4350"},
 	{0x9540, 3, 2, RADEON_RV710, CHIP_STD, "Radeon HD 4550"},
 	{0x9480, 3, 2, RADEON_RV730, CHIP_STD, "Radeon HD 4650"},
+	{0x9488, 3, 2, RADEON_RV730, CHIP_MOBILE, "Radeon HD 4650"},
 	{0x9498, 3, 2, RADEON_RV730, CHIP_STD, "Radeon HD 4650"},
 	{0x94b4, 3, 2, RADEON_RV740, CHIP_STD, "Radeon HD 4700"},
 	{0x9490, 3, 2, RADEON_RV730, CHIP_STD, "Radeon HD 4710"},
