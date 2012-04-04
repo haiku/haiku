@@ -18,6 +18,9 @@
 #include <TokenSpace.h>
 
 
+extern void __initialize_locale_kit();
+
+
 // debugging
 //#define DBG(x) x
 #define DBG(x)
@@ -55,6 +58,8 @@ extern "C" void
 initialize_after()
 {
 	DBG(OUT("initialize_after()\n"));
+
+	__initialize_locale_kit();
 
 	DBG(OUT("initialize_after() done\n"));
 }

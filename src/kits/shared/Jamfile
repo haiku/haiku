@@ -4,7 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UseLibraryHeaders agg ;
-UsePrivateHeaders shared libbe ;
+UsePrivateHeaders shared locale ;
 UseHeaders [ FDirName $(HAIKU_COMMON_DEBUG_OBJECT_DIR) servers input ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src kits ] ;
 

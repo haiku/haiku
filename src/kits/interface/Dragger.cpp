@@ -18,13 +18,12 @@
 #include <Alert.h>
 #include <Beep.h>
 #include <Bitmap.h>
-#include <Catalog.h>
 #include <Dragger.h>
-#include <LocaleBackend.h>
 #include <MenuItem.h>
 #include <Message.h>
 #include <PopUpMenu.h>
 #include <Shelf.h>
+#include <SystemCatalog.h>
 #include <Window.h>
 
 #include <AutoLocker.h>
@@ -37,15 +36,14 @@
 
 #include "ZombieReplicantView.h"
 
-using BPrivate::gLocaleBackend;
-using BPrivate::LocaleBackend;
+using BPrivate::gSystemCatalog;
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "Dragger"
 
 #undef B_TRANSLATE
 #define B_TRANSLATE(str) \
-	gLocaleBackend->GetString(B_TRANSLATE_MARK(str), "Dragger")
+	gSystemCatalog->GetString(B_TRANSLATE_MARK(str), "Dragger")
 
 const uint32 kMsgDragStarted = 'Drgs';
 
@@ -629,11 +627,6 @@ BDragger::_InitData()
 {
 	fBitmap = new BBitmap(BRect(0.0f, 0.0f, 7.0f, 7.0f), B_CMAP8, false, false);
 	fBitmap->SetBits(kHandBitmap, fBitmap->BitsLength(), 0, B_CMAP8);
-
-	// we need to translate some strings, and in order to do so, we need
-	// to use the LocaleBackend to reach liblocale.so
-	if (gLocaleBackend == NULL)
-		LocaleBackend::LoadBackend();
 }
 
 

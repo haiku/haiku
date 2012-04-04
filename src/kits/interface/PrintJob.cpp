@@ -19,32 +19,30 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Button.h>
-#include <Catalog.h>
 #include <Debug.h>
 #include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
-#include <LocaleBackend.h>
 #include <Messenger.h>
 #include <NodeInfo.h>
 #include <OS.h>
 #include <Path.h>
 #include <Region.h>
 #include <Roster.h>
+#include <SystemCatalog.h>
 #include <View.h>
 
 #include <pr_server.h>
 #include <ViewPrivate.h>
 
-using BPrivate::gLocaleBackend;
-using BPrivate::LocaleBackend;
+using BPrivate::gSystemCatalog;
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "PrintJob"
 
 #undef B_TRANSLATE
 #define B_TRANSLATE(str) \
-	gLocaleBackend->GetString(B_TRANSLATE_MARK(str), "PrintJob")
+	gSystemCatalog->GetString(B_TRANSLATE_MARK(str), "PrintJob")
 
 
 /*!	Summary of spool file:
@@ -170,11 +168,6 @@ BPrintJob::BPrintJob(const char* jobName)
 	fCurrentPageHeader = new _page_header_;
 	if (fCurrentPageHeader != NULL)
 		memset(fCurrentPageHeader, 0, sizeof(_page_header_));
-
-	// we need to translate some strings, and in order to do so, we need
-	// to use the LocaleBackend to reach liblocale.so
-	if (gLocaleBackend == NULL)
-		LocaleBackend::LoadBackend();
 }
 
 

@@ -18,7 +18,7 @@ if $(RUN_WITHOUT_APP_SERVER) != 0 {
 }
 
 UseLibraryHeaders icon ;
-UsePrivateHeaders shared app interface kernel notification ;
+UsePrivateHeaders shared app interface kernel locale notification ;
 UsePrivateSystemHeaders ;
 
 SetSubDirSupportedPlatforms haiku libbe_test ;

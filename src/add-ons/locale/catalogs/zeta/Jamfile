@@ -4,5 +4,5 @@ UsePublicHeaders locale ;
 
 Addon <catalog-addon>zeta 
 	: Catalog.cpp 
-	: be liblocale.so $(TARGET_LIBSUPC++)
+	: be $(TARGET_LIBSUPC++)
 	;

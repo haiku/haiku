@@ -81,6 +81,7 @@ StdBinCommands
 	catattr.cpp
 	checkfs.cpp
 	clipboard.cpp
+	clockconfig.cpp
 	df.cpp
 	diskimage.cpp
 	dpms.cpp
@@ -96,6 +97,7 @@ StdBinCommands
 	modifiers.cpp
 	open.cpp
 	play.cpp
+	query.cpp
 	quit.cpp
 	roster.cpp
 	setversion.cpp
@@ -123,13 +125,13 @@ StdBinCommands
 	urlwrapper.cpp
 	: be $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
 
-# commands that need libbe.so and liblocale.so
+# commands that need libbe.so and the stub catalog
 StdBinCommands
 	clockconfig.cpp
 	query.cpp
 	: be $(HAIKU_LOCALE_LIBS) : $(haiku-utils_rsrc) ;
 
-# commands that need libbe.so, libsupc++.so and liblocale.so
+# commands that need libbe.so, libsupc++.so and the stub catalog
 StdBinCommands
 	dstcheck.cpp
 	: be $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS) : $(haiku-utils_rsrc) ;
@@ -212,7 +214,7 @@ StdBinCommands
 	checkitout.cpp
 	: be tracker $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
 
-#standard commands that need libbe.so, libtracker.so, liblocale.so
+#standard commands that need libbe.so, libtracker.so and the stub catalog
 StdBinCommands
 	filepanel.cpp
 	: be tracker $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS) : $(haiku-utils_rsrc) ;

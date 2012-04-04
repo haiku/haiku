@@ -25,7 +25,7 @@ if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 SetSubDirSupportedPlatforms haiku libbe_test ;
 
 UseLibraryHeaders agg ;
-UsePrivateHeaders app input print interface libbe shared support tracker ;
+UsePrivateHeaders app input print interface locale shared support tracker ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src kits tracker ] ;
 

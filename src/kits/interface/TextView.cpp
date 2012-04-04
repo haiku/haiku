@@ -42,6 +42,7 @@
 #include <PropertyInfo.h>
 #include <Region.h>
 #include <ScrollBar.h>
+#include <SystemCatalog.h>
 #include <TextView.h>
 #include <Window.h>
 
@@ -54,21 +55,17 @@
 #include "UndoBuffer.h"
 #include "WidthBuffer.h"
 
-#include <Catalog.h>
-#include <LocaleBackend.h>
-
 
 using namespace std;
-using BPrivate::gLocaleBackend;
-using BPrivate::LocaleBackend;
+using BPrivate::gSystemCatalog;
 
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "TextView"
 
 
-#define TRANSLATE(str) gLocaleBackend->GetString(B_TRANSLATE_MARK(str), \
-		"TextView")
+#define TRANSLATE(str) \
+	gSystemCatalog->GetString(B_TRANSLATE_MARK(str), "TextView")
 
 #undef TRACE
 #undef CALLED
@@ -3256,11 +3253,6 @@ BTextView::_InitObject(BRect textRect, const BFont *initialFont,
 	fLastClickOffset = -1;
 
 	SetDoesUndo(true);
-
-	// We need to translate some strings, and in order to do so, we need
-	// to use the LocaleBackend to reach liblocale.so
-	if (gLocaleBackend == NULL)
-		LocaleBackend::LoadBackend();
 }
 
 
@@ -5562,7 +5554,7 @@ BTextView::_ShowContextMenu(BPoint where)
 	int32 start;
 	int32 finish;
 	GetSelection(&start, &finish);
-	
+
 	bool canEdit = IsEditable();
 	int32 length = TextLength();
 

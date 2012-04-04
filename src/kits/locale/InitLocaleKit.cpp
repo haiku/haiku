@@ -10,8 +10,17 @@
 #include <Volume.h>
 #include <VolumeRoster.h>
 
-#include <LocaleRoster.h>
 #include <DefaultCatalog.h>
+#include <MutableLocaleRoster.h>
+#include <SystemCatalog.h>
+
+
+namespace BPrivate {
+
+BCatalogAddOn* gSystemCatalog;
+
+}
+
 
 // helper function that makes sure an attribute-index exists:
 static void EnsureIndexExists(const char *attrName)
@@ -115,9 +124,10 @@ SetupCatalogBasics()
 }
 
 
-extern "C"
 void
-initialize_after()
+__initialize_locale_kit()
 {
 	SetupCatalogBasics();
+
+	MutableLocaleRoster::Default()->GetSystemCatalog(&BPrivate::gSystemCatalog);
 }

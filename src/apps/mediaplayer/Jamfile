@@ -114,7 +114,7 @@ Application MediaPlayer :
 	MainWin.cpp
 	VideoView.cpp
 
-	: be game locale media tracker translation textencoding $(TARGET_LIBSTDC++) 
+	: be game media tracker translation textencoding $(TARGET_LIBSTDC++) 
 		$(HAIKU_LOCALE_LIBS) libshared.a
 	: MediaPlayer.rdef
 ;

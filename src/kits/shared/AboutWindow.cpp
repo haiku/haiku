@@ -14,12 +14,10 @@
 #include <Alert.h>
 #include <Font.h>
 #include <String.h>
+#include <SystemCatalog.h>
 #include <TextView.h>
 
-#include <Catalog.h>
-#include <LocaleBackend.h>
-using BPrivate::gLocaleBackend;
-using BPrivate::LocaleBackend;
+using BPrivate::gSystemCatalog;
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -31,17 +29,11 @@ BAboutWindow::BAboutWindow(const char *appName, int32 firstCopyrightYear,
 {
 	fAppName = new BString(appName);
 
-	// we need to translate some strings, and in order to do so, we need
-	// to use the LocaleBackend to reache liblocale.so
-	if (gLocaleBackend == NULL)
-		LocaleBackend::LoadBackend();
-
-	const char* copyright = B_TRANSLATE_MARK("Copyright " B_UTF8_COPYRIGHT " %years% Haiku, Inc.");
+	const char* copyright = B_TRANSLATE_MARK("Copyright " B_UTF8_COPYRIGHT
+		" %years% Haiku, Inc.");
 	const char* writtenBy = B_TRANSLATE_MARK("Written by:");
-	if (gLocaleBackend) {
-		copyright = gLocaleBackend->GetString(copyright, "AboutWindow");
-		writtenBy = gLocaleBackend->GetString(writtenBy, "AboutWindow");
-	}
+	copyright = gSystemCatalog->GetString(copyright, "AboutWindow");
+	writtenBy = gSystemCatalog->GetString(writtenBy, "AboutWindow");
 
 	// Get current year
 	time_t tp;
@@ -85,10 +77,8 @@ BAboutWindow::Show()
 {
 	const char* aboutTitle = B_TRANSLATE_MARK("About" B_UTF8_ELLIPSIS);
 	const char* closeLabel = B_TRANSLATE_MARK("Close");
-	if (gLocaleBackend) {
-		aboutTitle = gLocaleBackend->GetString(aboutTitle, "AboutWindow");
-		closeLabel = gLocaleBackend->GetString(closeLabel, "AboutWindow");
-	}
+	aboutTitle = gSystemCatalog->GetString(aboutTitle, "AboutWindow");
+	closeLabel = gSystemCatalog->GetString(closeLabel, "AboutWindow");
 
 	BAlert *alert = new BAlert(aboutTitle, fText->String(), closeLabel);
 	BTextView *view = alert->TextView();

@@ -12,10 +12,11 @@ Translator RAWTranslator :
 	RAWTranslator.cpp
 	ConfigView.cpp
 	RAW.cpp
-	: be locale translation libtranslatorsutils.a 
-$(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: 
+	be translation libtranslatorsutils.a $(TARGET_LIBSUPC++) 
 	$(HAIKU_LOCALE_LIBS)
-	: true
+	: 
+	true
 ;
 
 DoCatalogs RAWTranslator :
@@ -28,5 +29,6 @@ DoCatalogs RAWTranslator :
 
 Package haiku-translationkit-cvs :
 	RAWTranslator
-	: boot home config add-ons Translators
+	:
+	boot home config add-ons Translators
 	;

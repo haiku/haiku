@@ -113,7 +113,6 @@ Depends ScreenSaverKit :
 # TODO: src/add-ons/locale/collators/GermanDIN-2.cpp does not compile
 NotFile LocaleKit ;
 Depends LocaleKit :
-	liblocale.so
 	Locale
 
 	# binaries for building localized software on haiku

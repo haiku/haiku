@@ -19,19 +19,20 @@ if $(RUN_WITHOUT_APP_SERVER) != 0 {
 
 UsePrivateHeaders [ FDirName kernel ] ;  # For KMessage.h
 #UsePrivateHeaders syslog_daemon ;		# For syslog.cpp
-UsePrivateHeaders libbe ;
 
 # Build our libbe.so
 
-AddResources libbe.so : libbe_version.rdef ;
+AddResources libbe.so : 
+	libbe_version.rdef CountryFlags.rdef LanguageFlags.rdef 
+;
+
 
 SetVersionScript libbe.so : libbe_versions ;
 
-SharedLibrary libbe.so :
-	LocaleBackend.cpp
-	:
+SharedLibrary libbe.so : :
 	<libbe>app_kit.o
 	<libbe>interface_kit.o
+	<libbe>locale_kit.o
 	<libbe>storage_kit.o
 	<libbe>support_kit.o
 
@@ -39,7 +40,7 @@ SharedLibrary libbe.so :
 	libagg.a
 
 	libroot.so	# make sure it links against our libroot.so
-	$(TARGET_LIBSTDC++)
+	$(TARGET_LIBSTDC++) $(HAIKU_ICU_LIBS)
 ;
 
 # Build libbe_test.so
@@ -62,6 +63,30 @@ SharedLibrary libbe_test.so :
 	$(TARGET_LIBSTDC++)
 ;
 
+SEARCH on [ FGristFiles AboutMenuItem.cpp ] += [ FDirName $(HAIKU_TOP) src kits shared ] ;
+SEARCH on [ FGristFiles AboutWindow.cpp ] += [ FDirName $(HAIKU_TOP) src kits shared ] ;
+SEARCH on [ FGristFiles ColorControl.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
+SEARCH on [ FGristFiles StringForSize.cpp ] += [ FDirName $(HAIKU_TOP) src kits shared ] ;
+SEARCH on [ FGristFiles TextView.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
+SEARCH on [ FGristFiles Dragger.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
+SEARCH on [ FGristFiles Menu.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
+SEARCH on [ FGristFiles PrintJob.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
+SEARCH on [ FGristFiles ZombieReplicantView.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
+
+DoCatalogs libbe.so
+	: x-vnd.Haiku-libbe
+	:
+	AboutMenuItem.cpp
+	AboutWindow.cpp
+	ColorControl.cpp
+	Dragger.cpp
+	Menu.cpp
+	PrintJob.cpp
+	StringForSize.cpp
+	TextView.cpp
+	ZombieReplicantView.cpp
+	;
+	
 #SEARCH on [ FGristFiles KMessage.cpp ]
 #	= [ FDirName $(HAIKU_TOP) src system kernel messaging ] ;
 #

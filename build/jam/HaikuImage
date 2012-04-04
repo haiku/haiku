@@ -88,7 +88,6 @@ SYSTEM_LIBS =
 	libdebug.so libdevice.so
 	libgame.so $(X86_ONLY)libGL.so libgnu.so
 	libjpeg.so
-	liblocale.so
 	libmail.so libmedia.so libmidi.so libmidi2.so
 	libnetwork.so
 	libpng.so
@@ -312,10 +311,22 @@ if $(TARGET_ARCH) = x86 {
 	}
 }
 
+# libbe.so now includes what used to be in liblocale.so
+# TODO: Remove this once all optional packages have been rebuilt (i.e. after
+#       next release)!
+SYSTEM_LIBS_LIBBE_ALIASES = liblocale.so ;
+if $(TARGET_ARCH) = x86 {
+	local lib ;
+	for lib in $(SYSTEM_LIBS_LIBBE_ALIASES) {
+		AddSymlinkToHaikuHybridImage system lib : libbe.so : $(lib) : : true ;
+	}
+}
+
 SYSTEM_LIBS_ALIASES =
 	$(SYSTEM_LIBS_LIBNETWORK_ALIASES)
 	libnetapi.so
 	$(SYSTEM_LIBS_LIBGL_ALIASES)
+	$(SYSTEM_LIBS_LIBBE_ALIASES)
 ;
 
 # libfreetype.so links to the current freetype lib
