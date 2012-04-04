@@ -14,11 +14,12 @@
 #include <SupportDefs.h>
 
 #include "accelerant.h"
-#include "displayport_reg.h"
+#include "dp_raw.h"
 
 
 // Radeon HD specific DisplayPort Configuration Data
 #define DP_TRAINING_AUX_RD_INTERVAL 0x000e
+#define DP_TPS3_SUPPORTED (1 << 6) // Stored within MAX_LANE_COUNT
 
 
 int dp_aux_write(uint32 hwPin, uint16 address, uint8* send,

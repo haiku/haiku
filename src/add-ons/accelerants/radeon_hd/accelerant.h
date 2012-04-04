@@ -14,7 +14,7 @@
 #include <edid.h>
 
 #include "atom.h"
-#include "displayport_reg.h"
+#include "dp_raw.h"
 #include "encoder.h"
 #include "mode.h"
 #include "pll.h"

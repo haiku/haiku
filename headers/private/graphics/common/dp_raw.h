@@ -149,7 +149,47 @@
 /* *** DPCD Link / Sink Status Field (0x0200)         *** */
 /* *** VESA DisplayPort Standard, rev 1.1, p120       *** */
 
-// TODO
+// DP Sink Count (0x0200)
+#define DP_SINK_COUNT						0x0200		// Reg
+#define DP_SINK_COUNT_MASK					(63 << 0)	// Mask
+#define DP_SINK_COUNT_CP_READY				(1 << 6)	// Bool
+// DP Service IRQ Vector (0x0201)
+#define DP_SINK_IRQ_VECTOR					0x0201		// Reg
+#define DP_SINK_IRQ_TEST_REQ				(1 << 1)	// Bool
+#define DP_SINK_IRQ_CP_IRQ					(1 << 2)	// Bool
+#define DP_SINK_IRQ_VENDOR					(1 << 6)	// Bool
+// DP Lane Status      A B
+#define DP_LANE_STATUS_0_1					0x0202		// Reg
+#define DP_LANE_STATUS_2_3					0x0203		// Reg
+#define DP_LINK_STATUS_SIZE					6			// Size
+#define DP_LANE_STATUS_CR_DONE_A			(1 << 0)	// Bool
+#define DP_LANE_STATUS_CHEQ_DONE_A			(1 << 1)	// Bool
+#define DP_LANE_STATUS_SYMB_LOCK_A			(1 << 2)	// Bool
+#define DP_LANE_STATUS_CR_DONE_B			(1 << 4)	// Bool
+#define DP_LANE_STATUS_CHEQ_DONE_B			(1 << 5)	// Bool
+#define DP_LANE_STATUS_SYMB_LOCK_B			(1 << 6)	// Bool
+// DP Lane Align Status (0x0204)
+#define DP_LANE_ALIGN						0x0204		// Reg
+#define DP_LANE_ALIGN_DONE					(1 << 0)	// Bool
+#define DP_LANE_ALIGN_PORT_STATUS_CHANGE	(1 << 6)	// Bool
+#define DP_LANE_ALIGN_LINK_STATUS_UPDATE	(1 << 7)	// Bool
+// DP Sink Status (0x0205)
+#define DP_SINK_STATUS						0x0205		// Reg
+#define DP_SINK_STATUS_IN_SYNC_0			(1 << 0)	// Bool
+#define DP_SINK_STATUS_IN_SYNC_1			(1 << 1)	// Bool
+// DP Adjust Request   A B
+#define DP_ADJ_REQUEST_0_1					0x0206		// Reg
+#define DP_ADJ_REQUEST_2_3					0x0207		// Reg
+#define DP_ADJ_VCC_SWING_LANEA_SHIFT		0			// Shift
+#define DP_ADJ_VCC_SWING_LANEA_MASK			(3 << 0)	// Mask
+#define DP_ADJ_PRE_EMPHASIS_LANEA_SHIFT		2			// Shift
+#define DP_ADJ_PRE_EMPHASIS_LANEA_MASK		(3 << 2)	// Mask
+#define DP_ADJ_VCC_SWING_LANEB_SHIFT		4			// Shift
+#define DP_ADJ_VCC_SRING_LANEB_MASK			(3 << 4)	// Mask
+#define DP_ADJ_PRE_EMPHASIS_LANEB_SHIFT		6			// Shift
+#define DP_ADJ_PRE_EMPHASIS_LANEB_MASK		(3 << 6)	// Mask
+
+// TODO: 0x0210 - 0x0217
 
 /* *** DPCD Automated Self-testing Field (0x0218)     *** */
 /* *** VESA DisplayPort Standard, rev 1.1, p123       *** */
@@ -174,7 +214,9 @@
 /* *** DPCD Sink Control Field (0x0600)               *** */
 /* *** VESA DisplayPort Standard, rev 1.1, p128       *** */
 
-// TODO
+#define DP_SET_POWER						0x0600		// Reg
+#define DP_SET_POWER_D0						(1 << 0)	// Value
+#define DP_SET_POWER_D3						(1 << 1)	// Value
 
 /* *** DPCD Reserved (0x0700+)                        *** */
 /* ****************************************************** */

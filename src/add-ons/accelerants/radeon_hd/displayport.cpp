@@ -13,7 +13,6 @@
 
 #include "accelerant_protos.h"
 #include "connector.h"
-#include "dp_raw.h"
 #include "mode.h"
 
 
@@ -425,7 +424,7 @@ dp_setup_connectors()
 static bool
 dp_get_link_status(dp_info* dp)
 {
-	int result = dp_aux_read(dp->auxPin, DP_LANE0_1_STATUS,
+	int result = dp_aux_read(dp->auxPin, DP_LANE_STATUS_0_1,
 		dp->linkStatus, DP_LINK_STATUS_SIZE, 100);
 
 	if (result <= 0) {
@@ -440,9 +439,9 @@ dp_get_link_status(dp_info* dp)
 static uint8
 dp_get_lane_status(dp_info* dp, int lane)
 {
-	int i = DP_LANE0_1_STATUS + (lane >> 1);
+	int i = DP_LANE_STATUS_0_1 + (lane >> 1);
 	int s = (lane & 1) * 4;
-	uint8 l = dp->linkStatus[i - DP_LANE0_1_STATUS];
+	uint8 l = dp->linkStatus[i - DP_LANE_STATUS_0_1];
 	return (l >> s) & 0xf;
 }
 
@@ -455,7 +454,7 @@ dp_clock_recovery_ok(dp_info* dp)
 
 	for (lane = 0; lane < dp->laneCount; lane++) {
 		laneStatus = dp_get_lane_status(dp, lane);
-		if ((laneStatus & DP_LANE_CR_DONE) == 0)
+		if ((laneStatus & DP_LANE_STATUS_CR_DONE_A) == 0)
 			return false;
 	}
 	return true;
@@ -478,10 +477,10 @@ dp_update_vs_emph(dp_info* dp)
 static uint8
 dp_get_adjust_request_voltage(dp_info* dp, int lane)
 {
-	int i = DP_ADJUST_REQUEST_LANE0_1 + (lane >> 1);
-	int s = (((lane & 1) != 0) ? DP_ADJUST_VOLTAGE_SWING_LANE1_SHIFT
-		: DP_ADJUST_VOLTAGE_SWING_LANE0_SHIFT);
-	uint8 l = dp->linkStatus[i - DP_LANE0_1_STATUS];
+	int i = DP_ADJ_REQUEST_0_1 + (lane >> 1);
+	int s = (((lane & 1) != 0) ? DP_ADJ_VCC_SWING_LANEB_SHIFT
+		: DP_ADJ_VCC_SWING_LANEA_SHIFT);
+	uint8 l = dp->linkStatus[i - DP_LANE_STATUS_0_1];
 
 	return ((l >> s) & 0x3) << DP_TRAIN_VCC_SWING_SHIFT;
 }
@@ -490,10 +489,10 @@ dp_get_adjust_request_voltage(dp_info* dp, int lane)
 static uint8
 dp_get_adjust_request_pre_emphasis(dp_info* dp, int lane)
 {
-	int i = DP_ADJUST_REQUEST_LANE0_1 + (lane >> 1);
-	int s = (((lane & 1) != 0) ? DP_ADJUST_PRE_EMPHASIS_LANE1_SHIFT
-		: DP_ADJUST_PRE_EMPHASIS_LANE0_SHIFT);
-	uint8 l = dp->linkStatus[i - DP_LANE0_1_STATUS];
+	int i = DP_ADJ_REQUEST_0_1 + (lane >> 1);
+	int s = (((lane & 1) != 0) ? DP_ADJ_PRE_EMPHASIS_LANEB_SHIFT
+		: DP_ADJ_PRE_EMPHASIS_LANEB_SHIFT);
+	uint8 l = dp->linkStatus[i - DP_LANE_STATUS_0_1];
 
 	return ((l >> s) & 0x3) << DP_TRAIN_PRE_EMPHASIS_SHIFT;
 }
