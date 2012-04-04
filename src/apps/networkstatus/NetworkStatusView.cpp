@@ -566,17 +566,12 @@ NetworkStatusView::_Update(bool force)
 		notification.SetTitle(interface.Name());
 		notification.SetMessageID(interface.Name());
 		notification.SetIcon(fNotifyIcons[fStatus]);
-		if (fStatus == kStatusConnecting) {
-			notification.SetContent(B_TRANSLATE("Connecting..."));
-			notification.Send();
-		} else if (fStatus == kStatusReady && oldStatus == kStatusConnecting) {
-			notification.SetContent(B_TRANSLATE("Connection Established"));
-			notification.Send();
-		} else if (fStatus == kStatusNoLink && oldStatus == kStatusConnecting) {
-			notification.SetContent(B_TRANSLATE("Connection Failed"));
-			notification.Send();
-		} else if (fStatus == kStatusNoLink && oldStatus == kStatusReady) {
-			notification.SetContent(B_TRANSLATE("Disconnected"));
+		if (fStatus == kStatusConnecting
+			|| (fStatus == kStatusReady && oldStatus == kStatusConnecting)
+			|| (fStatus == kStatusNoLink && oldStatus == kStatusReady)
+			|| (fStatus == kStatusNoLink && oldStatus == kStatusConnecting)) {
+			// A significant state change, raise notification.
+			notification.SetContent(kStatusDescriptions[fStatus]);
 			notification.Send();
 		}
 
