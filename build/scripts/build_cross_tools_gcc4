@@ -28,8 +28,11 @@ export MAKE
 
 case $haikuMachine in
 x86_64-*)
-	binutilsConfigureArgs="--enable-multilib"
-	gccConfigureArgs="--enable-multilib"
+	# GCC's default is to enable multilib, but there is a bug when
+	# explicitly using --enable-multilib that causes a build
+	# failure
+	binutilsConfigureArgs=""
+	gccConfigureArgs=""
 	;;
 m68k-*)
 	binutilsConfigureArgs="--enable-multilib"
