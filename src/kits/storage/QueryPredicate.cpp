@@ -15,6 +15,8 @@
 
 #include <ctype.h>
 
+#include <UnicodeChar.h>
+
 
 namespace BPrivate {
 namespace Storage {
@@ -192,20 +194,30 @@ StringNode::StringNode(const char *value, bool caseInsensitive)
 		return;
 
 	if (caseInsensitive) {
-		int32 len = strlen(value);
-		for (int32 i = 0; i < len; i++) {
-			char c = value[i];
-			if (isalpha(c)) {
-				int lower = tolower(c);
-				int upper = toupper(c);
-				if (lower < 0 || upper < 0)
-					fValue << c;
-				else
-					fValue << "[" << (char)lower << (char)upper << "]";
-			} else if (c == ' ')
+		while (uint32 codePoint = BUnicodeChar::FromUTF8(&value)) {
+			char utf8Buffer[4];
+			char *utf8 = utf8Buffer;
+			if (BUnicodeChar::IsAlpha(codePoint)) {
+				uint32 lower = BUnicodeChar::ToLower(codePoint);
+				uint32 upper = BUnicodeChar::ToUpper(codePoint);
+				if (lower == upper) {
+					BUnicodeChar::ToUTF8(codePoint, &utf8);
+					fValue.Append(utf8Buffer, utf8 - utf8Buffer);
+				} else {
+					fValue << "[";
+					BUnicodeChar::ToUTF8(lower, &utf8);
+					fValue.Append(utf8Buffer, utf8 - utf8Buffer);
+					utf8 = utf8Buffer;
+					BUnicodeChar::ToUTF8(upper, &utf8);
+					fValue.Append(utf8Buffer, utf8 - utf8Buffer);
+					fValue << "]";
+				}
+			} else if (codePoint == L' ') {
 				fValue << '*';
-			else
-				fValue << c;
+			} else {
+				BUnicodeChar::ToUTF8(codePoint, &utf8);
+				fValue.Append(utf8Buffer, utf8 - utf8Buffer);
+			}
 		}
 	} else {
 		fValue = value;
