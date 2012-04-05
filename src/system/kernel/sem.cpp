@@ -844,6 +844,7 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 		thread_prepare_to_block(thread, flags, THREAD_BLOCK_TYPE_SEMAPHORE,
 			(void*)(addr_t)id);
 
+		schedulerLocker.Unlock();
 		RELEASE_SEM_LOCK(sSems[slot]);
 
 		// release the other semaphore, if any
