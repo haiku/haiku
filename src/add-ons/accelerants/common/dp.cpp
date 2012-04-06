@@ -62,19 +62,17 @@ dp_decode_link_rate(uint32 rawLinkRate)
 uint32
 dp_get_lane_count(dp_info* dpInfo, display_mode* mode)
 {
-	// TODO: Really need a function in GraphicDefs.h for this
-	uint32 bitsPerPixel;
-	switch (mode->space) {
-		case B_CMAP8:
-			bitsPerPixel = 8;
-		case B_RGB15_LITTLE:
-			bitsPerPixel = 15;
-		case B_RGB16_LITTLE:
-			bitsPerPixel = 16;
-		case B_RGB24_LITTLE:
-		case B_RGB32_LITTLE:
-			bitsPerPixel = 32;
+	size_t pixelChunk;
+	size_t pixelsPerChunk;
+	status_t result = get_pixel_size_for((color_space)mode->space, &pixelChunk,
+		NULL, &pixelsPerChunk);
+
+	if (result != B_OK) {
+		TRACE("%s: Invalid color space!\n", __func__);
+		return 0;
 	}
+
+	uint32 bitsPerPixel = (pixelChunk / pixelsPerChunk) * 8;
 
 	uint32 maxLaneCount = dpInfo->config[DP_MAX_LANE_COUNT]
 		& DP_MAX_LANE_COUNT_MASK;
