@@ -587,7 +587,7 @@ pll_adjust(pll_info* pll, uint8 crtcID)
 							uint32 dpLinkSpeed
 								= dp_get_link_clock(connectorIndex);
 							args.v3.sInput.usPixelClock
-								= B_LENDIAN_TO_HOST_INT16(dpLinkSpeed / 10);
+								= B_HOST_TO_LENDIAN_INT16(dpLinkSpeed / 10);
 						} else if ((encoderFlags & ATOM_DEVICE_DFP_SUPPORT)
 							!= 0) {
 							#if 0
