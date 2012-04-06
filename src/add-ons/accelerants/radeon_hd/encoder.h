@@ -24,8 +24,7 @@ status_t encoder_digital_setup(uint32 connectorIndex,
 	uint32 pixelClock, int command);
 status_t encoder_dig_setup(uint32 connectorIndex,
 	uint32 pixelClock, int command);
-status_t encoder_external_setup(uint32 connectorIndex,
-	uint32 pixelClock, int command);
+status_t encoder_external_setup(uint32 connectorIndex, int command);
 status_t encoder_tv_setup(uint32 connectorIndex,
 	uint32 pixelClock, int command);
 

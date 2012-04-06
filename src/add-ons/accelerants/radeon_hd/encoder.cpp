@@ -57,7 +57,7 @@ encoder_init()
 
 		if ((info.chipsetFlags & CHIP_APU) != 0) {
 			if (gConnector[id]->encoderExternal.valid == true) {
-				encoder_external_setup(id, 0,
+				encoder_external_setup(id,
 					EXTERNAL_ENCODER_ACTION_V3_ENCODER_INIT);
 			}
 		}
@@ -363,12 +363,11 @@ encoder_mode_set(uint8 crtcID)
 	if (gConnector[connectorIndex]->encoderExternal.valid == true) {
 		if ((info.chipsetFlags & CHIP_APU) != 0) {
 			// aka DCE 4.1
-			encoder_external_setup(connectorIndex, pixelClock,
+			encoder_external_setup(connectorIndex,
 				EXTERNAL_ENCODER_ACTION_V3_ENCODER_SETUP);
-		} else {
-			encoder_external_setup(connectorIndex, pixelClock,
-				ATOM_ENABLE);
-		}
+		} else
+			encoder_external_setup(connectorIndex, ATOM_ENABLE);
+
 	}
 
 	encoder_apply_quirks(crtcID);
@@ -603,7 +602,10 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 		tableMajor, tableMinor);
 
 	dp_info* dpInfo = &gConnector[connectorIndex]->dpInfo;
-	uint32 dpClock = dp_get_link_clock(connectorIndex);
+	uint8 dpClock = 0;
+	if (dpInfo->valid == true)
+		dpClock = dpInfo->linkRate;
+
 	switch (tableMinor) {
 		case 1:
 			args.v1.ucAction = command;
@@ -713,16 +715,19 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 
 
 status_t
-encoder_external_setup(uint32 connectorIndex, uint32 pixelClock, int command)
+encoder_external_setup(uint32 connectorIndex, int command)
 {
 	TRACE("%s\n", __func__);
 
 	encoder_info* encoder
+		= &gConnector[connectorIndex]->encoder;
+	encoder_info* extEncoder
 		= &gConnector[connectorIndex]->encoderExternal;
+
 	dp_info* dpInfo
 		= &gConnector[connectorIndex]->dpInfo;
 
-	if (encoder->valid != true) {
+	if (extEncoder->valid != true) {
 		ERROR("%s: connector %" B_PRIu32 " doesn't have a valid "
 			"external encoder!", __func__, connectorIndex);
 		return B_ERROR;
@@ -749,6 +754,8 @@ encoder_external_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 	int connectorObjectID
 		= (gConnector[connectorIndex]->objectID & OBJECT_ID_MASK)
 			>> OBJECT_ID_SHIFT;
+
+	uint32 pixelClock = encoder->pll.pixelClock;
 
 	TRACE("%s: table %" B_PRIu8 ".%" B_PRIu8 "\n", __func__,
 		tableMajor, tableMinor);
@@ -809,9 +816,9 @@ encoder_external_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 						args.v3.sExtEncoder.ucLaneNum = 4;
 					}
 
-					uint16 encoderFlags = encoder->flags;
+					uint16 extEncoderFlags = extEncoder->flags;
 
-					switch ((encoderFlags & ENUM_ID_MASK) >> ENUM_ID_SHIFT) {
+					switch ((extEncoderFlags & ENUM_ID_MASK) >> ENUM_ID_SHIFT) {
 						case GRAPH_OBJECT_ENUM_ID1:
 							TRACE("%s: external encoder 1\n", __func__);
 							args.v3.sExtEncoder.ucConfig
@@ -1041,7 +1048,7 @@ encoder_dig_load_detect(uint32 connectorIndex)
 		return false;
 	}
 
-	encoder_external_setup(connectorIndex, 0,
+	encoder_external_setup(connectorIndex,
 		EXTERNAL_ENCODER_ACTION_V3_DACLOAD_DETECTION);
 
 	uint32 biosScratch0 = Read32(OUT, R600_BIOS_0_SCRATCH);
@@ -1729,32 +1736,29 @@ encoder_dpms_set_external(uint8 crtcID, int mode)
 
 	radeon_shared_info &info = *gInfo->shared_info;
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	pll_info* pll = &gConnector[connectorIndex]->encoderExternal.pll;
 
 	switch (mode) {
 		case B_DPMS_ON:
 			if ((info.chipsetFlags & CHIP_APU) != 0) {
-				encoder_external_setup(connectorIndex, pll->pixelClock,
+				encoder_external_setup(connectorIndex,
 					EXTERNAL_ENCODER_ACTION_V3_ENABLE_OUTPUT);
-				encoder_external_setup(connectorIndex, pll->pixelClock,
+				encoder_external_setup(connectorIndex,
 					EXTERNAL_ENCODER_ACTION_V3_ENCODER_BLANKING_OFF);
-			} else {
-				encoder_external_setup(connectorIndex, pll->pixelClock,
-					ATOM_ENABLE);
-			}
+			} else
+				encoder_external_setup(connectorIndex, ATOM_ENABLE);
+
 			break;
 		case B_DPMS_STAND_BY:
 		case B_DPMS_SUSPEND:
 		case B_DPMS_OFF:
 			if ((info.chipsetFlags & CHIP_APU) != 0) {
-				encoder_external_setup(connectorIndex, pll->pixelClock,
+				encoder_external_setup(connectorIndex,
 					EXTERNAL_ENCODER_ACTION_V3_ENCODER_BLANKING);
-				encoder_external_setup(connectorIndex, pll->pixelClock,
+				encoder_external_setup(connectorIndex,
 					EXTERNAL_ENCODER_ACTION_V3_DISABLE_OUTPUT);
-			} else {
-				encoder_external_setup(connectorIndex, pll->pixelClock,
-					ATOM_DISABLE);
-			}
+			} else
+				encoder_external_setup(connectorIndex, ATOM_DISABLE);
+
 			break;
 	}
 }
