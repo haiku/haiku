@@ -258,7 +258,7 @@ ExpressionTextView::SetValue(BString value)
 			stringWidth = font.StringWidth(value);
 		}
 
-		// there is no need to keep the period if no digits follow
+		// no need to keep the period if no digits follow
 		if (value[offset] == '.') {
 			value.Remove(offset, 1);
 			offset--;
@@ -273,7 +273,7 @@ ExpressionTextView::SetValue(BString value)
 				digit = (int)(value[offset]) - '0' + 1; // ascii to int + 1
 				if (digit != 10)
 					break;
-				value.Remove(offset, 1);
+				value[offset] = '0';
 			}
 			if (digit == 10) {
 				// carry over, shift the result
@@ -296,16 +296,26 @@ ExpressionTextView::SetValue(BString value)
 			} else {
 				// increase the current digit value with one
 				value[offset] = char(digit + 48);
+
+				// set offset to last digit
+				offset = value.FindFirst('E');
+				if (offset == B_ERROR)
+					offset = value.CountChars();
+				offset--;
 			}
 		}
 
-		// remove trailing zeros
-		while (value[offset] == '0')
-			value.Remove(offset--, 1);
+		// clean up decimal part if we have one
+		if (value.FindFirst('.') != B_ERROR) {
+			// remove trailing zeros
+			while (value[offset] == '0')
+				value.Remove(offset--, 1);
 
-		// there is no need to keep the period if no digits follow
-		if (value[offset] == '.')
-			value.Remove(offset, 1);
+			// there is no need to keep the period if no 
+			// digits follow
+			if (value[offset] == '.')
+				value.Remove(offset, 1);
+		}
 	}
 
 	// set the new value	
