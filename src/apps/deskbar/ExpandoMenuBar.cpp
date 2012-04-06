@@ -121,9 +121,9 @@ TExpandoMenuBar::AttachedToWindow()
 	desk_settings* settings = static_cast<TBarApp*>(be_app)->Settings();
 
 	float itemWidth = -0.1f;
-	if (fVertical) {
+	if (fVertical)
 		itemWidth = Frame().Width();
-	} else {
+	else {
 		itemWidth = iconSize;
 		if (fDrawLabel)
 			itemWidth += sMinimumWindowWidth - kMinimumIconSize;
@@ -523,9 +523,9 @@ TExpandoMenuBar::AddTeam(BList* team, BBitmap* icon, char* name,
 	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
 
 	float itemWidth = -1.0f;
-	if (fVertical) {
+	if (fVertical)
 		itemWidth = fBarView->Bounds().Width();
-	} else {
+	else {
 		itemWidth = iconSize;
 		if (fDrawLabel)
 			itemWidth += sMinimumWindowWidth - kMinimumIconSize;
@@ -537,9 +537,9 @@ TExpandoMenuBar::AddTeam(BList* team, BBitmap* icon, char* name,
 	TTeamMenuItem* item = new TTeamMenuItem(team, icon, name, signature,
 		itemWidth, itemHeight, fDrawLabel, fVertical);
 
-	if (settings->trackerAlwaysFirst && !strcmp(signature, kTrackerSignature)) {
+	if (settings->trackerAlwaysFirst && !strcmp(signature, kTrackerSignature))
 		AddItem(item, fFirstApp);
-	} else if (settings->sortRunningApps) {
+	else if (settings->sortRunningApps) {
 		TTeamMenuItem* teamItem
 			= dynamic_cast<TTeamMenuItem*>(ItemAt(fFirstApp));
 		int32 firstApp = fFirstApp;
