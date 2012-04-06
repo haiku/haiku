@@ -85,6 +85,7 @@ const struct supported_device {
 	{0x94c1, 2, 0, RADEON_RV610, CHIP_IGP, "Radeon HD 2400"},
 	{0x94c3, 2, 0, RADEON_RV610, CHIP_STD, "Radeon HD 2400"},
 	{0x94cc, 2, 0, RADEON_RV610, CHIP_STD, "Radeon HD 2400"},
+	{0x9519, 2, 0, RADEON_RV630, CHIP_STD, "AMD FireStream 9170"},
 	{0x9586, 2, 0, RADEON_RV630, CHIP_STD, "Radeon HD 2600"},
 	{0x9588, 2, 0, RADEON_RV630, CHIP_STD, "Radeon HD 2600"},
 	{0x958a, 2, 0, RADEON_RV630, CHIP_STD, "Radeon HD 2600 X2"},
@@ -138,6 +139,7 @@ const struct supported_device {
 	{0x9552, 3, 2, RADEON_RV710, CHIP_IGP, "Radeon HD 4300"},
 	{0x9555, 3, 2, RADEON_RV710, CHIP_STD, "Radeon HD 4350"},
 	{0x9540, 3, 2, RADEON_RV710, CHIP_STD, "Radeon HD 4550"},
+	{0x9452, 3, 2, RADEON_RV730, CHIP_STD, "AMD FireStream 9250"},
 	{0x9480, 3, 2, RADEON_RV730, CHIP_STD, "Radeon HD 4650"},
 	{0x9488, 3, 2, RADEON_RV730, CHIP_MOBILE, "Radeon HD 4650"},
 	{0x9498, 3, 2, RADEON_RV730, CHIP_STD, "Radeon HD 4650"},
@@ -145,6 +147,7 @@ const struct supported_device {
 	{0x9490, 3, 2, RADEON_RV730, CHIP_STD, "Radeon HD 4710"},
 	{0x94b3, 3, 2, RADEON_RV740, CHIP_STD, "Radeon HD 4770"},
 	{0x94b5, 3, 2, RADEON_RV740, CHIP_STD, "Radeon HD 4770"},
+	{0x9450, 3, 1, RADEON_RV770, CHIP_STD, "AMD FireStream 9270"},
 	{0x944a, 3, 1, RADEON_RV770, CHIP_MOBILE, "Radeon HD 4850"},
 	{0x944e, 3, 1, RADEON_RV770, CHIP_STD, "Radeon HD 4810"},
 	{0x944c, 3, 1, RADEON_RV770, CHIP_STD, "Radeon HD 4830"},
@@ -270,8 +273,9 @@ const struct supported_device {
 	{0x683d, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD 7770"},
 	//  Pitcairn
 	//	- 7790
+	{0x6818, 6, 0, RADEON_PITCAIRN, CHIP_STD, "Radeon HD 7870"},
+	{0x6819, 6, 0, RADEON_PITCAIRN, CHIP_STD, "Radeon HD 7800"},
 	//	- 7850
-	//	- 7870
 	//  Tahiti
 	//	- 7890
 	{0x679a, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD 7950"},
