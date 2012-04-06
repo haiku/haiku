@@ -14,7 +14,7 @@
 #include <edid.h>
 
 #include "atom.h"
-#include "dp_raw.h"
+#include "dp.h"
 #include "encoder.h"
 #include "mode.h"
 #include "pll.h"
@@ -125,28 +125,6 @@ typedef struct {
 } gpio_info;
 
 
-typedef struct {
-	bool	valid;
-	uint32	connectorIndex;
-
-	uint32	auxPin; // normally GPIO pin on GPU
-
-	uint8	config[8]; // DP configuration data
-	uint8	sinkType;
-	uint8	clock;
-	int		laneCount;
-
-	bool	trainingUseEncoder;
-
-	uint8	trainingAttempts;
-	uint8	trainingSet[4];
-	int		trainingReadInterval;
-	uint8 	linkStatus[DP_LINK_STATUS_SIZE];
-
-	bool	eDPOn;
-} dp_info;
-
-
 struct encoder_info {
 	bool		valid;
 	uint16		objectID;
@@ -169,6 +147,7 @@ typedef struct {
 	struct encoder_info encoder;
 	struct encoder_info encoderExternal;
 	// TODO struct radeon_hpd hpd;
+	dp_info		dpInfo;
 } connector_info;
 
 
@@ -200,7 +179,6 @@ extern atom_context* gAtomContext;
 extern display_info* gDisplay[MAX_DISPLAY];
 extern connector_info* gConnector[ATOM_MAX_SUPPORTED_DEVICE];
 extern gpio_info* gGPIOInfo[ATOM_MAX_SUPPORTED_DEVICE];
-extern dp_info* gDPInfo[ATOM_MAX_SUPPORTED_DEVICE];
 
 
 // register access

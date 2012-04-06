@@ -333,90 +333,39 @@ dp_get_link_clock(uint32 connectorIndex)
 }
 
 
-uint32
-dp_get_link_clock_encode(uint32 dpLinkClock)
-{
-	switch (dpLinkClock) {
-		case 270000:
-			return DP_LINK_RATE_270;
-		case 540000:
-			return DP_LINK_RATE_540;
-	}
-
-	return DP_LINK_RATE_162;
-}
-
-
-uint32
-dp_get_link_clock_decode(uint32 dpLinkClock)
-{
-	switch (dpLinkClock) {
-		case DP_LINK_RATE_270:
-			return 270000;
-		case DP_LINK_RATE_540:
-			return 540000;
-	}
-	return 162000;
-}
-
-
-uint32
-dp_get_lane_count(uint32 connectorIndex, display_mode* mode)
-{
-	uint32 bitsPerPixel = get_mode_bpp(mode);
-
-	uint32 maxLaneCount = gDPInfo[connectorIndex]->config[DP_MAX_LANE_COUNT]
-		& DP_MAX_LANE_COUNT_MASK;
-
-	uint32 maxLinkRate = dp_get_link_clock_decode(
-			gDPInfo[connectorIndex]->config[DP_MAX_LINK_RATE]);
-
-	uint32 lane;
-	for (lane = 1; lane < maxLaneCount; lane <<= 1) {
-		uint32 maxDPPixelClock = (maxLinkRate * lane * 8) / bitsPerPixel;
-		if (mode->timing.pixel_clock <= maxDPPixelClock)
-			break;
-	}
-	TRACE("%s: connector: %" B_PRIu32 ", lanes: %" B_PRIu32 "\n", __func__,
-		connectorIndex, lane);
-
-	return lane;
-}
-
-
 void
 dp_setup_connectors()
 {
 	TRACE("%s\n", __func__);
 
 	for (uint32 index = 0; index < ATOM_MAX_SUPPORTED_DEVICE; index++) {
-		gDPInfo[index]->valid = false;
+		dp_info* dpInfo = &gConnector[index]->dpInfo;
+		dpInfo->valid = false;
 		if (gConnector[index]->valid == false) {
-			gDPInfo[index]->config[0] = 0;
+			dpInfo->config[0] = 0;
 			continue;
 		}
 
 		if (connector_is_dp(index) == false) {
-			gDPInfo[index]->config[0] = 0;
+			dpInfo->config[0] = 0;
 			continue;
 		}
 
 		uint32 gpioID = gConnector[index]->gpioID;
 
 		uint32 auxPin = gGPIOInfo[gpioID]->hwPin;
-		gDPInfo[index]->auxPin = auxPin;
-		gDPInfo[index]->connectorIndex = index;
+		dpInfo->auxPin = auxPin;
 
 		uint8 auxMessage[25];
 		int result;
 
 		result = dp_aux_read(auxPin, DP_DPCD_REV, auxMessage, 8, 0);
 		if (result > 0) {
-			gDPInfo[index]->valid = true;
-			memcpy(gDPInfo[index]->config, auxMessage, 8);
+			dpInfo->valid = true;
+			memcpy(dpInfo->config, auxMessage, 8);
 		}
 
-		gDPInfo[index]->clock = dp_get_link_clock(index);
+		dpInfo->linkRate = dp_get_link_clock(index);
 	}
 }
 
@@ -462,11 +411,13 @@ dp_clock_recovery_ok(dp_info* dp)
 
 
 static void
-dp_update_vs_emph(dp_info* dp)
+dp_update_vs_emph(uint32 connectorIndex)
 {
+	dp_info* dp = &gConnector[connectorIndex]->dpInfo;
+
 	// Set initial vs and emph on source
-	transmitter_dig_setup(dp->connectorIndex, dp->clock, 0, dp->trainingSet[0],
-		ATOM_TRANSMITTER_ACTION_SETUP_VSEMPH);
+	transmitter_dig_setup(connectorIndex, dp->linkRate, 0,
+		dp->trainingSet[0], ATOM_TRANSMITTER_ACTION_SETUP_VSEMPH);
 
 	// Set vs and emph on the sink
 	dp_aux_write(dp->auxPin, DP_TRAIN_LANE0,
@@ -543,11 +494,12 @@ dp_get_adjust_train(dp_info* dp)
 
 
 static void
-dp_set_tp(dp_info* dp, int trainingPattern)
+dp_set_tp(uint32 connectorIndex, int trainingPattern)
 {
 	TRACE("%s\n", __func__);
 
 	radeon_shared_info &info = *gInfo->shared_info;
+	dp_info* dp = &gConnector[connectorIndex]->dpInfo;
 
 	int rawTrainingPattern = 0;
 
@@ -565,7 +517,7 @@ dp_set_tp(dp_info* dp, int trainingPattern)
 				break;
 		}
 		// TODO: PixelClock 0 ok?
-		encoder_dig_setup(dp->connectorIndex, 0, rawTrainingPattern);
+		encoder_dig_setup(connectorIndex, 0, rawTrainingPattern);
 	} else {
 		ERROR("%s: TODO: dp_encoder_service\n", __func__);
 		return;
@@ -590,9 +542,11 @@ dp_set_tp(dp_info* dp, int trainingPattern)
 
 
 status_t
-dp_link_train_cr(dp_info* dp)
+dp_link_train_cr(uint32 connectorIndex)
 {
 	TRACE("%s\n", __func__);
+
+	dp_info* dp = &gConnector[connectorIndex]->dpInfo;
 
 	// Display Port Clock Recovery Training
 
@@ -600,9 +554,9 @@ dp_link_train_cr(dp_info* dp)
 	uint8 voltage = 0xff;
 	int lane;
 
-	dp_set_tp(dp, DP_TRAIN_PATTERN_1);
+	dp_set_tp(connectorIndex, DP_TRAIN_PATTERN_1);
 	memset(dp->trainingSet, 0, 4);
-	dp_update_vs_emph(dp);
+	dp_update_vs_emph(connectorIndex);
 
 	while (1) {
 		if (dp->trainingReadInterval == 0)
@@ -642,7 +596,7 @@ dp_link_train_cr(dp_info* dp)
 		// Compute new trainingSet as requested by sink
 		dp_get_adjust_train(dp);
 
-		dp_update_vs_emph(dp);
+		dp_update_vs_emph(connectorIndex);
 	}
 
 	if (!clockRecovery) {
@@ -664,7 +618,7 @@ dp_link_train(uint8 crtcID, display_mode* mode)
 	TRACE("%s\n", __func__);
 
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	dp_info* dp = gDPInfo[connectorIndex];
+	dp_info* dp = &gConnector[connectorIndex]->dpInfo;
 
 	if (dp->valid != true) {
 		ERROR("%s: started on invalid DisplayPort connector #%" B_PRIu32 "\n",
@@ -732,7 +686,7 @@ dp_link_train(uint8 crtcID, display_mode* mode)
 	dpcd_reg_write(hwPin, DP_LANE_COUNT, sandbox);
 
 	// Set the link rate on the DP sink
-	sandbox = dp_get_link_clock_encode(dp->clock);
+	sandbox = dp_encode_link_rate(dp->linkRate);
 	dpcd_reg_write(hwPin, DP_LINK_RATE, sandbox);
 
 	// Start link training on source
@@ -747,7 +701,7 @@ dp_link_train(uint8 crtcID, display_mode* mode)
 	// Disable the training pattern on the sink
 	dpcd_reg_write(hwPin, DP_TRAIN, DP_TRAIN_PATTERN_DISABLED);
 
-	dp_link_train_cr(dp);
+	dp_link_train_cr(connectorIndex);
 	// TODO: dp_link_train_ce
 
 

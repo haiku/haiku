@@ -166,12 +166,12 @@ radeon_set_display_mode(display_mode* mode)
 		if (gDisplay[id]->attached == false)
 			continue;
 
-		uint16 connectorIndex = gDisplay[id]->connectorIndex;
+		uint32 connectorIndex = gDisplay[id]->connectorIndex;
+		dp_info *dpInfo = &gConnector[connectorIndex]->dpInfo;
 
 		// Determine DP lanes if DP
 		if (connector_is_dp(connectorIndex))
-			gDPInfo[connectorIndex]->laneCount
-				= dp_get_lane_count(connectorIndex, mode);
+			dpInfo->laneCount = dp_get_lane_count(dpInfo, mode);
 
 		// *** encoder prep
 		encoder_output_lock(true);

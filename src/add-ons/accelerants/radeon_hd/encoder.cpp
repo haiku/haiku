@@ -602,6 +602,7 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 	TRACE("%s: table %" B_PRIu8 ".%" B_PRIu8 "\n", __func__,
 		tableMajor, tableMinor);
 
+	dp_info* dpInfo = &gConnector[connectorIndex]->dpInfo;
 	uint32 dpClock = dp_get_link_clock(connectorIndex);
 	switch (tableMinor) {
 		case 1:
@@ -653,7 +654,7 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 
 			if (args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP
 				|| args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP_MST) {
-				args.v1.ucLaneNum = gDPInfo[connectorIndex]->laneCount;
+				args.v1.ucLaneNum = dpInfo->laneCount;
 			} else if (pixelClock > 165000)
 				args.v1.ucLaneNum = 8;
 			else
@@ -718,6 +719,8 @@ encoder_external_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 
 	encoder_info* encoder
 		= &gConnector[connectorIndex]->encoderExternal;
+	dp_info* dpInfo
+		= &gConnector[connectorIndex]->dpInfo;
 
 	if (encoder->valid != true) {
 		ERROR("%s: connector %" B_PRIu32 " doesn't have a valid "
@@ -764,12 +767,12 @@ encoder_external_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 						= display_get_encoder_mode(connectorIndex);
 
 					if (connector_is_dp(connectorIndex)) {
-						if (gDPInfo[connectorIndex]->clock == 270000) {
+						if (dpInfo->linkRate == 270000) {
 							args.v1.sDigEncoder.ucConfig
 								|= ATOM_ENCODER_CONFIG_DPLINKRATE_2_70GHZ;
 						}
 						args.v1.sDigEncoder.ucLaneNum
-							= gDPInfo[connectorIndex]->laneCount;
+							= dpInfo->laneCount;
 					} else if (pixelClock > 165000) {
 						args.v1.sDigEncoder.ucLaneNum = 8;
 					} else {
@@ -791,15 +794,15 @@ encoder_external_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 						= display_get_encoder_mode(connectorIndex);
 
 					if (connector_is_dp(connectorIndex)) {
-						if (gDPInfo[connectorIndex]->clock == 270000) {
+						if (dpInfo->linkRate == 270000) {
 							args.v3.sExtEncoder.ucConfig
 								|=EXTERNAL_ENCODER_CONFIG_V3_DPLINKRATE_2_70GHZ;
-						} else if (gDPInfo[connectorIndex]->clock == 540000) {
+						} else if (dpInfo->linkRate == 540000) {
 							args.v3.sExtEncoder.ucConfig
 								|=EXTERNAL_ENCODER_CONFIG_V3_DPLINKRATE_5_40GHZ;
 						}
 						args.v1.sDigEncoder.ucLaneNum
-							= gDPInfo[connectorIndex]->laneCount;
+							= dpInfo->laneCount;
 					} else if (pixelClock > 165000) {
 						args.v3.sExtEncoder.ucLaneNum = 8;
 					} else {
@@ -1129,11 +1132,13 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 	bool linkB = gConnector[connectorIndex]->encoderExternal.linkEnumeration
 		== GRAPH_OBJECT_ENUM_ID2 ? true : false;
 
+	dp_info* dpInfo = &gConnector[connectorIndex]->dpInfo;
+
 	uint8 dpClock = 0;
 	int dpLaneCount = 0;
-	if (gDPInfo[connectorIndex]->valid == true) {
-		dpClock = gDPInfo[connectorIndex]->clock;
-		dpLaneCount = gDPInfo[connectorIndex]->laneCount;
+	if (dpInfo->valid == true) {
+		dpClock = dpInfo->linkRate;
+		dpLaneCount = dpInfo->laneCount;
 	}
 
 	switch (tableMajor) {
