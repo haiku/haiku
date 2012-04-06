@@ -311,8 +311,7 @@ ExpressionTextView::SetValue(BString value)
 			while (value[offset] == '0')
 				value.Remove(offset--, 1);
 
-			// there is no need to keep the period if no 
-			// digits follow
+			// no need to keep the period if no digits follow
 			if (value[offset] == '.')
 				value.Remove(offset, 1);
 		}
