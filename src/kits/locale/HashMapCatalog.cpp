@@ -124,7 +124,10 @@ BHashMapCatalog::GetString(const char *string, const char *context,
 	const char *comment)
 {
 	CatKey key(string, context, comment);
-	return GetString(key);
+	BString value = fCatMap.Get(key);
+	if (value.Length() != 0)
+		return value.String();
+	return string;
 }
 
 
