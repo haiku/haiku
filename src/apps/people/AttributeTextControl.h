@@ -21,12 +21,25 @@ public:
 									const char* attribute);
 	virtual						~AttributeTextControl();
 
+	virtual	void				MouseDown(BPoint);
+	virtual	void				MouseMoved(BPoint, uint32, const BMessage*);
+
 			bool				HasChanged();
 			void				Revert();
 			void				Update();
 
 			const BString&		Attribute() const
 									{ return fAttribute; }
+
+private:
+			const BString&		_MakeUniformUrl(BString &url) const;
+			const BString&		_BuildMimeString(BString &mimeType,
+									const BString &url) const;
+
+			bool				_ContainsUrl() const;
+
+			BRect				_VisibleLabelBounds() const;
+			void				_HandleLabelClicked(const char*);
 
 private:
 			BString				fAttribute;
