@@ -1,0 +1,62 @@
+1	hindi	x-vnd.Haiku-ShowImage	886873119
+Use as background…	Menus		पृष्ठभूमि के रूप में प्रयोग करें...
+File	Menus		फ़ाइल
+Slide delay	Menus		स्लाइड मे देरी
+Selection mode	Menus		चयन मोड
+Zoom in	Menus		ज़ूम इन
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		दस्तावेज़ '%s' बदल दिया गया है. क्या आप दस्तावेज़ को बंद करना चाहते हैं?
+Page setup…	Menus		पृष्ठ सेटअप...
+Print…	Menus		छापें...
+OK	SaveToFile		ठीक है
+Previous page	Menus		पिछला पृष्ठ
+View	Menus		दृश्य
+Full screen	Menus		पूर्ण स्क्रीन
+Go to page	Menus		पृष्ठ पर जाएँ
+Zoom out	Menus		ज़ूम से बाहर आएं
+Quit	Menus		छोड़ना
+Rotate counterclockwise	Menus		वामावर्त घुमाएं
+High-quality zooming	Menus		उच्च गुणवत्ता ज़ूमिग
+Browse	Menus		ब्राउज़ करें
+Edit	Menus		संपादित करें
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		छवि लोड नहीं की जा सकी! इसके लिए या तो फ़ाइल या छवि अनुवादक मौजूद नहीं है.
+First page	Menus		प्रथम पृष्ठ
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		दस्तावेज़ '%s' (पृष्ठ %d) बदल दिया गया है. क्या आप दस्तावेज़ को बंद करना चाहते हैं?
+%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS सेकंड्स
+Leave full screen	Menus		फूल स्क्रीन को छोड़ें
+Close	Menus		बंद करें
+Close	ClosePrompt		बंद करें
+Undo	Menus		पूर्ववत्
+Resize to (in 1/72 inches):	PrintOptionsWindow		आकार बदलें (1/72 inches में):
+Rating	Menus		रेटिंग
+Flip left to right	Menus		फ्लिप बाएँ से दाएँ करें
+Show caption in full screen mode	Menus		कैप्शन पूर्ण स्क्रीन मोड में दिखाएँ
+DPI:	PrintOptionsWindow		डीपीआई:
+Open…	Menus		खोलें...
+Next file	Menus		अगली फाइल
+Clear selection	Menus		चयन खारिच करें
+Close document	ClosePrompt		दस्तावेज़ को बंद करें
+Height: 	PrintOptionsWindow		ऊंचाई:
+The file '%s' could not be written.	SaveToFile		फ़ाइल '%s' नहीं लिखी जा सकती
+Cancel	ClosePrompt		रद्द करें
+Show tool bar	Menus		टूल बार दिखाएँ
+Fit to window	Menus		विंडो में फ़िट करें
+Print options	PrintOptionsWindow		मुद्रण के विकल्प
+Copy	Menus		नक़ल करना
+Progress monitor	ProgressWindow		प्रगति अनुविक्षक
+Last page	Menus		अंतिम पृष्ठ
+Stretch to window	Menus		विंडो तक खींचे
+Previous file	Menus		पिछली फ़ाइल
+ShowImage	System name		चित्र दिखाएँ
+Slide show	Menus		स्लाइड शो
+Fit image to page	PrintOptionsWindow		छवि पृष्ठ पर फिट करे
+Flip top to bottom	Menus		ऊपर से नीचे फ्लिप करे
+Select all	Menus		सभी का चयन करें
+Zoom factor in %:	PrintOptionsWindow		ज़ूम फैक्टर प्रतिशत में:
+Width:	PrintOptionsWindow		चौड़ाई:
+Image	Menus		छवि
+OK	Alerts		ठीक है
+Rotate clockwise	Menus		घड़ी की दिशा में घुमाएँ
+Job setup	PrintOptionsWindow		जॉब सेटअप
+Original size	Menus		मूल आकार
+Next page	Menus		अगला पृष्ठ
+Save as…	Menus		के रूप में सहेजें...

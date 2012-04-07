@@ -1,0 +1,17 @@
+1	hindi	x-vnd.Haiku-mount_server	1422362183
+Mount read-only	AutoMounter		माउंट केवल पढ़ने के लिए
+Error mounting volume:\n\n%s	AutoMounter		त्रुटि मौन्तिंग वोलुम:\n\n%s
+Unmount error	AutoMounter		अन्मौंत त्रुटि
+Mount warning	AutoMounter		माउंट चेतावनी
+Mount read/write	AutoMounter		माउंट पढ़/लिख
+Mounting volume '%s'\n\n	AutoMounter		मौन्तिंग वोलुम '%s'\n\n
+Cancel	AutoMounter		रद्द
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		डिस्क को उन माउन्ट नहीं कर सकें \"%s\":\n\t%s\n\nक्या अनमाउंट मजबूर किया जाना चाहिए?\n\nनोट:एक आवेदन वर्तमान मात्रा करने के लिए लिख रही है, यह अब विरोहण डेटा की हानि में परिणाम हो सकता है अगर.\n
+Could not unmount disk \"%s\":\n\t%s	AutoMounter		डिस्क को उन माउन्ट नहीं कर सकें \"%s\":\n\t %s
+Mounting volume <unnamed volume>\n\n	AutoMounter		मौन्तिंग वोलुम <अज्ञात वोलुम>\n\n
+OK	AutoMounter		ठीक है
+The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		इस खंड पर फाइल सिस्टम हाइकू फाइल सिस्टम नहीं है| यह दृढ़ता से सुझाव है की यह केवल पढ़ने के मोड में माउंट कर दिया जाये| इससे हाइकू में त्रुटियों की वजह से अनचाहे डेटा नुकसान को रोकने में मदद होगी|
+Previous volumes mounted.	AutoMounter		पिछले वोलुमस माउन्तेद.
+Mount error	AutoMounter		माउंट करने में त्रुटि
+It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		या सुझाव है की यह भी अतिरिक्त हाइकू संस्करणों को केवल पढ़ने के मोड में समाउंट कर दिया जाए| इससे हाइकू में त्रुटियों की वजह से अनचाहे डेटा नुकसान को रोकने में मदद होगी|
+Force unmount	AutoMounter		फॉरस अनमाउन्ट

@@ -1,0 +1,61 @@
+1	hindi	x-vnd.Haiku-BluetoothPrefs	3926935355
+About Bluetooth…	Window		ब्लूटूथ के बारे में ...
+Handheld	Settings view		हैंडहेल्ड
+Default inquiry time:	Settings view		डिफ़ॉल्ट जांच का समय:
+Manufacturer: 	Device View		निर्माता: 
+Add device to list	Inquiry panel		सूची उपकरण जोड़ें
+Starting scan...	Inquiry panel		स्कैन करना शुरू करें...
+Show bluetooth console…	Window		ब्लूटूथ सांत्वना दिखाएँ...
+Smart phone	Settings view		स्मार्ट फोन
+Server	Settings view		सर्वर
+Stop bluetooth services…	Window		ब्लूटूथ सेवाओं को रोकें...
+Identify host as:	Settings view		मेजबान के रूप में पहचानें:
+View	Window		देखें
+Refresh…	Remote devices		रिफ्रेश...
+Pair…	Remote devices		जोड़ी...
+Incoming connections policy:	Settings view		आने वाले कनेक्शन नीति:
+From all devices	Settings view		सभी उपकरणों से
+Show name	Extended local device view		नाम दिखाएँ
+Local devices found on system:	Settings view		स्थानीय प्रणाली उपकरणों पर पाया:
+Remaining %1 seconds	Inquiry panel		%1 सेकंड शेष
+Server	Window		सर्वर
+Scanning completed.	Inquiry panel		स्कैनिंग पूरा किया.
+OK	main		ठीक है
+Remote devices list…	Window		दूरदराज के उपकरणों की सूची ...
+Remove	Remote devices		हटायें
+Quit	main		छोड़ो
+15 secs	Settings view		15 सेकेंड
+Start please	main		कृपया प्रारंभ करे
+Start bluetooth services…	Window		ब्लूटूथ सेवाओं को शुरू करें...
+Policy...	Settings view		नीति ...
+61 secs	Settings view		61 सेकेंड
+Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		हाइकू ब्लूटूथ प्रणाली, (अरसे )\n\nओलिवर रिज़ दोरंतेस द्वारा बनाया गया \n\nके समर्थन के साथ:\n\t- मिका लिन्द्क्विस्त\n\t- अद्रिएँ देस्तुगुएस \n\t- मक्सिम  येव्मेंकिन\n\nव्यक्तियों, जो मदद के लिए धन्यवाद...\n\nशिपिंग /दान करने के लिए हार्डवेयर:\n\tहेनरी जेर अब्रिल फ्लोरेज़ (एल कोलोम्बियन )\n\t\t& स्टेफनी बर्तोलीच\n\t- एडविन एरिक अम्स्लेर\n\t- डेनिस डी'एंट्रेमोंत\n\t- लुरोह\n\t- पिएटर पंमन\n\nआर्थिक रूप से:\n\t- कार्ल वोम दोर्फ्फ़, आंद्रेआ बेर्नार्दी(ओस्द्रवेर),\n\t- मत्त म, डौग फ, हुबर्ट ह,\n\t- सेबास्तियन बी, अन्द्रेव म, जारेड इ,\n\t- फ्रेडेरिक ह, टॉम स, फेर्री बी,\n\t- ग्रेग ग, दविड़ फ, रिचर्ड स, मार्टिन व:\n\nपैच के साथ:\n\t- मिचेल वेइरौच\n\t- फ्रेडरिक एक्दह्ल\n\t- रेनाल्ड लेसियूर\n\t- आंद्रेआस  फारबर \n\t- जोएर्ग मेयेर\nपरीक्षण:\n\t- पेट्टर ह. जुलिउस्सें\nजो हमारे सभी ज्ञान दिया: \n\t- थे येल्लोव्ताब टीम
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		वहाँ किसी भी ब्लूटूथ सिस्टम पर पंजीकृत लोकाल्देविस नहीं है.
+Identify us as...	Settings view		हमें पहचानें के रूप में...
+ packets: 	Device View		 पैकेट: 
+As blocked	Remote devices		के रूप में बंद
+Bluetooth	System name		ब्लूटूथ
+Disconnect	Remote devices		डिसकन्नेक्ट
+Pick LocalDevice...	Settings view		उठाओ लोकाल्देविस ...
+Defaults	Window		चूक
+Inquiry	Inquiry panel		जांच
+Desktop	Settings view		डेस्कटॉप
+Revert	Window		वापस लौटने
+Remote devices	Window		दूरदराज के उपकरणों
+Laptop	Settings view		लैपटॉप
+Discoverable	Extended local device view		डिस्कवरेबल
+Work offline	main		ऑफ़लाइन कार्य करे
+bluetooth_server has not been found running on the system. Should be started, or stay offline	main		ब्लूटूथ _सर्वर सिस्टम पर चलता नहीं पाया गया है. शुरू किया जाना चाहिए या ऑफ़लाइन रहने दे ?
+Service classes: 	Device View		सेवा क्लासएस: 
+Connections & channels…	Window		कनेक्शन और चैनल...
+Refresh LocalDevices…	Window		रिफ्रेश लोकाल्देविसस ...
+Settings	Window		सेटिंग्स
+Only from trusted devices	Settings view		केवल उपकरणों वस्तु पर भरोसा
+Scanning progress	Inquiry panel		स्कैनिंग प्रगति
+Always ask	Settings view		हमेशा पूछें
+Retrieving name of %1	Inquiry panel		%1 के नाम की  पुनःप्राप्त कर रहा है
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		जाँच करें कि अपने ऋमोट डिवाइस के ब्लूटूथ क्षमताओं सक्रिय कर रहे हैं. प्रेस 'जांच' स्कैनिंग शुरू करने के लिए. नाम की बहाली के लिए आवश्यक समय अज्ञात है, हालांकि युक्ति प्रति अधिक से अधिक 3 सेकंड से ज्यादा नहीं लेना चाहिए. बाद में आप उन्हें अपने मुख्य सूची में जोड़ने में सक्षम हो, जहाँ आप उन के साथ पैर होने में सक्षम हो जाएगा.
+Authenticate	Extended local device view		प्रामाणीकरण
+Retrieving names...	Inquiry panel		पुन: प्राप्त करने के नाम...
+Help	Window		मदद
+Add…	Remote devices		जोड़ें...

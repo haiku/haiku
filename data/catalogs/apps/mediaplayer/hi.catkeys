@@ -1,0 +1,84 @@
+1	hindi	x-vnd.Haiku-MediaPlayer	3343900623
+1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1(अमेरिकी)
+Stream settings	MediaPlayer-Main		स्ट्रीम सेटिंग्स
+<unknown>	PlaylistItem-album		<अज्ञात>
+The file'%filename' could not be opened.\n\n	MediaPlayer-Main		फ़ाइल'%फ़ाइल का नाम' खोला नहीं जा सकता.\n\n
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		स्केल कंट्रोल्स फुल स्क्रीन मोड पर. 
+Subtitle size:	MediaPlayer-SettingsWindow		उपशीर्षक का आकार:
+Save Playlist	MediaPlayer-PlaylistWindow		प्लेलिस्ट को सुरक्षित करे
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		जिंन फ़ाइलों को आप प्ले करना चाहता हैं उन में से को कोई  मीडिया फ़ाइलों दिखाई नहीं देते हैं.
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		सहेजा जा रहा है प्लेलिस्ट विफल.\n\nत्रुटि:
+New player…	MediaPlayer-Main		नया प्लेयर...
+100% scale	MediaPlayer-Main		सौ प्रतिशत स्केल
+Subtitle placement:	MediaPlayer-SettingsWindow		उपशीर्षक की जगह:
+Close	MediaPlayer-Main		बंद
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		कुछ फ़ाइलें रद्दी में नहीं भेजा जा सकती है.
+Open	MediaPlayer-Main		खोले
+Next	MediaPlayer-Main		अगला
+OK	MediaPlayer-SettingsWindow		ठीक है
+Track %d	MediaPlayer-Main		ट्रैक %d
+2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (सिनेमास्कोप)
+Medium	MediaPlayer-SettingsWindow		मध्यम
+Close	MediaPlayer-PlaylistWindow		बंद करे
+Open…	MediaPlayer-PlaylistWindow		खोले...
+Toggle mute.	MediaPlayer-Main		टॉगल म्यूट.
+Undo	MediaPlayer-PlaylistWindow		पूर्ववत्
+Use hardware video overlays if available	MediaPlayer-SettingsWindow		हार्डवेयर वीडियो ओवरले का उपयोग करे अगर उपलब्ध हो
+File info…	MediaPlayer-Main		फ़ाइल जानकारी...
+Pause playback.	MediaPlayer-Main		प्लेबैक रोकें.
+Remove Entry	MediaPlayer-RemovePLItemsCmd		प्रविष्टि को हटाएँ
+Close window after playing audio	MediaPlayer-SettingsWindow		इस विंडो को बंद कर देना ऑडियो को चलाने करने के बाद
+Full volume	MediaPlayer-SettingsWindow		फूल वॉल्यूम
+Drop files to play	MediaPlayer-Main		प्ले करने के लिए फ़ाइलें ड्रॉप करे 
+TogglePlaying	MediaPlayer-Main		टॉगल प्लेयिंग
+Cancel	MediaPlayer-SettingsWindow		रद्द
+Loop audio	MediaPlayer-SettingsWindow		लूप ऑडियो 
+Nothing to Play	MediaPlayer-Main		कुछ भी प्ले करने के लिए नहीं हैं
+Muted	MediaPlayer-SettingsWindow		मौन
+Quit	MediaPlayer-Main		छोड़ना
+Video	MediaPlayer-Main		वीडियो
+Start playing.	MediaPlayer-Main		प्ले करना शुरू करो.
+There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		कोई विकोडक स्थापित नहीं है फाइल के प्रारूप को संभालने के लिए या विकोडक को प्रारूप के विशेष संस्करण के साथ परेशानी है.
+Import Entry	MediaPlayer-ImportPLItemsCmd		आयात एंट्री
+Gets the URI of the currently playing item.	MediaPlayer-Main		अभी चलने वाले आइटम की यूआरआइ लाता है
+400% scale	MediaPlayer-Main		चार सौ प्रतिशत स्केल
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		प्लेलिस्ट को सहेजना विफल:\n\nत्रुटि:
+Move Entries	MediaPlayer-MovePLItemsCmd		प्रविष्टियां ले जाएँ 
+Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		कचरा त्रुटि में ले जाएँ
+Audio	MediaPlayer-Main		ऑडियो
+Open Playlist	MediaPlayer-PlaylistWindow		ओपन प्लेलिस्ट
+MediaPlayer	System name		मीडियाप्लेयर  
+OK	MediaPlayer-Main		ठीक है
+Settings…	MediaPlayer-Main		सेटिंग्स...
+MediaPlayer settings	MediaPlayer-SettingsWindow		मीडिया प्लेयर की सेटिंग
+Select all	MediaPlayer-PlaylistWindow		सभ को चुने 
+Move Entry	MediaPlayer-MovePLItemsCmd		एंट्री ले जाएँ
+Open	MediaPlayer-PlaylistWindow		ओपन
+Stop playing.	MediaPlayer-Main		खेल बंद करो.
+Error: 	MediaPlayer-RemovePLItemsCmd		त्रुटि:
+Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		आंतरिक त्रुटि (विकृत संदेश).प्लेलिस्ट सहेजने में असफल रहा.
+Skip to the previous track.	MediaPlayer-Main		पिछले ट्रैक पर जाएँ.
+%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% को एक अंदरी त्रुटि मिली है. यह फ़ाइल खोल नहीं सकती.
+Close window after playing video	MediaPlayer-SettingsWindow		इस विंडो को बंद कर देना विडियो को चलाने करने के बाद 
+Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		आसानी से फिल्में स्केल (गैर उपरिशायी मोड)
+OK	MediaPlayer-RemovePLItemsCmd		ठीक है
+50% scale	MediaPlayer-Main		पचास प्रतिशत स्केल
+Subtitles	MediaPlayer-Main		उपशीर्षक
+Prev	MediaPlayer-Main		पिछला
+Volume	MediaPlayer-Main		वॉल्यूम
+Audio track	MediaPlayer-Main		ऑडियो ट्रैक
+Import Entries	MediaPlayer-ImportPLItemsCmd		आयात प्रविष्टियां
+Pause	MediaPlayer-Main		ठहराव
+No aspect correction	MediaPlayer-Main		कोई पहलू सुधार नही
+Automatically start playing	MediaPlayer-SettingsWindow		स्वचालित खेल शुरू करे
+Track	Video Track Menu		ट्रैक
+Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		आंतरिक त्रुटि (ताला विफल).प्लेलिस्ट सहेजने में असफल रहा.
+View options	MediaPlayer-SettingsWindow		विकल्प देखें
+Play mode	MediaPlayer-SettingsWindow		प्ले मोड
+Remove Entries	MediaPlayer-RemovePLItemsCmd		प्रविष्टियां निकालें
+Video track	MediaPlayer-Main		वीडियो ट्रैक
+Loop video	MediaPlayer-SettingsWindow		लूप विडियो 
+Attributes	MediaPlayer-Main		ऐट्रिब्यूट
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		सभी फ़ाइलों को रद्दी में नहीं भेजा जा सकता है.
+<untitled>	PlaylistItem-title		<अनटाइटल्ड>
+Track	Audio Track Menu		ट्रैक

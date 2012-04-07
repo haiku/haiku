@@ -1,0 +1,12 @@
+1	hindi	x-vnd.Haiku-ActivityMonitor	3548050559
+P-faults	DataSource		पी-गलतियाँ
+Media nodes	DataSource		मीडिया नोडस
+Threads	DataSource		थ्रेअड्स
+MB	DataSource		एमबी
+Add graph	ActivityWindow		गराफ जोड़े
+Teams	DataSource		टीम्स
+Hide legend	ActivityView		लेजेनद को छुपाएँ
+Network send	DataSource		नेटवर्क भेज दिया गया है
+CPU usage (combined)	DataSource		सीपिउ उसेज(एक साथ)
+CPU	DataSource		सीपिउ
+Used memory	DataSource		मेमोरी इस्तमाल हुई वि

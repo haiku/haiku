@@ -1,0 +1,57 @@
+1	hindi	x-vnd.Haiku-PackageInstaller	2709408798
+Install to:	PackageView		इंस्टाल करें:
+OK	PackageView		ठीक है 
+Accept	PackageTextViewer		मंज़ूर है 
+Continue	PackageInstall		जारी रखें 
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		आप ने जो पैकेज चाह था वोह आपके सिस्टम में इंस्टाल नहीं हो सका. ये एक समस्या हो सकती है आप के चुने हुए पैकेज फ़ाइल के साथ. कृपया इस चीज़ की सलाह  लें अपने पैकेज बाटने वाले से.
+Image not loaded correctly	PackageImageViewer		चित्र ठीक से लोड नहीं हुआ 
+No package selected.	PackageInfo		कोई पैकेज चुना नहीं गया है.
+Install	PackageView		इंस्टाल 
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		दिया हुआ पैकेज लगता है की पहले से ही आप के सिस्टम में इन्स्तालड है. क्या आप इस को हटान चाटें है और जारी रखना चाहतें है इन्स्तोल्लेषण को? 
+Do you want to remember this decision for the rest of this installation?\n	PackageView		क्या आप इस निर्णय को याद रखना चाहते है आगे बचे हुए इन्स्तोल्लेषण के लिए?\n
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		फ़ाइल के साइज़ का मेल नहीं बेथ रहा है पैकेज फ़ाइल में. पैकेज क्या पता भ्रष्ट हो या फिर मोदिफाय हुआ हो इस के सृजन के बाद. क्या आप जारी रखना चाटें हैं?  
+Error while installing the package\n	PackageView		त्रुटि आई जब हम पेकेज को इंस्टाल करते समय\n 
+Disclaimer	PackageTextViewer		खंडन
+%.1f GiB	PackageView		%.1f GiB
+The installation of the package has been aborted.	PackageView		इन्स्तोल्लेषण पैकेज का गर्भपात कर दिया गया है.
+Done	PackageInstall		हो गया 
+All existing files will be replaced?	PackageView		सारी मोजूदा फ़ाइल बदल जायेंगी?
+Preparing package	PackageInstall		पैकेज को तैयार किया जा रहा है
+No package available.	PackageInfo		कोई पैकेज उपलब्ध नहीं है.
+none	PackageView		कोई नहीं 
+Stop	PackageStatus		रोकें 
+Other…	PackageView		और कोई...
+No installation type selected	PackageView		कोई इन्स्तोल्लेषण का प्रकार चुना नहीं गया है
+The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		सिम्बोलिक लिंक का नाम है '%s' पहले से ही उप्लोब्ध है दिए हुए पथ पर.\nलिंक को बदलें पेकेज के साथ वाल में से या फिर छोड़ दें?
+Installing files and folders	PackageInstall		फ़ाइल और फोल्डर को इंस्टाल कर रहें है 
+Package installer	PackageView		पैकेज इन्स्तोल्लर 
+Skip all	PackageView		सभ को छोड़ें 
+The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		इतेम का नाम '%s' पहले से ही है आपके दिए हुए रस्ते पर.\nइतेम को बदलें पैकेज में से किस्सी एक के साथ या फिर उससे छोड़ दें?
+The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		स्क्रिप्ट किसका नाम है '%s' पहले से ही है दिए हुए पथ पर.\n बदल दें स्क्रिप्ट पैकेज में से किसी एक से या छोड़ दें?
+Running post-installation scripts	PackageInstall		पोस्ट-इन्स्तोल्लेषण स्क्रिप्ट चल रहीं है 
+%llu bytes	PackageView		%llu bytes
+Skip	PackageView		इस को छोड़ें 
+%.1f MiB	PackageView		%.1f MiB
+The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		डिरेक्टरी जिस का नाम है '%s' पहले से ही हिया दिए हुए पथ पर.\nबदल दें डिरेक्टरी में से किस्सी एक से पैकेज में से या फिर छोड़ दें? 
+The package you requested has been successfully installed on your system.	PackageView		पैकेज जो आपने मांगता था वो सफल्तापोर्वक इनस्टॉल हो चूका है आपके सिस्टम पर.
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		त्रुटी! \"%s\" एक मूल्य पथ नहीं है.\n
+Installation type:	PackageView		इन्स्तोल्लेषण का प्रक्कर:
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		त्रुटी (%s)! खोल नहीं सकें \"%s\".\n
+Finishing installation	PackageInstall		इन्स्तोल्लेषण को खतम कर रहें है 
+Installing package	PackageStatus		इन्स्ताल्लिंग पैकेज 
+Ask again	PackageView		फिर से पूछें 
+Abort	PackageView		छोड़ दें 
+Replace all	PackageView		सभ को बदलें 
+Decline	PackageTextViewer		मन कर दें 
+The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		फ़ाइल जिसका नाम '%s' पहले से ही उपलब्ध है दिए हुए पथ पर.\nफ़ाइल को बदलें दिए हुए पैकेज में से या फिर छोड़ दें? 
+All existing files will be skipped?	PackageView		सारी मोजुदा फ़ाइल को छोड़ दिया जायेगा?
+Continue	PackageInfo		जारी रखें 
+%.1f KiB	PackageView		%.1f KiB
+(%s free)	PackageView		(%s free)
+Abort	PackageInfo		छोड़ें
+PackageInstaller	System name		PackageInstaller
+Abort	PackageInstall		छोड़ें
+Continue	PackageTextViewer		जारी रकें 
+Replace	PackageView		बदलें
+Installation progress	PackageView		इन्स्तोल्लेषण अभी जारी है 
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		पैकेज फ़ाइल पढ़ी नहीं जा सकती.\nउन में से एक वजह हो सकती है की क्या पता मांगी गयी फ़ाइल एक मूल्य BeOS .pkg पैकेज फ़ाइल नहीं है. 

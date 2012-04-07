@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.haiku-icon_o_matic	3919647642
+1	lithuanian	x-vnd.haiku-icon_o_matic	2985145160
 Select All	Icon-O-Matic-PathManipulator		Pažymėti viską
 Add Style	Icon-O-Matic-AddStylesCmd		Pridėti stilių
 Color (#%02x%02x%02x)	Style name after dropping a color		Spalva (#%02x%02x%02x)
@@ -40,6 +40,7 @@ Remove Paths	Icon-O-Matic-RemovePathsCmd		Pašalinti kreives
 Scale Y	Icon-O-Matic-PropertyNames		Ištempti Y ašyje
 Add Control Point	Icon-O-Matic-AddPointCmd		Pridėti valdymo tašką
 Untitled	Icon-O-Matic-Main		Be pavadinimo
+Multi Set 	Multi Set (property name)		Multiaibė 
 any of the other lists to	Empty property list - 2nd line		bet kuriame kitame sąraše
 Save as…	Icon-O-Matic-Menu-File		Įrašyti kaip…
 Change Color	Icon-O-Matic-SetColorCmd		Pakeisti spalvą
@@ -57,6 +58,7 @@ PNG Set	Icon-O-Matic-SavePanel		PNG rinkinys
 Joins	Icon-O-Matic-PropertyNames		Sujungimai
 Remove Style	Icon-O-Matic-RemoveStylesCmd		Pašalinti stilių
 Scale X	Icon-O-Matic-PropertyNames		Ištempti X ašyje
+Set 	Set (property name)		Aibė 
 Cancel	Icon-O-Matic-SVGExport		Atsisakyti
 Add shape with style	Icon-O-Matic-Menu-Shape		Pridėti figūrą su stiliumi
 Remove Shape	Icon-O-Matic-RemoveShapesCmd		Pašalinti figūrą

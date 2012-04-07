@@ -1,0 +1,61 @@
+1	hindi	x-vnd.Haiku-Mail	2592587573
+Mail checking	Config Window		मेल की जाँच
+Settings	Config Window		सेटिंग्स
+Never	Config Window	show status window	कभी नहीं
+Only when dial-up is connected	Config Window		केवल जब डायल अप जुड़ा
+While sending and receiving	Config Window		भेजने और प्राप्त करने के दौरान
+days	Config Window		दिन
+Incoming	Config Window		इन्कोमिंग
+Server name:	E-Mail		सर्वर का नाम:
+OK	Config Window		ठीक है
+Start mail services on startup	Config Window		स्टार्टअप पर शुरू मेल सेवाओं
+E-mail address:	E-Mail		ई मेल पता:
+Account name:	E-Mail		खाते के नाम:
+Account name:	Config Views		खाते का नाम:
+Create new account	AutoConfigWindow		नया अकाउंट बनाने के लिए
+OK	Config Views		ठीक है
+The filter could not be moved. Deleting filter.	Config Views		फिल्टर स्थानांतरित नहीं किया जा सका. फिल्टर हटाना चाहिए.
+Revert	Config Window		पलटें
+Login name:	E-Mail		लॉगिन नाम:
+Incoming	E-Mail		इन्कोमिंग
+Password:	E-Mail		पासवर्ड:
+Accounts	Config Window		खाते
+Finish	AutoConfigWindow		खतम हो गया 
+Remove	Config Window		हटायें
+Miscellaneous	Config Window		विविध
+Show connection status window:	Config Window		दिखाएँ कनेक्शन स्थिति विंडो:
+Server Name:	E-Mail		सर्वर का नाम:
+While sending	Config Window		भेजने के दुरान
+Schedule outgoing mail when dial-up is disconnected	Config Window		निवर्तमान मेल अनुसूची डायल अप जब काट दिया है
+hours	Config Window		घंटे
+Enter a valid e-mail address.	AutoConfigWindow		एक मूल्य ई-मेंल एड्रेस भरें
+Add	Config Window		जोड़ें
+Account settings	AutoConfigWindow		अकाउंट सेत्तिंग्स
+E-mail	System name		ई-मेंल
+never	Config Window	mail checking frequency	कभी नहीं
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nसामान्य सेटिंग्स लौट नहीं किया जा सका.\n\nसामान्य सेटिंग्स को पुन: प्राप्त करने में त्रुटि:\n%s\n
+Real name:	Config Views		असली नाम:
+\t\t· Outgoing	Config Window		\t\t· ओत्गोइंग
+Choose Protocol	E-Mail		प्रोटोकॉल चुनें
+Return address:	Config Views		भेजने वाले का पता:
+Edit mailbox menu…	Config Window		मेलबॉक्स मेनू संपादित करें...
+Outgoing	E-Mail		ओत्गोइंग
+\t\t· E-mail filters	Config Window		\t\t· ई-मेंल फिल्टर्स
+Remove	Config Views		हटायें
+\t\t· Incoming	Config Window		\t\t· इन्कोमिंग
+Next	AutoConfigWindow		अगला
+Check every	Config Window		हर जाँच
+Back	AutoConfigWindow		पिछला
+Incoming mail filters	Config Views		आने वाली मेल फ़िल्टर
+Account settings	Config Views		खाता सेटिंग्स
+minutes	Config Window		मिनट्स
+Error retrieving general settings: %s\n	Config Window		सामान्य सेटिंग्स को पुन: प्राप्त करने में त्रुटि: %s\n
+Real name:	E-Mail		असली नाम:
+Apply	Config Window		लागू
+Always	Config Window		हमेशा
+OK	AutoConfigWindow		ठीक है
+Add filter	Config Views		फिल्टर जोड़ें
+Outgoing	Config Window		ओउत्गोइंग
+Outgoing mail filters	Config Views		मेल फ़िल्टर निवर्तमान
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nजोड़ें बटन के साथ एक नया खाता बनाएँ.\n\nके साथ एक खाते को हटाएँ चयनित आइटम पर हटाएँ बटन.\n\nसूची में कोई आइटम चुन कर इसकी सेटिंग्स बदल सकते हैं.
+Error	Config Window		त्रुटि

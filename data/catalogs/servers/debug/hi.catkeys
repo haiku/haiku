@@ -1,0 +1,4 @@
+1	hindi	x-vnd.Haiku-debug_server	1035915338
+OK	DebugServer		ठीक है
+Debug	DebugServer		तार्किक त्रुटियों की खोज करे
+The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		आवेदन:ने एक \n\n %app\n\nत्रुटि का सामना किया है जो इसे जारी रखने से रोकता है. हाइकू आवेदन को समाप्त करेगा और साफायी करेगा.

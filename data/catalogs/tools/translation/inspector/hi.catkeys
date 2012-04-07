@@ -1,0 +1,32 @@
+1	hindi	x.vnd.OBOS-Inspector	2075781936
+User Translators	ActiveTranslatorsWindow		उसर अनुवादक
+No image available to save.	ImageWindow		कोई भी इमेज उपस्थित नहीं है सेव करने के लिए
+Sorry, unable to write the image file.	ImageView		माफ करना, असमर्थ छवि फ़ाइल लिखने के लिए.
+Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		दस्तावेजों की संख्या: %1\n\nट्रांसलेटर प्रयोग किया है:\nनाम: 2%\n:जानकारी: %n3संस्करण:%4\n
+\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nप्रकार: '%1' (%2)\nसमूह: '%3 (%4)\nगुणवत्ता: %5\nक्षमता:%6\nएमआईएमई प्रकार: %7\nनाम: %8\n
+Bummer	ImageWindow		बम्मर
+Last Page	ImageWindow		आखरी पेज
+\nInput Formats:	ImageView		\nइनपुट प्रारूप:
+Sorry, unable to load the image.	ImageView		माफ करना,इमेज को लोड करने में असमर्थ
+Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	इन्फो वीं
+Active Translators	InspectorApp		एक्टिव ट्रांसलेटर
+Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		इमेज: %1\nरंग अंतरिक्ष:%2 (%3)\nआयाम:%4 x %5\nबाइट्स:%6\nकुल बाइट्स: %7\n\nपहचान जानकारी:\nआईडी अक्षर:%8\nएमआईएमई प्रकार:%9\nप्रकार: 10% '(%11)\nट्रांसलेटर आईडी:%12\nसमहू: '%13' (%14)\nगुणवत्ता: %15\nक्षमता: %16\n\n विस्तार जानकारी:\n
+\nOutput Formats:	ImageView		\nआउटपुट फोर्मट्स:
+Save feature not implemented yet.	ImageWindow		सेव सुविधा अभी तक कार्यान्वित नहीं हुई है
+First Page	ImageWindow		पहला पेज 
+Next Page	ImageWindow		अगला पेज
+Open...	ImageWindow		खोलिए...
+\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nट्रांसलेटर प्रयुक्त:\nनाम: %1\nजानकारी: %2\nसंस्करण:%3\n
+Save...	ImageWindow		सेव...
+Info	ImageWindow		जानकारी
+OK	ImageWindow		ठीक है
+Window	ImageWindow		विंडो
+Quit	ImageWindow		छोड़ना
+Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		चुना हुआ दस्तावेज़: %1\n\nअनुवादक का इस्तमाल::\nनाम:%2\nके बारें में:: %3\nसंस्करण: %4\n
+Active Translators	ImageWindow		एक्टिव ट्रांस्लातोर्स
+View	ImageWindow		देखें
+Previous Page	ImageWindow		पीछला पेज
+OK	ImageView		ठीक है
+System Translators	ActiveTranslatorsWindow		सिस्टम अनुवादक
+Unknown	ImageView		अज्ञात
+File	ImageWindow		फाइल

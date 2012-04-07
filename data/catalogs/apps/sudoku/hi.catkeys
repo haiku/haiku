@@ -1,0 +1,34 @@
+1	hindi	x-vnd.Haiku-Sudoku	2463385585
+Restore snapshot	SudokuWindow		स्नैप्शोट को रीस्टोर करें 
+Could not set Sudoku:\n%s\n	SudokuWindow		सुडोकू को सेट नहीं कर पाए:\n%s\n
+Export as…	SudokuWindow		एक्सपोर्ट करें उससे...
+OK	SudokuWindow		ठीक है
+New	SudokuWindow		नया 
+Abort	ProgressWindow		छोड़ें
+Sudoku	System name		सुडोकू
+Could not open \"%s\":\n%s\n	SudokuWindow		उससे खोल नहीं सकें \"%s\":\n%s\n
+Easy	SudokuWindow		सरल
+Open file…	SudokuWindow		फ़ाइल को खोलें...
+Solve single field	SudokuWindow		सिंगल फिल्ड को सुलझाएं
+Solve	SudokuWindow		सुलझाएं
+Redo	SudokuWindow		फिर से करें
+File	SudokuWindow		फ़ाइल
+Advanced	SudokuWindow		उन्नत
+Start again	SudokuWindow		फिर से शुरू करें
+HTML	SudokuWindow		HTML
+Sudoku request	SudokuWindow		सुडोकू की आज्ञा
+Copy	SudokuWindow		कॉपी
+Mark valid hints	SudokuWindow		मूल्य संकेत को मार्क करें
+Sudoku solved - congratulations!\n	SudokuWindow		सुडोकू पूरा हुआ - बधाई हो!\n
+Hard	SudokuWindow		कठिन
+Snapshot current	SudokuWindow		जारी को स्नाप्शोट करें
+Text	SudokuWindow		टेक्स्ट
+Creating solvable field	SudokuGenerator		सोल्वेबल फिएल्ड बना रहे है 
+View	SudokuWindow		दृश्य
+Progress monitor	ProgressWindow		प्रगति अनुविक्षक
+Mark invalid values	SudokuWindow		अवैध मूल्य को मार्क करें
+Blank	SudokuWindow		खाली
+Help	SudokuWindow		सहायता
+Searching for removable values	SudokuGenerator		हटाये जाने वाले मूल्य को ढून्ढ रहें है 
+Undo	SudokuWindow		पूर्ववत् करें
+Quit	SudokuWindow		छोड़ें

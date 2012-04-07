@@ -1,11 +1,7 @@
-1	english	x-vnd.Haiku-Keymap	1347916797
-Caps Lock:	Modifier Keys window		大小写锁定：
+1	english	x-vnd.Haiku-Keymap	1259868356
 Tilde trigger	Keymap window		触发颚化字符
-Modifier Keys	Modifier Keys window		辅助按键
 Grave trigger	Keymap window		触发雕刻字符
 Select dead keys	Keymap window		选择废键：
-Option:	Modifier Keys window		选项：
-Revert	Modifier Keys window		取消
 Quit	Keymap window		退出
 Switch shortcut keys to Haiku mode	Keymap window		切换快捷键为Haiku模式
 Circumflex trigger	Keymap window		触发音调符号
@@ -13,9 +9,7 @@ Diaeresis trigger	Keymap window		触发分音符号
 Open…	Keymap window		打开..
 System:	Keymap window		系统：
 Switch shortcut keys	Keymap window		切换快捷键
-Set Modifier Keys…	Keymap window		设置辅助键...
 User:	Keymap window		用户：
-Control:	Modifier Keys window		控制键：
 Sample and clipboard:	Keymap window		示例和剪贴板：
 Layout	Keymap window		布局
 Switch shortcut keys to Windows/Linux mode	Keymap window		切换快捷键为 Windows/Linux 模式
@@ -25,5 +19,4 @@ File	Keymap window		文件
 (Current)	Keymap window		（当前）
 Font	Keymap window		字体
 Keymap	System name		键盘映射
-Command:	Modifier Keys window		命令键：
 Acute trigger	Keymap window		触发尖重音符

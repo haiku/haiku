@@ -1,0 +1,31 @@
+1	hindi	x-vnd.Haiku-PPMTranslator	2886727868
+PPM Settings	PPMMain		PPM सेत्तिंग्स
+Based on PPMTranslator sample code	PPMTranslator		PPM अनुवादक सेमपल कोड पर आधारित 
+OK	PPMMain		ठीक है
+Grayscale 8 bits	PPMTranslator		Grayscale 8 bits
+CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 bits
+PPM image	PPMTranslator		PPM चित्र
+RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 bits
+PPM Image Translator	PPMTranslator		PPM चित्र का अनुवादक
+Be Bitmap Format (PPMTranslator)	PPMTranslator		Be Bitmap Format (PPMTranslator)
+CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bits
+CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 bits
+bits/space	PPMTranslator		बिट्स/स्पेस
+RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 bits big-endian
+RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 8:8:8 32 bits big-endian
+Version %d.%d.%d %s	PPMTranslator		संस्करण %d.%d.%d %s
+RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 bits big-endian
+RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 bits
+Write ASCII	PPMTranslator		ASCII लिखें
+RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 bits
+None	PPMTranslator		कोई नहीं
+RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 bits big-endian
+RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 bits
+Bitmap 1 bit	PPMTranslator		बित्माप 1 bit
+RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 bits big-endian
+Input Color Space	PPMTranslator		इनपुट कॉलर स्पेस
+RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 bits
+Sample code copyright 1999, Be Incorporated	PPMTranslator		सेमपल कोड कोप्य्रिघ्त 1999, इन्कोर्पोरातेद रहें
+PPMTranslator Settings	PPMTranslator		PPM अनुवादक की सेत्तिंग्स
+Something is wrong with the PPMTranslator!	PPMMain		PPM अनुवादक से साथ कुछ गलत है!
+System palette 8 bits	PPMTranslator		सिस्टम पेलेट 8 bits

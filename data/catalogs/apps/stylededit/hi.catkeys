@@ -1,0 +1,80 @@
+1	hindi	x-vnd.Haiku-StyledEdit	1508367857
+StyledEdit	System name		StyledEdit
+Paste	Menus		पेस्ट
+OK	LoadAlert		ठीक है
+File	Menus		फ़ाइल
+???	LoadAlert		???
+Lines:	Statistics		लाइनें:
+Italic	Menus		तिरछे अक्षर
+Left	Menus		बाएं
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		पिछले संस्करण \"%s\" पर जाए? 
+Search backwards	FindandReplaceWindow		पीछे ढूँढें
+Size	Menus		आकार
+Save	QuitAlert		सहेजें
+Page setup…	Menus		पृष्ठ सेटअप...
+Print…	Menus		छापें...
+Can't undo	Menus		पूर्ववत नहीं कर सकते
+Save	Menus		सहेजें
+Replace with:	FindandReplaceWindow		साथ बदलें:
+Cancel	SaveAlert		रद्द
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		वापस नहीं कर सकते, फ़ाइल नहीं मिली : \"%s\".
+Case-sensitive	FindandReplaceWindow		केस संवेदी
+Green	Menus		हरा
+Revert to saved…	Menus		सहेजी स्थिति पर लौटे
+Yellow	Menus		पीला
+Replace in all windows	FindandReplaceWindow		सभी विंडो में बदलें
+Wrap lines	Menus		रेखाएं लपेटें
+Quit	Menus		बाहर जाएँ
+Document statistics	Statistics		दस्तावेज़ के आँकड़े
+Cancel	RevertToSavedAlert		रद्द करे
+Document	Menus		दस्तावेज़
+Save changes to the document \"%s\"? 	QuitAlert		दस्तावेज़ में परिवर्तन सहेजें \"%s\"? 
+Edit	Menus		संपादित करें
+Font	Menus		फ़ॉन्ट
+Replace all	FindandReplaceWindow		सभी को बदलें
+Statistics…	Menus		आँकड़े...
+Default	Open_and_SaveAsPanel		डिफ़ॉल्ट
+Replace next	Menus		अगले को बदल दें
+Cancel	FindandReplaceWindow		रद्द करे
+Close	Menus		बंद करें
+Save	SaveAlert		सुरक्षित करना
+Words:	Statistics		शब्द:
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		लोड करने में त्रुटि \"%s\":\n\t असमर्थित स्वरूप
+OK	RevertToSavedAlert		ठीक है
+Don't save	QuitAlert		न सहेजें
+Align	Menus		संरेखित करे
+Color	Menus		रंग
+Red	Menus		लाल
+Open…	Menus		खोलें...
+Center	Menus		बीच में
+Blue	Menus		नीला
+Cyan	Menus		सियान
+OK	Statistics		ठीक है
+Magenta	Menus		मैजंटा
+New	Menus		नया
+Wrap-around search	FindandReplaceWindow		रैप-अराउन्ड खोज
+Bold	Menus		मोटा अक्षर
+Find selection	Menus		चयन को खोजें
+Find:	FindandReplaceWindow		खोजें:
+Error saving \"%s\":\n%s	SaveAlert		सहेजने में त्रुटि \"%s\":\n%s
+Copy	Menus		नक़ल करना
+Cut	Menus		काटना
+Replace	FindandReplaceWindow		बदलें
+Find again	Menus		फिर से खोजें
+Cancel	QuitAlert		रद्द
+Find…	Menus		खोजें...
+Select all	Menus		सभी का चयन करें
+Don't save	SaveAlert		मत सहेजें
+Error loading \"%s\":\n\t%s	LoadAlert		लोड करने में त्रुटि \"%s\":\n\t%s
+Undo typing	QuitAlert		पूर्ववत टाइपिंग
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		इस फ़ाइल को केवल पढ़ने के लिए चिह्नित किया है. दस्तावेज़ में परिवर्तन सहेजें\"%s\"? 
+Black	Menus		काला
+Untitled 	StyledEditWindow		शीर्षकहीन 
+OK	SaveAlert		ठीक है
+Find	FindandReplaceWindow		खोजें
+Encoding	Open_and_SaveAsPanel		एन्कोडिंग
+Characters:	Statistics		अक्षर:
+Save as…	Menus		के रूप में सहेजें ...
+Redo typing	QuitAlert		फिर से टाइप करे
+Replace…	Menus		स्थान लेना...
+Right	Menus		सही

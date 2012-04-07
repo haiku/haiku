@@ -1,0 +1,27 @@
+1	hindi	x-vnd.Haiku.TV	1995288111
+TV	MainWin		टी.वी.
+Channel	MainWin		चैनल
+Settings…	MainWin		सेटिंग्स ...
+Interface	MainWin		इंटरफ़ेस
+Keep aspect ratio	MainWin		अनुपात पहलू बनाए रखें
+Previous channel	MainWin		पिछला चैनल
+Settings	MainWin		सेटिंग्स
+TV	System name		टी.वी.
+No border	MainWin		सीमा नहीं है
+Always on top	MainWin		हमेशा शीर्ष पर
+OK	MainWin		ठीक है
+Quit	MainWin		छोड़े
+Full screen	MainWin		संपूर्ण स्क्रीन
+Debug	MainWin		दोष मुक्त करना
+Scale to native size	MainWin		मूल आकार के लिए स्केल करे
+unknown	MainWin		अज्ञात
+Next channel	MainWin		अगला चैनल
+Error, interface is busy:\n\n	MainWin		त्रुटि, इंटरफ़ेस व्यस्त है:\n\n
+None	MainWin		कोई नहीं
+force 704 x 576, display aspect 4:3	MainWin		फोर्स 704 x 576, डिस्प्ले ऐस्पेक्ट 4:3
+DVB - Digital Video Broadcasting TV	MainWin		डीवीबी - डिजिटल वीडियो प्रसारण टी वी
+force 544 x 576, display aspect 4:3	MainWin		फोर्स 544 x 576, डिस्प्ले ऐस्पेक्ट 4:3
+pixel aspect ratio	MainWin		पिक्सेल पहलू अनुपात
+No menu	MainWin		कोई मेनू नही हैं
+Error, connecting to interface failed:\n\n	MainWin		त्रुटि, इंटरफ़ेस कनेक्ट करने में विफल :\n\n
+force 720 x 576, display aspect 4:3	MainWin		फोर्स 720 x 576, डिस्प्ले ऐस्पेक्ट 4:3

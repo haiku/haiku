@@ -1,0 +1,22 @@
+1	hindi	x-vnd.haiku-registrar	1138344559
+Restart system	ShutdownProcess		सिस्टम को फिर से शुरू करें 
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		अप्प्लिकेशन \"%appName%\" क्या पता ब्लोकेड हो मोडल पनेल पर.
+OK	ShutdownProcess		ठीक है
+System is shut down	ShutdownProcess		सिस्टम शूट डाउन है
+It's now safe to turn off the computer.	ShutdownProcess		अब सुरक्षित है कम्पूटर को बंद करना.
+Cancel	ShutdownProcess		रद्द करें
+Do you really want to shut down the system?	ShutdownProcess		क्या आप पक्का से सिस्टम शटडाउन करना चाहतें है?
+Asking other processes to quit.	ShutdownProcess		बाकी प्रोसस्सेस को पूछ रही है बंद करने के लिए.
+Asking \"%appName%\" to quit.	ShutdownProcess		पुच रहें है \"%appName%\" बंद करने के लिए.
+%action%?	ShutdownProcess		%action%?
+Shutdown aborted	ShutdownProcess		शटडाउन को छोड़ दिया
+Restarting…	ShutdownProcess		फिर से शुरू कर रहें है...
+Asking background applications to quit.	ShutdownProcess		बेकग्रौंड अप्प्लिकेशन से पूछ रहें है छोड़ने के लिए.
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		अप्प्लिकेशन \"%appName%\" ने छोड़ दिया है शटडाउन प्रोस्सेस को.
+Tidying things up a bit.	ShutdownProcess		थोडासा चीजों को साफ़ कर रहें है.
+Do you really want to restart the system?	ShutdownProcess		क्या आप पक्का से अपने सिस्टम को शुरू करना चाहते है?
+Shutdown status	ShutdownProcess		शुत्दोवं का स्टेटस
+Cancel shutdown	ShutdownProcess		शट डाउन न करें
+Kill application	ShutdownProcess		Kill application
+Restart	ShutdownProcess		फिर से शुरू करें
+Shutting down…	ShutdownProcess		शटडाउन कर रहें है...

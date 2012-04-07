@@ -1,0 +1,45 @@
+1	hindi	x-vnd.Haiku-Expander	386826896
+Expand	ExpanderMenu		विस्तार
+Close window when done expanding	ExpanderPreferences		विस्तार करने के बाद विंडो बंद करें
+Set destination…	ExpanderMenu		गंतव्य सेट कीजिए...
+Use:	ExpanderPreferences		उपयोग:
+File expanded	ExpanderWindow		फ़ाइल का विस्तार
+The destination is read only.	ExpanderWindow		गंतव्य केवल पढने के लिए है.
+Expander: Open	ExpanderWindow		विस्तारक: ओपन
+Expander settings	ExpanderPreferences		विस्तारक
+Select current	DirectoryFilePanel		वर्तमान चुना करें
+Source	ExpanderWindow		स्रोत
+Error when expanding archive	ExpanderWindow		त्रुटि जब संग्रह का विस्तार हो रहा था
+Hide contents	ExpanderWindow		सामग्री छिपाएँ
+Cancel	ExpanderWindow		रद्द
+Automatically expand files	ExpanderPreferences		अपने आप फाइलें विस्तार करें
+Creating listing for '%s'	ExpanderWindow		'%s' के लिए सूचीकरण बना रहा है
+Continue	ExpanderWindow		जारी रखें
+The destination folder does not exist.	ExpanderWindow		गंतव्य फ़ोल्डर मौजूद नहीं है.
+Cancel	ExpanderPreferences		रद्द करे
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		आप सुनिश्चित हैं कि आप इस आरकाइव के विस्तार को बंद करना चाहते हैं?\nविस्तारित आइटम सम्भव्तीय पूरे नहीं हो
+Select	DirectoryFilePanel		चुनें
+Same directory as source (archive) file	ExpanderPreferences		वह ही निदेशिका जो स्रोत(संग्रह) फ़ाइल की है
+Expanding '%s'	ExpanderWindow		विस्तार कर रहा है '%s'
+Settings	ExpanderMenu		सेटिंग्स
+Settings…	ExpanderMenu		सेटिंग्स ...
+Expander: Choose destination	DirectoryFilePanel		विस्तारक: गंतव्य चुनें
+Select	ExpanderPreferences		चुनें
+Show contents	ExpanderWindow		सामग्री दिखाएँ
+Automatically show contents listing	ExpanderPreferences		सामग्री की सूची अपने आप दिखाएँ
+OK	ExpanderPreferences		ठीक है
+Leave destination folder path empty	ExpanderPreferences		गंतव्य फ़ोल्डर के पथ को खाली छोड़ें
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		फ़ोल्डर, या तो ले जाया गया था या नाम बदला है या नहीं\nसुप्पोर्तेद है
+The file doesn't exist	ExpanderWindow		फ़ाइल मौजूद नहीं है
+Stop	ExpanderMenu		रुक जाओ
+File	ExpanderMenu		फ़ाइल
+Expander	System name		विस्तारक
+Expand	ExpanderWindow		विस्तार
+Close	ExpanderMenu		बंद
+The destination is not a folder.	ExpanderWindow		गंतव्य एक फोल्डर नहीं है.
+Open destination folder after extraction	ExpanderPreferences		निकालने के बाद गंतव्य फ़ोल्डर खोलें
+Set source…	ExpanderMenu		सेट स्रोत...
+Select '%s'	DirectoryFilePanel		चुनें '%s'
+Show contents	ExpanderMenu		दिखाएँ सामग्री
+Stop	ExpanderWindow		रुक जाओ
+Destination	ExpanderWindow		गंतव्य

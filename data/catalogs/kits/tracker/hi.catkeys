@@ -1,0 +1,451 @@
+1	hindi	x-vnd.Haiku-libtracker	3013164940
+common	B_COMMON_DIRECTORY		सामान्य
+OK	WidgetAttributeText		ठीक है
+Icon view	VolumeWindow		चिह्न दृश्य
+Add-ons	FilePanelPriv		अतिरिक्त जोड़ सकते हैं
+Desktop	Model		डेस्कटॉप
+Identify	ContainerWindow		पहचानें
+Warning space color	SettingsView		चेतावनी स्पॆस रंग
+Close	VolumeWindow		बंद करे
+Open	OpenWithWindow		खोले
+Tracker status	StatusWindow		ट्रैकर स्थिति
+Eject when unmounting	AutoMounterSettings		बेदखल जब विरोहण हो रहा हो
+Window	ContainerWindow		विंडो
+Decrease size	ContainerWindow		आकार घटाएँ
+Mini icon view	VolumeWindow		मिनी आइकन देखें
+You must have at least one attribute showing.	PoseView		आपको कम से कम एक गुण दिखा रहा होना चाहिए.
+Permissions	InfoWindow		अनुमतियाँ
+Invert selection	VolumeWindow		चुनाव उलटो
+Recent documents	FavoritesMenu		हाल ही में उपयोग किये गये दस्तावेज
+Modified	QueryPoseView		संशोधित
+Created	ContainerWindow		बनाया गया
+contains	SelectionWindow		शामिल हैं
+Sorry, you can't save things at the root of your system.	FilePanelPriv		क्षमा करें, आप चीजों को आपके सिस्टम के रूट पर नहीं संचित कर सकते हैं
+Show shared volumes on Desktop	SettingsView		साझा वॉल्यूम डेस्कटॉप पर दिखाएँ
+Paste links	ContainerWindow		 लिंक चिपकाएँ
+Name	OpenWithWindow		नाम
+Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		खुला नहीं सका \"%document\" क्योंकि आवेदन \"%app\" यह रद्दी में है
+File	ContainerWindow		फ़ाइल
+Handles any %type	OpenWithWindow		संचलन करना किसी भी %प्रकार का
+Delete	ContainerWindow		हटाएँ
+32 x 32	ContainerWindow		32 x 32
+Cannot unmount the boot volume \"%name\".	FSUtils		\"%name\" बूट मात्रा अंमाँऊंट नहीं कर सकते 
+Open with…	ContainerWindow		के साथ खोलें...
+Write	FilePermissionsView		लिखे
+for %num files	InfoWindow		%num फाइलों के लिए
+Modified	PoseView		संशोधित
+Make active printer	ContainerWindow		मुद्रक सक्रिय करें
+Create link here	ContainerWindow		यहाँ लिंक बनाएँ
+Moving: 	StatusWindow		चल़ रहा है:
+before	FindPanel		के पहले
+On	FindPanel		शुरू
+MiB	WidgetAttributeText		मेबी बाइट
+greater than	FindPanel		से अधिक
+Delete	PoseView		हटाएँ
+Select all	ContainerWindow		सभी चुनें
+Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		क्षमा करें, 'अक्षर ' गुण नहीं स्टोर कर सकता मल्टी बाइट ग्लिफ़.
+Clean up	DeskWindow		साफ़ करो
+You cannot copy or move the root directory.	FSUtils		आप मूल निर्देशिका को कॉपी या स्थानांतरित नहीं कर सकते
+Invert selection	FilePanelPriv		चुने हुए को उलटा करें
+Rename	InfoWindow	Button label, 'Rename' (en), 'Umbenennen' (de)	नाम बदलें
+save text	FilePanelPriv		पाठ को संचित करें
+Select all	FilePanelPriv		सभी को चुनें
+Link to:	InfoWindow		से लिंक करें:
+Location	ContainerWindow		स्थान
+Location	QueryPoseView		स्थान
+config	B_USER_CONFIG_DIRECTORY		config
+apps	B_APPS_DIRECTORY		apps
+Icon view	ContainerWindow		आइकन दृश्य
+Size	QueryPoseView		आकार
+Emptying Trash… 	StatusWindow		रद्दी खाली कर रहा है ...
+Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		नया ट्रेकर तेम्प्लातेस
+Close all in workspace	ContainerWindow		सारे कार्यस्थान मे बंद करें
+Empty Trash	ContainerWindow		रद्दी खाली करें
+Name = %name	FindPanel	FindResultTitle	नाम=%name
+Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		क्या आप सुनिश्चित हैं कि आप चयनित आइटम्स को इस फ़ोल्डर में कॉपी या स्थानांतरित करना चाहते हैं?
+Does not handle file	OpenWithWindow		फ़ाइल को संभाल नहीं सकता
+Arrange by	ContainerWindow		इसके द्वारा व्यवस्थित करें
+Mount server error	AutoMounterSettings		माउन्ट सर्वर त्रुटि
+Search	FindPanel		खोजें
+Preparing to empty Trash…	StatusWindow		रद्दी खाली करने की तैयारी ...
+Disks	Model		डिस्कस
+Create link	ContainerWindow		लिंक बनाएँ
+develop	B_COMMON_DEVELOP_DIRECTORY		बनायें
+Decrease size	DeskWindow		आकार घटाएँ
+Size	ContainerWindow		आकार
+All disks	AutoMounterSettings		सभी डिस्कस
+Would you like to find some other suitable application?	FSUtils		क्या आप कुछ अन्य उपयुक्त आवेदन ढूंढ निकालना चाहते है?
+Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		खुला नहीं सका \"%document\" आवेदन के साथ \"%app\" (लापता पुस्तकालये: %library). \n
+no items	CountView		कोई आइटमस नहीं है
+Ignore case	SelectionWindow		केस पर ध्यान न दें
+is not	FindPanel		नहीं है
+OK	AutoMounterSettings		ठीक है
+Windows	TrackerSettingsWindow		विंडोज
+Tracker preferences	TrackerSettingsWindow		ट्रैकर प्राथमिकताएं
+Cut	FilePanelPriv		काटे
+Replace	FilePanelPriv		बदलें
+Select all	VolumeWindow		सभी चुनें
+Opens with:	InfoWindow		के साथ खुलता है:
+Open	ContainerWindow		खोलें
+(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%आकार प्रसंस्कृत का %कुल आकार, %बाइट्स प्रति सेकंड/s)
+Error calculating folder size.	InfoWindow		फ़ोल्डर आकार की गणना त्रुटि
+New folder	FilePanelPriv		नया फ़ोल्डर
+%name info	InfoWindow	InfoWindow Title	%name जानकारी
+Favorites	FavoritesMenu		पसंदीदा
+Add-ons	VolumeWindow		अतिरिक्त जोड़ सकते हैं
+(Finish: %time - %finishtime left)	StatusWindow		(Finish: %time - %finishtime left)
+Sorry, you can't copy items to the Trash.	PoseView		क्षमा करें, आप आइटम्स रद्दी में प्रतिलिपि नहीं कर सकते है.
+List view	VolumeWindow		सूची दृश्य
+matches wildcard expression	SelectionWindow		वाइल्डकार्ड अभिव्यक्ति से मेल खाता है
+rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	फिर से नाम दें 
+You cannot replace a folder or a symbolic link with a file.	FSUtils		तुम एक फ़ोल्डर या एक फ़ाइल के साथ एक प्रतीकात्मक कड़ी को बदल नहीं सकते
+Show space bars on volumes	SettingsView		आवाज़ की तीव्रता पर स्पैस बार दिखाएँ
+Invert selection	ContainerWindow		चुनाव उलटो
+Increase size	DeskWindow		आकार बढ़ाएँ
+Resize to fit	ContainerWindow		फिट के अनुसार आकार बदलें
+%Ld bytes	WidgetAttributeText		%Ld बाइट्स
+Add printer…	ContainerWindow		प्रिंटर जोड़ें ...
+Open	VolumeWindow		खोलें
+New folder	ContainerWindow		नया फ़ोल्डर
+Kind	ContainerWindow		प्रकार
+rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	फिर से नाम दें
+home	B_USER_DIRECTORY		घर
+Select…	ContainerWindow		चुनें
+Copy to	ContainerWindow		पर प्रतिलिपि बनाएँ
+Move to Trash	ContainerWindow		रद्दी में ले जाएँ
+Move to	ContainerWindow		ले जाएँ
+Create %s clipping	PoseView		%s कटिंग बनाये
+Set new link target	InfoWindow		नए लक्ष्य की कड़ी सेट करे
+Save as Query template:	FindPanel		क्वेरी टेम्पलेट के रूप में सहेजें 
+preferences	B_PREFERENCES_DIRECTORY		वरीयताओं
+Cancel	FSUtils		रद्द करें
+move	FSUtils	As in 'to move this folder...' (en) Um diesen Ordner zu verschieben...' (de)	मूव
+Edit name	ContainerWindow		नाम संपादित करें
+Show volumes on Desktop	SettingsView		आवाज़ की मात्रा डेस्कटॉप पर दिखाएँ
+KiB	WidgetAttributeText		कीबी बाइट
+Error %error loading Add-On %name.	ContainerWindow		त्रुटि %error अतिरिक्त चीज़ें लोड हो रही है %name.
+Defaults	TrackerSettingsWindow		डिफॉल्टस
+%num items	CountView		%num आइटम्स
+Mini icon view	ContainerWindow		मिनी प्रतीक दृश्य
+Clean up	VolumeWindow		साफ़ करो
+OK	TrackerInitialState		ठीक है
+Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		खुल नहीं सका \"%name\". फ़ाइल गलती से निष्पादन योग्य के रूप में चिह्नित है.
+Add-ons	ContainerWindow		अतिरिक्त चीज़ें
+Edit templates…	TemplatesMenu		टेम्पलेट्स संपादित करे...
+An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		कोई आइटम नाम \"%name\" इस फ़ोल्डर में पहले से मौजूद है. क्या आप इसे प्रतीकात्मक लिंक आप पैदा कर रहे हैं के साथ बदलना चाहते हैं?
+Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		क्षमा करें, पर्याप्त गंतव्य के लिए चयन की प्रतिलिपि मात्रा पर खाली स्थान नहीं है.
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		खोल नहीं सका\"%document\" आवेदन के साथ \"%app\" (%error). 
+Sorry, saving more than one item is not allowed.	FilePanelPriv		खेद , एक से अधिक आइटम सहेजने, की अनुमति नहीं है.
+Searching for disks to mount…	StatusWindow		माउंट करने के लिए डिस्क खोज ...
+New folder	FSUtils		नया फ़ोल्डर
+Free space color	SettingsView		ख़ाली जगह का रंग
+Cut	ContainerWindow		कट
+Remove	FindPanel		हटायें
+Resize to fit	QueryContainerWindow		फिट करने के लिए आकारबदलें
+Desktop	TrackerSettingsWindow		डेस्कटॉप
+Sorry, you can't copy items to the Trash.	FSClipBoard		क्षमा करें, आप आइटम्स रद्दी में प्रतिलिपि नहीं कर सकते. 
+by attribute	FindPanel		विशेषता से
+Disk mounting during boot	AutoMounterSettings		डिस्क बूट के दौरान माउंट करें
+New Query	FindPanel		नए सवाल
+Preparing to move items…	StatusWindow		आइटम ले जाने की तैयारी...
+You cannot replace a file with a folder or a symbolic link.	FSUtils		तुम एक फ़ाइल के साथ एक फ़ोल्डर या एक प्रतीकात्मक कड़ी को बदल नहीं सकते
+Unmount	InfoWindow		अनमाउंट
+no supporting apps	OpenWithWindow		कोई समर्थन क्षुधा
+That name is already taken. Please type another one.	InfoWindow		वह नाम पहले ही ले लिया गया है. कोई दूसरा टाइप करें.
+Sorry, you can't create links in the Trash.	PoseView		क्षमा करें, आप रद्दी में लिंक नहीं बना सकते.
+Link \"%name\" to:	InfoWindow	File dialog title for new sym link	सम्बन्ध \"%name\" के लिए:
+Mount settings…	VolumeWindow		माउंट सेटिंगस...
+Select…	VolumeWindow		चुनें...
+All disks	FindPanel		सभी डिस्क
+Invert selection	QueryContainerWindow		चुनाव उलटो
+Execute	FilePermissionsView		चलाएँ
+Size	FindPanel		आकार
+1 item	CountView		एक वस्तु
+Open parent	ContainerWindow		खुला मूल
+Location:	InfoWindow		स्थान:
+Edit favorites…	FilePanelPriv		फेवरिट संपादित करें ...
+Create relative link	ContainerWindow		संबंधित लिंक बनाएँ
+Copy	ContainerWindow		अनुकृति बनाना
+Size	PoseView		आकार
+If you %ifYouDoAction the home folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		अगर आप %ifYouDoAction होम फोल्डर, %osName ठीक से नहीं पेश आएगी! क्या आप पक्का से यह करना चाहते हैं? To %toDoAction होम फोल्डर किसी भी तरह, Shift पकड़ कर रखें और क्लिक करें \"%toConfirmAction\".   
+Location	OpenWithWindow		स्थान
+Force identify	ContainerWindow		फोर्स पहचाने
+Duplicate	ContainerWindow		नकल
+New folder%ld	FSUtils		नया फ़ोल्डर%ld
+Outline selection rectangle only	SettingsView		आयत की रूपरेखा का चयन करें
+Select all	DeskWindow		सभी चुनें
+OK	InfoWindow		ठीक है
+Replace	FSUtils		बदलें
+You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		\n\t%name%\dest nwith:\n\t\ n%% name\n\nक्या आप की तरह से इसे आप% movemode रहे हैं के साथ की जगह आप आइटम बदलना चाहते हैं?
+Mini icon view	DeskWindow		मिनी प्रतीक दृश्य
+Error in regular expression:\n\n'%errstring'	PoseView		नियमित अभिव्यक्ति में त्रुटि:\n\n'%errstring'
+Mount all	MountMenu		सभी माउंट करें
+calculating…	InfoWindow		गणना कर रहा है...
+Unmount	VolumeWindow		अनमाउंट
+Edit name	VolumeWindow		नाम संपादित करें
+Mount all disks now	AutoMounterSettings		सब डिस्क माउंट करें
+Untitled bitmap	PoseView		शीर्षकहीन बिटमेप
+of %items	StatusWindow		की %items
+Description:	InfoWindow		विवरण:
+New	DeskWindow		नया
+Open	InfoWindow		खोलें
+64 x 64	ContainerWindow		64 x 64
+Replace all	FSUtils		सभी बदलें
+The application \"%appname\" does not support the type of document you are about to open. Are you sure you want to proceed? If you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		\ अनुप्रयोग "% \ APPNAME" आप  जिस दस्तावेज़ के प्रकार के बारे में खोलने के लिए कर रहे हैं यह का समर्थन नहीं करता. क्या आप आगे बढ़ना चाहते हैं? यदि आप जानते हैं कि आवेदन दस्तावेज़ प्रकार का समर्थन करता है, तो आप आवेदन के प्रकाशक से संपर्क करें और उन्हें अपने अपने रूप में समर्थित दस्तावेज़ के प्रकार सूची आवेदन अद्यतन करने के लिए पूछना चाहिए.
+Preparing to restore items…	StatusWindow		आइटम बहाल की तैयारी ...
+Replace other file	WidgetAttributeText		अन्य फ़ाइल बदलें
+Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		चयनित आइटम में से कुछ रद्दी में स्थानांतरित नहीं किया जा सकता है. क्या आप के बजाय उन्हें मिटाना चाहते हैं? (यह आपरेशन किया जाना है. नहीं लौट सकते हैं)
+You cannot create a link to the root directory.	FSUtils		आप रूट निर्देशिका के लिए एक लिंक नहीं बना सकते
+48 x 48	ContainerWindow		48 x 48
+Resize to fit	VolumeWindow		आकार बदलने के फिट करें
+Could not find application \"%appname\"	OpenWithWindow		आवेदन नहीं मिला \"%appname\"
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		चयनित आइटम को कचरा पेटी में स्थानांतरित नहीं किया जा सकता है. क्या आप इसे इसकी बजाय मिटाना चाहते हैं? (यह आपरेशन किया जाना है. नहीं लौट सकते हैं)
+Invert	SelectionWindow		पलटे
+Save Query as template…	FindPanel		टेम्पलेट के रूप में सहेजें क्वेरी...
+rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	फिर से नाम दें 
+Find	FindPanel		खोजें
+Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	मूव 
+Get info	ContainerWindow		सूचना प्राप्त करें
+Error creating link to \"%name\".	FSUtils		लिंक बनाने में त्रुटि \"%name\".
+Select	SelectionWindow		चयन करें
+Or	FindPanel		या
+The Tracker must be running to see set the default printer.	PoseView		डिफ़ॉल्ट प्रिंटर सेट देखने के लिए ट्रैकर चल रहा होना चाहिये
+by formula	FindPanel		सूत्र द्वारा
+40 x 40	DeskWindow		40 x 40
+Name	PoseView		नाम
+Group	FilePermissionsView		समूह
+Version:	InfoWindow		संस्करण:
+Created:	InfoWindow		बनाया गया:
+If you %ifYouDoAction the mime settings, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"%toConfirmAction\".	FSUtils		अगर आप %ifYouDoAction मिमे सेत्तिंग्स, %osName ठीक से नहीं पेश आएगी! क्या आप पक्का से यह करना चाहते हैं? To %toDoAction माईम फोल्डर किसी भी तरह, Shift पकड़ कर रखें और क्लिक करें \"%toConfirmAction\".
+\nShould this be fixed?	FSUtils		क्या
+Copying: 	StatusWindow		प्रतिलिपि बनाई जा रही: 
+Capacity:	InfoWindow		क्षमता:
+Delete	FilePanelPriv		हटाएँ
+Save	FindPanel		सुरक्षित करना
+copy	FSUtils	filename copy	प्रतिलिपि बनाये
+Temporary	FindPanel		अस्थायी
+Version	OpenWithWindow		वर्ज़न
+Default application	InfoWindow		डिफ़ॉल्ट अनुप्रयोग
+Preparing to copy items…	StatusWindow		आइटम्स की प्रतिलिपि की तैयारी...
+Show folder location in title tab	SettingsView		शो के शीर्षक में फ़ोल्डर स्थान टैब 
+Proceed	FSUtils		बढ़ना
+Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		कुछ आइटम पहले से ही मदों के रूप में एक ही नाम आप% क्रिया रहे हैं के साथ इस फ़ोल्डर में मौजूद हैं. \ n \ n क्या आप उन लोगों को आप% रहे हैं क्रिया या हर एक के लिए प्रेरित के साथ बदलना चाहते हैं?
+The mount server could not be contacted.	AutoMounterSettings		माउंट सर्वर से संपर्क नहीं किया जा सका.
+Error deleting items	FSUtils		वस्तुओं को हटाने में त्रुटि
+Create relative link here	ContainerWindow		यहाँ संबंधित लिंक बनाएँ
+trash	B_TRASH_DIRECTORY		रद्दी
+matches regular expression	SelectionWindow		नियमित अभिव्यक्ति से मेल खाता है
+Mount settings…	SettingsView		माउंट सेटिंग ...
+Edit name	InfoWindow		नाम संपादित करें
+Could not open \"%name\" (%error). 	FSUtils		खुल नहीं सका \"%name\". (%error). 
+Paste	ContainerWindow		चिपकाना
+optional	/boot/optional		वैकल्पिक
+Modified:	InfoWindow		संशोधित:
+Error moving \"%name\".	FSUtils		जाने में त्रुटि \"%name\".
+TiB	WidgetAttributeText		ती बी
+40 x 40	ContainerWindow		40 x 40
+The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		फ़ाइल \"%name\"पहले से निर्दिष्ट फ़ोल्डर में मौजूद है. क्या आप इसे बदलना चाहते हैं?
+Cancel	ContainerWindow		रद्द करें
+Only the boot disk	AutoMounterSettings		केवल बूट डिस्क
+Trash	TrackerSettingsWindow		रद्दी
+Unmount	ContainerWindow		अनमाउंट
+Copy layout	ContainerWindow		लेआउट की नकल करें
+label too long	PoseView		लेबल बहुत लंबा हैं
+Cancel	Tracker		रद्द करें
+Sorry, you cannot edit that attribute.	WidgetAttributeText		क्षमा करें, आप उस गुण को संपादित नहीं कर सकते
+Name	ContainerWindow		नाम
+Disk mount settings	AutoMounterSettings		डिस्क माउंट सेटिंग्स
+Reverse order	ContainerWindow		उलटा क्रम
+48 x 48	DeskWindow		48 x 48
+OK	OpenWithWindow		ठीक है
+Add current folder	FilePanelPriv		वर्तमान फ़ोल्डर जोड़ें
+Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		खोल नहीं सकता\"%document\" आवेदन के साथ  \"%app\" (लापता प्रतीक: %symbol). \n
+The target disk does not support creating links.	FSUtils		लक्ष्य डिस्क लिंक बनाने मे समर्थन नहीं है
+starts with	SelectionWindow		साथ शुरू होता है
+Preparing to delete items…	StatusWindow		आइटम्स हटाने की तैयारी ...
+Enable type-ahead filtering	SettingsView		टाइप आगे फ़िल्टरिंग सक्षम करें
+Would you like to find a suitable application to open the file?	FSUtils		क्या आप के लिए एक उपयुक्त स्थान को खोलने को आवेदन मिल पसंद है?
+There was an error writing the attribute.	WidgetAttributeText		वहाँ एक विशेषता लेखन मे त्रुटि थी
+Recalculate folder size	InfoWindow		फ़ोल्डर आकार की पुनर्गणना
+Unknown	WidgetAttributeText		अज्ञात
+Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		खुला नहीं सका \"%document\" (लापता चिन्ह: %symbol). \n
+by name	FindPanel		नाम से
+Creating links: 	StatusWindow		लिंक बनाना:
+Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	फिर से नाम दें
+Paused: click to resume or stop	StatusWindow		रुका हुआ: क्लिक करें फिर से शुरू या बंद करने के लिए
+Preferred for %type	OpenWithWindow		के लिए पसंदीदा %type
+GiB	WidgetAttributeText		गीबाइट्स
+If you %ifYouDoAction the common folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		अगर आप %ifYouDoAction कोम्मन फोल्डर, %osName ठीक से नहीं पेश आएगी! क्या आप पक्का से यह करना चाहते हैं? To %toDoAction कॉमन फोल्डर किसी भी तरह, Shift पकड़ कर रखें और क्लिक करें \"%toConfirmAction\".
+There was an error deleting \"%name\":\n\t%error	FSUtils		वहाँ एक को हटाने में त्रुटि \"%name\":\n\t%error
+Paste	FilePanelPriv		चिपकाएँ
+Copy more	ContainerWindow		और अधिक प्रति करें 
+OK	PoseView		ठीक है
+Read	FilePermissionsView		पढ़ें
+Clean up all	ContainerWindow		सब साफ़ करो
+New folder	TemplatesMenu		नया फ़ोल्डर
+Move here	ContainerWindow		यहाँ ले जाये
+File	FilePanelPriv		फ़ाइल
+Real name	ContainerWindow		असली नाम
+Error moving \"%name\"	FSUtils		जाने में त्रुटि \"%name\"
+You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		आप एक डिस्क में से एक पर आइटम ड्रॉप \"डिस्क"\"खिड़की में आइकन चाहिए.
+Cancel	WidgetAttributeText		रद्द करें
+Could not find an application to open \"%name\" (%error). 	FSUtils		खोलने के लिए आवेदन नहीं मिला \"%name\" (%error). 
+Create a Query template	FindPanel		प्रश्न आकार पट्ट बनाये
+Previously mounted disks	AutoMounterSettings		पहले से माउंट डिस्क 
+%Ld B	WidgetAttributeText		%Ld B
+copying	FSUtils		प्रतिलिपि बन रहे हैं
+Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		फ़ोल्डर प्रतिलिपि में त्रुटि \"%name\":\n\t%error\n\nक्या आप जारी रखना चाहेंगे?
+move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	मूव
+Show Disks icon	SettingsView		डिस्क चिह्न दिखाएँ
+Mount	VolumeWindow		माउन्ट
+Cancel	PoseView		रद्द करें
+\n\t(%Ld bytes, 	FSUtils		\n\t(%Ld बाइट्स,
+You can't move or copy items to read-only volumes.	FSUtils		आप केवल पढ़ने के लिए संस्करणों कॉपी या स्थानांतरित नहीं कर सकते हैं.
+Unknown	FilePermissionsView		अज्ञात
+All files and folders	FindPanel		सभी फ़ाइल या फ़ोल्डर
+Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		खुला नहीं सका \"%document\" (लापता पुस्तकालये: %library). \n
+The Tracker must be running to see Info windows.	PoseView		जानकारी विंडो को देखने के लिए ट्रैकर चल रहा होना चाहिये
+Other	FilePermissionsView		अन्य
+Query name:	FindPanel		क्वेरी का नाम:
+Permissions	ContainerWindow		अनुमतियाँ
+moving	FSUtils		चल रहे है
+Identify	InfoWindow		पहचानें
+Recent folders	ContainerWindow		हाल ही में उपयोग किये गये फ़ोल्डर्स
+rename	InfoWindow	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	फिर से नाम दें
+Close all	ContainerWindow		सभी बंद करें
+Include trash	FindPanel		रद्दी शामिल करें
+Query template	FindPanel		प्रश्न टेम्पलेट
+Open %name with:	OpenWithWindow		खोलें %name के साथ:
+Empty folder	NavMenu		खाली फ़ोल्डर
+Copy here	ContainerWindow		यहाँ कॉपी करें
+Move to Trash	FilePanelPriv		रद्दी पर ले जाएँ
+Current folder	ContainerWindow		वर्तमान फ़ोल्डर
+(Finish: %time)	StatusWindow		(खत्म: %time)
+The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		निर्दिष्ट नाम पहले से ही एक फ़ोल्डर के नाम के रूप में प्रयोग किया जा रहा हैं.कृपया दूसरा नाम चुनें.
+Clean up	ContainerWindow		साफ़ करो
+after	FindPanel		के बाद
+Select…	QueryContainerWindow		चुनें...
+link	FSUtils	filename link	सम्बन्ध
+At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		At %func \nfind_directory() failed. \n:कारण %error
+The specified name is illegal. Please choose another name.	FilePanelPriv		निर्दिष्ट नाम अवैध है.कृपया दूसरा नाम चुनें.
+You can't move a folder into itself or any of its own sub-folders.	FSUtils		आप इस फ़ोल्डर को अपने आप मे या इस के उप फ़ोल्डर नहीं भेज सकते.
+List view	ContainerWindow		सूची दृश्य
+Handles any file	OpenWithWindow		किसी भी फाइल को संभालता है
+Get info	FilePanelPriv		सूचना प्राप्त करें
+32 x 32	DeskWindow		32 x 32
+Cancel	FilePanelPriv		रद्द करें 
+Disks	DirMenu		डिस्क
+New folder %ld	FSUtils		नया फ़ोल्डर %ld
+All BeOS disks	AutoMounterSettings		सभी BeOS डिस्क
+Used space color	SettingsView		स्पैस रंग उपयोग किये गये
+Sorry, could not create a new folder.	FSUtils		क्षमा करें, कोई नया फ़ोल्डर नहीं बना सकते हैं.
+multiple disks	FindPanel		अनेक डिस्क
+Done	AutoMounterSettings		संपन्न हो गया
+You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		\"Disks\विंडो.
+Untitled clipping	PoseView		शीर्षकहीन क्लिपिंग
+Don't automount	AutoMounterSettings		ऑटोमाउंट नहीं करें
+Save	FilePanelPriv		सहेजें
+To: %dir	StatusWindow		करने के लिए: %dir
+Window	FilePanelPriv		विंडों
+Find…	VolumeWindow		खोजें ...
+Edit name	FilePanelPriv		नाम संपादित करें
+Size:	InfoWindow		आकार:
+Empty folder	SlowContextPopup		खाली फ़ोल्डर
+Open selection with:	OpenWithWindow		के साथ चयन खोलें:
+(%bytes bytes)	InfoWindow		(%बाइट्स बाइट्स)
+Preparing to create links…	StatusWindow		लिंक बनाने के लिए की तैयारी ...
+Show navigator	SettingsView		दिशा दिखानेवाला दिखाएँ
+Desktop	B_DESKTOP_DIRECTORY		डेस्कटॉप
+List folders first	SettingsView		पहले फ़ोल्डर्स की सूची दिखाएँ
+Get info	VolumeWindow		सूचना प्राप्त करें
+Name	SelectionWindow		नाम
+Trash	Model		रद्दी
+Favorites	FilePanelPriv		पसंदीदा
+Name	QueryPoseView		नाम
+Delete	FSUtils		हटाएँ
+Modified	FindPanel		संशोधित किया गया
+Error moving \"%name\" to Trash. (%error)	FSUtils		जाने में त्रुटि \"%name\" रद्दी में. (%error)
+You can't replace a folder with one of its sub-folders.	FSUtils		आप इस फ़ोल्डर की जगह इस के उप फ़ोल्डर नहीं डाल सकते.
+<No recent items>	FavoritesMenu		<कोई हाल के आइटम नहीं>
+Preferences…	ContainerWindow		वरीयताएँ...
+Move	PoseView		जाए
+Open and make preferred	OpenWithWindow		खोलें और फिर पसंद करें
+Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		आप सुनिश्चित हैं कि आप चयनित मद (s) को मिटाना चाहते हैं? इस आपरेशन को लौटाया नहीं जा सकता
+Add-ons	DeskWindow		अतिरिक्त जोड़ सकते हैं
+Name	FindPanel		नाम
+And	FindPanel		और
+Select…	DeskWindow		चुनें ...
+Copy	FilePanelPriv		प्रति बनाये
+Icon view	DeskWindow		आइकन का दृश्य
+(Finish: %time - Over %finishtime left)	StatusWindow		(Finish: %time - Over %finishtime left)
+Select all	QueryContainerWindow		सभी चुनें
+Files cannot be moved or deleted from a read-only volume.	PoseView		केवल पढ़ने के लिए संस्करणों में फाइले कॉपी या हटाए नहीं जा सकती .
+There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		वहां एक तरह से बदलने की कोशिश कर समस्या थी \"%name\". आइटम खोलें या व्यस्त हो सकता है.
+You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		आप रद्दी, घर या डेस्कटॉप निर्देशिका रद्दी में नहीं डाल सकते.
+Owner	FilePermissionsView		मालिक
+There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		आपके द्वारा निर्दिष्ट फ़ोल्डर में सहेजने मे समस्या थी.एक और  प्रयास करें.
+Restore	ContainerWindow		पुनर्स्थापित करें
+Restoring: 	StatusWindow		पुनर्स्थापित कर रहा है 
+system	B_SYSTEM_DIRECTORY		सिस्टम
+Skip	FSUtils		छोड़ें
+Settings…	MountMenu		सेटिंग्स...
+Error emptying Trash!	FSUtils		रद्दी खाली करने मे त्रुटि!
+Recent folders	FavoritesMenu		हाल ही में उपयोग किये गये फ़ोल्डर्स
+Close	ContainerWindow		बंद करे
+Preferred for file	OpenWithWindow		फ़ाइल के लिए पसंदीदा
+Go to parent	FilePanelPriv		रूट में जाओ
+Cancel	OpenWithWindow		रद्द करें
+That name is too long. Please type another one.	InfoWindow		यही नाम बहुत लंबा है. एक दूसरे टाइप करें.
+OK	FSUtils		ठीक है
+Paste layout	ContainerWindow		लेआउट चिपकाएँ
+Select	InfoWindow		चुनें
+Could not update permissions of file \"%name\". %error	FSUtils		फ़ाइल की अनुमतियाँ अद्यतन नहीं कि जा सकती \"%name\". %error
+Select…	FilePanelPriv		चुनें ...
+Don't move files to Trash	SettingsView		रद्दी में फाइलों मत डालें
+There was an error resolving the link.	Tracker		एक कड़ी को हल करने में त्रुटि हुई.
+%BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
+If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		अगर आप %ifYouDoAction सिस्टम फोल्डर या फिर उसके कंटेंट्स, आप उससे बूट नहीं कर पाएंगे %osName! क्या आप यह करना चाहते है? के लिए %toDoAction सिस्टम फोल्डर या फिर उसके कंटेंट्स केसे भी, Shift पकड़ कर रखें और क्लिक करें \"%toConfirmAction\".
+You can't move or copy the trash.	FSUtils		आप रद्दी को कॉपी या स्थानांतरित नहीं कर सकते हैं.
+ends with	SelectionWindow		के साथ समाप्त होता है
+Volume icons	TrackerSettingsWindow		मात्रा प्रतीक
+That name is already taken. Please type another one.	WidgetAttributeText		यही नाम पहले ही ले लिया है.एक दूसरे टाइप करें.
+Close	QueryContainerWindow		बंद करे
+Formula %formula	FindPanel	FindResultTitle	सूत्र %formula
+Kind:	InfoWindow		प्रकार:
+starts with	FindPanel		से शुरू होता है
+Increase size	ContainerWindow		आकार बढ़ाएँ
+is	FindPanel		है
+Attributes	ContainerWindow		विशेषताएँ
+Handles %type	OpenWithWindow		सँभालता है %प्रकार
+ends with	FindPanel		 के साथ समाप्त होता है
+New	ContainerWindow		नया
+Name matches wildcard expression:###	SelectionWindow		नाम वाइल्डकार्ड अभिव्यक्ति से मेल खाता है :###
+less than	FindPanel		से कम
+64 x 64	DeskWindow		64 x 64
+Modified	ContainerWindow		संशोधित किया गया
+Edit Query template	FindPanel		प्रश्न आकार पट्ट संपादित करें
+Prompt	FSUtils		शीघ्र
+Edit query	ContainerWindow		प्रश्न संपादित करें
+If you %ifYouDoAction the config folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"%toConfirmAction\".	FSUtils		अगर आप %ifYouDoAction कॉन्फिग फोल्डर, आप उससे बूट नहीं कर पाएंगे %osName! क्या आप यह करना चाहते है? के लिए %toDoAction कॉन्फिग फोल्डर या फिर उसके कंटेंट्स केसे भी, Shift पकड़ कर रखें और क्लिक करें \"%toConfirmAction\".
+Find…	ContainerWindow		खोजें...
+Create a Query	FindPanel		प्रश्न बनाये
+Move to Trash	FSUtils		रद्दी मे ले जाएँ
+Automatic disk mounting	AutoMounterSettings		स्वचालित डिस्क माउंट
+Original name	ContainerWindow		मूल नाम
+Find	FSUtils		खोजें
+Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		फ़ाइल की प्रतिलिपि में त्रुटि \"%name\":\n\t%error\n\nक्या आप जारी रखना चाहेंगे?
+Ask before delete	SettingsView		हटाने से पहले पूछें 
+Single window navigation	SettingsView		एक खिड़की मे नैवगेशन
+parent folder	NavMenu		मूल फ़ोल्डर
+contains	FindPanel		शामिल हैं
+Relation	OpenWithWindow		संबंध
+Open	FilePanelPriv		खोले
+Mount	DeskWindow		चिपकाना
+Mount	ContainerWindow		चिपकाना
+%capacity (%used used -- %free free)	InfoWindow		%क्षमता
+Cancel	FSClipBoard		रद्द करें
+Cut more	ContainerWindow		और अधिक काटे
+If you %ifYouDoAction the settings folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"%toConfirmAction\".	FSUtils		अगर आप %ifYouDoAction कोम्मन फोल्डर, %osName ठीक से नहीं पेश आएगी! क्या आप पक्का से यह करना चाहते हैं? To %toDoAction सेटिंग्स फोल्डर किसी भी तरह, Shift पकड़ कर रखें और क्लिक करें \"%toConfirmAction\".
+Deleting: 	StatusWindow		हटा रहा है
+Empty Trash	InfoWindow		रद्दी खाली करें
+Add	FindPanel		जोड़े

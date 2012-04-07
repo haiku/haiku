@@ -1,0 +1,48 @@
+1	hindi	x-vnd.Haiku-Pulse	2324471783
+OK	PrefsWindow		ठीक है
+Quit	DeskbarPulseView		बाहर जाएँ
+Mini mode	DeskbarPulseView		मिनी मोड
+Remove replicant	CPUButton		दोहराएँ हुए निकालें
+Active color	ConfigView		सक्रिय रंग
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		उपयोग: पल्स [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
+Fade colors	ConfigView		फीके रंग
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nडेविड रामसे और आर्वे ह्जोंनेवाग के द्वारा\nपुनरीक्षित दानिएल स्वित्किन के द्वारा\n
+OK	DeskbarPulseView		ठीक है
+Deskbar mode	PrefsWindow		डेस्कबार मोड
+%.2f GHz	NormalPulseView		%.2f GHz
+Normal mode	PrefsWindow		सामान्य मोड
+Defaults	PrefsWindow		डिफ़ॉल्ट्स
+Normal mode	MiniPulseView		सामान्य मोड
+Error	PulseApp		त्रुटी
+Info	PulseView		जानकारी 
+Deskbar	CPUButton		डेस्कबार
+Frame color	ConfigView		रंग को फ़्रेम करे
+Mini mode	PrefsWindow		मिनी मोड
+OK	PulseApp		ठीक है
+Bar colors	ConfigView		बार कलर
+Settings…	PulseView		सेटिंग्स...
+You can't disable the last active CPU.	PulseView		आप पिछले सक्रिय सीपीयू को अक्षम नहीं कर सकते हैं.
+Info	PulseApp		जानकारी 
+Info	CPUButton		जानकारी
+OK	PulseView		ठीक है
+Deskbar menu	CPUButton		डेस्कबार मेनू
+About Pulse…	PulseView		पल्स के बारे में...
+Deskbar mode	MiniPulseView		डेस्कबार मोड
+Quit	MiniPulseView		छोड़ना
+Pulse	System name		पल्स
+Pulse	NormalPulseView		पल्स
+%ld MHz	NormalPulseView		%ld MHz
+Deskbar mode	NormalPulseView		डेस्कबार मोड
+Pulse	PulseApp		पल्स
+Width of icon:	ConfigView		आइकन की चौड़ाई:
+You can't disable the last active CPU.	CPUButton		आप पिछले सक्रिय सीपीयू को अक्षम नहीं कर सकते हैं.
+Normal mode	DeskbarPulseView		सामान्य मोड
+OK	CPUButton		ठीक है
+About Pulse…	CPUButton		पल्स के बारे में...
+Removing from Deskbar failed.\n%s	DeskbarPulseView		डेस्कबार से हटाने में असफल.\n%s
+Mini mode	NormalPulseView		मिनी मोड
+Info	DeskbarPulseView		जानकारी
+Pulse settings	PulseWindow		पल्स सेटिंग्स
+Idle color	ConfigView		आइडल रंग
+Installing in Deskbar failed\n%s	PulseApp		इनस्टॉल करने में असफल डेस्कबार में\n%s
+CPU progress bar	NormalPulseView		सीपीयू प्रगति बार

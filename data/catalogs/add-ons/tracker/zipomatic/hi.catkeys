@@ -1,0 +1,18 @@
+1	hindi	x-vnd.haiku.zip-o-matic	2207848100
+1 file added.	file:ZipOMaticWindow.cpp		एक फ़ाइल जोडी गयी
+Stop	file:ZipOMaticWindow.cpp		रोक दो
+Creating archive: %s	file:ZipOMaticWindow.cpp		पुरालेख बन रहा है: %s
+Continue	file:ZipOMaticWindow.cpp		जारी रखें
+Preparing to archive	file:ZipperThread.cpp		पुरालेख बनाने की तैयारी
+Drop files here.	file:ZipOMaticWindow.cpp		फाइलों को इधर छोड़ें.
+Filename: %s	file:ZipOMaticWindow.cpp		फ़ाइल का नाम: %s
+Let them continue	file:ZipOMatic.cpp		उन्हें जारी रखने दे
+Do you want to stop them?	file:ZipOMatic.cpp		क्या आप उन्हें सहेजना चाहते हैं?
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		आप सुनिश्चित हैं कि आप इस पुरालेख का निर्माण बंद करना चाहते हैं?
+%ld files added.	file:ZipOMaticWindow.cpp		%ld फ़ाइल  जोडी गयी.
+Stopped	file:ZipOMaticWindow.cpp		रोका गया
+Archive	file:ZipperThread.cpp		पुरालेख
+Error creating archive	file:ZipOMaticWindow.cpp		पुरालेख बनाने में त्रुटि
+You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		तुम ने %ld ज़िप-ओ-मैटिक चल रही है. \n\n
+Archive created OK	file:ZipOMaticWindow.cpp		पुरालेख बन गया ठीक है
+Stop them	file:ZipOMatic.cpp		उन्हें रोको

@@ -1,0 +1,9 @@
+1	hindi	x-vnd.Haiku-EXRTranslator	3390292316
+Version %d.%d.%d, %s	ConfigView		संस्करण %d.%d.%d, %s
+EXR image translator	EXRTranslator		एक्सर छवि का अनुवादक
+Based on OpenEXR (http://www.openexr.com)	ConfigView		एक्सरओपन के आधार पर(http://www.openexr.com)
+EXR Settings	main		एक्सर की सेटिंग
+EXR Images	EXRTranslator		एक्सर छवियाँ 
+a division of Lucasfilm Entertainment Company Ltd	ConfigView		लुकास्फिल्म एन्टरटेन्मेंट कंपनी लटीडी का एक प्रभाग
+EXR Images	ConfigView		एक्सर छवियाँ
+EXR image	EXRTranslator		एक्सर छवि

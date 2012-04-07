@@ -1,0 +1,91 @@
+1	hindi	x-vnd.Haiku-Terminal	3000435316
+Not found.	Terminal TermWindow		नहीं मिला.
+Switch Terminals	Terminal TermWindow		स्विच टर्मिनल्स
+Change directory	Terminal TermView		निर्देशिका बदलें
+OK	Terminal TermWindow		ठीक है
+New Terminal	Terminal TermWindow		नया टर्मिनल
+Terminal couldn't start the shell. Sorry.	Terminal TermApp		टर्मिनल शेल नहीं शुरू कर सकता है. माफ़ कीजिए.
+Text size	Terminal TermWindow		टेक्स्ट का आकार
+Match case	Terminal FindWindow		केस मिलाएँ
+Quit	Terminal TermWindow		छोड़ना
+Use default shell	Terminal Shell		डिफ़ॉल्ट शेल का प्रयोग करें
+Confirm exit if active programs exist	Terminal AppearancePrefView		निकास की पुष्टि करें अगर सक्रिय प्रोग्राम मौजूद है
+Select all	Terminal TermWindow		सभी का चयन करें
+Close tab	Terminal TermWindow		टैब बंद करें
+Custom	Terminal colors schema		कस्टम
+Save to file…	Terminal PrefWindow		फ़ाइल सहेजें...
+OK	Terminal PrefWindow		ठीक है
+Black on White	Terminal colors schema		सफेद पर काला
+Window title:	Terminal AppearancePrefView		विंडो शीर्षक:
+Font:	Terminal AppearancePrefView		फ़ॉन्ट:
+Copy here	Terminal TermView		यहाँ प्रतिलिपि बनाएँ
+Really close?	Terminal TermWindow		वास्तव में बंद?
+Copy	Terminal TermWindow		प्रतिलिपि बनाएँ
+Window title:	Terminal TermWindow		विंडो शीर्षक:
+Unrecognized option \"%s\"\n	Terminal arguments parsing		अपरिचित विकल्प \"%s\"\n
+%app% settings	Terminal PrefWindow	window title	%app% settings
+Cancel	Terminal SetTitleWindow		रद्द
+Increase	Terminal TermWindow		बढ़ाना
+Settings	Terminal TermWindow		सेटिंग्स
+Window size	Terminal TermWindow		विंडो का आकार
+Selected text	Terminal AppearancePrefView		चयनित टेक्स्ट
+Find	Terminal FindWindow		खोजें
+Appearance	Terminal PrefWindow		दिखावट
+Tab title:	Terminal AppearancePrefView		टैब शीर्षक:
+Color schema:	Terminal AppearancePrefView		रंग स्कीमा:
+OK	Terminal SetTitleWindow		ठीक है
+Background	Terminal AppearancePrefView		पृष्ठभूमि
+Use selection	Terminal FindWindow		चयन का प्रयोग करें
+Green on Black	Terminal colors schema		काले पर हरा
+Size:	Terminal AppearancePrefView		आकार:
+Cannot execute \"%command\":\n\t%error	Terminal Shell		अमल नहीं कर सकते \"%command\" को:\n\t%error
+Full screen	Terminal TermWindow		पूर्ण स्क्रीन
+Window title…	Terminal TermWindow		विंडो शीर्षक...
+Page setup…	Terminal TermWindow		पृष्ठ सेटअप ...
+Insert path	Terminal TermView		पथ सम्मिलित करें
+No search string was entered.	Terminal TermWindow		कोई खोजने वाली स्ट्रिंग को दर्ज किया नहीं गया था.
+Don't save	Terminal PrefWindow		न सहेजें
+Set window title	Terminal TermWindow		विंडो शीर्षक सेट करें
+Terminal	System name		टर्मिनल
+Close other tabs	Terminal TermWindow		अन्य टैब बंद करें
+Match word	Terminal FindWindow		मैच शब्द
+Nothing is selected.	Terminal TermWindow		कुछ भी नहीं चुना गया है.
+Text not found.	Terminal TermWindow		टेक्स्ट नहीं मिला.
+Find…	Terminal TermWindow		खोजें...
+Move here	Terminal TermView		यहाँ ले जाएँ
+White on Black	Terminal colors schema		काले पर सफेद
+Error!	Terminal getString		त्रुटि!
+New tab	Terminal TermWindow		नया टैब
+Selected background	Terminal AppearancePrefView		पृष्ठभूमि चयनित
+Decrease	Terminal TermWindow		घटाएँ
+Create link here	Terminal TermView		यहाँ लिंक बनाएँ
+Close	Terminal TermWindow		बंद करें
+Text	Terminal AppearancePrefView		टेक्स्ट
+Clear all	Terminal TermWindow		सब साफ़
+Text encoding	Terminal TermWindow		टेक्स्ट एंकोडिंग
+size	Terminal TermView		आकार
+Close window	Terminal TermWindow		विंडो बंद करें
+Save as default	Terminal TermWindow		डिफ़ॉल्ट रूप में सहेजें
+Set tab title	Terminal TermWindow		टैब शीर्षक सेट करें
+Settings…	Terminal TermWindow		सेटिंग्स...
+Abort	Terminal Shell		रद्द करें
+Edit	Terminal TermWindow		संपादित करें
+Color:	Terminal AppearancePrefView		रंग:
+Print	Terminal TermWindow		प्रिंट
+Use text:	Terminal FindWindow		पाठ का उपयोग करें:
+Cancel	Terminal TermWindow		रद्द
+OK	Terminal TermApp		ठीक है
+Find failed	Terminal TermWindow		विफल खोजें
+Search forward	Terminal FindWindow		आगे खोज
+Edit tab title…	Terminal TermWindow		टैब शीर्षक संपादित करें...
+Find previous	Terminal TermWindow		पिछला खोजें
+Tab title:	Terminal TermWindow		टैब शीर्षक:
+Find next	Terminal TermWindow		आगे खोजें
+Close active tab	Terminal TermWindow		सक्रिय टैब बंद करें
+Paste	Terminal TermWindow		चिपकाना
+Save changes to this settings panel?	Terminal PrefWindow		इस सेटिंग्स पैनल में बदलाव सहेजें?
+Cancel	Terminal PrefWindow		रद्द
+Shell 	Terminal TermWindow		शेल 
+Save	Terminal PrefWindow		सहेजें
+Cancel	Terminal TermView		रद्द
+Use default	Terminal SetTitleWindow		डिफ़ॉल्ट का प्रयोग करें

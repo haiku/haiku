@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MediaPlayer	1233225587
+1	finnish	x-vnd.Haiku-MediaPlayer	1392487766
 raw audio	MediaPlayer-InfoWin		Raakaääni
 Location	MediaPlayer-InfoWin		Sijainti
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikkalainen)
@@ -133,6 +133,8 @@ Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Satunnaista kappaleita
 Revert	MediaPlayer-SettingsWindow		Käänteinen
 Edit	MediaPlayer-PlaylistWindow		Muokkaa
 Start media server	MediaPlayer-Main		Käynnistä mediapalvelin
+Toggle fullscreen.	MediaPlayer-Main		Täysruututila päälle/pois.
+ToggleFullscreen	MediaPlayer-Main		ToggleFullscreen
 <unnamed>	PlaylistItem-name		<nimetön>
 Open Clips	MediaPlayer-Main		Avaa videoleikkeet
 OK	MediaPlayer-PlaylistWindow		Valmis
@@ -148,6 +150,7 @@ Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Poista kappale roskakoriin
 Save	MediaPlayer-Main		Tallenna
 <nothing to undo>	MediaPlayer-PlaylistWindow		<ei mitään tehtävää>
 Mono	MediaPlayer-InfoWin		Mono
+File info	MediaPlayer-InfoWin		Tiedostotiedot
 Save	MediaPlayer-PlaylistWindow		Tallenna
 %d Bit	MediaPlayer-InfoWin		%d-bittinen
 Remove	MediaPlayer-PlaylistWindow		Poista

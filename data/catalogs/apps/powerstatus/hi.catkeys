@@ -1,0 +1,45 @@
+1	hindi	x-vnd.Haiku-PowerStatus	3347252226
+Design capacity low warning: 	PowerStatus		डिजाइन क्षमता कम चेतावनी: 
+Show percent	PowerStatus		प्रतिशत दिखाएँ
+Design capacity: 	PowerStatus		डिजाइन की क्षमता: 
+ mW	PowerStatus		 मिल्ली वाट घंटा
+Type: 	PowerStatus		प्रकार: 
+non-rechargeable	PowerStatus		जो दोबारा चार्ज ना हो सके
+Empty battery slot	PowerStatus		बैटरी के लिए खाली स्लॉट
+Run in window	PowerStatus		विंडो में चलाएँ
+About	PowerStatus		के बारे में
+PowerStatus	System name		PowerStatus
+PowerStatus	PowerStatus		PowerStatus
+ mWh	PowerStatus		 मिल्ली वाट घंटा
+Battery info…	PowerStatus		बैटरी की जानकारी ...
+Damaged battery	PowerStatus		टूटी हुई बेटरी
+Show time	PowerStatus		समय दिखाएँ
+Last full charge: 	PowerStatus		पिछले पूर्ण प्रभार: 
+Battery unused	PowerStatus		अप्रयुक्त बैटरी
+Extended battery info	PowerStatus		विस्तारित बैटरी की जानकारी
+Current rate: 	PowerStatus		वर्तमान दर: 
+discharging	PowerStatus		निर्वहन हो रहा है
+Show text label	PowerStatus		पाठ का लेबल दिखाएँ
+About…	PowerStatus		के बारे में...
+Model number: 	PowerStatus		मॉडल की संख्या: 
+Install in Deskbar	PowerStatus		डेस्कबार में स्थापित करे
+Capacity: 	PowerStatus		क्षमता: 
+Battery discharging	PowerStatus		बैटरी निर्वहन हो रही है
+Serial number: 	PowerStatus		क्रम संख्या:
+Capacity granularity 1: 	PowerStatus		क्षमता ग्राणुलारिटी 1: 
+OK	PowerStatus		ठीक है
+OEM info: 	PowerStatus		OEM जानकारी:
+Design voltage: 	PowerStatus		बनावट वोल्टेज:
+PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		बिजली की स्थिति \nAxel Dörfler, Clemens Zeidler ने लिखा है \n2006 कॉपीराइट, हाइकू इंक\n
+Battery charging	PowerStatus		बैटरी चार्ज हो रही हैं
+Design capacity warning: 	PowerStatus		डिजाइन क्षमता की चेतावनी:
+Battery info	PowerStatus		बैटरी की जानकारी
+Quit	PowerStatus		छोड़े
+rechargeable	PowerStatus		जो दोबारा चार्ज हो सके
+charging	PowerStatus		चार्ज हो रही हैं
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		आप बिजली की स्थिति एक विंडो में चला सकते हैं या डेस्कबार में स्थापित कर सकते हैं.
+Power status box	PowerStatus		बिजली की स्थिति का डिब्बा
+Show status icon	PowerStatus		स्थिति प्रतीक दिखाएँ
+Capacity granularity 2: 	PowerStatus		क्षमता ग्राणुलारिटी 2:
+Technology: 	PowerStatus		प्रौद्योगिकी: 
+no battery	PowerStatus		बैटरी नहीं हैं

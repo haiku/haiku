@@ -1,0 +1,9 @@
+1	hindi	x-vnd.Haiku-RTFTranslator	526958155
+Version %d.%d.%d, %s	ConfigView		संस्करण %d.%d.%d, %s
+RTF text files	RTFTranslator		RTF टेक्स्ट फ़ाइल
+RTF-Translator Settings	ConfigView		RTF-अनुवादक की सेत्तिंग्स
+Rich Text Format (RTF) files	ConfigView		Rich Text Format (RTF) की फ़ाइल
+RTF Settings	main		RTF की सेत्तिंग्स
+RichTextFormat file	RTFTranslator		RichTextFormat की फ़ाइल
+Rich Text Format Translator	RTFTranslator		Rich Text Format अनुवादक
+Rich Text Format translator v%d.%d.%d %s	RTFTranslator		Rich Text Format अनुवादक v%d.%d.%d %s

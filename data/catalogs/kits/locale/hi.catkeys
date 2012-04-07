@@ -1,0 +1,34 @@
+1	hindi	x-vnd.Haiku-libbe	180647795
+Close	AboutWindow		बंद
+%3.2f GiB	StringForSize		%3.2f GiB
+Written by:	AboutWindow		ने लिखा:
+About %app%	AboutMenuItem		के बारें में %app%
+Cut	TextView		कट
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		रेप्लिकेन्ट नहीं बना सके के लिए \"%विवरण\".\n%error
+Copy	TextView		कोपी 
+%3.2f KiB	StringForSize		%3.2f KiB
+%d bytes	StringForSize		%d bytes
+About…	AboutWindow		के बारे में...
+Error	PrintJob		त्रुटि
+No Pages to print!	PrintJob		कोई पन्ने प्रिंट करने के लिए नहीं है!
+OK	Dragger		ठीक है
+OK	PrintJob		ठीक है 
+Green:	ColorControl		हरा:
+Remove replicant	Dragger		अप्प्लिकांट को हटाएँ
+OK	ZombieReplicantView		ठीक है 
+Print Server is not responding.	PrintJob		प्रिंट सर्वर काम नहीं कर रहा.
+Paste	TextView		पेस्ट 
+Copyright © %years% Haiku, Inc.	AboutWindow		कॉपीराइट © %साल% हाइकू, इंक.
+%.2f TiB	StringForSize		%.2f TiB
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		रेप्लिच्केंट को अप्प्लिकेशन के लिए खोज नहीं पाए. कोई आप्लिकेशन हस्ताक्षर दिया नहीं गया है.\n%त्रुटि
+Redo	TextView		फिर से करें
+<empty>	Menu		<खाली>
+Select All	TextView		सब को चुने
+Warning	Dragger		चेतावनी
+Undo	TextView		पिछला किया हुआ लायें
+Red:	ColorControl		लाल:
+%3.2f MiB	StringForSize		%3.2f MiB
+About %app…	Dragger		के बारे में %app…
+Error	ZombieReplicantView		त्रुटि
+Blue:	ColorControl		नीला:
+Can't delete this replicant from its original application. Life goes on.	Dragger		रेप्लिकेंट को हटा नहीं सके उसकी असली अप्प्लिकेशन से. जीवन चलता रहता है.  

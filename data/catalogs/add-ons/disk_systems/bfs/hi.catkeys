@@ -1,0 +1,8 @@
+1	hindi	x-vnd.Haiku-BFSAddOn	1074880496
+Enable query support	BFS_Initialize_Parameter		क्वेरी समर्थन सक्षम करें
+2048 (Recommended)	BFS_Initialize_Parameter		2048(सिफारिश)
+8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (ज्यादातर बड़ी फ़ाइलें)
+Disabling query support may speed up certain file system operations, but should only be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		क्वेरी समर्थन को अक्षम करना कुछ फाइल सिस्टम संचालन की गति को बढ़ा सकता है, लेकिन इसका  इस्तेमाल  केवल तब ही  करना चाहिए अगर बिल्कुल निश्चित है कि क्वेरी (प्रश्नों) की जरूरत नहीं होगी.\n किसी भी वॉल्यूम जो हाइकू को बूट करने के लिए अभीष्ट है उसमे  क्वेरी समर्थन सक्षम होना चाहिए.
+1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (ज्यादातर छोटी फ़ाइलें)
+Blocksize:	BFS_Initialize_Parameter		ब्लॉकसाइज:
+Name:	BFS_Initialize_Parameter		नाम :

@@ -1,0 +1,17 @@
+1	hindi	x-vnd.Haiku-Sounds	3924145958
+Sounds	System name		आवाजें
+No such file or directory	HEventList		ऐसी कोई फ़ाइल या निर्देशिका नही हैं
+OK	SoundsHApp		ठीक है
+Sound File:	HWindow		ध्वनि फ़ाइल:
+OK	HEventList		ठीक है
+OK	HWindow		ठीक है
+This is not an audio file.	HWindow		यह एक ऑडियो फ़ाइल नहीं है
+Stop	HWindow		विराम दें
+About Sounds	SoundsHApp		ध्वनि के बारे में
+Sound	HEventList		ध्वनि
+Event	HEventList		घटना
+<none>	HEventList		<कोई नहीं>
+Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		ध्वनियाँ\nके द्वारा आप के लिए लायी गई :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\nAtsushi Takamatsu के द्वारा  मूल कार्य.\nकॉपीराइट  © 2003-2006 हाइकू
+<none>	HWindow		<कोई नहीं>
+Other…	HWindow		अन्य...
+Play	HWindow		प्ले

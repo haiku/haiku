@@ -1,23 +1,15 @@
-1	lithuanian	x-vnd.Haiku-Keymap	3895282621
-Caps Lock:	Modifier Keys window		Didžiosios raidės:
-OK	Modifier Keys window		Gerai
+1	lithuanian	x-vnd.Haiku-Keymap	1259868356
 Tilde trigger	Keymap window		Riestinis kirtis (tildė)
-Modifier Keys	Modifier Keys window		Valdymo klavišai
 Grave trigger	Keymap window		Kairinis kirtis (gravis)
 Select dead keys	Keymap window		Kombinaciniai klavišai
-Option:	Modifier Keys window		Alternatyva:
-Revert	Modifier Keys window		Atšaukti pakeitimus
 Quit	Keymap window		Baigti darbą
 Switch shortcut keys to Haiku mode	Keymap window		Naudoti „Haiku“ valdymo klavišus
 Circumflex trigger	Keymap window		Stogelis
-Cancel	Modifier Keys window		Atsisakyti
 Diaeresis trigger	Keymap window		Du taškai viršuje (umliautas)
 Open…	Keymap window		Atverti…
 System:	Keymap window		Sistemos išdėstymai:
 Switch shortcut keys	Keymap window		Sukeisti Valdymo ir Komandos klavišus
-Set Modifier Keys…	Keymap window		Keisti valdymo klavišus…
 User:	Keymap window		Naudotojo išdėstymai:
-Control:	Modifier Keys window		Valdymas:
 Sample and clipboard:	Keymap window		Vieta pabandymui:
 Layout	Keymap window		Klaviatūra
 Switch shortcut keys to Windows/Linux mode	Keymap window		Naudoti „Windows“ ir „Linux“ valdymo klavišus
@@ -27,5 +19,4 @@ File	Keymap window		Failas
 (Current)	Keymap window		(Esamas)
 Font	Keymap window		Šriftas
 Keymap	System name		Klavišų išdėstymas
-Command:	Modifier Keys window		Komanda:
 Acute trigger	Keymap window		Dešininis kirtis (akūtas)

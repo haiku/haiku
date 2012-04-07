@@ -1,0 +1,6 @@
+1	hindi	x-vnd.Haiku-DriveSetup	2675227205
+DriveSetup	System name		ड्राइव सेटअप
+Delete	MainWindow		हटाएँ
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		क्या आप वास्तव में परिवर्तनों को डिस्क में अब वापस लिखना चाहते हैं ?\n\nचुने हुए विभाजन पर सभी डेटा सदा के लिए  खो जाएगा, अगर आप ऐसा करते हैं!
+Rescan	MainWindow		रीस्कैन
+OK	MainWindow		ठीक है

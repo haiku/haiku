@@ -1,0 +1,24 @@
+1	hindi	x-vnd.Haiku-GLTeapot	2890609668
+Upper center	TeapotWindow		ऊपरी बीच 
+Lighting	TeapotWindow		प्रकाश
+Off	TeapotWindow		बंद
+Lower left	TeapotWindow		कोना बाएं
+White	TeapotWindow		सफ़ेद
+Yellow	TeapotWindow		पीला
+Blue	TeapotWindow		नीला
+Gouraud shading	TeapotWindow		गौरौड़ शेडिंग
+Quit	TeapotWindow		छोड़ए
+Filled polygons	TeapotWindow		भरे हुए बहुभुजाकृती (बहुकोणाकृती) (पोलीगोंस)
+Fog	TeapotWindow		कोहरा
+Backface culling	TeapotWindow		बेकफेस कल्लिंग
+Z-buffered	TeapotWindow		ज़ड-बफर
+File	TeapotWindow		फ़ाइल
+Options	TeapotWindow		विकल्पों
+Perspective	TeapotWindow		परिप्रेक्ष्य
+GLTeapot	System name		जीअल टीपोट
+Green	TeapotWindow		हरा
+Right	TeapotWindow		दाएँ
+FPS display	TeapotWindow		अफपिअस दिखाएँ
+Add a teapot	TeapotWindow		टीपोट जोड़ें
+Red	TeapotWindow		लाल
+Lights	TeapotWindow		लाईट

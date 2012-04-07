@@ -1,0 +1,93 @@
+1	hindi	x-vnd.Haiku-CodyCam	2416864674
+Capturing Image…	VideoConsumer.cpp		कैपचरिंग इमेज...
+Every 30 seconds	CodyCam		हर 30 सेकंड
+File name:	CodyCam		फ़ाइल का नाम:
+Last Capture: 	VideoConsumer.cpp		पिछला कैपचर: 
+Server login failed	VideoConsumer.cpp		सर्वर लॉगिन विफल
+Remote host has closed the connection.\n	FtpClient		दूरस्थ मेजबान कनेक्शन बंद कर दिया है.\n
+Login:	CodyCam		लॉगिन:
+Format:	CodyCam		प्रारूप:
+Every 2 hours	CodyCam		हर 2 घंटे
+Closing the window\n	VideoConsumer.cpp		विंडो बंद हो रही है\n
+login ID expected	CodyCam		लॉगिन आईडी की उम्मीद
+Rate:	CodyCam		दर:
+JPEG image	CodyCam		जेपीईजी इमेज
+Capture Rate Menu	CodyCam		कैपचरिंग दर मेनू
+File %s # unterminated quote at end of file\n	SettingsHandler		फ़ाइल %s # उन्तेर्मिनातेद बोली है फ़ाइल का अंत में\n
+Password:	CodyCam		पासवर्ड:
+Passive FTP	CodyCam		निष्क्रिय एफ़टीपी
+destination directory expected	CodyCam		गंतव्य उम्मीद निर्देशिका
+password	CodyCam		पासवर्ड
+Directory:	CodyCam		निर्देशिका:
+Every minute	CodyCam		हर मिनट
+read: %ld\n	SftpClient		पढ़ें: %ld\n
+Waiting…	CodyCam		प्रतीक्षा कर रहा है ...
+Logging in…	VideoConsumer.cpp		में प्रवेश ...
+Server:	CodyCam		सर्वर:
+server address expected	CodyCam		सर्वर पता की उम्मीद
+Error creating output file	VideoConsumer.cpp		उत्पादन में फ़ाइल बनाने में त्रुटि
+unrecognized upload client specified	CodyCam		अपलोड अपरिचित निर्दिष्ट ग्राहक
+File %s ; Line %ld # unterminated quote\n	SettingsHandler		फाइल %s ; पंक्ति %ld # अनतेरमिनेटेड कोट\n
+Output	CodyCam		उत्पादन
+Every 15 minutes	CodyCam		हर 15 मिनट में
+Cannot find an available video stream	CodyCam		एक उपलब्ध वीडियो धारा नहीं खोज सके
+Can't find an available connection to the video window	CodyCam		वीडियो विंडो के लिए एक कनेक्शन उपलब्ध नहीं खोज सके
+Transmitting…	VideoConsumer.cpp		प्रसारण ...
+Cannot get a time source	CodyCam		एक समय स्रोत प्राप्त नहीं कर सकते
+Every 8 hours	CodyCam		हर 8 घंटे
+Rename failed	VideoConsumer.cpp		नाम बदलने में विफल
+Cannot start time source!	CodyCam		समय स्रोत शुरू नहीं कर सकते!
+Cannot register the video window	CodyCam		वीडियो विंडो रजिस्टर नहीं कर सकते
+CodyCam	System name		कोडीकैम
+Every 24 hours	CodyCam		हर 24 घंटे
+unknown command	SettingsHandler		अज्ञात आदेश
+Video settings	CodyCam		वीडियो सेटिंग्स
+Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		एक वीडियो स्रोत नहीं मिला. आप एक कोद्य्काम उपयोग करने के लिए वेबकैम की जरूरत है.
+still image filename expected	CodyCam		अभी भी इमेज उम्मीद फ़ाइलनाम
+invalid upload client %ld\n	VideoConsumer.cpp		ग्राहक अपलोड अवैध %ld\n
+Every 15 seconds	CodyCam		हर 15 सेकंड
+Error writing output file	VideoConsumer.cpp		त्रुटि आउटपुट फाइल लेखन
+image file format expected	CodyCam		इमेज फ़ाइल प्रारूप उम्मीद
+Cannot set the time source for the video source	CodyCam		वीडियो स्रोत के लिए समय के स्रोत निर्धारित नहीं कर सकते
+Type:	CodyCam		प्रकार:
+Cannot set the time source for the video window	CodyCam		वीडियो विंडो के लिए समय के स्रोत निर्धारित नहीं कर सकते
+Stop video	CodyCam		वीडियो को रोकें
+Locking the window\n	VideoConsumer.cpp		विंडो लोच्किंग\n
+File %s; Line %ld # %s	SettingsHandler		फ़ाइल %s; लाइन %ld # %s
+Couldn't find requested directory on server	VideoConsumer.cpp		सर्वर पर डायरेक्टरी का अनुरोध नहीं मिला
+Renaming…	VideoConsumer.cpp		नाम बदलने ...
+Local	CodyCam		स्थानीय
+Error setting type of output file	VideoConsumer.cpp		उत्पादन में फ़ाइल की स्थापना प्रकार में त्रुटि
+upload client name expected	CodyCam		ग्राहक की उम्मीद नाम अपलोड
+SFTP	CodyCam		स्फ्त्प
+Connected…	VideoConsumer.cpp		कोन्नेक्टेद...
+PASS <suppressed>  (real password sent)\n	FtpClient		पास <सुप्प्रेस्सेद >(असली पासवर्ड भेजा)\n
+Every 5 minutes	CodyCam		हर 5 मिनट में
+read: %d\n	SftpClient		पढ़ें: %d\n
+OK	CodyCam		ठीक है
+Capture controls	CodyCam		कैपचर कंट्रोल्स
+Every hour	CodyCam		प्रत्येक घंटे
+Cannot connect the video source to the video window	CodyCam		वीडियो विंडो के लिए वीडियो स्रोत से कनेक्ट नहीं कर सकते
+capture rate expected	CodyCam		कैपचर अपेक्षित दर
+Error getting initial latency for the capture node	CodyCam		कब्जा नोड के लिए प्रारंभिक विलंबता पाने में त्रुटि
+Send to…	CodyCam		को भेजें ...
+on or off expected	Settings	Do not translate 'on' and 'off'	ओं या ऑफ अपेक्षित
+Quit	CodyCam		छोड़ना
+cmd: '%s'\n	FtpClient		सीएमडी: '%s'\n
+Never	CodyCam		कभी नहीं
+Cannot create a video window	CodyCam		एक वीडियो विंडो बना नहीं सकता
+Every 10 minutes	CodyCam		हर 10 मिनट
+Cannot start the video source	CodyCam		वीडियो स्रोत शुरू नहीं कर सकते
+Cannot start the video window	CodyCam		वीडियो विंडो शुरू नहीं कर सकते
+password expected	CodyCam		पासवर्ड प्रोटेक्टेड
+reply: %d, %d\n	FtpClient		उत्तर: %d, %d\n
+Cannot find the media roster	CodyCam		मीडिया रोस्टर नहीं खोज सके
+Every 4 hours	CodyCam		हर 4 घंटे
+FTP	CodyCam		एफ़टीपी
+File transmission failed	VideoConsumer.cpp		फ़ाइल संचरण विफल
+Cannot seek time source!	CodyCam		समय के स्रोत की तलाश नहीं कर सकते!
+File	CodyCam		फ़ाइल
+Image Format Menu	CodyCam		इमेज प्रारूप मेनू
+Every 30 minutes	CodyCam		हर 30 मिनट
+reply: '%s'\n	SftpClient		उत्तर: '%s'\n
+Start video	CodyCam		वीडियो शुरू करें

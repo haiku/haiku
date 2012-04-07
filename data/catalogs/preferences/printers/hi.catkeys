@@ -1,0 +1,43 @@
+1	hindi	x-vnd.Be-PRNT	2906062670
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		प्रिंटर: : %printer_name%\nDriver: %driver%\n
+Waiting	JobListView		प्रतीक्षा में
+Print test page	PrintersWindow		टेस्ट पेज को प्रिंट करें
+Test Page	TestPageView		टेस्ट पेज
+Test Page	PrintersWindow		टेस्ट पेज
+page	JobListView		पृष्ठ
+Cancel	AddPrinterDialog		रद्द करें
+Add printer	AddPrinterDialog		मुद्रक जोड़ें
+Green	TestPageView		हरा
+Printers	PrintersWindow		मुद्रक
+Default Printer	PrinterListView		डिफ़ॉल्ट मुद्रक
+Transport: %transport% %transport_address%	PrinterListView		ट्रैन्स्पॉर्ट: %transport% %transport_address%
+No pending jobs.	PrinterListView		कोई लंबित कार्य नही हैं .
+pages	JobListView		पृष्ठों
+Printers	System name		प्रिंटर
+Processing	JobListView		प्रसंस्करण
+Red	TestPageView		लाल
+Printer name:	AddPrinterDialog		मुद्रक का नाम:
+Driver: %driver%	PrinterListView		चालक:
+Black	TestPageView		काला
+Restart job	PrintersWindow		फिर से शुरू करें
+Add	AddPrinterDialog		जोड़ें
+Make default	PrintersWindow		डिफ़ॉल्ट बनाएँ
+Transport: %transport% %transport_address%	TestPageView		ट्रांसपोर्ट: %transport% %transport_address%
+Cancel job	PrintersWindow		काम रद्द करें
+Yellow	TestPageView		पीला
+Blue	TestPageView		नीला
+1 pending job.	PrinterListView		एक लंबित काम है.
+Remove	PrintersWindow		हटायें
+<pick one>	AddPrinterDialog		<एक चुने>
+Add …	PrintersWindow		जोड़ें ...
+Print jobs for 	PrintersWindow		छपने के लिए काम 
+Failed	JobListView		असफल हो गया
+%.2f KB	JobListView		%.2f किलो बाइट
+Magenta	TestPageView		मजेंटा
+Completed	JobListView		संपन्न हो गया
+No printer found!	TransportMenu		कोई मुद्रक पाया नही गया !
+Print jobs: No printer selected	PrintersWindow		मुद्रक के काम: कोई चयनित मुद्रक नही हैं
+Cyan	TestPageView		क्यान
+Unknown status	JobListView		अज्ञात स्थिति
+Connected to:	AddPrinterDialog		से जुड़े हैं :
+Printer type:	AddPrinterDialog		मुद्रक का प्रकार:

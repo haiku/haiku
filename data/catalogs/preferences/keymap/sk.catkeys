@@ -1,23 +1,15 @@
-1	slovak	x-vnd.Haiku-Keymap	3895282621
-Caps Lock:	Modifier Keys window		Caps Lock:
-OK	Modifier Keys window		OK
+1	slovak	x-vnd.Haiku-Keymap	1259868356
 Tilde trigger	Keymap window		Spúšťač tilda
-Modifier Keys	Modifier Keys window		Modifikačné klávesy
 Grave trigger	Keymap window		Spúšťač apostrof
 Select dead keys	Keymap window		Vyberte mŕtve klávesy
-Option:	Modifier Keys window		Voľba:
-Revert	Modifier Keys window		Vrátiť
 Quit	Keymap window		Ukončiť
 Switch shortcut keys to Haiku mode	Keymap window		Vymeniť skratkové klávesy na režim Haiku
 Circumflex trigger	Keymap window		Spúšťač vokáň
-Cancel	Modifier Keys window		Zrušiť
 Diaeresis trigger	Keymap window		Spúšťač rozluky
 Open…	Keymap window		Otvoriť…
 System:	Keymap window		Systém:
 Switch shortcut keys	Keymap window		Vymeniť skratkové klávesy
-Set Modifier Keys…	Keymap window		Nastaviť modifikačné klávesy…
 User:	Keymap window		Používateľ:
-Control:	Modifier Keys window		Ctrl:
 Sample and clipboard:	Keymap window		Vzor a schránka:
 Layout	Keymap window		Rozloženie
 Switch shortcut keys to Windows/Linux mode	Keymap window		Vymeniť skratkové klávesy na režim Windows/Linux
@@ -27,5 +19,4 @@ File	Keymap window		Súbor
 (Current)	Keymap window		(aktuálne)
 Font	Keymap window		Písmo
 Keymap	System name		Mapa kláves
-Command:	Modifier Keys window		Cmd:
 Acute trigger	Keymap window		Spúšťač dĺžeň

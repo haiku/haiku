@@ -1,25 +1,35 @@
-1	lithuanian	x-vnd.Haiku-MediaPlayer	1531133080
+1	lithuanian	x-vnd.Haiku-MediaPlayer	338754760
+raw audio	MediaPlayer-InfoWin		neapdorotas garso įrašas
+Location	MediaPlayer-InfoWin		Vieta
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikietiškas)
+%d kHz	MediaPlayer-InfoWin		%d kHz
 Stream settings	MediaPlayer-Main		Kaip nurodyta sraute
 <unknown>	PlaylistItem-album		<nežinomas>
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Failo „%filename“ nepavyko atverti.\n\n
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Padidinti valdiklius pilno ekrano veiksenoje
+Video	MediaPlayer-InfoWin		Vaizdas
 Subtitle size:	MediaPlayer-SettingsWindow		Subtitrų dydis:
 Save Playlist	MediaPlayer-PlaylistWindow		Įrašyti grojaraštį
+<no media>	MediaPlayer-InfoWin		<medija neatverta>
+(not supported)	MediaPlayer-InfoWin		(nepalaikoma)
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Nė vienas iš bandomų leisti failų nėra garso arba vaizdo įrašas.
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Grojaraščio įrašyti nepavyko.\n\nKlaida:
 New player…	MediaPlayer-Main		Nauja leistuvė…
 100% scale	MediaPlayer-Main		Mastelis 100%
 Subtitle placement:	MediaPlayer-SettingsWindow		Subtitrų padėtis:
 Close	MediaPlayer-Main		Užverti
+Display Mode	MediaPlayer-InfoWin		Rodymo būdas
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Kai kurių failų išmesti Šiukšlinėn nepavyko.
+<unknown>	MediaPlayer-InfoWin		<nežinomas>
 Open	MediaPlayer-Main		Atverti
 Next	MediaPlayer-Main		Kitas
 OK	MediaPlayer-SettingsWindow		Gerai
 Track %d	MediaPlayer-Main		%d-asis takelis
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2,35 : 1 („Cinemascope“)
+Display mode	MediaPlayer-InfoWin		Rodymo būdas
 Medium	MediaPlayer-SettingsWindow		Vidutinis
 Close	MediaPlayer-PlaylistWindow		Užverti
+Stereo	MediaPlayer-InfoWin		Stereo
 Open…	MediaPlayer-PlaylistWindow		Atverti…
 Toggle mute.	MediaPlayer-Main		Nutildyti / grąžinti garsą
 Undo	MediaPlayer-PlaylistWindow		Atšaukti
@@ -30,8 +40,10 @@ Close window after playing audio	MediaPlayer-SettingsWindow		Užverti langą bai
 Full volume	MediaPlayer-SettingsWindow		Visas
 Drop files to play	MediaPlayer-Main		Numeskite failus, kuriuose norite leisti
 TogglePlaying	MediaPlayer-Main		Leisti / pristabdyti
+Copyright	MediaPlayer-InfoWin		Autorių teisės
 Cancel	MediaPlayer-SettingsWindow		Atsisakyti
 Loop audio	MediaPlayer-SettingsWindow		Kartoti garso įrašą
+Container	MediaPlayer-InfoWin		Konteineris
 Nothing to Play	MediaPlayer-Main		Nėra ką leisti
 Muted	MediaPlayer-SettingsWindow		Nutildytas
 Quit	MediaPlayer-Main		Baigti darbą
@@ -40,6 +52,7 @@ Start playing.	MediaPlayer-Main		Pradėti atkūrimą.
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Neįdiegtas šio formato failams atkurti reikalingas dekoderis, arba jis nesugeba iškoduoti konkrečios formato versijos failų.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Importuoti įrašą
 Gets the URI of the currently playing item.	MediaPlayer-Main		Gauna šiuo metu atkuriamo įrašo URI.
+%d Channels	MediaPlayer-InfoWin		%d kanalai (-ų)
 400% scale	MediaPlayer-Main		Mastelis 400%
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Grojaraščio įrašyti nepavyko:\n\nKlaida:
 Move Entries	MediaPlayer-MovePLItemsCmd		Perkelti įrašus
@@ -47,14 +60,17 @@ Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Klaida išmetant Šiukšlin�
 Audio	MediaPlayer-Main		Garsas
 Open Playlist	MediaPlayer-PlaylistWindow		Atverti grojaraštį
 MediaPlayer	System name		Medijos leistuvė
+%f fps	MediaPlayer-InfoWin		%f kadrų per sekundę
 OK	MediaPlayer-Main		Gerai
 Settings…	MediaPlayer-Main		Nuostatos…
 MediaPlayer settings	MediaPlayer-SettingsWindow		Medijos leistuvės nuostatos
+h	MediaPlayer-InfoWin	Hours	h
 Select all	MediaPlayer-PlaylistWindow		Pažymėti viską
 Move Entry	MediaPlayer-MovePLItemsCmd		Perkelti įrašą
 Open	MediaPlayer-PlaylistWindow		Atverti
 Stop playing.	MediaPlayer-Main		Sustabdyti atkūrimą.
 Error: 	MediaPlayer-RemovePLItemsCmd		Klaida:
+Audio	MediaPlayer-InfoWin		Garsas
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Vidinė klaida (netinkamai suformuotas pranešimas). Grojaraščio įrašyti nepavyko.
 Skip to the previous track.	MediaPlayer-Main		Peršokti į ankstesnį takelį.
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		Vidinė klaida „%app%“ programoje. Failo atverti nepavyko.
@@ -80,17 +96,22 @@ Attributes	MediaPlayer-Main		Požymiai
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Visų failų išmesti Šiukšlinėn nepavyko.
 <untitled>	PlaylistItem-title		<be pavadinimo>
 Track	Audio Track Menu		Takelis
+unknown format	MediaPlayer-InfoWin		formatas nežinomas
 <nothing to redo>	MediaPlayer-PlaylistWindow		<nėra ką grąžinti>
 Skip to the next track.	MediaPlayer-Main		Peršokti į kitą takelį.
 Play	MediaPlayer-Main		Leisti
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Išmesti įrašus Šiukšlinėn
 200% scale	MediaPlayer-Main		Mastelis 200%
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Panašu, kad nepaleista įvairialypės terpės tarnyba.\nAr norite ją paleisti?
+Duration	MediaPlayer-InfoWin		Trukmė
 Aspect ratio	MediaPlayer-Main		Proporcija
 Error: 	MediaPlayer-Main		Klaida:
 Large	MediaPlayer-SettingsWindow		Didelis
 Bottom of video	MediaPlayer-SettingsWindow		Vaizdo įrašo apačioje
+DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
 Stop	MediaPlayer-Main		Stabdyti
+<unnamed media>	MediaPlayer-InfoWin		<bevardė medija>
+raw video	MediaPlayer-InfoWin		neapdorotas vaizdo įrašas
 Volume of background clips	MediaPlayer-SettingsWindow		Fone leidžiamų įrašų garsis
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Vidinė klaida (nepakako atminties). Grojaraščio įrašyti nepavyko.
 Hide interface	MediaPlayer-Main		Slėpti sąsają
@@ -100,6 +121,8 @@ Move file to Trash	MediaPlayer-PlaylistWindow		Išmesti failą Šiukšlinėn
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		Nutildyti
 Toggle pause/play.	MediaPlayer-Main		Leisti / pristabdyti.
+Haiku Media Kit: 	MediaPlayer-InfoWin		„Haiku“ medijos įrankinė: 
+min	MediaPlayer-InfoWin	Minutes	min
 Small	MediaPlayer-SettingsWindow		Mažas
 Randomize	MediaPlayer-PlaylistWindow		Sumaišyti
 Off	Subtitles menu		Išjungti
@@ -107,6 +130,8 @@ Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Sumaišyti įrašus
 Revert	MediaPlayer-SettingsWindow		Atšaukti pakeitimus
 Edit	MediaPlayer-PlaylistWindow		Taisa
 Start media server	MediaPlayer-Main		Paleisti įvairialypės terpės tarnybą
+Toggle fullscreen.	MediaPlayer-Main		Įjungti / išjungti viso ekrano veikseną.
+ToggleFullscreen	MediaPlayer-Main		ToggleFullscreen
 <unnamed>	PlaylistItem-name		<be pavadinimo>
 Open Clips	MediaPlayer-Main		Atverti įrašus
 OK	MediaPlayer-PlaylistWindow		Gerai
@@ -121,7 +146,10 @@ Always on top	MediaPlayer-Main		Visuomet viršuje
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Išmesti įrašą Šiukšlinėn
 Save	MediaPlayer-Main		Įrašyti
 <nothing to undo>	MediaPlayer-PlaylistWindow		<nėra ką atšaukti>
+Mono	MediaPlayer-InfoWin		Mono
+File info	MediaPlayer-InfoWin		Failo savybės
 Save	MediaPlayer-PlaylistWindow		Įrašyti
+%d Bit	MediaPlayer-InfoWin		%d bitų
 Remove	MediaPlayer-PlaylistWindow		Pašalinti
 Full screen	MediaPlayer-Main		Visas ekranas
 Open file…	MediaPlayer-Main		Atverti failą…

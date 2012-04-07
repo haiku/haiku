@@ -1,0 +1,16 @@
+1	hindi	x-vnd.Haiku-TGATranslator	4159874267
+Targa image (%d bits truecolor)	TGATranslator		तारगा चित्र (%d bits truecolor)
+Version %d.%d.%d %s	TGAView		संस्करण %d.%d.%d %s
+Ignore TGA alpha channel	TGAView		TGA अल्फा चैनल को नज़र अंदाज़ करें
+Targa image (%d bits colormap)	TGATranslator		तारगा का चित्र (%d bits colormap)
+TGA Image Translator	TGAView		TGA चित्र का अनुवादक
+Targa image (%d bits RLE colormap)	TGATranslator		तारगा का चित्र (%d bits RLE colormap)
+Targa image (%d bits gray)	TGATranslator		तारगा का चित्र (%d bits gray)
+Written by the Haiku Translation Kit Team	TGAView		हैकू ट्रांसलेशन किट टीम के द्वारा लिखा गया
+Targa image (%d bits RLE truecolor)	TGATranslator		तारगा का चित्र (%d bits RLE truecolor) 
+TGA images	TGATranslator		TGA का चित्र 
+TGATranslator Settings	TGATranslator		TGATranslator की सेत्तिंग्स
+Save with RLE Compression	TGAView		RLE कोम्प्रेस्शन के साथ सेव करें
+TGA image translator	TGATranslator		TGA चित्र का अनुवादक
+Targa image (%d bits RLE gray)	TGATranslator		तारगा का चित्र (%d bits RLE gray)
+TGA Settings	TGAMain		TGA की सेत्तिंग्स

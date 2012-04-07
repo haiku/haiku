@@ -1,0 +1,65 @@
+1	hindi	x-vnd.Haiku-BootManager	3014946856
+The boot manager has been successfully installed on your system.	BootManagerController		बूट प्रबंधक को आपके सिस्टम पर सफलतापूर्वक अधिष्ठापित किया गया है.
+After two seconds	DefaultPartitionPage		दो सेकंड के बाद
+Uninstall Boot Manager	UninstallPage	Title	बूट प्रबंधक हटायें प्रबंधक
+At least one partition must be selected!	BootManagerController		कम - से - कम एक विभाजन चयनित किया जाना चाहिए!
+The old Master Boot Record could not be saved to %s	BootManagerController		पुराने मास्टर बूट रिकॉर्ड में %s को सहेजा नहीं जा सका
+Restore MBR	BootManagerController	Button	एमबीआर पुनर्स्थापित करें
+Hard Drive	DrivesPage	Default disk name	हार्ड ड्राइव ध्यान दे: डिफ़ॉल्ट डिस्क का नाम
+USB Drive	DrivesPage	Default disk name	यूएसबी ड्राइव ध्यान दे: डिफ़ॉल्ट डिस्क का नाम
+The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		अब बूट डिवाइस: %s\n का मास्टर बूट रिकॉर्ड (एमबीआर):\n\t डिस्क पर सहेजा जाएगा.कृपया एमबीआर में  डालने के लिए एक फ़ाइल का चयन करें.\n\nयदि स्थापना के साथ कुछ गलत हो जाता है या यदि आप बाद में कभी बूट मेनू निकालना चाहते हैं तो बस बूटमेन प्रोग्राम चलाएँ और 'स्थापना रद्द करें' विकल्प चुनें.
+About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	%disk से %file के मास्टर बूट रिकॉर्ड (MBR) को बहाल करने वाला है.क्या आप जारी रखना चाहते  हैं?
+An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		मास्टर बूट रिकॉर्ड लिखने में त्रुटि.मास्टर बूट रिकॉर्ड नष्ट हो सकता है अब आपको एमबीआर को बहाल करना चाहिए! को बहाल करना चाहिए!
+Partitions	PartitionsPage	Title	विभाजन
+Timeout: %s	DefaultPartitionPage		समय समाप्त:%s
+Select	FileSelectionPage	Button	चयन करें
+Cannot access!	DrivesPage	Cannot install	उपयोग नहीं कर सकते!
+Uninstall boot manager	BootManagerController	Title	बूट प्रबंधक हटायें
+After four seconds	DefaultPartitionPage		चार सेकंड के बाद
+Uninstallation of boot menu failed	BootManagerController	Title	बूट मेनू का निराकरण करना विफल रहा है
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		कृपया पता लगाये मास्टर बूट रिकॉर्ड (एमबीआर)संचय फ़ाइल का जिससे बहाल करना है.यह फ़ाइल बनाई गई थी जब बूट प्रबंधक पहली बार स्थापित किया गया था.
+Next	WizardView	Button	अगला
+Uninstallation of boot menu completed	BootManagerController	Title	बूट मेनू का निराकरण करना सफल रहा है
+Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		कृपया आप उस ड्राइव का चयन करें जिसमें से बूट प्रबंधक को स्थापित करने या स्थापना को रद्द करना चाहते है.
+Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		टाइमआउट के बाद बूट मेनू डिफ़ॉल्ट विभाजन लोड होगा जब तक आप एक और विभाजन का चयन नहीं करते.\nआप एक विभाजन का चयन करने के लिए बूट मेनू को अनिश्चित काल इंतजार करा सकते हैं.\n'ALT' कुंजी दबाया रखो बूट समय पर टाइमआउट अक्षम करने के लिए
+After one second	DefaultPartitionPage		एक पल  के बाद
+The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		पहली हार्ड डिस्क के विभाजन तालिका बूट प्रबंधक के साथ संगत नहीं है.\nबूट प्रबंधक को पहले विभाजन से पहले 2 केबी उपलब्ध स्थान की जरूरत है.
+The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		निम्नलिखित विभाजन पाया गया. कृपया विभाजन के अगले  चेक बॉक्स  को चेक करे जिसे बूट मेनू में में शामिल किया जाना है .आप विभाजन के नाम भी सेट कर सकते हैं जैसे आपउन्हें बूट मेनू में प्रकट करना चाहते हैं.
+After one minute	DefaultPartitionPage		एक मिनट के बाद
+The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		बूट डिवाइस (%DISK) के मास्टर बूट रिकॉर्ड %FILE से सफलतापूर्वक से बहाल कर दिया गया है
+Write boot menu	BootManagerController	Button	बूट मेनू में लिखें
+The Master Boot Record could not be restored!	BootManagerController		मास्टर बूट रिकॉर्ड फिर से संग्रहीत नहीं किया सका
+Uninstall	DrivesPage	Button	स्थापना रद्द करें
+Default Partition	DefaultPartitionPage	Title	डिफ़ॉल्ट विभाजन
+After five seconds	DefaultPartitionPage		पाँच सेकंड के बाद
+Back	BootManagerController	Button	वापस ध्यान दे: बटन
+Installation of boot menu completed	BootManagerController	Title	बूट मेनू का अधिष्ठापन पूरा ध्यान दे: शीर्षक
+Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	अनामांकित %d
+File:	FileSelectionPage	Text control label	फ़ाइल: नोट: पाठ नियंत्रण लेबल
+Previous	WizardView	Button	पिछला
+Install	DrivesPage	Button	अधिष्ठापन करें
+About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		(%s) को बूट मेनू डिस्क पर लिखने वाला है.जारी रखने से पहले  नीचे  वाली जानकारी सत्यापित करें.
+Unknown	LegacyBootMenu	Text is shown for an unknown partition type	अज्ञात
+Update	DrivesPage	Button	नवीनीकरण करे
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		कृपया पता लगाये मास्टर बूट रिकॉर्ड (एमबीआर)संचय फ़ाइल का जिससे बहाल करना है.यह फ़ाइल बनाई गई थी जब बूट प्रबंधक पहली बार स्थापित किया गया था.
+Old Master Boot Record Saved failure	BootManagerController	Title	पुराने मास्टर बूट रिकॉर्ड सहेजने मे  विफल
+Drives	DrivesPage	Title	ड्राइव
+No space available!	DrivesPage	Cannot install	कोई स्थान उपलब्ध नहीं है!
+Never	DefaultPartitionPage		कभी नहीं
+Partition table not compatible	BootManagerController	Title	विभाजन तालिका अनुकूल नहीं है
+Old Master Boot Record saved	BootManagerController	Title	पुराने मास्टर बूट रिकॉर्ड सहेजा गया
+Boot Manager is unable to read the partition table!	BootManagerController		बूट प्रबंधक विभाजन तालिका को पढ़ने में असमर्थ है!
+Error reading partition table	BootManagerController	Title	विभाजन तालिका पढ़ने में त्रुटि
+Installation of boot menu failed	BootManagerController	Title	बूट मेनू की स्थापना विफल रही
+Backup Master Boot Record	BootManagerController	Title	मास्टर बूट रिकॉर्ड का बैकअप लें
+Quit	DrivesPage	Button	छोडे
+About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		बूट मेनू डिस्क पर लिखने वाला है. क्या आप सुनिश्चित हैं कि आप जारी रखना चाहते हैं?
+The old Master Boot Record was successfully saved to %s.	BootManagerController		पुराने मास्टर बूट रिकॉर्ड %s में सफलतापूर्वक सहेजा गया
+Default Partition:	DefaultPartitionPage	Menu field label	डिफ़ॉल्ट विभाजन:
+Partitions	DefaultPartitionPage	Pop up menu title	विभाजन
+BootManager	System name		बूट प्रबंधक
+Summary	BootManagerController	Title	सारांश
+OK	BootManagerController	Button	ठीक है
+Immediately	DefaultPartitionPage		तत्काल
+Done	BootManagerController	Button	पूर्ण
+After three seconds	DefaultPartitionPage		तीन सेकंड के बाद

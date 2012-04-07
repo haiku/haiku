@@ -1,0 +1,25 @@
+1	hindi	x-vnd.Haiku-Magnify	2043945964
+no clip msg\n	In console, when clipboard is empty after clicking Copy image		कोई क्लिप नहीं msg\n
+Make square	Magnify-Main		चौकोर बनाओ
+Copy image	Magnify-Main		छवि की प्रतिलिपि बनाएँ 
+Magnify help	Magnify-Help		मदद का आवर्धन करे
+usage: magnify [size] (magnify size * size pixels)\n	Console		उपयोग: आवर्धन[size] (magnify size * size pixels)\n
+Stick coordinates	Magnify-Main		स्टिक निर्देशांक
+Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		जानकारी:\nछिपाना /जानकारी दिखाने -छुपाता/दिखाता है सभी नई सुविधाओं\nनोट: जब दिखा रहा है, एक लाल वर्ग दिखाई देगा जो दर्शाता है\nजो पिक्सेल आरजीबी मूल्यों को प्रदर्शित किया जाएगा \nजोड़ /क्रॉसहेयर हटायें-- 2 क्रॉसहेयर (या हटाया) जोड़ा जा सकता है \n और वस्तुओं की नियुक्ति संरेखण में सहायता\n क्रॉसहेयर नीला चौकों और नीले लाइनों द्वारा प्रतिनिधित्व कर रहे हैं \n छिपा / ग्रिड शो -.. छुपाता /दिखाता है ग्रिड जो प्रत्येक पिक्सेल अलग करता\n 
+Hide/Show grid	Magnify-Main		ग्रिड को छिपाएँ/दिखाएँ 
+magnify: size must be a multiple of 4\n	Console		आवर्धन: आकार 4 की एक बहु\n 
+General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		सामान्य:32 x 32 -ऊपरी बाएँ संख्या दृश्यमान संख्या है\nपिक्सल (चौड़ाई x ऊँचाई )की\n 8 पिक्सलस/पिक्सल -पिक्सल की संख्या का प्रतिनिधित्व करता है \n जो एक पिक्सेल आवर्धन इस्तेमाल करता है \n R:152 G:52 B:10 -RGB मूल्य पिक्सेल के तहत \nलाल वर्ग\n
+Decrease pixel size	Magnify-Main		पिक्सेल आकार घटाएँ
+Magnify	System name		मग्निफ्य 
+%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize पिक्सलस/पिक्सेल
+Info	Magnify-Main		जानकारी
+Remove a crosshair	Magnify-Main		क्रोसहैर हटायें
+Freeze/Unfreeze image	Magnify-Main		छवि को फ्रीज/अन्फ्रीज़ कर देना 
+Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		प्रतिलिपि बनाएँ / सहेजें:\n प्रतिलिपि बनाएँ-क्लिपबोर्ड पर मौजूदा छवि की प्रतियां बनाए\n सहेजें-एक फ़ाइल के लिए उपयोगकर्ता को बचाने के लिए प्रेरित करता है और बाहर छवि  की बिट्स लिखता है\n
+Hide/Show info	Magnify-Main		छिपाएँ/जानकारी दिखाएँ
+Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		नेविगेशन:\n ऐरो चाबियाँ - वर्तमान चयन को ले जाएँ (आरजीबी सूचक या क्रॉस हेर)\n एक समय में लगभग एक पिक्सेल\n विकल्प-ऐरो की -  एक बार में माउस स्थान एक पिक्सेल ले जाएँ\n एक्स चयन को मार्क करता है - वर्तमान चयन किया है इसमें एक 'एक्स' हैं\n
+Save image	Magnify-Main		छवि को सुरक्षित करे
+Increase window size	Magnify-Main		विंडो का आकार बढ़ाएँ
+Decrease window size	Magnify-Main		विंडो का आकार घटाएँ
+Increase pixel size	Magnify-Main		पिक्सेल आकार बढ़ाएँ
+Add a crosshair	Magnify-Main		क्रोसहैर जोड़ें

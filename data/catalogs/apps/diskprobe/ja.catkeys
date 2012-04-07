@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DiskProbe	2593619007
+1	japanese	x-vnd.Haiku-DiskProbe	559191070
 File offset: 	ProbeView		ファイルオフセット：
 %ld (native)	ProbeView		%ld (ネイティブ)
 64 bit unsigned value:	TypeEditors		符号なし 64 ビット値：
@@ -90,14 +90,40 @@ Examine device:	OpenWindow		デバイスを調べる：
 Offset: 	ProbeView		オフセット：
 OK	ProbeView		OK
 Add	ProbeView		追加
+Edit	ProbeView		編集
+Native: %Ld (0x%0*Lx)	ProbeView		ネイティブ： %Ld (0x%0*Lx)
 32 bit unsigned value:	TypeEditors		符号なし 32 ビット値：
+Message	TypeEditors	This is the type of view	メッセージ
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	\"%s\"を開けませんでした：\n%s
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	基数
+Image view	TypeEditors	Image means here a picture file, not a disk image.	イメージ表示
 Cancel	AttributeWindow		中止
+Type editor not supported	ProbeView		タイプエディターはサポートされていません。
+MIME type editor	TypeEditors		MIME タイプエディター
+Swapped: %Ld (0x%0*Lx)	ProbeView		スワップ： %Ld (0x%0*Lx)
+Find	FindWindow		検索
 Remove	AttributeWindow		削除
 Print…	ProbeView		印刷…
+Block %Ld (0x%Lx)	ProbeView		ブロック %Ld (0x%Lx)
+Image	TypeEditors	This is the type of view	イメージ
+Could not open file \"%s\": %s\n	DiskProbe		ファイル\"%s\"を開けませんでした： %s\n
 Select all	ProbeView		すべて選択
+Probe file…	OpenWindow		ファイルを調べる…
+Icon view	TypeEditors		アイコン表示
+Bookmarks	ProbeView		ブックマーク
+Mode:	FindWindow		モード：
 15 bit	TypeEditors		15 ビット
+Open device	FileWindow		デバイスを開く
+Could not find search string.	ProbeView		検索文字列が見つかりませんでした。
 16 bit unsigned value:	TypeEditors		符号無し 16 ビット値：
+Attribute offset: 	ProbeView		属性のオフセット：
+View	ProbeView	This is the last menubar item 'File Edit Block View'	表示
+Redo	ProbeView		やり直し
+File: 	ProbeView		ファイル：
+32 bit unsigned pointer:	TypeEditors		符号なし 32 ビットポインタ：
 Cancel	ProbeView		中止
 Grayscale	TypeEditors		グレースケール
 32 bit signed value:	TypeEditors		符号つき 32 ビット値:
 DiskProbe request	DiskProbe		DiskProbe リクエスト
+Type editor	ProbeView		タイプエディター
+Contents:	TypeEditors		内容：

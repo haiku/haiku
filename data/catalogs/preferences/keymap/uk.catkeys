@@ -1,23 +1,15 @@
-1	ukrainian	x-vnd.Haiku-Keymap	3895282621
-Caps Lock:	Modifier Keys window		Caps Lock:
-OK	Modifier Keys window		Гаразд
+1	ukrainian	x-vnd.Haiku-Keymap	1259868356
 Tilde trigger	Keymap window		Тільда
-Modifier Keys	Modifier Keys window		Клавіші-модифікатори
 Grave trigger	Keymap window		Апостроф
 Select dead keys	Keymap window		Вибрати модифікатор
-Option:	Modifier Keys window		Опція:
-Revert	Modifier Keys window		Інвертувати
 Quit	Keymap window		Вихід
 Switch shortcut keys to Haiku mode	Keymap window		Перемикати швидкі кнопки як у Haiku
 Circumflex trigger	Keymap window		Ціркумфлекс
-Cancel	Modifier Keys window		Скасувати
 Diaeresis trigger	Keymap window		Діарезіс
 Open…	Keymap window		Відкрити…
 System:	Keymap window		Системні:
 Switch shortcut keys	Keymap window		Перемкнути швидкі кнопки
-Set Modifier Keys…	Keymap window		Налаштувати клавіші-модифікатори...
 User:	Keymap window		Користувацькі:
-Control:	Modifier Keys window		Клавіша:
 Sample and clipboard:	Keymap window		Приклад і буфер обміну
 Layout	Keymap window		Макет
 Switch shortcut keys to Windows/Linux mode	Keymap window		Перемикати швидкі кнопки як у Linux/Windows
@@ -27,5 +19,4 @@ File	Keymap window		Файл
 (Current)	Keymap window		(Активна)
 Font	Keymap window		Шрифт
 Keymap	System name		Розкладка
-Command:	Modifier Keys window		Команда:
 Acute trigger	Keymap window		Акюте

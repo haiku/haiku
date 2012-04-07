@@ -1,0 +1,52 @@
+1	hindi	x-vnd.Haiku-MediaConverter	2083427598
+Video using parameters form settings	MediaConverter		विडियो जो पारामीटर फॉर्म सेट्टिंग इस्तमाल कर रहें है 
+Video encoding:	MediaConverter		विडियो एन्कोडिंग:
+No audio	Audio codecs list		कोई आवाज नहीं है 
+Error	MediaConverter		त्रुटि
+Error loading a file	MediaConverter		फ़ाइल लोड करने में त्रुटि
+File Error	MediaConverter-FileInfo		फ़ाइल त्रुटि
+Open…	Menu		खोलें...
+Start [ms]: 	MediaConverter		शुरू करें [ms]:
+Output file '%filename' created	MediaConverter		ओउत्पुत फ़ाइल '%filename' बाना दी गयी है 
+Output format	MediaConverter		ओउत्पुत फॉर्मेट 
+%.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stereo / %lld फ्रामेस 
+End   [ms]: 	MediaConverter		खतम [ms]: 
+MediaConverter	System name		मीडियाकोन्वेर्टर 
+No video	Video codecs list		कोई विडियो नहीं 
+Duration:	MediaConverter-FileInfo		अवधि:
+OK	MediaConverter		ठीक है 
+Error writing audio frame %Ld	MediaConverter		ऑडियो फरमे लिखने में त्रुटि %Ld
+Error converting '%filename'	MediaConverter		कोन्वेर्ट करने में त्रुटि '%filename'
+Low	MediaConverter		कम 
+Conversion completed	MediaConverter		रूपांतरण पूरा हुआ 
+Audio:	MediaConverter-FileInfo		आवाज:
+OK	MediaConverter-FileInfo		ठीक है 
+Source files	MediaConverter		सोर्स फ़ाइल 
+Cancelling	MediaConverter		हटा रहें है 
+%d byte 	MediaFileInfo		%d byte 
+Error loading files	MediaConverter		फ़ाइल लोड करने में त्रुटि  
+Cancel	MediaConverter		रद्द करना 
+None available	Video codecs		कुछ भी उपलब्ध नहीं है 
+Conversion cancelled	MediaConverter		कन्वेर्शन रद्द हुआ 
+No file selected	MediaConverter-FileInfo		कोई भी फ़ाइल चुनी नहीं हुई है 
+Error writing video frame %Ld	MediaConverter		विडियो फरेम लिखने में त्रुटि %Ld  
+Select this folder	MediaConverter		इस फोल्डर को चुने 
+Continue	MediaConverter		जरी रखें 
+Encoder parameters	MediaConverter-EncoderWindow		एनकोडर पैरामीटर 
+Video:	MediaConverter-FileInfo		विडियो: 
+%u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2ffps / %Ld frames
+%d bit 	MediaFileInfo		%d bit 
+Error creating '%filename'	MediaConverter		बनाने में त्रुटि '%filename' 
+Video quality not supported	MediaConverter		विडियो की गुणवत्ता नहीं समर्थन करती है 
+Cancelling…	MediaConverter		रद्द कर रहें है...
+File details	MediaConverter		फाइल के बारें में 
+Select	MediaConverter		चुने 
+Writing video track: %ld%% complete	MediaConverter		विडियो ट्रैक लिख रहें है:%ld%% पूरी हुई 
+Quit	Menu		छोड रहें है  
+Preview	MediaConverter		प्रेविएव
+File format:	MediaConverter		फ़ाइल फॉर्मेट 
+None available	Audio codecs		कोई उप्लाब्दः नहीं है 
+MediaConverter+:SaveDirectory	MediaConverter		मीडियाकोन्वेर्टर+:सेवदिरेक्टोरी  
+Error read audio frame %Ld	MediaConverter		ऑडियो फरमे पढ़ने में त्रुटि %Ld
+%.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld channel / %lld frames
+Error launching: %strError%	MediaConverter		लॉन्च करने में त्रुटि: %strError% 

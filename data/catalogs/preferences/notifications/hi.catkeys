@@ -1,0 +1,50 @@
+1	hindi	x-vnd.Haiku-Notifications	3631903554
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		एक त्रुटि हो गई,वरीयताओं को सहेजने मे.\nयह संभव है आपकी डिस्क स्पेस खत्म हो गयी है
+Notifications	GeneralView		सूचनाएँ
+seconds of inactivity	GeneralView		निष्क्रियता के सेकेंड
+Revert	PrefletWin		वापस लौटना
+Mini icon	DisplayView		मिनी आइकॉन
+Enable notifications	GeneralView		अधिसूचना सक्रिय करें
+Error	NotificationView		त्रुटि
+OK	GeneralView		ठीक है
+Events are not notified	GeneralView		घटनाक्रम नहीं अधिसूचित कर रहे हैं
+Save	PrefletWin		सुरक्षित करना
+Type	NotificationView		टाइप
+Notifications cannot be stopped, because the server can't be reached.	GeneralView		सूचनाएं नहीं रोकी जा सकती है,क्योंकि सर्वर तक पहुँचा नहीं जा सका.
+Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		सूचनाएँ सक्षम नहीं कर सकते क्योंकि सर्वर नहीं पाया जा सका है.\nइसका मतलब यह है कि आपकी जानकारी पॉपर की स्थापना सफलतापूर्वक पूरी नहीं की गयी थी.
+OK	NotificationView		ठीक है
+Important	NotificationView		महत्वपूर्ण
+Cannot disable notifications because the server can't be reached.	GeneralView		सूचनाएँ निष्क्रिय नहीं कर सकते क्योंकि सर्वर तक पहुँचा नहीं जा सका.
+Progress	NotificationView		प्रगति
+Last Received	NotificationView		पिछले प्राप्त
+General	PrefletView		जनरल
+Display	PrefletView		प्रदर्शन
+Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		स्टार्टअप समय पर सूचनाएं सक्षम नहीं सकते, शायद बूट सेटिंग्स निर्देशिका में लिखने की अनुमति नहीं है.
+Search:	NotificationView		खोजें:
+The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		सूचनाएं सर्वर नहीं पाया जा सकता है..\nएक संभव कारण है संस्थापन सही ढंग से नहीं कर
+Allowed	NotificationView		अनुमति दी
+Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		वरीयताओं को सहेज नहीं सकते,यह संभव है बूट सेटिंग्स निर्देशिका में लिखने की अनुमति है नहीं है या डिस्क भरी हुई है.
+There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	DisplayView		वहाँ एक समस्या थी वरीयताओं को सहेजने मे.\nसेटिंग्स निर्देशिका में.यह संभव है सेटिंग्स निर्देशिका में लिखने की अनुमति है नहीं है.
+Yes	NotificationView		हाँ
+Large icon	DisplayView		बड़े चिह्न
+Icon size:	DisplayView		चिह्न का आकार:
+Hide notifications from screen after	GeneralView		के बाद स्क्रीन से सूचनाएँ छिपाएँ
+Disable notifications	GeneralView		सूचनाएँ को निष्क्रिय करें
+Notifications	System name		अधिसूचनाएं
+Notifications	NotificationView		सूचनाएँ
+No	NotificationView		नहीं
+Title	NotificationView		शीर्षक
+Information	NotificationView		जानकारी
+Window width:	DisplayView		विंडो की चौड़ाई:
+Application	NotificationView		आवेदन
+Enabled	NotificationView		सक्षम
+OK	DisplayView		ठीक है
+Unknown	NotificationView		अज्ञात
+Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		वरीयताओं को सहेज नहीं सकते,यह संभव है बूट सेटिंग्स निर्देशिका में लिखने की अनुमति है नहीं है.
+There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		वहाँ एक समस्या थी वरीयताओं को सहेजने मे.\nसेटिंग्स निर्देशिका में.यह संभव है सेटिंग्स निर्देशिका में लिखने की अनुमति है नहीं है.
+There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		वहाँ एक समस्या थी वरीयताओं को सहेजने मे.\nसेटिंग्स निर्देशिका में.यह संभव है सेटिंग्स निर्देशिका में लिखने की अनुमति है नहीं है.
+Enable notifications at startup	GeneralView		स्टार्टअप पर अधिसूचना सक्रिय करें
+Notifications	PrefletView		अधिसूचनाएं
+The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		सूचनाएं सर्वर नहीं पाया जा सकता है,इसका मतलब यह है कि आपकी जानकारी पॉपर की स्थापना सफलतापूर्वक पूरी नहीं की गयी थी.
+Applications	NotificationView		आवेदन
+Events are notified	GeneralView		घटनाक्रम अधिसूचित हैं

@@ -1,23 +1,15 @@
-1	german	x-vnd.Haiku-Keymap	3895282621
-Caps Lock:	Modifier Keys window		Feststelltaste:
-OK	Modifier Keys window		OK
+1	german	x-vnd.Haiku-Keymap	1259868356
 Tilde trigger	Keymap window		~ Tilde
-Modifier Keys	Modifier Keys window		Hilfstasten:
 Grave trigger	Keymap window		` Gravis
 Select dead keys	Keymap window		Auslösetasten definieren
-Option:	Modifier Keys window		Option:
-Revert	Modifier Keys window		Anfangswerte
 Quit	Keymap window		Beenden
 Switch shortcut keys to Haiku mode	Keymap window		Befehlstasten tauschen: Haiku-Modus
 Circumflex trigger	Keymap window		^ Zirkumflex
-Cancel	Modifier Keys window		Abbrechen
 Diaeresis trigger	Keymap window		¨ Trema/Diärese
 Open…	Keymap window		Öffnen…
 System:	Keymap window		System:
 Switch shortcut keys	Keymap window		Befehlstasten tauschen
-Set Modifier Keys…	Keymap window		Hilfstasten zuordnen…
 User:	Keymap window		Benutzer:
-Control:	Modifier Keys window		Steuerung:
 Sample and clipboard:	Keymap window		Tastenausgabe:
 Layout	Keymap window		Tastatur
 Switch shortcut keys to Windows/Linux mode	Keymap window		Befehlstasten tauschen: Windows/Linux-Modus
@@ -27,5 +19,4 @@ File	Keymap window		Datei
 (Current)	Keymap window		(Aktiv)
 Font	Keymap window		Schriftart
 Keymap	System name		Tastaturlayout
-Command:	Modifier Keys window		Befehl:
 Acute trigger	Keymap window		´ Akut

@@ -1,0 +1,14 @@
+1	hindi	x-vnd.Haiku-desklink	3053930521
+Control physical output	MediaReplicant		भौतिक आउटपुट का नियंत्रण करे
+Couldn't launch 	MediaReplicant		लांच नहीं कर सका
+OK	MediaReplicant		ठीक है
+Sound preferences…	MediaReplicant		ध्वनि की वरीयताएँ ...
+%g dB	MediaReplicant		%g डीबी
+No media server running	VolumeControl		कोई मीडिया सर्वर नहीं चल रहा है
+Media preferences…	MediaReplicant		मीडिया की वरीयताएँ ...
+Open MediaPlayer	MediaReplicant		मीडिया प्लेयर खोलें
+desklink	MediaReplicant		डेस्क लिंक
+Options	MediaReplicant		विकल्प
+%ld dB	VolumeControl		%ld डीबी
+Beep	MediaReplicant		भोंपू
+Volume	VolumeControl		मात्रा

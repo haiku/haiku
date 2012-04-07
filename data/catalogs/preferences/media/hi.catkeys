@@ -1,0 +1,30 @@
+1	hindi	x-vnd.Haiku-Media	1473363280
+Couldn't add volume control in Deskbar: %s\n	Media views		डेस्कबार में वोलुम कण्ट्रोल को जोड़ नहीं सके: %s\n
+Ready for use…	Media Window		उपयोग के लिए तैयार...
+Video input:	Media views		वीडियो इनपुट:
+Waiting for media_server to quit.	Media Window		मीडिया_सर्वर के जाने की प्रतीक्षा कर रहे हैं|
+Cleaning up.	Media Window		सफाई कर रहे हैं|
+Defaults	Media views		चूक
+Stopping media server…	Media Window		मीडिया सर्वर रोक रहे हैं...
+Quit	Media Window		छोडो
+OK	Media Window		ठीक है
+Starting media server…	Media Window		मीडिया सर्वर शुरू कर रहे हैं...
+Done shutting down.	Media Window		शट डाउन हो गया|
+Video settings	Media Window		वीडियो सेटिंग्स
+Video output:	Media views		वीडियो आउटपुट:
+Could not connect to the media server.\nWould you like to start it ?	Media Window		मीडिया सर्वर से कनेक्ट नहीं कर पा रहे हैं| \n क्या आप इसे शुरू करना चाहेंगे?
+Restart media services	Media views		मीडिया सेवाएँ फ़िरसे शुरू करें
+Couldn't remove volume control in Deskbar: %s\n	Media views		डेस्कबार में वोलुम कण्ट्रोल को हटा नहीं सके: %s\n
+Media	System name		मीडिया
+Telling media_addon_server to quit.	Media Window		मीडिया_एडोन_सर्वर को रुकने के लिए बोल रहे हैं|
+Audio mixer	Media Window		ऑडियो मिश्रक
+This hardware has no controls.	Media Window		इस हार्डवेयर के कोई नियंत्रण नहीं है|
+Audio output:	Media views		ऑडियो आउटपुट:
+Restarting media services\nStarting media server…\n	Media Window		मीडिया सेवाएँ फ़िरसे शुरू कर रहे हैं\nमीडिया सर्वर शुरू कर रहे हैं...\n
+Audio settings	Media Window		ऑडियो सेटिंग्स
+Start media server	Media Window		मीडिया सर्वर शुरू करें
+Restarting media services\nShutting down media server\n	Media Window		मीडिया सेवाएँ फ़िरसे शुरू कर रहे हैं\nमीडिया सर्वर रोक रहे हैं...\n
+<none>	Media views		<कुछ भी नहीं>
+Channel:	Media views		चैनल:
+Show volume control on Deskbar	Media views		डेस्कबार में ध्वनि पर नियंत्रण यंत्र दिखाएँ 
+Audio input:	Media views		ऑडियो इनपुट:

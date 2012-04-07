@@ -1,0 +1,52 @@
+1	hindi	x-vnd.Haiku-Shortcuts	621368175
+Error, NULL state description?\n	ShortcutsSpec		त्रुटि, नल स्थिति का विवरण?\n
+MoveMouse	ShortcutsSpec		माउस को हिलाएँ
+OK	ShortcutsWindow		ठीक है
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		शॉर्टकट आपके कीसेट संचित नही कर सका.
+Cancel	ShortcutsWindow		रद्द करे
+InsertString	ShortcutsSpec		स्ट्रिंग सम्मिलित करे
+Append KeySet…	ShortcutsWindow		कीसेट का संलग्न करे ...
+Control	ShortcutsSpec	Name for modifier on keyboard	नियंत्रण
+Key	ShortcutsWindow		कुंजी
+Open KeySet…	ShortcutsWindow		कीसेट खोले...
+MouseUp	ShortcutsSpec		माउसऊपर
+Revert to saved	ShortcutsWindow		पूर्व संचित स्थिति में लोटे
+Alt	ShortcutsSpec	Name for modifier on keyboard	ऑल्ट
+*InsertString \"Your Text Here\"	ShortcutsWindow		*स्ट्रिंग डालें \"Your Text Here\"
+*MouseUp	ShortcutsWindow		*माउसअप
+(Choose application with file requester)	ShortcutsWindow		(फ़ाइल रिक्वेस्टर साथ आवेदन चुनें)
+Window	ShortcutsSpec	Name for modifier on keyboard	विंडों
+*LaunchHandler text/html	ShortcutsWindow		*लांचहैंडलर टेक्स्ट/एचटीएमएल
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		शॉर्टकट्स आपके कीसेट फ़ाइल नहीं खोल सकता था!
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*बहु\"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
+SendMessage	ShortcutsSpec		संदेशभेजें
+MoveMouseTo	ShortcutsSpec		माउस को वहाँ ले जायें
+Save	ShortcutsWindow		सुरक्षित करना
+*MouseButton 1	ShortcutsWindow		*माउसबटन 1
+*MoveMouse +20 +0	ShortcutsWindow		*माउस को +बीस +शून्य पर ले जायें 
+MouseDown	ShortcutsSpec		माउस नीचे करे
+Remove selected shortcut	ShortcutsWindow		चयनित शॉर्टकट को हटाएँ
+MouseButton	ShortcutsSpec		माउस बटन
+Add new shortcut	ShortcutsWindow		नया शॉर्टकट जोड़ें
+Save & apply	ShortcutsWindow		सहेजें और लागू करे
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		* संदेश भेजें का आवेदन /x-vnd.Be-TRAK 'Tfnd'
+Append	ShortcutsWindow		जोड़ना
+File	ShortcutsWindow		फ़ाइल
+Beep	ShortcutsSpec		बीप
+Quit	ShortcutsWindow		छोड़ना
+*MouseDown	ShortcutsWindow		*माउसडाउन
+Don't save	ShortcutsWindow		न सहेजें
+Multi	ShortcutsSpec		बहु
+Application	ShortcutsWindow		आवेदन
+Shift	ShortcutsSpec	Name for modifier on keyboard	स्थान बदले
+*Beep	ShortcutsWindow		*बीप
+*MoveMouseTo 50% 50%	ShortcutsWindow		*माउस को 50प्रतिशत 50प्रतिशत पर ले जायें 
+Save KeySet as…	ShortcutsWindow		कीसेट को ऐसे सुरक्षित करे
+Open	ShortcutsWindow		खुला
+Really quit without saving your changes?	ShortcutsWindow		क्या आप वास्तव में अपने बदलाव को बिना सहेजे छोड़ना चाहते हैँ?
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		शॉर्टकट्स आपकी कीसेट फ़ाइल को पार्स करने में असमर्थ रहा !
+Select	ShortcutsWindow		चुनें
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		शॉर्टकट्स कीसेट फ़ाइल को सहेजने में असमर्थ रहा !
+Oh no	ShortcutsWindow		अरे नहीं
+LaunchHandler	ShortcutsSpec		लॉन्च हैंडलर 
+Shortcuts	System name		शॉर्टकट्स

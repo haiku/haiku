@@ -1,0 +1,23 @@
+1	hindi	x-vnd.Be-POST	2300302075
+Fetching mail for %name	Notifier		मेल खोज रहें है %name
+Check for mails only	DeskbarView		केवल मेंल के लिए चेक करें
+Send pending mails	DeskbarView		बची हुई मेल को भेजें
+New Messages	MailDaemon		नया सन्देश
+<no accounts>	DeskbarView		<कोई अकाउंट नहीं>
+%num new messages	DeskbarView		%num नया सन्देश
+Mail status	MailDaemon		मेल की स्थति
+Shutdown mail services	DeskbarView		मिल सर्विसेस बंद कर दीजिए
+%num new message	DeskbarView		%num नया सन्देश 
+Sending mail for %name	Notifier		मेल भेज रहें है %name
+Preferences…	DeskbarView		वरीयताएँ...
+%num new messages.	MailDaemon		%num नया सन्देश.
+%num new message.	MailDaemon		%num नया सन्देश.
+Create new message…	DeskbarView		नया सन्देश बनाने के लिए
+%num new message for %name\n	MailDaemon		%num नया सन्देश के लिए %name\n
+No new messages	MailDaemon		कोई नया सन्देश नहीं
+Check for mail now	DeskbarView		मेल के लिए अभी जाच करें
+No new messages	DeskbarView		कोई नया सन्देश नहीं
+%num new messages for %name\n	MailDaemon		num नया सन्देश के लिए %name\n
+Mail daemon status log	MailDaemon		मेल डाइमन स्तातुस लोग
+No new messages.	MailDaemon		कोई नया सन्देश नहीं
+Mail status	Notifier		मेल की स्थति

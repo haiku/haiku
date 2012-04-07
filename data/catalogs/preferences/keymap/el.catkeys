@@ -1,23 +1,15 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Keymap	3895282621
-Caps Lock:	Modifier Keys window		Κλείδωμα Κεφαλαίων:
-OK	Modifier Keys window		OK
+1	greek, modern (1453-)	x-vnd.Haiku-Keymap	1259868356
 Tilde trigger	Keymap window		Περισπωμένη
-Modifier Keys	Modifier Keys window		Πλήκτρα τροποποίησης
 Grave trigger	Keymap window		Βαρεία
 Select dead keys	Keymap window		Επιλογή νεκρών πλήκτρων
-Option:	Modifier Keys window		Επιλογή:
-Revert	Modifier Keys window		Επαναφορά
 Quit	Keymap window		Έξοδος
 Switch shortcut keys to Haiku mode	Keymap window		Αλλαγή πλήκτρων συντόμευσης σε λειτουργία Haiku
 Circumflex trigger	Keymap window		Περισπωμένη
-Cancel	Modifier Keys window		Ακύρωση
 Diaeresis trigger	Keymap window		Διαλυτικά
 Open…	Keymap window		Άνοιγμα...
 System:	Keymap window		Σύστημα:
 Switch shortcut keys	Keymap window		Αλλαγή πλήκτρων συντόμευσης
-Set Modifier Keys…	Keymap window		Ορισμός πλήκτρων τροποποίησης…
 User:	Keymap window		Χρήστης:
-Control:	Modifier Keys window		Έλεγχος:
 Sample and clipboard:	Keymap window		Δείγμα και πρόχειρο:
 Layout	Keymap window		Τύπος πληκτρολογίου
 Switch shortcut keys to Windows/Linux mode	Keymap window		Αλλαγή πλήκτρων συντόμευσης σε λειτουργία Windows/Linux
@@ -27,5 +19,4 @@ File	Keymap window		Αρχείο
 (Current)	Keymap window		(Τρέχων)
 Font	Keymap window		Γραμματοσειρά
 Keymap	System name		Διάταξη πληκτρολογίου
-Command:	Modifier Keys window		Εντολή:
 Acute trigger	Keymap window		Οξεία

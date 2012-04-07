@@ -1,0 +1,51 @@
+1	hindi	x-vnd.Haiku-Appearance	168322075
+Control highlight	Colors tab		उजागर के लिए नियंत्रण
+Control border	Colors tab		नियंत्रण सीमा
+Antialiasing type:	AntialiasingSettingsView		एंटीएलिअसिंग टाइप:
+Shadow	Colors tab		छाया
+On	AntialiasingSettingsView		शुरू करने के लिए
+Defaults	APRWindow		चूक
+Grayscale	AntialiasingSettingsView		ग्रेस्केल
+Shine	Colors tab		चमक
+About	DecorSettingsView		के बारे में
+Off	AntialiasingSettingsView		बंद
+Choose Decorator	DecorSettingsView		डेकोरेटर चुनें
+Success	Colors tab		सफलता
+Inactive window tab text	Colors tab		निष्क्रिय विंडो टैब टेक्स्ट
+About Decorator	DecorSettingsView		डेकोरेटर के बारे में
+Failure	Colors tab		असफलता
+Hinting menu	AntialiasingSettingsView		सहाईता के लिए मेनू
+Window Decorator	APRWindow		विंडो डेकोरेटर
+Window Decorator:	DecorSettingsView		विंडो डेकोरेटर:
+Document background	Colors tab		दस्तावेज़ पृष्ठभूमि
+Revert	APRWindow		वापस लौटने
+Window tab	Colors tab		विंडो टैब
+Tooltip background	Colors tab		टूलटिप पृष्ठभूमि
+Selected menu item background	Colors tab		चुनना हुआ मेनू आइटम पृष्ठभूमि
+Antialiasing	APRWindow		एन्टीएलियासिंग
+Navigation base	Colors tab		नेविगेशन बेस
+Window border	Colors tab		खिड़की सीमा
+Window tab text	Colors tab		विंडो टैब टेक्स्ट
+Document text	Colors tab		दस्तावेज़ टेक्स्ट
+Navigation pulse	Colors tab		नेविगेशन पलस
+Selected menu item text	Colors tab		चुनना हुआ मेनू आइटम टेक्स्ट
+Menu background	Colors tab		मेनू पृष्ठभूमि
+OK	DecorSettingsView		ठीक
+Panel background	Colors tab		पैनल पृष्ठभूमि
+Colors	APRWindow		रंग
+Control background	Colors tab		नियंत्रण पृष्ठभूमि
+Inactive window tab	Colors tab		निष्क्रिय विंडो टैब
+Appearance	System name		उपस्थिति
+Reduce colored edges filter strength:	AntialiasingSettingsView		कम रंग किनारों पर फिल्टर ताकत:
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		सबपिक्सेल आधारित विरोधी इशारा ग्लिफ़ के साथ संयोजन में अलिअसिंग उपलब्ध में इस हाइकू का निर्माण करने के लिए संभव पेटेंट मुद्दों से बचने नहीं है. इस सुविधा को सक्षम करते हैं, आप अपने आप को हाइकू का निर्माण और लिब्फ्रीत्य्पे  विन्यास हैडर में कुछ विकल्पों को लागू किया है.
+Control text	Colors tab		नियंत्रण टेक्स्ट
+Tooltip text	Colors tab		टूलटिप टेक्स्ट
+Inactive window border	Colors tab		निष्क्रिय विंडो सीमा
+Menu item text	Colors tab		मेनू आइटम टेक्स्ट
+LCD subpixel	AntialiasingSettingsView		एलसीडी सबपिक्सेल
+Selected menu item border	Colors tab		चुना हुआ मेनू आइटम सीमा
+Strong	AntialiasingSettingsView		मजबूत
+Panel text	Colors tab		पैनल टेक्स्ट
+Monospaced fonts only	AntialiasingSettingsView		केवल मोनोस्पेसड फोंट
+Antialiasing menu	AntialiasingSettingsView		एनीशीअलआईजिंग मेनू
+Glyph hinting:	AntialiasingSettingsView		ग्लिफ़ साहाईता:

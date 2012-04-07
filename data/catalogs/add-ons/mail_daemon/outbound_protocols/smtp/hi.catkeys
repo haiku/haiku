@@ -1,0 +1,16 @@
+1	hindi	x-vnd.Haiku-SMTP	2740407895
+SMTP server:	ConfigView		SMTP सर्वर:
+STARTTLS	ConfigView		STARTTLS
+Error while logging in to %serv	smtp		त्रुटी जब लोगिन कर रहे थे %serv
+Unencrypted	ConfigView		Unencrypted
+. The server says:\n	smtp		. सर्वर कह रहा है:\n
+ESMTP	ConfigView		ESMTP
+Connecting to server…	smtp		सर्वर से कन्नेक्ट कर रहें है...
+Error while opening connection to %serv	smtp		त्रुटी कन्नेक्शन के लिए जब खोल रहे थे %serv
+POP3 authentication failed. The server said:\n	smtp		POP3 प्रमाणीकरण असफल रही. सर्वर ने कहा:\n 
+Destination:	ConfigView		गंतव्य:
+: Connection refused or host not found.	smtp		: कनेक्शन मन हो गया या फिर होस्ट नहीं मिला 
+None	ConfigView		कोई नहीं 
+POP3 before SMTP	ConfigView		POP3 SMTP से पहले 
+SSL	ConfigView		SSL
+. The server said:\n	smtp		. सर्वर कह रहा है:\n

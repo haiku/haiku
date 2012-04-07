@@ -1,0 +1,96 @@
+1	hindi	x-vnd.haiku-icon_o_matic	3467163161
+Select All	Icon-O-Matic-PathManipulator		सभी का चयन करें
+Add Style	Icon-O-Matic-AddStylesCmd		स्टाइल जोड़ें
+Color (#%02x%02x%02x)	Style name after dropping a color		रंग (#%02x%02x%02x)
+Add	Icon-O-Matic-StylesList		जोड़ें
+Move Shape	Icon-O-Matic-MoveShapesCommand		आकृति हिलाएँ
+Opening the document failed!	Icon-O-Matic-Main		दस्तावेज़ खोलने में असफल!
+Reset transformation	Icon-O-Matic-ShapesList		परिवर्तन को रीसेट
+Move Paths	Icon-O-Matic-MovePathsCmd		पाथ को हिलाएँ
+None	Icon-O-Matic-Properties		कोई नहीं
+New	Icon-O-Matic-Menu-File		नया
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		आइकॉन-O-मैटिक सभी डेटा की वयाख्या नहीं कर सका SVG. से जो आया था जब यह भरा था .मूल फ़ाइल को अधिलेखि करने से, यह जानकारी खो जाएगी.
+Paste Properties	Icon-O-Matic-Properties		चिपकाने की प्रापर्टीस
+Stroke	Transformation		स्ट्रोक
+Save Icon	Dialog title		चिह्न सहेजें
+Closed	Icon-O-Matic-PropertyNames		बंद
+Remove Path	Icon-O-Matic-RemovePathsCmd		पथ निकालें
+Add shape with path	Icon-O-Matic-Menu-Shape		पथ के साथ आकृति जोड़ें
+Select	Icon-O-Matic-Properties		चुनें
+Height	Icon-O-Matic-PropertyNames		ऊंचाई
+Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		ट्रांसफॉर्मर निकालें
+Width	Icon-O-Matic-PropertyNames		चौड़ाई
+Transformation	Icon-O-Matic-TransformationBoxStates		परिवर्तन
+Duplicate	Icon-O-Matic-ShapesList		नकल
+<unkown property>	Icon-O-Matic-PropertyNames		<अनजान संपत्ति>
+Linear	Icon-O-Matic-StyleTypes		रैखिक
+Assign Path	Icon-O-Matic-AddPathsCmd		असाइन पथ
+Move	Icon-O-Matic-TransformationBoxStates		हिलाऍ
+Flip Control Points	Icon-O-Matic-FlipPointsCmd		फ्लिप नियंत्रण अंक
+warning	Icon-O-Matic-SVGExport		चेतावनी
+Copy	Icon-O-Matic-Properties		नक़ल करना
+Miter Limit	Icon-O-Matic-PropertyNames		माइटर सीमा
+OK	Icon-O-Matic-ColorPicker		ठीक है
+Remove Control Point	Icon-O-Matic-RemovePointsCmd		कन्ट्रोल पाइंट निकालें
+Bleep!	Exporter - Continue in error dialog		बीप!
+Add circle	Icon-O-Matic-PathsList		चक्र जोड़ें
+Shorten	Icon-O-Matic-PropertyNames		छोटा करना
+bad news	Title of error alert		बुरी खबर
+Remove Paths	Icon-O-Matic-RemovePathsCmd		पथ निकालें
+Scale Y	Icon-O-Matic-PropertyNames		स्केल वाइ
+Add Control Point	Icon-O-Matic-AddPointCmd		नियंत्रण बिंदु जोड़ें
+Untitled	Icon-O-Matic-Main		अनामांकित
+Multi Set 	Multi Set (property name)		बहु सेट 
+any of the other lists to	Empty property list - 2nd line		अन्य सूचियों में से किसी
+Save as…	Icon-O-Matic-Menu-File		के रूप में सुरक्षित करे...
+Change Color	Icon-O-Matic-SetColorCmd		रंग बदलें
+Style	Icon-O-Matic-Menus		स्टाइल
+<modify path>	Icon-O-Matic-PathCmd		<पथ को संशोधित करें>
+Opening the icon failed!	Icon-O-Matic-Main		आइकन खुलना असफल!
+Error: 	Icon-O-Matic-Main		त्रुटि:
+Rotate indices backwards	Icon-O-Matic-PathsList		सूचकांक पीछे की ओर घुमाएँ
+Name	Icon-O-Matic-PropertyNames		नाम
+bad news	Icon-O-Matic-Exporter		बुरी खबर
+<nothing to undo>	Icon-O-Matic-Menu-Edit		पूर्ववत करने के लिए कुछ नहीं
+Off	Icon-O-Matic-Menu-Settings		बंद
+Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		आकृति स्थिर करें
+PNG Set	Icon-O-Matic-SavePanel		पीएनजी सेट
+Joins	Icon-O-Matic-PropertyNames		में मिलती है
+Remove Style	Icon-O-Matic-RemoveStylesCmd		स्टाइल हटायें
+Scale X	Icon-O-Matic-PropertyNames		स्केल एक्स
+Set 	Set (property name)		सेट
+Cancel	Icon-O-Matic-SVGExport		रद्द
+Add shape with style	Icon-O-Matic-Menu-Shape		शैली के साथ आकृति जोड़ें
+Remove Shape	Icon-O-Matic-RemoveShapesCmd		आकृति हटाएँ
+Reverse	Icon-O-Matic-PathsList		उलटा
+HVIF Source Code	Icon-O-Matic-SavePanel		ऐचवीआइएफ स्रोत कोड
+Reset Transformations	Icon-O-Matic-ResetTransformationCmd		रीसेट परिवर्तन
+All	Icon-O-Matic-Properties		सभी
+Multi Paste Properties	Icon-O-Matic-Properties		बहु चिपकाएँ गुण
+Undo	Icon-O-Matic-Main		पूर्ववत्
+Click on a shape above	Empty transformers list - 1st line		किसी आकृति के ऊपर पर क्लिक करें
+Add Shape	Icon-O-Matic-AddShapesCmd		आकृति जोड़ें
+Contour	Transformation		रूपरेखा
+<nothing to redo>	Icon-O-Matic-Menu-Edit		<पुनः करने के लिए कुछ नहीं >
+Move Transformer	Icon-O-Matic-MoveTransformersCmd		ट्रांसफॉर्मर निकालें 
+Cancel	Icon-O-Matic-Menu-Settings		रद्द
+Modify Control Point	Icon-O-Matic-ChangePointCmd		नियंत्रण बिंदु जोड़ें
+Nudge Control Points	Icon-O-Matic-NudgePointsCommand		नियंत्रण बिंदु जोड़ें
+Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		ट्रांसफॉर्मर निकालें 
+Add Transformer	Icon-O-Matic-AddTransformersCmd		ट्रांसफॉर्मर निकालें 
+Nudge Control Point	Icon-O-Matic-NudgePointsCommand		नियंत्रण बिंदु जोड़ें
+Unassign Path	Icon-O-Matic-UnassignPathCmd		अनअसाइन पथ
+Add	Icon-O-Matic-TransformersList		जोड़ें
+Transformation	Transformation		रूपांतरण
+Reset transformation	Icon-O-Matic-StylesList		रूपांतरण को रीसेट
+Split Control Points	Icon-O-Matic-SplitPointsCmd		फ्लिप नियंत्रण अंक
+Close	Icon-O-Matic-Menu-File		बंद 
+Cancel	Icon-O-Matic-ColorPicker		रद्द
+Error: 	Icon-O-Matic-Exporter		त्रुटि:
+Add	Icon-O-Matic-PathsList		जोड़ें
+Transformation	Icon-O-Matic-TransformersList		रूपांतरण
+Duplicate	Icon-O-Matic-StylesList		नकल
+OK	Icon-O-Matic-SVGImport		ठीक है
+Duplicate	Icon-O-Matic-PathsList		नकल
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		रंग (#%02x%02x%02x)
+Remove Shapes	Icon-O-Matic-RemoveShapesCmd		आकृति हटाएँ

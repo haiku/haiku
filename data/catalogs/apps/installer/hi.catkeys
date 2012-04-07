@@ -1,0 +1,114 @@
+1	hindi	x-vnd.Haiku-Installer	3335683494
+So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		तो फिर फाइल के नीचे की ओर अन्य मेनू प्रविष्टियों के पीछे, इन पंक्तियों के समान कुछ जोड़ें:\n\n
+Are you sure you want to abort the installation and restart the system?	InstallerWindow		आप सुनिश्चित हैं कि आप स्थापना रद्द करके सिस्टम को पुनः आरंभ करना चाहते हैं?
+\t}\n\n	InstallerApp		\t}\n\n
+Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		इंस्टॉलर\n\tजेरोम डुवाल और स्टेपहान एब्मस द्वारा लिखा गया है\n\t२००५-२०१० कॉपीराइट, हाइकू|\n\n
+Newer versions of GRUB use an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		ग्रब के नए संस्करण में एक अतिरिक्त विन्यास फाइल का प्रयोग बूट मेनू में कस्टम प्रविष्टियों को जोड़ने के लिए किया जाता है| उन्हें ऊपर जमा करने के लिए, आपको इस तरह अपने पसंदीदा टर्मिनल को शुरू करके एक फाइल बनानी/संपादित करनी पड़ती है:\n\n
+Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		यहाँ वास्तव में बूट मेनू प्रदर्शित करने के लिए आपको लाइन के सामने एक \"#\" डालकर इस लाइन को कॉमेंट आउट करना है - \"GRUB_HIDDEN_TIMEOUT=0\"
+Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		स्थापना पूरी हो गयी| बूट क्षेत्र '%s' में लिखा दिया गया है| इंस्टॉलर छोड़ने के लिए छोड़ने का बटन दबाएँ या एक नया लक्ष्य के लिए एक और अधिष्ठापन के निष्पादन की मात्रा का चयन करें|
+Quit	InstallerApp		छोडें
+Additional disk space required: 0.0 KiB	InstallerWindow		अतिरिक्त डिस्क स्थान की आवश्यकता: ०.० KiB
+With GRUB it's: (hdN,n)\n\n	InstallerApp		ग्रब का साथ ये है: (hdN,n)\n\n
+\tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
+Stop	InstallerWindow	In alert after pressing Stop	रोको
+Install progress:  	InstallerWindow		स्थापित प्रगति:
+Starting Installation.	InstallProgress		अधिष्ठापन शुरू कर रहे हैं|
+This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		यह अल्फा गुणवत्ता सॉफ्टवेयर है! इसका मतलब यह है कि यहाँ महत्वपूर्ण डेटा को खोने का एक उच्च जोखिम है| अक्सर बैकअप लें! आपको चेतावनी दे दी गई है|\n\n\n
+Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		क्या आपको सुनिश्चित हैं कि आप इस बूट डिस्क पर स्थापित करना चाहते हैं? अगर आप आगे बढ़ना चाहते हैं तो इंस्टॉलर को मशीन रिबूट करनी पड़ेगी|
+Quit Boot Manager	InstallerWindow		बूट प्रबंधक छोडो
+Stop	InstallerWindow		रोको
+\t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
+\tchainloader\t\t+1\n\n	InstallerApp		\tchainloader\t\t+1\n\n
+OK	InstallerApp		ठीक है
+Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		पॉप अप मेनू से स्रोत और गंतव्य डिस्क चुनें. फिर \"शुरू\" क्लिक करें|
+\t# Haiku on /dev/sda7\n	InstallerApp		\t# हाइकू यहाँ पर है /dev/sda7\n
+Install from:	InstallerWindow		यहाँ से स्थापित करें:
+%1ld of %2ld	InstallerWindow	number of files copied	%2ld में से %1ld
+IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		हाइकू स्थापित करने से पहले महत्वपूर्ण जानकारी\n\n
+Continue	InstallerWindow	In alert after pressing Stop	जारी रखें
+Write boot sector to '%s'	InstallerWindow		बूट क्षेत्र '%s' में लिखें
+2.1) GRUB 1\n	InstallerApp		२.१) ग्रब १\n
+Collecting copy information.	InstallProgress		नकल जानकारी एकत्रित कर रहे हैं|
+Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		पॉप अप मेनू से स्रोत डिस्क चुनें. फिर \"शुरू\" क्लिक करें|
+Quit Boot Manager and DriveSetup	InstallerWindow		बूट प्रबंधक और ड्राइव सेटअप छोड़ो
+Quit	InstallerWindow		छोड़ो
+Welcome to the Haiku Installer!\n\n	InstallerApp		हाइकू इंस्टॉलर में आपका स्वागत है!\n\n
+Boot sector successfully written.	InstallProgress		बूट क्षेत्र सफलतापूर्वक लिख दिया गया है|
+Performing installation.	InstallProgress		अधिष्ठापन हो रहा है|
+scanning…	InstallerWindow		स्कैनिंग...
+Set up boot menu	InstallerWindow		बूट मेनू सेट अप करें
+The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		पहले तार्किक विभाजन की संख्या हमेशा \"४\" होगी, प्राथमिक विभाजन की संख्या की परवाह बिना|\n\n
+GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		ग्रब नामकरण योजना अभी भी यह है: (hdN,n)\n\n
+\tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <आपका पसंदीदा पाठ संपादक> /boot/grub/menu.lst\n\n
+Finishing Installation.	InstallProgress		स्थापना समाप्त हो रही है.
+\tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <आपका पसंदीदा पाठ संपादक> /etc/default/grub\n\n
+README	InstallerApp		README
+The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		गंतव्य डिस्क में शायद पर्याप्त जगह नहीं है| एक अलग डिस्क को चुनें या वैकल्पिक आइटम स्थापित करना ना चुनें|
+Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		इंस्टॉलर खिड़की बंद करने से पहले बूट प्रबंधक और ड्राइव सेटअप विंडो बंद करें|
+Scanning for disks…	InstallerWindow		डिस्क के लिए स्कैन चल रहा है...
+2.2) GRUB 2\n	InstallerApp		२.२) ग्रब १\n
+The disk can't be mounted. Please choose a different disk.	InstallProgress		डिस्क माउंट नहीं की जा सकी| एक अलग डिस्क चुनें|
+?? of ??	InstallerWindow	Unknown progress	??, ?? में से 
+\tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"हाइकू अल्फा\" {\n
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		उपलब्ध हार्ड ड्राइव और अन्य मीडिया का\nविभाजन करने के लिए ड्राइव सेटअप उपयोगिता को \nलांच करें|\nविभाजन\nबे फाइल सिस्टम से शुरू किये जा सकते हैं जो की हाइकू बूट\nविभाजन के लिए ज़रुरी है|
+Show optional packages	InstallerWindow		वैकल्पिक संकुल दिखाएँ
+No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		कोई भी स्थापना के लिए उपयुक्त विभाजन नहीं पाया गया है| कृपया विभाजन सेट अप करें और कम से कम एक विभाजन बे फाइल सिस्टम के साथ आरंभ करें|
+Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		इसके अलावा आपको वास्तव में बूट मेनू प्रदर्शित करने के लिए एक और फाइल को संपादित करना होगा:\n\n
+Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		पॉप अप मेनू में से वेह डिस्क चुने जिधर आप स्थापित करना चाहते हैं| फिर \"शुरू\" क्लिक करें|
+Unknown Type	InstallProgress	Partition content type	अज्ञात प्रकार
+<none>	InstallerWindow	No partition available	<कोई भी नहीं>
+\t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
+You'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\n	InstallerApp		आप ध्यान दें कि ग्रब हार्ड ड्राइव नामकरण के लिए एक अलग रणनीति का उपयोग करता है, जो लिनक्स से अलग है|\n\n
+\"n\" is the partition number, also starting with \"0\".\n	InstallerApp		\"n\" विभाजन संख्या है, जो की \"०\" के साथ शुरू होती है|
+Installation canceled.	InstallProgress		स्थापना रद्द कर दी गयी है|
+You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		आप एक डिस्क की सामग्री को उसके ऊपर ही स्थापित नहीं कर सकते| एक अलग डिस्क चुनें|
+???	InstallerWindow	Unknown currently copied item	???
+\"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\" विभाजन संख्या है, जिसके लिए ग्रब 2 \"१\" के साथ शुरू होता है\n
+Quit DriveSetup	InstallerWindow		ड्राइव सेटअप छोडें
+\"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\" हार्ड डिस्क नंबर है, जो की \"0\" के साथ शुरू होती है|
+Hide optional packages	InstallerWindow		वैकल्पिक संकुल छिपाएँ
+Please close the DriveSetup window before closing the Installer window.	InstallerWindow		इंस्टॉलर खिड़की बंद करने से पहले ड्राइव सेटअप विंडो को बंद करें|
+Restart system	InstallerWindow		सिस्टम को पुनः आरंभ करें
+OK	InstallerWindow		ठीक है
+Set up partitions…	InstallerWindow		विभाजन सेट अप करें
+The partition can't be mounted. Please choose a different partition.	InstallProgress		विभाजन आरोहित नहीं किये जा सकता| एक अलग विभाजन चुनें|
+Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		बूट प्रबंधक चल रहा है...\n\nअधिष्ठापन जारी रखने के लिए बूट प्रबंधक को बंद करें|
+Install anyway	InstallProgress		कैसे भी स्थापित करें
+An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		एक त्रुटि का सामना करना पड़ा और स्थापना पूर्ण नहीं हुई:\n\nत्रुटि: %s
+\trootnoverify\t\t(hd0,6)\n	InstallerApp		\trootnoverify\t\t(hd0,6)\n
+Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		'%1s' से '%2s' पर स्थापित करने के लिए शुरू बटन प्रेस करें|
+Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		ड्राइव सेटअप चला रहे हैं...\n\nअधिष्ठापन जारी रखने के लिए ड्राइव सेटअप बंद करें|
+Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		मज़ा लें और हाइकू का प्रयोग करने के लिए बहुत बहुत धन्यवाद! हमें उम्मीद है कि आपको यह पसंद आए!
+OK	InstallProgress		ठीक है
+Please choose target	InstallerWindow		लक्ष्य का चयन करें
+???	InstallerWindow	Unknown partition name	???
+1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		१)   यदि आप हाइकू को असली हार्डवेयर (एमुलेटर के अंदर नहीं) पर परस्थापित कर रहे हैं, यह अनुशंसित है कि आप पहले से ही एक हार्ड डिस्क विभाजन तैयार रखें| इंस्टॉलर और ड्राइव सेटअप देशी हाइकू फाइल सिस्टम के साथ मौजूद विभाजन आरंभ करने के लिए उपकरण प्रदान करते हैं, लेकिन वास्तविक विभाजन लेआउट बदलने के लिए विकल्प कंप्यूटर विन्यास की एक पर्याप्त महान विविधता पर परीक्षण नहीं किये गए है तो हम इसका उपयोग करने की सिफारिश नहीं दे रहे है|\n
+2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		२) इंस्टॉलर हाइकू विभाजन को अपने आप बूटएबल बना देगा, लेकिन वेह एक मौजूदा बूट मेनू में हाइकू एकीकृत करने के लिए कोई कदम नहीं उठाता| अगर आपके पास ग्रब पहले से स्थापित है, तो आप हाइकू को उसके बूट मेनू में जोड़ सकते हैं| आप ग्रब के किस संस्करण का उपयोग कर रहे हैं पर निर्भर, यह अलग ढंग से किया जाता है|\n\n\n
+Begin	InstallerWindow		शुरू करें
+Finally, you have to update the boot menu by entering:\n\n	InstallerApp		अंत में, आपको यह लिखकर बूट मेनू अद्यतन करना है:\n\n
+If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		यदि आपने एक विभाजन अभी तह नहीं बनाया है, तो बस रिबूट करें, और कोई उपकरण का उपयोग करके विभाजन बनाएँ, और अधिष्ठापन जारी रखने के लिए हाइकू में रिबूट करें| उदाहरण के लिए आप जीपार्टेड लाइव-सीडी का उपयोग कर सकते हैं, वह जगह बनाने के लिए मौजूदा विभाजन का आकार भी परिवर्तन कर सकता हैं|\n\n\n
+With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		ग्रब २ के साथ पहला तार्किक विभाजन में हमेशा संख्या \"५\" होगी, प्राथमिक विभाजन की संख्या की परवाह किए बिना.\n\n
+Write boot sector	InstallerWindow		बूट सेक्टर लिखें
+Cancel	InstallerWindow		रद्द करें
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		ड्राइव सेटअप, डिस्क विभाजन विन्यस्त के लिए आवेदन, शुरू नहीं किया जा सका|
+No optional packages available.	PackagesView		कोई वैकल्पिक संकुल उपलब्ध नहीं हैं|
+All hard disks start with \"hd\".\n	InstallerApp		सभी हार्ड डिस्क \"hd\" के साथ शुरू होती हैं|\n
+Continue	InstallerApp		जारी रखें
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" documentation, there is a link on the Desktop.\n\n	InstallerApp		३) जब आप पहली बार सफलतापूर्वक हाइकू में बूट करते हैं, सुनिश्चित करलें कि आप हमारी \"आपका स्वागत है\" प्रलेखन पढ़ें, डेस्कटॉप पर एक कड़ी है|\n\n
+Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		अपनी /boot/grub/menu.lst को एक टर्मिनल से पसंदीदा संपादक शुरू करके इस तरह से कॉन्फ़िगर करें:\n\n
+Boot sector not written because of an internal error.	InstallProgress		एक आंतरिक त्रुटि के कारण बूट क्षेत्र नहीं लिखा जा सका|
+Additional disk space required: %s	InstallerWindow		अतिरिक्त डिस्क स्थान की आवश्यकता: %s
+NOTE: While the naming strategy for hard disks is still as described under 2.1) the naming scheme for partitions has changed.\n\n	InstallerApp		नोट: जबकि हार्ड डिस्क नामकरण रणनीति अभी भी २.१) के अंतर्गत वर्णित ही है, विभाजनों के लिए नामकरण योजना बदल गयी है|\n\n
+Cancel	InstallProgress		रद्द करें
+Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		बूट प्रबंधक और ड्राइव सेटअप चला रहे हैं...\n\nअधिष्ठापन जारी रखने के लिए दोनों अनुप्रयोगों को बंद करें|
+Try installing anyway	InstallProgress		कैसे भी स्थापित करने की कोशिश करें
+So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		तो शीर्षक के नीचे जो संपादित नहीं करना, इन पंक्तियों के समान कुछ जोड़ें:\n\n
+Are you sure you want to to stop the installation?	InstallerWindow		आप सुनिश्चित हैं कि आप स्थापना को रोकना चाहते हैं?
+Onto:	InstallerWindow		इस पर:
+Please close the Boot Manager window before closing the Installer window.	InstallerWindow		इंस्टॉलर खिड़की बंद करने से पहले बूट प्रबंधक विंडो बंद करें|
+Tools	InstallerWindow		उपकरण
+The mount point could not be retrieved.	InstallProgress		आरोह बिंदु को पुनः प्राप्त नहीं किया जा सका|
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		लक्ष्य मात्रा खाली नहीं है| क्या आप वैसे भी स्थापित करना चाहते हैं?\n\n ध्यान दें: 'सिस्टम' फ़ोल्डर स्रोत मात्रा से एक स्वच्छ प्रतिलिपि होगा, अन्य सभी फ़ोल्डर्स का विलय कर दिया जाएगा, जबकि फ़ाइलें और लिंक जो दोनों स्रोत और लक्ष्य मात्रा पर मौजूद हैं, स्रोत मात्रा संस्करण से अधिलेखित हो जाएँगे|
+You can see the correct partition in GParted for example.\n\n\n	InstallerApp		उदाहरण के लिए, आप सही विभाजन जीपार्टेड में देख सकते हैं
+\ttitle\t\t\t\tHaiku\n	InstallerApp		\tशीर्षक\t\t\t\tहाइकू\n
+\tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsud <आपका पसंदीदा पाठ संपादक> /etc/grub.d/40_custom\n\n

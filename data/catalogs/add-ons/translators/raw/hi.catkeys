@@ -1,0 +1,9 @@
+1	hindi	x-vnd.Haiku-RAWTranslator	1938728039
+RAWTranslator Settings	ConfigView		RAWTranslator की सेत्तिंग्स
+Version %d.%d.%d, %s	ConfigView		संस्करण %d.%d.%d, %s
+RAW Images	ConfigView		RAW चित्र
+RAW image translator	RAWTranslator		RAW चित्र का अनुवादक
+RAW Settings	RAWTranslator main		RAW की सेत्तिंग्स
+RAW images	RAWTranslator		RAW चित्र
+%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	%s RAW चित्र
+Based on Dave Coffin's dcraw 8.63	ConfigView		देव कोफ्फिन के dcraw 8.63 पर आधार्रित

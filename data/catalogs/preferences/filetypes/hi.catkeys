@@ -1,0 +1,157 @@
+1	hindi	x-vnd.Haiku-FileTypes	473999706
+Application types…	FileTypes Window		आवेदन के प्रकार...
+Description:	Application Types Window		विवरण
+Args only	Application Type Window		केवल अर्ग्स
+Recognition rule is not valid:\n\n	FileTypes Window		मान्यता नियम वैध नहीं है:\n\n
+Add group	New File Type Window		समूह जोडें
+Remove	Application Type Window		हटायें
+Select same type as	FileType Window		चुने एक ही प्रकार के रूप में
+Remove icon	Icon View		चिह्न हटायें
+Supported types	Application Type Window		प्रकार समर्थित
+Show icons in list	FileTypes Window		सूची में चिह्न दिखाएँ
+Type name:	FileTypes Window		नाम टाइप करें:
+Internal name:	New File Type Window		आंतरिक नाम:
+Choose type	Type List Window		प्रकार चुनें
+New file type	New File Type Window		नए फ़ाइल के प्रकार
+Rule:	FileTypes Window		नियम:
+Add icon…	Icon View		चिह्न जोड़...
+Multiple files from \"%s\" file type	FileType Window		\"%s\" प्रकार के फ़ाइल में से एकाधिक फाइल
+Do you want to save the changes?	Application Type Window		क्या आप परिवर्तनों को सेव चाहते हैं
+File type	FileType Window		फ़ाइल के प्रकार
+Could not change attributes	Attribute Window		गुणों को बदलने नहीं जा सका
+Could not retrieve preferred application of this file	Preferred App Menu		इस फाइल के वरीय अनुप्रयोग पुनर्प्राप्त नहीं कर सके
+Beta	Application Types Window		बीटा
+Extensions:	FileTypes Window		एक्सटेंशन:
+Select same preferred application as	FileTypes Window		उसी पसंदीदा अनुप्रयोग का चयन करें जो
+Save	Application Type Window		सेव
+Could not retrieve application signature	Preferred App Menu		आवेदन हस्ताक्षर पुनः प्राप्त नहीं किया जा सका
+Add	Extension Window		जोड़ें
+Select same preferred application as	FileType Window		चुने एक ही पसंदीदा अनुप्रयोग के रूप में 
+Cancel	Attribute Window		कैंसल
+Icon	Application Type Window		चिह्न
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		फ़ाइल प्रकार को हटाकर वापस नहीं लाया जा सकता|\nक्या आप सुनिश्चित हैं कि आप इसे निकालना चाहते  हैं?
+Editable	Attribute Window	If Tracker allows to edit this attribute.	संपादन
+Multiple launch	Application Type Window		कई लांच
+(from application)	FileTypes Window		(अनुप्रयोग से)
+Could not set preferred application	FileTypes Window		वरीय अनुप्रयोग स्थापित नहीं किया जा सका
+Group:	New File Type Window		समूह:
+%1 application type	Application Type Window		%1 आवेदन के प्रकार
+Done	Extension Window		हो गया
+Application type	Application Type Window		आवेदन का प्रकार
+Done	Type List Window		हो गया
+Attribute	Attribute Window		गुण
+Show recognition rule	FileTypes Window		मान्यता नियम दिखाएँ
+FileTypes request	Preferred App Menu		फ़ाइल प्रकार अनुरोध
+Could not open file	FileType Window		फ़ाइल नहीं खोल सकता
+Description:	FileTypes Window		विवरण:
+File	FileTypes Window		फ़ाइल
+Name:	Application Types Window		नाम:
+Group name:	New File Type Window		समूह का नाम:
+Preferred application	FileType Window		वरीय अनुप्रयोग
+Progress	Application Types Window		प्रगति
+File	Application Type Window		फाइल
+Version:	Application Type Window		संस्करण:
+Select…	FileTypes Window		चुनें...
+FileTypes request	FileTypes		फाइलसटाइपस याचना
+Open…	FileTypes Window		खोलें...
+Select…	FileType Window		चुना...
+Launch	Application Types Window		लांच
+Same as…	FileType Window	The same APPLICATION as ...	के जैसा...
+Abort	Application Types Window		गर्भपात
+FileTypes	FileTypes		फ़ाइल प्रकार
+OK	FileTypes		ठीक है
+Extra attributes	FileTypes Window		अतिरिक्त विशेषताएँ
+Development	Application Type Window		विकास
+Edit…	Application Types Window		संपादित करें...
+Icon	FileType Window		चिह्न
+Final	Application Types Window		अंतिम
+Development	Application Types Window		विकास
+Open file	FileTypes		फ़ाइल खोलें
+Special:	Attribute Window		विशेष:
+Alpha	Application Type Window		अल्फा
+Add…	FileTypes Window		जोड़ें...
+Signature:	Application Type Window		हस्ताक्षर:
+Quit, don't save	Application Type Window		छोड़ो, जमा मत करो
+Add…	Application Type Window		जोड़ें...
+[Multiple files] file types	FileType Window		फ़ाइल प्रकार [एकाधिक फाइलें]
+Information	Application Types Window		जानकारी
+Gamma	Application Types Window		गाम्मा
+Quit	FileTypes Window		छोडें
+Select preferred application	FileType Window		पसंदीदा आवेदन चुनें
+Single launch	Application Type Window		एकल प्रक्षेपण
+Golden master	Application Types Window		गोल्डन मास्टर
+%s file type	FileType Window		%s फ़ाइल प्रकार
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		अनुप्रयोग \"%s\" इस फ़ाइल प्रकार का समर्थन नहीं करता|\nक्या आप सुनिश्चित हैं कि आप इसे ही स्थापित करना चाहते हैं?
+Type:	Attribute Window		प्रकार:
+Removing uninstalled application types	Application Types Window		अनिन्स्तोल्ड आवेदन प्रकार को हटाएँ
+Done	Attribute Window		हो गया
+Set Preferred Application	Preferred App Menu		पसंदीदा आवेदन सेट करें
+no icon	FileTypes Window		कोई चिह्न नहीं
+Alpha	Application Types Window		अल्फा
+Version	Application Types Window		संस्करण
+Background app	Application Type Window		पृष्ठभूमि आवेदन
+Add new group	New File Type Window		नया समूह जोड़ें
+Move down	FileTypes Window		नीचे चलायें
+Cancel	Application Type Window		कैंसल
+Settings	FileTypes Window		सेटिंग्स
+New resource file…	FileTypes Window		नए संसाधन फ़ाइल...
+Cancel	New File Type Window		कैंसल
+Icon	FileTypes Window		चिह्न
+Extension:	Extension Window		विस्तार:
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		एक सुपर प्रकार हटाकर उसे वापस नहीं लाया जा सकता|\nसभी फ़ाइल प्रकार जो इस सुपर प्रकार के हैं विलुप्त हो जाएँगे!\n\nक्या आप सुनिश्चित हैं कि आप ऐसा करना चाहते हैं? पूरे समूह को हटाने के लिए, शिफ्ट कुंजी दबाएँ और \"निकालो\" बटन प्रेस करें|
+Internal name:	FileTypes Window		आंतरिक नाम:
+Add	Attribute Window		जोड़ें
+Close	Application Type Window		बंद करें
+File recognition	FileTypes Window		फ़ाइल मान्यता
+Remove uninstalled	Application Types Window		अनिन्स्तोल्ड को हटाएँ
+Center	Attribute Window	Attribute column alignment in Tracker	केंद्र
+Golden master	Application Type Window		गोल्डन गुरु
+Could not open \"%s\":\n%s	FileTypes		खोल नहीं सके \"%s\":\n%s
+Alignment:	Attribute Window		संरेखण:
+Left	Attribute Window	Attribute column alignment in Tracker	बाएं
+Cancel	Extension Window		रद्द
+Path:	Application Types Window		रास्ता:
+Application flags	Application Type Window		आवेदन झंडे
+Cancel	Type List Window		कैंसल
+Move up	FileTypes Window		ऊपर चलायें
+Description	FileTypes Window		विवरण
+Save request	Application Type Window		अनुरोध सहेजें
+Beta	Application Type Window		बीटा
+None	FileTypes Window		कोई नहीं
+Remove	FileTypes Window		हटायें
+Attribute name:	Attribute Window		गुण नाम:
+Extension	Extension Window		विस्तार
+Add type	New File Type Window		प्रकार जोड़ें
+Internal name:	Attribute Window		आंतरिक नाम:
+Show in Tracker…	Application Types Window		ट्रेकर में दिखाएँ ...
+Final	Application Type Window		अंतिम
+Width:	Attribute Window	Default column width in Tracker for this attribute.	चौड़ाई:
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	के रूप में प्रदर्शित
+This file type already exists	New File Type Window		यह फाइल पहले से ही प्रस्तुत है
+Same as…	FileTypes Window		के रूप में ही...
+Exclusive launch	Application Type Window		अनन्य शुभारंभ
+%ld Application type%s could be removed.	Application Types Window		%Id आवेदन के प्रकार%s हटाएँ जा सकते हैं.
+FileTypes	System name		फ़ाइल के प्रकार
+Application types	Application Types Window		आवेदन के प्रकार
+Could not remove file type: %s\n	FileTypes Window		फाइल टाइप को हटाया नही जा सकता: %s\n
+Signature:	Application Types Window		हस्ताखाषर:
+Gamma	Application Type Window		गामा
+Cancel	Preferred App Menu		कैंसल
+Cancel	FileTypes Window		कैंसल
+Select preferred application	FileTypes Window		चुना हुआ वरीय अनुप्रयोग
+Right	Attribute Window	Attribute column alignment in Tracker	राईट
+Default application	FileType Window		डिफ़ॉल्ट अनुप्रयोग
+Long description:	Application Type Window		लंबा विवरण:
+FileTypes request	FileTypes Window		फाइल टाइप अनुरोध
+Version info	Application Type Window		जानकारी के संस्करण
+(from super type)	FileTypes Window		(फ्रॉम सुपर टाइप)
+Version:	Application Types Window		संस्करण:
+Preferred application	FileTypes Window		वरीय अनुप्रयोग
+Short description:	Application Type Window		संक्षिप्त विवरण:
+File could not be opened	Preferred App Menu		फ़ाइल खोला नहीं जा सका
+Could not change file extensions	Extension Window		फ़ाइल खोला नहीं जा सका
+Edit icon…	Icon View		चिह्न संपादित करें ...
+Same as…	FileType Window	The same TYPE as ...	के जैसा...
+Save into resource file…	Application Type Window		संसाधन फ़ाइल में सहेजें ...
+Visible	Attribute Window		प्रकट
+Could not install file type	New File Type Window		फ़ाइल प्रकार स्थापित नहीं किया जा सका

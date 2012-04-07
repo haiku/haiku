@@ -1,0 +1,14 @@
+1	hindi	x-vnd.Haiku-ICOTranslator	3151213372
+Cursor	ICOTranslator		कर्सर 
+Version %d.%d.%d, %s	ConfigView		संस्करण %d.%d.%d, %s
+Windows %s %ld bit image	ICOTranslator		विंडोज़ %s %ld बिट चित्र
+Windows icon images	ConfigView		विंडोज़ आइकन चित्र 
+Valid icon sizes are 16, 32, or 48	ConfigView		मान्य आइकन आकार हैं 16, 32, या 48
+Enforce valid icon sizes	ConfigView		मान्य चिह्न आकार लागू
+ICO Settings	main		आईसीऔ सेत्तिंग्स
+Windows icon translator	ICOTranslator		विंडोज़ आइकन संवादक
+pixels in either direction.	ConfigView		पिक्सेल्स कोई भी दिशा में
+Write 32 bit images on true color input	ConfigView		32 बिट चित्र सही कलर इनपुट में लिखे 
+Icon	ICOTranslator		आइकन
+ICOTranslator Settings	ConfigView		आईसीऔ संवादक सेत्तिंग्स
+Windows icon images	ICOTranslator		विंडोज़ आइकन चित्र

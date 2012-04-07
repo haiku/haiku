@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Time	1859841283
+1	finnish	x-vnd.Haiku-Time	3249243267
 GMT (UNIX compatible)	Time		Greenwichin aika (UNIX-yhteensopiva)
 OK	Time		Valmis
 Asia	Time		Aasia
@@ -30,6 +30,7 @@ Time	System name		Aika-asetukset
 America	Time		Amerikka
 Reset	Time		Nollaa
 Synchronize at boot	Time		Synkronoi alkulatauksen yhteydessä
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date, tekijät:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Received invalid time	Time		Vastaanotettiin virheellinen aika
 Antarctica	Time		Etelänapamanner
 The following error occured while synchronizing:r\n%s: %s	Time		Seuraava virhe tapahtui synkronoinnin aikana:r\n%s: %s

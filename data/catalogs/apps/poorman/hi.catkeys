@@ -1,0 +1,60 @@
+1	hindi	x-vnd.Haiku-PoorMan	995747556
+Website location	PoorMan		वेबसाइट का स्थान
+Error Server	PoorMan		सर्वर त्रुटि
+Settings…	PoorMan		सेटिंग्स...
+Create PoorMan log	PoorMan		पुरमैन लॉग बनाएँ
+Shutting down.\n	PoorMan		शटिंग डाउन.\n
+Hits: %lu	PoorMan		हिट्स: %lu
+Web folder:	PoorMan		वेब फ़ोल्डर:
+Default	PoorMan		डिफ़ॉल्ट
+Save log console selection	PoorMan		लॉग कंसोल चयन सहेजें
+Run server	PoorMan		रन सर्वर
+PoorMan settings	PoorMan		पुरमैन सेटिंग्स
+Clear hit counter	PoorMan		स्पष्ट हिट काउंटर
+Copy	PoorMan		नक़ल करना
+Max. simultaneous connections:	PoorMan		मैक्स. युगपत कनेक्शन:
+Start page:	PoorMan		पृष्ठ को प्रारंभ करे:
+done.\n	PoorMan		हो गया है.\n
+Create	PoorMan		बनाएँ
+Shutting down.	PoorMan		शटिंग डाउन.
+Website options	PoorMan		वेबसाइट विकल्प
+File Name	PoorMan		फ़ाइल का नाम
+Clear console log	PoorMan		स्पष्ट कंसोल लॉग
+Advanced	PoorMan		विस्तृत
+OK	PoorMan		ठीक है
+Status: Stopped	PoorMan		स्थिति: बंद कर दिया
+Dir Created	PoorMan		दीर बनाया
+Quit	PoorMan		छोड़ना
+Hits: 0	PoorMan		हिट्स: शून्य
+Save log console	PoorMan		कंसोल लॉग सहेजें
+Edit	PoorMan		संपादित करें
+Directory: (none)	PoorMan		निर्देशिका: (कोई नहीं)
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		वेब पर प्रकाशित करने के लिए फ़ोल्डर चुनें.\n\nआप गरीब आदमी (PoorMan) से अपने घर के फ़ोल्डर में एक डिफ़ाल्ट \"public_html\" बना सकते हैं. या आप अपने खुद के फ़ोल्डर्स का चयन करें.
+Log To Console	PoorMan		कंसोल मे लॉग करें
+Status: Running	PoorMan		स्थिति: रनिंग
+connections	PoorMan		कनेक्शंस
+Controls	PoorMan		नियंत्रण
+Send file listing if there's no start page	PoorMan		फ़ाइल लिस्टिंग भेजें अगर कोई आरम्भ पृष्ठ नहीं है
+Error Dir	PoorMan		त्रुटि डाइरेक्टोरी
+Select all	PoorMan		सभी का चयन करें
+File	PoorMan		फ़ाइल
+Save console selections as…	PoorMan		चयन सहेजें...
+File logging	PoorMan		फ़ाइल लॉगिंग
+Select web folder	PoorMan		वेब फ़ोल्डर चुनें
+Logging view	PoorMan		लॉगिंग दृश्य
+Logging	PoorMan		लॉगिंग
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		एक डिफ़ॉल्ट वेब फ़ोल्डर बना दिया गया है \"/boot/home/public_html.\"\nसुनिश्चित करें कि उस फ़ोल्डर में \"index.html\" नाम की एक HTML फ़ाइल है.
+Clear log file	PoorMan		लॉग फाइल साफ़ करें
+Log file name:	PoorMan		लॉग फ़ाइल का नाम:
+Directory: 	PoorMan		निर्देशिका: 
+Log To File	PoorMan		फाइल मे लॉग करें
+Done	PoorMan		हो गया है
+Create log file	PoorMan		लॉग फ़ाइल बनाएँ
+Starting up... 	PoorMan		स्टार्टिंग अप... 
+Site	PoorMan		साइट
+Cancel	PoorMan		रद्द
+Cannot start the server	PoorMan		सर्वर शुरू नहीं किया जा सकता
+Select	PoorMan		चयन करें
+Save console as…	PoorMan		कंसोल को सहेजें...
+PoorMan	System name		पुरमैन
+Console Logging	PoorMan		कंसोल लॉगिंग

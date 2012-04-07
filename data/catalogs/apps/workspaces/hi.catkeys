@@ -1,0 +1,12 @@
+1	hindi	x-vnd.Be-WORK	932379173
+Invalid argument: %s\n	Workspaces		अवैध तर्क: %s\n
+Quit	Workspaces		छोड़ें
+Workspaces	System name		कार्यक्षेत्र
+Change workspace count…	Workspaces		कार्यक्षेत्र की गिनती बदलें
+About Workspaces…	Workspaces		कार्यक्षेत्र के बारे में...
+Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		कार्यक्षेत्र\n%1, और %2 द्वारा लिखित.\n\nकॉपीराइट %3, हाइकू.\n\nचुनाव चाबी द्वारा विंडोज़ पीछे भेजें. नियंत्रण चाबी द्वारा विंडोज़ को सामने लायें.\n
+Show window border	Workspaces		विंडो का बार्डर दिखाएँ
+Auto-raise	Workspaces		आपही-उठाना
+OK	Workspaces		ठीक है
+Always on top	Workspaces		हमेशा शीर्ष पर
+Show window tab	Workspaces		विंडो टेब दिखाएँ

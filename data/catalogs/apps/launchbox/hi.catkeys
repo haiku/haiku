@@ -1,0 +1,33 @@
+1	hindi	x-vnd.Haiku-LaunchBox	4192523522
+New	LaunchBox		नया
+Set description…	LaunchBox		विवरण सेट करें...
+Vertical layout	LaunchBox		अनुलंब लेआउट
+OK	LaunchBox		ठीक है
+Pad 1	LaunchBox		पेड़ 1
+last chance	LaunchBox		आखिरी मौका
+Quit	LaunchBox		छोड़ना
+Clear button	LaunchBox		क्लिअर बटन
+LaunchBox	System name		लॉन्चबॉक्स
+Ignore double-click	LaunchBox		डबल क्लिक नजरअंदाज करें
+Auto-raise	LaunchBox		ऑटो-रेज़
+Show on all workspaces	LaunchBox		सभी कार्यस्थान पर दिखाएँ
+Show window border	LaunchBox		दिखाएँ विंडो सीमा
+Pad	LaunchBox		पैड
+Icon size	LaunchBox		चिह्न का आकार
+Bummer	LaunchBox		बममर
+Cancel	LaunchBox		रद्द
+Remove button	LaunchBox		हटाने के लिए बटन
+Horizontal layout	LaunchBox		क्षैतिज लेआउट
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nहस्ताक्षर के साथ अप्प्लिकेशन को लॉन्च करने में असफल '%2'.\n\nत्रुटि:
+Failed to launch '%1'.\n\nError:	LaunchBox		चलने में असफल '%1'.\n\nत्रुटि:
+Name Panel	LaunchBox		नाम पैनल
+Add button here	LaunchBox		यहाँ बटन जोड़ें
+Description for '%3'	LaunchBox		डिस्क्रिप्शन के लिए '%3'
+Settings	LaunchBox		सेट्टिंग्स
+Pad %1	LaunchBox		पैड %1
+Close	LaunchBox		बंद
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		नजर रखने के लिए उपकरण (ट्रैकर) को 'फ़ोल्डर खोलें' आदेश भेजने में विफल.\n\nत्रुटि: 
+You can drag an icon here.	LaunchBox		आप प्रतीक यहां खींच सकते हैं.
+Clone	LaunchBox		क्लोन
+launch popup	LaunchBox		पॉपअप लांच
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		वास्तव में इस पैड को बंद करना है?\n(पैड याद नहीं रखा जाएगा.)

@@ -1,0 +1,10 @@
+1	hindi	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
+Kill application	Team monitor		Kill application
+Quit application	Team monitor		Quit application
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		क्लिक करें 'Kill application' and 'Quit application' पर, ऊपर की सूची से एक ऐप्प्लिकेशन चुनें और उसे बंद करने के लिए उपलब्ध बट्टनस दबाएँ.\n\nपकडें  CONTROL+ALT+DELETE के लिए %ld सेकंड रिबूट करने के लिए. 
+If the application will not quit you may have to kill it.	Team monitor		अगर अप्प्लिकेशन बंद नहीं होती है तोह आपको उससे मार न पड़ेगा.
+Force reboot	Team monitor		फोर्स रिबूट 
+Team monitor	Team monitor		टीम मोनिटर 
+(This team is a system component)	Team monitor		(यह टीम एक सिस्टम कॉम्पोनेन्ट है) 
+Restart the desktop	Team monitor		डेस्कटॉप को फिर से शुरू करें 
+Cancel	Team monitor		हटा दें 
