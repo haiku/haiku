@@ -5,8 +5,8 @@
  * Authors:
  * 		Aaron Hill <serac@hillvisions.com>
  */
-#ifndef _GLIFE_GLIFEGRID_HPP
-#define _GLIFE_GLIFEGRID_HPP
+#ifndef _GLIFE_GLIFEGRID_H
+#define _GLIFE_GLIFEGRID_H
 
 
 // GLifeGrid Class Declaration
@@ -29,4 +29,4 @@ public:
 	bool		Occupied( int32, int32 );
 };
 
-#endif /* _GLIFE_GLIFEGRID_HPP */
+#endif /* _GLIFE_GLIFEGRID_H */

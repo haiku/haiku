@@ -5,12 +5,12 @@
  * Authors:
  * 		Aaron Hill <serac@hillvisions.com>
  */
-#ifndef _GLIFE_GLIFEVIEW_HPP
-#define _GLIFE_GLIFEVIEW_HPP
+#ifndef _GLIFE_GLIFEVIEW_H
+#define _GLIFE_GLIFEVIEW_H
 
 
 #include <GLView.h>
-#include "GLifeState.hpp"
+#include "GLifeState.h"
 
 
 // GLifeView Class Declaration
@@ -33,4 +33,4 @@ private:
 			int32		m_iStep;
 };
 
-#endif /* _GLIFE_GLIFEVIEW_HPP */
+#endif /* _GLIFE_GLIFEVIEW_H */

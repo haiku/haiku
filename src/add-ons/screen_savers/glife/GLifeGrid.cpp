@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <SupportDefs.h>
 
-#include "GLifeGrid.hpp"
+#include "GLifeGrid.h"
 
 
 // ------------------------------------------------------

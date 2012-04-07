@@ -12,9 +12,9 @@
 #include <GL/glu.h>
 #include <GLView.h>
 
-#include "GLifeGrid.hpp"
-#include "GLifeState.hpp"
-#include "GLifeView.hpp"
+#include "GLifeGrid.h"
+#include "GLifeState.h"
+#include "GLifeView.h"
 
 
 // ------------------------------------------------------

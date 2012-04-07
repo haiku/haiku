@@ -5,8 +5,8 @@
  * Authors:
  * 		Aaron Hill <serac@hillvisions.com>
  */
-#ifndef _GLIFE_GLIFESAVER_HPP
-#define _GLIFE_GLIFESAVER_HPP
+#ifndef _GLIFE_GLIFESAVER_H
+#define _GLIFE_GLIFESAVER_H
 
 
 // Required Includes
@@ -45,4 +45,4 @@ public:
 };
 
 
-#endif /* _GLIFE_GLIFESAVER_HPP */
+#endif /* _GLIFE_GLIFESAVER_H */

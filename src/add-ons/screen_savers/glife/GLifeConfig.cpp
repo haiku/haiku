@@ -12,8 +12,8 @@
 #include <StringView.h>
 #include <View.h>
 
-#include "GLifeState.hpp"
-#include "GLifeConfig.hpp"
+#include "GLifeState.h"
+#include "GLifeConfig.h"
 
 
 // ------------------------------------------------------

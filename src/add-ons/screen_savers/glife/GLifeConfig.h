@@ -5,14 +5,14 @@
  * Authors:
  * 		Aaron Hill <serac@hillvisions.com>
  */
-#ifndef _GLIFE_GLIFECONFIG_HPP
-#define _GLIFE_GLIFECONFIG_HPP
+#ifndef _GLIFE_GLIFECONFIG_H
+#define _GLIFE_GLIFECONFIG_H
 
 
 #include <Slider.h>
 #include <View.h>
 
-#include "GLifeState.hpp"
+#include "GLifeState.h"
 
 
 // Message IDs
@@ -42,4 +42,4 @@ public:
 	void		MessageReceived( BMessage* );
 };
 
-#endif /* _GLIFE_GLIFECONFIG_HPP */
+#endif /* _GLIFE_GLIFECONFIG_H */

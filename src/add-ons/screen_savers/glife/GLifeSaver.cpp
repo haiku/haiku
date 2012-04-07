@@ -13,11 +13,11 @@
 #include <ScreenSaver.h>
 #include <View.h>
 
-#include "GLifeGrid.hpp"
-#include "GLifeState.hpp"
-#include "GLifeConfig.hpp"
-#include "GLifeView.hpp"
-#include "GLifeSaver.hpp"
+#include "GLifeGrid.h"
+#include "GLifeState.h"
+#include "GLifeConfig.h"
+#include "GLifeView.h"
+#include "GLifeSaver.h"
 
 // ------------------------------------------------------
 //  GLifeSaver Class Constructor Definition

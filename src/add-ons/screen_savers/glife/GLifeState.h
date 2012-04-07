@@ -5,8 +5,8 @@
  * Authors:
  * 		Aaron Hill <serac@hillvisions.com>
  */
-#ifndef _GLIFE_GLIFESTATE_HPP
-#define _GLIFE_GLIFESTATE_HPP
+#ifndef _GLIFE_GLIFESTATE_H
+#define _GLIFE_GLIFESTATE_H
 
 
 // Constants
@@ -60,4 +60,4 @@ public:
 };
 
 
-#endif /* _GLIFE_GLIFESTATE_HPP */
+#endif /* _GLIFE_GLIFESTATE_H */
