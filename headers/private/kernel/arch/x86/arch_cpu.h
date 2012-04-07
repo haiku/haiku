@@ -33,6 +33,9 @@
 #define IA32_MSR_MTRR_PHYSICAL_BASE_0	0x200
 #define IA32_MSR_MTRR_PHYSICAL_MASK_0	0x201
 
+// K8 MSR registers
+#define K8_MSR_IPM						0xc0010055
+
 // x86 features from cpuid eax 1, edx register
 // reference http://www.intel.com/assets/pdf/appnote/241618.pdf (Table 5-5)
 #define IA32_FEATURE_FPU	(1 << 0) // x87 fpu
