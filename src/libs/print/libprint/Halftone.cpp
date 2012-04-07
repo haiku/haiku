@@ -31,21 +31,21 @@ ToGray(ColorRGB32 c)
 static uint
 GetRedValue(ColorRGB32 c)
 {
-	return c.little.red;	
+	return c.little.red;
 }
 
 
 static uint
 GetGreenValue(ColorRGB32 c)
 {
-	return c.little.green;	
+	return c.little.green;
 }
 
 
 static uint
 GetBlueValue(ColorRGB32 c)
 {
-	return c.little.blue;	
+	return c.little.blue;
 }
 
 
@@ -56,11 +56,11 @@ Halftone::Halftone(color_space colorSpace, double gamma, double min,
 	fGray       = ToGray;
 	SetPlanes(kPlaneMonochrome1);
 	SetBlackValue(kHighValueMeansBlack);
-	
+
 	InitFloydSteinberg();
-	
+
 	CreateGammaTable(gamma, min);
-	
+
 	if (ditherType == kTypeFloydSteinberg) {
 		fDither = &Halftone::DitherFloydSteinberg;
 		return;
@@ -79,13 +79,13 @@ Halftone::Halftone(color_space colorSpace, double gamma, double min,
 	}
 
 	switch (colorSpace) {
-	case B_RGB32:
-	case B_RGB32_BIG:
-		fDither = &Halftone::DitherRGB32;
-		break;
-	default:
-		fDither = NULL;
-		break;
+		case B_RGB32:
+		case B_RGB32_BIG:
+			fDither = &Halftone::DitherRGB32;
+			break;
+		default:
+			fDither = &Halftone::DitherNone;
+			break;
 	}
 }
 
@@ -364,4 +364,3 @@ Halftone::DitherFloydSteinberg(uchar *destination, const uchar* source0,
 		*destination = ConvertUsingBlackValue(cur);
 	}
 }
-
