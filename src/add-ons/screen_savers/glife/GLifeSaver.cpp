@@ -94,8 +94,13 @@ void GLifeSaver::StopSaver( void )
 //  GLifeSaver Class DirectConnected Definition
 void GLifeSaver::DirectConnected( direct_buffer_info* pdbiInfo )
 {
-	m_pglvViewport->DirectConnected( pdbiInfo );
-	m_pglvViewport->EnableDirectMode( true );
+	// Enable or disable direct rendering
+	#if 1
+	if (m_pglvViewport != NULL) {
+		m_pglvViewport->DirectConnected( pdbiInfo );
+		m_pglvViewport->EnableDirectMode( true );
+	}
+	#endif
 }
 
 // ------------------------------------------------------
