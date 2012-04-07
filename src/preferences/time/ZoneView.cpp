@@ -19,6 +19,7 @@
 
 #include <map>
 #include <new>
+#include <vector>
 
 #include <AutoDeleter.h>
 #include <Button.h>
@@ -301,10 +302,6 @@ TimeZoneView::_BuildZoneMenu()
 	BLanguage language;
 	BLocale::Default()->GetLanguage(&language);
 
-	BMessage countryList;
-	BLocaleRoster::Default()->GetAvailableCountries(&countryList);
-	countryList.AddString("country", "");
-
 	/*
 	 * Group timezones by regions, but filter out unwanted (duplicate) regions
 	 * and add an additional region with generic GMT-offset timezones at the end
@@ -335,68 +332,71 @@ TimeZoneView::_BuildZoneMenu()
 		zoneItemMap[translatedRegion] = regionItem;
 	}
 
+	// Get all time zones
+	BMessage zoneList;
+	BLocaleRoster::Default()->GetAvailableTimeZonesWithRegionInfo(&zoneList);
+
+	typedef std::map<BString, std::vector<const char*> > ZonesByCountyMap;
+	ZonesByCountyMap zonesByCountryMap;
+	const char *zoneID;
 	BString countryCode;
-	for (int c = 0; countryList.FindString("country", c, &countryCode)
-			== B_OK; c++) {
-		BCountry country(countryCode);
+	for (int tz = 0; zoneList.FindString("timeZone", tz, &zoneID) == B_OK
+			&& zoneList.FindString("region", tz, &countryCode) == B_OK; tz++) {
+		// From the global ("001") timezones, we only accept the generic GMT
+		// timezones, as all the other world-zones are duplicates of others.
+		if (countryCode == "001" && strncmp(zoneID, "Etc/GMT", 7) != 0)
+			continue;
+		zonesByCountryMap[countryCode].push_back(zoneID);
+	}
+
+	ZonesByCountyMap::const_iterator countryIter = zonesByCountryMap.begin();
+	for (; countryIter != zonesByCountryMap.end(); ++countryIter) {
+		BCountry country(countryIter->first.String());
 		BString countryName;
 		country.GetName(countryName);
 
-		// Now list the timezones for this country
-		BMessage zoneList;
-		BLocaleRoster::Default()->GetAvailableTimeZonesForCountry(&zoneList,
-			countryCode.Length() == 0 ? NULL : countryCode.String());
-
-		int32 count = 0;
-		type_code dummy;
-		zoneList.GetInfo("timeZone", &dummy, &count);
-
-		BString zoneID;
-		for (int tz = 0; zoneList.FindString("timeZone", tz, &zoneID) == B_OK;
-			tz++) {
+		size_t zoneCountInCountry = countryIter->second.size();
+		for (size_t tz = 0; tz < zoneCountInCountry; tz++) {
+			BString zoneID(countryIter->second[tz]);
 			int32 slashPos = zoneID.FindFirst('/');
 
-			// ignore any "global" timezones, as those are just aliases of
-			// regional ones
-			if (slashPos <= 0)
-				continue;
-
 			BString region(zoneID, slashPos);
-
 			if (region == "Etc")
 				region = kOtherRegion;
-			else if (countryName.Length() == 0) {
-				// skip global timezones from other regions, we are just
-				// interested in the generic GMT-based ones under "Etc/"
-				continue;
-			}
 
 			// just accept timezones from our supported regions, others are
 			// aliases and would just make the list even longer
 			TranslatedRegionMap::iterator regionIter = regionMap.find(region);
 			if (regionIter == regionMap.end())
 				continue;
-			const BString& regionName = regionIter->second;
 
-			BString fullCountryID = regionName;
-			bool countryIsRegion = countryName == regionName;
+			BString fullCountryID = regionIter->second;
+			bool countryIsRegion
+				= countryName == regionIter->second || region == kOtherRegion;
 			if (!countryIsRegion)
 				fullCountryID << "/" << countryName;
 
 			BTimeZone* timeZone = new BTimeZone(zoneID, &language);
-			BString tzName = timeZone->Name();
-			if (tzName == "GMT+00:00")
-				tzName = "GMT";
-
-			int32 openParenthesisPos = tzName.FindFirst('(');
-			if (openParenthesisPos >= 0) {
-				tzName.Remove(0, openParenthesisPos + 1);
-				int32 closeParenthesisPos = tzName.FindLast(')');
-				if (closeParenthesisPos >= 0)
-					tzName.Truncate(closeParenthesisPos);
-			}
+			BString tzName;
 			BString fullZoneID = fullCountryID;
-			fullZoneID << "/" << tzName;
+			if (zoneCountInCountry > 1)
+			{
+				// we can't use the country name as timezone name, since there
+				// are more than one timezones in this country - fetch the
+				// localized name of the timezone and use that
+				tzName = timeZone->Name();
+				int32 openParenthesisPos = tzName.FindFirst('(');
+				if (openParenthesisPos >= 0) {
+					tzName.Remove(0, openParenthesisPos + 1);
+					int32 closeParenthesisPos = tzName.FindLast(')');
+					if (closeParenthesisPos >= 0)
+						tzName.Truncate(closeParenthesisPos);
+				}
+				fullZoneID << "/" << tzName;
+			} else {
+				tzName = countryName;
+				fullZoneID << "/" << zoneID;
+			}
 
 			// skip duplicates
 			ZoneItemMap::iterator zoneIter = zoneItemMap.find(fullZoneID);
@@ -407,7 +407,7 @@ TimeZoneView::_BuildZoneMenu()
 
 			TimeZoneListItem* countryItem = NULL;
 			TimeZoneListItem* zoneItem = NULL;
-			if (count > 1 && countryName.Length() > 0) {
+			if (zoneCountInCountry > 1) {
 				ZoneItemMap::iterator countryIter
 					= zoneItemMap.find(fullCountryID);
 				if (countryIter == zoneItemMap.end()) {
@@ -420,8 +420,7 @@ TimeZoneView::_BuildZoneMenu()
 				zoneItem = new TimeZoneListItem(tzName, NULL, timeZone);
 				zoneItem->SetOutlineLevel(countryIsRegion ? 1 : 2);
 			} else {
-				BString& name = countryName.Length() > 0 ? countryName : tzName;
-				zoneItem = new TimeZoneListItem(name, NULL, timeZone);
+				zoneItem = new TimeZoneListItem(tzName, NULL, timeZone);
 				zoneItem->SetOutlineLevel(1);
 			}
 			zoneItemMap[fullZoneID] = zoneItem;
@@ -431,7 +430,7 @@ TimeZoneView::_BuildZoneMenu()
 				if (countryItem != NULL)
 					countryItem->SetExpanded(true);
 				ZoneItemMap::iterator regionItemIter
-					= zoneItemMap.find(regionName);
+					= zoneItemMap.find(regionIter->second);
 				if (regionItemIter != zoneItemMap.end())
 					regionItemIter->second->SetExpanded(true);
 			}
