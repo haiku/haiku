@@ -42,4 +42,5 @@ public:
 	void		MessageReceived( BMessage* );
 };
 
+
 #endif /* _GLIFE_GLIFECONFIG_H */

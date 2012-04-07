@@ -7,13 +7,14 @@
  */
 
 
+#include "GLifeConfig.h"
+
 #include <stdio.h>
 #include <Slider.h>
 #include <StringView.h>
 #include <View.h>
 
 #include "GLifeState.h"
-#include "GLifeConfig.h"
 
 
 // ------------------------------------------------------

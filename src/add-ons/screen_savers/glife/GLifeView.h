@@ -33,4 +33,5 @@ private:
 			int32		m_iStep;
 };
 
+
 #endif /* _GLIFE_GLIFEVIEW_H */

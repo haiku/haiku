@@ -14,6 +14,7 @@ const int32 c_iDefGridWidth = 60;
 const int32 c_iDefGridHeight = 40;
 const int32 c_iDefBorder = 0;
 
+
 // GLifeState Class Declaration & Definition
 class GLifeState
 {

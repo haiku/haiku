@@ -4,6 +4,7 @@
  *
  * Authors:
  * 		Aaron Hill <serac@hillvisions.com>
+ *		Alexander von Gluck <kallisti5@unixzen.com>
  */
  
 

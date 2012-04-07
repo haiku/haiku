@@ -9,6 +9,9 @@
 #define _GLIFE_GLIFEGRID_H
 
 
+#include <OS.h>
+
+
 // GLifeGrid Class Declaration
 class GLifeGrid
 {
@@ -28,5 +31,6 @@ public:
 	// Accessor Methods
 	bool		Occupied( int32, int32 );
 };
+
 
 #endif /* _GLIFE_GLIFEGRID_H */

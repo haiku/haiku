@@ -7,11 +7,11 @@
  */
 
 
+#include "GLifeGrid.h"
+
 #include <math.h>
 #include <stdlib.h>
 #include <SupportDefs.h>
-
-#include "GLifeGrid.h"
 
 
 // ------------------------------------------------------
@@ -27,6 +27,7 @@ inline int32 GLifeGrid::Neighbors( int32 iRow, int32 iColumn )
 		   ( Occupied( iRow + 1, iColumn     ) ? 1 : 0 ) + 
 		   ( Occupied( iRow + 1, iColumn + 1 ) ? 1 : 0 );
 }
+
 
 // ------------------------------------------------------
 //  GLifeGrid Class Constructor Definition
@@ -46,12 +47,14 @@ GLifeGrid::GLifeGrid( int32 iWidth, int32 iHeight )
 	}
 }
 
+
 // ------------------------------------------------------
 //  GLifeGrid Class Destructor Definition
 GLifeGrid::~GLifeGrid( void )
 {
 	delete m_pbGrid;
 }
+
 
 // ------------------------------------------------------
 //  GLifeGrid Class Generation Definition
@@ -74,6 +77,7 @@ void GLifeGrid::Generation( void )
 	delete m_pbGrid;
 	m_pbGrid = pbTemp;
 }
+
 
 // ------------------------------------------------------
 //  GLifeGrid Class Occupied Definition

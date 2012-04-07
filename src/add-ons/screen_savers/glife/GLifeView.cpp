@@ -50,12 +50,14 @@ GLifeView::GLifeView(BRect rect, const char* name, ulong resizingMode,
 	UnlockGL();
 }
 
+
 // ------------------------------------------------------
 //  GLifeView Class Destructor Definition
 GLifeView::~GLifeView( void )
 {
 	delete m_pglgGrid;
 }
+
 
 // ------------------------------------------------------
 //  GLifeView Class AttachedToWindow Definition
@@ -65,6 +67,7 @@ void GLifeView::AttachedToWindow( void )
 	BGLView::AttachedToWindow();
 	UnlockGL();
 }
+
 
 // ------------------------------------------------------
 //  GLifeView Class Draw Definition
@@ -163,6 +166,7 @@ void GLifeView::Draw(BRect updateRect)
 	
 	glPopMatrix();
 }
+
 
 // ------------------------------------------------------
 //  GLifeView Class Advance Definition
