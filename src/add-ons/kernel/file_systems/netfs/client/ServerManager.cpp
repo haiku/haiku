@@ -303,28 +303,30 @@ ServerManager::_BroadcastListener()
 		ssize_t bytesRead = recvfrom(fBroadcastListenerSocket, &message,
 			sizeof(message), 0, (sockaddr*)&addr, &addrSize);
 		if (bytesRead < 0) {
-			PRINT(("ServerManager::_BroadcastListener(): recvfrom() failed: %s\n",
-				strerror(errno)));
+			PRINT("ServerManager::_BroadcastListener(): recvfrom() "
+				"failed: %s\n", strerror(errno));
 			continue;
 		}
 
 		// check message size, magic, and protocol version
 		if (bytesRead != sizeof(BroadcastMessage)) {
-			PRINT(("ServerManager::_BroadcastListener(): received %ld bytes, but "
-				"it should be %lu\n", bytesRead, sizeof(BroadcastMessage)));
+			PRINT("ServerManager::_BroadcastListener(): received "
+				"%ld bytes, but it should be %lu\n", bytesRead,
+				sizeof(BroadcastMessage));
 			continue;
 		}
 		if (message.magic != B_HOST_TO_BENDIAN_INT32(BROADCAST_MESSAGE_MAGIC)) {
-			PRINT(("ServerManager::_BroadcastListener(): message has bad "
-				"magic.\n"));
+			PRINT("ServerManager::_BroadcastListener(): message has"
+				" bad magic.\n");
 			continue;
 		}
 		if (message.protocolVersion
 			!= (int32)B_HOST_TO_BENDIAN_INT32(NETFS_PROTOCOL_VERSION)) {
-			PRINT(("ServerManager::_BroadcastListener(): protocol version "
-				"does not match: %lu vs. %d.\n",
-				B_BENDIAN_TO_HOST_INT32(message.protocolVersion),
-				NETFS_PROTOCOL_VERSION));
+			PRINT("ServerManager::_BroadcastListener(): protocol "
+				"version does not match: %lu vs. %d.\n",
+				B_BENDIAN_TO_HOST_INT32(
+					message.protocolVersion),
+				NETFS_PROTOCOL_VERSION);
 			continue;
 		}
 

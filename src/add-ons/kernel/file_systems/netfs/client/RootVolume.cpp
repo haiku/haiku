@@ -152,8 +152,8 @@ RootVolume::IOCtl(Node* node, void* cookie, int cmd, void* buffer,
 				|| serverNameLen == sizeof(params->serverName)) {
 				return B_BAD_VALUE;
 			}
-			PRINT(("RootVolume::IOCtl(): NET_FS_IOCTL_ADD_SERVER: `%s'\n",
-				params->serverName));
+			PRINT("RootVolume::IOCtl(): NET_FS_IOCTL_ADD_SERVER: "
+				"`%s'\n", params->serverName);
 
 			// get the server address
 			NetAddress netAddress;
@@ -178,8 +178,8 @@ RootVolume::IOCtl(Node* node, void* cookie, int cmd, void* buffer,
 				|| serverNameLen == sizeof(params->serverName)) {
 				return B_BAD_VALUE;
 			}
-			PRINT(("RootVolume::IOCtl(): NET_FS_IOCTL_REMOVE_SERVER: `%s'\n",
-				params->serverName));
+			PRINT("RootVolume::IOCtl(): NET_FS_IOCTL_REMOVE_SERVER:"
+				" `%s'\n", params->serverName);
 
 			// get the server volume
 			ServerVolume* serverVolume = _GetServerVolume(params->serverName);
@@ -193,7 +193,7 @@ RootVolume::IOCtl(Node* node, void* cookie, int cmd, void* buffer,
 			return B_OK;
 		}
 		default:
-			PRINT(("RootVolume::IOCtl(): unknown ioctl: %d\n", cmd));
+			PRINT("RootVolume::IOCtl(): unknown ioctl: %d\n", cmd);
 			return B_BAD_VALUE;
 			break;
 	}
@@ -207,12 +207,12 @@ RootVolume::IOCtl(Node* node, void* cookie, int cmd, void* buffer,
 void
 RootVolume::ServerAdded(ExtendedServerInfo* serverInfo)
 {
-PRINT(("RootVolume::ServerAdded(%s)\n", serverInfo->GetServerName()));
+	PRINT("RootVolume::ServerAdded(%s)\n", serverInfo->GetServerName());
 	// check, if the server does already exist
 	ServerVolume* serverVolume = _GetServerVolume(serverInfo->GetAddress());
 	if (serverVolume) {
-		WARN(("RootVolume::ServerAdded(): WARNING: ServerVolume does already "
-			"exist.\n"));
+		WARN("RootVolume::ServerAdded(): WARNING: ServerVolume does "
+			"already exist.\n");
 		serverVolume->PutVolume();
 		return;
 	}
@@ -258,7 +258,7 @@ void
 RootVolume::ServerUpdated(ExtendedServerInfo* oldInfo,
 	ExtendedServerInfo* newInfo)
 {
-PRINT(("RootVolume::ServerUpdated(%s)\n", newInfo->GetServerName()));
+	PRINT("RootVolume::ServerUpdated(%s)\n", newInfo->GetServerName());
 	// get the volume
 	ServerVolume* serverVolume = _GetServerVolume(newInfo->GetAddress());
 	if (!serverVolume)
@@ -273,7 +273,7 @@ PRINT(("RootVolume::ServerUpdated(%s)\n", newInfo->GetServerName()));
 void
 RootVolume::ServerRemoved(ExtendedServerInfo* serverInfo)
 {
-PRINT(("RootVolume::ServerRemoved(%s)\n", serverInfo->GetServerName()));
+	PRINT("RootVolume::ServerRemoved(%s)\n", serverInfo->GetServerName());
 	// get the volume
 	ServerVolume* serverVolume = _GetServerVolume(serverInfo->GetAddress());
 	if (!serverVolume)

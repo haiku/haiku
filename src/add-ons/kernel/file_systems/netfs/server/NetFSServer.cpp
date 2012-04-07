@@ -764,7 +764,7 @@ NetFSServer::_AddClientConnection(ClientConnection* clientConnection)
 void
 NetFSServer::ClientConnectionClosed(ClientConnection* connection, bool broken)
 {
-PRINT(("NetFSServer::ClientConnectionClosed(%d)\n", broken));
+	PRINT("NetFSServer::ClientConnectionClosed(%d)\n", broken);
 	if (!connection)
 		return;
 	AutoLocker<Locker> locker(fLock);

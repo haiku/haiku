@@ -161,7 +161,7 @@ RequestChannel::SendRequest(Request* request)
 {
 	if (!request)
 		RETURN_ERROR(B_BAD_VALUE);
-PRINT(("%p->RequestChannel::SendRequest(): request: %p, type: %s\n", this, request, typeid(*request).name()));
+	PRINT("%p->RequestChannel::SendRequest(): request: %p, type: %s\n", this, request, typeid(*request).name());
 
 	// get request size
 	int32 size;
@@ -245,7 +245,7 @@ RequestChannel::ReceiveRequest(Request** _request)
 
 	requestDeleter.Detach();
 	*_request = request;
-PRINT(("%p->RequestChannel::ReceiveRequest(): request: %p, type: %s\n", this, request, typeid(*request).name()));
+	PRINT("%p->RequestChannel::ReceiveRequest(): request: %p, type: %s\n", this, request, typeid(*request).name());
 	return B_OK;
 }
 

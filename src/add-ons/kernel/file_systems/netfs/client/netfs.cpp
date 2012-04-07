@@ -224,7 +224,7 @@ netfs_unmount(void *ns)
 {
 	VolumeManager* volumeManager = (VolumeManager*)ns;
 
-	PRINT(("netfs_unmount()\n"));
+	PRINT("netfs_unmount()\n");
 
 	volumeManager->UnmountRootVolume();
 	delete volumeManager;
@@ -233,7 +233,7 @@ netfs_unmount(void *ns)
 		ObjectTracker::ExitDefault();
 	#endif
 
-	PRINT(("netfs_unmount() done\n"));
+	PRINT("netfs_unmount() done\n");
 
 	exit_debugging();
 	return B_OK;
@@ -250,13 +250,13 @@ netfs_sync(void *ns)
 	Volume* volume = volumeManager->GetRootVolume();
 	VolumePutter _(volume);
 
-	PRINT(("netfs_sync(%p)\n", ns));
+	PRINT("netfs_sync(%p)\n", ns);
 
 	status_t error = B_BAD_VALUE;
 	if (volume)
 		error = volume->Sync();
 
-	PRINT(("netfs_sync() done: %lx \n", error));
+	PRINT("netfs_sync() done: %lx \n", error);
 
 	return error;
 }
@@ -272,13 +272,13 @@ netfs_read_fs_stat(void *ns, struct fs_info *info)
 	Volume* volume = volumeManager->GetRootVolume();
 	VolumePutter _(volume);
 
-	PRINT(("netfs_read_fs_stat(%p, %p)\n", ns, info));
+	PRINT("netfs_read_fs_stat(%p, %p)\n", ns, info);
 
 	status_t error = B_BAD_VALUE;
 	if (volume)
 		error = volume->ReadFSStat(info);
 
-	PRINT(("netfs_read_fs_stat() done: %lx \n", error));
+	PRINT("netfs_read_fs_stat() done: %lx \n", error);
 
 	return error;
 }
@@ -294,13 +294,13 @@ netfs_write_fs_stat(void *ns, struct fs_info *info, long mask)
 	Volume* volume = volumeManager->GetRootVolume();
 	VolumePutter _(volume);
 
-	PRINT(("netfs_write_fs_stat(%p, %p, %ld)\n", ns, info, mask));
+	PRINT("netfs_write_fs_stat(%p, %p, %ld)\n", ns, info, mask);
 
 	status_t error = B_BAD_VALUE;
 	if (volume)
 		error = volume->WriteFSStat(info, mask);
 
-	PRINT(("netfs_write_fs_stat() done: %lx \n", error));
+	PRINT("netfs_write_fs_stat() done: %lx \n", error);
 
 	return error;
 }
@@ -319,13 +319,13 @@ netfs_read_vnode(void *ns, vnode_id vnid, char reenter, void **node)
 	Volume* volume = volumeManager->GetVolume(vnid);
 	VolumePutter _(volume);
 
-	PRINT(("netfs_read_vnode(%p, %Ld, %d, %p)\n", ns, vnid, reenter, node));
+	PRINT("netfs_read_vnode(%p, %Ld, %d, %p)\n", ns, vnid, reenter, node);
 
 	status_t error = B_BAD_VALUE;
 	if (volume)
 		error = volume->ReadVNode(vnid, reenter, (Node**)node);
 
-	PRINT(("netfs_read_vnode() done: (%lx, %p)\n", error, *node));
+	PRINT("netfs_read_vnode() done: (%lx, %p)\n", error, *node);
 
 	return error;
 }
@@ -371,9 +371,9 @@ int
 netfs_fsync(void *ns, void *_node)
 {
 	Node* node = (Node*)_node;
-	PRINT(("netfs_fsync(%p, %p)\n", ns, node));
+	PRINT("netfs_fsync(%p, %p)\n", ns, node);
 	status_t error = node->GetVolume()->FSync(node);
-	PRINT(("netfs_fsync() done: %lx\n", error));
+	PRINT("netfs_fsync() done: %lx\n", error);
 	return error;
 }
 
@@ -385,9 +385,9 @@ int
 netfs_read_stat(void *ns, void *_node, struct stat *st)
 {
 	Node* node = (Node*)_node;
-	PRINT(("netfs_read_stat(%p, %p, %p)\n", ns, node, st));
+	PRINT("netfs_read_stat(%p, %p, %p)\n", ns, node, st);
 	status_t error = node->GetVolume()->ReadStat(node, st);
-	PRINT(("netfs_read_stat() done: %lx\n", error));
+	PRINT("netfs_read_stat() done: %lx\n", error);
 	return error;
 }
 
@@ -397,9 +397,9 @@ int
 netfs_write_stat(void *ns, void *_node, struct stat *st, long mask)
 {
 	Node* node = (Node*)_node;
-	PRINT(("netfs_write_stat(%p, %p, %p, %ld)\n", ns, node, st, mask));
+	PRINT("netfs_write_stat(%p, %p, %p, %ld)\n", ns, node, st, mask);
 	status_t error = node->GetVolume()->WriteStat(node, st, mask);
-	PRINT(("netfs_write_stat() done: %lx\n", error));
+	PRINT("netfs_write_stat() done: %lx\n", error);
 	return error;
 }
 
@@ -409,9 +409,9 @@ int
 netfs_access(void *ns, void *_node, int mode)
 {
 	Node* node = (Node*)_node;
-	PRINT(("netfs_access(%p, %p, %d)\n", ns, node, mode));
+	PRINT("netfs_access(%p, %p, %d)\n", ns, node, mode);
 	status_t error = node->GetVolume()->Access(node, mode);
-	PRINT(("netfs_access() done: %lx\n", error));
+	PRINT("netfs_access() done: %lx\n", error);
 	return error;
 }
 
@@ -425,12 +425,12 @@ netfs_create(void *ns, void *_dir, const char *name, int openMode, int mode,
 	vnode_id *vnid, void **cookie)
 {
 	Node* dir = (Node*)_dir;
-	PRINT(("netfs_create(%p, %p, `%s', %d, %d, %p, %p)\n", ns, dir,
-		name, openMode, mode, vnid, cookie));
+	PRINT("netfs_create(%p, %p, `%s', %d, %d, %p, %p)\n", ns, dir,
+		name, openMode, mode, vnid, cookie);
 	status_t error = dir->GetVolume()->Create(dir, name, openMode, mode, vnid,
 		cookie);
-	PRINT(("netfs_create() done: (%lx, %Ld, %p)\n", error, *vnid,
-		*cookie));
+	PRINT("netfs_create() done: (%lx, %Ld, %p)\n", error, *vnid,
+		*cookie);
 	return error;
 }
 
@@ -440,9 +440,9 @@ int
 netfs_open(void *ns, void *_node, int openMode, void **cookie)
 {
 	Node* node = (Node*)_node;
-	PRINT(("netfs_open(%p, %p, %d)\n", ns, node, openMode));
+	PRINT("netfs_open(%p, %p, %d)\n", ns, node, openMode);
 	status_t error = node->GetVolume()->Open(node, openMode, cookie);
-	PRINT(("netfs_open() done: (%lx, %p)\n", error, *cookie));
+	PRINT("netfs_open() done: (%lx, %p)\n", error, *cookie);
 	return error;
 }
 
@@ -452,9 +452,9 @@ int
 netfs_close(void *ns, void *_node, void *cookie)
 {
 	Node* node = (Node*)_node;
-	PRINT(("netfs_close(%p, %p, %p)\n", ns, node, cookie));
+	PRINT("netfs_close(%p, %p, %p)\n", ns, node, cookie);
 	status_t error = node->GetVolume()->Close(node, cookie);
-	PRINT(("netfs_close() done: %lx\n", error));
+	PRINT("netfs_close() done: %lx\n", error);
 	return error;
 }
 
@@ -464,9 +464,9 @@ int
 netfs_free_cookie(void *ns, void *_node, void *cookie)
 {
 	Node* node = (Node*)_node;
-	PRINT(("netfs_free_cookie(%p, %p, %p)\n", ns, node, cookie));
+	PRINT("netfs_free_cookie(%p, %p, %p)\n", ns, node, cookie);
 	status_t error = node->GetVolume()->FreeCookie(node, cookie);
-	PRINT(("netfs_free_cookie() done: %lx\n", error));
+	PRINT("netfs_free_cookie() done: %lx\n", error);
 	return error;
 }
 
@@ -477,11 +477,11 @@ netfs_read(void *ns, void *_node, void *cookie, off_t pos, void *buffer,
 	size_t *bufferSize)
 {
 	Node* node = (Node*)_node;
-	PRINT(("netfs_read(%p, %p, %p, %Ld, %p, %lu)\n", ns, node, cookie, pos,
-		buffer, *bufferSize));
+	PRINT("netfs_read(%p, %p, %p, %Ld, %p, %lu)\n", ns, node, cookie, pos,
+		buffer, *bufferSize);
 	status_t error = node->GetVolume()->Read(node, cookie, pos, buffer,
 		*bufferSize, bufferSize);
-	PRINT(("netfs_read() done: (%lx, %lu)\n", error, *bufferSize));
+	PRINT("netfs_read() done: (%lx, %lu)\n", error, *bufferSize);
 	return error;
 }
 
@@ -492,11 +492,11 @@ netfs_write(void *ns, void *_node, void *cookie, off_t pos,
 	const void *buffer, size_t *bufferSize)
 {
 	Node* node = (Node*)_node;
-	PRINT(("netfs_write(%p, %p, %p, %Ld, %p, %lu)\n", ns, node, cookie, pos,
-		buffer, *bufferSize));
+	PRINT("netfs_write(%p, %p, %p, %Ld, %p, %lu)\n", ns, node, cookie, pos,
+		buffer, *bufferSize);
 	status_t error = node->GetVolume()->Write(node, cookie, pos, buffer,
 		*bufferSize, bufferSize);
-	PRINT(("netfs_write() done: (%lx, %lu)\n", error, *bufferSize));
+	PRINT("netfs_write() done: (%lx, %lu)\n", error, *bufferSize);
 	return error;
 }
 
@@ -507,11 +507,11 @@ netfs_ioctl(void *ns, void *_node, void *cookie, int cmd, void *buffer,
 	size_t bufferSize)
 {
 	Node* node = (Node*)_node;
-	PRINT(("netfs_ioctl(%p, %p, %p, %d, %p, %lu)\n", ns, node, cookie, cmd,
-		buffer, bufferSize));
+	PRINT("netfs_ioctl(%p, %p, %p, %d, %p, %lu)\n", ns, node, cookie, cmd,
+		buffer, bufferSize);
 	status_t error = node->GetVolume()->IOCtl(node, cookie, cmd, buffer,
 		bufferSize);
-	PRINT(("netfs_ioctl() done: (%lx)\n", error));
+	PRINT("netfs_ioctl() done: (%lx)\n", error);
 	return error;
 }
 
@@ -537,9 +537,9 @@ netfs_link(void *ns, void *_dir, const char *name, void *_node)
 {
 	Node* dir = (Node*)_dir;
 	Node* node = (Node*)_node;
-	PRINT(("netfs_link(%p, %p, `%s', %p)\n", ns, dir, name, node));
+	PRINT("netfs_link(%p, %p, `%s', %p)\n", ns, dir, name, node);
 	status_t error = dir->GetVolume()->Link(dir, name, node);
-	PRINT(("netfs_link() done: (%lx)\n", error));
+	PRINT("netfs_link() done: (%lx)\n", error);
 	return error;
 }
 
@@ -549,9 +549,9 @@ int
 netfs_unlink(void *ns, void *_dir, const char *name)
 {
 	Node* dir = (Node*)_dir;
-	PRINT(("netfs_unlink(%p, %p, `%s')\n", ns, dir, name));
+	PRINT("netfs_unlink(%p, %p, `%s')\n", ns, dir, name);
 	status_t error = dir->GetVolume()->Unlink(dir, name);
-	PRINT(("netfs_unlink() done: (%lx)\n", error));
+	PRINT("netfs_unlink() done: (%lx)\n", error);
 	return error;
 }
 
@@ -561,9 +561,9 @@ int
 netfs_symlink(void *ns, void *_dir, const char *name, const char *path)
 {
 	Node* dir = (Node*)_dir;
-	PRINT(("netfs_symlink(%p, %p, `%s', `%s')\n", ns, dir, name, path));
+	PRINT("netfs_symlink(%p, %p, `%s', `%s')\n", ns, dir, name, path);
 	status_t error = dir->GetVolume()->Symlink(dir, name, path);
-	PRINT(("netfs_symlink() done: (%lx)\n", error));
+	PRINT("netfs_symlink() done: (%lx)\n", error);
 	return error;
 }
 
@@ -573,11 +573,11 @@ int
 netfs_read_link(void *ns, void *_node, char *buffer, size_t *bufferSize)
 {
 	Node* node = (Node*)_node;
-	PRINT(("netfs_read_link(%p, %p, %p, %lu)\n", ns, node, buffer,
-		*bufferSize));
+	PRINT("netfs_read_link(%p, %p, %p, %lu)\n", ns, node, buffer,
+		*bufferSize);
 	status_t error = node->GetVolume()->ReadLink(node, buffer, *bufferSize,
 		bufferSize);
-	PRINT(("netfs_read_link() done: (%lx, %lu)\n", error, *bufferSize));
+	PRINT("netfs_read_link() done: (%lx, %lu)\n", error, *bufferSize);
 	return error;
 }
 
@@ -589,11 +589,11 @@ netfs_rename(void *ns, void *_oldDir, const char *oldName, void *_newDir,
 {
 	Node* oldDir = (Node*)_oldDir;
 	Node* newDir = (Node*)_newDir;
-	PRINT(("netfs_rename(%p, %p, `%s', %p, `%s')\n", ns, oldDir, oldName,
-		newDir, newName));
+	PRINT("netfs_rename(%p, %p, `%s', %p, `%s')\n", ns, oldDir, oldName,
+		newDir, newName);
 	status_t error = oldDir->GetVolume()->Rename(oldDir, oldName,
 		newDir, newName);
-	PRINT(("netfs_rename() done: (%lx)\n", error));
+	PRINT("netfs_rename() done: (%lx)\n", error);
 	return error;
 }
 
@@ -606,9 +606,9 @@ int
 netfs_mkdir(void *ns, void *_dir, const char *name, int mode)
 {
 	Node* dir = (Node*)_dir;
-	PRINT(("netfs_mkdir(%p, %p, `%s', %d)\n", ns, dir, name, mode));
+	PRINT("netfs_mkdir(%p, %p, `%s', %d)\n", ns, dir, name, mode);
 	status_t error = dir->GetVolume()->MkDir(dir, name, mode);
-	PRINT(("netfs_mkdir() done: (%lx)\n", error));
+	PRINT("netfs_mkdir() done: (%lx)\n", error);
 	return error;
 }
 
@@ -618,9 +618,9 @@ int
 netfs_rmdir(void *ns, void *_dir, const char *name)
 {
 	Node* dir = (Node*)_dir;
-	PRINT(("netfs_rmdir(%p, %p, `%s')\n", ns, dir, name));
+	PRINT("netfs_rmdir(%p, %p, `%s')\n", ns, dir, name);
 	status_t error = dir->GetVolume()->RmDir(dir, name);
-	PRINT(("netfs_rmdir() done: (%lx)\n", error));
+	PRINT("netfs_rmdir() done: (%lx)\n", error);
 	return error;
 }
 
@@ -630,9 +630,9 @@ int
 netfs_open_dir(void *ns, void *_node, void **cookie)
 {
 	Node* node = (Node*)_node;
-	PRINT(("netfs_open_dir(%p, %p)\n", ns, node));
+	PRINT("netfs_open_dir(%p, %p)\n", ns, node);
 	status_t error = node->GetVolume()->OpenDir(node, cookie);
-	PRINT(("netfs_open_dir() done: (%lx, %p)\n", error, *cookie));
+	PRINT("netfs_open_dir() done: (%lx, %p)\n", error, *cookie);
 	return error;
 }
 
@@ -642,9 +642,9 @@ int
 netfs_close_dir(void *ns, void *_node, void *cookie)
 {
 	Node* node = (Node*)_node;
-	PRINT(("netfs_close_dir(%p, %p, %p)\n", ns, node, cookie));
+	PRINT("netfs_close_dir(%p, %p, %p)\n", ns, node, cookie);
 	status_t error = node->GetVolume()->CloseDir(node, cookie);
-	PRINT(("netfs_close_dir() done: %lx\n", error));
+	PRINT("netfs_close_dir() done: %lx\n", error);
 	return error;
 }
 
@@ -654,9 +654,9 @@ int
 netfs_free_dir_cookie(void *ns, void *_node, void *cookie)
 {
 	Node* node = (Node*)_node;
-	PRINT(("netfs_free_dir_cookie(%p, %p, %p)\n", ns, node, cookie));
+	PRINT("netfs_free_dir_cookie(%p, %p, %p)\n", ns, node, cookie);
 	status_t error = node->GetVolume()->FreeDirCookie(node, cookie);
-	PRINT(("netfs_free_dir_cookie() done: %lx \n", error));
+	PRINT("netfs_free_dir_cookie() done: %lx \n", error);
 	return error;
 }
 
@@ -667,11 +667,11 @@ netfs_read_dir(void *ns, void *_node, void *cookie, long *count,
 	struct dirent *buffer, size_t bufferSize)
 {
 	Node* node = (Node*)_node;
-	PRINT(("netfs_read_dir(%p, %p, %p, %ld, %p, %lu)\n", ns, node, cookie,
-		*count, buffer, bufferSize));
+	PRINT("netfs_read_dir(%p, %p, %p, %ld, %p, %lu)\n", ns, node, cookie,
+		*count, buffer, bufferSize);
 	status_t error = node->GetVolume()->ReadDir(node, cookie, buffer,
 		bufferSize, *count, count);
-	PRINT(("netfs_read_dir() done: (%lx, %ld)\n", error, *count));
+	PRINT("netfs_read_dir() done: (%lx, %ld)\n", error, *count);
 	#if DEBUG
 		dirent* entry = buffer;
 		for (int32 i = 0; i < *count; i++) {
@@ -681,10 +681,10 @@ netfs_read_dir(void *ns, void *_node, void *cookie, long *count,
 			int nameLen = strnlen(entry->d_name, B_FILE_NAME_LENGTH - 1);
 			strncpy(name, entry->d_name, nameLen);
 			name[nameLen] = '\0';
-			PRINT(("  entry: d_dev: %ld, d_pdev: %ld, d_ino: %Ld, d_pino: %Ld, "
-				"d_reclen: %hu, d_name: `%s'\n",
-				entry->d_dev, entry->d_pdev, entry->d_ino, entry->d_pino,
-				entry->d_reclen, name));
+			PRINT("  entry: d_dev: %ld, d_pdev: %ld, d_ino: %Ld,"
+				" d_pino: %Ld, d_reclen: %hu, d_name: `%s'\n",
+				entry->d_dev, entry->d_pdev, entry->d_ino,
+				entry->d_pino, entry->d_reclen, name);
 			entry = (dirent*)((char*)entry + entry->d_reclen);
 		}
 	#endif
@@ -698,9 +698,9 @@ int
 netfs_rewind_dir(void *ns, void *_node, void *cookie)
 {
 	Node* node = (Node*)_node;
-	PRINT(("netfs_rewind_dir(%p, %p, %p)\n", ns, node, cookie));
+	PRINT("netfs_rewind_dir(%p, %p, %p)\n", ns, node, cookie);
 	status_t error = node->GetVolume()->RewindDir(node, cookie);
-	PRINT(("netfs_rewind_dir() done: %lx\n", error));
+	PRINT("netfs_rewind_dir() done: %lx\n", error);
 	return error;
 }
 
@@ -711,11 +711,11 @@ netfs_walk(void *ns, void *_dir, const char *entryName,
 	char **resolvedPath, vnode_id *vnid)
 {
 	Node* dir = (Node*)_dir;
-	PRINT(("netfs_walk(%p, %p, `%s', %p, %p)\n", ns, dir,
-		entryName, resolvedPath, vnid));
+	PRINT("netfs_walk(%p, %p, `%s', %p, %p)\n", ns, dir,
+		entryName, resolvedPath, vnid);
 	status_t error = dir->GetVolume()->Walk(dir, entryName, resolvedPath, vnid);
-	PRINT(("netfs_walk() done: (%lx, `%s', %Ld)\n", error,
-		(resolvedPath ? *resolvedPath : NULL), *vnid));
+	PRINT("netfs_walk() done: (%lx, `%s', %Ld)\n", error,
+		(resolvedPath ? *resolvedPath : NULL), *vnid);
 	return error;
 }
 
@@ -728,9 +728,9 @@ int
 netfs_open_attrdir(void *ns, void *_node, void **cookie)
 {
 	Node* node = (Node*)_node;
-	PRINT(("netfs_open_attrdir(%p, %p)\n", ns, node));
+	PRINT("netfs_open_attrdir(%p, %p)\n", ns, node);
 	status_t error = node->GetVolume()->OpenAttrDir(node, cookie);
-	PRINT(("netfs_open_attrdir() done: (%lx, %p)\n", error, *cookie));
+	PRINT("netfs_open_attrdir() done: (%lx, %p)\n", error, *cookie);
 	return error;
 }
 
@@ -740,9 +740,9 @@ int
 netfs_close_attrdir(void *ns, void *_node, void *cookie)
 {
 	Node* node = (Node*)_node;
-	PRINT(("netfs_close_attrdir(%p, %p, %p)\n", ns, node, cookie));
+	PRINT("netfs_close_attrdir(%p, %p, %p)\n", ns, node, cookie);
 	status_t error = node->GetVolume()->CloseAttrDir(node, cookie);
-	PRINT(("netfs_close_attrdir() done: (%lx)\n", error));
+	PRINT("netfs_close_attrdir() done: (%lx)\n", error);
 	return error;
 }
 
@@ -752,9 +752,9 @@ int
 netfs_free_attrdir_cookie(void *ns, void *_node, void *cookie)
 {
 	Node* node = (Node*)_node;
-	PRINT(("netfs_free_attrdir_cookie(%p, %p, %p)\n", ns, node, cookie));
+	PRINT("netfs_free_attrdir_cookie(%p, %p, %p)\n", ns, node, cookie);
 	status_t error = node->GetVolume()->FreeAttrDirCookie(node, cookie);
-	PRINT(("netfs_free_attrdir_cookie() done: (%lx)\n", error));
+	PRINT("netfs_free_attrdir_cookie() done: (%lx)\n", error);
 	return error;
 }
 
@@ -765,11 +765,11 @@ netfs_read_attrdir(void *ns, void *_node, void *cookie, long *count,
 	struct dirent *buffer, size_t bufferSize)
 {
 	Node* node = (Node*)_node;
-	PRINT(("netfs_read_attrdir(%p, %p, %p, %ld, %p, %lu)\n", ns, node,
-		cookie, *count, buffer, bufferSize));
+	PRINT("netfs_read_attrdir(%p, %p, %p, %ld, %p, %lu)\n", ns, node,
+		cookie, *count, buffer, bufferSize);
 	status_t error = node->GetVolume()->ReadAttrDir(node, cookie, buffer,
 		bufferSize, *count, count);
-	PRINT(("netfs_read_attrdir() done: (%lx, %ld)\n", error, *count));
+	PRINT("netfs_read_attrdir() done: (%lx, %ld)\n", error, *count);
 	return error;
 }
 
@@ -779,9 +779,9 @@ int
 netfs_rewind_attrdir(void *ns, void *_node, void *cookie)
 {
 	Node* node = (Node*)_node;
-	PRINT(("netfs_rewind_attrdir(%p, %p, %p)\n", ns, node, cookie));
+	PRINT("netfs_rewind_attrdir(%p, %p, %p)\n", ns, node, cookie);
 	status_t error = node->GetVolume()->RewindAttrDir(node, cookie);
-	PRINT(("netfs_rewind_attrdir() done: (%lx)\n", error));
+	PRINT("netfs_rewind_attrdir() done: (%lx)\n", error);
 	return error;
 }
 
@@ -792,11 +792,11 @@ netfs_read_attr(void *ns, void *_node, const char *name, int type,
 	void *buffer, size_t *bufferSize, off_t pos)
 {
 	Node* node = (Node*)_node;
-	PRINT(("netfs_read_attr(%p, %p, `%s', %d, %p, %lu, %Ld)\n", ns, node,
-		name, type, buffer, *bufferSize, pos));
+	PRINT("netfs_read_attr(%p, %p, `%s', %d, %p, %lu, %Ld)\n", ns, node,
+		name, type, buffer, *bufferSize, pos);
 	status_t error = node->GetVolume()->ReadAttr(node, name, type, pos, buffer,
 		*bufferSize, bufferSize);
-	PRINT(("netfs_read_attr() done: (%lx, %ld)\n", error, *bufferSize));
+	PRINT("netfs_read_attr() done: (%lx, %ld)\n", error, *bufferSize);
 	return error;
 }
 
@@ -807,11 +807,11 @@ netfs_write_attr(void *ns, void *_node, const char *name, int type,
 	const void *buffer, size_t *bufferSize, off_t pos)
 {
 	Node* node = (Node*)_node;
-	PRINT(("netfs_write_attr(%p, %p, `%s', %d, %p, %lu, %Ld)\n", ns, node,
-		name, type, buffer, *bufferSize, pos));
+	PRINT("netfs_write_attr(%p, %p, `%s', %d, %p, %lu, %Ld)\n", ns, node,
+		name, type, buffer, *bufferSize, pos);
 	status_t error = node->GetVolume()->WriteAttr(node, name, type, pos, buffer,
 		*bufferSize, bufferSize);
-	PRINT(("netfs_write_attr() done: (%lx, %ld)\n", error, *bufferSize));
+	PRINT("netfs_write_attr() done: (%lx, %ld)\n", error, *bufferSize);
 	return error;
 }
 
@@ -821,9 +821,9 @@ int
 netfs_remove_attr(void *ns, void *_node, const char *name)
 {
 	Node* node = (Node*)_node;
-	PRINT(("netfs_remove_attr(%p, %p, `%s')\n", ns, node, name));
+	PRINT("netfs_remove_attr(%p, %p, `%s')\n", ns, node, name);
 	status_t error = node->GetVolume()->RemoveAttr(node, name);
-	PRINT(("netfs_remove_attr() done: (%lx)\n", error));
+	PRINT("netfs_remove_attr() done: (%lx)\n", error);
 	return error;
 }
 
@@ -834,10 +834,10 @@ netfs_rename_attr(void *ns, void *_node, const char *oldName,
 	const char *newName)
 {
 	Node* node = (Node*)_node;
-	PRINT(("netfs_rename_attr(%p, %p, `%s', `%s')\n", ns, node, oldName,
-		newName));
+	PRINT("netfs_rename_attr(%p, %p, `%s', `%s')\n", ns, node, oldName,
+		newName);
 	status_t error = node->GetVolume()->RenameAttr(node, oldName, newName);
-	PRINT(("netfs_rename_attr() done: (%lx)\n", error));
+	PRINT("netfs_rename_attr() done: (%lx)\n", error);
 	return error;
 }
 
@@ -848,10 +848,10 @@ netfs_stat_attr(void *ns, void *_node, const char *name,
 	struct attr_info *attrInfo)
 {
 	Node* node = (Node*)_node;
-	PRINT(("netfs_stat_attr(%p, %p, `%s', %p)\n", ns, node, name,
-		attrInfo));
+	PRINT("netfs_stat_attr(%p, %p, `%s', %p)\n", ns, node, name,
+		attrInfo);
 	status_t error = node->GetVolume()->StatAttr(node, name, attrInfo);
-	PRINT(("netfs_stat_attr() done: (%lx)\n", error));
+	PRINT("netfs_stat_attr() done: (%lx)\n", error);
 	return error;
 }
 
@@ -868,8 +868,8 @@ netfs_open_query(void *ns, const char *queryString, ulong flags,
 	Volume* volume = volumeManager->GetRootVolume();
 	VolumePutter _(volume);
 
-	PRINT(("netfs_open_query(%p, `%s', %lu, %ld, %ld, %p)\n", ns,
-		queryString, flags, port, token, cookie));
+	PRINT("netfs_open_query(%p, `%s', %lu, %ld, %ld, %p)\n", ns,
+		queryString, flags, port, token, cookie);
 
 	status_t error = B_BAD_VALUE;
 	if (volume) {
@@ -877,7 +877,7 @@ netfs_open_query(void *ns, const char *queryString, ulong flags,
 			(QueryIterator**)cookie);
 	}
 
-	PRINT(("netfs_open_query() done: (%lx, %p)\n", error, *cookie));
+	PRINT("netfs_open_query() done: (%lx, %p)\n", error, *cookie);
 	return error;
 }
 
@@ -886,12 +886,12 @@ static
 int
 netfs_close_query(void *ns, void *cookie)
 {
-	PRINT(("netfs_close_query(%p, %p)\n", ns, cookie));
+	PRINT("netfs_close_query(%p, %p)\n", ns, cookie);
 
 	status_t error = B_OK;
 	// no-op: we don't use this hook
 
-	PRINT(("netfs_close_query() done: (%lx)\n", error));
+	PRINT("netfs_close_query() done: (%lx)\n", error);
 	return error;
 }
 
@@ -903,12 +903,12 @@ netfs_free_query_cookie(void *ns, void *node, void *cookie)
 	VolumeManager* volumeManager = (VolumeManager*)ns;
 	QueryIterator* iterator = (QueryIterator*)cookie;
 
-	PRINT(("netfs_free_query_cookie(%p, %p)\n", ns, cookie));
+	PRINT("netfs_free_query_cookie(%p, %p)\n", ns, cookie);
 
 	status_t error = B_OK;
 	volumeManager->GetQueryManager()->PutIterator(iterator);
 
-	PRINT(("netfs_free_query_cookie() done: (%lx)\n", error));
+	PRINT("netfs_free_query_cookie() done: (%lx)\n", error);
 	return error;
 }
 
@@ -923,8 +923,8 @@ netfs_read_query(void *ns, void *cookie, long *count,
 	QueryIterator* iterator = (QueryIterator*)cookie;
 	VolumePutter _(volume);
 
-	PRINT(("netfs_read_query(%p, %p, %ld, %p, %lu)\n", ns, cookie,
-		*count, buffer, bufferSize));
+	PRINT("netfs_read_query(%p, %p, %ld, %p, %lu)\n", ns, cookie,
+		*count, buffer, bufferSize);
 
 	status_t error = B_BAD_VALUE;
 	if (volume) {
@@ -932,7 +932,7 @@ netfs_read_query(void *ns, void *cookie, long *count,
 		*count, count);
 	}
 
-	PRINT(("netfs_read_query() done: (%lx, %ld)\n", error, *count));
+	PRINT("netfs_read_query() done: (%lx, %ld)\n", error, *count);
 	return error;
 }
 

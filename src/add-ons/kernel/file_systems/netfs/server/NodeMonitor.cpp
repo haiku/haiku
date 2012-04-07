@@ -102,8 +102,8 @@ NodeMonitor::StartWatching(const node_ref& ref)
 			error = watch_node(&ref, flags, this);
 	}
 if (error == B_OK) {
-PRINT(("NodeMonitor: started watching node: (%ld, %lld)\n", ref.device,
-ref.node));
+	PRINT("NodeMonitor: started watching node: (%ld, %lld)\n", ref.device,
+		ref.node);
 }
 	return error;
 }
@@ -112,8 +112,8 @@ ref.node));
 status_t
 NodeMonitor::StopWatching(const node_ref& ref)
 {
-PRINT(("NodeMonitor: stopped watching node: (%ld, %lld)\n", ref.device,
-ref.node));
+	PRINT("NodeMonitor: stopped watching node: (%ld, %lld)\n", ref.device,
+		ref.node);
 	return watch_node(&ref, B_STOP_WATCHING, this);
 }
 

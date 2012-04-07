@@ -719,8 +719,8 @@ VolumeManager::LoadEntry(dev_t volumeID, ino_t directoryID, const char* name,
 	Entry* entry = GetEntry(volumeID, directoryID, name);
 	if (!entry) {
 		// entry not known yet: create it
-PRINT(("VolumeManager::LoadEntry(%ld, %lld, `%s')\n", volumeID, directoryID,
-name));
+		PRINT("VolumeManager::LoadEntry(%ld, %lld, `%s')\n", volumeID,
+			directoryID, name);
 
 		// get the volume
 		Volume* volume = GetVolume(volumeID, true);
@@ -791,7 +791,8 @@ VolumeManager::OpenQuery(QueryDomain* queryDomain, const char* queryString,
 	if (!queryDomain || !queryString || !handle)
 		return B_BAD_VALUE;
 	bool liveQuery = (flags & B_LIVE_QUERY);
-PRINT(("VolumeManager::OpenQuery(%p, \"%s\", 0x%lx, %ld, %ld)\n", queryDomain, queryString, flags, remotePort, remoteToken));
+	PRINT("VolumeManager::OpenQuery(%p, \"%s\", 0x%lx, %ld, %ld)\n",
+		queryDomain, queryString, flags, remotePort, remoteToken);
 
 	// allocate the handle
 	QueryHandle* queryHandle = new(std::nothrow) QueryHandle(remotePort,
@@ -826,7 +827,8 @@ PRINT(("VolumeManager::OpenQuery(%p, \"%s\", 0x%lx, %ld, %ld)\n", queryDomain, q
 		// branches of the FS tree and don't have common nodes.
 		if (!queryDomain->QueryDomainIntersectsWith(volume))
 			continue;
-PRINT(("VolumeManager::OpenQuery(): adding Query for volume %ld\n", volume->GetID()));
+		PRINT("VolumeManager::OpenQuery(): adding Query for volume %ld"
+			"\n", volume->GetID());
 
 		// create the query for this volume
 		BVolume bVolume(volume->GetID());
@@ -1708,8 +1710,8 @@ VolumeManager::_CheckVolumeRootMoved(EntryMovedEvent* event)
 		event->nodeID = st.st_ino;
 		if (Volume* volume = GetVolume(st.st_dev)) {
 			if (volume->GetRootID() == st.st_ino) {
-				PRINT(("Mount point for volume %ld renamed\n",
-					volume->GetID()));
+				PRINT("Mount point for volume %ld renamed\n",
+					volume->GetID());
 			}
 		}
 	}

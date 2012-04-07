@@ -353,7 +353,7 @@ PRINT(("ShareVolume::PrepareToUnmount()\n"));
 	int32 count = fNodes->Size();
 	if (count == 0)
 		return;
-PRINT(("  %ld nodes to remove\n", count));
+	PRINT("  %ld nodes to remove\n", count);
 	vnode_id* ids = new(std::nothrow) vnode_id[count];
 	if (!ids) {
 		ERROR("ShareVolume::PrepareToUnmount(): ERROR: Insufficient memory to "
@@ -395,7 +395,7 @@ PRINT(("  %ld nodes to remove\n", count));
 	for (int32 i = 0; i < count; i++) {
 		Node* node;
 		if (GetVNode(ids[i], &node) == B_OK) {
-PRINT(("  removing node %lld\n", ids[i]));
+			PRINT("  removing node %lld\n", ids[i]);
 			Volume::RemoveVNode(ids[i]);
 			PutVNode(ids[i]);
 		}
@@ -1166,8 +1166,9 @@ ShareVolume::OpenDir(Node* _node, void** _cookie)
 	ObjectDeleter<Request> replyDeleter(reply);
 	if (reply->error != B_OK)
 {
-PRINT(("OpenDir() failed: node: %lld, remote: (%ld, %lld)\n",
-node->GetID(), node->GetRemoteID().volumeID, node->GetRemoteID().nodeID));
+		PRINT("OpenDir() failed: node: %lld, remote: (%ld, %lld)\n",
+			node->GetID(), node->GetRemoteID().volumeID,
+			node->GetRemoteID().nodeID);
 		RETURN_ERROR(reply->error);
 }
 
@@ -2017,10 +2018,10 @@ ShareVolume::GetQueryEntry(const EntryInfo& entryInfo,
 	buffer->d_ino = localNodeID;
 
 	*countRead = 1;
-PRINT(("  entry: d_dev: %ld, d_pdev: %ld, d_ino: %Ld, d_pino: %Ld, "
-"d_reclen: %hu, d_name: `%s'\n",
-buffer->d_dev, buffer->d_pdev, buffer->d_ino, buffer->d_pino,
-buffer->d_reclen, buffer->d_name));
+	PRINT("  entry: d_dev: %ld, d_pdev: %ld, d_ino: %Ld, d_pino: %Ld, "
+		"d_reclen: %hu, d_name: `%s'\n", buffer->d_dev, buffer->d_pdev,
+		buffer->d_ino, buffer->d_pino, buffer->d_reclen,
+		buffer->d_name);
 	return B_OK;
 }
 
@@ -2171,7 +2172,12 @@ ShareVolume::_HandleEntryCreatedRequest(EntryCreatedRequest* request)
 	status_t error = _GetLocalNodeID(request->directoryID, &vnida, true);
 	if (error == B_OK)
 		error = _GetLocalNodeID(request->nodeID, &vnidc, true);
-PRINT(("ShareVolume::_HandleEntryCreatedRequest(): error: 0x%lx, name: \"%s\", dir: %lld (remote: (%ld, %lld)), node: %lld (remote: (%ld, %lld))\n", error, name, vnida, request->directoryID.volumeID, request->directoryID.nodeID, vnidc, request->nodeID.volumeID, request->nodeID.nodeID));
+		PRINT("ShareVolume::_HandleEntryCreatedRequest(): error: 0x%lx,"
+			" name: \"%s\", dir: %lld (remote: (%ld, %lld)), node:"
+			" %lld (remote: (%ld, %lld))\n", error, name, vnida,
+			request->directoryID.volumeID,
+			request->directoryID.nodeID, vnidc,
+			request->nodeID.volumeID, request->nodeID.nodeID);
 
 	// send notifications / do additional processing
 	if (request->queryUpdate) {
@@ -2363,8 +2369,9 @@ ShareVolume::_GetLocalNodeID(NodeID remoteID, ino_t* _localID, bool enter)
 		fVolumeManager->RemoveNodeID(localID);
 		return error;
 	}
-PRINT(("ShareVolume(%ld): added node ID mapping: local: %lld -> "
-"remote: (%ld, %lld)\n", fID, localID, remoteID.volumeID, remoteID.nodeID));
+	PRINT("ShareVolume(%ld): added node ID mapping: local: %lld -> "
+		"remote: (%ld, %lld)\n", fID, localID, remoteID.volumeID,
+		remoteID.nodeID);
 
 	*_localID = localID;
 	return B_OK;
@@ -2396,7 +2403,8 @@ ShareVolume::_RemoveLocalNodeID(ino_t localID)
 
 	// remove from ID maps
 	NodeID remoteID = fRemoteNodeIDs->Get(localID);
-PRINT(("ShareVolume::_RemoveLocalNodeID(%lld): remote: (%ld, %lld)\n", localID, remoteID.volumeID, remoteID.nodeID));
+	PRINT("ShareVolume::_RemoveLocalNodeID(%lld): remote: (%ld, %lld)\n",
+		localID, remoteID.volumeID, remoteID.nodeID);
 	fRemoteNodeIDs->Remove(localID);
 	fLocalNodeIDs->Remove(remoteID);
 
@@ -2463,9 +2471,10 @@ ShareVolume::_LoadNode(const NodeInfo& nodeInfo, ShareNode** _node)
 			delete node;
 			return error;
 		}
-PRINT(("ShareVolume: added node: %lld: remote: (%ld, %lld), localID: %lld\n",
-node->GetID(), node->GetRemoteID().volumeID, node->GetRemoteID().nodeID,
-localID));
+		PRINT("ShareVolume: added node: %lld: remote: (%ld, %lld),"
+			" localID: %lld\n", node->GetID(),
+			node->GetRemoteID().volumeID,
+			node->GetRemoteID().nodeID, localID);
 	}
 
 	if (_node)
@@ -3023,7 +3032,7 @@ ShareVolume::_MountShare()
 	// get the share name
 	const char* share = shareInfo->GetShareName();
 
-PRINT(("ShareVolume::_MountShare(%s, %s)\n", server, share));
+	PRINT("ShareVolume::_MountShare(%s, %s)\n", server, share);
 	// init a connection to the authentication server
 	AuthenticationServer authenticationServer;
 	error = authenticationServer.InitCheck();
@@ -3094,7 +3103,10 @@ PRINT(("ShareVolume::_MountShare(%s, %s)\n", server, share));
 		fLocalNodeIDs->Remove(fRootNode->GetRemoteID());
 		RETURN_ERROR(error);
 	}
-PRINT(("ShareVolume::_MountShare(): root node: local: %lld, remote: (%ld, %lld)\n", fRootNode->GetID(), fRootNode->GetRemoteID().volumeID, fRootNode->GetRemoteID().nodeID));
+	PRINT("ShareVolume::_MountShare(): root node: local: %lld, remote: "
+		"(%ld, %lld)\n", fRootNode->GetID(),
+		fRootNode->GetRemoteID().volumeID,
+		fRootNode->GetRemoteID().nodeID);
 
 	// Add ourselves to the server connection, so that we can receive
 	// node monitoring events. There a race condition: We might already

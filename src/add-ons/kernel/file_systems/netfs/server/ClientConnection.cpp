@@ -1612,8 +1612,8 @@ ClientConnection::VisitOpenDirRequest(OpenDirRequest* request)
 	}
 else {
 if (directory)
-PRINT(("OpenDir() failed: client volume: %ld, node: (%ld, %lld)\n",
-volume->GetID(), directory->GetVolumeID(), directory->GetID()));
+PRINT("OpenDir() failed: client volume: %ld, node: (%ld, %lld)\n",
+volume->GetID(), directory->GetVolumeID(), directory->GetID());
 }
 
 	managerLocker.Unlock();
@@ -1679,7 +1679,7 @@ ClientConnection::VisitReadDirRequest(ReadDirRequest* request)
 	}
 
 if (result == B_OK) {
-PRINT(("ReadDir: (%ld, %lld)\n", request->volumeID, directory->GetID()));
+	PRINT("ReadDir: (%ld, %lld)\n", request->volumeID, directory->GetID());
 }
 
 	// rewind, if requested
@@ -1713,9 +1713,9 @@ PRINT(("ReadDir: (%ld, %lld)\n", request->volumeID, directory->GetID()));
 //reply.entryInfo.directoryID,
 //reply.entryInfo.nodeID, reply.entryInfo.name.GetString()));
 if (directory) {
-PRINT(("ReadDir done: volume: %ld, (%ld, %lld) -> (%lx, %ld)\n",
+PRINT("ReadDir done: volume: %ld, (%ld, %lld) -> (%lx, %ld)\n",
 volume->GetID(), directory->GetVolumeID(), directory->GetID(), result,
-reply.entryInfos.CountElements()));
+reply.entryInfos.CountElements());
 }
 
 	managerLocker.Unlock();
@@ -1789,10 +1789,11 @@ ClientConnection::VisitWalkRequest(WalkRequest* request)
 
 	// send the reply
 	reply.error = result;
-PRINT(("Walk: (%ld, %lld, `%s') -> (%lx, (%ld, %lld), `%s')\n",
-request->nodeID.volumeID, request->nodeID.nodeID, request->name.GetString(),
-result, reply.entryInfo.nodeInfo.st.st_dev, reply.entryInfo.nodeInfo.st.st_ino,
-reply.linkPath.GetString()));
+	PRINT("Walk: (%ld, %lld, `%s') -> (%lx, (%ld, %lld), `%s')\n",
+		request->nodeID.volumeID, request->nodeID.nodeID,
+		request->name.GetString(), result,
+		reply.entryInfo.nodeInfo.st.st_dev,
+		reply.entryInfo.nodeInfo.st.st_ino, reply.linkPath.GetString());
 	return GetChannel()->SendRequest(&reply);
 }
 
@@ -1854,9 +1855,9 @@ ClientConnection::VisitMultiWalkRequest(MultiWalkRequest* request)
 
 	// send the reply
 	reply.error = result;
-PRINT(("MultiWalk: (%ld, %lld, %ld) -> (%lx, %ld)\n",
-request->nodeID.volumeID, request->nodeID.nodeID, count,
-result, reply.entryInfos.CountElements()));
+	PRINT("MultiWalk: (%ld, %lld, %ld) -> (%lx, %ld)\n",
+		request->nodeID.volumeID, request->nodeID.nodeID, count,
+		result, reply.entryInfos.CountElements());
 	return GetChannel()->SendRequest(&reply);
 }
 
@@ -2434,7 +2435,8 @@ ClientConnection::VisitReadQueryRequest(ReadQueryRequest* request)
 			break;
 		if (countRead == 0)
 			break;
-PRINT(("  query entry: %ld, %lld, \"%s\"\n", dirEntry->d_pdev, dirEntry->d_pino, dirEntry->d_name));
+		PRINT("  query entry: %ld, %lld, \"%s\"\n",
+			dirEntry->d_pdev, dirEntry->d_pino, dirEntry->d_name);
 
 		VolumeManagerLocker managerLocker;
 		VolumeManager* volumeManager = VolumeManager::GetDefault();
@@ -2473,10 +2475,13 @@ PRINT(("  -> no client volumes\n"));
 	// send the reply
 	reply.error = result;
 	reply.count = countRead;
-PRINT(("ReadQuery: (%lx, %ld, dir: (%ld, %lld), node: (%ld, %lld, `%s')\n",
-reply.error, reply.count, reply.entryInfo.directoryID.volumeID,
-reply.entryInfo.directoryID.nodeID, reply.entryInfo.nodeInfo.st.st_dev,
-reply.entryInfo.nodeInfo.st.st_ino, reply.entryInfo.name.GetString()));
+	PRINT("ReadQuery: (%lx, %ld, dir: (%ld, %lld), node: (%ld, %lld, `%s')"
+		"\n", reply.error, reply.count,
+		reply.entryInfo.directoryID.volumeID,
+		reply.entryInfo.directoryID.nodeID,
+		reply.entryInfo.nodeInfo.st.st_dev,
+		reply.entryInfo.nodeInfo.st.st_ino,
+		reply.entryInfo.name.GetString());
 	return GetChannel()->SendRequest(&reply);
 }
 
@@ -2570,7 +2575,9 @@ ClientConnection::ProcessQueryEvent(NodeMonitoringEvent* event)
 			event->opcode);
 		return;
 	}
-PRINT(("ClientConnection::ProcessQueryEvent(): event: %p, type: %s: directory: (%ld, %lld)\n", event, typeid(event).name(), volumeID, directoryID));
+	PRINT("ClientConnection::ProcessQueryEvent(): event: %p, type: %s:"
+		" directory: (%ld, %lld)\n", event, typeid(event).name(),
+		volumeID, directoryID);
 
 	// create an array for the IDs of the client volumes a found entry may
 	// reside on

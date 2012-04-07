@@ -77,7 +77,7 @@ ServerVolume::SetServerInfo(ExtendedServerInfo* serverInfo)
 		fLock.Unlock();
 
 		if (remove) {
-			PRINT(("  removing share: %s\n", name));
+			PRINT("  removing share: %s\n", name);
 			if (Volume* volume = GetChildVolume(name)) {
 				volume->SetUnmounting(true);
 				volume->PutVolume();
@@ -101,7 +101,8 @@ ServerVolume::SetServerInfo(ExtendedServerInfo* serverInfo)
 		if (volume) {
 			volume->PutVolume();
 		} else {
-			PRINT(("  adding share: %s\n", shareInfo->GetShareName()));
+			PRINT("  adding share: %s\n",
+				shareInfo->GetShareName());
 			status_t error = _AddShare(shareInfo);
 			if (error != B_OK) {
 				ERROR("ServerVolume::SetServerInfo(): ERROR: Failed to add "

@@ -333,8 +333,8 @@ VolumeManager::PutVolume(Volume* volume)
 	{
 		AutoLocker<Locker> locker(this);
 		if (volume->ReleaseReference() && volume->IsRemoved()) {
-PRINT(("VolumeManager::PutVolume(%p): Removed volume unreferenced. "
-"Unmounting...\n", volume));
+			PRINT("VolumeManager::PutVolume(%p): Removed volume "
+				"unreferenced. Unmounting...\n", volume);
 			// remove from volume set -- now noone can get a reference to it
 			// anymore
 			fVolumes->Remove(volume);
