@@ -19,7 +19,7 @@
 
 // ------------------------------------------------------
 //  GLifeView Class Constructor Definition
-GLifeView::GLifeView(BRect rect, char* name, ulong resizingMode,
+GLifeView::GLifeView(BRect rect, const char* name, ulong resizingMode,
 	ulong options, GLifeState* pglsState)
 	:
 	BGLView(rect, name, resizingMode, 0, options),

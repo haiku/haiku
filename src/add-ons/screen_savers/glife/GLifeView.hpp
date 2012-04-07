@@ -17,7 +17,7 @@
 class GLifeView : public BGLView {
 public:
 	// Constructor & Destructor
-						GLifeView( BRect, char*, ulong, ulong, GLifeState* );
+						GLifeView( BRect, const char*, ulong, ulong, GLifeState* );
 						~GLifeView( void );
 				
 	// Public Methods
