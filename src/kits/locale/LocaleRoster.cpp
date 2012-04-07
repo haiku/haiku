@@ -280,6 +280,47 @@ BLocaleRoster::GetAvailableTimeZones(BMessage* timeZones) const
 
 
 status_t
+BLocaleRoster::GetAvailableTimeZonesWithRegionInfo(BMessage* timeZones) const
+{
+	if (!timeZones)
+		return B_BAD_VALUE;
+
+	status_t status = B_OK;
+
+	UErrorCode icuStatus = U_ZERO_ERROR;
+
+	StringEnumeration* zoneList = TimeZone::createTimeZoneIDEnumeration(
+		UCAL_ZONE_TYPE_CANONICAL, NULL, NULL, icuStatus);
+
+	int32 count = zoneList->count(icuStatus);
+	if (U_SUCCESS(icuStatus)) {
+		for (int i = 0; i < count; ++i) {
+			const char* zoneID = zoneList->next(NULL, icuStatus);
+			if (zoneID == NULL || !U_SUCCESS(icuStatus)) {
+				status = B_ERROR;
+				break;
+			}
+			timeZones->AddString("timeZone", zoneID);
+
+			char region[5];
+			icuStatus = U_ZERO_ERROR;
+			TimeZone::getRegion(zoneID, region, 5, icuStatus);
+			if (!U_SUCCESS(icuStatus)) {
+				status = B_ERROR;
+				break;
+			}
+			timeZones->AddString("region", region);
+		}
+	} else
+		status = B_ERROR;
+
+	delete zoneList;
+
+	return status;
+}
+
+
+status_t
 BLocaleRoster::GetAvailableTimeZonesForCountry(BMessage* timeZones,
 	const char* countryCode) const
 {

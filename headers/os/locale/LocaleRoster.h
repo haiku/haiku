@@ -45,6 +45,8 @@ public:
 									BMessage* timeZones) const;
 			status_t			GetAvailableTimeZones(
 									BMessage* timeZones) const;
+			status_t			GetAvailableTimeZonesWithRegionInfo(
+									BMessage* timeZonesWithRegonInfo) const;
 			status_t			GetAvailableTimeZonesForCountry(
 									BMessage* message,
 									const char* countryCode) const;
