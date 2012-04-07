@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src add-ons screen_savers ;
 SubInclude HAIKU_TOP src add-ons screen_savers butterfly ;
 SubInclude HAIKU_TOP src add-ons screen_savers debugnow ;
 SubInclude HAIKU_TOP src add-ons screen_savers flurry ;
-#SubInclude HAIKU_TOP src add-ons screen_savers glife ;
+SubInclude HAIKU_TOP src add-ons screen_savers glife ;
 SubInclude HAIKU_TOP src add-ons screen_savers haiku ;
 SubInclude HAIKU_TOP src add-ons screen_savers icons ;
 SubInclude HAIKU_TOP src add-ons screen_savers ifs ;
