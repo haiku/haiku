@@ -37,14 +37,14 @@ GLifeSaver::GLifeSaver( BMessage* pbmPrefs, image_id iidImage )
 //  GLifeSaver Class SaveState Definition
 status_t GLifeSaver::SaveState( BMessage* pbmPrefs ) const
 {
-	return m_glsState.SaveState( pbmPrefs );
+	return fGLifeState.SaveState( pbmPrefs );
 }
 
 // ------------------------------------------------------
 //  GLifeSaver Class RestoreState Definition
 void GLifeSaver::RestoreState( BMessage* pbmPrefs )
 {
-	m_glsState.RestoreState( pbmPrefs );
+	fGLifeState.RestoreState( pbmPrefs );
 }
 
 // ------------------------------------------------------
@@ -53,7 +53,8 @@ void GLifeSaver::StartConfig( BView* pbvView )
 {
 	// Setup the "config" class
 	GLifeConfig* pglcConfig = new GLifeConfig( pbvView->Bounds(),
-											   &m_glsState );
+		&fGLifeState );
+
 	pbvView->AddChild( pglcConfig );
 }
 
@@ -64,19 +65,19 @@ status_t GLifeSaver::StartSaver( BView* pbvView, bool bPreview )
 	if ( bPreview )
 	{
 		// We do not use the preview option
-		m_pglvViewport = 0;
+		fGLifeViewport = 0;
 		return B_ERROR;
 	}
 	else
 	{
 		SetTickSize( c_iTickSize );
 		
-		m_pglvViewport = new GLifeView( pbvView->Bounds(),
+		fGLifeViewport = new GLifeView( pbvView->Bounds(),
 										"GLifeView",
 										B_FOLLOW_NONE,
 										BGL_RGB | BGL_DEPTH | BGL_DOUBLE,
-										&m_glsState );
-		pbvView->AddChild( m_pglvViewport );
+										&fGLifeState );
+		pbvView->AddChild(fGLifeViewport);
 		
 		return B_OK;
 	}
@@ -86,8 +87,8 @@ status_t GLifeSaver::StartSaver( BView* pbvView, bool bPreview )
 //  GLifeSaver Class StopSaver Definition
 void GLifeSaver::StopSaver( void )
 {
-	if ( m_pglvViewport )
-		m_pglvViewport->EnableDirectMode( false );
+	if (fGLifeViewport != NULL)
+		gGLifeViewport->EnableDirectMode( false );
 }
 
 // ------------------------------------------------------
@@ -96,9 +97,9 @@ void GLifeSaver::DirectConnected( direct_buffer_info* pdbiInfo )
 {
 	// Enable or disable direct rendering
 	#if 1
-	if (m_pglvViewport != NULL) {
-		m_pglvViewport->DirectConnected( pdbiInfo );
-		m_pglvViewport->EnableDirectMode( true );
+	if (fGLifeViewport != NULL) {
+		fGLifeViewport->DirectConnected( pdbiInfo );
+		fGLifeViewport->EnableDirectMode( true );
 	}
 	#endif
 }
@@ -107,7 +108,7 @@ void GLifeSaver::DirectConnected( direct_buffer_info* pdbiInfo )
 //  GLifeSaver Class DirectDraw Definition
 void GLifeSaver::DirectDraw( int32 iFrame )
 {
-	m_pglvViewport->Advance();
+	fGLifeViewport->Advance();
 }
 
 // ------------------------------------------------------

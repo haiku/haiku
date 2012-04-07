@@ -21,11 +21,6 @@ const int32 c_iTickSize = 50000;
 // GLifeSaver Class Declaration
 class GLifeSaver : public BScreenSaver
 {
-private:
-	GLifeState	m_glsState;
-
-	GLifeView*	m_pglvViewport;
-
 public:
 	// Constructor
 				GLifeSaver( BMessage*, image_id );
@@ -42,6 +37,10 @@ public:
 	// Graphics Methods
 	void		DirectConnected( direct_buffer_info* );
 	void		DirectDraw( int32 );
+
+private:
+	GLifeState	fGLifeState;
+	GLifeView*	fGLifeViewPort;
 };
 
 
