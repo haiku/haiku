@@ -264,13 +264,17 @@ status_t
 RequestAllocator::AllocateData(Address& address, const void* data, int32 size,
 	int32 align, bool deferredInit)
 {
-	void* destination;
-	status_t error = AllocateAddress(address, size, align, &destination,
-		deferredInit);
-	if (error != B_OK)
-		return error;
-	if (size > 0)
-		memcpy(destination, data, size);
+	status_t error = B_OK;
+	if (data != NULL) {
+		void* destination;
+		error = AllocateAddress(address, size, align, &destination,
+			deferredInit);
+		if (error != B_OK)
+			return error;
+		if (size > 0)
+			memcpy(destination, data, size);
+	} else
+		address.SetTo(-1, 0, 0);
 	return error;
 }
 
