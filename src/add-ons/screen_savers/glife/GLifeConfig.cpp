@@ -37,35 +37,45 @@ GLifeConfig::GLifeConfig(BRect frame, GLifeState* pglsState)
 		"by Aaron Hill", B_FOLLOW_LEFT);
 
 	// Sliders
+	fGridDelay = new BSlider(frame, "GridDelay",
+		"Grid Life Delay: ",
+		new BMessage(kGridDelay),
+		0, 4, B_BLOCK_THUMB);
+
+	fGridDelay->SetHashMarks(B_HASH_MARKS_BOTTOM);
+	fGridDelay->SetLimitLabels("None", "4x");
+	fGridDelay->SetValue(pglsState->GridDelay());
+	fGridDelay->SetHashMarkCount(5);
+
+	fGridBorder = new BSlider(frame, "GridBorder",
+		"Grid Border: ",
+		new BMessage(kGridBorder),
+		0, 10, B_BLOCK_THUMB);
+
+	fGridBorder->SetHashMarks(B_HASH_MARKS_BOTTOM);
+	fGridBorder->SetLimitLabels("0", "10");
+	fGridBorder->SetValue(pglsState->GridBorder());
+	fGridBorder->SetHashMarkCount(11);
+
 	fGridWidth = new BSlider(frame, "GridWidth",
-		"Width of Grid: ",
-		new BMessage(e_midGridWidth),
+		"Grid Width: ",
+		new BMessage(kGridWidth),
 		10, 100, B_BLOCK_THUMB);
 
 	fGridWidth->SetHashMarks(B_HASH_MARKS_BOTTOM);
-	fGridWidth->SetLimitLabels("10", "100");
+	//fGridWidth->SetLimitLabels("10", "100");
 	fGridWidth->SetValue(pglsState->GridWidth());
 	fGridWidth->SetHashMarkCount(10);
 
 	fGridHeight = new BSlider(frame, "GridHeight",
-		"Height of Grid: ",
-		new BMessage(e_midGridHeight),
+		"Grid Height: ",
+		new BMessage(kGridHeight),
 		10, 100, B_BLOCK_THUMB);
 
 	fGridHeight->SetHashMarks(B_HASH_MARKS_BOTTOM);
-	fGridHeight->SetLimitLabels("10", "100");
+	//fGridHeight->SetLimitLabels("10", "100");
 	fGridHeight->SetValue(pglsState->GridHeight());
 	fGridHeight->SetHashMarkCount(10);
-
-	fBorder = new BSlider(frame, "Border",
-		"Overlap Border: ",
-		new BMessage(e_midBorder),
-		0, 10, B_BLOCK_THUMB);
-
-	fBorder->SetHashMarks(B_HASH_MARKS_BOTTOM);
-	fBorder->SetLimitLabels("0", "10");
-	fBorder->SetValue(pglsState->Border());
-	fBorder->SetHashMarkCount(11);
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, B_USE_DEFAULT_SPACING)
 		.Add(BGroupLayoutBuilder(B_VERTICAL, 0)
@@ -73,12 +83,18 @@ GLifeConfig::GLifeConfig(BRect frame, GLifeState* pglsState)
 			.Add(author)
 		)
 		.AddGlue()
-		.Add(fGridWidth)
-		.Add(fGridHeight)
-		.Add(fBorder)
+		.Add(fGridDelay)
+		.Add(fGridBorder)
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 0)
+			.Add(fGridWidth)
+			.Add(fGridHeight)
+		)
 		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
 			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 	);
+
+	// Do our first label update
+	_UpdateLabels();
 }
 
 
@@ -89,7 +105,8 @@ GLifeConfig::AttachedToWindow(void)
 {
 	fGridWidth->SetTarget(this);
 	fGridHeight->SetTarget(this);
-	fBorder->SetTarget(this);
+	fGridBorder->SetTarget(this);
+	fGridDelay->SetTarget(this);
 
 #ifdef _USE_ASYNCHRONOUS
 	
@@ -100,33 +117,51 @@ GLifeConfig::AttachedToWindow(void)
 }
 
 
+void
+GLifeConfig::_UpdateLabels()
+{
+	char newLabel[64];
+	snprintf(newLabel, sizeof(newLabel), "Grid Width: %li",
+		fGridWidth->Value());
+	fGridWidth->SetLabel(newLabel);
+	snprintf(newLabel, sizeof(newLabel), "Grid Height: %li",
+		fGridHeight->Value());
+	fGridHeight->SetLabel(newLabel);
+	snprintf(newLabel, sizeof(newLabel), "Grid Border: %li",
+		fGridBorder->Value());
+	fGridBorder->SetLabel(newLabel);
+
+	char delay[16];
+	if (fGridDelay->Value() <= 0)
+		sprintf(delay, "none");
+	else
+		sprintf(delay, "%" B_PRId32 "x", fGridDelay->Value());
+	snprintf(newLabel, sizeof(newLabel), "Grid Life Delay: %s", delay);
+	fGridDelay->SetLabel(newLabel);
+}
+
+
 // ------------------------------------------------------
 //  GLifeConfig Class MessageReceived Definition
 void
 GLifeConfig::MessageReceived(BMessage* pbmMessage)
 {
-	char	szNewLabel[64];
-	int32	iValue;
-	
 	switch(pbmMessage->what) {
-		case e_midGridWidth:
-			m_pglsState->GridWidth() = (iValue = fGridWidth->Value());
-			sprintf(szNewLabel, "Width of Grid: %li", iValue);
-			fGridWidth->SetLabel(szNewLabel);
+		case kGridWidth:
+			m_pglsState->GridWidth() = fGridWidth->Value();
 			break;
-		case e_midGridHeight:
-			m_pglsState->GridHeight() = (iValue = fGridHeight->Value());
-			sprintf(szNewLabel, "Height of Grid: %li", iValue);
-			fGridHeight->SetLabel(szNewLabel);
+		case kGridHeight:
+			m_pglsState->GridHeight() = fGridHeight->Value();
 			break;
-		case e_midBorder:
-			m_pglsState->Border() = (iValue = fBorder->Value());
-			sprintf(szNewLabel, "Overlap Border: %li", iValue);
-			fBorder->SetLabel(szNewLabel);
+		case kGridBorder:
+			m_pglsState->GridBorder() = fGridBorder->Value();
 			break;
-			
+		case kGridDelay:
+			m_pglsState->GridDelay() = fGridDelay->Value();
+			break;
 		default:
 			BView::MessageReceived(pbmMessage);
-			break;
+			return;
 	}
+	_UpdateLabels();
 }

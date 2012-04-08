@@ -4,6 +4,7 @@
  *
  * Authors:
  * 		Aaron Hill <serac@hillvisions.com>
+ *		Alexander von Gluck <kallisti5@unixzen.com>
  */
 
 
@@ -87,7 +88,7 @@ GLifeView::Draw(BRect updateRect)
 	
 	int32 iWidth = m_pglsState->GridWidth();
 	int32 iHeight = m_pglsState->GridHeight();
-	int32 iBorder = m_pglsState->Border();
+	int32 iBorder = m_pglsState->GridBorder();
 		
 	glPushMatrix();
 	
@@ -182,8 +183,9 @@ GLifeView::Advance(void)
 {
 	if (m_glfDelta++ > 360.0)
 		m_glfDelta -= 360.0;
-	// TODO: Allow for customized intervals
-	if (m_iStep++ > 4) {
+
+	int32 gridDelay = m_pglsState->GridDelay();
+	if (m_iStep++ > gridDelay) {
 		m_iStep = 0;
 		m_pglgGrid->Generation();
 	}

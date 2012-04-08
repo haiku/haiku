@@ -17,9 +17,10 @@
 
 // Message IDs
 enum {
-	e_midGridWidth		= 'grdw',
-	e_midGridHeight		= 'grdh',
-	e_midBorder			= 'bord'
+	kGridWidth		= 'grdw',
+	kGridHeight		= 'grdh',
+	kGridBorder		= 'bord',
+	kGridDelay		= 'dely'
 };
 
 
@@ -33,7 +34,9 @@ private:
 	
 	BSlider*	fGridWidth;
 	BSlider*	fGridHeight;
-	BSlider*	fBorder;
+	BSlider*	fGridBorder;
+	BSlider*	fGridDelay;
+	void		_UpdateLabels();
 	
 public:
 				GLifeConfig(BRect, GLifeState*);
