@@ -4,13 +4,16 @@
  *
  * Authors:
  * 		Aaron Hill <serac@hillvisions.com>
+ *		Alexander von Gluck <kallisti5@unixzen.com>
  */
 
 
 #include "GLifeConfig.h"
 
-#include <stdio.h>
+#include <GroupLayoutBuilder.h>
 #include <Slider.h>
+#include <stdio.h>
+#include <String.h>
 #include <StringView.h>
 #include <View.h>
 
@@ -19,19 +22,22 @@
 
 // ------------------------------------------------------
 //  GLifeConfig Class Constructor Definition
-GLifeConfig::GLifeConfig(BRect rFrame, GLifeState* pglsState)
+GLifeConfig::GLifeConfig(BRect frame, GLifeState* pglsState)
 	:
-	BView(rFrame, "", B_FOLLOW_NONE, B_WILL_DRAW),
+	BView(frame, "", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
 	m_pglsState(pglsState)
 {
-	// Static Labels
-	AddChild(new BStringView(BRect(10, 0, 240, 12), B_EMPTY_STRING,
-		"OpenGL \"Game of Life\""));
-	AddChild(new BStringView(BRect(16, 14, 240, 26), B_EMPTY_STRING,
-		"by Aaron Hill"));
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	// Info text
+	BStringView* name = new BStringView(frame, B_EMPTY_STRING,
+		"OpenGL \"Game of Life\"", B_FOLLOW_LEFT);
+	BStringView* author = new BStringView(frame, B_EMPTY_STRING,
+		"by Aaron Hill", B_FOLLOW_LEFT);
 
 	// Sliders
-	fGridWidth = new BSlider(BRect(10, 34, 234, 84), "GridWidth",
+	fGridWidth = new BSlider(frame, "GridWidth",
 		"Width of Grid: ",
 		new BMessage(e_midGridWidth),
 		10, 100, B_BLOCK_THUMB);
@@ -40,9 +46,8 @@ GLifeConfig::GLifeConfig(BRect rFrame, GLifeState* pglsState)
 	fGridWidth->SetLimitLabels("10", "100");
 	fGridWidth->SetValue(pglsState->GridWidth());
 	fGridWidth->SetHashMarkCount(10);
-	AddChild(fGridWidth);
 
-	fGridHeight = new BSlider(BRect(10, 86, 234, 136), "GridHeight",
+	fGridHeight = new BSlider(frame, "GridHeight",
 		"Height of Grid: ",
 		new BMessage(e_midGridHeight),
 		10, 100, B_BLOCK_THUMB);
@@ -51,18 +56,29 @@ GLifeConfig::GLifeConfig(BRect rFrame, GLifeState* pglsState)
 	fGridHeight->SetLimitLabels("10", "100");
 	fGridHeight->SetValue(pglsState->GridHeight());
 	fGridHeight->SetHashMarkCount(10);
-	AddChild(fGridHeight);
 
-	fBorder = new BSlider(BRect(10, 138, 234, 188), "Border",
+	fBorder = new BSlider(frame, "Border",
 		"Overlap Border: ",
 		new BMessage(e_midBorder),
-		0, 10, B_BLOCK_THUMB );
+		0, 10, B_BLOCK_THUMB);
 
 	fBorder->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fBorder->SetLimitLabels("0", "10");
 	fBorder->SetValue(pglsState->Border());
 	fBorder->SetHashMarkCount(11);
-	AddChild(fBorder);
+
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, B_USE_DEFAULT_SPACING)
+		.Add(BGroupLayoutBuilder(B_VERTICAL, 0)
+			.Add(name)
+			.Add(author)
+		)
+		.AddGlue()
+		.Add(fGridWidth)
+		.Add(fGridHeight)
+		.Add(fBorder)
+		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
+			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
+	);
 }
 
 
@@ -71,8 +87,6 @@ GLifeConfig::GLifeConfig(BRect rFrame, GLifeState* pglsState)
 void
 GLifeConfig::AttachedToWindow(void)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
 	fGridWidth->SetTarget(this);
 	fGridHeight->SetTarget(this);
 	fBorder->SetTarget(this);
