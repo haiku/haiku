@@ -146,14 +146,15 @@ class TBarView : public BView {
 		TReplicantTray* ReplicantTray() const { return fReplicantTray; }
 
 	private:
+		friend class TBarApp;
 		friend class TDeskbarMenu;
 		friend class PreferencesWindow;
 
 		status_t SendDragMessage(const char* signature, entry_ref* ref = NULL);
 
 		void PlaceDeskbarMenu();
-		void PlaceTray(bool vertSwap, bool leftSwap, BRect screenFrame);
-		void PlaceApplicationBar(BRect screenFrame);
+		void PlaceTray(bool vertSwap, bool leftSwap);
+		void PlaceApplicationBar();
 		void SaveExpandedItems();
 		void RemoveExpandedItems();
 		void ExpandItems();

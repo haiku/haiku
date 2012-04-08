@@ -453,7 +453,7 @@ TBarApp::MessageReceived(BMessage* message)
 			fSettings.trackerAlwaysFirst = !fSettings.trackerAlwaysFirst;
 
 			fBarWindow->Lock();
-			BarView()->UpdatePlacement();
+			BarView()->PlaceApplicationBar();
 			fBarWindow->Unlock();
 			break;
 
@@ -461,7 +461,7 @@ TBarApp::MessageReceived(BMessage* message)
 			fSettings.sortRunningApps = !fSettings.sortRunningApps;
 
 			fBarWindow->Lock();
-			BarView()->UpdatePlacement();
+			BarView()->PlaceApplicationBar();
 			fBarWindow->Unlock();
 			break;
 
@@ -477,7 +477,7 @@ TBarApp::MessageReceived(BMessage* message)
 			fSettings.superExpando = !fSettings.superExpando;
 
 			fBarWindow->Lock();
-			BarView()->UpdatePlacement();
+			BarView()->PlaceApplicationBar();
 			fBarWindow->Unlock();
 			break;
 
@@ -485,7 +485,7 @@ TBarApp::MessageReceived(BMessage* message)
 			fSettings.expandNewTeams = !fSettings.expandNewTeams;
 
 			fBarWindow->Lock();
-			BarView()->UpdatePlacement();
+			BarView()->PlaceApplicationBar();
 			fBarWindow->Unlock();
 			break;
 
@@ -493,7 +493,7 @@ TBarApp::MessageReceived(BMessage* message)
 			fSettings.hideLabels = !fSettings.hideLabels;
 
 			fBarWindow->Lock();
-			BarView()->UpdatePlacement();
+			BarView()->PlaceApplicationBar();
 			fBarWindow->Unlock();
 			break;
 
@@ -514,7 +514,7 @@ TBarApp::MessageReceived(BMessage* message)
 			ResizeTeamIcons();
 
 			fBarWindow->Lock();
-			BarView()->UpdatePlacement();
+			BarView()->PlaceApplicationBar();
 			fBarWindow->Unlock();
 			break;
 		}
@@ -759,6 +759,7 @@ TBarApp::ResizeTeamIcons()
 		BarTeamInfo* barInfo = (BarTeamInfo*)sBarTeamInfoList.ItemAt(i);
 		if ((barInfo->flags & B_BACKGROUND_APP) == 0
 			&& strcasecmp(barInfo->sig, kDeskbarSignature) != 0) {
+			delete barInfo->icon;
 			barInfo->icon = new BBitmap(IconRect(), kIconFormat);
 			FetchAppIcon(barInfo->sig, barInfo->icon);
 		}

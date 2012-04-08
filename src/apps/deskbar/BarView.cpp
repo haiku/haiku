@@ -315,7 +315,7 @@ TBarView::PlaceDeskbarMenu()
 
 
 void
-TBarView::PlaceTray(bool, bool, BRect screenFrame)
+TBarView::PlaceTray(bool vertSwap, bool leftSwap)
 {
 	BPoint statusLoc;
 	if (fState == kFullState) {
@@ -346,6 +346,7 @@ TBarView::PlaceTray(bool, bool, BRect screenFrame)
 			else
 				fReplicantTray->MoveTo(2, 2);
 		} else {
+			BRect screenFrame = (BScreen(Window())).Frame();
 			statusLoc.x = screenFrame.right - fDragRegion->Bounds().Width();
 			statusLoc.y = -1;
 		}
@@ -356,15 +357,23 @@ TBarView::PlaceTray(bool, bool, BRect screenFrame)
 
 
 void
-TBarView::PlaceApplicationBar(BRect screenFrame)
+TBarView::PlaceApplicationBar()
 {
 	if (fExpando != NULL) {
+		SaveExpandedItems();
 		fExpando->RemoveSelf();
 		delete fExpando;
 		fExpando = NULL;
 	}
-	if (fState == kMiniState)
+
+	BRect screenFrame = (BScreen(Window())).Frame();
+	if (fState == kMiniState) {
+		SizeWindow(screenFrame);
+		PositionWindow(screenFrame);
+		Window()->UpdateIfNeeded();
+		Invalidate();
 		return;
+	}
 
 	BRect expandoFrame(0, 0, 0, 0);
 	if (fVertical) {
@@ -395,6 +404,14 @@ TBarView::PlaceApplicationBar(BRect screenFrame)
 	fExpando = new TExpandoMenuBar(this, expandoFrame, "ExpandoMenuBar",
 		fVertical, !hideLabels && fState != kFullState);
 	AddChild(fExpando);
+
+	if (fVertical)
+		ExpandItems();
+
+	SizeWindow(screenFrame);
+	PositionWindow(screenFrame);
+	Window()->UpdateIfNeeded();
+	Invalidate();
 }
 
 
@@ -531,22 +548,9 @@ TBarView::ChangeState(int32 state, bool vertical, bool left, bool top)
 	if (stateChanged || vertSwap)
 		be_app->PostMessage(kStateChanged);
 
-	BRect screenFrame = (BScreen(Window())).Frame();
-
 	PlaceDeskbarMenu();
-	PlaceTray(vertSwap, leftSwap, screenFrame);
-
-	// Keep track of which apps are expanded
-	SaveExpandedItems();
-
-	PlaceApplicationBar(screenFrame);
-	SizeWindow(screenFrame);
-	PositionWindow(screenFrame);
-	Window()->UpdateIfNeeded();
-
-	// Re-expand apps
-	ExpandItems();
-	Invalidate();
+	PlaceTray(vertSwap, leftSwap);
+	PlaceApplicationBar();
 }
 
 
