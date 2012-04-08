@@ -70,13 +70,13 @@ const int32 kMenuTrackMargin = 20;
 
 
 TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
-		bool showInterval, uint32 state, float, bool showTime)
+		bool showInterval, uint32 state, float, bool showClock)
 	: BView(frame, "BarView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
 	fBarMenuBar(NULL),
 	fExpando(NULL),
 	fTrayLocation(1),
 	fShowInterval(showInterval),
-	fShowClock(showTime),
+	fShowClock(showClock),
 	fVertical(vertical),
 	fTop(top),
 	fLeft(left),
@@ -143,7 +143,7 @@ TBarView::Draw(BRect)
 	else if (AcrossBottom())
 		StrokeLine(bounds.LeftTop(), bounds.RightTop());
 
-	if (Vertical() && Expando()) {
+	if (fVertical && fState == kExpandoState) {
 		SetHighColor(hilite);
 		BRect frame(fExpando->Frame());
 		StrokeLine(BPoint(frame.left, frame.top - 1),
@@ -200,8 +200,7 @@ TBarView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 
 	// Auto-Raise
 	where = ConvertToScreen(where);
-	BScreen screen(Window());
-	BRect screenFrame = screen.Frame();
+	BRect screenFrame = (BScreen(Window())).Frame();
 	if ((where.x == screenFrame.left || where.x == screenFrame.right
 			|| where.y == screenFrame.top || where.y == screenFrame.bottom)
 		&& Window()->Frame().Contains(where)) {
@@ -276,7 +275,7 @@ TBarView::PlaceDeskbarMenu()
 	// only for vertical mini or expanded
 	// mini mode will have team menu added as part of BarMenuBar
 	if (fVertical && !fBarMenuBar) {
-		//	create the Be menu
+		// create the Be menu
 		BRect mbarFrame(Bounds());
 		mbarFrame.bottom = mbarFrame.top + kMenuBarHeight;
 		fBarMenuBar = new TBarMenuBar(this, mbarFrame, "BarMenuBar");
@@ -341,7 +340,7 @@ TBarView::PlaceTray(bool vertSwap, bool leftSwap)
 		if (fVertical) {
 			statusLoc.y = fBarMenuBar->Frame().bottom + 1;
 			statusLoc.x = 0;
-			if (Left() && Vertical())
+			if (fLeft && fVertical)
 				fReplicantTray->MoveTo(5, 2);
 			else
 				fReplicantTray->MoveTo(2, 2);
@@ -420,11 +419,20 @@ TBarView::GetPreferredWindowSize(BRect screenFrame, float* width, float* height)
 {
 	float windowHeight = 0;
 	float windowWidth = sMinimumWindowWidth;
-	bool calcHiddenSize = ((TBarApp*)be_app)->Settings()->autoHide
+	bool setToHiddenSize = ((TBarApp*)be_app)->Settings()->autoHide
 		&& IsHidden() && !DragRegion()->IsDragging();
 	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
 
-	if (!calcHiddenSize) {
+	if (setToHiddenSize) {
+		windowHeight = kHiddenDimension;
+
+		if (fState == kExpandoState && !fVertical) {
+			// top or bottom, full
+			fExpando->CheckItemSizes(0);
+			windowWidth = screenFrame.Width();
+		} else
+			windowWidth = kHiddenDimension;
+	} else {
 		if (fState == kFullState) {
 			windowHeight = screenFrame.bottom;
 			windowWidth = fBarMenuBar->Frame().Width();
@@ -445,16 +453,6 @@ TBarView::GetPreferredWindowSize(BRect screenFrame, float* width, float* height)
 			else
 				windowHeight = fBarMenuBar->Frame().bottom;
 		}
-	} else {
-		windowHeight = kHModeHiddenHeight;
-
-		if (fState == kExpandoState && !fVertical) {
-			// top or bottom, full
-			fExpando->CheckItemSizes(0);
-			windowHeight = iconSize + 4;
-			windowWidth = screenFrame.Width();
-		} else
-			windowWidth = kHModeHiddenHeight;
 	}
 
 	*width = windowWidth;
@@ -501,13 +499,13 @@ TBarView::SaveSettings()
 {
 	desk_settings* settings = ((TBarApp*)be_app)->Settings();
 
-	settings->vertical = Vertical();
-	settings->left = Left();
-	settings->top = Top();
-	settings->ampmMode = MilTime();
-	settings->state = (uint32)State();
+	settings->vertical = fVertical;
+	settings->left = fLeft;
+	settings->top = fTop;
+	settings->ampmMode = fShowInterval;
+	settings->state = (uint32)fState;
 	settings->width = 0;
-	settings->showTime = ShowingClock();
+	settings->showTime = fShowClock;
 
 	fReplicantTray->RememberClockSettings();
 }
@@ -584,7 +582,7 @@ TBarView::RemoveExpandedItems()
 void
 TBarView::ExpandItems()
 {
-	if (fExpando == NULL || !fVertical || !Expando()
+	if (fExpando == NULL || !fVertical || fState != kExpandoState
 		|| !static_cast<TBarApp*>(be_app)->Settings()->superExpando
 		|| fExpandedItems.CountItems() <= 0)
 		return;
@@ -653,8 +651,7 @@ TBarView::RaiseDeskbar(bool raise)
 void
 TBarView::HideDeskbar(bool hide)
 {
-	BScreen screen(Window());
-	BRect screenFrame = screen.Frame();
+	BRect screenFrame = (BScreen(Window())).Frame();
 
 	if (hide) {
 		Hide();
@@ -665,80 +662,6 @@ TBarView::HideDeskbar(bool hide)
 		SizeWindow(screenFrame);
 		PositionWindow(screenFrame);
 	}
-}
-
-
-// window placement functions
-
-bool
-TBarView::Vertical() const
-{
-	return fVertical;
-}
-
-
-bool
-TBarView::Left() const
-{
-	return fLeft;
-}
-
-
-bool
-TBarView::AcrossTop() const
-{
-	return fTop && !fVertical;
-}
-
-
-bool
-TBarView::AcrossBottom() const
-{
-	return !fTop && !fVertical;
-}
-
-
-bool
-TBarView::Expando() const
-{
-	return fState == kExpandoState;
-}
-
-
-bool
-TBarView::Top() const
-{
-	return fTop;
-}
-
-
-int32
-TBarView::State() const
-{
-	return fState;
-}
-
-
-// optional functionality functions
-
-bool
-TBarView::MilTime() const
-{
-	return fShowInterval;
-}
-
-
-void
-TBarView::ShowClock(bool on)
-{
-	fShowClock = on;
-}
-
-
-bool
-TBarView::ShowingClock() const
-{
-	return fShowClock;
 }
 
 
@@ -1002,7 +925,7 @@ TBarView::HandleDeskbarMenu(BMessage* messagewithdestination)
 		return;
 
 	// in mini-mode
-	if (Vertical() && !Expando()) {
+	if (fVertical && fState != kExpandoState) {
 		// if drop is in the team menu, bail
 		if (fBarMenuBar->CountItems() >= 2) {
 			uint32 buttons;

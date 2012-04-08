@@ -404,7 +404,7 @@ TTeamMenuItem::DrawContent()
 	// Draw the expandable icon.
 	TBarView* barView = (static_cast<TBarApp*>(be_app))->BarView();
 	if (fVertical && static_cast<TBarApp*>(be_app)->Settings()->superExpando
-		&& barView->Expando()) {
+		&& barView->ExpandoState()) {
 		BRect frame(Frame());
 		BRect rect(0, 0, kSwitchWidth, 10);
 		rect.OffsetTo(BPoint(frame.right - rect.Width(),

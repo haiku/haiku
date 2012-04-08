@@ -105,7 +105,7 @@ TWindowMenu::AttachedToWindow()
 			// and then.
 			Window()->Hide();
 			// if in expando (horizontal or vertical)
-			if (barview->Expando()) {
+			if (barview->ExpandoState()) {
 				SetTrackingHook(barview->MenuTrackingHook,
 					barview->GetTrackingHookData());
 			}
@@ -232,7 +232,7 @@ TWindowMenu::DetachedFromWindow()
 	// in expando mode the teammenu will not call DragStop, thus, it needs to
 	// be called from here
 	TBarView* barview = (dynamic_cast<TBarApp*>(be_app))->BarView();
-	if (barview && barview->Expando() && barview->Dragging()
+	if (barview && barview->ExpandoState() && barview->Dragging()
 		&& barview->LockLooper()) {
 		// We changed the show level in AttachedToWindow(). Undo it.
 		Window()->Show();

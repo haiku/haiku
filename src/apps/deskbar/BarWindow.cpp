@@ -252,7 +252,7 @@ TBarWindow::WorkspaceActivated(int32 workspace, bool active)
 {
 	BWindow::WorkspaceActivated(workspace, active);
 
-	if (active && !(fBarView->Expando() && fBarView->Vertical()))
+	if (active && !(fBarView->ExpandoState() && fBarView->Vertical()))
 		fBarView->UpdatePlacement();
 	else {
 		BRect screenFrame = (BScreen(fBarView->Window())).Frame();
@@ -346,7 +346,7 @@ TBarWindow::GetLocation(BMessage* message)
 {
 	BMessage reply('rply');
 	reply.AddInt32("location", (int32)DeskbarLocation());
-	reply.AddBool("expanded", fBarView->Expando());
+	reply.AddBool("expanded", fBarView->ExpandoState());
 
 	message->SendReply(&reply);
 }
@@ -430,7 +430,7 @@ void
 TBarWindow::IsExpanded(BMessage* message)
 {
 	BMessage reply('rply');
-	reply.AddBool("expanded", fBarView->Expando());
+	reply.AddBool("expanded", fBarView->ExpandoState());
 	message->SendReply(&reply);
 }
 

@@ -57,7 +57,7 @@ const float kMiniHeight = 46.0f;
 const float kHModeHeight = 21.0f;
 const float kMenuBarHeight = 21.0f;
 const float kStatusHeight = 22.0f;
-const float kHModeHiddenHeight = 1.0f;
+const float kHiddenDimension = 1.0f;
 const float kMaxPreventHidingDist = 80.0f;
 
 class BShelf;
@@ -89,17 +89,23 @@ class TBarView : public BView {
 		void RaiseDeskbar(bool raise);
 		void HideDeskbar(bool hide);
 
-		bool Vertical() const;
-		bool Left() const;
-		bool Top() const;
-		bool AcrossTop() const;
-		bool AcrossBottom() const;
-		bool Expando() const;
-		int32 State() const;
+		// window placement methods
+		bool Vertical() const { return fVertical; };
+		bool Left() const { return fLeft; };
+		bool Top() const { return fTop; };
+		bool AcrossTop() const { return fTop && !fVertical; };
+		bool AcrossBottom() const { return !fTop && !fVertical; };
 
-		bool MilTime() const;
-		void ShowClock(bool);
-		bool ShowingClock() const;
+		// window state methods
+		bool ExpandoState() const { return fState == kExpandoState; };
+		bool FullState() const { return fState == kFullState; };
+		bool MiniState() const { return fState == kMiniState; };
+		int32 State() const { return fState; };
+
+		// optional functionality methods
+		bool MilTime() const { return fShowInterval; };
+		void ShowClock(bool show) { fShowClock = show; };
+		bool ShowingClock() const { return fShowClock; };
 
 		void CacheDragData(const BMessage* incoming);
 		status_t DragStart();

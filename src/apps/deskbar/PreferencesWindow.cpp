@@ -302,7 +302,7 @@ PreferencesWindow::_EnableDisableDependentItems()
 {
 	TBarApp* barApp = static_cast<TBarApp*>(be_app);
 	if (barApp->BarView()->Vertical()
-		&& barApp->BarView()->Expando()) {
+		&& barApp->BarView()->ExpandoState()) {
 		fAppsShowExpanders->SetEnabled(true);
 		fAppsExpandNew->SetEnabled(fAppsShowExpanders->Value());
 	} else {

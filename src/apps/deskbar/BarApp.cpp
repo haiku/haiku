@@ -570,8 +570,15 @@ TBarApp::MessageReceived(BMessage* message)
 
 			ResizeTeamIcons();
 
+			if (BarView()->MiniState())
+				break;
+
 			fBarWindow->Lock();
-			BarView()->PlaceApplicationBar();
+			if (BarView()->Vertical())
+				BarView()->PlaceApplicationBar();
+			else
+				BarView()->UpdatePlacement();
+
 			fBarWindow->Unlock();
 			break;
 		}
