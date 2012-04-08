@@ -19,7 +19,7 @@
    along with Bash.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#if !defined (CROSS_COMPILING) 
+#if !defined (CROSS_COMPILING)
 #  include <config.h>
 #else	/* CROSS_COMPILING */
 /* A conservative set of defines based on POSIX/SUS3/XPG6 */
@@ -1448,7 +1448,7 @@ write_documentation (stream, documentation, indentation, flags)
 	{
 	  if (filename_p == 0)
 	    {
-	      if (line[0])	      
+	      if (line[0])
 		fprintf (stream, "  N_(\"");
 	      else
 		fprintf (stream, "  N_(\" ");		/* the empty string translates specially. */
