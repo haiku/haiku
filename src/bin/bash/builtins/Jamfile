@@ -47,7 +47,7 @@ rule MkBuiltinsExt
 
 actions MkBuiltinsExt1
 {
-	$(2[1]) -externfile $(1[1]) -structfile $(1[2]) -noproduction $(2[2-]) ;
+	$(2[1]) -externfile $(1[1]) -tempstructfile $(1[2]).temp -structfile $(1[2]) -noproduction $(2[2-]) ;
 }
 
 local bashDefFiles =
