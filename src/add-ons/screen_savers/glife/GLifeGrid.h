@@ -20,16 +20,16 @@ private:
 	int32		m_iWidth;
 	int32		m_iHeight;
 	
-	int32		Neighbors( int32, int32 );
+	int32		Neighbors(int32, int32);
 	
 public:
 	// Constructor & Destructor
-				GLifeGrid( int32, int32 );
-				~GLifeGrid( void );
+				GLifeGrid(int32, int32);
+				~GLifeGrid(void);
 	// Public Methods
-	void		Generation( void );
+	void		Generation(void);
 	// Accessor Methods
-	bool		Occupied( int32, int32 );
+	bool		Occupied(int32, int32);
 };
 
 

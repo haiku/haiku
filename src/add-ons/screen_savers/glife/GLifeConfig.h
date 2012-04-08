@@ -36,10 +36,10 @@ private:
 	BSlider*	m_pbsBorder;
 	
 public:
-				GLifeConfig( BRect, GLifeState* );
+				GLifeConfig(BRect, GLifeState*);
 	
-	void		AttachedToWindow( void );
-	void		MessageReceived( BMessage* );
+	void		AttachedToWindow(void);
+	void		MessageReceived(BMessage*);
 };
 
 

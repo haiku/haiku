@@ -10,20 +10,22 @@
 
 
 #include <GLView.h>
+
 #include "GLifeState.h"
+#include "GLifeGrid.h"
 
 
 // GLifeView Class Declaration
 class GLifeView : public BGLView {
 public:
 	// Constructor & Destructor
-						GLifeView( BRect, const char*, ulong, ulong, GLifeState* );
-						~GLifeView( void );
+						GLifeView(BRect, const char*, ulong, ulong, GLifeState*);
+						~GLifeView(void);
 				
 	// Public Methods
-			void		AttachedToWindow( void );
+			void		AttachedToWindow(void);
 	virtual	void		Draw(BRect updateRect);
-			void		Advance( void );
+			void		Advance(void);
 
 private:
 			GLifeState*	m_pglsState;
