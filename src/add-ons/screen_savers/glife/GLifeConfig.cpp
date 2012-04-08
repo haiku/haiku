@@ -26,43 +26,43 @@ GLifeConfig::GLifeConfig(BRect rFrame, GLifeState* pglsState)
 {
 	// Static Labels
 	AddChild(new BStringView(BRect(10, 0, 240, 12), B_EMPTY_STRING,
-		"Open GL \"Game of Life\" Screen Saver" ) );
+		"OpenGL \"Game of Life\""));
 	AddChild(new BStringView(BRect(16, 14, 240, 26), B_EMPTY_STRING,
 		"by Aaron Hill"));
 
 	// Sliders
-	m_pbsGridWidth = new BSlider(BRect(10, 34, 234, 84), "GridWidth",
-		"Width of Grid : ",
+	fGridWidth = new BSlider(BRect(10, 34, 234, 84), "GridWidth",
+		"Width of Grid: ",
 		new BMessage(e_midGridWidth),
 		10, 100, B_BLOCK_THUMB);
 
-	m_pbsGridWidth->SetHashMarks(B_HASH_MARKS_BOTTOM);
-	m_pbsGridWidth->SetLimitLabels("10", "100");
-	m_pbsGridWidth->SetValue(pglsState->GridWidth());
-	m_pbsGridWidth->SetHashMarkCount(10);
-	AddChild(m_pbsGridWidth);
+	fGridWidth->SetHashMarks(B_HASH_MARKS_BOTTOM);
+	fGridWidth->SetLimitLabels("10", "100");
+	fGridWidth->SetValue(pglsState->GridWidth());
+	fGridWidth->SetHashMarkCount(10);
+	AddChild(fGridWidth);
 
-	m_pbsGridHeight = new BSlider(BRect(10, 86, 234, 136), "GridHeight",
-		"Height of Grid : ",
+	fGridHeight = new BSlider(BRect(10, 86, 234, 136), "GridHeight",
+		"Height of Grid: ",
 		new BMessage(e_midGridHeight),
 		10, 100, B_BLOCK_THUMB);
 
-	m_pbsGridHeight->SetHashMarks(B_HASH_MARKS_BOTTOM);
-	m_pbsGridHeight->SetLimitLabels("10", "100");
-	m_pbsGridHeight->SetValue(pglsState->GridHeight());
-	m_pbsGridHeight->SetHashMarkCount(10);
-	AddChild(m_pbsGridHeight);
+	fGridHeight->SetHashMarks(B_HASH_MARKS_BOTTOM);
+	fGridHeight->SetLimitLabels("10", "100");
+	fGridHeight->SetValue(pglsState->GridHeight());
+	fGridHeight->SetHashMarkCount(10);
+	AddChild(fGridHeight);
 
-	m_pbsBorder = new BSlider(BRect(10, 138, 234, 188), "Border",
-		"Overlap Border : ",
+	fBorder = new BSlider(BRect(10, 138, 234, 188), "Border",
+		"Overlap Border: ",
 		new BMessage(e_midBorder),
 		0, 10, B_BLOCK_THUMB );
 
-	m_pbsBorder->SetHashMarks(B_HASH_MARKS_BOTTOM);
-	m_pbsBorder->SetLimitLabels("0", "10");
-	m_pbsBorder->SetValue(pglsState->Border());
-	m_pbsBorder->SetHashMarkCount(11);
-	AddChild(m_pbsBorder);
+	fBorder->SetHashMarks(B_HASH_MARKS_BOTTOM);
+	fBorder->SetLimitLabels("0", "10");
+	fBorder->SetValue(pglsState->Border());
+	fBorder->SetHashMarkCount(11);
+	AddChild(fBorder);
 }
 
 
@@ -73,9 +73,9 @@ GLifeConfig::AttachedToWindow(void)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
-	m_pbsGridWidth->SetTarget(this);
-	m_pbsGridHeight->SetTarget(this);
-	m_pbsBorder->SetTarget(this);
+	fGridWidth->SetTarget(this);
+	fGridHeight->SetTarget(this);
+	fBorder->SetTarget(this);
 
 #ifdef _USE_ASYNCHRONOUS
 	
@@ -96,19 +96,19 @@ GLifeConfig::MessageReceived(BMessage* pbmMessage)
 	
 	switch(pbmMessage->what) {
 		case e_midGridWidth:
-			m_pglsState->GridWidth() = (iValue = m_pbsGridWidth->Value());
-			sprintf(szNewLabel, "Width of Grid : %li", iValue);
-			m_pbsGridWidth->SetLabel(szNewLabel);
+			m_pglsState->GridWidth() = (iValue = fGridWidth->Value());
+			sprintf(szNewLabel, "Width of Grid: %li", iValue);
+			fGridWidth->SetLabel(szNewLabel);
 			break;
 		case e_midGridHeight:
-			m_pglsState->GridHeight() = (iValue = m_pbsGridHeight->Value());
-			sprintf(szNewLabel, "Height of Grid : %li", iValue);
-			m_pbsGridHeight->SetLabel(szNewLabel);
+			m_pglsState->GridHeight() = (iValue = fGridHeight->Value());
+			sprintf(szNewLabel, "Height of Grid: %li", iValue);
+			fGridHeight->SetLabel(szNewLabel);
 			break;
 		case e_midBorder:
-			m_pglsState->Border() = (iValue = m_pbsBorder->Value());
-			sprintf(szNewLabel, "Overlap Border : %li", iValue);
-			m_pbsBorder->SetLabel(szNewLabel);
+			m_pglsState->Border() = (iValue = fBorder->Value());
+			sprintf(szNewLabel, "Overlap Border: %li", iValue);
+			fBorder->SetLabel(szNewLabel);
 			break;
 			
 		default:

@@ -31,9 +31,9 @@ private:
 	
 	uint32		m_uiWindowFlags;
 	
-	BSlider*	m_pbsGridWidth;
-	BSlider*	m_pbsGridHeight;
-	BSlider*	m_pbsBorder;
+	BSlider*	fGridWidth;
+	BSlider*	fGridHeight;
+	BSlider*	fBorder;
 	
 public:
 				GLifeConfig(BRect, GLifeState*);
