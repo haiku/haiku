@@ -8,14 +8,19 @@ if $(HAIKU_GCC_VERSION[1]) < 3 {
 	SubDirC++Flags --no-warnings ;
 }
 
-
-Application GLTeapot :
+local sources =
 	FPS.cpp
 	GLObject.cpp
 	ObjectView.cpp
 	error.cpp
 	TeapotWindow.cpp
 	TeapotApp.cpp
+;
+
+Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+
+Application GLTeapot :
+	$(sources)
 	: be GL game $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
 	: GLTeapot.rdef
 ;
