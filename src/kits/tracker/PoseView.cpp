@@ -2413,7 +2413,7 @@ BPoseView::MessageReceived(BMessage *message)
 
 				if (PrimarySort() == attrHash)
 					attrHash = 0;
-					
+
 				SetPrimarySort(attrHash);
 				SetSecondarySort(0);
 				Cleanup(true);
@@ -9798,6 +9798,13 @@ BPoseView::StartFiltering()
 	}
 
 	Invalidate();
+}
+
+
+bool
+BPoseView::IsFiltering() const
+{
+	return fFiltering;
 }
 
 

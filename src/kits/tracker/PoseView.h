@@ -402,6 +402,9 @@ class BPoseView : public BView {
 		void StartWatchDateFormatChange();
 		void StopWatchDateFormatChange();
 
+		// type ahead filtering
+		bool IsFiltering() const;
+
 		void UpdateDateColumns(BMessage *);
 		virtual void AdaptToVolumeChange(BMessage *);
 		virtual void AdaptToDesktopIntegrationChange(BMessage *);

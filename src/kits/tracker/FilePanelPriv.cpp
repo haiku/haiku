@@ -101,7 +101,7 @@ GetLinkFlavor(const Model *model, bool resolve = true)
 
 
 static filter_result
-key_down_filter(BMessage *message, BHandler **, BMessageFilter *filter)
+key_down_filter(BMessage *message, BHandler **handler, BMessageFilter *filter)
 {
 	TFilePanel *panel = dynamic_cast<TFilePanel *>(filter->Looper());
 	ASSERT(panel);
@@ -119,6 +119,8 @@ key_down_filter(BMessage *message, BHandler **, BMessageFilter *filter)
 	if (!modifier && key == B_ESCAPE) {
 		if (view->ActivePose())
 			view->CommitActivePose(false);
+		else if (view->IsFiltering())
+			filter->Looper()->PostMessage(B_CANCEL, *handler);
 		else
 			filter->Looper()->PostMessage(kCancelButton);
 		return B_SKIP_MESSAGE;
