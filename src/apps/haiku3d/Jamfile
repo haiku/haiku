@@ -11,7 +11,7 @@ if $(HAIKU_GCC_VERSION[1]) < 3 {
 
 UsePrivateHeaders shared ;
 
-Application Haiku3d :
+local sources =
 	App.cpp
 	Camera.cpp
 	MainWindow.cpp
@@ -27,7 +27,12 @@ Application Haiku3d :
 	# texture
 	BitmapTexture.cpp
 	VideoFileTexture.cpp
+;
 
+Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+
+Application Haiku3d :
+	$(sources)
 	: be game GL media translation $(TARGET_LIBSTDC++)
 	: Haiku3d.rdef
 ;
