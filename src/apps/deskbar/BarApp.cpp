@@ -284,10 +284,16 @@ TBarApp::InitSettings()
 			storedSettings.FindBool("top", &settings.top);
 			storedSettings.FindBool("ampmMode", &settings.ampmMode);
 
-			storedSettings.FindInt32("state", (int32*)&settings.state);
+			if (storedSettings.FindInt32("state", (int32*)&settings.state)
+				< B_OK) {
+				settings.state = kExpandoState;
+			}
 			storedSettings.FindFloat("width", &settings.width);
 			storedSettings.FindBool("showTime", &settings.showTime);
-			storedSettings.FindPoint("switcherLoc", &settings.switcherLoc);
+			if (storedSettings.FindPoint("switcherLoc", &settings.switcherLoc)
+				< B_OK) {
+				settings.switcherLoc = BPoint(5000, 5000);
+			}
 			storedSettings.FindInt32("recentAppsCount",
 				&settings.recentAppsCount);
 			storedSettings.FindInt32("recentDocsCount",
@@ -305,6 +311,10 @@ TBarApp::InitSettings()
 			storedSettings.FindBool("superExpando", &settings.superExpando);
 			storedSettings.FindBool("expandNewTeams", &settings.expandNewTeams);
 			storedSettings.FindBool("hideLabels", &settings.hideLabels);
+			if (storedSettings.FindInt32("iconSize", (int32*)&settings.iconSize)
+				< B_OK) {
+				settings.iconSize = kMinimumIconSize;
+			}
 			storedSettings.FindInt32("iconSize", (int32*)&settings.iconSize);
 			storedSettings.FindBool("autoRaise", &settings.autoRaise);
 			storedSettings.FindBool("autoHide", &settings.autoHide);
