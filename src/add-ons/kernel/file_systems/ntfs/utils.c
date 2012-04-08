@@ -578,7 +578,7 @@ int utils_attr_get_name(ntfs_volume *vol, ATTR_RECORD *attr, char *buffer, int b
 
 	attrdef = ntfs_attr_find_in_attrdef(vol, attr->type);
 	if (attrdef) {
-		name    = NULL;
+		name = NULL;
 		namelen = ntfs_ucsnlen(attrdef->name, sizeof(attrdef->name));
 		if (ntfs_ucstombs(attrdef->name, namelen, &name, 0) < 0) {
 			ntfs_log_error("Couldn't translate attribute type to current locale.\n");
@@ -593,17 +593,20 @@ int utils_attr_get_name(ntfs_volume *vol, ATTR_RECORD *attr, char *buffer, int b
 
 	if (len >= bufsize) {
 		ntfs_log_error("Attribute type was truncated.\n");
+		free(name);
 		return 0;
 	}
 
 	if (!attr->name_length) {
+		free(name);
 		return 0;
 	}
 
 	buffer  += len;
 	bufsize -= len;
 
-	name    = NULL;
+	free(name);
+	name = NULL;
 	namelen = attr->name_length;
 	if (ntfs_ucstombs((ntfschar *)((char *)attr + attr->name_offset),
 	    namelen, &name, 0) < 0) {

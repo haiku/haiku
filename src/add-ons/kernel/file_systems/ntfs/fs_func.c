@@ -271,7 +271,8 @@ fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args,
 				ntfs_calc_free_space(ns);
 			}
 		}
-	}
+	} else
+		free(ns);
 
 exit:
 	ERROR("fs_mount - EXIT, result code is %s\n", strerror(result));
@@ -978,6 +979,7 @@ exit:
 		ntfs_inode_close(ni);
 	if (bi)
 		ntfs_inode_close(bi);
+	free(uname);
 
 	TRACE("fs_create - EXIT, result is %s\n", strerror(result));
 
@@ -1384,6 +1386,8 @@ exit:
 		ntfs_inode_close(sym);
 	if (bi)
 		ntfs_inode_close(bi);
+	free(utarget);
+	free(uname);
 
 	TRACE("fs_symlink - EXIT, result is %s\n", strerror(result));
 
@@ -1444,7 +1448,6 @@ fs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name,	int perms)
 		newNode = (vnode*)ntfs_calloc(sizeof(vnode));
 		if (newNode == NULL) {
 		 	result = ENOMEM;
-		 	ntfs_inode_close(ni);
 		 	goto exit;
 		}
 
@@ -1469,6 +1472,7 @@ exit:
 		ntfs_inode_close(ni);
 	if (bi)
 		ntfs_inode_close(bi);
+	free(uname);
 
 	TRACE("fs_mkdir - EXIT, result is %s\n", strerror(result));
 
