@@ -35,79 +35,84 @@
 
 // x86 features from cpuid eax 1, edx register
 // reference http://www.intel.com/assets/pdf/appnote/241618.pdf (Table 5-5)
-#define IA32_FEATURE_FPU	0x00000001 // x87 fpu
-#define IA32_FEATURE_VME	0x00000002 // virtual 8086
-#define IA32_FEATURE_DE		0x00000004 // debugging extensions
-#define IA32_FEATURE_PSE	0x00000008 // page size extensions
-#define IA32_FEATURE_TSC	0x00000010 // rdtsc instruction
-#define IA32_FEATURE_MSR	0x00000020 // rdmsr/wrmsr instruction
-#define IA32_FEATURE_PAE	0x00000040 // extended 3 level page table addressing
-#define IA32_FEATURE_MCE	0x00000080 // machine check exception
-#define IA32_FEATURE_CX8	0x00000100 // cmpxchg8b instruction
-#define IA32_FEATURE_APIC	0x00000200 // local apic on chip
-#define IA32_FEATURE_SEP	0x00000800 // SYSENTER/SYSEXIT
-#define IA32_FEATURE_MTRR	0x00001000 // MTRR
-#define IA32_FEATURE_PGE	0x00002000 // paging global bit
-#define IA32_FEATURE_MCA	0x00004000 // machine check architecture
-#define IA32_FEATURE_CMOV	0x00008000 // cmov instruction
-#define IA32_FEATURE_PAT	0x00010000 // page attribute table
-#define IA32_FEATURE_PSE36	0x00020000 // page size extensions with 4MB pages
-#define IA32_FEATURE_PSN	0x00040000 // processor serial number
-#define IA32_FEATURE_CLFSH	0x00080000 // cflush instruction
-#define IA32_FEATURE_DS		0x00200000 // debug store
-#define IA32_FEATURE_ACPI	0x00400000 // thermal monitor and clock ctrl
-#define IA32_FEATURE_MMX	0x00800000 // mmx instructions
-#define IA32_FEATURE_FXSR	0x01000000 // FXSAVE/FXRSTOR instruction
-#define IA32_FEATURE_SSE	0x02000000 // SSE
-#define IA32_FEATURE_SSE2	0x04000000 // SSE2
-#define IA32_FEATURE_SS		0x08000000 // self snoop
-#define IA32_FEATURE_HTT	0x10000000 // hyperthreading
-#define IA32_FEATURE_TM		0x20000000 // thermal monitor
-#define IA32_FEATURE_PBE	0x80000000 // pending break enable
+#define IA32_FEATURE_FPU	(1 << 0) // x87 fpu
+#define IA32_FEATURE_VME	(1 << 1) // virtual 8086
+#define IA32_FEATURE_DE		(1 << 2) // debugging extensions
+#define IA32_FEATURE_PSE	(1 << 3) // page size extensions
+#define IA32_FEATURE_TSC	(1 << 4) // rdtsc instruction
+#define IA32_FEATURE_MSR	(1 << 5) // rdmsr/wrmsr instruction
+#define IA32_FEATURE_PAE	(1 << 6) // extended 3 level page table addressing
+#define IA32_FEATURE_MCE	(1 << 7) // machine check exception
+#define IA32_FEATURE_CX8	(1 << 8) // cmpxchg8b instruction
+#define IA32_FEATURE_APIC	(1 << 9) // local apic on chip
+//							(1 << 10) // Reserved
+#define IA32_FEATURE_SEP	(1 << 11) // SYSENTER/SYSEXIT
+#define IA32_FEATURE_MTRR	(1 << 12) // MTRR
+#define IA32_FEATURE_PGE	(1 << 13) // paging global bit
+#define IA32_FEATURE_MCA	(1 << 14) // machine check architecture
+#define IA32_FEATURE_CMOV	(1 << 15) // cmov instruction
+#define IA32_FEATURE_PAT	(1 << 16) // page attribute table
+#define IA32_FEATURE_PSE36	(1 << 17) // page size extensions with 4MB pages
+#define IA32_FEATURE_PSN	(1 << 18) // processor serial number
+#define IA32_FEATURE_CLFSH	(1 << 19) // cflush instruction
+//							(1 << 20) // Reserved
+#define IA32_FEATURE_DS		(1 << 21) // debug store
+#define IA32_FEATURE_ACPI	(1 << 22) // thermal monitor and clock ctrl
+#define IA32_FEATURE_MMX	(1 << 23) // mmx instructions
+#define IA32_FEATURE_FXSR	(1 << 24) // FXSAVE/FXRSTOR instruction
+#define IA32_FEATURE_SSE	(1 << 25) // SSE
+#define IA32_FEATURE_SSE2	(1 << 26) // SSE2
+#define IA32_FEATURE_SS		(1 << 27) // self snoop
+#define IA32_FEATURE_HTT	(1 << 28) // hyperthreading
+#define IA32_FEATURE_TM		(1 << 29) // thermal monitor
+#define IA32_FEATURE_IA64	(1 << 30) // IA64 processor emulating x86
+#define IA32_FEATURE_PBE	(1 << 31) // pending break enable
 
 // x86 features from cpuid eax 1, ecx register
 // reference http://www.intel.com/assets/pdf/appnote/241618.pdf (Table 5-4)
-#define IA32_FEATURE_EXT_SSE3		0x00000001	// SSE3
-#define IA32_FEATURE_EXT_PCLMULQDQ	0x00000002	// PCLMULQDQ Instruction 
-#define IA32_FEATURE_EXT_DTES64		0x00000004	// 64-Bit Debug Store
-#define IA32_FEATURE_EXT_MONITOR	0x00000008	// MONITOR/MWAIT
-#define IA32_FEATURE_EXT_DSCPL		0x00000010	// CPL qualified debug store
-#define IA32_FEATURE_EXT_VMX		0x00000020	// Virtual Machine Extensions
-#define IA32_FEATURE_EXT_SMX		0x00000040	// Safer Mode Extensions
-#define IA32_FEATURE_EXT_EST		0x00000080	// Enhanced SpeedStep
-#define IA32_FEATURE_EXT_TM2		0x00000100	// Thermal Monitor 2
-#define IA32_FEATURE_EXT_SSSE3		0x00000200	// Supplemental SSE-3
-#define IA32_FEATURE_EXT_CNXTID		0x00000400	// L1 Context ID
-#define IA32_FEATURE_EXT_FMA		0x00001000	// Fused Multiply Add
-#define IA32_FEATURE_EXT_CX16		0x00002000	// CMPXCHG16B
-#define IA32_FEATURE_EXT_XTPR		0x00004000	// xTPR Update Control
-#define IA32_FEATURE_EXT_PDCM		0x00008000	// Perfmon and Debug Capability
-#define IA32_FEATURE_EXT_PCID		0x00020000	// Process Context Identifiers
-#define IA32_FEATURE_EXT_DCA		0x00040000	// Direct Cache Access
-#define IA32_FEATURE_EXT_SSE4_1		0x00080000	// SSE4.1
-#define IA32_FEATURE_EXT_SSE4_2		0x00100000	// SSE4.2
-#define IA32_FEATURE_EXT_X2APIC		0x00200000	// Extended xAPIC Support
-#define IA32_FEATURE_EXT_MOVBE 		0x00400000	// MOVBE Instruction
-#define IA32_FEATURE_EXT_POPCNT		0x00800000	// POPCNT Instruction
-#define IA32_FEATURE_EXT_TSCDEADLINE	0x01000000	// Time Stamp Counter Deadline
-#define IA32_FEATURE_EXT_AES		0x02000000	// AES Instruction Extensions
-#define IA32_FEATURE_EXT_XSAVE		0x04000000	// XSAVE/XSTOR States
-#define IA32_FEATURE_EXT_OSXSAVE	0x08000000	// OS-Enabled XSAVE
-#define IA32_FEATURE_EXT_AVX		0x10000000	// Advanced Vector Extensions
-#define IA32_FEATURE_EXT_F16C		0x20000000	// 16-bit FP conversion
-#define IA32_FEATURE_EXT_RDRND		0x40000000	// RDRAND instruction
-#define IA32_FEATURE_EXT_HYPERVISOR	0x80000000	// Running on a hypervisor
+#define IA32_FEATURE_EXT_SSE3		(1 << 0) // SSE3
+#define IA32_FEATURE_EXT_PCLMULQDQ	(1 << 1) // PCLMULQDQ Instruction
+#define IA32_FEATURE_EXT_DTES64		(1 << 2) // 64-Bit Debug Store
+#define IA32_FEATURE_EXT_MONITOR	(1 << 3) // MONITOR/MWAIT
+#define IA32_FEATURE_EXT_DSCPL		(1 << 4) // CPL qualified debug store
+#define IA32_FEATURE_EXT_VMX		(1 << 5) // Virtual Machine Extensions
+#define IA32_FEATURE_EXT_SMX		(1 << 6) // Safer Mode Extensions
+#define IA32_FEATURE_EXT_EST		(1 << 7) // Enhanced SpeedStep
+#define IA32_FEATURE_EXT_TM2		(1 << 8) // Thermal Monitor 2
+#define IA32_FEATURE_EXT_SSSE3		(1 << 9) // Supplemental SSE-3
+#define IA32_FEATURE_EXT_CNXTID		(1 << 10) // L1 Context ID
+//									(1 << 11) // Reserved
+#define IA32_FEATURE_EXT_FMA		(1 << 12) // Fused Multiply Add
+#define IA32_FEATURE_EXT_CX16		(1 << 13) // CMPXCHG16B
+#define IA32_FEATURE_EXT_XTPR		(1 << 14) // xTPR Update Control
+#define IA32_FEATURE_EXT_PDCM		(1 << 15) // Perfmon and Debug Capability
+//									(1 << 16) // Reserved
+#define IA32_FEATURE_EXT_PCID		(1 << 17) // Process Context Identifiers
+#define IA32_FEATURE_EXT_DCA		(1 << 18) // Direct Cache Access
+#define IA32_FEATURE_EXT_SSE4_1		(1 << 19) // SSE4.1
+#define IA32_FEATURE_EXT_SSE4_2		(1 << 20) // SSE4.2
+#define IA32_FEATURE_EXT_X2APIC		(1 << 21) // Extended xAPIC Support
+#define IA32_FEATURE_EXT_MOVBE 		(1 << 22) // MOVBE Instruction
+#define IA32_FEATURE_EXT_POPCNT		(1 << 23) // POPCNT Instruction
+#define IA32_FEATURE_EXT_TSCDEADLINE (1 << 24) // Time Stamp Counter Deadline
+#define IA32_FEATURE_EXT_AES		(1 << 25) // AES Instruction Extensions
+#define IA32_FEATURE_EXT_XSAVE		(1 << 26) // XSAVE/XSTOR States
+#define IA32_FEATURE_EXT_OSXSAVE	(1 << 27) // OS-Enabled XSAVE
+#define IA32_FEATURE_EXT_AVX		(1 << 28) // Advanced Vector Extensions
+#define IA32_FEATURE_EXT_F16C		(1 << 29) // 16-bit FP conversion
+#define IA32_FEATURE_EXT_RDRND		(1 << 30) // RDRAND instruction
+#define IA32_FEATURE_EXT_HYPERVISOR	(1 << 31) // Running on a hypervisor
 
 // x86 features from cpuid eax 0x80000001, edx register (AMD)
 // only care about the ones that are unique to this register
-#define IA32_FEATURE_AMD_EXT_SYSCALL	(1 << 11)	// SYSCALL/SYSRET
-#define IA32_FEATURE_AMD_EXT_NX			(1 << 20)	// no execute bit
-#define IA32_FEATURE_AMD_EXT_MMXEXT		(1 << 22)	// mmx extensions
-#define IA32_FEATURE_AMD_EXT_FFXSR		(1 << 25)	// fast FXSAVE/FXRSTOR
-#define IA32_FEATURE_AMD_EXT_RDTSCP		(1 << 27)	// rdtscp instruction
-#define IA32_FEATURE_AMD_EXT_LONG		(1 << 29)	// long mode
-#define IA32_FEATURE_AMD_EXT_3DNOWEXT	(1 << 30)	// 3DNow! extensions
-#define IA32_FEATURE_AMD_EXT_3DNOW		(1 << 31)	// 3DNow!
+#define IA32_FEATURE_AMD_EXT_SYSCALL	(1 << 11) // SYSCALL/SYSRET
+#define IA32_FEATURE_AMD_EXT_NX			(1 << 20) // no execute bit
+#define IA32_FEATURE_AMD_EXT_MMXEXT		(1 << 22) // mmx extensions
+#define IA32_FEATURE_AMD_EXT_FFXSR		(1 << 25) // fast FXSAVE/FXRSTOR
+#define IA32_FEATURE_AMD_EXT_RDTSCP		(1 << 27) // rdtscp instruction
+#define IA32_FEATURE_AMD_EXT_LONG		(1 << 29) // long mode
+#define IA32_FEATURE_AMD_EXT_3DNOWEXT	(1 << 30) // 3DNow! extensions
+#define IA32_FEATURE_AMD_EXT_3DNOW		(1 << 31) // 3DNow!
 
 // cr4 flags
 #define IA32_CR4_PAE					(1UL << 5)
