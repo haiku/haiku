@@ -9,8 +9,11 @@
 
 #include "PreferencesWindow.h"
 
+#include <ctype.h>
+
 #include <Catalog.h>
 #include <CheckBox.h>
+#include <FormattingConventions.h>
 #include <GroupLayout.h>
 #include <Locale.h>
 #include <LayoutBuilder.h>
@@ -18,8 +21,8 @@
 #include <RadioButton.h>
 #include <SeparatorView.h>
 #include <Slider.h>
-
-#include <ctype.h>
+#include <StringView.h>
+#include <View.h>
 
 #include "BarApp.h"
 #include "StatusView.h"
@@ -33,7 +36,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	BWindow(frame, B_TRANSLATE("Deskbar preferences"), B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE)
 {
-	// Controls
+	// Menu controls
 	fMenuRecentDocuments = new BCheckBox(B_TRANSLATE("Recent documents:"),
 		new BMessage(kUpdateRecentCounts));
 	fMenuRecentApplications = new BCheckBox(B_TRANSLATE("Recent applications:"),
@@ -48,6 +51,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fMenuRecentFolderCount = new BTextControl(NULL, NULL,
 		new BMessage(kUpdateRecentCounts));
 
+	// Applications controls
 	fAppsSort = new BCheckBox(B_TRANSLATE("Sort running applications"),
 		new BMessage(kSortRunningApps));
 	fAppsSortTrackerFirst = new BCheckBox(B_TRANSLATE("Tracker always first"),
@@ -68,8 +72,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 		B_TRANSLATE("Large"));
 	fAppsIconSizeSlider->SetModificationMessage(new BMessage(kResizeTeamIcons));
 
-	fClockSeconds = new BCheckBox(B_TRANSLATE("Show seconds"),
-		new BMessage(kShowSeconds));
+	// Window controls
 	fWindowAlwaysOnTop = new BCheckBox(B_TRANSLATE("Always on top"),
 		new BMessage(kAlwaysTop));
 	fWindowAutoRaise = new BCheckBox(B_TRANSLATE("Auto-raise"),
@@ -77,6 +80,39 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fWindowAutoHide = new BCheckBox(B_TRANSLATE("Auto-hide"),
 		new BMessage(kAutoHide));
 
+	// Clock controls
+	BMessage* timeInterval12HoursMessage = new BMessage(kTimeIntervalChanged);
+	timeInterval12HoursMessage->AddBool("use24HourClock", false);
+	fTimeInterval12HourRadioButton = new BRadioButton("time inteval",
+		B_TRANSLATE("12 hour"), timeInterval12HoursMessage);
+
+	BMessage* timeInterval24HoursMessage = new BMessage(kTimeIntervalChanged);
+	timeInterval24HoursMessage->AddBool("use24HourClock", true);
+	fTimeInterval24HourRadioButton = new BRadioButton("time inteval",
+		B_TRANSLATE("24 hour"), timeInterval24HoursMessage);
+
+	BMessage* timeFormatShortMessage = new BMessage(kTimeFormatChanged);
+	timeFormatShortMessage->AddUInt32("time format", B_SHORT_TIME_FORMAT);
+	fTimeFormatShortRadioButton = new BRadioButton("time format",
+		"Short", timeFormatShortMessage);
+
+	BMessage* timeFormatMediumMessage = new BMessage(kTimeFormatChanged);
+	timeFormatMediumMessage->AddUInt32("time format", B_MEDIUM_TIME_FORMAT);
+	fTimeFormatMediumRadioButton = new BRadioButton("time format",
+		"Medium", timeFormatMediumMessage);
+
+	BMessage* timeFormatLongMessage = new BMessage(kTimeFormatChanged);
+	timeFormatLongMessage->AddUInt32("time format", B_LONG_TIME_FORMAT);
+	fTimeFormatLongRadioButton = new BRadioButton("time format",
+		"Long", timeFormatLongMessage);
+
+	_UpdateTimeFormatRadioButtonLabels();
+
+	// Get settings from BarApp
+	TBarApp* barApp = static_cast<TBarApp*>(be_app);
+	desk_settings* settings = barApp->Settings();
+
+	// Menu settings
 	BTextView* docTextView = fMenuRecentDocumentCount->TextView();
 	BTextView* appTextView = fMenuRecentApplicationCount->TextView();
 	BTextView* folderTextView = fMenuRecentFolderCount->TextView();
@@ -93,29 +129,18 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	appTextView->SetMaxBytes(4);
 	folderTextView->SetMaxBytes(4);
 
-	// Values
-	TBarApp* barApp = static_cast<TBarApp*>(be_app);
-	desk_settings* appSettings = barApp->Settings();
+	int32 docCount = settings->recentDocsCount;
+	int32 appCount = settings->recentAppsCount;
+	int32 folderCount = settings->recentFoldersCount;
 
-	fAppsSort->SetValue(appSettings->sortRunningApps);
-	fAppsSortTrackerFirst->SetValue(appSettings->trackerAlwaysFirst);
-	fAppsShowExpanders->SetValue(appSettings->superExpando);
-	fAppsExpandNew->SetValue(appSettings->expandNewTeams);
-	fAppsHideLabels->SetValue(appSettings->hideLabels);
-	fAppsIconSizeSlider->SetValue(appSettings->iconSize / kIconSizeInterval);
+	fMenuRecentDocuments->SetValue(settings->recentDocsEnabled);
+	fMenuRecentDocumentCount->SetEnabled(settings->recentDocsEnabled);
 
-	int32 docCount = appSettings->recentDocsCount;
-	int32 appCount = appSettings->recentAppsCount;
-	int32 folderCount = appSettings->recentFoldersCount;
+	fMenuRecentApplications->SetValue(settings->recentAppsEnabled);
+	fMenuRecentApplicationCount->SetEnabled(settings->recentAppsEnabled);
 
-	fMenuRecentDocuments->SetValue(appSettings->recentDocsEnabled);
-	fMenuRecentDocumentCount->SetEnabled(appSettings->recentDocsEnabled);
-
-	fMenuRecentApplications->SetValue(appSettings->recentAppsEnabled);
-	fMenuRecentApplicationCount->SetEnabled(appSettings->recentAppsEnabled);
-
-	fMenuRecentFolders->SetValue(appSettings->recentFoldersEnabled);
-	fMenuRecentFolderCount->SetEnabled(appSettings->recentFoldersEnabled);
+	fMenuRecentFolders->SetValue(settings->recentFoldersEnabled);
+	fMenuRecentFolderCount->SetEnabled(settings->recentFoldersEnabled);
 
 	BString docString;
 	BString appString;
@@ -129,16 +154,37 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fMenuRecentApplicationCount->SetText(appString.String());
 	fMenuRecentFolderCount->SetText(folderString.String());
 
-	TReplicantTray* replicantTray = barApp->BarView()->fReplicantTray;
+	// Applications settings
+	fAppsSort->SetValue(settings->sortRunningApps);
+	fAppsSortTrackerFirst->SetValue(settings->trackerAlwaysFirst);
+	fAppsShowExpanders->SetValue(settings->superExpando);
+	fAppsExpandNew->SetValue(settings->expandNewTeams);
+	fAppsHideLabels->SetValue(settings->hideLabels);
+	fAppsIconSizeSlider->SetValue(settings->iconSize / kIconSizeInterval);
 
-	fClockSeconds->SetValue(replicantTray->ShowingSeconds());
+	// Window settings
+	fWindowAlwaysOnTop->SetValue(settings->alwaysOnTop);
+	fWindowAutoRaise->SetValue(settings->autoRaise);
+	fWindowAutoHide->SetValue(settings->autoHide);
 
-	bool showingClock = barApp->BarView()->ShowingClock();
-	fClockSeconds->SetEnabled(showingClock);
+	// Clock settings
+	BFormattingConventions conventions;
+	BLocale::Default()->GetFormattingConventions(&conventions);
+	if (conventions.Use24HourClock())
+		fTimeInterval24HourRadioButton->SetValue(B_CONTROL_ON);
+	else
+		fTimeInterval12HourRadioButton->SetValue(B_CONTROL_ON);
 
-	fWindowAlwaysOnTop->SetValue(appSettings->alwaysOnTop);
-	fWindowAutoRaise->SetValue(appSettings->autoRaise);
-	fWindowAutoHide->SetValue(appSettings->autoHide);
+	switch (settings->timeFormat) {
+		case B_LONG_TIME_FORMAT:
+			fTimeFormatLongRadioButton->SetValue(B_CONTROL_ON);
+			break;
+		case B_MEDIUM_TIME_FORMAT:
+			fTimeFormatMediumRadioButton->SetValue(B_CONTROL_ON);
+			break;
+		default:
+			fTimeFormatShortRadioButton->SetValue(B_CONTROL_ON);
+	}
 
 	_EnableDisableDependentItems();
 
@@ -149,22 +195,27 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fAppsHideLabels->SetTarget(be_app);
 	fAppsIconSizeSlider->SetTarget(be_app);
 
-	fClockSeconds->SetTarget(replicantTray);
-
 	fWindowAlwaysOnTop->SetTarget(be_app);
 	fWindowAutoRaise->SetTarget(be_app);
 	fWindowAutoHide->SetTarget(be_app);
 
+	TReplicantTray* replicantTray = barApp->BarView()->fReplicantTray;
+	fTimeInterval12HourRadioButton->SetTarget(replicantTray);
+	fTimeInterval24HourRadioButton->SetTarget(replicantTray);
+	fTimeFormatShortRadioButton->SetTarget(replicantTray);
+	fTimeFormatMediumRadioButton->SetTarget(replicantTray);
+	fTimeFormatLongRadioButton->SetTarget(replicantTray);
+
 	// Layout
 	fMenuBox = new BBox("fMenuBox");
 	fAppsBox = new BBox("fAppsBox");
-	fClockBox = new BBox("fClockBox");
 	fWindowBox = new BBox("fWindowBox");
+	fClockBox = new BBox("fClockBox");
 
 	fMenuBox->SetLabel(B_TRANSLATE("Menu"));
 	fAppsBox->SetLabel(B_TRANSLATE("Applications"));
-	fClockBox->SetLabel(B_TRANSLATE("Clock"));
 	fWindowBox->SetLabel(B_TRANSLATE("Window"));
+	fClockBox->SetLabel(B_TRANSLATE("Clock"));
 
 	BView* view;
 	view = BLayoutBuilder::Group<>()
@@ -207,15 +258,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 
 	view = BLayoutBuilder::Group<>()
 		.AddGroup(B_VERTICAL, 1)
-			.Add(fClockSeconds)
-			.AddGlue()
-			.SetInsets(10, 10, 10, 10)
-			.End()
-		.View();
-	fClockBox->AddChild(view);
-
-	view = BLayoutBuilder::Group<>()
-		.AddGroup(B_VERTICAL, 1)
 			.Add(fWindowAlwaysOnTop)
 			.Add(fWindowAutoRaise)
 			.Add(fWindowAutoHide)
@@ -224,6 +266,51 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 			.End()
 		.View();
 	fWindowBox->AddChild(view);
+
+	BStringView* timeIntervalLabel = new BStringView("interval",
+		B_TRANSLATE("Interval:"));
+	timeIntervalLabel->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
+		B_SIZE_UNSET));
+	timeIntervalLabel->SetLowColor((rgb_color){255, 255, 255, 255});
+
+	BGroupLayout* timeIntervalLayout = new BGroupLayout(B_VERTICAL, 0);
+	timeIntervalLayout->SetInsets(10, 0, 0, 0);
+	BView* timeIntervalView = new BView("interval", 0, timeIntervalLayout);
+	timeIntervalView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	timeIntervalView->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	timeIntervalView->AddChild(fTimeInterval12HourRadioButton);
+	timeIntervalView->AddChild(fTimeInterval24HourRadioButton);
+
+	BStringView* timeFormatLabel = new BStringView("format",
+		B_TRANSLATE("Format:"));
+	timeFormatLabel->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
+		B_SIZE_UNSET));
+	timeFormatLabel->SetLowColor((rgb_color){255, 255, 255, 255});
+
+	BGroupLayout* timeFormatLayout = new BGroupLayout(B_VERTICAL, 0);
+	timeFormatLayout->SetInsets(10, 0, 0, 0);
+	BView* timeFormatView = new BView("format", 0, timeFormatLayout);
+	timeFormatView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	timeFormatView->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	timeFormatView->AddChild(fTimeFormatShortRadioButton);
+	timeFormatView->AddChild(fTimeFormatMediumRadioButton);
+	timeFormatView->AddChild(fTimeFormatLongRadioButton);
+
+	view = BLayoutBuilder::Group<>()
+		.AddGroup(B_VERTICAL, 10)
+			.AddGroup(B_VERTICAL, 0)
+				.Add(timeIntervalLabel)
+				.Add(timeIntervalView)
+				.End()
+			.AddGroup(B_VERTICAL, 0)
+				.Add(timeFormatLabel)
+				.Add(timeFormatView)
+				.End()
+			.AddGlue()
+			.SetInsets(10, 10, 10, 10)
+			.End()
+		.View();
+	fClockBox->AddChild(view);
 
 	BLayoutBuilder::Group<>(this)
 		.AddGrid(5, 5)
@@ -271,6 +358,14 @@ PreferencesWindow::MessageReceived(BMessage* message)
 			BWindow::MessageReceived(message);
 			break;
 	}
+}
+
+
+void
+PreferencesWindow::WindowActivated(bool active)
+{
+	if (!active && IsMinimized())
+		PostMessage(B_QUIT_REQUESTED);
 }
 
 
@@ -323,8 +418,17 @@ PreferencesWindow::_EnableDisableDependentItems()
 
 
 void
-PreferencesWindow::WindowActivated(bool active)
+PreferencesWindow::_UpdateTimeFormatRadioButtonLabels()
 {
-	if (!active && IsMinimized())
-		PostMessage(B_QUIT_REQUESTED);
+	time_t timeValue = (time_t)time(NULL);
+	BString result;
+
+	BLocale::Default()->FormatTime(&result, timeValue, B_SHORT_TIME_FORMAT);
+	fTimeFormatShortRadioButton->SetLabel(result);
+
+	BLocale::Default()->FormatTime(&result, timeValue, B_MEDIUM_TIME_FORMAT);
+	fTimeFormatMediumRadioButton->SetLabel(result);
+
+	BLocale::Default()->FormatTime(&result, timeValue, B_LONG_TIME_FORMAT);
+	fTimeFormatLongRadioButton->SetLabel(result);
 }

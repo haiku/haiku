@@ -196,11 +196,12 @@ TBarApp::SaveSettings()
 		storedSettings.AddBool("vertical", fSettings.vertical);
 		storedSettings.AddBool("left", fSettings.left);
 		storedSettings.AddBool("top", fSettings.top);
-		storedSettings.AddBool("ampmMode", fSettings.ampmMode);
-
 		storedSettings.AddInt32("state", fSettings.state);
 		storedSettings.AddFloat("width", fSettings.width);
+
 		storedSettings.AddBool("showTime", fSettings.showTime);
+		storedSettings.AddBool("timeFormat", fSettings.timeFormat);
+
 		storedSettings.AddPoint("switcherLoc", fSettings.switcherLoc);
 		storedSettings.AddInt32("recentAppsCount", fSettings.recentAppsCount);
 		storedSettings.AddInt32("recentDocsCount", fSettings.recentDocsCount);
@@ -237,8 +238,8 @@ TBarApp::InitSettings()
 	settings.vertical = true;
 	settings.left = false;
 	settings.top = true;
-	settings.ampmMode = true;
 	settings.showTime = true;
+	settings.timeFormat = B_SHORT_TIME_FORMAT;
 	settings.state = kExpandoState;
 	settings.width = 0;
 	settings.switcherLoc = BPoint(5000, 5000);
@@ -287,10 +288,6 @@ TBarApp::InitSettings()
 				settings.left = false;
 			if (storedSettings.FindBool("top", &settings.top) != B_OK)
 				settings.top = true;
-			if (storedSettings.FindBool("ampmMode", &settings.ampmMode)
-				!= B_OK) {
-				settings.ampmMode = true;
-			}
 			if (storedSettings.FindInt32("state", (int32*)&settings.state)
 				!= B_OK) {
 				settings.state = kExpandoState;
@@ -300,6 +297,10 @@ TBarApp::InitSettings()
 			if (storedSettings.FindBool("showTime", &settings.showTime)
 				!= B_OK) {
 				settings.showTime = true;
+			}
+			if (storedSettings.FindUInt32("timeFormat", &settings.timeFormat)
+				!= B_OK) {
+				settings.timeFormat = B_SHORT_TIME_FORMAT;
 			}
 			if (storedSettings.FindPoint("switcherLoc", &settings.switcherLoc)
 				!= B_OK) {

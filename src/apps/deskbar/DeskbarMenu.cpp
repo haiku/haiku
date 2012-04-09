@@ -387,11 +387,21 @@ TDeskbarMenu::ResetTargets()
 				case kToggleDraggers:
 				case kConfigShow:
 				case kAlwaysTop:
-				case kShowSeconds:
+				case kExpandNewTeams:
+				case kHideLabels:
+				case kResizeTeamIcons:
+				case kSortRunningApps:
+				case kTrackerFirst:
 				case kRebootSystem:
 				case kSuspendSystem:
 				case kShutdownSystem:
 					item->SetTarget(be_app);
+					break;
+
+				case kShowHideTime:
+				case kTimeIntervalChanged:
+				case kTimeFormatChanged:
+					item->SetTarget(fBarView->fReplicantTray);
 					break;
 			}
 		}

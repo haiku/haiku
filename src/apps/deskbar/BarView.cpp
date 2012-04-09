@@ -70,13 +70,11 @@ const int32 kMenuTrackMargin = 20;
 
 
 TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
-		bool showInterval, uint32 state, float, bool showClock)
+		uint32 state, float)
 	: BView(frame, "BarView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
 	fBarMenuBar(NULL),
 	fExpando(NULL),
 	fTrayLocation(1),
-	fShowInterval(showInterval),
-	fShowClock(showClock),
 	fVertical(vertical),
 	fTop(top),
 	fLeft(left),
@@ -502,12 +500,10 @@ TBarView::SaveSettings()
 	settings->vertical = fVertical;
 	settings->left = fLeft;
 	settings->top = fTop;
-	settings->ampmMode = fShowInterval;
 	settings->state = (uint32)fState;
 	settings->width = 0;
-	settings->showTime = fShowClock;
 
-	fReplicantTray->RememberClockSettings();
+	fReplicantTray->SaveTimeSettings();
 }
 
 

@@ -35,6 +35,7 @@ public:
 private:
 			void			_UpdateRecentCounts();
 			void			_EnableDisableDependentItems();
+			void			_UpdateTimeFormatRadioButtonLabels();
 
 			BBox*			fMenuBox;
 			BBox*			fAppsBox;
@@ -56,11 +57,17 @@ private:
 			BCheckBox*		fAppsHideLabels;
 			BSlider*		fAppsIconSizeSlider;
 
-			BCheckBox*		fClockSeconds;
-
 			BCheckBox*		fWindowAlwaysOnTop;
 			BCheckBox*		fWindowAutoRaise;
 			BCheckBox*		fWindowAutoHide;
+
+			BCheckBox*		fShowTime;
+			BRadioButton*	fTimeInterval24HourRadioButton;
+			BRadioButton*	fTimeInterval12HourRadioButton;
+
+			BRadioButton*	fTimeFormatLongRadioButton;
+			BRadioButton*	fTimeFormatMediumRadioButton;
+			BRadioButton*	fTimeFormatShortRadioButton;
 };
 
 #endif	// _PREFERENCES_WINDOW_H

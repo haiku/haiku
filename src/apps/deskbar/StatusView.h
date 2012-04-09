@@ -45,6 +45,7 @@ All rights reserved.
 #include "BarView.h"
 #include "TimeView.h"
 
+
 const float kMaxReplicantHeight = 16.0f;
 const float kMaxReplicantWidth = 16.0f;
 const int32 kMinimumReplicantCount = 6;
@@ -111,11 +112,7 @@ public:
 	bool AcceptAddon(BRect frame, BMessage* message);
 	void RealignReplicants(int32 startIndex = -1);
 
-	bool ShowingSeconds(void);
-	bool ShowingMiltime(void);
-
-	void RememberClockSettings();
-	void DealWithClock(bool);
+	void SaveTimeSettings();
 
 #ifdef DB_ADDONS
 	status_t LoadAddOn(BEntry* entry, int32* id, bool addToSettings = true);
@@ -147,11 +144,14 @@ private:
 	BPoint LocationForReplicant(int32 index, float width);
 	BShelf* Shelf() const;
 
+	void ShowHideTime();
+	void UpdateTimeFormat(uint32 timeFormat);
+
 	status_t _SaveSettings();
 
 	friend class TReplicantShelf;
 
-	TTimeView* fClock;
+	TTimeView* fTime;
 	TBarView* fBarView;
 	TReplicantShelf* fShelf;
 	BRect fRightBottomReplicant;

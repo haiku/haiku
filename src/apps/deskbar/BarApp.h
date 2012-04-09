@@ -102,8 +102,8 @@ struct desk_settings {
 	bool vertical;
 	bool left;
 	bool top;
-	bool ampmMode;
 	bool showTime;
+	uint32 timeFormat;
 	uint32 state;
 	float width;
 	BPoint switcherLoc;

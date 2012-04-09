@@ -42,8 +42,9 @@ All rights reserved.
 #include <View.h>
 
 
-const uint32 kShowSeconds = 'ShSc';
-const uint32 kFullDate = 'FDat';
+const uint32 kShowHideTime = 'shtm';
+const uint32 kTimeIntervalChanged = 'tivc';
+const uint32 kTimeFormatChanged = 'tfmc';
 
 class BCountry;
 class BMessageRunner;
@@ -55,8 +56,7 @@ class _EXPORT	TTimeView;
 
 class TTimeView : public BView {
 	public:
-		TTimeView(float maxWidth, float height, bool showSeconds = false,
-			bool showInterval = false);
+		TTimeView(float maxWidth, float height, uint32 timeFormat);
 		TTimeView(BMessage* data);
 		~TTimeView();
 
@@ -67,50 +67,49 @@ class TTimeView : public BView {
 
 		void		AttachedToWindow();
 		void		Draw(BRect update);
-		void		GetPreferredSize(float* width, float* height);
-		void		ResizeToPreferred();
 		void		FrameMoved(BPoint);
+		void		GetPreferredSize(float* width, float* height);
 		void		MessageReceived(BMessage*);
 		void		MouseDown(BPoint where);
 		void		Pulse();
-
-		bool		ShowingSeconds() { return fShowSeconds; }
-		void		ShowSeconds(bool);
-		void		ShowCalendar(BPoint where);
+		void		ResizeToPreferred();
 
 		bool		Orientation() const;
 		void		SetOrientation(bool o);
 
+		uint32		TimeFormat() const;
+		void		SetTimeFormat(uint32 timeFormat);
+
+		void		ShowCalendar(BPoint where);
+
 	private:
 		friend class TReplicantTray;
 
-		void		Update();
 		void		GetCurrentTime();
 		void		GetCurrentDate();
 		void		CalculateTextPlacement();
-		void		ShowClockOptions(BPoint);
+		void		ShowTimeOptions(BPoint);
+		void		Update();
 
 		BView		*fParent;
 		bool		fNeedToUpdate;
 
-		time_t		fTime;
+		time_t		fCurrentTime;
 		time_t		fLastTime;
 
-		char		fTimeStr[64];
+		char		fCurrentTimeStr[64];
 		char		fLastTimeStr[64];
-		char		fDateStr[64];
+		char		fCurrentDateStr[64];
 		char		fLastDateStr[64];
 
 		int			fSeconds;
 		int			fMinute;
 		int			fHour;
 
-		bool		fShowInterval;
-		bool		fShowSeconds;
-
 		float		fMaxWidth;
 		float		fHeight;
 		bool		fOrientation; // vertical = true
+		uint32		fTimeFormat;
 		BPoint		fTimeLocation;
 		BPoint		fDateLocation;
 
@@ -124,6 +123,13 @@ inline bool
 TTimeView::Orientation() const
 {
 	return fOrientation;
+}
+
+
+inline uint32
+TTimeView::TimeFormat() const
+{
+	return fTimeFormat;
 }
 
 

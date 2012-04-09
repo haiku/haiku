@@ -56,8 +56,8 @@ static const float kHMargin = 2.0;
 
 
 enum {
-	kShowClock,
-	kChangeClock,
+	kShowTime,
+	kChangeTime,
 	kHide,
 	kShowCalendar
 };
@@ -66,23 +66,21 @@ enum {
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "TimeView"
 
-TTimeView::TTimeView(float maxWidth, float height, bool showSeconds,
-	bool)
+TTimeView::TTimeView(float maxWidth, float height, uint32 timeFormat)
 	:
 	BView(BRect(-100, -100, -90, -90), "_deskbar_tv_",
 	B_FOLLOW_RIGHT | B_FOLLOW_TOP,
 	B_WILL_DRAW | B_PULSE_NEEDED | B_FRAME_EVENTS),
 	fParent(NULL),
-	fShowInterval(true), // ToDo: defaulting this to true until UI is in place
-	fShowSeconds(showSeconds),
 	fMaxWidth(maxWidth),
 	fHeight(height),
-	fOrientation(true)
+	fOrientation(true),
+	fTimeFormat(timeFormat)
 {
-	fTime = fLastTime = time(NULL);
+	fCurrentTime = fLastTime = time(NULL);
 	fSeconds = fMinute = fHour = 0;
-	fTimeStr[0] = 0;
-	fDateStr[0] = 0;
+	fCurrentTimeStr[0] = 0;
+	fCurrentDateStr[0] = 0;
 	fLastTimeStr[0] = 0;
 	fLastDateStr[0] = 0;
 	fNeedToUpdate = true;
@@ -95,7 +93,7 @@ TTimeView::TTimeView(float maxWidth, float height, bool showSeconds,
 TTimeView::TTimeView(BMessage* data)
 	: BView(data)
 {
-	fTime = fLastTime = time(NULL);
+	fCurrentTime = fLastTime = time(NULL);
 	data->FindBool("seconds", &fShowSeconds);
 
 	fLocale = *BLocale::Default();
@@ -134,7 +132,7 @@ TTimeView::Archive(BMessage* data, bool deep) const
 void
 TTimeView::AttachedToWindow()
 {
-	fTime = time(NULL);
+	fCurrentTime = time(NULL);
 
 	SetFont(be_plain_font);
 	if (Parent()) {
@@ -149,6 +147,29 @@ TTimeView::AttachedToWindow()
 
 
 void
+TTimeView::Draw(BRect /*updateRect*/)
+{
+	PushState();
+
+	SetHighColor(ViewColor());
+	SetLowColor(ViewColor());
+	FillRect(Bounds());
+	SetHighColor(0, 0, 0, 255);
+
+	DrawString(fCurrentTimeStr, fTimeLocation);
+
+	PopState();
+}
+
+
+void
+TTimeView::FrameMoved(BPoint)
+{
+	Update();
+}
+
+
+void
 TTimeView::GetPreferredSize(float* width, float* height)
 {
 	*height = fHeight;
@@ -159,8 +180,103 @@ TTimeView::GetPreferredSize(float* width, float* height)
 	// we want to limit the width so that it can't overlap the bevels in the
 	// parent view.
 	*width = fOrientation ?
-		min_c(fMaxWidth - kHMargin, kHMargin + StringWidth(fTimeStr))
-		: kHMargin + StringWidth(fTimeStr);
+		min_c(fMaxWidth - kHMargin, kHMargin + StringWidth(fCurrentTimeStr))
+		: kHMargin + StringWidth(fCurrentTimeStr);
+}
+
+
+void
+TTimeView::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case B_LOCALE_CHANGED:
+			Update();
+			break;
+
+		case kChangeTime:
+			// launch the time prefs app
+			be_roster->Launch("application/x-vnd.Haiku-Time");
+			break;
+
+		case kShowHideTime:
+			Window()->PostMessage(message, Parent());
+			break;
+
+		case kShowCalendar:
+		{
+			BRect bounds(Bounds());
+			BPoint center(bounds.LeftTop());
+			center += BPoint(bounds.Width() / 2, bounds.Height() / 2);
+			ShowCalendar(center);
+			break;
+		}
+
+		default:
+			BView::MessageReceived(message);
+			break;
+	}
+}
+
+
+void
+TTimeView::MouseDown(BPoint point)
+{
+	uint32 buttons;
+
+	Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons);
+	if (buttons == B_SECONDARY_MOUSE_BUTTON) {
+		ShowTimeOptions(ConvertToScreen(point));
+		return;
+	} else if (buttons == B_PRIMARY_MOUSE_BUTTON)
+		ShowCalendar(point);
+
+	// invalidate last time/date strings and call the pulse
+	// method directly to change the display instantly
+	fLastDateStr[0] = '\0';
+	fLastTimeStr[0] = '\0';
+	Pulse();
+}
+
+
+void
+TTimeView::Pulse()
+{
+	time_t curTime = time(NULL);
+	tm* ct = localtime(&curTime);
+	if (ct == NULL)
+		return;
+
+	fCurrentTime = curTime;
+
+	GetCurrentTime();
+	GetCurrentDate();
+	if (strcmp(fCurrentTimeStr, fLastTimeStr) != 0) {
+		// Update bounds when the size of the strings has changed
+		// For dates, Update() could be called two times in a row,
+		// but that should only happen very rarely
+		if ((fLastTimeStr[1] != fCurrentTimeStr[1]
+			&& (fLastTimeStr[1] == ':' || fCurrentTimeStr[1] == ':'))
+			|| !fLastTimeStr[0])
+			Update();
+
+		strlcpy(fLastTimeStr, fCurrentTimeStr, sizeof(fLastTimeStr));
+		fNeedToUpdate = true;
+	}
+
+	// Update the tooltip if the date has changed
+	if (strcmp(fCurrentDateStr, fLastDateStr) != 0) {
+		strlcpy(fLastDateStr, fCurrentDateStr, sizeof(fLastDateStr));
+		SetToolTip(fCurrentDateStr);
+	}
+
+	if (fNeedToUpdate) {
+		fSeconds = ct->tm_sec;
+		fMinute = ct->tm_min;
+		fHour = ct->tm_hour;
+
+		Draw(Bounds());
+		fNeedToUpdate = false;
+	}
 }
 
 
@@ -179,47 +295,23 @@ TTimeView::ResizeToPreferred()
 }
 
 
+//	# pragma mark - Public methods
+
+
 void
-TTimeView::FrameMoved(BPoint)
+TTimeView::SetOrientation(bool orientation)
 {
-	Update();
+	fOrientation = orientation;
+	CalculateTextPlacement();
+	Invalidate();
 }
 
 
 void
-TTimeView::MessageReceived(BMessage* message)
+TTimeView::SetTimeFormat(uint32 timeFormat)
 {
-	switch (message->what) {
-		case kShowSeconds:
-			ShowSeconds(!ShowingSeconds());
-			break;
-
-		case B_LOCALE_CHANGED:
-			Update();
-			break;
-
-		case kChangeClock:
-			// launch the time prefs app
-			be_roster->Launch("application/x-vnd.Haiku-Time");
-			break;
-
-		case 'time':
-			Window()->PostMessage(message, Parent());
-			break;
-
-		case kShowCalendar:
-		{
-			BRect bounds(Bounds());
-			BPoint center(bounds.LeftTop());
-			center += BPoint(bounds.Width() / 2, bounds.Height() / 2);
-			ShowCalendar(center);
-			break;
-		}
-
-		default:
-			BView::MessageReceived(message);
-			break;
-	}
+	fTimeFormat = timeFormat;
+	Update();
 }
 
 
@@ -249,11 +341,26 @@ TTimeView::ShowCalendar(BPoint where)
 }
 
 
+//	# pragma mark - Private methods
+
+
 void
 TTimeView::GetCurrentTime()
 {
-	fLocale.FormatTime(fTimeStr, 64, fTime,
-		fShowSeconds ? B_MEDIUM_TIME_FORMAT : B_SHORT_TIME_FORMAT);
+	switch (fTimeFormat) {
+		case B_LONG_TIME_FORMAT:
+			fLocale.FormatTime(fCurrentTimeStr, 64, fCurrentTime,
+				B_LONG_TIME_FORMAT);
+			break;
+		case B_MEDIUM_TIME_FORMAT:
+			fLocale.FormatTime(fCurrentTimeStr, 64, fCurrentTime,
+				B_MEDIUM_TIME_FORMAT);
+			break;
+		default:
+			fLocale.FormatTime(fCurrentTimeStr, 64, fCurrentTime,
+				B_SHORT_TIME_FORMAT);
+	}
+	
 }
 
 
@@ -262,7 +369,7 @@ TTimeView::GetCurrentDate()
 {
 	char tmp[64];
 
-	fLocale.FormatDate(tmp, 64, fTime, B_FULL_DATE_FORMAT);
+	fLocale.FormatDate(tmp, 64, fCurrentTime, B_FULL_DATE_FORMAT);
 
 	// remove leading 0 from date when month is less than 10 (MM/DD/YY)
 	// or remove leading 0 from date when day is less than 10 (DD/MM/YY)
@@ -270,123 +377,7 @@ TTimeView::GetCurrentDate()
 	if (str[0] == '0')
 		str++;
 
-	strlcpy(fDateStr, str, sizeof(fDateStr));
-}
-
-
-void
-TTimeView::Draw(BRect /*updateRect*/)
-{
-	PushState();
-
-	SetHighColor(ViewColor());
-	SetLowColor(ViewColor());
-	FillRect(Bounds());
-	SetHighColor(0, 0, 0, 255);
-
-	DrawString(fTimeStr, fTimeLocation);
-
-	PopState();
-}
-
-
-void
-TTimeView::MouseDown(BPoint point)
-{
-	uint32 buttons;
-
-	Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons);
-	if (buttons == B_SECONDARY_MOUSE_BUTTON) {
-		ShowClockOptions(ConvertToScreen(point));
-		return;
-	} else if (buttons == B_PRIMARY_MOUSE_BUTTON)
-		ShowCalendar(point);
-
-	// invalidate last time/date strings and call the pulse
-	// method directly to change the display instantly
-	fLastDateStr[0] = '\0';
-	fLastTimeStr[0] = '\0';
-	Pulse();
-}
-
-
-void
-TTimeView::Pulse()
-{
-	time_t curTime = time(NULL);
-	tm* ct = localtime(&curTime);
-	if (ct == NULL)
-		return;
-
-	fTime = curTime;
-
-	GetCurrentTime();
-	GetCurrentDate();
-	if (strcmp(fTimeStr, fLastTimeStr) != 0) {
-		// Update bounds when the size of the strings has changed
-		// For dates, Update() could be called two times in a row,
-		// but that should only happen very rarely
-		if ((fLastTimeStr[1] != fTimeStr[1]
-			&& (fLastTimeStr[1] == ':' || fTimeStr[1] == ':'))
-			|| !fLastTimeStr[0])
-			Update();
-
-		strlcpy(fLastTimeStr, fTimeStr, sizeof(fLastTimeStr));
-		fNeedToUpdate = true;
-	}
-
-	// Update the tooltip if the date has changed
-	if (strcmp(fDateStr, fLastDateStr) != 0) {
-		strlcpy(fLastDateStr, fDateStr, sizeof(fLastDateStr));
-		SetToolTip(fDateStr);
-	}
-
-	if (fNeedToUpdate) {
-		fSeconds = ct->tm_sec;
-		fMinute = ct->tm_min;
-		fHour = ct->tm_hour;
-
-		Draw(Bounds());
-		fNeedToUpdate = false;
-	}
-}
-
-
-void
-TTimeView::ShowSeconds(bool on)
-{
-	fShowSeconds = on;
-	Update();
-}
-
-
-void
-TTimeView::Update()
-{
-	fLocale = *BLocale::Default();
-	GetCurrentTime();
-	GetCurrentDate();
-
-	SetToolTip(fDateStr);
-
-	ResizeToPreferred();
-	CalculateTextPlacement();
-
-	if (fParent) {
-		BMessage reformat('Trfm');
-		fParent->MessageReceived(&reformat);
-			// time string format realign
-		fParent->Invalidate();
-	}
-}
-
-
-void
-TTimeView::SetOrientation(bool o)
-{
-	fOrientation = o;
-	CalculateTextPlacement();
-	Invalidate();
+	strlcpy(fCurrentDateStr, str, sizeof(fCurrentDateStr));
 }
 
 
@@ -401,7 +392,7 @@ TTimeView::CalculateTextPlacement()
 	BFont font;
 	GetFont(&font);
 	const char* stringArray[1];
-	stringArray[0] = fTimeStr;
+	stringArray[0] = fCurrentTimeStr;
 	BRect rectArray[1];
 	escapement_delta delta = { 0.0, 0.0 };
 	font.GetBoundingBoxesForStrings(stringArray, 1, B_SCREEN_METRIC, &delta,
@@ -413,22 +404,29 @@ TTimeView::CalculateTextPlacement()
 
 
 void
-TTimeView::ShowClockOptions(BPoint point)
+TTimeView::ShowTimeOptions(BPoint point)
 {
 	BPopUpMenu* menu = new BPopUpMenu("", false, false);
 	menu->SetFont(be_plain_font);
 	BMenuItem* item;
 
-	item = new BMenuItem(B_TRANSLATE("Change time" B_UTF8_ELLIPSIS),
-		new BMessage(kChangeClock));
-	menu->AddItem(item);
+	if (IsHidden()) {
+		item = new BMenuItem(B_TRANSLATE("Show time"),
+			new BMessage(kShowHideTime));
+		menu->AddItem(item);
+	} else {
+		item = new BMenuItem(B_TRANSLATE("Change time" B_UTF8_ELLIPSIS),
+			new BMessage(kChangeTime));
+		menu->AddItem(item);
 
-	item = new BMenuItem(B_TRANSLATE("Hide time"), new BMessage('time'));
-	menu->AddItem(item);
+		item = new BMenuItem(B_TRANSLATE("Hide time"),
+			new BMessage(kShowHideTime));
+		menu->AddItem(item);
 
-	item = new BMenuItem(B_TRANSLATE("Show calendar" B_UTF8_ELLIPSIS),
-		new BMessage(kShowCalendar));
-	menu->AddItem(item);
+		item = new BMenuItem(B_TRANSLATE("Show calendar" B_UTF8_ELLIPSIS),
+			new BMessage(kShowCalendar));
+		menu->AddItem(item);
+	}
 
 	menu->SetTargetForItems(this);
 	// Changed to accept screen coord system point;
@@ -437,3 +435,18 @@ TTimeView::ShowClockOptions(BPoint point)
 		point.x + 4, point.y +4), true);
 }
 
+
+void
+TTimeView::Update()
+{
+	fLocale = *BLocale::Default();
+	GetCurrentTime();
+	GetCurrentDate();
+	SetToolTip(fCurrentDateStr);
+
+	ResizeToPreferred();
+	CalculateTextPlacement();
+
+	if (fParent)
+		fParent->Invalidate();
+}

@@ -96,8 +96,7 @@ TBarWindow::TBarWindow()
 	if (settings->alwaysOnTop)
 		SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
 	fBarView = new TBarView(Bounds(), settings->vertical, settings->left,
-		settings->top, settings->ampmMode, settings->state, settings->width,
-		settings->showTime);
+		settings->top, settings->state, settings->width);
 	AddChild(fBarView);
 
 	RemoveShortcut('H', B_COMMAND_KEY | B_CONTROL_KEY);

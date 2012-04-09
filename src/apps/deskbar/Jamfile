@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src apps deskbar ;
 
-UsePrivateHeaders app interface shared tracker ;
+UsePrivateHeaders app interface locale shared tracker ;
 UsePrivateHeaders private shared ;
 SubDirHdrs $(HAIKU_TOP) src kits tracker ;
 

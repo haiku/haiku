@@ -71,7 +71,7 @@ class TTeamMenuItem;
 class TBarView : public BView {
 	public:
 		TBarView(BRect frame, bool vertical, bool left, bool top,
-			bool ampmMode, uint32 state, float width, bool showClock);
+			uint32 state, float width);
 		~TBarView();
 
 		virtual void AttachedToWindow();
@@ -102,11 +102,7 @@ class TBarView : public BView {
 		bool MiniState() const { return fState == kMiniState; };
 		int32 State() const { return fState; };
 
-		// optional functionality methods
-		bool MilTime() const { return fShowInterval; };
-		void ShowClock(bool show) { fShowClock = show; };
-		bool ShowingClock() const { return fShowClock; };
-
+		// drag and drop methods
 		void CacheDragData(const BMessage* incoming);
 		status_t DragStart();
 		static bool MenuTrackingHook(BMenu* menu, void* castToThis);
@@ -172,8 +168,6 @@ class TBarView : public BView {
 		TDragRegion* fDragRegion;
 		TReplicantTray* fReplicantTray;
 
-		bool fShowInterval : 1;
-		bool fShowClock : 1;
 		bool fVertical : 1;
 		bool fTop : 1;
 		bool fLeft : 1;

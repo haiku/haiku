@@ -54,6 +54,7 @@ All rights reserved.
 #include <FindDirectory.h>
 #include <Locale.h>
 #include <MenuItem.h>
+#include <MutableLocaleRoster.h>
 #include <NodeInfo.h>
 #include <NodeMonitor.h>
 #include <Path.h>
@@ -126,7 +127,7 @@ DumpList(BList* itemlist)
 TReplicantTray::TReplicantTray(TBarView* parent, bool vertical)
 	: BView(BRect(0, 0, 1, 1), "Status", B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			B_WILL_DRAW | B_FRAME_EVENTS),
-	fClock(NULL),
+	fTime(NULL),
 	fBarView(parent),
 	fShelf(new TReplicantShelf(this)),
 	fMultiRowMode(vertical),
@@ -141,12 +142,17 @@ TReplicantTray::TReplicantTray(TBarView* parent, bool vertical)
 			2 * (logoBitmap->Bounds().Width() + 8));
 		fMinimumTrayWidth = sMinimumWindowWidth - kGutter - kDragRegionWidth;
 	}
+
+	// Create the time view
+	fTime = new TTimeView(fMinimumTrayWidth, kMaxReplicantHeight - 1.0,
+		((TBarApp*)be_app)->Settings()->timeFormat);
 }
 
 
 TReplicantTray::~TReplicantTray()
 {
 	delete fShelf;
+	delete fTime;
 }
 
 
@@ -164,8 +170,14 @@ TReplicantTray::AttachedToWindow()
 	SetDrawingMode(B_OP_COPY);
 
 	Window()->SetPulseRate(1000000);
-	DealWithClock(fBarView->ShowingClock());
 
+	AddChild(fTime);
+	fTime->MoveTo(Bounds().right - fTime->Bounds().Width() - 1, 2);
+	if (!((TBarApp*)be_app)->Settings()->showTime) {
+		fTime->Hide();
+		RealignReplicants();
+		AdjustPlacement();
+	}
 
 #ifdef DB_ADDONS
 	// load addons and rehydrate archives
@@ -191,50 +203,43 @@ TReplicantTray::DetachedFromWindow()
 
 
 void
-TReplicantTray::RememberClockSettings()
+TReplicantTray::SaveTimeSettings()
 {
-	if (fClock) {
-		desk_settings* settings = ((TBarApp*)be_app)->Settings();
+	if (fTime == NULL)
+		return;
 
-		settings->timeShowSeconds = fClock->ShowingSeconds();
-	}
-}
-
-
-bool
-TReplicantTray::ShowingSeconds()
-{
-	if (fClock)
-		return fClock->ShowingSeconds();
-	return false;
+	desk_settings* settings = ((TBarApp*)be_app)->Settings();
+	settings->showTime = !fTime->IsHidden();
+	settings->timeFormat = fTime->TimeFormat();
 }
 
 
 void
-TReplicantTray::DealWithClock(bool showClock)
+TReplicantTray::ShowHideTime()
 {
-	fBarView->ShowClock(showClock);
+	if (fTime == NULL)
+		return;
 
-	if (showClock) {
-		if (!fClock) {
-			desk_settings* settings = ((TBarApp*)be_app)->Settings();
+	if (fTime->IsHidden())
+		fTime->Show();
+	else
+		fTime->Hide();
 
-			fClock = new TTimeView(fMinimumTrayWidth, kMaxReplicantHeight - 1.0,
-				settings->timeShowSeconds,
-				false);
-			AddChild(fClock);
+	RealignReplicants();
+	AdjustPlacement();
+}
 
-			fClock->MoveTo(Bounds().right - fClock->Bounds().Width() - 1, 2);
-		}
-	} else {
-		if (fClock) {
-			RememberClockSettings();
 
-			fClock->RemoveSelf();
-			delete fClock;
-			fClock = NULL;
-		}
-	}
+void
+TReplicantTray::UpdateTimeFormat(uint32 timeFormat)
+{
+	if (fTime == NULL)
+		return;
+
+	fTime->SetTimeFormat(timeFormat);
+
+	RealignReplicants();
+	AdjustPlacement();
 }
 
 
@@ -261,10 +266,10 @@ TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 	} else {
 		// if last replicant overruns clock then resize to accomodate
 		if (fShelf->CountReplicants() > 0) {
-			if (fBarView->ShowingClock() && fRightBottomReplicant.right + 6
-				>= fClock->Frame().left) {
+			if (!fTime->IsHidden() && fTime->Frame().left
+				< fRightBottomReplicant.right + 6) {
 				width = fRightBottomReplicant.right + 6
-					+ fClock->Frame().Width();
+					+ fTime->Frame().Width();
 			} else
 				width = fRightBottomReplicant.right + 3;
 		}
@@ -306,25 +311,44 @@ void
 TReplicantTray::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case 'time':
+		case kShowHideTime:
 			// from context menu in clock and in this view
-			DealWithClock(!fBarView->ShowingClock());
-			RealignReplicants();
-			AdjustPlacement();
+			ShowHideTime();
 			break;
 
-		case 'Trfm':
-			// time string reformat -> realign
-			DealWithClock(fBarView->ShowingClock());
-			RealignReplicants();
-			AdjustPlacement();
-			break;
+		case kTimeIntervalChanged:
+		{
+			if (fTime == NULL)
+				return;
 
-		case kShowSeconds:
-		case kFullDate:
-			if (fClock != NULL)
-				Window()->PostMessage(message, fClock);
+			bool use24HourClock;
+			if (message->FindBool("use24HourClock", &use24HourClock)
+				== B_OK) {
+				BFormattingConventions conventions;
+				BLocale::Default()->GetFormattingConventions(&conventions);
+				conventions.SetExplicitUse24HourClock(use24HourClock);
+				BPrivate::MutableLocaleRoster::Default()->
+					SetDefaultFormattingConventions(conventions);
+				fTime->Update();
+				// time string reformat -> realign
+				RealignReplicants();
+				AdjustPlacement();
+			}
+
 			break;
+		}
+
+		case kTimeFormatChanged:
+		{
+			if (fTime == NULL)
+				return;
+
+			uint32 timeFormat;
+			if (message->FindUInt32("time format", &timeFormat) == B_OK)
+				UpdateTimeFormat(timeFormat);
+
+			break;
+		}
 
 #ifdef DB_ADDONS
 		case B_NODE_MONITOR:
@@ -347,11 +371,11 @@ TReplicantTray::ShowReplicantMenu(BPoint point)
 
 	// If clock is visible show the extended menu, otherwise show "Show Time"
 
-	if (fBarView->ShowingClock())
-		fClock->ShowClockOptions(ConvertToScreen(point));
+	if (fTime != NULL)
+		fTime->ShowTimeOptions(ConvertToScreen(point));
 	else {
 		BMenuItem* item = new BMenuItem(B_TRANSLATE("Show Time"),
-			new BMessage('time'));
+			new BMessage(kShowHideTime));
 		menu->AddItem(item);
 		menu->SetTargetForItems(this);
 		BPoint where = ConvertToScreen(point);
@@ -1097,8 +1121,8 @@ TReplicantTray::LocationForReplicant(int32 index, float width)
 			// determine free space in this row
 			BRect rect(loc.x, loc.y, loc.x + fMinimumTrayWidth - kIconGap
 				- 2.0, loc.y + kMaxReplicantHeight);
-			if (row == 0 && fBarView->ShowingClock())
-				rect.right -= fClock->Frame().Width() + kIconGap;
+			if (row == 0 && !fTime->IsHidden())
+				rect.right -= fTime->Frame().Width() + kIconGap;
 
 			for (int32 i = 0; i < index; i++) {
 				BView* view = NULL;
