@@ -40,7 +40,7 @@ int
 HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 {
 	struct msk_softc *sc = device_get_softc(dev);
-	u_int16_t status;
+	uint32_t status;
 
 	/* Reading B0_Y2_SP_ISRC2 masks further interrupts. */
 	status = CSR_READ_4(sc, B0_Y2_SP_ISRC2);
