@@ -23,5 +23,6 @@ Addon radeon_hd.accelerant :
 	hooks.cpp
 	mode.cpp
 	pll.cpp
+	renderqueue.cpp
 	: be libaccelerantscommon.a
 ;
