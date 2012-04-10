@@ -268,7 +268,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fWindowBox->AddChild(view);
 
 	BStringView* timeIntervalLabel = new BStringView("interval",
-		B_TRANSLATE("Interval:"));
+		B_TRANSLATE("Interval"));
 	timeIntervalLabel->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
 		B_SIZE_UNSET));
 	timeIntervalLabel->SetLowColor((rgb_color){255, 255, 255, 255});
@@ -282,7 +282,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	timeIntervalView->AddChild(fTimeInterval24HourRadioButton);
 
 	BStringView* timeFormatLabel = new BStringView("format",
-		B_TRANSLATE("Format:"));
+		B_TRANSLATE("Format"));
 	timeFormatLabel->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
 		B_SIZE_UNSET));
 	timeFormatLabel->SetLowColor((rgb_color){255, 255, 255, 255});
