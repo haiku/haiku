@@ -161,7 +161,8 @@ SYSTEM_ADD_ONS_PRINT_TRANSPORT = HP\ JetDirect IPP LPR
 	Print\ To\ File Serial\ Port USB\ Port
 ;
 SYSTEM_ADD_ONS_SCREENSAVERS = Butterfly DebugNow $(X86_ONLY)Flurry
-	$(HAIKU_INCLUDE_TRADEMARKS)Haiku Icons IFS Leaves Message Spider ;
+	$(X86_ONLY)GLife $(HAIKU_INCLUDE_TRADEMARKS)Haiku Icons IFS Leaves
+	Message Spider ;
 SYSTEM_ADD_ONS_DRIVERS_AUDIO = auich auvia echo3g emuxki hda ice1712 sis7018 ;
 SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD = ; #cmedia usb_audio ;
 SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon $(X86_ONLY)nvidia
