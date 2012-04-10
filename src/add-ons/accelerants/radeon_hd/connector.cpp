@@ -167,28 +167,28 @@ connector_read_mode_lvds(uint32 connectorIndex, display_mode* mode)
 		union atomLVDSInfo* lvdsInfo
 			= (union atomLVDSInfo*)(gAtomContext->bios + offset);
 
-		display_timing timing;
+		display_timing* timing = &mode->timing;
 
 		// Pixel Clock
-		timing.pixel_clock
+		timing->pixel_clock
 			= B_LENDIAN_TO_HOST_INT16(lvdsInfo->info.sLCDTiming.usPixClk) * 10;
 		// Horizontal
-		timing.h_display
+		timing->h_display
 			= B_LENDIAN_TO_HOST_INT16(lvdsInfo->info.sLCDTiming.usHActive);
-		timing.h_total = timing.h_display + B_LENDIAN_TO_HOST_INT16(
+		timing->h_total = timing->h_display + B_LENDIAN_TO_HOST_INT16(
 			lvdsInfo->info.sLCDTiming.usHBlanking_Time);
-		timing.h_sync_start = timing.h_display
+		timing->h_sync_start = timing->h_display
 			+ B_LENDIAN_TO_HOST_INT16(lvdsInfo->info.sLCDTiming.usHSyncOffset);
-		timing.h_sync_end = timing.h_sync_start
+		timing->h_sync_end = timing->h_sync_start
 			+ B_LENDIAN_TO_HOST_INT16(lvdsInfo->info.sLCDTiming.usHSyncWidth);
 		// Vertical
-		timing.v_display
+		timing->v_display
 			= B_LENDIAN_TO_HOST_INT16(lvdsInfo->info.sLCDTiming.usVActive);
-		timing.v_total = timing.v_display + B_LENDIAN_TO_HOST_INT16(
+		timing->v_total = timing->v_display + B_LENDIAN_TO_HOST_INT16(
 			lvdsInfo->info.sLCDTiming.usVBlanking_Time);
-		timing.v_sync_start = timing.v_display
+		timing->v_sync_start = timing->v_display
 			+ B_LENDIAN_TO_HOST_INT16(lvdsInfo->info.sLCDTiming.usVSyncOffset);
-		timing.v_sync_end = timing.v_sync_start
+		timing->v_sync_end = timing->v_sync_start
 			+ B_LENDIAN_TO_HOST_INT16(lvdsInfo->info.sLCDTiming.usVSyncWidth);
 
 		#if 0
@@ -204,37 +204,36 @@ connector_read_mode_lvds(uint32 connectorIndex, display_mode* mode)
 			lvdsInfo->info.sLCDTiming.susModeMiscInfo.usAccess);
 
 		if ((flags & ATOM_VSYNC_POLARITY) == 0)
-			timing.flags |= B_POSITIVE_VSYNC;
+			timing->flags |= B_POSITIVE_VSYNC;
 		if ((flags & ATOM_HSYNC_POLARITY) == 0)
-			timing.flags |= B_POSITIVE_HSYNC;
+			timing->flags |= B_POSITIVE_HSYNC;
 
 		// Extra flags
 		if ((flags & ATOM_INTERLACE) != 0)
-			timing.flags |= B_TIMING_INTERLACED;
+			timing->flags |= B_TIMING_INTERLACED;
 
 		#if 0
 		// We don't use these timing flags at the moment
 		if ((flags & ATOM_COMPOSITESYNC) != 0)
-			timing.flags |= MODE_FLAG_CSYNC;
+			timing->flags |= MODE_FLAG_CSYNC;
 		if ((flags & ATOM_DOUBLE_CLOCK_MODE) != 0)
-			timing.flags |= MODE_FLAG_DBLSCAN;
+			timing->flags |= MODE_FLAG_DBLSCAN;
 		#endif
 
-		mode->timing = timing;
 		mode->h_display_start = 0;
 		mode->v_display_start = 0;
-		mode->virtual_width = timing.h_display;
-		mode->virtual_height = timing.v_display;
+		mode->virtual_width = timing->h_display;
+		mode->virtual_height = timing->v_display;
 
 		// Assume 32-bit color
 		mode->space = B_RGB32_LITTLE;
 
 		TRACE("%s: %" B_PRIu32 " %" B_PRIu16 " %" B_PRIu16 " %" B_PRIu16
 			" %" B_PRIu16  " %" B_PRIu16 " %" B_PRIu16 " %" B_PRIu16
-			" %" B_PRIu16 "\n", __func__, timing.pixel_clock, timing.h_display,
-			timing.h_sync_start, timing.h_sync_end, timing.h_total,
-			timing.v_display, timing.v_sync_start, timing.v_sync_end,
-			timing.v_total);
+			" %" B_PRIu16 "\n", __func__, timing->pixel_clock,
+			timing->h_display, timing->h_sync_start, timing->h_sync_end,
+			timing->h_total, timing->v_display, timing->v_sync_start,
+			timing->v_sync_end, timing->v_total);
 
 		return true;
 	}
