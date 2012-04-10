@@ -371,7 +371,7 @@ TReplicantTray::ShowReplicantMenu(BPoint point)
 
 	// If clock is visible show the extended menu, otherwise show "Show Time"
 
-	if (fTime != NULL)
+	if (!fTime->IsHidden())
 		fTime->ShowTimeOptions(ConvertToScreen(point));
 	else {
 		BMenuItem* item = new BMenuItem(B_TRANSLATE("Show Time"),

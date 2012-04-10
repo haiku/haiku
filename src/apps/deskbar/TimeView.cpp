@@ -410,23 +410,17 @@ TTimeView::ShowTimeOptions(BPoint point)
 	menu->SetFont(be_plain_font);
 	BMenuItem* item;
 
-	if (IsHidden()) {
-		item = new BMenuItem(B_TRANSLATE("Show time"),
-			new BMessage(kShowHideTime));
-		menu->AddItem(item);
-	} else {
-		item = new BMenuItem(B_TRANSLATE("Change time" B_UTF8_ELLIPSIS),
-			new BMessage(kChangeTime));
-		menu->AddItem(item);
+	item = new BMenuItem(B_TRANSLATE("Change time" B_UTF8_ELLIPSIS),
+		new BMessage(kChangeTime));
+	menu->AddItem(item);
 
-		item = new BMenuItem(B_TRANSLATE("Hide time"),
-			new BMessage(kShowHideTime));
-		menu->AddItem(item);
+	item = new BMenuItem(B_TRANSLATE("Hide time"),
+		new BMessage(kShowHideTime));
+	menu->AddItem(item);
 
-		item = new BMenuItem(B_TRANSLATE("Show calendar" B_UTF8_ELLIPSIS),
-			new BMessage(kShowCalendar));
-		menu->AddItem(item);
-	}
+	item = new BMenuItem(B_TRANSLATE("Show calendar" B_UTF8_ELLIPSIS),
+		new BMessage(kShowCalendar));
+	menu->AddItem(item);
 
 	menu->SetTargetForItems(this);
 	// Changed to accept screen coord system point;
