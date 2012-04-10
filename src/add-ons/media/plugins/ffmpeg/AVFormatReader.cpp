@@ -200,7 +200,7 @@ protected:
 
 			media_format		fFormat;
 
-			ByteIOContext		fIOContext;
+			AVIOContext*		fIOContext;
 
 			AVPacket			fPacket;
 			bool				fReusePacket;
@@ -222,6 +222,7 @@ StreamBase::StreamBase(BPositionIO* source, BLocker* sourceLock,
 	fContext(NULL),
 	fStream(NULL),
 	fVirtualIndex(-1),
+	fIOContext(NULL),
 
 	fReusePacket(false),
 
@@ -230,7 +231,6 @@ StreamBase::StreamBase(BPositionIO* source, BLocker* sourceLock,
 {
 	// NOTE: Don't use streamLock here, it may not yet be initialized!
 
-	fIOContext.buffer = NULL;
 	av_new_packet(&fPacket, 0);
 	memset(&fFormat, 0, sizeof(media_format));
 }
@@ -238,7 +238,8 @@ StreamBase::StreamBase(BPositionIO* source, BLocker* sourceLock,
 
 StreamBase::~StreamBase()
 {
-	av_free(fIOContext.buffer);
+	av_free(fIOContext->buffer);
+	av_free(fIOContext);
 	av_free_packet(&fPacket);
 	av_free(fContext);
 }
@@ -255,59 +256,36 @@ StreamBase::Open()
 	if (buffer == NULL)
 		return B_NO_MEMORY;
 
-	size_t probeSize = 8192;
-	AVProbeData probeData;
-	probeData.filename = "";
-	probeData.buf = buffer;
-	probeData.buf_size = probeSize;
-
-	// Read a bit of the input...
-	// NOTE: Even if other streams have already read from the source,
-	// it is ok to not seek first, since our fPosition is 0, so the necessary
-	// seek will happen automatically in _Read().
-	if (_Read(this, buffer, probeSize) != (ssize_t)probeSize) {
-		av_free(buffer);
-		return B_IO_ERROR;
+	// Allocate I/O context with buffer and hook functions, pass ourself as
+	// cookie.
+	memset(buffer, 0, bufferSize);
+	fIOContext = avio_alloc_context(buffer, bufferSize, 0, this, _Read, 0,
+		_Seek);
+	if (fIOContext == NULL) {
+		TRACE("StreamBase::Open() - avio_alloc_context() failed!\n");
+		return B_ERROR;
 	}
-	// ...and seek back to the beginning of the file. This is important
-	// since libavformat will assume the stream to be at offset 0, the
-	// probe data is not reused.
-	_Seek(this, 0, SEEK_SET);
 
-	// Probe the input format
-	AVInputFormat* inputFormat = av_probe_input_format(&probeData, 1);
+	fContext = avformat_alloc_context();
+	fContext->pb = fIOContext;
 
-	if (inputFormat == NULL) {
-		TRACE("StreamBase::Open() - av_probe_input_format() failed!\n");
-		av_free(buffer);
+	// Allocate our context and probe the input format
+	if (avformat_open_input(&fContext, "", NULL, NULL) < 0) {
+		TRACE("StreamBase::Open() - avformat_open_input() failed!\n");
+		// avformat_open_input() frees the context in case of failure
 		return B_NOT_SUPPORTED;
 	}
 
 	TRACE("StreamBase::Open() - "
-		"av_probe_input_format(): %s\n", inputFormat->name);
+		"avformat_open_input(): %s\n", fContext->iformat->name);
 	TRACE("  flags:%s%s%s%s%s\n",
-		(inputFormat->flags & AVFMT_GLOBALHEADER) ? " AVFMT_GLOBALHEADER" : "",
-		(inputFormat->flags & AVFMT_NOTIMESTAMPS) ? " AVFMT_NOTIMESTAMPS" : "",
-		(inputFormat->flags & AVFMT_GENERIC_INDEX) ? " AVFMT_GENERIC_INDEX" : "",
-		(inputFormat->flags & AVFMT_TS_DISCONT) ? " AVFMT_TS_DISCONT" : "",
-		(inputFormat->flags & AVFMT_VARIABLE_FPS) ? " AVFMT_VARIABLE_FPS" : ""
+		(fContext->iformat->flags & AVFMT_GLOBALHEADER) ? " AVFMT_GLOBALHEADER" : "",
+		(fContext->iformat->flags & AVFMT_NOTIMESTAMPS) ? " AVFMT_NOTIMESTAMPS" : "",
+		(fContext->iformat->flags & AVFMT_GENERIC_INDEX) ? " AVFMT_GENERIC_INDEX" : "",
+		(fContext->iformat->flags & AVFMT_TS_DISCONT) ? " AVFMT_TS_DISCONT" : "",
+		(fContext->iformat->flags & AVFMT_VARIABLE_FPS) ? " AVFMT_VARIABLE_FPS" : ""
 	);
 
-	// Init I/O context with buffer and hook functions, pass ourself as
-	// cookie.
-	memset(buffer, 0, bufferSize);
-	if (init_put_byte(&fIOContext, buffer, bufferSize, 0, this,
-			_Read, 0, _Seek) != 0) {
-		TRACE("StreamBase::Open() - init_put_byte() failed!\n");
-		return B_ERROR;
-	}
-
-	// Initialize our context.
-	if (av_open_input_stream(&fContext, &fIOContext, "", inputFormat,
-			NULL) < 0) {
-		TRACE("StreamBase::Open() - av_open_input_stream() failed!\n");
-		return B_NOT_SUPPORTED;
-	}
 
 	// Retrieve stream information
 	if (av_find_stream_info(fContext) < 0) {
@@ -315,9 +293,9 @@ StreamBase::Open()
 		return B_NOT_SUPPORTED;
 	}
 
-	fSeekByBytes = (inputFormat->flags & AVFMT_TS_DISCONT) != 0;
+	fSeekByBytes = (fContext->iformat->flags & AVFMT_TS_DISCONT) != 0;
 	fStreamBuildsIndexWhileReading
-		= (inputFormat->flags & AVFMT_GENERIC_INDEX) != 0
+		= (fContext->iformat->flags & AVFMT_GENERIC_INDEX) != 0
 			|| fSeekByBytes;
 
 	TRACE("StreamBase::Open() - "
