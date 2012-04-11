@@ -34,6 +34,7 @@ private:
 			BMessenger			fTarget;
 			BString				fDevice;
 			AutoconfigClient*	fCurrentClient;
+			int32				fLastMediaStatus;
 };
 
 #endif	// AUTOCONFIG_LOOPER_H
