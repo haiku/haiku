@@ -297,6 +297,9 @@ radeon_init_accelerant(int device)
 
 	radeon_gpu_mc_setup();
 
+	// Set up data crunching + irq rings
+	radeon_gpu_ring_setup();
+
 	TRACE("%s done\n", __func__);
 	return B_OK;
 }

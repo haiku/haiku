@@ -19,6 +19,7 @@
 #include "mode.h"
 #include "pll.h"
 #include "radeon_hd.h"
+#include "ringqueue.h"
 
 
 #define MAX_DISPLAY 2
@@ -70,6 +71,8 @@ struct accelerant_info {
 	struct fb_info	fb;	// used for frame buffer info within MC
 
 	volatile uint32	dpms_mode;		// current driver dpms mode
+
+	RingQueue*		ringQueue[RADEON_QUEUE_MAX]; // Ring buffer command processor
 };
 
 

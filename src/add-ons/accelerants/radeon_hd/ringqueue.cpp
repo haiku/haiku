@@ -7,7 +7,7 @@
  */
 
 
-#include "renderqueue.h"
+#include "ringqueue.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -24,6 +24,13 @@ extern "C" void _sPrintf(const char* format, ...);
 #define ERROR(x...) _sPrintf("radeon_hd: " x)
 
 
+static const char* queueName[RADEON_QUEUE_MAX] = {
+    "GFX",
+    "CP1",
+    "CP2"
+};
+
+
 static int
 compute_order(unsigned long size)
 {
@@ -36,19 +43,22 @@ compute_order(unsigned long size)
 }
 
 
-RenderQueue::RenderQueue(size_t sizeBytes)
+RingQueue::RingQueue(size_t sizeBytes, uint32 queueType)
 	:
+	_queueType(queueType),
 	_readPtr(0),
 	_writePtr(0)
 {
-	TRACE("%s: Requested %d bytes for RenderQueue.\n", __func__, sizeBytes);
+	TRACE("%s: Requested %d bytes for %s RingQueue.\n", __func__, sizeBytes,
+		queueName[_queueType]);
 
 	size_t renderQueueSize = compute_order(sizeBytes / 8);
 	_size = (1 << (renderQueueSize + 1)) * 4;
 	_writeBytesAvail = _size;
 	_alignMask = 16 - 1;
 
-	TRACE("%s: Allocating %d bytes for RenderQueue.\n", __func__, _size);
+	TRACE("%s: Allocating %d bytes for %s RingQueue.\n", __func__, _size,
+		queueName[_queueType]);
 
 	// Allocate buffer memory
 	_data = (unsigned char*)malloc(_size);
@@ -57,17 +67,17 @@ RenderQueue::RenderQueue(size_t sizeBytes)
 }
 
 
-RenderQueue::~RenderQueue()
+RingQueue::~RingQueue()
 {
-	TRACE("%s: Closing RenderQueue.\n", __func__);
+	TRACE("%s: Closing %s RingQueue.\n", __func__, queueName[_queueType]);
 	free(_data);
 }
 
 
 status_t
-RenderQueue::Empty()
+RingQueue::Empty()
 {
-	TRACE("%s: Clearing RenderQueue\n", __func__);
+	TRACE("%s: Clearing %s RingQueue\n", __func__, queueName[_queueType]);
 	// Clear buffer
 	memset(_data, 0, _size);
 
@@ -80,7 +90,7 @@ RenderQueue::Empty()
 
 
 size_t
-RenderQueue::Read(unsigned char* dataPtr, size_t bytes)
+RingQueue::Read(unsigned char* dataPtr, size_t bytes)
 {
 	// If there is no data or nothing to read, return 0 bytes
 	if (dataPtr == 0 || bytes <= 0 || _writeBytesAvail == _size)
@@ -109,7 +119,7 @@ RenderQueue::Read(unsigned char* dataPtr, size_t bytes)
 
 
 size_t
-RenderQueue::Write(unsigned char* dataPtr, size_t bytes)
+RingQueue::Write(unsigned char* dataPtr, size_t bytes)
 {
 	// If there is no data, or no room available, 0 bytes written.
 	if (dataPtr == 0 || bytes <= 0 || _writeBytesAvail == 0)

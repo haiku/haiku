@@ -501,19 +501,22 @@ radeon_gpu_mc_setup()
 
 
 status_t
-radeon_gpu_irq_setup()
+radeon_gpu_ring_setup()
 {
-	// TODO: Stub for IRQ setup
+	TRACE("%s called\n", __func__);
 
-	// allocate rings via r600_ih_ring_alloc
+	// init GFX ring queue
+    gInfo->ringQueue[RADEON_QUEUE_TYPE_GFX_INDEX]
+		= new RingQueue(1024 * 1024, RADEON_QUEUE_TYPE_GFX_INDEX);
 
-	// disable irq's via r600_disable_interrupts
+	#if 0
+	// init IRQ ring queue (reverse of rendering/cp ring queue)
+	gInfo->irqRingQueue
+		= new IRQRingQueue(64 * 1024)
+	#endif
 
-	// r600_rlc_init
 
-	// setup interrupt control
-
-	return B_ERROR;
+	return B_OK;
 }
 
 
