@@ -281,7 +281,7 @@ TBarApp::InitSettings()
 		if (fSettingsFile->InitCheck() == B_OK
 			&& storedSettings.Unflatten(fSettingsFile) == B_OK) {
 			if (storedSettings.FindBool("vertical", &settings.vertical)
-				!= B_OK) {
+					!= B_OK) {
 				settings.vertical = true;
 			}
 			if (storedSettings.FindBool("left", &settings.left) != B_OK)
@@ -289,87 +289,87 @@ TBarApp::InitSettings()
 			if (storedSettings.FindBool("top", &settings.top) != B_OK)
 				settings.top = true;
 			if (storedSettings.FindInt32("state", (int32*)&settings.state)
-				!= B_OK) {
+					!= B_OK) {
 				settings.state = kExpandoState;
 			}
 			if (storedSettings.FindFloat("width", &settings.width) != B_OK)
 				settings.width = 0;
 			if (storedSettings.FindBool("showTime", &settings.showTime)
-				!= B_OK) {
+					!= B_OK) {
 				settings.showTime = true;
 			}
 			if (storedSettings.FindUInt32("timeFormat", &settings.timeFormat)
-				!= B_OK) {
+					!= B_OK) {
 				settings.timeFormat = B_SHORT_TIME_FORMAT;
 			}
 			if (storedSettings.FindPoint("switcherLoc", &settings.switcherLoc)
-				!= B_OK) {
+					!= B_OK) {
 				settings.switcherLoc = BPoint(5000, 5000);
 			}
 			if (storedSettings.FindInt32("recentAppsCount",
-				&settings.recentAppsCount) != B_OK) {
+					&settings.recentAppsCount) != B_OK) {
 				settings.recentAppsCount = 10;
 			}
 			if (storedSettings.FindInt32("recentDocsCount",
-				&settings.recentDocsCount) != B_OK) {
+					&settings.recentDocsCount) != B_OK) {
 				settings.recentDocsCount = 10;
 			}
 			if (storedSettings.FindBool("timeShowSeconds",
-				&settings.timeShowSeconds) != B_OK) {
+					&settings.timeShowSeconds) != B_OK) {
 				settings.timeShowSeconds = false;
 			}
 			if (storedSettings.FindInt32("recentFoldersCount",
-				&settings.recentFoldersCount) != B_OK) {
+					&settings.recentFoldersCount) != B_OK) {
 				settings.recentFoldersCount = 10;
 			}
 			if (storedSettings.FindBool("alwaysOnTop", &settings.alwaysOnTop)
-				!= B_OK) {
+					!= B_OK) {
 				settings.alwaysOnTop = false;
 			}
 			if (storedSettings.FindBool("timeFullDate", &settings.timeFullDate)
-				!= B_OK) {
+					!= B_OK) {
 				settings.timeFullDate = false;
 			}
 			if (storedSettings.FindBool("trackerAlwaysFirst",
-				&settings.trackerAlwaysFirst) != B_OK) {
+					&settings.trackerAlwaysFirst) != B_OK) {
 				settings.trackerAlwaysFirst = false;
 			}
 			if (storedSettings.FindBool("sortRunningApps",
-				&settings.sortRunningApps) != B_OK) {
+					&settings.sortRunningApps) != B_OK) {
 				settings.sortRunningApps = false;
 			}
 			if (storedSettings.FindBool("superExpando", &settings.superExpando)
-				!= B_OK) {
+					!= B_OK) {
 				settings.superExpando = false;
 			}
 			if (storedSettings.FindBool("expandNewTeams",
-				&settings.expandNewTeams) != B_OK) {
+					&settings.expandNewTeams) != B_OK) {
 				settings.expandNewTeams = false;
 			}
 			if (storedSettings.FindBool("hideLabels", &settings.hideLabels)
-				!= B_OK) {
+					!= B_OK) {
 				settings.hideLabels = false;
 			}
 			if (storedSettings.FindInt32("iconSize", (int32*)&settings.iconSize)
-				!= B_OK) {
+					!= B_OK) {
 				settings.iconSize = kMinimumIconSize;
 			}
 			if (storedSettings.FindBool("autoRaise", &settings.autoRaise)
-				!= B_OK) {
+					!= B_OK) {
 				settings.autoRaise = false;
 			}
 			if (storedSettings.FindBool("autoHide", &settings.autoHide) != B_OK)
 				settings.autoHide = false;
 			if (storedSettings.FindBool("recentAppsEnabled",
-				&settings.recentAppsEnabled) != B_OK) {
+					&settings.recentAppsEnabled) != B_OK) {
 				settings.recentAppsEnabled = true;
 			}
 			if (storedSettings.FindBool("recentDocsEnabled",
-				&settings.recentDocsEnabled) != B_OK) {
+					&settings.recentDocsEnabled) != B_OK) {
 				settings.recentDocsEnabled = true;
 			}
 			if (storedSettings.FindBool("recentFoldersEnabled",
-				&settings.recentFoldersEnabled) != B_OK) {
+					&settings.recentFoldersEnabled) != B_OK) {
 				settings.recentFoldersEnabled = true;
 			}
 		}
