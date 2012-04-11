@@ -265,7 +265,7 @@ TBarApp::InitSettings()
 	const char* settingsFileName = "Deskbar_settings";
 
 	find_directory(B_USER_DESKBAR_DIRECTORY, &dirPath, true);
-	// just make it
+		// just make it
 
 	if (find_directory (B_USER_SETTINGS_DIRECTORY, &dirPath, true) == B_OK) {
 		BPath filePath = dirPath;
@@ -743,15 +743,18 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char* sig, entry_ref* ref)
 
 	BString name;
 	if (!gLocalizedNamePreferred
-		|| BLocaleRoster::Default()->GetLocalizedFileName(name, *ref) != B_OK)
+		|| BLocaleRoster::Default()->GetLocalizedFileName(name, *ref)
+			!= B_OK) {
 		name = ref->name;
+	}
 
 	BarTeamInfo* barInfo = new BarTeamInfo(new BList(), flags, strdup(sig),
 		new BBitmap(IconRect(), kIconFormat), strdup(ref->name));
 
 	if ((barInfo->flags & B_BACKGROUND_APP) == 0
-		&& strcasecmp(barInfo->sig, kDeskbarSignature) != 0)
+		&& strcasecmp(barInfo->sig, kDeskbarSignature) != 0) {
 		FetchAppIcon(barInfo->sig, barInfo->icon);
+	}
 
 	barInfo->teams->AddItem((void*)team);
 
@@ -797,8 +800,8 @@ TBarApp::RemoveTeam(team_id team)
 		if (barInfo->teams->HasItem((void*)team)) {
 			int32 subsCount = sSubscribers.CountItems();
 			if (subsCount > 0) {
-				BMessage message((barInfo->teams->CountItems() == 1) ?
-					B_SOME_APP_QUIT : kRemoveTeam);
+				BMessage message((barInfo->teams->CountItems() == 1)
+					? B_SOME_APP_QUIT : kRemoveTeam);
 
 				message.AddInt32("team", team);
 				for (int32 i = 0; i < subsCount; i++) {
