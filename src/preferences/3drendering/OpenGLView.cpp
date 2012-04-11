@@ -22,6 +22,7 @@
 #include "CapabilitiesView.h"
 #include "ExtensionsView.h"
 #include "InfoView.h"
+#include "GearsView.h"
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -40,20 +41,20 @@ OpenGLView::OpenGLView()
 
 	glView->LockGL();
 
-    BMenu* menu = new BMenu(B_TRANSLATE("Automatic"));
-    menu->SetRadioMode(true);
-    menu->SetLabelFromMarked(true);
-    menu->AddItem(new BMenuItem(B_TRANSLATE("Automatic"),
-        new BMessage(MENU_AUTO_MESSAGE)));
-    menu->AddSeparatorItem();
-    menu->AddItem(new BMenuItem(B_TRANSLATE("Software Rasterizer"),
-        new BMessage(MENU_SWRAST_MESSAGE)));
-    menu->AddItem(new BMenuItem(B_TRANSLATE("Gallium Software Pipe"),
-        new BMessage(MENU_SWPIPE_MESSAGE)));
-    menu->AddItem(new BMenuItem(B_TRANSLATE("Gallium LLVM Pipe"),
-        new BMessage(MENU_SWLLVM_MESSAGE)));
-    BMenuField* menuField = new BMenuField("renderer",
-        B_TRANSLATE("3D Rendering Engine:"), menu);
+	BMenu* menu = new BMenu(B_TRANSLATE("Automatic"));
+	menu->SetRadioMode(true);
+	menu->SetLabelFromMarked(true);
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Automatic"),
+		new BMessage(MENU_AUTO_MESSAGE)));
+	menu->AddSeparatorItem();
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Software Rasterizer"),
+		new BMessage(MENU_SWRAST_MESSAGE)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Gallium Software Pipe"),
+		new BMessage(MENU_SWPIPE_MESSAGE)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Gallium LLVM Pipe"),
+		new BMessage(MENU_SWLLVM_MESSAGE)));
+	BMenuField* menuField = new BMenuField("renderer",
+		B_TRANSLATE("3D Rendering Engine:"), menu);
 	// TODO:  Set current Renderer
 	menuField->SetEnabled(false);
 
@@ -69,9 +70,13 @@ OpenGLView::OpenGLView()
 		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
 			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 		.Add(menuField)
-		.AddGroup(B_HORIZONTAL)
-			.Add(tabView)
-			.SetInsets(0, B_USE_DEFAULT_SPACING, 0, 0);
+		.AddGroup(B_HORIZONTAL, 0)
+			.Add(new GearsView())
+			.AddGroup(B_HORIZONTAL)
+				.Add(tabView)
+				.SetInsets(0, B_USE_DEFAULT_SPACING, 0, 0)
+				.End()
+			.End();
 }
 
 

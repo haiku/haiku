@@ -28,6 +28,7 @@ Preference 3DRendering
 	: be GL translation libcolumnlistview.a $(HAIKU_LOCALE_LIBS)
 		$(TARGET_LIBSUPC++)
 	: 3DRendering.rdef
+	: Gears.rdef
 	;
 
 DoCatalogs 3DRendering :
