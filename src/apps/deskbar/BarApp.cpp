@@ -559,7 +559,7 @@ TBarApp::MessageReceived(BMessage* message)
 		{
 			int32 iconSize;
 
-			if (message->FindInt32("be:value", &iconSize) < B_OK)
+			if (message->FindInt32("be:value", &iconSize) != B_OK)
 				break;
 
 			fSettings.iconSize = iconSize * kIconSizeInterval;
