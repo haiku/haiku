@@ -410,7 +410,7 @@ TTimeView::ShowTimeOptions(BPoint point)
 	menu->SetFont(be_plain_font);
 	BMenuItem* item;
 
-	item = new BMenuItem(B_TRANSLATE("Change time" B_UTF8_ELLIPSIS),
+	item = new BMenuItem(B_TRANSLATE("Open time preferences" B_UTF8_ELLIPSIS),
 		new BMessage(kChangeTime));
 	menu->AddItem(item);
 
