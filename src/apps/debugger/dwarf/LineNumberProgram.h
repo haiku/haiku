@@ -54,6 +54,7 @@ struct LineNumberProgram::State {
 	bool			isPrologueEnd;
 	bool			isEpilogueBegin;
 	uint32			instructionSet;
+	uint32			discriminator;
 
 	// when file is set to -1
 	const char*		explicitFile;

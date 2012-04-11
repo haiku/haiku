@@ -99,6 +99,7 @@ LineNumberProgram::GetNextRow(State& state) const
 			state.isBasicBlock = false;
 			state.isPrologueEnd = false;
 			state.isEpilogueBegin = false;
+			state.discriminator = 0;
 			appendRow = true;
 		} else if (opcode > 0) {
 			// standard opcode
@@ -108,6 +109,7 @@ LineNumberProgram::GetNextRow(State& state) const
 					state.isPrologueEnd = false;
 					state.isEpilogueBegin = false;
 					appendRow = true;
+					state.discriminator = 0;
 					break;
 				case DW_LNS_advance_pc:
 					state.address += dataReader.ReadUnsignedLEB128(0)
@@ -175,6 +177,11 @@ LineNumberProgram::GetNextRow(State& state) const
 					state.file = -1;
 					break;
 				}
+				case DW_LNE_set_discriminator:
+				{
+					state.discriminator = dataReader.ReadUnsignedLEB128(0);
+					break;
+				}
 				default:
 					WARNING("unsupported extended opcode: %u\n",
 						extendedOpcode);
@@ -209,4 +216,5 @@ LineNumberProgram::_SetToInitial(State& state) const
 	state.isPrologueEnd = false;
 	state.isEpilogueBegin = false;
 	state.instructionSet = 0;
+	state.discriminator = 0;
 }
