@@ -30,19 +30,19 @@ public:
 			size_t			Write(unsigned char* data, size_t bytes);
 			status_t		Empty();
 
-			size_t			GetSize() {return _size;};
-			size_t			GetWriteAvail() {return _writeBytesAvail;}
-			size_t			GetReadAvail() {return _size - _writeBytesAvail;}
+			size_t			GetSize() {return fSize;};
+			size_t			GetWriteAvail() {return fWriteBytesAvail;}
+			size_t			GetReadAvail() {return fSize - fWriteBytesAvail;}
 private:
-			uint32			_queueType;
+			uint32			fQueueType;
 
-			unsigned char*	_data;
-			size_t			_size;
-			size_t			_writeBytesAvail;
-			int				_readPtr;
-			int				_writePtr;
+			unsigned char*	fData;
+			size_t			fSize;
+			size_t			fWriteBytesAvail;
+			int				fReadPtr;
+			int				fWritePtr;
 
-			uint32			_alignMask;
+			uint32			fAlignMask;
 };
 
 
