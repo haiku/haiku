@@ -11,20 +11,19 @@
 
 class BBitmap;
 
-
 class GearsView : public BView {
 public:
-							GearsView();
-	virtual					~GearsView();
+								GearsView();
+	virtual						~GearsView();
 
-	virtual	void			Draw(BRect updateRect);
+	virtual	void				Draw(BRect updateRect);
 
 protected:
-			void			_InitGearsBitmap();
+			void				_InitGearsBitmap();
 
 private:
-			BBitmap*		fGears;
+			BBitmap*			fGears;
 };
 
 
-#endif /* OPENGL_VIEW_H */
+#endif	/* GEARS_VIEW_H */

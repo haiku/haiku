@@ -2,13 +2,14 @@
  * Copyright 2012 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Author:
+ * Authors:
  *		John Scipione <jscipione@gmail.com>
  */
 
 
 #include "GearsView.h"
 
+#include <Bitmap.h>
 #include <Catalog.h>
 #include <Locale.h>
 #include <Size.h>
@@ -40,13 +41,6 @@ GearsView::~GearsView()
 
 
 void
-GearsView::_InitGearsBitmap()
-{
-	fGears = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "gears_64.png");
-}
-
-
-void
 GearsView::Draw(BRect updateRect)
 {
 	SetHighColor(ViewColor());
@@ -63,4 +57,14 @@ GearsView::Draw(BRect updateRect)
 	SetDrawingMode(B_OP_ALPHA);
 	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
 	DrawBitmapAsync(fGears, BPoint(5, 70));
+}
+
+
+//	#pragma mark -
+
+
+void
+GearsView::_InitGearsBitmap()
+{
+	fGears = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "gears_64.png");
 }

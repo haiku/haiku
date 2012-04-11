@@ -2,9 +2,10 @@
  * Copyright 2009 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Author:
+ * Authors:
  *		Artur Wyszynski <harakash@gmail.com>
  */
+
 
 #include "ExtensionsList.h"
 
@@ -19,7 +20,8 @@
 
 
 ExtensionRow::ExtensionRow(const char* extensionName)
-	: BRow(),
+	:
+	BRow(),
 	fExtensionName(extensionName)
 {
 	SetField(new BStringField(extensionName), 0);
@@ -28,12 +30,12 @@ ExtensionRow::ExtensionRow(const char* extensionName)
 
 ExtensionRow::~ExtensionRow()
 {
-
 }
 
 
 ExtensionsList::ExtensionsList()
-	: BColumnListView("ExtensionsList", B_FOLLOW_ALL)
+	:
+	BColumnListView("ExtensionsList", B_FOLLOW_ALL)
 {
 	BStringColumn* column = new BStringColumn(B_TRANSLATE("Available"),
 		280, 280, 280, B_TRUNCATE_MIDDLE);

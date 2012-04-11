@@ -1,11 +1,7 @@
 /*
  * Copyright 2009 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- *
- * Author:
- *		Artur Wyszynski <harakash@gmail.com>
  */
-
 #ifndef OPENGL_WINDOW_H
 #define OPENGL_WINDOW_H
 
@@ -16,14 +12,15 @@
 
 class OpenGLWindow : public BWindow {
 public:
-    OpenGLWindow();
-    virtual ~OpenGLWindow();
+								OpenGLWindow();
+		virtual					~OpenGLWindow();
 
-    virtual bool QuitRequested();
-    virtual void MessageReceived(BMessage* message);
+		virtual	bool			QuitRequested();
+		virtual	void			MessageReceived(BMessage* message);
 
 private:
-    OpenGLView* fView;
+				OpenGLView*		fView;
 };
 
-#endif /* OPENGL_WINDOW_H */
+
+#endif	/* OPENGL_WINDOW_H */

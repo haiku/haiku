@@ -2,12 +2,15 @@
  * Copyright 2009-2010 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Author:
+ * Authors:
  *		Alex Wilson <yourpalal2@gmail.com>
  *		Artur Wyszynski <harakash@gmail.com>
  */
 
+
 #include "CapabilitiesView.h"
+
+#include <stdio.h>
 
 #include <Catalog.h>
 #include <ControlLook.h>
@@ -18,8 +21,6 @@
 #include <StringView.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
-
-#include <stdio.h>
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -136,4 +137,3 @@ CapabilitiesView::_AddConvolutionCapability()
 	convolution << (int32) width << 'x' << (int32) height;
 	_AddCapabilityView(B_TRANSLATE("Max. convolution:"), convolution);
 }
-

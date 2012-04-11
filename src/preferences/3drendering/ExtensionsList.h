@@ -1,11 +1,7 @@
 /*
  * Copyright 2009 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- *
- * Author:
- *		Artur Wyszynski <harakash@gmail.com>
  */
-
 #ifndef EXTENSIONS_LIST_H
 #define EXTENSIONS_LIST_H
 
@@ -16,18 +12,19 @@
 
 class ExtensionRow : public BRow {
 public:
-	ExtensionRow(const char* extensionName);
-	virtual ~ExtensionRow();
+								ExtensionRow(const char* extensionName);
+		virtual					~ExtensionRow();
 
 private:
-	BString fExtensionName;
+				BString			fExtensionName;
 };
 
 
 class ExtensionsList : public BColumnListView {
 public:
-    ExtensionsList();
-    virtual ~ExtensionsList();
+								ExtensionsList();
+		virtual					~ExtensionsList();
 };
 
-#endif /* EXTENSIONS_LIST_H */
+
+#endif	/* EXTENSIONS_LIST_H */

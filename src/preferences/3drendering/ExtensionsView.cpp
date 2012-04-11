@@ -2,12 +2,13 @@
  * Copyright 2009-2010 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Author:
+ * Authors:
  *		Alex Wilson <yourpalal2@gmail.com>
  *		Artur Wyszynski <harakash@gmail.com>
  */
+
+
 #include "ExtensionsView.h"
-#include "ExtensionsList.h"
 
 #include <Catalog.h>
 #include <GroupLayout.h>
@@ -18,6 +19,8 @@
 #include <String.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+
+#include "ExtensionsList.h"
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -43,7 +46,7 @@ ExtensionsView::~ExtensionsView()
 }
 
 
-// #pragma mark
+//	#pragma mark -
 
 
 void
@@ -61,7 +64,7 @@ ExtensionsView::_AddExtensionsList(ExtensionsList *extList, char* stringList)
 		extList->AddRow(new ExtensionRow(extName));
 		if (!stringList[n])
 			break;
-		stringList += (n + 1); // next !
+		stringList += (n + 1);
+			// next !
 	}
 }
-
