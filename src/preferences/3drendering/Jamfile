@@ -17,6 +17,7 @@ local sources =
 	ExtensionsList.cpp
 	ExtensionsView.cpp
 	InfoView.cpp
+	GearsView.cpp
 	;
 
 Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
@@ -28,7 +29,6 @@ Preference 3DRendering
 	: be GL translation libcolumnlistview.a $(HAIKU_LOCALE_LIBS)
 		$(TARGET_LIBSUPC++)
 	: 3DRendering.rdef
-	: Gears.rdef
 	;
 
 DoCatalogs 3DRendering :
@@ -38,6 +38,7 @@ DoCatalogs 3DRendering :
 	ExtensionsList.cpp
 	ExtensionsView.cpp
 	InfoView.cpp
+	GearsView.cpp
 	OpenGLWindow.cpp
 ;
 

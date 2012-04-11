@@ -26,4 +26,5 @@ public:
     virtual ~OpenGLView();
 };
 
+
 #endif /* OPENGL_VIEW_H */

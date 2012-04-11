@@ -7,6 +7,7 @@
  *		Artur Wyszynski <harakash@gmail.com>
  */
 
+
 #include "OpenGLView.h"
 
 #include <stdio.h>
@@ -67,20 +68,17 @@ OpenGLView::OpenGLView()
 
 	GroupLayout()->SetSpacing(0);
 	BLayoutBuilder::Group<>(this)
-		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
-		.Add(menuField)
 		.AddGroup(B_HORIZONTAL, 0)
 			.Add(new GearsView())
-			.AddGroup(B_HORIZONTAL)
+			.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING)
+				.SetInsets(0, B_USE_DEFAULT_SPACING,
+					B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
+				.Add(menuField)
 				.Add(tabView)
-				.SetInsets(0, B_USE_DEFAULT_SPACING, 0, 0)
 				.End()
 			.End();
 }
 
-
 OpenGLView::~OpenGLView()
 {
 }
-

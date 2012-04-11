@@ -1,7 +1,9 @@
 
-resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Haiku-3DRendering";
+resource app_signature "application/x-vnd.Haiku-3DRendering";
 
 resource app_name_catalog_entry "x-vnd.Haiku-3DRendering:System name:3D Rendering";
+
+resource(1, "gears_64.png") #'PNG ' import "gears_64.png";
 
 resource app_flags B_SINGLE_LAUNCH;
 
@@ -32,4 +34,3 @@ resource vector_icon {
 	$"02000A0001051001178422040A0203050403000A000203041810FF0215810004"
 	$"178222040A030103000A04010400"
 };
-
