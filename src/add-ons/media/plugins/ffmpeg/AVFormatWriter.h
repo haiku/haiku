@@ -54,7 +54,7 @@ private:
 			AVFormatContext*	fContext;
 			bool				fHeaderWritten;
 
-			ByteIOContext		fIOContext;
+			AVIOContext*		fIOContext;
 
 			StreamCookie**		fStreams;
 			BLocker				fStreamLock;

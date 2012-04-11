@@ -76,56 +76,56 @@ avformat_to_beos_byte_order(SampleFormat format)
 
 
 static void
-avmetadata_to_message(AVMetadata* metaData, BMessage* message)
+avdictionary_to_message(AVDictionary* dictionary, BMessage* message)
 {
-	if (metaData == NULL)
+	if (dictionary == NULL)
 		return;
 
-	AVMetadataTag* tag = NULL;
-	while ((tag = av_metadata_get(metaData, "", tag,
+	AVDictionaryEntry* entry = NULL;
+	while ((entry = av_dict_get(dictionary, "", entry,
 		AV_METADATA_IGNORE_SUFFIX))) {
-		// convert tag keys into something more meaningful using the names from
+		// convert entry keys into something more meaningful using the names from
 		// id3v2.c
-		if (strcmp(tag->key, "TALB") == 0 || strcmp(tag->key, "TAL") == 0)
-			message->AddString("album", tag->value);
-		else if (strcmp(tag->key, "TCOM") == 0)
-			message->AddString("composer", tag->value);
-		else if (strcmp(tag->key, "TCON") == 0 || strcmp(tag->key, "TCO") == 0)
-			message->AddString("genre", tag->value);
-		else if (strcmp(tag->key, "TCOP") == 0)
-			message->AddString("copyright", tag->value);
-		else if (strcmp(tag->key, "TDRL") == 0 || strcmp(tag->key, "TDRC") == 0)
-			message->AddString("date", tag->value);
-		else if (strcmp(tag->key, "TENC") == 0 || strcmp(tag->key, "TEN") == 0)
-			message->AddString("encoded_by", tag->value);
-		else if (strcmp(tag->key, "TIT2") == 0 || strcmp(tag->key, "TT2") == 0)
-			message->AddString("title", tag->value);
-		else if (strcmp(tag->key, "TLAN") == 0)
-			message->AddString("language", tag->value);
-		else if (strcmp(tag->key, "TPE1") == 0 || strcmp(tag->key, "TP1") == 0)
-			message->AddString("artist", tag->value);
-		else if (strcmp(tag->key, "TPE2") == 0 || strcmp(tag->key, "TP2") == 0)
-			message->AddString("album_artist", tag->value);
-		else if (strcmp(tag->key, "TPE3") == 0 || strcmp(tag->key, "TP3") == 0)
-			message->AddString("performer", tag->value);
-		else if (strcmp(tag->key, "TPOS") == 0)
-			message->AddString("disc", tag->value);
-		else if (strcmp(tag->key, "TPUB") == 0)
-			message->AddString("publisher", tag->value);
-		else if (strcmp(tag->key, "TRCK") == 0 || strcmp(tag->key, "TRK") == 0)
-			message->AddString("track", tag->value);
-		else if (strcmp(tag->key, "TSOA") == 0)
-			message->AddString("album-sort", tag->value);
-		else if (strcmp(tag->key, "TSOP") == 0)
-			message->AddString("artist-sort", tag->value);
-		else if (strcmp(tag->key, "TSOT") == 0)
-			message->AddString("title-sort", tag->value);
-		else if (strcmp(tag->key, "TSSE") == 0)
-			message->AddString("encoder", tag->value);
-		else if (strcmp(tag->key, "TYER") == 0)
-			message->AddString("year", tag->value);
+		if (strcmp(entry->key, "TALB") == 0 || strcmp(entry->key, "TAL") == 0)
+			message->AddString("album", entry->value);
+		else if (strcmp(entry->key, "TCOM") == 0)
+			message->AddString("composer", entry->value);
+		else if (strcmp(entry->key, "TCON") == 0 || strcmp(entry->key, "TCO") == 0)
+			message->AddString("genre", entry->value);
+		else if (strcmp(entry->key, "TCOP") == 0)
+			message->AddString("copyright", entry->value);
+		else if (strcmp(entry->key, "TDRL") == 0 || strcmp(entry->key, "TDRC") == 0)
+			message->AddString("date", entry->value);
+		else if (strcmp(entry->key, "TENC") == 0 || strcmp(entry->key, "TEN") == 0)
+			message->AddString("encoded_by", entry->value);
+		else if (strcmp(entry->key, "TIT2") == 0 || strcmp(entry->key, "TT2") == 0)
+			message->AddString("title", entry->value);
+		else if (strcmp(entry->key, "TLAN") == 0)
+			message->AddString("language", entry->value);
+		else if (strcmp(entry->key, "TPE1") == 0 || strcmp(entry->key, "TP1") == 0)
+			message->AddString("artist", entry->value);
+		else if (strcmp(entry->key, "TPE2") == 0 || strcmp(entry->key, "TP2") == 0)
+			message->AddString("album_artist", entry->value);
+		else if (strcmp(entry->key, "TPE3") == 0 || strcmp(entry->key, "TP3") == 0)
+			message->AddString("performer", entry->value);
+		else if (strcmp(entry->key, "TPOS") == 0)
+			message->AddString("disc", entry->value);
+		else if (strcmp(entry->key, "TPUB") == 0)
+			message->AddString("publisher", entry->value);
+		else if (strcmp(entry->key, "TRCK") == 0 || strcmp(entry->key, "TRK") == 0)
+			message->AddString("track", entry->value);
+		else if (strcmp(entry->key, "TSOA") == 0)
+			message->AddString("album-sort", entry->value);
+		else if (strcmp(entry->key, "TSOP") == 0)
+			message->AddString("artist-sort", entry->value);
+		else if (strcmp(entry->key, "TSOT") == 0)
+			message->AddString("title-sort", entry->value);
+		else if (strcmp(entry->key, "TSSE") == 0)
+			message->AddString("encoder", entry->value);
+		else if (strcmp(entry->key, "TYER") == 0)
+			message->AddString("year", entry->value);
 		else
-			message->AddString(tag->key, tag->value);
+			message->AddString(entry->key, entry->value);
 	}
 }
 
@@ -288,8 +288,8 @@ StreamBase::Open()
 
 
 	// Retrieve stream information
-	if (av_find_stream_info(fContext) < 0) {
-		TRACE("StreamBase::Open() - av_find_stream_info() failed!\n");
+	if (avformat_find_stream_info(fContext, NULL) < 0) {
+		TRACE("StreamBase::Open() - avformat_find_stream_info() failed!\n");
 		return B_NOT_SUPPORTED;
 	}
 
@@ -1220,7 +1220,7 @@ AVFormatReader::Stream::GetMetaData(BMessage* data)
 {
 	BAutolock _(&fLock);
 
-	avmetadata_to_message(fStream->metadata, data);
+	avdictionary_to_message(fStream->metadata, data);
 
 	return B_OK;
 }
@@ -1619,7 +1619,7 @@ AVFormatReader::GetMetaData(BMessage* _data)
 	if (context == NULL)
 		return B_NO_INIT;
 
-	avmetadata_to_message(context->metadata, _data);
+	avdictionary_to_message(context->metadata, _data);
 
 	// Add chapter info
 	for (unsigned i = 0; i < context->nb_chapters; i++) {
@@ -1632,14 +1632,14 @@ AVFormatReader::GetMetaData(BMessage* _data)
 			* chapter->end * chapter->time_base.num
 			/ chapter->time_base.den + 0.5));
 
-		avmetadata_to_message(chapter->metadata, &chapterData);
+		avdictionary_to_message(chapter->metadata, &chapterData);
 		_data->AddMessage("be:chapter", &chapterData);
 	}
 
 	// Add program info
 	for (unsigned i = 0; i < context->nb_programs; i++) {
 		BMessage progamData;
-		avmetadata_to_message(context->programs[i]->metadata, &progamData);
+		avdictionary_to_message(context->programs[i]->metadata, &progamData);
 		_data->AddMessage("be:program", &progamData);
 	}
 

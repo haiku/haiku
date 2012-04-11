@@ -322,6 +322,7 @@ AVFormatWriter::AVFormatWriter()
 	:
 	fContext(avformat_alloc_context()),
 	fHeaderWritten(false),
+	fIOContext(NULL),
 	fStreamLock("stream lock")
 {
 	TRACE("AVFormatWriter::AVFormatWriter\n");
@@ -345,7 +346,8 @@ AVFormatWriter::~AVFormatWriter()
     }
 
 	av_free(fContext);
-	av_free(fIOContext.buffer);
+	av_free(fIOContext->buffer);
+	av_free(fIOContext);
 }
 
 
@@ -363,14 +365,14 @@ AVFormatWriter::Init(const media_file_format* fileFormat)
 
 	// Init I/O context with buffer and hook functions, pass ourself as
 	// cookie.
-	if (init_put_byte(&fIOContext, buffer, kIOBufferSize, 1, this,
+	if (init_put_byte(fIOContext, buffer, kIOBufferSize, 1, this,
 			0, _Write, _Seek) != 0) {
 		TRACE("  init_put_byte() failed!\n");
 		return B_ERROR;
 	}
 
 	// Setup I/O hooks. This seems to be enough.
-	fContext->pb = &fIOContext;
+	fContext->pb = fIOContext;
 
 	// Set the AVOutputFormat according to fileFormat...
 	fContext->oformat = av_guess_format(fileFormat->short_name,

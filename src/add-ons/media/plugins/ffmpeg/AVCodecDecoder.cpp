@@ -74,7 +74,7 @@ AVCodecDecoder::AVCodecDecoder()
 	fFrame(0),
 	fIsAudio(false),
 	fCodec(NULL),
-	fContext(avcodec_alloc_context()),
+	fContext(avcodec_alloc_context3(NULL)),
 	fInputPicture(avcodec_alloc_frame()),
 	fOutputPicture(avcodec_alloc_frame()),
 
@@ -100,15 +100,15 @@ AVCodecDecoder::AVCodecDecoder()
 	fChunkBufferSize(0),
 	fAudioDecodeError(false),
 
-	fOutputBuffer(NULL),
+	fOutputFrame(avcodec_alloc_frame()),
 	fOutputBufferOffset(0),
 	fOutputBufferSize(0)
 {
 	TRACE("AVCodecDecoder::AVCodecDecoder()\n");
 
-	fContext->error_recognition = FF_ER_CAREFUL;
+	fContext->err_recognition = AV_EF_CAREFUL;
 	fContext->error_concealment = 3;
-	avcodec_thread_init(fContext, 1);
+	fContext->thread_count = 1;
 }
 
 
@@ -130,6 +130,7 @@ AVCodecDecoder::~AVCodecDecoder()
 	av_free(fOutputPicture);
 	av_free(fInputPicture);
 	av_free(fContext);
+	av_free(fOutputFrame);
 
 #if USE_SWS_FOR_COLOR_SPACE_CONVERSION
 	if (fSwsContext != NULL)
@@ -137,7 +138,6 @@ AVCodecDecoder::~AVCodecDecoder()
 #endif
 
 	delete[] fExtraData;
-	delete[] fOutputBuffer;
 }
 
 
@@ -161,12 +161,6 @@ AVCodecDecoder::Setup(media_format* ioEncodedFormat, const void* infoBuffer,
 
 	fIsAudio = (ioEncodedFormat->type == B_MEDIA_ENCODED_AUDIO);
 	TRACE("[%c] AVCodecDecoder::Setup()\n", fIsAudio?('a'):('v'));
-
-	if (fIsAudio && fOutputBuffer == NULL) {
-		fOutputBuffer = new(std::nothrow) char[AVCODEC_MAX_AUDIO_FRAME_SIZE];
-		if (fOutputBuffer == NULL)
-			return B_NO_MEMORY;
-	}
 
 #ifdef TRACE_AV_CODEC
 	char buffer[1024];
@@ -372,7 +366,7 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	}
 
 	// open new
-	int result = avcodec_open(fContext, fCodec);
+	int result = avcodec_open2(fContext, fCodec, NULL);
 	fCodecInitDone = (result >= 0);
 
 	fStartTime = 0;
@@ -454,7 +448,7 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 			avcodec_close(fContext);
 		}
 		// TODO: Set n-th fContext->pix_fmt here
-		if (avcodec_open(fContext, fCodec) >= 0) {
+		if (avcodec_open2(fContext, fCodec, NULL) >= 0) {
 			fCodecInitDone = true;
 
 #if USE_SWS_FOR_COLOR_SPACE_CONVERSION
@@ -529,17 +523,19 @@ AVCodecDecoder::_DecodeAudio(void* _buffer, int64* outFrameCount,
 	while (*outFrameCount < fOutputFrameCount) {
 		// Check conditions which would hint at broken code below.
 		if (fOutputBufferSize < 0) {
-			debugger("Decoding read past the end of the output buffer!");
+			fprintf(stderr, "Decoding read past the end of the output buffer! "
+				"%ld\n", fOutputBufferSize);
 			fOutputBufferSize = 0;
 		}
 		if (fChunkBufferSize < 0) {
-			debugger("Decoding read past the end of the chunk buffer!");
+			fprintf(stderr, "Decoding read past the end of the chunk buffer! "
+				"%ld\n", fChunkBufferSize);
 			fChunkBufferSize = 0;
 		}
 
 		if (fOutputBufferSize > 0) {
 			// We still have decoded audio frames from the last
-			// invokation, which start at fOutputBuffer + fOutputBufferOffset
+			// invokation, which start at fOutputBufferOffset
 			// and are of fOutputBufferSize. Copy those into the buffer,
 			// but not more than it can hold.
 			int32 frames = min_c(fOutputFrameCount - *outFrameCount,
@@ -547,7 +543,8 @@ AVCodecDecoder::_DecodeAudio(void* _buffer, int64* outFrameCount,
 			if (frames == 0)
 				debugger("fOutputBufferSize not multiple of frame size!");
 			size_t remainingSize = frames * fOutputFrameSize;
-			memcpy(buffer, fOutputBuffer + fOutputBufferOffset, remainingSize);
+			memcpy(buffer, fOutputFrame->data[0] + fOutputBufferOffset,
+				remainingSize);
 			fOutputBufferOffset += remainingSize;
 			fOutputBufferSize -= remainingSize;
 			buffer += remainingSize;
@@ -582,10 +579,11 @@ AVCodecDecoder::_DecodeAudio(void* _buffer, int64* outFrameCount,
 
 		fTempPacket.data = (uint8_t*)fChunkBuffer + fChunkBufferOffset;
 		fTempPacket.size = fChunkBufferSize;
-		// Initialize decodedBytes to the output buffer size.
-		int decodedBytes = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-		int usedBytes = avcodec_decode_audio3(fContext,
-			(int16*)fOutputBuffer, &decodedBytes, &fTempPacket);
+
+		avcodec_get_frame_defaults(fOutputFrame);
+		int gotFrame = 0;
+		int usedBytes = avcodec_decode_audio4(fContext,
+			fOutputFrame, &gotFrame, &fTempPacket);
 		if (usedBytes < 0 && !fAudioDecodeError) {
 			// Report failure if not done already
 			printf("########### audio decode error, "
@@ -597,12 +595,20 @@ AVCodecDecoder::_DecodeAudio(void* _buffer, int64* outFrameCount,
 			// Error or failure to produce decompressed output.
 			// Skip the chunk buffer data entirely.
 			usedBytes = fChunkBufferSize;
-			decodedBytes = 0;
+			fOutputBufferSize = 0;
 			// Assume the audio decoded until now is broken.
 			memset(_buffer, 0, buffer - (uint8*)_buffer);
 		} else {
 			// Success
 			fAudioDecodeError = false;
+			if (gotFrame == 1) {
+				fOutputBufferSize = av_samples_get_buffer_size(NULL,
+					fContext->channels, fOutputFrame->nb_samples,
+					fContext->sample_fmt, 1);
+				if (fOutputBufferSize < 0)
+					fOutputBufferSize = 0;
+			} else
+				fOutputBufferSize = 0;
 		}
 //printf("  chunk size: %d, decoded: %d, used: %d\n",
 //fTempPacket.size, decodedBytes, usedBytes);
@@ -610,7 +616,6 @@ AVCodecDecoder::_DecodeAudio(void* _buffer, int64* outFrameCount,
 		fChunkBufferOffset += usedBytes;
 		fChunkBufferSize -= usedBytes;
 		fOutputBufferOffset = 0;
-		fOutputBufferSize = decodedBytes;
 	}
 	fFrame += *outFrameCount;
 	TRACE_AUDIO("  frame count: %lld current: %lld\n", *outFrameCount, fFrame);
