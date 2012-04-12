@@ -876,7 +876,7 @@ TBarApp::FetchAppIcon(const char* signature, BBitmap* icon)
 		if (defaultAppMime.GetIcon(icon, size) != B_OK) {
 			// couldn't find generic 3 boxes icon
 			// fill with transparent
-			uint8 *iconBits = (uint8*)icon->Bits();
+			uint8* iconBits = (uint8*)icon->Bits();
 			if (icon->ColorSpace() == B_RGBA32) {
 				int32 i = 0;
 				while (i < icon->BitsLength()) {
