@@ -74,7 +74,7 @@ const uint32 kShowDeskbarMenu = 'BeMn';
 const uint32 kShowTeamMenu = 'TmMn';
 
 
-static const color_space kIconFormat = B_RGBA32;
+static const color_space kIconColorSpace = B_RGBA32;
 
 
 int
@@ -749,7 +749,7 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char* sig, entry_ref* ref)
 	}
 
 	BarTeamInfo* barInfo = new BarTeamInfo(new BList(), flags, strdup(sig),
-		new BBitmap(IconRect(), kIconFormat), strdup(ref->name));
+		new BBitmap(IconRect(), kIconColorSpace), strdup(ref->name));
 
 	if ((barInfo->flags & B_BACKGROUND_APP) == 0
 		&& strcasecmp(barInfo->sig, kDeskbarSignature) != 0) {
@@ -828,7 +828,7 @@ TBarApp::ResizeTeamIcons()
 		if ((barInfo->flags & B_BACKGROUND_APP) == 0
 			&& strcasecmp(barInfo->sig, kDeskbarSignature) != 0) {
 			delete barInfo->icon;
-			barInfo->icon = new BBitmap(IconRect(), kIconFormat);
+			barInfo->icon = new BBitmap(IconRect(), kIconColorSpace);
 			FetchAppIcon(barInfo->sig, barInfo->icon);
 		}
 	}
@@ -870,10 +870,27 @@ TBarApp::FetchAppIcon(const char* signature, BBitmap* icon)
 	}
 	
 	if (!foundIcon) {
-		// Get the generic 3 boxes icon
+		// get the generic 3 boxes icon
 		BMimeType defaultAppMime;
 		defaultAppMime.SetTo(B_APP_MIME_TYPE);
-		defaultAppMime.GetIcon(icon, size);
+		if (defaultAppMime.GetIcon(icon, size) != B_OK) {
+			// couldn't find generic 3 boxes icon
+			// fill with transparent
+			uint8 *iconBits = (uint8*)icon->Bits();
+			if (icon->ColorSpace() == B_RGBA32) {
+				int32 i = 0;
+				while (i < icon->BitsLength()) {
+					iconBits[i++] = B_TRANSPARENT_32_BIT.red;
+					iconBits[i++] = B_TRANSPARENT_32_BIT.green;
+					iconBits[i++] = B_TRANSPARENT_32_BIT.blue;
+					iconBits[i++] = B_TRANSPARENT_32_BIT.alpha;
+				}
+			} else {
+				// Assume B_CMAP8
+				for (int32 i = 0; i < icon->BitsLength(); i++)
+					iconBits[i] = B_TRANSPARENT_MAGIC_CMAP8;
+			}
+		}
 	}
 }
 
