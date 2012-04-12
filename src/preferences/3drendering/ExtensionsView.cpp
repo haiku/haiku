@@ -70,11 +70,12 @@ ExtensionsView::~ExtensionsView()
 void
 ExtensionsView::_AddExtensionsList(BColumnListView* fExtensionsList, char* stringList)
 {
-	if (stringList == NULL)
-		// empty extentions string
+	if (stringList == NULL) {
+		// empty extensions string
 		return;
+	}
 
-	while (*stringList != NULL) {
+	while (*stringList != '\0') {
 		char extName[255];
 		int n = strcspn(stringList, " ");
 		strncpy(extName, stringList, n);
