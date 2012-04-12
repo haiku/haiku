@@ -51,7 +51,7 @@ enum {
 
 #define	MAX_FONT_SIZE	12.0f
 
-/* various offse, width, height and position used to align and
+/* various offset, width, height and position used to align and
    set the various UI elements. */
 enum {
 	TOP_LEFT_LIMIT	= 26,
