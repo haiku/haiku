@@ -868,7 +868,7 @@ TBarApp::FetchAppIcon(const char* signature, BBitmap* icon)
 		if (appMime.GetIcon(icon, size) == B_OK)
 			foundIcon = true;
 	}
-	
+
 	if (!foundIcon) {
 		// get the generic 3 boxes icon
 		BMimeType defaultAppMime;
