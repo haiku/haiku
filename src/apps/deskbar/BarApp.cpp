@@ -858,15 +858,22 @@ void
 TBarApp::FetchAppIcon(const char* signature, BBitmap* icon)
 {
 	app_info appInfo;
+	icon_size size = icon->Bounds().IntegerHeight() >= 32
+		? B_LARGE_ICON : B_MINI_ICON;
+	bool foundIcon = false;
 
 	if (be_roster->GetAppInfo(signature, &appInfo) == B_OK) {
 		BFile file(&appInfo.ref, B_READ_ONLY);
 		BAppFileInfo appMime(&file);
-		icon_size size = icon->Bounds().IntegerHeight() >= 32
-			? B_LARGE_ICON : B_MINI_ICON;
-
-		if (appMime.GetIcon(icon, size) != B_OK)
-			appMime.GetTrackerIcon(icon, size);
+		if (appMime.GetIcon(icon, size) == B_OK)
+			foundIcon = true;
+	}
+	
+	if (!foundIcon) {
+		// Get the generic 3 boxes icon
+		BMimeType defaultAppMime;
+		defaultAppMime.SetTo(B_APP_MIME_TYPE);
+		defaultAppMime.GetIcon(icon, size);
 	}
 }
 
