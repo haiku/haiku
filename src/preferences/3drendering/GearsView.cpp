@@ -10,15 +10,10 @@
 #include "GearsView.h"
 
 #include <Bitmap.h>
-#include <Catalog.h>
 #include <Locale.h>
 #include <Size.h>
 #include <TranslationUtils.h>
 #include <TranslatorFormats.h>
-
-
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "GearsView"
 
 
 static const float kStripeWidth = 30.0;
@@ -28,7 +23,7 @@ GearsView::GearsView()
 	BView("GearsView", B_WILL_DRAW),
 	fGears(NULL)
 {
-	SetExplicitPreferredSize(BSize(64 + 5, B_SIZE_UNLIMITED));
+	SetExplicitPreferredSize(BSize(64.0 + 5.0, B_SIZE_UNLIMITED));
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	_InitGearsBitmap();
 }
@@ -56,7 +51,7 @@ GearsView::Draw(BRect updateRect)
 
 	SetDrawingMode(B_OP_ALPHA);
 	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-	DrawBitmapAsync(fGears, BPoint(5, 70));
+	DrawBitmapAsync(fGears, BPoint(5.0, 30.0));
 }
 
 

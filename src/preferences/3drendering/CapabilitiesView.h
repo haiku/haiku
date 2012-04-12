@@ -1,27 +1,31 @@
 /*
- * Copyright 2009-2010 Haiku Inc. All rights reserved.
+ * Copyright 2009-2012 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef CAPABILITIES_VIEW_H
 #define CAPABILITIES_VIEW_H
 
 
-#include <GridView.h>
+#include <ColumnListView.h>
+#include <ColumnTypes.h>
+#include <GroupView.h>
 
 #include <GL/gl.h>
 
 
-class CapabilitiesView : public BGridView {
+class CapabilitiesView : public BGroupView {
 public:
 								CapabilitiesView();
 		virtual					~CapabilitiesView();
 
 private:
-				void			_AddCapability(GLenum capability,
+				BRow*			_CreateCapabilitiesRow(GLenum capability,
 									const char* name);
-				void			_AddCapabilityView(const char* name,
-									const char* value);
-				void			_AddConvolutionCapability();
+				BRow*			_CreateConvolutionCapabilitiesRow();
+
+				BColumnListView* fCapabilitiesList;
+				BStringColumn*	fCapabilityColumn;
+				BStringColumn*	fValueColumn;
 };
 
 

@@ -6,7 +6,6 @@ if $(HAIKU_GCC_VERSION[1]) < 3 {
 	SubDirC++Flags --no-warnings ;
 }
 
-
 UsePrivateHeaders interface ;
 
 local sources =
@@ -14,7 +13,6 @@ local sources =
 	OpenGLWindow.cpp
 	OpenGLView.cpp
 	CapabilitiesView.cpp
-	ExtensionsList.cpp
 	ExtensionsView.cpp
 	InfoView.cpp
 	GearsView.cpp
@@ -35,10 +33,8 @@ DoCatalogs 3DRendering :
     x-vnd.Haiku-3DRendering
 	:
 	CapabilitiesView.cpp
-	ExtensionsList.cpp
 	ExtensionsView.cpp
 	InfoView.cpp
-	GearsView.cpp
 	OpenGLWindow.cpp
-;
+	;
 

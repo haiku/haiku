@@ -1,8 +1,9 @@
 /*
- * Copyright 2009 Haiku Inc. All rights reserved.
+ * Copyright 2009-2012 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		John Scipione <jscipione@gmail.com>
  *		Artur Wyszynski <harakash@gmail.com>
  */
 
@@ -15,9 +16,13 @@
 #include "OpenGLView.h"
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "OpenGLWindow"
+
+
 OpenGLWindow::OpenGLWindow()
 	:
-	BWindow(BRect(50, 50, 450 + 64, 400),
+	BWindow(BRect(50, 50, 450 + 64, 300),
 		B_TRANSLATE_SYSTEM_NAME("3D Rendering"), B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
 		| B_AUTO_UPDATE_SIZE_LIMITS)
