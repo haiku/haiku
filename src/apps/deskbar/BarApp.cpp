@@ -860,37 +860,37 @@ TBarApp::FetchAppIcon(const char* signature, BBitmap* icon)
 	app_info appInfo;
 	icon_size size = icon->Bounds().IntegerHeight() >= 32
 		? B_LARGE_ICON : B_MINI_ICON;
-	bool foundIcon = false;
 
 	if (be_roster->GetAppInfo(signature, &appInfo) == B_OK) {
+		// fetch the app icon
 		BFile file(&appInfo.ref, B_READ_ONLY);
 		BAppFileInfo appMime(&file);
 		if (appMime.GetIcon(icon, size) == B_OK)
-			foundIcon = true;
+			return;
 	}
 
-	if (!foundIcon) {
-		// get the generic 3 boxes icon
-		BMimeType defaultAppMime;
-		defaultAppMime.SetTo(B_APP_MIME_TYPE);
-		if (defaultAppMime.GetIcon(icon, size) != B_OK) {
-			// couldn't find generic 3 boxes icon
-			// fill with transparent
-			uint8* iconBits = (uint8*)icon->Bits();
-			if (icon->ColorSpace() == B_RGBA32) {
-				int32 i = 0;
-				while (i < icon->BitsLength()) {
-					iconBits[i++] = B_TRANSPARENT_32_BIT.red;
-					iconBits[i++] = B_TRANSPARENT_32_BIT.green;
-					iconBits[i++] = B_TRANSPARENT_32_BIT.blue;
-					iconBits[i++] = B_TRANSPARENT_32_BIT.alpha;
-				}
-			} else {
-				// Assume B_CMAP8
-				for (int32 i = 0; i < icon->BitsLength(); i++)
-					iconBits[i] = B_TRANSPARENT_MAGIC_CMAP8;
-			}
+	// couldn't find the app icon
+	// fetch the generic 3 boxes icon
+	BMimeType defaultAppMime;
+	defaultAppMime.SetTo(B_APP_MIME_TYPE);
+	if (defaultAppMime.GetIcon(icon, size) == B_OK)
+		return;
+
+	// couldn't find generic 3 boxes icon
+	// fill with transparent
+	uint8* iconBits = (uint8*)icon->Bits();
+	if (icon->ColorSpace() == B_RGBA32) {
+		int32 i = 0;
+		while (i < icon->BitsLength()) {
+			iconBits[i++] = B_TRANSPARENT_32_BIT.red;
+			iconBits[i++] = B_TRANSPARENT_32_BIT.green;
+			iconBits[i++] = B_TRANSPARENT_32_BIT.blue;
+			iconBits[i++] = B_TRANSPARENT_32_BIT.alpha;
 		}
+	} else {
+		// Assume B_CMAP8
+		for (int32 i = 0; i < icon->BitsLength(); i++)
+			iconBits[i] = B_TRANSPARENT_MAGIC_CMAP8;
 	}
 }
 
