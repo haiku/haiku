@@ -89,6 +89,8 @@ typedef bool (*CallbackFunction)(void* cookie, CanvasMessage& message);
 										void* cookie);
 		bool						RemoveCallback(uint32 token);
 
+		bool						IsConnected() { return fIsConnected; }
+
 private:
 		callback_info*				_FindCallback(uint32 token);
 static	int							_CallbackCompare(const uint32* key,

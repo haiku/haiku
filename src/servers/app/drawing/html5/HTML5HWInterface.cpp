@@ -136,8 +136,6 @@ HTML5HWInterface::HTML5HWInterface(const char* target)
 	}
 	fServer->AddHandler(handler);
 
-	//static const char desktop_html[] = "<html><head><title>Haiku</title></head>"
-	//	"<body></body></html>";
 	handler = new(std::nothrow) WebHandler("desktop.html",
 		new(std::nothrow) BMemoryIO(desktop_html, sizeof(desktop_html) - 1));
 	if (handler == NULL) {
@@ -146,7 +144,6 @@ HTML5HWInterface::HTML5HWInterface(const char* target)
 	}
 	fServer->AddHandler(handler);
 
-	//static const char haiku_js[] = "window.alert('plop');\n";
 	handler = new(std::nothrow) WebHandler("haiku.js",
 		new(std::nothrow) BMemoryIO(haiku_js, sizeof(haiku_js) - 1));
 	if (handler == NULL) {
@@ -497,14 +494,14 @@ HTML5HWInterface::SetDPMSMode(uint32 state)
 uint32
 HTML5HWInterface::DPMSMode()
 {
-	return B_UNSUPPORTED;
+	return (IsConnected() ? B_DPMS_ON : B_DPMS_SUSPEND);
 }
 
 
 uint32
 HTML5HWInterface::DPMSCapabilities()
 {
-	return 0;
+	return B_DPMS_ON | B_DPMS_SUSPEND;
 }
 
 
@@ -526,6 +523,8 @@ void
 HTML5HWInterface::SetCursor(ServerCursor* cursor)
 {
 	HWInterface::SetCursor(cursor);
+	if (!IsConnected())
+		return;
 	CanvasMessage message(NULL, fSendBuffer);
 	message.Start(RP_SET_CURSOR);
 	message.AddCursor(Cursor().Get());
@@ -536,6 +535,8 @@ void
 HTML5HWInterface::SetCursorVisible(bool visible)
 {
 	HWInterface::SetCursorVisible(visible);
+	if (!IsConnected())
+		return;
 	CanvasMessage message(NULL, fSendBuffer);
 	message.Start(RP_SET_CURSOR_VISIBLE);
 	message.Add(visible);
@@ -546,6 +547,8 @@ void
 HTML5HWInterface::MoveCursorTo(float x, float y)
 {
 	HWInterface::MoveCursorTo(x, y);
+	if (!IsConnected())
+		return;
 	CanvasMessage message(NULL, fSendBuffer);
 	message.Start(RP_MOVE_CURSOR_TO);
 	message.Add(x);
@@ -558,6 +561,8 @@ HTML5HWInterface::SetDragBitmap(const ServerBitmap* bitmap,
 	const BPoint& offsetFromCursor)
 {
 	HWInterface::SetDragBitmap(bitmap, offsetFromCursor);
+	if (!IsConnected())
+		return;
 	CanvasMessage message(NULL, fSendBuffer);
 	message.Start(RP_SET_CURSOR);
 	message.AddCursor(CursorAndDragBitmap().Get());
@@ -589,6 +594,8 @@ status_t
 HTML5HWInterface::InvalidateRegion(BRegion& region)
 {
 	CanvasMessage message(NULL, fSendBuffer);
+	if (!IsConnected())
+		return B_OK;
 	message.Start(RP_INVALIDATE_REGION);
 	message.AddRegion(region);
 	return B_OK;
@@ -599,6 +606,8 @@ status_t
 HTML5HWInterface::Invalidate(const BRect& frame)
 {
 	CanvasMessage message(NULL, fSendBuffer);
+	if (!IsConnected())
+		return B_OK;
 	message.Start(RP_INVALIDATE_RECT);
 	message.Add(frame);
 	return B_OK;
