@@ -31,7 +31,7 @@
 CapabilitiesView::CapabilitiesView()
 	:
 	BGroupView(B_TRANSLATE("Capabilities"), B_VERTICAL),
-	fCapabilitiesList(new BColumnListView("CapabilitiesList", B_FOLLOW_ALL))
+	fCapabilitiesList(new BColumnListView("CapabilitiesList", 0))
 {
 	// add the columns
 

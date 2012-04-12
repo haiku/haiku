@@ -76,6 +76,7 @@ OpenGLView::OpenGLView()
 				.Add(menuField)
 				.Add(tabView)
 				.End()
+			.AddGlue()
 			.End();
 }
 

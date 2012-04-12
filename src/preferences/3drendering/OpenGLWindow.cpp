@@ -13,6 +13,7 @@
 #include <Application.h>
 #include <Catalog.h>
 #include <GroupLayout.h>
+
 #include "OpenGLView.h"
 
 
@@ -22,7 +23,7 @@
 
 OpenGLWindow::OpenGLWindow()
 	:
-	BWindow(BRect(50, 50, 450 + 64, 300),
+	BWindow(BRect(50, 50, 300, 300),
 		B_TRANSLATE_SYSTEM_NAME("3D Rendering"), B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
 		| B_AUTO_UPDATE_SIZE_LIMITS)

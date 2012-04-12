@@ -29,7 +29,7 @@
 ExtensionsView::ExtensionsView()
 	:
 	BGroupView(B_TRANSLATE("Extensions"), B_VERTICAL),
-	fExtensionsList(new BColumnListView("ExtensionsList", B_FOLLOW_ALL))
+	fExtensionsList(new BColumnListView("ExtensionsList", 0))
 {
 	// add the columns
 

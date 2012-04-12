@@ -23,7 +23,8 @@ GearsView::GearsView()
 	BView("GearsView", B_WILL_DRAW),
 	fGears(NULL)
 {
-	SetExplicitPreferredSize(BSize(64.0 + 5.0, B_SIZE_UNLIMITED));
+	SetExplicitMinSize(BSize(64.0 + 10.0, B_SIZE_UNSET));
+	SetExplicitPreferredSize(BSize(64.0 + 10.0, B_SIZE_UNLIMITED));
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	_InitGearsBitmap();
 }
