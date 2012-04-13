@@ -30,52 +30,58 @@ const BAlignment kLabelAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_UNSET);
 const BAlignment kValueAlignment(B_ALIGN_RIGHT, B_ALIGN_VERTICAL_UNSET);
 
 
+// <bold>Render name</bold>
+// Vendor Name           GL Version
+// GLU version           GLUT API version
+//
+// example:
+// Software rasterizer for X86/MMX/SSE2
+// Mesa Project          2.1 Mesa 8.1-devel (git-2402c0)
+// GLU 1.3               GLUT API 5
+
 InfoView::InfoView()
 	:
-	BGridView(B_TRANSLATE("Information"))
+	BGroupView(B_TRANSLATE("Information"), B_HORIZONTAL)
 {
-	_AddString(B_TRANSLATE("GL version:"),
-		(const char*)glGetString(GL_VERSION));
-	_AddString(B_TRANSLATE("Vendor name:"),
-		(const char*)glGetString(GL_VENDOR));
-	_AddString(B_TRANSLATE("Renderer name:"),
+	BStringView* rendererView = new BStringView(NULL,
 		(const char*)glGetString(GL_RENDERER));
-	_AddString(B_TRANSLATE("GLU version:"),
-		(const char*)gluGetString(GLU_VERSION));
-	_AddString(B_TRANSLATE("GLUT API version:"),
-		BString() << (int32)GLUT_API_VERSION);
+	rendererView->SetExplicitAlignment(kLabelAlignment);
+	rendererView->SetFont(be_bold_font);
 
-	BGridLayout* layout = GridLayout();
-	layout->SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-		B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
+	BStringView* vendorNameView = new BStringView(NULL,
+		(const char*)glGetString(GL_VENDOR));
+	vendorNameView->SetExplicitAlignment(kLabelAlignment);
 
-	layout->AddItem(BSpaceLayoutItem::CreateGlue(), 0, layout->CountRows(),
-		layout->CountColumns(), 1);
+	BStringView* glVersionView = new BStringView(NULL,
+		(const char*)glGetString(GL_VERSION));
+	glVersionView->SetExplicitAlignment(kLabelAlignment);
 
-	// Set horizontal spacing to 0, and use the middle column as
-	// variable-width spacing (like layout 'glue').
-	layout->SetHorizontalSpacing(0);
-	layout->SetMinColumnWidth(1, be_control_look->DefaultLabelSpacing());
-	layout->SetMaxColumnWidth(1, B_SIZE_UNLIMITED);
+	BString gluString("GLU ");
+	gluString << (const char*)gluGetString(GLU_VERSION);
+	BStringView* gluVersionView = new BStringView(NULL, gluString.String());
+	gluVersionView->SetExplicitAlignment(kLabelAlignment);
+
+	BString glutAPIString("GLUT API ");
+	glutAPIString << (int32)GLUT_API_VERSION;
+	BStringView* glutVersionView = new BStringView(NULL,
+		glutAPIString.String());
+	glutVersionView->SetExplicitAlignment(kLabelAlignment);
+
+	BLayoutBuilder::Group<>(this)
+		.AddGroup(B_VERTICAL, 0)
+			.Add(rendererView)
+			.AddGroup(B_HORIZONTAL, 0)
+				.Add(vendorNameView)
+				.Add(glVersionView)
+				.End()
+			.AddGroup(B_HORIZONTAL, 0)
+				.Add(gluVersionView)
+				.Add(glutVersionView)
+				.End()
+			.End();
 }
 
 
 InfoView::~InfoView()
 {
-}
-
-
-void
-InfoView::_AddString(const char* label, const char* value)
-{
-	BView* labelView = new BStringView(NULL, label);
-	labelView->SetExplicitAlignment(kLabelAlignment);
-
-	BView* valueView = new BStringView(NULL, value);
-	valueView->SetExplicitAlignment(kValueAlignment);
-
-	int32 rows = GridLayout()->CountRows();
-	BLayoutBuilder::Grid<>(this)
-		.Add(labelView, 0, rows)
-		.Add(valueView, 2, rows);
 }

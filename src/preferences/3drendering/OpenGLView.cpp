@@ -17,6 +17,8 @@
 #include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuField.h>
+#include <PopUpMenu.h>
+#include <Size.h>
 #include <SpaceLayoutItem.h>
 #include <TabView.h>
 
@@ -42,9 +44,7 @@ OpenGLView::OpenGLView()
 
 	glView->LockGL();
 
-	BMenu* menu = new BMenu(B_TRANSLATE("Automatic"));
-	menu->SetRadioMode(true);
-	menu->SetLabelFromMarked(true);
+	BPopUpMenu* menu = new BPopUpMenu(B_TRANSLATE("Automatic"), true, true);
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Automatic"),
 		new BMessage(MENU_AUTO_MESSAGE)));
 	menu->AddSeparatorItem();
@@ -56,11 +56,16 @@ OpenGLView::OpenGLView()
 		new BMessage(MENU_SWLLVM_MESSAGE)));
 	BMenuField* menuField = new BMenuField("renderer",
 		B_TRANSLATE("3D Rendering Engine:"), menu);
+	menuField->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	// TODO:  Set current Renderer
 	menuField->SetEnabled(false);
 
+	float tabViewWidth
+		= this->StringWidth("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM");
+	float tabViewHeight = this->StringWidth("MMMMMMMMMMMMMMMMMMM");
+
 	BTabView *tabView = new BTabView("tab view", B_WIDTH_FROM_LABEL);
-	tabView->AddTab(new InfoView());
+	tabView->SetExplicitMinSize(BSize(tabViewWidth, tabViewHeight));
 	tabView->AddTab(new CapabilitiesView());
 	tabView->AddTab(new ExtensionsView());
 
@@ -74,6 +79,7 @@ OpenGLView::OpenGLView()
 				.SetInsets(0, B_USE_DEFAULT_SPACING,
 					B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 				.Add(menuField)
+				.Add(new InfoView())
 				.Add(tabView)
 				.End()
 			.AddGlue()

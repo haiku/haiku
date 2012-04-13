@@ -6,18 +6,13 @@
 #define INFO_VIEW_H
 
 
-#include <GridView.h>
+#include <GroupView.h>
 
 
-class InfoView : public BGridView {
+class InfoView : public BGroupView {
 public:
 								InfoView();
 		virtual					~InfoView();
-
-private:
-				void			_AddString(const char* label,
-									const char* value);
-
 };
 
 
