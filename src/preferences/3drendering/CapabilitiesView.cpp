@@ -35,14 +35,19 @@ CapabilitiesView::CapabilitiesView()
 {
 	// add the columns
 
+	float capabilityColWidth = this->StringWidth("MMMMMMMMMMMMMMMMMMMMM");
+
 	fCapabilityColumn = new BStringColumn(B_TRANSLATE("Capability"),
-		240, 240, 240, B_TRUNCATE_MIDDLE);
+		capabilityColWidth, capabilityColWidth - 20.0,
+		capabilityColWidth + 60.0, B_TRUNCATE_MIDDLE);
 	fCapabilitiesList->AddColumn(fCapabilityColumn, 0);
 	fCapabilitiesList->SetSortingEnabled(true);
 	fCapabilitiesList->SetSortColumn(fCapabilityColumn, true, true);
 
-	fValueColumn = new BStringColumn(B_TRANSLATE("Value"), 60, 60, 60,
-			B_TRUNCATE_MIDDLE);
+	float valueColWidth = this->StringWidth("MMMMMM");
+
+	fValueColumn = new BStringColumn(B_TRANSLATE("Value"), valueColWidth,
+		valueColWidth, valueColWidth, B_TRUNCATE_MIDDLE);
 	fCapabilitiesList->AddColumn(fValueColumn, 1);
 
 	// add the rows
@@ -89,10 +94,10 @@ CapabilitiesView::CapabilitiesView()
 	fCapabilitiesList->AddRow(_CreateConvolutionCapabilitiesRow());
 
 	fCapabilitiesList->AddRow(_CreateCapabilitiesRow(GL_MAX_ELEMENTS_INDICES,
-		"Max. recommended index elements"));
+		"Maximum recommended index elements"));
 
 	fCapabilitiesList->AddRow(_CreateCapabilitiesRow(GL_MAX_ELEMENTS_VERTICES,
-		"Max. recommended vertex elements"));
+		"Maximum recommended vertex elements"));
 
 	// add the list
 

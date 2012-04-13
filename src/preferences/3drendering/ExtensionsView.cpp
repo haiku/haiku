@@ -33,8 +33,12 @@ ExtensionsView::ExtensionsView()
 {
 	// add the columns
 
+	float availableColWidth
+		= this->StringWidth("MMMMMMMMMMMMMMMMMMMMMMMMMMMM");
+
 	fAvailableColumn = new BStringColumn(B_TRANSLATE("Available extensions"),
-		280, 280, 280, B_TRUNCATE_MIDDLE);
+		availableColWidth, availableColWidth, availableColWidth,
+		B_TRUNCATE_MIDDLE);
 	fExtensionsList->AddColumn(fAvailableColumn, 0);
 	fExtensionsList->SetSortingEnabled(true);
 	fExtensionsList->SetSortColumn(fAvailableColumn, true, true);
