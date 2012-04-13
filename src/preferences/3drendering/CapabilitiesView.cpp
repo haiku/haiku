@@ -35,7 +35,7 @@ CapabilitiesView::CapabilitiesView()
 {
 	// add the columns
 
-	float capabilityColWidth = this->StringWidth("M") * 21;
+	float capabilityColWidth = this->StringWidth("M") * 24;
 
 	fCapabilityColumn = new BStringColumn(B_TRANSLATE("Capability"),
 		capabilityColWidth, capabilityColWidth - 20.0,
@@ -102,8 +102,7 @@ CapabilitiesView::CapabilitiesView()
 	// add the list
 
 	AddChild(fCapabilitiesList);
-	GroupLayout()->SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-		B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
+	GroupLayout()->SetInsets(-1, -1, -1, -1);
 }
 
 
