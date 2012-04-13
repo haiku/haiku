@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		John Scipione <jscipione@gmail.com>
  *		Alex Wilson <yourpalal2@gmail.com>
  *		Artur Wyszynski <harakash@gmail.com>
  */

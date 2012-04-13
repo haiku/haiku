@@ -33,8 +33,7 @@ ExtensionsView::ExtensionsView()
 {
 	// add the columns
 
-	float availableColWidth
-		= this->StringWidth("MMMMMMMMMMMMMMMMMMMMMMMMMMMM");
+	float availableColWidth = this->StringWidth("M") * 26;
 
 	fAvailableColumn = new BStringColumn(B_TRANSLATE("Available extensions"),
 		availableColWidth, availableColWidth, availableColWidth,
