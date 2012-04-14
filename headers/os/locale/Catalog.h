@@ -48,6 +48,8 @@ public:
 			status_t			InitCheck() const;
 			int32				CountItems() const;
 
+			// TODO: drop this, as the lifetime of the returned object
+			//       is indeterminate
 			BCatalogAddOn*		CatalogAddOn();
 
 protected:
@@ -58,8 +60,8 @@ protected:
 			BCatalogAddOn*		fCatalog;
 
 private:
-			friend class BLocale;
-			friend status_t get_add_on_catalog(BCatalog*, const char*);
+	friend	class BLocale;
+	friend	status_t			get_add_on_catalog(BCatalog*, const char*);
 };
 
 
@@ -129,21 +131,21 @@ private:
 /* example:
 		#define B_TRANSLATE_CONTEXT "MyDecentApp-Menu"
 
-		static const char *choices[] = {
+		static const char* choices[] = {
 			B_TRANSLATE_MARK("left"),
 			B_TRANSLATE_MARK("right"),
 			B_TRANSLATE_MARK("up"),
 			B_TRANSLATE_MARK("down")
 		};
 
-		void MyClass::AddChoices(BMenu *menu) {
-			for (char **ch = choices; *ch; ch++) {
+		void MyClass::AddChoices(BMenu* menu) {
+			for (char** ch = choices; *ch != '\0'; ++ch) {
 				menu->AddItem(
 					new BMenuItem(
 						B_TRANSLATE(*ch),
 						new BMessage(...)
 					)
-				)
+				);
 			}
 		}
 */
@@ -331,8 +333,8 @@ protected:
 	virtual	void				UpdateFingerprint();
 
 protected:
-			friend class BCatalog;
-			friend status_t get_add_on_catalog(BCatalog*, const char*);
+	friend	class BCatalog;
+	friend	status_t 			get_add_on_catalog(BCatalog*, const char*);
 
 			status_t 			fInitCheck;
 			BString 			fSignature;
@@ -344,12 +346,13 @@ protected:
 // every catalog-add-on should export these symbols...
 // ...the function that instantiates a catalog for this add-on-type...
 extern "C"
-BCatalogAddOn *instantiate_catalog(const char *signature,
-	const char *language, uint32 fingerprint);
+BCatalogAddOn* instantiate_catalog(const char* signature, const char* language,
+	uint32 fingerprint);
+
 // ...the function that creates an empty catalog for this add-on-type...
 extern "C"
-BCatalogAddOn *create_catalog(const char *signature,
-	const char *language);
+BCatalogAddOn* create_catalog(const char* signature, const char* language);
+
 // ...and the priority which will be used to order the catalog-add-ons:
 extern uint8 gCatalogAddOnPriority;
 
@@ -357,76 +360,22 @@ extern uint8 gCatalogAddOnPriority;
 /*
  * BCatalog - inlines for trivial accessors:
  */
-inline status_t
-BCatalog::GetSignature(BString *sig)
-{
-	if (!sig)
-		return B_BAD_VALUE;
-	if (!fCatalog)
-		return B_NO_INIT;
-	*sig = fCatalog->fSignature;
-	return B_OK;
-}
-
-
-inline status_t
-BCatalog::GetLanguage(BString *lang)
-{
-	if (!lang)
-		return B_BAD_VALUE;
-	if (!fCatalog)
-		return B_NO_INIT;
-	*lang = fCatalog->fLanguageName;
-	return B_OK;
-}
-
-
-inline status_t
-BCatalog::GetFingerprint(uint32 *fp)
-{
-	if (!fp)
-		return B_BAD_VALUE;
-	if (!fCatalog)
-		return B_NO_INIT;
-	*fp = fCatalog->fFingerprint;
-	return B_OK;
-}
-
-
-inline const char *
-BCatalog::GetNoAutoCollectString(const char *string, const char *context,
-	const char *comment)
+inline const char*
+BCatalog::GetNoAutoCollectString(const char* string, const char* context,
+	const char* comment)
 {
 	return GetString(string, context, comment);
 }
 
 
-inline const char *
+inline const char*
 BCatalog::GetNoAutoCollectString(uint32 id)
 {
 	return GetString(id);
 }
 
 
-inline status_t
-BCatalog::InitCheck() const
-{
-	return fCatalog
-				? fCatalog->InitCheck()
-				: B_NO_INIT;
-}
-
-
-inline int32
-BCatalog::CountItems() const
-{
-	if (!fCatalog)
-		return 0;
-	return fCatalog->CountItems();
-}
-
-
-inline BCatalogAddOn *
+inline BCatalogAddOn*
 BCatalog::CatalogAddOn()
 {
 	return fCatalog;
@@ -436,16 +385,15 @@ BCatalog::CatalogAddOn()
 /*
  * BCatalogAddOn - inlines for trivial accessors:
  */
-inline BCatalogAddOn *
+inline BCatalogAddOn*
 BCatalogAddOn::Next()
 {
 	return fNext;
 }
 
-inline const char *
-BCatalogAddOn::MarkForTranslation(const char *str,
-	const char * /*ctx __attribute__ ((unused))*/,
-	const char * /*cmt __attribute__ ((unused))*/)
+inline const char*
+BCatalogAddOn::MarkForTranslation(const char* str, const char* /* context */,
+	const char* /* comment */)
 {
 	return str;
 }
