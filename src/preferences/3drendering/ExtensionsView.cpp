@@ -33,7 +33,7 @@ ExtensionsView::ExtensionsView()
 {
 	// add the columns
 
-	float availableColWidth = this->StringWidth("M") * 28;
+	float availableColWidth = this->StringWidth("M") * 27;
 
 	fAvailableColumn = new BStringColumn(B_TRANSLATE("Available extensions"),
 		availableColWidth, availableColWidth, availableColWidth,
@@ -50,7 +50,7 @@ ExtensionsView::ExtensionsView()
 	// add the list
 
 	AddChild(fExtensionsList);
-	GroupLayout()->SetInsets(-1, -1, -1, -1);
+	GroupLayout()->SetInsets(5.0, 5.0, 5.0, 5.0);
 }
 
 

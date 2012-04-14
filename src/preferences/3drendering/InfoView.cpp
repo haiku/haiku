@@ -13,14 +13,15 @@
 
 #include <Catalog.h>
 #include <ControlLook.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <GL/glut.h>
+#include <GridLayoutBuilder.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
 #include <Message.h>
 #include <String.h>
 #include <StringView.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glut.h>
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -71,14 +72,12 @@ InfoView::InfoView()
 	BLayoutBuilder::Group<>(this)
 		.AddGroup(B_VERTICAL, 0)
 			.Add(rendererView)
-			.AddGroup(B_HORIZONTAL, 0)
-				.Add(vendorNameView)
-				.Add(glVersionView)
-				.End()
-			.AddGroup(B_HORIZONTAL, 0)
-				.Add(gluVersionView)
-				.Add(glutVersionView)
-				.End()
+			.Add(BGridLayoutBuilder(0, 0)
+				.Add(vendorNameView, 0, 0)
+				.Add(glVersionView, 1, 0)
+				.Add(gluVersionView, 0, 1)
+				.Add(glutVersionView, 1, 1)
+			)
 			.End();
 }
 

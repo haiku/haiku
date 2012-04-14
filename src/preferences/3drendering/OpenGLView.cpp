@@ -61,7 +61,7 @@ OpenGLView::OpenGLView()
 	menuField->SetEnabled(false);
 
 	float tabViewWidth = this->StringWidth("M") * 36;
-	float tabViewHeight = this->StringWidth("M") * 19;
+	float tabViewHeight = this->StringWidth("M") * 16;
 
 	BTabView *tabView = new BTabView("tab view", B_WIDTH_FROM_LABEL);
 	tabView->SetExplicitMinSize(BSize(tabViewWidth, tabViewHeight));
