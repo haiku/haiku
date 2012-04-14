@@ -1,8 +1,0 @@
-SubDir HAIKU_TOP src add-ons locale catalogs zeta ;
-
-UsePublicHeaders locale ;
-
-Addon <catalog-addon>zeta 
-	: Catalog.cpp 
-	: be $(TARGET_LIBSUPC++)
-	;
