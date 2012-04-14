@@ -736,6 +736,9 @@ TFilePanel::Init(const BMessage *)
 
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(kCancelButton));
 	AddShortcut('H', B_COMMAND_KEY, new BMessage(kSwitchToHome));
+	AddShortcut('A', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(kShowSelectionWindow));
+	AddShortcut('A', B_COMMAND_KEY, new BMessage(B_SELECT_ALL), PoseView());
+	AddShortcut('S', B_COMMAND_KEY, new BMessage(kInvertSelection), PoseView());
 	AddShortcut(B_DOWN_ARROW, B_COMMAND_KEY, new BMessage(kOpenDir));
 	AddShortcut(B_DOWN_ARROW, B_COMMAND_KEY | B_OPTION_KEY, new BMessage(kOpenDir));
 	AddShortcut(B_UP_ARROW, B_COMMAND_KEY, new BMessage(kOpenParentDir));
