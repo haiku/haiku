@@ -31,6 +31,7 @@
 #include <cstdio>
 
 
+using BPrivate::DefaultCatalog;
 using std::auto_ptr;
 
 
@@ -38,6 +39,9 @@ using std::auto_ptr;
 	kit. Alternatively, this could be used as a full add-on, but currently this
 	is provided as part of liblocale.so.
 */
+
+
+namespace BPrivate {
 
 
 // several attributes/resource-IDs used within the Locale Kit:
@@ -64,7 +68,7 @@ static int16 kCatArchiveVersion = 1;
 DefaultCatalog::DefaultCatalog(const entry_ref &catalogOwner,
 	const char *language, uint32 fingerprint)
 	:
-	BHashMapCatalog("", language, fingerprint)
+	HashMapCatalog("", language, fingerprint)
 {
 	fInitCheck = B_NOT_SUPPORTED;
 	fprintf(stderr,
@@ -80,7 +84,7 @@ DefaultCatalog::DefaultCatalog(const entry_ref &catalogOwner,
 */
 DefaultCatalog::DefaultCatalog(entry_ref *appOrAddOnRef)
 	:
-	BHashMapCatalog("", "", 0)
+	HashMapCatalog("", "", 0)
 {
 	fInitCheck = ReadFromResource(*appOrAddOnRef);
 	// fprintf(stderr,
@@ -96,7 +100,7 @@ DefaultCatalog::DefaultCatalog(entry_ref *appOrAddOnRef)
 DefaultCatalog::DefaultCatalog(const char *path, const char *signature,
 	const char *language)
 	:
-	BHashMapCatalog(signature, language, 0),
+	HashMapCatalog(signature, language, 0),
 	fPath(path)
 {
 	fInitCheck = B_OK;
@@ -426,3 +430,6 @@ DefaultCatalog::Create(const char *signature, const char *language)
 
 const uint8 DefaultCatalog::kDefaultCatalogAddOnPriority = 1;
 	// give highest priority to our embedded catalog-add-on
+
+
+} // namespace BPrivate

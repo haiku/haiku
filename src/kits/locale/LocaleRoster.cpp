@@ -44,6 +44,8 @@
 
 
 using BPrivate::CatalogAddOnInfo;
+using BPrivate::MutableLocaleRoster;
+using BPrivate::RosterData;
 
 
 /*

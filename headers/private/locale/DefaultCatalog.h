@@ -22,7 +22,7 @@ namespace BPrivate {
  * but the value-type might change to add support for shortcuts and/or
  * graphical data (button-images and the like).
  */
-class DefaultCatalog : public BHashMapCatalog {
+class DefaultCatalog : public HashMapCatalog {
 	public:
 		DefaultCatalog(const entry_ref &catalogOwner, const char *language,
 			uint32 fingerprint);
@@ -34,7 +34,6 @@ class DefaultCatalog : public BHashMapCatalog {
 				// constructor for editor-app
 
 		~DefaultCatalog();
-
 
 		// implementation for editor-interface:
 		status_t ReadFromFile(const char *path = NULL);
@@ -63,13 +62,14 @@ class DefaultCatalog : public BHashMapCatalog {
 		mutable BString		fPath;
 };
 
+
 extern "C" status_t
 default_catalog_get_available_languages(BMessage* availableLanguages,
 	const char* sigPattern, const char* langPattern = NULL,
 	int32 fingerprint = 0);
 
+
 }	// namespace BPrivate
 
-using namespace BPrivate;
 
 #endif	/* _DEFAULT_CATALOG_H_ */

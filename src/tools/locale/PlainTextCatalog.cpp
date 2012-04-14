@@ -31,6 +31,7 @@
 #include <Catalog.h>
 
 
+using BPrivate::PlainTextCatalog;
 using std::auto_ptr;
 using std::min;
 using std::max;
@@ -42,6 +43,9 @@ using std::pair;
  *	locale kit. It is not meant to be used in applications like other add ons,
  *	but only as a way to get an easy to translate file for developers.
  */
+
+
+namespace BPrivate {
 
 
 const char *PlainTextCatalog::kCatMimeType
@@ -73,7 +77,7 @@ escapeQuotedChars(BString& stringToEscape)
 PlainTextCatalog::PlainTextCatalog(const char *signature, const char *language,
 	uint32 fingerprint)
 	:
-	BHashMapCatalog(signature, language, fingerprint)
+	HashMapCatalog(signature, language, fingerprint)
 {
 	// Look for the catalog in the directory we are going to use
 	// This constructor is not used so lets disable that...
@@ -93,7 +97,7 @@ PlainTextCatalog::PlainTextCatalog(const char *signature, const char *language,
 PlainTextCatalog::PlainTextCatalog(const char *path, const char *signature,
 	const char *language)
 	:
-	BHashMapCatalog(signature, language, 0),
+	HashMapCatalog(signature, language, 0),
 	fPath(path)
 {
 	fInitCheck = B_OK;
@@ -337,6 +341,9 @@ PlainTextCatalog::Instantiate(const char *signature, const char *language,
 	}
 	return catalog;
 }
+
+
+} // namespace BPrivate
 
 
 extern "C" BCatalogAddOn *

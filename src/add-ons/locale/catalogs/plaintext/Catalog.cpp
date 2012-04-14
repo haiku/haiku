@@ -32,6 +32,8 @@
 #include <Catalog.h>
 
 
+using BPrivate::HashMapCatalog;
+using BPrivate::PlainTextCatalog;
 using std::auto_ptr;
 using std::min;
 using std::max;
@@ -77,7 +79,7 @@ escapeQuotedChars(BString& stringToEscape)
 PlainTextCatalog::PlainTextCatalog(const char *signature, const char *language,
 	uint32 fingerprint)
 	:
-	BHashMapCatalog(signature, language, fingerprint)
+	HashMapCatalog(signature, language, fingerprint)
 {
 	// give highest priority to catalog living in sub-folder of app's folder:
 	app_info appInfo;
@@ -137,7 +139,7 @@ PlainTextCatalog::PlainTextCatalog(const char *signature, const char *language,
 PlainTextCatalog::PlainTextCatalog(const char *path, const char *signature,
 	const char *language)
 	:
-	BHashMapCatalog(signature, language, 0),
+	HashMapCatalog(signature, language, 0),
 	fPath(path)
 {
 	fInitCheck = B_OK;

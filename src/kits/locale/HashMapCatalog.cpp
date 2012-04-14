@@ -102,25 +102,25 @@ CatKey::HashFun(const char* s, int startValue) {
 }
 
 
-// BHashMapCatalog
+// HashMapCatalog
 
 
 void
-BHashMapCatalog::MakeEmpty()
+HashMapCatalog::MakeEmpty()
 {
 	fCatMap.Clear();
 }
 
 
 int32
-BHashMapCatalog::CountItems() const
+HashMapCatalog::CountItems() const
 {
 	return fCatMap.Size();
 }
 
 
 const char *
-BHashMapCatalog::GetString(const char *string, const char *context,
+HashMapCatalog::GetString(const char *string, const char *context,
 	const char *comment)
 {
 	CatKey key(string, context, comment);
@@ -129,7 +129,7 @@ BHashMapCatalog::GetString(const char *string, const char *context,
 
 
 const char *
-BHashMapCatalog::GetString(uint32 id)
+HashMapCatalog::GetString(uint32 id)
 {
 	CatKey key(id);
 	return GetString(key);
@@ -137,7 +137,7 @@ BHashMapCatalog::GetString(uint32 id)
 
 
 const char *
-BHashMapCatalog::GetString(const CatKey& key)
+HashMapCatalog::GetString(const CatKey& key)
 {
 	BString value = fCatMap.Get(key);
 	if (value.Length() == 0)
@@ -202,7 +202,7 @@ parseQuotedChars(BString& stringToParse)
 
 
 status_t
-BHashMapCatalog::SetString(const char *string, const char *translated,
+HashMapCatalog::SetString(const char *string, const char *translated,
 	const char *context, const char *comment)
 {
 	BString stringCopy(string);
@@ -225,7 +225,7 @@ BHashMapCatalog::SetString(const char *string, const char *translated,
 
 
 status_t
-BHashMapCatalog::SetString(int32 id, const char *translated)
+HashMapCatalog::SetString(int32 id, const char *translated)
 {
 	BString translatedCopy(translated);
 	status_t result = parseQuotedChars(translatedCopy);
@@ -238,7 +238,7 @@ BHashMapCatalog::SetString(int32 id, const char *translated)
 
 
 status_t
-BHashMapCatalog::SetString(const CatKey& key, const char *translated)
+HashMapCatalog::SetString(const CatKey& key, const char *translated)
 {
 	BString translatedCopy(translated);
 	status_t result = parseQuotedChars(translatedCopy);
@@ -258,7 +258,7 @@ BHashMapCatalog::SetString(const CatKey& key, const char *translated)
  * wrong order, and this does happen, as an hash map is an unsorted container.
  */
 uint32
-BHashMapCatalog::ComputeFingerprint() const
+HashMapCatalog::ComputeFingerprint() const
 {
 	uint32 checksum = 0;
 
@@ -276,7 +276,7 @@ BHashMapCatalog::ComputeFingerprint() const
 
 
 void
-BHashMapCatalog::UpdateFingerprint()
+HashMapCatalog::UpdateFingerprint()
 {
 	fFingerprint = ComputeFingerprint();
 }

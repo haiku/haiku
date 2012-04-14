@@ -12,6 +12,9 @@
 #include <DefaultCatalog.h>
 #include <EditableCatalog.h>
 
+
+using BPrivate::CatKey;
+using BPrivate::DefaultCatalog;
 using BPrivate::EditableCatalog;
 
 

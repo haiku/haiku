@@ -15,7 +15,8 @@ class BFile;
 
 namespace BPrivate {
 
-class PlainTextCatalog : public BHashMapCatalog {
+
+class PlainTextCatalog : public HashMapCatalog {
 	public:
 		PlainTextCatalog(const char *signature, const char *language,
 			uint32 fingerprint);
@@ -27,7 +28,6 @@ class PlainTextCatalog : public BHashMapCatalog {
 				// constructor for editor-app
 
 		~PlainTextCatalog();
-
 
 		// implementation for editor-interface:
 		status_t ReadFromFile(const char *path = NULL);
@@ -45,9 +45,8 @@ class PlainTextCatalog : public BHashMapCatalog {
 		mutable BString		fPath;
 };
 
-} // namespace BPrivate
 
-using BPrivate::PlainTextCatalog;
+} // namespace BPrivate
 
 
 #endif /* _PLAINTEXT_CATALOG_H_ */

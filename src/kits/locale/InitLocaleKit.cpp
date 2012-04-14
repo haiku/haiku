@@ -22,6 +22,11 @@ BCatalog gSystemCatalog;
 }
 
 
+using BPrivate::DefaultCatalog;
+using BPrivate::MutableLocaleRoster;
+using BPrivate::gSystemCatalog;
+
+
 // helper function that makes sure an attribute-index exists:
 static void EnsureIndexExists(const char *attrName)
 {
@@ -129,6 +134,5 @@ __initialize_locale_kit()
 {
 	SetupCatalogBasics();
 
-	MutableLocaleRoster::Default()->LoadSystemCatalog(
-		&BPrivate::gSystemCatalog);
+	MutableLocaleRoster::Default()->LoadSystemCatalog(&gSystemCatalog);
 }

@@ -46,6 +46,10 @@ using std::pair;
 static const char *kCatFolder = "catalogs";
 static const char *kCatExtension = ".catalog";
 
+
+namespace BPrivate {
+
+
 const char *DefaultCatalog::kCatMimeType
 	= "locale/x-vnd.Be.locale-catalog.default";
 
@@ -64,7 +68,7 @@ const uint8 DefaultCatalog::kDefaultCatalogAddOnPriority = 1;
 DefaultCatalog::DefaultCatalog(const entry_ref &catalogOwner, const char *language,
 	uint32 fingerprint)
 	:
-	BHashMapCatalog("", language, fingerprint)
+	HashMapCatalog("", language, fingerprint)
 {
 	// We created the catalog with an invalid signature, but we fix that now.
 	SetSignature(catalogOwner);
@@ -127,7 +131,7 @@ DefaultCatalog::DefaultCatalog(const entry_ref &catalogOwner, const char *langua
 */
 DefaultCatalog::DefaultCatalog(entry_ref *appOrAddOnRef)
 	:
-	BHashMapCatalog("", "", 0)
+	HashMapCatalog("", "", 0)
 {
 	fInitCheck = ReadFromResource(*appOrAddOnRef);
 	log_team(LOG_DEBUG,
@@ -143,7 +147,7 @@ DefaultCatalog::DefaultCatalog(entry_ref *appOrAddOnRef)
 DefaultCatalog::DefaultCatalog(const char *path, const char *signature,
 	const char *language)
 	:
-	BHashMapCatalog(signature, language, 0),
+	HashMapCatalog(signature, language, 0),
 	fPath(path)
 {
 	fInitCheck = B_OK;
@@ -615,10 +619,13 @@ DefaultCatalog::Create(const char *signature, const char *language)
 	return catalog;
 }
 
+
+} // namespace BPrivate
+
+
 extern "C" status_t
 default_catalog_get_available_languages(BMessage* availableLanguages,
-	const char* sigPattern, const char* langPattern = NULL,
-	int32 fingerprint = 0)
+	const char* sigPattern, const char* langPattern, int32 fingerprint)
 {
 	if (availableLanguages == NULL || sigPattern == NULL)
 		return B_BAD_DATA;

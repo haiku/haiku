@@ -21,6 +21,9 @@
 #include <String.h>
 
 
+using BPrivate::PlainTextCatalog;
+
+
 bool showKeys = false;
 bool showSummary = false;
 bool showWarnings = false;
