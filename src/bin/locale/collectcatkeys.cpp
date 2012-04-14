@@ -13,13 +13,15 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include <Catalog.h>
-using namespace BPrivate;
 #include <Entry.h>
 #include <File.h>
 #include "RegExp.h"
 #include <StorageDefs.h>
 #include <String.h>
+
+#include <EditableCatalog.h>
+
+using BPrivate::EditableCatalog;
 
 
 bool showKeys = false;
@@ -30,8 +32,6 @@ BString outputFile;
 const char *catalogSig = NULL;
 const char *catalogLang = "English";
 BString rxString("B_CATKEY\\s*");
-
-
 
 BString str, ctx, cmt;
 bool haveID;

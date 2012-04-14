@@ -60,10 +60,6 @@ class CatKey {
 		uint32 GetHashCode() const { return fHashVal; }
 };
 
-} // namespace BPrivate
-
-
-namespace BPrivate {
 
 class BHashMapCatalog: public BCatalogAddOn {
 	protected:
@@ -199,7 +195,5 @@ BHashMapCatalog::GetWalker(CatWalker *walker)
 
 
 } // namespace BPrivate
-
-using namespace BPrivate;
 
 #endif // _HASH_MAP_CATALOG_H_

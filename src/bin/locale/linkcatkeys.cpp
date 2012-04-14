@@ -7,16 +7,18 @@
 #include <cstdlib>
 #include <vector>
 
-#include <Catalog.h>
 #include <Entry.h>
 #include <File.h>
 #include <String.h>
 
+#include <EditableCatalog.h>
 #include <DefaultCatalog.h>
 #include <HashMapCatalog.h>
 #include <PlainTextCatalog.h>
 
+using BPrivate::EditableCatalog;
 using std::vector;
+
 
 void
 usage()

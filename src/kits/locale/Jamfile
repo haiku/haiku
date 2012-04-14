@@ -11,6 +11,7 @@ local sources =
 	Collator.cpp
 	Country.cpp
 	DefaultCatalog.cpp
+	EditableCatalog.cpp
 	FormattingConventions.cpp
 	HashMapCatalog.cpp
 	InitLocaleKit.cpp

@@ -50,10 +50,6 @@ public:
 			status_t			InitCheck() const;
 			int32				CountItems() const;
 
-			// TODO: drop this, as the lifetime of the returned object
-			//       is indeterminate
-			BCatalogAddOn*		CatalogAddOn();
-
 protected:
 								BCatalog(const BCatalog&);
 			const BCatalog&		operator= (const BCatalog&);
@@ -378,13 +374,6 @@ BCatalog::GetNoAutoCollectString(uint32 id)
 }
 
 
-inline BCatalogAddOn*
-BCatalog::CatalogAddOn()
-{
-	return fCatalog;
-}
-
-
 /*
  * BCatalogAddOn - inlines for trivial accessors:
  */
@@ -407,52 +396,6 @@ BCatalogAddOn::MarkForTranslation(int32 id)
 {
 	return id;
 }
-
-
-// TODO: does not belong here, either
-namespace BPrivate {
-
-
-class EditableCatalog : public BCatalog {
-public:
-								EditableCatalog(const char* type,
-									const char* signature,
-									const char* language);
-	virtual						~EditableCatalog();
-
-			status_t			SetString(const char* string,
-									const char* translated,
-									const char* context = NULL,
-									const char* comment = NULL);
-			status_t			SetString(int32 id, const char* translated);
-
-			bool				CanWriteData() const;
-			status_t			SetData(const char* name, BMessage* msg);
-			status_t			SetData(uint32 id, BMessage* msg);
-
-			status_t			ReadFromFile(const char* path = NULL);
-			status_t			ReadFromAttribute(
-									const entry_ref& appOrAddOnRef);
-			status_t			ReadFromResource(
-									const entry_ref& appOrAddOnRef);
-			status_t			WriteToFile(const char* path = NULL);
-			status_t			WriteToAttribute(
-									const entry_ref& appOrAddOnRef);
-			status_t			WriteToResource(
-									const entry_ref& appOrAddOnRef);
-
-			void				MakeEmpty();
-
-private:
-								EditableCatalog();
-								EditableCatalog(const EditableCatalog& other);
-		const EditableCatalog&	operator=(const EditableCatalog& other);
-									// hide assignment, default-, and
-									// copy-constructor
-};
-
-
-} // namespace BPrivate
 
 
 #endif /* _CATALOG_H_ */
