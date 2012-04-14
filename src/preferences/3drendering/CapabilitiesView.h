@@ -8,9 +8,8 @@
 
 #include <ColumnListView.h>
 #include <ColumnTypes.h>
-#include <GroupView.h>
-
 #include <GL/gl.h>
+#include <GroupView.h>
 
 
 class CapabilitiesView : public BGroupView {
