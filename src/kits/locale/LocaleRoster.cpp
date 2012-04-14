@@ -548,9 +548,8 @@ BLocaleRoster::_GetCatalog(BCatalog* catalog, vint32* catalogInitStatus)
 
 	// load the catalog for this mimetype and return it to the app
 	entry_ref ref;
-	BEntry(info.name).GetRef(&ref);
-	catalog->SetCatalog(ref, 0);
-	*catalogInitStatus = true;
+	if (BEntry(info.name).GetRef(&ref) == B_OK && catalog->SetTo(ref) == B_OK)
+		*catalogInitStatus = true;
 
 	return catalog;
 }

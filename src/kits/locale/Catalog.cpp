@@ -1,6 +1,6 @@
 /*
  * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de
- * Copyright 2003-2004, Oliver Tappe, zooey@hirschkaefer.de
+ * Copyright 2003-2004,2012, Oliver Tappe, zooey@hirschkaefer.de
  * Distributed under the terms of the MIT License.
  */
 
@@ -9,6 +9,7 @@
 #include <syslog.h>
 
 #include <Application.h>
+#include <Autolock.h>
 #include <Locale.h>
 #include <MutableLocaleRoster.h>
 #include <Node.h>
@@ -21,16 +22,19 @@ using BPrivate::MutableLocaleRoster;
 //#pragma mark - BCatalog
 BCatalog::BCatalog()
 	:
-	fCatalog(NULL)
+	fCatalog(NULL),
+	fLock("Catalog")
 {
 }
 
 
 BCatalog::BCatalog(const entry_ref& catalogOwner, const char* language,
 	uint32 fingerprint)
+	:
+	fCatalog(NULL),
+	fLock("Catalog")
 {
-	fCatalog = MutableLocaleRoster::Default()->LoadCatalog(catalogOwner,
-		language, fingerprint);
+	SetTo(catalogOwner, language, fingerprint);
 }
 
 
@@ -44,6 +48,10 @@ const char*
 BCatalog::GetString(const char* string, const char* context,
 	const char* comment)
 {
+	BAutolock lock(&fLock);
+	if (!lock.IsLocked())
+		return string;
+
 	const char* translated;
 	for (BCatalogAddOn* cat = fCatalog; cat != NULL; cat = cat->fNext) {
 		translated = cat->GetString(string, context, comment);
@@ -58,6 +66,10 @@ BCatalog::GetString(const char* string, const char* context,
 const char*
 BCatalog::GetString(uint32 id)
 {
+	BAutolock lock(&fLock);
+	if (!lock.IsLocked())
+		return "";
+
 	const char* translated;
 	for (BCatalogAddOn* cat = fCatalog; cat != NULL; cat = cat->fNext) {
 		translated = cat->GetString(id);
@@ -72,6 +84,10 @@ BCatalog::GetString(uint32 id)
 status_t
 BCatalog::GetData(const char* name, BMessage* msg)
 {
+	BAutolock lock(&fLock);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
 	if (fCatalog == NULL)
 		return B_NO_INIT;
 
@@ -89,6 +105,10 @@ BCatalog::GetData(const char* name, BMessage* msg)
 status_t
 BCatalog::GetData(uint32 id, BMessage* msg)
 {
+	BAutolock lock(&fLock);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
 	if (fCatalog == NULL)
 		return B_NO_INIT;
 
@@ -106,6 +126,10 @@ BCatalog::GetData(uint32 id, BMessage* msg)
 status_t
 BCatalog::GetSignature(BString* sig)
 {
+	BAutolock lock(&fLock);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
 	if (sig == NULL)
 		return B_BAD_VALUE;
 
@@ -121,6 +145,10 @@ BCatalog::GetSignature(BString* sig)
 status_t
 BCatalog::GetLanguage(BString* lang)
 {
+	BAutolock lock(&fLock);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
 	if (lang == NULL)
 		return B_BAD_VALUE;
 
@@ -136,6 +164,10 @@ BCatalog::GetLanguage(BString* lang)
 status_t
 BCatalog::GetFingerprint(uint32* fp)
 {
+	BAutolock lock(&fLock);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
 	if (fp == NULL)
 		return B_BAD_VALUE;
 
@@ -149,13 +181,16 @@ BCatalog::GetFingerprint(uint32* fp)
 
 
 status_t
-BCatalog::SetCatalog(const entry_ref& catalogOwner, uint32 fingerprint)
+BCatalog::SetTo(const entry_ref& catalogOwner, const char* language,
+	uint32 fingerprint)
 {
-	// This is not thread safe. It is used only in ReadOnlyBootPrompt and should
-	// not do harm there, but not sure what to do about it…
+	BAutolock lock(&fLock);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
 	MutableLocaleRoster::Default()->UnloadCatalog(fCatalog);
-	fCatalog = MutableLocaleRoster::Default()->LoadCatalog(catalogOwner, NULL,
-		fingerprint);
+	fCatalog = MutableLocaleRoster::Default()->LoadCatalog(catalogOwner,
+		language, fingerprint);
 
 	return B_OK;
 }
@@ -164,6 +199,10 @@ BCatalog::SetCatalog(const entry_ref& catalogOwner, uint32 fingerprint)
 status_t
 BCatalog::InitCheck() const
 {
+	BAutolock lock(&fLock);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
 	return fCatalog != NULL	? fCatalog->InitCheck() : B_NO_INIT;
 }
 
@@ -171,6 +210,10 @@ BCatalog::InitCheck() const
 int32
 BCatalog::CountItems() const
 {
+	BAutolock lock(&fLock);
+	if (!lock.IsLocked())
+		return 0;
+
 	return fCatalog != NULL ? fCatalog->CountItems() : 0;
 }
 

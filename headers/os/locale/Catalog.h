@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010, Haiku, Inc.
+ * Copyright 2003-2012, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _CATALOG_H_
@@ -7,6 +7,7 @@
 
 
 #include <LocaleRoster.h>
+#include <Locker.h>
 #include <SupportDefs.h>
 #include <String.h>
 
@@ -42,8 +43,9 @@ public:
 			status_t			GetLanguage(BString* language);
 			status_t			GetFingerprint(uint32* fingerprint);
 
-			status_t			SetCatalog(const entry_ref& catalogOwner,
-									uint32 fingerprint);
+			status_t			SetTo(const entry_ref& catalogOwner,
+									const char* language = NULL,
+									uint32 fingerprint = 0);
 
 			status_t			InitCheck() const;
 			int32				CountItems() const;
@@ -58,6 +60,7 @@ protected:
 									// hide assignment and copy-constructor
 
 			BCatalogAddOn*		fCatalog;
+	mutable	BLocker				fLock;
 
 private:
 	friend	class BLocale;
