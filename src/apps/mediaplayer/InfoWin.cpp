@@ -337,7 +337,7 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 		s << format.Width() << " x " << format.Height();
 		// encoded has output as 1st field...
 		char fpsString[20];
-		snprintf(fpsString, sizeof(fpsString), B_TRANSLATE("%f fps"),
+		snprintf(fpsString, sizeof(fpsString), B_TRANSLATE("%.3f fps"),
 			videoFormat.field_rate);
 		s << ", " << fpsString << "\n\n";
 		fContentsView->Insert(s.String());
@@ -398,7 +398,7 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 		if (sr > 0.0) {
 			char rateString[20];
 			snprintf(rateString, sizeof(rateString),
-				B_TRANSLATE("%d kHz"), sr / 1000);
+				B_TRANSLATE("%.3f kHz"), sr / 1000);
 			s << rateString;
 		} else {
 			BString rateString = B_TRANSLATE("%d kHz");
