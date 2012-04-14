@@ -69,14 +69,14 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bfsinfo
 
 SYSTEM_APPS = AboutSystem ActivityMonitor $(X86_ONLY)BootManager CharacterMap
 	CodyCam DeskCalc Devices DiskProbe DiskUsage DriveSetup CDPlayer Expander
-	Icon-O-Matic Installer LaunchBox Magnify Mail MediaConverter MediaPlayer
-	MidiPlayer NetworkStatus PackageInstaller People PoorMan PowerStatus
-	ProcessController Screenshot ShowImage SoundRecorder StyledEdit Terminal
-	TextSearch TV WebWatch Workspaces
+	$(X86_ONLY)GLInfo Icon-O-Matic Installer LaunchBox Magnify Mail
+	MediaConverter MediaPlayer MidiPlayer NetworkStatus PackageInstaller People
+	PoorMan PowerStatus ProcessController Screenshot ShowImage SoundRecorder
+	StyledEdit Terminal TextSearch TV WebWatch Workspaces
 ;
 SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations
 	<preference>Deskbar E-mail FileTypes Keyboard Keymap Locale Media
-	Mouse Network Notifications $(X86_ONLY)3DRendering Printers Screen ScreenSaver
+	Mouse Network Notifications Printers Screen ScreenSaver
 	Shortcuts Sounds Time Touchpad <preference>Tracker VirtualMemory
 ;
 SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo $(X86_ONLY)GLTeapot

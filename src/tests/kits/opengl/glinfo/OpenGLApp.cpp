@@ -16,7 +16,7 @@
 
 OpenGLApp::OpenGLApp()
 	:
-	BApplication("application/x-vnd.Haiku-3DRendering")
+	BApplication("application/x-vnd.Haiku-GLInfo")
 {
 }
 

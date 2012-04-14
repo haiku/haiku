@@ -1,4 +1,5 @@
-SubDir HAIKU_TOP src preferences 3drendering ;
+SubDir HAIKU_TOP src tests kits opengl glinfo ;
+
 SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
 
 # For GCC2
@@ -23,15 +24,15 @@ Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
 	# Dependency needed to trigger downloading/unzipping the package before
 	# compiling the files.
 
-Preference 3DRendering
+Preference GLInfo
 	: $(sources)
 	: be GL translation libcolumnlistview.a $(HAIKU_LOCALE_LIBS)
 		$(TARGET_LIBSUPC++)
-	: 3DRendering.rdef
+	: GLInfo.rdef
 ;
 
-DoCatalogs 3DRendering :
-    x-vnd.Haiku-3DRendering
+DoCatalogs GLInfo :
+    x-vnd.Haiku-GLInfo
 	:
 	CapabilitiesView.cpp
 	ExtensionsView.cpp

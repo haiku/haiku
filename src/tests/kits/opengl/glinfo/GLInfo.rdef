@@ -1,22 +1,22 @@
 
-resource app_signature "application/x-vnd.Haiku-3DRendering";
+resource app_signature "application/x-vnd.Haiku-GLInfo";
 
-resource app_name_catalog_entry "x-vnd.Haiku-3DRendering:System name:3D Rendering";
+resource app_name_catalog_entry "x-vnd.Haiku-GLInfo:System name:GL Info";
 
 resource(1, "gears_64.png") #'PNG ' import "gears_64.png";
 
 resource app_flags B_SINGLE_LAUNCH;
 
 resource app_version {
-	major  = 1,
+	major  = 2,
 	middle = 0,
 	minor  = 0,
 
 	variety = B_APPV_DEVELOPMENT,
 	internal = 0,
 
-	short_info = "3D Rendering",
-	long_info = "3D Rendering ©2009-2012 Haiku, Inc."
+	short_info = "GL Info",
+	long_info = "GL Info ©2009-2012 Haiku, Inc."
 };
 
 resource vector_icon {
