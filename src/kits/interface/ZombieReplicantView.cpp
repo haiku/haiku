@@ -26,7 +26,7 @@ using BPrivate::gSystemCatalog;
 
 #undef B_TRANSLATE
 #define B_TRANSLATE(str) \
-	gSystemCatalog->GetString(B_TRANSLATE_MARK(str), "ZombieReplicantView")
+	gSystemCatalog.GetString(B_TRANSLATE_MARK(str), "ZombieReplicantView")
 
 
 _BZombieReplicantView_::_BZombieReplicantView_(BRect frame, status_t error)

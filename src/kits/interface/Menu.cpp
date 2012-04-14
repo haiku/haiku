@@ -52,7 +52,7 @@ using BPrivate::gSystemCatalog;
 
 #undef B_TRANSLATE
 #define B_TRANSLATE(str) \
-	gSystemCatalog->GetString(B_TRANSLATE_MARK(str), "Menu")
+	gSystemCatalog.GetString(B_TRANSLATE_MARK(str), "Menu")
 
 
 using std::nothrow;

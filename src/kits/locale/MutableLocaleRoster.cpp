@@ -775,7 +775,7 @@ MutableLocaleRoster::SetFilesystemTranslationPreferred(bool preferred)
 
 
 status_t
-MutableLocaleRoster::GetSystemCatalog(BCatalogAddOn** catalog) const
+MutableLocaleRoster::LoadSystemCatalog(BCatalog* catalog) const
 {
 	if (!catalog)
 		return B_BAD_VALUE;
@@ -799,13 +799,13 @@ MutableLocaleRoster::GetSystemCatalog(BCatalogAddOn** catalog) const
 		return B_ERROR;
 	}
 
-	// load the catalog for libbe and return it to the app
+	// load the catalog for libbe into the given catalog
 	entry_ref ref;
-	BEntry(info.name).GetRef(&ref);
+	status_t status = BEntry(info.name).GetRef(&ref);
+	if (status != B_OK)
+		return status;
 
-	*catalog = LoadCatalog(ref);
-
-	return B_OK;
+	return catalog->SetTo(ref);
 }
 
 
@@ -859,8 +859,8 @@ MutableLocaleRoster::CreateCatalog(const char* type, const char* signature,
  * NULL is returned if no matching catalog could be found.
  */
 BCatalogAddOn*
-MutableLocaleRoster::LoadCatalog(const entry_ref& catalogOwner, const char* language,
-	int32 fingerprint) const
+MutableLocaleRoster::LoadCatalog(const entry_ref& catalogOwner,
+	const char* language, int32 fingerprint) const
 {
 	BAutolock lock(RosterData::Default()->fLock);
 	if (!lock.IsLocked())

@@ -46,7 +46,7 @@ public:
 									// contain the language-name(s)
 			status_t			SetFilesystemTranslationPreferred(bool preferred);
 
-			status_t			GetSystemCatalog(BCatalogAddOn** catalog) const;
+			status_t			LoadSystemCatalog(BCatalog* catalog) const;
 
 			BCatalogAddOn*		LoadCatalog(const entry_ref& catalogOwner,
 									const char* language = NULL,
@@ -109,7 +109,7 @@ struct RosterData {
 
 			BLocale				fDefaultLocale;
 			BTimeZone			fDefaultTimeZone;
-			
+
 			bool				fIsFilesystemTranslationPreferred;
 
 			bool				fAreResourcesLoaded;

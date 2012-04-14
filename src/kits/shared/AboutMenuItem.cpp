@@ -31,7 +31,7 @@ BAboutMenuItem::BAboutMenuItem()
 		name = B_TRANSLATE_NOCOLLECT_SYSTEM_NAME(info.ref.name);
 
 	const char* string = B_TRANSLATE_MARK("About %app%");
-	string = gSystemCatalog->GetString(string, "AboutMenuItem");
+	string = gSystemCatalog.GetString(string, "AboutMenuItem");
 
 	BString label = string;
 	if (name != NULL)

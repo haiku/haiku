@@ -32,8 +32,8 @@ BAboutWindow::BAboutWindow(const char *appName, int32 firstCopyrightYear,
 	const char* copyright = B_TRANSLATE_MARK("Copyright " B_UTF8_COPYRIGHT
 		" %years% Haiku, Inc.");
 	const char* writtenBy = B_TRANSLATE_MARK("Written by:");
-	copyright = gSystemCatalog->GetString(copyright, "AboutWindow");
-	writtenBy = gSystemCatalog->GetString(writtenBy, "AboutWindow");
+	copyright = gSystemCatalog.GetString(copyright, "AboutWindow");
+	writtenBy = gSystemCatalog.GetString(writtenBy, "AboutWindow");
 
 	// Get current year
 	time_t tp;
@@ -77,8 +77,8 @@ BAboutWindow::Show()
 {
 	const char* aboutTitle = B_TRANSLATE_MARK("About" B_UTF8_ELLIPSIS);
 	const char* closeLabel = B_TRANSLATE_MARK("Close");
-	aboutTitle = gSystemCatalog->GetString(aboutTitle, "AboutWindow");
-	closeLabel = gSystemCatalog->GetString(closeLabel, "AboutWindow");
+	aboutTitle = gSystemCatalog.GetString(aboutTitle, "AboutWindow");
+	closeLabel = gSystemCatalog.GetString(closeLabel, "AboutWindow");
 
 	BAlert *alert = new BAlert(aboutTitle, fText->String(), closeLabel);
 	BTextView *view = alert->TextView();

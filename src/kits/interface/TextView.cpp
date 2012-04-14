@@ -65,7 +65,7 @@ using BPrivate::gSystemCatalog;
 
 
 #define TRANSLATE(str) \
-	gSystemCatalog->GetString(B_TRANSLATE_MARK(str), "TextView")
+	gSystemCatalog.GetString(B_TRANSLATE_MARK(str), "TextView")
 
 #undef TRACE
 #undef CALLED
