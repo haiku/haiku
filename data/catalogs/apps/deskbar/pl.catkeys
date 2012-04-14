@@ -1,4 +1,4 @@
-1	polish	x-vnd.Be-TSKB	107564593
+1	polish	x-vnd.Be-TSKB	3192488620
 Power off	DeskbarMenu		Wyłącz komputer
 Edit menu…	PreferencesWindow		Edytuj zawartość menu…
 Suspend	DeskbarMenu		Stan wstrzymania
@@ -7,13 +7,11 @@ About Haiku	DeskbarMenu		O Haiku
 Recent documents:	PreferencesWindow		Ostatnio przeglądane dokumenty:
 Recent applications	DeskbarMenu		Ostatnio uruchomione aplikacje
 Sort running applications	PreferencesWindow		Sortuj uruchomione aplikacje alfabetycznie
-Change time…	TimeView		Zmień czas…
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplikacje
 Find…	DeskbarMenu		Wyszukaj…
 Window	PreferencesWindow		Położenie
 Menu	PreferencesWindow		Menu
 Recent documents	DeskbarMenu		Ostatnio otwarte dokumenty
-Show seconds	PreferencesWindow		Pokazuj sekundy
 Auto-hide	PreferencesWindow		Autoukrywanie
 Always on top	PreferencesWindow		Zawsze na wierzchu
 <Deskbar folder is empty>	DeskbarMenu		Folder Paska Pulpitu jest pusty
@@ -21,6 +19,7 @@ Show all	WindowMenu		Pokaż wszystkie okna
 No windows	WindowMenu		Brak okien aplikacji
 Deskbar	System name		Pasek Pulpitu
 Restart system	DeskbarMenu		Uruchom ponownie
+Large	PreferencesWindow		Duże
 Auto-raise	PreferencesWindow		Automatyczne rozszerzanie
 Hide time	TimeView		Ukryj czas
 Recent folders:	PreferencesWindow		Ostatnio przeglądane foldery:
@@ -29,6 +28,7 @@ Restart Tracker	DeskbarMenu		Uruchom ponownie Trackera
 Close all	WindowMenu		Zamknij wszystkie okna
 Deskbar preferences	PreferencesWindow		Ustawienia Panelu Pulpitu
 Mount	DeskbarMenu		Zamontuj
+Small	PreferencesWindow		Małe
 Recent applications:	PreferencesWindow		Ostatnio używane aplikacje:
 Shutdown…	DeskbarMenu		Wyłącz…
 Tracker always first	PreferencesWindow		Tracker zawsze na początku
@@ -40,8 +40,10 @@ Deskbar preferences…	DeskbarMenu		Preferencje Paska Pulpitu…
 Show Time	Tray		Pokaż czas
 Expand new applications	PreferencesWindow		Uruchamiaj aplikacje rozwinięte
 Show replicants	DeskbarMenu		Pokaż replikanty
+Hide application names	PreferencesWindow		Ukryj nazwy aplikacji
 Clock	PreferencesWindow		Zegar
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Dema
+Icon size	PreferencesWindow		Rozmiar ikon
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Aplety pulpitu
 Hide all	WindowMenu		Ukryj wszystkie okna
 Quit application	WindowMenu		Zakończ pracę aplikacji

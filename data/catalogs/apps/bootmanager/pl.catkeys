@@ -2,32 +2,32 @@
 The boot manager has been successfully installed on your system.	BootManagerController		Menedżer rozruchu został poprawnie zainstalowany na Twoim komputerze.
 After two seconds	DefaultPartitionPage		Za dwie sekundy
 Uninstall Boot Manager	UninstallPage	Title	Odinstalowywanie Menedżera Rozruchu
-At least one partition must be selected!	BootManagerController		Conajmniej jedna partycja musi zostać wybrana!
-The old Master Boot Record could not be saved to %s	BootManagerController		Nie można zachować poprzedniego MBR jako %s
+At least one partition must be selected!	BootManagerController		Co najmniej jedna partycja musi zostać wybrana!
+The old Master Boot Record could not be saved to %s	BootManagerController		Nie można zapisać poprzedniego Głównego Rekordu Startowego jako %s
 Restore MBR	BootManagerController	Button	Przywróć MBR
 Hard Drive	DrivesPage	Default disk name	Dysk Twardy
 USB Drive	DrivesPage	Default disk name	Dysk USB
-The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		MBR startowego urządzenia:\n\t%s\n zostanie zachowany. Proszę wybrać plik do którego zapisać MBR.\n\nJeśli wystąpi problem podczas instalacji lub jeśli później zechcesz usunąć menu startowe, poprostu uruchom program bootman i wybierz opcję 'Odinstaluj'.
-About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Zostanie przywrócony MBR urządzenia %disk z pliku %file. Czy chcesz kontynuować?
-An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Wystąpił błąd podczas zapisu menu startowego. MBR może być uszkodzony, natychmiast należy przywrócić MBR!
+The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Główny Rekord Startowy (MBR) urządzenia rozruchowego:\n\t%s\nzostanie zachowany. Proszę wybrać plik do którego zostanie zapisany MBR.\n\nJeśli wystąpi problem podczas instalacji lub jeśli później zechcesz usunąć menu startowe, po prostu uruchom program bootman i wybierz opcję 'Odinstaluj'.
+About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Zostanie przywrócony Główny Rekord Startowy (MBR) urządzenia %disk z pliku %file. Czy chcesz kontynuować?
+An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Wystąpił błąd podczas zapisu menu rozruchowego. MBR może być uszkodzony, natychmiast należy przywrócić MBR!
 Partitions	PartitionsPage	Title	Partycje
-Timeout: %s	DefaultPartitionPage		Limit czasu: %s
+Timeout: %s	DefaultPartitionPage		Czas oczekiwania: %s
 Select	FileSelectionPage	Button	Wybierz
 Cannot access!	DrivesPage	Cannot install	Brak dostępu!
-Uninstall boot manager	BootManagerController	Title	Odinstalowywanie Menedżera Rozruchu
+Uninstall boot manager	BootManagerController	Title	Odinstaluj Menedżer Rozruchu
 After four seconds	DefaultPartitionPage		Za cztery sekundy
 Uninstallation of boot menu failed	BootManagerController	Title	Odinstalowanie menu rozruchu nie powiodło się
-Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Wybierz plik z którego chcesz przywrócić MBR. Będzie to plik, który został utworzony przy pierwszej instalacji boot managera.
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Wybierz plik z którego chcesz przywrócić Główny Rekord Startowy (MBR). Będzie to plik, który został utworzony przy pierwszej instalacji menedżera rozruchu.
 Next	WizardView	Button	Dalej
 Uninstallation of boot menu completed	BootManagerController	Title	Odinstalowywanie menu rozruchu zostało zakończone
-Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Proszę wybierz dysk na który chcesz by menu rozruchu zostało zainstalowane, albo odinstalowane z niego.
+Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Proszę wybierz dysk na którym chcesz by menu rozruchu zostało zainstalowane, albo odinstalowane z niego.
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Proszę wskazać partycję domyślną i limit czasu.\nMenu rozruchowe załaduje domyślną partycję po przekroczeniu limitu czasu chyba, że wybierzesz inną partycję. Menu rozruchowe może czekać w nieskończoność do czasu aż wybierzesz partycję.\nPrzytrzymaj wciśnięty "ALT" aby wyłączyć limit czasu podczas startu systemu.
 After one second	DefaultPartitionPage		Za chwilę
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Tablica partycji pierwszego dysku nie jest kompatybilna z Menedżerem rozruchu.\nMenedżer rozruchu wymaga 2KB wolnego miejsca na dysku przed pierwszą partycją.
-The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Następujące partycje zostały wykryte. Zaznacz pole wyboru obok partycji aby były włączone w menu rozruchowym. Można także ustawić nazwy partycji jak chcesz aby pojawiły się w menu rozruchowym.
+The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Tablica partycji pierwszego dysku nie jest kompatybilna z Menedżerem Rozruchu.\nMenedżer Rozruchu wymaga 2KB wolnego miejsca na dysku przed pierwszą partycją.
+The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Następujące partycje zostały wykryte. Zaznacz pole wyboru obok partycji aby były włączone w menu rozruchowym. Można także ustawić nazwy partycji, jak chcesz aby pojawiły się one w menu rozruchowym.
 After one minute	DefaultPartitionPage		Za minutę
-The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		MBR urządzenia (%DISK) został pomyślnie przywrócony z pliku %FILE.
-Write boot menu	BootManagerController	Button	Zapisz menu startowe
+The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Główny Rekord Startowy urządzenia (%DISK) został pomyślnie przywrócony z pliku %FILE.
+Write boot menu	BootManagerController	Button	Zapisz menu rozruchowe
 The Master Boot Record could not be restored!	BootManagerController		Główny Rekord Startowy nie mógł zostać odtworzony!
 Uninstall	DrivesPage	Button	Odinstaluj
 Default Partition	DefaultPartitionPage	Title	Partycja Domyślna
@@ -38,23 +38,23 @@ Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be re
 File:	FileSelectionPage	Text control label	Plik:
 Previous	WizardView	Button	Poprzedni
 Install	DrivesPage	Button	Zainstaluj
-About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Informacje na temat zapisu menu startowego na dysku (%s). Należy dokładnie sprawdzić czy te informacje się zgadzają przed kontynuowaniem.
+About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Informacje na temat zapisu menu rozruchowego na dysku (%s). Należy dokładnie sprawdzić czy te informacje zgadzają się przed dalszym kontynuowaniem.
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Nieznana
 Update	DrivesPage	Button	Aktualizuj
-Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Wybierz plik z zachowanym MBR. Będzie to plik utworzony podczas pierwszej instalacji menedżera rozruchu.
-Old Master Boot Record Saved failure	BootManagerController	Title	Problem z zapisem poprzedniego MBR
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Wybierz plik z zachowanym Głównym Rekordem Startowym (MBR). Będzie to plik utworzony podczas pierwszej instalacji menedżera rozruchu.
+Old Master Boot Record Saved failure	BootManagerController	Title	Problem z zapisem poprzedniego Głównego Rekordu Startowego
 Drives	DrivesPage	Title	Dyski
 No space available!	DrivesPage	Cannot install	Brak miejsca!
 Never	DefaultPartitionPage		Nigdy
 Partition table not compatible	BootManagerController	Title	Tablica partycji jest niekompatybilna
-Old Master Boot Record saved	BootManagerController	Title	Poprzedni MBR został zapisany
+Old Master Boot Record saved	BootManagerController	Title	Poprzedni Główny Rekord Startowy został zapisany
 Boot Manager is unable to read the partition table!	BootManagerController		Menedżer Rozruchu nie jest w stanie odczytać tablicy partycji!
 Error reading partition table	BootManagerController	Title	Błąd odczytu tablicy partycji
 Installation of boot menu failed	BootManagerController	Title	Instalacja menu rozruchowego nie powiodła się
-Backup Master Boot Record	BootManagerController	Title	Kopia zapasowa MBR
+Backup Master Boot Record	BootManagerController	Title	Kopia zapasowa Głównego Rekordu Startowego
 Quit	DrivesPage	Button	Zamknij
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Informacje o zapisie menu rozruchowego na dysk. Kontynuować?
-The old Master Boot Record was successfully saved to %s.	BootManagerController		Poprzedni MBR został zapisany: %s.
+The old Master Boot Record was successfully saved to %s.	BootManagerController		Poprzedni Główny Rekord Startowy został zapisany: %s.
 Default Partition:	DefaultPartitionPage	Menu field label	Partycja Domyślna:
 Partitions	DefaultPartitionPage	Pop up menu title	Partycje
 BootManager	System name		Menedżer Rozruchu

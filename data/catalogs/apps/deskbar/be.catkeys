@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-TSKB	107564593
+1	belarusian	x-vnd.Be-TSKB	1657675882
 Power off	DeskbarMenu		Выключыць
 Edit menu…	PreferencesWindow		Змяніць меню...
 Suspend	DeskbarMenu		Прыпыніць
@@ -7,13 +7,11 @@ About Haiku	DeskbarMenu		Пра Haiku
 Recent documents:	PreferencesWindow		Нядаўнія дакументы:
 Recent applications	DeskbarMenu		Нядаўнія праграмы
 Sort running applications	PreferencesWindow		Сартыравать запушчаныя праграмы
-Change time…	TimeView		Змяніць час...
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Праграмы
 Find…	DeskbarMenu		Знайсці…
 Window	PreferencesWindow		Акно
 Menu	PreferencesWindow		Меню
 Recent documents	DeskbarMenu		Нядаўнія дакументы:
-Show seconds	PreferencesWindow		Паказваць секунды
 Auto-hide	PreferencesWindow		Схаваць аўтаматычна
 Always on top	PreferencesWindow		Заўсёды наверсе
 <Deskbar folder is empty>	DeskbarMenu		<Папка Deskbar-у пустая>

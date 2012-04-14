@@ -1,22 +1,33 @@
-1	polish	x-vnd.Haiku-Keymap	1259868356
+1	polish	x-vnd.Haiku-Keymap	3175108391
+Revert	Modifier keys window		Przywróć
 Tilde trigger	Keymap window		Wywołanie tyldy
 Grave trigger	Keymap window		Wywołanie ciężkie
 Select dead keys	Keymap window		Wybierz martwe klawisze
+Cancel	Modifier keys window		Anuluj
 Quit	Keymap window		Zakończ
 Switch shortcut keys to Haiku mode	Keymap window		Zmień klawisze skrótów w tryb Haiku
 Circumflex trigger	Keymap window		Wywołanie akcentu
 Diaeresis trigger	Keymap window		Wywołanie diarezy
 Open…	Keymap window		Otwórz…
 System:	Keymap window		System:
+Set modifier keys…	Keymap window		Ustaw klawisze modyfikujące…
+Option:	Modifier keys window	Option key role name	Opcja:
 Switch shortcut keys	Keymap window		Zmień klawisze skrótów
 User:	Keymap window		Użytkownik:
+Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Klawisz Ctrl
+Control:	Modifier keys window	Control key role name	Kontrol:
 Sample and clipboard:	Keymap window		Przykład i schowek:
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Klawisz Alt/Opt
 Layout	Keymap window		Układ
 Switch shortcut keys to Windows/Linux mode	Keymap window		Zmień klawisze skrótów w tryb Windows/Linuks
 Revert	Keymap window		Przywróć
+Command:	Modifier keys window	Command key role name	Polecenie:
 Save as…	Keymap window		Zapisz jako…
 File	Keymap window		Plik
+Key	Modifier keys window	A computer keyboard key	Klawisz
 (Current)	Keymap window		(Bieżący)
 Font	Keymap window		Czcionka
 Keymap	System name		Układ klawiatury
+Set modifier keys	Modifier keys window		Ustaw klawisze kodyfikujące
+Modifier keys	Modifier keys window		Klawisze modyfikujące
 Acute trigger	Keymap window		Wywołanie ostre

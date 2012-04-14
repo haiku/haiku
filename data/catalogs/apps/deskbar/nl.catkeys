@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Be-TSKB	107564593
+1	dutch; flemish	x-vnd.Be-TSKB	1657675882
 Power off	DeskbarMenu		Uitzetten
 Edit menu…	PreferencesWindow		Bewerk menu...
 Suspend	DeskbarMenu		Onderbreken
@@ -7,13 +7,11 @@ About Haiku	DeskbarMenu		Over Haiku
 Recent documents:	PreferencesWindow		Recente documenten:
 Recent applications	DeskbarMenu		Recente toepassingen
 Sort running applications	PreferencesWindow		Sorteer lopende toepassingen
-Change time…	TimeView		Tijd aanpassen...
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Toepassingen
 Find…	DeskbarMenu		Vind...
 Window	PreferencesWindow		Venster
 Menu	PreferencesWindow		Menu
 Recent documents	DeskbarMenu		Recente documenten
-Show seconds	PreferencesWindow		Toon seconden
 Auto-hide	PreferencesWindow		Automatisch verbergen
 Always on top	PreferencesWindow		Altijd bovenop
 <Deskbar folder is empty>	DeskbarMenu		<Deskbar map is leeg>

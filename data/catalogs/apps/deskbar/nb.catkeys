@@ -1,13 +1,11 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-TSKB	2159206862
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-TSKB	3709318151
 Edit menu…	PreferencesWindow		Rediger meny...
 Applications	PreferencesWindow		Programmer
 Recent documents:	PreferencesWindow		Nylig brukte dokumenter
 Sort running applications	PreferencesWindow		Sorter kjørende programmer
-Change time…	TimeView		Still klokken...
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		B_USER_DESKBAR_DIRECTORY/Programmer
 Window	PreferencesWindow		Vindu
 Menu	PreferencesWindow		Meny
-Show seconds	PreferencesWindow		Vis sekunder
 Always on top	PreferencesWindow		Alltid øverst
 Show all	WindowMenu		Vis alle
 No windows	WindowMenu		Ingen vinduer

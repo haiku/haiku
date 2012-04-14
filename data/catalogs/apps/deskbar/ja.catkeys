@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-TSKB	107564593
+1	japanese	x-vnd.Be-TSKB	3192488620
 Power off	DeskbarMenu		電源を切る
 Edit menu…	PreferencesWindow		メニューの編集…
 Suspend	DeskbarMenu		サスペンド
@@ -7,13 +7,11 @@ About Haiku	DeskbarMenu		Haiku について
 Recent documents:	PreferencesWindow		最近使ったドキュメント
 Recent applications	DeskbarMenu		最近使ったアプリケーション
 Sort running applications	PreferencesWindow		実行中のアプリケーションを名前順に並び換える
-Change time…	TimeView		日付と時刻の設定…
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		アプリケーション
 Find…	DeskbarMenu		検索…
 Window	PreferencesWindow		ウィンドウ
 Menu	PreferencesWindow		メニュー
 Recent documents	DeskbarMenu		最近使ったドキュメント
-Show seconds	PreferencesWindow		時刻に秒を表示
 Auto-hide	PreferencesWindow		自動的に隠す
 Always on top	PreferencesWindow		常に手前に
 <Deskbar folder is empty>	DeskbarMenu		<Deskbar フォルダーは空です>
@@ -21,6 +19,7 @@ Show all	WindowMenu		すべて表示
 No windows	WindowMenu		ウィンドウ無し
 Deskbar	System name		Deskbar
 Restart system	DeskbarMenu		システムを再起動
+Large	PreferencesWindow		大
 Auto-raise	PreferencesWindow		マウスオーバーで手前に
 Hide time	TimeView		時刻を隠す
 Recent folders:	PreferencesWindow		最近開いたフォルダー：
@@ -29,6 +28,7 @@ Restart Tracker	DeskbarMenu		Tracker を再起動
 Close all	WindowMenu		すべて閉じる
 Deskbar preferences	PreferencesWindow		Deskbar の設定
 Mount	DeskbarMenu		マウント
+Small	PreferencesWindow		小
 Recent applications:	PreferencesWindow		最近使ったアプリケーション
 Shutdown…	DeskbarMenu		シャットダウン…
 Tracker always first	PreferencesWindow		Tracker を常時先頭に表示
@@ -40,8 +40,10 @@ Deskbar preferences…	DeskbarMenu		Deskbar の設定…
 Show Time	Tray		時刻を表示する
 Expand new applications	PreferencesWindow		新しいアプリケーションを展開表示
 Show replicants	DeskbarMenu		レプリカントを表示
+Hide application names	PreferencesWindow		アプリケーション名を隠す
 Clock	PreferencesWindow		日付と時刻
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		デモ
+Icon size	PreferencesWindow		アイコンのサイズ
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		デスクトップアプレット
 Hide all	WindowMenu		すべてを隠す
 Quit application	WindowMenu		アプリケーションを終了

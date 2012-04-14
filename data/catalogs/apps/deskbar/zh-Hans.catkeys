@@ -1,4 +1,4 @@
-1	english	x-vnd.Be-TSKB	1680382422
+1	english	x-vnd.Be-TSKB	3230493711
 Power off	DeskbarMenu		关闭电源
 Edit menu…	PreferencesWindow		编辑菜单
 Suspend	DeskbarMenu		挂起
@@ -7,12 +7,10 @@ About Haiku	DeskbarMenu		关于 Haiku
 Recent documents:	PreferencesWindow		最近文档：
 Recent applications	DeskbarMenu		最近程序
 Sort running applications	PreferencesWindow		运行程序排序
-Change time…	TimeView		修改时间...
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		应用程序
 Find…	DeskbarMenu		查找...
 Window	PreferencesWindow		窗口
 Menu	PreferencesWindow		菜单
-Show seconds	PreferencesWindow		显示秒钟
 Auto-hide	PreferencesWindow		自动隐藏
 Always on top	PreferencesWindow		置顶
 <Deskbar folder is empty>	DeskbarMenu		<桌面栏目录为空>

@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-TSKB	107564593
+1	german	x-vnd.Be-TSKB	3192488620
 Power off	DeskbarMenu		Ausschalten
 Edit menu…	PreferencesWindow		Menü bearbeiten…
 Suspend	DeskbarMenu		Ruhezustand
@@ -7,13 +7,11 @@ About Haiku	DeskbarMenu		Über Haiku
 Recent documents:	PreferencesWindow		Letzte Dokumente:
 Recent applications	DeskbarMenu		Letzte Anwendungen
 Sort running applications	PreferencesWindow		Laufende Anwendungen sortieren
-Change time…	TimeView		Uhrzeit ändern…
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Anwendungen
 Find…	DeskbarMenu		Suchen…
 Window	PreferencesWindow		Fenster
 Menu	PreferencesWindow		Menü
 Recent documents	DeskbarMenu		Letzte Dokumente
-Show seconds	PreferencesWindow		Sekunden anzeigen
 Auto-hide	PreferencesWindow		Automatisch ausblenden
 Always on top	PreferencesWindow		Immer im Vordergrund
 <Deskbar folder is empty>	DeskbarMenu		<Deskbar-Ordner ist leer>
@@ -21,6 +19,7 @@ Show all	WindowMenu		Alle einblenden
 No windows	WindowMenu		Keine Fenster
 Deskbar	System name		Deskbar
 Restart system	DeskbarMenu		Neustarten
+Large	PreferencesWindow		Groß
 Auto-raise	PreferencesWindow		Automatisch nach vorn holen
 Hide time	TimeView		Uhrzeit ausblenden
 Recent folders:	PreferencesWindow		Letzte Ordner:
@@ -29,6 +28,7 @@ Restart Tracker	DeskbarMenu		Tracker neu starten
 Close all	WindowMenu		Alle schließen
 Deskbar preferences	PreferencesWindow		Deskbar-Einstellungen
 Mount	DeskbarMenu		Einhängen
+Small	PreferencesWindow		Klein
 Recent applications:	PreferencesWindow		Letzte Anwendungen:
 Shutdown…	DeskbarMenu		Herunterfahren…
 Tracker always first	PreferencesWindow		Tracker immer zuerst
@@ -40,8 +40,10 @@ Deskbar preferences…	DeskbarMenu		Deskbar-Einstellungen…
 Show Time	Tray		Uhrzeit einblenden
 Expand new applications	PreferencesWindow		Neue Anwendungen aufklappen
 Show replicants	DeskbarMenu		Replikanten einblenden
+Hide application names	PreferencesWindow		Anwendungsnamen ausblenden
 Clock	PreferencesWindow		Uhr
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demos
+Icon size	PreferencesWindow		Icon-Größe
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Desktop-Apps
 Hide all	WindowMenu		Alle ausblenden
 Quit application	WindowMenu		Anwendung beenden

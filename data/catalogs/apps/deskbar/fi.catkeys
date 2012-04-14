@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-TSKB	107564593
+1	finnish	x-vnd.Be-TSKB	1657675882
 Power off	DeskbarMenu		Sammuta virta
 Edit menu…	PreferencesWindow		Muokkaa valikkoa...
 Suspend	DeskbarMenu		Keskeytystila
@@ -7,13 +7,11 @@ About Haiku	DeskbarMenu		Haikusta...
 Recent documents:	PreferencesWindow		Äskettäiset asiakirjat:
 Recent applications	DeskbarMenu		Äskettäiset sovellukset
 Sort running applications	PreferencesWindow		Lajittele suoritettavat sovellukset
-Change time…	TimeView		Muuta aikaa...
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Sovellukset
 Find…	DeskbarMenu		Etsi...
 Window	PreferencesWindow		Ikkuna
 Menu	PreferencesWindow		Valikko
 Recent documents	DeskbarMenu		Äskettäiset asiakirjat
-Show seconds	PreferencesWindow		Näytä sekunnit
 Auto-hide	PreferencesWindow		Piilota automaattisesti
 Always on top	PreferencesWindow		Aina päällimmäisenä
 <Deskbar folder is empty>	DeskbarMenu		<Työpöytäpalkkikansio on tyhjä>

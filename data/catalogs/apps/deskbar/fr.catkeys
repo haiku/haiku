@@ -1,4 +1,4 @@
-1	french	x-vnd.Be-TSKB	107564593
+1	french	x-vnd.Be-TSKB	1657675882
 Power off	DeskbarMenu		Éteindre
 Edit menu…	PreferencesWindow		Éditer le menu…
 Suspend	DeskbarMenu		Mettre en veille
@@ -7,13 +7,11 @@ About Haiku	DeskbarMenu		À propos…
 Recent documents:	PreferencesWindow		Documents récents :
 Recent applications	DeskbarMenu		Applications récentes
 Sort running applications	PreferencesWindow		Trier les applications lancées
-Change time…	TimeView		Régler l'horloge…
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Applications
 Find…	DeskbarMenu		Rechercher…
 Window	PreferencesWindow		Fenêtre
 Menu	PreferencesWindow		Menu
 Recent documents	DeskbarMenu		Documents récents
-Show seconds	PreferencesWindow		Montrer les secondes
 Auto-hide	PreferencesWindow		Masquer automatiquement
 Always on top	PreferencesWindow		Toujours au dessus
 <Deskbar folder is empty>	DeskbarMenu		<Le dossier Deskbar est vide>

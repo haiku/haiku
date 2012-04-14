@@ -1,13 +1,11 @@
-1	russian	x-vnd.Be-TSKB	1662766351
+1	russian	x-vnd.Be-TSKB	3212877640
 Edit menu…	PreferencesWindow		Изменить меню…
 Applications	PreferencesWindow		Приложения
 Recent documents:	PreferencesWindow		Недавние документы:
 Sort running applications	PreferencesWindow		Сортировать запущенные приложения
-Change time…	TimeView		Настроить часы…
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Приложения
 Window	PreferencesWindow		Окно
 Menu	PreferencesWindow		Меню
-Show seconds	PreferencesWindow		Отображать секунды
 Auto-hide	PreferencesWindow		Скрывать автоматически
 Always on top	PreferencesWindow		Всегда сверху
 Show all	WindowMenu		Показать все

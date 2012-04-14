@@ -1,22 +1,38 @@
-1	german	x-vnd.Haiku-Keymap	1259868356
+1	german	x-vnd.Haiku-Keymap	3634277200
+Shift:	Modifier keys window	Shift key role name	Shift:
+Revert	Modifier keys window		Anfangswerte
+Key role	Modifier keys window	key roles, e.g. Control, Option, Command	Funktion
 Tilde trigger	Keymap window		~ Tilde
 Grave trigger	Keymap window		` Gravis
 Select dead keys	Keymap window		Auslösetasten definieren
+Cancel	Modifier keys window		Abbrechen
 Quit	Keymap window		Beenden
 Switch shortcut keys to Haiku mode	Keymap window		Befehlstasten tauschen: Haiku-Modus
 Circumflex trigger	Keymap window		^ Zirkumflex
 Diaeresis trigger	Keymap window		¨ Trema/Diärese
+Disabled	Modifier keys window	Do nothing	Deaktiviert
 Open…	Keymap window		Öffnen…
 System:	Keymap window		System:
+Set modifier keys…	Keymap window		Hilfstasten zuordnen…
+Option:	Modifier keys window	Option key role name	Option:
 Switch shortcut keys	Keymap window		Befehlstasten tauschen
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift-Taste
 User:	Keymap window		Benutzer:
+Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Strg-Taste
+Control:	Modifier keys window	Control key role name	Steuerung:
 Sample and clipboard:	Keymap window		Tastenausgabe:
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt-Taste
 Layout	Keymap window		Tastatur
 Switch shortcut keys to Windows/Linux mode	Keymap window		Befehlstasten tauschen: Windows/Linux-Modus
 Revert	Keymap window		Anfangswerte
+Command:	Modifier keys window	Command key role name	Befehl:
 Save as…	Keymap window		Speichern unter…
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd-Taste
 File	Keymap window		Datei
+Key	Modifier keys window	A computer keyboard key	Taste
 (Current)	Keymap window		(Aktiv)
 Font	Keymap window		Schriftart
 Keymap	System name		Tastaturlayout
+Set modifier keys	Modifier keys window		Hilfstasten zuordnen
+Modifier keys	Modifier keys window		Hilfstasten
 Acute trigger	Keymap window		´ Akut

@@ -140,7 +140,7 @@ Move Pivot	Icon-O-Matic-TransformationBoxStates		Переместить точк
 Path	Icon-O-Matic-Menus		Контур
 Freeze transformation	Icon-O-Matic-ShapesList		Применить изменения
 File	Icon-O-Matic-Menus		Файл
-Error: 	Icon-O-Matic-Exporter		Ошибка:
+Error: 	Icon-O-Matic-Exporter		Ошибка: 
 Add Transformers	Icon-O-Matic-AddTransformersCmd		Добавить трансформаторы
 Diamond	Icon-O-Matic-StyleTypes		Ромбовидный
 Path	Icon-O-Matic-PropertyNames		Контур
