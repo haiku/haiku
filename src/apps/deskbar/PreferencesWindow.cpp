@@ -265,12 +265,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 		.View();
 	fWindowBox->AddChild(view);
 
-	BStringView* timeIntervalLabel = new BStringView("interval",
-		B_TRANSLATE("Interval"));
-	timeIntervalLabel->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
-		B_SIZE_UNSET));
-	timeIntervalLabel->SetLowColor((rgb_color){255, 255, 255, 255});
-
 	BGroupLayout* timeIntervalLayout = new BGroupLayout(B_VERTICAL, 0);
 	timeIntervalLayout->SetInsets(20, 0, 0, 0);
 	BView* timeIntervalView = new BView("interval", 0, timeIntervalLayout);
@@ -282,7 +276,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	view = BLayoutBuilder::Group<>()
 		.AddGroup(B_VERTICAL, 10)
 			.AddGroup(B_VERTICAL, 0)
-				.Add(timeIntervalLabel)
+				.Add(new BStringView("interval", B_TRANSLATE("Interval")))
 				.Add(timeIntervalView)
 				.End()
 			.AddGroup(B_VERTICAL, 0)
