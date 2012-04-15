@@ -33,7 +33,9 @@ holders.
 All rights reserved.
 */
 
-#include <Debug.h>
+
+#include "BarApp.h"
+
 #include <locale.h>
 #include <stdlib.h>
 #include <string.h>
@@ -42,6 +44,7 @@ All rights reserved.
 #include <Autolock.h>
 #include <Bitmap.h>
 #include <Catalog.h>
+#include <Debug.h>
 #include <Directory.h>
 #include <Dragger.h>
 #include <File.h>
@@ -54,13 +57,14 @@ All rights reserved.
 
 #include "icons.h"
 #include "tracker_private.h"
-#include "BarApp.h"
 #include "BarView.h"
 #include "BarWindow.h"
+#include "PreferencesWindow.h"
 #include "DeskbarUtils.h"
 #include "FSUtils.h"
 #include "PublicCommands.h"
 #include "ResourceSet.h"
+#include "StatusView.h"
 #include "Switcher.h"
 #include "Utilities.h"
 
@@ -97,6 +101,7 @@ TBarApp::TBarApp()
 	InitIconPreloader();
 
 	fBarWindow = new TBarWindow();
+	fBarView = fBarWindow->BarView();
 
 	be_roster->StartWatching(this);
 
@@ -127,7 +132,7 @@ TBarApp::TBarApp()
 	// Call UpdatePlacement() after the window is shown because expanded apps
 	// need to resize the window.
 	if (fBarWindow->Lock()) {
-		BarView()->UpdatePlacement();
+		fBarView->UpdatePlacement();
 		fBarWindow->Unlock();
 	}
 
@@ -200,7 +205,9 @@ TBarApp::SaveSettings()
 		storedSettings.AddFloat("width", fSettings.width);
 
 		storedSettings.AddBool("showTime", fSettings.showTime);
-		storedSettings.AddBool("timeFormat", fSettings.timeFormat);
+		storedSettings.AddBool("showSeconds", fSettings.showSeconds);
+		storedSettings.AddBool("showDayOfWeek", fSettings.showDayOfWeek);
+		storedSettings.AddBool("showTimeZone", fSettings.showTimeZone);
 
 		storedSettings.AddPoint("switcherLoc", fSettings.switcherLoc);
 		storedSettings.AddInt32("recentAppsCount", fSettings.recentAppsCount);
@@ -239,7 +246,9 @@ TBarApp::InitSettings()
 	settings.left = false;
 	settings.top = true;
 	settings.showTime = true;
-	settings.timeFormat = B_SHORT_TIME_FORMAT;
+	settings.showSeconds = false;
+	settings.showDayOfWeek = false;
+	settings.showTimeZone = false;
 	settings.state = kExpandoState;
 	settings.width = 0;
 	settings.switcherLoc = BPoint(5000, 5000);
@@ -298,9 +307,17 @@ TBarApp::InitSettings()
 					!= B_OK) {
 				settings.showTime = true;
 			}
-			if (storedSettings.FindUInt32("timeFormat", &settings.timeFormat)
+			if (storedSettings.FindBool("showSeconds", &settings.showSeconds)
 					!= B_OK) {
-				settings.timeFormat = B_SHORT_TIME_FORMAT;
+				settings.showSeconds = false;
+			}
+			if (storedSettings.FindBool("showDayOfWeek", &settings.showDayOfWeek)
+					!= B_OK) {
+				settings.showDayOfWeek = false;
+			}
+			if (storedSettings.FindBool("showTimeZone", &settings.showTimeZone)
+					!= B_OK) {
+				settings.showTimeZone = false;
 			}
 			if (storedSettings.FindPoint("switcherLoc", &settings.switcherLoc)
 					!= B_OK) {
@@ -494,7 +511,7 @@ TBarApp::MessageReceived(BMessage* message)
 				!fSettings.autoRaise;
 
 			fBarWindow->Lock();
-			BarView()->UpdateEventMask();
+			fBarView->UpdateEventMask();
 			fBarWindow->Unlock();
 			break;
 
@@ -502,8 +519,8 @@ TBarApp::MessageReceived(BMessage* message)
 			fSettings.autoHide = !fSettings.autoHide;
 
 			fBarWindow->Lock();
-			BarView()->UpdateEventMask();
-			BarView()->HideDeskbar(fSettings.autoHide);
+			fBarView->UpdateEventMask();
+			fBarView->HideDeskbar(fSettings.autoHide);
 			fBarWindow->Unlock();
 			break;
 
@@ -511,7 +528,7 @@ TBarApp::MessageReceived(BMessage* message)
 			fSettings.trackerAlwaysFirst = !fSettings.trackerAlwaysFirst;
 
 			fBarWindow->Lock();
-			BarView()->PlaceApplicationBar();
+			fBarView->PlaceApplicationBar();
 			fBarWindow->Unlock();
 			break;
 
@@ -519,7 +536,7 @@ TBarApp::MessageReceived(BMessage* message)
 			fSettings.sortRunningApps = !fSettings.sortRunningApps;
 
 			fBarWindow->Lock();
-			BarView()->PlaceApplicationBar();
+			fBarView->PlaceApplicationBar();
 			fBarWindow->Unlock();
 			break;
 
@@ -535,7 +552,7 @@ TBarApp::MessageReceived(BMessage* message)
 			fSettings.superExpando = !fSettings.superExpando;
 
 			fBarWindow->Lock();
-			BarView()->PlaceApplicationBar();
+			fBarView->PlaceApplicationBar();
 			fBarWindow->Unlock();
 			break;
 
@@ -543,7 +560,7 @@ TBarApp::MessageReceived(BMessage* message)
 			fSettings.expandNewTeams = !fSettings.expandNewTeams;
 
 			fBarWindow->Lock();
-			BarView()->PlaceApplicationBar();
+			fBarView->PlaceApplicationBar();
 			fBarWindow->Unlock();
 			break;
 
@@ -551,7 +568,7 @@ TBarApp::MessageReceived(BMessage* message)
 			fSettings.hideLabels = !fSettings.hideLabels;
 
 			fBarWindow->Lock();
-			BarView()->PlaceApplicationBar();
+			fBarView->PlaceApplicationBar();
 			fBarWindow->Unlock();
 			break;
 
@@ -571,14 +588,14 @@ TBarApp::MessageReceived(BMessage* message)
 
 			ResizeTeamIcons();
 
-			if (BarView()->MiniState())
+			if (fBarView->MiniState())
 				break;
 
 			fBarWindow->Lock();
-			if (BarView()->Vertical())
-				BarView()->PlaceApplicationBar();
+			if (fBarView->Vertical())
+				fBarView->PlaceApplicationBar();
 			else
-				BarView()->UpdatePlacement();
+				fBarView->UpdatePlacement();
 
 			fBarWindow->Unlock();
 			break;
@@ -761,7 +778,7 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char* sig, entry_ref* ref)
 	sBarTeamInfoList.AddItem(barInfo);
 
 	if (fSettings.expandNewTeams)
-		BarView()->AddExpandedItem(sig);
+		fBarView->AddExpandedItem(sig);
 
 	int32 subsCount = sSubscribers.CountItems();
 	if (subsCount > 0) {

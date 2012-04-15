@@ -49,6 +49,7 @@ All rights reserved.
 #include "BarApp.h"
 #include "BarMenuTitle.h"
 #include "BarView.h"
+#include "BarWindow.h"
 #include "DeskbarMenu.h"
 #include "DeskbarUtils.h"
 #include "ExpandoMenuBar.h"

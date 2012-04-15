@@ -66,16 +66,20 @@ enum {
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "TimeView"
 
-TTimeView::TTimeView(float maxWidth, float height, uint32 timeFormat)
+TTimeView::TTimeView(float maxWidth, float height, bool use24HourClock,
+	bool showSeconds, bool showDayOfWeek, bool showTimeZone)
 	:
 	BView(BRect(-100, -100, -90, -90), "_deskbar_tv_",
-	B_FOLLOW_RIGHT | B_FOLLOW_TOP,
-	B_WILL_DRAW | B_PULSE_NEEDED | B_FRAME_EVENTS),
+		B_FOLLOW_RIGHT | B_FOLLOW_TOP,
+		B_WILL_DRAW | B_PULSE_NEEDED | B_FRAME_EVENTS),
 	fParent(NULL),
 	fMaxWidth(maxWidth),
 	fHeight(height),
 	fOrientation(true),
-	fTimeFormat(timeFormat)
+	fUse24HourClock(use24HourClock),
+	fShowSeconds(showSeconds),
+	fShowDayOfWeek(showDayOfWeek),
+	fShowTimeZone(showTimeZone)
 {
 	fCurrentTime = fLastTime = time(NULL);
 	fSeconds = fMinute = fHour = 0;
@@ -84,6 +88,7 @@ TTimeView::TTimeView(float maxWidth, float height, uint32 timeFormat)
 	fLastTimeStr[0] = 0;
 	fLastDateStr[0] = 0;
 	fNeedToUpdate = true;
+	UpdateTimeFormat();
 
 	fLocale = *BLocale::Default();
 }
@@ -141,8 +146,8 @@ TTimeView::AttachedToWindow()
 	} else
 		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	ResizeToPreferred();
 	CalculateTextPlacement();
+	ResizeToPreferred();
 }
 
 
@@ -307,10 +312,62 @@ TTimeView::SetOrientation(bool orientation)
 }
 
 
-void
-TTimeView::SetTimeFormat(uint32 timeFormat)
+bool
+TTimeView::Use24HourClock() const
 {
-	fTimeFormat = timeFormat;
+	return fUse24HourClock;
+}
+
+
+void
+TTimeView::SetUse24HourClock(bool use24HourClock)
+{
+	fUse24HourClock = use24HourClock;
+	Update();
+}
+
+
+bool
+TTimeView::ShowSeconds() const
+{
+	return fShowSeconds;
+}
+
+
+void
+TTimeView::SetShowSeconds(bool show)
+{
+	fShowSeconds = show;
+	Update();
+}
+
+
+bool
+TTimeView::ShowDayOfWeek() const
+{
+	return fShowDayOfWeek;
+}
+
+
+void
+TTimeView::SetShowDayOfWeek(bool show)
+{
+	fShowDayOfWeek = show;
+	Update();
+}
+
+
+bool
+TTimeView::ShowTimeZone() const
+{
+	return fShowTimeZone;
+}
+
+
+void
+TTimeView::SetShowTimeZone(bool show)
+{
+	fShowTimeZone = show;
 	Update();
 }
 
@@ -347,20 +404,7 @@ TTimeView::ShowCalendar(BPoint where)
 void
 TTimeView::GetCurrentTime()
 {
-	switch (fTimeFormat) {
-		case B_LONG_TIME_FORMAT:
-			fLocale.FormatTime(fCurrentTimeStr, 64, fCurrentTime,
-				B_LONG_TIME_FORMAT);
-			break;
-		case B_MEDIUM_TIME_FORMAT:
-			fLocale.FormatTime(fCurrentTimeStr, 64, fCurrentTime,
-				B_MEDIUM_TIME_FORMAT);
-			break;
-		default:
-			fLocale.FormatTime(fCurrentTimeStr, 64, fCurrentTime,
-				B_SHORT_TIME_FORMAT);
-	}
-	
+	fLocale.FormatTime(fCurrentTimeStr, 64, fCurrentTime, fTimeFormat);
 }
 
 
@@ -391,6 +435,15 @@ TTimeView::CalculateTextPlacement()
 
 	BFont font;
 	GetFont(&font);
+
+	// If 12 hour clock with all options turned on shrink font size to fit.
+	if (!fUse24HourClock && fShowSeconds && fShowDayOfWeek && fShowTimeZone)
+		font.SetSize(11.0);
+	else
+		font.SetSize(12.0);
+
+	SetFont(&font, B_FONT_SIZE);
+
 	const char* stringArray[1];
 	stringArray[0] = fCurrentTimeStr;
 	BRect rectArray[1];
@@ -410,7 +463,7 @@ TTimeView::ShowTimeOptions(BPoint point)
 	menu->SetFont(be_plain_font);
 	BMenuItem* item;
 
-	item = new BMenuItem(B_TRANSLATE("Open time preferences" B_UTF8_ELLIPSIS),
+	item = new BMenuItem(B_TRANSLATE("Time preferences" B_UTF8_ELLIPSIS),
 		new BMessage(kChangeTime));
 	menu->AddItem(item);
 
@@ -438,9 +491,37 @@ TTimeView::Update()
 	GetCurrentDate();
 	SetToolTip(fCurrentDateStr);
 
-	ResizeToPreferred();
+	UpdateTimeFormat();
+
 	CalculateTextPlacement();
+	ResizeToPreferred();
 
 	if (fParent)
 		fParent->Invalidate();
+}
+
+
+void
+TTimeView::UpdateTimeFormat()
+{
+	BString timeFormat;
+
+	if (fShowDayOfWeek)
+		timeFormat.Append("eee ");
+
+	if (fUse24HourClock)
+		timeFormat.Append("H:mm");
+	else
+		timeFormat.Append("h:mm");
+
+	if (fShowSeconds)
+		timeFormat.Append(":ss");
+
+	if (!fUse24HourClock)
+		timeFormat.Append(" a");
+
+	if (fShowTimeZone)
+		timeFormat.Append(" V");
+
+	fTimeFormat = timeFormat;
 }

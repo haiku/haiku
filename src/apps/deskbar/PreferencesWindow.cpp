@@ -3,6 +3,7 @@
  * All Rights Reserved. Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		John Scipione, jscipione@gmail.com
  *		Jonas Sundström, jonas@kirilla.com
  */
 
@@ -11,6 +12,8 @@
 
 #include <ctype.h>
 
+#include <Box.h>
+#include <Button.h>
 #include <Catalog.h>
 #include <CheckBox.h>
 #include <FormattingConventions.h>
@@ -22,6 +25,7 @@
 #include <SeparatorView.h>
 #include <Slider.h>
 #include <StringView.h>
+#include <TextControl.h>
 #include <View.h>
 
 #include "BarApp.h"
@@ -91,22 +95,12 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fTimeInterval24HourRadioButton = new BRadioButton("time inteval",
 		B_TRANSLATE("24 hour"), timeInterval24HoursMessage);
 
-	BMessage* timeFormatShortMessage = new BMessage(kTimeFormatChanged);
-	timeFormatShortMessage->AddUInt32("time format", B_SHORT_TIME_FORMAT);
-	fTimeFormatShortRadioButton = new BRadioButton("time format",
-		"Short", timeFormatShortMessage);
-
-	BMessage* timeFormatMediumMessage = new BMessage(kTimeFormatChanged);
-	timeFormatMediumMessage->AddUInt32("time format", B_MEDIUM_TIME_FORMAT);
-	fTimeFormatMediumRadioButton = new BRadioButton("time format",
-		"Medium", timeFormatMediumMessage);
-
-	BMessage* timeFormatLongMessage = new BMessage(kTimeFormatChanged);
-	timeFormatLongMessage->AddUInt32("time format", B_LONG_TIME_FORMAT);
-	fTimeFormatLongRadioButton = new BRadioButton("time format",
-		"Long", timeFormatLongMessage);
-
-	_UpdateTimeFormatRadioButtonLabels();
+	fShowSeconds = new BCheckBox(B_TRANSLATE("Show seconds"),
+		new BMessage(kShowSeconds));
+	fShowDayOfWeek = new BCheckBox(B_TRANSLATE("Show day of week"),
+		new BMessage(kShowDayOfWeek));
+	fShowTimeZone = new BCheckBox(B_TRANSLATE("Show time zone"),
+		new BMessage(kShowTimeZone));
 
 	// Get settings from BarApp
 	TBarApp* barApp = static_cast<TBarApp*>(be_app);
@@ -175,18 +169,18 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	else
 		fTimeInterval12HourRadioButton->SetValue(B_CONTROL_ON);
 
-	switch (settings->timeFormat) {
-		case B_LONG_TIME_FORMAT:
-			fTimeFormatLongRadioButton->SetValue(B_CONTROL_ON);
-			break;
-		case B_MEDIUM_TIME_FORMAT:
-			fTimeFormatMediumRadioButton->SetValue(B_CONTROL_ON);
-			break;
-		default:
-			fTimeFormatShortRadioButton->SetValue(B_CONTROL_ON);
+	TReplicantTray* replicantTray = barApp->BarView()->ReplicantTray();
+	if (replicantTray->Time() != NULL) {
+		fShowSeconds->SetValue(replicantTray->Time()->ShowSeconds());
+		fShowDayOfWeek->SetValue(replicantTray->Time()->ShowDayOfWeek());
+		fShowTimeZone->SetValue(replicantTray->Time()->ShowTimeZone());
+	} else {
+		fShowSeconds->SetValue(settings->showSeconds);
+		fShowDayOfWeek->SetValue(settings->showDayOfWeek);
+		fShowTimeZone->SetValue(settings->showTimeZone);
 	}
 
-	_EnableDisableDependentItems();
+	EnableDisableDependentItems();
 
 	// Targets
 	fAppsSort->SetTarget(be_app);
@@ -199,12 +193,12 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fWindowAutoRaise->SetTarget(be_app);
 	fWindowAutoHide->SetTarget(be_app);
 
-	TReplicantTray* replicantTray = barApp->BarView()->fReplicantTray;
 	fTimeInterval12HourRadioButton->SetTarget(replicantTray);
 	fTimeInterval24HourRadioButton->SetTarget(replicantTray);
-	fTimeFormatShortRadioButton->SetTarget(replicantTray);
-	fTimeFormatMediumRadioButton->SetTarget(replicantTray);
-	fTimeFormatLongRadioButton->SetTarget(replicantTray);
+
+	fShowSeconds->SetTarget(replicantTray);
+	fShowDayOfWeek->SetTarget(replicantTray);
+	fShowTimeZone->SetTarget(replicantTray);
 
 	// Layout
 	fMenuBox = new BBox("fMenuBox");
@@ -281,21 +275,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	timeIntervalView->AddChild(fTimeInterval12HourRadioButton);
 	timeIntervalView->AddChild(fTimeInterval24HourRadioButton);
 
-	BStringView* timeFormatLabel = new BStringView("format",
-		B_TRANSLATE("Format"));
-	timeFormatLabel->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
-		B_SIZE_UNSET));
-	timeFormatLabel->SetLowColor((rgb_color){255, 255, 255, 255});
-
-	BGroupLayout* timeFormatLayout = new BGroupLayout(B_VERTICAL, 0);
-	timeFormatLayout->SetInsets(10, 0, 0, 0);
-	BView* timeFormatView = new BView("format", 0, timeFormatLayout);
-	timeFormatView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	timeFormatView->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	timeFormatView->AddChild(fTimeFormatShortRadioButton);
-	timeFormatView->AddChild(fTimeFormatMediumRadioButton);
-	timeFormatView->AddChild(fTimeFormatLongRadioButton);
-
 	view = BLayoutBuilder::Group<>()
 		.AddGroup(B_VERTICAL, 10)
 			.AddGroup(B_VERTICAL, 0)
@@ -303,8 +282,9 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 				.Add(timeIntervalView)
 				.End()
 			.AddGroup(B_VERTICAL, 0)
-				.Add(timeFormatLabel)
-				.Add(timeFormatView)
+				.Add(fShowSeconds)
+				.Add(fShowDayOfWeek)
+				.Add(fShowTimeZone)
 				.End()
 			.AddGlue()
 			.SetInsets(10, 10, 10, 10)
@@ -328,7 +308,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 
 PreferencesWindow::~PreferencesWindow()
 {
-	_UpdateRecentCounts();
+	UpdateRecentCounts();
 	be_app->PostMessage(kConfigClose);
 }
 
@@ -342,16 +322,16 @@ PreferencesWindow::MessageReceived(BMessage* message)
 			break;
 
 		case kUpdateRecentCounts:
-			_UpdateRecentCounts();
+			UpdateRecentCounts();
 			break;
 
 		case kSuperExpando:
-			_EnableDisableDependentItems();
+			EnableDisableDependentItems();
 			be_app->PostMessage(message);
 			break;
 
 		case kStateChanged:
-			_EnableDisableDependentItems();
+			EnableDisableDependentItems();
 			break;
 
 		default:
@@ -370,7 +350,7 @@ PreferencesWindow::WindowActivated(bool active)
 
 
 void
-PreferencesWindow::_UpdateRecentCounts()
+PreferencesWindow::UpdateRecentCounts()
 {
 	BMessage message(kUpdateRecentCounts);
 
@@ -388,12 +368,12 @@ PreferencesWindow::_UpdateRecentCounts()
 
 	be_app->PostMessage(&message);
 
-	_EnableDisableDependentItems();
+	EnableDisableDependentItems();
 }
 
 
 void
-PreferencesWindow::_EnableDisableDependentItems()
+PreferencesWindow::EnableDisableDependentItems()
 {
 	TBarApp* barApp = static_cast<TBarApp*>(be_app);
 	if (barApp->BarView()->Vertical()
@@ -414,21 +394,4 @@ PreferencesWindow::_EnableDisableDependentItems()
 
 	fWindowAutoRaise->SetEnabled(
 		fWindowAlwaysOnTop->Value() == B_CONTROL_OFF);
-}
-
-
-void
-PreferencesWindow::_UpdateTimeFormatRadioButtonLabels()
-{
-	time_t timeValue = (time_t)time(NULL);
-	BString result;
-
-	BLocale::Default()->FormatTime(&result, timeValue, B_SHORT_TIME_FORMAT);
-	fTimeFormatShortRadioButton->SetLabel(result);
-
-	BLocale::Default()->FormatTime(&result, timeValue, B_MEDIUM_TIME_FORMAT);
-	fTimeFormatMediumRadioButton->SetLabel(result);
-
-	BLocale::Default()->FormatTime(&result, timeValue, B_LONG_TIME_FORMAT);
-	fTimeFormatLongRadioButton->SetLabel(result);
 }

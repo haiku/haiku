@@ -37,11 +37,6 @@ All rights reserved.
 
 
 #include <Application.h>
-#include <Catalog.h>
-#include <List.h>
-#include "BarWindow.h"
-#include "PreferencesWindow.h"
-
 
 /* ------------------------------------ */
 // Private app_server defines that I need to use
@@ -50,20 +45,6 @@ All rights reserved.
 #define _FLOATER_W_TYPE_ 4
 #define _STD_W_TYPE_ 0
 
-
-class BarTeamInfo {
-public:
-	BarTeamInfo(BList* teams, uint32 flags, char* sig, BBitmap* icon,
-				char* name);
-	BarTeamInfo(const BarTeamInfo &info);
-	~BarTeamInfo();
-
-	BList* teams;
-	uint32 flags;
-	char* sig;
-	BBitmap* icon;
-	char* name;
-};
 
 const uint32 kWin95 = 'Bill';
 const uint32 kAmiga = 'Ncro';
@@ -76,14 +57,6 @@ const uint32 kAddTeam = 'AdTm';
 const uint32 kRemoveTeam = 'RmTm';
 const uint32 kRestart = 'Rtrt';
 const uint32 kShutDown = 'ShDn';
-const uint32 kTrackerFirst = 'TkFt';
-const uint32 kSortRunningApps = 'SAps';
-const uint32 kSuperExpando = 'SprE';
-const uint32 kExpandNewTeams = 'ExTm';
-const uint32 kHideLabels = 'hLbs';
-const uint32 kResizeTeamIcons = 'RTIs';
-const uint32 kAutoRaise = 'AtRs';
-const uint32 kAutoHide = 'AtHd';
 const uint32 kRestartTracker = 'Trak';
 
 // from roster_private.h
@@ -103,7 +76,9 @@ struct desk_settings {
 	bool left;
 	bool top;
 	bool showTime;
-	uint32 timeFormat;
+	bool showSeconds;
+	bool showDayOfWeek;
+	bool showTimeZone;
 	uint32 state;
 	float width;
 	BPoint switcherLoc;
@@ -126,11 +101,28 @@ struct desk_settings {
 	bool recentFoldersEnabled;
 };
 
-
-class TBarView;
 class BFile;
+class BList;
+class BBitmap;
+class PreferencesWindow;
+class TBarView;
+class TBarWindow;
 
-using namespace BPrivate;
+
+class BarTeamInfo {
+public:
+	BarTeamInfo(BList* teams, uint32 flags, char* sig, BBitmap* icon,
+				char* name);
+	BarTeamInfo(const BarTeamInfo &info);
+	~BarTeamInfo();
+
+	BList* teams;
+	uint32 flags;
+	char* sig;
+	BBitmap* icon;
+	char* name;
+};
+
 
 class TBarApp : public BApplication {
 	public:
@@ -141,12 +133,9 @@ class TBarApp : public BApplication {
 		virtual void MessageReceived(BMessage* message);
 		virtual void RefsReceived(BMessage* refs);
 
-		desk_settings* Settings()
-			{ return &fSettings; }
-		TBarView* BarView() const
-			{ return fBarWindow->BarView(); }
-		TBarWindow* BarWindow() const
-			{ return fBarWindow; }
+		desk_settings* Settings() { return &fSettings; }
+		TBarView* BarView() const { return fBarView; }
+		TBarWindow* BarWindow() const { return fBarWindow; }
 
 		static void Subscribe(const BMessenger &subscriber, BList*);
 		static void Unsubscribe(const BMessenger &subscriber);
@@ -165,6 +154,7 @@ class TBarApp : public BApplication {
 		BRect IconRect();
 
 		TBarWindow* fBarWindow;
+		TBarView*	fBarView;
 		BMessenger fSwitcherMessenger;
 		BMessenger fStatusViewMessenger;
 		BFile* fSettingsFile;
@@ -177,5 +167,5 @@ class TBarApp : public BApplication {
 		static BList sSubscribers;
 };
 
-#endif	// BAR_APP_H
 
+#endif	// BAR_APP_H

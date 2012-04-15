@@ -1,8 +1,9 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de.
-** Copyright 2010-2011, Oliver Tappe, zooey@hirschkaefer.de.
-** All rights reserved. Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2010-2011, Oliver Tappe, zooey@hirschkaefer.de.
+ * Copyright 2012, John Scipione, jscipione@gmail.com
+ * All rights reserved. Distributed under the terms of the OpenBeOS License.
+ */
 
 
 #include <AutoDeleter.h>
@@ -509,6 +510,34 @@ BLocale::FormatTime(char* string, size_t maxSize, time_t time,
 }
 
 
+ssize_t
+BLocale::FormatTime(char* string, size_t maxSize, time_t time,
+	BString format) const
+{
+	BAutolock lock(fLock);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
+	if (format == NULL || format.CountChars() <= 0)
+		return B_BAD_VALUE;
+
+	ObjectDeleter<DateFormat> timeFormatter(_CreateTimeFormatter(format));
+	if (timeFormatter.Get() == NULL)
+		return B_NO_MEMORY;
+
+	UnicodeString icuString;
+	timeFormatter->format((UDate)time * 1000, icuString);
+
+	CheckedArrayByteSink stringConverter(string, maxSize);
+	icuString.toUTF8(stringConverter);
+
+	if (stringConverter.Overflowed())
+		return B_BAD_VALUE;
+
+	return stringConverter.NumberOfBytesWritten();
+}
+
+
 status_t
 BLocale::FormatTime(BString* string, time_t time, BTimeFormatStyle style,
 	const BTimeZone* timeZone) const
@@ -519,6 +548,40 @@ BLocale::FormatTime(BString* string, time_t time, BTimeFormatStyle style,
 
 	BString format;
 	fConventions.GetTimeFormat(style, format);
+	ObjectDeleter<DateFormat> timeFormatter(_CreateTimeFormatter(format));
+	if (timeFormatter.Get() == NULL)
+		return B_NO_MEMORY;
+
+	if (timeZone != NULL) {
+		ObjectDeleter<TimeZone> icuTimeZone(
+			TimeZone::createTimeZone(timeZone->ID().String()));
+		if (icuTimeZone.Get() == NULL)
+			return B_NO_MEMORY;
+		timeFormatter->setTimeZone(*icuTimeZone.Get());
+	}
+
+	UnicodeString icuString;
+	timeFormatter->format((UDate)time * 1000, icuString);
+
+	string->Truncate(0);
+	BStringByteSink stringConverter(string);
+	icuString.toUTF8(stringConverter);
+
+	return B_OK;
+}
+
+
+status_t
+BLocale::FormatTime(BString* string, time_t time, BString format,
+	const BTimeZone* timeZone) const
+{
+	BAutolock lock(fLock);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
+	if (format == NULL || format.CountChars() <= 0)
+		return B_BAD_VALUE;
+
 	ObjectDeleter<DateFormat> timeFormatter(_CreateTimeFormatter(format));
 	if (timeFormatter.Get() == NULL)
 		return B_NO_MEMORY;
@@ -607,7 +670,7 @@ BLocale::GetTimeFields(BDateElement*& fields, int& fieldCount,
 	icu::FieldPositionIterator positionIterator;
 	UnicodeString icuString;
 	time_t now;
-	timeFormatter->format((UDate)time(&now) * 1000,	icuString,
+	timeFormatter->format((UDate)time(&now) * 1000, icuString,
 		&positionIterator, error);
 
 	if (error != U_ZERO_ERROR)

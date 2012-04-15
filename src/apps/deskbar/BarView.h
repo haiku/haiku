@@ -36,11 +36,16 @@ All rights reserved.
 #ifndef BARVIEW_H
 #define BARVIEW_H
 
+
 #include <Deskbar.h>
 #include <View.h>
 
 #include "NavMenu.h"
 #include "ObjectList.h"
+
+
+const uint32 kStateChanged = 'stch';
+
 
 enum DeskbarShelf {
 	B_DESKBAR_ANY_SHELF = 0,
@@ -53,12 +58,14 @@ enum {
 	kFullState = 2
 };
 
+
 const float kMiniHeight = 46.0f;
 const float kHModeHeight = 21.0f;
 const float kMenuBarHeight = 21.0f;
 const float kStatusHeight = 22.0f;
 const float kHiddenDimension = 1.0f;
 const float kMaxPreventHidingDist = 80.0f;
+
 
 class BShelf;
 class TBarMenuBar;

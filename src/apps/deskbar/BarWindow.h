@@ -88,7 +88,7 @@ private:
 			bool				_IsFocusMessage(BMessage* message);
 
 private:
-	static	TDeskbarMenu*			sDeskbarMenu;
+	static	TDeskbarMenu*		sDeskbarMenu;
 			TBarView*			fBarView;
 };
 

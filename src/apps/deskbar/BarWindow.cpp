@@ -39,6 +39,7 @@ All rights reserved.
 #include <stdio.h>
 
 #include <Application.h>
+#include <Catalog.h>
 #include <Directory.h>
 #include <FindDirectory.h>
 #include <Path.h>

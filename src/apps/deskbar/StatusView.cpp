@@ -143,9 +143,15 @@ TReplicantTray::TReplicantTray(TBarView* parent, bool vertical)
 		fMinimumTrayWidth = sMinimumWindowWidth - kGutter - kDragRegionWidth;
 	}
 
+	BFormattingConventions conventions;
+	BLocale::Default()->GetFormattingConventions(&conventions);
+	bool use24HourClock = conventions.Use24HourClock();
+	desk_settings* settings = ((TBarApp*)be_app)->Settings();
+
 	// Create the time view
 	fTime = new TTimeView(fMinimumTrayWidth, kMaxReplicantHeight - 1.0,
-		((TBarApp*)be_app)->Settings()->timeFormat);
+		use24HourClock, settings->showSeconds, settings->showDayOfWeek,
+		settings->showTimeZone);
 }
 
 
@@ -199,47 +205,6 @@ TReplicantTray::DetachedFromWindow()
 #endif
 #endif
 	BView::DetachedFromWindow();
-}
-
-
-void
-TReplicantTray::SaveTimeSettings()
-{
-	if (fTime == NULL)
-		return;
-
-	desk_settings* settings = ((TBarApp*)be_app)->Settings();
-	settings->showTime = !fTime->IsHidden();
-	settings->timeFormat = fTime->TimeFormat();
-}
-
-
-void
-TReplicantTray::ShowHideTime()
-{
-	if (fTime == NULL)
-		return;
-
-	if (fTime->IsHidden())
-		fTime->Show();
-	else
-		fTime->Hide();
-
-	RealignReplicants();
-	AdjustPlacement();
-}
-
-
-void
-TReplicantTray::UpdateTimeFormat(uint32 timeFormat)
-{
-	if (fTime == NULL)
-		return;
-
-	fTime->SetTimeFormat(timeFormat);
-
-	RealignReplicants();
-	AdjustPlacement();
 }
 
 
@@ -329,7 +294,7 @@ TReplicantTray::MessageReceived(BMessage* message)
 				conventions.SetExplicitUse24HourClock(use24HourClock);
 				BPrivate::MutableLocaleRoster::Default()->
 					SetDefaultFormattingConventions(conventions);
-				fTime->Update();
+				fTime->SetUse24HourClock(use24HourClock);
 				// time string reformat -> realign
 				RealignReplicants();
 				AdjustPlacement();
@@ -338,17 +303,38 @@ TReplicantTray::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case kTimeFormatChanged:
-		{
+		case kShowSeconds:
 			if (fTime == NULL)
 				return;
 
-			uint32 timeFormat;
-			if (message->FindUInt32("time format", &timeFormat) == B_OK)
-				UpdateTimeFormat(timeFormat);
+			fTime->SetShowSeconds(!fTime->ShowSeconds());
 
+			// time string reformat -> realign
+			RealignReplicants();
+			AdjustPlacement();
 			break;
-		}
+
+		case kShowDayOfWeek:
+			if (fTime == NULL)
+				return;
+
+			fTime->SetShowDayOfWeek(!fTime->ShowDayOfWeek());
+
+			// time string reformat -> realign
+			RealignReplicants();
+			AdjustPlacement();
+			break;
+
+		case kShowTimeZone:
+			if (fTime == NULL)
+				return;
+
+			fTime->SetShowTimeZone(!fTime->ShowTimeZone());
+
+			// time string reformat -> realign
+			RealignReplicants();
+			AdjustPlacement();
+			break;
 
 #ifdef DB_ADDONS
 		case B_NODE_MONITOR:
@@ -359,28 +345,6 @@ TReplicantTray::MessageReceived(BMessage* message)
 		default:
 			BView::MessageReceived(message);
 			break;
-	}
-}
-
-
-void
-TReplicantTray::ShowReplicantMenu(BPoint point)
-{
-	BPopUpMenu* menu = new BPopUpMenu("", false, false);
-	menu->SetFont(be_plain_font);
-
-	// If clock is visible show the extended menu, otherwise show "Show Time"
-
-	if (!fTime->IsHidden())
-		fTime->ShowTimeOptions(ConvertToScreen(point));
-	else {
-		BMenuItem* item = new BMenuItem(B_TRANSLATE("Show Time"),
-			new BMessage(kShowHideTime));
-		menu->AddItem(item);
-		menu->SetTargetForItems(this);
-		BPoint where = ConvertToScreen(point);
-		menu->Go(where, true, true, BRect(where - BPoint(4, 4),
-			where + BPoint(4, 4)), true);
 	}
 }
 
@@ -423,7 +387,54 @@ TReplicantTray::MouseDown(BPoint where)
 	BView::MouseDown(where);
 }
 
+
+void
+TReplicantTray::ShowReplicantMenu(BPoint point)
+{
+	BPopUpMenu* menu = new BPopUpMenu("", false, false);
+	menu->SetFont(be_plain_font);
+
+	// If clock is visible show the extended menu, otherwise show "Show time"
+
+	if (!fTime->IsHidden())
+		fTime->ShowTimeOptions(ConvertToScreen(point));
+	else {
+		BMenuItem* item = new BMenuItem(B_TRANSLATE("Show time"),
+			new BMessage(kShowHideTime));
+		menu->AddItem(item);
+		menu->SetTargetForItems(this);
+		BPoint where = ConvertToScreen(point);
+		menu->Go(where, true, true, BRect(where - BPoint(4, 4),
+			where + BPoint(4, 4)), true);
+	}
+}
+
+
+void
+TReplicantTray::SetMultiRow(bool state)
+{
+	fMultiRowMode = state;
+}
+
+
+void
+TReplicantTray::ShowHideTime()
+{
+	if (fTime == NULL)
+		return;
+
+	if (fTime->IsHidden())
+		fTime->Show();
+	else
+		fTime->Hide();
+
+	RealignReplicants();
+	AdjustPlacement();
+}
+
+
 #ifdef DB_ADDONS
+
 
 void
 TReplicantTray::InitAddOnSupport()
@@ -1219,13 +1230,6 @@ TReplicantTray::RealignReplicants(int32 startIndex)
 }
 
 
-void
-TReplicantTray::SetMultiRow(bool state)
-{
-	fMultiRowMode = state;
-}
-
-
 status_t
 TReplicantTray::_SaveSettings()
 {
@@ -1239,8 +1243,22 @@ TReplicantTray::_SaveSettings()
 		if ((result = file.InitCheck()) == B_OK) 
 			result = fAddOnSettings.Flatten(&file);
 	}
-	
+
 	return result;
+}
+
+
+void
+TReplicantTray::SaveTimeSettings()
+{
+	if (fTime == NULL)
+		return;
+
+	desk_settings* settings = ((TBarApp*)be_app)->Settings();
+	settings->showTime = !fTime->IsHidden();
+	settings->showSeconds = fTime->ShowSeconds();
+	settings->showDayOfWeek = fTime->ShowDayOfWeek();
+	settings->showTimeZone = fTime->ShowTimeZone();
 }
 
 

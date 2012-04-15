@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2011, Haiku, Inc.
+ * Copyright 2003-2012, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _B_LOCALE_H_
@@ -119,9 +119,14 @@ public:
 								//       has been implemented!
 			ssize_t				FormatTime(char* string, size_t maxSize,
 									time_t time, BTimeFormatStyle style) const;
+			ssize_t				FormatTime(char* string, size_t maxSize,
+									time_t time, BString format) const;
 			status_t			FormatTime(BString* string, time_t time,
 									BTimeFormatStyle style,
 									const BTimeZone* timeZone = NULL) const;
+			status_t			FormatTime(BString* string, time_t time,
+									BString format,
+									const BTimeZone* timeZone) const;
 			status_t			FormatTime(BString* string,
 									int*& fieldPositions, int& fieldCount,
 									time_t time, BTimeFormatStyle style) const;
