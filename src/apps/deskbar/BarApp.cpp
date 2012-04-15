@@ -509,10 +509,6 @@ TBarApp::MessageReceived(BMessage* message)
 		case kAutoRaise:
 			fSettings.autoRaise = fSettings.alwaysOnTop ? false :
 				!fSettings.autoRaise;
-
-			fBarWindow->Lock();
-			fBarView->UpdateEventMask();
-			fBarWindow->Unlock();
 			break;
 
 		case kAutoHide:

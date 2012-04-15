@@ -510,11 +510,15 @@ TBarView::SaveSettings()
 void
 TBarView::UpdateEventMask()
 {
-	if (((TBarApp*)be_app)->Settings()->autoRaise
-		|| ((TBarApp*)be_app)->Settings()->autoHide)
+	SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
+
+#if 0
+	desk_settings* settings = ((TBarApp*)be_app)->Settings();
+	if (settings->autoRaise || settings->autoHide)
 		SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 	else
 		SetEventMask(0);
+#endif
 }
 
 

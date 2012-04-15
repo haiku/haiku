@@ -142,7 +142,10 @@ TBarWindow::MenusBeginning()
 
 	fBarView->SetEventMask(0);
 		// This works around a BeOS bug - the menu is quit with every
-		// B_MOUSE_DOWN the window receives...
+		// B_MOUSE_DOWN the window receives.
+		//
+		// Is this bug still here? I commented this line out and didn't
+		// notice anything different
 
 	BWindow::MenusBeginning();
 }
