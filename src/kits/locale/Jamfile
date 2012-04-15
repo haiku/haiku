@@ -8,6 +8,7 @@ UsePublicHeaders locale storage ;
 local sources =
 	cat.cpp
 	Catalog.cpp
+	CatalogData.cpp
 	Collator.cpp
 	Country.cpp
 	DefaultCatalog.cpp

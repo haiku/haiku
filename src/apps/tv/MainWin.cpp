@@ -46,9 +46,9 @@
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "MainWin"
 
-static const char* fLocalizedName = B_TRANSLATE_MARK("TV");
-static const char* fLocalizedRevision = B_TRANSLATE_MARK("unknown");
-static const char* fLocalizedInfo1 = B_TRANSLATE_MARK("DVB - Digital Video Broadcasting TV");
+B_TRANSLATE_MARK_VOID("TV");
+B_TRANSLATE_MARK_VOID("unknown");
+B_TRANSLATE_MARK_VOID("DVB - Digital Video Broadcasting TV");
 
 enum
 {
@@ -85,7 +85,7 @@ enum
 
 MainWin::MainWin(BRect frame_rect)
 	:
-	BWindow(frame_rect, B_TRANSLATE_SYSTEM_NAME(NAME), B_TITLED_WINDOW, 
+	BWindow(frame_rect, B_TRANSLATE_SYSTEM_NAME(NAME), B_TITLED_WINDOW,
  	B_ASYNCHRONOUS_CONTROLS /* | B_WILL_ACCEPT_FIRST_CLICK */)
  ,	fController(new Controller)
  ,	fIsFullscreen(false)
@@ -103,9 +103,9 @@ MainWin::MainWin(BRect frame_rect)
  ,	fFrameResizedCalled(true)
 {
 	BRect rect = Bounds();
-	
+
 	// background
-	fBackground = new BView(rect, "background", B_FOLLOW_ALL, 
+	fBackground = new BView(rect, "background", B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE);
 	fBackground->SetViewColor(0,0,0);
 	AddChild(fBackground);
@@ -120,14 +120,14 @@ MainWin::MainWin(BRect frame_rect)
 
 	// video view
 	BRect video_rect = BRect(0, fMenuBarHeight, rect.right, rect.bottom);
-	fVideoView = new VideoView(video_rect, "video display", B_FOLLOW_ALL, 
+	fVideoView = new VideoView(video_rect, "video display", B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE);
 	fBackground->AddChild(fVideoView);
 
 	fVideoView->MakeFocus();
 
 //	SetSizeLimits(fControlViewMinWidth - 1, 32767,
-//		fMenuBarHeight + fControlViewHeight - 1, fMenuBarHeight 
+//		fMenuBarHeight + fControlViewHeight - 1, fMenuBarHeight
 //		+ fControlViewHeight - 1);
 
 //	SetSizeLimits(320 - 1, 32767, 240 + fMenuBarHeight - 1, 32767);
@@ -174,40 +174,40 @@ MainWin::CreateMenu()
 	fMenuBar->AddItem(fSettingsMenu);
 	fMenuBar->AddItem(fDebugMenu);
 
-	fFileMenu->AddItem(new BMenuItem(B_TRANSLATE("Quit"), 
+	fFileMenu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
 		new BMessage(M_FILE_QUIT), 'Q', B_COMMAND_KEY));
 
 /*
-	fChannelMenu->AddItem(new BMenuItem(B_TRANSLATE("Next channel"), 
+	fChannelMenu->AddItem(new BMenuItem(B_TRANSLATE("Next channel"),
 		new BMessage(M_CHANNEL_NEXT), '+', B_COMMAND_KEY));
-	fChannelMenu->AddItem(new BMenuItem(B_TRANSLATE("Previous channel"), 
+	fChannelMenu->AddItem(new BMenuItem(B_TRANSLATE("Previous channel"),
 		new BMessage(M_CHANNEL_PREV), '-', B_COMMAND_KEY));
 	fChannelMenu->AddSeparatorItem();
-	fChannelMenu->AddItem(new BMenuItem("RTL", new BMessage(M_DUMMY), '0', 
+	fChannelMenu->AddItem(new BMenuItem("RTL", new BMessage(M_DUMMY), '0',
 		B_COMMAND_KEY));
-	fChannelMenu->AddItem(new BMenuItem("Pro7", new BMessage(M_DUMMY), '1', 
+	fChannelMenu->AddItem(new BMenuItem("Pro7", new BMessage(M_DUMMY), '1',
 		B_COMMAND_KEY));
 
-	fInterfaceMenu->AddItem(new BMenuItem(B_TRANSLATE("none"), 
+	fInterfaceMenu->AddItem(new BMenuItem(B_TRANSLATE("none"),
 		new BMessage(M_DUMMY)));
-	fInterfaceMenu->AddItem(new BMenuItem(B_TRANSLATE("none 1"), 
+	fInterfaceMenu->AddItem(new BMenuItem(B_TRANSLATE("none 1"),
 		new BMessage(M_DUMMY)));
-	fInterfaceMenu->AddItem(new BMenuItem(B_TRANSLATE("none 2"), 
+	fInterfaceMenu->AddItem(new BMenuItem(B_TRANSLATE("none 2"),
 		new BMessage(M_DUMMY)));
 */
 
-	fSettingsMenu->AddItem(new BMenuItem(B_TRANSLATE("Scale to native size"), 
+	fSettingsMenu->AddItem(new BMenuItem(B_TRANSLATE("Scale to native size"),
 		new BMessage(M_SCALE_TO_NATIVE_SIZE), 'N', B_COMMAND_KEY));
-	fSettingsMenu->AddItem(new BMenuItem(B_TRANSLATE("Full screen"), 
+	fSettingsMenu->AddItem(new BMenuItem(B_TRANSLATE("Full screen"),
 		new BMessage(M_TOGGLE_FULLSCREEN), 'F', B_COMMAND_KEY));
 	fSettingsMenu->AddSeparatorItem();
-	fSettingsMenu->AddItem(new BMenuItem(B_TRANSLATE("No menu"), 
+	fSettingsMenu->AddItem(new BMenuItem(B_TRANSLATE("No menu"),
 		new BMessage(M_TOGGLE_NO_MENU), 'M', B_COMMAND_KEY));
-	fSettingsMenu->AddItem(new BMenuItem(B_TRANSLATE("No border"), 
+	fSettingsMenu->AddItem(new BMenuItem(B_TRANSLATE("No border"),
 		new BMessage(M_TOGGLE_NO_BORDER), 'B', B_COMMAND_KEY));
-	fSettingsMenu->AddItem(new BMenuItem(B_TRANSLATE("Always on top"), 
+	fSettingsMenu->AddItem(new BMenuItem(B_TRANSLATE("Always on top"),
 		new BMessage(M_TOGGLE_ALWAYS_ON_TOP), 'T', B_COMMAND_KEY));
-	fSettingsMenu->AddItem(new BMenuItem(B_TRANSLATE("Keep aspect ratio"), 
+	fSettingsMenu->AddItem(new BMenuItem(B_TRANSLATE("Keep aspect ratio"),
 		new BMessage(M_TOGGLE_KEEP_ASPECT_RATIO), 'K', B_COMMAND_KEY));
 	fSettingsMenu->AddSeparatorItem();
 	fSettingsMenu->AddItem(new BMenuItem(B_TRANSLATE("Settings"B_UTF8_ELLIPSIS)
@@ -216,28 +216,28 @@ MainWin::CreateMenu()
 	const char* pixel_ratio = B_TRANSLATE("pixel aspect ratio");
 	BString str1 = pixel_ratio;
 	str1 << " 1.00000:1";
-	fDebugMenu->AddItem(new BMenuItem(str1.String(), 
+	fDebugMenu->AddItem(new BMenuItem(str1.String(),
 		new BMessage(M_ASPECT_100000_1)));
 	BString str2 = pixel_ratio;
 	str2 << " 1.06666:1";
-	fDebugMenu->AddItem(new BMenuItem(str2.String(), 
+	fDebugMenu->AddItem(new BMenuItem(str2.String(),
 		new BMessage(M_ASPECT_106666_1)));
 	BString str3 = pixel_ratio;
 	str3 << " 1.09091:1";
-	fDebugMenu->AddItem(new BMenuItem(str3.String(), 
+	fDebugMenu->AddItem(new BMenuItem(str3.String(),
 		new BMessage(M_ASPECT_109091_1)));
 	BString str4 = pixel_ratio;
 	str4 << " 1.41176:1";
-	fDebugMenu->AddItem(new BMenuItem(str4.String(), 
+	fDebugMenu->AddItem(new BMenuItem(str4.String(),
 		new BMessage(M_ASPECT_141176_1)));
 	fDebugMenu->AddItem(new BMenuItem(B_TRANSLATE(
-		"force 720 x 576, display aspect 4:3"), 
+		"force 720 x 576, display aspect 4:3"),
 		new BMessage(M_ASPECT_720_576)));
 	fDebugMenu->AddItem(new BMenuItem(B_TRANSLATE(
-		"force 704 x 576, display aspect 4:3"), 
+		"force 704 x 576, display aspect 4:3"),
 		new BMessage(M_ASPECT_704_576)));
 	fDebugMenu->AddItem(new BMenuItem(B_TRANSLATE(
-		"force 544 x 576, display aspect 4:3"), 
+		"force 544 x 576, display aspect 4:3"),
 		new BMessage(M_ASPECT_544_576)));
 
 	fSettingsMenu->ItemAt(1)->SetMarked(fIsFullscreen);
@@ -255,7 +255,7 @@ MainWin::SetupInterfaceMenu()
 {
 	fInterfaceMenu->RemoveItems(0, fInterfaceMenu->CountItems(), true);
 
-	fInterfaceMenu->AddItem(new BMenuItem(B_TRANSLATE("None"), 
+	fInterfaceMenu->AddItem(new BMenuItem(B_TRANSLATE("None"),
 		new BMessage(M_SELECT_INTERFACE)));
 
 	int count = gDeviceRoster->DeviceCount();
@@ -264,9 +264,9 @@ MainWin::SetupInterfaceMenu()
 		fInterfaceMenu->AddSeparatorItem();
 
 	for (int i = 0; i < count; i++) {
-		// 1 gets subtracted in MessageReceived, so -1 is Interface None, 
+		// 1 gets subtracted in MessageReceived, so -1 is Interface None,
 		// and 0 == Interface 0 in SelectInterface()
-		fInterfaceMenu->AddItem(new BMenuItem(gDeviceRoster->DeviceName(i), 
+		fInterfaceMenu->AddItem(new BMenuItem(gDeviceRoster->DeviceName(i),
 			new BMessage(M_SELECT_INTERFACE + i + 1)));
 	}
 }
@@ -283,12 +283,12 @@ MainWin::SetupChannelMenu()
 	int channels = fController->ChannelCount();
 
 	if (channels == 0) {
-		fChannelMenu->AddItem(new BMenuItem(B_TRANSLATE("None"), 
+		fChannelMenu->AddItem(new BMenuItem(B_TRANSLATE("None"),
 			new BMessage(M_DUMMY)));
 	} else {
-		fChannelMenu->AddItem(new BMenuItem(B_TRANSLATE("Next channel"), 
+		fChannelMenu->AddItem(new BMenuItem(B_TRANSLATE("Next channel"),
 			new BMessage(M_CHANNEL_NEXT), '+', B_COMMAND_KEY));
-		fChannelMenu->AddItem(new BMenuItem(B_TRANSLATE("Previous channel"), 
+		fChannelMenu->AddItem(new BMenuItem(B_TRANSLATE("Previous channel"),
 			new BMessage(M_CHANNEL_PREV), '-', B_COMMAND_KEY));
 		fChannelMenu->AddSeparatorItem();
 	}
@@ -405,7 +405,7 @@ MainWin::SelectInitialInterface()
 
 	int count = gDeviceRoster->DeviceCount();
 	for (int i = 0; i < count; i++) {
-		if (fController->IsInterfaceAvailable(i) 
+		if (fController->IsInterfaceAvailable(i)
 			&& B_OK == fController->ConnectInterface(i)) {
 			printf("MainWin::SelectInitialInterface connected to interface "
 				"%d\n", i);
@@ -431,7 +431,7 @@ MainWin::MouseDown(BMessage *msg)
 	BPoint screen_where;
 	uint32 buttons = msg->FindInt32("buttons");
 
-	// On Zeta, only "screen_where" is relyable, "where" and "be:view_where" 
+	// On Zeta, only "screen_where" is relyable, "where" and "be:view_where"
 	// seem to be broken
 	if (B_OK != msg->FindPoint("screen_where", &screen_where)) {
 		// Workaround for BeOS R5, it has no "screen_where"
@@ -444,7 +444,7 @@ MainWin::MouseDown(BMessage *msg)
 //	if (1 == msg->FindInt32("buttons") && msg->FindInt32("clicks") == 1) {
 
 	if (1 == buttons && msg->FindInt32("clicks") % 2 == 0) {
-		BRect r(screen_where.x - 1, screen_where.y - 1, screen_where.x + 1, 
+		BRect r(screen_where.x - 1, screen_where.y - 1, screen_where.x + 1,
 			screen_where.y + 1);
 		if (r.Contains(fMouseDownMousePos)) {
 			PostMessage(M_TOGGLE_FULLSCREEN);
@@ -453,7 +453,7 @@ MainWin::MouseDown(BMessage *msg)
 	}
 
 	if (2 == buttons && msg->FindInt32("clicks") % 2 == 0) {
-		BRect r(screen_where.x - 1, screen_where.y - 1, screen_where.x + 1, 
+		BRect r(screen_where.x - 1, screen_where.y - 1, screen_where.x + 1,
 			screen_where.y + 1);
 		if (r.Contains(fMouseDownMousePos)) {
 			PostMessage(M_TOGGLE_NO_BORDER_NO_MENU);
@@ -471,7 +471,7 @@ MainWin::MouseDown(BMessage *msg)
 
 	if (buttons == 1 && !fIsFullscreen) {
 		// start mouse tracking
-		fVideoView->SetMouseEventMask(B_POINTER_EVENTS | B_NO_POINTER_HISTORY 
+		fVideoView->SetMouseEventMask(B_POINTER_EVENTS | B_NO_POINTER_HISTORY
 			/* | B_LOCK_WINDOW_FOCUS */);
 		fMouseDownTracking = true;
 	}
@@ -510,7 +510,7 @@ MainWin::MouseMoved(BMessage *msg)
 		printf("view where: %.0f, %.0f => ", mousePos.x, mousePos.y);
 		fVideoView->ConvertToScreen(&mousePos);
 */
-		// On Zeta, only "screen_where" is relyable, "where" and 
+		// On Zeta, only "screen_where" is relyable, "where" and
 		// "be:view_where" seem to be broken
 		if (B_OK != msg->FindPoint("screen_where", &mousePos)) {
 			// Workaround for BeOS R5, it has no "screen_where"
@@ -542,65 +542,65 @@ MainWin::ShowContextMenu(const BPoint &screen_point)
 	printf("Show context menu\n");
 	BPopUpMenu *menu = new BPopUpMenu("context menu", false, false);
 	BMenuItem *item;
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Scale to native size"), 
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Scale to native size"),
 		new BMessage(M_SCALE_TO_NATIVE_SIZE), 'N', B_COMMAND_KEY));
-	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Full screen"), 
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Full screen"),
 		new BMessage(M_TOGGLE_FULLSCREEN), 'F', B_COMMAND_KEY));
 	item->SetMarked(fIsFullscreen);
 	menu->AddSeparatorItem();
-	menu->AddItem(item = new BMenuItem(B_TRANSLATE("No menu"), 
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("No menu"),
 		new BMessage(M_TOGGLE_NO_MENU), 'M', B_COMMAND_KEY));
 	item->SetMarked(fNoMenu);
-	menu->AddItem(item = new BMenuItem(B_TRANSLATE("No border"), 
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("No border"),
 		new BMessage(M_TOGGLE_NO_BORDER), 'B', B_COMMAND_KEY));
 	item->SetMarked(fNoBorder);
-	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Always on top"), 
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Always on top"),
 		new BMessage(M_TOGGLE_ALWAYS_ON_TOP), 'T', B_COMMAND_KEY));
 	item->SetMarked(fAlwaysOnTop);
-	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Keep aspect ratio"), 
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Keep aspect ratio"),
 		new BMessage(M_TOGGLE_KEEP_ASPECT_RATIO), 'K', B_COMMAND_KEY));
 	item->SetMarked(fKeepAspectRatio);
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"), 
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
 		new BMessage(M_FILE_QUIT), 'Q', B_COMMAND_KEY));
 
 	menu->AddSeparatorItem();
 	const char* pixel_aspect = "pixel aspect ratio";
 	BString str1 = pixel_aspect;
 	str1 << " 1.00000:1";
-	menu->AddItem(new BMenuItem(str1.String(), 
+	menu->AddItem(new BMenuItem(str1.String(),
 		new BMessage(M_ASPECT_100000_1)));
 	BString str2 = pixel_aspect;
 	str2 << " 1.06666:1";
-	menu->AddItem(new BMenuItem(str2.String(), 
+	menu->AddItem(new BMenuItem(str2.String(),
 		new BMessage(M_ASPECT_106666_1)));
 	BString str3 = pixel_aspect;
 	str3 << " 1.09091:1";
-	menu->AddItem(new BMenuItem(str3.String(), 
+	menu->AddItem(new BMenuItem(str3.String(),
 		new BMessage(M_ASPECT_109091_1)));
 	BString str4 = pixel_aspect;
 	str4 << " 1.41176:1";
-	menu->AddItem(new BMenuItem(str4.String(), 
+	menu->AddItem(new BMenuItem(str4.String(),
 		new BMessage(M_ASPECT_141176_1)));
 	menu->AddItem(new BMenuItem(B_TRANSLATE(
-		"force 720 x 576, display aspect 4:3"), 
+		"force 720 x 576, display aspect 4:3"),
 		new BMessage(M_ASPECT_720_576)));
 	menu->AddItem(new BMenuItem(B_TRANSLATE(
-		"force 704 x 576, display aspect 4:3"), 
+		"force 704 x 576, display aspect 4:3"),
 		new BMessage(M_ASPECT_704_576)));
 	menu->AddItem(new BMenuItem(B_TRANSLATE(
-		"force 544 x 576, display aspect 4:3"), 
+		"force 544 x 576, display aspect 4:3"),
 		new BMessage(M_ASPECT_544_576)));
 
 	menu->SetTargetForItems(this);
-	BRect r(screen_point.x - 5, screen_point.y - 5, screen_point.x + 5, 
+	BRect r(screen_point.x - 5, screen_point.y - 5, screen_point.x + 5,
 		screen_point.y + 5);
 	menu->Go(screen_point, true, true, r, true);
 }
 
 
 void
-MainWin::VideoFormatChange(int width, int height, float width_scale, 
+MainWin::VideoFormatChange(int width, int height, float width_scale,
 	float height_scale)
 {
 	// called when video format or aspect ratio changes
@@ -611,7 +611,7 @@ MainWin::VideoFormatChange(int width, int height, float width_scale,
 	if (width_scale < 1.0 && height_scale >= 1.0) {
 		width_scale  = 1.0 / width_scale;
 		height_scale = 1.0 / height_scale;
-		printf("inverting! new values: width_scale %.6f, height_scale %.6f\n", 
+		printf("inverting! new values: width_scale %.6f, height_scale %.6f\n",
 			width_scale, height_scale);
 	}
 
@@ -652,7 +652,7 @@ MainWin::FrameResized(float new_width, float new_height)
 
 
 	printf("FrameResized enter: new_width %.0f, new_height %.0f, bounds width "
-		"%.0f, bounds height %.0f\n", new_width, new_height, Bounds().Width(), 
+		"%.0f, bounds height %.0f\n", new_width, new_height, Bounds().Width(),
 		Bounds().Height());
 
 	if (fIsFullscreen) {
@@ -715,7 +715,7 @@ MainWin::AdjustFullscreenRenderer()
 		float max_height = fBackground->Bounds().Height() + 1.0f;
 		float scaled_width  = fSourceWidth * fWidthScale;
 		float scaled_height = fSourceHeight * fHeightScale;
-		float factor = min_c(max_width / scaled_width, max_height 
+		float factor = min_c(max_width / scaled_width, max_height
 			/ scaled_height);
 		int render_width = int(scaled_width * factor);
 		int render_height = int(scaled_height * factor);
@@ -724,8 +724,8 @@ MainWin::AdjustFullscreenRenderer()
 
 		printf("AdjustFullscreenRenderer: background %.1f x %.1f, src video "
 			"%d x %d, scaled video %.3f x %.3f, factor %.3f, render %d x %d, "
-			"x-ofs %d, y-ofs %d\n", max_width, max_height, fSourceWidth, 
-			fSourceHeight, scaled_width, scaled_height, factor, render_width, 
+			"x-ofs %d, y-ofs %d\n", max_width, max_height, fSourceWidth,
+			fSourceHeight, scaled_width, scaled_height, factor, render_width,
 			render_height, x_ofs, y_ofs);
 
 		fVideoView->MoveTo(x_ofs, y_ofs);
@@ -738,7 +738,7 @@ MainWin::AdjustFullscreenRenderer()
 		// no need to keep aspect ratio, make
 		// render cover the whole background
 		fVideoView->MoveTo(0, 0);
-		fVideoView->ResizeTo(fBackground->Bounds().Width(), 
+		fVideoView->ResizeTo(fBackground->Bounds().Width(),
 			fBackground->Bounds().Height());
 
 	}
@@ -753,7 +753,7 @@ MainWin::AdjustWindowedRenderer(bool user_resized)
 	// In windowed mode, the renderer always covers the
 	// whole background, accounting for the menu
 	fVideoView->MoveTo(0, fNoMenu ? 0 : fMenuBarHeight);
-	fVideoView->ResizeTo(fBackground->Bounds().Width(), 
+	fVideoView->ResizeTo(fBackground->Bounds().Width(),
 		fBackground->Bounds().Height() - (fNoMenu ? 0 : fMenuBarHeight));
 
 	if (fKeepAspectRatio) {
@@ -761,19 +761,19 @@ MainWin::AdjustWindowedRenderer(bool user_resized)
 		// do resize the window as required
 
 		float max_width  = Bounds().Width() + 1.0f;
-		float max_height = Bounds().Height() + 1.0f - (fNoMenu ? 0 
+		float max_height = Bounds().Height() + 1.0f - (fNoMenu ? 0
 			: fMenuBarHeight);
 		float scaled_width  = fSourceWidth * fWidthScale;
 		float scaled_height = fSourceHeight * fHeightScale;
 
-		if (!user_resized && (scaled_width > max_width 
+		if (!user_resized && (scaled_width > max_width
 			|| scaled_height > max_height)) {
 			// A format switch occured, and the window was
 			// smaller then the video source. As it was not
 			// initiated by the user resizing the window, we
 			// enlarge the window to fit the video.
 			fIgnoreFrameResized = true;
-			ResizeTo(scaled_width - 1, scaled_height - 1 
+			ResizeTo(scaled_width - 1, scaled_height - 1
 				+ (fNoMenu ? 0 : fMenuBarHeight));
 //			Sync();
 			return;
@@ -785,12 +785,12 @@ MainWin::AdjustWindowedRenderer(bool user_resized)
 
 		printf("AdjustWindowedRenderer: old display %d x %d, src video "
 			"%d x %d, scaled video %.3f x %.3f, aspect ratio %.3f, new "
-			"display %d x %d\n", int(max_width), int(max_height), 
+			"display %d x %d\n", int(max_width), int(max_height),
 			fSourceWidth, fSourceHeight, scaled_width, scaled_height,
 			display_aspect_ratio, new_width, new_height);
 
 		fIgnoreFrameResized = true;
-		ResizeTo(new_width - 1, new_height - 1 + (fNoMenu ? 0 
+		ResizeTo(new_width - 1, new_height - 1 + (fNoMenu ? 0
 			: fMenuBarHeight));
 //		Sync();
 	}
@@ -839,8 +839,8 @@ MainWin::ToggleFullscreen()
 //		Sync();
 
 		fSavedFrame = Frame();
-		printf("saving current frame: %d %d %d %d\n", int(fSavedFrame.left), 
-			int(fSavedFrame.top), int(fSavedFrame.right), 
+		printf("saving current frame: %d %d %d %d\n", int(fSavedFrame.left),
+			int(fSavedFrame.top), int(fSavedFrame.right),
 			int(fSavedFrame.bottom));
 		BScreen screen(this);
 		BRect rect(screen.Frame());
@@ -970,7 +970,7 @@ MainWin::KeyDown(BMessage *msg)
 	uint32 raw_char  = msg->FindInt32("raw_char");
 	uint32 modifiers = msg->FindInt32("modifiers");
 
-	printf("key 0x%lx, raw_char 0x%lx, modifiers 0x%lx\n", key, raw_char, 
+	printf("key 0x%lx, raw_char 0x%lx, modifiers 0x%lx\n", key, raw_char,
 		modifiers);
 
 	switch (raw_char) {
@@ -993,7 +993,7 @@ MainWin::KeyDown(BMessage *msg)
 				break;
 
 		case B_TAB:
-			if ((modifiers & (B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY 
+			if ((modifiers & (B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY
 				| B_MENU_KEY)) == 0) {
 				PostMessage(M_TOGGLE_FULLSCREEN);
 				return B_OK;
@@ -1086,17 +1086,17 @@ MainWin::KeyDown(BMessage *msg)
 void
 MainWin::DispatchMessage(BMessage *msg, BHandler *handler)
 {
-	if ((msg->what == B_MOUSE_DOWN) && (handler == fBackground 
+	if ((msg->what == B_MOUSE_DOWN) && (handler == fBackground
 		|| handler == fVideoView))
 		MouseDown(msg);
-	if ((msg->what == B_MOUSE_MOVED) && (handler == fBackground 
+	if ((msg->what == B_MOUSE_MOVED) && (handler == fBackground
 		|| handler == fVideoView))
 		MouseMoved(msg);
-	if ((msg->what == B_MOUSE_UP) && (handler == fBackground 
+	if ((msg->what == B_MOUSE_UP) && (handler == fBackground
 		|| handler == fVideoView))
 		MouseUp(msg);
 
-	if ((msg->what == B_KEY_DOWN) && (handler == fBackground 
+	if ((msg->what == B_KEY_DOWN) && (handler == fBackground
 		|| handler == fVideoView)) {
 
 		// special case for PrintScreen key
@@ -1229,7 +1229,7 @@ MainWin::MessageReceived(BMessage *msg)
 				ToggleFullscreen();
 			}
 			ResizeTo(int(fSourceWidth * fWidthScale),
-					 int(fSourceHeight * fHeightScale) + (fNoMenu ? 0 
+					 int(fSourceHeight * fHeightScale) + (fNoMenu ? 0
 					 	: fMenuBarHeight));
 //			Sync();
 			break;
@@ -1267,12 +1267,12 @@ MainWin::MessageReceived(BMessage *msg)
 			break;
 
 		default:
-			if (msg->what >= M_SELECT_CHANNEL 
+			if (msg->what >= M_SELECT_CHANNEL
 				&& msg->what <= M_SELECT_CHANNEL_END) {
 				SelectChannel(msg->what - M_SELECT_CHANNEL);
 				break;
 			}
-			if (msg->what >= M_SELECT_INTERFACE 
+			if (msg->what >= M_SELECT_INTERFACE
 				&& msg->what <= M_SELECT_INTERFACE_END) {
 				SelectInterface(msg->what - M_SELECT_INTERFACE - 1);
 				break;

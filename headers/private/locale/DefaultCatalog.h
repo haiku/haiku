@@ -46,9 +46,9 @@ class DefaultCatalog : public HashMapCatalog {
 		status_t SetRawString(const CatKey& key, const char *translated);
 		void SetSignature(const entry_ref &catalogOwner);
 
-		static BCatalogAddOn *Instantiate(const entry_ref& catalogOwner,
+		static BCatalogData *Instantiate(const entry_ref& catalogOwner,
 			const char *language, uint32 fingerprint);
-		static BCatalogAddOn *Create(const char *signature,
+		static BCatalogData *Create(const char *signature,
 			const char *language);
 
 		static const uint8 kDefaultCatalogAddOnPriority;

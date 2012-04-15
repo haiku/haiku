@@ -20,7 +20,7 @@ namespace BPrivate {
  * reading and writing the catalog to a file. Classes doing that are
  * HashMapCatalog and PlainTextCatalog.
  * If you ever need to create a catalog not built around an hash map, inherit
- * BCatalogAddOn instead. Note that in this case you will not be able to use our
+ * BCatalogData instead. Note that in this case you will not be able to use our
  * development tools anymore.
  */
 

@@ -89,8 +89,8 @@ StyledEditApp::StyledEditApp()
 	BApplication(APP_SIGNATURE),
 	fOpenPanel(NULL)
 {
-	B_TRANSLATE_MARK_SYSTEM_NAME("StyledEdit");
-	
+	B_TRANSLATE_MARK_SYSTEM_NAME_VOID("StyledEdit");
+
 	fOpenPanel = new BFilePanel();
 	fOpenAsEncoding = 0;
 

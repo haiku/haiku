@@ -51,7 +51,7 @@ main(int argc, char **argv)
 		exit(-1);
 	}
 	DefaultCatalog* inputCatImpl
-		= dynamic_cast<DefaultCatalog*>(inputCatalog.CatalogAddOn());
+		= dynamic_cast<DefaultCatalog*>(inputCatalog.CatalogData());
 	if (!inputCatImpl) {
 		fprintf(stderr, "couldn't access impl of input-catalog %s\n",
 			inputFile);

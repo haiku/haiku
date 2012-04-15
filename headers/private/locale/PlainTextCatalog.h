@@ -33,7 +33,7 @@ class PlainTextCatalog : public HashMapCatalog {
 		status_t ReadFromFile(const char *path = NULL);
 		status_t WriteToFile(const char *path = NULL);
 
-		static BCatalogAddOn *Instantiate(const char *signature,
+		static BCatalogData *Instantiate(const char *signature,
 			const char *language, uint32 fingerprint);
 
 		static const char *kCatMimeType;

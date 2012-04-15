@@ -396,7 +396,7 @@ PlainTextCatalog::UpdateAttributes(const char* path)
 }
 
 
-BCatalogAddOn *
+BCatalogData *
 PlainTextCatalog::Instantiate(const char *signature, const char *language,
 	uint32 fingerprint)
 {
@@ -410,7 +410,7 @@ PlainTextCatalog::Instantiate(const char *signature, const char *language,
 }
 
 
-extern "C" BCatalogAddOn *
+extern "C" BCatalogData *
 instantiate_catalog(const char *signature, const char *language,
 	uint32 fingerprint)
 {
@@ -424,7 +424,7 @@ instantiate_catalog(const char *signature, const char *language,
 }
 
 
-extern "C" BCatalogAddOn *
+extern "C" BCatalogData *
 create_catalog(const char *signature, const char *language)
 {
 	PlainTextCatalog *catalog

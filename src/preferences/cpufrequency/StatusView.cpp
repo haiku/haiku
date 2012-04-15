@@ -42,18 +42,16 @@ extern "C" _EXPORT BView *instantiate_deskbar_item(void);
  * and then collectcatkeys will not see the strings in the file.
  * So we mark them explicitly here.
  */
-void notUsed() {
-	B_TRANSLATE_MARK("Dynamic performance");
-	B_TRANSLATE_MARK("High performance");
-	B_TRANSLATE_MARK("Low energy");
-	B_TRANSLATE_MARK("Set state");
-	B_TRANSLATE_MARK("CPUFrequency\n"
-			"\twritten by Clemens Zeidler\n"
-			"\tCopyright 2009, Haiku, Inc.\n");
-	B_TRANSLATE_MARK("Ok");
-	B_TRANSLATE_MARK("Open Speedstep preferences" B_UTF8_ELLIPSIS);
-	B_TRANSLATE_MARK("Quit");
-}
+B_TRANSLATE_MARK_VOID("Dynamic performance");
+B_TRANSLATE_MARK_VOID("High performance");
+B_TRANSLATE_MARK_VOID("Low energy");
+B_TRANSLATE_MARK_VOID("Set state");
+B_TRANSLATE_MARK_VOID("CPUFrequency\n"
+	"\twritten by Clemens Zeidler\n"
+	"\tCopyright 2009, Haiku, Inc.\n");
+B_TRANSLATE_MARK_VOID("Ok");
+B_TRANSLATE_MARK_VOID("Open Speedstep preferences" B_UTF8_ELLIPSIS);
+B_TRANSLATE_MARK_VOID("Quit");
 
 // messages FrequencySwitcher
 const uint32 kMsgDynamicPolicyPulse = '&dpp';

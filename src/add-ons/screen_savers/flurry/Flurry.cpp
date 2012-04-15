@@ -59,8 +59,8 @@ FlurryView::FlurryView(BRect bounds)
 	fOldFrameTime(-1.0),
 	fFlurryInfo_t(NULL)
 {
-	B_TRANSLATE_MARK_SYSTEM_NAME("Flurry");
-	
+	B_TRANSLATE_MARK_SYSTEM_NAME_VOID("Flurry");
+
 	fWidth = bounds.Width();
 	fHeight = bounds.Height();
 	fStartTime = _CurrentTime();

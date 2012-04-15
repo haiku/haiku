@@ -100,7 +100,7 @@ main(int argc, char **argv)
 		exit(-1);
 	}
 	DefaultCatalog* targetCatImpl
-		= dynamic_cast<DefaultCatalog*>(targetCatalog.CatalogAddOn());
+		= dynamic_cast<DefaultCatalog*>(targetCatalog.CatalogData());
 	if (!targetCatImpl) {
 		fprintf(stderr, "couldn't access impl of target-catalog %s\n",
 			outputFile.String());
@@ -116,7 +116,7 @@ main(int argc, char **argv)
 			exit(-1);
 		}
 		HashMapCatalog* inputCatImpl
-			= dynamic_cast<HashMapCatalog*>(inputCatalog.CatalogAddOn());
+			= dynamic_cast<HashMapCatalog*>(inputCatalog.CatalogData());
 		if (!inputCatImpl) {
 			fprintf(stderr, "couldn't access impl of input-catalog %s\n",
 				inputFiles[i]);

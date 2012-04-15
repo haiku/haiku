@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010, Haiku. All rights reserved.
+ * Copyright 2003-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -67,8 +67,8 @@ CatalogAddOnInfo::~CatalogAddOnInfo()
 {
 	int32 count = fLoadedCatalogs.CountItems();
 	for (int32 i = 0; i < count; ++i) {
-		BCatalogAddOn* cat
-			= static_cast<BCatalogAddOn*>(fLoadedCatalogs.ItemAt(i));
+		BCatalogData* cat
+			= static_cast<BCatalogData*>(fLoadedCatalogs.ItemAt(i));
 		delete cat;
 	}
 	fLoadedCatalogs.MakeEmpty();
@@ -817,7 +817,7 @@ MutableLocaleRoster::LoadSystemCatalog(BCatalog* catalog) const
  * Any created catalog will be initialized with the given signature and
  * language-name.
  */
-BCatalogAddOn*
+BCatalogData*
 MutableLocaleRoster::CreateCatalog(const char* type, const char* signature,
 	const char* language)
 {
@@ -836,7 +836,7 @@ MutableLocaleRoster::CreateCatalog(const char* type, const char* signature,
 			|| !info->fCreateFunc)
 			continue;
 
-		BCatalogAddOn* catalog = info->fCreateFunc(signature, language);
+		BCatalogData* catalog = info->fCreateFunc(signature, language);
 		if (catalog) {
 			info->fLoadedCatalogs.AddItem(catalog);
 			info->UnloadIfPossible();
@@ -858,7 +858,7 @@ MutableLocaleRoster::CreateCatalog(const char* type, const char* signature,
  * instead of a single catalog.
  * NULL is returned if no matching catalog could be found.
  */
-BCatalogAddOn*
+BCatalogData*
 MutableLocaleRoster::LoadCatalog(const entry_ref& catalogOwner,
 	const char* language, int32 fingerprint) const
 {
@@ -881,7 +881,7 @@ MutableLocaleRoster::LoadCatalog(const entry_ref& catalogOwner,
 			// try to load catalogs for one of the preferred languages:
 			GetPreferredLanguages(&languages);
 
-		BCatalogAddOn* catalog = NULL;
+		BCatalogData* catalog = NULL;
 		const char* lang;
 		for (int32 l=0; languages.FindString("language", l, &lang)==B_OK; ++l) {
 			catalog = info->fInstantiateFunc(catalogOwner, lang, fingerprint);
@@ -895,8 +895,8 @@ MutableLocaleRoster::LoadCatalog(const entry_ref& catalogOwner,
 			// to "english"):
 			int32 pos;
 			BString langName(lang);
-			BCatalogAddOn* currCatalog = catalog;
-			BCatalogAddOn* nextCatalog = NULL;
+			BCatalogData* currCatalog = catalog;
+			BCatalogData* nextCatalog = NULL;
 			while ((pos = langName.FindLast('_')) >= 0) {
 				// language is based on parent, so we load that, too:
 				// (even if the parent catalog was not found)
@@ -928,7 +928,7 @@ MutableLocaleRoster::LoadCatalog(const entry_ref& catalogOwner,
  * Add-ons that have no more current catalogs are unloaded, too.
  */
 status_t
-MutableLocaleRoster::UnloadCatalog(BCatalogAddOn* catalog)
+MutableLocaleRoster::UnloadCatalog(BCatalogData* catalog)
 {
 	if (!catalog)
 		return B_BAD_VALUE;
@@ -938,7 +938,7 @@ MutableLocaleRoster::UnloadCatalog(BCatalogAddOn* catalog)
 		return B_ERROR;
 
 	status_t res = B_ERROR;
-	BCatalogAddOn* nextCatalog;
+	BCatalogData* nextCatalog;
 
 	while (catalog != NULL) {
 		nextCatalog = catalog->Next();

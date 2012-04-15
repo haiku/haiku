@@ -401,7 +401,7 @@ DefaultCatalog::Unflatten(BDataIO *dataIO)
 }
 
 
-BCatalogAddOn *
+BCatalogData *
 DefaultCatalog::Instantiate(const entry_ref &catalogOwner, const char *language,
 	uint32 fingerprint)
 {
@@ -415,7 +415,7 @@ DefaultCatalog::Instantiate(const entry_ref &catalogOwner, const char *language,
 }
 
 
-BCatalogAddOn *
+BCatalogData *
 DefaultCatalog::Create(const char *signature, const char *language)
 {
 	DefaultCatalog *catalog

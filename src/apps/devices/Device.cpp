@@ -41,15 +41,13 @@ const char* kCategoryString[] = {
 };
 
 // This list is only used to translate Device properties
-static const char* kTranslateMarkString[] = {
-	B_TRANSLATE_MARK("unknown"),
-	B_TRANSLATE_MARK("Device"),
-	B_TRANSLATE_MARK("Computer"),
-	B_TRANSLATE_MARK("ACPI bus"),
-	B_TRANSLATE_MARK("PCI bus"),
-	B_TRANSLATE_MARK("ISA bus"),
-	B_TRANSLATE_MARK("Unknown device")
-};
+B_TRANSLATE_MARK_VOID("unknown");
+B_TRANSLATE_MARK_VOID("Device");
+B_TRANSLATE_MARK_VOID("Computer");
+B_TRANSLATE_MARK_VOID("ACPI bus");
+B_TRANSLATE_MARK_VOID("PCI bus");
+B_TRANSLATE_MARK_VOID("ISA bus");
+B_TRANSLATE_MARK_VOID("Unknown device");
 
 
 Device::Device(Device* physicalParent, BusType busType, Category category,
@@ -150,8 +148,8 @@ Device::GetBasicStrings()
 							"Manufacturer\t\t\t: %Manufacturer%\n"
 							"Driver used\t\t\t\t: %DriverUsed%\n"
 							"Device paths\t: %DevicePaths%"));
-	
-	str.ReplaceFirst("%Name%", GetName()); 
+
+	str.ReplaceFirst("%Name%", GetName());
 	str.ReplaceFirst("%Manufacturer%", GetManufacturer());
 	str.ReplaceFirst("%DriverUsed%", GetDriverUsed());
 	str.ReplaceFirst("%DevicePaths%", GetDevPathsPublished());
@@ -168,8 +166,8 @@ Device::GetBusStrings()
 
 BString
 Device::GetBusTabName()
-{ 
-	return B_TRANSLATE("Bus Information"); 
+{
+	return B_TRANSLATE("Bus Information");
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT license.
  */
 #ifndef _MUTABLE_LOCALE_ROSTER_H_
@@ -21,7 +21,7 @@
 
 class BLocale;
 class BCatalog;
-class BCatalogAddOn;
+class BCatalogData;
 
 struct entry_ref;
 
@@ -44,28 +44,29 @@ public:
 									// the message contains one or more
 									// 'language'-string-fields which
 									// contain the language-name(s)
-			status_t			SetFilesystemTranslationPreferred(bool preferred);
+			status_t			SetFilesystemTranslationPreferred(
+									bool preferred);
 
 			status_t			LoadSystemCatalog(BCatalog* catalog) const;
 
-			BCatalogAddOn*		LoadCatalog(const entry_ref& catalogOwner,
+			BCatalogData*		LoadCatalog(const entry_ref& catalogOwner,
 									const char* language = NULL,
 									int32 fingerprint = 0) const;
-			status_t			UnloadCatalog(BCatalogAddOn* addOn);
+			status_t			UnloadCatalog(BCatalogData* catalogData);
 
-			BCatalogAddOn*		CreateCatalog(const char* type,
+			BCatalogData*		CreateCatalog(const char* type,
 									const char* signature,
 									const char* language);
 };
 
 
-typedef BCatalogAddOn* (*InstantiateCatalogFunc)(const entry_ref& catalogOwner,
+typedef BCatalogData* (*InstantiateCatalogFunc)(const entry_ref& catalogOwner,
 	const char* language, uint32 fingerprint);
 
-typedef BCatalogAddOn* (*CreateCatalogFunc)(const char* name,
+typedef BCatalogData* (*CreateCatalogFunc)(const char* name,
 	const char* language);
 
-typedef BCatalogAddOn* (*InstantiateEmbeddedCatalogFunc)(
+typedef BCatalogData* (*InstantiateEmbeddedCatalogFunc)(
 	entry_ref* appOrAddOnRef);
 
 typedef status_t (*GetAvailableLanguagesFunc)(BMessage*, const char*,

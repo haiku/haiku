@@ -15,7 +15,7 @@
 
 #include <assert.h>
 
-#include <Catalog.h>
+#include <CatalogData.h>
 #include <HashMap.h>
 #include <String.h>
 
@@ -61,7 +61,7 @@ class CatKey {
 };
 
 
-class HashMapCatalog: public BCatalogAddOn {
+class HashMapCatalog: public BCatalogData {
 	protected:
 		uint32 ComputeFingerprint() const;
 		typedef HashMap<CatKey, BString> CatMap;
@@ -72,7 +72,7 @@ class HashMapCatalog: public BCatalogAddOn {
 			uint32 fingerprint);
 			// Constructor for normal use
 			//
-		// overrides of BCatalogAddOn:
+		// overrides of BCatalogData:
 		const char *GetString(const char *string, const char *context = NULL,
 						const char *comment = NULL);
 		const char *GetString(uint32 id);
@@ -132,7 +132,7 @@ class HashMapCatalog: public BCatalogAddOn {
 inline HashMapCatalog::HashMapCatalog(const char* signature,
 	const char* language, uint32 fingerprint)
 	:
-	BCatalogAddOn(signature, language, fingerprint)
+	BCatalogData(signature, language, fingerprint)
 {
 }
 

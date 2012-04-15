@@ -1,4 +1,4 @@
-/* 
+/*
 **
 ** A simple analog clock screensaver.
 **
@@ -28,7 +28,7 @@ public:
 					Clock(BMessage *message, image_id id);
 	void			StartConfig(BView *view);
 	status_t		StartSaver(BView *v, bool preview);
-	void			Draw(BView *v, int32 frame);	
+	void			Draw(BView *v, int32 frame);
 	BStringView		*tview;
 private:
 	void 			DrawBlock(BView *view, float x, float y, float a, float size);
@@ -50,7 +50,7 @@ Clock::Clock(BMessage *message, image_id image)
 	:
 	BScreenSaver(message, image)
 {
-	B_TRANSLATE_MARK_SYSTEM_NAME("SimpleClock");
+	B_TRANSLATE_MARK_SYSTEM_NAME_VOID("SimpleClock");
 }
 
 
@@ -77,37 +77,37 @@ void Clock::DrawBlock(BView *view, float x, float y, float a, float size)
 		points[i].x= x+size*cos(angles[i]);
 		points[i].y= y+size*sin(angles[i]);
 	}
-	view->FillPolygon(&points[0],4);	
-	
+	view->FillPolygon(&points[0],4);
+
 }
 
 void Clock::DrawArrow(BView *view, float xc, float yc, float a, float len, float k, float width)
 {
-	float g = width/len;			
-	
+	float g = width/len;
+
 	float x = xc+(len)*cos(a);
 	float y = yc+(len)*sin(a);
-	
+
 	float size = len*k;
 
 	float angles[4]={a-g,a+g,a+(M_PI)-g,a+(M_PI)+g};
-	
+
 	BPoint points[4];
 	for(int i=0;i<4;i++) {
 		points[i].x= x+size*cos(angles[i]);
 		points[i].y= y+size*sin(angles[i]);
 	}
-	view->FillPolygon(&points[0],4);	
+	view->FillPolygon(&points[0],4);
 }
 
 void Clock::Draw(BView *view, int32)
-{	
+{
 	BScreen screen;
 	BBitmap buffer(view->Bounds(), screen.ColorSpace(), true);
 	BView offscreen(view->Bounds(), NULL, 0, 0);
 	buffer.AddChild(&offscreen);
 	buffer.Lock();
-	
+
 	int n;
 	float a,R;
 	float width = view->Bounds().Width();
@@ -122,23 +122,23 @@ void Clock::Draw(BView *view, int32)
 	todayhour   = TodayTime->tm_hour + (todayminute/60.0);
 
 	rgb_color bg_color = {0,0,0};
-	offscreen.SetHighColor(bg_color); 
+	offscreen.SetHighColor(bg_color);
 	offscreen.SetLowColor(bg_color);
 	offscreen.FillRect(offscreen.Bounds());
-	
+
 	offscreen.SetHighColor(200,200,200);
-	
+
 	for(n=0,a=0,R=510*zoom;n<60;n++,a+=(2*M_PI)/60) {
 		float x = width/2 + R * cos(a);
-		float y = height/2 + R * sin(a);		
+		float y = height/2 + R * sin(a);
 		DrawBlock(&offscreen,x,y,a,14*zoom);
 	}
 
 	offscreen.SetHighColor(255,255,255);
-	
+
 	for(n=0,a=0,R=500*zoom;n<12;n++,a+=(2*M_PI)/12) {
 		float x = width/2 + R * cos(a);
-		float y = height/2 + R * sin(a);		
+		float y = height/2 + R * sin(a);
 		DrawBlock(&offscreen,x,y,a,32*zoom);
 	}
 
@@ -147,7 +147,7 @@ void Clock::Draw(BView *view, int32)
 	DrawArrow(&offscreen, width/2,height/2, ( ((2*M_PI)/12) * todayhour) - (M_PI/2), 140*zoom, 1, 14*zoom);
 	offscreen.FillEllipse(BPoint(width/2,height/2),24*zoom,24*zoom);
 	offscreen.SetHighColor(250,20,20);
-	DrawArrow(&offscreen, width/2,height/2, ( ((2*M_PI)/60) * todaysecond) - (M_PI/2), 240*zoom, 1, 4*zoom);	
+	DrawArrow(&offscreen, width/2,height/2, ( ((2*M_PI)/60) * todaysecond) - (M_PI/2), 240*zoom, 1, 4*zoom);
 	offscreen.FillEllipse(BPoint(width/2,height/2),20*zoom,20*zoom);
 
 	offscreen.Sync();

@@ -12,7 +12,7 @@
 #include <String.h>
 
 
-class BCatalogAddOn;
+class BCatalogData;
 class BLocale;
 class BMessage;
 struct entry_ref;
@@ -30,11 +30,6 @@ public:
 									const char* context = NULL,
 									const char* comment = NULL);
 			const char*			GetString(uint32 id);
-
-			const char*			GetNoAutoCollectString(const char* string,
-									const char* context = NULL,
-									const char* comment = NULL);
-			const char*			GetNoAutoCollectString(uint32 id);
 
 			status_t			GetData(const char* name, BMessage* msg);
 			status_t			GetData(uint32 id, BMessage* msg);
@@ -55,7 +50,7 @@ protected:
 			const BCatalog&		operator= (const BCatalog&);
 									// hide assignment and copy-constructor
 
-			BCatalogAddOn*		fCatalog;
+			BCatalogData*		fCatalogData;
 	mutable	BLocker				fLock;
 
 private:
@@ -122,12 +117,13 @@ private:
 #undef B_TRANSLATE_SYSTEM_NAME
 #define B_TRANSLATE_SYSTEM_NAME(string) \
 	BLocaleRoster::Default()->IsFilesystemTranslationPreferred() \
-	? BLocaleRoster::Default()->GetCatalog()->GetString((string), \
-		B_TRANSLATE_SYSTEM_NAME_CONTEXT) : (string)
+		? BLocaleRoster::Default()->GetCatalog()->GetString((string), \
+			B_TRANSLATE_SYSTEM_NAME_CONTEXT) \
+		: (string)
 
 // Translation markers which can be used to mark static strings/IDs which
-// are used as key for translation requests (at other places in the code):
-/* example:
+// are used as key for translation requests (at other places in the code).
+/* Example:
 		#define B_TRANSLATE_CONTEXT "MyDecentApp-Menu"
 
 		static const char* choices[] = {
@@ -137,7 +133,8 @@ private:
 			B_TRANSLATE_MARK("down")
 		};
 
-		void MyClass::AddChoices(BMenu* menu) {
+		void MyClass::AddChoices(BMenu* menu)
+		{
 			for (char** ch = choices; *ch != '\0'; ++ch) {
 				menu->AddItem(
 					new BMenuItem(
@@ -149,46 +146,57 @@ private:
 		}
 */
 #undef B_TRANSLATE_MARK
-#define B_TRANSLATE_MARK(str) \
-	BCatalogAddOn::MarkForTranslation((str), B_TRANSLATE_CONTEXT, "")
+#define B_TRANSLATE_MARK(string) (string)
 
 #undef B_TRANSLATE_MARK_COMMENT
-#define B_TRANSLATE_MARK_COMMENT(str, cmt) \
-	BCatalogAddOn::MarkForTranslation((str), B_TRANSLATE_CONTEXT, (cmt))
+#define B_TRANSLATE_MARK_COMMENT(string, comment) (string)
 
 #undef B_TRANSLATE_MARK_ALL
-#define B_TRANSLATE_MARK_ALL(str, ctx, cmt) \
-	BCatalogAddOn::MarkForTranslation((str), (ctx), (cmt))
+#define B_TRANSLATE_MARK_ALL(string, context, comment) (string)
 
 #undef B_TRANSLATE_MARK_ID
-#define B_TRANSLATE_MARK_ID(id) \
-	BCatalogAddOn::MarkForTranslation((id))
+#define B_TRANSLATE_MARK_ID(id) (id)
 
 #undef B_TRANSLATE_MARK_SYSTEM_NAME
-#define B_TRANSLATE_MARK_SYSTEM_NAME(str) \
-	BCatalogAddOn::MarkForTranslation((str), B_TRANSLATE_SYSTEM_NAME_CONTEXT, "")
+#define B_TRANSLATE_MARK_SYSTEM_NAME(string) (string)
+
+// the same for void contexts:
+#undef B_TRANSLATE_MARK_VOID
+#define B_TRANSLATE_MARK_VOID(string)
+
+#undef B_TRANSLATE_MARK_COMMENT_VOID
+#define B_TRANSLATE_MARK_COMMENT_VOID(string, comment)
+
+#undef B_TRANSLATE_MARK_ALL_VOID
+#define B_TRANSLATE_MARK_ALL_VOID(string, context, comment)
+
+#undef B_TRANSLATE_MARK_ID_VOID
+#define B_TRANSLATE_MARK_ID_VOID(id)
+
+#undef B_TRANSLATE_MARK_SYSTEM_NAME_VOID
+#define B_TRANSLATE_MARK_SYSTEM_NAME_VOID(string)
 
 // Translation macros which do not let collectcatkeys try to collect the key
 // (useful in combination with the marking macros above):
 #undef B_TRANSLATE_NOCOLLECT
-#define B_TRANSLATE_NOCOLLECT(str) \
-	B_TRANSLATE(str)
+#define B_TRANSLATE_NOCOLLECT(string) \
+	B_TRANSLATE(string)
 
 #undef B_TRANSLATE_NOCOLLECT_COMMENT
-#define B_TRANSLATE_NOCOLLECT_COMMENT(str, cmt) \
-	B_TRANSLATE_COMMENT(str, cmt)
+#define B_TRANSLATE_NOCOLLECT_COMMENT(string, comment) \
+	B_TRANSLATE_COMMENT(string, comment)
 
 #undef B_TRANSLATE_NOCOLLECT_ALL
-#define B_TRANSLATE_NOCOLLECT_ALL(str, ctx, cmt) \
-	B_TRANSLATE_ALL(str, ctx, cmt)
+#define B_TRANSLATE_NOCOLLECT_ALL(string, context, comment) \
+	B_TRANSLATE_ALL(string, context, comment)
 
 #undef B_TRANSLATE_NOCOLLECT_ID
 #define B_TRANSLATE_NOCOLLECT_ID(id) \
 	B_TRANSLATE_ID(id)
 
 #undef B_TRANSLATE_NOCOLLECT_SYSTEM_NAME
-#define B_TRANSLATE_NOCOLLECT_SYSTEM_NAME(str) \
-	B_TRANSLATE_SYSTEM_NAME(str)
+#define B_TRANSLATE_NOCOLLECT_SYSTEM_NAME(string) \
+	B_TRANSLATE_SYSTEM_NAME(string)
 
 #endif	/* B_AVOID_TRANSLATION_MACROS */
 
@@ -226,176 +234,61 @@ private:
 	B_CATKEY((string), B_TRANSLATE_SYSTEM_NAME_CONTEXT)
 
 #undef B_TRANSLATE_MARK
-#define B_TRANSLATE_MARK(str) \
-	B_CATKEY((str), B_TRANSLATE_CONTEXT)
+#define B_TRANSLATE_MARK(string) \
+	B_CATKEY((string), B_TRANSLATE_CONTEXT)
 
 #undef B_TRANSLATE_MARK_COMMENT
-#define B_TRANSLATE_MARK_COMMENT(str, cmt) \
-	B_CATKEY((str), B_TRANSLATE_CONTEXT, (cmt))
+#define B_TRANSLATE_MARK_COMMENT(string, comment) \
+	B_CATKEY((string), B_TRANSLATE_CONTEXT, (comment))
 
 #undef B_TRANSLATE_MARK_ALL
-#define B_TRANSLATE_MARK_ALL(str, ctx, cmt) \
-	B_CATKEY((str), (ctx), (cmt))
+#define B_TRANSLATE_MARK_ALL(string, context, comment) \
+	B_CATKEY((string), (context), (comment))
 
 #undef B_TRANSLATE_MARK_ID
 #define B_TRANSLATE_MARK_ID(id) \
 	B_CATKEY((id))
 
 #undef B_TRANSLATE_MARK_SYSTEM_NAME
-#define B_TRANSLATE_MARK_SYSTEM_NAME(str) \
-	B_CATKEY((str), B_TRANSLATE_SYSTEM_NAME_CONTEXT, "")
+#define B_TRANSLATE_MARK_SYSTEM_NAME(string) \
+	B_CATKEY((string), B_TRANSLATE_SYSTEM_NAME_CONTEXT, "")
+
+#undef B_TRANSLATE_MARK_VOID
+#define B_TRANSLATE_MARK_VOID(string) \
+	B_CATKEY((string), B_TRANSLATE_CONTEXT)
+
+#undef B_TRANSLATE_MARK_COMMENT_VOID
+#define B_TRANSLATE_MARK_COMMENT_VOID(string, comment) \
+	B_CATKEY((string), B_TRANSLATE_CONTEXT, (comment))
+
+#undef B_TRANSLATE_MARK_ALL_VOID
+#define B_TRANSLATE_MARK_ALL_VOID(string, context, comment) \
+	B_CATKEY((string), (context), (comment))
+
+#undef B_TRANSLATE_MARK_ID_VOID
+#define B_TRANSLATE_MARK_ID_VOID(id) \
+	B_CATKEY((id))
+
+#undef B_TRANSLATE_MARK_SYSTEM_NAME_VOID
+#define B_TRANSLATE_MARK_SYSTEM_NAME_VOID(string) \
+	B_CATKEY((string), B_TRANSLATE_SYSTEM_NAME_CONTEXT, "")
 
 #undef B_TRANSLATE_NOCOLLECT
-#define B_TRANSLATE_NOCOLLECT(str) \
-	(void)
+#define B_TRANSLATE_NOCOLLECT(string)
 
 #undef B_TRANSLATE_NOCOLLECT_COMMENT
-#define B_TRANSLATE_NOCOLLECT_COMMENT(str, cmt) \
-	(void)
+#define B_TRANSLATE_NOCOLLECT_COMMENT(string, comment)
 
 #undef B_TRANSLATE_NOCOLLECT_ALL
-#define B_TRANSLATE_NOCOLLECT_ALL(str, ctx, cmt) \
-	(void)
+#define B_TRANSLATE_NOCOLLECT_ALL(string, context, comment)
 
 #undef B_TRANSLATE_NOCOLLECT_ID
-#define B_TRANSLATE_NOCOLLECT_ID(id) \
-	(void)
+#define B_TRANSLATE_NOCOLLECT_ID(id)
 
 #undef B_TRANSLATE_NOCOLLECT_SYSTEM_NAME
-#define B_TRANSLATE_NOCOLLECT_SYSTEM_NAME(str) \
-	(void)
+#define B_TRANSLATE_NOCOLLECT_SYSTEM_NAME(string)
 
 #endif	/* B_COLLECTING_CATKEYS */
-
-
-/************************************************************************/
-// For BCatalog add-on implementations:
-// TODO: should go into another header
-
-class BCatalogAddOn {
-public:
-								BCatalogAddOn(const char* signature,
-									const char* language,
-									uint32 fingerprint);
-	virtual						~BCatalogAddOn();
-
-	virtual	const char*			GetString(const char* string,
-									const char* context = NULL,
-									const char* comment = NULL) = 0;
-	virtual	const char*			GetString(uint32 id) = 0;
-
-			status_t			InitCheck() const;
-			BCatalogAddOn*		Next();
-
-	// the following could be used to localize non-textual data (e.g.
-	// icons), but these will only be implemented if there's demand for such
-	// a feature:
-	virtual	bool				CanHaveData() const;
-	virtual	status_t			GetData(const char* name, BMessage* msg);
-	virtual	status_t			GetData(uint32 id, BMessage* msg);
-
-	// interface for catalog-editor-app and testing apps:
-	virtual	status_t			SetString(const char* string,
-									const char* translated,
-									const char* context = NULL,
-									const char* comment = NULL);
-	virtual	status_t			SetString(int32 id, const char* translated);
-
-	virtual	bool				CanWriteData() const;
-	virtual	status_t			SetData(const char* name, BMessage* msg);
-	virtual	status_t			SetData(uint32 id, BMessage* msg);
-
-	virtual	status_t			ReadFromFile(const char* path = NULL);
-	virtual	status_t			ReadFromAttribute(
-									const entry_ref& appOrAddOnRef);
-	virtual	status_t			ReadFromResource(
-									const entry_ref& appOrAddOnRef);
-	virtual	status_t			WriteToFile(const char* path = NULL);
-	virtual	status_t			WriteToAttribute(
-									const entry_ref& appOrAddOnRef);
-	virtual	status_t			WriteToResource(
-									const entry_ref& appOrAddOnRef);
-
-	virtual	void				MakeEmpty();
-	virtual	int32				CountItems() const;
-
-	// magic marker functions which are used to mark a string/id
-	// which will be translated elsewhere in the code (where it can
-	// not be found since it is references by a variable):
-	static	const char*			MarkForTranslation(const char* string,
-									const char* context, const char* comment);
-	static	int32				MarkForTranslation(int32 id);
-
-			void				SetNext(BCatalogAddOn* next);
-
-protected:
-	virtual	void				UpdateFingerprint();
-
-protected:
-	friend	class BCatalog;
-	friend	status_t 			get_add_on_catalog(BCatalog*, const char*);
-
-			status_t 			fInitCheck;
-			BString 			fSignature;
-			BString 			fLanguageName;
-			uint32				fFingerprint;
-			BCatalogAddOn*		fNext;
-};
-
-// every catalog-add-on should export these symbols...
-// ...the function that instantiates a catalog for this add-on-type...
-extern "C"
-BCatalogAddOn* instantiate_catalog(const char* signature, const char* language,
-	uint32 fingerprint);
-
-// ...the function that creates an empty catalog for this add-on-type...
-extern "C"
-BCatalogAddOn* create_catalog(const char* signature, const char* language);
-
-// ...and the priority which will be used to order the catalog-add-ons:
-extern uint8 gCatalogAddOnPriority;
-
-
-/*
- * BCatalog - inlines for trivial accessors:
- */
-inline const char*
-BCatalog::GetNoAutoCollectString(const char* string, const char* context,
-	const char* comment)
-{
-	return GetString(string, context, comment);
-}
-
-
-inline const char*
-BCatalog::GetNoAutoCollectString(uint32 id)
-{
-	return GetString(id);
-}
-
-
-/*
- * BCatalogAddOn - inlines for trivial accessors:
- */
-inline BCatalogAddOn*
-BCatalogAddOn::Next()
-{
-	return fNext;
-}
-
-inline const char*
-BCatalogAddOn::MarkForTranslation(const char* str, const char* /* context */,
-	const char* /* comment */)
-{
-	return str;
-}
-
-
-inline int32
-BCatalogAddOn::MarkForTranslation(int32 id)
-{
-	return id;
-}
 
 
 #endif /* _CATALOG_H_ */

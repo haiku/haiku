@@ -11,20 +11,20 @@
 #include <Roster.h>
 
 
-int 
+int
 main(int argc, char **argv)
 {
-	B_TRANSLATE_MARK_SYSTEM_NAME("Tracker");
+	B_TRANSLATE_MARK_SYSTEM_NAME_VOID("Tracker");
 	BApplication app("application/x-vnd.Haiku-TrackerPreferences");
-	
+
 	// launch Tracker if it's not running
 	be_roster->Launch("application/x-vnd.Be-TRAK");
-	
-	BMessage message;	
-	message.what = B_EXECUTE_PROPERTY;	
+
+	BMessage message;
+	message.what = B_EXECUTE_PROPERTY;
 	message.AddSpecifier("Preferences");
-	
+
 	BMessenger("application/x-vnd.Be-TRAK").SendMessage(&message);
-	
+
 	return 0;
 }

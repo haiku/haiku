@@ -46,7 +46,7 @@ public:
 
 			void				MakeEmpty();
 
-			BCatalogAddOn*		CatalogAddOn();
+			BCatalogData*		CatalogData();
 
 private:
 								EditableCatalog();

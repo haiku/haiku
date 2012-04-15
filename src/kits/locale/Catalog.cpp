@@ -10,6 +10,7 @@
 
 #include <Application.h>
 #include <Autolock.h>
+#include <CatalogData.h>
 #include <Locale.h>
 #include <MutableLocaleRoster.h>
 #include <Node.h>
@@ -22,7 +23,7 @@ using BPrivate::MutableLocaleRoster;
 //#pragma mark - BCatalog
 BCatalog::BCatalog()
 	:
-	fCatalog(NULL),
+	fCatalogData(NULL),
 	fLock("Catalog")
 {
 }
@@ -31,7 +32,7 @@ BCatalog::BCatalog()
 BCatalog::BCatalog(const entry_ref& catalogOwner, const char* language,
 	uint32 fingerprint)
 	:
-	fCatalog(NULL),
+	fCatalogData(NULL),
 	fLock("Catalog")
 {
 	SetTo(catalogOwner, language, fingerprint);
@@ -40,7 +41,7 @@ BCatalog::BCatalog(const entry_ref& catalogOwner, const char* language,
 
 BCatalog::~BCatalog()
 {
-	MutableLocaleRoster::Default()->UnloadCatalog(fCatalog);
+	MutableLocaleRoster::Default()->UnloadCatalog(fCatalogData);
 }
 
 
@@ -53,7 +54,7 @@ BCatalog::GetString(const char* string, const char* context,
 		return string;
 
 	const char* translated;
-	for (BCatalogAddOn* cat = fCatalog; cat != NULL; cat = cat->fNext) {
+	for (BCatalogData* cat = fCatalogData; cat != NULL; cat = cat->fNext) {
 		translated = cat->GetString(string, context, comment);
 		if (translated != NULL)
 			return translated;
@@ -71,7 +72,7 @@ BCatalog::GetString(uint32 id)
 		return "";
 
 	const char* translated;
-	for (BCatalogAddOn* cat = fCatalog; cat != NULL; cat = cat->fNext) {
+	for (BCatalogData* cat = fCatalogData; cat != NULL; cat = cat->fNext) {
 		translated = cat->GetString(id);
 		if (translated != NULL)
 			return translated;
@@ -88,11 +89,11 @@ BCatalog::GetData(const char* name, BMessage* msg)
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	if (fCatalog == NULL)
+	if (fCatalogData == NULL)
 		return B_NO_INIT;
 
 	status_t res;
-	for (BCatalogAddOn* cat = fCatalog; cat != NULL; cat = cat->fNext) {
+	for (BCatalogData* cat = fCatalogData; cat != NULL; cat = cat->fNext) {
 		res = cat->GetData(name, msg);
 		if (res != B_NAME_NOT_FOUND && res != EOPNOTSUPP)
 			return res;	// return B_OK if found, or specific error-code
@@ -109,11 +110,11 @@ BCatalog::GetData(uint32 id, BMessage* msg)
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	if (fCatalog == NULL)
+	if (fCatalogData == NULL)
 		return B_NO_INIT;
 
 	status_t res;
-	for (BCatalogAddOn* cat = fCatalog; cat != NULL; cat = cat->fNext) {
+	for (BCatalogData* cat = fCatalogData; cat != NULL; cat = cat->fNext) {
 		res = cat->GetData(id, msg);
 		if (res != B_NAME_NOT_FOUND && res != EOPNOTSUPP)
 			return res;	// return B_OK if found, or specific error-code
@@ -133,10 +134,10 @@ BCatalog::GetSignature(BString* sig)
 	if (sig == NULL)
 		return B_BAD_VALUE;
 
-	if (fCatalog == NULL)
+	if (fCatalogData == NULL)
 		return B_NO_INIT;
 
-	*sig = fCatalog->fSignature;
+	*sig = fCatalogData->fSignature;
 
 	return B_OK;
 }
@@ -152,10 +153,10 @@ BCatalog::GetLanguage(BString* lang)
 	if (lang == NULL)
 		return B_BAD_VALUE;
 
-	if (fCatalog == NULL)
+	if (fCatalogData == NULL)
 		return B_NO_INIT;
 
-	*lang = fCatalog->fLanguageName;
+	*lang = fCatalogData->fLanguageName;
 
 	return B_OK;
 }
@@ -171,10 +172,10 @@ BCatalog::GetFingerprint(uint32* fp)
 	if (fp == NULL)
 		return B_BAD_VALUE;
 
-	if (fCatalog == NULL)
+	if (fCatalogData == NULL)
 		return B_NO_INIT;
 
-	*fp = fCatalog->fFingerprint;
+	*fp = fCatalogData->fFingerprint;
 
 	return B_OK;
 }
@@ -188,8 +189,8 @@ BCatalog::SetTo(const entry_ref& catalogOwner, const char* language,
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	MutableLocaleRoster::Default()->UnloadCatalog(fCatalog);
-	fCatalog = MutableLocaleRoster::Default()->LoadCatalog(catalogOwner,
+	MutableLocaleRoster::Default()->UnloadCatalog(fCatalogData);
+	fCatalogData = MutableLocaleRoster::Default()->LoadCatalog(catalogOwner,
 		language, fingerprint);
 
 	return B_OK;
@@ -203,7 +204,7 @@ BCatalog::InitCheck() const
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	return fCatalog != NULL	? fCatalog->InitCheck() : B_NO_INIT;
+	return fCatalogData != NULL	? fCatalogData->InitCheck() : B_NO_INIT;
 }
 
 
@@ -214,159 +215,5 @@ BCatalog::CountItems() const
 	if (!lock.IsLocked())
 		return 0;
 
-	return fCatalog != NULL ? fCatalog->CountItems() : 0;
-}
-
-
-//#pragma mark - BCatalogAddOn
-BCatalogAddOn::BCatalogAddOn(const char* signature, const char* language,
-	uint32 fingerprint)
-	:
-	fInitCheck(B_NO_INIT),
-	fSignature(signature),
-	fLanguageName(language),
-	fFingerprint(fingerprint),
-	fNext(NULL)
-{
-	fLanguageName.ToLower();
-		// canonicalize language-name to lowercase
-}
-
-
-BCatalogAddOn::~BCatalogAddOn()
-{
-}
-
-
-void
-BCatalogAddOn::UpdateFingerprint()
-{
-	fFingerprint = 0;
-		// base implementation always yields the same fingerprint,
-		// which means that no version-mismatch detection is possible.
-}
-
-
-status_t
-BCatalogAddOn::InitCheck() const
-{
-	return fInitCheck;
-}
-
-
-bool
-BCatalogAddOn::CanHaveData() const
-{
-	return false;
-}
-
-
-status_t
-BCatalogAddOn::GetData(const char* name, BMessage* msg)
-{
-	return EOPNOTSUPP;
-}
-
-
-status_t
-BCatalogAddOn::GetData(uint32 id, BMessage* msg)
-{
-	return EOPNOTSUPP;
-}
-
-
-status_t
-BCatalogAddOn::SetString(const char* string, const char* translated,
-	const char* context, const char* comment)
-{
-	return EOPNOTSUPP;
-}
-
-
-status_t
-BCatalogAddOn::SetString(int32 id, const char* translated)
-{
-	return EOPNOTSUPP;
-}
-
-
-bool
-BCatalogAddOn::CanWriteData() const
-{
-	return false;
-}
-
-
-status_t
-BCatalogAddOn::SetData(const char* name, BMessage* msg)
-{
-	return EOPNOTSUPP;
-}
-
-
-status_t
-BCatalogAddOn::SetData(uint32 id, BMessage* msg)
-{
-	return EOPNOTSUPP;
-}
-
-
-status_t
-BCatalogAddOn::ReadFromFile(const char* path)
-{
-	return EOPNOTSUPP;
-}
-
-
-status_t
-BCatalogAddOn::ReadFromAttribute(const entry_ref& appOrAddOnRef)
-{
-	return EOPNOTSUPP;
-}
-
-
-status_t
-BCatalogAddOn::ReadFromResource(const entry_ref& appOrAddOnRef)
-{
-	return EOPNOTSUPP;
-}
-
-
-status_t
-BCatalogAddOn::WriteToFile(const char* path)
-{
-	return EOPNOTSUPP;
-}
-
-
-status_t
-BCatalogAddOn::WriteToAttribute(const entry_ref& appOrAddOnRef)
-{
-	return EOPNOTSUPP;
-}
-
-
-status_t
-BCatalogAddOn::WriteToResource(const entry_ref& appOrAddOnRef)
-{
-	return EOPNOTSUPP;
-}
-
-
-void BCatalogAddOn::MakeEmpty()
-{
-}
-
-
-int32
-BCatalogAddOn::CountItems() const
-{
-	return 0;
-}
-
-
-void
-BCatalogAddOn::SetNext(BCatalogAddOn* next)
-{
-	fNext = next;
+	return fCatalogData != NULL ? fCatalogData->CountItems() : 0;
 }

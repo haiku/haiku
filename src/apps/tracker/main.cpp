@@ -52,7 +52,7 @@ All rights reserved.
 
 int main(int , char **)
 {
-#ifdef PROFILE 
+#ifdef PROFILE
 	PROFILE_INIT(1024);
 #endif
 
@@ -60,12 +60,12 @@ int main(int , char **)
 	SetNewLeakChecking(true);
 	SetMallocLeakChecking(true);
 #endif
-	B_TRANSLATE_MARK_SYSTEM_NAME("Tracker");
+	B_TRANSLATE_MARK_SYSTEM_NAME_VOID("Tracker");
 
 	TTracker tracker;
 	tracker.Run();
 
-#ifdef PROFILE 
+#ifdef PROFILE
 	PROFILE_DUMP("/boot/home/Desktop/trackerProfile");
 #endif
 

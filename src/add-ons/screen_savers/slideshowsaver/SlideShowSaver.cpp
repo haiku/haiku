@@ -11,18 +11,18 @@
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
 // to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
+// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+// and/or sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included 
+// The above copyright notice and this permission notice shall be included
 // in all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 // OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 // THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
@@ -62,11 +62,11 @@ ent_is_dir(const entry_ref *ref)
 	BEntry ent(ref);
 	if (ent.InitCheck() != B_OK)
 		return B_ERROR;
-		
+
 	struct stat st;
 	if (ent.GetStat(&st) != B_OK)
 		return B_ERROR;
-	
+
 	return S_ISDIR(st.st_mode) ? (B_OK + 1) : B_OK;
 }
 
@@ -94,18 +94,18 @@ SlideShowSaver::SlideShowSaver(BMessage *archive, image_id image)
 	:
 	BScreenSaver(archive, image), fLock("SlideShow Lock")
 {
-	B_TRANSLATE_MARK_SYSTEM_NAME("SlideShowSaver");
-	
+	B_TRANSLATE_MARK_SYSTEM_NAME_VOID("SlideShowSaver");
+
 	fNewDirectory = true;
 	fBitmap = NULL;
 	fShowBorder = true;
 	fShowCaption = true;
-	
+
 	fSettings = new LiveSettings("SlideShowSaver_Settings",
 		gDefaultSettings, sizeof(gDefaultSettings) / sizeof(LiveSetting));
 	fSettings->LoadSettings();
 		// load settings from the settings file
-		
+
 	fSettings->AddObserver(this);
 }
 
@@ -113,8 +113,8 @@ SlideShowSaver::~SlideShowSaver()
 {
 	delete fBitmap;
 	fBitmap = NULL;
-	
-	fSettings->RemoveObserver(this);	
+
+	fSettings->RemoveObserver(this);
 	fSettings->Release();
 }
 
@@ -152,7 +152,7 @@ SlideShowSaver::UpdateTickSize()
 	bigtime_t ticks = static_cast<bigtime_t>
 		(fSettings->SetGetInt32(SAVER_SETTING_DELAY)) * 1000;
 	SetTickSize(ticks);
-	
+
 	return B_OK;
 }
 
@@ -174,23 +174,23 @@ status_t
 SlideShowSaver::UpdateDirectory()
 {
 	status_t result = B_OK;
-	
+
 	fLock.Lock();
-	
+
 	BString strDirectory;
 	fSettings->GetString(SAVER_SETTING_DIRECTORY, strDirectory);
 	BDirectory dir(strDirectory.String());
 	if (dir.InitCheck() != B_OK || dir.GetNextRef(&fCurrentRef) != B_OK)
 		result = B_ERROR;
-	// Use ShowNextImage to find which translatable image is 
+	// Use ShowNextImage to find which translatable image is
 	// alphabetically first in the given directory, and load it
 	if (result == B_OK && ShowNextImage(true, true) == false)
 		result = B_ERROR;
-		
+
 	fNewDirectory = true;
-			
+
 	fLock.Unlock();
-		
+
 	return result;
 }
 
@@ -207,25 +207,25 @@ SlideShowSaver::StartSaver(BView *view, bool preview)
 {
 	UpdateShowCaption();
 	UpdateShowBorder();
-	
+
 	if (UpdateDirectory() != B_OK)
 		return B_ERROR;
-	
+
 	// Read ticksize setting and set it as the delay
 	UpdateTickSize();
-	
-	return B_OK; 
-} 
+
+	return B_OK;
+}
 
 void
 SlideShowSaver::Draw(BView *view, int32 frame)
 {
 	fLock.Lock();
-	
+
 	view->SetLowColor(0, 0, 0);
 	view->SetHighColor(192, 192, 192);
 	view->SetViewColor(192, 192, 192);
-	
+
 	bool bResult = false;
 	if (fNewDirectory == true) {
 		// Already have a bitmap on the first frame
@@ -234,10 +234,10 @@ SlideShowSaver::Draw(BView *view, int32 frame)
 		bResult = ShowNextImage(true, false);
 		// try rewinding to beginning
 		if (bResult == false)
-			bResult = ShowNextImage(true, true);		
+			bResult = ShowNextImage(true, true);
 	}
 	fNewDirectory = false;
-	
+
 	if (bResult == true && fBitmap != NULL) {
 		BRect destRect(0, 0, fBitmap->Bounds().Width(), fBitmap->Bounds().Height()),
 			vwBounds = view->Bounds();
@@ -248,7 +248,7 @@ SlideShowSaver::Draw(BView *view, int32 frame)
 		if (destRect.Height() < vwBounds.Height()) {
 			destRect.OffsetBy(0, (vwBounds.Height() - destRect.Height()) / 2);
 		}
-		
+
 		BRect border = destRect, bounds = view->Bounds();
 		// top
 		view->FillRect(BRect(0, 0, bounds.right, border.top-1), B_SOLID_LOW);
@@ -258,19 +258,19 @@ SlideShowSaver::Draw(BView *view, int32 frame)
 		view->FillRect(BRect(border.right+1, border.top, bounds.right, border.bottom), B_SOLID_LOW);
 		// bottom
 		view->FillRect(BRect(0, border.bottom+1, bounds.right, bounds.bottom), B_SOLID_LOW);
-		
+
 		if (fShowBorder == true) {
 			BRect strokeRect = destRect;
 			strokeRect.InsetBy(-1, -1);
 			view->StrokeRect(strokeRect);
 		}
-		
+
 		view->DrawBitmap(fBitmap, fBitmap->Bounds(), destRect);
-		
+
 		if (fShowCaption == true)
 			DrawCaption(view);
 	}
-	
+
 	fLock.Unlock();
 }
 
@@ -303,7 +303,7 @@ SlideShowSaver::SetImage(const entry_ref *pref)
 	if (proster->Identify(&file, &ioExtension, &info, 0, NULL,
 		B_TRANSLATOR_BITMAP) != B_OK)
 		return B_ERROR;
-	
+
 	// Translate image data and create a new ShowImage window
 	BBitmapStream outstream;
 	if (proster->Translate(&file, &info, &ioExtension, &outstream,
@@ -312,15 +312,15 @@ SlideShowSaver::SetImage(const entry_ref *pref)
 	BBitmap *newBitmap = NULL;
 	if (outstream.DetachBitmap(&newBitmap) != B_OK)
 		return B_ERROR;
-		
+
 	// Now that I've successfully loaded the new bitmap,
-	// I can be sure it is safe to delete the old one, 
+	// I can be sure it is safe to delete the old one,
 	// and clear everything
 	delete fBitmap;
 	fBitmap = newBitmap;
 	newBitmap = NULL;
 	fCurrentRef = ref;
-	
+
 	// Get path to use in caption
 	fCaption = "<< Unable to read the path >>";
 	BEntry entry(&fCurrentRef);
@@ -340,7 +340,7 @@ SlideShowSaver::ShowNextImage(bool next, bool rewind)
 {
 	bool found;
 	entry_ref curRef, imgRef;
-	
+
 	curRef = fCurrentRef;
 	found = FindNextImage(&curRef, &imgRef, next, rewind);
 	if (found) {
@@ -367,7 +367,7 @@ SlideShowSaver::IsImage(const entry_ref *pref)
 {
 	if (!pref)
 		return false;
-		
+
 	if (ent_is_dir(pref) != B_OK)
 		// if ref is erroneous or a directory, return false
 		return false;
@@ -379,7 +379,7 @@ SlideShowSaver::IsImage(const entry_ref *pref)
 	BTranslatorRoster *proster = BTranslatorRoster::Default();
 	if (!proster)
 		return false;
-		
+
 	BMessage ioExtension;
 	if (ioExtension.AddInt32("/documentIndex", 1) != B_OK)
 		return false;
@@ -389,7 +389,7 @@ SlideShowSaver::IsImage(const entry_ref *pref)
 	if (proster->Identify(&file, &ioExtension, &info, 0, NULL,
 		B_TRANSLATOR_BITMAP) != B_OK)
 		return false;
-		
+
 	return true;
 }
 
@@ -405,7 +405,7 @@ SlideShowSaver::FindNextImage(entry_ref *in_current, entry_ref *out_image, bool 
 	BList entries;
 	bool found = false;
 	int32 cur;
-	
+
 	if (curImage.GetParent(&parent) != B_OK)
 		return false;
 
@@ -417,15 +417,15 @@ SlideShowSaver::FindNextImage(entry_ref *in_current, entry_ref *out_image, bool 
 			entries.AddItem(in_current);
 		}
 	}
-	
+
 	entries.SortItems(CompareEntries);
-	
+
 	cur = entries.IndexOf(in_current);
 //	ASSERT(cur >= 0);
 
 	// remove it so FreeEntries() does not delete it
 	entries.RemoveItem(in_current);
-	
+
 	if (next) {
 		// find the next image in the list
 		if (rewind) cur = 0; // start with first
@@ -461,7 +461,7 @@ SlideShowSaver::FreeEntries(BList *entries)
 	const int32 n = entries->CountItems();
 	for (int32 i = 0; i < n; i ++) {
 		entry_ref *ref = (entry_ref *)entries->ItemAt(i);
-		delete ref;		
+		delete ref;
 	}
 	entries->MakeEmpty();
 }
@@ -480,20 +480,20 @@ SlideShowSaver::LayoutCaption(BView *view, BFont &font, BPoint &pos, BRect &rect
 	pos.x = (bounds.left + bounds.right - width)/2;
 	// flush bottom
 	pos.y = bounds.bottom - fontHeight.descent - 5;
-	
+
 	// background rectangle
 	rect.Set(0, 0, (width-1)+2, (height-1)+2+1); // 2 for border and 1 for text shadow
 	rect.OffsetTo(pos);
 	rect.OffsetBy(-1, -1-fontHeight.ascent); // -1 for border
 }
-		
+
 void
 SlideShowSaver::DrawCaption(BView *view)
 {
 	BFont font;
 	BPoint pos;
 	BRect rect;
-	LayoutCaption(view, font, pos, rect);		
+	LayoutCaption(view, font, pos, rect);
 
 	view->PushState();
 	// draw background

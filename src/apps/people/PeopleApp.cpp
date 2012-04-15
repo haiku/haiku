@@ -73,7 +73,7 @@ TPeopleApp::TPeopleApp()
 	fWindowCount(0),
 	fAttributes(20, true)
 {
-	B_TRANSLATE_MARK_SYSTEM_NAME("People");
+	B_TRANSLATE_MARK_SYSTEM_NAME_VOID("People");
 
 	fPosition.Set(6, TITLE_BAR_HEIGHT, 6 + WIND_WIDTH,
 		TITLE_BAR_HEIGHT + WIND_HEIGHT);
