@@ -63,8 +63,6 @@ private:
 #define B_TRANSLATE_SYSTEM_NAME_CONTEXT "System name"
 
 
-#ifndef B_COLLECTING_CATKEYS
-
 #ifndef B_AVOID_TRANSLATION_MACROS
 // macros for easy catalog-access, define B_AVOID_TRANSLATION_MACROS if
 // you don't want these (in which case you need to collect the catalog keys
@@ -199,96 +197,6 @@ private:
 	B_TRANSLATE_SYSTEM_NAME(string)
 
 #endif	/* B_AVOID_TRANSLATION_MACROS */
-
-#else	/* B_COLLECTING_CATKEYS */
-// TODO: why define them here? Since we obviously control the preprocessor, we
-// could simply always include a certain file that defines them; this doesn't
-// really belong into a public header.
-
-// Translation macros used when executing collectcatkeys
-
-#undef B_TRANSLATE_CONTEXT
-
-#undef B_TRANSLATE
-#define B_TRANSLATE(string) \
-	B_CATKEY((string), B_TRANSLATE_CONTEXT)
-
-#undef B_TRANSLATE_WITH_CONTEXT
-#define B_TRANSLATE_WITH_CONTEXT(string, context) \
-	B_CATKEY((string), (context))
-
-#undef B_TRANSLATE_COMMENT
-#define B_TRANSLATE_COMMENT(string, comment) \
-	B_CATKEY((string), B_TRANSLATE_CONTEXT, (comment))
-
-#undef B_TRANSLATE_ALL
-#define B_TRANSLATE_ALL(string, context, comment) \
-	B_CATKEY((string), (context), (comment))
-
-#undef B_TRANSLATE_ID
-#define B_TRANSLATE_ID(id) \
-	B_CATKEY((id))
-
-#undef B_TRANSLATE_SYSTEM_NAME
-#define B_TRANSLATE_SYSTEM_NAME(string) \
-	B_CATKEY((string), B_TRANSLATE_SYSTEM_NAME_CONTEXT)
-
-#undef B_TRANSLATE_MARK
-#define B_TRANSLATE_MARK(string) \
-	B_CATKEY((string), B_TRANSLATE_CONTEXT)
-
-#undef B_TRANSLATE_MARK_COMMENT
-#define B_TRANSLATE_MARK_COMMENT(string, comment) \
-	B_CATKEY((string), B_TRANSLATE_CONTEXT, (comment))
-
-#undef B_TRANSLATE_MARK_ALL
-#define B_TRANSLATE_MARK_ALL(string, context, comment) \
-	B_CATKEY((string), (context), (comment))
-
-#undef B_TRANSLATE_MARK_ID
-#define B_TRANSLATE_MARK_ID(id) \
-	B_CATKEY((id))
-
-#undef B_TRANSLATE_MARK_SYSTEM_NAME
-#define B_TRANSLATE_MARK_SYSTEM_NAME(string) \
-	B_CATKEY((string), B_TRANSLATE_SYSTEM_NAME_CONTEXT, "")
-
-#undef B_TRANSLATE_MARK_VOID
-#define B_TRANSLATE_MARK_VOID(string) \
-	B_CATKEY((string), B_TRANSLATE_CONTEXT)
-
-#undef B_TRANSLATE_MARK_COMMENT_VOID
-#define B_TRANSLATE_MARK_COMMENT_VOID(string, comment) \
-	B_CATKEY((string), B_TRANSLATE_CONTEXT, (comment))
-
-#undef B_TRANSLATE_MARK_ALL_VOID
-#define B_TRANSLATE_MARK_ALL_VOID(string, context, comment) \
-	B_CATKEY((string), (context), (comment))
-
-#undef B_TRANSLATE_MARK_ID_VOID
-#define B_TRANSLATE_MARK_ID_VOID(id) \
-	B_CATKEY((id))
-
-#undef B_TRANSLATE_MARK_SYSTEM_NAME_VOID
-#define B_TRANSLATE_MARK_SYSTEM_NAME_VOID(string) \
-	B_CATKEY((string), B_TRANSLATE_SYSTEM_NAME_CONTEXT, "")
-
-#undef B_TRANSLATE_NOCOLLECT
-#define B_TRANSLATE_NOCOLLECT(string)
-
-#undef B_TRANSLATE_NOCOLLECT_COMMENT
-#define B_TRANSLATE_NOCOLLECT_COMMENT(string, comment)
-
-#undef B_TRANSLATE_NOCOLLECT_ALL
-#define B_TRANSLATE_NOCOLLECT_ALL(string, context, comment)
-
-#undef B_TRANSLATE_NOCOLLECT_ID
-#define B_TRANSLATE_NOCOLLECT_ID(id)
-
-#undef B_TRANSLATE_NOCOLLECT_SYSTEM_NAME
-#define B_TRANSLATE_NOCOLLECT_SYSTEM_NAME(string)
-
-#endif	/* B_COLLECTING_CATKEYS */
 
 
 #endif /* _CATALOG_H_ */
