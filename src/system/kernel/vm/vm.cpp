@@ -676,9 +676,10 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		addr_t oldBase = area->Base();
 		addr_t newBase = lastAddress + 1;
 		size_t newSize = areaLast - lastAddress;
+		size_t newOffset = newBase - oldBase;
 
 		// unmap pages
-		unmap_pages(area, oldBase, newBase - oldBase);
+		unmap_pages(area, oldBase, newOffset);
 
 		// resize the area
 		status_t error = addressSpace->ShrinkAreaHead(area, newSize,
@@ -686,9 +687,17 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		if (error != B_OK)
 			return error;
 
-		// TODO: If no one else uses the area's cache, we should resize it, too!
-
-		area->cache_offset += newBase - oldBase;
+		// If no one else uses the area's cache, we can resize it, too.
+		if (cache->areas == area && area->cache_next == NULL
+			&& cache->consumers.IsEmpty()
+			&& cache->type == CACHE_TYPE_RAM) {
+			// Since VMCache::Rebase() can temporarily drop the lock, we must
+			// unlock all lower caches to prevent locking order inversion.
+			cacheChainLocker.Unlock(cache);
+			cache->Rebase(cache->virtual_base + newOffset, priority);
+			cache->ReleaseRefAndUnlock();
+		}
+		area->cache_offset += newOffset;
 
 		return B_OK;
 	}
@@ -696,7 +705,6 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 	// The tough part -- cut a piece out of the middle of the area.
 	// We do that by shrinking the area to the begin section and creating a
 	// new area for the end section.
-
 	addr_t firstNewSize = address - area->Base();
 	addr_t secondBase = lastAddress + 1;
 	addr_t secondSize = areaLast - lastAddress;
@@ -711,26 +719,74 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 	if (error != B_OK)
 		return error;
 
-	// TODO: If no one else uses the area's cache, we might want to create a
-	// new cache for the second area, transfer the concerned pages from the
-	// first cache to it and resize the first cache.
-
-	// map the second area
 	virtual_address_restrictions addressRestrictions = {};
 	addressRestrictions.address = (void*)secondBase;
 	addressRestrictions.address_specification = B_EXACT_ADDRESS;
 	VMArea* secondArea;
-	error = map_backing_store(addressSpace, cache,
-		area->cache_offset + (secondBase - area->Base()), area->name,
-		secondSize, area->wiring, area->protection, REGION_NO_PRIVATE_MAP, 0,
-		&addressRestrictions, kernel, &secondArea, NULL);
-	if (error != B_OK) {
-		addressSpace->ShrinkAreaTail(area, oldSize, allocationFlags);
-		return error;
-	}
 
-	// We need a cache reference for the new area.
-	cache->AcquireRefLocked();
+	// If no one else uses the area's cache and it's an anonymous cache, we
+	// can split it.
+	if (cache->areas == area && area->cache_next == NULL
+		&& cache->consumers.IsEmpty()
+		&& cache->type == CACHE_TYPE_RAM) {
+		// Create a new cache for the second area.
+		VMCache* secondCache;
+		error = VMCacheFactory::CreateAnonymousCache(secondCache, false, 0, 0,
+			dynamic_cast<VMAnonymousNoSwapCache*>(cache) == NULL,
+			VM_PRIORITY_USER);
+		if (error != B_OK) {
+			addressSpace->ShrinkAreaTail(area, oldSize, allocationFlags);
+			return error;
+		}
+
+		secondCache->Lock();
+
+		// Transfer the concerned pages from the first cache.
+		secondCache->MovePageRange(cache, secondBase - area->Base()
+			+ area->cache_offset, secondSize, area->cache_offset);
+		secondCache->virtual_base = area->cache_offset;
+		secondCache->virtual_end = area->cache_offset + secondSize;
+
+		// Since VMCache::Resize() can temporarily drop the lock, we must
+		// unlock all lower caches to prevent locking order inversion.
+		cacheChainLocker.Unlock(cache);
+		cache->Resize(cache->virtual_base + firstNewSize, priority);
+		// Don't unlock the cache yet because we might have to resize it
+		// back.
+
+		// Map the second area.
+		error = map_backing_store(addressSpace, secondCache, area->cache_offset,
+			area->name, secondSize, area->wiring, area->protection,
+			REGION_NO_PRIVATE_MAP, 0, &addressRestrictions, kernel, &secondArea,
+			NULL);
+		if (error != B_OK) {
+			// Restore the original cache.
+			cache->Resize(cache->virtual_base + oldSize, priority);
+			// Move the pages back.
+			cache->MovePageRange(secondCache, area->cache_offset, secondSize,
+				secondBase - area->Base() + area->cache_offset);
+			cache->ReleaseRefAndUnlock();
+			secondCache->ReleaseRefAndUnlock();
+			addressSpace->ShrinkAreaTail(area, oldSize, allocationFlags);
+			return error;
+		}
+
+		// Now we can unlock it.
+		cache->ReleaseRefAndUnlock();
+		secondCache->Unlock();
+	} else {
+		error = map_backing_store(addressSpace, cache, area->cache_offset
+			+ (secondBase - area->Base()),
+			area->name, secondSize, area->wiring, area->protection,
+			REGION_NO_PRIVATE_MAP, 0, &addressRestrictions, kernel, &secondArea,
+			NULL);
+		if (error != B_OK) {
+			addressSpace->ShrinkAreaTail(area, oldSize, allocationFlags);
+			return error;
+		}
+		// We need a cache reference for the new area.
+		cache->AcquireRefLocked();
+	}
 
 	if (_secondArea != NULL)
 		*_secondArea = secondArea;

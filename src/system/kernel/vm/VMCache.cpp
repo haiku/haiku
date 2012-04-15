@@ -187,6 +187,29 @@ class Resize : public VMCacheTraceEntry {
 };
 
 
+class Rebase : public VMCacheTraceEntry {
+	public:
+		Rebase(VMCache* cache, off_t base)
+			:
+			VMCacheTraceEntry(cache),
+			fOldBase(cache->virtual_base),
+			fBase(base)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("vm cache rebase: cache: %p, base: %lld -> %lld", fCache,
+				fOldBase, fBase);
+		}
+
+	private:
+		off_t	fOldBase;
+		off_t	fBase;
+};
+
+
 class AddConsumer : public VMCacheTraceEntry {
 	public:
 		AddConsumer(VMCache* cache, VMCache* consumer)
@@ -825,11 +848,12 @@ VMCache::RemovePage(vm_page* page)
 }
 
 
-/*!	Moves the given page from its current cache inserts it into this cache.
+/*!	Moves the given page from its current cache inserts it into this cache
+	at the given offset.
 	Both caches must be locked.
 */
 void
-VMCache::MovePage(vm_page* page)
+VMCache::MovePage(vm_page* page, off_t offset)
 {
 	VMCache* oldCache = page->Cache();
 
@@ -840,6 +864,9 @@ VMCache::MovePage(vm_page* page)
 	oldCache->pages.Remove(page);
 	oldCache->page_count--;
 	T2(RemovePage(oldCache, page));
+
+	// change the offset
+	page->cache_offset = offset >> PAGE_SHIFT;
 
 	// insert here
 	pages.Insert(page);
@@ -852,6 +879,15 @@ VMCache::MovePage(vm_page* page)
 	}
 
 	T2(InsertPage(this, page, page->cache_offset << PAGE_SHIFT));
+}
+
+/*!	Moves the given page from its current cache inserts it into this cache.
+	Both caches must be locked.
+*/
+void
+VMCache::MovePage(vm_page* page)
+{
+	MovePage(page, page->cache_offset << PAGE_SHIFT);
 }
 
 
@@ -885,6 +921,27 @@ VMCache::MoveAllPages(VMCache* fromCache)
 		T2(InsertPage(this, page, page->cache_offset << PAGE_SHIFT));
 	}
 #endif
+}
+
+
+/*!	Moves the given pages from their current cache and inserts them into this
+	cache. Both caches must be locked.
+*/
+void
+VMCache::MovePageRange(VMCache* source, off_t offset, off_t size,
+		off_t newOffset)
+{
+	page_num_t startPage = offset >> PAGE_SHIFT;
+	page_num_t endPage = (offset + size + B_PAGE_SIZE - 1) >> PAGE_SHIFT;
+	int32 offsetChange = (int32)(newOffset - offset);
+
+	VMCachePagesTree::Iterator it = source->pages.GetIterator(startPage, true,
+		true);
+	for (vm_page* page = it.Next();
+				page != NULL && page->cache_offset < endPage;
+				page = it.Next()) {
+		MovePage(page, (page->cache_offset << PAGE_SHIFT) + offsetChange);
+	}
 }
 
 
@@ -1138,6 +1195,71 @@ VMCache::Resize(off_t newSize, int priority)
 	}
 
 	virtual_end = newSize;
+	return B_OK;
+}
+
+/*!	This function updates the virtual_base field of the cache.
+	If needed, it will free up all pages that don't belong to the cache anymore.
+	The cache lock must be held when you call it.
+	Since removed pages don't belong to the cache any longer, they are not
+	written back before they will be removed.
+
+	Note, this function may temporarily release the cache lock in case it
+	has to wait for busy pages.
+*/
+status_t
+VMCache::Rebase(off_t newBase, int priority)
+{
+	TRACE(("VMCache::Rebase(cache %p, newBase %Ld) old base %Ld\n",
+		this, newBase, this->virtual_base));
+	this->AssertLocked();
+
+	T(Rebase(this, newBase));
+
+	status_t status = Commit(virtual_end - newBase, priority);
+	if (status != B_OK)
+		return status;
+
+	uint32 basePage = (uint32)(newBase >> PAGE_SHIFT);
+
+	if (newBase > virtual_base) {
+		// we need to remove all pages in the cache outside of the new virtual
+		// size
+		VMCachePagesTree::Iterator it = pages.GetIterator();
+		for (vm_page* page = it.Next();
+				page != NULL && page->cache_offset < basePage;
+				page = it.Next()) {
+			if (page->busy) {
+				if (page->busy_writing) {
+					// We cannot wait for the page to become available
+					// as we might cause a deadlock this way
+					page->busy_writing = false;
+						// this will notify the writer to free the page
+				} else {
+					// wait for page to become unbusy
+					WaitForPageEvents(page, PAGE_EVENT_NOT_BUSY, true);
+
+					// restart from the start of the list
+					it = pages.GetIterator();
+				}
+				continue;
+			}
+
+			// remove the page and put it into the free queue
+			DEBUG_PAGE_ACCESS_START(page);
+			vm_remove_all_page_mappings(page);
+			ASSERT(page->WiredCount() == 0);
+				// TODO: Find a real solution! If the page is wired
+				// temporarily (e.g. by lock_memory()), we actually must not
+				// unmap it!
+			RemovePage(page);
+			vm_page_free(this, page);
+				// Note: When iterating through a IteratableSplayTree
+				// removing the current node is safe.
+		}
+	}
+
+	virtual_base = newBase;
 	return B_OK;
 }
 

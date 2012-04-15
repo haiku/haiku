@@ -546,6 +546,65 @@ VMAnonymousCache::Resize(off_t newSize, int priority)
 
 
 status_t
+VMAnonymousCache::Rebase(off_t newBase, int priority)
+{
+	// If the cache size shrinks, drop all swap pages beyond the new size.
+	if (fAllocatedSwapSize > 0) {
+		off_t basePage = newBase >> PAGE_SHIFT;
+		swap_block* swapBlock = NULL;
+
+		for (off_t pageIndex = 0;
+				pageIndex < basePage && fAllocatedSwapSize > 0;
+				pageIndex++) {
+			WriteLocker locker(sSwapHashLock);
+
+			// Get the swap slot index for the page.
+			swap_addr_t blockIndex = pageIndex & SWAP_BLOCK_MASK;
+			if (swapBlock == NULL || blockIndex == 0) {
+				swap_hash_key key = { this, pageIndex };
+				swapBlock = sSwapHashTable.Lookup(key);
+
+				if (swapBlock == NULL) {
+					pageIndex = ROUNDUP(pageIndex + 1, SWAP_BLOCK_PAGES);
+					continue;
+				}
+			}
+
+			swap_addr_t slotIndex = swapBlock->swap_slots[blockIndex];
+			vm_page* page;
+			if (slotIndex != SWAP_SLOT_NONE
+				&& ((page = LookupPage(pageIndex * B_PAGE_SIZE)) == NULL
+					|| !page->busy)) {
+					// TODO: We skip (i.e. leak) swap space of busy pages, since
+					// there could be I/O going on (paging in/out). Waiting is
+					// not an option as 1. unlocking the cache means that new
+					// swap pages could be added in a range we've already
+					// cleared (since the cache still has the old size) and 2.
+					// we'd risk a deadlock in case we come from the file cache
+					// and the FS holds the node's write-lock. We should mark
+					// the page invalid and let the one responsible clean up.
+					// There's just no such mechanism yet.
+				swap_slot_dealloc(slotIndex, 1);
+				fAllocatedSwapSize -= B_PAGE_SIZE;
+
+				swapBlock->swap_slots[blockIndex] = SWAP_SLOT_NONE;
+				if (--swapBlock->used == 0) {
+					// All swap pages have been freed -- we can discard the swap
+					// block.
+					sSwapHashTable.RemoveUnchecked(swapBlock);
+					object_cache_free(sSwapBlockCache, swapBlock,
+						CACHE_DONT_WAIT_FOR_MEMORY
+							| CACHE_DONT_LOCK_KERNEL_SPACE);
+				}
+			}
+		}
+	}
+
+	return VMCache::Rebase(newBase, priority);
+}
+
+
+status_t
 VMAnonymousCache::Commit(off_t size, int priority)
 {
 	TRACE("%p->VMAnonymousCache::Commit(%" B_PRIdOFF ")\n", this, size);

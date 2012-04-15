@@ -26,6 +26,8 @@ public:
 	virtual	bool				HasPage(off_t offset);
 
 	virtual	int32				GuardSize()	{ return fGuardedSize; }
+	virtual	void				SetGuardSize(int32 guardSize)
+									{ fGuardedSize = guardSize; }
 
 	virtual	status_t			Read(off_t offset, const generic_io_vec *vecs,
 									 size_t count,uint32 flags,

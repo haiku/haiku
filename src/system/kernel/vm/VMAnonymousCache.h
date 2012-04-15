@@ -40,12 +40,15 @@ public:
 									uint32 allocationFlags);
 
 	virtual	status_t			Resize(off_t newSize, int priority);
+	virtual	status_t			Rebase(off_t newBase, int priority);
 
 	virtual	status_t			Commit(off_t size, int priority);
 	virtual	bool				HasPage(off_t offset);
 	virtual	bool				DebugHasPage(off_t offset);
 
 	virtual	int32				GuardSize()	{ return fGuardedSize; }
+	virtual	void				SetGuardSize(int32 guardSize)
+									{ fGuardedSize = guardSize; }
 
 	virtual	status_t			Read(off_t offset, const generic_io_vec* vecs,
 									size_t count, uint32 flags,
