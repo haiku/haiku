@@ -300,6 +300,8 @@ radeon_init_accelerant(int device)
 	// Set up data crunching + irq rings
 	radeon_gpu_ring_setup();
 
+	radeon_gpu_ring_boot(RADEON_QUEUE_TYPE_GFX_INDEX);
+
 	TRACE("%s done\n", __func__);
 	return B_OK;
 }

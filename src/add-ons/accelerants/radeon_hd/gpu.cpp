@@ -506,7 +506,7 @@ radeon_gpu_ring_setup()
 	TRACE("%s called\n", __func__);
 
 	// init GFX ring queue
-    gInfo->ringQueue[RADEON_QUEUE_TYPE_GFX_INDEX]
+	gInfo->ringQueue[RADEON_QUEUE_TYPE_GFX_INDEX]
 		= new RingQueue(1024 * 1024, RADEON_QUEUE_TYPE_GFX_INDEX);
 
 	#if 0
@@ -515,6 +515,23 @@ radeon_gpu_ring_setup()
 		= new IRQRingQueue(64 * 1024)
 	#endif
 
+
+	return B_OK;
+}
+
+
+status_t
+radeon_gpu_ring_boot(uint32 ringType)
+{
+	TRACE("%s called\n", __func__);
+
+	RingQueue* ring = gInfo->ringQueue[ringType];
+	if (ring == NULL) {
+		ERROR("%s: Specified ring doesn't exist!\n", __func__);
+		return B_ERROR;
+	}
+
+	// TODO: Write initial ring state
 
 	return B_OK;
 }

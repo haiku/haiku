@@ -176,6 +176,7 @@ void radeon_gpu_mc_resume(struct gpu_state *gpuState);
 status_t radeon_gpu_mc_idlewait();
 status_t radeon_gpu_mc_setup();
 status_t radeon_gpu_ring_setup();
+status_t radeon_gpu_ring_boot(uint32 ringType);
 status_t radeon_gpu_ss_disable();
 
 
