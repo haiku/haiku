@@ -3,10 +3,10 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Axel Dörfler, axeld@pinc-software.de
- *		Hugo Santos, hugosantos@gmail.com
  *		Dario Casalinuovo
+ *		Axel Dörfler, axeld@pinc-software.de
  *		Rene Gollent, rene@gollent.com
+ *		Hugo Santos, hugosantos@gmail.com
  */
 
 
