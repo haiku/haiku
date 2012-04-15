@@ -65,8 +65,8 @@ iterative_io_get_vecs_hook(void* cookie, io_request* request, off_t offset,
 {
 	iso9660_inode* node = (iso9660_inode*)cookie;
 
-	vecs->offset = offset + node->startLBN[FS_DATA_FORMAT]
-		* node->volume->logicalBlkSize[FS_DATA_FORMAT];
+	vecs->offset = offset + ((off_t)node->startLBN[FS_DATA_FORMAT]
+		* (off_t)node->volume->logicalBlkSize[FS_DATA_FORMAT]);
 	vecs->length = size;
 
 	*_count = 1;
@@ -439,8 +439,8 @@ fs_read_pages(fs_volume* _volume, fs_vnode* _node, void*  _cookie, off_t pos,
 	}
 
 	file_io_vec fileVec;
-	fileVec.offset = pos + node->startLBN[FS_DATA_FORMAT]
-		* volume->logicalBlkSize[FS_DATA_FORMAT];
+	fileVec.offset = pos + ((off_t)node->startLBN[FS_DATA_FORMAT]
+		* (off_t)volume->logicalBlkSize[FS_DATA_FORMAT]);
 	fileVec.length = bytesLeft;
 
 	uint32 vecIndex = 0;
