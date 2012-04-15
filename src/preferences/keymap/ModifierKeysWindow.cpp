@@ -75,52 +75,30 @@ ModifierKeysWindow::ModifierKeysWindow()
 	get_key_map(&fSavedMap, &fSavedBuffer);
 
 	BStringView* keyRole = new BStringView("key role",
-		B_TRANSLATE_COMMENT("Key role",
-			"key roles, e.g. Control, Option, Command"));
+		B_TRANSLATE_COMMENT("Role", "As in the role of a modifier key"));
 	keyRole->SetAlignment(B_ALIGN_RIGHT);
 	keyRole->SetFont(be_bold_font);
 
 	BStringView* keyLabel = new BStringView("key label",
-		B_TRANSLATE_COMMENT("Key", "A computer keyboard key"));
+		B_TRANSLATE_COMMENT("Key", "As in a computer keyboard key"));
 	keyLabel->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	keyLabel->SetFont(be_bold_font);
-
-	float width = 0.0;
-	float widest = 0.0;
 
 	fShiftStringView = new BStringView("shift",
 		B_TRANSLATE_COMMENT("Shift:", "Shift key role name"));
 	fShiftStringView->SetAlignment(B_ALIGN_RIGHT);
-	width = fShiftStringView->StringWidth(fShiftStringView->Text());
-	if (width > widest)
-		widest = width;
 
 	fControlStringView = new BStringView("control",
 		B_TRANSLATE_COMMENT("Control:", "Control key role name"));
 	fControlStringView->SetAlignment(B_ALIGN_RIGHT);
-	width = fControlStringView->StringWidth(fControlStringView->Text());
-	if (width > widest)
-		widest = width;
 
 	fOptionStringView = new BStringView("option",
 		B_TRANSLATE_COMMENT("Option:", "Option key role name"));
 	fOptionStringView->SetAlignment(B_ALIGN_RIGHT);
-	width = fOptionStringView->StringWidth(fOptionStringView->Text());
-	if (width > widest)
-		widest = width;
 
 	fCommandStringView = new BStringView("command",
 		B_TRANSLATE_COMMENT("Command:", "Command key role name"));
 	fCommandStringView->SetAlignment(B_ALIGN_RIGHT);
-	width = fCommandStringView->StringWidth(fCommandStringView->Text());
-	if (width > widest)
-		widest = width;
-
-	// set the width of each of the string view's to the widest
-	fShiftStringView->SetExplicitMaxSize(BSize(widest, B_SIZE_UNSET));
-	fControlStringView->SetExplicitMaxSize(BSize(widest, B_SIZE_UNSET));
-	fOptionStringView->SetExplicitMaxSize(BSize(widest, B_SIZE_UNSET));
-	fCommandStringView->SetExplicitMaxSize(BSize(widest, B_SIZE_UNSET));
 
 	fShiftConflictView = new ConflictView("shift warning view");
 	fShiftConflictView->SetExplicitMaxSize(BSize(15, 15));
