@@ -214,7 +214,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 
 	BView* view;
 	view = BLayoutBuilder::Group<>()
-		.AddGroup(B_VERTICAL, 10)
+		.AddGroup(B_VERTICAL, 0)
 			.AddGroup(B_HORIZONTAL, 0)
 				.AddGroup(B_VERTICAL, 0)
 					.Add(fMenuRecentDocuments)
@@ -227,46 +227,52 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 					.Add(fMenuRecentApplicationCount)
 					.End()
 				.End()
-			.Add(new BButton(B_TRANSLATE("Edit menu" B_UTF8_ELLIPSIS),
-				new BMessage(kEditMenuInTracker)))
-			.SetInsets(10, 10, 10, 10)
+			.AddGroup(B_VERTICAL, 0)
+				.SetInsets(0, B_USE_DEFAULT_SPACING, 0, 0)
+				.Add(new BButton(B_TRANSLATE("Edit menu" B_UTF8_ELLIPSIS),
+					new BMessage(kEditMenuInTracker)))
+				.End()
+			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
+				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.End()
 		.View();
 	fMenuBox->AddChild(view);
 
 	view = BLayoutBuilder::Group<>()
-		.AddGroup(B_VERTICAL, 1)
+		.AddGroup(B_VERTICAL, 0)
 			.Add(fAppsSort)
 			.Add(fAppsSortTrackerFirst)
 			.Add(fAppsShowExpanders)
 			.AddGroup(B_HORIZONTAL, 0)
-				.SetInsets(20, 0, 0, 0)
+				.SetInsets(B_USE_BIG_SPACING, 0, 0, 0)
 				.Add(fAppsExpandNew)
 				.End()
 			.Add(fAppsHideLabels)
 			.AddGroup(B_HORIZONTAL, 0)
-				.SetInsets(0, 10, 0, 0)
+				.SetInsets(0, B_USE_DEFAULT_SPACING, 0, 0)
 				.Add(fAppsIconSizeSlider)
 				.End()
 			.AddGlue()
-			.SetInsets(10, 10, 10, 10)
+			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
+				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.End()
 		.View();
 	fAppsBox->AddChild(view);
 
 	view = BLayoutBuilder::Group<>()
-		.AddGroup(B_VERTICAL, 1)
+		.AddGroup(B_VERTICAL, 0)
 			.Add(fWindowAlwaysOnTop)
 			.Add(fWindowAutoRaise)
 			.Add(fWindowAutoHide)
 			.AddGlue()
-			.SetInsets(10, 10, 10, 10)
+			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
+				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.End()
 		.View();
 	fWindowBox->AddChild(view);
 
 	BGroupLayout* timeIntervalLayout = new BGroupLayout(B_VERTICAL, 0);
-	timeIntervalLayout->SetInsets(20, 0, 0, 0);
+	timeIntervalLayout->SetInsets(B_USE_DEFAULT_SPACING, 0, 0, 0);
 	BView* timeIntervalView = new BView("interval", 0, timeIntervalLayout);
 	timeIntervalView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	timeIntervalView->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -274,12 +280,14 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	timeIntervalView->AddChild(fTimeInterval24HourRadioButton);
 
 	view = BLayoutBuilder::Group<>()
-		.AddGroup(B_VERTICAL, 10)
+		.AddGroup(B_VERTICAL, 0)
 			.AddGroup(B_VERTICAL, 0)
+				.SetInsets(0, 0, 0, B_USE_DEFAULT_SPACING)
 				.Add(new BStringView("interval", B_TRANSLATE("Interval")))
 				.Add(timeIntervalView)
 				.End()
 			.AddGroup(B_VERTICAL, 0)
+				.SetInsets(0, 0, 0, B_USE_DEFAULT_SPACING)
 				.Add(fShowSeconds)
 				.Add(fShowDayOfWeek)
 				.Add(fShowTimeZone)
@@ -287,7 +295,8 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 			.Add(new BButton(B_TRANSLATE("Time preferences" B_UTF8_ELLIPSIS),
 				new BMessage(kTimePreferences)))
 			.AddGlue()
-			.SetInsets(10, 10, 10, 10)
+			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
+				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.End()
 		.View();
 	fClockBox->AddChild(view);
@@ -298,7 +307,8 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 			.Add(fWindowBox, 1, 0)
 			.Add(fAppsBox, 0, 1)
 			.Add(fClockBox, 1, 1)
-			.SetInsets(10, 10, 10, 10)
+			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
+				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.End()
 		.End();
 
