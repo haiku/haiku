@@ -22,6 +22,7 @@
 #include <LayoutBuilder.h>
 #include <OpenWithTracker.h>
 #include <RadioButton.h>
+#include <Roster.h>
 #include <SeparatorView.h>
 #include <Slider.h>
 #include <StringView.h>
@@ -286,6 +287,8 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 				.Add(fShowDayOfWeek)
 				.Add(fShowTimeZone)
 				.End()
+			.Add(new BButton(B_TRANSLATE("Time preferences" B_UTF8_ELLIPSIS),
+				new BMessage(kTimePreferences)))
 			.AddGlue()
 			.SetInsets(10, 10, 10, 10)
 			.End()
@@ -332,6 +335,11 @@ PreferencesWindow::MessageReceived(BMessage* message)
 
 		case kStateChanged:
 			EnableDisableDependentItems();
+			break;
+
+		case kTimePreferences:
+			// launch the time prefs app
+			be_roster->Launch("application/x-vnd.Haiku-Time");
 			break;
 
 		default:

@@ -28,6 +28,7 @@ const uint32 kTimeIntervalChanged	= 'TiCh';
 const uint32 kShowSeconds			= 'SwSc';
 const uint32 kShowDayOfWeek			= 'SwDw';
 const uint32 kShowTimeZone			= 'SwTz';
+const uint32 kTimePreferences		= 'TmPr';
 
 class BBox;
 class BButton;
