@@ -42,6 +42,7 @@ public:
 	virtual	BSize				MaxSize();
 	virtual	BSize				PreferredSize();
 	virtual	void				ResizeToPreferred();
+	virtual	BAlignment			LayoutAlignment();
 	virtual	void				FrameMoved(BPoint newPosition);
 	virtual	void				FrameResized(float newWidth, float newHeight);
 

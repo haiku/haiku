@@ -13,14 +13,14 @@
 
 #include <StringView.h>
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include <LayoutUtils.h>
 #include <Message.h>
 #include <View.h>
 #include <Window.h>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include <binary_compatibility/Interface.h>
 
@@ -196,6 +196,14 @@ BStringView::ResizeToPreferred()
 		width = Bounds().Width();
 
 	BView::ResizeTo(width, height);
+}
+
+
+BAlignment
+BStringView::LayoutAlignment()
+{
+	return BLayoutUtils::ComposeAlignment(ExplicitAlignment(),
+		BAlignment(fAlign, B_ALIGN_MIDDLE));
 }
 
 
