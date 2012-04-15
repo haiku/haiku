@@ -227,6 +227,8 @@ const struct supported_device {
 	{0x6779, 5, 0, RADEON_CAICOS, CHIP_STD, "Radeon HD 6450"},
 	{0x68fa, 5, 0, RADEON_CAICOS, CHIP_STD, "Radeon HD 7350"},
 	{0x68f9, 5, 0, RADEON_CAICOS, CHIP_STD, "Radeon HD 7350"},
+	{0x677b, 5, 0, RADEON_CAICOS, CHIP_STD, "Radeon HD 7400"},
+	{0x6772, 5, 0, RADEON_CAICOS, CHIP_APU, "Radeon HD 7400A"},
 	//  Turks
 	{0x6740, 5, 0, RADEON_TURKS, CHIP_MOBILE, "Radeon HD 6770M"},
 	{0x6741, 5, 0, RADEON_TURKS, CHIP_MOBILE, "Radeon HD 6650M"},
@@ -260,27 +262,57 @@ const struct supported_device {
 	{0x6719, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD 6950"},
 	{0x671c, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD CAYMAN"},
 	{0x671f, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD 6900"},
-	//  Antilles
+	//  Antilles (Top, Dual GPU)
 	{0x671d, 5, 0, RADEON_ANTILLES, CHIP_STD, "Radeon HD 6990"},
 
 	// Marketing Names: Radeon HD 74xx - HD 79xx
 	// Introduced: Late 2011
 	// Codename: Southern Islands
 	// Process: 28 nm
-	//  Lombok
-	//  Cape Verde
+	//  Lombok?
+	{0x6850, 6, 0, RADEON_LOMBOK, CHIP_MOBILE, "Radeon HD 7570"},
+	//  Cape Verde (TODO: Need to find friendly names)
+	{0x6820, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD Verde"},
+	{0x6821, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD Verde"},
+	{0x6823, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD Verde"},
+	{0x6824, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD Verde"},
+	{0x6825, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD Verde"},
+	{0x6826, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD Verde"},
+	{0x6827, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD Verde"},
+	{0x6828, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD Verde"},
+	{0x6829, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD Verde"},
+	{0x682d, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD Verde"},
+	{0x682f, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD Verde"},
+	{0x6830, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD Verde"},
+	{0x6831, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD Verde"},
+	{0x6837, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD Verde"},
+	{0x6838, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD Verde"},
+	{0x6839, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD Verde"},
+	{0x683b, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD Verde"},
 	{0x683f, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD 7750"},
 	{0x683d, 6, 0, RADEON_CAPEVERDE, CHIP_STD, "Radeon HD 7770"},
-	//  Pitcairn
-	//	- 7790
+	//  Pitcairn (TODO: Need to find friendly names)
+	{0x6800, 6, 0, RADEON_PITCAIRN, CHIP_MOBILE, "Radeon HD 7970"},
+	{0x6801, 6, 0, RADEON_PITCAIRN, CHIP_STD, "Radeon HD Pitcairn"},
+	{0x6802, 6, 0, RADEON_PITCAIRN, CHIP_STD, "Radeon HD Pitcairn"},
+	{0x6808, 6, 0, RADEON_PITCAIRN, CHIP_STD, "Radeon HD Pitcairn"},
+	{0x6809, 6, 0, RADEON_PITCAIRN, CHIP_STD, "Radeon HD Pitcairn"},
+	{0x6810, 6, 0, RADEON_PITCAIRN, CHIP_STD, "Radeon HD Pitcairn"},
 	{0x6818, 6, 0, RADEON_PITCAIRN, CHIP_STD, "Radeon HD 7870"},
 	{0x6819, 6, 0, RADEON_PITCAIRN, CHIP_STD, "Radeon HD 7800"},
-	//	- 7850
-	//  Tahiti
-	//	- 7890
+	{0x684c, 6, 0, RADEON_PITCAIRN, CHIP_STD, "Radeon HD Pitcairn"},
+	//  Tahiti (TODO: Need to find friendly names)
+	{0x6780, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD Tahiti"},
+	{0x6784, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD Tahiti"},
+	{0x6788, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD Tahiti"},
+	{0x678a, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD Tahiti"},
+	{0x6790, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD Tahiti"},
+	{0x679e, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD Tahiti"},
+	{0x679f, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD Tahiti"},
 	{0x679a, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD 7950"},
-	{0x6798, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD 7970"}
-	//  New Zealand
+	{0x6798, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD 7970"},
+	//  New Zealand (Top, Dual GPU)
+	{0x6799, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD 7990"}
 };
 
 
