@@ -244,7 +244,10 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 				.Add(fAppsExpandNew)
 				.End()
 			.Add(fAppsHideLabels)
-			.Add(fAppsIconSizeSlider)
+			.AddGroup(B_HORIZONTAL, 0)
+				.SetInsets(0, 10, 0, 0)
+				.Add(fAppsIconSizeSlider)
+				.End()
 			.AddGlue()
 			.SetInsets(10, 10, 10, 10)
 			.End()
@@ -269,7 +272,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	timeIntervalLabel->SetLowColor((rgb_color){255, 255, 255, 255});
 
 	BGroupLayout* timeIntervalLayout = new BGroupLayout(B_VERTICAL, 0);
-	timeIntervalLayout->SetInsets(10, 0, 0, 0);
+	timeIntervalLayout->SetInsets(20, 0, 0, 0);
 	BView* timeIntervalView = new BView("interval", 0, timeIntervalLayout);
 	timeIntervalView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	timeIntervalView->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
