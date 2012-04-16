@@ -379,8 +379,8 @@ initialize_termios(struct termios &tio)
 	tio.c_cc[VSUSP]  = CSUSP;		/* '^Z' */
 }
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Terminal Shell"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Terminal Shell"
 
 status_t
 Shell::_Spawn(int row, int col, const ShellParameters& parameters)

@@ -12,8 +12,8 @@
 class BMessage;
 class ActivityWindow;
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ActivityWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ActivityWindow"
 
 
 class ActivityMonitor : public BApplication {

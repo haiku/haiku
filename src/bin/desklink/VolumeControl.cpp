@@ -31,8 +31,8 @@
 
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "VolumeControl"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "VolumeControl"
 
 
 static const char* kMediaServerSignature = "application/x-vnd.Be.media-server";

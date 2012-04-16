@@ -28,8 +28,8 @@
 #define MAX_DRAG_HEIGHT		200.0
 #define ALPHA				170
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "LanguageListView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "LanguageListView"
 
 
 static const float kLeftInset = 4;

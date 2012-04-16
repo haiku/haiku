@@ -22,8 +22,8 @@
 
 #include "CalcWindow.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "CalcApplication"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "CalcApplication"
 
 static const char* kSettingsFileName	= "DeskCalc_settings";
 const char* kAppSig				= "application/x-vnd.Haiku-DeskCalc";

@@ -19,8 +19,8 @@
 #include "PropertyObject.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Icon-O-Matic-Properties"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Icon-O-Matic-Properties"
 
 
 // constructor
@@ -90,10 +90,10 @@ SetPropertiesCommand::GetName(BString& name)
 		BString property = name_for_id(
 			fOldProperties->PropertyAt(0)->Identifier());
 		if (fObjectCount > 1)
-			name << B_TRANSLATE_WITH_CONTEXT("Multi Set ",
+			name << B_TRANSLATE_CONTEXT("Multi Set ",
 				"Multi Set (property name)") << property;
 		else
-			name << B_TRANSLATE_WITH_CONTEXT("Set ", "Set (property name)")
+			name << B_TRANSLATE_CONTEXT("Set ", "Set (property name)")
 				 << property;
 	}
 }

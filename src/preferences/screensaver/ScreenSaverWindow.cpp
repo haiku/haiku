@@ -40,8 +40,8 @@
 #include "ScreenCornerSelector.h"
 #include "ScreenSaverItem.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ScreenSaver"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ScreenSaver"
 
 const uint32 kPreviewMonitorGap = 16;
 const uint32 kMinSettingsWidth = 230;

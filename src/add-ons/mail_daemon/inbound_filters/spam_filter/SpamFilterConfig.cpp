@@ -95,8 +95,8 @@
 #include <FileConfigView.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "SpamFilterConfig"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "SpamFilterConfig"
 
 
 static const char *kServerSignature = "application/x-vnd.agmsmith.spamdbm";

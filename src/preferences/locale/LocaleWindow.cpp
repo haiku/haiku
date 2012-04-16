@@ -34,8 +34,8 @@
 using BPrivate::MutableLocaleRoster;
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Locale Preflet Window"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Locale Preflet Window"
 
 
 static const uint32 kMsgLanguageInvoked = 'LaIv';

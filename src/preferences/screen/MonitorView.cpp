@@ -21,8 +21,8 @@
 
 #include "Constants.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Monitor View"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Monitor View"
 
 
 MonitorView::MonitorView(BRect rect, const char *name, int32 width, int32 height)

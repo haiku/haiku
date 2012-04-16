@@ -15,8 +15,8 @@
 #include <Window.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Color Step View"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Color Step View"
 
 
 const int32 kColorBarHeight = 15;

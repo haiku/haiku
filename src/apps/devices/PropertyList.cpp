@@ -12,8 +12,8 @@
 #include <Catalog.h>
 #include <ColumnTypes.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "PropertyList"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PropertyList"
 
 
 PropertyRow::PropertyRow(const char* name, const char* value)

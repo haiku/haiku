@@ -76,8 +76,8 @@ All rights reserved.
 #include "Utilities.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "FindPanel"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "FindPanel"
 
 const char *kAllMimeTypes = "mime/ALLTYPES";
 

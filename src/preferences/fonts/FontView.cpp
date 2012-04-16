@@ -20,8 +20,8 @@
 #include <Locale.h>
 #include <SpaceLayoutItem.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Font view"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Font view"
 
 static void
 add_font_selection_view(BGridLayout* layout, FontSelectionView* view,

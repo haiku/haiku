@@ -22,8 +22,8 @@
 
 #include "messages.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "FontDemoView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "FontDemoView"
 
 FontDemoView::FontDemoView(BRect rect)
 	: BView(rect, "FontDemoView", B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS),

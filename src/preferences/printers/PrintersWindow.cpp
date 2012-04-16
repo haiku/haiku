@@ -33,8 +33,8 @@
 #include "SpoolFolder.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "PrintersWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PrintersWindow"
 
 
 class TestPageWindow : public BWindow {

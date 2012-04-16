@@ -50,8 +50,8 @@ All rights reserved.
 const uint32 kSelectButtonPressed = 'sbpr';
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "SelectionWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "SelectionWindow"
 
 
 SelectionWindow::SelectionWindow(BContainerWindow* window)

@@ -11,8 +11,8 @@
 #include <View.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "MediaConverter-EncoderWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MediaConverter-EncoderWindow"
 
 
 MediaEncoderWindow::MediaEncoderWindow(BRect frame, BView* view)

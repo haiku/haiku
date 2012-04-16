@@ -34,8 +34,8 @@
 #endif
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Pref Window"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Pref Window"
 
 // messages PrefFileWatcher
 const uint32 kUpdatedPreferences = '&UdP';
@@ -479,6 +479,6 @@ PreferencesWindow<Preferences>::_UpdateButtons()
 }
 
 
-#undef B_TRANSLATE_CONTEXT
+#undef B_TRANSLATION_CONTEXT
 
 #endif	// PREFERENCES_WINDOW_h

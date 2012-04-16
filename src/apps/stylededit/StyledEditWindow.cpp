@@ -52,8 +52,8 @@ const float kLineViewWidth = 30.0;
 const char* kInfoAttributeName = "StyledEdit-info";
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "StyledEditWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "StyledEditWindow"
 
 
 // This is a temporary solution for building BString with printf like format.
@@ -114,8 +114,8 @@ StyledEditWindow::Quit()
 }
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "QuitAlert"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "QuitAlert"
 
 
 bool
@@ -649,8 +649,8 @@ StyledEditWindow::MenusBeginning()
 }
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "SaveAlert"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "SaveAlert"
 
 
 status_t
@@ -730,8 +730,8 @@ StyledEditWindow::Save(BMessage* message)
 }
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Open_and_SaveAsPanel"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Open_and_SaveAsPanel"
 
 
 status_t
@@ -964,8 +964,8 @@ StyledEditWindow::IsDocumentEntryRef(const entry_ref* ref)
 // #pragma mark - private methods
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Menus"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Menus"
 
 
 void
@@ -1280,8 +1280,8 @@ StyledEditWindow::_SaveAttrs()
 }
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "LoadAlert"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "LoadAlert"
 
 
 status_t
@@ -1345,8 +1345,8 @@ StyledEditWindow::_LoadFile(entry_ref* ref)
 }
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "RevertToSavedAlert"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "RevertToSavedAlert"
 
 
 void
@@ -1386,8 +1386,8 @@ StyledEditWindow::_RevertToSaved()
 	if (_LoadFile(&ref) != B_OK)
 		return;
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Menus"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Menus"
 
 	// clear undo modes
 	fUndoItem->SetLabel(B_TRANSLATE("Can't undo"));
@@ -1597,8 +1597,8 @@ StyledEditWindow::_SetFontStyle(const char* fontFamily, const char* fontStyle)
 }
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Statistics"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Statistics"
 
 
 int32
@@ -1630,8 +1630,8 @@ StyledEditWindow::_ShowStatistics()
 }
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Menus"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Menus"
 
 
 void

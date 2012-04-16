@@ -53,8 +53,8 @@ All rights reserved.
 #include "MimeTypes.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "TemplatesMenu"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "TemplatesMenu"
 
 
 namespace BPrivate {

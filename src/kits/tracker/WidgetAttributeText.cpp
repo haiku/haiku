@@ -66,8 +66,8 @@ All rights reserved.
 #include "ViewState.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "WidgetAttributeText"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "WidgetAttributeText"
 
 
 const int32 kGenericReadBufferSize = 1024;

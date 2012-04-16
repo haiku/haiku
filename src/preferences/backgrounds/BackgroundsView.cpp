@@ -33,8 +33,8 @@
 #include "ImageFilePanel.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Main View"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Main View"
 
 
 static const uint32 kMsgApplySettings = 'aply';

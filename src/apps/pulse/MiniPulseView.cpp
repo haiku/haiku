@@ -13,8 +13,8 @@
 #include <Catalog.h>
 #include <interface/Window.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "MiniPulseView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MiniPulseView"
 
 
 MiniPulseView::MiniPulseView(BRect rect, const char *name, Prefs *prefs) : 

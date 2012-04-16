@@ -24,8 +24,8 @@
 #include "Polygon.h"
 #include "PolygonQueue.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Screensaver Spider"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Screensaver Spider"
 
 enum {
 	MSG_QUEUE_NUMBER			= 'qunm',

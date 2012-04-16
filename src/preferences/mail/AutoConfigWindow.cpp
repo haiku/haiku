@@ -23,8 +23,8 @@
 #include <crypt.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "AutoConfigWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "AutoConfigWindow"
 
 
 AutoConfigWindow::AutoConfigWindow(BRect rect, ConfigWindow *parent)

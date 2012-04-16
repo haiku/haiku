@@ -41,7 +41,7 @@
 
 	\section macros Using the macros
 	You don't have to do much in your program to handle catalogs. You must
-	first set the B_TRANSLATE_CONTEXT define to a string that identifies which
+	first set the B_TRANSLATION_CONTEXT define to a string that identifies which
 	part of the application the strings you will translate are in. This allows
 	the translators to keep track of the strings in the catalog more easily,
 	and find where they are visible in the application. then, all you have to

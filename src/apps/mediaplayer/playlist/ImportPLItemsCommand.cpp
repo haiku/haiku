@@ -17,8 +17,8 @@
 #include "PlaylistItem.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "MediaPlayer-ImportPLItemsCmd"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MediaPlayer-ImportPLItemsCmd"
 
 
 using std::nothrow;

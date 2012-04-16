@@ -26,8 +26,8 @@
 #include "DataSource.h"
 #include "SettingsWindow.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ActivityWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ActivityWindow"
 
 static const uint32 kMsgAddView = 'advw';
 static const uint32 kMsgShowSettings = 'shst';

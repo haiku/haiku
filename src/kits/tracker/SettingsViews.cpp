@@ -82,8 +82,8 @@ send_bool_notices(uint32 what, const char *name, bool value)
 //	#pragma mark -
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "SettingsView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "SettingsView"
 
 SettingsView::SettingsView(const char* name)
 	:

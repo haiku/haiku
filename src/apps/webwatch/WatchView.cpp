@@ -30,8 +30,8 @@
 #include "WatchApp.h"
 #include "WatchView.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "WatchView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "WatchView"
 
 
 const rgb_color COLOR_FOREGROUND = { 0, 0, 0 };

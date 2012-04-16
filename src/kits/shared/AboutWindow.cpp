@@ -20,8 +20,8 @@
 using BPrivate::gSystemCatalog;
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "AboutWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "AboutWindow"
 
 
 BAboutWindow::BAboutWindow(const char *appName, int32 firstCopyrightYear,

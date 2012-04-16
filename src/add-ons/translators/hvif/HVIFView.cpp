@@ -18,8 +18,8 @@
 
 #define HVIF_SETTING_RENDER_SIZE_CHANGED	'rsch'
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "HVIFView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "HVIFView"
 
 
 HVIFView::HVIFView(const char* name, uint32 flags, TranslatorSettings *settings)

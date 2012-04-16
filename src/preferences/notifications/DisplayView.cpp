@@ -31,8 +31,8 @@
 #include "SettingsHost.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "DisplayView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "DisplayView"
 
 
 DisplayView::DisplayView(SettingsHost* host)

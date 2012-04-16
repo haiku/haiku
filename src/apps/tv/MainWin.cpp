@@ -43,8 +43,8 @@
 #include <View.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "MainWin"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MainWin"
 
 B_TRANSLATE_MARK_VOID("TV");
 B_TRANSLATE_MARK_VOID("unknown");

@@ -16,8 +16,8 @@
 #include <StringView.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Extended local device view"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Extended local device view"
 
 ExtendedLocalDeviceView::ExtendedLocalDeviceView(BRect frame,
 	LocalDevice* bDevice, uint32 resizingMode, uint32 flags)

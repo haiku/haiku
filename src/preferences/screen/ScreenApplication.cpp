@@ -19,8 +19,8 @@
 #include <Catalog.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Screen"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Screen"
 
 
 static const char* kAppSignature = "application/x-vnd.Haiku-Screen";

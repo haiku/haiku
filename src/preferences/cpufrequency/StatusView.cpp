@@ -30,8 +30,8 @@
 extern "C" _EXPORT BView *instantiate_deskbar_item(void);
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Status view"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Status view"
 #define MAX_FREQ_STRING "9999MHz"
 
 

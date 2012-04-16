@@ -79,7 +79,7 @@ of their respective holders. All rights reserved.
 #endif
 
 
-#define B_TRANSLATE_CONTEXT "Mail"
+#define B_TRANSLATION_CONTEXT "Mail"
 
 
 const rgb_color kNormalTextColor = {0, 0, 0, 255};

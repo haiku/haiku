@@ -45,8 +45,8 @@
 #include "Utility.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ScreenshotWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ScreenshotWindow"
 
 
 enum {

@@ -54,8 +54,8 @@ All rights reserved.
 #include "Utilities.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "DirMenu"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "DirMenu"
 
 
 BDirMenu::BDirMenu(BMenuBar *bar, BMessenger target, uint32 command,

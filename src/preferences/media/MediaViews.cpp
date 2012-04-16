@@ -33,8 +33,8 @@
 #include "MediaWindow.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Media views"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Media views"
 
 #define MEDIA_DEFAULT_INPUT_CHANGE 'dich'
 #define MEDIA_DEFAULT_OUTPUT_CHANGE 'doch'

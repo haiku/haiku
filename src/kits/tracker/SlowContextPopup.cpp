@@ -62,8 +62,8 @@ All rights reserved.
 #include "Tracker.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "SlowContextPopup"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "SlowContextPopup"
 
 BSlowContextMenu::BSlowContextMenu(const char *title)
 	:	BPopUpMenu(title, false, false),

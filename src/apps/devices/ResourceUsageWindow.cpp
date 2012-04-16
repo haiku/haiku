@@ -26,8 +26,8 @@
 #include "DevicesInfo.h"
 #include "DevicesWindows.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ResourceUsageWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ResourceUsageWindow"
 
 class IRQDMAItem : public BListItem
 {

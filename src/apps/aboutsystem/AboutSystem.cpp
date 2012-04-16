@@ -400,8 +400,8 @@ AboutApp::AboutApp()
 //	#pragma mark -
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "AboutWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "AboutWindow"
 
 AboutWindow::AboutWindow()
 	: BWindow(BRect(0, 0, 500, 300), B_TRANSLATE("About this system"),
@@ -543,8 +543,8 @@ CropView::DoLayout()
 
 //	#pragma mark - AboutView
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "AboutView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "AboutView"
 
 AboutView::AboutView()
 	: BView("aboutview", B_WILL_DRAW | B_PULSE_NEEDED),

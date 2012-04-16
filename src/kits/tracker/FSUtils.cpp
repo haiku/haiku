@@ -102,8 +102,8 @@ enum ConflictCheckResult {
 
 namespace BPrivate {
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "FSUtils"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "FSUtils"
 
 static status_t FSDeleteFolder(BEntry *, CopyLoopControl *, bool updateStatus,
 	bool deleteTopDir = true, bool upateFileNameInStatus = false);

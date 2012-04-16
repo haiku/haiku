@@ -50,8 +50,8 @@
 
 #include "TIFFView.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "TIFFView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "TIFFView"
 
 // add_menu_item
 void

@@ -74,8 +74,8 @@ static const uint32 kUpdateSwitchTerminalsMenuItem = 'Ustm';
 
 using namespace BPrivate ; // BCharacterSet stuff
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Terminal TermWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Terminal TermWindow"
 
 
 // #pragma mark - TermViewContainerView

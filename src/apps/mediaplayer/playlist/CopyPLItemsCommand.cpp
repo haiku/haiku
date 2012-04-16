@@ -14,8 +14,8 @@
 #include "Playlist.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "MediaPlayer-CopyPLItemsCmd"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MediaPlayer-CopyPLItemsCmd"
 
 
 using std::nothrow;

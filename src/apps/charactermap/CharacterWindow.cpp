@@ -32,8 +32,8 @@
 #include "CharacterView.h"
 #include "UnicodeBlockView.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "CharacterWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "CharacterWindow"
 
 static const uint32 kMsgUnicodeBlockSelected = 'unbs';
 static const uint32 kMsgCharacterChanged = 'chch';

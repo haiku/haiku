@@ -13,8 +13,8 @@
 #include <String.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "MediaConverter-FileInfo"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MediaConverter-FileInfo"
 
 
 const float kSpacing = 5.0f;

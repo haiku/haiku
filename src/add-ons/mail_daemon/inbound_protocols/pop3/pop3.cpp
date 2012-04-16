@@ -44,8 +44,8 @@
 #include "MessageIO.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "pop3"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "pop3"
 
 
 static void NotHere(BStringList &that, BStringList &otherList,

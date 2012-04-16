@@ -43,8 +43,8 @@
 // TODO: think about adopting Tracker's info window style here (pressable path)
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Application Types Window"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Application Types Window"
 
 
 class ProgressWindow : public BWindow {

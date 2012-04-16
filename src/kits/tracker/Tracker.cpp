@@ -205,8 +205,8 @@ GetVolumeFlags(Model *model)
 //	#pragma mark -
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Tracker"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Tracker"
 
 TTracker::TTracker()
 	:	BApplication(kTrackerSignature),

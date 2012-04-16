@@ -30,8 +30,8 @@
 #include "PulseWindow.h"
 #include "DeskbarPulseView.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "PulseApp"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PulseApp"
 
 
 PulseApp::PulseApp(int argc, char **argv)

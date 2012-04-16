@@ -105,8 +105,8 @@ AddOneShortcut(const Model *model, const char *, uint32 shortcut, bool /*primary
 
 // #pragma mark -
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "DeskWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "DeskWindow"
 
 BDeskWindow::BDeskWindow(LockingList<BWindow> *windowList)
 	:

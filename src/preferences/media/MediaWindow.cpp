@@ -38,8 +38,8 @@
 #include "MediaIcons.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Media Window"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Media Window"
 
 
 const uint32 ML_SELECTED_NODE = 'MlSN';

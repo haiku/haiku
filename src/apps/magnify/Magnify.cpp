@@ -36,8 +36,8 @@
 #include <sys/stat.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Magnify-Main"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Magnify-Main"
 
 
 const int32 msg_help = 'help';
@@ -751,8 +751,8 @@ TWindow::PixelSize()
 }
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Magnify-Help"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Magnify-Help"
 
 
 void
@@ -827,8 +827,8 @@ TWindow::ShowHelp()
 }
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Magnify-Main"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Magnify-Main"
 
 
 bool
@@ -1529,7 +1529,7 @@ TMagnify::CopyImage()
 
 	BMessage *message = be_clipboard->Data();
 	if (!message) {
-		printf(B_TRANSLATE_WITH_CONTEXT("no clip msg\n", 
+		printf(B_TRANSLATE_CONTEXT("no clip msg\n", 
 			"In console, when clipboard is empty after clicking Copy image"));
 		return;
 	}
@@ -2066,7 +2066,7 @@ main(int argc, char* argv[])
 	int32 pixelCount = -1;
 
 	if (argc > 2) {
-		printf(B_TRANSLATE_WITH_CONTEXT(
+		printf(B_TRANSLATE_CONTEXT(
 			"usage: magnify [size] (magnify size * size pixels)\n", 
 			"Console"));
 		exit(1);
@@ -2075,17 +2075,17 @@ main(int argc, char* argv[])
 			pixelCount = abs(atoi(argv[1]));
 
 			if ((pixelCount > 100) || (pixelCount < 4)) {
-				printf(B_TRANSLATE_WITH_CONTEXT(
+				printf(B_TRANSLATE_CONTEXT(
 					"usage: magnify [size] (magnify size * size pixels)\n", 
 					"Console"));
-				printf(B_TRANSLATE_WITH_CONTEXT(
+				printf(B_TRANSLATE_CONTEXT(
 					"  size must be > 4 and a multiple of 4\n", 
 					"Console"));
 				exit(1);
 			}
 
 			if (pixelCount % 4) {
-				printf(B_TRANSLATE_WITH_CONTEXT(
+				printf(B_TRANSLATE_CONTEXT(
 					"magnify: size must be a multiple of 4\n", 
 					"Console"));
 				exit(1);

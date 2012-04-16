@@ -13,8 +13,8 @@
 #include <MenuItem.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "TransportMenu"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "TransportMenu"
 
 
 TransportMenu::TransportMenu(const char* title, uint32 what,

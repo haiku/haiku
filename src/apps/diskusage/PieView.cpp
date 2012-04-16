@@ -36,8 +36,8 @@
 #include "MainWindow.h"
 #include "Scanner.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Pie View"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Pie View"
 
 static const int32 kIdxGetInfo = 0;
 static const int32 kIdxOpen = 1;

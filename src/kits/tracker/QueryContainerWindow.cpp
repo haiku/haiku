@@ -47,8 +47,8 @@ All rights reserved.
 #include "QueryPoseView.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "QueryContainerWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "QueryContainerWindow"
 
 BQueryContainerWindow::BQueryContainerWindow(LockingList<BWindow> *windowList,
 	uint32 containerWindowFlags, window_look look,

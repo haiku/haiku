@@ -21,8 +21,8 @@
 #include <string.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Preferred App Menu"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Preferred App Menu"
 
 
 static int

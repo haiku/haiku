@@ -21,8 +21,8 @@
 
 static const uint32 kMsgShow = 'show';
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ProgressWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ProgressWindow"
 
 
 ProgressWindow::ProgressWindow()

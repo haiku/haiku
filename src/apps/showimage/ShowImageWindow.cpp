@@ -122,8 +122,8 @@ bs_printf(BString* string, const char* format, ...)
 //	#pragma mark -- ShowImageWindow
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Menus"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Menus"
 
 
 ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
@@ -262,7 +262,7 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 	}
 
 	// add View menu here so it can access ShowImageView methods
-	BMenu* menu = new BMenu(B_TRANSLATE_WITH_CONTEXT("View", "Menus"));
+	BMenu* menu = new BMenu(B_TRANSLATE_CONTEXT("View", "Menus"));
 	_BuildViewMenu(menu, false);
 	fBar->AddItem(menu);
 
@@ -1102,10 +1102,10 @@ ShowImageWindow::_LoadError(const entry_ref& ref)
 {
 	// TODO: give a better error message!
 	BAlert* alert = new BAlert(B_TRANSLATE_SYSTEM_NAME("ShowImage"),
-		B_TRANSLATE_WITH_CONTEXT("Could not load image! Either the "
+		B_TRANSLATE_CONTEXT("Could not load image! Either the "
 			"file or an image translator for it does not exist.",
 			"LoadAlerts"),
-		B_TRANSLATE_WITH_CONTEXT("OK", "Alerts"), NULL, NULL,
+		B_TRANSLATE_CONTEXT("OK", "Alerts"), NULL, NULL,
 		B_WIDTH_AS_USUAL, B_INFO_ALERT);
 	alert->Go();
 }
@@ -1186,8 +1186,8 @@ ShowImageWindow::_SaveToFile(BMessage* message)
 }
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ClosePrompt"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ClosePrompt"
 
 
 bool

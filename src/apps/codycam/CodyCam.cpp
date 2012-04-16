@@ -23,8 +23,8 @@
 #include <TranslationKit.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "CodyCam"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "CodyCam"
 
 #define VIDEO_SIZE_X 320
 #define VIDEO_SIZE_Y 240

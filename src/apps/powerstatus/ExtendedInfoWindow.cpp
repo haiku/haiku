@@ -15,8 +15,8 @@
 #include <SpaceLayoutItem.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "PowerStatus"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PowerStatus"
 
 
 const int kLineSpacing = 5;

@@ -17,8 +17,8 @@
 #include "PrefletView.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "PrefletWin"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PrefletWin"
 
 
 const int32 kRevert = '_RVT';

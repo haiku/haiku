@@ -37,8 +37,8 @@
 #include "PowerStatus.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "PowerStatus"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PowerStatus"
 
 
 extern "C" _EXPORT BView *instantiate_deskbar_item(void);

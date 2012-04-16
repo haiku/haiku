@@ -28,8 +28,8 @@
 #include "GearsView.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "OpenGLView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "OpenGLView"
 
 
 OpenGLView::OpenGLView()

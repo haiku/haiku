@@ -40,8 +40,8 @@
 #define _H(a) (a->Frame().Height())
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Main Window"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Main Window"
 
 
 MidiPlayerWindow::MidiPlayerWindow()

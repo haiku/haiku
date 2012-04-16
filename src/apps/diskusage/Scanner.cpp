@@ -19,8 +19,8 @@
 
 #include "DiskUsage.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Scanner"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Scanner"
 
 using std::vector;
 

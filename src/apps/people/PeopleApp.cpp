@@ -34,8 +34,8 @@
 #include <string.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "People"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "People"
 
 
 struct DefaultAttribute {
@@ -147,9 +147,9 @@ TPeopleApp::TPeopleApp()
 	}
 	if (!valid) {
 		mime.Install();
-		mime.SetShortDescription(B_TRANSLATE_WITH_CONTEXT("Person",
+		mime.SetShortDescription(B_TRANSLATE_CONTEXT("Person",
 			"Short mimetype description"));
-		mime.SetLongDescription(B_TRANSLATE_WITH_CONTEXT(
+		mime.SetLongDescription(B_TRANSLATE_CONTEXT(
 			"Contact information for a person.",
 			"Long mimetype description"));
 		mime.SetIcon(kPersonIcon, sizeof(kPersonIcon));

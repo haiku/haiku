@@ -23,8 +23,8 @@
 #define PNG_NO_PEDANTIC_WARNINGS
 #include <png.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "PNGTranslator"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PNGTranslator"
 
 PNGView::PNGView(const BRect &frame, const char *name, uint32 resizeMode,
 		uint32 flags, TranslatorSettings *settings)

@@ -37,8 +37,8 @@
 #include "PictureView.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "People"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "People"
 
 
 PersonView::PersonView(const char* name, const char* categoryAttribute,
@@ -257,7 +257,7 @@ PersonView::BuildGroupMenu()
 
 	if (count == 0) {
 		fGroups->AddItem(item = new BMenuItem(
-			B_TRANSLATE_WITH_CONTEXT("none", "Groups list"),
+			B_TRANSLATE_CONTEXT("none", "Groups list"),
 			new BMessage(M_GROUP_MENU)));
 		item->SetEnabled(false);
 	}

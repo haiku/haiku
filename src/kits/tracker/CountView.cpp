@@ -52,8 +52,8 @@ All rights reserved.
 const bigtime_t kBarberPoleDelay = 500000;
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "CountView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "CountView"
 
 BCountView::BCountView(BRect bounds, BPoseView* view)
 	: BView(bounds, "CountVw", B_FOLLOW_LEFT + B_FOLLOW_BOTTOM,

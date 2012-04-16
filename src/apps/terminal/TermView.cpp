@@ -340,8 +340,8 @@ enum {
 	SELECT_LINES
 };
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Terminal TermView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Terminal TermView"
 
 static property_info sPropList[] = {
 	{ "encoding",

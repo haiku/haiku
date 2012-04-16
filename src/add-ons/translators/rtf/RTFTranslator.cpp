@@ -14,8 +14,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "RTFTranslator"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "RTFTranslator"
 
 #define READ_BUFFER_SIZE 2048
 #define DATA_BUFFER_SIZE 64

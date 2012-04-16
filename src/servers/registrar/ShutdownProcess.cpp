@@ -48,8 +48,8 @@
 #include "TRoster.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ShutdownProcess"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ShutdownProcess"
 
 
 using std::nothrow;

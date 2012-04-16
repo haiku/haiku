@@ -59,8 +59,8 @@ private:
 };
 
 
-#undef B_TRANSLATE_SYSTEM_NAME_CONTEXT
-#define B_TRANSLATE_SYSTEM_NAME_CONTEXT "System name"
+#undef B_TRANSLATION_SYSTEM_NAME_CONTEXT
+#define B_TRANSLATION_SYSTEM_NAME_CONTEXT "System name"
 
 
 #ifndef B_AVOID_TRANSLATION_MACROS
@@ -68,9 +68,7 @@ private:
 // you don't want these (in which case you need to collect the catalog keys
 // manually, as collectcatkeys won't do it for you):
 
-// TODO: maybe rename this to B_TRANSLATE_DEFAULT_CONTEXT, so that
-// B_TRANSLATE_WITH_CONTEXT() can just be called B_TRANSLATE_CONTEXT()
-#undef B_TRANSLATE_CONTEXT
+#undef B_TRANSLATION_CONTEXT
 	// In a single application, several strings (e.g. 'Ok') will be used
 	// more than once, in different contexts.
 	// As the application programmer can not know if all translations of
@@ -81,10 +79,10 @@ private:
 	// same string and tell which strings appears in what context of the
 	// application.
 	// In order to give the translator a useful hint, the application
-	// programmer needs to define B_TRANSLATE_CONTEXT with the context he'd
+	// programmer needs to define B_TRANSLATION_CONTEXT with the context he'd
 	// like to be associated with the strings used in this specifc source file.
 	// example:
-	//		#define B_TRANSLATE_CONTEXT "Folder-Window"
+	//		#define B_TRANSLATION_CONTEXT "Folder-Window"
 	// Tip: Use a descriptive name of the class implemented in that
 	//		source-file.
 
@@ -92,16 +90,16 @@ private:
 #undef B_TRANSLATE
 #define B_TRANSLATE(string) \
 	BLocaleRoster::Default()->GetCatalog()->GetString((string), \
-		B_TRANSLATE_CONTEXT)
+		B_TRANSLATION_CONTEXT)
 
-#undef B_TRANSLATE_WITH_CONTEXT
-#define B_TRANSLATE_WITH_CONTEXT(string, context) \
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT(string, context) \
 	BLocaleRoster::Default()->GetCatalog()->GetString((string), (context))
 
 #undef B_TRANSLATE_COMMENT
 #define B_TRANSLATE_COMMENT(string, comment) \
 	BLocaleRoster::Default()->GetCatalog()->GetString((string), \
-		B_TRANSLATE_CONTEXT, (comment))
+		B_TRANSLATION_CONTEXT, (comment))
 
 #undef B_TRANSLATE_ALL
 #define B_TRANSLATE_ALL(string, context, comment) \
@@ -116,13 +114,13 @@ private:
 #define B_TRANSLATE_SYSTEM_NAME(string) \
 	BLocaleRoster::Default()->IsFilesystemTranslationPreferred() \
 		? BLocaleRoster::Default()->GetCatalog()->GetString((string), \
-			B_TRANSLATE_SYSTEM_NAME_CONTEXT) \
+			B_TRANSLATION_SYSTEM_NAME_CONTEXT) \
 		: (string)
 
 // Translation markers which can be used to mark static strings/IDs which
 // are used as key for translation requests (at other places in the code).
 /* Example:
-		#define B_TRANSLATE_CONTEXT "MyDecentApp-Menu"
+		#define B_TRANSLATION_CONTEXT "MyDecentApp-Menu"
 
 		static const char* choices[] = {
 			B_TRANSLATE_MARK("left"),

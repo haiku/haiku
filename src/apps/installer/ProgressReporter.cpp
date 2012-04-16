@@ -11,8 +11,8 @@
 #include <Locale.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "InstallProgress"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "InstallProgress"
 
 
 ProgressReporter::ProgressReporter(const BMessenger& messenger,

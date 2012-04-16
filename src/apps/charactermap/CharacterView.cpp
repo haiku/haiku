@@ -20,8 +20,8 @@
 
 #include "UnicodeBlocks.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "CharacterView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "CharacterView"
 
 static const uint32 kMsgCopyAsEscapedString = 'cesc';
 

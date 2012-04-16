@@ -61,8 +61,8 @@ static const uint32 kMsgApplyModifiers 		= 'apmd';
 static const uint32 kMsgRevertModifiers		= 'rvmd';
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Modifier keys window"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Modifier keys window"
 
 
 ModifierKeysWindow::ModifierKeysWindow()

@@ -20,8 +20,8 @@
 #include <be_apps/Tracker/RecentItems.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "FileWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "FileWindow"
 
 
 FileWindow::FileWindow(BRect rect, entry_ref *ref, const BMessage *settings)

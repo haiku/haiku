@@ -22,8 +22,8 @@
 #include <String.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Extensions"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Extensions"
 
 
 ExtensionsView::ExtensionsView()

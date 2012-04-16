@@ -33,8 +33,8 @@
 #include "ZipperThread.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "file:ZipOMaticWindow.cpp"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "file:ZipOMaticWindow.cpp"
 
 
 ZippoWindow::ZippoWindow(BList windowList, bool keepOpen)

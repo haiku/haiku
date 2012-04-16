@@ -49,8 +49,8 @@
 #include "WirelessNetworkMenuItem.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "NetworkStatusView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "NetworkStatusView"
 
 
 static const char *kStatusDescriptions[] = {

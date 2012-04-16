@@ -41,8 +41,8 @@ static const uint32 kMsgAgree = 'agre';
 //"IN THE SOFTWARE.";
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "InstallerApp"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "InstallerApp"
 
 
 int main(int, char **)

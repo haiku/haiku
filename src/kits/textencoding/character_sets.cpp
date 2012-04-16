@@ -5,8 +5,8 @@
 #include <Debug.h>
 #include "character_sets.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "textencodings"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "textencodings"
 
 namespace BPrivate {
 

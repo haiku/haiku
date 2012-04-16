@@ -56,8 +56,8 @@ const uint32 kAutomountSettingsChanged = 'achg';
 const uint32 kBootMountSettingsChanged = 'bchg';
 const uint32 kEjectWhenUnmountingChanged = 'ejct';
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "AutoMounterSettings"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "AutoMounterSettings"
 
 class AutomountSettingsPanel : public BBox {
 public:

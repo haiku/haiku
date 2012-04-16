@@ -18,8 +18,8 @@
 #include "WizardPageView.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "WizardView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "WizardView"
 
 
 WizardView::WizardView(const char* name)

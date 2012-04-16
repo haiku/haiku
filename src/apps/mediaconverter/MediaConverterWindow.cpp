@@ -36,8 +36,8 @@
 #include "MessageConstants.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "MediaConverter"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MediaConverter"
 #define VERSION "1.3.0"
 
 
@@ -519,7 +519,7 @@ MediaConverterWindow::BuildAudioVideoMenus()
 		== B_OK) {
 		if (separator) {
 			menu->AddItem(new BMenuItem(
-				B_TRANSLATE_WITH_CONTEXT("No audio", "Audio codecs list"),
+				B_TRANSLATE_CONTEXT("No audio", "Audio codecs list"),
 				new BMessage(AUDIO_CODEC_SELECT_MESSAGE)));
 			menu->AddSeparatorItem();
 			separator = false;
@@ -543,7 +543,7 @@ MediaConverterWindow::BuildAudioVideoMenus()
 		((BInvoker *)item)->Invoke();
 	} else {
 		item = new BMenuItem(
-			B_TRANSLATE_WITH_CONTEXT("None available", "Audio codecs"),
+			B_TRANSLATE_CONTEXT("None available", "Audio codecs"),
 			NULL);
 		menu->AddItem(item);
 		item->SetMarked(true);
@@ -575,7 +575,7 @@ MediaConverterWindow::BuildAudioVideoMenus()
 	while (get_next_encoder(&cookie, mf_format, &format, &outfmt, &codec_info) == B_OK) {
 		if (separator) {
 			menu->AddItem(new BMenuItem(
-				B_TRANSLATE_WITH_CONTEXT("No video", "Video codecs list"),
+				B_TRANSLATE_CONTEXT("No video", "Video codecs list"),
 				new BMessage(VIDEO_CODEC_SELECT_MESSAGE)));
 			menu->AddSeparatorItem();
 			separator = false;
@@ -594,7 +594,7 @@ MediaConverterWindow::BuildAudioVideoMenus()
 		((BInvoker *)item)->Invoke();
 	} else {
 		item = new BMenuItem(
-			B_TRANSLATE_WITH_CONTEXT("None available", "Video codecs"), 
+			B_TRANSLATE_CONTEXT("None available", "Video codecs"), 
 			NULL);
 		menu->AddItem(item);
 		item->SetMarked(true);
@@ -912,13 +912,13 @@ MediaConverterWindow::_CreateMenu()
 	BMenuItem* item;
 	BMenu* menu;
 
-	menu = new BMenu(B_TRANSLATE_WITH_CONTEXT("File", "Menu"));
-	item = new BMenuItem(B_TRANSLATE_WITH_CONTEXT(
+	menu = new BMenu(B_TRANSLATE_CONTEXT("File", "Menu"));
+	item = new BMenuItem(B_TRANSLATE_CONTEXT(
 		"Open" B_UTF8_ELLIPSIS, "Menu"),
 		new BMessage(OPEN_FILE_MESSAGE), 'O');
 	menu->AddItem(item);
 	menu->AddSeparatorItem();
-	item = new BMenuItem(B_TRANSLATE_WITH_CONTEXT("Quit", "Menu"), 
+	item = new BMenuItem(B_TRANSLATE_CONTEXT("Quit", "Menu"), 
 		new BMessage(QUIT_MESSAGE), 'Q');
 	menu->AddItem(item);
 

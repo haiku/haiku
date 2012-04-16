@@ -61,8 +61,8 @@ const int32 kListFloater = 5;
 const int32 kSystemFloater = 6;
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "WindowMenu"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "WindowMenu"
 
 bool
 TWindowMenu::WindowShouldBeListed(uint32 behavior)

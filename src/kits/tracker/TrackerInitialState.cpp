@@ -332,8 +332,8 @@ AddTemporaryBackgroundImages(BMessage *message, const char *imagePath,
 // #pragma mark -
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "TrackerInitialState"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "TrackerInitialState"
 
 bool
 TTracker::InstallMimeIfNeeded(const char *type, int32 bitsID,

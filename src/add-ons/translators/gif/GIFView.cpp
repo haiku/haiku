@@ -31,8 +31,8 @@
 
 #include "GIFView.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "GIFView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "GIFView"
 
 
 extern int32 translatorVersion;

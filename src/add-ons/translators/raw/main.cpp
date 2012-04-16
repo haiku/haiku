@@ -25,8 +25,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "RAWTranslator main"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "RAWTranslator main"
 
 int
 main(int argc, char **argv)

@@ -22,7 +22,7 @@ class CatalogTest {
 		void Check();
 };
 
-#define B_TRANSLATE_CONTEXT "CatalogTest"
+#define B_TRANSLATION_CONTEXT "CatalogTest"
 
 
 #define catSig "x-vnd.Be.locale.catalogTest"
@@ -34,7 +34,7 @@ CatalogTest::Run()
 	printf("app...");
 	status_t res;
 	BString s;
-	s << "string" << "\x01" << B_TRANSLATE_CONTEXT << "\x01";
+	s << "string" << "\x01" << B_TRANSLATION_CONTEXT << "\x01";
 	size_t hashVal = CatKey::HashFun(s.String());
 	assert(be_locale != NULL);
 	system("mkdir -p ./locale/catalogs/"catSig);
@@ -44,7 +44,7 @@ CatalogTest::Run()
 	assert(cata.InitCheck() == B_OK);
 
 	// ...and populate the catalog with some data:
-	res = cata.SetString("string", "Schnur", B_TRANSLATE_CONTEXT);
+	res = cata.SetString("string", "Schnur", B_TRANSLATION_CONTEXT);
 	assert(res == B_OK);
 	res = cata.SetString(hashVal, "Schnur_id");
 		// add a second entry for the same hash-value, but with different
@@ -55,13 +55,14 @@ CatalogTest::Run()
 	res = cata.SetString("string", "Textpuffer", "programming",
 		"Deutsches Fachbuch");
 	assert(res == B_OK);
-	res = cata.SetString("string", "Leine", B_TRANSLATE_CONTEXT, "Deutsches Fachbuch");
+	res = cata.SetString("string", "Leine", B_TRANSLATION_CONTEXT,
+		"Deutsches Fachbuch");
 	assert(res == B_OK);
 	res = cata.WriteToFile("./locale/catalogs/"catSig"/german.catalog");
 	assert(res == B_OK);
 
 	// check if we are getting back the correct strings:
-	s = cata.GetString(("string"), B_TRANSLATE_CONTEXT);
+	s = cata.GetString(("string"), B_TRANSLATION_CONTEXT);
 	assert(s == "Schnur");
 	s = cata.GetString(hashVal);
 	assert(s == "Schnur_id");
@@ -69,7 +70,7 @@ CatalogTest::Run()
 	assert(s == "String");
 	s = cata.GetString("string", "programming", "Deutsches Fachbuch");
 	assert(s == "Textpuffer");
-	s = cata.GetString("string", B_TRANSLATE_CONTEXT, "Deutsches Fachbuch");
+	s = cata.GetString("string", B_TRANSLATION_CONTEXT, "Deutsches Fachbuch");
 	assert(s == "Leine");
 
 	// now we create a new (base) catalog and embed this one into the app-file:
@@ -83,7 +84,7 @@ CatalogTest::Run()
 	assert(res == B_OK);
 	// the following string will be hidden by the definition inside the
 	// german catalog:
-	res = catb.SetString("string", "hidden", B_TRANSLATE_CONTEXT);
+	res = catb.SetString("string", "hidden", B_TRANSLATION_CONTEXT);
 	assert(res == B_OK);
 	app_info appInfo;
 	res = be_app->GetAppInfo(&appInfo);
@@ -103,7 +104,7 @@ CatalogTest::Check()
 	status_t res;
 	printf("app-check...");
 	BString s;
-	s << "string" << "\x01" << B_TRANSLATE_CONTEXT << "\x01";
+	s << "string" << "\x01" << B_TRANSLATION_CONTEXT << "\x01";
 	size_t hashVal = CatKey::HashFun(s.String());
 	// ok, we now try to re-load the catalog that has just been written:
 	//

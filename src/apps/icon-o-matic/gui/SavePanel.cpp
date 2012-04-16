@@ -29,8 +29,8 @@
 #include "Panel.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Icon-O-Matic-SavePanel"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Icon-O-Matic-SavePanel"
 
 
 enum {
@@ -206,7 +206,7 @@ SavePanel::SetExportMode(bool exportMode)
 		fFormatMF->SetEnabled(true);
 		SetExportMode(fExportMode);
 		_EnableSettings();
-		helper << B_TRANSLATE_WITH_CONTEXT("Export Icon", "Dialog title");
+		helper << B_TRANSLATE_CONTEXT("Export Icon", "Dialog title");
 	} else {
 		fExportMode = ExportMode();
 			// does not overwrite fExportMode in case we already were
@@ -215,7 +215,7 @@ SavePanel::SetExportMode(bool exportMode)
 
 		fFormatMF->SetEnabled(false);
 		fSettingsB->SetEnabled(false);
-		helper << B_TRANSLATE_WITH_CONTEXT("Save Icon", "Dialog title");
+		helper << B_TRANSLATE_CONTEXT("Save Icon", "Dialog title");
 	}
 
 	window->Unlock();

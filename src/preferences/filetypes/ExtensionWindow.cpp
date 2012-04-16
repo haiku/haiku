@@ -23,8 +23,8 @@
 #include <string.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Extension Window"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Extension Window"
 
 
 const uint32 kMsgExtensionUpdated = 'exup';

@@ -51,7 +51,7 @@ of their respective holders. All rights reserved.
 #include <TextView.h>
 
 
-#define B_TRANSLATE_CONTEXT "Mail"
+#define B_TRANSLATION_CONTEXT "Mail"
 
 
 enum {

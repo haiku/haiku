@@ -18,8 +18,8 @@
 #include "Style.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Icon-O-Matic-SetGradientCmd"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Icon-O-Matic-SetGradientCmd"
 
 
 using std::nothrow;

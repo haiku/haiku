@@ -43,8 +43,8 @@
 #include "CalcOptions.h"
 #include "ExpressionTextView.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "CalcView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "CalcView"
 
 //const uint8 K_COLOR_OFFSET				= 32;
 const float kFontScaleY						= 0.4f;

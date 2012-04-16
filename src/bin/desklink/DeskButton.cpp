@@ -27,8 +27,8 @@
 #define DO_ACTION	'doac'
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "DeskButton"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "DeskButton"
 
 
 extern const char *kAppSignature;

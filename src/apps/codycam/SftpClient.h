@@ -12,8 +12,8 @@
 #include "SpawningUploadClient.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "SftpClient"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "SftpClient"
 
 
 using std::string;

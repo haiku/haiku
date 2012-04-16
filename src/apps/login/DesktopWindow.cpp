@@ -18,8 +18,8 @@
 #include "LoginApp.h"
 #include "DesktopWindow.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Desktop Window"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Desktop Window"
 
 const window_feel kPrivateDesktopWindowFeel = window_feel(1024);
 const window_look kPrivateDesktopWindowLook = window_look(4);

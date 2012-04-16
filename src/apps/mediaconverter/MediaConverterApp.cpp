@@ -25,8 +25,8 @@
 #include "MessageConstants.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "MediaConverter"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MediaConverter"
 
 
 const char APP_SIGNATURE[] = "application/x-vnd.Haiku-MediaConverter";

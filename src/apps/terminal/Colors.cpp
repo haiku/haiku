@@ -8,8 +8,8 @@
 #include <Catalog.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Terminal colors schema"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Terminal colors schema"
 
 
 const rgb_color kBlack= { 0, 0, 0, 255 };

@@ -50,7 +50,7 @@ of their respective holders. All rights reserved.
 #include "Messages.h"
 
 
-#define B_TRANSLATE_CONTEXT "Mail"
+#define B_TRANSLATION_CONTEXT "Mail"
 
 
 extern BRect		signature_window;

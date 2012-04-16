@@ -23,8 +23,8 @@
 
 #include "KitSupport.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "RemoteDevice"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "RemoteDevice"
 
 
 namespace Bluetooth {

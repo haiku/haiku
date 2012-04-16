@@ -31,8 +31,8 @@
 #include "Selection.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Icon-O-Matic-TransformersList"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Icon-O-Matic-TransformersList"
 
 
 using std::nothrow;
@@ -135,9 +135,9 @@ TransformerListView::Draw(BRect updateRect)
 		return;
 
 	// display helpful messages
-	const char* message1 = B_TRANSLATE_WITH_CONTEXT("Click on a shape above", 
+	const char* message1 = B_TRANSLATE_CONTEXT("Click on a shape above", 
 		"Empty transformers list - 1st line");
-	const char* message2 = B_TRANSLATE_WITH_CONTEXT("to attach transformers.",
+	const char* message2 = B_TRANSLATE_CONTEXT("to attach transformers.",
 		"Empty transformers list - 2nd line");
 
 	SetHighColor(tint_color(LowColor(), B_DARKEN_2_TINT));

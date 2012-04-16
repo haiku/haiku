@@ -15,8 +15,8 @@
 #include "ShortcutsWindow.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ShortcutsApp"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ShortcutsApp"
 
 
 ShortcutsApp::ShortcutsApp()

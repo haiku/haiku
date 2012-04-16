@@ -80,8 +80,8 @@ namespace
 //	#pragma mark -
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Open_and_SaveAsPanel"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Open_and_SaveAsPanel"
 
 
 StyledEditApp::StyledEditApp()

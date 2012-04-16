@@ -14,8 +14,8 @@
 #include <Catalog.h>
 #include <Window.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "FontDemo"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "FontDemo"
 
 const BString APP_NAME = B_TRANSLATE_MARK("FontDemo");
 

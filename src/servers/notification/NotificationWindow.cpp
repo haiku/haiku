@@ -31,8 +31,8 @@
 #include "AppUsage.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "NotificationWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "NotificationWindow"
 
 
 property_info main_prop_list[] = {

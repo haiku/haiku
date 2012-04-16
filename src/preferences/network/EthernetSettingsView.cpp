@@ -87,8 +87,8 @@ MatchPattern(const char* string, const char* pattern)
 //	#pragma mark -
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "EthernetSettingsView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "EthernetSettingsView"
 
 
 EthernetSettingsView::EthernetSettingsView()

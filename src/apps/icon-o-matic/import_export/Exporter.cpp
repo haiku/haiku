@@ -25,8 +25,8 @@
 #include "Icon.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Icon-O-Matic-Exporter"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Icon-O-Matic-Exporter"
 
 
 using std::nothrow;
@@ -112,7 +112,7 @@ Exporter::_ExportThread()
 		BString helper(B_TRANSLATE("Saving your document failed!"));
 		helper << "\n\n" << B_TRANSLATE("Error: ") << strerror(ret);
 		BAlert* alert = new BAlert(B_TRANSLATE("bad news"), helper.String(),
-			B_TRANSLATE_WITH_CONTEXT("Bleep!", 
+			B_TRANSLATE_CONTEXT("Bleep!", 
 				"Exporter - Continue in error dialog"), 
 			NULL, NULL);
 		// launch alert asynchronously

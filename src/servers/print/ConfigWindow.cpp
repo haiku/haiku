@@ -30,8 +30,8 @@
 #include "PrintUtils.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ConfigWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ConfigWindow"
 
 
 static const float a0_width = 2380.0;

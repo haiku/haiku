@@ -12,8 +12,8 @@
 #include <PartitionParameterEditor.h>
 #include <View.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "BFS_Creation_Parameter"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "BFS_Creation_Parameter"
 
 
 PrimaryPartitionEditor::PrimaryPartitionEditor()

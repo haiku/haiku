@@ -45,8 +45,8 @@
 #include "SettingsWindow.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "MediaPlayer-Main"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MediaPlayer-Main"
 
 
 static const char* kCurrentPlaylistFilename = "MediaPlayer Current Playlist";

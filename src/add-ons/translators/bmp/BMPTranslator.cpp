@@ -28,8 +28,8 @@ using std::min;
 //#define ERROR(x) printf(x);
 #define ERROR(x)
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "BMPTranslator"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "BMPTranslator"
 
 
 // The input formats that this translator supports.

@@ -24,8 +24,8 @@
 #include "ShowImageConstants.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "PrintOptionsWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PrintOptionsWindow"
 
 
 PrintOptions::PrintOptions()

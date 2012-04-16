@@ -33,8 +33,8 @@
 #include "StatusView.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "PreferencesWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PreferencesWindow"
 
 PreferencesWindow::PreferencesWindow(BRect frame)
 	:

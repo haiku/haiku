@@ -37,8 +37,8 @@
 #include "TGAView.h"
 #include "StreamBuffer.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "TGATranslator"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "TGATranslator"
 
 // The input formats that this translator supports.
 static const translation_format sInputFormats[] = {

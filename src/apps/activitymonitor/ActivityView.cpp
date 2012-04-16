@@ -32,8 +32,8 @@
 #include "SystemInfo.h"
 #include "SystemInfoHandler.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ActivityView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ActivityView"
 
 template<typename ObjectType>
 class ListAddDeleter {

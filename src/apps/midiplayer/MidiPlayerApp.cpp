@@ -28,8 +28,8 @@
 #include "MidiPlayerApp.h"
 #include "MidiPlayerWindow.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Main Application"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Main Application"
 
 MidiPlayerApp::MidiPlayerApp()
 	: BApplication(MIDI_PLAYER_SIGNATURE)

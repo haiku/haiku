@@ -186,8 +186,8 @@ public:
 // #pragma mark - BStatusWindow
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "StatusWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "StatusWindow"
 
 
 BStatusWindow::BStatusWindow()

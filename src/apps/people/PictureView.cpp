@@ -37,8 +37,8 @@
 #include "PeopleApp.h"	// for B_PERSON_MIMETYPE
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "People"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "People"
 
 
 const uint32 kMsgPopUpMenuClosed = 'pmcl';

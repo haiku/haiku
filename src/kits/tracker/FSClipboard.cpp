@@ -108,8 +108,8 @@ CompareModeAndRefName(const char *modeName, const char *refName)
 //	#pragma mark -
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "FSClipBoard"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "FSClipBoard"
 
 bool
 FSClipboardHasRefs()

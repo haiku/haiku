@@ -20,8 +20,8 @@
 #include <PrintJob.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "PrintServerApp"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PrintServerApp"
 
 
 struct AsyncThreadParams {

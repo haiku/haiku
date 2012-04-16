@@ -25,8 +25,8 @@
 #include "SetPropertiesCommand.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Icon-O-Matic-PropertiesList"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Icon-O-Matic-PropertiesList"
 
 
 using std::nothrow;
@@ -59,11 +59,11 @@ IconObjectListView::Draw(BRect updateRect)
 		return;
 
 	// display helpful messages
-	const char* message1 = B_TRANSLATE_WITH_CONTEXT(
+	const char* message1 = B_TRANSLATE_CONTEXT(
 		"Click on an object in", "Empty property list - 1st line");
-	const char* message2 = B_TRANSLATE_WITH_CONTEXT(
+	const char* message2 = B_TRANSLATE_CONTEXT(
 		"any of the other lists to", "Empty property list - 2nd line");
-	const char* message3 = B_TRANSLATE_WITH_CONTEXT(
+	const char* message3 = B_TRANSLATE_CONTEXT(
 		"edit it's properties here.", "Empty property list - 3rd line");
 
 	SetHighColor(tint_color(LowColor(), B_DARKEN_2_TINT));

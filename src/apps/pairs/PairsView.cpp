@@ -92,8 +92,8 @@ PairsView::_HasBitmap(BList& bitmaps, BBitmap* bitmap)
 	return false;
 }
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "PairsView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PairsView"
 
 void
 PairsView::_ReadRandomIcons()

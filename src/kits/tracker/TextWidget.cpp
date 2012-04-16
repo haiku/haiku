@@ -55,8 +55,8 @@ All rights reserved.
 #include "WidgetAttributeText.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "TextWidget"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "TextWidget"
 
 const float kWidthMargin = 20;
 

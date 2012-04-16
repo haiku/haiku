@@ -39,8 +39,8 @@
 #include "KeymapListItem.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Keymap window"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Keymap window"
 
 
 static const uint32 kMsgMenuFileOpen = 'mMFO';

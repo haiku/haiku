@@ -16,8 +16,8 @@
 #include "Playlist.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "MediaPlayer-RemovePLItemsCmd"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MediaPlayer-RemovePLItemsCmd"
 
 
 using std::nothrow;

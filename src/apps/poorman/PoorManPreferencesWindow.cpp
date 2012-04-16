@@ -19,8 +19,8 @@
 #include "PoorManServer.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "PoorMan"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PoorMan"
 
 
 PoorManPreferencesWindow::PoorManPreferencesWindow(BRect frame, char * name)

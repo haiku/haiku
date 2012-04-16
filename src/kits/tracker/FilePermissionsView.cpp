@@ -47,8 +47,8 @@ const uint32 kNewOwnerEntered = 'nwow';
 const uint32 kNewGroupEntered = 'nwgr';
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "FilePermissionsView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "FilePermissionsView"
 
 FilePermissionsView::FilePermissionsView(BRect rect, Model *model)
 	:	BView(rect, "FilePermissionsView", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW),

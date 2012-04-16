@@ -19,8 +19,8 @@
 #include <unistd.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "dstcheck"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "dstcheck"
 
 
 const uint32 TIMEDALERT_UPDATE = 'taup';

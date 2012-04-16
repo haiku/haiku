@@ -44,8 +44,8 @@ const uint32 MSG_DESTTEXT		= 'mDTX';
 const uint32 MSG_SHOWCONTENTS	= 'mSCT';
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ExpanderWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ExpanderWindow"
 
 ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 		BMessage* settings)
@@ -506,8 +506,8 @@ ExpanderWindow::RefsReceived(BMessage* msg)
 }
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ExpanderMenu"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ExpanderMenu"
 
 void
 ExpanderWindow::_AddMenuBar(BLayout* layout)
@@ -542,8 +542,8 @@ ExpanderWindow::_AddMenuBar(BLayout* layout)
 }
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ExpanderWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ExpanderWindow"
 
 void
 ExpanderWindow::StartExpanding()

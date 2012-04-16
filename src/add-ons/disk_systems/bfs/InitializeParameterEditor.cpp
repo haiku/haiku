@@ -24,8 +24,8 @@
 #include <Window.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "BFS_Initialize_Parameter"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "BFS_Initialize_Parameter"
 
 
 static uint32 MSG_BLOCK_SIZE = 'blsz';

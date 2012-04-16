@@ -26,8 +26,8 @@
 #include "FontView.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "APRWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "APRWindow"
 
 
 static const uint32 kMsgSetDefaults = 'dflt';

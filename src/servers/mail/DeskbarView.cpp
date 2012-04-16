@@ -41,8 +41,8 @@
 #include "DeskbarViewIcons.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "DeskbarView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "DeskbarView"
 
 
 const char* kTrackerSignature = "application/x-vnd.Be-TRAK";

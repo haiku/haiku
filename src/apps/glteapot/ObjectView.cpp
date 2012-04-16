@@ -28,8 +28,8 @@
 #include "GLObject.h"
 #include "ResScroll.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ObjectView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ObjectView"
 
 float displayScale = 1.0;
 float depthOfView = 30.0;

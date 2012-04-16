@@ -56,8 +56,8 @@
 #define CONNECT FPRINTF
 #define WINDOW FPRINTF
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "RecorderWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "RecorderWindow"
 
 
 // default window positioning

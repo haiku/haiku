@@ -26,8 +26,8 @@
 #include "FontSelectionView.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Font view"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Font view"
 
 
 static const uint32 kMsgCheckFonts = 'chkf';

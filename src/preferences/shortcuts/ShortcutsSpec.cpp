@@ -32,8 +32,8 @@
 
 #define CLASS "ShortcutsSpec : "
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ShortcutsSpec"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ShortcutsSpec"
 
 const float _height = 20.0f;
 

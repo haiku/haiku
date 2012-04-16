@@ -22,8 +22,8 @@
 #include "WonderBrushView.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "WonderBrushTranslator"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "WonderBrushTranslator"
 
 
 using std::nothrow;

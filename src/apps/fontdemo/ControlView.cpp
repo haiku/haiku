@@ -25,8 +25,8 @@
 
 #include <stdio.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ControlView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ControlView"
 
 ControlView::ControlView(BRect rect)
 	: BView(rect, "ControlView", B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE_JUMP),

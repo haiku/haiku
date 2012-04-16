@@ -40,8 +40,8 @@
 #include "TranslatorListView.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "DataTranslations"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "DataTranslations"
 
 
 const uint32 kMsgTranslatorInfo = 'trin';

@@ -156,8 +156,8 @@ AddMenuItemVisitor::Visit(BPartition *partition, int32 level)
 //	#pragma mark -
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "MountMenu"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MountMenu"
 
 MountMenu::MountMenu(const char *name)
 	: BMenu(name)

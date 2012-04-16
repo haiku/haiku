@@ -45,8 +45,8 @@
 #include "WorkerThread.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "InstallerWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "InstallerWindow"
 
 
 static const char* kDriveSetupSignature = "application/x-vnd.Haiku-DriveSetup";

@@ -24,8 +24,8 @@
 #include "DiskProbe.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "OpenWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "OpenWindow"
 
 static const uint32 kMsgProbeFile = 'prDv';
 static const uint32 kMsgProbeDevice = 'prFl';

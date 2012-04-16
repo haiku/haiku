@@ -18,8 +18,8 @@
 #include "Transformer.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Icon-O-Matic-MoveTransformersCmd"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Icon-O-Matic-MoveTransformersCmd"
 
 
 using std::nothrow;

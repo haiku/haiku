@@ -48,8 +48,8 @@
 #endif
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "smtp"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "smtp"
 
 
 #define CRLF "\r\n"

@@ -18,8 +18,8 @@
 #include <MailSettings.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ConfigView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ConfigView"
 
 
 const uint32 kMsgActionMoveTo = 'argm';

@@ -34,8 +34,8 @@
 #include <Mime.h>
 #include <Path.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ProcessController"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ProcessController"
 
 Preferences::Preferences(const char* name, const char* signature, bool doSave)
 	: BMessage('Pref'), BLocker("Preferences", true),

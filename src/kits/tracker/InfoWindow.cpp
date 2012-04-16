@@ -76,8 +76,8 @@ All rights reserved.
 #include "WidgetAttributeText.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "InfoWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "InfoWindow"
 
 
 namespace BPrivate {

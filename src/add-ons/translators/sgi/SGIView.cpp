@@ -50,8 +50,8 @@
 
 const char* author = "Stephan Aßmus, <stippi@yellowbites.com>";
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "SGIView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "SGIView"
 
 // add_menu_item
 void

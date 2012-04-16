@@ -33,8 +33,8 @@
 #include <MailSettings.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "MailDaemon"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MailDaemon"
 
 
 using std::map;

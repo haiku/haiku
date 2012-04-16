@@ -66,8 +66,8 @@ const uint32 kDefaultsButtonPressed = 'Apbp';
 const uint32 kRevertButtonPressed = 'Rebp';
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "TrackerSettingsWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "TrackerSettingsWindow"
 
 TrackerSettingsWindow::TrackerSettingsWindow()
 	:

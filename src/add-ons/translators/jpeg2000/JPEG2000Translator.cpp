@@ -42,8 +42,8 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <TextView.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "JPEG2000Translator"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "JPEG2000Translator"
 
 // Set these accordingly
 #define JP2_ACRONYM "JP2"

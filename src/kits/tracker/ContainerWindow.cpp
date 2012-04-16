@@ -91,8 +91,8 @@ All rights reserved.
 #include "TemplatesMenu.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ContainerWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ContainerWindow"
 
 const uint32 kRedo = 'REDO';
 	// this is the same as B_REDO in Dano/Zeta/Haiku

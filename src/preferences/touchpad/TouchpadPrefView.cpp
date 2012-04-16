@@ -34,8 +34,8 @@
 const uint32 SCROLL_X_DRAG = 'sxdr';
 const uint32 SCROLL_Y_DRAG = 'sydr';
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "TouchpadPrefView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "TouchpadPrefView"
 
 
 TouchpadView::TouchpadView(BRect frame)

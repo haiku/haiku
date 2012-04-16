@@ -61,7 +61,7 @@ using namespace BPrivate;
 #include "Signature.h"
 
 
-#define B_TRANSLATE_CONTEXT "Mail"
+#define B_TRANSLATION_CONTEXT "Mail"
 
 #define BUTTON_WIDTH		70
 #define BUTTON_HEIGHT		20

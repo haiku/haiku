@@ -73,8 +73,8 @@ const int32 kOpenAndMakeDefault = 'OpDf';
 const rgb_color kOpenWithDefaultColor = { 0xFF, 0xFF, 0xCC, 255};
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "OpenWithWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "OpenWithWindow"
 
 OpenWithContainerWindow::OpenWithContainerWindow(BMessage *entriesToOpen,
 		LockingList<BWindow> *windowList, window_look look, window_feel feel,

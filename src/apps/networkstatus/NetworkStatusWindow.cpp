@@ -14,8 +14,8 @@
 #include <Catalog.h>
 #include <Locale.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "NetworkStatusWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "NetworkStatusWindow"
 
 
 NetworkStatusWindow::NetworkStatusWindow()

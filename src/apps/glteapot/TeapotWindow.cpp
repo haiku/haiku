@@ -13,8 +13,8 @@
 
 #include "TeapotWindow.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "TeapotWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "TeapotWindow"
 
 TeapotWindow::TeapotWindow(BRect rect, const char* name, window_type wt,
 	ulong something)

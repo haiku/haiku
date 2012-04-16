@@ -18,8 +18,8 @@
 #include <MailProtocol.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "RuleFilter"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "RuleFilter"
 
 
 RuleFilter::RuleFilter(MailProtocol& protocol, AddonSettings* addonSettings)

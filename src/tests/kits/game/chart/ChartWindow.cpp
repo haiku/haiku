@@ -39,8 +39,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ChartWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ChartWindow"
 
 /* pseudo-random generator parameters (not very good ones,
    but good enough for what we do here). */

@@ -82,8 +82,8 @@
 #include "StyledTextImporter.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Icon-O-Matic-Main"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Icon-O-Matic-Main"
 
 
 using std::nothrow;
@@ -184,7 +184,7 @@ MainWindow::MessageReceived(BMessage* message)
 				continue;
 			char name[30];
 			sprintf(name, 
-				B_TRANSLATE_WITH_CONTEXT("Color (#%02x%02x%02x)", 
+				B_TRANSLATE_CONTEXT("Color (#%02x%02x%02x)", 
 					"Style name after dropping a color"), 
 				color->red, color->green, color->blue);
 			Style* style = new (nothrow) Style(*color);
@@ -359,7 +359,7 @@ MainWindow::MessageReceived(BMessage* message)
 			if (fUndoMI->IsEnabled())
 				fUndoMI->SetLabel(label.String());
 			else {
-				fUndoMI->SetLabel(B_TRANSLATE_WITH_CONTEXT("<nothing to undo>",
+				fUndoMI->SetLabel(B_TRANSLATE_CONTEXT("<nothing to undo>",
 					"Icon-O-Matic-Menu-Edit"));
 			}
 	
@@ -369,7 +369,7 @@ MainWindow::MessageReceived(BMessage* message)
 			if (fRedoMI->IsEnabled())
 				fRedoMI->SetLabel(label.String());
 			else {
-				fRedoMI->SetLabel(B_TRANSLATE_WITH_CONTEXT("<nothing to redo>",
+				fRedoMI->SetLabel(B_TRANSLATE_CONTEXT("<nothing to redo>",
 					"Icon-O-Matic-Menu-Edit"));
 			}
 			break;
@@ -424,7 +424,7 @@ MainWindow::MessageReceived(BMessage* message)
 					commands[1] = pathCommand;
 					commands[2] = shapeCommand;
 					command = new CompoundCommand(commands, 3,
-						B_TRANSLATE_WITH_CONTEXT("Add shape with path & style",
+						B_TRANSLATE_CONTEXT("Add shape with path & style",
 							"Icon-O-Matic-Menu-Shape"),
 						0);
 				} else if (styleCommand) {
@@ -432,7 +432,7 @@ MainWindow::MessageReceived(BMessage* message)
 					commands[0] = styleCommand;
 					commands[1] = shapeCommand;
 					command = new CompoundCommand(commands, 2,
-						B_TRANSLATE_WITH_CONTEXT("Add shape with style",
+						B_TRANSLATE_CONTEXT("Add shape with style",
 							"Icon-O-Matic-Menu-Shape"), 
 						0);
 				} else {
@@ -440,7 +440,7 @@ MainWindow::MessageReceived(BMessage* message)
 					commands[0] = pathCommand;
 					commands[1] = shapeCommand;
 					command = new CompoundCommand(commands, 2,
-						B_TRANSLATE_WITH_CONTEXT("Add shape with path",
+						B_TRANSLATE_CONTEXT("Add shape with path",
 							"Icon-O-Matic-Menu-Shape"), 
 						0);
 				}
@@ -712,9 +712,9 @@ MainWindow::Open(const entry_ref& ref, bool append)
 		BString helper(B_TRANSLATE("Opening the document failed!"));
 		helper << "\n\n" << B_TRANSLATE("Error: ") << strerror(ret);
 		BAlert* alert = new BAlert(
-			B_TRANSLATE_WITH_CONTEXT("bad news", "Title of error alert"),
+			B_TRANSLATE_CONTEXT("bad news", "Title of error alert"),
 			helper.String(), 
-			B_TRANSLATE_WITH_CONTEXT("Bummer", 
+			B_TRANSLATE_CONTEXT("Bummer", 
 				"Cancel button - error alert"),	
 			NULL, NULL);
 		// launch alert asynchronously
@@ -790,9 +790,9 @@ MainWindow::Open(const BMessenger& externalObserver, const uint8* data,
 			BString helper(B_TRANSLATE("Opening the icon failed!"));
 			helper << "\n\n" << B_TRANSLATE("Error: ") << strerror(ret);
 			BAlert* alert = new BAlert(
-				B_TRANSLATE_WITH_CONTEXT("bad news", "Title of error alert"),
+				B_TRANSLATE_CONTEXT("bad news", "Title of error alert"),
 				helper.String(), 
-				B_TRANSLATE_WITH_CONTEXT("Bummer", 
+				B_TRANSLATE_CONTEXT("Bummer", 
 					"Cancel button - error alert"),	
 				NULL, NULL);
 			// launch alert asynchronously
@@ -1134,8 +1134,8 @@ MainWindow::_CreateMenuBar()
 	BMenuBar* menuBar = new BMenuBar("main menu");
 
 
-	#undef B_TRANSLATE_CONTEXT
-	#define B_TRANSLATE_CONTEXT "Icon-O-Matic-Menus"
+	#undef B_TRANSLATION_CONTEXT
+	#define B_TRANSLATION_CONTEXT "Icon-O-Matic-Menus"
 	
 	
 	BMenu* fileMenu = new BMenu(B_TRANSLATE("File"));
@@ -1154,8 +1154,8 @@ MainWindow::_CreateMenuBar()
 
 
 	// File
-	#undef B_TRANSLATE_CONTEXT
-	#define B_TRANSLATE_CONTEXT "Icon-O-Matic-Menu-File"
+	#undef B_TRANSLATION_CONTEXT
+	#define B_TRANSLATION_CONTEXT "Icon-O-Matic-Menu-File"
 	
 
 	BMenuItem* item = new BMenuItem(B_TRANSLATE("New"),
@@ -1190,8 +1190,8 @@ MainWindow::_CreateMenuBar()
 	item->SetTarget(be_app);
 
 	// Edit
-	#undef B_TRANSLATE_CONTEXT
-	#define B_TRANSLATE_CONTEXT "Icon-O-Matic-Menu-Edit"
+	#undef B_TRANSLATION_CONTEXT
+	#define B_TRANSLATION_CONTEXT "Icon-O-Matic-Menu-Edit"
 	
 	
 	fUndoMI = new BMenuItem(B_TRANSLATE("<nothing to undo>"),
@@ -1207,8 +1207,8 @@ MainWindow::_CreateMenuBar()
 
 
 	// Settings
-	#undef B_TRANSLATE_CONTEXT
-	#define B_TRANSLATE_CONTEXT "Icon-O-Matic-Menu-Settings"
+	#undef B_TRANSLATION_CONTEXT
+	#define B_TRANSLATION_CONTEXT "Icon-O-Matic-Menu-Settings"
 	
 	
 	BMenu* filterModeMenu = new BMenu(B_TRANSLATE("Snap to grid"));

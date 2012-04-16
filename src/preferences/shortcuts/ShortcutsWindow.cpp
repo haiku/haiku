@@ -59,8 +59,8 @@
 	// the "shortcut_catcher" input_server filter, it should not be overloaded
 	// with window position information.  Instead, a separate file is used.
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ShortcutsWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ShortcutsWindow"
 
 #define ERROR "Shortcuts error"
 #define WARNING "Shortcuts warning"

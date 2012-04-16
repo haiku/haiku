@@ -11,8 +11,8 @@
 #include <MediaTrack.h>
 #include <stdio.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "MediaFileInfo"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MediaFileInfo"
 
 MediaFileInfo::MediaFileInfo(BMediaFile* file)
 {

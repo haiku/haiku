@@ -19,8 +19,8 @@
 #include <Catalog.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "People"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "People"
 
 
 AttributeTextControl::AttributeTextControl(const char* label,

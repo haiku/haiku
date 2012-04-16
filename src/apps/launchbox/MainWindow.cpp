@@ -26,8 +26,8 @@
 #include "PadView.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "LaunchBox"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "LaunchBox"
 MainWindow::MainWindow(const char* name, BRect frame, bool addDefaultButtons)
 	:
 	BWindow(frame, name, B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,

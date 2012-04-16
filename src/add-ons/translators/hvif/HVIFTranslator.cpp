@@ -22,8 +22,8 @@
 #define HVIF_TRANSLATION_QUALITY		1.0
 #define HVIF_TRANSLATION_CAPABILITY		1.0
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "HVIFTranslator"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "HVIFTranslator"
 
 
 static const translation_format sInputFormats[] = {

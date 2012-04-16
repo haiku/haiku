@@ -37,8 +37,8 @@
 #include "GeneralView.h"
 #include "SettingsHost.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "GeneralView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "GeneralView"
 const int32 kServer = '_TSR';
 
 const char* kStartServer = B_TRANSLATE("Enable notifications");

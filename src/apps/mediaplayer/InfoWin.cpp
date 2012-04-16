@@ -51,8 +51,8 @@ const rgb_color kBlue =  {   0,   0, 220, 255 };
 const rgb_color kGreen = { 171, 221, 161, 255 };
 const rgb_color kBlack = {   0,   0,   0, 255 };
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "MediaPlayer-InfoWin"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MediaPlayer-InfoWin"
 
 // should later draw an icon
 class InfoView : public BView {

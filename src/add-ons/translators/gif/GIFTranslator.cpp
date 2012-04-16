@@ -37,8 +37,8 @@
 #define GIF_TYPE 'GIF '
 #endif
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "GIFTranslator"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "GIFTranslator"
 
 
 // This global will be externed in other files - set once here

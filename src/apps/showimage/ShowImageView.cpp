@@ -915,8 +915,8 @@ ShowImageView::_OutputFormatForType(BBitmap* bitmap, const char* type,
 }
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "SaveToFile"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "SaveToFile"
 
 
 void

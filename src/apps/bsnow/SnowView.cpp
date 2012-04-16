@@ -19,8 +19,8 @@
 
 
 #define FORWARD_TO_PARENT
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "BSnow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "BSnow"
 
 
 SnowView::SnowView()

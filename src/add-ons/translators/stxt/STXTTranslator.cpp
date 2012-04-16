@@ -28,8 +28,8 @@
 using namespace BPrivate;
 using namespace std;
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "STXTTranslator"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "STXTTranslator"
 
 #define READ_BUFFER_SIZE 32768
 #define DATA_BUFFER_SIZE 256

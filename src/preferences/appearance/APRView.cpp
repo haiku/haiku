@@ -30,8 +30,8 @@
 #include "ColorSet.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Colors tab"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Colors tab"
 
 #define COLOR_DROPPED 'cldp'
 #define DECORATOR_CHANGED 'dcch'

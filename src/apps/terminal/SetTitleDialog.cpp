@@ -17,8 +17,8 @@ static const uint32 kMessageDefault			= 'dflt';
 static const uint32 kMessageTitleChanged	= 'chng';
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Terminal SetTitleWindow"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Terminal SetTitleWindow"
 
 
 // #pragma mark - SetTitleDialog

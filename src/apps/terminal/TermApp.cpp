@@ -47,8 +47,8 @@ main()
 	return 0;
 }
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Terminal TermApp"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Terminal TermApp"
 
 TermApp::TermApp()
 	: BApplication(TERM_SIGNATURE),

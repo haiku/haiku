@@ -8,8 +8,8 @@
 
 #include <Catalog.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "UnicodeBlocks"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "UnicodeBlocks"
 
 const unicode_block kNoBlock;
 

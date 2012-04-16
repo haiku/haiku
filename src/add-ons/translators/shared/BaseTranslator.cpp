@@ -38,8 +38,8 @@
 
 #include "BaseTranslator.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "BaseTranslator"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "BaseTranslator"
 
 
 // ---------------------------------------------------------------

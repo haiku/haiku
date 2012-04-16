@@ -37,8 +37,8 @@
 #define HANDOVER_USE_GDB 1
 //#define HANDOVER_USE_DEBUGGER 1
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "DebugServer"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "DebugServer"
 
 #define USE_GUI true
 	// define to false if the debug server shouldn't use GUI (i.e. an alert)

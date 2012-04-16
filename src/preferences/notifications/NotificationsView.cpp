@@ -26,8 +26,8 @@
 
 #include "NotificationsView.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "NotificationView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "NotificationView"
 
 const float kEdgePadding = 5.0;
 const float kCLVTitlePadding = 8.0;

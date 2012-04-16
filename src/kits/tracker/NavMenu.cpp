@@ -251,8 +251,8 @@ SpringLoadedFolderCacheDragData(const BMessage* incoming, BMessage* *message,
 //	#pragma mark -
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "NavMenu"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "NavMenu"
 
 BNavMenu::BNavMenu(const char* title, uint32 message, const BHandler* target,
 	BWindow* parentWindow, const BObjectList<BString> *list)

@@ -37,8 +37,8 @@
 
 using BPrivate::gSystemCatalog;
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "PrintJob"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PrintJob"
 
 #undef B_TRANSLATE
 #define B_TRANSLATE(str) \

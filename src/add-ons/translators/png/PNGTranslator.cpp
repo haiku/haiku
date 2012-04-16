@@ -43,8 +43,8 @@
 
 #include "PNGView.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "PNGTranslator"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PNGTranslator"
 
 // The input formats that this translator supports.
 static const translation_format sInputFormats[] = {

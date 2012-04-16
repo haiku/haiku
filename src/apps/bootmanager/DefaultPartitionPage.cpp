@@ -24,8 +24,8 @@
 #include <TextView.h>
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "DefaultPartitionPage"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "DefaultPartitionPage"
 
 
 enum {

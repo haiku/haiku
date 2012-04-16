@@ -26,8 +26,8 @@
 #include "multiuser_utils.h"
 #endif
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Login App"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Login App"
 
 const char *kLoginAppSig = "application/x-vnd.Haiku-Login";
 

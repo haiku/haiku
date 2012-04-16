@@ -29,8 +29,8 @@
 #include <Catalog.h>
 #include <StringForSize.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ProcessController"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ProcessController"
 
 
 KernelMemoryBarMenuItem::KernelMemoryBarMenuItem(system_info& systemInfo)

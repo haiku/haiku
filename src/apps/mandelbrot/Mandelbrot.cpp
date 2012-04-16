@@ -21,8 +21,8 @@
 #include <math.h>
 #include <stdio.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Mandelbrot"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Mandelbrot"
 
 
 /* Those are the menu item id's of the main window */

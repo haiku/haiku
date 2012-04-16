@@ -14,8 +14,8 @@
 
 #include "DevicesView.h"
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "DevicesApplication"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "DevicesApplication"
 
 class DevicesApplication : public BApplication {
 public:

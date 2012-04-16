@@ -70,7 +70,7 @@ of their respective holders. All rights reserved.
 #include <time.h>
 
 
-#define B_TRANSLATE_CONTEXT "Mail"
+#define B_TRANSLATION_CONTEXT "Mail"
 
 
 using namespace BPrivate;

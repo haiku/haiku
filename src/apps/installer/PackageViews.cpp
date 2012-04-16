@@ -24,8 +24,8 @@
 #include "StringForSize.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "PackagesView"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PackagesView"
 
 #define ICON_ATTRIBUTE "INSTALLER PACKAGE: ICON"
 

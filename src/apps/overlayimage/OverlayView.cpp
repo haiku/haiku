@@ -19,8 +19,8 @@
 #include <String.h>
 #include <TextView.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Main view"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Main view"
 
 const float kDraggerSize = 7;
 	

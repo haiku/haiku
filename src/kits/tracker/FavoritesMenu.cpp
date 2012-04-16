@@ -57,8 +57,8 @@ All rights reserved.
 #include "Utilities.h"
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "FavoritesMenu"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "FavoritesMenu"
 
 FavoritesMenu::FavoritesMenu(const char *title, BMessage *openFolderMessage,
 	BMessage *openFileMessage, const BMessenger &target,
