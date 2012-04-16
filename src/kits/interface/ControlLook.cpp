@@ -846,6 +846,9 @@ BControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 		orientation);
 
 	view->PopState();
+
+	// reset clipping constraints
+	view->ConstrainClippingRegion(NULL);
 }
 
 
