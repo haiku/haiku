@@ -4821,6 +4821,9 @@ BView::SetToolTip(const char* text)
 	HideToolTip();
 	SetToolTip(static_cast<BToolTip*>(NULL));
 
+	if (text == NULL || text[0] == '\0')
+		return;
+
 	if (BTextToolTip* tip = dynamic_cast<BTextToolTip*>(fToolTip))
 		tip->SetText(text);
 	else
