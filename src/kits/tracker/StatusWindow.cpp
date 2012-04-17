@@ -421,8 +421,7 @@ BStatusWindow::WindowActivated(bool state)
 // #pragma mark - BStatusView
 
 
-BStatusView::BStatusView(BRect bounds, thread_id thread,
-	StatusWindowState type)
+BStatusView::BStatusView(BRect bounds, thread_id thread, StatusWindowState type)
 	:
 	BView(bounds, "StatusView", B_FOLLOW_NONE, B_WILL_DRAW),
 	fType(type),
@@ -651,7 +650,7 @@ BStatusView::Draw(BRect updateRect)
 	BString destinationString(_DestinationString(&destinationStringWidth));
 	availableSpace -= destinationStringWidth;
 
-	float statusStringWidth = 0.f;	
+	float statusStringWidth = 0.f;
 	BString statusString(_StatusString(availableSpace, smallFontSize,
 		&statusStringWidth));
 
@@ -690,7 +689,7 @@ BStatusView::_DestinationString(float* _width)
 		return buffer;
 	} else {
 		*_width = 0;
-		return BString();	
+		return BString();
 	}
 }
 
@@ -737,7 +736,7 @@ BStatusView::_FullSpeedString()
 	if (fBytesPerSecond != 0.0) {
 		char sizeBuffer[128];
 		buffer.SetTo(B_TRANSLATE(
-			"(%SizeProcessed of %TotalSize, %BytesPerSecond/s)"));
+			"%SizeProcessed of %TotalSize, %BytesPerSecond/s"));
 		buffer.ReplaceFirst("%SizeProcessed",
 			string_for_size((double)fSizeProcessed, sizeBuffer,
 			sizeof(sizeBuffer)));
@@ -787,12 +786,14 @@ BStatusView::_TimeStatusString(float availableSpace, float* _width)
 	}
 
 	BString string(_FullTimeRemainingString(now, finishTime, timeText));
-	*_width = StringWidth(string.String());
-	if (*_width > availableSpace) {
+	float width = StringWidth(string.String());
+	if (width > availableSpace) {
 		string.SetTo(_ShortTimeRemainingString(timeText));
-		*_width = StringWidth(string.String());
+		width = StringWidth(string.String());
 	}
 
+	if (_width != NULL)
+		*_width = width;
 	return string;
 }
 
@@ -803,7 +804,7 @@ BStatusView::_ShortTimeRemainingString(const char* timeText)
 	BString buffer;
 
 	// complete string too wide, try with shorter version
-	buffer.SetTo(B_TRANSLATE("(Finish: %time)"));
+	buffer.SetTo(B_TRANSLATE("Finish: %time"));
 	buffer.ReplaceFirst("%time", timeText);
 
 	return buffer;
@@ -818,10 +819,10 @@ BStatusView::_FullTimeRemainingString(time_t now, time_t finishTime,
 	BString buffer;
 	BString finishStr;
 	if (finishTime - now > 60 * 60) {
-		buffer.SetTo(B_TRANSLATE("(Finish: %time - Over %finishtime left)"));
+		buffer.SetTo(B_TRANSLATE("Finish: %time - Over %finishtime left"));
 		formatter.Format(now * 1000000LL, finishTime * 1000000LL, &finishStr);
 	} else {
-		buffer.SetTo(B_TRANSLATE("(Finish: %time - %finishtime left)"));
+		buffer.SetTo(B_TRANSLATE("Finish: %time - %finishtime left"));
 		formatter.Format(now * 1000000LL, finishTime * 1000000LL, &finishStr);
 	}
 
@@ -945,6 +946,11 @@ BStatusView::UpdateStatus(const char *curItem, off_t itemSize, bool optional)
 			}
 			if (count > 0)
 				fBytesPerSecond /= count;
+
+			BString toolTip = _TimeStatusString(1024.f, NULL);
+			toolTip << "\n" << _FullSpeedString();
+			SetToolTip(toolTip.String());
+
 			Invalidate();
 		}
 
@@ -954,7 +960,8 @@ BStatusView::UpdateStatus(const char *curItem, off_t itemSize, bool optional)
 		// so we can show it when the time comes
 		strncpy(fPendingStatusString, curItem, 127);
 		fPendingStatusString[127] = '0';
-	}
+	} else
+		SetToolTip((const char*)NULL);
 }
 
 
