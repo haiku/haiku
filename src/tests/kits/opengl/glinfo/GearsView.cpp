@@ -52,7 +52,7 @@ GearsView::Draw(BRect updateRect)
 
 	SetDrawingMode(B_OP_ALPHA);
 	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-	DrawBitmapAsync(fGears, BPoint(5.0, 18.0));
+	DrawBitmapAsync(fGears, BPoint(5.0, 10.0));
 }
 
 
