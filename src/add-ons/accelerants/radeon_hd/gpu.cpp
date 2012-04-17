@@ -531,7 +531,127 @@ radeon_gpu_ring_boot(uint32 ringType)
 		return B_ERROR;
 	}
 
-	// TODO: Write initial ring state
+	// We don't execute this code until it's more complete.
+	ERROR("%s: TODO\n", __func__);
+	return B_OK;
+
+
+	// TODO: Write initial ring PACKET3 STATE
+
+	// *** r600_cp_init_ring_buffer
+	// Reset command processor
+	Write32(OUT, GRBM_SOFT_RESET, RADEON_SOFT_RESET_CP);
+	Read32(OUT, GRBM_SOFT_RESET);
+	snooze(15000);
+	Write32(OUT, GRBM_SOFT_RESET, 0);
+
+	// Set ring buffer size
+	uint32 controlScratch = RB_NO_UPDATE
+		| (compute_order(4096 / 8) << 8) // rptr_update_l2qw
+		| compute_order(ring->GetSize() / 8); // size_l2qw
+	#ifdef __BIG_ENDIAN
+	controlScratch |= BUF_SWAP_32BIT;
+	#endif
+	Write32(OUT, CP_RB_CNTL, controlScratch);
+
+	// Set delays and timeouts
+	Write32(OUT, CP_SEM_WAIT_TIMER, 0);
+	Write32(OUT, CP_RB_WPTR_DELAY, 0);
+
+	// Enable RenderBuffer Reads
+	controlScratch |= RB_RPTR_WR_ENA;
+	Write32(OUT, CP_RB_CNTL, controlScratch);
+
+	// Zero out command processor read and write pointers
+	Write32(OUT, CP_RB_RPTR_WR, 0);
+	Write32(OUT, CP_RB_WPTR, 0);
+
+	#if 0
+	int ringPointer = 0;
+	// TODO: AGP cards
+	/*
+	if (RADEON_IS_AGP) {
+		ringPointer = dev_priv->ring_rptr->offset
+			- dev->agp->base
+			+ dev_priv->gart_vm_start;
+	} else {
+	*/
+	ringPointer = dev_priv->ring_rptr->offset
+		- ((unsigned long) dev->sg->virtual)
+		+ dev_priv->gart_vm_start;
+
+	Write32(OUT, CP_RB_RPTR_ADDR, (ringPointer & 0xfffffffc));
+	Write32(OUT, CP_RB_RPTR_ADDR_HI, upper_32_bits(ringPointer));
+
+	// Drop RPTR_WR_ENA and update CP RB Control
+	controlScratch &= ~R600_RB_RPTR_WR_ENA;
+	Write32(OUT, CP_RB_CNTL, controlScratch);
+	#endif
+
+	#if 0
+	// Update command processor pointer
+	int commandPointer = 0;
+
+	// TODO: AGP cards
+	/*
+	if (RADEON_IS_AGP) {
+		commandPointer = (dev_priv->cp_ring->offset
+			- dev->agp->base
+			+ dev_priv->gart_vm_start);
+	}
+	*/
+	commandPointer = (dev_priv->cp_ring->offset
+		- (unsigned long)dev->sg->virtual
+		+ dev_priv->gart_vm_start);
+	#endif
+
+	#if 0
+	Write32(OUT, CP_RB_BASE, commandPointer >> 8);
+	Write32(OUT, CP_ME_CNTL, 0xff);
+	Write32(OUT, CP_DEBUG, (1 << 27) | (1 << 28));
+	#endif
+
+	#if 0
+	// Initialize scratch register pointer.
+	// This wil lcause the scratch register values to be wtitten
+	// to memory whenever they are updated.
+
+	uint64 scratchAddr = Read32(OUT, CP_RB_RPTR_ADDR) & 0xFFFFFFFC;
+	scratchAddr |= ((uint64)Read32(OUT, CP_RB_RPTR_ADDR_HI)) << 32;
+	scratchAddr += R600_SCRATCH_REG_OFFSET;
+	scratchAddr >>= 8;
+	scratchAddr &= 0xffffffff;
+
+	Write32(OUT, R600_SCRATCH_ADDR, (uint32)scratchAddr);
+
+	Write32(OUT, R600_SCRATCH_UMSK, 0x7);
+	#endif
+
+	#if 0
+	// Enable bus mastering
+	radeon_enable_bm(dev_priv);
+
+	radeon_write_ring_rptr(dev_priv, R600_SCRATCHOFF(0), 0);
+	Write32(OUT, R600_LAST_FRAME_REG, 0);
+
+	radeon_write_ring_rptr(dev_priv, R600_SCRATCHOFF(1), 0);
+	Write32(OUT, R600_LAST_DISPATCH_REG, 0);
+
+	radeon_write_ring_rptr(dev_priv, R600_SCRATCHOFF(2), 0);
+	Write32(OUT, R600_LAST_CLEAR_REG, 0);
+	#endif
+
+	// Reset sarea?
+	#if 0
+	master_priv = file_priv->master->driver_priv;
+	if (master_priv->sarea_priv) {
+		master_priv->sarea_priv->last_frame = 0;
+		master_priv->sarea_priv->last_dispatch = 0;
+		master_priv->sarea_priv->last_clear = 0;
+	}
+
+	r600_do_wait_for_idle(dev_priv);
+	#endif
 
 	return B_OK;
 }

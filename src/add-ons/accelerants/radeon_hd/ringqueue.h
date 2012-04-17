@@ -11,13 +11,18 @@
 
 #include "Accelerant.h"
 
+#include <stdint.h>
+
 
 #define RADEON_QUEUE_MAX 3
-// Basic r100+ graphic data ring 
+// Basic r100+ graphic data ring
 #define RADEON_QUEUE_TYPE_GFX_INDEX 0
 // Cayman+ have two compute command processor rings
 #define CAYMAN_QUEUE_TYPE_CP1_INDEX 1
 #define CAYMAN_QUEUE_TYPE_CP2_INDEX 2
+
+
+int compute_order(unsigned long size);
 
 
 // A basic ring buffer for passing render data into card.
@@ -33,6 +38,8 @@ public:
 			size_t			GetSize() {return fSize;};
 			size_t			GetWriteAvail() {return fWriteBytesAvail;}
 			size_t			GetReadAvail() {return fSize - fWriteBytesAvail;}
+			intptr_t		GetLocation() {return (intptr_t)fData;}
+
 private:
 			uint32			fQueueType;
 
