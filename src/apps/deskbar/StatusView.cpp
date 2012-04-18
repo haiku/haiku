@@ -124,8 +124,9 @@ DumpList(BList* itemlist)
 // don't change the name of this view to anything other than "Status"!
 
 TReplicantTray::TReplicantTray(TBarView* parent, bool vertical)
-	: BView(BRect(0, 0, 1, 1), "_replicant_tray_",
-			B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_FRAME_EVENTS),
+	:
+	BView(BRect(0, 0, 1, 1), "_deskbar_rt_", B_FOLLOW_LEFT | B_FOLLOW_TOP,
+		B_WILL_DRAW | B_FRAME_EVENTS),
 	fTime(NULL),
 	fBarView(parent),
 	fShelf(new TReplicantShelf(this)),

@@ -640,7 +640,7 @@ TBarApp::MessageReceived(BMessage* message)
 			if (message->FindBool("filesys", &localize) == B_OK)
 				gLocalizedNamePreferred = localize;
 
-			BMessenger(fBarWindow->FindView("_replicant_tray_")).SendMessage(
+			BMessenger(fBarWindow->FindView("_deskbar_rt_")).SendMessage(
 				message);
 				// Notify the replicant tray that the time interval has
 				// changed and it should update the time view and reflow
