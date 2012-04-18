@@ -37,6 +37,7 @@ extern "C" void _sPrintf(const char* format, ...);
 void
 encoder_init()
 {
+	TRACE("%s: called\n", __func__);
 	radeon_shared_info &info = *gInfo->shared_info;
 
 	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
@@ -78,6 +79,9 @@ encoder_assign_crtc(uint8 crtcID)
 	if (atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor)
 		!= B_OK)
 		return;
+
+	TRACE("%s: table %" B_PRIu8 ".%" B_PRIu8 "\n", __func__,
+		tableMajor, tableMinor);
 
 	uint16 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	uint16 encoderID = gConnector[connectorIndex]->encoder.objectID;
@@ -577,17 +581,23 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 	bool linkB = connector->encoder.linkEnumeration
 		== GRAPH_OBJECT_ENUM_ID2 ? true : false;
 
-	// determine DP panel mode
-	uint32 panelMode;
-	if (info.dceMajor >= 4 && isDPBridge) {
-		if (connector->encoderExternal.objectID == ENCODER_OBJECT_ID_NUTMEG)
-			panelMode = DP_PANEL_MODE_INTERNAL_DP1_MODE;
-		else {
-			// aka ENCODER_OBJECT_ID_TRAVIS or VIDEO_CONNECTOR_EDP
-			panelMode = DP_PANEL_MODE_INTERNAL_DP2_MODE;
-		}
-	} else
-		panelMode = DP_PANEL_MODE_EXTERNAL_DP_MODE;
+	uint32 panelMode = 0;
+	// determine DP panel mode if doing panel mode setup
+	if (command == ATOM_ENCODER_CMD_SETUP_PANEL_MODE) {
+		if (info.dceMajor >= 4 && isDPBridge) {
+			if (connector->encoderExternal.objectID == ENCODER_OBJECT_ID_NUTMEG)
+				panelMode = DP_PANEL_MODE_INTERNAL_DP1_MODE;
+			else if (connector->encoderExternal.objectID
+				== ENCODER_OBJECT_ID_TRAVIS) {
+				TRACE("%s: TODO: Travis: read DP confg data, DP1 vs DP2 mode\n",
+					__func__);
+				panelMode = DP_PANEL_MODE_INTERNAL_DP1_MODE;
+			} else {
+				panelMode = DP_PANEL_MODE_INTERNAL_DP2_MODE;
+			}
+		} else
+			panelMode = DP_PANEL_MODE_EXTERNAL_DP_MODE;
+	}
 
 	#if 0
 	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
@@ -606,6 +616,13 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 	if (dpInfo->valid == true)
 		dpClock = dpInfo->linkRate;
 
+	bool dualLink = false;
+	if (connector->type == VIDEO_CONNECTOR_DVID
+		&& pixelClock > 165000) {
+		// TODO: Expand on this
+		dualLink = true;
+	}
+
 	switch (tableMinor) {
 		case 1:
 			args.v1.ucAction = command;
@@ -617,6 +634,14 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 				args.v1.ucEncoderMode
 					= display_get_encoder_mode(connectorIndex);
 			}
+
+			if (args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP
+				|| args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP_MST) {
+				args.v1.ucLaneNum = dpInfo->laneCount;
+			} else if (dualLink)
+				args.v1.ucLaneNum = 8;
+			else
+				args.v1.ucLaneNum = 4;
 
 			if ((args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP
 				|| args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP_MST)
@@ -644,8 +669,8 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 			break;
 		case 2:
 		case 3:
-			args.v1.ucAction = command;
-			args.v1.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
+			args.v3.ucAction = command;
+			args.v3.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
 
 			if (command == ATOM_ENCODER_CMD_SETUP_PANEL_MODE)
 				args.v3.ucPanelMode = panelMode;
@@ -654,16 +679,16 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 					= display_get_encoder_mode(connectorIndex);
 			}
 
-			if (args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP
-				|| args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP_MST) {
-				args.v1.ucLaneNum = dpInfo->laneCount;
-			} else if (pixelClock > 165000)
-				args.v1.ucLaneNum = 8;
+			if (args.v3.ucEncoderMode == ATOM_ENCODER_MODE_DP
+				|| args.v3.ucEncoderMode == ATOM_ENCODER_MODE_DP_MST) {
+				args.v3.ucLaneNum = dpInfo->laneCount;
+			} else if (dualLink)
+				args.v3.ucLaneNum = 8;
 			else
-				args.v1.ucLaneNum = 4;
+				args.v3.ucLaneNum = 4;
 
-			if ((args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP
-				|| args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP_MST)
+			if ((args.v3.ucEncoderMode == ATOM_ENCODER_MODE_DP
+				|| args.v3.ucEncoderMode == ATOM_ENCODER_MODE_DP_MST)
 				&& dpClock == 270000) {
 				args.v1.ucConfig |= ATOM_ENCODER_CONFIG_DPLINKRATE_2_70GHZ;
 			}
@@ -673,23 +698,23 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 			// TODO: get BPC
 			switch (8) {
 				case 0:
-					args.v4.ucBitPerColor = PANEL_BPC_UNDEFINE;
+					args.v3.ucBitPerColor = PANEL_BPC_UNDEFINE;
 					break;
 				case 6:
-					args.v4.ucBitPerColor = PANEL_6BIT_PER_COLOR;
+					args.v3.ucBitPerColor = PANEL_6BIT_PER_COLOR;
 					break;
 				case 8:
 				default:
-					args.v4.ucBitPerColor = PANEL_8BIT_PER_COLOR;
+					args.v3.ucBitPerColor = PANEL_8BIT_PER_COLOR;
 					break;
 				case 10:
-					args.v4.ucBitPerColor = PANEL_10BIT_PER_COLOR;
+					args.v3.ucBitPerColor = PANEL_10BIT_PER_COLOR;
 					break;
 				case 12:
-					args.v4.ucBitPerColor = PANEL_12BIT_PER_COLOR;
+					args.v3.ucBitPerColor = PANEL_12BIT_PER_COLOR;
 					break;
 				case 16:
-					args.v4.ucBitPerColor = PANEL_16BIT_PER_COLOR;
+					args.v3.ucBitPerColor = PANEL_16BIT_PER_COLOR;
 					break;
 			}
 			break;
