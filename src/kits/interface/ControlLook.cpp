@@ -560,6 +560,7 @@ BControlLook::DrawScrollBarBackground(BView* view, BRect& rect1, BRect& rect2,
 	DrawScrollBarBackground(view, rect2, updateRect, base, flags, orientation);
 }
 
+
 void
 BControlLook::DrawScrollBarBackground(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
@@ -1920,10 +1921,12 @@ BControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 		defaultIndicatorTint = (B_NO_TINT + defaultIndicatorTint) / 2;
 
 	rgb_color defaultIndicatorColor = tint_color(base, defaultIndicatorTint);
-	rgb_color cornerBgColor = background;
+	rgb_color cornerBgColor;
+
+	drawing_mode oldMode = view->DrawingMode();
 
 	if ((flags & B_DEFAULT_BUTTON) != 0) {
-		// draw default button indicator
+		cornerBgColor = defaultIndicatorColor;
 		edgeLightColor = _EdgeLightColor(defaultIndicatorColor,
 			contrast * ((flags & B_DISABLED) != 0 ? 0.3 : 0.8),
 			brightness * ((flags & B_DISABLED) != 0 ? 1.0 : 0.9), flags);
@@ -1931,8 +1934,7 @@ BControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 			contrast * ((flags & B_DISABLED) != 0 ? 0.3 : 0.8),
 			brightness * ((flags & B_DISABLED) != 0 ? 1.0 : 0.9), flags);
 
-		cornerBgColor = defaultIndicatorColor;
-
+		// draw default button indicator
 		view->SetHighColor(background);
 		view->FillRect(rect);
 		view->SetHighColor(base);
@@ -1946,6 +1948,14 @@ BControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 		view->StrokeRoundRect(rect, leftTopRadius, leftTopRadius);
 		rect.InsetBy(1, 1);
 	} else {
+		if ((flags & B_BLEND_FRAME) != 0) {
+			cornerBgColor = (rgb_color){ background.red, background.blue,
+				background.green, 0 };
+
+			view->SetDrawingMode(B_OP_ALPHA);
+		} else
+			cornerBgColor = background;
+
 		edgeLightColor = _EdgeLightColor(background,
 			contrast * ((flags & B_DISABLED) != 0 ? 0.0 : 1.0),
 			brightness * 1.0, flags);
@@ -2020,6 +2030,8 @@ BControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 			contrast * ((flags & B_DISABLED) != 0 ? 0.0 : 1.0),
 			brightness * 1.0, flags, borders);
 	}
+
+	view->SetDrawingMode(oldMode);
 
 	// draw frame
 	if ((flags & B_BLEND_FRAME) != 0) {
