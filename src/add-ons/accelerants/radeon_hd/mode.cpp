@@ -118,7 +118,7 @@ radeon_get_edid_info(void* info, size_t size, uint32* edid_version)
 
 	memcpy(info, &gInfo->shared_info->edid_info, sizeof(struct edid1_info));
 		// VESA
-	//memcpy(info, &gDisplay[0]->edid_info, sizeof(struct edid1_info));
+	//memcpy(info, &gDisplay[0]->edidData, sizeof(struct edid1_info));
 		// BitBanged display 0
 
 	*edid_version = EDID_VERSION_1;
@@ -306,12 +306,12 @@ is_mode_supported(display_mode* mode)
 
 	// if we have edid info, check frequency adginst crt reported valid ranges
 	if (gInfo->shared_info->has_edid
-		&& gDisplay[crtid]->found_ranges) {
+		&& gDisplay[crtid]->foundRanges) {
 
 		// validate horizontal frequency range
 		uint32 hfreq = mode->timing.pixel_clock / mode->timing.h_total;
-		if (hfreq > gDisplay[crtid]->hfreq_max + 1
-			|| hfreq < gDisplay[crtid]->hfreq_min - 1) {
+		if (hfreq > gDisplay[crtid]->hfreqMax + 1
+			|| hfreq < gDisplay[crtid]->hfreqMin - 1) {
 			//TRACE("!!! mode below falls outside of hfreq range!\n");
 			sane = false;
 		}
@@ -319,8 +319,8 @@ is_mode_supported(display_mode* mode)
 		// validate vertical frequency range
 		uint32 vfreq = mode->timing.pixel_clock / ((mode->timing.v_total
 			* mode->timing.h_total) / 1000);
-		if (vfreq > gDisplay[crtid]->vfreq_max + 1
-			|| vfreq < gDisplay[crtid]->vfreq_min - 1) {
+		if (vfreq > gDisplay[crtid]->vfreqMax + 1
+			|| vfreq < gDisplay[crtid]->vfreqMin - 1) {
 			//TRACE("!!! mode below falls outside of vfreq range!\n");
 			sane = false;
 		}

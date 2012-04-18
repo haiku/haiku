@@ -217,7 +217,7 @@ init_registers(register_info* regs, uint8 crtcID)
 status_t
 detect_crt_ranges(uint32 crtid)
 {
-	edid1_info* edid = &gDisplay[crtid]->edid_info;
+	edid1_info* edid = &gDisplay[crtid]->edidData;
 
 	// Scan each display EDID description for monitor ranges
 	for (uint32 index = 0; index < EDID1_NUM_DETAILED_MONITOR_DESC; index++) {
@@ -228,10 +228,10 @@ detect_crt_ranges(uint32 crtid)
 		if (monitor->monitor_desc_type
 			== EDID1_MONITOR_RANGES) {
 			edid1_monitor_range range = monitor->data.monitor_range;
-			gDisplay[crtid]->vfreq_min = range.min_v;   /* in Hz */
-			gDisplay[crtid]->vfreq_max = range.max_v;
-			gDisplay[crtid]->hfreq_min = range.min_h;   /* in kHz */
-			gDisplay[crtid]->hfreq_max = range.max_h;
+			gDisplay[crtid]->vfreqMin = range.min_v;   /* in Hz */
+			gDisplay[crtid]->vfreqMax = range.max_v;
+			gDisplay[crtid]->hfreqMin = range.min_h;   /* in kHz */
+			gDisplay[crtid]->hfreqMax = range.max_h;
 			return B_OK;
 		}
 	}
@@ -247,7 +247,7 @@ detect_displays()
 	for (uint32 id = 0; id < MAX_DISPLAY; id++) {
 		gDisplay[id]->attached = false;
 		gDisplay[id]->powered = false;
-		gDisplay[id]->found_ranges = false;
+		gDisplay[id]->foundRanges = false;
 	}
 
 	uint32 displayIndex = 0;
@@ -280,7 +280,7 @@ detect_displays()
 				__func__, id);
 			// Lets try bit-banging edid from connector
 			gDisplay[displayIndex]->attached =
-				connector_read_edid(id, &gDisplay[displayIndex]->edid_info);
+				connector_read_edid(id, &gDisplay[displayIndex]->edidData);
 
 			if (gConnector[id]->encoder.type == VIDEO_ENCODER_TVDAC
 				|| gConnector[id]->encoder.type == VIDEO_ENCODER_DAC) {
@@ -308,11 +308,11 @@ detect_displays()
 
 		if (gDisplay[displayIndex]->preferredMode.virtual_width > 0) {
 			// Found a single preferred mode
-			gDisplay[displayIndex]->found_ranges = false;
+			gDisplay[displayIndex]->foundRanges = false;
 		} else {
 			// Use edid data and pull ranges
 			if (detect_crt_ranges(displayIndex) == B_OK)
-				gDisplay[displayIndex]->found_ranges = true;
+				gDisplay[displayIndex]->foundRanges = true;
 		}
 
 		displayIndex++;
@@ -330,7 +330,7 @@ detect_displays()
 			gDisplay[0]->connectorIndex = id;
 			init_registers(gDisplay[0]->regs, 0);
 			if (detect_crt_ranges(0) == B_OK)
-				gDisplay[0]->found_ranges = true;
+				gDisplay[0]->foundRanges = true;
 			break;
 		}
 	}
@@ -362,9 +362,9 @@ debug_displays()
 			ERROR(" + connector type: %s\n", get_connector_name(connectorType));
 			ERROR(" + encoder type:   %s\n", get_encoder_name(encoderType));
 			ERROR(" + limits: Vert Min/Max: %" B_PRIu32 "/%" B_PRIu32"\n",
-				gDisplay[id]->vfreq_min, gDisplay[id]->vfreq_max);
+				gDisplay[id]->vfreqMin, gDisplay[id]->vfreqMax);
 			ERROR(" + limits: Horz Min/Max: %" B_PRIu32 "/%" B_PRIu32"\n",
-				gDisplay[id]->hfreq_min, gDisplay[id]->hfreq_max);
+				gDisplay[id]->hfreqMin, gDisplay[id]->hfreqMax);
 		}
 	}
 	TRACE("==========================================\n");
@@ -400,7 +400,7 @@ display_get_encoder_mode(uint32 connectorIndex)
 	if (crtc == -1) {
 		ERROR("%s: BUG: executed on connector without crtc!\n", __func__);
 	} else {
-		edid1_info* edid = &gDisplay[crtc]->edid_info;
+		edid1_info* edid = &gDisplay[crtc]->edidData;
 		edidDigital = edid->display.input_type ? true : false;
 	}
 

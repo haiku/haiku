@@ -159,12 +159,12 @@ typedef struct {
 	bool			powered;
 	uint32			connectorIndex; // matches connector id in connector_info
 	register_info*	regs;
-	bool			found_ranges;
-	uint32			vfreq_max;
-	uint32			vfreq_min;
-	uint32			hfreq_max;
-	uint32			hfreq_min;
-	edid1_info		edid_info;
+	bool			foundRanges;
+	uint32			vfreqMax;
+	uint32			vfreqMin;
+	uint32			hfreqMax;
+	uint32			hfreqMin;
+	edid1_info		edidData;
 	display_mode	preferredMode;
 } display_info;
 
