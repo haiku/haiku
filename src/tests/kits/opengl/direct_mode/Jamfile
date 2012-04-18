@@ -10,8 +10,14 @@ if $(TARGET_PLATFORM) != haiku {
 	UsePublicHeaders opengl ;
 }
 
-SimpleTest GLDirectMode :
+local sources =
 	GLDirectMode.cpp
+;
+
+Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+
+SimpleTest GLDirectMode :
+	$(sources)
 	: be game GL $(TARGET_LIBSUPC++)
 	: GLDirectMode.rdef
 ;

@@ -1,4 +1,5 @@
 SubDir HAIKU_TOP src tests kits opengl demos gears ;
+SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
@@ -9,7 +10,15 @@ if $(TARGET_PLATFORM) != haiku {
 	UsePublicHeaders opengl ;
 }
 
-SimpleTest GLGears :
+
+local sources =
 	gears.c
+;
+
+Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+
+
+SimpleTest GLGears :
+	$(sources)
 	: be GL
 ;

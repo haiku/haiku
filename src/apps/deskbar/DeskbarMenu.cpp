@@ -399,10 +399,8 @@ TDeskbarMenu::ResetTargets()
 					break;
 
 				case kShowHideTime:
-				case kTimeIntervalChanged:
 				case kShowSeconds:
 				case kShowDayOfWeek:
-				case kShowTimeZone:
 					item->SetTarget(fBarView->fReplicantTray);
 					break;
 			}

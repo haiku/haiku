@@ -1,4 +1,5 @@
 SubDir HAIKU_TOP src tests kits opengl glut game_mode ;
+SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
@@ -9,7 +10,13 @@ if $(TARGET_PLATFORM) != haiku {
 	UsePublicHeaders opengl ;
 }
 
-SimpleTest GLUTGameMode :
+local sources =
 	game_mode.c
+;
+
+Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+
+SimpleTest GLUTGameMode :
+	$(sources)
 	: be GL
 ;

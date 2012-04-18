@@ -152,9 +152,6 @@ CalcView::CalcView(BRect frame, rgb_color rgbBaseColor, BMessage* settings)
 	// colorize based on base color.
 	_Colorize();
 
-	// create pop-up menu system
-	_CreatePopUpMenu();
-
 	// Fetch the calc icon for compact view
 	_FetchAppIcon(fCalcIcon);
 }
@@ -196,9 +193,6 @@ CalcView::CalcView(BMessage* archive)
 	// read data from archive
 	_LoadSettings(archive);
 
-	// create pop-up menu system
-	_CreatePopUpMenu();
-
 	// Fetch the calc icon for compact view
 	_FetchAppIcon(fCalcIcon);
 }
@@ -221,21 +215,43 @@ CalcView::AttachedToWindow()
 	BRect frame(Frame());
 	FrameResized(frame.Width(), frame.Height());
 
-	SetKeypadMode(fOptions->keypad_mode);
+	bool addKeypadModeMenuItems = true;
+	if (Parent() && (Parent()->Flags() & B_DRAW_ON_CHILDREN) != 0) {
+		// don't add these items if we are a replicant on the desktop
+		addKeypadModeMenuItems = false;
+	}
+
+	// create and attach the pop-up menu
+	_CreatePopUpMenu(addKeypadModeMenuItems);
+
+	if (addKeypadModeMenuItems)
+		SetKeypadMode(fOptions->keypad_mode);
 }
 
 
 void
 CalcView::MessageReceived(BMessage* message)
 {
+	if (Parent() && (Parent()->Flags() & B_DRAW_ON_CHILDREN) != 0) {
+		// if we are embedded in desktop we need to receive these
+		// message here since we don't have a parent BWindow
+		switch (message->what) {
+			case MSG_OPTIONS_AUTO_NUM_LOCK:
+				ToggleAutoNumlock();
+				return;
+
+			case MSG_OPTIONS_AUDIO_FEEDBACK:
+				ToggleAudioFeedback();
+				return;
+		}
+	}
+
 	// check if message was dropped
 	if (message->WasDropped()) {
 		// pass message on to paste
 		if (message->IsSourceRemote())
 			Paste(message);
-
 	} else {
-
 		// act on posted message type
 		switch (message->what) {
 
@@ -510,8 +526,8 @@ CalcView::MouseDown(BPoint point)
 	int32 buttons = 0;
 	Window()->CurrentMessage()->FindInt32("buttons", &buttons);
 
-	// display popup menu if not primary mouse button
 	if ((B_PRIMARY_MOUSE_BUTTON & buttons) == 0) {
+		// display popup menu if not primary mouse button
 		BMenuItem* selected;
 		if ((selected = fPopUpMenu->Go(ConvertToScreen(point))) != NULL
 			&& selected->Message() != NULL) {
@@ -1233,36 +1249,40 @@ CalcView::_Colorize()
 
 
 void
-CalcView::_CreatePopUpMenu()
+CalcView::_CreatePopUpMenu(bool addKeypadModeMenuItems)
 {
 	// construct items
 	fAutoNumlockItem = new BMenuItem(B_TRANSLATE("Enable Num Lock on startup"),
 		new BMessage(MSG_OPTIONS_AUTO_NUM_LOCK));
 	fAudioFeedbackItem = new BMenuItem(B_TRANSLATE("Audio Feedback"),
 		new BMessage(MSG_OPTIONS_AUDIO_FEEDBACK));
-	fKeypadModeCompactItem = new BMenuItem(B_TRANSLATE("Compact"),
-		new BMessage(MSG_OPTIONS_KEYPAD_MODE_COMPACT), '0');
-	fKeypadModeBasicItem = new BMenuItem(B_TRANSLATE("Basic"),
-		new BMessage(MSG_OPTIONS_KEYPAD_MODE_BASIC), '1');
-	fKeypadModeScientificItem = new BMenuItem(B_TRANSLATE("Scientific"),
-		new BMessage(MSG_OPTIONS_KEYPAD_MODE_SCIENTIFIC), '2');
+	if (addKeypadModeMenuItems) {
+		fKeypadModeCompactItem = new BMenuItem(B_TRANSLATE("Compact"),
+			new BMessage(MSG_OPTIONS_KEYPAD_MODE_COMPACT), '0');
+		fKeypadModeBasicItem = new BMenuItem(B_TRANSLATE("Basic"),
+			new BMessage(MSG_OPTIONS_KEYPAD_MODE_BASIC), '1');
+		fKeypadModeScientificItem = new BMenuItem(B_TRANSLATE("Scientific"),
+			new BMessage(MSG_OPTIONS_KEYPAD_MODE_SCIENTIFIC), '2');
+	}
 
 	// apply current settings
 	fAutoNumlockItem->SetMarked(fOptions->auto_num_lock);
 	fAudioFeedbackItem->SetMarked(fOptions->audio_feedback);
-	_MarkKeypadItems(fOptions->keypad_mode);
 
 	// construct menu
 	fPopUpMenu = new BPopUpMenu("pop-up", false, false);
 
 	fPopUpMenu->AddItem(fAutoNumlockItem);
-// TODO: Enabled when we use beep events which can be configured in the Sounds
-// preflet.
-//	fPopUpMenu->AddItem(fAudioFeedbackItem);
-	fPopUpMenu->AddSeparatorItem();
-	fPopUpMenu->AddItem(fKeypadModeCompactItem);
-	fPopUpMenu->AddItem(fKeypadModeBasicItem);
-	fPopUpMenu->AddItem(fKeypadModeScientificItem);
+	// TODO: Enable this when we use beep events which can be configured
+	// in the Sounds preflet.
+	//fPopUpMenu->AddItem(fAudioFeedbackItem);
+	if (addKeypadModeMenuItems) {
+		fPopUpMenu->AddSeparatorItem();
+		fPopUpMenu->AddItem(fKeypadModeCompactItem);
+		fPopUpMenu->AddItem(fKeypadModeBasicItem);
+		fPopUpMenu->AddItem(fKeypadModeScientificItem);
+		_MarkKeypadItems(fOptions->keypad_mode);
+	}
 }
 
 

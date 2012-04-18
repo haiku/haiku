@@ -207,7 +207,6 @@ TBarApp::SaveSettings()
 		storedSettings.AddBool("showTime", fSettings.showTime);
 		storedSettings.AddBool("showSeconds", fSettings.showSeconds);
 		storedSettings.AddBool("showDayOfWeek", fSettings.showDayOfWeek);
-		storedSettings.AddBool("showTimeZone", fSettings.showTimeZone);
 
 		storedSettings.AddPoint("switcherLoc", fSettings.switcherLoc);
 		storedSettings.AddInt32("recentAppsCount", fSettings.recentAppsCount);
@@ -248,7 +247,6 @@ TBarApp::InitSettings()
 	settings.showTime = true;
 	settings.showSeconds = false;
 	settings.showDayOfWeek = false;
-	settings.showTimeZone = false;
 	settings.state = kExpandoState;
 	settings.width = 0;
 	settings.switcherLoc = BPoint(5000, 5000);
@@ -314,10 +312,6 @@ TBarApp::InitSettings()
 			if (storedSettings.FindBool("showDayOfWeek", &settings.showDayOfWeek)
 					!= B_OK) {
 				settings.showDayOfWeek = false;
-			}
-			if (storedSettings.FindBool("showTimeZone", &settings.showTimeZone)
-					!= B_OK) {
-				settings.showTimeZone = false;
 			}
 			if (storedSettings.FindPoint("switcherLoc", &settings.switcherLoc)
 					!= B_OK) {
@@ -640,10 +634,11 @@ TBarApp::MessageReceived(BMessage* message)
 			if (message->FindBool("filesys", &localize) == B_OK)
 				gLocalizedNamePreferred = localize;
 
-			BMessenger(fBarWindow->FindView("_deskbar_tv_")).SendMessage(
+			BMessenger(fBarWindow->FindView("_deskbar_rt_")).SendMessage(
 				message);
-				// Notify the TimeView that the format has changed and it should
-				// recompute its size
+				// Notify the replicant tray that the time interval has
+				// changed and it should update the time view and reflow
+				// the tray icons.
 			break;
 		}
 

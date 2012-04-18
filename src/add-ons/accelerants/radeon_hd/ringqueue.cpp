@@ -31,7 +31,7 @@ static const char* queueName[RADEON_QUEUE_MAX] = {
 };
 
 
-static int
+int
 compute_order(unsigned long size)
 {
 	int	order;

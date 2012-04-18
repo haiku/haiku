@@ -44,23 +44,7 @@ OpenGLView::OpenGLView()
 
 	glView->LockGL();
 
-	BPopUpMenu* menu = new BPopUpMenu(B_TRANSLATE("Automatic"), true, true);
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Automatic"),
-		new BMessage(MENU_AUTO_MESSAGE)));
-	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Software Rasterizer"),
-		new BMessage(MENU_SWRAST_MESSAGE)));
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Gallium Software Pipe"),
-		new BMessage(MENU_SWPIPE_MESSAGE)));
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Gallium LLVM Pipe"),
-		new BMessage(MENU_SWLLVM_MESSAGE)));
-	BMenuField* menuField = new BMenuField("renderer",
-		B_TRANSLATE("3D Rendering Engine:"), menu);
-	menuField->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
-	// TODO:  Set current Renderer
-	menuField->SetEnabled(false);
-
-	float tabViewWidth = this->StringWidth("M") * 36;
+	float tabViewWidth = this->StringWidth("M") * 42;
 	float tabViewHeight = this->StringWidth("M") * 16;
 
 	BTabView *tabView = new BTabView("tab view", B_WIDTH_FROM_LABEL);
@@ -77,7 +61,6 @@ OpenGLView::OpenGLView()
 			.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING)
 				.SetInsets(0, B_USE_DEFAULT_SPACING,
 					B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
-				.Add(menuField)
 				.Add(new InfoView())
 				.Add(tabView)
 				.End()

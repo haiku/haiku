@@ -47,6 +47,6 @@ UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa x86 ] ;
 AddResources Legacy\ Software\ Rasterizer : MesaSoftwareRenderer.rdef ;
 
 Addon Legacy\ Software\ Rasterizer :
-	MesaSoftwareRenderer.cpp :
+	MesaSoftwareRenderer.cpp
 	: libGL.so be $(TARGET_LIBSUPC++)
 ;

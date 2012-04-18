@@ -16,6 +16,7 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <CheckBox.h>
+#include <ControlLook.h>
 #include <FormattingConventions.h>
 #include <GroupLayout.h>
 #include <Locale.h>
@@ -33,8 +34,13 @@
 #include "StatusView.h"
 
 
+static const float kIndentSpacing
+	= be_control_look->DefaultItemSpacing() * 2.3;
+
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "PreferencesWindow"
+
 
 PreferencesWindow::PreferencesWindow(BRect frame)
 	:
@@ -86,22 +92,10 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 		new BMessage(kAutoHide));
 
 	// Clock controls
-	BMessage* timeInterval12HoursMessage = new BMessage(kTimeIntervalChanged);
-	timeInterval12HoursMessage->AddBool("use24HourClock", false);
-	fTimeInterval12HourRadioButton = new BRadioButton("time inteval",
-		B_TRANSLATE("12 hour"), timeInterval12HoursMessage);
-
-	BMessage* timeInterval24HoursMessage = new BMessage(kTimeIntervalChanged);
-	timeInterval24HoursMessage->AddBool("use24HourClock", true);
-	fTimeInterval24HourRadioButton = new BRadioButton("time inteval",
-		B_TRANSLATE("24 hour"), timeInterval24HoursMessage);
-
 	fShowSeconds = new BCheckBox(B_TRANSLATE("Show seconds"),
 		new BMessage(kShowSeconds));
 	fShowDayOfWeek = new BCheckBox(B_TRANSLATE("Show day of week"),
 		new BMessage(kShowDayOfWeek));
-	fShowTimeZone = new BCheckBox(B_TRANSLATE("Show time zone"),
-		new BMessage(kShowTimeZone));
 
 	// Get settings from BarApp
 	TBarApp* barApp = static_cast<TBarApp*>(be_app);
@@ -163,22 +157,13 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fWindowAutoHide->SetValue(settings->autoHide);
 
 	// Clock settings
-	BFormattingConventions conventions;
-	BLocale::Default()->GetFormattingConventions(&conventions);
-	if (conventions.Use24HourClock())
-		fTimeInterval24HourRadioButton->SetValue(B_CONTROL_ON);
-	else
-		fTimeInterval12HourRadioButton->SetValue(B_CONTROL_ON);
-
 	TReplicantTray* replicantTray = barApp->BarView()->ReplicantTray();
 	if (replicantTray->Time() != NULL) {
 		fShowSeconds->SetValue(replicantTray->Time()->ShowSeconds());
 		fShowDayOfWeek->SetValue(replicantTray->Time()->ShowDayOfWeek());
-		fShowTimeZone->SetValue(replicantTray->Time()->ShowTimeZone());
 	} else {
 		fShowSeconds->SetValue(settings->showSeconds);
 		fShowDayOfWeek->SetValue(settings->showDayOfWeek);
-		fShowTimeZone->SetValue(settings->showTimeZone);
 	}
 
 	EnableDisableDependentItems();
@@ -194,12 +179,8 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fWindowAutoRaise->SetTarget(be_app);
 	fWindowAutoHide->SetTarget(be_app);
 
-	fTimeInterval12HourRadioButton->SetTarget(replicantTray);
-	fTimeInterval24HourRadioButton->SetTarget(replicantTray);
-
 	fShowSeconds->SetTarget(replicantTray);
 	fShowDayOfWeek->SetTarget(replicantTray);
-	fShowTimeZone->SetTarget(replicantTray);
 
 	// Layout
 	fMenuBox = new BBox("fMenuBox");
@@ -244,7 +225,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 			.Add(fAppsSortTrackerFirst)
 			.Add(fAppsShowExpanders)
 			.AddGroup(B_HORIZONTAL, 0)
-				.SetInsets(B_USE_BIG_SPACING, 0, 0, 0)
+				.SetInsets(kIndentSpacing, 0, 0, 0)
 				.Add(fAppsExpandNew)
 				.End()
 			.Add(fAppsHideLabels)
@@ -271,29 +252,10 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 		.View();
 	fWindowBox->AddChild(view);
 
-	BGroupLayout* timeIntervalLayout = new BGroupLayout(B_VERTICAL, 0);
-	timeIntervalLayout->SetInsets(B_USE_DEFAULT_SPACING, 0, 0, 0);
-	BView* timeIntervalView = new BView("interval", 0, timeIntervalLayout);
-	timeIntervalView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	timeIntervalView->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	timeIntervalView->AddChild(fTimeInterval12HourRadioButton);
-	timeIntervalView->AddChild(fTimeInterval24HourRadioButton);
-
 	view = BLayoutBuilder::Group<>()
 		.AddGroup(B_VERTICAL, 0)
-			.AddGroup(B_VERTICAL, 0)
-				.SetInsets(0, 0, 0, B_USE_DEFAULT_SPACING)
-				.Add(new BStringView("interval", B_TRANSLATE("Interval")))
-				.Add(timeIntervalView)
-				.End()
-			.AddGroup(B_VERTICAL, 0)
-				.SetInsets(0, 0, 0, B_USE_DEFAULT_SPACING)
-				.Add(fShowSeconds)
-				.Add(fShowDayOfWeek)
-				.Add(fShowTimeZone)
-				.End()
-			.Add(new BButton(B_TRANSLATE("Time preferences" B_UTF8_ELLIPSIS),
-				new BMessage(kTimePreferences)))
+			.Add(fShowSeconds)
+			.Add(fShowDayOfWeek)
 			.AddGlue()
 			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
@@ -342,11 +304,6 @@ PreferencesWindow::MessageReceived(BMessage* message)
 
 		case kStateChanged:
 			EnableDisableDependentItems();
-			break;
-
-		case kTimePreferences:
-			// launch the time prefs app
-			be_roster->Launch("application/x-vnd.Haiku-Time");
 			break;
 
 		default:

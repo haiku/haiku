@@ -35,7 +35,7 @@ CapabilitiesView::CapabilitiesView()
 {
 	// add the columns
 
-	float capabilityColWidth = this->StringWidth("M") * 23;
+	float capabilityColWidth = this->StringWidth("M") * 28;
 
 	fCapabilityColumn = new BStringColumn(B_TRANSLATE("Capability"),
 		capabilityColWidth, capabilityColWidth - 20.0,
@@ -44,7 +44,7 @@ CapabilitiesView::CapabilitiesView()
 	fCapabilitiesList->SetSortingEnabled(true);
 	fCapabilitiesList->SetSortColumn(fCapabilityColumn, true, true);
 
-	float valueColWidth = this->StringWidth("M") * 6;
+	float valueColWidth = this->StringWidth("M") * 8;
 
 	fValueColumn = new BStringColumn(B_TRANSLATE("Value"), valueColWidth,
 		valueColWidth, valueColWidth, B_TRUNCATE_MIDDLE);
