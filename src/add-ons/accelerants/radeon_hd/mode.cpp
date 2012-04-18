@@ -173,14 +173,14 @@ radeon_set_display_mode(display_mode* mode)
 		if (connector_is_dp(connectorIndex))
 			dpInfo->laneCount = dp_get_lane_count(dpInfo, mode);
 
-		// *** encoder prep
+		// *** crtc and encoder prep
 		encoder_output_lock(true);
 		encoder_dpms_set(id, B_DPMS_OFF);
-		encoder_assign_crtc(id);
-
-		// *** CRT controler prep
 		display_crtc_lock(id, ATOM_ENABLE);
 		display_crtc_dpms(id, B_DPMS_OFF);
+
+		// *** Set up encoder -> crtc routing
+		encoder_assign_crtc(id);
 
 		// *** CRT controler mode set
 		// TODO: program SS
