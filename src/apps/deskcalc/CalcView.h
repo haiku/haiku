@@ -104,7 +104,7 @@ class CalcView : public BView {
 
 			void				_Colorize();
 
-			void				_CreatePopUpMenu();
+			void				_CreatePopUpMenu(bool addKeypadModeMenuItems);
 
 			BRect				_ExpressionRect() const;
 			BRect				_KeypadRect() const;
