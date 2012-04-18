@@ -86,16 +86,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 		new BMessage(kAutoHide));
 
 	// Clock controls
-	BMessage* timeInterval12HoursMessage = new BMessage(kTimeIntervalChanged);
-	timeInterval12HoursMessage->AddBool("use24HourClock", false);
-	fTimeInterval12HourRadioButton = new BRadioButton("time inteval",
-		B_TRANSLATE("12 hour"), timeInterval12HoursMessage);
-
-	BMessage* timeInterval24HoursMessage = new BMessage(kTimeIntervalChanged);
-	timeInterval24HoursMessage->AddBool("use24HourClock", true);
-	fTimeInterval24HourRadioButton = new BRadioButton("time inteval",
-		B_TRANSLATE("24 hour"), timeInterval24HoursMessage);
-
 	fShowSeconds = new BCheckBox(B_TRANSLATE("Show seconds"),
 		new BMessage(kShowSeconds));
 	fShowDayOfWeek = new BCheckBox(B_TRANSLATE("Show day of week"),
@@ -163,13 +153,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fWindowAutoHide->SetValue(settings->autoHide);
 
 	// Clock settings
-	BFormattingConventions conventions;
-	BLocale::Default()->GetFormattingConventions(&conventions);
-	if (conventions.Use24HourClock())
-		fTimeInterval24HourRadioButton->SetValue(B_CONTROL_ON);
-	else
-		fTimeInterval12HourRadioButton->SetValue(B_CONTROL_ON);
-
 	TReplicantTray* replicantTray = barApp->BarView()->ReplicantTray();
 	if (replicantTray->Time() != NULL) {
 		fShowSeconds->SetValue(replicantTray->Time()->ShowSeconds());
@@ -193,9 +176,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fWindowAlwaysOnTop->SetTarget(be_app);
 	fWindowAutoRaise->SetTarget(be_app);
 	fWindowAutoHide->SetTarget(be_app);
-
-	fTimeInterval12HourRadioButton->SetTarget(replicantTray);
-	fTimeInterval24HourRadioButton->SetTarget(replicantTray);
 
 	fShowSeconds->SetTarget(replicantTray);
 	fShowDayOfWeek->SetTarget(replicantTray);
@@ -271,21 +251,8 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 		.View();
 	fWindowBox->AddChild(view);
 
-	BGroupLayout* timeIntervalLayout = new BGroupLayout(B_VERTICAL, 0);
-	timeIntervalLayout->SetInsets(B_USE_DEFAULT_SPACING, 0, 0, 0);
-	BView* timeIntervalView = new BView("interval", 0, timeIntervalLayout);
-	timeIntervalView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	timeIntervalView->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	timeIntervalView->AddChild(fTimeInterval12HourRadioButton);
-	timeIntervalView->AddChild(fTimeInterval24HourRadioButton);
-
 	view = BLayoutBuilder::Group<>()
 		.AddGroup(B_VERTICAL, 0)
-			.AddGroup(B_VERTICAL, 0)
-				.SetInsets(0, 0, 0, B_USE_DEFAULT_SPACING)
-				.Add(new BStringView("interval", B_TRANSLATE("Interval")))
-				.Add(timeIntervalView)
-				.End()
 			.AddGroup(B_VERTICAL, 0)
 				.SetInsets(0, 0, 0, B_USE_DEFAULT_SPACING)
 				.Add(fShowSeconds)

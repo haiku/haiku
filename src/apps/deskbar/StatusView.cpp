@@ -54,7 +54,6 @@ All rights reserved.
 #include <FindDirectory.h>
 #include <Locale.h>
 #include <MenuItem.h>
-#include <MutableLocaleRoster.h>
 #include <NodeInfo.h>
 #include <NodeMonitor.h>
 #include <Path.h>
@@ -125,8 +124,8 @@ DumpList(BList* itemlist)
 // don't change the name of this view to anything other than "Status"!
 
 TReplicantTray::TReplicantTray(TBarView* parent, bool vertical)
-	: BView(BRect(0, 0, 1, 1), "Status", B_FOLLOW_LEFT | B_FOLLOW_TOP,
-			B_WILL_DRAW | B_FRAME_EVENTS),
+	: BView(BRect(0, 0, 1, 1), "_replicant_tray_",
+			B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_FRAME_EVENTS),
 	fTime(NULL),
 	fBarView(parent),
 	fShelf(new TReplicantShelf(this)),
@@ -276,32 +275,26 @@ void
 TReplicantTray::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case kShowHideTime:
-			// from context menu in clock and in this view
-			ShowHideTime();
-			break;
-
-		case kTimeIntervalChanged:
+		case B_LOCALE_CHANGED:
 		{
 			if (fTime == NULL)
 				return;
 
-			bool use24HourClock;
-			if (message->FindBool("use24HourClock", &use24HourClock)
-				== B_OK) {
-				BFormattingConventions conventions;
-				BLocale::Default()->GetFormattingConventions(&conventions);
-				conventions.SetExplicitUse24HourClock(use24HourClock);
-				BPrivate::MutableLocaleRoster::Default()->
-					SetDefaultFormattingConventions(conventions);
-				fTime->SetUse24HourClock(use24HourClock);
-				// time string reformat -> realign
-				RealignReplicants();
-				AdjustPlacement();
-			}
+			// Locale may have updated 12/24 hour clock
+			BFormattingConventions conventions;
+			BLocale::Default()->GetFormattingConventions(&conventions);
+			fTime->SetUse24HourClock(conventions.Use24HourClock());
 
+			// time string reformat -> realign
+			RealignReplicants();
+			AdjustPlacement();
 			break;
 		}
+
+		case kShowHideTime:
+			// from context menu in clock and in this view
+			ShowHideTime();
+			break;
 
 		case kShowSeconds:
 			if (fTime == NULL)

@@ -66,6 +66,7 @@ enum {
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "TimeView"
 
+
 TTimeView::TTimeView(float maxWidth, float height, bool use24HourClock,
 	bool showSeconds, bool showDayOfWeek, bool showTimeZone)
 	:
@@ -194,10 +195,6 @@ void
 TTimeView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case B_LOCALE_CHANGED:
-			Update();
-			break;
-
 		case kChangeTime:
 			// launch the time prefs app
 			be_roster->Launch("application/x-vnd.Haiku-Time");
@@ -487,16 +484,16 @@ void
 TTimeView::Update()
 {
 	fLocale = *BLocale::Default();
+	UpdateTimeFormat();
+
 	GetCurrentTime();
 	GetCurrentDate();
 	SetToolTip(fCurrentDateStr);
 
-	UpdateTimeFormat();
-
 	CalculateTextPlacement();
 	ResizeToPreferred();
 
-	if (fParent)
+	if (fParent != NULL)
 		fParent->Invalidate();
 }
 

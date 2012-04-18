@@ -399,7 +399,6 @@ TDeskbarMenu::ResetTargets()
 					break;
 
 				case kShowHideTime:
-				case kTimeIntervalChanged:
 				case kShowSeconds:
 				case kShowDayOfWeek:
 				case kShowTimeZone:

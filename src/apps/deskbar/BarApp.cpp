@@ -640,10 +640,11 @@ TBarApp::MessageReceived(BMessage* message)
 			if (message->FindBool("filesys", &localize) == B_OK)
 				gLocalizedNamePreferred = localize;
 
-			BMessenger(fBarWindow->FindView("_deskbar_tv_")).SendMessage(
+			BMessenger(fBarWindow->FindView("_replicant_tray_")).SendMessage(
 				message);
-				// Notify the TimeView that the format has changed and it should
-				// recompute its size
+				// Notify the replicant tray that the time interval has
+				// changed and it should update the time view and reflow
+				// the tray icons.
 			break;
 		}
 

@@ -24,7 +24,6 @@ const uint32 kAutoRaise				= 'AtRs';
 const uint32 kAutoHide				= 'AtHd';
 
 const uint32 kShowHideTime			= 'ShTm';
-const uint32 kTimeIntervalChanged	= 'TiCh';
 const uint32 kShowSeconds			= 'SwSc';
 const uint32 kShowDayOfWeek			= 'SwDw';
 const uint32 kShowTimeZone			= 'SwTz';
@@ -74,9 +73,6 @@ private:
 			BCheckBox*		fWindowAlwaysOnTop;
 			BCheckBox*		fWindowAutoRaise;
 			BCheckBox*		fWindowAutoHide;
-
-			BRadioButton*	fTimeInterval24HourRadioButton;
-			BRadioButton*	fTimeInterval12HourRadioButton;
 
 			BCheckBox*		fShowSeconds;
 			BCheckBox*		fShowDayOfWeek;
