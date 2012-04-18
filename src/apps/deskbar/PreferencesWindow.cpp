@@ -16,6 +16,7 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <CheckBox.h>
+#include <ControlLook.h>
 #include <FormattingConventions.h>
 #include <GroupLayout.h>
 #include <Locale.h>
@@ -33,8 +34,13 @@
 #include "StatusView.h"
 
 
+static const float kIndentSpacing
+	= be_control_look->DefaultItemSpacing() * 2.3;
+
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "PreferencesWindow"
+
 
 PreferencesWindow::PreferencesWindow(BRect frame)
 	:
@@ -219,7 +225,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 			.Add(fAppsSortTrackerFirst)
 			.Add(fAppsShowExpanders)
 			.AddGroup(B_HORIZONTAL, 0)
-				.SetInsets(B_USE_BIG_SPACING, 0, 0, 0)
+				.SetInsets(kIndentSpacing, 0, 0, 0)
 				.Add(fAppsExpandNew)
 				.End()
 			.Add(fAppsHideLabels)
