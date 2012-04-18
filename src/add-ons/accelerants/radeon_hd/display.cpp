@@ -388,15 +388,30 @@ display_get_encoder_mode(uint32 connectorIndex)
 			return ATOM_ENCODER_MODE_DVO;
 	}
 
+	// Find crtc for connector
+	int32 crtc = -1;
+	for (int32 id = 0; id < MAX_DISPLAY; id++) {
+		if (gDisplay[id]->connectorIndex == connectorIndex) {
+			crtc = id;
+			break;
+		}
+	}
+	if (crtc == -1) {
+		ERROR("%s: BUG: ran on connector without crtc!\n", __func__);
+		return ATOM_ENCODER_MODE_CRT;
+	}
+
+	edid1_info* edid = &gDisplay[crtc]->edid_info;
+
 	// Normal encoder situations
 	switch (gConnector[connectorIndex]->type) {
 		case VIDEO_CONNECTOR_DVII:
 		case VIDEO_CONNECTOR_HDMIB: /* HDMI-B is DL-DVI; analog works fine */
 			// TODO: if audio detected on edid and DCE4, ATOM_ENCODER_MODE_DVI
 			//        if audio detected on edid not DCE4, ATOM_ENCODER_MODE_HDMI
-			// if (gConnector[connectorIndex]->use_digital)
-			//	return ATOM_ENCODER_MODE_DVI;
-			// else
+			if (edid->display.input_type) // is digital?
+				return ATOM_ENCODER_MODE_DVI;
+			else
 				return ATOM_ENCODER_MODE_CRT;
 			break;
 		case VIDEO_CONNECTOR_DVID:
