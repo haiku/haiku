@@ -238,11 +238,11 @@ CalcView::MessageReceived(BMessage* message)
 		switch (message->what) {
 			case MSG_OPTIONS_AUTO_NUM_LOCK:
 				ToggleAutoNumlock();
-				break;
+				return;
 
 			case MSG_OPTIONS_AUDIO_FEEDBACK:
 				ToggleAudioFeedback();
-				break;
+				return;
 		}
 	}
 
