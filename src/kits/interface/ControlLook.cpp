@@ -1948,13 +1948,13 @@ BControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 		view->StrokeRoundRect(rect, leftTopRadius, leftTopRadius);
 		rect.InsetBy(1, 1);
 	} else {
+		cornerBgColor = background;
 		if ((flags & B_BLEND_FRAME) != 0) {
-			cornerBgColor = (rgb_color){ background.red, background.blue,
-				background.green, 0 };
-
+			// set the background color to transparent for the case
+			// that we are on the desktop
+			cornerBgColor.alpha = 0;
 			view->SetDrawingMode(B_OP_ALPHA);
-		} else
-			cornerBgColor = background;
+		}
 
 		edgeLightColor = _EdgeLightColor(background,
 			contrast * ((flags & B_DISABLED) != 0 ? 0.0 : 1.0),
