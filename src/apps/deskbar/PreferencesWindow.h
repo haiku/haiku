@@ -26,8 +26,6 @@ const uint32 kAutoHide				= 'AtHd';
 const uint32 kShowHideTime			= 'ShTm';
 const uint32 kShowSeconds			= 'SwSc';
 const uint32 kShowDayOfWeek			= 'SwDw';
-const uint32 kShowTimeZone			= 'SwTz';
-const uint32 kTimePreferences		= 'TmPr';
 
 class BBox;
 class BButton;
@@ -76,7 +74,6 @@ private:
 
 			BCheckBox*		fShowSeconds;
 			BCheckBox*		fShowDayOfWeek;
-			BCheckBox*		fShowTimeZone;
 };
 
 

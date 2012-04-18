@@ -150,8 +150,7 @@ TReplicantTray::TReplicantTray(TBarView* parent, bool vertical)
 
 	// Create the time view
 	fTime = new TTimeView(fMinimumTrayWidth, kMaxReplicantHeight - 1.0,
-		use24HourClock, settings->showSeconds, settings->showDayOfWeek,
-		settings->showTimeZone);
+		use24HourClock, settings->showSeconds, settings->showDayOfWeek);
 }
 
 
@@ -313,17 +312,6 @@ TReplicantTray::MessageReceived(BMessage* message)
 				return;
 
 			fTime->SetShowDayOfWeek(!fTime->ShowDayOfWeek());
-
-			// time string reformat -> realign
-			RealignReplicants();
-			AdjustPlacement();
-			break;
-
-		case kShowTimeZone:
-			if (fTime == NULL)
-				return;
-
-			fTime->SetShowTimeZone(!fTime->ShowTimeZone());
 
 			// time string reformat -> realign
 			RealignReplicants();
@@ -1252,7 +1240,6 @@ TReplicantTray::SaveTimeSettings()
 	settings->showTime = !fTime->IsHidden();
 	settings->showSeconds = fTime->ShowSeconds();
 	settings->showDayOfWeek = fTime->ShowDayOfWeek();
-	settings->showTimeZone = fTime->ShowTimeZone();
 }
 
 
@@ -1599,4 +1586,3 @@ TDragRegion::SetDragRegionLocation(int32 location)
 	fDragLocation = location;
 	Invalidate();
 }
-

@@ -78,7 +78,6 @@ struct desk_settings {
 	bool showTime;
 	bool showSeconds;
 	bool showDayOfWeek;
-	bool showTimeZone;
 	uint32 state;
 	float width;
 	BPoint switcherLoc;

@@ -90,8 +90,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 		new BMessage(kShowSeconds));
 	fShowDayOfWeek = new BCheckBox(B_TRANSLATE("Show day of week"),
 		new BMessage(kShowDayOfWeek));
-	fShowTimeZone = new BCheckBox(B_TRANSLATE("Show time zone"),
-		new BMessage(kShowTimeZone));
 
 	// Get settings from BarApp
 	TBarApp* barApp = static_cast<TBarApp*>(be_app);
@@ -157,11 +155,9 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	if (replicantTray->Time() != NULL) {
 		fShowSeconds->SetValue(replicantTray->Time()->ShowSeconds());
 		fShowDayOfWeek->SetValue(replicantTray->Time()->ShowDayOfWeek());
-		fShowTimeZone->SetValue(replicantTray->Time()->ShowTimeZone());
 	} else {
 		fShowSeconds->SetValue(settings->showSeconds);
 		fShowDayOfWeek->SetValue(settings->showDayOfWeek);
-		fShowTimeZone->SetValue(settings->showTimeZone);
 	}
 
 	EnableDisableDependentItems();
@@ -179,7 +175,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 
 	fShowSeconds->SetTarget(replicantTray);
 	fShowDayOfWeek->SetTarget(replicantTray);
-	fShowTimeZone->SetTarget(replicantTray);
 
 	// Layout
 	fMenuBox = new BBox("fMenuBox");
@@ -253,14 +248,8 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 
 	view = BLayoutBuilder::Group<>()
 		.AddGroup(B_VERTICAL, 0)
-			.AddGroup(B_VERTICAL, 0)
-				.SetInsets(0, 0, 0, B_USE_DEFAULT_SPACING)
-				.Add(fShowSeconds)
-				.Add(fShowDayOfWeek)
-				.Add(fShowTimeZone)
-				.End()
-			.Add(new BButton(B_TRANSLATE("Time preferences" B_UTF8_ELLIPSIS),
-				new BMessage(kTimePreferences)))
+			.Add(fShowSeconds)
+			.Add(fShowDayOfWeek)
 			.AddGlue()
 			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
@@ -309,11 +298,6 @@ PreferencesWindow::MessageReceived(BMessage* message)
 
 		case kStateChanged:
 			EnableDisableDependentItems();
-			break;
-
-		case kTimePreferences:
-			// launch the time prefs app
-			be_roster->Launch("application/x-vnd.Haiku-Time");
 			break;
 
 		default:

@@ -55,7 +55,7 @@ class TTimeView : public BView {
 public:
 								TTimeView(float maxWidth, float height,
 									bool use24HourClock, bool showSeconds,
-									bool showDayOfWeek, bool showTimeZone);
+									bool showDayOfWeek);
 								TTimeView(BMessage* data);
 								~TTimeView();
 
@@ -85,9 +85,6 @@ public:
 
 				bool			ShowDayOfWeek() const;
 				void			SetShowDayOfWeek(bool show);
-
-				bool			ShowTimeZone() const;
-				void			SetShowTimeZone(bool show);
 
 				void			ShowCalendar(BPoint where);
 
@@ -123,7 +120,6 @@ private:
 				bool			fUse24HourClock;
 				bool			fShowSeconds;
 				bool			fShowDayOfWeek;
-				bool			fShowTimeZone;
 				BString			fTimeFormat;
 
 				BPoint			fTimeLocation;

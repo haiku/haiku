@@ -68,7 +68,7 @@ enum {
 
 
 TTimeView::TTimeView(float maxWidth, float height, bool use24HourClock,
-	bool showSeconds, bool showDayOfWeek, bool showTimeZone)
+	bool showSeconds, bool showDayOfWeek)
 	:
 	BView(BRect(-100, -100, -90, -90), "_deskbar_tv_",
 		B_FOLLOW_RIGHT | B_FOLLOW_TOP,
@@ -79,8 +79,7 @@ TTimeView::TTimeView(float maxWidth, float height, bool use24HourClock,
 	fOrientation(true),
 	fUse24HourClock(use24HourClock),
 	fShowSeconds(showSeconds),
-	fShowDayOfWeek(showDayOfWeek),
-	fShowTimeZone(showTimeZone)
+	fShowDayOfWeek(showDayOfWeek)
 {
 	fCurrentTime = fLastTime = time(NULL);
 	fSeconds = fMinute = fHour = 0;
@@ -354,21 +353,6 @@ TTimeView::SetShowDayOfWeek(bool show)
 }
 
 
-bool
-TTimeView::ShowTimeZone() const
-{
-	return fShowTimeZone;
-}
-
-
-void
-TTimeView::SetShowTimeZone(bool show)
-{
-	fShowTimeZone = show;
-	Update();
-}
-
-
 void
 TTimeView::ShowCalendar(BPoint where)
 {
@@ -432,14 +416,6 @@ TTimeView::CalculateTextPlacement()
 
 	BFont font;
 	GetFont(&font);
-
-	// If 12 hour clock with all options turned on shrink font size to fit.
-	if (!fUse24HourClock && fShowSeconds && fShowDayOfWeek && fShowTimeZone)
-		font.SetSize(11.0);
-	else
-		font.SetSize(12.0);
-
-	SetFont(&font, B_FONT_SIZE);
 
 	const char* stringArray[1];
 	stringArray[0] = fCurrentTimeStr;
@@ -516,9 +492,6 @@ TTimeView::UpdateTimeFormat()
 
 	if (!fUse24HourClock)
 		timeFormat.Append(" a");
-
-	if (fShowTimeZone)
-		timeFormat.Append(" V");
 
 	fTimeFormat = timeFormat;
 }
