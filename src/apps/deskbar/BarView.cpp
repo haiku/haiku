@@ -44,6 +44,7 @@ All rights reserved.
 #include <AppFileInfo.h>
 #include <Bitmap.h>
 #include <Directory.h>
+#include <LocaleRoster.h>
 #include <NodeInfo.h>
 #include <Roster.h>
 #include <Screen.h>
@@ -154,6 +155,10 @@ void
 TBarView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case B_LOCALE_CHANGED:
+			fReplicantTray->MessageReceived(message);
+			break;
+
 		case B_REFS_RECEIVED:
 			// received when an item is selected during DnD
 			// message is targeted here from Be menu

@@ -125,7 +125,7 @@ DumpList(BList* itemlist)
 
 TReplicantTray::TReplicantTray(TBarView* parent, bool vertical)
 	:
-	BView(BRect(0, 0, 1, 1), "_deskbar_rt_", B_FOLLOW_LEFT | B_FOLLOW_TOP,
+	BView(BRect(0, 0, 1, 1), "Status", B_FOLLOW_LEFT | B_FOLLOW_TOP,
 		B_WILL_DRAW | B_FRAME_EVENTS),
 	fTime(NULL),
 	fBarView(parent),
