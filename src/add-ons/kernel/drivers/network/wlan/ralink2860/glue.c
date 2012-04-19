@@ -16,9 +16,9 @@
 
 #include <net80211/ieee80211_var.h>
 
-#include "rt2860_io.h"
-#include "rt2860_reg.h"
-#include "rt2860_softc.h"
+#include "dev/rt2860/rt2860_io.h"
+#include "dev/rt2860/rt2860_reg.h"
+#include "dev/rt2860/rt2860_softc.h"
 
 
 HAIKU_FBSD_WLAN_DRIVER_GLUE(ralink2860, rt2860, pci)

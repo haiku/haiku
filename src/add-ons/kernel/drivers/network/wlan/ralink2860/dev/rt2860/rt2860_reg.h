@@ -19,7 +19,11 @@
 #ifndef _RT2860_REG_H_
 #define _RT2860_REG_H_
 
-#define RT2860_REG_EEPROM_CSR						0x0004
+#define RT2860_REG_PCI_CFG					0x0000
+#define RT2860_REG_EEPROM_CSR					0x0004
+#define RT2860_REG_PCI_MCU_CSR					0x0008
+#define RT2860_REG_PCI_SYS_CSR					0x000c
+#define RT2860_REG_PCIE_JTAG					0x0010
 
 #define RT2860_REG_SCHDMA_INT_STATUS				0x0200
 #define RT2860_REG_SCHDMA_INT_MASK					0x0204
@@ -40,42 +44,73 @@
 #define RT2860_REG_SCHDMA_TX_MAX_CNT(qid)			(0x0234 + (qid) * 16)
 #define RT2860_REG_SCHDMA_TX_CTX_IDX(qid)			(0x0238 + (qid) * 16)
 #define RT2860_REG_SCHDMA_TX_DTX_IDX(qid)			(0x023c + (qid) * 16)
+#define RT2860_REG_SCHDMA_US_CYC_CNT				0x02a4
 
 #define RT2860_REG_PBF_SYS_CTRL						0x0400
-#define RT2860_REG_PBF_CFG							0x0408
+#define RT2860_REG_PBF_HOST_CMD						0x0404
+#define RT2860_REG_PBF_CFG						0x0408
 #define RT2860_REG_PBF_MAX_PCNT						0x040c
+#define RT2860_REG_PBF_BUF_CTRL						0x0410
+#define RT2860_REG_PBF_MCU_INT_STA					0x0414
+#define RT2860_REG_PBF_MCU_INT_ENA					0x0418
+#define RT2860_REG_PBF_TX0Q_IO						0x041c
+#define RT2860_REG_PBF_TX1Q_IO						0x0420
+#define RT2860_REG_PBF_TX2Q_IO						0x0424
+#define RT2860_REG_PBF_RX0Q_IO						0x0428
 #define RT2860_REG_PBF_BCN_OFFSET0					0x042c
 #define RT2860_REG_PBF_BCN_OFFSET1					0x0430
+#define RT2860_REG_PBF_TXRXQ_STA					0x0434
 #define RT2860_REG_PBF_TXRXQ_PCNT					0x0438
+#define RT2860_REG_PBF_DBG						0x043c
+#define RT2860_REG_PBF_CAP_CTRL						0x0440
 
-#define RT2860_REG_MAC_CSR0							0x1000
-#define RT2860_REG_SYS_CTRL							0x1004
-#define RT2860_REG_ADDR_DW0							0x1008
-#define RT2860_REG_ADDR_DW1							0x100c
+#define RT2872_REG_RF_CSR_CFG						0x500
+#define RT2872_REG_RF_SETTING						0x504
+#define RT2872_REG_RF_TEST_CONTROL					0x508
+
+#define RT2860_REG_MAC_CSR0						0x1000
+#define RT2860_REG_SYS_CTRL						0x1004
+#define RT2860_REG_ADDR_DW0						0x1008
+#define RT2860_REG_ADDR_DW1						0x100c
 #define RT2860_REG_BSSID_DW0						0x1010
 #define RT2860_REG_BSSID_DW1						0x1014
 #define RT2860_REG_MAX_LEN_CFG						0x1018
 #define RT2860_REG_BBP_CSR_CFG						0x101c
 #define RT2860_REG_RF_CSR_CFG0						0x1020
-#define RT2860_REG_LED_CFG							0x102c
+#define RT2860_REG_LED_CFG						0x102c
+#define RT2860_REG_AMPDU_MAX_LEN_20M1S					0x1030
+#define RT2860_REG_AMPDU_MAX_LEN_20M2S					0x1034
+#define RT2860_REG_AMPDU_MAX_LEN_40M1S					0x1038
+#define RT2860_REG_AMPDU_MAX_LEN_40M2S					0x103c
+#define RT2860_REG_AMPDU_BA_WINSIZE					0x1040
 
-#define RT2860_REG_XIFS_TIME_CFG             		0x1100
+#define RT2860_REG_XIFS_TIME_CFG             				0x1100
 #define RT2860_REG_BKOFF_SLOT_CFG					0x1104
+#define RT2860_REG_NAV_TIME_CFG						0x1108
+#define RT2860_REG_CH_TIME_CFG						0x110c
+#define RT2860_REG_PBF_LIFE_TIMER					0x1110
 #define RT2860_REG_BCN_TIME_CFG						0x1114
+#define RT2860_REG_TBTT_SYNC_CFG					0x1118
 #define RT2860_REG_TSF_TIMER_DW0					0x111c
 #define RT2860_REG_TSF_TIMER_DW1					0x1120
 #define RT2860_REG_TBTT_TIMER						0x1124
+#define RT2860_REG_INT_TIMER						0x1128
+#define RT2860_REG_INT_TIMER_EN						0x112c
+#define RT2860_REG_CH_IDLE_STA						0x1130
 
 #define RT2860_REG_STATUS_CFG						0x1200
 #define RT2860_REG_PWR_PIN_CFG						0x1204
 #define RT2860_REG_AUTO_WAKEUP_CFG					0x1208
 
-#define RT2860_REG_TX_EDCA_AC_CFG(aci)				(0x1300 + (aci) * 4)
+#define RT2860_REG_TX_EDCA_AC_CFG(aci)					(0x1300 + (aci) * 4)
+#define RT2860_REG_TX_EDCA_TID_AC_MAP					0x1310
 #define RT2860_REG_TX_PWR_CFG(ridx)					(0x1314 + (ridx) * 4)
 #define RT2860_REG_TX_PIN_CFG						0x1328
 #define RT2860_REG_TX_BAND_CFG						0x132c
 #define RT2860_REG_TX_SW_CFG0						0x1330
 #define RT2860_REG_TX_SW_CFG1						0x1334
+#define RT2860_REG_TX_SW_CFG2						0x1338
+#define RT2860_REG_TX_TXOP_THRES_CFG					0x133c
 #define RT2860_REG_TX_TXOP_CTRL_CFG					0x1340
 #define RT2860_REG_TX_RTS_CFG						0x1344
 #define RT2860_REG_TX_TIMEOUT_CFG					0x1348
@@ -91,14 +126,27 @@
 #define RT2860_REG_TX_MM40_PROT_CFG					0x1370
 #define RT2860_REG_TX_GF20_PROT_CFG					0x1374
 #define RT2860_REG_TX_GF40_PROT_CFG					0x1378
+#define RT2860_REG_TX_EXP_CTS_TIME					0x137c
 #define RT2860_REG_TX_EXP_ACK_TIME					0x1380
 
 #define RT2860_REG_RX_FILTER_CFG					0x1400
 #define RT2860_REG_AUTO_RSP_CFG						0x1404
-#define RT2860_REG_LEGACY_BASIC_RATE				0x1408
+#define RT2860_REG_LEGACY_BASIC_RATE					0x1408
 #define RT2860_REG_HT_BASIC_RATE					0x140c
+#define RT2860_REG_HT_CTRL_CFG						0x1410
+#define RT2860_REG_SIFS_COST_CFG					0x1414
+#define RT2860_REG_RX_PARSER_CFG					0x1418
 
-#define RT2860_REG_HCCAPSMP_TXOP_HLDR_ET			0x1608
+#define RT2860_REG_TX_SEC_CNT0						0x1500
+#define RT2860_REG_RX_SEC_CNT0						0x1504
+#define RT2860_REG_CCMP_FC_MUTE						0x1508
+
+#define RT2860_REG_HCCAPSMP_TXOP_HLDR_ADDR0				0x1600
+#define RT2860_REG_HCCAPSMP_TXOP_HLDR_ADDR1				0x1604
+#define RT2860_REG_HCCAPSMP_TXOP_HLDR_ET				0x1608
+#define RT2860_REG_HCCAPSMP_QOS_CFPOLL_RA_DW0				0x160c
+#define RT2860_REG_HCCAPSMP_QOS_CFPOLL_A1_DW1				0x1610
+#define RT2860_REG_HCCAPSMP_QOS_CFPOLL_QC				0x1614
 
 #define RT2860_REG_RX_STA_CNT0						0x1700
 #define RT2860_REG_RX_STA_CNT1						0x1704
@@ -116,7 +164,7 @@
 #define RT2860_REG_TX_AGG_CNT5						0x1734
 #define RT2860_REG_TX_AGG_CNT6						0x1738
 #define RT2860_REG_TX_AGG_CNT7						0x173c
-#define RT2860_REG_TXRX_MPDU_DEN_CNT				0x1740
+#define RT2860_REG_TXRX_MPDU_DEN_CNT					0x1740
 
 #define RT2860_REG_WCID(wcid)						(0x1800 + (wcid) * 8)
 #define RT2860_REG_PKEY(wcid)						(0x4000 + (wcid) * 32)
@@ -134,6 +182,95 @@
 #define RT2860_REG_H2M_MAILBOX_BBP_AGENT			0x7028
 
 #define RT2860_REG_BEACON_BASE(vap)					(0x7800 + (vap) * 512)
+
+/* RT3070 registers */
+#define RT3070_RF_CSR_CFG		0x0500
+#define RT3070_EFUSE_CTRL		0x0580
+#define RT3070_EFUSE_DATA0		0x0590
+#define RT3070_EFUSE_DATA1		0x0594
+#define RT3070_EFUSE_DATA2		0x0598
+#define RT3070_EFUSE_DATA3		0x059c
+#define RT3090_OSC_CTRL			0x05a4
+#define RT3070_LDO_CFG0			0x05d4
+#define RT3070_GPIO_SWITCH		0x05dc
+
+#define RT3090_AUX_CTRL			0x010c
+#define RT3070_OPT_14			0x0114
+
+/* possible flags for register RF_CSR_CFG */
+#define RT3070_RF_KICK		(1 << 17)
+#define RT3070_RF_WRITE		(1 << 16)
+
+/* possible flags for register EFUSE_CTRL */
+#define RT3070_SEL_EFUSE	(1 << 31)
+#define RT3070_EFSROM_KICK	(1 << 30)
+#define RT3070_EFSROM_AIN_MASK	0x03ff0000
+#define RT3070_EFSROM_AIN_SHIFT	16
+#define RT3070_EFSROM_MODE_MASK	0x000000c0
+#define RT3070_EFUSE_AOUT_MASK	0x0000003f
+
+/* possible flags for RT3020 RF register 1 */
+#define RT3070_RF_BLOCK	(1 << 0)
+#define RT3070_RX0_PD	(1 << 2)
+#define RT3070_TX0_PD	(1 << 3)
+#define RT3070_RX1_PD	(1 << 4)
+#define RT3070_TX1_PD	(1 << 5)
+#define RT3070_RX2_PD	(1 << 6)
+#define RT3070_TX2_PD	(1 << 7)
+
+/* possible flags for RT3020 RF register 1 */
+#define RT3070_RF_BLOCK	(1 << 0)
+#define RT3070_RX0_PD	(1 << 2)
+#define RT3070_TX0_PD	(1 << 3)
+#define RT3070_RX1_PD	(1 << 4)
+#define RT3070_TX1_PD	(1 << 5)
+#define RT3070_RX2_PD	(1 << 6)
+#define RT3070_TX2_PD	(1 << 7)
+
+/* possible flags for RT3020 RF register 7 */
+#define RT3070_TUNE	(1 << 0)
+
+/* possible flags for RT3020 RF register 15 */
+#define RT3070_TX_LO2	(1 << 3)
+
+/* possible flags for RT3020 RF register 17 */
+#define RT3070_TX_LO1	(1 << 3)
+
+/* possible flags for RT3020 RF register 20 */
+#define RT3070_RX_LO1	(1 << 3)
+
+/* possible flags for RT3020 RF register 21 */
+#define RT3070_RX_LO2	(1 << 3)
+#define RT3070_RX_CTB	(1 << 7)
+
+/* possible flags for RT3020 RF register 22 */
+#define RT3070_BB_LOOPBACK	(1 << 0)
+
+/* possible flags for RT3053 RF register 1 */
+#define RT3593_VCO	(1 << 0)
+
+/* possible flags for RT3053 RF register 2 */
+#define RT3593_RESCAL	(1 << 7)
+
+/* possible flags for RT3053 RF register 3 */
+#define RT3593_VCOCAL	(1 << 7)
+
+/* possible flags for RT3053 RF register 6 */
+#define RT3593_VCO_IC	(1 << 6)
+
+/* possible flags for RT3053 RF register 20 */
+#define RT3593_LDO_PLL_VC_MASK	0x0e
+#define RT3593_LDO_RF_VC_MASK	0xe0
+
+/* possible flags for RT3053 RF register 22 */
+#define RT3593_CP_IC_MASK	0xe0
+#define RT3593_CP_IC_SHIFT	5
+
+/* possible flags for RT3053 RF register 46 */
+#define RT3593_RX_CTB	(1 << 5)
+
+#define RT3090_DEF_LNA	10
+
 
 #define RT2860_REG_RF_R1							0
 #define RT2860_REG_RF_R2							1
@@ -240,10 +377,23 @@
 #define RT2860_REG_MAC_SRST							(1 << 0)
 
 /*
+ * RT2872_REG_RF_CSR_CFG flags
+ */
+#define RT2872_REG_RF_CSR_BUSY						(1 << 17)
+#define RT2872_REG_RF_CSR_KICK						(1 << 17)
+#define RT2872_REG_RF_CSR_WRITE						(1 << 16)
+#define RT2872_REG_RF_ID_SHIFT						8
+#define RT2872_REG_RF_ID_MASK						0x1f
+#define RT2872_REG_RF_VAL_SHIFT						0
+#define RT2872_REG_RF_VAL_MASK						0xff
+
+/*
  * RT2860_REG_BBP_CSR_CFG flags
  */
-#define RT2860_REG_BBP_RW_MODE_PARALLEL				(1 << 19)
+#define RT2860_REG_BBP_RW_MODE_PARALLEL					(1 << 19)
+#define RT2860_REG_BBP_PAR_DUR						(1 << 19)
 #define RT2860_REG_BBP_CSR_BUSY						(1 << 17)
+#define RT2860_REG_BBP_CSR_KICK						(1 << 17)
 #define RT2860_REG_BBP_CSR_READ						(1 << 16)
 #define RT2860_REG_BBP_REG_SHIFT					8
 #define RT2860_REG_BBP_REG_MASK						0xff

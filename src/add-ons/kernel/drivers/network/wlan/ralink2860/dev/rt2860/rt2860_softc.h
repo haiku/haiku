@@ -49,64 +49,67 @@
 #include <net80211/ieee80211_radiotap.h>
 #include <net80211/ieee80211_regdomain.h>
 
-#include <dev/pci/pcireg.h>
-#include <dev/pci/pcivar.h>
+//#include "opt_rt2860.h"
 
-#include "rt2860_rxdesc.h"
-#include "rt2860_txdesc.h"
-#include "rt2860_txwi.h"
-#include "rt2860_amrr.h"
+#include <dev/rt2860/rt2860_rxdesc.h>
+#include <dev/rt2860/rt2860_txdesc.h>
+#include <dev/rt2860/rt2860_txwi.h>
+#include <dev/rt2860/rt2860_amrr.h>
 
-#define RT2860_SOFTC_LOCK(sc)								mtx_lock(&(sc)->lock)
-#define RT2860_SOFTC_UNLOCK(sc)								mtx_unlock(&(sc)->lock)
-#define	RT2860_SOFTC_ASSERT_LOCKED(sc)						mtx_assert(&(sc)->lock, MA_OWNED)
+#define RT2860_SOFTC_LOCK(sc)				mtx_lock(&(sc)->lock)
+#define RT2860_SOFTC_UNLOCK(sc)				\
+		mtx_unlock(&(sc)->lock)
+#define	RT2860_SOFTC_ASSERT_LOCKED(sc)			\
+		mtx_assert(&(sc)->lock, MA_OWNED)
 
-#define RT2860_SOFTC_TX_RING_LOCK(ring)						mtx_lock(&(ring)->lock)
-#define RT2860_SOFTC_TX_RING_UNLOCK(ring)					mtx_unlock(&(ring)->lock)
-#define	RT2860_SOFTC_TX_RING_ASSERT_LOCKED(ring)			mtx_assert(&(ring)->lock, MA_OWNED)
+#define RT2860_SOFTC_TX_RING_LOCK(ring)			mtx_lock(&(ring)->lock)
+#define RT2860_SOFTC_TX_RING_UNLOCK(ring)		\
+		mtx_unlock(&(ring)->lock)
+#define	RT2860_SOFTC_TX_RING_ASSERT_LOCKED(ring)	\
+		mtx_assert(&(ring)->lock, MA_OWNED)
 
-#define RT2860_SOFTC_FLAGS_UCODE_LOADED						(1 << 0)
+#define RT2860_SOFTC_FLAGS_UCODE_LOADED			(1 << 0)
 
-#define RT2860_SOFTC_LED_OFF_COUNT							3
+#define RT2860_SOFTC_LED_OFF_COUNT			3
 
-#define RT2860_SOFTC_RSSI_OFF_COUNT							3
+#define RT2860_SOFTC_RSSI_OFF_COUNT			3
 
-#define RT2860_SOFTC_LNA_GAIN_COUNT							4
+#define RT2860_SOFTC_LNA_GAIN_COUNT			4
 
-#define RT2860_SOFTC_TXPOW_COUNT							50
+#define RT2860_SOFTC_TXPOW_COUNT			50
 
-#define RT2860_SOFTC_TXPOW_RATE_COUNT						5
+#define RT2860_SOFTC_TXPOW_RATE_COUNT			5
 
-#define RT2860_SOFTC_TSSI_COUNT								9
+#define RT2860_SOFTC_TSSI_COUNT				9
 
-#define RT2860_SOFTC_BBP_EEPROM_COUNT						8
+#define RT2860_SOFTC_BBP_EEPROM_COUNT			8
 
-#define RT2860_SOFTC_RSSI_COUNT								3
+#define RT2860_SOFTC_RSSI_COUNT				3
 
-#define RT2860_SOFTC_STAID_COUNT							64
+#define RT2860_SOFTC_STAID_COUNT			64
 
-#define RT2860_SOFTC_TX_RING_COUNT							6
+#define RT2860_SOFTC_TX_RING_COUNT			6
 
-#define RT2860_SOFTC_RX_RING_DATA_COUNT						128
+#define RT2860_SOFTC_RX_RING_DATA_COUNT			128
 
-#define RT2860_SOFTC_MAX_SCATTER							10
+#define RT2860_SOFTC_MAX_SCATTER			10
 
-#define RT2860_SOFTC_TX_RING_DATA_COUNT						256
-#define RT2860_SOFTC_TX_RING_DESC_COUNT						\
+#define RT2860_SOFTC_TX_RING_DATA_COUNT			256
+#define RT2860_SOFTC_TX_RING_DESC_COUNT					\
 	(RT2860_SOFTC_TX_RING_DATA_COUNT * RT2860_SOFTC_MAX_SCATTER)
 
-#define RT2860_SOFTC_RX_RADIOTAP_PRESENT					\
-	((1 << IEEE80211_RADIOTAP_FLAGS) |						\
-	 (1 << IEEE80211_RADIOTAP_RATE) |						\
-	 (1 << IEEE80211_RADIOTAP_DBM_ANTSIGNAL) |				\
-	 (1 << IEEE80211_RADIOTAP_DBM_ANTNOISE) |				\
-	 (1 << IEEE80211_RADIOTAP_ANTENNA) |					\
-	 (1 << IEEE80211_RADIOTAP_DB_ANTSIGNAL) |				\
+#define RT2860_SOFTC_RX_RADIOTAP_PRESENT				\
+	((1 << IEEE80211_RADIOTAP_FLAGS) |				\
+	 (1 << IEEE80211_RADIOTAP_RATE) |				\
+	 (1 << IEEE80211_RADIOTAP_DBM_ANTSIGNAL) |			\
+	 (1 << IEEE80211_RADIOTAP_DBM_ANTNOISE) |			\
+	 (1 << IEEE80211_RADIOTAP_ANTENNA) |				\
+	 (1 << IEEE80211_RADIOTAP_DB_ANTSIGNAL) |			\
 	 (1 << IEEE80211_RADIOTAP_XCHANNEL))
 
-#define RT2860_SOFTC_TX_RADIOTAP_PRESENT					\
-	((1 << IEEE80211_RADIOTAP_FLAGS) |						\
-	 (1 << IEEE80211_RADIOTAP_RATE) |						\
+#define RT2860_SOFTC_TX_RADIOTAP_PRESENT				\
+	((1 << IEEE80211_RADIOTAP_FLAGS) |				\
+	 (1 << IEEE80211_RADIOTAP_RATE) |				\
 	 (1 << IEEE80211_RADIOTAP_XCHANNEL))
 
 struct rt2860_softc_rx_data
@@ -309,7 +312,7 @@ struct rt2860_softc
 	{
 		uint8_t	val;
 		uint8_t	reg;
-	} __packed bbp_eeprom[RT2860_SOFTC_BBP_EEPROM_COUNT];
+	} __packed bbp_eeprom[RT2860_SOFTC_BBP_EEPROM_COUNT], rf[10];
 
 	uint16_t powersave_level;
 
@@ -403,6 +406,12 @@ struct rt2860_softc
 	unsigned long rx_cipher_invalid_key_errors;
 
 	int tx_stbc;
+
+	uint8_t rf24_20mhz;
+	uint8_t	rf24_40mhz;
+	uint8_t	patch_dac;
+	uint8_t	txmixgain_2ghz;
+	uint8_t	txmixgain_5ghz;
 
 #ifdef RT2860_DEBUG
 	int debug;

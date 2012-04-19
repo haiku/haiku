@@ -19,7 +19,7 @@
 #ifndef _RT2860_RF_H_
 #define _RT2860_RF_H_
 
-#include "rt2860_softc.h"
+#include <dev/rt2860/rt2860_softc.h>
 
 const char *rt2860_rf_name(int rf_rev);
 
@@ -28,5 +28,22 @@ void rt2860_rf_select_chan_group(struct rt2860_softc *sc,
 
 void rt2860_rf_set_chan(struct rt2860_softc *sc,
 	struct ieee80211_channel *c);
+
+uint8_t rt3090_rf_read(struct rt2860_softc *sc, uint8_t reg);
+
+void rt3090_rf_write(struct rt2860_softc *sc, uint8_t reg, uint8_t val);
+
+void rt3090_set_chan(struct rt2860_softc *sc, u_int chan);
+
+int rt3090_rf_init(struct rt2860_softc *sc);
+
+void rt3090_set_rx_antenna(struct rt2860_softc *, int);
+
+void rt3090_rf_wakeup(struct rt2860_softc *sc);
+
+int rt3090_filter_calib(struct rt2860_softc *sc, uint8_t init, uint8_t target,
+    uint8_t *val);
+
+void rt3090_rf_setup(struct rt2860_softc *sc);
 
 #endif /* #ifndef _RT2860_RF_H_ */

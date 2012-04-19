@@ -19,7 +19,7 @@
 #ifndef _RT2860_LED_H_
 #define _RT2860_LED_H_
 
-#include "rt2860_softc.h"
+#include <dev/rt2860/rt2860_softc.h>
 
 #define RT2860_LED_CMD_RADIO_OFF				0
 #define RT2860_LED_CMD_RADIO_ON					(1 << 5)
@@ -30,4 +30,4 @@ void rt2860_led_brightness(struct rt2860_softc *sc, uint8_t brightness);
 
 void rt2860_led_cmd(struct rt2860_softc *sc, uint8_t cmd);
 
-#endif /* #ifndef _RT2870_LED_H_ */
+#endif /* #ifndef _RT2860_LED_H_ */

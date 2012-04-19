@@ -16,8 +16,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include "rt2860_io.h"
-#include "rt2860_reg.h"
+#include <dev/rt2860/rt2860_io.h>
+#include <dev/rt2860/rt2860_reg.h>
 
 /*
  * Defines and macros
@@ -62,6 +62,80 @@ static void rt2860_io_eeprom_shiftout_bits(struct rt2860_softc *sc,
 static uint16_t rt2860_io_eeprom_shiftin_bits(struct rt2860_softc *sc);
 
 static uint8_t rt2860_io_byte_rev(uint8_t byte);
+
+/* #ifdef RT305X_SOC */
+static const uint16_t rt3052_eeprom[] = 
+{
+	0x3052, 0x0101, 0x0c00, 0x3043, 0x8852, 0xffff, 0xffff, 0xffff,
+	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+	0xffff, 0xffff, 0xffff, 0xffff, 0x0c00, 0x3043, 0x7752, 0x0c00,
+	0x3043, 0x6652, 0x0822, 0x0024, 0xffff, 0x012f, 0x7755, 0xaaa8,
+	0x888c, 0xffff, 0x000c, 0x0000, 0x0000, 0x0000, 0x0000, 0xffff,
+	0xffff, 0x0d0d, 0x0d0d, 0x0c0c, 0x0c0c, 0x0c0c, 0x0c0c, 0x0c0c,
+	0x1010, 0x1111, 0x1211, 0x1212, 0x1313, 0x1413, 0x1414, 0xffff,
+	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0x6666,
+	0xaacc, 0x6688, 0xaacc, 0x6688, 0xaacc, 0x6688, 0xaacc, 0x6688,
+	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+};
+
+uint8_t rt3052_rf_default[] = {
+	0x50,
+	0x01,
+	0xF7,
+	0x75,
+	0x40,
+	0x03,
+	0x42,
+	0x50,
+	0x39,
+	0x0F,
+	0x60,
+	0x21,
+	0x75,
+	0x75,
+	0x90,
+	0x58,
+	0xB3,
+	0x92,
+	0x2C,
+	0x02,
+	0xBA,
+	0xDB,
+	0x00,
+	0x31,
+	0x08,
+	0x01,
+	0x25, /* Core Power: 0x25=1.25V */
+	0x23, /* RF: 1.35V */
+      	0x13, /* ADC: must consist with R27 */
+	0x83,
+	0x00,
+	0x00,
+};
+/* #endif */
+
 
 /*
  * Static variables
@@ -108,6 +182,7 @@ static const uint16_t rt2860_io_ccitt16[] =
  */
 uint32_t rt2860_io_mac_read(struct rt2860_softc *sc, uint16_t reg)
 {
+	bus_space_read_4(sc->bst, sc->bsh, RT2860_REG_MAC_CSR0);
 	return bus_space_read_4(sc->bst, sc->bsh, reg);
 }
 
@@ -117,6 +192,7 @@ uint32_t rt2860_io_mac_read(struct rt2860_softc *sc, uint16_t reg)
 void rt2860_io_mac_read_multi(struct rt2860_softc *sc,
 	uint16_t reg, void *buf, size_t len)
 {
+	bus_space_read_4(sc->bst, sc->bsh, RT2860_REG_MAC_CSR0);
 	bus_space_read_region_1(sc->bst, sc->bsh, reg, buf, len);
 }
 
@@ -126,6 +202,7 @@ void rt2860_io_mac_read_multi(struct rt2860_softc *sc,
 void rt2860_io_mac_write(struct rt2860_softc *sc,
 	uint16_t reg, uint32_t val)
 {
+	bus_space_read_4(sc->bst, sc->bsh, RT2860_REG_MAC_CSR0);
 	bus_space_write_4(sc->bst, sc->bsh, reg, val);
 }
 
@@ -135,7 +212,15 @@ void rt2860_io_mac_write(struct rt2860_softc *sc,
 void rt2860_io_mac_write_multi(struct rt2860_softc *sc,
 	uint16_t reg, const void *buf, size_t len)
 {
-	bus_space_write_region_1(sc->bst, sc->bsh, reg, buf, len);
+	int i;
+	const uint8_t *p;
+
+	bus_space_read_4(sc->bst, sc->bsh, RT2860_REG_MAC_CSR0);
+
+	p = buf;
+	for (i = 0; i < len; i ++)
+		bus_space_write_1(sc->bst, sc->bsh, reg + i, *(p+i));
+//	bus_space_write_region_1(sc->bst, sc->bsh, reg, buf, len);
 }
 
 /*
@@ -150,6 +235,46 @@ void rt2860_io_mac_set_region_4(struct rt2860_softc *sc,
 		rt2860_io_mac_write(sc, reg + i, val);
 }
 
+/* Read 16-bit from eFUSE ROM (>=RT3071 only.) */
+static uint16_t
+rt3090_efuse_read_2(struct rt2860_softc *sc, uint16_t addr)
+{
+	uint32_t tmp;
+	uint16_t reg;
+	int ntries;
+
+	addr *= 2;
+	/*-
+	 * Read one 16-byte block into registers EFUSE_DATA[0-3]:
+	 * DATA0: F E D C
+	 * DATA1: B A 9 8
+	 * DATA2: 7 6 5 4
+	 * DATA3: 3 2 1 0
+	 */
+	tmp = rt2860_io_mac_read(sc, RT3070_EFUSE_CTRL);
+	tmp &= ~(RT3070_EFSROM_MODE_MASK | RT3070_EFSROM_AIN_MASK);
+	tmp |= (addr & ~0xf) << RT3070_EFSROM_AIN_SHIFT | RT3070_EFSROM_KICK;
+	rt2860_io_mac_write(sc, RT3070_EFUSE_CTRL, tmp);
+	for (ntries = 0; ntries < 500; ntries++) {
+		tmp = rt2860_io_mac_read(sc, RT3070_EFUSE_CTRL);
+		if (!(tmp & RT3070_EFSROM_KICK))
+			break;
+		DELAY(2);
+	}
+	if (ntries == 500)
+		return 0xffff;
+
+	if ((tmp & RT3070_EFUSE_AOUT_MASK) == RT3070_EFUSE_AOUT_MASK)
+		return 0xffff;	/* address not found */
+
+	/* determine to which 32-bit register our 16-bit word belongs */
+	reg = RT3070_EFUSE_DATA3 - (addr & 0xc);
+	tmp = rt2860_io_mac_read(sc, reg);
+
+	return (addr & 2) ? tmp >> 16 : tmp & 0xffff;
+}
+
+
 /*
  * rt2860_io_eeprom_read
  */
@@ -159,6 +284,14 @@ uint16_t rt2860_io_eeprom_read(struct rt2860_softc *sc, uint16_t addr)
 	uint16_t val;
 
 	addr = (addr >> 1);
+
+	if (sc->mac_rev == 0x28720200) {
+		return (rt3052_eeprom[addr]);
+	} else if ((sc->mac_rev & 0xffff0000) >= 0x30710000) {
+		tmp = rt2860_io_mac_read(sc, RT3070_EFUSE_CTRL);
+		if (tmp & RT3070_SEL_EFUSE)
+			return (rt3090_efuse_read_2(sc, addr));
+	}
 
 	tmp = rt2860_io_mac_read(sc, RT2860_REG_EEPROM_CSR);
 
@@ -224,6 +357,43 @@ uint8_t rt2860_io_bbp_read(struct rt2860_softc *sc, uint8_t reg)
 	int ntries;
 	uint32_t tmp;
 
+	if (sc->mac_rev == 0x28720200)
+	{
+		for (ntries = 0; ntries < 100; ntries ++) {
+			if ( !(rt2860_io_mac_read(sc, RT2860_REG_BBP_CSR_CFG) & 
+			    RT2860_REG_BBP_CSR_BUSY) )
+				break;
+			DELAY(1);
+		}
+		if (ntries == 100) {
+			printf("%s:%s: BBP busy after 100 probes\n",
+				device_get_nameunit(sc->dev), __func__);
+			return (0);
+		}
+		rt2860_io_mac_write(sc, RT2860_REG_BBP_CSR_CFG, 
+		    RT2860_REG_BBP_CSR_READ |
+		    RT2860_REG_BBP_CSR_KICK | RT2860_REG_BBP_RW_MODE_PARALLEL |
+		    (reg & RT2860_REG_BBP_REG_MASK) << RT2860_REG_BBP_REG_SHIFT);
+		for (ntries = 0; ntries < 100; ntries ++) {
+			if ( !(rt2860_io_mac_read(sc, RT2860_REG_BBP_CSR_CFG) & 
+			    RT2860_REG_BBP_CSR_BUSY) )
+				break;
+			DELAY(1);
+		}
+		if (ntries == 100) {
+			printf("%s:%s: BBP busy after 100 probes\n",
+				device_get_nameunit(sc->dev), __func__);
+			return (0);
+		}
+		else {
+			return 
+			    ((rt2860_io_mac_read(sc, RT2860_REG_BBP_CSR_CFG) >>
+			    RT2860_REG_BBP_VAL_SHIFT) & 
+			    RT2860_REG_BBP_VAL_MASK);
+		}
+		return (0);
+	}
+
 	for (ntries = 0; ntries < 100; ntries++)
 	{
 		if (!(rt2860_io_mac_read(sc, RT2860_REG_H2M_MAILBOX_BBP_AGENT) &
@@ -276,6 +446,27 @@ void rt2860_io_bbp_write(struct rt2860_softc *sc, uint8_t reg, uint8_t val)
 	int ntries;
 	uint32_t tmp;
 
+	if (sc->mac_rev == 0x28720200)
+	{
+		for (ntries = 0; ntries < 100; ntries ++) {
+			if ( !(rt2860_io_mac_read(sc, RT2860_REG_BBP_CSR_CFG) & 
+			    RT2860_REG_BBP_CSR_BUSY) )
+				break;
+			DELAY(1);
+		}
+		if (ntries == 100) {
+			printf("%s:%s: BBP busy after 100 probes\n",
+				device_get_nameunit(sc->dev), __func__);
+			return;
+		}
+		rt2860_io_mac_write(sc, RT2860_REG_BBP_CSR_CFG, 
+		    RT2860_REG_BBP_CSR_KICK | RT2860_REG_BBP_RW_MODE_PARALLEL |
+		    (reg & RT2860_REG_BBP_REG_MASK) << RT2860_REG_BBP_REG_SHIFT | 
+		    (val & RT2860_REG_BBP_VAL_MASK) << RT2860_REG_BBP_VAL_SHIFT );
+		rt2860_io_bbp_read(sc, reg);
+		return;
+	}
+
 	for (ntries = 0; ntries < 100; ntries++)
 	{
 		if (!(rt2860_io_mac_read(sc, RT2860_REG_H2M_MAILBOX_BBP_AGENT) &
@@ -311,6 +502,27 @@ void rt2860_io_bbp_write(struct rt2860_softc *sc, uint8_t reg, uint8_t val)
 void rt2860_io_rf_write(struct rt2860_softc *sc, uint8_t reg, uint32_t val)
 {
 	int ntries;
+	if (sc->mac_rev == 0x28720200)
+	{
+		for (ntries = 0; ntries < 100; ntries ++) {
+			if ( !(rt2860_io_mac_read(sc, RT2872_REG_RF_CSR_CFG) & 
+			    RT2872_REG_RF_CSR_BUSY) )
+				break;
+			DELAY(1);
+		}
+		if (ntries == 100) {
+			printf("%s:%s: RF busy after 100 probes\n",
+				device_get_nameunit(sc->dev), __func__);
+			return;
+		}
+		rt2860_io_mac_write(sc, RT2872_REG_RF_CSR_CFG, 
+		    RT2872_REG_RF_CSR_KICK | RT2872_REG_RF_CSR_WRITE |
+		    (reg & RT2872_REG_RF_ID_MASK) << RT2872_REG_RF_ID_SHIFT | 
+		    (val & RT2872_REG_RF_VAL_MASK) << RT2872_REG_RF_VAL_SHIFT );
+		rt2860_io_rf_read(sc, reg);
+		return;
+	}
+
 
 	for (ntries = 0; ntries < 100; ntries++)
 		if (!(rt2860_io_mac_read(sc, RT2860_REG_RF_CSR_CFG0) &
@@ -328,6 +540,58 @@ void rt2860_io_rf_write(struct rt2860_softc *sc, uint8_t reg, uint32_t val)
 }
 
 /*
+ * rt2860_io_rf_read
+ */
+int32_t rt2860_io_rf_read(struct rt2860_softc *sc, uint8_t reg)
+{
+	int ntries;
+	if (sc->mac_rev == 0x28720200)
+	{
+		for (ntries = 0; ntries < 100; ntries ++) {
+			if ( !(rt2860_io_mac_read(sc, RT2872_REG_RF_CSR_CFG) & 
+			    RT2872_REG_RF_CSR_BUSY) )
+				break;
+			DELAY(1);
+		}
+		if (ntries == 100) {
+			printf("%s:%s: RF busy after 100 probes\n",
+				device_get_nameunit(sc->dev), __func__);
+			return (-1);
+		}
+		rt2860_io_mac_write(sc, RT2872_REG_RF_CSR_CFG, 
+		    RT2872_REG_RF_CSR_KICK |
+		    (reg & RT2872_REG_RF_ID_MASK) << RT2872_REG_RF_ID_SHIFT );
+
+		for (ntries = 0; ntries < 100; ntries ++) {
+			if ( !(rt2860_io_mac_read(sc, RT2872_REG_RF_CSR_CFG) & 
+			    RT2872_REG_RF_CSR_BUSY) )
+				break;
+			DELAY(1);
+		}
+		if (ntries == 100) {
+			printf("%s:%s: RF busy after 100 probes\n",
+				device_get_nameunit(sc->dev), __func__);
+		}
+
+		return (rt2860_io_mac_read(sc, RT2872_REG_RF_CSR_CFG) & RT2872_REG_RF_VAL_MASK);
+	}
+	return (-1);
+}
+
+/*
+ * rt2860_io_rf_load_defaults
+ */
+void rt2860_io_rf_load_defaults(struct rt2860_softc *sc)
+{
+	int i;
+
+	if (sc->mac_rev == 0x28720200) {
+		for (i = 0; i < 32; i ++)
+			rt2860_io_rf_write(sc, i, rt3052_rf_default[i]);
+	}
+}
+
+/*
  * rt2860_io_mcu_cmd
  */
 void rt2860_io_mcu_cmd(struct rt2860_softc *sc, uint8_t cmd,
@@ -335,6 +599,9 @@ void rt2860_io_mcu_cmd(struct rt2860_softc *sc, uint8_t cmd,
 {
 	uint32_t tmp;
 	int ntries;
+
+	if (sc->mac_rev == 0x28720200)
+		return;
 
 	for (ntries = 0; ntries < 100; ntries++)
 	{
@@ -437,30 +704,47 @@ int rt2860_io_mcu_load_ucode(struct rt2860_softc *sc,
 
 	rt2860_io_mac_write(sc, RT2860_REG_PBF_SYS_CTRL, RT2860_REG_HST_PM_SEL);
 
-	rt2860_io_mac_write_multi(sc, RT2860_REG_MCU_UCODE_BASE, ucode, len);
+	for(i = 0; i < len; i += 4)
+	{
+		rt2860_io_mac_write(sc, RT2860_REG_MCU_UCODE_BASE + i, 
+		    (ucode[i+3] << 24) | (ucode[i+2] << 16) | 
+		    (ucode[i+1] << 8) | ucode[i]);
+	}
+
+	if (sc->mac_rev != 0x28720200)
+		rt2860_io_mac_write_multi(sc, RT2860_REG_MCU_UCODE_BASE,
+		    ucode, len);
 
 	rt2860_io_mac_write(sc, RT2860_REG_PBF_SYS_CTRL, 0);
-	rt2860_io_mac_write(sc, RT2860_REG_PBF_SYS_CTRL, RT2860_REG_MCU_RESET);
+
+	if (sc->mac_rev != 0x28720200)
+		rt2860_io_mac_write(sc, RT2860_REG_PBF_SYS_CTRL,
+		    RT2860_REG_MCU_RESET);
+
+	DELAY(10000);
 
 	/* initialize BBP R/W access agent */
 
 	rt2860_io_mac_write(sc, RT2860_REG_H2M_MAILBOX_BBP_AGENT, 0);
 	rt2860_io_mac_write(sc, RT2860_REG_H2M_MAILBOX, 0);
 
-	for (ntries = 0; ntries < 1000; ntries++)
-	{
-		if (rt2860_io_mac_read(sc, RT2860_REG_PBF_SYS_CTRL) &
-			RT2860_REG_MCU_READY)
-			break;
+	if (sc->mac_rev != 0x28720200) {
 
-		DELAY(1000);
-	}
+		for (ntries = 0; ntries < 1000; ntries++)
+		{
+			if (rt2860_io_mac_read(sc, RT2860_REG_PBF_SYS_CTRL) &
+				RT2860_REG_MCU_READY)
+				break;
 
-	if (ntries == 1000)
-	{
-		printf("%s: timeout waiting for MCU to initialize\n",
-			device_get_nameunit(sc->dev));
-		return ETIMEDOUT;
+			DELAY(1000);
+		}
+
+		if (ntries == 1000)
+		{
+			printf("%s: timeout waiting for MCU to initialize\n",
+				device_get_nameunit(sc->dev));
+			return ETIMEDOUT;
+		}
 	}
 
 	return 0;

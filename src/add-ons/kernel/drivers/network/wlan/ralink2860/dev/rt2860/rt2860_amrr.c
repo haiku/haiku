@@ -27,7 +27,7 @@
 
 #include <net80211/ieee80211_var.h>
 
-#include "rt2860_amrr.h"
+#include <dev/rt2860/rt2860_amrr.h>
 
 /*
  * Defines and macros

@@ -16,14 +16,36 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef _RT2860_READ_EEPROM_H_
-#define _RT2860_READ_EEPROM_H_
+#include <dev/rt2860/rt2860_led.h>
+#include <dev/rt2860/rt2860_reg.h>
+#include <dev/rt2860/rt2860_eeprom.h>
+#include <dev/rt2860/rt2860_io.h>
 
-#include "rt2860_softc.h"
+/*
+ * rt2860_led_brightness
+ */
+void rt2860_led_brightness(struct rt2860_softc *sc, uint8_t brightness)
+{
+	uint8_t polarity;
+	uint16_t tmp;
 
-void rt2860_read_eeprom(struct rt2860_softc *sc);
+	polarity = (sc->led_cntl & RT2860_EEPROM_LED_POLARITY) ? 1 : 0;
 
-uint32_t rt2860_read_eeprom_txpow_rate_add_delta(uint32_t txpow_rate,
-	int8_t delta);
+	tmp = (polarity << 8) | brightness;
 
-#endif /* #ifndef _RT2860_READ_EEPROM_H_ */
+	rt2860_io_mcu_cmd(sc, RT2860_IO_MCU_CMD_LED_BRIGHTNESS,
+		RT2860_REG_H2M_TOKEN_NO_INTR, tmp);
+}
+
+/*
+ * rt2860_led_cmd
+ */
+void rt2860_led_cmd(struct rt2860_softc *sc, uint8_t cmd)
+{
+	uint16_t tmp;
+
+	tmp = (cmd << 8) | (sc->led_cntl & RT2860_EEPROM_LED_MODE_MASK);
+
+	rt2860_io_mcu_cmd(sc, RT2860_IO_MCU_CMD_LEDS,
+		RT2860_REG_H2M_TOKEN_NO_INTR, tmp);
+}

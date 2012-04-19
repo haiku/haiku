@@ -16,11 +16,11 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include "rt2860_read_eeprom.h"
-#include "rt2860_reg.h"
-#include "rt2860_eeprom.h"
-#include "rt2860_io.h"
-#include "rt2860_debug.h"
+#include <dev/rt2860/rt2860_read_eeprom.h>
+#include <dev/rt2860/rt2860_reg.h>
+#include <dev/rt2860/rt2860_eeprom.h>
+#include <dev/rt2860/rt2860_io.h>
+#include <dev/rt2860/rt2860_debug.h>
 
 /*
  * rt2860_read_eeprom
@@ -102,6 +102,8 @@ void rt2860_read_eeprom(struct rt2860_softc *sc)
 		device_get_nameunit(sc->dev), sc->rf_rev, sc->ntxpath, sc->nrxpath);
 
 	val = rt2860_io_eeprom_read(sc, RT2860_EEPROM_NIC_CONFIG);
+	if ((val & 0xff00) != 0xff00)
+		sc->patch_dac = (val >> 15) & 1;
 
 	sc->hw_radio_cntl = ((val & RT2860_EEPROM_HW_RADIO_CNTL) ? 1 : 0);
 	sc->tx_agc_cntl = ((val & RT2860_EEPROM_TX_AGC_CNTL) ? 1 : 0);
@@ -172,8 +174,12 @@ void rt2860_read_eeprom(struct rt2860_softc *sc)
 	/* read RSSI offsets and LNA gains */
 
 	val = rt2860_io_eeprom_read(sc, RT2860_EEPROM_LNA_GAIN);
+	if ((sc->mac_rev & 0xffff0000) >= 0x30710000)
+		sc->lna_gain[0] = RT3090_DEF_LNA;
+	else				/* channel group 0 */
+		sc->lna_gain[0] = val & 0xff;
 
-	sc->lna_gain[0] = (val & 0xff);
+//	sc->lna_gain[0] = (val & 0xff);
 	sc->lna_gain[1] = (val >> 8) & 0xff;
 
 	val = rt2860_io_eeprom_read(sc, RT2860_EEPROM_RSSI_OFF_2GHZ_BASE);
@@ -181,17 +187,27 @@ void rt2860_read_eeprom(struct rt2860_softc *sc)
 	sc->rssi_off_2ghz[0] = (val & 0xff);
 	sc->rssi_off_2ghz[1] = (val >> 8) & 0xff;
 
-	val = rt2860_io_eeprom_read(sc, RT2860_EEPROM_RSSI_OFF_2GHZ_BASE + sizeof(uint16_t));
+	val = rt2860_io_eeprom_read(sc, RT2860_EEPROM_RSSI_OFF_2GHZ_BASE + 2);
 
-	sc->rssi_off_2ghz[2] = (val & 0xff);
+	//sc->rssi_off_2ghz[2] = (val & 0xff);
 	sc->lna_gain[2] = (val >> 8) & 0xff;
+	if ((sc->mac_rev & 0xffff0000) >= 0x30710000) {
+		/*
+		 * On RT3090 chips (limited to 2 Rx chains), this ROM
+		 * field contains the Tx mixer gain for the 2GHz band.
+		 */
+		if ((val & 0xff) != 0xff)
+			sc->txmixgain_2ghz = val & 0x7;
+		//DPRINTF(("tx mixer gain=%u (2GHz)\n", sc->txmixgain_2ghz));
+	} else
+		sc->rssi_off_2ghz[2] = val & 0xff;	/* Ant C */
 
 	val = rt2860_io_eeprom_read(sc, RT2860_EEPROM_RSSI_OFF_5GHZ_BASE);
 
 	sc->rssi_off_5ghz[0] = (val & 0xff);
 	sc->rssi_off_5ghz[1] = (val >> 8) & 0xff;
 
-	val = rt2860_io_eeprom_read(sc, RT2860_EEPROM_RSSI_OFF_5GHZ_BASE + sizeof(uint16_t));
+	val = rt2860_io_eeprom_read(sc, RT2860_EEPROM_RSSI_OFF_5GHZ_BASE + 2);
 
 	sc->rssi_off_5ghz[2] = (val & 0xff);
 	sc->lna_gain[3] = (val >> 8) & 0xff;
@@ -378,22 +394,22 @@ void rt2860_read_eeprom(struct rt2860_softc *sc)
 	sc->tssi_2ghz[0] = (val & 0xff);	/* [-4] */
 	sc->tssi_2ghz[1] = (val >> 8);		/* [-3] */
 
-	val = rt2860_io_eeprom_read(sc, RT2860_EEPROM_TSSI_2GHZ_BASE + sizeof(uint16_t));
+	val = rt2860_io_eeprom_read(sc, RT2860_EEPROM_TSSI_2GHZ_BASE + 2);
 
 	sc->tssi_2ghz[2] = (val & 0xff);	/* [-2] */
 	sc->tssi_2ghz[3] = (val >> 8);		/* [-1] */
 
-	val = rt2860_io_eeprom_read(sc, RT2860_EEPROM_TSSI_2GHZ_BASE + 2 * sizeof(uint16_t));
+	val = rt2860_io_eeprom_read(sc, RT2860_EEPROM_TSSI_2GHZ_BASE + 2 * 2);
 
 	sc->tssi_2ghz[4] = (val & 0xff);	/* [0] */
 	sc->tssi_2ghz[5] = (val >> 8);		/* [+1] */
 
-	val = rt2860_io_eeprom_read(sc, RT2860_EEPROM_TSSI_2GHZ_BASE + 3 * sizeof(uint16_t));
+	val = rt2860_io_eeprom_read(sc, RT2860_EEPROM_TSSI_2GHZ_BASE + 3 * 2);
 
 	sc->tssi_2ghz[6] = (val & 0xff);	/* [+2] */
 	sc->tssi_2ghz[7] = (val >> 8);		/* [+3] */
 
-	val = rt2860_io_eeprom_read(sc, RT2860_EEPROM_TSSI_2GHZ_BASE + 4 * sizeof(uint16_t));
+	val = rt2860_io_eeprom_read(sc, RT2860_EEPROM_TSSI_2GHZ_BASE + 4 * 2);
 
 	sc->tssi_2ghz[8] = (val & 0xff);	/* [+4] */
 	sc->tssi_step_2ghz = (val >> 8);
@@ -415,22 +431,22 @@ void rt2860_read_eeprom(struct rt2860_softc *sc)
 	sc->tssi_5ghz[0] = (val & 0xff);	/* [-4] */
 	sc->tssi_5ghz[1] = (val >> 8);		/* [-3] */
 
-	val = rt2860_io_eeprom_read(sc, RT2860_EEPROM_TSSI_5GHZ_BASE + sizeof(uint16_t));
+	val = rt2860_io_eeprom_read(sc, RT2860_EEPROM_TSSI_5GHZ_BASE + 2);
 
 	sc->tssi_5ghz[2] = (val & 0xff);	/* [-2] */
 	sc->tssi_5ghz[3] = (val >> 8);		/* [-1] */
 
-	val = rt2860_io_eeprom_read(sc, RT2860_EEPROM_TSSI_5GHZ_BASE + 2 * sizeof(uint16_t));
+	val = rt2860_io_eeprom_read(sc, RT2860_EEPROM_TSSI_5GHZ_BASE + 2 * 2);
 
 	sc->tssi_5ghz[4] = (val & 0xff);	/* [0] */
 	sc->tssi_5ghz[5] = (val >> 8);		/* [+1] */
 
-	val = rt2860_io_eeprom_read(sc, RT2860_EEPROM_TSSI_5GHZ_BASE + 3 * sizeof(uint16_t));
+	val = rt2860_io_eeprom_read(sc, RT2860_EEPROM_TSSI_5GHZ_BASE + 3 * 2);
 
 	sc->tssi_5ghz[6] = (val & 0xff);	/* [+2] */
 	sc->tssi_5ghz[7] = (val >> 8);		/* [+3] */
 
-	val = rt2860_io_eeprom_read(sc, RT2860_EEPROM_TSSI_5GHZ_BASE + 4 * sizeof(uint16_t));
+	val = rt2860_io_eeprom_read(sc, RT2860_EEPROM_TSSI_5GHZ_BASE + 4 * 2);
 
 	sc->tssi_5ghz[8] = (val & 0xff);	/* [+4] */
 	sc->tssi_step_5ghz = (val >> 8);
@@ -450,8 +466,18 @@ void rt2860_read_eeprom(struct rt2860_softc *sc)
 	/* read default BBP settings */
 
 	rt2860_io_eeprom_read_multi(sc, RT2860_EEPROM_BBP_BASE,
-		sc->bbp_eeprom, RT2860_SOFTC_BBP_EEPROM_COUNT * sizeof(uint16_t));
+		sc->bbp_eeprom, RT2860_SOFTC_BBP_EEPROM_COUNT * 2);
 
+	if ((sc->mac_rev & 0xffff0000) >= 0x30710000) {
+		/* read vendor RF settings */
+		for (i = 0; i < 10; i++) {
+			val = rt2860_io_eeprom_read(sc, RT3071_EEPROM_RF_BASE + i);
+			sc->rf[i].val = val & 0xff;
+			sc->rf[i].reg = val >> 8;
+//			DPRINTF(("RF%d=0x%02x\n", sc->rf[i].reg,
+//			    sc->rf[i].val));
+		}
+	}
 	/* read powersave level */
 
 	val = rt2860_io_eeprom_read(sc, RT2860_EEPROM_POWERSAVE_LEVEL);
