@@ -70,12 +70,47 @@
 	// ARM Semaphores, Doorbells, and Mailboxes
 
 #define VECT_BASE 0xffff0000
-	// TODO: Double check this
 #define VECT_SIZE SIZE_4K
-	// TODO: Guessed Vector size of 4k
 
 #define DEVICE_BASE		ARM_CTRL_BASE
 #define DEVICE_SIZE		SIZE_4K
+
+
+/* UART */
+// TODO: Check these UART defines!
+#define UART_RHR    0
+#define UART_THR    0
+#define UART_DLL    0
+#define UART_IER    1
+#define UART_DLH    1
+#define UART_IIR    2
+#define UART_FCR    2
+#define UART_EFR    2
+#define UART_LCR    3
+#define UART_MCR    4
+#define UART_LSR    5
+#define UART_MSR    6
+#define UART_TCR    6
+#define UART_SPR    7
+#define UART_TLR    7
+#define UART_MDR1   8
+#define UART_MDR2   9
+#define UART_SFLSR  10
+#define UART_RESUME 11
+#define UART_TXFLL  10
+#define UART_TXFLH  11
+#define UART_SFREGL 12
+#define UART_SFREGH 13
+#define UART_RXFLL  12
+#define UART_RXFLH  13
+#define UART_BLR    14
+#define UART_UASR   14
+#define UART_ACREG  15
+#define UART_SCR    16
+#define UART_SSR    17
+#define UART_EBLR   18
+#define UART_MVR    19
+#define UART_SYSC   20
 
 
 #endif /* __PLATFORM_BCM2708_H */
