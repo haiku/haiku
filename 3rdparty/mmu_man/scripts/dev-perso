@@ -154,14 +154,13 @@ dev() {
 	test -z "$EDITOR" -a -z "$SVN_EDITOR" && export EDITOR=vim
 	
 	# make sure the update action is the first found in history.
-	if [ -z "$DEVUPCMD" ]; then
-		test -d .svn && DEVUPCMD="svn up"
-		test -d .bzr && DEVUPCMD="bzr update"
-		test -d .hg && DEVUPCMD="hg pull"
-		test -d .git && DEVUPCMD="git pull"
-		test -d CVS && DEVUPCMD="cvs up -d"
-		test -n "$P4PORT" && DEVUPCMD="p4 sync"
-	fi
+	test -z "$DEVUPCMD" -a -d .svn && DEVUPCMD="svn up"
+	test -z "$DEVUPCMD" -a -d .bzr && DEVUPCMD="bzr update"
+	test -z "$DEVUPCMD" -a -d .hg && DEVUPCMD="hg pull"
+	test -z "$DEVUPCMD" -a -d .git && DEVUPCMD="git pull"
+	test -z "$DEVUPCMD" -a -d CVS && DEVUPCMD="cvs up -d"
+	test -z "$DEVUPCMD" -a \( -f _FOSSIL -o -f .fslckout \) && DEVUPCMD="fossil pull"
+	test -z "$DEVUPCMD" -a -n "$P4PORT" && DEVUPCMD="p4 sync"
 	test -n "$DEVUPCMD" && history -s "$DEVUPCMD"
 }
 
