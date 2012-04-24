@@ -721,7 +721,7 @@ TBarView::DragStart()
 		if (fLastDragItem)
 			init_tracking_hook(fLastDragItem, NULL, NULL);
 
-		if (item) {
+		if (item != NULL) {
 			if (item == fLastDragItem)
 				return B_OK;
 

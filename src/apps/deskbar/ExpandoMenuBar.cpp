@@ -100,7 +100,7 @@ TExpandoMenuBar::TExpandoMenuBar(TBarView* bar, BRect frame, const char* name,
 		float maxContentWidth = sMinimumWindowWidth + iconSize
 			- kMinimumIconSize;
 		SetMaxContentWidth(maxContentWidth);
-	}	
+	}
 }
 
 
@@ -390,18 +390,27 @@ TExpandoMenuBar::MouseDown(BPoint where)
 void
 TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 {
-	if (!message) {
+	if (message == NULL) {
 		// force a cleanup
 		_FinishedDrag();
+
+		if (code == B_INSIDE_VIEW) {
+			// set the tooltip
+			TTeamMenuItem* item = TeamItemAtPoint(where);
+			if (item != NULL && !item->DrawLabel() && item->Name() != '\0')
+				SetToolTip(item->Name());
+		}
+
 		BMenuBar::MouseMoved(where, code, message);
 		return;
 	}
 
 	uint32 buttons;
-	if (!(Window()->CurrentMessage())
+	if (Window()->CurrentMessage() == NULL
 		|| Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons)
-		< B_OK)
+			< B_OK) {
 		buttons = 0;
+	}
 
 	if (buttons == 0)
 		return;
@@ -426,7 +435,8 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 		case B_INSIDE_VIEW:
 			if (fBarView->Dragging()) {
 				TTeamMenuItem* item = NULL;
-				for (int32 i = 0; i < CountItems(); i++) {
+				int32 itemCount = CountItems();
+				for (int32 i = 0; i < itemCount; i++) {
 					BMenuItem* _item = ItemAt(i);
 					if (_item->Frame().Contains(where)) {
 						item = dynamic_cast<TTeamMenuItem*>(_item);
@@ -552,16 +562,18 @@ TExpandoMenuBar::AddTeam(BList* team, BBitmap* icon, char* name,
 			firstApp++;
 		}
 
-		int32 count = CountItems(), i;
-		for (i = firstApp; i < count; i++) {
+		int32 i = firstApp;
+		int32 itemCount = CountItems();
+		while (i < itemCount) {
 			teamItem = dynamic_cast<TTeamMenuItem*>(ItemAt(i));
 			if (teamItem != NULL && strcasecmp(teamItem->Name(), name) > 0) {
 				AddItem(item, i);
 				break;
 			}
+			i++;
 		}
 		// was the item added to the list yet?
-		if (i == count)
+		if (i == itemCount)
 			AddItem(item);
 	} else
 		AddItem(item);
