@@ -395,12 +395,18 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 		_FinishedDrag();
 
 		if (code == B_INSIDE_VIEW) {
-			// set the tooltip
 			TTeamMenuItem* item = TeamItemAtPoint(where);
-			if (item != NULL && !item->DrawLabel() && item->Name() != '\0')
-				SetToolTip(item->Name());
+
+			if (item != NULL) {
+				if (!item->DrawLabel() && item != fLastMousedOverItem) {
+					// set the tooltip
+					SetToolTip(item->Name());
+				} else
+					fLastMousedOverItem = item;
+			}
 		}
 
+		fLastMousedOverItem = NULL;
 		BMenuBar::MouseMoved(where, code, message);
 		return;
 	}
