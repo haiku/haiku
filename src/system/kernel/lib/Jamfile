@@ -112,7 +112,7 @@ KernelMergeObject kernel_lib_posix.o :
 	strlen.cpp
 	strncat.c
 	strncmp.c
-	strncpy.c
+	strncpy.cpp
 	strndup.cpp
 	strnlen.cpp
 	strpbrk.c

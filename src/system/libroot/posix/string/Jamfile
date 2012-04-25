@@ -32,7 +32,7 @@ MergeObject posix_string.o :
 	strlwr.c
 	strncat.c
 	strncmp.c
-	strncpy.c
+	strncpy.cpp
 	strndup.cpp
 	strnlen.cpp
 	strpbrk.c
