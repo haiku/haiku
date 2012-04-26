@@ -9,6 +9,7 @@
 #include "ALMLayout.h"
 
 
+#include <stdio.h>
 #include <vector>
 
 #include <AutoDeleter.h>
@@ -160,7 +161,7 @@ BALM::BALMLayout::DefaultPolicy::OnBadLayout(BALMLayout* layout,
 		return true;
 
 	if (result == kInfeasible) {
-		debugger("BALMLayout failed to solve your layout!");
+		printf("BALMLayout failed to solve your layout!\n");
 		return false;
 	} else
 		return true;
