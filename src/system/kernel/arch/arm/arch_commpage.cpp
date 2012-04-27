@@ -31,6 +31,6 @@ status_t
 arch_commpage_init_post_cpus(void)
 {
 #warning ARM:IMPLEMENTME
-        return B_OK;
+	return B_OK;
 }
 

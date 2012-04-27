@@ -100,4 +100,3 @@ arch_debug_console_init_settings(kernel_args *args)
 {
 	return B_OK;
 }
-

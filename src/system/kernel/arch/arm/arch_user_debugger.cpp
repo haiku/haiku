@@ -14,6 +14,8 @@
 
 
 #warning ARM: WRITEME
+
+
 void
 arch_clear_team_debug_info(struct arch_team_debug_info *info)
 {
@@ -61,9 +63,8 @@ arch_get_debug_cpu_state(debug_cpu_state *cpuState)
 status_t
 arch_get_thread_debug_cpu_state(Thread *thread, debug_cpu_state *cpuState)
 {
-        return B_ERROR;
+	return B_ERROR;
 }
-
 
 
 status_t
@@ -92,6 +93,7 @@ arch_clear_watchpoint(void *address)
 {
 	return B_ERROR;
 }
+
 
 bool
 arch_has_breakpoints(struct arch_team_debug_info *info)

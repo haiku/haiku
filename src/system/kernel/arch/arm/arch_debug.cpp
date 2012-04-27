@@ -27,8 +27,9 @@ struct stack_frame {
 #define NUM_PREVIOUS_LOCATIONS 32
 
 extern struct iframe_stack gBootFrameStack;
-/*
 
+
+/*
 static bool
 already_visited(uint32 *visited, int32 *_last, int32 *_num, uint32 framePointer)
 {

@@ -316,78 +316,78 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 	struct elf_image_info *resolve_image, struct Elf32_Rela *rel, int rel_len)
 #endif
 {
-        int i;
-        struct Elf32_Sym *sym;
-        int vlErr;
-        addr_t S = 0;   // symbol address
-        addr_t R = 0;   // section relative symbol address
+	int i;
+	struct Elf32_Sym *sym;
+	int vlErr;
+	addr_t S = 0;   // symbol address
+	addr_t R = 0;   // section relative symbol address
 
-        addr_t G = 0;   // GOT address
-        addr_t L = 0;   // PLT address
+	addr_t G = 0;   // GOT address
+	addr_t L = 0;   // PLT address
 
-        #define P       ((addr_t)(image->text_region.delta + rel[i].r_offset))
-        #define A       ((addr_t)rel[i].r_addend)
-        #define B       (image->text_region.delta)
-#warning ARM:define T correctly for thumb!!!
-	#define	T	0
+	#define P ((addr_t)(image->text_region.delta + rel[i].r_offset))
+	#define A ((addr_t)rel[i].r_addend)
+	#define B (image->text_region.delta)
+	#warning ARM:define T correctly for thumb!!!
+	#define	T 0
 
-        // TODO: Get the GOT address!
-        #define REQUIRE_GOT     \
-                if (G == 0) {   \
-                        dprintf("arch_elf_relocate_rela(): Failed to get GOT address!\n"); \
-                        return B_ERROR; \
-                }
+	// TODO: Get the GOT address!
+	#define REQUIRE_GOT     \
+		if (G == 0) {   \
+			dprintf("arch_elf_relocate_rela(): Failed to get GOT address!\n"); \
+			return B_ERROR; \
+		}
 
-        // TODO: Get the PLT address!
-        #define REQUIRE_PLT     \
-                if (L == 0) {   \
-                        dprintf("arch_elf_relocate_rela(): Failed to get PLT address!\n"); \
-                        return B_ERROR; \
-                }
+	// TODO: Get the PLT address!
+	#define REQUIRE_PLT     \
+	if (L == 0) {   \
+		dprintf("arch_elf_relocate_rela(): Failed to get PLT address!\n"); \
+		return B_ERROR; \
+	}
 
-        for (i = 0; i * (int)sizeof(struct Elf32_Rela) < rel_len; i++) {
-#if CHATTY
-                dprintf("looking at rel type %d, offset 0x%lx, sym 0x%lx, addend 0x%lx\n",
-                        ELF32_R_TYPE(rel[i].r_info), rel[i].r_offset, ELF32_R_SYM(rel[i].r_info), rel[i].r_addend);
-#endif
-                switch (ELF32_R_TYPE(rel[i].r_info)) {
-#warning ARM:ADDOTHERREL
-                        case R_ARM_GLOB_DAT:
-                                sym = SYMBOL(image, ELF32_R_SYM(rel[i].r_info));
-
-#ifdef _BOOT_MODE
-                                vlErr = boot_elf_resolve_symbol(image, sym, &S);
-#else
-                                vlErr = elf_resolve_symbol(image, sym, resolve_image, &S);
-#endif
-                                if (vlErr < 0) {
-                                        dprintf("%s(): Failed to relocate "
-                                                "entry index %d, rel type %d, offset 0x%lx, sym 0x%lx, "
-                                                "addend 0x%lx\n", __FUNCTION__, i, ELF32_R_TYPE(rel[i].r_info),
-                                                rel[i].r_offset, ELF32_R_SYM(rel[i].r_info),
-                                                rel[i].r_addend);
-                                        return vlErr;
-                                }
-                                break;
-                }
-
-#warning ARM:ADDOTHERREL
-                switch (ELF32_R_TYPE(rel[i].r_info)) {
+	for (i = 0; i * (int)sizeof(struct Elf32_Rela) < rel_len; i++) {
+		#if CHATTY
+		dprintf("looking at rel type %d, offset 0x%lx, "
+		"sym 0x%lx, addend 0x%lx\n", ELF32_R_TYPE(rel[i].r_info),
+		rel[i].r_offset, ELF32_R_SYM(rel[i].r_info), rel[i].r_addend);
+		#endif
+		switch (ELF32_R_TYPE(rel[i].r_info)) {
+		#warning ARM:ADDOTHERREL
 			case R_ARM_GLOB_DAT:
-				write_32(P,(S + A) | T);
+				sym = SYMBOL(image, ELF32_R_SYM(rel[i].r_info));
+
+				#ifdef _BOOT_MODE
+				vlErr = boot_elf_resolve_symbol(image, sym, &S);
+				#else
+				vlErr = elf_resolve_symbol(image, sym, resolve_image, &S);
+				#endif
+				if (vlErr < 0) {
+					dprintf("%s(): Failed to relocate "
+						"entry index %d, rel type %d, offset 0x%lx, sym 0x%lx, "
+						"addend 0x%lx\n", __FUNCTION__, i,
+						ELF32_R_TYPE(rel[i].r_info), rel[i].r_offset,
+						ELF32_R_SYM(rel[i].r_info), rel[i].r_addend);
+					return vlErr;
+				}
+				break;
+		}
+
+		#warning ARM:ADDOTHERREL
+		switch (ELF32_R_TYPE(rel[i].r_info)) {
+			case R_ARM_GLOB_DAT:
+				write_32(P, (S + A) | T);
 				break;
 
-                        case R_ARM_NONE:
-                                break;
+			case R_ARM_NONE:
+				break;
 
 			default:
-                                dprintf("arch_elf_relocate_rela(): unhandled "
-					"relocation type %d!\n", 
-					ELF32_R_TYPE(rel[i].r_info));
-                                return B_ERROR;
+				dprintf("arch_elf_relocate_rela(): unhandled "
+					"relocation type %d!\n", ELF32_R_TYPE(rel[i].r_info));
+				return B_ERROR;
 		}
-}
-#warning ARM: FIXME!!!!!!!
+	}
+
+	#warning ARM: FIXME!!!!!!!
 	return B_NO_ERROR;
 }
-

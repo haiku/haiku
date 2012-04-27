@@ -23,7 +23,7 @@ int arch_fpu_type;
 int arch_mmu_type;
 int arch_platform;
 
-status_t 
+status_t
 arch_cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
 {
 	// enable FPU
@@ -37,7 +37,7 @@ arch_cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
 }
 
 
-status_t 
+status_t
 arch_cpu_init_percpu(kernel_args *args, int curr_cpu)
 {
 	if (curr_cpu != 0)
@@ -96,11 +96,12 @@ arch_cpu_shutdown(bool reboot)
 }
 
 
-void 
+void
 arch_cpu_sync_icache(void *address, size_t len)
 {
 	uint32 Rd = 0;
-	asm volatile ("mcr p15, 0, %[c7format], c7, c5, 0" : : [c7format] "r" (Rd) );
+	asm volatile ("mcr p15, 0, %[c7format], c7, c5, 0"
+		: : [c7format] "r" (Rd) );
 }
 
 
@@ -118,41 +119,45 @@ arch_cpu_memory_write_barrier(void)
 }
 
 
-void 
+void
 arch_cpu_invalidate_TLB_range(addr_t start, addr_t end)
 {
 	int32 num_pages = end / B_PAGE_SIZE - start / B_PAGE_SIZE;
 	while (num_pages-- >= 0) {
-		asm volatile ("mcr p15, 0, %[c8format], c8, c6, 1" : : [c8format] "r" (start) );
+		asm volatile ("mcr p15, 0, %[c8format], c8, c6, 1"
+			: : [c8format] "r" (start) );
 		start += B_PAGE_SIZE;
 	}
 }
 
 
-void 
+void
 arch_cpu_invalidate_TLB_list(addr_t pages[], int num_pages)
 {
-	for (int i = 0; i < num_pages; i++)
-		asm volatile ("mcr p15, 0, %[c8format], c8, c6, 1" : : [c8format] "r" (pages[i]) );
+	for (int i = 0; i < num_pages; i++) {
+		asm volatile ("mcr p15, 0, %[c8format], c8, c6, 1":
+			: [c8format] "r" (pages[i]) );
+	}
 }
 
 
-void 
+void
 arch_cpu_global_TLB_invalidate(void)
 {
 	uint32 Rd = 0;
-	asm volatile ("mcr p15, 0, %[c8format], c8, c7, 0" : : [c8format] "r" (Rd) );
+	asm volatile ("mcr p15, 0, %[c8format], c8, c7, 0"
+		: : [c8format] "r" (Rd) );
 }
 
 
-void 
+void
 arch_cpu_user_TLB_invalidate(void)
 {/*
 	cpu_ops.flush_insn_pipeline();
 	cpu_ops.flush_atc_user();
 	cpu_ops.flush_insn_pipeline();
 */
-#warning WRITEME 
+#warning WRITEME
 }
 
 
@@ -160,7 +165,7 @@ status_t
 arch_cpu_user_memcpy(void *to, const void *from, size_t size,
 	addr_t *faultHandler)
 {
-#warning WRITEME 
+#warning WRITEME
 /*
 	char *tmp = (char *)to;
 	char *s = (char *)from;
@@ -187,14 +192,15 @@ error:
  *	\param to Pointer to the destination C-string.
  *	\param from Pointer to the source C-string.
  *	\param size Size in bytes of the string buffer pointed to by \a to.
- *	
+ *
  *	\return strlen(\a from).
  */
 
 ssize_t
-arch_cpu_user_strlcpy(char *to, const char *from, size_t size, addr_t *faultHandler)
+arch_cpu_user_strlcpy(char *to, const char *from,
+	size_t size, addr_t *faultHandler)
 {
-#warning WRITEME 
+#warning WRITEME
 /*
 	int from_length = 0;
 	addr_t oldFaultHandler = *faultHandler;
@@ -226,7 +232,7 @@ error:
 status_t
 arch_cpu_user_memset(void *s, char c, size_t count, addr_t *faultHandler)
 {
-#warning WRITEME 
+#warning WRITEME
 
 /*
 	char *xs = (char *)s;

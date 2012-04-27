@@ -17,7 +17,8 @@
 #include <real_time_clock.h>
 #include <util/kernel_cpp.h>
 
-/*
+
+#if 0
 static M68KPlatform *sM68KPlatform;
 
 
@@ -25,14 +26,16 @@ static M68KPlatform *sM68KPlatform;
 M68KPlatform::M68KPlatform(platform_type platformType,
 	m68k_platform_type m68kPlatformType)
 	: fPlatformType(platformType),
-	  fM68KPlatformType(m68kPlatformType)
+	fM68KPlatformType(m68kPlatformType)
 {
 }
+
 
 // destructor
 M68KPlatform::~M68KPlatform()
 {
 }
+
 
 // Default
 M68KPlatform *
@@ -43,13 +46,12 @@ M68KPlatform::Default()
 
 
 // # pragma mark -
-*/
+#endif
 
 status_t
 arch_platform_init(struct kernel_args *kernelArgs)
 {
-#warning ARM:WRITEME
-
+	#warning ARM:WRITEME
 	return B_OK;
 }
 
@@ -57,9 +59,9 @@ arch_platform_init(struct kernel_args *kernelArgs)
 status_t
 arch_platform_init_post_vm(struct kernel_args *kernelArgs)
 {
+	#warning ARM:WRITEME
+	//sM68KPlatform->InitPostVM(kernelArgs);
 	return B_OK;
-#warning ARM:WRITEME
-//sM68KPlatform->InitPostVM(kernelArgs);
 }
 
 

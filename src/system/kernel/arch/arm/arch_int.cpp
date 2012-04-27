@@ -29,8 +29,6 @@
 #include <vm/VMAddressSpace.h>
 #include <string.h>
 
-#warning M68K: writeme!
-
 
 //#define TRACE_ARCH_INT
 #ifdef TRACE_ARCH_INT
@@ -70,7 +68,7 @@ struct iframe_stack gBootFrameStack;
 void
 arch_int_enable_io_interrupt(int irq)
 {
-#warning ARM WRITEME
+	#warning ARM WRITEME
 	//if (!sPIC)
 	//	return;
 
@@ -83,7 +81,7 @@ arch_int_enable_io_interrupt(int irq)
 void
 arch_int_disable_io_interrupt(int irq)
 {
-#warning ARM WRITEME
+	#warning ARM WRITEME
 
 	//if (!sPIC)
 	//	return;
@@ -99,35 +97,41 @@ arch_int_disable_io_interrupt(int irq)
 static void
 print_iframe(struct iframe *frame)
 {
-/*
-	dprintf("r0-r3:   0x%08lx 0x%08lx 0x%08lx 0x%08lx\n", frame->r0, frame->r1, frame->r2, frame->r3);
-	dprintf("r4-r7:   0x%08lx 0x%08lx 0x%08lx 0x%08lx\n", frame->r4, frame->r5, frame->r6, frame->r7);
-	dprintf("r8-r11:  0x%08lx 0x%08lx 0x%08lx 0x%08lx\n", frame->r8, frame->r9, frame->r10, frame->r11);
-	dprintf("r12-r15: 0x%08lx 0x%08lx 0x%08lx 0x%08lx\n", frame->r12, frame->r13, frame->a6, frame->a7);
+	#if 0
+	dprintf("r0-r3:   0x%08lx 0x%08lx 0x%08lx 0x%08lx\n", frame->r0, frame->r1,
+		frame->r2, frame->r3);
+	dprintf("r4-r7:   0x%08lx 0x%08lx 0x%08lx 0x%08lx\n", frame->r4, frame->r5,
+		frame->r6, frame->r7);
+	dprintf("r8-r11:  0x%08lx 0x%08lx 0x%08lx 0x%08lx\n", frame->r8, frame->r9,
+		frame->r10, frame->r11);
+	dprintf("r12-r15: 0x%08lx 0x%08lx 0x%08lx 0x%08lx\n", frame->r12, frame->r13,
+		frame->a6, frame->a7);
 	dprintf("      pc 0x%08lx         sr 0x%08lx\n", frame->pc, frame->sr);
-*/
+	#endif
 
-#warning ARM WRITEME
+	#warning ARM WRITEME
 }
 
 
 status_t
 arch_int_init(kernel_args *args)
 {
+	#if 0
 	status_t err;
 	addr_t vbr;
 	int i;
 
-//	gExceptionVectors = (m68k_exception_handler *)args->arch_args.vir_vbr;
+	gExceptionVectors = (m68k_exception_handler *)args->arch_args.vir_vbr;
 
 	/* fill in the vector table */
-//	for (i = 0; i < M68K_EXCEPTION_VECTOR_COUNT; i++)
-//		gExceptionVectors[i] = &__m68k_exception_common;
+	for (i = 0; i < M68K_EXCEPTION_VECTOR_COUNT; i++)
+		gExceptionVectors[i] = &__m68k_exception_common;
 
-//	vbr = args->arch_args.phys_vbr;
+	vbr = args->arch_args.phys_vbr;
 	/* point VBR to the new table */
-//	asm volatile  ("movec %0,%%vbr" : : "r"(vbr):);
-#warning ARM WRITEME
+	asm volatile  ("movec %0,%%vbr" : : "r"(vbr):);
+	#endif
+	#warning ARM WRITEME
 
 	return B_OK;
 }
@@ -137,8 +141,8 @@ status_t
 arch_int_init_post_vm(kernel_args *args)
 {
 	status_t err;
-//	err = M68KPlatform::Default()->InitPIC(args);
-#warning ARM WRITEME
+	// err = M68KPlatform::Default()->InitPIC(args);
+	#warning ARM WRITEME
 
 	return err;
 }
@@ -159,5 +163,3 @@ arch_int_init_post_device_manager(struct kernel_args *args)
 
 	return B_ENTRY_NOT_FOUND;
 }
-
-

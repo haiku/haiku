@@ -28,9 +28,9 @@
 static union {
 	uint64	align;
 	char	thirty_two[sizeof(ARMPagingMethod32Bit)];
-#if B_HAIKU_PHYSICAL_BITS == 64
+	#if B_HAIKU_PHYSICAL_BITS == 64
 	char	pae[sizeof(ARMPagingMethodPAE)];
-#endif
+	#endif
 } sPagingMethodBuffer;
 
 
@@ -50,7 +50,7 @@ arch_vm_translation_map_init(kernel_args *args,
 {
 	TRACE("vm_translation_map_init: entry\n");
 
-#ifdef TRACE_VM_TMAP
+	#ifdef TRACE_VM_TMAP
 	TRACE("physical memory ranges:\n");
 	for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
 		phys_addr_t start = args->physical_memory_range[i].start;
@@ -73,9 +73,9 @@ arch_vm_translation_map_init(kernel_args *args,
 		addr_t end = start + args->virtual_allocated_range[i].size;
 		TRACE("  %#10" B_PRIxADDR " - %#10" B_PRIxADDR "\n", start, end);
 	}
-#endif
+	#endif
 
-#if B_HAIKU_PHYSICAL_BITS == 64 //IRA: Check all 64 bit code and adjust for ARM
+	#if B_HAIKU_PHYSICAL_BITS == 64 //IRA: Check 64 bit code and adjust for ARM
 	bool paeAvailable = x86_check_feature(IA32_FEATURE_PAE, FEATURE_COMMON);
 	bool paeNeeded = false;
 	for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
@@ -95,9 +95,9 @@ arch_vm_translation_map_init(kernel_args *args,
 			paeNeeded ? "available" : "needed");
 		gARMPagingMethod = new(&sPagingMethodBuffer) ARMPagingMethod32Bit;
 	}
-#else
+	#else
 	gARMPagingMethod = new(&sPagingMethodBuffer) ARMPagingMethod32Bit;
-#endif
+	#endif
 
 	return gARMPagingMethod->Init(args, _physicalPageMapper);
 }

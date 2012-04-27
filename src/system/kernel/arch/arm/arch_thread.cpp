@@ -27,7 +27,7 @@
 
 #include <string.h>
 
-#warning M68K: writeme!
+
 // Valid initial arch_thread state. We just memcpy() it when initializing
 // a new thread structure.
 static struct arch_thread sInitialState;
@@ -82,17 +82,20 @@ arch_thread_init_tls(Thread *thread)
 void
 arch_thread_context_switch(Thread *from, Thread *to)
 {
-/*	addr_t newPageDirectory;
+	#if 0
+	addr_t newPageDirectory;
 
 	newPageDirectory = (addr_t)m68k_next_page_directory(from, to);
 
 	if ((newPageDirectory % B_PAGE_SIZE) != 0)
-		panic("arch_thread_context_switch: bad pgdir 0x%lx\n", newPageDirectory);
-#warning M68K: export from arch_vm.c
+		panic("arch_thread_context_switch: bad pgdir 0x%lx\n",
+			newPageDirectory);
+	#warning M68K: export from arch_vm.c
 	m68k_set_pgdir(newPageDirectory);
-	m68k_context_switch(&from->arch_info.sp, to->arch_info.sp);*/
-#warning ARM:WRITEME
+	m68k_context_switch(&from->arch_info.sp, to->arch_info.sp);
+	#endif
 
+	#warning ARM:WRITEME
 }
 
 
@@ -106,7 +109,8 @@ arch_thread_dump_info(void *info)
 
 
 status_t
-arch_thread_enter_userspace(Thread *thread, addr_t entry, void *arg1, void *arg2)
+arch_thread_enter_userspace(Thread *thread, addr_t entry,
+	void *arg1, void *arg2)
 {
 	panic("arch_thread_enter_uspace(): not yet implemented\n");
 	return B_ERROR;
@@ -145,7 +149,6 @@ arch_check_syscall_restart(Thread *thread)
  *	arch_fork_arg structure to be passed to arch_restore_fork_frame().
  *	Also makes sure to return the right value.
  */
-
 void
 arch_store_fork_frame(struct arch_fork_arg *arg)
 {
@@ -159,9 +162,7 @@ arch_store_fork_frame(struct arch_fork_arg *arg)
  *	This function does not return to the caller, but will enter userland
  *	in the child team at the same position where the parent team left of.
  */
-
 void
 arch_restore_fork_frame(struct arch_fork_arg *arg)
 {
 }
-
