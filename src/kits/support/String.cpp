@@ -56,11 +56,7 @@ static inline int32
 strlen_clamp(const char* str, int32 max)
 {
 	// this should yield 0 for max<0:
-	int32 length = 0;
-	while (length < max && *str++) {
-		length++;
-	}
-	return length;
+	return max <= 0 ? 0 : strnlen(str, max);
 }
 
 
