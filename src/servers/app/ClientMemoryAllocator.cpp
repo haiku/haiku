@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2012, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -19,14 +19,17 @@
 	area might be temporarily unavailable or might be relocated at any time.
 */
 
+
 //	TODO: right now, areas will always stay static until they are deleted;
 //		locking is not yet done or enforced!
 
+
 #include "ClientMemoryAllocator.h"
-#include "ServerApp.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "ServerApp.h"
 
 
 typedef block_list::Iterator block_iterator;
@@ -126,46 +129,51 @@ ClientMemoryAllocator::Free(block* freeBlock)
 	block_iterator iterator = fFreeBlocks.GetIterator();
 	struct block* before = NULL;
 	struct block* after = NULL;
+	bool inFreeList = true;
 
-	// TODO: this could be done better if free blocks are sorted,
-	//	and if we had one free blocks list per chunk!
-	//	IOW this is a bit slow...
+	if (freeBlock->size != freeBlock->chunk->size) {
+		// TODO: this could be done better if free blocks are sorted,
+		//	and if we had one free blocks list per chunk!
+		//	IOW this is a bit slow...
 
-	while (struct block* block = iterator.Next()) {
-		if (block->chunk != freeBlock->chunk)
-			continue;
+		while (struct block* block = iterator.Next()) {
+			if (block->chunk != freeBlock->chunk)
+				continue;
 
-		if (block->base + block->size == freeBlock->base)
-			before = block;
+			if (block->base + block->size == freeBlock->base)
+				before = block;
 
-		if (block->base == freeBlock->base + freeBlock->size)
-			after = block;
-	}
+			if (block->base == freeBlock->base + freeBlock->size)
+				after = block;
+		}
 
-	if (before != NULL && after != NULL) {
-		// merge with adjacent blocks
-		before->size += after->size + freeBlock->size;
-		fFreeBlocks.Remove(after);
-		free(after);
-		free(freeBlock);
-		freeBlock = before;
-	} else if (before != NULL) {
-		before->size += freeBlock->size;
-		free(freeBlock);
-		freeBlock = before;
-	} else if (after != NULL) {
-		after->base -= freeBlock->size;
-		after->size += freeBlock->size;
-		free(freeBlock);
-		freeBlock = after;
+		if (before != NULL && after != NULL) {
+			// merge with adjacent blocks
+			before->size += after->size + freeBlock->size;
+			fFreeBlocks.Remove(after);
+			free(after);
+			free(freeBlock);
+			freeBlock = before;
+		} else if (before != NULL) {
+			before->size += freeBlock->size;
+			free(freeBlock);
+			freeBlock = before;
+		} else if (after != NULL) {
+			after->base -= freeBlock->size;
+			after->size += freeBlock->size;
+			free(freeBlock);
+			freeBlock = after;
+		} else
+			fFreeBlocks.Add(freeBlock);
 	} else
-		fFreeBlocks.Add(freeBlock);
+		inFreeList = false;
 
 	if (freeBlock->size == freeBlock->chunk->size) {
 		// We can delete the chunk now
 		struct chunk* chunk = freeBlock->chunk;
 
-		fFreeBlocks.Remove(freeBlock);
+		if (inFreeList)
+			fFreeBlocks.Remove(freeBlock);
 		free(freeBlock);
 
 		fChunks.Remove(chunk);
@@ -284,6 +292,9 @@ ClientMemoryAllocator::_AllocateChunk(size_t size, bool& newArea)
 }
 
 
+// #pragma mark -
+
+
 ClientMemory::ClientMemory()
 	:
 	fBlock(NULL)
@@ -303,7 +314,7 @@ ClientMemory::Allocate(ClientMemoryAllocator* allocator, size_t size,
 	bool& newArea)
 {
 	fAllocator = allocator;
-	return fAllocator->Allocate(size, &fBlock, newArea); 
+	return fAllocator->Allocate(size, &fBlock, newArea);
 }
 
 
@@ -332,6 +343,9 @@ ClientMemory::AreaOffset()
 		return fBlock->base - fBlock->chunk->base;
 	return 0;
 }
+
+
+// #pragma mark -
 
 
 ClonedAreaMemory::ClonedAreaMemory()
