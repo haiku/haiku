@@ -700,9 +700,8 @@ private:
 
 			LayoutData*			fLayoutData;
 			BToolTip*			fToolTip;
-			BToolTip*			fVisibleToolTip;
 
-			uint32				_reserved[5];
+			uint32				_reserved[6];
 };
 
 

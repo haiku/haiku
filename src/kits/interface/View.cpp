@@ -4817,10 +4817,6 @@ BView::DoLayout()
 void
 BView::SetToolTip(const char* text)
 {
-	// TODO: temporary work-around for bug #5669
-	HideToolTip();
-	SetToolTip(static_cast<BToolTip*>(NULL));
-
 	if (text == NULL || text[0] == '\0')
 		return;
 
@@ -4858,12 +4854,10 @@ BView::ShowToolTip(BToolTip* tip)
 	if (tip == NULL)
 		return;
 
-	fVisibleToolTip = tip;
-
 	BPoint where;
 	GetMouse(&where, NULL, false);
 
-	BToolTipManager::Manager()->ShowTip(tip, ConvertToScreen(where));
+	BToolTipManager::Manager()->ShowTip(tip, ConvertToScreen(where), this);
 }
 
 
@@ -4871,17 +4865,12 @@ void
 BView::HideToolTip()
 {
 	BToolTipManager::Manager()->HideTip();
-	fVisibleToolTip = NULL;
 }
 
 
 bool
 BView::GetToolTipAt(BPoint point, BToolTip** _tip)
 {
-	if (fVisibleToolTip != NULL) {
-		*_tip = fVisibleToolTip;
-		return true;
-	}
 	if (fToolTip != NULL) {
 		*_tip = fToolTip;
 		return true;
@@ -5038,7 +5027,6 @@ BView::_InitData(BRect frame, const char* name, uint32 resizingMode,
 	fLayoutData = new LayoutData;
 
 	fToolTip = NULL;
-	fVisibleToolTip = NULL;
 }
 
 

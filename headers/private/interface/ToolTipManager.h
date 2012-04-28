@@ -18,7 +18,8 @@ class BToolTipManager {
 public:
 	static	BToolTipManager*	Manager();
 
-			void				ShowTip(BToolTip* tip, BPoint point);
+			void				ShowTip(BToolTip* tip, BPoint point,
+									void* owner);
 			void				HideTip();
 
 			void				SetShowDelay(bigtime_t time);
