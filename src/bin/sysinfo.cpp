@@ -143,12 +143,10 @@ struct cache_description {
 static void
 print_intel_cache_descriptors(enum cpu_types type, cpuid_info *info)
 {
-	int i, j, maxDesc;
-
 	uint8 cacheDescriptors[15];	// Max
 
-	maxDesc = 0;
-	i = 0;
+	int maxDesc = 0;
+	int i = 0;
 
 	// put valid values into array
 	if ((info->regs.eax & 0x80000000) == 0) {
@@ -187,11 +185,12 @@ print_intel_cache_descriptors(enum cpu_types type, cpuid_info *info)
 
 	putchar('\n');
 
-	for (i = 0; i < maxDesc; i++) {
+	for (int i = 0; i < maxDesc; i++) {
 		// ignore NULL descriptors
 		if (cacheDescriptors[i] == 0)
 			continue;
 
+		int j;
 		for (j = 0; sIntelCacheDescriptions[j].code; j++) {
 			if (cacheDescriptors[i] == sIntelCacheDescriptions[j].code) {
 				if (cacheDescriptors[i] == 0x40) {
@@ -217,17 +216,16 @@ print_intel_cache_descriptors(enum cpu_types type, cpuid_info *info)
 static void
 print_TLB(uint32 reg, const char *pages)
 {
-	int num;
 	int entries[2];
 	int ways[2];
-	char *name[2] = { "Inst TLB", "Data TLB" };
+	const char *name[2] = { "Inst TLB", "Data TLB" };
 
 	entries[0] = (reg & 0xff);
 	ways[0] = ((reg >> 8) & 0xff);
 	entries[1] = ((reg >> 16) & 0xff);
 	ways[1] = ((reg >> 24) & 0xff);
 
-	for (num = 0; num < 2; num++) {
+	for (int num = 0; num < 2; num++) {
 		printf("\t%s: %s%s%u entries, ", name[num],
 			pages ? pages : "", pages ? " pages, " : "", entries[num]);
 
@@ -301,28 +299,21 @@ static void
 print_intel_cache_desc(int32 cpu)
 {
 	cpuid_info info;
-	uint32 type;
-	uint32 level;
-	bool isFullyAssoc;
-	uint32 lineSize;
-	uint32 linesPerTag;
-	uint32 ways;
-	uint32 sets;
-
+	
 	// A second parameters needs to be passed to CPUID which determines the cache level to query
 	get_cpuid(&info, 0x00000004, cpu);
 
 	putchar('\n');
 
-	type = info.regs.eax & 0xf;
-	level = (info.regs.eax & 0x70) >> 4;
-	isFullyAssoc = info.regs.eax & 0x100;
+	uint32 type = info.regs.eax & 0xf;
+	uint32 level = (info.regs.eax & 0x70) >> 4;
+	bool isFullyAssoc = info.regs.eax & 0x100;
 
-	lineSize = (info.regs.ebx & 0xfff) + 1;
-	linesPerTag = ((info.regs.ebx & 0x3ff000) >> 12) + 1;
-	ways = ((info.regs.ebx & 0xffc00000) >> 22) + 1;
+	uint32 lineSize = (info.regs.ebx & 0xfff) + 1;
+	uint32 linesPerTag = ((info.regs.ebx & 0x3ff000) >> 12) + 1;
+	uint32 ways = ((info.regs.ebx & 0xffc00000) >> 22) + 1;
 
-	sets = info.regs.ecx;
+	uint32 sets = info.regs.ecx;
 
 	printf("\tL%ld ",level);
 
@@ -340,7 +331,7 @@ print_intel_cache_desc(int32 cpu)
 	printf("%lu lines/tag, %lu bytes/line\n", linesPerTag, lineSize);
 
 	get_cpuid(&info, 0x80000006, cpu);
-	print_level2_cache(info.regs.ecx, "L2 cache");
+	print_level2_cache(sets, "L2 cache");
 }
 
 
@@ -361,11 +352,10 @@ print_amd_power_management_features(uint32 features)
 		"TS", "FID", "VID", "TTP", "TM", "STC",
 	};
 	int32 found = 4;
-	int32 i;
 
 	printf("\tPower Management Features:");
 
-	for (i = 0; i < 6; i++) {
+	for (int32 i = 0; i < 6; i++) {
 		if ((features & (1UL << i)) && kFeatures[i] != NULL) {
 			printf("%s%s", found == 0 ? "\t\t" : " ", kFeatures[i]);
 			found++;
@@ -391,9 +381,8 @@ print_amd_features(uint32 features)
 		NULL, "FFXSTR", NULL, "RDTSCP", NULL, "64", "3DNow+", "3DNow!"
 	};
 	int32 found = 0;
-	int32 i;
 
-	for (i = 0; i < 32; i++) {
+	for (int32 i = 0; i < 32; i++) {
 		if ((features & (1UL << i)) && kFeatures[i] != NULL) {
 			printf("%s%s", found == 0 ? "\t\t" : " ", kFeatures[i]);
 			found++;
@@ -419,9 +408,8 @@ print_extended_features(uint32 features)
 		NULL, "AES", "XSAVE", "OSXSAVE", NULL, NULL, NULL, NULL
 	};
 	int32 found = 0;
-	int32 i;
 
-	for (i = 0; i < 32; i++) {
+	for (int32 i = 0; i < 32; i++) {
 		if ((features & (1UL << i)) && kFeatures[i] != NULL) {
 			printf("%s%s", found == 0 ? "\t\t" : " ", kFeatures[i]);
 			found++;
@@ -451,9 +439,8 @@ print_features(uint32 features)
 		"HTT", "TM", NULL, "PBE",
 	};
 	int32 found = 0;
-	int32 i;
 
-	for (i = 0; i < 32; i++) {
+	for (int32 i = 0; i < 32; i++) {
 		if ((features & (1UL << i)) && kFeatures[i] != NULL) {
 			printf("%s%s", found == 0 ? "\t\t" : " ", kFeatures[i]);
 			found++;
@@ -476,7 +463,7 @@ print_processor_signature(system_info *sys_info, cpuid_info *info, const char *p
 {
 
 	if ((sys_info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_AMD_x86) {
-		printf("\t%s%sype %u, family %u, model %u, stepping %u, features 0x%08lx\n",
+		printf("\t%s%sype %lu, family %lu, model %u, stepping %lu, features 0x%08lx\n",
 			prefix ? prefix : "", prefix && prefix[0] ? "t" : "T",
 			info->eax_1.type,
 			info->eax_1.family + (info->eax_1.family == 0xf ? info->eax_1.extended_family : 0),
@@ -485,7 +472,7 @@ print_processor_signature(system_info *sys_info, cpuid_info *info, const char *p
 			info->eax_1.features);
 	} else if ((sys_info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86) {
 		// model calculation is different for INTEL
-		printf("\t%s%sype %u, family %u, model %u, stepping %u, features 0x%08lx\n",
+		printf("\t%s%sype %lu, family %lu, model %u, stepping %lu, features 0x%08lx\n",
 			prefix ? prefix : "", prefix && prefix[0] ? "t" : "T",
 			info->eax_1.type,
 			info->eax_1.family + (info->eax_1.family == 0xf ? info->eax_1.extended_family : 0),
@@ -521,34 +508,32 @@ dump_cpu(system_info *info, int32 cpu)
 	 */
 
 	cpuid_info baseInfo;
-	cpuid_info cpuInfo;
-	int32 maxStandardFunction, maxExtendedFunction = 0;
-
 	if (get_cpuid(&baseInfo, 0, cpu) != B_OK) {
 		// this CPU doesn't support cpuid
 		return;
 	}
 
-	maxStandardFunction = baseInfo.eax_0.max_eax;
+	int32 maxStandardFunction = baseInfo.eax_0.max_eax;
 	if (maxStandardFunction >= 500)
 		maxStandardFunction = 0; /* old Pentium sample chips has cpu signature here */
 
 	/* Extended cpuid */
 
+	cpuid_info cpuInfo;
 	get_cpuid(&cpuInfo, 0x80000000, cpu);
 
 	// extended cpuid is only supported if max_eax is greater than the service id
+	int32 maxExtendedFunction = 0;
 	if (cpuInfo.eax_0.max_eax > 0x80000000)
 		maxExtendedFunction = cpuInfo.eax_0.max_eax & 0xff;
 
 	if (maxExtendedFunction >=4 ) {
 		char buffer[49];
 		char *name = buffer;
-		int32 i;
 
 		memset(buffer, 0, sizeof(buffer));
 
-		for (i = 0; i < 3; i++) {
+		for (int32 i = 0; i < 3; i++) {
 			cpuid_info nameInfo;
 			get_cpuid(&nameInfo, 0x80000002 + i, cpu);
 
@@ -653,7 +638,6 @@ dump_cpus(system_info *info)
 	const char *vendor = get_cpu_vendor_string(info->cpu_type);
 	const char *model = get_cpu_model_string(info);
 	char modelString[32];
-	int32 cpu;
 
 	if (model == NULL && vendor == NULL)
 		model = "(Unknown)";
@@ -670,7 +654,7 @@ dump_cpus(system_info *info)
 		info->id[0], info->id[1]);
 
 #ifdef __INTEL__
-	for (cpu = 0; cpu < info->cpu_count; cpu++)
+	for (int32 cpu = 0; cpu < info->cpu_count; cpu++)
 		dump_cpu(info, cpu);
 #endif	// __INTEL__
 }
@@ -750,15 +734,12 @@ dump_system_info(system_info *info)
 int
 main(int argc, char *argv[])
 {
-	system_info info;
-	const char *opt;
-	int i;
-
 	if (!is_computer_on()) {
 		printf("The computer is not on! No info available\n");
 		exit(EXIT_FAILURE);
 	}
 
+	system_info info;
 	if (get_system_info(&info) != B_OK) {
 		printf("Error getting system information!\n");
 		return 1;
@@ -767,8 +748,8 @@ main(int argc, char *argv[])
 	if (argc <= 1) {
 		dump_system_info(&info);
 	} else {
-		for (i = 1; i < argc; i++) {
-			opt = argv[i];
+		for (int i = 1; i < argc; i++) {
+			const char *opt = argv[i];
 			if (strncmp(opt, "-id", strlen(opt)) == 0) {
 				/* note: the original also assumes this option on "sysinfo -" */
 				printf("0x%.8lx 0x%.8lx\n", info.id[0], info.id[1]);

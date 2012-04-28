@@ -49,7 +49,7 @@ StdBinCommands
 	release.c
 	renice.c
 	rescan.c
-	sysinfo.c
+	sysinfo.cpp
 	unchop.c
 	uptime.cpp
 	vmstat.cpp
