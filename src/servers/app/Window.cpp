@@ -602,10 +602,14 @@ Window::ReloadDecor()
 			Window* window = stack->WindowAt(i);
 			BRegion dirty;
 			DesktopSettings settings(fDesktop);
-			decorator->AddTab(settings, window->Title(), window->Look(),
-				window->Flags(), -1, &dirty);
+			if (decorator->AddTab(settings, window->Title(), window->Look(),
+				window->Flags(), -1, &dirty) == NULL) {
+				delete decorator;
+				return false;
+			}
 		}
-	}
+	} else
+		return true;
 
 	windowBehaviour = gDecorManager.AllocateWindowBehaviour(this);
 	if (windowBehaviour == NULL) {
@@ -624,7 +628,7 @@ Window::ReloadDecor()
 		if (window->IsFocus())
 			decorator->SetFocus(i, true);
 		if (window == stack->TopLayerWindow())
-			decorator->SetTopTap(i);
+			decorator->SetTopTab(i);
 	}
 
 	return true;
@@ -2111,7 +2115,7 @@ Window::DetachFromWindowStack(bool ownStackNeeded)
 	::Decorator* decorator = fCurrentStack->Decorator();
 	if (decorator != NULL) {
 		decorator->RemoveTab(index);
-		decorator->SetTopTap(fCurrentStack->LayerOrder().CountItems() - 1);
+		decorator->SetTopTab(fCurrentStack->LayerOrder().CountItems() - 1);
 	}
 
 	Window* remainingTop = fCurrentStack->TopLayerWindow();
@@ -2230,7 +2234,7 @@ Window::MoveToTopStackLayer()
 		return false;
 	decorator->SetDrawingEngine(fDrawingEngine);
 	SetLook(Look(), NULL);
-	decorator->SetTopTap(PositionInStack());
+	decorator->SetTopTab(PositionInStack());
 	return fCurrentStack->MoveToTopLayer(this);
 }
 
@@ -2248,7 +2252,7 @@ Window::MoveToStackPosition(int32 to, bool isMoving)
 	::Decorator* decorator = Decorator();
 	if (decorator && decorator->MoveTab(index, to, isMoving, &dirty) == false)
 		return false;
-	
+
 	fDesktop->RebuildAndRedrawAfterWindowChange(this, dirty);
 	return true;
 }

@@ -159,7 +159,7 @@ Decorator::TabAt(const BPoint& where) const
 
 
 void
-Decorator::SetTopTap(int32 tab)
+Decorator::SetTopTab(int32 tab)
 {
 	fTopTab = fTabList.ItemAt(tab);
 }
@@ -404,7 +404,7 @@ Decorator::SetTabLocation(int32 tab, float location, bool isShifting,
 	return false;
 }
 
- 
+
 
 /*!	\brief Changes the focus value of the decorator
 
