@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -128,7 +128,7 @@ public:
 	LocatableFile* GetFile(const BString& directoryPath,
 		const BString& relativePath)
 	{
-		if (directoryPath.Length() == 0)
+		if (directoryPath.Length() == 0 || relativePath[0] == '/')
 			return GetFile(relativePath);
 		return GetFile(BString(directoryPath) << '/' << relativePath);
 	}
@@ -314,7 +314,7 @@ private:
 			directory->ReleaseReference();
 			return NULL;
 		}
-		
+
 		directory->AddEntry(file);
 
 		fEntries.Insert(file);
@@ -366,7 +366,7 @@ private:
 			if (parentDirectory->GetLocatedPath(locatedDirectoryPath))
 				_LocateEntryInParentDir(directory, locatedDirectoryPath, true);
 		}
-		
+
 		if (parentDirectory != NULL)
 			parentDirectory->AddEntry(directory);
 
