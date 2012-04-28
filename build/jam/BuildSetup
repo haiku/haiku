@@ -225,7 +225,7 @@ switch $(HAIKU_CPU) {
 	case arm :
 	{
 		HAIKU_DEFINES += __ARM__ ;
-		HAIKU_BOOT_PLATFORM = u-boot ;
+		HAIKU_BOOT_PLATFORM ?= u-boot ;
 		HAIKU_BOOT_BOARD ?= verdex ;
 		HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ;
 			# in kB (there is not really a floppy on the gumstix ;) )
