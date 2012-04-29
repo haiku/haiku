@@ -12,8 +12,6 @@
 #include <map>
 #include <vector>
 
-#include "ServerConnection.h"
-
 #include <DataIO.h>
 #include <List.h>
 #include <String.h>
@@ -23,6 +21,9 @@
 #include "MailProtocol.h"
 #include "MailSettings.h"
 #include <StringList.h>
+
+
+class BSocket;
 
 
 class POP3Protocol : public InboundProtocol {
@@ -79,7 +80,7 @@ private:
 			BString				fDestinationDir;
 			int32				fFetchBodyLimit;
 
-			ServerConnection	fServerConnection;
+			BSocket*			fServerConnection;
 			bool				fUseSSL;
 };
 

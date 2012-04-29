@@ -32,6 +32,7 @@
 #include <Directory.h>
 #include <fs_attr.h>
 #include <Path.h>
+#include <SecureSocket.h>
 #include <String.h>
 #include <VolumeRoster.h>
 #include <Query.h>
@@ -63,7 +64,8 @@ POP3Protocol::POP3Protocol(BMailAccountSettings* settings)
 	:
 	InboundProtocol(settings),
 	fNumMessages(-1),
-	fMailDropSize(0)
+	fMailDropSize(0),
+	fServerConnection(NULL)
 {
 	printf("POP3Protocol::POP3Protocol(BMailAccountSettings* settings)\n");
 	fSettings = fAccountSettings.InboundSettings().Settings();
@@ -102,7 +104,7 @@ POP3Protocol::Connect()
 	delete[] password;
 
 	if (error != B_OK)
-		fServerConnection.Disconnect();
+		fServerConnection->Disconnect();
 	return error;
 }
 
@@ -112,7 +114,9 @@ POP3Protocol::Disconnect()
 {
 	SendCommand("QUIT" CRLF);
 
-	fServerConnection.Disconnect();
+	fServerConnection->Disconnect();
+	delete fServerConnection;
+	fServerConnection = NULL;
 
 	return B_OK;
 }
@@ -366,19 +370,26 @@ POP3Protocol::Open(const char* server, int port, int)
 		return B_NAME_NOT_FOUND;
 	}
 
-	status_t status = B_ERROR;
-	if (fUseSSL)
-		status = fServerConnection.ConnectSSL(server, port);
-	else
-		status = fServerConnection.ConnectSocket(server, port);
-	if (status != B_OK)
-		return status;
+	delete fServerConnection;
+	fServerConnection = NULL;
+	if (fUseSSL) {
+		fServerConnection = new(std::nothrow) BSecureSocket(
+			BNetworkAddress(server, port));
+	} else {
+		fServerConnection = new(std::nothrow) BSocket(BNetworkAddress(
+			server,	port));
+	}
+
+	if (fServerConnection == NULL)
+		return B_NO_MEMORY;
+	if (fServerConnection->InitCheck() != B_OK)
+		return fServerConnection->InitCheck();
 
 	BString line;
 	status_t err = ReceiveLine(line);
 
 	if (err < 0) {
-		fServerConnection.Disconnect();
+		fServerConnection->Disconnect();
 		error_msg << ": " << strerror(err);
 		ShowError(error_msg.String());
 		return B_ERROR;
@@ -392,7 +403,7 @@ POP3Protocol::Open(const char* server, int port, int)
 			error_msg << B_TRANSLATE(": No reply.\n");
 
 		ShowError(error_msg.String());
-		fServerConnection.Disconnect();
+		fServerConnection->Disconnect();
 		return B_ERROR;
 	}
 
@@ -627,7 +638,8 @@ POP3Protocol::RetrieveInternal(const char *command, int32 message,
 		return B_ERROR;
 
 	while (cont) {
-		status_t result = fServerConnection.WaitForData(POP3_RETRIEVAL_TIMEOUT);
+		status_t result = fServerConnection->WaitForReadable(
+			POP3_RETRIEVAL_TIMEOUT);
 		if (result == B_TIMED_OUT) {
 			// No data available, even after waiting a minute.
 			fLog = "POP3 timeout - no data received after a long wait.";
@@ -636,7 +648,7 @@ POP3Protocol::RetrieveInternal(const char *command, int32 message,
 		if (amountToReceive > bufSize - 1 - amountInBuffer)
 			amountToReceive = bufSize - 1 - amountInBuffer;
 
-		amountReceived = fServerConnection.Read(buf + amountInBuffer,
+		amountReceived = fServerConnection->Read(buf + amountInBuffer,
 			amountToReceive);
 
 		if (amountReceived < 0) {
@@ -752,7 +764,8 @@ POP3Protocol::ReceiveLine(BString &line)
 
 	line = "";
 
-	status_t result = fServerConnection.WaitForData(POP3_RETRIEVAL_TIMEOUT);
+	status_t result = fServerConnection->WaitForReadable(
+		POP3_RETRIEVAL_TIMEOUT);
 	if (result == B_TIMED_OUT)
 		return errno;
 
@@ -761,7 +774,7 @@ POP3Protocol::ReceiveLine(BString &line)
 		int32 bytesReceived;
 		uint8 c = 0;
 
-		bytesReceived = fServerConnection.Read((char*)&c, 1);
+		bytesReceived = fServerConnection->Read((char*)&c, 1);
 		if (bytesReceived < 0)
 			return errno;
 
@@ -793,12 +806,11 @@ POP3Protocol::SendCommand(const char* cmd)
 	// don't misinterrpret responses from previous commands (that got left over
 	// due to bugs) as being from this command.
 
-	status_t result = fServerConnection.WaitForData(1000);
-	if (result == B_OK) {
+	while (fServerConnection->WaitForReadable(1000) == B_OK) {
 		int amountReceived;
-		char tempString [1025];
+		char tempString [1024];
 
-		amountReceived = fServerConnection.Read(tempString,
+		amountReceived = fServerConnection->Read(tempString,
 			sizeof(tempString) - 1);
 		if (amountReceived < 0)
 			return errno;
@@ -810,7 +822,7 @@ POP3Protocol::SendCommand(const char* cmd)
 		//	break;
 	}
 
-	if (fServerConnection.Write(cmd, ::strlen(cmd)) < 0) {
+	if (fServerConnection->Write(cmd, ::strlen(cmd)) < 0) {
 		fLog = strerror(errno);
 		printf("POP3Protocol::SendCommand Send \"%s\" failed, code %d: %s\n",
 			cmd, errno, fLog.String());

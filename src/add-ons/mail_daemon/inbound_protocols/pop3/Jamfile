@@ -32,8 +32,8 @@ AddResources POP3 : POP3.rdef ;
 
 Addon POP3
 	: $(sources)
-	: be libmail.so $(HAIKU_LOCALE_LIBS) $(HAIKU_OPENSSL_LIBS)
-		$(TARGET_LIBSUPC++) $(TARGET_NETWORK_LIBS)
+	: be libbnetapi.so libmail.so $(HAIKU_LOCALE_LIBS)
+		$(HAIKU_OPENSSL_LIBS) $(TARGET_LIBSUPC++) $(TARGET_NETWORK_LIBS)
 ;
 
 Package haiku-maildaemon-cvs :
