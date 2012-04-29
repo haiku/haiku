@@ -9,7 +9,7 @@
 #define CLIENT_MEMORY_ALLOCATOR_H
 
 
-#include "MultiLocker.h"
+#include <Locker.h>
 
 #include <util/DoublyLinkedList.h>
 
@@ -50,6 +50,7 @@ private:
 
 private:
 			ServerApp*			fApplication;
+			BLocker				fLock;
 			chunk_list			fChunks;
 			block_list			fFreeBlocks;
 };
@@ -77,7 +78,7 @@ public:
 	virtual area_id				Area();
 	virtual uint8*				Address();
 	virtual uint32				AreaOffset();
-	
+
 private:
 			ClientMemoryAllocator*	fAllocator;
 			block*				fBlock;

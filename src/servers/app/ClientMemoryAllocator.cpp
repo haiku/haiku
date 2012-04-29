@@ -10,24 +10,20 @@
 /*!	This class manages a pool of areas for one client. The client is supposed
 	to clone these areas into its own address space to access the data.
 	This mechanism is only used for bitmaps for far.
-
-	Note, this class doesn't provide any real locking - you need to have the
-	ServerApp locked when interacting with any method of this class.
-
-	The Lock()/Unlock() methods are needed whenever you access a pointer that
-	lies within an area allocated using this class. This is needed because an
-	area might be temporarily unavailable or might be relocated at any time.
 */
 
 
-//	TODO: right now, areas will always stay static until they are deleted;
-//		locking is not yet done or enforced!
+// TODO: areas could be relocated if needed (to be able to resize them)
+//		However, this would require a lock whenever a block of memory
+//		allocated by this allocator is accessed.
 
 
 #include "ClientMemoryAllocator.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <Autolock.h>
 
 #include "ServerApp.h"
 
@@ -38,7 +34,8 @@ typedef chunk_list::Iterator chunk_iterator;
 
 ClientMemoryAllocator::ClientMemoryAllocator(ServerApp* application)
 	:
-	fApplication(application)
+	fApplication(application),
+	fLock("client memory lock")
 {
 }
 
@@ -69,6 +66,8 @@ ClientMemoryAllocator::~ClientMemoryAllocator()
 void*
 ClientMemoryAllocator::Allocate(size_t size, block** _address, bool& newArea)
 {
+	BAutolock locker(fLock);
+
 	// Search best matching free block from the list
 
 	block_iterator iterator = fFreeBlocks.GetIterator();
@@ -123,6 +122,8 @@ ClientMemoryAllocator::Free(block* freeBlock)
 {
 	if (freeBlock == NULL)
 		return;
+
+	BAutolock locker(fLock);
 
 	// search for an adjacent free block
 
