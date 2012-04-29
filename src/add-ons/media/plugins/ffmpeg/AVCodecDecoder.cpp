@@ -106,9 +106,12 @@ AVCodecDecoder::AVCodecDecoder()
 {
 	TRACE("AVCodecDecoder::AVCodecDecoder()\n");
 
+	system_info info;
+	get_system_info(&info);
+
 	fContext->err_recognition = AV_EF_CAREFUL;
 	fContext->error_concealment = 3;
-	fContext->thread_count = 1;
+	fContext->thread_count = info.cpu_count;
 }
 
 
