@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku.
+ * Copyright 2001-2012, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -481,6 +481,21 @@ ServerApp::RemovePicture(ServerPicture* picture)
 
 	fPictureMap.erase(picture->Token());
 	picture->ReleaseReference();
+}
+
+
+/*!	Called from the ClientMemoryAllocator whenever a server area could be
+	deleted.
+	A message is then sent to the client telling it that it can delete its
+	client area, too.
+*/
+void
+ServerApp::NotifyDeleteClientArea(area_id serverArea)
+{
+	BMessage notify(kMsgDeleteServerMemoryArea);
+	notify.AddInt32("server area", serverArea);
+
+	SendMessageToClient(&notify);
 }
 
 

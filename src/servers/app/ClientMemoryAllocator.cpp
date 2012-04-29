@@ -179,6 +179,8 @@ ClientMemoryAllocator::Free(block* freeBlock)
 
 		fChunks.Remove(chunk);
 		delete_area(chunk->area);
+		fApplication->NotifyDeleteClientArea(chunk->area);
+
 		free(chunk);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku.
+ * Copyright 2001-2012, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -342,6 +342,12 @@ enum {
 	AS_DUMP_BITMAPS,
 
 	AS_LAST_CODE
+};
+
+// TODO: move this into a private app header, together with the rest of the
+//		private message definitions in AppDefs.h
+enum {
+	kMsgDeleteServerMemoryArea		= '_DSA',
 };
 
 // bitmap allocation flags

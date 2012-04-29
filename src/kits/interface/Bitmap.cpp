@@ -1186,7 +1186,7 @@ BBitmap::_CleanUp()
 		link.Attach<int32>(fServerToken);
 		link.Flush();
 
-		// TODO: we may want to delete parts of the server memory areas here!
+		// The server areas are deleted via kMsgDeleteServerMemoryArea message
 
 		fArea = -1;
 		fServerToken = -1;

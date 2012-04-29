@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku.
+ * Copyright 2001-2012, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -93,6 +93,8 @@ public:
 			const ServerFont&	PlainFont() const { return fPlainFont; }
 
 			BPrivate::BTokenSpace& ViewTokens() { return fViewTokens; }
+
+			void				NotifyDeleteClientArea(area_id serverArea);
 
 private:
 	virtual	void				_GetLooperName(char* name, size_t size);
