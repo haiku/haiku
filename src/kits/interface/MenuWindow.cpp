@@ -233,7 +233,8 @@ BMenuFrame::Draw(BRect updateRect)
 	if (be_control_look != NULL)
 		return;
 
-	SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_2_TINT));
+	SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
+		B_DARKEN_2_TINT));
 	BRect bounds(Bounds());
 
 	StrokeLine(BPoint(bounds.right, bounds.top),
@@ -249,8 +250,9 @@ BMenuFrame::Draw(BRect updateRect)
 
 BMenuWindow::BMenuWindow(const char *name)
 	// The window will be resized by BMenu, so just pass a dummy rect
-	: BWindow(BRect(0, 0, 0, 0), name, B_BORDERED_WINDOW_LOOK, kMenuWindowFeel,
-		B_NOT_MOVABLE | B_NOT_ZOOMABLE | B_AVOID_FOCUS
+	:
+	BWindow(BRect(0, 0, 0, 0), name, B_BORDERED_WINDOW_LOOK, kMenuWindowFeel,
+		B_NOT_MOVABLE | B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_AVOID_FOCUS
 			| kAcceptKeyboardFocusFlag),
 	fMenu(NULL),
 	fMenuFrame(NULL),
