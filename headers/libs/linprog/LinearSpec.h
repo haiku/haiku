@@ -58,6 +58,10 @@ public:
 	virtual	ResultType			FindMins(const VariableList* variables) = 0;
 	virtual	ResultType			FindMaxs(const VariableList* variables) = 0;
 
+	virtual	void				GetRangeConstraints(const Variable* var,
+									const Constraint** _min,
+									const Constraint** _max) const = 0;
+
 protected:
 			LinearSpec*			fLinearSpec; 
 };
@@ -138,6 +142,9 @@ public:
 
 			BString				ToString() const;
 
+			void				GetRangeConstraints(const Variable*,
+									const Constraint** _min,
+								   	const Constraint** _max) const;
 	const	ConstraintList&		Constraints() const;
 	const	VariableList&		UsedVariables() const;
 	const	VariableList&		AllVariables() const;

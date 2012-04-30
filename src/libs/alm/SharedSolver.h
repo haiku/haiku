@@ -70,7 +70,7 @@ private:
 
 
 	static	void				_AddConstraintsToSet(Area* area,
-									std::set<Constraint*>& constraints);
+									std::set<const Constraint*>& constraints);
 	static	status_t			_AddConstraintToArchive(Constraint* constraint,
 									BMessage* archive);
 			status_t			_InstantiateConstraint(const void* rawData,

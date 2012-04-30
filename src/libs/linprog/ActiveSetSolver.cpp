@@ -614,6 +614,19 @@ ActiveSetSolver::FindMins(const VariableList* variables)
 
 
 void
+ActiveSetSolver::GetRangeConstraints(const Variable* var,
+	const Constraint** _min, const Constraint** _max) const
+{
+	int32 variableIndex = var->GlobalIndex();
+
+	if (_min)
+		*_min = fVariableGEConstraints.ItemAt(variableIndex);
+	if (_max)
+		*_max = fVariableLEConstraints.ItemAt(variableIndex);
+}
+
+
+void
 ActiveSetSolver::_RemoveSoftConstraint(ConstraintList& list)
 {
 	ConstraintList allConstraints = fLinearSpec->Constraints();

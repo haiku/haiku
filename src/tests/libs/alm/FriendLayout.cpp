@@ -69,8 +69,8 @@ public:
 		fRight = xTabs[1];
 
 		layout1->AreaFor(button2)->SetContentAspectRatio(1.0f);
-		fLayout2->Solver()->AddConstraint(-1.0f, xTabs[0], 1.0f, xTabs[1],
-			LinearProgramming::kGE, 20.0f);
+		fLayout2->Solver()->AddConstraint(-1.0f, layout1->Left(), 1.0f, xTabs[0],
+			LinearProgramming::kLE, 90.0f);
 
 		BButton* archiveButton = new BButton("clone", new BMessage('arcv'));
 		archiveButton->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,

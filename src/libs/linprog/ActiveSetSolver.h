@@ -77,6 +77,9 @@ public:
 			ResultType			FindMaxs(const VariableList* variables);
 			ResultType			FindMins(const VariableList* variables);
 
+			void				GetRangeConstraints(const Variable* var,
+									const Constraint** _min,
+									const Constraint** _max) const;
 private:
 			void				_RemoveSoftConstraint(ConstraintList& list);
 			void				_AddSoftConstraint(const ConstraintList& list);

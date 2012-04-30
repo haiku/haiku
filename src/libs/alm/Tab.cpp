@@ -60,7 +60,8 @@ TabBase::TabBase()
 
 TabBase::TabBase(BMessage* archive)
 	:
-	BArchivable(BUnarchiver::PrepareArchive(archive))
+	BArchivable(BUnarchiver::PrepareArchive(archive)),
+	fLayouts(NULL)
 {
 	BUnarchiver(archive).Finish(B_OK);
 }

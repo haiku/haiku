@@ -217,12 +217,13 @@ SharedSolver::AllArchived(BMessage* archive) const
 	for each archived layout:
 		add it to our archive
 		add constraints created by areas and column manager to a set
+		add range constraints on the left/top/right/bottom tabs to the same set
 	for each constraint in the linear spec:
 		if it is not in the set above:
 			archive it
 	*/
 	BArchiver archiver(archive);
-	std::set<Constraint*> autoConstraints;
+	std::set<const Constraint*> autoConstraints;
 	for (int32 i = fLayouts.CountItems() - 1; i >= 0; i--) {
 		BALMLayout* layout = fLayouts.ItemAt(i);
 		if (!archiver.IsArchived(layout))
@@ -233,14 +234,27 @@ SharedSolver::AllArchived(BMessage* archive) const
 
 		for (int32 j = layout->fRowColumnManager->fRows.CountItems() - 1;
 				j >= 0; j--) {
-			Row* row = layout->fRowColumnManager->fRows.ItemAt(i);
+			Row* row = layout->fRowColumnManager->fRows.ItemAt(j);
 			autoConstraints.insert(row->fPrefSizeConstraint);
 		}
 
 		for (int32 j = layout->fRowColumnManager->fColumns.CountItems() - 1;
 				j >= 0; j--) {
-			Column* column = layout->fRowColumnManager->fColumns.ItemAt(i);
+			Column* column = layout->fRowColumnManager->fColumns.ItemAt(j);
 			autoConstraints.insert(column->fPrefSizeConstraint);
+		}
+
+		Variable* corners[] = {layout->fLeft, layout->fTop, layout->fRight,
+			layout->fBottom};
+
+		for (int32 j = 0; j < 4; j++) {
+			const Constraint* min;
+			const Constraint* max;
+			fLinearSpec.GetRangeConstraints(corners[j], &min, &max);
+			if (min)
+				autoConstraints.insert(min);
+			if (max)
+				autoConstraints.insert(max);
 		}
 	}
 
@@ -248,7 +262,7 @@ SharedSolver::AllArchived(BMessage* archive) const
 	const ConstraintList& constraints = fLinearSpec.Constraints();
 	for (int32 i = constraints.CountItems() - 1; i >= 0 && err == B_OK; i--) {
 		Constraint* constraint = constraints.ItemAt(i);
-		if (autoConstraints.find(constraint) != autoConstraints.end())
+		if (autoConstraints.find(constraint) == autoConstraints.end())
 			err = _AddConstraintToArchive(constraint, archive);
 	}
 	return err;
@@ -279,7 +293,7 @@ SharedSolver::AllUnarchived(const BMessage* archive)
 
 void
 SharedSolver::_AddConstraintsToSet(Area* area,
-	std::set<Constraint*>& constraints)
+	std::set<const Constraint*>& constraints)
 {
 	if (area->fMinContentWidth)
 		constraints.insert(area->fMinContentWidth);
@@ -295,8 +309,20 @@ SharedSolver::_AddConstraintsToSet(Area* area,
 
 
 status_t
-SharedSolver::_AddConstraintToArchive(Constraint* constraint, BMessage* archive)
+SharedSolver::_AddConstraintToArchive(Constraint* constraint,
+	BMessage* archive)
 {
+	/* Format:
+	 * int32: summandCount
+	 *  { int32 : token
+	 *    double: coefficient
+	 *  } [summandCount]	
+	 *  int32: operator
+	 *  double: rightSide
+	 *  double: penaltyNeg
+	 *  double: penaltyPos
+	 */
+
 	// TODO: check Read/Write calls
 	BArchiver archiver(archive);
 	BMallocIO buffer;
@@ -338,6 +364,17 @@ status_t
 SharedSolver::_InstantiateConstraint(const void* rawData, ssize_t numBytes,
 	BUnarchiver& unarchiver)
 {
+	/* Format:
+	 * int32: summandCount
+	 *  { int32 : token
+	 *    double: coefficient
+	 *  } [summandCount]	
+	 *  int32: operator
+	 *  double: rightSide
+	 *  double: penaltyNeg
+	 *  double: penaltyPos
+	 */
+
 	// TODO: check Read/Write calls
 	BMemoryIO buffer(rawData, numBytes);
 	int32 summandCount;
@@ -376,13 +413,16 @@ SharedSolver::_InstantiateConstraint(const void* rawData, ssize_t numBytes,
 	double penaltyPos;
 	buffer.Read(&penaltyPos, sizeof(penaltyPos));
 
-	if (err == B_OK) {
-		fLinearSpec.AddConstraint(summandList, (OperatorType)op, rightSide,
-			penaltyNeg, penaltyPos);
+	if (err != B_OK)
+		return err;
+
+	if (fLinearSpec.AddConstraint(summandList, (OperatorType)op, rightSide,
+			penaltyNeg, penaltyPos) != NULL) {
 		deleter.Detach();
+		return B_OK;
 	}
 
-	return err;
+	return B_NO_MEMORY;
 }
 
 
