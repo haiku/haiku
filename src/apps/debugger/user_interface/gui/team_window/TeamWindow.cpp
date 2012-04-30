@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -698,6 +698,7 @@ TeamWindow::_Init()
 	fStepIntoButton->SetTarget(this);
 	fStepOutButton->SetTarget(this);
 
+	fSourcePathView->SetExplicitMinSize(BSize(100.0, B_SIZE_UNSET));
 	fSourcePathView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	BMessageFilter* filter = new(std::nothrow) PathViewMessageFilter(
 		BMessenger(this));
