@@ -23,7 +23,7 @@
 #include <AppFileInfo.h>
 #include <Beep.h>
 #include <Bitmap.h>
-#include <Catalog.h> 
+#include <Catalog.h>
 #include <ControlLook.h>
 #include <Clipboard.h>
 #include <File.h>
@@ -834,7 +834,7 @@ CalcView::_LoadSettings(BMessage* archive)
 	if (archive->FindData("rgbBaseColor", B_RGB_COLOR_TYPE,
 			(const void**)&color, &size) < B_OK
 		|| size != sizeof(rgb_color)) {
-		fBaseColor = (rgb_color){ 128, 128, 128, 255 };
+		fBaseColor = ui_color(B_PANEL_BACKGROUND_COLOR);
 		puts("Missing rgbBaseColor from CalcView archive!\n");
 	} else {
 		fBaseColor = *color;
