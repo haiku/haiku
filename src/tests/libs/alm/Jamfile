@@ -7,47 +7,47 @@ UsePrivateHeaders shared ;
 Application ALMHelloWorld :
 	HelloWorld.cpp
 	:
-	be liblpsolve55.so libalm.so $(TARGET_LIBSUPC++)
+	be libalm.so $(TARGET_LIBSUPC++)
 ;
 
 Application ALMViews :
 	Views.cpp
 	:
-	be liblpsolve55.so be libalm.so $(TARGET_LIBSUPC++)
+	be libalm.so $(TARGET_LIBSUPC++)
 ;
 
 Application ALMPinwheel :
 	Pinwheel.cpp
 	:
-	be liblpsolve55.so be libalm.so $(TARGET_LIBSUPC++)
+	be libalm.so $(TARGET_LIBSUPC++)
 ;
 
 Application ALMAreas :
 	Areas.cpp
 	:
-	be liblpsolve55.so be libalm.so $(TARGET_LIBSUPC++)
+	be libalm.so $(TARGET_LIBSUPC++)
 ;
 
 Application ALMTableDemo :
 	TableDemo.cpp
 	:
-	be liblpsolve55.so be libalm.so $(TARGET_LIBSUPC++)
+	be libalm.so $(TARGET_LIBSUPC++)
 ;
 
 Application ALMOperator :
 	OperatorLayout.cpp
 	:
-	be liblpsolve55.so be libalm.so $(TARGET_LIBSTDC++)
+	be libalm.so $(TARGET_LIBSTDC++)
 ;
 
 Application ALMThreeButtons :
 	ThreeButtons.cpp
 	:
-	be liblpsolve55.so be libalm.so $(TARGET_LIBSTDC++)
+	be libalm.so $(TARGET_LIBSTDC++)
 ;
 
 Application ALMComplexButtons :
 	ComplexButtons.cpp
 	:
-	be liblpsolve55.so be libalm.so $(TARGET_LIBSTDC++)
+	be libalm.so $(TARGET_LIBSTDC++)
 ;

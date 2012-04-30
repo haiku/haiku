@@ -11,7 +11,7 @@
 #include <new>
 #include <stdio.h>
 
-#include "LPSolveInterface.h"
+//#include "LPSolveInterface.h"
 #include "ActiveSetSolver.h"
 
 

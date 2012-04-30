@@ -102,7 +102,6 @@ PRIVATE_SYSTEM_LIBS =
 	libalm.so
 	libfluidsynth.so
 	libilmimf.so
-	liblpsolve55.so
 ;
 SYSTEM_SERVERS = app_server cddb_daemon debug_server input_server mail_daemon
 	media_addon_server media_server midi_server mount_server net_server

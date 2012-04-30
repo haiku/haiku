@@ -14,6 +14,5 @@ SharedLibrary libalm.so :
 	RowColumnManager.cpp
 	Tab.cpp
 	:
-	liblpsolve55.so liblinprog.a
-	be $(TARGET_LIBSTDC++)
+	liblinprog.a be $(TARGET_LIBSTDC++)
 ;

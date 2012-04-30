@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src libs linprog ;
 
 SetSubDirSupportedPlatforms haiku haiku_host libbe_test ;
 
-UseLibraryHeaders lp_solve linprog ;
+UseLibraryHeaders linprog ;
 UsePrivateHeaders shared ;
 
 
@@ -11,7 +11,7 @@ StaticLibrary liblinprog.a :
 	Constraint.cpp
 	LayoutOptimizer.cpp
 	LinearSpec.cpp
-	LPSolveInterface.cpp
+#	LPSolveInterface.cpp
 	QPSolverInterface.cpp
 	Summand.cpp
 	Variable.cpp
