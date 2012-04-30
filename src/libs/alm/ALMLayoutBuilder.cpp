@@ -61,7 +61,8 @@ BALMLayoutBuilder&
 BALMLayoutBuilder::Add(BView* view, XTab* left, YTab* top,
 	XTab* right, YTab* bottom)
 {
-	fLayout->AddView(view, left, top, right, bottom);
+	Area* a = (fLayout->AddView(view, left, top, right, bottom));
+	_SetCurrentArea(a);
 	return *this;
 }
 
@@ -69,7 +70,7 @@ BALMLayoutBuilder::Add(BView* view, XTab* left, YTab* top,
 BALMLayoutBuilder&
 BALMLayoutBuilder::Add(BView* view, Row* row, Column* column)
 {
-	fLayout->AddView(view, row, column);
+	_SetCurrentArea(fLayout->AddView(view, row, column));
 	return *this;
 }
 
@@ -78,7 +79,7 @@ BALMLayoutBuilder&
 BALMLayoutBuilder::Add(BLayoutItem* item, XTab* left, YTab* top,
 	XTab* right, YTab* bottom)
 {
-	fLayout->AddItem(item, left, top, right, bottom);
+	_SetCurrentArea(fLayout->AddItem(item, left, top, right, bottom));
 	return *this;
 }
 
@@ -125,235 +126,198 @@ BALMLayoutBuilder::SetSpacing(float horizontal, float vertical)
 }
 
 
-BALMLayoutBuilder::Snake
+BALMLayoutBuilder&
 BALMLayoutBuilder::StartingAt(BView* view)
 {
-	return Snake(fLayout->AreaFor(view), this);
-}
-
-
-BALMLayoutBuilder::Snake
-BALMLayoutBuilder::StartingAt(BLayoutItem* item)
-{
-	return Snake(fLayout->AreaFor(item), this);
-}
-
-
-BALMLayoutBuilder::Snake::Snake(Area* area, BALMLayoutBuilder* root)
-{
-	fCurrentArea = area;
-	fRootBuilder = root;
-	fPreviousSnake = NULL;
-}
-
-
-BALMLayoutBuilder::Snake::Snake(Area* area, Snake* previous)
-{
-	fCurrentArea = area;
-	fRootBuilder = previous->fRootBuilder;
-	fPreviousSnake = previous;
-}
-
-
-BALMLayoutBuilder::Snake&
-BALMLayoutBuilder::Snake::AddToLeft(BView* view, XTab* _left, YTab* top,
-	YTab* bottom)
-{
-	BReference<XTab> left = _left;
-	if (_left == NULL)
-		left = _Layout()->AddXTab();
-	XTab* right = fCurrentArea->Left();
-	if (!top)
-		top = fCurrentArea->Top();
-	if (!bottom)
-		bottom = fCurrentArea->Bottom();
-
-	fCurrentArea = _AddToLayout(view, left, top, right, bottom);
+	fAreaStack.MakeEmpty();
+	fAreaStack.AddItem(fLayout->AreaFor(view));
 	return *this;
-}
-
-
-BALMLayoutBuilder::Snake&
-BALMLayoutBuilder::Snake::AddToRight(BView* view, XTab* _right, YTab* top,
-	YTab* bottom)
-{
-	XTab* left = fCurrentArea->Right();
-	BReference<XTab> right = _right;
-	if (_right == NULL)
-		right = _Layout()->AddXTab();
-	if (!top)
-		top = fCurrentArea->Top();
-	if (!bottom)
-		bottom = fCurrentArea->Bottom();
-
-	fCurrentArea = _AddToLayout(view, left, top, right, bottom);
-	return *this;
-}
-
-
-BALMLayoutBuilder::Snake&
-BALMLayoutBuilder::Snake::AddAbove(BView* view, YTab* _top, XTab* left,
-	XTab* right)
-{
-	if (!left)
-		left = fCurrentArea->Left();
-	if (!right)
-		right = fCurrentArea->Right();
-	BReference<YTab> top = _top;
-	if (_top == NULL)
-		top = _Layout()->AddYTab();
-	YTab* bottom = fCurrentArea->Top();
-
-	fCurrentArea = _AddToLayout(view, left, top, right, bottom);
-	return *this;
-}
-
-
-BALMLayoutBuilder::Snake&
-BALMLayoutBuilder::Snake::AddBelow(BView* view, YTab* _bottom, XTab* left,
-	XTab* right)
-{
-	if (!left)
-		left = fCurrentArea->Left();
-	if (!right)
-		right = fCurrentArea->Right();
-	YTab* top = fCurrentArea->Bottom();
-	BReference<YTab> bottom = _bottom;
-	if (_bottom == NULL)
-		bottom = _Layout()->AddYTab();
-
-	fCurrentArea = _AddToLayout(view, left, top, right, bottom);
-	return *this;
-}
-
-
-BALMLayoutBuilder::Snake&
-BALMLayoutBuilder::Snake::AddToLeft(BLayoutItem* item, XTab* _left, YTab* top,
-	YTab* bottom)
-{
-	BReference<XTab> left = _left;
-	if (_left == NULL)
-		left = _Layout()->AddXTab();
-	XTab* right = fCurrentArea->Left();
-	if (!top)
-		top = fCurrentArea->Top();
-	if (!bottom)
-		bottom = fCurrentArea->Bottom();
-
-	fCurrentArea = _AddToLayout(item, left, top, right, bottom);
-	return *this;
-}
-
-
-BALMLayoutBuilder::Snake&
-BALMLayoutBuilder::Snake::AddToRight(BLayoutItem* item, XTab* _right, YTab* top,
-	YTab* bottom)
-{
-	XTab* left = fCurrentArea->Right();
-	BReference<XTab> right = _right;
-	if (_right == NULL)
-		right = _Layout()->AddXTab();
-	if (!top)
-		top = fCurrentArea->Top();
-	if (!bottom)
-		bottom = fCurrentArea->Bottom();
-
-	fCurrentArea = _AddToLayout(item, left, top, right, bottom);
-	return *this;
-}
-
-
-BALMLayoutBuilder::Snake&
-BALMLayoutBuilder::Snake::AddAbove(BLayoutItem* item, YTab* _top, XTab* left,
-	XTab* right)
-{
-	if (!left)
-		left = fCurrentArea->Left();
-	if (!right)
-		right = fCurrentArea->Right();
-	BReference<YTab> top = _top;
-	if (_top == NULL)
-		top = _Layout()->AddYTab();
-	YTab* bottom = fCurrentArea->Top();
-
-	fCurrentArea = _AddToLayout(item, left, top, right, bottom);
-	return *this;
-}
-
-
-BALMLayoutBuilder::Snake&
-BALMLayoutBuilder::Snake::AddBelow(BLayoutItem* item, YTab* _bottom, XTab* left,
-	XTab* right)
-{
-	if (!left)
-		left = fCurrentArea->Left();
-	if (!right)
-		right = fCurrentArea->Right();
-	YTab* top = fCurrentArea->Bottom();
-	BReference<YTab> bottom = _bottom;
-	if (_bottom == NULL)
-		bottom = _Layout()->AddYTab();
-
-	fCurrentArea = _AddToLayout(item, left, top, right, bottom);
-	return *this;
-}
-
-
-BALMLayoutBuilder::Snake
-BALMLayoutBuilder::Snake::StartingAt(BView* view)
-{
-	return fRootBuilder->StartingAt(view);
-}
-
-
-BALMLayoutBuilder::Snake
-BALMLayoutBuilder::Snake::StartingAt(BLayoutItem* item)
-{
-	return fRootBuilder->StartingAt(item);
-}
-
-
-BALMLayoutBuilder::Snake
-BALMLayoutBuilder::Snake::Push()
-{
-	return Snake(fCurrentArea, this);
-}
-
-
-BALMLayoutBuilder::Snake&
-BALMLayoutBuilder::Snake::Pop()
-{
-	return *fPreviousSnake;
 }
 
 
 BALMLayoutBuilder&
-BALMLayoutBuilder::Snake::End()
+BALMLayoutBuilder::StartingAt(BLayoutItem* item)
 {
-	return *fRootBuilder;
+	fAreaStack.MakeEmpty();
+	fAreaStack.AddItem(fLayout->AreaFor(item));
+	return *this;
 }
 
 
-BALMLayout*
-BALMLayoutBuilder::Snake::_Layout()
+BALMLayoutBuilder&
+BALMLayoutBuilder::AddToLeft(BView* view, XTab* _left, YTab* top, YTab* bottom)
 {
-	return fRootBuilder->fLayout;
+	Area* currentArea = _CurrentArea();
+	BReference<XTab> left = _left;
+	if (_left == NULL)
+		left = fLayout->AddXTab();
+	XTab* right = currentArea->Left();
+	if (!top)
+		top = currentArea->Top();
+	if (!bottom)
+		bottom = currentArea->Bottom();
+
+	return Add(view, left, top, right, bottom);
+}
+
+
+BALMLayoutBuilder&
+BALMLayoutBuilder::AddToRight(BView* view, XTab* _right, YTab* top,
+	YTab* bottom)
+{
+	Area* currentArea = _CurrentArea();
+	XTab* left = currentArea->Right();
+	BReference<XTab> right = _right;
+	if (_right == NULL)
+		right = fLayout->AddXTab();
+	if (!top)
+		top = currentArea->Top();
+	if (!bottom)
+		bottom = currentArea->Bottom();
+
+	return Add(view, left, top, right, bottom);
+}
+
+
+BALMLayoutBuilder&
+BALMLayoutBuilder::AddAbove(BView* view, YTab* _top, XTab* left,
+	XTab* right)
+{
+	Area* currentArea = _CurrentArea();
+	if (!left)
+		left = currentArea->Left();
+	if (!right)
+		right = currentArea->Right();
+	BReference<YTab> top = _top;
+	if (_top == NULL)
+		top = fLayout->AddYTab();
+	YTab* bottom = currentArea->Top();
+
+	return Add(view, left, top, right, bottom);
+}
+
+
+BALMLayoutBuilder&
+BALMLayoutBuilder::AddBelow(BView* view, YTab* _bottom, XTab* left,
+	XTab* right)
+{
+	Area* currentArea = _CurrentArea();
+	if (!left)
+		left = currentArea->Left();
+	if (!right)
+		right = currentArea->Right();
+	YTab* top = currentArea->Bottom();
+	BReference<YTab> bottom = _bottom;
+	if (_bottom == NULL)
+		bottom = fLayout->AddYTab();
+
+	return Add(view, left, top, right, bottom);
+}
+
+
+BALMLayoutBuilder&
+BALMLayoutBuilder::AddToLeft(BLayoutItem* item, XTab* _left, YTab* top,
+	YTab* bottom)
+{
+	Area* currentArea = _CurrentArea();
+	BReference<XTab> left = _left;
+	if (_left == NULL)
+		left = fLayout->AddXTab();
+	XTab* right = currentArea->Left();
+	if (!top)
+		top = currentArea->Top();
+	if (!bottom)
+		bottom = currentArea->Bottom();
+
+	return Add(item, left, top, right, bottom);
+}
+
+
+BALMLayoutBuilder&
+BALMLayoutBuilder::AddToRight(BLayoutItem* item, XTab* _right, YTab* top,
+	YTab* bottom)
+{
+	Area* currentArea = _CurrentArea();
+	XTab* left = currentArea->Right();
+	BReference<XTab> right = _right;
+	if (_right == NULL)
+		right = fLayout->AddXTab();
+	if (!top)
+		top = currentArea->Top();
+	if (!bottom)
+		bottom = currentArea->Bottom();
+
+	return Add(item, left, top, right, bottom);
+}
+
+
+BALMLayoutBuilder&
+BALMLayoutBuilder::AddAbove(BLayoutItem* item, YTab* _top, XTab* left,
+	XTab* right)
+{
+	Area* currentArea = _CurrentArea();
+	if (!left)
+		left = currentArea->Left();
+	if (!right)
+		right = currentArea->Right();
+	BReference<YTab> top = _top;
+	if (_top == NULL)
+		top = fLayout->AddYTab();
+	YTab* bottom = currentArea->Top();
+
+	return Add(item, left, top, right, bottom);
+}
+
+
+BALMLayoutBuilder&
+BALMLayoutBuilder::AddBelow(BLayoutItem* item, YTab* _bottom, XTab* left,
+	XTab* right)
+{
+	Area* currentArea = _CurrentArea();
+	if (!left)
+		left = currentArea->Left();
+	if (!right)
+		right = currentArea->Right();
+	YTab* top = currentArea->Bottom();
+	BReference<YTab> bottom = _bottom;
+	if (_bottom == NULL)
+		bottom = fLayout->AddYTab();
+
+	return Add(item, left, top, right, bottom);
+}
+
+
+BALMLayoutBuilder&
+BALMLayoutBuilder::Push()
+{
+	fAreaStack.AddItem(_CurrentArea());
+	return *this;
+}
+
+
+BALMLayoutBuilder&
+BALMLayoutBuilder::Pop()
+{
+	if (fAreaStack.CountItems() > 0)
+		fAreaStack.RemoveItemAt(fAreaStack.CountItems() - 1);
+	return *this;
+}
+
+
+void
+BALMLayoutBuilder::_SetCurrentArea(Area* area)
+{
+	if (fAreaStack.CountItems() > 0)
+		fAreaStack.ReplaceItem(fAreaStack.CountItems() - 1, area);
+	else
+		fAreaStack.AddItem(area);
 }
 
 
 Area*
-BALMLayoutBuilder::Snake::_AddToLayout(BView* view, XTab* left, YTab* top,
-	XTab* right, YTab* bottom)
+BALMLayoutBuilder::_CurrentArea() const
 {
-	return _Layout()->AddView(view, left, top, right, bottom);
-}
-
-
-Area*
-BALMLayoutBuilder::Snake::_AddToLayout(BLayoutItem* item, XTab* left,
-	YTab* top, XTab* right, YTab* bottom)
-{
-	return _Layout()->AddItem(item, left, top, right, bottom);
+	return fAreaStack.ItemAt(fAreaStack.CountItems() - 1);
 }
 
 
