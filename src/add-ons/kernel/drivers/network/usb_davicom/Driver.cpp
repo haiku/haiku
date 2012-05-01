@@ -33,16 +33,16 @@ mutex gDriverLock;
 // IMPORTANT: keep entries sorted by ids to let the
 // binary search lookup procedure work correctly !!!
 DeviceInfo gSupportedDevices[] = {
-	{ { { 0x01e1, 0x9601 } }, "Noname DM9601" },
-	{ { { 0x07aa, 0x9601 } }, "Corega FEther USB-TXC" },
-	{ { { 0x0a46, 0x0268 } }, "ShanTou ST268 USB NIC" },
-	{ { { 0x0a46, 0x6688 } }, "ZT6688 USB NIC" },
-	{ { { 0x0a46, 0x8515 } }, "ADMtek ADM8515 USB NIC" },
-	{ { { 0x0a46, 0x9000 } }, "DM9000E" },
-	{ { { 0x0a46, 0x9601 } }, "Davicom DM9601" },
-	{ { { 0x0a47, 0x9601 } }, "Hirose USB-100" },
-	{ { { 0x0fe6, 0x8101 } }, "Sunrising SR9600" },
-	{ { { 0x0fe6, 0x9700 } }, "Kontron DM9601" }
+	{ { 0x01e1, 0x9601 }, "Noname DM9601" },
+	{ { 0x07aa, 0x9601 }, "Corega FEther USB-TXC" },
+	{ { 0x0a46, 0x0268 }, "ShanTou ST268 USB NIC" },
+	{ { 0x0a46, 0x6688 }, "ZT6688 USB NIC" },
+	{ { 0x0a46, 0x8515 }, "ADMtek ADM8515 USB NIC" },
+	{ { 0x0a46, 0x9000 }, "DM9000E" },
+	{ { 0x0a46, 0x9601 }, "Davicom DM9601" },
+	{ { 0x0a47, 0x9601 }, "Hirose USB-100" },
+	{ { 0x0fe6, 0x8101 }, "Sunrising SR9600" },
+	{ { 0x0fe6, 0x9700 }, "Kontron DM9601" }
 };
 
 
@@ -57,22 +57,23 @@ lookup_and_create_device(usb_device device)
 		return NULL;
 	}
 
-	TRACE("trying %#06x:%#06x.\n", 
+	TRACE("trying %#06x:%#06x.\n",
 			deviceDescriptor->vendor_id, deviceDescriptor->product_id);
-	
+
 	// use binary search to lookup device in table
-	DeviceInfo::Id id = { { deviceDescriptor->vendor_id, 
-							deviceDescriptor->product_id } };
+	uint32 id = deviceDescriptor->vendor_id << 16
+					| deviceDescriptor->product_id;
 	int left  = -1;
 	int right = _countof(gSupportedDevices);
-	while((right - left) > 1) {
+	while ((right - left) > 1) {
 		int i = (left + right) / 2;
-		((gSupportedDevices[i].Key() < id.fKey) ? left : right) = i;
+		((gSupportedDevices[i].Key() < id) ? left : right) = i;
 	}
 
-	if(gSupportedDevices[right].Key() == id.fKey) 
+	if (gSupportedDevices[right].Key() == id)
 		return new DavicomDevice(device, gSupportedDevices[right]);
 
+	TRACE_ALWAYS("Search for %#x failed %d-%d.\n", id, left, right);
 	return NULL;
 }
 
@@ -194,7 +195,7 @@ init_driver()
 	const size_t count = _countof(gSupportedDevices);
 	static usb_support_descriptor sDescriptors[count] = {{ 0 }};
 
-	for(size_t i = 0; i < count; i++) {
+	for (size_t i = 0; i < count; i++) {
 		sDescriptors[i].vendor  = gSupportedDevices[i].VendorId();
 		sDescriptors[i].product = gSupportedDevices[i].ProductId();
 	}

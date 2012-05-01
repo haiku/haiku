@@ -24,7 +24,7 @@
 #define MAX_DEVICES	8
 
 
-const char* const kVersion = "ver.0.9.4";
+const char* const kVersion = "ver.0.9.5";
 extern usb_module_info *gUSBModule;
 
 
