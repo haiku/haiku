@@ -75,7 +75,7 @@ struct SharedSolver::PreferredSizeValidator {
 		ResultType solveResult)
 	{
 		float width = layout->Right()->Value() - layout->Left()->Value();
-		float height = layout->Top()->Value() - layout->Bottom()->Value();
+		float height = layout->Bottom()->Value() - layout->Top()->Value();
 		solver->SetPreferredSize(layout, BSize(width, height));
 	}
 };
