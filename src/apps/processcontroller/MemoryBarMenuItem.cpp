@@ -135,8 +135,8 @@ MemoryBarMenuItem::DrawBar(bool force)
 
 	rect.InsetBy(1, 1);
 	BRect r = rect;
-	float grenze1 = rect.left + (rect.right - rect.left) * float(fWriteMemory) / fCommitedMemory;
-	float grenze2 = rect.left + (rect.right - rect.left) * float(fAllMemory) / fCommitedMemory;
+	double grenze1 = rect.left + (rect.right - rect.left) * float(fWriteMemory) / fCommitedMemory;
+	double grenze2 = rect.left + (rect.right - rect.left) * float(fAllMemory) / fCommitedMemory;
 	if (grenze1 > rect.right)
 		grenze1 = rect.right;
 	if (grenze2 > rect.right)
@@ -234,7 +234,7 @@ MemoryBarMenuItem::GetContentSize(float* _width, float* _height)
 
 
 int
-MemoryBarMenuItem::UpdateSituation(int commitedMemory)
+MemoryBarMenuItem::UpdateSituation(int64 commitedMemory)
 {
 	fCommitedMemory = commitedMemory;
 	BarUpdate();
@@ -247,8 +247,8 @@ MemoryBarMenuItem::BarUpdate()
 {
 	area_info areaInfo;
 	int32 cookie = 0;
-	size_t lram_size = 0;
-	size_t lwram_size = 0;
+	int64 lram_size = 0;
+	int64 lwram_size = 0;
 	bool exists = false;
 
 	while (get_next_area_info(fTeamID, &cookie, &areaInfo) == B_OK) {

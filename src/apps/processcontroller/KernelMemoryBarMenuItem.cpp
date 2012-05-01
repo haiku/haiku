@@ -39,9 +39,9 @@ KernelMemoryBarMenuItem::KernelMemoryBarMenuItem(system_info& systemInfo)
 	fLastSum = -1;
 	fGrenze1 = -1;
 	fGrenze2 = -1;
-	fPhysicalMemory = float(int(systemInfo.max_pages * B_PAGE_SIZE / 1024));
-	fCommittedMemory = float(int(systemInfo.used_pages * B_PAGE_SIZE / 1024));
-	fCachedMemory = float(int(systemInfo.cached_pages * B_PAGE_SIZE / 1024));
+	fPhysicalMemory = systemInfo.max_pages * B_PAGE_SIZE / 1024LL;
+	fCommittedMemory = systemInfo.used_pages * B_PAGE_SIZE / 1024LL;
+	fCachedMemory = systemInfo.cached_pages * B_PAGE_SIZE / 1024LL;
 }
 
 
@@ -55,8 +55,8 @@ KernelMemoryBarMenuItem::DrawContent()
 
 
 void
-KernelMemoryBarMenuItem::UpdateSituation(float committedMemory,
-	float cachedMemory)
+KernelMemoryBarMenuItem::UpdateSituation(int64 committedMemory,
+	int64 cachedMemory)
 {
 	fCommittedMemory = committedMemory;
 	fCachedMemory = cachedMemory;
@@ -87,9 +87,9 @@ KernelMemoryBarMenuItem::DrawBar(bool force)
 	cadre.InsetBy(1, 1);
 	BRect r = cadre;
 
-	float grenze1 = cadre.left + (cadre.right - cadre.left)
+	double grenze1 = cadre.left + (cadre.right - cadre.left)
 						* fCachedMemory / fPhysicalMemory;
-	float grenze2 = cadre.left + (cadre.right - cadre.left)
+	double grenze2 = cadre.left + (cadre.right - cadre.left)
 						* fCommittedMemory / fPhysicalMemory;
 	if (grenze1 > cadre.right)
 		grenze1 = cadre.right;
