@@ -1,0 +1,52 @@
+SubDir HAIKU_TOP src system boot platform raspberrypi_arm ;
+
+SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform $(TARGET_BOOT_PLATFORM) ;
+
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders [ FDirName graphics common ] ;
+UsePrivateHeaders [ FDirName graphics vesa ] ;
+UsePrivateHeaders [ FDirName storage ] ;
+
+{
+	local defines = _BOOT_MODE ;
+
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) -fno-rtti ;
+}
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
+
+local genericPlatformSources =
+	text_menu.cpp
+#	video_blit.cpp
+#	video_splash.cpp
+;
+
+KernelMergeObject boot_platform_raspberrypi_arm.o :
+	entry.S
+	start.c
+	console.cpp
+	cpu.cpp
+	debug.cpp
+	devices.cpp
+	keyboard.cpp
+	menu.cpp
+	mmu.cpp
+	serial.cpp
+	video.cpp
+	arch_start_kernel.S
+
+	$(genericPlatformSources)
+	: -fno-pic
+	: boot_platform_generic.a
+;
+
+
+SEARCH on [ FGristFiles $(genericPlatformSources) ]
+	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
+
+
+# Tell the build system to where stage1.bin can be found, so it can be used
+# elsewhere.
+SEARCH on stage1.bin = $(SUBDIR) ;
