@@ -33,10 +33,20 @@
 #	define TRACE(x) ;
 #endif
 
+#ifdef _USER_MODE
+#	define ERROR(x) printf x
+#else
+#	define ERROR(x) dprintf x
+#endif
+
 using std::nothrow;
 
 // Maximal number of logical partitions per extended partition we allow.
 static const int32 kMaxLogicalPartitionCount = 128;
+
+// Constants used to verify if a disk uses a GPT
+static const int32 kGPTSignatureSize = 8;
+static const char kGPTSignature[8] = { 'E', 'F', 'I', ' ', 'P', 'A', 'R', 'T' };
 
 
 // constructor
@@ -295,20 +305,32 @@ PartitionMapParser::_ReadPartitionTable(off_t offset, partition_table* table)
 	if (table == NULL)
 		table = fPartitionTable;
 
-	status_t error = B_OK;
-
-	// read
-	if (read_pos(fDeviceFD, fSessionOffset + offset, table, toRead) != toRead) {
-#ifndef _BOOT_MODE
-		error = errno;
-		if (error == B_OK)
-			error = B_IO_ERROR;
-#else
-		error = B_IO_ERROR;
-#endif
-		TRACE(("intel: _ReadPartitionTable(): reading the partition table "
-			"failed: %lx\n", error));
+	// Read the partition table from the device into the table structure
+	ssize_t bytesRead = read_pos(fDeviceFD, fSessionOffset + offset,
+		table, toRead);
+	if (bytesRead != (ssize_t)toRead) {
+		TRACE(("intel: _ReadPartitionTable(): reading the partition "
+			"table failed: %lx\n", errno));
+		return bytesRead < 0 ? errno : B_IO_ERROR;
 	}
-	return error;
+
+	// check for GPT signature "EFI PART"
+	// located in the 8bytes following the mbr
+	toRead = kGPTSignatureSize;
+	char gptSignature[8];
+	bytesRead = read_pos(fDeviceFD, fSessionOffset + offset
+		+ sizeof(partition_table), &gptSignature, toRead);
+	if (bytesRead != (ssize_t)toRead) {
+		TRACE(("intel: _ReadPartitionTable(): checking for GPT "
+			"signature failed: %lx\n", errno));
+		return bytesRead < 0 ? errno : B_IO_ERROR;
+	}
+	if (memcmp(gptSignature, kGPTSignature, kGPTSignatureSize) == 0) {
+		ERROR(("Error: Disk is GPT-formatted: "
+			"GPT disks are currently unsupported.\n"));
+		return B_BAD_DATA;
+	}
+
+	return B_OK;
 }
 
