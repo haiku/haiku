@@ -71,7 +71,10 @@ public:
 					layout->AddXTab())
 				.AddToRight(stringView1)
 				.AddToRight(BSpaceLayoutItem::CreateGlue(), layout->Right())
-				.AddBelow(statusBar, NULL, layout->Left(), layout->Right())
+				.AddBelow(statusBar, NULL, layout->Left(), layout->Right());
+
+		// start over so that layout->RightOf() can return accurate results
+		BALM::BALMLayoutBuilder(layout)
 			.StartingAt(statusBar)
 				.AddBelow(menu2, layout->Bottom(), layout->Left(),
 					layout->RightOf(menu1))
