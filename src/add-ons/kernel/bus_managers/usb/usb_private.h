@@ -480,7 +480,8 @@ public:
 											uint8 hubPort,
 											usb_device_descriptor &desc,
 											int8 deviceAddress,
-											usb_speed speed, bool isRootHub);
+											usb_speed speed, bool isRootHub,
+											void *controllerCookie = NULL);
 virtual									~Device();
 
 		status_t						InitCheck();
@@ -535,6 +536,11 @@ virtual	status_t						BuildDeviceName(char *string,
 											{ return fHubAddress; }
 		uint8							HubPort() const { return fHubPort; }
 
+		void							SetControllerCookie(void *cookie)
+											{ fControllerCookie = cookie; }
+		void *							ControllerCookie() const
+											{ return fControllerCookie; }
+
 		// Convenience functions for standard requests
 virtual	status_t						SetFeature(uint16 selector);
 virtual	status_t						ClearFeature(uint16 selector);
@@ -554,6 +560,7 @@ private:
 		int8							fHubAddress;
 		uint8							fHubPort;
 		ControlPipe *					fDefaultPipe;
+		void *							fControllerCookie;
 };
 
 

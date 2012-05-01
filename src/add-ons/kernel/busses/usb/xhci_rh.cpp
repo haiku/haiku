@@ -23,7 +23,7 @@ static usb_device_descriptor sXHCIRootHubDevice =
 	9,								// Max packet size on endpoint 0
 	0,								// Vendor ID
 	0,								// Product ID
-	0x003,							// Version
+	0x300,							// Version
 	1,								// Index of manufacturer string
 	2,								// Index of product string
 	0,								// Index of serial number string

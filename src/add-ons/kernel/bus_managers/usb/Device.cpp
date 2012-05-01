@@ -12,7 +12,7 @@
 
 Device::Device(Object *parent, int8 hubAddress, uint8 hubPort,
 	usb_device_descriptor &desc, int8 deviceAddress, usb_speed speed,
-	bool isRootHub)
+	bool isRootHub, void *controllerCookie)
 	:	Object(parent),
 		fDeviceDescriptor(desc),
 		fInitOK(false),
@@ -23,7 +23,8 @@ Device::Device(Object *parent, int8 hubAddress, uint8 hubPort,
 		fSpeed(speed),
 		fDeviceAddress(deviceAddress),
 		fHubAddress(hubAddress),
-		fHubPort(hubPort)
+		fHubPort(hubPort),
+		fControllerCookie(controllerCookie)
 {
 	TRACE("creating device\n");
 
@@ -455,20 +456,20 @@ Device::InitEndpoints(int32 interfaceIndex)
 				direction = Pipe::In;
 
 			switch (endpoint->descr->attributes & 0x03) {
-				case 0x00: /* Control Endpoint */
+				case USB_ENDPOINT_ATTR_CONTROL: /* Control Endpoint */
 					pipe = new(std::nothrow) ControlPipe(this);
 					direction = Pipe::Default;
 					break;
 
-				case 0x01: /* Isochronous Endpoint */
+				case USB_ENDPOINT_ATTR_ISOCHRONOUS: /* Isochronous Endpoint */
 					pipe = new(std::nothrow) IsochronousPipe(this);
 					break;
 
-				case 0x02: /* Bulk Endpoint */
+				case USB_ENDPOINT_ATTR_BULK: /* Bulk Endpoint */
 					pipe = new(std::nothrow) BulkPipe(this);
 					break;
 
-				case 0x03: /* Interrupt Endpoint */
+				case USB_ENDPOINT_ATTR_INTERRUPT: /* Interrupt Endpoint */
 					pipe = new(std::nothrow) InterruptPipe(this);
 					break;
 			}

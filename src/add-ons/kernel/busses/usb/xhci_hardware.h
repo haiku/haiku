@@ -42,8 +42,9 @@
 // USB Status Register
 #define STS_HCH				(1 << 0)
 #define STS_HSE				(1 << 2)
+#define STS_EINT			(1 << 3)
 #define STS_PCD				(1 << 4)
-#define STS_CNR				(1<<11)
+#define STS_CNR				(1 << 11)
 #define STS_HCE				(1 << 12)
 #define XHCI_PAGESIZE		0x08		// PAGE SIZE
 #define XHCI_DNCTRL			0x14
@@ -81,6 +82,11 @@
 
 // Host Controller Doorbell Registers
 #define XHCI_DOORBELL(n)		(0x0000 + (4 * (n)))
+#define XHCI_DOORBELL_TARGET(x)		((x) & 0xff)
+#define XHCI_DOORBELL_TARGET_GET(x)	((x) & 0xff)
+#define XHCI_DOORBELL_STREAMID(x)		(((x) & 0xffff) << 16)
+#define XHCI_DOORBELL_STREAMID_GET(x)	(((x) >> 16) & 0xffff)
+
 
 // Extended Capabilities
 #define XECP_ID(x)				((x) & 0xff)
@@ -398,6 +404,10 @@ struct xhci_device_ctx {
 	struct xhci_slot_ctx slot;
 	struct xhci_endpoint_ctx endpoints[XHCI_MAX_ENDPOINTS - 1];
 };
+
+
+#define XHCI_ENDPOINT_ID(pipe)	(2 * pipe->EndpointAddress()	\
+		+ (pipe->Direction() != Pipe::Out ? 1 : 0))
 
 
 #endif // !XHCI_HARDWARE_H

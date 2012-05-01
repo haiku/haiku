@@ -17,18 +17,48 @@
 
 struct pci_info;
 struct pci_module_info;
+struct xhci_td;
+struct xhci_device;
+struct xhci_endpoint;
 class XHCIRootHub;
 
 
 enum xhci_state {
 	XHCI_STATE_DISABLED = 0,
 	XHCI_STATE_ENABLED,
+	XHCI_STATE_DEFAULT,
 	XHCI_STATE_ADDRESSED,
 	XHCI_STATE_CONFIGURED,
 };
 
 
-struct xhci_device {
+typedef struct xhci_td {
+	struct xhci_trb	trbs[18];
+
+	addr_t	buffer_phy;
+	addr_t	this_phy;		// A physical pointer to this address
+	void	*buffer_log;	// Pointer to the logical buffer
+	size_t	buffer_size;	// Size of the buffer
+
+	struct xhci_td	*next;
+	uint8	last_used;
+	Transfer *transfer;
+} xhci_td __attribute__((__aligned__(16)));
+
+
+typedef struct xhci_endpoint {
+	xhci_device		*device;
+	xhci_td 		*td_head;
+	struct xhci_trb (*trbs)[XHCI_MAX_TRANSFERS];
+	addr_t trb_addr;
+	uint8	used;
+	uint8	current;
+} xhci_endpoint;
+
+
+typedef struct xhci_device {
+	uint8 slot;
+	uint8 address;
 	enum xhci_state state;
 	area_id trb_area;
 	addr_t trb_addr;
@@ -41,7 +71,9 @@ struct xhci_device {
 	area_id device_ctx_area;
 	addr_t device_ctx_addr;
 	struct xhci_device_ctx *device_ctx;
-};
+
+	xhci_endpoint endpoints[XHCI_MAX_ENDPOINTS - 1];
+} xhci_device;
 
 
 class XHCI : public BusManager {
@@ -51,6 +83,7 @@ public:
 
 			status_t			Start();
 	virtual	status_t			SubmitTransfer(Transfer *transfer);
+			status_t			SubmitRequest(Transfer *transfer);
 	virtual	status_t			CancelQueuedTransfers(Pipe *pipe, bool force);
 
 	virtual	status_t			NotifyPipeChange(Pipe *pipe,
@@ -67,6 +100,9 @@ public:
 									uint8 mult, uint8 fpsShift,
 									uint16 maxPacketSize, uint16 maxFrameSize);
 	virtual	void				FreeDevice(Device *device);
+
+			status_t			_InsertEndpointForPipe(Pipe *pipe);
+			status_t			_RemoveEndpointForPipe(Pipe *pipe);
 
 			// Port operations for root hub
 			uint8				PortCount() const { return fPortCount; }
@@ -92,12 +128,22 @@ private:
 	static	int32				FinishThread(void *data);
 			void				FinishTransfers();
 
+			// Descriptor
+			xhci_td *			CreateDescriptor(size_t bufferSize);
+			void				FreeDescriptor(xhci_td *descriptor);
+
+			status_t			_LinkDescriptorForPipe(xhci_td *descriptor,
+									xhci_endpoint *endpoint);
+			status_t			_UnlinkDescriptorForPipe(xhci_td *descriptor,
+									xhci_endpoint *endpoint);
+
 			// Command
 			void				QueueCommand(xhci_trb *trb);
 			void				HandleCmdComplete(xhci_trb *trb);
+			void				HandleTransferComplete(xhci_trb *trb);
 			status_t			DoCommand(xhci_trb *trb);
 			//Doorbell
-			void				Ring();
+			void				Ring(uint8 slot, uint8 endpoint);
 
 			// Commands
 			status_t			Noop();
