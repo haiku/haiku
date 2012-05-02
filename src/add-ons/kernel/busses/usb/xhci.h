@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2011, Haiku Inc. All rights reserved.
+ * Copyright 2006-2012, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -49,7 +49,7 @@ typedef struct xhci_td {
 typedef struct xhci_endpoint {
 	xhci_device		*device;
 	xhci_td 		*td_head;
-	struct xhci_trb (*trbs)[XHCI_MAX_TRANSFERS];
+	struct xhci_trb *trbs; // [XHCI_MAX_TRANSFERS]
 	addr_t trb_addr;
 	uint8	used;
 	uint8	current;
@@ -62,7 +62,7 @@ typedef struct xhci_device {
 	enum xhci_state state;
 	area_id trb_area;
 	addr_t trb_addr;
-	struct xhci_trb (*trbs)[XHCI_MAX_ENDPOINTS - 1][XHCI_MAX_TRANSFERS];
+	struct xhci_trb (*trbs); // [XHCI_MAX_ENDPOINTS - 1][XHCI_MAX_TRANSFERS]
 
 	area_id input_ctx_area;
 	addr_t input_ctx_addr;
@@ -83,7 +83,8 @@ public:
 
 			status_t			Start();
 	virtual	status_t			SubmitTransfer(Transfer *transfer);
-			status_t			SubmitRequest(Transfer *transfer);
+			status_t			SubmitControlRequest(Transfer *transfer);
+			status_t			SubmitNormalRequest(Transfer *transfer);
 	virtual	status_t			CancelQueuedTransfers(Pipe *pipe, bool force);
 
 	virtual	status_t			NotifyPipeChange(Pipe *pipe,
@@ -168,8 +169,6 @@ private:
 	inline	uint32				ReadOpReg(uint32 reg);
 
 			// Capability register functions
-	inline	uint8				ReadCapReg8(uint32 reg);
-	inline	uint16				ReadCapReg16(uint32 reg);
 	inline	uint32				ReadCapReg32(uint32 reg);
 	inline	void				WriteCapReg32(uint32 reg, uint32 value);
 
@@ -184,8 +183,11 @@ private:
 	static	pci_module_info *	sPCIModule;
 
 			uint8 *				fCapabilityRegisters;
+			uint32				fCapabilityLength;
 			uint8 *				fOperationalRegisters;
+			uint32				fOperationalLength;
 			uint8 *				fRuntimeRegisters;
+			uint32				fRuntimeLength;
 			uint8 *				fDoorbellRegisters;
 			area_id				fRegisterArea;
 			pci_info *			fPCIInfo;
@@ -207,6 +209,8 @@ private:
 			sem_id				fFinishTransfersSem;
 			thread_id			fFinishThread;
 			bool				fStopThreads;
+
+			xhci_td	*			fFinishedHead;
 
 			// Root Hub
 			XHCIRootHub *		fRootHub;
