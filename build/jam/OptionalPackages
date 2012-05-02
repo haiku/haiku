@@ -34,6 +34,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	Clockwerk				- native audio/video compositing
 #	CLucene					- indexed file search
 #	CMake					- cross platform make
+#	Colors!					- color picker application
 #	Ctags					- exuberant ctags (source files indexing)
 #	Curl					- a client that groks URLs
 #	CVS						- the version control system
@@ -459,6 +460,26 @@ if [ IsOptionalHaikuImagePackageAdded CMake ] {
 				: $(baseURL)/cmake-2.8.4-r1a3-x86-gcc2-2011-05-19.zip
 				: : true ;
 		}
+	}
+}
+
+
+# Colors!
+if [ IsOptionalHaikuImagePackageAdded Colors! ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Colors! available for $(TARGET_ARCH)" ;
+	} else {
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			InstallOptionalHaikuImagePackage
+				Colors!-2.0-x86-gcc4-2012-04-30.zip
+				: $(baseURL)/Colors\!-2.0-x86-gcc4-2012-04-30.zip ;
+		} else {
+			InstallOptionalHaikuImagePackage
+				Colors!-2.0-x86-gcc2-2012-04-30.zip
+				: $(baseURL)/Colors\!-2.0-x86-gcc2-2012-04-30.zip ;
+		}
+		AddSymlinkToHaikuImage home config settings deskbar Applications
+			: /boot/apps/Colors\!/Colors\! ;
 	}
 }
 
