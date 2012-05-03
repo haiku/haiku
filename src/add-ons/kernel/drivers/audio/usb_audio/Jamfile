@@ -2,10 +2,17 @@ SubDir HAIKU_TOP src add-ons kernel drivers audio usb_audio ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders audio ;
+UsePrivateHeaders kernel media ;
+
+UsePrivateHeaders kernel net ;
+
+UsePrivateHeaders [ FDirName kernel util ] ;
 
 KernelAddon usb_audio :
-	usb_audio.c
-	USB_audio_utils.c
-;
-
+	Driver.cpp
+	Device.cpp
+	AudioControlInterface.cpp
+	AudioStreamingInterface.cpp
+	Stream.cpp
+	Settings.cpp
+	;

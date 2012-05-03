@@ -1,0 +1,28 @@
+##
+##	Driver for USB Audio Device Class devices.
+##	Copyright (c) 2009,10,12 S.Zharski <imker@gmx.li>
+##	Distributed under the terms of the MIT license.
+##
+
+## trace [on|off] - activate additional tracing.
+## default value: off
+
+trace on 
+
+## logfile [full path to private log file] 
+## default path value: /var/log/usb_asix.log
+## if disabled - all output goes to syslog
+
+logfile /boot/home/usb_audio.log
+
+## reset_logfile [on|off] - truncate private log file on driver/system restart
+## default value: off
+##
+
+# reset_logfile off
+
+## add_timestamp  [on|off]  - add time of writing the string in private log file.
+## default value: on
+##
+
+# add_timestamp off
