@@ -171,14 +171,14 @@ TTeamMenuItem::SetOverrideSelected(bool selected)
 
 
 bool
-TTeamMenuItem::DrawLabel() const
+TTeamMenuItem::HasLabel() const
 {
 	return fDrawLabel;
 }
 
 
 void
-TTeamMenuItem::SetDrawLabel(bool drawLabel)
+TTeamMenuItem::SetHasLabel(bool drawLabel)
 {
 	fDrawLabel = drawLabel;
 }

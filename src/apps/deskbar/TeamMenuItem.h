@@ -64,8 +64,8 @@ class TTeamMenuItem : public BMenuItem {
 		void SetOverrideHeight(float height);
 		void SetOverrideSelected(bool selected);
 
-		bool DrawLabel() const;
-		void SetDrawLabel(bool drawLabel);
+		bool HasLabel() const;
+		void SetHasLabel(bool drawLabel);
 
 		bool IsExpanded();
 		void ToggleExpandState(bool resizeWindow);

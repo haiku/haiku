@@ -45,6 +45,7 @@ All rights reserved.
 #include <NodeInfo.h>
 #include <Roster.h>
 #include <Screen.h>
+#include <ToolTip.h>
 
 #include "BarApp.h"
 #include "BarMenuTitle.h"
@@ -395,19 +396,43 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 		// force a cleanup
 		_FinishedDrag();
 
-		if (code == B_INSIDE_VIEW) {
-			TTeamMenuItem* item = TeamItemAtPoint(where);
+		switch (code) {
+			case B_ENTERED_VIEW:
+			case B_INSIDE_VIEW:
+			{
+				TTeamMenuItem* item = TeamItemAtPoint(where);
+				if (item == NULL) {
+					// item is NULL, break out
+					fLastMousedOverItem = NULL;
+					break;
+				}
 
-			if (item != NULL) {
-				if (!item->DrawLabel() && item != fLastMousedOverItem) {
-					// set the tooltip
-					SetToolTip(item->Name());
-				} else
+				if (item->HasLabel()) {
+					// item has a visible label, set the item and break out
 					fLastMousedOverItem = item;
+					break;
+				}
+
+				if (item == fLastMousedOverItem) {
+					// already set the tooltip for this item, break out
+					break;
+				}
+
+				// new item, update the tooltip with the item name
+				SetToolTip(item->Name());
+
+				// save the current item for the next MouseMoved() call
+				fLastMousedOverItem = item;
+
+				break;
 			}
+
+			case B_OUTSIDE_VIEW:
+			case B_EXITED_VIEW:
+				fLastMousedOverItem = NULL;
+				break;
 		}
 
-		fLastMousedOverItem = NULL;
 		BMenuBar::MouseMoved(where, code, message);
 		return;
 	}
