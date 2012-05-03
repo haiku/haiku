@@ -45,7 +45,6 @@ All rights reserved.
 #include <NodeInfo.h>
 #include <Roster.h>
 #include <Screen.h>
-#include <ToolTip.h>
 
 #include "BarApp.h"
 #include "BarMenuTitle.h"

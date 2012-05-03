@@ -55,6 +55,7 @@ All rights reserved.
 #include "BarMenuBar.h"
 #include "ExpandoMenuBar.h"
 
+
 void
 AddRefsToDeskbarMenu(const BMessage* m, entry_ref* subdirectory)
 {
