@@ -167,4 +167,4 @@ class TBarApp : public BApplication {
 };
 
 
-#endif	// BAR_APP_H
+#endif	/* BAR_APP_H */

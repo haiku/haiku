@@ -33,6 +33,7 @@ holders.
 All rights reserved.
 */
 
+
 #include "WindowMenuItem.h"
 
 #include <stdio.h>
@@ -329,4 +330,3 @@ TWindowMenuItem::RequiresUpdate()
 {
 	return fRequireUpdate;
 }
-

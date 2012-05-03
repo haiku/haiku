@@ -33,26 +33,27 @@ holders.
 All rights reserved.
 */
 
-#include <Debug.h>
+
+#include "ExpandoMenuBar.h"
 
 #include <string.h>
 
 #include <Autolock.h>
 #include <Bitmap.h>
 #include <ControlLook.h>
+#include <Debug.h>
 #include <NodeInfo.h>
 #include <Roster.h>
 #include <Screen.h>
 
-#include "icons.h"
-#include "icons_logo.h"
 #include "BarApp.h"
 #include "BarMenuTitle.h"
 #include "BarView.h"
 #include "BarWindow.h"
 #include "DeskbarMenu.h"
 #include "DeskbarUtils.h"
-#include "ExpandoMenuBar.h"
+#include "icons.h"
+#include "icons_logo.h"
 #include "ResourceSet.h"
 #include "ShowHideMenuItem.h"
 #include "StatusView.h"
@@ -60,13 +61,13 @@ All rights reserved.
 #include "WindowMenu.h"
 #include "WindowMenuItem.h"
 
+
 const float kDefaultDeskbarMenuWidth = 50.0f;
 const float kSepItemWidth = 5.0f;
 const float kIconPadding = 8.0f;
 
 const uint32 kMinimizeTeam = 'mntm';
 const uint32 kBringTeamToFront = 'bftm';
-
 
 bool TExpandoMenuBar::sDoMonitor = false;
 thread_id TExpandoMenuBar::sMonThread = B_ERROR;
@@ -921,4 +922,3 @@ TExpandoMenuBar::_FinishedDrag(bool invoke)
 	if (!invoke && fBarView->Dragging())
 		fBarView->DragStop(true);
 }
-

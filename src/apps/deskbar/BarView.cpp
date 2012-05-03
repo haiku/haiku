@@ -33,7 +33,6 @@ holders.
 All rights reserved.
 */
 
-#include <Debug.h>
 
 #include "BarView.h"
 
@@ -43,6 +42,7 @@ All rights reserved.
 
 #include <AppFileInfo.h>
 #include <Bitmap.h>
+#include <Debug.h>
 #include <Directory.h>
 #include <LocaleRoster.h>
 #include <NodeInfo.h>
@@ -1063,4 +1063,3 @@ TBarView::IconFrame(const char* name) const
 {
 	return OffsetIconFrame(fReplicantTray->IconFrame(name));
 }
-

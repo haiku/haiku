@@ -33,13 +33,16 @@ holders.
 All rights reserved.
 */
 
-#include <Debug.h>
+
+#include "ShowHideMenuItem.h"
+
 #include <malloc.h>
 #include <stdio.h>
 #include <string.h>
+
+#include <Debug.h>
 #include <Roster.h>
 
-#include "ShowHideMenuItem.h"
 #include "WindowMenuItem.h"
 #include "tracker_private.h"
 
@@ -141,4 +144,3 @@ TShowHideMenuItem::TeamShowHideCommon(int32 action, const BList* teamList,
 
 	return B_OK;
 }
-

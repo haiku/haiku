@@ -33,25 +33,26 @@ holders.
 All rights reserved.
 */
 
+
+#include "DeskbarUtils.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <Debug.h>
-#include <Window.h>
 #include <AppFileInfo.h>
+#include <Debug.h>
 #include <Directory.h>
 #include <FilePanel.h>
 #include <FindDirectory.h>
 #include <List.h>
 #include <Mime.h>
 #include <NodeInfo.h>
-#include <Path.h>
 #include <Screen.h>
 #include <SymLink.h>
+#include <Window.h>
 
 #include "BarMenuBar.h"
-#include "DeskbarUtils.h"
 #include "ExpandoMenuBar.h"
 
 void
@@ -100,4 +101,3 @@ AddRefsToDeskbarMenu(const BMessage* m, entry_ref* subdirectory)
 		}
 	}
 }
-

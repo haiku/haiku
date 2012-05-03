@@ -33,7 +33,6 @@ holders.
 All rights reserved.
 */
 
-#include <Debug.h>
 
 #include "TeamMenuItem.h"
 
@@ -43,6 +42,7 @@ All rights reserved.
 
 #include <Bitmap.h>
 #include <ControlLook.h>
+#include <Debug.h>
 #include <Font.h>
 #include <Region.h>
 #include <Roster.h>
@@ -625,4 +625,3 @@ TTeamMenuItem::_IsSelected() const
 {
 	return IsSelected() || fOverriddenSelected;
 }
-

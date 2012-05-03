@@ -32,12 +32,12 @@ brand product names are registered trademarks or trademarks of their respective
 holders.
 All rights reserved.
 */
+#ifndef SHOWHIDEMENUITEM_H
+#define SHOWHIDEMENUITEM_H
+
 
 //	window control menu items (Show All, Hide All, Close All)
 //	in WindowMenu
-
-#ifndef SHOWHIDEMENUITEM_H
-#define SHOWHIDEMENUITEM_H
 
 #include <MenuItem.h>
 
@@ -66,5 +66,4 @@ private:
 };
 
 
-#endif /* SHOWHIDEMENUITEM_H */
-
+#endif	/* SHOWHIDEMENUITEM_H */

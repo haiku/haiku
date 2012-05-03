@@ -32,9 +32,9 @@ brand product names are registered trademarks or trademarks of their respective
 holders.
 All rights reserved.
 */
-
 #ifndef __STATUS_VIEW__
 #define __STATUS_VIEW__
+
 
 #include <Control.h>
 #include <Node.h>
@@ -221,5 +221,5 @@ private:
 	int32 fDragLocation;
 };
 
-#endif
 
+#endif	/* __STATUS_VIEW__ */

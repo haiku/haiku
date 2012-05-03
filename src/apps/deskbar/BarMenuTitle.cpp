@@ -33,12 +33,12 @@ holders.
 All rights reserved.
 */
 
-#include <Debug.h>
 
 #include "BarMenuTitle.h"
 
 #include <Bitmap.h>
 #include <ControlLook.h>
+#include <Debug.h>
 
 #include "BarApp.h"
 #include "BarView.h"
@@ -208,4 +208,3 @@ TBarMenuTitle::Invoke(BMessage* message)
 
 	return BMenuItem::Invoke(message);
 }
-

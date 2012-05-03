@@ -33,9 +33,14 @@ holders.
 All rights reserved.
 */
 
+
 #define USE_RESOURCES 1
 
 #include "ResourceSet.h"
+
+#include <stdlib.h>
+#include <unistd.h>
+#include <ctype.h>
 
 #include <Application.h>
 #include <Autolock.h>
@@ -47,15 +52,9 @@ All rights reserved.
 #include <Path.h>
 #include <String.h>
 
-
 #if USE_RESOURCES
 #include <Resources.h>
 #endif
-
-
-#include <stdlib.h>
-#include <unistd.h>
-#include <ctype.h>
 
 #if USE_RESOURCES
 #define RESOURCES_ONLY(x) x
@@ -63,8 +62,8 @@ All rights reserved.
 #define RESOURCES_ONLY(x)
 #endif
 
-namespace TResourcePrivate {
 
+namespace TResourcePrivate {
 	class TypeObject {
 	public:
 		TypeObject()
@@ -914,4 +913,3 @@ AppResSet()
 	gResourceLocker.Unlock();
 	return gResources;
 }
-

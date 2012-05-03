@@ -33,13 +33,13 @@ holders.
 All rights reserved.
 */
 
-#include <Debug.h>
 
 #include "BarMenuBar.h"
 
 #include <string.h>
 
 #include <Bitmap.h>
+#include <Debug.h>
 #include <NodeInfo.h>
 
 #include "icons.h"
@@ -203,4 +203,3 @@ TBarMenuBar::InitTrackingHook(bool (*hookFunction)(BMenu*, void*),
 	if (fAppListMenuItem && (fAppListMenuItem->Frame().Contains(loc) || both))
 		init_tracking_hook(fAppListMenuItem, hookFunction, state);
 }
-

@@ -35,9 +35,11 @@ All rights reserved.
 #ifndef TEAMMENUITEM_H
 #define TEAMMENUITEM_H
 
+
 //	Individual team/application listing
 //	item for TeamMenu in mini/vertical mode
-// 	item for ExpandoMenuBar in vertical or horizontal expanded mode
+//	item for ExpandoMenuBar in vertical or horizontal expanded mode
+
 
 #include <MenuItem.h>
 
@@ -46,7 +48,6 @@ All rights reserved.
 
 
 class BBitmap;
-
 
 class TTeamMenuItem : public BMenuItem {
 	public:
@@ -107,5 +108,5 @@ class TTeamMenuItem : public BMenuItem {
 		bool fOverriddenSelected;
 };
 
-#endif /* TEAMMENUITEM_H */
 
+#endif	/* TEAMMENUITEM_H */

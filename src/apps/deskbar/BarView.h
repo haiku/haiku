@@ -32,7 +32,6 @@ brand product names are registered trademarks or trademarks of their respective
 holders.
 All rights reserved.
 */
-
 #ifndef BARVIEW_H
 #define BARVIEW_H
 
@@ -229,5 +228,5 @@ TBarView::CachedTypesList() const
 	return fCachedTypesList;
 }
 
-#endif /* BARVIEW_H */
 
+#endif	/* BARVIEW_H */

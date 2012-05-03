@@ -43,7 +43,6 @@ All rights reserved.
 class TDeskbarMenu;
 class TBarView;
 
-
 class TBarWindow : public BWindow {
 public:
 								TBarWindow();
@@ -92,5 +91,5 @@ private:
 			TBarView*			fBarView;
 };
 
-#endif	/* BAR_WINDOW_H */
 
+#endif	/* BAR_WINDOW_H */

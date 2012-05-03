@@ -33,6 +33,9 @@ holders.
 All rights reserved.
 */
 
+
+#include "DeskbarMenu.h"
+
 #include <Debug.h>
 #include <Bitmap.h>
 #include <Catalog.h>
@@ -42,7 +45,6 @@ All rights reserved.
 #include <MenuItem.h>
 #include <Roster.h>
 
-#include "DeskbarMenu.h"
 #include "BarApp.h"
 #include "BarView.h"
 #include "DeskbarUtils.h"
@@ -685,6 +687,4 @@ DeskbarMountMenu::AddDynamicItem(add_state s)
 	return false;
 }
 
-
 #endif
-

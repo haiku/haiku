@@ -35,9 +35,11 @@ All rights reserved.
 #ifndef _T_RESOURCE_SET_H
 #define _T_RESOURCE_SET_H
 
+
 #include <List.h>
 #include <Locker.h>
 #include <SupportDefs.h>
+
 
 class BBitmap;
 class BResources;
@@ -115,5 +117,5 @@ private:
 
 TResourceSet* AppResSet();
 
-#endif
 
+#endif	/* _T_RESOURCE_SET_H */

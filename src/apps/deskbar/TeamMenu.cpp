@@ -33,6 +33,9 @@ holders.
 All rights reserved.
 */
 
+
+#include "TeamMenu.h"
+
 #include <string.h>
 
 #include <Application.h>
@@ -43,7 +46,6 @@ All rights reserved.
 #include "BarMenuBar.h"
 #include "DeskbarUtils.h"
 #include "TeamMenuItem.h"
-#include "TeamMenu.h"
 
 
 TTeamMenu::TTeamMenu()
@@ -155,4 +157,3 @@ void
 TTeamMenu::DrawBackground(BRect)
 {
 }
-

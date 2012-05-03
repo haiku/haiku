@@ -32,13 +32,14 @@ brand product names are registered trademarks or trademarks of their respective
 holders.
 All rights reserved.
 */
+#ifndef WINDOWMENU_H
+#define WINDOWMENU_H
+
 
 // list of windows for a specific application
 // always submenu for a TeamMenuItem
 // all DB positions
 
-#ifndef WINDOWMENU_H
-#define WINDOWMENU_H
 
 #include <Menu.h>
 #include <String.h>
@@ -62,5 +63,5 @@ class TWindowMenu : public BMenu {
 		int				fExpandedIndex;
 };
 
-#endif /* WINDOWMENU_H */
 
+#endif	/* WINDOWMENU_H */

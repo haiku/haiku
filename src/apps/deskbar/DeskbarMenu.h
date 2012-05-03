@@ -32,7 +32,6 @@ brand product names are registered trademarks or trademarks of their respective
 holders.
 All rights reserved.
 */
-
 #ifndef _DESKBAR_MENU_H_
 #define _DESKBAR_MENU_H_
 

@@ -35,6 +35,7 @@ All rights reserved.
 #ifndef EXPANDO_MENU_BAR_H
 #define EXPANDO_MENU_BAR_H
 
+
 // application list
 // top level at window
 // in expanded mode horizontal and vertical
@@ -42,6 +43,7 @@ All rights reserved.
 
 #include <MenuBar.h>
 #include <Locker.h>
+
 
 class BBitmap;
 class TBarView;
@@ -117,5 +119,5 @@ class TExpandoMenuBar : public BMenuBar {
 		static BLocker		sMonLocker;
 };
 
-#endif /* EXPANDO_MENU_BAR_H */
 
+#endif /* EXPANDO_MENU_BAR_H */

@@ -34,12 +34,11 @@ All rights reserved.
 */
 
 
-#include "tracker_private.h"
-#include "BarApp.h"
 #include "Switcher.h"
-#include "ResourceSet.h"
-#include "WindowMenuItem.h"
-#include "icons.h"
+
+#include <string.h>
+#include <stdlib.h>
+#include <float.h>
 
 #include <Bitmap.h>
 #include <Debug.h>
@@ -51,10 +50,11 @@ All rights reserved.
 #include <Screen.h>
 #include <String.h>
 
-#include <string.h>
-#include <stdlib.h>
-#include <float.h>
-
+#include "BarApp.h"
+#include "ResourceSet.h"
+#include "WindowMenuItem.h"
+#include "icons.h"
+#include "tracker_private.h"
 
 #define _ALLOW_STICKY_ 0
 	// allows you to press 's' to keep the switcher window on screen
@@ -2394,4 +2394,3 @@ TWindowView::Pulse()
 	} else
 		free(windowInfo);
 }
-

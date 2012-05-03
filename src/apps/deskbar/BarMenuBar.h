@@ -32,13 +32,14 @@ brand product names are registered trademarks or trademarks of their respective
 holders.
 All rights reserved.
 */
+#ifndef BARMENUBAR_H
+#define BARMENUBAR_H
+
 
 // Be Menu, used in vertical mode, expanded and mini
 //   - in mini mode will have team menu next to Be menu
 //   - Be menu in horizontal mode is embedded in ExpandoMenuBar
 
-#ifndef BARMENUBAR_H
-#define BARMENUBAR_H
 
 #include <MenuBar.h>
 
@@ -71,5 +72,5 @@ class TBarMenuBar : public BMenuBar {
 		TBarMenuTitle* fAppListMenuItem;
 };
 
-#endif /* BARMENUBAR_H */
 
+#endif	/* BARMENUBAR_H */

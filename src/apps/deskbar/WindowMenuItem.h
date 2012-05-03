@@ -43,10 +43,8 @@ All rights reserved.
 
 class BBitmap;
 
-
-/*!	Individual windows of an application item for WindowMenu,
-	sub of TeamMenuItem all DB positions
-*/
+// Individual windows of an application item for WindowMenu,
+// sub of TeamMenuItem all DB positions
 class TWindowMenuItem : public BMenuItem {
 public:
 								TWindowMenuItem(const char* title, int32 id,
@@ -92,4 +90,3 @@ private:
 
 
 #endif	/* WINDOWMENUITEM_H */
-

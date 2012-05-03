@@ -33,7 +33,8 @@ holders.
 All rights reserved.
 */
 
-#include <Debug.h>
+
+#include "StatusView.h"
 
 #include <errno.h>
 #include <stdio.h>
@@ -50,6 +51,7 @@ All rights reserved.
 #include <Bitmap.h>
 #include <Catalog.h>
 #include <ControlLook.h>
+#include <Debug.h>
 #include <Directory.h>
 #include <FindDirectory.h>
 #include <Locale.h>
@@ -64,11 +66,10 @@ All rights reserved.
 #include <VolumeRoster.h>
 #include <Window.h>
 
-#include "icons_logo.h"
 #include "BarApp.h"
 #include "DeskbarUtils.h"
+#include "icons_logo.h"
 #include "ResourceSet.h"
-#include "StatusView.h"
 #include "StatusViewShelf.h"
 #include "TimeView.h"
 

@@ -33,9 +33,13 @@ holders.
 All rights reserved.
 */
 
+
+#include "WindowMenu.h"
+
 #include <malloc.h>
 #include <stdio.h>
 #include <string.h>
+
 #include <Catalog.h>
 #include <Locale.h>
 #include <Window.h>
@@ -46,10 +50,8 @@ All rights reserved.
 #include "ShowHideMenuItem.h"
 #include "TeamMenu.h"
 #include "TeamMenuItem.h"
-#include "WindowMenuItem.h"
-#include "WindowMenu.h"
-
 #include "tracker_private.h"
+#include "WindowMenuItem.h"
 
 
 const int32 kDesktopWindow = 1024;
@@ -257,4 +259,3 @@ TWindowMenu::SetExpanded(bool status, int lastIndex)
 	fExpanded = status;
 	fExpandedIndex = lastIndex;
 }
-

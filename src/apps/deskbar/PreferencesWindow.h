@@ -27,6 +27,7 @@ const uint32 kShowHideTime			= 'ShTm';
 const uint32 kShowSeconds			= 'SwSc';
 const uint32 kShowDayOfWeek			= 'SwDw';
 
+
 class BBox;
 class BButton;
 class BCheckBox;
@@ -77,4 +78,4 @@ private:
 };
 
 
-#endif	// _PREFERENCES_WINDOW_H
+#endif	/* _PREFERENCES_WINDOW_H */

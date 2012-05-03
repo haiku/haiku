@@ -48,6 +48,7 @@ All rights reserved.
 #include <Locale.h>
 #include <MenuItem.h>
 #include <MessageFilter.h>
+#include <MessagePrivate.h>
 #include <Screen.h>
 
 #include "BarApp.h"
@@ -57,8 +58,6 @@ All rights reserved.
 #include "PublicCommands.h"
 #include "StatusView.h"
 #include "tracker_private.h"
-
-#include <MessagePrivate.h>
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -611,4 +610,3 @@ TBarWindow::_IsFocusMessage(BMessage* message)
 
 	return true;
 }
-

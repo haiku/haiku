@@ -35,6 +35,7 @@ All rights reserved.
 #ifndef SWITCHER_H
 #define SWITCHER_H
 
+
 #include <Box.h>
 #include <List.h>
 #include <OS.h>
@@ -103,5 +104,5 @@ private:
 			int32			fWindowID;
 };
 
-#endif	/* SWITCHER_H */
 
+#endif	/* SWITCHER_H */

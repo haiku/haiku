@@ -13,13 +13,11 @@
 class BMessage;
 class BStringView;
 
-
 namespace BPrivate {
 	class BCalendarView;
 }
 
 using BPrivate::BCalendarView;
-
 
 class CalendarMenuWindow : public BWindow {
 public:
@@ -43,4 +41,4 @@ private:
 };
 
 
-#endif	// _CALENDAR_MENU_WINDOW_H_
+#endif	/* _CALENDAR_MENU_WINDOW_H_ */
