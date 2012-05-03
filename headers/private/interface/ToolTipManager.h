@@ -18,7 +18,7 @@ class BToolTipManager {
 public:
 	static	BToolTipManager*	Manager();
 
-			void				ShowTip(BToolTip* tip, BPoint point,
+			void				ShowTip(BToolTip* tip, BPoint where,
 									void* owner);
 			void				HideTip();
 

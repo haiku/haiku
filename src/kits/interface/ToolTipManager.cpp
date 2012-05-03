@@ -46,6 +46,8 @@ public:
 
 			void				HideTip();
 			void				ShowTip();
+
+			void				ResetWindowFrame();
 			void				ResetWindowFrame(BPoint where);
 
 			BToolTip*			Tip() const { return fToolTip; }
@@ -105,10 +107,7 @@ ToolTipView::DetachedFromWindow()
 void
 ToolTipView::FrameResized(float width, float height)
 {
-	BPoint where;
-	GetMouse(&where, NULL, false);
-
-	ResetWindowFrame(ConvertToScreen(where));
+	ResetWindowFrame();
 }
 
 
@@ -153,6 +152,16 @@ void
 ToolTipView::ShowTip()
 {
 	fHidden = false;
+}
+
+
+void
+ToolTipView::ResetWindowFrame()
+{
+	BPoint where;
+	GetMouse(&where, NULL, false);
+
+	ResetWindowFrame(ConvertToScreen(where));
 }
 
 
@@ -366,7 +375,7 @@ BToolTipManager::Manager()
 
 
 void
-BToolTipManager::ShowTip(BToolTip* tip, BPoint point, void* owner)
+BToolTipManager::ShowTip(BToolTip* tip, BPoint where, void* owner)
 {
 	BToolTip* current = NULL;
 	void* currentOwner = NULL;
@@ -388,7 +397,7 @@ BToolTipManager::ShowTip(BToolTip* tip, BPoint point, void* owner)
 	fWindow.SendMessage(kMsgHideToolTip);
 
 	if (tip != NULL) {
-		BWindow* window = new BPrivate::ToolTipWindow(tip, point, owner);
+		BWindow* window = new BPrivate::ToolTipWindow(tip, where, owner);
 		window->Show();
 
 		fWindow = BMessenger(window);
