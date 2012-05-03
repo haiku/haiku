@@ -77,11 +77,11 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 		B_TRANSLATE_COMMENT("Same as" B_UTF8_ELLIPSIS,
 			"The same TYPE as ..."), new BMessage(kMsgSameTypeAs));
 
-	BLayoutBuilder::Grid<>(fileTypeBox, padding, padding)
+	BLayoutBuilder::Grid<>(fileTypeBox)
 		.SetInsets(padding, padding * 2, padding, padding)
-		.Add(fTypeControl, 0, 0, 2, 1)
-		.Add(fSelectTypeButton, 0, 1)
-		.Add(fSameTypeAsButton, 1, 1);
+		.Add(fTypeControl, 0, 0, 3, 1)
+		.Add(fSelectTypeButton, 1, 1)
+		.Add(fSameTypeAsButton, 2, 1);
 
 	// "Icon" group
 
@@ -116,17 +116,15 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 
 	BLayoutBuilder::Grid<>(preferredBox, padding, padding)
 		.SetInsets(padding, padding * 2, padding, padding)
-		.Add(fPreferredField, 0, 0, 2, 1)
-		.Add(fSelectAppButton, 0, 1)
-		.Add(fSameAppAsButton, 1, 1);
+		.Add(fPreferredField, 0, 0, 3, 1)
+		.Add(fSelectAppButton, 1, 1)
+		.Add(fSameAppAsButton, 2, 1);
 
-	BLayoutBuilder::Group<>(this, B_HORIZONTAL, padding)
+	BLayoutBuilder::Grid<>(this)
 		.SetInsets(padding)
-		.AddGroup(B_VERTICAL, padding)
-			.Add(fileTypeBox)
-			.Add(preferredBox)
-			.End()
-		.Add(iconBox);
+		.Add(fileTypeBox, 0, 0, 2, 1)
+		.Add(iconBox, 0, 1, 1, 1)
+		.Add(preferredBox, 1, 1, 1, 1);
 
 	fTypeControl->MakeFocus(true);
 	BMimeType::StartWatching(this);

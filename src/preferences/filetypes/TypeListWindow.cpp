@@ -56,6 +56,7 @@ TypeListWindow::TypeListWindow(const char* currentType, uint32 what,
 		.SetInsets(padding)
 		.Add(scrollView)
 		.AddGroup(B_HORIZONTAL, padding)
+			.AddGlue()
 			.Add(button)
 			.Add(fSelectButton);
 
