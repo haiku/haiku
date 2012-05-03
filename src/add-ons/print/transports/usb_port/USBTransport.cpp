@@ -112,29 +112,37 @@ USBPrinterRoster::DeviceAdded(BUSBDevice *dev)
 
 	// Try to find a working printer interface in this device
 	if (config) {
-		for (uint32 idx = 0; printer == NULL && idx < config->CountInterfaces(); idx++) {
+		for (uint32 idx = 0; printer == NULL
+			&& idx < config->CountInterfaces(); idx++) {
 			const BUSBInterface *interface = config->InterfaceAt(idx);
-			if (interface->Class() == PRINTER_INTERFACE_CLASS
-				&& interface->Subclass() == PRINTER_INTERFACE_SUBCLASS
-				&& (interface->Protocol() == PIT_UNIDIRECTIONAL
-				|| interface->Protocol() == PIT_BIDIRECTIONAL
-				||  interface->Protocol() == PIT_1284_4_COMPATIBLE)) {
-				// Found a usable Printer interface!
-				for (uint32 endpointIdx = 0; endpointIdx < interface->CountEndpoints(); endpointIdx++) {
-					const BUSBEndpoint *endpoint = interface->EndpointAt(endpointIdx);
-					if (!endpoint->IsBulk())
-						continue;
+			for (uint32 alt = 0; alt < interface->CountAlternates(); alt++) {
+				const BUSBInterface *alternate = interface->AlternateAt(alt);
+				if (alternate->Class() == PRINTER_INTERFACE_CLASS
+					&& alternate->Subclass() == PRINTER_INTERFACE_SUBCLASS
+					&& (alternate->Protocol() == PIT_UNIDIRECTIONAL
+					|| alternate->Protocol() == PIT_BIDIRECTIONAL
+					||  alternate->Protocol() == PIT_1284_4_COMPATIBLE)) {
+					// Found a usable Printer interface!
+					for (uint32 endpointIdx = 0;
+						endpointIdx < alternate->CountEndpoints();
+						endpointIdx++) {
+						const BUSBEndpoint *endpoint =
+							alternate->EndpointAt(endpointIdx);
+						if (!endpoint->IsBulk())
+							continue;
 
-					if (endpoint->IsInput())
-						in = endpoint;
-					else if (endpoint->IsOutput())
-						out = endpoint;
+						if (endpoint->IsInput())
+							in = endpoint;
+						else if (endpoint->IsOutput())
+							out = endpoint;
 
-					if (!in || !out)
-						continue;
+						if (!in || !out)
+							continue;
 
-					printer = interface;
-					break;
+						printer = alternate;
+						((BUSBInterface*)interface)->SetAlternate(alt);
+						break;
+					}
 				}
 			}
 		}
@@ -168,7 +176,7 @@ USBPrinterRoster::DeviceAdded(BUSBDevice *dev)
 }
 
 
-void 
+void
 USBPrinterRoster::DeviceRemoved(BUSBDevice *dev)
 {
 	PrinterMap::Iterator iterator = fPrinters.GetIterator();
@@ -184,7 +192,7 @@ USBPrinterRoster::DeviceRemoved(BUSBDevice *dev)
 }
 
 
-status_t 
+status_t
 USBPrinterRoster::ListPrinters(BMessage *msg)
 {
 	PrinterMap::Iterator iterator = fPrinters.GetIterator();
@@ -206,7 +214,7 @@ USBPrinter::USBPrinter(const BString& id, const BString& name,
 
 
 //TODO: see usb_printer.cpp for error handling during read/write!
-ssize_t 
+ssize_t
 USBPrinter::Write(const void *buf, size_t size)
 {
 	if (!buf || size <= 0)
@@ -229,20 +237,20 @@ USBPrinter::Read(void *buf, size_t size)
 
 // Implementation of transport add-on interface
 
-BDataIO * 
-instantiate_transport(BDirectory *printer, BMessage *msg) 
+BDataIO *
+instantiate_transport(BDirectory *printer, BMessage *msg)
 {
 	USBTransport *transport = new(std::nothrow) USBTransport(printer, msg);
 	if (transport != NULL && transport->InitCheck() == B_OK)
 		return transport;
-	
-	delete transport; 
+
+	delete transport;
 	return NULL;
 }
 
 
 // List detected printers
-status_t 
+status_t
 list_transport_ports(BMessage *msg)
 {
 	USBPrinterRoster roster;
@@ -253,7 +261,7 @@ list_transport_ports(BMessage *msg)
 
 
 // Implementation of USBTransport
-USBTransport::USBTransport(BDirectory *printer, BMessage *msg) 
+USBTransport::USBTransport(BDirectory *printer, BMessage *msg)
 	: fPrinter(NULL)
 {
 	BString key;
