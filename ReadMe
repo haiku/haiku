@@ -60,6 +60,10 @@ The following tools are needed to compile Haiku for the ARM platform
  * Mtools (http://www.gnu.org/software/mtools/intro.html)
  * sfdisk
 
+Specific: Linux
+---------------
+ * zlib1g-dev (for building GCC4 buildtools on Linux hosts)
+
 Specific: Mac OS X
 ------------------
 
