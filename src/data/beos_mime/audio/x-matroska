@@ -5,7 +5,7 @@ resource(1, "META:TYPE") "audio/x-matroska";
 
 resource(2, "META:SNIFF_RULE") "0.50 (0x1A45DFA3)";
 
-resource(3, "META:S:DESC") #'MSDC' "Matroska Audio";
+resource(3, "META:S:DESC") #'MSDC' "Matroska audio file";
 
 resource(4, "META:EXTENS") message(234) {
 	"extensions" = "mka",

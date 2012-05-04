@@ -7,9 +7,9 @@ resource(2, "META:SNIFF_RULE") "0.80 (\"[InternetShortcut]\")";
 
 resource(3, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-urlwrapper";
 
-resource(4, "META:S:DESC") #'MSDC' "Internet Shortcut";
+resource(4, "META:S:DESC") #'MSDC' "Internet shortcut";
 
-resource(5, "META:L:DESC") #'MLDC' "Microsoft Internet Explorer Shortcut";
+resource(5, "META:L:DESC") #'MLDC' "Microsoft Internet Explorer shortcut";
 
 resource(6, "META:EXTENS") message(234) {
 	"extensions" = "url",

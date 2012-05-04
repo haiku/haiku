@@ -3,9 +3,9 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "video/x-rmvb";
 
-resource(2, "META:S:DESC") #'MSDC' "RealMedia Movie";
+resource(2, "META:S:DESC") #'MSDC' "RealMedia video file";
 
-resource(3, "META:L:DESC") #'MLDC' "RealMedia Variable Bitrate movie";
+resource(3, "META:L:DESC") #'MLDC' "RealMedia Variable Bitrate video file";
 
 resource(4, "META:EXTENS") message(234) {
 	"extensions" = "rmvb",

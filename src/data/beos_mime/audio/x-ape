@@ -3,9 +3,9 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "audio/x-ape";
 
-resource(2, "META:S:DESC") #'MSDC' "APE (Monkey's Audio) Sound File";
+resource(2, "META:S:DESC") #'MSDC' "APE audio file";
 
-resource(3, "META:L:DESC") #'MLDC' "Lossless Compressed APE (Monkey's Audio) Sound File";
+resource(3, "META:L:DESC") #'MLDC' "Losslessly compressed APE (Monkey's Audio) audio file";
 
 resource(4, "META:EXTENS") message(234) {
 	"extensions" = "ape",

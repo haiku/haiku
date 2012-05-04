@@ -5,7 +5,8 @@ resource(1, "META:TYPE") "application/x-scode-UPkg";
 
 resource(2, "META:SNIFF_RULE") "0.40 (\"AlB\\032\")";
 
-resource(3, "META:S:DESC") #'MSDC' "Software Package";
+resource(3, "META:S:DESC") #'MSDC' "Software package";
+
 resource(4, "META:L:DESC") #'MLDC' "Binary package for the PackageInstaller";
 
 resource(5, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-PackageInstaller";

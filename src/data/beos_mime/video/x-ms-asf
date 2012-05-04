@@ -5,10 +5,11 @@ resource(1, "META:TYPE") "video/x-ms-asf";
 
 resource(2, "META:SNIFF_RULE") "0.50 (\"\\060\\046\\262\\165\")";
 
-resource(3, "META:S:DESC") #'MSDC' "Microsoft ASF Movie";
+resource(3, "META:S:DESC") #'MSDC' "ASF video file";
 
-resource(4, "META:EXTENS") message(234) {
+resource(4, "META:L:DESC") #'MLDC' "Microsoft® ASF video file";
+
+resource(5, "META:EXTENS") message(234) {
 	"extensions" = "asf",
 	"type" = "video/x-ms-asf"
 };
-

@@ -3,12 +3,14 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "audio/x-flac";
 
-resource(2, "META:S:DESC") #'MSDC' "FLAC Sound File";
+resource(2, "META:S:DESC") #'MSDC' "FLAC audio file";
 
-resource(3, "META:EXTENS") message(234) {
+resource(4, "META:L:DESC") #'MLDC' "Losslessly compressed FLAC audio file";
+
+resource(5, "META:EXTENS") message(234) {
 	"extensions" = "fla",
 	"extensions" = "flac",
 	"type" = "audio/x-flac"
 };
 
-resource(5, "META:SNIFF_RULE") "0.50 (\"fLaC\")";
+resource(6, "META:SNIFF_RULE") "0.50 (\"fLaC\")";

@@ -3,9 +3,9 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "application/x-bfs-image";
 
-resource(2, "META:S:DESC") #'MSDC' "BFS Image";
+resource(2, "META:S:DESC") #'MSDC' "BFS image";
 
-resource(3, "META:L:DESC") #'MLDC' "Be File System Image";
+resource(3, "META:L:DESC") #'MLDC' "Be File System image";
 
 resource(4, "META:SNIFF_RULE") "0.60 [544](\"1SFBEGIB\"|\"1SFBBIGE\")";
 

@@ -3,9 +3,9 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "text/csv";
 
-resource(2, "META:S:DESC") #'MSDC' "CSV Text File";
+resource(2, "META:S:DESC") #'MSDC' "CSV text file";
 
-resource(3, "META:L:DESC") #'MLDC' "Comma-Separated Values Text File";
+resource(3, "META:L:DESC") #'MLDC' "Comma-Separated Values text file";
 
 resource(4, "META:EXTENS") message(234) {
 	"extensions" = "csv",

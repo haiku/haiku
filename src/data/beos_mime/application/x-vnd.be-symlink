@@ -3,7 +3,7 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "application/x-vnd.Be-symlink";
 
-resource(2, "META:S:DESC") #'MSDC' "Symbolic Link";
+resource(2, "META:S:DESC") #'MSDC' "Symbolic link";
 
 resource(3, "META:L:DESC") #'MLDC' "Link to another item in the file system";
 

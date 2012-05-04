@@ -3,6 +3,8 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "application/x-bzip2";
 
+resource(2, "META:S:DESC") #'MSDC' "BZip2 archive";
+
 resource(3, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-Expander";
 
 resource(4, "META:EXTENS") message(234) {

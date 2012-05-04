@@ -3,7 +3,7 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "text/x-partial-email";
 
-resource(2, "META:S:DESC") #'MSDC' "Partial Downloaded E-mail";
+resource(2, "META:S:DESC") #'MSDC' "Partially downloaded E-mail";
 
 resource(3, "META:EXTENS") message(234) {
 	"type" = "text/x-partial-email"

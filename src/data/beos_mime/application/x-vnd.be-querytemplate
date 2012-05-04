@@ -3,7 +3,7 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "application/x-vnd.Be-querytemplate";
 
-resource(2, "META:S:DESC") #'MSDC' "Query Template";
+resource(2, "META:S:DESC") #'MSDC' "Query template";
 
 resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.Be-TRAK";
 

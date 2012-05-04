@@ -5,7 +5,7 @@ resource(1, "META:TYPE") "application/x-font-ttf";
 
 resource(2, "META:SNIFF_RULE") "0.50 (0x00010000|0x74727565|0x74746366)";
 
-resource(4, "META:S:DESC") #'MSDC' "TrueType Font";
+resource(4, "META:S:DESC") #'MSDC' "TrueType font";
 
 resource(5, "META:EXTENS") message(234) {
 	"extensions" = "ttf",

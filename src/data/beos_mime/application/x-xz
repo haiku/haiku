@@ -3,11 +3,13 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "application/x-xz";
 
-resource(2, "META:SNIFF_RULE") "0.60 (0xfd377a585a00)";
+resource(2, "META:S:DESC") #'MSDC' "XZ archive";
 
-resource(3, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-Expander";
+resource(3, "META:SNIFF_RULE") "0.60 (0xfd377a585a00)";
 
-resource(4, "META:EXTENS") message(234) {
+resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-Expander";
+
+resource(5, "META:EXTENS") message(234) {
 	"extensions" = "xz",
 	"type" = "application/x-xz"
 };

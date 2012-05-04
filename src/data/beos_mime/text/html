@@ -8,7 +8,7 @@ resource(2, "META:SNIFF_RULE") #'CSTR' array {
 	"<BODY\" | \"<TABLE\" | \"<!--\" | \"<META\" | \"<CENTER\")"
 };
 
-resource(3, "META:S:DESC") #'MSDC' "HTML File";
+resource(3, "META:S:DESC") #'MSDC' "HTML file";
 
 resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-WebPositive";
 

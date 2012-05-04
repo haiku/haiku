@@ -5,7 +5,7 @@ resource(1, "META:TYPE") "video/mp2t";
 
 resource(2, "META:SNIFF_RULE") "0.30 (0x47)";
 
-resource(3, "META:S:DESC") #'MSDC' "MPEG-2 Transport Stream";
+resource(3, "META:S:DESC") #'MSDC' "MPEG-2 transport stream";
 
 resource(4, "META:EXTENS") message(234) {
 	"extensions" = "ts",

@@ -5,5 +5,4 @@ resource(1, "META:TYPE") "video/mpeg";
 
 resource(2, "META:SNIFF_RULE") "0.50 (\"\\000\\000\\001\\272\" | \"\\000\\000\\001\\263\")";
 
-resource(3, "META:S:DESC") #'MSDC' "MPEG Movie";
-
+resource(3, "META:S:DESC") #'MSDC' "MPEG video file";
