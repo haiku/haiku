@@ -4817,9 +4817,6 @@ BView::DoLayout()
 void
 BView::SetToolTip(const char* text)
 {
-	if (text == NULL || text[0] == '\0')
-		return;
-
 	if (BTextToolTip* tip = dynamic_cast<BTextToolTip*>(fToolTip))
 		tip->SetText(text);
 	else
@@ -4853,6 +4850,13 @@ BView::ShowToolTip(BToolTip* tip)
 {
 	if (tip == NULL)
 		return;
+
+	if (BTextToolTip* textTip = dynamic_cast<BTextToolTip*>(tip)) {
+		const char* text = textTip->Text();
+		// if text is NULL or blank don't show the tooltip
+		if (text == NULL || text[0] == '\0')
+			return;
+	}
 
 	BPoint where;
 	GetMouse(&where, NULL, false);

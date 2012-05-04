@@ -400,24 +400,26 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 			case B_INSIDE_VIEW:
 			{
 				TTeamMenuItem* item = TeamItemAtPoint(where);
-				if (item == NULL) {
-					// item is NULL, break out
-					fLastMousedOverItem = NULL;
-					break;
-				}
-
-				if (item->HasLabel()) {
-					// item has a visible label, set the item and break out
-					fLastMousedOverItem = item;
-					break;
-				}
-
 				if (item == fLastMousedOverItem) {
 					// already set the tooltip for this item, break out
 					break;
 				}
 
-				// new item, update the tooltip with the item name
+				if (item == NULL) {
+					// item is NULL, remove the tooltip and break out
+					fLastMousedOverItem = NULL;
+					SetToolTip((const char*)NULL);
+					break;
+				}
+
+				if (item->HasLabel()) {
+					// item has a visible label, remove the tooltip and break out
+					fLastMousedOverItem = item;
+					SetToolTip((const char*)NULL);
+					break;
+				}
+
+				// new item, set the tooltip to the item name
 				SetToolTip(item->Name());
 
 				// save the current item for the next MouseMoved() call
@@ -425,11 +427,6 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 
 				break;
 			}
-
-			case B_OUTSIDE_VIEW:
-			case B_EXITED_VIEW:
-				fLastMousedOverItem = NULL;
-				break;
 		}
 
 		BMenuBar::MouseMoved(where, code, message);
