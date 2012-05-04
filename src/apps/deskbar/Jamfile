@@ -4,7 +4,7 @@ UsePrivateHeaders app interface locale shared tracker ;
 UsePrivateHeaders private shared ;
 SubDirHdrs $(HAIKU_TOP) src kits tracker ;
 
-AddResources Deskbar : Deskbar.rdef icon-freelogo.rdef icons.rdef ;
+AddResources Deskbar : Deskbar.rdef icons.rdef ;
 
 SubDirC++Flags -DDB_ADDONS
 	-D_INCLUDES_CLASS_DEVICE_MAP=1

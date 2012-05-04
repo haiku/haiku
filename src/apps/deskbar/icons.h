@@ -1,4 +1,5 @@
 enum {
+	R_LeafLogoBitmap = 14,
 	R_LargeNewGroupIcon = 16,
 	R_SmallNewGroupIcon = 17,
 	R_TeamIcon = 18,

@@ -66,12 +66,14 @@ All rights reserved.
 #include <VolumeRoster.h>
 #include <Window.h>
 
+#include "icons.h"
+
 #include "BarApp.h"
 #include "DeskbarUtils.h"
-#include "icons_logo.h"
 #include "ResourceSet.h"
 #include "StatusViewShelf.h"
 #include "TimeView.h"
+
 
 using std::max;
 

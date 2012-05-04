@@ -46,14 +46,14 @@ All rights reserved.
 #include <Roster.h>
 #include <Screen.h>
 
+#include "icons.h"
+
 #include "BarApp.h"
 #include "BarMenuTitle.h"
 #include "BarView.h"
 #include "BarWindow.h"
 #include "DeskbarMenu.h"
 #include "DeskbarUtils.h"
-#include "icons.h"
-#include "icons_logo.h"
 #include "ResourceSet.h"
 #include "ShowHideMenuItem.h"
 #include "StatusView.h"
@@ -143,8 +143,9 @@ TExpandoMenuBar::AttachedToWindow()
 			R_LeafLogoBitmap);
 		if (logoBitmap != NULL)
 			fDeskbarMenuWidth = logoBitmap->Bounds().Width() + 16;
-		fDeskbarMenuItem = new TBarMenuTitle(fDeskbarMenuWidth, Frame().Height(),
-			logoBitmap, beMenu, true);
+
+		fDeskbarMenuItem = new TBarMenuTitle(fDeskbarMenuWidth,
+			Frame().Height(), logoBitmap, beMenu, true);
 		AddItem(fDeskbarMenuItem);
 
 		fSeparatorItem = new TTeamMenuItem(kSepItemWidth, itemHeight, fVertical);
