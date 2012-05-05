@@ -89,7 +89,6 @@ class TBarView : public BView {
 		virtual void MouseDown(BPoint where);
 
 		void SaveSettings();
-		void UpdateEventMask();
 		void UpdatePlacement();
 		void ChangeState(int32 state, bool vertical, bool left, bool top);
 		void RaiseDeskbar(bool raise);

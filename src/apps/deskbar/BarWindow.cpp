@@ -90,7 +90,8 @@ TBarWindow::TBarWindow()
 		B_WILL_ACCEPT_FIRST_CLICK | B_NOT_ZOOMABLE | B_NOT_CLOSABLE
 		| B_NOT_MINIMIZABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE
 		| B_AVOID_FRONT | B_ASYNCHRONOUS_CONTROLS,
-		B_ALL_WORKSPACES)
+		B_ALL_WORKSPACES),
+	fShowingMenu(false)
 {
 	desk_settings* settings = ((TBarApp*)be_app)->Settings();
 	if (settings->alwaysOnTop)
@@ -139,13 +140,7 @@ TBarWindow::MenusBeginning()
 	sDeskbarMenu->NeedsToRebuild();
 	sDeskbarMenu->ResetTargets();
 
-	fBarView->SetEventMask(0);
-		// This works around a BeOS bug - the menu is quit with every
-		// B_MOUSE_DOWN the window receives.
-		//
-		// Is this bug still here? I commented this line out and didn't
-		// notice anything different
-
+	fShowingMenu = true;
 	BWindow::MenusBeginning();
 }
 
@@ -153,6 +148,7 @@ TBarWindow::MenusBeginning()
 void
 TBarWindow::MenusEnded()
 {
+	fShowingMenu = false;
 	BWindow::MenusEnded();
 
 	if (sDeskbarMenu->LockLooper()) {
@@ -160,8 +156,6 @@ TBarWindow::MenusEnded()
 		sDeskbarMenu->RemoveItems(0, sDeskbarMenu->CountItems(), true);
 		sDeskbarMenu->UnlockLooper();
 	}
-
-	fBarView->UpdateEventMask();
 }
 
 
@@ -520,7 +514,7 @@ TBarWindow::CountItems(BMessage* message)
 void
 TBarWindow::AddItem(BMessage* message)
 {
-	DeskbarShelf shelf = B_DESKBAR_TRAY; 
+	DeskbarShelf shelf = B_DESKBAR_TRAY;
 	entry_ref ref;
 	int32 id = 999;
 	BMessage reply;
@@ -593,6 +587,13 @@ TBarWindow::GetIconFrame(BMessage* message)
 	BMessage reply('rply');
 	reply.AddRect("frame", frame);
 	message->SendReply(&reply);
+}
+
+
+bool
+TBarWindow::IsShowingMenu() const
+{
+	return fShowingMenu;
 }
 
 

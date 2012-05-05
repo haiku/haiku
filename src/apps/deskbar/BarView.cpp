@@ -70,6 +70,65 @@ const int32 kDefaultRecentAppCount = 10;
 const int32 kMenuTrackMargin = 20;
 
 
+class BarViewMessageFilter : public BMessageFilter
+{
+	public:
+		BarViewMessageFilter(TBarView* barView);
+		virtual ~BarViewMessageFilter();
+
+		virtual filter_result Filter(BMessage* message, BHandler** target);
+
+	private:
+		TBarView* fBarView;
+};
+
+
+BarViewMessageFilter::BarViewMessageFilter(TBarView* barView)
+	:
+	BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
+	fBarView(barView)
+{
+}
+
+
+BarViewMessageFilter::~BarViewMessageFilter()
+{
+}
+
+
+filter_result
+BarViewMessageFilter::Filter(BMessage* message, BHandler** target)
+{
+	if (message->what == B_MOUSE_DOWN || message->what == B_MOUSE_MOVED) {
+		BPoint where = message->FindPoint("be:view_where");
+		uint32 transit = message->FindInt32("be:transit");
+		BMessage *dragMessage = NULL;
+		if (message->HasMessage("be:drag_message")) {
+			dragMessage = new BMessage();
+			message->FindMessage("be:drag_message", dragMessage);
+		}
+		switch (message->what)
+		{
+			case B_MOUSE_DOWN:
+			{
+				fBarView->MouseDown(where);
+			}
+			break;
+
+			case B_MOUSE_MOVED:
+			{
+				fBarView->MouseMoved(where, transit, dragMessage);
+			}
+			break;
+		}
+
+		delete dragMessage;
+	}
+
+	return B_DISPATCH_MESSAGE;
+}
+
+
 TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
 		uint32 state, float)
 	: BView(frame, "BarView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
@@ -112,7 +171,8 @@ TBarView::AttachedToWindow()
 	SetViewColor(ui_color(B_MENU_BACKGROUND_COLOR));
 	SetFont(be_plain_font);
 
-	UpdateEventMask();
+	Window()->AddCommonFilter(new BarViewMessageFilter(this));
+
 	UpdatePlacement();
 
 	fTrackingHookData.fTrackingHook = MenuTrackingHook;
@@ -185,9 +245,6 @@ TBarView::MessageReceived(BMessage* message)
 void
 TBarView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 {
-	if (Window() == NULL || EventMask() == 0)
-		return;
-
 	desk_settings* settings = ((TBarApp*)be_app)->Settings();
 	bool alwaysOnTop = settings->alwaysOnTop;
 	bool autoRaise = settings->autoRaise;
@@ -209,12 +266,18 @@ TBarView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 		&& Window()->Frame().Contains(where)) {
 		// cursor is on a screen edge within the window frame
 
-		if (!alwaysOnTop && autoRaise && !isTopMost)
+		if (!alwaysOnTop && autoRaise && !isTopMost) {
 			RaiseDeskbar(true);
+			SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
+		}
 
 		if (autoHide && IsHidden())
 			HideDeskbar(false);
 	} else {
+		TBarWindow* window = (TBarWindow*)Window();
+		if (window->IsShowingMenu())
+			return;
+
 		// cursor is not on screen edge
 		BRect preventHideArea = Window()->Frame().InsetByCopy(
 			-kMaxPreventHidingDist, -kMaxPreventHidingDist);
@@ -223,8 +286,10 @@ TBarView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 			return;
 
 		// cursor to bar distance above threshold
-		if (!alwaysOnTop && autoRaise && isTopMost)
+		if (!alwaysOnTop && autoRaise && isTopMost) {
 			RaiseDeskbar(false);
+			SetEventMask(0);
+		}
 
 		if (autoHide && !IsHidden())
 			HideDeskbar(true);
@@ -509,21 +574,6 @@ TBarView::SaveSettings()
 	settings->width = 0;
 
 	fReplicantTray->SaveTimeSettings();
-}
-
-
-void
-TBarView::UpdateEventMask()
-{
-	SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
-
-#if 0
-	desk_settings* settings = ((TBarApp*)be_app)->Settings();
-	if (settings->autoRaise || settings->autoHide)
-		SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
-	else
-		SetEventMask(0);
-#endif
 }
 
 

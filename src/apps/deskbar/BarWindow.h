@@ -83,12 +83,15 @@ public:
 
 			void				GetIconFrame(BMessage* message);
 
+			bool				IsShowingMenu() const;
+
 private:
 			bool				_IsFocusMessage(BMessage* message);
 
 private:
 	static	TDeskbarMenu*		sDeskbarMenu;
 			TBarView*			fBarView;
+			bool				fShowingMenu;
 };
 
 

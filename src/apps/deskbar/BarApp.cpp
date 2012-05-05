@@ -509,7 +509,6 @@ TBarApp::MessageReceived(BMessage* message)
 			fSettings.autoHide = !fSettings.autoHide;
 
 			fBarWindow->Lock();
-			fBarView->UpdateEventMask();
 			fBarView->HideDeskbar(fSettings.autoHide);
 			fBarWindow->Unlock();
 			break;
