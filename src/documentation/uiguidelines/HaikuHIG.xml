@@ -399,7 +399,7 @@ There are other possible ways, but these should be enough for you to get the ide
 <sect1>
 <title>Replicants</title>
 
-<para>Replicants take their cue from Dolly the sheep in allowing a BView to be closned and allow you to do Really Neat Things(TM). As cool as replicant technology is, it is only an emerging technology in other operating systems and is unfamiliar to most users in general. As such, it is best left as an extra feature and not the primary mode of operation for a program. Here are some guidelines for using them, however.
+<para>Replicants take their cue from Dolly the sheep in allowing a BView to be cloned and allow you to do Really Neat Things(TM). As cool as replicant technology is, it is only an emerging technology in other operating systems and is unfamiliar to most users in general. As such, it is best left as an extra feature and not the primary mode of operation for a program. Here are some guidelines for using them, however.
 
 <orderedlist>
 <listitem>It is appropriate for program to be a replicant if it is a lightweight program which provides information or a feature which the user will want to be able to access frequently.</listitem>
