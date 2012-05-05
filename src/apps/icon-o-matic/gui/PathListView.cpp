@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2012, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -47,28 +47,29 @@ static const float kMarkWidth		= 14.0;
 static const float kBorderOffset	= 3.0;
 static const float kTextOffset		= 4.0;
 
-class PathListItem : public SimpleItem,
-					 public Observer {
- public:
-					PathListItem(VectorPath* p,
-								 PathListView* listView,
-								 bool markEnabled)
-						: SimpleItem(""),
-						  path(NULL),
-						  fListView(listView),
-						  fMarkEnabled(markEnabled),
-						  fMarked(false)
-					{
-						SetPath(p);
-					}
 
-	virtual			~PathListItem()
-					{
-						SetPath(NULL);
-					}
+class PathListItem : public SimpleItem, public Observer {
+public:
+	PathListItem(VectorPath* p, PathListView* listView, bool markEnabled)
+		:
+		SimpleItem(""),
+		path(NULL),
+		fListView(listView),
+		fMarkEnabled(markEnabled),
+		fMarked(false)
+	{
+		SetPath(p);
+	}
+
+
+	virtual ~PathListItem()
+	{
+		SetPath(NULL);
+	}
+
 
 	// SimpleItem interface
-	virtual	void	Draw(BView* owner, BRect itemFrame, uint32 flags)
+	virtual	void Draw(BView* owner, BRect itemFrame, uint32 flags)
 	{
 		SimpleItem::DrawBackground(owner, itemFrame, flags);
 
@@ -78,18 +79,13 @@ class PathListItem : public SimpleItem,
 		owner->GetFontHeight(&fh);
 		BString truncatedString(Text());
 		owner->TruncateString(&truncatedString, B_TRUNCATE_MIDDLE,
-							  itemFrame.Width()
-							  - kBorderOffset
-							  - kMarkWidth
-							  - kTextOffset
-							  - kBorderOffset);
+			itemFrame.Width() - kBorderOffset - kMarkWidth - kTextOffset
+				- kBorderOffset);
 		float height = itemFrame.Height();
 		float textHeight = fh.ascent + fh.descent;
 		BPoint pos;
-		pos.x = itemFrame.left
-					+ kBorderOffset + kMarkWidth + kTextOffset;
-		pos.y = itemFrame.top
-					 + ceilf((height - textHeight) / 2.0 + fh.ascent);
+		pos.x = itemFrame.left + kBorderOffset + kMarkWidth + kTextOffset;
+		pos.y = itemFrame.top + ceilf((height - textHeight) / 2.0 + fh.ascent);
 		owner->DrawString(truncatedString.String(), pos);
 
 		if (!fMarkEnabled)
@@ -109,7 +105,7 @@ class PathListItem : public SimpleItem,
 		if (fMarked) {
 			markRect.InsetBy(2, 2);
 			owner->SetHighColor(tint_color(owner->LowColor(),
-								B_DARKEN_4_TINT));
+				B_DARKEN_4_TINT));
 			owner->SetPenSize(2);
 			owner->StrokeLine(markRect.LeftTop(), markRect.RightBottom());
 			owner->StrokeLine(markRect.LeftBottom(), markRect.RightTop());
@@ -117,64 +113,73 @@ class PathListItem : public SimpleItem,
 		}
 	}
 
+
 	// Observer interface
-	virtual	void	ObjectChanged(const Observable* object)
-					{
-						UpdateText();
-					}
+	virtual	void ObjectChanged(const Observable* object)
+	{
+		UpdateText();
+	}
+
 
 	// PathListItem
-			void	SetPath(VectorPath* p)
-					{
-						if (p == path)
-							return;
+	void SetPath(VectorPath* p)
+	{
+		if (p == path)
+			return;
 
-						if (path) {
-							path->RemoveObserver(this);
-							path->Release();
-						}
+		if (path) {
+			path->RemoveObserver(this);
+			path->Release();
+		}
 
-						path = p;
+		path = p;
 
-						if (path) {
-							path->Acquire();
-							path->AddObserver(this);
-							UpdateText();
-						}
-					}
-			void	UpdateText()
-					{
-						SetText(path->Name());
-						Invalidate();
-					}
+		if (path) {
+			path->Acquire();
+			path->AddObserver(this);
+			UpdateText();
+		}
+	}
 
-			void	SetMarkEnabled(bool enabled)
-					{
-						if (fMarkEnabled == enabled)
-							return;
-						fMarkEnabled = enabled;
-						Invalidate();
-					}
-			void	SetMarked(bool marked)
-					{
-						if (fMarked == marked)
-							return;
-						fMarked = marked;
-						Invalidate();
-					}
 
-			void Invalidate()
-					{
-						// :-/
-						if (fListView->LockLooper()) {
-							fListView->InvalidateItem(
-								fListView->IndexOf(this));
-							fListView->UnlockLooper();
-						}
-					}
+	void UpdateText()
+	{
+		SetText(path->Name());
+		Invalidate();
+	}
 
+
+	void SetMarkEnabled(bool enabled)
+	{
+		if (fMarkEnabled == enabled)
+			return;
+		fMarkEnabled = enabled;
+		Invalidate();
+	}
+
+
+	void SetMarked(bool marked)
+	{
+		if (fMarked == marked)
+			return;
+		fMarked = marked;
+		Invalidate();
+	}
+
+
+	void Invalidate()
+	{
+		if (fListView->LockLooper()) {
+			fListView->InvalidateItem(
+				fListView->IndexOf(this));
+			fListView->UnlockLooper();
+		}
+	}
+
+public:
 	VectorPath* 	path;
- private:
+
+private:
 	PathListView*	fListView;
 	bool			fMarkEnabled;
 	bool			fMarked;
@@ -182,34 +187,46 @@ class PathListItem : public SimpleItem,
 
 
 class ShapePathListener : public PathContainerListener,
-						  public ShapeContainerListener {
- public:
+	public ShapeContainerListener {
+public:
 	ShapePathListener(PathListView* listView)
-		: fListView(listView),
-		  fShape(NULL)
+		:
+		fListView(listView),
+		fShape(NULL)
 	{
 	}
+
+
 	virtual ~ShapePathListener()
 	{
 		SetShape(NULL);
 	}
+
 
 	// PathContainerListener interface
 	virtual void PathAdded(VectorPath* path, int32 index)
 	{
 		fListView->_SetPathMarked(path, true);
 	}
+
+
 	virtual void PathRemoved(VectorPath* path)
 	{
 		fListView->_SetPathMarked(path, false);
 	}
 
+
 	// ShapeContainerListener interface
-	virtual void ShapeAdded(Shape* shape, int32 index) {}
+	virtual void ShapeAdded(Shape* shape, int32 index)
+	{
+	}
+
+
 	virtual void ShapeRemoved(Shape* shape)
 	{
 		fListView->SetCurrentShape(NULL);
 	}
+
 
 	// ShapePathListener
 	void SetShape(Shape* shape)
@@ -226,17 +243,20 @@ class ShapePathListener : public PathContainerListener,
 			fShape->Paths()->AddListener(this);
 	}
 
+
 	Shape* CurrentShape() const
 	{
 		return fShape;
 	}
 
- private:
+private:
 	PathListView*	fListView;
 	Shape*			fShape;
 };
 
+
 // #pragma mark -
+
 
 enum {
 	MSG_ADD					= 'addp',
@@ -255,41 +275,40 @@ enum {
 	MSG_REMOVE				= 'remp',
 };
 
-// constructor
-PathListView::PathListView(BRect frame,
-						   const char* name,
-						   BMessage* message, BHandler* target)
-	: SimpleListView(frame, name,
-					 NULL, B_SINGLE_SELECTION_LIST),
-	  fMessage(message),
-	  fMenu(NULL),
 
-	  fPathContainer(NULL),
-	  fShapeContainer(NULL),
-	  fCommandStack(NULL),
+PathListView::PathListView(BRect frame, const char* name, BMessage* message,
+	BHandler* target)
+	:
+	SimpleListView(frame, name, NULL, B_SINGLE_SELECTION_LIST),
+	fMessage(message),
+	fMenu(NULL),
 
-	  fCurrentShape(NULL),
-	  fShapePathListener(new ShapePathListener(this))
+	fPathContainer(NULL),
+	fShapeContainer(NULL),
+	fCommandStack(NULL),
+
+	fCurrentShape(NULL),
+	fShapePathListener(new ShapePathListener(this))
 {
 	SetTarget(target);
 }
 
-// destructor
+
 PathListView::~PathListView()
 {
 	_MakeEmpty();
 	delete fMessage;
 
-	if (fPathContainer)
+	if (fPathContainer != NULL)
 		fPathContainer->RemoveListener(this);
 
-	if (fShapeContainer)
+	if (fShapeContainer != NULL)
 		fShapeContainer->RemoveListener(fShapePathListener);
 
 	delete fShapePathListener;
 }
 
-// SelectionChanged
+
 void
 PathListView::SelectionChanged()
 {
@@ -299,7 +318,7 @@ PathListView::SelectionChanged()
 		// NOTE: single selection list
 		PathListItem* item
 			= dynamic_cast<PathListItem*>(ItemAt(CurrentSelection(0)));
-		if (fMessage) {
+		if (fMessage != NULL) {
 			BMessage message(*fMessage);
 			message.AddPointer("path", item ? (void*)item->path : NULL);
 			Invoke(&message);
@@ -309,11 +328,11 @@ PathListView::SelectionChanged()
 	_UpdateMenu();
 }
 
-// MouseDown
+
 void
 PathListView::MouseDown(BPoint where)
 {
-	if (!fCurrentShape) {
+	if (fCurrentShape == NULL) {
 		SimpleListView::MouseDown(where);
 		return;
 	}
@@ -321,25 +340,22 @@ PathListView::MouseDown(BPoint where)
 	bool handled = false;
 	int32 index = IndexOf(where);
 	PathListItem* item = dynamic_cast<PathListItem*>(ItemAt(index));
-	if (item) {
+	if (item != NULL) {
 		BRect itemFrame(ItemFrame(index));
-		itemFrame.right = itemFrame.left
-							+ kBorderOffset + kMarkWidth
-							+ kTextOffset / 2.0;
+		itemFrame.right = itemFrame.left + kBorderOffset + kMarkWidth
+			+ kTextOffset / 2.0;
+
 		VectorPath* path = item->path;
 		if (itemFrame.Contains(where) && fCommandStack) {
 			// add or remove the path to the shape
 			::Command* command;
 			if (fCurrentShape->Paths()->HasPath(path)) {
-				command = new UnassignPathCommand(
-								fCurrentShape, path);
+				command = new UnassignPathCommand(fCurrentShape, path);
 			} else {
 				VectorPath* paths[1];
 				paths[0] = path;
-				command = new AddPathsCommand(
-								fCurrentShape->Paths(),
-								paths, 1, false,
-								fCurrentShape->Paths()->CountPaths());
+				command = new AddPathsCommand(fCurrentShape->Paths(),
+					paths, 1, false, fCurrentShape->Paths()->CountPaths());
 			}
 			fCommandStack->Perform(command);
 			handled = true;
@@ -350,7 +366,7 @@ PathListView::MouseDown(BPoint where)
 		SimpleListView::MouseDown(where);
 }
 
-// MessageReceived
+
 void
 PathListView::MessageReceived(BMessage* message)
 {
@@ -482,7 +498,7 @@ PathListView::MessageReceived(BMessage* message)
 	}
 }
 
-// MakeDragMessage
+
 void
 PathListView::MakeDragMessage(BMessage* message) const
 {
@@ -492,37 +508,37 @@ PathListView::MakeDragMessage(BMessage* message) const
 	for (int32 i = 0; i < count; i++) {
 		PathListItem* item = dynamic_cast<PathListItem*>(
 			ItemAt(CurrentSelection(i)));
-		if (item)
+		if (item != NULL)
 			message->AddPointer("path", (void*)item->path);
 		else
 			break;
 	}
 }
 
-// AcceptDragMessage
+
 bool
 PathListView::AcceptDragMessage(const BMessage* message) const
 {
 	return SimpleListView::AcceptDragMessage(message);
 }
 
-// SetDropTargetRect
+
 void
 PathListView::SetDropTargetRect(const BMessage* message, BPoint where)
 {
 	SimpleListView::SetDropTargetRect(message, where);
 }
 
-// MoveItems
+
 void
 PathListView::MoveItems(BList& items, int32 toIndex)
 {
-	if (!fCommandStack || !fPathContainer)
+	if (fCommandStack == NULL || fPathContainer == NULL)
 		return;
 
 	int32 count = items.CountItems();
 	VectorPath** paths = new (nothrow) VectorPath*[count];
-	if (!paths)
+	if (paths == NULL)
 		return;
 
 	for (int32 i = 0; i < count; i++) {
@@ -531,10 +547,9 @@ PathListView::MoveItems(BList& items, int32 toIndex)
 		paths[i] = item ? item->path : NULL;
 	}
 
-	MovePathsCommand* command
-		= new (nothrow) MovePathsCommand(fPathContainer,
-										 paths, count, toIndex);
-	if (!command) {
+	MovePathsCommand* command = new (nothrow) MovePathsCommand(fPathContainer,
+		paths, count, toIndex);
+	if (command == NULL) {
 		delete[] paths;
 		return;
 	}
@@ -542,11 +557,11 @@ PathListView::MoveItems(BList& items, int32 toIndex)
 	fCommandStack->Perform(command);
 }
 
-// CopyItems
+
 void
 PathListView::CopyItems(BList& items, int32 toIndex)
 {
-	if (!fCommandStack || !fPathContainer)
+	if (fCommandStack == NULL || fPathContainer == NULL)
 		return;
 
 	int32 count = items.CountItems();
@@ -558,10 +573,9 @@ PathListView::CopyItems(BList& items, int32 toIndex)
 		paths[i] = item ? new (nothrow) VectorPath(*item->path) : NULL;
 	}
 
-	AddPathsCommand* command
-		= new (nothrow) AddPathsCommand(fPathContainer,
-										paths, count, true, toIndex);
-	if (!command) {
+	AddPathsCommand* command = new(nothrow) AddPathsCommand(fPathContainer,
+		paths, count, true, toIndex);
+	if (command == NULL) {
 		for (int32 i = 0; i < count; i++)
 			delete paths[i];
 		return;
@@ -570,11 +584,11 @@ PathListView::CopyItems(BList& items, int32 toIndex)
 	fCommandStack->Perform(command);
 }
 
-// RemoveItemList
+
 void
 PathListView::RemoveItemList(BList& items)
 {
-	if (!fCommandStack || !fPathContainer)
+	if (fCommandStack == NULL || fPathContainer == NULL)
 		return;
 
 	int32 count = items.CountItems();
@@ -582,61 +596,60 @@ PathListView::RemoveItemList(BList& items)
 	for (int32 i = 0; i < count; i++) {
 		PathListItem* item = dynamic_cast<PathListItem*>(
 			(BListItem*)items.ItemAtFast(i));
-		if (item)
+		if (item != NULL)
 			paths[i] = item->path;
 		else
 			paths[i] = NULL;
 	}
 
-	RemovePathsCommand* command
-		= new (nothrow) RemovePathsCommand(fPathContainer,
-										   paths, count);
+	RemovePathsCommand* command = new (nothrow) RemovePathsCommand(
+		fPathContainer, paths, count);
+
 	fCommandStack->Perform(command);
 }
 
-// CloneItem
+
 BListItem*
 PathListView::CloneItem(int32 index) const
 {
 	if (PathListItem* item = dynamic_cast<PathListItem*>(ItemAt(index))) {
-		return new PathListItem(item->path,
-								const_cast<PathListView*>(this),
-								fCurrentShape != NULL);
+		return new(nothrow) PathListItem(item->path,
+			const_cast<PathListView*>(this), fCurrentShape != NULL);
 	}
 	return NULL;
 }
 
-// IndexOfSelectable
+
 int32
 PathListView::IndexOfSelectable(Selectable* selectable) const
 {
 	VectorPath* path = dynamic_cast<VectorPath*>(selectable);
-	if (!path)
+	if (path == NULL)
 		return -1;
 
-	for (int32 i = 0;
-		 PathListItem* item = dynamic_cast<PathListItem*>(ItemAt(i));
-		 i++) {
-		if (item->path == path)
+	int32 count = CountItems();
+	for (int32 i = 0; i < count; i++) {
+		if (SelectableFor(ItemAt(i)) == path)
 			return i;
 	}
 
 	return -1;
 }
 
-// SelectableFor
+
 Selectable*
 PathListView::SelectableFor(BListItem* item) const
 {
 	PathListItem* pathItem = dynamic_cast<PathListItem*>(item);
-	if (pathItem)
+	if (pathItem != NULL)
 		return pathItem->path;
 	return NULL;
 }
 
+
 // #pragma mark -
 
-// PathAdded
+
 void
 PathListView::PathAdded(VectorPath* path, int32 index)
 {
@@ -653,7 +666,7 @@ PathListView::PathAdded(VectorPath* path, int32 index)
 	UnlockLooper();
 }
 
-// PathRemoved
+
 void
 PathListView::PathRemoved(VectorPath* path)
 {
@@ -670,9 +683,10 @@ PathListView::PathRemoved(VectorPath* path)
 	UnlockLooper();
 }
 
+
 // #pragma mark -
 
-// SetPathContainer
+
 void
 PathListView::SetPathContainer(PathContainer* container)
 {
@@ -680,14 +694,14 @@ PathListView::SetPathContainer(PathContainer* container)
 		return;
 
 	// detach from old container
-	if (fPathContainer)
+	if (fPathContainer != NULL)
 		fPathContainer->RemoveListener(this);
 
 	_MakeEmpty();
 
 	fPathContainer = container;
 
-	if (!fPathContainer)
+	if (fPathContainer == NULL)
 		return;
 
 	fPathContainer->AddListener(this);
@@ -703,7 +717,7 @@ PathListView::SetPathContainer(PathContainer* container)
 //	fPathContainer->ReadUnlock();
 }
 
-// SetShapeContainer
+
 void
 PathListView::SetShapeContainer(ShapeContainer* container)
 {
@@ -711,23 +725,23 @@ PathListView::SetShapeContainer(ShapeContainer* container)
 		return;
 
 	// detach from old container
-	if (fShapeContainer)
+	if (fShapeContainer != NULL)
 		fShapeContainer->RemoveListener(fShapePathListener);
 
 	fShapeContainer = container;
 
-	if (fShapeContainer)
+	if (fShapeContainer != NULL)
 		fShapeContainer->AddListener(fShapePathListener);
 }
 
-// SetCommandStack
+
 void
 PathListView::SetCommandStack(CommandStack* stack)
 {
 	fCommandStack = stack;
 }
 
-// SetMenu
+
 void
 PathListView::SetMenu(BMenu* menu)
 {
@@ -781,7 +795,7 @@ PathListView::SetMenu(BMenu* menu)
 	_UpdateMenu();
 }
 
-// SetCurrentShape
+
 void
 PathListView::SetCurrentShape(Shape* shape)
 {
@@ -794,57 +808,70 @@ PathListView::SetCurrentShape(Shape* shape)
 	_UpdateMarks();
 }
 
+
 // #pragma mark -
 
-// _AddPath
+
 bool
 PathListView::_AddPath(VectorPath* path, int32 index)
 {
-	if (path) {
-		 return AddItem(
-		 	new PathListItem(path, this, fCurrentShape != NULL), index);
+	if (path == NULL)
+		return false;
+
+	PathListItem* item = new(nothrow) PathListItem(path, this,
+		fCurrentShape != NULL);
+	if (item == NULL)
+		return false;
+
+	if (!AddItem(item, index)) {
+		delete item;
+		return false;
 	}
-	return false;
+	
+	return true;
 }
 
-// _RemovePath
+
 bool
 PathListView::_RemovePath(VectorPath* path)
 {
 	PathListItem* item = _ItemForPath(path);
-	if (item && RemoveItem(item)) {
+	if (item != NULL && RemoveItem(item)) {
 		delete item;
 		return true;
 	}
 	return false;
 }
 
-// _ItemForPath
+
 PathListItem*
 PathListView::_ItemForPath(VectorPath* path) const
 {
-	for (int32 i = 0;
+	int32 count = CountItems();
+	for (int32 i = 0; i < count; i++) {
 		 PathListItem* item = dynamic_cast<PathListItem*>(ItemAt(i));
-		 i++) {
+		if (item == NULL)
+			continue;
 		if (item->path == path)
 			return item;
 	}
 	return NULL;
 }
 
+
 // #pragma mark -
 
-// _UpdateMarks
+
 void
 PathListView::_UpdateMarks()
 {
 	int32 count = CountItems();
-	if (fCurrentShape) {
+	if (fCurrentShape != NULL) {
 		// enable display of marks and mark items whoes
 		// path is contained in fCurrentShape
 		for (int32 i = 0; i < count; i++) {
 			PathListItem* item = dynamic_cast<PathListItem*>(ItemAt(i));
-			if (!item)
+			if (item == NULL)
 				continue;
 			item->SetMarkEnabled(true);
 			item->SetMarked(fCurrentShape->Paths()->HasPath(item->path));
@@ -853,7 +880,7 @@ PathListView::_UpdateMarks()
 		// disable display of marks
 		for (int32 i = 0; i < count; i++) {
 			PathListItem* item = dynamic_cast<PathListItem*>(ItemAt(i));
-			if (!item)
+			if (item == NULL)
 				continue;
 			item->SetMarkEnabled(false);
 		}
@@ -862,20 +889,20 @@ PathListView::_UpdateMarks()
 	Invalidate();
 }
 
-// _SetPathMarked
+
 void
 PathListView::_SetPathMarked(VectorPath* path, bool marked)
 {
-	if (PathListItem* item = _ItemForPath(path)) {
+	PathListItem* item = _ItemForPath(path);
+	if (item != NULL)
 		item->SetMarked(marked);
-	}
 }
 
-// _UpdateMenu
+
 void
 PathListView::_UpdateMenu()
 {
-	if (!fMenu)
+	if (fMenu == NULL)
 		return;
 
 	bool gotSelection = CurrentSelection(0) >= 0;

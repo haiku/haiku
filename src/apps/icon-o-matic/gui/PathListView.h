@@ -50,7 +50,7 @@ class PathListView : public SimpleListView,
 
 	virtual	bool				AcceptDragMessage(const BMessage* message) const;
 	virtual	void				SetDropTargetRect(const BMessage* message,
-												  BPoint where);
+									BPoint where);
 
 	virtual	void				MoveItems(BList& items, int32 toIndex);
 	virtual	void				CopyItems(BList& items, int32 toIndex);
