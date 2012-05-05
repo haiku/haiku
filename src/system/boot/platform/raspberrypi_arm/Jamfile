@@ -30,6 +30,7 @@ KernelMergeObject boot_platform_raspberrypi_arm.o :
 	cpu.cpp
 	debug.cpp
 	devices.cpp
+	gpio.cpp
 	keyboard.cpp
 	menu.cpp
 	mmu.cpp

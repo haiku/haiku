@@ -24,4 +24,4 @@ extern void serial_enable(void);
 #endif
 
 
-#endif /* _SYSTEM_BOOT_PLATFORM_ROUTERBOARD_MIPSEL_SERIAL_H */
+#endif /* _SYSTEM_BOOT_PLATFORM_PI_SERIAL_H */

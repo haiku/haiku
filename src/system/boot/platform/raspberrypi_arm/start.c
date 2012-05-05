@@ -5,11 +5,12 @@
  */
 
 
-#include "serial.h"
 #include "console.h"
 #include "cpu.h"
-#include "mmu.h"
+#include "gpio.h"
 #include "keyboard.h"
+#include "mmu.h"
+#include "serial.h"
 
 #include <KernelExport.h>
 #include <boot/platform.h>
@@ -31,6 +32,9 @@ extern uint8 _end;
 
 extern int main(stage2_args *args);
 void _start(void);
+
+
+volatile unsigned *gGPIOBase;
 
 
 static void
@@ -104,6 +108,11 @@ pi_start(void)
 	call_ctors();
 
 	cpu_init();
+	gpio_init();
+
+	// Flick on "OK" led
+	GPIO_CLR(16);
+
 	mmu_init();
 	serial_init();
 	console_init();

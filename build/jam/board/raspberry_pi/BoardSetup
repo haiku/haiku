@@ -56,9 +56,6 @@ fi" ;
 
 HAIKU_BOARD_SDIMAGE_FILES = 
 	haiku_loader
-	haiku_loader.ub
-	haiku_loader_nbsd.ub
-	$(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME)
 ;
 
 
