@@ -508,9 +508,12 @@ PathListView::MakeDragMessage(BMessage* message) const
 	for (int32 i = 0; i < count; i++) {
 		PathListItem* item = dynamic_cast<PathListItem*>(
 			ItemAt(CurrentSelection(i)));
-		if (item != NULL)
+		if (item != NULL) {
 			message->AddPointer("path", (void*)item->path);
-		else
+			BMessage archive;
+			if (item->path->Archive(&archive, true) == B_OK)
+				message->AddMessage("path archive", &archive);
+		} else
 			break;
 	}
 }
@@ -527,6 +530,56 @@ void
 PathListView::SetDropTargetRect(const BMessage* message, BPoint where)
 {
 	SimpleListView::SetDropTargetRect(message, where);
+}
+
+
+bool
+PathListView::HandleDropMessage(const BMessage* message, int32 dropIndex)
+{
+	// Let SimpleListView handle drag-sorting (when drag came from ourself)
+	if (SimpleListView::HandleDropMessage(message, dropIndex))
+		return true;
+
+	if (fCommandStack == NULL || fPathContainer == NULL)
+		return false;
+
+	// Drag may have come from another instance, like in another window.
+	// Reconstruct the Styles from the archive and add them at the drop
+	// index.
+	int index = 0;
+	BList paths;
+	while (true) {
+		BMessage archive;
+		if (message->FindMessage("path archive", index, &archive) != B_OK)
+			break;
+
+		VectorPath* path = new(std::nothrow) VectorPath(&archive);
+		if (path == NULL)
+			break;
+		
+		if (!paths.AddItem(path)) {
+			delete path;
+			break;
+		}
+
+		index++;
+	}
+
+	int32 count = paths.CountItems();
+	if (count == 0)
+		return false;
+
+	AddPathsCommand* command = new(nothrow) AddPathsCommand(fPathContainer,
+		(VectorPath**)paths.Items(), count, true, dropIndex);
+	if (command == NULL) {
+		for (int32 i = 0; i < count; i++)
+			delete (VectorPath*)paths.ItemAtFast(i);
+		return false;
+	}
+
+	fCommandStack->Perform(command);
+
+	return true;
 }
 
 
