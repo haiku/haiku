@@ -16,9 +16,9 @@ gpio_init()
 	// Set up pointer to Raspberry Pi GPIO base
 	gGPIOBase = (volatile unsigned *)GPIO_BASE;
 
-	// Take control of general use pins, status led, uart
+	// Take control of ok led and general use pins
 	int pin = 0;
-	for (pin = 14; pin <= 25; pin++) {
+	for (pin = 16; pin <= 25; pin++) {
 		GPIO_IN(pin);
 		GPIO_OUT(pin);
 	}

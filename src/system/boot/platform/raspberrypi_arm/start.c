@@ -116,7 +116,6 @@ pi_start(void)
 	mmu_init();
 	serial_init();
 	console_init();
-	serial_enable();
 
 	args.heap_size = HEAP_SIZE;
 	args.arguments = NULL;

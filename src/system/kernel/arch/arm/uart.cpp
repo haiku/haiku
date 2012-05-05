@@ -95,18 +95,17 @@ static inline unsigned char read_uart_reg(int port, uint reg)
 #define MCRVAL (MCR_DTR | MCR_RTS)	/* RTS/DTR */
 #define FCRVAL (FCR_FIFO_EN | FCR_RXSR | FCR_TXSR) /* Clear & enable FIFOs */
 
-#define V_NS16550_CLK            (48000000) /* 48MHz (APLL96/2) */
-
 
 int uart_debug_port(void)
 {
 	return DEBUG_UART;
 }
 
+
 void uart_init_port(int port, uint baud)
 {
 	/* clear the tx & rx fifo and disable */
-	uint16 baud_divisor = (V_NS16550_CLK / 16 / baud);
+	uint16 baud_divisor = (BOARD_UART_CLOCK / 16 / baud);
 
 	write_uart_reg(port, UART_IER, 0);
 	write_uart_reg(port, UART_LCR, LCR_BKSE | LCRVAL); // config mode A

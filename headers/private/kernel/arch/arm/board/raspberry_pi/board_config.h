@@ -15,12 +15,15 @@
 
 #include <arch/arm/bcm2708.h>
 
+// UART Settings
 #define BOARD_UART1_BASE UART0_BASE
 #define BOARD_UART2_BASE UART1_BASE
-#define BOARD_UART3_BASE UART1_BASE
-#warning NO UART3!!!
+#define BOARD_UART3_BASE 0
 
 #define BOARD_DEBUG_UART 0
+
+#define BOARD_UART_CLOCK 125000000
+	/* 125Mhz, strange */
 
 
 #endif /* _BOARD_RASPBERRY_PI_BOARD_CONFIG_H */

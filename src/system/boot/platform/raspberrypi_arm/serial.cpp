@@ -1,10 +1,14 @@
 /*
+ * Copyright 2004-2008, Axel D??rfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
  * Copyright 2009 Jonas Sundström, jonas@kirilla.com
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 
 #include "serial.h"
+#include "uart.h"
 
 #include <boot/platform.h>
 #include <arch/cpu.h>
@@ -13,31 +17,57 @@
 #include <string.h>
 
 
+static int32 sSerialEnabled = 0;
+
+static char sBuffer[16384];
+static uint32 sBufferPosition;
+
+
 static void
 serial_putc(char c)
 {
-#warning IMPLEMENT serial_putc
+	uart_putc(uart_debug_port(), c);
 }
 
 
 extern "C" void
 serial_puts(const char* string, size_t size)
 {
-#warning IMPLEMENT serial_puts
+	if (sSerialEnabled <= 0)
+		return;
+
+	if (sBufferPosition + size < sizeof(sBuffer)) {
+		memcpy(sBuffer + sBufferPosition, string, size);
+		sBufferPosition += size;
+	}
+
+	while (size-- != 0) {
+		char c = string[0];
+
+		if (c == '\n') {
+			serial_putc('\r');
+			serial_putc('\n');
+		} else if (c != '\r')
+			serial_putc(c);
+
+		string++;
+	}
 }
 
 
-extern "C" void 
+extern "C" void
 serial_disable(void)
 {
-#warning IMPLEMENT serial_disable
+	sSerialEnabled--;
 }
 
 
-extern "C" void 
+extern "C" void
 serial_enable(void)
 {
-#warning IMPLEMENT serial_enable
+	uart_init_early();
+	uart_init();
+	sSerialEnabled++;
 }
 
 
@@ -51,6 +81,8 @@ serial_cleanup(void)
 extern "C" void
 serial_init(void)
 {
-#warning IMPLEMENT serial_init
+	serial_enable();
+
+	serial_putc('S');
 }
 
