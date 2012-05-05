@@ -324,25 +324,11 @@ void
 DragSortableListView::MessageReceived(BMessage* message)
 {
 	if (message->what == fDragCommand) {
-		DragSortableListView *list = NULL;
-		if (message->FindPointer("list", (void **)&list) == B_OK
-			 && list == this) {
-			int32 count = CountItems();
-			if (fDropIndex < 0 || fDropIndex > count)
-				fDropIndex = count;
-			BList items;
-			int32 index;
-			for (int32 i = 0; message->FindInt32("index", i, &index) == B_OK; i++)
-				if (BListItem* item = ItemAt(index))
-					items.AddItem((void*)item);
-			if (items.CountItems() > 0) {
-				if (modifiers() & B_SHIFT_KEY)
-					CopyItems(items, fDropIndex);
-				else
-					MoveItems(items, fDropIndex);
-			}
-			fDropIndex = -1;
-		}
+		int32 count = CountItems();
+		if (fDropIndex < 0 || fDropIndex > count)
+			fDropIndex = count;
+		HandleDropMessage(message, fDropIndex);
+		fDropIndex = -1;
 	} else {
 		switch (message->what) {
 			case MSG_TICK: {
@@ -631,6 +617,34 @@ DragSortableListView::SetDropTargetRect(const BMessage* message, BPoint where)
 			SetViewCursor(&cursor, true);
 		}
 	}
+}
+
+
+bool
+DragSortableListView::HandleDropMessage(const BMessage* message,
+	int32 dropIndex)
+{
+	DragSortableListView *list = NULL;
+	if (message->FindPointer("list", (void **)&list) != B_OK || list != this)
+		return false;
+
+	BList items;
+	int32 index;
+	for (int32 i = 0; message->FindInt32("index", i, &index) == B_OK; i++) {
+		BListItem* item = ItemAt(index);
+		if (item != NULL)
+			items.AddItem((void*)item);
+	}
+
+	if (items.CountItems() == 0)
+		return false;
+
+	if (modifiers() & B_SHIFT_KEY)
+		CopyItems(items, index);
+	else
+		MoveItems(items, index);
+
+	return true;
 }
 
 // SetAutoScrolling
