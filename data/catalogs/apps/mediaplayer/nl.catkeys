@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-MediaPlayer	1392487766
+1	dutch; flemish	x-vnd.Haiku-MediaPlayer	1796053067
 raw audio	MediaPlayer-InfoWin		ruwe audio
 Location	MediaPlayer-InfoWin		Locatie
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikaans)
@@ -62,7 +62,6 @@ Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Fout bij het verplaatsen naa
 Audio	MediaPlayer-Main		Audio
 Open Playlist	MediaPlayer-PlaylistWindow		Afspeellijst openen
 MediaPlayer	System name		Mediaspeler
-%f fps	MediaPlayer-InfoWin		%f fps
 OK	MediaPlayer-Main		Oké
 Settings…	MediaPlayer-Main		Instellingen...
 MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer-instellingen

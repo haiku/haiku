@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-TSKB	3212877640
+1	russian	x-vnd.Be-TSKB	1193384805
 Edit menu…	PreferencesWindow		Изменить меню…
 Applications	PreferencesWindow		Приложения
 Recent documents:	PreferencesWindow		Недавние документы:
@@ -21,7 +21,6 @@ Recent applications:	PreferencesWindow		Недавние приложения:
 Tracker always first	PreferencesWindow		Tracker всегда первый
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Настройки
 Show calendar…	TimeView		Показать календарь…
-Show Time	Tray		Отображать время
 Expand new applications	PreferencesWindow		Раскрывать список окон при запуске
 Clock	PreferencesWindow		Часы
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Демо

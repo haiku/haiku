@@ -1,8 +1,6 @@
-1	greek, modern (1453-)	x-vnd.Haiku-SMTP	2740407895
+1	greek, modern (1453-)	x-vnd.Haiku-SMTP	1052586247
 SMTP server:	ConfigView		Εξυπηρετητής SMTP:
-STARTTLS	ConfigView		STARTTLS
 Error while logging in to %serv	smtp		Σφάλμα κατα τη σύνδεση στο %serv
-Unencrypted	ConfigView		Μη κρυπτογραφημένο
 . The server says:\n	smtp		Ο εξυπηρετητής αποκρίθηκε:\n
 ESMTP	ConfigView		ESMTP
 Connecting to server…	smtp		Σύνδεση στον εξυπηρετητή...
@@ -12,5 +10,4 @@ Destination:	ConfigView		Προορισμός:
 : Connection refused or host not found.	smtp		: Η σύνδεση απορίφθηκε ή δε βρέθηκε διακομιστής.
 None	ConfigView		Κανένα
 POP3 before SMTP	ConfigView		POP3 πρίν από SMTP
-SSL	ConfigView		SSL
 . The server said:\n	smtp		Ο εξυπηρετητής αποκρίθηκε:\n

@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	1801347100
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	3603368351
 common	B_COMMON_DIRECTORY		felles
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Ikonvisning
@@ -87,13 +87,11 @@ Replace	FilePanelPriv		Erstatt
 Select all	VolumeWindow		Merk alle
 Opens with:	InfoWindow		Åpnes med:
 Open	ContainerWindow		Åpne
-(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed av %TotalSize, %BytesPerSecond/s)
 Error calculating folder size.	InfoWindow		Feil ved beregning av mappestørrelse
 New folder	FilePanelPriv		Ny mappe
 %name info	InfoWindow	InfoWindow Title	%name info
 Favorites	FavoritesMenu		Favoritter
 Add-ons	VolumeWindow		Tillegg
-(Finish: %time - %finishtime left)	StatusWindow		(Finish: %time - %finishtime left)
 Sorry, you can't copy items to the Trash.	PoseView		Beklager, du kan ikke kopiere oppføringer til søppelkurven
 List view	VolumeWindow		Listevisning
 matches wildcard expression	SelectionWindow		treffer wildcard uttrykk
@@ -322,7 +320,6 @@ Empty folder	NavMenu		Tom mappe
 Copy here	ContainerWindow		Kopier hit
 Move to Trash	FilePanelPriv		Flytt til søppelkurv
 Current folder	ContainerWindow		Nåværende mappe
-(Finish: %time)	StatusWindow		(Ferdig: %time)
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Det spesifiserte navnet er allerede brukt som navn på en mappe. Vennligst velg et annet navn.
 Clean up	ContainerWindow		Rydd opp
 after	FindPanel		etter
@@ -379,7 +376,6 @@ And	FindPanel		Og
 Select…	DeskWindow		Velg...
 Copy	FilePanelPriv		Kopier
 Icon view	DeskWindow		Ikonvisning
-(Finish: %time - Over %finishtime left)	StatusWindow		(Finish: %time - Over %finishtime left)
 Select all	QueryContainerWindow		Merk alle
 Files cannot be moved or deleted from a read-only volume.	PoseView		Filer kan ikke bli flyttet eller slettet fra et skrivebeskyttet volum.
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Det oppstoproblem ved erstatting av \"%name\". Elementet kan være åpent eller opptatt.

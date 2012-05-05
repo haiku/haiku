@@ -1,8 +1,6 @@
-1	german	x-vnd.Haiku-SMTP	2740407895
+1	german	x-vnd.Haiku-SMTP	1052586247
 SMTP server:	ConfigView		SMTP-Server:
-STARTTLS	ConfigView		STARTTLS
 Error while logging in to %serv	smtp		Fehler beim Anmelden an %serv
-Unencrypted	ConfigView		Unverschlüsselt
 . The server says:\n	smtp		. Servermeldung:\n
 ESMTP	ConfigView		ESMTP
 Connecting to server…	smtp		Mit Server verbinden…
@@ -12,5 +10,4 @@ Destination:	ConfigView		Zielverzeichnis:
 : Connection refused or host not found.	smtp		: Verbindung abgelehnt oder Host nicht gefunden.
 None	ConfigView		Keine
 POP3 before SMTP	ConfigView		POP3 vor SMTP
-SSL	ConfigView		SSL
 . The server said:\n	smtp		. Servermeldung:\n

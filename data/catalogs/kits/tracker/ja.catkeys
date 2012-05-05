@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	1698823093
+1	japanese	x-vnd.Haiku-libtracker	3500844344
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		アイコン表示
 Add-ons	FilePanelPriv		アドオン
@@ -85,13 +85,11 @@ Replace	FilePanelPriv		置換
 Select all	VolumeWindow		すべて選択
 Opens with:	InfoWindow		アプリケーション：
 Open	ContainerWindow		開く
-(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(合計%TotalSize中%SizeProcessed処理済, %BytesPerSecond/秒)
 Error calculating folder size.	InfoWindow		フォルダーサイズの計算中にエラー発生。
 New folder	FilePanelPriv		新規フォルダー
 %name info	InfoWindow	InfoWindow Title	%name の情報
 Favorites	FavoritesMenu		お気に入り
 Add-ons	VolumeWindow		アドオン
-(Finish: %time - %finishtime left)	StatusWindow		(終了: %time - 残り %finishtime)
 Sorry, you can't copy items to the Trash.	PoseView		ごみ箱にコピーすることはできません。
 List view	VolumeWindow		一覧表示
 matches wildcard expression	SelectionWindow		ワイルドカード表現と一致
@@ -318,7 +316,6 @@ Empty folder	NavMenu		空フォルダー
 Copy here	ContainerWindow		ここにコピー
 Move to Trash	FilePanelPriv		ごみ箱に捨てる
 Current folder	ContainerWindow		現在のフォルダー
-(Finish: %time)	StatusWindow		（完了：%time）
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		指定された名前は既にフォルダー名として使用されています。別の名前を指定してください。
 Clean up	ContainerWindow		アイコンの整列
 after	FindPanel		以降
@@ -375,7 +372,6 @@ And	FindPanel		かつ
 Select…	DeskWindow		選択…
 Copy	FilePanelPriv		コピー
 Icon view	DeskWindow		アイコン表示
-(Finish: %time - Over %finishtime left)	StatusWindow		(終了: %time - 残り %finishtime 以上)
 Select all	QueryContainerWindow		すべて選択
 Files cannot be moved or deleted from a read-only volume.	PoseView		読み取り専用パーティションへの移動やファイルの削除はできません。
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		\"%name\"を置き換えようとしたら不具合が発生しました。項目は開いた状態か使用中かもしれません。

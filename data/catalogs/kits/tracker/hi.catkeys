@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-libtracker	3013164940
+1	hindi	x-vnd.Haiku-libtracker	520218895
 common	B_COMMON_DIRECTORY		सामान्य
 OK	WidgetAttributeText		ठीक है
 Icon view	VolumeWindow		चिह्न दृश्य
@@ -87,13 +87,11 @@ Replace	FilePanelPriv		बदलें
 Select all	VolumeWindow		सभी चुनें
 Opens with:	InfoWindow		के साथ खुलता है:
 Open	ContainerWindow		खोलें
-(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%आकार प्रसंस्कृत का %कुल आकार, %बाइट्स प्रति सेकंड/s)
 Error calculating folder size.	InfoWindow		फ़ोल्डर आकार की गणना त्रुटि
 New folder	FilePanelPriv		नया फ़ोल्डर
 %name info	InfoWindow	InfoWindow Title	%name जानकारी
 Favorites	FavoritesMenu		पसंदीदा
 Add-ons	VolumeWindow		अतिरिक्त जोड़ सकते हैं
-(Finish: %time - %finishtime left)	StatusWindow		(Finish: %time - %finishtime left)
 Sorry, you can't copy items to the Trash.	PoseView		क्षमा करें, आप आइटम्स रद्दी में प्रतिलिपि नहीं कर सकते है.
 List view	VolumeWindow		सूची दृश्य
 matches wildcard expression	SelectionWindow		वाइल्डकार्ड अभिव्यक्ति से मेल खाता है
@@ -320,7 +318,6 @@ Empty folder	NavMenu		खाली फ़ोल्डर
 Copy here	ContainerWindow		यहाँ कॉपी करें
 Move to Trash	FilePanelPriv		रद्दी पर ले जाएँ
 Current folder	ContainerWindow		वर्तमान फ़ोल्डर
-(Finish: %time)	StatusWindow		(खत्म: %time)
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		निर्दिष्ट नाम पहले से ही एक फ़ोल्डर के नाम के रूप में प्रयोग किया जा रहा हैं.कृपया दूसरा नाम चुनें.
 Clean up	ContainerWindow		साफ़ करो
 after	FindPanel		के बाद
@@ -377,7 +374,6 @@ And	FindPanel		और
 Select…	DeskWindow		चुनें ...
 Copy	FilePanelPriv		प्रति बनाये
 Icon view	DeskWindow		आइकन का दृश्य
-(Finish: %time - Over %finishtime left)	StatusWindow		(Finish: %time - Over %finishtime left)
 Select all	QueryContainerWindow		सभी चुनें
 Files cannot be moved or deleted from a read-only volume.	PoseView		केवल पढ़ने के लिए संस्करणों में फाइले कॉपी या हटाए नहीं जा सकती .
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		वहां एक तरह से बदलने की कोशिश कर समस्या थी \"%name\". आइटम खोलें या व्यस्त हो सकता है.

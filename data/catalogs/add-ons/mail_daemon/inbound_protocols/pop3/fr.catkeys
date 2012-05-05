@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-POP3	985832399
+1	french	x-vnd.Haiku-POP3	334151960
 Plain text	ConfigView		Texte brut
 Sending APOP authentication…	pop3		Envoi de l'authentification APOP…
 Sending username…	pop3		Envoi du nom d'utilisateur…
@@ -6,7 +6,6 @@ Connecting to POP3 server…	pop3		Connexion au serveur POP3…
 : No reply.\n	pop3		: Pas de réponse.\n
 : Connection refused or host not found	pop3		: Connexion refusée ou hôte introuvable
 Error while connecting to server %serv	pop3		Erreur lors de la connexion au serveur %serv
-: Could not allocate socket.	pop3		: Impossible d'allouer le socket
 Error while authenticating user %user	pop3		Erreur d'authentification de l'utilisateur %user
 Destination:	ConfigView		Destination :
 APOP	ConfigView		APOP

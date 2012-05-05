@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-POP3	4151138513
+1	ukrainian	x-vnd.Haiku-POP3	3499458074
 Plain text	ConfigView		Звиклий текст
 Sending APOP authentication…	pop3		Відправка визначника APOP …
 Sending username…	pop3		Відправка імені користувача…
@@ -9,7 +9,6 @@ Getting UniqueIDs…	pop3		Отримання особистого ID…
 : No reply.\n	pop3		Без відповіді.\n
 : Connection refused or host not found	pop3		Під'єднання невдале або хост не знайдено
 Error while connecting to server %serv	pop3		Помилка при під'єднанні до сервера  %serv
-: Could not allocate socket.	pop3		: Неможливо призначити сокет .
 Error while authenticating user %user	pop3		Помилка ідентифікації користувача %user
 Destination:	ConfigView		Ціль:
 APOP	ConfigView		APOP

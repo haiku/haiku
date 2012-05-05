@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-POP3	1324485597
+1	german	x-vnd.Haiku-POP3	672805158
 Plain text	ConfigView		Klartext
 Sending APOP authentication…	pop3		APOP-Authentifizierung wird gesendet…
 Sending username…	pop3		Benutzername wird gesendet…
@@ -9,7 +9,6 @@ Getting UniqueIDs…	pop3		UniqueIDs werden empfangen…
 : No reply.\n	pop3		: Keine Antwort.\n
 : Connection refused or host not found	pop3		: Verbindung abgelehnt oder Host nicht gefunden
 Error while connecting to server %serv	pop3		Fehler beim Verbinden mit Server %serv
-: Could not allocate socket.	pop3		: Socket konnte nicht reserviert werden.
 Error while authenticating user %user	pop3		Fehler beim Authentifizieren von Benutzer %user
 Destination:	ConfigView		Zielverzeichnis:
 APOP	ConfigView		APOP

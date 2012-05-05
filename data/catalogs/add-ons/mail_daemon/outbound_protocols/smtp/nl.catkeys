@@ -1,8 +1,6 @@
-1	dutch; flemish	x-vnd.Haiku-SMTP	2740407895
+1	dutch; flemish	x-vnd.Haiku-SMTP	1052586247
 SMTP server:	ConfigView		SMTP server:
-STARTTLS	ConfigView		STARTTLS
 Error while logging in to %serv	smtp		Fout bij het inloggen in %serv
-Unencrypted	ConfigView		Niet-versleuteld
 . The server says:\n	smtp		. De server zegt:\n
 ESMTP	ConfigView		ESMTP
 Connecting to server…	smtp		Verbinden met de server...
@@ -12,5 +10,4 @@ Destination:	ConfigView		Doel:
 : Connection refused or host not found.	smtp		: Verbinding afgewezen of host niet gevonden.
 None	ConfigView		Geen
 POP3 before SMTP	ConfigView		POP3 voor SMTP
-SSL	ConfigView		SSL
 . The server said:\n	smtp		. De server zei:\n

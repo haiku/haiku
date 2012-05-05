@@ -1,8 +1,6 @@
-1	lithuanian	x-vnd.Haiku-SMTP	2740407895
+1	lithuanian	x-vnd.Haiku-SMTP	1052586247
 SMTP server:	ConfigView		SMTP serveris:
-STARTTLS	ConfigView		STARTTLS
 Error while logging in to %serv	smtp		Klaida registruojantis į seansą su %serv
-Unencrypted	ConfigView		ryšys nešifruotas
 . The server says:\n	smtp		. Serveris atsakė:\n
 ESMTP	ConfigView		ESMTP
 Connecting to server…	smtp		Jungiamasi prie serverio…
@@ -12,5 +10,4 @@ Destination:	ConfigView		Paskirties aplankas:
 : Connection refused or host not found.	smtp		: ryšys atmestas arba serverio nepavyko rasti
 None	ConfigView		joks
 POP3 before SMTP	ConfigView		POP3 prieš SMTP
-SSL	ConfigView		SSL
 . The server said:\n	smtp		. Serveris atsakė:\n

@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	1319179540
+1	lithuanian	x-vnd.Haiku-libtracker	3121200791
 common	B_COMMON_DIRECTORY		Bendra
 OK	WidgetAttributeText		Gerai
 Icon view	VolumeWindow		Rodyti piktogramas
@@ -88,13 +88,11 @@ Replace	FilePanelPriv		Pakeisti
 Select all	VolumeWindow		Pažymėti visus
 Opens with:	InfoWindow		Atveriamas naudojant:
 Open	ContainerWindow		Atverti
-(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed iš %TotalSize, %BytesPerSecond/s)
 Error calculating folder size.	InfoWindow		Skaičiuojant aplanko dydį, įvyko klaida.
 New folder	FilePanelPriv		Naujas aplankas
 %name info	InfoWindow	InfoWindow Title	Informacija apie „%name“
 Favorites	FavoritesMenu		Parankiniai
 Add-ons	VolumeWindow		Priedai
-(Finish: %time - %finishtime left)	StatusWindow		(Pabaiga: %time – liko %finishtime)
 Sorry, you can't copy items to the Trash.	PoseView		Deja, Šiukšlinėn objektų kopijuoti neleidžiama.
 List view	VolumeWindow		Rodyti sąrašą
 matches wildcard expression	SelectionWindow		atitinka šabloną
@@ -323,7 +321,6 @@ Empty folder	NavMenu		Aplankas tuščias
 Copy here	ContainerWindow		Kopijuoti čia
 Move to Trash	FilePanelPriv		Išmesti Šiukšlinėn
 Current folder	ContainerWindow		Šis aplankas
-(Finish: %time)	StatusWindow		(Liko: %time)
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Nurodytu vardu jau yra pavadintas aplankas. Įveskite kitą vardą.
 Clean up	ContainerWindow		Sutvarkyti
 after	FindPanel		nuo
@@ -380,7 +377,6 @@ And	FindPanel		ir
 Select…	DeskWindow		Pažymėti…
 Copy	FilePanelPriv		Kopijuoti
 Icon view	DeskWindow		Rodyti piktogramas
-(Finish: %time - Over %finishtime left)	StatusWindow		(pabaiga: %time – liko dar virš %finishtime)
 Select all	QueryContainerWindow		Pažymėti viską
 Files cannot be moved or deleted from a read-only volume.	PoseView		Perkelti ar šalinti objektų iš tomų, prijungtų tik skaitymui, negalima.
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Iškilo nesklandumų bandant pakeisti „%name“. Gali būti, jog objektas atvertas arba užimtas.

@@ -1,9 +1,7 @@
-1	greek, modern (1453-)	x-vnd.Be-TSKB	1657675882
+1	greek, modern (1453-)	x-vnd.Be-TSKB	1095421712
 Power off	DeskbarMenu		Απενεργοποίηση
 Edit menu…	PreferencesWindow		Επεξεργασία μενού...
-Suspend	DeskbarMenu		Αναστολή λειτουργίας
 Applications	PreferencesWindow		Εφαρμογές
-About Haiku	DeskbarMenu		Περί Haiku
 Recent documents:	PreferencesWindow		Πρόσφατα έγγραφα:
 Recent applications	DeskbarMenu		Πρόσφατες εφαρμογές
 Sort running applications	PreferencesWindow		Ταξινόμησε τις τρέχουσες εφαρμογές
@@ -35,7 +33,6 @@ Recent folders	DeskbarMenu		Πρόσφατοι φάκελοι
 About this system	DeskbarMenu		Περί Συστήματος
 Show calendar…	TimeView		Εμφάνιση ημερολογίου…
 Deskbar preferences…	DeskbarMenu		Προτιμήσεις Deskbar…
-Show Time	Tray		Εμφάνιση ώρας
 Expand new applications	PreferencesWindow		Επέκταση νέων εφαρμογών
 Show replicants	DeskbarMenu		Εμφάνιση αντιγράφων
 Clock	PreferencesWindow		Ρολόϊ

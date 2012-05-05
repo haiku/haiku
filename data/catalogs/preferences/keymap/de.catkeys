@@ -1,9 +1,9 @@
-1	german	x-vnd.Haiku-Keymap	3634277200
+1	german	x-vnd.Haiku-Keymap	4022885915
 Shift:	Modifier keys window	Shift key role name	Shift:
 Revert	Modifier keys window		Anfangswerte
-Key role	Modifier keys window	key roles, e.g. Control, Option, Command	Funktion
 Tilde trigger	Keymap window		~ Tilde
 Grave trigger	Keymap window		` Gravis
+Role	Modifier keys window	As in the role of a modifier key	Funktion
 Select dead keys	Keymap window		Auslösetasten definieren
 Cancel	Modifier keys window		Abbrechen
 Quit	Keymap window		Beenden
@@ -18,6 +18,7 @@ Option:	Modifier keys window	Option key role name	Option:
 Switch shortcut keys	Keymap window		Befehlstasten tauschen
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift-Taste
 User:	Keymap window		Benutzer:
+Key	Modifier keys window	As in a computer keyboard key	Taste
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Strg-Taste
 Control:	Modifier keys window	Control key role name	Steuerung:
 Sample and clipboard:	Keymap window		Tastenausgabe:
@@ -29,7 +30,6 @@ Command:	Modifier keys window	Command key role name	Befehl:
 Save as…	Keymap window		Speichern unter…
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd-Taste
 File	Keymap window		Datei
-Key	Modifier keys window	A computer keyboard key	Taste
 (Current)	Keymap window		(Aktiv)
 Font	Keymap window		Schriftart
 Keymap	System name		Tastaturlayout

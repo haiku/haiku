@@ -1,8 +1,6 @@
-1	polish	x-vnd.Haiku-SMTP	2740407895
+1	polish	x-vnd.Haiku-SMTP	1052586247
 SMTP server:	ConfigView		Serwer SMTP:
-STARTTLS	ConfigView		STARTTLS
 Error while logging in to %serv	smtp		Błąd podczas logowania do %serv
-Unencrypted	ConfigView		Nieszyfrowany
 . The server says:\n	smtp		. Serwer mówi:\n
 ESMTP	ConfigView		ESMTP
 Connecting to server…	smtp		Łączenie ze serwerem…
@@ -12,5 +10,4 @@ Destination:	ConfigView		Przeznaczenie:
 : Connection refused or host not found.	smtp		: Połączenie odrzucone lub nie znaleziono hosta.
 None	ConfigView		Brak
 POP3 before SMTP	ConfigView		POP3 przed SMTP
-SSL	ConfigView		SSL
 . The server said:\n	smtp		. Serwer odpowiedział:\n

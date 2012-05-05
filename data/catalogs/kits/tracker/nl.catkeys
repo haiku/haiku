@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	1319179540
+1	dutch; flemish	x-vnd.Haiku-libtracker	3121200791
 common	B_COMMON_DIRECTORY		algemeen
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Icoonweergave
@@ -88,13 +88,11 @@ Replace	FilePanelPriv		Vervangen
 Select all	VolumeWindow		Alles selecteren
 Opens with:	InfoWindow		Wordt geopend met:
 Open	ContainerWindow		Openen
-(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed van %TotalSize, %BytesPersecond/s)
 Error calculating folder size.	InfoWindow		Fout bij het berekenen van de mapgrootte
 New folder	FilePanelPriv		Nieuwe map
 %name info	InfoWindow	InfoWindow Title	%name info
 Favorites	FavoritesMenu		Favorieten
 Add-ons	VolumeWindow		Invoegtoepassingen
-(Finish: %time - %finishtime left)	StatusWindow		(Einde: %time - %finishtime resterend)
 Sorry, you can't copy items to the Trash.	PoseView		Sorry, u kunt geen items naar de prullenbak kopiëren.
 List view	VolumeWindow		Lijstweergave
 matches wildcard expression	SelectionWindow		komt overeen met wildcardtekens
@@ -323,7 +321,6 @@ Empty folder	NavMenu		Lege map
 Copy here	ContainerWindow		Hierheen kopiëren
 Move to Trash	FilePanelPriv		Verpaats naar de prullenbak
 Current folder	ContainerWindow		Huidige map
-(Finish: %time)	StatusWindow		(Voltooid: %time)
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		De gespecifieerde naam wordt al gebruikt als naam van een map. Kies alstublieft een andere naam.
 Clean up	ContainerWindow		Opruimen
 after	FindPanel		na
@@ -380,7 +377,6 @@ And	FindPanel		En
 Select…	DeskWindow		Selecteren...
 Copy	FilePanelPriv		Kopiëren
 Icon view	DeskWindow		Icoonweergave
-(Finish: %time - Over %finishtime left)	StatusWindow		(Einde: %time - Meer dan %finishtime resterend)
 Select all	QueryContainerWindow		Alles selecteren
 Files cannot be moved or deleted from a read-only volume.	PoseView		Bestanden van een alleen-lezen-gegevensdrager laten zich niet verwijderen of verplaatsen.
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Er was een probleem bij het vervangen van \"%name\". Mogelijk is het item geopend of bezig.

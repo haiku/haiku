@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-POP3	1324485597
+1	belarusian	x-vnd.Haiku-POP3	672805158
 Plain text	ConfigView		Просты тэкст
 Sending APOP authentication…	pop3		Дасыланне APOP аўтэнтыфікацыі…
 Sending username…	pop3		Дасыланне імя карыстальніка…
@@ -9,7 +9,6 @@ Getting UniqueIDs…	pop3		Атрыманне ідэнтыфікатараў…
 : No reply.\n	pop3		: Няма адказу.\n
 : Connection refused or host not found	pop3		: Адмова ў далучэнні альбо хост не знойдзены
 Error while connecting to server %serv	pop3		Памылка падчас далучэння %user да сервера
-: Could not allocate socket.	pop3		: Немагчыма вылучыць сокет.
 Error while authenticating user %user	pop3		Памылка падчас аўтэнтыфікацыі %user
 Destination:	ConfigView		Прызначэнне:
 APOP	ConfigView		APOP

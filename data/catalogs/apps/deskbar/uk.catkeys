@@ -1,9 +1,7 @@
-1	ukrainian	x-vnd.Be-TSKB	1657675882
+1	ukrainian	x-vnd.Be-TSKB	1095421712
 Power off	DeskbarMenu		Вимкнути
 Edit menu…	PreferencesWindow		Редагувати меню…
-Suspend	DeskbarMenu		Призупинити
 Applications	PreferencesWindow		Додатки
-About Haiku	DeskbarMenu		Про Haiku
 Recent documents:	PreferencesWindow		Недавні документи:
 Recent applications	DeskbarMenu		Останні програми
 Sort running applications	PreferencesWindow		Сортувати додатки, що запущені
@@ -35,7 +33,6 @@ Recent folders	DeskbarMenu		Останні теки
 About this system	DeskbarMenu		Про цю систему
 Show calendar…	TimeView		Показати календар…
 Deskbar preferences…	DeskbarMenu		Налаштування Deskbar...
-Show Time	Tray		Показати час
 Expand new applications	PreferencesWindow		Розпакувати нові додатки
 Show replicants	DeskbarMenu		Показати репліканти
 Clock	PreferencesWindow		Годинник

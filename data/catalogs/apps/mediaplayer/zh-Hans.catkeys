@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-MediaPlayer	1546758421
+1	english	x-vnd.Haiku-MediaPlayer	1950323722
 raw audio	MediaPlayer-InfoWin		原生音频
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1（美式）
 Stream settings	MediaPlayer-Main		流设置
@@ -53,7 +53,6 @@ Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		移动到垃圾箱出错
 Audio	MediaPlayer-Main		音频
 Open Playlist	MediaPlayer-PlaylistWindow		打开播放列表
 MediaPlayer	System name		媒体播放器
-%f fps	MediaPlayer-InfoWin		%f fps
 OK	MediaPlayer-Main		确定
 Settings…	MediaPlayer-Main		设置...
 MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer 设置

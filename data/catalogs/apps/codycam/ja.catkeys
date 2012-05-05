@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-CodyCam	3353004969
+1	japanese	x-vnd.Haiku-CodyCam	2416864674
 Capturing Image…	VideoConsumer.cpp		画像を取得中...
 Every 30 seconds	CodyCam		30秒毎
 File name:	CodyCam		ファイル名:
@@ -38,6 +38,7 @@ Every 8 hours	CodyCam		8時間毎
 Rename failed	VideoConsumer.cpp		名前の変更に失敗しました
 Cannot start time source!	CodyCam		タイムソースを開始できません
 Cannot register the video window	CodyCam		ビデオウィンドウを登録できません
+CodyCam	System name		CodyCam
 Every 24 hours	CodyCam		24時間毎
 unknown command	SettingsHandler		不明なコマンドです
 Video settings	CodyCam		ビデオ設定

@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-POP3	1324485597
+1	hindi	x-vnd.Haiku-POP3	672805158
 Plain text	ConfigView		सदा टेक्स्ट 
 Sending APOP authentication…	pop3		APOP औथेन्तिकाशन भेज रहें हैं...
 Sending username…	pop3		उसर्नेम को भेज रहे है...
@@ -9,7 +9,6 @@ Getting UniqueIDs…	pop3		UniqueIDs को ला रहें है...
 : No reply.\n	pop3		कोई जवाब नहीं.\n
 : Connection refused or host not found	pop3		: कनेक्शन मना कर दिया गया या फिर होस्ट नहीं मिला
 Error while connecting to server %serv	pop3		त्रुटी जब सर्वर से कोन्नेक्ट करने की कोशिश कर रहे थे %serv
-: Could not allocate socket.	pop3		: सोकेट को अल्लोकेट नहीं कर पाए.
 Error while authenticating user %user	pop3		त्रुटी जब उसर को औंठेन्तिकते कर रहे थे %user
 Destination:	ConfigView		गंतव्य:
 APOP	ConfigView		APOP

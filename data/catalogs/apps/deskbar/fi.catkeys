@@ -1,9 +1,7 @@
-1	finnish	x-vnd.Be-TSKB	1657675882
+1	finnish	x-vnd.Be-TSKB	1095421712
 Power off	DeskbarMenu		Sammuta virta
 Edit menu…	PreferencesWindow		Muokkaa valikkoa...
-Suspend	DeskbarMenu		Keskeytystila
 Applications	PreferencesWindow		Sovellukset
-About Haiku	DeskbarMenu		Haikusta...
 Recent documents:	PreferencesWindow		Äskettäiset asiakirjat:
 Recent applications	DeskbarMenu		Äskettäiset sovellukset
 Sort running applications	PreferencesWindow		Lajittele suoritettavat sovellukset
@@ -35,7 +33,6 @@ Recent folders	DeskbarMenu		Äskettäiset kansiot
 About this system	DeskbarMenu		Tästä järjestelmästä
 Show calendar…	TimeView		Näytä kalenteri...
 Deskbar preferences…	DeskbarMenu		Työpöytäpalkkiasetukset...
-Show Time	Tray		Näytä aika
 Expand new applications	PreferencesWindow		Laajenna uudet sovellukset
 Show replicants	DeskbarMenu		Näytä replikantit
 Clock	PreferencesWindow		Kello

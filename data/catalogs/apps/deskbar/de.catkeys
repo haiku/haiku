@@ -1,17 +1,19 @@
-1	german	x-vnd.Be-TSKB	3192488620
+1	german	x-vnd.Be-TSKB	359782181
 Power off	DeskbarMenu		Ausschalten
+Show day of week	PreferencesWindow		Wochentag anzeigen
 Edit menu…	PreferencesWindow		Menü bearbeiten…
-Suspend	DeskbarMenu		Ruhezustand
 Applications	PreferencesWindow		Anwendungen
-About Haiku	DeskbarMenu		Über Haiku
+Time preferences…	TimeView		Datum & Zeit Einstellungen…
 Recent documents:	PreferencesWindow		Letzte Dokumente:
 Recent applications	DeskbarMenu		Letzte Anwendungen
 Sort running applications	PreferencesWindow		Laufende Anwendungen sortieren
+Show time	Tray		Uhrzeit anzeigen
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Anwendungen
 Find…	DeskbarMenu		Suchen…
 Window	PreferencesWindow		Fenster
 Menu	PreferencesWindow		Menü
 Recent documents	DeskbarMenu		Letzte Dokumente
+Show seconds	PreferencesWindow		Sekunden anzeigen
 Auto-hide	PreferencesWindow		Automatisch ausblenden
 Always on top	PreferencesWindow		Immer im Vordergrund
 <Deskbar folder is empty>	DeskbarMenu		<Deskbar-Ordner ist leer>
@@ -37,7 +39,6 @@ Recent folders	DeskbarMenu		Letzte Ordner
 About this system	DeskbarMenu		Über dieses System
 Show calendar…	TimeView		Kalender anzeigen…
 Deskbar preferences…	DeskbarMenu		Deskbar-Einstellungen…
-Show Time	Tray		Uhrzeit einblenden
 Expand new applications	PreferencesWindow		Neue Anwendungen aufklappen
 Show replicants	DeskbarMenu		Replikanten einblenden
 Hide application names	PreferencesWindow		Anwendungsnamen ausblenden

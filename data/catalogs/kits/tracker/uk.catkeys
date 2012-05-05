@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	360023500
+1	ukrainian	x-vnd.Haiku-libtracker	2162044751
 common	B_COMMON_DIRECTORY		common
 OK	WidgetAttributeText		Гаразд
 Icon view	VolumeWindow		У вигляді іконок
@@ -87,13 +87,11 @@ Replace	FilePanelPriv		Замінити
 Select all	VolumeWindow		Вибрати все
 Opens with:	InfoWindow		Відкрити за допомогою:
 Open	ContainerWindow		Відкрити
-(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		%SizeProcessed з %TotalSize, %BytesPerSecond/s)
 Error calculating folder size.	InfoWindow		Помилка при обчисленні розміру папки.
 New folder	FilePanelPriv		Нова папка
 %name info	InfoWindow	InfoWindow Title	%name інформація
 Favorites	FavoritesMenu		Вибране
 Add-ons	VolumeWindow		Додатки
-(Finish: %time - %finishtime left)	StatusWindow		(Завершено: %time - %finishtime залишилось)
 Sorry, you can't copy items to the Trash.	PoseView		Вибачте, Ви не можете копіювати елементи до Кошика.
 List view	VolumeWindow		У вигляді списку
 matches wildcard expression	SelectionWindow		співпадає з підставленими виразами
@@ -322,7 +320,6 @@ Empty folder	NavMenu		Пуста папка
 Copy here	ContainerWindow		Копіювати сюди
 Move to Trash	FilePanelPriv		Перемістити до Кошика
 Current folder	ContainerWindow		Поточна папка
-(Finish: %time)	StatusWindow		(Фініш: %time)
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Зазначене ім'я вже використовується в якості імені папки. Будь ласка, виберіть інше ім'я.
 Clean up	ContainerWindow		Очистити
 after	FindPanel		після
@@ -379,7 +376,6 @@ And	FindPanel		І
 Select…	DeskWindow		Вибрати…
 Copy	FilePanelPriv		Копіювати
 Icon view	DeskWindow		У вигляді іконок
-(Finish: %time - Over %finishtime left)	StatusWindow		(Закінчення: %time - Понад %finishtime залишилось)
 Select all	QueryContainerWindow		Вибрати все
 Files cannot be moved or deleted from a read-only volume.	PoseView		Неможливо видалити або перемістити файл з тому тільки для читання.
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Виникла проблема при спробі перемістити \"%name\". Елемент може бути відкритим або зайнятим.

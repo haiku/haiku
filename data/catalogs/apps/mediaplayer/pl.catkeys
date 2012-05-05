@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-MediaPlayer	1392487766
+1	polish	x-vnd.Haiku-MediaPlayer	721480919
 raw audio	MediaPlayer-InfoWin		czysty dźwięk
 Location	MediaPlayer-InfoWin		Położenie
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerykańskie)
@@ -14,6 +14,7 @@ Save Playlist	MediaPlayer-PlaylistWindow		Zapisz listę odtwarzania
 (not supported)	MediaPlayer-InfoWin		(nie wspierane)
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Żaden z plików, które chciałeś otworzyć, nie wygląda na plik multimedialny.
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Zapisywanie listy odtwarzania nie powiodło się.\n\nBłąd: 
+%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 New player…	MediaPlayer-Main		Nowy odtwarzacz…
 100% scale	MediaPlayer-Main		100% skali
 Subtitle placement:	MediaPlayer-SettingsWindow		Położenie napisów:
@@ -62,7 +63,6 @@ Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Błąd przenoszenia do Kosza
 Audio	MediaPlayer-Main		Dźwięk
 Open Playlist	MediaPlayer-PlaylistWindow		Otwórz listę odtwarzania
 MediaPlayer	System name		MediaPlayer
-%f fps	MediaPlayer-InfoWin		%f fps
 OK	MediaPlayer-Main		OK
 Settings…	MediaPlayer-Main		Ustawienia…
 MediaPlayer settings	MediaPlayer-SettingsWindow		Ustawienia programu MediaPlayer
@@ -133,6 +133,7 @@ Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Mieszanie wpisów
 Revert	MediaPlayer-SettingsWindow		Przywróć
 Edit	MediaPlayer-PlaylistWindow		Edytuj
 Start media server	MediaPlayer-Main		Uruchom serwer mediów
+%.3f fps	MediaPlayer-InfoWin		%.3f fps
 Toggle fullscreen.	MediaPlayer-Main		Przełącz tryb pełnoekranowy.
 ToggleFullscreen	MediaPlayer-Main		PrzałączeniePełnegoEkranu
 <unnamed>	PlaylistItem-name		<bez nazwy>

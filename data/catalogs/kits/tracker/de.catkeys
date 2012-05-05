@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	1319179540
+1	german	x-vnd.Haiku-libtracker	3121200791
 common	B_COMMON_DIRECTORY		Allgemein
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Icon-Ansicht
@@ -88,13 +88,11 @@ Replace	FilePanelPriv		Ersetzen
 Select all	VolumeWindow		Alles auswählen
 Opens with:	InfoWindow		Wird geöffnet mit:
 Open	ContainerWindow		Öffnen
-(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed von %TotalSize, %BytesPerSecond/s)
 Error calculating folder size.	InfoWindow		Fehler beim Ermitteln der Ordnergröße.
 New folder	FilePanelPriv		Neuer Ordner
 %name info	InfoWindow	InfoWindow Title	%name Info
 Favorites	FavoritesMenu		Favoriten
 Add-ons	VolumeWindow		Add-ons
-(Finish: %time - %finishtime left)	StatusWindow		(Fertig: %time - Noch %finishtime)
 Sorry, you can't copy items to the Trash.	PoseView		Objekte können leider nicht in den Papierkorb kopiert werden.
 List view	VolumeWindow		Listenansicht
 matches wildcard expression	SelectionWindow		entspricht Platzhalter-Ausdruck
@@ -323,7 +321,6 @@ Empty folder	NavMenu		Leerer Ordner
 Copy here	ContainerWindow		Hierher kopieren
 Move to Trash	FilePanelPriv		In Papierkorb verschieben
 Current folder	ContainerWindow		Aktueller Ordner
-(Finish: %time)	StatusWindow		(Fertig: %time)
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Der angegebene Name wird bereits von einem Ordner benutzt. Bitte einen anderen wählen.
 Clean up	ContainerWindow		Icons ausrichten
 after	FindPanel		nach
@@ -380,7 +377,6 @@ And	FindPanel		Und
 Select…	DeskWindow		Auswählen…
 Copy	FilePanelPriv		Kopieren
 Icon view	DeskWindow		Icon-Ansicht
-(Finish: %time - Over %finishtime left)	StatusWindow		(Fertig: %time - Noch über %finishtime)
 Select all	QueryContainerWindow		Alles auswählen
 Files cannot be moved or deleted from a read-only volume.	PoseView		Dateien können auf einem schreibgeschützten Datenträger nicht verschoben oder gelöscht werden.
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Es ist ein Problem beim Ersetzen von \"%name\" aufgetreten. Das Objekt könnte geöffnet oder gerade in Benutzung sein.

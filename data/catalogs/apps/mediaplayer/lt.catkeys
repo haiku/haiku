@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-MediaPlayer	338754760
+1	lithuanian	x-vnd.Haiku-MediaPlayer	742320061
 raw audio	MediaPlayer-InfoWin		neapdorotas garso įrašas
 Location	MediaPlayer-InfoWin		Vieta
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikietiškas)
@@ -60,7 +60,6 @@ Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Klaida išmetant Šiukšlin�
 Audio	MediaPlayer-Main		Garsas
 Open Playlist	MediaPlayer-PlaylistWindow		Atverti grojaraštį
 MediaPlayer	System name		Medijos leistuvė
-%f fps	MediaPlayer-InfoWin		%f kadrų per sekundę
 OK	MediaPlayer-Main		Gerai
 Settings…	MediaPlayer-Main		Nuostatos…
 MediaPlayer settings	MediaPlayer-SettingsWindow		Medijos leistuvės nuostatos

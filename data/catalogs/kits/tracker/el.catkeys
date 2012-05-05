@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	3352001058
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	859055013
 common	B_COMMON_DIRECTORY		κοινό
 OK	WidgetAttributeText		Εντάξει
 Icon view	VolumeWindow		Προβολή εικονιδίου
@@ -86,13 +86,11 @@ Replace	FilePanelPriv		Αντικατάσταση
 Select all	VolumeWindow		Επιλογή όλων
 Opens with:	InfoWindow		Άνοιγμα με:
 Open	ContainerWindow		Άνοιγμα
-(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed από %TotalSize, %BytesPerSecond/s)
 Error calculating folder size.	InfoWindow		Σφάλμα κατά τον υπολογισμό του μεγέθους φακέλου
 New folder	FilePanelPriv		Νέος φάκελος
 %name info	InfoWindow	InfoWindow Title	%name πληροφορίες
 Favorites	FavoritesMenu		Αγαπημένα
 Add-ons	VolumeWindow		Πρόσθετα
-(Finish: %time - %finishtime left)	StatusWindow		(Τερματισμός: %time - %finishtime απομένουν)
 Sorry, you can't copy items to the Trash.	PoseView		Δεν μπορείτε να αντιγράψετε στοιχεία στον Κάδο.
 List view	VolumeWindow		Προβολή λίστας
 rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	μετονομασία
@@ -317,7 +315,6 @@ Empty folder	NavMenu		Άδειος φάκελος
 Copy here	ContainerWindow		Αντιγραφή εδώ
 Move to Trash	FilePanelPriv		Μεταφορά στον καδο ανακύκλωσης
 Current folder	ContainerWindow		Τρέχων κατάλογος
-(Finish: %time)	StatusWindow		(Τερματισμός: %time)
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Το προσδιορισμένο όνομα ήδη χρησιμοποιείται ως όνομα φακέλου. Παρακαλώ διαλέξτε άλλο όνομα.
 Clean up	ContainerWindow		Καθαρισμός
 after	FindPanel		μετά
@@ -373,7 +370,6 @@ And	FindPanel		Και
 Select…	DeskWindow		Επιλογή...
 Copy	FilePanelPriv		Αντιγραφή
 Icon view	DeskWindow		Προβολή εικονιδίου
-(Finish: %time - Over %finishtime left)	StatusWindow		(Τερματισμός: %time - Περίπου %finishtime απομένουν)
 Select all	QueryContainerWindow		Επιλογή όλων
 Files cannot be moved or deleted from a read-only volume.	PoseView		Τα αρχεία δεν μπορούν να μετακινηθούν ή να διαγραφούν από ένα τόμο μόνο προς ανάγνωση.
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Υπήρξε κάποιο πρόβλημα κατά την προσπάθεια αντικατάστασης του \"%name\". Το αντικείμενο μπορεί να είναι ήδη ανοιχτό ή απασχολημένο.

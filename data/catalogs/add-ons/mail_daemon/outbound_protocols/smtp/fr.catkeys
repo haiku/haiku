@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-SMTP	294421070
+1	french	x-vnd.Haiku-SMTP	2726836340
 SMTP server:	ConfigView		Serveur SMTP :
 Error while logging in to %serv	smtp		Erreur lors de la connexion à %serv
 . The server says:\n	smtp		. Le serveur indique :\n
@@ -8,5 +8,4 @@ Destination:	ConfigView		Destination :
 : Connection refused or host not found.	smtp		: Connexion refusée ou hôte non trouvé.
 None	ConfigView		Aucun
 POP3 before SMTP	ConfigView		POP3 avant SMTP
-SSL	ConfigView		SSL
 . The server said:\n	smtp		. Le serveur a indiqué :\n

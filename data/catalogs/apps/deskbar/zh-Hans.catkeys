@@ -1,9 +1,7 @@
-1	english	x-vnd.Be-TSKB	3230493711
+1	english	x-vnd.Be-TSKB	2668239541
 Power off	DeskbarMenu		关闭电源
 Edit menu…	PreferencesWindow		编辑菜单
-Suspend	DeskbarMenu		挂起
 Applications	PreferencesWindow		应用程序
-About Haiku	DeskbarMenu		关于 Haiku
 Recent documents:	PreferencesWindow		最近文档：
 Recent applications	DeskbarMenu		最近程序
 Sort running applications	PreferencesWindow		运行程序排序
@@ -31,7 +29,6 @@ Shutdown…	DeskbarMenu		关机...
 Tracker always first	PreferencesWindow		文件浏览器置顶
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		系统设置
 Show calendar…	TimeView		显示日历...
-Show Time	Tray		显示时间
 Expand new applications	PreferencesWindow		展开新程序
 Clock	PreferencesWindow		时钟
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		演示程序

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	1319179540
+1	belarusian	x-vnd.Haiku-libtracker	3121200791
 common	B_COMMON_DIRECTORY		агульны
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Від іконак
@@ -88,13 +88,11 @@ Replace	FilePanelPriv		Замяніць
 Select all	VolumeWindow		Выбраць усё
 Opens with:	InfoWindow		Адкрыць з:
 Open	ContainerWindow		Адкрыць
-(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed з %TotalSize, %BytesPerSecond/s)
 Error calculating folder size.	InfoWindow		Памылка пры падліку памеру каталога.
 New folder	FilePanelPriv		Новы каталог
 %name info	InfoWindow	InfoWindow Title	%name інфа
 Favorites	FavoritesMenu		Выбранае
 Add-ons	VolumeWindow		Дапаўненні
-(Finish: %time - %finishtime left)	StatusWindow		(Скончыць: %time - засталося %finishtime)
 Sorry, you can't copy items to the Trash.	PoseView		Прабачце, вы не можаце капіяваць элементы ў Сметніцу.
 List view	VolumeWindow		Від спісу
 matches wildcard expression	SelectionWindow		супадае з падстановачнымі выразамі
@@ -323,7 +321,6 @@ Empty folder	NavMenu		Пусты каталог
 Copy here	ContainerWindow		Капіяваць сюды
 Move to Trash	FilePanelPriv		Адправіць у Сметніцу
 Current folder	ContainerWindow		Цякучы каталог
-(Finish: %time)	StatusWindow		(Завяршэнне: %time)
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Пазначанае імя ужо выкарыстана як імя каталога. Калі ласка, выберыце іншае.
 Clean up	ContainerWindow		Прыбрацца
 after	FindPanel		пасля
@@ -380,7 +377,6 @@ And	FindPanel		І
 Select…	DeskWindow		Выбраць...
 Copy	FilePanelPriv		Капіяваць
 Icon view	DeskWindow		Від іконак
-(Finish: %time - Over %finishtime left)	StatusWindow		(Завяршэнне: %time - Засталося каля %finishtime)
 Select all	QueryContainerWindow		Выбраць усё
 Files cannot be moved or deleted from a read-only volume.	PoseView		Нельга выдаляць або перамяшчаць файла з тома толькі для чытання.
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Адбылася памылка пры замене \"%name\". Элемент можа быць заняты або адкрыты.

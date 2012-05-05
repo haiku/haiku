@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-TSKB	3709318151
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-TSKB	1689825316
 Edit menu…	PreferencesWindow		Rediger meny...
 Applications	PreferencesWindow		Programmer
 Recent documents:	PreferencesWindow		Nylig brukte dokumenter
@@ -20,7 +20,6 @@ Recent applications:	PreferencesWindow		Nylig brukte programmer
 Tracker always first	PreferencesWindow		Tracker alltid først
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		B_USER_DESKBAR_DIRECTORY/Innstillinger
 Show calendar…	TimeView		Vis kalender...
-Show Time	Tray		Vis klokken
 Expand new applications	PreferencesWindow		Pakk ut nye programmer
 Clock	PreferencesWindow		Klokke
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		B_USER_DESKBAR_DIRECTORY/Demoer

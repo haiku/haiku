@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	518861418
+1	english	x-vnd.Haiku-libtracker	3343389761
 common	B_COMMON_DIRECTORY		常用
 OK	WidgetAttributeText		确定
 Icon view	VolumeWindow		图标视图
@@ -85,7 +85,6 @@ Replace	FilePanelPriv		替换
 Select all	VolumeWindow		全选
 Opens with:	InfoWindow		打开方式：
 Open	ContainerWindow		打开
-(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed of %TotalSize, %BytesPerSecond/s)
 Error calculating folder size.	InfoWindow		文件夹大小计算错误。
 New folder	FilePanelPriv		新建文件夹
 %name info	InfoWindow	InfoWindow Title	%name 信息
@@ -308,7 +307,6 @@ Empty folder	NavMenu		清空目录
 Copy here	ContainerWindow		复制到此
 Move to Trash	FilePanelPriv		移动到垃圾箱
 Current folder	ContainerWindow		当前目录
-(Finish: %time)	StatusWindow		（完成：%time）
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		指定名称已经作为目录名使用。请选择其他命名。
 Clean up	ContainerWindow		清除
 after	FindPanel		之后

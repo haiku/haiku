@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-POP3	1324485597
+1	english	x-vnd.Haiku-POP3	672805158
 Plain text	ConfigView		纯文本
 Sending APOP authentication…	pop3		发送 APOP 认证...
 Sending username…	pop3		发送用户名...
@@ -9,7 +9,6 @@ Getting UniqueIDs…	pop3		获取特别ID...
 : No reply.\n	pop3		：无回复。\n
 : Connection refused or host not found	pop3		：连接被拒绝，或未发现主机
 Error while connecting to server %serv	pop3		连接到服务器 %serv 失败
-: Could not allocate socket.	pop3		：无法分配端口。
 Error while authenticating user %user	pop3		认证用户 %user 失败
 Destination:	ConfigView		目标：
 APOP	ConfigView		APOP

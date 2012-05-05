@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Be-TSKB	3212877640
+1	romanian	x-vnd.Be-TSKB	1193384805
 Edit menu…	PreferencesWindow		Editează meniu...
 Applications	PreferencesWindow		Aplicații
 Recent documents:	PreferencesWindow		Documente recente:
@@ -21,7 +21,6 @@ Recent applications:	PreferencesWindow		Aplicații recente:
 Tracker always first	PreferencesWindow		Trackerul întotdeauna primul
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Preferințe
 Show calendar…	TimeView		Afișează calendar...
-Show Time	Tray		Afișează ora
 Expand new applications	PreferencesWindow		Extinde aplicații noi
 Clock	PreferencesWindow		Ceas
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demo-uri

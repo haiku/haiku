@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	1319179540
+1	finnish	x-vnd.Haiku-libtracker	3121200791
 common	B_COMMON_DIRECTORY		yhteinen
 OK	WidgetAttributeText		Valmis
 Icon view	VolumeWindow		Kuvakenäkymä
@@ -88,13 +88,11 @@ Replace	FilePanelPriv		Korvaa
 Select all	VolumeWindow		Valitse kaikki
 Opens with:	InfoWindow		Avaa sovelluksella:
 Open	ContainerWindow		Avaa
-(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed / %TotalSize, %BytesPerSecond/s)
 Error calculating folder size.	InfoWindow		Virhe laskettaessa kansiokokoa
 New folder	FilePanelPriv		Uusi kansio
 %name info	InfoWindow	InfoWindow Title	%name-tiedot
 Favorites	FavoritesMenu		Suosikit
 Add-ons	VolumeWindow		Lisäosat
-(Finish: %time - %finishtime left)	StatusWindow		(Loppuu: %time - %finishtime jäljellä)
 Sorry, you can't copy items to the Trash.	PoseView		Et voi kopioida kohteita roskakoriin.
 List view	VolumeWindow		Luettelonäkymä
 matches wildcard expression	SelectionWindow		täsmää jokerilausekkeeseen
@@ -323,7 +321,6 @@ Empty folder	NavMenu		Tyhjennä kansio
 Copy here	ContainerWindow		Kopioi tänne
 Move to Trash	FilePanelPriv		Siirrä roskakoriin
 Current folder	ContainerWindow		Nykyinen kansio
-(Finish: %time)	StatusWindow		(Loppuu klo: %time)
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Määritelty nimi on jo käytössä kansionimenä. Valitse toinen nimi.
 Clean up	ContainerWindow		Tyhjennä
 after	FindPanel		jälkeen
@@ -380,7 +377,6 @@ And	FindPanel		Ja
 Select…	DeskWindow		Valitse...
 Copy	FilePanelPriv		Kopioi
 Icon view	DeskWindow		Kuvakenäkymä
-(Finish: %time - Over %finishtime left)	StatusWindow		(Loppuu: %time - Yli %finistime jäljellä)
 Select all	QueryContainerWindow		Valitse kaikki
 Files cannot be moved or deleted from a read-only volume.	PoseView		Tiedostoja ei voi siirtää tai poistaa kirjoitussuojatulta taltiolta.
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Kohteen ”%name” korvaaminen epäonnistui. Kohde ei ehkä ole avattu tai se on varattu.

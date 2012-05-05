@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MediaPlayer	1392487766
+1	finnish	x-vnd.Haiku-MediaPlayer	1796053067
 raw audio	MediaPlayer-InfoWin		Raakaääni
 Location	MediaPlayer-InfoWin		Sijainti
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikkalainen)
@@ -62,7 +62,6 @@ Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Siirrä roskakoriin
 Audio	MediaPlayer-Main		Ääni
 Open Playlist	MediaPlayer-PlaylistWindow		Avaa soittoluettelo
 MediaPlayer	System name		Mediasoitin
-%f fps	MediaPlayer-InfoWin		%f fps
 OK	MediaPlayer-Main		Valmis
 Settings…	MediaPlayer-Main		Asetukset...
 MediaPlayer settings	MediaPlayer-SettingsWindow		Mediasoitinasetukset

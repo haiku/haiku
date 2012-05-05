@@ -1,11 +1,11 @@
-1	polish	x-vnd.Haiku-libtracker	1319179540
+1	polish	x-vnd.Haiku-libtracker	3121200791
 common	B_COMMON_DIRECTORY		common
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Widok ikon
 Add-ons	FilePanelPriv		Wtyczki
 Desktop	Model		Pulpit
 Identify	ContainerWindow		Rozpoznaj
-Warning space color	SettingsView		Kolor wysokiej zajętości (ostrzeżenie)
+Warning space color	SettingsView		Błąd przestrzeni kolorów
 Close	VolumeWindow		Zamknij
 Open	OpenWithWindow		Otwórz
 Tracker status	StatusWindow		Status Trackera
@@ -88,13 +88,11 @@ Replace	FilePanelPriv		Zastąp
 Select all	VolumeWindow		Zaznacz wszystko
 Opens with:	InfoWindow		Otwórz za pomocą:
 Open	ContainerWindow		Otwórz
-(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed z %TotalSize, %BytesPerSecond/s)
 Error calculating folder size.	InfoWindow		Błąd przy obliczaniu rozmiaru folderu.
 New folder	FilePanelPriv		Nowy folder
 %name info	InfoWindow	InfoWindow Title	%name informacje
 Favorites	FavoritesMenu		Ulubione
 Add-ons	VolumeWindow		Wtyczki
-(Finish: %time - %finishtime left)	StatusWindow		(Koniec: %time - %finishtime pozostało)
 Sorry, you can't copy items to the Trash.	PoseView		Przepraszamy, nie możesz skopiować elementu do kosza.
 List view	VolumeWindow		Widok listy
 matches wildcard expression	SelectionWindow		Odpowiada wieloznacznikowemu wyrażeniu
@@ -323,7 +321,6 @@ Empty folder	NavMenu		Pusty folder
 Copy here	ContainerWindow		Kopiuj tutaj
 Move to Trash	FilePanelPriv		Przenieś do kosza
 Current folder	ContainerWindow		Obecny folder
-(Finish: %time)	StatusWindow		(Pozostało: %time)
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Dana nazwa jest już użyta jako nazwa folderu. Proszę wybrać inną nazwę.
 Clean up	ContainerWindow		Wyczyść
 after	FindPanel		po
@@ -380,7 +377,6 @@ And	FindPanel		I
 Select…	DeskWindow		Wybierz…
 Copy	FilePanelPriv		Kopiuj
 Icon view	DeskWindow		Widok ikon
-(Finish: %time - Over %finishtime left)	StatusWindow		(Koniec: %time - Pozostało %finishtime)
 Select all	QueryContainerWindow		Zaznacz wszystko
 Files cannot be moved or deleted from a read-only volume.	PoseView		Pliki nie mogą zostać przeniesione do woluminu tylko do odczytu.
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Pojawił się problem przy modyfikowaniu \"%name\". Plik może być zajęty lub otwarty przez inny proces.

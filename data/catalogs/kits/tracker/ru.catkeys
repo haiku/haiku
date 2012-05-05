@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	1305910161
+1	russian	x-vnd.Haiku-libtracker	4130438504
 common	B_COMMON_DIRECTORY		Общие
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Большие значки
@@ -86,7 +86,6 @@ Replace	FilePanelPriv		Заменить
 Select all	VolumeWindow		Выделить все
 Opens with:	InfoWindow		Открывать в:
 Open	ContainerWindow		Открыть
-(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed из %TotalSize, %BytesPerSecond/с)
 Error calculating folder size.	InfoWindow		Ошибка при подсчете размера папки.
 New folder	FilePanelPriv		Новая папка
 %name info	InfoWindow	InfoWindow Title	Информация о %name
@@ -310,7 +309,6 @@ Empty folder	NavMenu		Пустая папка
 Copy here	ContainerWindow		Копировать сюда
 Move to Trash	FilePanelPriv		В корзину
 Current folder	ContainerWindow		Текущую папку
-(Finish: %time)	StatusWindow		(Осталось: %time)
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Указанное имя уже использовано в качестве имени папки. Введите какое-нибудь другое.
 Clean up	ContainerWindow		Выстроить
 after	FindPanel		после

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	3422331931
+1	french	x-vnd.Haiku-libtracker	1951892978
 common	B_COMMON_DIRECTORY		commun
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Vue en icônes
@@ -88,7 +88,6 @@ Replace	FilePanelPriv		Remplacer
 Select all	VolumeWindow		Sélectionner tout
 Opens with:	InfoWindow		Ouvrir avec :
 Open	ContainerWindow		Ouvrir
-(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed sur %TotalSize, %BytesPerSecond/s)
 Error calculating folder size.	InfoWindow		Erreur de calcul de la taille du dossier.
 New folder	FilePanelPriv		Nouveau dossier
 %name info	InfoWindow	InfoWindow Title	Informations sur %name
@@ -318,7 +317,6 @@ Empty folder	NavMenu		Dossier vide
 Copy here	ContainerWindow		Copier ici
 Move to Trash	FilePanelPriv		Envoyer à la corbeille
 Current folder	ContainerWindow		Dossier courant
-(Finish: %time)	StatusWindow		(Fin : %time)
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Le nom indiqué est déjà utilisé comme nom de dossier. Veuillez en choisir un autre.
 Clean up	ContainerWindow		Nettoyer
 after	FindPanel		après

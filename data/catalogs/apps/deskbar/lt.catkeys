@@ -1,9 +1,7 @@
-1	lithuanian	x-vnd.Be-TSKB	1657675882
+1	lithuanian	x-vnd.Be-TSKB	1095421712
 Power off	DeskbarMenu		Išjungti
 Edit menu…	PreferencesWindow		Taisyti meniu…
-Suspend	DeskbarMenu		Pristabdyti
 Applications	PreferencesWindow		Programos
-About Haiku	DeskbarMenu		Apie „Haiku“
 Recent documents:	PreferencesWindow		Paskiausi dokumentai:
 Recent applications	DeskbarMenu		Paskiausiai leistos programos
 Sort running applications	PreferencesWindow		Rikiuoti paleistas programas
@@ -35,7 +33,6 @@ Recent folders	DeskbarMenu		Paskiausiai lankyti aplankai
 About this system	DeskbarMenu		Apie šią sistemą
 Show calendar…	TimeView		Rodyti kalendorių…
 Deskbar preferences…	DeskbarMenu		Užduočių juostos nuostatos…
-Show Time	Tray		Rodyti laikrodį
 Expand new applications	PreferencesWindow		Išskleisti paleidžiamas programas
 Show replicants	DeskbarMenu		Rodyti replikavimo rankenėles
 Clock	PreferencesWindow		Laikrodis

@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	1592297043
+1	slovak	x-vnd.Haiku-libtracker	3394318294
 common	B_COMMON_DIRECTORY		spoločné
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Zobrazenie ikon
@@ -87,13 +87,11 @@ Replace	FilePanelPriv		Nahradiť
 Select all	VolumeWindow		Vybrať všetko
 Opens with:	InfoWindow		Otvára sa pomocou:
 Open	ContainerWindow		Otvoriť
-(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed z %TotalSize, %BytesPerSecond/s)
 Error calculating folder size.	InfoWindow		Chyba pri výpočte veľkosti priečinka.
 New folder	FilePanelPriv		Nový priečinok
 %name info	InfoWindow	InfoWindow Title	Info o %name
 Favorites	FavoritesMenu		Obľúbené
 Add-ons	VolumeWindow		Doplnky
-(Finish: %time - %finishtime left)	StatusWindow		(Dokončenie: %time - zostáva %finishtime)
 Sorry, you can't copy items to the Trash.	PoseView		Ľutujeme, nemôžete kopírovať položky do Koša.
 List view	VolumeWindow		Zobrazenie zoznamu
 matches wildcard expression	SelectionWindow		zodpovedá výrazu so zástupnými znakmi
@@ -322,7 +320,6 @@ Empty folder	NavMenu		Prázdny priečinok
 Copy here	ContainerWindow		Kopírovať sem
 Move to Trash	FilePanelPriv		Presunúť do Koša
 Current folder	ContainerWindow		Aktuálny priečinok
-(Finish: %time)	StatusWindow		(Dokončenie: %time)
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Uvedený názov je už použitý ako názov priečinka. Prosím, vyberte iný názov.
 Clean up	ContainerWindow		Vyčistiť
 after	FindPanel		po
@@ -379,7 +376,6 @@ And	FindPanel		a
 Select…	DeskWindow		Vybrať…
 Copy	FilePanelPriv		Kopírovať
 Icon view	DeskWindow		Zobrazenie ikon
-(Finish: %time - Over %finishtime left)	StatusWindow		(Koniec: %time - zostáva viac ako %finishtime)
 Select all	QueryContainerWindow		Vybrať všetky
 Files cannot be moved or deleted from a read-only volume.	PoseView		Súbory nemožno presunúť alebo zmazať na zväzku, ktorý je len na čítanie.
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Vyskytol sa problém pri pokuse nahradiť „%name“. Položka môže byť otvorená alebo sa používa.

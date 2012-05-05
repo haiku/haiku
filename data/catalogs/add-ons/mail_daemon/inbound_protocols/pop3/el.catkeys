@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-POP3	1324485597
+1	greek, modern (1453-)	x-vnd.Haiku-POP3	672805158
 Plain text	ConfigView		Απλό κείμενο
 Sending APOP authentication…	pop3		Αποστολή πιστοποίησης APOP...
 Sending username…	pop3		Αποστολή ονόματος χρήστη...
@@ -9,7 +9,6 @@ Getting UniqueIDs…	pop3		Λήψη UniqueIDs…
 : No reply.\n	pop3		: Καμία απάντηση.\n
 : Connection refused or host not found	pop3		: Η σύνδεση απορρίφθηκε 'η ο διακομιστής δε βρέθηκε
 Error while connecting to server %serv	pop3		Σφάλμα κατα τη σύνδεση στον εξυπηρετητή %serv
-: Could not allocate socket.	pop3		: Αδυναμία κατανομής της υποδοχής
 Error while authenticating user %user	pop3		Σφάλμα κατα την πιστοποίηση του χρήστη %user
 Destination:	ConfigView		Προορισμός:
 APOP	ConfigView		APOP
