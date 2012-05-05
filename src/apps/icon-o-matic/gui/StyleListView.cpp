@@ -428,9 +428,12 @@ StyleListView::MakeDragMessage(BMessage* message) const
 	for (int32 i = 0; i < count; i++) {
 		StyleListItem* item = dynamic_cast<StyleListItem*>(
 			ItemAt(CurrentSelection(i)));
-		if (item != NULL)
+		if (item != NULL) {
 			message->AddPointer("style", (void*)item->style);
-		else
+			BMessage archive;
+			if (item->style->Archive(&archive, true) == B_OK)
+				message->AddMessage("style archive", &archive);
+		} else
 			break;
 	}
 }
@@ -447,6 +450,56 @@ void
 StyleListView::SetDropTargetRect(const BMessage* message, BPoint where)
 {
 	SimpleListView::SetDropTargetRect(message, where);
+}
+
+
+bool
+StyleListView::HandleDropMessage(const BMessage* message, int32 dropIndex)
+{
+	// Let SimpleListView handle drag-sorting (when drag came from ourself)
+	if (SimpleListView::HandleDropMessage(message, dropIndex))
+		return true;
+
+	if (fCommandStack == NULL || fStyleContainer == NULL)
+		return false;
+
+	// Drag may have come from another instance, like in another window.
+	// Reconstruct the Styles from the archive and add them at the drop
+	// index.
+	int index = 0;
+	BList styles;
+	while (true) {
+		BMessage archive;
+		if (message->FindMessage("style archive", index, &archive) != B_OK)
+			break;
+		Style* style = new(std::nothrow) Style(&archive);
+		if (style == NULL)
+			break;
+		
+		if (!styles.AddItem(style)) {
+			delete style;
+			break;
+		}
+
+		index++;
+	}
+
+	int32 count = styles.CountItems();
+	if (count == 0)
+		return false;
+
+	AddStylesCommand* command = new(std::nothrow) AddStylesCommand(
+		fStyleContainer, (Style**)styles.Items(), count, dropIndex);
+
+	if (command == NULL) {
+		for (int32 i = 0; i < count; i++)
+			delete (Style*)styles.ItemAtFast(i);
+		return false;
+	}
+
+	fCommandStack->Perform(command);
+
+	return true;
 }
 
 
