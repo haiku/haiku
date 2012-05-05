@@ -639,10 +639,10 @@ DragSortableListView::HandleDropMessage(const BMessage* message,
 	if (items.CountItems() == 0)
 		return false;
 
-	if (modifiers() & B_SHIFT_KEY)
-		CopyItems(items, index);
+	if ((modifiers() & B_SHIFT_KEY) != 0)
+		CopyItems(items, dropIndex);
 	else
-		MoveItems(items, index);
+		MoveItems(items, dropIndex);
 
 	return true;
 }
