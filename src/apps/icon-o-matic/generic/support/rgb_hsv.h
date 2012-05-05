@@ -98,6 +98,9 @@ HSV_to_RGB(float h, float s, float v, float& R, float& G, float& B)
 
 		case 5:
 			RETURN_RGB(v, m, n);
+
+		default:
+			RETURN_RGB(0, 0, 0);
 	}
 }
 
