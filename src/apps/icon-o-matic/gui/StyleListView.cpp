@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, 2011, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2006-2012, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -54,26 +54,25 @@ enum {
 
 class StyleListItem : public SimpleItem,
 					 public Observer {
- public:
-					StyleListItem(Style* s,
-								  StyleListView* listView,
-								  bool markEnabled)
-						: SimpleItem(""),
-						  style(NULL),
-						  fListView(listView),
-						  fMarkEnabled(markEnabled),
-						  fMarked(false)
-					{
-						SetStyle(s);
-					}
+public:
+	StyleListItem(Style* s, StyleListView* listView, bool markEnabled)
+		:
+		SimpleItem(""),
+		style(NULL),
+		fListView(listView),
+		fMarkEnabled(markEnabled),
+		fMarked(false)
+	{
+		SetStyle(s);
+	}
 
-	virtual			~StyleListItem()
-					{
-						SetStyle(NULL);
-					}
+	virtual ~StyleListItem()
+	{
+		SetStyle(NULL);
+	}
 
 	// SimpleItem interface
-	virtual	void	Draw(BView* owner, BRect itemFrame, uint32 flags)
+	virtual	void Draw(BView* owner, BRect itemFrame, uint32 flags)
 	{
 		SimpleItem::DrawBackground(owner, itemFrame, flags);
 
@@ -83,18 +82,13 @@ class StyleListItem : public SimpleItem,
 		owner->GetFontHeight(&fh);
 		BString truncatedString(Text());
 		owner->TruncateString(&truncatedString, B_TRUNCATE_MIDDLE,
-							  itemFrame.Width()
-							  - kBorderOffset
-							  - kMarkWidth
-							  - kTextOffset
-							  - kBorderOffset);
+			itemFrame.Width() - kBorderOffset - kMarkWidth - kTextOffset
+			- kBorderOffset);
 		float height = itemFrame.Height();
 		float textHeight = fh.ascent + fh.descent;
 		BPoint pos;
-		pos.x = itemFrame.left
-					+ kBorderOffset + kMarkWidth + kTextOffset;
-		pos.y = itemFrame.top
-					 + ceilf((height - textHeight) / 2.0 + fh.ascent);
+		pos.x = itemFrame.left + kBorderOffset + kMarkWidth + kTextOffset;
+		pos.y = itemFrame.top + ceilf((height - textHeight) / 2.0 + fh.ascent);
 		owner->DrawString(truncatedString.String(), pos);
 
 		if (!fMarkEnabled)
@@ -114,7 +108,7 @@ class StyleListItem : public SimpleItem,
 		if (fMarked) {
 			markRect.InsetBy(2, 2);
 			owner->SetHighColor(tint_color(owner->LowColor(),
-								B_DARKEN_4_TINT));
+				B_DARKEN_4_TINT));
 			owner->SetPenSize(2);
 			owner->StrokeLine(markRect.LeftTop(), markRect.RightBottom());
 			owner->StrokeLine(markRect.LeftBottom(), markRect.RightTop());
@@ -124,62 +118,64 @@ class StyleListItem : public SimpleItem,
 
 	// Observer interface
 	virtual	void	ObjectChanged(const Observable* object)
-					{
-						UpdateText();
-					}
+	{
+		UpdateText();
+	}
 
 	// StyleListItem
-			void	SetStyle(Style* s)
-					{
-						if (s == style)
-							return;
+	void SetStyle(Style* s)
+	{
+		if (s == style)
+			return;
 
-						if (style) {
-							style->RemoveObserver(this);
-							style->Release();
-						}
+		if (style) {
+			style->RemoveObserver(this);
+			style->Release();
+		}
 
-						style = s;
+		style = s;
 
-						if (style) {
-							style->Acquire();
-							style->AddObserver(this);
-							UpdateText();
-						}
-					}
-			void	UpdateText()
-					{
-						SetText(style->Name());
-						Invalidate();
-					}
+		if (style) {
+			style->Acquire();
+			style->AddObserver(this);
+			UpdateText();
+		}
+	}
 
-			void	SetMarkEnabled(bool enabled)
-					{
-						if (fMarkEnabled == enabled)
-							return;
-						fMarkEnabled = enabled;
-						Invalidate();
-					}
-			void	SetMarked(bool marked)
-					{
-						if (fMarked == marked)
-							return;
-						fMarked = marked;
-						Invalidate();
-					}
+	void UpdateText()
+	{
+		SetText(style->Name());
+		Invalidate();
+	}
 
-			void Invalidate()
-					{
-						// :-/
-						if (fListView->LockLooper()) {
-							fListView->InvalidateItem(
-								fListView->IndexOf(this));
-							fListView->UnlockLooper();
-						}
-					}
+	void SetMarkEnabled(bool enabled)
+	{
+		if (fMarkEnabled == enabled)
+			return;
+		fMarkEnabled = enabled;
+		Invalidate();
+	}
 
-	Style* 	style;
- private:
+	void SetMarked(bool marked)
+	{
+		if (fMarked == marked)
+			return;
+		fMarked = marked;
+		Invalidate();
+	}
+
+	void Invalidate()
+	{
+		if (fListView->LockLooper()) {
+			fListView->InvalidateItem(fListView->IndexOf(this));
+			fListView->UnlockLooper();
+		}
+	}
+
+public:
+	Style*			style;
+
+private:
 	StyleListView*	fListView;
 	bool			fMarkEnabled;
 	bool			fMarked;
@@ -187,21 +183,28 @@ class StyleListItem : public SimpleItem,
 
 
 class ShapeStyleListener : public ShapeListener,
-						   public ShapeContainerListener {
- public:
+	public ShapeContainerListener {
+public:
 	ShapeStyleListener(StyleListView* listView)
-		: fListView(listView),
-		  fShape(NULL)
+		:
+		fListView(listView),
+		fShape(NULL)
 	{
 	}
+
 	virtual ~ShapeStyleListener()
 	{
 		SetShape(NULL);
 	}
 
 	// ShapeListener interface
-	virtual	void TransformerAdded(Transformer* t, int32 index) {}
-	virtual	void TransformerRemoved(Transformer* t) {}
+	virtual	void TransformerAdded(Transformer* t, int32 index)
+	{
+	}
+	
+	virtual	void TransformerRemoved(Transformer* t)
+	{
+	}
 
 	virtual void StyleChanged(Style* oldStyle, Style* newStyle)
 	{
@@ -210,7 +213,10 @@ class ShapeStyleListener : public ShapeListener,
 	}
 
 	// ShapeContainerListener interface
-	virtual void ShapeAdded(Shape* shape, int32 index) {}
+	virtual void ShapeAdded(Shape* shape, int32 index)
+	{
+	}
+
 	virtual void ShapeRemoved(Shape* shape)
 	{
 		fListView->SetCurrentShape(NULL);
@@ -236,56 +242,58 @@ class ShapeStyleListener : public ShapeListener,
 		return fShape;
 	}
 
- private:
+private:
 	StyleListView*	fListView;
 	Shape*			fShape;
 };
 
+
 // #pragma mark -
 
-// constructor
-StyleListView::StyleListView(BRect frame,
-						   const char* name,
-						   BMessage* message, BHandler* target)
-	: SimpleListView(frame, name,
-					 NULL, B_SINGLE_SELECTION_LIST),
-	  fMessage(message),
-	  fStyleContainer(NULL),
-	  fShapeContainer(NULL),
-	  fCommandStack(NULL),
-	  fCurrentColor(NULL),
 
-	  fCurrentShape(NULL),
-	  fShapeListener(new ShapeStyleListener(this)),
+StyleListView::StyleListView(BRect frame, const char* name, BMessage* message,
+	BHandler* target)
+	:
+	SimpleListView(frame, name, NULL, B_SINGLE_SELECTION_LIST),
+	fMessage(message),
+	fStyleContainer(NULL),
+	fShapeContainer(NULL),
+	fCommandStack(NULL),
+	fCurrentColor(NULL),
 
-	  fMenu(NULL)
+	fCurrentShape(NULL),
+	fShapeListener(new ShapeStyleListener(this)),
+
+	fMenu(NULL)
 {
 	SetTarget(target);
 }
 
-// destructor
+
 StyleListView::~StyleListView()
 {
 	_MakeEmpty();
 	delete fMessage;
 
-	if (fStyleContainer)
+	if (fStyleContainer != NULL)
 		fStyleContainer->RemoveListener(this);
 
-	if (fShapeContainer)
+	if (fShapeContainer != NULL)
 		fShapeContainer->RemoveListener(fShapeListener);
 
 	delete fShapeListener;
 }
 
+
 // #pragma mark -
 
-// MessageReceived
+
 void
 StyleListView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case MSG_ADD: {
+		case MSG_ADD:
+		{
 			Style* style;
 			AddStylesCommand* command;
 			rgb_color color;
@@ -301,10 +309,13 @@ StyleListView::MessageReceived(BMessage* message)
 			fCommandStack->Perform(command);
 			break;
 		}
+
 		case MSG_REMOVE:
 			RemoveSelected();
 			break;
-		case MSG_DUPLICATE: {
+
+		case MSG_DUPLICATE:
+		{
 			int32 count = CountSelectedItems();
 			int32 index = 0;
 			BList items;
@@ -317,19 +328,21 @@ StyleListView::MessageReceived(BMessage* message)
 			CopyItems(items, index + 1);
 			break;
 		}
-		case MSG_RESET_TRANSFORMATION: {
+
+		case MSG_RESET_TRANSFORMATION:
+		{
 			int32 count = CountSelectedItems();
 			BList gradients;
 			for (int32 i = 0; i < count; i++) {
 				StyleListItem* item = dynamic_cast<StyleListItem*>(
 					ItemAt(CurrentSelection(i)));
-				if (item && item->style && item->style->Gradient())
-					if (!gradients.AddItem(
-							(void*)item->style->Gradient()))
+				if (item && item->style && item->style->Gradient()) {
+					if (!gradients.AddItem((void*)item->style->Gradient()))
 						break;
+				}
 			}
 			count = gradients.CountItems();
-			if (count < 0)
+			if (count <= 0)
 				break;
 
 			Transformable* transformables[count];
@@ -338,19 +351,20 @@ StyleListView::MessageReceived(BMessage* message)
 				transformables[i] = gradient;
 			}
 
-			ResetTransformationCommand* command = 
-				new ResetTransformationCommand(transformables, count);
+			ResetTransformationCommand* command
+				= new ResetTransformationCommand(transformables, count);
 
 			fCommandStack->Perform(command);
 			break;
 		}
+
 		default:
 			SimpleListView::MessageReceived(message);
 			break;
 	}
 }
 
-// SelectionChanged
+
 void
 StyleListView::SelectionChanged()
 {
@@ -370,11 +384,11 @@ StyleListView::SelectionChanged()
 	_UpdateMenu();
 }
 
-// MouseDown
+
 void
 StyleListView::MouseDown(BPoint where)
 {
-	if (!fCurrentShape) {
+	if (fCurrentShape == NULL) {
 		SimpleListView::MouseDown(where);
 		return;
 	}
@@ -382,11 +396,10 @@ StyleListView::MouseDown(BPoint where)
 	bool handled = false;
 	int32 index = IndexOf(where);
 	StyleListItem* item = dynamic_cast<StyleListItem*>(ItemAt(index));
-	if (item) {
+	if (item != NULL) {
 		BRect itemFrame(ItemFrame(index));
-		itemFrame.right = itemFrame.left
-							+ kBorderOffset + kMarkWidth
-							+ kTextOffset / 2.0;
+		itemFrame.right = itemFrame.left + kBorderOffset + kMarkWidth
+			+ kTextOffset / 2.0;
 		Style* style = item->style;
 		if (itemFrame.Contains(where)) {
 			// set the style on the shape
@@ -405,7 +418,7 @@ StyleListView::MouseDown(BPoint where)
 		SimpleListView::MouseDown(where);
 }
 
-// MakeDragMessage
+
 void
 StyleListView::MakeDragMessage(BMessage* message) const
 {
@@ -415,37 +428,37 @@ StyleListView::MakeDragMessage(BMessage* message) const
 	for (int32 i = 0; i < count; i++) {
 		StyleListItem* item = dynamic_cast<StyleListItem*>(
 			ItemAt(CurrentSelection(i)));
-		if (item)
+		if (item != NULL)
 			message->AddPointer("style", (void*)item->style);
 		else
 			break;
 	}
 }
 
-// AcceptDragMessage
+
 bool
 StyleListView::AcceptDragMessage(const BMessage* message) const
 {
 	return SimpleListView::AcceptDragMessage(message);
 }
 
-// SetDropTargetRect
+
 void
 StyleListView::SetDropTargetRect(const BMessage* message, BPoint where)
 {
 	SimpleListView::SetDropTargetRect(message, where);
 }
 
-// MoveItems
+
 void
 StyleListView::MoveItems(BList& items, int32 toIndex)
 {
-	if (!fCommandStack || !fStyleContainer)
+	if (fCommandStack == NULL || fStyleContainer == NULL)
 		return;
 
 	int32 count = items.CountItems();
 	Style** styles = new (nothrow) Style*[count];
-	if (!styles)
+	if (styles == NULL)
 		return;
 
 	for (int32 i = 0; i < count; i++) {
@@ -454,10 +467,9 @@ StyleListView::MoveItems(BList& items, int32 toIndex)
 		styles[i] = item ? item->style : NULL;
 	}
 
-	MoveStylesCommand* command
-		= new (nothrow) MoveStylesCommand(fStyleContainer,
-										  styles, count, toIndex);
-	if (!command) {
+	MoveStylesCommand* command = new (nothrow) MoveStylesCommand(
+		fStyleContainer, styles, count, toIndex);
+	if (command == NULL) {
 		delete[] styles;
 		return;
 	}
@@ -465,11 +477,11 @@ StyleListView::MoveItems(BList& items, int32 toIndex)
 	fCommandStack->Perform(command);
 }
 
-// CopyItems
+
 void
 StyleListView::CopyItems(BList& items, int32 toIndex)
 {
-	if (!fCommandStack || !fStyleContainer)
+	if (fCommandStack == NULL || fStyleContainer == NULL)
 		return;
 
 	int32 count = items.CountItems();
@@ -493,7 +505,7 @@ StyleListView::CopyItems(BList& items, int32 toIndex)
 	fCommandStack->Perform(command);
 }
 
-// RemoveItemList
+
 void
 StyleListView::RemoveItemList(BList& items)
 {
@@ -517,49 +529,49 @@ StyleListView::RemoveItemList(BList& items)
 	fCommandStack->Perform(command);
 }
 
-// CloneItem
+
 BListItem*
 StyleListView::CloneItem(int32 index) const
 {
 	if (StyleListItem* item = dynamic_cast<StyleListItem*>(ItemAt(index))) {
 		return new StyleListItem(item->style,
-								 const_cast<StyleListView*>(this),
-								 fCurrentShape != NULL);
+			const_cast<StyleListView*>(this),
+			fCurrentShape != NULL);
 	}
 	return NULL;
 }
 
-// IndexOfSelectable
+
 int32
 StyleListView::IndexOfSelectable(Selectable* selectable) const
 {
 	Style* style = dynamic_cast<Style*>(selectable);
-	if (!style)
+	if (style == NULL)
 		return -1;
 
-	for (int32 i = 0;
-		 StyleListItem* item = dynamic_cast<StyleListItem*>(ItemAt(i));
-		 i++) {
-		if (item->style == style)
+	int count = CountItems();
+	for (int32 i = 0; i < count; i++) {
+		if (SelectableFor(ItemAt(i)) == style)
 			return i;
 	}
 
 	return -1;
 }
 
-// SelectableFor
+
 Selectable*
 StyleListView::SelectableFor(BListItem* item) const
 {
 	StyleListItem* styleItem = dynamic_cast<StyleListItem*>(item);
-	if (styleItem)
+	if (styleItem != NULL)
 		return styleItem->style;
 	return NULL;
 }
 
+
 // #pragma mark -
 
-// StyleAdded
+
 void
 StyleListView::StyleAdded(Style* style, int32 index)
 {
@@ -576,7 +588,7 @@ StyleListView::StyleAdded(Style* style, int32 index)
 	UnlockLooper();
 }
 
-// StyleRemoved
+
 void
 StyleListView::StyleRemoved(Style* style)
 {
@@ -593,9 +605,10 @@ StyleListView::StyleRemoved(Style* style)
 	UnlockLooper();
 }
 
+
 // #pragma mark -
 
-// SetMenu
+
 void
 StyleListView::SetMenu(BMenu* menu)
 {
@@ -629,7 +642,7 @@ StyleListView::SetMenu(BMenu* menu)
 	_UpdateMenu();
 }
 
-// SetStyleContainer
+
 void
 StyleListView::SetStyleContainer(StyleContainer* container)
 {
@@ -637,14 +650,14 @@ StyleListView::SetStyleContainer(StyleContainer* container)
 		return;
 
 	// detach from old container
-	if (fStyleContainer)
+	if (fStyleContainer != NULL)
 		fStyleContainer->RemoveListener(this);
 
 	_MakeEmpty();
 
 	fStyleContainer = container;
 
-	if (!fStyleContainer)
+	if (fStyleContainer == NULL)
 		return;
 
 	fStyleContainer->AddListener(this);
@@ -655,7 +668,7 @@ StyleListView::SetStyleContainer(StyleContainer* container)
 		_AddStyle(fStyleContainer->StyleAtFast(i), i);
 }
 
-// SetShapeContainer
+
 void
 StyleListView::SetShapeContainer(ShapeContainer* container)
 {
@@ -672,21 +685,21 @@ StyleListView::SetShapeContainer(ShapeContainer* container)
 		fShapeContainer->AddListener(fShapeListener);
 }
 
-// SetCommandStack
+
 void
 StyleListView::SetCommandStack(CommandStack* stack)
 {
 	fCommandStack = stack;
 }
 
-// SetCurrentColor
+
 void
 StyleListView::SetCurrentColor(CurrentColor* color)
 {
 	fCurrentColor = color;
 }
 
-// SetCurrentShape
+
 void
 StyleListView::SetCurrentShape(Shape* shape)
 {
@@ -699,47 +712,51 @@ StyleListView::SetCurrentShape(Shape* shape)
 	_UpdateMarks();
 }
 
+
 // #pragma mark -
 
-// _AddStyle
+
 bool
 StyleListView::_AddStyle(Style* style, int32 index)
 {
-	if (style) {
+	if (style != NULL) {
 		 return AddItem(new StyleListItem(
 		 	style, this, fCurrentShape != NULL), index);
 	}
 	return false;
 }
 
-// _RemoveStyle
+
 bool
 StyleListView::_RemoveStyle(Style* style)
 {
 	StyleListItem* item = _ItemForStyle(style);
-	if (item && RemoveItem(item)) {
+	if (item != NULL && RemoveItem(item)) {
 		delete item;
 		return true;
 	}
 	return false;
 }
 
-// _ItemForStyle
+
 StyleListItem*
 StyleListView::_ItemForStyle(Style* style) const
 {
-	for (int32 i = 0;
-		 StyleListItem* item = dynamic_cast<StyleListItem*>(ItemAt(i));
-		 i++) {
+	int count = CountItems();
+	for (int32 i = 0; i < count; i++) {
+		StyleListItem* item = dynamic_cast<StyleListItem*>(ItemAt(i));
+		if (item == NULL)
+			continue;
 		if (item->style == style)
 			return item;
 	}
 	return NULL;
 }
 
+
 // #pragma mark -
 
-// _UpdateMarks
+
 void
 StyleListView::_UpdateMarks()
 {
@@ -749,7 +766,7 @@ StyleListView::_UpdateMarks()
 		// style is contained in fCurrentShape
 		for (int32 i = 0; i < count; i++) {
 			StyleListItem* item = dynamic_cast<StyleListItem*>(ItemAt(i));
-			if (!item)
+			if (item == NULL)
 				continue;
 			item->SetMarkEnabled(true);
 			item->SetMarked(fCurrentShape->Style() == item->style);
@@ -758,7 +775,7 @@ StyleListView::_UpdateMarks()
 		// disable display of marks
 		for (int32 i = 0; i < count; i++) {
 			StyleListItem* item = dynamic_cast<StyleListItem*>(ItemAt(i));
-			if (!item)
+			if (item == NULL)
 				continue;
 			item->SetMarkEnabled(false);
 		}
@@ -767,20 +784,20 @@ StyleListView::_UpdateMarks()
 	Invalidate();
 }
 
-// _SetStyleMarked
+
 void
 StyleListView::_SetStyleMarked(Style* style, bool marked)
 {
-	if (StyleListItem* item = _ItemForStyle(style)) {
+	StyleListItem* item = _ItemForStyle(style);
+	if (item != NULL)
 		item->SetMarked(marked);
-	}
 }
 
-// _UpdateMenu
+
 void
 StyleListView::_UpdateMenu()
 {
-	if (!fMenu)
+	if (fMenu == NULL)
 		return;
 
 	bool gotSelection = CurrentSelection(0) >= 0;
