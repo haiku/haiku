@@ -34,9 +34,6 @@ extern int main(stage2_args *args);
 void _start(void);
 
 
-volatile unsigned *gGPIOBase;
-
-
 static void
 clear_bss(void)
 {
