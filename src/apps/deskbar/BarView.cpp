@@ -250,11 +250,19 @@ TBarView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 	bool autoRaise = settings->autoRaise;
 	bool autoHide = settings->autoHide;
 
-	if (!autoRaise && !autoHide)
+	if (DragRegion()->IsDragging()) {
+		DragRegion()->MouseMoved(where, transit, dragMessage);
 		return;
+	}
 
-	if (DragRegion()->IsDragging())
+	if (transit == B_ENTERED_VIEW && EventMask() == 0)
+		SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
+
+	if (!autoRaise && !autoHide) {
+		if (transit == B_EXITED_VIEW || transit == B_OUTSIDE_VIEW)
+			SetEventMask(0);
 		return;
+	}
 
 	bool isTopMost = Window()->Feel() == B_FLOATING_ALL_WINDOW_FEEL;
 
@@ -266,13 +274,12 @@ TBarView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 		&& Window()->Frame().Contains(where)) {
 		// cursor is on a screen edge within the window frame
 
-		if (!alwaysOnTop && autoRaise && !isTopMost) {
+		if (!alwaysOnTop && autoRaise && !isTopMost)
 			RaiseDeskbar(true);
-			SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
-		}
 
 		if (autoHide && IsHidden())
 			HideDeskbar(false);
+
 	} else {
 		TBarWindow* window = (TBarWindow*)Window();
 		if (window->IsShowingMenu())
