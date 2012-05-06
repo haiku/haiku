@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku.
+ * Copyright 2006-2012, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -314,6 +314,34 @@ VectorPath::operator=(const VectorPath& from)
 	Notify();
 
 	return *this;
+}
+
+
+bool
+VectorPath::operator==(const VectorPath& other) const
+{
+	if (fClosed != other.fClosed)
+		return false;
+	
+	if (fPointCount != other.fPointCount)
+		return false;
+
+	if (fPath == NULL && other.fPath == NULL)
+		return true;
+
+	if (fPath == NULL || other.fPath == NULL)
+		return false;
+
+	for (int32 i = 0; i < fPointCount; i++) {
+		if (fPath[i].point != other.fPath[i].point
+			|| fPath[i].point_in != other.fPath[i].point_in
+			|| fPath[i].point_out != other.fPath[i].point_out
+			|| fPath[i].connected != other.fPath[i].connected) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 
