@@ -91,10 +91,6 @@ static inline unsigned char read_uart_reg(int port, uint reg)
 #define LSR_TEMT	0x40	/* Xmitter empty */
 #define LSR_ERR		0x80	/* Error */
 
-#define LCRVAL LCR_8N1				/* 8 data, 1 stop, no parity */
-#define MCRVAL (MCR_DTR | MCR_RTS)	/* RTS/DTR */
-#define FCRVAL (FCR_FIFO_EN | FCR_RXSR | FCR_TXSR) /* Clear & enable FIFOs */
-
 
 int uart_debug_port(void)
 {
@@ -104,26 +100,36 @@ int uart_debug_port(void)
 
 void uart_init_port(int port, uint baud)
 {
-	/* clear the tx & rx fifo and disable */
-	uint16 baud_divisor = (BOARD_UART_CLOCK / 16 / baud);
+	uint16 baudDivisor = BOARD_UART_CLOCK / (16 * baud);
 
+	// Write standard uart settings
+	write_uart_reg(port, UART_LCR, LCR_8N1);
+		// 8N1
 	write_uart_reg(port, UART_IER, 0);
-	write_uart_reg(port, UART_LCR, LCR_BKSE | LCRVAL); // config mode A
-	write_uart_reg(port, UART_DLL, baud_divisor & 0xff);
-	write_uart_reg(port, UART_DLH, (baud_divisor >> 8) & 0xff);
-	write_uart_reg(port, UART_LCR, LCRVAL); // operational mode
-	write_uart_reg(port, UART_MCR, MCRVAL);
-	write_uart_reg(port, UART_FCR, FCRVAL);
-	write_uart_reg(port, UART_MDR1, 0); // UART 16x mode
+		// Disable interrupt
+	write_uart_reg(port, UART_FCR, 0);
+		// Disable FIFO
+	write_uart_reg(port, UART_MCR, MCR_DTR | MCR_RTS);
+		// DTR / RTS
 
+	// Gain access to, and program baud divisor
+	unsigned char buffer = read_uart_reg(port, UART_LCR);
+	write_uart_reg(port, UART_LCR, buffer | LCR_BKSE);
+	write_uart_reg(port, UART_DLL, baudDivisor & 0xff);
+	write_uart_reg(port, UART_DLH, (baudDivisor >> 8) & 0xff);
+	write_uart_reg(port, UART_LCR, buffer & ~LCR_BKSE);
+
+//	write_uart_reg(port, UART_MDR1, 0); // UART 16x mode
 //	write_uart_reg(port, UART_LCR, 0xBF); // config mode B
 //	write_uart_reg(port, UART_EFR, (1<<7)|(1<<6)); // hw flow control
-//	write_uart_reg(port, UART_LCR, LCRVAL); // operational mode
+//	write_uart_reg(port, UART_LCR, LCR_8N1); // operational mode
 }
 
 
 void uart_init_early(void)
 {
+	// Perform special hardware UART configuration
+
 	#if BOARD_CPU_OMAP3
 	/* UART1 */
 	RMWREG32(CM_FCLKEN1_CORE, 13, 1, 1);
@@ -139,13 +145,12 @@ void uart_init_early(void)
 	#else
 	#warning INTITIALIZE UART!!!!!
 	#endif
-
-	uart_init_port(DEBUG_UART, 115200);
 }
 
 
 void uart_init(void)
 {
+	uart_init_port(uart_debug_port(), 115200);
 }
 
 
