@@ -19,6 +19,9 @@
 #include <string.h>
 
 
+struct uart_info* gUART;
+
+
 void
 arch_debug_remove_interrupt_handler(uint32 line)
 {
@@ -57,14 +60,18 @@ arch_debug_serial_try_getchar(void)
 char
 arch_debug_serial_getchar(void)
 {
-	return uart_getc(uart_debug_port(), FALSE);
+	if (gUART->getc != NULL)
+		return gUART->getc(gUART->base, false);
+
+	return 0;
 }
 
 
 void
 arch_debug_serial_putchar(const char c)
 {
-	uart_putc(uart_debug_port(), c);
+	if (gUART->putc != NULL)
+		gUART->putc(gUART->base, c);
 }
 
 
@@ -89,7 +96,12 @@ arch_debug_serial_early_boot_message(const char *string)
 status_t
 arch_debug_console_init(kernel_args *args)
 {
-	uart_init_early();
+	gUART = uart_create();
+
+	if (gUART == NULL)
+		return B_ERROR;
+
+	gUART->init_early();
 
 	return B_OK;
 }

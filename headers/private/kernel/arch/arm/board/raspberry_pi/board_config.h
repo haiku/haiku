@@ -16,11 +16,13 @@
 #include <arch/arm/bcm2708.h>
 
 // UART Settings
+#define BOARD_UART_8250 1
+
 #define BOARD_UART1_BASE UART0_BASE
 #define BOARD_UART2_BASE UART1_BASE
 #define BOARD_UART3_BASE 0
 
-#define BOARD_DEBUG_UART 0
+#define BOARD_UART_DEBUG BOARD_UART2_BASE
 
 #define BOARD_UART_CLOCK 125000000
 	/* 125Mhz, strange */

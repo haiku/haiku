@@ -1,6 +1,9 @@
 /*
  * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2012, Alexander von Gluck, kallisti5@unixzen.com
+ * Distributed under the terms of the MIT License.
  */
 
 
@@ -12,12 +15,10 @@
 #include <boot/stage2.h>
 #include <string.h>
 
-// serial output should always be enabled on u-boot platforms..
-#define ENABLE_SERIAL 
 
+struct uart_info* gUARTInfo;
 
 static int32 sSerialEnabled = 0;
-
 static char sBuffer[16384];
 static uint32 sBufferPosition;
 
@@ -25,7 +26,7 @@ static uint32 sBufferPosition;
 static void
 serial_putc(char c)
 {
-	uart_putc(uart_debug_port(),c);
+	gUARTInfo->putc(gUARTInfo->base, c);
 }
 
 
@@ -54,25 +55,21 @@ serial_puts(const char* string, size_t size)
 }
 
 
-extern "C" void 
+extern "C" void
 serial_disable(void)
 {
-#ifdef ENABLE_SERIAL
 	sSerialEnabled = 0;
-#else
-	sSerialEnabled--;
-#endif
 }
 
 
-extern "C" void 
+extern "C" void
 serial_enable(void)
 {
 	/* should already be initialized by U-Boot */
 	/*
-	uart_init_early();
-	uart_init();//todo
-	uart_init_port(uart_debug_port(),9600);
+	gUARTInfo->init_early();
+	gUARTInfo->init(gUARTInfo->base);
+	gUARTInfo->init_port(gUARTInfo->base, 9600);
 	*/
 	sSerialEnabled++;
 }
@@ -95,8 +92,13 @@ serial_cleanup(void)
 extern "C" void
 serial_init(void)
 {
-#ifdef ENABLE_SERIAL
-	serial_enable();
-#endif
-}
+	// Setup information on uart
+	gUARTInfo = uart_create();
 
+	if (gUARTInfo == NULL) {
+		// TODO: Notify user somehow.
+		return;
+	}
+
+	serial_enable();
+}
