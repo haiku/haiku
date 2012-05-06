@@ -366,6 +366,7 @@ Playlist::SetCurrentItemIndex(int32 index, bool notify)
 	if (index >= CountItems()) {
 		index = CountItems() - 1;
 		result = false;
+		notify = false;
 	}
 	if (index < 0) {
 		index = -1;
@@ -457,7 +458,7 @@ Playlist::AppendRefs(const BMessage* refsReceivedMessage, int32 appendIndex)
 			if (_IsQuery(type))
 				AppendQueryToPlaylist(ref, &subPlaylist);
 			else {
-				if ( !ExtraMediaExists(this, ref) ) {
+				if (!ExtraMediaExists(this, ref)) {
 					AppendToPlaylistRecursive(ref, &subPlaylist);
 				}
 			}
