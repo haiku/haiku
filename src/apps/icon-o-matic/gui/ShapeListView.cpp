@@ -25,14 +25,19 @@
 #include "AddShapesCommand.h"
 #include "AddStylesCommand.h"
 #include "CommandStack.h"
+#include "CompoundCommand.h"
 #include "FreezeTransformationCommand.h"
 #include "MoveShapesCommand.h"
 #include "Observer.h"
+#include "PathContainer.h"
 #include "RemoveShapesCommand.h"
 #include "ResetTransformationCommand.h"
 #include "Selection.h"
 #include "Shape.h"
+#include "Style.h"
+#include "StyleContainer.h"
 #include "Util.h"
+#include "VectorPath.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -119,6 +124,8 @@ ShapeListView::ShapeListView(BRect frame, const char* name, BMessage* message,
 	SimpleListView(frame, name, NULL, B_MULTIPLE_SELECTION_LIST),
 	fMessage(message),
 	fShapeContainer(NULL),
+	fStyleContainer(NULL),
+	fPathContainer(NULL),
 	fCommandStack(NULL)
 {
 	SetDragCommand(MSG_DRAG_SHAPE);
@@ -231,9 +238,29 @@ ShapeListView::MakeDragMessage(BMessage* message) const
 	for (int32 i = 0; i < count; i++) {
 		ShapeListItem* item = dynamic_cast<ShapeListItem*>(
 			ItemAt(CurrentSelection(i)));
-		if (item != NULL)
+		if (item != NULL && item->shape != NULL) {
 			message->AddPointer("shape", (void*)item->shape);
-		else
+			
+			// Add archives of everything this Shape uses
+			BMessage archive;
+			
+			BMessage styleArchive;
+			item->shape->Style()->Archive(&styleArchive, true);
+			archive.AddMessage("style", &styleArchive);
+
+			PathContainer* paths = item->shape->Paths();
+			for (int32 j = 0; j < paths->CountPaths(); j++) {
+				BMessage pathArchive;
+				paths->PathAt(j)->Archive(&pathArchive, true);
+				archive.AddMessage("path", &pathArchive);
+			}
+
+			BMessage shapeArchive;
+			item->shape->Archive(&shapeArchive, true);
+			archive.AddMessage("shape", &shapeArchive);
+
+			message->AddMessage("shape archive", &archive);
+		} else
 			break;
 	}
 }
@@ -250,6 +277,145 @@ void
 ShapeListView::SetDropTargetRect(const BMessage* message, BPoint where)
 {
 	SimpleListView::SetDropTargetRect(message, where);
+}
+
+
+bool
+ShapeListView::HandleDropMessage(const BMessage* message, int32 dropIndex)
+{
+	// Let SimpleListView handle drag-sorting (when drag came from ourself)
+	if (SimpleListView::HandleDropMessage(message, dropIndex))
+		return true;
+
+	if (fCommandStack == NULL || fShapeContainer == NULL
+		|| fStyleContainer == NULL || fPathContainer == NULL) {
+		return false;
+	}
+
+	// Drag may have come from another instance, like in another window.
+	// Reconstruct the Shapes from the archive and add them at the drop
+	// index.
+	int index = 0;
+	BList styles;
+	BList paths;
+	BList shapes;
+	while (true) {
+		BMessage archive;
+		if (message->FindMessage("shape archive", index, &archive) != B_OK)
+			break;
+
+		// Extract the shape archive		
+		BMessage shapeArchive;
+		if (archive.FindMessage("shape", &shapeArchive) != B_OK)
+			break;
+
+		// Extract the style
+		BMessage styleArchive;
+		if (archive.FindMessage("style", &styleArchive) != B_OK)
+			break;
+
+		Style* style = new Style(&styleArchive);
+		if (style == NULL)
+			break;
+		
+		Style* styleToAssign = style;
+		// Try to find an existing style that is the same as the extracted
+		// style and use that one instead.
+		for (int32 i = 0; i < fStyleContainer->CountStyles(); i++) {
+			Style* other = fStyleContainer->StyleAtFast(i);
+			if (*other == *style) {
+				styleToAssign = other;
+				delete style;
+				style = NULL;
+				break;
+			}
+		}
+		
+		if (style != NULL && !styles.AddItem(style)) {
+			delete style;
+			break;
+		}
+
+		// Create the shape using the given style
+		Shape* shape = new(std::nothrow) Shape(styleToAssign);
+		if (shape == NULL)
+			break;
+
+		if (shape->Unarchive(&shapeArchive) != B_OK
+			|| !shapes.AddItem(shape)) {
+			delete shape;
+			if (style != NULL) {
+				styles.RemoveItem(style);
+				delete style;
+			}
+			break;
+		}
+		
+		// Extract the paths
+		int pathIndex = 0;
+		while (true) {
+			BMessage pathArchive;
+			if (archive.FindMessage("path", pathIndex, &pathArchive) != B_OK)
+				break;
+			
+			VectorPath* path = new(nothrow) VectorPath(&pathArchive);
+			if (path == NULL)
+				break;
+			
+			VectorPath* pathToInclude = path;
+			for (int32 i = 0; i < fPathContainer->CountPaths(); i++) {
+				VectorPath* other = fPathContainer->PathAtFast(i);
+				if (*other == *path) {
+					pathToInclude = other;
+					delete path;
+					path = NULL;
+					break;
+				}
+			}
+			
+			if (path != NULL && !paths.AddItem(path)) {
+				delete path;
+				break;
+			}
+			
+			shape->Paths()->AddPath(pathToInclude);
+			
+			pathIndex++;
+		}
+
+		index++;
+	}
+
+	int32 shapeCount = shapes.CountItems();
+	if (shapeCount == 0)
+		return false;
+
+	// TODO: Add allocation checks beyond this point.
+
+	AddStylesCommand* stylesCommand = new(std::nothrow) AddStylesCommand(
+		fStyleContainer, (Style**)styles.Items(), styles.CountItems(),
+		fStyleContainer->CountStyles());
+
+	AddPathsCommand* pathsCommand = new(std::nothrow) AddPathsCommand(
+		fPathContainer, (VectorPath**)paths.Items(), paths.CountItems(),
+		true, fPathContainer->CountPaths());
+
+	AddShapesCommand* shapesCommand = new(std::nothrow) AddShapesCommand(
+		fShapeContainer, (Shape**)shapes.Items(), shapeCount, dropIndex,
+		fSelection);
+
+	::Command** commands = new(std::nothrow) ::Command*[3];
+
+	commands[0] = stylesCommand;
+	commands[1] = pathsCommand;
+	commands[2] = shapesCommand;
+
+	CompoundCommand* command = new CompoundCommand(commands, 3,
+		B_TRANSLATE("Drop shapes"), -1);
+
+	fCommandStack->Perform(command);
+
+	return true;
 }
 
 
@@ -504,6 +670,20 @@ ShapeListView::SetShapeContainer(ShapeContainer* container)
 	int32 count = fShapeContainer->CountShapes();
 	for (int32 i = 0; i < count; i++)
 		_AddShape(fShapeContainer->ShapeAtFast(i), i);
+}
+
+
+void
+ShapeListView::SetStyleContainer(StyleContainer* container)
+{
+	fStyleContainer = container;
+}
+
+
+void
+ShapeListView::SetPathContainer(PathContainer* container)
+{
+	fPathContainer = container;
 }
 
 

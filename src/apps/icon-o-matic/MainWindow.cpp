@@ -844,6 +844,8 @@ MainWindow::SetIcon(Icon* icon)
 	fStyleListView->SetShapeContainer(fIcon != NULL ? fIcon->Shapes() : NULL);
 
 	fShapeListView->SetShapeContainer(fIcon != NULL ? fIcon->Shapes() : NULL);
+	fShapeListView->SetStyleContainer(fIcon != NULL ? fIcon->Styles() : NULL);
+	fShapeListView->SetPathContainer(fIcon != NULL ? fIcon->Paths() : NULL);
 
 	// icon previews
 	fIconPreview16Folder->SetIcon(fIcon);
