@@ -79,7 +79,7 @@ if [ -z "$gcc" ]; then
 fi
 
 # check whether the gcc exists
-count=`ls $abiDir/$arch/$gcc/tools/current/bin/*gcc 2>/dev/null | wc -l`
+count=`ls -l $abiDir/$arch/$gcc/tools/current/bin/*gcc 2>/dev/null | wc -l`
 if [ $count -eq 0 ]; then
 	echo "Can't set GCC $arch/$gcc -- not installed." >&2
 	exit 1
