@@ -26,7 +26,7 @@ static uint32 sBufferPosition;
 static void
 serial_putc(char c)
 {
-	gUARTInfo->putc(gUARTInfo->base, c);
+	gUARTInfo->putchar(gUARTInfo->base, c);
 }
 
 

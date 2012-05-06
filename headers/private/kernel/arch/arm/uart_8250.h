@@ -35,8 +35,8 @@ extern "C" {
 void uart_8250_init_port(addr_t base, uint baud);
 void uart_8250_init_early(void);
 void uart_8250_init(addr_t base);
-int uart_8250_putc(addr_t base, char c);
-int uart_8250_getc(addr_t base, bool wait);
+int uart_8250_putchar(addr_t base, char c);
+int uart_8250_getchar(addr_t base, bool wait);
 void uart_8250_flush_tx(addr_t base);
 void uart_8250_flush_rx(addr_t base);
 

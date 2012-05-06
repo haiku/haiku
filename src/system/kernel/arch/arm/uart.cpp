@@ -54,8 +54,8 @@ uart_create(void)
 	uart->init = uart_8250_init;
 	uart->init_early = uart_8250_init_early;
 	uart->init_port = uart_8250_init_port;
-	uart->putc = uart_8250_putc;
-	uart->getc = uart_8250_getc;
+	uart->putchar = uart_8250_putchar;
+	uart->getchar = uart_8250_getchar;
 	uart->flush_tx = uart_8250_flush_tx;
 	uart->flush_rx = uart_8250_flush_rx;
 	#elif defined(BOARD_UART_AMBA)
@@ -63,8 +63,8 @@ uart_create(void)
 	uart->init = uart_amba_init;
 	uart->init_early = uart_amba_init_early;
 	uart->init_port = uart_amba_init_port;
-	uart->putc = uart_amba_putc;
-	uart->getc = uart_amba_getc;
+	uart->putchar = uart_amba_putchar;
+	uart->getchar = uart_amba_getchar;
 	uart->flush_tx = uart_amba_flush_tx;
 	uart->flush_rx = uart_amba_flush_rx;
 	#else

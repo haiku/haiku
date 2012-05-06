@@ -138,7 +138,7 @@ uart_8250_init(addr_t base)
 
 
 int
-uart_8250_putc(addr_t base, char c )
+uart_8250_putchar(addr_t base, char c)
 {
 	while (!(read_8250(base, UART_LSR) & (1<<6)));
 		// wait for the last char to get out
@@ -149,7 +149,7 @@ uart_8250_putc(addr_t base, char c )
 
 /* returns -1 if no data available */
 int
-uart_8250_getc(addr_t base, bool wait)
+uart_8250_getchar(addr_t base, bool wait)
 {
 	if (wait) {
 		while (!(read_8250(base, UART_LSR) & (1<<0)));

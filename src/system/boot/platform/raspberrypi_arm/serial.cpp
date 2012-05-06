@@ -28,7 +28,7 @@ static void
 serial_putc(char c)
 {
 	if (gUARTInfo != NULL)
-		gUARTInfo->putc(gUARTInfo->base, c);
+		gUARTInfo->putchar(gUARTInfo->base, c);
 }
 
 

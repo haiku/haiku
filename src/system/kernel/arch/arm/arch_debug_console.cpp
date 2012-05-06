@@ -60,8 +60,8 @@ arch_debug_serial_try_getchar(void)
 char
 arch_debug_serial_getchar(void)
 {
-	if (gUART->getc != NULL)
-		return gUART->getc(gUART->base, false);
+	if (gUART->getchar != NULL)
+		return gUART->getchar(gUART->base, false);
 
 	return 0;
 }
@@ -70,8 +70,8 @@ arch_debug_serial_getchar(void)
 void
 arch_debug_serial_putchar(const char c)
 {
-	if (gUART->putc != NULL)
-		gUART->putc(gUART->base, c);
+	if (gUART->putchar != NULL)
+		gUART->putchar(gUART->base, c);
 }
 
 

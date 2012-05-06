@@ -26,8 +26,8 @@ struct uart_info {
 	void (*init)(addr_t base);
 	void (*init_early)(void);
 	void (*init_port)(addr_t base, uint baud);
-	int (*putc)(addr_t base, char c);
-	int (*getc)(addr_t base, bool wait);
+	int (*putchar)(addr_t base, char c);
+	int (*getchar)(addr_t base, bool wait);
 	void (*flush_tx)(addr_t base);
 	void (*flush_rx)(addr_t base);
 };
