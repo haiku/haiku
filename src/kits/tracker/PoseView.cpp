@@ -8282,6 +8282,9 @@ BPoseView::RecalcExtent()
 }
 
 
+const int32 kRoomForLine = 2;
+
+
 BRect
 BPoseView::Extent() const
 {
@@ -8291,7 +8294,8 @@ BPoseView::Extent() const
 		BColumn *column = fColumnList->LastItem();
 		if (column) {
 			rect.left = rect.top = 0;
-			rect.right = column->Offset() + column->Width();
+			rect.right = column->Offset() + column->Width()
+				+ kTitleColumnRightExtraMargin - kRoomForLine / 2.0f;
 			rect.bottom = fListElemHeight * CurrentPoseList()->CountItems();
 		} else
 			rect.Set(LeftTop().x, LeftTop().y, LeftTop().x, LeftTop().y);
@@ -8939,8 +8943,6 @@ BPoseView::ResizeColumnToWidest(BColumn *column)
 	return false;
 }
 
-
-const int32 kRoomForLine = 2;
 
 BPoint
 BPoseView::ResizeColumn(BColumn *column, float newSize,
