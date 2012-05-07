@@ -12,6 +12,7 @@
 #include <sys/types.h>
 
 #include "uart_8250.h"
+#include "uart_pl011.h"
 
 
 #ifdef __cplusplus

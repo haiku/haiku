@@ -32,14 +32,16 @@
 #define UART_SHIFT 2
 
 
-static inline void write_8250(addr_t base, uint reg, unsigned char data)
+static inline void
+write_8250(addr_t base, uint reg, unsigned char data)
 {
 	*(volatile unsigned char *)(base + (reg << UART_SHIFT))
 		= data;
 }
 
 
-static inline unsigned char read_8250(addr_t base, uint reg)
+static inline unsigned char
+read_8250(addr_t base, uint reg)
 {
 	return *(volatile unsigned char *)(base + (reg << UART_SHIFT));
 }

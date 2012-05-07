@@ -18,7 +18,7 @@ local kernelLibArchObjects =
 KernelMergeObject boot_arch_$(TARGET_ARCH).o :
 	uart.cpp
 	uart_8250.cpp
-#	uart_amba101.cpp
+	uart_pl011.cpp
 	arch_elf.cpp
 	arch_video.cpp
 	arch_video_920.cpp
@@ -30,8 +30,8 @@ KernelMergeObject boot_arch_$(TARGET_ARCH).o :
 	$(kernelLibArchObjects)
 ;
 
-SEARCH on [ FGristFiles arch_elf.cpp uart.cpp uart_8250.cpp ]
-    = [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_ARCH) ] ;
+SEARCH on [ FGristFiles arch_elf.cpp uart.cpp uart_8250.cpp uart_pl011.cpp ]
+	= [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_ARCH) ] ;
 
 SEARCH on [ FGristFiles $(librootArchObjects) ]
-    = [ FDirName $(HAIKU_TOP) src system libroot posix string arch $(TARGET_ARCH) ] ;
+	= [ FDirName $(HAIKU_TOP) src system libroot posix string arch $(TARGET_ARCH) ] ;

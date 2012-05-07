@@ -30,6 +30,7 @@ KernelMergeObject kernel_arch_arm.o :
 	arch_asm.S
 	uart.cpp
 	uart_8250.cpp
+	uart_pl011.cpp
 
 	# paging
 	arm_physical_page_mapper.cpp

@@ -93,6 +93,7 @@ serial_init(void)
 
 	serial_enable();
 
-	serial_putc('S');
+	serial_putc('!');
+	serial_puts("SER INIT", 8);
 }
 

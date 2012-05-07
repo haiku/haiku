@@ -58,15 +58,14 @@ uart_create(void)
 	uart->getchar = uart_8250_getchar;
 	uart->flush_tx = uart_8250_flush_tx;
 	uart->flush_rx = uart_8250_flush_rx;
-	#elif defined(BOARD_UART_AMBA)
-	#error BOARD_UART_AMBA is Incomplete!
-	uart->init = uart_amba_init;
-	uart->init_early = uart_amba_init_early;
-	uart->init_port = uart_amba_init_port;
-	uart->putchar = uart_amba_putchar;
-	uart->getchar = uart_amba_getchar;
-	uart->flush_tx = uart_amba_flush_tx;
-	uart->flush_rx = uart_amba_flush_rx;
+	#elif defined(BOARD_UART_AMBA_PL011)
+	uart->init = uart_pl011_init;
+	uart->init_early = uart_pl011_init_early;
+	uart->init_port = uart_pl011_init_port;
+	uart->putchar = uart_pl011_putchar;
+	uart->getchar = uart_pl011_getchar;
+	uart->flush_tx = uart_pl011_flush_tx;
+	uart->flush_rx = uart_pl011_flush_rx;
 	#else
 	#error Unknown UART Type (or no UART provided)
 	#endif
