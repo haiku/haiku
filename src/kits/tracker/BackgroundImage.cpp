@@ -93,6 +93,7 @@ BackgroundImage::GetBackgroundImage(const BNode *node, bool isDesktop)
 			bitmap = BTranslationUtils::GetBitmap(path);
 			if (!bitmap) {
 				PRINT(("failed to load background bitmap from path\n"));
+				continue;
 			}
 		} else
 			break;
