@@ -72,6 +72,17 @@
 #define PL011_CR_SIREN	0x0002 // SIR enable
 #define PL011_CR_UARTEN 0x0001 // UART enable
 
+#define PL011_LCRH_SPS		0x80
+#define PL01x_LCRH_WLEN_8	0x60
+#define PL01x_LCRH_WLEN_7	0x40
+#define PL01x_LCRH_WLEN_6	0x20
+#define PL01x_LCRH_WLEN_5	0x00
+#define PL01x_LCRH_FEN		0x10
+#define PL01x_LCRH_STP2		0x08
+#define PL01x_LCRH_EPS		0x04
+#define PL01x_LCRH_PEN		0x02
+#define PL01x_LCRH_BRK		0x01
+
 // TODO: Other PL01x registers + values?
 
 

@@ -89,7 +89,8 @@ serial_init(void)
 	}
 
 	gUARTInfo->init_early();
-	gUARTInfo->init(gUARTInfo->base);
+	gUARTInfo->init_port(gUARTInfo->base, 9600);
+	//gUARTInfo->init(gUARTInfo->base);
 
 	serial_enable();
 

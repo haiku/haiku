@@ -24,8 +24,8 @@
 
 #define BOARD_UART_DEBUG BOARD_UART2_BASE
 
-#define BOARD_UART_CLOCK 125000000
-	/* 125Mhz, strange */
+#define BOARD_UART_CLOCK 3000000
+	/* 3Mhz */
 
 
 #endif /* _BOARD_RASPBERRY_PI_BOARD_CONFIG_H */

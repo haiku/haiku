@@ -31,6 +31,28 @@ read_pl011(addr_t base, uint reg)
 void
 uart_pl011_init_port(addr_t base, uint baud)
 {
+	uint16 clockDiv
+		= (baud > BOARD_UART_CLOCK / 16) ? 8 : 4;
+	uint16 baudDivisor = BOARD_UART_CLOCK * clockDiv / baud;
+		// TODO: Round to closest baud divisor
+	uint16 lcr = PL01x_LCRH_WLEN_8;
+
+	// Disable everything
+	unsigned char originalCR
+		= read_pl011(base, PL011_CR);
+	write_pl011(base, PL011_CR, 0);
+
+	// Set baud divisor
+	write_pl011(base, PL011_FBRD, baudDivisor & 0x3f);
+	write_pl011(base, PL011_IBRD, baudDivisor >> 6);
+
+	// Set LCR
+	write_pl011(base, PL011_LCRH, lcr);
+
+	// Disable auto RTS / CTS in original CR
+	originalCR &= ~(PL011_CR_CTSEN | PL011_CR_RTSEN);
+
+	write_pl011(base, PL011_CR, originalCR);
 }
 
 
@@ -60,12 +82,6 @@ uart_pl011_init(addr_t base)
 
 	while (read_pl011(base, PL01x_FR) & PL01x_FR_BUSY);
 		// Wait for xmit
-
-	// Write baud divider
-	#if 0
-	write_pl011(base, PL011_FBRD, div & 0x3F);
-	write_pl011(base, PL011_IBRD, div >> 6);
-	#endif
 }
 
 
