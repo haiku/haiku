@@ -108,7 +108,7 @@ pi_start(void)
 	gpio_init();
 
 	// Flick on "OK" led
-	GPIO_CLR(16);
+	gpio_write(GPIO_BASE, 16, 0);
 
 	mmu_init();
 	serial_init();

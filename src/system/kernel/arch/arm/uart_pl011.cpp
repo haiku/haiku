@@ -60,6 +60,7 @@ void
 uart_pl011_init_early(void)
 {
 	// Perform special hardware UART configuration
+	// Raspberry Pi: Early setup handled by gpio_init in platform code
 }
 
 

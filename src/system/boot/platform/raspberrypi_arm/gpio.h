@@ -9,23 +9,29 @@
 #define _SYSTEM_BOOT_PLATFORM_PI_GPIO_H
 
 
+#include <SupportDefs.h>
+
 #include <arch/arm/bcm2708.h>
 
 
-// Macros for easy GPIO pin access in loader
-#define GPIO_IN(g) *(gGPIOBase + ((g)/10)) &= ~(7<<(((g)%10)*3))
-#define GPIO_OUT(g) *(gGPIOBase + ((g)/10)) |=  (1<<(((g)%10)*3))
-#define GPIO_SET(g) *(gGPIOBase + 7) = (1<<g)
-#define GPIO_CLR(g) *(gGPIOBase + 10) = (1<<g)
+#define GPIO_IN		0
+#define GPIO_OUT	1
+#define GPIO_ALT0	4
+#define GPIO_ALT1	5
+#define GPIO_ALT2	6
+#define GPIO_ALT3	7
+#define GPIO_ALT4	3
+#define GPIO_ALT5	2
 
-
-volatile unsigned *gGPIOBase;
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+
+void gpio_write(addr_t base, int pin, bool value);
+void gpio_mode(addr_t base, int pin, int mode);
 
 void gpio_init();
 
