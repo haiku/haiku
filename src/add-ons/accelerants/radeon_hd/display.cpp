@@ -313,7 +313,7 @@ detect_displays()
 					// ???, shouldn't happen... I think.
 					TRACE("%s: Warning: connector %" B_PRIu32 " has neither "
 						"digital EDID nor is an analog encoder?\n",
-						__func__, id);"
+						__func__, id);
 				}
 			}
 		}
