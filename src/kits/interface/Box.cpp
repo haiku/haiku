@@ -563,10 +563,10 @@ BBox::DoLayout()
 		BView::DoLayout();
 
 		if (fLabelView != NULL) {
-			layout->DisableLayoutInvalidation();
+			DisableLayoutInvalidation();
 				// don't trigger a relayout
 			AddChild(fLabelView, ChildAt(0));
-			layout->EnableLayoutInvalidation();
+			EnableLayoutInvalidation();
 		} else
 			return;
 	}
