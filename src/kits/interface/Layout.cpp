@@ -301,6 +301,8 @@ BLayout::InvalidateLayout(bool children)
 	// printf("BLayout(%p)::InvalidateLayout(%i) : state %x, disabled %li\n",
 	// this, children, (unsigned int)fState, fInvalidationDisabled);
 
+	if (fTarget && fTarget->IsLayoutInvalidationDisabled())
+		return;
 	if (fInvalidationDisabled > 0
 		|| (fState & B_LAYOUT_INVALIDATION_ILLEGAL) != 0) {
 		return;

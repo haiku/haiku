@@ -4745,6 +4745,15 @@ BView::DisableLayoutInvalidation()
 
 
 bool
+BView::IsLayoutInvalidationDisabled()
+{
+	if (fLayoutData->fLayoutInvalidationDisabled > 0)
+		return true;
+	return false;
+}
+
+
+bool
 BView::IsLayoutValid() const
 {
 	return fLayoutData->fLayoutValid;

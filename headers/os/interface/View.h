@@ -554,6 +554,7 @@ public:
 
 			void				EnableLayoutInvalidation();
 			void				DisableLayoutInvalidation();
+			bool				IsLayoutInvalidationDisabled();
 			bool				IsLayoutValid() const;
 			void				ResetLayoutInvalidation();
 
