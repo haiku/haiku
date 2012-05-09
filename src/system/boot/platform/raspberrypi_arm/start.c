@@ -37,28 +37,18 @@ void _start(void);
 static void
 clear_bss(void)
 {
-	/* TODO: fix boot_loader_routerboard_mipsel.ld
-	 * so this code works, or find a workaround.
-	 */
-/*
 	memset(&__bss_start, 0, &_end - &__bss_start);
-*/
 }
 
 
 static void
 call_ctors(void)
 {
-	/* TODO: fix boot_loader_routerboard_mipsel.ld
-	 * so this code works, or find a workaround.
-	 */
-/*
 	void (**f)(void);
 
 	for (f = &__ctor_list; f < &__ctor_end; f++) {
 		(**f)();
 	}
-*/
 }
 
 
@@ -98,7 +88,6 @@ platform_exit(void)
 void
 pi_start(void)
 {
-#warning IMPLEMENT _start
 	stage2_args args;
 
 	clear_bss();

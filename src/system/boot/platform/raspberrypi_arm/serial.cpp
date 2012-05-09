@@ -80,7 +80,9 @@ serial_cleanup(void)
 extern "C" void
 serial_init(void)
 {
-	gUART = new UartPL011(uart_base_debug());
+	gUART = new(nothrow) UartPL011(uart_base_debug());
+	if (gUART == 0)
+		return;
 
 	gUART->InitEarly();
 	gUART->Init();
