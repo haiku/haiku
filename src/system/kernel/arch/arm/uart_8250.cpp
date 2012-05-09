@@ -32,18 +32,30 @@
 #define UART_SHIFT 2
 
 
-static inline void
-write_8250(addr_t base, uint reg, unsigned char data)
+Uart8250::Uart8250(addr_t base)
+	:
+	fUARTBase(base)
 {
-	*(volatile unsigned char *)(base + (reg << UART_SHIFT))
+}
+
+
+Uart8250::~Uart8250()
+{
+}
+
+
+void
+Uart8250::WriteUart(uint32 reg, unsigned char data)
+{
+	*(volatile unsigned char *)(fUARTBase + (reg << UART_SHIFT))
 		= data;
 }
 
 
-static inline unsigned char
-read_8250(addr_t base, uint reg)
+unsigned char
+Uart8250::ReadUart(uint32 reg)
 {
-	return *(volatile unsigned char *)(base + (reg << UART_SHIFT));
+	return *(volatile unsigned char *)(fUARTBase + (reg << UART_SHIFT));
 }
 
 
@@ -81,36 +93,36 @@ read_8250(addr_t base, uint reg)
 
 
 void
-uart_8250_init_port(addr_t base, uint baud)
+Uart8250::InitPort(uint32 baud)
 {
 	uint16 baudDivisor = BOARD_UART_CLOCK / (16 * baud);
 
 	// Write standard uart settings
-	write_8250(base, UART_LCR, LCR_8N1);
+	WriteUart(UART_LCR, LCR_8N1);
 		// 8N1
-	write_8250(base, UART_IER, 0);
+	WriteUart(UART_IER, 0);
 		// Disable interrupt
-	write_8250(base, UART_FCR, 0);
+	WriteUart(UART_FCR, 0);
 		// Disable FIFO
-	write_8250(base, UART_MCR, MCR_DTR | MCR_RTS);
+	WriteUart(UART_MCR, MCR_DTR | MCR_RTS);
 		// DTR / RTS
 
 	// Gain access to, and program baud divisor
-	unsigned char buffer = read_8250(base, UART_LCR);
-	write_8250(base, UART_LCR, buffer | LCR_BKSE);
-	write_8250(base, UART_DLL, baudDivisor & 0xff);
-	write_8250(base, UART_DLH, (baudDivisor >> 8) & 0xff);
-	write_8250(base, UART_LCR, buffer & ~LCR_BKSE);
+	unsigned char buffer = ReadUart(UART_LCR);
+	WriteUart(UART_LCR, buffer | LCR_BKSE);
+	WriteUart(UART_DLL, baudDivisor & 0xff);
+	WriteUart(UART_DLH, (baudDivisor >> 8) & 0xff);
+	WriteUart(UART_LCR, buffer & ~LCR_BKSE);
 
-//	write_8250(base, UART_MDR1, 0); // UART 16x mode
-//	write_8250(base, UART_LCR, 0xBF); // config mode B
-//	write_8250(base, UART_EFR, (1<<7)|(1<<6)); // hw flow control
-//	write_8250(base, UART_LCR, LCR_8N1); // operational mode
+//	WriteUart(UART_MDR1, 0); // UART 16x mode
+//	WriteUart(UART_LCR, 0xBF); // config mode B
+//	WriteUart(UART_EFR, (1<<7)|(1<<6)); // hw flow control
+//	WriteUart(UART_LCR, LCR_8N1); // operational mode
 }
 
 
 void
-uart_8250_init_early(void)
+Uart8250::InitEarly()
 {
 	// Perform special hardware UART configuration
 
@@ -133,51 +145,51 @@ uart_8250_init_early(void)
 
 
 void
-uart_8250_init(addr_t base)
+Uart8250::Init()
 {
-	uart_8250_init_port(base, 115200);
+	InitPort(115200);
 }
 
 
 int
-uart_8250_putchar(addr_t base, char c)
+Uart8250::PutChar(char c)
 {
-	while (!(read_8250(base, UART_LSR) & (1<<6)));
+	while (!(ReadUart(UART_LSR) & (1<<6)));
 		// wait for the last char to get out
-	write_8250(base, UART_THR, c);
+	WriteUart(UART_THR, c);
 	return 0;
 }
 
 
 /* returns -1 if no data available */
 int
-uart_8250_getchar(addr_t base, bool wait)
+Uart8250::GetChar(bool wait)
 {
 	if (wait) {
-		while (!(read_8250(base, UART_LSR) & (1<<0)));
+		while (!(ReadUart(UART_LSR) & (1<<0)));
 			// wait for data to show up in the rx fifo
 	} else {
-		if (!(read_8250(base, UART_LSR) & (1<<0)))
+		if (!(ReadUart(UART_LSR) & (1<<0)))
 			return -1;
 	}
-	return read_8250(base, UART_RHR);
+	return ReadUart(UART_RHR);
 }
 
 
 void
-uart_8250_flush_tx(addr_t base)
+Uart8250::FlushTx()
 {
-	while (!(read_8250(base, UART_LSR) & (1<<6)));
+	while (!(ReadUart(UART_LSR) & (1<<6)));
 		// wait for the last char to get out
 }
 
 
 void
-uart_8250_flush_rx(addr_t base)
+Uart8250::FlushRx()
 {
 	// empty the rx fifo
-	while (read_8250(base, UART_LSR) & (1<<0)) {
-		volatile char c = read_8250(base, UART_RHR);
+	while (ReadUart(UART_LSR) & (1<<0)) {
+		volatile char c = ReadUart(UART_RHR);
 		(void)c;
 	}
 }

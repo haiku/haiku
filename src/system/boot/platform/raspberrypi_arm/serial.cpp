@@ -17,7 +17,7 @@
 #include <string.h>
 
 
-struct uart_info* gUARTInfo;
+UartPL011* gUART;
 
 static int32 sSerialEnabled = 0;
 static char sBuffer[16384];
@@ -27,8 +27,7 @@ static uint32 sBufferPosition;
 static void
 serial_putc(char c)
 {
-	if (gUARTInfo != NULL)
-		gUARTInfo->putchar(gUARTInfo->base, c);
+	gUART->PutChar(c);
 }
 
 
@@ -81,16 +80,11 @@ serial_cleanup(void)
 extern "C" void
 serial_init(void)
 {
-	gUARTInfo = uart_create();
+	gUART = new UartPL011(uart_base_debug());
 
-	if (gUARTInfo == NULL) {
-		// TODO: Notify user somehow.
-		return;
-	}
-
-	gUARTInfo->init_early();
-	gUARTInfo->init_port(gUARTInfo->base, 9600);
-	//gUARTInfo->init(gUARTInfo->base);
+	gUART->InitEarly();
+	gUART->Init();
+	gUART->InitPort(9600);
 
 	serial_enable();
 

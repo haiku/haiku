@@ -24,24 +24,31 @@
 #define __DEV_UART_8250_H
 
 
+#include <SupportDefs.h>
 #include <sys/types.h>
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+class Uart8250 {
+public:
+							Uart8250(addr_t base);
+							~Uart8250();
+
+	void					InitEarly();
+	void					Init();
+	void					InitPort(uint32 baud);
+
+	int						PutChar(char c);
+	int						GetChar(bool wait);
+
+	void					FlushTx();
+	void					FlushRx();
+
+private:
+	void					WriteUart(uint32 reg, unsigned char data);
+	unsigned char			ReadUart(uint32 reg);
+
+	addr_t					fUARTBase;
+};
 
 
-void uart_8250_init_port(addr_t base, uint baud);
-void uart_8250_init_early(void);
-void uart_8250_init(addr_t base);
-int uart_8250_putchar(addr_t base, char c);
-int uart_8250_getchar(addr_t base, bool wait);
-void uart_8250_flush_tx(addr_t base);
-void uart_8250_flush_rx(addr_t base);
-
-
-#ifdef __cplusplus
-}
-#endif
 #endif

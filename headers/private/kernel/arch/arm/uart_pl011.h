@@ -10,6 +10,7 @@
 
 
 #include <sys/types.h>
+#include <SupportDefs.h>
 
 
 #define PL01x_DR	0x00 // Data read or written
@@ -86,21 +87,27 @@
 // TODO: Other PL01x registers + values?
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+class UartPL011 {
+public:
+							UartPL011(addr_t base);
+							~UartPL011();
+
+	void					InitEarly();
+	void					Init();
+	void					InitPort(uint32 baud);
+
+	int						PutChar(char c);
+	int						GetChar(bool wait);
+
+	void					FlushTx();
+	void					FlushRx();
+
+private:
+	void					WriteUart(uint32 reg, unsigned char data);
+	unsigned char			ReadUart(uint32 reg);
+
+	addr_t					fUARTBase;
+};
 
 
-void uart_pl011_init_port(addr_t base, uint baud);
-void uart_pl011_init_early(void);
-void uart_pl011_init(addr_t base);
-int uart_pl011_putchar(addr_t base, char c);
-int uart_pl011_getchar(addr_t base, bool wait);
-void uart_pl011_flush_tx(addr_t base);
-void uart_pl011_flush_rx(addr_t base);
-
-
-#ifdef __cplusplus
-}
-#endif
 #endif

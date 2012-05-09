@@ -16,7 +16,7 @@
 #include <string.h>
 
 
-struct uart_info* gUARTInfo;
+gUart8250* gUART;
 
 static int32 sSerialEnabled = 0;
 static char sBuffer[16384];
@@ -26,7 +26,7 @@ static uint32 sBufferPosition;
 static void
 serial_putc(char c)
 {
-	gUARTInfo->putchar(gUARTInfo->base, c);
+	gUART->PutChar(c);
 }
 
 
@@ -67,9 +67,9 @@ serial_enable(void)
 {
 	/* should already be initialized by U-Boot */
 	/*
-	gUARTInfo->init_early();
-	gUARTInfo->init(gUARTInfo->base);
-	gUARTInfo->init_port(gUARTInfo->base, 9600);
+	gUART->InitEarly();
+	gUART->Init();
+	gUART->InitPort(9600);
 	*/
 	sSerialEnabled++;
 }
@@ -93,12 +93,7 @@ extern "C" void
 serial_init(void)
 {
 	// Setup information on uart
-	gUARTInfo = uart_create();
-
-	if (gUARTInfo == NULL) {
-		// TODO: Notify user somehow.
-		return;
-	}
+	gUART = new Uart8250(uart_base_debug());
 
 	serial_enable();
 }

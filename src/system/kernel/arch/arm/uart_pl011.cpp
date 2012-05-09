@@ -14,22 +14,34 @@
 //#include <target/debugconfig.h>
 
 
-static inline void
-write_pl011(addr_t base, uint reg, unsigned char data)
+UartPL011::UartPL011(addr_t base)
+	:
+	fUARTBase(base)
 {
-	*(volatile unsigned char *)(base + reg) = data;
 }
 
 
-static inline unsigned char
-read_pl011(addr_t base, uint reg)
+UartPL011::~UartPL011()
 {
-	return *(volatile unsigned char *)(base + reg);
 }
 
 
 void
-uart_pl011_init_port(addr_t base, uint baud)
+UartPL011::WriteUart(uint32 reg, unsigned char data)
+{
+	*(volatile unsigned char *)(fUARTBase + reg) = data;
+}
+
+
+unsigned char
+UartPL011::ReadUart(uint32 reg)
+{
+	return *(volatile unsigned char *)(fUARTBase + reg);
+}
+
+
+void
+UartPL011::InitPort(uint32 baud)
 {
 	uint16 clockDiv
 		= (baud > BOARD_UART_CLOCK / 16) ? 8 : 4;
@@ -39,25 +51,25 @@ uart_pl011_init_port(addr_t base, uint baud)
 
 	// Disable everything
 	unsigned char originalCR
-		= read_pl011(base, PL011_CR);
-	write_pl011(base, PL011_CR, 0);
+		= ReadUart(PL011_CR);
+	WriteUart(PL011_CR, 0);
 
 	// Set baud divisor
-	write_pl011(base, PL011_FBRD, baudDivisor & 0x3f);
-	write_pl011(base, PL011_IBRD, baudDivisor >> 6);
+	WriteUart(PL011_FBRD, baudDivisor & 0x3f);
+	WriteUart(PL011_IBRD, baudDivisor >> 6);
 
 	// Set LCR
-	write_pl011(base, PL011_LCRH, lcr);
+	WriteUart(PL011_LCRH, lcr);
 
 	// Disable auto RTS / CTS in original CR
 	originalCR &= ~(PL011_CR_CTSEN | PL011_CR_RTSEN);
 
-	write_pl011(base, PL011_CR, originalCR);
+	WriteUart(PL011_CR, originalCR);
 }
 
 
 void
-uart_pl011_init_early(void)
+UartPL011::InitEarly()
 {
 	// Perform special hardware UART configuration
 	// Raspberry Pi: Early setup handled by gpio_init in platform code
@@ -65,33 +77,33 @@ uart_pl011_init_early(void)
 
 
 void
-uart_pl011_init(addr_t base)
+UartPL011::Init()
 {
 	// TODO: Enable clock producer?
 	// TODO: Clear pending error and receive interrupts
 
 	// Provoke TX FIFO into asserting
-	unsigned char cr = PL011_CR_UARTEN | PL011_CR_TXE | PL011_IFLS;
-	write_pl011(base, PL011_CR, cr);
-	write_pl011(base, PL011_FBRD, 0);
-	write_pl011(base, PL011_IBRD, 1);
+	uint32 cr = PL011_CR_UARTEN | PL011_CR_TXE | PL011_IFLS;
+	WriteUart(PL011_CR, cr);
+	WriteUart(PL011_FBRD, 0);
+	WriteUart(PL011_IBRD, 1);
 
 	// TODO: For arm vendor, st different rx vs tx
-	write_pl011(base, PL011_LCRH, 0);
+	WriteUart(PL011_LCRH, 0);
 
-	write_pl011(base, PL01x_DR, 0);
+	WriteUart(PL01x_DR, 0);
 
-	while (read_pl011(base, PL01x_FR) & PL01x_FR_BUSY);
+	while (ReadUart(PL01x_FR) & PL01x_FR_BUSY);
 		// Wait for xmit
 }
 
 
 int
-uart_pl011_putchar(addr_t base, char c)
+UartPL011::PutChar(char c)
 {
-	write_pl011(base, PL01x_DR, (unsigned int)c);
+	WriteUart(PL01x_DR, (unsigned int)c);
 
-	while (read_pl011(base, PL01x_FR) & PL01x_FR_TXFF);
+	while (ReadUart(PL01x_FR) & PL01x_FR_TXFF);
 		// wait for the last char to get out
 
 	return 0;
@@ -100,7 +112,7 @@ uart_pl011_putchar(addr_t base, char c)
 
 /* returns -1 if no data available */
 int
-uart_pl011_getchar(addr_t base, bool wait)
+UartPL011::GetChar(bool wait)
 {
 	#warning ARM Amba PL011 UART incomplete
 	return -1;
@@ -108,15 +120,15 @@ uart_pl011_getchar(addr_t base, bool wait)
 
 
 void
-uart_pl011_flush_tx(addr_t base)
+UartPL011::FlushTx()
 {
-	while (read_pl011(base, PL01x_FR) & PL01x_FR_TXFF);
+	while (ReadUart(PL01x_FR) & PL01x_FR_TXFF);
 		// wait for the last char to get out
 }
 
 
 void
-uart_pl011_flush_rx(addr_t base)
+UartPL011::FlushRx()
 {
 	#warning ARM Amba PL011 UART incomplete
 }
