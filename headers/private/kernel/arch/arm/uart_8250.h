@@ -37,6 +37,9 @@ public:
 	void					Init();
 	void					InitPort(uint32 baud);
 
+	void					Enable();
+	void					Disable();
+
 	int						PutChar(char c);
 	int						GetChar(bool wait);
 
@@ -47,6 +50,7 @@ private:
 	void					WriteUart(uint32 reg, unsigned char data);
 	unsigned char			ReadUart(uint32 reg);
 
+	bool					fUARTEnabled;
 	addr_t					fUARTBase;
 };
 

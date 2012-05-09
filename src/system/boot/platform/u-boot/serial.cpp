@@ -16,7 +16,7 @@
 #include <string.h>
 
 
-gUart8250* gUART;
+Uart8250* gLoaderUART;
 
 static int32 sSerialEnabled = 0;
 static char sBuffer[16384];
@@ -26,7 +26,7 @@ static uint32 sBufferPosition;
 static void
 serial_putc(char c)
 {
-	gUART->PutChar(c);
+	gLoaderUART->PutChar(c);
 }
 
 
@@ -67,9 +67,8 @@ serial_enable(void)
 {
 	/* should already be initialized by U-Boot */
 	/*
-	gUART->InitEarly();
-	gUART->Init();
-	gUART->InitPort(9600);
+	gLoaderUART->InitEarly();
+	gLoaderUART->InitPort(9600);
 	*/
 	sSerialEnabled++;
 }
@@ -93,7 +92,9 @@ extern "C" void
 serial_init(void)
 {
 	// Setup information on uart
-	gUART = new Uart8250(uart_base_debug());
+	gLoaderUART = new(nothrow) Uart8250(uart_base_debug());
+	if (gLoaderUART == 0)
+		return;
 
 	serial_enable();
 }

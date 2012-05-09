@@ -17,7 +17,7 @@
 #include <string.h>
 
 
-UartPL011* gUART;
+UartPL011* gLoaderUART;
 
 static int32 sSerialEnabled = 0;
 static char sBuffer[16384];
@@ -27,7 +27,7 @@ static uint32 sBufferPosition;
 static void
 serial_putc(char c)
 {
-	gUART->PutChar(c);
+	gLoaderUART->PutChar(c);
 }
 
 
@@ -80,13 +80,12 @@ serial_cleanup(void)
 extern "C" void
 serial_init(void)
 {
-	gUART = new(nothrow) UartPL011(uart_base_debug());
-	if (gUART == 0)
+	gLoaderUART = new(nothrow) UartPL011(uart_base_debug());
+	if (gLoaderUART == 0)
 		return;
 
-	gUART->InitEarly();
-	gUART->Init();
-	gUART->InitPort(9600);
+	gLoaderUART->InitEarly();
+	gLoaderUART->InitPort(9600);
 
 	serial_enable();
 

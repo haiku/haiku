@@ -34,6 +34,7 @@
 
 Uart8250::Uart8250(addr_t base)
 	:
+	fUARTEnabled(true),
 	fUARTBase(base)
 {
 }
@@ -95,6 +96,8 @@ Uart8250::ReadUart(uint32 reg)
 void
 Uart8250::InitPort(uint32 baud)
 {
+	Disable();
+
 	uint16 baudDivisor = BOARD_UART_CLOCK / (16 * baud);
 
 	// Write standard uart settings
@@ -118,6 +121,8 @@ Uart8250::InitPort(uint32 baud)
 //	WriteUart(UART_LCR, 0xBF); // config mode B
 //	WriteUart(UART_EFR, (1<<7)|(1<<6)); // hw flow control
 //	WriteUart(UART_LCR, LCR_8N1); // operational mode
+
+	Enable();
 }
 
 
@@ -145,9 +150,16 @@ Uart8250::InitEarly()
 
 
 void
-Uart8250::Init()
+Uart8250::Enable()
 {
-	InitPort(115200);
+	fUARTEnabled = true;
+}
+
+
+void
+Uart8250::Disable()
+{
+	fUARTEnabled = false;
 }
 
 
