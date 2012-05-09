@@ -550,21 +550,24 @@ BBox::DoLayout()
 	if (!(Flags() & B_SUPPORTS_LAYOUT))
 		return;
 
-	bool layouted = GetLayout() ? true : false;
+	BLayout* layout = GetLayout();
 
 	// If the user set a layout, let the base class version call its
 	// hook. In case when we have BView as a label, remove it from child list
 	// so it won't be layouted with the rest of views and add it again
 	// after that.
-	if (layouted) {
+	if (layout != NULL) {
 		if (fLabelView)
 			RemoveChild(fLabelView);
 
 		BView::DoLayout();
 
-		if (fLabelView)
+		if (fLabelView != NULL) {
+			layout->DisableLayoutInvalidation();
+				// don't trigger a relayout
 			AddChild(fLabelView, ChildAt(0));
-		else
+			layout->EnableLayoutInvalidation();
+		} else
 			return;
 	}
 
@@ -574,13 +577,13 @@ BBox::DoLayout()
 	// desired position.
 
 	// layout the label view
-	if (fLabelView) {
+	if (fLabelView != NULL) {
 		fLabelView->MoveTo(fLayoutData->label_box.LeftTop());
 		fLabelView->ResizeTo(fLayoutData->label_box.Size());
 	}
 
 	// If we have layout return here and do not layout the child
-	if (layouted)
+	if (layout != NULL)
 		return;
 
 	// layout the child
