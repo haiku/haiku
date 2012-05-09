@@ -265,6 +265,7 @@ detect_displays()
 			TRACE("%s: is bridge, performing bridge DDC setup\n", __func__);
 			encoder_external_setup(id, 23860,
 				EXTERNAL_ENCODER_ACTION_V3_DDC_SETUP);
+			gDisplay[displayIndex]->attached = true;
 		} else if (gConnector[id]->type == VIDEO_CONNECTOR_LVDS) {
 		#endif
 		if (gConnector[id]->type == VIDEO_CONNECTOR_LVDS) {
@@ -275,21 +276,44 @@ detect_displays()
 					&gDisplay[displayIndex]->preferredMode);
 		}
 
+		// If no display found yet, try more standard detection methods
 		if (gDisplay[displayIndex]->attached == false) {
-			TRACE("%s: bit-banging ddc for edid on connector %" B_PRIu32 "\n",
+			TRACE("%s: bit-banging ddc for EDID on connector %" B_PRIu32 "\n",
 				__func__, id);
-			// Lets try bit-banging edid from connector
-			gDisplay[displayIndex]->attached =
-				connector_read_edid(id, &gDisplay[displayIndex]->edidData);
 
-			if (gConnector[id]->encoder.type == VIDEO_ENCODER_TVDAC
-				|| gConnector[id]->encoder.type == VIDEO_ENCODER_DAC) {
-				// analog? with valid EDID? lets make sure there is load.
-				// There is only one ddc communications path on DVI-I
-				if (encoder_analog_load_detect(id) != true) {
-					TRACE("%s: no analog load on EDID valid connector "
-						"#%" B_PRIu32 "\n", __func__, id);
-					gDisplay[displayIndex]->attached = false;
+			// Lets try bit-banging edid from connector
+			gDisplay[displayIndex]->attached
+				= connector_read_edid(id, &gDisplay[displayIndex]->edidData);
+
+			// Since DVI-I shows up as two connectors, and there is only one
+			// edid channel, we have to make *sure* the edid data received is
+			// valid for te connector.
+
+			// Found EDID data?
+			if (gDisplay[displayIndex]->attached) {
+				TRACE("%s: found EDID data on connector %" B_PRIu32 "\n",
+					__func__, id);
+
+				bool analogEncoder
+					= gConnector[id]->encoder.type == VIDEO_ENCODER_TVDAC
+					|| gConnector[id]->encoder.type == VIDEO_ENCODER_DAC;
+
+				edid1_info* edid = &gDisplay[displayIndex]->edidData;
+				if (!edid->display.input_type && analogEncoder) {
+					// If non-digital EDID + the encoder is analog...
+					TRACE("%s: connector %" B_PRIu32 " has non-digital EDID "
+						"and a analog encoder.\n", __func__, id);
+					gDisplay[displayIndex]->attached
+						= encoder_analog_load_detect(id);
+				} else if (edid->display.input_type && !analogEncoder) {
+					// If EDID is digital, we make an assumption here.
+					TRACE("%s: connector %" B_PRIu32 " has digital EDID "
+						"and is not a analog encoder.\n", __func__, id);
+				} else {
+					// ???, shouldn't happen... I think.
+					TRACE("%s: Warning: connector %" B_PRIu32 " has neither "
+						"digital EDID nor is an analog encoder?\n",
+						__func__, id);"
 				}
 			}
 		}
@@ -320,6 +344,8 @@ detect_displays()
 
 	// fallback if no attached monitors were found
 	if (displayIndex == 0) {
+		// This is a hack, however as we don't support HPD just yet,
+		// it tries to prevent a "no displays" situation.
 		ERROR("%s: ERROR: 0 attached monitors were found on display connectors."
 			" Injecting first connector as a last resort.\n", __func__);
 		for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
