@@ -20,6 +20,7 @@
 #include <termios.h>
 
 static const char IDLE_NAME[] = "idle thread ";
+static bigtime_t lastMeasure = 0;
 
 /*
  * Keeps track of a single thread's times 
@@ -243,8 +244,7 @@ compare(
 	utotal = 0;
 	for (i = 0; i < times.nthreads; i++) {
 		ignore = 0;
-		if (get_thread_info(times.thread_times[i].thid,
-							&t) < B_NO_ERROR) {
+		if (get_thread_info(times.thread_times[i].thid, &t) < B_NO_ERROR) {
 			strcpy(t.name, "(unknown)");
 			strcpy(tm.args, "(unknown)");
 		} else {
@@ -286,10 +286,10 @@ compare(
 	}
 	free_times(&times);
 	printf("------ %7.2f %7.2f %7.2f %4.1f%% TOTAL (%4.1f%% idle time, %4.1f%% unknown)", 
-		   (double)(gtotal / 1000), 
+		   (double) (gtotal / 1000),
 		   (double) (utotal / 1000),
 		   (double) (ktotal / 1000),
-		   cpu_perc(gtotal, uinterval), 
+		   cpu_perc(gtotal, uinterval),
 		   cpu_perc(idletime, uinterval),
 		   cpu_perc(cpus * uinterval - (gtotal + idletime), uinterval));
 	fflush(stdout);
@@ -339,7 +339,6 @@ static thread_time_list_t
 gather(
 	   thread_time_list_t *old,
 	   bigtime_t *busy_wait_time,
-	   bigtime_t uinterval,
 	   int refresh
 	   )
 {
@@ -351,10 +350,18 @@ gather(
 	bigtime_t old_busy;
 	int i;
 	system_info info;
+	bigtime_t	oldLastMeasure;
 
 	i = 0;
 	init_times(&times);
 	tmcookie = 0;
+	oldLastMeasure = lastMeasure;
+	lastMeasure = system_time();
+
+	get_system_info(&info);
+	old_busy = *busy_wait_time;
+	*busy_wait_time = info._busy_wait_time;
+
 	while (get_next_team_info(&tmcookie, &tm) == B_NO_ERROR) {
 		thcookie = 0;
 		while (get_next_thread_info(tm.team, &thcookie, &t) == B_NO_ERROR) {
@@ -365,15 +372,13 @@ gather(
 			i++;
 		}
 	}
-	get_system_info(&info);
-	old_busy = *busy_wait_time;
-	*busy_wait_time = info._busy_wait_time;
 	if (old != NULL) {
 		if (screen_size_changed) {
 			setup_term(true);
 			screen_size_changed = 0;
 		}
-		compare(old, &times, old_busy, *busy_wait_time, uinterval, refresh);
+		compare(old, &times, old_busy, *busy_wait_time,
+			system_time() - oldLastMeasure, refresh);
 		free_times(old);
 	}
 	return (times);
@@ -451,30 +456,26 @@ main(int argc, char **argv)
 	
 	signal(SIGWINCH, winch_handler);
 	
-	then = system_time();
+	lastMeasure = system_time();
 	if (iters < 0) {
 		// You will only have to wait half a second for the first iteration.
 		uinterval = 1 * 1000000 / 2;
-		baseline = gather(NULL, &busy, 0, refresh);
-		elapsed = system_time() - then;
-		if (elapsed < uinterval) {
+		baseline = gather(NULL, &busy, refresh);
+		elapsed = system_time() - lastMeasure;
+		if (elapsed < uinterval)
 			snooze(uinterval - elapsed);
-			elapsed = uinterval;
-		}
 		then = system_time();
-		baseline = gather(&baseline, &busy, elapsed, refresh);
+		baseline = gather(&baseline, &busy, refresh);
+
 	} else
-		baseline = gather(NULL, &busy, 0, refresh);
+		baseline = gather(NULL, &busy, refresh);
 
 	uinterval = interval * 1000000;
 	for (i = 0; iters < 0 || i < iters; i++) {
-		elapsed = system_time() - then;
-		if (elapsed < uinterval) {
+		elapsed = system_time() - lastMeasure;
+		if (elapsed < uinterval)
 			snooze(uinterval - elapsed);
-			elapsed = uinterval;
-		}
-		then = system_time();
-		baseline = gather(&baseline, &busy, elapsed, refresh);
+		baseline = gather(&baseline, &busy, refresh);
 	}
 	exit(0);
 }
