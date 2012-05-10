@@ -19,6 +19,38 @@ UartPL011::UartPL011(addr_t base)
 	fUARTEnabled(true),
 	fUARTBase(base)
 {
+	// ** Loopback test
+	uint32 cr = PL01x_CR_UARTEN;
+		// Enable UART
+	cr |= PL011_CR_TXE;
+		// Enable TX
+	cr |= PL011_CR_LBE;
+		// Enable Loopback mode
+	WriteUart(PL011_CR, cr);
+
+	WriteUart(PL011_FBRD, 0);
+	WriteUart(PL011_IBRD, 1);
+	WriteUart(PL011_LCRH, 0); // TODO: ST is different tx, rx lcr
+
+	// Write a 0 to the port and wait for confim..
+	WriteUart(PL01x_DR, 0);
+
+	while (ReadUart(PL01x_FR) & PL01x_FR_BUSY);
+		// Wait for xmit on loopback
+
+	// ** Disable loopback, enable uart
+	cr = PL01x_CR_UARTEN | PL011_CR_RXE | PL011_CR_TXE;
+	WriteUart(PL011_CR, cr);
+
+	// Enable DMA to received request outputs
+	WriteUart(PL011_DMACR, PL011_DMAONERR);
+
+	// ** Clear interrupts
+	WriteUart(PL011_ICR, PL011_OEIS | PL011_BEIS
+		| PL011_PEIS | PL011_FEIS);
+
+	// Set Rx timeout interrupt mask and Rx interrput mask
+	WriteUart(PL011_IMSC, PL011_RTIM | PL011_RXIM);
 }
 
 
@@ -67,28 +99,19 @@ void
 UartPL011::InitEarly()
 {
 	// Perform special hardware UART configuration
-	// Raspberry Pi: Early setup handled by gpio_init in platform code
+	// Raspberry Pi: Early gpio handled by gpio_init in platform code
 }
 
 
 void
 UartPL011::Enable()
 {
-	// TODO: Enable clock producer?
-
-	unsigned char cr = PL011_CR_UARTEN;
+	uint32 cr = PL01x_CR_UARTEN;
 		// Enable UART
-	cr |= PL011_CR_TXE; // | PL011_CR_RXE;
+	cr |= PL011_CR_TXE | PL011_CR_RXE;
 		// Enable TX and RX
+
 	WriteUart(PL011_CR, cr);
-
-	// TODO: For arm vendor, st different rx vs tx
-	// WriteUart(PL011_LCRH, 0);
-
-	WriteUart(PL01x_DR, 0);
-
-	while (ReadUart(PL01x_FR) & PL01x_FR_BUSY);
-		// Wait for xmit
 
 	fUARTEnabled = true;
 }

@@ -64,14 +64,14 @@
 #define PL011_CR_DTR	0x0400 // DTR
 #define PL011_CR_RXE	0x0200 // Receive enable
 #define PL011_CR_TXE	0x0100 // Transmit enable
-#define PL011_CR_LBR	0x0080 // Loopback enable
-#define PL011_CR_RTIE	0x0040
-#define PL011_CR_TIE	0x0020
-#define PL011_CR_RIE	0x0010
-#define PL011_CR_MSIE	0x0008
-#define PL011_CR_IIRLP	0x0004 // SIR low power mode
-#define PL011_CR_SIREN	0x0002 // SIR enable
-#define PL011_CR_UARTEN 0x0001 // UART enable
+#define PL011_CR_LBE	0x0080 // Loopback enable
+#define PL010_CR_RTIE	0x0040
+#define PL010_CR_TIE	0x0020
+#define PL010_CR_RIE	0x0010
+#define PL010_CR_MSIE	0x0008
+#define PL01x_CR_IIRLP	0x0004 // SIR low power mode
+#define PL01x_CR_SIREN	0x0002 // SIR enable
+#define PL01x_CR_UARTEN 0x0001 // UART enable
 
 #define PL011_LCRH_SPS		0x80
 #define PL01x_LCRH_WLEN_8	0x60
@@ -84,7 +84,64 @@
 #define PL01x_LCRH_PEN		0x02
 #define PL01x_LCRH_BRK		0x01
 
-// TODO: Other PL01x registers + values?
+#define PL010_IIR_RTIS	0x08
+#define PL010_IIR_TIS	0x04
+#define PL010_IIR_RIS	0x02
+#define PL010_IIR_MIS	0x01
+
+#define PL011_IFLS_RX1_8	(0 << 3)
+#define PL011_IFLS_RX2_8	(1 << 3)
+#define PL011_IFLS_RX4_8	(2 << 3)
+#define PL011_IFLS_RX6_8	(3 << 3)
+#define PL011_IFLS_RX7_8	(4 << 3)
+#define PL011_IFLS_TX1_8	(0 << 0)
+#define PL011_IFLS_TX2_8	(1 << 0)
+#define PL011_IFLS_TX4_8	(2 << 0)
+#define PL011_IFLS_TX6_8	(3 << 0)
+#define PL011_IFLS_TX7_8	(4 << 0)
+
+#define PL011_IFLS_RX_HALF	(5 << 3) // ST vendor only
+#define PL011_IFLS_TX_HALF	(5 << 0) // ST vendor only
+
+#define PL011_OEIM		(1 << 10) // overrun error interrupt mask
+#define PL011_BEIM		(1 << 9) // break error interrupt mask
+#define PL011_PEIM		(1 << 8) // parity error interrupt mask
+#define PL011_FEIM		(1 << 7) // framing error interrupt mask
+#define PL011_RTIM		(1 << 6) // receive timeout interrupt mask
+#define PL011_TXIM		(1 << 5) // transmit interrupt mask
+#define PL011_RXIM		(1 << 4) // receive interrupt mask
+#define PL011_DSRMIM	(1 << 3) // DSR interrupt mask
+#define PL011_DCDMIM	(1 << 2) // DCD interrupt mask
+#define PL011_CTSMIM	(1 << 1) // CTS interrupt mask
+#define PL011_RIMIM		(1 << 0) // RI interrupt mask
+
+#define PL011_OEIS		(1 << 10) // overrun error interrupt state
+#define PL011_BEIS		(1 << 9) // break error interrupt state
+#define PL011_PEIS		(1 << 8) // parity error interrupt state
+#define PL011_FEIS		(1 << 7) // framing error interrupt	state
+#define PL011_RTIS		(1 << 6) // receive timeout interrupt state
+#define PL011_TXIS		(1 << 5) // transmit interrupt state
+#define PL011_RXIS		(1 << 4) // receive interrupt state
+#define PL011_DSRMIS	(1 << 3) // DSR interrupt state
+#define PL011_DCDMIS	(1 << 2) // DCD interrupt state
+#define PL011_CTSMIS	(1 << 1) // CTS interrupt state
+#define PL011_RIMIS		(1 << 0) // RI interrupt state
+
+#define PL011_OEIC		(1 << 10) // overrun error interrupt clear
+#define PL011_BEIC		(1 << 9) // break error interrupt clear
+#define PL011_PEIC		(1 << 8) // parity error interrupt clear
+#define PL011_FEIC		(1 << 7) // framing error interrupt clear
+#define PL011_RTIC		(1 << 6) // receive timeout interrupt clear
+#define PL011_TXIC		(1 << 5) // transmit interrupt clear
+#define PL011_RXIC		(1 << 4) // receive interrupt clear
+#define PL011_DSRMIC	(1 << 3) // DSR interrupt clear
+#define PL011_DCDMIC	(1 << 2) // DCD interrupt clear
+#define PL011_CTSMIC	(1 << 1) // CTS interrupt clear
+#define PL011_RIMIC		(1 << 0) // RI interrupt clear
+
+#define PL011_DMAONERR	(1 << 2) // disable dma on err
+#define PL011_TXDMAE	(1 << 1) // enable transmit dma
+#define PL011_RXDMAE	(1 << 0) // enable receive dma
 
 
 class UartPL011 {
