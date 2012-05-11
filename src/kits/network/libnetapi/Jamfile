@@ -48,23 +48,25 @@ SharedLibrary libbnetapi.so :
 	# Building of the commented out files has not been completely tested after
 	# integrating the code from the GSoC 2010 "Services Kit" project and doing
 	# some renaming of types, constants and methods.
-#	HttpAuthentication.cpp
-#	HttpHeaders.cpp
-#	HttpForm.cpp
+	HttpAuthentication.cpp
+	HttpHeaders.cpp
+	HttpForm.cpp
 	HttpTime.cpp
+
+	md5.c
 
 	Url.cpp
 	UrlContext.cpp
-#	UrlProtocol.cpp
-#	UrlProtocolAsynchronousListener.cpp
-#	UrlProtocolDispatchingListener.cpp
-#	UrlProtocolHttp.cpp # TODO: -> add-on, See above.
-#	UrlProtocolListener.cpp
-#	UrlRequest.cpp
-#	UrlResult.cpp
-#	UrlSynchronousRequest.cpp
+	UrlProtocol.cpp
+	UrlProtocolAsynchronousListener.cpp
+	UrlProtocolDispatchingListener.cpp
+	UrlProtocolHttp.cpp # TODO: -> add-on, See above.
+	UrlProtocolListener.cpp
+	UrlRequest.cpp
+	UrlResult.cpp
+	UrlSynchronousRequest.cpp
 
 	:
-	be $(TARGET_NETWORK_LIBS) $(TARGET_LIBSUPC++) $(HAIKU_OPENSSL_LIBS)
+	be $(TARGET_NETWORK_LIBS) $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) $(HAIKU_OPENSSL_LIBS)
 	libshared.a
 ;

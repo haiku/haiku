@@ -21,6 +21,7 @@ public:
 										BUrlResult* result,
 										const char* threadName,
 										const char* protocolName);
+	virtual							~BUrlProtocol();
 										
 	// URL protocol required members
 	// TODO: (stippi) I know it's sometimes appealing to have these
