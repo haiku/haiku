@@ -29,7 +29,7 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
 # First build the non arch dependent parts
 KernelMergeObject boot_platform_u-boot_common.o :
-	start2.cpp
+	start.cpp
 	debug.cpp
 	console.cpp
 	serial.cpp
