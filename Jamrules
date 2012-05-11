@@ -88,11 +88,4 @@ if $(HAIKU_BUILD_PROFILE) && ! $(HAIKU_BUILD_PROFILE_DEFINED) {
 	}
 }
 
-# Include embedded board-specific file.
-# UserBuildConfig can override HAIKU_BOOT_BOARD.
-if $(HAIKU_BOOT_BOARD) {
-	include [ FDirName $(HAIKU_BUILD_RULES_DIR) board $(HAIKU_BOOT_BOARD)
-		BoardSetup ] ;
-}
-
 PrepareConfigVariables ;

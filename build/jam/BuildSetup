@@ -293,6 +293,13 @@ switch $(HAIKU_CPU) {
 	case * :
 		Exit "Currently unsupported target CPU:" $(HAIKU_CPU) ;
 }
+
+# Include embedded board-specific file.
+if $(HAIKU_BOOT_BOARD) {
+	include [ FDirName $(HAIKU_BUILD_RULES_DIR) board $(HAIKU_BOOT_BOARD)
+		BoardSetup ] ;
+}
+
 HAIKU_ARCH ?= $(HAIKU_CPU) ;
 HAIKU_ARCH_MACRO_DEFINE = ARCH_$(HAIKU_ARCH) ;
 HAIKU_DEFINES += $(HAIKU_ARCH_MACRO_DEFINE) ;
