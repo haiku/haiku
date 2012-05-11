@@ -2,6 +2,10 @@
 
 HAIKU_BOARD_DESCRIPTION = "Raspberry Pi" ;
 
+# must force both since they are set before this file is read.
+HAIKU_BOOT_PLATFORM = raspberrypi_arm ;
+TARGET_BOOT_PLATFORM = raspberrypi_arm ;
+
 #
 # Various hardcoded addresses
 #
