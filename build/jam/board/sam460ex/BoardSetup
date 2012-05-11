@@ -1,0 +1,34 @@
+# ACube SAM460ex board-specific definitions
+
+HAIKU_BOARD_DESCRIPTION = "ACube Sam460ex" ;
+
+# must force both since they are set before this file is read.
+HAIKU_BOOT_PLATFORM = u-boot ;
+TARGET_BOOT_PLATFORM = u-boot ;
+
+#FIXME!!!!!!!!!!!!!!!
+#
+# Various hardcoded addresses
+#
+
+# load address for haiku_loader
+HAIKU_BOARD_LOADER_BASE = 0x00000000 ;
+# entry points (raw binary, and netbsd loader emulation)
+HAIKU_BOARD_LOADER_ENTRY_RAW = 0x00000000 ;
+HAIKU_BOARD_LOADER_ENTRY_NBSD = 0x00000008 ;
+
+# load address for haiku_loader uimage
+# (must be different than real load address)
+HAIKU_BOARD_LOADER_UIBASE = 0x02000000 ;
+
+HAIKU_BOARD_LOADER_STACK_BASE = 0x02000000 ;
+
+#
+# gcc flags for the specific cpu
+#
+
+TARGET_KERNEL_CCFLAGS += -mtune=440 -msoft-float ;
+TARGET_KERNEL_C++FLAGS += -mtune=440 -msoft-float ;
+TARGET_CCFLAGS += -mtune=440 -msoft-float ;
+TARGET_C++FLAGS += -mtune=440 -msoft-float ;
+
