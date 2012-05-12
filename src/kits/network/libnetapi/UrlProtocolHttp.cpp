@@ -32,10 +32,11 @@ static const char* kHttpProtocolThreadStrStatus[
 
 
 BUrlProtocolHttp::BUrlProtocolHttp(BUrl& url, bool ssl, 
-		BUrlProtocolListener* listener, BUrlContext* context, 
-		BUrlResult* result)
+		const char *protocolName, BUrlProtocolListener* listener, 
+		BUrlContext* context, BUrlResult* result)
 	: 
-	BUrlProtocol(url, listener, context, result, "BUrlProtocol.HTTP", "HTTP"),
+	BUrlProtocol(url, listener, context, result, "BUrlProtocol.HTTP", protocolName),
+	fSSL(ssl),
 	fRequestMethod(B_HTTP_GET),
 	fHttpVersion(B_HTTP_11)
 {
@@ -337,9 +338,13 @@ BUrlProtocolHttp::_ResolveHostName()
 		
 	if (fUrl.HasPort())
 		fRemoteAddr = BNetworkAddress(fUrl.Host(), fUrl.Port());
-	else
-		fRemoteAddr = BNetworkAddress(fUrl.Host(), 80);
-	
+	else {
+		if (fSSL)
+			fRemoteAddr = BNetworkAddress(fUrl.Host(), 443);
+		else
+			fRemoteAddr = BNetworkAddress(fUrl.Host(), 80);
+	}
+				
 	if (fRemoteAddr.InitCheck() != B_OK)
 		return false;
 	

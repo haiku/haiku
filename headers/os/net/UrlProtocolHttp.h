@@ -23,6 +23,7 @@ class BAbstractSocket;
 class BUrlProtocolHttp : public BUrlProtocol {
 public:
 								BUrlProtocolHttp(BUrl& url, bool ssl = false,
+									const char *protocolName = "HTTP",
 									BUrlProtocolListener* listener = NULL,
 									BUrlContext* context = NULL,
 									BUrlResult* result = NULL);
@@ -62,6 +63,7 @@ private:
 private:
 			BAbstractSocket*	fSocket;
 			BNetworkAddress		fRemoteAddr;
+			bool				fSSL;
 			
 			int8				fRequestMethod;
 			int8				fHttpVersion;
