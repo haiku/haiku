@@ -85,6 +85,10 @@ SwatchGroup::SwatchGroup(BRect frame)
 	fCurrentColorSV = new SwatchView("current swatch",
 		new BMessage(MSG_COLOR_PICKER), this, color, 28.0, 28.0);
 
+	// When the color of this swatch changes via drag&drop, we want to
+	// adopt it as current color.
+	fCurrentColorSV->SetDroppedMessage(new BMessage(MSG_SET_COLOR));
+
 	// create color field and slider
 	fColorField = new ColorField(BPoint(0.0, 0.0), H_SELECTED,
 		1.0, B_HORIZONTAL);
