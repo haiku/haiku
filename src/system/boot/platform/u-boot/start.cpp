@@ -48,12 +48,10 @@ extern "C" void _start(void);
 extern "C" int start_raw(int argc, const char **argv);
 extern "C" void dump_uimage(struct image_header *image);
 
+// declared in shell.S
 extern struct image_header *gUImage;
 extern uboot_arm_gd *gUBootGlobalData;
 extern uint32 gUBootOS;
-
-
-register volatile uboot_arm_gd *gGD asm ("r8");
 
 static uint32 sBootOptions;
 
@@ -181,9 +179,9 @@ start_raw(int argc, const char **argv)
 		for (i = 0; i < argc; i++)
 			dprintf("argv[%d] @%lx = '%s'\n", i, (uint32)argv[i], argv[i]);
 		dprintf("os: %d\n", gUBootOS);
-		dprintf("gd @ %p\n", gGD);
-		dprintf("gd->bd @ %p\n", gGD->bd);
-		dprintf("fb_base %p\n", (void*)gGD->fb_base);
+		dprintf("gd @ %p\n", gUBootGlobalData);
+		dprintf("gd->bd @ %p\n", gUBootGlobalData->bd);
+		dprintf("fb_base %p\n", (void*)gUBootGlobalData->fb_base);
 		dprintf("uimage @ %p\n", gUImage);
 		if (gUImage)
 			dump_uimage(gUImage);
