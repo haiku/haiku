@@ -1,9 +1,10 @@
 /*
- * Copyright 2010 Haiku Inc. All rights reserved.
+ * Copyright 2010-2011 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Christophe Huriaux, c.huriaux@gmail.com
+ *      Niels Sascha Reedijk, niels.reedijk@gmail.com
  */
 
 
@@ -14,6 +15,8 @@
 #include <arpa/inet.h>
 #include <Debug.h>
 #include <File.h>
+#include <Socket.h>
+#include <SecureSocket.h>
 #include <UrlProtocolHttp.h>
 
 
@@ -28,14 +31,26 @@ static const char* kHttpProtocolThreadStrStatus[
 	};
 
 
-BUrlProtocolHttp::BUrlProtocolHttp(BUrl& url, BUrlProtocolListener* listener,
-		BUrlContext* context, BUrlResult* result)
+BUrlProtocolHttp::BUrlProtocolHttp(BUrl& url, bool ssl, 
+		BUrlProtocolListener* listener, BUrlContext* context, 
+		BUrlResult* result)
 	: 
 	BUrlProtocol(url, listener, context, result, "BUrlProtocol.HTTP", "HTTP"),
 	fRequestMethod(B_HTTP_GET),
 	fHttpVersion(B_HTTP_11)
 {
 	_ResetOptions();
+	if (ssl)
+		fSocket = new BSecureSocket();
+	else
+		fSocket = new BSocket();
+
+}
+
+
+BUrlProtocolHttp::~BUrlProtocolHttp()
+{
+	delete fSocket;
 }
 
 
@@ -203,11 +218,7 @@ status_t
 BUrlProtocolHttp::_ProtocolLoop()
 {	
 	printf("UHP[%p]::{Loop} %s\n", this, fUrl.UrlString().String());
-	// Socket initialization
-	fSocket = BNetEndpoint(SOCK_STREAM);
-	if (fSocket.InitCheck() != B_OK) 
-		return B_PROT_SOCKET_ERROR;
-	
+
 	// Initialize the request redirection loop
 	int8 maxRedirs = fOptMaxRedirs;
 	bool newRequest;
@@ -325,23 +336,20 @@ BUrlProtocolHttp::_ResolveHostName()
 		fUrl.UrlString().String());
 		
 	if (fUrl.HasPort())
-		fRemoteAddr = BNetAddress(fUrl.Host(), fUrl.Port());
+		fRemoteAddr = BNetworkAddress(fUrl.Host(), fUrl.Port());
 	else
-		fRemoteAddr = BNetAddress(fUrl.Host(), 80);
+		fRemoteAddr = BNetworkAddress(fUrl.Host(), 80);
 	
 	if (fRemoteAddr.InitCheck() != B_OK)
 		return false;
-		
-	char addr[15];
-	struct in_addr ip;
-	fRemoteAddr.GetAddr(ip);
-	inet_ntop(AF_INET, &ip, addr, 15);
 	
 	//! ProtocolHook:HostnameResolved
 	if (fListener != NULL)
-		fListener->HostnameResolved(this, const_cast<const char*>(addr));
+		fListener->HostnameResolved(this, 
+					const_cast<const char*>(fRemoteAddr.ToString().String()));
 	
-	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Hostname resolved to: %s", addr);
+	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Hostname resolved to: %s", 
+			   fRemoteAddr.ToString().String());
 	
 	return true;
 }
@@ -352,11 +360,10 @@ BUrlProtocolHttp::_MakeRequest()
 {
 	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Connection to %s.", 
 		fUrl.Authority().String());
-	status_t connectError = fSocket.Connect(fRemoteAddr);
+	status_t connectError = fSocket->Connect(fRemoteAddr);
 	
 	if (connectError != B_OK) {
-		_EmitDebug(B_URL_PROTOCOL_DEBUG_ERROR, "Connection error: %s.", 
-			fSocket.ErrorStr());
+		_EmitDebug(B_URL_PROTOCOL_DEBUG_ERROR, "Socket connection error.");
 		return B_PROT_CONNECTION_FAILED;
 	}
 	
@@ -368,7 +375,7 @@ BUrlProtocolHttp::_MakeRequest()
 	
 	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Sending request (size=%d)",
 		fOutputBuffer.Length());
-	fSocket.Send(fOutputBuffer.String(), fOutputBuffer.Length());
+	fSocket->Write(fOutputBuffer.String(), fOutputBuffer.Length());
 	fOutputBuffer.Truncate(0);
 	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Request sent.");
 	
@@ -377,14 +384,14 @@ BUrlProtocolHttp::_MakeRequest()
 			fOutputBuffer = fOptPostFields->RawData();
 			_EmitDebug(B_URL_PROTOCOL_DEBUG_TRANSFER_OUT, 
 				fOutputBuffer.String());
-			fSocket.Send(fOutputBuffer.String(), fOutputBuffer.Length());
+			fSocket->Write(fOutputBuffer.String(), fOutputBuffer.Length());
 		} else {
 			for (BHttpForm::Iterator it = fOptPostFields->GetIterator();
 				const BHttpFormData* currentField = it.Next();
 				) {
 				_EmitDebug(B_URL_PROTOCOL_DEBUG_TRANSFER_OUT, 
 					it.MultipartHeader().String());
-				fSocket.Send(it.MultipartHeader().String(), 
+				fSocket->Write(it.MultipartHeader().String(), 
 					it.MultipartHeader().Length());
 				
 				switch (currentField->Type()) {
@@ -393,7 +400,7 @@ BUrlProtocolHttp::_MakeRequest()
 						break;
 						
 					case B_HTTPFORM_STRING:
-						fSocket.Send(currentField->String().String(), 
+						fSocket->Write(currentField->String().String(), 
 							currentField->String().Length());
 						break;
 					
@@ -406,22 +413,22 @@ BUrlProtocolHttp::_MakeRequest()
 
 							readSize = upFile.Read(readBuffer, 1024);
 							while (readSize > 0) {
-								fSocket.Send(readBuffer, readSize);
+								fSocket->Write(readBuffer, readSize);
 								readSize = upFile.Read(readBuffer, 1024);
 							}
 						}
 						break;
 						
 					case B_HTTPFORM_BUFFER:
-						fSocket.Send(currentField->Buffer(), 
+						fSocket->Write(currentField->Buffer(), 
 							currentField->BufferSize());
 						break;
 				}
 				
-				fSocket.Send("\r\n", 2);
+				fSocket->Write("\r\n", 2);
 			}
 			
-			fSocket.Send(fOptPostFields->GetMultipartFooter().String(), 
+			fSocket->Write(fOptPostFields->GetMultipartFooter().String(), 
 				fOptPostFields->GetMultipartFooter().Length());
 		}
 	} else if ((fRequestMethod == B_HTTP_POST || fRequestMethod == B_HTTP_PUT) 
@@ -436,18 +443,16 @@ BUrlProtocolHttp::_MakeRequest()
 				char hexSize[16];
 				size_t hexLength = sprintf(hexSize, "%ld", read);
 				
-				fSocket.Send(hexSize, hexLength);
-				fSocket.Send("\r\n", 2);
-				fSocket.Send(outputTempBuffer, read);
-				fSocket.Send("\r\n", 2);
+				fSocket->Write(hexSize, hexLength);
+				fSocket->Write("\r\n", 2);
+				fSocket->Write(outputTempBuffer, read);
+				fSocket->Write("\r\n", 2);
 			}
 		}
 		
-		fSocket.Send("0\r\n\r\n", 5);
+		fSocket->Write("0\r\n\r\n", 5);
 	}
 	fOutputBuffer.Truncate(0, true);
-	
-	fSocket.SetNonBlocking(false);
 	
 	fStatusReceived = false;
 	fHeadersReceived = false;
@@ -466,7 +471,9 @@ BUrlProtocolHttp::_MakeRequest()
 		 
 	while (!fQuit && !(receiveEnd && parseEnd)) {
 		if (!receiveEnd) {
-			 bytesRead = fSocket.Receive(fInputBuffer, receiveBufferSize);
+			fSocket->WaitForReadable();
+			BNetBuffer chunk(receiveBufferSize);
+			bytesRead = fSocket->Read(chunk.Data(), receiveBufferSize);
 			
 			if (bytesRead < 0) {
 				readError = true;
@@ -474,6 +481,8 @@ BUrlProtocolHttp::_MakeRequest()
 				continue; 
 			} else if (bytesRead == 0)
 				receiveEnd = true;
+			
+			fInputBuffer.AppendData(chunk.Data(), bytesRead);
 		}
 		else
 			bytesRead = 0;
@@ -563,7 +572,7 @@ BUrlProtocolHttp::_MakeRequest()
 		parseEnd = (fInputBuffer.Size() == 0);
 	}
 	
-	fSocket.Close();
+	fSocket->Disconnect();
 	
 	if (readError)
 		return B_PROT_READ_FAILED;
@@ -681,7 +690,7 @@ BUrlProtocolHttp::_CopyChunkInBuffer(char** buffer, ssize_t* bytesReceived)
 				chunkHeader.Length() - semiColonIndex);
 			
 		chunkSize = strtol(chunkHeader.String(), NULL, 16);		
-		PRINT(("BHP[%p] Chunk %s=%d\n", this, chunkHeader.String(), chunkSize));
+		PRINT(("BHP[%p] Chunk %s=%ld\n", this, chunkHeader.String(), chunkSize));
 		if (chunkSize == 0) {
 			fContentReceived = true;
 		}
