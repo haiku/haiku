@@ -133,6 +133,23 @@ start_linux(int argc, int archnum, void *atags)
 
 
 extern "C" int
+start_linux_ppc_old(void */*board_info*/,
+	void */*initrd_start*/, void */*initrd_end*/,
+	const char */*cmdline_start*/, const char */*cmdline_end*/)
+{
+	return 1;
+}
+
+
+extern "C" int
+start_linux_ppc_fdt(void *fdt, long/*UNUSED*/, long/*UNUSED*/,
+	uint32 epapr_magic, uint32 initial_mem_size)
+{
+	return 1;
+}
+
+
+extern "C" int
 start_raw(int argc, const char **argv)
 {
 	stage2_args args;
