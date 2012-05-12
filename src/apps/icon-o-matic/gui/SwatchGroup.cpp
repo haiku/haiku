@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2012, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -22,25 +22,28 @@
 #include "Group.h"
 #include "SwatchView.h"
 
+
 enum {
 	MSG_SET_COLOR		= 'stcl',
 	MSG_COLOR_PICKER	= 'clpk',
 	MSG_ALPHA_SLIDER	= 'alps',
 };
 
+
 #define SWATCH_VIEW_WIDTH 20
 #define SWATCH_VIEW_HEIGHT 15
 
-// constructor
+
 SwatchGroup::SwatchGroup(BRect frame)
-	: BView(frame, "style view", B_FOLLOW_NONE, 0),
+	:
+	BView(frame, "style view", B_FOLLOW_NONE, 0),
 
-	  fCurrentColor(NULL),
-	  fIgnoreNotifications(false),
+	fCurrentColor(NULL),
+	fIgnoreNotifications(false),
 
-	  fColorPickerPanel(NULL),
-	  fColorPickerMode(H_SELECTED),
-	  fColorPickerFrame(100.0, 100.0, 200.0, 200.0)
+	fColorPickerPanel(NULL),
+	fColorPickerMode(H_SELECTED),
+	fColorPickerFrame(100.0, 100.0, 200.0, 200.0)
 {
 	frame = BRect(0, 0, 100, 15);
 	fTopSwatchViews = new Group(frame, "top swatch group");
@@ -62,32 +65,33 @@ SwatchGroup::SwatchGroup(BRect frame)
 			h = ((float)(i - 9) / 10.0) * 6.0;
 			v = 0.5;
 		}
+
 		HSV_to_RGB(h, s, v, r, g, b);
 		color.red = (uint8)(255.0 * r);
 		color.green = (uint8)(255.0 * g);
 		color.blue = (uint8)(255.0 * b);
 		fSwatchViews[i] = new SwatchView("swatch", new BMessage(MSG_SET_COLOR),
-										 this, color,
-										 SWATCH_VIEW_WIDTH,
-										 SWATCH_VIEW_HEIGHT);
+			this, color, SWATCH_VIEW_WIDTH, SWATCH_VIEW_HEIGHT);
+
 		fSwatchViews[i]->SetResizingMode(B_FOLLOW_LEFT | B_FOLLOW_TOP);
+
 		if (i < 10)
 			fTopSwatchViews->AddChild(fSwatchViews[i]);
 		else
 			fBottomSwatchViews->AddChild(fSwatchViews[i]);
 	}
-	// crrate current color swatch view
+
+	// create current color swatch view
 	fCurrentColorSV = new SwatchView("current swatch",
-									 new BMessage(MSG_COLOR_PICKER),
-									 this, color, 28.0, 28.0);
+		new BMessage(MSG_COLOR_PICKER), this, color, 28.0, 28.0);
 
 	// create color field and slider
 	fColorField = new ColorField(BPoint(0.0, 0.0), H_SELECTED,
-								 1.0, B_HORIZONTAL);
+		1.0, B_HORIZONTAL);
 	fColorSlider = new ColorSlider(BPoint(0.0, 0.0), H_SELECTED,
-								   1.0, 1.0, B_HORIZONTAL);
+		1.0, 1.0, B_HORIZONTAL);
 	fAlphaSlider = new AlphaSlider(B_HORIZONTAL,
-								   new BMessage(MSG_ALPHA_SLIDER));
+		new BMessage(MSG_ALPHA_SLIDER));
 
 	// layout gui
 	fTopSwatchViews->SetSpacing(0, 0);
@@ -98,18 +102,18 @@ SwatchGroup::SwatchGroup(BRect frame)
 	fBottomSwatchViews->SetResizingMode(B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 
 	float paletteHeight = fBottomSwatchViews->Frame().Height()
-							+ fTopSwatchViews->Frame().Height() + 1;
+		+ fTopSwatchViews->Frame().Height() + 1;
 
 	fTopSwatchViews->MoveTo(paletteHeight + 2, 4);
 	fBottomSwatchViews->MoveTo(paletteHeight + 2,
-							   fTopSwatchViews->Frame().bottom + 1);
+		fTopSwatchViews->Frame().bottom + 1);
 
 	fCurrentColorSV->MoveTo(0, fTopSwatchViews->Frame().top);
 	fCurrentColorSV->ResizeTo(paletteHeight, paletteHeight);
 	fCurrentColorSV->SetResizingMode(B_FOLLOW_LEFT | B_FOLLOW_TOP);
 
 	float width = fTopSwatchViews->Frame().right
-					- fCurrentColorSV->Frame().left;
+		- fCurrentColorSV->Frame().left;
 
 	fColorField->ResizeTo(width, 40);
 	fColorField->FrameResized(width, 40);
@@ -136,34 +140,32 @@ SwatchGroup::SwatchGroup(BRect frame)
 	AddChild(fAlphaSlider);
 }
 
-// destructor
+
 SwatchGroup::~SwatchGroup()
 {
 	SetCurrentColor(NULL);
 }
 
-// ObjectChanged
+
 void
 SwatchGroup::ObjectChanged(const Observable* object)
 {
-	if (object == fCurrentColor) {
-		rgb_color color = fCurrentColor->Color();
+	if (object != fCurrentColor || fIgnoreNotifications)
+		return;
 
-		if (!fIgnoreNotifications) {
-			float h, s, v;
-			RGB_to_HSV(color.red / 255.0,
-					   color.green / 255.0,
-					   color.blue / 255.0,
-					   h, s, v);
-		
-			_SetColor(h, s, v, color.alpha);
-		}
-	}
+	rgb_color color = fCurrentColor->Color();
+
+	float h, s, v;
+	RGB_to_HSV(color.red / 255.0, color.green / 255.0, color.blue / 255.0,
+		h, s, v);
+
+	_SetColor(h, s, v, color.alpha);
 }
+
 
 // #pragma mark -
 
-// AttachedToWindow
+
 void
 SwatchGroup::AttachedToWindow()
 {
@@ -172,19 +174,20 @@ SwatchGroup::AttachedToWindow()
 	fAlphaSlider->SetTarget(this);
 }
 
-// MessageReceived
+
 void
 SwatchGroup::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case MSG_SET_COLOR: {
+		case MSG_SET_COLOR:
+		{
 			rgb_color color;
 			if (restore_color_from_message(message, color) == B_OK) {
 // TODO: fix color picker panel to respect alpha
 if (message->HasRect("panel frame"))
 color.alpha = fAlphaSlider->Value();
 //
-				if (fCurrentColor)
+				if (fCurrentColor != NULL)
 					fCurrentColor->SetColor(color);
 			}
 			// if message contains these fields,
@@ -203,30 +206,33 @@ color.alpha = fAlphaSlider->Value();
 			}
 			break;
 		}
-		case MSG_COLOR_FIELD: {
+
+		case MSG_COLOR_FIELD:
+		{
 			// get h from color slider
 			float h = ((255 - fColorSlider->Value()) / 255.0) * 6.0;
 			float s, v;
 			// s and v are comming from the message
-			if (message->FindFloat("value", &s) >= B_OK
-				&& message->FindFloat("value", 1, &v) >= B_OK) {
-
+			if (message->FindFloat("value", &s) == B_OK
+				&& message->FindFloat("value", 1, &v) == B_OK) {
 				_SetColor(h, s, v, fAlphaSlider->Value());
 			}
 			break;
 		}
-		case MSG_COLOR_SLIDER: {
+
+		case MSG_COLOR_SLIDER:
+		{
 			float h;
 			float s, v;
 			fColorSlider->GetOtherValues(&s, &v);
 			// h is comming from the message
-			if (message->FindFloat("value", &h) >= B_OK) {
-
+			if (message->FindFloat("value", &h) == B_OK)
 				_SetColor(h, s, v, fAlphaSlider->Value());
-			}
 			break;
 		}
-		case MSG_ALPHA_SLIDER: {
+
+		case MSG_ALPHA_SLIDER:
+		{
 			float h = (1.0 - (float)fColorSlider->Value() / 255.0) * 6;
 			float s, v;
 			fColorSlider->GetOtherValues(&s, &v);
@@ -234,18 +240,16 @@ color.alpha = fAlphaSlider->Value();
 			break;
 		}
 
-		case MSG_COLOR_PICKER: {
+		case MSG_COLOR_PICKER:
+		{
 			rgb_color color;
 			if (restore_color_from_message(message, color) < B_OK)
 				break;
-			if (!fColorPickerPanel) {
-				fColorPickerPanel
-					= new ColorPickerPanel(fColorPickerFrame,
-										   color,
-										   fColorPickerMode,
-										   Window(),
-										   new BMessage(MSG_SET_COLOR),
-										   this);
+
+			if (fColorPickerPanel == NULL) {
+				fColorPickerPanel = new ColorPickerPanel(fColorPickerFrame,
+					color, fColorPickerMode, Window(),
+					new BMessage(MSG_SET_COLOR), this);
 				fColorPickerPanel->Show();
 			} else {
 				if (fColorPickerPanel->Lock()) {
@@ -263,37 +267,39 @@ color.alpha = fAlphaSlider->Value();
 	}
 }
 
+
 // #pragma mark -
 
-// SetCurrentColor
+
 void
 SwatchGroup::SetCurrentColor(CurrentColor* color)
 {
 	if (fCurrentColor == color)
 		return;
 
-	if (fCurrentColor)
+	if (fCurrentColor != NULL)
 		fCurrentColor->RemoveObserver(this);
 
 	fCurrentColor = color;
 
-	if (fCurrentColor) {
+	if (fCurrentColor != NULL) {
 		fCurrentColor->AddObserver(this);
 
 		ObjectChanged(fCurrentColor);
 	}
 }
 
+
 // #pragma mark -
 
-// _SetColor
+
 void
 SwatchGroup::_SetColor(rgb_color color)
 {
 	fCurrentColorSV->SetColor(color);
 }
 
-// _SetColor
+
 void
 SwatchGroup::_SetColor(float h, float s, float v, uint8 a)
 {
@@ -322,8 +328,10 @@ SwatchGroup::_SetColor(float h, float s, float v, uint8 a)
 	}
 
 	fIgnoreNotifications = true;
+
 	if (fCurrentColor)
 		fCurrentColor->SetColor(color);
 	_SetColor(color);
+
 	fIgnoreNotifications = false;
 }

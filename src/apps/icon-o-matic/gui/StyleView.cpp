@@ -6,7 +6,6 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-
 #include "StyleView.h"
 
 #include <new>
