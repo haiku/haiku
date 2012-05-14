@@ -79,8 +79,8 @@ UartPL011::InitPort(uint32 baud)
 	// Calculate baud divisor
 	uint32 baudDivisor = BOARD_UART_CLOCK / (16 * baud);
 	uint32 remainder = BOARD_UART_CLOCK % (16 * baud);
-	uint32 baudFractional = ((8 * remainder) / baud) >> 1
-		+ ((8 * remainder) / baud) & 1;
+	uint32 baudFractional = ((8 * remainder) / BAUD >> 1)
+		+ ((8 * remainder) / BAUD & 1);
 
 	// Disable UART
 	Disable();
