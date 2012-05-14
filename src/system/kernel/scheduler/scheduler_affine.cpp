@@ -500,9 +500,10 @@ affine_reschedule(void)
 			&& nextThread->priority < B_NORMAL_PRIORITY)
 			quantum = kMaxThreadQuantum;
 
-		if (!thread_is_idle_thread(nextThread))
+		if (!thread_is_idle_thread(nextThread)) {
 			add_timer(quantumTimer, &reschedule_event, quantum,
 				B_ONE_SHOT_RELATIVE_TIMER | B_TIMER_ACQUIRE_SCHEDULER_LOCK);
+		}
 
 		if (nextThread != oldThread)
 			scheduler_switch_thread(oldThread, nextThread);
