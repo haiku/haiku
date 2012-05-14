@@ -55,7 +55,7 @@ APRWindow::APRWindow(BRect frame)
 	fColorsView = new APRView(B_TRANSLATE("Colors"));
 
 	fDecorSettings = new DecorSettingsView(
-		B_TRANSLATE("Window Decorator"));
+		B_TRANSLATE("Decorators"));
 
 	fAntialiasingSettings = new AntialiasingSettingsView(
 		B_TRANSLATE("Antialiasing"));

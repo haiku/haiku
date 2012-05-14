@@ -48,7 +48,7 @@ DecorSettingsView::DecorSettingsView(const char* name)
 	// Decorator menu
 	_BuildDecorMenu();
 	fDecorMenuField = new BMenuField("decorator",
-		B_TRANSLATE("Window Decorator:"), fDecorMenu);
+		B_TRANSLATE("Window decorator:"), fDecorMenu);
 
 	fDecorInfoButton = new BButton(B_TRANSLATE("About"),
 		new BMessage(kMsgDecorInfo));
