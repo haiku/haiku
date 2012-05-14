@@ -99,13 +99,4 @@ gpio_init()
 	int pin = 0;
 	for (pin = 16; pin <= 25; pin++)
 		gpio_mode(GPIO_BASE, pin, GPIO_OUT);
-
-	// ** Prepare UART pins for serial communication
-	// Set alternate function 0 on UART pins
-	gpio_mode(GPIO_BASE, 14, GPIO_ALT0);
-	gpio_mode(GPIO_BASE, 15, GPIO_ALT0);
-
-	// Pull UART pins to initial state low
-	gpio_write(GPIO_BASE, 14, 0);
-	gpio_write(GPIO_BASE, 15, 0);
 }
