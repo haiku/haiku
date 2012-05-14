@@ -19,6 +19,8 @@ UartPL011::UartPL011(addr_t base)
 	fUARTEnabled(true),
 	fUARTBase(base)
 {
+	// TODO: Nice, but not required
+	#if 0
 	// ** Loopback test
 	uint32 cr = PL01x_CR_UARTEN;
 		// Enable UART
@@ -51,6 +53,7 @@ UartPL011::UartPL011(addr_t base)
 
 	// Set Rx timeout interrupt mask and Rx interrput mask
 	WriteUart(PL011_IMSC, PL011_RTIM | PL011_RXIM);
+	#endif
 }
 
 
