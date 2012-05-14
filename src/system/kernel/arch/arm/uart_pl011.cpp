@@ -76,19 +76,21 @@ UartPL011::ReadUart(uint32 reg)
 void
 UartPL011::InitPort(uint32 baud)
 {
+	// Calculate baud divisor
+	uint32 baudDivisor = BOARD_UART_CLOCK / (16 * baud);
+	uint32 remainder = BOARD_UART_CLOCK % (16 * baud);
+	uint32 baudFractional = ((8 * remainder) / baud) >> 1
+		+ ((8 * remainder) / baud) & 1;
+
 	// Disable UART
 	Disable();
-
-	// Calculate baud divisor
-	uint16 baudDivisor = BOARD_UART_CLOCK / (16 * baud);
-	uint16 baudFractional = BOARD_UART_CLOCK % (16 * baud);
 
 	// Set baud divisor
 	WriteUart(PL011_IBRD, baudDivisor);
 	WriteUart(PL011_FBRD, baudFractional);
 
-	// Set LCR
-	WriteUart(PL011_LCRH, PL01x_LCRH_WLEN_8);
+	// Set LCR 8n1, enable fifo
+	WriteUart(PL011_LCRH, PL01x_LCRH_WLEN_8 | PL01x_LCRH_FEN);
 
 	// Enable UART
 	Enable();
@@ -131,8 +133,8 @@ UartPL011::PutChar(char c)
 {
 	if (fUARTEnabled == true) {
 		WriteUart(PL01x_DR, (unsigned int)c);
-		while (ReadUart(PL01x_FR) & PL01x_FR_TXFF);
-			// wait for the last char to get out
+		// Empty the transmit buffer
+		FlushTx();
 		return 0;
 	}
 
