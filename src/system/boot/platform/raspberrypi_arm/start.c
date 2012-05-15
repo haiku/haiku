@@ -27,8 +27,12 @@
 // GCC defined globals
 extern void (*__ctor_list)(void);
 extern void (*__ctor_end)(void);
+extern void (*__dtor_list)(void);
+extern void (*__dtor_end)(void);
 extern uint8 __bss_start;
-extern uint8 _end;
+extern uint8 __bss_end;
+extern uint8 __stack_start;
+extern uint8 __stack_end;
 
 extern int main(stage2_args *args);
 void _start(void);
@@ -37,14 +41,20 @@ void _start(void);
 static void
 clear_bss(void)
 {
-	memset(&__bss_start, 0, &_end - &__bss_start);
+	memset(&__bss_start, 0, &__bss_end - &__bss_start);
+}
+
+
+static void
+fill_stack(void)
+{
+	memset(&__stack_start, 0xBEBEBEBE, &__stack_end - &__stack_start);
 }
 
 
 static void
 call_ctors(void)
 {
-	#warning BUG: constructors don't get called!
 	void (**f)(void);
 
 	for (f = &__ctor_list; f < &__ctor_end; f++) {
@@ -92,6 +102,7 @@ pi_start(void)
 	stage2_args args;
 
 	clear_bss();
+	fill_stack();
 	call_ctors();
 
 	cpu_init();
