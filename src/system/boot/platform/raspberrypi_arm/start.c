@@ -44,6 +44,7 @@ clear_bss(void)
 static void
 call_ctors(void)
 {
+	#warning BUG: constructors don't get called!
 	void (**f)(void);
 
 	for (f = &__ctor_list; f < &__ctor_end; f++) {
@@ -65,7 +66,7 @@ abort(void)
 uint32
 platform_boot_options(void)
 {
-#warning IMPLEMENT platform_boot_options
+	#warning IMPLEMENT platform_boot_options
 	return 0;
 }
 
@@ -73,7 +74,7 @@ platform_boot_options(void)
 void
 platform_start_kernel(void)
 {
-#warning IMPLEMENT platform_start_kernel
+	#warning IMPLEMENT platform_start_kernel
 	panic("kernel returned!\n");
 }
 
@@ -81,7 +82,7 @@ platform_start_kernel(void)
 void
 platform_exit(void)
 {
-#warning IMPLEMENT platform_exit
+	#warning IMPLEMENT platform_exit
 }
 
 

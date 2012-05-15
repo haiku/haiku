@@ -21,8 +21,6 @@ UartPL011 gLoaderUART(uart_base_debug());
 
 
 static int32 sSerialEnabled = 0;
-static char sBuffer[16384];
-static uint32 sBufferPosition;
 
 
 static void
@@ -38,12 +36,7 @@ serial_puts(const char* string, size_t size)
 	if (sSerialEnabled <= 0)
 		return;
 
-	if (sBufferPosition + size < sizeof(sBuffer)) {
-		memcpy(sBuffer + sBufferPosition, string, size);
-		sBufferPosition += size;
-	}
-
-	while (size-- != 0) {
+	while (size-- > 0) {
 		char c = string[0];
 
 		if (c == '\n') {
@@ -86,7 +79,5 @@ serial_init(void)
 
 	serial_enable();
 
-	serial_putc('!');
-	serial_puts("SER INIT", 8);
+	serial_puts("Serial startup\n", 15);
 }
-

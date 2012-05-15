@@ -104,7 +104,9 @@ void
 UartPL011::InitEarly()
 {
 	// Perform special hardware UART configuration
-	// Raspberry Pi: Early gpio handled by gpio_init in platform code
+
+	#warning Raspberry Pi Hack: Fix constructors not getting called in loader.
+	fUARTBase = uart_base_debug();
 }
 
 
@@ -135,7 +137,7 @@ int
 UartPL011::PutChar(char c)
 {
 	if (fUARTEnabled == true) {
-		WriteUart(PL01x_DR, (unsigned int)c);
+		WriteUart(PL01x_DR, c);
 		// Empty the transmit buffer
 		FlushTx();
 		return 0;
@@ -145,7 +147,6 @@ UartPL011::PutChar(char c)
 }
 
 
-/* returns -1 if no data available */
 int
 UartPL011::GetChar(bool wait)
 {
@@ -158,7 +159,6 @@ void
 UartPL011::FlushTx()
 {
 	while (ReadUart(PL01x_FR) & PL01x_FR_TXFF);
-		// wait for the last char to get out
 }
 
 
