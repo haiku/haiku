@@ -104,9 +104,6 @@ void
 UartPL011::InitEarly()
 {
 	// Perform special hardware UART configuration
-
-	#warning Raspberry Pi Hack: Fix constructors not getting called in loader.
-	fUARTBase = uart_base_debug();
 }
 
 
