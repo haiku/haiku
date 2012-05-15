@@ -162,8 +162,8 @@ public:
 	void					FlushRx();
 
 private:
-	void					WriteUart(uint32 reg, unsigned char data);
-	unsigned char			ReadUart(uint32 reg);
+	void					WriteUart(uint32 reg, uint32 data);
+	uint32					ReadUart(uint32 reg);
 
 	bool					fUARTEnabled;
 	addr_t					fUARTBase;

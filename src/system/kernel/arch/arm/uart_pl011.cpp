@@ -63,16 +63,16 @@ UartPL011::~UartPL011()
 
 
 void
-UartPL011::WriteUart(uint32 reg, unsigned char data)
+UartPL011::WriteUart(uint32 reg, uint32 data)
 {
-	*(volatile unsigned char *)(fUARTBase + reg) = data;
+	*(volatile uint32*)(fUARTBase + reg) = data;
 }
 
 
-unsigned char
+uint32
 UartPL011::ReadUart(uint32 reg)
 {
-	return *(volatile unsigned char *)(fUARTBase + reg);
+	return *(volatile uint32*)(fUARTBase + reg);
 }
 
 
