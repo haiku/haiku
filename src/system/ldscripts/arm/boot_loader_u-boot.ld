@@ -11,7 +11,7 @@ SECTIONS
 
 	. = ALIGN(0x4);
 	__ctor_list = .;
-	.ctors : { *(.ctors) }
+	.ctors : { *(.ctors) *(.init_array) }
 	__ctor_end = .;
 
 	.rodata : { *(.rodata .rodata.*) }
