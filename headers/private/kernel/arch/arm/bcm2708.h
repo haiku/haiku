@@ -29,38 +29,46 @@
 
 #define SIZE_4K 0x00001000
 
+
+/*
+ * Found in:
+ * Broadcom BCM2835 ARM Peripherals
+ *  - BCM2835-ARM-Peripherals.pdf
+ */
+
+// 1.2.2 notes that peripherals are remapped from 0x7e to 0x20
 #define BCM2708_SDRAM_BASE	0x00000000
 #define BCM2708_PERI_BASE	0x20000000
 
-
 #define SDRAM_BASE		BCM2708_SDRAM_BASE
 #define ST_BASE			(BCM2708_PERI_BASE + 0x3000)
-	// System Timer
+	// System Timer, sec 12.0, page 172
 #define DMA_BASE		(BCM2708_PERI_BASE + 0x7000)
-	// DMA Controller
+	// DMA Controller, sec 4.2, page 39
 #define ARM_BASE		(BCM2708_PERI_BASE + 0xB000)
-	// BCM2708 ARM Control Block
+	// BCM2708 ARM Control Block, sec 7.5, page 112
 #define PM_BASE			(BCM2708_PERI_BASE + 0x100000)
 	// Power Management, Reset controller and Watchdog registers
 #define GPIO_BASE		(BCM2708_PERI_BASE + 0x200000)
-	// GPIO
+	// GPIO, sec 6.1, page 90
 #define UART0_BASE		(BCM2708_PERI_BASE + 0x201000)
-	// UART 0
+	// UART 0, sec 13.4, page 177
 #define MMCI0_BASE		(BCM2708_PERI_BASE + 0x202000)
 	// MMC
 #define UART1_BASE		(BCM2708_PERI_BASE + 0x215000)
-	// UART 1
+	// UART 1, sec 2.1, page 65
 #define EMMC_BASE		(BCM2708_PERI_BASE + 0x300000)
-	// eMMC interface
+	// eMMC interface, sec 5, page 66
 #define SMI_BASE		(BCM2708_PERI_BASE + 0x600000)
 	// SMI Base
 #define USB_BASE		(BCM2708_PERI_BASE + 0x980000)
-	// USB Controller
+	// USB Controller, 15.2, page 202
 #define FB_BASE			(BCM2708_PERI_BASE + 0x0000)
 	// Fake frame buffer
 #define FB_SIZE			SIZE_4K
 
 
+// 7.5, page 112
 #define ARM_CTRL_BASE			(ARM_BASE + 0x000)
 #define ARM_CTRL_IC_BASa		(ARM_BASE + 0x200)
 	// Interrupt controller
