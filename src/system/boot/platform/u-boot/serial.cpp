@@ -13,6 +13,7 @@
 #include <boot/platform.h>
 #include <arch/cpu.h>
 #include <boot/stage2.h>
+#include <new>
 #include <string.h>
 
 
@@ -91,8 +92,10 @@ serial_cleanup(void)
 extern "C" void
 serial_init(void)
 {
+	static char sUARTBuffer[sizeof(Uart8250)];
+
 	// Setup information on uart
-	gLoaderUART = new(nothrow) Uart8250(uart_base_debug());
+	gLoaderUART = new(sUARTBuffer) Uart8250(uart_base_debug());
 	if (gLoaderUART == 0)
 		return;
 
