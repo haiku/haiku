@@ -10,3 +10,6 @@ jmp_loader:
 
 	/* Start Haiku loader */
 	b pi_start
+
+	/* Cause exception if loader returns */
+	swi 0xFFFFFF
