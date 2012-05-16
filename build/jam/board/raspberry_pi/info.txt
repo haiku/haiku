@@ -1,27 +1,17 @@
-Some early bootloader information from Raspberry Pi foundation...
-
-Setting up the boot partition
+Setting up the Haiku boot partition
 
 partition 1 -- FAT32, bootable flag, type 'c'
-partition 2 -- os, whatever
+partition 2 -- BeFS, Haiku filesystem, type 'eb'
 
-The boot partition must contain the following files,
-get them from one of the official images:
-
+The boot partition must contain the following files to boot Haiku:
 * bootcode.bin : 2nd stage bootloader, starts with SDRAM disabled
 * loader.bin : 3rd stage bootloader, starts with SDRAM enabled
 * start.elf: The GPU binary firmware image, provided by the foundation.
-  * For now, use beta_start.elf
-* kernel.img: The OS kernel to load on the ARM processor.
-  Normally this is Linux - see instructions for compiling a kernel.
-* cmdline.txt: Parameters passed to the kernel on boot.
+* kernel.img: Haiku Loader (haiku_loader)
+* config.txt: A configuration file read by the GPU.
 
 Optional files:
-* config.txt: A configuration file read by the GPU.
-  Use this to override set the video mode, alter system clock speeds,
-  voltages, etc.
 * vlls directory: Additional GPU code, e.g. extra codecs.
-  Not present in the initial release.
 
 Additional GPU firmware images, rename over start.elf to use them:
 * arm128_start.elf : 128M ARM, 128M GPU split
