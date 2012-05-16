@@ -17,7 +17,7 @@
 extern "C" void
 panic(const char* format, ...)
 {
-	const char hint[] = "*** PANIC ***";
+	const char hint[] = "\n*** PANIC ***\n";
 	char buffer[512];
 	va_list list;
 	int length;

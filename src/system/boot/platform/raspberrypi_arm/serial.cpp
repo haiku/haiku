@@ -79,5 +79,6 @@ serial_init(void)
 
 	serial_enable();
 
-	serial_puts("Serial startup\n", 15);
+	serial_puts("\n\n********************\n", 23);
+	serial_puts("Haiku serial startup\n", 21);
 }
