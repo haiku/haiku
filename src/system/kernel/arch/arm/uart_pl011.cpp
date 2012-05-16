@@ -14,13 +14,20 @@
 //#include <target/debugconfig.h>
 
 
+static void
+barrier()
+{
+	asm volatile ("" : : : "memory");
+}
+
+
 UartPL011::UartPL011(addr_t base)
 	:
 	fUARTEnabled(true),
 	fUARTBase(base)
 {
-	// TODO: Nice, but not required
-	#if 0
+	barrier();
+
 	// ** Loopback test
 	uint32 cr = PL01x_CR_UARTEN;
 		// Enable UART
@@ -37,23 +44,19 @@ UartPL011::UartPL011(addr_t base)
 	// Write a 0 to the port and wait for confim..
 	WriteUart(PL01x_DR, 0);
 
-	while (ReadUart(PL01x_FR) & PL01x_FR_BUSY);
-		// Wait for xmit on loopback
+	while (ReadUart(PL01x_FR) & PL01x_FR_BUSY)
+		barrier();
 
 	// ** Disable loopback, enable uart
 	cr = PL01x_CR_UARTEN | PL011_CR_RXE | PL011_CR_TXE;
 	WriteUart(PL011_CR, cr);
 
-	// Enable DMA to received request outputs
-	WriteUart(PL011_DMACR, PL011_DMAONERR);
-
 	// ** Clear interrupts
 	WriteUart(PL011_ICR, PL011_OEIS | PL011_BEIS
 		| PL011_PEIS | PL011_FEIS);
 
-	// Set Rx timeout interrupt mask and Rx interrput mask
-	WriteUart(PL011_IMSC, PL011_RTIM | PL011_RXIM);
-	#endif
+	// ** Disable interrupts
+	WriteUart(PL011_IMSC, 0);
 }
 
 
@@ -134,9 +137,11 @@ int
 UartPL011::PutChar(char c)
 {
 	if (fUARTEnabled == true) {
+		// Wait until there is room in fifo
+		while ((ReadUart(PL01x_FR) & PL01x_FR_TXFF) != 0)
+			barrier();
+
 		WriteUart(PL01x_DR, c);
-		// Empty the transmit buffer
-		FlushTx();
 		return 0;
 	}
 
@@ -155,12 +160,16 @@ UartPL011::GetChar(bool wait)
 void
 UartPL011::FlushTx()
 {
-	while (ReadUart(PL01x_FR) & PL01x_FR_TXFF);
+	// Wait until transmit fifo empty
+	while ((ReadUart(PL01x_FR) & PL011_FR_TXFE) == 0)
+		barrier();
 }
 
 
 void
 UartPL011::FlushRx()
 {
-	#warning ARM Amba PL011 UART incomplete
+	// Wait until receive fifo empty
+	while ((ReadUart(PL01x_FR) & PL01x_FR_RXFE) == 0)
+		barrier();
 }
