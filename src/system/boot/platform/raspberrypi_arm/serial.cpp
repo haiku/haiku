@@ -20,7 +20,7 @@
 UartPL011 gLoaderUART(uart_base_debug());
 
 
-static int32 sSerialEnabled = 0;
+static bool sSerialEnabled = false;
 
 
 static void
@@ -30,10 +30,17 @@ serial_putc(char c)
 }
 
 
+extern "C" int
+serial_getc(bool wait)
+{
+	return gLoaderUART.GetChar(wait);
+}
+
+
 extern "C" void
 serial_puts(const char* string, size_t size)
 {
-	if (sSerialEnabled <= 0)
+	if (!sSerialEnabled)
 		return;
 
 	while (size-- > 0) {
@@ -53,23 +60,26 @@ serial_puts(const char* string, size_t size)
 extern "C" void
 serial_disable(void)
 {
-	sSerialEnabled--;
+	if (sSerialEnabled)
+		serial_cleanup();
+
+	gLoaderUART.Disable();
 }
 
 
 extern "C" void
 serial_enable(void)
 {
-	sSerialEnabled++;
+	gLoaderUART.Enable();
+	sSerialEnabled = true;
 }
 
 
 extern "C" void
 serial_cleanup(void)
 {
-	// Transmit the last of our fifo
+	sSerialEnabled = false;
 	gLoaderUART.FlushTx();
-	gLoaderUART.Disable();
 }
 
 

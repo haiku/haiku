@@ -93,6 +93,9 @@ void
 platform_exit(void)
 {
 	serial_cleanup();
+	// Wait for keypress on serial
+	serial_getc(true);
+	serial_disable();
 }
 
 
