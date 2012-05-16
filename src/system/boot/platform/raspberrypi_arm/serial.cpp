@@ -67,7 +67,9 @@ serial_enable(void)
 extern "C" void
 serial_cleanup(void)
 {
-#warning IMPLEMENT serial_cleanup
+	// Transmit the last of our fifo
+	gLoaderUART.FlushTx();
+	gLoaderUART.Disable();
 }
 
 

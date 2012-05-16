@@ -92,7 +92,7 @@ platform_start_kernel(void)
 void
 platform_exit(void)
 {
-	#warning IMPLEMENT platform_exit
+	serial_cleanup();
 }
 
 
