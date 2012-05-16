@@ -33,6 +33,7 @@ public:
 
 			bool				IsSolved() const;
 			bool				IsEmpty() const;
+			bool				IsValueCompleted(uint32 value) const;
 
 			uint32				Size() const { return fSize; }
 			uint32				BlockSize() const { return fBlockSize; }

@@ -814,21 +814,30 @@ SudokuView::MouseDown(BPoint where)
 				| B_TERTIARY_MOUSE_BUTTON)) != 0) {
 		// double click or other buttons set a value
 		if ((fField->FlagsAt(x, y) & kInitialValue) == 0) {
+			bool wasCompleted;
 			if (fField->ValueAt(x, y) > 0) {
+				value = fField->ValueAt(x, y) - 1;
+				wasCompleted = fField->IsValueCompleted(value + 1);
+
 				fField->SetValueAt(x, y, 0);
 				fShowHintX = x;
 				fShowHintY = y;
 			} else {
+				wasCompleted = fField->IsValueCompleted(value + 1);
+
 				fField->SetValueAt(x, y, value + 1);
 				BMessenger(this).SendMessage(kMsgCheckSolved);
+
+				// allow dragging to remove the hint from other fields
+				fLastHintValueSet = false;
+				fLastHintValue = value;
+				fLastField = field;
 			}
 
-			_InvalidateField(x, y);
-
-			// allow dragging to remove the hint from other fields
-			fLastHintValueSet = false;
-			fLastHintValue = value;
-			fLastField = field;
+			if (wasCompleted != fField->IsValueCompleted(value + 1))
+				Invalidate();
+			else
+				_InvalidateField(x, y);
 		}
 		return;
 	}
@@ -1204,8 +1213,8 @@ SudokuView::Draw(BRect /*updateRect*/)
 					|| (fShowKeyboardFocus && x == fKeyboardX
 						&& y == fKeyboardY))
 				&& (fField->FlagsAt(x, y) & kInitialValue) == 0) {
-				//SetLowColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
-				SetLowColor(255, 255, 210);
+				// TODO: make color more intense
+				SetLowColor(tint_color(fBackgroundColor, B_DARKEN_2_TINT));
 				FillRect(_Frame(x, y), B_SOLID_LOW);
 			} else {
 				SetLowColor(fBackgroundColor);
@@ -1222,13 +1231,16 @@ SudokuView::Draw(BRect /*updateRect*/)
 			}
 
 			SetFont(&fFieldFont);
-			if (fField->FlagsAt(x, y) & kInitialValue)
+			if ((fField->FlagsAt(x, y) & kInitialValue) != 0)
 				SetHighColor(0, 0, 0);
 			else {
 				if ((fHintFlags & kMarkInvalid) == 0
-					|| fField->ValidMaskAt(x, y) & (1UL << (value - 1)))
-					SetHighColor(0, 0, 200);
-				else
+					|| fField->ValidMaskAt(x, y) & (1UL << (value - 1))) {
+					if (fField->IsValueCompleted(value))
+						SetHighColor(60, 60, 150);
+					else
+						SetHighColor(0, 0, 220);
+				} else
 					SetHighColor(200, 0, 0);
 			}
 

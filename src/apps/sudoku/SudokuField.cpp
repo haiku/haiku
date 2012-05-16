@@ -251,6 +251,21 @@ SudokuField::IsEmpty() const
 }
 
 
+bool
+SudokuField::IsValueCompleted(uint32 value) const
+{
+	uint32 count = 0;
+	for (uint32 y = 0; y < fSize; y++) {
+		for (uint32 x = 0; x < fSize; x++) {
+			if (ValueAt(x, y) == value)
+				count++;
+		}
+	}
+
+	return count == Size();
+}
+
+
 void
 SudokuField::SetHintMaskAt(uint32 x, uint32 y, uint32 hintMask)
 {
