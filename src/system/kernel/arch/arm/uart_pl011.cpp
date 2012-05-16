@@ -152,7 +152,15 @@ UartPL011::PutChar(char c)
 int
 UartPL011::GetChar(bool wait)
 {
-	#warning ARM Amba PL011 UART incomplete
+	if (fUARTEnabled == true) {
+		// Wait until a character is received?
+		if (wait) {
+			while ((ReadUart(PL01x_FR) & PL01x_FR_RXFE) != 0)
+				barrier();
+		}
+		return ReadUart(PL01x_DR);
+	}
+
 	return -1;
 }
 
