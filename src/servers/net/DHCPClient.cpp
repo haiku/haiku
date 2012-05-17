@@ -429,6 +429,8 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 	fStartTime = system_time();
 	fTransactionID = (uint32)fStartTime;
 
+	srand(fTransactionID);
+
 	BNetworkAddress link;
 	BNetworkInterface interface(device);
 	fStatus = interface.GetHardwareAddress(link);
