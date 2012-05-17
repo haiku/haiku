@@ -34,7 +34,7 @@
 static void
 calculate_cpu_conversion_factor()
 {
-         #warning ARM:TODO!
+         #warning U-Boot:TODO!
 }
 
 
@@ -42,7 +42,7 @@ static status_t
 check_cpu_features()
 {
 
-        #warning ARM:TODO!
+        #warning U-Boot:TODO!
 	return B_OK;
 }
 
@@ -55,10 +55,12 @@ spin(bigtime_t microseconds)
 {
 	for(bigtime_t i=0;i<microseconds;i=i+1)
 	{
+		/*
 		asm volatile ("mov r0,r0");
 		asm volatile ("mov r0,r0");
+		*/
 	}
-	#warning ARM/UBOOT:TODO!!
+	#warning U-Boot:TODO!!
 }
 
 
