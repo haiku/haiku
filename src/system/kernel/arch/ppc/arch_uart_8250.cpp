@@ -5,7 +5,7 @@
 
 #include <debug.h>
 #include <arch/generic/debug_uart_8250.h>
-//#include <board_config.h>
+#include <new>
 
 
 // we shouldn't need special setup, we use plain MMIO.

@@ -1,6 +1,13 @@
 SubDir HAIKU_TOP src system boot arch ppc ;
 
-DEFINES += _BOOT_MODE ;
+{
+	local defines = _BOOT_MODE ;
+
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) -fno-rtti ;
+}
+
 
 local kernelLibArchObjects =
 	<src!system!kernel!lib!arch!$(TARGET_ARCH)>byteorder.o
@@ -9,6 +16,8 @@ local kernelLibArchObjects =
 ;
 
 KernelMergeObject boot_arch_$(TARGET_ARCH).o :
+	debug_uart_8250.cpp
+	arch_uart_8250.cpp
 	arch_elf.cpp
 	: # additional flags
 	:
@@ -16,5 +25,9 @@ KernelMergeObject boot_arch_$(TARGET_ARCH).o :
 	$(kernelLibArchObjects)
 ;
 
-SEARCH on [ FGristFiles arch_elf.cpp ]
+SEARCH on [ FGristFiles arch_elf.cpp arch_uart_8250.cpp ]
     = [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_ARCH) ] ;
+
+SEARCH on [ FGristFiles debug_uart_8250.cpp ]
+	= [ FDirName $(HAIKU_TOP) src system kernel arch generic ] ;
+
