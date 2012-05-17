@@ -25,16 +25,19 @@
 #define HEAP_SIZE (128 * 1024)
 
 
-typedef struct uboot_arm_gd {
+typedef struct uboot_gd {
+	// those are the only few members that we can trust
+	// others depend on compile-time config
 	struct board_data *bd;
 	uint32 flags;
 	uint32 baudrate;
+	// those are ARM-only
 	uint32 have_console;
 	uint32 reloc_off;
 	uint32 env_addr;
 	uint32 env_valid;
 	uint32 fb_base;
-} uboot_arm_gd;
+} uboot_gd;
 
 
 // GCC defined globals
@@ -50,7 +53,7 @@ extern "C" void dump_uimage(struct image_header *image);
 
 // declared in shell.S
 extern struct image_header *gUImage;
-extern uboot_arm_gd *gUBootGlobalData;
+extern uboot_gd *gUBootGlobalData;
 extern uint32 gUBootOS;
 
 static uint32 sBootOptions;
@@ -181,7 +184,7 @@ start_raw(int argc, const char **argv)
 		dprintf("os: %d\n", gUBootOS);
 		dprintf("gd @ %p\n", gUBootGlobalData);
 		dprintf("gd->bd @ %p\n", gUBootGlobalData->bd);
-		dprintf("fb_base %p\n", (void*)gUBootGlobalData->fb_base);
+		//dprintf("fb_base %p\n", (void*)gUBootGlobalData->fb_base);
 		dprintf("uimage @ %p\n", gUImage);
 		if (gUImage)
 			dump_uimage(gUImage);
