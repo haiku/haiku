@@ -14,8 +14,9 @@ HAIKU_BOOT_PLATFORM = u-boot ;
 HAIKU_BOARD_LOADER_BASE = 0x00000000 ;
 # entry points (raw binary, and netbsd loader emulation)
 HAIKU_BOARD_LOADER_ENTRY_LINUX = 0x00000000 ;
-#HAIKU_BOARD_LOADER_ENTRY_NBSD = 0x00000008 ;
-#HAIKU_BOARD_LOADER_ENTRY_RAW = 0x00000010 ;
+
+HAIKU_BOARD_LOADER_ENTRY = $(HAIKU_BOARD_LOADER_ENTRY_LINUX) ;
+HAIKU_BOARD_LOADER_FAKE_OS = linux ;
 
 # load address for haiku_loader uimage
 # (must be different than real load address)
@@ -27,8 +28,8 @@ HAIKU_BOARD_LOADER_STACK_BASE = 0x02000000 ;
 # gcc flags for the specific cpu
 #
 
-TARGET_KERNEL_CCFLAGS += -mtune=440 -msoft-float ;
-TARGET_KERNEL_C++FLAGS += -mtune=440 -msoft-float ;
-TARGET_CCFLAGS += -mtune=440 -msoft-float ;
-TARGET_C++FLAGS += -mtune=440 -msoft-float ;
+HAIKU_KERNEL_CCFLAGS += -mcpu=440 -mtune=440 -msoft-float ;
+HAIKU_KERNEL_C++FLAGS += -mcpu=440 -mtune=440 -msoft-float ;
+HAIKU_CCFLAGS += -mcpu=440 -mtune=440 -msoft-float ;
+HAIKU_C++FLAGS += -mcpu=440 -mtune=440 -msoft-float ;
 
