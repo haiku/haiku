@@ -34,6 +34,7 @@ ArchUART8250::~ArchUART8250()
 {
 }
 
+
 void
 ArchUART8250::InitEarly()
 {
@@ -55,6 +56,8 @@ ArchUART8250::InitEarly()
 #warning INTITIALIZE UART!!!!!
 #endif
 }
+
+
 void
 ArchUART8250::Out8(int reg, uint8 value)
 {
@@ -75,4 +78,3 @@ DebugUART8250 *arch_get_uart_8250(addr_t base, int64 clock)
 	ArchUART8250 *uart = new(buffer) ArchUART8250(base, clock);
 	return uart;
 }
-

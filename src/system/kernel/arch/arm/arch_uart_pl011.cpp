@@ -210,8 +210,6 @@ ArchUARTPL011::Barrier()
 }
 
 
-
-
 void
 ArchUARTPL011::InitPort(uint32 baud)
 {

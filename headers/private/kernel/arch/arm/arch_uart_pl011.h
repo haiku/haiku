@@ -10,33 +10,37 @@
 
 
 #include <sys/types.h>
+
 #include <SupportDefs.h>
+
 #include <arch/generic/debug_uart.h>
+
 
 class ArchUARTPL011 : public DebugUART {
 public:
 							ArchUARTPL011(addr_t base, int64 clock);
 							~ArchUARTPL011();
 
-	void					InitEarly();
-	void					InitPort(uint32 baud);
+			void			InitEarly();
+			void			InitPort(uint32 baud);
 
-	void					Enable();
-	void					Disable();
+			void			Enable();
+			void			Disable();
 
-	int						PutChar(char c);
-	int						GetChar(bool wait);
+			int				PutChar(char c);
+			int				GetChar(bool wait);
 
-	void					FlushTx();
-	void					FlushRx();
+			void			FlushTx();
+			void			FlushRx();
 
 private:
-	void					Out32(int reg, uint32 value);
-	uint32					In32(int reg);
-	virtual void			Barrier();
+			void			Out32(int reg, uint32 value);
+			uint32			In32(int reg);
+	virtual	void			Barrier();
 };
 
 
 ArchUARTPL011 *arch_get_uart_pl011(addr_t base, int64 clock);
+
 
 #endif

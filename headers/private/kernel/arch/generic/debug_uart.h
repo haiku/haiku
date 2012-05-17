@@ -9,8 +9,9 @@
 #define _KERNEL_ARCH_DEBUG_UART_H
 
 
-#include <SupportDefs.h>
 #include <sys/types.h>
+
+#include <SupportDefs.h>
 
 
 class DebugUART {
@@ -21,35 +22,35 @@ public:
 								fEnabled(true) {};
 							~DebugUART() {};
 
-	virtual void			InitEarly() {};
-	virtual void			Init() {};
-	virtual void			InitPort(uint32 baud) {};
+	virtual	void			InitEarly() {};
+	virtual	void			Init() {};
+	virtual	void			InitPort(uint32 baud) {};
 
-	virtual void			Enable() { fEnabled = true; }
-	virtual void			Disable() { fEnabled = false; }
+	virtual	void			Enable() { fEnabled = true; }
+	virtual	void			Disable() { fEnabled = false; }
 
-	virtual int				PutChar(char c) = 0;
-	virtual int				GetChar(bool wait) = 0;
+	virtual	int				PutChar(char c) = 0;
+	virtual	int				GetChar(bool wait) = 0;
 
-	virtual void			FlushTx() = 0;
-	virtual void			FlushRx() = 0;
+	virtual	void			FlushTx() = 0;
+	virtual	void			FlushRx() = 0;
 
-	addr_t					Base() const { return fBase; }
-	int64					Clock() const { return fClock; }
-	bool					Enabled() const { return fEnabled; }
+			addr_t			Base() const { return fBase; }
+			int64			Clock() const { return fClock; }
+			bool			Enabled() const { return fEnabled; }
 
 protected:
 	// default MMIO
-	virtual void			Out8(int reg, uint8 value)
+	virtual	void			Out8(int reg, uint8 value)
 								{ *((uint8 *)Base() + reg) = value; }
-	virtual uint8			In8(int reg)
+	virtual	uint8			In8(int reg)
 								{ return *((uint8 *)Base() + reg); }
-	virtual void			Barrier() {}
+	virtual	void			Barrier() {}
 
 private:
-	addr_t					fBase;
-	int64					fClock;
-	bool					fEnabled;
+			addr_t			fBase;
+			int64			fClock;
+			bool			fEnabled;
 };
 
 
