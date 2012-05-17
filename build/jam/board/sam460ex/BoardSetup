@@ -13,8 +13,9 @@ HAIKU_BOOT_PLATFORM = u-boot ;
 # load address for haiku_loader
 HAIKU_BOARD_LOADER_BASE = 0x00000000 ;
 # entry points (raw binary, and netbsd loader emulation)
-HAIKU_BOARD_LOADER_ENTRY_RAW = 0x00000000 ;
-HAIKU_BOARD_LOADER_ENTRY_NBSD = 0x00000008 ;
+HAIKU_BOARD_LOADER_ENTRY_LINUX = 0x00000000 ;
+#HAIKU_BOARD_LOADER_ENTRY_NBSD = 0x00000008 ;
+#HAIKU_BOARD_LOADER_ENTRY_RAW = 0x00000010 ;
 
 # load address for haiku_loader uimage
 # (must be different than real load address)
