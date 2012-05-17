@@ -14,7 +14,9 @@
 #include <boot/stage2.h>
 #include <arch/cpu.h>
 #include <arch_kernel.h>
+#ifdef __ARM__
 #include <arm_mmu.h>
+#endif
 #include <kernel.h>
 
 #include <board_config.h>
@@ -37,6 +39,7 @@
 	// You also need to define ENABLE_SERIAL in serial.cpp
 	// for output to work.
 
+#ifdef __ARM__
 
 /*
 TODO:
@@ -620,6 +623,8 @@ mmu_init(void)
 		gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size));
 }
 
+#endif
+
 
 //	#pragma mark -
 
@@ -628,19 +633,25 @@ extern "C" status_t
 platform_allocate_region(void **_address, size_t size, uint8 protection,
 	bool /*exactAddress*/)
 {
+#ifdef __ARM__
 	void *address = mmu_allocate(*_address, size);
 	if (address == NULL)
 		return B_NO_MEMORY;
 
 	*_address = address;
 	return B_OK;
+#else
+	return B_ERROR;
+#endif
 }
 
 
 extern "C" status_t
 platform_free_region(void *address, size_t size)
 {
+#ifdef __ARM__
 	mmu_free(address, size);
+#endif
 	return B_OK;
 }
 
@@ -657,6 +668,7 @@ platform_release_heap(struct stage2_args *args, void *base)
 status_t
 platform_init_heap(struct stage2_args *args, void **_base, void **_top)
 {
+#ifdef __ARM__
 	void *heap = (void *)get_next_physical_address(args->heap_size);
 	if (heap == NULL)
 		return B_NO_MEMORY;
@@ -664,4 +676,7 @@ platform_init_heap(struct stage2_args *args, void **_base, void **_top)
 	*_base = heap;
 	*_top = (void *)((int8 *)heap + args->heap_size);
 	return B_OK;
+#else
+	return B_ERROR;
+#endif
 }

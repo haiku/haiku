@@ -5,7 +5,10 @@
 
 
 #include "video.h"
+//XXX
+#ifdef __ARM__
 #include "arch_video.h"
+#endif
 
 #include <arch/cpu.h>
 #include <boot/stage2.h>
@@ -92,14 +95,16 @@ platform_switch_to_logo(void)
 
 	status_t err;
 
+#ifdef __ARM__
 	err = arch_set_default_video_mode();
 	dprintf("set video mode: 0x%08x\n", err);
 	if (err < B_OK)
 		return;
+#endif
 
 	err = video_display_splash((addr_t)gFrameBufferBase);
 	dprintf("video_display_splash: 0x%08x\n", err);
-	#warning ARM:TODO
+	#warning U-Boot:TODO
 }
 
 
@@ -107,7 +112,7 @@ extern "C" void
 platform_switch_to_text_mode(void)
 {
 	TRACE(("%s()\n", __FUNCTION__));
-	#warning ARM:TODO
+	#warning U-Boot:TODO
 }
 
 
@@ -115,8 +120,10 @@ extern "C" status_t
 platform_init_video(void)
 {
 	TRACE(("%s()\n", __FUNCTION__));
-    	#warning ARM:TODO
+    	#warning U-Boot:TODO
+#ifdef __ARM__
 	arch_probe_video_mode();
+#endif
 	//XXX for testing
 	//platform_switch_to_logo();
 	//return arch_probe_video_mode();
