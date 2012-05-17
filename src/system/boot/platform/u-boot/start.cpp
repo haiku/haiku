@@ -56,6 +56,8 @@ extern struct image_header *gUImage;
 extern uboot_gd *gUBootGlobalData;
 extern uint32 gUBootOS;
 
+void * gFDT = NULL;
+
 static uint32 sBootOptions;
 
 
@@ -146,7 +148,8 @@ extern "C" int
 start_linux_ppc_fdt(void *fdt, long/*UNUSED*/, long/*UNUSED*/,
 	uint32 epapr_magic, uint32 initial_mem_size)
 {
-	return 1;
+	gFDT = fdt;	//XXX: make a copy?
+	return start_raw(0, NULL);
 }
 
 
