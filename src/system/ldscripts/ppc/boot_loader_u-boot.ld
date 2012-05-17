@@ -7,7 +7,7 @@ SECTIONS
 	. = BOARD_LOADER_BASE;
 
 	/* text/read-only data */
-	.text :	{ *(.text .gnu.linkonce.t.*) }
+	.text :	{ *(.text .text.* .gnu.linkonce.t.*) }
 
 	. = ALIGN(0x4);
 	__ctor_list = .;
@@ -20,10 +20,13 @@ SECTIONS
 	. = ALIGN(0x1000);
 	__data_start = .;
 	.data : { *(.data .gnu.linkonce.d.*) }
+	.data.rel.ro : { *(.data.rel.ro.local .data.rel.ro*) }
+	.got : { *(.got .got2) }
 
 	/* uninitialized data (in same segment as writable data) */
 	__bss_start = .;
-	.bss : { *(.bss) }
+	.sbss : { *(.sbss .sbss.* .gnu.linkonce.sb.*) }
+	.bss : { *(.bss .bss.* .gnu.linkonce.b.*) }
 
 	. = ALIGN(0x1000);
 	_end = . ;
