@@ -12,18 +12,17 @@
 
 //#include <arch_platform.h>
 #include <arch/debug_console.h>
+#include <arch/generic/debug_uart_8250.h>
+#include <arch/arm/arch_uart_pl011.h>
 #include <boot/kernel_args.h>
 #include <kernel.h>
 #include <vm/vm.h>
-#include <arch/arm/uart.h>
 #include <string.h>
 
+#include "board_config.h"
 
-#if defined(BOARD_UART_AMBA_PL011)
-UartPL011* gArchDebugUART;
-#else
-Uart8250* gArchDebugUART;
-#endif
+
+DebugUART *gArchDebugUART;
 
 
 void
@@ -97,9 +96,10 @@ status_t
 arch_debug_console_init(kernel_args *args)
 {
 	#if defined(BOARD_UART_AMBA_PL011)
-	gArchDebugUART = new UartPL011(uart_base_debug());
+	gArchDebugUART = arch_get_uart_pl011(BOARD_UART_DEBUG, BOARD_UART_CLOCK);
 	#else
-	gArchDebugUART = new Uart8250(uart_base_debug());
+	// More Generic 8250
+	gArchDebugUART = arch_get_uart_8250(BOARD_UART_DEBUG, BOARD_UART_CLOCK);
 	#endif
 
 	gArchDebugUART->InitEarly();

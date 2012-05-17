@@ -18,7 +18,7 @@
 #include <string.h>
 
 
-DebugUART8250* gUART;
+DebugUART* gUART;
 
 static int32 sSerialEnabled = 0;
 static char sBuffer[16384];
