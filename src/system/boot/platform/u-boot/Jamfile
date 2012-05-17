@@ -185,6 +185,12 @@ BuildUImage haiku_loader.ub : haiku_loader :
 		-n 'haiku_loader' ;
 
 local tgzArchive = haiku-floppyboot.tgz ;
+
+BuildUImage haiku_loader_linux.ub : haiku_loader :
+	-A $(TARGET_ARCH) -O linux -T kernel -C none
+	-a $(HAIKU_BOARD_LOADER_BASE) -e $(HAIKU_BOARD_LOADER_ENTRY_LINUX)
+		-n 'haiku_loader' ;
+
 BuildUImage haiku_loader_nbsd.ub : haiku_loader $(tgzArchive) :
 	-A $(TARGET_ARCH) -O $(uImageFakeOS) -T multi -C none
 	-a $(HAIKU_BOARD_LOADER_BASE) -e $(HAIKU_BOARD_LOADER_ENTRY_NBSD)
