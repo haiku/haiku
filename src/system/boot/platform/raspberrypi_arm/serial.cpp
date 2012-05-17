@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Axel D??rfler, axeld@pinc-software.de.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2009 Jonas Sundström, jonas@kirilla.com
@@ -8,8 +8,9 @@
 
 
 #include "serial.h"
-#include "uart.h"
+#include "arch_uart_pl011.h"
 
+#include "board_config.h"
 #include <boot/platform.h>
 #include <arch/cpu.h>
 #include <boot/stage2.h>
@@ -17,7 +18,7 @@
 #include <string.h>
 
 
-UartPL011 gLoaderUART(uart_base_debug());
+DebugUART *gUART;
 
 
 static bool sSerialEnabled = false;
@@ -26,14 +27,14 @@ static bool sSerialEnabled = false;
 static void
 serial_putc(char c)
 {
-	gLoaderUART.PutChar(c);
+	gUART->PutChar(c);
 }
 
 
 extern "C" int
 serial_getc(bool wait)
 {
-	return gLoaderUART.GetChar(wait);
+	return gUART->GetChar(wait);
 }
 
 
@@ -63,14 +64,14 @@ serial_disable(void)
 	if (sSerialEnabled)
 		serial_cleanup();
 
-	gLoaderUART.Disable();
+	gUART->Disable();
 }
 
 
 extern "C" void
 serial_enable(void)
 {
-	gLoaderUART.Enable();
+	gUART->Enable();
 	sSerialEnabled = true;
 }
 
@@ -79,15 +80,16 @@ extern "C" void
 serial_cleanup(void)
 {
 	sSerialEnabled = false;
-	gLoaderUART.FlushTx();
+	gUART->FlushTx();
 }
 
 
 extern "C" void
 serial_init(void)
 {
-	gLoaderUART.InitEarly();
-	gLoaderUART.InitPort(9600);
+	gUART = arch_get_uart_pl011(BOARD_UART_DEBUG, BOARD_UART_CLOCK);
+	gUART->InitEarly();
+	gUART->InitPort(9600);
 
 	serial_enable();
 

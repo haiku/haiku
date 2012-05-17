@@ -8,6 +8,7 @@ UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 UsePrivateHeaders [ FDirName graphics vesa ] ;
 UsePrivateHeaders [ FDirName storage ] ;
+UsePrivateHeaders [ FDirName kernel arch generic ] ;
 
 # TODO: move this to arch/arm !
 
