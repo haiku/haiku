@@ -519,6 +519,7 @@ mmu_free(void *virtualAddress, size_t size)
 		sNextVirtualAddress -= size;
 	}
 }
+#endif
 
 
 /*!	Sets up the final and kernel accessible GDT and IDT tables.
@@ -530,6 +531,7 @@ mmu_init_for_kernel(void)
 {
 	TRACE(("mmu_init_for_kernel\n"));
 
+#ifdef __ARM__
 	// save the memory we've physically allocated
 	gKernelArgs.physical_allocated_range[0].size
 		= sNextPhysicalAddress - gKernelArgs.physical_allocated_range[0].start;
@@ -567,6 +569,7 @@ mmu_init_for_kernel(void)
 		}
 	}
 #endif
+#endif
 }
 
 
@@ -575,6 +578,7 @@ mmu_init(void)
 {
 	TRACE(("mmu_init\n"));
 
+#ifdef __ARM__
 	mmu_write_C1(mmu_read_C1() & ~((1<<29)|(1<<28)|(1<<0)));
 		// access flag disabled, TEX remap disabled, mmu disabled
 
@@ -621,9 +625,8 @@ mmu_init(void)
 
 	TRACE(("kernel stack at 0x%lx to 0x%lx\n", gKernelArgs.cpu_kstack[0].start,
 		gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size));
-}
-
 #endif
+}
 
 
 //	#pragma mark -
