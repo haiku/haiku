@@ -1324,7 +1324,7 @@ MainWin::_PlaylistItemOpened(const PlaylistItemRef& item, status_t result)
 		if (allItemsFailed) {
 			// Display error if all files failed to play.
 			BString message(B_TRANSLATE(
-				"The file' %filename' could not be opened.\n\n"));;
+				"The file '%filename' could not be opened.\n\n"));;
 			message.ReplaceAll("%filename", item->Name());
 
 			if (result == B_MEDIA_NO_HANDLER) {
