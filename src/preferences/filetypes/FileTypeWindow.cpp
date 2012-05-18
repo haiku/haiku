@@ -49,7 +49,7 @@ const uint32 kMsgSamePreferredAppAsOpened = 'spaO';
 
 FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 	:
-	BWindow(BRect(0.0f, 0.0f, 200.0f, 200.0f).OffsetBySelf(position),
+	BWindow(BRect(0.0f, 0.0f, 300.0f, 200.0f).OffsetBySelf(position),
 		B_TRANSLATE("File type"), B_TITLED_WINDOW,
 		B_NOT_V_RESIZABLE | B_NOT_ZOOMABLE
 			| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
@@ -77,11 +77,11 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 		B_TRANSLATE_COMMENT("Same as" B_UTF8_ELLIPSIS,
 			"The same TYPE as ..."), new BMessage(kMsgSameTypeAs));
 
-	BLayoutBuilder::Grid<>(fileTypeBox)
+	BLayoutBuilder::Grid<>(fileTypeBox, padding, padding / 2)
 		.SetInsets(padding, padding * 2, padding, padding)
 		.Add(fTypeControl, 0, 0, 3, 1)
-		.Add(fSelectTypeButton, 1, 1)
-		.Add(fSameTypeAsButton, 2, 1);
+		.Add(fSelectTypeButton, 0, 1)
+		.Add(fSameTypeAsButton, 1, 1);
 
 	// "Icon" group
 
@@ -114,17 +114,17 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 			"The same APPLICATION as ..."),
 			new BMessage(kMsgSamePreferredAppAs));
 
-	BLayoutBuilder::Grid<>(preferredBox, padding, padding)
+	BLayoutBuilder::Grid<>(preferredBox, padding, padding / 2)
 		.SetInsets(padding, padding * 2, padding, padding)
 		.Add(fPreferredField, 0, 0, 3, 1)
-		.Add(fSelectAppButton, 1, 1)
-		.Add(fSameAppAsButton, 2, 1);
+		.Add(fSelectAppButton, 0, 1)
+		.Add(fSameAppAsButton, 1, 1);
 
 	BLayoutBuilder::Grid<>(this)
 		.SetInsets(padding)
 		.Add(fileTypeBox, 0, 0, 2, 1)
-		.Add(iconBox, 0, 1, 1, 1)
-		.Add(preferredBox, 1, 1, 1, 1);
+		.Add(preferredBox, 0, 1, 1, 1)
+		.Add(iconBox, 1, 1, 1, 1);
 
 	fTypeControl->MakeFocus(true);
 	BMimeType::StartWatching(this);
