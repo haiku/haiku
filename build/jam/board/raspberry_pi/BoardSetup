@@ -41,10 +41,10 @@ HAIKU_BOARD_SDIMAGE_SIZE = 256 ;
 # gcc flags for the specific cpu
 #
 
-HAIKU_KERNEL_CCFLAGS += -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=softfp ;
-HAIKU_KERNEL_C++FLAGS += -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=softfp ;
-HAIKU_CCFLAGS += -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=softfp ;
-HAIKU_C++FLAGS += -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=softfp ;
+HAIKU_KERNEL_CCFLAGS += -mtune=arm1176jzf-s ;
+HAIKU_KERNEL_C++FLAGS += -mtune=arm1176jzf-s ;
+HAIKU_CCFLAGS += -mtune=arm1176jzf-s ;
+HAIKU_C++FLAGS += -mtune=arm1176jzf-s ;
 
 # Workaround for ld using 32k for alignment despite forcing it in the config...
 # should definitely not be needed!
