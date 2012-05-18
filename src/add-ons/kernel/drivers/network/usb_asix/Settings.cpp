@@ -36,7 +36,7 @@ void create_log()
 
 	int flags = O_WRONLY | O_CREAT | ((gTruncateLogFile) ? O_TRUNC : 0);
 	int fd = open(gLogFilePath, flags, 0666);
-	if (fd > 0)
+	if (fd >= 0)
 		close(fd);
 
 	mutex_init(&gLogLock, DRIVER_NAME"-logging");
@@ -117,7 +117,7 @@ void usb_asix_trace(bool force, const char* func, const char *fmt, ...)
 
 	mutex_lock(&gLogLock);
 	int fd = open(gLogFilePath, O_WRONLY | O_APPEND);
-	if (fd > 0) {
+	if (fd >= 0) {
 		write(fd, buffer, strlen(buffer));
 		close(fd);
 	}
