@@ -1302,7 +1302,7 @@ AudioControlInterface::_ListFeatureUnitOption(uint32 controlType,
 		Controls[index].parent	 = parentIndex;
 		Controls[index].string	 = string;
 		if (name != NULL)
-			strncpy(Controls[index].name, name, sizeof(Controls[index].name));
+			strlcpy(Controls[index].name, name, sizeof(Controls[index].name));
 		if (initGainLimits)
 			_InitGainLimits(Controls[index]);
 
@@ -1316,7 +1316,7 @@ AudioControlInterface::_ListFeatureUnitOption(uint32 controlType,
 			Controls[index].master	= masterIndex;
 			Controls[index].string	= string;
 			if (name != NULL)
-				strncpy(Controls[index].name, name,
+				strlcpy(Controls[index].name, name,
 												sizeof(Controls[index].name));
 			if (initGainLimits)
 				_InitGainLimits(Controls[index]);
@@ -1465,7 +1465,7 @@ AudioControlInterface::_ListSelectorUnitControl(int32& index, int32 parentGroup,
 	Controls[index].flags		= B_MULTI_MIX_MUX;
 	Controls[index].parent		= parentGroup;
 	Controls[index].string		= S_null;
-	strncpy(Controls[index].name, "Source", sizeof(Controls[index].name));
+	strlcpy(Controls[index].name, "Source", sizeof(Controls[index].name));
 	index++;
 
 	for (int i = 0; i < selector->fInputPins.Count(); i++) {
@@ -1476,7 +1476,7 @@ AudioControlInterface::_ListSelectorUnitControl(int32& index, int32 parentGroup,
 		Controls[index].parent	= recordMUX;
 		_AudioControl* control = Find(selector->fInputPins[i]);
 		if (control != NULL) {
-			strncpy(Controls[index].name,
+			strlcpy(Controls[index].name,
 					control->Name(), sizeof(Controls[index].name));
 		} else {
 			snprintf(Controls[index].name,
@@ -1498,7 +1498,7 @@ AudioControlInterface::_ListMixControlsPage(int32& index,
 		= Controls[index].id	= index | 0x10000;
 	Controls[index].flags		= B_MULTI_MIX_GROUP;
 	Controls[index].parent		= 0;
-	strncpy(Controls[index].name, Name, sizeof(Controls[index].name));
+	strlcpy(Controls[index].name, Name, sizeof(Controls[index].name));
 	index++;
 
 	int32 group = groupIndex;

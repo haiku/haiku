@@ -361,10 +361,10 @@ Device::_MultiGetDescription(multi_description *multiDescription)
 	Description.interface_version = B_CURRENT_INTERFACE_VERSION;
 	Description.interface_minimum = B_CURRENT_INTERFACE_VERSION;
 
-	strncpy(Description.friendly_name, "USB Audio", // TODO: ????
+	strlcpy(Description.friendly_name, "USB Audio", // TODO: ????
 									sizeof(Description.friendly_name));
 
-	strncpy(Description.vendor_info, "S.Zharski",
+	strlcpy(Description.vendor_info, "S.Zharski",
 									sizeof(Description.vendor_info));
 
 	Description.output_channel_count		= 0;
