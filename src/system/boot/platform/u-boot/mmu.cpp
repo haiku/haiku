@@ -41,6 +41,7 @@
 
 #ifdef __ARM__
 
+
 /*
 TODO:
 	-recycle bit!
@@ -61,70 +62,72 @@ TODO:
 */
 
 
-
-
-
-
 /*
 *defines a block in memory
 */
 struct memblock {
-        const char      name[16]; // the name will be used for debugging etc later perhaps...
-        addr_t    start; // start of the block
-        addr_t    end; // end of the block
-	uint32	  flags; // which flags should be applied (device/normal etc..)
+	const char name[16];
+		// the name will be used for debugging etc later perhaps...
+	addr_t	start;
+		// start of the block
+	addr_t	end;
+		// end of the block
+	uint32	flags;
+		// which flags should be applied (device/normal etc..)
 };
 
 
 static struct memblock LOADER_MEMORYMAP[] = {
 	{
-                "devices",
+		"devices",
 		DEVICE_BASE,
 		DEVICE_BASE + DEVICE_SIZE - 1,
 		MMU_L2_FLAG_B,
-        },
-        {
-                "RAM_loader",//1MB loader
+	},
+	{
+		"RAM_loader", // 1MB loader
 		SDRAM_BASE + 0,
 		SDRAM_BASE + 0x0fffff,
 		MMU_L2_FLAG_C,
-        },
-        {
-                "RAM_pt",//Page Table 1MB
+	},
+	{
+		"RAM_pt", // Page Table 1MB
 		SDRAM_BASE + 0x100000,
 		SDRAM_BASE + 0x1FFFFF,
 		MMU_L2_FLAG_C,
-        },
-        {
-                "RAM_free",//16MB free RAM (actually more but we don't identity map it automaticaly)
+	},
+	{
+		"RAM_free", // 16MB free RAM (more but we don't map it automaticaly)
 		SDRAM_BASE + 0x0200000,
 		SDRAM_BASE + 0x11FFFFF,
 		MMU_L2_FLAG_C,
-        },
-        {
-                "RAM_stack",//stack
+	},
+	{
+		"RAM_stack", // stack
 		SDRAM_BASE + 0x1200000,
 		SDRAM_BASE + 0x2000000,
 		MMU_L2_FLAG_C,
-        },
-        {
-                "RAM_initrd",//stack
+	},
+	{
+		"RAM_initrd", // stack
 		SDRAM_BASE + 0x2000000,
 		SDRAM_BASE + 0x2500000,
 		MMU_L2_FLAG_C,
-        },
+	},
 
 #ifdef FB_BASE
-        {
-                "framebuffer",//2MB framebuffer ram
+	{
+		"framebuffer", // 2MB framebuffer ram
 		FB_BASE,
 		FB_BASE + FB_SIZE - 1,
 		MMU_L2_FLAG_AP_RW|MMU_L2_FLAG_C,
-        },
+	},
 #endif
 };
 
-//static const uint32 kDefaultPageTableFlags = MMU_FLAG_READWRITE;	// not cached not buffered, R/W
+
+//static const uint32 kDefaultPageTableFlags = MMU_FLAG_READWRITE;
+	// not cached not buffered, R/W
 static const size_t kMaxKernelSize = 0x200000;		// 2 MB for the kernel
 
 static addr_t sNextPhysicalAddress = 0; //will be set by mmu_init
@@ -183,22 +186,23 @@ get_next_physical_address_alligned(size_t size, uint32 mask)
 static addr_t
 get_next_virtual_page(size_t pagesize)
 {
-	return get_next_virtual_address_alligned( pagesize, 0xffffffc0 );
+	return get_next_virtual_address_alligned(pagesize, 0xffffffc0);
 }
 
 
 static addr_t
 get_next_physical_page(size_t pagesize)
 {
-	return get_next_physical_address_alligned( pagesize, 0xffffffc0 );
+	return get_next_physical_address_alligned(pagesize, 0xffffffc0);
 }
 
 
 void
 mmu_set_TTBR(uint32  ttb)
 {
-	ttb &=  0xffffc000;
-	asm volatile( "MCR p15, 0, %[adr], c2, c0, 0"::[adr] "r" (ttb)  ); /* set translation table base */
+	ttb &= 0xffffc000;
+	asm volatile("MCR p15, 0, %[adr], c2, c0, 0"::[adr] "r" (ttb));
+		// set translation table base
 }
 
 
@@ -206,7 +210,8 @@ void
 mmu_flush_TLB()
 {
 	uint32 bla = 0;
-	asm volatile("MCR p15, 0, %[c8format], c8, c7, 0"::[c8format] "r" (bla) ); /* flush TLB */
+	asm volatile("MCR p15, 0, %[c8format], c8, c7, 0"::[c8format] "r" (bla));
+		// flush TLB
 }
 
 
@@ -239,7 +244,7 @@ get_next_page_table(uint32 type)
 	TRACE(("get_next_page_table, sNextPageTableAddress %p, kPageTableRegionEnd "
 		"%p, type  0x%lx\n", sNextPageTableAddress, kPageTableRegionEnd, type));
 	size_t size = 0;
-	switch(type){
+	switch(type) {
 		case MMU_L1_TYPE_COARSEPAGETABLE:
 			size = 1024;
 		break;
