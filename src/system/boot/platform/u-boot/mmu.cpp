@@ -173,6 +173,7 @@ get_next_physical_address(size_t size)
 	return address;
 }
 
+
 static addr_t
 get_next_physical_address_alligned(size_t size, uint32 mask)
 {
@@ -197,33 +198,43 @@ get_next_physical_page(size_t pagesize)
 }
 
 
+/*
+ * Set translation table base
+ */
 void
-mmu_set_TTBR(uint32  ttb)
+mmu_set_TTBR(uint32 ttb)
 {
 	ttb &= 0xffffc000;
-	asm volatile("MCR p15, 0, %[adr], c2, c0, 0"::[adr] "r" (ttb));
-		// set translation table base
+	asm volatile("MRC p15, 0, %[adr], c2, c0, 0"::[adr] "r" (ttb));
 }
 
 
+/*
+ * Flush the TLB
+ */
 void
 mmu_flush_TLB()
 {
-	uint32 bla = 0;
-	asm volatile("MCR p15, 0, %[c8format], c8, c7, 0"::[c8format] "r" (bla));
-		// flush TLB
+	uint32 value = 0;
+	asm volatile("MCR p15, 0, %[c8format], c8, c7, 0"::[c8format] "r" (value));
 }
 
 
+/*
+ * Read MMU Control Register
+ */
 uint32
 mmu_read_C1()
 {
-	uint32 bla = 0;
-	asm volatile("MRC p15, 0, %[c1out], c1, c0, 0":[c1out] "=r" (bla));
-	return bla;
+	uint32 controlReg = 0;
+	asm volatile("MRC p15, 0, %[c1out], c1, c0, 0":[c1out] "=r" (controlReg));
+	return controlReg;
 }
 
 
+/*
+ * Write MMU Control Register
+ */
 void
 mmu_write_C1(uint32 value)
 {
