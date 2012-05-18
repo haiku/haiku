@@ -14,9 +14,7 @@
 #include <boot/stage2.h>
 #include <arch/cpu.h>
 #include <arch_kernel.h>
-#ifdef __ARM__
 #include <arm_mmu.h>
-#endif
 #include <kernel.h>
 
 #include <board_config.h>
@@ -28,7 +26,7 @@
 
 #define TRACE_MMU
 #ifdef TRACE_MMU
-#   define TRACE(x...) dprintf("mmu: " x)
+#	define TRACE(x...) dprintf("mmu: " x)
 #	define CALLED() dprintf("%s()\n", __func__)
 #else
 #	define TRACE(x) ;
@@ -44,29 +42,6 @@
 
 extern uint8 __stack_start;
 extern uint8 __stack_end;
-
-
-#ifdef __ARM__
-
-
-/*
-TODO:
-	-recycle bit!
-*/
-
-/*!	The (physical) memory layout of the boot loader is currently as follows:
-	 0x00000000			u-boot (run from NOR flash)
-	 0xa0000000			u-boot stuff like kernel arguments afaik
-	 0xa0100000 - 0xa0ffffff	boot.tgz (up to 15MB probably never needed so big...)
-	 0xa1000000 - 0xa1ffffff	pagetables
-	 0xa2000000 - ?			code (up to 1MB)
-	 0xa2100000			boot loader heap / free physical memory
-
-	The kernel is mapped at KERNEL_BASE, all other stuff mapped by the
-	loader (kernel args, modules, driver settings, ...) comes after
-	0x80020000 which means that there is currently only 2 MB reserved for
-	the kernel itself (see kMaxKernelSize).
-*/
 
 
 /*
@@ -87,8 +62,8 @@ struct memblock {
 static struct memblock LOADER_MEMORYMAP[] = {
 	{
 		"devices",
-		PERIPHERAL_BASE,
-		PERIPHERAL_BASE + PERIPHERAL_SIZE - 1,
+		DEVICE_BASE,
+		DEVICE_BASE + DEVICE_SIZE - 1,
 		MMU_L2_FLAG_B,
 	},
 	{
@@ -554,7 +529,6 @@ mmu_free(void *virtualAddress, size_t size)
 		sNextVirtualAddress -= size;
 	}
 }
-#endif
 
 
 /*!	Sets up the final and kernel accessible GDT and IDT tables.

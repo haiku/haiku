@@ -111,18 +111,13 @@ pi_start(void)
 	cpu_init();
 	gpio_init();
 
-	// Flick on "OK" led
-	gpio_write(GPIO_BASE, 16, 0);
+	// Flick on "OK" led, use pre-mmu firmware base
+	gpio_write(BCM2708_DEVICEFW_BASE + GPIO_BASE, 16, 0);
+
+	mmu_init();
 
 	serial_init();
 	console_init();
-
-	/*
-	 * TODO: Move befpre gpio_init
-	 * Once memory mapping is working, uart + gpio should
-	 * use mapped peripheral addresses
-	 */
-	mmu_init();
 
 	args.heap_size = HEAP_SIZE;
 	args.arguments = NULL;

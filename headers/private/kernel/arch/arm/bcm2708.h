@@ -37,32 +37,33 @@
  */
 
 // 1.2.2 notes that peripherals are remapped from 0x7e to 0x20
-#define BCM2708_SDRAM_BASE	0x00000000
-#define BCM2708_PERI_BASE	0x20000000
+#define BCM2708_SDRAM_BASE		0x00000000
+#define BCM2708_DEVICEHW_BASE	0x7E000000 // Real Hardware Base
+#define BCM2708_DEVICEFW_BASE	0x20000000 // Firmware Mapped Base
 
-#define ST_BASE			(BCM2708_PERI_BASE + 0x3000)
+#define ST_BASE			0x3000
 	// System Timer, sec 12.0, page 172
-#define DMA_BASE		(BCM2708_PERI_BASE + 0x7000)
+#define DMA_BASE		0x7000
 	// DMA Controller, sec 4.2, page 39
-#define ARM_BASE		(BCM2708_PERI_BASE + 0xB000)
+#define ARM_BASE		0xB000
 	// BCM2708 ARM Control Block, sec 7.5, page 112
-#define PM_BASE			(BCM2708_PERI_BASE + 0x100000)
+#define PM_BASE			0x100000
 	// Power Management, Reset controller and Watchdog registers
-#define GPIO_BASE		(BCM2708_PERI_BASE + 0x200000)
+#define GPIO_BASE		0x200000
 	// GPIO, sec 6.1, page 90
-#define UART0_BASE		(BCM2708_PERI_BASE + 0x201000)
+#define UART0_BASE		0x201000
 	// UART 0, sec 13.4, page 177
-#define MMCI0_BASE		(BCM2708_PERI_BASE + 0x202000)
+#define MMCI0_BASE		0x202000
 	// MMC
-#define UART1_BASE		(BCM2708_PERI_BASE + 0x215000)
+#define UART1_BASE		0x215000
 	// UART 1, sec 2.1, page 65
-#define EMMC_BASE		(BCM2708_PERI_BASE + 0x300000)
+#define EMMC_BASE		0x300000
 	// eMMC interface, sec 5, page 66
-#define SMI_BASE		(BCM2708_PERI_BASE + 0x600000)
+#define SMI_BASE		0x600000
 	// SMI Base
-#define USB_BASE		(BCM2708_PERI_BASE + 0x980000)
+#define USB_BASE		0x980000
 	// USB Controller, 15.2, page 202
-#define FB_BASE			(BCM2708_PERI_BASE + 0x0000)
+#define FB_BASE			0x000000
 	// Fake frame buffer
 #define FB_SIZE			SIZE_4K
 
@@ -79,8 +80,8 @@
 #define VECT_BASE 0xffff0000
 #define VECT_SIZE SIZE_4K
 
-#define PERIPHERAL_BASE		BCM2708_PERI_BASE
-#define PERIPHERAL_SIZE		0x1000000
+#define DEVICE_BASE		BCM2708_DEVICEHW_BASE
+#define DEVICE_SIZE		0x1000000
 
 #define SDRAM_BASE		BCM2708_SDRAM_BASE
 #define SDRAM_SIZE		0x4000000
