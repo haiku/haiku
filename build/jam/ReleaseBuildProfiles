@@ -26,6 +26,7 @@ switch $(HAIKU_BUILD_PROFILE) {
 		AddOptionalHaikuImagePackages CVS Development Git Mercurial
 			Python Subversion OpenSSH OpenSSL ;
 		AddOptionalHaikuImagePackages Nano P7zip Welcome BeBook XZ-Utils ;
+		AddOptionalHaikuImagePackages wpa_supplicant ;
 	}
 
 	case "beta-*" : {
@@ -43,6 +44,7 @@ switch $(HAIKU_BUILD_PROFILE) {
 
 		AddOptionalHaikuImagePackages Pe Nano Vision P7zip XZ-Utils ;
 		AddOptionalHaikuImagePackages Development Git OpenSSH OpenSSL ;
+		AddOptionalHaikuImagePackages wpa_supplicant ;
 	}
 }
 
