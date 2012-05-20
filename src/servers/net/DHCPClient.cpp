@@ -24,6 +24,7 @@
 #include <syslog.h>
 #include <sys/sockio.h>
 #include <sys/time.h>
+#include <unistd.h>
 
 #include <Debug.h>
 #include <Message.h>
@@ -541,6 +542,12 @@ DHCPClient::_Negotiate(dhcp_state state)
 	uint32 tries;
 	_ResetTimeout(socket, timeout, tries);
 
+	char hostName[MAXHOSTNAMELEN];
+	if (gethostname(hostName, MAXHOSTNAMELEN) == 0)
+		fHostName.SetTo(hostName, MAXHOSTNAMELEN);
+	else
+		fHostName.Truncate(0);
+
 	dhcp_message discover(DHCP_DISCOVER);
 	_PrepareMessage(discover, state);
 
@@ -842,11 +849,23 @@ DHCPClient::_PrepareMessage(dhcp_message& message, dhcp_state state)
 		case DHCP_DISCOVER:
 			next = message.PutOption(next, OPTION_REQUEST_PARAMETERS,
 				kRequestParameters, sizeof(kRequestParameters));
+
+			if (fHostName.Length() > 0) {
+				next = message.PutOption(next, OPTION_HOST_NAME,
+					reinterpret_cast<const uint8*>(fHostName.String()),
+					fHostName.Length());
+			}
 			break;
 
 		case DHCP_REQUEST:
 			next = message.PutOption(next, OPTION_REQUEST_PARAMETERS,
 				kRequestParameters, sizeof(kRequestParameters));
+
+			if (fHostName.Length() > 0) {
+				next = message.PutOption(next, OPTION_HOST_NAME,
+					reinterpret_cast<const uint8*>(fHostName.String()),
+					fHostName.Length());
+			}
 
 			if (state == REQUESTING) {
 				const sockaddr_in& server = (sockaddr_in&)fServer.SockAddr();
