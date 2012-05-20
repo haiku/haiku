@@ -28,6 +28,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	Bluetooth				- experimental Haiku components for Bluetooth
 #	BurnItNow				- CD burning app
 #	Bzip					- file archiving utility
+#   Caya                    - a multiprotocol im client
 #	CCache					- fast compiler cache
 #	CDRecord				- the command line CD writing tools
 #	Clang					- the LLVM C and C++ compiler (llvm, libs, headers)
@@ -362,6 +363,28 @@ if [ IsOptionalHaikuImagePackageAdded CARootCertificates ] {
 		: common data ssl ;
 }
 
+
+# Caya
+if [ IsOptionalHaikuImagePackageAdded Caya ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Caya available for $(TARGET_ARCH)" ;
+	} else {
+		if $(HAIKU_GCC_VERSION[1]) >= 4 || $(isHybridBuild) {
+			InstallOptionalHaikuImagePackage
+				caya-264-x86-gcc4-2012-05-20.zip
+				: $(baseURL)/caya-264-x86-gcc4-2012-05-20.zip
+				: : true ;
+			InstallOptionalHaikuImagePackage
+				caya-gpl-protocols-35-x86-gcc4-2012-05-20.zip
+				: $(baseURL)/caya-gpl-protocols-35-x86-gcc4-2012-05-20.zip
+				: : true ;
+			AddSymlinkToHaikuImage home config be Applications
+				: /boot/apps/Caya/Caya ;
+		} else {
+			Echo "No optional package Caya available for $(TARGET_ARCH)-gcc2" ;
+		}
+	}
+}
 
 # CCache
 if [ IsOptionalHaikuImagePackageAdded CCache ] {
