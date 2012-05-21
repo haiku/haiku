@@ -96,7 +96,7 @@ const char *kPeopleSignature = "application/x-vnd.Be-PEPL";
 // file system endianness swapping, etc., the correct endianness for the
 // correct machine has to be used here
 
-const BRect kDefaultFrame(40, 40, 500, 350);
+const BRect kDefaultFrame(40, 40, 695, 350);
 const int32 kDefaultQueryTemplateCount = 3;
 
 const AttributeTemplate kDefaultQueryTemplate[] =

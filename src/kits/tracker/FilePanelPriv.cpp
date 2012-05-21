@@ -159,7 +159,7 @@ TFilePanel::TFilePanel(file_panel_mode mode, BMessenger *target,
 
 	fIsSavePanel = (mode == B_SAVE_PANEL);
 
-	BRect windRect(85, 50, 510, 296);
+	BRect windRect(85, 50, 568, 296);
 	MoveTo(windRect.LeftTop());
 	ResizeTo(windRect.Width(), windRect.Height());
 
@@ -739,6 +739,7 @@ TFilePanel::Init(const BMessage *)
 	AddShortcut('A', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(kShowSelectionWindow));
 	AddShortcut('A', B_COMMAND_KEY, new BMessage(B_SELECT_ALL), PoseView());
 	AddShortcut('S', B_COMMAND_KEY, new BMessage(kInvertSelection), PoseView());
+	AddShortcut('Y', B_COMMAND_KEY, new BMessage(kResizeToFit), PoseView());
 	AddShortcut(B_DOWN_ARROW, B_COMMAND_KEY, new BMessage(kOpenDir));
 	AddShortcut(B_DOWN_ARROW, B_COMMAND_KEY | B_OPTION_KEY, new BMessage(kOpenDir));
 	AddShortcut(B_UP_ARROW, B_COMMAND_KEY, new BMessage(kOpenParentDir));
@@ -1180,6 +1181,10 @@ TFilePanel::MessageReceived(BMessage *message)
 
 		case kCancelButton:
 			PostMessage(B_QUIT_REQUESTED);
+			break;
+
+		case kResizeToFit:
+			ResizeToFit();
 			break;
 
 		case kOpenDir:
