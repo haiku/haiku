@@ -1,31 +1,47 @@
+/*
+ * Copyright 2010-2012 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Francois Revol
+ *		Ithamar R. Adema, ithamar.adema@team-embedded.nl
+ *		Alexander von Gluck, kallisti5@unixzen.com
+ */
 #ifndef _ARCH_ARM_ARM_MMU_H
 #define _ARCH_ARM_ARM_MMU_H
+
 
 /*
  * generic arm mmu definitions
  */
 
-
 /*
- * defines for the page directory (aka Master/Section Table)
+ * L1 defines for the page directory (page table walk methods)
  */
+#define MMU_L1_TYPE_FAULT		0x0
+	// MMU Fault
+	// 31                                                  2 10
+	// |                                                    |00|
+#define MMU_L1_TYPE_SECTION		0x2
+	// Single step table walk, 4096 entries
+	// 1024K pages, 16K consumed
+	// 31                   20 19   12 11  10 9 8      5 432 10
+	// | page table address   |  0?   |  AP  |0| domain |1CB|10|
+#define MMU_L1_TYPE_FINE		0x3
+	// Three(?) step table walk, 1024 entries
+	// 1K, 4K, 64K pages, 4K consumed
+	// 31                           12 11     9 8      5 432 10
+	// | page table address           |   0?   | domain |100|11|
+#define MMU_L1_TYPE_COARSE		0x1
+	// Two step table walk, 256 entries
+	// 4K(Haiku), 64K pages, 1K consumed
+	// 31                                  10 9 8      5 432 10
+	// | page table address                  |0| domain |000|01|
 
-#define MMU_L1_TYPE_COARSEPAGETABLE 0x1
-	//only type used in Haiku by now (4k pages)
 
-// coarse pagetable entry :
-//
-// 31                    10 9 8      5 432 10
-// | page table address    |?| domain |000|01
-//
 // the domain is not used so and the ? is implementation specified... have not
 // found it in the cortex A8 reference... so I set t to 0
 // page table must obviously be on multiple of 1KB
-
-#define MMU_L1_TYPE_SECTION 0x2
-	//map 1MB directly instead of using a page table (not used)
-#define MMU_L1_TYPE_FINEEPAGETABLE 0x3
-	//map 1kb pages (not used and not supported on newer ARMs)
 
 /*
  * L2-Page descriptors... now things get really complicated...

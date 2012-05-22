@@ -246,10 +246,10 @@ get_next_page_table(uint32 type)
 
 	size_t size = 0;
 	switch(type) {
-		case MMU_L1_TYPE_COARSEPAGETABLE:
+		case MMU_L1_TYPE_COARSE:
 			size = 1024;
 		break;
-		case MMU_L1_TYPE_FINEEPAGETABLE:
+		case MMU_L1_TYPE_FINE:
 			size = 4096;
 		break;
 	}
@@ -281,12 +281,12 @@ init_page_directory()
 
 	// clear out the pgdir
 	for (uint32 i = 0; i < 4096; i++)
-	sPageDirectory[i] = 0;
+		sPageDirectory[i] = 0;
 
 	uint32 *pageTable = NULL;
 	for (uint32 i = 0; i < ARRAY_SIZE(LOADER_MEMORYMAP);i++) {
 
-		pageTable = get_next_page_table(MMU_L1_TYPE_COARSEPAGETABLE);
+		pageTable = get_next_page_table(MMU_L1_TYPE_COARSE);
 		TRACE("BLOCK: %s START: %lx END %lx\n", LOADER_MEMORYMAP[i].name,
 			LOADER_MEMORYMAP[i].start, LOADER_MEMORYMAP[i].end);
 		addr_t pos = LOADER_MEMORYMAP[i].start;
@@ -299,8 +299,8 @@ init_page_directory()
 			if (c > 255) { // we filled a pagetable => we need a new one
 				// there is 1MB per pagetable so:
 				sPageDirectory[VADDR_TO_PDENT(pos)]
-					= (uint32)pageTable | MMU_L1_TYPE_COARSEPAGETABLE;
-				pageTable = get_next_page_table(MMU_L1_TYPE_COARSEPAGETABLE);
+					= (uint32)pageTable | MMU_L1_TYPE_COARSE;
+				pageTable = get_next_page_table(MMU_L1_TYPE_COARSE);
 				c = 0;
 			}
 
@@ -309,7 +309,7 @@ init_page_directory()
 
 		if (c > 0) {
 			sPageDirectory[VADDR_TO_PDENT(pos)]
-				= (uint32)pageTable | MMU_L1_TYPE_COARSEPAGETABLE;
+				= (uint32)pageTable | MMU_L1_TYPE_COARSE;
 		}
 	}
 	TRACE("%s: Page table setup complete\n", __func__);
@@ -340,7 +340,7 @@ add_page_table(addr_t base)
 	TRACE("%s: base = %p\n", __func__, (void *)base);
 
 	// Get new page table and clear it out
-	uint32 *pageTable = get_next_page_table(MMU_L1_TYPE_COARSEPAGETABLE);
+	uint32 *pageTable = get_next_page_table(MMU_L1_TYPE_COARSE);
 /*
 	if (pageTable > (uint32 *)(8 * 1024 * 1024)) {
 		panic("tried to add page table beyond the indentity mapped 8 MB "
@@ -352,7 +352,7 @@ add_page_table(addr_t base)
 
 	// put the new page table into the page directory
 	sPageDirectory[VADDR_TO_PDENT(base)]
-		= (uint32)pageTable | MMU_L1_TYPE_COARSEPAGETABLE;
+		= (uint32)pageTable | MMU_L1_TYPE_COARSE;
 }
 
 
