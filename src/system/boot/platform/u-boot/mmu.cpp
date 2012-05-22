@@ -253,15 +253,21 @@ static uint32 *
 get_next_page_table(uint32 type)
 {
 	TRACE(("get_next_page_table, sNextPageTableAddress %p, kPageTableRegionEnd "
-		"%p, type  0x%lx\n", sNextPageTableAddress, kPageTableRegionEnd, type));
+		"%p, type 0x" B_PRIX32 "\n", sNextPageTableAddress,
+		kPageTableRegionEnd, type));
+
 	size_t size = 0;
 	switch(type) {
 		case MMU_L1_TYPE_COARSE:
+		default:
 			size = 1024;
-		break;
+			break;
 		case MMU_L1_TYPE_FINE:
 			size = 4096;
-		break;
+			break;
+		case MMU_L1_TYPE_SECTION:
+			size = 16384;
+			break;
 	}
 
 	addr_t address = sNextPageTableAddress;
