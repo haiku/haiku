@@ -242,7 +242,7 @@ static uint32 *
 get_next_page_table(uint32 type)
 {
 	TRACE("%s: sNextPageTableAddress %p, kPageTableRegionEnd %p, "
-		"type 0x" B_PRIX32 "\n", __func__, sNextPageTableAddress,
+		"type 0x%" B_PRIX32 "\n", __func__, sNextPageTableAddress,
 		kPageTableRegionEnd, type);
 
 	size_t size = 0;
