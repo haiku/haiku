@@ -36,10 +36,9 @@
  *  - BCM2835-ARM-Peripherals.pdf
  */
 
-// 1.2.2 notes that peripherals are remapped from 0x7e to 0x20
+// Section 1.2.2
 #define BCM2708_SDRAM_BASE		0x00000000
-#define BCM2708_DEVICEHW_BASE	0x7E000000 // Real Hardware Base
-#define BCM2708_DEVICEFW_BASE	0x20000000 // Firmware Mapped Base
+#define BCM2708_PERIPHERAL_BASE	0x20000000
 
 #define ST_BASE			0x3000
 	// System Timer, sec 12.0, page 172
@@ -77,11 +76,11 @@
 #define ARM_CTRL_0_SBM_BASE		(ARM_BASE + 0x800)
 	// ARM Semaphores, Doorbells, and Mailboxes
 
-#define VECT_BASE 0xffff0000
+#define VECT_BASE 0xFFFF0000
 #define VECT_SIZE SIZE_4K
 
-#define DEVICE_BASE		BCM2708_DEVICEHW_BASE
-#define DEVICE_SIZE		0x1000000
+#define PERIPHERAL_BASE	BCM2708_PERIPHERAL_BASE
+#define PERIPHERAL_SIZE 0xFFFFFF
 
 #define SDRAM_BASE		BCM2708_SDRAM_BASE
 #define SDRAM_SIZE		0x4000000

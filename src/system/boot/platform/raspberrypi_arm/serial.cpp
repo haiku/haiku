@@ -14,6 +14,7 @@
 #include <boot/platform.h>
 #include <arch/cpu.h>
 #include <boot/stage2.h>
+#include "mmu.h"
 
 #include <string.h>
 
@@ -87,7 +88,10 @@ serial_cleanup(void)
 extern "C" void
 serial_init(void)
 {
-	gUART = arch_get_uart_pl011(BOARD_UART_DEBUG, BOARD_UART_CLOCK);
+	addr_t uart0 = mmu_map_physical_memory(PERIPHERAL_BASE + BOARD_UART_DEBUG,
+		0x00004000, kDefaultPageFlags);
+
+	gUART = arch_get_uart_pl011(uart0, BOARD_UART_CLOCK);
 	gUART->InitEarly();
 	gUART->InitPort(9600);
 

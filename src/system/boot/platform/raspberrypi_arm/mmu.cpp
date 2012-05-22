@@ -62,12 +62,16 @@ struct memblock {
 static struct memblock LOADER_MEMORYMAP[] = {
 	{
 		"devices",
-		DEVICE_BASE,
-		DEVICE_BASE + DEVICE_SIZE - 1,
+		PERIPHERAL_BASE,
+		PERIPHERAL_BASE + PERIPHERAL_SIZE,
 		MMU_L2_FLAG_B,
 	},
+	// Device memory between 0x0 and 0x10000000
+	// (0x0) Ram / Video ram (0x10000000) (256MB)
+	// We don't detect the split yet, se we have to be
+	// careful not to run into video ram.
 	{
-		"RAM_loader", // 1MB loader
+		"RAM_loader", // 1MB for the loader
 		SDRAM_BASE + 0,
 		SDRAM_BASE + 0x0fffff,
 		MMU_L2_FLAG_C,
@@ -84,7 +88,6 @@ static struct memblock LOADER_MEMORYMAP[] = {
 		SDRAM_BASE + 0x11FFFFF,
 		MMU_L2_FLAG_C,
 	},
-#if 0
 	{
 		"RAM_stack", // stack
 		SDRAM_BASE + 0x1200000,
@@ -97,7 +100,7 @@ static struct memblock LOADER_MEMORYMAP[] = {
 		SDRAM_BASE + 0x2500000,
 		MMU_L2_FLAG_C,
 	},
-
+	// (0x2500000 ~37MB)
 #ifdef FB_BASE
 	{
 		"framebuffer", // 2MB framebuffer ram
@@ -105,7 +108,6 @@ static struct memblock LOADER_MEMORYMAP[] = {
 		FB_BASE + FB_SIZE - 1,
 		MMU_L2_FLAG_AP_RW|MMU_L2_FLAG_C,
 	},
-#endif
 #endif
 };
 
@@ -585,7 +587,7 @@ mmu_init(void)
 {
 	CALLED();
 
-	mmu_write_C1(mmu_read_C1() & ~((1<<29)|(1<<28)|(1<<0)));
+	mmu_write_C1(mmu_read_C1() & ~((1 << 29) | (1 << 28) | (1 << 0)));
 		// access flag disabled, TEX remap disabled, mmu disabled
 
 	uint32 highestRAMAddress = SDRAM_BASE;

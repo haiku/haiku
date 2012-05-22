@@ -112,7 +112,7 @@ pi_start(void)
 	gpio_init();
 
 	// Flick on "OK" led, use pre-mmu firmware base
-	gpio_write(BCM2708_DEVICEFW_BASE + GPIO_BASE, 16, 0);
+	gpio_write(PERIPHERAL_BASE + GPIO_BASE, 16, 0);
 
 	mmu_init();
 
