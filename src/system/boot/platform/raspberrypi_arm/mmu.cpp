@@ -40,8 +40,13 @@
 	// You also need to define ENABLE_SERIAL in serial.cpp
 	// for output to work.
 
+//#define DEBUG_DISABLE_MMU
+
+
 extern uint8 __stack_start;
 extern uint8 __stack_end;
+
+extern addr_t gPeripheralBase;
 
 
 /*
@@ -60,6 +65,7 @@ struct memblock {
 
 
 static struct memblock LOADER_MEMORYMAP[] = {
+	// We map this first so we can always find peripherals
 	{
 		"devices",
 		PERIPHERAL_BASE,
@@ -114,20 +120,20 @@ static struct memblock LOADER_MEMORYMAP[] = {
 
 //static const uint32 kDefaultPageTableFlags = MMU_FLAG_READWRITE;
 	// not cached not buffered, R/W
-static const size_t kMaxKernelSize = 0x200000;		// 2 MB for the kernel
+static const size_t kMaxKernelSize = 0x200000; // 2 MB for the kernel
 
-static addr_t sNextPhysicalAddress = 0; //will be set by mmu_init
+static addr_t sNextPhysicalAddress = 0; // will be set by mmu_init
 static addr_t sNextVirtualAddress = KERNEL_BASE + kMaxKernelSize;
 static addr_t sMaxVirtualAddress = KERNEL_BASE + kMaxKernelSize;
 
 static addr_t sNextPageTableAddress = 0;
-//the page directory is in front of the pagetable
+// the page directory is in front of the pagetable
 static uint32 kPageTableRegionEnd = 0;
 
 // working page directory and page table
 static uint32 *sPageDirectory = 0 ;
-//page directory has to be on a multiple of 16MB for
-//some arm processors
+// page directory has to be on a multiple of 16MB for
+// some arm processors
 
 
 static addr_t
@@ -141,10 +147,12 @@ get_next_virtual_address(size_t size)
 
 
 static addr_t
-get_next_virtual_address_alligned (size_t size, uint32 mask)
+get_next_virtual_address_alligned(size_t size, uint32 mask)
 {
-	addr_t address = (sNextVirtualAddress) & mask;
+	addr_t address = sNextVirtualAddress & mask;
 	sNextVirtualAddress = address + size;
+
+	TRACE("%s: %p\n", __func__, (void*)address);
 
 	return address;
 }
@@ -190,7 +198,7 @@ get_next_physical_page(size_t pagesize)
 void
 mmu_set_TTBR(uint32 ttb)
 {
-	TRACE("%s: Set Translation Table Base to 0x%lx\n", __func__);
+	TRACE("%s: Set Translation Table Base to 0x%" B_PRIx32 "\n", __func__, ttb);
 	ttb &= 0xffffc000;
 	asm volatile("MRC p15, 0, %[adr], c2, c0, 0"::[adr] "r" (ttb));
 }
@@ -233,7 +241,8 @@ mmu_write_C1(uint32 value)
 void
 mmu_write_DACR(uint32 value)
 {
-	TRACE("%s: Set Domain Access Register to 0x%lx\n", __func__);
+	TRACE("%s: Set Domain Access Register to 0x%" B_PRIx32 "\n",
+		__func__, value);
 	asm volatile("MCR p15, 0, %[c1in], c3, c0, 0"::[c1in] "r" (value));
 }
 
@@ -242,7 +251,7 @@ static uint32 *
 get_next_page_table(uint32 type)
 {
 	TRACE("%s: sNextPageTableAddress %p, kPageTableRegionEnd %p, "
-		"type 0x%" B_PRIX32 "\n", __func__, sNextPageTableAddress,
+		"type 0x%" B_PRIx32 "\n", __func__, sNextPageTableAddress,
 		kPageTableRegionEnd, type);
 
 	size_t size = 0;
@@ -289,7 +298,7 @@ init_page_directory()
 		sPageDirectory[i] = 0;
 
 	uint32 *pageTable = NULL;
-	for (uint32 i = 0; i < ARRAY_SIZE(LOADER_MEMORYMAP);i++) {
+	for (uint32 i = 0; i < ARRAY_SIZE(LOADER_MEMORYMAP); i++) {
 
 		pageTable = get_next_page_table(MMU_L1_TYPE_COARSE);
 		TRACE("BLOCK: %s START: %lx END %lx\n", LOADER_MEMORYMAP[i].name,
@@ -328,11 +337,15 @@ init_page_directory()
 	// TLB Flush
 	mmu_flush_TLB();
 
-	// Set domain access register
+	// Set domain access register, manager access to all
 	mmu_write_DACR(0xFFFFFFFF);
 
+	#ifndef DEBUG_DISABLE_MMU
 	TRACE("%s: Enable MMU...\n", __func__);
 	mmu_write_C1(mmu_read_C1() | 0x1);
+
+	gPeripheralBase = sNextVirtualAddress;
+	#endif
 
 	TRACE("%s: Complete\n", __func__);
 }

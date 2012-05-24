@@ -37,6 +37,9 @@ extern uint8 __stack_end;
 extern int main(stage2_args *args);
 void _start(void);
 
+// Adjusted during mmu_init
+addr_t gPeripheralBase = PERIPHERAL_BASE;
+
 
 static void
 clear_bss(void)
@@ -112,8 +115,9 @@ pi_start(void)
 	gpio_init();
 
 	// Flick on "OK" led, use pre-mmu firmware base
-	gpio_write(PERIPHERAL_BASE + GPIO_BASE, 16, 0);
+	gpio_write(gPeripheralBase + GPIO_BASE, 16, 0);
 
+	// To debug mmu, enable serial_init above me!
 	mmu_init();
 
 	serial_init();
