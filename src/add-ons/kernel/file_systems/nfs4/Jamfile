@@ -1,0 +1,7 @@
+SubDir HAIKU_TOP src add-ons kernel file_systems nfs4 ;
+
+UsePrivateHeaders kernel ;
+
+KernelAddon nfs4 :
+	kernel_interface.cpp
+;
