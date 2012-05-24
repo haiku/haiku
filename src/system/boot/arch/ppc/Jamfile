@@ -19,13 +19,14 @@ KernelMergeObject boot_arch_$(TARGET_ARCH).o :
 	debug_uart_8250.cpp
 	arch_uart_8250.cpp
 	arch_elf.cpp
+	arch_cpu_asm.S
 	: # additional flags
 	:
 	$(kernelArchObjects)
 	$(kernelLibArchObjects)
 ;
 
-SEARCH on [ FGristFiles arch_elf.cpp arch_uart_8250.cpp ]
+SEARCH on [ FGristFiles arch_elf.cpp arch_uart_8250.cpp arch_cpu_asm.S ]
     = [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_ARCH) ] ;
 
 SEARCH on [ FGristFiles debug_uart_8250.cpp ]
