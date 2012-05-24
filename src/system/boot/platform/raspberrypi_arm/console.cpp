@@ -209,12 +209,9 @@ console_hide_cursor(void)
 int
 console_wait_for_key(void)
 {
-	#warning IMPLEMENT console_wait_for_key
-	#if 0
 	union key key;
+	key.ax = serial_getc(true);
 	return key.code.ascii;
-	#endif
-	return 0;
 }
 
 

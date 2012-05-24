@@ -15,9 +15,12 @@ extern "C" {
 
 extern void serial_init(void);
 extern void serial_cleanup(void);
-extern void serial_puts(const char *string, size_t size);
 extern void serial_disable(void);
 extern void serial_enable(void);
+
+extern void serial_puts(const char *string, size_t size);
+extern int serial_getc(bool wait);
+
 
 #ifdef __cplusplus
 }
