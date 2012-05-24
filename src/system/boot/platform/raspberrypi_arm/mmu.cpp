@@ -200,7 +200,7 @@ mmu_set_TTBR(uint32 ttb)
 {
 	TRACE("%s: Set Translation Table Base to 0x%" B_PRIx32 "\n", __func__, ttb);
 	ttb &= 0xffffc000;
-	asm volatile("MRC p15, 0, %[adr], c2, c0, 0"::[adr] "r" (ttb));
+	asm volatile("MCR p15, 0, %[adr], c2, c0, 0"::[adr] "r" (ttb));
 }
 
 
