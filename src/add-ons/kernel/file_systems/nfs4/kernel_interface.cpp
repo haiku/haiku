@@ -9,6 +9,8 @@
 
 #include <fs_interface.h>
 
+#include "Connection.h"
+
 
 extern fs_volume_ops gNFSv4VolumeOps;
 extern fs_vnode_ops gNFSv4VnodeOps;
@@ -56,13 +58,21 @@ nfs4_put_vnode(fs_volume* volume, fs_vnode* vnode, bool reenter)
 static status_t
 nfs4_std_ops(int32 op, ...)
 {
+	status_t result;
+
 	switch (op) {
 		case B_MODULE_INIT:
 			dprintf("NFS4 Init\n");
+			result = Connection::Init();
+			if (result != B_OK)
+				return result;
 			return B_OK;
 
 		case B_MODULE_UNINIT:
 			dprintf("NFS4 Uninit\n");
+			result = Connection::CleanUp();
+			if (result != B_OK)
+				return result;
 			return B_OK;
 
 		default:
