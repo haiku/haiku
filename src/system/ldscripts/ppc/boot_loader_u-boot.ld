@@ -15,13 +15,16 @@ SECTIONS
 	__ctor_end = .;
 
 	.rodata : { *(.rodata .rodata.*) }
+	.sdata2 : { *(.sdata2) }
 
 	/* writable data  */
 	. = ALIGN(0x1000);
 	__data_start = .;
 	.data : { *(.data .gnu.linkonce.d.*) }
 	.data.rel.ro : { *(.data.rel.ro.local .data.rel.ro*) }
+	.data.rel.local : { *(.data.rel.local*) }
 	.got : { *(.got .got2) }
+	.sdata : { *(.sdata .sdata.* .gnu.linkonce.s.*) }
 
 	/* uninitialized data (in same segment as writable data) */
 	__bss_start = .;
