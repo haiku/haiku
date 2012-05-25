@@ -693,7 +693,7 @@ CalcView::FrameResized(float width, float height)
 
 	frame.OffsetTo(B_ORIGIN);
 	float inset = (frame.Height() - fExpressionTextView->LineHeight(0)) / 2;
-	frame.InsetBy(inset, inset);
+	frame.InsetBy(0, inset);
 	fExpressionTextView->SetTextRect(frame);
 	Invalidate();
 }
