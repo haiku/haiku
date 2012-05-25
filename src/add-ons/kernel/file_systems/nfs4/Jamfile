@@ -5,5 +5,7 @@ UsePrivateHeaders kernel ;
 KernelAddon nfs4 :
 	Connection.cpp
 	kernel_interface.cpp
+	RPCAuth.cpp
+	RPCCall.cpp
 	XDR.cpp
 ;
