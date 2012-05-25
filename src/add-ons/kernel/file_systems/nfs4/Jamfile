@@ -7,5 +7,6 @@ KernelAddon nfs4 :
 	kernel_interface.cpp
 	RPCAuth.cpp
 	RPCCall.cpp
+	RPCReply.cpp
 	XDR.cpp
 ;
