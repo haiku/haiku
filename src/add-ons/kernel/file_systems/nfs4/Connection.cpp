@@ -25,6 +25,23 @@
 KSOCKET_MODULE_DECL;
 
 
+bool
+ServerAddress::operator==(const ServerAddress& x)
+{
+	return fAddress == x.fAddress && fPort == x.fPort
+			&& fProtocol == x.fProtocol;
+}
+
+bool
+ServerAddress::operator<(const ServerAddress& x)
+{
+	return fAddress < x.fAddress ||
+			(fAddress == x.fAddress && fPort < x.fPort) ||
+			(fAddress == x.fAddress && fPort == x.fPort &&
+				fProtocol < x.fProtocol);
+}
+
+
 Connection::Connection(const sockaddr_in& addr, Transport proto, bool markers)
 	:
 	fSock(-1),
