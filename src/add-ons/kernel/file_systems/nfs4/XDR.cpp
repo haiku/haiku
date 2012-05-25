@@ -285,19 +285,19 @@ WriteStream::AddOpaque(const void *ptr, uint32 size)
 status_t
 WriteStream::AddOpaque(const WriteStream& stream)
 {
-	return AddOpaque(stream.GetBuffer(), stream.GetSize());
+	return AddOpaque(stream.Buffer(), stream.Size());
 }
 
 
 status_t
 WriteStream::Append(const WriteStream& stream)
 {
-	uint32 size = stream.GetSize();
+	uint32 size = stream.Size();
 	status_t err = _CheckResize(size);
 	if (err != B_OK)
 		return err;
 
-	memcpy(fBuffer + fPosition, stream.GetBuffer(), size);
+	memcpy(fBuffer + fPosition, stream.Buffer(), size);
 	fPosition += size / sizeof(int32);
 
 	return B_OK;

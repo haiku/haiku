@@ -20,8 +20,8 @@ public:
 
 	virtual					~Stream();
 
-	inline	const void*		GetBuffer() const;
-	inline	Position		GetCurrent() const;
+	inline	const void*		Buffer() const;
+	inline	Position		Current() const;
 
 protected:
 							Stream(void* buffer, uint32 size);
@@ -39,7 +39,7 @@ public:
 							ReadStream(void* buffer, uint32 size);
 	virtual					~ReadStream();
 
-	inline	int				GetSize() const;
+	inline	int				Size() const;
 
 			int32			GetInt();
 			uint32			GetUInt();
@@ -64,7 +64,7 @@ public:
 							WriteStream(const WriteStream& x);
 	virtual					~WriteStream();
 
-	inline	int				GetSize() const;
+	inline	int				Size() const;
 
 			status_t		InsertUInt(Stream::Position pos, uint32 x);
 
@@ -82,7 +82,7 @@ public:
 
 			status_t		Append(const WriteStream& stream);
 
-	inline	status_t		GetError() const;
+	inline	status_t		Error() const;
 
 private:
 			status_t		_CheckResize(uint32 size);
@@ -94,21 +94,21 @@ private:
 
 
 inline const void*
-Stream::GetBuffer() const
+Stream::Buffer() const
 {
 	return fBuffer;
 }
 
 
 inline Stream::Position
-Stream::GetCurrent() const
+Stream::Current() const
 {
 	return fPosition;
 }
 
 
 inline int
-ReadStream::GetSize() const
+ReadStream::Size() const
 {
 	return fSize;
 }
@@ -129,7 +129,7 @@ ReadStream::GetBoolean()
 
 
 inline int
-WriteStream::GetSize() const
+WriteStream::Size() const
 {
 	return fPosition * sizeof(uint32);
 }
@@ -143,7 +143,7 @@ WriteStream::AddBoolean(bool x)
 
 
 inline status_t
-WriteStream::GetError() const
+WriteStream::Error() const
 {
 	return fError;
 }

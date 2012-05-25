@@ -40,7 +40,7 @@ Call::Create(uint32 proc, const Auth* creds, const Auth* ver)
 		return NULL;
 
 	// XID will be determined and set by RPC::Server
-	call->fXIDPosition = call->fStream.GetCurrent();
+	call->fXIDPosition = call->fStream.Current();
 	call->fStream.AddUInt(0);
 
 	call->fStream.AddInt(CALL);
@@ -49,13 +49,13 @@ Call::Create(uint32 proc, const Auth* creds, const Auth* ver)
 	call->fStream.AddUInt(NFS_VERSION);
 	call->fStream.AddUInt(proc);
 
-	call->fStream.Append(creds->GetStream());
+	call->fStream.Append(creds->Stream());
 	delete creds;
 
-	call->fStream.Append(ver->GetStream());
+	call->fStream.Append(ver->Stream());
 	delete ver;
 
-	if (call->fStream.GetError() != B_OK) {
+	if (call->fStream.Error() != B_OK) {
 		delete call;
 		return NULL;
 	}

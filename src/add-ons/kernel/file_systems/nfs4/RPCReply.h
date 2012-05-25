@@ -21,8 +21,8 @@ public:
 
 	inline	uint32				GetXID();
 
-	inline	status_t			GetError();
-	inline	XDR::ReadStream&	GetStream();
+	inline	status_t			Error();
+	inline	XDR::ReadStream&	Stream();
 
 private:
 			uint32				fXID;
@@ -41,14 +41,14 @@ Reply::GetXID()
 
 
 inline status_t
-Reply::GetError()
+Reply::Error()
 {
 	return fError;
 }
 
 
 inline XDR::ReadStream&
-Reply::GetStream()
+Reply::Stream()
 {
 	return fStream;
 }

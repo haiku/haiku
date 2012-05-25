@@ -21,7 +21,7 @@ enum auth_flavour {
 
 class Auth {
 public:
-	inline	const XDR::WriteStream&		GetStream() const;
+	inline	const XDR::WriteStream&		Stream() const;
 
 	static	const Auth*					CreateNone();
 	static	const Auth*					CreateSys();
@@ -34,7 +34,7 @@ private:
 
 
 inline const XDR::WriteStream&
-Auth::GetStream() const
+Auth::Stream() const
 {
 	return fStream;
 }

@@ -34,7 +34,7 @@ Auth::CreateNone()
 
 	auth->fStream.AddInt(AUTH_NONE);
 	auth->fStream.AddOpaque(NULL, 0);
-	if (auth->fStream.GetError() != B_OK) {
+	if (auth->fStream.Error() != B_OK) {
 		delete auth;
 		return NULL;
 	}
@@ -72,14 +72,14 @@ Auth::CreateSys()
 	} else
 		xdr.AddUInt(0);
 	free(groups);
-	if (xdr.GetError() != B_OK) {
+	if (xdr.Error() != B_OK) {
 		delete auth;
 		return NULL;
 	}
 
 	auth->fStream.AddInt(AUTH_SYS);
 	auth->fStream.AddOpaque(xdr);
-	if (auth->fStream.GetError() != B_OK) {
+	if (auth->fStream.Error() != B_OK) {
 		delete auth;
 		return NULL;
 	}

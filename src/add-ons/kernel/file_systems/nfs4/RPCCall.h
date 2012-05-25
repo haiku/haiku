@@ -23,7 +23,7 @@ public:
 
 			void					SetXID(uint32 x);
 
-	inline	XDR::WriteStream&		GetStream();
+	inline	XDR::WriteStream&		Stream();
 
 private:
 									Call();
@@ -35,7 +35,7 @@ private:
 
 
 inline XDR::WriteStream&
-Call::GetStream()
+Call::Stream()
 {
 	return fStream;
 }
