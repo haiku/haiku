@@ -8,7 +8,7 @@ UsePrivateHeaders kernel storage ;
 
 SubDirC++Flags -fno-rtti ;
 
-KernelStaticLibrary boot_amiga_ffs :
+BootStaticLibrary boot_amiga_ffs :
 	amiga_ffs.cpp
 	Volume.cpp
 	Directory.cpp

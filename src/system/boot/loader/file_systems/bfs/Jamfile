@@ -10,7 +10,7 @@ local defines = [ FDefines _BOOT_MODE ] ;
 SubDirCcFlags $(defines) ;
 SubDirC++Flags -fno-rtti $(defines) ;
 
-KernelStaticLibrary boot_bfs :
+BootStaticLibrary boot_bfs :
 	bfs.cpp
 	Directory.cpp
 	File.cpp

@@ -7,7 +7,7 @@
 
 #include <SupportDefs.h>
 
-#include <apm_defs.h>
+#include <arch/x86/apm_defs.h>
 
 
 struct kernel_args;

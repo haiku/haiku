@@ -8,7 +8,7 @@ UsePrivateHeaders [ FDirName kernel arch $(TARGET_ARCH) board $(TARGET_BOOT_BOAR
 
 SubDirC++Flags -fno-rtti ;
 
-KernelMergeObject boot_platform_u-boot_arm.o :
+BootMergeObject boot_platform_u-boot_arm.o :
 	# must come first to have _start_* at correct locations
 	shell.S
 

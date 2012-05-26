@@ -159,10 +159,13 @@ if $(HAIKU_GCC_VERSION[1]) = 2 {
 HAIKU_C++ ?= $(HAIKU_CC) ;
 HAIKU_LINK = $(HAIKU_CC) ;
 HAIKU_LINKFLAGS = $(HAIKU_GCC_BASE_FLAGS) ;
+HAIKU_BOOT_LINKFLAGS = ;
 
 HAIKU_HDRS = [ FStandardHeaders ] ;
 HAIKU_KERNEL_CCFLAGS = $(HAIKU_CCFLAGS) $(HAIKU_GCC_BASE_FLAGS) ;
 HAIKU_KERNEL_C++FLAGS = $(HAIKU_C++FLAGS) $(HAIKU_GCC_BASE_FLAGS) ;
+HAIKU_BOOT_CCFLAGS = $(HAIKU_CCFLAGS) $(HAIKU_GCC_BASE_FLAGS) ;
+HAIKU_BOOT_C++FLAGS = $(HAIKU_C++FLAGS) $(HAIKU_GCC_BASE_FLAGS) ;
 HAIKU_CCFLAGS += $(HAIKU_GCC_BASE_FLAGS) -nostdinc ;
 HAIKU_C++FLAGS += $(HAIKU_GCC_BASE_FLAGS) -nostdinc ;
 HAIKU_DEFINES = __HAIKU__ ;
@@ -249,7 +252,6 @@ switch $(HAIKU_CPU) {
 	}
 	case x86_64 :
 	{
-		HAIKU_DEFINES += __x86_64__ ;
 		HAIKU_BOOT_PLATFORM = bios_ia32 ;
 		HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 2880 ; # in kB
 		# offset in floppy image (>= sizeof(haiku_loader))
@@ -329,6 +331,8 @@ HAIKU_ASFLAGS = ;
 HAIKU_KERNEL_CCFLAGS += -finline -fno-builtin ;
 HAIKU_KERNEL_C++FLAGS += -finline -fno-builtin -fno-exceptions ;
 HAIKU_KERNEL_DEFINES += _KERNEL_MODE ;
+HAIKU_BOOT_CCFLAGS += -finline -fno-builtin ;
+HAIKU_BOOT_C++FLAGS += -finline -fno-builtin -fno-exceptions ;
 
 if $(HAIKU_GCC_VERSION[1]) >= 3 {
 	HAIKU_KERNEL_C++FLAGS += -fno-use-cxa-atexit ;
@@ -340,6 +344,8 @@ if $(HAIKU_GCC_VERSION[1]) >= 4 {
 	if $(HAIKU_GCC_VERSION[2]) >= 3 {
 		HAIKU_KERNEL_CCFLAGS += -ffreestanding ;
 		HAIKU_KERNEL_C++FLAGS += -ffreestanding ;
+		HAIKU_BOOT_CCFLAGS += -ffreestanding ;
+		HAIKU_BOOT_C++FLAGS += -ffreestanding ;
 	}
 }
 
@@ -377,6 +383,15 @@ switch $(HAIKU_ARCH) {
 	}
 	case x86_64 :
 	{
+		# Kernel lives in the top 2GB of the address space, use kernel code model.
+		HAIKU_KERNEL_CCFLAGS += -mcmodel=kernel ;
+		HAIKU_KERNEL_C++FLAGS += -mcmodel=kernel ;
+
+		# Bootloader is 32-bit.
+		HAIKU_BOOT_LINKFLAGS += -m elf_i386_haiku ;
+		HAIKU_BOOT_CCFLAGS += -m32 ;
+		HAIKU_BOOT_C++FLAGS += -m32 ;
+
 		# Enable use of the gcc built-in atomic functions instead of atomic_*().
 		# The former are inlined and have thus less overhead.
 		HAIKU_DEFINES += B_USE_BUILTIN_ATOMIC_FUNCTIONS ;
@@ -962,6 +977,7 @@ local buildVars =
 
 	KERNEL_CCFLAGS KERNEL_C++FLAGS
 	KERNEL_PIC_CCFLAGS KERNEL_PIC_LINKFLAGS
+	BOOT_CCFLAGS BOOT_C++FLAGS BOOT_LINKFLAGS
 	WARNING_CCFLAGS WARNING_C++FLAGS
 
 	KERNEL_WARNING_CCFLAGS KERNEL_WARNING_C++FLAGS
@@ -998,6 +1014,9 @@ if $(TARGET_PLATFORM) = haiku {
 	TARGET_GCC_LIBGCC			= $(HAIKU_GCC_LIBGCC) ;
 	TARGET_GCC_LIBGCC_OBJECTS	= $(HAIKU_GCC_LIBGCC_OBJECTS) ;
 
+	TARGET_BOOT_LIBGCC			= $(HAIKU_BOOT_LIBGCC) ;
+	TARGET_BOOT_LIBSUPC++		= $(HAIKU_BOOT_LIBSUPC++) ;
+
 	TARGET_BOOT_PLATFORM		?= $(HAIKU_BOOT_PLATFORM) ;
 	TARGET_BOOT_BOARD			?= $(HAIKU_BOOT_BOARD) ;
 
@@ -1013,6 +1032,9 @@ if $(TARGET_PLATFORM) = haiku {
 	TARGET_GCC_HEADERS_DIR		= ;
 	TARGET_GCC_LIBGCC			= ;
 	TARGET_GCC_LIBGCC_OBJECTS	= ;
+
+	TARGET_BOOT_LIBGCC			= ;
+	TARGET_BOOT_LIBSUPC++		= ;
 
 	TARGET_BOOT_PLATFORM		= ;
 	TARGET_BOOT_BOARD			= ;

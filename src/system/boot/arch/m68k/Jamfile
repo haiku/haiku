@@ -13,7 +13,7 @@ local kernelLibArchObjects =
 	<src!system!kernel!lib!arch!$(TARGET_ARCH)>memset.o
 ;
 
-KernelMergeObject boot_arch_$(TARGET_ARCH).o :
+BootMergeObject boot_arch_$(TARGET_ARCH).o :
 	arch_elf.cpp
 	$(librootArchObjects)
 	: -fno-pic
@@ -21,17 +21,17 @@ KernelMergeObject boot_arch_$(TARGET_ARCH).o :
 	$(kernelLibArchObjects)
 ;
 
-KernelMergeObject boot_arch_$(TARGET_ARCH)_030.o :
+BootMergeObject boot_arch_$(TARGET_ARCH)_030.o :
 	mmu_030.cpp
 	: -fno-pic -Wno-unused -m68030
 ;
 
-KernelMergeObject boot_arch_$(TARGET_ARCH)_040.o :
+BootMergeObject boot_arch_$(TARGET_ARCH)_040.o :
 	mmu_040.cpp
 	: -fno-pic -Wno-unused -m68040
 ;
 
-KernelMergeObject boot_arch_$(TARGET_ARCH)_060.o :
+BootMergeObject boot_arch_$(TARGET_ARCH)_060.o :
 	mmu_060.cpp
 	: -fno-pic -Wno-unused -m68060
 ;

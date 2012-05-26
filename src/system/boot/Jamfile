@@ -1,27 +1,37 @@
 SubDir HAIKU_TOP src system boot ;
 
-local librootFunctions =
-	abs.o
-	ctype.o
-	LocaleData.o
-	qsort.o
-	kernel_vsprintf.o
-	memcmp.o
-	memmove.o
-	strdup.o
-	strndup.o
-	strlen.o
-	strnlen.o
-	strcmp.o
-	strcasecmp.o
-	strncmp.o
-	strcat.o
-	strcpy.o
-	strlcat.o
-	strlcpy.o
-	strchr.o
-	strrchr.o
-	strtol.o
+DEFINES += _BOOT_MODE ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot posix string ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot posix stdlib ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot posix locale ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) kernel lib ] ;
+
+UsePrivateHeaders [ FDirName libroot locale ] ;
+
+BootMergeObject boot_libroot.o :
+	abs.c
+	ctype.cpp
+	LocaleData.cpp
+	qsort.c
+	kernel_vsprintf.cpp
+	memcmp.c
+	memmove.c
+	strdup.c
+	strndup.cpp
+	strlen.cpp
+	strnlen.cpp
+	strcmp.c
+	strcasecmp.c
+	strncmp.c
+	strcat.c
+	strcpy.c
+	strlcat.c
+	strlcpy.c
+	strchr.c
+	strrchr.c
+	strtol.c
+	: -fno-pic
 ;
 
 local extraLinkerArgs = ;
@@ -31,7 +41,7 @@ if $(HAIKU_BOARD_LOADER_BASE) {
 
 AddResources haiku_loader : boot_loader.rdef ;
 
-KernelLd boot_loader_$(TARGET_BOOT_PLATFORM) :
+BootLd boot_loader_$(TARGET_BOOT_PLATFORM) :
 	boot_platform_$(TARGET_BOOT_PLATFORM).o
 	boot_arch_$(TARGET_ARCH).o
 	boot_loader.a
@@ -47,9 +57,8 @@ KernelLd boot_loader_$(TARGET_BOOT_PLATFORM) :
 	# needed by tarfs and video_splash.cpp
 	boot_zlib.a
 
-	# libroot functions needed by the stage2 boot loader (compiled for the
-	# kernel)
-	$(librootFunctions:G=src!system!kernel!lib)
+	# libroot functions needed by the stage2 boot loader
+	boot_libroot.o
 
 	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/boot_loader_$(TARGET_BOOT_PLATFORM).ld
 	: -Bstatic $(extraLinkerArgs)

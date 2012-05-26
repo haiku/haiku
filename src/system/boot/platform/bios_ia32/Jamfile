@@ -17,7 +17,7 @@ UsePrivateHeaders [ FDirName storage ] ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
-KernelMergeObject boot_platform_bios_ia32.o :
+BootMergeObject boot_platform_bios_ia32.o :
 	shell.S
 	start.cpp
 	debug.cpp

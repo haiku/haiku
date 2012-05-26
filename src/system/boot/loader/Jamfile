@@ -50,7 +50,7 @@ UsePrivateHeaders shared storage ;
 	SubDirC++Flags $(defines) -fno-rtti ;
 }
 
-KernelStaticLibrary boot_loader :
+BootStaticLibrary boot_loader :
 	elf.cpp
 	heap.cpp
 	kernel_args.cpp
@@ -81,7 +81,7 @@ KernelStaticLibrary boot_loader :
 # The partition support is built in an extra static library
 # so that only the ones that are used will be included.
 
-KernelStaticLibrary boot_partitions :
+BootStaticLibrary boot_partitions :
 	FileMapDisk.cpp
 	amiga_rdb.cpp
 	apple.cpp

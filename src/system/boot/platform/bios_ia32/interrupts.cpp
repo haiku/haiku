@@ -17,7 +17,7 @@
 #include <boot/platform/generic/text_console.h>
 
 #include <arch_cpu.h>
-#include <descriptors.h>
+#include <arch/x86/descriptors.h>
 
 #include "debug.h"
 #include "keyboard.h"

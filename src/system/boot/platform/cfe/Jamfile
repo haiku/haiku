@@ -6,7 +6,7 @@ UsePrivateHeaders [ FDirName graphics common ] ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
-KernelMergeObject boot_platform_cfe.o :
+BootMergeObject boot_platform_cfe.o :
 	console.cpp
 	debug.cpp
 	devices.cpp

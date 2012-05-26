@@ -7,7 +7,7 @@ UsePrivateHeaders kernel [ FDirName kernel arch $(TARGET_ARCH) ]
 
 SubDirC++Flags -fno-rtti ;
 
-KernelStaticLibrary boot_platform_openfirmware_ppc :
+BootStaticLibrary boot_platform_openfirmware_ppc :
 	arch_mmu.cpp
 	arch_cpu_asm.S
 	arch_start_kernel.S

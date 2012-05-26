@@ -18,7 +18,7 @@ local kernelLibArchObjects =
 	<src!system!kernel!lib!arch!$(TARGET_ARCH)>byteorder.o
 ;
 
-KernelMergeObject boot_arch_$(TARGET_ARCH).o :
+BootMergeObject boot_arch_$(TARGET_ARCH).o :
 	$(kernelArchSources)
 	$(kernelLibArchSources)
 	: # additional flags

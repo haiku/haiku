@@ -45,7 +45,7 @@ local bios_ia32_edid_src =
 ;
 
 
-KernelMergeObject boot_platform_pxe_ia32.o :
+BootMergeObject boot_platform_pxe_ia32.o :
 	pxe_stage2.S
 	smp_trampoline.S
 	pxe_bios.S

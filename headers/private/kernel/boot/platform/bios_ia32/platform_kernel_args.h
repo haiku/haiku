@@ -10,7 +10,7 @@
 #endif
 
 
-#include <apm.h>
+#include <arch/x86/apm.h>
 #include <bios_drive.h>
 
 

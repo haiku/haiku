@@ -8,7 +8,7 @@ local kernelLibArchObjects =
 	<src!system!kernel!lib!arch!$(TARGET_ARCH)>memset.o
 ;
 
-KernelMergeObject boot_arch_$(TARGET_ARCH).o :
+BootMergeObject boot_arch_$(TARGET_ARCH).o :
 	arch_elf.cpp
 	: # additional flags
 	:

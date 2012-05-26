@@ -29,7 +29,7 @@ local uImageFakeOS = "netbsd" ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
 # First build the non arch dependent parts
-KernelMergeObject boot_platform_u-boot_common.o :
+BootMergeObject boot_platform_u-boot_common.o :
 	start.cpp
 	debug.cpp
 	console.cpp
@@ -48,7 +48,7 @@ KernelMergeObject boot_platform_u-boot_common.o :
 	: boot_platform_generic.a
 ;
 
-KernelMergeObject boot_platform_u-boot.o :
+BootMergeObject boot_platform_u-boot.o :
 	: :
 	# must come first to have _start_* at correct locations
 	boot_platform_u-boot_$(TARGET_ARCH).o

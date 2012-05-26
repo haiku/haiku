@@ -1,0 +1,129 @@
+
+rule SetupBoot
+{
+	# Usage SetupBoot <sources_or_objects> : <extra_cc_flags> : <include_private_headers> ;
+	#
+	# <sources_or_objects> - Ideally sources, otherwise HDRSEARCH can not be
+	#                        set for the sources and the sources some header
+	#                        dependencies might be missing.
+
+	local sources = [ FGristFiles $(1) ] ;
+	local objects = $(sources:S=$(SUFOBJ)) ;
+
+	# add private kernel headers
+	if $(3) != false {
+		SourceSysHdrs $(sources) : $(TARGET_PRIVATE_KERNEL_HEADERS) ;
+	}
+
+	local object ;
+	for object in $(objects) {
+		# add boot flags for the object
+		ObjectCcFlags $(object) : $(TARGET_BOOT_CCFLAGS) $(2) ;
+		ObjectC++Flags $(object) : $(TARGET_BOOT_C++FLAGS) $(2) ;
+		ObjectDefines $(object) : $(TARGET_KERNEL_DEFINES) ;
+        ASFLAGS on $(object) = $(TARGET_BOOT_CCFLAGS) ;
+
+		# override warning flags
+		TARGET_WARNING_CCFLAGS on $(object) = $(TARGET_KERNEL_WARNING_CCFLAGS) ;
+		TARGET_WARNING_C++FLAGS on $(object)
+			= $(TARGET_KERNEL_WARNING_C++FLAGS) ;
+	}
+}
+
+rule BootObjects
+{
+	SetupBoot $(1) : $(2) ;
+	Objects $(1) ;
+}
+
+rule BootLd
+{
+	# BootLd <name> : <objs> : <linkerscript> : <args> ;
+
+	LINK on $(1) = $(TARGET_LD) ;
+
+	LINKFLAGS on $(1) = $(4) ;
+	if $(3) { LINKFLAGS on $(1) += --script=$(3) ; }
+
+	# Remove any preset LINKLIBS, but link against libgcc.a. Linking against
+	# libsupc++ is opt-out.
+	local libs ;
+	if ! [ on $(1) return HAIKU_NO_LIBSUPC++ ] {
+		libs += $(TARGET_BOOT_LIBSUPC++) ;
+	}
+	LINKLIBS on $(1) =  $(libs) $(TARGET_BOOT_LIBGCC) ;
+
+	# TODO: Do we really want to invoke SetupBoot here? The objects should
+	# have been compiled with BootObjects anyway, so we're doing that twice.
+	SetupBoot $(2) ;
+
+	# Show that we depend on the libraries we need
+	LocalClean clean : $(1) ;
+	LocalDepends all : $(1) ;
+	Depends $(1) : $(2) ;
+
+	MakeLocateDebug $(1) ;
+
+	on $(1) XRes $(1) : $(RESFILES) ;
+	if ! [ on $(1) return $(DONT_USE_BEOS_RULES) ] {
+		SetType $(1) ;
+		MimeSet $(1) ;
+		SetVersion $(1) ;
+	}
+}
+
+actions BootLd bind VERSION_SCRIPT
+{
+	$(LINK) $(LINKFLAGS) -o "$(1)" "$(2)" $(LINKLIBS) \
+		--version-script=$(VERSION_SCRIPT)
+}
+
+rule BootMergeObject
+{
+	# BootMergeObject <name> : <sources> : <extra CFLAGS> : <other objects> ;
+	# Compiles source files and merges the object files to an object file.
+	# <name>: Name of the object file to create. No grist will be added.
+	# <sources>: Sources to be compiled. Grist will be added.
+	# <extra CFLAGS>: Additional flags for compilation.
+	# <other objects>: Object files or static libraries to be merged. No grist
+	#                  will be added.
+	#
+
+	SetupBoot $(2) : $(3) ;
+	Objects $(2) ;
+	MergeObjectFromObjects $(1) : $(2:S=$(SUFOBJ)) : $(4) ;
+	LINKFLAGS on $(1) += $(TARGET_BOOT_LINKFLAGS) ;
+}
+
+rule BootStaticLibrary
+{
+	# Usage BootStaticLibrary <name> : <sources> : <extra cc flags>  ;
+	# This is designed to take a set of sources and libraries and create
+	# a file called lib<name>.a
+
+	SetupBoot $(2) : $(3) : false ;
+	Library $(1) : $(2) ;
+}
+
+rule BootStaticLibraryObjects
+{
+	# Usage BootStaticLibrary <name> : <sources> ;
+	# This is designed to take a set of sources and libraries and create
+	# a file called <name>
+
+	# Show that we depend on the libraries we need
+	SetupBoot $(2) ;
+	LocalClean clean : $(1) ;
+	LocalDepends all : $(1) ;
+	Depends $(1) : $(2) ;
+
+	MakeLocateDebug $(1) ;
+}
+
+actions BootStaticLibraryObjects
+{
+	# Force recreation of the archive to avoid build errors caused by
+	# stale dependencies after renaming or deleting object files.
+	$(RM) "$(1)"
+	$(HAIKU_AR) -r "$(1)" "$(2)" ;
+}
