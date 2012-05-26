@@ -44,37 +44,49 @@ private:
 
 class Server {
 public:
-							Server(Connection* conn);
-	virtual					~Server();
+									Server(Connection* conn,
+										ServerAddress* addr);
+	virtual							~Server();
 
-			status_t		SendCall(Call* call, Reply** reply);
-	inline	void			CancelCall(uint32 xid);
+			status_t				SendCall(Call* call, Reply** reply);
 
-protected:
-	inline	uint32			_GetXID();
-			status_t		_StartListening();
+			status_t				Repair();
+
+	inline	const ServerAddress&	ID() const;
 
 private:
-			status_t		_Listener();
-	static	status_t		_ListenerThreadStart(void* ptr);
+	inline	uint32					_GetXID();
 
-			thread_id		fThread;
-			bool			fThreadCancel;
+			status_t				_StartListening();
 
-			RequestManager	fRequests;
-			Connection*		fConnection;
+			status_t				_Listener();
+	static	status_t				_ListenerThreadStart(void* ptr);
 
-			vint32			fXID;
-	static	const bigtime_t	kWaitTime	= 1000000;
+			thread_id				fThread;
+			bool					fThreadCancel;
+			status_t				fThreadError;
+
+			RequestManager			fRequests;
+			Connection*				fConnection;
+			const ServerAddress*	fAddress;
+
+			vint32					fXID;
+	static	const bigtime_t			kWaitTime	= 1000000;
 };
+
+inline const ServerAddress&
+Server::ID() const
+{
+	return *fAddress;
+}
 
 struct ServerNode {
 	ServerAddress	fID;
-	Server*		fServer;
-	int			fRefCount;
+	Server*			fServer;
+	int				fRefCount;
 
-	ServerNode*	fLeft;
-	ServerNode* fRight;
+	ServerNode*		fLeft;
+	ServerNode* 	fRight;
 };
 
 class ServerManager {
@@ -88,8 +100,7 @@ public:
 
 private:
 
-
-			ServerNode*	_Find(ServerAddress& id);
+			ServerNode*	_Find(const ServerAddress& id);
 			void		_Delete(ServerNode* node);
 			ServerNode*	_Insert(ServerNode* node);
 

@@ -60,7 +60,6 @@ RequestManager::FindRequest(uint32 xid)
 			if (fQueueHead == req)
 				fQueueHead = req->fNext;
 			mutex_unlock(&fLock);
-			dprintf("Found %x %x\n", (unsigned int)fQueueHead, (unsigned int)fQueueTail);
 
 			return req;
 		}
@@ -68,16 +67,16 @@ RequestManager::FindRequest(uint32 xid)
 		prev = req;
 		req = req->fNext;
 	}
-	dprintf("Nothing found\n");
 	mutex_unlock(&fLock);
 
 	return NULL;
 }
 
 
-Server::Server(Connection* conn)
+Server::Server(Connection* conn, ServerAddress* addr)
 	:
 	fConnection(conn),
+	fAddress(addr),
 	fXID(rand() << 1)
 {
 	_StartListening();
@@ -98,8 +97,8 @@ Server::~Server()
 status_t
 Server::_StartListening()
 {
-	dprintf("new thread\n");
 	fThreadCancel = false;
+	fThreadError = B_OK;
 	fThread = spawn_kernel_thread(&Server::_ListenerThreadStart,
 									"NFSv4 Listener", B_NORMAL_PRIORITY, this);
 	if (fThread < B_OK)
@@ -119,6 +118,9 @@ status_t
 Server::SendCall(Call* call, Reply** reply)
 {
 	status_t result;
+
+	if (fThreadError != B_OK)
+		return fThreadError;
 
 	Request* req = new(std::nothrow) Request;
 	if (req == NULL)
@@ -145,16 +147,21 @@ Server::SendCall(Call* call, Reply** reply)
 	return B_OK;
 
 out_cancel:
-	CancelCall(xid);
+	fRequests.FindRequest(xid);
 	delete req;
 	return result;
 }
 
 
-void
-Server::CancelCall(uint32 xid)
+status_t
+Server::Repair()
 {
-	fRequests.FindRequest(xid);
+	fThreadCancel = true;
+	status_t result = fConnection->Reconnect();
+	if (result != B_OK)
+		return result;
+	wait_for_thread(fThread, &result);
+	return _StartListening();
 }
 
 
@@ -174,12 +181,15 @@ Server::_Listener()
 
 	while (!fThreadCancel) {
 		result = fConnection->Receive(&buffer, &size);
-		if (result != B_OK)
+		if (result != B_OK) {
+			fThreadError = result;
 			return result;
+		}
 		
 		Reply* reply = new(std::nothrow) Reply(buffer, size);
 		if (reply == NULL) {
 			free(buffer);
+			fThreadError = result;
 			return B_NO_MEMORY;
 		}
 
@@ -212,6 +222,7 @@ ServerManager::ServerManager()
 
 ServerManager::~ServerManager()
 {
+	mutex_destroy(&fLock);
 }
 
 
@@ -235,7 +246,6 @@ ServerManager::Acquire(Server** pserv, uint32 ip, uint16 port, Transport proto)
 		return B_OK;
 	}
 	mutex_unlock(&fLock);
-	dprintf("creating\n");
 
 	node = new(std::nothrow) ServerNode;
 	if (node == NULL)
@@ -250,7 +260,7 @@ ServerManager::Acquire(Server** pserv, uint32 ip, uint16 port, Transport proto)
 		return result;
 	}
 
-	node->fServer = new Server(conn);
+	node->fServer = new Server(conn, &node->fID);
 	if (node->fServer == NULL) {
 		delete node;
 		delete conn;
@@ -283,9 +293,8 @@ ServerManager::Acquire(Server** pserv, uint32 ip, uint16 port, Transport proto)
 void
 ServerManager::Release(Server* serv)
 {
-#if 0
 	mutex_lock(&fLock);
-	ServerNode* node = _Find(serv->GetID());
+	ServerNode* node = _Find(serv->ID());
 	if (node != NULL) {
 		node->fRefCount--;
 
@@ -298,16 +307,14 @@ ServerManager::Release(Server* serv)
 		delete node->fServer;
 		delete node;
 	}
-#endif
 }
 
 
 ServerNode*
-ServerManager::_Find(ServerAddress& id)
+ServerManager::_Find(const ServerAddress& id)
 {
 	ServerNode* node = fRoot;
 	while (node != NULL) {
-		dprintf("passing addr: %x port %d proto: %d\n", (int)node->fID.fAddress, (int)node->fID.fPort, (int)node->fID.fProtocol);
 		if (node->fID == id)
 			return node;
 		if (node->fID < id)
@@ -317,6 +324,67 @@ ServerManager::_Find(ServerAddress& id)
 	}
 
 	return node;
+}
+
+
+void
+ServerManager::_Delete(ServerNode* node)
+{
+	bool found = false;
+	ServerNode* previous = NULL;
+	ServerNode* current = fRoot;
+	while (current != NULL) {
+		if (current->fID == node->fID) {
+			found = true;
+			break;
+		}
+
+		if (current->fID < node->fID) {
+			previous = current;
+			current = current->fRight;
+		} else {
+			previous = current;
+			current = current->fLeft;
+		}
+	}
+
+	if (!found)
+		return;
+
+	if (previous == NULL)
+		fRoot = NULL;
+	else if (current->fLeft == NULL && current->fRight == NULL) {
+		if (previous->fID < node->fID)
+			previous->fRight = NULL;
+		else
+			previous->fLeft = NULL;
+	} else if (current->fLeft != NULL && current->fRight == NULL) {
+		if (previous->fID < node->fID)
+			previous->fRight = current->fLeft;
+		else
+			previous->fLeft = current->fLeft;
+	} else if (current->fLeft == NULL && current->fRight != NULL) {
+		if (previous->fID < node->fID)
+			previous->fRight = current->fRight;
+		else
+			previous->fLeft = current->fRight;
+	} else {
+		ServerNode* left_prev = current;
+		ServerNode*	left = current->fLeft;
+
+		while (left->fLeft != NULL) {
+			left_prev = left;
+			left = left->fLeft;
+		}
+
+		if (previous->fID < node->fID)
+			previous->fRight = left;
+		else
+			previous->fLeft = left;
+
+
+		left_prev->fLeft = NULL;
+	}
 }
 
 
