@@ -10,6 +10,11 @@
 #include <fs_interface.h>
 
 #include "Connection.h"
+#include "RPCServer.h"
+
+
+#define NFS_PROC_NULL		0
+#define NFS_PROC_COMPOUND	1
 
 
 extern fs_volume_ops gNFSv4VolumeOps;
@@ -19,11 +24,26 @@ extern "C" void
 dprintf(const char* format, ...);
 
 
+RPC::ServerManager* gRPCServerManager;
+
+
 static status_t
 nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 			const char* args, ino_t* _rootVnodeID)
 {
 	dprintf("NFS4 Mounting...\n");
+
+	RPC::Server *s;
+	// hardcoded ip 192.168.1.70
+	gRPCServerManager->Acquire(&s, 0xc0a80146, 2049, ProtocolTCP);
+	
+	RPC::Reply *r;
+	RPC::Call *c = RPC::Call::Create(NFS_PROC_NULL, RPC::Auth::CreateSys(),
+										RPC::Auth::CreateNone());
+	s->SendCall(c, &r);
+	delete r;
+	delete c;
+	gRPCServerManager->Release(s);
 
 	volume->ops = &gNFSv4VolumeOps;
 
@@ -55,26 +75,44 @@ nfs4_put_vnode(fs_volume* volume, fs_vnode* vnode, bool reenter)
 }
 
 
+status_t
+nfs4_init()
+{
+	dprintf("NFS4 Init\n");
+
+	status_t result = Connection::Init();
+	if (result != B_OK)
+		return result;
+
+	gRPCServerManager = new(std::nothrow) RPC::ServerManager;
+	if (gRPCServerManager == NULL)
+		return B_NO_MEMORY;
+	return B_OK;
+}
+
+
+status_t
+nfs4_uninit()
+{
+	dprintf("NFS4 Uninit\n");
+
+	delete gRPCServerManager;
+
+	status_t result = Connection::CleanUp();
+	if (result != B_OK)
+		return result;
+	return B_OK;
+}
+
+
 static status_t
 nfs4_std_ops(int32 op, ...)
 {
-	status_t result;
-
 	switch (op) {
 		case B_MODULE_INIT:
-			dprintf("NFS4 Init\n");
-			result = Connection::Init();
-			if (result != B_OK)
-				return result;
-			return B_OK;
-
+			return nfs4_init();
 		case B_MODULE_UNINIT:
-			dprintf("NFS4 Uninit\n");
-			result = Connection::CleanUp();
-			if (result != B_OK)
-				return result;
-			return B_OK;
-
+			return nfs4_uninit();
 		default:
 			return B_ERROR;
 	}
