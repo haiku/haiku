@@ -62,22 +62,21 @@ protected:
 		uint8				fTerminalID;
 		usb_pipe			fStreamEndpoint;
 		bool				fIsRunning;
-/*		uint32				fHWChannel;*/
 		area_id				fArea;
+		size_t				fAreaSize;
 		usb_iso_packet_descriptor*	fDescriptors;
 		size_t						fDescriptorsCount;
 		size_t				fCurrentBuffer;
 		uint32				fStartingFrame;
 		size_t				fSamplesCount;
+		size_t				fPacketSize;
 		int32				fProcessedBuffers;
-//		void*				fBuffersPhysAddress;
-/*		bigtime_t			fRealTime;
-		bigtime_t			fFramesCount;
-		int32				fBufferCycle;
-public:
-		uint32				fCSP; */
+		_multi_format		fFormat;
+
 private:
-		status_t			_QueueNextTransfer(size_t buffer);
+		status_t			_ChooseAlternate();
+		status_t			_SetupBuffers();
+		status_t			_QueueNextTransfer(size_t buffer, bool start);
 static	void				_TransferCallback(void *cookie, int32 status,
 								void *data, uint32 actualLength);
 		void				_DumpDescriptors();

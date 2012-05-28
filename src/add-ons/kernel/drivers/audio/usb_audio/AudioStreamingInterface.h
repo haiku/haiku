@@ -40,11 +40,12 @@ public:
 							~ASEndpointDescriptor();
 
 // protected:
-		uint8				fAttributes;
+		uint8				fCSAttributes;
 		uint8				fLockDelayUnits;
 		uint16				fLockDelay;
 		uint16				fMaxPacketSize;
 		uint8				fEndpointAddress;
+		uint8				fEndpointAttributes;
 };
 
 
@@ -113,11 +114,22 @@ public:
 		ASEndpointDescriptor*	Endpoint()	{ return fEndpoint;	 }
 		_ASFormatDescriptor*	Format()	{ return fFormat;	 }
 
+		status_t				SetSamplingRate(uint32 newRate);
+		status_t				SetSamplingRateById(uint32 newId);
+		uint32					GetSamplingRate() { return fSamplingRate; }
+		uint32					GetSamplingRateId(uint32 rate);
+		uint32					GetSamplingRateIds();
+		uint32					GetFormatId();
+		status_t				SetFormatId(uint32 newFormatId);
+		uint32					SamplingRateFromId(uint32 id);
+
 protected:
+
 		size_t					fAlternate;
 		ASInterfaceDescriptor*	fInterface;
 		ASEndpointDescriptor*	fEndpoint;
 		_ASFormatDescriptor*	fFormat;
+		uint32					fSamplingRate;
 };
 
 

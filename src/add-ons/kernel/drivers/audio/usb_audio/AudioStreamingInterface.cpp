@@ -11,6 +11,29 @@
 #include "audio.h"
 
 
+static struct RatePair {
+	uint32 rate;
+	uint32 rateId;
+} ratesMap[] = {
+	{ 8000, B_SR_8000 },
+	{ 11025, B_SR_11025 },
+	{ 12000, B_SR_12000 },
+	{ 16000, B_SR_16000 },
+	{ 22050, B_SR_22050 },
+	{ 24000, B_SR_24000 },
+	{ 32000, B_SR_32000 },
+	{ 44100, B_SR_44100 },
+	{ 48000, B_SR_48000 },
+	{ 64000, B_SR_64000 },
+	{ 88200, B_SR_88200 },
+	{ 96000, B_SR_96000 },
+	{ 176400, B_SR_176400 },
+	{ 192000, B_SR_192000 },
+	{ 384000, B_SR_384000 },
+	{ 1536000, B_SR_1536000 }
+};
+
+
 //
 //	Audio Stream information entities
 //
@@ -44,28 +67,31 @@ ASInterfaceDescriptor::~ASInterfaceDescriptor()
 ASEndpointDescriptor::ASEndpointDescriptor(usb_endpoint_descriptor* Endpoint,
 					usb_as_cs_endpoint_descriptor* Descriptor)
 			:
-			fAttributes(0),
+			fCSAttributes(0),
 			fLockDelayUnits(0),
 			fLockDelay(0),
 			fMaxPacketSize(0),
-			fEndpointAddress(0)
+			fEndpointAddress(0),
+			fEndpointAttributes(0)
 {
 //	usb_audiocontrol_header_descriptor *Header
 //		= (usb_audiocontrol_header_descriptor *)Interface->generic[i];
 
-	fAttributes = Descriptor->attributes;
+	fCSAttributes = Descriptor->attributes;
 	fLockDelayUnits = Descriptor->lock_delay_units;
 	fLockDelay = Descriptor->lock_delay;
 
 //	usb_endpoint_descriptor* endpoint = Interface->endpoint[0]->descr;
+	fEndpointAttributes = Endpoint->attributes;
 	fEndpointAddress = Endpoint->endpoint_address;
 	fMaxPacketSize = Endpoint->max_packet_size;
 
-	TRACE("fAttributes:%d\n", fAttributes);
+	TRACE("fCSAttributes:%d\n", fCSAttributes);
 	TRACE("fLockDelayUnits:%d\n", fLockDelayUnits);
 	TRACE("fLockDelay:%d\n", fLockDelay);
 	TRACE("fMaxPacketSize:%d\n", fMaxPacketSize);
 	TRACE("fEndpointAddress:%#02x\n", fEndpointAddress);
+	TRACE("fEndpointAttributes:%d\n", fEndpointAttributes);
 }
 
 
@@ -186,8 +212,10 @@ AudioStreamAlternate::AudioStreamAlternate(size_t alternate,
 			fAlternate(alternate),
 			fInterface(interface),
 			fEndpoint(endpoint),
-			fFormat(format)
+			fFormat(format),
+			fSamplingRate(0)
 {
+	// SetSamplingRate(0); // init to default (max) sampling rate
 }
 
 
@@ -196,6 +224,166 @@ AudioStreamAlternate::~AudioStreamAlternate()
 	delete fInterface;
 	delete fEndpoint;
 	delete fFormat;
+}
+
+
+status_t
+AudioStreamAlternate::SetSamplingRate(uint32 newRate)
+{
+	TypeIFormatDescriptor* format
+		= static_cast<TypeIFormatDescriptor*>(Format());
+
+	if (format == NULL) {
+		TRACE_ALWAYS("Format not set for active alternate\n");
+		return B_NO_INIT;
+	}
+	
+	Vector<uint32>& frequencies = format->fSampleFrequencies;
+	bool continuous = format->fSampleFrequencyType == 0;
+	
+	if (newRate == 0) { // by default select max available
+		fSamplingRate = 0;
+		if (continuous)
+			fSamplingRate = max_c(frequencies[0], frequencies[1]);
+		else
+			for (int i = 0; i < frequencies.Count(); i++)
+				fSamplingRate = max_c(fSamplingRate, frequencies[i]);
+	} else {
+		if (continuous) {
+			uint32 min = min_c(frequencies[0], frequencies[1]);
+			uint32 max = max_c(frequencies[0], frequencies[1]);
+			if (newRate < min || newRate > max) {
+				TRACE_ALWAYS("Rate %d outside of %d - %d ignored.\n",
+					newRate, min, max);
+				return B_BAD_INDEX;
+			}
+			fSamplingRate = newRate;
+		} else {
+			for (int i = 0; i < frequencies.Count(); i++)
+				if (newRate == frequencies[i]) {
+					fSamplingRate = newRate;
+					return B_OK;
+				}
+				TRACE_ALWAYS("Rate %d not found - ignore it.\n", newRate);
+				return B_BAD_INDEX;
+		}
+	}
+
+//	newRate = fSamplingRate;
+	return B_OK;
+}
+
+
+uint32
+AudioStreamAlternate::GetSamplingRateId(uint32 rate)
+{
+	if (rate == 0)
+		rate = fSamplingRate;
+
+	for (size_t i = 0; i < _countof(ratesMap); i++)
+		if (ratesMap[i].rate == rate)
+			return ratesMap[i].rateId;
+
+	TRACE_ALWAYS("Ignore unsupported sample rate %d.\n", rate);
+	return 0;
+}
+
+
+uint32
+AudioStreamAlternate::GetSamplingRateIds()
+{
+	TypeIFormatDescriptor* format
+		= static_cast<TypeIFormatDescriptor*>(Format());
+
+	if (format == NULL) {
+		TRACE_ALWAYS("Format not set for active alternate\n");
+		return 0;
+	}
+	
+	uint32 rates = 0;
+	Vector<uint32>& frequencies = format->fSampleFrequencies;
+	if (format->fSampleFrequencyType == 0) { // continuous frequencies
+		uint32 min = min_c(frequencies[0], frequencies[1]);
+		uint32 max = max_c(frequencies[0], frequencies[1]);
+
+		for (int i = 0; i < frequencies.Count(); i++) {
+			if (frequencies[i] < min || frequencies[i] > max)
+				continue;
+			rates |= GetSamplingRateId(frequencies[i]);
+		}
+	} else
+		for (int i = 0; i < frequencies.Count(); i++)
+			rates |= GetSamplingRateId(frequencies[i]);
+
+	return rates;
+}
+
+
+uint32
+AudioStreamAlternate::GetFormatId()
+{
+	TypeIFormatDescriptor* format
+		= static_cast<TypeIFormatDescriptor*>(Format());
+
+	if (format == NULL || Interface() == NULL) {
+		TRACE_ALWAYS("Ignore alternate due format "
+			"%#08x or interface %#08x null.\n", format, Interface());
+		return 0;
+	}
+
+	uint32 formats = 0;
+	switch (Interface()->fFormatTag) {
+		case UAF_PCM8: formats = B_FMT_8BIT_U; break;
+		case UAF_IEEE_FLOAT: formats = B_FMT_FLOAT; break;
+		case UAF_PCM:
+			switch(format->fBitResolution) {
+				case 8: formats = B_FMT_8BIT_S; break;
+				case 16: formats = B_FMT_16BIT; break;
+				case 18: formats = B_FMT_18BIT; break;
+				case 20: formats = B_FMT_20BIT; break;
+				case 24: formats = B_FMT_24BIT; break;
+				case 32: formats = B_FMT_32BIT; break;
+				default:
+					TRACE_ALWAYS("Ignore unsupported "
+						"bit resolution %d for alternate.\n",
+						format->fBitResolution);
+					break;
+			}
+			break;
+		default:
+			TRACE_ALWAYS("Ignore unsupported "
+				"format bit resolution %d for alternate.\n",
+				Interface()->fFormatTag);
+			break;
+	}
+	
+	return formats;
+}
+
+
+uint32
+AudioStreamAlternate::SamplingRateFromId(uint32 id)
+{
+	for (size_t i = 0; i < _countof(ratesMap); i++)
+		if (ratesMap[i].rateId == id)
+			return ratesMap[i].rate;
+
+	TRACE_ALWAYS("Unknown sample rate id: %d.\n", id);
+	return 0;
+}
+
+
+status_t
+AudioStreamAlternate::SetSamplingRateById(uint32 newId)
+{
+	return SetSamplingRate(SamplingRateFromId(newId));
+}
+
+
+status_t
+AudioStreamAlternate::SetFormatId(uint32 /*newFormatId*/)
+{
+	return B_OK; // TODO
 }
 
 
@@ -329,9 +517,8 @@ AudioStreamingInterface::GetFormatsAndRates(multi_description *Description)
 	Description->interface_flags
 		|= fIsInput ? B_MULTI_INTERFACE_RECORD : B_MULTI_INTERFACE_PLAYBACK;
 
-	uint32 rates = 0;
-	uint32 formats = 0;
-
+//	uint32 rates = 0;
+/*
 	TypeIFormatDescriptor* format
 		= static_cast<TypeIFormatDescriptor*>(
 				fAlternates[fActiveAlternate]->Format());
@@ -373,27 +560,9 @@ AudioStreamingInterface::GetFormatsAndRates(multi_description *Description)
 			}
 		}
 	}
-
-	switch (fAlternates[fActiveAlternate]->Interface()->fFormatTag) {
-		case UAF_PCM8:			formats = B_FMT_8BIT_U;	break;
-		case UAF_IEEE_FLOAT:	formats = B_FMT_FLOAT;	break;
-		case UAF_PCM:
-			switch(format->fBitResolution) {
-				case 8: formats = B_FMT_8BIT_S; break;
-				case 16: formats = B_FMT_16BIT; break;
-				case 18: formats = B_FMT_18BIT; break;
-				case 20: formats = B_FMT_20BIT; break;
-				case 24: formats = B_FMT_24BIT; break;
-				case 32: formats = B_FMT_32BIT; break;
-					break;
-				default:
-					TRACE_ALWAYS("Ignore unsupported "
-							"bit resolution %d for alternate %d.\n",
-						format->fBitResolution, fActiveAlternate);
-					break;
-			}
-			break;
-	}
+*/
+	uint32 rates = fAlternates[fActiveAlternate]->GetSamplingRateIds();
+	uint32 formats = fAlternates[fActiveAlternate]->GetFormatId();
 
 	if (fIsInput) {
 		Description->input_rates = rates;

@@ -81,6 +81,7 @@ virtual	status_t			StopDevice();
 		bool				fRemoved;
 		vint32				fInsideNotify;
 		usb_device			fDevice;
+		uint16				fUSBVersion;
 		uint16				fVendorID;
 		uint16				fProductID;
 const	char *				fDescription;
@@ -116,9 +117,9 @@ protected:
 //		uint16				fFrameSize;
 
 		// pipes for notifications and data io
-		usb_pipe			fControlEndpoint;
-		usb_pipe			fInStreamEndpoint;
-		usb_pipe			fOutStreamEndpoint;
+//		usb_pipe			fControlEndpoint;
+//		usb_pipe			fInStreamEndpoint;
+//		usb_pipe			fOutStreamEndpoint;
 
 		// data stores for async usb transfers
 		uint32				fActualLengthRead;

@@ -23,9 +23,9 @@ Device::Device(usb_device device)
 			fDevice(device),
 			fNonBlocking(false),
 			fAudioControl(this),
-			fControlEndpoint(0),
-			fInStreamEndpoint(0),
-			fOutStreamEndpoint(0),
+		//	fControlEndpoint(0),
+		//	fInStreamEndpoint(0),
+		//	fOutStreamEndpoint(0),
 			fNotifyReadSem(-1),
 			fNotifyWriteSem(-1),
 			fNotifyBuffer(NULL),
@@ -42,6 +42,7 @@ Device::Device(usb_device device)
 
 	fVendorID = deviceDescriptor->vendor_id;
 	fProductID = deviceDescriptor->product_id;
+	fUSBVersion = deviceDescriptor->usb_version;
 
 	fNotifyReadSem = create_sem(0, DRIVER_NAME"_notify_read");
 	if (fNotifyReadSem < B_OK) {
@@ -155,9 +156,9 @@ Device::Close()
 	// wait until possible notification handling finished...
 	while (atomic_add(&fInsideNotify, 0) != 0)
 		snooze(100);
-	gUSBModule->cancel_queued_transfers(fControlEndpoint);
-	gUSBModule->cancel_queued_transfers(fInStreamEndpoint);
-	gUSBModule->cancel_queued_transfers(fOutStreamEndpoint);
+//	gUSBModule->cancel_queued_transfers(fControlEndpoint);
+//	gUSBModule->cancel_queued_transfers(fInStreamEndpoint);
+//	gUSBModule->cancel_queued_transfers(fOutStreamEndpoint);
 
 	fOpen = false;
 
@@ -289,9 +290,9 @@ Device::Removed()
 	while (atomic_add(&fInsideNotify, 0) != 0)
 		snooze(100);
 
-	gUSBModule->cancel_queued_transfers(fControlEndpoint);
-	gUSBModule->cancel_queued_transfers(fInStreamEndpoint);
-	gUSBModule->cancel_queued_transfers(fOutStreamEndpoint);
+//	gUSBModule->cancel_queued_transfers(fControlEndpoint);
+//	gUSBModule->cancel_queued_transfers(fInStreamEndpoint);
+//	gUSBModule->cancel_queued_transfers(fOutStreamEndpoint);
 /*
 	if (fLinkStateChangeSem >= B_OK)
 		release_sem_etc(fLinkStateChangeSem, 1, B_DO_NOT_RESCHEDULE);
@@ -415,7 +416,7 @@ Device::_MultiGetDescription(multi_description *multiDescription)
 	TraceMultiDescription(&Description, Channels);
 
 	if (user_memcpy(multiDescription, &Description,
-				sizeof(multi_description)) != B_OK) {
+		sizeof(multi_description)) != B_OK) {
 		return B_BAD_ADDRESS;
 	}
 
@@ -555,6 +556,10 @@ Device::_MultiGetBuffers(multi_buffer_list* List)
 		List->request_record_channels,
 		List->request_record_buffer_size);
 
+	List->flags = 0;
+	List->return_playback_channels = 0;
+	List->return_record_channels = 0;
+	
 	for (int i = 0; i < fStreams.Count() && status == B_OK; i++) {
 		status = fStreams[i]->GetBuffers(List);
 	}
@@ -564,18 +569,23 @@ Device::_MultiGetBuffers(multi_buffer_list* List)
 
 
 status_t
-Device::_MultiBufferExchange(multi_buffer_info* Info)
+Device::_MultiBufferExchange(multi_buffer_info* multiInfo)
 {
+	multi_buffer_info Info;
+	if (user_memcpy(&Info, multiInfo, sizeof(multi_buffer_info)) != B_OK)
+		return B_BAD_ADDRESS;
+
 	for (int i = 0; i < fStreams.Count(); i++) {
 		if (!fStreams[i]->IsRunning()) {
 			fStreams[i]->Start();
 		}
 	}
 
-	TRACE_ALWAYS("Exchange!\n");
+//	TRACE_ALWAYS("Exchange!\n");
+/*
 	snooze(1000000);
 	return B_OK;
-
+*/
 	status_t status = B_ERROR;
 	bool anyBufferProcessed = false;
 	for (int i = 0; i < fStreams.Count() && !anyBufferProcessed; i++) {
@@ -586,9 +596,12 @@ Device::_MultiBufferExchange(multi_buffer_info* Info)
 			break;
 		}
 
-		anyBufferProcessed = fStreams[i]->ExchangeBuffer(Info);
+		anyBufferProcessed = fStreams[i]->ExchangeBuffer(&Info);
 		status = anyBufferProcessed ? B_OK : B_ERROR;
 	}
+
+	if (user_memcpy(multiInfo, &Info, sizeof(multi_buffer_info)) != B_OK)
+		return B_BAD_ADDRESS;
 
 	return status;
 }
@@ -713,7 +726,7 @@ Device::_SetupEndpoints()
 status_t
 Device::StopDevice()
 {
-	status_t result = B_OK; // WriteRXControlRegister(0);
+	status_t result = B_OK;
 
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of writing %#04x RX Control:%#010x\n", 0, result);
