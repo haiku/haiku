@@ -67,7 +67,7 @@ RequestBuilder::GetAttr(Attribute* attrs, uint32 count)
 	uint32 bitmap[2];
 	memset(bitmap, 0, sizeof(bitmap));
 	for (uint32 i = 0; i < count; i++) {
-		bitmap[(int)attrs[i] / 32] |= 1 << (int)attrs[i] % 32;
+		bitmap[attrs[i] / 32] |= 1 << attrs[i] % 32;
 	}
 
 	uint32 bcount = bitmap[1] != 0 ? 2 : 1;
