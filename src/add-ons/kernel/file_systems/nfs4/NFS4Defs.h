@@ -9,6 +9,13 @@
 #define NFS4DEFS_H
 
 
+#define NFS4_FHSIZE	128
+
+struct Filehandle {
+	uint8			fSize;
+	uint8			fFH[NFS4_FHSIZE];
+};
+
 enum Procedure {
 	ProcNull		= 0,
 	ProcCompound	= 1

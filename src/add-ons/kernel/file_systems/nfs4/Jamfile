@@ -5,6 +5,7 @@ UsePrivateHeaders kernel ;
 KernelAddon nfs4 :
 	Connection.cpp
 	kernel_interface.cpp
+	ReplyInterpreter.cpp
 	RequestBuilder.cpp
 	RPCAuth.cpp
 	RPCCall.cpp
