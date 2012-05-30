@@ -138,6 +138,7 @@ extern bool			cancel_timer(timer *t);
 /* kernel threads */
 extern thread_id	spawn_kernel_thread(thread_func function,
 						const char *name, int32 priority, void *arg);
+extern status_t		interrupt_thread(thread_id id);
 
 /* signal functions */
 extern int			send_signal_etc(pid_t thread, uint signal, uint32 flags);

@@ -86,6 +86,8 @@ Server::Server(Connection* conn, ServerAddress* addr)
 Server::~Server()
 {
 	fThreadCancel = true;
+	fConnection->Disconnect();
+	interrupt_thread(fThread);
 
 	delete fConnection;
 
@@ -157,9 +159,12 @@ status_t
 Server::Repair()
 {
 	fThreadCancel = true;
+	interrupt_thread(fThread);
+
 	status_t result = fConnection->Reconnect();
 	if (result != B_OK)
 		return result;
+
 	wait_for_thread(fThread, &result);
 	return _StartListening();
 }
@@ -197,7 +202,8 @@ Server::_Listener()
 		if (req != NULL) {
 			*req->fReply = reply;
 			req->fEvent.NotifyAll();
-		}
+		} else
+			delete reply;
 	}
 
 	return B_OK;

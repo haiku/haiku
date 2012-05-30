@@ -39,6 +39,7 @@ public:
 	inline	status_t			Receive(void** buffer, uint32* size);
 
 			status_t			Reconnect();
+			void				Disconnect();
 
 	static	status_t			Init();
 	static	status_t			CleanUp();

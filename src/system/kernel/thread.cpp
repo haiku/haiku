@@ -3008,6 +3008,20 @@ kill_thread(thread_id id)
 
 
 status_t
+interrupt_thread(thread_id id)
+{
+	Thread* thread = Thread::GetAndLock(id);
+	if (thread == NULL)
+		return B_BAD_THREAD_ID;
+	BReference<Thread> threadReference(thread, true);
+	ThreadLocker threadLocker(thread, true);
+
+	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+	return thread_interrupt(thread, false);
+}
+
+
+status_t
 send_data(thread_id thread, int32 code, const void *buffer, size_t bufferSize)
 {
 	return send_data_etc(thread, code, buffer, bufferSize, 0);

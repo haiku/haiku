@@ -55,7 +55,8 @@ Connection::Connection(const sockaddr_in& addr, Transport proto, bool markers)
 
 Connection::~Connection()
 {
-	kclosesocket(fSock);
+	if (fSock != -1)
+		kclosesocket(fSock);
 	mutex_destroy(&fSockLock);
 }
 
@@ -184,6 +185,9 @@ Connection::_ReceivePacket(void** pbuffer, uint32* psize)
 		result = errno;
 		free(buffer);
 		return result;
+	} else if (size == 0) {
+		free(buffer);
+		return ECONNABORTED;
 	}
 
 	*pbuffer = buffer;
@@ -254,6 +258,15 @@ Connection::Reconnect()
 {
 	kclosesocket(fSock);
 	return _Connect();
+}
+
+
+void
+Connection::Disconnect()
+{
+	int sock = fSock;
+	fSock = -1;
+	kclosesocket(sock);
 }
 
 
