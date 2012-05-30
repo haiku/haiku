@@ -6,6 +6,7 @@
  *		Gerald Zajac
  */
 
+
 #include "accelerant.h"
 #include "i810_regs.h"
 
@@ -22,7 +23,7 @@ AccelerantEngineCount(void)
 
 status_t
 AcquireEngine(uint32 capabilities, uint32 maxWait,
-			sync_token* syncToken, engine_token** engineToken)
+	sync_token* syncToken, engine_token** engineToken)
 {
 	(void)capabilities;	// avoid compiler warning for unused arg
 	(void)maxWait;		// avoid compiler warning for unused arg
@@ -55,9 +56,9 @@ WaitEngineIdle(void)
 	// Wait until engine is idle.
 
 	int k = 10000000;
-	
+
 	while ((INREG16(INST_DONE) & 0x7B) != 0x7B && k > 0)
-		k--; 
+		k--;
 }
 
 
@@ -73,9 +74,9 @@ GetSyncToken(engine_token* engineToken, sync_token* syncToken)
 status_t
 SyncToToken(sync_token* syncToken)
 {
-	(void)syncToken;		// avoid compiler warning for unused arg
+	(void)syncToken;
+		// avoid compiler warning for unused arg
 
 	WaitEngineIdle();
 	return B_OK;
 }
-

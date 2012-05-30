@@ -6,6 +6,7 @@
  *		Gerald Zajac
  */
 
+
 #include <AGP.h>
 #include <KernelExport.h>
 #include <PCI.h>
@@ -47,18 +48,18 @@ struct ChipInfo {
 // This table maps a PCI device ID to a chip type identifier and the chip name.
 
 static const ChipInfo chipTable[] = {
-	{ 0x7121, "i810"	},
-	{ 0x7123, "i810-dc100"	},
-	{ 0x7125, "i810e"	},
-	{ 0x1132, "i815"	},
-	{ 0,    NULL }
+	{ 0x7121, "i810" },
+	{ 0x7123, "i810-dc100" },
+	{ 0x7125, "i810e" },
+	{ 0x1132, "i815" },
+	{ 0, NULL }
 };
 
 
 struct DeviceInfo {
-	uint32			openCount;		// count of how many times device has been opened
+	uint32			openCount;		// how many times device has been opened
 	int32			flags;
-	area_id 		sharedArea;		// area shared between driver and accelerants
+	area_id 		sharedArea;		// shared between driver and accelerants
 	SharedInfo* 	sharedInfo;		// pointer to shared info area memory
 	vuint8*	 		regs;			// pointer to memory mapped registers
 	const ChipInfo*	pChipInfo;		// info about the selected chip
@@ -76,13 +77,12 @@ static pci_module_info*	gPCI;
 
 
 // Prototypes for device hook functions.
-
 static status_t device_open(const char* name, uint32 flags, void** cookie);
 static status_t device_close(void* dev);
 static status_t device_free(void* dev);
 static status_t device_read(void* dev, off_t pos, void* buf, size_t* len);
 static status_t device_write(void* dev, off_t pos, const void* buf,
-					size_t* len);
+	size_t* len);
 static status_t device_ioctl(void* dev, uint32 msg, void* buf, size_t len);
 
 static device_hooks gDeviceHooks =
@@ -100,9 +100,8 @@ static device_hooks gDeviceHooks =
 };
 
 
-
 // Video chip register definitions.
-//=================================
+// =================================
 
 #define INTERRUPT_ENABLED		0x020a0
 #define INTERRUPT_MASK			0x020a8
@@ -116,14 +115,13 @@ static device_hooks gDeviceHooks =
 
 
 // Macros for memory mapped I/O.
-//==============================
+// ==============================
 
 #define INREG16(addr)		(*((vuint16*)(di.regs + (addr))))
 #define INREG32(addr)		(*((vuint32*)(di.regs + (addr))))
 
 #define OUTREG16(addr, val)	(*((vuint16*)(di.regs + (addr))) = (val))
 #define OUTREG32(addr, val)	(*((vuint32*)(di.regs + (addr))) = (val))
-
 
 
 static inline uint32
@@ -147,8 +145,8 @@ GetEdidFromBIOS(edid1_raw& edidRaw)
 {
 	// Get the EDID info from the video BIOS, and return B_OK if successful.
 
-#define ADDRESS_SEGMENT(address) ((addr_t)(address) >> 4)
-#define ADDRESS_OFFSET(address) ((addr_t)(address) & 0xf)
+	#define ADDRESS_SEGMENT(address) ((addr_t)(address) >> 4)
+	#define ADDRESS_OFFSET(address) ((addr_t)(address) & 0xf)
 
 	vm86_state vmState;
 
@@ -295,12 +293,12 @@ InitDevice(DeviceInfo& di)
 	if (di.gttArea < B_OK) {
 		TRACE("Unable to create GTT, error: 0x%lx\n", di.gttArea);
 		return B_NO_MEMORY;
-	}	
+	}
 
 	memset((void*)(di.gttAddr), 0, gttSize);
 
 	// Get the physical address of the GTT, and set GTT address in the chip.
-	
+
 	physical_entry entry;
 	status_t status = get_memory_map((void *)(di.gttAddr),
 		B_PAGE_SIZE, &entry, 1);
@@ -309,8 +307,8 @@ InitDevice(DeviceInfo& di)
 		return status;
 	}
 
-	OUTREG32(PAGE_TABLE_CONTROL, entry.address | PAGE_TABLE_ENABLED);	
-	INREG32(PAGE_TABLE_CONTROL);	
+	OUTREG32(PAGE_TABLE_CONTROL, entry.address | PAGE_TABLE_ENABLED);
+	INREG32(PAGE_TABLE_CONTROL);
 
 	// Allocate video memory to be used for the frame buffer.
 
@@ -395,7 +393,7 @@ GetNextSupportedDevice(uint32& pciIndex, pci_info& pciInfo)
 
 			while (pDevice->chipID != 0) {	// end of table?
 				if (pDevice->chipID == pciInfo.device_id)
-					return pDevice;		// matching device/chip found
+					return pDevice; // matching device/chip found
 
 				pDevice++;
 			}
@@ -404,9 +402,8 @@ GetNextSupportedDevice(uint32& pciIndex, pci_info& pciInfo)
 		pciIndex++;
 	}
 
-	return NULL;		// no supported device found
+	return NULL; // no supported device found
 }
-
 
 
 //	#pragma mark - Kernel Interface
@@ -471,8 +468,8 @@ init_driver(void)
 
 		// Compose device name.
 		sprintf(di.name, "graphics/" DEVICE_FORMAT,
-				  di.pciInfo.vendor_id, di.pciInfo.device_id,
-				  di.pciInfo.bus, di.pciInfo.device, di.pciInfo.function);
+			di.pciInfo.vendor_id, di.pciInfo.device_id,
+			di.pciInfo.bus, di.pciInfo.device, di.pciInfo.function);
 		TRACE("init_driver() match found; name: %s\n", di.name);
 
 		gDeviceNames[count] = di.name;
@@ -526,7 +523,6 @@ find_device(const char* name)
 }
 
 
-
 //	#pragma mark - Device Hooks
 
 
@@ -555,7 +551,7 @@ device_open(const char* name, uint32 /*flags*/, void** cookie)
 		if (status < B_OK)
 			DeleteAreas(di);	// error occurred; delete any areas created
 	}
-	
+
 	gLock.Release();
 
 	if (status == B_OK) {

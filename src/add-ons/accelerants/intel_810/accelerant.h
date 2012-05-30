@@ -5,12 +5,11 @@
  * Authors:
  *		Gerald Zajac
  */
-
 #ifndef _ACCELERANT_H
 #define _ACCELERANT_H
 
-#include "DriverInterface.h"
 
+#include "DriverInterface.h"
 
 
 #undef TRACE
@@ -24,7 +23,6 @@ extern "C" void  _sPrintf(const char* format, ...);
 
 
 // Global data used by various source files of the accelerant.
-
 struct AccelerantInfo {
 	int			deviceFileDesc;		// file descriptor of kernel driver
 
@@ -48,7 +46,7 @@ extern AccelerantInfo gInfo;
 // the functions that are unique to a particular chip family, will be prefixed
 // with the name of the family, and the functions that are applicable to all
 // chips will have no prefix.
-//================================================================
+// ================================================================
 
 #if defined(__cplusplus)
 extern "C" {
@@ -95,11 +93,9 @@ status_t SyncToToken(sync_token* st);
 #endif
 
 
-
 // Prototypes for other functions that are called from source files other than
 // where they are defined.
-//============================================================================
-
+// ============================================================================
 status_t CreateModeList(bool (*checkMode)(const display_mode* mode));
 bool	 IsModeUsable(const display_mode* mode);
 

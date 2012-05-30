@@ -34,6 +34,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 **************************************************************************/
 
+
 #include "accelerant.h"
 
 
@@ -104,7 +105,6 @@ static WatermarkInfo watermarks_16[] = {
 };
 
 
-
 uint32
 I810_GetWatermark(const DisplayModeEx& mode)
 {
@@ -115,16 +115,16 @@ I810_GetWatermark(const DisplayModeEx& mode)
 	// pixel clock.
 
 	switch (mode.bitsPerPixel) {
-	case 8:
-		table = watermarks_8;
-		tableLen = ARRAY_SIZE(watermarks_8);
-		break;
-	case 16:
-		table = watermarks_16;
-		tableLen = ARRAY_SIZE(watermarks_16);
-		break;
-	default:
-		return 0;
+		case 8:
+			table = watermarks_8;
+			tableLen = ARRAY_SIZE(watermarks_8);
+			break;
+		case 16:
+			table = watermarks_16;
+			tableLen = ARRAY_SIZE(watermarks_16);
+			break;
+		default:
+			return 0;
 	}
 
 	uint32 i;

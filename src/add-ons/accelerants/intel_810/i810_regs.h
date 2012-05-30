@@ -13,7 +13,6 @@
 	Copyright 1998-1999 Precision Insight, Inc., Cedar Park, Texas.
 	All Rights Reserved.
  */
-
 #ifndef __I810_REGS_H__
 #define __I810_REGS_H__
 
@@ -29,7 +28,7 @@
 #define EXT_HORIZ_TOTAL			0x35
 #define EXT_HORIZ_BLANK			0x39
 #define EXT_START_ADDR			0x40
-#define EXT_START_ADDR_ENABLE	0x80 
+#define EXT_START_ADDR_ENABLE	0x80
 #define EXT_OFFSET				0x41
 #define EXT_START_ADDR_HI		0x42
 #define INTERLACE_CNTL			0x70
@@ -123,37 +122,48 @@
 	(OUTREG(addr, (INREG(addr) & ~mask) | (value & mask)))
 
 
-static inline uint8 ReadCrtcReg(uint8 index)
+static inline uint8
+ReadCrtcReg(uint8 index)
 {
 	OUTREG8(CRTC_INDEX, index);
 	return INREG8(CRTC_DATA);
 }
 
-static inline void WriteCrtcReg(uint8 index, uint8 value)
+
+static inline void
+WriteCrtcReg(uint8 index, uint8 value)
 {
 	OUTREG8(CRTC_INDEX, index);
 	OUTREG8(CRTC_DATA, value);
 }
 
-static inline uint8 ReadGraphReg(uint8 index)
+
+static inline uint8
+ReadGraphReg(uint8 index)
 {
 	OUTREG8(GRAPH_INDEX, index);
 	return INREG8(GRAPH_DATA);
 }
 
-static inline void WriteGraphReg(uint8 index, uint8 value)
+
+static inline void
+WriteGraphReg(uint8 index, uint8 value)
 {
 	OUTREG8(GRAPH_INDEX, index);
 	OUTREG8(GRAPH_DATA, value);
 }
 
-static inline uint8 ReadSeqReg(uint8 index)
+
+static inline uint8
+ReadSeqReg(uint8 index)
 {
 	OUTREG8(SEQ_INDEX, index);
 	return INREG8(SEQ_DATA);
 }
 
-static inline void WriteSeqReg(uint8 index, uint8 value)
+
+static inline void
+WriteSeqReg(uint8 index, uint8 value)
 {
 	OUTREG8(SEQ_INDEX, index);
 	OUTREG8(SEQ_DATA, value);

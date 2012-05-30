@@ -1,17 +1,17 @@
 /*
  * Copyright 2007-2012 Haiku, Inc.  All rights reserved.
  * Distributed under the terms of the MIT license.
-
+ *
  * Authors:
  *		Gerald Zajac
  */
+
 
 #include "accelerant.h"
 
 #include <create_display_modes.h>		// common accelerant header file
 #include <string.h>
 #include <unistd.h>
-
 
 
 static bool
@@ -31,9 +31,8 @@ IsThereEnoughFBMemory(const display_mode* mode, uint32 bitsPerPixel)
 	uint32 bytesPerPixel = (bitsPerPixel + 7) / 8;
 
 	return (maxWidth * maxHeight * bytesPerPixel
-			<= gInfo.sharedInfo->maxFrameBufferSize);
+		<= gInfo.sharedInfo->maxFrameBufferSize);
 }
-
 
 
 bool
@@ -101,7 +100,7 @@ CreateModeList(bool (*checkMode)(const display_mode* mode))
 				TRACE("CreateModeList(); EDID version %d.%d out of range\n",
 					rawEdid.version.version, rawEdid.version.revision);
 			} else {
-				edid_decode(&si.edidInfo, &rawEdid);	// decode & save EDID info
+				edid_decode(&si.edidInfo, &rawEdid); // decode & save EDID info
 				si.bHaveEDID = true;
 			}
 		}
@@ -132,7 +131,6 @@ CreateModeList(bool (*checkMode)(const display_mode* mode))
 	gInfo.modeList = list;
 	return B_OK;
 }
-
 
 
 status_t
@@ -223,7 +221,6 @@ SetDisplayMode(display_mode* pMode)
 }
 
 
-
 status_t
 MoveDisplay(uint16 horizontalStart, uint16 verticalStart)
 {
@@ -269,7 +266,7 @@ GetModeList(display_mode* dmList)
 status_t
 GetDisplayMode(display_mode* current_mode)
 {
-	*current_mode = gInfo.sharedInfo->displayMode;	// return current display mode
+	*current_mode = gInfo.sharedInfo->displayMode; // current display mode
 	return B_OK;
 }
 
@@ -281,7 +278,7 @@ GetFrameBufferConfig(frame_buffer_config* pFBC)
 
 	pFBC->frame_buffer = (void*)((addr_t)(si.videoMemAddr));
 	pFBC->frame_buffer_dma = (void*)((addr_t)(si.videoMemPCI));
-	pFBC->bytes_per_row = si.displayMode.virtual_width 
+	pFBC->bytes_per_row = si.displayMode.virtual_width
 		* si.displayMode.bytesPerPixel;
 
 	return B_OK;
@@ -317,9 +314,7 @@ GetPixelClockLimits(display_mode* mode, uint32* low, uint32* high)
 }
 
 
-
 #ifdef __HAIKU__
-
 status_t
 GetEdidInfo(void* info, size_t size, uint32* _version)
 {
@@ -335,5 +330,4 @@ GetEdidInfo(void* info, size_t size, uint32* _version)
 	*_version = EDID_VERSION_1;
 	return B_OK;
 }
-
 #endif	// __HAIKU__

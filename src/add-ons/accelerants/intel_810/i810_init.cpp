@@ -19,10 +19,9 @@
 #include "i810_regs.h"
 
 
-
 bool
 I810_GetColorSpaceParams(int colorSpace, uint8& bitsPerPixel,
-						 uint32& maxPixelClock)
+	uint32& maxPixelClock)
 {
 	// Get parameters for a color space which is supported by the i810 chips.
 	// Argument maxPixelClock is in KHz.

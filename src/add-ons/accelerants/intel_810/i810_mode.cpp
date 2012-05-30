@@ -14,6 +14,7 @@
 	All Rights Reserved.
  */
 
+
 #include "accelerant.h"
 #include "i810_regs.h"
 
@@ -22,14 +23,13 @@
 #include <unistd.h>
 
 
-
 // I810_CalcVCLK -- Determine closest clock frequency to the one requested.
-
 #define MAX_VCO_FREQ 600.0
 #define TARGET_MAX_N 30
 #define REF_FREQ	 24.0
 
 #define CALC_VCLK(m,n,p) (double)m / ((double)n * (1 << p)) * 4 * REF_FREQ
+
 
 static void
 CalcVCLK(double freq, uint16& clkM, uint16& clkN, uint16& clkP) {
@@ -65,8 +65,8 @@ CalcVCLK(double freq, uint16& clkM, uint16& clkN, uint16& clkP) {
 			f_best = f_out;
 			errBest = f_err;
 		}
-	} while ((fabs(f_err) >= errTarget) &&
-			 ((n <= TARGET_MAX_N) || (fabs(errBest) > errMax)));
+	} while ((fabs(f_err) >= errTarget) && ((n <= TARGET_MAX_N)
+		|| (fabs(errBest) > errMax)));
 
 	if (fabs(f_err) < errTarget) {
 		m_best = m;
@@ -83,7 +83,7 @@ CalcVCLK(double freq, uint16& clkM, uint16& clkN, uint16& clkP) {
 }
 
 
-static void 
+static void
 SetCrtcTimingValues(const DisplayModeEx& mode)
 {
 	// Set the timing values for CRTC registers cr00 to cr18, and some extended
@@ -104,7 +104,7 @@ SetCrtcTimingValues(const DisplayModeEx& mode)
 	int vBlank_e = vTotal;			// end of vertical blanking
 
 	uint16 offset = mode.bytesPerRow / 8;
-	
+
 	// CRTC Controller values
 
 	uint8 crtc[25];
@@ -151,7 +151,7 @@ SetCrtcTimingValues(const DisplayModeEx& mode)
 		WriteCrtcReg(j, crtc[j]);
 
 	// Set the extended CRTC reg's.
-	
+
 	WriteCrtcReg(EXT_VERT_TOTAL, vTotal >> 8);
 	WriteCrtcReg(EXT_VERT_DISPLAY, vDisp_e >> 8);
 	WriteCrtcReg(EXT_VERT_SYNC_START, vSync_s >> 8);
@@ -161,7 +161,7 @@ SetCrtcTimingValues(const DisplayModeEx& mode)
 	WriteCrtcReg(EXT_OFFSET, offset >> 8);
 
 	WriteCrtcReg(INTERLACE_CNTL, INTERLACE_DISABLE);	// turn off interlace
-	
+
 	// Enable high resolution mode.
 	WriteCrtcReg(IO_CTNL, ReadCrtcReg(IO_CTNL) | EXTENDED_CRTC_CNTL);
 }
@@ -211,7 +211,7 @@ I810_SetDisplayMode(const DisplayModeEx& mode)
 
 	// Set the address mapping to use the frame buffer memory mapped via the
 	// GTT table instead of the VGA buffer.
-	
+
 	uint8 addrMapping = ReadGraphReg(ADDRESS_MAPPING);
 	addrMapping &= 0xE0;		// preserve reserved bits 7:5
 	addrMapping |= (GTT_MEM_MAP_ENABLE | LINEAR_MODE_ENABLE);
@@ -224,7 +224,7 @@ I810_SetDisplayMode(const DisplayModeEx& mode)
 	temp = INREG8(BITBLT_CNTL) & ~COLEXP_MODE;
 	temp |= (mode.bitsPerPixel == 8 ? COLEXP_8BPP : COLEXP_16BPP);
 	OUTREG8(BITBLT_CNTL, temp);
-	
+
 	// Turn on 8 bit dac mode so that the indexed colors are displayed properly,
 	// and put display in high resolution mode.
 
@@ -236,15 +236,15 @@ I810_SetDisplayMode(const DisplayModeEx& mode)
 	OUTREG16(EIR, 0);
 
 	temp32 = INREG32(FWATER_BLC);
-	temp32 &= ~(LM_BURST_LENGTH | LM_FIFO_WATERMARK |
-			   MM_BURST_LENGTH | MM_FIFO_WATERMARK);
+	temp32 &= ~(LM_BURST_LENGTH | LM_FIFO_WATERMARK
+		| MM_BURST_LENGTH | MM_FIFO_WATERMARK);
 	temp32 |= I810_GetWatermark(mode);
 	OUTREG32(FWATER_BLC, temp32);
 
 	// Enable high resolution mode.
 	WriteCrtcReg(IO_CTNL, ReadCrtcReg(IO_CTNL) | EXTENDED_CRTC_CNTL);
 
-	I810_AdjustFrame(mode);		
+	I810_AdjustFrame(mode);
 	return B_OK;
 }
 
@@ -255,13 +255,13 @@ I810_AdjustFrame(const DisplayModeEx& mode)
 	// Adjust start address in frame buffer.
 
 	uint32 address = ((mode.v_display_start * mode.virtual_width
-			+ mode.h_display_start) * mode.bytesPerPixel) >> 2;
+		+ mode.h_display_start) * mode.bytesPerPixel) >> 2;
 
 	WriteCrtcReg(START_ADDR_LO, address & 0xff);
 	WriteCrtcReg(START_ADDR_HI, (address >> 8) & 0xff);
 	WriteCrtcReg(EXT_START_ADDR_HI, (address >> 22) & 0xff);
 	WriteCrtcReg(EXT_START_ADDR,
-			((address >> 16) & 0x3f) | EXT_START_ADDR_ENABLE);
+		((address >> 16) & 0x3f) | EXT_START_ADDR_ENABLE);
 }
 
 

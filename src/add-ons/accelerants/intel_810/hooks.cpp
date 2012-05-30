@@ -6,13 +6,15 @@
  *		Gerald Zajac
  */
 
+
 #include "accelerant.h"
 
 
 extern "C" void*
 get_accelerant_hook(uint32 feature, void* data)
 {
-	(void)data;		// avoid compiler warning for unused arg
+	(void)data;
+		// avoid compiler warning for unused arg
 
 	switch (feature) {
 		// General

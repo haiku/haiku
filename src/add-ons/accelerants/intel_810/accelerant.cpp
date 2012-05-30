@@ -6,12 +6,12 @@
  *		Gerald Zajac
  */
 
+
 #include "accelerant.h"
 
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
-
 
 
 AccelerantInfo gInfo;	// global data used by source files of accelerant
@@ -32,7 +32,7 @@ SuppressArtifacts(void* dataPtr)
 	// the video memory.  This is because some artifacts still occur at the
 	// top of the screen if the accessed memory is at the beginning of the
 	// video memory.
-	
+
 	// Note that this function will reduce the general performance of a
 	// computer somewhat, but it is much less of a hit than if double
 	// buffering was used for the video.  Base on the frame rate of the
@@ -40,8 +40,7 @@ SuppressArtifacts(void* dataPtr)
 
 	SharedInfo& si = *((SharedInfo*)dataPtr);
 
-	while (true)
-	{
+	while (true) {
 		uint32* src = ((uint32*)(si.videoMemAddr)) + si.videoMemSize / 4 - 1;
 		uint32 count = 65000;
 
@@ -74,13 +73,13 @@ InitCommon(int fileDesc)
 		(void**)&(gInfo.sharedInfo), B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 		sharedArea);
 	if (gInfo.sharedInfoArea < 0)
-		return gInfo.sharedInfoArea;	// sharedInfoArea has error code
+		return gInfo.sharedInfoArea; // sharedInfoArea has error code
 
 	gInfo.regsArea = clone_area("i810 regs area", (void**)&(gInfo.regs),
 		B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, gInfo.sharedInfo->regsArea);
 	if (gInfo.regsArea < 0) {
 		delete_area(gInfo.sharedInfoArea);
-		return gInfo.regsArea;		// regsArea has error code
+		return gInfo.regsArea; // regsArea has error code
 	}
 
 	return B_OK;
@@ -129,7 +128,7 @@ InitAccelerant(int fileDesc)
 					// Ensure that this function won't be executed again
 					// (copies should be clones)
 					si.bAccelerantInUse = true;
-					
+
 					thread_id threadID = spawn_thread(SuppressArtifacts,
 						"SuppressArtifacts_Thread", B_DISPLAY_PRIORITY,
 						gInfo.sharedInfo);
