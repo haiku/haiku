@@ -20,9 +20,11 @@ public:
 						Inode(Filesystem* fs, const Filehandle &fh);
 
 	inline	ino_t		ID() const;
+	inline	mode_t		Type() const;
 
 private:
 			uint64		fFileId;
+			uint32		fType;
 
 			Filehandle	fHandle;
 			Filesystem*	fFilesystem;
@@ -37,6 +39,13 @@ Inode::ID() const
 	else
 		return (ino_t)fFileId ^ (fFileId >>
 					(sizeof(uint64) - sizeof(ino_t)) * 8);
+}
+
+
+inline mode_t
+Inode::Type() const
+{
+	return sNFSFileTypeToHaiku[fType];
 }
 
 

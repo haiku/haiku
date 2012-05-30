@@ -11,10 +11,11 @@
 
 #include "Connection.h"
 #include "RPCServer.h"
-
-
-#define NFS_PROC_NULL		0
-#define NFS_PROC_COMPOUND	1
+#include "NFS4Defs.h"
+#include "Inode.h"
+#include "RequestBuilder.h"
+#include "ReplyInterpreter.h"
+#include "Filesystem.h"
 
 
 extern fs_volume_ops gNFSv4VolumeOps;
@@ -31,30 +32,33 @@ static status_t
 nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 			const char* args, ino_t* _rootVnodeID)
 {
-	dprintf("NFS4 Mounting...\n");
+	status_t result;
 
-	RPC::Server *s;
+	RPC::Server *server;
 	// hardcoded ip 192.168.1.70
-	gRPCServerManager->Acquire(&s, 0xc0a80146, 2049, ProtocolTCP);
+	result = gRPCServerManager->Acquire(&server, 0xc0a80146, 2049, ProtocolUDP);
+	if (result != B_OK)
+		return result;
 	
-	RPC::Reply *r;
-	RPC::Call *c = RPC::Call::Create(NFS_PROC_NULL, RPC::Auth::CreateSys(),
-										RPC::Auth::CreateNone());
-	s->SendCall(c, &r);
-	delete r;
-	delete c;
-	gRPCServerManager->Release(s);
+	Filesystem* fs;
+	// hardcoded path
+	result = Filesystem::Mount(&fs, server, "haiku/src/add-ons/kernel");
+	if (result != B_OK) {
+		gRPCServerManager->Release(server);
+		return result;
+	}
 
+	Inode* inode = fs->CreateRootInode();
+
+	volume->private_volume = fs;
 	volume->ops = &gNFSv4VolumeOps;
 
-	status_t error = publish_vnode(volume, 0, (void*)0xdeadbeef,
-									&gNFSv4VnodeOps, S_IFDIR, 0);
-	if (error != B_OK)
-		return error;
+	result = publish_vnode(volume, inode->ID(), inode, &gNFSv4VnodeOps,
+							inode->Type(), 0);
+	if (result != B_OK)
+		return result;
 
-	*_rootVnodeID = 0;
-
-	dprintf("NFS4 Mounted\n");
+	*_rootVnodeID = inode->ID();
 
 	return B_OK;
 }

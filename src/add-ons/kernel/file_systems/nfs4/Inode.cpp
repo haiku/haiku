@@ -26,7 +26,7 @@ Inode::Inode(Filesystem* fs, const Filehandle &fh)
 	RequestBuilder req(ProcCompound);
 	req.PutFH(fh);
 
-	Attribute attr[] = { FATTR4_FILEID };
+	Attribute attr[] = { FATTR4_TYPE, FATTR4_FILEID };
 	req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
 
 	RPC::Reply *rpl;
@@ -41,14 +41,17 @@ Inode::Inode(Filesystem* fs, const Filehandle &fh)
 	AttrValue* values;
 	uint32 count;
 	result = reply.GetAttr(&values, &count);
-	if (result != B_OK)
+	if (result != B_OK || count < 1)
 		return;
 
-	if (count < 1 || values[0].fAttribute != FATTR4_FILEID) {
+	if (count < 2 || values[1].fAttribute != FATTR4_FILEID) {
 		// Server does not provide fileid. We need to make something up.
 		fFileId = fs->GetId();
 	} else
-		fFileId = values[0].fData.fValue64;
+		fFileId = values[1].fData.fValue64;
+
+	// FATTR4_TYPE is mandatory
+	fType = values[0].fData.fValue32;
 
 	delete values;
 }

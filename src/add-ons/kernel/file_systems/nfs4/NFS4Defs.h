@@ -9,6 +9,8 @@
 #define NFS4DEFS_H
 
 
+#include <sys/stat.h>
+
 #include <SupportDefs.h>
 
 
@@ -102,6 +104,23 @@ enum Attribute {
 	FATTR4_TIME_MODIFY			= 53,
 	FATTR4_TIME_MODIFY_SET		= 54,
 	FATTR4_MOUNTED_ON_FILEID	= 55
+};
+
+enum FileType {
+	NF4REG			= 1,    /* Regular File */
+	NF4DIR			= 2,    /* Directory */
+	NF4BLK			= 3,    /* Special File - block device */
+	NF4CHR			= 4,    /* Special File - character device */
+	NF4LNK			= 5,    /* Symbolic Link */
+	NF4SOCK			= 6,    /* Special File - socket */
+	NF4FIFO			= 7,    /* Special File - fifo */
+	NF4ATTRDIR		= 8,    /* Attribute Directory */
+	NF4NAMEDATTR	= 9     /* Named Attribute */
+};
+
+static const mode_t sNFSFileTypeToHaiku[] = {
+	S_IFREG, S_IFDIR, S_IFBLK, S_IFCHR, S_IFLNK, S_IFSOCK, S_IFIFO, S_IFDIR,
+	S_IFREG
 };
 
 enum FileHandleExpiryType {
