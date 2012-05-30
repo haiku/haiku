@@ -9,6 +9,9 @@
 #define NFS4DEFS_H
 
 
+#include <SupportDefs.h>
+
+
 #define NFS4_FHSIZE	128
 
 struct Filehandle {
