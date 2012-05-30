@@ -28,8 +28,10 @@ HAIKU_BOARD_LOADER_STACK_BASE = 0x02000000 ;
 # gcc flags for the specific cpu
 #
 
-HAIKU_KERNEL_CCFLAGS += -mcpu=440 -mtune=440 -msoft-float ;
-HAIKU_KERNEL_C++FLAGS += -mcpu=440 -mtune=440 -msoft-float ;
-HAIKU_CCFLAGS += -mcpu=440 -mtune=440 -msoft-float ;
-HAIKU_C++FLAGS += -mcpu=440 -mtune=440 -msoft-float ;
+HAIKU_KERNEL_PIC_CCFLAGS += -mcpu=440fp -mtune=440fp ;
+HAIKU_KERNEL_PIC_C++FLAGS += -mcpu=440fp -mtune=440fp ;
+HAIKU_KERNEL_CCFLAGS += -mcpu=440fp -mtune=440fp ;
+HAIKU_KERNEL_C++FLAGS += -mcpu=440fp -mtune=440fp ;
+HAIKU_CCFLAGS += -mcpu=440fp -mtune=440fp ;
+HAIKU_C++FLAGS += -mcpu=440fp -mtune=440fp ;
 
