@@ -33,6 +33,7 @@ public:
 			status_t	GetAttr(AttrValue** attrs, uint32* count);
 			status_t	GetFH(Filehandle* fh);
 	inline	status_t	LookUp();
+	inline	status_t	PutFH();
 	inline	status_t	PutRootFH();
 
 private:
@@ -48,6 +49,13 @@ inline status_t
 ReplyInterpreter::LookUp()
 {
 	return _OperationError(OpLookUp);
+}
+
+
+inline status_t
+ReplyInterpreter::PutFH()
+{
+	return _OperationError(OpPutFH);
 }
 
 

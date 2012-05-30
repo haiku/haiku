@@ -13,13 +13,19 @@
 #include "RPCServer.h"
 
 
+class Inode;
+
 class Filesystem {
 public:
 	static	status_t		Mount(Filesystem** pfs, RPC::Server* serv,
 								const char* path);
 							~Filesystem();
 
+			Inode*			CreateRootInode();
+
 	inline	uint32			FHExpiryType() const;
+	inline	RPC::Server*	Server();
+	inline	uint64			GetId();
 
 private:
 							Filesystem();
@@ -29,7 +35,23 @@ private:
 			Filehandle		fRootFH;
 
 			RPC::Server*	fServer;
+
+			vint64			fId;
 };
+
+
+inline RPC::Server*
+Filesystem::Server()
+{
+	return fServer;
+}
+
+
+inline uint64
+Filesystem::GetId()
+{
+	return atomic_add64(&fId, 1);
+}
 
 
 #endif	// FILESYSTEM_H

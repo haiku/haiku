@@ -29,6 +29,7 @@ enum Opcode {
 	OpGetAttr		= 9,
 	OpGetFH			= 10,
 	OpLookUp		= 15,
+	OpPutFH			= 22,
 	OpPutRootFH		= 24
 };
 

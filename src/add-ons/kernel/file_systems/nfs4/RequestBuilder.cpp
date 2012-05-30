@@ -115,6 +115,22 @@ RequestBuilder::LookUp(const char* name)
 
 
 status_t
+RequestBuilder::PutFH(const Filehandle& fh)
+{
+	if (fProcedure != ProcCompound)
+		return B_BAD_VALUE;
+	if (fRequest == NULL)
+		return B_NO_MEMORY;
+
+	fRequest->Stream().AddUInt(OpPutFH);
+	fRequest->Stream().AddOpaque(fh.fFH, fh.fSize);
+	fOpCount++;
+
+	return B_OK;
+}
+
+
+status_t
 RequestBuilder::PutRootFH()
 {
 	if (fProcedure != ProcCompound)

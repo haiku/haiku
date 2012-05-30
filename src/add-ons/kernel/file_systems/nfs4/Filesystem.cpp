@@ -14,8 +14,12 @@
 #include "ReplyInterpreter.h"
 #include "RequestBuilder.h"
 
+#include "Inode.h"
+
 
 Filesystem::Filesystem()
+	:
+	fId(0)
 {
 }
 
@@ -32,7 +36,7 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath)
 	req.PutRootFH();
 
 	// Better way of doing this will be needed
-	uint32 lookupCount;
+	uint32 lookupCount = 0;
 	char* path = strdup(fsPath);
 	char* pathStart = path;
 	char* pathEnd;
@@ -104,7 +108,7 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath)
 		return B_UNSUPPORTED;
 	}
 
-	Filesystem* fs = new Filesystem;
+	Filesystem* fs = new(std::nothrow) Filesystem;
 	fs->fFHExpiryType = values[0].fData.fValue32;
 	memcpy(&fs->fRootFH, &fh, sizeof(Filehandle));
 	fs->fServer = serv;
@@ -114,5 +118,12 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath)
 	*pfs = fs;
 
 	return B_OK;
+}
+
+
+Inode*
+Filesystem::CreateRootInode()
+{
+	return new(std::nothrow)Inode(this, fRootFH);
 }
 
