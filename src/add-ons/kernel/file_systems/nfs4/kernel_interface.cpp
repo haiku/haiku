@@ -67,7 +67,12 @@ nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 static status_t
 nfs4_unmount(fs_volume* volume)
 {
-	dprintf("NFS4 Unmounting...\n");
+	Filesystem* fs = reinterpret_cast<Filesystem*>(volume->private_volume);
+	RPC::Server* server = fs->Server();
+
+	delete fs;
+	gRPCServerManager->Release(server);
+
 	return B_OK;
 }
 
@@ -75,6 +80,9 @@ nfs4_unmount(fs_volume* volume)
 static status_t
 nfs4_put_vnode(fs_volume* volume, fs_vnode* vnode, bool reenter)
 {
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	delete inode;
+
 	return B_OK;
 }
 
