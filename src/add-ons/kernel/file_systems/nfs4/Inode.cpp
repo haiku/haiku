@@ -107,3 +107,34 @@ Inode::Stat(struct stat* st)
 	return B_OK;
 }
 
+
+status_t
+Inode::OpenDir(uint64* cookie)
+{
+	if (fType != NF4DIR)
+		return B_NOT_A_DIRECTORY;
+
+	RequestBuilder req(ProcCompound);
+	req.PutFH(fHandle);
+	req.Access();
+
+	RPC::Reply *rpl;
+	fFilesystem->Server()->SendCall(req.Request(), &rpl);
+	ReplyInterpreter reply(rpl);
+
+	status_t result;
+	result = reply.PutFH();
+	if (result != B_OK)
+		return result;
+
+	uint32 allowed;
+	result = reply.Access(NULL, &allowed);
+	if (result != B_OK)
+		return result;
+
+	if (allowed & ACCESS4_READ != ACCESS4_READ)
+		return B_PERMISSION_DENIED;
+
+	return B_OK;
+}
+

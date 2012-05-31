@@ -95,6 +95,38 @@ nfs4_read_stat(fs_volume* volume, fs_vnode* vnode, struct stat* stat)
 }
 
 
+static status_t
+nfs4_open_dir(fs_volume* volume, fs_vnode* vnode, void** _cookie)
+{
+	uint64* cookie = new(std::nothrow) uint64;
+	if (cookie == NULL)
+		return B_NO_MEMORY;
+	*_cookie = cookie;
+
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	status_t result = inode->OpenDir(cookie);
+	if (result != B_OK)
+		delete cookie;
+
+	return result;
+}
+
+
+static status_t 
+nfs4_close_dir(fs_volume* volume, fs_vnode* vnode, void* cookie)
+{
+	return B_OK;
+}
+
+
+static status_t
+nfs4_free_dir_cookie(fs_volume* volume, fs_vnode* vnode, void* cookie)
+{
+	delete reinterpret_cast<uint64*>(cookie);
+	return B_OK;
+}
+
+
 status_t
 nfs4_init()
 {
@@ -174,6 +206,25 @@ fs_vnode_ops gNFSv4VnodeOps = {
 
 	NULL,	// access()
 	&nfs4_read_stat,
+	NULL,	// write_stat()
+	NULL,	// fs_preallocate()
+
+	/* file operations */
+	NULL,	// create()
+	NULL,	// open()
+	NULL,	// close()
+	NULL,	// free_cookie()
+	NULL,	// read()
+	NULL,	// write,
+
+	/* directory operations */
+	NULL,	// create_dir()
+	NULL,	// remove_dir()
+	nfs4_open_dir,
+	nfs4_close_dir,
+	nfs4_free_dir_cookie,
+	NULL,	// read_dir()
+	NULL,	// rewind_dir,
 };
 
 static file_system_module_info sNFSv4ModuleInfo = {

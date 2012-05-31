@@ -25,6 +25,7 @@ public:
 	inline	mode_t		Type() const;
 
 			status_t	Stat(struct stat* st);
+			status_t	OpenDir(uint64* cookie);
 
 private:
 			uint64		fFileId;
