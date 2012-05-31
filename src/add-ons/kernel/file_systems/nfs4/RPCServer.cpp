@@ -304,15 +304,13 @@ ServerManager::Release(Server* serv)
 	if (node != NULL) {
 		node->fRefCount--;
 
-		if (node->fRefCount == 0)
+		if (node->fRefCount == 0) {
 			_Delete(node);
+			delete node->fServer;
+			delete node;
+		}
 	}
 	mutex_unlock(&fLock);
-
-	if (node != NULL) {
-		delete node->fServer;
-		delete node;
-	}
 }
 
 
