@@ -59,6 +59,71 @@ Inode::Inode(Filesystem* fs, const Filehandle &fh, Inode* parent)
 }
 
 
+// filesystems that do not provide fileid are currently unsupported
+// client will have to be able to create its own mapping between file names
+// and made up IDs
+status_t
+Inode::LookUp(const char* name, ino_t* id)
+{
+	if (fType != NF4DIR)
+		return B_NOT_A_DIRECTORY;
+
+	if (!strcmp(name, ".")) {
+		*id = ID();
+		return B_OK;
+	}
+
+	RequestBuilder req(ProcCompound);
+	req.PutFH(fHandle);
+
+	if (!strcmp(name, ".."))
+		req.LookUpUp();
+	else
+		req.LookUp(name);
+
+	req.GetFH();
+
+	Attribute attr[] = { FATTR4_FILEID };
+	req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
+
+	RPC::Reply *rpl;
+	fFilesystem->Server()->SendCall(req.Request(), &rpl);
+	ReplyInterpreter reply(rpl);
+
+	status_t result = reply.PutFH();
+	if (result != B_OK)
+		return result;
+
+	if (!strcmp(name, ".."))
+		result = reply.LookUpUp();
+	else
+		result = reply.LookUp();
+	if (result != B_OK)
+		return result;
+
+	Filehandle fh;
+	result = reply.GetFH(&fh);
+	if (result != B_OK)
+		return result;
+
+	AttrValue* values;
+	uint32 count;
+	result = reply.GetAttr(&values, &count);
+	if (result != B_OK)
+		return result;
+
+	if (count < 1 || values[0].fAttribute != FATTR4_FILEID) {
+		delete[] values;
+		return B_UNSUPPORTED;
+	}
+	*id = values[0].fData.fValue64;
+	delete[] values;
+
+	fFilesystem->InoIdMap()->AddEntry(fh, *id);
+	return B_OK;
+}
+
+
 status_t
 Inode::Stat(struct stat* st)
 {

@@ -26,7 +26,9 @@ public:
 	inline			ino_t		ID() const;
 	inline			mode_t		Type() const;
 
+					status_t	LookUp(const char* name, ino_t* id);
 					status_t	Stat(struct stat* st);
+
 					status_t	OpenDir(uint64* cookie);
 					status_t	ReadDir(void* buffer, uint32 size,
 									uint32* count, uint64* cookie);
@@ -44,7 +46,7 @@ private:
 
 					Filehandle	fHandle;
 					Filesystem*	fFilesystem;
-					Inode*		fParent;
+					Inode*		fParent;	// this will cause trouble
 };
 
 

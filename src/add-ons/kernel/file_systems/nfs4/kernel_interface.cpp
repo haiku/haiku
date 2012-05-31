@@ -66,6 +66,26 @@ nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 
 
 static status_t
+nfs4_get_vnode(fs_volume* volume, ino_t id, fs_vnode* vnode, int* _type,
+	uint32* _flags, bool reenter)
+{
+	Filesystem* fs = reinterpret_cast<Filesystem*>(volume->private_volume);
+	Inode* inode;	
+	status_t result = fs->GetInode(id, &inode);
+	if (result != B_OK)
+		return result;
+
+	vnode->ops = &gNFSv4VnodeOps;
+	vnode->private_node = inode;
+
+	*_type = inode->Type();
+	*_flags = 0;
+
+	return B_OK;
+}
+
+
+static status_t
 nfs4_unmount(fs_volume* volume)
 {
 	Filesystem* fs = reinterpret_cast<Filesystem*>(volume->private_volume);
@@ -75,6 +95,19 @@ nfs4_unmount(fs_volume* volume)
 	gRPCServerManager->Release(server);
 
 	return B_OK;
+}
+
+
+static status_t
+nfs4_lookup(fs_volume* volume, fs_vnode* dir, const char* name, ino_t* _id)
+{
+	Inode* inode = reinterpret_cast<Inode*>(dir->private_node);
+	status_t result = inode->LookUp(name, _id);
+	if (result != B_OK)
+		return result;
+
+	void* ptr;
+	return get_vnode(volume, *_id, &ptr);
 }
 
 
@@ -183,11 +216,15 @@ nfs4_std_ops(int32 op, ...)
 
 
 fs_volume_ops gNFSv4VolumeOps = {
-	&nfs4_unmount
+	nfs4_unmount,
+	NULL,
+	NULL,
+	NULL,
+	nfs4_get_vnode,
 };
 
 fs_vnode_ops gNFSv4VnodeOps = {
-	NULL,	// lookup()
+	nfs4_lookup,
 	NULL,	// get_vnode_name()
 	nfs4_put_vnode,
 	NULL,	// remove_vnode()

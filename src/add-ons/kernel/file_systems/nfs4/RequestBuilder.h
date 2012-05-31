@@ -25,6 +25,7 @@ public:
 			status_t				GetAttr(Attribute* attrs, uint32 count);
 			status_t				GetFH();
 			status_t				LookUp(const char* name);
+			status_t				LookUpUp();
 			status_t				PutFH(const Filehandle& fh);
 			status_t				PutRootFH();
 			status_t				ReadDir(uint32 count, uint64* cookie, 

@@ -123,6 +123,23 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
 }
 
 
+status_t
+Filesystem::GetInode(ino_t id, Inode** _inode)
+{
+	Filehandle fh;
+	status_t result = fInoIdMap.GetFilehandle(&fh, id);
+	if (result != B_OK)
+		return result;
+
+	Inode* inode = new(std::nothrow)Inode(this, fh, NULL);
+	if (inode == NULL)
+		return B_NO_MEMORY;
+
+	*_inode = inode;
+	return B_OK;
+}
+
+
 Inode*
 Filesystem::CreateRootInode()
 {

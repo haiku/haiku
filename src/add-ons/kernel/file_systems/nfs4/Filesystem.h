@@ -9,11 +9,13 @@
 #define FILESYSTEM_H
 
 
+#include "InodeIdMap.h"
 #include "NFS4Defs.h"
 #include "RPCServer.h"
 
 
 class Inode;
+class InodeIdMap;
 
 class Filesystem {
 public:
@@ -21,6 +23,7 @@ public:
 								const char* path, dev_t id);
 							~Filesystem();
 
+			status_t		GetInode(ino_t id, Inode** inode);
 			Inode*			CreateRootInode();
 
 	inline	uint32			FHExpiryType() const;
@@ -28,6 +31,7 @@ public:
 	inline	uint64			GetId();
 
 	inline	dev_t			DevId() const;
+	inline	InodeIdMap*		InoIdMap();
 private:
 							Filesystem();
 
@@ -39,6 +43,8 @@ private:
 
 			vint64			fId;
 			dev_t			fDevId;
+
+			InodeIdMap		fInoIdMap;
 };
 
 
@@ -60,6 +66,13 @@ inline dev_t
 Filesystem::DevId() const
 {
 	return fDevId;
+}
+
+
+inline InodeIdMap*
+Filesystem::InoIdMap()
+{
+	return &fInoIdMap;
 }
 
 

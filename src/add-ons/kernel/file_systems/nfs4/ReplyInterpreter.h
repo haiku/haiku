@@ -42,6 +42,7 @@ public:
 			status_t	GetAttr(AttrValue** attrs, uint32* count);
 			status_t	GetFH(Filehandle* fh);
 	inline	status_t	LookUp();
+	inline	status_t	LookUpUp();
 	inline	status_t	PutFH();
 	inline	status_t	PutRootFH();
 			status_t	ReadDir(uint64* cookie, DirEntry** dirents,
@@ -62,6 +63,13 @@ inline status_t
 ReplyInterpreter::LookUp()
 {
 	return _OperationError(OpLookUp);
+}
+
+
+inline status_t
+ReplyInterpreter::LookUpUp()
+{
+	return _OperationError(OpLookUpUp);
 }
 
 

@@ -13,13 +13,7 @@
 
 #include <SupportDefs.h>
 
-
-#define NFS4_FHSIZE	128
-
-struct Filehandle {
-	uint8			fSize;
-	uint8			fFH[NFS4_FHSIZE];
-};
+#include "Filehandle.h"
 
 enum Procedure {
 	ProcNull		= 0,
@@ -31,6 +25,7 @@ enum Opcode {
 	OpGetAttr		= 9,
 	OpGetFH			= 10,
 	OpLookUp		= 15,
+	OpLookUpUp		= 16,
 	OpPutFH			= 22,
 	OpPutRootFH		= 24,
 	OpReadDir		= 26
