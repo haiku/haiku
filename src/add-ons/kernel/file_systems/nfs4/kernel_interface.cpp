@@ -189,7 +189,7 @@ fs_volume_ops gNFSv4VolumeOps = {
 fs_vnode_ops gNFSv4VnodeOps = {
 	NULL,	// lookup()
 	NULL,	// get_vnode_name()
-	&nfs4_put_vnode,
+	nfs4_put_vnode,
 	NULL,	// remove_vnode()
 
 	/* VM file access */
@@ -216,7 +216,7 @@ fs_vnode_ops gNFSv4VnodeOps = {
 	NULL,	// rename()
 
 	NULL,	// access()
-	&nfs4_read_stat,
+	nfs4_read_stat,
 	NULL,	// write_stat()
 	NULL,	// fs_preallocate()
 
@@ -257,7 +257,7 @@ static file_system_module_info sNFSv4ModuleInfo = {
 	NULL,	// free_identify_partition_cookie()
 	NULL,	// free_partition_content_cookie()
 
-	&nfs4_mount,
+	nfs4_mount,
 };
 
 module_info* modules[] = {
