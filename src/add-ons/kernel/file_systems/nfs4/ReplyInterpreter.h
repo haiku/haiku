@@ -24,6 +24,15 @@ struct AttrValue {
 	} fData;
 };
 
+struct DirEntry {
+	const char*			fName;
+	AttrValue*			fAttrs;
+	uint32				fAttrCount;
+
+						DirEntry();
+						~DirEntry();
+};
+
 class ReplyInterpreter {
 public:
 						ReplyInterpreter(RPC::Reply* reply);
@@ -35,8 +44,12 @@ public:
 	inline	status_t	LookUp();
 	inline	status_t	PutFH();
 	inline	status_t	PutRootFH();
+			status_t	ReadDir(uint64* cookie, DirEntry** dirents,
+							uint32* count, bool* eof);
 
 private:
+			status_t	_DecodeAttrs(XDR::ReadStream& stream, AttrValue** attrs,
+							uint32* count);
 			status_t	_OperationError(Opcode op);
 
 	static	status_t	_NFS4ErrorToHaiku(uint32 x);

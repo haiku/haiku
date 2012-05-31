@@ -15,35 +15,54 @@
 
 #include "Filesystem.h"
 #include "NFS4Defs.h"
+#include "ReplyInterpreter.h"
 
 
 class Inode {
 public:
-						Inode(Filesystem* fs, const Filehandle &fh);
+								Inode(Filesystem* fs, const Filehandle &fh,
+									Inode* parent);
 
-	inline	ino_t		ID() const;
-	inline	mode_t		Type() const;
+	inline			ino_t		ID() const;
+	inline			mode_t		Type() const;
 
-			status_t	Stat(struct stat* st);
-			status_t	OpenDir(uint64* cookie);
+					status_t	Stat(struct stat* st);
+					status_t	OpenDir(uint64* cookie);
+					status_t	ReadDir(void* buffer, uint32 size,
+									uint32* count, uint64* cookie);
 
 private:
-			uint64		fFileId;
-			uint32		fType;
+					status_t	_ReadDirOnce(DirEntry** dirents, uint32* count,
+									uint64* cookie, bool* eof);
+					status_t	_FillDirEntry(struct dirent* de, ino_t id,
+									const char* name, uint32 pos, uint32 size);
 
-			Filehandle	fHandle;
-			Filesystem*	fFilesystem;
+	static inline	ino_t		_FileIdToInoT(uint64 fileid);
+
+					uint64		fFileId;
+					uint32		fType;
+
+					Filehandle	fHandle;
+					Filesystem*	fFilesystem;
+					Inode*		fParent;
 };
+
+
+inline ino_t
+Inode::_FileIdToInoT(uint64 fileid)
+{
+	if (sizeof(ino_t) >= sizeof(uint64))
+		return fileid;
+	else
+		return (ino_t)fileid ^ (fileid >>
+					(sizeof(uint64) - sizeof(ino_t)) * 8);
+}
 
 
 inline ino_t
 Inode::ID() const
 {
-	if (sizeof(ino_t) >= sizeof(uint64))
-		return fFileId;
-	else
-		return (ino_t)fFileId ^ (fFileId >>
-					(sizeof(uint64) - sizeof(ino_t)) * 8);
+	return _FileIdToInoT(fFileId);
 }
 
 

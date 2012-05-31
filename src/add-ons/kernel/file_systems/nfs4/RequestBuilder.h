@@ -27,10 +27,15 @@ public:
 			status_t				LookUp(const char* name);
 			status_t				PutFH(const Filehandle& fh);
 			status_t				PutRootFH();
+			status_t				ReadDir(uint32 count, uint64* cookie, 
+										Attribute* attrs, uint32 attr_count);
 
 			RPC::Call*				Request();
 
 private:
+			void					_AttrBitmap(XDR::WriteStream& stream,
+										Attribute* attrs, uint32 count);
+
 			uint32					fOpCount;
 			XDR::Stream::Position	fOpCountPosition;
 

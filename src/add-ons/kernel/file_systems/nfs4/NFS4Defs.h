@@ -32,7 +32,8 @@ enum Opcode {
 	OpGetFH			= 10,
 	OpLookUp		= 15,
 	OpPutFH			= 22,
-	OpPutRootFH		= 24
+	OpPutRootFH		= 24,
+	OpReadDir		= 26
 };
 
 enum Access {

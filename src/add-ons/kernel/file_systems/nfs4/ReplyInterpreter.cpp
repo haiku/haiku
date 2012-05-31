@@ -14,6 +14,22 @@
 #include <util/kernel_cpp.h>
 
 
+DirEntry::DirEntry()
+	:
+	fName(NULL),
+	fAttrs(NULL),
+	fAttrCount(0)
+{
+}
+
+
+DirEntry::~DirEntry()
+{
+	free(const_cast<char*>(fName));
+	delete[] fAttrs;
+}
+
+
 ReplyInterpreter::ReplyInterpreter(RPC::Reply* reply)
 	:
 	fReply(reply)
@@ -75,6 +91,74 @@ ReplyInterpreter::GetAttr(AttrValue** attrs, uint32* count)
 	if (res != B_OK)
 		return res;
 
+	return _DecodeAttrs(fReply->Stream(), attrs, count);
+}
+
+
+status_t
+ReplyInterpreter::GetFH(Filehandle* fh)
+{
+	status_t res = _OperationError(OpGetFH);
+	if (res != B_OK)
+		return res;
+
+	uint32 size;
+	const void* ptr = fReply->Stream().GetOpaque(&size);
+	if (ptr == NULL || size > NFS4_FHSIZE)
+		return B_BAD_VALUE;
+
+	if (fh != NULL) {
+		fh->fSize = size;
+		memcpy(fh->fFH, ptr, size);
+	}
+
+	return B_OK;
+}
+
+
+status_t
+ReplyInterpreter::ReadDir(uint64* cookie, DirEntry** dirents, uint32* _count,
+	bool* eof)
+{
+	status_t res = _OperationError(OpReadDir);
+	if (res != B_OK)
+		return res;
+
+	cookie[1] = fReply->Stream().GetUHyper();
+
+	bool isNext;
+	uint32 count = 0;
+	DirEntry* entries = new(std::nothrow) DirEntry[*_count];
+	if (entries == NULL)
+		return B_NO_MEMORY;
+
+	isNext = fReply->Stream().GetBoolean();
+	while (isNext && count <= *_count) {
+		cookie[0] = fReply->Stream().GetUHyper();
+
+		entries[count].fName = fReply->Stream().GetString();
+		_DecodeAttrs(fReply->Stream(), &entries[count].fAttrs,
+			&entries[count].fAttrCount);
+
+		count++;
+
+		isNext = fReply->Stream().GetBoolean();
+	}
+	if (!isNext)
+		*eof = fReply->Stream().GetBoolean();
+	else
+		*eof = false;
+
+	*_count = count;
+	*dirents = entries;
+
+	return B_OK;
+}
+
+status_t
+ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
+	uint32* count)
+{
 	uint32 bcount = fReply->Stream().GetUInt();
 	uint32 *bitmap = new(std::nothrow) uint32[bcount];
 	if (bitmap == NULL)
@@ -82,17 +166,17 @@ ReplyInterpreter::GetAttr(AttrValue** attrs, uint32* count)
 
 	uint32 attr_count = 0;
 	for (uint32 i = 0; i < bcount; i++) {
-		bitmap[i] = fReply->Stream().GetUInt();
+		bitmap[i] = str.GetUInt();
 		attr_count += sCountBits(bitmap[i]);
 	}
 
 	uint32 size;
-	const void* ptr = fReply->Stream().GetOpaque(&size);
+	const void* ptr = str.GetOpaque(&size);
 	XDR::ReadStream stream(const_cast<void*>(ptr), size);
 
 	AttrValue* values = new(std::nothrow) AttrValue[attr_count];
 	if (values == NULL) {
-		delete bitmap;
+		delete[] bitmap;
 		return B_NO_MEMORY;
 	}
 
@@ -134,31 +218,10 @@ ReplyInterpreter::GetAttr(AttrValue** attrs, uint32* count)
 		current++;
 	}
 
-	delete bitmap;
+	delete[] bitmap;
 
 	*count = attr_count;
 	*attrs = values;
-	return B_OK;
-}
-
-
-status_t
-ReplyInterpreter::GetFH(Filehandle* fh)
-{
-	status_t res = _OperationError(OpGetFH);
-	if (res != B_OK)
-		return res;
-
-	uint32 size;
-	const void* ptr = fReply->Stream().GetOpaque(&size);
-	if (ptr == NULL || size > NFS4_FHSIZE)
-		return B_BAD_VALUE;
-
-	if (fh != NULL) {
-		fh->fSize = size;
-		memcpy(fh->fFH, ptr, size);
-	}
-
 	return B_OK;
 }
 

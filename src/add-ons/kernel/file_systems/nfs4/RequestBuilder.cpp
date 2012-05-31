@@ -62,18 +62,7 @@ RequestBuilder::GetAttr(Attribute* attrs, uint32 count)
 		return B_NO_MEMORY;
 
 	fRequest->Stream().AddUInt(OpGetAttr);
-
-	// 2 is safe in NFS4, not in NFS4.1 though
-	uint32 bitmap[2];
-	memset(bitmap, 0, sizeof(bitmap));
-	for (uint32 i = 0; i < count; i++) {
-		bitmap[attrs[i] / 32] |= 1 << attrs[i] % 32;
-	}
-
-	uint32 bcount = bitmap[1] != 0 ? 2 : 1;
-	fRequest->Stream().AddUInt(bcount);
-	for (uint32 i = 0; i < bcount; i++)
-		fRequest->Stream().AddUInt(bitmap[i]);
+	_AttrBitmap(fRequest->Stream(), attrs, count);
 
 	fOpCount++;
 
@@ -145,6 +134,32 @@ RequestBuilder::PutRootFH()
 }
 
 
+status_t
+RequestBuilder::ReadDir(uint32 count, uint64* cookie, Attribute* attrs,
+	uint32 attr_count)
+{
+	(void)count;
+
+	if (fProcedure != ProcCompound)
+		return B_BAD_VALUE;
+	if (fRequest == NULL)
+		return B_NO_MEMORY;
+
+	fRequest->Stream().AddUInt(OpReadDir);
+	fRequest->Stream().AddUHyper(cookie[0]);
+	fRequest->Stream().AddUHyper(cookie[1]);
+
+	// consider predicting this values basing on count or buffer size
+	fRequest->Stream().AddUInt(0x2000);
+	fRequest->Stream().AddUInt(0x8000);
+	_AttrBitmap(fRequest->Stream(), attrs, attr_count);
+
+	fOpCount++;
+
+	return B_OK;
+}
+
+
 RPC::Call*
 RequestBuilder::Request()
 {
@@ -155,5 +170,23 @@ RequestBuilder::Request()
 		return fRequest;
 	else
 		return NULL;
+}
+
+
+void
+RequestBuilder::_AttrBitmap(XDR::WriteStream& stream, Attribute* attrs,
+	uint32 count)
+{
+	// 2 is safe in NFS4, not in NFS4.1 though
+	uint32 bitmap[2];
+	memset(bitmap, 0, sizeof(bitmap));
+	for (uint32 i = 0; i < count; i++) {
+		bitmap[attrs[i] / 32] |= 1 << attrs[i] % 32;
+	}
+
+	uint32 bcount = bitmap[1] != 0 ? 2 : 1;
+	stream.AddUInt(bcount);
+	for (uint32 i = 0; i < bcount; i++)
+		stream.AddUInt(bitmap[i]);
 }
 

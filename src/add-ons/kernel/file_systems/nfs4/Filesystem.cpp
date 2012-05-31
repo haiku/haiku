@@ -30,7 +30,8 @@ Filesystem::~Filesystem()
 
 
 status_t
-Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath)
+Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
+	dev_t id)
 {
 	RequestBuilder req(ProcCompound);
 	req.PutRootFH();
@@ -97,14 +98,14 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath)
 		return result;
 
 	if (count != 1 || values[0].fAttribute != FATTR4_FH_EXPIRE_TYPE) {
-		delete values;
+		delete[] values;
 		return B_BAD_VALUE;
 	}
 
 	// Currently, only persistent filehandles are supported. That will be
 	// changed soon.
 	if (values[0].fData.fValue32 != FH4_PERSISTENT) {
-		delete values;
+		delete[] values;
 		return B_UNSUPPORTED;
 	}
 
@@ -112,8 +113,9 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath)
 	fs->fFHExpiryType = values[0].fData.fValue32;
 	memcpy(&fs->fRootFH, &fh, sizeof(Filehandle));
 	fs->fServer = serv;
+	fs->fDevId = id;
 
-	delete values;
+	delete[] values;
 
 	*pfs = fs;
 
@@ -124,6 +126,6 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath)
 Inode*
 Filesystem::CreateRootInode()
 {
-	return new(std::nothrow)Inode(this, fRootFH);
+	return new(std::nothrow)Inode(this, fRootFH, NULL);
 }
 

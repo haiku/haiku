@@ -18,7 +18,7 @@ class Inode;
 class Filesystem {
 public:
 	static	status_t		Mount(Filesystem** pfs, RPC::Server* serv,
-								const char* path);
+								const char* path, dev_t id);
 							~Filesystem();
 
 			Inode*			CreateRootInode();
@@ -27,6 +27,7 @@ public:
 	inline	RPC::Server*	Server();
 	inline	uint64			GetId();
 
+	inline	dev_t			DevId() const;
 private:
 							Filesystem();
 
@@ -37,6 +38,7 @@ private:
 			RPC::Server*	fServer;
 
 			vint64			fId;
+			dev_t			fDevId;
 };
 
 
@@ -51,6 +53,13 @@ inline uint64
 Filesystem::GetId()
 {
 	return atomic_add64(&fId, 1);
+}
+
+
+inline dev_t
+Filesystem::DevId() const
+{
+	return fDevId;
 }
 
 

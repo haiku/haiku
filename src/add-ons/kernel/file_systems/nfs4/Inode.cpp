@@ -9,6 +9,7 @@
 
 #include "Inode.h"
 
+#include <dirent.h>
 #include <string.h>
 
 #include "ReplyInterpreter.h"
@@ -17,9 +18,10 @@
 
 // Creating Inode object from Filehandle probably is not a good idea when
 // filehandles are volatile.
-Inode::Inode(Filesystem* fs, const Filehandle &fh)
+Inode::Inode(Filesystem* fs, const Filehandle &fh, Inode* parent)
 	:
-	fFilesystem(fs)
+	fFilesystem(fs),
+	fParent(parent)
 {
 	memcpy(&fHandle, &fh, sizeof(fh));
 
@@ -53,7 +55,7 @@ Inode::Inode(Filesystem* fs, const Filehandle &fh)
 	// FATTR4_TYPE is mandatory
 	fType = values[0].fData.fValue32;
 
-	delete values;
+	delete[] values;
 }
 
 
@@ -82,8 +84,10 @@ Inode::Stat(struct stat* st)
 		return result;
 
 	// FATTR4_SIZE is mandatory
-	if (count < 1 || values[0].fAttribute != FATTR4_SIZE)
+	if (count < 1 || values[0].fAttribute != FATTR4_SIZE) {
+		delete[] values;
 		return B_BAD_VALUE;
+	}
 	st->st_size = values[0].fData.fValue64;
 
 	uint32 next = 1;
@@ -103,7 +107,7 @@ Inode::Stat(struct stat* st)
 	st->st_uid = 0;
 	st->st_gid = 0;
 
-	delete values;
+	delete[] values;
 	return B_OK;
 }
 
@@ -134,6 +138,126 @@ Inode::OpenDir(uint64* cookie)
 
 	if (allowed & ACCESS4_READ != ACCESS4_READ)
 		return B_PERMISSION_DENIED;
+
+	cookie[0] = 0;
+	cookie[1] = 2;
+
+	return B_OK;
+}
+
+
+status_t
+Inode::_ReadDirOnce(DirEntry** dirents, uint32* count, uint64* cookie,
+	bool* eof)
+{
+	RequestBuilder req(ProcCompound);
+	req.PutFH(fHandle);
+
+	Attribute attr[] = { FATTR4_FILEID };
+	req.ReadDir(*count, cookie, attr, sizeof(attr) / sizeof(Attribute));
+
+	RPC::Reply *rpl;
+	fFilesystem->Server()->SendCall(req.Request(), &rpl);
+	ReplyInterpreter reply(rpl);
+
+	status_t result;
+	result = reply.PutFH();
+	if (result != B_OK)
+		return result;
+
+	return reply.ReadDir(cookie, dirents, count, eof);
+}
+
+
+status_t
+Inode::_FillDirEntry(struct dirent* de, ino_t id, const char* name, uint32 pos,
+	uint32 size)
+{
+	uint32 nameSize = strlen(name);
+	const uint32 entSize = sizeof(struct dirent);
+
+	if (pos + entSize + nameSize > size)
+		return B_BUFFER_OVERFLOW;
+
+	de->d_dev = fFilesystem->DevId();
+	de->d_ino = id;
+	de->d_reclen = entSize + nameSize;
+	if (de->d_reclen % 8 != 0)
+		de->d_reclen += 8 - de->d_reclen % 8;
+
+	strcpy(de->d_name, name);
+
+	return B_OK;
+}
+
+
+status_t
+Inode::ReadDir(void* _buffer, uint32 size, uint32* _count, uint64* cookie)
+{
+	uint32 count = 0;
+	uint32 pos = 0;
+	uint32 this_count;
+	bool eof = false;
+
+	char* buffer = reinterpret_cast<char*>(_buffer);
+
+	if (cookie[0] == 0 && cookie[1] == 2 && count < *_count) {
+		struct dirent* de = reinterpret_cast<dirent*>(buffer + pos);
+
+		_FillDirEntry(de, fFileId, ".", pos, size);
+
+		pos += de->d_reclen;
+		count++;
+		cookie[1]--;
+	}
+
+	if (cookie[0] == 0 && cookie[1] == 1 && count < *_count) {
+		struct dirent* de = reinterpret_cast<dirent*>(buffer + pos);
+		
+		if (fParent != NULL)
+			_FillDirEntry(de, fParent->fFileId, "..", pos, size);
+		else
+			_FillDirEntry(de, fFileId, "..", pos, size);
+
+		pos += de->d_reclen;
+		count++;
+		cookie[1]--;
+	}
+
+	while (count < *_count && !eof) {
+		this_count = *_count;
+		DirEntry* dirents;
+
+		status_t result = _ReadDirOnce(&dirents, &this_count, cookie, &eof);
+		if (result != B_OK)
+			return result;
+
+		uint32 i;
+		for (i = 0; i < this_count; i++) {
+			struct dirent* de = reinterpret_cast<dirent*>(buffer + pos);
+
+			ino_t id;
+			if (dirents[i].fAttrCount == 1)
+				id = _FileIdToInoT(dirents[i].fAttrs[0].fData.fValue64);
+			else
+				id = _FileIdToInoT(fFilesystem->GetId());
+
+			const char* name = dirents[i].fName;
+			if (_FillDirEntry(de, id, name, pos, size) == B_BUFFER_OVERFLOW) {
+				eof = true;
+				break;
+			}
+
+			pos += de->d_reclen;
+		}
+		delete[] dirents;
+		count += i;
+	}
+
+	if (count == 0 && this_count > 0)
+		return B_BUFFER_OVERFLOW;
+
+	*_count = count;
 
 	return B_OK;
 }

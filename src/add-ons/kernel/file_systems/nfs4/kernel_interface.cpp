@@ -42,7 +42,8 @@ nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 	
 	Filesystem* fs;
 	// hardcoded path
-	result = Filesystem::Mount(&fs, server, "haiku/src/add-ons/kernel");
+	result = Filesystem::Mount(&fs, server, "haiku/src/add-ons/kernel",
+				volume->id);
 	if (result != B_OK) {
 		gRPCServerManager->Release(server);
 		return result;
@@ -98,7 +99,7 @@ nfs4_read_stat(fs_volume* volume, fs_vnode* vnode, struct stat* stat)
 static status_t
 nfs4_open_dir(fs_volume* volume, fs_vnode* vnode, void** _cookie)
 {
-	uint64* cookie = new(std::nothrow) uint64;
+	uint64* cookie = new(std::nothrow) uint64[2];
 	if (cookie == NULL)
 		return B_NO_MEMORY;
 	*_cookie = cookie;
@@ -122,8 +123,18 @@ nfs4_close_dir(fs_volume* volume, fs_vnode* vnode, void* cookie)
 static status_t
 nfs4_free_dir_cookie(fs_volume* volume, fs_vnode* vnode, void* cookie)
 {
-	delete reinterpret_cast<uint64*>(cookie);
+	delete[] reinterpret_cast<uint64*>(cookie);
 	return B_OK;
+}
+
+
+static status_t
+nfs4_read_dir(fs_volume* volume, fs_vnode* vnode, void* _cookie,
+				struct dirent* buffer, size_t bufferSize, uint32* _num)
+{
+	uint64* cookie = reinterpret_cast<uint64*>(_cookie);
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	return inode->ReadDir(buffer, bufferSize, _num, cookie);
 }
 
 
@@ -223,7 +234,7 @@ fs_vnode_ops gNFSv4VnodeOps = {
 	nfs4_open_dir,
 	nfs4_close_dir,
 	nfs4_free_dir_cookie,
-	NULL,	// read_dir()
+	nfs4_read_dir,
 	NULL,	// rewind_dir,
 };
 
