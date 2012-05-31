@@ -13,6 +13,7 @@
 #include <errno_private.h>
 #include <fs_info.h>
 #include <fs_volume.h>
+#include <PCI.h>
 
 #include <syscalls.h>
 
@@ -27,6 +28,7 @@ int _kstatfs_(dev_t device, void *whatever, int fd, const char *path, fs_info *i
 int mount(const char *filesystem, const char *where, const char *device, ulong flags,
 	void *parms, int len);
 int unmount(const char *path);
+long get_nth_pci_info(long index, pci_info *info); 
 
 
 int
@@ -143,3 +145,8 @@ unmount(const char *path)
 	return 0;
 }
 
+
+long get_nth_pci_info(long index,pci_info *info)
+{
+	return B_ERROR;
+}
