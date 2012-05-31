@@ -119,8 +119,8 @@ enum FileType {
 };
 
 static const mode_t sNFSFileTypeToHaiku[] = {
-	S_IFREG, S_IFDIR, S_IFBLK, S_IFCHR, S_IFLNK, S_IFSOCK, S_IFIFO, S_IFDIR,
-	S_IFREG
+	S_IFREG, S_IFREG, S_IFDIR, S_IFBLK, S_IFCHR, S_IFLNK, S_IFSOCK, S_IFIFO,
+	S_IFDIR, S_IFREG
 };
 
 enum FileHandleExpiryType {

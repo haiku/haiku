@@ -83,7 +83,7 @@ ReplyInterpreter::GetAttr(AttrValue** attrs, uint32* count)
 	uint32 attr_count = 0;
 	for (uint32 i = 0; i < bcount; i++) {
 		bitmap[i] = fReply->Stream().GetUInt();
-		attr_count = sCountBits(bitmap[i]);
+		attr_count += sCountBits(bitmap[i]);
 	}
 
 	uint32 size;
@@ -110,9 +110,27 @@ ReplyInterpreter::GetAttr(AttrValue** attrs, uint32* count)
 		current++;
 	}
 
+	if (sIsAttrSet(FATTR4_SIZE, bitmap, bcount)) {
+		values[current].fAttribute = FATTR4_SIZE;
+		values[current].fData.fValue64 = stream.GetUHyper();
+		current++;
+	}
+
 	if (sIsAttrSet(FATTR4_FILEID, bitmap, bcount)) {
 		values[current].fAttribute = FATTR4_FILEID;
 		values[current].fData.fValue64 = stream.GetUHyper();
+		current++;
+	}
+
+	if (sIsAttrSet(FATTR4_MODE, bitmap, bcount)) {
+		values[current].fAttribute = FATTR4_MODE;
+		values[current].fData.fValue32 = stream.GetUInt();
+		current++;
+	}
+
+	if (sIsAttrSet(FATTR4_NUMLINKS, bitmap, bcount)) {
+		values[current].fAttribute = FATTR4_NUMLINKS;
+		values[current].fData.fValue32 = stream.GetUInt();
 		current++;
 	}
 

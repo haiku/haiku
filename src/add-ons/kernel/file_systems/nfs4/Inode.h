@@ -9,6 +9,8 @@
 #define INODE_H
 
 
+#include <sys/stat.h>
+
 #include <SupportDefs.h>
 
 #include "Filesystem.h"
@@ -21,6 +23,8 @@ public:
 
 	inline	ino_t		ID() const;
 	inline	mode_t		Type() const;
+
+			status_t	Stat(struct stat* st);
 
 private:
 			uint64		fFileId;

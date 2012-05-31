@@ -79,6 +79,14 @@ nfs4_put_vnode(fs_volume* volume, fs_vnode* vnode, bool reenter)
 }
 
 
+static status_t
+nfs4_read_stat(fs_volume* volume, fs_vnode* vnode, struct stat* stat)
+{
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	return inode->Stat(stat);
+}
+
+
 status_t
 nfs4_init()
 {
@@ -130,7 +138,34 @@ fs_volume_ops gNFSv4VolumeOps = {
 fs_vnode_ops gNFSv4VnodeOps = {
 	NULL,	// lookup()
 	NULL,	// get_vnode_name()
-	&nfs4_put_vnode
+	&nfs4_put_vnode,
+	NULL,	// remove_vnode()
+
+	/* VM file access */
+	NULL,	// can_page()
+	NULL,	// read_pages()
+	NULL,	// write_pages()
+
+	NULL,	// io()
+	NULL,	// cancel_io()
+
+	NULL,	// get_file_map()
+
+	NULL,	// ioctl()
+	NULL,
+	NULL,	// fs_select()
+	NULL,	// fs_deselect()
+	NULL,	// fsync()
+
+	NULL,	// read_link()
+	NULL,	// create_symlink()
+
+	NULL,	// link()
+	NULL,	// unlink()
+	NULL,	// rename()
+
+	NULL,	// access()
+	&nfs4_read_stat,
 };
 
 static file_system_module_info sNFSv4ModuleInfo = {
