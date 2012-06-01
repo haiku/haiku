@@ -181,7 +181,7 @@ SYSTEM_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)atheros813x
 
 	# WLAN drivers
 	$(X86_ONLY)aironetwifi $(X86_ONLY)atheroswifi $(X86_ONLY)broadcom43xx
-	$(X86_ONLY)ipw2100 $(X86_ONLY)iprowifi2200 $(X86_ONLY)iprowifi3945
+	$(X86_ONLY)iprowifi2100 $(X86_ONLY)iprowifi2200 $(X86_ONLY)iprowifi3945
 	$(X86_ONLY)iprowifi4965 $(X86_ONLY)marvell88w8363 $(X86_ONLY)marvell88w8335
 	$(X86_ONLY)ralink2860 $(X86_ONLY)ralinkwifi $(X86_ONLY)wavelanwifi
 

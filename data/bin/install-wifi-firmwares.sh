@@ -175,7 +175,7 @@ function PostFirmwareInstallation()
 
 function InstallIpw2100()
 {
-	driver='ipw2100'
+	driver='iprowifi2100'
 	PreFirmwareInstallation
 
 	# Extract contents.
