@@ -16,7 +16,7 @@
 #include <string.h>
 
 
-#define AMDCPU 0x1100
+#define AMD_VENDOR 0x110000
 
 #define EXT_FAMILY_MASK 0xF00000
 #define EXT_MODEL_MASK	0x0F0000
@@ -84,11 +84,26 @@ main(int argc, char *argv[])
 	unsigned int extMod = (cpuid & EXT_MODEL_MASK) >> 16;
 	unsigned int family = (cpuid & FAMILY_MASK) >> 8;
 	unsigned int model = (cpuid & MODEL_MASK) >> 4;
+	unsigned int stepping = (cpuid & STEPPING_MASK);
 
-	if (family == 0xF)
-		printf("model: 0x%lX\n", extFam + (extMod << 4) + model + 0x1100);
-	else
-		printf("model: 0x%lX\n", (family << 4) + model + 0x1100);
+	unsigned int amdFamily = 0;
+	unsigned int amdModel = 0;
+	if (family == 0xF) {
+		amdFamily = extFam + family;
+		amdModel = (extMod << 4) + model;
+	} else {
+		amdFamily = family;
+		amdModel = model;
+	}
+
+	// Haiku AMD cpuid format: VVFFMM
+	unsigned int amdHaiku
+		= AMD_VENDOR + (amdFamily << 8) + amdModel;
+
+	printf("family: 0x%lX\n", amdFamily);
+	printf("model: 0x%lX\n", amdModel);
+	printf("stepping: 0x%lX\n", stepping);
+	printf("Haiku CPUID: 0x%lX\n", amdHaiku);
 
 	return 0;
 }
