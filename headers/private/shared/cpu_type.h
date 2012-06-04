@@ -232,33 +232,70 @@ get_cpu_model_string(system_info *info)
 		case B_CPU_AMD_K6_III:
 		case B_CPU_AMD_K6_III_MODEL_13:
 			return "K6-III";
+		case B_CPU_AMD_GEODE_LX:
+			return "Geode LX";
 		case B_CPU_AMD_ATHLON_MODEL_1:
 		case B_CPU_AMD_ATHLON_MODEL_2:
 		case B_CPU_AMD_ATHLON_THUNDERBIRD:
 			return "Athlon";
-		case B_CPU_AMD_ATHLON_XP:
+		case B_CPU_AMD_ATHLON_XP_MODEL_6:
+		case B_CPU_AMD_ATHLON_XP_MODEL_7:
 		case B_CPU_AMD_ATHLON_XP_MODEL_8:
 		case B_CPU_AMD_ATHLON_XP_MODEL_10:
 			return "Athlon XP";
 		case B_CPU_AMD_DURON:
-		case B_CPU_AMD_ATHLON_XP_MODEL_7:
 			return "Duron";
 		case B_CPU_AMD_ATHLON_64_MODEL_3:
+		case B_CPU_AMD_ATHLON_64_MODEL_4:
 		case B_CPU_AMD_ATHLON_64_MODEL_7:
 		case B_CPU_AMD_ATHLON_64_MODEL_8:
 		case B_CPU_AMD_ATHLON_64_MODEL_11:
 		case B_CPU_AMD_ATHLON_64_MODEL_12:
 		case B_CPU_AMD_ATHLON_64_MODEL_14:
 		case B_CPU_AMD_ATHLON_64_MODEL_15:
+		case B_CPU_AMD_ATHLON_64_MODEL_20:
+		case B_CPU_AMD_ATHLON_64_MODEL_23:
+		case B_CPU_AMD_ATHLON_64_MODEL_24:
+		case B_CPU_AMD_ATHLON_64_MODEL_27:
+		case B_CPU_AMD_ATHLON_64_MODEL_28:
+		case B_CPU_AMD_ATHLON_64_MODEL_31:
+		case B_CPU_AMD_ATHLON_64_MODEL_35:
+		case B_CPU_AMD_ATHLON_64_MODEL_43:
+		case B_CPU_AMD_ATHLON_64_MODEL_44:
+		case B_CPU_AMD_ATHLON_64_MODEL_47:
+		case B_CPU_AMD_ATHLON_64_MODEL_63:
+		case B_CPU_AMD_ATHLON_64_MODEL_79:
+		case B_CPU_AMD_ATHLON_64_MODEL_95:
+		case B_CPU_AMD_ATHLON_64_MODEL_127:
 			return "Athlon 64";
-		case B_CPU_AMD_OPTERON:
+		case B_CPU_AMD_OPTERON_MODEL_5:
+		case B_CPU_AMD_OPTERON_MODEL_21:
+		case B_CPU_AMD_OPTERON_MODEL_33:
+		case B_CPU_AMD_OPTERON_MODEL_37:
+		case B_CPU_AMD_OPTERON_MODEL_39:
 			return "Opteron";
-		case B_CPU_AMD_PHENOM:
+		case B_CPU_AMD_TURION_64_MODEL_36:
+		case B_CPU_AMD_TURION_64_MODEL_76:
+		case B_CPU_AMD_TURION_64_MODEL_104:
+			return "Turion 64";
+		case B_CPU_AMD_PHENOM_MODEL_2:
 			return "Phenom";
-		case B_CPU_AMD_PHENOM_II:
+		case B_CPU_AMD_PHENOM_II_MODEL_4:
+		case B_CPU_AMD_PHENOM_II_MODEL_5:
+		case B_CPU_AMD_PHENOM_II_MODEL_6:
+		case B_CPU_AMD_PHENOM_II_MODEL_10:
+			get_cpuid_model_string(cpuidName);
+			if (strcasestr(cpuidName, "Athlon") != NULL)
+				return "Athlon II";
 			return "Phenom II";
-		case B_CPU_AMD_GEODE_LX:
-			return "Geode LX";
+		case B_CPU_AMD_A_SERIES:
+			return "A-Series";
+		case B_CPU_AMD_C_SERIES:
+			return "C-Series";
+		case B_CPU_AMD_E_SERIES:
+			return "E-Series";
+		case B_CPU_AMD_FX_SERIES:
+			return "FX-Series";
 
 		/* Transmeta */
 		case B_CPU_TRANSMETA_CRUSOE:
