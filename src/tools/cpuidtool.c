@@ -16,8 +16,6 @@
 #include <string.h>
 
 
-#define INTEL_VENDOR 0x100000
-
 #define EXT_FAMILY_MASK 0xF00000
 #define EXT_MODEL_MASK	0x0F0000
 #define FAMILY_MASK		0x000F00
@@ -69,14 +67,14 @@ static int xtoi(const char* xs, unsigned int* result)
 int
 main(int argc, char *argv[])
 {
-	if (argc != 2) {
-		printf("Provide the Intel cpuid in hex, and you will get how we id it\n");
-		printf("usage: intelcpuid <cpuid_hex>\n");
+	if (argc != 3) {
+		printf("Provide the cpuid in hex, and you will get how we id it\n");
+		printf("usage: cpuidhaiku <AMD|INTEL> <cpuid_hex>\n");
 		return 1;
 	}
 
-	unsigned int cpuid;
-	xtoi(argv[1], &cpuid);
+	unsigned int cpuid = 0;
+	xtoi(argv[2], &cpuid);
 
 	printf("cpuid: 0x%X\n", cpuid);
 
@@ -86,11 +84,24 @@ main(int argc, char *argv[])
 	unsigned int model = (cpuid & MODEL_MASK) >> 4;
 	unsigned int stepping = (cpuid & STEPPING_MASK);
 
-	// Haiku INTEL cpuid format: VVEFEM
-	unsigned int intelHaiku = INTEL_VENDOR + ((extFam & 0xF) << 12)
-		+ (family << 8) + (extMod << 4) + model;
+	unsigned int cpuidHaiku;
+	if (strncmp(argv[1], "AMD", 3) == 0) {
+		if (family == 0xF) {
+			cpuidHaiku = (extFam << 20) + (extMod << 16)
+				+ (family << 4) + model;
+		} else
+			cpuidHaiku = (family << 4) + model;
+		cpuidHaiku += 0x1100; // AMD vendor id
+	} else if (strncmp(argv[1], "INTEL", 5) == 0) {
+		cpuidHaiku = (extFam << 20) + (extMod << 16)
+			+ (family << 4) + model;
+		cpuidHaiku += 0x1000; // Intel vendor id
+	} else {
+		printf("Vendor should be AMD or INTEL\n");
+		return 1;
+	}
 
-	printf("Haiku CPUID: 0x%lX\n", intelHaiku);
+	printf("Haiku CPUID: 0x%lx\n", cpuidHaiku);
 
 	return 0;
 }
