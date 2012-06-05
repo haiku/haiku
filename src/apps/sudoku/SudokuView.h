@@ -94,8 +94,12 @@ private:
 			void				_InvalidateHintField(uint32 x, uint32 y,
 									uint32 hintX, uint32 hintY);
 			void				_InvalidateField(uint32 x, uint32 y);
+			void				_InvalidateValue(uint32 value,
+									bool invalidateHint = false,
+									uint32 x = ~0UL, uint32 y = ~0UL);
 			void				_InvalidateKeyboardFocus(uint32 x, uint32 y);
 			void				_InsertKey(char rawKey, int32 modifiers);
+			void				_SetValueHintValue(uint32 value);
 			void				_RemoveHint();
 			bool				_GetHintFieldFor(BPoint where, uint32 x,
 									uint32 y, uint32& hintX, uint32& hintY);
@@ -127,6 +131,7 @@ private:
 			uint32				fShowHintY;
 			uint32				fLastHintValue;
 			bool				fLastHintValueSet;
+			uint32				fValueHintValue;
 			uint32				fLastField;
 			uint32				fKeyboardX;
 			uint32				fKeyboardY;

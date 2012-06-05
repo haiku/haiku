@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2012, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -28,9 +28,17 @@
 #include <String.h>
 
 
-const uint32 kMsgCheckSolved = 'chks';
+static const uint32 kMsgCheckSolved = 'chks';
 
-const uint32 kStrongLineSize = 2;
+static const uint32 kStrongLineSize = 2;
+
+static const rgb_color kBackgroundColor = {255, 255, 240};
+static const rgb_color kHintColor = {255, 115, 0};
+static const rgb_color kValueColor = {0, 91, 162};
+static const rgb_color kValueCompletedColor = {55, 140, 35};
+static const rgb_color kInvalidValueColor = {200, 0, 0};
+static const rgb_color kValueHintBackgroundColor = {255, 215, 127};
+static const rgb_color kHintValueHintBackgroundColor = {255, 235, 185};
 
 extern const char* kSignature;
 
@@ -103,6 +111,7 @@ SudokuView::InitObject(const BMessage* archive)
 {
 	fField = NULL;
 	fShowHintX = ~0UL;
+	fValueHintValue = ~0UL;
 	fLastHintValue = ~0UL;
 	fLastField = ~0UL;
 	fKeyboardX = 0;
@@ -131,9 +140,8 @@ SudokuView::InitObject(const BMessage* archive)
 
 	SetViewColor(B_TRANSPARENT_COLOR);
 		// to avoid flickering
-	rgb_color color = { 255, 255, 240 };
-	fBackgroundColor = color;
-	SetLowColor(color);
+	fBackgroundColor = kBackgroundColor;
+	SetLowColor(fBackgroundColor);
 	FrameResized(0, 0);
 }
 
@@ -212,6 +220,7 @@ SudokuView::SetTo(entry_ref& ref)
 
 	_PushUndo();
 	status = fField->SetTo(_BaseCharacter(), buffer);
+	fValueHintValue = ~0UL;
 	Invalidate();
 	fclose(file);
 	return status;
@@ -234,6 +243,7 @@ SudokuView::SetTo(const char* data)
 
 	_PushUndo();
 	status = fField->SetTo(_BaseCharacter(), buffer);
+	fValueHintValue = ~0UL;
 	Invalidate();
 	return status;
 }
@@ -250,6 +260,7 @@ SudokuView::SetTo(SudokuField* field)
 	fField = field;
 
 	fBlockSize = fField->BlockSize();
+	fValueHintValue = ~0UL;
 	FrameResized(0, 0);
 	Invalidate();
 	return B_OK;
@@ -377,7 +388,7 @@ SudokuView::SaveTo(BDataIO& stream, uint32 exportAs)
 						text << "<td width=\"" << divider << "\" ";
 						text << "class=\"sudoku sudoku_empty " << style;
 						text << "\">\n&nbsp;";
-					} else if (fField->FlagsAt(x, y) & kInitialValue) {
+					} else if (fField->IsInitialValue(x, y)) {
 						text << "<td width=\"" << divider << "\" ";
 						text << "class=\"sudoku sudoku_initial " << style
 							<< "\">\n";
@@ -543,7 +554,7 @@ SudokuView::ClearChanged()
 
 	for (uint32 y = 0; y < fField->Size(); y++) {
 		for (uint32 x = 0; x < fField->Size(); x++) {
-			if ((fField->FlagsAt(x, y) & kInitialValue) == 0)
+			if (!fField->IsInitialValue(x, y))
 				fField->SetValueAt(x, y, 0);
 		}
 	}
@@ -612,8 +623,9 @@ SudokuView::FrameResized(float /*width*/, float /*height*/)
 	// font for numbers
 
 	uint32 size = fField->Size();
-	fWidth = (Bounds().Width() - kStrongLineSize * (fBlockSize - 1)) / size;
-	fHeight = (Bounds().Height() - kStrongLineSize * (fBlockSize - 1)) / size;
+	fWidth = (Bounds().Width() + 2 - kStrongLineSize * (fBlockSize - 1)) / size;
+	fHeight = (Bounds().Height() + 2 - kStrongLineSize * (fBlockSize - 1))
+		/ size;
 	_FitFont(fFieldFont, fWidth - 2, fHeight - 2);
 
 	font_height fontHeight;
@@ -641,8 +653,8 @@ SudokuView::FrameResized(float /*width*/, float /*height*/)
 BPoint
 SudokuView::_LeftTop(uint32 x, uint32 y)
 {
-	return BPoint(x * fWidth + x / fBlockSize * kStrongLineSize + 1,
-		y * fHeight + y / fBlockSize * kStrongLineSize + 1);
+	return BPoint(x * fWidth - 1 + x / fBlockSize * kStrongLineSize + 1,
+		y * fHeight - 1 + y / fBlockSize * kStrongLineSize + 1);
 }
 
 
@@ -675,6 +687,22 @@ void
 SudokuView::_InvalidateField(uint32 x, uint32 y)
 {
 	Invalidate(_Frame(x, y));
+}
+
+
+void
+SudokuView::_InvalidateValue(uint32 value, bool invalidateHint,
+	uint32 fieldX, uint32 fieldY)
+{
+	for (uint32 y = 0; y < fField->Size(); y++) {
+		for (uint32 x = 0; x < fField->Size(); x++) {
+			if (fField->ValueAt(x, y) == value || (x == fieldX && y == fieldY))
+				Invalidate(_Frame(x, y));
+			else if (invalidateHint && fField->ValueAt(x, y) == 0
+				&& fField->HasHint(x, y, value))
+				Invalidate(_Frame(x, y));
+		}
+	}
 }
 
 
@@ -720,6 +748,22 @@ SudokuView::_GetFieldFor(BPoint where, uint32& x, uint32& y)
 		return false;
 
 	return true;
+}
+
+
+void
+SudokuView::_SetValueHintValue(uint32 value)
+{
+	if (value == fValueHintValue)
+		return;
+
+	if (fValueHintValue != ~0UL)
+		_InvalidateValue(fValueHintValue, true);
+
+	fValueHintValue = value;
+
+	if (fValueHintValue != ~0UL)
+		_InvalidateValue(fValueHintValue, true);
 }
 
 
@@ -801,6 +845,15 @@ SudokuView::MouseDown(BPoint where)
 		Looper()->CurrentMessage()->FindInt32("clicks", &clicks);
 	}
 
+	if (buttons == B_PRIMARY_MOUSE_BUTTON && clicks == 1) {
+		uint32 value = fField->ValueAt(x, y);
+		if (value != 0) {
+			// Toggle value hint
+			_SetValueHintValue(fValueHintValue == value ? ~0UL : value);
+			return;
+		}
+	}
+
 	uint32 hintX, hintY;
 	if (!_GetHintFieldFor(where, x, y, hintX, hintY))
 		return;
@@ -813,9 +866,10 @@ SudokuView::MouseDown(BPoint where)
 		|| (buttons & (B_SECONDARY_MOUSE_BUTTON
 				| B_TERTIARY_MOUSE_BUTTON)) != 0) {
 		// double click or other buttons set a value
-		if ((fField->FlagsAt(x, y) & kInitialValue) == 0) {
+		if (!fField->IsInitialValue(x, y)) {
 			bool wasCompleted;
 			if (fField->ValueAt(x, y) > 0) {
+				// Remove value
 				value = fField->ValueAt(x, y) - 1;
 				wasCompleted = fField->IsValueCompleted(value + 1);
 
@@ -823,6 +877,7 @@ SudokuView::MouseDown(BPoint where)
 				fShowHintX = x;
 				fShowHintY = y;
 			} else {
+				// Set value
 				wasCompleted = fField->IsValueCompleted(value + 1);
 
 				fField->SetValueAt(x, y, value + 1);
@@ -834,8 +889,11 @@ SudokuView::MouseDown(BPoint where)
 				fLastField = field;
 			}
 
+			if (value + 1 != fValueHintValue)
+				_SetValueHintValue(~0UL);
+
 			if (wasCompleted != fField->IsValueCompleted(value + 1))
-				Invalidate();
+				_InvalidateValue(value + 1, false, x, y);
 			else
 				_InvalidateField(x, y);
 		}
@@ -852,7 +910,12 @@ SudokuView::MouseDown(BPoint where)
 		hintMask &= ~valueMask;
 
 	fField->SetHintMaskAt(x, y, hintMask);
-	_InvalidateHintField(x, y, hintX, hintY);
+
+	if (value + 1 != fValueHintValue) {
+		_SetValueHintValue(~0UL);
+		_InvalidateHintField(x, y, hintX, hintY);
+	} else
+		_InvalidateField(x, y);
 
 	fLastHintValue = value;
 	fLastField = field;
@@ -879,8 +942,9 @@ SudokuView::MouseMoved(BPoint where, uint32 transit,
 		fKeyboardX = x;
 		fKeyboardY = y;
 	}
+
 	if (!isField
-		|| (fField->FlagsAt(x, y) & kInitialValue) != 0
+		|| fField->IsInitialValue(x, y)
 		|| (!fShowCursor && fField->ValueAt(x, y) != 0)) {
 		_RemoveHint();
 		return;
@@ -919,7 +983,7 @@ void
 SudokuView::_InsertKey(char rawKey, int32 modifiers)
 {
 	if (!fEditable || !_ValidCharacter(rawKey)
-		|| (fField->FlagsAt(fKeyboardX, fKeyboardY) & kInitialValue) != 0)
+		|| fField->IsInitialValue(fKeyboardX, fKeyboardY))
 		return;
 
 	uint32 value = rawKey - _BaseCharacter();
@@ -1144,9 +1208,12 @@ SudokuView::_DrawHints(uint32 x, uint32 y)
 	for (uint32 j = 0; j < fBlockSize; j++) {
 		for (uint32 i = 0; i < fBlockSize; i++) {
 			uint32 value = j * fBlockSize + i;
-			if (hintMask & (1UL << value))
-				SetHighColor(200, 0, 0);
-			else {
+			if (hintMask & (1UL << value)) {
+//				if (value + 1 == fValueHintValue)
+//					SetHighColor(kValueHintBackgroundColor);
+//				else
+					SetHighColor(kHintColor);
+			}else {
 				if (!showAll)
 					continue;
 
@@ -1170,18 +1237,14 @@ SudokuView::_DrawHints(uint32 x, uint32 y)
 void
 SudokuView::Draw(BRect /*updateRect*/)
 {
-	// draw one pixel border otherwise not covered
-	// by lines and fields
-	SetLowColor(fBackgroundColor);
-	StrokeRect(Bounds(), B_SOLID_LOW);
-
 	// draw lines
 
 	uint32 size = fField->Size();
 
+	SetLowColor(fBackgroundColor);
 	SetHighColor(0, 0, 0);
 
-	float width = fWidth;
+	float width = fWidth - 1;
 	for (uint32 x = 1; x < size; x++) {
 		if (x % fBlockSize == 0) {
 			FillRect(BRect(width, 0, width + kStrongLineSize,
@@ -1193,7 +1256,7 @@ SudokuView::Draw(BRect /*updateRect*/)
 		width += fWidth;
 	}
 
-	float height = fHeight;
+	float height = fHeight - 1;
 	for (uint32 y = 1; y < size; y++) {
 		if (y % fBlockSize == 0) {
 			FillRect(BRect(0, height, Bounds().Width(),
@@ -1209,39 +1272,46 @@ SudokuView::Draw(BRect /*updateRect*/)
 
 	for (uint32 y = 0; y < size; y++) {
 		for (uint32 x = 0; x < size; x++) {
+			uint32 value = fField->ValueAt(x, y);
+
+			rgb_color backgroundColor = fBackgroundColor;
+			if (value == fValueHintValue)
+				backgroundColor = kValueHintBackgroundColor;
+			else if (value == 0 && fField->HasHint(x, y, fValueHintValue))
+				backgroundColor = kHintValueHintBackgroundColor;
+
 			if (((fShowCursor && x == fShowHintX && y == fShowHintY)
 					|| (fShowKeyboardFocus && x == fKeyboardX
 						&& y == fKeyboardY))
-				&& (fField->FlagsAt(x, y) & kInitialValue) == 0) {
+				&& !fField->IsInitialValue(x, y)) {
 				// TODO: make color more intense
-				SetLowColor(tint_color(fBackgroundColor, B_DARKEN_2_TINT));
+				SetLowColor(tint_color(backgroundColor, B_DARKEN_2_TINT));
 				FillRect(_Frame(x, y), B_SOLID_LOW);
 			} else {
-				SetLowColor(fBackgroundColor);
+				SetLowColor(backgroundColor);
 				FillRect(_Frame(x, y), B_SOLID_LOW);
 			}
 
 			if (fShowKeyboardFocus && x == fKeyboardX && y == fKeyboardY)
 				_DrawKeyboardFocus();
 
-			uint32 value = fField->ValueAt(x, y);
 			if (value == 0) {
 				_DrawHints(x, y);
 				continue;
 			}
 
 			SetFont(&fFieldFont);
-			if ((fField->FlagsAt(x, y) & kInitialValue) != 0)
+			if (fField->IsInitialValue(x, y))
 				SetHighColor(0, 0, 0);
 			else {
 				if ((fHintFlags & kMarkInvalid) == 0
-					|| fField->ValidMaskAt(x, y) & (1UL << (value - 1))) {
+					|| fField->IsValid(x, y, value)) {
 					if (fField->IsValueCompleted(value))
-						SetHighColor(60, 60, 150);
+						SetHighColor(kValueCompletedColor);
 					else
-						SetHighColor(0, 0, 220);
+						SetHighColor(kValueColor);
 				} else
-					SetHighColor(200, 0, 0);
+					SetHighColor(kInvalidValueColor);
 			}
 
 			char text[2];
