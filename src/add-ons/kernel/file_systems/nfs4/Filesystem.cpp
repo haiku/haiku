@@ -126,12 +126,15 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
 status_t
 Filesystem::GetInode(ino_t id, Inode** _inode)
 {
-	Filehandle fh;
-	status_t result = fInoIdMap.GetFilehandle(&fh, id);
+	FileInfo fi;
+	status_t result = fInoIdMap.GetFileInfo(&fi, id);
+	if (result == B_ENTRY_NOT_FOUND)
+		dprintf("NFS4: unknown inode: %llu\n", id);
+
 	if (result != B_OK)
 		return result;
 
-	Inode* inode = new(std::nothrow)Inode(this, fh);
+	Inode* inode = new(std::nothrow)Inode(this, fi);
 	if (inode == NULL)
 		return B_NO_MEMORY;
 
@@ -143,6 +146,10 @@ Filesystem::GetInode(ino_t id, Inode** _inode)
 Inode*
 Filesystem::CreateRootInode()
 {
-	return new(std::nothrow)Inode(this, fRootFH, true);
+	FileInfo fi;
+	fi.fFH = fRootFH;
+	fi.fParent = fRootFH;
+	fi.fName = strdup("/");
+	return new(std::nothrow)Inode(this, fi);
 }
 

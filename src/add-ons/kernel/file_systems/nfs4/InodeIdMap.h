@@ -17,32 +17,37 @@
 
 class InodeIdMap {
 public:
-	inline	status_t						AddEntry(const Filehandle& inode,
-												ino_t id);
-	inline	status_t						GetFilehandle(Filehandle* fh,
-												ino_t id);
+	inline	status_t						AddEntry(const Filehandle& fh,
+												const Filehandle& parent,
+												const char* name, ino_t id);
+	inline	status_t						GetFileInfo(FileInfo* fi, ino_t id);
 
 private:
-			AVLTreeMap<ino_t, Filehandle>	fMap;
+			AVLTreeMap<ino_t, FileInfo>	fMap;
 
 };
 
 
 inline status_t
-InodeIdMap::AddEntry(const Filehandle& inode, ino_t id)
+InodeIdMap::AddEntry(const Filehandle& fh, const Filehandle& parent,
+	const char* name, ino_t id)
 {
-	return fMap.Insert(id, inode);
+	FileInfo fi;
+	fi.fFH = fh;
+	fi.fParent = parent;
+	fi.fName = strdup(name);
+	return fMap.Insert(id, fi);
 }
 
 
 inline status_t
-InodeIdMap::GetFilehandle(Filehandle* fh, ino_t id)
+InodeIdMap::GetFileInfo(FileInfo* fi, ino_t id)
 {
-	AVLTreeMap<ino_t, Filehandle>::Iterator it = fMap.Find(id);
+	AVLTreeMap<ino_t, FileInfo>::Iterator it = fMap.Find(id);
 	if (!it.HasCurrent())
-		return B_BAD_VALUE;
+		return B_ENTRY_NOT_FOUND;
 
-	*fh = it.Current();
+	*fi = it.Current();
 	return B_OK;
 }
 

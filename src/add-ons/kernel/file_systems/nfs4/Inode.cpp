@@ -18,15 +18,15 @@
 
 // Creating Inode object from Filehandle probably is not a good idea when
 // filehandles are volatile.
-Inode::Inode(Filesystem* fs, const Filehandle &fh, bool root)
+Inode::Inode(Filesystem* fs, const FileInfo &fi)
 	:
+	fHandle(fi.fFH),
 	fFilesystem(fs),
-	fRoot(root)
+	fParentFH(fi.fParent),
+	fName(strdup(fi.fName))
 {
-	memcpy(&fHandle, &fh, sizeof(fh));
-
 	RequestBuilder req(ProcCompound);
-	req.PutFH(fh);
+	req.PutFH(fHandle);
 
 	Attribute attr[] = { FATTR4_TYPE, FATTR4_FILEID };
 	req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
@@ -56,6 +56,12 @@ Inode::Inode(Filesystem* fs, const Filehandle &fh, bool root)
 	fType = values[0].fData.fValue32;
 
 	delete[] values;
+}
+
+
+Inode::~Inode()
+{
+	free(const_cast<char*>(fName));
 }
 
 
@@ -116,10 +122,12 @@ Inode::LookUp(const char* name, ino_t* id)
 		delete[] values;
 		return B_UNSUPPORTED;
 	}
-	*id = _FileIdToInoT(values[0].fData.fValue64);
-	fFilesystem->InoIdMap()->AddEntry(fh, values[0].fData.fValue64);
 
+	*id = _FileIdToInoT(values[0].fData.fValue64);
 	delete[] values;
+
+	fFilesystem->InoIdMap()->AddEntry(fh, fHandle, name, *id);
+
 	return B_OK;
 }
 
@@ -296,8 +304,6 @@ Inode::_ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 		fileId = fFilesystem->GetId();
 	} else
 		fileId = values[0].fData.fValue64;
-	
-	fFilesystem->InoIdMap()->AddEntry(fh, fileId);
 
 	return _FillDirEntry(de, _FileIdToInoT(fileId), "..", pos, size);
 }
@@ -326,7 +332,7 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count, uint64* cookie)
 	if (cookie[0] == 0 && cookie[1] == 1 && count < *_count) {
 		struct dirent* de = reinterpret_cast<dirent*>(buffer + pos);
 		
-		if (!fRoot)
+		if (strcmp(fName, "/"))
 			_ReadDirUp(de, pos, size);
 		else
 			_FillDirEntry(de, _FileIdToInoT(fFileId), "..", pos, size);

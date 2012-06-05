@@ -20,8 +20,8 @@
 
 class Inode {
 public:
-								Inode(Filesystem* fs, const Filehandle &fh,
-									bool root = false);
+								Inode(Filesystem* fs, const FileInfo& fi);
+								~Inode();
 
 	inline			ino_t		ID() const;
 	inline			mode_t		Type() const;
@@ -49,7 +49,8 @@ private:
 					Filehandle	fHandle;
 					Filesystem*	fFilesystem;
 
-					bool		fRoot;
+					Filehandle	fParentFH;
+					const char*	fName;
 };
 
 
