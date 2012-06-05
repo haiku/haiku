@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2012, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -280,6 +280,13 @@ SudokuField::HintMaskAt(uint32 x, uint32 y) const
 }
 
 
+bool
+SudokuField::HasHint(uint32 x, uint32 y, uint32 value) const
+{
+	return (_FieldAt(x, y).hint_mask & (1UL << (value - 1))) != 0;
+}
+
+
 void
 SudokuField::SetValidMaskAt(uint32 x, uint32 y, uint32 validMask)
 {
@@ -294,6 +301,13 @@ SudokuField::ValidMaskAt(uint32 x, uint32 y) const
 }
 
 
+bool
+SudokuField::IsValid(uint32 x, uint32 y, uint32 value) const
+{
+	return (_FieldAt(x, y).valid_mask & (1UL << (value - 1))) != 0;
+}
+
+
 void
 SudokuField::SetFlagsAt(uint32 x, uint32 y, uint32 flags)
 {
@@ -305,6 +319,13 @@ uint32
 SudokuField::FlagsAt(uint32 x, uint32 y) const
 {
 	return _FieldAt(x, y).flags;
+}
+
+
+bool
+SudokuField::IsInitialValue(uint32 x, uint32 y) const
+{
+	return (_FieldAt(x, y).flags & kInitialValue) != 0;
 }
 
 

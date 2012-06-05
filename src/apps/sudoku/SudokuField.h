@@ -41,13 +41,16 @@ public:
 			void				SetHintMaskAt(uint32 x, uint32 y,
 									uint32 hintMask);
 			uint32				HintMaskAt(uint32 x, uint32 y) const;
+			bool				HasHint(uint32 x, uint32 y, uint32 value) const;
 
 			void				SetValidMaskAt(uint32 x, uint32 y,
 									uint32 validMask);
 			uint32				ValidMaskAt(uint32 x, uint32 y) const;
+			bool				IsValid(uint32 x, uint32 y, uint32 value) const;
 
 			void				SetFlagsAt(uint32 x, uint32 y, uint32 flags);
 			uint32				FlagsAt(uint32 x, uint32 y) const;
+			bool				IsInitialValue(uint32 x, uint32 y) const;
 
 			void				SetValueAt(uint32 x, uint32 y, uint32 value,
 									bool setSolved = false);
