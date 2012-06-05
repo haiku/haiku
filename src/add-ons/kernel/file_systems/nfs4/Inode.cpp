@@ -65,7 +65,6 @@ Inode::Inode(Filesystem* fs, const Filehandle &fh, bool root)
 status_t
 Inode::LookUp(const char* name, ino_t* id)
 {
-	dprintf("nfs4: lookup: %s\n", name);
 	if (fType != NF4DIR)
 		return B_NOT_A_DIRECTORY;
 
@@ -338,7 +337,7 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count, uint64* cookie)
 	}
 
 	while (count < *_count && !eof) {
-		this_count = *_count;
+		this_count = *_count - count;
 		DirEntry* dirents;
 
 		status_t result = _ReadDirOnce(&dirents, &this_count, cookie, &eof);
@@ -346,7 +345,7 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count, uint64* cookie)
 			return result;
 
 		uint32 i;
-		for (i = 0; i < this_count; i++) {
+		for (i = 0; i < min_c(this_count, *_count - count); i++) {
 			struct dirent* de = reinterpret_cast<dirent*>(buffer + pos);
 
 			ino_t id;
@@ -371,7 +370,7 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count, uint64* cookie)
 		return B_BUFFER_OVERFLOW;
 
 	*_count = count;
-
+	
 	return B_OK;
 }
 

@@ -155,6 +155,7 @@ ReplyInterpreter::ReadDir(uint64* cookie, DirEntry** dirents, uint32* _count,
 	return B_OK;
 }
 
+
 status_t
 ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 	uint32* count)
@@ -169,6 +170,13 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 		bitmap[i] = str.GetUInt();
 		attr_count += sCountBits(bitmap[i]);
 	}
+
+	if (attr_count == 0) {
+		*attrs = NULL;
+		*count = 0;
+		return B_OK;
+	} else if (attr_count > FATTR4_MAXIMUM_ATTR_ID)
+		return B_BAD_VALUE;
 
 	uint32 size;
 	const void* ptr = str.GetOpaque(&size);
