@@ -14,15 +14,11 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <drivers/ksocket.h>
 #include <util/kernel_cpp.h>
 
 
 #define	LAST_FRAGMENT	0x80000000
 #define MAX_PACKET_SIZE	65535
-
-
-KSOCKET_MODULE_DECL;
 
 
 bool
@@ -66,7 +62,7 @@ Connection::Connection(const sockaddr_in& addr, Transport proto, bool markers)
 Connection::~Connection()
 {
 	if (fSock != -1)
-		kclosesocket(fSock);
+		close(fSock);
 	mutex_destroy(&fSockLock);
 }
 
@@ -76,7 +72,7 @@ Connection::GetLocalID(ServerAddress* addr)
 {
 	struct sockaddr_in saddr;
 	socklen_t slen = sizeof(addr);
-	status_t result = kgetsockname(fSock, (struct sockaddr*)&saddr, &slen);
+	status_t result = getsockname(fSock, (struct sockaddr*)&saddr, &slen);
 	if (result != B_OK)
 		return result;
 
@@ -105,7 +101,7 @@ Connection::_SendStream(const void* buffer, uint32 size)
 	uint32 sent = 0;
 	mutex_lock(&fSockLock);
 	do {
-		result = ksend(fSock, buf + sent, size + sizeof(uint32) - sent, 0);
+		result = send(fSock, buf + sent, size + sizeof(uint32) - sent, 0);
 		sent += result;
 	} while (result > 0 && sent < size + sizeof(uint32));
 	mutex_unlock(&fSockLock);
@@ -127,7 +123,7 @@ status_t
 Connection::_SendPacket(const void* buffer, uint32 size)
 {
 	// send on DGRAM sockets is atomic. No need to lock.
-	status_t result = ksend(fSock, buffer,  size, 0);
+	status_t result = send(fSock, buffer,  size, 0);
 	if (result < 0)
 		return errno;
 
@@ -149,7 +145,7 @@ Connection::_ReceiveStream(void** pbuffer, uint32* psize)
 		// There is only one listener thread per connection. No need to lock.
 		uint32 received = 0;
 		do {
-			result = krecv(fSock, &record_size + received,
+			result = recv(fSock, &record_size + received,
 							sizeof(record_size) - received, 0);
 			received += result;
 		} while (result > 0 && received < sizeof(record_size));
@@ -175,7 +171,7 @@ Connection::_ReceiveStream(void** pbuffer, uint32* psize)
 
 		received = 0;
 		do {
-			result = krecv(fSock, (uint8*)buffer + size + received,
+			result = recv(fSock, (uint8*)buffer + size + received,
 							record_size - received, 0);
 			received += result;
 		} while (result > 0 && received < sizeof(record_size));
@@ -207,7 +203,7 @@ Connection::_ReceivePacket(void** pbuffer, uint32* psize)
 		return B_NO_MEMORY;
 
 	// There is only one listener thread per connection. No need to lock.
-	size = krecv(fSock, buffer, size, 0);
+	size = recv(fSock, buffer, size, 0);
 	if (size < 0) {
 		result = errno;
 		free(buffer);
@@ -257,10 +253,10 @@ Connection::_Connect()
 {
 	switch (fProtocol) {
 		case ProtocolTCP:
-			fSock = ksocket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+			fSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 			break;
 		case ProtocolUDP:
-			fSock = ksocket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+			fSock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 			break;
 		default:
 			return B_BAD_VALUE;
@@ -268,11 +264,11 @@ Connection::_Connect()
 	if (fSock < 0)
 		return errno;
 
-	status_t result = kconnect(fSock, (struct sockaddr*)&fServerAddress,
+	status_t result = connect(fSock, (struct sockaddr*)&fServerAddress,
 								fServerAddress.sin_len);
 	if (result < 0) {
 		result = errno;
-		kclosesocket(fSock);
+		close(fSock);
 		return result;
 	}
 
@@ -283,7 +279,7 @@ Connection::_Connect()
 status_t
 Connection::Reconnect()
 {
-	kclosesocket(fSock);
+	close(fSock);
 	return _Connect();
 }
 
@@ -293,20 +289,6 @@ Connection::Disconnect()
 {
 	int sock = fSock;
 	fSock = -1;
-	kclosesocket(sock);
-}
-
-
-status_t
-Connection::Init()
-{
-	return ksocket_init();
-}
-
-
-status_t
-Connection::CleanUp()
-{
-	return ksocket_cleanup();
+	close(sock);
 }
 

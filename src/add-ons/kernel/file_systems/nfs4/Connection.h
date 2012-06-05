@@ -45,9 +45,6 @@ public:
 			status_t			Reconnect();
 			void				Disconnect();
 
-	static	status_t			Init();
-	static	status_t			CleanUp();
-
 private:
 								Connection(const sockaddr_in& addr,
 									Transport proto, bool markers);

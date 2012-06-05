@@ -243,10 +243,6 @@ nfs4_init()
 {
 	dprintf("NFS4 Init\n");
 
-	status_t result = Connection::Init();
-	if (result != B_OK)
-		return result;
-
 	gRPCServerManager = new(std::nothrow) RPC::ServerManager;
 	if (gRPCServerManager == NULL)
 		return B_NO_MEMORY;
@@ -261,9 +257,6 @@ nfs4_uninit()
 
 	delete gRPCServerManager;
 
-	status_t result = Connection::CleanUp();
-	if (result != B_OK)
-		return result;
 	return B_OK;
 }
 
