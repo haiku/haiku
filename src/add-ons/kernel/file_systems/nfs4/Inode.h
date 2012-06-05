@@ -25,6 +25,7 @@ public:
 
 	inline			ino_t		ID() const;
 	inline			mode_t		Type() const;
+	inline			const char*	Name() const;
 
 					status_t	LookUp(const char* name, ino_t* id);
 					status_t	Stat(struct stat* st);
@@ -76,6 +77,13 @@ inline mode_t
 Inode::Type() const
 {
 	return sNFSFileTypeToHaiku[fType];
+}
+
+
+inline const char*
+Inode::Name() const
+{
+	return fName;
 }
 
 

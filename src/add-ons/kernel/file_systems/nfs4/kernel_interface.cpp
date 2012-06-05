@@ -112,6 +112,16 @@ nfs4_lookup(fs_volume* volume, fs_vnode* dir, const char* name, ino_t* _id)
 
 
 static status_t
+nfs4_get_vnode_name(fs_volume* volume, fs_vnode* vnode, char* buffer,
+	size_t bufferSize)
+{
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	strncpy(buffer, inode->Name(), bufferSize);
+	return B_OK;
+}
+
+
+static status_t
 nfs4_put_vnode(fs_volume* volume, fs_vnode* vnode, bool reenter)
 {
 	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
@@ -242,7 +252,7 @@ fs_volume_ops gNFSv4VolumeOps = {
 
 fs_vnode_ops gNFSv4VnodeOps = {
 	nfs4_lookup,
-	NULL,	// get_vnode_name()
+	nfs4_get_vnode_name,
 	nfs4_put_vnode,
 	NULL,	// remove_vnode()
 
