@@ -101,6 +101,8 @@ FileInfo::operator=(const FileInfo& fi)
 {
 	fFH = fi.fFH;
 	fParent = fi.fParent;
+
+	free(const_cast<char*>(fName));
 	fName = strdup(fi.fName);
 	return *this;
 }
