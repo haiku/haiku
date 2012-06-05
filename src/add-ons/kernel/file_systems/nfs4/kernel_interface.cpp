@@ -150,12 +150,19 @@ nfs4_read_stat(fs_volume* volume, fs_vnode* vnode, struct stat* stat)
 static status_t
 nfs4_open(fs_volume* volume, fs_vnode* vnode, int openMode, void** _cookie)
 {
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+
+	if (inode->Type() == S_IFDIR) {
+		*_cookie = NULL;
+		return B_OK;
+	}
+
 	OpenFileCookie* cookie = new OpenFileCookie;
 	if (cookie == NULL)
 		return B_NO_MEMORY;
 	*_cookie = cookie;
 
-	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+
 	status_t result = inode->Open(openMode, cookie);
 	if (result != B_OK)
 		delete cookie;
@@ -175,6 +182,10 @@ static status_t
 nfs4_free_cookie(fs_volume* volume, fs_vnode* vnode, void* _cookie)
 {
 	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+
+	if (inode->Type() == S_IFDIR)
+		return B_OK;
+
 	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
 	inode->Close(cookie);
 	delete cookie;
@@ -188,6 +199,10 @@ nfs4_read(fs_volume* volume, fs_vnode* vnode, void* _cookie, off_t pos,
 	void* buffer, size_t* length)
 {
 	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+
+	if (inode->Type() == S_IFDIR)
+		return B_IS_A_DIRECTORY;
+
 	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
 
 	return inode->Read(cookie, pos, buffer, length);
