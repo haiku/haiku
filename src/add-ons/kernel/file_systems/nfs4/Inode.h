@@ -34,6 +34,7 @@ public:
 	inline			const char*	Name() const;
 
 					status_t	LookUp(const char* name, ino_t* id);
+					status_t	Access(int mode);
 					status_t	Stat(struct stat* st);
 
 					status_t	Open(int mode, OpenFileCookie* cookie);

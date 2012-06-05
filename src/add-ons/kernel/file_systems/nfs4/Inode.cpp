@@ -133,6 +133,47 @@ Inode::LookUp(const char* name, ino_t* id)
 
 
 status_t
+Inode::Access(int mode)
+{
+	RequestBuilder req(ProcCompound);
+	req.PutFH(fHandle);
+	req.Access();
+
+	RPC::Reply *rpl;
+	fFilesystem->Server()->SendCall(req.Request(), &rpl);
+	ReplyInterpreter reply(rpl);
+
+	status_t result;
+	result = reply.PutFH();
+	if (result != B_OK)
+		return result;
+
+	uint32 allowed;
+	result = reply.Access(NULL, &allowed);
+	if (result != B_OK)
+		return result;
+
+	int acc = 0;
+	if ((allowed & ACCESS4_READ) != 0)
+		acc |= R_OK;
+
+	if (fType == NF4DIR && (allowed & ACCESS4_LOOKUP) != 0)
+		acc |= X_OK | R_OK;
+
+	if (fType != NF4DIR && (allowed & ACCESS4_EXECUTE) != 0)
+		acc |= X_OK;
+
+	if ((allowed & ACCESS4_MODIFY) != 0)
+		acc |= W_OK;
+
+	if ((mode & acc) != mode)
+		return B_NOT_ALLOWED;
+
+	return B_OK;
+}
+
+
+status_t
 Inode::Stat(struct stat* st)
 {
 	RequestBuilder req(ProcCompound);

@@ -132,6 +132,14 @@ nfs4_put_vnode(fs_volume* volume, fs_vnode* vnode, bool reenter)
 
 
 static status_t
+nfs4_access(fs_volume* volume, fs_vnode* vnode, int mode)
+{
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	return inode->Access(mode);
+}
+
+
+static status_t
 nfs4_read_stat(fs_volume* volume, fs_vnode* vnode, struct stat* stat)
 {
 	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
@@ -312,7 +320,7 @@ fs_vnode_ops gNFSv4VnodeOps = {
 	NULL,	// unlink()
 	NULL,	// rename()
 
-	NULL,	// access()
+	nfs4_access,
 	nfs4_read_stat,
 	NULL,	// write_stat()
 	NULL,	// fs_preallocate()
