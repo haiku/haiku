@@ -21,7 +21,7 @@
 class Inode {
 public:
 								Inode(Filesystem* fs, const Filehandle &fh,
-									Inode* parent);
+									bool root = false);
 
 	inline			ino_t		ID() const;
 	inline			mode_t		Type() const;
@@ -38,6 +38,8 @@ private:
 									uint64* cookie, bool* eof);
 					status_t	_FillDirEntry(struct dirent* de, ino_t id,
 									const char* name, uint32 pos, uint32 size);
+					status_t	_ReadDirUp(struct dirent* de, uint32 pos,
+									uint32 size);
 
 	static inline	ino_t		_FileIdToInoT(uint64 fileid);
 
@@ -46,7 +48,8 @@ private:
 
 					Filehandle	fHandle;
 					Filesystem*	fFilesystem;
-					Inode*		fParent;	// this will cause trouble
+
+					bool		fRoot;
 };
 
 

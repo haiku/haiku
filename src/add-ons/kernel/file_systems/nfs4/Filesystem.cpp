@@ -131,7 +131,7 @@ Filesystem::GetInode(ino_t id, Inode** _inode)
 	if (result != B_OK)
 		return result;
 
-	Inode* inode = new(std::nothrow)Inode(this, fh, NULL);
+	Inode* inode = new(std::nothrow)Inode(this, fh);
 	if (inode == NULL)
 		return B_NO_MEMORY;
 
@@ -143,6 +143,6 @@ Filesystem::GetInode(ino_t id, Inode** _inode)
 Inode*
 Filesystem::CreateRootInode()
 {
-	return new(std::nothrow)Inode(this, fRootFH, NULL);
+	return new(std::nothrow)Inode(this, fRootFH, true);
 }
 

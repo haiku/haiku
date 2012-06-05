@@ -18,10 +18,10 @@
 
 // Creating Inode object from Filehandle probably is not a good idea when
 // filehandles are volatile.
-Inode::Inode(Filesystem* fs, const Filehandle &fh, Inode* parent)
+Inode::Inode(Filesystem* fs, const Filehandle &fh, bool root)
 	:
 	fFilesystem(fs),
-	fParent(parent)
+	fRoot(root)
 {
 	memcpy(&fHandle, &fh, sizeof(fh));
 
@@ -65,6 +65,7 @@ Inode::Inode(Filesystem* fs, const Filehandle &fh, Inode* parent)
 status_t
 Inode::LookUp(const char* name, ino_t* id)
 {
+	dprintf("nfs4: lookup: %s\n", name);
 	if (fType != NF4DIR)
 		return B_NOT_A_DIRECTORY;
 
@@ -116,10 +117,10 @@ Inode::LookUp(const char* name, ino_t* id)
 		delete[] values;
 		return B_UNSUPPORTED;
 	}
-	*id = values[0].fData.fValue64;
-	delete[] values;
+	*id = _FileIdToInoT(values[0].fData.fValue64);
+	fFilesystem->InoIdMap()->AddEntry(fh, values[0].fData.fValue64);
 
-	fFilesystem->InoIdMap()->AddEntry(fh, *id);
+	delete[] values;
 	return B_OK;
 }
 
@@ -257,6 +258,53 @@ Inode::_FillDirEntry(struct dirent* de, ino_t id, const char* name, uint32 pos,
 
 
 status_t
+Inode::_ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
+{
+	RequestBuilder req(ProcCompound);
+	req.PutFH(fHandle);
+	req.LookUpUp();
+	req.GetFH();
+	Attribute attr[] = { FATTR4_FILEID };
+	req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
+
+	RPC::Reply *rpl;
+	fFilesystem->Server()->SendCall(req.Request(), &rpl);
+	ReplyInterpreter reply(rpl);
+
+	status_t result;
+	result = reply.PutFH();
+	if (result != B_OK)
+		return result;
+
+	result = reply.LookUpUp();
+	if (result != B_OK)
+		return result;
+
+	Filehandle fh;
+	result = reply.GetFH(&fh);
+	if (result != B_OK)
+		return result;
+
+	AttrValue* values;
+	uint32 count;
+	result = reply.GetAttr(&values, &count);
+	if (result != B_OK)
+		return result;
+
+	uint64 fileId;
+	if (count < 1 || values[0].fAttribute != FATTR4_FILEID) {
+		// Server does not provide fileid. We need to make something up.
+		fileId = fFilesystem->GetId();
+	} else
+		fileId = values[0].fData.fValue64;
+	
+	fFilesystem->InoIdMap()->AddEntry(fh, fileId);
+
+	return _FillDirEntry(de, _FileIdToInoT(fileId), "..", pos, size);
+}
+
+
+status_t
 Inode::ReadDir(void* _buffer, uint32 size, uint32* _count, uint64* cookie)
 {
 	uint32 count = 0;
@@ -279,10 +327,10 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count, uint64* cookie)
 	if (cookie[0] == 0 && cookie[1] == 1 && count < *_count) {
 		struct dirent* de = reinterpret_cast<dirent*>(buffer + pos);
 		
-		if (fParent != NULL)
-			_FillDirEntry(de, fParent->fFileId, "..", pos, size);
+		if (!fRoot)
+			_ReadDirUp(de, pos, size);
 		else
-			_FillDirEntry(de, fFileId, "..", pos, size);
+			_FillDirEntry(de, _FileIdToInoT(fFileId), "..", pos, size);
 
 		pos += de->d_reclen;
 		count++;
