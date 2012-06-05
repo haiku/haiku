@@ -54,6 +54,27 @@ RequestBuilder::Access()
 
 
 status_t
+RequestBuilder::Close(uint32 seq, const uint32* id, uint32 stateSeq)
+{
+	if (fProcedure != ProcCompound)
+		return B_BAD_VALUE;
+	if (fRequest == NULL)
+		return B_NO_MEMORY;
+
+	fRequest->Stream().AddUInt(OpClose);
+	fRequest->Stream().AddUInt(seq);
+	fRequest->Stream().AddUInt(stateSeq);
+	fRequest->Stream().AddUInt(id[0]);
+	fRequest->Stream().AddUInt(id[1]);
+	fRequest->Stream().AddUInt(id[2]);
+
+	fOpCount++;
+
+	return B_OK;
+}
+
+
+status_t
 RequestBuilder::GetAttr(Attribute* attrs, uint32 count)
 {
 	if (fProcedure != ProcCompound)

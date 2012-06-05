@@ -65,6 +65,22 @@ ReplyInterpreter::Access(uint32* supported, uint32* allowed)
 }
 
 
+status_t
+ReplyInterpreter::Close()
+{
+	status_t res = _OperationError(OpClose);
+	if (res != B_OK)
+		return res;
+
+	fReply->Stream().GetUInt();
+	fReply->Stream().GetUInt();
+	fReply->Stream().GetUInt();
+	fReply->Stream().GetUInt();
+
+	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+}
+
+
 // Bit Twiddling Hacks
 // http://graphics.stanford.edu/~seander/bithacks.html
 static inline uint32 sCountBits(uint32 v)

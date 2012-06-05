@@ -23,6 +23,8 @@ public:
 									~RequestBuilder();
 
 			status_t				Access();
+			status_t				Close(uint32 seq, const uint32* id,
+										uint32 stateSeq);
 			status_t				GetAttr(Attribute* attrs, uint32 count);
 			status_t				GetFH();
 			status_t				LookUp(const char* name);

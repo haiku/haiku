@@ -156,7 +156,26 @@ nfs4_open(fs_volume* volume, fs_vnode* vnode, int openMode, void** _cookie)
 }
 
 
-status_t
+static status_t
+nfs4_close(fs_volume* volume, fs_vnode* vnode, void* cookie)
+{
+	return B_OK;
+}
+
+
+static status_t
+nfs4_free_cookie(fs_volume* volume, fs_vnode* vnode, void* _cookie)
+{
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
+	inode->Close(cookie);
+	delete cookie;
+
+	return B_OK;
+}
+
+
+static status_t
 nfs4_read(fs_volume* volume, fs_vnode* vnode, void* _cookie, off_t pos,
 	void* buffer, size_t* length)
 {
@@ -308,8 +327,8 @@ fs_vnode_ops gNFSv4VnodeOps = {
 	/* file operations */
 	NULL,	// create()
 	nfs4_open,
-	NULL,	// close()
-	NULL,	// free_cookie()
+	nfs4_close,
+	nfs4_free_cookie,
 	nfs4_read,
 	NULL,	// write,
 

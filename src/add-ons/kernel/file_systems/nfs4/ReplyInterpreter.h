@@ -39,6 +39,7 @@ public:
 						~ReplyInterpreter();
 
 			status_t	Access(uint32* supported, uint32* allowed);
+			status_t	Close();
 			status_t	GetAttr(AttrValue** attrs, uint32* count);
 			status_t	GetFH(Filehandle* fh);
 	inline	status_t	LookUp();

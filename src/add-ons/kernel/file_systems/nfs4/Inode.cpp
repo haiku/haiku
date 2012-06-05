@@ -250,6 +250,30 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 
 
 status_t
+Inode::Close(OpenFileCookie* cookie)
+{
+	RequestBuilder req(ProcCompound);
+	req.PutFH(fHandle);
+	req.Close(cookie->fSeq, cookie->fStateId, cookie->fStateSeq);
+
+	RPC::Reply *rpl;
+	fFilesystem->Server()->SendCall(req.Request(), &rpl);
+	ReplyInterpreter reply(rpl);
+
+	status_t result;
+	result = reply.PutFH();
+	if (result != B_OK)
+		return result;
+
+	result = reply.Close();
+	if (result != B_OK)
+		return result;
+
+	return B_OK;
+}
+
+
+status_t
 Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length)
 {
 	bool eof = false;
