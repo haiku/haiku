@@ -206,6 +206,28 @@ RequestBuilder::PutRootFH()
 
 
 status_t
+RequestBuilder::Read(const uint32* id, uint32 stateSeq, uint64 pos, uint32 len)
+{
+	if (fProcedure != ProcCompound)
+		return B_BAD_VALUE;
+	if (fRequest == NULL)
+		return B_NO_MEMORY;
+
+	fRequest->Stream().AddUInt(OpRead);
+	fRequest->Stream().AddUInt(stateSeq);
+	fRequest->Stream().AddUInt(id[0]);
+	fRequest->Stream().AddUInt(id[1]);
+	fRequest->Stream().AddUInt(id[2]);
+	fRequest->Stream().AddUHyper(pos);
+	fRequest->Stream().AddUInt(len);
+
+	fOpCount++;
+
+	return B_OK;
+}
+
+
+status_t
 RequestBuilder::ReadDir(uint32 count, uint64* cookie, Attribute* attrs,
 	uint32 attr_count)
 {

@@ -250,6 +250,41 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 
 
 status_t
+Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length)
+{
+	bool eof = false;
+	uint32 size = 0;
+	uint32 len = 0;
+
+	while (size < *_length && !eof) {
+		RequestBuilder req(ProcCompound);
+		req.PutFH(fHandle);
+		req.Read(cookie->fStateId, cookie->fStateSeq, pos + size,
+			*_length - size);
+
+		RPC::Reply *rpl;
+		fFilesystem->Server()->SendCall(req.Request(), &rpl);
+		ReplyInterpreter reply(rpl);
+
+		status_t result;
+		result = reply.PutFH();
+		if (result != B_OK)
+			return result;
+
+		result = reply.Read(reinterpret_cast<char*>(buffer) + size, &len, &eof);
+		if (result != B_OK)
+			return result;
+
+		size += len;
+	}
+
+	*_length = size;
+
+	return B_OK;
+}
+
+
+status_t
 Inode::OpenDir(uint64* cookie)
 {
 	if (fType != NF4DIR)

@@ -165,6 +165,21 @@ ReplyInterpreter::OpenConfirm(uint32* stateSeq)
 
 
 status_t
+ReplyInterpreter::Read(void* buffer, uint32* size, bool* eof)
+{
+	status_t res = _OperationError(OpRead);
+	if (res != B_OK)
+		return res;
+
+	*eof = fReply->Stream().GetBoolean();
+	const void* ptr = fReply->Stream().GetOpaque(size);
+	memcpy(buffer, ptr, *size);
+
+	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+}
+
+
+status_t
 ReplyInterpreter::ReadDir(uint64* cookie, DirEntry** dirents, uint32* _count,
 	bool* eof)
 {

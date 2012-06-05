@@ -156,6 +156,17 @@ nfs4_open(fs_volume* volume, fs_vnode* vnode, int openMode, void** _cookie)
 }
 
 
+status_t
+nfs4_read(fs_volume* volume, fs_vnode* vnode, void* _cookie, off_t pos,
+	void* buffer, size_t* length)
+{
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
+
+	return inode->Read(cookie, pos, buffer, length);
+}
+
+
 static status_t
 nfs4_open_dir(fs_volume* volume, fs_vnode* vnode, void** _cookie)
 {
@@ -299,7 +310,7 @@ fs_vnode_ops gNFSv4VnodeOps = {
 	nfs4_open,
 	NULL,	// close()
 	NULL,	// free_cookie()
-	NULL,	// read()
+	nfs4_read,
 	NULL,	// write,
 
 	/* directory operations */

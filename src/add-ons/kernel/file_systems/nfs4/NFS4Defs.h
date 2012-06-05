@@ -30,6 +30,7 @@ enum Opcode {
 	OpOpenConfirm			= 20,
 	OpPutFH					= 22,
 	OpPutRootFH				= 24,
+	OpRead					= 25,
 	OpReadDir				= 26,
 	OpSetClientID			= 35,
 	OpSetClientIDConfirm	= 36

@@ -37,6 +37,8 @@ public:
 					status_t	Stat(struct stat* st);
 
 					status_t	Open(int mode, OpenFileCookie* cookie);
+					status_t	Read(OpenFileCookie* cookie, off_t pos,
+									void* buffer, size_t* length);
 
 					status_t	OpenDir(uint64* cookie);
 					status_t	ReadDir(void* buffer, uint32 size,
