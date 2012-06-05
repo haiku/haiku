@@ -171,6 +171,16 @@ nfs4_read_dir(fs_volume* volume, fs_vnode* vnode, void* _cookie,
 }
 
 
+static status_t
+nfs4_rewind_dir(fs_volume* volume, fs_vnode* vnode, void* _cookie)
+{
+	uint64* cookie = reinterpret_cast<uint64*>(_cookie);
+	cookie[0] = 0;
+	cookie[1] = 2;
+
+	return B_OK;
+}
+
 status_t
 nfs4_init()
 {
@@ -272,7 +282,7 @@ fs_vnode_ops gNFSv4VnodeOps = {
 	nfs4_close_dir,
 	nfs4_free_dir_cookie,
 	nfs4_read_dir,
-	NULL,	// rewind_dir,
+	nfs4_rewind_dir,
 };
 
 static file_system_module_info sNFSv4ModuleInfo = {
