@@ -119,6 +119,62 @@ RequestBuilder::LookUpUp()
 
 
 status_t
+RequestBuilder::Open(uint32 seq, uint32 access, uint64 id, OpenCreate oc,
+	const char* name)
+{
+	if (fProcedure != ProcCompound)
+		return B_BAD_VALUE;
+	if (fRequest == NULL)
+		return B_NO_MEMORY;
+
+	fRequest->Stream().AddUInt(OpOpen);
+	fRequest->Stream().AddUInt(seq);
+	fRequest->Stream().AddUInt(access);
+	fRequest->Stream().AddUInt(0);			// deny none
+	fRequest->Stream().AddUHyper(id);
+
+	char owner[128];
+	int pos = 0;
+	*(uint32*)(owner + pos) = time(NULL);
+	pos += sizeof(uint32);
+
+	*(uint32*)(owner + pos) = find_thread(NULL);
+	pos += sizeof(uint32);
+
+	fRequest->Stream().AddOpaque(owner, pos);
+
+	fRequest->Stream().AddUInt(oc);
+	fRequest->Stream().AddUInt(0);			// claim null
+	fRequest->Stream().AddString(name, strlen(name));
+
+	fOpCount++;
+
+	return B_OK;
+}
+
+
+status_t
+RequestBuilder::OpenConfirm(uint32 seq, const uint32* id, uint32 stateSeq)
+{
+	if (fProcedure != ProcCompound)
+		return B_BAD_VALUE;
+	if (fRequest == NULL)
+		return B_NO_MEMORY;
+
+	fRequest->Stream().AddUInt(OpOpenConfirm);
+	fRequest->Stream().AddUInt(stateSeq);
+	fRequest->Stream().AddUInt(id[0]);
+	fRequest->Stream().AddUInt(id[1]);
+	fRequest->Stream().AddUInt(id[2]);
+	fRequest->Stream().AddUInt(seq);
+
+	fOpCount++;
+
+	return B_OK;
+}
+
+
+status_t
 RequestBuilder::PutFH(const Filehandle& fh)
 {
 	if (fProcedure != ProcCompound)
@@ -168,6 +224,63 @@ RequestBuilder::ReadDir(uint32 count, uint64* cookie, Attribute* attrs,
 	fRequest->Stream().AddUInt(0x2000);
 	fRequest->Stream().AddUInt(0x8000);
 	_AttrBitmap(fRequest->Stream(), attrs, attr_count);
+
+	fOpCount++;
+
+	return B_OK;
+}
+
+
+status_t
+RequestBuilder::SetClientID(const RPC::Server* serv)
+{
+	if (fProcedure != ProcCompound)
+		return B_BAD_VALUE;
+	if (fRequest == NULL)
+		return B_NO_MEMORY;
+
+	fRequest->Stream().AddUInt(OpSetClientID);
+	uint64 verifier = rand();
+	verifier = verifier << 32 | rand();
+	fRequest->Stream().AddUHyper(verifier);
+
+	char id[128] = "HAIKU:kernel:";
+	int pos = strlen(id);
+	*(uint32*)(id + pos) = serv->ID().fAddress;
+	pos += sizeof(uint32);
+	*(uint16*)(id + pos) = serv->ID().fPort;
+	pos += sizeof(uint16);
+	*(uint16*)(id + pos) = serv->ID().fProtocol;
+	pos += sizeof(uint16);
+
+	*(uint32*)(id + pos) = serv->LocalID().fAddress;
+	pos += sizeof(uint32);
+	
+	fRequest->Stream().AddOpaque(id, pos);
+
+	// Callbacks are currently not supported
+	fRequest->Stream().AddUInt(0);
+	fRequest->Stream().AddOpaque(NULL, 0);
+	fRequest->Stream().AddOpaque(NULL, 0);
+	fRequest->Stream().AddUInt(0);
+
+	fOpCount++;
+
+	return B_OK;
+}
+
+
+status_t
+RequestBuilder::SetClientIDConfirm(uint64 id, uint64 ver)
+{
+	if (fProcedure != ProcCompound)
+		return B_BAD_VALUE;
+	if (fRequest == NULL)
+		return B_NO_MEMORY;
+
+	fRequest->Stream().AddUInt(OpSetClientIDConfirm);
+	fRequest->Stream().AddUHyper(id);
+	fRequest->Stream().AddUHyper(ver);
 
 	fOpCount++;
 

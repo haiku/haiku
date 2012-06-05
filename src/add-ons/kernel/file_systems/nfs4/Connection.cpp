@@ -42,6 +42,16 @@ ServerAddress::operator<(const ServerAddress& x)
 }
 
 
+ServerAddress&
+ServerAddress::operator=(const ServerAddress& x)
+{
+	fAddress = x.fAddress;
+	fPort = x.fPort;
+	fProtocol = x.fProtocol;
+	return *this;
+}
+
+
 Connection::Connection(const sockaddr_in& addr, Transport proto, bool markers)
 	:
 	fSock(-1),
@@ -58,6 +68,23 @@ Connection::~Connection()
 	if (fSock != -1)
 		kclosesocket(fSock);
 	mutex_destroy(&fSockLock);
+}
+
+
+status_t
+Connection::GetLocalID(ServerAddress* addr)
+{
+	struct sockaddr_in saddr;
+	socklen_t slen = sizeof(addr);
+	status_t result = kgetsockname(fSock, (struct sockaddr*)&saddr, &slen);
+	if (result != B_OK)
+		return result;
+
+	addr->fProtocol = fProtocol;
+	addr->fPort = ntohs(saddr.sin_port);
+	addr->fAddress = ntohl(saddr.sin_addr.s_addr);
+
+	return B_OK;
 }
 
 

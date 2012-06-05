@@ -21,14 +21,18 @@ enum Procedure {
 };
 
 enum Opcode {
-	OpAccess		= 3,
-	OpGetAttr		= 9,
-	OpGetFH			= 10,
-	OpLookUp		= 15,
-	OpLookUpUp		= 16,
-	OpPutFH			= 22,
-	OpPutRootFH		= 24,
-	OpReadDir		= 26
+	OpAccess				= 3,
+	OpGetAttr				= 9,
+	OpGetFH					= 10,
+	OpLookUp				= 15,
+	OpLookUpUp				= 16,
+	OpOpen					= 18,
+	OpOpenConfirm			= 20,
+	OpPutFH					= 22,
+	OpPutRootFH				= 24,
+	OpReadDir				= 26,
+	OpSetClientID			= 35,
+	OpSetClientIDConfirm	= 36
 };
 
 enum Access {
@@ -126,6 +130,21 @@ enum FileHandleExpiryType {
 	FH4_VOLATILE_ANY		= 0x02,
 	FH4_VOL_MIGRATION		= 0x04,
 	FH4_VOL_RENAME			= 0x08
+};
+
+enum OpenAccess {
+	OPEN4_SHARE_ACCESS_READ		= 1,
+	OPEN4_SHARE_ACCESS_WRITE	= 2
+};
+
+enum OpenCreate {
+	OPEN4_NOCREATE			= 0,
+	OPEN4_CREATE			= 1
+};
+
+enum OpenFlags {
+	OPEN4_RESULT_CONFIRM		= 2,
+	OPEN4_RESULT_LOCKTYPE_POSIX	= 4
 };
 
 enum Errors {

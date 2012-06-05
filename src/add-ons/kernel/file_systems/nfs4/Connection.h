@@ -27,6 +27,8 @@ struct ServerAddress {
 
 			bool				operator==(const ServerAddress& x);
 			bool				operator<(const ServerAddress& x);
+
+			ServerAddress&		operator=(const ServerAddress& x);
 };
 
 class Connection {
@@ -37,6 +39,8 @@ public:
 
 	inline	status_t			Send(const void* buffer, uint32 size);
 	inline	status_t			Receive(void** buffer, uint32* size);
+
+			status_t			GetLocalID(ServerAddress* addr);
 
 			status_t			Reconnect();
 			void				Disconnect();

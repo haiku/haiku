@@ -142,7 +142,17 @@ nfs4_read_stat(fs_volume* volume, fs_vnode* vnode, struct stat* stat)
 static status_t
 nfs4_open(fs_volume* volume, fs_vnode* vnode, int openMode, void** _cookie)
 {
-	return B_ERROR;
+	OpenFileCookie* cookie = new OpenFileCookie;
+	if (cookie == NULL)
+		return B_NO_MEMORY;
+	*_cookie = cookie;
+
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	status_t result = inode->Open(openMode, cookie);
+	if (result != B_OK)
+		delete cookie;
+
+	return result;
 }
 
 

@@ -61,7 +61,7 @@ ReplyInterpreter::Access(uint32* supported, uint32* allowed)
 	if (allowed != NULL)
 		*allowed = allow;
 
-	return B_OK;
+	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
 }
 
 
@@ -112,7 +112,55 @@ ReplyInterpreter::GetFH(Filehandle* fh)
 		memcpy(fh->fFH, ptr, size);
 	}
 
-	return B_OK;
+	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+}
+
+
+status_t
+ReplyInterpreter::Open(uint32* id, uint32* seq, bool* confirm)
+{
+	status_t res = _OperationError(OpOpen);
+	if (res != B_OK)
+		return res;
+
+	*seq = fReply->Stream().GetUInt();
+	id[0] = fReply->Stream().GetUInt();
+	id[1] = fReply->Stream().GetUInt();
+	id[2] = fReply->Stream().GetUInt();
+
+	// change info
+	fReply->Stream().GetBoolean();
+	fReply->Stream().GetUHyper();
+	fReply->Stream().GetUHyper();
+
+	uint32 flags = fReply->Stream().GetUInt();
+	*confirm = (flags & OPEN4_RESULT_CONFIRM) == OPEN4_RESULT_CONFIRM;
+
+	// attrmask
+	uint32 bcount = fReply->Stream().GetUInt();
+	for (uint32 i = 0; i < bcount; i++)
+		fReply->Stream().GetUInt();
+
+	// delegation info
+	fReply->Stream().GetUInt();
+
+	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+}
+
+
+status_t
+ReplyInterpreter::OpenConfirm(uint32* stateSeq)
+{
+	status_t res = _OperationError(OpOpenConfirm);
+	if (res != B_OK)
+		return res;
+
+	*stateSeq = fReply->Stream().GetUInt();
+	fReply->Stream().GetUInt();
+	fReply->Stream().GetUInt();
+	fReply->Stream().GetUInt();
+
+	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
 }
 
 
@@ -152,7 +200,21 @@ ReplyInterpreter::ReadDir(uint64* cookie, DirEntry** dirents, uint32* _count,
 	*_count = count;
 	*dirents = entries;
 
-	return B_OK;
+	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+}
+
+
+status_t
+ReplyInterpreter::SetClientID(uint64* clientid, uint64* verifier)
+{
+	status_t res = _OperationError(OpSetClientID);
+	if (res != B_OK)
+		return res;
+
+	*clientid = fReply->Stream().GetUHyper();
+	*verifier = fReply->Stream().GetUHyper();
+
+	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
 }
 
 
@@ -230,7 +292,7 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 
 	*count = attr_count;
 	*attrs = values;
-	return B_OK;
+	return str.IsEOF() ? B_BAD_VALUE : B_OK;
 }
 
 

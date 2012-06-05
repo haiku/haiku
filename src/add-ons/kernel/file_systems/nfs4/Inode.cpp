@@ -186,6 +186,70 @@ Inode::Stat(struct stat* st)
 
 
 status_t
+Inode::Open(int mode, OpenFileCookie* cookie)
+{
+	cookie->fSeq = 0;
+
+	RequestBuilder req_setid(ProcCompound);
+	req_setid.SetClientID(fFilesystem->Server());
+
+	RPC::Reply *rpl;
+	fFilesystem->Server()->SendCall(req_setid.Request(), &rpl);
+	ReplyInterpreter setid(rpl);
+
+	uint64 id, ver;
+	status_t result = setid.SetClientID(&id, &ver);
+	if (result != B_OK)
+		return result;
+
+	RequestBuilder req_conf(ProcCompound);
+	req_conf.SetClientIDConfirm(id, ver);
+
+	fFilesystem->Server()->SendCall(req_conf.Request(), &rpl);
+	ReplyInterpreter conf(rpl);
+
+	result = conf.SetClientIDConfirm();
+	if (result != B_OK)
+		return result;
+
+	RequestBuilder req(ProcCompound);
+	req.PutFH(fParentFH);
+	req.Open(cookie->fSeq, OPEN4_SHARE_ACCESS_READ, id, OPEN4_NOCREATE, fName);
+	cookie->fSeq++;
+	fFilesystem->Server()->SendCall(req.Request(), &rpl);
+	ReplyInterpreter reply(rpl);
+
+	result = reply.PutFH();
+	if (result != B_OK)
+		return result;
+
+	bool confirm;
+	result = reply.Open(cookie->fStateId, &cookie->fStateSeq, &confirm);
+	if (result != B_OK)
+		return result;
+
+	if (confirm) {
+		RequestBuilder req(ProcCompound);
+		req.PutFH(fHandle);
+		req.OpenConfirm(cookie->fSeq, cookie->fStateId, cookie->fStateSeq);
+		cookie->fSeq++;
+		fFilesystem->Server()->SendCall(req.Request(), &rpl);
+		ReplyInterpreter reply(rpl);
+
+		result = reply.PutFH();
+		if (result != B_OK)
+			return result;
+
+		result = reply.OpenConfirm(&cookie->fStateSeq);
+		if (result != B_OK)
+			return result;
+	}
+
+	return B_OK;
+}
+
+
+status_t
 Inode::OpenDir(uint64* cookie)
 {
 	if (fType != NF4DIR)

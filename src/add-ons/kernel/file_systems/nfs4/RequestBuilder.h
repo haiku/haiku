@@ -13,6 +13,7 @@
 
 #include "NFS4Defs.h"
 #include "RPCCall.h"
+#include "RPCServer.h"
 #include "XDR.h"
 
 
@@ -26,10 +27,16 @@ public:
 			status_t				GetFH();
 			status_t				LookUp(const char* name);
 			status_t				LookUpUp();
+			status_t				Open(uint32 seq, uint32 access, uint64 id,
+										OpenCreate oc, const char* name);
+			status_t				OpenConfirm(uint32 seq, const uint32* id,
+										uint32 stateSeq);
 			status_t				PutFH(const Filehandle& fh);
 			status_t				PutRootFH();
 			status_t				ReadDir(uint32 count, uint64* cookie, 
 										Attribute* attrs, uint32 attr_count);
+			status_t				SetClientID(const RPC::Server* serv);
+			status_t				SetClientIDConfirm(uint64 id, uint64 ver);
 
 			RPC::Call*				Request();
 

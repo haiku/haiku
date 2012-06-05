@@ -18,6 +18,12 @@
 #include "ReplyInterpreter.h"
 
 
+struct OpenFileCookie {
+	uint32		fStateId[3];
+	uint32		fStateSeq;
+	uint32		fSeq;
+};
+
 class Inode {
 public:
 								Inode(Filesystem* fs, const FileInfo& fi);
@@ -29,6 +35,8 @@ public:
 
 					status_t	LookUp(const char* name, ino_t* id);
 					status_t	Stat(struct stat* st);
+
+					status_t	Open(int mode, OpenFileCookie* cookie);
 
 					status_t	OpenDir(uint64* cookie);
 					status_t	ReadDir(void* buffer, uint32 size,

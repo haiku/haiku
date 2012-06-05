@@ -53,6 +53,7 @@ public:
 			status_t				Repair();
 
 	inline	const ServerAddress&	ID() const;
+	inline	ServerAddress			LocalID() const;
 
 private:
 	inline	uint32					_GetXID();
@@ -79,6 +80,17 @@ Server::ID() const
 {
 	return *fAddress;
 }
+
+
+inline ServerAddress
+Server::LocalID() const
+{
+	ServerAddress addr;
+	memset(&addr, 0, sizeof(addr));
+	fConnection->GetLocalID(&addr);
+	return addr;
+}
+
 
 struct ServerNode {
 	ServerAddress	fID;

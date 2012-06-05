@@ -43,10 +43,14 @@ public:
 			status_t	GetFH(Filehandle* fh);
 	inline	status_t	LookUp();
 	inline	status_t	LookUpUp();
+			status_t	Open(uint32* id, uint32* seq, bool* confirm);
+			status_t	OpenConfirm(uint32* stateSeq);
 	inline	status_t	PutFH();
 	inline	status_t	PutRootFH();
 			status_t	ReadDir(uint64* cookie, DirEntry** dirents,
 							uint32* count, bool* eof);
+			status_t	SetClientID(uint64* clientid, uint64* verifier);
+	inline	status_t	SetClientIDConfirm();
 
 private:
 			status_t	_DecodeAttrs(XDR::ReadStream& stream, AttrValue** attrs,
@@ -84,6 +88,13 @@ inline status_t
 ReplyInterpreter::PutRootFH()
 {
 	return _OperationError(OpPutRootFH);
+}
+
+
+inline status_t
+ReplyInterpreter::SetClientIDConfirm()
+{
+	return _OperationError(OpSetClientIDConfirm);
 }
 
 
