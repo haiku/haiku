@@ -640,7 +640,9 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 
 	TRACE("model number: %s\n", modelNumber);
 	TRACE("serial number: %s\n", serialNumber);
-  	TRACE("firmware rev.: %s\n", firmwareRev);
+	TRACE("firmware rev.: %s\n", firmwareRev);
+	TRACE("trim support: %s\n",
+		ataData.data_set_management_support ? "yes" : "no");
 
 	if (sg_memcpy(request->sg_list, request->sg_count, &scsiData,
 			sizeof(scsiData)) < B_OK) {
