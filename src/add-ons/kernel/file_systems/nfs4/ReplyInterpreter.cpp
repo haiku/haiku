@@ -212,7 +212,7 @@ ReplyInterpreter::ReadDir(uint64* cookie, DirEntry** dirents, uint32* _count,
 		return B_NO_MEMORY;
 
 	isNext = fReply->Stream().GetBoolean();
-	while (isNext && count <= *_count) {
+	while (isNext && count < *_count) {
 		cookie[0] = fReply->Stream().GetUHyper();
 
 		entries[count].fName = fReply->Stream().GetString();
