@@ -81,7 +81,7 @@ do
 
 	for y in $( echo "$HEADERS_RAW" | cut -d':' -f2 | sed 's/\\//g' | tr -d '\n' )
 	do
-		CLEAN_HEADER=$( echo "$y" | grep -v "include/GL" )
+		CLEAN_HEADER=$( echo "$y" | grep -v "include/GL/" )
 		ZIP_HEADERS="$ZIP_HEADERS $CLEAN_HEADER"
 	done
 done
