@@ -129,7 +129,7 @@ InstallerApp::ReadyToRun()
 		"menu. Depending on what version of GRUB you use, this is done "
 		"differently.\n\n\n");
 	infoText << B_TRANSLATE(
-		"2.1) GRUB 1\n");
+		"2.1) GRUB (since os-prober v1.44)\n");
 	infoText << B_TRANSLATE(
 		"Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku "
 		"should be recognized out of the box. To add Haiku to the GRUB menu, "
