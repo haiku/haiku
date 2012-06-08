@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2017, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2025, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -396,5 +396,24 @@ Index::UpdateLastModified(Transaction& transaction, Inode* inode,
 		inode->UpdateOldLastModified();
 
 	return status;
+}
+
+
+status_t
+Index::UpdateNodeID(Transaction& transaction, const uint8* key, uint16 length,
+	off_t oldInodeID, off_t newInodeID)
+{
+	// Remove node and insert it with the new id (we can't use BPlusTree::Replace(), as it
+	// doesn't handle trees where duplicates are allowed)
+	BPlusTree* tree = Node()->Tree();
+
+	status_t status = tree->Remove(transaction, key, length, oldInodeID);
+	if (status == B_ENTRY_NOT_FOUND)
+		return B_OK;
+
+	if (status != B_OK)
+		return status;
+
+	return tree->Insert(transaction, key, length, newInodeID);
 }
 

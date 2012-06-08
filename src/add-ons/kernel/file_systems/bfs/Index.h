@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2012, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2025, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef INDEX_H
@@ -53,6 +53,9 @@ public:
 								Inode* inode);
 			status_t		UpdateLastModified(Transaction& transaction,
 								Inode* inode, bigtime_t modified = -1);
+
+			status_t		UpdateNodeID(Transaction& transaction, const uint8* key, uint16 length,
+								off_t oldInodeID, off_t newInodeID);
 
 private:
 							Index(const Index& other);

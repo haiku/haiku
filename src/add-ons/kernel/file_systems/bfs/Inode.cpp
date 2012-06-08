@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2020, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2025, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -2833,6 +2833,31 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 	// if either _id or _inode is passed, we will keep the inode locked
 	if (_id == NULL && _inode == NULL)
 		put_vnode(volume->FSVolume(), inode->ID());
+
+	return B_OK;
+}
+
+
+status_t
+Inode::CopyBlockTo(Transaction& transaction, off_t targetBlock)
+{
+	CachedBlock target(fVolume);
+	status_t status = target.SetToWritable(transaction, targetBlock, true);
+	if (status != B_OK)
+		RETURN_ERROR(status);
+
+	CachedBlock source(fVolume);
+	status = source.SetTo(fID);
+	if (status != B_OK)
+		return status;
+
+	uint8* targetData = (uint8*)target.WritableBlock();
+	const uint8* sourceData = source.Block();
+	memcpy(targetData, sourceData, fVolume->BlockSize());
+
+	// update inode ID in target block
+	bfs_inode* targetNode = (bfs_inode*)target.Block();
+	targetNode->inode_num = fVolume->ToBlockRun(targetBlock);
 
 	return B_OK;
 }
