@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2011, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2012, Haiku, Inc. All rights reserved.
  * Copyright 1997, 1998 R3 Software Ltd. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
@@ -8,6 +8,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Philippe Saint-Pierre, stpere@gmail.com
  */
+
 
 #include "CalcView.h"
 
@@ -435,10 +436,10 @@ CalcView::Draw(BRect updateRect)
 				flags |= BControlLook::B_IGNORE_OUTLINE;
 
 				be_control_look->DrawButtonFrame(this, frame, updateRect,
-					6.0f, fBaseColor, fBaseColor, flags);
+					fBaseColor, fBaseColor, flags);
 
 				be_control_look->DrawButtonBackground(this, frame, updateRect,
-					6.0f, fBaseColor, flags);
+					fBaseColor, flags);
 
 				be_control_look->DrawLabel(this, key->label, frame, updateRect,
 					fBaseColor, flags, BAlignment(B_ALIGN_HORIZONTAL_CENTER,

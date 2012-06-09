@@ -8,6 +8,7 @@
 
 
 #include "cpu.h"
+#include "board_config.h"
 
 #include <OS.h>
 #include <boot/platform.h>
@@ -44,7 +45,18 @@ check_cpu_features()
 {
 	uint32 msr;
 
-	// we do need an FPU
+#if BOARD_CPU_TYPE_PPC440
+	// the FPU is implemented as an Auxiliary Processing Unit,
+	// so we must enable transfers by setting the DAPUIB bit to 0
+	asm volatile(
+		"mfccr0 %%r3\n"
+		"\tlis %%r4,~(1<<(20-16))\n"
+		"\tand %%r3,%%r3,%%r4\n"
+		"\tmtccr0 %%r3"
+		: : : "r3", "r4");
+#endif
+
+	// we do need an FPU for vsnprintf to work
 	// on Sam460ex at least U-Boot doesn't enable the FPU for us
 	msr = get_msr();
 	msr |= MSR_FP_AVAILABLE;

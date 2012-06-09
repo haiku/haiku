@@ -1,14 +1,14 @@
 diff --git a/src/mesa/sources.mak b/src/mesa/sources.mak
-index c746b8a..09dc5f5 100644
+index 63fbf58..5530230 100644
 --- a/src/mesa/sources.mak
 +++ b/src/mesa/sources.mak
-@@ -276,7 +276,6 @@ ASM_C_SOURCES =	\
- 	x86/x86_xform.c \
- 	x86/3dnow.c \
- 	x86/sse.c \
--	x86/rtasm/x86sse.c \
- 	sparc/sparc.c \
- 	x86-64/x86-64.c
+@@ -277,7 +277,6 @@ ASM_C_FILES =	\
+ 	$(SRCDIR)/x86/x86_xform.c \
+ 	$(SRCDIR)/x86/3dnow.c \
+ 	$(SRCDIR)/x86/sse.c \
+-	$(SRCDIR)/x86/rtasm/x86sse.c \
+ 	$(SRCDIR)/sparc/sparc.c \
+ 	$(SRCDIR)/x86-64/x86-64.c
  
 diff --git a/src/mesa/tnl/t_vertex_sse.c b/src/mesa/tnl/t_vertex_sse.c
 index e0141c3..1afaf78 100644

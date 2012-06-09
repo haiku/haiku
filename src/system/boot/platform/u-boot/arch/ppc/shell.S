@@ -59,4 +59,7 @@ SYMBOL(gUBootOS):
 //	.byte	0
 	.long   0
 SYMBOL_END(gUBootOS)
+SYMBOL(gFDT):
+	.long   0
+SYMBOL_END(gFDT)
 

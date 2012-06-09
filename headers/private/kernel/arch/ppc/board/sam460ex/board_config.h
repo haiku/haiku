@@ -11,6 +11,9 @@
 
 #define BOARD_NAME_PRETTY "ACube Sam460ex"
 
+#define BOARD_CPU_TYPE_PPC440 1
+#define BOARD_CPU_PPC460EX 1
+
 // UART Settings
 // TODO: use the FDT instead of hardcoding
 #define BOARD_UART1_BASE 0xef600300

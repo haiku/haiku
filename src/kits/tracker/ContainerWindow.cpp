@@ -141,7 +141,7 @@ const int32 kContainerWindowHeightLimit = 85;
 
 const int32 kWindowStaggerBy = 17;
 
-BRect BContainerWindow::sNewWindRect(85, 50, 415, 280);
+BRect BContainerWindow::sNewWindRect(85, 50, 548, 280);
 
 
 namespace BPrivate {

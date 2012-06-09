@@ -52,11 +52,11 @@ extern "C" int start_raw(int argc, const char **argv);
 extern "C" void dump_uimage(struct image_header *image);
 
 // declared in shell.S
+// those are initialized to NULL but not in the BSS
 extern struct image_header *gUImage;
 extern uboot_gd *gUBootGlobalData;
 extern uint32 gUBootOS;
-
-void * gFDT = NULL;
+extern void *gFDT;
 
 static uint32 sBootOptions;
 
@@ -184,7 +184,7 @@ start_raw(int argc, const char **argv)
 		dprintf("argc = %d\n", argc);
 		for (i = 0; i < argc; i++)
 			dprintf("argv[%d] @%lx = '%s'\n", i, (uint32)argv[i], argv[i]);
-		dprintf("os: %d\n", gUBootOS);
+		dprintf("os: %d\n", (int)gUBootOS);
 		dprintf("gd @ %p\n", gUBootGlobalData);
 		dprintf("gd->bd @ %p\n", gUBootGlobalData->bd);
 		//dprintf("fb_base %p\n", (void*)gUBootGlobalData->fb_base);
