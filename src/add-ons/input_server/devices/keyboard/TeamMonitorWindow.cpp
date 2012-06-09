@@ -416,6 +416,8 @@ TeamMonitorWindow::UpdateList()
 	}
 
 	fRestartButton->SetEnabled(!desktopRunning);
+
+	fListView->MakeFocus();
 }
 
 
