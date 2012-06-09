@@ -227,6 +227,10 @@ TeamMonitorWindow::TeamMonitorWindow()
 
 	AddShortcut('T', B_COMMAND_KEY | B_OPTION_KEY,
 		new BMessage(kMsgLaunchTerminal));
+	AddShortcut('K', B_COMMAND_KEY | B_OPTION_KEY,
+		new BMessage(TM_KILL_APPLICATION));
+	AddShortcut('Q', B_COMMAND_KEY | B_OPTION_KEY,
+		new BMessage(TM_QUIT_APPLICATION));
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
 
 	gLocalizedNamePreferred
