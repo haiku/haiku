@@ -1490,17 +1490,21 @@ DefaultDecorator::GetComponentColors(Component component, uint8 highlight,
 	DefaultDecorator::Tab* tab = static_cast<DefaultDecorator::Tab*>(_tab);
 	switch (component) {
 		case COMPONENT_TAB:
-			_colors[COLOR_TAB_FRAME_LIGHT]
-				= tint_color(kFocusFrameColor, B_DARKEN_2_TINT);
-			_colors[COLOR_TAB_FRAME_DARK]
-				= tint_color(kFocusFrameColor, B_DARKEN_3_TINT);
 			if (tab && tab->buttonFocus) {
+				_colors[COLOR_TAB_FRAME_LIGHT]
+					= tint_color(kFocusFrameColor, B_DARKEN_2_TINT);
+				_colors[COLOR_TAB_FRAME_DARK]
+					= tint_color(kFocusFrameColor, B_DARKEN_3_TINT);
 				_colors[COLOR_TAB] = kFocusTabColor;
 				_colors[COLOR_TAB_LIGHT] = kFocusTabColorLight;
 				_colors[COLOR_TAB_BEVEL] = kFocusTabColorBevel;
 				_colors[COLOR_TAB_SHADOW] = kFocusTabColorShadow;
 				_colors[COLOR_TAB_TEXT] = kFocusTextColor;
 			} else {
+				_colors[COLOR_TAB_FRAME_LIGHT]
+					= tint_color(kNonFocusFrameColor, B_DARKEN_2_TINT);
+				_colors[COLOR_TAB_FRAME_DARK]
+					= tint_color(kNonFocusFrameColor, B_DARKEN_3_TINT);
 				_colors[COLOR_TAB] = kNonFocusTabColor;
 				_colors[COLOR_TAB_LIGHT] = kNonFocusTabColorLight;
 				_colors[COLOR_TAB_BEVEL] = kNonFocusTabColorBevel;
