@@ -227,7 +227,7 @@ WorkspacesView::_DrawWindow(DrawingEngine* drawingEngine,
 			tabFrame.left = tabFrame.right - width;
 		}
 
-		if (tabFrame.Height() > 0 && tabFrame.bottom >= tabFrame.top) {
+		if (tabFrame.bottom >= tabFrame.top) {
 			// Shift the tab up
 			float tabHeight = tabFrame.Height();
 			tabFrame.bottom = frame.top - 1;
