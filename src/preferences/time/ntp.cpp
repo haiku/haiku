@@ -153,6 +153,7 @@ ntp_update_time(const char* hostname, const char** errorString,
 			0, (struct sockaddr *)&address, sizeof(address)) < 0) {
 		*errorString = B_TRANSLATE("Sending request failed");
 		*errorCode = errno;
+		close(connection);
 		return B_ERROR;
 	}
 
@@ -168,6 +169,7 @@ ntp_update_time(const char* hostname, const char** errorString,
 	if (select(connection + 1, &waitForReceived, NULL, NULL, &timeout) <= 0) {
 		*errorString = B_TRANSLATE("Waiting for answer failed");
 		*errorCode = errno;
+		close(connection);
 		return B_ERROR;
 	}
 
