@@ -190,6 +190,17 @@ WriteStream::~WriteStream()
 }
 
 
+void
+WriteStream::Clear()
+{
+	free(fBuffer);
+	fSize = kInitialSize;
+	fBuffer = reinterpret_cast<uint32*>(malloc(fSize));
+	fError = B_OK;
+	fPosition = 0;
+}
+
+
 status_t
 WriteStream::InsertUInt(Stream::Position pos, uint32 x)
 {

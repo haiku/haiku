@@ -16,9 +16,27 @@ RequestBuilder::RequestBuilder(Procedure proc)
 	:
 	fOpCount(0),
 	fProcedure(proc),
-	fRequest(RPC::Call::Create(proc, RPC::Auth::CreateSys(),
-								RPC::Auth::CreateNone()))
+	fRequest(NULL)
 {
+	_InitHeader();
+}
+
+
+RequestBuilder::~RequestBuilder()
+{
+	delete fRequest;
+}
+
+
+void
+RequestBuilder::_InitHeader()
+{
+	fRequest = RPC::Call::Create(fProcedure, RPC::Auth::CreateSys(),
+					RPC::Auth::CreateNone());
+
+	if (fRequest == NULL)
+		return;
+
 	if (fProcedure == ProcCompound) {
 		fRequest->Stream().AddOpaque(NULL, 0);
 		fRequest->Stream().AddUInt(0);
@@ -26,12 +44,6 @@ RequestBuilder::RequestBuilder(Procedure proc)
 		fOpCountPosition = fRequest->Stream().Current();
 		fRequest->Stream().AddUInt(0);
 	}
-}
-
-
-RequestBuilder::~RequestBuilder()
-{
-	delete fRequest;
 }
 
 

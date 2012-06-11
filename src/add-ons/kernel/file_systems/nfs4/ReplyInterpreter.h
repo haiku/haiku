@@ -35,8 +35,11 @@ struct DirEntry {
 
 class ReplyInterpreter {
 public:
-						ReplyInterpreter(RPC::Reply* reply);
+						ReplyInterpreter(RPC::Reply* reply = NULL);
 						~ReplyInterpreter();
+
+	inline	status_t	SetTo(RPC::Reply* reply);
+	inline	void		Reset();
 
 			status_t	Access(uint32* supported, uint32* allowed);
 			status_t	Close();
@@ -55,6 +58,8 @@ public:
 	inline	status_t	SetClientIDConfirm();
 
 private:
+			void		_ParseHeader();
+
 			status_t	_DecodeAttrs(XDR::ReadStream& stream, AttrValue** attrs,
 							uint32* count);
 			status_t	_OperationError(Opcode op);
@@ -63,6 +68,29 @@ private:
 
 			RPC::Reply*	fReply;
 };
+
+
+inline status_t
+ReplyInterpreter::SetTo(RPC::Reply* _reply)
+{
+	if (fReply != NULL)
+		return B_DONT_DO_THAT;
+
+	fReply = _reply;
+
+	if (fReply != NULL)
+		_ParseHeader();
+
+	return B_OK;
+}
+
+
+inline void
+ReplyInterpreter::Reset()
+{
+	delete fReply;
+	fReply = NULL;
+}
 
 
 inline status_t

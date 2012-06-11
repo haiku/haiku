@@ -8,6 +8,7 @@ KernelAddon nfs4 :
 	Inode.cpp
 	kernel_interface.cpp
 	ReplyInterpreter.cpp
+	Request.cpp
 	RequestBuilder.cpp
 	RPCAuth.cpp
 	RPCCall.cpp

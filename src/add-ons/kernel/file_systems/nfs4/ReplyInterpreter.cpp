@@ -34,15 +34,23 @@ ReplyInterpreter::ReplyInterpreter(RPC::Reply* reply)
 	:
 	fReply(reply)
 {
-	fReply->Stream().GetUInt();
-	fReply->Stream().GetOpaque(NULL);
-	fReply->Stream().GetUInt();
+	if (reply != NULL)
+		_ParseHeader();
 }
 
 
 ReplyInterpreter::~ReplyInterpreter()
 {
 	delete fReply;
+}
+
+
+void
+ReplyInterpreter::_ParseHeader()
+{
+	fReply->Stream().GetUInt();
+	fReply->Stream().GetOpaque(NULL);
+	fReply->Stream().GetUInt();
 }
 
 
@@ -330,6 +338,9 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 status_t
 ReplyInterpreter::_OperationError(Opcode op)
 {
+	if (fReply == NULL)
+		return B_NOT_INITIALIZED;
+
 	if (fReply->Error() != B_OK || fReply->Stream().IsEOF())
 		return fReply->Error();
 

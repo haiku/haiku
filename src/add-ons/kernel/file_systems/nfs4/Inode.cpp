@@ -12,8 +12,7 @@
 #include <dirent.h>
 #include <string.h>
 
-#include "ReplyInterpreter.h"
-#include "RequestBuilder.h"
+#include "Request.h"
 
 
 // Creating Inode object from Filehandle probably is not a good idea when
@@ -25,17 +24,20 @@ Inode::Inode(Filesystem* fs, const FileInfo &fi)
 	fParentFH(fi.fParent),
 	fName(strdup(fi.fName))
 {
-	RequestBuilder req(ProcCompound);
+	Request request(fFilesystem->Server());
+	RequestBuilder& req = request.Builder();
+
 	req.PutFH(fHandle);
 
 	Attribute attr[] = { FATTR4_TYPE, FATTR4_FILEID };
 	req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
 
-	RPC::Reply *rpl;
-	fs->Server()->SendCall(req.Request(), &rpl);
-	ReplyInterpreter reply(rpl);
+	status_t result = request.Send();
+	if (result != B_OK)
+		return;
 
-	status_t result;
+	ReplyInterpreter& reply = request.Reply();
+
 	result = reply.PutFH();
 	if (result != B_OK)
 		return;
@@ -79,7 +81,9 @@ Inode::LookUp(const char* name, ino_t* id)
 		return B_OK;
 	}
 
-	RequestBuilder req(ProcCompound);
+	Request request(fFilesystem->Server());
+	RequestBuilder& req = request.Builder();
+
 	req.PutFH(fHandle);
 
 	if (!strcmp(name, ".."))
@@ -92,11 +96,13 @@ Inode::LookUp(const char* name, ino_t* id)
 	Attribute attr[] = { FATTR4_FILEID };
 	req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
 
-	RPC::Reply *rpl;
-	fFilesystem->Server()->SendCall(req.Request(), &rpl);
-	ReplyInterpreter reply(rpl);
+	status_t result = request.Send();
+	if (result != B_OK)
+		return result;
 
-	status_t result = reply.PutFH();
+	ReplyInterpreter& reply = request.Reply();
+
+	result = reply.PutFH();
 	if (result != B_OK)
 		return result;
 
@@ -135,15 +141,18 @@ Inode::LookUp(const char* name, ino_t* id)
 status_t
 Inode::Access(int mode)
 {
-	RequestBuilder req(ProcCompound);
+	Request request(fFilesystem->Server());
+	RequestBuilder& req = request.Builder();
+
 	req.PutFH(fHandle);
 	req.Access();
 
-	RPC::Reply *rpl;
-	fFilesystem->Server()->SendCall(req.Request(), &rpl);
-	ReplyInterpreter reply(rpl);
+	status_t result = request.Send();
+	if (result != B_OK)
+		return result;
 
-	status_t result;
+	ReplyInterpreter& reply = request.Reply();
+
 	result = reply.PutFH();
 	if (result != B_OK)
 		return result;
@@ -176,17 +185,20 @@ Inode::Access(int mode)
 status_t
 Inode::Stat(struct stat* st)
 {
-	RequestBuilder req(ProcCompound);
+	Request request(fFilesystem->Server());
+	RequestBuilder& req = request.Builder();
+
 	req.PutFH(fHandle);
 
 	Attribute attr[] = { FATTR4_SIZE, FATTR4_MODE, FATTR4_NUMLINKS };
 	req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
 
-	RPC::Reply *rpl;
-	fFilesystem->Server()->SendCall(req.Request(), &rpl);
-	ReplyInterpreter reply(rpl);
+	status_t result = request.Send();
+	if (result != B_OK)
+		return result;
 
-	status_t result;
+	ReplyInterpreter& reply = request.Reply();
+
 	result = reply.PutFH();
 	if (result != B_OK)
 		return result;
@@ -231,34 +243,41 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 {
 	cookie->fSeq = 0;
 
-	RequestBuilder req_setid(ProcCompound);
-	req_setid.SetClientID(fFilesystem->Server());
+	Request request(fFilesystem->Server());
+	request.Builder().SetClientID(fFilesystem->Server());
 
-	RPC::Reply *rpl;
-	fFilesystem->Server()->SendCall(req_setid.Request(), &rpl);
-	ReplyInterpreter setid(rpl);
+	status_t result = request.Send();
+	if (result != B_OK)
+		return result;
 
 	uint64 id, ver;
-	status_t result = setid.SetClientID(&id, &ver);
+	result = request.Reply().SetClientID(&id, &ver);
 	if (result != B_OK)
 		return result;
 
-	RequestBuilder req_conf(ProcCompound);
-	req_conf.SetClientIDConfirm(id, ver);
+	request.Reset();
+	request.Builder().SetClientIDConfirm(id, ver);
 
-	fFilesystem->Server()->SendCall(req_conf.Request(), &rpl);
-	ReplyInterpreter conf(rpl);
-
-	result = conf.SetClientIDConfirm();
+	result = request.Send();
 	if (result != B_OK)
 		return result;
 
-	RequestBuilder req(ProcCompound);
+	result = request.Reply().SetClientIDConfirm();
+	if (result != B_OK)
+		return result;
+
+	request.Reset();
+	RequestBuilder& req = request.Builder();
+
 	req.PutFH(fParentFH);
 	req.Open(cookie->fSeq, OPEN4_SHARE_ACCESS_READ, id, OPEN4_NOCREATE, fName);
 	cookie->fSeq++;
-	fFilesystem->Server()->SendCall(req.Request(), &rpl);
-	ReplyInterpreter reply(rpl);
+
+	result = request.Send();
+	if (result != B_OK)
+		return result;
+
+	ReplyInterpreter& reply = request.Reply();
 
 	result = reply.PutFH();
 	if (result != B_OK)
@@ -270,12 +289,14 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 		return result;
 
 	if (confirm) {
-		RequestBuilder req(ProcCompound);
+		request.Reset();
 		req.PutFH(fHandle);
 		req.OpenConfirm(cookie->fSeq, cookie->fStateId, cookie->fStateSeq);
 		cookie->fSeq++;
-		fFilesystem->Server()->SendCall(req.Request(), &rpl);
-		ReplyInterpreter reply(rpl);
+
+		result = request.Send();
+		if (result != B_OK)
+			return result;
 
 		result = reply.PutFH();
 		if (result != B_OK)
@@ -293,15 +314,18 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 status_t
 Inode::Close(OpenFileCookie* cookie)
 {
-	RequestBuilder req(ProcCompound);
+	Request request(fFilesystem->Server());
+	RequestBuilder& req = request.Builder();
+
 	req.PutFH(fHandle);
 	req.Close(cookie->fSeq, cookie->fStateId, cookie->fStateSeq);
 
-	RPC::Reply *rpl;
-	fFilesystem->Server()->SendCall(req.Request(), &rpl);
-	ReplyInterpreter reply(rpl);
+	status_t result = request.Send();
+	if (result != B_OK)
+		return result;
 
-	status_t result;
+	ReplyInterpreter& reply = request.Reply();
+
 	result = reply.PutFH();
 	if (result != B_OK)
 		return result;
@@ -322,16 +346,19 @@ Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length)
 	uint32 len = 0;
 
 	while (size < *_length && !eof) {
-		RequestBuilder req(ProcCompound);
+		Request request(fFilesystem->Server());
+		RequestBuilder& req = request.Builder();
+
 		req.PutFH(fHandle);
 		req.Read(cookie->fStateId, cookie->fStateSeq, pos + size,
 			*_length - size);
 
-		RPC::Reply *rpl;
-		fFilesystem->Server()->SendCall(req.Request(), &rpl);
-		ReplyInterpreter reply(rpl);
+		status_t result = request.Send();
+		if (result != B_OK)
+			return result;
 
-		status_t result;
+		ReplyInterpreter& reply = request.Reply();
+
 		result = reply.PutFH();
 		if (result != B_OK)
 			return result;
@@ -355,15 +382,18 @@ Inode::OpenDir(uint64* cookie)
 	if (fType != NF4DIR)
 		return B_NOT_A_DIRECTORY;
 
-	RequestBuilder req(ProcCompound);
+	Request request(fFilesystem->Server());
+	RequestBuilder& req = request.Builder();
+
 	req.PutFH(fHandle);
 	req.Access();
 
-	RPC::Reply *rpl;
-	fFilesystem->Server()->SendCall(req.Request(), &rpl);
-	ReplyInterpreter reply(rpl);
+	status_t result = request.Send();
+	if (result != B_OK)
+		return result;
 
-	status_t result;
+	ReplyInterpreter& reply = request.Reply();
+
 	result = reply.PutFH();
 	if (result != B_OK)
 		return result;
@@ -387,17 +417,20 @@ status_t
 Inode::_ReadDirOnce(DirEntry** dirents, uint32* count, uint64* cookie,
 	bool* eof)
 {
-	RequestBuilder req(ProcCompound);
+	Request request(fFilesystem->Server());
+	RequestBuilder& req = request.Builder();
+
 	req.PutFH(fHandle);
 
 	Attribute attr[] = { FATTR4_FILEID };
 	req.ReadDir(*count, cookie, attr, sizeof(attr) / sizeof(Attribute));
 
-	RPC::Reply *rpl;
-	fFilesystem->Server()->SendCall(req.Request(), &rpl);
-	ReplyInterpreter reply(rpl);
+	status_t result = request.Send();
+	if (result != B_OK)
+		return result;
 
-	status_t result;
+	ReplyInterpreter& reply = request.Reply();
+
 	result = reply.PutFH();
 	if (result != B_OK)
 		return result;
@@ -431,18 +464,21 @@ Inode::_FillDirEntry(struct dirent* de, ino_t id, const char* name, uint32 pos,
 status_t
 Inode::_ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 {
-	RequestBuilder req(ProcCompound);
+	Request request(fFilesystem->Server());
+	RequestBuilder& req = request.Builder();
+
 	req.PutFH(fHandle);
 	req.LookUpUp();
 	req.GetFH();
 	Attribute attr[] = { FATTR4_FILEID };
 	req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
 
-	RPC::Reply *rpl;
-	fFilesystem->Server()->SendCall(req.Request(), &rpl);
-	ReplyInterpreter reply(rpl);
+	status_t result = request.Send();
+	if (result != B_OK)
+		return result;
 
-	status_t result;
+	ReplyInterpreter& reply = request.Reply();
+
 	result = reply.PutFH();
 	if (result != B_OK)
 		return result;

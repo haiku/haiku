@@ -11,8 +11,7 @@
 
 #include <string.h>
 
-#include "ReplyInterpreter.h"
-#include "RequestBuilder.h"
+#include "Request.h"
 
 #include "Inode.h"
 
@@ -33,7 +32,9 @@ status_t
 Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
 	dev_t id)
 {
-	RequestBuilder req(ProcCompound);
+	Request request(serv);
+	RequestBuilder& req = request.Builder();
+
 	req.PutRootFH();
 
 	// Better way of doing this will be needed
@@ -62,11 +63,11 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
 	Attribute attr[] = { FATTR4_FH_EXPIRE_TYPE };
 	req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
 
-	RPC::Reply *rpl;
-	serv->SendCall(req.Request(), &rpl);
-	ReplyInterpreter reply(rpl);
+	status_t result = request.Send();
+	if (result != B_OK)
+		return result;
 
-	status_t result;
+	ReplyInterpreter& reply = request.Reply();
 
 	result = reply.PutRootFH();
 	if (result != B_OK)

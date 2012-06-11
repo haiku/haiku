@@ -65,6 +65,7 @@ public:
 	virtual					~WriteStream();
 
 	inline	int				Size() const;
+			void			Clear();
 
 			status_t		InsertUInt(Stream::Position pos, uint32 x);
 
