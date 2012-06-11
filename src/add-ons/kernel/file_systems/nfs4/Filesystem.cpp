@@ -18,7 +18,7 @@
 
 Filesystem::Filesystem()
 	:
-	fId(0)
+	fId(1)
 {
 }
 

@@ -31,6 +31,7 @@ struct Filehandle {
 // Unfortunately just a filehandle is not enough even when they are persistent
 // since OPEN requires both parent filehandle and file name (just like LOOKUP).
 struct FileInfo {
+			uint64		fFileId;
 			Filehandle	fFH;
 
 			Filehandle	fParent;
@@ -74,6 +75,7 @@ Filehandle::operator=(const Filehandle& fh)
 inline
 FileInfo::FileInfo()
 	:
+	fFileId(0),
 	fName(NULL)
 {
 }
@@ -89,6 +91,7 @@ FileInfo::~FileInfo()
 inline
 FileInfo::FileInfo(const FileInfo& fi)
 	:
+	fFileId(fi.fFileId),
 	fFH(fi.fFH),
 	fParent(fi.fParent),
 	fName(strdup(fi.fName))
@@ -99,6 +102,7 @@ FileInfo::FileInfo(const FileInfo& fi)
 inline FileInfo&
 FileInfo::operator=(const FileInfo& fi)
 {
+	fFileId = fi.fFileId;
 	fFH = fi.fFH;
 	fParent = fi.fParent;
 

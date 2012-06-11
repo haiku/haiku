@@ -48,11 +48,13 @@ Inode::Inode(Filesystem* fs, const FileInfo &fi)
 	if (result != B_OK || count < 1)
 		return;
 
-	if (count < 2 || values[1].fAttribute != FATTR4_FILEID) {
-		// Server does not provide fileid. We need to make something up.
-		fFileId = fs->GetId();
+	if (fi.fFileId == 0) {
+		if (count < 2 || values[1].fAttribute != FATTR4_FILEID)
+			fFileId = fs->AllocFileId();
+		else
+			fFileId = values[1].fData.fValue64;
 	} else
-		fFileId = values[1].fData.fValue64;
+		fFileId = fi.fFileId;
 
 	// FATTR4_TYPE is mandatory
 	fType = values[0].fData.fValue32;
@@ -124,15 +126,15 @@ Inode::LookUp(const char* name, ino_t* id)
 	if (result != B_OK)
 		return result;
 
-	if (count < 1 || values[0].fAttribute != FATTR4_FILEID) {
-		delete[] values;
-		return B_UNSUPPORTED;
-	}
-
-	*id = _FileIdToInoT(values[0].fData.fValue64);
+	uint64 fileId;
+	if (count < 1 || values[0].fAttribute != FATTR4_FILEID)
+		fileId = fFilesystem->AllocFileId();
+	else
+		fileId = values[0].fData.fValue64;
 	delete[] values;
 
-	fFilesystem->InoIdMap()->AddEntry(fh, fHandle, name, *id);
+	*id = _FileIdToInoT(fileId);
+	fFilesystem->InoIdMap()->AddEntry(fh, fHandle, name, fileId, *id);
 
 	return B_OK;
 }
@@ -500,15 +502,19 @@ Inode::_ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 
 	uint64 fileId;
 	if (count < 1 || values[0].fAttribute != FATTR4_FILEID) {
-		// Server does not provide fileid. We need to make something up.
-		fileId = fFilesystem->GetId();
+		fileId = fFilesystem->AllocFileId();
 	} else
 		fileId = values[0].fData.fValue64;
 
 	return _FillDirEntry(de, _FileIdToInoT(fileId), "..", pos, size);
 }
 
-
+// TODO: Currently inode numbers returned by ReadDir are virtually random.
+// Apparently Haiku does not use that information (contrary to inode number
+// returned by LookUp) so fixing it can wait until directory caches are
+// implemented.
+// When directories are cached client should store inode numbers it assigned
+// to directroy entries and use them consequently.
 status_t
 Inode::ReadDir(void* _buffer, uint32 size, uint32* _count, uint64* cookie)
 {
@@ -558,7 +564,7 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count, uint64* cookie)
 			if (dirents[i].fAttrCount == 1)
 				id = _FileIdToInoT(dirents[i].fAttrs[0].fData.fValue64);
 			else
-				id = _FileIdToInoT(fFilesystem->GetId());
+				id = _FileIdToInoT(fFilesystem->AllocFileId());
 
 			const char* name = dirents[i].fName;
 			if (_FillDirEntry(de, id, name, pos, size) == B_BUFFER_OVERFLOW) {

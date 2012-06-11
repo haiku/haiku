@@ -28,7 +28,7 @@ public:
 
 	inline	uint32			FHExpiryType() const;
 	inline	RPC::Server*	Server();
-	inline	uint64			GetId();
+	inline	uint64			AllocFileId();
 
 	inline	dev_t			DevId() const;
 	inline	InodeIdMap*		InoIdMap();
@@ -56,7 +56,7 @@ Filesystem::Server()
 
 
 inline uint64
-Filesystem::GetId()
+Filesystem::AllocFileId()
 {
 	return atomic_add64(&fId, 1);
 }
