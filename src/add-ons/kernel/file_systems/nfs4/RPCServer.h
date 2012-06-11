@@ -22,6 +22,7 @@ namespace RPC {
 struct Request {
 	uint32				fXID;
 	ConditionVariable	fEvent;
+	bool				fDone;
 	Reply**				fReply;
 
 	Request*			fNext;
@@ -86,6 +87,8 @@ private:
 inline status_t
 Server::WaitCall(Request* request, bigtime_t time)
 {
+	if (request->fDone)
+		return B_OK;
 	return request->fEvent.Wait(B_RELATIVE_TIMEOUT, time);
 }
 

@@ -35,10 +35,15 @@ Request::_SendUDP()
 	result = fServer->WaitCall(rpc);
 	if (result != B_OK) {
 		int attempts = 1;
-		while (result != B_OK && attempts++ < kRetryLimit)
+		while (result != B_OK && attempts++ < kRetryLimit) {
 			result = fServer->ResendCallAsync(fBuilder.Request(), rpc);
+			if (result != B_OK)
+				return result;
 
-		if (attempts == kRetryLimit) {
+			result = fServer->WaitCall(rpc);
+		}
+
+		if (result != B_OK) {
 			fServer->CancelCall(rpc);
 			delete rpc;
 			return result;

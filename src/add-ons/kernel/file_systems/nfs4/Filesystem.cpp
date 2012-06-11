@@ -135,9 +135,10 @@ Filesystem::GetInode(ino_t id, Inode** _inode)
 	if (result != B_OK)
 		return result;
 
-	Inode* inode = new(std::nothrow)Inode(this, fi);
-	if (inode == NULL)
-		return B_NO_MEMORY;
+	Inode* inode;
+	result = Inode::CreateInode(this, fi, &inode);
+	if (result != B_OK)
+		return result;
 
 	*_inode = inode;
 	return B_OK;
@@ -151,6 +152,12 @@ Filesystem::CreateRootInode()
 	fi.fFH = fRootFH;
 	fi.fParent = fRootFH;
 	fi.fName = strdup("/");
-	return new(std::nothrow)Inode(this, fi);
+
+	Inode* inode;
+	status_t result = Inode::CreateInode(this, fi, &inode);
+	if (result == B_OK)
+		return inode;
+	else
+		return NULL;
 }
 

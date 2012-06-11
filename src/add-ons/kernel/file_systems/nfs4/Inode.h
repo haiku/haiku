@@ -26,7 +26,8 @@ struct OpenFileCookie {
 
 class Inode {
 public:
-								Inode(Filesystem* fs, const FileInfo& fi);
+	static			status_t	CreateInode(Filesystem* fs, const FileInfo& fi,
+									Inode** inode);
 								~Inode();
 
 	inline			ino_t		ID() const;
@@ -47,6 +48,8 @@ public:
 									uint32* count, uint64* cookie);
 
 private:
+								Inode();
+
 					status_t	_ReadDirOnce(DirEntry** dirents, uint32* count,
 									uint64* cookie, bool* eof);
 					status_t	_FillDirEntry(struct dirent* de, ino_t id,

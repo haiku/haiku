@@ -15,51 +15,65 @@
 #include "Request.h"
 
 
+Inode::Inode()
+{
+}
+
+
 // Creating Inode object from Filehandle probably is not a good idea when
 // filehandles are volatile.
-Inode::Inode(Filesystem* fs, const FileInfo &fi)
-	:
-	fHandle(fi.fFH),
-	fFilesystem(fs),
-	fParentFH(fi.fParent),
-	fName(strdup(fi.fName))
+status_t
+Inode::CreateInode(Filesystem* fs, const FileInfo &fi, Inode** _inode)
 {
-	Request request(fFilesystem->Server());
+	Inode* inode = new(std::nothrow) Inode;
+	if (inode == NULL)
+		return B_NO_MEMORY;
+
+	inode->fHandle = fi.fFH;
+	inode->fFilesystem = fs;
+	inode->fParentFH = fi.fParent;
+	inode->fName = strdup(fi.fName);
+
+	Request request(fs->Server());
 	RequestBuilder& req = request.Builder();
 
-	req.PutFH(fHandle);
+	req.PutFH(inode->fHandle);
 
 	Attribute attr[] = { FATTR4_TYPE, FATTR4_FILEID };
 	req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
 
 	status_t result = request.Send();
 	if (result != B_OK)
-		return;
+		return result;
 
 	ReplyInterpreter& reply = request.Reply();
 
 	result = reply.PutFH();
 	if (result != B_OK)
-		return;
+		return result;
 
 	AttrValue* values;
 	uint32 count;
 	result = reply.GetAttr(&values, &count);
 	if (result != B_OK || count < 1)
-		return;
+		return result;
 
 	if (fi.fFileId == 0) {
 		if (count < 2 || values[1].fAttribute != FATTR4_FILEID)
-			fFileId = fs->AllocFileId();
+			inode->fFileId = fs->AllocFileId();
 		else
-			fFileId = values[1].fData.fValue64;
+			inode->fFileId = values[1].fData.fValue64;
 	} else
-		fFileId = fi.fFileId;
+		inode->fFileId = fi.fFileId;
 
 	// FATTR4_TYPE is mandatory
-	fType = values[0].fData.fValue32;
+	inode->fType = values[0].fData.fValue32;
 
 	delete[] values;
+
+	*_inode = inode;
+
+	return B_OK;
 }
 
 

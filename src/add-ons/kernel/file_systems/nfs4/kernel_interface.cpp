@@ -50,6 +50,12 @@ nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 	}
 
 	Inode* inode = fs->CreateRootInode();
+	if (inode == NULL) {
+		delete fs;
+		gRPCServerManager->Release(server);
+
+		return B_IO_ERROR;
+	}
 
 	volume->private_volume = fs;
 	volume->ops = &gNFSv4VolumeOps;

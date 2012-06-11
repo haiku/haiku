@@ -150,6 +150,8 @@ Server::SendCallAsync(Call* call, Reply** reply, Request** request)
 	call->SetXID(xid);
 	req->fXID = xid;
 	req->fReply = reply;
+	req->fEvent.Init(&req->fEvent, NULL);
+	req->fDone = false;
 	req->fNext = NULL;
 
 	fRequests.AddRequest(req);
@@ -227,6 +229,7 @@ Server::_Listener()
 		Request* req = fRequests.FindRequest(reply->GetXID());
 		if (req != NULL) {
 			*req->fReply = reply;
+			req->fDone = true;
 			req->fEvent.NotifyAll();
 		} else
 			delete reply;
