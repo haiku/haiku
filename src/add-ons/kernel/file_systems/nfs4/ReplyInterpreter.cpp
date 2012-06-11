@@ -14,6 +14,20 @@
 #include <util/kernel_cpp.h>
 
 
+AttrValue::AttrValue()
+	:
+	fFreePointer(false)
+{
+}
+
+
+AttrValue::~AttrValue()
+{
+	if (fFreePointer)
+		free(fData.fPointer);
+}
+
+
 DirEntry::DirEntry()
 	:
 	fName(NULL),
@@ -324,6 +338,58 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 	if (sIsAttrSet(FATTR4_NUMLINKS, bitmap, bcount)) {
 		values[current].fAttribute = FATTR4_NUMLINKS;
 		values[current].fData.fValue32 = stream.GetUInt();
+		current++;
+	}
+
+	if (sIsAttrSet(FATTR4_TIME_ACCESS, bitmap, bcount)) {
+		values[current].fAttribute = FATTR4_TIME_ACCESS;
+		values[current].fFreePointer = true;
+
+		struct timespec ts;
+		ts.tv_sec = static_cast<time_t>(stream.GetHyper());
+		ts.tv_nsec = static_cast<long>(stream.GetUInt());
+		
+		values[current].fData.fPointer = malloc(sizeof(ts));
+		memcpy(values[current].fData.fPointer, &ts, sizeof(ts));
+		current++;
+	}
+
+	if (sIsAttrSet(FATTR4_TIME_CREATE, bitmap, bcount)) {
+		values[current].fAttribute = FATTR4_TIME_CREATE;
+		values[current].fFreePointer = true;
+
+		struct timespec ts;
+		ts.tv_sec = static_cast<time_t>(stream.GetHyper());
+		ts.tv_nsec = static_cast<long>(stream.GetUInt());
+		
+		values[current].fData.fPointer = malloc(sizeof(ts));
+		memcpy(values[current].fData.fPointer, &ts, sizeof(ts));
+		current++;
+	}
+
+	if (sIsAttrSet(FATTR4_TIME_METADATA, bitmap, bcount)) {
+		values[current].fAttribute = FATTR4_TIME_METADATA;
+		values[current].fFreePointer = true;
+
+		struct timespec ts;
+		ts.tv_sec = static_cast<time_t>(stream.GetHyper());
+		ts.tv_nsec = static_cast<long>(stream.GetUInt());
+		
+		values[current].fData.fPointer = malloc(sizeof(ts));
+		memcpy(values[current].fData.fPointer, &ts, sizeof(ts));
+		current++;
+	}
+
+	if (sIsAttrSet(FATTR4_TIME_MODIFY, bitmap, bcount)) {
+		values[current].fAttribute = FATTR4_TIME_MODIFY;
+		values[current].fFreePointer = true;
+
+		struct timespec ts;
+		ts.tv_sec = static_cast<time_t>(stream.GetHyper());
+		ts.tv_nsec = static_cast<long>(stream.GetUInt());
+		
+		values[current].fData.fPointer = malloc(sizeof(ts));
+		memcpy(values[current].fData.fPointer, &ts, sizeof(ts));
 		current++;
 	}
 

@@ -206,7 +206,9 @@ Inode::Stat(struct stat* st)
 
 	req.PutFH(fHandle);
 
-	Attribute attr[] = { FATTR4_SIZE, FATTR4_MODE, FATTR4_NUMLINKS };
+	Attribute attr[] = { FATTR4_SIZE, FATTR4_MODE, FATTR4_NUMLINKS,
+						FATTR4_TIME_ACCESS, FATTR4_TIME_CREATE,
+						FATTR4_TIME_METADATA, FATTR4_TIME_MODIFY };
 	req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
 
 	status_t result = request.Send();
@@ -271,6 +273,30 @@ Inode::Stat(struct stat* st)
 		next++;
 	} else
 		st->st_nlink = 1;
+
+	if (count >= next && values[next].fAttribute == FATTR4_TIME_ACCESS) {
+		memcpy(&st->st_atim, values[next].fData.fPointer, sizeof(timespec));
+		next++;
+	} else
+		memset(&st->st_atim, 0, sizeof(timespec));
+
+	if (count >= next && values[next].fAttribute == FATTR4_TIME_CREATE) {
+		memcpy(&st->st_crtim, values[next].fData.fPointer, sizeof(timespec));
+		next++;
+	} else
+		memset(&st->st_crtim, 0, sizeof(timespec));
+
+	if (count >= next && values[next].fAttribute == FATTR4_TIME_METADATA) {
+		memcpy(&st->st_ctim, values[next].fData.fPointer, sizeof(timespec));
+		next++;
+	} else
+		memset(&st->st_ctim, 0, sizeof(timespec));
+
+	if (count >= next && values[next].fAttribute == FATTR4_TIME_MODIFY) {
+		memcpy(&st->st_mtim, values[next].fData.fPointer, sizeof(timespec));
+		next++;
+	} else
+		memset(&st->st_mtim, 0, sizeof(timespec));
 
 	st->st_uid = 0;
 	st->st_gid = 0;

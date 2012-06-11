@@ -16,7 +16,11 @@
 
 
 struct AttrValue {
+			AttrValue();
+			~AttrValue();
+
 	uint8	fAttribute;
+	bool	fFreePointer;
 	union {
 			uint32		fValue32;
 			uint64		fValue64;
