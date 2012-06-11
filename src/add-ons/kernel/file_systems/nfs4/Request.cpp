@@ -13,10 +13,26 @@
 status_t
 Request::Send()
 {
+	return _TrySend();
+}
+
+
+status_t
+Request::_TrySend()
+{
 	RPC::Reply *rpl;
-	status_t result = fServer->SendCall(fBuilder.Request(), &rpl);
+	RPC::Request *rpc;
+
+	status_t result = fServer->SendCallAsync(fBuilder.Request(), &rpl, &rpc);
 	if (result != B_OK)
 		return result;
+
+	result = fServer->WaitCall(rpc);
+	if (result != B_OK) {
+		fServer->CancelCall(rpc);
+		delete rpc;
+		return result;
+	}
 
 	return fReply.SetTo(rpl);
 }

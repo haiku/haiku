@@ -119,8 +119,26 @@ Server::_StartListening()
 status_t
 Server::SendCall(Call* call, Reply** reply)
 {
-	status_t result;
+	Request* req;
+	status_t result = SendCallAsync(call, reply, &req);
+	if (result != B_OK)
+		return result;
 
+	result = WaitCall(req);
+	if (result != B_OK) {
+		CancelCall(req);
+		delete req;
+		return result;
+	}
+
+	delete req;
+	return B_OK;
+}
+
+
+status_t
+Server::SendCallAsync(Call* call, Reply** reply, Request** request)
+{
 	if (fThreadError != B_OK)
 		return fThreadError;
 
@@ -137,21 +155,15 @@ Server::SendCall(Call* call, Reply** reply)
 	fRequests.AddRequest(req);
 
 	XDR::WriteStream& stream = call->Stream();
-	result = fConnection->Send(stream.Buffer(), stream.Size());
-	if (result != B_OK)
-		goto out_cancel;
+	status_t result = fConnection->Send(stream.Buffer(), stream.Size());
+	if (result != B_OK) {
+		fRequests.FindRequest(xid);
+		delete req;
+		return result;
+	}
 
-	result = req->fEvent.Wait(B_RELATIVE_TIMEOUT, kWaitTime);
-	if (result != B_OK)
-		goto out_cancel;
-
-	delete req;
+	*request = req;
 	return B_OK;
-
-out_cancel:
-	fRequests.FindRequest(xid);
-	delete req;
-	return result;
 }
 
 

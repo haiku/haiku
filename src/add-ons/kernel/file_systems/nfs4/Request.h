@@ -25,6 +25,8 @@ public:
 			void				Reset();
 
 private:
+			status_t			_TrySend();
+
 			RPC::Server*		fServer;
 
 			RequestBuilder		fBuilder;

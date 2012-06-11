@@ -50,6 +50,12 @@ public:
 
 			status_t				SendCall(Call* call, Reply** reply);
 
+			status_t				SendCallAsync(Call* call, Reply** reply,
+										Request** request);
+	inline	status_t				WaitCall(Request* request,
+										bigtime_t time = kWaitTime);
+	inline	status_t				CancelCall(Request* request);
+
 			status_t				Repair();
 
 	inline	const ServerAddress&	ID() const;
@@ -74,6 +80,22 @@ private:
 			vint32					fXID;
 	static	const bigtime_t			kWaitTime	= 1000000;
 };
+
+
+inline status_t
+Server::WaitCall(Request* request, bigtime_t time)
+{
+	return request->fEvent.Wait(B_RELATIVE_TIMEOUT, time);
+}
+
+
+inline status_t
+Server::CancelCall(Request* request)
+{
+	fRequests.FindRequest(request->fXID);
+	return B_OK;
+}
+
 
 inline const ServerAddress&
 Server::ID() const
