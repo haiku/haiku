@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Alex Smith, alex@alex-smith.me.uk.
+ * Copyright 2012, Alex Smith, alex@alex-smith.me.uk.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KERNEL_ARCH_x86_64_CONFIG_H
