@@ -129,7 +129,15 @@ InstallerApp::ReadyToRun()
 		"menu. Depending on what version of GRUB you use, this is done "
 		"differently.\n\n\n");
 	infoText << B_TRANSLATE(
-		"2.1) GRUB 1\n");
+		"2.1) GRUB (since os-prober v1.44)\n");
+	infoText << B_TRANSLATE(
+		"Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku "
+		"should be recognized out of the box. To add Haiku to the GRUB menu, "
+		"open a Terminal and enter:\n\n");
+	infoText << B_TRANSLATE(
+		"\tsudo update-grub\n\n\n");
+	infoText << B_TRANSLATE(
+		"2.2) GRUB 1\n");
 	infoText << B_TRANSLATE(
 		"Configure your /boot/grub/menu.lst by launching your favorite "
 		"editor from a Terminal like this:\n\n");
@@ -163,7 +171,7 @@ InstallerApp::ReadyToRun()
 	infoText << B_TRANSLATE(
 		"You can see the correct partition in GParted for example.\n\n\n");
 	infoText << B_TRANSLATE(
-		"2.2) GRUB 2\n");
+		"2.3) GRUB 2\n");
 	infoText << B_TRANSLATE(
 		"Newer versions of GRUB use an extra configuration file to add "
 		"custom entries to the boot menu. To add them to the top, you have "
@@ -213,8 +221,8 @@ InstallerApp::ReadyToRun()
 		"\tsudo update-grub\n\n\n");
 	infoText << B_TRANSLATE(
 		"3)   When you successfully boot into Haiku for the first time, make "
-		"sure to read our \"Welcome\" documentation, there is a link on the "
-		"Desktop.\n\n");
+		"sure to read our \"Welcome\" and \"Userguide\" documentation. There "
+		"are links on the Desktop and in WebPositive's bookmarks.\n\n");
 	infoText << B_TRANSLATE(
 		"Have fun and thanks a lot for trying out Haiku! We hope you like it!");
 

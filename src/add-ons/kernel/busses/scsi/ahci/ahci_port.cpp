@@ -50,7 +50,8 @@ AHCIPort::AHCIPort(AHCIController *controller, int index)
 	fIsATAPI(false),
 	fTestUnitReadyActive(false),
 	fResetPort(false),
-	fError(false)
+	fError(false),
+	fTrim(false)
 {
 	B_INITIALIZE_SPINLOCK(&fSpinlock);
 	fRequestSem = create_sem(1, "ahci request");
@@ -613,6 +614,7 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 		fUse48BitCommands = lba && lba48;
 		fSectorSize = 512;
 		fSectorCount = !(lba || sectors) ? 0 : lba48 ? sectors48 : sectors;
+		fTrim = ataData.data_set_management_support;
 		TRACE("lba %d, lba48 %d, fUse48BitCommands %d, sectors %lu, "
 			"sectors48 %llu, size %llu\n",
 			lba, lba48, fUse48BitCommands, sectors, sectors48,
@@ -640,7 +642,8 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 
 	TRACE("model number: %s\n", modelNumber);
 	TRACE("serial number: %s\n", serialNumber);
-  	TRACE("firmware rev.: %s\n", firmwareRev);
+	TRACE("firmware rev.: %s\n", firmwareRev);
+	TRACE("trim support: %s\n", fTrim ? "yes" : "no");
 
 	if (sg_memcpy(request->sg_list, request->sg_count, &scsiData,
 			sizeof(scsiData)) < B_OK) {
@@ -956,6 +959,31 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 				request->subsys_status = SCSI_REQ_INVALID;
 				gSCSI->finished(request, 1);
 			}
+			break;
+		}
+		case SCSI_OP_WRITE_SAME_16:
+		{
+			scsi_cmd_wsame_16 *cmd = (scsi_cmd_wsame_16 *)request->cdb;
+
+			// SCSI unmap is used for trim, otherwise we don't support it
+			if (!cmd->unmap) {
+				TRACE("%s port %d: unsupported request opcode 0x%02x\n",
+					__func__, fIndex, request->cdb[0]);
+				request->subsys_status = SCSI_REQ_ABORTED;
+				gSCSI->finished(request, 1);
+				break;
+			}
+
+			if (!fTrim) {
+				// Drive doesn't support trim (or atapi)
+				// Just say it was successful and quit
+				request->subsys_status = SCSI_REQ_CMP;
+			} else {
+				TRACE("%s unimplemented: TRIM call\n", __func__);
+				// TODO: Make Serial ATA (sata_request?) trim call here.
+				request->subsys_status = SCSI_REQ_ABORTED;
+			}
+			gSCSI->finished(request, 1);
 			break;
 		}
 		default:

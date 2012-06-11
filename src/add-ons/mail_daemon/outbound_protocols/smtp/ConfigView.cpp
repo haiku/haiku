@@ -43,16 +43,14 @@ SMTPConfigView::SMTPConfigView(MailAddonSettings& settings,
 #endif
 		)
 {
-#if defined(USE_SSL) || defined(B_COLLECTING_CATKEYS)
-	static const char* kUnencryptedStr = B_TRANSLATE_MARK("Unencrypted");
-	static const char* kSSLStr = B_TRANSLATE_MARK("SSL");
-	static const char* kSTARTTLSStr = B_TRANSLATE_MARK("STARTTLS");
-#endif
+	B_TRANSLATE_MARK_VOID("Unencrypted");
+	B_TRANSLATE_MARK_VOID("SSL");
+	B_TRANSLATE_MARK_VOID("STARTTLS");
 
 #ifdef USE_SSL
-	AddFlavor(B_TRANSLATE_NOCOLLECT(kUnencryptedStr));
-	AddFlavor(B_TRANSLATE(kSSLStr));
-	AddFlavor(B_TRANSLATE(kSTARTTLSStr));
+	AddFlavor(B_TRANSLATE_NOCOLLECT("Unencrypted"));
+	AddFlavor(B_TRANSLATE("SSL"));
+	AddFlavor(B_TRANSLATE("STARTTLS"));
 #endif
 
 	AddAuthMethod(B_TRANSLATE("None"), false);

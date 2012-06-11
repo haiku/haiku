@@ -230,6 +230,8 @@ BFSPartitionHandle::Repair(bool checkOnly)
 	if (fd < 0)
 	    return errno;
 
+	FileDescriptorCloser closer(fd);
+
 	struct check_control result;
 	memset(&result, 0, sizeof(result));
 	result.magic = BFS_IOCTL_CHECK_MAGIC;
@@ -295,12 +297,8 @@ BFSPartitionHandle::Repair(bool checkOnly)
 	}
 
 	// stop checking
-	if (ioctl(fd, BFS_IOCTL_STOP_CHECKING, &result, sizeof(result)) != 0) {
-		close(fd);
+	if (ioctl(fd, BFS_IOCTL_STOP_CHECKING, &result, sizeof(result)) != 0)
 		return errno;
-	}
-
-	close(fd);
 
 	printf("        %" B_PRIu64 " nodes checked,\n\t%" B_PRIu64 " blocks not "
 		"allocated,\n\t%" B_PRIu64 " blocks already set,\n\t%" B_PRIu64

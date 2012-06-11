@@ -117,16 +117,16 @@ arch_system_info_init(struct kernel_args *args)
 	}
 
 	if (base != B_CPU_x86) {
-		if (base == B_CPU_INTEL_x86) {
+		if (base == B_CPU_INTEL_x86
+			|| (base == B_CPU_AMD_x86 && cpu->arch.family == 0xF)) {
 			model = (cpu->arch.extended_family << 20)
 				+ (cpu->arch.extended_model << 16)
 				+ (cpu->arch.family << 4) + cpu->arch.model;
 		} else {
-			model = (cpu->arch.family << 4) +
-			cpu->arch.model;
-			// There isn't much useful information yet in the extended
-			// family and extended model fields of AMD processors
-			// and is probably undefined for others
+			model = (cpu->arch.family << 4)
+				+ cpu->arch.model;
+			// Isn't much useful extended family and model information
+			// yet on other processors.
 		}
 	}
 

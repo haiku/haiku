@@ -98,38 +98,41 @@ VTConsole::VTConsole()
 void
 VTConsole::ClearScreen()
 {
-	WriteAt(NULL, 0LL, "\033E", 2);
+	WriteAt(NULL, 0LL, "\033[2J", 4);
 }
 
 
 void
 VTConsole::SetCursor(int32 x, int32 y)
 {
-	char buff[] = "\033Y  ";
+	char buffer[8];
 	x = MIN(79, MAX(0, x));
 	y = MIN(24, MAX(0, y));
-	buff[3] += (char)x;
-	buff[2] += (char)y;
-	WriteAt(NULL, 0LL, buff, 4);
+	int len = snprintf(buffer, sizeof(buffer),
+		"\033[%" B_PRId32 ";%" B_PRId32 "H", y, x);
+	WriteAt(NULL, 0LL, buffer, len);
 }
 
 
 void
 VTConsole::SetColor(int32 foreground, int32 background)
 {
+	return;
 	static const char cmap[] = {
-		15, 4, 2, 6, 1, 5, 3, 7,
-		8, 12, 10, 14, 9, 13, 11, 0 };
-	char buff[] = "\033b \033c ";
+		0, 4, 2, 6, 1, 5, 3, 7 };
+	char buffer[12];
 
-	if (foreground < 0 && foreground >= 16)
+	if (foreground < 0 && foreground >= 8)
 		return;
-	if (background < 0 && background >= 16)
+	if (background < 0 && background >= 8)
 		return;
 
-	buff[2] += cmap[foreground];
-	buff[5] += cmap[background];
-	WriteAt(NULL, 0LL, buff, 6);
+	// We assume normal display attributes here
+	int len = snprintf(buffer, sizeof(buffer),
+		"\033[#0;3%" B_PRId32 ";4%" B_PRId32 "m",
+		cmap[foreground], cmap[background]);
+
+	WriteAt(NULL, 0LL, buffer, len);
 }
 
 
@@ -206,12 +209,9 @@ console_hide_cursor(void)
 int
 console_wait_for_key(void)
 {
-	#warning IMPLEMENT console_wait_for_key
-	#if 0
 	union key key;
+	key.ax = serial_getc(true);
 	return key.code.ascii;
-	#endif
-	return 0;
 }
 
 

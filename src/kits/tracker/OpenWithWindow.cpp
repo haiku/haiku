@@ -84,7 +84,7 @@ OpenWithContainerWindow::OpenWithContainerWindow(BMessage *entriesToOpen,
 {
 	AutoLock<BWindow> lock(this);
 
-	BRect windowRect(85, 50, 510, 296);
+	BRect windowRect(85, 50, 718, 296);
 	MoveTo(windowRect.LeftTop());
 	ResizeTo(windowRect.Width(), windowRect.Height());
 
@@ -328,6 +328,10 @@ OpenWithContainerWindow::MessageReceived(BMessage *message)
 
 		case B_OBSERVER_NOTICE_CHANGE:
 			return;
+
+		case kResizeToFit:
+			ResizeToFit();
+			break;
 	}
 	_inherited::MessageReceived(message);
 }
@@ -368,7 +372,8 @@ OpenWithContainerWindow::ShowContextMenu(BPoint, const entry_ref *, BView *)
 void
 OpenWithContainerWindow::AddShortcuts()
 {
-	// add get info here
+	AddShortcut('I', B_COMMAND_KEY, new BMessage(kGetInfo), PoseView());
+	AddShortcut('Y', B_COMMAND_KEY, new BMessage(kResizeToFit), PoseView());
 }
 
 

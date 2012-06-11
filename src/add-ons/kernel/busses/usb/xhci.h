@@ -33,16 +33,17 @@ enum xhci_state {
 
 
 typedef struct xhci_td {
-	struct xhci_trb	trbs[18];
+	struct xhci_trb	trbs[XHCI_MAX_TRBS_PER_TD];
 
-	addr_t	buffer_phy;
-	addr_t	this_phy;		// A physical pointer to this address
-	void	*buffer_log;	// Pointer to the logical buffer
-	size_t	buffer_size;	// Size of the buffer
+	addr_t	this_phy;					// A physical pointer to this address
+	addr_t	buffer_phy[XHCI_MAX_TRBS_PER_TD];
+	void	*buffer_log[XHCI_MAX_TRBS_PER_TD];	// Pointer to the logical buffer
+	size_t	buffer_size[XHCI_MAX_TRBS_PER_TD];	// Size of the buffer
+	uint8	buffer_count;
 
 	struct xhci_td	*next;
-	uint8	last_used;
 	Transfer *transfer;
+	uint8	trb_count;
 } xhci_td __attribute__((__aligned__(16)));
 
 
@@ -53,6 +54,7 @@ typedef struct xhci_endpoint {
 	addr_t trb_addr;
 	uint8	used;
 	uint8	current;
+	mutex	lock;
 } xhci_endpoint;
 
 
@@ -99,7 +101,8 @@ public:
 									uint8 type, uint64 ringAddr,
 									uint16 interval, uint8 maxPacketCount,
 									uint8 mult, uint8 fpsShift,
-									uint16 maxPacketSize, uint16 maxFrameSize);
+									uint16 maxPacketSize, uint16 maxFrameSize,
+									usb_speed speed);
 	virtual	void				FreeDevice(Device *device);
 
 			status_t			_InsertEndpointForPipe(Pipe *pipe);
@@ -125,13 +128,23 @@ private:
 	static	int32				InterruptHandler(void *data);
 			int32				Interrupt();
 
+			// Event management
+	static	int32				EventThread(void *data);
+			void				CompleteEvents();
+
 			// Transfer management
 	static	int32				FinishThread(void *data);
 			void				FinishTransfers();
 
 			// Descriptor
 			xhci_td *			CreateDescriptor(size_t bufferSize);
+			xhci_td *			CreateDescriptorChain(size_t bufferSize);
 			void				FreeDescriptor(xhci_td *descriptor);
+
+			size_t				WriteDescriptorChain(xhci_td *descriptor,
+									iovec *vector, size_t vectorCount);
+			size_t				ReadDescriptorChain(xhci_td *descriptor,
+									iovec *vector, size_t vectorCount);
 
 			status_t			_LinkDescriptorForPipe(xhci_td *descriptor,
 									xhci_endpoint *endpoint);
@@ -230,6 +243,8 @@ private:
 			// Devices
 			struct xhci_device	fDevices[XHCI_MAX_DEVICES];
 
+			sem_id				fEventSem;
+			thread_id			fEventThread;
 			uint16				fEventIdx;
 			uint16				fCmdIdx;
 			uint8				fEventCcs;

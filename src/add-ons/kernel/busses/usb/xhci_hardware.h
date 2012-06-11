@@ -266,13 +266,14 @@
 #define XHCI_MAX_SCRATCHPADS	32
 #define XHCI_MAX_DEVICES	128
 #define XHCI_MAX_TRANSFERS	4
+#define XHCI_MAX_TRBS_PER_TD	18
 
 
 struct xhci_trb {
 	uint64	qwtrb0;
 	uint32	dwtrb2;
 	uint32	dwtrb3;
-} __attribute__((__aligned__(4)));;
+} __attribute__((__aligned__(4)));
 
 
 struct xhci_segment {

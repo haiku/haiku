@@ -205,7 +205,7 @@ void
 mmu_set_TTBR(uint32 ttb)
 {
 	ttb &= 0xffffc000;
-	asm volatile("MRC p15, 0, %[adr], c2, c0, 0"::[adr] "r" (ttb));
+	asm volatile("MCR p15, 0, %[adr], c2, c0, 0"::[adr] "r" (ttb));
 }
 
 

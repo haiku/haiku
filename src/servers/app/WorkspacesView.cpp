@@ -214,18 +214,32 @@ WorkspacesView::_DrawWindow(DrawingEngine* drawingEngine,
 		_DarkenColor(white);
 	}
 
-	if (tabFrame.left < frame.left)
-		tabFrame.left = frame.left;
-	if (tabFrame.right >= frame.right)
-		tabFrame.right = frame.right - 1;
+	if (tabFrame.Height() > 0 && tabFrame.Width() > 0) {
+		float width = tabFrame.Width();
+		if (tabFrame.left < frame.left) {
+			// Shift the tab right
+			tabFrame.left = frame.left;
+			tabFrame.right = tabFrame.left + width;
+		}
+		if (tabFrame.right > frame.right) {
+			// Shift the tab left
+			tabFrame.right = frame.right;
+			tabFrame.left = tabFrame.right - width;
+		}
 
-	tabFrame.bottom = frame.top - 1;
-	tabFrame.top = min_c(tabFrame.top, tabFrame.bottom);
-	tabFrame = tabFrame & workspaceFrame;
+		if (tabFrame.bottom >= tabFrame.top) {
+			// Shift the tab up
+			float tabHeight = tabFrame.Height();
+			tabFrame.bottom = frame.top - 1;
+			tabFrame.top = tabFrame.bottom - tabHeight;
+		}
 
-	if (decorator != NULL && tabFrame.IsValid()) {
-		drawingEngine->FillRect(tabFrame, tabColor);
-		backgroundRegion.Exclude(tabFrame);
+		tabFrame = tabFrame & workspaceFrame;
+
+		if (decorator != NULL && tabFrame.IsValid()) {
+			drawingEngine->FillRect(tabFrame, tabColor);
+			backgroundRegion.Exclude(tabFrame);
+		}
 	}
 
 	drawingEngine->StrokeRect(frame, frameColor);

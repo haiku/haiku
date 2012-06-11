@@ -121,6 +121,7 @@ SYSTEM_ADD_ONS_ACCELERANTS = $(X86_ONLY)radeon.accelerant
 	$(X86_ONLY)ati.accelerant
 	$(X86_ONLY)3dfx.accelerant
 	$(X86_ONLY)radeon_hd.accelerant
+	$(X86_ONLY)intel_810.accelerant
 	#$(X86_ONLY)via.accelerant
 	#$(X86_ONLY)vmware.accelerant
 ;
@@ -168,6 +169,7 @@ SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon $(X86_ONLY)nvidia
 	$(X86_ONLY)neomagic $(X86_ONLY)matrox $(X86_ONLY)intel_extreme
 	$(X86_ONLY)s3 $(X86_ONLY)vesa #$(X86_ONLY)via #$(X86_ONLY)vmware
 	$(X86_ONLY)ati $(X86_ONLY)3dfx $(X86_ONLY)radeon_hd
+	$(X86_ONLY)intel_810
 ;
 SYSTEM_ADD_ONS_DRIVERS_MIDI = emuxki ice1712 usb_midi ;
 SYSTEM_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)atheros813x
@@ -181,7 +183,7 @@ SYSTEM_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)atheros813x
 
 	# WLAN drivers
 	$(X86_ONLY)aironetwifi $(X86_ONLY)atheroswifi $(X86_ONLY)broadcom43xx
-	$(X86_ONLY)ipw2100 $(X86_ONLY)iprowifi2200 $(X86_ONLY)iprowifi3945
+	$(X86_ONLY)iprowifi2100 $(X86_ONLY)iprowifi2200 $(X86_ONLY)iprowifi3945
 	$(X86_ONLY)iprowifi4965 $(X86_ONLY)marvell88w8363 $(X86_ONLY)marvell88w8335
 	$(X86_ONLY)ralink2860 $(X86_ONLY)ralinkwifi $(X86_ONLY)wavelanwifi
 

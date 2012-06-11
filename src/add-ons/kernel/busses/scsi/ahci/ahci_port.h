@@ -70,6 +70,7 @@ private:
 	bool							fTestUnitReadyActive;
 	bool							fResetPort;
 	bool							fError;
+	bool							fTrim;
 
 	volatile fis *					fFIS;
 	volatile command_list_entry *	fCommandList;

@@ -1,0 +1,19 @@
+SubDir HAIKU_TOP src add-ons accelerants intel_810 ;
+
+UsePrivateHeaders graphics ;
+UsePrivateHeaders [ FDirName graphics intel_810 ] ;
+UsePrivateHeaders [ FDirName graphics common ] ;
+
+Addon intel_810.accelerant :
+	accelerant.cpp
+	engine.cpp
+	hooks.cpp
+	mode.cpp
+
+	i810_dpms.cpp
+	i810_init.cpp
+	i810_mode.cpp
+	i810_watermark.cpp
+
+	: be libaccelerantscommon.a
+;

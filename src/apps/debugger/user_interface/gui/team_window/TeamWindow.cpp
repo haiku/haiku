@@ -990,6 +990,7 @@ TeamWindow::_SetActiveSourceCode(SourceCode* sourceCode)
 
 	fSourceView->SetSourceCode(fActiveSourceCode);
 
+	_UpdateSourcePathState();
 	_ScrollToActiveFunction();
 }
 
@@ -1046,6 +1047,38 @@ TeamWindow::_UpdateRunButtons()
 			fStepOutButton->SetEnabled(true);
 			break;
 	}
+}
+
+
+void
+TeamWindow::_UpdateSourcePathState()
+{
+	LocatableFile* sourceFile = NULL;
+	BString sourceText = "Source file unavailable.";
+	BString truncatedText;
+
+	if (fActiveSourceCode != NULL) {
+		sourceFile = fActiveFunction->GetFunctionDebugInfo()->SourceFile();
+
+		if (sourceFile != NULL && !sourceFile->GetLocatedPath(sourceText))
+			sourceFile->GetPath(sourceText);
+
+		if (fActiveSourceCode->GetSourceFile() == NULL && sourceFile != NULL) {
+			sourceText.Prepend("Click to locate source file '");
+			sourceText += "'";
+			truncatedText = sourceText;
+			fSourcePathView->TruncateString(&truncatedText, B_TRUNCATE_MIDDLE,
+				fSourcePathView->Bounds().Width());
+		} else if (sourceFile != NULL) {
+			sourceText.Prepend("File: ");
+		}
+	}
+
+	if (!truncatedText.IsEmpty() && truncatedText != sourceText) {
+		fSourcePathView->SetToolTip(sourceText);
+		fSourcePathView->SetText(truncatedText);
+	} else
+		fSourcePathView->SetText(sourceText);
 }
 
 
@@ -1183,33 +1216,8 @@ TeamWindow::_HandleSourceCodeChanged()
 	AutoLocker< ::Team> locker(fTeam);
 
 	SourceCode* sourceCode = fActiveFunction->GetFunction()->GetSourceCode();
-	LocatableFile* sourceFile = NULL;
-	BString sourceText;
-	BString truncatedText;
 	if (sourceCode == NULL)
 		sourceCode = fActiveFunction->GetSourceCode();
-
-	if (sourceCode != NULL)
-		sourceFile = fActiveFunction->GetFunctionDebugInfo()->SourceFile();
-
-	if (sourceFile != NULL && !sourceFile->GetLocatedPath(sourceText))
-		sourceFile->GetPath(sourceText);
-
-	if (sourceCode != NULL && sourceCode->GetSourceFile() == NULL
-		&& sourceFile != NULL) {
-		sourceText.Prepend("Click to locate source file '");
-		sourceText += "'";
-		truncatedText = sourceText;
-		fSourcePathView->TruncateString(&truncatedText, B_TRUNCATE_MIDDLE,
-			fSourcePathView->Bounds().Width());
-		if (sourceText != truncatedText)
-			fSourcePathView->SetToolTip(sourceText.String());
-		fSourcePathView->SetText(truncatedText.String());
-	} else if (sourceFile != NULL) {
-		sourceText.Prepend("File: ");
-		fSourcePathView->SetText(sourceText.String());
-	} else
-		fSourcePathView->SetText("Source file unavailable.");
 
 	BReference<SourceCode> sourceCodeReference(sourceCode);
 

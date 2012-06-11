@@ -132,6 +132,7 @@ private:
 			void				_SetActiveSourceCode(SourceCode* sourceCode);
 			void				_UpdateCpuState();
 			void				_UpdateRunButtons();
+			void				_UpdateSourcePathState();
 			void				_ScrollToActiveFunction();
 
 			void				_HandleThreadStateChanged(thread_id threadID);

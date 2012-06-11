@@ -62,9 +62,7 @@
 	// SMI Base
 #define USB_BASE		0x980000
 	// USB Controller, 15.2, page 202
-#define FB_BASE			0x000000
-	// Fake frame buffer
-#define FB_SIZE			SIZE_4K
+// FB_BASE will depend on memory split
 
 
 // 7.5, page 112

@@ -965,8 +965,6 @@ fs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 			result = errno;
 	}
 
-	free(uname);
-
 exit:
 	if (result >= B_OK)
 		*_cookie = cookie;

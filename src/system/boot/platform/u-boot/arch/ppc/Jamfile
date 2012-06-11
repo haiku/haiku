@@ -13,9 +13,9 @@ BootMergeObject boot_platform_u-boot_ppc.o :
 	shell.S
 
 	#arch_mmu.cpp
-	#arch_cpu_asm.S
+	arch_cpu_asm.S
 	arch_start_kernel.S
-	#cpu.cpp
+	arch_cpu.cpp
 	#mmu.cpp
 	: -fno-pic
 ;

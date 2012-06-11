@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2012, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,6 +7,7 @@
  *		Rene Gollent (rene@gollent.com)
  *		Alexandre Deckner (alex@zappotek.com)
  */
+
 
 //!	BDragger represents a replicant "handle".
 
@@ -45,10 +46,10 @@ using BPrivate::gSystemCatalog;
 #define B_TRANSLATE(str) \
 	gSystemCatalog.GetString(B_TRANSLATE_MARK(str), "Dragger")
 
-const uint32 kMsgDragStarted = 'Drgs';
 
-const unsigned char
-kHandBitmap[] = {
+static const uint32 kMsgDragStarted = 'Drgs';
+
+static const unsigned char kHandBitmap[] = {
 	255, 255,   0,   0,   0, 255, 255, 255,
 	255, 255,   0, 131, 131,   0, 255, 255,
 	  0,   0,   0,   0, 131, 131,   0,   0,
@@ -112,8 +113,9 @@ DraggerManager* DraggerManager::sDefaultInstance = NULL;
 }	// unnamed namespace
 
 
-BDragger::BDragger(BRect bounds, BView *target, uint32 rmask, uint32 flags)
-	: BView(bounds, "_dragger_", rmask, flags),
+BDragger::BDragger(BRect bounds, BView* target, uint32 resizeMask, uint32 flags)
+	:
+	BView(bounds, "_dragger_", resizeMask, flags),
 	fTarget(target),
 	fRelation(TARGET_UNKNOWN),
 	fShelf(NULL),
@@ -127,8 +129,9 @@ BDragger::BDragger(BRect bounds, BView *target, uint32 rmask, uint32 flags)
 }
 
 
-BDragger::BDragger(BMessage *data)
-	: BView(data),
+BDragger::BDragger(BMessage* data)
+	:
+	BView(data),
 	fTarget(NULL),
 	fRelation(TARGET_UNKNOWN),
 	fShelf(NULL),
@@ -138,16 +141,16 @@ BDragger::BDragger(BMessage *data)
 	fPopUpIsCustom(false),
 	fPopUp(NULL)
 {
-	data->FindInt32("_rel", (int32 *)&fRelation);
+	data->FindInt32("_rel", (int32*)&fRelation);
 
 	_InitData();
 
 	BMessage popupMsg;
 	if (data->FindMessage("_popup", &popupMsg) == B_OK) {
-		BArchivable *archivable = instantiate_object(&popupMsg);
+		BArchivable* archivable = instantiate_object(&popupMsg);
 
 		if (archivable) {
-			fPopUp = dynamic_cast<BPopUpMenu *>(archivable);
+			fPopUp = dynamic_cast<BPopUpMenu*>(archivable);
 			fPopUpIsCustom = true;
 		}
 	}
@@ -162,7 +165,7 @@ BDragger::~BDragger()
 
 
 BArchivable	*
-BDragger::Instantiate(BMessage *data)
+BDragger::Instantiate(BMessage* data)
 {
 	if (validate_instantiation(data, "BDragger"))
 		return new BDragger(data);
@@ -171,7 +174,7 @@ BDragger::Instantiate(BMessage *data)
 
 
 status_t
-BDragger::Archive(BMessage *data, bool deep) const
+BDragger::Archive(BMessage* data, bool deep) const
 {
 	status_t ret = BView::Archive(data, deep);
 	if (ret != B_OK)
@@ -179,15 +182,16 @@ BDragger::Archive(BMessage *data, bool deep) const
 
 	BMessage popupMsg;
 
-	if (fPopUp && fPopUpIsCustom) {
+	if (fPopUp != NULL && fPopUpIsCustom) {
 		bool windowLocked = fPopUp->Window()->Lock();
 
 		ret = fPopUp->Archive(&popupMsg, deep);
 
-		if (windowLocked)
+		if (windowLocked) {
 			fPopUp->Window()->Unlock();
 				// TODO: Investigate, in some (rare) occasions the menu window
 				//		 has already been unlocked
+		}
 
 		if (ret == B_OK)
 			ret = data->AddMessage("_popup", &popupMsg);
@@ -229,8 +233,8 @@ BDragger::Draw(BRect update)
 {
 	BRect bounds(Bounds());
 
-	if (AreDraggersDrawn() && (!fShelf || fShelf->AllowsDragging())) {
-		if (Parent() && (Parent()->Flags() & B_DRAW_ON_CHILDREN) == 0) {
+	if (AreDraggersDrawn() && (fShelf == NULL || fShelf->AllowsDragging())) {
+		if (Parent() != NULL && (Parent()->Flags() & B_DRAW_ON_CHILDREN) == 0) {
 			uint32 flags = Parent()->Flags();
 			Parent()->SetFlags(flags | B_DRAW_ON_CHILDREN);
 			Parent()->Draw(Frame() & ConvertToParent(update));
@@ -248,7 +252,7 @@ BDragger::Draw(BRect update)
 			// TODO: should draw it differently ?
 		}
 	} else if (IsVisibilityChanging()) {
-		if (Parent()) {
+		if (Parent() != NULL) {
 			if ((Parent()->Flags() & B_DRAW_ON_CHILDREN) == 0) {
 				uint32 flags = Parent()->Flags();
 				Parent()->SetFlags(flags | B_DRAW_ON_CHILDREN);
@@ -266,13 +270,13 @@ BDragger::Draw(BRect update)
 void
 BDragger::MouseDown(BPoint where)
 {
-	if (!fTarget || !AreDraggersDrawn())
+	if (fTarget == NULL || !AreDraggersDrawn())
 		return;
 
 	uint32 buttons;
-	Window()->CurrentMessage()->FindInt32("buttons", (int32 *)&buttons);
+	Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons);
 
-	if (fShelf != NULL && (buttons & B_SECONDARY_MOUSE_BUTTON))
+	if (fShelf != NULL && (buttons & B_SECONDARY_MOUSE_BUTTON) != 0)
 		_ShowPopUp(fTarget, where);
 }
 
@@ -285,14 +289,14 @@ BDragger::MouseUp(BPoint point)
 
 
 void
-BDragger::MouseMoved(BPoint point, uint32 code, const BMessage *msg)
+BDragger::MouseMoved(BPoint point, uint32 code, const BMessage* msg)
 {
 	BView::MouseMoved(point, code, msg);
 }
 
 
 void
-BDragger::MessageReceived(BMessage *msg)
+BDragger::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
 		case B_TRASH_TARGET:
@@ -316,7 +320,8 @@ BDragger::MessageReceived(BMessage *msg)
 				Flush();
 				fTransition = false;
 			} else {
-				if ((fShelf && (fShelf->AllowsDragging() && AreDraggersDrawn()))
+				if ((fShelf != NULL && fShelf->AllowsDragging()
+						&& AreDraggersDrawn())
 					|| AreDraggersDrawn()) {
 					Show();
 				} else
@@ -332,25 +337,22 @@ BDragger::MessageReceived(BMessage *msg)
 					fTarget->Archive(&archive);
 				else if (fRelation == TARGET_IS_CHILD)
 					Archive(&archive);
-				else {
-					if (fTarget->Archive(&archive)) {
-						BMessage archivedSelf(B_ARCHIVED_OBJECT);
+				else if (fTarget->Archive(&archive)) {
+					BMessage archivedSelf(B_ARCHIVED_OBJECT);
 
-						if (Archive(&archivedSelf))
-							archive.AddMessage("__widget", &archivedSelf);
-					}
+					if (Archive(&archivedSelf))
+						archive.AddMessage("__widget", &archivedSelf);
 				}
 
 				archive.AddInt32("be:actions", B_TRASH_TARGET);
 				BPoint offset;
 				drawing_mode mode;
-				BBitmap *bitmap = DragBitmap(&offset, &mode);
+				BBitmap* bitmap = DragBitmap(&offset, &mode);
 				if (bitmap != NULL)
 					DragMessage(&archive, bitmap, mode, offset, this);
 				else {
-					DragMessage(&archive,
-						ConvertFromScreen(fTarget->ConvertToScreen(fTarget->Bounds())),
-						this);
+					DragMessage(&archive, ConvertFromScreen(
+						fTarget->ConvertToScreen(fTarget->Bounds())), this);
 				}
 			}
 			break;
@@ -543,7 +545,7 @@ BDragger::AllDetached()
 
 
 status_t
-BDragger::SetPopUp(BPopUpMenu *menu)
+BDragger::SetPopUp(BPopUpMenu* menu)
 {
 	if (menu != NULL && menu != fPopUp) {
 		delete fPopUp;
@@ -555,11 +557,11 @@ BDragger::SetPopUp(BPopUpMenu *menu)
 }
 
 
-BPopUpMenu *
+BPopUpMenu*
 BDragger::PopUp() const
 {
 	if (fPopUp == NULL && fTarget)
-		const_cast<BDragger *>(this)->_BuildDefaultPopUp();
+		const_cast<BDragger*>(this)->_BuildDefaultPopUp();
 
 	return fPopUp;
 }
@@ -572,15 +574,15 @@ BDragger::InShelf() const
 }
 
 
-BView *
+BView*
 BDragger::Target() const
 {
 	return fTarget;
 }
 
 
-BBitmap *
-BDragger::DragBitmap(BPoint *offset, drawing_mode *mode)
+BBitmap*
+BDragger::DragBitmap(BPoint* offset, drawing_mode* mode)
 {
 	return NULL;
 }
@@ -598,8 +600,8 @@ void BDragger::_ReservedDragger3() {}
 void BDragger::_ReservedDragger4() {}
 
 
-BDragger &
-BDragger::operator=(const BDragger &)
+BDragger&
+BDragger::operator=(const BDragger&)
 {
 	return *this;
 }
@@ -663,7 +665,7 @@ BDragger::_RemoveFromList()
 status_t
 BDragger::_DetermineRelationship()
 {
-	if (fTarget) {
+	if (fTarget != NULL) {
 		if (fTarget == Parent())
 			fRelation = TARGET_IS_PARENT;
 		else if (fTarget == ChildAt(0))
@@ -680,11 +682,12 @@ BDragger::_DetermineRelationship()
 	}
 
 	if (fRelation == TARGET_IS_PARENT) {
-		BRect bounds (Frame());
-		BRect parentBounds (Parent()->Bounds());
-		if (!parentBounds.Contains(bounds))
+		BRect bounds(Frame());
+		BRect parentBounds(Parent()->Bounds());
+		if (!parentBounds.Contains(bounds)) {
 			MoveTo(parentBounds.right - bounds.Width(),
 				parentBounds.bottom - bounds.Height());
+		}
 	}
 
 	return B_OK;
@@ -692,14 +695,14 @@ BDragger::_DetermineRelationship()
 
 
 status_t
-BDragger::_SetViewToDrag(BView *target)
+BDragger::_SetViewToDrag(BView* target)
 {
 	if (target->Window() != Window())
 		return B_ERROR;
 
 	fTarget = target;
 
-	if (Window())
+	if (Window() != NULL)
 		_DetermineRelationship();
 
 	return B_OK;
@@ -707,7 +710,7 @@ BDragger::_SetViewToDrag(BView *target)
 
 
 void
-BDragger::_SetShelf(BShelf *shelf)
+BDragger::_SetShelf(BShelf* shelf)
 {
 	fShelf = shelf;
 }
@@ -731,13 +734,13 @@ BDragger::_BuildDefaultPopUp()
 	fPopUp = new BPopUpMenu("Shelf", false, false, B_ITEMS_IN_COLUMN);
 
 	// About
-	BMessage *msg = new BMessage(B_ABOUT_REQUESTED);
+	BMessage* msg = new BMessage(B_ABOUT_REQUESTED);
 
-	const char *name = fTarget->Name();
-	if (name)
+	const char* name = fTarget->Name();
+	if (name != NULL)
 		msg->AddString("target", name);
 
-	BString about(B_TRANSLATE("About %app"B_UTF8_ELLIPSIS));
+	BString about(B_TRANSLATE("About %app" B_UTF8_ELLIPSIS));
 	about.ReplaceFirst("%app", name);
 
 	fPopUp->AddItem(new BMenuItem(about.String(), msg));
@@ -748,11 +751,11 @@ BDragger::_BuildDefaultPopUp()
 
 
 void
-BDragger::_ShowPopUp(BView *target, BPoint where)
+BDragger::_ShowPopUp(BView* target, BPoint where)
 {
 	BPoint point = ConvertToScreen(where);
 
-	if (!fPopUp && fTarget)
+	if (fPopUp == NULL && fTarget != NULL)
 		_BuildDefaultPopUp();
 
 	fPopUp->SetTargetForItems(fTarget);
