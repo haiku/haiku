@@ -154,15 +154,28 @@ Server::SendCallAsync(Call* call, Reply** reply, Request** request)
 
 	fRequests.AddRequest(req);
 
+	*request = req;
+	return ResendCallAsync(call, req);
+}
+
+
+status_t
+Server::ResendCallAsync(Call* call, Request* req)
+{
+	if (fThreadError != B_OK) {
+		fRequests.FindRequest(req->fXID);
+		delete req;
+		return fThreadError;
+	}
+
 	XDR::WriteStream& stream = call->Stream();
 	status_t result = fConnection->Send(stream.Buffer(), stream.Size());
 	if (result != B_OK) {
-		fRequests.FindRequest(xid);
+		fRequests.FindRequest(req->fXID);
 		delete req;
 		return result;
 	}
 
-	*request = req;
 	return B_OK;
 }
 
@@ -198,7 +211,9 @@ Server::_Listener()
 
 	while (!fThreadCancel) {
 		result = fConnection->Receive(&buffer, &size);
-		if (result != B_OK) {
+		if (result == B_NO_MEMORY)
+			continue;
+		else if (result != B_OK) {
 			fThreadError = result;
 			return result;
 		}
@@ -206,8 +221,7 @@ Server::_Listener()
 		Reply* reply = new(std::nothrow) Reply(buffer, size);
 		if (reply == NULL) {
 			free(buffer);
-			fThreadError = result;
-			return B_NO_MEMORY;
+			continue;
 		}
 
 		Request* req = fRequests.FindRequest(reply->GetXID());

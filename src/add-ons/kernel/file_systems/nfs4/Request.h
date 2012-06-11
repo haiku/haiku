@@ -25,12 +25,15 @@ public:
 			void				Reset();
 
 private:
-			status_t			_TrySend();
+			status_t			_SendUDP();
+			status_t			_SendTCP();
 
 			RPC::Server*		fServer;
 
 			RequestBuilder		fBuilder;
 			ReplyInterpreter	fReply;
+
+	static	const int			kRetryLimit = 5;
 };
 
 

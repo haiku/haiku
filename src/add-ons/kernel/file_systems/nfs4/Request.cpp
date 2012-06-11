@@ -13,12 +13,17 @@
 status_t
 Request::Send()
 {
-	return _TrySend();
+	switch (fServer->ID().fProtocol) {
+		case ProtocolUDP:	return _SendUDP();
+		case ProtocolTCP:	return _SendTCP();
+	}
+
+	return B_BAD_VALUE;
 }
 
 
 status_t
-Request::_TrySend()
+Request::_SendUDP()
 {
 	RPC::Reply *rpl;
 	RPC::Request *rpc;
@@ -29,10 +34,46 @@ Request::_TrySend()
 
 	result = fServer->WaitCall(rpc);
 	if (result != B_OK) {
-		fServer->CancelCall(rpc);
-		delete rpc;
-		return result;
+		int attempts = 1;
+		while (result != B_OK && attempts++ < kRetryLimit)
+			result = fServer->ResendCallAsync(fBuilder.Request(), rpc);
+
+		if (attempts == kRetryLimit) {
+			fServer->CancelCall(rpc);
+			delete rpc;
+			return result;
+		}
 	}
+
+	return fReply.SetTo(rpl);
+}
+
+
+status_t
+Request::_SendTCP()
+{
+	RPC::Reply *rpl;
+	RPC::Request *rpc;
+
+	status_t result;
+	int attempts = 0;
+	do {
+		result = fServer->SendCallAsync(fBuilder.Request(), &rpl, &rpc);
+		if (result == B_NO_MEMORY)
+			return result;
+		else if (result != B_OK) {
+			fServer->Repair();
+			continue;
+		}
+
+		result = fServer->WaitCall(rpc);
+		if (result != B_OK) {
+			fServer->CancelCall(rpc);
+			delete rpc;
+
+			fServer->Repair();	
+		}
+	} while (result != B_OK && attempts++ < kRetryLimit);
 
 	return fReply.SetTo(rpl);
 }

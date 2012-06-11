@@ -52,6 +52,7 @@ public:
 
 			status_t				SendCallAsync(Call* call, Reply** reply,
 										Request** request);
+			status_t				ResendCallAsync(Call* call, Request* req);
 	inline	status_t				WaitCall(Request* request,
 										bigtime_t time = kWaitTime);
 	inline	status_t				CancelCall(Request* request);
