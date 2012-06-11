@@ -225,6 +225,7 @@ DesktopSettingsPrivate::_Load()
 		BMessage settings;
 		status = settings.Unflatten(&file);
 		if (status == B_OK) {
+			// menus
 			float fontSize;
 			if (settings.FindFloat("font size", &fontSize) == B_OK)
 				fMenuInfo.font_size = fontSize;
@@ -255,6 +256,24 @@ DesktopSettingsPrivate::_Load()
 				fMenuInfo.triggers_always_shown = triggersAlwaysShown;
 			}
 
+			// scrollbars
+			bool proportional;
+			if (settings.FindBool("proportional", &proportional) == B_OK)
+				fScrollBarInfo.proportional = proportional;
+
+			bool doubleArrows;
+			if (settings.FindBool("double arrows", &doubleArrows) == B_OK)
+				fScrollBarInfo.double_arrows = doubleArrows;
+
+			int32 knob;
+			if (settings.FindInt32("knob", &knob) == B_OK)
+				fScrollBarInfo.knob = knob;
+
+			int32 minKnobSize;
+			if (settings.FindInt32("min knob size", &minKnobSize) == B_OK)
+				fScrollBarInfo.min_knob_size = minKnobSize;
+
+			// subpixel font rendering
 			bool subpix;
 			if (settings.FindBool("subpixel antialiasing", &subpix) == B_OK)
 				gSubpixelAntialiasing = subpix;
@@ -271,6 +290,7 @@ DesktopSettingsPrivate::_Load()
 				gSubpixelOrderingRGB = subpixelOrdering;
 			}
 
+			// colors
 			for (int32 i = 0; i < kNumColors; i++) {
 				char colorName[12];
 				snprintf(colorName, sizeof(colorName), "color%ld",
@@ -406,6 +426,11 @@ DesktopSettingsPrivate::Save(uint32 mask)
 			settings.AddBool("click to open", fMenuInfo.click_to_open);
 			settings.AddBool("triggers always shown",
 				fMenuInfo.triggers_always_shown);
+
+			settings.AddBool("proportional", fScrollBarInfo.proportional);
+			settings.AddBool("double arrows", fScrollBarInfo.double_arrows);
+			settings.AddInt32("knob", fScrollBarInfo.knob);
+			settings.AddInt32("min knob size", fScrollBarInfo.min_knob_size);
 
 			settings.AddBool("subpixel antialiasing", gSubpixelAntialiasing);
 			settings.AddInt8("subpixel average weight", gSubpixelAverageWeight);
