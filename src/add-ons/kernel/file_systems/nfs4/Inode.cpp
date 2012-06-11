@@ -223,14 +223,40 @@ Inode::Stat(struct stat* st)
 	if (count >= next && values[next].fAttribute == FATTR4_MODE) {
 		st->st_mode |= values[next].fData.fValue32;
 		next++;
+	} else {
+		// Try to guess using ACCESS request
+		request.Reset();
+		request.Builder().PutFH(fHandle);
+		request.Builder().Access();
+		result = request.Send();
+		if (result != B_OK)
+			return result;
+		result = request.Reply().PutFH();
+		if (result != B_OK)
+			return result;
+		uint32 prvl;
+		result = request.Reply().Access(NULL, &prvl);
+		if (result != B_OK)
+			return result;
+
+		if ((prvl & ACCESS4_READ) != 0)
+			st->st_mode |= S_IRUSR | S_IRGRP | S_IROTH;
+
+		if ((prvl & ACCESS4_MODIFY) != 0)
+			st->st_mode |= S_IWUSR | S_IWGRP | S_IWOTH;
+
+		if (fType == NF4DIR && (prvl & ACCESS4_LOOKUP) != 0)
+			st->st_mode |= S_IXUSR | S_IXGRP | S_IXOTH;
+
+		if (fType != NF4DIR && (prvl & ACCESS4_EXECUTE) != 0)
+			st->st_mode |= S_IXUSR | S_IXGRP | S_IXOTH;
 	}
-	// TODO: else: get some info from ACCESS
 
 	if (count >= next && values[next].fAttribute == FATTR4_NUMLINKS) {
 		st->st_nlink = values[next].fData.fValue32;
 		next++;
 	} else
-		st->st_nlink = 1;	// TODO: if !link_support we dont have to ask
+		st->st_nlink = 1;
 
 	st->st_uid = 0;
 	st->st_gid = 0;
