@@ -43,6 +43,11 @@ private:
 
 };
 
+class ProgramData {
+public:
+	virtual				~ProgramData() { }
+};
+
 class Server {
 public:
 									Server(Connection* conn,
@@ -63,6 +68,9 @@ public:
 	inline	const ServerAddress&	ID() const;
 	inline	ServerAddress			LocalID() const;
 
+	inline	ProgramData*			PrivateData();
+	inline	void					SetPrivateData(ProgramData* priv);
+
 private:
 	inline	uint32					_GetXID();
 
@@ -78,6 +86,8 @@ private:
 			RequestManager			fRequests;
 			Connection*				fConnection;
 			const ServerAddress*	fAddress;
+
+			ProgramData*			fPrivateData;
 
 			vint32					fXID;
 	static	const bigtime_t			kWaitTime	= 1000000;
@@ -118,6 +128,21 @@ Server::LocalID() const
 }
 
 
+inline ProgramData*
+Server::PrivateData()
+{
+	return fPrivateData;
+}
+
+
+inline void
+Server::SetPrivateData(ProgramData* priv)
+{
+	delete fPrivateData;
+	fPrivateData = priv;
+}
+
+
 struct ServerNode {
 	ServerAddress	fID;
 	Server*			fServer;
@@ -133,7 +158,8 @@ public:
 						~ServerManager();
 
 			status_t	Acquire(Server** pserv, uint32 ip, uint16 port,
-								Transport proto);
+								Transport proto,
+								ProgramData* (*createPriv)(Server*));
 			void		Release(Server* serv);
 
 private:

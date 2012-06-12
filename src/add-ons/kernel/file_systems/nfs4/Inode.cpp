@@ -83,9 +83,6 @@ Inode::~Inode()
 }
 
 
-// filesystems that do not provide fileid are currently unsupported
-// client will have to be able to create its own mapping between file names
-// and made up IDs
 status_t
 Inode::LookUp(const char* name, ino_t* id)
 {
@@ -309,39 +306,16 @@ Inode::Stat(struct stat* st)
 status_t
 Inode::Open(int mode, OpenFileCookie* cookie)
 {
-	cookie->fSeq = 0;
+	cookie->fClientId = fFilesystem->NFSServer()->ClientId();
 
 	Request request(fFilesystem->Server());
-	request.Builder().SetClientID(fFilesystem->Server());
-
-	status_t result = request.Send();
-	if (result != B_OK)
-		return result;
-
-	uint64 id, ver;
-	result = request.Reply().SetClientID(&id, &ver);
-	if (result != B_OK)
-		return result;
-
-	request.Reset();
-	request.Builder().SetClientIDConfirm(id, ver);
-
-	result = request.Send();
-	if (result != B_OK)
-		return result;
-
-	result = request.Reply().SetClientIDConfirm();
-	if (result != B_OK)
-		return result;
-
-	request.Reset();
 	RequestBuilder& req = request.Builder();
 
 	req.PutFH(fParentFH);
-	req.Open(cookie->fSeq, OPEN4_SHARE_ACCESS_READ, id, OPEN4_NOCREATE, fName);
-	cookie->fSeq++;
+	req.Open(fFilesystem->NFSServer()->SequenceId(), OPEN4_SHARE_ACCESS_READ,
+		cookie->fClientId, OPEN4_NOCREATE, fName);
 
-	result = request.Send();
+	status_t result = request.Send();
 	if (result != B_OK)
 		return result;
 
@@ -359,8 +333,8 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 	if (confirm) {
 		request.Reset();
 		req.PutFH(fHandle);
-		req.OpenConfirm(cookie->fSeq, cookie->fStateId, cookie->fStateSeq);
-		cookie->fSeq++;
+		req.OpenConfirm(fFilesystem->NFSServer()->SequenceId(),
+			cookie->fStateId, cookie->fStateSeq);
 
 		result = request.Send();
 		if (result != B_OK)
@@ -386,7 +360,8 @@ Inode::Close(OpenFileCookie* cookie)
 	RequestBuilder& req = request.Builder();
 
 	req.PutFH(fHandle);
-	req.Close(cookie->fSeq, cookie->fStateId, cookie->fStateSeq);
+	req.Close(fFilesystem->NFSServer()->SequenceId(), cookie->fStateId,
+		cookie->fStateSeq);
 
 	status_t result = request.Send();
 	if (result != B_OK)
@@ -401,6 +376,8 @@ Inode::Close(OpenFileCookie* cookie)
 	result = reply.Close();
 	if (result != B_OK)
 		return result;
+
+	fFilesystem->NFSServer()->ReleaseCID(cookie->fClientId);
 
 	return B_OK;
 }

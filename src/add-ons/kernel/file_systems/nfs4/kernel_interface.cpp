@@ -28,6 +28,13 @@ dprintf(const char* format, ...);
 RPC::ServerManager* gRPCServerManager;
 
 
+static RPC::ProgramData*
+sCreateNFS4Server(RPC::Server* serv)
+{
+	return new NFS4Server(serv);
+}
+
+
 static status_t
 nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 			const char* args, ino_t* _rootVnodeID)
@@ -36,7 +43,8 @@ nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 
 	RPC::Server *server;
 	// hardcoded ip 192.168.1.70
-	result = gRPCServerManager->Acquire(&server, 0xc0a80146, 2049, ProtocolUDP);
+	result = gRPCServerManager->Acquire(&server, 0xc0a80146, 2049, ProtocolUDP,
+		sCreateNFS4Server);
 	if (result != B_OK)
 		return result;
 	

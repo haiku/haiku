@@ -11,7 +11,7 @@
 
 #include "InodeIdMap.h"
 #include "NFS4Defs.h"
-#include "RPCServer.h"
+#include "NFS4Server.h"
 
 
 class Inode;
@@ -27,7 +27,10 @@ public:
 			Inode*			CreateRootInode();
 
 	inline	uint32			FHExpiryType() const;
+
 	inline	RPC::Server*	Server();
+	inline	NFS4Server*		NFSServer();
+
 	inline	uint64			AllocFileId();
 
 	inline	dev_t			DevId() const;
@@ -52,6 +55,13 @@ inline RPC::Server*
 Filesystem::Server()
 {
 	return fServer;
+}
+
+
+inline NFS4Server*
+Filesystem::NFSServer()
+{
+	return reinterpret_cast<NFS4Server*>(fServer->PrivateData());
 }
 
 

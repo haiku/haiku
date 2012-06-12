@@ -77,6 +77,7 @@ Server::Server(Connection* conn, ServerAddress* addr)
 	:
 	fConnection(conn),
 	fAddress(addr),
+	fPrivateData(NULL),
 	fXID(rand() << 1)
 {
 	_StartListening();
@@ -85,6 +86,8 @@ Server::Server(Connection* conn, ServerAddress* addr)
 
 Server::~Server()
 {
+	delete fPrivateData;
+
 	fThreadCancel = true;
 	fConnection->Disconnect();
 	interrupt_thread(fThread);
@@ -200,7 +203,7 @@ Server::Repair()
 uint32
 Server::_GetXID()
 {
-	return (uint32)atomic_add(&fXID, 1);
+	return static_cast<uint32>(atomic_add(&fXID, 1));
 }
 
 
@@ -262,7 +265,8 @@ ServerManager::~ServerManager()
 
 
 status_t
-ServerManager::Acquire(Server** pserv, uint32 ip, uint16 port, Transport proto)
+ServerManager::Acquire(Server** pserv, uint32 ip, uint16 port, Transport proto,
+	ProgramData* (*createPriv)(Server*))
 {
 	status_t result;
 
@@ -301,6 +305,7 @@ ServerManager::Acquire(Server** pserv, uint32 ip, uint16 port, Transport proto)
 		delete conn;
 		return B_NO_MEMORY;
 	}
+	node->fServer->SetPrivateData(createPriv(node->fServer));
 
 	node->fRefCount = 1;
 	node->fLeft = node->fRight = NULL;
