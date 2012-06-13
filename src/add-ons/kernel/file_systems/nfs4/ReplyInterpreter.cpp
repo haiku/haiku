@@ -323,6 +323,12 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 		current++;
 	}
 
+	if (sIsAttrSet(FATTR4_LEASE_TIME, bitmap, bcount)) {
+		values[current].fAttribute = FATTR4_LEASE_TIME;
+		values[current].fData.fValue32 = stream.GetUInt();
+		current++;
+	}
+
 	if (sIsAttrSet(FATTR4_FILEID, bitmap, bcount)) {
 		values[current].fAttribute = FATTR4_FILEID;
 		values[current].fData.fValue64 = stream.GetUHyper();

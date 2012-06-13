@@ -24,6 +24,16 @@ public:
 
 	inline	uint32			SequenceId();
 private:
+			status_t		_GetLeaseTime();
+
+			status_t		_StartRenewing();
+			status_t		_Renewal();
+	static	status_t		_RenewalThreadStart(void* ptr);
+			thread_id		fThread;
+			bool			fThreadCancel;
+
+			uint32			fLeaseTime;
+
 			uint64			fClientId;
 			uint32			fCIDUseCount;
 			mutex			fLock;

@@ -262,7 +262,7 @@ RequestBuilder::Read(const uint32* id, uint32 stateSeq, uint64 pos, uint32 len)
 
 status_t
 RequestBuilder::ReadDir(uint32 count, uint64* cookie, Attribute* attrs,
-	uint32 attr_count)
+	uint32 attrCount)
 {
 	(void)count;
 
@@ -278,7 +278,24 @@ RequestBuilder::ReadDir(uint32 count, uint64* cookie, Attribute* attrs,
 	// consider predicting this values basing on count or buffer size
 	fRequest->Stream().AddUInt(0x2000);
 	fRequest->Stream().AddUInt(0x8000);
-	_AttrBitmap(fRequest->Stream(), attrs, attr_count);
+	_AttrBitmap(fRequest->Stream(), attrs, attrCount);
+
+	fOpCount++;
+
+	return B_OK;
+}
+
+
+status_t
+RequestBuilder::Renew(uint64 clientId)
+{
+	if (fProcedure != ProcCompound)
+		return B_BAD_VALUE;
+	if (fRequest == NULL)
+		return B_NO_MEMORY;
+
+	fRequest->Stream().AddUInt(OpRenew);
+	fRequest->Stream().AddUHyper(clientId);
 
 	fOpCount++;
 
