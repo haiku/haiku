@@ -152,8 +152,8 @@ RequestBuilder::LookUpUp()
 
 
 status_t
-RequestBuilder::Open(uint32 seq, uint32 access, uint64 id, OpenCreate oc,
-	const char* name)
+RequestBuilder::Open(OpenClaim claim, uint32 seq, uint32 access, uint64 id,
+	OpenCreate oc, uint32 ownerTime, uint32 ownerTID, const char* name)
 {
 	if (fProcedure != ProcCompound)
 		return B_BAD_VALUE;
@@ -168,17 +168,26 @@ RequestBuilder::Open(uint32 seq, uint32 access, uint64 id, OpenCreate oc,
 
 	char owner[128];
 	int pos = 0;
-	*(uint32*)(owner + pos) = time(NULL);
+	*(uint32*)(owner + pos) = ownerTime;
 	pos += sizeof(uint32);
 
-	*(uint32*)(owner + pos) = find_thread(NULL);
+	*(uint32*)(owner + pos) = ownerTID;
 	pos += sizeof(uint32);
 
 	fRequest->Stream().AddOpaque(owner, pos);
 
 	fRequest->Stream().AddUInt(oc);
-	fRequest->Stream().AddUInt(0);			// claim null
-	fRequest->Stream().AddString(name, strlen(name));
+	fRequest->Stream().AddUInt(claim);
+	switch (claim) {
+		case CLAIM_NULL:
+			fRequest->Stream().AddString(name, strlen(name));
+			break;
+		case CLAIM_PREVIOUS:
+			fRequest->Stream().AddUInt(0);
+			break;
+		default:
+			return B_UNSUPPORTED;
+	}
 
 	fOpCount++;
 

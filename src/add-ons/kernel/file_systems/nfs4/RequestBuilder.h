@@ -31,8 +31,10 @@ public:
 			status_t				GetFH();
 			status_t				LookUp(const char* name);
 			status_t				LookUpUp();
-			status_t				Open(uint32 seq, uint32 access, uint64 id,
-										OpenCreate oc, const char* name);
+			status_t				Open(OpenClaim claim, uint32 seq,
+										uint32 access, uint64 id, OpenCreate oc,
+										uint32 ownerTime, uint32 ownerTID,
+										const char* name);
 			status_t				OpenConfirm(uint32 seq, const uint32* id,
 										uint32 stateSeq);
 			status_t				PutFH(const Filehandle& fh);

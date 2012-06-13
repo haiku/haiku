@@ -146,6 +146,13 @@ enum OpenCreate {
 	OPEN4_CREATE			= 1
 };
 
+enum OpenClaim {
+	CLAIM_NULL				= 0,
+	CLAIM_PREVIOUS			= 1,
+	CLAIM_DELEGATE_CUR		= 2,
+	CLAIM_DELEGATE_PREV		= 3
+};
+
 enum OpenFlags {
 	OPEN4_RESULT_CONFIRM		= 2,
 	OPEN4_RESULT_LOCKTYPE_POSIX	= 4

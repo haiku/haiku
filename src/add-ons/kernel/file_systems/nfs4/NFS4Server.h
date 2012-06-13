@@ -14,10 +14,16 @@
 #include "RPCServer.h"
 
 
+class OpenFileCookie;
+
 class NFS4Server : public RPC::ProgramData {
 public:
 							NFS4Server(RPC::Server* serv);
 	virtual					~NFS4Server();
+
+			uint64			ServerRebooted(uint64 clientId);
+			void			AddOpenFile(OpenFileCookie* cookie);
+			void			RemoveOpenFile(OpenFileCookie* cookie);
 
 			uint64			ClientId(uint64 prevId = 0, bool forceNew = false);
 			void			ReleaseCID(uint64 cid);
@@ -26,6 +32,8 @@ public:
 
 	inline	uint32			LeaseTime();
 private:
+			status_t		_ReclaimOpen(OpenFileCookie* cookie);
+
 			status_t		_GetLeaseTime();
 
 			status_t		_StartRenewing();
@@ -41,6 +49,9 @@ private:
 			mutex			fLock;
 
 			vint32			fSequenceId;
+
+			OpenFileCookie*	fOpenFiles;
+			mutex			fOpenLock;
 
 			RPC::Server*	fServer;
 };

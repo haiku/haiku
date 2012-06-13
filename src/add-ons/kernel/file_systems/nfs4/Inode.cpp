@@ -338,15 +338,23 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 {
 	bool confirm;
 	status_t result;
+
+	cookie->fHandle = fHandle;
+	cookie->fMode = mode;
+
 	do {
 		cookie->fClientId = fFilesystem->NFSServer()->ClientId();
 
 		Request request(fFilesystem->Server());
 		RequestBuilder& req = request.Builder();
 
+		cookie->fOwnerTime = time(NULL);
+		cookie->fOwnerTID = find_thread(NULL);
+
 		req.PutFH(fParentFH);
-		req.Open(fFilesystem->NFSServer()->SequenceId(),
-			OPEN4_SHARE_ACCESS_READ, cookie->fClientId, OPEN4_NOCREATE, fName);
+		req.Open(CLAIM_NULL, fFilesystem->NFSServer()->SequenceId(),
+			OPEN4_SHARE_ACCESS_READ, cookie->fClientId, OPEN4_NOCREATE,
+			cookie->fOwnerTime, cookie->fOwnerTID, fName);
 
 		result = request.Send();
 		if (result != B_OK)
@@ -374,6 +382,8 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 		break;
 	} while (true);
 
+	fFilesystem->NFSServer()->AddOpenFile(cookie);
+
 	if (confirm) {
 		Request request(fFilesystem->Server());
 
@@ -384,18 +394,24 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 			cookie->fStateId, cookie->fStateSeq);
 
 		result = request.Send();
-		if (result != B_OK)
+		if (result != B_OK) {
+			fFilesystem->NFSServer()->RemoveOpenFile(cookie);
 			return result;
+		}
 
 		ReplyInterpreter& reply = request.Reply();
 
 		result = reply.PutFH();
-		if (result != B_OK)
+		if (result != B_OK) {
+			fFilesystem->NFSServer()->RemoveOpenFile(cookie);
 			return result;
+		}
 
 		result = reply.OpenConfirm(&cookie->fStateSeq);
-		if (result != B_OK)
+		if (result != B_OK) {
+			fFilesystem->NFSServer()->RemoveOpenFile(cookie);
 			return result;
+		}
 	}
 
 	return B_OK;
@@ -405,6 +421,8 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 status_t
 Inode::Close(OpenFileCookie* cookie)
 {
+	fFilesystem->NFSServer()->RemoveOpenFile(cookie);
+
 	do {
 		Request request(fFilesystem->Server());
 		RequestBuilder& req = request.Builder();
@@ -469,6 +487,13 @@ Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length)
 			if (reply.NFS4Error() == NFS4ERR_GRACE) {
 				snooze_etc(fFilesystem->NFSServer()->LeaseTime() / 3,
 					B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
+				continue;
+			}
+
+			// server has rebooted, reclaim share and try again
+			if (reply.NFS4Error() == NFS4ERR_STALE_CLIENTID ||
+				reply.NFS4Error() == NFS4ERR_STALE_STATEID) {
+				fFilesystem->NFSServer()->ServerRebooted(cookie->fClientId);
 				continue;
 			}
 

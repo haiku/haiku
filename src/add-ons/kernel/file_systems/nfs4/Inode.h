@@ -19,9 +19,19 @@
 
 
 struct OpenFileCookie {
-	uint64		fClientId;
-	uint32		fStateId[3];
-	uint32		fStateSeq;
+	uint64				fClientId;
+
+	uint32				fMode;
+
+	Filehandle			fHandle;
+	uint32				fStateId[3];
+	uint32				fStateSeq;
+
+	uint32				fOwnerTime;
+	uint32				fOwnerTID;
+
+	OpenFileCookie*		fNext;
+	OpenFileCookie*		fPrev;
 };
 
 class Inode {

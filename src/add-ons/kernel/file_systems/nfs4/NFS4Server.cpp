@@ -7,6 +7,7 @@
  */
 
 
+#include "Inode.h"
 #include "NFS4Server.h"
 #include "Request.h"
 
@@ -17,9 +18,11 @@ NFS4Server::NFS4Server(RPC::Server* serv)
 	fLeaseTime(0),
 	fCIDUseCount(0),
 	fSequenceId(0),
+	fOpenFiles(NULL),
 	fServer(serv)
 {
 	mutex_init(&fLock, NULL);
+	mutex_init(&fOpenLock, NULL);
 }
 
 
@@ -32,6 +35,110 @@ NFS4Server::~NFS4Server()
 	wait_for_thread(fThread, &result);
 
 	mutex_destroy(&fLock);
+	mutex_destroy(&fOpenLock);
+}
+
+
+uint64
+NFS4Server::ServerRebooted(uint64 clientId)
+{
+	if (clientId != fClientId)
+		return fClientId;
+
+	fClientId = ClientId(clientId, true);
+
+	// reclaim all open files
+	mutex_lock(&fOpenLock);
+	OpenFileCookie* current = fOpenFiles;
+	while (current != NULL) {
+		_ReclaimOpen(current);
+		current = current->fNext;
+	}
+	mutex_unlock(&fOpenLock);
+
+	return fClientId;
+}
+
+
+status_t
+NFS4Server::_ReclaimOpen(OpenFileCookie* cookie)
+{
+	if (cookie->fClientId == fClientId)
+		return B_OK;
+	
+	cookie->fClientId = fClientId;
+
+	Request request(fServer);
+	RequestBuilder& req = request.Builder();
+
+	req.PutFH(cookie->fHandle);
+	req.Open(CLAIM_PREVIOUS, SequenceId(), OPEN4_SHARE_ACCESS_READ,
+		cookie->fClientId, OPEN4_NOCREATE, cookie->fOwnerTime,
+		cookie->fOwnerTID, NULL);
+
+	status_t result = request.Send();
+	if (result != B_OK)
+		return result;
+
+	ReplyInterpreter& reply = request.Reply();
+
+	result = reply.PutFH();
+	if (result != B_OK)
+		return result;
+
+	bool confirm;
+	result = reply.Open(cookie->fStateId, &cookie->fStateSeq, &confirm);
+	if (result != B_OK)
+		return result;
+
+	if (confirm) {
+		request.Reset();
+
+		req.PutFH(cookie->fHandle);
+		req.OpenConfirm(SequenceId(), cookie->fStateId, cookie->fStateSeq);
+
+		result = request.Send();
+		if (result != B_OK)
+			return result;
+
+		result = reply.PutFH();
+		if (result != B_OK)
+			return result;
+
+		result = reply.OpenConfirm(&cookie->fStateSeq);
+		if (result != B_OK)
+			return result;
+	}
+
+	return B_OK;
+}
+
+
+void
+NFS4Server::AddOpenFile(OpenFileCookie* cookie)
+{
+	mutex_lock(&fOpenLock);
+	cookie->fPrev = NULL;
+	cookie->fNext = fOpenFiles;
+	if (fOpenFiles != NULL)
+		fOpenFiles->fPrev = cookie;
+	fOpenFiles = cookie;
+	mutex_unlock(&fOpenLock);
+}
+
+
+void
+NFS4Server::RemoveOpenFile(OpenFileCookie* cookie)
+{
+	mutex_lock(&fOpenLock);
+	if (cookie == fOpenFiles)
+		fOpenFiles = cookie->fNext;
+
+	if (cookie->fNext)
+		cookie->fNext->fPrev = cookie->fPrev;
+	if (cookie->fPrev)
+		cookie->fPrev->fNext = cookie->fNext;
+	mutex_unlock(&fOpenLock);
 }
 
 
@@ -156,6 +263,9 @@ NFS4Server::_Renewal()
 		snooze_etc(fLeaseTime - 2, B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT
 			| B_CAN_INTERRUPT);
 		mutex_lock(&fLock);
+
+		uint64 clientId = fClientId;
+
 		if (fCIDUseCount == 0) {
 			fThreadCancel = true;
 			mutex_unlock(&fLock);
@@ -165,8 +275,10 @@ NFS4Server::_Renewal()
 		Request request(fServer);
 		request.Builder().Renew(fClientId);
 		request.Send();
-
 		mutex_unlock(&fLock);
+
+		if (request.Reply().NFS4Error() == NFS4ERR_STALE_CLIENTID)
+			ServerRebooted(clientId);
 	}
 
 	return B_OK;
