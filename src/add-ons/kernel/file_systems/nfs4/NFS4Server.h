@@ -23,6 +23,8 @@ public:
 			void			ReleaseCID(uint64 cid);
 
 	inline	uint32			SequenceId();
+
+	inline	uint32			LeaseTime();
 private:
 			status_t		_GetLeaseTime();
 
@@ -43,10 +45,20 @@ private:
 			RPC::Server*	fServer;
 };
 
-uint32
+inline uint32
 NFS4Server::SequenceId()
 {
 	return static_cast<uint32>(atomic_add(&fSequenceId, 1));
+}
+
+
+inline uint32
+NFS4Server::LeaseTime()
+{
+	if (fLeaseTime == 0)
+		_GetLeaseTime();
+
+	return fLeaseTime;
 }
 
 

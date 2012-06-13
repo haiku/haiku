@@ -336,32 +336,49 @@ Inode::Stat(struct stat* st)
 status_t
 Inode::Open(int mode, OpenFileCookie* cookie)
 {
-	cookie->fClientId = fFilesystem->NFSServer()->ClientId();
-
-	Request request(fFilesystem->Server());
-	RequestBuilder& req = request.Builder();
-
-	req.PutFH(fParentFH);
-	req.Open(fFilesystem->NFSServer()->SequenceId(), OPEN4_SHARE_ACCESS_READ,
-		cookie->fClientId, OPEN4_NOCREATE, fName);
-
-	status_t result = request.Send();
-	if (result != B_OK)
-		return result;
-
-	ReplyInterpreter& reply = request.Reply();
-
-	result = reply.PutFH();
-	if (result != B_OK)
-		return result;
-
 	bool confirm;
-	result = reply.Open(cookie->fStateId, &cookie->fStateSeq, &confirm);
-	if (result != B_OK)
-		return result;
+	status_t result;
+	do {
+		cookie->fClientId = fFilesystem->NFSServer()->ClientId();
+
+		Request request(fFilesystem->Server());
+		RequestBuilder& req = request.Builder();
+
+		req.PutFH(fParentFH);
+		req.Open(fFilesystem->NFSServer()->SequenceId(),
+			OPEN4_SHARE_ACCESS_READ, cookie->fClientId, OPEN4_NOCREATE, fName);
+
+		result = request.Send();
+		if (result != B_OK)
+			return result;
+
+		ReplyInterpreter& reply = request.Reply();
+
+		// server is in grace period, we need to wait
+		if (reply.NFS4Error() == NFS4ERR_GRACE) {
+			fFilesystem->NFSServer()->ReleaseCID(cookie->fClientId);
+			snooze_etc(fFilesystem->NFSServer()->LeaseTime() / 3,
+				B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
+			continue;
+		}
+
+		result = reply.PutFH();
+		if (result != B_OK)
+			return result;
+
+
+		result = reply.Open(cookie->fStateId, &cookie->fStateSeq, &confirm);
+		if (result != B_OK)
+			return result;
+
+		break;
+	} while (true);
 
 	if (confirm) {
-		request.Reset();
+		Request request(fFilesystem->Server());
+
+		RequestBuilder& req = request.Builder();
+
 		req.PutFH(fHandle);
 		req.OpenConfirm(fFilesystem->NFSServer()->SequenceId(),
 			cookie->fStateId, cookie->fStateSeq);
@@ -369,6 +386,8 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 		result = request.Send();
 		if (result != B_OK)
 			return result;
+
+		ReplyInterpreter& reply = request.Reply();
 
 		result = reply.PutFH();
 		if (result != B_OK)
@@ -386,28 +405,39 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 status_t
 Inode::Close(OpenFileCookie* cookie)
 {
-	Request request(fFilesystem->Server());
-	RequestBuilder& req = request.Builder();
+	do {
+		Request request(fFilesystem->Server());
+		RequestBuilder& req = request.Builder();
 
-	req.PutFH(fHandle);
-	req.Close(fFilesystem->NFSServer()->SequenceId(), cookie->fStateId,
-		cookie->fStateSeq);
+		req.PutFH(fHandle);
+		req.Close(fFilesystem->NFSServer()->SequenceId(), cookie->fStateId,
+			cookie->fStateSeq);
 
-	status_t result = request.Send();
-	if (result != B_OK)
-		return result;
+		status_t result = request.Send();
+		if (result != B_OK)
+			return result;
 
-	ReplyInterpreter& reply = request.Reply();
+		ReplyInterpreter& reply = request.Reply();
 
-	result = reply.PutFH();
-	if (result != B_OK)
-		return result;
+		// server is in grace period, we need to wait
+		if (reply.NFS4Error() == NFS4ERR_GRACE) {
+			snooze_etc(fFilesystem->NFSServer()->LeaseTime() / 3,
+				B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
+			continue;
+		}
 
-	result = reply.Close();
-	if (result != B_OK)
-		return result;
+		result = reply.PutFH();
+		if (result != B_OK)
+			return result;
 
-	fFilesystem->NFSServer()->ReleaseCID(cookie->fClientId);
+		result = reply.Close();
+		if (result != B_OK)
+			return result;
+
+		fFilesystem->NFSServer()->ReleaseCID(cookie->fClientId);
+
+		return B_OK;
+	} while (true);
 
 	return B_OK;
 }
@@ -421,28 +451,40 @@ Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length)
 	uint32 len = 0;
 
 	while (size < *_length && !eof) {
-		Request request(fFilesystem->Server());
-		RequestBuilder& req = request.Builder();
+		do {
+			Request request(fFilesystem->Server());
+			RequestBuilder& req = request.Builder();
 
-		req.PutFH(fHandle);
-		req.Read(cookie->fStateId, cookie->fStateSeq, pos + size,
-			*_length - size);
+			req.PutFH(fHandle);
+			req.Read(cookie->fStateId, cookie->fStateSeq, pos + size,
+				*_length - size);
 
-		status_t result = request.Send();
-		if (result != B_OK)
-			return result;
+			status_t result = request.Send();
+			if (result != B_OK)
+				return result;
 
-		ReplyInterpreter& reply = request.Reply();
+			ReplyInterpreter& reply = request.Reply();
 
-		result = reply.PutFH();
-		if (result != B_OK)
-			return result;
+			// server is in grace period, we need to wait
+			if (reply.NFS4Error() == NFS4ERR_GRACE) {
+				snooze_etc(fFilesystem->NFSServer()->LeaseTime() / 3,
+					B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
+				continue;
+			}
 
-		result = reply.Read(reinterpret_cast<char*>(buffer) + size, &len, &eof);
-		if (result != B_OK)
-			return result;
+			result = reply.PutFH();
+			if (result != B_OK)
+				return result;
 
-		size += len;
+			result = reply.Read(reinterpret_cast<char*>(buffer) + size, &len,
+						&eof);
+			if (result != B_OK)
+				return result;
+
+			size += len;
+
+			break;
+		} while (true);
 	}
 
 	*_length = size;
