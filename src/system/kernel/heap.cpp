@@ -313,8 +313,9 @@ dump_page(heap_page *page)
 		count++;
 
 	kprintf("\t\tpage %p: bin_index: %u; free_count: %u; empty_index: %u; "
-		"free_list %p (%lu entr%s)\n", page, page->bin_index, page->free_count,
-		page->empty_index, page->free_list, count, count == 1 ? "y" : "ies");
+		"free_list %p (%" B_PRIu32 " entr%s)\n", page, page->bin_index,
+		page->free_count, page->empty_index, page->free_list, count,
+		count == 1 ? "y" : "ies");
 }
 
 
@@ -325,8 +326,9 @@ dump_bin(heap_bin *bin)
 	for (heap_page *page = bin->page_list; page != NULL; page = page->next)
 		count++;
 
-	kprintf("\telement_size: %lu; max_free_count: %u; page_list %p (%lu pages"
-		");\n", bin->element_size, bin->max_free_count, bin->page_list, count);
+	kprintf("\telement_size: %" B_PRIu32 "; max_free_count: %u; page_list %p "
+		"(%" B_PRIu32 " pages);\n", bin->element_size, bin->max_free_count,
+		bin->page_list, count);
 
 	for (heap_page *page = bin->page_list; page != NULL; page = page->next)
 		dump_page(page);
@@ -347,10 +349,11 @@ dump_allocator_areas(heap_allocator *heap)
 {
 	heap_area *area = heap->all_areas;
 	while (area) {
-		kprintf("\tarea %p: area: %ld; base: 0x%08lx; size: %lu; page_count: "
-			"%lu; free_pages: %p (%lu entr%s)\n", area, area->area, area->base,
-			area->size, area->page_count, area->free_pages,
-			area->free_page_count, area->free_page_count == 1 ? "y" : "ies");
+		kprintf("\tarea %p: area: %" B_PRId32 "; base: %p; size: %zu; page_count: "
+			"%" B_PRIu32 "; free_pages: %p (%" B_PRIu32 " entr%s)\n", area,
+			area->area, (void *)area->base, area->size, area->page_count,
+			area->free_pages, area->free_page_count,
+			area->free_page_count == 1 ? "y" : "ies");
 		area = area->all_next;
 	}
 
@@ -361,10 +364,11 @@ dump_allocator_areas(heap_allocator *heap)
 static void
 dump_allocator(heap_allocator *heap, bool areas, bool bins)
 {
-	kprintf("allocator %p: name: %s; page_size: %lu; bin_count: %lu; pages: "
-		"%lu; free_pages: %lu; empty_areas: %lu\n", heap, heap->name,
-		heap->page_size, heap->bin_count, heap->total_pages,
-		heap->total_free_pages, heap->empty_areas);
+	kprintf("allocator %p: name: %s; page_size: %" B_PRIu32 "; bin_count: "
+		"%" B_PRIu32 "; pages: %" B_PRIu32 "; free_pages: %" B_PRIu32 "; "
+		"empty_areas: %" B_PRIu32 "\n", heap, heap->name, heap->page_size,
+		heap->bin_count, heap->total_pages, heap->total_free_pages,
+		heap->empty_areas);
 
 	if (areas)
 		dump_allocator_areas(heap);
@@ -481,8 +485,8 @@ dump_allocations(int argc, char **argv)
 							continue;
 
 						if (!statsOnly) {
-							kprintf("address: 0x%08lx; size: %lu bytes\n",
-								base, elementSize);
+							kprintf("address: 0x%p; size: %lu bytes\n",
+								(void *)base, elementSize);
 						}
 
 						totalSize += elementSize;
@@ -502,7 +506,7 @@ dump_allocations(int argc, char **argv)
 					size_t size = pageCount * heap->page_size;
 
 					if (!statsOnly) {
-						kprintf("address: 0x%08lx; size: %lu bytes\n", base,
+						kprintf("address: %p; size: %lu bytes\n", (void *)base,
 							size);
 					}
 
@@ -521,7 +525,7 @@ dump_allocations(int argc, char **argv)
 			break;
 	}
 
-	kprintf("total allocations: %lu; total bytes: %lu\n", totalCount, totalSize);
+	kprintf("total allocations: %" B_PRIu32 "; total bytes: %zu\n", totalCount, totalSize);
 	return 0;
 }
 
@@ -1096,9 +1100,9 @@ heap_add_area(heap_allocator *heap, area_id areaID, addr_t base, size_t size)
 	pageLocker.Unlock();
 	areaWriteLocker.Unlock();
 
-	dprintf("heap_add_area: area %ld added to %s heap %p - usable range 0x%08lx "
-		"- 0x%08lx\n", area->area, heap->name, heap, area->base,
-		area->base + area->size);
+	dprintf("heap_add_area: area %" B_PRId32 " added to %s heap %p - usable "
+		"range %p - %p\n", area->area, heap->name, heap, (void *)area->base,
+		(void *)(area->base + area->size));
 }
 
 
@@ -1142,9 +1146,9 @@ heap_remove_area(heap_allocator *heap, heap_area *area)
 	heap->total_pages -= area->page_count;
 	heap->total_free_pages -= area->free_page_count;
 
-	dprintf("heap_remove_area: area %ld with range 0x%08lx - 0x%08lx removed "
-		"from %s heap %p\n", area->area, area->base, area->base + area->size,
-		heap->name, heap);
+	dprintf("heap_remove_area: area %" B_PRId32 " with range %p - %p removed "
+		"from %s heap %p\n", area->area, (void *)area->base,
+		(void *)(area->base + area->size), heap->name, heap);
 
 	return B_OK;
 }
@@ -1659,7 +1663,7 @@ heap_free(heap_allocator *heap, void *address)
 		if (((addr_t)address - area->base - page->index
 			* heap->page_size) % bin->element_size != 0) {
 			panic("free(): passed invalid pointer %p supposed to be in bin for "
-				"element size %ld\n", address, bin->element_size);
+				"element size %" B_PRIu32 "\n", address, bin->element_size);
 			return B_ERROR;
 		}
 

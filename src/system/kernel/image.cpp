@@ -254,21 +254,22 @@ dump_images_list(int argc, char **argv)
 		team_id id = strtol(argv[1], NULL, 0);
 		team = team_get_team_struct_locked(id);
 		if (team == NULL) {
-			kprintf("No team with ID %ld found\n", id);
+			kprintf("No team with ID %" B_PRId32 " found\n", id);
 			return 1;
 		}
 	} else
 		team = thread_get_current_thread()->team;
 
-	kprintf("Registered images of team %ld\n", team->id);
+	kprintf("Registered images of team %" B_PRId32 "\n", team->id);
 	kprintf("    ID text       size    data       size    name\n");
 
 	while ((image = (struct image*)list_get_next_item(&team->image_list, image))
 			!= NULL) {
 		image_info *info = &image->info;
 
-		kprintf("%6ld %p %-7ld %p %-7ld %s\n", info->id, info->text, info->text_size,
-			info->data, info->data_size, info->name);
+		kprintf("%6" B_PRId32 " %p %-7" B_PRId32 " %p %-7" B_PRId32 " %s\n",
+			info->id, info->text, info->text_size, info->data, info->data_size,
+			info->name);
 	}
 
 	return 0;
@@ -417,8 +418,8 @@ _user_image_relocated(image_id id)
 	// get an image info
 	error = _get_image_info(id, &info, sizeof(image_info));
 	if (error != B_OK) {
-		dprintf("_user_image_relocated(%ld): Failed to get image info: %lx\n",
-			id, error);
+		dprintf("_user_image_relocated(%" B_PRId32 "): Failed to get image "
+			"info: %" B_PRIx32 "\n", id, error);
 		return;
 	}
 

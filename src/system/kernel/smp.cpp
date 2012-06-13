@@ -234,10 +234,10 @@ dump_ici_messages(int argc, char** argv)
 		message = message->next;
 	}
 
-	kprintf("ICI broadcast messages: %ld, first: %p\n", count,
+	kprintf("ICI broadcast messages: %" B_PRId32 ", first: %p\n", count,
 		sBroadcastMessages);
-	kprintf("  done:         %ld\n", doneCount);
-	kprintf("  unreferenced: %ld\n", unreferencedCount);
+	kprintf("  done:         %" B_PRId32 "\n", doneCount);
+	kprintf("  unreferenced: %" B_PRId32 "\n", unreferencedCount);
 
 	// count per-CPU messages
 	for (int32 i = 0; i < sNumCPUs; i++) {
@@ -248,8 +248,8 @@ dump_ici_messages(int argc, char** argv)
 			message = message->next;
 		}
 
-		kprintf("CPU %ld messages: %ld, first: %p\n", i, count,
-			sCPUMessages[i]);
+		kprintf("CPU %" B_PRId32 " messages: %" B_PRId32 ", first: %p\n", i,
+			count, sCPUMessages[i]);
 	}
 
 	return 0;
@@ -271,15 +271,15 @@ dump_ici_message(int argc, char** argv)
 	smp_msg* message = (smp_msg*)(addr_t)address;
 	kprintf("ICI message %p:\n", message);
 	kprintf("  next:        %p\n", message->next);
-	kprintf("  message:     %ld\n", message->message);
-	kprintf("  data:        %ld\n", message->data);
-	kprintf("  data2:       %ld\n", message->data2);
-	kprintf("  data3:       %ld\n", message->data3);
+	kprintf("  message:     %" B_PRId32 "\n", message->message);
+	kprintf("  data:        %" B_PRIu32 "\n", message->data);
+	kprintf("  data2:       %" B_PRIu32 "\n", message->data2);
+	kprintf("  data3:       %" B_PRIu32 "\n", message->data3);
 	kprintf("  data_ptr:    %p\n", message->data_ptr);
-	kprintf("  flags:       %lx\n", message->flags);
-	kprintf("  ref_count:   %lx\n", message->ref_count);
+	kprintf("  flags:       %" B_PRIx32 "\n", message->flags);
+	kprintf("  ref_count:   %" B_PRIx32 "\n", message->ref_count);
 	kprintf("  done:        %s\n", message->done ? "true" : "false");
-	kprintf("  proc_bitmap: %lx\n", message->proc_bitmap);
+	kprintf("  proc_bitmap: %" B_PRIx32 "\n", message->proc_bitmap);
 
 	return 0;
 }
@@ -361,7 +361,7 @@ acquire_spinlock(spinlock* lock)
 		oldValue = atomic_or((int32*)lock, 1);
 		if (oldValue != 0) {
 			panic("acquire_spinlock: attempt to acquire lock %p twice on "
-				"non-SMP system (last caller: %p, value %ld)", lock,
+				"non-SMP system (last caller: %p, value %" B_PRId32 ")", lock,
 				find_lock_caller(lock), oldValue);
 		}
 
@@ -458,7 +458,7 @@ acquire_spinlock_cpu(int32 currentCPU, spinlock *lock)
 		oldValue = atomic_or((int32*)lock, 1);
 		if (oldValue != 0) {
 			panic("acquire_spinlock_cpu(): attempt to acquire lock %p twice on "
-				"non-SMP system (last caller: %p, value %ld)", lock,
+				"non-SMP system (last caller: %p, value %" B_PRId32 ")", lock,
 				find_lock_caller(lock), oldValue);
 		}
 
@@ -755,8 +755,8 @@ process_pending_ici(int32 currentCPU)
 		}
 
 		default:
-			dprintf("smp_intercpu_int_handler: got unknown message %ld\n",
-				msg->message);
+			dprintf("smp_intercpu_int_handler: got unknown message %" B_PRId32
+				"\n", msg->message);
 			break;
 	}
 

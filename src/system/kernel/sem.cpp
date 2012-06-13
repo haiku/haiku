@@ -163,8 +163,8 @@ dump_sem_list(int argc, char** argv)
 			|| (owner != -1 && sem->u.used.owner != owner))
 			continue;
 
-		kprintf("%p %6ld %5ld %6ld "
-			"%6ld "
+		kprintf("%p %6" B_PRId32 " %5" B_PRId32 " %6" B_PRId32 " "
+			"%6" B_PRId32 " "
 			" %s\n", sem, sem->id, sem->u.used.count,
 			sem->u.used.owner,
 			sem->u.used.last_acquirer > 0 ? sem->u.used.last_acquirer : 0,
@@ -179,16 +179,16 @@ static void
 dump_sem(struct sem_entry* sem)
 {
 	kprintf("SEM: %p\n", sem);
-	kprintf("id:      %ld (%#lx)\n", sem->id, sem->id);
+	kprintf("id:      %" B_PRId32 " (%#" B_PRIx32 ")\n", sem->id, sem->id);
 	if (sem->id >= 0) {
 		kprintf("name:    '%s'\n", sem->u.used.name);
-		kprintf("owner:   %ld\n", sem->u.used.owner);
-		kprintf("count:   %ld\n", sem->u.used.count);
+		kprintf("owner:   %" B_PRId32 "\n", sem->u.used.owner);
+		kprintf("count:   %" B_PRId32 "\n", sem->u.used.count);
 		kprintf("queue:  ");
 		if (!sem->queue.IsEmpty()) {
 			ThreadQueue::Iterator it = sem->queue.GetIterator();
 			while (queued_thread* entry = it.Next())
-				kprintf(" %ld", entry->thread->id);
+				kprintf(" %" B_PRId32, entry->thread->id);
 			kprintf("\n");
 		} else
 			kprintf(" -\n");
@@ -198,9 +198,9 @@ dump_sem(struct sem_entry* sem)
 		set_debug_variable("_owner", sem->u.used.owner);
 
 #if DEBUG_SEM_LAST_ACQUIRER
-		kprintf("last acquired by: %ld, count: %ld\n",
+		kprintf("last acquired by: %" B_PRId32 ", count: %" B_PRId32 "\n",
 			sem->u.used.last_acquirer, sem->u.used.last_acquire_count);
-		kprintf("last released by: %ld, count: %ld\n",
+		kprintf("last released by: %" B_PRId32 ", count: %" B_PRId32 "\n",
 			sem->u.used.last_releaser, sem->u.used.last_release_count);
 
 		if (sem->u.used.last_releaser != 0)
@@ -217,7 +217,7 @@ dump_sem(struct sem_entry* sem)
 			unset_debug_variable("_acquirer");
 	} else {
 		kprintf("next:    %p\n", sem->u.unused.next);
-		kprintf("next_id: %ld\n", sem->u.unused.next_id);
+		kprintf("next_id: %" B_PRId32 "\n", sem->u.unused.next_id);
 	}
 }
 
@@ -378,8 +378,8 @@ delete_sem_internal(sem_id id, bool checkPermission)
 		RELEASE_SEM_LOCK(sSems[slot]);
 		RELEASE_SEM_LIST_LOCK();
 		restore_interrupts(state);
-		dprintf("thread %ld tried to delete kernel semaphore %ld.\n",
-			thread_get_current_thread_id(), id);
+		dprintf("thread %" B_PRId32 " tried to delete kernel semaphore "
+			"%" B_PRId32 ".\n", thread_get_current_thread_id(), id);
 		return B_NOT_ALLOWED;
 	}
 
@@ -387,7 +387,7 @@ delete_sem_internal(sem_id id, bool checkPermission)
 		list_remove_link(&sSems[slot].u.used.team_link);
 		sSems[slot].u.used.owner = -1;
 	} else
-		panic("sem %ld has no owner", id);
+		panic("sem %" B_PRId32 " has no owner", id);
 
 	RELEASE_SEM_LIST_LOCK();
 
@@ -769,8 +769,8 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 		return B_NO_MORE_SEMS;
 
 	if (!are_interrupts_enabled()) {
-		panic("switch_sem_etc: called with interrupts disabled for sem %ld\n",
-			id);
+		panic("switch_sem_etc: called with interrupts disabled for sem "
+			"%" B_PRId32 "\n", id);
 	}
 
 	if (id < 0)
@@ -793,8 +793,8 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 	//	doesn't have any use outside the kernel
 	if ((flags & B_CHECK_PERMISSION) != 0
 		&& sSems[slot].u.used.owner == team_get_kernel_team_id()) {
-		dprintf("thread %ld tried to acquire kernel semaphore %ld.\n",
-			thread_get_current_thread_id(), id);
+		dprintf("thread %" B_PRId32 " tried to acquire kernel semaphore "
+			"%" B_PRId32 ".\n", thread_get_current_thread_id(), id);
 		status = B_NOT_ALLOWED;
 		goto err;
 	}
@@ -945,7 +945,7 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 	//	doesn't have any use outside the kernel
 	if ((flags & B_CHECK_PERMISSION) != 0
 		&& sSems[slot].u.used.owner == team_get_kernel_team_id()) {
-		dprintf("thread %ld tried to release kernel semaphore.\n",
+		dprintf("thread %" B_PRId32 " tried to release kernel semaphore.\n",
 			thread_get_current_thread_id());
 		return B_NOT_ALLOWED;
 	}

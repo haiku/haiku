@@ -412,10 +412,10 @@ FileMap::Translate(off_t offset, size_t size, file_io_vec* vecs, size_t* _count,
 		*_count = 0;
 		return B_OK;
 	}
-	if (offset + size > fSize) {
+	if ((off_t)(offset + size) > fSize) {
 		if (align > 1) {
 			off_t alignedSize = (fSize + align - 1) & ~(off_t)(align - 1);
-			if (offset + size >= alignedSize)
+			if ((off_t)(offset + size) >= alignedSize)
 				padLastVec = alignedSize - fSize;
 		}
 		size = fSize - offset;
@@ -441,7 +441,7 @@ FileMap::Translate(off_t offset, size_t size, file_io_vec* vecs, size_t* _count,
 		vecs[0].offset = -1;
 	vecs[0].length = fileExtent->disk.length - offset;
 
-	if (vecs[0].length >= size) {
+	if (vecs[0].length >= (off_t)size) {
 		vecs[0].length = size + padLastVec;
 		*_count = 1;
 		return B_OK;
@@ -457,7 +457,7 @@ FileMap::Translate(off_t offset, size_t size, file_io_vec* vecs, size_t* _count,
 
 		vecs[vecIndex++] = fileExtent->disk;
 
-		if (size <= fileExtent->disk.length) {
+		if ((off_t)size <= fileExtent->disk.length) {
 			vecs[vecIndex - 1].length = size + padLastVec;
 			break;
 		}
@@ -499,7 +499,7 @@ dump_file_map(int argc, char** argv)
 	}
 
 	kprintf("FileMap %p\n", map);
-	kprintf("  size    %Ld\n", map->Size());
+	kprintf("  size    %" B_PRIdOFF "\n", map->Size());
 	kprintf("  count   %lu\n", map->Count());
 
 	if (!printExtents)
@@ -508,8 +508,9 @@ dump_file_map(int argc, char** argv)
 	for (uint32 i = 0; i < map->Count(); i++) {
 		file_extent* extent = map->ExtentAt(i);
 
-		kprintf("  [%lu] offset %Ld, disk offset %Ld, length %Ld\n",
-			i, extent->offset, extent->disk.offset, extent->disk.length);
+		kprintf("  [%" B_PRIu32 "] offset %" B_PRIdOFF ", disk offset %"
+			B_PRIdOFF ", length %" B_PRIdOFF "\n", i, extent->offset,
+			extent->disk.offset, extent->disk.length);
 	}
 
 	return 0;
@@ -555,9 +556,10 @@ dump_file_map_stats(int argc, char** argv)
 		count++;
 	}
 
-	kprintf("%ld file maps (%ld empty), %Ld file bytes in total, %Ld bytes "
-		"cached, %lu extents\n", count, emptyCount, size, mapSize, extents);
-	kprintf("average %lu extents per map for %Ld bytes.\n",
+	kprintf("%" B_PRId32 " file maps (%" B_PRIu32 " empty), %" B_PRIdOFF " file"
+		" bytes in total, %" B_PRIdOFF " bytes cached, %" B_PRIu32 " extents\n",
+		count, emptyCount, size, mapSize, extents);
+	kprintf("average %" B_PRIu32 " extents per map for %" B_PRIdOFF " bytes.\n",
 		extents / (count - emptyCount), mapSize / (count - emptyCount));
 
 	return 0;

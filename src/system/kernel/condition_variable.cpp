@@ -315,7 +315,7 @@ ConditionVariable::Dump() const
 
 	for (EntryList::ConstIterator it = fEntries.GetIterator();
 		 ConditionVariableEntry* entry = it.Next();) {
-		kprintf(" %ld", entry->fThread->id);
+		kprintf(" %" B_PRId32, entry->fThread->id);
 	}
 	kprintf("\n");
 }
@@ -330,7 +330,7 @@ ConditionVariable::_Notify(bool all, bool schedulerLocked, status_t result)
 
 	if (!fEntries.IsEmpty()) {
 		if (result > B_OK) {
-			panic("tried to notify with invalid result %ld\n", result);
+			panic("tried to notify with invalid result %" B_PRId32 "\n", result);
 			result = B_ERROR;
 		}
 

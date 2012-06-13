@@ -361,7 +361,7 @@ main2(void *unused)
 			resume_thread(thread);
 			TRACE("Bootscript started\n");
 		} else
-			dprintf("error starting \"%s\" error = %ld \n", args[0], thread);
+			dprintf("error starting \"%s\" error = %" B_PRId32 " \n", args[0], thread);
 	}
 
 	return 0;

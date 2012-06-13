@@ -457,7 +457,7 @@ unload_module_image(module_image* moduleImage, bool remove)
 	ASSERT_LOCKED_RECURSIVE(&sModulesLock);
 
 	if (moduleImage->ref_count != 0) {
-		FATAL(("Can't unload %s due to ref_cnt = %ld\n", moduleImage->path,
+		FATAL(("Can't unload %s due to ref_cnt = %" B_PRId32 "\n", moduleImage->path,
 			moduleImage->ref_count));
 		return B_ERROR;
 	}
@@ -1172,8 +1172,8 @@ dump_modules(int argc, char** argv)
 
 	while ((module = (struct module*)hash_next(sModulesHash, &iterator))
 			!= NULL) {
-		kprintf("%p: \"%s\", \"%s\" (%ld), refcount = %ld, state = %d, "
-			"mimage = %p\n", module, module->name,
+		kprintf("%p: \"%s\", \"%s\" (%" B_PRId32 "), refcount = %" B_PRId32 ", "
+			"state = %d, mimage = %p\n", module, module->name,
 			module->module_image ? module->module_image->path : "",
 			module->offset, module->ref_count, module->state,
 			module->module_image);
@@ -1184,8 +1184,9 @@ dump_modules(int argc, char** argv)
 
 	while ((image = (struct module_image*)hash_next(sModuleImagesHash,
 				&iterator)) != NULL) {
-		kprintf("%p: \"%s\" (image_id = %ld), info = %p, refcount = %ld\n",
-			image, image->path, image->image, image->info, image->ref_count);
+		kprintf("%p: \"%s\" (image_id = %" B_PRId32 "), info = %p, refcount = "
+			"%" B_PRId32 "\n", image, image->path, image->image, image->info,
+			image->ref_count);
 	}
 	return 0;
 }

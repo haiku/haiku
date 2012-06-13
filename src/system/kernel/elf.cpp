@@ -9,6 +9,8 @@
 
 /*!	Contains the ELF loader */
 
+#ifndef __x86_64__
+
 #include <elf.h>
 
 #include <OS.h>
@@ -2587,3 +2589,4 @@ _user_read_kernel_image_symbols(image_id id, struct Elf32_Sym* symbolTable,
 
 	return B_OK;
 }
+#endif
