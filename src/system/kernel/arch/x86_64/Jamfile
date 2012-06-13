@@ -1,0 +1,21 @@
+SubDir HAIKU_TOP src system kernel arch x86_64 ;
+
+SubDirHdrs [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) system kernel ] ;
+	# for syscall_numbers.h
+
+UsePrivateKernelHeaders ;
+UsePrivateHeaders shared ;
+
+KernelMergeObject kernel_arch_x86_64.o :
+	arch_cpu.cpp
+	:
+	$(TARGET_KERNEL_PIC_CCFLAGS)
+;
+
+CreateAsmStructOffsetsHeader asm_offsets.h : asm_offsets.cpp ;
+
+# We need to specify the dependency on the generated syscalls file explicitly.
+#Includes [ FGristFiles arch_x86.S arch_interrupts.S ]
+#	: <syscalls>syscall_numbers.h ;
+#Includes [ FGristFiles arch_interrupts.S ]
+#	: <syscalls>syscall_table.h ;

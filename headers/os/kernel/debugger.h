@@ -13,13 +13,16 @@
 
 // include architecture specific definitions
 #include <arch/x86/arch_debugger.h>
+#include <arch/x86_64/arch_debugger.h>
 #include <arch/ppc/arch_debugger.h>
 #include <arch/m68k/arch_debugger.h>
 #include <arch/mipsel/arch_debugger.h>
 #include <arch/arm/arch_debugger.h>
 
 
-#ifdef __INTEL__
+#ifdef __x86_64__
+	typedef struct x86_64_debug_cpu_state debug_cpu_state;
+#elif __INTEL__
 	typedef struct x86_debug_cpu_state debug_cpu_state;
 #elif __POWERPC__
 	typedef struct ppc_debug_cpu_state debug_cpu_state;
