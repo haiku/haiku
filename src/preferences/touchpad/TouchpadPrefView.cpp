@@ -375,6 +375,7 @@ TouchpadPrefView::SetupView()
 	fScrollAccelSlider->SetHashMarkCount(7);
 	fScrollAccelSlider->SetLimitLabels(B_TRANSLATE("Slow"),
 		B_TRANSLATE("Fast"));
+	fScrollAccelSlider->SetExplicitMinSize(BSize(150, B_SIZE_UNSET));
 
 	fScrollStepXSlider = new BSlider("scroll_stepX",
 		B_TRANSLATE("Horizontal"),
