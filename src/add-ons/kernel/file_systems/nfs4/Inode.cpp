@@ -152,6 +152,36 @@ Inode::LookUp(const char* name, ino_t* id)
 
 
 status_t
+Inode::ReadLink(void* buffer, size_t* length)
+{
+	if (fType != NF4LNK)
+		return B_BAD_VALUE;
+
+	Request request(fFilesystem->Server());
+	RequestBuilder& req = request.Builder();
+
+	req.PutFH(fHandle);
+	req.ReadLink();	
+
+	status_t result = request.Send();
+	if (result != B_OK)
+		return result;
+
+	ReplyInterpreter& reply = request.Reply();
+
+	result = reply.PutFH();
+	if (result != B_OK)
+		return result;
+
+	uint32 size;
+	result = reply.ReadLink(buffer, &size, *length);
+	*length = static_cast<size_t>(size);
+
+	return result;
+}
+
+
+status_t
 Inode::Access(int mode)
 {
 	Request request(fFilesystem->Server());

@@ -35,6 +35,7 @@ public:
 	inline			const char*	Name() const;
 
 					status_t	LookUp(const char* name, ino_t* id);
+					status_t	ReadLink(void* buffer, size_t* length);
 					status_t	Access(int mode);
 					status_t	Stat(struct stat* st);
 

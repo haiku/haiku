@@ -41,6 +41,7 @@ public:
 										uint64 pos, uint32 len);
 			status_t				ReadDir(uint32 count, uint64* cookie, 
 										Attribute* attrs, uint32 attrCount);
+			status_t				ReadLink();
 			status_t				Renew(uint64 clientId);
 			status_t				SetClientID(const RPC::Server* serv);
 			status_t				SetClientIDConfirm(uint64 id, uint64 ver);

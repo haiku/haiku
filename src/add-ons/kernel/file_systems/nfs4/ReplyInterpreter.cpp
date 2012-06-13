@@ -258,6 +258,19 @@ ReplyInterpreter::ReadDir(uint64* cookie, DirEntry** dirents, uint32* _count,
 
 
 status_t
+ReplyInterpreter::ReadLink(void* buffer, uint32* size, uint32 maxSize)
+{
+	status_t res = _OperationError(OpReadLink);
+	if (res != B_OK)
+		return res;
+
+	const void* ptr = fReply->Stream().GetOpaque(size);
+	memcpy(buffer, ptr, min_c(*size, maxSize));
+
+	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+}
+
+status_t
 ReplyInterpreter::SetClientID(uint64* clientid, uint64* verifier)
 {
 	status_t res = _OperationError(OpSetClientID);

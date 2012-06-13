@@ -146,6 +146,15 @@ nfs4_put_vnode(fs_volume* volume, fs_vnode* vnode, bool reenter)
 
 
 static status_t
+nfs4_read_symlink(fs_volume* volume, fs_vnode* link, char* buffer,
+	size_t* _bufferSize)
+{
+	Inode* inode = reinterpret_cast<Inode*>(link->private_node);
+	return inode->ReadLink(buffer, _bufferSize);
+}
+
+
+static status_t
 nfs4_access(fs_volume* volume, fs_vnode* vnode, int mode)
 {
 	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
@@ -342,7 +351,7 @@ fs_vnode_ops gNFSv4VnodeOps = {
 	NULL,	// fs_deselect()
 	NULL,	// fsync()
 
-	NULL,	// read_link()
+	nfs4_read_symlink,
 	NULL,	// create_symlink()
 
 	NULL,	// link()

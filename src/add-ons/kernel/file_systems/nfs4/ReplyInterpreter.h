@@ -58,6 +58,7 @@ public:
 			status_t	Read(void* buffer, uint32* size, bool* eof);
 			status_t	ReadDir(uint64* cookie, DirEntry** dirents,
 							uint32* count, bool* eof);
+			status_t	ReadLink(void* buffer, uint32* size, uint32 maxSize);
 	inline	status_t	Renew();
 			status_t	SetClientID(uint64* clientid, uint64* verifier);
 	inline	status_t	SetClientIDConfirm();

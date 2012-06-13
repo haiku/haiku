@@ -287,6 +287,22 @@ RequestBuilder::ReadDir(uint32 count, uint64* cookie, Attribute* attrs,
 
 
 status_t
+RequestBuilder::ReadLink()
+{
+	if (fProcedure != ProcCompound)
+		return B_BAD_VALUE;
+	if (fRequest == NULL)
+		return B_NO_MEMORY;
+
+	fRequest->Stream().AddUInt(OpReadLink);
+
+	fOpCount++;
+
+	return B_OK;
+}
+
+
+status_t
 RequestBuilder::Renew(uint64 clientId)
 {
 	if (fProcedure != ProcCompound)
