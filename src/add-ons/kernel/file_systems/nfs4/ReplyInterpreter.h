@@ -45,6 +45,8 @@ public:
 	inline	status_t	SetTo(RPC::Reply* reply);
 	inline	void		Reset();
 
+	inline	uint32		NFS4Error();
+
 			status_t	Access(uint32* supported, uint32* allowed);
 			status_t	Close();
 			status_t	GetAttr(AttrValue** attrs, uint32* count);
@@ -72,6 +74,7 @@ private:
 
 	static	status_t	_NFS4ErrorToHaiku(uint32 x);
 
+			uint32		fNFS4Error;
 			RPC::Reply*	fReply;
 };
 
@@ -96,6 +99,13 @@ ReplyInterpreter::Reset()
 {
 	delete fReply;
 	fReply = NULL;
+}
+
+
+inline uint32
+ReplyInterpreter::NFS4Error()
+{
+	return fNFS4Error;
 }
 
 

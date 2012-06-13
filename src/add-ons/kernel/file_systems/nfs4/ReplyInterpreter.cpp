@@ -46,6 +46,7 @@ DirEntry::~DirEntry()
 
 ReplyInterpreter::ReplyInterpreter(RPC::Reply* reply)
 	:
+	fNFS4Error(NFS4_OK),
 	fReply(reply)
 {
 	if (reply != NULL)
@@ -62,7 +63,7 @@ ReplyInterpreter::~ReplyInterpreter()
 void
 ReplyInterpreter::_ParseHeader()
 {
-	fReply->Stream().GetUInt();
+	fNFS4Error = fReply->Stream().GetUInt();
 	fReply->Stream().GetOpaque(NULL);
 	fReply->Stream().GetUInt();
 }
