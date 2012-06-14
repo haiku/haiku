@@ -50,7 +50,7 @@ get_cpuid(cpuid_info *info, uint32 eaxRegister, uint32 forCPU)
 	//	that the CPU supports cpuid.
 
 	if (!get_cpuid_for(info, smp_get_current_cpu(), eaxRegister, forCPU)) {
-		smp_send_broadcast_ici(SMP_MSG_CALL_FUNCTION, (uint32)info,
+		smp_send_broadcast_ici(SMP_MSG_CALL_FUNCTION, (addr_t)info,
 			eaxRegister, forCPU, (void *)get_cpuid_for, SMP_MSG_FLAG_SYNC);
 	}
 
