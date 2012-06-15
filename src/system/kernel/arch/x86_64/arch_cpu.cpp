@@ -1,14 +1,16 @@
 /*
- * Copyright 2012, Alex Smith, alex@alex-smith.me.uk
+ * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2012, Alex Smith, alex@alex-smith.me.uk.
  * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
  */
 
 
 #include <cpu.h>
 
 #include <boot/kernel_args.h>
-
-//	#pragma mark -
 
 
 status_t
@@ -43,6 +45,13 @@ status_t
 arch_cpu_init_post_modules(kernel_args *args)
 {
 	return B_OK;
+}
+
+
+void
+arch_cpu_user_TLB_invalidate(void)
+{
+
 }
 
 
@@ -95,6 +104,33 @@ arch_cpu_user_strlcpy(char *to, const char *from, size_t size,
 
 	*faultHandler = oldFaultHandler;
 	return fromLength;
+
+error:
+	*faultHandler = oldFaultHandler;
+	return B_BAD_ADDRESS;
+}
+
+
+status_t
+arch_cpu_user_memcpy(void *to, const void *from, size_t size,
+	addr_t *faultHandler)
+{
+	char *d = (char *)to;
+	const char *s = (const char *)from;
+	addr_t oldFaultHandler = *faultHandler;
+
+	// this check is to trick the gcc4 compiler and have it keep the error label
+	if (s == NULL)
+		goto error;
+
+	*faultHandler = (addr_t)&&error;
+
+	for (; size != 0; size--) {
+		*d++ = *s++;
+	}
+
+	*faultHandler = oldFaultHandler;
+	return 0;
 
 error:
 	*faultHandler = oldFaultHandler;
