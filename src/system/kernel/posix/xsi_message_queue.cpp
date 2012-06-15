@@ -775,8 +775,9 @@ _user_xsi_msgrcv(int messageQueueID, void *messagePointer,
 			messageQueue = sMessageQueueHashTable.Lookup(messageQueueID);
 			if (result == EIDRM || messageQueue == NULL || (messageQueue != NULL
 				&& sequenceNumber != messageQueue->SequenceNumber())) {
-				TRACE_ERROR(("xsi_msgrcv: message queue id %d (sequence = %ld) "
-					"got destroyed\n", messageQueueID, sequenceNumber));
+				TRACE_ERROR(("xsi_msgrcv: message queue id %d (sequence = "
+					"%" B_PRIu32 ") got destroyed\n", messageQueueID,
+					sequenceNumber));
 				return EIDRM;
 			} else if (result == B_INTERRUPTED) {
 				TRACE_ERROR(("xsi_msgrcv: thread %d got interrupted while "
@@ -881,8 +882,9 @@ _user_xsi_msgsnd(int messageQueueID, const void *messagePointer,
 			messageQueue = sMessageQueueHashTable.Lookup(messageQueueID);
 			if (result == EIDRM || messageQueue == NULL || (messageQueue != NULL
 				&& sequenceNumber != messageQueue->SequenceNumber())) {
-				TRACE_ERROR(("xsi_msgsnd: message queue id %d (sequence = %ld) "
-					"got destroyed\n", messageQueueID, sequenceNumber));
+				TRACE_ERROR(("xsi_msgsnd: message queue id %d (sequence = "
+					"%" B_PRIu32 ") got destroyed\n", messageQueueID,
+					sequenceNumber));
 				delete message;
 				notSent = false;
 				result = EIDRM;

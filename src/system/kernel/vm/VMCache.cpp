@@ -1325,24 +1325,24 @@ void
 VMCache::Dump(bool showPages) const
 {
 	kprintf("CACHE %p:\n", this);
-	kprintf("  ref_count:    %ld\n", RefCount());
+	kprintf("  ref_count:    %" B_PRId32 "\n", RefCount());
 	kprintf("  source:       %p\n", source);
 	kprintf("  type:         %s\n", vm_cache_type_to_string(type));
 	kprintf("  virtual_base: 0x%Lx\n", virtual_base);
 	kprintf("  virtual_end:  0x%Lx\n", virtual_end);
-	kprintf("  temporary:    %ld\n", temporary);
+	kprintf("  temporary:    %" B_PRIu32 "\n", temporary);
 	kprintf("  lock:         %p\n", &fLock);
 #if KDEBUG
-	kprintf("  lock.holder:  %ld\n", fLock.holder);
+	kprintf("  lock.holder:  %" B_PRId32 "\n", fLock.holder);
 #endif
 	kprintf("  areas:\n");
 
 	for (VMArea* area = areas; area != NULL; area = area->cache_next) {
-		kprintf("    area 0x%lx, %s\n", area->id, area->name);
+		kprintf("    area 0x%" B_PRIx32 ", %s\n", area->id, area->name);
 		kprintf("\tbase_addr:  0x%lx, size: 0x%lx\n", area->Base(),
 			area->Size());
-		kprintf("\tprotection: 0x%lx\n", area->protection);
-		kprintf("\towner:      0x%lx\n", area->address_space->ID());
+		kprintf("\tprotection: 0x%" B_PRIx32 "\n", area->protection);
+		kprintf("\towner:      0x%" B_PRIx32 "\n", area->address_space->ID());
 	}
 
 	kprintf("  consumers:\n");
@@ -1367,7 +1367,7 @@ VMCache::Dump(bool showPages) const
 			}
 		}
 	} else
-		kprintf("\t%ld in cache\n", page_count);
+		kprintf("\t%" B_PRIu32 " in cache\n", page_count);
 }
 
 

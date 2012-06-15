@@ -12,8 +12,8 @@
 void *
 memcpy(void *dest, const void *src, size_t count)
 {
-	const unsigned char *s = src;
-	unsigned char *d = dest;
+	const unsigned char *s = reinterpret_cast<const unsigned char *>(src);
+	unsigned char *d = reinterpret_cast<unsigned char *>(dest);
 
 	for (; count != 0; count--) {
 		*d++ = *s++;
@@ -26,7 +26,7 @@ memcpy(void *dest, const void *src, size_t count)
 void *
 memset(void *dest, int val, size_t count)
 {
-	unsigned char *d = dest;
+	unsigned char *d = reinterpret_cast<unsigned char *>(dest);
 
 	for (; count != 0; count--) {
 		*d++ = static_cast<unsigned char>(val);

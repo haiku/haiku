@@ -263,19 +263,23 @@ dump_attribute(device_attr* attr, int32 level)
 			break;
 		case B_INT8_TYPE:
 		case B_UINT8_TYPE:
-			kprintf("uint8 : %u (%#x)", attr->value.ui8, attr->value.ui8);
+			kprintf("uint8 : %" B_PRIu8 " (%#" B_PRIx8 ")", attr->value.ui8,
+				attr->value.ui8);
 			break;
 		case B_INT16_TYPE:
 		case B_UINT16_TYPE:
-			kprintf("uint16 : %u (%#x)", attr->value.ui16, attr->value.ui16);
+			kprintf("uint16 : %" B_PRIu16 " (%#" B_PRIx16 ")", attr->value.ui16,
+				attr->value.ui16);
 			break;
 		case B_INT32_TYPE:
 		case B_UINT32_TYPE:
-			kprintf("uint32 : %lu (%#lx)", attr->value.ui32, attr->value.ui32);
+			kprintf("uint32 : %" B_PRIu32 " (%#" B_PRIx32 ")", attr->value.ui32,
+				attr->value.ui32);
 			break;
 		case B_INT64_TYPE:
 		case B_UINT64_TYPE:
-			kprintf("uint64 : %Lu (%#Lx)", attr->value.ui64, attr->value.ui64);
+			kprintf("uint64 : %" B_PRIu64 " (%#" B_PRIx64 ")", attr->value.ui64,
+				attr->value.ui64);
 			break;
 		default:
 			kprintf("raw data");
@@ -2167,9 +2171,9 @@ void
 device_node::Dump(int32 level)
 {
 	put_level(level);
-	kprintf("(%ld) @%p \"%s\" (ref %ld, init %ld, module %p, data %p)\n", level,
-		this, ModuleName(), fRefCount, fInitialized, DriverModule(),
-		DriverData());
+	kprintf("(%" B_PRId32 ") @%p \"%s\" (ref %" B_PRId32 ", init %" B_PRId32
+		", module %p, data %p)\n", level, this, ModuleName(), fRefCount,
+		fInitialized, DriverModule(), DriverData());
 
 	AttributeList::Iterator attribute = Attributes().GetIterator();
 	while (attribute.HasNext()) {

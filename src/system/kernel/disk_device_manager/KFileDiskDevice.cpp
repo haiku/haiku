@@ -212,7 +212,7 @@ KFileDiskDevice::_GetDirectoryPath(partition_id id, KPath* path)
 	status_t error = path->SetPath(kFileDevicesDir);
 	if (error == B_OK) {
 		char idBuffer[12];
-		snprintf(idBuffer, sizeof(idBuffer), "%ld", id);
+		snprintf(idBuffer, sizeof(idBuffer), "%" B_PRId32, id);
 		error = path->Append(idBuffer);
 	}
 	return error;

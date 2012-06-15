@@ -329,7 +329,8 @@ get_boot_partitions(kernel_args* args, PartitionStack& partitions)
 
 	// create boot method
 	int32 bootMethodType = bootVolume.GetInt32(BOOT_METHOD, BOOT_METHOD_DEFAULT);
-	dprintf("get_boot_partitions(): boot method type: %ld\n", bootMethodType);
+	dprintf("get_boot_partitions(): boot method type: %" B_PRId32 "\n",
+		bootMethodType);
 
 	BootMethod* bootMethod = NULL;
 	switch (bootMethodType) {

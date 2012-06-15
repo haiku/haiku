@@ -108,7 +108,7 @@ cmd_error(int argc, char **argv)
 	}
 
 	int32 error = parse_expression(argv[1]);
-	kprintf("error 0x%lx: %s\n", error, strerror(error));
+	kprintf("error 0x%" B_PRIx32 ": %s\n", error, strerror(error));
 
 	return 0;
 }

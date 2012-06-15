@@ -109,13 +109,13 @@ dump_run_queue(int argc, char **argv)
 
 	for (int32 i = 0; i < smp_get_num_cpus(); i++) {
 		thread = sRunQueue[i];
-		kprintf("Run queue for cpu %ld (%ld threads)\n", i,
+		kprintf("Run queue for cpu %" B_PRId32 " (%" B_PRId32 " threads)\n", i,
 			sRunQueueSize[i]);
 		if (sRunQueueSize[i] > 0) {
 			kprintf("thread      id      priority  avg. quantum  name\n");
 			while (thread) {
-				kprintf("%p  %-7ld %-8ld  %-12ld  %s\n", thread, thread->id,
-					thread->priority,
+				kprintf("%p  %-7" B_PRId32 " %-8" B_PRId32 "  %-12" B_PRId32
+					"  %s\n", thread, thread->id, thread->priority,
 					thread->scheduler_data->GetAverageQuantumUsage(),
 					thread->name);
 				thread = thread->queue_next;

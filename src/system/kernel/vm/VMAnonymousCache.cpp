@@ -222,8 +222,8 @@ dump_swap_info(int argc, char** argv)
 	for (SwapFileList::Iterator it = sSwapFileList.GetIterator();
 			swap_file* file = it.Next();) {
 		swap_addr_t total = file->last_slot - file->first_slot;
-		kprintf("  vnode: %p, pages: total: %lu, free: %lu\n",
-			file->vnode, total, file->bmp->free_slots);
+		kprintf("  vnode: %p, pages: total: %" B_PRIu32 ", free: %" B_PRIu32
+			"\n", file->vnode, total, file->bmp->free_slots);
 
 		totalSwapPages += total;
 		freeSwapPages += file->bmp->free_slots;
@@ -231,12 +231,12 @@ dump_swap_info(int argc, char** argv)
 
 	kprintf("\n");
 	kprintf("swap space in pages:\n");
-	kprintf("total:     %9lu\n", totalSwapPages);
-	kprintf("available: %9llu\n", sAvailSwapSpace / B_PAGE_SIZE);
-	kprintf("reserved:  %9llu\n",
+	kprintf("total:     %9" B_PRIu32 "\n", totalSwapPages);
+	kprintf("available: %9" B_PRIdOFF "\n", sAvailSwapSpace / B_PAGE_SIZE);
+	kprintf("reserved:  %9" B_PRIdOFF "\n",
 		totalSwapPages - sAvailSwapSpace / B_PAGE_SIZE);
-	kprintf("used:      %9lu\n", totalSwapPages - freeSwapPages);
-	kprintf("free:      %9lu\n", freeSwapPages);
+	kprintf("used:      %9" B_PRIu32 "\n", totalSwapPages - freeSwapPages);
+	kprintf("free:      %9" B_PRIu32 "\n", freeSwapPages);
 
 	return 0;
 }
@@ -303,7 +303,8 @@ find_swap_file(swap_addr_t slotIndex)
 			return swapFile;
 	}
 
-	panic("find_swap_file(): can't find swap file for slot %ld\n", slotIndex);
+	panic("find_swap_file(): can't find swap file for slot %" B_PRIu32 "\n",
+		slotIndex);
 	return NULL;
 }
 

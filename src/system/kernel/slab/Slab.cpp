@@ -266,8 +266,8 @@ dump_slabs(int argc, char* argv[])
 	while (it.HasNext()) {
 		ObjectCache* cache = it.Next();
 
-		kprintf("%p %22s %8lu %8" B_PRIuSIZE " %8lu %6lu %8lu %8lu %8lx\n",
-			cache, cache->name, cache->object_size, cache->alignment,
+		kprintf("%p %22s %8lu %8" B_PRIuSIZE " %8lu %6lu %8lu %8lu %8" B_PRIx32
+			"\n", cache, cache->name, cache->object_size, cache->alignment,
 			cache->usage, cache->empty_count, cache->used_count,
 			cache->total_objects, cache->flags);
 	}
@@ -298,7 +298,7 @@ dump_cache_info(int argc, char* argv[])
 	kprintf("slab_size:         %lu\n", cache->slab_size);
 	kprintf("usage:             %lu\n", cache->usage);
 	kprintf("maximum:           %lu\n", cache->maximum);
-	kprintf("flags:             0x%lx\n", cache->flags);
+	kprintf("flags:             0x%" B_PRIx32 "\n", cache->flags);
 	kprintf("cookie:            %p\n", cache->cookie);
 	kprintf("resize entry don't wait: %p\n", cache->resize_entry_dont_wait);
 	kprintf("resize entry can wait:   %p\n", cache->resize_entry_can_wait);

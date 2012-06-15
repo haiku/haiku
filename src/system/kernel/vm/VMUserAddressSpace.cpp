@@ -203,7 +203,8 @@ VMUserAddressSpace::CanResizeArea(VMArea* area, size_t newSize)
 	// also be resized in that area
 	// TODO: if there is free space after the reserved area, it could
 	// be used as well...
-	return next->id == RESERVED_AREA_ID && next->cache_offset <= area->Base()
+	return next->id == RESERVED_AREA_ID
+		&& (uint64)next->cache_offset <= (uint64)area->Base()
 		&& next->Base() + (next->Size() - 1) >= newEnd;
 }
 
@@ -218,7 +219,7 @@ VMUserAddressSpace::ResizeArea(VMArea* _area, size_t newSize,
 	VMUserArea* next = fAreas.GetNext(area);
 	if (next != NULL && next->Base() <= newEnd) {
 		if (next->id != RESERVED_AREA_ID
-			|| next->cache_offset > area->Base()
+			|| (uint64)next->cache_offset > (uint64)area->Base()
 			|| next->Base() + (next->Size() - 1) < newEnd) {
 			panic("resize situation for area %p has changed although we "
 				"should have the address space lock", area);
@@ -361,11 +362,11 @@ VMUserAddressSpace::Dump() const
 
 	for (VMUserAreaList::ConstIterator it = fAreas.GetIterator();
 			VMUserArea* area = it.Next();) {
-		kprintf(" area 0x%lx: ", area->id);
+		kprintf(" area 0x%" B_PRIx32 ": ", area->id);
 		kprintf("base_addr = 0x%lx ", area->Base());
 		kprintf("size = 0x%lx ", area->Size());
 		kprintf("name = '%s' ", area->name);
-		kprintf("protection = 0x%lx\n", area->protection);
+		kprintf("protection = 0x%" B_PRIx32 "\n", area->protection);
 	}
 }
 

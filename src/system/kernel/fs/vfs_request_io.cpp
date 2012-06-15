@@ -140,7 +140,7 @@ do_iterative_fd_io_iterate(void* _cookie, io_request* request,
 	TRACE_RIO("[%ld] do_iterative_fd_io_iterate(request: %p)\n",
 		find_thread(NULL), request);
 
-	static const int32 kMaxSubRequests = 8;
+	static const size_t kMaxSubRequests = 8;
 
 	iterative_io_cookie* cookie = (iterative_io_cookie*)_cookie;
 
@@ -152,7 +152,7 @@ do_iterative_fd_io_iterate(void* _cookie, io_request* request,
 
 	// get the next file vecs
 	file_io_vec vecs[kMaxSubRequests];
-	uint32 vecCount = kMaxSubRequests;
+	size_t vecCount = kMaxSubRequests;
 	status_t error = cookie->get_vecs(cookie->cookie, request, requestOffset,
 		requestLength, vecs, &vecCount);
 	if (error != B_OK && error != B_BUFFER_OVERFLOW)
@@ -161,11 +161,11 @@ do_iterative_fd_io_iterate(void* _cookie, io_request* request,
 		*_partialTransfer = true;
 		return B_OK;
 	}
-	TRACE_RIO("[%ld]  got %lu file vecs\n", find_thread(NULL), vecCount);
+	TRACE_RIO("[%ld]  got %zu file vecs\n", find_thread(NULL), vecCount);
 
 	// create subrequests for the file vecs we've got
-	int32 subRequestCount = 0;
-	for (uint32 i = 0; i < vecCount && subRequestCount < kMaxSubRequests; i++) {
+	size_t subRequestCount = 0;
+	for (size_t i = 0; i < vecCount && subRequestCount < kMaxSubRequests; i++) {
 		off_t vecOffset = vecs[i].offset;
 		off_t vecLength = min_c(vecs[i].length, requestLength);
 		TRACE_RIO("[%ld]    vec %lu offset: %lld, length: %lld\n",
@@ -270,13 +270,13 @@ do_synchronous_iterative_vnode_io(struct vnode* vnode, void* openCookie,
 
 		while (error == B_OK && vecLength > 0) {
 			file_io_vec fileVecs[8];
-			uint32 fileVecCount = 8;
+			size_t fileVecCount = 8;
 			error = getVecs(cookie, request, offset, vecLength, fileVecs,
 				&fileVecCount);
 			if (error != B_OK || fileVecCount == 0)
 				break;
 
-			for (uint32 i = 0; i < fileVecCount; i++) {
+			for (size_t i = 0; i < fileVecCount; i++) {
 				const file_io_vec& fileVec = fileVecs[i];
 				size_t toTransfer = min_c(fileVec.length, (off_t)length);
 				size_t transferred = toTransfer;

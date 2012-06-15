@@ -2972,16 +2972,16 @@ display_mem(int argc, char** argv)
 
 			switch (itemSize) {
 				case 1:
-					kprintf(" %02x", *(uint8*)&value);
+					kprintf(" %02" B_PRIx8, *(uint8*)&value);
 					break;
 				case 2:
-					kprintf(" %04x", *(uint16*)&value);
+					kprintf(" %04" B_PRIx16, *(uint16*)&value);
 					break;
 				case 4:
-					kprintf(" %08lx", *(uint32*)&value);
+					kprintf(" %08" B_PRIx32, *(uint32*)&value);
 					break;
 				case 8:
-					kprintf(" %016Lx", *(uint64*)&value);
+					kprintf(" %016" B_PRIx64, *(uint64*)&value);
 					break;
 			}
 		}
@@ -3106,9 +3106,9 @@ dump_caches_recursively(VMCache* cache, cache_info& info, int level)
 	for (int i = 0; i < level; i++)
 		kprintf("  ");
 
-	kprintf("%p: type: %s, base: %lld, size: %lld, pages: %lu", cache,
-		vm_cache_type_to_string(cache->type), cache->virtual_base,
-		cache->virtual_end, cache->page_count);
+	kprintf("%p: type: %s, base: %" B_PRIdOFF ", size: %" B_PRIdOFF ", "
+		"pages: %" B_PRIu32, cache, vm_cache_type_to_string(cache->type),
+		cache->virtual_base, cache->virtual_end, cache->page_count);
 
 	if (level == 0)
 		kprintf("/%lu", info.page_count);
@@ -3123,12 +3123,12 @@ dump_caches_recursively(VMCache* cache, cache_info& info, int level)
 	// areas
 	if (cache->areas != NULL) {
 		VMArea* area = cache->areas;
-		kprintf(", areas: %ld (%s, team: %ld)", area->id, area->name,
-			area->address_space->ID());
+		kprintf(", areas: %" B_PRId32 " (%s, team: %" B_PRId32 ")", area->id,
+			area->name, area->address_space->ID());
 
 		while (area->cache_next != NULL) {
 			area = area->cache_next;
-			kprintf(", %ld", area->id);
+			kprintf(", %" B_PRId32, area->id);
 		}
 	}
 
@@ -3194,9 +3194,9 @@ dump_caches(int argc, char** argv)
 
 	kprintf("total committed memory: %" B_PRIdOFF ", total used pages: %"
 		B_PRIuPHYSADDR "\n", totalCommitted, totalPages);
-	kprintf("%lu caches (%lu root caches), sorted by %s per cache "
-		"tree...\n\n", totalCount, rootCount,
-		sortByPageCount ? "page count" : "committed size");
+	kprintf("%" B_PRIu32 " caches (%" B_PRIu32 " root caches), sorted by %s "
+		"per cache tree...\n\n", totalCount, rootCount, sortByPageCount ?
+			"page count" : "committed size");
 
 	if (rootCount <= (uint32)kCacheInfoTableCount) {
 		for (uint32 i = 0; i < rootCount; i++) {
@@ -3258,11 +3258,11 @@ dump_area_struct(VMArea* area, bool mappings)
 {
 	kprintf("AREA: %p\n", area);
 	kprintf("name:\t\t'%s'\n", area->name);
-	kprintf("owner:\t\t0x%lx\n", area->address_space->ID());
-	kprintf("id:\t\t0x%lx\n", area->id);
+	kprintf("owner:\t\t0x%" B_PRIx32 "\n", area->address_space->ID());
+	kprintf("id:\t\t0x%" B_PRIx32 "\n", area->id);
 	kprintf("base:\t\t0x%lx\n", area->Base());
 	kprintf("size:\t\t0x%lx\n", area->Size());
-	kprintf("protection:\t0x%lx\n", area->protection);
+	kprintf("protection:\t0x%" B_PRIx32 "\n", area->protection);
 	kprintf("wiring:\t\t0x%x\n", area->wiring);
 	kprintf("memory_type:\t%#" B_PRIx32 "\n", area->MemoryType());
 	kprintf("cache:\t\t%p\n", area->cache);
@@ -3284,7 +3284,7 @@ dump_area_struct(VMArea* area, bool mappings)
 		while (iterator.Next() != NULL) {
 			count++;
 		}
-		kprintf("page mappings:\t%lu\n", count);
+		kprintf("page mappings:\t%" B_PRIu32 "\n", count);
 	}
 }
 
@@ -3377,9 +3377,9 @@ dump_area_list(int argc, char** argv)
 			|| (name != NULL && strstr(area->name, name) == NULL))
 			continue;
 
-		kprintf("%p %5lx  %p\t%p %4lx\t%4d  %s\n", area, area->id,
-			(void*)area->Base(), (void*)area->Size(), area->protection,
-			area->wiring, area->name);
+		kprintf("%p %5" B_PRIx32 "  %p\t%p %4" B_PRIx32 "\t%4d  %s\n", area,
+			area->id, (void*)area->Base(), (void*)area->Size(),
+			area->protection, area->wiring, area->name);
 	}
 	return 0;
 }
@@ -3852,7 +3852,7 @@ vm_init(kernel_args* args)
 	for (i = 0; i < args->num_cpus; i++) {
 		char name[64];
 
-		sprintf(name, "idle thread %lu kstack", i + 1);
+		sprintf(name, "idle thread %" B_PRIu32 " kstack", i + 1);
 		address = (void*)args->cpu_kstack[i].start;
 		create_area(name, &address, B_EXACT_ADDRESS, args->cpu_kstack[i].size,
 			B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
@@ -4035,7 +4035,7 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 
 	if (status < B_OK) {
 		dprintf("vm_page_fault: vm_soft_fault returned error '%s' on fault at "
-			"0x%lx, ip 0x%lx, write %d, user %d, thread 0x%lx\n",
+			"0x%lx, ip 0x%lx, write %d, user %d, thread 0x%" B_PRIx32 "\n",
 			strerror(status), address, faultAddress, isWrite, isUser,
 			thread_get_current_thread_id());
 		if (!isUser) {
@@ -4059,12 +4059,13 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 			VMArea* area = addressSpace->LookupArea(faultAddress);
 
 			Thread* thread = thread_get_current_thread();
-			dprintf("vm_page_fault: thread \"%s\" (%ld) in team \"%s\" (%ld) "
-				"tried to %s address %#lx, ip %#lx (\"%s\" +%#lx)\n",
-				thread->name, thread->id, thread->team->Name(),
-				thread->team->id, isWrite ? "write" : "read", address,
-				faultAddress, area ? area->name : "???",
-				faultAddress - (area ? area->Base() : 0x0));
+			dprintf("vm_page_fault: thread \"%s\" (%" B_PRId32 ") in team "
+				"\"%s\" (%" B_PRId32 ") tried to %s address %#lx, ip %#lx "
+				"(\"%s\" +%#lx)\n", thread->name, thread->id,
+				thread->team->Name(), thread->team->id,
+				isWrite ? "write" : "read", address, faultAddress,
+				area ? area->name : "???", faultAddress - (area ?
+					area->Base() : 0x0));
 
 			// We can print a stack trace of the userland thread here.
 // TODO: The user_memcpy() below can cause a deadlock, if it causes a page
@@ -4394,8 +4395,8 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 		// check permissions
 		uint32 protection = get_area_page_protection(area, address);
 		if (isUser && (protection & B_USER_PROTECTION) == 0) {
-			dprintf("user access on kernel area 0x%lx at %p\n", area->id,
-				(void*)originalAddress);
+			dprintf("user access on kernel area 0x%" B_PRIx32 " at %p\n",
+				area->id, (void*)originalAddress);
 			TPF(PageFaultError(area->id,
 				VMPageFaultTracing::PAGE_FAULT_ERROR_KERNEL_ONLY));
 			status = B_PERMISSION_DENIED;
@@ -4403,16 +4404,16 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 		}
 		if (isWrite && (protection
 				& (B_WRITE_AREA | (isUser ? 0 : B_KERNEL_WRITE_AREA))) == 0) {
-			dprintf("write access attempted on write-protected area 0x%lx at"
-				" %p\n", area->id, (void*)originalAddress);
+			dprintf("write access attempted on write-protected area 0x%"
+				B_PRIx32 " at %p\n", area->id, (void*)originalAddress);
 			TPF(PageFaultError(area->id,
 				VMPageFaultTracing::PAGE_FAULT_ERROR_WRITE_PROTECTED));
 			status = B_PERMISSION_DENIED;
 			break;
 		} else if (!isWrite && (protection
 				& (B_READ_AREA | (isUser ? 0 : B_KERNEL_READ_AREA))) == 0) {
-			dprintf("read access attempted on read-protected area 0x%lx at"
-				" %p\n", area->id, (void*)originalAddress);
+			dprintf("read access attempted on read-protected area 0x%" B_PRIx32
+				" at %p\n", area->id, (void*)originalAddress);
 			TPF(PageFaultError(area->id,
 				VMPageFaultTracing::PAGE_FAULT_ERROR_READ_PROTECTED));
 			status = B_PERMISSION_DENIED;
@@ -4673,7 +4674,7 @@ vm_try_reserve_memory(size_t amount, int priority, bigtime_t timeout)
 
 	//dprintf("try to reserve %lu bytes, %Lu left\n", amount, sAvailableMemory);
 
-	if (sAvailableMemory >= amount + reserve) {
+	if (sAvailableMemory >= (off_t)(amount + reserve)) {
 		sAvailableMemory -= amount;
 		return B_OK;
 	}
@@ -4696,7 +4697,7 @@ vm_try_reserve_memory(size_t amount, int priority, bigtime_t timeout)
 
 		sNeededMemory -= amount;
 
-		if (sAvailableMemory >= amount + reserve) {
+		if (sAvailableMemory >= (off_t)(amount + reserve)) {
 			sAvailableMemory -= amount;
 			return B_OK;
 		}

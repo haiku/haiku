@@ -809,7 +809,7 @@ dump_node(int argc, char** argv)
 	kprintf(" dir next:    %p\n", vnode->dir_next);
 
 	if (S_ISDIR(vnode->stream.type)) {
-		kprintf(" dir scanned: %ld\n", vnode->stream.u.dir.scanned);
+		kprintf(" dir scanned: %" B_PRId32 "\n", vnode->stream.u.dir.scanned);
 		kprintf(" contents:\n");
 
 		devfs_vnode* children = vnode->stream.u.dir.dir_head;
@@ -828,9 +828,9 @@ dump_node(int argc, char** argv)
 				vnode->stream.u.dev.partition->raw_device);
 			kprintf("  offset:          %Ld\n", info.offset);
 			kprintf("  size:            %Ld\n", info.size);
-			kprintf("  block size:      %ld\n", info.logical_block_size);
-			kprintf("  session:         %ld\n", info.session);
-			kprintf("  partition:       %ld\n", info.partition);
+			kprintf("  block size:      %" B_PRId32 "\n", info.logical_block_size);
+			kprintf("  session:         %" B_PRId32 "\n", info.session);
+			kprintf("  partition:       %" B_PRId32 "\n", info.partition);
 			kprintf("  device:          %s\n", info.device);
 			set_debug_variable("_raw",
 				(addr_t)vnode->stream.u.dev.partition->raw_device);

@@ -407,7 +407,7 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 				}
 
 				outBuffer.PutString("0x", 2);
-				number(outBuffer, (uint32)va_arg(args, void *), 16, fieldWidth,
+				number(outBuffer, (addr_t)va_arg(args, void *), 16, fieldWidth,
 					precision, flags);
 				continue;
 

@@ -261,7 +261,7 @@ KDiskDeviceManager::KDiskDeviceManager()
 	if (fMediaChecker >= 0)
 		resume_thread(fMediaChecker);
 
-	DBG(OUT("number of disk systems: %ld\n", CountDiskSystems()));
+	DBG(OUT("number of disk systems: %" B_PRId32 "\n", CountDiskSystems()));
 	// TODO: Watch the disk systems and the relevant directories.
 }
 
@@ -285,26 +285,26 @@ KDiskDeviceManager::~KDiskDeviceManager()
 
 	// some sanity checks
 	if (fPartitions->Count() > 0) {
-		DBG(OUT("WARNING: There are still %ld unremoved partitions!\n",
+		DBG(OUT("WARNING: There are still %" B_PRId32 " unremoved partitions!\n",
 			fPartitions->Count()));
 		for (PartitionMap::Iterator it = fPartitions->Begin();
 				it != fPartitions->End(); ++it) {
-			DBG(OUT("         partition: %ld\n", it->Value()->ID()));
+			DBG(OUT("         partition: %" B_PRId32 "\n", it->Value()->ID()));
 		}
 	}
 	if (fObsoletePartitions->Count() > 0) {
-		DBG(OUT("WARNING: There are still %ld obsolete partitions!\n",
+		DBG(OUT("WARNING: There are still %" B_PRId32 " obsolete partitions!\n",
 				fObsoletePartitions->Count()));
 		for (PartitionSet::Iterator it = fObsoletePartitions->Begin();
 				it != fObsoletePartitions->End(); ++it) {
-			DBG(OUT("         partition: %ld\n", (*it)->ID()));
+			DBG(OUT("         partition: %" B_PRId32 "\n", (*it)->ID()));
 		}
 	}
 	// remove all disk systems
 	for (int32 cookie = 0; KDiskSystem* diskSystem = NextDiskSystem(&cookie);) {
 		fDiskSystems->Remove(diskSystem->ID());
 		if (diskSystem->IsLoaded()) {
-			DBG(OUT("WARNING: Disk system `%s' (%ld) is still loaded!\n",
+			DBG(OUT("WARNING: Disk system `%s' (%" B_PRId32 ") is still loaded!\n",
 				diskSystem->Name(), diskSystem->ID()));
 		} else
 			delete diskSystem;

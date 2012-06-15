@@ -320,7 +320,7 @@ static status_t query_rewind(struct file_descriptor* descriptor);
 static void query_free_fd(struct file_descriptor* descriptor);
 static status_t query_close(struct file_descriptor* descriptor);
 
-static status_t common_ioctl(struct file_descriptor* descriptor, uint32 op,
+static status_t common_ioctl(struct file_descriptor* descriptor, ulong op,
 	void* buffer, size_t length);
 static status_t common_read_stat(struct file_descriptor* descriptor,
 	struct stat* statData);
@@ -1135,8 +1135,8 @@ restart:
 		rw_lock_read_unlock(&sVnodeLock);
 		if (!canWait || --tries < 0) {
 			// vnode doesn't seem to become unbusy
-			dprintf("vnode %ld:%Ld is not becoming unbusy!\n", mountID,
-				vnodeID);
+			dprintf("vnode %" B_PRIdDEV ":%" B_PRIdINO " is not becoming unbusy!\n",
+				mountID, vnodeID);
 			return B_BUSY;
 		}
 		snooze(5000); // 5 ms
@@ -1930,8 +1930,8 @@ get_root_vnode(bool kernel)
 			return root;
 
 		// That should never happen.
-		dprintf("get_root_vnode(): IO context for team %ld doesn't have a "
-			"root\n", team_get_current_team_id());
+		dprintf("get_root_vnode(): IO context for team %" B_PRId32 " doesn't "
+			"have a root\n", team_get_current_team_id());
 	}
 
 	inc_vnode_ref_count(sRoot);
@@ -2088,8 +2088,8 @@ lookup_dir_entry(struct vnode* dir, const char* name, struct vnode** _vnode)
 	rw_lock_read_unlock(&sVnodeLock);
 
 	if (*_vnode == NULL) {
-		panic("lookup_dir_entry(): could not lookup vnode (mountid 0x%lx vnid "
-			"0x%Lx)\n", dir->device, id);
+		panic("lookup_dir_entry(): could not lookup vnode (mountid 0x%" B_PRIx32
+			" vnid 0x%" B_PRIx64 ")\n", dir->device, id);
 		return B_ENTRY_NOT_FOUND;
 	}
 
@@ -2952,17 +2952,17 @@ _dump_advisory_locking(advisory_locking* locking)
 	if (locking == NULL)
 		return;
 
-	kprintf("   lock:        %ld", locking->lock);
-	kprintf("   wait_sem:    %ld", locking->wait_sem);
+	kprintf("   lock:        %" B_PRId32, locking->lock);
+	kprintf("   wait_sem:    %" B_PRId32, locking->wait_sem);
 
 	int32 index = 0;
 	LockList::Iterator iterator = locking->locks.GetIterator();
 	while (iterator.HasNext()) {
 		struct advisory_lock* lock = iterator.Next();
 
-		kprintf("   [%2ld] team:   %ld\n", index++, lock->team);
-		kprintf("        start:  %Ld\n", lock->start);
-		kprintf("        end:    %Ld\n", lock->end);
+		kprintf("   [%2" B_PRId32 "] team:   %" B_PRId32 "\n", index++, lock->team);
+		kprintf("        start:  %" B_PRIdOFF "\n", lock->start);
+		kprintf("        end:    %" B_PRIdOFF "\n", lock->end);
 		kprintf("        shared? %s\n", lock->shared ? "yes" : "no");
 	}
 }
@@ -2972,7 +2972,7 @@ static void
 _dump_mount(struct fs_mount* mount)
 {
 	kprintf("MOUNT: %p\n", mount);
-	kprintf(" id:            %ld\n", mount->id);
+	kprintf(" id:            %" B_PRIdDEV "\n", mount->id);
 	kprintf(" device_name:   %s\n", mount->device_name);
 	kprintf(" root_vnode:    %p\n", mount->root_vnode);
 	kprintf(" covers:        %p\n", mount->root_vnode->covers);
@@ -2984,7 +2984,7 @@ _dump_mount(struct fs_mount* mount)
 	fs_volume* volume = mount->volume;
 	while (volume != NULL) {
 		kprintf(" volume %p:\n", volume);
-		kprintf("  layer:            %ld\n", volume->layer);
+		kprintf("  layer:            %" B_PRId32 "\n", volume->layer);
 		kprintf("  private_volume:   %p\n", volume->private_volume);
 		kprintf("  ops:              %p\n", volume->ops);
 		kprintf("  file_system:      %p\n", volume->file_system);
@@ -3098,9 +3098,9 @@ static void
 _dump_vnode(struct vnode* vnode, bool printPath)
 {
 	kprintf("VNODE: %p\n", vnode);
-	kprintf(" device:        %ld\n", vnode->device);
-	kprintf(" id:            %Ld\n", vnode->id);
-	kprintf(" ref_count:     %ld\n", vnode->ref_count);
+	kprintf(" device:        %" B_PRIdDEV "\n", vnode->device);
+	kprintf(" id:            %" B_PRIdINO "\n", vnode->id);
+	kprintf(" ref_count:     %" B_PRId32 "\n", vnode->ref_count);
 	kprintf(" private_node:  %p\n", vnode->private_node);
 	kprintf(" mount:         %p\n", vnode->mount);
 	kprintf(" covered_by:    %p\n", vnode->covered_by);
@@ -3149,16 +3149,16 @@ dump_mount(int argc, char** argv)
 		return 0;
 	}
 
-	uint32 id = parse_expression(argv[1]);
-	struct fs_mount* mount = NULL;
+	ulong val = parse_expression(argv[1]);
+	uint32 id = val;
 
-	mount = (fs_mount*)hash_lookup(sMountsTable, (void*)&id);
+	struct fs_mount* mount = (fs_mount*)hash_lookup(sMountsTable, (void*)&id);
 	if (mount == NULL) {
 		if (IS_USER_ADDRESS(id)) {
 			kprintf("fs_mount not found\n");
 			return 0;
 		}
-		mount = (fs_mount*)id;
+		mount = (fs_mount*)val;
 	}
 
 	_dump_mount(mount);
@@ -3182,7 +3182,7 @@ dump_mounts(int argc, char** argv)
 	hash_open(sMountsTable, &iterator);
 	while ((mount = (struct fs_mount*)hash_next(sMountsTable, &iterator))
 			!= NULL) {
-		kprintf("%p%4ld %p %p %p %s\n", mount, mount->id, mount->root_vnode,
+		kprintf("%p%4" B_PRIdDEV " %p %p %p %s\n", mount, mount->id, mount->root_vnode,
 			mount->root_vnode->covers, mount->volume->private_volume,
 			mount->volume->file_system_name);
 
@@ -3265,10 +3265,11 @@ dump_vnodes(int argc, char** argv)
 		if (vnode->device != device)
 			continue;
 
-		kprintf("%p%4ld%10Ld%5ld %p %p %p %s%s%s\n", vnode, vnode->device,
-			vnode->id, vnode->ref_count, vnode->cache, vnode->private_node,
-			vnode->advisory_locking, vnode->IsRemoved() ? "r" : "-",
-			vnode->IsBusy() ? "b" : "-", vnode->IsUnpublished() ? "u" : "-");
+		kprintf("%p%4" B_PRIdDEV "%10" B_PRIdINO "%5" B_PRId32 " %p %p %p %s%s%s\n",
+			vnode, vnode->device, vnode->id, vnode->ref_count, vnode->cache,
+			vnode->private_node, vnode->advisory_locking,
+			vnode->IsRemoved() ? "r" : "-", vnode->IsBusy() ? "b" : "-",
+			vnode->IsUnpublished() ? "u" : "-");
 	}
 
 	hash_close(sVnodeTable, &iterator, false);
@@ -3301,9 +3302,10 @@ dump_vnode_caches(int argc, char** argv)
 		if (device != -1 && vnode->device != device)
 			continue;
 
-		kprintf("%p%4ld%10Ld %p %8Ld%8ld\n", vnode, vnode->device, vnode->id,
-			vnode->cache, (vnode->cache->virtual_end + B_PAGE_SIZE - 1)
-				/ B_PAGE_SIZE, vnode->cache->page_count);
+		kprintf("%p%4" B_PRIdDEV "%10" B_PRIdINO " %p %8" B_PRIdOFF "%8" B_PRId32 "\n",
+			vnode, vnode->device, vnode->id, vnode->cache,
+			(vnode->cache->virtual_end + B_PAGE_SIZE - 1) / B_PAGE_SIZE,
+			vnode->cache->page_count);
 	}
 
 	hash_close(sVnodeTable, &iterator, false);
@@ -3322,13 +3324,13 @@ dump_io_context(int argc, char** argv)
 	struct io_context* context = NULL;
 
 	if (argc > 1) {
-		uint32 num = parse_expression(argv[1]);
+		ulong num = parse_expression(argv[1]);
 		if (IS_KERNEL_ADDRESS(num))
 			context = (struct io_context*)num;
 		else {
 			Team* team = team_get_team_struct_locked(num);
 			if (team == NULL) {
-				kprintf("could not find team with ID %ld\n", num);
+				kprintf("could not find team with ID %lu\n", num);
 				return 0;
 			}
 			context = (struct io_context*)team->io_context;
@@ -3339,8 +3341,8 @@ dump_io_context(int argc, char** argv)
 	kprintf("I/O CONTEXT: %p\n", context);
 	kprintf(" root vnode:\t%p\n", context->root);
 	kprintf(" cwd vnode:\t%p\n", context->cwd);
-	kprintf(" used fds:\t%lu\n", context->num_used_fds);
-	kprintf(" max fds:\t%lu\n", context->table_size);
+	kprintf(" used fds:\t%" B_PRIu32 "\n", context->num_used_fds);
+	kprintf(" max fds:\t%" B_PRIu32 "\n", context->table_size);
 
 	if (context->num_used_fds)
 		kprintf("   no.  type         ops  ref  open  mode         pos"
@@ -3360,8 +3362,8 @@ dump_io_context(int argc, char** argv)
 			fd->u.vnode);
 	}
 
-	kprintf(" used monitors:\t%lu\n", context->num_monitors);
-	kprintf(" max monitors:\t%lu\n", context->max_monitors);
+	kprintf(" used monitors:\t%" B_PRIu32 "\n", context->num_monitors);
+	kprintf(" max monitors:\t%" B_PRIu32 "\n", context->max_monitors);
 
 	set_debug_variable("_cwd", (addr_t)context->cwd);
 
@@ -3377,8 +3379,8 @@ dump_vnode_usage(int argc, char** argv)
 		return 0;
 	}
 
-	kprintf("Unused vnodes: %ld (max unused %ld)\n", sUnusedVnodes,
-		kMaxUnusedVnodes);
+	kprintf("Unused vnodes: %" B_PRIu32 " (max unused %" B_PRIu32 ")\n",
+		sUnusedVnodes, kMaxUnusedVnodes);
 
 	struct hash_iterator iterator;
 	hash_open(sVnodeTable, &iterator);
@@ -3391,7 +3393,8 @@ dump_vnode_usage(int argc, char** argv)
 
 	hash_close(sVnodeTable, &iterator, false);
 
-	kprintf("%lu vnodes total (%ld in use).\n", count, count - sUnusedVnodes);
+	kprintf("%" B_PRIu32 " vnodes total (%" B_PRIu32 " in use).\n", count,
+		count - sUnusedVnodes);
 	return 0;
 }
 
@@ -3449,7 +3452,7 @@ common_file_io_vec_pages(struct vnode* vnode, void* cookie,
 		// now directly read the data from the device
 		// the first file_io_vec can be read directly
 
-		if (fileVecs[0].length < numBytes)
+		if (fileVecs[0].length < (off_t)numBytes)
 			size = fileVecs[0].length;
 		else
 			size = numBytes;
@@ -3469,20 +3472,20 @@ common_file_io_vec_pages(struct vnode* vnode, void* cookie,
 		//	a) also use this direct I/O for writes (otherwise, it would
 		//	   overwrite precious data)
 		//	b) panic if the term below is true (at least for writes)
-		if (size > fileVecs[0].length) {
+		if ((off_t)size > fileVecs[0].length) {
 			//dprintf("warning: device driver %p doesn't respect total length "
 			//	"in read_pages() call!\n", ref->device);
 			size = fileVecs[0].length;
 		}
 
-		ASSERT(size <= fileVecs[0].length);
+		ASSERT((off_t)size <= fileVecs[0].length);
 
 		// If the file portion was contiguous, we're already done now
 		if (size == numBytes)
 			return B_OK;
 
 		// if we reached the end of the file, we can return as well
-		if (size != fileVecs[0].length) {
+		if ((off_t)size != fileVecs[0].length) {
 			*_numBytes = size;
 			return B_OK;
 		}
@@ -3525,7 +3528,7 @@ common_file_io_vec_pages(struct vnode* vnode, void* cookie,
 			size = 0;
 
 			// assign what is left of the current fileVec to the tempVecs
-			for (size = 0; size < fileLeft && vecIndex < vecCount
+			for (size = 0; (off_t)size < fileLeft && vecIndex < vecCount
 					&& tempCount < MAX_TEMP_IO_VECS;) {
 				// try to satisfy one iovec per iteration (or as much as
 				// possible)
@@ -3622,8 +3625,9 @@ new_vnode(fs_volume* volume, ino_t vnodeID, void* privateNode,
 	// file system integrity check:
 	// test if the vnode already exists and bail out if this is the case!
 	if (!nodeCreated) {
-		panic("vnode %ld:%Ld already exists (node = %p, vnode->node = %p)!",
-			volume->id, vnodeID, privateNode, vnode->private_node);
+		panic("vnode %" B_PRIdDEV ":%" B_PRIdINO " already exists (node = %p, "
+			"vnode->node = %p)!", volume->id, vnodeID, privateNode,
+			vnode->private_node);
 		return B_ERROR;
 	}
 
@@ -5275,7 +5279,7 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 
 	if (vnode == NULL) {
 		panic("vfs: fs_create() returned success but there is no vnode, "
-			"mount ID %ld!\n", directory->device);
+			"mount ID %" B_PRIdDEV "!\n", directory->device);
 		return B_BAD_VALUE;
 	}
 
@@ -5895,7 +5899,7 @@ dir_remove(int fd, char* path, bool kernel)
 
 
 static status_t
-common_ioctl(struct file_descriptor* descriptor, uint32 op, void* buffer,
+common_ioctl(struct file_descriptor* descriptor, ulong op, void* buffer,
 	size_t length)
 {
 	struct vnode* vnode = descriptor->u.vnode;
@@ -5925,9 +5929,10 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 	status_t status = B_OK;
 
 	if (op == F_SETLK || op == F_SETLKW || op == F_GETLK) {
+		// TODO: x86_64 needs ulong argument here.
 		if (descriptor->type != FDTYPE_FILE)
 			status = B_BAD_VALUE;
-		else if (user_memcpy(&flock, (struct flock*)argument,
+		else if (user_memcpy(&flock, (struct flock*)((ulong)argument),
 				sizeof(struct flock)) != B_OK)
 			status = B_BAD_ADDRESS;
 
@@ -6009,7 +6014,8 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 				status = get_advisory_lock(vnode, &flock);
 				if (status == B_OK) {
 					// copy back flock structure
-					status = user_memcpy((struct flock*)argument, &flock,
+					// TODO: x86_64
+					status = user_memcpy((struct flock*)((ulong)argument), &flock,
 						sizeof(struct flock));
 				}
 			} else
@@ -7924,7 +7930,7 @@ _kern_sync(void)
 	while ((device = next_dev(&cookie)) >= 0) {
 		status_t status = fs_sync(device);
 		if (status != B_OK && status != B_BAD_VALUE) {
-			dprintf("sync: device %ld couldn't sync: %s\n", device,
+			dprintf("sync: device %" B_PRIdDEV " couldn't sync: %s\n", device,
 				strerror(status));
 		}
 	}
@@ -9216,8 +9222,8 @@ _user_create_pipe(int* userFDs)
 	status = get_vnode(sRoot->mount->id, nodeID, &vnode, true, false);
 	if (status != B_OK) {
 		// that should not happen
-		dprintf("_user_create_pipe(): Failed to lookup vnode (%ld, %lld)\n",
-			sRoot->mount->id, sRoot->id);
+		dprintf("_user_create_pipe(): Failed to lookup vnode (%" B_PRIdDEV ", "
+			"%" B_PRIdINO ")\n", sRoot->mount->id, sRoot->id);
 		return status;
 	}
 

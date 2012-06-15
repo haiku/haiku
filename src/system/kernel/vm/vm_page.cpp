@@ -943,8 +943,8 @@ dump_page(int argc, char **argv)
 					&& physicalAddress / B_PAGE_SIZE
 						== page->physical_page_number) {
 					VMArea* area = addressSpace->LookupArea(address);
-					kprintf("  aspace %ld, area %ld: %#" B_PRIxADDR
-						" (%c%c%s%s)\n", addressSpace->ID(),
+					kprintf("  aspace %" B_PRId32 ", area %" B_PRId32 ": %#"
+						B_PRIxADDR " (%c%c%s%s)\n", addressSpace->ID(),
 						area != NULL ? area->id : -1, address,
 						(flags & B_KERNEL_READ_AREA) != 0 ? 'r' : '-',
 						(flags & B_KERNEL_WRITE_AREA) != 0 ? 'w' : '-',
@@ -1117,7 +1117,7 @@ dump_page_stats(int argc, char **argv)
 	kprintf("unreserved free pages: %" B_PRId32 "\n", sUnreservedFreePages);
 	kprintf("unsatisfied page reservations: %" B_PRId32 "\n",
 		sUnsatisfiedPageReservations);
-	kprintf("mapped pages: %lu\n", gMappedPagesCount);
+	kprintf("mapped pages: %" B_PRId32 "\n", gMappedPagesCount);
 	kprintf("longest free pages run: %" B_PRIuPHYSADDR " pages (at %"
 		B_PRIuPHYSADDR ")\n", longestFreeRun.Length(),
 		sPages[longestFreeRun.start].physical_page_number);

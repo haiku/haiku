@@ -64,7 +64,7 @@ void
 scheduler_init(void)
 {
 	int32 cpuCount = smp_get_num_cpus();
-	dprintf("scheduler_init: found %ld logical cpu%s\n", cpuCount,
+	dprintf("scheduler_init: found %" B_PRId32 " logical cpu%s\n", cpuCount,
 		cpuCount != 1 ? "s" : "");
 
 	if (cpuCount > 1) {

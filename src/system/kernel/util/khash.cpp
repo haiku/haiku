@@ -417,13 +417,13 @@ hash_dump_table(struct hash_table* table)
 {
 	uint32 i;
 
-	dprintf("hash table %p, table size: %lu, elements: %u\n", table,
+	dprintf("hash table %p, table size: %" B_PRIu32 ", elements: %u\n", table,
 		table->table_size, table->num_elements);
 
 	for (i = 0; i < table->table_size; i++) {
 		struct hash_element* element = table->table[i];
 		if (element != NULL) {
-			dprintf("%6lu:", i);
+			dprintf("%6" B_PRIu32 ":", i);
 			while (element != NULL) {
 				dprintf(" %p", element);
 				element = (hash_element*)NEXT(table, element);

@@ -1114,38 +1114,39 @@ static void
 _dump_team_info(Team* team)
 {
 	kprintf("TEAM: %p\n", team);
-	kprintf("id:               %ld (%#lx)\n", team->id, team->id);
+	kprintf("id:               %" B_PRId32 " (%#" B_PRIx32 ")\n", team->id,
+		team->id);
 	kprintf("serial_number:    %" B_PRId64 "\n", team->serial_number);
 	kprintf("name:             '%s'\n", team->Name());
 	kprintf("args:             '%s'\n", team->Args());
 	kprintf("hash_next:        %p\n", team->hash_next);
 	kprintf("parent:           %p", team->parent);
 	if (team->parent != NULL) {
-		kprintf(" (id = %ld)\n", team->parent->id);
+		kprintf(" (id = %" B_PRId32 ")\n", team->parent->id);
 	} else
 		kprintf("\n");
 
 	kprintf("children:         %p\n", team->children);
 	kprintf("num_threads:      %d\n", team->num_threads);
 	kprintf("state:            %d\n", team->state);
-	kprintf("flags:            0x%lx\n", team->flags);
+	kprintf("flags:            0x%" B_PRIx32 "\n", team->flags);
 	kprintf("io_context:       %p\n", team->io_context);
 	if (team->address_space)
 		kprintf("address_space:    %p\n", team->address_space);
-	kprintf("user data:        %p (area %ld)\n", (void*)team->user_data,
-		team->user_data_area);
+	kprintf("user data:        %p (area %" B_PRId32 ")\n",
+		(void*)team->user_data, team->user_data_area);
 	kprintf("free user thread: %p\n", team->free_user_threads);
 	kprintf("main_thread:      %p\n", team->main_thread);
 	kprintf("thread_list:      %p\n", team->thread_list);
-	kprintf("group_id:         %ld\n", team->group_id);
-	kprintf("session_id:       %ld\n", team->session_id);
+	kprintf("group_id:         %" B_PRId32 "\n", team->group_id);
+	kprintf("session_id:       %" B_PRId32 "\n", team->session_id);
 }
 
 
 static int
 dump_team_info(int argc, char** argv)
 {
-	team_id id = -1;
+	ulong arg;
 	bool found = false;
 
 	if (argc < 2) {
@@ -1157,10 +1158,10 @@ dump_team_info(int argc, char** argv)
 		return 0;
 	}
 
-	id = strtoul(argv[1], NULL, 0);
-	if (IS_KERNEL_ADDRESS(id)) {
+	arg = strtoul(argv[1], NULL, 0);
+	if (IS_KERNEL_ADDRESS(arg)) {
 		// semi-hack
-		_dump_team_info((Team*)id);
+		_dump_team_info((Team*)arg);
 		return 0;
 	}
 
@@ -1168,7 +1169,7 @@ dump_team_info(int argc, char** argv)
 	for (TeamTable::Iterator it = sTeamHash.GetIterator();
 		Team* team = it.Next();) {
 		if ((team->Name() && strcmp(argv[1], team->Name()) == 0)
-			|| team->id == id) {
+			|| team->id == (team_id)arg) {
 			_dump_team_info(team);
 			found = true;
 			break;
@@ -1176,7 +1177,7 @@ dump_team_info(int argc, char** argv)
 	}
 
 	if (!found)
-		kprintf("team \"%s\" (%ld) doesn't exist!\n", argv[1], id);
+		kprintf("team \"%s\" (%" B_PRId32 ") doesn't exist!\n", argv[1], (team_id)arg);
 	return 0;
 }
 
@@ -1188,7 +1189,7 @@ dump_teams(int argc, char** argv)
 
 	for (TeamTable::Iterator it = sTeamHash.GetIterator();
 		Team* team = it.Next();) {
-		kprintf("%p%7ld  %p  %s\n", team, team->id, team->parent, team->Name());
+		kprintf("%p%7" B_PRId32 "  %p  %s\n", team, team->id, team->parent, team->Name());
 	}
 
 	return 0;
@@ -2054,7 +2055,7 @@ fork_team(void)
 
 	if (thread->user_thread == NULL) {
 #if KDEBUG
-		panic("user data area not found, parent area is %ld",
+		panic("user data area not found, parent area is %" B_PRId32,
 			parentTeam->user_data_area);
 #endif
 		status = B_ERROR;
@@ -2237,7 +2238,7 @@ job_control_entry::~job_control_entry()
 		ProcessGroup* group = sGroupHash.Lookup(group_id);
 		if (group == NULL) {
 			panic("job_control_entry::~job_control_entry(): unknown group "
-				"ID: %ld", group_id);
+				"ID: %" B_PRId32, group_id);
 			return;
 		}
 

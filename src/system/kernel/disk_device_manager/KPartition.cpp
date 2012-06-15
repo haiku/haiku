@@ -216,7 +216,7 @@ KPartition::PublishDevice()
 	error = devfs_publish_partition(buffer, &info);
 	if (error != B_OK) {
 		dprintf("KPartition::PublishDevice(): Failed to publish partition "
-			"%ld: %s\n", ID(), strerror(error));
+			"%" B_PRId32 ": %s\n", ID(), strerror(error));
 		free(fPublishedName);
 		fPublishedName = NULL;
 		return error;
@@ -237,14 +237,14 @@ KPartition::UnpublishDevice()
 	status_t error = GetPath(&path);
 	if (error != B_OK) {
 		dprintf("KPartition::UnpublishDevice(): Failed to get path for "
-			"partition %ld: %s\n", ID(), strerror(error));
+			"partition %" B_PRId32 ": %s\n", ID(), strerror(error));
 		return error;
 	}
 
 	error = devfs_unpublish_partition(path.Path());
 	if (error != B_OK) {
 		dprintf("KPartition::UnpublishDevice(): Failed to unpublish partition "
-			"%ld: %s\n", ID(), strerror(error));
+			"%" B_PRId32 ": %s\n", ID(), strerror(error));
 	}
 
 	free(fPublishedName);
@@ -285,7 +285,7 @@ KPartition::RepublishDevice()
 		free(newName);
 		UnpublishDevice();
 		dprintf("KPartition::RepublishDevice(): Failed to republish partition "
-			"%ld: %s\n", ID(), strerror(error));
+			"%" B_PRId32 ": %s\n", ID(), strerror(error));
 		return error;
 	}
 
@@ -657,7 +657,7 @@ KPartition::GetFileName(char* buffer, size_t size) const
 {
 	// If the parent is the device, the name is the index of the partition.
 	if (Parent() == NULL || Parent()->IsDevice()) {
-		if (snprintf(buffer, size, "%ld", Index()) >= (int)size)
+		if (snprintf(buffer, size, "%" B_PRId32, Index()) >= (int)size)
 			return B_NAME_TOO_LONG;
 		return B_OK;
 	}
@@ -669,7 +669,7 @@ KPartition::GetFileName(char* buffer, size_t size) const
 		return error;
 
 	size_t len = strlen(buffer);
-	if (snprintf(buffer + len, size - len, "_%ld", Index()) >= int(size - len))
+	if (snprintf(buffer + len, size - len, "_%" B_PRId32, Index()) >= int(size - len))
 		return B_NAME_TOO_LONG;
 	return B_OK;
 }
@@ -1172,7 +1172,7 @@ KPartition::UninitializeContents(bool logChanges)
 				B_FORCE_UNMOUNT | B_UNMOUNT_BUSY_PARTITION);
 			if (error != B_OK) {
 				dprintf("KPartition::UninitializeContents(): Failed to unmount "
-					"device %ld: %s\n", VolumeID(), strerror(error));
+					"device %" B_PRIdDEV ": %s\n", VolumeID(), strerror(error));
 			}
 
 			SetVolumeID(-1);
@@ -1302,17 +1302,17 @@ KPartition::Dump(bool deep, int32 level)
 	KPath path;
 	GetPath(&path);
 	if (level > 0)
-		OUT("%spartition %ld: %s\n", prefix, ID(), path.Path());
+		OUT("%spartition %" B_PRId32 ": %s\n", prefix, ID(), path.Path());
 	OUT("%s  offset:            %lld\n", prefix, Offset());
 	OUT("%s  size:              %lld (%.2f MB)\n", prefix, Size(),
 		Size() / (1024.0*1024));
 	OUT("%s  content size:      %lld\n", prefix, ContentSize());
-	OUT("%s  block size:        %lu\n", prefix, BlockSize());
-	OUT("%s  child count:       %ld\n", prefix, CountChildren());
-	OUT("%s  index:             %ld\n", prefix, Index());
-	OUT("%s  status:            %lu\n", prefix, Status());
-	OUT("%s  flags:             %lx\n", prefix, Flags());
-	OUT("%s  volume:            %ld\n", prefix, VolumeID());
+	OUT("%s  block size:        %" B_PRIu32 "\n", prefix, BlockSize());
+	OUT("%s  child count:       %" B_PRId32 "\n", prefix, CountChildren());
+	OUT("%s  index:             %" B_PRId32 "\n", prefix, Index());
+	OUT("%s  status:            %" B_PRIu32 "\n", prefix, Status());
+	OUT("%s  flags:             %" B_PRIx32 "\n", prefix, Flags());
+	OUT("%s  volume:            %" B_PRIdDEV "\n", prefix, VolumeID());
 	OUT("%s  disk system:       %s\n", prefix,
 		(DiskSystem() ? DiskSystem()->Name() : NULL));
 	OUT("%s  name:              %s\n", prefix, Name());

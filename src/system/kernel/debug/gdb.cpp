@@ -252,8 +252,8 @@ gdb_parse_command(void)
 		case 'm':
 		{
 			char* ptr;
-			unsigned address;
-			unsigned len;
+			addr_t address;
+			size_t len;
 
 			// The 'm' command has the form mAAA,LLL
 			// where AAA is the address and LLL is the

@@ -346,9 +346,9 @@ KDiskDevice::WriteUserData(UserDataWriter& writer)
 void
 KDiskDevice::Dump(bool deep, int32 level)
 {
-	OUT("device %ld: %s\n", ID(), Path());
+	OUT("device %" B_PRId32 ": %s\n", ID(), Path());
 	OUT("  media status:      %s\n", strerror(fMediaStatus));
-	OUT("  device flags:      %lx\n", DeviceFlags());
+	OUT("  device flags:      %" B_PRIx32 "\n", DeviceFlags());
 	if (fMediaStatus == B_OK)
 		KPartition::Dump(deep, 0);
 }

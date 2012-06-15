@@ -243,7 +243,7 @@ IOCache::_DoRequest(IORequest* request, generic_size_t& _bytesTransferred)
 		off_t lineOffset = (offset >> fLineSizeShift) << fLineSizeShift;
 
 		// intersection of request and cache line
-		off_t cacheLineEnd = std::min(lineOffset + fLineSize, fDeviceCapacity);
+		off_t cacheLineEnd = std::min(lineOffset + (off_t)fLineSize, fDeviceCapacity);
 		size_t requestLineLength
 			= std::min(cacheLineEnd - offset, (off_t)length);
 

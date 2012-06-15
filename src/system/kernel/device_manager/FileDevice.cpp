@@ -232,7 +232,7 @@ FileDevice::Control(void* _cookie, int32 op, void* buffer, size_t length)
 	switch (op) {
 		case B_GET_DEVICE_SIZE:
 			return set_ioctl_result(
-				fFileSize > ~(size_t)0 ? ~(size_t)0 : (size_t)fFileSize,
+				(uint64)fFileSize > (uint64)(~(size_t)0) ? ~(size_t)0 : (size_t)fFileSize,
 				buffer, length);
 
 		case B_SET_BLOCKING_IO:

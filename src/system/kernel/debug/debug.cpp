@@ -264,7 +264,7 @@ insert_chars_into_line(char* buffer, int32& position, int32& length,
 
 	// reposition cursor, if necessary
 	if (position < length)
-		kprintf("\x1b[%ldD", length - position);
+		kprintf("\x1b[%" B_PRId32 "D", length - position);
 }
 
 
@@ -296,7 +296,7 @@ remove_char_from_line(char* buffer, int32& position, int32& length)
 	kputchar(' ');
 
 	// reposition the cursor
-	kprintf("\x1b[%ldD", length - position + 1);
+	kprintf("\x1b[%" B_PRId32 "D", length - position + 1);
 }
 
 
@@ -439,7 +439,7 @@ public:
 		if (reprintLine) {
 			kprintf("%s%.*s", kKDLPrompt, (int)length, buffer);
 			if (position < length)
-				kprintf("\x1b[%ldD", length - position);
+				kprintf("\x1b[%" B_PRId32 "D", length - position);
 		}
 	}
 };
@@ -488,7 +488,7 @@ read_line(char* buffer, int32 maxLength,
 						kputchar(' ');
 
 					// reposition cursor
-					kprintf("\x1b[%ldD", length - position);
+					kprintf("\x1b[%" B_PRId32 "D", length - position);
 
 					length = position;
 				}
@@ -566,7 +566,7 @@ read_line(char* buffer, int32 maxLength,
 
 						// swap the current line with something from the history
 						if (position > 0)
-							kprintf("\x1b[%ldD", position); // move to beginning of line
+							kprintf("\x1b[%" B_PRId32 "D", position); // move to beginning of line
 
 						strcpy(buffer, sLineBuffer[historyLine]);
 						length = position = strlen(buffer);
@@ -608,7 +608,7 @@ read_line(char* buffer, int32 maxLength,
 						length = strlen(buffer);
 						kprintf("%s\x1b[K", buffer + position);
 							// print the line and clear the rest
-						kprintf("\x1b[%ldD", length - position);
+						kprintf("\x1b[%" B_PRId32 "D", length - position);
 							// reposition cursor
 						currentHistoryLine = historyLine;
 
@@ -617,7 +617,7 @@ read_line(char* buffer, int32 maxLength,
 					case 'H': // home
 					{
 						if (position > 0) {
-							kprintf("\x1b[%ldD", position);
+							kprintf("\x1b[%" B_PRId32 "D", position);
 							position = 0;
 						}
 						break;
@@ -625,7 +625,7 @@ read_line(char* buffer, int32 maxLength,
 					case 'F': // end
 					{
 						if (position < length) {
-							kprintf("\x1b[%ldC", length - position);
+							kprintf("\x1b[%" B_PRId32 "C", length - position);
 							position = length;
 						}
 						break;
@@ -825,10 +825,10 @@ kernel_debugger_loop(const char* messagePrefix, const char* message,
 
 	Thread* thread = thread_get_current_thread();
 	if (thread == NULL) {
-		kprintf("Running on CPU %ld\n", sDebuggerOnCPU);
+		kprintf("Running on CPU %" B_PRId32 "\n", sDebuggerOnCPU);
 	} else if (!debug_is_kernel_memory_accessible((addr_t)thread,
 			sizeof(Thread), B_KERNEL_READ_AREA)) {
-		kprintf("Running on CPU %ld\n", sDebuggerOnCPU);
+		kprintf("Running on CPU %" B_PRId32 "\n", sDebuggerOnCPU);
 		kprintf("Current thread pointer is %p, which is an address we "
 			"can't read from.\n", thread);
 		arch_debug_unset_current_thread();
@@ -836,8 +836,8 @@ kernel_debugger_loop(const char* messagePrefix, const char* message,
 		set_debug_variable("_thread", (uint64)(addr_t)thread);
 		set_debug_variable("_threadID", thread->id);
 
-		kprintf("Thread %ld \"%.64s\" running on CPU %ld\n", thread->id,
-			thread->name, sDebuggerOnCPU);
+		kprintf("Thread %" B_PRId32 " \"%.64s\" running on CPU %" B_PRId32 "\n",
+			thread->id, thread->name, sDebuggerOnCPU);
 
 		if (thread->cpu != gCPU + cpu) {
 			kprintf("The thread's CPU pointer is %p, but should be %p.\n",
@@ -1159,7 +1159,7 @@ cmd_switch_cpu(int argc, char** argv)
 	}
 
 	if (argc == 1) {
-		kprintf("running on CPU %ld\n", smp_get_current_cpu());
+		kprintf("running on CPU %" B_PRId32 "\n", smp_get_current_cpu());
 		return 0;
 	}
 
@@ -1170,7 +1170,7 @@ cmd_switch_cpu(int argc, char** argv)
 	}
 
 	if (newCPU == smp_get_current_cpu()) {
-		kprintf("already running on CPU %ld\n", newCPU);
+		kprintf("already running on CPU %" B_PRId32 "\n", newCPU);
 		return 0;
 	}
 
@@ -1409,7 +1409,7 @@ syslog_init_post_vm(struct kernel_args* args)
 		"Welcome to syslog debug output!\nHaiku revision: %s\n",
 		get_haiku_revision());
 	syslog_write(revisionBuffer,
-		std::min(length, (ssize_t)sizeof(revisionBuffer) - 1), false);
+		std::min(length, (int32)sizeof(revisionBuffer) - 1), false);
 
 	add_debugger_command_etc("syslog", &cmd_dump_syslog,
 		"Dumps the syslog buffer.",
@@ -1522,7 +1522,7 @@ flush_pending_repeats(bool notifySyslog)
 	if (sMessageRepeatCount > 1) {
 		static char temp[40];
 		size_t length = snprintf(temp, sizeof(temp),
-			"Last message repeated %ld times.\n", sMessageRepeatCount);
+			"Last message repeated %" B_PRId32 " times.\n", sMessageRepeatCount);
 		length = std::min(length, sizeof(temp) - 1);
 
 		if (sSerialDebugEnabled)

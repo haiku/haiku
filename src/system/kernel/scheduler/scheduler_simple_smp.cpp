@@ -70,8 +70,8 @@ dump_run_queue(int argc, char **argv)
 	else {
 		kprintf("thread    id      priority name\n");
 		while (thread) {
-			kprintf("%p  %-7ld %-8ld %s\n", thread, thread->id,
-				thread->priority, thread->name);
+			kprintf("%p  %-7" B_PRId32 " %-8" B_PRId32 " %s\n", thread,
+				thread->id, thread->priority, thread->name);
 			thread = thread->queue_next;
 		}
 	}

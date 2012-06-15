@@ -370,8 +370,8 @@ load_driver(legacy_driver *driver)
 #error Add checks here for new vs old api version!
 #endif
 		if (*apiVersion > B_CUR_DRIVER_API_VERSION) {
-			dprintf("devfs: \"%s\" api_version %ld not handled\n", driver->name,
-				*apiVersion);
+			dprintf("devfs: \"%s\" api_version %" B_PRId32 " not handled\n",
+				driver->name, *apiVersion);
 			status = B_BAD_VALUE;
 			goto error1;
 		}
@@ -664,8 +664,8 @@ load_driver_symbols(const char *driverName)
 static status_t
 reload_driver(legacy_driver *driver)
 {
-	dprintf("devfs: reload driver \"%s\" (%ld, %lld)\n", driver->name,
-		driver->device, driver->node);
+	dprintf("devfs: reload driver \"%s\" (%" B_PRIdDEV ", %lld)\n",
+		driver->name, driver->device, driver->node);
 
 	unload_driver(driver);
 
@@ -825,16 +825,16 @@ dump_driver(legacy_driver* driver)
 	kprintf("DEVFS DRIVER: %p\n", driver);
 	kprintf(" name:           %s\n", driver->name);
 	kprintf(" path:           %s\n", driver->path);
-	kprintf(" image:          %ld\n", driver->image);
-	kprintf(" device:         %ld\n", driver->device);
+	kprintf(" image:          %" B_PRId32 "\n", driver->image);
+	kprintf(" device:         %" B_PRIdDEV "\n", driver->device);
 	kprintf(" node:           %Ld\n", driver->node);
-	kprintf(" last modified:  %ld.%lu\n", driver->last_modified.tv_sec,
+	kprintf(" last modified:  %" B_PRIdTIME ".%ld\n", driver->last_modified.tv_sec,
 		driver->last_modified.tv_nsec);
-	kprintf(" devs used:      %ld\n", driver->devices_used);
-	kprintf(" devs published: %ld\n", driver->devices.Count());
+	kprintf(" devs used:      %" B_PRIu32 "\n", driver->devices_used);
+	kprintf(" devs published: %" B_PRId32 "\n", driver->devices.Count());
 	kprintf(" binary updated: %d\n", driver->binary_updated);
-	kprintf(" priority:       %ld\n", driver->priority);
-	kprintf(" api version:    %ld\n", driver->api_version);
+	kprintf(" priority:       %" B_PRId32 "\n", driver->priority);
+	kprintf(" api version:    %" B_PRId32 "\n", driver->api_version);
 	kprintf(" hooks:          find_device %p, publish_devices %p\n"
 		"                 uninit_driver %p, uninit_hardware %p\n",
 		driver->find_device, driver->publish_devices, driver->uninit_driver,
@@ -883,7 +883,8 @@ dump_driver(int argc, char** argv)
 			if (driver == NULL)
 				break;
 
-			kprintf("%p  %5ld %3ld %5ld %c %3ld %s\n", driver,
+			kprintf("%p  %5" B_PRId32 " %3" B_PRIu32 " %5" B_PRId32 " %c "
+				"%3" B_PRId32 " %s\n", driver,
 				driver->image < 0 ? -1 : driver->image,
 				driver->devices_used, driver->devices.Count(),
 				driver->binary_updated ? 'U' : ' ', driver->priority,

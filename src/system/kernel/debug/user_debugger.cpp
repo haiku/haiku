@@ -540,7 +540,7 @@ thread_hit_debug_event_internal(debug_debugger_message event,
 	port_id port = -1;
 	if (setPort) {
 		char nameBuffer[128];
-		snprintf(nameBuffer, sizeof(nameBuffer), "nub to thread %ld",
+		snprintf(nameBuffer, sizeof(nameBuffer), "nub to thread %" B_PRId32,
 			thread->id);
 
 		port = create_port(1, nameBuffer);
@@ -811,7 +811,7 @@ thread_hit_serious_debug_event(debug_debugger_message event,
 	if (error != B_OK) {
 		Thread *thread = thread_get_current_thread();
 		dprintf("thread_hit_serious_debug_event(): Failed to install debugger: "
-			"thread: %ld: %s\n", thread->id, strerror(error));
+			"thread: %" B_PRId32 ": %s\n", thread->id, strerror(error));
 		return error;
 	}
 
@@ -2632,14 +2632,14 @@ install_team_debugger(team_id teamID, port_id debuggerPort,
 
 	// create the debugger write lock semaphore
 	char nameBuffer[B_OS_NAME_LENGTH];
-	snprintf(nameBuffer, sizeof(nameBuffer), "team %ld debugger port write",
-		teamID);
+	snprintf(nameBuffer, sizeof(nameBuffer), "team %" B_PRId32 " debugger port "
+		"write", teamID);
 	sem_id debuggerWriteLock = create_sem(1, nameBuffer);
 	if (debuggerWriteLock < 0)
 		error = debuggerWriteLock;
 
 	// create the nub port
-	snprintf(nameBuffer, sizeof(nameBuffer), "team %ld debug", teamID);
+	snprintf(nameBuffer, sizeof(nameBuffer), "team %" B_PRId32 " debug", teamID);
 	if (error == B_OK) {
 		nubPort = create_port(1, nameBuffer);
 		if (nubPort < 0)
@@ -2666,7 +2666,8 @@ install_team_debugger(team_id teamID, port_id debuggerPort,
 	// spawn the nub thread
 	thread_id nubThread = -1;
 	if (error == B_OK) {
-		snprintf(nameBuffer, sizeof(nameBuffer), "team %ld debug task", teamID);
+		snprintf(nameBuffer, sizeof(nameBuffer), "team %" B_PRId32 " debug task",
+			teamID);
 		nubThread = spawn_kernel_thread_etc(debug_nub_thread, nameBuffer,
 			B_NORMAL_PRIORITY, NULL, teamID);
 		if (nubThread < 0)

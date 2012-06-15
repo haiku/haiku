@@ -2041,7 +2041,7 @@ MemoryManager::_DumpAreas(int argc, char** argv)
 	kprintf("  medium:   %" B_PRIuSIZE "/%" B_PRIuSIZE "\n", totalUsedMedium,
 		totalTotalMedium);
 	kprintf("  large:    %" B_PRIuSIZE "\n", totalUsedLarge);
-	kprintf("  memory:   %" B_PRIuSIZE "/%" B_PRIuSIZE " KB\n",
+	kprintf("  memory:   %" B_PRIuSIZE "/%" B_PRIu32 " KB\n",
 		(totalUsedSmall * SLAB_CHUNK_SIZE_SMALL
 			+ totalUsedMedium * SLAB_CHUNK_SIZE_MEDIUM
 			+ totalUsedLarge * SLAB_CHUNK_SIZE_LARGE) / 1024,

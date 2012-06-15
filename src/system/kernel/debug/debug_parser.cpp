@@ -130,8 +130,8 @@ parse_exception(const char* message, int32 position)
 {
 	if (sNextJumpBufferIndex == 0) {
 		kprintf_unfiltered("parse_exception(): No jump buffer!\n");
-		kprintf_unfiltered("exception: \"%s\", position: %lu\n", message,
-			position);
+		kprintf_unfiltered("exception: \"%s\", position: %" B_PRId32 "\n",
+			message, position);
 		return;
 	}
 
