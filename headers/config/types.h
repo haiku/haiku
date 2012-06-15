@@ -22,6 +22,7 @@ typedef signed int			__haiku_std_int32;
 typedef unsigned int		__haiku_std_uint32;
 typedef signed long long	__haiku_std_int64;
 typedef unsigned long long	__haiku_std_uint64;
+	// TODO: on x86_64 these should be long
 
 typedef __haiku_std_int8	__haiku_int8;
 typedef __haiku_std_uint8	__haiku_uint8;
