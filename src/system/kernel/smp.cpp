@@ -861,7 +861,7 @@ smp_intercpu_int_handler(int32 cpu)
 
 void
 smp_send_ici(int32 targetCPU, int32 message, addr_t data, addr_t data2,
-	addr_t data3, void* dataPointer, addr_t flags)
+	addr_t data3, void* dataPointer, uint32 flags)
 {
 	struct smp_msg *msg;
 
