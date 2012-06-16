@@ -28,8 +28,6 @@ public:
 			uint64			ClientId(uint64 prevId = 0, bool forceNew = false);
 			void			ReleaseCID(uint64 cid);
 
-	inline	uint32			SequenceId();
-
 	inline	uint32			LeaseTime();
 private:
 			status_t		_ReclaimOpen(OpenFileCookie* cookie);
@@ -48,19 +46,11 @@ private:
 			uint32			fCIDUseCount;
 			mutex			fLock;
 
-			vint32			fSequenceId;
-
 			OpenFileCookie*	fOpenFiles;
 			mutex			fOpenLock;
 
 			RPC::Server*	fServer;
 };
-
-inline uint32
-NFS4Server::SequenceId()
-{
-	return static_cast<uint32>(atomic_add(&fSequenceId, 1));
-}
 
 
 inline uint32

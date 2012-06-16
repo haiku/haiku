@@ -17,7 +17,6 @@ NFS4Server::NFS4Server(RPC::Server* serv)
 	fThreadCancel(true),
 	fLeaseTime(0),
 	fCIDUseCount(0),
-	fSequenceId(0),
 	fOpenFiles(NULL),
 	fServer(serv)
 {
@@ -72,11 +71,10 @@ NFS4Server::_ReclaimOpen(OpenFileCookie* cookie)
 	RequestBuilder& req = request.Builder();
 
 	req.PutFH(cookie->fHandle);
-	req.Open(CLAIM_PREVIOUS, SequenceId(), OPEN4_SHARE_ACCESS_READ,
-		cookie->fClientId, OPEN4_NOCREATE, cookie->fOwnerTime,
-		cookie->fOwnerTID, NULL);
+	req.Open(CLAIM_PREVIOUS, cookie->fSequence++, OPEN4_SHARE_ACCESS_READ,
+		cookie->fClientId, OPEN4_NOCREATE, cookie->fOwnerId, NULL);
 
-	status_t result = request.Send();
+	status_t result = request.Send();;
 	if (result != B_OK)
 		return result;
 
@@ -95,7 +93,8 @@ NFS4Server::_ReclaimOpen(OpenFileCookie* cookie)
 		request.Reset();
 
 		req.PutFH(cookie->fHandle);
-		req.OpenConfirm(SequenceId(), cookie->fStateId, cookie->fStateSeq);
+		req.OpenConfirm(cookie->fSequence++, cookie->fStateId,
+			cookie->fStateSeq);
 
 		result = request.Send();
 		if (result != B_OK)

@@ -15,6 +15,9 @@
 #include "Request.h"
 
 
+vint64 OpenFileCookie::fLastOwnerId = 0;
+
+
 Inode::Inode()
 {
 }
@@ -395,6 +398,7 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 
 	cookie->fHandle = fHandle;
 	cookie->fMode = mode;
+	cookie->fSequence = 0;
 
 	do {
 		cookie->fClientId = fFilesystem->NFSServer()->ClientId();
@@ -402,13 +406,11 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 		Request request(fFilesystem->Server());
 		RequestBuilder& req = request.Builder();
 
-		cookie->fOwnerTime = time(NULL);
-		cookie->fOwnerTID = find_thread(NULL);
+		cookie->fOwnerId = atomic_add64(&cookie->fLastOwnerId, 1);
 
 		req.PutFH(fParentFH);
-		req.Open(CLAIM_NULL, fFilesystem->NFSServer()->SequenceId(),
-			OPEN4_SHARE_ACCESS_READ, cookie->fClientId, OPEN4_NOCREATE,
-			cookie->fOwnerTime, cookie->fOwnerTID, fName);
+		req.Open(CLAIM_NULL, cookie->fSequence++, OPEN4_SHARE_ACCESS_READ,
+			cookie->fClientId, OPEN4_NOCREATE, cookie->fOwnerId, fName);
 
 		result = request.Send();
 		if (result != B_OK)
@@ -434,7 +436,6 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 		if (result != B_OK)
 			return result;
 
-
 		result = reply.Open(cookie->fStateId, &cookie->fStateSeq, &confirm);
 		if (result != B_OK)
 			return result;
@@ -450,8 +451,8 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fHandle);
-		req.OpenConfirm(fFilesystem->NFSServer()->SequenceId(),
-			cookie->fStateId, cookie->fStateSeq);
+		req.OpenConfirm(cookie->fSequence++, cookie->fStateId,
+			cookie->fStateSeq);
 
 		result = request.Send();
 		if (result != B_OK) {
@@ -488,7 +489,7 @@ Inode::Close(OpenFileCookie* cookie)
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fHandle);
-		req.Close(fFilesystem->NFSServer()->SequenceId(), cookie->fStateId,
+		req.Close(cookie->fSequence++, cookie->fStateId,
 			cookie->fStateSeq);
 
 		status_t result = request.Send();

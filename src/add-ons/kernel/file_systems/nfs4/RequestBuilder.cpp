@@ -153,7 +153,7 @@ RequestBuilder::LookUpUp()
 
 status_t
 RequestBuilder::Open(OpenClaim claim, uint32 seq, uint32 access, uint64 id,
-	OpenCreate oc, uint32 ownerTime, uint32 ownerTID, const char* name)
+	OpenCreate oc, uint64 ownerId, const char* name)
 {
 	if (fProcedure != ProcCompound)
 		return B_BAD_VALUE;
@@ -168,11 +168,8 @@ RequestBuilder::Open(OpenClaim claim, uint32 seq, uint32 access, uint64 id,
 
 	char owner[128];
 	int pos = 0;
-	*(uint32*)(owner + pos) = ownerTime;
-	pos += sizeof(uint32);
-
-	*(uint32*)(owner + pos) = ownerTID;
-	pos += sizeof(uint32);
+	*(uint64*)(owner + pos) = ownerId;
+	pos += sizeof(uint64);
 
 	fRequest->Stream().AddOpaque(owner, pos);
 
