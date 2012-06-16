@@ -17,9 +17,7 @@
 
 class InodeIdMap {
 public:
-	inline	status_t						AddEntry(const Filehandle& fh,
-												const Filehandle& parent,
-												const char* name, uint64 fileId,
+	inline	status_t						AddEntry(const FileInfo& fi,
 												ino_t id);
 	inline	status_t						GetFileInfo(FileInfo* fi, ino_t id);
 
@@ -30,14 +28,8 @@ private:
 
 
 inline status_t
-InodeIdMap::AddEntry(const Filehandle& fh, const Filehandle& parent,
-	const char* name, uint64 fileId, ino_t id)
+InodeIdMap::AddEntry(const FileInfo& fi, ino_t id)
 {
-	FileInfo fi;
-	fi.fFileId = fileId;
-	fi.fFH = fh;
-	fi.fParent = parent;
-	fi.fName = strdup(name);
 	return fMap.Insert(id, fi);
 }
 

@@ -18,6 +18,7 @@
 
 Filesystem::Filesystem()
 	:
+	fPath(NULL),
 	fId(1)
 {
 }
@@ -25,6 +26,7 @@ Filesystem::Filesystem()
 
 Filesystem::~Filesystem()
 {
+	free(const_cast<char*>(fPath));
 }
 
 
@@ -60,8 +62,6 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
 
 	req.GetFH();
 	req.Access();
-	Attribute attr[] = { FATTR4_FH_EXPIRE_TYPE };
-	req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
 
 	status_t result = request.Send();
 	if (result != B_OK)
@@ -92,31 +92,11 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
 				!= (ACCESS4_READ | ACCESS4_LOOKUP))
 		return B_PERMISSION_DENIED;
 
-	AttrValue* values;
-	uint32 count;
-	result = reply.GetAttr(&values, &count);
-	if (result != B_OK)
-		return result;
-
-	if (count != 1 || values[0].fAttribute != FATTR4_FH_EXPIRE_TYPE) {
-		delete[] values;
-		return B_BAD_VALUE;
-	}
-
-	// Currently, only persistent filehandles are supported. That will be
-	// changed soon.
-	if (values[0].fData.fValue32 != FH4_PERSISTENT) {
-		delete[] values;
-		return B_UNSUPPORTED;
-	}
-
 	Filesystem* fs = new(std::nothrow) Filesystem;
-	fs->fFHExpiryType = values[0].fData.fValue32;
+	fs->fPath = strdup(fsPath);
 	memcpy(&fs->fRootFH, &fh, sizeof(Filehandle));
 	fs->fServer = serv;
 	fs->fDevId = id;
-
-	delete[] values;
 
 	*pfs = fs;
 
@@ -152,6 +132,7 @@ Filesystem::CreateRootInode()
 	fi.fFH = fRootFH;
 	fi.fParent = fRootFH;
 	fi.fName = strdup("/");
+	fi.fPath = strdup(fPath);
 
 	Inode* inode;
 	status_t result = Inode::CreateInode(this, fi, &inode);

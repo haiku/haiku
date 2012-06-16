@@ -61,6 +61,8 @@ public:
 private:
 								Inode();
 
+					status_t	_LookUpFilehandle();
+
 					status_t	_ReadDirOnce(DirEntry** dirents, uint32* count,
 									uint64* cookie, bool* eof);
 					status_t	_FillDirEntry(struct dirent* de, ino_t id,
@@ -78,6 +80,8 @@ private:
 
 					Filehandle	fParentFH;
 					const char*	fName;
+
+					const char*	fPath;
 };
 
 

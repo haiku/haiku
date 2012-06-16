@@ -26,8 +26,6 @@ public:
 			status_t		GetInode(ino_t id, Inode** inode);
 			Inode*			CreateRootInode();
 
-	inline	uint32			FHExpiryType() const;
-
 	inline	RPC::Server*	Server();
 	inline	NFS4Server*		NFSServer();
 
@@ -38,7 +36,7 @@ public:
 private:
 							Filesystem();
 
-			uint32			fFHExpiryType;
+			const char*		fPath;
 
 			Filehandle		fRootFH;
 

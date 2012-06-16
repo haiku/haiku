@@ -20,8 +20,6 @@ Inode::Inode()
 }
 
 
-// Creating Inode object from Filehandle probably is not a good idea when
-// filehandles are volatile.
 status_t
 Inode::CreateInode(Filesystem* fs, const FileInfo &fi, Inode** _inode)
 {
@@ -33,47 +31,56 @@ Inode::CreateInode(Filesystem* fs, const FileInfo &fi, Inode** _inode)
 	inode->fFilesystem = fs;
 	inode->fParentFH = fi.fParent;
 	inode->fName = strdup(fi.fName);
+	inode->fPath = strdup(fi.fPath);
 
-	Request request(fs->Server());
-	RequestBuilder& req = request.Builder();
+	do {
+		Request request(fs->Server());
+		RequestBuilder& req = request.Builder();
 
-	req.PutFH(inode->fHandle);
+		req.PutFH(inode->fHandle);
 
-	Attribute attr[] = { FATTR4_TYPE, FATTR4_FILEID };
-	req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
+		Attribute attr[] = { FATTR4_TYPE, FATTR4_FILEID };
+		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
 
-	status_t result = request.Send();
-	if (result != B_OK)
-		return result;
+		status_t result = request.Send();
+		if (result != B_OK)
+			return result;
 
-	ReplyInterpreter& reply = request.Reply();
+		ReplyInterpreter& reply = request.Reply();
 
-	result = reply.PutFH();
-	if (result != B_OK)
-		return result;
+		// filehandle has expired
+		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
+			inode->_LookUpFilehandle();
+			continue;
+		}
 
-	AttrValue* values;
-	uint32 count;
-	result = reply.GetAttr(&values, &count);
-	if (result != B_OK || count < 1)
-		return result;
+		result = reply.PutFH();
+		if (result != B_OK)
+			return result;
 
-	if (fi.fFileId == 0) {
-		if (count < 2 || values[1].fAttribute != FATTR4_FILEID)
-			inode->fFileId = fs->AllocFileId();
-		else
-			inode->fFileId = values[1].fData.fValue64;
-	} else
-		inode->fFileId = fi.fFileId;
+		AttrValue* values;
+		uint32 count;
+		result = reply.GetAttr(&values, &count);
+		if (result != B_OK || count < 1)
+			return result;
 
-	// FATTR4_TYPE is mandatory
-	inode->fType = values[0].fData.fValue32;
+		if (fi.fFileId == 0) {
+			if (count < 2 || values[1].fAttribute != FATTR4_FILEID)
+				inode->fFileId = fs->AllocFileId();
+			else
+				inode->fFileId = values[1].fData.fValue64;
+		} else
+			inode->fFileId = fi.fFileId;
 
-	delete[] values;
+		// FATTR4_TYPE is mandatory
+		inode->fType = values[0].fData.fValue32;
 
-	*_inode = inode;
+		delete[] values;
 
-	return B_OK;
+		*_inode = inode;
+
+		return B_OK;
+	} while (true);
 }
 
 
@@ -94,60 +101,82 @@ Inode::LookUp(const char* name, ino_t* id)
 		return B_OK;
 	}
 
-	Request request(fFilesystem->Server());
-	RequestBuilder& req = request.Builder();
+	do {
+		Request request(fFilesystem->Server());
+		RequestBuilder& req = request.Builder();
 
-	req.PutFH(fHandle);
+		req.PutFH(fHandle);
 
-	if (!strcmp(name, ".."))
-		req.LookUpUp();
-	else
-		req.LookUp(name);
+		if (!strcmp(name, ".."))
+			req.LookUpUp();
+		else
+			req.LookUp(name);
 
-	req.GetFH();
+		req.GetFH();
 
-	Attribute attr[] = { FATTR4_FILEID };
-	req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
+		Attribute attr[] = { FATTR4_FILEID };
+		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
 
-	status_t result = request.Send();
-	if (result != B_OK)
-		return result;
+		status_t result = request.Send();
+		if (result != B_OK)
+			return result;
 
-	ReplyInterpreter& reply = request.Reply();
+		ReplyInterpreter& reply = request.Reply();
 
-	result = reply.PutFH();
-	if (result != B_OK)
-		return result;
+		// filehandle has expired
+		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
+			_LookUpFilehandle();
+			continue;
+		}
 
-	if (!strcmp(name, ".."))
-		result = reply.LookUpUp();
-	else
-		result = reply.LookUp();
-	if (result != B_OK)
-		return result;
+		result = reply.PutFH();
+		if (result != B_OK)
+			return result;
 
-	Filehandle fh;
-	result = reply.GetFH(&fh);
-	if (result != B_OK)
-		return result;
+		if (!strcmp(name, ".."))
+			result = reply.LookUpUp();
+		else
+			result = reply.LookUp();
+		if (result != B_OK)
+			return result;
 
-	AttrValue* values;
-	uint32 count;
-	result = reply.GetAttr(&values, &count);
-	if (result != B_OK)
-		return result;
+		Filehandle fh;
+		result = reply.GetFH(&fh);
+		if (result != B_OK)
+			return result;
 
-	uint64 fileId;
-	if (count < 1 || values[0].fAttribute != FATTR4_FILEID)
-		fileId = fFilesystem->AllocFileId();
-	else
-		fileId = values[0].fData.fValue64;
-	delete[] values;
+		AttrValue* values;
+		uint32 count;
+		result = reply.GetAttr(&values, &count);
+		if (result != B_OK)
+			return result;
 
-	*id = _FileIdToInoT(fileId);
-	fFilesystem->InoIdMap()->AddEntry(fh, fHandle, name, fileId, *id);
+		uint64 fileId;
+		if (count < 1 || values[0].fAttribute != FATTR4_FILEID)
+			fileId = fFilesystem->AllocFileId();
+		else
+			fileId = values[0].fData.fValue64;
+		delete[] values;
 
-	return B_OK;
+		*id = _FileIdToInoT(fileId);
+
+		FileInfo fi;
+		fi.fFileId = fileId;
+		fi.fFH = fh;
+		fi.fParent = fHandle;
+		fi.fName = strdup(name);
+
+		char* path = reinterpret_cast<char*>(malloc(strlen(name) + 2 +
+			strlen(fPath)));
+		strcpy(path, fPath);
+		strcat(path, "/");
+		strcat(path, name);
+		fi.fPath = path;
+
+		fFilesystem->InoIdMap()->AddEntry(fi, *id);
+
+		return B_OK;
+	} while (true);
 }
 
 
@@ -157,179 +186,204 @@ Inode::ReadLink(void* buffer, size_t* length)
 	if (fType != NF4LNK)
 		return B_BAD_VALUE;
 
-	Request request(fFilesystem->Server());
-	RequestBuilder& req = request.Builder();
+	do {
+		Request request(fFilesystem->Server());
+		RequestBuilder& req = request.Builder();
 
-	req.PutFH(fHandle);
-	req.ReadLink();	
+		req.PutFH(fHandle);
+		req.ReadLink();	
 
-	status_t result = request.Send();
-	if (result != B_OK)
+		status_t result = request.Send();
+		if (result != B_OK)
+			return result;
+
+		ReplyInterpreter& reply = request.Reply();
+
+		// filehandle has expired
+		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
+			_LookUpFilehandle();
+			continue;
+		}
+
+		result = reply.PutFH();
+		if (result != B_OK)
+			return result;
+
+		uint32 size;
+		result = reply.ReadLink(buffer, &size, *length);
+		*length = static_cast<size_t>(size);
+
 		return result;
-
-	ReplyInterpreter& reply = request.Reply();
-
-	result = reply.PutFH();
-	if (result != B_OK)
-		return result;
-
-	uint32 size;
-	result = reply.ReadLink(buffer, &size, *length);
-	*length = static_cast<size_t>(size);
-
-	return result;
+	} while (true);
 }
 
 
 status_t
 Inode::Access(int mode)
 {
-	Request request(fFilesystem->Server());
-	RequestBuilder& req = request.Builder();
+	do {
+		Request request(fFilesystem->Server());
+		RequestBuilder& req = request.Builder();
 
-	req.PutFH(fHandle);
-	req.Access();
+		req.PutFH(fHandle);
+		req.Access();
 
-	status_t result = request.Send();
-	if (result != B_OK)
-		return result;
+		status_t result = request.Send();
+		if (result != B_OK)
+			return result;
 
-	ReplyInterpreter& reply = request.Reply();
+		ReplyInterpreter& reply = request.Reply();
 
-	result = reply.PutFH();
-	if (result != B_OK)
-		return result;
+		// filehandle has expired
+		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
+			_LookUpFilehandle();
+			continue;
+		}
 
-	uint32 allowed;
-	result = reply.Access(NULL, &allowed);
-	if (result != B_OK)
-		return result;
+		result = reply.PutFH();
+		if (result != B_OK)
+			return result;
 
-	int acc = 0;
-	if ((allowed & ACCESS4_READ) != 0)
-		acc |= R_OK;
+		uint32 allowed;
+		result = reply.Access(NULL, &allowed);
+		if (result != B_OK)
+			return result;
 
-	if (fType == NF4DIR && (allowed & ACCESS4_LOOKUP) != 0)
-		acc |= X_OK | R_OK;
+		int acc = 0;
+		if ((allowed & ACCESS4_READ) != 0)
+			acc |= R_OK;
 
-	if (fType != NF4DIR && (allowed & ACCESS4_EXECUTE) != 0)
-		acc |= X_OK;
+		if (fType == NF4DIR && (allowed & ACCESS4_LOOKUP) != 0)
+			acc |= X_OK | R_OK;
 
-	if ((allowed & ACCESS4_MODIFY) != 0)
-		acc |= W_OK;
+		if (fType != NF4DIR && (allowed & ACCESS4_EXECUTE) != 0)
+			acc |= X_OK;
 
-	if ((mode & acc) != mode)
-		return B_NOT_ALLOWED;
+		if ((allowed & ACCESS4_MODIFY) != 0)
+			acc |= W_OK;
 
-	return B_OK;
+		if ((mode & acc) != mode)
+			return B_NOT_ALLOWED;
+
+		return B_OK;
+	} while (true);
 }
 
 
 status_t
 Inode::Stat(struct stat* st)
 {
-	Request request(fFilesystem->Server());
-	RequestBuilder& req = request.Builder();
+	do {
+		Request request(fFilesystem->Server());
+		RequestBuilder& req = request.Builder();
 
-	req.PutFH(fHandle);
+		req.PutFH(fHandle);
 
-	Attribute attr[] = { FATTR4_SIZE, FATTR4_MODE, FATTR4_NUMLINKS,
-						FATTR4_TIME_ACCESS, FATTR4_TIME_CREATE,
-						FATTR4_TIME_METADATA, FATTR4_TIME_MODIFY };
-	req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
+		Attribute attr[] = { FATTR4_SIZE, FATTR4_MODE, FATTR4_NUMLINKS,
+							FATTR4_TIME_ACCESS, FATTR4_TIME_CREATE,
+							FATTR4_TIME_METADATA, FATTR4_TIME_MODIFY };
+		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
 
-	status_t result = request.Send();
-	if (result != B_OK)
-		return result;
+		status_t result = request.Send();
+		if (result != B_OK)
+			return result;
 
-	ReplyInterpreter& reply = request.Reply();
+		ReplyInterpreter& reply = request.Reply();
 
-	result = reply.PutFH();
-	if (result != B_OK)
-		return result;
+		// filehandle has expired
+		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
+			_LookUpFilehandle();
+			continue;
+		}
 
-	AttrValue* values;
-	uint32 count;
-	result = reply.GetAttr(&values, &count);
-	if (result != B_OK)
-		return result;
+		result = reply.PutFH();
+		if (result != B_OK)
+			return result;
 
-	// FATTR4_SIZE is mandatory
-	if (count < 1 || values[0].fAttribute != FATTR4_SIZE) {
+		AttrValue* values;
+		uint32 count;
+		result = reply.GetAttr(&values, &count);
+		if (result != B_OK)
+			return result;
+
+		// FATTR4_SIZE is mandatory
+		if (count < 1 || values[0].fAttribute != FATTR4_SIZE) {
+			delete[] values;
+			return B_BAD_VALUE;
+		}
+		st->st_size = values[0].fData.fValue64;
+
+		uint32 next = 1;
+		st->st_mode = Type();
+		if (count >= next && values[next].fAttribute == FATTR4_MODE) {
+			st->st_mode |= values[next].fData.fValue32;
+			next++;
+		} else {
+			// Try to guess using ACCESS request
+			request.Reset();
+			request.Builder().PutFH(fHandle);
+			request.Builder().Access();
+			result = request.Send();
+			if (result != B_OK)
+				return result;
+			result = request.Reply().PutFH();
+			if (result != B_OK)
+				return result;
+			uint32 prvl;
+			result = request.Reply().Access(NULL, &prvl);
+			if (result != B_OK)
+				return result;
+
+			if ((prvl & ACCESS4_READ) != 0)
+				st->st_mode |= S_IRUSR | S_IRGRP | S_IROTH;
+
+			if ((prvl & ACCESS4_MODIFY) != 0)
+				st->st_mode |= S_IWUSR | S_IWGRP | S_IWOTH;
+
+			if (fType == NF4DIR && (prvl & ACCESS4_LOOKUP) != 0)
+				st->st_mode |= S_IXUSR | S_IXGRP | S_IXOTH;
+
+			if (fType != NF4DIR && (prvl & ACCESS4_EXECUTE) != 0)
+				st->st_mode |= S_IXUSR | S_IXGRP | S_IXOTH;
+		}
+
+		if (count >= next && values[next].fAttribute == FATTR4_NUMLINKS) {
+			st->st_nlink = values[next].fData.fValue32;
+			next++;
+		} else
+			st->st_nlink = 1;
+
+		if (count >= next && values[next].fAttribute == FATTR4_TIME_ACCESS) {
+			memcpy(&st->st_atim, values[next].fData.fPointer, sizeof(timespec));
+			next++;
+		} else
+			memset(&st->st_atim, 0, sizeof(timespec));
+
+		if (count >= next && values[next].fAttribute == FATTR4_TIME_CREATE) {
+			memcpy(&st->st_crtim, values[next].fData.fPointer,
+				sizeof(timespec));
+			next++;
+		} else
+			memset(&st->st_crtim, 0, sizeof(timespec));
+
+		if (count >= next && values[next].fAttribute == FATTR4_TIME_METADATA) {
+			memcpy(&st->st_ctim, values[next].fData.fPointer, sizeof(timespec));
+			next++;
+		} else
+			memset(&st->st_ctim, 0, sizeof(timespec));
+
+		if (count >= next && values[next].fAttribute == FATTR4_TIME_MODIFY) {
+			memcpy(&st->st_mtim, values[next].fData.fPointer, sizeof(timespec));
+			next++;
+		} else
+			memset(&st->st_mtim, 0, sizeof(timespec));
+
+		st->st_uid = 0;
+		st->st_gid = 0;
+
 		delete[] values;
-		return B_BAD_VALUE;
-	}
-	st->st_size = values[0].fData.fValue64;
-
-	uint32 next = 1;
-	st->st_mode = Type();
-	if (count >= next && values[next].fAttribute == FATTR4_MODE) {
-		st->st_mode |= values[next].fData.fValue32;
-		next++;
-	} else {
-		// Try to guess using ACCESS request
-		request.Reset();
-		request.Builder().PutFH(fHandle);
-		request.Builder().Access();
-		result = request.Send();
-		if (result != B_OK)
-			return result;
-		result = request.Reply().PutFH();
-		if (result != B_OK)
-			return result;
-		uint32 prvl;
-		result = request.Reply().Access(NULL, &prvl);
-		if (result != B_OK)
-			return result;
-
-		if ((prvl & ACCESS4_READ) != 0)
-			st->st_mode |= S_IRUSR | S_IRGRP | S_IROTH;
-
-		if ((prvl & ACCESS4_MODIFY) != 0)
-			st->st_mode |= S_IWUSR | S_IWGRP | S_IWOTH;
-
-		if (fType == NF4DIR && (prvl & ACCESS4_LOOKUP) != 0)
-			st->st_mode |= S_IXUSR | S_IXGRP | S_IXOTH;
-
-		if (fType != NF4DIR && (prvl & ACCESS4_EXECUTE) != 0)
-			st->st_mode |= S_IXUSR | S_IXGRP | S_IXOTH;
-	}
-
-	if (count >= next && values[next].fAttribute == FATTR4_NUMLINKS) {
-		st->st_nlink = values[next].fData.fValue32;
-		next++;
-	} else
-		st->st_nlink = 1;
-
-	if (count >= next && values[next].fAttribute == FATTR4_TIME_ACCESS) {
-		memcpy(&st->st_atim, values[next].fData.fPointer, sizeof(timespec));
-		next++;
-	} else
-		memset(&st->st_atim, 0, sizeof(timespec));
-
-	if (count >= next && values[next].fAttribute == FATTR4_TIME_CREATE) {
-		memcpy(&st->st_crtim, values[next].fData.fPointer, sizeof(timespec));
-		next++;
-	} else
-		memset(&st->st_crtim, 0, sizeof(timespec));
-
-	if (count >= next && values[next].fAttribute == FATTR4_TIME_METADATA) {
-		memcpy(&st->st_ctim, values[next].fData.fPointer, sizeof(timespec));
-		next++;
-	} else
-		memset(&st->st_ctim, 0, sizeof(timespec));
-
-	if (count >= next && values[next].fAttribute == FATTR4_TIME_MODIFY) {
-		memcpy(&st->st_mtim, values[next].fData.fPointer, sizeof(timespec));
-		next++;
-	} else
-		memset(&st->st_mtim, 0, sizeof(timespec));
-
-	st->st_uid = 0;
-	st->st_gid = 0;
-
-	delete[] values;
-	return B_OK;
+		return B_OK;
+	} while (true);
 }
 
 
@@ -361,6 +415,12 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 			return result;
 
 		ReplyInterpreter& reply = request.Reply();
+
+		// filehandle has expired
+		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
+			_LookUpFilehandle();
+			continue;
+		}
 
 		// server is in grace period, we need to wait
 		if (reply.NFS4Error() == NFS4ERR_GRACE) {
@@ -437,6 +497,12 @@ Inode::Close(OpenFileCookie* cookie)
 
 		ReplyInterpreter& reply = request.Reply();
 
+		// filehandle has expired
+		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
+			_LookUpFilehandle();
+			continue;
+		}
+
 		// server is in grace period, we need to wait
 		if (reply.NFS4Error() == NFS4ERR_GRACE) {
 			snooze_etc(fFilesystem->NFSServer()->LeaseTime() / 3,
@@ -483,6 +549,12 @@ Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length)
 
 			ReplyInterpreter& reply = request.Reply();
 
+			// filehandle has expired
+			if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
+				_LookUpFilehandle();
+				continue;
+			}
+
 			// server is in grace period, we need to wait
 			if (reply.NFS4Error() == NFS4ERR_GRACE) {
 				snooze_etc(fFilesystem->NFSServer()->LeaseTime() / 3,
@@ -524,34 +596,42 @@ Inode::OpenDir(uint64* cookie)
 	if (fType != NF4DIR)
 		return B_NOT_A_DIRECTORY;
 
-	Request request(fFilesystem->Server());
-	RequestBuilder& req = request.Builder();
+	do {
+		Request request(fFilesystem->Server());
+		RequestBuilder& req = request.Builder();
 
-	req.PutFH(fHandle);
-	req.Access();
+		req.PutFH(fHandle);
+		req.Access();
 
-	status_t result = request.Send();
-	if (result != B_OK)
-		return result;
+		status_t result = request.Send();
+		if (result != B_OK)
+			return result;
 
-	ReplyInterpreter& reply = request.Reply();
+		ReplyInterpreter& reply = request.Reply();
 
-	result = reply.PutFH();
-	if (result != B_OK)
-		return result;
+		// filehandle has expired
+		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
+			_LookUpFilehandle();
+			continue;
+		}
 
-	uint32 allowed;
-	result = reply.Access(NULL, &allowed);
-	if (result != B_OK)
-		return result;
+		result = reply.PutFH();
+		if (result != B_OK)
+			return result;
 
-	if (allowed & ACCESS4_READ != ACCESS4_READ)
-		return B_PERMISSION_DENIED;
+		uint32 allowed;
+		result = reply.Access(NULL, &allowed);
+		if (result != B_OK)
+			return result;
 
-	cookie[0] = 0;
-	cookie[1] = 2;
+		if (allowed & ACCESS4_READ != ACCESS4_READ)
+			return B_PERMISSION_DENIED;
 
-	return B_OK;
+		cookie[0] = 0;
+		cookie[1] = 2;
+
+		return B_OK;
+	} while (true);
 }
 
 
@@ -559,25 +639,33 @@ status_t
 Inode::_ReadDirOnce(DirEntry** dirents, uint32* count, uint64* cookie,
 	bool* eof)
 {
-	Request request(fFilesystem->Server());
-	RequestBuilder& req = request.Builder();
+	do {
+		Request request(fFilesystem->Server());
+		RequestBuilder& req = request.Builder();
 
-	req.PutFH(fHandle);
+		req.PutFH(fHandle);
 
-	Attribute attr[] = { FATTR4_FILEID };
-	req.ReadDir(*count, cookie, attr, sizeof(attr) / sizeof(Attribute));
+		Attribute attr[] = { FATTR4_FILEID };
+		req.ReadDir(*count, cookie, attr, sizeof(attr) / sizeof(Attribute));
 
-	status_t result = request.Send();
-	if (result != B_OK)
-		return result;
+		status_t result = request.Send();
+		if (result != B_OK)
+			return result;
 
-	ReplyInterpreter& reply = request.Reply();
+		ReplyInterpreter& reply = request.Reply();
 
-	result = reply.PutFH();
-	if (result != B_OK)
-		return result;
+		// filehandle has expired
+		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
+			_LookUpFilehandle();
+			continue;
+		}
 
-	return reply.ReadDir(cookie, dirents, count, eof);
+		result = reply.PutFH();
+		if (result != B_OK)
+			return result;
+
+		return reply.ReadDir(cookie, dirents, count, eof);
+	} while (true);
 }
 
 
@@ -606,47 +694,55 @@ Inode::_FillDirEntry(struct dirent* de, ino_t id, const char* name, uint32 pos,
 status_t
 Inode::_ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 {
-	Request request(fFilesystem->Server());
-	RequestBuilder& req = request.Builder();
+	do {
+		Request request(fFilesystem->Server());
+		RequestBuilder& req = request.Builder();
 
-	req.PutFH(fHandle);
-	req.LookUpUp();
-	req.GetFH();
-	Attribute attr[] = { FATTR4_FILEID };
-	req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
+		req.PutFH(fHandle);
+		req.LookUpUp();
+		req.GetFH();
+		Attribute attr[] = { FATTR4_FILEID };
+		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
 
-	status_t result = request.Send();
-	if (result != B_OK)
-		return result;
+		status_t result = request.Send();
+		if (result != B_OK)
+			return result;
 
-	ReplyInterpreter& reply = request.Reply();
+		ReplyInterpreter& reply = request.Reply();
 
-	result = reply.PutFH();
-	if (result != B_OK)
-		return result;
+		// filehandle has expired
+		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
+			_LookUpFilehandle();
+			continue;
+		}
 
-	result = reply.LookUpUp();
-	if (result != B_OK)
-		return result;
+		result = reply.PutFH();
+		if (result != B_OK)
+			return result;
 
-	Filehandle fh;
-	result = reply.GetFH(&fh);
-	if (result != B_OK)
-		return result;
+		result = reply.LookUpUp();
+		if (result != B_OK)
+			return result;
 
-	AttrValue* values;
-	uint32 count;
-	result = reply.GetAttr(&values, &count);
-	if (result != B_OK)
-		return result;
+		Filehandle fh;
+		result = reply.GetFH(&fh);
+		if (result != B_OK)
+			return result;
 
-	uint64 fileId;
-	if (count < 1 || values[0].fAttribute != FATTR4_FILEID) {
-		fileId = fFilesystem->AllocFileId();
-	} else
-		fileId = values[0].fData.fValue64;
+		AttrValue* values;
+		uint32 count;
+		result = reply.GetAttr(&values, &count);
+		if (result != B_OK)
+			return result;
 
-	return _FillDirEntry(de, _FileIdToInoT(fileId), "..", pos, size);
+		uint64 fileId;
+		if (count < 1 || values[0].fAttribute != FATTR4_FILEID) {
+			fileId = fFilesystem->AllocFileId();
+		} else
+			fileId = values[0].fData.fValue64;
+
+		return _FillDirEntry(de, _FileIdToInoT(fileId), "..", pos, size);
+	} while (true);
 }
 
 // TODO: Currently inode numbers returned by ReadDir are virtually random.
@@ -724,5 +820,55 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count, uint64* cookie)
 	*_count = count;
 	
 	return B_OK;
+}
+
+
+status_t
+Inode::_LookUpFilehandle()
+{
+	Request request(fFilesystem->Server());
+	RequestBuilder& req = request.Builder();
+
+	req.PutRootFH();
+
+	uint32 lookupCount = 0;
+	char* path = strdup(fPath);
+	char* pathStart = path;
+	char* pathEnd;
+	while (pathStart != NULL) {
+		pathEnd = strpbrk(pathStart, "/");
+		if (pathEnd != NULL)
+			*pathEnd = '\0';
+
+		req.LookUp(pathStart);
+
+		if (pathEnd != NULL && pathEnd[1] != '\0')
+			pathStart = pathEnd + 1;
+		else
+			pathStart = NULL;
+
+		lookupCount++;
+	}
+	free(path);
+
+	req.GetFH();
+
+	status_t result = request.Send();
+	if (result != B_OK)
+		return result;
+
+	ReplyInterpreter& reply = request.Reply();
+
+	result = reply.PutRootFH();
+	if (result != B_OK)
+		return result;
+
+	for (uint32 i = 0; i < lookupCount; i++) {
+		result = reply.LookUp();
+		if (result != B_OK)
+			return result;
+	}
+
+	return reply.GetFH(&fHandle);
 }
 

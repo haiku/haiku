@@ -36,8 +36,7 @@ struct FileInfo {
 
 			Filehandle	fParent;
 			const char*	fName;
-
-			// ... full path may be needed if filehandles are volatile
+			const char*	fPath;
 
 	inline				FileInfo();
 	inline				~FileInfo();
@@ -76,7 +75,8 @@ inline
 FileInfo::FileInfo()
 	:
 	fFileId(0),
-	fName(NULL)
+	fName(NULL),
+	fPath(NULL)
 {
 }
 
@@ -85,6 +85,7 @@ inline
 FileInfo::~FileInfo()
 {
 	free(const_cast<char*>(fName));
+	free(const_cast<char*>(fPath));
 }
 
 
@@ -94,7 +95,8 @@ FileInfo::FileInfo(const FileInfo& fi)
 	fFileId(fi.fFileId),
 	fFH(fi.fFH),
 	fParent(fi.fParent),
-	fName(strdup(fi.fName))
+	fName(strdup(fi.fName)),
+	fPath(strdup(fi.fPath))
 {
 }
 
@@ -108,6 +110,10 @@ FileInfo::operator=(const FileInfo& fi)
 
 	free(const_cast<char*>(fName));
 	fName = strdup(fi.fName);
+
+	free(const_cast<char*>(fPath));
+	fPath = strdup(fi.fPath);
+
 	return *this;
 }
 
