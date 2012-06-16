@@ -4,7 +4,7 @@ OUTPUT_ARCH("i386:x86-64")
 ENTRY(_start)
 SECTIONS
 {
-	. = 0xFFFFFF8000000000 + SIZEOF_HEADERS;
+	. = 0xFFFFFFFF80000000 + SIZEOF_HEADERS;
 
 	.interp : { *(.interp) }
 	.hash : { *(.hash) }
