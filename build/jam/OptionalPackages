@@ -532,11 +532,11 @@ if [ IsOptionalHaikuImagePackageAdded Curl ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Curl available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		InstallOptionalHaikuImagePackage curl-7.21.7-x86-gcc4-2012-02-18.zip
-			: $(baseURL)/curl-7.21.7-x86-gcc4-2012-02-18.zip ;
+		InstallOptionalHaikuImagePackage curl-7.26.0-x86-gcc4-2012-06-15.zip
+			: $(baseURL)/curl-7.26.0-x86-gcc4-2012-06-15.zip ;
 	} else {
-		InstallOptionalHaikuImagePackage curl-7.21.7-x86-gcc2-2012-02-18.zip
-			: $(baseURL)/curl-7.21.7-x86-gcc2-2012-02-18.zip ;
+		InstallOptionalHaikuImagePackage curl-7.26.0-x86-gcc2-2012-06-15.zip
+			: $(baseURL)/curl-7.26.0-x86-gcc2-2012-06-15.zip ;
 	}
 }
 
@@ -1185,12 +1185,12 @@ if [ IsOptionalHaikuImagePackageAdded LibXML2 ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				libxml2-2.7.8-r1a3-x86-gcc4-2011-05-24.zip
-				: $(baseURL)/libxml2-2.7.8-r1a3-x86-gcc4-2011-05-24.zip ;
+				libxml2-2.8.0-x86-gcc4-2012-06-15.zip
+				: $(baseURL)/libxml2-2.8.0-x86-gcc4-2012-06-15.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				libxml2-2.7.8-r1a3-x86-gcc2-2011-05-18.zip
-				: $(baseURL)/libxml2-2.7.8-r1a3-x86-gcc2-2011-05-18.zip ;
+				libxml2-2.8.0-x86-gcc2-2012-06-15.zip
+				: $(baseURL)/libxml2-2.8.0-x86-gcc2-2012-06-15.zip ;
 		}
 	}
 }
@@ -1277,13 +1277,13 @@ if [ IsOptionalHaikuImagePackageAdded Mercurial ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				mercurial-1.8.3-r1a3-x86-gcc4-2011-05-24.zip
-				: $(baseURL)/mercurial-1.8.3-r1a3-x86-gcc4-2011-05-24.zip
+				mercurial-2.2.2-x86-gcc4-2012-06-15.zip
+				: $(baseURL)/mercurial-2.2.2-x86-gcc4-2012-06-15.zip
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				mercurial-1.8.3-r1a3-x86-gcc2-2011-05-17.zip
-				: $(baseURL)/mercurial-1.8.3-r1a3-x86-gcc2-2011-05-17.zip
+				mercurial-2.2.2-x86-gcc2-2012-06-15.zip
+				: $(baseURL)/mercurial-2.2.2-x86-gcc2-2012-06-15.zip
 				: : true ;
 		}
 	}
@@ -1449,12 +1449,12 @@ if [ IsOptionalHaikuImagePackageAdded P7zip ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				p7zip-9.13-r1a3-x86-gcc4-2011-05-24.zip
-				: $(baseURL)/p7zip-9.13-r1a3-x86-gcc4-2011-05-24.zip ;
+				p7zip-9.20.1-x86-gcc4-2012-06-15.zip
+				: $(baseURL)/p7zip-9.20.1-x86-gcc4-2011-06-15.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				p7zip-9.13-r1a3-x86-gcc2-2011-05-18.zip
-				: $(baseURL)/p7zip-9.13-r1a3-x86-gcc2-2011-05-18.zip ;
+				p7zip-9.20.1-x86-gcc2-2012-06-15.zip
+				: $(baseURL)/p7zip-9.20.1-x86-gcc2-2012-06-15.zip ;
 		}
 		AddExpanderRuleToHaikuImage "application/x-7z-compressed" : .7z
 			: "7za l \\0045s"
@@ -1664,12 +1664,12 @@ if [ IsOptionalHaikuImagePackageAdded TagLib ] {
 		Echo "No optional package TagLib available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
-			taglib-1.6.3-r1r3-x86-gcc4-2011-05-24.zip
-			: $(baseURL)/taglib-1.6.3-r1r3-x86-gcc4-2011-05-24.zip ;
+			taglib-1.7.2-x86-gcc4-2012-06-15.zip
+			: $(baseURL)/taglib-1.7.2-x86-gcc4-2012-06-15.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			taglib-1.6.3-r1a3-x86-gcc2-2011-05-20.zip
-			: $(baseURL)/taglib-1.6.3-r1a3-x86-gcc2-2011-05-20.zip ;
+			taglib-1.7.2-x86-gcc2-2012-06-15.zip
+			: $(baseURL)/taglib-1.7.2-x86-gcc2-2012-06-15.zip ;
 	}
 }
 
@@ -1681,12 +1681,12 @@ if [ IsOptionalHaikuImagePackageAdded Tar ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				tar-1.25-r1a3-x86-gcc4-2011-05-24.zip
-				: $(baseURL)/tar-1.25-r1a3-x86-gcc4-2011-05-24.zip ;
+				tar-1.26-x86-gcc4-2012-06-15.zip
+				: $(baseURL)/tar-1.26-x86-gcc4-2012-06-15.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				tar-1.25-r1a3-x86-gcc2-2011-05-20.zip
-				: $(baseURL)/tar-1.25-r1a3-x86-gcc2-2011-05-20.zip ;
+				tar-1.26-x86-gcc2-2012-06-15.zip
+				: $(baseURL)/tar-1.26-x86-gcc2-2012-06-15.zip ;
 		}
 	}
 }
@@ -1973,11 +1973,11 @@ if [ IsOptionalHaikuImagePackageAdded Yasm ] {
 		Echo "No optional package Yasm available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
-			yasm-1.1.0-r1a3-x86-gcc4-2011-05-24.zip
-			: $(baseURL)/yasm-1.1.0-r1a3-x86-gcc4-2011-05-24.zip ;
+			yasm-1.2.0-x86-gcc4-2012-06-15.zip
+			: $(baseURL)/yasm-1.2.0-x86-gcc4-2012-06-15.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			yasm-1.1.0-r1a3-x86-gcc2-2011-05-17.zip
-			: $(baseURL)/yasm-1.1.0-r1a3-x86-gcc2-2011-05-17.zip ;
+			yasm-1.2.0-x86-gcc2-2012-06-15.zip
+			: $(baseURL)/yasm-1.2.0-x86-gcc2-2012-06-15.zip ;
 	}
 }
