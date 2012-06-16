@@ -317,7 +317,7 @@ CPUButton::AttachedToWindow()
 	fReplicantInDeskbar = false;
 
 	if (fReplicant) {
-		if (strcmp(Window()->Title(), B_TRANSLATE("Deskbar")) == 0) {
+		if (strcmp(Window()->Title(), B_TRANSLATE("Deskbar"))) {
 			// Make room for dragger
 			ResizeBy(4, 4);
 
