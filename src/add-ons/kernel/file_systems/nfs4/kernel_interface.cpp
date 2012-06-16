@@ -113,6 +113,14 @@ nfs4_unmount(fs_volume* volume)
 
 
 static status_t
+nfs4_read_fs_info(fs_volume* volume, struct fs_info* info)
+{
+	Filesystem* fs = reinterpret_cast<Filesystem*>(volume->private_volume);
+	return fs->ReadInfo(info);
+}
+
+
+static status_t
 nfs4_lookup(fs_volume* volume, fs_vnode* dir, const char* name, ino_t* _id)
 {
 	Inode* inode = reinterpret_cast<Inode*>(dir->private_node);
@@ -323,7 +331,7 @@ nfs4_std_ops(int32 op, ...)
 
 fs_volume_ops gNFSv4VolumeOps = {
 	nfs4_unmount,
-	NULL,
+	nfs4_read_fs_info,
 	NULL,
 	NULL,
 	nfs4_get_vnode,

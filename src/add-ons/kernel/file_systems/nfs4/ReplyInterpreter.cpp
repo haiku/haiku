@@ -349,6 +349,30 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 		current++;
 	}
 
+	if (sIsAttrSet(FATTR4_FILES_FREE, bitmap, bcount)) {
+		values[current].fAttribute = FATTR4_FILES_FREE;
+		values[current].fData.fValue64 = stream.GetUHyper();
+		current++;
+	}
+
+	if (sIsAttrSet(FATTR4_FILES_TOTAL, bitmap, bcount)) {
+		values[current].fAttribute = FATTR4_FILES_TOTAL;
+		values[current].fData.fValue64 = stream.GetUHyper();
+		current++;
+	}
+
+	if (sIsAttrSet(FATTR4_MAXREAD, bitmap, bcount)) {
+		values[current].fAttribute = FATTR4_MAXREAD;
+		values[current].fData.fValue64 = stream.GetUHyper();
+		current++;
+	}
+
+	if (sIsAttrSet(FATTR4_MAXWRITE, bitmap, bcount)) {
+		values[current].fAttribute = FATTR4_MAXWRITE;
+		values[current].fData.fValue64 = stream.GetUHyper();
+		current++;
+	}
+
 	if (sIsAttrSet(FATTR4_MODE, bitmap, bcount)) {
 		values[current].fAttribute = FATTR4_MODE;
 		values[current].fData.fValue32 = stream.GetUInt();
@@ -358,6 +382,18 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 	if (sIsAttrSet(FATTR4_NUMLINKS, bitmap, bcount)) {
 		values[current].fAttribute = FATTR4_NUMLINKS;
 		values[current].fData.fValue32 = stream.GetUInt();
+		current++;
+	}
+
+	if (sIsAttrSet(FATTR4_SPACE_FREE, bitmap, bcount)) {
+		values[current].fAttribute = FATTR4_SPACE_FREE;
+		values[current].fData.fValue64 = stream.GetUHyper();
+		current++;
+	}
+
+	if (sIsAttrSet(FATTR4_SPACE_TOTAL, bitmap, bcount)) {
+		values[current].fAttribute = FATTR4_SPACE_TOTAL;
+		values[current].fData.fValue64 = stream.GetUHyper();
 		current++;
 	}
 

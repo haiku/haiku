@@ -9,6 +9,8 @@
 #define FILESYSTEM_H
 
 
+#include <fs_info.h>
+
 #include "InodeIdMap.h"
 #include "NFS4Defs.h"
 #include "NFS4Server.h"
@@ -25,6 +27,8 @@ public:
 
 			status_t		GetInode(ino_t id, Inode** inode);
 			Inode*			CreateRootInode();
+
+			status_t		ReadInfo(struct fs_info* info);
 
 	inline	RPC::Server*	Server();
 	inline	NFS4Server*		NFSServer();
