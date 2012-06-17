@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright (c) 2010 Haiku, Inc.
+# Copyright (c) 2010-2012 Haiku, Inc.
 # Distributed under the terms of the MIT License.
 #
 # Authors:
@@ -120,21 +120,6 @@ function DownloadFileIfNotCached()
 		local msg="As a result, ${driver}'s firmware will not be installed."
 		alert --warning "$error $msg"
 	fi
-}
-
-
-function OpenIntelFirmwareWebpage()
-{
-	# OpenIntelFirmwareWebpage <url> <file>
-	local url="$1"
-	local file="$2"
-
-	echo "Downloading $file ..."
-	alert --info "A webpage is going to open. Download and save $file in ${firmwareDir}/${driver}/"
-
-	open "$url"
-
-	alert --info "Click OK after the $file has been saved in ${firmwareDir}/${driver}/"
 }
 
 
