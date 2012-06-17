@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	3121200791
+1	german	x-vnd.Haiku-libtracker	3695303004
 common	B_COMMON_DIRECTORY		Allgemein
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Icon-Ansicht
@@ -47,6 +47,7 @@ Select all	ContainerWindow		Alles auswählen
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Das 'Zeichen' Attribut kann leider keine Multi-Byte Zeichen speichern.
 Clean up	DeskWindow		Aufräumen
 You cannot copy or move the root directory.	FSUtils		Das Root-Verzeichnis kann nicht kopiert oder bewegt werden.
+%SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed von %TotalSize, %BytesPerSecond/s
 Invert selection	FilePanelPriv		Auswahl umkehren
 Rename	InfoWindow	Button label, 'Rename' (en), 'Umbenennen' (de)	Umbenennen
 save text	FilePanelPriv		Text speichern
@@ -76,6 +77,7 @@ Decrease size	DeskWindow		Verkleinern
 Size	ContainerWindow		Größe
 All disks	AutoMounterSettings		Alle Datenträger
 Would you like to find some other suitable application?	FSUtils		Soll eine andere passende Anwendung gesucht werden?
+Finish: %time - %finishtime left	StatusWindow		Fertig: %time - Noch %finishtime
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		\"%document\" konnte nicht mit der Anwendung \"%app\" geöffnet werden (fehlende Bibliothek: %library.). \n
 no items	CountView		keine
 Ignore case	SelectionWindow		Ignoriere Groß-/Kleinschreibung
@@ -131,6 +133,7 @@ OK	TrackerInitialState		OK
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		\"%name\" konnte nicht geöffnet werden. Die Datei ist fälschlicherweise als ausführbar gekennzeichnet.
 Add-ons	ContainerWindow		Add-ons
 Edit templates…	TemplatesMenu		Vorlagen bearbeiten…
+Finish: %time - Over %finishtime left	StatusWindow		Fertig: %time - Noch über %finishtime
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Ein Objekt mit dem Namen \"%name\" existiert bereits in diesem Ordner. Soll es mit der Verknüpfung ersetzt werden, die gerade erstellt werden soll?
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Es ist nicht genug Speicherplatz auf dem Zieldatenträger frei, um die Auswahl zu kopieren.
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		\"%document\" konnte nicht mit der Anwendung \"%app\" geöffnet werden (%error).
@@ -252,6 +255,7 @@ Trash	TrackerSettingsWindow		Papierkorb
 Unmount	ContainerWindow		Aushängen
 Copy layout	ContainerWindow		Anordnung kopieren
 label too long	PoseView		Beschriftung zu lang
+Finish: %time	StatusWindow		Fertig: %time
 Cancel	Tracker		Abbrechen
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Dieses Attribut kann leider nicht bearbeitet werden.
 Name	ContainerWindow		Name

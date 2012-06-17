@@ -1,22 +1,38 @@
-1	belarusian	x-vnd.Haiku-Keymap	1259868356
+1	belarusian	x-vnd.Haiku-Keymap	4022885915
+Shift:	Modifier keys window	Shift key role name	Зрух
+Revert	Modifier keys window		Вярнуць
 Tilde trigger	Keymap window		Tilde
 Grave trigger	Keymap window		Grave
+Role	Modifier keys window	As in the role of a modifier key	Роля
 Select dead keys	Keymap window		Пазначыць трыгеры (Dead Keys)
+Cancel	Modifier keys window		Адмяніць
 Quit	Keymap window		Выйсці
 Switch shortcut keys to Haiku mode	Keymap window		Пераключыць камбінацыі ў рэжым Haiku
 Circumflex trigger	Keymap window		Circumflex
 Diaeresis trigger	Keymap window		Diaeresis
+Disabled	Modifier keys window	Do nothing	Выключаны
 Open…	Keymap window		Адкрыць…
 System:	Keymap window		Сістэмныя:
+Set modifier keys…	Keymap window		Усталяваць клавішы-мадыфікатары…
+Option:	Modifier keys window	Option key role name	Уласцівасць:
 Switch shortcut keys	Keymap window		Пераключыць хуткія камбінацыі
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Клавіша Shift
 User:	Keymap window		Карыстач:
+Key	Modifier keys window	As in a computer keyboard key	Клавіша
+Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Клавіша Ctrl
+Control:	Modifier keys window	Control key role name	Control:
 Sample and clipboard:	Keymap window		Прыклад і буфер абмену:
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Клавіша Alt/Opt
 Layout	Keymap window		Расклад клавіятуры
 Switch shortcut keys to Windows/Linux mode	Keymap window		Пераключыць камбінацыі у рэжым Windows/Linux
 Revert	Keymap window		Вярнуць
+Command:	Modifier keys window	Command key role name	Command:
 Save as…	Keymap window		Захаваць як…
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Клавіша Win/Cmd
 File	Keymap window		Файл
 (Current)	Keymap window		(Бягучая)
 Font	Keymap window		Шрыфт
 Keymap	System name		Мапа клавіятуры
+Set modifier keys	Modifier keys window		Усталяваць клавішы-мадыфікатары
+Modifier keys	Modifier keys window		Клавішы-мадыфікатары
 Acute trigger	Keymap window		Acute

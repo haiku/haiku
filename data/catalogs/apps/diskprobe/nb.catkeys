@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DiskProbe	2585427111
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DiskProbe	2279950845
 64 bit unsigned value:	TypeEditors		64-bit verdi uten fortegn
 Find again	ProbeView		Finn påny
 Text	FindWindow		Tekst
@@ -60,3 +60,7 @@ Page setup…	ProbeView		Sideoppsett...
 New…	FileWindow		Ny...
 Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Kunne ikke lese bilde
 Save changes before closing?	ProbeView		Lagre endringer før lukking?
+Close	FileWindow		Lukk
+OK	ProbeView		OK
+Cancel	AttributeWindow		Avbryt
+Cancel	ProbeView		Avbryt

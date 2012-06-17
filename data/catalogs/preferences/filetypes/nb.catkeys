@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-FileTypes	3519063021
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-FileTypes	871051909
 Application types…	FileTypes Window		Programtyper...
 Description:	Application Types Window		Beskrivelse
 Recognition rule is not valid:\n\n	FileTypes Window		Gjennkjenningsregel er ugyldig:\n\n
@@ -100,6 +100,7 @@ Close	Application Type Window		Lukk
 File recognition	FileTypes Window		Filgjenkjenning
 Remove uninstalled	Application Types Window		Fjern avinstallerte
 Center	Attribute Window	Attribute column alignment in Tracker	Midstill
+Golden master	Application Type Window		Original
 Could not open \"%s\":\n%s	FileTypes		Kunne ikke åpne \"%s\":\n%s
 Left	Attribute Window	Attribute column alignment in Tracker	Venstrestill
 Cancel	Extension Window		Avbryt
@@ -134,6 +135,7 @@ Select preferred application	FileTypes Window		Velg foretrukket program
 Right	Attribute Window	Attribute column alignment in Tracker	Høyrestill
 Default application	FileType Window		Forvalgt program
 Long description:	Application Type Window		Lang beskrivelse:
+FileTypes request	FileTypes Window		Filtyper-forespørsel
 Version info	Application Type Window		Versjonsinformasjon
 (from super type)	FileTypes Window		(fra supertype)
 Version:	Application Types Window		Versjon:

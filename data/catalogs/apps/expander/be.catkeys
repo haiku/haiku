@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Expander	1072439789
+1	belarusian	x-vnd.Haiku-Expander	2398100010
 Expand	ExpanderMenu		Распакаваць
 Close window when done expanding	ExpanderPreferences		Закрыць вакно пасля распакоўкі
 Set destination…	ExpanderMenu		Задаць прызначэнне…
@@ -16,8 +16,11 @@ Cancel	ExpanderWindow		Скасаваць
 Automatically expand files	ExpanderPreferences		Распакоўваць файлы аўтаматычна
 Creating listing for '%s'	ExpanderWindow		Стварэнне спіса для '%s'
 Continue	ExpanderWindow		Працягваць
+Destination folder	ExpanderPreferences		Тэчка прызначэння
 The destination folder does not exist.	ExpanderWindow		Тэчка прызначэння не існуе.
+Other	ExpanderPreferences		Іншы
 Cancel	ExpanderPreferences		Адмена
+Expansion	ExpanderPreferences		Пашырэньне
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Спыніць распакоўку гэтага \nархіва? Ужо распакаваныя файлы могуць быць няпоўнымі.
 Select	DirectoryFilePanel		Пазначыць
 Same directory as source (archive) file	ExpanderPreferences		Папка ў якой знаходзіцца зыходны архіў

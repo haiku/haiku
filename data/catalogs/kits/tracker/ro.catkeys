@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	3430048979
+1	romanian	x-vnd.Haiku-libtracker	1975309530
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Vizualizare pictogramă
 Add-ons	FilePanelPriv		Module
@@ -167,6 +167,7 @@ The selected item cannot be moved to the Trash. Would you like to delete it inst
 Invert	SelectionWindow		Inversează
 Save Query as template…	FindPanel		Salvează interogare ca șablon...
 Find	FindPanel		Găsește
+Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Mută
 Get info	ContainerWindow		Obține info
 Select	SelectionWindow		Selectează
 Or	FindPanel		Sau
@@ -219,6 +220,7 @@ Enable type-ahead filtering	SettingsView		Activează filtrarea tastează-înaint
 Would you like to find a suitable application to open the file?	FSUtils		Doriți să găsiți o aplicație potrivită pentru a deschide fișierul?
 There was an error writing the attribute.	WidgetAttributeText		A apărut o eroare la scrierea atributului.
 Recalculate folder size	InfoWindow		Recalculează dimensiunea dosarului
+Unknown	WidgetAttributeText		Necunoscut
 by name	FindPanel		după nume
 Creating links: 	StatusWindow		Se creează legăturile:
 Paused: click to resume or stop	StatusWindow		Pauză: dați clic pentru a relua sau a opri
@@ -286,6 +288,7 @@ Empty folder	SlowContextPopup		Dosar liber
 Open selection with:	OpenWithWindow		Deschide selecție cu:
 Preparing to create links…	StatusWindow		Se pregătește crearea legăturilor...
 Show navigator	SettingsView		Afișează navigator
+Desktop	B_DESKTOP_DIRECTORY		Desktop
 List folders first	SettingsView		Enumeră dosarele întâi
 Get info	VolumeWindow		Obține info
 Name	SelectionWindow		Nume

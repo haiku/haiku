@@ -1,15 +1,19 @@
-1	finnish	x-vnd.Be-TSKB	1095421712
+1	finnish	x-vnd.Be-TSKB	359782181
 Power off	DeskbarMenu		Sammuta virta
+Show day of week	PreferencesWindow		Näytä viikonpäivä
 Edit menu…	PreferencesWindow		Muokkaa valikkoa...
 Applications	PreferencesWindow		Sovellukset
+Time preferences…	TimeView		Aika-asetukset...
 Recent documents:	PreferencesWindow		Äskettäiset asiakirjat:
 Recent applications	DeskbarMenu		Äskettäiset sovellukset
 Sort running applications	PreferencesWindow		Lajittele suoritettavat sovellukset
+Show time	Tray		Näytä aika
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Sovellukset
 Find…	DeskbarMenu		Etsi...
 Window	PreferencesWindow		Ikkuna
 Menu	PreferencesWindow		Valikko
 Recent documents	DeskbarMenu		Äskettäiset asiakirjat
+Show seconds	PreferencesWindow		Näytä sekunnit
 Auto-hide	PreferencesWindow		Piilota automaattisesti
 Always on top	PreferencesWindow		Aina päällimmäisenä
 <Deskbar folder is empty>	DeskbarMenu		<Työpöytäpalkkikansio on tyhjä>
@@ -17,6 +21,7 @@ Show all	WindowMenu		Näytä kaikki
 No windows	WindowMenu		Ei ikkunoita
 Deskbar	System name		Työpöytäpalkki
 Restart system	DeskbarMenu		Käynnistä järjestelmä uudelleen
+Large	PreferencesWindow		Suuri
 Auto-raise	PreferencesWindow		Nosta automaattisesti
 Hide time	TimeView		Piilota aika
 Recent folders:	PreferencesWindow		Äskettäiset kansiot:
@@ -25,6 +30,7 @@ Restart Tracker	DeskbarMenu		Käynnistä Seuraaja uudelleen
 Close all	WindowMenu		Sulje kaikki
 Deskbar preferences	PreferencesWindow		Työpöytäpalkin asetukset
 Mount	DeskbarMenu		Liitä
+Small	PreferencesWindow		Pieni
 Recent applications:	PreferencesWindow		Äskettäiset sovellukset:
 Shutdown…	DeskbarMenu		Sammuttaminen...
 Tracker always first	PreferencesWindow		Seuraaja aina ensimmäisenä
@@ -35,8 +41,10 @@ Show calendar…	TimeView		Näytä kalenteri...
 Deskbar preferences…	DeskbarMenu		Työpöytäpalkkiasetukset...
 Expand new applications	PreferencesWindow		Laajenna uudet sovellukset
 Show replicants	DeskbarMenu		Näytä replikantit
+Hide application names	PreferencesWindow		Piilota sovellusnimet
 Clock	PreferencesWindow		Kello
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Esittelyohjelmat
+Icon size	PreferencesWindow		Kuvakekoko
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Työpöytäappletit
 Hide all	WindowMenu		Piilota kaikki
 Quit application	WindowMenu		Poistu sovelluksesta

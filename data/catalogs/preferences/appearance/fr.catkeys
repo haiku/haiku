@@ -1,4 +1,5 @@
-1	french	x-vnd.Haiku-Appearance	168322075
+1	french	x-vnd.Haiku-Appearance	3882211276
+Plain font:	Font view		Police simple :
 Control highlight	Colors tab		Mise en valeur de contrôle
 Control border	Colors tab		Bordure des contrôles
 Antialiasing type:	AntialiasingSettingsView		Type de lissage :
@@ -15,8 +16,6 @@ Inactive window tab text	Colors tab		Texte des titres de fenêtres inactives
 About Decorator	DecorSettingsView		À propos du Décorateur
 Failure	Colors tab		Échec
 Hinting menu	AntialiasingSettingsView		Menu ajustement
-Window Decorator	APRWindow		Décorateur de fenêtre
-Window Decorator:	DecorSettingsView		Décorateur de fenêtre :
 Document background	Colors tab		Arrière plan du document
 Revert	APRWindow		Rétablir
 Window tab	Colors tab		Titre des fenêtres
@@ -31,15 +30,20 @@ Navigation pulse	Colors tab		Pulsation de navigation
 Selected menu item text	Colors tab		Texte de l'élément sélectionné dans le menu
 Menu background	Colors tab		Arrière plan de menu
 OK	DecorSettingsView		OK
+Size:	Font Selection view		Taille :
 Panel background	Colors tab		Arrière plan des panneaux
+Menu font:	Font view		Police des menus :
 Colors	APRWindow		Couleurs
 Control background	Colors tab		Arrière plan des contrôles
 Inactive window tab	Colors tab		Titres des fenêtres inactives
 Appearance	System name		Apparence
+Fixed font:	Font view		Police à chasse fixe :
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Voix ambiguë d'un cœur qui au zéphyr préfère les jattes de kiwis . 0123456789
 Reduce colored edges filter strength:	AntialiasingSettingsView		Intensité du filtre de réduction des bords de couleurs :
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Le lissage sous-pixel n'est pas disponible en même temps que les consignes de glyphes dans cette version d'Haiku afin d'éviter des problèmes de brevets logiciels. Pour activer cette fonctionnalité, vous devez compiler Haiku vous-même et activer certaines options dans l'en-tête de configuration de libfreetype.
 Control text	Colors tab		Texte des contrôles
 Tooltip text	Colors tab		Texte des bulles d'aide
+Bold font:	Font view		Caractères gras :
 Inactive window border	Colors tab		Bordure de fenêtre inactive
 Menu item text	Colors tab		Texte des éléments de menu
 LCD subpixel	AntialiasingSettingsView		Sous-pixel LCD
@@ -48,4 +52,5 @@ Strong	AntialiasingSettingsView		Épais
 Panel text	Colors tab		Texte des panneaux
 Monospaced fonts only	AntialiasingSettingsView		Seulement les polices à chasse fixe
 Antialiasing menu	AntialiasingSettingsView		Menu lissage
+Fonts	APRWindow		Polices
 Glyph hinting:	AntialiasingSettingsView		Consigne de glyphes :

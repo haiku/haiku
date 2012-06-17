@@ -1,22 +1,38 @@
-1	finnish	x-vnd.Haiku-Keymap	1259868356
+1	finnish	x-vnd.Haiku-Keymap	4022885915
+Shift:	Modifier keys window	Shift key role name	Vaihtonäppäin:
+Revert	Modifier keys window		Palauta
 Tilde trigger	Keymap window		Aaltoviivaliipaisin
 Grave trigger	Keymap window		Gravisliipaisin
+Role	Modifier keys window	As in the role of a modifier key	Rooli
 Select dead keys	Keymap window		Valitse kuolleet näppäimet
+Cancel	Modifier keys window		Peru
 Quit	Keymap window		Poistu
 Switch shortcut keys to Haiku mode	Keymap window		Vaihda pikanäppäimet Haiku-tilaan
 Circumflex trigger	Keymap window		Sirkumfleksiliipaisin
 Diaeresis trigger	Keymap window		Treemaliipaisin
+Disabled	Modifier keys window	Do nothing	Poissa käytöstä
 Open…	Keymap window		Avaa…
 System:	Keymap window		Järjestelmä:
+Set modifier keys…	Keymap window		Aseta muuntonäppäimet...
+Option:	Modifier keys window	Option key role name	Valitsin:
 Switch shortcut keys	Keymap window		Vaihda pikanäppäimiä
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Vaihtonäppäin
 User:	Keymap window		Käyttäjä:
+Key	Modifier keys window	As in a computer keyboard key	Näppäin
+Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl-näppäin
+Control:	Modifier keys window	Control key role name	Ohjain:
 Sample and clipboard:	Keymap window		Näyte ja leikepöytä:
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt-näppäin
 Layout	Keymap window		Ulkoasu
 Switch shortcut keys to Windows/Linux mode	Keymap window		Vaihda pikanäppäimet Windows/Linux -tilaan
 Revert	Keymap window		Palauta
+Command:	Modifier keys window	Command key role name	Komento:
 Save as…	Keymap window		Tallenna nimellä…
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd-näppäin
 File	Keymap window		Tiedosto
 (Current)	Keymap window		(Nykyinen)
 Font	Keymap window		Kirjasin
 Keymap	System name		Näppäinkuvausasetukset
+Set modifier keys	Modifier keys window		Aseta muuntonäppäimet
+Modifier keys	Modifier keys window		Muuntonäppäimet
 Acute trigger	Keymap window		Akuuttiaksenttiliipaisin

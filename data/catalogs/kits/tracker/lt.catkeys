@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	3121200791
+1	lithuanian	x-vnd.Haiku-libtracker	3695303004
 common	B_COMMON_DIRECTORY		Bendra
 OK	WidgetAttributeText		Gerai
 Icon view	VolumeWindow		Rodyti piktogramas
@@ -47,6 +47,7 @@ Select all	ContainerWindow		Pažymėti viską
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Apgailestaujame, tačiau „Character“ požymyje negalima saugoti daugiabaičio rašmens.
 Clean up	DeskWindow		Sutvarkyti
 You cannot copy or move the root directory.	FSUtils		Šakninio aplanko negalima nei kopijuoti, nei perkelti.
+%SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed iš %TotalSize, %BytesPerSecond/s
 Invert selection	FilePanelPriv		Invertuoti žymėjimą
 Rename	InfoWindow	Button label, 'Rename' (en), 'Umbenennen' (de)	Pervardinti
 save text	FilePanelPriv		įrašyti tekstą
@@ -76,6 +77,7 @@ Decrease size	DeskWindow		Sumažinti
 Size	ContainerWindow		Dydis
 All disks	AutoMounterSettings		Visus tomus
 Would you like to find some other suitable application?	FSUtils		Ar norėtumėte paieškoti kokios nors kitos tinkamos programos?
+Finish: %time - %finishtime left	StatusWindow		Pabaiga: %time – liko dar %finishtime
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Failo „%document“ nepavyko atverti programa „%app“ (trūksta bibliotekų: %library).\n
 no items	CountView		Objektų nėra
 Ignore case	SelectionWindow		Nepaisyti raidžių registro
@@ -131,6 +133,7 @@ OK	TrackerInitialState		Gerai
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Failo „%name“ nepavyko atverti. Jis klaidingai pažymėtas kaip vykdomasis.
 Add-ons	ContainerWindow		Priedai
 Edit templates…	TemplatesMenu		Tvarkyti šablonus…
+Finish: %time - Over %finishtime left	StatusWindow		Pabaiga: %time – liko dar virš %finishtime
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Objektas vardu „%name“ jau egzistuoja šiame aplanke. Ar norite jį pakeisti kuriama simboline nuoroda?
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Deja, paskirties tome nepakanka laisvos vietos pažymėtiems objektams nukopijuoti.
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Failo „%document“ nepavyko atverti programa „%app“ (%error).
@@ -252,6 +255,7 @@ Trash	TrackerSettingsWindow		Šiukšlinė
 Unmount	ContainerWindow		Atjungti
 Copy layout	ContainerWindow		Kopijuoti išdėstymą
 label too long	PoseView		vardas per ilgas
+Finish: %time	StatusWindow		Pabaiga: %time
 Cancel	Tracker		Atsisakyti
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Deja, šio atributo keisti negalite.
 Name	ContainerWindow		Vardas

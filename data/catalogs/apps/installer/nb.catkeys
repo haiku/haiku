@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Installer	2603843027
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Installer	2221795564
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Så bak de andre menyoppføringene mot slutten av filen legger du til noe i likhet med disse linjene:\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Er du sikker på at du vil avbryte installasjonen og starte systemet på nytt?
 \t}\n\n	InstallerApp		\t}\n\n
@@ -28,7 +28,6 @@ Install from:	InstallerWindow		Installer fra:
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		VIKTIG INFORMASJON FØR DU INSTALLERER HAIKU\n\n
 Continue	InstallerWindow	In alert after pressing Stop	Fortsett
 Write boot sector to '%s'	InstallerWindow		Skriv oppstartsektor til '%s'
-2.1) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
 Collecting copy information.	InstallProgress		Samler kopieringsinformasjon.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Velg kildedisken i sprettoppmenyen, og klikk på \"Begynn\".
 Quit Boot Manager and DriveSetup	InstallerWindow		Avslutt Oppstartsbehandler og Diskoppsett
@@ -48,7 +47,6 @@ README	InstallerApp		LESMEG
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Det er kankje ikke nok plass på måldisken. Forsøk å velge en annen disk, eller velg å ikke installere valgfrie komponenter.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Vennligst lukk Oppstartsbehandler- og Diskoppsett-vinduene før du lukker installasjonsvinduet.
 Scanning for disks…	InstallerWindow		Søker etter disker…
-2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Disken kan ikke monteres. Velg en annen disk i stedet.
 ?? of ??	InstallerWindow	Unknown progress	?? av ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
@@ -76,3 +74,6 @@ OK	InstallerWindow		OK
 Set up partitions…	InstallerWindow		Sett opp partisjoner…
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Partisjonen kan ikke monteres. Vennligst velg en annen partisjon.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Oppstartsbehandler…\n\nLukk Oppstartsbehandler for å fortsette med installasjonen.
+OK	InstallProgress		OK
+???	InstallerWindow	Unknown partition name	???
+Continue	InstallerApp		Fortsett

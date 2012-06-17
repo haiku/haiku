@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Appearance	168322075
+1	ukrainian	x-vnd.Haiku-Appearance	1492316509
 Control highlight	Colors tab		Підсвітка елемента
 Control border	Colors tab		Межа елемента
 Antialiasing type:	AntialiasingSettingsView		Тип зглажування:
@@ -15,8 +15,6 @@ Inactive window tab text	Colors tab		Текст заголовку неакти�
 About Decorator	DecorSettingsView		Про Декоратор
 Failure	Colors tab		Невдача
 Hinting menu	AntialiasingSettingsView		Меню коректування
-Window Decorator	APRWindow		Декоратор вікна
-Window Decorator:	DecorSettingsView		Декоратор вікна:
 Document background	Colors tab		Тло документа
 Revert	APRWindow		Повернути
 Window tab	Colors tab		Заголовок вікна
