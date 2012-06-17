@@ -890,7 +890,7 @@ SudokuView::MouseDown(BPoint where)
 			}
 
 			if (value + 1 != fValueHintValue)
-				_SetValueHintValue(~0UL);
+				_SetValueHintValue(value + 1);
 
 			if (wasCompleted != fField->IsValueCompleted(value + 1))
 				_InvalidateValue(value + 1, false, x, y);
