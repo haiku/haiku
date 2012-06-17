@@ -1,15 +1,15 @@
 /*
- * Copyright 2008-20011 Haiku Inc. All rights reserved.
+ * Copyright 2008-2012 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
- *		Bryce Groff	  <bgroff@hawaii.edu>
- *		Karsten Heimrich. <host.haiku@gmx.de>
+ *		Bryce Groff	<bgroff@hawaii.edu>
+ *		Karsten Heimrich <host.haiku@gmx.de>
  */
 
+
 #include "CreateParamsPanel.h"
-#include "Support.h"
 
 #include <Button.h>
 #include <Catalog.h>
@@ -28,6 +28,8 @@
 #include <Partition.h>
 #include <String.h>
 
+#include "Support.h"
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "CreateParamsPanel"
@@ -36,7 +38,8 @@
 class CreateParamsPanel::EscapeFilter : public BMessageFilter {
 public:
 	EscapeFilter(CreateParamsPanel* target)
-		: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
+		:
+		BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
 		fPanel(target)
 	{
 	}
@@ -85,7 +88,8 @@ enum {
 
 CreateParamsPanel::CreateParamsPanel(BWindow* window, BPartition* partition,
 	off_t offset, off_t size)
-	: BWindow(BRect(300.0, 200.0, 600.0, 300.0), 0, B_MODAL_WINDOW_LOOK,
+	:
+	BWindow(BRect(300.0, 200.0, 600.0, 300.0), 0, B_MODAL_WINDOW_LOOK,
 		B_MODAL_SUBSET_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fEscapeFilter(new EscapeFilter(this)),
@@ -140,20 +144,18 @@ CreateParamsPanel::MessageReceived(BMessage* message)
 				fEditor->PartitionTypeChanged(type);
 			}
 			break;
-		
+
 		case MSG_SIZE_SLIDER:
-			_UpdateTextControl();
+			_UpdateSizeTextControl();
 			break;
-			
+
 		case MSG_SIZE_TEXTCONTROL:
 		{
-			BString sizeString;
-			sizeString = fSizeTextControl->Text();
-			int32 sizeInt = atoi(sizeString.String());
-			if (sizeInt >= 0 && sizeInt <= fSizeSlider->MaxPartitionSize())
-				fSizeSlider->SetValue(sizeInt);
+			int32 size = atoi(fSizeTextControl->Text());
+			if (size >= 0 && size <= fSizeSlider->MaxPartitionSize())
+				fSizeSlider->SetValue(size + fSizeSlider->Offset());
 			else
-				_UpdateTextControl();
+				_UpdateSizeTextControl();
 			break;
 		}
 
@@ -244,16 +246,15 @@ CreateParamsPanel::_CreateViewControls(BPartition* parent, off_t offset,
 		offset, offset + size);
 	fSizeSlider->SetPosition(1.0);
 	fSizeSlider->SetModificationMessage(new BMessage(MSG_SIZE_SLIDER));
-	
-	BString sizeText;
-	sizeText << fSizeSlider->Value();
-	fSizeTextControl = new BTextControl("Size Control",
-		"", sizeText.String(), NULL);
+
+	fSizeTextControl = new BTextControl("Size Control", "", "", NULL);
 	for(int32 i = 0; i < 256; i++)
 		fSizeTextControl->TextView()->DisallowChar(i);
 	for(int32 i = '0'; i <= '9'; i++)
 		fSizeTextControl->TextView()->AllowChar(i);
-	fSizeTextControl->SetModificationMessage(new BMessage(MSG_SIZE_TEXTCONTROL));
+	_UpdateSizeTextControl();
+	fSizeTextControl->SetModificationMessage(
+		new BMessage(MSG_SIZE_TEXTCONTROL));
 
 	fNameTextControl = new BTextControl("Name Control",
 		B_TRANSLATE("Partition name:"),	"", NULL);
@@ -295,7 +296,8 @@ CreateParamsPanel::_CreateViewControls(BPartition* parent, off_t offset,
 		)
 	);
 
-	status_t err = parent->GetParameterEditor(B_CREATE_PARAMETER_EDITOR, &fEditor);
+	status_t err = parent->GetParameterEditor(B_CREATE_PARAMETER_EDITOR,
+		&fEditor);
 	if (err == B_OK && fEditor != NULL)
 		AddChild(fEditor->View());
 	else
@@ -316,9 +318,9 @@ CreateParamsPanel::_CreateViewControls(BPartition* parent, off_t offset,
 
 
 void
-CreateParamsPanel::_UpdateTextControl()
+CreateParamsPanel::_UpdateSizeTextControl()
 {
 	BString sizeString;
-	sizeString << fSizeSlider->Value();
+	sizeString << fSizeSlider->Value() - fSizeSlider->Offset();
 	fSizeTextControl->SetText(sizeString.String());
 }

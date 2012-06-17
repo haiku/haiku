@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009 Haiku Inc. All rights reserved.
+ * Copyright 2002-2012 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -8,6 +8,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Bryce Groff <bgroff@hawaii.edu>
  */
+
 
 #include "Support.h"
 
@@ -100,7 +101,7 @@ SizeSlider::SizeSlider(const char* name, const char* label,
 	B_HORIZONTAL, B_TRIANGLE_THUMB),
 	fStartOffset(minValue),
 	fEndOffset(maxValue),
-	fMaxPartitionSize(maxValue)
+	fMaxPartitionSize(maxValue - minValue)
 {
 	rgb_color fillColor = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
 	UseFillColor(true, &fillColor);
