@@ -31,6 +31,7 @@ VIEW='View licenses'
 ABORT='Abort installation'
 OK='I agree to the licenses. Install firmwares.'
 
+baseURL='http://www.haiku-files.org/files/wifi-firmwares'
 firmwareDir=`finddir B_SYSTEM_DATA_DIRECTORY`/firmware
 tempDir=`finddir B_COMMON_TEMP_DIRECTORY`/wifi-firmwares
 driversDir=`finddir B_SYSTEM_ADDONS_DIRECTORY`/kernel/drivers
@@ -119,7 +120,6 @@ function DownloadFileIfNotCached()
 		local msg="As a result, ${driver}'s firmware will not be installed."
 		alert --warning "$error $msg"
 	fi
-
 }
 
 
@@ -180,13 +180,9 @@ function InstallIpw2100()
 
 	# Extract contents.
 	local file='ipw2100-fw-1.3.tgz'
-
-	# In case the file doesn's exist.
-	if [ ! -e ${firmwareDir}/${driver}/$file ] ; then
-		url='http://ipw2100.sourceforge.net/firmware.php?fid=4'
-		OpenIntelFirmwareWebpage $url $file
-	fi
-	# TODO: handle when $file hasn't been saved in ${firmwareDir}/${driver}/
+	local url="${baseURL}/intel/${file}"
+	local dir="${firmwareDir}/${driver}"
+	DownloadFileIfNotCached $url $file $dir
 
 	# Install the firmware & license file by extracting in place.
 	cd "${firmwareDir}/${driver}"
@@ -203,13 +199,9 @@ function InstallIprowifi2200()
 
 	# Extract contents.
 	local file='ipw2200-fw-3.1.tgz'
-
-	# In case the file doesn't exist.
-	if [ ! -e ${firmwareDir}/${driver}/$file ] ; then
-		url=http://ipw2200.sourceforge.net/firmware.php?fid=8
-		OpenIntelFirmwareWebpage $url $file
-	fi
-	# TODO: handle when $file hasn't been saved in ${firmwareDir}/${driver}/
+	local url="${baseURL}/intel/${file}"
+	local dir="${firmwareDir}/${driver}"
+	DownloadFileIfNotCached $url $file $dir
 
 	cd "$tempDir"
 	gunzip < "${firmwareDir}/${driver}/$file" | tar xf -
@@ -255,7 +247,7 @@ function InstallMarvell88w8335()
 
 	# Download firmware archive.
 	local file="malo-firmware-1.4.tgz"
-	local url='http://www.nazgul.ch/malo/malo-firmware-1.4.tgz'
+	local url="${baseURL}/marvell/${file}"
 	local dir="${firmwareDir}/${driver}"
 	DownloadFileIfNotCached $url $file "$dir"
 	if [ $result -gt 0 ]; then
@@ -280,7 +272,7 @@ function BuildBroadcomFWCutter()
 	# Download & extract b43-fwcutter.
 	local file="b43-fwcutter-012.tar.bz2"
 	local dir="${firmwareDir}/${driver}/b43-fwcutter"
-	local url="http://bu3sch.de/b43/fwcutter/b43-fwcutter-012.tar.bz2"
+	local url="${baseURL}/b43/fwcutter/${file}"
 	DownloadFileIfNotCached $url $file $dir
 	if [ $result -gt 0 ]; then
 		return $result
@@ -330,7 +322,7 @@ function CutAndInstallBroadcomFirmware()
 	# Download firmware.
 	local file="wl_apsta-3.130.20.0.o"
 	local dir="${firmwareDir}/${driver}"
-	local url='http://downloads.openwrt.org/sources/wl_apsta-3.130.20.0.o'
+	local url="${baseURL}/b43/${file}"
 	DownloadFileIfNotCached $url $file $dir
 	if [ $result -gt 0 ]; then
 		return $result
