@@ -26,7 +26,7 @@ public:
 
 private:
 				BView*			fView;
-				BCheckBox*		fActiveCB;
+				BCheckBox*		fActiveCheckBox;
 				BString			fParameters;
 };
 
