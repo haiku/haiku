@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Time	1859841283
+1	slovak	x-vnd.Haiku-Time	3249243267
 GMT (UNIX compatible)	Time		GMT (kompatibilné s Unixom)
 OK	Time		OK
 Asia	Time		Ázia
@@ -30,6 +30,7 @@ Time	System name		Čas
 America	Time		Amerika
 Reset	Time		Obnoviť
 Synchronize at boot	Time		Synchronizovať pri štarte
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Čas a dátum, napísali:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Received invalid time	Time		Prijatý neplatný čas
 Antarctica	Time		Antarktída
 The following error occured while synchronizing:r\n%s: %s	Time		Počas synchronizácie sa vyskytla nasledovná chyba:r\n%s: %s

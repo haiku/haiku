@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Installer	3852628561
+1	greek, modern (1453-)	x-vnd.Haiku-Installer	2099988747
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Οπως στις άλλες καταχωρήσεις του μενού, στην κάτω μεριά του αρχείου προσθέστε κάτι ανάλογο των παρακάτω γραμμών:\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Είστε σίγουρος πως θέλετε να ακυρώσετε την εγκατάσταση και να επανεκκινήσετε το σύστημα;
 \t}\n\n	InstallerApp		\t}\n\n
@@ -28,7 +28,6 @@ Install from:	InstallerWindow		Εγκατάσταση από:
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		ΣΗΜΑΝΤΙΚΕΣ ΠΛΗΡΟΦΟΡΙΕΣ ΠΡΙΝ ΤΗΝ ΕΓΚΑΤΑΣΤΑΣΗ ΤΟΥ HAIKU\n\n
 Continue	InstallerWindow	In alert after pressing Stop	Συνέχεια
 Write boot sector to '%s'	InstallerWindow		Εγγραφή τομέα εκκίνησης σε '%s'
-2.1) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
 Collecting copy information.	InstallProgress		Συλλογή πληροφοριών αντιγραφής.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Επιλέξτε το δίσκο προέλευσης από το αναδυόμενο μενού. Στη συνέχεια, κάντε κλικ στην \"Έναρξη\".
 Quit Boot Manager and DriveSetup	InstallerWindow		Έξοδος από το Διαχειριστή Εκκίνησης και από τη Διαχείρηση Δίσκου
@@ -49,7 +48,6 @@ README	InstallerApp		README
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Ο δίσκος προορισμού μπορεί να μην έχει αρκετό χώρο. Δοκιμάστε να επιλέξετε ένα διαφορετικό δίσκο ή επιλέξτε να μην εγκαταστήσετε προαιρετικά στοιχεία.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Παρακαλώ κλείστε το Διαχειριστή Εκκίνησης και τη Διαχείρηση Δίσκου, πριν κλείσετε το πρόγραμμα Εγκατάστασης.
 Scanning for disks…	InstallerWindow		Εξέταση για δίσκους...
-2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Ο δίσκος δεν μπορεί να προσαρτηθεί. Παρακαλώ επιλέξτε ένα διαφορετικό δίσκο.
 ?? of ??	InstallerWindow	Unknown progress	;; από ;;
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
@@ -99,7 +97,6 @@ DriveSetup, the application to configure disk partitions, could not be launched.
 No optional packages available.	PackagesView		Δεν υπάρχουν διαθέσιμα προαιρετικά πακέτα.
 All hard disks start with \"hd\".\n	InstallerApp		Όλοι οι δίσκοι ξεκινούν με  \"hd\".\n
 Continue	InstallerApp		Συνέχεια
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" documentation, there is a link on the Desktop.\n\n	InstallerApp		3) Όταν με επιτυχία εκκινηθεί το Haiku, για πρώτη φορά, βεβαιωθείτε ότι έχετε διαβάσει την τεκμηρίωση \"Καλωσορίσματος\", υπάρχει ένας σύνδεσμος στην επιφάνεια εργασίας.\n\n
 BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Το BootManager, η εφαρμογή για τη ρύθμιση του μενού εκκίνησης του Haiku δε μπόρεσε να εκτελεστεί.
 Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Ρύθμιστε του /boot/grub/menu.lst εκτελώντας τον αγαπημένο σας επεξεργαστή κειμένου από ένα Τερματικό κάπως έτσι: \n\n
 Boot sector not written because of an internal error.	InstallProgress		Ο τομέας εκκίνησης δεν γράφτηκε λόγο ενός εσωτερικού σφάλματος.

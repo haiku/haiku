@@ -1,7 +1,7 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MediaPlayer	2852236457
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MediaPlayer	1694310530
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikansk)
 <unknown>	PlaylistItem-album		<ukjent>
-The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Filen '%filename' kunne ikke åpnes.\n\n
+Video	MediaPlayer-InfoWin		Video
 Save Playlist	MediaPlayer-PlaylistWindow		Lagre spilleliste
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Ingen av filene du ville spille ser ut til å være mediafiler.
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Lagring av spilleliste mislyktes.\n\nFeilmelding:
@@ -9,6 +9,7 @@ New player…	MediaPlayer-Main		Ny spiller...
 100% scale	MediaPlayer-Main		100% skalert
 Close	MediaPlayer-Main		Lukk
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Noen filer kunne ikke flyttes til søppelkurven
+<unknown>	MediaPlayer-InfoWin		<ukjent>
 Open	MediaPlayer-Main		Åpne
 Next	MediaPlayer-Main		Neste
 OK	MediaPlayer-SettingsWindow		OK
@@ -43,6 +44,7 @@ MediaPlayer settings	MediaPlayer-SettingsWindow		Mediaspiller-innstillinger
 Open	MediaPlayer-PlaylistWindow		Åpne
 Stop playing.	MediaPlayer-Main		Stopp avspilling
 Error: 	MediaPlayer-RemovePLItemsCmd		Feil:
+Audio	MediaPlayer-InfoWin		Audio
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Internfeil (misformet melding). Lagring av spilleliste feilet.
 Skip to the previous track.	MediaPlayer-Main		Hopp tilbake til forrige spor
 OK	MediaPlayer-RemovePLItemsCmd		OK

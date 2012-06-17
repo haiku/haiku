@@ -1,9 +1,9 @@
-1	hindi	x-vnd.Haiku-MediaPlayer	3343900623
+1	hindi	x-vnd.Haiku-MediaPlayer	3764443013
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1(अमेरिकी)
 Stream settings	MediaPlayer-Main		स्ट्रीम सेटिंग्स
 <unknown>	PlaylistItem-album		<अज्ञात>
-The file'%filename' could not be opened.\n\n	MediaPlayer-Main		फ़ाइल'%फ़ाइल का नाम' खोला नहीं जा सकता.\n\n
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		स्केल कंट्रोल्स फुल स्क्रीन मोड पर. 
+Video	MediaPlayer-InfoWin		वीडियो
 Subtitle size:	MediaPlayer-SettingsWindow		उपशीर्षक का आकार:
 Save Playlist	MediaPlayer-PlaylistWindow		प्लेलिस्ट को सुरक्षित करे
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		जिंन फ़ाइलों को आप प्ले करना चाहता हैं उन में से को कोई  मीडिया फ़ाइलों दिखाई नहीं देते हैं.
@@ -13,6 +13,7 @@ New player…	MediaPlayer-Main		नया प्लेयर...
 Subtitle placement:	MediaPlayer-SettingsWindow		उपशीर्षक की जगह:
 Close	MediaPlayer-Main		बंद
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		कुछ फ़ाइलें रद्दी में नहीं भेजा जा सकती है.
+<unknown>	MediaPlayer-InfoWin		<अज्ञात>
 Open	MediaPlayer-Main		खोले
 Next	MediaPlayer-Main		अगला
 OK	MediaPlayer-SettingsWindow		ठीक है
@@ -56,6 +57,7 @@ Move Entry	MediaPlayer-MovePLItemsCmd		एंट्री ले जाएँ
 Open	MediaPlayer-PlaylistWindow		ओपन
 Stop playing.	MediaPlayer-Main		खेल बंद करो.
 Error: 	MediaPlayer-RemovePLItemsCmd		त्रुटि:
+Audio	MediaPlayer-InfoWin		ऑडियो
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		आंतरिक त्रुटि (विकृत संदेश).प्लेलिस्ट सहेजने में असफल रहा.
 Skip to the previous track.	MediaPlayer-Main		पिछले ट्रैक पर जाएँ.
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% को एक अंदरी त्रुटि मिली है. यह फ़ाइल खोल नहीं सकती.
@@ -82,3 +84,6 @@ Attributes	MediaPlayer-Main		ऐट्रिब्यूट
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		सभी फ़ाइलों को रद्दी में नहीं भेजा जा सकता है.
 <untitled>	PlaylistItem-title		<अनटाइटल्ड>
 Track	Audio Track Menu		ट्रैक
+Error: 	MediaPlayer-Main		त्रुटि:
+OK	MediaPlayer-PlaylistWindow		ठीक है
+<unknown>	PlaylistItem-author		<अज्ञात>

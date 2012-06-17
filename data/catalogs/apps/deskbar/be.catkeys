@@ -1,15 +1,19 @@
-1	belarusian	x-vnd.Be-TSKB	1095421712
+1	belarusian	x-vnd.Be-TSKB	359782181
 Power off	DeskbarMenu		Выключыць
+Show day of week	PreferencesWindow		Паказваць дзень тыдню
 Edit menu…	PreferencesWindow		Змяніць меню...
 Applications	PreferencesWindow		Праграмы
+Time preferences…	TimeView		Наладкі Часу…
 Recent documents:	PreferencesWindow		Нядаўнія дакументы:
 Recent applications	DeskbarMenu		Нядаўнія праграмы
 Sort running applications	PreferencesWindow		Сартыравать запушчаныя праграмы
+Show time	Tray		Паказваць час
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Праграмы
 Find…	DeskbarMenu		Знайсці…
 Window	PreferencesWindow		Акно
 Menu	PreferencesWindow		Меню
 Recent documents	DeskbarMenu		Нядаўнія дакументы:
+Show seconds	PreferencesWindow		Паказваць секунды
 Auto-hide	PreferencesWindow		Схаваць аўтаматычна
 Always on top	PreferencesWindow		Заўсёды наверсе
 <Deskbar folder is empty>	DeskbarMenu		<Папка Deskbar-у пустая>
@@ -17,6 +21,7 @@ Show all	WindowMenu		Паказаць усё
 No windows	WindowMenu		Без вокнаў
 Deskbar	System name		Deskbar
 Restart system	DeskbarMenu		Перазапусціць сістэму
+Large	PreferencesWindow		Вялікі
 Auto-raise	PreferencesWindow		Узнікаць аўтаматычна
 Hide time	TimeView		Час на схаванне
 Recent folders:	PreferencesWindow		Нядаўнія каталёгі:
@@ -25,6 +30,7 @@ Restart Tracker	DeskbarMenu		Перазапусціць Tracker
 Close all	WindowMenu		Закрыць усё
 Deskbar preferences	PreferencesWindow		Наладкі Deskbar
 Mount	DeskbarMenu		Прымацаваць
+Small	PreferencesWindow		Малы
 Recent applications:	PreferencesWindow		Нядаўнія праграмы
 Shutdown…	DeskbarMenu		Спыніць…
 Tracker always first	PreferencesWindow		Трэкер заўсёды першы
@@ -35,8 +41,10 @@ Show calendar…	TimeView		Паказаць календар...
 Deskbar preferences…	DeskbarMenu		Наладкі Deskbar-у…
 Expand new applications	PreferencesWindow		Разгарнуць новыя праграмы
 Show replicants	DeskbarMenu		Паказваць дупліканты
+Hide application names	PreferencesWindow		Схаваць імёны праграм
 Clock	PreferencesWindow		Гадзіннік
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Прыклады
+Icon size	PreferencesWindow		Памер значак
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Праграмкі Дэсктопу
 Hide all	WindowMenu		Схаваць усё
 Quit application	WindowMenu		Выйсці з праграмы

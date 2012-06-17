@@ -1,10 +1,11 @@
-1	slovak	x-vnd.Be-MAIL	2284738205
+1	slovak	x-vnd.Be-MAIL	2834665561
 View	Mail		Zobraziť
 %d - Date	Mail		%d - Dátum
 Attach attributes:	Mail		Pripojiť atribúty:
 Inconsistency occurred in the undo/redo buffer.	Mail		V zásobníku vrátení/opakovaní sa vyskytla nekonzistencia.
 An error occurred trying to save the attachment.	Mail		Vyskytla sa chyba pri pokuse uložiť prílohu.
 Copy to new	Mail		Skopírovať ako novú
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Ponechať ako „New“
 Edit	Mail		Upraviť
 Print	Mail		Tlačiť
 <none>	Mail		<žiadne>
@@ -63,6 +64,7 @@ Warn unencodable:	Mail		Upozorniť na nezakódovateľné:
 Quit	Mail		Ukončiť
 %n - Full name	Mail		%n - Plný názov
  Read 	Mail		 Prečítené 
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
 Trash	Mail		Kôš
 Default account:	Mail		Predvolený účet:
 Size:	Mail		Veľkosť:

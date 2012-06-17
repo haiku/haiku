@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	3394318294
+1	slovak	x-vnd.Haiku-libtracker	3968420507
 common	B_COMMON_DIRECTORY		spoločné
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Zobrazenie ikon
@@ -46,6 +46,7 @@ Select all	ContainerWindow		Vybrať všetky
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Ľutujeme, atribút „Character“ nemôže ukladať viacbajtové grafémy.
 Clean up	DeskWindow		Vyčistiť
 You cannot copy or move the root directory.	FSUtils		Nemôžete skopírovať alebo presunúť koreňový adresár.
+%SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed z %TotalSize, %BytesPerSecond/s
 Invert selection	FilePanelPriv		Invertovať výber
 Rename	InfoWindow	Button label, 'Rename' (en), 'Umbenennen' (de)	Premenovať
 save text	FilePanelPriv		uložiť text
@@ -75,6 +76,7 @@ Decrease size	DeskWindow		Zmenšiť veľkosť
 Size	ContainerWindow		Veľkosť
 All disks	AutoMounterSettings		Všetky disky
 Would you like to find some other suitable application?	FSUtils		Chcete nájsť nejakú inú vhodnú aplikáciu?
+Finish: %time - %finishtime left	StatusWindow		Dokončenie: %time - zostáva %finishtime
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Nebolo možné otvoriť „%document“, pomocou aplikácie „%app“ (Chýbajú knižnice: %library). \n
 no items	CountView		žiadne položky
 Ignore case	SelectionWindow		Ignorovať veľkosť písmen
@@ -130,6 +132,7 @@ OK	TrackerInitialState		OK
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Nebolo možné otvoriť „%name“. Súbor je chybne označený ako spustiteľný. 
 Add-ons	ContainerWindow		Doplnky
 Edit templates…	TemplatesMenu		Upraviť šablóny…
+Finish: %time - Over %finishtime left	StatusWindow		(Koniec: %time - zostáva viac ako %finishtime)
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Položka s názvom „%name“ už v tomto priečinku existuje. Chcete ju nahradiť symbolickým odkazom, ktorý vytvárate?
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Ľutujeme, na cieľovom zväzku nie je dostatok voľného miesta na skopírovanie výberu.
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nebolo možné otvoriť „%document“, pomocou aplikácie „%app“ (%error). 
@@ -251,6 +254,7 @@ Trash	TrackerSettingsWindow		Kôš
 Unmount	ContainerWindow		Odpojiť
 Copy layout	ContainerWindow		Kopírovať rozloženie
 label too long	PoseView		menovka je príliš dlhá
+Finish: %time	StatusWindow		Dokončenie: %time
 Cancel	Tracker		Zrušiť
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Ľutujeme, tento atribút nemôžete upravovať.
 Name	ContainerWindow		Názov

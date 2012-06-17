@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Installer	3852628561
+1	romanian	x-vnd.Haiku-Installer	2099988747
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		În spatele celorlalte intrări din meniu spre baza fișierului, adăugați ceva asemănător cu aceste linii:\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Sigur doriți să anulați instalarea și să reporniți sistemul?
 \t}\n\n	InstallerApp		\t}\n\n
@@ -28,7 +28,6 @@ Install from:	InstallerWindow		Instalează de la:
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		INFORMAȚII IMPORTANTE ÎNAINTE DE A INSTALA HAIKU\n\n
 Continue	InstallerWindow	In alert after pressing Stop	Continuă
 Write boot sector to '%s'	InstallerWindow		Scrie sectorul de pornire a sistemului pe „%s”
-2.1) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
 Collecting copy information.	InstallProgress		Se colectează informațiile de copiere.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Alege discul sursă din meniul contextual. Apoi apasă „Începe”.
 Quit Boot Manager and DriveSetup	InstallerWindow		Părăsește Administratorul de boot și ConfigurareDrive
@@ -49,7 +48,6 @@ README	InstallerApp		CITEȘTE-MĂ
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		E posibil ca discul de destinație să nu dețină destul spațiu. Încercați să alegeți un disc diferit sau alegeți să nu instalați elementele opționale.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Închideți Administratorul de boot și ConfigurareDrive înainte de a închide fereastra Programului de instalare.
 Scanning for disks…	InstallerWindow		Se scanează pentru discuri...
-2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Discul nu poate fi montat. Alegeți un disc diferit.
 ?? of ??	InstallerWindow	Unknown progress	?? din ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry „Haiku Alpha” {\n
@@ -99,7 +97,6 @@ DriveSetup, the application to configure disk partitions, could not be launched.
 No optional packages available.	PackagesView		Niciun pachet opțional disponibil.
 All hard disks start with \"hd\".\n	InstallerApp		Toate hard discurile încep cu „hd”.\n
 Continue	InstallerApp		Continuă
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" documentation, there is a link on the Desktop.\n\n	InstallerApp		3) Când ați pornit cu succes Haiku pentru prima dată, asigurați-vă că citiți documentația de „Bun venit”, există o legătură pe Desktop.\n\n
 BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		AdministratorBoot, aplicația de configurare a meniului de pornire Haiku, nu a putut fi lansată.
 Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Configurați /boot/grub/menu.lst prin pornirea editorului preferat de la un Terminal în acel fel:\n\n
 Boot sector not written because of an internal error.	InstallProgress		Sectorul de boot nu a fost scris din cauza unei erori interne.

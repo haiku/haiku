@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Installer	3852628561
+1	slovak	x-vnd.Haiku-Installer	2099988747
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Za ďalšie položky menu blízko konca súboru pridajte niečo podobné týmto riadkom:\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Ste si istý, že chcete zrušiť inštaláciu a reštartovať systém?
 \t}\n\n	InstallerApp		\t}\n\n
@@ -28,7 +28,6 @@ Install from:	InstallerWindow		Inštalovať z:
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		DÔLEŽITÉ INFORMÁCIE PRED INŠTALÁCIOU HAIKU\n\n
 Continue	InstallerWindow	In alert after pressing Stop	Pokračovať
 Write boot sector to '%s'	InstallerWindow		Zapísať zavádzací sektor na „%s“
-2.1) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
 Collecting copy information.	InstallProgress		Zhromažďujú sa informácie o kopírovaní.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Zvoľte zdrojový disk z roletového menu. Potom kliknite na „Začať“.
 Quit Boot Manager and DriveSetup	InstallerWindow		Ukončiť Správcu zavádzania a Nastavenie diskových oblastí
@@ -49,7 +48,6 @@ README	InstallerApp		README
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Cieľový disk nemusí mať dostatok miesta. Skúste zvoliť iný disk alebo zvoľte neinštalovať voliteľné položky.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Prosím, zatvorte okná Správcu zavádzania a Nastavenie diskových oblastí predtým, než zatvoríte okno Inštalátora.
 Scanning for disks…	InstallerWindow		Zisťujú sa disky…
-2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Disk nie je možné pripojiť. Prosím, zvoľte iný disk.
 ?? of ??	InstallerWindow	Unknown progress	?? z ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
@@ -99,7 +97,6 @@ DriveSetup, the application to configure disk partitions, could not be launched.
 No optional packages available.	PackagesView		Nie sú dostupné žiadne voliteľné balíky.
 All hard disks start with \"hd\".\n	InstallerApp		Všetky pevné disky začínajú „hd“.\n
 Continue	InstallerApp		Pokračovať
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" documentation, there is a link on the Desktop.\n\n	InstallerApp		3)   Keď prvýkrát úspešne naštartujete do Haiku, určite si prečítajte našu dokumentáciu „Vitajte“. Odkaz na ňu nájdete na Ploche.\n\n
 BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Správca zavádzania (aplikácia na nastavenie zavádzacieho menu Haiku) sa nedal spustiť.
 Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Nastavte súbor /boot/grub/menu.lst pomcou vášho obľúbeného textového editora, ktorý spustíte z Terminálu takto:\n\n
 Boot sector not written because of an internal error.	InstallProgress		Zavádzací sektor nebol zapísaný z dôvodu vnútornej chyby.

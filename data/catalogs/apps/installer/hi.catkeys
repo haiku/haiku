@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-Installer	3335683494
+1	hindi	x-vnd.Haiku-Installer	1583043680
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		तो फिर फाइल के नीचे की ओर अन्य मेनू प्रविष्टियों के पीछे, इन पंक्तियों के समान कुछ जोड़ें:\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		आप सुनिश्चित हैं कि आप स्थापना रद्द करके सिस्टम को पुनः आरंभ करना चाहते हैं?
 \t}\n\n	InstallerApp		\t}\n\n
@@ -27,7 +27,6 @@ Install from:	InstallerWindow		यहाँ से स्थापित कर�
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		हाइकू स्थापित करने से पहले महत्वपूर्ण जानकारी\n\n
 Continue	InstallerWindow	In alert after pressing Stop	जारी रखें
 Write boot sector to '%s'	InstallerWindow		बूट क्षेत्र '%s' में लिखें
-2.1) GRUB 1\n	InstallerApp		२.१) ग्रब १\n
 Collecting copy information.	InstallProgress		नकल जानकारी एकत्रित कर रहे हैं|
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		पॉप अप मेनू से स्रोत डिस्क चुनें. फिर \"शुरू\" क्लिक करें|
 Quit Boot Manager and DriveSetup	InstallerWindow		बूट प्रबंधक और ड्राइव सेटअप छोड़ो
@@ -46,7 +45,6 @@ README	InstallerApp		README
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		गंतव्य डिस्क में शायद पर्याप्त जगह नहीं है| एक अलग डिस्क को चुनें या वैकल्पिक आइटम स्थापित करना ना चुनें|
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		इंस्टॉलर खिड़की बंद करने से पहले बूट प्रबंधक और ड्राइव सेटअप विंडो बंद करें|
 Scanning for disks…	InstallerWindow		डिस्क के लिए स्कैन चल रहा है...
-2.2) GRUB 2\n	InstallerApp		२.२) ग्रब १\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		डिस्क माउंट नहीं की जा सकी| एक अलग डिस्क चुनें|
 ?? of ??	InstallerWindow	Unknown progress	??, ?? में से 
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"हाइकू अल्फा\" {\n
@@ -94,7 +92,6 @@ DriveSetup, the application to configure disk partitions, could not be launched.
 No optional packages available.	PackagesView		कोई वैकल्पिक संकुल उपलब्ध नहीं हैं|
 All hard disks start with \"hd\".\n	InstallerApp		सभी हार्ड डिस्क \"hd\" के साथ शुरू होती हैं|\n
 Continue	InstallerApp		जारी रखें
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" documentation, there is a link on the Desktop.\n\n	InstallerApp		३) जब आप पहली बार सफलतापूर्वक हाइकू में बूट करते हैं, सुनिश्चित करलें कि आप हमारी \"आपका स्वागत है\" प्रलेखन पढ़ें, डेस्कटॉप पर एक कड़ी है|\n\n
 Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		अपनी /boot/grub/menu.lst को एक टर्मिनल से पसंदीदा संपादक शुरू करके इस तरह से कॉन्फ़िगर करें:\n\n
 Boot sector not written because of an internal error.	InstallProgress		एक आंतरिक त्रुटि के कारण बूट क्षेत्र नहीं लिखा जा सका|
 Additional disk space required: %s	InstallerWindow		अतिरिक्त डिस्क स्थान की आवश्यकता: %s

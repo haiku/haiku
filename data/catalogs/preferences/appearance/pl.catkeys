@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Appearance	2558216842
+1	polish	x-vnd.Haiku-Appearance	3882211276
 Plain font:	Font view		Czcionka zwykła:
 Control highlight	Colors tab		Podkreślenie kontrolki
 Control border	Colors tab		Obramowanie kontrolki
@@ -16,8 +16,6 @@ Inactive window tab text	Colors tab		Tekst nieaktywnej zakładki okna
 About Decorator	DecorSettingsView		O Dekoratorze
 Failure	Colors tab		Niepowodzenie
 Hinting menu	AntialiasingSettingsView		Menu hintingu
-Window Decorator	APRWindow		Dekorator Okna
-Window Decorator:	DecorSettingsView		Dekorator Okna:
 Document background	Colors tab		Tło dokumentu
 Revert	APRWindow		Przywróć ustawienia
 Window tab	Colors tab		Zakładka okna

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Notifications	299049300
+1	english	x-vnd.Haiku-Notifications	3631903554
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		首选项保存出错。\n您可能已经用尽了磁盘空间。
 Notifications	GeneralView		通知
 seconds of inactivity	GeneralView		静止秒数
@@ -44,6 +44,7 @@ Can't save preferences, you probably don't have write access to the boot setting
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		保存首选项存在问题。\n你可能不具有设置目录的写入权限。
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		保存首选项存在问题。\n你可能不具有设置目录的写入权限。
 Enable notifications at startup	GeneralView		启动时启用通知
+Notifications	PrefletView		通知
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		通知服务器无法找到。\n您 InfoPopper 没有成功完成安装。
 Applications	NotificationView		应用程序
 Events are notified	GeneralView		事件已通知

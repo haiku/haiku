@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Appearance	2811701284
+1	russian	x-vnd.Haiku-Appearance	4135695718
 Control highlight	Colors tab		Подсветка элемента
 Control border	Colors tab		Граница элемента
 Antialiasing type:	AntialiasingSettingsView		Тип сглаживания:
@@ -14,8 +14,6 @@ Success	Colors tab		Успех
 Inactive window tab text	Colors tab		Текст заголовка неактивного окна
 Failure	Colors tab		Неудача
 Hinting menu	AntialiasingSettingsView		Корректировка (хинтинг)
-Window Decorator	APRWindow		Оконный декоратор
-Window Decorator:	DecorSettingsView		Оконный декоратор:
 Document background	Colors tab		Фон документа
 Revert	APRWindow		Вернуть
 Window tab	Colors tab		Заголовок окна

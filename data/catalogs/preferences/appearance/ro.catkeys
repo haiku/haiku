@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Appearance	168322075
+1	romanian	x-vnd.Haiku-Appearance	1492316509
 Control highlight	Colors tab		Punct principal de control
 Control border	Colors tab		Margine de control
 Antialiasing type:	AntialiasingSettingsView		Tip de anti-alias:
@@ -15,8 +15,6 @@ Inactive window tab text	Colors tab		Text de fereastră tab inactivă
 About Decorator	DecorSettingsView		Despre Decorator
 Failure	Colors tab		Eşec
 Hinting menu	AntialiasingSettingsView		Meniu de sugestii
-Window Decorator	APRWindow		Decorator fereastră
-Window Decorator:	DecorSettingsView		Decorator fereastră:
 Document background	Colors tab		Fundalul documentului
 Revert	APRWindow		Revenire
 Window tab	Colors tab		Tab de fereastră

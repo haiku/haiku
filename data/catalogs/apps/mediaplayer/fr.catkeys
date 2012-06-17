@@ -1,8 +1,7 @@
-1	french	x-vnd.Haiku-MediaPlayer	1756510747
+1	french	x-vnd.Haiku-MediaPlayer	1642794756
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Panoramique américain)
 Stream settings	MediaPlayer-Main		Réglages du flux
 <unknown>	PlaylistItem-album		<inconnu>
-The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Impossible d'ouvrir le fichier « %filename ».\n\n
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Agrandir les commandes en mode plein écran
 Video	MediaPlayer-InfoWin		Vidéo
 Subtitle size:	MediaPlayer-SettingsWindow		Taille des sous-titres :

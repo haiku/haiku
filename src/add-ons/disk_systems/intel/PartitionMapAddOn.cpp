@@ -327,8 +327,10 @@ PartitionMapHandle::ValidateCreateChild(off_t* _offset, off_t* _size,
 	if (!type.SetType(typeString) || type.IsEmpty())
 		return B_BAD_VALUE;
 
-	if (type.IsExtended() && fPartitionMap.ExtendedPartitionIndex() >= 0)
+	if (type.IsExtended() && fPartitionMap.ExtendedPartitionIndex() >= 0) {
+		// There can only be a single extended partition
 		return B_BAD_VALUE;
+	}
 
 	// check name
 	if (name)

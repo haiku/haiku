@@ -1,11 +1,10 @@
-1	finnish	x-vnd.Haiku-MediaPlayer	1796053067
-raw audio	MediaPlayer-InfoWin		Raakaääni
+1	finnish	x-vnd.Haiku-MediaPlayer	607764928
+raw audio	MediaPlayer-InfoWin		raakaääni
 Location	MediaPlayer-InfoWin		Sijainti
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikkalainen)
 %d kHz	MediaPlayer-InfoWin		%d kHz
 Stream settings	MediaPlayer-Main		Virta-asetukset
 <unknown>	PlaylistItem-album		<tuntematon>
-The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Tiedostoa ’%filename’ ei voitu avata.\n\n
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Skaalausohjaimet kokonäyttötilassa
 Video	MediaPlayer-InfoWin		Video
 Subtitle size:	MediaPlayer-SettingsWindow		Aliotsikkokoko:
@@ -14,6 +13,7 @@ Save Playlist	MediaPlayer-PlaylistWindow		Tallenna soittoluettelo
 (not supported)	MediaPlayer-InfoWin		(ei ole tuettu)
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Mikään tiedostoista, jotka olisit halunnut soittaa, ei näytä olevan mediatiedostoja.
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Soittoluettelon tallentaminen epäonnistui.\n\nVirhe:
+%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 New player…	MediaPlayer-Main		Uusi soitin...
 100% scale	MediaPlayer-Main		100 % skaala
 Subtitle placement:	MediaPlayer-SettingsWindow		Aliotsikon sijainti:
@@ -50,7 +50,7 @@ Nothing to Play	MediaPlayer-Main		Ei mitään soitettavaa
 Muted	MediaPlayer-SettingsWindow		Mykistetty
 Quit	MediaPlayer-Main		Poistu
 Video	MediaPlayer-Main		Video
-Start playing.	MediaPlayer-Main		Aloita soittaminen
+Start playing.	MediaPlayer-Main		Aloita soittaminen.
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Tätä tiedostomuotoa käsittelevää dekooderia ei ole asennettu, tai dekooderilla on vaikeuksia tietyn muotoversion kanssa.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Tuo kappale
 Gets the URI of the currently playing item.	MediaPlayer-Main		Hakee parhaillaan soitettavan kappaleen Internet-resurssin tunnusosoitetta.
@@ -73,7 +73,7 @@ Stop playing.	MediaPlayer-Main		Lopeta soittaminen.
 Error: 	MediaPlayer-RemovePLItemsCmd		Virhe:
 Audio	MediaPlayer-InfoWin		Ääni
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Sisäinen virhe (vääränmuotoinen viesti). Soittoluettelon tallentaminen epäonnistui.
-Skip to the previous track.	MediaPlayer-Main		Hyppää edellisen kappaleen yli
+Skip to the previous track.	MediaPlayer-Main		Hyppää edellisen kappaleen yli.
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% kohtasi sisäisen virheen. Tiedostoa ei kyetty avaamaan.
 Close window after playing video	MediaPlayer-SettingsWindow		Sulje ikkuna videotiedoston soittamisen jälkeen
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Skaalaa elokuvat pehmeästi (ei-kerrostustila)
@@ -108,7 +108,7 @@ It appears the media server is not running.\nWould you like to start it ?	MediaP
 Duration	MediaPlayer-InfoWin		Kesto
 Aspect ratio	MediaPlayer-Main		Kuvasuhde
 Error: 	MediaPlayer-Main		Virhe:
-Large	MediaPlayer-SettingsWindow		Laaja
+Large	MediaPlayer-SettingsWindow		Suuri
 Bottom of video	MediaPlayer-SettingsWindow		Videon alareuna
 DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
 Stop	MediaPlayer-Main		Pysäytä
@@ -132,6 +132,7 @@ Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Satunnaista kappaleita
 Revert	MediaPlayer-SettingsWindow		Käänteinen
 Edit	MediaPlayer-PlaylistWindow		Muokkaa
 Start media server	MediaPlayer-Main		Käynnistä mediapalvelin
+%.3f fps	MediaPlayer-InfoWin		%.3f fps
 Toggle fullscreen.	MediaPlayer-Main		Täysruututila päälle/pois.
 ToggleFullscreen	MediaPlayer-Main		ToggleFullscreen
 <unnamed>	PlaylistItem-name		<nimetön>
@@ -158,7 +159,7 @@ Open file…	MediaPlayer-Main		Avaa tiedosto...
 300% scale	MediaPlayer-Main		300 % skaala
 Bottom of screen	MediaPlayer-SettingsWindow		Näytön alareuna
 Save error	MediaPlayer-PlaylistWindow		Tallenna virhe
-Rating	MediaPlayer-Main		Aset arvosana
+Rating	MediaPlayer-Main		Aseta arvosana
 Playlist	MediaPlayer-PlaylistWindow		Soittoluettelo
 Lock Peaks	MediaPlayer-PeakView		Lukitse huiput
 Low volume	MediaPlayer-SettingsWindow		Alenna äänenvoimakkuutta

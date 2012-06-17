@@ -1,9 +1,9 @@
-1	ukrainian	x-vnd.Haiku-MediaPlayer	986711925
+1	ukrainian	x-vnd.Haiku-MediaPlayer	4123753294
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Амер.)
 Stream settings	MediaPlayer-Main		Настройки потоку
 <unknown>	PlaylistItem-album		<невідомий>
-The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Файл'%filename' неможливо відкрити.\n\n
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Настройка маштабу в повноекранному режимі
+Video	MediaPlayer-InfoWin		Відео
 Subtitle size:	MediaPlayer-SettingsWindow		Розмір субтитрів:
 Save Playlist	MediaPlayer-PlaylistWindow		Зберегти список відтворення
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Жоден з файлів, які ви хотіли відкрити не є медіа файлом.
@@ -13,6 +13,7 @@ New player…	MediaPlayer-Main		Новий програвач…
 Subtitle placement:	MediaPlayer-SettingsWindow		Розміщення субтитрів:
 Close	MediaPlayer-Main		Закрити
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Деякі файли не можуть бути переміщені в кошик.
+<unknown>	MediaPlayer-InfoWin		<невідомий>
 Open	MediaPlayer-Main		Відкрити
 Next	MediaPlayer-Main		Наступний
 OK	MediaPlayer-SettingsWindow		Гаразд
@@ -56,6 +57,7 @@ Move Entry	MediaPlayer-MovePLItemsCmd		Перемістити запис
 Open	MediaPlayer-PlaylistWindow		Відкрити
 Stop playing.	MediaPlayer-Main		Зупинити відтворення
 Error: 	MediaPlayer-RemovePLItemsCmd		Помилка:
+Audio	MediaPlayer-InfoWin		Аудіо
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутрішня помилка (неправильне повідомлення). Збереження списку відтворення призупинено.
 Skip to the previous track.	MediaPlayer-Main		Повернутися до попереднього треку
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% викликав внутрішню помилку. Файл неможливо відкрити.

@@ -1,4 +1,5 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Keymap	2457049402
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Keymap	1338057828
+Revert	Modifier keys window		Tilbakestill
 Tilde trigger	Keymap window		Tildeutløser
 Select dead keys	Keymap window		Velg døde taster
 Quit	Keymap window		Avslutt
