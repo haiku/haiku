@@ -142,7 +142,7 @@ function SetFirmwarePermissions()
 {
 	cd ${firmwareDir}/${driver}/
 	for file in * ; do
-		if [ "$file" != "$driver" ] ; then
+		if [ "$file" != "$driver" ] && [ -f "$file" ] ; then
 			chmod a=r $file
 		fi
 	done
