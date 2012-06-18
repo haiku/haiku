@@ -2,11 +2,11 @@ SubDir HAIKU_TOP src tests system boot loader ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
-UsePrivateHeaders [ FDirName storage ] ;
-UsePrivateHeaders [ FDirName shared ] ;
+UsePrivateHeaders [ FDirName kernel util ] ;
+UsePrivateHeaders kernel shared storage system ;
 SubDirSysHdrs $(HAIKU_TOP) headers private kernel arch $(TARGET_ARCH) ;
+SubDirSysHdrs $(HAIKU_TOP) headers private system arch $(TARGET_ARCH) ;
 SubDirSysHdrs $(HAIKU_TOP) src tests system boot loader ;
 SubDirHdrs $(HAIKU_TOP) src system boot loader ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems amiga ;
@@ -34,6 +34,7 @@ ObjectDefines
 	loader.cpp
 	kernel_args.cpp
 	load_driver_settings.cpp
+	pager.cpp
 
 	# other
 	platform_menu.cpp
@@ -79,6 +80,7 @@ ObjectDefines
 SimpleTest BootLoaderTest :
 	# userland bindings
 	platform_start.cpp
+	platform_console.cpp
 	platform_debug.cpp
 	platform_devices.cpp
 	platform_heap.cpp
@@ -97,6 +99,7 @@ SimpleTest BootLoaderTest :
 	loader.cpp
 	kernel_args.cpp
 	load_driver_settings.cpp
+	pager.cpp
 
 	# partitioning systems
 	amiga_rdb.cpp
@@ -106,19 +109,20 @@ SimpleTest BootLoaderTest :
 	PartitionMap.cpp
 	PartitionMapParser.cpp
 
-	# utility functions - Dano has a strlcpy() function in libroot.so, while R5 has not
+	# utility functions
 	list.cpp
-	strlcat.c
-	strlcpy.c
 	driver_settings.cpp
+	ring_buffer.cpp
 	KMessage.cpp
 
-	: boottest_bfs.a boottest_amiga_ffs.a boottest_tarfs.a libz.a
-	;
+	:
+	boottest_bfs.a boottest_amiga_ffs.a boottest_tarfs.a libz.a
+	kernelland_emu
+;
 
 # Tell Jam where to find the utility sources
 
-SEARCH on [ FGristFiles list.cpp ]
+SEARCH on [ FGristFiles list.cpp ring_buffer.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 
 SEARCH on [ FGristFiles KMessage.cpp ]
@@ -134,7 +138,7 @@ SEARCH on [ FGristFiles
 		main.cpp vfs.cpp partitions.cpp
 		heap.cpp RootFileSystem.cpp
 		elf.cpp menu.cpp loader.cpp
-		kernel_args.cpp load_driver_settings.cpp
+		kernel_args.cpp load_driver_settings.cpp pager.cpp
 	] = [ FDirName $(HAIKU_TOP) src system boot loader ] ;
 
 # partitioning system modules

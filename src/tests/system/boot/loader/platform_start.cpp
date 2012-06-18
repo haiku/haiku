@@ -35,7 +35,8 @@ main(int argc, char **argv)
 {
 	// The command arguments are evaluated in platform_devices.cpp!
 
-	boot_main(NULL);
+	stage2_args args;
+	boot_main(&args);
 
 	return 0;
 }

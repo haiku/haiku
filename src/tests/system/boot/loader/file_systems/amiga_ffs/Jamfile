@@ -2,7 +2,8 @@ SubDir HAIKU_TOP src tests system boot loader file_systems amiga_ffs ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders [ FDirName kernel ] ;
+UsePrivateKernelHeaders ;
+UsePrivateSystemHeaders ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName storage ] ;
 SubDirSysHdrs $(HAIKU_TOP) src tests system boot loader ;
@@ -13,7 +14,7 @@ if $(TARGET_PLATFORM) != haiku {
 	UsePublicHeaders storage ;	# DiskDeviceDefs.h
 }
 
-ObjectDefines 
+ObjectDefines
 	amiga_ffs.cpp
 	Volume.cpp
 	Directory.cpp
