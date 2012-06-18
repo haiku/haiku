@@ -1,4 +1,5 @@
-1	english	x-vnd.Haiku-Keymap	1259868356
+1	english	x-vnd.Haiku-Keymap	140876782
+Revert	Modifier keys window		取消
 Tilde trigger	Keymap window		触发颚化字符
 Grave trigger	Keymap window		触发雕刻字符
 Select dead keys	Keymap window		选择废键：

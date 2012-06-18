@@ -1,11 +1,10 @@
-1	german	x-vnd.Haiku-MediaPlayer	721480919
+1	german	x-vnd.Haiku-MediaPlayer	607764928
 raw audio	MediaPlayer-InfoWin		Raw-Audio
 Location	MediaPlayer-InfoWin		Ort
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikanisch)
 %d kHz	MediaPlayer-InfoWin		%d kHz
 Stream settings	MediaPlayer-Main		Stream-Einstellungen
 <unknown>	PlaylistItem-album		<unbekannt>
-The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Die Datei '%filename' konnte nicht geöffnet werden.\n\n
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Bedienelemente im Vollbildmodus vergrößern
 Video	MediaPlayer-InfoWin		Video
 Subtitle size:	MediaPlayer-SettingsWindow		Untertitelgröße:

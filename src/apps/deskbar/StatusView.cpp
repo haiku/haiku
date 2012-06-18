@@ -181,11 +181,6 @@ TReplicantTray::AttachedToWindow()
 
 	AddChild(fTime);
 	fTime->MoveTo(Bounds().right - fTime->Bounds().Width() - 1, 2);
-	if (!((TBarApp*)be_app)->Settings()->showTime) {
-		fTime->Hide();
-		RealignReplicants();
-		AdjustPlacement();
-	}
 
 #ifdef DB_ADDONS
 	// load addons and rehydrate archives
@@ -438,13 +433,13 @@ TReplicantTray::InitAddOnSupport()
 			int32 id;
 			BString path;
 			if (fAddOnSettings.Unflatten(&file) == B_OK) {
-				for (int32 i = 0; fAddOnSettings.FindString(kReplicantPathField, 
+				for (int32 i = 0; fAddOnSettings.FindString(kReplicantPathField,
 					i, &path) == B_OK; i++) {
 					if (entry.SetTo(path.String()) == B_OK && entry.Exists()) {
 						result = LoadAddOn(&entry, &id, false);
-					} else 
+					} else
 						result = B_ENTRY_NOT_FOUND;
-					
+
 					if (result != B_OK) {
 						fAddOnSettings.RemoveData(kReplicantPathField, i);
 						--i;
@@ -460,7 +455,7 @@ void
 TReplicantTray::DeleteAddOnSupport()
 {
 	_SaveSettings();
-	
+
 	for (int32 i = fItemList->CountItems(); i-- > 0 ;) {
 		DeskbarItemInfo* item = (DeskbarItemInfo*)fItemList->RemoveItem(i);
 		if (item) {
@@ -641,7 +636,7 @@ TReplicantTray::LoadAddOn(BEntry* entry, int32* id, bool addToSettings)
 		fAddOnSettings.AddString(kReplicantPathField, path.Path());
 		_SaveSettings();
 	}
-	
+
 	return B_OK;
 }
 
@@ -711,7 +706,7 @@ TReplicantTray::RemoveItem(int32 id)
 	if (item->isAddOn) {
 		BPath path(&item->entryRef);
 		BString storedPath;
-		for (int32 i = 0; 
+		for (int32 i = 0;
 			fAddOnSettings.FindString(kReplicantPathField, i, &storedPath)
 				== B_OK; i++) {
 			if (storedPath == path.Path()) {
@@ -720,7 +715,7 @@ TReplicantTray::RemoveItem(int32 id)
 			}
 		}
 		_SaveSettings();
-				
+
 		BNode node(&item->entryRef);
 		watch_node(&item->nodeRef, B_STOP_WATCHING, this, Window());
 	}
@@ -1225,7 +1220,7 @@ TReplicantTray::_SaveSettings()
 		path.Append(kReplicantSettingsFile);
 
 		BFile file(path.Path(), B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
-		if ((result = file.InitCheck()) == B_OK) 
+		if ((result = file.InitCheck()) == B_OK)
 			result = fAddOnSettings.Flatten(&file);
 	}
 
@@ -1240,7 +1235,6 @@ TReplicantTray::SaveTimeSettings()
 		return;
 
 	desk_settings* settings = ((TBarApp*)be_app)->Settings();
-	settings->showTime = !fTime->IsHidden();
 	settings->showSeconds = fTime->ShowSeconds();
 	settings->showDayOfWeek = fTime->ShowDayOfWeek();
 }

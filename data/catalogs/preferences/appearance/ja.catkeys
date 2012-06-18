@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Appearance	2558216842
+1	japanese	x-vnd.Haiku-Appearance	3882211276
 Plain font:	Font view		標準フォント：
 Control highlight	Colors tab		コントロールのハイライト
 Control border	Colors tab		コントロールの境界
@@ -16,8 +16,6 @@ Inactive window tab text	Colors tab		非アクティブウィンドウタブの�
 About Decorator	DecorSettingsView		デコレーターについて
 Failure	Colors tab		失敗
 Hinting menu	AntialiasingSettingsView		ヒンティングメニュー
-Window Decorator	APRWindow		ウィンドウデコレーター
-Window Decorator:	DecorSettingsView		ウィンドウデコレーター：
 Document background	Colors tab		ドキュメントの背景
 Revert	APRWindow		元に戻す
 Window tab	Colors tab		ウィンドウのタブ

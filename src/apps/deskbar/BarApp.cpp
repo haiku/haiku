@@ -204,7 +204,6 @@ TBarApp::SaveSettings()
 		storedSettings.AddInt32("state", fSettings.state);
 		storedSettings.AddFloat("width", fSettings.width);
 
-		storedSettings.AddBool("showTime", fSettings.showTime);
 		storedSettings.AddBool("showSeconds", fSettings.showSeconds);
 		storedSettings.AddBool("showDayOfWeek", fSettings.showDayOfWeek);
 
@@ -244,7 +243,6 @@ TBarApp::InitSettings()
 	settings.vertical = true;
 	settings.left = false;
 	settings.top = true;
-	settings.showTime = true;
 	settings.showSeconds = false;
 	settings.showDayOfWeek = false;
 	settings.state = kExpandoState;
@@ -301,10 +299,6 @@ TBarApp::InitSettings()
 			}
 			if (storedSettings.FindFloat("width", &settings.width) != B_OK)
 				settings.width = 0;
-			if (storedSettings.FindBool("showTime", &settings.showTime)
-					!= B_OK) {
-				settings.showTime = true;
-			}
 			if (storedSettings.FindBool("showSeconds", &settings.showSeconds)
 					!= B_OK) {
 				settings.showSeconds = false;

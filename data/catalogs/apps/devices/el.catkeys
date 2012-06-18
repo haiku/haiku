@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Devices	600550154
+1	greek, modern (1453-)	x-vnd.Haiku-Devices	3390622992
 Manufacturer	DeviceSCSI		Κατασκευαστής
 Order by:	DevicesView		Κατανομή κατά:
 ACPI controller	Device		Ελεγκτής ACPI
@@ -61,3 +61,12 @@ Worm	DeviceSCSI		Σκώληκας
 Multimedia controller	Device		Ελεγκτής πολυμέσων
 Unknown	DevicePCI		Άγνωστο
 Device name:	Device		Όνομα συσκευής:
+Computer	DevicesView		Υπολογιστής
+Device name	Device		Όνομα συσκευής
+Manufacturer	Device		Κατασκευαστής
+Manufacturer	DevicePCI		Κατασκευαστής
+Bridge	Device		Γέφυρα
+Unknown device	DevicesView		Άγνωστη συσκευή
+Device name	DeviceSCSI		Όνομα συσκευής
+Device paths	DevicePCI		Διαδρομές συσκευών
+Devices	DevicesView		Συσκευές

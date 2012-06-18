@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Appearance	168322075
+1	english	x-vnd.Haiku-Appearance	1492316509
 Control highlight	Colors tab		控件亮度
 Control border	Colors tab		控件边界
 Antialiasing type:	AntialiasingSettingsView		抗锯齿类型:
@@ -15,8 +15,6 @@ Inactive window tab text	Colors tab		激活窗口标签
 About Decorator	DecorSettingsView		关于 Decorator
 Failure	Colors tab		失败
 Hinting menu	AntialiasingSettingsView		提示菜单
-Window Decorator	APRWindow		窗口装饰
-Window Decorator:	DecorSettingsView		窗口装饰：
 Document background	Colors tab		文档背景
 Revert	APRWindow		取消
 Window tab	Colors tab		窗口选项

@@ -70,6 +70,8 @@ APRView::APRView(const char* name)
 	}
 #endif
 
+	LoadSettings();
+
 	// Set up list of color attributes
 	fAttrList = new BListView("AttributeList", B_SINGLE_SELECTION_LIST);
 
@@ -80,7 +82,8 @@ APRView::APRView(const char* name)
 		const ColorDescription& description = *get_color_description(i);
 		const char* text = B_TRANSLATE_NOCOLLECT(description.text);
 		color_which which = description.which;
-		fAttrList->AddItem(new ColorWhichItem(text, which));
+		fAttrList->AddItem(new ColorWhichItem(text, which,
+			fCurrentSet.GetColor(which)));
 	}
 
 	BRect wellrect(0, 0, 50, 50);
@@ -122,7 +125,6 @@ APRView::AttachedToWindow()
 	fAttrList->SetTarget(this);
 	fColorWell->SetTarget(this);
 
-	LoadSettings();
 	fAttrList->Select(0);
 }
 
@@ -246,6 +248,14 @@ void
 APRView::_UpdateControls()
 {
 	rgb_color color = fCurrentSet.GetColor(fWhich);
+
+	int32 currentIndex = fAttrList->CurrentSelection();
+	ColorWhichItem *item = (ColorWhichItem*) fAttrList->ItemAt(currentIndex);
+	if (item != NULL) {
+		item->SetColor(color);
+		fAttrList->InvalidateItem(currentIndex);
+	}
+
 	fPicker->SetValue(color);
 	fColorWell->SetColor(color);
 	fColorWell->Invalidate();

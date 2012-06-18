@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Time	1859841283
+1	belarusian	x-vnd.Haiku-Time	3249243267
 GMT (UNIX compatible)	Time		GMT (як у UNIX)
 OK	Time		ОК
 Asia	Time		Азія
@@ -30,6 +30,7 @@ Time	System name		Дата і Час
 America	Time		Амерыка
 Reset	Time		Скінуць
 Synchronize at boot	Time		Сінхранізаваць падчас старту
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date, распрацавана:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Received invalid time	Time		Атрыманы несапраўдны час
 Antarctica	Time		Антарктыка
 The following error occured while synchronizing:r\n%s: %s	Time		Памылка падчас сінхранізацыі:r\n%s: %s

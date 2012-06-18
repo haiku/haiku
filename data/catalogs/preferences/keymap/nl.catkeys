@@ -1,4 +1,5 @@
-1	dutch; flemish	x-vnd.Haiku-Keymap	1259868356
+1	dutch; flemish	x-vnd.Haiku-Keymap	140876782
+Revert	Modifier keys window		Herstellen
 Tilde trigger	Keymap window		Tilde-activeerder
 Grave trigger	Keymap window		Accent grave-activeerder
 Select dead keys	Keymap window		Selecteer dode toetsen

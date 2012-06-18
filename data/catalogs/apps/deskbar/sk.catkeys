@@ -1,15 +1,19 @@
-1	slovak	x-vnd.Be-TSKB	1095421712
+1	slovak	x-vnd.Be-TSKB	359782181
 Power off	DeskbarMenu		Vypnúť
+Show day of week	PreferencesWindow		Zobraziť deň v týždni
 Edit menu…	PreferencesWindow		Upraviť menu…
 Applications	PreferencesWindow		Aplikácie
+Time preferences…	TimeView		Nastavenia času…
 Recent documents:	PreferencesWindow		Nedávne dokumenty:
 Recent applications	DeskbarMenu		Nedávne aplikácie
 Sort running applications	PreferencesWindow		Zoradiť bežiace aplikácie
+Show time	Tray		Zobraziť čas
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplikácie
 Find…	DeskbarMenu		Nájsť…
 Window	PreferencesWindow		Okno
 Menu	PreferencesWindow		Menu
 Recent documents	DeskbarMenu		Nedávne dokumenty
+Show seconds	PreferencesWindow		Zobraziť sekundy
 Auto-hide	PreferencesWindow		Automaticky skrývať
 Always on top	PreferencesWindow		Vždy na vrchu
 <Deskbar folder is empty>	DeskbarMenu		<priečinok Panel je prázdny>
@@ -17,6 +21,7 @@ Show all	WindowMenu		Zobraziť všetky
 No windows	WindowMenu		Žiadne okná
 Deskbar	System name		Panel
 Restart system	DeskbarMenu		Reštartovať systém
+Large	PreferencesWindow		Veľké
 Auto-raise	PreferencesWindow		Automaticky aktivovať
 Hide time	TimeView		Skryť čas
 Recent folders:	PreferencesWindow		Nedávne priečinky:
@@ -25,6 +30,7 @@ Restart Tracker	DeskbarMenu		Reštartovať Tracker
 Close all	WindowMenu		Zatvoriť všetky
 Deskbar preferences	PreferencesWindow		Nastavenia Panelu
 Mount	DeskbarMenu		Pripojiť
+Small	PreferencesWindow		Malé
 Recent applications:	PreferencesWindow		Nedávne aplikácie:
 Shutdown…	DeskbarMenu		Vypnúť…
 Tracker always first	PreferencesWindow		Tracker vždy prvý
@@ -35,8 +41,10 @@ Show calendar…	TimeView		Zobraziť kalendár…
 Deskbar preferences…	DeskbarMenu		Nastavenia Panelu…
 Expand new applications	PreferencesWindow		Výsuvný zoznam nových aplikácií
 Show replicants	DeskbarMenu		Zobraziť replikantov
+Hide application names	PreferencesWindow		Skryť názvy aplikácií
 Clock	PreferencesWindow		Hodiny
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demá
+Icon size	PreferencesWindow		Veľkosť ikon
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Aplety plochy
 Hide all	WindowMenu		Skryť všetky
 Quit application	WindowMenu		Ukončiť aplikáciu

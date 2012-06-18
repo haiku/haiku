@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Mail	3915766319
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Mail	4066342318
 Mail checking	Config Window		Se etter e-post
 Settings	Config Window		Innstillinger
 Only when dial-up is connected	Config Window		Bare når oppringt nettverk er tilkoblet
@@ -6,6 +6,7 @@ While sending and receiving	Config Window		Under sending og mottak
 days	Config Window		dager
 OK	Config Window		OK
 Start mail services on startup	Config Window		Start e-posttjenester ved oppstart
+Account name:	E-Mail		Kontonavn
 Account name:	Config Views		Kontonavn
 OK	Config Views		OK
 The filter could not be moved. Deleting filter.	Config Views		Filteret kunne ikke flyttes. Sletter filter.
@@ -18,6 +19,7 @@ While sending	Config Window		Under sending
 Schedule outgoing mail when dial-up is disconnected	Config Window		Legg utgående e-post i kø når oppringt nettverk er frakoblet
 hours	Config Window		timer
 Add	Config Window		Legg til
+Account settings	AutoConfigWindow		Kontoinnstillinger
 E-mail	System name		E-post
 Real name:	Config Views		Virkelig navn
 Return address:	Config Views		Svaradresse
@@ -27,8 +29,10 @@ Check every	Config Window		Sjekk hver
 Incoming mail filters	Config Views		Inkommende e-postfiltre
 Account settings	Config Views		Kontoinnstillinger
 minutes	Config Window		minutter
+Real name:	E-Mail		Virkelig navn
 Apply	Config Window		Bruk
 Always	Config Window		Alltid
+OK	AutoConfigWindow		OK
 Add filter	Config Views		Legg til filter
 Outgoing mail filters	Config Views		Utgående e-postfiltre
 \n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nLegg til en ny konto med Legg til-knappen.\n\nFjern en konto med Fjern-knappen på den valgte oppføringen.\n\nVelg en oppføring fra listen for å forandre innstillingene.

@@ -18,14 +18,12 @@
 
 PrimaryPartitionEditor::PrimaryPartitionEditor()
 	:
-	BPartitionParameterEditor(),
-	fView(NULL),
-	fActiveCB(NULL),
 	fParameters(NULL)
 {
-	fActiveCB = new BCheckBox("active", B_TRANSLATE("Active partition"), NULL);
+	fActiveCheckBox = new BCheckBox("active", B_TRANSLATE("Active partition"),
+		NULL);
 	fView = new BGroupView(B_VERTICAL);
-	fView->AddChild(fActiveCB);
+	fView->AddChild(fActiveCheckBox);
 }
 
 
@@ -44,12 +42,13 @@ PrimaryPartitionEditor::View()
 bool
 PrimaryPartitionEditor::FinishedEditing()
 {
-	if (fActiveCB->IsEnabled()) {
-		if (fActiveCB->Value() == B_CONTROL_ON)
+	if (fActiveCheckBox->IsEnabled()) {
+		if (fActiveCheckBox->Value() == B_CONTROL_ON)
 			fParameters.SetTo("active true ;");
 		else
 			fParameters.SetTo("active false ;");
-	} else fParameters.SetTo("");
+	} else
+		fParameters.SetTo("");
 
 	return true;
 }
@@ -69,6 +68,6 @@ PrimaryPartitionEditor::GetParameters(BString* parameters)
 status_t
 PrimaryPartitionEditor::PartitionTypeChanged(const char* type)
 {
-	fActiveCB->SetEnabled(strcmp(type, kPartitionTypeIntelExtended) != 0);
+	fActiveCheckBox->SetEnabled(strcmp(type, kPartitionTypeIntelExtended) != 0);
 	return B_OK;
 }

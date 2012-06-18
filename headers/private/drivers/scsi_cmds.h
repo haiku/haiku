@@ -196,6 +196,7 @@
 #define SCSI_OP_READ_16						0x88
 #define SCSI_OP_WRITE_16					0x8a
 #define SCSI_OP_VERIFY_16					0x8f
+#define SCSI_OP_WRITE_SAME_16				0x93
 #define SCSI_OP_SERVICE_ACTION_IN			0x9e
 #define SCSI_OP_SERVICE_ACTION_OUT			0x9f
 #define SCSI_OP_MOVE_MEDIUM					0xa5
@@ -434,6 +435,28 @@ typedef struct scsi_cmd_rw_16 {
 	uint8	control;
 } _PACKED scsi_cmd_rw_16;
 
+
+// WRITE SAME (16)
+
+typedef struct scsi_cmd_wsame_16 {
+	uint8	opcode;
+	LBITFIELD8_6(
+		_res1_0 : 1,
+		lb_data : 1,
+		pb_data : 1,
+		unmap : 1,
+		_res1_4 : 1,
+		write_protect : 3
+	);
+	uint64	lba;
+	uint32	length;
+	LBITFIELD8_2(
+		group_number : 5,
+		_res14_5 : 3
+	);
+	uint8	control;
+} _PACKED scsi_cmd_wsame_16;
+	
 
 // REQUEST SENSE
 

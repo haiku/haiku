@@ -1,9 +1,8 @@
-1	english	x-vnd.Haiku-MediaPlayer	1950323722
+1	english	x-vnd.Haiku-MediaPlayer	1836607731
 raw audio	MediaPlayer-InfoWin		原生音频
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1（美式）
 Stream settings	MediaPlayer-Main		流设置
 <unknown>	PlaylistItem-album		<未知>
-The file'%filename' could not be opened.\n\n	MediaPlayer-Main		无法打开 '%filename' 文件。\n\n
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		全屏模式比例控制
 Video	MediaPlayer-InfoWin		视频
 Subtitle size:	MediaPlayer-SettingsWindow		字幕大小：

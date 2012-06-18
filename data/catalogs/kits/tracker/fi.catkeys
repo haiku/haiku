@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	3121200791
+1	finnish	x-vnd.Haiku-libtracker	3695303004
 common	B_COMMON_DIRECTORY		yhteinen
 OK	WidgetAttributeText		Valmis
 Icon view	VolumeWindow		Kuvakenäkymä
@@ -47,6 +47,7 @@ Select all	ContainerWindow		Valitse kaikki
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Attribuuttia ’Character’ ei voi tallentaa monitavuiseen kirjoitusmerkkiin.
 Clean up	DeskWindow		Tyhjennä
 You cannot copy or move the root directory.	FSUtils		Et voi kopioida tai siirtää root-hakemistoon.
+%SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed / %TotalSize, %BytesPerSecond/s
 Invert selection	FilePanelPriv		Käänteinen valinta
 Rename	InfoWindow	Button label, 'Rename' (en), 'Umbenennen' (de)	Nimeä uudelleen
 save text	FilePanelPriv		tallenna teksti
@@ -76,6 +77,7 @@ Decrease size	DeskWindow		Pienennä kokoa
 Size	ContainerWindow		Koko
 All disks	AutoMounterSettings		Kaikki levyt
 Would you like to find some other suitable application?	FSUtils		Haluaisitko etsiä jonkun toisen sopivan sovelluksen?
+Finish: %time - %finishtime left	StatusWindow		Loppuu: %time - %finishtime jäljellä
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Ei voitu avata asiakirjaa ”%document” sovelluksella ”%app” (Puuttuvat kirjastot: %library). \n
 no items	CountView		ei kohteita
 Ignore case	SelectionWindow		Ohita kirjainkoko
@@ -88,7 +90,7 @@ Replace	FilePanelPriv		Korvaa
 Select all	VolumeWindow		Valitse kaikki
 Opens with:	InfoWindow		Avaa sovelluksella:
 Open	ContainerWindow		Avaa
-Error calculating folder size.	InfoWindow		Virhe laskettaessa kansiokokoa
+Error calculating folder size.	InfoWindow		Virhe laskettaessa kansiokokoa.
 New folder	FilePanelPriv		Uusi kansio
 %name info	InfoWindow	InfoWindow Title	%name-tiedot
 Favorites	FavoritesMenu		Suosikit
@@ -131,6 +133,7 @@ OK	TrackerInitialState		Valmis
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Ei voitu avata kohdetta ”%name”. Tiedosto on virheellisesti merkitty suoritettavaksi tiedostoksi.
 Add-ons	ContainerWindow		Lisäosat
 Edit templates…	TemplatesMenu		Muokkaa mallinteita...
+Finish: %time - Over %finishtime left	StatusWindow		Loppuu: %time - Yli %finistime jäljellä
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Kohde nimeltä ”%name” on jo olemassa tässä kansiossa. Haluaisitko korvata sen symbolisella linkillä, jota olet luomassa?
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Kohdetaltiolla ei ole tarpeeksi tilaa valinnan kopioimiseksi.
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Ei voitu avata asiakirjaa ”%document” sovelluksella ”%app” (%error). 
@@ -196,7 +199,7 @@ The application \"%appname\" does not support the type of document you are about
 Preparing to restore items…	StatusWindow		Valmistaudutaan palauttamaan kohteita...
 Replace other file	WidgetAttributeText		Korvaa muu tiedosto
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Joitakin valittuja kohteita ei voi siirtää roskakoriin. Haluaisitko sen sijaan poistaa ne? (Tätä toimintoa ei voi palauttaa.)
-You cannot create a link to the root directory.	FSUtils		Et voi luoda linkki juurihakemistoon.
+You cannot create a link to the root directory.	FSUtils		Et voi luoda linkkiä juurihakemistoon.
 48 x 48	ContainerWindow		48 x 48
 Resize to fit	VolumeWindow		Muunna koko sopimaan
 Could not find application \"%appname\"	OpenWithWindow		Ei voitu löytää sovellusta ”%appname”
@@ -252,6 +255,7 @@ Trash	TrackerSettingsWindow		Roskakori
 Unmount	ContainerWindow		Irrota
 Copy layout	ContainerWindow		Kopioi sijoittelu
 label too long	PoseView		nimike on liian pitkä
+Finish: %time	StatusWindow		Loppuu klo: %time
 Cancel	Tracker		Peru
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Et voi muokata tuota attribuuttia.
 Name	ContainerWindow		Nimi
@@ -290,7 +294,7 @@ Real name	ContainerWindow		Oikea nimi
 Error moving \"%name\"	FSUtils		Virhe siirrettäessä kohdetta ”%name”
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Sinun on pudotettava kohteet ”Levyt”-ikkunan yhdelle levykuvakkeelle.
 Cancel	WidgetAttributeText		Peru
-Could not find an application to open \"%name\" (%error). 	FSUtils		Ei voitu löytää sovellusta avattavaksi ”%name” (%error).
+Could not find an application to open \"%name\" (%error). 	FSUtils		Ei voitu löytää sovellusta ”%name” avattavaksi (%error).
 Create a Query template	FindPanel		Luo kyselymallinne
 Previously mounted disks	AutoMounterSettings		Aiemmin liitetyt levyt
 %Ld B	WidgetAttributeText		%Ld tavua
@@ -341,7 +345,7 @@ Used space color	SettingsView		Käytetyn tilan väri
 Sorry, could not create a new folder.	FSUtils		Ei voitu luoda uutta kansiota.
 multiple disks	FindPanel		useita levyjä
 Done	AutoMounterSettings		Valmis
-You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Sinun on pudottava kohteet yhteen ”Levyt”-ikkunan levykuvakkeista.
+You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Sinun on pudotettava kohteet yhteen ”Levyt”-ikkunan levykuvakkeista.
 Untitled clipping	PoseView		Otsikoton leikkaus
 Don't automount	AutoMounterSettings		Älä liitä automaattisesti
 Save	FilePanelPriv		Tallenna
@@ -379,7 +383,7 @@ Copy	FilePanelPriv		Kopioi
 Icon view	DeskWindow		Kuvakenäkymä
 Select all	QueryContainerWindow		Valitse kaikki
 Files cannot be moved or deleted from a read-only volume.	PoseView		Tiedostoja ei voi siirtää tai poistaa kirjoitussuojatulta taltiolta.
-There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Kohteen ”%name” korvaaminen epäonnistui. Kohde ei ehkä ole avattu tai se on varattu.
+There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Kohteen ”%name” korvaaminen epäonnistui. Kohde on ehkä avattu tai se on varattu.
 You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		Et voi laittaa roskakoria, kotihakemistoa tai työpöytähakemistoa roskakoriin.
 Owner	FilePermissionsView		Omistaja
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Tallentaminen haluamaasi kansioon epäonnistui. Kokeile jotain toista kansiota.

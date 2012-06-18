@@ -1,11 +1,10 @@
-1	lithuanian	x-vnd.Haiku-MediaPlayer	742320061
+1	lithuanian	x-vnd.Haiku-MediaPlayer	607764928
 raw audio	MediaPlayer-InfoWin		neapdorotas garso įrašas
 Location	MediaPlayer-InfoWin		Vieta
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikietiškas)
 %d kHz	MediaPlayer-InfoWin		%d kHz
 Stream settings	MediaPlayer-Main		Kaip nurodyta sraute
 <unknown>	PlaylistItem-album		<nežinomas>
-The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Failo „%filename“ nepavyko atverti.\n\n
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Padidinti valdiklius pilno ekrano veiksenoje
 Video	MediaPlayer-InfoWin		Vaizdas
 Subtitle size:	MediaPlayer-SettingsWindow		Subtitrų dydis:
@@ -14,6 +13,7 @@ Save Playlist	MediaPlayer-PlaylistWindow		Įrašyti grojaraštį
 (not supported)	MediaPlayer-InfoWin		(nepalaikoma)
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Nė vienas iš bandomų leisti failų nėra garso arba vaizdo įrašas.
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Grojaraščio įrašyti nepavyko.\n\nKlaida:
+%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 New player…	MediaPlayer-Main		Nauja leistuvė…
 100% scale	MediaPlayer-Main		Mastelis 100%
 Subtitle placement:	MediaPlayer-SettingsWindow		Subtitrų padėtis:
@@ -33,8 +33,10 @@ Stereo	MediaPlayer-InfoWin		Stereo
 Open…	MediaPlayer-PlaylistWindow		Atverti…
 Toggle mute.	MediaPlayer-Main		Nutildyti / grąžinti garsą
 Undo	MediaPlayer-PlaylistWindow		Atšaukti
+Use hardware video overlays if available	MediaPlayer-SettingsWindow		Naudoti aparatinį video perdengimą, jei įmanoma
 File info…	MediaPlayer-Main		Failo savybės…
 Pause playback.	MediaPlayer-Main		Pristabdyti atkūrimą.
+Overlay	MediaPlayer-InfoWin		Perdengimas
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Pašalinti įrašą
 Close window after playing audio	MediaPlayer-SettingsWindow		Užverti langą baigus garso įrašo atkūrimą
 Full volume	MediaPlayer-SettingsWindow		Visas
@@ -74,6 +76,7 @@ Internal error (malformed message). Saving the playlist failed.	MediaPlayer-Play
 Skip to the previous track.	MediaPlayer-Main		Peršokti į ankstesnį takelį.
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		Vidinė klaida „%app%“ programoje. Failo atverti nepavyko.
 Close window after playing video	MediaPlayer-SettingsWindow		Užverti langą baigus vaizdo įrašo atkūrimą
+Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Tolygiai keisti vaizdo mastelį (neperdengimo veiksenoje)
 OK	MediaPlayer-RemovePLItemsCmd		Gerai
 50% scale	MediaPlayer-Main		Mastelis 50%
 Subtitles	MediaPlayer-Main		Subtitrai
@@ -129,6 +132,7 @@ Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Sumaišyti įrašus
 Revert	MediaPlayer-SettingsWindow		Atšaukti pakeitimus
 Edit	MediaPlayer-PlaylistWindow		Taisa
 Start media server	MediaPlayer-Main		Paleisti įvairialypės terpės tarnybą
+%.3f fps	MediaPlayer-InfoWin		%.3f kadr./sek.
 Toggle fullscreen.	MediaPlayer-Main		Įjungti / išjungti viso ekrano veikseną.
 ToggleFullscreen	MediaPlayer-Main		ToggleFullscreen
 <unnamed>	PlaylistItem-name		<be pavadinimo>

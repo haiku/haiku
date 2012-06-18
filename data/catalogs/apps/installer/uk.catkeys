@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Installer	3852628561
+1	ukrainian	x-vnd.Haiku-Installer	2099988747
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Так позаду інших пунктів меню, що вказані зверху файлу просто додайте щось схоже на ці рядки:\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Ви впевнені що бажаєте зупинити встановлення і перезавантажити систему?
 \t}\n\n	InstallerApp		\t}\n\n
@@ -28,7 +28,6 @@ Install from:	InstallerWindow		Встановити з:
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		ВАЖЛИВА ІНФОРМАЦІЯ ПЕРЕД ВСТАНОВЛЕННЯМ HAIKU\n\n
 Continue	InstallerWindow	In alert after pressing Stop	Продовжити
 Write boot sector to '%s'	InstallerWindow		Записати загрузочний сектор до '%s'
-2.1) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
 Collecting copy information.	InstallProgress		Збір інформації для копіювання.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Виберіть диск джерело з випадаючого меню. Тоді клікніть \"Почати\".
 Quit Boot Manager and DriveSetup	InstallerWindow		Вийти з Бутменеджера і утиліти DriveSetup
@@ -49,7 +48,6 @@ README	InstallerApp		ПРОЧИТАЙ
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Поточний диск має недостатньо місця. Виберіть інший диск або не встановлюйте необов’язкові елементи.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Закрийти Бутменеджер і вікно DriveSetup до закриття вікна Встановлювача.
 Scanning for disks…	InstallerWindow		Сканування дисків…
-2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Диск неможливо підмонтувати. Виберіть інший.
 ?? of ??	InstallerWindow	Unknown progress	?? з ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
@@ -99,7 +97,6 @@ DriveSetup, the application to configure disk partitions, could not be launched.
 No optional packages available.	PackagesView		Необов’язкові пакети відсутні.
 All hard disks start with \"hd\".\n	InstallerApp		Всі жорсткі диски починаються з \"hd\".\n
 Continue	InstallerApp		Продовжити
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" documentation, there is a link on the Desktop.\n\n	InstallerApp		3) Коли Ви успішно зануритесь у Haiku почніть з прочитання документації \"Welcome\", її лінк Ви знайдете на робочому столі.\n\n
 BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		 Завантажувач (BootManager), додаток для конфігурування загрузочного меню Haiku, не є запущеним.
 Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Зконфігуруйте /boot/grub/menu.lst запустивши свій улюблений редактор з Terminal’у ось так:\n\n
 Boot sector not written because of an internal error.	InstallProgress		Загрузочний сектор не записано через внутрішню помилку.

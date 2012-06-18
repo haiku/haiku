@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-Appearance	168322075
+1	hindi	x-vnd.Haiku-Appearance	1492316509
 Control highlight	Colors tab		उजागर के लिए नियंत्रण
 Control border	Colors tab		नियंत्रण सीमा
 Antialiasing type:	AntialiasingSettingsView		एंटीएलिअसिंग टाइप:
@@ -15,8 +15,6 @@ Inactive window tab text	Colors tab		निष्क्रिय विंडो
 About Decorator	DecorSettingsView		डेकोरेटर के बारे में
 Failure	Colors tab		असफलता
 Hinting menu	AntialiasingSettingsView		सहाईता के लिए मेनू
-Window Decorator	APRWindow		विंडो डेकोरेटर
-Window Decorator:	DecorSettingsView		विंडो डेकोरेटर:
 Document background	Colors tab		दस्तावेज़ पृष्ठभूमि
 Revert	APRWindow		वापस लौटने
 Window tab	Colors tab		विंडो टैब

@@ -1,9 +1,9 @@
-1	greek, modern (1453-)	x-vnd.Haiku-MediaPlayer	986711925
+1	greek, modern (1453-)	x-vnd.Haiku-MediaPlayer	4123753294
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Αμερικάνικο)
 Stream settings	MediaPlayer-Main		Ρυθμίσεις ροής
 <unknown>	PlaylistItem-album		<άγνωστο>
-The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Το αρχείο '%filename' δεν μπορεί να ανοιχτεί. \n\n
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Κλιμάκωση των ελέγχων σε λειτουργία πλήρους οθόνης
+Video	MediaPlayer-InfoWin		Βίντεο
 Subtitle size:	MediaPlayer-SettingsWindow		Μέγεθος υπότιτλων:
 Save Playlist	MediaPlayer-PlaylistWindow		Αποθήκευση λίστας αναπαραγωγής
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		None of the files you wanted to play appear to be media files.
@@ -13,6 +13,7 @@ New player…	MediaPlayer-Main		Νέος αναπαραγωγός…
 Subtitle placement:	MediaPlayer-SettingsWindow		Τοποθέτηση υπότιτλων:
 Close	MediaPlayer-Main		Κλείσιμο
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Μερικά αρχεία δεν μπορούν να μετακινηθούν στον Κάδο.
+<unknown>	MediaPlayer-InfoWin		<άγνωστο>
 Open	MediaPlayer-Main		Άνοιγμα
 Next	MediaPlayer-Main		Επόμενο
 OK	MediaPlayer-SettingsWindow		Εντάξει
@@ -56,6 +57,7 @@ Move Entry	MediaPlayer-MovePLItemsCmd		Μετακίνηση Καταχώρηση
 Open	MediaPlayer-PlaylistWindow		Άνοιγμα
 Stop playing.	MediaPlayer-Main		Σταμάτημα αναπαραγωγής
 Error: 	MediaPlayer-RemovePLItemsCmd		Σφάλμα:
+Audio	MediaPlayer-InfoWin		Ήχος
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Εσωτερικό σφάλμα (ακατάλληλο μήνυμα). Απέτυχε η αποθήκευση της λίστας αναπαραγωγής.
 Skip to the previous track.	MediaPlayer-Main		Μετάβαση στο προηγούμενο κομμάτι.
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		Το %app% αντιμετώπησε ένα εσωτερικό σφάλμα. Τα αρχείο δεν μπόρεσε να ανοίξει.

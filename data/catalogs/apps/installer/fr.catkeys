@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Installer	3852628561
+1	french	x-vnd.Haiku-Installer	2099988747
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Ainsi, après les autres entrées du menu vers la fin du fichier, ajouter quelque chose semblable à ces lignes :\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Êtes-vous sûr de vouloir abandonner l'installation et redémarrer le système ?
 \t}\n\n	InstallerApp		\t}\n\n
@@ -28,7 +28,6 @@ Install from:	InstallerWindow		Installer depuis :
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		INFORMATIONS IMPORTANTES AVANT D'INSTALLER HAIKU\n\n
 Continue	InstallerWindow	In alert after pressing Stop	Continuer
 Write boot sector to '%s'	InstallerWindow		Écrire le secteur d'amorce sur « %s »
-2.1) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
 Collecting copy information.	InstallProgress		Récupération des informations de copie.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Choisir le disque source dans la liste déroulante, puis cliquer sur « Commencer ».
 Quit Boot Manager and DriveSetup	InstallerWindow		Quitter le gestionnaire d'amorçage et le gestionnaire de disques
@@ -49,7 +48,6 @@ README	InstallerApp		LISEZ-MOI
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Le disque de destination pourrait ne pas avoir assez de place. Sélectionnez un autre disque ou retirez certains objets optionnels.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Veuillez fermer les fenêtres du gestionnaire de démarrage et du gestionnaire de disques avant de quitter l'Installeur.
 Scanning for disks…	InstallerWindow		Recherche des disques…
-2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Impossible de monter ce disque. Veuillez en choisir un autre.
 ?? of ??	InstallerWindow	Unknown progress	?? sur ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
@@ -99,7 +97,6 @@ DriveSetup, the application to configure disk partitions, could not be launched.
 No optional packages available.	PackagesView		Pas de paquets optionnels disponibles.
 All hard disks start with \"hd\".\n	InstallerApp		Tout les disques durs commencent par « hd ».\n
 Continue	InstallerApp		Continuer
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" documentation, there is a link on the Desktop.\n\n	InstallerApp		3) Quand vous lancerez Haiku pour la première fois, veuillez lire « Welcome », notre documentation de Bienvenue. Vous trouverez un raccourci sur le bureau.\n\n
 BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Le Gestionnaire d'amorçage d'Haiku qui configure le menu de démarrage, n'a pas pu être lancé.
 Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Configurez votre /boot/grub/menu.lst en lançant votre éditeur de texte favori depuis un terminal comme ceci :\n\n
 Boot sector not written because of an internal error.	InstallProgress		Le secteur d'amorçage n'a pas été écrit à cause d'une erreur interne.

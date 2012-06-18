@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.haiku-icon_o_matic	209862233
+1	bokmål, norwegian; norwegian bokmål	x-vnd.haiku-icon_o_matic	2755867189
 Select All	Icon-O-Matic-PathManipulator		Velg alle
 Add Style	Icon-O-Matic-AddStylesCmd		Legg til stil
 Color (#%02x%02x%02x)	Style name after dropping a color		Farge (#%02x%02x%02x)
@@ -68,6 +68,7 @@ Opacity	Icon-O-Matic-PropertyNames		Gjennomsiktighet
 Add with path	Icon-O-Matic-ShapesList		Legg til med sti
 Gradient type	Icon-O-Matic-StyleTypes		Gradient-type
 Icon-O-Matic	System name		Icon-O-Matic
+Cancel	Icon-O-Matic-Menu-Settings		Avbryt
 Modify Control Point	Icon-O-Matic-ChangePointCmd		Endre kontrollpunkt
 Saving your document failed!	Icon-O-Matic-Exporter		Lagring av dokumentet mislyktes!
 edit it's properties here.	Empty property list - 3rd line		rediger dens egenskaper her
@@ -99,6 +100,7 @@ Add shape with path & style	Icon-O-Matic-Menu-Shape		Legg til form med sti & sti
 Gradient	Icon-O-Matic-StyleTypes		Gradient
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON-atributt
 Export as…	Icon-O-Matic-Menu-File		Eksporter som...
+Transformation	Transformation		Omforming
 Click on an object in	Empty property list - 1st line		Klikk på et objekt i
 Move Transformers	Icon-O-Matic-MoveTransformersCmd		Flytt omformere
 Move Styles	Icon-O-Matic-MoveStylesCmd		Flytt stiler
@@ -107,6 +109,7 @@ Transformer	Icon-O-Matic-Menus		Omformer
 Flip	Icon-O-Matic-PathManipulator		Flipp
 Conic	Icon-O-Matic-StyleTypes		Kjeglesnitt
 Split Control Points	Icon-O-Matic-SplitPointsCmd		Splitt kontrollpunkter
+Save	Icon-O-Matic-Menu-Settings		Lagre
 Add empty	Icon-O-Matic-ShapesList		Legg til tom
 Cancel	Icon-O-Matic-ColorPicker		Avbryt
 Paste	Icon-O-Matic-Properties		Lim inn
