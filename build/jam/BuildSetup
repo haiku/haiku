@@ -391,8 +391,8 @@ switch $(HAIKU_ARCH) {
 
 		# Bootloader is 32-bit.
 		HAIKU_BOOT_LINKFLAGS += -m elf_i386_haiku ;
-		HAIKU_BOOT_CCFLAGS += -m32 ;
-		HAIKU_BOOT_C++FLAGS += -m32 ;
+		HAIKU_BOOT_CCFLAGS += -m32 -march=pentium ;
+		HAIKU_BOOT_C++FLAGS += -m32 -march=pentium ;
 
 		# Enable use of the gcc built-in atomic functions instead of atomic_*().
 		# The former are inlined and have thus less overhead.
