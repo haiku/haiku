@@ -1297,6 +1297,7 @@ if $(HAIKU_NO_WERROR) != 1 {
 	EnableWerror src add-ons kernel generic ;
 #	EnableWerror src add-ons kernel network datalink_protocols ;
 	EnableWerror src add-ons kernel network devices ;
+	EnableWerror src add-ons kernel network dns_resolver ;
 	EnableWerror src add-ons kernel network notifications ;
 	EnableWerror src add-ons kernel network ppp ;
 	EnableWerror src add-ons kernel network protocols ;

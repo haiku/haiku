@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src add-ons kernel network ;
 
 SubInclude HAIKU_TOP src add-ons kernel network datalink_protocols ;
 SubInclude HAIKU_TOP src add-ons kernel network devices ;
+SubInclude HAIKU_TOP src add-ons kernel network dns_resolver ;
 SubInclude HAIKU_TOP src add-ons kernel network notifications ;
 SubInclude HAIKU_TOP src add-ons kernel network protocols ;
 SubInclude HAIKU_TOP src add-ons kernel network stack ;

@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src add-ons kernel network dns_resolver server ;
+
+UsePrivateKernelHeaders ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
+Application dns_resolver_server
+	:
+	main.cpp
+
+	:
+	be $(TARGET_NETWORK_LIBS)
+
+	:
+	dns_resolver_server.rdef
+;
