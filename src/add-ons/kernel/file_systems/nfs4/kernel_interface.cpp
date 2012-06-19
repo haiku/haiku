@@ -7,6 +7,10 @@
  */
 
 
+#include <arpa/inet.h>
+#include <stdio.h>
+
+#include <net/dns_resolver.h>
 #include <fs_interface.h>
 
 #include "Connection.h"
@@ -36,22 +40,68 @@ sCreateNFS4Server(RPC::Server* serv)
 
 
 static status_t
+sParseArguments(const char* _args, uint32* _ip, char* _path)
+{
+	if (_args == NULL)
+		return B_BAD_VALUE;
+
+	char* args = strdup(_args);
+	char* path = strpbrk(args, ":");
+	if (path == NULL) {
+		free(args);
+		return B_MISMATCHED_VALUES;
+	}
+	*path++ = '\0';
+
+	status_t result;
+	struct in_addr addr;
+	if (inet_aton(args, &addr) == 0) {
+			dns_resolver_module* dns;
+			result = get_module(DNS_RESOLVER_MODULE_NAME,
+				reinterpret_cast<module_info**>(&dns));
+			if (result != B_OK) {
+				free(args);
+				return result;
+			}
+
+			result = dns->dns_resolve(args, _ip);
+			put_module(DNS_RESOLVER_MODULE_NAME);
+			if (result != B_OK) {
+				free(args);
+				return result;
+			}
+	} else
+		*_ip = addr.s_addr;
+	*_ip = ntohl(*_ip);
+
+	_path[255] = '\0';
+	strncpy(_path, path, 255);
+
+	free(args);
+	return B_OK;
+}
+
+
+static status_t
 nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 			const char* args, ino_t* _rootVnodeID)
 {
 	status_t result;
 
+	uint32 ip;
+	char path[256];
+	result = sParseArguments(args, &ip, path);
+	if (result != B_OK)
+		return result;
+
 	RPC::Server *server;
-	// hardcoded ip 192.168.1.70
-	result = gRPCServerManager->Acquire(&server, 0xc0a80146, 2049, ProtocolUDP,
+	result = gRPCServerManager->Acquire(&server, ip, 2049, ProtocolUDP,
 		sCreateNFS4Server);
 	if (result != B_OK)
 		return result;
 	
 	Filesystem* fs;
-	// hardcoded path
-	result = Filesystem::Mount(&fs, server, "haiku/src/add-ons/kernel",
-				volume->id);
+	result = Filesystem::Mount(&fs, server, path, volume->id);
 	if (result != B_OK) {
 		gRPCServerManager->Release(server);
 		return result;
@@ -294,6 +344,7 @@ nfs4_rewind_dir(fs_volume* volume, fs_vnode* vnode, void* _cookie)
 
 	return B_OK;
 }
+
 
 status_t
 nfs4_init()
