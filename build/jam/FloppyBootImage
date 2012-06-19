@@ -52,44 +52,51 @@ SYSTEM_ADD_ONS_BUS_MANAGERS = $(X86_ONLY)acpi $(ATA_ONLY)ata config_manager dpc 
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs iso9660 attribute_overlay write_overlay ;
 
 
-# modules
-AddFilesToFloppyBootArchive system add-ons kernel bus_managers
-	: $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
-AddFilesToFloppyBootArchive system add-ons kernel busses ide
-	: generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata it8211 ;
-AddFilesToFloppyBootArchive system add-ons kernel busses scsi
-	: ahci ;
-AddFilesToFloppyBootArchive system add-ons kernel console : vga_text ;
-AddFilesToFloppyBootArchive system add-ons kernel file_systems
-	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
-AddFilesToFloppyBootArchive system add-ons kernel generic
-	: $(ATA_ONLY)ata_adapter $(IDE_ONLY)ide_adapter locked_pool scsi_periph ;
-AddFilesToFloppyBootArchive system add-ons kernel partitioning_systems
-	: intel session ;
-AddFilesToFloppyBootArchive system add-ons kernel interrupt_controllers
-	: $(PPC_ONLY)openpic ;
+if $(TARGET_ARCH) != x86_64 {
+	# modules
+	AddFilesToFloppyBootArchive system add-ons kernel bus_managers
+		: $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
+	AddFilesToFloppyBootArchive system add-ons kernel busses ide
+		: generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata it8211 ;
+	AddFilesToFloppyBootArchive system add-ons kernel busses scsi
+		: ahci ;
+	AddFilesToFloppyBootArchive system add-ons kernel console : vga_text ;
+	AddFilesToFloppyBootArchive system add-ons kernel file_systems
+		: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
+	AddFilesToFloppyBootArchive system add-ons kernel generic
+		: $(ATA_ONLY)ata_adapter $(IDE_ONLY)ide_adapter locked_pool scsi_periph ;
+	AddFilesToFloppyBootArchive system add-ons kernel partitioning_systems
+		: intel session ;
+	AddFilesToFloppyBootArchive system add-ons kernel interrupt_controllers
+		: $(PPC_ONLY)openpic ;
 
-if $(USB_BOOT) = 1 {
-	AddFilesToFloppyBootArchive system add-ons kernel busses usb
-		: <usb>uhci <usb>ohci <usb>ehci ;
-}
+	if $(USB_BOOT) = 1 {
+		AddFilesToFloppyBootArchive system add-ons kernel busses usb
+			: <usb>uhci <usb>ohci <usb>ehci ;
+	}
 
-if $(TARGET_ARCH) = x86 {
-	AddFilesToFloppyBootArchive system add-ons kernel cpu : generic_x86 ;
-}
+	if $(TARGET_ARCH) = x86 {
+		AddFilesToFloppyBootArchive system add-ons kernel cpu : generic_x86 ;
+	}
 
-# drivers
-AddNewDriversToFloppyBootArchive disk scsi : scsi_cd scsi_disk ;
-if $(USB_BOOT) = 1 {
-	AddDriversToFloppyBootArchive disk usb : usb_disk ;
-}
-if $(NET_BOOT) = 1 {
-	AddDriversToFloppyBootArchive disk virtual : remote_disk ;
-	AddDriversToFloppyBootArchive net : $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
+	# drivers
+	AddNewDriversToFloppyBootArchive disk scsi : scsi_cd scsi_disk ;
+	if $(USB_BOOT) = 1 {
+		AddDriversToFloppyBootArchive disk usb : usb_disk ;
+	}
+	if $(NET_BOOT) = 1 {
+		AddDriversToFloppyBootArchive disk virtual : remote_disk ;
+		AddDriversToFloppyBootArchive net : $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
+	}
 }
 
 # kernel
-AddFilesToFloppyBootArchive system : <revisioned>kernel_$(TARGET_ARCH) ;
+if $(TARGET_ARCH) = x86_64 {
+	# TODO x86_64: ELF64 support not added to set_haiku_revision.
+	AddFilesToFloppyBootArchive system : kernel_$(TARGET_ARCH) ;
+} else {
+	AddFilesToFloppyBootArchive system : <revisioned>kernel_$(TARGET_ARCH) ;
+}
 
 # scripts and data files
 
@@ -114,19 +121,21 @@ if $(NET_BOOT) = 1 {
 }
 
 # boot module links
-AddBootModuleSymlinksToFloppyBootArchive
-	$(SYSTEM_ADD_ONS_BUS_MANAGERS)
-	$(PPC_ONLY)openpic
-	$(ATA_ONLY)ata_adapter $(IDE_ONLY)ide_adapter locked_pool scsi_periph
-	$(X86_ONLY)generic_x86
-	ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata
-	it8211
-	$(USB_ONLY)<usb>uhci $(USB_ONLY)<usb>ohci $(USB_ONLY)<usb>ehci
-	scsi_cd scsi_disk $(USB_ONLY)usb_disk
-	intel session
-	$(SYSTEM_ADD_ONS_FILE_SYSTEMS)
-	$(BOOT_ADD_ONS_NET)
-;
+if $(TARGET_ARCH) != x86_64 {
+	AddBootModuleSymlinksToFloppyBootArchive
+		$(SYSTEM_ADD_ONS_BUS_MANAGERS)
+		$(PPC_ONLY)openpic
+		$(ATA_ONLY)ata_adapter $(IDE_ONLY)ide_adapter locked_pool scsi_periph
+		$(X86_ONLY)generic_x86
+		ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata
+		it8211
+		$(USB_ONLY)<usb>uhci $(USB_ONLY)<usb>ohci $(USB_ONLY)<usb>ehci
+		scsi_cd scsi_disk $(USB_ONLY)usb_disk
+		intel session
+		$(SYSTEM_ADD_ONS_FILE_SYSTEMS)
+		$(BOOT_ADD_ONS_NET)
+	;
+}
 
 
 #pragma mark - Build The Archive
