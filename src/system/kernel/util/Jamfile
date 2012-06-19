@@ -4,6 +4,7 @@ UsePrivateHeaders [ FDirName kernel util ] ;
 
 KernelMergeObject kernel_util.o :
 	AVLTreeBase.cpp
+	hostname.cpp
 	kernel_cpp.cpp
 	KernelReferenceable.cpp
 	khash.cpp

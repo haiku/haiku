@@ -54,7 +54,7 @@ Auth::CreateSys()
 	xdr.AddUInt(time(NULL));
 
 	char hostname[255];
-	//if (gethostname(hostname, 255) < 0)
+	if (gethostname(hostname, 255) < 0)
 		strcpy(hostname, "unknown");
 	xdr.AddString(hostname, 255);
 
