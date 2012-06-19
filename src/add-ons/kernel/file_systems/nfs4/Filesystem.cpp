@@ -209,9 +209,11 @@ Filesystem::ReadInfo(struct fs_info* info)
 
 	info->flags = B_FS_IS_READONLY;
 	const char* name = strrchr(fPath, '/');
-	if (name != NULL)
+	if (name != NULL) {
 		name++;
-	strncpy(info->volume_name, name, B_FILE_NAME_LENGTH);
+		strncpy(info->volume_name, name, B_FILE_NAME_LENGTH);
+	} else
+		strncpy(info->volume_name, fPath, B_FILE_NAME_LENGTH);
 
 	return B_OK;
 }
