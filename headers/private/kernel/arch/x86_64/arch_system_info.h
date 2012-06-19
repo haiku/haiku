@@ -13,9 +13,11 @@
 extern "C" {
 #endif
 
-//status_t get_current_cpuid(cpuid_info *info, uint32 eax);
-//uint32 get_eflags(void);
-//void set_eflags(uint32 value);
+#ifdef _BOOT_MODE
+status_t get_current_cpuid(cpuid_info *info, uint32 eax);
+uint32 get_eflags(void);
+void set_eflags(uint32 value);
+#endif
 
 //status_t _user_get_cpuid(cpuid_info *info, uint32 eax, uint32 cpu);
 
