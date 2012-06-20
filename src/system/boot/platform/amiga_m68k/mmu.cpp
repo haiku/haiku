@@ -526,7 +526,7 @@ mmu_init_for_kernel(void)
 
 		dprintf("allocated virt memory ranges:\n");
 		for (i = 0; i < gKernelArgs.num_virtual_allocated_ranges; i++) {
-			dprintf("    base 0x%08lx, length 0x%08lx\n", gKernelArgs.virtual_allocated_range[i].start, gKernelArgs.virtual_allocated_range[i].size);
+			dprintf("    base 0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n", gKernelArgs.virtual_allocated_range[i].start, gKernelArgs.virtual_allocated_range[i].size);
 		}
 	}
 #endif

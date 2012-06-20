@@ -3585,7 +3585,7 @@ vm_free_kernel_args(kernel_args* args)
 	TRACE(("vm_free_kernel_args()\n"));
 
 	for (i = 0; i < args->num_kernel_args_ranges; i++) {
-		area_id area = area_for((void*)args->kernel_args_range[i].start);
+		area_id area = area_for((void*)(addr_t)args->kernel_args_range[i].start);
 		if (area >= B_OK)
 			delete_area(area);
 	}
@@ -3598,7 +3598,7 @@ allocate_kernel_args(kernel_args* args)
 	TRACE(("allocate_kernel_args()\n"));
 
 	for (uint32 i = 0; i < args->num_kernel_args_ranges; i++) {
-		void* address = (void*)args->kernel_args_range[i].start;
+		void* address = (void*)(addr_t)args->kernel_args_range[i].start;
 
 		create_area("_kernel args_", &address, B_EXACT_ADDRESS,
 			args->kernel_args_range[i].size, B_ALREADY_WIRED,
@@ -3614,7 +3614,7 @@ unreserve_boot_loader_ranges(kernel_args* args)
 
 	for (uint32 i = 0; i < args->num_virtual_allocated_ranges; i++) {
 		vm_unreserve_address_range(VMAddressSpace::KernelID(),
-			(void*)args->virtual_allocated_range[i].start,
+			(void*)(addr_t)args->virtual_allocated_range[i].start,
 			args->virtual_allocated_range[i].size);
 	}
 }
@@ -3626,13 +3626,13 @@ reserve_boot_loader_ranges(kernel_args* args)
 	TRACE(("reserve_boot_loader_ranges()\n"));
 
 	for (uint32 i = 0; i < args->num_virtual_allocated_ranges; i++) {
-		void* address = (void*)args->virtual_allocated_range[i].start;
+		void* address = (void*)(addr_t)args->virtual_allocated_range[i].start;
 
 		// If the address is no kernel address, we just skip it. The
 		// architecture specific code has to deal with it.
 		if (!IS_KERNEL_ADDRESS(address)) {
-			dprintf("reserve_boot_loader_ranges(): Skipping range: %p, %lu\n",
-				address, args->virtual_allocated_range[i].size);
+			dprintf("reserve_boot_loader_ranges(): Skipping range: %p, %"
+				B_PRIu64 "\n", address, args->virtual_allocated_range[i].size);
 			continue;
 		}
 

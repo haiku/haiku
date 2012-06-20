@@ -280,36 +280,36 @@ add_kernel_args_range(void* start, size_t size)
 */
 extern "C" status_t
 insert_address_range(addr_range* ranges, uint32* _numRanges, uint32 maxRanges,
-	addr_t start, size_t size)
+	uint64 start, uint64 size)
 {
-	return insert_range<addr_range, addr_t, size_t>(ranges, _numRanges,
+	return insert_range<addr_range, uint64, uint64>(ranges, _numRanges,
 		maxRanges, start, size);
 }
 
 
 extern "C" status_t
 remove_address_range(addr_range* ranges, uint32* _numRanges, uint32 maxRanges,
-	addr_t start, size_t size)
+	uint64 start, uint64 size)
 {
-	return remove_range<addr_range, addr_t, size_t>(ranges, _numRanges,
+	return remove_range<addr_range, uint64, uint64>(ranges, _numRanges,
 		maxRanges, start, size);
 }
 
 
 bool
-get_free_address_range(addr_range* ranges, uint32 numRanges, addr_t base,
-	size_t size, addr_t* _rangeBase)
+get_free_address_range(addr_range* ranges, uint32 numRanges, uint64 base,
+	uint64 size, uint64* _rangeBase)
 {
-	return get_free_range<addr_range, addr_t, size_t>(ranges, numRanges, base,
+	return get_free_range<addr_range, uint64, uint64>(ranges, numRanges, base,
 		size, _rangeBase);
 }
 
 
 bool
-is_address_range_covered(addr_range* ranges, uint32 numRanges, addr_t base,
-	size_t size)
+is_address_range_covered(addr_range* ranges, uint32 numRanges, uint64 base,
+	uint64 size)
 {
-	return is_range_covered<addr_range, addr_t, size_t>(ranges, numRanges, base,
+	return is_range_covered<addr_range, uint64, uint64>(ranges, numRanges, base,
 		size);
 }
 
@@ -389,7 +389,7 @@ insert_physical_allocated_range(phys_addr_t start, phys_size_t size)
 
 
 status_t
-insert_virtual_allocated_range(addr_t start, size_t size)
+insert_virtual_allocated_range(uint64 start, uint64 size)
 {
 	return insert_address_range(gKernelArgs.virtual_allocated_range,
 		&gKernelArgs.num_virtual_allocated_ranges, MAX_VIRTUAL_ALLOCATED_RANGE,

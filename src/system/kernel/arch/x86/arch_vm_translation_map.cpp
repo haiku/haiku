@@ -70,7 +70,7 @@ arch_vm_translation_map_init(kernel_args *args,
 	for (uint32 i = 0; i < args->num_virtual_allocated_ranges; i++) {
 		addr_t start = args->virtual_allocated_range[i].start;
 		addr_t end = start + args->virtual_allocated_range[i].size;
-		TRACE("  %#10" B_PRIxADDR " - %#10" B_PRIxADDR "\n", start, end);
+		TRACE("  %#10" B_PRIx64 " - %#10" B_PRIx64 "\n", start, end);
 	}
 #endif
 

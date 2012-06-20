@@ -58,7 +58,7 @@ typedef struct kernel_args {
 	addr_range	cpu_kstack[MAX_BOOT_CPUS];
 
 	// boot volume KMessage data
-	void		*boot_volume;
+	uint64		boot_volume;
 	int32		boot_volume_size;
 
 	struct driver_settings_file *driver_settings;

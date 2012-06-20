@@ -88,7 +88,7 @@ find_physical_memory_ranges(size_t &total)
 static bool
 is_virtual_allocated(void *address, size_t size)
 {
-	addr_t foundBase;
+	uint64 foundBase;
 	return !get_free_address_range(gKernelArgs.virtual_allocated_range,
 		gKernelArgs.num_virtual_allocated_ranges, (addr_t)address, size,
 		&foundBase) || foundBase != (addr_t)address;
@@ -281,7 +281,7 @@ find_free_virtual_range(void *base, size_t size)
 	void *firstFound = NULL;
 	void *firstBaseFound = NULL;
 	for (uint32 i = 0; i < gKernelArgs.num_virtual_allocated_ranges; i++) {
-		void *address = (void *)(gKernelArgs.virtual_allocated_range[i].start
+		void *address = (void *)(addr_t)(gKernelArgs.virtual_allocated_range[i].start
 			+ gKernelArgs.virtual_allocated_range[i].size);
 		if (!is_virtual_allocated(address, size)) {
 			if (!base)
