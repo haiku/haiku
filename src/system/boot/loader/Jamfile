@@ -38,6 +38,18 @@ UsePrivateHeaders shared storage ;
 		case "x86" :
 		{
 			defines +=
+				ALTERNATE_BOOT_ARCH=\\\"x86_64\\\"
+
+				BOOT_SUPPORT_PARTITION_EFI
+
+				#BOOT_SUPPORT_FILE_SYSTEM_FAT
+			;
+		}
+		case "x86_64" :
+		{
+			defines +=
+				ALTERNATE_BOOT_ARCH=\\\"x86\\\"
+
 				BOOT_SUPPORT_PARTITION_EFI
 
 				#BOOT_SUPPORT_FILE_SYSTEM_FAT
