@@ -345,7 +345,8 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 		fsid.fMajor = stream.GetUHyper();
 		fsid.fMinor = stream.GetUHyper();
 		
-		values[current].fData.fPointer = new FilesystemId(fsid);
+		values[current].fData.fPointer = malloc(sizeof(fsid));
+		memcpy(values[current].fData.fPointer, &fsid, sizeof(fsid));
 		current++;
 	}
 

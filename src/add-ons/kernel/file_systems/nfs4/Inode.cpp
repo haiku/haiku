@@ -801,6 +801,7 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count, uint64* cookie)
 		cookie[1]--;
 	}
 
+	bool overflow = false;
 	while (count < *_count && !eof) {
 		this_count = *_count - count;
 		DirEntry* dirents;
@@ -809,7 +810,7 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count, uint64* cookie)
 		if (result != B_OK)
 			return result;
 
-		uint32 i;
+		uint32 i, entries = 0;
 		for (i = 0; i < min_c(this_count, *_count - count); i++) {
 			struct dirent* de = reinterpret_cast<dirent*>(buffer + pos);
 
@@ -828,16 +829,18 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count, uint64* cookie)
 			const char* name = dirents[i].fName;
 			if (_FillDirEntry(de, id, name, pos, size) == B_BUFFER_OVERFLOW) {
 				eof = true;
+				overflow = true;
 				break;
 			}
 
 			pos += de->d_reclen;
+			entries++;
 		}
 		delete[] dirents;
-		count += i;
+		count += entries;
 	}
 
-	if (count == 0 && this_count > 0)
+	if (count == 0 && overflow)
 		return B_BUFFER_OVERFLOW;
 
 	*_count = count;
