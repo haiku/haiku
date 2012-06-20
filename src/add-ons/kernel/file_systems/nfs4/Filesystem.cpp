@@ -44,10 +44,14 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
 	char* path = strdup(fsPath);
 	char* pathStart = path;
 	char* pathEnd;
-	while (pathStart != NULL) {
+	while (pathStart != NULL && pathStart[0] != '\0') {
 		pathEnd = strpbrk(pathStart, "/");
 		if (pathEnd != NULL)
 			*pathEnd = '\0';
+		if (pathEnd == pathStart) {
+			pathStart++;
+			continue;
+		}
 
 		req.LookUp(pathStart);
 
@@ -106,7 +110,10 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
 		reinterpret_cast<FilesystemId*>(values[0].fData.fPointer);
 
 	Filesystem* fs = new(std::nothrow) Filesystem;
-	fs->fPath = strdup(fsPath);
+	if (fsPath != NULL && fsPath[0] == '/')
+		fs->fPath = strdup(fsPath + 1);
+	else
+		fs->fPath = strdup(fsPath + 1);
 	memcpy(&fs->fRootFH, &fh, sizeof(Filehandle));
 	fs->fServer = serv;
 	fs->fDevId = id;
