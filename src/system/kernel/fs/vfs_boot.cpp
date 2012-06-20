@@ -54,6 +54,8 @@ static struct {
 	{NULL}
 };
 
+static int32 sBootMethodType;
+
 // This can be used by other code to see if there is a boot file system already
 dev_t gBootDevice = -1;
 bool gReadOnlyBootDevice = false;
@@ -322,27 +324,28 @@ DiskBootMethod::SortPartitions(KPartition** partitions, int32 count)
 static status_t
 get_boot_partitions(kernel_args* args, PartitionStack& partitions)
 {
-	const KMessage& bootVolume = args->boot_volume;
+	KMessage bootVolume;
+	bootVolume.SetTo(args->boot_volume, args->boot_volume_size);
 
 	dprintf("get_boot_partitions(): boot volume message:\n");
 	bootVolume.Dump(&dprintf);
 
 	// create boot method
-	int32 bootMethodType = bootVolume.GetInt32(BOOT_METHOD, BOOT_METHOD_DEFAULT);
+	sBootMethodType = bootVolume.GetInt32(BOOT_METHOD, BOOT_METHOD_DEFAULT);
 	dprintf("get_boot_partitions(): boot method type: %" B_PRId32 "\n",
-		bootMethodType);
+		sBootMethodType);
 
 	BootMethod* bootMethod = NULL;
-	switch (bootMethodType) {
+	switch (sBootMethodType) {
 		case BOOT_METHOD_NET:
-			bootMethod = new(nothrow) NetBootMethod(bootVolume, bootMethodType);
+			bootMethod = new(nothrow) NetBootMethod(bootVolume, sBootMethodType);
 			break;
 
 		case BOOT_METHOD_HARD_DISK:
 		case BOOT_METHOD_CD:
 		default:
 			bootMethod = new(nothrow) DiskBootMethod(bootVolume,
-				bootMethodType);
+				sBootMethodType);
 			break;
 	}
 
@@ -415,7 +418,7 @@ get_boot_partitions(kernel_args* args, PartitionStack& partitions)
 
 	// sort partition list (e.g.. when booting from CD, CDs should come first in
 	// the list)
-	if (!args->boot_volume.GetBool(BOOT_VOLUME_USER_SELECTED, false))
+	if (!bootVolume.GetBool(BOOT_VOLUME_USER_SELECTED, false))
 		bootMethod->SortPartitions(partitions.Array(), partitions.CountItems());
 
 	return B_OK;
@@ -513,10 +516,8 @@ vfs_mount_boot_file_system(kernel_args* args)
 	// whether the module images the boot loader has pre-loaded are the same as
 	// on the boot volume. That is the case when booting from hard disk or CD,
 	// but not via network.
-	int32 bootMethodType = args->boot_volume.GetInt32(BOOT_METHOD,
-		BOOT_METHOD_DEFAULT);
-	bool bootingFromBootLoaderVolume = bootMethodType == BOOT_METHOD_HARD_DISK
-		|| bootMethodType == BOOT_METHOD_CD;
+	bool bootingFromBootLoaderVolume = sBootMethodType == BOOT_METHOD_HARD_DISK
+		|| sBootMethodType == BOOT_METHOD_CD;
 	module_init_post_boot_device(bootingFromBootLoaderVolume);
 
 	file_cache_init_post_boot_device();

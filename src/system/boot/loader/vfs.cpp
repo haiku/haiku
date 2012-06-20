@@ -380,8 +380,7 @@ register_boot_file_system(Directory *volume)
 		return status;
 	}
 
-	gKernelArgs.boot_volume.SetInt64(BOOT_VOLUME_PARTITION_OFFSET,
-		partition->offset);
+	gBootVolume.SetInt64(BOOT_VOLUME_PARTITION_OFFSET, partition->offset);
 
 	Node *device = get_node_from(partition->FD());
 	if (device == NULL) {

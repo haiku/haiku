@@ -233,8 +233,7 @@ load_modules(stage2_args *args, Directory *volume)
 	// and now load all partitioning and file system modules
 	// needed to identify the boot volume
 
-	if (!gKernelArgs.boot_volume.GetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE,
-			false)) {
+	if (!gBootVolume.GetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, false)) {
 		// iterate over the mounted volumes and load their file system
 		Partition *partition;
 		if (gRoot->GetPartitionFor(volume, &partition) == B_OK) {

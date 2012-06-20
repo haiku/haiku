@@ -1182,8 +1182,7 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 	}
 
 	TRACE(("boot drive size: %Ld bytes\n", drive->Size()));
-	gKernelArgs.boot_volume.SetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE,
-		gBootedFromImage);
+	gBootVolume.SetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, gBootedFromImage);
 
 	return B_OK;
 }
@@ -1232,8 +1231,8 @@ platform_register_boot_device(Node *device)
 	check_cd_boot(drive);
 #endif
 
-	gKernelArgs.boot_volume.SetInt64("boot drive number", drive->DriveID());
-	gKernelArgs.boot_volume.SetData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE,
+	gBootVolume.SetInt64("boot drive number", drive->DriveID());
+	gBootVolume.SetData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE,
 		&drive->Identifier(), sizeof(disk_identifier));
 
 	return B_OK;

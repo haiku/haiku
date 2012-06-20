@@ -18,8 +18,6 @@
 #include <platform_kernel_args.h>
 #include <arch_kernel_args.h>
 
-#include <util/KMessage.h>
-
 #define CURRENT_KERNEL_ARGS_VERSION	1
 #define MAX_KERNEL_ARGS_RANGE		20
 
@@ -59,7 +57,9 @@ typedef struct kernel_args {
 	uint32		num_cpus;
 	addr_range	cpu_kstack[MAX_BOOT_CPUS];
 
-	KMessage	boot_volume;
+	// boot volume KMessage data
+	void		*boot_volume;
+	int32		boot_volume_size;
 
 	struct driver_settings_file *driver_settings;
 

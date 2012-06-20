@@ -481,7 +481,7 @@ user_menu_boot_volume(Menu* menu, MenuItem* item)
 	bootItem->Select(true);
 	bootItem->SetData(item->Data());
 
-	gKernelArgs.boot_volume.SetBool(BOOT_VOLUME_USER_SELECTED, true);
+	gBootVolume.SetBool(BOOT_VOLUME_USER_SELECTED, true);
 	return true;
 }
 
@@ -712,7 +712,7 @@ add_boot_volume_menu(Directory* bootVolume)
 	menu->AddItem(item = new(nothrow) MenuItem("Return to main menu"));
 	item->SetType(MENU_ITEM_NO_CHOICE);
 
-	if (gKernelArgs.boot_volume.GetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, false))
+	if (gBootVolume.GetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, false))
 		menu->SetChoiceText("CD-ROM or hard drive");
 
 	return menu;

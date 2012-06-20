@@ -152,15 +152,14 @@ platform_register_boot_device(Node *device)
 			rootPath = fileNameEnd + 1;
 	}
 
-	KMessage& bootVolume = gKernelArgs.boot_volume;
-	if (bootVolume.SetInt32(BOOT_METHOD, BOOT_METHOD_NET) != B_OK
-		|| bootVolume.AddInt64("client MAC",
+	if (gBootVolume.SetInt32(BOOT_METHOD, BOOT_METHOD_NET) != B_OK
+		|| gBootVolume.AddInt64("client MAC",
 			sTFTP.MACAddress().ToUInt64()) != B_OK
-		|| bootVolume.AddInt32("client IP", sTFTP.IPAddress()) != B_OK
-		|| bootVolume.AddInt32("server IP", sTFTP.ServerIPAddress()) != B_OK
-		|| bootVolume.AddInt32("server port", sTFTP.ServerPort()) != B_OK
+		|| gBootVolume.AddInt32("client IP", sTFTP.IPAddress()) != B_OK
+		|| gBootVolume.AddInt32("server IP", sTFTP.ServerIPAddress()) != B_OK
+		|| gBootVolume.AddInt32("server port", sTFTP.ServerPort()) != B_OK
 		|| (sTFTP.RootPath()
-			&& bootVolume.AddString("net root path", rootPath)
+			&& gBootVolume.AddString("net root path", rootPath)
 				!= B_OK)) {
 		return B_NO_MEMORY;
 	}
