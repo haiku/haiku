@@ -21,35 +21,38 @@ class InodeIdMap;
 
 class Filesystem {
 public:
-	static	status_t		Mount(Filesystem** pfs, RPC::Server* serv,
-								const char* path, dev_t id);
-							~Filesystem();
+	static	status_t			Mount(Filesystem** pfs, RPC::Server* serv,
+									const char* path, dev_t id);
+								~Filesystem();
 
-			status_t		GetInode(ino_t id, Inode** inode);
-			Inode*			CreateRootInode();
+			status_t			GetInode(ino_t id, Inode** inode);
+			Inode*				CreateRootInode();
 
-			status_t		ReadInfo(struct fs_info* info);
+			status_t			ReadInfo(struct fs_info* info);
 
-	inline	RPC::Server*	Server();
-	inline	NFS4Server*		NFSServer();
+	inline	RPC::Server*		Server();
+	inline	NFS4Server*			NFSServer();
 
-	inline	uint64			AllocFileId();
+	inline	const FilesystemId&	FsId() const;
 
-	inline	dev_t			DevId() const;
-	inline	InodeIdMap*		InoIdMap();
+	inline	uint64				AllocFileId();
+
+	inline	dev_t				DevId() const;
+	inline	InodeIdMap*			InoIdMap();
 private:
-							Filesystem();
+								Filesystem();
 
-			const char*		fPath;
+			const char*			fPath;
+			FilesystemId		fFsId;
 
-			Filehandle		fRootFH;
+			Filehandle			fRootFH;
 
-			RPC::Server*	fServer;
+			RPC::Server*		fServer;
 
-			vint64			fId;
-			dev_t			fDevId;
+			vint64				fId;
+			dev_t				fDevId;
 
-			InodeIdMap		fInoIdMap;
+			InodeIdMap			fInoIdMap;
 };
 
 
@@ -64,6 +67,13 @@ inline NFS4Server*
 Filesystem::NFSServer()
 {
 	return reinterpret_cast<NFS4Server*>(fServer->PrivateData());
+}
+
+
+inline const FilesystemId&
+Filesystem::FsId() const
+{
+	return fFsId;
 }
 
 

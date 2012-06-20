@@ -44,6 +44,14 @@ struct FileInfo {
 	inline	FileInfo&	operator=(const FileInfo& fi);
 };
 
+struct FilesystemId {
+			uint64		fMajor;
+			uint64		fMinor;
+
+	inline	bool		operator==(const FilesystemId& fsid) const;
+	inline	bool		operator!=(const FilesystemId& fsid) const;
+};
+
 
 inline
 Filehandle::Filehandle()
@@ -115,6 +123,20 @@ FileInfo::operator=(const FileInfo& fi)
 	fPath = strdup(fi.fPath);
 
 	return *this;
+}
+
+
+inline bool
+FilesystemId::operator==(const FilesystemId& fsid) const
+{
+	return fMajor == fsid.fMajor && fMinor == fsid.fMinor;
+}
+
+
+inline bool
+FilesystemId::operator!=(const FilesystemId& fsid) const
+{
+	return !operator==(fsid);
 }
 
 

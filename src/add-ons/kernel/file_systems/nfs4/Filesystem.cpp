@@ -63,6 +63,9 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
 	req.GetFH();
 	req.Access();
 
+	Attribute attr[] = { FATTR4_FSID };
+	req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
+
 	status_t result = request.Send();
 	if (result != B_OK)
 		return result;
@@ -92,11 +95,22 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
 				!= (ACCESS4_READ | ACCESS4_LOOKUP))
 		return B_PERMISSION_DENIED;
 
+	AttrValue* values;
+	uint32 count;
+	result = reply.GetAttr(&values, &count);
+	if (result != B_OK || count < 1)
+		return result;
+
+	// FATTR4_FSID is mandatory
+	FilesystemId* fsid =
+		reinterpret_cast<FilesystemId*>(values[0].fData.fPointer);
+
 	Filesystem* fs = new(std::nothrow) Filesystem;
 	fs->fPath = strdup(fsPath);
 	memcpy(&fs->fRootFH, &fh, sizeof(Filehandle));
 	fs->fServer = serv;
 	fs->fDevId = id;
+	fs->fFsId = *fsid;
 
 	*pfs = fs;
 

@@ -337,6 +337,18 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 		current++;
 	}
 
+	if (sIsAttrSet(FATTR4_FSID, bitmap, bcount)) {
+		values[current].fAttribute = FATTR4_FSID;
+		values[current].fFreePointer = true;
+
+		FilesystemId fsid;
+		fsid.fMajor = stream.GetUHyper();
+		fsid.fMinor = stream.GetUHyper();
+		
+		values[current].fData.fPointer = new FilesystemId(fsid);
+		current++;
+	}
+
 	if (sIsAttrSet(FATTR4_LEASE_TIME, bitmap, bcount)) {
 		values[current].fAttribute = FATTR4_LEASE_TIME;
 		values[current].fData.fValue32 = stream.GetUInt();

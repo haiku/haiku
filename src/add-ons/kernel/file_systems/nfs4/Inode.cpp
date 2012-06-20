@@ -42,7 +42,7 @@ Inode::CreateInode(Filesystem* fs, const FileInfo &fi, Inode** _inode)
 
 		req.PutFH(inode->fHandle);
 
-		Attribute attr[] = { FATTR4_TYPE, FATTR4_FILEID };
+		Attribute attr[] = { FATTR4_TYPE, FATTR4_FSID, FATTR4_FILEID };
 		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
 
 		status_t result = request.Send();
@@ -64,19 +64,27 @@ Inode::CreateInode(Filesystem* fs, const FileInfo &fi, Inode** _inode)
 		AttrValue* values;
 		uint32 count;
 		result = reply.GetAttr(&values, &count);
-		if (result != B_OK || count < 1)
+		if (result != B_OK || count < 2)
 			return result;
 
 		if (fi.fFileId == 0) {
-			if (count < 2 || values[1].fAttribute != FATTR4_FILEID)
+			if (count < 3 || values[2].fAttribute != FATTR4_FILEID)
 				inode->fFileId = fs->AllocFileId();
 			else
-				inode->fFileId = values[1].fData.fValue64;
+				inode->fFileId = values[2].fData.fValue64;
 		} else
 			inode->fFileId = fi.fFileId;
 
 		// FATTR4_TYPE is mandatory
 		inode->fType = values[0].fData.fValue32;
+
+		// FATTR4_FSID is mandatory
+		FilesystemId* fsid =
+			reinterpret_cast<FilesystemId*>(values[1].fData.fPointer);
+		if (*fsid != fs->FsId()) {
+			delete[] values;
+			return B_ENTRY_NOT_FOUND;
+		}
 
 		delete[] values;
 
@@ -117,7 +125,7 @@ Inode::LookUp(const char* name, ino_t* id)
 
 		req.GetFH();
 
-		Attribute attr[] = { FATTR4_FILEID };
+		Attribute attr[] = { FATTR4_FSID, FATTR4_FILEID };
 		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
 
 		status_t result = request.Send();
@@ -154,11 +162,19 @@ Inode::LookUp(const char* name, ino_t* id)
 		if (result != B_OK)
 			return result;
 
+		// FATTR4_FSID is mandatory
+		FilesystemId* fsid =
+			reinterpret_cast<FilesystemId*>(values[0].fData.fPointer);
+		if (*fsid != fFilesystem->FsId()) {
+			delete[] values;
+			return B_ENTRY_NOT_FOUND;
+		}
+
 		uint64 fileId;
-		if (count < 1 || values[0].fAttribute != FATTR4_FILEID)
+		if (count < 2 || values[1].fAttribute != FATTR4_FILEID)
 			fileId = fFilesystem->AllocFileId();
 		else
-			fileId = values[0].fData.fValue64;
+			fileId = values[1].fData.fValue64;
 		delete[] values;
 
 		*id = _FileIdToInoT(fileId);
@@ -646,7 +662,7 @@ Inode::_ReadDirOnce(DirEntry** dirents, uint32* count, uint64* cookie,
 
 		req.PutFH(fHandle);
 
-		Attribute attr[] = { FATTR4_FILEID };
+		Attribute attr[] = { FATTR4_FSID, FATTR4_FILEID };
 		req.ReadDir(*count, cookie, attr, sizeof(attr) / sizeof(Attribute));
 
 		status_t result = request.Send();
@@ -797,9 +813,15 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count, uint64* cookie)
 		for (i = 0; i < min_c(this_count, *_count - count); i++) {
 			struct dirent* de = reinterpret_cast<dirent*>(buffer + pos);
 
+			// FATTR4_FSID is mandatory
+			void* data = dirents[i].fAttrs[0].fData.fPointer;
+			FilesystemId* fsid = reinterpret_cast<FilesystemId*>(data);
+			if (*fsid != fFilesystem->FsId())
+				continue;
+
 			ino_t id;
-			if (dirents[i].fAttrCount == 1)
-				id = _FileIdToInoT(dirents[i].fAttrs[0].fData.fValue64);
+			if (dirents[i].fAttrCount == 2)
+				id = _FileIdToInoT(dirents[i].fAttrs[1].fData.fValue64);
 			else
 				id = _FileIdToInoT(fFilesystem->AllocFileId());
 
