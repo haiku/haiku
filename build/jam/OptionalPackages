@@ -128,8 +128,8 @@ if [ IsOptionalHaikuImagePackageAdded APR ] {
 			: : true ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			apr-1.4.6-x86-gcc2-2012-06-20.zip
-			: $(baseURL)/apr-1.4.6-x86-gcc2-2012-06-20.zip
+			apr-1.4.6-x86-gcc2-2012-06-19.zip
+			: $(baseURL)/apr-1.4.6-x86-gcc2-2012-06-19.zip
 			: : true ;
 	}
 }
@@ -146,8 +146,8 @@ if [ IsOptionalHaikuImagePackageAdded APR-util ] {
 			: : true ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			apr-util-1.4.1-x86-gcc2-2012-06-20.zip
-			: $(baseURL)/apr-util-1.4.1-x86-gcc2-2012-06-20.zip
+			apr-util-1.4.1-x86-gcc2-2012-06-19.zip
+			: $(baseURL)/apr-util-1.4.1-x86-gcc2-2012-06-19.zip
 			: : true ;
 	}
 }
@@ -174,11 +174,11 @@ if [ IsOptionalHaikuImagePackageAdded Bazaar ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Bazaar available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		InstallOptionalHaikuImagePackage bzr-2.6b1-x86-gcc4-2012-03-30.zip
-			: $(baseURL)/bzr-2.6b1-x86-gcc4-2012-03-30.zip ;
+		InstallOptionalHaikuImagePackage bzr-2.5.1-x86-gcc4-2012-06-21.zip
+			: $(baseURL)/bzr-2.5.1-x86-gcc4-2012-06-21.zip ;
 	} else {
-		InstallOptionalHaikuImagePackage bzr-2.6b1-x86-gcc2-2012-03-31.zip
-			: $(baseURL)/bzr-2.6b1-x86-gcc2-2012-03-31.zip ;
+		InstallOptionalHaikuImagePackage bzr-2.5.1-x86-gcc2-2012-06-21.zip
+			: $(baseURL)/bzr-2.5.1-x86-gcc2-2012-06-21.zip ;
 	}
 }
 
@@ -536,8 +536,8 @@ if [ IsOptionalHaikuImagePackageAdded Curl ] {
 		InstallOptionalHaikuImagePackage curl-7.26.0-x86-gcc4-2012-06-20.zip
 			: $(baseURL)/curl-7.26.0-x86-gcc4-2012-06-20.zip ;
 	} else {
-		InstallOptionalHaikuImagePackage curl-7.26.0-x86-gcc2-2012-06-20.zip
-			: $(baseURL)/curl-7.26.0-x86-gcc2-2012-06-20.zip ;
+		InstallOptionalHaikuImagePackage curl-7.26.0-x86-gcc2-2012-06-21.zip
+			: $(baseURL)/curl-7.26.0-x86-gcc2-2012-06-21.zip ;
 	}
 }
 
@@ -554,8 +554,8 @@ if [ IsOptionalHaikuImagePackageAdded CVS ] {
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				cvs-1.12.13.1-r1a3-x86-gcc2-2012-06-20.zip
-				: $(baseURL)/cvs-1.12.13.1-r1a3-x86-gcc2-2012-06-20.zip
+				cvs-1.12.13.1-x86-gcc2-2012-06-20.zip
+				: $(baseURL)/cvs-1.12.13.1-gcc2-2012-06-20.zip
 				: : true ;
 		}
 	}
@@ -913,8 +913,8 @@ if [ IsOptionalHaikuImagePackageAdded Expat ] {
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				expat-2.0.1-r1a3-x86-gcc2-2011-05-20.zip
-				: $(baseURL)/expat-2.0.1-r1a3-x86-gcc2-2011-05-20.zip
+				expat-2.0.1-x86-gcc2-2012-06-20.zip
+				: $(baseURL)/expat-2.0.1-x86-gcc2-2012-06-20.zip
 				: : true ;
 		}
 	}
@@ -1303,8 +1303,8 @@ if [ IsOptionalHaikuImagePackageAdded Mercurial ] {
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				mercurial-2.2.2-x86-gcc2-2012-06-15.zip
-				: $(baseURL)/mercurial-2.2.2-x86-gcc2-2012-06-15.zip
+				mercurial-2.2.2-x86-gcc2-2012-06-20.zip
+				: $(baseURL)/mercurial-2.2.2-x86-gcc2-2012-06-20.zip
 				: : true ;
 		}
 	}
@@ -1474,8 +1474,8 @@ if [ IsOptionalHaikuImagePackageAdded P7zip ] {
 				: $(baseURL)/p7zip-9.20.1-x86-gcc4-2011-06-19.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				p7zip-9.20.1-x86-gcc2-2012-06-15.zip
-				: $(baseURL)/p7zip-9.20.1-x86-gcc2-2012-06-15.zip ;
+				p7zip-9.20.1-x86-gcc2-2012-06-21.zip
+				: $(baseURL)/p7zip-9.20.1-x86-gcc2-2012-06-21.zip ;
 		}
 		AddExpanderRuleToHaikuImage "application/x-7z-compressed" : .7z
 			: "7za l \\0045s"
