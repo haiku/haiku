@@ -210,6 +210,64 @@ Inode::LookUp(const char* name, ino_t* id)
 }
 
 
+// Rename may cause some problems if filehandles are volatile and local Inode
+// object exists for renamed node. It's stored filename will become invalid
+// and, consequnetly, filehandle restoration will fail. Probably, it will
+// be much easier to solve this problem if more metadata is cached.
+status_t
+Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName)
+{
+	if (from->fFilesystem != to->fFilesystem)
+		return B_DONT_DO_THAT;
+
+	do {
+		RPC::Server* serv = from->fFilesystem->Server();
+		Request request(serv);
+		RequestBuilder& req = request.Builder();
+
+		req.PutFH(from->fHandle);
+		req.SaveFH();
+		req.PutFH(to->fHandle);
+		req.Rename(fromName, toName);
+
+		status_t result = request.Send();
+		if (result != B_OK)
+			return result;
+
+		ReplyInterpreter& reply = request.Reply();
+
+		// filehandle has expired
+		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
+			from->_LookUpFilehandle();
+			to->_LookUpFilehandle();
+			continue;
+		}
+
+		// filesystem has been moved
+		if (reply.NFS4Error() == NFS4ERR_MOVED) {
+			from->fFilesystem->Migrate(from->fHandle, serv);
+			to->fFilesystem->Migrate(to->fHandle, serv);
+			continue;
+		}
+
+		result = reply.PutFH();
+		if (result != B_OK)
+			return result;
+
+		result = reply.SaveFH();
+		if (result != B_OK)
+			return result;
+
+		result = reply.PutFH();
+		if (result != B_OK)
+			return result;
+
+
+		return reply.Rename();
+	} while (true);
+}
+
+
 status_t
 Inode::ReadLink(void* buffer, size_t* length)
 {

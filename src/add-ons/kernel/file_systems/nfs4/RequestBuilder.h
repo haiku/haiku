@@ -44,7 +44,9 @@ public:
 										uint64 cookieVerf, Attribute* attrs,
 										uint32 attrCount);
 			status_t				ReadLink();
+			status_t				Rename(const char* from, const char* to);
 			status_t				Renew(uint64 clientId);
+			status_t				SaveFH();
 			status_t				SetClientID(const RPC::Server* serv);
 			status_t				SetClientIDConfirm(uint64 id, uint64 ver);
 

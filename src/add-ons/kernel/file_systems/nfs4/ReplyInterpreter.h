@@ -78,7 +78,9 @@ public:
 			status_t	ReadDir(uint64* cookie, uint64* cookieVerf,
 							DirEntry** dirents, uint32* count, bool* eof);
 			status_t	ReadLink(void* buffer, uint32* size, uint32 maxSize);
+			status_t	Rename();
 	inline	status_t	Renew();
+	inline	status_t	SaveFH();
 			status_t	SetClientID(uint64* clientid, uint64* verifier);
 	inline	status_t	SetClientIDConfirm();
 
@@ -158,6 +160,13 @@ inline status_t
 ReplyInterpreter::Renew()
 {
 	return _OperationError(OpRenew);
+}
+
+
+inline status_t
+ReplyInterpreter::SaveFH()
+{
+	return _OperationError(OpSaveFH);
 }
 
 

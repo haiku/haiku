@@ -289,6 +289,26 @@ ReplyInterpreter::ReadLink(void* buffer, uint32* size, uint32 maxSize)
 	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
 }
 
+
+status_t
+ReplyInterpreter::Rename()
+{
+	status_t res = _OperationError(OpRename);
+	if (res != B_OK)
+		return res;
+
+	fReply->Stream().GetBoolean();
+	fReply->Stream().GetUHyper();
+	fReply->Stream().GetUHyper();
+
+	fReply->Stream().GetBoolean();
+	fReply->Stream().GetUHyper();
+	fReply->Stream().GetUHyper();
+
+	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+}
+
+
 status_t
 ReplyInterpreter::SetClientID(uint64* clientid, uint64* verifier)
 {
@@ -556,7 +576,7 @@ ReplyInterpreter::_NFS4ErrorToHaiku(uint32 x)
 		case NFS4ERR_NOENT:		return B_ENTRY_NOT_FOUND;
 		case NFS4ERR_IO:		return B_IO_ERROR;
 		case NFS4ERR_NXIO:		return B_DEVICE_NOT_FOUND;
-		case NFS4ERR_ACCESS:	return B_PERMISSION_DENIED;
+		case NFS4ERR_ACCESS:	return B_NOT_ALLOWED;
 		case NFS4ERR_EXIST:		return B_FILE_EXISTS;
 		case NFS4ERR_XDEV:		return B_CROSS_DEVICE_LINK;
 		case NFS4ERR_NOTDIR:	return B_NOT_A_DIRECTORY;

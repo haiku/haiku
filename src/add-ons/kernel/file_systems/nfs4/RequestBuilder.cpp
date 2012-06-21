@@ -309,6 +309,24 @@ RequestBuilder::ReadLink()
 
 
 status_t
+RequestBuilder::Rename(const char* from, const char* to)
+{
+	if (fProcedure != ProcCompound)
+		return B_BAD_VALUE;
+	if (fRequest == NULL)
+		return B_NO_MEMORY;
+
+	fRequest->Stream().AddUInt(OpRename);
+	fRequest->Stream().AddString(from);
+	fRequest->Stream().AddString(to);
+
+	fOpCount++;
+
+	return B_OK;
+}
+
+
+status_t
 RequestBuilder::Renew(uint64 clientId)
 {
 	if (fProcedure != ProcCompound)
@@ -319,6 +337,21 @@ RequestBuilder::Renew(uint64 clientId)
 	fRequest->Stream().AddUInt(OpRenew);
 	fRequest->Stream().AddUHyper(clientId);
 
+	fOpCount++;
+
+	return B_OK;
+}
+
+
+status_t
+RequestBuilder::SaveFH()
+{
+	if (fProcedure != ProcCompound)
+		return B_BAD_VALUE;
+	if (fRequest == NULL)
+		return B_NO_MEMORY;
+
+	fRequest->Stream().AddUInt(OpSaveFH);
 	fOpCount++;
 
 	return B_OK;

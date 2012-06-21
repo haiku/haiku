@@ -270,7 +270,7 @@ status_t
 WriteStream::AddString(const char* str, uint32 maxlen)
 {
 	uint32 len = strlen(str);
-	uint32 size = min_c(maxlen, len);
+	uint32 size = maxlen == 0 ? len : min_c(maxlen, len);
 
 	return AddOpaque(str, size);
 }

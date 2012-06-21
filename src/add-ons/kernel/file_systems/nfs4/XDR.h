@@ -76,7 +76,7 @@ public:
 
 	inline	status_t		AddBoolean(bool x);
 
-			status_t		AddString(const char* str, uint32 maxlen);
+			status_t		AddString(const char* str, uint32 maxlen = 0);
 
 			status_t		AddOpaque(const void* ptr, uint32 size);
 			status_t		AddOpaque(const WriteStream& stream);
