@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Expander	101544763
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Expander	800089309
 Expand	ExpanderMenu		Pakk ut
 Close window when done expanding	ExpanderPreferences		Lukk vinduet når utpakkingen er ferdig
 Set destination…	ExpanderMenu		Velg mål…
@@ -25,3 +25,4 @@ Settings	ExpanderMenu		Innstillinger
 Settings…	ExpanderMenu		Innstillinger…
 Expander: Choose destination	DirectoryFilePanel		Arkivåpner: Velg mål
 Select	ExpanderPreferences		Velg
+Expand	ExpanderWindow		Pakk ut

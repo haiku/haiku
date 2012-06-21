@@ -75,7 +75,6 @@ struct desk_settings {
 	bool vertical;
 	bool left;
 	bool top;
-	bool showTime;
 	bool showSeconds;
 	bool showDayOfWeek;
 	uint32 state;

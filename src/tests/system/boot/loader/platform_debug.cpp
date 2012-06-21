@@ -1,7 +1,7 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2012, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <boot/platform.h>
@@ -32,3 +32,9 @@ dprintf(const char *format, ...)
 	va_end(args);
 }
 
+
+char*
+platform_debug_get_log_buffer(size_t* _size)
+{
+	return NULL;
+}

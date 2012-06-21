@@ -1,4 +1,5 @@
-1	belarusian	x-vnd.Haiku-Appearance	2547306525
+1	belarusian	x-vnd.Haiku-Appearance	3882211276
+Plain font:	Font view		Просты шрыфт:
 Control highlight	Colors tab		Выдзяленне кнопак
 Control border	Colors tab		Аблямоўка кнопак
 Antialiasing type:	AntialiasingSettingsView		Тып згладжвання
@@ -15,8 +16,6 @@ Inactive window tab text	Colors tab		Тэкст неактыўнай уклад�
 About Decorator	DecorSettingsView		Пра Decorator
 Failure	Colors tab		Непаспяхова
 Hinting menu	AntialiasingSettingsView		Меню хінтынгу
-Window Decorator	APRWindow		Дэкаратар Вакон
-Window Decorator:	DecorSettingsView		Дэкаратар Вакон:
 Document background	Colors tab		Фон дакумента
 Revert	APRWindow		Вярнуць
 Window tab	Colors tab		Ўкладка вакна
@@ -31,14 +30,20 @@ Navigation pulse	Colors tab		Колер падсветкі навігацыі
 Selected menu item text	Colors tab		Тэкст пазначанага пункту меню
 Menu background	Colors tab		Фон меню
 OK	DecorSettingsView		Так
+Size:	Font Selection view		Памер:
 Panel background	Colors tab		Фон панэлі
+Menu font:	Font view		Шрыфт меню:
 Colors	APRWindow		Колеры
 Control background	Colors tab		Фон кнопак
 Inactive window tab	Colors tab		Неактыўная ўкладка
 Appearance	System name		Афармленне
+Fixed font:	Font view		Роўнашырокі шрыфт:
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	У рудога вераб’я ў сховішчы пад фатэлем ляжаць нейкія гаючыя зёлкі.
 Reduce colored edges filter strength:	AntialiasingSettingsView		Паменьшыць інтэнсіўнасць фільтру каляровых краёў:
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Субпіксельнае згладжванне ў камбінацыі з хінтынгам сімвалаў недаступнае ў гэтай зборцы Haiku з-за магчымых канфліктаў з патэнтамі. Каб уключыць гэтую функцыю, вы павінны сабрать Haiku самастойна і уключыць канкрэтныя опцыі ў канфігурацыйным загалоўку libfreetype.
 Control text	Colors tab		Тэкст кнопак
 Tooltip text	Colors tab		Тэкст падказак
+Bold font:	Font view		Тлусты шрыфт:
 Inactive window border	Colors tab		Неактыўная мяжа вакна
 Menu item text	Colors tab		Тэкст пунктаў меню
 LCD subpixel	AntialiasingSettingsView		Субпіксельнае (LCD)
@@ -47,4 +52,5 @@ Strong	AntialiasingSettingsView		Жырны
 Panel text	Colors tab		Тэкст панэлі
 Monospaced fonts only	AntialiasingSettingsView		Толькі монашырынныя шрыфты
 Antialiasing menu	AntialiasingSettingsView		Меню згладжвання
+Fonts	APRWindow		Шрыфты
 Glyph hinting:	AntialiasingSettingsView		Хінтынг сімвалаў

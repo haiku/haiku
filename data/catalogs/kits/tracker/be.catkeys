@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	3121200791
+1	belarusian	x-vnd.Haiku-libtracker	3695303004
 common	B_COMMON_DIRECTORY		агульны
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Від іконак
@@ -47,6 +47,7 @@ Select all	ContainerWindow		Выбраць усё
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Прабачце, атрыбут 'Сімвал' не можа мясціць многабайтавы знак.
 Clean up	DeskWindow		Прыбрацца
 You cannot copy or move the root directory.	FSUtils		Вы не можаце капіяваць або перамяшчаць карнявы каталог
+%SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed з %TotalSize, %BytesPerSecond/s
 Invert selection	FilePanelPriv		Інвертаваць выдзяленне
 Rename	InfoWindow	Button label, 'Rename' (en), 'Umbenennen' (de)	Перайменаваць
 save text	FilePanelPriv		захаваць тэкст
@@ -76,6 +77,7 @@ Decrease size	DeskWindow		Паменшыць памер
 Size	ContainerWindow		Памер
 All disks	AutoMounterSettings		Усе дыскі
 Would you like to find some other suitable application?	FSUtils		Жадаеце пашукаць іншую падыходзячую праграму?
+Finish: %time - %finishtime left	StatusWindow		Завяршэнне: %time - засталося %finishtime
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Немагчыма адкрыць \"%document\" праграмай \"%app\" (Не хапае: %library). \n
 no items	CountView		няма элементаў
 Ignore case	SelectionWindow		Не ўлічваць рэгістр
@@ -131,6 +133,7 @@ OK	TrackerInitialState		ОК
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Немагчыма адкрыць \"%name\". Файл памылкова пазначаны як выканальны
 Add-ons	ContainerWindow		Дапаўненні
 Edit templates…	TemplatesMenu		Правіць шаблоны...
+Finish: %time - Over %finishtime left	StatusWindow		Завяршэнне: %time - Засталося каля %finishtime
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Элемент \"%name\" у гэтым каталозе ўжо існуе. Ці жадаеце замяніць яго ствараемай спасылкай?
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Прабачце, не хапае месца на томе прызначэння для капіявання выбранага.
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Нельга адкрыць  \"%document\" праграмай \"%app\" (%error).
@@ -252,6 +255,7 @@ Trash	TrackerSettingsWindow		Сметніца
 Unmount	ContainerWindow		Размантаваць
 Copy layout	ContainerWindow		Капіяваць макет
 label too long	PoseView		метка занадта доўгая
+Finish: %time	StatusWindow		Завяршэнне: %time
 Cancel	Tracker		Адмена
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Прабачце, вы не можаце правіць гэты атрыбут.
 Name	ContainerWindow		Імя

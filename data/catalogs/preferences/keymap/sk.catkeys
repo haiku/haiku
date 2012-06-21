@@ -1,22 +1,38 @@
-1	slovak	x-vnd.Haiku-Keymap	1259868356
+1	slovak	x-vnd.Haiku-Keymap	4022885915
+Shift:	Modifier keys window	Shift key role name	Posun:
+Revert	Modifier keys window		Vrátiť
 Tilde trigger	Keymap window		Spúšťač tilda
 Grave trigger	Keymap window		Spúšťač apostrof
+Role	Modifier keys window	As in the role of a modifier key	Úloha
 Select dead keys	Keymap window		Vyberte mŕtve klávesy
+Cancel	Modifier keys window		Zrušiť
 Quit	Keymap window		Ukončiť
 Switch shortcut keys to Haiku mode	Keymap window		Vymeniť skratkové klávesy na režim Haiku
 Circumflex trigger	Keymap window		Spúšťač vokáň
 Diaeresis trigger	Keymap window		Spúšťač rozluky
+Disabled	Modifier keys window	Do nothing	Vypnuté
 Open…	Keymap window		Otvoriť…
 System:	Keymap window		Systém:
+Set modifier keys…	Keymap window		Nastaviť klávesy modifikátorov…
+Option:	Modifier keys window	Option key role name	Voľba:
 Switch shortcut keys	Keymap window		Vymeniť skratkové klávesy
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Kláves Shift
 User:	Keymap window		Používateľ:
+Key	Modifier keys window	As in a computer keyboard key	Kláves
+Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Kláves Ctrl
+Control:	Modifier keys window	Control key role name	Control:
 Sample and clipboard:	Keymap window		Vzor a schránka:
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Kláves Alt/Opt
 Layout	Keymap window		Rozloženie
 Switch shortcut keys to Windows/Linux mode	Keymap window		Vymeniť skratkové klávesy na režim Windows/Linux
 Revert	Keymap window		Vrátiť
+Command:	Modifier keys window	Command key role name	Príkaz:
 Save as…	Keymap window		Uložiť ako…
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Kláves Win/Cmd
 File	Keymap window		Súbor
 (Current)	Keymap window		(aktuálne)
 Font	Keymap window		Písmo
 Keymap	System name		Mapa kláves
+Set modifier keys	Modifier keys window		Nastaviť modifikačné klávesy
+Modifier keys	Modifier keys window		Modifikačné klávesy
 Acute trigger	Keymap window		Spúšťač dĺžeň

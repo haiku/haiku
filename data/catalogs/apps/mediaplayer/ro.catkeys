@@ -1,9 +1,9 @@
-1	romanian	x-vnd.Haiku-MediaPlayer	986711925
+1	romanian	x-vnd.Haiku-MediaPlayer	4123753294
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (American)
 Stream settings	MediaPlayer-Main		Configurări flux
 <unknown>	PlaylistItem-album		<necunoscut>
-The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Fișierul„%filename” nu s-a putut deschide.\n\n
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Scalează controalele în modul ecran complet
+Video	MediaPlayer-InfoWin		Video
 Subtitle size:	MediaPlayer-SettingsWindow		Dimensiune subtitrare:
 Save Playlist	MediaPlayer-PlaylistWindow		Salvează lista de redare
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Niciun fișier pe care ați vrut să le redați nu par a fi fișiere media.
@@ -13,6 +13,7 @@ New player…	MediaPlayer-Main		Player nou...
 Subtitle placement:	MediaPlayer-SettingsWindow		Amplasare subtitrare:
 Close	MediaPlayer-Main		Închide
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Unele fișiere nu pot fi mutate la gunoi.
+<unknown>	MediaPlayer-InfoWin		<necunoscut>
 Open	MediaPlayer-Main		Deschide
 Next	MediaPlayer-Main		Următor
 OK	MediaPlayer-SettingsWindow		OK
@@ -56,6 +57,7 @@ Move Entry	MediaPlayer-MovePLItemsCmd		Mută intrare
 Open	MediaPlayer-PlaylistWindow		Deschide
 Stop playing.	MediaPlayer-Main		Oprește redarea.
 Error: 	MediaPlayer-RemovePLItemsCmd		Eroare:
+Audio	MediaPlayer-InfoWin		Audio
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Eroare internă (mesaj greșit). Salvarea listei de redare a eșuat.
 Skip to the previous track.	MediaPlayer-Main		Mergi la pista precedentă.
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% a întâlnit o eroare internă. Fișierul nu a putut fi deschis.

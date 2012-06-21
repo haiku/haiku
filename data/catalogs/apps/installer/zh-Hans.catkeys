@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Installer	3852628561
+1	english	x-vnd.Haiku-Installer	2099988747
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		在接近文件末尾，其他菜单条目之后，添加类似于下面的内容：\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		您是否确定终止安装，重新启动系统？
 \t}\n\n	InstallerApp		\t}\n\n
@@ -28,7 +28,6 @@ Install from:	InstallerWindow		安装源：
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		安装必读\n\n
 Continue	InstallerWindow	In alert after pressing Stop	继续
 Write boot sector to '%s'	InstallerWindow		引导扇区写入到 '%s'
-2.1) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
 Collecting copy information.	InstallProgress		收集复制信息。
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		从弹出菜单中选择源磁盘。然后点击\"开始\"。
 Quit Boot Manager and DriveSetup	InstallerWindow		退出引导管理器和磁盘管理器
@@ -49,7 +48,6 @@ README	InstallerApp		README
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		目标磁盘可能没有足够的空间。尝试选择其他的磁盘或者选择不安装附加项目。
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		请在关闭系统安装器之前关闭引导管理器和磁盘管理器。
 Scanning for disks…	InstallerWindow		扫描磁盘...
-2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		磁盘无法挂载。请选择其他磁盘。
 ?? of ??	InstallerWindow	Unknown progress	??来源于??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
@@ -99,7 +97,6 @@ DriveSetup, the application to configure disk partitions, could not be launched.
 No optional packages available.	PackagesView		无可用附加软件包。
 All hard disks start with \"hd\".\n	InstallerApp		所有硬盘的起始字符为：\"hd\"。\n
 Continue	InstallerApp		继续
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" documentation, there is a link on the Desktop.\n\n	InstallerApp		3）在首次成功进入 Haiku 时，请一定要阅读我们的 \"Welcome\" 文档，在桌面上有它的链接。\n\n
 BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		引导管理器，用于配置 Haiku 引导菜单，无法启动。
 Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		从终端中启动偏好的编辑器，配置您的 /boot/grub/menu.lst，如下：
 Boot sector not written because of an internal error.	InstallProgress		由于内部错误，引导扇区未写入。

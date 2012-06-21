@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Notifications	299049300
+1	russian	x-vnd.Haiku-Notifications	3631903554
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Произошла ошибка при сохранении настроек\nВозможно, что закончилось свободное место на диске.
 Notifications	GeneralView		Уведомления
 seconds of inactivity	GeneralView		секунд бездействия
@@ -44,6 +44,7 @@ Can't save preferences, you probably don't have write access to the boot setting
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Возникла проблема при сохранении настроек.\nВвозможно у вас нет прав на запись в директорию настроек загрузки.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Возникла проблема при сохранении настроек.\nвозможно у вас нет прав на запись в директорию настроек загрузки.
 Enable notifications at startup	GeneralView		Добавить уведомления в автозагрузку
+Notifications	PrefletView		Уведомления
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Сервер уведомлений не найден.\nЭто означает, что сервер уведомлений может быть поврежден.
 Applications	NotificationView		Приложения
 Events are notified	GeneralView		События уведомляются

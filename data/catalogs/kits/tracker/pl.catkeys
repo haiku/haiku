@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	3121200791
+1	polish	x-vnd.Haiku-libtracker	3695303004
 common	B_COMMON_DIRECTORY		common
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Widok ikon
@@ -47,6 +47,7 @@ Select all	ContainerWindow		Zaznacz wszystko
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Przepraszamy, atrybut 'Character' nie może przechowywać wielobajtowych znaków.
 Clean up	DeskWindow		Wyczyść
 You cannot copy or move the root directory.	FSUtils		Nie możesz kopiować ani przenosić katalogu głównego.
+%SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed z %TotalSize, %BytesPerSecond/s
 Invert selection	FilePanelPriv		Odwróć zaznaczenie
 Rename	InfoWindow	Button label, 'Rename' (en), 'Umbenennen' (de)	Zmień nazwę
 save text	FilePanelPriv		zapisz tekst
@@ -76,6 +77,7 @@ Decrease size	DeskWindow		Zmniejsz rozmiar
 Size	ContainerWindow		Rozmiar
 All disks	AutoMounterSettings		Wszystkie dyski
 Would you like to find some other suitable application?	FSUtils		Czy chciałbyś poszukać innych odpowiednich aplikacji?
+Finish: %time - %finishtime left	StatusWindow		Koniec: %time - %finishtime pozostało
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Nie można otworzyć \"%document\" z użyciem \"%app\" (Brakujące biblioteki: %library). \n
 no items	CountView		Brak zawartości
 Ignore case	SelectionWindow		Ignoruj wielkość liter
@@ -131,6 +133,7 @@ OK	TrackerInitialState		OK
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Nie można otworzyć \"%name\". Plik jest błednie oznaczony jako wykonywalny. 
 Add-ons	ContainerWindow		Wtyczki
 Edit templates…	TemplatesMenu		Edytuj szablony…
+Finish: %time - Over %finishtime left	StatusWindow		Koniec: %time - Pozostało %finishtime
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Objekt o nazwie \"%name\" już istnieje w tym folderu. Zamienić na skrót symboliczny?
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Nie wystarczająca ilość pamięci w miejscu docelowym by wykonać kopiowanie.
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nie można otworzyć \"%document\" z aplikacją \"%app\" (%error). 
@@ -252,6 +255,7 @@ Trash	TrackerSettingsWindow		Kosz
 Unmount	ContainerWindow		Odmontuj
 Copy layout	ContainerWindow		Kopiuj motyw
 label too long	PoseView		opis zbyt długi
+Finish: %time	StatusWindow		Pozostało: %time
 Cancel	Tracker		Anuluj
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Nie możesz edytować tego atrybutu.
 Name	ContainerWindow		Nazwa

@@ -1,7 +1,8 @@
-1	slovak	x-vnd.Haiku-3DRendering	1539891217
+1	slovak	x-vnd.Haiku-3DRendering	1725618140
 List stack size:	Capabilities		Veľkosť zásobníka zoznamu:
 Information	InfoView		Informácie
 Max. clipping planes:	Capabilities		Max. orezávacích rovín:
+GL version:	InfoView		Verzia GL:
 Max. texture units:	Capabilities		Max. textúrových jednotiek:
 Renderer name:	InfoView		Názov vykresľovača:
 Vendor name:	InfoView		Dodávateľ:
@@ -19,6 +20,7 @@ GLUT API version:	InfoView		Verzia GLUT API:
 Texture stack size:	Capabilities		Veľkosť zásobníka textúr:
 Max. evaluators equation order:	Capabilities		Max. rád rovnice vyhodnocovačov:
 Max. 3D texture size:	Capabilities		Max. veľkosť 3D textúry:
+3D Rendering	System name		3D vykresľovanie
 Capabilities	Capabilities		Schopnosti
 Max. recommended index elements:	Capabilities		Max. odporúčaných indexových prvkov:
 Available	Extensions		Dostupné

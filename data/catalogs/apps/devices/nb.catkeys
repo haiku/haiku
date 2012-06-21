@@ -1,4 +1,5 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Devices	4021276649
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Devices	2163563541
+Manufacturer	DeviceSCSI		Produsent
 Order by:	DevicesView		Sorter etter:
 ACPI controller	Device		ACPI-kontroller
 Memory controller	Device		Minnekontroller
@@ -10,6 +11,7 @@ Docking station	Device		Dokkingstasjon
 Computer	Device		Datamaskin
 Unknown device	Device		Ukjent enhet
 Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Klasseinformasjon:\t\t\t\t: %classInfo%
+Processor	DeviceSCSI		Prosessor
 Detailed	DevicesView		Detaljert
 Category	DevicesView		Kategori
 Quit	DevicesView		Avslutt
@@ -37,6 +39,7 @@ PCI bus	Device		PCI-buss
 ACPI System Indicator	DeviceACPI		ACPI-systemindikator
 None	Device		Ingen
 PCI bus	DevicesView		PCI-buss
+Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Klasseinformasjon:\t\t\t\t: %classInfo%
 Basic information	DevicesView		Basisinformasjon
 PCI Information	DevicePCI		PCI-informasjon
 Manufacturer:	Device		Produsent:
@@ -54,3 +57,10 @@ Signal processing controller	Device		Signalbehandlingskontroller
 Serial bus controller	Device		Seriellbusskontroller
 Wireless controller	Device		Trådløs kontroller
 ACPI node '%1'	DeviceACPI		ACPI-node '%1'
+Device name	Device		Enhetsnavn
+Manufacturer	Device		Produsent
+Manufacturer	DevicePCI		Produsent
+Unknown device	DevicesView		Ukjent enhet
+Device name	DeviceSCSI		Enhetsnavn
+Device paths	DevicePCI		Enhetsti
+Devices	DevicesView		Maskinvare

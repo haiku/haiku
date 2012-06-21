@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	3500844344
+1	japanese	x-vnd.Haiku-libtracker	4074946557
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		アイコン表示
 Add-ons	FilePanelPriv		アドオン
@@ -46,6 +46,7 @@ Select all	ContainerWindow		すべて選択
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		「Character」属性にはマルチバイト文字を保存できません。
 Clean up	DeskWindow		アイコンの整列
 You cannot copy or move the root directory.	FSUtils		ルートフォルダーをコピーまたは移動はできません。
+%SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%TotalSize中%SizeProcessed処理済, %BytesPerSecond/秒
 Invert selection	FilePanelPriv		選択範囲を反転
 Rename	InfoWindow	Button label, 'Rename' (en), 'Umbenennen' (de)	名前の変更
 save text	FilePanelPriv		テキストを保存
@@ -73,6 +74,7 @@ Decrease size	DeskWindow		サイズを縮小
 Size	ContainerWindow		サイズ
 All disks	AutoMounterSettings		全パーティション
 Would you like to find some other suitable application?	FSUtils		他に適切なアプリケーションを検索しますか？
+Finish: %time - %finishtime left	StatusWindow		終了: %time - 残り %finishtime
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		%libraryライブラリーがインストールされてないため、\"%app\" を使って \"%document\" を開くことはできませんでした。
 no items	CountView		0 項目
 Ignore case	SelectionWindow		大文字/小文字を区別しない
@@ -127,6 +129,7 @@ OK	TrackerInitialState		OK
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		ファイルが誤って実行可能に設定されているため、\"%name\" を開けませんでした。
 Add-ons	ContainerWindow		アドオン
 Edit templates…	TemplatesMenu		テンプレートを編集…
+Finish: %time - Over %finishtime left	StatusWindow		終了: %time - 残り %finishtime 以上
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		このフォルダーに既に \"%name\" という項目があります。作成しょうとしているシンボリックリンクと置き換えますか？
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		コピー先ディスクの空き容量が不足しています。コピーができません。
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		アプリケーション \"%app\" を使って「%document」を開くことはできませんでした（%error）。
@@ -247,6 +250,7 @@ Trash	TrackerSettingsWindow		ごみ箱
 Unmount	ContainerWindow		マウント解除
 Copy layout	ContainerWindow		レイアウトをコピー
 label too long	PoseView		ラベルが長すぎます
+Finish: %time	StatusWindow		完了：%time
 Cancel	Tracker		中止
 Sorry, you cannot edit that attribute.	WidgetAttributeText		この属性は編集できません。
 Name	ContainerWindow		名前

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Installer	3852628561
+1	finnish	x-vnd.Haiku-Installer	2099988747
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Joten lisää muiden valikkorivien alapuolelle tiedoston loppuun joitakin seuraavanlaisia rivejä:\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Oletko varma, että haluat keskeyttää asennuksen ja käynnistää järjestelmän uudelleen?
 \t}\n\n	InstallerApp		\t}\n\n
@@ -28,7 +28,6 @@ Install from:	InstallerWindow		Asennetaan levyltä:
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		TÄRKEITÄ TIETOJA ENNEN HAIKUN ASENTAMISTA\n\n
 Continue	InstallerWindow	In alert after pressing Stop	Jatka
 Write boot sector to '%s'	InstallerWindow		Kirjoita alkulataussektori kohteeseen ’%s’
-2.1) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
 Collecting copy information.	InstallProgress		Kerätään kopiointitietoja.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Valitse lähdelevy ponnahdusvalikosta. Napsauta sitten ”Aloita”.
 Quit Boot Manager and DriveSetup	InstallerWindow		Poistu Alkulataushallinnasta ja Levyasema-asetuksista
@@ -49,7 +48,6 @@ README	InstallerApp		LUEMINUT
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Kohdelevyllä ei ehkä ole riittävästi tilaa. Yritä valita eri levy tai älä valitse valinnaisten alkioiden asentamista.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Sulje ensin Alkulataushallinta- ja Levyasema-asetusikkunat ennen asennusohjelman ikkunan sulkemista.
 Scanning for disks…	InstallerWindow		Etsitään levyjä…
-2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Levyä ei voitu liittää. Valitse eri levy.
 ?? of ??	InstallerWindow	Unknown progress	?? / ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry ”Haiku Alfa” {\n
@@ -99,7 +97,6 @@ DriveSetup, the application to configure disk partitions, could not be launched.
 No optional packages available.	PackagesView		Valinnaisia pakkauksia ei ole saatavilla.
 All hard disks start with \"hd\".\n	InstallerApp		Kaikki kiintolevynimet alkavat kirjaimilla ”hd”.\n
 Continue	InstallerApp		Jatka
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" documentation, there is a link on the Desktop.\n\n	InstallerApp		3) Kun alkukäynnistät Haikun onnistuneesti ensimmäisen kerran, muista lukea ”Tervetuloa”-dokumentit. Niihin löytyy linkki työpöydältä.\n\n
 BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Alkulataushallinta, sovellus Haiku-alkulatausvalikon asettamiseen, ei voitu käynnistää.
 Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Aseta tiedosto /boot/grub/menu.lst käynnistämällä suosikkieditorisi Pääteikkunassa seuraavalla tavalla:\n\n
 Boot sector not written because of an internal error.	InstallProgress		Alkulataussektoria ei kirjoitettu sisäisen virheen vuoksi.

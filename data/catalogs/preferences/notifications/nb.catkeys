@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Notifications	2661343760
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Notifications	3082337137
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		En feil oppsto da innstillingene skulle lagres.\nDet er mulig disken begynner å bli full.
 Notifications	GeneralView		Meldinger
 seconds of inactivity	GeneralView		sekunder med inaktivitet
@@ -21,6 +21,7 @@ Yes	NotificationView		Ja
 Large icon	DisplayView		Stort ikon
 Icon size:	DisplayView		Ikonstørrelse:
 Notifications	System name		Meldinger
+Notifications	NotificationView		Meldinger
 No	NotificationView		Nei
 Title	NotificationView		Tittel
 Information	NotificationView		Informasjon
@@ -29,4 +30,5 @@ Application	NotificationView		Program
 Enabled	NotificationView		Aktivert
 OK	DisplayView		OK
 Unknown	NotificationView		Ukjent
+Notifications	PrefletView		Meldinger
 Applications	NotificationView		Programmer

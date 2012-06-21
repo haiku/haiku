@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 Haiku Inc. All rights reserved.
+ * Copyright 2008-2012 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -15,13 +15,15 @@
 #include <PartitionParameterEditor.h>
 #include <Partition.h>
 
+
 class BMenuField;
 class BTextControl;
 class SizeSlider;
 
+
 class CreateParamsPanel : public BWindow {
 public:
-								CreateParamsPanel(BWindow* window, 
+								CreateParamsPanel(BWindow* window,
 									BPartition* parent, off_t offset,
 									off_t size);
 	virtual						~CreateParamsPanel();
@@ -38,9 +40,11 @@ private:
 			void 				_CreateViewControls(BPartition* parent,
 									off_t offset, off_t size);
 
-			void				_UpdateTextControl();
+			void				_UpdateSizeTextControl();
 
+private:
 	class EscapeFilter;
+
 			EscapeFilter*		fEscapeFilter;
 			sem_id				fExitSemaphore;
 			BWindow*			fWindow;
@@ -54,5 +58,6 @@ private:
 			SizeSlider*			fSizeSlider;
 			BTextControl*		fSizeTextControl;
 };
+
 
 #endif // CREATE_PARAMS_PANEL_H

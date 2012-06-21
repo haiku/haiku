@@ -1,4 +1,5 @@
-1	russian	x-vnd.Haiku-Keymap	1259868356
+1	russian	x-vnd.Haiku-Keymap	140876782
+Revert	Modifier keys window		Вернуть
 Tilde trigger	Keymap window		Тильда
 Grave trigger	Keymap window		Апостроф
 Select dead keys	Keymap window		Выбор мертвых клавиш
