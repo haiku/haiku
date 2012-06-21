@@ -12,6 +12,7 @@
 
 #include <arch/x86/apm.h>
 #include <bios_drive.h>
+#include <util/FixedWidthPointer.h>
 
 
 // must match SMP_MAX_CPUS in arch_smp.h
@@ -25,9 +26,10 @@
 typedef struct {
 	uint16		serial_base_ports[MAX_SERIAL_PORTS];
 
-	bios_drive	*drives;	// this does not contain the boot drive
+	FixedWidthPointer<bios_drive> drives;
+		// this does not contain the boot drive
 
 	apm_info	apm;
-} platform_kernel_args;
+} _PACKED platform_kernel_args;
 
 #endif	/* KERNEL_BOOT_PLATFORM_BIOS_IA32_KERNEL_ARGS_H */

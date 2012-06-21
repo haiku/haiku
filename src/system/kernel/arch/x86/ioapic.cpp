@@ -650,7 +650,7 @@ ioapic_init(kernel_args* args)
 		&ioapic_end_of_interrupt
 	};
 
-	if (args->arch_args.apic == NULL)
+	if (!args->arch_args.apic)
 		return;
 
 	if (args->arch_args.ioapic_phys == 0) {

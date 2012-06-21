@@ -13,13 +13,13 @@
 typedef struct addr_range {
 	uint64 start;
 	uint64 size;
-} addr_range;
+} _PACKED addr_range;
 
 
 typedef struct phys_addr_range {
 	phys_addr_t	start;
 	phys_size_t	size;
-} phys_addr_range;
+} _PACKED phys_addr_range;
 
 
 #ifdef __cplusplus

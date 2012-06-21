@@ -6,11 +6,12 @@
 #define KERNEL_BOOT_DRIVER_SETTINGS_H
 
 
+#include <util/FixedWidthPointer.h>
 #include <util/list.h>
 
 
 struct driver_settings_file {
-	struct driver_settings_file *next;
+	FixedWidthPointer<struct driver_settings_file> next;
 	char	name[B_OS_NAME_LENGTH];
 	char	*buffer;
 	size_t	size;

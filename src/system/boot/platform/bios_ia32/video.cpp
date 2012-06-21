@@ -957,7 +957,7 @@ platform_init_video(void)
 		}
 
 		gKernelArgs.edid_info = kernel_args_malloc(sizeof(edid1_info));
-		if (gKernelArgs.edid_info != NULL)
+		if (gKernelArgs.edid_info)
 			memcpy(gKernelArgs.edid_info, &info, sizeof(edid1_info));
 	}
 

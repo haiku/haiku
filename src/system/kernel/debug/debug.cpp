@@ -1401,7 +1401,7 @@ syslog_init_post_vm(struct kernel_args* args)
 	sSyslogMessage->ident[0] = '\0';
 	//strcpy(sSyslogMessage->ident, "KERNEL");
 
-	if (args->debug_output != NULL)
+	if (args->debug_output)
 		syslog_write((const char*)args->debug_output, args->debug_size, false);
 
 	char revisionBuffer[64];
@@ -1431,7 +1431,7 @@ err1:
 static status_t
 syslog_init(struct kernel_args* args)
 {
-	if (!args->keep_debug_output_buffer || args->debug_output == NULL)
+	if (!args->keep_debug_output_buffer || !args->debug_output)
 		return B_OK;
 
 	sSyslogBuffer = create_ring_buffer_etc(args->debug_output, args->debug_size,

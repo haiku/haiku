@@ -9,6 +9,10 @@
 #	error This file is included from <boot/kernel_args.h> only
 #endif
 
+
+#include <util/FixedWidthPointer.h>
+
+
 #define MAX_BOOT_PTABLES 4
 
 #define _PACKED __attribute__((packed))
@@ -34,14 +38,13 @@ typedef struct {
 	// smp stuff
 	uint32	apic_time_cv_factor; // apic ticks per second
 	uint32	apic_phys;
-	uint32	*apic;
+	FixedWidthPointer<void> apic;
 	uint32	ioapic_phys;
-	uint32	*ioapic;
 	uint32	cpu_apic_id[MAX_BOOT_CPUS];
 	uint32	cpu_apic_version[MAX_BOOT_CPUS];
 	// hpet stuff
 	uint32	hpet_phys;
-	uint32	*hpet;
-} arch_kernel_args;
+	FixedWidthPointer<void> hpet;
+} _PACKED arch_kernel_args;
 
 #endif	/* KERNEL_ARCH_x86_KERNEL_ARGS_H */

@@ -68,7 +68,7 @@ apic_disable_local_ints()
 status_t
 apic_init(kernel_args *args)
 {
-	if (args->arch_args.apic == NULL)
+	if (!args->arch_args.apic)
 		return B_NO_INIT;
 
 	sLocalAPIC = args->arch_args.apic;

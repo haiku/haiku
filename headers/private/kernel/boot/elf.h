@@ -9,10 +9,11 @@
 #include <boot/addr_range.h>
 #include <sys/stat.h>
 #include <elf_priv.h>
+#include <util/FixedWidthPointer.h>
 
 
 struct preloaded_image {
-	struct preloaded_image *next;
+	FixedWidthPointer<struct preloaded_image> next;
 	char		*name;
 	elf_region	text_region;
 	elf_region	data_region;
@@ -37,7 +38,7 @@ struct preloaded_image {
 		// the ID field will be filled out in the kernel
 	bool		is_module;
 		// set by the module initialization code
-};
+} _PACKED;
 
 #ifdef __cplusplus
 extern "C" {

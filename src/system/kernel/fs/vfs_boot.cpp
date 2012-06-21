@@ -325,7 +325,7 @@ static status_t
 get_boot_partitions(kernel_args* args, PartitionStack& partitions)
 {
 	KMessage bootVolume;
-	bootVolume.SetTo((void *)(addr_t)args->boot_volume, args->boot_volume_size);
+	bootVolume.SetTo(args->boot_volume, args->boot_volume_size);
 
 	dprintf("get_boot_partitions(): boot volume message:\n");
 	bootVolume.Dump(&dprintf);

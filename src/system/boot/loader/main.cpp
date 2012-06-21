@@ -128,7 +128,7 @@ main(stage2_args *args)
 
 			buffer = (void*)(((addr_t)buffer + 3) & ~(addr_t)0x3);
 			memcpy(buffer, gBootVolume.Buffer(), gBootVolume.ContentSize());
-			gKernelArgs.boot_volume = (addr_t)buffer;
+			gKernelArgs.boot_volume = buffer;
 			gKernelArgs.boot_volume_size = gBootVolume.ContentSize();
 
 			// ToDo: cleanup, heap_release() etc.

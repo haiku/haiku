@@ -162,7 +162,7 @@ debug_cleanup(void)
 
 	if (!gKernelArgs.keep_debug_output_buffer) {
 		gKernelArgs.debug_output = kernel_args_malloc(sBufferPosition);
-		if (gKernelArgs.debug_output != NULL) {
+		if (gKernelArgs.debug_output) {
 			memcpy(gKernelArgs.debug_output, sBuffer, sBufferPosition);
 			gKernelArgs.debug_size = sBufferPosition;
 		}
