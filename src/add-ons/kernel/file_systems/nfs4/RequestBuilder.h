@@ -44,6 +44,7 @@ public:
 										uint64 cookieVerf, Attribute* attrs,
 										uint32 attrCount);
 			status_t				ReadLink();
+			status_t				Remove(const char* file);
 			status_t				Rename(const char* from, const char* to);
 			status_t				Renew(uint64 clientId);
 			status_t				SaveFH();

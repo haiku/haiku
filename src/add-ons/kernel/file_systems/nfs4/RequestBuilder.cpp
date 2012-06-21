@@ -309,6 +309,23 @@ RequestBuilder::ReadLink()
 
 
 status_t
+RequestBuilder::Remove(const char* file)
+{
+	if (fProcedure != ProcCompound)
+		return B_BAD_VALUE;
+	if (fRequest == NULL)
+		return B_NO_MEMORY;
+
+	fRequest->Stream().AddUInt(OpRemove);
+	fRequest->Stream().AddString(file);
+
+	fOpCount++;
+
+	return B_OK;
+}
+
+
+status_t
 RequestBuilder::Rename(const char* from, const char* to)
 {
 	if (fProcedure != ProcCompound)

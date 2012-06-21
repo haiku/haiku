@@ -213,6 +213,14 @@ nfs4_read_symlink(fs_volume* volume, fs_vnode* link, char* buffer,
 
 
 static status_t
+nfs4_unlink(fs_volume* volume, fs_vnode* dir, const char* name)
+{
+	Inode* inode = reinterpret_cast<Inode*>(dir->private_node);
+	return inode->Remove(name);
+}
+
+
+static status_t
 nfs4_rename(fs_volume* volume, fs_vnode* fromDir, const char* fromName,
 	fs_vnode* toDir, const char* toName)
 {
@@ -306,6 +314,14 @@ nfs4_read(fs_volume* volume, fs_vnode* vnode, void* _cookie, off_t pos,
 	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
 
 	return inode->Read(cookie, pos, buffer, length);
+}
+
+
+static status_t
+nfs4_remove_dir(fs_volume* volume, fs_vnode* parent, const char* name)
+{
+	Inode* inode = reinterpret_cast<Inode*>(parent->private_node);
+	return inode->Remove(name);
 }
 
 
@@ -434,7 +450,7 @@ fs_vnode_ops gNFSv4VnodeOps = {
 	NULL,	// create_symlink()
 
 	NULL,	// link()
-	NULL,	// unlink()
+	nfs4_unlink,
 	nfs4_rename,
 
 	nfs4_access,
@@ -452,7 +468,7 @@ fs_vnode_ops gNFSv4VnodeOps = {
 
 	/* directory operations */
 	NULL,	// create_dir()
-	NULL,	// remove_dir()
+	nfs4_remove_dir,
 	nfs4_open_dir,
 	nfs4_close_dir,
 	nfs4_free_dir_cookie,

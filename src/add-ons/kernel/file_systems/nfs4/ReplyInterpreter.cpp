@@ -291,6 +291,21 @@ ReplyInterpreter::ReadLink(void* buffer, uint32* size, uint32 maxSize)
 
 
 status_t
+ReplyInterpreter::Remove()
+{
+	status_t res = _OperationError(OpRemove);
+	if (res != B_OK)
+		return res;
+
+	fReply->Stream().GetBoolean();
+	fReply->Stream().GetUHyper();
+	fReply->Stream().GetUHyper();
+
+	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+}
+
+
+status_t
 ReplyInterpreter::Rename()
 {
 	status_t res = _OperationError(OpRename);

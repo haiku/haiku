@@ -34,6 +34,7 @@ enum Opcode {
 	OpRead					= 25,
 	OpReadDir				= 26,
 	OpReadLink				= 27,
+	OpRemove				= 28,
 	OpRename				= 29,
 	OpRenew					= 30,
 	OpSaveFH				= 32,

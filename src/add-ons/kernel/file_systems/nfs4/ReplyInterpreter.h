@@ -78,6 +78,7 @@ public:
 			status_t	ReadDir(uint64* cookie, uint64* cookieVerf,
 							DirEntry** dirents, uint32* count, bool* eof);
 			status_t	ReadLink(void* buffer, uint32* size, uint32 maxSize);
+			status_t	Remove();
 			status_t	Rename();
 	inline	status_t	Renew();
 	inline	status_t	SaveFH();

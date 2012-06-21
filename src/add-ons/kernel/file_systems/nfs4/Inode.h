@@ -32,6 +32,7 @@ public:
 
 					status_t	LookUp(const char* name, ino_t* id);
 					status_t	ReadLink(void* buffer, size_t* length);
+					status_t	Remove(const char* name);
 	static			status_t	Rename(Inode* from, Inode* to,
 									const char* fromName, const char* toName);
 					status_t	Access(int mode);
