@@ -267,8 +267,8 @@ RequestBuilder::Read(const uint32* id, uint32 stateSeq, uint64 pos, uint32 len)
 
 
 status_t
-RequestBuilder::ReadDir(uint32 count, uint64* cookie, Attribute* attrs,
-	uint32 attrCount)
+RequestBuilder::ReadDir(uint32 count, uint64 cookie, uint64 cookieVerf,
+	Attribute* attrs, uint32 attrCount)
 {
 	(void)count;
 
@@ -278,8 +278,8 @@ RequestBuilder::ReadDir(uint32 count, uint64* cookie, Attribute* attrs,
 		return B_NO_MEMORY;
 
 	fRequest->Stream().AddUInt(OpReadDir);
-	fRequest->Stream().AddUHyper(cookie[0]);
-	fRequest->Stream().AddUHyper(cookie[1]);
+	fRequest->Stream().AddUHyper(cookie);
+	fRequest->Stream().AddUHyper(cookieVerf);
 
 	// consider predicting this values basing on count or buffer size
 	fRequest->Stream().AddUInt(0x2000);

@@ -7,15 +7,16 @@
  */
 
 
+#include "Inode.h"
 #include "Request.h"
 
 
 status_t
-Request::Send()
+Request::Send(Cookie* cookie)
 {
 	switch (fServer->ID().fProtocol) {
-		case ProtocolUDP:	return _SendUDP();
-		case ProtocolTCP:	return _SendTCP();
+		case ProtocolUDP:	return _SendUDP(cookie);
+		case ProtocolTCP:	return _SendTCP(cookie);
 	}
 
 	return B_BAD_VALUE;
@@ -23,41 +24,61 @@ Request::Send()
 
 
 status_t
-Request::_SendUDP()
+Request::_SendUDP(Cookie* cookie)
 {
-	RPC::Reply *rpl;
+	RPC::Reply *rpl = NULL;
 	RPC::Request *rpc;
 
 	status_t result = fServer->SendCallAsync(fBuilder.Request(), &rpl, &rpc);
 	if (result != B_OK)
 		return result;
 
+	if (cookie != NULL)
+		cookie->RegisterRequest(rpc);
+
 	result = fServer->WaitCall(rpc);
 	if (result != B_OK) {
 		int attempts = 1;
 		while (result != B_OK && attempts++ < kRetryLimit) {
 			result = fServer->ResendCallAsync(fBuilder.Request(), rpc);
-			if (result != B_OK)
+			if (result != B_OK) {
+				if (cookie != NULL)
+					cookie->UnregisterRequest(rpc);
 				return result;
+			}
 
 			result = fServer->WaitCall(rpc);
 		}
 
 		if (result != B_OK) {
+			if (cookie != NULL)
+				cookie->UnregisterRequest(rpc);
 			fServer->CancelCall(rpc);
 			delete rpc;
 			return result;
 		}
 	}
 
-	return fReply.SetTo(rpl);
+	if (cookie != NULL)
+		cookie->UnregisterRequest(rpc);
+
+	if (rpc->fError != B_OK) {
+		delete rpl;
+		result = rpc->fError;
+		delete rpc;
+		return result;
+	} else {
+		fReply.SetTo(rpl);
+		delete rpc;
+		return B_OK;
+	}
 }
 
 
 status_t
-Request::_SendTCP()
+Request::_SendTCP(Cookie* cookie)
 {
-	RPC::Reply *rpl;
+	RPC::Reply *rpl = NULL;
 	RPC::Request *rpc;
 
 	status_t result;
@@ -71,8 +92,14 @@ Request::_SendTCP()
 			continue;
 		}
 
+		if (cookie != NULL)
+			cookie->RegisterRequest(rpc);
+
 		result = fServer->WaitCall(rpc);
 		if (result != B_OK) {
+			if (cookie != NULL)
+				cookie->UnregisterRequest(rpc);
+
 			fServer->CancelCall(rpc);
 			delete rpc;
 
@@ -80,7 +107,19 @@ Request::_SendTCP()
 		}
 	} while (result != B_OK && attempts++ < kRetryLimit);
 
-	return fReply.SetTo(rpl);
+	if (cookie != NULL)
+		cookie->UnregisterRequest(rpc);
+
+	if (rpc->fError != B_OK) {
+		delete rpl;
+		result = rpc->fError;
+		delete rpc;
+		return result;
+	} else {
+		fReply.SetTo(rpl);
+		delete rpc;
+		return B_OK;
+	};
 }
 
 

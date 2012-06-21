@@ -237,14 +237,14 @@ ReplyInterpreter::Read(void* buffer, uint32* size, bool* eof)
 
 
 status_t
-ReplyInterpreter::ReadDir(uint64* cookie, DirEntry** dirents, uint32* _count,
-	bool* eof)
+ReplyInterpreter::ReadDir(uint64* cookie, uint64* cookieVerf,
+	DirEntry** dirents, uint32* _count,	bool* eof)
 {
 	status_t res = _OperationError(OpReadDir);
 	if (res != B_OK)
 		return res;
 
-	cookie[1] = fReply->Stream().GetUHyper();
+	*cookieVerf = fReply->Stream().GetUHyper();
 
 	bool isNext;
 	uint32 count = 0;
@@ -254,7 +254,7 @@ ReplyInterpreter::ReadDir(uint64* cookie, DirEntry** dirents, uint32* _count,
 
 	isNext = fReply->Stream().GetBoolean();
 	while (isNext && count < *_count) {
-		cookie[0] = fReply->Stream().GetUHyper();
+		*cookie = fReply->Stream().GetUHyper();
 
 		entries[count].fName = fReply->Stream().GetString();
 		_DecodeAttrs(fReply->Stream(), &entries[count].fAttrs,

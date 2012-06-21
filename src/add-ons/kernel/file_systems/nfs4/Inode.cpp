@@ -15,9 +15,6 @@
 #include "Request.h"
 
 
-vint64 OpenFileCookie::fLastOwnerId = 0;
-
-
 Inode::Inode()
 {
 }
@@ -447,6 +444,7 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 	bool confirm;
 	status_t result;
 
+	cookie->fInode = this;
 	cookie->fHandle = fHandle;
 	cookie->fMode = mode;
 	cookie->fSequence = 0;
@@ -610,7 +608,7 @@ Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length)
 			req.Read(cookie->fStateId, cookie->fStateSeq, pos + size,
 				*_length - size);
 
-			status_t result = request.Send();
+			status_t result = request.Send(cookie);
 			if (result != B_OK)
 				return result;
 
@@ -664,7 +662,7 @@ Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length)
 
 
 status_t
-Inode::OpenDir(uint64* cookie)
+Inode::OpenDir(OpenDirCookie* cookie)
 {
 	if (fType != NF4DIR)
 		return B_NOT_A_DIRECTORY;
@@ -707,8 +705,9 @@ Inode::OpenDir(uint64* cookie)
 		if (allowed & ACCESS4_READ != ACCESS4_READ)
 			return B_PERMISSION_DENIED;
 
-		cookie[0] = 0;
-		cookie[1] = 2;
+		cookie->fInode = this;
+		cookie->fCookie = 0;
+		cookie->fCookieVerf = 2;
 
 		return B_OK;
 	} while (true);
@@ -716,7 +715,7 @@ Inode::OpenDir(uint64* cookie)
 
 
 status_t
-Inode::_ReadDirOnce(DirEntry** dirents, uint32* count, uint64* cookie,
+Inode::_ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
 	bool* eof)
 {
 	do {
@@ -727,9 +726,10 @@ Inode::_ReadDirOnce(DirEntry** dirents, uint32* count, uint64* cookie,
 		req.PutFH(fHandle);
 
 		Attribute attr[] = { FATTR4_FSID, FATTR4_FILEID };
-		req.ReadDir(*count, cookie, attr, sizeof(attr) / sizeof(Attribute));
+		req.ReadDir(*count, cookie->fCookie, cookie->fCookieVerf, attr,
+			sizeof(attr) / sizeof(Attribute));
 
-		status_t result = request.Send();
+		status_t result = request.Send(cookie);
 		if (result != B_OK)
 			return result;
 
@@ -751,7 +751,8 @@ Inode::_ReadDirOnce(DirEntry** dirents, uint32* count, uint64* cookie,
 		if (result != B_OK)
 			return result;
 
-		return reply.ReadDir(cookie, dirents, count, eof);
+		return reply.ReadDir(&cookie->fCookie, &cookie->fCookieVerf, dirents,
+			count, eof);
 	} while (true);
 }
 
@@ -846,7 +847,8 @@ Inode::_ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 // When directories are cached client should store inode numbers it assigned
 // to directroy entries and use them consequently.
 status_t
-Inode::ReadDir(void* _buffer, uint32 size, uint32* _count, uint64* cookie)
+Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
+	OpenDirCookie* cookie)
 {
 	uint32 count = 0;
 	uint32 pos = 0;
@@ -855,17 +857,17 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count, uint64* cookie)
 
 	char* buffer = reinterpret_cast<char*>(_buffer);
 
-	if (cookie[0] == 0 && cookie[1] == 2 && count < *_count) {
+	if (cookie->fCookie == 0 && cookie->fCookieVerf == 2 && count < *_count) {
 		struct dirent* de = reinterpret_cast<dirent*>(buffer + pos);
 
 		_FillDirEntry(de, fFileId, ".", pos, size);
 
 		pos += de->d_reclen;
 		count++;
-		cookie[1]--;
+		cookie->fCookieVerf--;
 	}
 
-	if (cookie[0] == 0 && cookie[1] == 1 && count < *_count) {
+	if (cookie->fCookie == 0 && cookie->fCookieVerf == 1 && count < *_count) {
 		struct dirent* de = reinterpret_cast<dirent*>(buffer + pos);
 		
 		if (strcmp(fName, "/"))
@@ -875,7 +877,7 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count, uint64* cookie)
 
 		pos += de->d_reclen;
 		count++;
-		cookie[1]--;
+		cookie->fCookieVerf--;
 	}
 
 	bool overflow = false;

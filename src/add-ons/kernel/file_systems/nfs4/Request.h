@@ -14,6 +14,8 @@
 #include "RPCServer.h"
 
 
+class Cookie;
+
 class Request {
 public:
 	inline						Request(RPC::Server* serv);
@@ -21,12 +23,12 @@ public:
 	inline	RequestBuilder&		Builder();
 	inline	ReplyInterpreter&	Reply();
 
-			status_t			Send();
+			status_t			Send(Cookie* cookie = NULL);
 			void				Reset();
 
 private:
-			status_t			_SendUDP();
-			status_t			_SendTCP();
+			status_t			_SendUDP(Cookie* cookie);
+			status_t			_SendTCP(Cookie* cookie);
 
 			RPC::Server*		fServer;
 

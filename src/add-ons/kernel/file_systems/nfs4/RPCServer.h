@@ -22,8 +22,10 @@ namespace RPC {
 struct Request {
 	uint32				fXID;
 	ConditionVariable	fEvent;
+
 	bool				fDone;
 	Reply**				fReply;
+	status_t			fError;
 
 	Request*			fNext;
 };
@@ -62,6 +64,7 @@ public:
 	inline	status_t				WaitCall(Request* request,
 										bigtime_t time = kWaitTime);
 	inline	status_t				CancelCall(Request* request);
+			status_t				WakeCall(Request* request);
 
 			status_t				Repair();
 

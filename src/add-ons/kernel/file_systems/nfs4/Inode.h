@@ -13,28 +13,11 @@
 
 #include <SupportDefs.h>
 
+#include "Cookie.h"
 #include "Filesystem.h"
 #include "NFS4Defs.h"
 #include "ReplyInterpreter.h"
 
-
-struct OpenFileCookie {
-			uint64			fClientId;
-
-			uint32			fMode;
-
-			Filehandle		fHandle;
-			uint32			fStateId[3];
-			uint32			fStateSeq;
-
-			uint32			fSequence;
-
-			uint64			fOwnerId;
-	static	vint64			fLastOwnerId;
-
-			OpenFileCookie*	fNext;
-			OpenFileCookie*	fPrev;
-};
 
 class Inode {
 public:
@@ -45,6 +28,7 @@ public:
 	inline			ino_t		ID() const;
 	inline			mode_t		Type() const;
 	inline			const char*	Name() const;
+	inline			Filesystem*	FileSystem() const;
 
 					status_t	LookUp(const char* name, ino_t* id);
 					status_t	ReadLink(void* buffer, size_t* length);
@@ -56,9 +40,9 @@ public:
 					status_t	Read(OpenFileCookie* cookie, off_t pos,
 									void* buffer, size_t* length);
 
-					status_t	OpenDir(uint64* cookie);
+					status_t	OpenDir(OpenDirCookie* cookie);
 					status_t	ReadDir(void* buffer, uint32 size,
-									uint32* count, uint64* cookie);
+									uint32* count, OpenDirCookie* cookie);
 
 private:
 								Inode();
@@ -66,7 +50,7 @@ private:
 					status_t	_LookUpFilehandle();
 
 					status_t	_ReadDirOnce(DirEntry** dirents, uint32* count,
-									uint64* cookie, bool* eof);
+									OpenDirCookie* cookie, bool* eof);
 					status_t	_FillDirEntry(struct dirent* de, ino_t id,
 									const char* name, uint32 pos, uint32 size);
 					status_t	_ReadDirUp(struct dirent* de, uint32 pos,
@@ -116,6 +100,13 @@ inline const char*
 Inode::Name() const
 {
 	return fName;
+}
+
+
+inline Filesystem*
+Inode::FileSystem() const
+{
+	return fFilesystem;
 }
 
 

@@ -155,6 +155,7 @@ Server::SendCallAsync(Call* call, Reply** reply, Request** request)
 	req->fReply = reply;
 	req->fEvent.Init(&req->fEvent, NULL);
 	req->fDone = false;
+	req->fError = B_OK;
 	req->fNext = NULL;
 
 	fRequests.AddRequest(req);
@@ -180,6 +181,22 @@ Server::ResendCallAsync(Call* call, Request* req)
 		delete req;
 		return result;
 	}
+
+	return B_OK;
+}
+
+
+status_t
+Server::WakeCall(Request* request)
+{
+	Request* req = fRequests.FindRequest(request->fXID);
+	if (req == NULL)
+		return B_OK;
+
+	request->fError = B_FILE_ERROR;
+	*request->fReply = NULL;
+	request->fDone = true;
+	request->fEvent.NotifyAll();
 
 	return B_OK;
 }
