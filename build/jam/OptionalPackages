@@ -1869,7 +1869,7 @@ if [ IsOptionalHaikuImagePackageAdded WifiFirmwareScriptData ] {
 		# firmware cutter
 		local broadcomFWCutterArchive = b43-fwcutter-012.tar.bz2 ;
 		local broadcomFWCutterURL =
-			http://bu3sch.de/b43/fwcutter/$(broadcomFWCutterArchive) ;
+			http://www.haiku-files.org/files/wifi-firmwares/b43/fwcutter/$(broadcomFWCutterArchive) ;
 		local broadcomFWCutterFile = [ DownloadFile $(broadcomFWCutterArchive)
 			: $(broadcomFWCutterURL) ] ;
 		AddFilesToHaikuImage system data firmware broadcom43xx b43-fwcutter
@@ -1889,16 +1889,16 @@ if [ IsOptionalHaikuImagePackageAdded WifiFirmwareScriptData ] {
 		# file containing firmware
 		local broadcom43xxFile ;
 		broadcom43xxFile = [ DownloadFile wl_apsta-3.130.20.0.o
-			: http://downloads.openwrt.org/sources/wl_apsta-3.130.20.0.o ] ;
+			: http://www.haiku-files.org/files/wifi-firmwares/b43/wl_apsta-3.130.20.0.o ] ;
 		AddFilesToHaikuImage system data firmware broadcom43xx
 			: $(broadcom43xxFile) ;
 
 		# marvell88w8335
-		local marvelArchive = malo-firmware-1.4.tgz ;
-		local marvelURL = http://www.nazgul.ch/malo/$(marvelArchive) ;
-		local marvelFile = [ DownloadFile $(marvelArchive) : $(marvelURL) ] ;
+		local marvellArchive = malo-firmware-1.4.tgz ;
+		local marvellURL = http://www.haiku-files.org/files/wifi-firmwares/marvell/$(marvellArchive) ;
+		local marvellFile = [ DownloadFile $(marvellArchive) : $(marvellURL) ] ;
 		AddFilesToHaikuImage system data firmware marvell88w8335
-			: $(marvelFile) ;
+			: $(marvellFile) ;
 	}
 }
 
