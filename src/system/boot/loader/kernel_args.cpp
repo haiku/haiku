@@ -26,9 +26,20 @@ static void* sLast;
 static size_t sFree = kChunkSize;
 
 
-template<typename RangeType>
+static status_t
+add_kernel_args_range(void* start, size_t size)
+{
+	return insert_address_range(gKernelArgs.kernel_args_range,
+		&gKernelArgs.num_kernel_args_ranges, MAX_KERNEL_ARGS_RANGE,
+		(addr_t)start, size);
+}
+
+
+// #pragma mark - addr_range utility functions
+
+
 static void
-remove_range_index(RangeType* ranges, uint32& numRanges, uint32 index)
+remove_range_index(addr_range* ranges, uint32& numRanges, uint32 index)
 {
 	if (index + 1 == numRanges) {
 		// remove last range
@@ -37,25 +48,31 @@ remove_range_index(RangeType* ranges, uint32& numRanges, uint32 index)
 	}
 
 	memmove(&ranges[index], &ranges[index + 1],
-		sizeof(RangeType) * (numRanges - 1 - index));
+		sizeof(addr_range) * (numRanges - 1 - index));
 	numRanges--;
 }
 
 
-template<typename RangeType, typename AddressType, typename SizeType>
-static status_t
-insert_range(RangeType* ranges, uint32* _numRanges, uint32 maxRanges,
-	AddressType start, SizeType size)
+/*!	Inserts the specified (start, size) pair (aka range) in the
+	addr_range array.
+	It will extend existing ranges in order to have as little
+	ranges in the array as possible.
+	Returns B_OK on success, or B_ENTRY_NOT_FOUND if there was
+	no free array entry available anymore.
+*/
+extern "C" status_t
+insert_address_range(addr_range* ranges, uint32* _numRanges, uint32 maxRanges,
+	uint64 start, uint64 size)
 {
 	uint32 numRanges = *_numRanges;
 
 	start = ROUNDDOWN(start, B_PAGE_SIZE);
 	size = ROUNDUP(size, B_PAGE_SIZE);
-	AddressType end = start + size;
+	uint64 end = start + size;
 
 	for (uint32 i = 0; i < numRanges; i++) {
-		AddressType rangeStart = ranges[i].start;
-		AddressType rangeEnd = rangeStart + ranges[i].size;
+		uint64 rangeStart = ranges[i].start;
+		uint64 rangeEnd = rangeStart + ranges[i].size;
 
 		if (end < rangeStart || start > rangeEnd) {
 			// ranges don't intersect or touch each other
@@ -84,8 +101,8 @@ insert_range(RangeType* ranges, uint32* _numRanges, uint32 maxRanges,
 
 			rangeStart = ranges[i].start;
 			rangeEnd = rangeStart + ranges[i].size;
-			AddressType joinStart = ranges[j].start;
-			AddressType joinEnd = joinStart + ranges[j].size;
+			uint64 joinStart = ranges[j].start;
+			uint64 joinEnd = joinStart + ranges[j].size;
 
 			if (rangeStart <= joinEnd && joinEnd <= rangeEnd) {
 				// join range that used to be before the current one, or
@@ -113,7 +130,7 @@ insert_range(RangeType* ranges, uint32* _numRanges, uint32 maxRanges,
 	if (numRanges >= maxRanges)
 		return B_ENTRY_NOT_FOUND;
 
-	ranges[numRanges].start = (AddressType)start;
+	ranges[numRanges].start = (uint64)start;
 	ranges[numRanges].size = size;
 	(*_numRanges)++;
 
@@ -121,19 +138,18 @@ insert_range(RangeType* ranges, uint32* _numRanges, uint32 maxRanges,
 }
 
 
-template<typename RangeType, typename AddressType, typename SizeType>
-static status_t
-remove_range(RangeType* ranges, uint32* _numRanges, uint32 maxRanges,
-	AddressType start, SizeType size)
+extern "C" status_t
+remove_address_range(addr_range* ranges, uint32* _numRanges, uint32 maxRanges,
+	uint64 start, uint64 size)
 {
 	uint32 numRanges = *_numRanges;
 
-	AddressType end = ROUNDUP(start + size, B_PAGE_SIZE);
+	uint64 end = ROUNDUP(start + size, B_PAGE_SIZE);
 	start = ROUNDDOWN(start, B_PAGE_SIZE);
 
 	for (uint32 i = 0; i < numRanges; i++) {
-		AddressType rangeStart = ranges[i].start;
-		AddressType rangeEnd = rangeStart + ranges[i].size;
+		uint64 rangeStart = ranges[i].start;
+		uint64 rangeEnd = rangeStart + ranges[i].size;
 
 		if (start <= rangeStart) {
 			if (end <= rangeStart) {
@@ -158,8 +174,8 @@ remove_range(RangeType* ranges, uint32* _numRanges, uint32 maxRanges,
 			// the range. We keep the head of the range and insert its tail
 			// as a new range.
 			ranges[i].size = start - rangeStart;
-			return insert_range<RangeType, AddressType, SizeType>(ranges,
-				_numRanges, maxRanges, end, rangeEnd - end);
+			return insert_address_range(ranges, _numRanges, maxRanges, end,
+				rangeEnd - end);
 		}
 	}
 
@@ -168,12 +184,11 @@ remove_range(RangeType* ranges, uint32* _numRanges, uint32 maxRanges,
 }
 
 
-template<typename RangeType, typename AddressType, typename SizeType>
-static bool
-get_free_range(RangeType* ranges, uint32 numRanges, AddressType base,
-	SizeType size, AddressType* _rangeBase)
+bool
+get_free_address_range(addr_range* ranges, uint32 numRanges, uint64 base,
+	uint64 size, uint64* _rangeBase)
 {
-	AddressType end = base + size - 1;
+	uint64 end = base + size - 1;
 	if (end < base)
 		return false;
 
@@ -182,8 +197,8 @@ get_free_range(RangeType* ranges, uint32 numRanges, AddressType base,
 	// intersects with an existing one.
 
 	for (uint32 i = 0; i < numRanges;) {
-		AddressType rangeStart = ranges[i].start;
-		AddressType rangeEnd = ranges[i].start + ranges[i].size - 1;
+		uint64 rangeStart = ranges[i].start;
+		uint64 rangeEnd = ranges[i].start + ranges[i].size - 1;
 
 		if (base <= rangeEnd && rangeStart <= end) {
 			base = rangeEnd + 1;
@@ -203,21 +218,20 @@ get_free_range(RangeType* ranges, uint32 numRanges, AddressType base,
 }
 
 
-template<typename RangeType, typename AddressType, typename SizeType>
-static bool
-is_range_covered(RangeType* ranges, uint32 numRanges, AddressType base,
-	SizeType size)
+bool
+is_address_range_covered(addr_range* ranges, uint32 numRanges, uint64 base,
+	uint64 size)
 {
 	// Note: We don't assume that the ranges are sorted, so we can't do this
 	// in a simple loop. Instead we restart the loop whenever the start of the
 	// given range intersects with an existing one.
 
 	for (uint32 i = 0; i < numRanges;) {
-		AddressType rangeStart = ranges[i].start;
-		AddressType rangeSize = ranges[i].size;
+		uint64 rangeStart = ranges[i].start;
+		uint64 rangeSize = ranges[i].size;
 
 		if (rangeStart <= base && rangeSize > base - rangeStart) {
-			SizeType intersect = std::min(rangeStart + rangeSize - base, size);
+			uint64 intersect = std::min(rangeStart + rangeSize - base, size);
 			base += intersect;
 			size -= intersect;
 			if (size == 0)
@@ -234,136 +248,24 @@ is_range_covered(RangeType* ranges, uint32 numRanges, AddressType base,
 }
 
 
-template<typename RangeType>
-static void
-sort_ranges(RangeType* ranges, uint32 count)
+void
+sort_address_ranges(addr_range* ranges, uint32 numRanges)
 {
 	// TODO: This is a pretty sucky bubble sort implementation!
 	bool done;
 
 	do {
 		done = true;
-		for (uint32 i = 1; i < count; i++) {
+		for (uint32 i = 1; i < numRanges; i++) {
 			if (ranges[i].start < ranges[i - 1].start) {
 				done = false;
-				RangeType tempRange;
-				memcpy(&tempRange, &ranges[i], sizeof(RangeType));
-				memcpy(&ranges[i], &ranges[i - 1], sizeof(RangeType));
-				memcpy(&ranges[i - 1], &tempRange, sizeof(RangeType));
+				addr_range tempRange;
+				memcpy(&tempRange, &ranges[i], sizeof(addr_range));
+				memcpy(&ranges[i], &ranges[i - 1], sizeof(addr_range));
+				memcpy(&ranges[i - 1], &tempRange, sizeof(addr_range));
 			}
 		}
 	} while (!done);
-}
-
-
-// #pragma mark -
-
-
-static status_t
-add_kernel_args_range(void* start, size_t size)
-{
-	return insert_address_range(gKernelArgs.kernel_args_range,
-		&gKernelArgs.num_kernel_args_ranges, MAX_KERNEL_ARGS_RANGE,
-		(addr_t)start, size);
-}
-
-
-// #pragma mark - addr_range utility functions
-
-
-/*!	Inserts the specified (start, size) pair (aka range) in the
-	addr_range array.
-	It will extend existing ranges in order to have as little
-	ranges in the array as possible.
-	Returns B_OK on success, or B_ENTRY_NOT_FOUND if there was
-	no free array entry available anymore.
-*/
-extern "C" status_t
-insert_address_range(addr_range* ranges, uint32* _numRanges, uint32 maxRanges,
-	uint64 start, uint64 size)
-{
-	return insert_range<addr_range, uint64, uint64>(ranges, _numRanges,
-		maxRanges, start, size);
-}
-
-
-extern "C" status_t
-remove_address_range(addr_range* ranges, uint32* _numRanges, uint32 maxRanges,
-	uint64 start, uint64 size)
-{
-	return remove_range<addr_range, uint64, uint64>(ranges, _numRanges,
-		maxRanges, start, size);
-}
-
-
-bool
-get_free_address_range(addr_range* ranges, uint32 numRanges, uint64 base,
-	uint64 size, uint64* _rangeBase)
-{
-	return get_free_range<addr_range, uint64, uint64>(ranges, numRanges, base,
-		size, _rangeBase);
-}
-
-
-bool
-is_address_range_covered(addr_range* ranges, uint32 numRanges, uint64 base,
-	uint64 size)
-{
-	return is_range_covered<addr_range, uint64, uint64>(ranges, numRanges, base,
-		size);
-}
-
-
-void
-sort_address_ranges(addr_range* ranges, uint32 numRanges)
-{
-	sort_ranges(ranges, numRanges);
-}
-
-
-// #pragma mark - phys_addr_range utility functions
-
-
-status_t
-insert_physical_address_range(phys_addr_range* ranges, uint32* _numRanges,
-	uint32 maxRanges, phys_addr_t start, phys_size_t size)
-{
-	return insert_range<phys_addr_range, phys_addr_t, phys_size_t>(ranges,
-		_numRanges, maxRanges, start, size);
-}
-
-
-status_t
-remove_physical_address_range(phys_addr_range* ranges, uint32* _numRanges,
-	uint32 maxRanges, phys_addr_t start, phys_size_t size)
-{
-	return remove_range<phys_addr_range, phys_addr_t, phys_size_t>(ranges,
-		_numRanges, maxRanges, start, size);
-}
-
-
-bool
-get_free_physical_address_range(phys_addr_range* ranges, uint32 numRanges,
-	phys_addr_t base, phys_size_t size, phys_addr_t* _rangeBase)
-{
-	return get_free_range<phys_addr_range, phys_addr_t, phys_size_t>(ranges,
-		numRanges, base, size, _rangeBase);
-}
-
-
-bool
-is_physical_address_range_covered(phys_addr_range* ranges, uint32 numRanges,
-	phys_addr_t base, phys_size_t size)
-{
-	return is_range_covered<phys_addr_range, phys_addr_t, phys_size_t>(ranges,
-		numRanges, base, size);
-}
-
-
-void
-sort_physical_address_ranges(phys_addr_range* ranges, uint32 numRanges)
-{
-	sort_ranges(ranges, numRanges);
 }
 
 
@@ -371,18 +273,18 @@ sort_physical_address_ranges(phys_addr_range* ranges, uint32 numRanges)
 
 
 status_t
-insert_physical_memory_range(phys_addr_t start, phys_size_t size)
+insert_physical_memory_range(uint64 start, uint64 size)
 {
-	return insert_physical_address_range(gKernelArgs.physical_memory_range,
+	return insert_address_range(gKernelArgs.physical_memory_range,
 		&gKernelArgs.num_physical_memory_ranges, MAX_PHYSICAL_MEMORY_RANGE,
 		start, size);
 }
 
 
 status_t
-insert_physical_allocated_range(phys_addr_t start, phys_size_t size)
+insert_physical_allocated_range(uint64 start, uint64 size)
 {
-	return insert_physical_address_range(gKernelArgs.physical_allocated_range,
+	return insert_address_range(gKernelArgs.physical_allocated_range,
 		&gKernelArgs.num_physical_allocated_ranges,
 		MAX_PHYSICAL_ALLOCATED_RANGE, start, size);
 }
@@ -403,19 +305,19 @@ void
 ignore_physical_memory_ranges_beyond_4gb()
 {
 	// sort
-	sort_physical_address_ranges(gKernelArgs.physical_memory_range,
+	sort_address_ranges(gKernelArgs.physical_memory_range,
 		gKernelArgs.num_physical_memory_ranges);
 
-	static const phys_addr_t kLimit = (phys_addr_t)1 << 32;
+	static const uint64 kLimit = (uint64)1 << 32;
 
 	// remove everything past 4 GB
 	for (uint32 i = gKernelArgs.num_physical_memory_ranges; i > 0; i--) {
-		phys_addr_range& range = gKernelArgs.physical_memory_range[i - 1];
+		addr_range& range = gKernelArgs.physical_memory_range[i - 1];
 		if (range.start >= kLimit) {
 			// the complete range is beyond the limit
 			dprintf("ignore_physical_memory_ranges_beyond_4gb(): ignoring "
-				"range: %#" B_PRIxPHYSADDR " - %#" B_PRIxPHYSADDR "\n",
-				range.start, range.start + range.size);
+				"range: %#" B_PRIx64 " - %#" B_PRIx64 "\n", range.start,
+				range.start + range.size);
 			gKernelArgs.ignored_physical_memory += range.size;
 			gKernelArgs.num_physical_memory_ranges = i - 1;
 			continue;
@@ -424,7 +326,7 @@ ignore_physical_memory_ranges_beyond_4gb()
 		if (kLimit - range.start < range.size) {
 			// the range is partially beyond the limit
 			dprintf("ignore_physical_memory_ranges_beyond_4gb(): ignoring "
-				"range: %#" B_PRIxPHYSADDR " - %#" B_PRIxPHYSADDR "\n", kLimit,
+				"range: %#" B_PRIx64 " - %#" B_PRIx64 "\n", kLimit,
 				range.start + range.size);
 			gKernelArgs.ignored_physical_memory
 				+= range.size - (kLimit - range.start);

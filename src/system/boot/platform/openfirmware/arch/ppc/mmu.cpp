@@ -180,9 +180,8 @@ is_virtual_allocated(void *address, size_t size)
 static bool
 is_physical_allocated(void *address, size_t size)
 {
-	phys_addr_t foundBase;
-	return !get_free_physical_address_range(
-		gKernelArgs.physical_allocated_range,
+	uint64 foundBase;
+	return !get_free_address_range(gKernelArgs.physical_allocated_range,
 		gKernelArgs.num_physical_allocated_ranges, (addr_t)address, size,
 		&foundBase) || foundBase != (addr_t)address;
 }
@@ -191,7 +190,7 @@ is_physical_allocated(void *address, size_t size)
 static bool
 is_physical_memory(void *address, size_t size)
 {
-	return is_physical_address_range_covered(gKernelArgs.physical_memory_range,
+	return is_address_range_covered(gKernelArgs.physical_memory_range,
 		gKernelArgs.num_physical_memory_ranges, (addr_t)address, size);
 }
 
@@ -424,7 +423,7 @@ find_physical_memory_range(size_t size)
 {
 	for (uint32 i = 0; i < gKernelArgs.num_physical_memory_ranges; i++) {
 		if (gKernelArgs.physical_memory_range[i].size > size)
-			return (void *)gKernelArgs.physical_memory_range[i].start;
+			return (void *)(addr_t)gKernelArgs.physical_memory_range[i].start;
 	}
 	return PHYSINVAL;
 }
@@ -443,8 +442,9 @@ find_free_physical_range(size_t size)
 	}
 
 	for (uint32 i = 0; i < gKernelArgs.num_physical_allocated_ranges; i++) {
-		void *address = (void *)(gKernelArgs.physical_allocated_range[i].start
-			+ gKernelArgs.physical_allocated_range[i].size);
+		void *address =
+			(void *)(addr_t)(gKernelArgs.physical_allocated_range[i].start
+				+ gKernelArgs.physical_allocated_range[i].size);
 		if (!is_physical_allocated(address, size)
 			&& is_physical_memory(address, size))
 			return address;

@@ -747,8 +747,8 @@ add_safe_mode_menu()
 	// check whether we have memory beyond 4 GB
 	bool hasMemoryBeyond4GB = false;
 	for (uint32 i = 0; i < gKernelArgs.num_physical_memory_ranges; i++) {
-		phys_addr_range& range = gKernelArgs.physical_memory_range[i];
-		if (range.start >= (phys_addr_t)1 << 32) {
+		addr_range& range = gKernelArgs.physical_memory_range[i];
+		if (range.start >= (uint64)1 << 32) {
 			hasMemoryBeyond4GB = true;
 			break;
 		}

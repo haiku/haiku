@@ -47,15 +47,15 @@ typedef struct kernel_args {
 	struct preloaded_image kernel_image;
 	FixedWidthPointer<struct preloaded_image> preloaded_images;
 
-	uint32			num_physical_memory_ranges;
-	phys_addr_range	physical_memory_range[MAX_PHYSICAL_MEMORY_RANGE];
-	uint32			num_physical_allocated_ranges;
-	phys_addr_range	physical_allocated_range[MAX_PHYSICAL_ALLOCATED_RANGE];
-	uint32			num_virtual_allocated_ranges;
-	addr_range		virtual_allocated_range[MAX_VIRTUAL_ALLOCATED_RANGE];
-	uint32			num_kernel_args_ranges;
-	addr_range		kernel_args_range[MAX_KERNEL_ARGS_RANGE];
-	uint64			ignored_physical_memory;
+	uint32		num_physical_memory_ranges;
+	addr_range	physical_memory_range[MAX_PHYSICAL_MEMORY_RANGE];
+	uint32		num_physical_allocated_ranges;
+	addr_range	physical_allocated_range[MAX_PHYSICAL_ALLOCATED_RANGE];
+	uint32		num_virtual_allocated_ranges;
+	addr_range	virtual_allocated_range[MAX_VIRTUAL_ALLOCATED_RANGE];
+	uint32		num_kernel_args_ranges;
+	addr_range	kernel_args_range[MAX_KERNEL_ARGS_RANGE];
+	uint64		ignored_physical_memory;
 
 	uint32		num_cpus;
 	addr_range	cpu_kstack[MAX_BOOT_CPUS];
@@ -67,7 +67,7 @@ typedef struct kernel_args {
 	FixedWidthPointer<struct driver_settings_file> driver_settings;
 
 	struct {
-		phys_addr_range	physical_buffer;
+		addr_range	physical_buffer;
 		uint32	bytes_per_row;
 		uint16	width;
 		uint16	height;

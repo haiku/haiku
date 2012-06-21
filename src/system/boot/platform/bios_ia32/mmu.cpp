@@ -108,8 +108,8 @@ get_next_virtual_address(size_t size)
 static addr_t
 get_next_physical_address(size_t size)
 {
-	phys_addr_t base;
-	if (!get_free_physical_address_range(gKernelArgs.physical_allocated_range,
+	uint64 base;
+	if (!get_free_address_range(gKernelArgs.physical_allocated_range,
 			gKernelArgs.num_physical_allocated_ranges, sNextPhysicalAddress,
 			size, &base)) {
 		panic("Out of physical memory!");
@@ -426,14 +426,14 @@ bool
 mmu_allocate_physical(addr_t base, size_t size)
 {
 	// check whether the physical memory range exists at all
-	if (!is_physical_address_range_covered(gKernelArgs.physical_memory_range,
+	if (!is_address_range_covered(gKernelArgs.physical_memory_range,
 			gKernelArgs.num_physical_memory_ranges, base, size)) {
 		return false;
 	}
 
 	// check whether the physical range is still free
-	phys_addr_t foundBase;
-	if (!get_free_physical_address_range(gKernelArgs.physical_allocated_range,
+	uint64 foundBase;
+	if (!get_free_address_range(gKernelArgs.physical_allocated_range,
 			gKernelArgs.num_physical_allocated_ranges, base, size, &foundBase)
 		|| foundBase != base) {
 		return false;
@@ -565,9 +565,9 @@ mmu_init_for_kernel(void)
 	gKernelArgs.num_virtual_allocated_ranges = 1;
 
 	// sort the address ranges
-	sort_physical_address_ranges(gKernelArgs.physical_memory_range,
+	sort_address_ranges(gKernelArgs.physical_memory_range,
 		gKernelArgs.num_physical_memory_ranges);
-	sort_physical_address_ranges(gKernelArgs.physical_allocated_range,
+	sort_address_ranges(gKernelArgs.physical_allocated_range,
 		gKernelArgs.num_physical_allocated_ranges);
 	sort_address_ranges(gKernelArgs.virtual_allocated_range,
 		gKernelArgs.num_virtual_allocated_ranges);
@@ -578,15 +578,14 @@ mmu_init_for_kernel(void)
 
 		dprintf("phys memory ranges:\n");
 		for (i = 0; i < gKernelArgs.num_physical_memory_ranges; i++) {
-			dprintf("    base %#018" B_PRIxPHYSADDR ", length %#018"
-				B_PRIxPHYSADDR "\n", gKernelArgs.physical_memory_range[i].start,
+			dprintf("    base %#018" B_PRIx64 ", length %#018" B_PRIx64 "\n",
+				gKernelArgs.physical_memory_range[i].start,
 				gKernelArgs.physical_memory_range[i].size);
 		}
 
 		dprintf("allocated phys memory ranges:\n");
 		for (i = 0; i < gKernelArgs.num_physical_allocated_ranges; i++) {
-			dprintf("    base %#018" B_PRIxPHYSADDR ", length %#018"
-				B_PRIxPHYSADDR "\n",
+			dprintf("    base %#018" B_PRIx64 ", length %#018" B_PRIx64 "\n",
 				gKernelArgs.physical_allocated_range[i].start,
 				gKernelArgs.physical_allocated_range[i].size);
 		}
@@ -692,7 +691,7 @@ mmu_init(void)
 		}
 
 		// sort the ranges
-		sort_physical_address_ranges(gKernelArgs.physical_memory_range,
+		sort_address_ranges(gKernelArgs.physical_memory_range,
 			gKernelArgs.num_physical_memory_ranges);
 
 		// On some machines we get several ranges that contain only a few pages
@@ -701,10 +700,10 @@ mmu_init(void)
 		// leave us only with a few larger contiguous ranges (ideally one).
 		for (int32 i = gKernelArgs.num_physical_memory_ranges - 1; i >= 0;
 				i--) {
-			size_t size = gKernelArgs.physical_memory_range[i].size;
+			uint64 size = gKernelArgs.physical_memory_range[i].size;
 			if (size < 64 * 1024) {
-				addr_t start = gKernelArgs.physical_memory_range[i].start;
-				remove_physical_address_range(gKernelArgs.physical_memory_range,
+				uint64 start = gKernelArgs.physical_memory_range[i].start;
+				remove_address_range(gKernelArgs.physical_memory_range,
 					&gKernelArgs.num_physical_memory_ranges,
 					MAX_PHYSICAL_MEMORY_RANGE, start, size);
 			}
