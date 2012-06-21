@@ -32,8 +32,8 @@ dprintf(const char* format, ...);
 RPC::ServerManager* gRPCServerManager;
 
 
-static RPC::ProgramData*
-sCreateNFS4Server(RPC::Server* serv)
+RPC::ProgramData*
+CreateNFS4Server(RPC::Server* serv)
 {
 	return new NFS4Server(serv);
 }
@@ -96,7 +96,7 @@ nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 
 	RPC::Server *server;
 	result = gRPCServerManager->Acquire(&server, ip, 2049, ProtocolUDP,
-		sCreateNFS4Server);
+		CreateNFS4Server);
 	if (result != B_OK)
 		return result;
 	

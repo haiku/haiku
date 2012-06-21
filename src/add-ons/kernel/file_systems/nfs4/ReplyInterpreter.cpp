@@ -14,6 +14,22 @@
 #include <util/kernel_cpp.h>
 
 
+FSLocation::~FSLocation()
+{
+	free(const_cast<char*>(fRootPath));
+	for (uint32 i = 0; i < fCount; i++)
+		free(const_cast<char*>(fLocations[i]));
+	delete[] fLocations;
+}
+
+
+FSLocations::~FSLocations()
+{
+	free(const_cast<char*>(fRootPath));
+	delete[] fLocations;
+}
+
+
 AttrValue::AttrValue()
 	:
 	fFreePointer(false)
@@ -25,6 +41,8 @@ AttrValue::~AttrValue()
 {
 	if (fFreePointer)
 		free(fData.fPointer);
+	if (fAttribute == FATTR4_FS_LOCATIONS)
+		delete fData.fLocations;
 }
 
 
@@ -285,6 +303,30 @@ ReplyInterpreter::SetClientID(uint64* clientid, uint64* verifier)
 }
 
 
+static const char*
+sFlattenPathname(XDR::ReadStream& str)
+{
+	uint32 count = str.GetUInt();
+	char* pathname = NULL;
+	uint32 size = 0;
+	for (uint32 i = 0; i < count; i++) {
+		const char* path = str.GetString();
+		size += strlen(path) + 1;
+		if (pathname == NULL) {
+			pathname = reinterpret_cast<char*>(malloc(strlen(path + 1)));
+			pathname[0] = '\0';
+		} else {
+			*pathname++ = '/';
+			pathname = reinterpret_cast<char*>(realloc(pathname, size));
+		}
+		strcat(pathname, path);
+		free(const_cast<char*>(path));
+	}
+
+	return pathname;
+}
+
+
 status_t
 ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 	uint32* count)
@@ -371,6 +413,25 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 	if (sIsAttrSet(FATTR4_FILES_TOTAL, bitmap, bcount)) {
 		values[current].fAttribute = FATTR4_FILES_TOTAL;
 		values[current].fData.fValue64 = stream.GetUHyper();
+		current++;
+	}
+
+	if (sIsAttrSet(FATTR4_FS_LOCATIONS, bitmap, bcount)) {
+		values[current].fAttribute = FATTR4_FS_LOCATIONS;
+
+		FSLocations* locs = new FSLocations;
+		locs->fRootPath = sFlattenPathname(stream);
+		locs->fCount = stream.GetUInt();
+		locs->fLocations = new FSLocation[locs->fCount];
+		for (uint32 i = 0; i < locs->fCount; i++) {
+			locs->fLocations[i].fRootPath = sFlattenPathname(stream);
+			locs->fLocations[i].fCount = stream.GetUInt();
+			locs->fLocations[i].fLocations =
+				new const char*[locs->fLocations[i].fCount];
+			for (uint32 j = 0; j < locs->fLocations[i].fCount; j++)
+				locs->fLocations[i].fLocations[j] = stream.GetString();
+		}
+		values[current].fData.fLocations = locs;
 		current++;
 	}
 

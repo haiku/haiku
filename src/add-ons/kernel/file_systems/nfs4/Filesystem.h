@@ -30,9 +30,13 @@ public:
 
 			status_t			ReadInfo(struct fs_info* info);
 
+			status_t			Migrate(const Filehandle& fh,
+									const RPC::Server* serv);
+
 	inline	RPC::Server*		Server();
 	inline	NFS4Server*			NFSServer();
 
+	inline	const char*			Path() const;
 	inline	const FilesystemId&	FsId() const;
 
 	inline	uint64				AllocFileId();
@@ -42,9 +46,12 @@ public:
 private:
 								Filesystem();
 
-			const char*			fPath;
 			FilesystemId		fFsId;
+			const char*			fPath;
+			mutex				fMigrationLock;
 
+			const char*			fName;
+			FileInfo			fRoot;
 			Filehandle			fRootFH;
 
 			RPC::Server*		fServer;
@@ -67,6 +74,13 @@ inline NFS4Server*
 Filesystem::NFSServer()
 {
 	return reinterpret_cast<NFS4Server*>(fServer->PrivateData());
+}
+
+
+inline const char*
+Filesystem::Path() const
+{
+	return fPath;
 }
 
 

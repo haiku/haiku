@@ -15,6 +15,22 @@
 #include "RPCReply.h"
 
 
+struct FSLocation {
+	const char*			fRootPath;
+	const char**		fLocations;
+	uint32				fCount;
+
+						~FSLocation();
+};
+
+struct FSLocations {
+	const char*			fRootPath;
+	FSLocation*			fLocations;
+	uint32				fCount;
+
+						~FSLocations();
+};
+
 struct AttrValue {
 			AttrValue();
 			~AttrValue();
@@ -22,9 +38,10 @@ struct AttrValue {
 	uint8	fAttribute;
 	bool	fFreePointer;
 	union {
-			uint32		fValue32;
-			uint64		fValue64;
-			void*		fPointer;
+			uint32			fValue32;
+			uint64			fValue64;
+			void*			fPointer;
+			FSLocations*	fLocations;
 	} fData;
 };
 

@@ -37,7 +37,8 @@ Inode::CreateInode(Filesystem* fs, const FileInfo &fi, Inode** _inode)
 	inode->fPath = strdup(fi.fPath);
 
 	do {
-		Request request(fs->Server());
+		RPC::Server* serv = fs->Server();
+		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(inode->fHandle);
@@ -54,6 +55,12 @@ Inode::CreateInode(Filesystem* fs, const FileInfo &fi, Inode** _inode)
 		// filehandle has expired
 		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
 			inode->_LookUpFilehandle();
+			continue;
+		}
+
+		// filesystem has been moved
+		if (reply.NFS4Error() == NFS4ERR_MOVED) {
+			fs->Migrate(inode->fHandle, serv);
 			continue;
 		}
 
@@ -113,7 +120,8 @@ Inode::LookUp(const char* name, ino_t* id)
 	}
 
 	do {
-		Request request(fFilesystem->Server());
+		RPC::Server* serv = fFilesystem->Server();
+		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fHandle);
@@ -137,6 +145,12 @@ Inode::LookUp(const char* name, ino_t* id)
 		// filehandle has expired
 		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
 			_LookUpFilehandle();
+			continue;
+		}
+
+		// filesystem has been moved
+		if (reply.NFS4Error() == NFS4ERR_MOVED) {
+			fFilesystem->Migrate(fHandle, serv);
 			continue;
 		}
 
@@ -206,7 +220,8 @@ Inode::ReadLink(void* buffer, size_t* length)
 		return B_BAD_VALUE;
 
 	do {
-		Request request(fFilesystem->Server());
+		RPC::Server* serv = fFilesystem->Server();
+		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fHandle);
@@ -221,6 +236,12 @@ Inode::ReadLink(void* buffer, size_t* length)
 		// filehandle has expired
 		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
 			_LookUpFilehandle();
+			continue;
+		}
+
+		// filesystem has been moved
+		if (reply.NFS4Error() == NFS4ERR_MOVED) {
+			fFilesystem->Migrate(fHandle, serv);
 			continue;
 		}
 
@@ -241,7 +262,8 @@ status_t
 Inode::Access(int mode)
 {
 	do {
-		Request request(fFilesystem->Server());
+		RPC::Server* serv = fFilesystem->Server();
+		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fHandle);
@@ -256,6 +278,12 @@ Inode::Access(int mode)
 		// filehandle has expired
 		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
 			_LookUpFilehandle();
+			continue;
+		}
+
+		// filesystem has been moved
+		if (reply.NFS4Error() == NFS4ERR_MOVED) {
+			fFilesystem->Migrate(fHandle, serv);
 			continue;
 		}
 
@@ -293,7 +321,8 @@ status_t
 Inode::Stat(struct stat* st)
 {
 	do {
-		Request request(fFilesystem->Server());
+		RPC::Server* serv = fFilesystem->Server();
+		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fHandle);
@@ -312,6 +341,12 @@ Inode::Stat(struct stat* st)
 		// filehandle has expired
 		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
 			_LookUpFilehandle();
+			continue;
+		}
+
+		// filesystem has been moved
+		if (reply.NFS4Error() == NFS4ERR_MOVED) {
+			fFilesystem->Migrate(fHandle, serv);
 			continue;
 		}
 
@@ -419,7 +454,8 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 	do {
 		cookie->fClientId = fFilesystem->NFSServer()->ClientId();
 
-		Request request(fFilesystem->Server());
+		RPC::Server* serv = fFilesystem->Server();
+		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
 		cookie->fOwnerId = atomic_add64(&cookie->fLastOwnerId, 1);
@@ -437,6 +473,12 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 		// filehandle has expired
 		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
 			_LookUpFilehandle();
+			continue;
+		}
+
+		// filesystem has been moved
+		if (reply.NFS4Error() == NFS4ERR_MOVED) {
+			fFilesystem->Migrate(fHandle, serv);
 			continue;
 		}
 
@@ -501,7 +543,8 @@ Inode::Close(OpenFileCookie* cookie)
 	fFilesystem->NFSServer()->RemoveOpenFile(cookie);
 
 	do {
-		Request request(fFilesystem->Server());
+		RPC::Server* serv = fFilesystem->Server();
+		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fHandle);
@@ -517,6 +560,12 @@ Inode::Close(OpenFileCookie* cookie)
 		// filehandle has expired
 		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
 			_LookUpFilehandle();
+			continue;
+		}
+
+		// filesystem has been moved
+		if (reply.NFS4Error() == NFS4ERR_MOVED) {
+			fFilesystem->Migrate(fHandle, serv);
 			continue;
 		}
 
@@ -553,7 +602,8 @@ Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length)
 
 	while (size < *_length && !eof) {
 		do {
-			Request request(fFilesystem->Server());
+			RPC::Server* serv = fFilesystem->Server();
+			Request request(serv);
 			RequestBuilder& req = request.Builder();
 
 			req.PutFH(fHandle);
@@ -569,6 +619,12 @@ Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length)
 			// filehandle has expired
 			if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
 				_LookUpFilehandle();
+				continue;
+			}
+
+			// filesystem has been moved
+			if (reply.NFS4Error() == NFS4ERR_MOVED) {
+				fFilesystem->Migrate(fHandle, serv);
 				continue;
 			}
 
@@ -614,7 +670,8 @@ Inode::OpenDir(uint64* cookie)
 		return B_NOT_A_DIRECTORY;
 
 	do {
-		Request request(fFilesystem->Server());
+		RPC::Server* serv = fFilesystem->Server();
+		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fHandle);
@@ -629,6 +686,12 @@ Inode::OpenDir(uint64* cookie)
 		// filehandle has expired
 		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
 			_LookUpFilehandle();
+			continue;
+		}
+
+		// filesystem has been moved
+		if (reply.NFS4Error() == NFS4ERR_MOVED) {
+			fFilesystem->Migrate(fHandle, serv);
 			continue;
 		}
 
@@ -657,7 +720,8 @@ Inode::_ReadDirOnce(DirEntry** dirents, uint32* count, uint64* cookie,
 	bool* eof)
 {
 	do {
-		Request request(fFilesystem->Server());
+		RPC::Server* serv = fFilesystem->Server();
+		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fHandle);
@@ -674,6 +738,12 @@ Inode::_ReadDirOnce(DirEntry** dirents, uint32* count, uint64* cookie,
 		// filehandle has expired
 		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
 			_LookUpFilehandle();
+			continue;
+		}
+
+		// filesystem has been moved
+		if (reply.NFS4Error() == NFS4ERR_MOVED) {
+			fFilesystem->Migrate(fHandle, serv);
 			continue;
 		}
 
@@ -712,7 +782,8 @@ status_t
 Inode::_ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 {
 	do {
-		Request request(fFilesystem->Server());
+		RPC::Server* serv = fFilesystem->Server();
+		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fHandle);
@@ -730,6 +801,12 @@ Inode::_ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 		// filehandle has expired
 		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
 			_LookUpFilehandle();
+			continue;
+		}
+
+		// filesystem has been moved
+		if (reply.NFS4Error() == NFS4ERR_MOVED) {
+			fFilesystem->Migrate(fHandle, serv);
 			continue;
 		}
 
@@ -849,16 +926,10 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count, uint64* cookie)
 }
 
 
-status_t
-Inode::_LookUpFilehandle()
+static status_t
+sParsePath(RequestBuilder& req, uint32* count, const char* _path)
 {
-	Request request(fFilesystem->Server());
-	RequestBuilder& req = request.Builder();
-
-	req.PutRootFH();
-
-	uint32 lookupCount = 0;
-	char* path = strdup(fPath);
+	char* path = strdup(_path);
 	char* pathStart = path;
 	char* pathEnd;
 	while (pathStart != NULL) {
@@ -873,9 +944,26 @@ Inode::_LookUpFilehandle()
 		else
 			pathStart = NULL;
 
-		lookupCount++;
+		(*count)++;
 	}
 	free(path);
+
+	return B_OK;
+}
+
+
+status_t
+Inode::_LookUpFilehandle()
+{
+	Request request(fFilesystem->Server());
+	RequestBuilder& req = request.Builder();
+
+	req.PutRootFH();
+
+	uint32 lookupCount = 0;
+
+	sParsePath(req, &lookupCount, fFilesystem->Path());
+	sParsePath(req, &lookupCount, fPath);
 
 	req.GetFH();
 
