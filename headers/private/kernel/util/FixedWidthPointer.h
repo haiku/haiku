@@ -22,17 +22,28 @@ class FixedWidthPointer {
 public:
 	operator Type*() const
 	{
-		return (Type *)(addr_t)fValue;
+		return (Type*)(addr_t)fValue;
+	}
+
+	template<typename OtherType>
+	operator OtherType*() const
+	{
+		return static_cast<OtherType*>((Type*)(addr_t)fValue);
 	}
 
 	Type& operator*() const
 	{
-		return *(Type *)*this;
+		return *((Type*)(addr_t)fValue);
 	}
 
 	Type* operator->() const
 	{
-		return *this;
+		return (Type*)(addr_t)fValue;
+	}
+
+	Type& operator[](size_t i) const
+	{
+		return ((Type*)(addr_t)fValue)[i];
 	}
 
 	FixedWidthPointer& operator=(const FixedWidthPointer& p)
