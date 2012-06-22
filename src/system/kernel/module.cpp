@@ -1805,7 +1805,7 @@ module_init(kernel_args* args)
 	for (image = args->preloaded_images; image != NULL; image = image->next) {
 		status_t status = register_preloaded_module_image(image);
 		if (status != B_OK && image->is_module) {
-			dprintf("Could not register image \"%s\": %s\n", image->name,
+			dprintf("Could not register image \"%s\": %s\n", (char *)image->name,
 				strerror(status));
 		}
 	}

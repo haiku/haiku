@@ -56,7 +56,7 @@ is_in_image(struct elf_image_info *image, addr_t address)
 
 #ifdef _BOOT_MODE
 status_t
-boot_arch_elf_relocate_rel(struct preloaded_image *image,
+boot_arch_elf_relocate_rel(struct preloaded_elf32_image *image,
 	struct Elf32_Rel *rel, int relLength)
 #else
 int
@@ -167,7 +167,7 @@ arch_elf_relocate_rel(struct elf_image_info *image,
 
 #ifdef _BOOT_MODE
 status_t
-boot_arch_elf_relocate_rela(struct preloaded_image *image,
+boot_arch_elf_relocate_rela(struct preloaded_elf32_image *image,
 	struct Elf32_Rela *rel, int relLength)
 #else
 int

@@ -82,6 +82,9 @@ platform_start_kernel(void)
 	addr_t stackTop
 		= gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size;
 
+	preloaded_elf32_image *image = static_cast<preloaded_elf32_image *>(
+		(void *)gKernelArgs.kernel_image);
+
 	smp_init_other_cpus();
 	debug_cleanup();
 	mmu_init_for_kernel();
@@ -91,8 +94,7 @@ platform_start_kernel(void)
 
 	smp_boot_other_cpus();
 
-	dprintf("kernel entry at %lx\n",
-		gKernelArgs.kernel_image.elf_header.e_entry);
+	dprintf("kernel entry at %lx\n", image->elf_header.e_entry);
 
 	asm("movl	%0, %%eax;	"			// move stack out of way
 		"movl	%%eax, %%esp; "
@@ -102,7 +104,7 @@ platform_start_kernel(void)
 		"pushl 	$0x0;"					// dummy retval for call to main
 		"pushl 	%1;	"					// this is the start address
 		"ret;		"					// jump.
-		: : "g" (args), "g" (gKernelArgs.kernel_image.elf_header.e_entry));
+		: : "g" (args), "g" (image->elf_header.e_entry));
 
 	panic("kernel returned!\n");
 }

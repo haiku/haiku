@@ -15,9 +15,9 @@ extern "C" {
 
 /* ELF support */
 
-extern status_t boot_arch_elf_relocate_rel(struct preloaded_image *image,
+extern status_t boot_arch_elf_relocate_rel(preloaded_elf32_image *image,
 	struct Elf32_Rel *rel, int rel_len);
-extern status_t boot_arch_elf_relocate_rela(struct preloaded_image *image,
+extern status_t boot_arch_elf_relocate_rela(preloaded_elf32_image *image,
 	struct Elf32_Rela *rel, int rel_len);
 
 

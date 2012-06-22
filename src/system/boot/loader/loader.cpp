@@ -93,7 +93,8 @@ load_kernel(stage2_args *args, Directory *volume)
 	dprintf("load kernel %s...\n", name);
 
 	elf_init();
-	status_t status = elf_load_image(fd, &gKernelArgs.kernel_image);
+	preloaded_image *image;
+	status_t status = elf_load_image(fd, &image);
 
 	close(fd);
 
@@ -102,13 +103,15 @@ load_kernel(stage2_args *args, Directory *volume)
 		return status;
 	}
 
-	status = elf_relocate_image(&gKernelArgs.kernel_image);
+	gKernelArgs.kernel_image = image;
+
+	status = elf_relocate_image(gKernelArgs.kernel_image);
 	if (status < B_OK) {
 		dprintf("relocating kernel failed: %lx!\n", status);
 		return status;
 	}
 
-	gKernelArgs.kernel_image.name = kernel_args_strdup(name);
+	gKernelArgs.kernel_image->name = kernel_args_strdup(name);
 
 	return B_OK;
 }

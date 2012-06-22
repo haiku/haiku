@@ -1418,7 +1418,7 @@ legacy_driver_add_preloaded(kernel_args* args)
 			status = add_driver(imagePath.Path(), image->id);
 		if (status != B_OK) {
 			dprintf("legacy_driver_add_preloaded: Failed to add \"%s\": %s\n",
-				image->name, strerror(status));
+				(char *)image->name, strerror(status));
 			unload_kernel_add_on(image->id);
 		}
 	}

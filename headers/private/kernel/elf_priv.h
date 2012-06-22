@@ -10,6 +10,7 @@
 
 
 #include <elf32.h>
+#include <elf64.h>
 #include <image.h>
 
 

@@ -44,7 +44,7 @@ typedef struct kernel_args {
 	uint32		kernel_args_size;
 	uint32		version;
 
-	struct preloaded_image kernel_image;
+	FixedWidthPointer<struct preloaded_image> kernel_image;
 	FixedWidthPointer<struct preloaded_image> preloaded_images;
 
 	uint32		num_physical_memory_ranges;

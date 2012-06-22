@@ -22,7 +22,7 @@
 
 #ifdef _BOOT_MODE
 status_t
-boot_arch_elf_relocate_rel(struct preloaded_image *image,
+boot_arch_elf_relocate_rel(struct preloaded_elf32_image *image,
 	struct Elf32_Rel *rel, int rel_len)
 #else
 int
@@ -83,7 +83,7 @@ write_8_check(addr_t P, Elf32_Word value)
 
 #ifdef _BOOT_MODE
 status_t
-boot_arch_elf_relocate_rela(struct preloaded_image *image,
+boot_arch_elf_relocate_rela(struct preloaded_elf32_image *image,
 	struct Elf32_Rela *rel, int rel_len)
 #else
 int

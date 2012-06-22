@@ -95,7 +95,10 @@ determine_machine(void)
 extern "C" void
 platform_start_kernel(void)
 {
-	addr_t kernelEntry = gKernelArgs.kernel_image.elf_header.e_entry;
+	preloaded_elf32_image* image = static_cast<preloaded_elf32_image*>(
+		(void*)gKernelArgs.kernel_image);
+
+	addr_t kernelEntry = image->elf_header.e_entry;
 	addr_t stackTop = gKernelArgs.cpu_kstack[0].start
 		+ gKernelArgs.cpu_kstack[0].size;
 

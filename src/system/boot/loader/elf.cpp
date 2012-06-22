@@ -1,5 +1,6 @@
 /*
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2012, Alex Smith, alex@alex-smith.me.uk.
  * Distributed under the terms of the MIT License.
  */
 
@@ -61,7 +62,7 @@ verify_elf_header(struct Elf32_Ehdr &header)
 
 
 static status_t
-elf_parse_dynamic_section(struct preloaded_image *image)
+elf_parse_dynamic_section(preloaded_elf32_image *image)
 {
 	image->syms = 0;
 	image->rel = 0;
@@ -124,7 +125,7 @@ elf_parse_dynamic_section(struct preloaded_image *image)
 
 
 static status_t
-load_elf_symbol_table(int fd, preloaded_image *image)
+load_elf_symbol_table(int fd, preloaded_elf32_image *image)
 {
 	struct Elf32_Ehdr &elfHeader = image->elf_header;
 	Elf32_Sym *symbolTable = NULL;
@@ -226,28 +227,40 @@ error1:
 
 
 status_t
-elf_load_image(int fd, preloaded_image *image)
+elf_load_image(int fd, preloaded_image **_image)
 {
 	size_t totalSize;
 	status_t status;
 
-	TRACE(("elf_load_image(fd = %d, image = %p)\n", fd, image));
+	TRACE(("elf_load_image(fd = %d, _image = %p)\n", fd, _image));
+
+	preloaded_elf32_image *image = (preloaded_elf32_image *)kernel_args_malloc(
+		sizeof(preloaded_elf32_image));
+	if (image == NULL)
+		return B_NO_MEMORY;
 
 	struct Elf32_Ehdr &elfHeader = image->elf_header;
 
 	ssize_t length = read_pos(fd, 0, &elfHeader, sizeof(Elf32_Ehdr));
-	if (length < (ssize_t)sizeof(Elf32_Ehdr))
+	if (length < (ssize_t)sizeof(Elf32_Ehdr)) {
+		kernel_args_free(image);
 		return B_BAD_TYPE;
+	}
 
 	status = verify_elf_header(elfHeader);
-	if (status < B_OK)
+	if (status < B_OK) {
+		kernel_args_free(image);
 		return status;
+	}
+
+	image->elf_class = elfHeader.e_ident[EI_CLASS];
 
 	ssize_t size = elfHeader.e_phnum * elfHeader.e_phentsize;
 	Elf32_Phdr *programHeaders = (struct Elf32_Phdr *)malloc(size);
 	if (programHeaders == NULL) {
 		dprintf("error allocating space for program headers\n");
-		return B_NO_MEMORY;
+		status = B_NO_MEMORY;
+		goto error1;
 	}
 
 	length = read_pos(fd, elfHeader.e_phoff, programHeaders, size);
@@ -281,7 +294,7 @@ elf_load_image(int fd, preloaded_image *image)
 				continue;
 		}
 
-		elf_region *region;
+		elf32_region *region;
 		if (header.IsReadWrite()) {
 			if (image->data_region.size != 0) {
 				dprintf("elf: rw already handled!\n");
@@ -302,7 +315,7 @@ elf_load_image(int fd, preloaded_image *image)
 			B_PAGE_SIZE);
 		region->delta = -region->start;
 
-		TRACE(("segment %d: start = %p, size = %lu, delta = %lx\n", i,
+		TRACE(("segment %ld: start = 0x%lx, size = %lu, delta = %lx\n", i,
 			region->start, region->size, region->delta));
 	}
 
@@ -314,8 +327,8 @@ elf_load_image(int fd, preloaded_image *image)
 	}
 
 	// get the segment order
-	elf_region *firstRegion;
-	elf_region *secondRegion;
+	elf32_region *firstRegion;
+	elf32_region *secondRegion;
 	if (image->text_region.start < image->data_region.start) {
 		firstRegion = &image->text_region;
 		secondRegion = &image->data_region;
@@ -356,7 +369,7 @@ elf_load_image(int fd, preloaded_image *image)
 		if (header.p_type != PT_LOAD)
 			continue;
 
-		elf_region *region;
+		elf32_region *region;
 		if (header.IsReadWrite())
 			region = &image->data_region;
 		else if (header.IsExecutable())
@@ -397,6 +410,7 @@ elf_load_image(int fd, preloaded_image *image)
 
 	free(programHeaders);
 
+	*_image = image;
 	return B_OK;
 
 error2:
@@ -404,6 +418,7 @@ error2:
 		platform_free_region((void *)image->text_region.start, totalSize);
 error1:
 	free(programHeaders);
+	kernel_args_free(image);
 
 	return status;
 }
@@ -437,13 +452,7 @@ elf_load_image(Directory *directory, const char *path)
 
 	// we still need to load it, so do it
 
-	image = (preloaded_image *)kernel_args_malloc(sizeof(preloaded_image));
-	if (image == NULL) {
-		close(fd);
-		return B_NO_MEMORY;
-	}
-
-	status_t status = elf_load_image(fd, image);
+	status_t status = elf_load_image(fd, &image);
 	if (status == B_OK) {
 		image->name = kernel_args_strdup(path);
 		image->inode = stat.st_ino;
@@ -460,8 +469,10 @@ elf_load_image(Directory *directory, const char *path)
 
 
 status_t
-elf_relocate_image(struct preloaded_image *image)
+elf_relocate_image(preloaded_image *_image)
 {
+	preloaded_elf32_image *image = static_cast<preloaded_elf32_image *>(_image);
+
 	status_t status = elf_parse_dynamic_section(image);
 	if (status != B_OK)
 		return status;
@@ -480,12 +491,13 @@ elf_relocate_image(struct preloaded_image *image)
 		TRACE(("total %i plt-relocs\n",
 			image->pltrel_len / (int)sizeof(struct Elf32_Rel)));
 
+		struct Elf32_Rel *pltrel = image->pltrel;
 		if (image->pltrel_type == DT_REL) {
-			status = boot_arch_elf_relocate_rel(image, image->pltrel,
+			status = boot_arch_elf_relocate_rel(image, pltrel,
 				image->pltrel_len);
 		} else {
 			status = boot_arch_elf_relocate_rela(image,
-				(struct Elf32_Rela *)image->pltrel, image->pltrel_len);
+				(struct Elf32_Rela *)pltrel, image->pltrel_len);
 		}
 		if (status < B_OK)
 			return status;
@@ -505,7 +517,7 @@ elf_relocate_image(struct preloaded_image *image)
 
 
 status_t
-boot_elf_resolve_symbol(struct preloaded_image *image,
+boot_elf_resolve_symbol(struct preloaded_elf32_image *image,
 	struct Elf32_Sym *symbol, addr_t *symbolAddress)
 {
 	switch (symbol->st_shndx) {

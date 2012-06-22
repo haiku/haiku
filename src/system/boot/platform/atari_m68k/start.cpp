@@ -74,6 +74,9 @@ platform_start_kernel(void)
 	addr_t stackTop
 		= gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size;
 
+	preloaded_elf32_image *image = static_cast<preloaded_elf32_image *>(
+		(void *)gKernelArgs.kernel_image);
+
 	//smp_init_other_cpus();
 	//serial_cleanup();
 	mmu_init_for_kernel();
@@ -81,8 +84,7 @@ platform_start_kernel(void)
 
 #warning M68K: stop ints
 	
-	dprintf("kernel entry at %lx\n",
-		gKernelArgs.kernel_image.elf_header.e_entry);
+	dprintf("kernel entry at %lx\n", image->elf_header.e_entry);
 
 	asm volatile (
 		"move.l	%0,%%sp;	"			// move stack out of way
@@ -97,7 +99,7 @@ platform_start_kernel(void)
 		"move.l 	#0x0,-(%%sp);"		// dummy retval for call to main
 		"move.l 	%1,-(%%sp);	"		// this is the start address
 		"rts;		"					// jump.
-		: : "g" (args), "g" (gKernelArgs.kernel_image.elf_header.e_entry));
+		: : "g" (args), "g" (image->elf_header.e_entry));
 
 	// Huston, we have a problem!
 

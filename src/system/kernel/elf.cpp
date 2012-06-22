@@ -1245,7 +1245,7 @@ error1:
 
 
 static status_t
-insert_preloaded_image(struct preloaded_image *preloadedImage, bool kernel)
+insert_preloaded_image(struct preloaded_elf32_image *preloadedImage, bool kernel)
 {
 	status_t status;
 
@@ -1260,8 +1260,14 @@ insert_preloaded_image(struct preloaded_image *preloadedImage, bool kernel)
 	image->name = strdup(preloadedImage->name);
 	image->dynamic_section = preloadedImage->dynamic_section.start;
 
-	image->text_region = preloadedImage->text_region;
-	image->data_region = preloadedImage->data_region;
+	image->text_region.id = preloadedImage->text_region.id;
+	image->text_region.start = preloadedImage->text_region.start;
+	image->text_region.size = preloadedImage->text_region.size;
+	image->text_region.delta = preloadedImage->text_region.delta;
+	image->data_region.id = preloadedImage->data_region.id;
+	image->data_region.start = preloadedImage->data_region.start;
+	image->data_region.size = preloadedImage->data_region.size;
+	image->data_region.delta = preloadedImage->data_region.delta;
 
 	status = elf_parse_dynamic_section(image);
 	if (status != B_OK)
@@ -2468,12 +2474,15 @@ elf_init(kernel_args *args)
 
 	// Build a image structure for the kernel, which has already been loaded.
 	// The preloaded_images were already prepared by the VM.
-	if (insert_preloaded_image(&args->kernel_image, true) < B_OK)
+	image = args->kernel_image;
+	if (insert_preloaded_image(static_cast<struct preloaded_elf32_image *>(
+			image), true) < B_OK)
 		panic("could not create kernel image.\n");
 
 	// Build image structures for all preloaded images.
 	for (image = args->preloaded_images; image != NULL; image = image->next)
-		insert_preloaded_image(image, false);
+		insert_preloaded_image(static_cast<struct preloaded_elf32_image *>(
+			image), false);
 
 	add_debugger_command("ls", &dump_address_info,
 		"lookup symbol for a particular address");

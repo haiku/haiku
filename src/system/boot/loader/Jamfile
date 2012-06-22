@@ -39,6 +39,7 @@ UsePrivateHeaders shared storage ;
 		{
 			defines +=
 				ALTERNATE_BOOT_ARCH=\\\"x86_64\\\"
+				BOOT_SUPPORT_ELF64
 
 				BOOT_SUPPORT_PARTITION_EFI
 
@@ -49,6 +50,7 @@ UsePrivateHeaders shared storage ;
 		{
 			defines +=
 				ALTERNATE_BOOT_ARCH=\\\"x86\\\"
+				BOOT_SUPPORT_ELF64
 
 				BOOT_SUPPORT_PARTITION_EFI
 

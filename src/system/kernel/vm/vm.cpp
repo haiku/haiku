@@ -3537,9 +3537,13 @@ vm_free_unused_boot_loader_range(addr_t start, addr_t size)
 }
 
 
+// TODO x86_64: hardcoding elf32 is temporary.
 static void
-create_preloaded_image_areas(struct preloaded_image* image)
+create_preloaded_image_areas(struct preloaded_elf32_image* image)
 {
+#ifdef __x86_64__
+	panic("fix this");
+#else
 	char name[B_OS_NAME_LENGTH];
 	void* address;
 	int32 length;
@@ -3570,6 +3574,7 @@ create_preloaded_image_areas(struct preloaded_image* image)
 	image->data_region.id = create_area(name, &address, B_EXACT_ADDRESS,
 		PAGE_ALIGN(image->data_region.size), B_ALREADY_WIRED,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+#endif
 }
 
 
@@ -3842,11 +3847,13 @@ vm_init(kernel_args* args)
 
 	allocate_kernel_args(args);
 
-	create_preloaded_image_areas(&args->kernel_image);
+	create_preloaded_image_areas(static_cast<struct preloaded_elf32_image*>(
+		(void*)args->kernel_image));
 
 	// allocate areas for preloaded images
 	for (image = args->preloaded_images; image != NULL; image = image->next)
-		create_preloaded_image_areas(image);
+		create_preloaded_image_areas(
+			static_cast<struct preloaded_elf32_image*>(image));
 
 	// allocate kernel stacks
 	for (i = 0; i < args->num_cpus; i++) {

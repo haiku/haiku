@@ -356,6 +356,9 @@ smp_cpu_ready(void)
 
 	//TRACE(("smp_cpu_ready: entry cpu %ld\n", curr_cpu));
 
+	preloaded_elf32_image *image = static_cast<preloaded_elf32_image *>(
+		(void *)gKernelArgs.kernel_image);
+
 	// Important.  Make sure supervisor threads can fault on read only pages...
 	asm("movl %%eax, %%cr0" : : "a" ((1 << 31) | (1 << 16) | (1 << 5) | 1));
 	asm("cld");
@@ -381,7 +384,7 @@ smp_cpu_ready(void)
 		"pushl 	%2;	"					// this is the start address
 		"ret;		"					// jump.
 		: : "g" (curr_cpu), "g" (&gKernelArgs),
-			"g" (gKernelArgs.kernel_image.elf_header.e_entry));
+			"g" (image->elf_header.e_entry));
 
 	// no where to return to
 	return 0;
