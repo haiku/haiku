@@ -30,6 +30,7 @@ public:
 										uint32 stateSeq);
 			status_t				GetAttr(Attribute* attrs, uint32 count);
 			status_t				GetFH();
+			status_t				Link(const char* name);
 			status_t				LookUp(const char* name);
 			status_t				LookUpUp();
 			status_t				Open(OpenClaim claim, uint32 seq,

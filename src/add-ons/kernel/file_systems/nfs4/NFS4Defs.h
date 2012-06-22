@@ -25,6 +25,7 @@ enum Opcode {
 	OpClose					= 4,
 	OpGetAttr				= 9,
 	OpGetFH					= 10,
+	OpLink					= 11,
 	OpLookUp				= 15,
 	OpLookUpUp				= 16,
 	OpOpen					= 18,

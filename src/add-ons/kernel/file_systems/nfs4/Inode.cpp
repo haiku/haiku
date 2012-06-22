@@ -210,6 +210,56 @@ Inode::LookUp(const char* name, ino_t* id)
 }
 
 
+status_t
+Inode::Link(Inode* dir, const char* name)
+{
+	do {
+		RPC::Server* serv = fFilesystem->Server();
+		Request request(serv);
+		RequestBuilder& req = request.Builder();
+
+		req.PutFH(fHandle);
+		req.SaveFH();
+		req.PutFH(dir->fHandle);
+		req.Link(name);
+
+		status_t result = request.Send();
+		if (result != B_OK)
+			return result;
+
+		ReplyInterpreter& reply = request.Reply();
+
+		// filehandle has expired
+		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
+			_LookUpFilehandle();
+			dir->_LookUpFilehandle();
+			continue;
+		}
+
+		// filesystem has been moved
+		if (reply.NFS4Error() == NFS4ERR_MOVED) {
+			fFilesystem->Migrate(fHandle, serv);
+			dir->fFilesystem->Migrate(dir->fHandle, serv);
+			continue;
+		}
+
+		result = reply.PutFH();
+		if (result != B_OK)
+			return result;
+
+		result = reply.SaveFH();
+		if (result != B_OK)
+			return result;
+
+		result = reply.PutFH();
+		if (result != B_OK)
+			return result;
+
+		return reply.Link();
+	} while (true);
+}
+
+
 // May cause problem similar to Rename (described below). When node's is has
 // more than one hard link and we delete the name it stores for filehandle
 // restoration node will inocorectly become unavailable.

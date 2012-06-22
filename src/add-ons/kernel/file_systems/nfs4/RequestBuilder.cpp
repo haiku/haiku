@@ -119,6 +119,24 @@ RequestBuilder::GetFH()
 
 
 status_t
+RequestBuilder::Link(const char* name)
+{
+	if (fProcedure != ProcCompound)
+		return B_BAD_VALUE;
+	if (fRequest == NULL)
+		return B_NO_MEMORY;
+	if (name == NULL)
+		return B_BAD_VALUE;
+
+	fRequest->Stream().AddUInt(OpLink);
+	fRequest->Stream().AddString(name);
+	fOpCount++;
+
+	return B_OK;
+}
+
+
+status_t
 RequestBuilder::LookUp(const char* name)
 {
 	if (fProcedure != ProcCompound)

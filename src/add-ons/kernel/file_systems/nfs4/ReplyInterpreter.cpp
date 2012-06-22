@@ -174,6 +174,21 @@ ReplyInterpreter::GetFH(Filehandle* fh)
 
 
 status_t
+ReplyInterpreter::Link()
+{
+	status_t res = _OperationError(OpLink);
+	if (res != B_OK)
+		return res;
+
+	fReply->Stream().GetBoolean();
+	fReply->Stream().GetUHyper();
+	fReply->Stream().GetUHyper();
+
+	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+}
+
+
+status_t
 ReplyInterpreter::Open(uint32* id, uint32* seq, bool* confirm)
 {
 	status_t res = _OperationError(OpOpen);

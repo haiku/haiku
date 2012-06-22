@@ -213,6 +213,15 @@ nfs4_read_symlink(fs_volume* volume, fs_vnode* link, char* buffer,
 
 
 static status_t
+nfs4_link(fs_volume* volume, fs_vnode* dir, const char* name, fs_vnode* vnode)
+{
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	Inode* dirInode = reinterpret_cast<Inode*>(dir->private_node);
+	return inode->Link(dirInode, name);
+}
+
+
+static status_t
 nfs4_unlink(fs_volume* volume, fs_vnode* dir, const char* name)
 {
 	Inode* inode = reinterpret_cast<Inode*>(dir->private_node);
@@ -449,7 +458,7 @@ fs_vnode_ops gNFSv4VnodeOps = {
 	nfs4_read_symlink,
 	NULL,	// create_symlink()
 
-	NULL,	// link()
+	nfs4_link,
 	nfs4_unlink,
 	nfs4_rename,
 
