@@ -12,6 +12,7 @@
 #include <SupportDefs.h>
 
 #include "NFS4Defs.h"
+#include "ReplyInterpreter.h"
 #include "RPCCall.h"
 #include "RPCServer.h"
 #include "XDR.h"
@@ -50,6 +51,7 @@ public:
 			status_t				SaveFH();
 			status_t				SetClientID(const RPC::Server* serv);
 			status_t				SetClientIDConfirm(uint64 id, uint64 ver);
+			status_t				Verify(AttrValue* attr, uint32 count);
 
 			RPC::Call*				Request();
 

@@ -39,7 +39,8 @@ enum Opcode {
 	OpRenew					= 30,
 	OpSaveFH				= 32,
 	OpSetClientID			= 35,
-	OpSetClientIDConfirm	= 36
+	OpSetClientIDConfirm	= 36,
+	OpVerify				= 37
 };
 
 enum Access {

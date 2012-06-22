@@ -214,12 +214,20 @@ Inode::LookUp(const char* name, ino_t* id)
 // more than one hard link and we delete the name it stores for filehandle
 // restoration node will inocorectly become unavailable.
 status_t
-Inode::Remove(const char* name)
+Inode::Remove(const char* name, FileType type)
 {
 	do {
 		RPC::Server* serv = fFilesystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
+
+		req.PutFH(fHandle);
+		req.LookUp(name);
+		AttrValue attr;
+		attr.fAttribute = FATTR4_TYPE;
+		attr.fFreePointer = false;
+		attr.fData.fValue32 = type;
+		req.Verify(&attr, 1);
 
 		req.PutFH(fHandle);
 		req.Remove(name);
@@ -241,6 +249,22 @@ Inode::Remove(const char* name)
 			fFilesystem->Migrate(fHandle, serv);
 			continue;
 		}
+
+		result = reply.PutFH();
+		if (result != B_OK)
+			return result;
+
+		result = reply.LookUp();
+		if (result != B_OK)
+			return result;
+
+		result = reply.Verify();
+		if (result == NFS4ERR_NOT_SAME && type == NF4REG)
+			return B_IS_A_DIRECTORY;
+		if (result == NFS4ERR_NOT_SAME && type == NF4DIR)
+			return B_NOT_A_DIRECTORY;
+		if (result != B_OK)
+			return result;
 
 		result = reply.PutFH();
 		if (result != B_OK)

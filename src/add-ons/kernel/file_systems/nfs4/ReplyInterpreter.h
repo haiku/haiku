@@ -84,6 +84,7 @@ public:
 	inline	status_t	SaveFH();
 			status_t	SetClientID(uint64* clientid, uint64* verifier);
 	inline	status_t	SetClientIDConfirm();
+	inline	status_t	Verify();
 
 private:
 			void		_ParseHeader();
@@ -175,6 +176,13 @@ inline status_t
 ReplyInterpreter::SetClientIDConfirm()
 {
 	return _OperationError(OpSetClientIDConfirm);
+}
+
+
+inline status_t
+ReplyInterpreter::Verify()
+{
+	return _OperationError(OpVerify);
 }
 
 

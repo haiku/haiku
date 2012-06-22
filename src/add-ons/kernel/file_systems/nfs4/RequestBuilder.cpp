@@ -432,6 +432,37 @@ RequestBuilder::SetClientIDConfirm(uint64 id, uint64 ver)
 }
 
 
+status_t
+RequestBuilder::Verify(AttrValue* attr, uint32 count)
+{
+	if (fProcedure != ProcCompound)
+		return B_BAD_VALUE;
+	if (fRequest == NULL)
+		return B_NO_MEMORY;
+
+	fRequest->Stream().AddUInt(OpVerify);
+
+	Attribute* attrs =
+		reinterpret_cast<Attribute*>(malloc(sizeof(Attribute) * count));
+	for (uint32 i = 0; i < count; i++)
+		attrs[i] = static_cast<Attribute>(attr[i].fAttribute);
+	_AttrBitmap(fRequest->Stream(), attrs, count);
+	free(attrs);
+
+	uint32 i = 0;
+	XDR::WriteStream str;
+	if (i < count && attr[i].fAttribute == FATTR4_TYPE) {
+		str.AddUInt(attr[i].fData.fValue32);
+		i++;
+	}
+
+	fRequest->Stream().AddOpaque(str);
+	fOpCount++;
+
+	return B_OK;
+}
+
+
 RPC::Call*
 RequestBuilder::Request()
 {

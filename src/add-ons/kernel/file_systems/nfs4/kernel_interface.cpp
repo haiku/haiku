@@ -216,7 +216,7 @@ static status_t
 nfs4_unlink(fs_volume* volume, fs_vnode* dir, const char* name)
 {
 	Inode* inode = reinterpret_cast<Inode*>(dir->private_node);
-	return inode->Remove(name);
+	return inode->Remove(name, NF4REG);
 }
 
 
@@ -321,7 +321,7 @@ static status_t
 nfs4_remove_dir(fs_volume* volume, fs_vnode* parent, const char* name)
 {
 	Inode* inode = reinterpret_cast<Inode*>(parent->private_node);
-	return inode->Remove(name);
+	return inode->Remove(name, NF4DIR);
 }
 
 
