@@ -385,7 +385,7 @@ if [ IsOptionalHaikuImagePackageAdded TagLib ] {
 }
 
 local baseURL = http://haiku-files.org/files/optional-packages ;
-HAIKU_TAGLIB_PACKAGE = taglib-1.7.2-x86-gcc2-2012-06-15.zip ;
+HAIKU_TAGLIB_PACKAGE = taglib-1.6.3-r1a3-x86-gcc2-2011-05-20.zip ;
 HAIKU_TAGLIB_URL = $(baseURL)/$(HAIKU_TAGLIB_PACKAGE) ;
 
 if $(HAIKU_BUILD_FEATURE_TAGLIB) {
