@@ -1384,7 +1384,7 @@ syslog_init_post_vm(struct kernel_args* args)
 		}
 	} else {
 		// create an area for the debug syslog buffer
-		void* base = (void*)ROUNDDOWN((addr_t)args->debug_output, B_PAGE_SIZE);
+		void* base = (void*)ROUNDDOWN((addr_t)(void *)args->debug_output, B_PAGE_SIZE);
 		size_t size = ROUNDUP(args->debug_size, B_PAGE_SIZE);
 		area_id area = create_area("syslog debug", &base, B_EXACT_ADDRESS, size,
 				B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
@@ -1401,7 +1401,7 @@ syslog_init_post_vm(struct kernel_args* args)
 	sSyslogMessage->ident[0] = '\0';
 	//strcpy(sSyslogMessage->ident, "KERNEL");
 
-	if (args->debug_output)
+	if (args->debug_output != NULL)
 		syslog_write((const char*)args->debug_output, args->debug_size, false);
 
 	char revisionBuffer[64];
@@ -1431,7 +1431,7 @@ err1:
 static status_t
 syslog_init(struct kernel_args* args)
 {
-	if (!args->keep_debug_output_buffer || !args->debug_output)
+	if (!args->keep_debug_output_buffer || args->debug_output == NULL)
 		return B_OK;
 
 	sSyslogBuffer = create_ring_buffer_etc(args->debug_output, args->debug_size,

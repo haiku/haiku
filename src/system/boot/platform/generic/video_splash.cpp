@@ -146,7 +146,7 @@ video_display_splash(addr_t frameBuffer)
 			// pointer into the lower half of the icons image data
 			gKernelArgs.boot_splash
 				= (uint8*)kernel_args_malloc(uncompressedSize);
-			if (!gKernelArgs.boot_splash)
+			if (gKernelArgs.boot_splash == NULL)
 				return B_NO_MEMORY;
 			uncompress(kSplashIcons8BitCompressedImage,
 				sizeof(kSplashIcons8BitCompressedImage),
@@ -159,7 +159,7 @@ video_display_splash(addr_t frameBuffer)
 			// pointer into the lower half of the icons image data
 			gKernelArgs.boot_splash
 				= (uint8*)kernel_args_malloc(uncompressedSize);
-			if (!gKernelArgs.boot_splash)
+			if (gKernelArgs.boot_splash == NULL)
 				return B_NO_MEMORY;
 			uncompress(kSplashIcons24BitCompressedImage,
 				sizeof(kSplashIcons24BitCompressedImage),

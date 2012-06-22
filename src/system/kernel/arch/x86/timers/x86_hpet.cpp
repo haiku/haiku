@@ -217,7 +217,7 @@ hpet_init(struct kernel_args *args)
 	/* hpet_acpi_probe() through a similar "scan spots" table
 	   to that of smp.cpp.
 	   Seems to be the most elegant solution right now. */
-	if (!args->arch_args.hpet)
+	if (args->arch_args.hpet == NULL)
 		return B_ERROR;
 
 	if (sHPETRegs == NULL) {

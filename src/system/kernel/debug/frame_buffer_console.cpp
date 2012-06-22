@@ -442,7 +442,7 @@ frame_buffer_console_init(kernel_args* args)
 		add_boot_item(VESA_MODES_BOOT_INFO, sVesaModes, args->vesa_modes_size);
 	}
 
-	if (args->edid_info) {
+	if (args->edid_info != NULL) {
 		edid1_info* info = (edid1_info*)malloc(sizeof(edid1_info));
 		if (info != NULL) {
 			memcpy(info, args->edid_info, sizeof(edid1_info));

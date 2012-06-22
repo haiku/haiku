@@ -25,11 +25,6 @@ public:
 		return (Type *)(addr_t)fValue;
 	}
 
-	operator addr_t() const
-	{
-		return (addr_t)fValue;
-	}
-
 	Type& operator*() const
 	{
 		return *(Type *)*this;
@@ -90,11 +85,6 @@ public:
 		return (OtherType*)(addr_t)fValue;
 	}
 
-	operator addr_t() const
-	{
-		return (addr_t)fValue;
-	}
-
 	FixedWidthPointer& operator=(const FixedWidthPointer& p)
 	{
 		fValue = p.fValue;
@@ -120,6 +110,20 @@ public:
 private:
 	uint64 fValue;
 } _PACKED;
+
+template<typename Type>
+inline bool
+operator==(const FixedWidthPointer<Type>& a, void* b)
+{
+	return a.Get() == (addr_t)b;
+}
+
+template<typename Type>
+inline bool
+operator!=(const FixedWidthPointer<Type>& a, void* b)
+{
+	return a.Get() != (addr_t)b;
+}
 
 
 #endif	/* KERNEL_UTIL_FIXED_WIDTH_POINTER_H */
