@@ -87,6 +87,33 @@ RequestBuilder::Close(uint32 seq, const uint32* id, uint32 stateSeq)
 
 
 status_t
+RequestBuilder::Create(FileType type, const char* name, const char* path,
+	AttrValue* attr, uint32 count)
+{
+	if (fProcedure != ProcCompound)
+		return B_BAD_VALUE;
+	if (fRequest == NULL)
+		return B_NO_MEMORY;
+	if (path == NULL)
+		return B_BAD_VALUE;
+	if (name == NULL)
+		return B_BAD_VALUE;
+	if (type != NF4LNK)
+		return B_BAD_VALUE;
+
+	fRequest->Stream().AddUInt(OpCreate);
+	fRequest->Stream().AddUInt(type);
+	fRequest->Stream().AddString(path);
+	fRequest->Stream().AddString(name);
+	_EncodeAttrs(fRequest->Stream(), attr, count);
+
+	fOpCount++;
+
+	return B_OK;
+}
+
+
+status_t
 RequestBuilder::GetAttr(Attribute* attrs, uint32 count)
 {
 	if (fProcedure != ProcCompound)
@@ -459,22 +486,8 @@ RequestBuilder::Verify(AttrValue* attr, uint32 count)
 		return B_NO_MEMORY;
 
 	fRequest->Stream().AddUInt(OpVerify);
+	_EncodeAttrs(fRequest->Stream(), attr, count);
 
-	Attribute* attrs =
-		reinterpret_cast<Attribute*>(malloc(sizeof(Attribute) * count));
-	for (uint32 i = 0; i < count; i++)
-		attrs[i] = static_cast<Attribute>(attr[i].fAttribute);
-	_AttrBitmap(fRequest->Stream(), attrs, count);
-	free(attrs);
-
-	uint32 i = 0;
-	XDR::WriteStream str;
-	if (i < count && attr[i].fAttribute == FATTR4_TYPE) {
-		str.AddUInt(attr[i].fData.fValue32);
-		i++;
-	}
-
-	fRequest->Stream().AddOpaque(str);
 	fOpCount++;
 
 	return B_OK;
@@ -509,5 +522,32 @@ RequestBuilder::_AttrBitmap(XDR::WriteStream& stream, Attribute* attrs,
 	stream.AddUInt(bcount);
 	for (uint32 i = 0; i < bcount; i++)
 		stream.AddUInt(bitmap[i]);
+}
+
+
+void
+RequestBuilder::_EncodeAttrs(XDR::WriteStream& stream, AttrValue* attr,
+	uint32 count)
+{
+	Attribute* attrs =
+		reinterpret_cast<Attribute*>(malloc(sizeof(Attribute) * count));
+	for (uint32 i = 0; i < count; i++)
+		attrs[i] = static_cast<Attribute>(attr[i].fAttribute);
+	_AttrBitmap(stream, attrs, count);
+	free(attrs);
+
+	uint32 i = 0;
+	XDR::WriteStream str;
+	if (i < count && attr[i].fAttribute == FATTR4_TYPE) {
+		str.AddUInt(attr[i].fData.fValue32);
+		i++;
+	}
+
+	if (i < count && attr[i].fAttribute == FATTR4_MODE) {
+		str.AddUInt(attr[i].fData.fValue32);
+		i++;
+	}
+
+	stream.AddOpaque(str);
 }
 

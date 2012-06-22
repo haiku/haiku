@@ -384,6 +384,49 @@ Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName)
 
 
 status_t
+Inode::CreateLink(const char* name, const char* path, int mode)
+{
+	do {
+		RPC::Server* serv = fFilesystem->Server();
+		Request request(serv);
+		RequestBuilder& req = request.Builder();
+
+		req.PutFH(fHandle);
+
+		AttrValue attr;
+		attr.fAttribute = FATTR4_MODE;
+		attr.fFreePointer = false;
+		attr.fData.fValue32 = mode;
+		req.Create(NF4LNK, name, path, &attr, 1);
+
+		status_t result = request.Send();
+		if (result != B_OK)
+			return result;
+
+		ReplyInterpreter& reply = request.Reply();
+
+		// filehandle has expired
+		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
+			_LookUpFilehandle();
+			continue;
+		}
+
+		// filesystem has been moved
+		if (reply.NFS4Error() == NFS4ERR_MOVED) {
+			fFilesystem->Migrate(fHandle, serv);
+			continue;
+		}
+
+		result = reply.PutFH();
+		if (result != B_OK)
+			return result;
+
+		return reply.Create();
+	} while (true);
+}
+
+
+status_t
 Inode::ReadLink(void* buffer, size_t* length)
 {
 	if (fType != NF4LNK)

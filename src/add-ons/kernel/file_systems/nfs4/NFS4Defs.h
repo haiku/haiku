@@ -23,6 +23,7 @@ enum Procedure {
 enum Opcode {
 	OpAccess				= 3,
 	OpClose					= 4,
+	OpCreate				= 6,
 	OpGetAttr				= 9,
 	OpGetFH					= 10,
 	OpLink					= 11,

@@ -31,7 +31,11 @@ public:
 	inline			Filesystem*	FileSystem() const;
 
 					status_t	LookUp(const char* name, ino_t* id);
+
+					status_t	CreateLink(const char* name, const char* path,
+									int mode);
 					status_t	ReadLink(void* buffer, size_t* length);
+
 					status_t	Link(Inode* dir, const char* name);
 					status_t	Remove(const char* name, FileType type);
 	static			status_t	Rename(Inode* from, Inode* to,

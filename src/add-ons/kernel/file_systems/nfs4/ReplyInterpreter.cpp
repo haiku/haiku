@@ -122,6 +122,25 @@ ReplyInterpreter::Close()
 }
 
 
+status_t
+ReplyInterpreter::Create()
+{
+	status_t res = _OperationError(OpCreate);
+	if (res != B_OK)
+		return res;
+
+	fReply->Stream().GetBoolean();
+	fReply->Stream().GetUHyper();
+	fReply->Stream().GetUHyper();
+	uint32 count = fReply->Stream().GetUInt();
+	for (uint32 i; i < count; i++)
+		fReply->Stream().GetUInt();
+
+	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+}
+
+
+
 // Bit Twiddling Hacks
 // http://graphics.stanford.edu/~seander/bithacks.html
 static inline uint32 sCountBits(uint32 v)

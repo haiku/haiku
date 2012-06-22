@@ -28,6 +28,9 @@ public:
 			status_t				Access();
 			status_t				Close(uint32 seq, const uint32* id,
 										uint32 stateSeq);
+			status_t				Create(FileType type, const char* name,
+										const char* path, AttrValue* attr,
+										uint32 count);
 			status_t				GetAttr(Attribute* attrs, uint32 count);
 			status_t				GetFH();
 			status_t				Link(const char* name);
@@ -59,6 +62,8 @@ public:
 private:
 			void					_InitHeader();
 
+			void					_EncodeAttrs(XDR::WriteStream& stream,
+										AttrValue* attr, uint32 count);
 			void					_AttrBitmap(XDR::WriteStream& stream,
 										Attribute* attrs, uint32 count);
 
