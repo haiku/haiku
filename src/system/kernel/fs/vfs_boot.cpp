@@ -320,7 +320,7 @@ DiskBootMethod::SortPartitions(KPartition** partitions, int32 count)
 	The boot code should then just try them one by one.
 */
 static status_t
-get_boot_partitions(KMessage &bootVolume, PartitionStack& partitions)
+get_boot_partitions(KMessage& bootVolume, PartitionStack& partitions)
 {
 	dprintf("get_boot_partitions(): boot volume message:\n");
 	bootVolume.Dump(&dprintf);

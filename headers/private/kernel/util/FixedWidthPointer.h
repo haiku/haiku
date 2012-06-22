@@ -30,23 +30,23 @@ public:
 		return (addr_t)fValue;
 	}
 
-	Type &operator*() const
+	Type& operator*() const
 	{
 		return *(Type *)*this;
 	}
 
-	Type *operator->() const
+	Type* operator->() const
 	{
 		return *this;
 	}
 
-	FixedWidthPointer &operator=(const FixedWidthPointer &p)
+	FixedWidthPointer& operator=(const FixedWidthPointer& p)
 	{
 		fValue = p.fValue;
 		return *this;
 	}
 
-	FixedWidthPointer &operator=(Type *p)
+	FixedWidthPointer& operator=(Type* p)
 	{
 		fValue = (addr_t)p;
 		return *this;
@@ -69,6 +69,7 @@ public:
 	{
 		fValue = addr;
 	}
+
 private:
 	uint64 fValue;
 } _PACKED;
@@ -80,13 +81,13 @@ class FixedWidthPointer<void> {
 public:
 	operator void*() const
 	{
-		return (void *)(addr_t)fValue;
+		return (void*)(addr_t)fValue;
 	}
 
 	template<typename OtherType>
 	operator OtherType*() const
 	{
-		return (OtherType *)(addr_t)fValue;
+		return (OtherType*)(addr_t)fValue;
 	}
 
 	operator addr_t() const
@@ -94,13 +95,13 @@ public:
 		return (addr_t)fValue;
 	}
 
-	FixedWidthPointer &operator=(const FixedWidthPointer &p)
+	FixedWidthPointer& operator=(const FixedWidthPointer& p)
 	{
 		fValue = p.fValue;
 		return *this;
 	}
 
-	FixedWidthPointer &operator=(void *p)
+	FixedWidthPointer& operator=(void* p)
 	{
 		fValue = (addr_t)p;
 		return *this;
@@ -115,6 +116,7 @@ public:
 	{
 		fValue = addr;
 	}
+
 private:
 	uint64 fValue;
 } _PACKED;
