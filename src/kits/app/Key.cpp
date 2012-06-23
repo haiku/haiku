@@ -32,6 +32,7 @@ CompareLists(BObjectList<BString> a, BObjectList<BString> b)
 
 BKey::BKey()
 {
+	Unset();
 }
 
 
@@ -44,6 +45,7 @@ BKey::BKey(BKeyPurpose purpose, const char* identifier,
 
 BKey::BKey(BKey& other)
 {
+	*this = other;
 }
 
 
@@ -63,6 +65,7 @@ status_t
 BKey::SetTo(BKeyPurpose purpose, const char* identifier,
 	const char* secondaryIdentifier, const uint8* data, size_t length)
 {
+	fCreationTime = 0;
 	SetPurpose(purpose);
 	SetIdentifier(identifier);
 	SetSecondaryIdentifier(secondaryIdentifier);
