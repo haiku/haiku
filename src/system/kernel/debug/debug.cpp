@@ -1401,8 +1401,10 @@ syslog_init_post_vm(struct kernel_args* args)
 	sSyslogMessage->ident[0] = '\0';
 	//strcpy(sSyslogMessage->ident, "KERNEL");
 
-	if (args->debug_output != NULL)
-		syslog_write((const char*)args->debug_output, args->debug_size, false);
+	if (args->debug_output != NULL) {
+		syslog_write((const char*)args->debug_output.Pointer(),
+			args->debug_size, false);
+	}
 
 	char revisionBuffer[64];
 	length = snprintf(revisionBuffer, sizeof(revisionBuffer),

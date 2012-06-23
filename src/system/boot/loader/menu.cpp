@@ -534,7 +534,7 @@ debug_menu_display_current_log(Menu* menu, MenuItem* item)
 static bool
 debug_menu_display_previous_syslog(Menu* menu, MenuItem* item)
 {
-	ring_buffer* buffer = (ring_buffer*)gKernelArgs.debug_output;
+	ring_buffer* buffer = (ring_buffer*)gKernelArgs.debug_output.Pointer();
 	if (buffer == NULL)
 		return true;
 
@@ -595,7 +595,8 @@ save_previous_syslog_to_volume(Directory* directory)
 		return fd;
 	}
 
-	ring_buffer* syslogBuffer = (ring_buffer*)gKernelArgs.debug_output;
+	ring_buffer* syslogBuffer
+		= (ring_buffer*)gKernelArgs.debug_output.Pointer();
 	iovec vecs[2];
 	int32 vecCount = ring_buffer_get_vecs(syslogBuffer, vecs);
 	if (vecCount > 0) {
@@ -899,7 +900,8 @@ add_debug_menu()
 			"Displays the debug info the boot loader has logged.");
 	}
 
-	ring_buffer* syslogBuffer = (ring_buffer*)gKernelArgs.debug_output;
+	ring_buffer* syslogBuffer
+		= (ring_buffer*)gKernelArgs.debug_output.Pointer();
 	if (syslogBuffer != NULL && ring_buffer_readable(syslogBuffer) > 0) {
 		if (!currentLogItemVisible)
 			menu->AddSeparatorItem();

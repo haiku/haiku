@@ -32,7 +32,7 @@ struct preloaded_image {
 	uint8		elf_class;
 	addr_range	dynamic_section;
 
-	FixedWidthPointer<const char> debug_string_table;
+	FixedWidthPointer<char> debug_string_table;
 	uint32		num_debug_symbols;
 	uint32		debug_string_table_size;
 

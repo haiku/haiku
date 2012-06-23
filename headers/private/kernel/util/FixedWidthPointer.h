@@ -20,30 +20,29 @@
 template<typename Type>
 class FixedWidthPointer {
 public:
-	operator Type*() const
+	Type * Pointer() const
 	{
 		return (Type*)(addr_t)fValue;
 	}
 
-	template<typename OtherType>
-	operator OtherType*() const
+	operator Type*() const
 	{
-		return static_cast<OtherType*>((Type*)(addr_t)fValue);
+		return Pointer();
 	}
 
 	Type& operator*() const
 	{
-		return *((Type*)(addr_t)fValue);
+		return *Pointer();
 	}
 
 	Type* operator->() const
 	{
-		return (Type*)(addr_t)fValue;
+		return Pointer();
 	}
 
 	Type& operator[](size_t i) const
 	{
-		return ((Type*)(addr_t)fValue)[i];
+		return Pointer()[i];
 	}
 
 	FixedWidthPointer& operator=(const FixedWidthPointer& p)
@@ -85,15 +84,14 @@ private:
 template<>
 class FixedWidthPointer<void> {
 public:
-	operator void*() const
+	void * Pointer() const
 	{
 		return (void*)(addr_t)fValue;
 	}
 
-	template<typename OtherType>
-	operator OtherType*() const
+	operator void*() const
 	{
-		return (OtherType*)(addr_t)fValue;
+		return Pointer();
 	}
 
 	FixedWidthPointer& operator=(const FixedWidthPointer& p)
@@ -122,16 +120,34 @@ private:
 	uint64 fValue;
 } _PACKED;
 
+
 template<typename Type>
 inline bool
-operator==(const FixedWidthPointer<Type>& a, void* b)
+operator==(const FixedWidthPointer<Type>& a, const Type* b)
 {
 	return a.Get() == (addr_t)b;
 }
 
+
 template<typename Type>
 inline bool
-operator!=(const FixedWidthPointer<Type>& a, void* b)
+operator!=(const FixedWidthPointer<Type>& a, const Type* b)
+{
+	return a.Get() != (addr_t)b;
+}
+
+
+template<typename Type>
+inline bool
+operator==(const FixedWidthPointer<Type>& a, Type* b)
+{
+	return a.Get() == (addr_t)b;
+}
+
+
+template<typename Type>
+inline bool
+operator!=(const FixedWidthPointer<Type>& a, Type* b)
 {
 	return a.Get() != (addr_t)b;
 }

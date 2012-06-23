@@ -83,7 +83,7 @@ platform_start_kernel(void)
 		= gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size;
 
 	preloaded_elf32_image *image = static_cast<preloaded_elf32_image *>(
-		gKernelArgs.kernel_image);
+		gKernelArgs.kernel_image.Pointer());
 
 	smp_init_other_cpus();
 	debug_cleanup();
