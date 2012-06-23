@@ -1,7 +1,8 @@
 /*
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2012, Alex Smith, alex@alex-smith.me.uk.
+ * Distributed under the terms of the OpenBeOS License.
+ */
 #ifndef KERNEL_BOOT_ELF_H
 #define KERNEL_BOOT_ELF_H
 
@@ -76,15 +77,11 @@ struct preloaded_elf64_image : public preloaded_image {
 	FixedWidthPointer<Elf64_Sym> debug_symbols;
 } _PACKED;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
-extern status_t boot_elf_resolve_symbol(struct preloaded_elf32_image *image,
-	struct Elf32_Sym *symbol, addr_t *symbolAddress);
+extern status_t boot_elf_resolve_symbol(preloaded_elf32_image* image,
+	struct Elf32_Sym* symbol, Elf32_Addr* symbolAddress);
+extern status_t boot_elf_resolve_symbol(preloaded_elf64_image* image,
+	struct Elf64_Sym* symbol, Elf64_Addr* symbolAddress);
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif	/* KERNEL_BOOT_ELF_H */
