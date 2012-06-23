@@ -1272,7 +1272,7 @@ ShowImageWindow::_ToggleFullScreen()
 		fWindowFrame = Frame();
 		frame = screen.Frame();
 		frame.top -= fBar->Bounds().Height()+1;
-		frame.right += B_V_SCROLL_BAR_WIDTH;
+		frame.right += B_V_SCROLL_BAR_WIDTH-1;
 		frame.bottom += B_H_SCROLL_BAR_HEIGHT;
 		frame.InsetBy(-1, -1); // PEN_SIZE in ShowImageView
 
