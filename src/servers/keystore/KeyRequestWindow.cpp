@@ -18,6 +18,7 @@
 #include <NetworkDevice.h>
 #include <PopUpMenu.h>
 #include <SpaceLayoutItem.h>
+#include <StringView.h>
 #include <TextControl.h>
 #include <View.h>
 
@@ -54,13 +55,19 @@ public:
 		rootLayout->SetSpacing(inset);
 		layout->SetSpacing(inset, inset);
 
-		fKeyringName = new(std::nothrow) BTextControl("Keyring:", "", NULL);
-		if (fKeyringName == NULL)
+		BStringView* label = new(std::nothrow) BStringView("keyringLabel",
+			"Keyring:");
+		if (label == NULL)
 			return;
 
 		int32 row = 0;
-		layout->AddItem(fKeyringName->CreateLabelLayoutItem(), 0, row);
-		layout->AddItem(fKeyringName->CreateTextViewLayoutItem(), 1, row++);
+		layout->AddView(label, 0, row);
+
+		fKeyringName = new(std::nothrow) BStringView("keyringName", "");
+		if (fKeyringName == NULL)
+			return;
+
+		layout->AddView(fKeyringName, 1, row++);
 
 		fPassword = new(std::nothrow) BTextControl("Password:", "", NULL);
 		if (fPassword == NULL)
@@ -118,7 +125,7 @@ public:
 	}
 
 private:
-	BTextControl* fKeyringName;
+	BStringView* fKeyringName;
 	BTextControl* fPassword;
 	BCheckBox* fPersist;
 	BButton* fCancelButton;
