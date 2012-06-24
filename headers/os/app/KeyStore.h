@@ -14,8 +14,6 @@ public:
 								BKeyStore();
 	virtual						~BKeyStore();
 
-// TODO: -> GetNextPassword() - there can always be more than one key
-// with the same identifier/secondaryIdentifier (ie. different username)
 			status_t			GetKey(BKeyType type, const char* identifier,
 									BKey& key);
 			status_t			GetKey(BKeyType type, const char* identifier,
