@@ -52,8 +52,11 @@ public:
 			return;
 
 		BString details;
-		details << "The application\n" << signature << " (" << path << ")\n"
-			<< "requests access to keyring\n" << keyringName << "\n";
+		details << "The application:\n\n"
+			<< signature << " (" << path << ")\n\n"
+			<< "requests access to keyring:\n\n"
+			<< keyringName << "\n\n";
+
 		if (appIsNew)
 			details << "This application hasn't been granted access before.";
 		else if (appWasUpdated) {
@@ -61,10 +64,20 @@ public:
 				<< " granted access.";
 		} else {
 			details << "This application doesn't yet have the required"
-				" priviledges.";
+				" privileges.";
 		}
 
 		message->SetText(details);
+		message->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
+		message->SetFontAndColor(be_plain_font, B_FONT_ALL, &textColor);
+		message->MakeEditable(false);
+		message->MakeSelectable(false);
+		message->SetWordWrap(true);
+
+		message->SetExplicitMinSize(BSize(message->StringWidth(
+				"01234567890123456789012345678901234567890123456789") + inset,
+			B_SIZE_UNSET));
 
 		BGroupView* buttons = new(std::nothrow) BGroupView(B_HORIZONTAL);
 		if (buttons == NULL)
