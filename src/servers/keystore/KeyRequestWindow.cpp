@@ -20,6 +20,7 @@
 #include <SpaceLayoutItem.h>
 #include <StringView.h>
 #include <TextControl.h>
+#include <TextView.h>
 #include <View.h>
 
 #include <new>
@@ -99,6 +100,21 @@ public:
 			new BMessage(kMessageUnlock));
 		buttons->GroupLayout()->AddView(fUnlockButton);
 
+		BTextView* message = new(std::nothrow) BTextView("message");
+		message->SetText("An application wants to access the keyring below, "
+			"but it is locked with a passphrase. Please enter the passphrase "
+			"to unlock the keyring.\n"
+			"If you unlock the keyring, it stays unlocked until the system is "
+			"shut down or the keyring is manually locked again.\n"
+			"If you cancel this dialog the keyring will remain locked.");
+		message->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
+		message->SetFontAndColor(be_plain_font, B_FONT_ALL, &textColor);
+		message->MakeEditable(false);
+		message->MakeSelectable(false);
+		message->SetWordWrap(true);
+
+		rootLayout->AddView(message);
 		rootLayout->AddView(controls);
 		rootLayout->AddView(buttons);
 	}
