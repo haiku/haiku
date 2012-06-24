@@ -63,16 +63,17 @@ const int32 kFPOne = to_fixed_point(1);
 // Used by class Filter 
 class FilterThread {
 public:
-	FilterThread(Filter* filter, int32 i, int32 n, bool runInCurrentThread = false);
+	FilterThread(Filter* filter, int32 i, int32 n,
+		bool runInCurrentThread = false);
 	~FilterThread();
 	
 private:
 	status_t Run();
 	static status_t worker_thread(void* data);
 	
-	Filter* fFilter;
-	int32   fI;
-	int32   fN;
+	Filter*	fFilter;
+	int32	fI;
+	int32	fN;
 };
 
 class Filter {
@@ -142,26 +143,27 @@ private:
 	// Returns the number of active CPUs
 	int32 CPUCount() const { return fCPUCount; }
 
-	BMessenger     fListener;
-	uint32         fWhat;
-	int32          fCPUCount; // the number of active CPUs
-	bool           fStarted; // has Start() been called?
-	sem_id         fWaitForThreads; // to exit
-	int32          fN; // the number of used filter threads
-	volatile int32 fNumberOfThreads; // the current number of FilterThreads
-	volatile bool  fIsRunning; // FilterThreads should process data as long as it is true
-	BBitmap*       fSrcImage;
-	bool           fDestImageInitialized;
-	BBitmap*       fDestImage;		
+	BMessenger		fListener;
+	uint32			fWhat;
+	int32			fCPUCount; // the number of active CPUs
+	bool			fStarted; // has Start() been called?
+	sem_id			fWaitForThreads; // to exit
+	int32			fN; // the number of used filter threads
+	volatile int32	fNumberOfThreads; // the current number of FilterThreads
+	volatile bool	fIsRunning; // FilterThreads should process data as long as it is true
+	BBitmap*		fSrcImage;
+	bool			fDestImageInitialized;
+	BBitmap*		fDestImage;		
 #if TIME_FILTER
-	BStopWatch*    fStopWatch;
+	BStopWatch*		fStopWatch;
 #endif
 };
 
 // Scales and optionally dithers an image
 class Scaler : public Filter {
 public:
-	Scaler(BBitmap* image, BRect rect, BMessenger listener, uint32 what, bool dither);
+	Scaler(BBitmap* image, BRect rect, BMessenger listener, uint32 what,
+		bool dither);
 	~Scaler();
 
 	BBitmap* CreateDestImage(BBitmap* srcImage);
@@ -173,7 +175,9 @@ public:
 private:
 	void ScaleBilinear(int32 fromRow, int32 toRow);
 	void ScaleBilinearFP(int32 fromRow, int32 toRow);
-	inline void RowValues(float* sum, const uchar* srcData, intType srcW, intType fromX, intType toX, const float a0X, const float a1X, const int32 kBPP);
+	inline void RowValues(float* sum, const uchar* srcData, intType srcW,
+					intType fromX, intType toX, const float a0X,
+					const float a1X, const int32 kBPP);
 	void DownScaleBilinear(int32 fromRow, int32 toRow);
 	static inline uchar Limit(intType value);
 	void Dither(int32 fromRow, int32 toRow);
@@ -195,14 +199,16 @@ public:
 		kNumberOfAffineTransformations = 4
 	};
 
-	ImageProcessor(enum operation op, BBitmap* image, BMessenger listener, uint32 what);
+	ImageProcessor(enum operation op, BBitmap* image, BMessenger listener,
+		uint32 what);
 	BBitmap* CreateDestImage(BBitmap* srcImage);
 	int32 GetNumberOfUnits();
 	void Run(int32 i, int32 n);
 	
 private:	
 	int32 BytesPerPixel(color_space cs) const;
-	inline void CopyPixel(uchar* dest, int32 destX, int32 destY, const uchar* src, int32 x, int32 y);
+	inline void CopyPixel(uchar* dest, int32 destX, int32 destY,
+					const uchar* src, int32 x, int32 y);
 	inline void InvertPixel(int32 x, int32 y, uchar* dest, const uchar* src);
 
 	enum operation fOp;

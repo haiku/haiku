@@ -104,20 +104,20 @@ public:
 
 private:
 			enum image_orientation {
-				k0,    // 0
-				k90,   // 1
-				k180,  // 2
-				k270,  // 3
-				k0V,   // 4
-				k90V,  // 5
-				k0H,   // 6
-				k270V, // 7
+				k0,		// 0
+				k90,	// 1
+				k180,	// 2
+				k270,	// 3
+				k0V,	// 4
+				k90V,	// 5
+				k0H,	// 6
+				k270V,	// 7
 				kNumberOfOrientations,
 			};
 
 			void				_SetHasSelection(bool bHasSelection);
 			void				_AnimateSelection(bool a);
-			void				_SendMessageToWindow(BMessage *message);
+			void				_SendMessageToWindow(BMessage* message);
 			void				_SendMessageToWindow(uint32 code);
 			void				_Notify();
 			void				_UpdateStatusText();
