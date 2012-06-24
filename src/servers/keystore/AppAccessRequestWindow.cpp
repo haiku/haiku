@@ -80,7 +80,7 @@ public:
 			new BMessage(kMessageOnce));
 		buttons->GroupLayout()->AddView(fOnceButton);
 
-		fAlwaysButton = new(std::nothrow) BButton("Always Allow",
+		fAlwaysButton = new(std::nothrow) BButton("Allow Always",
 			new BMessage(kMessageAlways));
 		buttons->GroupLayout()->AddView(fAlwaysButton);
 
