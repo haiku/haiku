@@ -140,19 +140,19 @@ int
 show_status(const char* keyring)
 {
 	BKeyStore keyStore;
-	printf("keyring \"%s\" is %saccessible\n", keyring,
-		keyStore.IsKeyringAccessible(keyring) ? "" : "not ");
+	printf("keyring \"%s\" is %slocked\n", keyring,
+		keyStore.IsKeyringUnlocked(keyring) ? "un" : "");
 	return 0;
 }
 
 
 int
-revoke_access(const char* keyring)
+lock_keyring(const char* keyring)
 {
 	BKeyStore keyStore;
-	status_t result = keyStore.RevokeAccess(keyring);
+	status_t result = keyStore.LockKeyring(keyring);
 	if (result != B_OK) {
-		printf("failed to revoke access to keyring \"%s\": %s\n", keyring,
+		printf("failed to lock keyring \"%s\": %s\n", keyring,
 			strerror(result));
 		return 2;
 	}
@@ -222,12 +222,12 @@ print_usage(const char* name)
 	printf("\t\tRemoves the specified keyring.\n\n");
 
 	printf("\t%s status [<keyring>]\n", name);
-	printf("\t\tShows the access status of the specified keyring, or the"
+	printf("\t\tShows the lock state of the specified keyring, or the"
 		" default keyring if none is supplied.\n\n");
 
-	printf("\t%s revoke [<keyring>]\n", name);
-	printf("\t\tRevoke access to the specified keyring, or to the default"
-		" keyring if none is supplied.\n\n");
+	printf("\t%s lock [<keyring>]\n", name);
+	printf("\t\tLock the specified keyring, or the default keyring if none is"
+		" supplied.\n\n");
 
 	printf("\t%s master add <keyring>\n", name);
 	printf("\t\tAdd the access key for the specified keyring to the default"
@@ -333,11 +333,11 @@ main(int argc, char* argv[])
 			return print_usage(argv[0]);
 
 		return show_status(argc == 3 ? argv[2] : "");
-	} else if (strcmp(argv[1], "revoke") == 0) {
+	} else if (strcmp(argv[1], "lock") == 0) {
 		if (argc != 2 && argc != 3)
 			return print_usage(argv[0]);
 
-		return revoke_access(argc == 3 ? argv[2] : "");
+		return lock_keyring(argc == 3 ? argv[2] : "");
 	} else if (strcmp(argv[1], "master") == 0) {
 		if (argc != 4)
 			return print_usage(argv[0]);

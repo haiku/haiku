@@ -49,7 +49,7 @@ private:
 										const BMessage& keyMessage);
 		status_t					_RemoveKeyring(const BString& name);
 
-		status_t					_AccessKeyring(Keyring& keyring);
+		status_t					_UnlockKeyring(Keyring& keyring);
 
 		status_t					_RequestKey(const BString& keyringName,
 										BMessage& keyMessage);

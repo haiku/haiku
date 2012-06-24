@@ -20,9 +20,9 @@ public:
 		status_t					ReadFromMessage(const BMessage& message);
 		status_t					WriteToMessage(BMessage& message);
 
-		status_t					Access(const BMessage& keyMessage);
-		void						RevokeAccess();
-		bool						IsAccessible() const;
+		status_t					Unlock(const BMessage& keyMessage);
+		void						Lock();
+		bool						IsUnlocked() const;
 		const BMessage&				KeyMessage() const;
 
 		status_t					GetNextApplication(uint32& cookie,
@@ -62,7 +62,7 @@ private:
 		BMessage					fData;
 		BMessage					fApplications;
 		BMessage					fKeyMessage;
-		bool						fAccessible;
+		bool						fUnlocked;
 		bool						fModified;
 };
 

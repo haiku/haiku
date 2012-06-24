@@ -10,11 +10,11 @@
 Keyring::Keyring(const char* name, const BMessage* keyMessage)
 	:
 	fName(name),
-	fAccessible(false),
+	fUnlocked(false),
 	fModified(false)
 {
 	if (keyMessage != NULL)
-		Access(*keyMessage);
+		Unlock(*keyMessage);
 }
 
 
@@ -59,7 +59,7 @@ Keyring::WriteToMessage(BMessage& message)
 
 
 status_t
-Keyring::Access(const BMessage& keyMessage)
+Keyring::Unlock(const BMessage& keyMessage)
 {
 	fKeyMessage = keyMessage;
 
@@ -69,15 +69,15 @@ Keyring::Access(const BMessage& keyMessage)
 		return result;
 	}
 
-	fAccessible = true;
+	fUnlocked = true;
 	return B_OK;
 }
 
 
 void
-Keyring::RevokeAccess()
+Keyring::Lock()
 {
-	if (!fAccessible)
+	if (!fUnlocked)
 		return;
 
 	_EncryptToFlatBuffer();
@@ -85,14 +85,14 @@ Keyring::RevokeAccess()
 	fKeyMessage.MakeEmpty();
 	fData.MakeEmpty();
 	fApplications.MakeEmpty();
-	fAccessible = false;
+	fUnlocked = false;
 }
 
 
 bool
-Keyring::IsAccessible() const
+Keyring::IsUnlocked() const
 {
-	return fAccessible;
+	return fUnlocked;
 }
 
 
@@ -131,7 +131,7 @@ status_t
 Keyring::FindApplication(const char* signature, const char* path,
 	BMessage& appMessage)
 {
-	if (!fAccessible)
+	if (!fUnlocked)
 		return B_NOT_ALLOWED;
 
 	int32 count;
@@ -159,7 +159,7 @@ Keyring::FindApplication(const char* signature, const char* path,
 status_t
 Keyring::AddApplication(const char* signature, const BMessage& appMessage)
 {
-	if (!fAccessible)
+	if (!fUnlocked)
 		return B_NOT_ALLOWED;
 
 	status_t result = fApplications.AddMessage(signature, &appMessage);
@@ -174,7 +174,7 @@ Keyring::AddApplication(const char* signature, const BMessage& appMessage)
 status_t
 Keyring::RemoveApplication(const char* signature, const char* path)
 {
-	if (!fAccessible)
+	if (!fUnlocked)
 		return B_NOT_ALLOWED;
 
 	if (path == NULL) {
@@ -216,7 +216,7 @@ status_t
 Keyring::FindKey(const BString& identifier, const BString& secondaryIdentifier,
 	bool secondaryIdentifierOptional, BMessage* _foundKeyMessage) const
 {
-	if (!fAccessible)
+	if (!fUnlocked)
 		return B_NOT_ALLOWED;
 
 	int32 count;
@@ -262,7 +262,7 @@ status_t
 Keyring::FindKey(BKeyType type, BKeyPurpose purpose, uint32 index,
 	BMessage& _foundKeyMessage) const
 {
-	if (!fAccessible)
+	if (!fUnlocked)
 		return B_NOT_ALLOWED;
 
 	for (int32 keyIndex = 0;; keyIndex++) {
@@ -327,7 +327,7 @@ status_t
 Keyring::AddKey(const BString& identifier, const BString& secondaryIdentifier,
 	const BMessage& keyMessage)
 {
-	if (!fAccessible)
+	if (!fUnlocked)
 		return B_NOT_ALLOWED;
 
 	// Check for collisions.
@@ -348,7 +348,7 @@ status_t
 Keyring::RemoveKey(const BString& identifier,
 	const BMessage& keyMessage)
 {
-	if (!fAccessible)
+	if (!fUnlocked)
 		return B_NOT_ALLOWED;
 
 	int32 count;
@@ -397,7 +397,7 @@ Keyring::_EncryptToFlatBuffer()
 	if (!fModified)
 		return B_OK;
 
-	if (!fAccessible)
+	if (!fUnlocked)
 		return B_NOT_ALLOWED;
 
 	BMessage container;

@@ -71,11 +71,11 @@ public:
 			status_t			GetNextMasterKeyring(uint32& cookie,
 									BString& keyring);
 
-			// Access
+			// Locking
 
-			bool				IsKeyringAccessible(const char* keyring);
-			status_t			RevokeAccess(const char* keyring);
-			status_t			RevokeMasterAccess();
+			bool				IsKeyringUnlocked(const char* keyring);
+			status_t			LockKeyring(const char* keyring);
+			status_t			LockMasterKeyring();
 
 			// Applications
 

@@ -41,8 +41,8 @@ static const uint32 kFlagRemoveMasterKey			= 0x0100;
 static const uint32 kFlagAddKeyringsToMaster		= 0x0200;
 static const uint32 kFlagRemoveKeyringsFromMaster	= 0x0400;
 static const uint32 kFlagEnumerateMasterKeyrings	= 0x0800;
-static const uint32 kFlagQueryAccessibility			= 0x1000;
-static const uint32 kFlagRevokeAccess				= 0x2000;
+static const uint32 kFlagQueryLockState				= 0x1000;
+static const uint32 kFlagLockKeyring				= 0x2000;
 static const uint32 kFlagEnumerateApplications		= 0x4000;
 static const uint32 kFlagRemoveApplications			= 0x8000;
 
@@ -50,9 +50,8 @@ static const uint32 kDefaultAppFlags = kFlagGetKey | kFlagEnumerateKeys
 	| kFlagAddKey | kFlagRemoveKey | kFlagAddKeyring | kFlagRemoveKeyring
 	| kFlagEnumerateKeyrings | kFlagSetMasterKey | kFlagRemoveMasterKey
 	| kFlagAddKeyringsToMaster | kFlagRemoveKeyringsFromMaster
-	| kFlagEnumerateMasterKeyrings | kFlagQueryAccessibility
-	| kFlagQueryAccessibility | kFlagRevokeAccess | kFlagEnumerateApplications
-	| kFlagRemoveApplications;
+	| kFlagEnumerateMasterKeyrings | kFlagQueryLockState | kFlagLockKeyring
+	| kFlagEnumerateApplications | kFlagRemoveApplications;
 
 
 KeyStoreServer::KeyStoreServer()
@@ -117,8 +116,8 @@ KeyStoreServer::MessageReceived(BMessage* message)
 		case KEY_STORE_GET_NEXT_KEY:
 		case KEY_STORE_ADD_KEY:
 		case KEY_STORE_REMOVE_KEY:
-		case KEY_STORE_IS_KEYRING_ACCESSIBLE:
-		case KEY_STORE_REVOKE_ACCESS:
+		case KEY_STORE_IS_KEYRING_UNLOCKED:
+		case KEY_STORE_LOCK_KEYRING:
 		case KEY_STORE_ADD_KEYRING_TO_MASTER:
 		case KEY_STORE_REMOVE_KEYRING_FROM_MASTER:
 		case KEY_STORE_GET_NEXT_APPLICATION:
@@ -146,10 +145,10 @@ KeyStoreServer::MessageReceived(BMessage* message)
 				case KEY_STORE_REMOVE_APPLICATION:
 				{
 					// These need keyring access to do anything.
-					while (!keyring->IsAccessible()) {
-						status_t accessResult = _AccessKeyring(*keyring);
-						if (accessResult != B_OK) {
-							result = accessResult;
+					while (!keyring->IsUnlocked()) {
+						status_t unlockResult = _UnlockKeyring(*keyring);
+						if (unlockResult != B_OK) {
+							result = unlockResult;
 							message->what = 0;
 							break;
 						}
@@ -320,16 +319,16 @@ KeyStoreServer::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case KEY_STORE_IS_KEYRING_ACCESSIBLE:
+		case KEY_STORE_IS_KEYRING_UNLOCKED:
 		{
-			reply.AddBool("accessible", keyring->IsAccessible());
+			reply.AddBool("unlocked", keyring->IsUnlocked());
 			result = B_OK;
 			break;
 		}
 
-		case KEY_STORE_REVOKE_ACCESS:
+		case KEY_STORE_LOCK_KEYRING:
 		{
-			keyring->RevokeAccess();
+			keyring->Lock();
 			result = B_OK;
 			break;
 		}
@@ -338,10 +337,10 @@ KeyStoreServer::MessageReceived(BMessage* message)
 		case KEY_STORE_REMOVE_KEYRING_FROM_MASTER:
 		{
 			// We also need access to the default keyring.
-			while (!fDefaultKeyring->IsAccessible()) {
-				status_t accessResult = _AccessKeyring(*fDefaultKeyring);
-				if (accessResult != B_OK) {
-					result = accessResult;
+			while (!fDefaultKeyring->IsUnlocked()) {
+				status_t unlockResult = _UnlockKeyring(*fDefaultKeyring);
+				if (unlockResult != B_OK) {
+					result = unlockResult;
 					message->what = 0;
 					break;
 				}
@@ -528,10 +527,10 @@ KeyStoreServer::_AccessFlagsFor(uint32 command) const
 			return kFlagRemoveKeyringsFromMaster;
 		case KEY_STORE_GET_NEXT_MASTER_KEYRING:
 			return kFlagEnumerateMasterKeyrings;
-		case KEY_STORE_IS_KEYRING_ACCESSIBLE:
-			return kFlagQueryAccessibility;
-		case KEY_STORE_REVOKE_ACCESS:
-			return kFlagRevokeAccess;
+		case KEY_STORE_IS_KEYRING_UNLOCKED:
+			return kFlagQueryLockState;
+		case KEY_STORE_LOCK_KEYRING:
+			return kFlagLockKeyring;
 		case KEY_STORE_GET_NEXT_APPLICATION:
 			return kFlagEnumerateApplications;
 		case KEY_STORE_REMOVE_APPLICATION:
@@ -673,16 +672,16 @@ KeyStoreServer::_RemoveKeyring(const BString& name)
 
 
 status_t
-KeyStoreServer::_AccessKeyring(Keyring& keyring)
+KeyStoreServer::_UnlockKeyring(Keyring& keyring)
 {
 	// If we are accessing a keyring that has been added to master access we
 	// get the key from the default keyring and unlock with that.
 	BMessage keyMessage;
-	if (&keyring != fDefaultKeyring && fDefaultKeyring->IsAccessible()) {
+	if (&keyring != fDefaultKeyring && fDefaultKeyring->IsUnlocked()) {
 		if (fDefaultKeyring->FindKey(kKeyringKeysIdentifier, keyring.Name(),
 				false, &keyMessage) == B_OK) {
-			// We found a key for this keyring, try to access with it.
-			if (keyring.Access(keyMessage) == B_OK)
+			// We found a key for this keyring, try to unlock with it.
+			if (keyring.Unlock(keyMessage) == B_OK)
 				return B_OK;
 		}
 	}
@@ -692,7 +691,7 @@ KeyStoreServer::_AccessKeyring(Keyring& keyring)
 	if (result != B_OK)
 		return result;
 
-	return keyring.Access(keyMessage);
+	return keyring.Unlock(keyMessage);
 }
 
 

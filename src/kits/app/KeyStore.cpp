@@ -291,40 +291,40 @@ BKeyStore::GetNextMasterKeyring(uint32& cookie, BString& keyring)
 }
 
 
-// #pragma mark - Access
+// #pragma mark - Locking
 
 
 bool
-BKeyStore::IsKeyringAccessible(const char* keyring)
+BKeyStore::IsKeyringUnlocked(const char* keyring)
 {
-	BMessage message(KEY_STORE_IS_KEYRING_ACCESSIBLE);
+	BMessage message(KEY_STORE_IS_KEYRING_UNLOCKED);
 	message.AddString("keyring", keyring);
 
 	BMessage reply;
 	if (_SendKeyMessage(message, &reply) != B_OK)
 		return false;
 
-	bool accessible;
-	if (reply.FindBool("accessible", &accessible) != B_OK)
+	bool unlocked;
+	if (reply.FindBool("unlocked", &unlocked) != B_OK)
 		return false;
 
-	return accessible;
+	return unlocked;
 }
 
 
 status_t
-BKeyStore::RevokeAccess(const char* keyring)
+BKeyStore::LockKeyring(const char* keyring)
 {
-	BMessage message(KEY_STORE_REVOKE_ACCESS);
+	BMessage message(KEY_STORE_LOCK_KEYRING);
 	message.AddString("keyring", keyring);
 	return _SendKeyMessage(message, NULL);
 }
 
 
 status_t
-BKeyStore::RevokeMasterAccess()
+BKeyStore::LockMasterKeyring()
 {
-	return RevokeAccess(NULL);
+	return LockKeyring(NULL);
 }
 
 
