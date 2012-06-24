@@ -69,7 +69,7 @@ struct elf_image_info {
 
 #define STRING(image, offset) ((char *)(&(image)->strtab[(offset)]))
 #define SYMNAME(image, sym) STRING(image, (sym)->st_name)
-#define SYMBOL(image, num) ((struct Elf32_Sym *)&(image)->syms[num])
+#define SYMBOL(image, num) (&(image)->syms[num])
 #define HASHTABSIZE(image) ((image)->symhash[0])
 #define HASHBUCKETS(image) ((unsigned int *)&(image)->symhash[2])
 #define HASHCHAINS(image) ((unsigned int *)&(image)->symhash[2+HASHTABSIZE(image)])

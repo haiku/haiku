@@ -16,6 +16,7 @@ local librootOsArchSources =
 ;
 
 BootMergeObject boot_arch_$(TARGET_ARCH).o :
+	arch_elf64.cpp
 	$(kernelArchSources)
 	$(kernelLibArchSources)
 	$(librootOsArchSources)
@@ -28,3 +29,5 @@ SEARCH on [ FGristFiles $(kernelLibArchSources) ]
     = [ FDirName $(HAIKU_TOP) src system kernel lib arch x86 ] ;
 SEARCH on [ FGristFiles $(librootOsArchSources) ]
     = [ FDirName $(HAIKU_TOP) src system libroot os arch x86 ] ;
+SEARCH on [ FGristFiles $(kernelArchSources) ]
+    = [ FDirName $(HAIKU_TOP) src system boot arch x86 ] ;

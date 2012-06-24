@@ -178,4 +178,3 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 	dprintf("arch_elf_relocate_rela: not supported on x86\n");
 	return B_ERROR;
 }
-

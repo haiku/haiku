@@ -19,6 +19,7 @@ local kernelLibArchObjects =
 ;
 
 BootMergeObject boot_arch_$(TARGET_ARCH).o :
+	arch_elf64.cpp
 	$(kernelArchSources)
 	$(kernelLibArchSources)
 	: # additional flags
