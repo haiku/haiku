@@ -1059,7 +1059,7 @@ ShowImageWindow::MessageReceived(BMessage* message)
 				}
 				BRect frame = fToolBarView->Parent()->Bounds();
 				frame.top = fToolBarView->Frame().bottom + 1;
-				fScrollView->MoveTo(0, frame.top);
+				fScrollView->MoveTo(fScrollView->Frame().left, frame.top);
 				fScrollView->ResizeTo(fScrollView->Bounds().Width(),
 					frame.Height() - B_H_SCROLL_BAR_HEIGHT + 1);
 				fVerticalScrollBar->MoveTo(
