@@ -542,6 +542,48 @@ KeyStoreServer::_AccessFlagsFor(uint32 command) const
 }
 
 
+const char*
+KeyStoreServer::_AccessStringFor(uint32 accessFlag) const
+{
+	switch (accessFlag) {
+		case kFlagGetKey:
+			return "Get keys from the keyring.";
+		case kFlagEnumerateKeys:
+			return "Enumerate and get keys from the keyring.";
+		case kFlagAddKey:
+			return "Add keys to the keyring.";
+		case kFlagRemoveKey:
+			return "Remove keys from the keyring.";
+		case kFlagAddKeyring:
+			return "Add new keyrings.";
+		case kFlagRemoveKeyring:
+			return "Remove keyrings.";
+		case kFlagEnumerateKeyrings:
+			return "Enumerate the available keyrings.";
+		case kFlagSetMasterKey:
+			return "Set the master key.";
+		case kFlagRemoveMasterKey:
+			return "Remove the master key.";
+		case kFlagAddKeyringsToMaster:
+			return "Add the keyring key to the master keyring.";
+		case kFlagRemoveKeyringsFromMaster:
+			return "Remove the keyring key from the master keyring.";
+		case kFlagEnumerateMasterKeyrings:
+			return "Enumerate keyrings added to the master keyring.";
+		case kFlagQueryLockState:
+			return "Query the lock state of the keyring.";
+		case kFlagLockKeyring:
+			return "Lock the keyring.";
+		case kFlagEnumerateApplications:
+			return "Enumerate the applications of the keyring.";
+		case kFlagRemoveApplications:
+			return "Remove applications from the keyring.";
+	}
+
+	return NULL;
+}
+
+
 status_t
 KeyStoreServer::_ResolveCallingApp(const BMessage& message,
 	app_info& callingAppInfo) const

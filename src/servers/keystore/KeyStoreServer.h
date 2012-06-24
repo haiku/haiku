@@ -30,6 +30,7 @@ private:
 		status_t					_WriteKeyStoreDatabase();
 
 		uint32						_AccessFlagsFor(uint32 command) const;
+		const char*					_AccessStringFor(uint32 accessFlag) const;
 		status_t					_ResolveCallingApp(const BMessage& message,
 										app_info& callingAppInfo) const;
 
