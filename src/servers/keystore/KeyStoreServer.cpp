@@ -643,7 +643,7 @@ KeyStoreServer::_ValidateAppAccess(Keyring& keyring, const app_info& appInfo,
 
 	appMessage.MakeEmpty();
 	appMessage.AddString("path", path.Path());
-	appMessage.AddUInt32("flags", accessFlags);
+	appMessage.AddUInt32("flags", appFlags | accessFlags);
 	appMessage.AddString("checksum", checksum);
 
 	keyring.RemoveApplication(appInfo.signature, path.Path());
