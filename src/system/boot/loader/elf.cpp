@@ -222,7 +222,7 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 	// inbetween.
 	totalSize = secondRegion->start + secondRegion->size - firstRegion->start;
 	if (totalSize > image->text_region.size + image->data_region.size
-		+ 8 * 1024) {
+		+ 0x200000) {
 		status = B_BAD_DATA;
 		goto error1;
 	}
@@ -543,22 +543,27 @@ elf_init()
 status_t
 elf_load_image(int fd, preloaded_image** _image)
 {
-	status_t status;
+	status_t status = B_ERROR;
 
 	TRACE(("elf_load_image(fd = %d, _image = %p)\n", fd, _image));
 
 #if BOOT_SUPPORT_ELF64
-	status = ELF64Loader::Create(fd, _image);
-	if (status == B_OK) {
-		return ELF64Loader::Load(fd, *_image);
-	} else if (status == B_BAD_TYPE) {
+	if (gKernelArgs.kernel_image == NULL
+		|| gKernelArgs.kernel_image->elf_class == ELFCLASS64) {
+		status = ELF64Loader::Create(fd, _image);
+		if (status == B_OK)
+			return ELF64Loader::Load(fd, *_image);
+		else if (status != B_BAD_TYPE)
+			return status;
+	}
 #endif
+
+	if (gKernelArgs.kernel_image == NULL
+		|| gKernelArgs.kernel_image->elf_class == ELFCLASS32) {
 		status = ELF32Loader::Create(fd, _image);
 		if (status == B_OK)
 			return ELF32Loader::Load(fd, *_image);
-#if BOOT_SUPPORT_ELF64
 	}
-#endif
 
 	return status;
 }
