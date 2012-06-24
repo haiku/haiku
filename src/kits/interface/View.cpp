@@ -4350,31 +4350,12 @@ BView::MessageReceived(BMessage* msg)
 				if (deltaX == 0.0f && deltaY == 0.0f)
 					break;
 
-				float smallStep, largeStep;
 				if (horizontal != NULL) {
-					horizontal->GetSteps(&smallStep, &largeStep);
-
-					// pressing the option/command/control key scrolls faster
-					if (modifiers()
-						& (B_OPTION_KEY | B_COMMAND_KEY | B_CONTROL_KEY)) {
-						deltaX *= largeStep;
-					} else
-						deltaX *= smallStep * 3;
-
-					horizontal->SetValue(horizontal->Value() + deltaX);
+					ScrollWithMouseWheelDelta(horizontal, deltaX);
 				}
 
 				if (vertical != NULL) {
-					vertical->GetSteps(&smallStep, &largeStep);
-
-					// pressing the option/command/control key scrolls faster
-					if (modifiers()
-						& (B_OPTION_KEY | B_COMMAND_KEY | B_CONTROL_KEY)) {
-						deltaY *= largeStep;
-					} else
-						deltaY *= smallStep * 3;
-
-					vertical->SetValue(vertical->Value() + deltaY);
+					ScrollWithMouseWheelDelta(vertical, deltaY);
 				}
 				break;
 			}
@@ -5718,6 +5699,26 @@ BView::_SwitchServerCurrentView() const
 
 		fOwner->fLastViewToken = serverToken;
 	}
+}
+
+
+void
+BView::ScrollWithMouseWheelDelta(BScrollBar* scrollBar, float delta)
+{
+	if (scrollBar == NULL || delta == 0.0f)
+		return;
+
+	float smallStep, largeStep;
+	scrollBar->GetSteps(&smallStep, &largeStep);
+
+	// pressing the option/command/control key scrolls faster
+	if (modifiers()
+			& (B_OPTION_KEY | B_COMMAND_KEY | B_CONTROL_KEY)) {
+		delta *= largeStep;
+	} else
+		delta *= smallStep * 3;
+
+	scrollBar->SetValue(scrollBar->Value() + delta);
 }
 
 
