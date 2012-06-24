@@ -635,9 +635,10 @@ KeyStoreServer::_ValidateAppAccess(Keyring& keyring, const app_info& appInfo,
 	if ((accessFlags & appFlags) == accessFlags)
 		return B_OK;
 
+	const char* accessString = _AccessStringFor(accessFlags);
 	bool allowAlways = false;
 	result = _RequestAppAccess(keyring.Name(), appInfo.signature, path.Path(),
-		appIsNew, appWasUpdated, accessFlags, allowAlways);
+		accessString, appIsNew, appWasUpdated, accessFlags, allowAlways);
 	if (result != B_OK || !allowAlways)
 		return result;
 
@@ -656,12 +657,12 @@ KeyStoreServer::_ValidateAppAccess(Keyring& keyring, const app_info& appInfo,
 
 status_t
 KeyStoreServer::_RequestAppAccess(const BString& keyringName,
-	const char* signature, const char* path, bool appIsNew, bool appWasUpdated,
-	uint32 accessFlags, bool& allowAlways)
+	const char* signature, const char* path, const char* accessString,
+	bool appIsNew, bool appWasUpdated, uint32 accessFlags, bool& allowAlways)
 {
 	AppAccessRequestWindow* requestWindow
 		= new(std::nothrow) AppAccessRequestWindow(keyringName, signature, path,
-			appIsNew, appWasUpdated);
+			accessString, appIsNew, appWasUpdated);
 	if (requestWindow == NULL)
 		return B_NO_MEMORY;
 

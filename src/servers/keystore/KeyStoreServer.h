@@ -40,7 +40,8 @@ private:
 		status_t					_RequestAppAccess(
 										const BString& keyringName,
 										const char* signature,
-										const char* path, bool appIsNew,
+										const char* path,
+										const char* accessString, bool appIsNew,
 										bool appWasUpdated, uint32 accessFlags,
 										bool& allowAlways);
 

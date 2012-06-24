@@ -18,7 +18,8 @@ public:
 									AppAccessRequestWindow(
 										const char* keyringName,
 										const char* signature,
-										const char* path, bool appIsNew,
+										const char* path,
+										const char* accessString, bool appIsNew,
 										bool appWasUpdated);
 virtual								~AppAccessRequestWindow();
 

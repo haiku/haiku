@@ -31,7 +31,8 @@ static const uint32 kMessageAlways = 'btaa';
 class AppAccessRequestView : public BView {
 public:
 	AppAccessRequestView(const char* keyringName, const char* signature,
-		const char* path, bool appIsNew, bool appWasUpdated)
+		const char* path, const char* accessString, bool appIsNew,
+		bool appWasUpdated)
 		:
 		BView("AppAccessRequestView", B_WILL_DRAW)
 	{
@@ -52,10 +53,18 @@ public:
 			return;
 
 		BString details;
-		details << "The application:\n\n"
-			<< signature << " (" << path << ")\n\n"
-			<< "requests access to keyring:\n\n"
-			<< keyringName << "\n\n";
+		details << "The application:\n"
+			<< signature << " (" << path << ")\n\n";
+
+		if (keyringName != NULL) {
+			details << "requests access to keyring:\n"
+				<< keyringName << "\n\n";
+		}
+
+		if (accessString != NULL) {
+			details << "to perform the following action:\n"
+				<< accessString << "\n\n";
+		}
 
 		if (appIsNew)
 			details << "This application hasn't been granted access before.";
@@ -120,7 +129,8 @@ private:
 
 
 AppAccessRequestWindow::AppAccessRequestWindow(const char* keyringName,
-	const char* signature, const char* path, bool appIsNew, bool appWasUpdated)
+	const char* signature, const char* path, const char* accessString,
+	bool appIsNew, bool appWasUpdated)
 	:
 	BWindow(BRect(50, 50, 269, 302), "Application Keyring Access",
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS
@@ -140,7 +150,7 @@ AppAccessRequestWindow::AppAccessRequestWindow(const char* keyringName,
 	SetLayout(layout);
 
 	fRequestView = new(std::nothrow) AppAccessRequestView(keyringName,
-		signature, path, appIsNew, appWasUpdated);
+		signature, path, accessString, appIsNew, appWasUpdated);
 	if (fRequestView == NULL)
 		return;
 
