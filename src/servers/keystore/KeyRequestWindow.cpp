@@ -25,7 +25,7 @@
 
 
 static const uint32 kMessageCancel = 'btcl';
-static const uint32 kMessageOk = 'btok';
+static const uint32 kMessageUnlock = 'btul';
 
 
 class KeyRequestView : public BView {
@@ -88,8 +88,9 @@ public:
 
 		buttons->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
 
-		fOkButton = new(std::nothrow) BButton("OK", new BMessage(kMessageOk));
-		buttons->GroupLayout()->AddView(fOkButton);
+		fUnlockButton = new(std::nothrow) BButton("Unlock",
+			new BMessage(kMessageUnlock));
+		buttons->GroupLayout()->AddView(fUnlockButton);
 
 		rootLayout->AddView(controls);
 		rootLayout->AddView(buttons);
@@ -99,8 +100,8 @@ public:
 	AttachedToWindow()
 	{
 		fCancelButton->SetTarget(Window());
-		fOkButton->SetTarget(Window());
-		fOkButton->MakeDefault(true);
+		fUnlockButton->SetTarget(Window());
+		fUnlockButton->MakeDefault(true);
 	}
 
 	void
@@ -121,20 +122,20 @@ private:
 	BTextControl* fPassword;
 	BCheckBox* fPersist;
 	BButton* fCancelButton;
-	BButton* fOkButton;
+	BButton* fUnlockButton;
 };
 
 
 KeyRequestWindow::KeyRequestWindow()
 	:
-	BWindow(BRect(50, 50, 269, 302), "Access Keyring",
+	BWindow(BRect(50, 50, 269, 302), "Unlock Keyring",
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS
 			| B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fRequestView(NULL),
 	fDoneSem(-1),
 	fResult(B_ERROR)
 {
-	fDoneSem = create_sem(0, "keyring access dialog");
+	fDoneSem = create_sem(0, "keyring unlock dialog");
 	if (fDoneSem < 0)
 		return;
 
@@ -178,8 +179,8 @@ KeyRequestWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMessageCancel:
-		case kMessageOk:
-			fResult = message->what == kMessageOk ? B_OK : B_CANCELED;
+		case kMessageUnlock:
+			fResult = message->what == kMessageUnlock ? B_OK : B_CANCELED;
 			release_sem(fDoneSem);
 			return;
 	}
