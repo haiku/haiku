@@ -121,6 +121,7 @@ public:
 		fCancelButton->SetTarget(Window());
 		fUnlockButton->SetTarget(Window());
 		fUnlockButton->MakeDefault(true);
+		fPassword->MakeFocus();
 	}
 
 	void
