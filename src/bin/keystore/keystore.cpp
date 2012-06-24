@@ -192,6 +192,46 @@ remove_keyring_from_master(const char* keyring)
 
 
 int
+list_applications(const char* keyring)
+{
+	BKeyStore keyStore;
+	uint32 cookie = 0;
+
+	while (true) {
+		BString signature;
+		status_t result = keyStore.GetNextApplication(keyring,
+			cookie, signature);
+		if (result == B_ENTRY_NOT_FOUND)
+			break;
+
+		if (result != B_OK) {
+			printf("failed to get next application: %s\n", strerror(result));
+			return 2;
+		}
+
+		printf("application: \"%s\"\n", signature.String());
+	}
+
+	return 0;
+}
+
+
+int
+remove_application(const char* keyring, const char* signature)
+{
+	BKeyStore keyStore;
+
+	status_t result = keyStore.RemoveApplication(keyring, signature);
+	if (result != B_OK) {
+		printf("failed to remove application: %s\n", strerror(result));
+		return 3;
+	}
+
+	return 0;
+}
+
+
+int
 print_usage(const char* name)
 {
 	printf("usage:\n");
@@ -199,7 +239,10 @@ print_usage(const char* name)
 	printf("\t\tLists all passwords of the specified keyring or from the"
 		" master keyring if none is supplied.\n");
 	printf("\t%s list keyrings\n", name);
-	printf("\t\tLists all keyrings.\n\n");
+	printf("\t\tLists all keyrings.\n");
+	printf("\t%s list applications [<fromKeyring>]\n", name);
+	printf("\t\tLists the applications that have been granted permanent access"
+		" to a keyring once it is unlocked.\n\n");
 
 	printf("\t%s add password <identifier> [<secondaryIdentifier>] <password>"
 		"\n", name);
@@ -216,8 +259,7 @@ print_usage(const char* name)
 
 	printf("\t%s add keyring <name> <password>\n", name);
 	printf("\t\tAdds a new keyring with the specified name, protected by the"
-		" supplied password.\n\n");
-
+		" supplied password.\n");
 	printf("\t%s remove keyring <name>\n", name);
 	printf("\t\tRemoves the specified keyring.\n\n");
 
@@ -236,6 +278,13 @@ print_usage(const char* name)
 	printf("\t%s master remove <keyring>\n", name);
 	printf("\t\tRemove the access key for the specified keyring from the"
 		" master keyring.\n\n");
+
+	printf("\t%s remove application <signature>\n", name);
+	printf("\t\tRemove permanent access for the application with the given"
+		" signature from the master keyring.\n");
+	printf("\t%s remove application from <keyring> <signature>\n", name);
+	printf("\t\tRemove permanent access for the application with the given"
+		" signature from the specified keyring.\n");
 
 	return 1;
 }
@@ -257,6 +306,8 @@ main(int argc, char* argv[])
 			return list_passwords(argc > 3 ? argv[3] : NULL);
 		if (strcmp(argv[2], "keyrings") == 0)
 			return list_keyrings();
+		if (strcmp(argv[2], "applications") == 0)
+			return list_applications(argc > 3 ? argv[3] : NULL);
 	} else if (strcmp(argv[1], "add") == 0) {
 		if (argc < 3)
 			return print_usage(argv[0]);
@@ -327,6 +378,17 @@ main(int argc, char* argv[])
 		} else if (strcmp(argv[2], "keyring") == 0) {
 			if (argc == 4)
 				return remove_keyring(argv[3]);
+		} else if (strcmp(argv[2], "application") == 0) {
+			const char* keyring = NULL;
+			const char* signature = NULL;
+			if (argc == 6 && strcmp(argv[3], "from") == 0) {
+				keyring = argv[4];
+				signature = argv[5];
+			} else if (argc == 4)
+				signature = argv[3];
+
+			if (signature != NULL)
+				return remove_application(keyring, signature);
 		}
 	} else if (strcmp(argv[1], "status") == 0) {
 		if (argc != 2 && argc != 3)
