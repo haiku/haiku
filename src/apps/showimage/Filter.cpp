@@ -23,7 +23,8 @@
 // Implementation of FilterThread
 FilterThread::FilterThread(Filter* filter, int32 i, int32 n,
 	bool runInCurrentThread)
-	: fFilter(filter),
+	:
+	fFilter(filter),
 	fI(i),
 	fN(n)
 {
