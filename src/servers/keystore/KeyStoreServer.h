@@ -54,7 +54,7 @@ private:
 		status_t					_RequestKey(const BString& keyringName,
 										BMessage& keyMessage);
 
-		Keyring*					fDefaultKeyring;
+		Keyring*					fMasterKeyring;
 		KeyringList					fKeyrings;
 		BFile						fKeyStoreFile;
 };

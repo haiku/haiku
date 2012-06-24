@@ -27,6 +27,7 @@
 using namespace BPrivate;
 
 
+static const char* kMasterKeyringName = "Master";
 static const char* kKeyringKeysIdentifier = "Keyrings";
 
 static const uint32 kFlagGetKey						= 0x0001;
@@ -57,7 +58,7 @@ static const uint32 kDefaultAppFlags = kFlagGetKey | kFlagEnumerateKeys
 KeyStoreServer::KeyStoreServer()
 	:
 	BApplication(kKeyStoreServerSignature),
-	fDefaultKeyring(NULL),
+	fMasterKeyring(NULL),
 	fKeyrings(20, true)
 {
 	BPath path;
@@ -82,8 +83,8 @@ KeyStoreServer::KeyStoreServer()
 
 	_ReadKeyStoreDatabase();
 
-	if (fDefaultKeyring == NULL)
-		fDefaultKeyring = new(std::nothrow) Keyring("");
+	if (fMasterKeyring == NULL)
+		fMasterKeyring = new(std::nothrow) Keyring(kMasterKeyringName);
 }
 
 
@@ -303,7 +304,7 @@ KeyStoreServer::MessageReceived(BMessage* message)
 			}
 
 			if (cookie == 0)
-				keyring = fDefaultKeyring;
+				keyring = fMasterKeyring;
 			else
 				keyring = fKeyrings.ItemAt(cookie - 1);
 
@@ -336,9 +337,9 @@ KeyStoreServer::MessageReceived(BMessage* message)
 		case KEY_STORE_ADD_KEYRING_TO_MASTER:
 		case KEY_STORE_REMOVE_KEYRING_FROM_MASTER:
 		{
-			// We also need access to the default keyring.
-			while (!fDefaultKeyring->IsUnlocked()) {
-				status_t unlockResult = _UnlockKeyring(*fDefaultKeyring);
+			// We also need access to the master keyring.
+			while (!fMasterKeyring->IsUnlocked()) {
+				status_t unlockResult = _UnlockKeyring(*fMasterKeyring);
 				if (unlockResult != B_OK) {
 					result = unlockResult;
 					message->what = 0;
@@ -358,12 +359,12 @@ KeyStoreServer::MessageReceived(BMessage* message)
 
 			switch (message->what) {
 				case KEY_STORE_ADD_KEYRING_TO_MASTER:
-					result = fDefaultKeyring->AddKey(kKeyringKeysIdentifier,
+					result = fMasterKeyring->AddKey(kKeyringKeysIdentifier,
 						secondaryIdentifier, keyMessage);
 					break;
 
 				case KEY_STORE_REMOVE_KEYRING_FROM_MASTER:
-					result = fDefaultKeyring->RemoveKey(kKeyringKeysIdentifier,
+					result = fMasterKeyring->RemoveKey(kKeyringKeysIdentifier,
 						keyMessage);
 					break;
 			}
@@ -466,8 +467,8 @@ KeyStoreServer::_ReadKeyStoreDatabase()
 			continue;
 		}
 
-		if (strlen(keyringName) == 0)
-			fDefaultKeyring = keyring;
+		if (strcmp(keyringName, kMasterKeyringName) == 0)
+			fMasterKeyring = keyring;
 		else
 			fKeyrings.BinaryInsert(keyring, &Keyring::Compare);
 	}
@@ -480,8 +481,8 @@ status_t
 KeyStoreServer::_WriteKeyStoreDatabase()
 {
 	BMessage keyrings;
-	if (fDefaultKeyring != NULL)
-		fDefaultKeyring->WriteToMessage(keyrings);
+	if (fMasterKeyring != NULL)
+		fMasterKeyring->WriteToMessage(keyrings);
 
 	for (int32 i = 0; i < fKeyrings.CountItems(); i++) {
 		Keyring* keyring = fKeyrings.ItemAt(i);
@@ -629,8 +630,8 @@ KeyStoreServer::_RequestAppAccess(const BString& keyringName,
 Keyring*
 KeyStoreServer::_FindKeyring(const BString& name)
 {
-	if (name.IsEmpty())
-		return fDefaultKeyring;
+	if (name.IsEmpty() || name == kMasterKeyringName)
+		return fMasterKeyring;
 
 	return fKeyrings.BinarySearchByKey(name, &Keyring::Compare);
 }
@@ -662,8 +663,8 @@ KeyStoreServer::_RemoveKeyring(const BString& name)
 	if (keyring == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	if (keyring == fDefaultKeyring) {
-		// The default keyring can't be removed.
+	if (keyring == fMasterKeyring) {
+		// The master keyring can't be removed.
 		return B_NOT_ALLOWED;
 	}
 
@@ -675,10 +676,10 @@ status_t
 KeyStoreServer::_UnlockKeyring(Keyring& keyring)
 {
 	// If we are accessing a keyring that has been added to master access we
-	// get the key from the default keyring and unlock with that.
+	// get the key from the master keyring and unlock with that.
 	BMessage keyMessage;
-	if (&keyring != fDefaultKeyring && fDefaultKeyring->IsUnlocked()) {
-		if (fDefaultKeyring->FindKey(kKeyringKeysIdentifier, keyring.Name(),
+	if (&keyring != fMasterKeyring && fMasterKeyring->IsUnlocked()) {
+		if (fMasterKeyring->FindKey(kKeyringKeysIdentifier, keyring.Name(),
 				false, &keyMessage) == B_OK) {
 			// We found a key for this keyring, try to unlock with it.
 			if (keyring.Unlock(keyMessage) == B_OK)

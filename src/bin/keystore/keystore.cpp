@@ -196,20 +196,20 @@ print_usage(const char* name)
 {
 	printf("usage:\n");
 	printf("\t%s list passwords [<fromKeyring>]\n", name);
-	printf("\t\tLists all accessible passwords from the specified keyring or"
-		" from the default keyring if none is supplied.\n");
+	printf("\t\tLists all passwords of the specified keyring or from the"
+		" master keyring if none is supplied.\n");
 	printf("\t%s list keyrings\n", name);
-	printf("\t\tLists all accessible keyrings.\n\n");
+	printf("\t\tLists all keyrings.\n\n");
 
 	printf("\t%s add password <identifier> [<secondaryIdentifier>] <password>"
 		"\n", name);
-	printf("\t\tAdds the specified password to the default keyring.\n");
+	printf("\t\tAdds the specified password to the master keyring.\n");
 	printf("\t%s add password to <keyring> <identifier> [<secondaryIdentifier>]"
 		" <password>\n", name);
 	printf("\t\tAdds the specified password to the specified keyring.\n\n");
 
 	printf("\t%s remove password <identifier> [<secondaryIdentifier>]\n", name);
-	printf("\t\tRemoves the specified password from the default keyring.\n");
+	printf("\t\tRemoves the specified password from the master keyring.\n");
 	printf("\t%s remove password from <keyring> <identifier>"
 		" [<secondaryIdentifier>]\n", name);
 	printf("\t\tRemoves the specified password from the specified keyring.\n\n");
@@ -223,19 +223,19 @@ print_usage(const char* name)
 
 	printf("\t%s status [<keyring>]\n", name);
 	printf("\t\tShows the lock state of the specified keyring, or the"
-		" default keyring if none is supplied.\n\n");
+		" master keyring if none is supplied.\n\n");
 
 	printf("\t%s lock [<keyring>]\n", name);
-	printf("\t\tLock the specified keyring, or the default keyring if none is"
+	printf("\t\tLock the specified keyring, or the master keyring if none is"
 		" supplied.\n\n");
 
 	printf("\t%s master add <keyring>\n", name);
-	printf("\t\tAdd the access key for the specified keyring to the default"
+	printf("\t\tAdd the access key for the specified keyring to the master"
 		" keyring.\n");
 
 	printf("\t%s master remove <keyring>\n", name);
 	printf("\t\tRemove the access key for the specified keyring from the"
-		" default keyring.\n");
+		" master keyring.\n\n");
 
 	return 1;
 }
