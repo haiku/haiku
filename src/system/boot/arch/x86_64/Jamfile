@@ -2,6 +2,10 @@ SubDir HAIKU_TOP src system boot arch x86_64 ;
 
 DEFINES += _BOOT_MODE ;
 
+local bootArchSources =
+	arch_elf64.cpp
+;
+
 local kernelArchSources =
 	arch_elf.cpp
 	cpuid.S
@@ -16,18 +20,18 @@ local librootOsArchSources =
 ;
 
 BootMergeObject boot_arch_$(TARGET_ARCH).o :
-	arch_elf64.cpp
+	$(bootArchSources)
 	$(kernelArchSources)
 	$(kernelLibArchSources)
 	$(librootOsArchSources)
 	: # additional flags
 ;
 
+SEARCH on [ FGristFiles $(bootArchSources) ]
+    = [ FDirName $(HAIKU_TOP) src system boot arch x86 ] ;
 SEARCH on [ FGristFiles $(kernelArchSources) ]
     = [ FDirName $(HAIKU_TOP) src system kernel arch x86 ] ;
 SEARCH on [ FGristFiles $(kernelLibArchSources) ]
     = [ FDirName $(HAIKU_TOP) src system kernel lib arch x86 ] ;
 SEARCH on [ FGristFiles $(librootOsArchSources) ]
     = [ FDirName $(HAIKU_TOP) src system libroot os arch x86 ] ;
-SEARCH on [ FGristFiles $(kernelArchSources) ]
-    = [ FDirName $(HAIKU_TOP) src system boot arch x86 ] ;

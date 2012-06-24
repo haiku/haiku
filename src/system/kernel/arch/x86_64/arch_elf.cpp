@@ -136,31 +136,36 @@ boot_arch_elf_relocate_rela(preloaded_elf64_image* image, Elf64_Rela* rel,
 		}
 
 		// Address of the relocation.
-		Elf64_Addr* resolveAddr = (Elf64_Addr *)(image->text_region.delta
-			+ rel[i].r_offset);
+		Elf64_Addr relocAddr = image->text_region.delta + rel[i].r_offset;
 
-		// Perform the relocation.
+		// Calculate the relocation value.
+		Elf64_Addr relocValue;
 		switch(type) {
 			case R_X86_64_NONE:
-				break;
+				continue;
 			case R_X86_64_64:
-				*resolveAddr = symAddr + rel[i].r_addend;
+				relocValue = symAddr + rel[i].r_addend;
 				break;
 			case R_X86_64_PC32:
-				*resolveAddr = symAddr + rel[i].r_addend - rel[i].r_offset;
+				relocValue = symAddr + rel[i].r_addend - rel[i].r_offset;
 				break;
 			case R_X86_64_GLOB_DAT:
 			case R_X86_64_JUMP_SLOT:
-				*resolveAddr = symAddr + rel[i].r_addend;
+				relocValue = symAddr + rel[i].r_addend;
 				break;
 			case R_X86_64_RELATIVE:
-				*resolveAddr = image->text_region.delta + rel[i].r_addend;
+				relocValue = image->text_region.delta + rel[i].r_addend;
 				break;
 			default:
 				dprintf("arch_elf_relocate_rel: unhandled relocation type %d\n",
 					type);
 				return B_BAD_DATA;
 		}
+#ifdef _BOOT_MODE
+		boot_elf_set_relocation(image, relocAddr, relocValue);
+#else
+		*(Elf64_Addr *)relocAddr = relocValue;
+#endif
 	}
 
 	return B_OK;

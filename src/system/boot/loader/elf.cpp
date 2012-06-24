@@ -38,6 +38,7 @@ class ELFLoader {
 private:
 	typedef typename Class::ImageType	ImageType;
 	typedef typename Class::RegionType	RegionType;
+	typedef typename Class::AddrType	AddrType;
 	typedef typename Class::EhdrType	EhdrType;
 	typedef typename Class::PhdrType	PhdrType;
 	typedef typename Class::ShdrType	ShdrType;
@@ -53,7 +54,7 @@ public:
 
 private:
 	static	status_t	_LoadSymbolTable(int fd, ImageType* image);
-	static	status_t	_ParseDynamicSection(ImageType* image);
+	static	status_t	_ParseDynamicSection(ImageType* image, AddrType delta);
 };
 
 
@@ -62,6 +63,7 @@ struct ELF32Class {
 
 	typedef preloaded_elf32_image	ImageType;
 	typedef elf32_region			RegionType;
+	typedef Elf32_Addr				AddrType;
 	typedef Elf32_Ehdr				EhdrType;
 	typedef Elf32_Phdr				PhdrType;
 	typedef Elf32_Shdr				ShdrType;
@@ -80,6 +82,7 @@ struct ELF64Class {
 
 	typedef preloaded_elf64_image	ImageType;
 	typedef elf64_region			RegionType;
+	typedef Elf64_Addr				AddrType;
 	typedef Elf64_Ehdr				EhdrType;
 	typedef Elf64_Phdr				PhdrType;
 	typedef Elf64_Shdr				ShdrType;
@@ -132,6 +135,7 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 	size_t totalSize;
 	ssize_t length;
 	status_t status;
+	void* mappedRegion = NULL;
 
 	ImageType* image = static_cast<ImageType*>(_image);
 	EhdrType& elfHeader = image->elf_header;
@@ -196,8 +200,9 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 			B_PAGE_SIZE);
 		region->delta = -region->start;
 
-		TRACE(("segment %ld: start = 0x%lx, size = %lu, delta = %lx\n", i,
-			region->start, region->size, region->delta));
+		TRACE(("segment %ld: start = 0x%llx, size = %llu, delta = %llx\n", i,
+			(uint64)region->start, (uint64)region->size,
+			(int64)(AddrType)region->delta));
 	}
 
 	// found both, text and data?
@@ -228,10 +233,10 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 	}
 
 	// The kernel and the modules are relocatable, thus
-	// platform_allocate_region() can automatically allocate an address,
+	// platform_allocate_elf_region() can automatically allocate an address,
 	// but shall prefer the specified base address.
-	if (platform_allocate_region((void **)&firstRegion->start, totalSize,
-			B_READ_AREA | B_WRITE_AREA, false) < B_OK) {
+	if (platform_allocate_elf_region(&firstRegion->start, totalSize,
+			B_READ_AREA | B_WRITE_AREA, &mappedRegion) < B_OK) {
 		status = B_NO_MEMORY;
 		goto error1;
 	}
@@ -241,6 +246,16 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 
 	image->data_region.delta += image->data_region.start;
 	image->text_region.delta += image->text_region.start;
+
+	TRACE(("text: start 0x%llx, size 0x%llx, delta 0x%llx\n",
+		(uint64)image->text_region.start, (uint64)image->text_region.size,
+		(int64)(AddrType)image->text_region.delta));
+	TRACE(("data: start 0x%llx, size 0x%llx, delta 0x%llx\n",
+		(uint64)image->data_region.start, (uint64)image->data_region.size,
+		(int64)(AddrType)image->data_region.delta));
+
+	// Calculate the delta from a real load address to the mapped address
+	image->mapped_delta = (AddrType)(addr_t)mappedRegion - firstRegion->start;
 
 	// load program data
 
@@ -258,10 +273,14 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 		else
 			continue;
 
-		TRACE(("load segment %d (%ld bytes)...\n", i, header.p_filesz));
+		// Calculate where to load the data to.
+		addr_t dest = region->start + image->mapped_delta;
+
+		TRACE(("load segment %ld (%llu bytes) mapped at 0x%lx...\n", i,
+			(uint64)header.p_filesz, dest));
 
 		length = read_pos(fd, header.p_offset,
-			(void*)(region->start + (header.p_vaddr % B_PAGE_SIZE)),
+			(void*)(dest + (header.p_vaddr % B_PAGE_SIZE)),
 			header.p_filesz);
 		if (length < (ssize_t)header.p_filesz) {
 			status = B_BAD_DATA;
@@ -274,7 +293,7 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 
 		uint32 offset = (header.p_vaddr % B_PAGE_SIZE) + header.p_filesz;
 		if (offset < region->size)
-			memset((void*)(region->start + offset), 0, region->size - offset);
+			memset((void*)(dest + offset), 0, region->size - offset);
 	}
 
 	// offset dynamic section, and program entry addresses by the delta of the
@@ -294,8 +313,8 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 	return B_OK;
 
 error2:
-	if (image->text_region.start != 0)
-		platform_free_region((void*)image->text_region.start, totalSize);
+	if (mappedRegion != NULL)
+		platform_free_region(mappedRegion, totalSize);
 error1:
 	free(programHeaders);
 	kernel_args_free(image);
@@ -310,13 +329,16 @@ ELFLoader<Class>::Relocate(preloaded_image* _image)
 {
 	ImageType* image = static_cast<ImageType*>(_image);
 
-	status_t status = _ParseDynamicSection(image);
+	// Pull information out of the dynamic section. First pass through we set
+	// the addresses we want in our address space.
+	status_t status = _ParseDynamicSection(image, image->mapped_delta);
 	if (status != B_OK)
 		return status;
 
 	// deal with the rels first
 	if (image->rel) {
-		TRACE(("total %i relocs\n", image->rel_len / (int)sizeof(RelType)));
+		TRACE(("total %i relocs\n",
+			(int)image->rel_len / (int)sizeof(RelType)));
 
 		status = boot_arch_elf_relocate_rel(image, image->rel, image->rel_len);
 		if (status < B_OK)
@@ -324,15 +346,18 @@ ELFLoader<Class>::Relocate(preloaded_image* _image)
 	}
 
 	if (image->pltrel) {
-		TRACE(("total %i plt-relocs\n",
-			image->pltrel_len / (int)sizeof(RelType)));
-
 		RelType* pltrel = image->pltrel;
 		if (image->pltrel_type == DT_REL) {
+			TRACE(("total %i plt-relocs\n",
+				(int)image->pltrel_len / (int)sizeof(RelType)));
+
 			status = boot_arch_elf_relocate_rel(image, pltrel,
 				image->pltrel_len);
 		} else {
-			status = boot_arch_elf_relocate_rela(image, (RelaType *)pltrel,
+			TRACE(("total %i plt-relocs\n",
+				(int)image->pltrel_len / (int)sizeof(RelaType)));
+
+			status = boot_arch_elf_relocate_rela(image, (RelaType*)pltrel,
 				image->pltrel_len);
 		}
 		if (status < B_OK)
@@ -341,12 +366,16 @@ ELFLoader<Class>::Relocate(preloaded_image* _image)
 
 	if (image->rela) {
 		TRACE(("total %i rela relocs\n",
-			image->rela_len / (int)sizeof(RelaType)));
+			(int)image->rela_len / (int)sizeof(RelaType)));
 		status = boot_arch_elf_relocate_rela(image, image->rela,
 			image->rela_len);
 		if (status < B_OK)
 			return status;
 	}
+
+	// Make a second pass through the dynamic section, storing the correct
+	// virtual addresses for the kernel.
+	_ParseDynamicSection(image, 0);
 
 	return B_OK;
 }
@@ -458,7 +487,7 @@ error1:
 
 template<typename Class>
 /*static*/ status_t
-ELFLoader<Class>::_ParseDynamicSection(ImageType* image)
+ELFLoader<Class>::_ParseDynamicSection(ImageType* image, AddrType delta)
 {
 	image->syms = 0;
 	image->rel = 0;
@@ -469,9 +498,11 @@ ELFLoader<Class>::_ParseDynamicSection(ImageType* image)
 	image->pltrel_len = 0;
 	image->pltrel_type = 0;
 
-	DynType* d = (DynType*)image->dynamic_section.start;
-	if (!d)
+	if(image->dynamic_section.start == 0)
 		return B_ERROR;
+
+	DynType* d = (DynType*)(addr_t)(image->dynamic_section.start
+		+ image->mapped_delta);
 
 	for (int i = 0; d[i].d_tag != DT_NULL; i++) {
 		switch (d[i].d_tag) {
@@ -480,25 +511,25 @@ ELFLoader<Class>::_ParseDynamicSection(ImageType* image)
 				break;
 			case DT_SYMTAB:
 				image->syms = (SymType*)(d[i].d_un.d_ptr
-					+ image->text_region.delta);
+					+ image->text_region.delta + delta);
 				break;
 			case DT_REL:
 				image->rel = (RelType*)(d[i].d_un.d_ptr
-					+ image->text_region.delta);
+					+ image->text_region.delta + delta);
 				break;
 			case DT_RELSZ:
 				image->rel_len = d[i].d_un.d_val;
 				break;
 			case DT_RELA:
 				image->rela = (RelaType*)(d[i].d_un.d_ptr
-					+ image->text_region.delta);
+					+ image->text_region.delta + delta);
 				break;
 			case DT_RELASZ:
 				image->rela_len = d[i].d_un.d_val;
 				break;
 			case DT_JMPREL:
 				image->pltrel = (RelType*)(d[i].d_un.d_ptr
-					+ image->text_region.delta);
+					+ image->text_region.delta  + delta);
 				break;
 			case DT_PLTRELSZ:
 				image->pltrel_len = d[i].d_un.d_val;

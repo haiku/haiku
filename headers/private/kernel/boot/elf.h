@@ -1,7 +1,7 @@
 /*
  * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2012, Alex Smith, alex@alex-smith.me.uk.
- * Distributed under the terms of the OpenBeOS License.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef KERNEL_BOOT_ELF_H
 #define KERNEL_BOOT_ELF_H
@@ -44,9 +44,10 @@ struct preloaded_image {
 } _PACKED;
 
 struct preloaded_elf32_image : public preloaded_image {
-	Elf32_Ehdr elf_header;
+	Elf32_Ehdr	elf_header;
 	elf32_region text_region;
 	elf32_region data_region;
+	uint32		mapped_delta;
 
 	FixedWidthPointer<Elf32_Sym> syms;
 	FixedWidthPointer<Elf32_Rel> rel;
@@ -61,9 +62,10 @@ struct preloaded_elf32_image : public preloaded_image {
 } _PACKED;
 
 struct preloaded_elf64_image : public preloaded_image {
-	Elf64_Ehdr elf_header;
+	Elf64_Ehdr	elf_header;
 	elf64_region text_region;
 	elf64_region data_region;
+	uint64		mapped_delta;
 
 	FixedWidthPointer<Elf64_Sym> syms;
 	FixedWidthPointer<Elf64_Rel> rel;
@@ -77,11 +79,23 @@ struct preloaded_elf64_image : public preloaded_image {
 	FixedWidthPointer<Elf64_Sym> debug_symbols;
 } _PACKED;
 
-
+#ifdef _BOOT_MODE
 extern status_t boot_elf_resolve_symbol(preloaded_elf32_image* image,
 	struct Elf32_Sym* symbol, Elf32_Addr* symbolAddress);
 extern status_t boot_elf_resolve_symbol(preloaded_elf64_image* image,
 	struct Elf64_Sym* symbol, Elf64_Addr* symbolAddress);
 
+
+// Helper method to set a relocation at the mapped address in the loader's
+// address space.
+template<typename ImageType, typename AddrType>
+inline void
+boot_elf_set_relocation(ImageType* image, AddrType resolveAddress,
+	AddrType finalAddress)
+{
+	AddrType* dest = (AddrType*)(addr_t)(resolveAddress + image->mapped_delta);
+	*dest = finalAddress;
+}
+#endif
 
 #endif	/* KERNEL_BOOT_ELF_H */

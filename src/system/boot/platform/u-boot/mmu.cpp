@@ -681,6 +681,24 @@ platform_free_region(void *address, size_t size)
 }
 
 
+status_t
+platform_allocate_elf_region(uint32 *_address, uint32 size, uint8 protection,
+	void **_mappedAddress)
+{
+#ifdef __ARM__
+	void *address = mmu_allocate((void *)*_address, size);
+	if (address == NULL)
+		return B_NO_MEMORY;
+
+	*_address = (uint32)address;
+	*_mappedAddress = address;
+	return B_OK;
+#else
+	return B_ERROR;
+#endif
+}
+
+
 void
 platform_release_heap(struct stage2_args *args, void *base)
 {
