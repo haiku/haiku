@@ -333,24 +333,18 @@ BKeyStore::LockMasterKeyring()
 
 
 status_t
-BKeyStore::GetNextApplication(const BKey& key, uint32& cookie,
-	BString& signature) const
+BKeyStore::GetNextApplication(uint32& cookie, BString& signature) const
 {
-	return GetNextApplication(NULL, key, cookie, signature);
+	return GetNextApplication(NULL, cookie, signature);
 }
 
 
 status_t
-BKeyStore::GetNextApplication(const char* keyring, const BKey& key,
-	uint32& cookie, BString& signature) const
+BKeyStore::GetNextApplication(const char* keyring, uint32& cookie,
+	BString& signature) const
 {
-	BMessage keyMessage;
-	if (key.Flatten(keyMessage) != B_OK)
-		return B_BAD_VALUE;
-
 	BMessage message(KEY_STORE_GET_NEXT_APPLICATION);
 	message.AddString("keyring", keyring);
-	message.AddMessage("key", &keyMessage);
 	message.AddUInt32("cookie", cookie);
 
 	BMessage reply;
@@ -367,23 +361,17 @@ BKeyStore::GetNextApplication(const char* keyring, const BKey& key,
 
 
 status_t
-BKeyStore::RemoveApplication(const BKey& key, const char* signature)
+BKeyStore::RemoveApplication(const char* signature)
 {
-	return RemoveApplication(NULL, key, signature);
+	return RemoveApplication(NULL, signature);
 }
 
 
 status_t
-BKeyStore::RemoveApplication(const char* keyring, const BKey& key,
-	const char* signature)
+BKeyStore::RemoveApplication(const char* keyring, const char* signature)
 {
-	BMessage keyMessage;
-	if (key.Flatten(keyMessage) != B_OK)
-		return B_BAD_VALUE;
-
 	BMessage message(KEY_STORE_REMOVE_APPLICATION);
 	message.AddString("keyring", keyring);
-	message.AddMessage("key", &keyMessage);
 	message.AddString("signature", signature);
 
 	return _SendKeyMessage(message, NULL);
