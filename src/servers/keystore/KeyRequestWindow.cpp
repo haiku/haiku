@@ -82,10 +82,6 @@ public:
 		layout->AddItem(fPassword->CreateLabelLayoutItem(), 0, row);
 		layout->AddItem(layoutItem, 1, row++);
 
-		fPersist = new(std::nothrow) BCheckBox("Not yet");
-		layout->AddItem(BSpaceLayoutItem::CreateGlue(), 0, row);
-		layout->AddView(fPersist, 1, row++);
-
 		BGroupView* buttons = new(std::nothrow) BGroupView(B_HORIZONTAL);
 		if (buttons == NULL)
 			return;
@@ -143,7 +139,6 @@ public:
 private:
 	BStringView* fKeyringName;
 	BTextControl* fPassword;
-	BCheckBox* fPersist;
 	BButton* fCancelButton;
 	BButton* fUnlockButton;
 };
