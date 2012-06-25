@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2025, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef BLOCK_ALLOCATOR_H
@@ -30,6 +30,10 @@ public:
 			status_t		InitializeAndClearBitmap(Transaction& transaction);
 
 			void			Uninitialize();
+
+			void			SetAllowedRange(off_t beginBlock, off_t endBlock);
+			bool			IsCompletelyInsideAllowedRange(block_run run) const;
+			bool			IsCompletelyOutsideAllowedRange(block_run run) const;
 
 			status_t		AllocateForInode(Transaction& transaction,
 								const block_run* parent, mode_t type,
@@ -83,6 +87,9 @@ private:
 			int32			fNumGroups;
 			uint32			fBlocksPerGroup;
 			uint32			fNumBitmapBlocks;
+
+			off_t			fAllowedBeginBlock;
+			off_t			fAllowedEndBlock;
 };
 
 #ifdef BFS_DEBUGGER_COMMANDS
