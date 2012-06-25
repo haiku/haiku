@@ -438,6 +438,9 @@ KeyStoreServer::MessageReceived(BMessage* message)
 				path = NULL;
 
 			result = keyring->RemoveApplication(signature, path);
+			if (result == B_OK)
+				_WriteKeyStoreDatabase();
+
 			break;
 		}
 
