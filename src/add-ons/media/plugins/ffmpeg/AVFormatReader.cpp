@@ -17,10 +17,13 @@
 #include <DataIO.h>
 #include <MediaDefs.h>
 #include <MediaFormats.h>
+#include <InterfaceDefs.h>
+#include <String.h>
 
 extern "C" {
 	#include "avcodec.h"
 	#include "avformat.h"
+	#include "dict.h"
 }
 
 #include "DemuxerTable.h"
@@ -1478,12 +1481,14 @@ AVFormatReader::~AVFormatReader()
 const char*
 AVFormatReader::Copyright()
 {
-// TODO: Could not find the equivalent in libavformat >= version 53.
-// Use metadata API instead!
-//	if (fStreams != NULL && fStreams[0] != NULL)
-//		return fStreams[0]->Context()->copyright;
-	// TODO: Return copyright of the file instead!
-	return "Copyright 2009, Stephan Aßmus";
+	BMessage* message = new BMessage();
+	if (GetMetaData(message) == B_OK) {
+		const char* copyright;
+		if (message->FindString("copyright", &copyright) == B_OK)
+			return copyright;
+	}
+	delete message;
+	return "";
 }
 
 
@@ -1638,9 +1643,9 @@ AVFormatReader::GetMetaData(BMessage* _data)
 
 	// Add program info
 	for (unsigned i = 0; i < context->nb_programs; i++) {
-		BMessage progamData;
-		avdictionary_to_message(context->programs[i]->metadata, &progamData);
-		_data->AddMessage("be:program", &progamData);
+		BMessage programData;
+		avdictionary_to_message(context->programs[i]->metadata, &programData);
+		_data->AddMessage("be:program", &programData);
 	}
 
 	return B_OK;
