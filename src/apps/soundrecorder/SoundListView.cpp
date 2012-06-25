@@ -34,12 +34,11 @@ void
 SoundListView::Draw(BRect updateRect)
 {
 	if (IsEmpty()) {
-		SetHighColor(235,235,235);
-		FillRect(Bounds());
+		SetLowColor(ViewColor());
+		FillRect(Bounds(), B_SOLID_LOW);
 
-		SetHighColor(0,0,0);
+		SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 		BFont font(be_bold_font);
-		font.SetSize(12.0);
 		SetFont(&font);
 		font_height height;
 		font.GetHeight(&height);
@@ -58,7 +57,8 @@ void
 SoundListView::AttachedToWindow()
 {
 	BListView::AttachedToWindow();
-	SetViewColor(255,255,255);
+	SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+		B_LIGHTEN_1_TINT));
 }
 
 
