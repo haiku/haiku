@@ -9,6 +9,7 @@
 
 Keyring::Keyring()
 	:
+	fHasUnlockKey(false),
 	fUnlocked(false),
 	fModified(false)
 {
@@ -18,6 +19,7 @@ Keyring::Keyring()
 Keyring::Keyring(const char* name)
 	:
 	fName(name),
+	fHasUnlockKey(false),
 	fUnlocked(false),
 	fModified(false)
 {
@@ -33,6 +35,10 @@ status_t
 Keyring::ReadFromMessage(const BMessage& message)
 {
 	status_t result = message.FindString("name", &fName);
+	if (result != B_OK)
+		return result;
+
+	result = message.FindBool("hasUnlockKey", &fHasUnlockKey);
 	if (result != B_OK)
 		return result;
 
@@ -68,18 +74,29 @@ Keyring::WriteToMessage(BMessage& message)
 	if (result != B_OK)
 		return result;
 
+	result = message.AddBool("hasUnlockKey", fHasUnlockKey);
+	if (result != B_OK)
+		return result;
+
 	return message.AddString("name", fName);
 }
 
 
 status_t
-Keyring::Unlock(const BMessage& keyMessage)
+Keyring::Unlock(const BMessage* keyMessage)
 {
-	fKeyMessage = keyMessage;
+	if (fUnlocked)
+		return B_OK;
+
+	if (fHasUnlockKey == (keyMessage == NULL))
+		return B_BAD_VALUE;
+
+	if (keyMessage != NULL)
+		fUnlockKey = *keyMessage;
 
 	status_t result = _DecryptFromFlatBuffer();
 	if (result != B_OK) {
-		fKeyMessage.MakeEmpty();
+		fUnlockKey.MakeEmpty();
 		return result;
 	}
 
@@ -96,7 +113,7 @@ Keyring::Lock()
 
 	_EncryptToFlatBuffer();
 
-	fKeyMessage.MakeEmpty();
+	fUnlockKey.MakeEmpty();
 	fData.MakeEmpty();
 	fApplications.MakeEmpty();
 	fUnlocked = false;
@@ -110,10 +127,43 @@ Keyring::IsUnlocked() const
 }
 
 
-const BMessage&
-Keyring::KeyMessage() const
+bool
+Keyring::HasUnlockKey() const
 {
-	return fKeyMessage;
+	return fHasUnlockKey;
+}
+
+
+const BMessage&
+Keyring::UnlockKey() const
+{
+	return fUnlockKey;
+}
+
+
+status_t
+Keyring::SetUnlockKey(const BMessage& keyMessage)
+{
+	if (!fUnlocked)
+		return B_NOT_ALLOWED;
+
+	fHasUnlockKey = true;
+	fUnlockKey = keyMessage;
+	fModified = true;
+	return B_OK;
+}
+
+
+status_t
+Keyring::RemoveUnlockKey()
+{
+	if (!fUnlocked)
+		return B_NOT_ALLOWED;
+
+	fUnlockKey.MakeEmpty();
+	fHasUnlockKey = false;
+	fModified = true;
+	return B_OK;
 }
 
 
@@ -430,7 +480,9 @@ Keyring::_EncryptToFlatBuffer()
 	if (result != B_OK)
 		return result;
 
-	// TODO: Actually encrypt the flat buffer...
+	if (fHasUnlockKey) {
+		// TODO: Actually encrypt the flat buffer...
+	}
 
 	fModified = false;
 	return B_OK;
@@ -443,7 +495,9 @@ Keyring::_DecryptFromFlatBuffer()
 	if (fFlatBuffer.BufferLength() == 0)
 		return B_OK;
 
-	// TODO: Actually decrypt the flat buffer...
+	if (fHasUnlockKey) {
+		// TODO: Actually decrypt the flat buffer...
+	}
 
 	BMessage container;
 	fFlatBuffer.Seek(0, SEEK_SET);

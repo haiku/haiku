@@ -20,10 +20,15 @@ public:
 		status_t					ReadFromMessage(const BMessage& message);
 		status_t					WriteToMessage(BMessage& message);
 
-		status_t					Unlock(const BMessage& keyMessage);
+		status_t					Unlock(const BMessage* keyMessage);
 		void						Lock();
 		bool						IsUnlocked() const;
-		const BMessage&				KeyMessage() const;
+
+		bool						HasUnlockKey() const;
+		const BMessage&				UnlockKey() const;
+
+		status_t					SetUnlockKey(const BMessage& keyMessage);
+		status_t					RemoveUnlockKey();
 
 		status_t					GetNextApplication(uint32& cookie,
 										BString& signature, BString& path);
@@ -61,7 +66,8 @@ private:
 		BMallocIO					fFlatBuffer;
 		BMessage					fData;
 		BMessage					fApplications;
-		BMessage					fKeyMessage;
+		BMessage					fUnlockKey;
+		bool						fHasUnlockKey;
 		bool						fUnlocked;
 		bool						fModified;
 };

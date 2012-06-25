@@ -350,7 +350,7 @@ KeyStoreServer::MessageReceived(BMessage* message)
 				break;
 
 			BString secondaryIdentifier = keyring->Name();
-			BMessage keyMessage = keyring->KeyMessage();
+			BMessage keyMessage = keyring->UnlockKey();
 			keyMessage.RemoveName("identifier");
 			keyMessage.AddString("identifier", kKeyringKeysIdentifier);
 			keyMessage.RemoveName("secondaryIdentifier");
@@ -720,6 +720,9 @@ KeyStoreServer::_RemoveKeyring(const BString& name)
 status_t
 KeyStoreServer::_UnlockKeyring(Keyring& keyring)
 {
+	if (!keyring.HasUnlockKey())
+		return keyring.Unlock(NULL);
+
 	// If we are accessing a keyring that has been added to master access we
 	// get the key from the master keyring and unlock with that.
 	BMessage keyMessage;
@@ -727,7 +730,7 @@ KeyStoreServer::_UnlockKeyring(Keyring& keyring)
 		if (fMasterKeyring->FindKey(kKeyringKeysIdentifier, keyring.Name(),
 				false, &keyMessage) == B_OK) {
 			// We found a key for this keyring, try to unlock with it.
-			if (keyring.Unlock(keyMessage) == B_OK)
+			if (keyring.Unlock(&keyMessage) == B_OK)
 				return B_OK;
 		}
 	}
@@ -737,7 +740,7 @@ KeyStoreServer::_UnlockKeyring(Keyring& keyring)
 	if (result != B_OK)
 		return result;
 
-	return keyring.Unlock(keyMessage);
+	return keyring.Unlock(&keyMessage);
 }
 
 
