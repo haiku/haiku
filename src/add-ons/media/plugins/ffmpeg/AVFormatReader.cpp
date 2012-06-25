@@ -18,7 +18,6 @@
 #include <MediaDefs.h>
 #include <MediaFormats.h>
 #include <InterfaceDefs.h>
-#include <String.h>
 
 extern "C" {
 	#include "avcodec.h"
@@ -1453,6 +1452,7 @@ AVFormatReader::Stream::Seek(uint32 flags, int64* frame, bigtime_t* time)
 
 AVFormatReader::AVFormatReader()
 	:
+	fCopyright(""),
 	fStreams(NULL),
 	fSourceLock("source I/O lock")
 {
@@ -1481,14 +1481,12 @@ AVFormatReader::~AVFormatReader()
 const char*
 AVFormatReader::Copyright()
 {
-	BMessage* message = new BMessage();
-	if (GetMetaData(message) == B_OK) {
-		const char* copyright;
-		if (message->FindString("copyright", &copyright) == B_OK)
-			return copyright;
+	if (fCopyright.Length() <= 0) {
+		BMessage message;
+		if (GetMetaData(&message) == B_OK)
+			message.FindString("copyright", &fCopyright);
 	}
-	delete message;
-	return "";
+	return fCopyright.String();
 }
 
 

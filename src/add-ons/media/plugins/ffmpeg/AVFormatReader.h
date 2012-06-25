@@ -7,6 +7,7 @@
 
 
 #include <Locker.h>
+#include <String.h>
 
 #include "ReaderPlugin.h"
 
@@ -48,6 +49,7 @@ public:
 private:
 			class Stream;
 
+			BString				fCopyright;
 			Stream**			fStreams;
 			BLocker				fSourceLock;
 };
