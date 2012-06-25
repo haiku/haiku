@@ -20,7 +20,7 @@
 // The whole kernel address space is the top 512GB of the address space.
 #ifdef _BOOT_MODE
 # define KERNEL_BASE			0x80000000
-# define KERNEL_BASE_64BIT		0xffffffff80000000
+# define KERNEL_BASE_64BIT		0xffffffff80000000ll
 #else
 # define KERNEL_BASE			0xffffff8000000000
 #endif

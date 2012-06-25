@@ -18,7 +18,7 @@
 #define KERNEL_TOP  (KERNEL_BASE + (KERNEL_SIZE - 1))
 
 #ifdef _BOOT_MODE
-# define KERNEL_BASE_64BIT 0xffffffff80000000
+# define KERNEL_BASE_64BIT 0xffffffff80000000ll
 #endif
 
 /* User space layout is a little special:
