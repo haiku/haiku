@@ -269,13 +269,12 @@ KeyStoreServer::MessageReceived(BMessage* message)
 		{
 			BMessage keyMessage;
 			BString keyring;
-			if (message->FindString("keyring", &keyring) != B_OK
-				|| message->FindMessage("key", &keyMessage) != B_OK) {
+			if (message->FindString("keyring", &keyring) != B_OK) {
 				result = B_BAD_VALUE;
 				break;
 			}
 
-			result = _AddKeyring(keyring, keyMessage);
+			result = _AddKeyring(keyring);
 			if (result == B_OK)
 				_WriteKeyStoreDatabase();
 
@@ -681,12 +680,12 @@ KeyStoreServer::_FindKeyring(const BString& name)
 
 
 status_t
-KeyStoreServer::_AddKeyring(const BString& name, const BMessage& keyMessage)
+KeyStoreServer::_AddKeyring(const BString& name)
 {
 	if (_FindKeyring(name) != NULL)
 		return B_NAME_IN_USE;
 
-	Keyring* keyring = new(std::nothrow) Keyring(name, &keyMessage);
+	Keyring* keyring = new(std::nothrow) Keyring(name);
 	if (keyring == NULL)
 		return B_NO_MEMORY;
 

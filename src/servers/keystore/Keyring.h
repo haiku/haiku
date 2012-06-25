@@ -12,8 +12,7 @@
 
 class Keyring {
 public:
-									Keyring(const char* name,
-										const BMessage* keyMessage = NULL);
+									Keyring(const char* name);
 									~Keyring();
 
 		const char*					Name() const { return fName; }

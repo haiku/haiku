@@ -57,12 +57,11 @@ remove_password(const char* keyring, const char* identifier,
 
 
 int
-add_keyring(const char* keyring, const char* passwordString)
+add_keyring(const char* keyring)
 {
 	BKeyStore keyStore;
-	BPasswordKey password(passwordString, B_KEY_PURPOSE_KEYRING, NULL);
 
-	status_t result = keyStore.AddKeyring(keyring, password);
+	status_t result = keyStore.AddKeyring(keyring);
 	if (result != B_OK) {
 		printf("failed to add keyring: %s\n", strerror(result));
 		return 2;
@@ -257,9 +256,8 @@ print_usage(const char* name)
 		" [<secondaryIdentifier>]\n", name);
 	printf("\t\tRemoves the specified password from the specified keyring.\n\n");
 
-	printf("\t%s add keyring <name> <password>\n", name);
-	printf("\t\tAdds a new keyring with the specified name, protected by the"
-		" supplied password.\n");
+	printf("\t%s add keyring <name>\n", name);
+	printf("\t\tAdds a new keyring with the specified name.\n");
 	printf("\t%s remove keyring <name>\n", name);
 	printf("\t\tRemoves the specified keyring.\n\n");
 
@@ -344,10 +342,10 @@ main(int argc, char* argv[])
 					password);
 			}
 		} else if (strcmp(argv[2], "keyring") == 0) {
-			if (argc < 5)
+			if (argc < 4)
 				return print_usage(argv[0]);
 
-			return add_keyring(argv[3], argv[4]);
+			return add_keyring(argv[3]);
 		}
 	} else if (strcmp(argv[1], "remove") == 0) {
 		if (argc < 3)

@@ -7,14 +7,12 @@
 #include "Keyring.h"
 
 
-Keyring::Keyring(const char* name, const BMessage* keyMessage)
+Keyring::Keyring(const char* name)
 	:
 	fName(name),
 	fUnlocked(false),
 	fModified(false)
 {
-	if (keyMessage != NULL)
-		Unlock(*keyMessage);
 }
 
 

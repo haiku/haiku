@@ -187,16 +187,10 @@ BKeyStore::GetNextKey(const char* keyring, BKeyType type, BKeyPurpose purpose,
 
 
 status_t
-BKeyStore::AddKeyring(const char* keyring, const BKey& key)
+BKeyStore::AddKeyring(const char* keyring)
 {
-	BMessage keyMessage;
-	if (key.Flatten(keyMessage) != B_OK)
-		return B_BAD_VALUE;
-
 	BMessage message(KEY_STORE_ADD_KEYRING);
 	message.AddString("keyring", keyring);
-	message.AddMessage("key", &keyMessage);
-
 	return _SendKeyMessage(message, NULL);
 }
 

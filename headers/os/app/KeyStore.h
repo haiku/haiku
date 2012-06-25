@@ -51,8 +51,7 @@ public:
 
 			// Keyrings
 
-			status_t			AddKeyring(const char* keyring,
-									const BKey& key);
+			status_t			AddKeyring(const char* keyring);
 			status_t			RemoveKeyring(const char* keyring);
 
 			status_t			GetNextKeyring(uint32& cookie,

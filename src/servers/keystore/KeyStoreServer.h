@@ -47,8 +47,7 @@ private:
 
 		Keyring*					_FindKeyring(const BString& name);
 
-		status_t					_AddKeyring(const BString& name,
-										const BMessage& keyMessage);
+		status_t					_AddKeyring(const BString& name);
 		status_t					_RemoveKeyring(const BString& name);
 
 		status_t					_UnlockKeyring(Keyring& keyring);
