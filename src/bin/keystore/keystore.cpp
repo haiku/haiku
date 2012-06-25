@@ -231,6 +231,37 @@ remove_application(const char* keyring, const char* signature)
 
 
 int
+set_unlock_key(const char* keyring, const char* passwordString)
+{
+	BKeyStore keyStore;
+	BPasswordKey password(passwordString, B_KEY_PURPOSE_KEYRING, NULL);
+
+	status_t result = keyStore.SetUnlockKey(keyring, password);
+	if (result != B_OK) {
+		printf("failed to set unlock key: %s\n", strerror(result));
+		return 3;
+	}
+
+	return 0;
+}
+
+
+int
+remove_unlock_key(const char* keyring)
+{
+	BKeyStore keyStore;
+
+	status_t result = keyStore.RemoveUnlockKey(keyring);
+	if (result != B_OK) {
+		printf("failed to remove unlock key: %s\n", strerror(result));
+		return 3;
+	}
+
+	return 0;
+}
+
+
+int
 print_usage(const char* name)
 {
 	printf("usage:\n");
@@ -282,8 +313,13 @@ print_usage(const char* name)
 		" signature from the master keyring.\n");
 	printf("\t%s remove application from <keyring> <signature>\n", name);
 	printf("\t\tRemove permanent access for the application with the given"
-		" signature from the specified keyring.\n");
+		" signature from the specified keyring.\n\n");
 
+	printf("\t%s key set <keyring> <password>\n", name);
+	printf("\t\tSet the unlock key of the specified keyring to the given"
+		" password.\n");
+	printf("\t%s key remove <keyring>\n", name);
+	printf("\t\tRemove the unlock key of the specified keyring.\n");
 	return 1;
 }
 
@@ -406,6 +442,17 @@ main(int argc, char* argv[])
 			return add_keyring_to_master(argv[3]);
 		if (strcmp(argv[2], "remove") == 0)
 			return remove_keyring_from_master(argv[3]);
+	} else if (strcmp(argv[1], "key") == 0) {
+		if (argc < 4)
+			return print_usage(argv[0]);
+
+		if (strcmp(argv[2], "set") == 0) {
+			if (argc == 5)
+				return set_unlock_key(argv[3], argv[4]);
+		} else if (strcmp(argv[2], "remove") == 0) {
+			if (argc == 4)
+				return remove_unlock_key(argv[3]);
+		}
 	}
 
 	return print_usage(argv[0]);
