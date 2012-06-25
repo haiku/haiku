@@ -17,12 +17,10 @@
 #include <DataIO.h>
 #include <MediaDefs.h>
 #include <MediaFormats.h>
-#include <InterfaceDefs.h>
 
 extern "C" {
 	#include "avcodec.h"
 	#include "avformat.h"
-	#include "dict.h"
 }
 
 #include "DemuxerTable.h"
