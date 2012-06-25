@@ -223,17 +223,15 @@ BKeyStore::GetNextKeyring(uint32& cookie, BString& keyring)
 }
 
 
-// #pragma mark - Master key
-
-
 status_t
-BKeyStore::SetMasterKey(const BKey& key)
+BKeyStore::SetUnlockKey(const char* keyring, const BKey& key)
 {
 	BMessage keyMessage;
 	if (key.Flatten(keyMessage) != B_OK)
 		return B_BAD_VALUE;
 
-	BMessage message(KEY_STORE_SET_MASTER_KEY);
+	BMessage message(KEY_STORE_SET_UNLOCK_KEY);
+	message.AddString("keyring", keyring);
 	message.AddMessage("key", &keyMessage);
 
 	return _SendKeyMessage(message, NULL);
@@ -241,10 +239,28 @@ BKeyStore::SetMasterKey(const BKey& key)
 
 
 status_t
-BKeyStore::RemoveMasterKey()
+BKeyStore::RemoveUnlockKey(const char* keyring)
 {
-	BMessage message(KEY_STORE_REMOVE_MASTER_KEY);
+	BMessage message(KEY_STORE_REMOVE_UNLOCK_KEY);
+	message.AddString("keyring", keyring);
 	return _SendKeyMessage(message, NULL);
+}
+
+
+// #pragma mark - Master key
+
+
+status_t
+BKeyStore::SetMasterUnlockKey(const BKey& key)
+{
+	return SetUnlockKey(NULL, key);
+}
+
+
+status_t
+BKeyStore::RemoveMasterUnlockKey()
+{
+	return RemoveUnlockKey(NULL);
 }
 
 

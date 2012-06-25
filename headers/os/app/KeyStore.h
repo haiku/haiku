@@ -57,10 +57,14 @@ public:
 			status_t			GetNextKeyring(uint32& cookie,
 									BString& keyring);
 
-			// Master key
+			status_t			SetUnlockKey(const char* keyring,
+									const BKey& key);
+			status_t			RemoveUnlockKey(const char* keyring);
 
-			status_t			SetMasterKey(const BKey& key);
-			status_t			RemoveMasterKey();
+			// Master keyring
+
+			status_t			SetMasterUnlockKey(const BKey& key);
+			status_t			RemoveMasterUnlockKey();
 
 			status_t			AddKeyringToMaster(const char* keyring);
 			status_t			RemoveKeyringFromMaster(const char* keyring);

@@ -39,8 +39,8 @@ static const uint32 kFlagRemoveKey					= 0x0008;
 static const uint32 kFlagAddKeyring					= 0x0010;
 static const uint32 kFlagRemoveKeyring				= 0x0020;
 static const uint32 kFlagEnumerateKeyrings			= 0x0040;
-static const uint32 kFlagSetMasterKey				= 0x0080;
-static const uint32 kFlagRemoveMasterKey			= 0x0100;
+static const uint32 kFlagSetUnlockKey				= 0x0080;
+static const uint32 kFlagRemoveUnlockKey			= 0x0100;
 static const uint32 kFlagAddKeyringsToMaster		= 0x0200;
 static const uint32 kFlagRemoveKeyringsFromMaster	= 0x0400;
 static const uint32 kFlagEnumerateMasterKeyrings	= 0x0800;
@@ -51,7 +51,7 @@ static const uint32 kFlagRemoveApplications			= 0x8000;
 
 static const uint32 kDefaultAppFlags = kFlagGetKey | kFlagEnumerateKeys
 	| kFlagAddKey | kFlagRemoveKey | kFlagAddKeyring | kFlagRemoveKeyring
-	| kFlagEnumerateKeyrings | kFlagSetMasterKey | kFlagRemoveMasterKey
+	| kFlagEnumerateKeyrings | kFlagSetUnlockKey | kFlagRemoveUnlockKey
 	| kFlagAddKeyringsToMaster | kFlagRemoveKeyringsFromMaster
 	| kFlagEnumerateMasterKeyrings | kFlagQueryLockState | kFlagLockKeyring
 	| kFlagEnumerateApplications | kFlagRemoveApplications;
@@ -123,6 +123,8 @@ KeyStoreServer::MessageReceived(BMessage* message)
 		case KEY_STORE_REMOVE_KEY:
 		case KEY_STORE_IS_KEYRING_UNLOCKED:
 		case KEY_STORE_LOCK_KEYRING:
+		case KEY_STORE_SET_UNLOCK_KEY:
+		case KEY_STORE_REMOVE_UNLOCK_KEY:
 		case KEY_STORE_ADD_KEYRING_TO_MASTER:
 		case KEY_STORE_REMOVE_KEYRING_FROM_MASTER:
 		case KEY_STORE_GET_NEXT_APPLICATION:
@@ -145,6 +147,8 @@ KeyStoreServer::MessageReceived(BMessage* message)
 				case KEY_STORE_GET_NEXT_KEY:
 				case KEY_STORE_ADD_KEY:
 				case KEY_STORE_REMOVE_KEY:
+				case KEY_STORE_SET_UNLOCK_KEY:
+				case KEY_STORE_REMOVE_UNLOCK_KEY:
 				case KEY_STORE_ADD_KEYRING_TO_MASTER:
 				case KEY_STORE_GET_NEXT_APPLICATION:
 				case KEY_STORE_REMOVE_APPLICATION:
@@ -330,6 +334,31 @@ KeyStoreServer::MessageReceived(BMessage* message)
 		{
 			keyring->Lock();
 			result = B_OK;
+			break;
+		}
+
+		case KEY_STORE_SET_UNLOCK_KEY:
+		{
+			BMessage keyMessage;
+			if (message->FindMessage("key", &keyMessage) != B_OK) {
+				result = B_BAD_VALUE;
+				break;
+			}
+
+			result = keyring->SetUnlockKey(keyMessage);
+			if (result == B_OK)
+				_WriteKeyStoreDatabase();
+
+			// TODO: Update the key in the master if this keyring was added.
+			break;
+		}
+
+		case KEY_STORE_REMOVE_UNLOCK_KEY:
+		{
+			result = keyring->RemoveUnlockKey();
+			if (result == B_OK)
+				_WriteKeyStoreDatabase();
+
 			break;
 		}
 
@@ -520,10 +549,10 @@ KeyStoreServer::_AccessFlagsFor(uint32 command) const
 			return kFlagRemoveKeyring;
 		case KEY_STORE_GET_NEXT_KEYRING:
 			return kFlagEnumerateKeyrings;
-		case KEY_STORE_SET_MASTER_KEY:
-			return kFlagSetMasterKey;
-		case KEY_STORE_REMOVE_MASTER_KEY:
-			return kFlagRemoveMasterKey;
+		case KEY_STORE_SET_UNLOCK_KEY:
+			return kFlagSetUnlockKey;
+		case KEY_STORE_REMOVE_UNLOCK_KEY:
+			return kFlagRemoveUnlockKey;
 		case KEY_STORE_ADD_KEYRING_TO_MASTER:
 			return kFlagAddKeyringsToMaster;
 		case KEY_STORE_REMOVE_KEYRING_FROM_MASTER:
@@ -562,10 +591,10 @@ KeyStoreServer::_AccessStringFor(uint32 accessFlag) const
 			return "Remove keyrings.";
 		case kFlagEnumerateKeyrings:
 			return "Enumerate the available keyrings.";
-		case kFlagSetMasterKey:
-			return "Set the master key.";
-		case kFlagRemoveMasterKey:
-			return "Remove the master key.";
+		case kFlagSetUnlockKey:
+			return "Set the unlock key of the keyring.";
+		case kFlagRemoveUnlockKey:
+			return "Remove the unlock key of the keyring.";
 		case kFlagAddKeyringsToMaster:
 			return "Add the keyring key to the master keyring.";
 		case kFlagRemoveKeyringsFromMaster:
