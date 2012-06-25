@@ -29,6 +29,7 @@ StaticLibrary libshared.a :
 	RWLockManager.cpp
 	SHA256.cpp
 	ShakeTrackingFilter.cpp
+	StringForRate.cpp
 	StringForSize.cpp
 	Variant.cpp
 ;

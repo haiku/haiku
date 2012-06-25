@@ -32,6 +32,7 @@
 #include <Mime.h>
 #include <NodeInfo.h>
 #include <String.h>
+#include <StringForRate.h>
 #include <StringView.h>
 #include <TextView.h>
 
@@ -407,14 +408,10 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 		}
 		if (format.type == B_MEDIA_ENCODED_AUDIO) {
 			float br = format.u.encoded_audio.bit_rate;
-			if (br > 0.0) {
-				char rateString[20];
-				snprintf(rateString, sizeof(rateString), B_TRANSLATE(", %.0f kbps"),
-					br / 1000);
-				s << rateString;
-			}
+			char string[20] = "";
+			if (br > 0.0)
+				s << ", " << string_for_rate(br, string, 20, 1000.0);
 		}
-
 		s << "\n\n";
 		fContentsView->Insert(s.String());
 	}
