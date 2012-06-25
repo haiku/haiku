@@ -29,7 +29,7 @@ SECTIONS
 	.rodata : { *(.rodata .rodata.* .gnu.linkonce.r.*) }
 
 	/* writable data */
-	. = ALIGN (0x200000);
+	. = ALIGN (0x1000);
 	__data_start = .;
 	.data : { *(.data .data.* .gnu.linkonce.d.*) }
 

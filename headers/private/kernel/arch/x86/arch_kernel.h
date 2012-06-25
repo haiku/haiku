@@ -17,6 +17,10 @@
 #define KERNEL_SIZE 0x80000000
 #define KERNEL_TOP  (KERNEL_BASE + (KERNEL_SIZE - 1))
 
+#ifdef _BOOT_MODE
+# define KERNEL_BASE_64BIT 0xffffffff80000000
+#endif
+
 /* User space layout is a little special:
  * The user space does not completely cover the space not covered by the
  * kernel. There is a gap of 64kb between the user and kernel space. The 64kb

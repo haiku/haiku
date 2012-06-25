@@ -72,13 +72,6 @@ extern size_t platform_get_user_input_text(Menu *menu, MenuItem *item,
 	char *buffer, size_t bufferSize);
 extern char* platform_debug_get_log_buffer(size_t* _size);
 
-/* ELF functions */
-
-extern status_t platform_allocate_elf_region(uint32 *_address, uint32 size,
-	uint8 protection, void **_mappedAddress);
-extern status_t platform_allocate_elf_region(uint64 *_address, uint64 size,
-	uint8 protection, void **_mappedAddress);
-
 #endif
 
 #endif	/* KERNEL_BOOT_PLATFORM_H */

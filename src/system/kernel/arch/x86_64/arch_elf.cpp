@@ -162,7 +162,7 @@ boot_arch_elf_relocate_rela(preloaded_elf64_image* image, Elf64_Rela* rel,
 				return B_BAD_DATA;
 		}
 #ifdef _BOOT_MODE
-		boot_elf_set_relocation(image, relocAddr, relocValue);
+		boot_elf64_set_relocation(relocAddr, relocValue);
 #else
 		*(Elf64_Addr *)relocAddr = relocValue;
 #endif

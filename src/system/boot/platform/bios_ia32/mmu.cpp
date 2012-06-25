@@ -769,43 +769,6 @@ platform_free_region(void *address, size_t size)
 }
 
 
-status_t
-platform_allocate_elf_region(uint32 *_address, uint32 size, uint8 protection,
-	void **_mappedAddress)
-{
-	void *address = mmu_allocate((void *)*_address, size);
-	if (address == NULL)
-		return B_NO_MEMORY;
-
-	*_address = (uint32)address;
-	*_mappedAddress = address;
-	return B_OK;
-}
-
-
-status_t
-platform_allocate_elf_region(uint64 *_address, uint64 size, uint8 protection,
-	void **_mappedAddress)
-{
-	// The 64-bit kernel is loaded to 0xFFFFFFFF80000000. You'll notice that
-	// the low 32 bits of this address are the same as the 32-bit KERNEL_BASE
-	// (0x80000000). Therefore, the way this function is implemented is to use
-	// mmu_allocate() and then set the upper 32 bits to all 1s. The long mode
-	// switch code will remap everything to the correct addresses.
-
-	void *address = mmu_allocate((void *)(addr_t)(*_address & 0xFFFFFFFF), size);
-	if (address == NULL)
-		return B_NO_MEMORY;
-
-	// This is the address that the ELF loading code will access the mapping
-	// through.
-	*_mappedAddress = address;
-
-	*_address = (uint64)(uint32)address | 0xFFFFFFFF00000000LL;
-	return B_OK;
-}
-
-
 void
 platform_release_heap(struct stage2_args *args, void *base)
 {

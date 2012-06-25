@@ -388,6 +388,7 @@ switch $(HAIKU_ARCH) {
 		# code due to interrupts.
 		HAIKU_KERNEL_CCFLAGS += -mcmodel=kernel -mno-red-zone ;
 		HAIKU_KERNEL_C++FLAGS += -mcmodel=kernel -mno-red-zone ;
+		HAIKU_KERNEL_PIC_LINKFLAGS += -z max-page-size=0x1000 ;
 
 		# Bootloader is 32-bit.
 		HAIKU_BOOT_LINKFLAGS += -m elf_i386_haiku ;

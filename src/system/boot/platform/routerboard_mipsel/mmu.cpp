@@ -79,15 +79,6 @@ platform_free_region(void* address, size_t size)
 }
 
 
-status_t
-platform_allocate_elf_region(uint32 *_address, uint32 size, uint8 protection,
-	void **_mappedAddress)
-{
-#warning IMPLEMENT platform_allocate_elf_region
-	return B_ERROR;
-}
-
-
 void
 platform_release_heap(struct stage2_args* args, void* base)
 {
