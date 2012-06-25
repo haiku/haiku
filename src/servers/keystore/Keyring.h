@@ -12,6 +12,7 @@
 
 class Keyring {
 public:
+									Keyring();
 									Keyring(const char* name);
 									~Keyring();
 

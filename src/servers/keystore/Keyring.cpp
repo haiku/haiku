@@ -7,6 +7,14 @@
 #include "Keyring.h"
 
 
+Keyring::Keyring()
+	:
+	fUnlocked(false),
+	fModified(false)
+{
+}
+
+
 Keyring::Keyring(const char* name)
 	:
 	fName(name),
@@ -24,9 +32,13 @@ Keyring::~Keyring()
 status_t
 Keyring::ReadFromMessage(const BMessage& message)
 {
+	status_t result = message.FindString("name", &fName);
+	if (result != B_OK)
+		return result;
+
 	ssize_t size;
 	const void* data;
-	status_t result = message.FindData(fName, B_RAW_TYPE, &data, &size);
+	result = message.FindData("data", B_RAW_TYPE, &data, &size);
 	if (result != B_OK)
 		return result;
 
@@ -51,8 +63,12 @@ Keyring::WriteToMessage(BMessage& message)
 	if (result != B_OK)
 		return result;
 
-	return message.AddData(fName, B_RAW_TYPE, fFlatBuffer.Buffer(),
+	result = message.AddData("data", B_RAW_TYPE, fFlatBuffer.Buffer(),
 		fFlatBuffer.BufferLength());
+	if (result != B_OK)
+		return result;
+
+	return message.AddString("name", fName);
 }
 
 

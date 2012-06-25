@@ -30,6 +30,8 @@ using namespace BPrivate;
 static const char* kMasterKeyringName = "Master";
 static const char* kKeyringKeysIdentifier = "Keyrings";
 
+static const uint32 kKeyStoreFormatVersion = 1;
+
 static const uint32 kFlagGetKey						= 0x0001;
 static const uint32 kFlagEnumerateKeys				= 0x0002;
 static const uint32 kFlagAddKey						= 0x0004;
@@ -83,8 +85,10 @@ KeyStoreServer::KeyStoreServer()
 
 	_ReadKeyStoreDatabase();
 
-	if (fMasterKeyring == NULL)
+	if (fMasterKeyring == NULL) {
 		fMasterKeyring = new(std::nothrow) Keyring(kMasterKeyringName);
+		fKeyrings.BinaryInsert(fMasterKeyring, &Keyring::Compare);
+	}
 }
 
 
@@ -302,11 +306,7 @@ KeyStoreServer::MessageReceived(BMessage* message)
 				break;
 			}
 
-			if (cookie == 0)
-				keyring = fMasterKeyring;
-			else
-				keyring = fKeyrings.ItemAt(cookie - 1);
-
+			keyring = fKeyrings.ItemAt(cookie);
 			if (keyring == NULL) {
 				result = B_ENTRY_NOT_FOUND;
 				break;
@@ -442,34 +442,35 @@ KeyStoreServer::MessageReceived(BMessage* message)
 status_t
 KeyStoreServer::_ReadKeyStoreDatabase()
 {
-	BMessage keyrings;
-	status_t result = keyrings.Unflatten(&fKeyStoreFile);
+	BMessage keystore;
+	status_t result = keystore.Unflatten(&fKeyStoreFile);
 	if (result != B_OK) {
 		printf("failed to read keystore database\n");
 		_WriteKeyStoreDatabase();
+			// Reinitializes the database.
 		return result;
 	}
 
 	int32 index = 0;
-	char* keyringName = NULL;
-	while (keyrings.GetInfo(B_RAW_TYPE, index++, &keyringName, NULL) == B_OK) {
-		Keyring* keyring = new(std::nothrow) Keyring(keyringName);
+	BMessage keyringData;
+	while (keystore.FindMessage("keyrings", index++, &keyringData) == B_OK) {
+		Keyring* keyring = new(std::nothrow) Keyring();
 		if (keyring == NULL) {
-			printf("no memory for allocating keyring \"%s\"\n", keyringName);
-			continue;
+			printf("no memory for allocating keyring\n");
+			break;
 		}
 
-		status_t result = keyring->ReadFromMessage(keyrings);
+		status_t result = keyring->ReadFromMessage(keyringData);
 		if (result != B_OK) {
-			printf("failed to read keyring \"%s\" from data\n", keyringName);
+			printf("failed to read keyring from data\n");
 			delete keyring;
 			continue;
 		}
 
-		if (strcmp(keyringName, kMasterKeyringName) == 0)
+		if (strcmp(keyring->Name(), kMasterKeyringName) == 0)
 			fMasterKeyring = keyring;
-		else
-			fKeyrings.BinaryInsert(keyring, &Keyring::Compare);
+
+		fKeyrings.BinaryInsert(keyring, &Keyring::Compare);
 	}
 
 	return B_OK;
@@ -479,23 +480,25 @@ KeyStoreServer::_ReadKeyStoreDatabase()
 status_t
 KeyStoreServer::_WriteKeyStoreDatabase()
 {
-	BMessage keyrings;
-	if (fMasterKeyring != NULL)
-		fMasterKeyring->WriteToMessage(keyrings);
+	BMessage keystore;
+	keystore.AddUInt32("format", kKeyStoreFormatVersion);
 
 	for (int32 i = 0; i < fKeyrings.CountItems(); i++) {
 		Keyring* keyring = fKeyrings.ItemAt(i);
 		if (keyring == NULL)
 			continue;
 
-		status_t result = keyring->WriteToMessage(keyrings);
+		BMessage keyringData;
+		status_t result = keyring->WriteToMessage(keyringData);
 		if (result != B_OK)
 			return result;
+
+		keystore.AddMessage("keyrings", &keyringData);
 	}
 
 	fKeyStoreFile.SetSize(0);
 	fKeyStoreFile.Seek(0, SEEK_SET);
-	return keyrings.Flatten(&fKeyStoreFile);
+	return keystore.Flatten(&fKeyStoreFile);
 }
 
 
