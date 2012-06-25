@@ -280,10 +280,10 @@ if [ IsOptionalHaikuImagePackageAdded SDLLibs ] {
 			: $(baseURL)/lib/sdl-mixer-1.2.11-x86-gcc2-2012-06-25.zip ;
 		InstallOptionalHaikuImagePackage
 			sdl-net-1.2.8-x86-gcc2-2012-06-24.zip
-			: $(baseURL)/lib/sdl-net-1.2.8-x86-gcc2-2012-06-25.zip ;
+			: $(baseURL)/lib/sdl-net-1.2.8-x86-gcc2-2012-06-24.zip ;
 		InstallOptionalHaikuImagePackage
 			sdl-sound-1.0.3-x86-gcc2-2012-06-24.zip
-			: $(baseURL)/lib/sdl-sound-1.0.3-x86-gcc2-2012-06-25.zip ;
+			: $(baseURL)/lib/sdl-sound-1.0.3-x86-gcc2-2012-06-24.zip ;
 		InstallOptionalHaikuImagePackage
 			sdl-rtf-0.1.0-r1a3-x86-gcc2-2011-05-20.zip
 			: $(baseURL)/lib/sdl-rtf-0.1.0-r1a3-x86-gcc2-2011-05-20.zip ;
