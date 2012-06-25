@@ -171,6 +171,9 @@ status_t
 Keyring::GetNextApplication(uint32& cookie, BString& signature,
 	BString& path)
 {
+	if (!fUnlocked)
+		return B_NOT_ALLOWED;
+
 	char* nameFound = NULL;
 	status_t result = fApplications.GetInfo(B_MESSAGE_TYPE, cookie++,
 		&nameFound, NULL);
