@@ -410,7 +410,7 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 			float br = format.u.encoded_audio.bit_rate;
 			char string[20] = "";
 			if (br > 0.0)
-				s << ", " << string_for_rate(br, string, 20, 1000.0);
+				s << ", " << string_for_rate(br, string, sizeof(string));
 		}
 		s << "\n\n";
 		fContentsView->Insert(s.String());

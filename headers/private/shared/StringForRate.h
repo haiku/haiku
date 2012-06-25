@@ -12,7 +12,7 @@ namespace BPrivate {
 
 
 const char* string_for_rate(double rate, char* string, size_t stringSize,
-	double base = 1024.0f);
+	double base = 1000.0f);
 
 
 }	// namespace BPrivate
