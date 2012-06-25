@@ -341,7 +341,7 @@ if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		HAIKU_FREETYPE_FILE = freetype-2.4.9-x86-gcc4-2012-06-15.zip ;
 	} else {
-		HAIKU_FREETYPE_FILE = freetype-2.4.9-x86-gcc2-2012-06-15.zip ;
+		HAIKU_FREETYPE_FILE = freetype-2.4.9-x86-gcc2-2012-06-19.zip ;
 	}
 
 	local freetypeZipFile = [ DownloadFile $(HAIKU_FREETYPE_FILE)
