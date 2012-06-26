@@ -337,7 +337,7 @@ if $(TARGET_ARCH) = x86 {
 local freetypeBaseURL = http://haiku-files.org/files/optional-packages/lib ;
 if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 {
 	if $(TARGET_ARCH) = ppc {
-		HAIKU_FREETYPE_FILE = freetype-2.4.6-ppc-gcc4-2012-03-17.zip ;
+		HAIKU_FREETYPE_FILE = freetype-2.4.9-ppc-gcc4-2012-06-26.zip ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		HAIKU_FREETYPE_FILE = freetype-2.4.9-x86-gcc4-2012-06-15.zip ;
 	} else {
