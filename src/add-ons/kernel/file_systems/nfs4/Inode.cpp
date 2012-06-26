@@ -49,17 +49,8 @@ Inode::CreateInode(Filesystem* fs, const FileInfo &fi, Inode** _inode)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		// filehandle has expired
-		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
-			inode->_LookUpFilehandle();
+		if (inode->_HandleErrors(reply.NFS4Error(), serv))
 			continue;
-		}
-
-		// filesystem has been moved
-		if (reply.NFS4Error() == NFS4ERR_MOVED) {
-			fs->Migrate(inode->fHandle, serv);
-			continue;
-		}
 
 		result = reply.PutFH();
 		if (result != B_OK)
@@ -139,17 +130,8 @@ Inode::LookUp(const char* name, ino_t* id)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		// filehandle has expired
-		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
-			_LookUpFilehandle();
+		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
-		}
-
-		// filesystem has been moved
-		if (reply.NFS4Error() == NFS4ERR_MOVED) {
-			fFilesystem->Migrate(fHandle, serv);
-			continue;
-		}
 
 		result = reply.PutFH();
 		if (result != B_OK)
@@ -288,17 +270,8 @@ Inode::Remove(const char* name, FileType type)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		// filehandle has expired
-		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
-			_LookUpFilehandle();
+		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
-		}
-
-		// filesystem has been moved
-		if (reply.NFS4Error() == NFS4ERR_MOVED) {
-			fFilesystem->Migrate(fHandle, serv);
-			continue;
-		}
 
 		result = reply.PutFH();
 		if (result != B_OK)
@@ -405,17 +378,8 @@ Inode::CreateLink(const char* name, const char* path, int mode)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		// filehandle has expired
-		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
-			_LookUpFilehandle();
+		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
-		}
-
-		// filesystem has been moved
-		if (reply.NFS4Error() == NFS4ERR_MOVED) {
-			fFilesystem->Migrate(fHandle, serv);
-			continue;
-		}
 
 		result = reply.PutFH();
 		if (result != B_OK)
@@ -446,17 +410,8 @@ Inode::ReadLink(void* buffer, size_t* length)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		// filehandle has expired
-		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
-			_LookUpFilehandle();
+		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
-		}
-
-		// filesystem has been moved
-		if (reply.NFS4Error() == NFS4ERR_MOVED) {
-			fFilesystem->Migrate(fHandle, serv);
-			continue;
-		}
 
 		result = reply.PutFH();
 		if (result != B_OK)
@@ -488,17 +443,8 @@ Inode::Access(int mode)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		// filehandle has expired
-		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
-			_LookUpFilehandle();
+		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
-		}
-
-		// filesystem has been moved
-		if (reply.NFS4Error() == NFS4ERR_MOVED) {
-			fFilesystem->Migrate(fHandle, serv);
-			continue;
-		}
 
 		result = reply.PutFH();
 		if (result != B_OK)
@@ -551,17 +497,8 @@ Inode::Stat(struct stat* st)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		// filehandle has expired
-		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
-			_LookUpFilehandle();
+		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
-		}
-
-		// filesystem has been moved
-		if (reply.NFS4Error() == NFS4ERR_MOVED) {
-			fFilesystem->Migrate(fHandle, serv);
-			continue;
-		}
 
 		result = reply.PutFH();
 		if (result != B_OK)
@@ -753,25 +690,10 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 
 		ReplyInterpreter& reply = request.Reply();
 
-		// filehandle has expired
-		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
-			_LookUpFilehandle();
-			continue;
-		}
-
-		// filesystem has been moved
-		if (reply.NFS4Error() == NFS4ERR_MOVED) {
-			fFilesystem->Migrate(fHandle, serv);
-			continue;
-		}
-
-		// server is in grace period, we need to wait
-		if (reply.NFS4Error() == NFS4ERR_GRACE) {
+		if (reply.NFS4Error() == NFS4ERR_GRACE)
 			fFilesystem->NFSServer()->ReleaseCID(cookie->fClientId);
-			snooze_etc(fFilesystem->NFSServer()->LeaseTime() / 3,
-				B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
+		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
-		}
 
 		result = reply.PutFH();
 		if (result != B_OK)
@@ -871,25 +793,10 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		// filehandle has expired
-		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
-			_LookUpFilehandle();
-			continue;
-		}
-
-		// filesystem has been moved
-		if (reply.NFS4Error() == NFS4ERR_MOVED) {
-			fFilesystem->Migrate(fHandle, serv);
-			continue;
-		}
-
-		// server is in grace period, we need to wait
-		if (reply.NFS4Error() == NFS4ERR_GRACE) {
+		if (reply.NFS4Error() == NFS4ERR_GRACE)
 			fFilesystem->NFSServer()->ReleaseCID(cookie->fClientId);
-			snooze_etc(fFilesystem->NFSServer()->LeaseTime() / 3,
-				B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
+		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
-		}
 
 		result = reply.PutFH();
 		if (result != B_OK)
@@ -931,24 +838,8 @@ Inode::Close(OpenFileCookie* cookie)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		// filehandle has expired
-		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
-			_LookUpFilehandle();
+		if (_HandleErrors(reply.NFS4Error(), serv, cookie))
 			continue;
-		}
-
-		// filesystem has been moved
-		if (reply.NFS4Error() == NFS4ERR_MOVED) {
-			fFilesystem->Migrate(fHandle, serv);
-			continue;
-		}
-
-		// server is in grace period, we need to wait
-		if (reply.NFS4Error() == NFS4ERR_GRACE) {
-			snooze_etc(fFilesystem->NFSServer()->LeaseTime() / 3,
-				B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
-			continue;
-		}
 
 		result = reply.PutFH();
 		if (result != B_OK)
@@ -990,31 +881,8 @@ Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length)
 
 			ReplyInterpreter& reply = request.Reply();
 
-			// filehandle has expired
-			if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
-				_LookUpFilehandle();
+			if (_HandleErrors(reply.NFS4Error(), serv, cookie))
 				continue;
-			}
-
-			// filesystem has been moved
-			if (reply.NFS4Error() == NFS4ERR_MOVED) {
-				fFilesystem->Migrate(fHandle, serv);
-				continue;
-			}
-
-			// server is in grace period, we need to wait
-			if (reply.NFS4Error() == NFS4ERR_GRACE) {
-				snooze_etc(fFilesystem->NFSServer()->LeaseTime() / 3,
-					B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
-				continue;
-			}
-
-			// server has rebooted, reclaim share and try again
-			if (reply.NFS4Error() == NFS4ERR_STALE_CLIENTID ||
-				reply.NFS4Error() == NFS4ERR_STALE_STATEID) {
-				fFilesystem->NFSServer()->ServerRebooted(cookie->fClientId);
-				continue;
-			}
 
 			result = reply.PutFH();
 			if (result != B_OK)
@@ -1089,31 +957,8 @@ Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
 				}
 			}
 
-			// filehandle has expired
-			if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
-				_LookUpFilehandle();
+			if (_HandleErrors(reply.NFS4Error(), serv, cookie))
 				continue;
-			}
-
-			// filesystem has been moved
-			if (reply.NFS4Error() == NFS4ERR_MOVED) {
-				fFilesystem->Migrate(fHandle, serv);
-				continue;
-			}
-
-			// server is in grace period, we need to wait
-			if (reply.NFS4Error() == NFS4ERR_GRACE) {
-				snooze_etc(fFilesystem->NFSServer()->LeaseTime() / 3,
-					B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
-				continue;
-			}
-
-			// server has rebooted, reclaim share and try again
-			if (reply.NFS4Error() == NFS4ERR_STALE_CLIENTID ||
-				reply.NFS4Error() == NFS4ERR_STALE_STATEID) {
-				fFilesystem->NFSServer()->ServerRebooted(cookie->fClientId);
-				continue;
-			}
 
 			result = reply.PutFH();
 			if (result != B_OK)
@@ -1161,17 +1006,8 @@ Inode::OpenDir(OpenDirCookie* cookie)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		// filehandle has expired
-		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
-			_LookUpFilehandle();
+		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
-		}
-
-		// filesystem has been moved
-		if (reply.NFS4Error() == NFS4ERR_MOVED) {
-			fFilesystem->Migrate(fHandle, serv);
-			continue;
-		}
 
 		result = reply.PutFH();
 		if (result != B_OK)
@@ -1215,17 +1051,8 @@ Inode::_ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
 
 		ReplyInterpreter& reply = request.Reply();
 
-		// filehandle has expired
-		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
-			_LookUpFilehandle();
+		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
-		}
-
-		// filesystem has been moved
-		if (reply.NFS4Error() == NFS4ERR_MOVED) {
-			fFilesystem->Migrate(fHandle, serv);
-			continue;
-		}
 
 		result = reply.PutFH();
 		if (result != B_OK)
@@ -1279,17 +1106,8 @@ Inode::_ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		// filehandle has expired
-		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
-			_LookUpFilehandle();
+		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
-		}
-
-		// filesystem has been moved
-		if (reply.NFS4Error() == NFS4ERR_MOVED) {
-			fFilesystem->Migrate(fHandle, serv);
-			continue;
-		}
 
 		result = reply.PutFH();
 		if (result != B_OK)
@@ -1405,6 +1223,47 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
 	*_count = count;
 	
 	return B_OK;
+}
+
+
+bool
+Inode::_HandleErrors(uint32 nfs4Error, RPC::Server* serv,
+	OpenFileCookie* cookie)
+{
+	switch (nfs4Error) {
+		case NFS4_OK:
+			return false;
+
+		// server needs more time, we need to wait
+		case NFS4ERR_DELAY:
+			snooze_etc(5 * 1000000, B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
+			return true;
+
+		// server is in grace period, we need to wait
+		case NFS4ERR_GRACE:
+			snooze_etc(fFilesystem->NFSServer()->LeaseTime() / 3,
+				B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
+			return true;
+
+		// server has rebooted, reclaim share and try again
+		case NFS4ERR_STALE_CLIENTID:
+		case NFS4ERR_STALE_STATEID:
+			fFilesystem->NFSServer()->ServerRebooted(cookie->fClientId);
+			return true;
+
+		// filehandle has expired
+		case NFS4ERR_FHEXPIRED:
+			_LookUpFilehandle();
+			return true;
+
+		// filesystem has been moved
+		case NFS4ERR_MOVED:
+			fFilesystem->Migrate(fHandle, serv);
+			return true;
+
+		default:
+			return false;
+	}
 }
 
 

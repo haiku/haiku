@@ -59,6 +59,11 @@ public:
 private:
 								Inode();
 
+
+					bool		_HandleErrors(uint32 nfs4Error,
+									RPC::Server* serv,
+									OpenFileCookie* cookie = NULL);
+
 					status_t	_LookUpFilehandle();
 
 					status_t	_ReadDirOnce(DirEntry** dirents, uint32* count,
