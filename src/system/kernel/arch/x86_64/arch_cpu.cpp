@@ -30,6 +30,8 @@ arch_cpu_init_percpu(kernel_args *args, int cpu)
 status_t
 arch_cpu_init(kernel_args *args)
 {
+	dprintf("not implemented...\n");
+	while (1);
 	return B_OK;
 }
 

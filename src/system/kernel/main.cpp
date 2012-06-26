@@ -78,8 +78,6 @@ static int32 main2(void *);
 extern "C" int
 _start(kernel_args *bootKernelArgs, int currentCPU)
 {
-	while (1) {}
-
 	if (bootKernelArgs->kernel_args_size != sizeof(kernel_args)
 		|| bootKernelArgs->version != CURRENT_KERNEL_ARGS_VERSION) {
 		// This is something we cannot handle right now - release kernels
