@@ -271,6 +271,7 @@ NFS4Server::_Renewal()
 
 		if (request.Reply().NFS4Error() == NFS4ERR_STALE_CLIENTID)
 			ServerRebooted(clientId);
+		// TODO: support NFS4ERR_LEASE_MOVED
 	}
 
 	return B_OK;

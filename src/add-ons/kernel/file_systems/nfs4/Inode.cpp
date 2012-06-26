@@ -1221,6 +1221,11 @@ Inode::_HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 			fFilesystem->Migrate(fHandle, serv);
 			return true;
 
+		// lease has been moved, provoke server to return NFS4ERR_MOVED
+		case NFS4ERR_LEASE_MOVED:
+			Access(0);
+			return true;
+
 		default:
 			return false;
 	}
