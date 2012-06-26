@@ -85,6 +85,7 @@ public:
 			status_t	Rename();
 	inline	status_t	Renew();
 	inline	status_t	SaveFH();
+			status_t	SetAttr();
 			status_t	SetClientID(uint64* clientid, uint64* verifier);
 	inline	status_t	SetClientIDConfirm();
 	inline	status_t	Verify();

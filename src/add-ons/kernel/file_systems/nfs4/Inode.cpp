@@ -12,6 +12,8 @@
 #include <dirent.h>
 #include <string.h>
 
+#include <NodeMonitor.h>
+
 #include "Request.h"
 
 
@@ -551,6 +553,93 @@ Inode::Stat(struct stat* st)
 		delete[] values;
 		return B_OK;
 	} while (true);
+}
+
+
+status_t
+Inode::WriteStat(const struct stat* st, uint32 mask)
+{
+	status_t result;
+	OpenFileCookie* cookie = NULL;
+	AttrValue attr[4];
+	uint32 i = 0;
+
+	if ((mask & B_STAT_SIZE) != 0) {
+		delete cookie;
+		cookie = new OpenFileCookie;
+		if (cookie == NULL)
+			return B_NO_MEMORY;
+
+		result = Open(O_WRONLY, cookie);
+		if (result != B_OK) {
+			delete cookie;
+			return result;
+		}
+
+		attr[i].fAttribute = FATTR4_SIZE;
+		attr[i].fFreePointer = false;
+		attr[i].fData.fValue64 = st->st_size;
+		i++;
+	}
+
+	if ((mask & B_STAT_MODE) != 0) {
+		attr[i].fAttribute = FATTR4_MODE;
+		attr[i].fFreePointer = false;
+		attr[i].fData.fValue32 = st->st_mode;
+		i++;
+	}
+
+	if ((mask & B_STAT_ACCESS_TIME) != 0) {
+		attr[i].fAttribute = FATTR4_TIME_ACCESS_SET;
+		attr[i].fFreePointer = true;
+		attr[i].fData.fPointer = malloc(sizeof(st->st_atime));
+		memcpy(attr[i].fData.fPointer, &st->st_atime, sizeof(st->st_atime));
+		i++;
+	}
+
+	if ((mask & B_STAT_MODIFICATION_TIME) != 0) {
+		attr[i].fAttribute = FATTR4_TIME_MODIFY_SET;
+		attr[i].fFreePointer = true;
+		attr[i].fData.fPointer = malloc(sizeof(st->st_mtime));
+		memcpy(attr[i].fData.fPointer, &st->st_mtime, sizeof(st->st_mtime));
+		i++;
+	}
+
+	do {
+		RPC::Server* serv = fFilesystem->Server();
+		Request request(serv);
+		RequestBuilder& req = request.Builder();
+
+		req.PutFH(fHandle);
+		if ((mask & B_STAT_SIZE) != 0)
+			req.SetAttr(cookie->fStateId, cookie->fStateSeq, attr, i);
+		else
+			req.SetAttr(NULL, 0, attr, i);
+
+		status_t result = request.Send();
+		if (result != B_OK) {
+			Close(cookie);
+			delete cookie;
+			return result;
+		}
+
+		ReplyInterpreter& reply = request.Reply();
+
+		if (_HandleErrors(reply.NFS4Error(), serv))
+			continue;
+
+		reply.PutFH();
+		result = reply.SetAttr();
+
+		if ((mask & B_STAT_SIZE) != 0) {
+			Close(cookie);
+			delete cookie;
+		}
+
+		return result;
+	} while (true);
+
+	return B_OK;
 }
 
 

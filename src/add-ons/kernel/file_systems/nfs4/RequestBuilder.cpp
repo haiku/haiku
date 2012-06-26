@@ -445,6 +445,34 @@ RequestBuilder::SaveFH()
 
 
 status_t
+RequestBuilder::SetAttr(const uint32* id, uint32 stateSeq, AttrValue* attr,
+	uint32 count)
+{
+	if (fProcedure != ProcCompound)
+		return B_BAD_VALUE;
+	if (fRequest == NULL)
+		return B_NO_MEMORY;
+
+	fRequest->Stream().AddUInt(OpSetAttr);
+	fRequest->Stream().AddUInt(stateSeq);
+	if (id != NULL) {
+		fRequest->Stream().AddUInt(id[0]);
+		fRequest->Stream().AddUInt(id[1]);
+		fRequest->Stream().AddUInt(id[2]);
+	} else {
+		fRequest->Stream().AddUInt(0);
+		fRequest->Stream().AddUInt(0);
+		fRequest->Stream().AddUInt(0);
+	}
+	_EncodeAttrs(fRequest->Stream(), attr, count);
+
+	fOpCount++;
+
+	return B_OK;
+}
+
+
+status_t
 RequestBuilder::SetClientID(const RPC::Server* serv)
 {
 	if (fProcedure != ProcCompound)
@@ -598,6 +626,28 @@ RequestBuilder::_EncodeAttrs(XDR::WriteStream& stream, AttrValue* attr,
 
 	if (i < count && attr[i].fAttribute == FATTR4_MODE) {
 		str.AddUInt(attr[i].fData.fValue32);
+		i++;
+	}
+
+	if (i < count && attr[i].fAttribute == FATTR4_TIME_ACCESS_SET) {
+		str.AddInt(1);		// SET_TO_CLIENT_TIME4
+
+		struct timespec* ts =
+			reinterpret_cast<timespec*>(attr[i].fData.fPointer);
+		str.AddHyper(ts->tv_sec);
+		str.AddUInt(ts->tv_nsec);
+
+		i++;
+	}
+
+	if (i < count && attr[i].fAttribute == FATTR4_TIME_MODIFY_SET) {
+		str.AddInt(1);		// SET_TO_CLIENT_TIME4
+
+		struct timespec* ts =
+			reinterpret_cast<timespec*>(attr[i].fData.fPointer);
+		str.AddHyper(ts->tv_sec);
+		str.AddUInt(ts->tv_nsec);
+
 		i++;
 	}
 

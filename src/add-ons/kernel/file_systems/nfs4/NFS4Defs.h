@@ -41,6 +41,7 @@ enum Opcode {
 	OpRename				= 29,
 	OpRenew					= 30,
 	OpSaveFH				= 32,
+	OpSetAttr				= 34,
 	OpSetClientID			= 35,
 	OpSetClientIDConfirm	= 36,
 	OpVerify				= 37,

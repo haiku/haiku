@@ -265,6 +265,15 @@ nfs4_read_stat(fs_volume* volume, fs_vnode* vnode, struct stat* stat)
 
 
 static status_t
+nfs4_write_stat(fs_volume* volume, fs_vnode* vnode, const struct stat* stat,
+	uint32 statMask)
+{
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	return inode->WriteStat(stat, statMask);
+}
+
+
+static status_t
 nfs4_create(fs_volume* volume, fs_vnode* dir, const char* name, int openMode,
 	int perms, void** _cookie, ino_t* _newVnodeID)
 {
@@ -523,7 +532,7 @@ fs_vnode_ops gNFSv4VnodeOps = {
 
 	nfs4_access,
 	nfs4_read_stat,
-	NULL,	// write_stat()
+	nfs4_write_stat,
 	NULL,	// fs_preallocate()
 
 	/* file operations */

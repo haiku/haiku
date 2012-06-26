@@ -360,6 +360,21 @@ ReplyInterpreter::Rename()
 
 
 status_t
+ReplyInterpreter::SetAttr()
+{
+	status_t res = _OperationError(OpSetAttr);
+	if (res != B_OK)
+		return res;
+
+	uint32 bcount = fReply->Stream().GetUInt();
+	for (uint32 i = 0; i < bcount; i++)
+		fReply->Stream().GetUInt();
+
+	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+}
+
+
+status_t
 ReplyInterpreter::SetClientID(uint64* clientid, uint64* verifier)
 {
 	status_t res = _OperationError(OpSetClientID);

@@ -40,8 +40,10 @@ public:
 					status_t	Remove(const char* name, FileType type);
 	static			status_t	Rename(Inode* from, Inode* to,
 									const char* fromName, const char* toName);
+
 					status_t	Access(int mode);
 					status_t	Stat(struct stat* st);
+					status_t	WriteStat(const struct stat* st, uint32 mask);
 
 					status_t	Create(const char* name, int mode, int perms,
 									OpenFileCookie* cookie, ino_t* id);
