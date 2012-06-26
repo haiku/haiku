@@ -727,13 +727,20 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 
 		req.PutFH(fParentFH);
 
-		AttrValue cattr;
-		cattr.fAttribute = FATTR4_MODE;
-		cattr.fFreePointer = false;
-		cattr.fData.fValue32 = perms;
+		AttrValue cattr[2];
+		uint32 i = 0;
+		if ((mode & O_TRUNC) == O_TRUNC) {
+			cattr[i].fAttribute = FATTR4_SIZE;
+			cattr[i].fFreePointer = false;
+			cattr[i].fData.fValue64 = 0;
+			i++;
+		}
+		cattr[i].fAttribute = FATTR4_MODE;
+		cattr[i].fFreePointer = false;
+		cattr[i].fData.fValue32 = perms;
 		req.Open(CLAIM_NULL, cookie->fSequence++, sModeToAccess(mode),
-			cookie->fClientId, OPEN4_CREATE, cookie->fOwnerId, name, &cattr,
-			1, mode & O_EXCL == O_EXCL);
+			cookie->fClientId, OPEN4_CREATE, cookie->fOwnerId, name, cattr,
+			i + 1, (mode & O_EXCL) == O_EXCL);
 
 		req.GetFH();
 
@@ -845,6 +852,16 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 		cookie->fOwnerId = atomic_add64(&cookie->fLastOwnerId, 1);
 
 		req.PutFH(fParentFH);
+
+		if ((mode & O_TRUNC) == O_TRUNC) {
+			AttrValue attr;
+			attr.fAttribute = FATTR4_SIZE;
+			attr.fFreePointer = false;
+			attr.fData.fValue64 = 0;
+			req.Open(CLAIM_NULL, cookie->fSequence++, sModeToAccess(mode),
+				cookie->fClientId, OPEN4_CREATE, cookie->fOwnerId, fName, &attr,
+				1, false);
+		} else
 		req.Open(CLAIM_NULL, cookie->fSequence++, sModeToAccess(mode),
 			cookie->fClientId, OPEN4_NOCREATE, cookie->fOwnerId, fName);
 
