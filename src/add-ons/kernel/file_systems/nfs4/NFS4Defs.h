@@ -29,6 +29,7 @@ enum Opcode {
 	OpLink					= 11,
 	OpLookUp				= 15,
 	OpLookUpUp				= 16,
+	OpNverify				= 17,
 	OpOpen					= 18,
 	OpOpenConfirm			= 20,
 	OpPutFH					= 22,

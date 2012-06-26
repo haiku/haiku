@@ -72,6 +72,7 @@ public:
 			status_t	Link();
 	inline	status_t	LookUp();
 	inline	status_t	LookUpUp();
+	inline	status_t	Nverify();
 			status_t	Open(uint32* id, uint32* seq, bool* confirm);
 			status_t	OpenConfirm(uint32* stateSeq);
 	inline	status_t	PutFH();
@@ -147,6 +148,13 @@ inline status_t
 ReplyInterpreter::LookUpUp()
 {
 	return _OperationError(OpLookUpUp);
+}
+
+
+inline status_t
+ReplyInterpreter::Nverify()
+{
+	return _OperationError(OpNverify);
 }
 
 

@@ -198,6 +198,23 @@ RequestBuilder::LookUpUp()
 
 
 status_t
+RequestBuilder::Nverify(AttrValue* attr, uint32 count)
+{
+	if (fProcedure != ProcCompound)
+		return B_BAD_VALUE;
+	if (fRequest == NULL)
+		return B_NO_MEMORY;
+
+	fRequest->Stream().AddUInt(OpNverify);
+	_EncodeAttrs(fRequest->Stream(), attr, count);
+
+	fOpCount++;
+
+	return B_OK;
+}
+
+
+status_t
 RequestBuilder::Open(OpenClaim claim, uint32 seq, uint32 access, uint64 id,
 	OpenCreate oc, uint64 ownerId, const char* name, AttrValue* attr,
 	uint32 count, bool excl)

@@ -241,8 +241,11 @@ Inode::Remove(const char* name, FileType type)
 		AttrValue attr;
 		attr.fAttribute = FATTR4_TYPE;
 		attr.fFreePointer = false;
-		attr.fData.fValue32 = type;
-		req.Verify(&attr, 1);
+		attr.fData.fValue32 = NF4DIR;
+		if (type == NF4DIR)
+			req.Verify(&attr, 1);
+		else
+			req.Nverify(&attr, 1);
 
 		req.PutFH(fHandle);
 		req.Remove(name);
@@ -259,8 +262,12 @@ Inode::Remove(const char* name, FileType type)
 		reply.PutFH();
 		reply.LookUp();
 
-		result = reply.Verify();
-		if (result == NFS4ERR_NOT_SAME && type == NF4REG)
+		if (type == NF4DIR)
+			result = reply.Verify();
+		else
+			result = reply.Nverify();
+
+		if (result == NFS4ERR_SAME && type != NF4DIR)
 			return B_IS_A_DIRECTORY;
 		if (result == NFS4ERR_NOT_SAME && type == NF4DIR)
 			return B_NOT_A_DIRECTORY;

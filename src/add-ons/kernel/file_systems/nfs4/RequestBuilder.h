@@ -36,6 +36,7 @@ public:
 			status_t				Link(const char* name);
 			status_t				LookUp(const char* name);
 			status_t				LookUpUp();
+			status_t				Nverify(AttrValue* attr, uint32 count);
 			status_t				Open(OpenClaim claim, uint32 seq,
 										uint32 access, uint64 id, OpenCreate oc,
 										uint64 ownerId, const char* name,
