@@ -29,8 +29,8 @@ public:
 			status_t				Close(uint32 seq, const uint32* id,
 										uint32 stateSeq);
 			status_t				Create(FileType type, const char* name,
-										const char* path, AttrValue* attr,
-										uint32 count);
+										AttrValue* attr, uint32 count,
+										const char* path = NULL);
 			status_t				GetAttr(Attribute* attrs, uint32 count);
 			status_t				GetFH();
 			status_t				Link(const char* name);

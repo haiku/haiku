@@ -377,6 +377,15 @@ nfs4_write(fs_volume* volume, fs_vnode* vnode, void* _cookie, off_t pos,
 
 
 static status_t
+nfs4_create_dir(fs_volume* volume, fs_vnode* parent, const char* name,
+	int mode)
+{
+	Inode* inode = reinterpret_cast<Inode*>(parent->private_node);
+	return inode->CreateDir(name, mode);
+}
+
+
+static status_t
 nfs4_remove_dir(fs_volume* volume, fs_vnode* parent, const char* name)
 {
 	Inode* inode = reinterpret_cast<Inode*>(parent->private_node);
@@ -526,7 +535,7 @@ fs_vnode_ops gNFSv4VnodeOps = {
 	nfs4_write,
 
 	/* directory operations */
-	NULL,	// create_dir()
+	nfs4_create_dir,
 	nfs4_remove_dir,
 	nfs4_open_dir,
 	nfs4_close_dir,

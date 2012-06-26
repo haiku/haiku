@@ -52,6 +52,7 @@ public:
 					status_t	Write(OpenFileCookie* cookie, off_t pos,
 									const void* buffer, size_t *_length);
 
+					status_t	CreateDir(const char* name, int mode);
 					status_t	OpenDir(OpenDirCookie* cookie);
 					status_t	ReadDir(void* buffer, uint32 size,
 									uint32* count, OpenDirCookie* cookie);

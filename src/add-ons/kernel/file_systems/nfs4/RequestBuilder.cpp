@@ -87,23 +87,24 @@ RequestBuilder::Close(uint32 seq, const uint32* id, uint32 stateSeq)
 
 
 status_t
-RequestBuilder::Create(FileType type, const char* name, const char* path,
-	AttrValue* attr, uint32 count)
+RequestBuilder::Create(FileType type, const char* name, AttrValue* attr,
+	uint32 count, const char* path)
 {
 	if (fProcedure != ProcCompound)
 		return B_BAD_VALUE;
 	if (fRequest == NULL)
 		return B_NO_MEMORY;
-	if (path == NULL)
+	if (type == NF4LNK && path == NULL)
 		return B_BAD_VALUE;
 	if (name == NULL)
 		return B_BAD_VALUE;
-	if (type != NF4LNK)
+	if (type == NF4BLK || type == NF4CHR)
 		return B_BAD_VALUE;
 
 	fRequest->Stream().AddUInt(OpCreate);
 	fRequest->Stream().AddUInt(type);
-	fRequest->Stream().AddString(path);
+	if (type == NF4LNK)
+		fRequest->Stream().AddString(path);
 	fRequest->Stream().AddString(name);
 	_EncodeAttrs(fRequest->Stream(), attr, count);
 

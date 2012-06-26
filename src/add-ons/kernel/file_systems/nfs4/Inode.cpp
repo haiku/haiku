@@ -336,7 +336,7 @@ Inode::CreateLink(const char* name, const char* path, int mode)
 		attr.fAttribute = FATTR4_MODE;
 		attr.fFreePointer = false;
 		attr.fData.fValue32 = mode;
-		req.Create(NF4LNK, name, path, &attr, 1);
+		req.Create(NF4LNK, name, &attr, 1, path);
 
 		status_t result = request.Send();
 		if (result != B_OK)
@@ -916,6 +916,38 @@ Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
 	*_length = size;
 
 	return B_OK;
+}
+
+
+status_t
+Inode::CreateDir(const char* name, int mode)
+{
+	do {
+		RPC::Server* serv = fFilesystem->Server();
+		Request request(serv);
+		RequestBuilder& req = request.Builder();
+
+		req.PutFH(fHandle);
+
+		AttrValue attr;
+		attr.fAttribute = FATTR4_MODE;
+		attr.fFreePointer = false;
+		attr.fData.fValue32 = mode;
+		req.Create(NF4DIR, name, &attr, 1);
+
+		status_t result = request.Send();
+		if (result != B_OK)
+			return result;
+
+		ReplyInterpreter& reply = request.Reply();
+
+		if (_HandleErrors(reply.NFS4Error(), serv))
+			continue;
+
+		reply.PutFH();
+
+		return reply.Create();
+	} while (true);
 }
 
 
