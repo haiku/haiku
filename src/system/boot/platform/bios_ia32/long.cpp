@@ -269,7 +269,7 @@ long_start_kernel()
 	uint64 entry = image->elf_header.e_entry;
 	uint64 stackTop = gKernelArgs.cpu_kstack[0].start
 		+ gKernelArgs.cpu_kstack[0].size;
-	uint64 kernelArgs = fix_address((addr_t)&gKernelArgs);
+	uint64 kernelArgs = (addr_t)&gKernelArgs;
 
 	dprintf("kernel entry at 0x%llx, stack 0x%llx, args 0x%llx\n", entry,
 		stackTop, kernelArgs);
