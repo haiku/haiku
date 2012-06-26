@@ -354,6 +354,24 @@ nfs4_read(fs_volume* volume, fs_vnode* vnode, void* _cookie, off_t pos,
 
 
 static status_t
+nfs4_write(fs_volume* volume, fs_vnode* vnode, void* _cookie, off_t pos,
+	const void* buffer, size_t* length)
+{
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+
+	if (inode->Type() == S_IFDIR)
+		return B_IS_A_DIRECTORY;
+
+	if (inode->Type() == S_IFLNK)
+		return B_BAD_VALUE;
+
+	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
+
+	return inode->Write(cookie, pos, buffer, *length);
+}
+
+
+static status_t
 nfs4_remove_dir(fs_volume* volume, fs_vnode* parent, const char* name)
 {
 	Inode* inode = reinterpret_cast<Inode*>(parent->private_node);
@@ -500,7 +518,7 @@ fs_vnode_ops gNFSv4VnodeOps = {
 	nfs4_close,
 	nfs4_free_cookie,
 	nfs4_read,
-	NULL,	// write,
+	nfs4_write,
 
 	/* directory operations */
 	NULL,	// create_dir()

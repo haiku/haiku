@@ -58,6 +58,9 @@ public:
 			status_t				SetClientID(const RPC::Server* serv);
 			status_t				SetClientIDConfirm(uint64 id, uint64 ver);
 			status_t				Verify(AttrValue* attr, uint32 count);
+			status_t				Write(const uint32* id, uint32 stateSeq,
+										const void* buffer, uint64 pos,
+										uint32 len);
 
 			RPC::Call*				Request();
 

@@ -372,6 +372,21 @@ ReplyInterpreter::SetClientID(uint64* clientid, uint64* verifier)
 }
 
 
+status_t
+ReplyInterpreter::Write(uint32* size)
+{
+	status_t res = _OperationError(OpWrite);
+	if (res != B_OK)
+		return res;
+
+	*size = fReply->Stream().GetUInt();
+	fReply->Stream().GetInt();
+	fReply->Stream().GetUHyper();
+
+	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+}
+
+
 static const char*
 sFlattenPathname(XDR::ReadStream& str)
 {

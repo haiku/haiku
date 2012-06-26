@@ -42,7 +42,8 @@ enum Opcode {
 	OpSaveFH				= 32,
 	OpSetClientID			= 35,
 	OpSetClientIDConfirm	= 36,
-	OpVerify				= 37
+	OpVerify				= 37,
+	OpWrite					= 38
 };
 
 enum Access {
@@ -169,6 +170,12 @@ enum OpenClaim {
 enum OpenFlags {
 	OPEN4_RESULT_CONFIRM		= 2,
 	OPEN4_RESULT_LOCKTYPE_POSIX	= 4
+};
+
+enum WriteStable {
+	UNSTABLE4				= 0,
+	DATA_SYNC4				= 1,
+	FILE_SYNC4				= 2
 };
 
 enum Errors {

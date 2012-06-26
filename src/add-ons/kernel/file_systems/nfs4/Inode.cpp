@@ -1020,6 +1020,74 @@ Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length)
 
 
 status_t
+Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
+	size_t length)
+{
+	uint32 size = 0;
+	uint32 len = 0;
+	const char* buffer = reinterpret_cast<const char*>(_buffer);
+
+	while (size < length) {
+		do {
+			RPC::Server* serv = fFilesystem->Server();
+			Request request(serv);
+			RequestBuilder& req = request.Builder();
+
+			req.PutFH(fHandle);
+			req.Write(cookie->fStateId, cookie->fStateSeq, buffer + size,
+				pos + size, length - size);
+
+			status_t result = request.Send(cookie);
+			if (result != B_OK)
+				return result;
+
+			ReplyInterpreter& reply = request.Reply();
+
+			// filehandle has expired
+			if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
+				_LookUpFilehandle();
+				continue;
+			}
+
+			// filesystem has been moved
+			if (reply.NFS4Error() == NFS4ERR_MOVED) {
+				fFilesystem->Migrate(fHandle, serv);
+				continue;
+			}
+
+			// server is in grace period, we need to wait
+			if (reply.NFS4Error() == NFS4ERR_GRACE) {
+				snooze_etc(fFilesystem->NFSServer()->LeaseTime() / 3,
+					B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
+				continue;
+			}
+
+			// server has rebooted, reclaim share and try again
+			if (reply.NFS4Error() == NFS4ERR_STALE_CLIENTID ||
+				reply.NFS4Error() == NFS4ERR_STALE_STATEID) {
+				fFilesystem->NFSServer()->ServerRebooted(cookie->fClientId);
+				continue;
+			}
+
+			result = reply.PutFH();
+			if (result != B_OK)
+				return result;
+
+			result = reply.Write(&len);
+			if (result != B_OK)
+				return result;
+
+			size += len;
+
+			break;
+		} while (true);
+	}
+
+	return B_OK;
+}
+
+
+status_t
 Inode::OpenDir(OpenDirCookie* cookie)
 {
 	if (fType != NF4DIR)

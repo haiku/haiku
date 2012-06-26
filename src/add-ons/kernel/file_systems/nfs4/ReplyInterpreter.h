@@ -87,6 +87,7 @@ public:
 			status_t	SetClientID(uint64* clientid, uint64* verifier);
 	inline	status_t	SetClientIDConfirm();
 	inline	status_t	Verify();
+			status_t	Write(uint32* size);
 
 private:
 			void		_ParseHeader();

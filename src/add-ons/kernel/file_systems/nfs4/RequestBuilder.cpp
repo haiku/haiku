@@ -500,6 +500,30 @@ RequestBuilder::Verify(AttrValue* attr, uint32 count)
 }
 
 
+status_t
+RequestBuilder::Write(const uint32* id, uint32 stateSeq, const void* buffer,
+	uint64 pos, uint32 len)
+{
+	if (fProcedure != ProcCompound)
+		return B_BAD_VALUE;
+	if (fRequest == NULL)
+		return B_NO_MEMORY;
+
+	fRequest->Stream().AddUInt(OpWrite);
+	fRequest->Stream().AddUInt(stateSeq);
+	fRequest->Stream().AddUInt(id[0]);
+	fRequest->Stream().AddUInt(id[1]);
+	fRequest->Stream().AddUInt(id[2]);
+	fRequest->Stream().AddUHyper(pos);
+	fRequest->Stream().AddInt(FILE_SYNC4);
+	fRequest->Stream().AddOpaque(buffer, len);
+
+	fOpCount++;
+
+	return B_OK;
+}
+
+
 RPC::Call*
 RequestBuilder::Request()
 {
