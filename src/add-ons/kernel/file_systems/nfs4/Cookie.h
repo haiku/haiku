@@ -13,7 +13,6 @@
 
 #include "Filesystem.h"
 
-class Inode;
 
 struct Cookie {
 			struct RequestEntry {
@@ -21,7 +20,7 @@ struct Cookie {
 				RequestEntry*	fNext;
 			};
 
-			Inode*			fInode;
+			Filesystem*		fFilesystem;
 			RequestEntry*	fRequests;
 			mutex			fRequestLock;
 

@@ -77,7 +77,7 @@ Cookie::CancelAll()
 	mutex_lock(&fRequestLock);
 	RequestEntry* ent = fRequests;
 	while (ent != NULL) {
-		fInode->FileSystem()->Server()->WakeCall(ent->fRequest);
+		fFilesystem->Server()->WakeCall(ent->fRequest);
 		ent = ent->fNext;
 	}
 	mutex_unlock(&fRequestLock);

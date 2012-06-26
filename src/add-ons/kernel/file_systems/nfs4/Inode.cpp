@@ -712,8 +712,6 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 	bool confirm;
 	status_t result;
 
-	cookie->fInode = this;
-	cookie->fHandle = fHandle;
 	cookie->fMode = mode;
 	cookie->fSequence = 0;
 
@@ -811,6 +809,9 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 
 		fFilesystem->InoIdMap()->AddEntry(fi, *id);
 
+		cookie->fFilesystem = fFilesystem;
+		cookie->fHandle = fh;
+
 		break;
 	} while (true);
 
@@ -829,7 +830,7 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 	bool confirm;
 	status_t result;
 
-	cookie->fInode = this;
+	cookie->fFilesystem = fFilesystem;
 	cookie->fHandle = fHandle;
 	cookie->fMode = mode;
 	cookie->fSequence = 0;
@@ -1131,7 +1132,7 @@ Inode::OpenDir(OpenDirCookie* cookie)
 		if (allowed & ACCESS4_READ != ACCESS4_READ)
 			return B_PERMISSION_DENIED;
 
-		cookie->fInode = this;
+		cookie->fFilesystem = fFilesystem;
 		cookie->fCookie = 0;
 		cookie->fCookieVerf = 2;
 

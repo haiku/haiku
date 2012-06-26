@@ -278,6 +278,11 @@ nfs4_create(fs_volume* volume, fs_vnode* dir, const char* name, int openMode,
 	if (result != B_OK)
 		delete cookie;
 
+	void* ptr;
+	result = get_vnode(volume, *_newVnodeID, &ptr);
+	if (result != B_OK)
+		delete cookie;
+
 	return result;
 }
 
