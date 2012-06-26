@@ -674,6 +674,10 @@ ReplyInterpreter::_NFS4ErrorToHaiku(uint32 x)
 		case NFS4ERR_INVAL:		return B_BAD_VALUE;
 		case NFS4ERR_FBIG:		return B_FILE_TOO_LARGE;
 		// ...
+		case NFS4ERR_DELAY:
+		case NFS4ERR_GRACE:
+								return B_WOULD_BLOCK;
+		// ...
 		default:				return B_ERROR;
 	}
 }

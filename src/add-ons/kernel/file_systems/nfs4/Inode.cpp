@@ -1285,14 +1285,20 @@ Inode::_HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 
 		// server needs more time, we need to wait
 		case NFS4ERR_DELAY:
-			snooze_etc(5 * 1000000, B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
-			return true;
+			if (cookie == NULL || (cookie->fMode & O_NONBLOCK) == 0) {
+				snooze_etc(5 * 1000000, B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
+				return true;
+			} else
+				return false;
 
 		// server is in grace period, we need to wait
 		case NFS4ERR_GRACE:
-			snooze_etc(fFilesystem->NFSServer()->LeaseTime() / 3,
-				B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
-			return true;
+			if (cookie == NULL || (cookie->fMode & O_NONBLOCK) == 0) {
+				snooze_etc(fFilesystem->NFSServer()->LeaseTime() / 3,
+					B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
+				return true;
+			} else
+				return false;
 
 		// server has rebooted, reclaim share and try again
 		case NFS4ERR_STALE_CLIENTID:
