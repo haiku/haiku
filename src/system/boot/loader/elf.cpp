@@ -76,11 +76,11 @@ struct ELF32Class {
 
 	static inline status_t
 	AllocateRegion(AddrType* _address, AddrType size, uint8 protection,
-		void **_mappedAddress)
+		void** _mappedAddress)
 	{
 		status_t status = platform_allocate_region((void**)_address, size,
 			protection, false);
-		if (status < B_OK)
+		if (status != B_OK)
 			return status;
 
 		*_mappedAddress = (void*)*_address;
@@ -123,7 +123,7 @@ struct ELF64Class {
 
 		status_t status = platform_allocate_region(&address, size, protection,
 			false);
-		if (status < B_OK)
+		if (status != B_OK)
 			return status;
 
 		*_mappedAddress = address;
@@ -282,7 +282,7 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 	// can automatically allocate an address, but shall prefer the specified
 	// base address.
 	if (Class::AllocateRegion(&firstRegion->start, totalSize,
-			B_READ_AREA | B_WRITE_AREA, &mappedRegion) < B_OK) {
+			B_READ_AREA | B_WRITE_AREA, &mappedRegion) != B_OK) {
 		status = B_NO_MEMORY;
 		goto error1;
 	}
@@ -379,7 +379,7 @@ ELFLoader<Class>::Relocate(preloaded_image* _image)
 			(int)image->rel_len / (int)sizeof(RelType)));
 
 		status = boot_arch_elf_relocate_rel(image, image->rel, image->rel_len);
-		if (status < B_OK)
+		if (status != B_OK)
 			return status;
 	}
 
@@ -398,7 +398,7 @@ ELFLoader<Class>::Relocate(preloaded_image* _image)
 			status = boot_arch_elf_relocate_rela(image, (RelaType*)pltrel,
 				image->pltrel_len);
 		}
-		if (status < B_OK)
+		if (status != B_OK)
 			return status;
 	}
 
@@ -407,7 +407,7 @@ ELFLoader<Class>::Relocate(preloaded_image* _image)
 			(int)image->rela_len / (int)sizeof(RelaType)));
 		status = boot_arch_elf_relocate_rela(image, image->rela,
 			image->rela_len);
-		if (status < B_OK)
+		if (status != B_OK)
 			return status;
 	}
 
