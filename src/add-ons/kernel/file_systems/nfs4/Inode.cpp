@@ -710,7 +710,7 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 
 		cookie->fOwnerId = atomic_add64(&cookie->fLastOwnerId, 1);
 
-		req.PutFH(fParentFH);
+		req.PutFH(fHandle);
 
 		AttrValue cattr[2];
 		uint32 i = 0;
