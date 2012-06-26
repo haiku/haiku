@@ -80,9 +80,7 @@ NFS4Server::_ReclaimOpen(OpenFileCookie* cookie)
 
 	ReplyInterpreter& reply = request.Reply();
 
-	result = reply.PutFH();
-	if (result != B_OK)
-		return result;
+	reply.PutFH();
 
 	bool confirm;
 	result = reply.Open(cookie->fStateId, &cookie->fStateSeq, &confirm);
@@ -100,10 +98,7 @@ NFS4Server::_ReclaimOpen(OpenFileCookie* cookie)
 		if (result != B_OK)
 			return result;
 
-		result = reply.PutFH();
-		if (result != B_OK)
-			return result;
-
+		reply.PutFH();
 		result = reply.OpenConfirm(&cookie->fStateSeq);
 		if (result != B_OK)
 			return result;
@@ -203,9 +198,7 @@ NFS4Server::_GetLeaseTime()
 
 	ReplyInterpreter& reply = request.Reply();
 
-	result = reply.PutRootFH();
-	if (result != B_OK)
-		return result;
+	reply.PutRootFH();
 
 	AttrValue* values;
 	uint32 count;

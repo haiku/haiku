@@ -65,6 +65,7 @@ DirEntry::~DirEntry()
 ReplyInterpreter::ReplyInterpreter(RPC::Reply* reply)
 	:
 	fNFS4Error(NFS4_OK),
+	fDecodeError(false),
 	fReply(reply)
 {
 	if (reply != NULL)
@@ -618,16 +619,26 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 status_t
 ReplyInterpreter::_OperationError(Opcode op)
 {
+	if (fDecodeError)
+		return B_BAD_VALUE;
+
 	if (fReply == NULL)
 		return B_NOT_INITIALIZED;
 
-	if (fReply->Error() != B_OK || fReply->Stream().IsEOF())
+	if (fReply->Error() != B_OK || fReply->Stream().IsEOF()) {
+		fDecodeError = true;
 		return fReply->Error();
+	}
 
-	if (fReply->Stream().GetInt() != op)
+	if (fReply->Stream().GetInt() != op) {
+		fDecodeError = true;
 		return B_BAD_VALUE;
+	}
 
-	return _NFS4ErrorToHaiku(fReply->Stream().GetUInt());
+	status_t result = _NFS4ErrorToHaiku(fReply->Stream().GetUInt());
+	if (result != B_OK)
+		fDecodeError = true;
+	return result;
 }
 
 

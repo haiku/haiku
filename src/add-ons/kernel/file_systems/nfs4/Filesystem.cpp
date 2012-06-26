@@ -100,20 +100,13 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
 
 	ReplyInterpreter& reply = request.Reply();
 
-	result = reply.PutRootFH();
-	if (result != B_OK)
-		return result;
+	reply.PutRootFH();
 
-	for (uint32 i = 0; i < lookupCount; i++) {
-		result = reply.LookUp();
-		if (result != B_OK)
-			return result;
-	}
+	for (uint32 i = 0; i < lookupCount; i++)
+		reply.LookUp();
 
 	Filehandle fh;
-	result = reply.GetFH(&fh);
-	if (result != B_OK)
-		return result;
+	reply.GetFH(&fh);
 
 	uint32 allowed;
 	result = reply.Access(NULL, &allowed);
@@ -224,9 +217,7 @@ Filesystem::ReadInfo(struct fs_info* info)
 
 	ReplyInterpreter& reply = request.Reply();
 
-	result = reply.PutFH();
-	if (result != B_OK)
-		return result;
+	reply.PutFH();
 
 	AttrValue* values;
 	uint32 count, next = 0;
@@ -301,11 +292,7 @@ Filesystem::Migrate(const Filehandle& fh, const RPC::Server* serv)
 
 	ReplyInterpreter& reply = request.Reply();
 
-	result = reply.PutFH();
-	if (result != B_OK) {
-		mutex_unlock(&fMigrationLock);
-		return result;
-	}
+	reply.PutFH();
 
 	AttrValue* values;
 	uint32 count;

@@ -99,6 +99,7 @@ private:
 	static	status_t	_NFS4ErrorToHaiku(uint32 x);
 
 			uint32		fNFS4Error;
+			bool		fDecodeError;
 			RPC::Reply*	fReply;
 };
 
@@ -109,6 +110,7 @@ ReplyInterpreter::SetTo(RPC::Reply* _reply)
 	if (fReply != NULL)
 		return B_DONT_DO_THAT;
 
+	fDecodeError = false;
 	fReply = _reply;
 
 	if (fReply != NULL)
@@ -123,6 +125,7 @@ ReplyInterpreter::Reset()
 {
 	delete fReply;
 	fReply = NULL;
+	fDecodeError = false;
 }
 
 

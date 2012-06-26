@@ -52,9 +52,7 @@ Inode::CreateInode(Filesystem* fs, const FileInfo &fi, Inode** _inode)
 		if (inode->_HandleErrors(reply.NFS4Error(), serv))
 			continue;
 
-		result = reply.PutFH();
-		if (result != B_OK)
-			return result;
+		reply.PutFH();
 
 		AttrValue* values;
 		uint32 count;
@@ -133,21 +131,14 @@ Inode::LookUp(const char* name, ino_t* id)
 		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
 
-		result = reply.PutFH();
-		if (result != B_OK)
-			return result;
-
+		reply.PutFH();
 		if (!strcmp(name, ".."))
-			result = reply.LookUpUp();
+			reply.LookUpUp();
 		else
-			result = reply.LookUp();
-		if (result != B_OK)
-			return result;
+			reply.LookUp();
 
 		Filehandle fh;
-		result = reply.GetFH(&fh);
-		if (result != B_OK)
-			return result;
+		reply.GetFH(&fh);
 
 		AttrValue* values;
 		uint32 count;
@@ -225,17 +216,9 @@ Inode::Link(Inode* dir, const char* name)
 			continue;
 		}
 
-		result = reply.PutFH();
-		if (result != B_OK)
-			return result;
-
-		result = reply.SaveFH();
-		if (result != B_OK)
-			return result;
-
-		result = reply.PutFH();
-		if (result != B_OK)
-			return result;
+		reply.PutFH();
+		reply.SaveFH();
+		reply.PutFH();
 
 		return reply.Link();
 	} while (true);
@@ -273,13 +256,8 @@ Inode::Remove(const char* name, FileType type)
 		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
 
-		result = reply.PutFH();
-		if (result != B_OK)
-			return result;
-
-		result = reply.LookUp();
-		if (result != B_OK)
-			return result;
+		reply.PutFH();
+		reply.LookUp();
 
 		result = reply.Verify();
 		if (result == NFS4ERR_NOT_SAME && type == NF4REG)
@@ -289,10 +267,7 @@ Inode::Remove(const char* name, FileType type)
 		if (result != B_OK)
 			return result;
 
-		result = reply.PutFH();
-		if (result != B_OK)
-			return result;
-
+		reply.PutFH();
 		return reply.Remove();
 	} while (true);
 }
@@ -338,18 +313,9 @@ Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName)
 			continue;
 		}
 
-		result = reply.PutFH();
-		if (result != B_OK)
-			return result;
-
-		result = reply.SaveFH();
-		if (result != B_OK)
-			return result;
-
-		result = reply.PutFH();
-		if (result != B_OK)
-			return result;
-
+		reply.PutFH();
+		reply.SaveFH();
+		reply.PutFH();
 
 		return reply.Rename();
 	} while (true);
@@ -381,9 +347,7 @@ Inode::CreateLink(const char* name, const char* path, int mode)
 		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
 
-		result = reply.PutFH();
-		if (result != B_OK)
-			return result;
+		reply.PutFH();
 
 		return reply.Create();
 	} while (true);
@@ -413,9 +377,7 @@ Inode::ReadLink(void* buffer, size_t* length)
 		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
 
-		result = reply.PutFH();
-		if (result != B_OK)
-			return result;
+		reply.PutFH();
 
 		uint32 size;
 		result = reply.ReadLink(buffer, &size, *length);
@@ -446,9 +408,7 @@ Inode::Access(int mode)
 		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
 
-		result = reply.PutFH();
-		if (result != B_OK)
-			return result;
+		reply.PutFH();
 
 		uint32 allowed;
 		result = reply.Access(NULL, &allowed);
@@ -500,9 +460,7 @@ Inode::Stat(struct stat* st)
 		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
 
-		result = reply.PutFH();
-		if (result != B_OK)
-			return result;
+		reply.PutFH();
 
 		AttrValue* values;
 		uint32 count;
@@ -530,9 +488,7 @@ Inode::Stat(struct stat* st)
 			result = request.Send();
 			if (result != B_OK)
 				return result;
-			result = request.Reply().PutFH();
-			if (result != B_OK)
-				return result;
+			request.Reply().PutFH();
 			uint32 prvl;
 			result = request.Reply().Access(NULL, &prvl);
 			if (result != B_OK)
@@ -626,11 +582,7 @@ sConfirmOpen(Filesystem* fs, Filehandle& fh, OpenFileCookie* cookie)
 
 	ReplyInterpreter& reply = request.Reply();
 
-	result = reply.PutFH();
-	if (result != B_OK) {
-		fs->NFSServer()->RemoveOpenFile(cookie);
-		return result;
-	}
+	reply.PutFH();
 
 	result = reply.OpenConfirm(&cookie->fStateSeq);
 	if (result != B_OK) {
@@ -695,17 +647,9 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
 
-		result = reply.PutFH();
-		if (result != B_OK)
-			return result;
-
-		result = reply.Open(cookie->fStateId, &cookie->fStateSeq, &confirm);
-		if (result != B_OK)
-			return result;
-
-		result = reply.GetFH(&fh);
-		if (result != B_OK)
-			return result;
+		reply.PutFH();
+		reply.Open(cookie->fStateId, &cookie->fStateSeq, &confirm);
+		reply.GetFH(&fh);
 
 		AttrValue* values;
 		uint32 count;
@@ -798,10 +742,7 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
 
-		result = reply.PutFH();
-		if (result != B_OK)
-			return result;
-
+		reply.PutFH();
 		result = reply.Open(cookie->fStateId, &cookie->fStateSeq, &confirm);
 		if (result != B_OK)
 			return result;
@@ -841,10 +782,7 @@ Inode::Close(OpenFileCookie* cookie)
 		if (_HandleErrors(reply.NFS4Error(), serv, cookie))
 			continue;
 
-		result = reply.PutFH();
-		if (result != B_OK)
-			return result;
-
+		reply.PutFH();
 		result = reply.Close();
 		if (result != B_OK)
 			return result;
@@ -884,10 +822,7 @@ Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length)
 			if (_HandleErrors(reply.NFS4Error(), serv, cookie))
 				continue;
 
-			result = reply.PutFH();
-			if (result != B_OK)
-				return result;
-
+			reply.PutFH();
 			result = reply.Read(reinterpret_cast<char*>(buffer) + size, &len,
 						&eof);
 			if (result != B_OK)
@@ -960,9 +895,7 @@ Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
 			if (_HandleErrors(reply.NFS4Error(), serv, cookie))
 				continue;
 
-			result = reply.PutFH();
-			if (result != B_OK)
-				return result;
+			reply.PutFH();
 
 			if ((cookie->fMode & O_APPEND) == O_APPEND) {
 				result = reply.Verify();
@@ -1009,9 +942,7 @@ Inode::OpenDir(OpenDirCookie* cookie)
 		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
 
-		result = reply.PutFH();
-		if (result != B_OK)
-			return result;
+		reply.PutFH();
 
 		uint32 allowed;
 		result = reply.Access(NULL, &allowed);
@@ -1054,10 +985,7 @@ Inode::_ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
 		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
 
-		result = reply.PutFH();
-		if (result != B_OK)
-			return result;
-
+		reply.PutFH();
 		return reply.ReadDir(&cookie->fCookie, &cookie->fCookieVerf, dirents,
 			count, eof);
 	} while (true);
@@ -1109,22 +1037,15 @@ Inode::_ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
 
-		result = reply.PutFH();
-		if (result != B_OK)
-			return result;
-
-		result = reply.LookUpUp();
-		if (result != B_OK)
-			return result;
+		reply.PutFH();
+		reply.LookUpUp();
 
 		Filehandle fh;
-		result = reply.GetFH(&fh);
-		if (result != B_OK)
-			return result;
+		reply.GetFH(&fh);
 
 		AttrValue* values;
 		uint32 count;
-		result = reply.GetAttr(&values, &count);
+		reply.GetAttr(&values, &count);
 		if (result != B_OK)
 			return result;
 
@@ -1314,15 +1235,9 @@ Inode::_LookUpFilehandle()
 
 	ReplyInterpreter& reply = request.Reply();
 
-	result = reply.PutRootFH();
-	if (result != B_OK)
-		return result;
-
-	for (uint32 i = 0; i < lookupCount; i++) {
-		result = reply.LookUp();
-		if (result != B_OK)
-			return result;
-	}
+	reply.PutRootFH();
+	for (uint32 i = 0; i < lookupCount; i++)
+		reply.LookUp();
 
 	return reply.GetFH(&fHandle);
 }
