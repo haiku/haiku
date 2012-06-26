@@ -197,6 +197,7 @@ static status_t
 nfs4_put_vnode(fs_volume* volume, fs_vnode* vnode, bool reenter)
 {
 	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	inode->FileSystem()->InoIdMap()->RemoveEntry(inode->ID());
 	delete inode;
 
 	return B_OK;

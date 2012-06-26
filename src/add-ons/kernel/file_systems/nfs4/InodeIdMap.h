@@ -19,6 +19,7 @@ class InodeIdMap {
 public:
 	inline	status_t						AddEntry(const FileInfo& fi,
 												ino_t id);
+	inline	status_t						RemoveEntry(ino_t id);
 	inline	status_t						GetFileInfo(FileInfo* fi, ino_t id);
 
 private:
@@ -31,6 +32,13 @@ inline status_t
 InodeIdMap::AddEntry(const FileInfo& fi, ino_t id)
 {
 	return fMap.Insert(id, fi);
+}
+
+
+inline status_t
+InodeIdMap::RemoveEntry(ino_t id)
+{
+	return fMap.Remove(id);
 }
 
 
