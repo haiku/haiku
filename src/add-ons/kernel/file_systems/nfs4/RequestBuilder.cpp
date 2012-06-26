@@ -198,7 +198,8 @@ RequestBuilder::LookUpUp()
 
 status_t
 RequestBuilder::Open(OpenClaim claim, uint32 seq, uint32 access, uint64 id,
-	OpenCreate oc, uint64 ownerId, const char* name)
+	OpenCreate oc, uint64 ownerId, const char* name, AttrValue* attr,
+	uint32 count, bool excl)
 {
 	if (fProcedure != ProcCompound)
 		return B_BAD_VALUE;
@@ -219,6 +220,11 @@ RequestBuilder::Open(OpenClaim claim, uint32 seq, uint32 access, uint64 id,
 	fRequest->Stream().AddOpaque(owner, pos);
 
 	fRequest->Stream().AddUInt(oc);
+	if (oc == OPEN4_CREATE) {
+		fRequest->Stream().AddInt(excl ? GUARDED4 : UNCHECKED4);
+		_EncodeAttrs(fRequest->Stream(), attr, count);
+	}
+
 	fRequest->Stream().AddUInt(claim);
 	switch (claim) {
 		case CLAIM_NULL:

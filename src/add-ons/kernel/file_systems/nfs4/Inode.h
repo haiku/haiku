@@ -43,6 +43,8 @@ public:
 					status_t	Access(int mode);
 					status_t	Stat(struct stat* st);
 
+					status_t	Create(const char* name, int mode, int perms,
+									OpenFileCookie* cookie, ino_t* id);
 					status_t	Open(int mode, OpenFileCookie* cookie);
 					status_t	Close(OpenFileCookie* cookie);
 					status_t	Read(OpenFileCookie* cookie, off_t pos,

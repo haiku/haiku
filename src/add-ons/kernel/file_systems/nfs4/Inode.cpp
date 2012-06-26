@@ -654,6 +654,175 @@ Inode::Stat(struct stat* st)
 }
 
 
+static OpenAccess
+sModeToAccess(int mode)
+{
+	switch (mode & O_RWMASK) {
+		case O_RDONLY:
+			return OPEN4_SHARE_ACCESS_READ;
+		case O_WRONLY:
+			return OPEN4_SHARE_ACCESS_WRITE;
+		case O_RDWR:
+			return OPEN4_SHARE_ACCESS_BOTH;
+	}
+
+	return OPEN4_SHARE_ACCESS_READ;
+}
+
+
+static status_t
+sConfirmOpen(Filesystem* fs, Filehandle& fh, OpenFileCookie* cookie)
+{
+	Request request(fs->Server());
+
+	RequestBuilder& req = request.Builder();
+
+	req.PutFH(fh);
+	req.OpenConfirm(cookie->fSequence++, cookie->fStateId,
+		cookie->fStateSeq);
+
+	status_t result = request.Send();
+	if (result != B_OK) {
+		fs->NFSServer()->RemoveOpenFile(cookie);
+		return result;
+	}
+
+	ReplyInterpreter& reply = request.Reply();
+
+	result = reply.PutFH();
+	if (result != B_OK) {
+		fs->NFSServer()->RemoveOpenFile(cookie);
+		return result;
+	}
+
+	result = reply.OpenConfirm(&cookie->fStateSeq);
+	if (result != B_OK) {
+		fs->NFSServer()->RemoveOpenFile(cookie);
+		return result;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
+	ino_t* id)
+{
+	bool confirm;
+	status_t result;
+
+	cookie->fInode = this;
+	cookie->fHandle = fHandle;
+	cookie->fMode = mode;
+	cookie->fSequence = 0;
+
+	Filehandle fh;
+	do {
+		cookie->fClientId = fFilesystem->NFSServer()->ClientId();
+
+		RPC::Server* serv = fFilesystem->Server();
+		Request request(serv);
+		RequestBuilder& req = request.Builder();
+
+		cookie->fOwnerId = atomic_add64(&cookie->fLastOwnerId, 1);
+
+		req.PutFH(fParentFH);
+
+		AttrValue cattr;
+		cattr.fAttribute = FATTR4_MODE;
+		cattr.fFreePointer = false;
+		cattr.fData.fValue32 = perms;
+		req.Open(CLAIM_NULL, cookie->fSequence++, sModeToAccess(mode),
+			cookie->fClientId, OPEN4_CREATE, cookie->fOwnerId, name, &cattr,
+			1, mode & O_EXCL == O_EXCL);
+
+		req.GetFH();
+
+		Attribute attr[] = { FATTR4_FILEID };
+		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
+
+		result = request.Send();
+		if (result != B_OK)
+			return result;
+
+		ReplyInterpreter& reply = request.Reply();
+
+		// filehandle has expired
+		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
+			_LookUpFilehandle();
+			continue;
+		}
+
+		// filesystem has been moved
+		if (reply.NFS4Error() == NFS4ERR_MOVED) {
+			fFilesystem->Migrate(fHandle, serv);
+			continue;
+		}
+
+		// server is in grace period, we need to wait
+		if (reply.NFS4Error() == NFS4ERR_GRACE) {
+			fFilesystem->NFSServer()->ReleaseCID(cookie->fClientId);
+			snooze_etc(fFilesystem->NFSServer()->LeaseTime() / 3,
+				B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
+			continue;
+		}
+
+		result = reply.PutFH();
+		if (result != B_OK)
+			return result;
+
+		result = reply.Open(cookie->fStateId, &cookie->fStateSeq, &confirm);
+		if (result != B_OK)
+			return result;
+
+		result = reply.GetFH(&fh);
+		if (result != B_OK)
+			return result;
+
+		AttrValue* values;
+		uint32 count;
+		result = reply.GetAttr(&values, &count);
+		if (result != B_OK)
+			return result;
+
+		uint64 fileId;
+		if (count == 1 && values[1].fAttribute == FATTR4_FILEID)
+			fileId = values[1].fData.fValue64;
+		else
+			fileId = fFilesystem->AllocFileId();
+			
+		delete[] values;
+
+		*id = _FileIdToInoT(fileId);
+
+		FileInfo fi;
+		fi.fFileId = fileId;
+		fi.fFH = fh;
+		fi.fParent = fHandle;
+		fi.fName = strdup(name);
+
+		char* path = reinterpret_cast<char*>(malloc(strlen(name) + 2 +
+			strlen(fPath)));
+		strcpy(path, fPath);
+		strcat(path, "/");
+		strcat(path, name);
+		fi.fPath = path;
+
+		fFilesystem->InoIdMap()->AddEntry(fi, *id);
+
+		break;
+	} while (true);
+
+	fFilesystem->NFSServer()->AddOpenFile(cookie);
+
+	if (confirm)
+		return sConfirmOpen(fFilesystem, fh, cookie);
+	else
+		return B_OK;
+}
+
+
 status_t
 Inode::Open(int mode, OpenFileCookie* cookie)
 {
@@ -675,7 +844,7 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 		cookie->fOwnerId = atomic_add64(&cookie->fLastOwnerId, 1);
 
 		req.PutFH(fParentFH);
-		req.Open(CLAIM_NULL, cookie->fSequence++, OPEN4_SHARE_ACCESS_READ,
+		req.Open(CLAIM_NULL, cookie->fSequence++, sModeToAccess(mode),
 			cookie->fClientId, OPEN4_NOCREATE, cookie->fOwnerId, fName);
 
 		result = request.Send();
@@ -717,37 +886,10 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 
 	fFilesystem->NFSServer()->AddOpenFile(cookie);
 
-	if (confirm) {
-		Request request(fFilesystem->Server());
-
-		RequestBuilder& req = request.Builder();
-
-		req.PutFH(fHandle);
-		req.OpenConfirm(cookie->fSequence++, cookie->fStateId,
-			cookie->fStateSeq);
-
-		result = request.Send();
-		if (result != B_OK) {
-			fFilesystem->NFSServer()->RemoveOpenFile(cookie);
-			return result;
-		}
-
-		ReplyInterpreter& reply = request.Reply();
-
-		result = reply.PutFH();
-		if (result != B_OK) {
-			fFilesystem->NFSServer()->RemoveOpenFile(cookie);
-			return result;
-		}
-
-		result = reply.OpenConfirm(&cookie->fStateSeq);
-		if (result != B_OK) {
-			fFilesystem->NFSServer()->RemoveOpenFile(cookie);
-			return result;
-		}
-	}
-
-	return B_OK;
+	if (confirm)
+		return sConfirmOpen(fFilesystem, fHandle, cookie);
+	else
+		return B_OK;
 }
 
 

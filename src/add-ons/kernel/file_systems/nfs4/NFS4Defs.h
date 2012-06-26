@@ -144,12 +144,19 @@ enum FileHandleExpiryType {
 
 enum OpenAccess {
 	OPEN4_SHARE_ACCESS_READ		= 1,
-	OPEN4_SHARE_ACCESS_WRITE	= 2
+	OPEN4_SHARE_ACCESS_WRITE	= 2,
+	OPEN4_SHARE_ACCESS_BOTH		= 3
 };
 
 enum OpenCreate {
 	OPEN4_NOCREATE			= 0,
 	OPEN4_CREATE			= 1
+};
+
+enum OpenCreateHow {
+	UNCHECKED4				= 0,
+	GUARDED4				= 1,
+	EXCLUSIVE4				= 2
 };
 
 enum OpenClaim {

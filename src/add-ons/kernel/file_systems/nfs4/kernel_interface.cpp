@@ -265,6 +265,24 @@ nfs4_read_stat(fs_volume* volume, fs_vnode* vnode, struct stat* stat)
 
 
 static status_t
+nfs4_create(fs_volume* volume, fs_vnode* dir, const char* name, int openMode,
+	int perms, void** _cookie, ino_t* _newVnodeID)
+{
+	OpenFileCookie* cookie = new OpenFileCookie;
+	if (cookie == NULL)
+		return B_NO_MEMORY;
+	*_cookie = cookie;
+
+	Inode* inode = reinterpret_cast<Inode*>(dir->private_node);
+	status_t result = inode->Create(name, openMode, perms, cookie, _newVnodeID);
+	if (result != B_OK)
+		delete cookie;
+
+	return result;
+}
+
+
+static status_t
 nfs4_open(fs_volume* volume, fs_vnode* vnode, int openMode, void** _cookie)
 {
 	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
@@ -477,7 +495,7 @@ fs_vnode_ops gNFSv4VnodeOps = {
 	NULL,	// fs_preallocate()
 
 	/* file operations */
-	NULL,	// create()
+	nfs4_create,
 	nfs4_open,
 	nfs4_close,
 	nfs4_free_cookie,
