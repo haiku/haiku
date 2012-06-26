@@ -593,7 +593,7 @@ Inode::WriteStat(const struct stat* st, uint32 mask)
 		attr[i].fAttribute = FATTR4_TIME_ACCESS_SET;
 		attr[i].fFreePointer = true;
 		attr[i].fData.fPointer = malloc(sizeof(st->st_atime));
-		memcpy(attr[i].fData.fPointer, &st->st_atime, sizeof(st->st_atime));
+		memcpy(attr[i].fData.fPointer, &st->st_atime, sizeof(st->st_atim));
 		i++;
 	}
 
@@ -601,7 +601,7 @@ Inode::WriteStat(const struct stat* st, uint32 mask)
 		attr[i].fAttribute = FATTR4_TIME_MODIFY_SET;
 		attr[i].fFreePointer = true;
 		attr[i].fData.fPointer = malloc(sizeof(st->st_mtime));
-		memcpy(attr[i].fData.fPointer, &st->st_mtime, sizeof(st->st_mtime));
+		memcpy(attr[i].fData.fPointer, &st->st_mtime, sizeof(st->st_mtim));
 		i++;
 	}
 
