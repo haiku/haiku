@@ -573,6 +573,11 @@ RequestBuilder::_EncodeAttrs(XDR::WriteStream& stream, AttrValue* attr,
 		i++;
 	}
 
+	if (i < count && attr[i].fAttribute == FATTR4_SIZE) {
+		str.AddUHyper(attr[i].fData.fValue64);
+		i++;
+	}
+
 	if (i < count && attr[i].fAttribute == FATTR4_MODE) {
 		str.AddUInt(attr[i].fData.fValue32);
 		i++;

@@ -1022,27 +1022,55 @@ Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length)
 
 status_t
 Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
-	size_t length)
+	size_t *_length)
 {
 	uint32 size = 0;
 	uint32 len = 0;
+	uint64 fileSize;
 	const char* buffer = reinterpret_cast<const char*>(_buffer);
 
-	while (size < length) {
+	while (size < *_length) {
 		do {
 			RPC::Server* serv = fFilesystem->Server();
 			Request request(serv);
 			RequestBuilder& req = request.Builder();
 
+			if (size == 0 && (cookie->fMode & O_APPEND) == O_APPEND) {
+				struct stat st;
+				status_t result = Stat(&st);
+				if (result != B_OK)
+					return result;
+
+				fileSize = st.st_size;
+				pos = fileSize;
+			}
+
 			req.PutFH(fHandle);
+			if ((cookie->fMode & O_APPEND) == O_APPEND) {
+				AttrValue attr;
+				attr.fAttribute = FATTR4_SIZE;
+				attr.fFreePointer = false;
+				attr.fData.fValue64 = fileSize + size;
+				req.Verify(&attr, 1);
+			}
 			req.Write(cookie->fStateId, cookie->fStateSeq, buffer + size,
-				pos + size, length - size);
+				pos + size, *_length - size);
 
 			status_t result = request.Send(cookie);
 			if (result != B_OK)
 				return result;
 
 			ReplyInterpreter& reply = request.Reply();
+
+			// append: race condition
+			if (reply.NFS4Error() == NFS4ERR_NOT_SAME) {
+				if (size == 0)
+					continue;
+				else {
+					*_length = size;
+					return B_OK;
+				}
+			}
 
 			// filehandle has expired
 			if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
@@ -1074,6 +1102,12 @@ Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
 			if (result != B_OK)
 				return result;
 
+			if ((cookie->fMode & O_APPEND) == O_APPEND) {
+				result = reply.Verify();
+				if (result != B_OK)
+					return result;
+			}
+
 			result = reply.Write(&len);
 			if (result != B_OK)
 				return result;
@@ -1083,6 +1117,8 @@ Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
 			break;
 		} while (true);
 	}
+
+	*_length = size;
 
 	return B_OK;
 }

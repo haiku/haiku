@@ -50,7 +50,7 @@ public:
 					status_t	Read(OpenFileCookie* cookie, off_t pos,
 									void* buffer, size_t* length);
 					status_t	Write(OpenFileCookie* cookie, off_t pos,
-									const void* buffer, size_t length);
+									const void* buffer, size_t *_length);
 
 					status_t	OpenDir(OpenDirCookie* cookie);
 					status_t	ReadDir(void* buffer, uint32 size,

@@ -372,7 +372,7 @@ nfs4_write(fs_volume* volume, fs_vnode* vnode, void* _cookie, off_t pos,
 
 	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
 
-	return inode->Write(cookie, pos, buffer, *length);
+	return inode->Write(cookie, pos, buffer, length);
 }
 
 
