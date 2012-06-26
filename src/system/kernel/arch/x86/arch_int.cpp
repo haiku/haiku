@@ -553,7 +553,7 @@ arch_int_init(struct kernel_args *args)
 	interrupt_handler_function** table;
 
 	// set the global sIDT variable
-	sIDTs[0] = (desc_table *)args->arch_args.vir_idt;
+	sIDTs[0] = (desc_table *)(addr_t)args->arch_args.vir_idt;
 
 	// setup the standard programmable interrupt controller
 	pic_init();

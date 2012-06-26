@@ -56,7 +56,8 @@ struct X86PagingMethodPAE::ToPAESwitcher {
 		fKernelArgs(args)
 	{
 		// page hole set up in the boot loader
-		fPageHole = (page_table_entry*)fKernelArgs->arch_args.page_hole;
+		fPageHole = (page_table_entry*)
+			(addr_t)fKernelArgs->arch_args.page_hole;
 
 		// calculate where the page dir would be
 		fPageHolePageDir = (page_directory_entry*)

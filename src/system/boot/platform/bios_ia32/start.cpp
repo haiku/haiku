@@ -22,6 +22,7 @@
 #include "hpet.h"
 #include "interrupts.h"
 #include "keyboard.h"
+#include "long.h"
 #include "mmu.h"
 #include "multiboot.h"
 #include "serial.h"
@@ -75,6 +76,12 @@ platform_boot_options(void)
 extern "C" void
 platform_start_kernel(void)
 {
+	// 64-bit kernel entry is all handled in long.cpp
+	if (gKernelArgs.kernel_image->elf_class == ELFCLASS64) {
+		long_start_kernel();
+		return;
+	}
+
 	static struct kernel_args *args = &gKernelArgs;
 		// something goes wrong when we pass &gKernelArgs directly
 		// to the assembler inline below - might be a bug in GCC

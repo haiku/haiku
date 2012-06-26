@@ -419,6 +419,24 @@ mmu_allocate(void *virtualAddress, size_t size)
 }
 
 
+/*!	Allocates a single page and returns both its virtual and physical
+	addresses.
+*/
+void *
+mmu_allocate_page(addr_t *_physicalAddress)
+{
+	addr_t virt = get_next_virtual_page();
+	addr_t phys = get_next_physical_page();
+
+	map_page(virt, phys, kDefaultPageFlags);
+
+	if (_physicalAddress)
+		*_physicalAddress = phys;
+
+	return (void *)virt;
+}
+
+
 /*!	Allocates the given physical range.
 	\return \c true, if the range could be allocated, \c false otherwise.
 */
@@ -478,6 +496,35 @@ mmu_free(void *virtualAddress, size_t size)
 }
 
 
+size_t
+mmu_get_virtual_usage()
+{
+	return sNextVirtualAddress - KERNEL_BASE;
+}
+
+
+bool
+mmu_get_virtual_mapping(addr_t virtualAddress, addr_t *_physicalAddress)
+{
+	if (virtualAddress < KERNEL_BASE) {
+		panic("mmu_get_virtual_mapping: asked to lookup invalid page %p!\n",
+			(void *)virtualAddress);
+	}
+
+	uint32 *pageTable = (uint32 *)(sPageDirectory[virtualAddress
+		/ (B_PAGE_SIZE * 1024)] & 0xfffff000);
+	uint32 tableEntry = pageTable[(virtualAddress % (B_PAGE_SIZE * 1024))
+		/ B_PAGE_SIZE];
+
+	if ((tableEntry & (1<<0)) != 0) {
+		*_physicalAddress = tableEntry & 0xFFFFF000;
+		return true;
+	} else {
+		return false;
+	}
+}
+
+
 /*!	Sets up the final and kernel accessible GDT and IDT tables.
 	BIOS calls won't work any longer after this function has
 	been called.
@@ -501,10 +548,10 @@ mmu_init_for_kernel(void)
 		map_page(gKernelArgs.arch_args.vir_idt, (uint32)idt, kDefaultPageFlags);
 
 		// initialize it
-		interrupts_init_kernel_idt((void*)gKernelArgs.arch_args.vir_idt,
+		interrupts_init_kernel_idt((void*)(addr_t)gKernelArgs.arch_args.vir_idt,
 			IDT_LIMIT);
 
-		TRACE("idt at virtual address 0x%lx\n", gKernelArgs.arch_args.vir_idt);
+		TRACE("idt at virtual address 0x%llx\n", gKernelArgs.arch_args.vir_idt);
 	}
 
 	// set up a new gdt
@@ -524,7 +571,7 @@ mmu_init_for_kernel(void)
 
 		// put standard segment descriptors in it
 		segment_descriptor* virtualGDT
-			= (segment_descriptor*)gKernelArgs.arch_args.vir_gdt;
+			= (segment_descriptor*)(addr_t)gKernelArgs.arch_args.vir_gdt;
 		clear_segment_descriptor(&virtualGDT[0]);
 
 		// seg 0x08 - kernel 4GB code
@@ -548,7 +595,7 @@ mmu_init_for_kernel(void)
 
 		// load the GDT
 		gdtDescriptor.limit = GDT_LIMIT - 1;
-		gdtDescriptor.base = (void*)gKernelArgs.arch_args.vir_gdt;
+		gdtDescriptor.base = (void*)(addr_t)gKernelArgs.arch_args.vir_gdt;
 
 		asm("lgdt	%0;"
 			: : "m" (gdtDescriptor));

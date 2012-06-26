@@ -266,7 +266,7 @@ X86PagingMethod32Bit::Init(kernel_args* args,
 	TRACE("X86PagingMethod32Bit::Init(): entry\n");
 
 	// page hole set up in stage2
-	fPageHole = (page_table_entry*)args->arch_args.page_hole;
+	fPageHole = (page_table_entry*)(addr_t)args->arch_args.page_hole;
 	// calculate where the pgdir would be
 	fPageHolePageDir = (page_directory_entry*)
 		(((addr_t)args->arch_args.page_hole)
@@ -276,7 +276,7 @@ X86PagingMethod32Bit::Init(kernel_args* args,
 		sizeof(page_directory_entry) * NUM_USER_PGDIR_ENTS);
 
 	fKernelPhysicalPageDirectory = args->arch_args.phys_pgdir;
-	fKernelVirtualPageDirectory = (page_directory_entry*)
+	fKernelVirtualPageDirectory = (page_directory_entry*)(addr_t)
 		args->arch_args.vir_pgdir;
 
 #ifdef TRACE_X86_PAGING_METHOD_32_BIT

@@ -26,15 +26,15 @@ typedef struct {
 	uint32	system_time_cv_factor;
 	uint64	cpu_clock_speed;
 	uint32	phys_pgdir;
-	uint32	vir_pgdir;
+	uint64	vir_pgdir;
 	uint32	num_pgtables;
 	uint32	pgtables[MAX_BOOT_PTABLES];
-	uint32	virtual_end;
+	uint64	virtual_end;
 	uint32	phys_idt;
-	uint32	vir_idt;
+	uint64	vir_idt;
 	uint32	phys_gdt;
-	uint32	vir_gdt;
-	uint32	page_hole;
+	uint64	vir_gdt;
+	uint64	page_hole;
 	// smp stuff
 	uint32	apic_time_cv_factor; // apic ticks per second
 	uint32	apic_phys;

@@ -37,6 +37,8 @@ local bios_ia32_src =
 	apm.cpp
 	interrupts.cpp
 	interrupts_asm.S
+	long.cpp
+	long_asm.S
 ;
 
 local bios_ia32_edid_src =

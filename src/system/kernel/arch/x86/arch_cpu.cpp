@@ -817,7 +817,7 @@ arch_cpu_init_post_vm(kernel_args *args)
 	uint32 i;
 
 	// account for the segment descriptors
-	gGDT = (segment_descriptor *)args->arch_args.vir_gdt;
+	gGDT = (segment_descriptor *)(addr_t)args->arch_args.vir_gdt;
 	create_area("gdt", (void **)&gGDT, B_EXACT_ADDRESS, B_PAGE_SIZE,
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 

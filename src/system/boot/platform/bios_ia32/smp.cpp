@@ -366,7 +366,7 @@ smp_cpu_ready(void)
 
 	// Set up the final idt
 	idt_descr.a = IDT_LIMIT - 1;
-	idt_descr.b = (uint32 *)gKernelArgs.arch_args.vir_idt;
+	idt_descr.b = (uint32 *)(addr_t)gKernelArgs.arch_args.vir_idt;
 
 	asm("lidt	%0;"
 		: : "m" (idt_descr));

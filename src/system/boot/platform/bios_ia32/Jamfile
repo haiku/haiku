@@ -40,6 +40,8 @@ BootMergeObject boot_platform_bios_ia32.o :
 	hpet.cpp
 	interrupts.cpp
 	interrupts_asm.S
+	long.cpp
+	long_asm.S
 
 	# VESA/DDC EDID
 	decode_edid.c
