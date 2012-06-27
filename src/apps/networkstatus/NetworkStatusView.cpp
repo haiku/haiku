@@ -243,9 +243,12 @@ void
 NetworkStatusView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
-	if (Parent())
-		SetViewColor(Parent()->ViewColor());
-	else
+	if (Parent() != NULL) {
+		if ((Parent()->Flags() & B_DRAW_ON_CHILDREN) != 0)
+			SetViewColor(B_TRANSPARENT_COLOR);
+		else
+			SetViewColor(Parent()->ViewColor());
+	} else
 		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	SetLowColor(ViewColor());

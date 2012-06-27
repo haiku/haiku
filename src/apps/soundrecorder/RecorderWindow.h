@@ -94,6 +94,8 @@ private:
 		BDirectory fTempDir;
 		int fTempCount;
 
+		float fDeployedHeight;
+
 		BBox * fBottomBox;
 		BBox * fFileInfoBox;
 		BStringView *fFilename;

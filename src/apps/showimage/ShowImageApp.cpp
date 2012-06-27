@@ -207,7 +207,7 @@ void
 ShowImageApp::_BroadcastToWindows(BMessage* message)
 {
 	const int32 count = CountWindows();
-	for (int32 i = 0; i < count; i ++) {
+	for (int32 i = 0; i < count; i++) {
 		// BMessenger checks for us if BWindow is still a valid object
 		BMessenger messenger(WindowAt(i));
 		messenger.SendMessage(message);

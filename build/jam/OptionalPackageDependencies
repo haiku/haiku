@@ -17,6 +17,7 @@ OptionalPackageDependencies Development : DevelopmentBase Perl ;
 OptionalPackageDependencies DevelopmentPowerPC : DevelopmentMin ;
 OptionalPackageDependencies GetText : LibIconv ;
 OptionalPackageDependencies Git : Expat Curl OpenSSL LibIconv ;
+OptionalPackageDependencies GitDoc : Man Git ;
 OptionalPackageDependencies ICU-devel : DevelopmentBase ;
 OptionalPackageDependencies LibLayout : DevelopmentBase ;
 OptionalPackageDependencies Man : Groff ;

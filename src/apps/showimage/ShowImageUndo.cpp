@@ -64,7 +64,7 @@ ShowImageUndo::SendUndoStateMessage(bool bCanUndo)
 
 
 void
-ShowImageUndo::SetTo(BRect rect, BBitmap *restore, BBitmap *selection)
+ShowImageUndo::SetTo(BRect rect, BBitmap* restore, BBitmap* selection)
 {
 	// NOTE: THIS FUNCTION DOES NOT MAKE COPIES OF THE BITMAPS PASSED TO IT
 	InternalClear();
@@ -79,7 +79,7 @@ ShowImageUndo::SetTo(BRect rect, BBitmap *restore, BBitmap *selection)
 
 
 void
-ShowImageUndo::Undo(BRect rect, BBitmap *restore, BBitmap *selection)
+ShowImageUndo::Undo(BRect rect, BBitmap* restore, BBitmap* selection)
 {
 	// NOTE: THIS FUNCTION DOES NOT MAKE COPIES OF THE BITMAPS PASSED TO IT
 	fUndoType = UNDO_REDO;

@@ -990,7 +990,8 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			backgroundsMessage.AddRef("refs", fImageView->Image());
 			// This is used in the Backgrounds code for scaled placement
 			backgroundsMessage.AddInt32("placement", 'scpl');
-			be_roster->Launch("application/x-vnd.haiku-backgrounds", &backgroundsMessage);
+			be_roster->Launch("application/x-vnd.haiku-backgrounds",
+				&backgroundsMessage);
 			break;
 		}
 
@@ -1050,15 +1051,15 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			if (message->FindFloat("offset", &offset) == B_OK
 				&& message->FindBool("show", &show) == B_OK) {
 				// Compensate rounding errors with the final placement
-				if (show) {
+				if (show)
 					fToolBarView->MoveTo(fToolBarView->Frame().left, 0);
-				} else {
+				else {
 					fToolBarView->MoveTo(fToolBarView->Frame().left, offset);
 					fToolBarView->Hide();
 				}
 				BRect frame = fToolBarView->Parent()->Bounds();
 				frame.top = fToolBarView->Frame().bottom + 1;
-				fScrollView->MoveTo(0, frame.top);
+				fScrollView->MoveTo(fScrollView->Frame().left, frame.top);
 				fScrollView->ResizeTo(fScrollView->Bounds().Width(),
 					frame.Height() - B_H_SCROLL_BAR_HEIGHT + 1);
 				fVerticalScrollBar->MoveTo(
@@ -1174,7 +1175,8 @@ ShowImageWindow::_SaveToFile(BMessage* message)
 
 	int32 i;
 	for (i = 0; i < outCount; i++) {
-		if (outFormat[i].group == B_TRANSLATOR_BITMAP && outFormat[i].type == outType)
+		if (outFormat[i].group == B_TRANSLATOR_BITMAP && outFormat[i].type
+				== outType)
 			break;
 	}
 	if (i == outCount)
@@ -1271,7 +1273,7 @@ ShowImageWindow::_ToggleFullScreen()
 		BScreen screen;
 		fWindowFrame = Frame();
 		frame = screen.Frame();
-		frame.top -= fBar->Bounds().Height()+1;
+		frame.top -= fBar->Bounds().Height() + 1;
 		frame.right += B_V_SCROLL_BAR_WIDTH;
 		frame.bottom += B_H_SCROLL_BAR_HEIGHT;
 		frame.InsetBy(-1, -1); // PEN_SIZE in ShowImageView
@@ -1414,7 +1416,7 @@ ShowImageWindow::_Print(BMessage* msg)
 		float width;
 		switch (fPrintOptions.Option()) {
 			case PrintOptions::kFitToPage: {
-				float w1 = printableRect.Width()+1;
+				float w1 = printableRect.Width() + 1;
 				float w2 = imageWidth * (printableRect.Height() + 1)
 					/ imageHeight;
 				if (w2 < w1)

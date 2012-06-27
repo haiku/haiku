@@ -9,7 +9,7 @@
 #include <View.h>
 
 
-class BStringView : public BView{
+class BStringView : public BView {
 public:
 								BStringView(BRect bounds, const char* name,
 									const char* text, uint32 resizeFlags

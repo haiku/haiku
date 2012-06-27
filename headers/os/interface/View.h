@@ -584,6 +584,8 @@ protected:
 
 	virtual	void				LayoutChanged();
 
+			void				ScrollWithMouseWheelDelta(BScrollBar*, float);
+
 private:
 			void				_Layout(bool force, BLayoutContext* context);
 			void				_LayoutLeft(BLayout* deleted);

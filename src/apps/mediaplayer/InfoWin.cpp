@@ -32,6 +32,7 @@
 #include <Mime.h>
 #include <NodeInfo.h>
 #include <String.h>
+#include <StringForRate.h>
 #include <StringView.h>
 #include <TextView.h>
 
@@ -405,6 +406,12 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 			rateString.ReplaceFirst("%d", "??");
 			s << rateString;
 		}
+		if (format.type == B_MEDIA_ENCODED_AUDIO) {
+			float br = format.u.encoded_audio.bit_rate;
+			char string[20] = "";
+			if (br > 0.0)
+				s << ", " << string_for_rate(br, string, sizeof(string));
+		}
 		s << "\n\n";
 		fContentsView->Insert(s.String());
 	}
@@ -430,6 +437,8 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 		d = d % (60 * 1000);
 		s << v << ":";
 		v = d / 1000;
+		if (v < 10)
+			s << '0';
 		s << v;
 		if (hours)
 			s << " " << B_TRANSLATE_COMMENT("h", "Hours");
