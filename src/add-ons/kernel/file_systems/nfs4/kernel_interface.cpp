@@ -214,6 +214,14 @@ nfs4_set_flags(fs_volume* volume, fs_vnode* vnode, void* _cookie, int flags)
 
 
 static status_t
+nfs4_fsync(fs_volume* volume, fs_vnode* vnode)
+{
+	// Currently, there is no cache and all writes are FILE_SYNC4
+	return B_OK;
+}
+
+
+static status_t
 nfs4_read_symlink(fs_volume* volume, fs_vnode* link, char* buffer,
 	size_t* _bufferSize)
 {
@@ -564,7 +572,7 @@ fs_vnode_ops gNFSv4VnodeOps = {
 	nfs4_set_flags,
 	NULL,	// fs_select()
 	NULL,	// fs_deselect()
-	NULL,	// fsync()
+	nfs4_fsync,
 
 	nfs4_read_symlink,
 	nfs4_create_symlink,
