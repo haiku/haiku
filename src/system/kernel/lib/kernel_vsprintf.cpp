@@ -450,11 +450,11 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 		}
 
 		if (qualifier == 'L')
-			num = va_arg(args, uint64);
+			num = va_arg(args, unsigned long long);
 		else if (qualifier == 'l') {
-			num = va_arg(args, uint32);
+			num = va_arg(args, unsigned long);
 			if ((flags & SIGN) != 0)
-				num = (ssize_t)num;
+				num = (long)num;
 		} else if (qualifier == 'z') {
 			num = va_arg(args, size_t);
 			if ((flags & SIGN) != 0)
