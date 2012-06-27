@@ -135,9 +135,11 @@ Inode::LookUp(const char* name, ino_t* id)
 
 		reply.PutFH();
 		if (!strcmp(name, ".."))
-			reply.LookUpUp();
+			result = reply.LookUpUp();
 		else
-			reply.LookUp();
+			result = reply.LookUp();
+		if (result != B_OK)
+			return result;
 
 		Filehandle fh;
 		reply.GetFH(&fh);
@@ -262,7 +264,9 @@ Inode::Remove(const char* name, FileType type)
 			continue;
 
 		reply.PutFH();
-		reply.LookUp();
+		result = reply.LookUp();
+		if (result != B_OK)
+			return result;
 
 		if (type == NF4DIR)
 			result = reply.Verify();
@@ -1168,7 +1172,9 @@ Inode::_ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 			continue;
 
 		reply.PutFH();
-		reply.LookUpUp();
+		result = reply.LookUpUp();
+		if (result != B_OK)
+			return result;
 
 		Filehandle fh;
 		reply.GetFH(&fh);
