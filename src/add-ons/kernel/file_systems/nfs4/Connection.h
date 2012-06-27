@@ -35,56 +35,45 @@ class Connection {
 public:
 	static	status_t			Connect(Connection **conn,
 									const ServerAddress& id);
-								~Connection();
+	virtual						~Connection();
 
-	inline	status_t			Send(const void* buffer, uint32 size);
-	inline	status_t			Receive(void** buffer, uint32* size);
+	virtual	status_t			Send(const void* buffer, uint32 size) = 0;
+	virtual	status_t			Receive(void** buffer, uint32* size) = 0;
 
 			status_t			GetLocalID(ServerAddress* addr);
 
 			status_t			Reconnect();
 			void				Disconnect();
 
-private:
+protected:
 								Connection(const sockaddr_in& addr,
-									Transport proto, bool markers);
+									Transport proto);
 			status_t			_Connect();
-
-			status_t			_SendStream(const void* buffer, uint32 size);
-			status_t			_SendPacket(const void* buffer, uint32 size);
-
-			status_t			_ReceiveStream(void** buffer, uint32* size);
-			status_t			_ReceivePacket(void** buffer, uint32* size);
 
 			int					fSock;
 			mutex				fSockLock;
-
-			const bool			fUseMarkers;
 
 			const Transport		fProtocol;
 			const sockaddr_in	fServerAddress;
 };
 
+class ConnectionStream : public Connection {
+public:
+								ConnectionStream(const sockaddr_in& addr,
+									Transport proto);
 
-inline status_t
-Connection::Send(const void* buffer, uint32 size)
-{
-	if (fUseMarkers) 
-		return _SendStream(buffer, size);
-	else
-		return _SendPacket(buffer, size);
-}
+	virtual	status_t			Send(const void* buffer, uint32 size);
+	virtual	status_t			Receive(void** buffer, uint32* size);
+};
 
+class ConnectionPacket : public Connection {
+public:
+								ConnectionPacket(const sockaddr_in& addr,
+									Transport proto);
 
-inline status_t
-Connection::Receive(void** buffer, uint32* size)
-{
-	if (fUseMarkers)
-		return _ReceiveStream(buffer, size);
-	else
-		return _ReceivePacket(buffer, size);
-}
-
+	virtual	status_t			Send(const void* buffer, uint32 size);
+	virtual	status_t			Receive(void** buffer, uint32* size);
+};
 
 #endif	// CONNECTION_H
 

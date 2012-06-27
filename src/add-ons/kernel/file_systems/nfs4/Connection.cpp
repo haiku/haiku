@@ -48,14 +48,27 @@ ServerAddress::operator=(const ServerAddress& x)
 }
 
 
-Connection::Connection(const sockaddr_in& addr, Transport proto, bool markers)
+Connection::Connection(const sockaddr_in& addr, Transport proto)
 	:
 	fSock(-1),
-	fUseMarkers(markers),
 	fProtocol(proto),
 	fServerAddress(addr)
 {
 	mutex_init(&fSockLock, NULL);
+}
+
+
+ConnectionStream::ConnectionStream(const sockaddr_in& addr, Transport proto)
+	:
+	Connection(addr, proto)
+{
+}
+
+
+ConnectionPacket::ConnectionPacket(const sockaddr_in& addr, Transport proto)
+	:
+	Connection(addr, proto)
+{
 }
 
 
@@ -85,7 +98,7 @@ Connection::GetLocalID(ServerAddress* addr)
 
 
 status_t
-Connection::_SendStream(const void* buffer, uint32 size)
+ConnectionStream::Send(const void* buffer, uint32 size)
 {
 	status_t result;
 
@@ -120,7 +133,7 @@ Connection::_SendStream(const void* buffer, uint32 size)
 
 
 status_t
-Connection::_SendPacket(const void* buffer, uint32 size)
+ConnectionPacket::Send(const void* buffer, uint32 size)
 {
 	// send on DGRAM sockets is atomic. No need to lock.
 	status_t result = send(fSock, buffer,  size, 0);
@@ -132,7 +145,7 @@ Connection::_SendPacket(const void* buffer, uint32 size)
 
 
 status_t
-Connection::_ReceiveStream(void** pbuffer, uint32* psize)
+ConnectionStream::Receive(void** pbuffer, uint32* psize)
 {
 	status_t result;
 
@@ -193,7 +206,7 @@ Connection::_ReceiveStream(void** pbuffer, uint32* psize)
 
 
 status_t
-Connection::_ReceivePacket(void** pbuffer, uint32* psize)
+ConnectionPacket::Receive(void** pbuffer, uint32* psize)
 {
 	status_t result;
 	int32 size = MAX_PACKET_SIZE;
@@ -231,8 +244,11 @@ Connection::Connect(Connection **pconn, const ServerAddress& id)
 	addr.sin_addr.s_addr = htonl(id.fAddress);
 	addr.sin_port = htons(id.fPort);
 
-	Connection* conn = new(std::nothrow) Connection(addr, id.fProtocol,
-												id.fProtocol == ProtocolTCP);
+	Connection* conn;
+	if (id.fProtocol == ProtocolTCP)
+		conn = new(std::nothrow) ConnectionStream(addr, id.fProtocol);
+	else
+		conn = new(std::nothrow) ConnectionPacket(addr, id.fProtocol);
 	if (conn == NULL)
 		return B_NO_MEMORY;
 
