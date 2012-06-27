@@ -205,6 +205,21 @@ nfs4_put_vnode(fs_volume* volume, fs_vnode* vnode, bool reenter)
 
 
 static status_t
+nfs4_remove_vnode(fs_volume* volume, fs_vnode* vnode, bool reenter)
+{
+	// It is the server that actually deletes a node. Nodes on client
+	// side are only an attempt to simulate local filesystem. Hence,
+	// this hook is the same as put_vnode().
+
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	inode->FileSystem()->InoIdMap()->RemoveEntry(inode->ID());
+	delete inode;
+
+	return B_OK;
+}
+
+
+static status_t
 nfs4_set_flags(fs_volume* volume, fs_vnode* vnode, void* _cookie, int flags)
 {
 	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
@@ -556,7 +571,7 @@ fs_vnode_ops gNFSv4VnodeOps = {
 	nfs4_lookup,
 	nfs4_get_vnode_name,
 	nfs4_put_vnode,
-	NULL,	// remove_vnode()
+	nfs4_remove_vnode,
 
 	/* VM file access */
 	NULL,	// can_page()
