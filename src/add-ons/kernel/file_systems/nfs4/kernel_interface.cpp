@@ -205,6 +205,15 @@ nfs4_put_vnode(fs_volume* volume, fs_vnode* vnode, bool reenter)
 
 
 static status_t
+nfs4_set_flags(fs_volume* volume, fs_vnode* vnode, void* _cookie, int flags)
+{
+	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
+	cookie->fMode = (cookie->fMode & ~(O_APPEND | O_NONBLOCK)) | flags;
+	return B_OK;
+}
+
+
+static status_t
 nfs4_read_symlink(fs_volume* volume, fs_vnode* link, char* buffer,
 	size_t* _bufferSize)
 {
@@ -519,7 +528,7 @@ fs_vnode_ops gNFSv4VnodeOps = {
 	NULL,	// get_file_map()
 
 	NULL,	// ioctl()
-	NULL,
+	nfs4_set_flags,
 	NULL,	// fs_select()
 	NULL,	// fs_deselect()
 	NULL,	// fsync()
