@@ -13,6 +13,7 @@
 #include <OS.h>
 
 #include <arch/cpu.h>
+#include <arch/x86/descriptors.h>
 #include <arch_kernel.h>
 #include <boot/platform.h>
 #include <boot/stdio.h>

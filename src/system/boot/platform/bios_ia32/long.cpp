@@ -4,10 +4,6 @@
  */
 
 
-// Stop this from being included, it conflicts with the x86_64 version.
-#define _KERNEL_ARCH_x86_DESCRIPTORS_H
-
-
 #include "long.h"
 
 #include <KernelExport.h>

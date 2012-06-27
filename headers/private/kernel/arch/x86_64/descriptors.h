@@ -10,8 +10,8 @@
 // Note that the ordering of these is important to SYSCALL/SYSRET.
 #define KERNEL_CODE_SEG		0x08
 #define KERNEL_DATA_SEG		0x10
-#define USER_DATA_SEG		0x18
-#define USER_CODE_SEG		0x20
+#define USER_DATA_SEG		0x1b
+#define USER_CODE_SEG		0x23
 
 
 #ifndef _ASSEMBLER
