@@ -11,6 +11,8 @@
 
 #include <string.h>
 
+#include "Cookie.h"
+
 
 RequestBuilder::RequestBuilder(Procedure proc)
 	:
@@ -140,6 +142,96 @@ RequestBuilder::GetFH()
 		return B_NO_MEMORY;
 
 	fRequest->Stream().AddUInt(OpGetFH);
+	fOpCount++;
+
+	return B_OK;
+}
+
+
+status_t
+RequestBuilder::Lock(OpenFileCookie* cookie, LockInfo* lock, bool reclaim)
+{
+	if (fProcedure != ProcCompound)
+		return B_BAD_VALUE;
+	if (fRequest == NULL)
+		return B_NO_MEMORY;
+
+	fRequest->Stream().AddUInt(OpLock);
+
+	fRequest->Stream().AddInt(lock->fType);
+	fRequest->Stream().AddBoolean(reclaim);
+
+	fRequest->Stream().AddUHyper(lock->fStart);
+	fRequest->Stream().AddUHyper(lock->fLength);
+
+	fRequest->Stream().AddBoolean(true);			// new lock owner
+
+	// open seq stateid
+	fRequest->Stream().AddUInt(cookie->fSequence++);
+	fRequest->Stream().AddUInt(cookie->fStateSeq);
+	fRequest->Stream().AddUInt(cookie->fStateId[0]);
+	fRequest->Stream().AddUInt(cookie->fStateId[1]);
+	fRequest->Stream().AddUInt(cookie->fStateId[2]);
+
+	// lock seq owner
+	fRequest->Stream().AddUInt(lock->fSequence++);
+	fRequest->Stream().AddUHyper(cookie->fClientId);
+	fRequest->Stream().AddOpaque(&lock->fOwner, sizeof(lock->fOwner));
+
+	fOpCount++;
+
+	return B_OK;
+}
+
+
+status_t
+RequestBuilder::LockT(LockType type, uint64 pos, uint64 len,
+	OpenFileCookie* cookie)
+{
+	if (fProcedure != ProcCompound)
+		return B_BAD_VALUE;
+	if (fRequest == NULL)
+		return B_NO_MEMORY;
+
+	fRequest->Stream().AddUInt(OpLockT);
+
+	fRequest->Stream().AddInt(type);
+
+	fRequest->Stream().AddUHyper(pos);
+	fRequest->Stream().AddUHyper(len);
+
+	fRequest->Stream().AddUHyper(cookie->fClientId);
+
+	uint32 owner = find_thread(NULL);
+	fRequest->Stream().AddOpaque(&owner, sizeof(owner));
+
+	fOpCount++;
+
+	return B_OK;
+}
+
+
+status_t
+RequestBuilder::LockU(LockInfo* lock)
+{
+	if (fProcedure != ProcCompound)
+		return B_BAD_VALUE;
+	if (fRequest == NULL)
+		return B_NO_MEMORY;
+
+	fRequest->Stream().AddUInt(OpLockU);
+
+	fRequest->Stream().AddInt(lock->fType);
+
+	fRequest->Stream().AddUInt(lock->fSequence++);
+	fRequest->Stream().AddUInt(lock->fStateSeq);
+	fRequest->Stream().AddUInt(lock->fStateId[0]);
+	fRequest->Stream().AddUInt(lock->fStateId[1]);
+	fRequest->Stream().AddUInt(lock->fStateId[2]);
+
+	fRequest->Stream().AddUHyper(lock->fStart);
+	fRequest->Stream().AddUHyper(lock->fLength);
+
 	fOpCount++;
 
 	return B_OK;

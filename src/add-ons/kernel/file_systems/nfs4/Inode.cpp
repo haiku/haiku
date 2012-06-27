@@ -699,6 +699,7 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 
 	cookie->fMode = mode;
 	cookie->fSequence = 0;
+	cookie->fLocks = NULL;
 
 	Filehandle fh;
 	do {
@@ -803,6 +804,7 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 	cookie->fHandle = fHandle;
 	cookie->fMode = mode;
 	cookie->fSequence = 0;
+	cookie->fLocks = NULL;
 
 	do {
 		cookie->fClientId = fFilesystem->NFSServer()->ClientId();
@@ -1275,6 +1277,208 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
 }
 
 
+status_t
+Inode::TestLock(OpenFileCookie* cookie, struct flock* lock)
+{
+	do {
+		RPC::Server* serv = fFilesystem->Server();
+		Request request(serv);
+		RequestBuilder& req = request.Builder();
+
+		req.PutFH(fHandle);
+		req.LockT(sGetLockType(lock->l_type, false), lock->l_start,
+			lock->l_len, cookie);
+
+		status_t result = request.Send();
+		if (result != B_OK)
+			return result;
+
+		ReplyInterpreter &reply = request.Reply();
+		if (_HandleErrors(reply.NFS4Error(), serv, cookie))
+			continue;
+
+		reply.PutFH();
+		LockType ltype;
+		uint64 pos, len;
+		result = reply.LockT(&pos, &len, &ltype);
+		if (reply.NFS4Error() == NFS4ERR_DENIED) {
+			lock->l_type = sLockTypeToHaiku(ltype);
+			lock->l_start = static_cast<off_t>(pos);
+			lock->l_len = static_cast<off_t>(len);
+			result = B_OK;
+		} else if (reply.NFS4Error() == NFS4_OK)
+			lock->l_type = F_UNLCK;
+
+		return result;
+	} while (true);
+
+	return B_OK;
+}
+
+
+status_t
+Inode::AcquireLock(OpenFileCookie* cookie, const struct flock* lock,
+	bool wait)
+{
+	LockInfo* linfo = new LockInfo;
+	if (linfo == NULL)
+		return B_NO_MEMORY;
+
+	linfo->fSequence = 0;
+	linfo->fStart = lock->l_start;
+	if (lock->l_len == OFF_MAX)
+		linfo->fLength = UINT64_MAX;
+	else
+		linfo->fLength = lock->l_len;
+	linfo->fType = sGetLockType(lock->l_type, wait);
+	linfo->fOwner = find_thread(NULL);
+
+	do {
+		RPC::Server* serv = fFilesystem->Server();
+		Request request(serv);
+		RequestBuilder& req = request.Builder();
+
+		req.PutFH(fHandle);
+		req.Lock(cookie, linfo);
+
+		status_t result = request.Send();
+		if (result != B_OK) {
+			delete linfo;
+			return result;
+		}
+
+		ReplyInterpreter &reply = request.Reply();
+		if (wait && reply.NFS4Error() == NFS4ERR_DENIED) {
+			snooze_etc(5 * 1000000, B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
+			continue;
+		}
+
+		if (_HandleErrors(reply.NFS4Error(), serv, cookie))
+			continue;
+
+		reply.PutFH();
+		result = reply.Lock(linfo);
+		if (result != B_OK) {
+			delete linfo;
+			return result;
+		}
+
+		break;
+	} while (true);
+
+	mutex_lock(&cookie->fLocksLock);
+	linfo->fNext = cookie->fLocks;
+	cookie->fLocks = linfo;
+	mutex_unlock(&cookie->fLocksLock);
+
+	return B_OK;
+}
+
+
+status_t
+Inode::ReleaseLock(OpenFileCookie* cookie, const struct flock* lock)
+{
+	LockInfo* prev = NULL;
+	uint32 owner = find_thread(NULL);
+
+	mutex_lock(&cookie->fLocksLock);
+	LockInfo* linfo = cookie->fLocks;
+	while (linfo != NULL) {
+		if (linfo->fOwner == owner &&
+			linfo->fStart == static_cast<uint64>(lock->l_start) &&
+			(linfo->fLength == static_cast<uint64>(lock->l_len) ||
+				(linfo->fLength == UINT64_MAX && lock->l_len == OFF_MAX))) {
+			if (prev != NULL)
+				prev->fNext = linfo->fNext;
+			else
+				cookie->fLocks = linfo->fNext;
+			break;
+		}
+
+		prev = linfo;
+		linfo = linfo->fNext;
+	}
+	mutex_unlock(&cookie->fLocksLock);
+
+	if (linfo == NULL)
+		return B_BAD_VALUE;
+
+	do {
+		RPC::Server* serv = fFilesystem->Server();
+		Request request(serv);
+		RequestBuilder& req = request.Builder();
+
+		req.PutFH(fHandle);
+		req.LockU(linfo);
+
+		status_t result = request.Send();
+		if (result != B_OK)
+			return result;
+
+		ReplyInterpreter &reply = request.Reply();
+
+		if (_HandleErrors(reply.NFS4Error(), serv, cookie))
+			continue;
+
+		reply.PutFH();
+		result = reply.LockU();
+		if (result != B_OK)
+			return result;
+
+		break;
+	} while (true);
+
+	delete linfo;
+
+	return B_OK;
+}
+
+
+status_t
+Inode::ReleaseAllLocks(OpenFileCookie* cookie)
+{
+	mutex_lock(&cookie->fLocksLock);
+	while (cookie->fLocks != NULL) {
+		do {
+			RPC::Server* serv = fFilesystem->Server();
+			Request request(serv);
+			RequestBuilder& req = request.Builder();
+
+			req.PutFH(fHandle);
+			req.LockU(cookie->fLocks);
+
+			status_t result = request.Send();
+			if (result != B_OK) {
+				mutex_unlock(&cookie->fLocksLock);
+				return result;
+			}
+
+			ReplyInterpreter &reply = request.Reply();
+
+			if (_HandleErrors(reply.NFS4Error(), serv, cookie))
+				continue;
+
+			reply.PutFH();
+			result = reply.LockU();
+			if (result != B_OK) {
+				mutex_unlock(&cookie->fLocksLock);
+				return result;
+			}
+
+			break;
+		} while (true);
+
+		LockInfo* linfo = cookie->fLocks->fNext;
+		delete cookie->fLocks;
+		cookie->fLocks = linfo;
+	}
+	mutex_unlock(&cookie->fLocksLock);
+
+	return B_OK;
+}
+
+
+
 bool
 Inode::_HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 	OpenFileCookie* cookie)
@@ -1284,6 +1488,7 @@ Inode::_HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 			return false;
 
 		// server needs more time, we need to wait
+		case NFS4ERR_LOCKED:
 		case NFS4ERR_DELAY:
 			if (cookie == NULL || (cookie->fMode & O_NONBLOCK) == 0) {
 				snooze_etc(5 * 1000000, B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);

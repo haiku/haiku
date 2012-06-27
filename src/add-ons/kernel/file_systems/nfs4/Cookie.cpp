@@ -84,3 +84,15 @@ Cookie::CancelAll()
 	return B_OK;
 }
 
+
+OpenFileCookie::OpenFileCookie()
+{
+	mutex_init(&fLocksLock, NULL);
+}
+
+
+OpenFileCookie::~OpenFileCookie()
+{
+	mutex_destroy(&fLocksLock);
+}
+

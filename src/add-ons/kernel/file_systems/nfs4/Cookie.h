@@ -14,6 +14,20 @@
 #include "Filesystem.h"
 
 
+struct LockInfo {
+			uint32			fStateId[3];
+			uint32			fStateSeq;
+
+			uint32			fSequence;
+
+			uint32			fOwner;
+			uint64			fStart;
+			uint64			fLength;
+			LockType		fType;
+
+			LockInfo*		fNext;
+};
+
 struct Cookie {
 			struct RequestEntry {
 				RPC::Request*	fRequest;
@@ -46,8 +60,14 @@ struct OpenFileCookie : public Cookie {
 			uint64			fOwnerId;
 	static	vint64			fLastOwnerId;
 
+			LockInfo*		fLocks;
+			mutex			fLocksLock;
+
 			OpenFileCookie*	fNext;
 			OpenFileCookie*	fPrev;
+
+							OpenFileCookie();
+							~OpenFileCookie();
 };
 
 struct OpenDirCookie : public Cookie {

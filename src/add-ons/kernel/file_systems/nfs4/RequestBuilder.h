@@ -18,6 +18,9 @@
 #include "XDR.h"
 
 
+class OpenFileCookie;
+class LockInfo;
+
 class RequestBuilder {
 public:
 									RequestBuilder(Procedure p = ProcCompound);
@@ -34,6 +37,11 @@ public:
 			status_t				GetAttr(Attribute* attrs, uint32 count);
 			status_t				GetFH();
 			status_t				Link(const char* name);
+			status_t				Lock(OpenFileCookie* cookie,
+										LockInfo* lock, bool reclaim = false);
+			status_t				LockT(LockType type, uint64 pos,
+										uint64 len, OpenFileCookie* cookie);
+			status_t				LockU(LockInfo* lock);
 			status_t				LookUp(const char* name);
 			status_t				LookUpUp();
 			status_t				Nverify(AttrValue* attr, uint32 count);

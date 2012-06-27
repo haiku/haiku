@@ -54,6 +54,8 @@ struct DirEntry {
 						~DirEntry();
 };
 
+class LockInfo;
+
 class ReplyInterpreter {
 public:
 						ReplyInterpreter(RPC::Reply* reply = NULL);
@@ -70,6 +72,9 @@ public:
 			status_t	GetAttr(AttrValue** attrs, uint32* count);
 			status_t	GetFH(Filehandle* fh);
 			status_t	Link();
+			status_t	Lock(LockInfo* linfo);
+			status_t 	LockT(uint64* pos, uint64* len, LockType* type);
+			status_t	LockU();
 	inline	status_t	LookUp();
 	inline	status_t	LookUpUp();
 	inline	status_t	Nverify();

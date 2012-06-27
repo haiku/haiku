@@ -59,6 +59,15 @@ public:
 					status_t	ReadDir(void* buffer, uint32 size,
 									uint32* count, OpenDirCookie* cookie);
 
+					status_t	TestLock(OpenFileCookie* cookie,
+									struct flock* lock);
+					status_t	AcquireLock(OpenFileCookie* cookie,
+									const struct flock* lock, bool wait);
+					status_t	ReleaseLock(OpenFileCookie* cookie,
+									const struct flock* lock);
+					status_t	ReleaseAllLocks(OpenFileCookie* cookie);
+
+
 private:
 								Inode();
 

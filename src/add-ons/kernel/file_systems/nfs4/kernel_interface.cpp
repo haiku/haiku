@@ -466,6 +466,39 @@ nfs4_rewind_dir(fs_volume* volume, fs_vnode* vnode, void* _cookie)
 }
 
 
+static status_t
+nfs4_test_lock(fs_volume* volume, fs_vnode* vnode, void* _cookie,
+	struct flock* lock)
+{
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
+	return inode->TestLock(cookie, lock);
+}
+
+
+static status_t
+nfs4_acquire_lock(fs_volume* volume, fs_vnode* vnode, void* _cookie,
+			const struct flock* lock, bool wait)
+{
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
+	return inode->AcquireLock(cookie, lock, wait);
+}
+
+
+static status_t
+nfs4_release_lock(fs_volume* volume, fs_vnode* vnode, void* _cookie,
+			const struct flock* lock)
+{
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
+	if (lock != NULL)
+		return inode->ReleaseLock(cookie, lock);
+	else
+		return inode->ReleaseAllLocks(cookie);
+}
+
+
 status_t
 nfs4_init()
 {
@@ -561,6 +594,35 @@ fs_vnode_ops gNFSv4VnodeOps = {
 	nfs4_free_dir_cookie,
 	nfs4_read_dir,
 	nfs4_rewind_dir,
+
+	/* attribute directory operations */
+	NULL,	// open_attr_dir
+	NULL,	// close_attr_dir
+	NULL,	// free_attr_dir_cookie
+	NULL,	// read_attr_dir
+	NULL,	// rewind_attr_dir
+
+	/* attribute operations */
+	NULL,	// create_attr
+	NULL,	// open_attr
+	NULL,	// close_attr
+	NULL,	// free_attr_cookie
+	NULL,	// read_attr
+	NULL,	// write_attr
+
+	NULL,	// read_attr_stat
+	NULL,	// write_attr_stat
+	NULL,	// rename_attr
+	NULL,	// remove_attr
+
+	/* support for node and FS layers */
+	NULL,	// create_special_node
+	NULL,	// get_super_vnode
+
+	/* lock operations */
+	nfs4_test_lock,
+	nfs4_acquire_lock,
+	nfs4_release_lock,
 };
 
 static file_system_module_info sNFSv4ModuleInfo = {

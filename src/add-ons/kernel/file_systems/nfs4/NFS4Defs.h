@@ -9,6 +9,7 @@
 #define NFS4DEFS_H
 
 
+#include <fcntl.h>
 #include <sys/stat.h>
 
 #include <SupportDefs.h>
@@ -27,6 +28,9 @@ enum Opcode {
 	OpGetAttr				= 9,
 	OpGetFH					= 10,
 	OpLink					= 11,
+	OpLock					= 12,
+	OpLockT					= 13,
+	OpLockU					= 14,
 	OpLookUp				= 15,
 	OpLookUpUp				= 16,
 	OpNverify				= 17,
@@ -179,6 +183,40 @@ enum WriteStable {
 	DATA_SYNC4				= 1,
 	FILE_SYNC4				= 2
 };
+
+enum LockType {
+	READ_LT			= 1,
+	WRITE_LT		= 2,
+	READW_LT		= 3,
+	WRITEW_LT		= 4
+};
+
+
+static inline
+LockType sGetLockType(short type, bool wait) {
+	switch (type) {
+		case F_RDLCK:	return wait ? READW_LT : READ_LT;
+		case F_WRLCK:	return wait ? WRITEW_LT : WRITE_LT;
+		default:		return READ_LT;
+	}
+}
+
+
+static inline
+short sLockTypeToHaiku(LockType type) {
+	switch (type) {
+		case READ_LT:
+		case READW_LT:
+						return F_RDLCK;
+
+		case WRITE_LT:
+		case WRITEW_LT:
+						return F_WRLCK;
+
+		default:		return F_UNLCK;
+	}
+}
+
 
 enum Errors {
 	NFS4_OK						= 0,

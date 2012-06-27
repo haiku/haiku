@@ -31,6 +31,7 @@ public:
 	inline	uint32			LeaseTime();
 private:
 			status_t		_ReclaimOpen(OpenFileCookie* cookie);
+			status_t		_ReclaimLocks(OpenFileCookie* cookie);
 
 			status_t		_GetLeaseTime();
 

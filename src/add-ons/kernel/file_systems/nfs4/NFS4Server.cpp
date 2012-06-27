@@ -51,6 +51,7 @@ NFS4Server::ServerRebooted(uint64 clientId)
 	OpenFileCookie* current = fOpenFiles;
 	while (current != NULL) {
 		_ReclaimOpen(current);
+		_ReclaimLocks(current);
 		current = current->fNext;
 	}
 	mutex_unlock(&fOpenLock);
@@ -74,7 +75,7 @@ NFS4Server::_ReclaimOpen(OpenFileCookie* cookie)
 	req.Open(CLAIM_PREVIOUS, cookie->fSequence++, OPEN4_SHARE_ACCESS_READ,
 		cookie->fClientId, OPEN4_NOCREATE, cookie->fOwnerId, NULL);
 
-	status_t result = request.Send();;
+	status_t result = request.Send();
 	if (result != B_OK)
 		return result;
 
@@ -103,6 +104,39 @@ NFS4Server::_ReclaimOpen(OpenFileCookie* cookie)
 		if (result != B_OK)
 			return result;
 	}
+
+	return B_OK;
+}
+
+
+status_t
+NFS4Server::_ReclaimLocks(OpenFileCookie* cookie)
+{
+	mutex_lock(&cookie->fLocksLock);
+	LockInfo* linfo = cookie->fLocks;
+	while (linfo != NULL) {
+		do {
+			Request request(fServer);
+			RequestBuilder& req = request.Builder();
+
+			req.PutFH(cookie->fHandle);
+			req.Lock(cookie, linfo, true);
+
+			status_t result = request.Send();
+			if (result != B_OK)
+				break;
+
+			ReplyInterpreter &reply = request.Reply();
+
+			reply.PutFH();
+			reply.Lock(linfo);
+
+			break;
+		} while (true);
+
+		linfo = linfo->fNext;
+	}
+	mutex_unlock(&cookie->fLocksLock);
 
 	return B_OK;
 }

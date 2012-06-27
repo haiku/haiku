@@ -13,6 +13,8 @@
 
 #include <util/kernel_cpp.h>
 
+#include "Cookie.h"
+
 
 FSLocation::~FSLocation()
 {
@@ -203,6 +205,56 @@ ReplyInterpreter::Link()
 	fReply->Stream().GetBoolean();
 	fReply->Stream().GetUHyper();
 	fReply->Stream().GetUHyper();
+
+	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+}
+
+
+status_t
+ReplyInterpreter::Lock(LockInfo* linfo)
+{
+	status_t res = _OperationError(OpLock);
+	if (res != B_OK)
+		return res;
+
+	linfo->fStateSeq = fReply->Stream().GetUInt();
+	linfo->fStateId[0] = fReply->Stream().GetUInt();
+	linfo->fStateId[1] = fReply->Stream().GetUInt();
+	linfo->fStateId[2] = fReply->Stream().GetUInt();
+
+	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+}
+
+
+status_t
+ReplyInterpreter::LockT(uint64* pos, uint64* len, LockType* type)
+{
+	status_t res = _OperationError(OpLockU);
+	if (res != B_WOULD_BLOCK || NFS4Error() != NFS4ERR_DENIED)
+		return res;
+
+	*pos = fReply->Stream().GetUHyper();
+	*len = fReply->Stream().GetUHyper();
+	*type = static_cast<LockType>(fReply->Stream().GetInt());
+
+	fReply->Stream().GetUHyper();
+	fReply->Stream().GetOpaque(NULL);
+
+	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+}
+
+
+status_t
+ReplyInterpreter::LockU()
+{
+	status_t res = _OperationError(OpLockU);
+	if (res != B_OK)
+		return res;
+
+	fReply->Stream().GetUInt();
+	fReply->Stream().GetUInt();
+	fReply->Stream().GetUInt();
+	fReply->Stream().GetUInt();
 
 	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
 }
@@ -675,6 +727,8 @@ ReplyInterpreter::_NFS4ErrorToHaiku(uint32 x)
 		case NFS4ERR_FBIG:		return B_FILE_TOO_LARGE;
 		// ...
 		case NFS4ERR_DELAY:
+		case NFS4ERR_DENIED:
+		case NFS4ERR_LOCKED:
 		case NFS4ERR_GRACE:
 								return B_WOULD_BLOCK;
 		// ...
