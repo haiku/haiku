@@ -91,7 +91,8 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
 	req.GetFH();
 	req.Access();
 
-	Attribute attr[] = { FATTR4_FSID, FATTR4_FS_LOCATIONS };
+	Attribute attr[] = { FATTR4_SUPPORTED_ATTRS, FATTR4_FH_EXPIRE_TYPE,
+		FATTR4_FSID, FATTR4_FS_LOCATIONS };
 	req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
 
 	status_t result = request.Send();
@@ -119,22 +120,28 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
 	AttrValue* values;
 	uint32 count;
 	result = reply.GetAttr(&values, &count);
-	if (result != B_OK || count < 1)
+	if (result != B_OK || count < 2)
 		return result;
+
+	Filesystem* fs = new(std::nothrow) Filesystem;
+	if (fs == NULL)
+		return B_NO_MEMORY;
+
+	// FATTR4_SUPPORTED_ATTRS is mandatory
+	memcpy(fs->fSupAttrs, &values[0].fData.fValue64, sizeof(fs->fSupAttrs));
+
+	// FATTR4_FH_EXPIRE_TYPE is mandatory
+	fs->fExpireType = values[1].fData.fValue32;
 
 	// FATTR4_FSID is mandatory
 	FilesystemId* fsid =
-		reinterpret_cast<FilesystemId*>(values[0].fData.fPointer);
+		reinterpret_cast<FilesystemId*>(values[2].fData.fPointer);
 
-	Filesystem* fs = new(std::nothrow) Filesystem;
-
-	if (count == 2 && values[1].fAttribute == FATTR4_FS_LOCATIONS) {
+	if (count == 4 && values[3].fAttribute == FATTR4_FS_LOCATIONS) {
 		FSLocations* locs =
-			reinterpret_cast<FSLocations*>(values[1].fData.fLocations);
+			reinterpret_cast<FSLocations*>(values[3].fData.fLocations);
 
 		fs->fPath = strdup(locs->fRootPath);
-
-		delete locs;
 	} else
 		fs->fPath = NULL;
 
@@ -162,6 +169,7 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
 
 	*pfs = fs;
 
+	delete[] values;
 	return B_OK;
 }
 
@@ -264,6 +272,8 @@ Filesystem::ReadInfo(struct fs_info* info)
 	info->flags = B_FS_IS_READONLY;
 	strncpy(info->volume_name, fName, B_FILE_NAME_LENGTH);
 
+	delete[] values;
+
 	return B_OK;
 }
 
@@ -310,6 +320,7 @@ Filesystem::Migrate(const Filehandle& fh, const RPC::Server* serv)
 		reinterpret_cast<module_info**>(&dns));
 	if (result != B_OK) {
 		mutex_unlock(&fMigrationLock);
+		delete[] values;
 		return result;
 	}
 
@@ -337,7 +348,7 @@ Filesystem::Migrate(const Filehandle& fh, const RPC::Server* serv)
 	}
 
 	put_module(DNS_RESOLVER_MODULE_NAME);
-	delete locs;
+	delete[] values;
 
 	if (server == fServer) {
 		mutex_unlock(&fMigrationLock);

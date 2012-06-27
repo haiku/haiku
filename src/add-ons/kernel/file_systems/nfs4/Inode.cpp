@@ -819,8 +819,28 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 
 		cookie->fOwnerId = atomic_add64(&cookie->fLastOwnerId, 1);
 
-		req.PutFH(fParentFH);
+		// Since we are opening the file using a pair (parentFH, name) we
+		// need to check for race conditions.
+		if (fFilesystem->IsAttrSupported(FATTR4_FILEID)) {
+			req.PutFH(fParentFH);
+			req.LookUp(fName);
+			AttrValue attr;
+			attr.fAttribute = FATTR4_FILEID;
+			attr.fFreePointer = false;
+			attr.fData.fValue64 = fFileId;
+			req.Verify(&attr, 1);
+		} else if (fFilesystem->ExpireType() == FH4_PERSISTENT) {
+			req.PutFH(fParentFH);
+			req.LookUp(fName);
+			AttrValue attr;
+			attr.fAttribute = FATTR4_FILEHANDLE;
+			attr.fFreePointer = true;
+			attr.fData.fPointer = malloc(sizeof(fHandle));
+			memcpy(attr.fData.fPointer, &fHandle, sizeof(fHandle));
+			req.Verify(&attr, 1);
+		}
 
+		req.PutFH(fParentFH);
 		if ((mode & O_TRUNC) == O_TRUNC) {
 			AttrValue attr;
 			attr.fAttribute = FATTR4_SIZE;
@@ -843,6 +863,21 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 			fFilesystem->NFSServer()->ReleaseCID(cookie->fClientId);
 		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
+
+		// Verify if the file we want to open is the file this Inode
+		// represents.
+		if (fFilesystem->IsAttrSupported(FATTR4_FILEID) ||
+			fFilesystem->ExpireType() == FH4_PERSISTENT) {
+			reply.PutFH();
+			result = reply.LookUp();
+			if (result != B_OK)
+				return result;
+			result = reply.Verify();
+			if (result != B_OK && reply.NFS4Error() == NFS4ERR_NOT_SAME)
+				return B_ENTRY_NOT_FOUND;
+			else if (result != B_OK)
+				return result;
+		}
 
 		reply.PutFH();
 		result = reply.Open(cookie->fStateId, &cookie->fStateSeq, &confirm);
@@ -1190,6 +1225,8 @@ Inode::_ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 			fileId = fFilesystem->AllocFileId();
 		} else
 			fileId = values[0].fData.fValue64;
+
+		delete[] values;
 
 		return _FillDirEntry(de, _FileIdToInoT(fileId), "..", pos, size);
 	} while (true);

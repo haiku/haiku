@@ -716,6 +716,17 @@ RequestBuilder::_EncodeAttrs(XDR::WriteStream& stream, AttrValue* attr,
 		i++;
 	}
 
+	if (i < count && attr[i].fAttribute == FATTR4_FILEHANDLE) {
+		Filehandle* fh = reinterpret_cast<Filehandle*>(attr[i].fData.fPointer);
+		str.AddOpaque(fh->fFH, fh->fSize);
+		i++;
+	}
+
+	if (i < count && attr[i].fAttribute == FATTR4_FILEID) {
+		str.AddUHyper(attr[i].fData.fValue64);
+		i++;
+	}
+
 	if (i < count && attr[i].fAttribute == FATTR4_MODE) {
 		str.AddUInt(attr[i].fData.fValue32);
 		i++;

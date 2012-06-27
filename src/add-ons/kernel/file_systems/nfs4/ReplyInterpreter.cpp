@@ -154,15 +154,6 @@ static inline uint32 sCountBits(uint32 v)
 }
 
 
-static inline bool sIsAttrSet(Attribute attr, uint32* bitmap, uint32 count)
-{
-	if ((uint32)attr / 32 >= count)
-		return false;
-
-	return (bitmap[attr / 32] & 1 << attr % 32) != 0;
-}
-
-
 status_t
 ReplyInterpreter::GetAttr(AttrValue** attrs, uint32* count)
 {
@@ -512,6 +503,18 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 	}
 
 	uint32 current = 0;
+
+	if (sIsAttrSet(FATTR4_SUPPORTED_ATTRS, bitmap, bcount)) {
+		values[current].fAttribute = FATTR4_SUPPORTED_ATTRS;
+		uint32 count = stream.GetInt();
+		uint32 i;
+		// two uint32 are enough for NFS4, not for NFS4.1
+		for (i = 0; i < min_c(count, 2); i++)
+			((uint32*)&values[current].fData.fValue64)[i] = stream.GetUInt();
+		for (; i < count; i++)
+			stream.GetUInt();
+		current++;
+	}
 
 	if (sIsAttrSet(FATTR4_TYPE, bitmap, bcount)) {
 		values[current].fAttribute = FATTR4_TYPE;

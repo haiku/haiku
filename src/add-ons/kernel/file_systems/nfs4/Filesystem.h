@@ -33,6 +33,9 @@ public:
 			status_t			Migrate(const Filehandle& fh,
 									const RPC::Server* serv);
 
+	inline	bool				IsAttrSupported(Attribute attr) const;
+	inline	uint32				ExpireType() const;
+
 	inline	RPC::Server*		Server();
 	inline	NFS4Server*			NFSServer();
 
@@ -45,6 +48,9 @@ public:
 	inline	InodeIdMap*			InoIdMap();
 private:
 								Filesystem();
+
+			uint32				fExpireType;
+			uint32				fSupAttrs[2];
 
 			FilesystemId		fFsId;
 			const char*			fPath;
@@ -61,6 +67,20 @@ private:
 
 			InodeIdMap			fInoIdMap;
 };
+
+
+inline bool
+Filesystem::IsAttrSupported(Attribute attr) const
+{
+	return sIsAttrSet(attr, fSupAttrs, 2);
+}
+
+
+inline uint32
+Filesystem::ExpireType() const
+{
+	return fExpireType;
+}
 
 
 inline RPC::Server*

@@ -124,6 +124,17 @@ enum Attribute {
 	FATTR4_MAXIMUM_ATTR_ID
 };
 
+
+static inline bool sIsAttrSet(Attribute attr, const uint32* bitmap,
+	uint32 count)
+{
+	if ((uint32)attr / 32 >= count)
+		return false;
+
+	return (bitmap[attr / 32] & 1 << attr % 32) != 0;
+}
+
+
 enum FileType {
 	NF4REG			= 1,    /* Regular File */
 	NF4DIR			= 2,    /* Directory */
