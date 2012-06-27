@@ -59,11 +59,19 @@ struct interrupt_descriptor {
 	uint32 base0 : 16;
 	uint32 sel : 16;
 	uint32 ist : 3;
-	uint32 unused : 5;
-	uint32 flags : 8;
+	uint32 unused1 : 5;
+	uint32 type : 4;
+	uint32 unused2 : 1;
+	uint32 dpl : 2;
+	uint32 present : 1;
 	uint32 base1 : 16;
 	uint32 base2 : 32;
 	uint32 reserved : 32;
+} _PACKED;
+
+struct gdt_idt_descr {
+	uint16 limit;
+	addr_t base;
 } _PACKED;
 
 enum descriptor_privilege_levels {
@@ -88,6 +96,11 @@ enum descriptor_types {
 	// Descriptor types
 	DT_SYSTEM_SEGMENT = 0,
 	DT_CODE_DATA_SEGMENT = 1,
+};
+
+enum gate_types {
+	GATE_INTERRUPT = 14,
+	GATE_TRAP = 15,
 };
 
 
@@ -141,6 +154,24 @@ set_tss_descriptor(segment_descriptor* _desc, uint64 base, uint32 limit)
 	desc->type = DT_TSS;
 	desc->desc_type = DT_SYSTEM_SEGMENT;
 	desc->dpl = DPL_KERNEL;
+}
+
+
+static inline void
+set_interrupt_descriptor(interrupt_descriptor* desc, uint64 addr, uint32 type,
+	uint16 seg, uint32 dpl, uint32 ist)
+{
+	desc->base0 = (addr & 0xFFFF);
+	desc->base1 = ((addr >> 16) & 0xFFFF);
+	desc->base2 = ((addr >> 32) & 0xFFFFFFFF);
+	desc->sel = seg;
+	desc->ist = ist;
+	desc->type = type;
+	desc->dpl = dpl;
+	desc->present = 1;
+	desc->unused1 = 0;
+	desc->unused2 = 0;
+	desc->reserved = 0;
 }
 
 

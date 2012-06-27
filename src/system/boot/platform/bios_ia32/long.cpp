@@ -20,12 +20,6 @@
 #include "mmu.h"
 
 
-struct gdt_idt_descr {
-	uint16 limit;
-	addr_t base;
-} _PACKED;
-
-
 /*! Convert a 32-bit address to a 64-bit address. */
 static inline uint64
 fix_address(uint64 address)

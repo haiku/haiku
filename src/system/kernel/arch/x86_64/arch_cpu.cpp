@@ -14,37 +14,35 @@
 
 
 status_t
-arch_cpu_preboot_init_percpu(kernel_args *args, int cpu)
+arch_cpu_preboot_init_percpu(kernel_args* args, int cpu)
 {
 	return B_OK;
 }
 
 
 status_t
-arch_cpu_init_percpu(kernel_args *args, int cpu)
+arch_cpu_init_percpu(kernel_args* args, int cpu)
 {
 	return B_OK;
 }
 
 
 status_t
-arch_cpu_init(kernel_args *args)
-{
-	dprintf("not implemented...\n");
-	while (1);
-	return B_OK;
-}
-
-
-status_t
-arch_cpu_init_post_vm(kernel_args *args)
+arch_cpu_init(kernel_args* args)
 {
 	return B_OK;
 }
 
 
 status_t
-arch_cpu_init_post_modules(kernel_args *args)
+arch_cpu_init_post_vm(kernel_args* args)
+{
+	return B_OK;
+}
+
+
+status_t
+arch_cpu_init_post_modules(kernel_args* args)
 {
 	return B_OK;
 }
@@ -79,8 +77,8 @@ arch_cpu_invalidate_TLB_list(addr_t pages[], int num_pages)
 
 
 ssize_t
-arch_cpu_user_strlcpy(char *to, const char *from, size_t size,
-	addr_t *faultHandler)
+arch_cpu_user_strlcpy(char* to, const char* from, size_t size,
+	addr_t* faultHandler)
 {
 	int fromLength = 0;
 	addr_t oldFaultHandler = *faultHandler;
@@ -99,6 +97,7 @@ arch_cpu_user_strlcpy(char *to, const char *from, size_t size,
 				break;
 		}
 	}
+
 	// count any leftover from chars
 	while (*from++ != '\0') {
 		fromLength++;
@@ -114,11 +113,11 @@ error:
 
 
 status_t
-arch_cpu_user_memcpy(void *to, const void *from, size_t size,
-	addr_t *faultHandler)
+arch_cpu_user_memcpy(void* to, const void* from, size_t size,
+	addr_t* faultHandler)
 {
-	char *d = (char *)to;
-	const char *s = (const char *)from;
+	char* d = (char*)to;
+	const char* s = (const char*)from;
 	addr_t oldFaultHandler = *faultHandler;
 
 	// this check is to trick the gcc4 compiler and have it keep the error label
@@ -141,9 +140,9 @@ error:
 
 
 status_t
-arch_cpu_user_memset(void *s, char c, size_t count, addr_t *faultHandler)
+arch_cpu_user_memset(void* s, char c, size_t count, addr_t* faultHandler)
 {
-	char *xs = (char *)s;
+	char* xs = (char*)s;
 	addr_t oldFaultHandler = *faultHandler;
 
 	// this check is to trick the gcc4 compiler and have it keep the error label
@@ -179,24 +178,22 @@ arch_cpu_idle(void)
 
 
 void
-arch_cpu_sync_icache(void *address, size_t length)
+arch_cpu_sync_icache(void* address, size_t length)
 {
-	// instruction cache is always consistent on x86
+	// Instruction cache is always consistent on x86.
 }
 
 
 void
 arch_cpu_memory_read_barrier(void)
 {
-	asm volatile ("lock;" : : : "memory");
-	asm volatile ("addl $0, 0(%%esp);" : : : "memory");
+	asm volatile("lfence" : : : "memory");
 }
 
 
 void
 arch_cpu_memory_write_barrier(void)
 {
-	asm volatile ("lock;" : : : "memory");
-	asm volatile ("addl $0, 0(%%esp);" : : : "memory");
+	asm volatile("sfence" : : : "memory");
 }
 

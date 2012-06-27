@@ -225,6 +225,9 @@ enum x86_vendors {
 
 #define nop() __asm__ ("nop"::)
 
+#define read_cr2(value) \
+	__asm__("mov	%%cr2,%0" : "=r" (value))
+
 #define read_cr3(value) \
 	__asm__("mov	%%cr3,%0" : "=r" (value))
 

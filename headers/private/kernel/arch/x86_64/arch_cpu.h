@@ -71,7 +71,7 @@ struct iframe {
 	unsigned long user_ss;
 } _PACKED;
 
-#define IFRAME_IS_USER(f)	((f)->cs == USER_CODE_SEG)
+#define IFRAME_IS_USER(f)	(((f)->cs & DPL_USER) == DPL_USER)
 
 
 typedef struct arch_cpu_info {
@@ -87,9 +87,8 @@ typedef struct arch_cpu_info {
 	int					model;
 	int					extended_model;
 
-	// TSS and double fault TSS for this CPU.
+	// TSS for this CPU.
 	struct tss			tss;
-	struct tss			double_fault_tss;
 } arch_cpu_info;
 
 

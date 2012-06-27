@@ -13,6 +13,7 @@ KernelMergeObject kernel_arch_x86_64.o :
 	arch_debug_console.cpp
 	arch_elf.cpp
 	arch_int.cpp
+	arch_interrupts.S
 	arch_platform.cpp
 	arch_real_time_clock.cpp
 	arch_smp.cpp
