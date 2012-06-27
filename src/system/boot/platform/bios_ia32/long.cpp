@@ -32,7 +32,7 @@ template<typename Type>
 inline void
 fix_address(FixedWidthPointer<Type>& p)
 {
-	if(p != NULL)
+	if (p != NULL)
 		p.SetTo(fix_address(p.Get()));
 }
 
@@ -69,7 +69,7 @@ long_idt_init()
 		mmu_allocate_page(&gKernelArgs.arch_args.phys_idt);
 	gKernelArgs.arch_args.vir_idt = fix_address((addr_t)idt);
 
-	dprintf("IDT at phys 0x%lx, virt 0x%llx\n", gKernelArgs.arch_args.phys_idt,
+	dprintf("IDT at phys %#lx, virt %#llx\n", gKernelArgs.arch_args.phys_idt,
 		gKernelArgs.arch_args.vir_idt);
 
 	// The 32-bit kernel gets an IDT with the loader's exception handlers until
@@ -209,7 +209,7 @@ convert_kernel_args()
 	// converting, as the next pointer will be converted.
 	preloaded_image* image = gKernelArgs.preloaded_images;
 	fix_address(gKernelArgs.preloaded_images);
-	while (image) {
+	while (image != NULL) {
 		preloaded_image* next = image->next;
 		convert_preloaded_image(static_cast<preloaded_elf64_image*>(image));
 		image = next;
@@ -234,7 +234,7 @@ convert_kernel_args()
 	// Fix driver settings files.
 	driver_settings_file* file = gKernelArgs.driver_settings;
 	fix_address(gKernelArgs.driver_settings);
-	while (file) {
+	while (file != NULL) {
 		driver_settings_file* next = file->next;
 		fix_address(file->next);
 		fix_address(file->buffer);
@@ -249,7 +249,7 @@ long_start_kernel()
 	// Check whether long mode is supported.
 	cpuid_info info;
 	get_current_cpuid(&info, 0x80000001);
-	if ((info.regs.edx & (1<<29)) == 0)
+	if ((info.regs.edx & (1 << 29)) == 0)
 		panic("64-bit kernel requires a 64-bit CPU");
 
 	preloaded_elf64_image *image = static_cast<preloaded_elf64_image *>(
@@ -271,7 +271,7 @@ long_start_kernel()
 		+ gKernelArgs.cpu_kstack[0].size;
 	uint64 kernelArgs = (addr_t)&gKernelArgs;
 
-	dprintf("kernel entry at 0x%llx, stack 0x%llx, args 0x%llx\n", entry,
+	dprintf("kernel entry at %#llx, stack %#llx, args %#llx\n", entry,
 		stackTop, kernelArgs);
 
 	// We're about to enter the kernel -- disable console output.

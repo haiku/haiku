@@ -17,7 +17,7 @@
 
 typedef void interrupt_handler_function(iframe* frame);
 
-static const char *kInterruptNames[] = {
+static const char* kInterruptNames[] = {
 	/*  0 */ "Divide Error Exception",
 	/*  1 */ "Debug Exception",
 	/*  2 */ "NMI Interrupt",
@@ -64,17 +64,17 @@ static void
 invalid_exception(iframe* frame)
 {
 	char name[32];
-	panic("unhandled trap 0x%lx (%s) at ip 0x%lx\n",
+	panic("unhandled trap %#lx (%s) at ip %#lx\n",
 		frame->vector, exception_name(frame->vector, name, sizeof(name)),
 		frame->rip);
 }
 
 
 static void
-fatal_exception(iframe *frame)
+fatal_exception(iframe* frame)
 {
 	char name[32];
-	panic("fatal exception 0x%lx (%s) at ip 0x%lx, error code 0x%lx\n",
+	panic("fatal exception %#lx (%s) at ip %#lx, error code %#lx\n",
 		frame->vector, exception_name(frame->vector, name, sizeof(name)),
 		frame->rip, frame->error_code);
 }
@@ -84,7 +84,7 @@ static void
 unexpected_exception(iframe* frame)
 {
 	char name[32];
-	panic("fatal exception 0x%lx (%s) at ip 0x%lx, error code 0x%lx\n",
+	panic("fatal exception %#lx (%s) at ip %#lx, error code %#lx\n",
 		frame->vector, exception_name(frame->vector, name, sizeof(name)),
 		frame->rip, frame->error_code);
 }
@@ -96,7 +96,7 @@ page_fault_exception(iframe* frame)
 	unsigned long cr2;
 	read_cr2(cr2);
 
-	panic("page fault exception at ip 0x%lx on 0x%lx, error code 0x%lx\n",
+	panic("page fault exception at ip %#lx on %#lx, error code %#lx\n",
 		frame->rip, cr2, frame->error_code);
 }
 

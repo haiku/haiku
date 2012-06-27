@@ -20,12 +20,12 @@ FUNCTION(long_enter_kernel):
 	// address. To switch to 64-bit paging we must first disable 32-bit paging,
 	// otherwise loading the new CR3 will fault.
 	movl	%cr0, %eax
-	andl	$~(1<<31), %eax
+	andl	$~(1 << 31), %eax
 	movl	%eax, %cr0
 
 	// Enable PAE.
 	movl	%cr4, %eax
-	orl		$(1<<5), %eax
+	orl		$(1 << 5), %eax
 	movl	%eax, %cr4
 
 	// Point CR3 to the kernel's PML4.
@@ -35,13 +35,13 @@ FUNCTION(long_enter_kernel):
 	// Enable long mode by setting EFER.LME.
 	movl	$0xC0000080, %ecx
 	rdmsr
-	orl		$(1<<8), %eax
+	orl		$(1 << 8), %eax
 	wrmsr
 
 	// Re-enable paging, which will put us in compatibility mode as we are
 	// currently in a 32-bit code segment.
 	movl	%cr0, %ecx
-	orl		$(1<<31), %ecx
+	orl		$(1 << 31), %ecx
 	movl	%ecx, %cr0
 
 	// Jump into the 64-bit code segment.

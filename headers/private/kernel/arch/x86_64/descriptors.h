@@ -120,8 +120,8 @@ set_segment_descriptor(segment_descriptor* desc, uint8 type, uint8 dpl)
 	// it always treats base as 0 and does no limit checks.
 	desc->base0 = 0;
 	desc->base1 = 0;
-	desc->limit0 = 0xFFFF;
-	desc->limit1 = 0xF;
+	desc->limit0 = 0xffff;
+	desc->limit1 = 0xf;
 	desc->granularity = 1;
 
 	desc->type = type;
@@ -145,8 +145,8 @@ set_tss_descriptor(segment_descriptor* _desc, uint64 base, uint32 limit)
 	tss_descriptor* desc = (tss_descriptor*)_desc;
 
 	desc->base0 = base & 0xffffff;
-	desc->base1 = ((base) >> 24) & 0xff;
-	desc->base2 = ((base) >> 32);
+	desc->base1 = (base >> 24) & 0xff;
+	desc->base2 = (base >> 32);
 	desc->limit0 = limit & 0xffff;
 	desc->limit1 = (limit >> 16) & 0xf;
 
@@ -161,9 +161,9 @@ static inline void
 set_interrupt_descriptor(interrupt_descriptor* desc, uint64 addr, uint32 type,
 	uint16 seg, uint32 dpl, uint32 ist)
 {
-	desc->base0 = (addr & 0xFFFF);
-	desc->base1 = ((addr >> 16) & 0xFFFF);
-	desc->base2 = ((addr >> 32) & 0xFFFFFFFF);
+	desc->base0 = addr & 0xffff;
+	desc->base1 = (addr >> 16) & 0xffff;
+	desc->base2 = (addr >> 32) & 0xffffffff;
 	desc->sel = seg;
 	desc->ist = ist;
 	desc->type = type;
