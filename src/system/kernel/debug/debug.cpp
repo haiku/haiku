@@ -2066,7 +2066,8 @@ panic(const char* format, ...)
 
 	cpu_status state = disable_interrupts();
 
-	kernel_debugger_internal("PANIC: ", format, args, smp_get_current_cpu());
+	kernel_debugger_internal("PANIC: ", format, args,
+		thread_get_current_thread() ? smp_get_current_cpu() : 0);
 
 	restore_interrupts(state);
 
