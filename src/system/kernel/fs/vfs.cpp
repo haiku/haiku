@@ -5475,7 +5475,10 @@ file_close(struct file_descriptor* descriptor)
 
 	if (status == B_OK) {
 		// remove all outstanding locks for this team
-		release_advisory_lock(vnode, NULL);
+		if (HAS_FS_CALL(vnode, release_lock))
+			status = FS_CALL(vnode, release_lock, descriptor->cookie, NULL);
+		else
+			status = release_advisory_lock(vnode, NULL);
 	}
 	return status;
 }
@@ -6006,7 +6009,11 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 
 		case F_GETLK:
 			if (vnode != NULL) {
-				status = get_advisory_lock(vnode, &flock);
+				if (HAS_FS_CALL(vnode, test_lock)) {
+					status = FS_CALL(vnode, test_lock, descriptor->cookie,
+						&flock);
+				} else
+					status = get_advisory_lock(vnode, &flock);
 				if (status == B_OK) {
 					// copy back flock structure
 					status = user_memcpy((struct flock*)argument, &flock,
@@ -6025,7 +6032,11 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 			if (vnode == NULL) {
 				status = B_BAD_VALUE;
 			} else if (flock.l_type == F_UNLCK) {
-				status = release_advisory_lock(vnode, &flock);
+				if (HAS_FS_CALL(vnode, release_lock)) {
+					status = FS_CALL(vnode, release_lock, descriptor->cookie,
+						&flock);
+				} else
+					status = release_advisory_lock(vnode, &flock);
 			} else {
 				// the open mode must match the lock type
 				if (((descriptor->open_mode & O_RWMASK) == O_RDONLY
@@ -6034,8 +6045,13 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 						&& flock.l_type == F_RDLCK))
 					status = B_FILE_ERROR;
 				else {
-					status = acquire_advisory_lock(vnode, -1,
-						&flock, op == F_SETLKW);
+					if (HAS_FS_CALL(vnode, acquire_lock)) {
+						status = FS_CALL(vnode, acquire_lock,
+							descriptor->cookie, &flock, op == F_SETLKW);
+					} else {
+						status = acquire_advisory_lock(vnode, -1,
+							&flock, op == F_SETLKW);
+					}
 				}
 			}
 			break;
