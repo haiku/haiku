@@ -734,6 +734,7 @@ ReplyInterpreter::_NFS4ErrorToHaiku(uint32 x)
 		case NFS4ERR_LOCKED:
 		case NFS4ERR_GRACE:
 								return B_WOULD_BLOCK;
+		case NFS4ERR_FHEXPIRED:	return B_ENTRY_NOT_FOUND;
 		// ...
 		default:				return B_ERROR;
 	}

@@ -1575,8 +1575,10 @@ Inode::_HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 
 		// filehandle has expired
 		case NFS4ERR_FHEXPIRED:
-			_LookUpFilehandle();
-			return true;
+			if (_LookUpFilehandle() == B_OK)
+				return true;
+			else
+				return false;
 
 		// filesystem has been moved
 		case NFS4ERR_MOVED:
@@ -1635,6 +1637,14 @@ Inode::_LookUpFilehandle()
 
 	req.GetFH();
 
+	if (fFilesystem->IsAttrSupported(FATTR4_FILEID)) {
+		AttrValue attr;
+		attr.fAttribute = FATTR4_FILEID;
+		attr.fFreePointer = false;
+		attr.fData.fValue64 = fFileId;
+		req.Verify(&attr, 1);
+	}
+
 	status_t result = request.Send();
 	if (result != B_OK)
 		return result;
@@ -1645,6 +1655,13 @@ Inode::_LookUpFilehandle()
 	for (uint32 i = 0; i < lookupCount; i++)
 		reply.LookUp();
 
-	return reply.GetFH(&fHandle);
+	result = reply.GetFH(&fHandle);
+	if (result != B_OK)
+		return result;
+
+	if (fFilesystem->IsAttrSupported(FATTR4_FILEID))
+		return reply.Verify();
+	else
+		return B_OK;
 }
 
