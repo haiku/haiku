@@ -225,10 +225,20 @@ convert_kernel_args()
 		image = next;
 	}
 
+	// Set correct kernel args range addresses.
+	dprintf("kernel args ranges:\n");
+	for (uint32 i = 0; i < gKernelArgs.num_kernel_args_ranges; i++) {
+		gKernelArgs.kernel_args_range[i].start = fix_address(
+			gKernelArgs.kernel_args_range[i].start);
+		dprintf("    base %#018" B_PRIx64 ", length %#018" B_PRIx64 "\n",
+			gKernelArgs.kernel_args_range[i].start,
+			gKernelArgs.kernel_args_range[i].size);
+	}
+
 	// Set correct kernel stack addresses.
 	for (uint32 i = 0; i < gKernelArgs.num_cpus; i++) {
-		gKernelArgs.cpu_kstack[i].start
-			= fix_address(gKernelArgs.cpu_kstack[i].start);
+		gKernelArgs.cpu_kstack[i].start = fix_address(
+			gKernelArgs.cpu_kstack[i].start);
 	}
 
 	// Fix driver settings files.
