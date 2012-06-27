@@ -1533,18 +1533,37 @@ Inode::_HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 		// server needs more time, we need to wait
 		case NFS4ERR_LOCKED:
 		case NFS4ERR_DELAY:
-			if (cookie == NULL || (cookie->fMode & O_NONBLOCK) == 0) {
+			if (cookie == NULL) {
 				snooze_etc(5 * 1000000, B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
 				return true;
+			} else if ((cookie->fMode & O_NONBLOCK) == 0) {
+				status_t result = acquire_sem_etc(cookie->fSnoozeCancel, 1,
+					B_RELATIVE_TIMEOUT, 5 * 1000000);
+				if (result == B_TIMED_OUT)
+					return true;
+				else {
+					release_sem(cookie->fSnoozeCancel);
+					return false;
+				}
 			} else
 				return false;
 
 		// server is in grace period, we need to wait
 		case NFS4ERR_GRACE:
-			if (cookie == NULL || (cookie->fMode & O_NONBLOCK) == 0) {
+			if (cookie == NULL) {
 				snooze_etc(fFilesystem->NFSServer()->LeaseTime() / 3,
 					B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
 				return true;
+			} else if ((cookie->fMode & O_NONBLOCK) == 0) {
+				status_t result = acquire_sem_etc(cookie->fSnoozeCancel, 1,
+					B_RELATIVE_TIMEOUT,
+					fFilesystem->NFSServer()->LeaseTime() / 3);
+				if (result == B_TIMED_OUT)
+					return true;
+				else {
+					release_sem(cookie->fSnoozeCancel);
+					return false;
+				}
 			} else
 				return false;
 

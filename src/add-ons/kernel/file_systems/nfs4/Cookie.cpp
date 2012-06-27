@@ -18,14 +18,17 @@ vint64 OpenFileCookie::fLastOwnerId = 0;
 
 Cookie::Cookie()
 	:
-	fRequests(NULL)
+	fRequests(NULL),
+	fSnoozeCancel(create_sem(1, NULL))
 {
+	acquire_sem(fSnoozeCancel);
 	mutex_init(&fRequestLock, NULL);
 }
 
 
 Cookie::~Cookie()
 {
+	delete_sem(fSnoozeCancel);
 	mutex_destroy(&fRequestLock);
 }
 
@@ -74,6 +77,8 @@ Cookie::UnregisterRequest(RPC::Request* req)
 status_t
 Cookie::CancelAll()
 {
+	release_sem(fSnoozeCancel);
+
 	mutex_lock(&fRequestLock);
 	RequestEntry* ent = fRequests;
 	while (ent != NULL) {

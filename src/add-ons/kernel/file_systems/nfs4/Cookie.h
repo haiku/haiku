@@ -38,6 +38,8 @@ struct Cookie {
 			RequestEntry*	fRequests;
 			mutex			fRequestLock;
 
+			sem_id			fSnoozeCancel;
+
 							Cookie();
 	virtual					~Cookie();
 
