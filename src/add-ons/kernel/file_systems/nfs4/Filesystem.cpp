@@ -281,11 +281,9 @@ Filesystem::ReadInfo(struct fs_info* info)
 status_t
 Filesystem::Migrate(const Filehandle& fh, const RPC::Server* serv)
 {
-	mutex_lock(&fMigrationLock);
-	if (serv != fServer) {
-		mutex_unlock(&fMigrationLock);
+	MutexLocker _(fMigrationLock);
+	if (serv != fServer)
 		return B_OK;
-	}
 
 	Request request(fServer);
 	RequestBuilder& req = request.Builder();
@@ -295,10 +293,8 @@ Filesystem::Migrate(const Filehandle& fh, const RPC::Server* serv)
 	req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
 
 	status_t result = request.Send();
-	if (result != B_OK) {
-		mutex_unlock(&fMigrationLock);
+	if (result != B_OK)
 		return result;
-	}
 
 	ReplyInterpreter& reply = request.Reply();
 
@@ -307,10 +303,8 @@ Filesystem::Migrate(const Filehandle& fh, const RPC::Server* serv)
 	AttrValue* values;
 	uint32 count;
 	result = reply.GetAttr(&values, &count);
-	if (result != B_OK || count < 1) {
-		mutex_unlock(&fMigrationLock);
+	if (result != B_OK || count < 1)
 		return result;
-	}
 
 	FSLocations* locs =
 		reinterpret_cast<FSLocations*>(values[0].fData.fLocations);
@@ -319,7 +313,6 @@ Filesystem::Migrate(const Filehandle& fh, const RPC::Server* serv)
 	result = get_module(DNS_RESOLVER_MODULE_NAME,
 		reinterpret_cast<module_info**>(&dns));
 	if (result != B_OK) {
-		mutex_unlock(&fMigrationLock);
 		delete[] values;
 		return result;
 	}
@@ -350,14 +343,10 @@ Filesystem::Migrate(const Filehandle& fh, const RPC::Server* serv)
 	put_module(DNS_RESOLVER_MODULE_NAME);
 	delete[] values;
 
-	if (server == fServer) {
-		mutex_unlock(&fMigrationLock);
+	if (server == fServer)
 		return B_ERROR;
-	}
 
 	gRPCServerManager->Release(server);
-
-	mutex_unlock(&fMigrationLock);
 
 	return B_OK;
 }

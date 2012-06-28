@@ -36,17 +36,15 @@ Cookie::~Cookie()
 status_t
 Cookie::RegisterRequest(RPC::Request* req)
 {
-	mutex_lock(&fRequestLock);
 	RequestEntry* ent = new RequestEntry;
-	if (ent == NULL) {
-		mutex_unlock(&fRequestLock);
+	if (ent == NULL)
 		return B_NO_MEMORY;
-	}
 
+	MutexLocker _(fRequestLock);
 	ent->fRequest = req;
 	ent->fNext = fRequests;
 	fRequests = ent;
-	mutex_unlock(&fRequestLock);
+
 	return B_OK;
 }
 
@@ -54,7 +52,7 @@ Cookie::RegisterRequest(RPC::Request* req)
 status_t
 Cookie::UnregisterRequest(RPC::Request* req)
 {
-	mutex_lock(&fRequestLock);
+	MutexLocker _(fRequestLock);
 	RequestEntry* ent = fRequests;
 	RequestEntry* prev = NULL;
 	while (ent != NULL) {
@@ -69,7 +67,7 @@ Cookie::UnregisterRequest(RPC::Request* req)
 		prev = ent;
 		ent = ent->fNext;
 	}
-	mutex_unlock(&fRequestLock);
+
 	return B_OK;
 }
 
@@ -79,13 +77,13 @@ Cookie::CancelAll()
 {
 	release_sem(fSnoozeCancel);
 
-	mutex_lock(&fRequestLock);
+	MutexLocker _(fRequestLock);
 	RequestEntry* ent = fRequests;
 	while (ent != NULL) {
 		fFilesystem->Server()->WakeCall(ent->fRequest);
 		ent = ent->fNext;
 	}
-	mutex_unlock(&fRequestLock);
+
 	return B_OK;
 }
 

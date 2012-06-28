@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems nfs4 ;
 
-UsePrivateHeaders kernel ;
+UsePrivateKernelHeaders ;
+UsePrivateHeaders shared ;
 
 KernelAddon nfs4 :
 	Cookie.cpp

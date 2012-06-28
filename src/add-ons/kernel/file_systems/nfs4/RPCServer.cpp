@@ -11,6 +11,8 @@
 
 #include <stdlib.h>
 
+#include <util/AutoLock.h>
+
 #include "RPCReply.h"
 
 
@@ -35,20 +37,19 @@ RequestManager::~RequestManager()
 void
 RequestManager::AddRequest(Request* req)
 {
-	mutex_lock(&fLock);
+	MutexLocker _(fLock);
 	if (fQueueTail != NULL)
 		fQueueTail->fNext = req;
 	else 
 		fQueueHead = req;
 	fQueueTail = req;
-	mutex_unlock(&fLock);
 }
 
 
 Request*
 RequestManager::FindRequest(uint32 xid)
 {
-	mutex_lock(&fLock);
+	MutexLocker _(fLock);
 	Request* req = fQueueHead;
 	Request* prev = NULL;
 	while (req != NULL) {
@@ -59,7 +60,6 @@ RequestManager::FindRequest(uint32 xid)
 				fQueueTail = prev;
 			if (fQueueHead == req)
 				fQueueHead = req->fNext;
-			mutex_unlock(&fLock);
 
 			return req;
 		}
@@ -67,7 +67,6 @@ RequestManager::FindRequest(uint32 xid)
 		prev = req;
 		req = req->fNext;
 	}
-	mutex_unlock(&fLock);
 
 	return NULL;
 }
@@ -292,16 +291,14 @@ ServerManager::Acquire(Server** pserv, uint32 ip, uint16 port, Transport proto,
 	id.fPort = port;
 	id.fProtocol = proto;
 
-	mutex_lock(&fLock);
+	MutexLocker locker(fLock);
 	ServerNode* node = _Find(id);
 	if (node != NULL) {
 		node->fRefCount++;
-		mutex_unlock(&fLock);
-
 		*pserv = node->fServer;
+
 		return B_OK;
 	}
-	mutex_unlock(&fLock);
 
 	node = new(std::nothrow) ServerNode;
 	if (node == NULL)
@@ -327,20 +324,15 @@ ServerManager::Acquire(Server** pserv, uint32 ip, uint16 port, Transport proto,
 	node->fRefCount = 1;
 	node->fLeft = node->fRight = NULL;
 
-	// We need to be prepared if someone already connected to the server and
-	// updated the BST. In such case we use that connection and cancel ours.
-	mutex_lock(&fLock);
 	ServerNode* nd = _Insert(node);
 	if (nd != node) {
 		nd->fRefCount++;
-		mutex_unlock(&fLock);
 
 		delete node->fServer;
 		delete node;
 		*pserv = nd->fServer;
 		return B_OK;
 	}
-	mutex_unlock(&fLock);
 
 	*pserv = node->fServer;
 	return B_OK;
@@ -350,7 +342,7 @@ ServerManager::Acquire(Server** pserv, uint32 ip, uint16 port, Transport proto,
 void
 ServerManager::Release(Server* serv)
 {
-	mutex_lock(&fLock);
+	MutexLocker _(fLock);
 	ServerNode* node = _Find(serv->ID());
 	if (node != NULL) {
 		node->fRefCount--;
@@ -361,7 +353,6 @@ ServerManager::Release(Server* serv)
 			delete node;
 		}
 	}
-	mutex_unlock(&fLock);
 }
 
 

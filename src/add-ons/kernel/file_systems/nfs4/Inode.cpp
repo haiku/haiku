@@ -1413,10 +1413,9 @@ Inode::AcquireLock(OpenFileCookie* cookie, const struct flock* lock,
 		break;
 	} while (true);
 
-	mutex_lock(&cookie->fLocksLock);
+	MutexLocker _(cookie->fLocksLock);
 	linfo->fNext = cookie->fLocks;
 	cookie->fLocks = linfo;
-	mutex_unlock(&cookie->fLocksLock);
 
 	return B_OK;
 }
@@ -1428,7 +1427,7 @@ Inode::ReleaseLock(OpenFileCookie* cookie, const struct flock* lock)
 	LockInfo* prev = NULL;
 	uint32 owner = find_thread(NULL);
 
-	mutex_lock(&cookie->fLocksLock);
+	MutexLocker locker(cookie->fLocksLock);
 	LockInfo* linfo = cookie->fLocks;
 	while (linfo != NULL) {
 		if (linfo->fOwner == owner &&
@@ -1445,7 +1444,7 @@ Inode::ReleaseLock(OpenFileCookie* cookie, const struct flock* lock)
 		prev = linfo;
 		linfo = linfo->fNext;
 	}
-	mutex_unlock(&cookie->fLocksLock);
+	locker.Unlock();
 
 	if (linfo == NULL)
 		return B_BAD_VALUE;
@@ -1484,7 +1483,7 @@ Inode::ReleaseLock(OpenFileCookie* cookie, const struct flock* lock)
 status_t
 Inode::ReleaseAllLocks(OpenFileCookie* cookie)
 {
-	mutex_lock(&cookie->fLocksLock);
+	MutexLocker _(cookie->fLocksLock);
 	while (cookie->fLocks != NULL) {
 		do {
 			RPC::Server* serv = fFilesystem->Server();
@@ -1495,10 +1494,8 @@ Inode::ReleaseAllLocks(OpenFileCookie* cookie)
 			req.LockU(cookie->fLocks);
 
 			status_t result = request.Send();
-			if (result != B_OK) {
-				mutex_unlock(&cookie->fLocksLock);
+			if (result != B_OK);
 				return result;
-			}
 
 			ReplyInterpreter &reply = request.Reply();
 
@@ -1507,10 +1504,8 @@ Inode::ReleaseAllLocks(OpenFileCookie* cookie)
 
 			reply.PutFH();
 			result = reply.LockU();
-			if (result != B_OK) {
-				mutex_unlock(&cookie->fLocksLock);
+			if (result != B_OK)
 				return result;
-			}
 
 			break;
 		} while (true);
@@ -1519,7 +1514,6 @@ Inode::ReleaseAllLocks(OpenFileCookie* cookie)
 		delete cookie->fLocks;
 		cookie->fLocks = linfo;
 	}
-	mutex_unlock(&cookie->fLocksLock);
 
 	return B_OK;
 }

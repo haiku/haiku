@@ -9,7 +9,9 @@
 #define INODEIDMAP_H
 
 
+#include <lock.h>
 #include <SupportDefs.h>
+#include <util/AutoLock.h>
 #include <util/AVLTreeMap.h>
 
 #include "Filehandle.h"
@@ -17,20 +19,39 @@
 
 class InodeIdMap {
 public:
+	inline									InodeIdMap();
+	inline									~InodeIdMap();
+
 	inline	status_t						AddEntry(const FileInfo& fi,
 												ino_t id);
 	inline	status_t						RemoveEntry(ino_t id);
 	inline	status_t						GetFileInfo(FileInfo* fi, ino_t id);
 
 private:
-			AVLTreeMap<ino_t, FileInfo>	fMap;
+			AVLTreeMap<ino_t, FileInfo>		fMap;
+			mutex							fLock;
 
 };
+
+
+inline
+InodeIdMap::InodeIdMap()
+{
+	mutex_init(&fLock, NULL);
+}
+
+
+inline
+InodeIdMap::~InodeIdMap()
+{
+	mutex_destroy(&fLock);
+}
 
 
 inline status_t
 InodeIdMap::AddEntry(const FileInfo& fi, ino_t id)
 {
+	MutexLocker _(fLock);
 	return fMap.Insert(id, fi);
 }
 
@@ -38,6 +59,7 @@ InodeIdMap::AddEntry(const FileInfo& fi, ino_t id)
 inline status_t
 InodeIdMap::RemoveEntry(ino_t id)
 {
+	MutexLocker _(fLock);
 	return fMap.Remove(id);
 }
 
@@ -45,6 +67,7 @@ InodeIdMap::RemoveEntry(ino_t id)
 inline status_t
 InodeIdMap::GetFileInfo(FileInfo* fi, ino_t id)
 {
+	MutexLocker _(fLock);
 	AVLTreeMap<ino_t, FileInfo>::Iterator it = fMap.Find(id);
 	if (!it.HasCurrent())
 		return B_ENTRY_NOT_FOUND;
