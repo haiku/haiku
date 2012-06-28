@@ -647,22 +647,6 @@ Inode::WriteStat(const struct stat* st, uint32 mask)
 }
 
 
-static OpenAccess
-sModeToAccess(int mode)
-{
-	switch (mode & O_RWMASK) {
-		case O_RDONLY:
-			return OPEN4_SHARE_ACCESS_READ;
-		case O_WRONLY:
-			return OPEN4_SHARE_ACCESS_WRITE;
-		case O_RDWR:
-			return OPEN4_SHARE_ACCESS_BOTH;
-	}
-
-	return OPEN4_SHARE_ACCESS_READ;
-}
-
-
 static status_t
 sConfirmOpen(Filesystem* fs, Filehandle& fh, OpenFileCookie* cookie)
 {

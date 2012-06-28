@@ -78,7 +78,7 @@ NFS4Server::_ReclaimOpen(OpenFileCookie* cookie)
 	RequestBuilder& req = request.Builder();
 
 	req.PutFH(cookie->fHandle);
-	req.Open(CLAIM_PREVIOUS, cookie->fSequence++, OPEN4_SHARE_ACCESS_READ,
+	req.Open(CLAIM_PREVIOUS, cookie->fSequence++, sModeToAccess(cookie->fMode),
 		cookie->fClientId, OPEN4_NOCREATE, cookie->fOwnerId, NULL);
 
 	status_t result = request.Send();

@@ -166,6 +166,23 @@ enum OpenAccess {
 	OPEN4_SHARE_ACCESS_BOTH		= 3
 };
 
+
+static inline OpenAccess
+sModeToAccess(int mode)
+{
+	switch (mode & O_RWMASK) {
+		case O_RDONLY:
+			return OPEN4_SHARE_ACCESS_READ;
+		case O_WRONLY:
+			return OPEN4_SHARE_ACCESS_WRITE;
+		case O_RDWR:
+			return OPEN4_SHARE_ACCESS_BOTH;
+	}
+
+	return OPEN4_SHARE_ACCESS_READ;
+}
+
+
 enum OpenCreate {
 	OPEN4_NOCREATE			= 0,
 	OPEN4_CREATE			= 1
@@ -203,8 +220,8 @@ enum LockType {
 };
 
 
-static inline
-LockType sGetLockType(short type, bool wait) {
+static inline LockType
+sGetLockType(short type, bool wait) {
 	switch (type) {
 		case F_RDLCK:	return wait ? READW_LT : READ_LT;
 		case F_WRLCK:	return wait ? WRITEW_LT : WRITE_LT;
@@ -213,8 +230,8 @@ LockType sGetLockType(short type, bool wait) {
 }
 
 
-static inline
-short sLockTypeToHaiku(LockType type) {
+static inline short 
+sLockTypeToHaiku(LockType type) {
 	switch (type) {
 		case READ_LT:
 		case READW_LT:
