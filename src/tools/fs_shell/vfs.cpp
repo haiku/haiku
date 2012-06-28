@@ -112,7 +112,6 @@ struct fs_mount {
 	fssh_file_system_module_info *fs;
 	fssh_mount_id		id;
 	fssh_fs_volume		*volume;
-	void			*cookie;
 	char			*device_name;
 	char			*fs_name;
 	fssh_recursive_lock	rlock;	// guards the vnodes list
@@ -4942,7 +4941,7 @@ fs_next_device(int32_t *_cookie)
 
 	while (device < sNextMountID) {
 		mount = find_mount(device++);
-		if (mount != NULL && mount->cookie != NULL)
+		if (mount != NULL && mount->volume->private_volume != NULL)
 			break;
 	}
 
