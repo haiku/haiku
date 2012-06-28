@@ -8,6 +8,8 @@ KernelAddon nfs4 :
 	Connection.cpp
 	Filesystem.cpp
 	Inode.cpp
+	InodeDir.cpp
+	InodeRegular.cpp
 	kernel_interface.cpp
 	NFS4Server.cpp
 	ReplyInterpreter.cpp
