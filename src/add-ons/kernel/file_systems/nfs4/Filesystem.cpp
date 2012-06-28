@@ -16,7 +16,7 @@
 #include <net/dns_resolver.h>
 
 #include "Request.h"
-#include "Inode.h"
+#include "RootInode.h"
 
 
 extern RPC::ServerManager* gRPCServerManager;
@@ -30,7 +30,7 @@ Filesystem::Filesystem()
 	fOpenFiles(NULL),
 	fOpenCount(0),
 	fPath(NULL),
-	fName(NULL),
+	fRoot(NULL),
 	fId(1)
 {
 	mutex_init(&fOpenLock, NULL);
@@ -43,8 +43,8 @@ Filesystem::~Filesystem()
 
 	mutex_destroy(&fOpenLock);
 
-	free(const_cast<char*>(fName));
 	free(const_cast<char*>(fPath));
+	delete fRoot;
 }
 
 
@@ -155,33 +155,39 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
 	} else
 		fs->fPath = NULL;
 
+	FileInfo fi;
 	const char* name;
 	if (fsPath != NULL && fsPath[0] == '/')
 		fsPath++;
 	name = strrchr(fsPath, '/');
 	if (name != NULL) {
 		name++;
-		fs->fName = strdup(name);
+		fi.fName = strdup(name);
 	} else
-		fs->fName = strdup(fsPath);
+		fi.fName = strdup(fsPath);
 
-	memcpy(&fs->fRootFH, &fh, sizeof(Filehandle));
 	fs->fServer = serv;
 	fs->fDevId = id;
 	fs->fFsId = *fsid;
 
-	FileInfo fi;
 	fi.fFH = fh;
 	fi.fParent = fh;
-	fi.fName = strdup("/");
 	fi.fPath = strdup(sGetPath(fs->fPath, fsPath));
-	fs->fRoot = fi;
-
-	*pfs = fs;
 
 	delete[] values;
 
+	Inode* inode;
+	result = Inode::CreateInode(fs, fi, &inode);
+	if (result != B_OK) {
+		delete fs;
+		return result;
+	}
+
+	fs->fRoot = reinterpret_cast<RootInode*>(inode);
+
 	fs->NFSServer()->AddFilesystem(fs);
+	*pfs = fs;
+
 	return B_OK;
 }
 
@@ -207,115 +213,19 @@ Filesystem::GetInode(ino_t id, Inode** _inode)
 }
 
 
-Inode*
-Filesystem::CreateRootInode()
-{
-	Inode* inode;
-	status_t result = Inode::CreateInode(this, fRoot, &inode);
-	if (result == B_OK)
-		return inode;
-	else
-		return NULL;
-}
-
-
 status_t
-Filesystem::ReadInfo(struct fs_info* info)
+Filesystem::Migrate(const RPC::Server* serv)
 {
-	Request request(fServer);
-	RequestBuilder& req = request.Builder();
-
-	req.PutFH(fRootFH);
-	Attribute attr[] = { FATTR4_FILES_FREE, FATTR4_FILES_TOTAL,
-		FATTR4_MAXREAD, FATTR4_MAXWRITE, FATTR4_SPACE_FREE,
-		FATTR4_SPACE_TOTAL };
-	req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
-
-	status_t result = request.Send();
-	if (result != B_OK)
-		return result;
-
-	ReplyInterpreter& reply = request.Reply();
-
-	reply.PutFH();
-
-	AttrValue* values;
-	uint32 count, next = 0;
-	result = reply.GetAttr(&values, &count);
-	if (result != B_OK)
-		return result;
-
-	if (count >= next && values[next].fAttribute == FATTR4_FILES_FREE) {
-		info->free_nodes = values[next].fData.fValue64;
-		next++;
-	}
-
-	if (count >= next && values[next].fAttribute == FATTR4_FILES_TOTAL) {
-		info->total_nodes = values[next].fData.fValue64;
-		next++;
-	}
-
-	uint64 io_size = LONGLONG_MAX;
-	if (count >= next && values[next].fAttribute == FATTR4_MAXREAD) {
-		io_size = min_c(io_size, values[next].fData.fValue64);
-		next++;
-	}
-
-	if (count >= next && values[next].fAttribute == FATTR4_MAXWRITE) {
-		io_size = min_c(io_size, values[next].fData.fValue64);
-		next++;
-	}
-
-	if (io_size == LONGLONG_MAX)
-		io_size = 32768;
-	info->io_size = io_size;
-	info->block_size = io_size;
-
-	if (count >= next && values[next].fAttribute == FATTR4_SPACE_FREE) {
-		info->free_blocks = values[next].fData.fValue64 / io_size;
-		next++;
-	}
-
-	if (count >= next && values[next].fAttribute == FATTR4_SPACE_TOTAL) {
-		info->total_blocks = values[next].fData.fValue64 / io_size;
-		next++;
-	}
-
-	info->flags = B_FS_IS_READONLY;
-	strncpy(info->volume_name, fName, B_FILE_NAME_LENGTH);
-
-	delete[] values;
-
-	return B_OK;
-}
-
-
-status_t
-Filesystem::Migrate(const Filehandle& fh, const RPC::Server* serv)
-{
-	MutexLocker _(fMigrationLock);
+	MutexLocker _(fOpenLock);
 	if (serv != fServer)
 		return B_OK;
 
-	Request request(fServer);
-	RequestBuilder& req = request.Builder();
-
-	req.PutFH(fh);
-	Attribute attr[] = { FATTR4_FS_LOCATIONS };
-	req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
-
-	status_t result = request.Send();
-	if (result != B_OK)
-		return result;
-
-	ReplyInterpreter& reply = request.Reply();
-
-	reply.PutFH();
+	if (!fRoot->ProbeMigration())
+		return B_OK;
 
 	AttrValue* values;
-	uint32 count;
-	result = reply.GetAttr(&values, &count);
-	if (result != B_OK || count < 1)
+	status_t result = fRoot->GetLocations(&values);
+	if (result != B_OK)
 		return result;
 
 	FSLocations* locs =
@@ -357,6 +267,10 @@ Filesystem::Migrate(const Filehandle& fh, const RPC::Server* serv)
 
 	if (server == fServer)
 		return B_ERROR;
+
+	NFS4Server* old = reinterpret_cast<NFS4Server*>(server->PrivateData());
+	old->RemoveFilesystem(this);
+	NFSServer()->AddFilesystem(this);
 
 	gRPCServerManager->Release(server);
 

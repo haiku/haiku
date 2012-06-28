@@ -214,6 +214,21 @@ NFS4Server::ClientId(uint64 prevId, bool forceNew)
 
 
 status_t
+NFS4Server::FilesystemMigrated()
+{
+	// reclaim all opened files and held locks from all filesystems
+	MutexLocker _(fFSLock);
+	Filesystem* fs = fFilesystems;
+	while (fs != NULL) {
+		fs->Migrate(fServer);
+		fs = fs->fNext;
+	}
+
+	return B_OK;
+}
+
+
+status_t
 NFS4Server::_GetLeaseTime()
 {
 	Request request(fServer);
@@ -297,9 +312,14 @@ NFS4Server::_Renewal()
 		request.Builder().Renew(fClientId);
 		request.Send();
 
-		if (request.Reply().NFS4Error() == NFS4ERR_STALE_CLIENTID)
-			ServerRebooted(clientId);
-		// TODO: support NFS4ERR_LEASE_MOVED
+		switch (request.Reply().NFS4Error()) {
+			case NFS4ERR_STALE_CLIENTID:
+				ServerRebooted(clientId);
+				break;
+			case NFS4ERR_LEASE_MOVED:
+				FilesystemMigrated();
+				break;
+		}
 	}
 
 	return B_OK;

@@ -14,12 +14,13 @@
 #include <fs_interface.h>
 
 #include "Connection.h"
-#include "RPCServer.h"
-#include "NFS4Defs.h"
+#include "Filesystem.h"
 #include "Inode.h"
+#include "NFS4Defs.h"
 #include "RequestBuilder.h"
 #include "ReplyInterpreter.h"
-#include "Filesystem.h"
+#include "RootInode.h"
+#include "RPCServer.h"
 
 
 extern fs_volume_ops gNFSv4VolumeOps;
@@ -107,7 +108,7 @@ nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 		return result;
 	}
 
-	Inode* inode = fs->CreateRootInode();
+	Inode* inode = fs->Root();
 	if (inode == NULL) {
 		delete fs;
 		gRPCServerManager->Release(server);
@@ -166,7 +167,8 @@ static status_t
 nfs4_read_fs_info(fs_volume* volume, struct fs_info* info)
 {
 	Filesystem* fs = reinterpret_cast<Filesystem*>(volume->private_volume);
-	return fs->ReadInfo(info);
+	RootInode* inode = reinterpret_cast<RootInode*>(fs->Root());
+	return inode->ReadInfo(info);
 }
 
 
@@ -196,7 +198,11 @@ nfs4_get_vnode_name(fs_volume* volume, fs_vnode* vnode, char* buffer,
 static status_t
 nfs4_put_vnode(fs_volume* volume, fs_vnode* vnode, bool reenter)
 {
+	Filesystem* fs = reinterpret_cast<Filesystem*>(volume->private_volume);
 	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	if (fs->Root() == inode)
+		return B_OK;
+
 	inode->FileSystem()->InoIdMap()->RemoveEntry(inode->ID());
 	delete inode;
 
@@ -211,7 +217,11 @@ nfs4_remove_vnode(fs_volume* volume, fs_vnode* vnode, bool reenter)
 	// side are only an attempt to simulate local filesystem. Hence,
 	// this hook is the same as put_vnode().
 
+	Filesystem* fs = reinterpret_cast<Filesystem*>(volume->private_volume);
 	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	if (fs->Root() == inode)
+		return B_OK;
+
 	inode->FileSystem()->InoIdMap()->RemoveEntry(inode->ID());
 	delete inode;
 

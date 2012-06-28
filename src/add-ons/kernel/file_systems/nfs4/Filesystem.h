@@ -9,15 +9,13 @@
 #define FILESYSTEM_H
 
 
-#include <fs_info.h>
-
 #include "InodeIdMap.h"
 #include "NFS4Defs.h"
 #include "NFS4Server.h"
 
 
 class Inode;
-class InodeIdMap;
+class RootInode;
 
 class Filesystem {
 public:
@@ -26,12 +24,9 @@ public:
 								~Filesystem();
 
 			status_t			GetInode(ino_t id, Inode** inode);
-			Inode*				CreateRootInode();
+	inline	Inode*				Root();
 
-			status_t			ReadInfo(struct fs_info* info);
-
-			status_t			Migrate(const Filehandle& fh,
-									const RPC::Server* serv);
+			status_t			Migrate(const RPC::Server* serv);
 
 			OpenFileCookie*		OpenFilesLock();
 			void				OpenFilesUnlock();
@@ -67,11 +62,8 @@ private:
 
 			FilesystemId		fFsId;
 			const char*			fPath;
-			mutex				fMigrationLock;
 
-			const char*			fName;
-			FileInfo			fRoot;
-			Filehandle			fRootFH;
+			RootInode*			fRoot;
 
 			RPC::Server*		fServer;
 
@@ -80,6 +72,13 @@ private:
 
 			InodeIdMap			fInoIdMap;
 };
+
+
+inline Inode*
+Filesystem::Root()
+{
+	return reinterpret_cast<Inode*>(fRoot);
+}
 
 
 inline uint32

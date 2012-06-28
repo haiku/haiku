@@ -13,6 +13,7 @@ KernelAddon nfs4 :
 	ReplyInterpreter.cpp
 	Request.cpp
 	RequestBuilder.cpp
+	RootInode.cpp
 	RPCAuth.cpp
 	RPCCall.cpp
 	RPCReply.cpp

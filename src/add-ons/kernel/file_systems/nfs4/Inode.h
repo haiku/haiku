@@ -68,7 +68,7 @@ public:
 					status_t	ReleaseAllLocks(OpenFileCookie* cookie);
 
 
-private:
+protected:
 								Inode();
 
 

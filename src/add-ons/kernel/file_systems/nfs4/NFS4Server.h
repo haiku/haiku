@@ -23,6 +23,7 @@ public:
 	virtual					~NFS4Server();
 
 			uint64			ServerRebooted(uint64 clientId);
+			status_t		FilesystemMigrated();
 
 			void			AddFilesystem(Filesystem* fs);
 			void			RemoveFilesystem(Filesystem* fs);

@@ -15,6 +15,7 @@
 #include <NodeMonitor.h>
 
 #include "Request.h"
+#include "RootInode.h"
 
 
 Inode::Inode()
@@ -25,7 +26,12 @@ Inode::Inode()
 status_t
 Inode::CreateInode(Filesystem* fs, const FileInfo &fi, Inode** _inode)
 {
-	Inode* inode = new(std::nothrow) Inode;
+	Inode* inode = NULL;
+	if (fs->Root() == NULL)
+		inode = new(std::nothrow) RootInode;
+	else
+		inode = new(std::nothrow) Inode;
+
 	if (inode == NULL)
 		return B_NO_MEMORY;
 
@@ -215,8 +221,7 @@ Inode::Link(Inode* dir, const char* name)
 
 		// filesystem has been moved
 		if (reply.NFS4Error() == NFS4ERR_MOVED) {
-			fFilesystem->Migrate(fHandle, serv);
-			dir->fFilesystem->Migrate(dir->fHandle, serv);
+			fFilesystem->Migrate(serv);
 			continue;
 		}
 
@@ -321,8 +326,7 @@ Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName)
 
 		// filesystem has been moved
 		if (reply.NFS4Error() == NFS4ERR_MOVED) {
-			from->fFilesystem->Migrate(from->fHandle, serv);
-			to->fFilesystem->Migrate(to->fHandle, serv);
+			from->fFilesystem->Migrate(serv);
 			continue;
 		}
 
@@ -1557,13 +1561,9 @@ Inode::_HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 				return false;
 
 		// filesystem has been moved
-		case NFS4ERR_MOVED:
-			fFilesystem->Migrate(fHandle, serv);
-			return true;
-
-		// lease has been moved, provoke server to return NFS4ERR_MOVED
 		case NFS4ERR_LEASE_MOVED:
-			Access(0);
+		case NFS4ERR_MOVED:
+			fFilesystem->Migrate(serv);
 			return true;
 
 		default:
