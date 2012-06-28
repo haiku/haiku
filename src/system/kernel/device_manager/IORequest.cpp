@@ -664,8 +664,8 @@ IOOperation::Dump() const
 	kprintf("  parent:           %p\n", fParent);
 	kprintf("  status:           %s\n", strerror(fStatus));
 	kprintf("  dma buffer:       %p\n", fDMABuffer);
-	kprintf("  offset:           %-8Ld (original: %Ld)\n", fOffset,
-		fOriginalOffset);
+	kprintf("  offset:           %-8" B_PRIdOFF " (original: %" B_PRIdOFF ")\n",
+		fOffset, fOriginalOffset);
 	kprintf("  length:           %-8" B_PRIuGENADDR " (original: %"
 		B_PRIuGENADDR ")\n", fLength, fOriginalLength);
 	kprintf("  transferred:      %" B_PRIuGENADDR "\n", fTransferredBytes);
@@ -1162,8 +1162,8 @@ IORequest::_CopyData(void* _buffer, off_t offset, size_t size, bool copyIn)
 	uint8* buffer = (uint8*)_buffer;
 
 	if (offset < fOffset || offset + (off_t)size > fOffset + (off_t)fLength) {
-		panic("IORequest::_CopyData(): invalid range: (%lld, %lu)", offset,
-			size);
+		panic("IORequest::_CopyData(): invalid range: (%" B_PRIdOFF ", %lu)",
+			offset, size);
 		return B_BAD_VALUE;
 	}
 
@@ -1281,7 +1281,7 @@ IORequest::Dump() const
 	kprintf("  status:            %s\n", strerror(fStatus));
 	kprintf("  mutex:             %p\n", &fLock);
 	kprintf("  IOBuffer:          %p\n", fBuffer);
-	kprintf("  offset:            %Ld\n", fOffset);
+	kprintf("  offset:            %" B_PRIdOFF "\n", fOffset);
 	kprintf("  length:            %" B_PRIuGENADDR "\n", fLength);
 	kprintf("  transfer size:     %" B_PRIuGENADDR "\n", fTransferSize);
 	kprintf("  relative offset:   %" B_PRIuGENADDR "\n", fRelativeParentOffset);

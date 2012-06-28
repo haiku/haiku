@@ -999,8 +999,8 @@ VMAnonymousCache::_Commit(off_t size, int priority)
 
 	off_t toReserve = size - committed_size;
 	if (vm_try_reserve_memory(toReserve, priority, 1000000) != B_OK) {
-		dprintf("%p->VMAnonymousCache::_Commit(%lld): Failed to reserve %lld "
-			"bytes of RAM\n", this, size, toReserve);
+		dprintf("%p->VMAnonymousCache::_Commit(%" B_PRIdOFF "): Failed to "
+			"reserve %" B_PRIdOFF " bytes of RAM\n", this, size, toReserve);
 		return B_NO_MEMORY;
 	}
 
@@ -1370,8 +1370,8 @@ swap_init_post_modules()
 	status_t error = _kern_write_stat(fd, NULL, false, &stat,
 		sizeof(struct stat), B_STAT_SIZE | B_STAT_SIZE_INSECURE);
 	if (error != B_OK) {
-		dprintf("Failed to resize /var/swap to %lld bytes: %s\n", size,
-			strerror(error));
+		dprintf("Failed to resize /var/swap to %" B_PRIdOFF " bytes: %s\n",
+			size, strerror(error));
 	}
 
 	close(fd);

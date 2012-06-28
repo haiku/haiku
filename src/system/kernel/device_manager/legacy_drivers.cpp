@@ -664,7 +664,7 @@ load_driver_symbols(const char *driverName)
 static status_t
 reload_driver(legacy_driver *driver)
 {
-	dprintf("devfs: reload driver \"%s\" (%" B_PRIdDEV ", %lld)\n",
+	dprintf("devfs: reload driver \"%s\" (%" B_PRIdDEV ", %" B_PRIdINO ")\n",
 		driver->name, driver->device, driver->node);
 
 	unload_driver(driver);
@@ -827,7 +827,7 @@ dump_driver(legacy_driver* driver)
 	kprintf(" path:           %s\n", driver->path);
 	kprintf(" image:          %" B_PRId32 "\n", driver->image);
 	kprintf(" device:         %" B_PRIdDEV "\n", driver->device);
-	kprintf(" node:           %Ld\n", driver->node);
+	kprintf(" node:           %" B_PRIdINO "\n", driver->node);
 	kprintf(" last modified:  %" B_PRIdTIME ".%ld\n", driver->last_modified.tv_sec,
 		driver->last_modified.tv_nsec);
 	kprintf(" devs used:      %" B_PRIu32 "\n", driver->devices_used);

@@ -802,7 +802,7 @@ dump_node(int argc, char** argv)
 	}
 
 	kprintf("DEVFS NODE: %p\n", vnode);
-	kprintf(" id:          %Ld\n", vnode->id);
+	kprintf(" id:          %" B_PRIdINO "\n", vnode->id);
 	kprintf(" name:        \"%s\"\n", vnode->name);
 	kprintf(" type:        %x\n", vnode->stream.type);
 	kprintf(" parent:      %p\n", vnode->parent);
@@ -814,7 +814,7 @@ dump_node(int argc, char** argv)
 
 		devfs_vnode* children = vnode->stream.u.dir.dir_head;
 		while (children != NULL) {
-			kprintf("   %p, id %Ld\n", children, children->id);
+			kprintf("   %p, id %" B_PRIdINO "\n", children, children->id);
 			children = children->dir_next;
 		}
 	} else if (S_ISLNK(vnode->stream.type)) {
@@ -826,8 +826,8 @@ dump_node(int argc, char** argv)
 			partition_info& info = vnode->stream.u.dev.partition->info;
 			kprintf("  raw device node: %p\n",
 				vnode->stream.u.dev.partition->raw_device);
-			kprintf("  offset:          %Ld\n", info.offset);
-			kprintf("  size:            %Ld\n", info.size);
+			kprintf("  offset:          %" B_PRIdOFF "\n", info.offset);
+			kprintf("  size:            %" B_PRIdOFF "\n", info.size);
 			kprintf("  block size:      %" B_PRId32 "\n", info.logical_block_size);
 			kprintf("  session:         %" B_PRId32 "\n", info.session);
 			kprintf("  partition:       %" B_PRId32 "\n", info.partition);

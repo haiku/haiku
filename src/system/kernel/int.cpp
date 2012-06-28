@@ -80,9 +80,9 @@ dump_int_statistics(int argc, char **argv)
 			&& sVectors[i].handler_list == NULL)
 			continue;
 
-		kprintf("int %3d, enabled %" B_PRId32 ", handled %8lld, unhandled %8lld%s%s\n",
-			i, sVectors[i].enable_count, sVectors[i].handled_count,
-			sVectors[i].unhandled_count,
+		kprintf("int %3d, enabled %" B_PRId32 ", handled %8" B_PRId64 ", "
+			"unhandled %8" B_PRId64 "%s%s\n", i, sVectors[i].enable_count,
+			sVectors[i].handled_count,sVectors[i].unhandled_count,
 			B_SPINLOCK_IS_LOCKED(&sVectors[i].vector_lock) ? ", ACTIVE" : "",
 			sVectors[i].handler_list == NULL ? ", no handler" : "");
 
@@ -106,7 +106,7 @@ dump_int_statistics(int argc, char **argv)
 			if (io->no_handled_info)
 				kprintf("<unknown>\n");
 			else
-				kprintf("%8lld\n", io->handled_count);
+				kprintf("%8" B_PRId64 "\n", io->handled_count);
 		}
 
 		kprintf("\n");

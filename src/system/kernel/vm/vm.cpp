@@ -3114,7 +3114,7 @@ dump_caches_recursively(VMCache* cache, cache_info& info, int level)
 		kprintf("/%lu", info.page_count);
 
 	if (cache->type == CACHE_TYPE_RAM || (level == 0 && info.committed > 0)) {
-		kprintf(", committed: %lld", cache->committed_size);
+		kprintf(", committed: %" B_PRIdOFF, cache->committed_size);
 
 		if (level == 0)
 			kprintf("/%lu", info.committed);
@@ -3267,7 +3267,7 @@ dump_area_struct(VMArea* area, bool mappings)
 	kprintf("memory_type:\t%#" B_PRIx32 "\n", area->MemoryType());
 	kprintf("cache:\t\t%p\n", area->cache);
 	kprintf("cache_type:\t%s\n", vm_cache_type_to_string(area->cache_type));
-	kprintf("cache_offset:\t0x%Lx\n", area->cache_offset);
+	kprintf("cache_offset:\t0x%" B_PRIx64 "\n", area->cache_offset);
 	kprintf("cache_next:\t%p\n", area->cache_next);
 	kprintf("cache_prev:\t%p\n", area->cache_prev);
 

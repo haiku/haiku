@@ -806,9 +806,10 @@ AbstractTraceEntry::Dump(TraceOutput& out)
 		: fTime;
 
 	if (out.Flags() & TRACE_OUTPUT_TEAM_ID)
-		out.Print("[%6" B_PRId32 ":%6" B_PRId32 "] %10Ld: ", fThread, fTeam, time);
+		out.Print("[%6" B_PRId32 ":%6" B_PRId32 "] %10" B_PRId64 ": ", fThread,
+			fTeam, time);
 	else
-		out.Print("[%6" B_PRId32 "] %10Ld: ", fThread, time);
+		out.Print("[%6" B_PRId32 "] %10" B_PRId64 ": ", fThread, time);
 
 	AddDump(out);
 
@@ -994,7 +995,7 @@ public:
 	{
 		// TODO: this is *very* slow
 		char buffer[64];
-		snprintf(buffer, sizeof(buffer), "%Ld", fValue);
+		snprintf(buffer, sizeof(buffer), "%" B_PRId64, fValue);
 		return strstr(out.DumpEntry(entry), buffer) != NULL;
 	}
 };
@@ -1005,7 +1006,7 @@ public:
 	{
 		// TODO: this is *very* slow
 		char buffer[64];
-		snprintf(buffer, sizeof(buffer), "%Lx", fValue);
+		snprintf(buffer, sizeof(buffer), "%" B_PRIx64, fValue);
 		return strstr(out.DumpEntry(entry), buffer) != NULL;
 	}
 };

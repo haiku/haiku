@@ -1303,10 +1303,10 @@ KPartition::Dump(bool deep, int32 level)
 	GetPath(&path);
 	if (level > 0)
 		OUT("%spartition %" B_PRId32 ": %s\n", prefix, ID(), path.Path());
-	OUT("%s  offset:            %lld\n", prefix, Offset());
-	OUT("%s  size:              %lld (%.2f MB)\n", prefix, Size(),
+	OUT("%s  offset:            %" B_PRIdOFF "\n", prefix, Offset());
+	OUT("%s  size:              %" B_PRIdOFF " (%.2f MB)\n", prefix, Size(),
 		Size() / (1024.0*1024));
-	OUT("%s  content size:      %lld\n", prefix, ContentSize());
+	OUT("%s  content size:      %" B_PRIdOFF "\n", prefix, ContentSize());
 	OUT("%s  block size:        %" B_PRIu32 "\n", prefix, BlockSize());
 	OUT("%s  child count:       %" B_PRId32 "\n", prefix, CountChildren());
 	OUT("%s  index:             %" B_PRId32 "\n", prefix, Index());

@@ -1328,8 +1328,8 @@ VMCache::Dump(bool showPages) const
 	kprintf("  ref_count:    %" B_PRId32 "\n", RefCount());
 	kprintf("  source:       %p\n", source);
 	kprintf("  type:         %s\n", vm_cache_type_to_string(type));
-	kprintf("  virtual_base: 0x%Lx\n", virtual_base);
-	kprintf("  virtual_end:  0x%Lx\n", virtual_end);
+	kprintf("  virtual_base: 0x%" B_PRIx64 "\n", virtual_base);
+	kprintf("  virtual_end:  0x%" B_PRIx64 "\n", virtual_end);
 	kprintf("  temporary:    %" B_PRIu32 "\n", temporary);
 	kprintf("  lock:         %p\n", &fLock);
 #if KDEBUG

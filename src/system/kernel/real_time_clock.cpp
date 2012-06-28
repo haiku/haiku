@@ -84,8 +84,8 @@ rtc_debug(int argc, char **argv)
 			= arch_rtc_get_system_time_offset(sRealTimeData);
 
 		currentTime = (systemTimeOffset + system_time()) / 1000000;
-		dprintf("system_time:  %Ld\n", system_time());
-		dprintf("system_time_offset:    %Ld\n", systemTimeOffset);
+		dprintf("system_time:  %" B_PRId64 "\n", system_time());
+		dprintf("system_time_offset:    %" B_PRId64 "\n", systemTimeOffset);
 		dprintf("current_time: %" B_PRIu32 "\n", currentTime);
 	} else {
 		// If there was an argument, reset the system and hw time.

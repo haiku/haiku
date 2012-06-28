@@ -1685,11 +1685,11 @@ _dump_thread_info(Thread *thread, bool shortInfo)
 		kprintf("(%d)\n", thread->cpu->cpu_num);
 	else
 		kprintf("\n");
-	kprintf("sig_pending:        %#llx (blocked: %#llx"
-		", before sigsuspend(): %#llx)\n",
-		(long long)thread->ThreadPendingSignals(),
-		(long long)thread->sig_block_mask,
-		(long long)thread->sigsuspend_original_unblocked_mask);
+	kprintf("sig_pending:        %#" B_PRIx64 " (blocked: %#" B_PRIx64
+		", before sigsuspend(): %#" B_PRIx64 ")\n",
+		(int64)thread->ThreadPendingSignals(),
+		(int64)thread->sig_block_mask,
+		(int64)thread->sigsuspend_original_unblocked_mask);
 	kprintf("in_kernel:          %d\n", thread->in_kernel);
 
 	if (thread->state == B_THREAD_WAITING) {
@@ -1756,8 +1756,8 @@ _dump_thread_info(Thread *thread, bool shortInfo)
 	kprintf("user_thread:        %p\n", (void *)thread->user_thread);
 	kprintf("kernel_errno:       %#x (%s)\n", thread->kernel_errno,
 		strerror(thread->kernel_errno));
-	kprintf("kernel_time:        %Ld\n", thread->kernel_time);
-	kprintf("user_time:          %Ld\n", thread->user_time);
+	kprintf("kernel_time:        %" B_PRId64 "\n", thread->kernel_time);
+	kprintf("user_time:          %" B_PRId64 "\n", thread->user_time);
 	kprintf("flags:              0x%" B_PRIx32 "\n", thread->flags);
 	kprintf("architecture dependant section:\n");
 	arch_thread_dump_info(&thread->arch_info);
