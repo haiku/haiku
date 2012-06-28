@@ -514,6 +514,10 @@ nfs4_release_lock(fs_volume* volume, fs_vnode* vnode, void* _cookie,
 			const struct flock* lock)
 {
 	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+
+	if (inode->Type() == S_IFDIR || inode->Type() == S_IFLNK)
+		return B_OK;
+
 	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
 	if (lock != NULL)
 		return inode->ReleaseLock(cookie, lock);
