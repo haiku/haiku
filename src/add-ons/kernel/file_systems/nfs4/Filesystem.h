@@ -33,6 +33,12 @@ public:
 			status_t			Migrate(const Filehandle& fh,
 									const RPC::Server* serv);
 
+			OpenFileCookie*		OpenFilesLock();
+			void				OpenFilesUnlock();
+	inline	uint32				OpenFilesCount();
+			void				AddOpenFile(OpenFileCookie* cookie);
+			void				RemoveOpenFile(OpenFileCookie* cookie);
+
 	inline	bool				IsAttrSupported(Attribute attr) const;
 	inline	uint32				ExpireType() const;
 
@@ -46,8 +52,15 @@ public:
 
 	inline	dev_t				DevId() const;
 	inline	InodeIdMap*			InoIdMap();
+
+			Filesystem*			fNext;
+			Filesystem*			fPrev;
 private:
 								Filesystem();
+
+			OpenFileCookie*		fOpenFiles;
+			uint32				fOpenCount;
+			mutex				fOpenLock;
 
 			uint32				fExpireType;
 			uint32				fSupAttrs[2];
@@ -67,6 +80,13 @@ private:
 
 			InodeIdMap			fInoIdMap;
 };
+
+
+inline uint32
+Filesystem::OpenFilesCount()
+{
+	return fOpenCount;
+}
 
 
 inline bool

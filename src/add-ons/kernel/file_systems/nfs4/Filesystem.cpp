@@ -9,9 +9,10 @@
 
 #include "Filesystem.h"
 
+#include <arpa/inet.h>
 #include <string.h>
 
-#include <arpa/inet.h>
+#include <lock.h>
 #include <net/dns_resolver.h>
 
 #include "Request.h"
@@ -24,15 +25,24 @@ extern RPC::ProgramData* CreateNFS4Server(RPC::Server* serv);
 
 Filesystem::Filesystem()
 	:
+	fNext(NULL),
+	fPrev(NULL),
+	fOpenFiles(NULL),
+	fOpenCount(0),
 	fPath(NULL),
 	fName(NULL),
 	fId(1)
 {
+	mutex_init(&fOpenLock, NULL);
 }
 
 
 Filesystem::~Filesystem()
 {
+	NFSServer()->RemoveFilesystem(this);
+
+	mutex_destroy(&fOpenLock);
+
 	free(const_cast<char*>(fName));
 	free(const_cast<char*>(fPath));
 }
@@ -170,6 +180,8 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
 	*pfs = fs;
 
 	delete[] values;
+
+	fs->NFSServer()->AddFilesystem(fs);
 	return B_OK;
 }
 
@@ -349,5 +361,49 @@ Filesystem::Migrate(const Filehandle& fh, const RPC::Server* serv)
 	gRPCServerManager->Release(server);
 
 	return B_OK;
+}
+
+
+OpenFileCookie*
+Filesystem::OpenFilesLock()
+{
+	mutex_lock(&fOpenLock);
+	return fOpenFiles;
+}
+
+
+void
+Filesystem::OpenFilesUnlock()
+{
+	mutex_unlock(&fOpenLock);
+}
+
+
+void
+Filesystem::AddOpenFile(OpenFileCookie* cookie)
+{
+	MutexLocker _(fOpenLock);
+
+	cookie->fPrev = NULL;
+	cookie->fNext = fOpenFiles;
+	if (fOpenFiles != NULL)
+		fOpenFiles->fPrev = cookie;
+	fOpenFiles = cookie;
+	NFSServer()->IncUsage();
+}
+
+
+void
+Filesystem::RemoveOpenFile(OpenFileCookie* cookie)
+{
+	MutexLocker _(fOpenLock);
+	if (cookie == fOpenFiles)
+		fOpenFiles = cookie->fNext;
+
+	if (cookie->fNext)
+		cookie->fNext->fPrev = cookie->fPrev;
+	if (cookie->fPrev)
+		cookie->fPrev->fNext = cookie->fNext;
+	NFSServer()->DecUsage();
 }
 

@@ -7,6 +7,7 @@
  */
 
 
+#include "Filesystem.h"
 #include "Inode.h"
 #include "NFS4Server.h"
 #include "Request.h"
@@ -16,25 +17,26 @@ NFS4Server::NFS4Server(RPC::Server* serv)
 	:
 	fThreadCancel(true),
 	fLeaseTime(0),
-	fCIDUseCount(0),
-	fOpenFiles(NULL),
+	fClientIdLastUse(0),
+	fUseCount(0),
+	fFilesystems(NULL),
 	fServer(serv)
 {
-	mutex_init(&fLock, NULL);
-	mutex_init(&fOpenLock, NULL);
+	mutex_init(&fClientIdLock, NULL);
+	mutex_init(&fFSLock, NULL);
 }
 
 
 NFS4Server::~NFS4Server()
 {
 	fThreadCancel = true;
-	fCIDUseCount = 0;
+	fUseCount = 0;
 	interrupt_thread(fThread);
 	status_t result;
 	wait_for_thread(fThread, &result);
 
-	mutex_destroy(&fLock);
-	mutex_destroy(&fOpenLock);
+	mutex_destroy(&fClientIdLock);
+	mutex_destroy(&fFSLock);
 }
 
 
@@ -46,13 +48,18 @@ NFS4Server::ServerRebooted(uint64 clientId)
 
 	fClientId = ClientId(clientId, true);
 
-	// reclaim all open files
-	MutexLocker _(fOpenLock);
-	OpenFileCookie* current = fOpenFiles;
-	while (current != NULL) {
-		_ReclaimOpen(current);
-		_ReclaimLocks(current);
-		current = current->fNext;
+	// reclaim all opened files and held locks from all filesystems
+	MutexLocker _(fFSLock);
+	Filesystem* fs = fFilesystems;
+	while (fs != NULL) {
+		OpenFileCookie* current = fs->OpenFilesLock();
+		while (current != NULL) {
+			_ReclaimOpen(current);
+			_ReclaimLocks(current);
+			current = current->fNext;
+		}
+		fs->OpenFilesUnlock();
+		fs = fs->fNext;
 	}
 
 	return fClientId;
@@ -141,36 +148,42 @@ NFS4Server::_ReclaimLocks(OpenFileCookie* cookie)
 
 
 void
-NFS4Server::AddOpenFile(OpenFileCookie* cookie)
+NFS4Server::AddFilesystem(Filesystem* fs)
 {
-	MutexLocker _(fOpenLock);
-	cookie->fPrev = NULL;
-	cookie->fNext = fOpenFiles;
-	if (fOpenFiles != NULL)
-		fOpenFiles->fPrev = cookie;
-	fOpenFiles = cookie;
+	MutexLocker _(fFSLock);
+	fs->fPrev = NULL;
+	fs->fNext = fFilesystems;
+	if (fFilesystems != NULL)
+		fFilesystems->fPrev = fs;
+	fFilesystems = fs;
+	fUseCount += fs->OpenFilesCount();
+	if (fs->OpenFilesCount() > 0 && fThreadCancel)
+		_StartRenewing();
 }
 
 
 void
-NFS4Server::RemoveOpenFile(OpenFileCookie* cookie)
+NFS4Server::RemoveFilesystem(Filesystem* fs)
 {
-	MutexLocker _(fOpenLock);
-	if (cookie == fOpenFiles)
-		fOpenFiles = cookie->fNext;
+	MutexLocker _(fFSLock);
+	if (fs == fFilesystems)
+		fFilesystems = fs->fNext;
 
-	if (cookie->fNext)
-		cookie->fNext->fPrev = cookie->fPrev;
-	if (cookie->fPrev)
-		cookie->fPrev->fNext = cookie->fNext;
+	if (fs->fNext)
+		fs->fNext->fPrev = fs->fPrev;
+	if (fs->fPrev)
+		fs->fPrev->fNext = fs->fNext;
+	fUseCount -= fs->OpenFilesCount();
 }
 
 
 uint64
 NFS4Server::ClientId(uint64 prevId, bool forceNew)
 {
-	MutexLocker _(fLock);
-	if ((forceNew && fClientId == prevId) || fCIDUseCount == 0) {
+	MutexLocker _(fClientIdLock);
+	if (fClientIdLastUse + (time_t)LeaseTime() < time(NULL)
+		|| forceNew && fClientId == prevId) {
+
 		Request request(fServer);
 		request.Builder().SetClientID(fServer);
 
@@ -193,21 +206,10 @@ NFS4Server::ClientId(uint64 prevId, bool forceNew)
 		result = request.Reply().SetClientIDConfirm();
 		if (result != B_OK)
 			return fClientId;
-
-		_StartRenewing();
 	}
 
-	fCIDUseCount++;
-
+	fClientIdLastUse = time(NULL);
 	return fClientId;
-}
-
-
-void
-NFS4Server::ReleaseCID(uint64 cid)
-{
-	MutexLocker _(fLock);
-	fCIDUseCount--;
 }
 
 
@@ -233,7 +235,7 @@ NFS4Server::_GetLeaseTime()
 	if (result != B_OK)
 		return result;
 
-	// FATTR4_LEASE_TIM is mandatory
+	// FATTR4_LEASE_TIME is mandatory
 	if (count < 1 || values[0].fAttribute != FATTR4_LEASE_TIME) {
 		delete[] values;
 		return B_BAD_VALUE;
@@ -250,7 +252,6 @@ NFS4Server::_StartRenewing()
 {
 	if (!fThreadCancel)
 		return B_OK;
-
 
 	if (fLeaseTime == 0) {
 		status_t result = _GetLeaseTime();
@@ -281,19 +282,20 @@ NFS4Server::_Renewal()
 		// TODO: operations like OPEN, READ, CLOSE, etc also renew leases
 		snooze_etc(fLeaseTime - 2, B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT
 			| B_CAN_INTERRUPT);
-		MutexLocker locker(fLock);
 
 		uint64 clientId = fClientId;
 
-		if (fCIDUseCount == 0) {
-			fThreadCancel = true;
-			return B_OK;
+		if (fUseCount == 0) {
+			MutexLocker _(fFSLock);
+			if (fUseCount == 0) {
+				fThreadCancel = true;
+				return B_OK;
+			}
 		}
 
 		Request request(fServer);
 		request.Builder().Renew(fClientId);
 		request.Send();
-		locker.Unlock();
 
 		if (request.Reply().NFS4Error() == NFS4ERR_STALE_CLIENTID)
 			ServerRebooted(clientId);

@@ -14,6 +14,7 @@
 #include "RPCServer.h"
 
 
+class Filesystem;
 class OpenFileCookie;
 
 class NFS4Server : public RPC::ProgramData {
@@ -22,11 +23,14 @@ public:
 	virtual					~NFS4Server();
 
 			uint64			ServerRebooted(uint64 clientId);
-			void			AddOpenFile(OpenFileCookie* cookie);
-			void			RemoveOpenFile(OpenFileCookie* cookie);
+
+			void			AddFilesystem(Filesystem* fs);
+			void			RemoveFilesystem(Filesystem* fs);
+
+	inline	void			IncUsage();
+	inline	void			DecUsage();
 
 			uint64			ClientId(uint64 prevId = 0, bool forceNew = false);
-			void			ReleaseCID(uint64 cid);
 
 	inline	uint32			LeaseTime();
 private:
@@ -44,14 +48,34 @@ private:
 			uint32			fLeaseTime;
 
 			uint64			fClientId;
-			uint32			fCIDUseCount;
-			mutex			fLock;
+			bool			fClientIdInit;
+			time_t			fClientIdLastUse;
+			mutex			fClientIdLock;
 
-			OpenFileCookie*	fOpenFiles;
-			mutex			fOpenLock;
+			uint32			fUseCount;
+			Filesystem*		fFilesystems;
+			mutex			fFSLock;
 
 			RPC::Server*	fServer;
 };
+
+
+inline void
+NFS4Server::IncUsage()
+{
+	MutexLocker _(fFSLock);
+	fUseCount++;
+	if (fThreadCancel)
+		_StartRenewing();
+}
+
+
+inline void
+NFS4Server::DecUsage()
+{
+	MutexLocker _(fFSLock);
+	fUseCount--;
+}
 
 
 inline uint32

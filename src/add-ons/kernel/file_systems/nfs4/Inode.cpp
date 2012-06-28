@@ -676,7 +676,7 @@ sConfirmOpen(Filesystem* fs, Filehandle& fh, OpenFileCookie* cookie)
 
 	status_t result = request.Send();
 	if (result != B_OK) {
-		fs->NFSServer()->RemoveOpenFile(cookie);
+		fs->RemoveOpenFile(cookie);
 		return result;
 	}
 
@@ -686,7 +686,7 @@ sConfirmOpen(Filesystem* fs, Filehandle& fh, OpenFileCookie* cookie)
 
 	result = reply.OpenConfirm(&cookie->fStateSeq);
 	if (result != B_OK) {
-		fs->NFSServer()->RemoveOpenFile(cookie);
+		fs->RemoveOpenFile(cookie);
 		return result;
 	}
 
@@ -745,8 +745,6 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (reply.NFS4Error() == NFS4ERR_GRACE)
-			fFilesystem->NFSServer()->ReleaseCID(cookie->fClientId);
 		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
 
@@ -791,7 +789,7 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 		break;
 	} while (true);
 
-	fFilesystem->NFSServer()->AddOpenFile(cookie);
+	fFilesystem->AddOpenFile(cookie);
 
 	if (confirm)
 		return sConfirmOpen(fFilesystem, fh, cookie);
@@ -861,8 +859,6 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (reply.NFS4Error() == NFS4ERR_GRACE)
-			fFilesystem->NFSServer()->ReleaseCID(cookie->fClientId);
 		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
 
@@ -889,7 +885,7 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 		break;
 	} while (true);
 
-	fFilesystem->NFSServer()->AddOpenFile(cookie);
+	fFilesystem->AddOpenFile(cookie);
 
 	if (confirm)
 		return sConfirmOpen(fFilesystem, fHandle, cookie);
@@ -901,7 +897,7 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 status_t
 Inode::Close(OpenFileCookie* cookie)
 {
-	fFilesystem->NFSServer()->RemoveOpenFile(cookie);
+	fFilesystem->RemoveOpenFile(cookie);
 
 	do {
 		RPC::Server* serv = fFilesystem->Server();
@@ -925,8 +921,6 @@ Inode::Close(OpenFileCookie* cookie)
 		result = reply.Close();
 		if (result != B_OK)
 			return result;
-
-		fFilesystem->NFSServer()->ReleaseCID(cookie->fClientId);
 
 		return B_OK;
 	} while (true);
