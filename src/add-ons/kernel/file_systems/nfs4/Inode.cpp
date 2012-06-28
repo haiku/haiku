@@ -734,8 +734,10 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 
 		req.GetFH();
 
-		Attribute attr[] = { FATTR4_FILEID };
-		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
+		if (fFilesystem->IsAttrSupported(FATTR4_FILEID)) {
+			Attribute attr[] = { FATTR4_FILEID };
+			req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
+		}
 
 		result = request.Send();
 		if (result != B_OK)
@@ -752,19 +754,19 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 		reply.Open(cookie->fStateId, &cookie->fStateSeq, &confirm);
 		reply.GetFH(&fh);
 
-		AttrValue* values;
-		uint32 count;
-		result = reply.GetAttr(&values, &count);
-		if (result != B_OK)
-			return result;
-
 		uint64 fileId;
-		if (count == 1 && values[1].fAttribute == FATTR4_FILEID)
+		if (fFilesystem->IsAttrSupported(FATTR4_FILEID)) {
+			AttrValue* values;
+			uint32 count;
+			result = reply.GetAttr(&values, &count);
+			if (result != B_OK)
+				return result;
+
 			fileId = values[1].fData.fValue64;
-		else
+
+			delete[] values;
+		} else
 			fileId = fFilesystem->AllocFileId();
-			
-		delete[] values;
 
 		*id = _FileIdToInoT(fileId);
 
@@ -1194,8 +1196,11 @@ Inode::_ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 		req.PutFH(fHandle);
 		req.LookUpUp();
 		req.GetFH();
-		Attribute attr[] = { FATTR4_FILEID };
-		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
+
+		if (fFilesystem->IsAttrSupported(FATTR4_FILEID)) {
+			Attribute attr[] = { FATTR4_FILEID };
+			req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
+		}
 
 		status_t result = request.Send();
 		if (result != B_OK)
@@ -1214,19 +1219,18 @@ Inode::_ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 		Filehandle fh;
 		reply.GetFH(&fh);
 
-		AttrValue* values;
-		uint32 count;
-		reply.GetAttr(&values, &count);
-		if (result != B_OK)
-			return result;
-
 		uint64 fileId;
-		if (count < 1 || values[0].fAttribute != FATTR4_FILEID) {
-			fileId = fFilesystem->AllocFileId();
-		} else
-			fileId = values[0].fData.fValue64;
+		if (fFilesystem->IsAttrSupported(FATTR4_FILEID)) {
+			AttrValue* values;
+			uint32 count;
+			reply.GetAttr(&values, &count);
+			if (result != B_OK)
+				return result;
 
-		delete[] values;
+			fileId = values[0].fData.fValue64;
+			delete[] values;
+		} else
+			fileId = fFilesystem->AllocFileId();
 
 		return _FillDirEntry(de, _FileIdToInoT(fileId), "..", pos, size);
 	} while (true);
