@@ -389,6 +389,7 @@ cache_transaction::cache_transaction()
 	notification_hook = NULL;
 	notification_data = NULL;
 	open = true;
+	has_sub_transaction = false;
 }
 
 
