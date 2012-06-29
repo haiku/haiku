@@ -21,6 +21,9 @@ class Index;
 class InodeAllocator;
 class NodeGetter;
 class Transaction;
+class BlockRunBuffer;
+
+
 
 
 // To be used in Inode::Create() as publishFlags
@@ -41,6 +44,7 @@ public:
 			ino_t				ID() const { return fID; }
 			off_t				BlockNumber() const
 									{ return fVolume->VnodeToBlock(fID); }
+			void				SetID(ino_t ID);
 
 			rw_lock&			Lock() { return fLock; }
 			ReadLocker			ReadLock() { return ReadLocker(fLock); }
@@ -143,7 +147,7 @@ public:
 
 			// manipulating the data stream
 			status_t			FindBlockRun(off_t pos, block_run& run,
-									off_t& offset);
+									off_t& offset) const;
 
 			status_t			ReadAt(off_t pos, uint8* buffer, size_t* length);
 			status_t			WriteAt(Transaction& transaction, off_t pos,
@@ -155,6 +159,9 @@ public:
 			status_t			Append(Transaction& transaction, off_t bytes);
 			status_t			TrimPreallocation(Transaction& transaction);
 			bool				NeedsTrimming() const;
+
+			status_t			MoveStream();
+			status_t			StreamCompletelyInsideAllowedRange(bool& inRange) const;
 
 			status_t			Free(Transaction& transaction);
 			status_t			Sync();
@@ -257,9 +264,19 @@ private:
 			status_t			_ShrinkStream(Transaction& transaction,
 									off_t size);
 			status_t			_AddBlockRun(Transaction& transaction,
-									data_stream* data, block_run run,
-									off_t targetSize, int32* rest = NULL,
-									off_t beginBlock = 0, off_t endBlock = 0);
+									data_stream* dataStream, block_run run,
+									off_t targetSize, int32* rest = NULL);
+
+			// moving the data stream
+			status_t			_WriteBufferedRuns(Transaction& transaction,
+									BlockRunBuffer& buffer,
+									data_stream* dataStream, off_t targetSize,
+									bool flush = false);
+			status_t			_FreeIndirectBlocks(Transaction& transaction,
+									data_stream *dataStream);
+
+			status_t			_GetNextBlockRun(off_t& position,
+									block_run& run) const;
 
 private:
 			rw_lock				fLock;
