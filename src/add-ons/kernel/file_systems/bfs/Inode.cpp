@@ -1715,6 +1715,254 @@ Inode::_AllocateBlockArray(Transaction& transaction, block_run& run,
 }
 
 
+/*! Adds \a run to \a data, allocating indirection blocks if necessary.
+	If the block run cannot be added as is, due to constraints on block run
+	size in the double indirect range, \a rest is set to the number of blocks
+	that need to be shaved off the run and the function returns.
+
+	If the physical stream size ends up larger than \a targetSize, the stream
+	size is set to the target file size.
+*/
+status_t
+Inode::_AddBlockRun(Transaction& transaction, data_stream* data, block_run run,
+	off_t targetSize, int32* rest, off_t beginBlock, off_t endBlock)
+{
+	status_t status;
+
+	if (rest)
+		*rest = 0;
+
+	bool cutSize = targetSize < data->Size()
+		+ (run.Length() << fVolume->BlockShift());
+		// if adding this block_run means overshooting the target stream size,
+		// we need to set data->size to targetSize.
+
+	// Direct block range
+
+	if (data->Size() <= data->MaxDirectRange()) {
+		// let's try to put them into the direct block range
+		int32 free = 0;
+		for (; free < NUM_DIRECT_BLOCKS; free++) {
+			if (data->direct[free].IsZero())
+				break;
+		}
+
+		if (free < NUM_DIRECT_BLOCKS) {
+			// can we merge the last allocated run with the new one?
+			int32 last = free - 1;
+			if (free > 0 && data->direct[last].MergeableWith(run)) {
+				data->direct[last].length = HOST_ENDIAN_TO_BFS_INT16(
+					data->direct[last].Length() + run.Length());
+			} else
+				data->direct[free] = run;
+
+			data->max_direct_range = HOST_ENDIAN_TO_BFS_INT64(
+				data->MaxDirectRange()
+				+ run.Length() * fVolume->BlockSize());
+			data->size = cutSize ? HOST_ENDIAN_TO_BFS_INT64(targetSize)
+				: data->max_direct_range;
+			return B_OK;
+		}
+	}
+
+	// Indirect block range
+
+	if (data->Size() <= data->MaxIndirectRange()
+		|| !data->MaxIndirectRange()) {
+		CachedBlock cached(fVolume);
+		block_run* runs = NULL;
+		uint32 free = 0;
+		off_t block;
+
+		// if there is no indirect block yet, create one
+		if (data->indirect.IsZero()) {
+			status = _AllocateBlockArray(transaction, data->indirect,
+				NUM_ARRAY_BLOCKS, true);
+			if (status != B_OK)
+				return status;
+
+			data->max_indirect_range = data->max_direct_range;
+			// insert the block_run in the first block
+			status = cached.SetTo(data->indirect);
+			if (status != B_OK)
+				return status;
+
+			runs = (block_run*)cached.Block();
+		} else {
+			uint32 numberOfRuns = fVolume->BlockSize() / sizeof(block_run);
+			block = fVolume->ToBlock(data->indirect);
+
+			// search first empty entry
+			int32 i = 0;
+			for (; i < data->indirect.Length(); i++) {
+				status = cached.SetTo(block + i);
+				if (status != B_OK)
+					return status;
+
+				runs = (block_run*)cached.Block();
+				for (free = 0; free < numberOfRuns; free++)
+					if (runs[free].IsZero())
+						break;
+
+				if (free < numberOfRuns)
+					break;
+			}
+			if (i == data->indirect.Length())
+				runs = NULL;
+		}
+
+		if (runs != NULL) {
+			// try to insert the run to the last one - note that this
+			// doesn't take block borders into account, so it could be
+			// further optimized
+			cached.MakeWritable(transaction);
+
+			int32 last = free - 1;
+			if (free > 0 && runs[last].MergeableWith(run)) {
+				runs[last].length = HOST_ENDIAN_TO_BFS_INT16(
+					runs[last].Length() + run.Length());
+			} else
+				runs[free] = run;
+
+			data->max_indirect_range = HOST_ENDIAN_TO_BFS_INT64(
+				data->MaxIndirectRange()
+				+ (run.Length() << fVolume->BlockShift()));
+			data->size = cutSize ? HOST_ENDIAN_TO_BFS_INT64(targetSize)
+				: data->max_indirect_range;
+			return B_OK;
+		}
+	}
+
+	// Double indirect block range
+
+	if (data->Size() <= data->MaxDoubleIndirectRange()
+		|| !data->max_double_indirect_range) {
+		// We make sure here that we have this minimum allocated, so if
+		// the allocation succeeds, we don't run into an endless loop.
+		uint16 doubleIndirectBlockLength;
+		if (!data->max_double_indirect_range)
+			doubleIndirectBlockLength = _DoubleIndirectBlockLength();
+		else
+			doubleIndirectBlockLength = data->double_indirect.Length();
+
+		if ((run.Length() % doubleIndirectBlockLength) != 0) {
+			// The number of allocated blocks isn't a multiple of
+			// 'doubleIndirectBlockLength', so we return and let the caller
+			// change this. This can happen the first time the stream grows
+			// into the double indirect range.
+			if (rest) {
+				*rest = run.Length() % doubleIndirectBlockLength;
+				return B_OK;
+			}
+
+			// the caller didn't expect rest
+			return B_BAD_VALUE;
+		}
+
+		// if there is no double indirect block yet, create one
+		if (data->double_indirect.IsZero()) {
+			status = _AllocateBlockArray(transaction,
+				data->double_indirect, _DoubleIndirectBlockLength());
+			if (status != B_OK)
+				return status;
+
+			data->max_double_indirect_range = data->max_indirect_range;
+		}
+
+		// calculate the index where to insert the new blocks
+
+		int32 runsPerBlock;
+		int32 directSize;
+		int32 indirectSize;
+		get_double_indirect_sizes(data->double_indirect.Length(),
+			fVolume->BlockSize(), runsPerBlock, directSize, indirectSize);
+		if (directSize <= 0 || indirectSize <= 0)
+			return B_BAD_DATA;
+
+		off_t start = data->MaxDoubleIndirectRange()
+			- data->MaxIndirectRange();
+		int32 indirectIndex = start / indirectSize;
+		int32 index = (start % indirectSize) / directSize;
+		int32 runsPerArray = runsPerBlock * doubleIndirectBlockLength;
+
+		// distribute the blocks to the array and allocate
+		// new array blocks when needed
+
+		CachedBlock cached(fVolume);
+		CachedBlock cachedDirect(fVolume);
+		block_run* array = NULL;
+		uint32 runLength = run.Length();
+
+		while (run.length != 0) {
+			// get the indirect array block
+			if (array == NULL) {
+				uint32 block = indirectIndex / runsPerBlock;
+				if (block >= doubleIndirectBlockLength)
+					return EFBIG;
+
+				status = cached.SetTo(fVolume->ToBlock(
+					data->double_indirect) + block);
+				if (status != B_OK)
+					return status;
+
+				array = (block_run*)cached.Block();
+			}
+
+			do {
+				// do we need a new array block?
+				if (array[indirectIndex % runsPerBlock].IsZero()) {
+					cached.MakeWritable(transaction);
+
+					status = _AllocateBlockArray(transaction,
+						array[indirectIndex % runsPerBlock],
+						data->double_indirect.Length());
+						if (status != B_OK)
+							return status;
+				}
+
+				status = cachedDirect.SetToWritable(transaction,
+					fVolume->ToBlock(array[indirectIndex
+						% runsPerBlock]) + index / runsPerBlock);
+				if (status != B_OK)
+					return status;
+
+				block_run* runs = (block_run*)cachedDirect.Block();
+
+				do {
+					// insert the block_run into the array
+					runs[index % runsPerBlock] = run;
+					runs[index % runsPerBlock].length
+						= HOST_ENDIAN_TO_BFS_INT16(doubleIndirectBlockLength);
+
+					// alter the remaining block_run
+					run.start = HOST_ENDIAN_TO_BFS_INT16(run.Start()
+						+ doubleIndirectBlockLength);
+					run.length = HOST_ENDIAN_TO_BFS_INT16(run.Length()
+						- doubleIndirectBlockLength);
+				} while ((++index % runsPerBlock) != 0 && run.length);
+			} while ((index % runsPerArray) != 0 && run.length);
+
+			if (index == runsPerArray)
+				index = 0;
+			if (++indirectIndex % runsPerBlock == 0) {
+				array = NULL;
+				index = 0;
+			}
+		}
+
+		data->max_double_indirect_range = HOST_ENDIAN_TO_BFS_INT64(
+			data->MaxDoubleIndirectRange()
+			+ (runLength << fVolume->BlockShift()));
+		data->size = cutSize ? HOST_ENDIAN_TO_BFS_INT64(targetSize)
+			: data->max_double_indirect_range;
+
+		return B_OK;
+	}
+
+	RETURN_ERROR(EFBIG);
+}
+
+
 /*!	Grows the stream to \a size, and fills the direct/indirect/double indirect
 	ranges with the runs.
 	This method will also determine the size of the preallocation, if any.
@@ -1803,6 +2051,12 @@ Inode::_GrowStream(Transaction& transaction, off_t size)
 		// the requested blocks do not need to be returned with a
 		// single allocation, so we need to iterate until we have
 		// enough blocks allocated
+
+		// If data has a double_indirect block, we're adding block_run:s to
+		// the double indirect range.
+		if (!data->double_indirect.IsZero())
+			minimum = data->double_indirect.Length();
+
 		if (minimum > 1) {
 			// make sure that "blocks" is a multiple of minimum
 			blocksRequested = round_up(blocksRequested, minimum);
@@ -1821,239 +2075,34 @@ Inode::_GrowStream(Transaction& transaction, off_t size)
 		// don't preallocate if the first allocation was already too small
 		blocksRequested = blocksNeeded;
 
-		// Direct block range
+		int32 rest;
+		status = _AddBlockRun(transaction, data, run, size, &rest);
+		if (status != B_OK)
+			return status;
 
-		if (data->Size() <= data->MaxDirectRange()) {
-			// let's try to put them into the direct block range
-			int32 free = 0;
-			for (; free < NUM_DIRECT_BLOCKS; free++) {
-				if (data->direct[free].IsZero())
-					break;
-			}
+		if (rest != 0) {
+			// We've entered the double indirect range, and the number of
+			// allocated blocks isn't a multiple of 'doubleIndirectBlockLength'
 
-			if (free < NUM_DIRECT_BLOCKS) {
-				// can we merge the last allocated run with the new one?
-				int32 last = free - 1;
-				if (free > 0 && data->direct[last].MergeableWith(run)) {
-					data->direct[last].length = HOST_ENDIAN_TO_BFS_INT16(
-						data->direct[last].Length() + run.Length());
-				} else
-					data->direct[free] = run;
+			minimum = _DoubleIndirectBlockLength();
 
-				data->max_direct_range = HOST_ENDIAN_TO_BFS_INT64(
-					data->MaxDirectRange()
-					+ run.Length() * fVolume->BlockSize());
-				data->size = HOST_ENDIAN_TO_BFS_INT64(blocksNeeded > 0
-					? data->max_direct_range : size);
+			// Free the remaining blocks that don't fit into this multiple.
+			run.length = HOST_ENDIAN_TO_BFS_INT16(run.Length() - rest);
+
+			status = fVolume->Free(transaction,
+				block_run::Run(run.AllocationGroup(),
+				run.Start() + run.Length(), rest));
+			if (status != B_OK)
+				return status;
+
+			blocksNeeded += rest;
+			blocksRequested = round_up(blocksNeeded, minimum);
+
+			// Are there any blocks left in the run? If not, allocate
+			// a new one
+			if (run.length == 0)
 				continue;
-			}
 		}
-
-		// Indirect block range
-
-		if (data->Size() <= data->MaxIndirectRange()
-			|| !data->MaxIndirectRange()) {
-			CachedBlock cached(fVolume);
-			block_run* runs = NULL;
-			uint32 free = 0;
-			off_t block;
-
-			// if there is no indirect block yet, create one
-			if (data->indirect.IsZero()) {
-				status = _AllocateBlockArray(transaction, data->indirect,
-					NUM_ARRAY_BLOCKS, true);
-				if (status != B_OK)
-					return status;
-
-				data->max_indirect_range = HOST_ENDIAN_TO_BFS_INT64(
-					data->MaxDirectRange());
-				// insert the block_run in the first block
-				status = cached.SetTo(data->indirect);
-				if (status != B_OK)
-					return status;
-
-				runs = (block_run*)cached.Block();
-			} else {
-				uint32 numberOfRuns = fVolume->BlockSize() / sizeof(block_run);
-				block = fVolume->ToBlock(data->indirect);
-
-				// search first empty entry
-				int32 i = 0;
-				for (; i < data->indirect.Length(); i++) {
-					status = cached.SetTo(block + i);
-					if (status != B_OK)
-						return status;
-
-					runs = (block_run*)cached.Block();
-					for (free = 0; free < numberOfRuns; free++)
-						if (runs[free].IsZero())
-							break;
-
-					if (free < numberOfRuns)
-						break;
-				}
-				if (i == data->indirect.Length())
-					runs = NULL;
-			}
-
-			if (runs != NULL) {
-				// try to insert the run to the last one - note that this
-				// doesn't take block borders into account, so it could be
-				// further optimized
-				cached.MakeWritable(transaction);
-
-				int32 last = free - 1;
-				if (free > 0 && runs[last].MergeableWith(run)) {
-					runs[last].length = HOST_ENDIAN_TO_BFS_INT16(
-						runs[last].Length() + run.Length());
-				} else
-					runs[free] = run;
-
-				data->max_indirect_range = HOST_ENDIAN_TO_BFS_INT64(
-					data->MaxIndirectRange()
-					+ ((uint32)run.Length() << fVolume->BlockShift()));
-				data->size = HOST_ENDIAN_TO_BFS_INT64(blocksNeeded > 0
-					? data->MaxIndirectRange() : size);
-				continue;
-			}
-		}
-
-		// Double indirect block range
-
-		if (data->Size() <= data->MaxDoubleIndirectRange()
-			|| !data->max_double_indirect_range) {
-			// We make sure here that we have this minimum allocated, so if
-			// the allocation succeeds, we don't run into an endless loop.
-			if (!data->max_double_indirect_range)
-				minimum = _DoubleIndirectBlockLength();
-			else
-				minimum = data->double_indirect.Length();
-
-			if ((run.Length() % minimum) != 0) {
-				// The number of allocated blocks isn't a multiple of 'minimum',
-				// so we have to change this. This can happen the first time the
-				// stream grows into the double indirect range.
-				// First, free the remaining blocks that don't fit into this
-				// multiple.
-				int32 rest = run.Length() % minimum;
-				run.length = HOST_ENDIAN_TO_BFS_INT16(run.Length() - rest);
-
-				status = fVolume->Free(transaction,
-					block_run::Run(run.AllocationGroup(),
-					run.Start() + run.Length(), rest));
-				if (status != B_OK)
-					return status;
-
-				blocksNeeded += rest;
-				blocksRequested = round_up(blocksNeeded, minimum);
-
-				// Are there any blocks left in the run? If not, allocate
-				// a new one
-				if (run.length == 0)
-					continue;
-			}
-
-			// if there is no double indirect block yet, create one
-			if (data->double_indirect.IsZero()) {
-				status = _AllocateBlockArray(transaction,
-					data->double_indirect, _DoubleIndirectBlockLength());
-				if (status != B_OK)
-					return status;
-
-				data->max_double_indirect_range = data->max_indirect_range;
-			}
-
-			// calculate the index where to insert the new blocks
-
-			int32 runsPerBlock;
-			int32 directSize;
-			int32 indirectSize;
-			get_double_indirect_sizes(data->double_indirect.Length(),
-				fVolume->BlockSize(), runsPerBlock, directSize, indirectSize);
-			if (directSize <= 0 || indirectSize <= 0)
-				return B_BAD_DATA;
-
-			off_t start = data->MaxDoubleIndirectRange()
-				- data->MaxIndirectRange();
-			int32 indirectIndex = start / indirectSize;
-			int32 index = (start % indirectSize) / directSize;
-			int32 runsPerArray = runsPerBlock * minimum;
-
-			// distribute the blocks to the array and allocate
-			// new array blocks when needed
-
-			CachedBlock cached(fVolume);
-			CachedBlock cachedDirect(fVolume);
-			block_run* array = NULL;
-			uint32 runLength = run.Length();
-
-			while (run.length != 0) {
-				// get the indirect array block
-				if (array == NULL) {
-					uint32 block = indirectIndex / runsPerBlock;
-					if (block >= minimum)
-						return EFBIG;
-
-					status = cached.SetTo(fVolume->ToBlock(
-						data->double_indirect) + block);
-					if (status != B_OK)
-						return status;
-
-					array = (block_run*)cached.Block();
-				}
-
-				do {
-					// do we need a new array block?
-					if (array[indirectIndex % runsPerBlock].IsZero()) {
-						cached.MakeWritable(transaction);
-
-						status = _AllocateBlockArray(transaction,
-							array[indirectIndex % runsPerBlock],
-							data->double_indirect.Length());
-						if (status != B_OK)
-							return status;
-					}
-
-					status = cachedDirect.SetToWritable(transaction,
-						fVolume->ToBlock(array[indirectIndex
-							% runsPerBlock]) + index / runsPerBlock);
-					if (status != B_OK)
-						return status;
-
-					block_run* runs = (block_run*)cachedDirect.Block();
-
-					do {
-						// insert the block_run into the array
-						runs[index % runsPerBlock] = run;
-						runs[index % runsPerBlock].length
-							= HOST_ENDIAN_TO_BFS_INT16(minimum);
-
-						// alter the remaining block_run
-						run.start = HOST_ENDIAN_TO_BFS_INT16(run.Start()
-							+ minimum);
-						run.length = HOST_ENDIAN_TO_BFS_INT16(run.Length()
-							- minimum);
-					} while ((++index % runsPerBlock) != 0 && run.length);
-				} while ((index % runsPerArray) != 0 && run.length);
-
-				if (index == runsPerArray)
-					index = 0;
-				if (++indirectIndex % runsPerBlock == 0) {
-					array = NULL;
-					index = 0;
-				}
-			}
-
-			data->max_double_indirect_range = HOST_ENDIAN_TO_BFS_INT64(
-				data->MaxDoubleIndirectRange()
-				+ (runLength << fVolume->BlockShift()));
-			data->size = blocksNeeded > 0 ? HOST_ENDIAN_TO_BFS_INT64(
-				data->max_double_indirect_range) : size;
-
-			continue;
-		}
-
-		RETURN_ERROR(EFBIG);
 	}
 	// update the size of the data stream
 	data->size = HOST_ENDIAN_TO_BFS_INT64(size);
