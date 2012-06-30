@@ -1,4 +1,4 @@
-1	german	x-vnd.haiku-icon_o_matic	3736361491
+1	german	x-vnd.haiku-icon_o_matic	4233739176
 Select All	Icon-O-Matic-PathManipulator		Alles auswählen
 Add Style	Icon-O-Matic-AddStylesCmd		Stil hinzufügen
 Color (#%02x%02x%02x)	Style name after dropping a color		Farbe (#%02x%02x%02x)
@@ -117,6 +117,7 @@ Gradient	Icon-O-Matic-StyleTypes		Farbverlauf
 Min LOD	Icon-O-Matic-PropertyNames		Min. LOD
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON Attribut
 Invert selection	Icon-O-Matic-Properties		Auswahl umkehren
+Drop shapes	Icon-O-Matic-ShapesList		Formen ablegen
 Export as…	Icon-O-Matic-Menu-File		Exportieren als…
 Transformation	Transformation		Transformation
 Click on an object in	Empty property list - 1st line		Auf ein Objekt klicken in

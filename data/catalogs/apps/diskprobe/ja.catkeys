@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DiskProbe	559191070
+1	japanese	x-vnd.Haiku-DiskProbe	969240855
 File offset: 	ProbeView		ファイルオフセット：
 %ld (native)	ProbeView		%ld (ネイティブ)
 64 bit unsigned value:	TypeEditors		符号なし 64 ビット値：
@@ -121,6 +121,8 @@ View	ProbeView	This is the last menubar item 'File Edit Block View'	表示
 Redo	ProbeView		やり直し
 File: 	ProbeView		ファイル：
 32 bit unsigned pointer:	TypeEditors		符号なし 32 ビットポインタ：
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		ファイルの書き込みに失敗しました：\n%s\n\nすべての変更は終了時に失われます。
+32 bit	TypeEditors		32 ビット
 Cancel	ProbeView		中止
 Grayscale	TypeEditors		グレースケール
 32 bit signed value:	TypeEditors		符号つき 32 ビット値:

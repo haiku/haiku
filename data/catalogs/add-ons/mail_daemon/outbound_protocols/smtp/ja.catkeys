@@ -1,5 +1,6 @@
-1	japanese	x-vnd.Haiku-SMTP	1052586247
+1	japanese	x-vnd.Haiku-SMTP	1802799722
 SMTP server:	ConfigView		SMTPサーバー：
+STARTTLS	ConfigView		STARTTLS
 Error while logging in to %serv	smtp		%serv へのログイン中にエラーが発生しました
 . The server says:\n	smtp		サーバーからのメッセージです\n
 ESMTP	ConfigView		ESMTP
@@ -10,4 +11,5 @@ Destination:	ConfigView		メッセージの保存先：
 : Connection refused or host not found.	smtp		接続が拒否されたかサーバーが見つかりません。
 None	ConfigView		無し
 POP3 before SMTP	ConfigView		送信前に受信する
+SSL	ConfigView		SSL
 . The server said:\n	smtp		サーバーからのメッセージです\n

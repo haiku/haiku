@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Installer	2099988747
+1	japanese	x-vnd.Haiku-Installer	3488795908
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		したがって、Haikuを GRUBメニューに追加するには、ファイルの最後に下記のような記述をしてください。\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		インストールを中止して、システムを再起動しますか？
 \t}\n\n	InstallerApp		\t}\n\n
@@ -12,6 +12,7 @@ With GRUB it's: (hdN,n)\n\n	InstallerApp		GRUBではこのような表記をし�
 \tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	中断
 Install progress:  	InstallerWindow		進行状況：  
+2.2) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
 Starting Installation.	InstallProgress		準備をしています…
 This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		品質のソフトウェアです。高い確率で重要なデータを失う恐れがあります。こまめにバックアップをとってください! さらに、次の点に留意してください。\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		本当にインストールを中断してよいですか ?
@@ -37,6 +38,7 @@ Boot sector successfully written.	InstallProgress		ブートセクターの書�
 Performing installation.	InstallProgress		インストールを実行しています。
 scanning…	InstallerWindow		ディスクを検出しています…
 Set up boot menu	InstallerWindow		ブートメニューの設定
+2.1) GRUB (since os-prober v1.44)\n	InstallerApp		2.1) GRUB (os-prober v1.44 以降)\n
 The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		プライマリーパーティションの数にもかかわらず、最初の論理パーティションは常に\"4\"という数字が付きます。\n\n
 GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		GRUBの命名規則はまだ: (hdN,n) です。\n\n
 \tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <好みのテキストエディタ> /boot/grub/menu.lst\n\n
@@ -48,6 +50,7 @@ README	InstallerApp		README
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		インストール先ディスクの空き容量が不足している可能性があります。他のディスクを選択するか、インストールするオプションを減らしてください。
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Haiku インストーラーを閉じる前に Boot Manager と DriveSetup を終了してください。
 Scanning for disks…	InstallerWindow		ディスクを検出しています…
+2.3) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		このディスクをマウントできません。他のディスクを選択してください。
 ?? of ??	InstallerWindow	Unknown progress	?? / ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
@@ -67,6 +70,7 @@ Installer	System name		インストーラー
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		インストール元ディスクへのインストールはできません。他のディスクを選んでください。
 ???	InstallerWindow	Unknown currently copied item	???
 \"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\"はパーティション番号で、GRUB 2は\"1\"から数えます。\n
+Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku should be recognized out of the box. To add Haiku to the GRUB menu, open a Terminal and enter:\n\n	InstallerApp		os-prober v1.44  以降 (たとえば、Ubuntu 11.04 以降) では、Haiku は設定なしで認識するはずです。Haiku を GRUB メニューに追加するには、ターミナルを立ち上げて以下を入力します：\n\n
 Quit DriveSetup	InstallerWindow		DriveSetup の終了
 \"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\"はハードディスクの番号で、\"0\"から数えます。\n
 Hide optional packages	InstallerWindow		オプショナルパッケージを隠す
@@ -109,6 +113,7 @@ So below the heading that must not be edited, add something similar to these lin
 Are you sure you want to to stop the installation?	InstallerWindow		本当にインストールを中断してよいですか ?
 Onto:	InstallerWindow		インストール先：
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		ブートマネージャーウィンドウを閉じてから、インストーラーウィンドウを閉じてください。
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   はじめて Haiku のブートに成功したら、 \"Welcome\" と \"Userguide\" を必ず読んでください。これらは、デスクトップ上のリンクおよび、WebPositive のブックマーク中にあります。\n\n
 Tools	InstallerWindow		ツール
 The mount point could not be retrieved.	InstallProgress		マウントポイントを取得できませんでした。
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		インストール先パーティションにはデータがあります。それでもインストールしますか？\n\n注意：システムフォルダーはインストール元からそのままクリーンコピーされますが、その他のフォルダーはマージされ、両方のボリュームに存在するファイルやリンクはインストール元のバージョンで上書きされます。

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Installer	2099988747
+1	german	x-vnd.Haiku-Installer	3488795908
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Gegen Ende der Datei fügt man unter den anderen Menüeinträgen etwas in dieser Art an:\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Soll die Installation tatsächlich abgebrochen und der Rechner neu gestartet werden?
 \t}\n\n	InstallerApp		\t}\n\n
@@ -12,6 +12,7 @@ With GRUB it's: (hdN,n)\n\n	InstallerApp		Bei GRUB ist es: (hdN,n)\n\n
 \tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	Installation abbrechen
 Install progress:  	InstallerWindow		Installationsverlauf: 
+2.2) GRUB 1\n	InstallerApp		2.2) GRUB 1\n
 Starting Installation.	InstallProgress		Installation wird vorbereitet.
 This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Dies ist eine Alpha-Version! Es besteht ein hohes Risiko, dass wichtige Daten verloren gehen können. Man sollte seine Daten unbedingt regelmäßig sichern!\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		Soll die Installation wirklich abgebrochen werden?
@@ -37,6 +38,7 @@ Boot sector successfully written.	InstallProgress		Der Bootsektor wurde erfolgre
 Performing installation.	InstallProgress		Installation läuft.
 scanning…	InstallerWindow		Untersuchung läuft…
 Set up boot menu	InstallerWindow		Bootmenü einrichten
+2.1) GRUB (since os-prober v1.44)\n	InstallerApp		2.1) GRUB (seit os-prober v1.44)\n
 The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		Die erste logische Partition trägt immer die Nummer \"4\", unabhängig von der Anzahl primärer Partitionen.\n\n
 GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		Das Benennungsschema von GRUB ist immer noch: (hdN,n)\n\n
 \tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <Lieblings-Texteditor> /boot/grub/menu.lst\n\n
@@ -48,6 +50,7 @@ README	InstallerApp		LIESMICH
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Auf dem Ziellaufwerk ist anscheinend nicht genügend Platz. Entweder ein anderes Laufwerk wählen oder einige optionale Pakete deaktivieren.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Bitte BootManger und DriveSetup vor dem Installer-Fenster schließen.
 Scanning for disks…	InstallerWindow		Es wird nach Laufwerken gesucht…
+2.3) GRUB 2\n	InstallerApp		2.3) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Das Laufwerk konnte nicht eingehängt werden. Bitte ein anderes Laufwerk wählen.
 ?? of ??	InstallerWindow	Unknown progress	?? von ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
@@ -67,6 +70,7 @@ Installer	System name		Installer
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Der Inhalt eines Laufwerks kann nicht auf sich selbst installiert werden. Bitte ein anderes Ziellaufwerk wählen.
 ???	InstallerWindow	Unknown currently copied item	???
 \"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\" ist die Partitionsnummer, die für GRUB 2 mit \"1\" beginnt\n
+Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku should be recognized out of the box. To add Haiku to the GRUB menu, open a Terminal and enter:\n\n	InstallerApp		Seit es den os-prober v1.44 gibt (bei Ubuntu beispielsweise ab Version 11.04 dabei), sollte Haiku automatisch erkannt werden. Damit ein Haiku-Eintrag im GRUB Menü erscheint, folgendes in ein Terminal eingeben:\n\n
 Quit DriveSetup	InstallerWindow		DriveSetup beenden
 \"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\" ist die Festplattennummer, beginnend bei \"0\".\n
 Hide optional packages	InstallerWindow		Optionale Pakete ausblenden
@@ -109,6 +113,7 @@ So below the heading that must not be edited, add something similar to these lin
 Are you sure you want to to stop the installation?	InstallerWindow		Soll die Installation tatsächlich abgebrochen werden?
 Onto:	InstallerWindow		Nach:
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Bitte BootManager vor dem Installer-Fenster schließen.
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Wurde Haiku das erste Mal erfolgreich gestartet, sollte man sich die  \"Welcome\" und \"Userguide\" Dokumentation ansehen. Verknüpfungen darauf befinden sich auf dem Desktop und in WebPositives Bookmarks.\n\n
 Tools	InstallerWindow		Werkzeuge
 The mount point could not be retrieved.	InstallProgress		Der Einhängeort wurde nicht gefunden.
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Das Ziellaufwerk ist nicht leer. Soll trotzdem hierher installiert werden?\n\nHinweis: Der 'system'-Ordner wird mit einer sauberen Kopie aus dem Quelllaufwerk überschrieben; alle anderen Ordner werden zusammengeführt, wobei Dateien und Verknüpfungen, die auf beiden Laufwerken existieren, mit der Version des Quelllaufwerks überschrieben werden.

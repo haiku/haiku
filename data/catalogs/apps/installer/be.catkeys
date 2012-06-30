@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Installer	2099988747
+1	belarusian	x-vnd.Haiku-Installer	3440510165
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Дадайце ў канец кожнага з ніжэйшых запісаў меню нешта падобнае да гэтага:
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Сапраўды спыніць усталёўку і перазагрузіць сістэму?
 \t}\n\n	InstallerApp		\t}\n\n
@@ -12,6 +12,7 @@ With GRUB it's: (hdN,n)\n\n	InstallerApp		У GRUB гэта: (hdN,n)\n\n
 \tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	Стоп
 Install progress:  	InstallerWindow		Прагрэс усталёўкі:
+2.2) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
 Starting Installation.	InstallProgress		Пачынаецца Ўсталёўка.
 This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Гэта праграма знаходзіцца ў альфа-версіі! Гэта значыць, вы рызыкуеце згубіць важныя даныя. Часцей рабіце рэзервовыя копіі! Мы вас папярэдзілі.\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		Вы насамрэч жадаеце перарваць усталёўку?
@@ -48,6 +49,7 @@ README	InstallerApp		README
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Дыск прызначэння, пэўна, не мае патрэбнага месца. Паспрабуйце выбраць іншы дыск або адмяніце ўсталёўку дадатковых пунктаў.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Калі ласка, закрыйце Boot Manager і DriveSetup перад закрыццём Усталёўшчыка.
 Scanning for disks…	InstallerWindow		Сканіраванне дыскаў...
+2.3) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Немагчыма замантаваць дыск. Калі ласка, выберыце іншы.
 ?? of ??	InstallerWindow	Unknown progress	?? з ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		 \tmenuentry \"Haiku Alpha\" {\n
