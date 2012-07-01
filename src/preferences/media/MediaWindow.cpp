@@ -405,7 +405,7 @@ MediaWindow::InitWindow()
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL)
 		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
 			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
-		.Add(scrollView)
+		.Add(scrollView, 0.0f)
 		.AddGroup(B_VERTICAL)
 			.SetInsets(0, 0, 0, 0)
 			.Add(fTitleView)

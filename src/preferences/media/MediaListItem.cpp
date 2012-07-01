@@ -131,7 +131,7 @@ struct MediaListItem::Renderer {
 		width += 8.0f;
 			// space between icons and text
 
-		width += be_plain_font->StringWidth(fTitle) + 3.0f;
+		width += be_plain_font->StringWidth(fTitle) + 16.0f;
 		return width;
 	}
 
