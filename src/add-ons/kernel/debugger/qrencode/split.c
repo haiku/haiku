@@ -41,7 +41,7 @@
 
 #if !HAVE_STRDUP
 #undef strdup
-char *strdup(const char *s)
+char *strdup_internal(const char *s)
 {
 	size_t len = strlen(s) + 1;
 	void *new = malloc(len);
@@ -269,7 +269,7 @@ static char *dupAndToUpper(const char *str, QRencodeMode hint)
 	char *newstr, *p;
 	QRencodeMode mode;
 
-	newstr = strdup(str);
+	newstr = strdup_internal(str);
 	if(newstr == NULL) return NULL;
 
 	p = newstr;
