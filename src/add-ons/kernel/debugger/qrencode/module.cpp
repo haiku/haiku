@@ -51,7 +51,7 @@ move_to_and_clear_line(int line)
 }
 
 
-static void
+static bool
 print_qrcode(QRcode* qrCode, bool waitForKey)
 {
 	move_to_and_clear_line(0);
@@ -75,8 +75,10 @@ print_qrcode(QRcode* qrCode, bool waitForKey)
 	if (waitForKey) {
 		kputs("press q to abort or any other key to continue...\x1b[1B\x1b[G");
 		if (kgetc() == 'q')
-			abort_debugger_command();
+			return false;
 	}
+
+	return true;
 }
 
 
@@ -172,8 +174,14 @@ qrencode(int argc, char* argv[])
 		source += copyCount;
 		inputLength -= copyCount;
 
-		print_qrcode(qrCode, inputLength > 0);
+		bool doContinue = print_qrcode(qrCode, inputLength > 0);
 		QRcode_free(qrCode);
+
+		if (!doContinue) {
+			QRcode_clearCache();
+			abort_debugger_command();
+				// Does not return.
+		}
 	}
 
 	QRcode_clearCache();
