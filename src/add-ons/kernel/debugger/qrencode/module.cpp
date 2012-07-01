@@ -23,7 +23,7 @@ extern void abort_debugger_command();
 }
 
 
-static const char* kWebPostBaseURL = "http://haiku.mlotz.ch/qrencode/store.php";
+static const char* kWebPostBaseURL = "http://mlotz.ch/q";
 
 static char sStringBuffer[16 * 1024];
 static char sEncodeBuffer[3 * 1024];
@@ -86,7 +86,7 @@ encode_url(const char* query, const char* data, int encodeLength,
 {
 	sEncodeBuffer[0] = 0;
 	strlcat(sEncodeBuffer, kWebPostBaseURL, encodeLength + 1);
-	strlcat(sEncodeBuffer, "?id=", encodeLength + 1);
+	strlcat(sEncodeBuffer, "?i=", encodeLength + 1);
 	strlcat(sEncodeBuffer, sWebPostId, encodeLength + 1);
 	strlcat(sEncodeBuffer, "&", encodeLength + 1);
 	strlcat(sEncodeBuffer, query, encodeLength + 1);
@@ -148,7 +148,7 @@ qrencode(int argc, char* argv[])
 	while (inputLength > 0) {
 		int copyCount = 0;
 		if (sWebPostId[0] != 0) {
-			copyCount = encode_url(sWebPostCounter++ == 0 ? "clear" : "data",
+			copyCount = encode_url(sWebPostCounter++ == 0 ? "clear" : "d",
 				source, encodeLength, inputLength);
 			if (copyCount < 0) {
 				kprintf("Failed to URL encode buffer.\n");
