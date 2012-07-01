@@ -239,7 +239,8 @@ AddFilesToHaikuImage system add-ons kernel busses usb
 AddFilesToHaikuImage system add-ons kernel console : vga_text ;
 AddFilesToHaikuImage system add-ons kernel debugger
 	: <kdebug>demangle $(X86_ONLY)<kdebug>disasm <kdebug>hangman
-	  <kdebug>invalidate_on_exit <kdebug>usb_keyboard <kdebug>run_on_exit ;
+	  <kdebug>invalidate_on_exit <kdebug>usb_keyboard <kdebug>qrencode
+	  <kdebug>run_on_exit ;
 AddFilesToHaikuImage system add-ons kernel file_systems
 	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToHaikuImage system add-ons kernel generic
