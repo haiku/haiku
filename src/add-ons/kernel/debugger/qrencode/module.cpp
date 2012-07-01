@@ -8,6 +8,7 @@
 
 
 #include <debug.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -17,11 +18,15 @@ extern "C" {
 }
 
 
+static const char* kWebPostBaseURL = "http://haiku.mlotz.ch/qrencode/store.php";
+
 static char sStringBuffer[16 * 1024];
 static char sEncodeBuffer[3 * 1024];
 static int sBufferPosition = 0;
 static int sQRCodeVersion = 19;
 static QRecLevel sQRCodeLevel = QR_ECLEVEL_L;
+static char sWebPostId[64];
+static int sWebPostCounter = 0;
 
 
 static bool
@@ -70,6 +75,50 @@ print_qrcode(QRcode* qrCode, bool waitForKey)
 
 
 static int
+encode_url(const char* query, const char* data, int encodeLength,
+	int inputLength)
+{
+	sEncodeBuffer[0] = 0;
+	strlcat(sEncodeBuffer, kWebPostBaseURL, encodeLength + 1);
+	strlcat(sEncodeBuffer, "?id=", encodeLength + 1);
+	strlcat(sEncodeBuffer, sWebPostId, encodeLength + 1);
+	strlcat(sEncodeBuffer, "&", encodeLength + 1);
+	strlcat(sEncodeBuffer, query, encodeLength + 1);
+	int position = strlcat(sEncodeBuffer, "=", encodeLength + 1);
+	if (position > encodeLength)
+		return -1;
+
+	int copyCount = 0;
+	while (inputLength > 0 && position < encodeLength) {
+		char character = data[copyCount];
+		if ((character >= 'a' && character <= 'z')
+			|| (character >= 'A' && character <= 'Z')
+			|| (character >= '0' && character <= '9')
+			|| character == '.' || character == '-' || character == '_'
+			|| character == '~') {
+			sEncodeBuffer[position++] = character;
+			sEncodeBuffer[position] = 0;
+		} else {
+			// Encode to a %xx escape.
+			if (encodeLength - position < 3) {
+				// Doesn't fit anymore, we're done.
+				break;
+			}
+
+			char escaped[4];
+			sprintf(escaped, "%%%.2x", character);
+			position = strlcat(sEncodeBuffer, escaped, encodeLength + 1);
+		}
+
+		inputLength--;
+		copyCount++;
+	}
+
+	return copyCount;
+}
+
+
+static int
 qrencode(int argc, char* argv[])
 {
 	if (argc > 1 && strcmp(argv[1], "--help") == 0) {
@@ -91,14 +140,25 @@ qrencode(int argc, char* argv[])
 	int inputLength = strlen(source);
 	int encodeLength = QRspec_getDataLength(sQRCodeVersion, sQRCodeLevel) - 3;
 	while (inputLength > 0) {
-		int copyCount = inputLength < encodeLength ? inputLength : encodeLength;
-		memcpy(sEncodeBuffer, source, copyCount);
-		sEncodeBuffer[copyCount] = 0;
+		int copyCount = 0;
+		if (sWebPostId[0] != 0) {
+			copyCount = encode_url(sWebPostCounter++ == 0 ? "clear" : "data",
+				source, encodeLength, inputLength);
+			if (copyCount < 0) {
+				kprintf("Failed to URL encode buffer.\n");
+				QRcode_clearCache();
+				return 1;
+			}
+		} else {
+			copyCount = inputLength < encodeLength ? inputLength : encodeLength;
+			memcpy(sEncodeBuffer, source, copyCount);
+			sEncodeBuffer[copyCount] = 0;
+		}
 
 		QRcode* qrCode = QRcode_encodeString8bit(sEncodeBuffer, sQRCodeVersion,
 			sQRCodeLevel);
 		if (qrCode == NULL) {
-			kprintf("Failed to encode buffer into qr code\n");
+			kprintf("Failed to encode buffer into qr code.\n");
 			QRcode_clearCache();
 			return 1;
 		}
@@ -222,6 +282,36 @@ qrconfig(int argc, char* argv[])
 }
 
 
+static int
+qrwebpost(int argc, char* argv[])
+{
+	if (argc >= 3 && strcmp(argv[1], "start") == 0) {
+		strlcpy(sWebPostId, argv[2], sizeof(sWebPostId));
+		sWebPostCounter = 0;
+
+		// Generate the clear code.
+		const char* args[2] = { "", "yes" };
+		qrencode(2, (char**)args);
+	} else if (argc >= 2 && strcmp(argv[1], "stop") == 0) {
+		sWebPostId[0] = 0;
+	} else {
+		kprintf("%s start <id>\n", argv[0]);
+		kprintf("%s stop\n", argv[0]);
+		kprintf("Causes the QR codes to be rendered as URLs that resolve to\n"
+			"a service that allows appending the data of multiple QR codes\n"
+			"for easier handling.\n"
+			"An initial QR code is generated that invokes a clear operation\n"
+			"to prepare the output file on the server.\n"
+			"Note that there is no logic behind the service, if you and\n"
+			"someone else use the same id at the same time, they will\n"
+			"overwrite eachother. Therefore use a reasonably unique name.\n");
+		return 1;
+	}
+
+	return 0;
+}
+
+
 static status_t
 std_ops(int32 op, ...)
 {
@@ -237,6 +327,8 @@ std_ops(int32 op, ...)
 				"encodes the current QR buffer and clears it");
 			add_debugger_command("qrconfig", qrconfig,
 				"sets the QR code version to be used");
+			add_debugger_command("qrwebpost", qrwebpost,
+				"sets up URL encoding for QR codes");
 			return B_OK;
 		case B_MODULE_UNINIT:
 			remove_debugger_command("qrencode", qrencode);
@@ -244,6 +336,7 @@ std_ops(int32 op, ...)
 			remove_debugger_command("qrclear", qrclear);
 			remove_debugger_command("qrflush", qrflush);
 			remove_debugger_command("qrconfig", qrconfig);
+			remove_debugger_command("qrwebpost", qrwebpost);
 			return B_OK;
 	}
 
