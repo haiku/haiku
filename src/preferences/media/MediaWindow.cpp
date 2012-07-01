@@ -413,11 +413,10 @@ MediaWindow::InitWindow()
 
 	// Start the window
 	fInitCheck = InitMedia(true);
-	if (fInitCheck != B_OK) {
+	if (fInitCheck != B_OK)
 		PostMessage(B_QUIT_REQUESTED);
-	} else 	if (IsHidden()) {
+	else if (IsHidden())
 			Show();
-	}
 }
 
 
@@ -753,7 +752,7 @@ MediaWindow::_MakeEmptyParamView()
 		B_ALIGN_VERTICAL_CENTER);
 	stringView->SetExplicitAlignment(centered);
 	stringView->SetAlignment(B_ALIGN_CENTER);
-	
+
 	fContentLayout->AddView(stringView);
 	fContentLayout->SetVisibleItem(fContentLayout->CountItems() - 1);
 
