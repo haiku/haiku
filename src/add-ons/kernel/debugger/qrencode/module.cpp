@@ -103,8 +103,20 @@ encode_url(const char* query, const char* data, int encodeLength,
 			|| (character >= 'A' && character <= 'Z')
 			|| (character >= '0' && character <= '9')
 			|| character == '.' || character == '-' || character == '_'
-			|| character == '~') {
+			|| character == '~'
+			// These aren't strictly valid, but seem to work.
+			|| character == '/' || character == '(' || character == ')'
+			|| character == '=' || character == '^' || character == '?'
+			|| character == '|' || character == '*' || character == '@'
+			|| character == ';' || character == ':' || character == ','
+			|| character == '{' || character == '}' || character == '['
+			|| character == ']' || character == '<' || character == '>'
+			|| character == '!' || character == '\\') {
 			sEncodeBuffer[position++] = character;
+			sEncodeBuffer[position] = 0;
+		} else if (character == ' ') {
+			// Encode spaces as '+' as that's shorter than %20.
+			sEncodeBuffer[position++] = '+';
 			sEncodeBuffer[position] = 0;
 		} else {
 			// Encode to a %xx escape.
