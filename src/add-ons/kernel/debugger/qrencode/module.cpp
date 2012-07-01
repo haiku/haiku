@@ -18,6 +18,11 @@ extern "C" {
 }
 
 
+extern "C" {
+extern void abort_debugger_command();
+}
+
+
 static const char* kWebPostBaseURL = "http://haiku.mlotz.ch/qrencode/store.php";
 
 static char sStringBuffer[16 * 1024];
@@ -68,8 +73,9 @@ print_qrcode(QRcode* qrCode, bool waitForKey)
 	move_to_and_clear_line(qrCode->width / 2 + 3);
 
 	if (waitForKey) {
-		kputs("press any key to continue...\x1b[1B\x1b[G");
-		kgetc();
+		kputs("press q to abort or any other key to continue...\x1b[1B\x1b[G");
+		if (kgetc() == 'q')
+			abort_debugger_command();
 	}
 }
 
