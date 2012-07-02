@@ -739,7 +739,7 @@ Inode::AcquireLock(OpenFileCookie* cookie, const struct flock* lock,
 
 	linfo->fSequence = 0;
 	linfo->fStart = lock->l_start;
-	if (lock->l_len == OFF_MAX)
+	if (lock->l_len + lock->l_start == OFF_MAX)
 		linfo->fLength = UINT64_MAX;
 	else
 		linfo->fLength = lock->l_len;
