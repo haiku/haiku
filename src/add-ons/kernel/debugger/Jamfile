@@ -7,5 +7,6 @@ SubInclude HAIKU_TOP src add-ons kernel debugger disasm ;
 SubInclude HAIKU_TOP src add-ons kernel debugger hangman ;
 SubInclude HAIKU_TOP src add-ons kernel debugger invalidate_on_exit ;
 SubInclude HAIKU_TOP src add-ons kernel debugger laplinkll ;
+SubInclude HAIKU_TOP src add-ons kernel debugger qrencode ;
 SubInclude HAIKU_TOP src add-ons kernel debugger run_on_exit ;
 SubInclude HAIKU_TOP src add-ons kernel debugger usb_keyboard ;

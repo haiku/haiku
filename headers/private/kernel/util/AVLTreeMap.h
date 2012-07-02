@@ -26,7 +26,7 @@ namespace AVLTreeMapStrategy {
 	typename Node;
 	inline Node* Allocate(const Key& key, const Value& value)
 	inline void Free(Node* node)
-	inline Key GetKey(Node* node) const
+	inline const Key GetKey(const Node* node) const
 	inline Value& GetValue(Node* node) const
 	inline AVLTreeNode* GetAVLTreeNode(Node* node) const
 	inline Node* GetNode(AVLTreeNode* node) const
@@ -622,7 +622,7 @@ public:
 		fAllocator.Deallocate(node);
 	}
 
-	inline Key& GetKey(Node* node) const
+	inline const Key& GetKey(const Node* node) const
 	{
 		return node->key;
 	}

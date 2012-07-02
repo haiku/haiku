@@ -2,7 +2,7 @@
 //
 //	Copyright (c) 2003, OpenBeOS
 //
-//  This software is part of the OpenBeOS distribution and is covered 
+//  This software is part of the OpenBeOS distribution and is covered
 //  by the OpenBeOS license.
 //
 //
@@ -10,7 +10,7 @@
 //  Author:      Sikosis, Jérôme Duval
 //  Description: Media Preferences
 //  Created :    June 25, 2003
-// 
+//
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 #include "MediaListItem.h"
 
@@ -70,13 +70,13 @@ struct MediaListItem::Renderer {
 	{
 		fDoubleInsets = doubleInset;
 	}
-	
+
 	void Render(BView* onto, BRect frame, bool complete = false)
 	{
 		const rgb_color lowColor = onto->LowColor();
 		const rgb_color highColor = onto->HighColor();
 		const rgb_color kBlack = {0, 0, 0, 255};
-	
+
 		if (fSelected || complete) {
 			if (fSelected)
 				onto->SetLowColor(tint_color(lowColor, B_DARKEN_2_TINT));
@@ -86,7 +86,7 @@ struct MediaListItem::Renderer {
 		frame.left += 4;
 		frame.top += kITEM_MARGIN;
 		BRect iconFrame(MediaIcons::IconRectAt(frame.LeftTop() + BPoint(1, 0)));
-	
+
 		onto->SetDrawingMode(B_OP_OVER);
 		if (fPrimaryIcon && !fDoubleInsets) {
 			onto->DrawBitmap(fPrimaryIcon, iconFrame);
@@ -103,7 +103,7 @@ struct MediaListItem::Renderer {
 
 		onto->SetDrawingMode(B_OP_COPY);
 		onto->SetHighColor(kBlack);
-		
+
 		BFont font = be_plain_font;
 		font_height	fontInfo;
 		font.GetHeight(&fontInfo);
@@ -130,8 +130,8 @@ struct MediaListItem::Renderer {
 		width += iconSpace;
 		width += 8.0f;
 			// space between icons and text
-	
-		width += be_plain_font->StringWidth(fTitle) + 3.0f;
+
+		width += be_plain_font->StringWidth(fTitle) + 16.0f;
 		return width;
 	}
 
