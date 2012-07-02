@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2008, Haiku Inc. All rights reserved.
- * Distributes under the terms of the MIT license.
+ * Distributed under the terms of the MIT license.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
@@ -8,18 +8,52 @@
 #ifndef _KERNEL_ARCH_x86_KERNEL_H
 #define _KERNEL_ARCH_x86_KERNEL_H
 
+
 #ifndef _ASSEMBLER
 #	include <arch/cpu.h>
 #endif
+
+
+#ifdef _BOOT_MODE
+
+
+// 32-bit and 64-bit kernel load addresses.
+#define KERNEL_BASE				0x80000000
+#define KERNEL_BASE_64BIT		0xffffffff80000000ll
+
+
+#elif defined(__x86_64__)
+
+
+// Base of the kernel address space.
+// When compiling the bootloader, KERNEL_BASE is set to the x86 base address,
+// KERNEL_BASE_64BIT is set to where the kernel loaded to.
+// For the kernel, KERNEL_BASE is the base of the kernel address space. This is
+// NOT the address where the kernel is loaded to: the kernel is loaded in the
+// top 2GB of the virtual address space as required by GCC's kernel code model.
+// The whole kernel address space is the top 512GB of the address space.
+#define KERNEL_BASE				0xffffff8000000000
+#define KERNEL_SIZE				0x8000000000
+#define KERNEL_TOP  			(KERNEL_BASE + (KERNEL_SIZE - 1))
+
+// Userspace address space layout.
+#define USER_BASE				0x0
+#define USER_BASE_ANY			0x100000
+#define USER_SIZE				0x800000000000
+#define USER_TOP				(USER_BASE + USER_SIZE)
+
+#define KERNEL_USER_DATA_BASE	0x7fffefff0000
+#define USER_STACK_REGION		0x7ffff0000000
+#define USER_STACK_REGION_SIZE	(USER_TOP - USER_STACK_REGION)
+
+
+#else	// __x86_64__
+
 
 // memory layout
 #define KERNEL_BASE 0x80000000
 #define KERNEL_SIZE 0x80000000
 #define KERNEL_TOP  (KERNEL_BASE + (KERNEL_SIZE - 1))
-
-#ifdef _BOOT_MODE
-# define KERNEL_BASE_64BIT 0xffffffff80000000ll
-#endif
 
 /* User space layout is a little special:
  * The user space does not completely cover the space not covered by the
@@ -40,4 +74,7 @@
 #define USER_STACK_REGION		0x70000000
 #define USER_STACK_REGION_SIZE	(USER_TOP - USER_STACK_REGION)
 
-#endif	/* _KERNEL_ARCH_x86_KERNEL_H */
+
+#endif	// __x86_64__
+
+#endif	// _KERNEL_ARCH_x86_KERNEL_H

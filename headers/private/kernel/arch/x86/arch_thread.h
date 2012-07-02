@@ -16,39 +16,65 @@
 extern "C" {
 #endif
 
-struct iframe *i386_get_user_iframe(void);
-struct iframe *i386_get_current_iframe(void);
-struct iframe *i386_get_thread_user_iframe(Thread *thread);
 
-uint32 x86_next_page_directory(Thread *from, Thread *to);
+struct iframe* i386_get_user_iframe(void);
+struct iframe* i386_get_current_iframe(void);
+struct iframe* i386_get_thread_user_iframe(Thread* thread);
 
-void x86_restart_syscall(struct iframe *frame);
+uint32 x86_next_page_directory(Thread* from, Thread* to);
 
-void x86_set_tls_context(Thread *thread);
+void x86_restart_syscall(struct iframe* frame);
+
+void x86_set_tls_context(Thread* thread);
+
+
+#ifdef __x86_64__
+
+
+// TODO
+static inline Thread*
+arch_thread_get_current_thread(void)
+{
+	return NULL;
+}
+
+
+static inline void
+arch_thread_set_current_thread(Thread* t)
+{
+	
+}
+
+
+#else	// __x86_64__
+
 
 // override empty macro
 #undef arch_syscall_64_bit_return_value
 void arch_syscall_64_bit_return_value(void);
 
 
-static
-inline Thread *
+static inline Thread*
 arch_thread_get_current_thread(void)
 {
-	Thread *t;
+	Thread* t;
 	read_dr3(t);
 	return t;
 }
 
+
 static inline void
-arch_thread_set_current_thread(Thread *t)
+arch_thread_set_current_thread(Thread* t)
 {
 	write_dr3(t);
 }
+
+
+#endif	// __x86_64__
+
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* _KERNEL_ARCH_x86_THREAD_H */
-

@@ -1,5 +1,6 @@
 /*
  * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2012, Alex Smith, alex@alex-smith.me.uk.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KERNEL_ARCH_x86_INT_H
@@ -20,30 +21,30 @@ arch_int_enable_interrupts_inline(void)
 static inline int
 arch_int_disable_interrupts_inline(void)
 {
-	int flags;
+	unsigned long flags;
 
-	asm volatile("pushfl;\n"
-		"popl %0;\n"
+	asm volatile("pushf;\n"
+		"pop %0;\n"
 		"cli" : "=g" (flags));
-	return flags ;
+	return (flags & 0x200) != 0;
 }
 
 
 static inline void
 arch_int_restore_interrupts_inline(int oldState)
 {
-	if (oldState & 0x200)
-			asm("sti");
+	if (oldState)
+		asm("sti");
 }
 
 
 static inline bool
 arch_int_are_interrupts_enabled_inline(void)
 {
-	int flags;
+	unsigned long flags;
 
-	asm volatile("pushfl;\n"
-		"popl %0;\n" : "=g" (flags));
+	asm volatile("pushf;\n"
+		"pop %0;\n" : "=g" (flags));
 	return (flags & 0x200) != 0;
 }
 

@@ -8,7 +8,11 @@
 
 #include <KernelExport.h>
 
-#include <arch/x86_64/descriptors.h>
+// Include the x86_64 version of descriptors.h
+#define __x86_64__
+#include <arch/x86/descriptors.h>
+#undef __x86_64__
+
 #include <arch_system_info.h>
 #include <boot/platform.h>
 #include <boot/heap.h>
