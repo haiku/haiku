@@ -704,7 +704,10 @@ Inode::AcquireLock(OpenFileCookie* cookie, const struct flock* lock,
 	else
 		linfo->fLength = lock->l_len;
 	linfo->fType = sGetLockType(lock->l_type, wait);
-	linfo->fOwner = find_thread(NULL);
+
+	thread_info info;
+	get_thread_info(find_thread(NULL), &info);
+	linfo->fOwner = info.team;
 
 	do {
 		RPC::Server* serv = fFilesystem->Server();
