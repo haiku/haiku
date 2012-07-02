@@ -20,6 +20,7 @@
 
 class OpenFileCookie;
 class LockInfo;
+class LockOwner;
 
 class RequestBuilder {
 public:
@@ -72,11 +73,17 @@ public:
 			status_t				Write(const uint32* id, uint32 stateSeq,
 										const void* buffer, uint64 pos,
 										uint32 len);
+			status_t				ReleaseLockOwner(OpenFileCookie* cookie,
+										LockOwner* owner);
 
 			RPC::Call*				Request();
 
 private:
 			void					_InitHeader();
+
+			void					_GenerateLockOwner(XDR::WriteStream& stream,
+										OpenFileCookie* cookie,
+										LockOwner* owner);
 
 			void					_EncodeAttrs(XDR::WriteStream& stream,
 										AttrValue* attr, uint32 count);

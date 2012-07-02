@@ -49,7 +49,8 @@ enum Opcode {
 	OpSetClientID			= 35,
 	OpSetClientIDConfirm	= 36,
 	OpVerify				= 37,
-	OpWrite					= 38
+	OpWrite					= 38,
+	OpReleaseLockOwner		= 39
 };
 
 enum Access {

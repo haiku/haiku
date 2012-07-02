@@ -134,6 +134,7 @@ Cookie::CancelAll()
 
 OpenFileCookie::OpenFileCookie()
 	:
+	fLocks(NULL),
 	fLockOwners(NULL)
 {
 	mutex_init(&fLocksLock, NULL);
@@ -151,8 +152,6 @@ OpenFileCookie::~OpenFileCookie()
 LockOwner*
 OpenFileCookie::GetLockOwner(uint32 owner)
 {
-	MutexLocker _(fOwnerLock);
-
 	LockOwner* current = fLockOwners;
 	while (current != NULL) {
 		if (current->fOwner == owner)
@@ -211,7 +210,26 @@ OpenFileCookie::DeleteLock(LockInfo* lock)
 		if (owner->fNext)
 			owner->fNext->fPrev = owner->fPrev;
 
+		_ReleaseLockOwner(owner);
 		delete owner;
 	}
+}
+
+
+status_t
+OpenFileCookie::_ReleaseLockOwner(LockOwner* owner)
+{
+	Request request(fFilesystem->Server());
+	RequestBuilder& req = request.Builder();
+
+	req.ReleaseLockOwner(this, owner);
+
+	status_t result = request.Send();
+	if (result != B_OK)
+		return result;
+
+	ReplyInterpreter &reply = request.Reply();
+
+	return reply.ReleaseLockOwner();
 }
 

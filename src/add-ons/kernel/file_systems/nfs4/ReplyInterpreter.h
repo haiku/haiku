@@ -95,6 +95,7 @@ public:
 	inline	status_t	SetClientIDConfirm();
 	inline	status_t	Verify();
 			status_t	Write(uint32* size);
+	inline	status_t	ReleaseLockOwner();
 
 private:
 			void		_ParseHeader();
@@ -203,6 +204,13 @@ inline status_t
 ReplyInterpreter::Verify()
 {
 	return _OperationError(OpVerify);
+}
+
+
+inline status_t
+ReplyInterpreter::ReleaseLockOwner()
+{
+	return _OperationError(OpReleaseLockOwner);
 }
 
 

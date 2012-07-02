@@ -100,6 +100,9 @@ struct OpenFileCookie : public Cookie {
 			void			AddLock(LockInfo* lock);
 			void			RemoveLock(LockInfo* lock, LockInfo* prev);
 			void			DeleteLock(LockInfo* lock);
+
+private:
+			status_t		_ReleaseLockOwner(LockOwner* owner);
 };
 
 struct OpenDirCookie : public Cookie {
