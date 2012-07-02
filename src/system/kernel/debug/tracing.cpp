@@ -805,10 +805,10 @@ AbstractTraceEntry::Dump(TraceOutput& out)
 		? fTime - out.LastEntryTime()
 		: fTime;
 
-	if (out.Flags() & TRACE_OUTPUT_TEAM_ID)
+	if (out.Flags() & TRACE_OUTPUT_TEAM_ID) {
 		out.Print("[%6" B_PRId32 ":%6" B_PRId32 "] %10" B_PRId64 ": ", fThread,
 			fTeam, time);
-	else
+	} else
 		out.Print("[%6" B_PRId32 "] %10" B_PRId64 ": ", fThread, time);
 
 	AddDump(out);
