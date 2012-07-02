@@ -733,11 +733,16 @@ Inode::AcquireLock(OpenFileCookie* cookie, const struct flock* lock,
 	if (result != B_OK)
 		return result;
 
-	LockInfo* linfo = new LockInfo;
+	thread_info info;
+	get_thread_info(find_thread(NULL), &info);
+	LockOwner* owner = cookie->GetLockOwner(info.team);
+	if (owner == NULL)
+		return B_NO_MEMORY;
+
+	LockInfo* linfo = new LockInfo(owner);
 	if (linfo == NULL)
 		return B_NO_MEMORY;
 
-	linfo->fSequence = 0;
 	linfo->fStart = lock->l_start;
 	if (lock->l_len + lock->l_start == OFF_MAX)
 		linfo->fLength = UINT64_MAX;
@@ -745,11 +750,9 @@ Inode::AcquireLock(OpenFileCookie* cookie, const struct flock* lock,
 		linfo->fLength = lock->l_len;
 	linfo->fType = sGetLockType(lock->l_type, wait);
 
-	thread_info info;
-	get_thread_info(find_thread(NULL), &info);
-	linfo->fOwner = info.team;
-
 	do {
+		MutexLocker ownerLocker(linfo->fOwner->fLock);
+
 		RPC::Server* serv = fFilesystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
@@ -759,32 +762,33 @@ Inode::AcquireLock(OpenFileCookie* cookie, const struct flock* lock,
 
 		status_t result = request.Send();
 		if (result != B_OK) {
-			delete linfo;
+			cookie->DeleteLock(linfo);
 			return result;
 		}
 
 		ReplyInterpreter &reply = request.Reply();
-		if (wait && reply.NFS4Error() == NFS4ERR_DENIED) {
-			snooze_etc(5 * 1000000, B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
-			continue;
-		}
-
-		if (_HandleErrors(reply.NFS4Error(), serv, cookie))
-			continue;
 
 		reply.PutFH();
 		result = reply.Lock(linfo);
+
+		ownerLocker.Unlock();
+		if (wait && reply.NFS4Error() == NFS4ERR_DENIED) {
+			snooze_etc(sSecToBigTime(5), B_SYSTEM_TIMEBASE,
+				B_RELATIVE_TIMEOUT);
+			continue;
+		}
+		if (_HandleErrors(reply.NFS4Error(), serv, cookie))
+			continue;
+
 		if (result != B_OK) {
-			delete linfo;
+			cookie->DeleteLock(linfo);
 			return result;
 		}
-
 		break;
 	} while (true);
 
 	MutexLocker _(cookie->fLocksLock);
-	linfo->fNext = cookie->fLocks;
-	cookie->fLocks = linfo;
+	cookie->AddLock(linfo);
 
 	return B_OK;
 }
@@ -794,19 +798,16 @@ status_t
 Inode::ReleaseLock(OpenFileCookie* cookie, const struct flock* lock)
 {
 	LockInfo* prev = NULL;
-	uint32 owner = find_thread(NULL);
+
+	thread_info info;
+	get_thread_info(find_thread(NULL), &info);
+	uint32 owner = info.team;
 
 	MutexLocker locker(cookie->fLocksLock);
 	LockInfo* linfo = cookie->fLocks;
 	while (linfo != NULL) {
-		if (linfo->fOwner == owner &&
-			linfo->fStart == static_cast<uint64>(lock->l_start) &&
-			(linfo->fLength == static_cast<uint64>(lock->l_len) ||
-				(linfo->fLength == UINT64_MAX && lock->l_len == OFF_MAX))) {
-			if (prev != NULL)
-				prev->fNext = linfo->fNext;
-			else
-				cookie->fLocks = linfo->fNext;
+		if (linfo->fOwner->fOwner == owner && *linfo == *lock) {
+			cookie->RemoveLock(linfo, prev);
 			break;
 		}
 
@@ -819,6 +820,8 @@ Inode::ReleaseLock(OpenFileCookie* cookie, const struct flock* lock)
 		return B_BAD_VALUE;
 
 	do {
+		MutexLocker ownerLocker(linfo->fOwner->fLock);
+
 		RPC::Server* serv = fFilesystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
@@ -827,23 +830,29 @@ Inode::ReleaseLock(OpenFileCookie* cookie, const struct flock* lock)
 		req.LockU(linfo);
 
 		status_t result = request.Send();
-		if (result != B_OK)
+		if (result != B_OK) {
+			cookie->DeleteLock(linfo);
 			return result;
+		}
 
 		ReplyInterpreter &reply = request.Reply();
 
+		reply.PutFH();
+		result = reply.LockU(linfo);
+
+		ownerLocker.Unlock();
 		if (_HandleErrors(reply.NFS4Error(), serv, cookie))
 			continue;
 
-		reply.PutFH();
-		result = reply.LockU();
-		if (result != B_OK)
+		if (result != B_OK) {
+			cookie->DeleteLock(linfo);
 			return result;
+		}
 
 		break;
 	} while (true);
 
-	delete linfo;
+	cookie->DeleteLock(linfo);
 
 	return B_OK;
 }
@@ -855,6 +864,8 @@ Inode::ReleaseAllLocks(OpenFileCookie* cookie)
 	MutexLocker _(cookie->fLocksLock);
 	while (cookie->fLocks != NULL) {
 		do {
+			MutexLocker ownerLocker(cookie->fLocks->fOwner->fLock);
+
 			RPC::Server* serv = fFilesystem->Server();
 			Request request(serv);
 			RequestBuilder& req = request.Builder();
@@ -868,20 +879,18 @@ Inode::ReleaseAllLocks(OpenFileCookie* cookie)
 
 			ReplyInterpreter &reply = request.Reply();
 
+			reply.PutFH();
+			reply.LockU(cookie->fLocks);
+
+			ownerLocker.Unlock();
 			if (_HandleErrors(reply.NFS4Error(), serv, cookie))
 				continue;
 
-			reply.PutFH();
-			result = reply.LockU();
-			if (result != B_OK)
-				return result;
-
-			break;
 		} while (true);
 
-		LockInfo* linfo = cookie->fLocks->fNext;
-		delete cookie->fLocks;
-		cookie->fLocks = linfo;
+		LockInfo* linfo = cookie->fLocks;
+		cookie->RemoveLock(linfo, NULL);
+		cookie->DeleteLock(linfo);
 	}
 
 	return B_OK;

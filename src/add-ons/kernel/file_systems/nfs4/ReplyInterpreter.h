@@ -74,7 +74,7 @@ public:
 			status_t	Link();
 			status_t	Lock(LockInfo* linfo);
 			status_t 	LockT(uint64* pos, uint64* len, LockType* type);
-			status_t	LockU();
+			status_t	LockU(LockInfo* linfo);
 	inline	status_t	LookUp();
 	inline	status_t	LookUpUp();
 	inline	status_t	Nverify();

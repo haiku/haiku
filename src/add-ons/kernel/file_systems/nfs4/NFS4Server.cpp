@@ -121,6 +121,12 @@ NFS4Server::_ReclaimLocks(OpenFileCookie* cookie)
 	MutexLocker _(cookie->fLocksLock);
 	LockInfo* linfo = cookie->fLocks;
 	while (linfo != NULL) {
+		MutexLocker locker(linfo->fOwner->fLock);
+		if (linfo->fOwner->fClientId != fClientId) {
+			memset(linfo->fOwner->fStateId, 0, sizeof(linfo->fOwner->fStateId));
+			linfo->fOwner->fClientId = fClientId;
+		}
+
 		do {
 			Request request(fServer);
 			RequestBuilder& req = request.Builder();
@@ -139,6 +145,7 @@ NFS4Server::_ReclaimLocks(OpenFileCookie* cookie)
 
 			break;
 		} while (true);
+		locker.Unlock();
 
 		linfo = linfo->fNext;
 	}

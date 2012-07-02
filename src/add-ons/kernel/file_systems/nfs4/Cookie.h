@@ -14,18 +14,39 @@
 #include "Filesystem.h"
 
 
-struct LockInfo {
+struct LockOwner {
+			uint64			fClientId;
+
 			uint32			fStateId[3];
 			uint32			fStateSeq;
-
 			uint32			fSequence;
 
 			uint32			fOwner;
+
+			uint32			fUseCount;
+
+			mutex			fLock;
+
+			LockOwner*		fNext;
+			LockOwner*		fPrev;
+
+							LockOwner(uint32 owner);
+							~LockOwner();
+};
+
+struct LockInfo {
+			LockOwner*		fOwner;
+
 			uint64			fStart;
 			uint64			fLength;
 			LockType		fType;
 
 			LockInfo*		fNext;
+
+							LockInfo(LockOwner* owner);
+							~LockInfo();
+
+			bool			operator==(const struct flock& lock) const;
 };
 
 struct Cookie {
@@ -65,11 +86,20 @@ struct OpenFileCookie : public Cookie {
 			LockInfo*		fLocks;
 			mutex			fLocksLock;
 
+			LockOwner*		fLockOwners;
+			mutex			fOwnerLock;
+
 			OpenFileCookie*	fNext;
 			OpenFileCookie*	fPrev;
 
 							OpenFileCookie();
 							~OpenFileCookie();
+
+			LockOwner*		GetLockOwner(uint32 owner);
+
+			void			AddLock(LockInfo* lock);
+			void			RemoveLock(LockInfo* lock, LockInfo* prev);
+			void			DeleteLock(LockInfo* lock);
 };
 
 struct OpenDirCookie : public Cookie {

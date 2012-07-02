@@ -208,10 +208,10 @@ ReplyInterpreter::Lock(LockInfo* linfo)
 	if (res != B_OK)
 		return res;
 
-	linfo->fStateSeq = fReply->Stream().GetUInt();
-	linfo->fStateId[0] = fReply->Stream().GetUInt();
-	linfo->fStateId[1] = fReply->Stream().GetUInt();
-	linfo->fStateId[2] = fReply->Stream().GetUInt();
+	linfo->fOwner->fStateSeq = fReply->Stream().GetUInt();
+	linfo->fOwner->fStateId[0] = fReply->Stream().GetUInt();
+	linfo->fOwner->fStateId[1] = fReply->Stream().GetUInt();
+	linfo->fOwner->fStateId[2] = fReply->Stream().GetUInt();
 
 	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
 }
@@ -236,16 +236,16 @@ ReplyInterpreter::LockT(uint64* pos, uint64* len, LockType* type)
 
 
 status_t
-ReplyInterpreter::LockU()
+ReplyInterpreter::LockU(LockInfo* linfo)
 {
 	status_t res = _OperationError(OpLockU);
 	if (res != B_OK)
 		return res;
 
-	fReply->Stream().GetUInt();
-	fReply->Stream().GetUInt();
-	fReply->Stream().GetUInt();
-	fReply->Stream().GetUInt();
+	linfo->fOwner->fStateSeq = fReply->Stream().GetUInt();
+	linfo->fOwner->fStateId[0] = fReply->Stream().GetUInt();
+	linfo->fOwner->fStateId[1] = fReply->Stream().GetUInt();
+	linfo->fOwner->fStateId[2] = fReply->Stream().GetUInt();
 
 	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
 }

@@ -16,6 +16,50 @@
 vint64 OpenFileCookie::fLastOwnerId = 0;
 
 
+LockOwner::LockOwner(uint32 owner)
+	:
+	fSequence(0),
+	fOwner(owner),
+	fUseCount(0),
+	fNext(NULL),
+	fPrev(NULL)
+{
+	memset(fStateId, 0, sizeof(fStateId));
+	mutex_init(&fLock, NULL);
+}
+
+
+LockOwner::~LockOwner()
+{
+	mutex_destroy(&fLock);
+}
+
+
+LockInfo::LockInfo(LockOwner* owner)
+	:
+	fOwner(owner)
+{
+	fOwner->fUseCount++;
+}
+
+
+LockInfo::~LockInfo()
+{
+	fOwner->fUseCount--;
+}
+
+
+bool
+LockInfo::operator==(const struct flock& lock) const
+{
+	bool eof = lock.l_len + lock.l_start == OFF_MAX;
+	uint64 start = static_cast<uint64>(lock.l_start);
+	uint64 len = static_cast<uint64>(lock.l_len);
+
+	return fStart == start && fLength == len || eof && fLength == UINT64_MAX;
+}
+
+
 Cookie::Cookie()
 	:
 	fRequests(NULL),
@@ -89,13 +133,85 @@ Cookie::CancelAll()
 
 
 OpenFileCookie::OpenFileCookie()
+	:
+	fLockOwners(NULL)
 {
 	mutex_init(&fLocksLock, NULL);
+	mutex_init(&fOwnerLock, NULL);
 }
 
 
 OpenFileCookie::~OpenFileCookie()
 {
 	mutex_destroy(&fLocksLock);
+	mutex_destroy(&fOwnerLock);
+}
+
+
+LockOwner*
+OpenFileCookie::GetLockOwner(uint32 owner)
+{
+	MutexLocker _(fOwnerLock);
+
+	LockOwner* current = fLockOwners;
+	while (current != NULL) {
+		if (current->fOwner == owner)
+			return current;
+
+		current = current->fNext;
+	}
+
+	current = new LockOwner(owner);
+	if (current == NULL)
+		return NULL;
+
+	current->fClientId = fClientId;
+	current->fNext = fLockOwners;
+	if (fLockOwners != NULL)
+		fLockOwners->fPrev = current;
+	fLockOwners = current;
+
+	return current;
+}
+
+
+// Caller must hold fLocksLock
+void
+OpenFileCookie::AddLock(LockInfo* lock)
+{
+	lock->fNext = fLocks;
+	fLocks = lock;
+}
+
+
+// Caller must hold fLocksLock
+void
+OpenFileCookie::RemoveLock(LockInfo* lock, LockInfo* prev)
+{
+	if (prev != NULL)
+		prev->fNext = lock->fNext;
+	else
+		fLocks = lock->fNext;
+}
+
+
+void
+OpenFileCookie::DeleteLock(LockInfo* lock)
+{
+	MutexLocker _(fOwnerLock);
+
+	LockOwner* owner = lock->fOwner;
+	delete lock;
+
+	if (owner->fUseCount == 0) {
+		if (owner->fPrev)
+			owner->fPrev->fNext = owner->fNext;
+		else
+			fLockOwners = owner->fNext;
+		if (owner->fNext)
+			owner->fNext->fPrev = owner->fPrev;
+
+		delete owner;
+	}
 }
 
