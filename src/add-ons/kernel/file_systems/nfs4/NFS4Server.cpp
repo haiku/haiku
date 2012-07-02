@@ -181,7 +181,7 @@ uint64
 NFS4Server::ClientId(uint64 prevId, bool forceNew)
 {
 	MutexLocker _(fClientIdLock);
-	if (fClientIdLastUse + (time_t)LeaseTime() < time(NULL)
+	if (fUseCount == 0 && fClientIdLastUse + (time_t)LeaseTime() < time(NULL)
 		|| forceNew && fClientId == prevId) {
 
 		Request request(fServer);
@@ -256,7 +256,7 @@ NFS4Server::_GetLeaseTime()
 		return B_BAD_VALUE;
 	}
 
-	fLeaseTime = values[0].fData.fValue32 * 1000000;
+	fLeaseTime = values[0].fData.fValue32;
 
 	return B_OK;
 }
@@ -295,8 +295,8 @@ NFS4Server::_Renewal()
 {
 	while (!fThreadCancel) {
 		// TODO: operations like OPEN, READ, CLOSE, etc also renew leases
-		snooze_etc(fLeaseTime - 2, B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT
-			| B_CAN_INTERRUPT);
+		snooze_etc(sSecToBigTime(fLeaseTime - 2), B_SYSTEM_TIMEBASE,
+			B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT);
 
 		uint64 clientId = fClientId;
 

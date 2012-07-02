@@ -892,6 +892,8 @@ bool
 Inode::_HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 	OpenFileCookie* cookie)
 {
+	uint32 leaseTime;
+
 	switch (nfs4Error) {
 		case NFS4_OK:
 			return false;
@@ -900,11 +902,12 @@ Inode::_HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 		case NFS4ERR_LOCKED:
 		case NFS4ERR_DELAY:
 			if (cookie == NULL) {
-				snooze_etc(5 * 1000000, B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
+				snooze_etc(sSecToBigTime(5), B_SYSTEM_TIMEBASE,
+					B_RELATIVE_TIMEOUT);
 				return true;
 			} else if ((cookie->fMode & O_NONBLOCK) == 0) {
 				status_t result = acquire_sem_etc(cookie->fSnoozeCancel, 1,
-					B_RELATIVE_TIMEOUT, 5 * 1000000);
+					B_RELATIVE_TIMEOUT, sSecToBigTime(5));
 				if (result == B_TIMED_OUT)
 					return true;
 				else {
@@ -916,14 +919,14 @@ Inode::_HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 
 		// server is in grace period, we need to wait
 		case NFS4ERR_GRACE:
+			leaseTime = fFilesystem->NFSServer()->LeaseTime();
 			if (cookie == NULL) {
-				snooze_etc(fFilesystem->NFSServer()->LeaseTime() / 3,
-					B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
+				snooze_etc(sSecToBigTime(leaseTime) / 3, B_SYSTEM_TIMEBASE,
+					B_RELATIVE_TIMEOUT);
 				return true;
 			} else if ((cookie->fMode & O_NONBLOCK) == 0) {
 				status_t result = acquire_sem_etc(cookie->fSnoozeCancel, 1,
-					B_RELATIVE_TIMEOUT,
-					fFilesystem->NFSServer()->LeaseTime() / 3);
+					B_RELATIVE_TIMEOUT, sSecToBigTime(leaseTime) / 3);
 				if (result == B_TIMED_OUT)
 					return true;
 				else {
@@ -951,6 +954,14 @@ Inode::_HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 		case NFS4ERR_MOVED:
 			fFilesystem->Migrate(serv);
 			return true;
+
+		// lease has expired
+		case NFS4ERR_EXPIRED:
+			if (cookie != NULL) {
+				fFilesystem->NFSServer()->ClientId(cookie->fClientId, true);
+				return true;
+			} else
+				return false;
 
 		default:
 			return false;

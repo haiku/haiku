@@ -309,5 +309,12 @@ enum Errors {
 };
 
 
+static inline bigtime_t
+sSecToBigTime(uint32 sec)
+{
+	return static_cast<bigtime_t>(sec) * 1000000;
+}
+
+
 #endif	// NFS4DEFS_H
 
