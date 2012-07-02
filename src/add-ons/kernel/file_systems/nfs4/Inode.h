@@ -76,7 +76,8 @@ protected:
 									OpenFileCookie* cookie = NULL);
 					status_t	_LookUpFilehandle();
 
-					status_t	_ConfirmOpen(OpenFileCookie* cookie);
+					status_t	_ConfirmOpen(const Filehandle& fh,
+									OpenFileCookie* cookie);
 
 					status_t	_ReadDirOnce(DirEntry** dirents, uint32* count,
 									OpenDirCookie* cookie, bool* eof);

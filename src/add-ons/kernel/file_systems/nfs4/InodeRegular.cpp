@@ -17,7 +17,7 @@
 
 
 status_t
-Inode::_ConfirmOpen(OpenFileCookie* cookie)
+Inode::_ConfirmOpen(const Filehandle& fh, OpenFileCookie* cookie)
 {
 	do {
 		RPC::Server* serv = fFilesystem->Server();
@@ -25,7 +25,7 @@ Inode::_ConfirmOpen(OpenFileCookie* cookie)
 
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fHandle);
+		req.PutFH(fh);
 		req.OpenConfirm(cookie->fSequence++, cookie->fStateId,
 			cookie->fStateSeq);
 
@@ -152,7 +152,7 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 	fFilesystem->AddOpenFile(cookie);
 
 	if (confirm)
-		return _ConfirmOpen(cookie);
+		return _ConfirmOpen(fh, cookie);
 	else
 		return B_OK;
 }
@@ -248,7 +248,7 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 	fFilesystem->AddOpenFile(cookie);
 
 	if (confirm)
-		return _ConfirmOpen(cookie);
+		return _ConfirmOpen(fHandle, cookie);
 	else
 		return B_OK;
 }
