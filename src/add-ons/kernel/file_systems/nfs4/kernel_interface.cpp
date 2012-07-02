@@ -327,8 +327,10 @@ nfs4_create(fs_volume* volume, fs_vnode* dir, const char* name, int openMode,
 
 	Inode* inode = reinterpret_cast<Inode*>(dir->private_node);
 	status_t result = inode->Create(name, openMode, perms, cookie, _newVnodeID);
-	if (result != B_OK)
+	if (result != B_OK) {
 		delete cookie;
+		return result;
+	}
 
 	void* ptr;
 	result = get_vnode(volume, *_newVnodeID, &ptr);
