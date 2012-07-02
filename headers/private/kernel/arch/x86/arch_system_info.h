@@ -12,11 +12,13 @@
 extern "C" {
 #endif
 
+#ifndef __x86_64__
 status_t get_current_cpuid(cpuid_info *info, uint32 eax);
 uint32 get_eflags(void);
 void set_eflags(uint32 value);
 
 status_t _user_get_cpuid(cpuid_info *info, uint32 eax, uint32 cpu);
+#endif
 
 #ifdef __cplusplus
 }

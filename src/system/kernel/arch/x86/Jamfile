@@ -15,61 +15,79 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) paging 32bit ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) paging pae ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) timers ] ;
 
+local archSpecificSources ;
+if $(TARGET_ARCH) = x86_64 {
+	SEARCH_SOURCE += [ FDirName $(SUBDIR) 64 ] ;
+
+	archSpecificSources =
+		stubs.cpp
+	;
+} else {
+	SEARCH_SOURCE += [ FDirName $(SUBDIR) 32 ] ;
+
+	archSpecificSources =
+		arch_commpage.cpp
+		arch_cpu.cpp
+		arch_debug.cpp
+		arch_elf.cpp
+		arch_int.cpp
+		arch_platform.cpp
+#		arch_selector.cpp
+		arch_real_time_clock.cpp
+		arch_smp.cpp
+		arch_thread.cpp
+		arch_timer.cpp
+		arch_vm.cpp
+		arch_vm_translation_map.cpp
+		arch_x86.S
+		arch_interrupts.S
+		arch_system_info.cpp
+		arch_user_debugger.cpp
+		apic.cpp
+		apm.cpp
+		bios.cpp
+		cpuid.S
+		ioapic.cpp
+		irq_routing_table.cpp
+		msi.cpp
+		pic.cpp
+		syscall.S
+		vm86.cpp
+		x86_signals.cpp
+		x86_signals_asm.S
+		x86_syscalls.cpp
+
+		# paging
+		x86_physical_page_mapper.cpp
+		x86_physical_page_mapper_large_memory.cpp
+		X86PagingMethod.cpp
+		X86PagingStructures.cpp
+		X86VMTranslationMap.cpp
+
+		# paging/32bit
+		X86PagingMethod32Bit.cpp
+		X86PagingStructures32Bit.cpp
+		X86VMTranslationMap32Bit.cpp
+
+		# paging/pae
+		X86PagingMethodPAE.cpp
+		X86PagingStructuresPAE.cpp
+		X86VMTranslationMapPAE.cpp
+
+		# timers
+		x86_apic.cpp
+		x86_hpet.cpp
+		x86_pit.cpp
+	;
+}
+
+local archGenericSources =
+	arch_debug_console.cpp
+;
 
 KernelMergeObject kernel_arch_x86.o :
-	arch_commpage.cpp
-	arch_cpu.cpp
-	arch_debug.cpp
-	arch_debug_console.cpp
-	arch_elf.cpp
-	arch_int.cpp
-	arch_platform.cpp
-#	arch_selector.cpp
-	arch_real_time_clock.cpp
-	arch_smp.cpp
-	arch_thread.cpp
-	arch_timer.cpp
-	arch_vm.cpp
-	arch_vm_translation_map.cpp
-	arch_x86.S
-	arch_interrupts.S
-	arch_system_info.cpp
-	arch_user_debugger.cpp
-	apic.cpp
-	apm.cpp
-	bios.cpp
-	cpuid.S
-	ioapic.cpp
-	irq_routing_table.cpp
-	msi.cpp
-	pic.cpp
-	syscall.S
-	vm86.cpp
-	x86_signals.cpp
-	x86_signals_asm.S
-	x86_syscalls.cpp
-
-	# paging
-	x86_physical_page_mapper.cpp
-	x86_physical_page_mapper_large_memory.cpp
-	X86PagingMethod.cpp
-	X86PagingStructures.cpp
-	X86VMTranslationMap.cpp
-
-	# paging/32bit
-	X86PagingMethod32Bit.cpp
-	X86PagingStructures32Bit.cpp
-	X86VMTranslationMap32Bit.cpp
-
-	# paging/pae
-	X86PagingMethodPAE.cpp
-	X86PagingStructuresPAE.cpp
-	X86VMTranslationMapPAE.cpp
-
-	# timers
-	x86_apic.cpp
-	x86_hpet.cpp
-	x86_pit.cpp
+	$(archSpecificSources)
+	$(archGenericSources)
 	:
 	$(TARGET_KERNEL_PIC_CCFLAGS)
 ;
