@@ -650,9 +650,41 @@ Inode::WriteStat(const struct stat* st, uint32 mask)
 }
 
 
+inline status_t
+Inode::_CheckLockType(short ltype, uint32 mode)
+{
+	switch (ltype) {
+		case F_UNLCK:
+			return B_OK;
+
+		case F_RDLCK:
+			if ((mode & O_RDONLY) == 0 && (mode & O_RDWR) == 0)
+				return EBADF;
+			else
+				return B_OK;
+
+		case F_WRLCK:
+			if ((mode & O_WRONLY) == 0 && (mode & O_RDWR) == 0)
+				return EBADF;
+			else
+				return B_OK;
+
+		default:
+			return B_BAD_VALUE;
+	}
+}
+
+
 status_t
 Inode::TestLock(OpenFileCookie* cookie, struct flock* lock)
 {
+	if (lock->l_type == F_UNLCK)
+		return B_OK;
+
+	status_t result = _CheckLockType(lock->l_type, cookie->fMode);
+	if (result != B_OK)
+		return result;
+
 	do {
 		RPC::Server* serv = fFilesystem->Server();
 		Request request(serv);
@@ -693,6 +725,10 @@ status_t
 Inode::AcquireLock(OpenFileCookie* cookie, const struct flock* lock,
 	bool wait)
 {
+	status_t result = _CheckLockType(lock->l_type, cookie->fMode);
+	if (result != B_OK)
+		return result;
+
 	LockInfo* linfo = new LockInfo;
 	if (linfo == NULL)
 		return B_NO_MEMORY;

@@ -85,6 +85,8 @@ protected:
 					status_t	_ReadDirUp(struct dirent* de, uint32 pos,
 									uint32 size);
 
+	static inline	status_t	_CheckLockType(short ltype, uint32 mode);
+
 	static inline	ino_t		_FileIdToInoT(uint64 fileid);
 
 					uint64		fFileId;
