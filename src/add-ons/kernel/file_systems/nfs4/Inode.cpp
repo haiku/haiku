@@ -709,7 +709,11 @@ Inode::TestLock(OpenFileCookie* cookie, struct flock* lock)
 		if (reply.NFS4Error() == NFS4ERR_DENIED) {
 			lock->l_type = sLockTypeToHaiku(ltype);
 			lock->l_start = static_cast<off_t>(pos);
-			lock->l_len = static_cast<off_t>(len);
+			if (len >= OFF_MAX)
+				lock->l_len = OFF_MAX;
+			else
+				lock->l_len = static_cast<off_t>(len);
+
 			result = B_OK;
 		} else if (reply.NFS4Error() == NFS4_OK)
 			lock->l_type = F_UNLCK;
