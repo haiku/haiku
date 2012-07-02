@@ -68,6 +68,7 @@ NFS4Server::IncUsage()
 	fUseCount++;
 	if (fThreadCancel)
 		_StartRenewing();
+	fClientIdLastUse = time(NULL);
 }
 
 
@@ -75,6 +76,7 @@ inline void
 NFS4Server::DecUsage()
 {
 	MutexLocker _(fFSLock);
+	fClientIdLastUse = time(NULL);
 	fUseCount--;
 }
 
