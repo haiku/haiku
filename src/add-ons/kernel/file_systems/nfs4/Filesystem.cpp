@@ -170,7 +170,7 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
 	fs->fDevId = id;
 	fs->fFsId = *fsid;
 
-	fi.fFH = fh;
+	fi.fHandle = fh;
 	fi.fParent = fh;
 	fi.fPath = strdup(sGetPath(fs->fPath, fsPath));
 

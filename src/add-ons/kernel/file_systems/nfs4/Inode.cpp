@@ -34,18 +34,15 @@ Inode::CreateInode(Filesystem* fs, const FileInfo &fi, Inode** _inode)
 	if (inode == NULL)
 		return B_NO_MEMORY;
 
-	inode->fHandle = fi.fFH;
+	inode->fInfo = fi;
 	inode->fFilesystem = fs;
-	inode->fParentFH = fi.fParent;
-	inode->fName = strdup(fi.fName);
-	inode->fPath = strdup(fi.fPath);
 
 	do {
 		RPC::Server* serv = fs->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(inode->fHandle);
+		req.PutFH(inode->fInfo.fHandle);
 
 		Attribute attr[] = { FATTR4_TYPE, FATTR4_FSID, FATTR4_FILEID };
 		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
@@ -69,11 +66,11 @@ Inode::CreateInode(Filesystem* fs, const FileInfo &fi, Inode** _inode)
 
 		if (fi.fFileId == 0) {
 			if (count < 3 || values[2].fAttribute != FATTR4_FILEID)
-				inode->fFileId = fs->AllocFileId();
+				inode->fInfo.fFileId = fs->AllocFileId();
 			else
-				inode->fFileId = values[2].fData.fValue64;
+				inode->fInfo.fFileId = values[2].fData.fValue64;
 		} else
-			inode->fFileId = fi.fFileId;
+			inode->fInfo.fFileId = fi.fFileId;
 
 		// FATTR4_TYPE is mandatory
 		inode->fType = values[0].fData.fValue32;
@@ -97,7 +94,7 @@ Inode::CreateInode(Filesystem* fs, const FileInfo &fi, Inode** _inode)
 
 Inode::~Inode()
 {
-	free(const_cast<char*>(fName));
+	free(const_cast<char*>(fInfo.fName));
 }
 
 
@@ -117,7 +114,7 @@ Inode::LookUp(const char* name, ino_t* id)
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fHandle);
+		req.PutFH(fInfo.fHandle);
 
 		if (!strcmp(name, ".."))
 			req.LookUpUp();
@@ -174,13 +171,13 @@ Inode::LookUp(const char* name, ino_t* id)
 
 		FileInfo fi;
 		fi.fFileId = fileId;
-		fi.fFH = fh;
-		fi.fParent = fHandle;
+		fi.fHandle = fh;
+		fi.fParent = fInfo.fHandle;
 		fi.fName = strdup(name);
 
 		char* path = reinterpret_cast<char*>(malloc(strlen(name) + 2 +
-			strlen(fPath)));
-		strcpy(path, fPath);
+			strlen(fInfo.fPath)));
+		strcpy(path, fInfo.fPath);
 		strcat(path, "/");
 		strcat(path, name);
 		fi.fPath = path;
@@ -200,9 +197,9 @@ Inode::Link(Inode* dir, const char* name)
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fHandle);
+		req.PutFH(fInfo.fHandle);
 		req.SaveFH();
-		req.PutFH(dir->fHandle);
+		req.PutFH(dir->fInfo.fHandle);
 		req.Link(name);
 
 		status_t result = request.Send();
@@ -244,7 +241,7 @@ Inode::Remove(const char* name, FileType type)
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fHandle);
+		req.PutFH(fInfo.fHandle);
 		req.LookUp(name);
 		AttrValue attr;
 		attr.fAttribute = FATTR4_TYPE;
@@ -255,7 +252,7 @@ Inode::Remove(const char* name, FileType type)
 		else
 			req.Nverify(&attr, 1);
 
-		req.PutFH(fHandle);
+		req.PutFH(fInfo.fHandle);
 		req.Remove(name);
 
 		status_t result = request.Send();
@@ -305,9 +302,9 @@ Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName)
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(from->fHandle);
+		req.PutFH(from->fInfo.fHandle);
 		req.SaveFH();
-		req.PutFH(to->fHandle);
+		req.PutFH(to->fInfo.fHandle);
 		req.Rename(fromName, toName);
 
 		status_t result = request.Send();
@@ -346,7 +343,7 @@ Inode::CreateLink(const char* name, const char* path, int mode)
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fHandle);
+		req.PutFH(fInfo.fHandle);
 
 		AttrValue attr;
 		attr.fAttribute = FATTR4_MODE;
@@ -381,7 +378,7 @@ Inode::ReadLink(void* buffer, size_t* length)
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fHandle);
+		req.PutFH(fInfo.fHandle);
 		req.ReadLink();	
 
 		status_t result = request.Send();
@@ -412,7 +409,7 @@ Inode::Access(int mode)
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fHandle);
+		req.PutFH(fInfo.fHandle);
 		req.Access();
 
 		status_t result = request.Send();
@@ -460,7 +457,7 @@ Inode::Stat(struct stat* st)
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fHandle);
+		req.PutFH(fInfo.fHandle);
 
 		Attribute attr[] = { FATTR4_SIZE, FATTR4_MODE, FATTR4_NUMLINKS,
 							FATTR4_TIME_ACCESS, FATTR4_TIME_CREATE,
@@ -499,7 +496,7 @@ Inode::Stat(struct stat* st)
 		} else {
 			// Try to guess using ACCESS request
 			request.Reset();
-			request.Builder().PutFH(fHandle);
+			request.Builder().PutFH(fInfo.fHandle);
 			request.Builder().Access();
 			result = request.Send();
 			if (result != B_OK)
@@ -617,7 +614,7 @@ Inode::WriteStat(const struct stat* st, uint32 mask)
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fHandle);
+		req.PutFH(fInfo.fHandle);
 		if ((mask & B_STAT_SIZE) != 0)
 			req.SetAttr(cookie->fStateId, cookie->fStateSeq, attr, i);
 		else
@@ -690,7 +687,7 @@ Inode::TestLock(OpenFileCookie* cookie, struct flock* lock)
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fHandle);
+		req.PutFH(fInfo.fHandle);
 		req.LockT(sGetLockType(lock->l_type, false), lock->l_start,
 			lock->l_len, cookie);
 
@@ -760,7 +757,7 @@ Inode::AcquireLock(OpenFileCookie* cookie, const struct flock* lock,
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fHandle);
+		req.PutFH(fInfo.fHandle);
 		req.Lock(cookie, linfo);
 
 		status_t result = request.Send();
@@ -829,7 +826,7 @@ Inode::ReleaseLock(OpenFileCookie* cookie, const struct flock* lock)
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fHandle);
+		req.PutFH(fInfo.fHandle);
 		req.LockU(linfo);
 
 		status_t result = request.Send();
@@ -874,7 +871,7 @@ Inode::ReleaseAllLocks(OpenFileCookie* cookie)
 			Request request(serv);
 			RequestBuilder& req = request.Builder();
 
-			req.PutFH(fHandle);
+			req.PutFH(fInfo.fHandle);
 			req.LockU(linfo);
 
 			status_t result = request.Send();
@@ -1021,7 +1018,7 @@ Inode::_LookUpFilehandle()
 	uint32 lookupCount = 0;
 
 	sParsePath(req, &lookupCount, fFilesystem->Path());
-	sParsePath(req, &lookupCount, fPath);
+	sParsePath(req, &lookupCount, fInfo.fPath);
 
 	req.GetFH();
 
@@ -1029,7 +1026,7 @@ Inode::_LookUpFilehandle()
 		AttrValue attr;
 		attr.fAttribute = FATTR4_FILEID;
 		attr.fFreePointer = false;
-		attr.fData.fValue64 = fFileId;
+		attr.fData.fValue64 = fInfo.fFileId;
 		req.Verify(&attr, 1);
 	}
 
@@ -1043,7 +1040,7 @@ Inode::_LookUpFilehandle()
 	for (uint32 i = 0; i < lookupCount; i++)
 		reply.LookUp();
 
-	result = reply.GetFH(&fHandle);
+	result = reply.GetFH(&fInfo.fHandle);
 	if (result != B_OK)
 		return result;
 

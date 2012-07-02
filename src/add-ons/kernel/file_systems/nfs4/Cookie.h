@@ -74,7 +74,7 @@ struct OpenFileCookie : public Cookie {
 
 			uint32			fMode;
 
-			Filehandle		fHandle;
+			FileInfo		fInfo;
 			uint32			fStateId[3];
 			uint32			fStateSeq;
 

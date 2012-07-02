@@ -75,7 +75,7 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 
 		cookie->fOwnerId = atomic_add64(&cookie->fLastOwnerId, 1);
 
-		req.PutFH(fHandle);
+		req.PutFH(fInfo.fHandle);
 
 		AttrValue cattr[2];
 		uint32 i = 0;
@@ -130,13 +130,13 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 
 		FileInfo fi;
 		fi.fFileId = fileId;
-		fi.fFH = fh;
-		fi.fParent = fHandle;
+		fi.fHandle = fh;
+		fi.fParent = fInfo.fHandle;
 		fi.fName = strdup(name);
 
 		char* path = reinterpret_cast<char*>(malloc(strlen(name) + 2 +
-			strlen(fPath)));
-		strcpy(path, fPath);
+			strlen(fInfo.fPath)));
+		strcpy(path, fInfo.fPath);
 		strcat(path, "/");
 		strcat(path, name);
 		fi.fPath = path;
@@ -144,7 +144,7 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 		fFilesystem->InoIdMap()->AddEntry(fi, *id);
 
 		cookie->fFilesystem = fFilesystem;
-		cookie->fHandle = fh;
+		cookie->fInfo = fi;
 
 		break;
 	} while (true);
@@ -165,7 +165,7 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 	status_t result;
 
 	cookie->fFilesystem = fFilesystem;
-	cookie->fHandle = fHandle;
+	cookie->fInfo = fInfo;
 	cookie->fMode = mode;
 	cookie->fSequence = 0;
 	cookie->fLocks = NULL;
@@ -182,36 +182,36 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 		// Since we are opening the file using a pair (parentFH, name) we
 		// need to check for race conditions.
 		if (fFilesystem->IsAttrSupported(FATTR4_FILEID)) {
-			req.PutFH(fParentFH);
-			req.LookUp(fName);
+			req.PutFH(fInfo.fParent);
+			req.LookUp(fInfo.fName);
 			AttrValue attr;
 			attr.fAttribute = FATTR4_FILEID;
 			attr.fFreePointer = false;
-			attr.fData.fValue64 = fFileId;
+			attr.fData.fValue64 = fInfo.fFileId;
 			req.Verify(&attr, 1);
 		} else if (fFilesystem->ExpireType() == FH4_PERSISTENT) {
-			req.PutFH(fParentFH);
-			req.LookUp(fName);
+			req.PutFH(fInfo.fParent);
+			req.LookUp(fInfo.fName);
 			AttrValue attr;
 			attr.fAttribute = FATTR4_FILEHANDLE;
 			attr.fFreePointer = true;
-			attr.fData.fPointer = malloc(sizeof(fHandle));
-			memcpy(attr.fData.fPointer, &fHandle, sizeof(fHandle));
+			attr.fData.fPointer = malloc(sizeof(fInfo.fHandle));
+			memcpy(attr.fData.fPointer, &fInfo.fHandle, sizeof(fInfo.fHandle));
 			req.Verify(&attr, 1);
 		}
 
-		req.PutFH(fParentFH);
+		req.PutFH(fInfo.fParent);
 		if ((mode & O_TRUNC) == O_TRUNC) {
 			AttrValue attr;
 			attr.fAttribute = FATTR4_SIZE;
 			attr.fFreePointer = false;
 			attr.fData.fValue64 = 0;
 			req.Open(CLAIM_NULL, cookie->fSequence++, sModeToAccess(mode),
-				cookie->fClientId, OPEN4_CREATE, cookie->fOwnerId, fName, &attr,
-				1, false);
+				cookie->fClientId, OPEN4_CREATE, cookie->fOwnerId, fInfo.fName,
+				&attr, 1, false);
 		} else
 		req.Open(CLAIM_NULL, cookie->fSequence++, sModeToAccess(mode),
-			cookie->fClientId, OPEN4_NOCREATE, cookie->fOwnerId, fName);
+			cookie->fClientId, OPEN4_NOCREATE, cookie->fOwnerId, fInfo.fName);
 
 		result = request.Send();
 		if (result != B_OK)
@@ -248,7 +248,7 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 	fFilesystem->AddOpenFile(cookie);
 
 	if (confirm)
-		return _ConfirmOpen(fHandle, cookie);
+		return _ConfirmOpen(fInfo.fHandle, cookie);
 	else
 		return B_OK;
 }
@@ -264,7 +264,7 @@ Inode::Close(OpenFileCookie* cookie)
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fHandle);
+		req.PutFH(fInfo.fHandle);
 		req.Close(cookie->fSequence++, cookie->fStateId,
 			cookie->fStateSeq);
 
@@ -302,7 +302,7 @@ Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length)
 			Request request(serv);
 			RequestBuilder& req = request.Builder();
 
-			req.PutFH(fHandle);
+			req.PutFH(fInfo.fHandle);
 			req.Read(cookie->fStateId, cookie->fStateSeq, pos + size,
 				*_length - size);
 
@@ -358,7 +358,7 @@ Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
 				pos = fileSize;
 			}
 
-			req.PutFH(fHandle);
+			req.PutFH(fInfo.fHandle);
 			if ((cookie->fMode & O_APPEND) == O_APPEND) {
 				AttrValue attr;
 				attr.fAttribute = FATTR4_SIZE;

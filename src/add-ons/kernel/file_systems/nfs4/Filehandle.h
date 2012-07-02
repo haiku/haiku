@@ -32,7 +32,7 @@ struct Filehandle {
 // since OPEN requires both parent filehandle and file name (just like LOOKUP).
 struct FileInfo {
 			uint64		fFileId;
-			Filehandle	fFH;
+			Filehandle	fHandle;
 
 			Filehandle	fParent;
 			const char*	fName;
@@ -101,7 +101,7 @@ inline
 FileInfo::FileInfo(const FileInfo& fi)
 	:
 	fFileId(fi.fFileId),
-	fFH(fi.fFH),
+	fHandle(fi.fHandle),
 	fParent(fi.fParent),
 	fName(strdup(fi.fName)),
 	fPath(strdup(fi.fPath))
@@ -113,7 +113,7 @@ inline FileInfo&
 FileInfo::operator=(const FileInfo& fi)
 {
 	fFileId = fi.fFileId;
-	fFH = fi.fFH;
+	fHandle = fi.fHandle;
 	fParent = fi.fParent;
 
 	free(const_cast<char*>(fName));

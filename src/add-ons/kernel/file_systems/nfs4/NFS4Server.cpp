@@ -77,7 +77,7 @@ NFS4Server::_ReclaimOpen(OpenFileCookie* cookie)
 	Request request(fServer);
 	RequestBuilder& req = request.Builder();
 
-	req.PutFH(cookie->fHandle);
+	req.PutFH(cookie->fInfo.fHandle);
 	req.Open(CLAIM_PREVIOUS, cookie->fSequence++, sModeToAccess(cookie->fMode),
 		cookie->fClientId, OPEN4_NOCREATE, cookie->fOwnerId, NULL);
 
@@ -97,7 +97,7 @@ NFS4Server::_ReclaimOpen(OpenFileCookie* cookie)
 	if (confirm) {
 		request.Reset();
 
-		req.PutFH(cookie->fHandle);
+		req.PutFH(cookie->fInfo.fHandle);
 		req.OpenConfirm(cookie->fSequence++, cookie->fStateId,
 			cookie->fStateSeq);
 
@@ -131,7 +131,7 @@ NFS4Server::_ReclaimLocks(OpenFileCookie* cookie)
 			Request request(fServer);
 			RequestBuilder& req = request.Builder();
 
-			req.PutFH(cookie->fHandle);
+			req.PutFH(cookie->fInfo.fHandle);
 			req.Lock(cookie, linfo, true);
 
 			status_t result = request.Send();

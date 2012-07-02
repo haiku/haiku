@@ -24,7 +24,7 @@ Inode::CreateDir(const char* name, int mode)
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fHandle);
+		req.PutFH(fInfo.fHandle);
 
 		AttrValue attr;
 		attr.fAttribute = FATTR4_MODE;
@@ -59,7 +59,7 @@ Inode::OpenDir(OpenDirCookie* cookie)
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fHandle);
+		req.PutFH(fInfo.fHandle);
 		req.Access();
 
 		status_t result = request.Send();
@@ -99,7 +99,7 @@ Inode::_ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fHandle);
+		req.PutFH(fInfo.fHandle);
 
 		Attribute attr[] = { FATTR4_FSID, FATTR4_FILEID };
 		req.ReadDir(*count, cookie->fCookie, cookie->fCookieVerf, attr,
@@ -151,7 +151,7 @@ Inode::_ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fHandle);
+		req.PutFH(fInfo.fHandle);
 		req.LookUpUp();
 		req.GetFH();
 
@@ -214,7 +214,7 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
 	if (cookie->fCookie == 0 && cookie->fCookieVerf == 2 && count < *_count) {
 		struct dirent* de = reinterpret_cast<dirent*>(buffer + pos);
 
-		_FillDirEntry(de, fFileId, ".", pos, size);
+		_FillDirEntry(de, fInfo.fFileId, ".", pos, size);
 
 		pos += de->d_reclen;
 		count++;
@@ -224,10 +224,10 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
 	if (cookie->fCookie == 0 && cookie->fCookieVerf == 1 && count < *_count) {
 		struct dirent* de = reinterpret_cast<dirent*>(buffer + pos);
 		
-		if (strcmp(fName, "/"))
+		if (strcmp(fInfo.fName, "/"))
 			_ReadDirUp(de, pos, size);
 		else
-			_FillDirEntry(de, _FileIdToInoT(fFileId), "..", pos, size);
+			_FillDirEntry(de, _FileIdToInoT(fInfo.fFileId), "..", pos, size);
 
 		pos += de->d_reclen;
 		count++;

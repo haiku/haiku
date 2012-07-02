@@ -90,16 +90,10 @@ protected:
 
 	static inline	ino_t		_FileIdToInoT(uint64 fileid);
 
-					uint64		fFileId;
 					uint32		fType;
 
-					Filehandle	fHandle;
+					FileInfo	fInfo;
 					Filesystem*	fFilesystem;
-
-					Filehandle	fParentFH;
-					const char*	fName;
-
-					const char*	fPath;
 };
 
 
@@ -117,7 +111,7 @@ Inode::_FileIdToInoT(uint64 fileid)
 inline ino_t
 Inode::ID() const
 {
-	return _FileIdToInoT(fFileId);
+	return _FileIdToInoT(fInfo.fFileId);
 }
 
 
@@ -131,7 +125,7 @@ Inode::Type() const
 inline const char*
 Inode::Name() const
 {
-	return fName;
+	return fInfo.fName;
 }
 
 

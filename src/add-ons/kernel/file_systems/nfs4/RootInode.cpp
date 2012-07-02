@@ -22,7 +22,7 @@ RootInode::ReadInfo(struct fs_info* info)
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fHandle);
+		req.PutFH(fInfo.fHandle);
 		Attribute attr[] = { FATTR4_FILES_FREE, FATTR4_FILES_TOTAL,
 			FATTR4_MAXREAD, FATTR4_MAXWRITE, FATTR4_SPACE_FREE,
 			FATTR4_SPACE_TOTAL };
@@ -87,7 +87,7 @@ RootInode::ReadInfo(struct fs_info* info)
 	} while (true);
 
 	info->flags = 0;
-	strncpy(info->volume_name, fName, B_FILE_NAME_LENGTH);
+	strncpy(info->volume_name, fInfo.fName, B_FILE_NAME_LENGTH);
 
 	return B_OK;
 }
@@ -101,7 +101,7 @@ RootInode::ProbeMigration()
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fHandle);
+		req.PutFH(fInfo.fHandle);
 		req.Access();
 
 		status_t result = request.Send();
@@ -130,7 +130,7 @@ RootInode::GetLocations(AttrValue** attrv)
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fHandle);
+		req.PutFH(fInfo.fHandle);
 		Attribute attr[] = { FATTR4_FS_LOCATIONS };
 		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
 
