@@ -43,7 +43,7 @@ AddResources haiku_loader : boot_loader.rdef ;
 
 BootLd boot_loader_$(TARGET_BOOT_PLATFORM) :
 	boot_platform_$(TARGET_BOOT_PLATFORM).o
-	boot_arch_$(TARGET_ARCH).o
+	boot_arch_$(TARGET_KERNEL_ARCH).o
 	boot_loader.a
 	boot_net.a
 	boot_partitions.a
@@ -109,6 +109,6 @@ BuildBiosLoader haiku_loader : boot_loader_$(TARGET_BOOT_PLATFORM) ;
 # different target for PXE, to be build with TARGET_BOOT_PLATFORM=pxe_ia32 jam pxehaiku-loader
 BuildBiosLoader pxehaiku-loader : boot_loader_$(TARGET_BOOT_PLATFORM) ;
 
-SubInclude HAIKU_TOP src system boot arch $(TARGET_ARCH) ;
+SubInclude HAIKU_TOP src system boot arch $(TARGET_KERNEL_ARCH) ;
 SubInclude HAIKU_TOP src system boot loader ;
 SubInclude HAIKU_TOP src system boot platform ;

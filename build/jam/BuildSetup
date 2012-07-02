@@ -193,7 +193,7 @@ switch $(HAIKU_DISTRO_COMPATIBILITY) {
 # analyze the gcc machine spec to determine HAIKU_CPU
 switch $(HAIKU_GCC_MACHINE) {
 	case i?86-*		: HAIKU_CPU = x86 ;
-	case x86_64-*		: HAIKU_CPU = x86_64 ;
+	case x86_64-*	: HAIKU_CPU = x86_64 ;
 	case powerpc-*	: HAIKU_CPU = ppc ;
 	case m68k-*		: HAIKU_CPU = m68k ;
 	case mipsel-*	: HAIKU_CPU = mipsel ;
@@ -252,10 +252,14 @@ switch $(HAIKU_CPU) {
 	}
 	case x86_64 :
 	{
+		# x86_64 completely shares the x86 bootloader.
 		HAIKU_BOOT_PLATFORM = bios_ia32 ;
 		HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 2880 ; # in kB
 		# offset in floppy image (>= sizeof(haiku_loader))
 		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 300 ; # in kB
+
+		# x86_64 kernel source is under arch/x86.
+		HAIKU_KERNEL_ARCH = x86 ;
 
 		# yasm is required for target arch x86_64
 		if ! $(HAIKU_YASM) {
@@ -306,6 +310,7 @@ HAIKU_ARCH ?= $(HAIKU_CPU) ;
 HAIKU_ARCH_MACRO_DEFINE = ARCH_$(HAIKU_ARCH) ;
 HAIKU_DEFINES += $(HAIKU_ARCH_MACRO_DEFINE) ;
 HAIKU_DEFINES += BOOT_ARCHIVE_IMAGE_OFFSET=$(HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET) ;
+HAIKU_KERNEL_ARCH ?= $(HAIKU_ARCH) ;
 HAIKU_ATA_STACK ?= 1 ;
 
 # directories
@@ -457,7 +462,7 @@ HAIKU_PRIVATE_SYSTEM_HEADERS =
 HAIKU_PRIVATE_KERNEL_HEADERS =
 	[ PrivateHeaders $(DOT) kernel libroot shared
 		kernel/boot/platform/$(HAIKU_BOOT_PLATFORM) ]
-	[ ArchHeaders $(HAIKU_ARCH) ]
+	[ ArchHeaders $(HAIKU_KERNEL_ARCH) ]
 	[ FDirName $(HAIKU_COMMON_DEBUG_OBJECT_DIR) system kernel ]
 	$(HAIKU_PRIVATE_SYSTEM_HEADERS)
 ;
@@ -968,7 +973,7 @@ if $(TARGET_PLATFORM) != haiku {
 # specified TARGET_PLATFORM.
 
 local buildVars =
-	ARCH CPU GCC_VERSION
+	ARCH CPU GCC_VERSION KERNEL_ARCH
 
 	AR CC C++ LD OBJCOPY RANLIB
 

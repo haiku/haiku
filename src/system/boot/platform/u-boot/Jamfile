@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src system boot platform u-boot ;
 
 SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform $(TARGET_BOOT_PLATFORM) ;
 
-SubDirHdrs $(HAIKU_TOP) src system boot arch $(TARGET_ARCH) ;
+SubDirHdrs $(HAIKU_TOP) src system boot arch $(TARGET_KERNEL_ARCH) ;
 
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
@@ -12,7 +12,7 @@ UsePrivateHeaders [ FDirName kernel arch generic ] ;
 
 # TODO: move this to arch/arm !
 
-UsePrivateHeaders [ FDirName kernel arch $(TARGET_ARCH) board $(TARGET_BOOT_BOARD) ] ;
+UsePrivateHeaders [ FDirName kernel arch $(TARGET_KERNEL_ARCH) board $(TARGET_BOOT_BOARD) ] ;
 
 {
 	local defines = _BOOT_MODE ;

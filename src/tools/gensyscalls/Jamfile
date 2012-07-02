@@ -42,7 +42,7 @@ rule PreprocessSyscalls
 	local headers = [ on $(1) return $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ] ;
 	local sysHeaders =
 		$(TARGET_PRIVATE_SYSTEM_HEADERS)
-		[ ArchHeaders $(TARGET_ARCH) ]
+		[ ArchHeaders $(TARGET_KERNEL_ARCH) ]
 		[ on $(1) return $(SUBDIRSYSHDRS) $(SYSHDRS) ]
 		$(HAIKU_HDRS) ;
 

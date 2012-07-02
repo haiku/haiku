@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src system boot platform cfe arch ppc ;
 
 SubDirHdrs $(HAIKU_TOP) src system boot platform $(TARGET_BOOT_PLATFORM) ;
 UsePrivateSystemHeaders ;
-UsePrivateHeaders kernel [ FDirName kernel arch $(TARGET_ARCH) ] 
+UsePrivateHeaders kernel [ FDirName kernel arch $(TARGET_KERNEL_ARCH) ] 
 	[ FDirName kernel boot platform $(HAIKU_BOOT_PLATFORM) ] ;
 
 SubDirC++Flags -fno-rtti ;
@@ -16,4 +16,4 @@ BootStaticLibrary boot_platform_cfe_ppc :
 ;
 
 SEARCH on [ FGristFiles arch_cpu_asm.S arch_mmu.cpp ]
-    = [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_ARCH) ] ;
+    = [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH) ] ;

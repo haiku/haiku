@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src system boot arch arm ;
 
 #XXX: should not be needed here
-UsePrivateHeaders [ FDirName kernel arch $(TARGET_ARCH) board $(TARGET_BOOT_BOARD) ] ;
+UsePrivateHeaders [ FDirName kernel arch $(TARGET_KERNEL_ARCH) board $(TARGET_BOOT_BOARD) ] ;
 
 {
 	local defines = _BOOT_MODE ;
@@ -22,7 +22,7 @@ local kernelLibArchObjects =
 	<src!system!kernel!lib!arch!$(TARGET_ARCH)>memset.o
 ;
 
-BootMergeObject boot_arch_$(TARGET_ARCH).o :
+BootMergeObject boot_arch_$(TARGET_KERNEL_ARCH).o :
 	debug_uart_8250.cpp
 	arch_uart_8250.cpp
 	arch_uart_pl011.cpp
@@ -38,7 +38,7 @@ BootMergeObject boot_arch_$(TARGET_ARCH).o :
 ;
 
 SEARCH on [ FGristFiles arch_elf.cpp uart.cpp arch_uart_8250.cpp arch_uart_pl011.cpp ]
-	= [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_ARCH) ] ;
+	= [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH) ] ;
 
 SEARCH on [ FGristFiles debug_uart_8250.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system kernel arch generic ] ;
