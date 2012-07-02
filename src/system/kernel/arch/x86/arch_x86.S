@@ -278,9 +278,8 @@ FUNCTION(arch_cpu_user_strlcpy):
 
 	/* If count is now 0, skip straight to null terminating
 	   as our loop will otherwise overflow */
-	cmp		$0,%ecx
-	jne		.L_user_strlcpy_copy_begin
-	movb		$0,(%edi)
+	jnz		.L_user_strlcpy_copy_begin
+	movb	$0,(%edi)
 	jmp		.L_user_strlcpy_source_count
 
 .L_user_strlcpy_copy_begin:
@@ -289,30 +288,24 @@ FUNCTION(arch_cpu_user_strlcpy):
 	/* move data by bytes */
 	movsb
 	cmpb $0,-1(%esi)
-	je .L_user_strlcpy_copy_loop_done
+	je .L_user_strlcpy_source_done
 	loop .L_user_strlcpy_copy_loop
 
-.L_user_strlcpy_copy_loop_done:
-	/* check if we copied the entire source string */
-	cmp		$0,%ecx
-	jne		.L_user_strlcpy_source_done
-
-.L_user_strlcpy_zero_terminate:
 	/* null terminate string */
 	movb	$0,(%edi)
-	dec	%esi
+	dec		%esi
 
 	/* count remaining bytes in src */
 .L_user_strlcpy_source_count:
 	not		%ecx
-	movb	$0,%al
+	xor		%al,%al
 	repnz
 	scasb
 
 .L_user_strlcpy_source_done:
 	movl	%esi,%eax
 	subl	20(%esp),%eax
-	subl	$1,%eax
+	dec		%eax
 	/* restore the old fault handler */
 	movl	%ebx,(%edx)
 
