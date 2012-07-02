@@ -156,7 +156,7 @@ RequestBuilder::_GenerateLockOwner(XDR::WriteStream& stream,
 
 	uint64 lockOwner[2];
 	lockOwner[0] = owner->fOwner;
-	lockOwner[1] = cookie->fOwnerId;
+	lockOwner[1] = cookie->fInfo.fFileId;
 	stream.AddOpaque(lockOwner, sizeof(lockOwner));
 }
 
