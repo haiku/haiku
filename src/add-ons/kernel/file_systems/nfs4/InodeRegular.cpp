@@ -66,6 +66,7 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 	cookie->fSequence = 0;
 	cookie->fLocks = NULL;
 
+	bool badOwner = false;
 	Filehandle fh;
 	do {
 		cookie->fClientId = fFilesystem->NFSServer()->ClientId();
@@ -91,14 +92,14 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 		cattr[i].fData.fValue32 = perms;
 		i++;
 
-		if (fFilesystem->IsAttrSupported(FATTR4_OWNER)) {
+		if (!badOwner && fFilesystem->IsAttrSupported(FATTR4_OWNER)) {
 			cattr[i].fAttribute = FATTR4_OWNER;
 			cattr[i].fFreePointer = true;
 			cattr[i].fData.fPointer = gIdMapper->GetOwner(getuid());
 			i++;
 		}
 
-		if (fFilesystem->IsAttrSupported(FATTR4_OWNER_GROUP)) {
+		if (!badOwner && fFilesystem->IsAttrSupported(FATTR4_OWNER_GROUP)) {
 			cattr[i].fAttribute = FATTR4_OWNER_GROUP;
 			cattr[i].fFreePointer = true;
 			cattr[i].fData.fPointer = gIdMapper->GetOwnerGroup(getgid());
@@ -122,6 +123,10 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 
 		ReplyInterpreter& reply = request.Reply();
 
+		if (reply.NFS4Error() == NFS4ERR_BADOWNER) {
+			badOwner = true;
+			continue;
+		}
 		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
 

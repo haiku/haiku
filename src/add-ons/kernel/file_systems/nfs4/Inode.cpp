@@ -340,6 +340,8 @@ Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName)
 status_t
 Inode::CreateLink(const char* name, const char* path, int mode)
 {
+	bool badOwner = false;
+
 	do {
 		RPC::Server* serv = fFilesystem->Server();
 		Request request(serv);
@@ -354,14 +356,14 @@ Inode::CreateLink(const char* name, const char* path, int mode)
 		cattr[i].fData.fValue32 = mode;
 		i++;
 
-		if (fFilesystem->IsAttrSupported(FATTR4_OWNER)) {
+		if (!badOwner && fFilesystem->IsAttrSupported(FATTR4_OWNER)) {
 			cattr[i].fAttribute = FATTR4_OWNER;
 			cattr[i].fFreePointer = true;
 			cattr[i].fData.fPointer = gIdMapper->GetOwner(getuid());
 			i++;
 		}
 
-		if (fFilesystem->IsAttrSupported(FATTR4_OWNER_GROUP)) {
+		if (!badOwner && fFilesystem->IsAttrSupported(FATTR4_OWNER_GROUP)) {
 			cattr[i].fAttribute = FATTR4_OWNER_GROUP;
 			cattr[i].fFreePointer = true;
 			cattr[i].fData.fPointer = gIdMapper->GetOwnerGroup(getgid());
@@ -376,6 +378,10 @@ Inode::CreateLink(const char* name, const char* path, int mode)
 
 		ReplyInterpreter& reply = request.Reply();
 
+		if (reply.NFS4Error() == NFS4ERR_BADOWNER) {
+			badOwner = true;
+			continue;
+		}
 		if (_HandleErrors(reply.NFS4Error(), serv))
 			continue;
 
