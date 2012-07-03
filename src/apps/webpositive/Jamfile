@@ -1,0 +1,65 @@
+SubDir HAIKU_TOP src apps webpositive ;
+
+UseLibraryHeaders webkit ;
+
+SubDirC++Flags $(defines) -Wno-error=sequence-point ;
+SubDirCcFlags $(defines) -Wno-error=sequence-point ;
+
+# source directories
+local sourceDirs =
+	autocompletion
+	support
+	tabview
+;
+
+local sourceDir ;
+for sourceDir in $(sourceDirs) {
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps webpositive $(sourceDir) ] ;
+}
+
+# SVN revision
+#local svnRevisionFile = [ FGristFiles svn_revision ] ;
+#MakeLocate $(svnRevisionFile) : $(LOCATE_TARGET) ;
+#CreateSVNRevisionFile $(svnRevisionFile) ;
+
+Application WebPositive :
+	# autocompletion
+	AutoCompleter.cpp
+	AutoCompleterDefaultImpl.cpp
+	TextViewCompleter.cpp
+
+	# support
+	BaseURL.cpp
+	BitmapButton.cpp
+	DateTime.cpp
+	FontSelectionView.cpp
+	IconButton.cpp
+	SettingsMessage.cpp
+	StringForSize.cpp
+
+	# tabview
+	TabContainerView.cpp
+	TabManager.cpp
+	TabView.cpp
+
+	AuthenticationPanel.cpp
+	BrowserApp.cpp
+	BrowserWindow.cpp
+	BrowsingHistory.cpp
+	CredentialsStorage.cpp
+	DownloadProgressView.cpp
+	DownloadWindow.cpp
+	SettingsKeys.cpp
+	SettingsWindow.cpp
+	svn_revision.cpp
+	URLInputGroup.cpp
+	:
+	# webkit libs
+	javascriptcore webcore webkit wtf
+	# dependencies
+	curl icuuc icudata png sqlite3 xml2 z
+	# haiku
+	be bsd localestub network stdc++ tracker translation
+	:
+	WebPositive.rdef
+;
