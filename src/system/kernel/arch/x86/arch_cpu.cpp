@@ -28,7 +28,6 @@
 
 #include <arch_system_info.h>
 #include <arch/x86/apic.h>
-#include <arch/x86/selector.h>
 #include <boot/kernel_args.h>
 
 #include "interrupts.h"
@@ -821,10 +820,6 @@ arch_cpu_init_post_vm(kernel_args *args)
 	gGDT = (segment_descriptor *)(addr_t)args->arch_args.vir_gdt;
 	create_area("gdt", (void **)&gGDT, B_EXACT_ADDRESS, B_PAGE_SIZE,
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-
-	// currently taken out of the build, because it's not yet used (and assumes
-	// (a fixed number of used GDT entries)
-	//i386_selector_init(gGDT);  // pass the new gdt
 
 	// allocate an area for the double fault stacks
 	virtual_address_restrictions virtualRestrictions = {};
