@@ -6,7 +6,9 @@
 
 #include <asm_defs.h>
 
-#include <arch/x86_64/descriptors.h>
+#define __x86_64__
+#include <arch/x86/descriptors.h>
+#undef __x86_64__
 
 
 .code32
