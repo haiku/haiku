@@ -355,7 +355,7 @@ init_double_fault(int cpuNum)
 	tss->sp0 = (uint32)x86_get_double_fault_stack(cpuNum, &stackSize);
 	tss->sp0 += stackSize;
 	tss->ss0 = KERNEL_DATA_SEG;
-	read_cr3(tss->cr3);
+	tss->cr3 = x86_read_cr3();
 		// copy the current cr3 to the double fault cr3
 	tss->eip = (uint32)&double_fault;
 	tss->es = KERNEL_DATA_SEG;

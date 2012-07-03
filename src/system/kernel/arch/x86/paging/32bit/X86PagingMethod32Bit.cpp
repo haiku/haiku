@@ -419,9 +419,8 @@ X86PagingMethod32Bit::IsKernelPageAccessible(addr_t virtualAddress,
 {
 	// We only trust the kernel team's page directory. So switch to it first.
 	// Always set it to make sure the TLBs don't contain obsolete data.
-	uint32 physicalPageDirectory;
-	read_cr3(physicalPageDirectory);
-	write_cr3(fKernelPhysicalPageDirectory);
+	uint32 physicalPageDirectory = x86_read_cr3();
+	x86_write_cr3(fKernelPhysicalPageDirectory);
 
 	// get the page directory entry for the address
 	page_directory_entry pageDirectoryEntry;
@@ -465,7 +464,7 @@ X86PagingMethod32Bit::IsKernelPageAccessible(addr_t virtualAddress,
 
 	// switch back to the original page directory
 	if (physicalPageDirectory != fKernelPhysicalPageDirectory)
-		write_cr3(physicalPageDirectory);
+		x86_write_cr3(physicalPageDirectory);
 
 	if ((pageTableEntry & X86_PTE_PRESENT) == 0)
 		return false;

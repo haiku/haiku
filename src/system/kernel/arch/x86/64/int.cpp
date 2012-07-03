@@ -53,7 +53,7 @@ extern void hardware_interrupt(struct iframe* frame);
 
 
 static const char*
-exception_name(unsigned long number, char* buffer, size_t bufferSize)
+exception_name(uint64 number, char* buffer, size_t bufferSize)
 {
 	if (number >= 0
 			&& number < (sizeof(kInterruptNames) / sizeof(kInterruptNames[0])))
@@ -97,8 +97,7 @@ unexpected_exception(iframe* frame)
 static void
 page_fault_exception(iframe* frame)
 {
-	unsigned long cr2;
-	read_cr2(cr2);
+	addr_t cr2 = x86_read_cr2();
 
 	panic("page fault exception at ip %#lx on %#lx, error code %#lx\n",
 		frame->rip, cr2, frame->error_code);

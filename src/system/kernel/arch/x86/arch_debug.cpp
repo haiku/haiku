@@ -401,8 +401,8 @@ setup_for_thread(char *arg, Thread **_thread, uint32 *_ebp,
 				thread_get_current_thread(), thread);
 
 			if (newPageDirectory != 0) {
-				read_cr3(*_oldPageDirectory);
-				write_cr3(newPageDirectory);
+				*_oldPageDirectory = x86_read_cr3();
+				x86_write_cr3(newPageDirectory);
 			}
 
 			if (thread->state == B_THREAD_RUNNING) {
@@ -669,7 +669,7 @@ stack_trace(int argc, char **argv)
 
 	if (oldPageDirectory != 0) {
 		// switch back to the previous page directory to no cause any troubles
-		write_cr3(oldPageDirectory);
+		x86_write_cr3(oldPageDirectory);
 	}
 
 	return 0;
@@ -829,7 +829,7 @@ show_call(int argc, char **argv)
 
 	if (oldPageDirectory != 0) {
 		// switch back to the previous page directory to not cause any troubles
-		write_cr3(oldPageDirectory);
+		x86_write_cr3(oldPageDirectory);
 	}
 
 	return 0;
@@ -938,8 +938,8 @@ cmd_in_context(int argc, char** argv)
 			thread_get_current_thread(), thread);
 
 		if (newPageDirectory != 0) {
-			read_cr3(oldPageDirectory);
-			write_cr3(newPageDirectory);
+			oldPageDirectory = x86_read_cr3();
+			x86_write_cr3(newPageDirectory);
 		}
 	}
 
@@ -951,7 +951,7 @@ cmd_in_context(int argc, char** argv)
 
 	// reset the page directory
 	if (oldPageDirectory)
-		write_cr3(oldPageDirectory);
+		x86_write_cr3(oldPageDirectory);
 
 	return 0;
 }
@@ -1128,7 +1128,7 @@ arch_debug_get_interrupt_pc(bool* _isSyscall)
 void
 arch_debug_unset_current_thread(void)
 {
-	write_dr3(NULL);
+	x86_write_dr3(NULL);
 }
 
 

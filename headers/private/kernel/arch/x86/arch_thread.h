@@ -57,8 +57,7 @@ void arch_syscall_64_bit_return_value(void);
 static inline Thread*
 arch_thread_get_current_thread(void)
 {
-	Thread* t;
-	read_dr3(t);
+	Thread* t = (Thread*)x86_read_dr3();
 	return t;
 }
 
@@ -66,7 +65,7 @@ arch_thread_get_current_thread(void)
 static inline void
 arch_thread_set_current_thread(Thread* t)
 {
-	write_dr3(t);
+	x86_write_dr3(t);
 }
 
 

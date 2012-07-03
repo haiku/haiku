@@ -163,7 +163,7 @@ struct X86PagingMethodPAE::ToPAESwitcher {
 private:
 	static void _EnablePAE(void* physicalPDPT, int cpu)
 	{
-		write_cr3((addr_t)physicalPDPT);
+		x86_write_cr3((addr_t)physicalPDPT);
 		x86_write_cr4(x86_read_cr4() | IA32_CR4_PAE | IA32_CR4_GLOBAL_PAGES);
 	}
 
@@ -681,9 +681,8 @@ X86PagingMethodPAE::IsKernelPageAccessible(addr_t virtualAddress,
 	// We only trust the kernel team's page directories. So switch to the
 	// kernel PDPT first. Always set it to make sure the TLBs don't contain
 	// obsolete data.
-	uint32 physicalPDPT;
-	read_cr3(physicalPDPT);
-	write_cr3(fKernelPhysicalPageDirPointerTable);
+	uint32 physicalPDPT = x86_read_cr3();
+	x86_write_cr3(fKernelPhysicalPageDirPointerTable);
 
 	// get the PDPT entry for the address
 	pae_page_directory_pointer_table_entry pdptEntry = 0;
@@ -734,7 +733,7 @@ X86PagingMethodPAE::IsKernelPageAccessible(addr_t virtualAddress,
 
 	// switch back to the original page directory
 	if (physicalPDPT != fKernelPhysicalPageDirPointerTable)
-		write_cr3(physicalPDPT);
+		x86_write_cr3(physicalPDPT);
 
 	if ((pageTableEntry & X86_PAE_PTE_PRESENT) == 0)
 		return false;

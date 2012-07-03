@@ -28,6 +28,7 @@ if $(TARGET_ARCH) = x86_64 {
 	SEARCH_SOURCE += [ FDirName $(SUBDIR) 32 ] ;
 
 	archSpecificSources =
+		arch.S
 		int.cpp
 		interrupts.S
 
@@ -42,7 +43,6 @@ if $(TARGET_ARCH) = x86_64 {
 		arch_timer.cpp
 		arch_vm.cpp
 		arch_vm_translation_map.cpp
-		arch_x86.S
 		arch_system_info.cpp
 		arch_user_debugger.cpp
 		apic.cpp

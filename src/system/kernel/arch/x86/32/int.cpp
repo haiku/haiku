@@ -322,8 +322,7 @@ x86_double_fault_exception(struct iframe* frame)
 void
 x86_page_fault_exception_double_fault(struct iframe* frame)
 {
-	uint32 cr2;
-	asm("movl %%cr2, %0" : "=r" (cr2));
+	addr_t cr2 = x86_read_cr2();
 
 	// Only if this CPU has a fault handler, we're allowed to be here.
 	cpu_ent& cpu = gCPU[x86_double_fault_get_cpu()];
@@ -351,10 +350,8 @@ static void
 page_fault_exception(struct iframe* frame)
 {
 	Thread *thread = thread_get_current_thread();
-	uint32 cr2;
+	addr_t cr2 = x86_read_cr2();
 	addr_t newip;
-
-	asm("movl %%cr2, %0" : "=r" (cr2));
 
 	if (debug_debugger_running()) {
 		// If this CPU or this thread has a fault handler, we're allowed to be

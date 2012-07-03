@@ -21,7 +21,7 @@ arch_int_enable_interrupts_inline(void)
 static inline int
 arch_int_disable_interrupts_inline(void)
 {
-	unsigned long flags;
+	size_t flags;
 
 	asm volatile("pushf;\n"
 		"pop %0;\n"
@@ -41,7 +41,7 @@ arch_int_restore_interrupts_inline(int oldState)
 static inline bool
 arch_int_are_interrupts_enabled_inline(void)
 {
-	unsigned long flags;
+	size_t flags;
 
 	asm volatile("pushf;\n"
 		"pop %0;\n" : "=g" (flags));

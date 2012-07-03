@@ -270,19 +270,46 @@ typedef struct arch_cpu_info {
 
 #define nop() __asm__ ("nop"::)
 
-#define read_cr2(value) \
-	__asm__("mov	%%cr2,%0" : "=r" (value))
+#define x86_read_cr0() ({ \
+	size_t _v; \
+	__asm__("mov	%%cr0,%0" : "=r" (_v)); \
+	_v; \
+})
 
-#define read_cr3(value) \
-	__asm__("mov	%%cr3,%0" : "=r" (value))
+#define x86_write_cr0(value) \
+	__asm__("mov	%0,%%cr0" : : "r" (value))
 
-#define write_cr3(value) \
+#define x86_read_cr2() ({ \
+	size_t _v; \
+	__asm__("mov	%%cr2,%0" : "=r" (_v)); \
+	_v; \
+})
+
+#define x86_read_cr3() ({ \
+	size_t _v; \
+	__asm__("mov	%%cr3,%0" : "=r" (_v)); \
+	_v; \
+})
+
+#define x86_write_cr3(value) \
 	__asm__("mov	%0,%%cr3" : : "r" (value))
 
-#define read_dr3(value) \
-	__asm__("mov	%%dr3,%0" : "=r" (value))
+#define x86_read_cr4() ({ \
+	size_t _v; \
+	__asm__("mov	%%cr4,%0" : "=r" (_v)); \
+	_v; \
+})
 
-#define write_dr3(value) \
+#define x86_write_cr4(value) \
+	__asm__("mov	%0,%%cr4" : : "r" (value))
+
+#define x86_read_dr3() ({ \
+	size_t _v; \
+	__asm__("mov	%%dr3,%0" : "=r" (_v)); \
+	_v; \
+})
+
+#define x86_write_dr3(value) \
 	__asm__("mov	%0,%%dr3" : : "r" (value))
 
 #define invalidate_TLB(va) \
@@ -360,10 +387,6 @@ void i386_noop_swap(void* oldFpuState, const void* newFpuState);
 void i386_fnsave_swap(void* oldFpuState, const void* newFpuState);
 void i386_fxsave_swap(void* oldFpuState, const void* newFpuState);
 uint32 x86_read_ebp();
-uint32 x86_read_cr0();
-void x86_write_cr0(uint32 value);
-uint32 x86_read_cr4();
-void x86_write_cr4(uint32 value);
 uint64 x86_read_msr(uint32 registerNumber);
 void x86_write_msr(uint32 registerNumber, uint64 value);
 void x86_set_task_gate(int32 cpu, int32 n, int32 segment);

@@ -86,32 +86,6 @@ FUNCTION(x86_read_ebp):
 	ret
 FUNCTION_END(x86_read_ebp)
 
-/* uint32 x86_read_cr0(); */
-FUNCTION(x86_read_cr0):
-	movl	%cr0, %eax
-	ret
-FUNCTION_END(x86_read_cr0)
-
-/* void x86_write_cr0(uint32 value); */
-FUNCTION(x86_write_cr0):
-	movl	4(%esp), %eax
-	movl	%eax, %cr0
-	ret
-FUNCTION_END(x86_write_cr0)
-
-/* uint32 x86_read_cr4(); */
-FUNCTION(x86_read_cr4):
-	movl	%cr4, %eax
-	ret
-FUNCTION_END(x86_read_cr4)
-
-/* void x86_write_cr4(uint32 value); */
-FUNCTION(x86_write_cr4):
-	movl	4(%esp), %eax
-	movl	%eax, %cr4
-	ret
-FUNCTION_END(x86_write_cr4)
-
 /* uint64 x86_read_msr(uint32 register); */
 FUNCTION(x86_read_msr):
 	movl	4(%esp), %ecx
