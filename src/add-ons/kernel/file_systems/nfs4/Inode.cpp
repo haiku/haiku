@@ -9,6 +9,7 @@
 
 #include "Inode.h"
 
+#include <ctype.h>
 #include <string.h>
 
 #include <NodeMonitor.h>
@@ -547,14 +548,20 @@ Inode::Stat(struct stat* st)
 
 		if (count >= next && values[next].fAttribute == FATTR4_OWNER) {
 			char* owner = reinterpret_cast<char*>(values[next].fData.fPointer);
-			st->st_uid = gIdMapper->GetUserId(owner);
+			if (owner != NULL && isdigit(owner[0]))
+				st->st_uid = atoi(owner);
+			else
+				st->st_uid = gIdMapper->GetUserId(owner);
 			next++;
 		} else
 			st->st_uid = 0;
 
 		if (count >= next && values[next].fAttribute == FATTR4_OWNER_GROUP) {
 			char* group = reinterpret_cast<char*>(values[next].fData.fPointer);
-			st->st_gid = gIdMapper->GetGroupId(group);
+			if (group != NULL && isdigit(group[0]))
+				st->st_gid = atoi(group);
+			else
+				st->st_gid = gIdMapper->GetGroupId(group);
 			next++;
 		} else
 			st->st_gid = 0;
