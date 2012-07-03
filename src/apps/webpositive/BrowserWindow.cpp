@@ -31,12 +31,12 @@
  */
 
 #include "config.h"
-#include "LauncherWindow.h"
+#include "BrowserWindow.h"
 
 #include "AuthenticationPanel.h"
+#include "BrowserApp.h"
 #include "BrowsingHistory.h"
 #include "IconButton.h"
-#include "LauncherApp.h"
 #include "WebPage.h"
 #include "WebTabView.h"
 #include "WebView.h"
@@ -61,628 +61,687 @@
 
 #include <stdio.h>
 
+
 enum {
 	OPEN_LOCATION = 'open',
-    GO_BACK = 'goba',
-    GO_FORWARD = 'gofo',
-    STOP = 'stop',
-    GOTO_URL = 'goul',
-    RELOAD = 'reld',
-    CLEAR_HISTORY = 'clhs',
+	GO_BACK = 'goba',
+	GO_FORWARD = 'gofo',
+	STOP = 'stop',
+	GOTO_URL = 'goul',
+	RELOAD = 'reld',
+	CLEAR_HISTORY = 'clhs',
 
-    TEXT_SIZE_INCREASE = 'tsin',
-    TEXT_SIZE_DECREASE = 'tsdc',
-    TEXT_SIZE_RESET = 'tsrs',
+	TEXT_SIZE_INCREASE = 'tsin',
+	TEXT_SIZE_DECREASE = 'tsdc',
+	TEXT_SIZE_RESET = 'tsrs',
 
-    TEXT_SHOW_FIND_GROUP = 'sfnd',
-    TEXT_HIDE_FIND_GROUP = 'hfnd',
-    TEXT_FIND_NEXT = 'fndn',
-    TEXT_FIND_PREVIOUS = 'fndp',
+	TEXT_SHOW_FIND_GROUP = 'sfnd',
+	TEXT_HIDE_FIND_GROUP = 'hfnd',
+	TEXT_FIND_NEXT = 'fndn',
+	TEXT_FIND_PREVIOUS = 'fndp',
 };
 
-using namespace WebCore;
 
-static BLayoutItem* layoutItemFor(BView* view)
+static BLayoutItem*
+layoutItemFor(BView* view)
 {
-    BLayout* layout = view->Parent()->GetLayout();
-    int32 index = layout->IndexOfView(view);
-    return layout->ItemAt(index);
+	BLayout* layout = view->Parent()->GetLayout();
+	int32 index = layout->IndexOfView(view);
+	return layout->ItemAt(index);
 }
 
-LauncherWindow::LauncherWindow(BRect frame, const BMessenger& downloadListener,
-        ToolbarPolicy toolbarPolicy)
-    : BWebWindow(frame, "HaikuLauncher",
-        B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-        B_AUTO_UPDATE_SIZE_LIMITS | B_ASYNCHRONOUS_CONTROLS)
-    , m_downloadListener(downloadListener)
+
+BrowserWindow::BrowserWindow(BRect frame, const BMessenger& downloadListener,
+		ToolbarPolicy toolbarPolicy)
+	: BWebWindow(frame, kApplicationName,
+		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+		B_AUTO_UPDATE_SIZE_LIMITS | B_ASYNCHRONOUS_CONTROLS)
+	, fDownloadListener(downloadListener)
 {
-    BMessage* newTabMessage = new BMessage(NEW_TAB);
-    newTabMessage->AddString("url", "");
-    newTabMessage->AddPointer("window", this);
-    newTabMessage->AddBool("select", true);
-    m_tabManager = new TabManager(BMessenger(this), newTabMessage);
+	BMessage* newTabMessage = new BMessage(NEW_TAB);
+	newTabMessage->AddString("url", "");
+	newTabMessage->AddPointer("window", this);
+	newTabMessage->AddBool("select", true);
+	fTabManager = new TabManager(BMessenger(this), newTabMessage);
 
-    if (toolbarPolicy == HaveToolbar) {
-        // Menu
-        m_menuBar = new BMenuBar("Main menu");
-        BMenu* menu = new BMenu("Window");
-        BMessage* newWindowMessage = new BMessage(NEW_WINDOW);
-        newWindowMessage->AddString("url", "");
-        BMenuItem* newItem = new BMenuItem("New window", newWindowMessage, 'N');
-        menu->AddItem(newItem);
-        newItem->SetTarget(be_app);
-        newItem = new BMenuItem("New tab", new BMessage(*newTabMessage), 'T');
-        menu->AddItem(newItem);
-        newItem->SetTarget(be_app);
-        menu->AddItem(new BMenuItem("Open location", new BMessage(OPEN_LOCATION), 'L'));
-        menu->AddSeparatorItem();
-        menu->AddItem(new BMenuItem("Close window", new BMessage(B_QUIT_REQUESTED), 'W', B_SHIFT_KEY));
-        menu->AddItem(new BMenuItem("Close tab", new BMessage(CLOSE_TAB), 'W'));
-        menu->AddSeparatorItem();
-        menu->AddItem(new BMenuItem("Show downloads", new BMessage(SHOW_DOWNLOAD_WINDOW), 'J'));
-        menu->AddSeparatorItem();
-        BMenuItem* quitItem = new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q');
-        menu->AddItem(quitItem);
-        quitItem->SetTarget(be_app);
-        m_menuBar->AddItem(menu);
+	if (toolbarPolicy == HaveToolbar) {
+		// Menu
+		fMenuBar = new BMenuBar("Main menu");
+		BMenu* menu = new BMenu("Window");
+		BMessage* newWindowMessage = new BMessage(NEW_WINDOW);
+		newWindowMessage->AddString("url", "");
+		BMenuItem* newItem = new BMenuItem("New window", newWindowMessage, 'N');
+		menu->AddItem(newItem);
+		newItem->SetTarget(be_app);
+		newItem = new BMenuItem("New tab", new BMessage(*newTabMessage), 'T');
+		menu->AddItem(newItem);
+		newItem->SetTarget(be_app);
+		menu->AddItem(new BMenuItem("Open location", new BMessage(OPEN_LOCATION), 'L'));
+		menu->AddSeparatorItem();
+		menu->AddItem(new BMenuItem("Close window", new BMessage(B_QUIT_REQUESTED), 'W', B_SHIFT_KEY));
+		menu->AddItem(new BMenuItem("Close tab", new BMessage(CLOSE_TAB), 'W'));
+		menu->AddSeparatorItem();
+		menu->AddItem(new BMenuItem("Show downloads", new BMessage(SHOW_DOWNLOAD_WINDOW), 'J'));
+		menu->AddSeparatorItem();
+		BMenuItem* quitItem = new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q');
+		menu->AddItem(quitItem);
+		quitItem->SetTarget(be_app);
+		fMenuBar->AddItem(menu);
 
-        menu = new BMenu("Text");
-        menu->AddItem(new BMenuItem("Find", new BMessage(TEXT_SHOW_FIND_GROUP), 'F'));
-        menu->AddSeparatorItem();
-        menu->AddItem(new BMenuItem("Increase size", new BMessage(TEXT_SIZE_INCREASE), '+'));
-        menu->AddItem(new BMenuItem("Decrease size", new BMessage(TEXT_SIZE_DECREASE), '-'));
-        menu->AddItem(new BMenuItem("Reset size", new BMessage(TEXT_SIZE_RESET), '0'));
-        m_menuBar->AddItem(menu);
+		menu = new BMenu("Text");
+		menu->AddItem(new BMenuItem("Find", new BMessage(TEXT_SHOW_FIND_GROUP), 'F'));
+		menu->AddSeparatorItem();
+		menu->AddItem(new BMenuItem("Increase size", new BMessage(TEXT_SIZE_INCREASE), '+'));
+		menu->AddItem(new BMenuItem("Decrease size", new BMessage(TEXT_SIZE_DECREASE), '-'));
+		menu->AddItem(new BMenuItem("Reset size", new BMessage(TEXT_SIZE_RESET), '0'));
+		fMenuBar->AddItem(menu);
 
-        m_goMenu = new BMenu("Go");
-        m_menuBar->AddItem(m_goMenu);
+		fGoMenu = new BMenu("Go");
+		fMenuBar->AddItem(fGoMenu);
 
-        // Back, Forward & Stop
-        m_BackButton = new IconButton("Back", 0, NULL, new BMessage(GO_BACK));
-        m_BackButton->SetIcon(201);
-        m_BackButton->TrimIcon();
+		// Back, Forward & Stop
+		fBackButton = new IconButton("Back", 0, NULL, new BMessage(GO_BACK));
+		fBackButton->SetIcon(201);
+		fBackButton->TrimIcon();
 
-        m_ForwardButton = new IconButton("Forward", 0, NULL, new BMessage(GO_FORWARD));
-        m_ForwardButton->SetIcon(202);
-        m_ForwardButton->TrimIcon();
+		fForwardButton = new IconButton("Forward", 0, NULL, new BMessage(GO_FORWARD));
+		fForwardButton->SetIcon(202);
+		fForwardButton->TrimIcon();
 
-        m_StopButton = new IconButton("Stop", 0, NULL, new BMessage(STOP));
-        m_StopButton->SetIcon(204);
-        m_StopButton->TrimIcon();
+		fStopButton = new IconButton("Stop", 0, NULL, new BMessage(STOP));
+		fStopButton->SetIcon(204);
+		fStopButton->TrimIcon();
 
-        // URL
-        m_url = new BTextControl("url", "", "", NULL);
-        m_url->SetDivider(50.0);
+		// URL
+		fURLTextControl = new BTextControl("url", "", "", NULL);
+		fURLTextControl->SetDivider(50.0);
 
-        // Go
-        m_goButton = new BButton("", "Go", new BMessage(GOTO_URL));
+		// Go
+		fGoButton = new BButton("", "Go", new BMessage(GOTO_URL));
 
-        // Status Bar
-        m_statusText = new BStringView("status", "");
-        m_statusText->SetAlignment(B_ALIGN_LEFT);
-        m_statusText->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
-        m_statusText->SetExplicitMinSize(BSize(150, 12));
-            // Prevent the window from growing to fit a long status message...
-        BFont font(be_plain_font);
-        font.SetSize(ceilf(font.Size() * 0.8));
-        m_statusText->SetFont(&font, B_FONT_SIZE);
+		// Status Bar
+		fStatusText = new BStringView("status", "");
+		fStatusText->SetAlignment(B_ALIGN_LEFT);
+		fStatusText->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+		fStatusText->SetExplicitMinSize(BSize(150, 12));
+			// Prevent the window from growing to fit a long status message...
+		BFont font(be_plain_font);
+		font.SetSize(ceilf(font.Size() * 0.8));
+		fStatusText->SetFont(&font, B_FONT_SIZE);
 
-        // Loading progress bar
-        m_loadingProgressBar = new BStatusBar("progress");
-        m_loadingProgressBar->SetMaxValue(100);
-        m_loadingProgressBar->Hide();
-        m_loadingProgressBar->SetBarHeight(12);
+		// Loading progress bar
+		fLoadingProgressBar = new BStatusBar("progress");
+		fLoadingProgressBar->SetMaxValue(100);
+		fLoadingProgressBar->Hide();
+		fLoadingProgressBar->SetBarHeight(12);
 
-        const float kInsetSpacing = 5;
-        const float kElementSpacing = 7;
+		const float kInsetSpacing = 5;
+		const float kElementSpacing = 7;
 
-        m_findTextControl = new BTextControl("find", "Find:", "",
-            new BMessage(TEXT_FIND_NEXT));
-        m_findCaseSensitiveCheckBox = new BCheckBox("Match case");
-        BView* findGroup = BGroupLayoutBuilder(B_VERTICAL)
-            .Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
-            .Add(BGroupLayoutBuilder(B_HORIZONTAL, kElementSpacing)
-                .Add(m_findTextControl)
-                .Add(new BButton("Previous", new BMessage(TEXT_FIND_PREVIOUS)))
-                .Add(new BButton("Next", new BMessage(TEXT_FIND_NEXT)))
-                .Add(m_findCaseSensitiveCheckBox)
-                .Add(BSpaceLayoutItem::CreateGlue())
-                .Add(new BButton("Close", new BMessage(TEXT_HIDE_FIND_GROUP)))
-                .SetInsets(kInsetSpacing, kInsetSpacing,
-                    kInsetSpacing, kInsetSpacing)
-            )
-        ;
-        // Layout
-        AddChild(BGroupLayoutBuilder(B_VERTICAL)
-            .Add(m_menuBar)
-            .Add(m_tabManager->TabGroup())
-            .Add(BGridLayoutBuilder(kElementSpacing, kElementSpacing)
-                .Add(m_BackButton, 0, 0)
-                .Add(m_ForwardButton, 1, 0)
-                .Add(m_StopButton, 2, 0)
-                .Add(m_url, 3, 0)
-                .Add(m_goButton, 4, 0)
-                .SetInsets(kInsetSpacing, kInsetSpacing, kInsetSpacing, kInsetSpacing)
-            )
-            .Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
-            .Add(m_tabManager->ContainerView())
-            .Add(findGroup)
-            .Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
-            .Add(BGroupLayoutBuilder(B_HORIZONTAL, kElementSpacing)
-                .Add(m_statusText)
-                .Add(m_loadingProgressBar, 0.2)
-                .AddStrut(12 - kElementSpacing)
-                .SetInsets(kInsetSpacing, 0, kInsetSpacing, 0)
-            )
-        );
+		fFindTextControl = new BTextControl("find", "Find:", "",
+			new BMessage(TEXT_FIND_NEXT));
+		fFindCaseSensitiveCheckBox = new BCheckBox("Match case");
+		BView* findGroup = BGroupLayoutBuilder(B_VERTICAL)
+			.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
+			.Add(BGroupLayoutBuilder(B_HORIZONTAL, kElementSpacing)
+				.Add(fFindTextControl)
+				.Add(new BButton("Previous", new BMessage(TEXT_FIND_PREVIOUS)))
+				.Add(new BButton("Next", new BMessage(TEXT_FIND_NEXT)))
+				.Add(fFindCaseSensitiveCheckBox)
+				.Add(BSpaceLayoutItem::CreateGlue())
+				.Add(new BButton("Close", new BMessage(TEXT_HIDE_FIND_GROUP)))
+				.SetInsets(kInsetSpacing, kInsetSpacing,
+					kInsetSpacing, kInsetSpacing)
+			)
+		;
+		// Layout
+		AddChild(BGroupLayoutBuilder(B_VERTICAL)
+			.Add(fMenuBar)
+			.Add(fTabManager->TabGroup())
+			.Add(BGridLayoutBuilder(kElementSpacing, kElementSpacing)
+				.Add(fBackButton, 0, 0)
+				.Add(fForwardButton, 1, 0)
+				.Add(fStopButton, 2, 0)
+				.Add(fURLTextControl, 3, 0)
+				.Add(fGoButton, 4, 0)
+				.SetInsets(kInsetSpacing, kInsetSpacing, kInsetSpacing, kInsetSpacing)
+			)
+			.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
+			.Add(fTabManager->ContainerView())
+			.Add(findGroup)
+			.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
+			.Add(BGroupLayoutBuilder(B_HORIZONTAL, kElementSpacing)
+				.Add(fStatusText)
+				.Add(fLoadingProgressBar, 0.2)
+				.AddStrut(12 - kElementSpacing)
+				.SetInsets(kInsetSpacing, 0, kInsetSpacing, 0)
+			)
+		);
 
-        m_url->MakeFocus(true);
+		fURLTextControl->MakeFocus(true);
 
-        m_findGroup = layoutItemFor(findGroup);
-        m_tabGroup = layoutItemFor(m_tabManager->TabGroup());
-    } else {
-        m_BackButton = 0;
-        m_ForwardButton = 0;
-        m_StopButton = 0;
-        m_goButton = 0;
-        m_url = 0;
-        m_menuBar = 0;
-        m_statusText = 0;
-        m_loadingProgressBar = 0;
+		fFindGroup = layoutItemFor(findGroup);
+		fTabGroup = layoutItemFor(fTabManager->TabGroup());
+	} else {
+		fBackButton = 0;
+		fForwardButton = 0;
+		fStopButton = 0;
+		fGoButton = 0;
+		fURLTextControl = 0;
+		fMenuBar = 0;
+		fStatusText = 0;
+		fLoadingProgressBar = 0;
 
-        BWebView* webView = new BWebView("web_view");
-        SetCurrentWebView(webView);
+		BWebView* webView = new BWebView("web_view");
+		SetCurrentWebView(webView);
 
-        AddChild(BGroupLayoutBuilder(B_VERTICAL, 7)
-            .Add(CurrentWebView())
-        );
-    }
+		AddChild(BGroupLayoutBuilder(B_VERTICAL, 7)
+			.Add(CurrentWebView())
+		);
+	}
 
-    newTab("", true);
+	CreateNewTab("", true);
 
-    m_findGroup->SetVisible(false);
+	fFindGroup->SetVisible(false);
 
-    AddShortcut('G', B_COMMAND_KEY, new BMessage(TEXT_FIND_NEXT));
-    AddShortcut('G', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(TEXT_FIND_PREVIOUS));
-    AddShortcut('F', B_COMMAND_KEY, new BMessage(TEXT_SHOW_FIND_GROUP));
-    AddShortcut('F', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(TEXT_HIDE_FIND_GROUP));
-    AddShortcut('R', B_COMMAND_KEY, new BMessage(RELOAD));
+	AddShortcut('G', B_COMMAND_KEY, new BMessage(TEXT_FIND_NEXT));
+	AddShortcut('G', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(TEXT_FIND_PREVIOUS));
+	AddShortcut('F', B_COMMAND_KEY, new BMessage(TEXT_SHOW_FIND_GROUP));
+	AddShortcut('F', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(TEXT_HIDE_FIND_GROUP));
+	AddShortcut('R', B_COMMAND_KEY, new BMessage(RELOAD));
 	
-    be_app->PostMessage(WINDOW_OPENED);
+	be_app->PostMessage(WINDOW_OPENED);
 }
 
-LauncherWindow::~LauncherWindow()
+
+BrowserWindow::~BrowserWindow()
 {
 }
 
-void LauncherWindow::DispatchMessage(BMessage* message, BHandler* target)
+
+void
+BrowserWindow::DispatchMessage(BMessage* message, BHandler* target)
 {
-	if (m_url && message->what == B_KEY_DOWN && target == m_url->TextView()) {
+	if (fURLTextControl && message->what == B_KEY_DOWN
+		&& target == fURLTextControl->TextView()) {
 		// Handle B_RETURN in the URL text control. This is the easiest
 		// way to react *only* when the user presses the return key in the
 		// address bar, as opposed to trying to load whatever is in there when
 		// the text control just goes out of focus.
-	    const char* bytes;
-	    if (message->FindString("bytes", &bytes) == B_OK
-	    	&& bytes[0] == B_RETURN) {
-	    	// Do it in such a way that the user sees the Go-button go down.
-	    	m_goButton->SetValue(B_CONTROL_ON);
-	    	UpdateIfNeeded();
-	    	m_goButton->Invoke();
-	    	snooze(1000);
-	    	m_goButton->SetValue(B_CONTROL_OFF);
-	    }
+		const char* bytes;
+		if (message->FindString("bytes", &bytes) == B_OK
+			&& bytes[0] == B_RETURN) {
+			// Do it in such a way that the user sees the Go-button go down.
+			fGoButton->SetValue(B_CONTROL_ON);
+			UpdateIfNeeded();
+			fGoButton->Invoke();
+			snooze(1000);
+			fGoButton->SetValue(B_CONTROL_OFF);
+		}
 	}
 	BWebWindow::DispatchMessage(message, target);
 }
 
-void LauncherWindow::MessageReceived(BMessage* message)
+
+void
+BrowserWindow::MessageReceived(BMessage* message)
 {
-    switch (message->what) {
-    case OPEN_LOCATION:
-        if (m_url) {
-        	if (m_url->TextView()->IsFocus())
-        	    m_url->TextView()->SelectAll();
-        	else
-        	    m_url->MakeFocus(true);
-        }
-    	break;
-    case RELOAD:
-        CurrentWebView()->Reload();
-        break;
-    case GOTO_URL: {
-        BString url;
-        if (message->FindString("url", &url) != B_OK)
-        	url = m_url->Text();
-        CurrentWebView()->LoadURL(url.String());
-        break;
-    }
-    case GO_BACK:
-        CurrentWebView()->GoBack();
-        break;
-    case GO_FORWARD:
-        CurrentWebView()->GoForward();
-        break;
-    case STOP:
-        CurrentWebView()->StopLoading();
-        break;
+	switch (message->what) {
+	case OPEN_LOCATION:
+		if (fURLTextControl) {
+			if (fURLTextControl->TextView()->IsFocus())
+				fURLTextControl->TextView()->SelectAll();
+			else
+				fURLTextControl->MakeFocus(true);
+		}
+		break;
+	case RELOAD:
+		CurrentWebView()->Reload();
+		break;
+	case GOTO_URL: {
+		BString url;
+		if (message->FindString("url", &url) != B_OK)
+			url = fURLTextControl->Text();
+		CurrentWebView()->LoadURL(url.String());
+		break;
+	}
+	case GO_BACK:
+		CurrentWebView()->GoBack();
+		break;
+	case GO_FORWARD:
+		CurrentWebView()->GoForward();
+		break;
+	case STOP:
+		CurrentWebView()->StopLoading();
+		break;
 
-    case CLEAR_HISTORY: {
-        BrowsingHistory* history = BrowsingHistory::defaultInstance();
-        if (history->countItems() == 0)
-            break;
-        BAlert* alert = new BAlert("Confirmation", "Do you really want to clear "
-            "the browsing history?", "Clear", "Cancel");
-        if (alert->Go() == 0)
-            history->clear();
-        break;
-    }
+	case CLEAR_HISTORY: {
+		BrowsingHistory* history = BrowsingHistory::defaultInstance();
+		if (history->countItems() == 0)
+			break;
+		BAlert* alert = new BAlert("Confirmation", "Do you really want to "
+			"clear the browsing history?", "Clear", "Cancel");
+		if (alert->Go() == 0)
+			history->clear();
+		break;
+	}
 
-    case B_SIMPLE_DATA: {
-        // User possibly dropped files on this window.
-        // If there is more than one entry_ref, let the app handle it (open one
-        // new page per ref). If there is one ref, open it in this window.
-        type_code type;
-        int32 countFound;
-        if (message->GetInfo("refs", &type, &countFound) != B_OK
-            || type != B_REF_TYPE) {
-            break;
-        }
-        if (countFound > 1) {
-            message->what = B_REFS_RECEIVED;
-            be_app->PostMessage(message);
-            break;
-        }
-        entry_ref ref;
-        if (message->FindRef("refs", &ref) != B_OK)
-            break;
-        BEntry entry(&ref, true);
-        BPath path;
-        if (!entry.Exists() || entry.GetPath(&path) != B_OK)
-            break;
-        CurrentWebView()->LoadURL(path.Path());
-        break;
-    }
+	case B_SIMPLE_DATA: {
+		// User possibly dropped files on this window.
+		// If there is more than one entry_ref, let the app handle it (open one
+		// new page per ref). If there is one ref, open it in this window.
+		type_code type;
+		int32 countFound;
+		if (message->GetInfo("refs", &type, &countFound) != B_OK
+			|| type != B_REF_TYPE) {
+			break;
+		}
+		if (countFound > 1) {
+			message->what = B_REFS_RECEIVED;
+			be_app->PostMessage(message);
+			break;
+		}
+		entry_ref ref;
+		if (message->FindRef("refs", &ref) != B_OK)
+			break;
+		BEntry entry(&ref, true);
+		BPath path;
+		if (!entry.Exists() || entry.GetPath(&path) != B_OK)
+			break;
+		CurrentWebView()->LoadURL(path.Path());
+		break;
+	}
 
-    case TEXT_SIZE_INCREASE:
-        CurrentWebView()->IncreaseTextSize();
-        break;
-    case TEXT_SIZE_DECREASE:
-        CurrentWebView()->DecreaseTextSize();
-        break;
-    case TEXT_SIZE_RESET:
-        CurrentWebView()->ResetTextSize();
-        break;
+	case TEXT_SIZE_INCREASE:
+		CurrentWebView()->IncreaseTextSize();
+		break;
+	case TEXT_SIZE_DECREASE:
+		CurrentWebView()->DecreaseTextSize();
+		break;
+	case TEXT_SIZE_RESET:
+		CurrentWebView()->ResetTextSize();
+		break;
 
-    case TEXT_FIND_NEXT:
-        CurrentWebView()->FindString(m_findTextControl->Text(), true,
-            m_findCaseSensitiveCheckBox->Value());
-        break;
-    case TEXT_FIND_PREVIOUS:
-        CurrentWebView()->FindString(m_findTextControl->Text(), false,
-            m_findCaseSensitiveCheckBox->Value());
-        break;
-    case TEXT_SHOW_FIND_GROUP:
-        if (!m_findGroup->IsVisible())
-            m_findGroup->SetVisible(true);
-        m_findTextControl->MakeFocus(true);
-        break;
-    case TEXT_HIDE_FIND_GROUP:
-        if (m_findGroup->IsVisible())
-            m_findGroup->SetVisible(false);
-        break;
+	case TEXT_FIND_NEXT:
+		CurrentWebView()->FindString(fFindTextControl->Text(), true,
+			fFindCaseSensitiveCheckBox->Value());
+		break;
+	case TEXT_FIND_PREVIOUS:
+		CurrentWebView()->FindString(fFindTextControl->Text(), false,
+			fFindCaseSensitiveCheckBox->Value());
+		break;
+	case TEXT_SHOW_FIND_GROUP:
+		if (!fFindGroup->IsVisible())
+			fFindGroup->SetVisible(true);
+		fFindTextControl->MakeFocus(true);
+		break;
+	case TEXT_HIDE_FIND_GROUP:
+		if (fFindGroup->IsVisible())
+			fFindGroup->SetVisible(false);
+		break;
 
-    case SHOW_DOWNLOAD_WINDOW:
-        message->AddUInt32("workspaces", Workspaces());
-        be_app->PostMessage(message);
-        break;
+	case SHOW_DOWNLOAD_WINDOW:
+		message->AddUInt32("workspaces", Workspaces());
+		be_app->PostMessage(message);
+		break;
 
-    case CLOSE_TAB:
-        if (m_tabManager->CountTabs() > 1) {
-	    	int32 index;
-    		if (message->FindInt32("tab index", &index) != B_OK)
-	    		index = m_tabManager->SelectedTabIndex();
-            delete m_tabManager->RemoveTab(index);
-            updateTabGroupVisibility();
-        } else
-            PostMessage(B_QUIT_REQUESTED);
-        break;
+	case CLOSE_TAB:
+		if (fTabManager->CountTabs() > 1) {
+			int32 index;
+			if (message->FindInt32("tab index", &index) != B_OK)
+				index = fTabManager->SelectedTabIndex();
+			delete fTabManager->RemoveTab(index);
+			_UpdateTabGroupVisibility();
+		} else
+			PostMessage(B_QUIT_REQUESTED);
+		break;
 
-    case TAB_CHANGED: {
-    	// This message may be received also when the last tab closed, i.e. with index == -1.
-        int32 index;
-        if (message->FindInt32("tab index", &index) != B_OK)
-            index = -1;
-        BWebView* webView = dynamic_cast<BWebView*>(m_tabManager->ViewForTab(index));
-        if (webView == CurrentWebView())
-        	break;
-        SetCurrentWebView(webView);
-        if (webView)
-            updateTitle(webView->MainFrameTitle());
-        else
-            updateTitle("");
-        if (webView) {
-            m_url->SetText(webView->MainFrameURL());
-            // Trigger update of the interface to the new page, by requesting
-            // to resend all notifications.
-            webView->WebPage()->ResendNotifications();
-        }
-        break;
-    }
+	case TAB_CHANGED: {
+		// This message may be received also when the last tab closed, i.e. with index == -1.
+		int32 index;
+		if (message->FindInt32("tab index", &index) != B_OK)
+			index = -1;
+		BWebView* webView = dynamic_cast<BWebView*>(fTabManager->ViewForTab(index));
+		if (webView == CurrentWebView())
+			break;
+		SetCurrentWebView(webView);
+		if (webView)
+			_UpdateTitle(webView->MainFrameTitle());
+		else
+			_UpdateTitle("");
+		if (webView) {
+			fURLTextControl->SetText(webView->MainFrameURL());
+			// Trigger update of the interface to the new page, by requesting
+			// to resend all notifications.
+			webView->WebPage()->ResendNotifications();
+		}
+		break;
+	}
 
-    default:
-        BWebWindow::MessageReceived(message);
-        break;
-    }
+	default:
+		BWebWindow::MessageReceived(message);
+		break;
+	}
 }
 
-bool LauncherWindow::QuitRequested()
+
+bool
+BrowserWindow::QuitRequested()
 {
-    // TODO: Check for modified form data and ask user for confirmation, etc.
+	// TODO: Check for modified form data and ask user for confirmation, etc.
 
-    // Iterate over all tabs to delete all BWebViews.
-    // Do this here, so WebKit tear down happens earlier.
-    while (m_tabManager->CountTabs() > 0)
-        delete m_tabManager->RemoveTab(0L);
-    SetCurrentWebView(0);
+	// Iterate over all tabs to delete all BWebViews.
+	// Do this here, so WebKit tear down happens earlier.
+	while (fTabManager->CountTabs() > 0)
+		delete fTabManager->RemoveTab(0L);
+	SetCurrentWebView(0);
 
-    BMessage message(WINDOW_CLOSED);
-    message.AddRect("window frame", Frame());
-    be_app->PostMessage(&message);
-    return true;
+	BMessage message(WINDOW_CLOSED);
+	message.AddRect("window frame", Frame());
+	be_app->PostMessage(&message);
+	return true;
 }
 
-void LauncherWindow::MenusBeginning()
+
+void
+BrowserWindow::MenusBeginning()
 {
-    BMenuItem* menuItem;
-    while ((menuItem = m_goMenu->RemoveItem(0L)))
-        delete menuItem;
+	BMenuItem* menuItem;
+	while ((menuItem = fGoMenu->RemoveItem(0L)))
+		delete menuItem;
 
-    BrowsingHistory* history = BrowsingHistory::defaultInstance();
-    if (!history->Lock())
-        return;
+	BrowsingHistory* history = BrowsingHistory::defaultInstance();
+	if (!history->Lock())
+		return;
 
-    int32 count = history->countItems();
-    for (int32 i = 0; i < count; i++) {
-        BrowsingHistoryItem historyItem = history->historyItemAt(i);
-        BMessage* message = new BMessage(GOTO_URL);
-        message->AddString("url", historyItem.url().String());
-        // TODO: More sophisticated menu structure... sorted by days/weeks...
-        BString truncatedUrl(historyItem.url());
-        be_plain_font->TruncateString(&truncatedUrl, B_TRUNCATE_END, 480);
-        menuItem = new BMenuItem(truncatedUrl, message);
-        m_goMenu->AddItem(menuItem);
-    }
+	int32 count = history->countItems();
+	for (int32 i = 0; i < count; i++) {
+		BrowsingHistoryItem historyItem = history->historyItemAt(i);
+		BMessage* message = new BMessage(GOTO_URL);
+		message->AddString("url", historyItem.url().String());
+		// TODO: More sophisticated menu structure... sorted by days/weeks...
+		BString truncatedUrl(historyItem.url());
+		be_plain_font->TruncateString(&truncatedUrl, B_TRUNCATE_END, 480);
+		menuItem = new BMenuItem(truncatedUrl, message);
+		fGoMenu->AddItem(menuItem);
+	}
 
 
-    if (m_goMenu->CountItems() > 3) {
-        m_goMenu->AddSeparatorItem();
-        m_goMenu->AddItem(new BMenuItem("Clear history", new BMessage(CLEAR_HISTORY)));
-    }
+	if (fGoMenu->CountItems() > 3) {
+		fGoMenu->AddSeparatorItem();
+		fGoMenu->AddItem(new BMenuItem("Clear history",
+			new BMessage(CLEAR_HISTORY)));
+	}
 
-    history->Unlock();
+	history->Unlock();
 }
 
-void LauncherWindow::newTab(const BString& url, bool select, BWebView* webView)
+
+void
+BrowserWindow::CreateNewTab(const BString& url, bool select, BWebView* webView)
 {
-    // Executed in app thread (new BWebPage needs to be created in app thread).
-    if (!webView)
-        webView = new BWebView("web view");
-    webView->WebPage()->SetDownloadListener(m_downloadListener);
+	// Executed in app thread (new BWebPage needs to be created in app thread).
+	if (!webView)
+		webView = new BWebView("web view");
+	webView->WebPage()->SetDownloadListener(fDownloadListener);
 
-    m_tabManager->AddTab(webView, "New tab");
+	fTabManager->AddTab(webView, "New tab");
 
-    if (url.Length())
-        webView->LoadURL(url.String());
+	if (url.Length())
+		webView->LoadURL(url.String());
 
-    if (select) {
-        m_tabManager->SelectTab(m_tabManager->CountTabs() - 1);
-        SetCurrentWebView(webView);
-        NavigationCapabilitiesChanged(false, false, false, webView);
-        if (m_url) {
-        	m_url->SetText(url.String());
-            m_url->MakeFocus(true);
-        }
-    }
+	if (select) {
+		fTabManager->SelectTab(fTabManager->CountTabs() - 1);
+		SetCurrentWebView(webView);
+		NavigationCapabilitiesChanged(false, false, false, webView);
+		if (fURLTextControl) {
+			fURLTextControl->SetText(url.String());
+			fURLTextControl->MakeFocus(true);
+		}
+	}
 
-    updateTabGroupVisibility();
+	_UpdateTabGroupVisibility();
 }
+
 
 // #pragma mark - Notification API
 
-void LauncherWindow::NavigationRequested(const BString& url, BWebView* view)
+
+void
+BrowserWindow::NavigationRequested(const BString& url, BWebView* view)
 {
 }
 
-void LauncherWindow::NewWindowRequested(const BString& url, bool primaryAction)
+
+void
+BrowserWindow::NewWindowRequested(const BString& url, bool primaryAction)
 {
-    // Always open new windows in the application thread, since
-    // creating a BWebView will try to grab the application lock.
-    // But our own WebPage may already try to lock us from within
-    // the application thread -> dead-lock. Thus we can't wait for
-    // a reply here.
-    BMessage message(NEW_TAB);
-    message.AddPointer("window", this);
-    message.AddString("url", url);
-    message.AddBool("select", primaryAction);
-    be_app->PostMessage(&message);
+	// Always open new windows in the application thread, since
+	// creating a BWebView will try to grab the application lock.
+	// But our own WebPage may already try to lock us from within
+	// the application thread -> dead-lock. Thus we can't wait for
+	// a reply here.
+	BMessage message(NEW_TAB);
+	message.AddPointer("window", this);
+	message.AddString("url", url);
+	message.AddBool("select", primaryAction);
+	be_app->PostMessage(&message);
 }
 
-void LauncherWindow::NewPageCreated(BWebView* view)
+
+void 
+BrowserWindow::NewPageCreated(BWebView* view)
 {
-    newTab(BString(), true, view);
+	CreateNewTab(BString(), true, view);
 }
 
-void LauncherWindow::LoadNegotiating(const BString& url, BWebView* view)
+
+void
+BrowserWindow::LoadNegotiating(const BString& url, BWebView* view)
 {
-    BString status("Requesting: ");
-    status << url;
-    StatusChanged(status, view);
+	BString status("Requesting: ");
+	status << url;
+	StatusChanged(status, view);
 }
 
-void LauncherWindow::LoadCommitted(const BString& url, BWebView* view)
+
+void
+BrowserWindow::LoadCommitted(const BString& url, BWebView* view)
 {
-    if (view != CurrentWebView())
-        return;
+	if (view != CurrentWebView())
+		return;
 
 	// This hook is invoked when the load is commited.
-    if (m_url)
-        m_url->SetText(url.String());
+	if (fURLTextControl)
+		fURLTextControl->SetText(url.String());
 
-    BString status("Loading: ");
-    status << url;
-    StatusChanged(status, view);
+	BString status("Loading: ");
+	status << url;
+	StatusChanged(status, view);
 }
 
-void LauncherWindow::LoadProgress(float progress, BWebView* view)
+
+void
+BrowserWindow::LoadProgress(float progress, BWebView* view)
 {
-    if (view != CurrentWebView())
-        return;
+	if (view != CurrentWebView())
+		return;
 
-    if (m_loadingProgressBar) {
-        if (progress < 100 && m_loadingProgressBar->IsHidden())
-            m_loadingProgressBar->Show();
-        m_loadingProgressBar->SetTo(progress);
-    }
+	if (fLoadingProgressBar) {
+		if (progress < 100 && fLoadingProgressBar->IsHidden())
+			fLoadingProgressBar->Show();
+		fLoadingProgressBar->SetTo(progress);
+	}
 }
 
-void LauncherWindow::LoadFailed(const BString& url, BWebView* view)
+
+void
+BrowserWindow::LoadFailed(const BString& url, BWebView* view)
 {
-    if (view != CurrentWebView())
-        return;
+	if (view != CurrentWebView())
+		return;
 
-    BString status(url);
-    status << " failed.";
-    StatusChanged(status, view);
-    if (m_loadingProgressBar && !m_loadingProgressBar->IsHidden())
-        m_loadingProgressBar->Hide();
+	BString status(url);
+	status << " failed.";
+	StatusChanged(status, view);
+	if (fLoadingProgressBar && !fLoadingProgressBar->IsHidden())
+		fLoadingProgressBar->Hide();
 }
 
-void LauncherWindow::LoadFinished(const BString& url, BWebView* view)
+
+void
+BrowserWindow::LoadFinished(const BString& url, BWebView* view)
 {
-    if (view != CurrentWebView())
-        return;
+	if (view != CurrentWebView())
+		return;
 
-    BString status(url);
-    status << " finished.";
-    StatusChanged(status, view);
-    if (m_loadingProgressBar && !m_loadingProgressBar->IsHidden())
-        m_loadingProgressBar->Hide();
+	BString status(url);
+	status << " finished.";
+	StatusChanged(status, view);
+	if (fLoadingProgressBar && !fLoadingProgressBar->IsHidden())
+		fLoadingProgressBar->Hide();
 
-    NavigationCapabilitiesChanged(m_BackButton->IsEnabled(),
-        m_ForwardButton->IsEnabled(), false, view);
+	NavigationCapabilitiesChanged(fBackButton->IsEnabled(),
+		fForwardButton->IsEnabled(), false, view);
 }
 
-void LauncherWindow::ResizeRequested(float width, float height, BWebView* view)
+
+void
+BrowserWindow::ResizeRequested(float width, float height, BWebView* view)
 {
-    if (view != CurrentWebView())
-        return;
+	if (view != CurrentWebView())
+		return;
 
-    // TODO: Ignore request when there is more than one BWebView embedded!
+	// TODO: Ignore request when there is more than one BWebView embedded!
 
-    ResizeTo(width, height);
+	ResizeTo(width, height);
 }
 
-void LauncherWindow::SetToolBarsVisible(bool flag, BWebView* view)
+
+void
+BrowserWindow::SetToolBarsVisible(bool flag, BWebView* view)
 {
-    // TODO
-    // TODO: Ignore request when there is more than one BWebView embedded!
+	// TODO
+	// TODO: Ignore request when there is more than one BWebView embedded!
 }
 
-void LauncherWindow::SetStatusBarVisible(bool flag, BWebView* view)
+
+void
+BrowserWindow::SetStatusBarVisible(bool flag, BWebView* view)
 {
-    // TODO
-    // TODO: Ignore request when there is more than one BWebView embedded!
+	// TODO
+	// TODO: Ignore request when there is more than one BWebView embedded!
 }
 
-void LauncherWindow::SetMenuBarVisible(bool flag, BWebView* view)
+
+void
+BrowserWindow::SetMenuBarVisible(bool flag, BWebView* view)
 {
-    // TODO
-    // TODO: Ignore request when there is more than one BWebView embedded!
+	// TODO
+	// TODO: Ignore request when there is more than one BWebView embedded!
 }
 
-void LauncherWindow::SetResizable(bool flag, BWebView* view)
+
+void
+BrowserWindow::SetResizable(bool flag, BWebView* view)
 {
-    // TODO: Ignore request when there is more than one BWebView embedded!
+	// TODO: Ignore request when there is more than one BWebView embedded!
 
-    if (flag)
-        SetFlags(Flags() & ~B_NOT_RESIZABLE);
-    else
-        SetFlags(Flags() | B_NOT_RESIZABLE);
+	if (flag)
+		SetFlags(Flags() & ~B_NOT_RESIZABLE);
+	else
+		SetFlags(Flags() | B_NOT_RESIZABLE);
 }
 
-void LauncherWindow::TitleChanged(const BString& title, BWebView* view)
+
+void
+BrowserWindow::TitleChanged(const BString& title, BWebView* view)
 {
-    for (int32 i = 0; i < m_tabManager->CountTabs(); i++) {
-        if (m_tabManager->ViewForTab(i) == view) {
-            m_tabManager->SetTabLabel(i, title);
-            break;
-        }
-    }
-    if (view != CurrentWebView())
-        return;
+	for (int32 i = 0; i < fTabManager->CountTabs(); i++) {
+		if (fTabManager->ViewForTab(i) == view) {
+			fTabManager->SetTabLabel(i, title);
+			break;
+		}
+	}
+	if (view != CurrentWebView())
+		return;
 
-    updateTitle(title);
+	_UpdateTitle(title);
 }
 
-void LauncherWindow::StatusChanged(const BString& statusText, BWebView* view)
+
+void
+BrowserWindow::StatusChanged(const BString& statusText, BWebView* view)
 {
-    if (view != CurrentWebView())
-        return;
+	if (view != CurrentWebView())
+		return;
 
-    if (m_statusText)
-        m_statusText->SetText(statusText.String());
+	if (fStatusText)
+		fStatusText->SetText(statusText.String());
 }
 
-void LauncherWindow::NavigationCapabilitiesChanged(bool canGoBackward,
-    bool canGoForward, bool canStop, BWebView* view)
+
+void
+BrowserWindow::NavigationCapabilitiesChanged(bool canGoBackward,
+	bool canGoForward, bool canStop, BWebView* view)
 {
-    if (view != CurrentWebView())
-        return;
+	if (view != CurrentWebView())
+		return;
 
-    if (m_BackButton)
-        m_BackButton->SetEnabled(canGoBackward);
-    if (m_ForwardButton)
-        m_ForwardButton->SetEnabled(canGoForward);
-    if (m_StopButton)
-        m_StopButton->SetEnabled(canStop);
+	if (fBackButton)
+		fBackButton->SetEnabled(canGoBackward);
+	if (fForwardButton)
+		fForwardButton->SetEnabled(canGoForward);
+	if (fStopButton)
+		fStopButton->SetEnabled(canStop);
 }
 
-void LauncherWindow::UpdateGlobalHistory(const BString& url)
+
+void
+BrowserWindow::UpdateGlobalHistory(const BString& url)
 {
-    BrowsingHistory::defaultInstance()->addItem(BrowsingHistoryItem(url));
+	BrowsingHistory::defaultInstance()->addItem(BrowsingHistoryItem(url));
 }
 
-bool LauncherWindow::AuthenticationChallenge(BString message, BString& inOutUser,
+
+bool
+BrowserWindow::AuthenticationChallenge(BString message, BString& inOutUser,
 	BString& inOutPassword, bool& inOutRememberCredentials, uint32 failureCount,
 	BWebView* view)
 {
 	// Switch to the page for which this authentication is required.
 	if (view != CurrentWebView()) {
-		m_tabManager->SelectTab(view);
+		fTabManager->SelectTab(view);
 		UpdateIfNeeded();
 	}
-    AuthenticationPanel* panel = new AuthenticationPanel(Frame());
-    	// Panel auto-destructs.
-    return panel->getAuthentication(message, inOutUser, inOutPassword,
-    	inOutRememberCredentials, failureCount > 0, inOutUser, inOutPassword,
-    	&inOutRememberCredentials);
+	AuthenticationPanel* panel = new AuthenticationPanel(Frame());
+		// Panel auto-destructs.
+	return panel->getAuthentication(message, inOutUser, inOutPassword,
+		inOutRememberCredentials, failureCount > 0, inOutUser, inOutPassword,
+		&inOutRememberCredentials);
 }
 
-void LauncherWindow::updateTitle(const BString& title)
+
+// #pragma mark - private
+
+
+void
+BrowserWindow::_UpdateTitle(const BString& title)
 {
-    BString windowTitle = title;
-    if (windowTitle.Length() > 0)
-        windowTitle << " - ";
-    windowTitle << "HaikuLauncher";
-    SetTitle(windowTitle.String());
+	BString windowTitle = title;
+	if (windowTitle.Length() > 0)
+		windowTitle << " - ";
+	windowTitle << kApplicationName;
+	SetTitle(windowTitle.String());
 }
 
-void LauncherWindow::updateTabGroupVisibility()
+
+void
+BrowserWindow::_UpdateTabGroupVisibility()
 {
 	if (Lock()) {
-	    //m_tabGroup->SetVisible(m_tabManager->CountTabs() > 1);
-	    m_tabManager->SetCloseButtonsAvailable(m_tabManager->CountTabs() > 1);
-	    Unlock();
+		//fTabGroup->SetVisible(fTabManager->CountTabs() > 1);
+		fTabManager->SetCloseButtonsAvailable(fTabManager->CountTabs() > 1);
+		Unlock();
 	}
 }

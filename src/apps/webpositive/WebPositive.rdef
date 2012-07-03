@@ -1,4 +1,4 @@
-resource app_signature "application/x-vnd.RJL-HaikuLauncher";
+resource app_signature "application/x-vnd.Haiku-WebPositive";
 
 resource app_version {
 	major      = 0,
@@ -6,8 +6,8 @@ resource app_version {
 	minor      = 1,
 	variety    = B_APPV_ALPHA,
 	internal   = 0,
-	short_info = "HaikuLauncher",
-	long_info  = "HaikuLauncher ©2007-2010 The WebKit Haiku Project"
+	short_info = "WebPositive",
+	long_info  = "WebPositive ©2007-2010 The WebKit Haiku Project"
 };
 
 resource app_flags B_SINGLE_LAUNCH;

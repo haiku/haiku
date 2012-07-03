@@ -8,10 +8,10 @@
  * modification, are permitted provided that the following conditions
  * are met:
  * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
+ *	notice, this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ *	notice, this list of conditions and the following disclaimer in the
+ *	documentation and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY APPLE COMPUTER, INC. ``AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -27,17 +27,16 @@
  */
 
 #include "config.h"
-#include "LauncherApp.h"
+#include "BrowserApp.h"
 
+#include "BrowserWindow.h"
 #include "DownloadWindow.h"
-#include "FrameView.h"
-#include "GraphicsContext.h"
-#include "LauncherWindow.h"
 #include "WebPage.h"
 #include "WebView.h"
 #include "WebViewConstants.h"
 #include <Alert.h>
 #include <Autolock.h>
+#include <Directory.h>
 #include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
@@ -45,170 +44,187 @@
 #include <Screen.h>
 #include <stdio.h>
 
-extern const char* kApplicationSignature = "application/x-vnd.RJL-HaikuLauncher";
+
+const char* kApplicationSignature = "application/x-vnd.Haiku-WebPositive";
+const char* kApplicationName = "WebPositive";
+
+
 enum {
-    LOAD_AT_STARTING = 'lost'
+	LOAD_AT_STARTING = 'lost'
 };
 
 
-LauncherApp::LauncherApp()
-    : BApplication(kApplicationSignature)
-    , m_windowCount(0)
-    , m_lastWindowFrame(100, 100, 700, 750)
-    , m_launchRefsMessage(0)
-    , m_initialized(false)
-    , m_downloadWindow(0)
+BrowserApp::BrowserApp()
+	: BApplication(kApplicationSignature)
+	, fWindowCount(0)
+	, fLastWindowFrame(100, 100, 700, 750)
+	, fLaunchRefsMessage(0)
+	, fInitialized(false)
+	, fDownloadWindow(0)
 {
 }
 
-LauncherApp::~LauncherApp()
+
+BrowserApp::~BrowserApp()
 {
-	delete m_launchRefsMessage;
+	delete fLaunchRefsMessage;
 }
 
-void LauncherApp::AboutRequested()
+
+void
+BrowserApp::AboutRequested()
 {
-    BAlert* alert = new BAlert("About HaikuLauncher",
-        "For testing WebKit...\n\nby Ryan Leavengood", "Sweet!");
-    alert->Go();
+	BAlert* alert = new BAlert("About WebPositive",
+		"WebPositive\n\nby Ryan Leavengood, Andrea Anzani, "
+		"Maxime Simone, Michael Lotz, Rene Gollent and Stephan Aßmus",
+		"Sweet!");
+	alert->Go();
 }
 
-void LauncherApp::ArgvReceived(int32 argc, char** argv)
+
+void
+BrowserApp::ArgvReceived(int32 argc, char** argv)
 {
 	for (int i = 1; i < argc; i++) {
 		const char* url = argv[i];
 		BEntry entry(argv[i], true);
 		BPath path;
 		if (entry.Exists() && entry.GetPath(&path) == B_OK)
-		    url = path.Path();
-	    BMessage message(LOAD_AT_STARTING);
-	    message.AddString("url", url);
-	    message.AddBool("new window", m_initialized || i > 1);
-	    PostMessage(&message);
+			url = path.Path();
+		BMessage message(LOAD_AT_STARTING);
+		message.AddString("url", url);
+		message.AddBool("new window", fInitialized || i > 1);
+		PostMessage(&message);
 	}
 }
 
-void LauncherApp::ReadyToRun()
+
+void
+BrowserApp::ReadyToRun()
 {
 	// Since we will essentially run the GUI...
 	set_thread_priority(Thread(), B_DISPLAY_PRIORITY);
 
-    BWebPage::InitializeOnce();
-    BWebPage::SetCacheModel(B_WEBKIT_CACHE_MODEL_WEB_BROWSER);
+	BWebPage::InitializeOnce();
+	BWebPage::SetCacheModel(B_WEBKIT_CACHE_MODEL_WEB_BROWSER);
 
 	BFile settingsFile;
-	BRect windowFrameFromSettings = m_lastWindowFrame;
+	BRect windowFrameFromSettings = fLastWindowFrame;
 	BRect downloadWindowFrame(100, 100, 300, 250);
 	bool showDownloads = false;
-	if (openSettingsFile(settingsFile, B_READ_ONLY)) {
+	if (_OpenSettingsFile(settingsFile, B_READ_ONLY)) {
 		BMessage settingsArchive;
 		settingsArchive.Unflatten(&settingsFile);
 		settingsArchive.FindRect("window frame", &windowFrameFromSettings);
 		settingsArchive.FindRect("downloads window frame", &downloadWindowFrame);
 		settingsArchive.FindBool("show downloads", &showDownloads);
 	}
-	m_lastWindowFrame = windowFrameFromSettings;
+	fLastWindowFrame = windowFrameFromSettings;
 
-    m_downloadWindow = new DownloadWindow(downloadWindowFrame, showDownloads);
+	fDownloadWindow = new DownloadWindow(downloadWindowFrame, showDownloads);
 
-	m_initialized = true;
+	fInitialized = true;
 
-	if (m_launchRefsMessage) {
-		RefsReceived(m_launchRefsMessage);
-		delete m_launchRefsMessage;
-		m_launchRefsMessage = 0;
+	if (fLaunchRefsMessage) {
+		RefsReceived(fLaunchRefsMessage);
+		delete fLaunchRefsMessage;
+		fLaunchRefsMessage = 0;
 	} else {
-	    LauncherWindow* window = new LauncherWindow(m_lastWindowFrame,
-	        BMessenger(m_downloadWindow));
-	    window->Show();
+		BrowserWindow* window = new BrowserWindow(fLastWindowFrame,
+			BMessenger(fDownloadWindow));
+		window->Show();
 	}
 }
 
-void LauncherApp::MessageReceived(BMessage* message)
+
+void
+BrowserApp::MessageReceived(BMessage* message)
 {
-    switch (message->what) {
-    case LOAD_AT_STARTING: {
-        BString url;
-        if (message->FindString("url", &url) != B_OK)
-        	break;
-        bool openNewWindow = false;
-        message->FindBool("new window", &openNewWindow);
-        LauncherWindow* webWindow = NULL;
-        for (int i = 0; BWindow* window = WindowAt(i); i++) {
-            webWindow = dynamic_cast<LauncherWindow*>(window);
-            if (!webWindow)
-            	continue;
-            if (!openNewWindow) {
-            	// stop at the first window
-	            break;
-            }
-        }
-        if (webWindow) {
-        	// There should always be at least one window open. If not, maybe we are about
-        	// to quit anyway...
-        	if (openNewWindow) {
-        		// open a new window with an offset to the last window
-                newWindow(url);
-        	} else {
-            	// load the URL in the first window
-                webWindow->CurrentWebView()->LoadURL(url.String());
-        	}
-        }
-        break;
-    }
-    case B_SILENT_RELAUNCH:
-    	newWindow("");
-    	break;
-    case NEW_WINDOW: {
+	switch (message->what) {
+	case LOAD_AT_STARTING: {
 		BString url;
 		if (message->FindString("url", &url) != B_OK)
 			break;
-    	newWindow(url);
-    	break;
-    }
-    case NEW_TAB: {
-    	LauncherWindow* window;
+		bool openNewWindow = false;
+		message->FindBool("new window", &openNewWindow);
+		BrowserWindow* webWindow = NULL;
+		for (int i = 0; BWindow* window = WindowAt(i); i++) {
+			webWindow = dynamic_cast<BrowserWindow*>(window);
+			if (!webWindow)
+				continue;
+			if (!openNewWindow) {
+				// stop at the first window
+				break;
+			}
+		}
+		if (webWindow) {
+			// There should always be at least one window open. If not, maybe we are about
+			// to quit anyway...
+			if (openNewWindow) {
+				// open a new window with an offset to the last window
+				_CreateNewWindow(url);
+			} else {
+				// load the URL in the first window
+				webWindow->CurrentWebView()->LoadURL(url.String());
+			}
+		}
+		break;
+	}
+	case B_SILENT_RELAUNCH:
+		_CreateNewWindow("");
+		break;
+	case NEW_WINDOW: {
+		BString url;
+		if (message->FindString("url", &url) != B_OK)
+			break;
+		_CreateNewWindow(url);
+		break;
+	}
+	case NEW_TAB: {
+		BrowserWindow* window;
 		if (message->FindPointer("window", reinterpret_cast<void**>(&window)) != B_OK)
 			break;
-    	BString url;
+		BString url;
 		message->FindString("url", &url);
-    	bool select = false;
+		bool select = false;
 		message->FindBool("select", &select);
-    	newTab(window, url, select);
-        break;
-    }
-    case WINDOW_OPENED:
-    	m_windowCount++;
-    	break;
-    case WINDOW_CLOSED:
-    	m_windowCount--;
-        message->FindRect("window frame", &m_lastWindowFrame);
-    	if (m_windowCount <= 0)
-    		PostMessage(B_QUIT_REQUESTED);
-    	break;
+		_CreateNewTab(window, url, select);
+		break;
+	}
+	case WINDOW_OPENED:
+		fWindowCount++;
+		break;
+	case WINDOW_CLOSED:
+		fWindowCount--;
+		message->FindRect("window frame", &fLastWindowFrame);
+		if (fWindowCount <= 0)
+			PostMessage(B_QUIT_REQUESTED);
+		break;
 
-    case SHOW_DOWNLOAD_WINDOW: {
-    	BAutolock _(m_downloadWindow);
-        uint32 workspaces;
-        if (message->FindUInt32("workspaces", &workspaces) == B_OK)
-            m_downloadWindow->SetWorkspaces(workspaces);
-        if (m_downloadWindow->IsHidden())
-            m_downloadWindow->Show();
-        else
-            m_downloadWindow->Activate();
-    }
+	case SHOW_DOWNLOAD_WINDOW: {
+		BAutolock _(fDownloadWindow);
+		uint32 workspaces;
+		if (message->FindUInt32("workspaces", &workspaces) == B_OK)
+			fDownloadWindow->SetWorkspaces(workspaces);
+		if (fDownloadWindow->IsHidden())
+			fDownloadWindow->Show();
+		else
+			fDownloadWindow->Activate();
+	}
 
-    default:
-        BApplication::MessageReceived(message);
-        break;
-    }
+	default:
+		BApplication::MessageReceived(message);
+		break;
+	}
 }
 
-void LauncherApp::RefsReceived(BMessage* message)
+
+void
+BrowserApp::RefsReceived(BMessage* message)
 {
-	if (!m_initialized) {
-		delete m_launchRefsMessage;
-		m_launchRefsMessage = new BMessage(*message);
+	if (!fInitialized) {
+		delete fLaunchRefsMessage;
+		fLaunchRefsMessage = new BMessage(*message);
 		return;
 	}
 
@@ -222,82 +238,97 @@ void LauncherApp::RefsReceived(BMessage* message)
 			continue;
 		BString url;
 		url << path.Path();
-		newWindow(url);
+		_CreateNewWindow(url);
 	}
 }
 
-bool LauncherApp::QuitRequested()
+
+bool
+BrowserApp::QuitRequested()
 {
-    for (int i = 0; BWindow* window = WindowAt(i); i++) {
-        LauncherWindow* webWindow = dynamic_cast<LauncherWindow*>(window);
-        if (!webWindow)
-        	continue;
-        if (!webWindow->Lock())
-        	continue;
-        if (webWindow->QuitRequested()) {
-        	m_lastWindowFrame = webWindow->Frame();
-        	webWindow->Quit();
-        	i--;
-        } else {
-        	webWindow->Unlock();
-        	return false;
-        }
-    }
+	for (int i = 0; BWindow* window = WindowAt(i); i++) {
+		BrowserWindow* webWindow = dynamic_cast<BrowserWindow*>(window);
+		if (!webWindow)
+			continue;
+		if (!webWindow->Lock())
+			continue;
+		if (webWindow->QuitRequested()) {
+			fLastWindowFrame = webWindow->Frame();
+			webWindow->Quit();
+			i--;
+		} else {
+			webWindow->Unlock();
+			return false;
+		}
+	}
 
 	BFile settingsFile;
-	if (openSettingsFile(settingsFile, B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY)) {
+	if (_OpenSettingsFile(settingsFile, B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY)) {
 		BMessage settingsArchive;
-		settingsArchive.AddRect("window frame", m_lastWindowFrame);
-		if (m_downloadWindow->Lock()) {
-    	    settingsArchive.AddRect("downloads window frame", m_downloadWindow->Frame());
-	        settingsArchive.AddBool("show downloads", !m_downloadWindow->IsHidden());
-	        m_downloadWindow->Unlock();
+		settingsArchive.AddRect("window frame", fLastWindowFrame);
+		if (fDownloadWindow->Lock()) {
+			settingsArchive.AddRect("downloads window frame", fDownloadWindow->Frame());
+			settingsArchive.AddBool("show downloads", !fDownloadWindow->IsHidden());
+			fDownloadWindow->Unlock();
 		}
 		settingsArchive.Flatten(&settingsFile);
 	}
 
-    return true;
+	return true;
 }
 
-bool LauncherApp::openSettingsFile(BFile& file, uint32 mode)
+
+bool
+BrowserApp::_OpenSettingsFile(BFile& file, uint32 mode)
 {
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK
-		|| path.Append("HaikuLauncher") != B_OK) {
+		|| path.Append(kApplicationName) != B_OK
+		|| create_directory(path.Path(), 0777) != B_OK
+		|| path.Append("Application") != B_OK) {
 		return false;
 	}
+
 	return file.SetTo(path.Path(), mode) == B_OK;
 }
 
-void LauncherApp::newWindow(const BString& url)
-{
-	m_lastWindowFrame.OffsetBy(20, 20);
-	if (!BScreen().Frame().Contains(m_lastWindowFrame))
-		m_lastWindowFrame.OffsetTo(50, 50);
 
-	LauncherWindow* window = new LauncherWindow(m_lastWindowFrame,
-	    BMessenger(m_downloadWindow));
+void
+BrowserApp::_CreateNewWindow(const BString& url)
+{
+	fLastWindowFrame.OffsetBy(20, 20);
+	if (!BScreen().Frame().Contains(fLastWindowFrame))
+		fLastWindowFrame.OffsetTo(50, 50);
+
+	BrowserWindow* window = new BrowserWindow(fLastWindowFrame,
+		BMessenger(fDownloadWindow));
 	window->Show();
 	if (url.Length())
-	    window->CurrentWebView()->LoadURL(url.String());
+		window->CurrentWebView()->LoadURL(url.String());
 }
 
-void LauncherApp::newTab(LauncherWindow* window, const BString& url, bool select)
+
+void
+BrowserApp::_CreateNewTab(BrowserWindow* window, const BString& url,
+	bool select)
 {
-    if (!window->Lock())
-        return;
-    window->newTab(url, select);
-    window->Unlock();
+	if (!window->Lock())
+		return;
+	window->CreateNewTab(url, select);
+	window->Unlock();
 }
+
 
 // #pragma mark -
 
-int main(int, char**)
-{
-    new LauncherApp();
-    be_app->Run();
-    delete be_app;
 
-    return 0;
+int
+main(int, char**)
+{
+	new BrowserApp();
+	be_app->Run();
+	delete be_app;
+
+	return 0;
 }
 

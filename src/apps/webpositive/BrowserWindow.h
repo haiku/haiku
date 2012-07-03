@@ -26,9 +26,9 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef BROWSER_WINDOW_H
+#define BROWSER_WINDOW_H
 
-#ifndef LauncherWindow_h
-#define LauncherWindow_h
 
 #include "WebWindow.h"
 #include <Messenger.h>
@@ -46,75 +46,91 @@ class TabManager;
 class BWebView;
 
 enum ToolbarPolicy {
-    HaveToolbar,
-    DoNotHaveToolbar
+	HaveToolbar,
+	DoNotHaveToolbar
 };
 
 enum {
-    NEW_WINDOW = 'nwnd',
-    NEW_TAB = 'ntab',
-    WINDOW_OPENED = 'wndo',
-    WINDOW_CLOSED = 'wndc',
-    SHOW_DOWNLOAD_WINDOW = 'sdwd'
+	NEW_WINDOW = 'nwnd',
+	NEW_TAB = 'ntab',
+	WINDOW_OPENED = 'wndo',
+	WINDOW_CLOSED = 'wndc',
+	SHOW_DOWNLOAD_WINDOW = 'sdwd'
 };
 
-class LauncherWindow : public BWebWindow {
+
+class BrowserWindow : public BWebWindow {
 public:
-    LauncherWindow(BRect frame, const BMessenger& downloadListener,
-        ToolbarPolicy = HaveToolbar);
-    virtual ~LauncherWindow();
+								BrowserWindow(BRect frame,
+									const BMessenger& downloadListener,
+									ToolbarPolicy = HaveToolbar);
+	virtual						~BrowserWindow();
 
-	virtual void DispatchMessage(BMessage* message, BHandler* target);
-    virtual void MessageReceived(BMessage* message);
-    virtual bool QuitRequested();
-    virtual void MenusBeginning();
+	virtual	void				DispatchMessage(BMessage* message,
+									BHandler* target);
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	bool				QuitRequested();
+	virtual	void				MenusBeginning();
 
-    void newTab(const BString& url, bool select, BWebView* webView = 0);
-
-private:
-    // WebPage notification API implementations
-    virtual void NavigationRequested(const BString& url, BWebView* view);
-    virtual void NewWindowRequested(const BString& url, bool primaryAction);
-	virtual void NewPageCreated(BWebView* view);
-    virtual void LoadNegotiating(const BString& url, BWebView* view);
-    virtual void LoadCommitted(const BString& url, BWebView* view);
-    virtual void LoadProgress(float progress, BWebView* view);
-    virtual void LoadFailed(const BString& url, BWebView* view);
-    virtual void LoadFinished(const BString& url, BWebView* view);
-    virtual void TitleChanged(const BString& title, BWebView* view);
-    virtual void ResizeRequested(float width, float height, BWebView* view);
-    virtual void SetToolBarsVisible(bool flag, BWebView* view);
-    virtual void SetStatusBarVisible(bool flag, BWebView* view);
-    virtual void SetMenuBarVisible(bool flag, BWebView* view);
-    virtual void SetResizable(bool flag, BWebView* view);
-    virtual void StatusChanged(const BString& status, BWebView* view);
-    virtual void NavigationCapabilitiesChanged(bool canGoBackward,
-        bool canGoForward, bool canStop, BWebView* view);
-    virtual void UpdateGlobalHistory(const BString& url);
-	virtual bool AuthenticationChallenge(BString message, BString& inOutUser,
-		BString& inOutPassword, bool& inOutRememberCredentials,
-		uint32 failureCount, BWebView* view);
-
-    void updateTitle(const BString &title);
-    void updateTabGroupVisibility();
+			void				CreateNewTab(const BString& url, bool select,
+									BWebView* webView = 0);
 
 private:
-    BMessenger m_downloadListener;
-    BMenuBar* m_menuBar;
-    BMenu* m_goMenu;
-    IconButton* m_BackButton;
-    IconButton* m_ForwardButton;
-    IconButton* m_StopButton;
-    BButton* m_goButton;
-    BTextControl* m_url;
-    BStringView* m_statusText;
-    BStatusBar* m_loadingProgressBar;
-    BLayoutItem* m_findGroup;
-    BLayoutItem* m_tabGroup;
-    BTextControl* m_findTextControl;
-    BCheckBox* m_findCaseSensitiveCheckBox;
-    TabManager* m_tabManager;
+	// WebPage notification API implementations
+	virtual	void				NavigationRequested(const BString& url,
+									BWebView* view);
+	virtual	void				NewWindowRequested(const BString& url,
+									bool primaryAction);
+	virtual	void				NewPageCreated(BWebView* view);
+	virtual	void				LoadNegotiating(const BString& url,
+									BWebView* view);
+	virtual	void				LoadCommitted(const BString& url,
+									BWebView* view);
+	virtual	void				LoadProgress(float progress, BWebView* view);
+	virtual	void				LoadFailed(const BString& url, BWebView* view);
+	virtual	void				LoadFinished(const BString& url,
+									BWebView* view);
+	virtual	void				TitleChanged(const BString& title,
+									BWebView* view);
+	virtual	void				ResizeRequested(float width, float height,
+									BWebView* view);
+	virtual	void				SetToolBarsVisible(bool flag, BWebView* view);
+	virtual	void				SetStatusBarVisible(bool flag, BWebView* view);
+	virtual	void				SetMenuBarVisible(bool flag, BWebView* view);
+	virtual	void				SetResizable(bool flag, BWebView* view);
+	virtual	void				StatusChanged(const BString& status,
+									BWebView* view);
+	virtual	void				NavigationCapabilitiesChanged(
+									bool canGoBackward, bool canGoForward,
+									bool canStop, BWebView* view);
+	virtual	void				UpdateGlobalHistory(const BString& url);
+	virtual	bool				AuthenticationChallenge(BString message,
+									BString& inOutUser, BString& inOutPassword,
+									bool& inOutRememberCredentials,
+									uint32 failureCount, BWebView* view);
+
+private:
+			void				_UpdateTitle(const BString &title);
+			void				_UpdateTabGroupVisibility();
+
+private:
+			BMessenger			fDownloadListener;
+			BMenuBar*			fMenuBar;
+			BMenu*				fGoMenu;
+			IconButton*			fBackButton;
+			IconButton*			fForwardButton;
+			IconButton*			fStopButton;
+			BButton*			fGoButton;
+			BTextControl*		fURLTextControl;
+			BStringView*		fStatusText;
+			BStatusBar*			fLoadingProgressBar;
+			BLayoutItem*		fFindGroup;
+			BLayoutItem*		fTabGroup;
+			BTextControl*		fFindTextControl;
+			BCheckBox*			fFindCaseSensitiveCheckBox;
+			TabManager*			fTabManager;
 };
 
-#endif // LauncherWindow_h
+
+#endif // BROWSER_WINDOW_H
 
