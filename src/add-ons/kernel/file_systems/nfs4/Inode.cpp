@@ -595,7 +595,7 @@ Inode::WriteStat(const struct stat* st, uint32 mask)
 {
 	status_t result;
 	OpenFileCookie* cookie = NULL;
-	AttrValue attr[4];
+	AttrValue attr[6];
 	uint32 i = 0;
 
 	if ((mask & B_STAT_SIZE) != 0) {
@@ -620,6 +620,20 @@ Inode::WriteStat(const struct stat* st, uint32 mask)
 		attr[i].fAttribute = FATTR4_MODE;
 		attr[i].fFreePointer = false;
 		attr[i].fData.fValue32 = st->st_mode;
+		i++;
+	}
+
+	if ((mask & B_STAT_UID) != 0) {
+		attr[i].fAttribute = FATTR4_OWNER;
+		attr[i].fFreePointer = true;
+		attr[i].fData.fPointer = gIdMapper->GetOwner(st->st_uid);
+		i++;
+	}
+
+	if ((mask & B_STAT_GID) != 0) {
+		attr[i].fAttribute = FATTR4_OWNER_GROUP;
+		attr[i].fFreePointer = true;
+		attr[i].fData.fPointer = gIdMapper->GetOwnerGroup(st->st_gid);
 		i++;
 	}
 
