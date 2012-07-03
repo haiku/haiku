@@ -5,8 +5,8 @@
  * Authors:
  *		Paweł Dziepak, pdziepak@quarnos.org
  */
-#ifndef FILEHANDLE_H
-#define FILEHANDLE_H
+#ifndef FILEINFO_H
+#define FILEINFO_H
 
 
 #include <stdlib.h>
@@ -27,6 +27,8 @@ struct Filehandle {
 };
 
 
+class Filesystem;
+
 // Complete information needed to identify a file in any situation.
 // Unfortunately just a filehandle is not enough even when they are persistent
 // since OPEN requires both parent filehandle and file name (just like LOOKUP).
@@ -42,6 +44,8 @@ struct FileInfo {
 	inline				~FileInfo();
 	inline				FileInfo(const FileInfo& fi);
 	inline	FileInfo&	operator=(const FileInfo& fi);
+
+			status_t	UpdateFileHandles(Filesystem* fs);
 };
 
 struct FilesystemId {
@@ -140,5 +144,5 @@ FilesystemId::operator!=(const FilesystemId& fsid) const
 }
 
 
-#endif	// FILEHANDLE_H
+#endif	// FILEHINFO_H
 

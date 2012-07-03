@@ -11,6 +11,7 @@
 
 #include <SupportDefs.h>
 
+#include "FileInfo.h"
 #include "NFS4Defs.h"
 #include "RPCReply.h"
 

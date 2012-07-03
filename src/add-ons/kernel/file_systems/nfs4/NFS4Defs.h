@@ -14,7 +14,6 @@
 
 #include <SupportDefs.h>
 
-#include "Filehandle.h"
 
 enum Procedure {
 	ProcNull		= 0,

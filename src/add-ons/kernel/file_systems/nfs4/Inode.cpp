@@ -210,8 +210,8 @@ Inode::Link(Inode* dir, const char* name)
 
 		// filehandle has expired
 		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
-			_LookUpFilehandle();
-			dir->_LookUpFilehandle();
+			fInfo.UpdateFileHandles(fFilesystem);
+			dir->fInfo.UpdateFileHandles(dir->fFilesystem);
 			continue;
 		}
 
@@ -315,8 +315,8 @@ Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName)
 
 		// filehandle has expired
 		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
-			from->_LookUpFilehandle();
-			to->_LookUpFilehandle();
+			from->fInfo.UpdateFileHandles(from->fFilesystem);
+			to->fInfo.UpdateFileHandles(to->fFilesystem);
 			continue;
 		}
 
@@ -956,7 +956,7 @@ Inode::_HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 
 		// filehandle has expired
 		case NFS4ERR_FHEXPIRED:
-			if (_LookUpFilehandle() == B_OK)
+			if (fInfo.UpdateFileHandles(fFilesystem) == B_OK)
 				return true;
 			else
 				return false;
@@ -978,75 +978,5 @@ Inode::_HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 		default:
 			return false;
 	}
-}
-
-
-static status_t
-sParsePath(RequestBuilder& req, uint32* count, const char* _path)
-{
-	char* path = strdup(_path);
-	char* pathStart = path;
-	char* pathEnd;
-	while (pathStart != NULL) {
-		pathEnd = strpbrk(pathStart, "/");
-		if (pathEnd != NULL)
-			*pathEnd = '\0';
-
-		req.LookUp(pathStart);
-
-		if (pathEnd != NULL && pathEnd[1] != '\0')
-			pathStart = pathEnd + 1;
-		else
-			pathStart = NULL;
-
-		(*count)++;
-	}
-	free(path);
-
-	return B_OK;
-}
-
-
-status_t
-Inode::_LookUpFilehandle()
-{
-	Request request(fFilesystem->Server());
-	RequestBuilder& req = request.Builder();
-
-	req.PutRootFH();
-
-	uint32 lookupCount = 0;
-
-	sParsePath(req, &lookupCount, fFilesystem->Path());
-	sParsePath(req, &lookupCount, fInfo.fPath);
-
-	req.GetFH();
-
-	if (fFilesystem->IsAttrSupported(FATTR4_FILEID)) {
-		AttrValue attr;
-		attr.fAttribute = FATTR4_FILEID;
-		attr.fFreePointer = false;
-		attr.fData.fValue64 = fInfo.fFileId;
-		req.Verify(&attr, 1);
-	}
-
-	status_t result = request.Send();
-	if (result != B_OK)
-		return result;
-
-	ReplyInterpreter& reply = request.Reply();
-
-	reply.PutRootFH();
-	for (uint32 i = 0; i < lookupCount; i++)
-		reply.LookUp();
-
-	result = reply.GetFH(&fInfo.fHandle);
-	if (result != B_OK)
-		return result;
-
-	if (fFilesystem->IsAttrSupported(FATTR4_FILEID))
-		return reply.Verify();
-	else
-		return B_OK;
 }
 

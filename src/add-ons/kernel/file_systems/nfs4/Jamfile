@@ -6,6 +6,7 @@ UsePrivateHeaders shared ;
 KernelAddon nfs4 :
 	Cookie.cpp
 	Connection.cpp
+	FileInfo.cpp
 	Filesystem.cpp
 	Inode.cpp
 	InodeDir.cpp

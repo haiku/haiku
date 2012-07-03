@@ -14,7 +14,7 @@
 #include <util/AutoLock.h>
 #include <util/AVLTreeMap.h>
 
-#include "Filehandle.h"
+#include "FileInfo.h"
 
 
 class InodeIdMap {
