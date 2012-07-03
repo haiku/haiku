@@ -6,8 +6,8 @@
 
 #include <asm_defs.h>
 
-#include <arch/x86_64/descriptors.h>
-#include <arch/x86_64/arch_cpu.h>
+#include <arch/x86/descriptors.h>
+#include <arch/x86/arch_cpu.h>
 
 #include "asm_offsets.h"
 

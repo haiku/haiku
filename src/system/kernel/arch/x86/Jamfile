@@ -20,17 +20,21 @@ if $(TARGET_ARCH) = x86_64 {
 	SEARCH_SOURCE += [ FDirName $(SUBDIR) 64 ] ;
 
 	archSpecificSources =
+		int.cpp
+		interrupts.S
 		stubs.cpp
 	;
 } else {
 	SEARCH_SOURCE += [ FDirName $(SUBDIR) 32 ] ;
 
 	archSpecificSources =
+		int.cpp
+		interrupts.S
+
 		arch_commpage.cpp
 		arch_cpu.cpp
 		arch_debug.cpp
 		arch_elf.cpp
-		arch_int.cpp
 		arch_platform.cpp
 #		arch_selector.cpp
 		arch_real_time_clock.cpp
@@ -40,7 +44,6 @@ if $(TARGET_ARCH) = x86_64 {
 		arch_vm.cpp
 		arch_vm_translation_map.cpp
 		arch_x86.S
-		arch_interrupts.S
 		arch_system_info.cpp
 		arch_user_debugger.cpp
 		apic.cpp
@@ -50,7 +53,6 @@ if $(TARGET_ARCH) = x86_64 {
 		ioapic.cpp
 		irq_routing_table.cpp
 		msi.cpp
-		pic.cpp
 		syscall.S
 		vm86.cpp
 		x86_signals.cpp
@@ -83,6 +85,8 @@ if $(TARGET_ARCH) = x86_64 {
 
 local archGenericSources =
 	arch_debug_console.cpp
+	arch_int.cpp
+	pic.cpp
 ;
 
 KernelMergeObject kernel_arch_x86.o :

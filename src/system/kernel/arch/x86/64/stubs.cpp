@@ -14,7 +14,6 @@
 #include <debugger.h>
 #include <elf.h>
 #include <elf_priv.h>
-#include <int.h>
 #include <real_time_clock.h>
 #include <real_time_data.h>
 #include <smp.h>
@@ -35,7 +34,6 @@
 #include <arch/system_info.h>
 #include <arch/smp.h>
 #include <arch/real_time_clock.h>
-#include <arch/int.h>
 #include <arch/elf.h>
 
 
@@ -674,55 +672,6 @@ arch_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
 	uint32 protection)
 {
 	return true;
-}
-
-
-void
-arch_int_enable_io_interrupt(int irq)
-{
-
-}
-
-
-void
-arch_int_disable_io_interrupt(int irq)
-{
-
-}
-
-
-void
-arch_int_configure_io_interrupt(int irq, uint32 config)
-{
-
-}
-
-
-status_t
-arch_int_init(struct kernel_args *args)
-{
-	return B_OK;
-}
-
-
-status_t
-arch_int_init_post_vm(struct kernel_args *args)
-{
-	return B_OK;
-}
-
-
-status_t
-arch_int_init_io(kernel_args* args)
-{
-	return B_OK;
-}
-
-
-status_t
-arch_int_init_post_device_manager(struct kernel_args *args)
-{
-	return B_OK;
 }
 
 

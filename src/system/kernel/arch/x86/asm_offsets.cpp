@@ -44,6 +44,11 @@ dummy()
 	DEFINE_OFFSET_MACRO(THREAD, Thread, kernel_stack_top);
 	DEFINE_OFFSET_MACRO(THREAD, Thread, fault_handler);
 
+#ifdef __x86_64__
+	// struct iframe
+	DEFINE_SIZEOF_MACRO(IFRAME, iframe);
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, vector);
+#else
 	// struct iframe
 	DEFINE_SIZEOF_MACRO(IFRAME, iframe);
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, cs);
@@ -58,6 +63,7 @@ dummy()
 	// struct vm86_iframe
 	DEFINE_SIZEOF_MACRO(VM86_IFRAME, vm86_iframe);
 	DEFINE_OFFSET_MACRO(VM86_IFRAME, vm86_iframe, flags);
+#endif
 
 	// struct syscall_info
 	DEFINE_SIZEOF_MACRO(SYSCALL_INFO, syscall_info);

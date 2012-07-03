@@ -12,10 +12,13 @@
 #include <boot/kernel_args.h>
 #include <cpu.h>
 
-#include <arch/x86_64/descriptors.h>
+#include <arch/x86/apic.h>
+#include <arch/x86/descriptors.h>
+#include <arch/x86/pic.h>
 
 
 typedef void interrupt_handler_function(iframe* frame);
+
 
 static const char* kInterruptNames[] = {
 	/*  0 */ "Divide Error Exception",
@@ -46,6 +49,7 @@ static interrupt_descriptor* sIDT;
 interrupt_handler_function* gInterruptHandlerTable[kInterruptHandlerTableSize];
 
 extern uint8 isr_array[kInterruptHandlerTableSize][16];
+extern void hardware_interrupt(struct iframe* frame);
 
 
 static const char*
@@ -104,27 +108,6 @@ page_fault_exception(iframe* frame)
 // #pragma mark -
 
 
-void
-arch_int_enable_io_interrupt(int irq)
-{
-
-}
-
-
-void
-arch_int_disable_io_interrupt(int irq)
-{
-
-}
-
-
-void
-arch_int_configure_io_interrupt(int irq, uint32 config)
-{
-
-}
-
-
 status_t
 arch_int_init(kernel_args* args)
 {
@@ -152,8 +135,8 @@ arch_int_init(kernel_args* args)
 	// Initialize the interrupt handler table.
 	for (uint32 i = 0; i < ARCH_INTERRUPT_BASE; i++)
 		table[i] = invalid_exception;
-	//for (uint32 i = ARCH_INTERRUPT_BASE; i < INTERRUPT_HANDLER_TABLE_SIZE; i++)
-	//	table[i] = hardware_interrupt;
+	for (uint32 i = ARCH_INTERRUPT_BASE; i < kInterruptHandlerTableSize; i++)
+		table[i] = hardware_interrupt;
 
 	table[0]  = unexpected_exception;	// Divide Error Exception (#DE)
 	//table[1]  = x86_handle_debug_exception; // Debug Exception (#DB)
@@ -165,7 +148,7 @@ arch_int_init(kernel_args* args)
 	table[5]  = unexpected_exception;	// BOUND Range Exceeded Exception (#BR)
 	table[6]  = unexpected_exception;	// Invalid Opcode Exception (#UD)
 	table[7]  = fatal_exception;		// Device Not Available Exception (#NM)
-	table[8]  = fatal_exception;		 // Double Fault Exception (#DF)
+	table[8]  = fatal_exception;		// Double Fault Exception (#DF)
 	table[9]  = fatal_exception;		// Coprocessor Segment Overrun
 	table[10] = fatal_exception;		// Invalid TSS Exception (#TS)
 	table[11] = fatal_exception;		// Segment Not Present (#NP)
@@ -184,6 +167,9 @@ arch_int_init(kernel_args* args)
 	};
 	asm volatile("lidt %0" :: "m"(idtr));
 
+	// Set up the legacy PIC.
+	pic_init();
+
 	panic("not implemented\n");
 	return B_OK;
 }
@@ -192,19 +178,11 @@ arch_int_init(kernel_args* args)
 status_t
 arch_int_init_post_vm(kernel_args* args)
 {
-	return B_OK;
-}
+	// Always init the local apic as it can be used for timers even if we
+	// don't end up using the io apic
+	//apic_init(args);
 
+	// TODO: create area for IDT.
 
-status_t
-arch_int_init_io(kernel_args* args)
-{
-	return B_OK;
-}
-
-
-status_t
-arch_int_init_post_device_manager(kernel_args* args)
-{
 	return B_OK;
 }
