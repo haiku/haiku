@@ -34,15 +34,19 @@ Inode::CreateDir(const char* name, int mode)
 		cattr[i].fData.fValue32 = mode;
 		i++;
 
-		cattr[i].fAttribute = FATTR4_OWNER;
-		cattr[i].fFreePointer = true;
-		cattr[i].fData.fPointer = gIdMapper->GetOwner(getuid());
-		i++;
+		if (fFilesystem->IsAttrSupported(FATTR4_OWNER)) {
+			cattr[i].fAttribute = FATTR4_OWNER;
+			cattr[i].fFreePointer = true;
+			cattr[i].fData.fPointer = gIdMapper->GetOwner(getuid());
+			i++;
+		}
 
-		cattr[i].fAttribute = FATTR4_OWNER_GROUP;
-		cattr[i].fFreePointer = true;
-		cattr[i].fData.fPointer = gIdMapper->GetOwnerGroup(getgid());
-		i++;
+		if (fFilesystem->IsAttrSupported(FATTR4_OWNER_GROUP)) {
+			cattr[i].fAttribute = FATTR4_OWNER_GROUP;
+			cattr[i].fFreePointer = true;
+			cattr[i].fData.fPointer = gIdMapper->GetOwnerGroup(getgid());
+			i++;
+		}
 
 		req.Create(NF4DIR, name, cattr, i);
 

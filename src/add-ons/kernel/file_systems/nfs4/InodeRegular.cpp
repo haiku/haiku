@@ -91,15 +91,19 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 		cattr[i].fData.fValue32 = perms;
 		i++;
 
-		cattr[i].fAttribute = FATTR4_OWNER;
-		cattr[i].fFreePointer = true;
-		cattr[i].fData.fPointer = gIdMapper->GetOwner(getuid());
-		i++;
+		if (fFilesystem->IsAttrSupported(FATTR4_OWNER)) {
+			cattr[i].fAttribute = FATTR4_OWNER;
+			cattr[i].fFreePointer = true;
+			cattr[i].fData.fPointer = gIdMapper->GetOwner(getuid());
+			i++;
+		}
 
-		cattr[i].fAttribute = FATTR4_OWNER_GROUP;
-		cattr[i].fFreePointer = true;
-		cattr[i].fData.fPointer = gIdMapper->GetOwnerGroup(getgid());
-		i++;
+		if (fFilesystem->IsAttrSupported(FATTR4_OWNER_GROUP)) {
+			cattr[i].fAttribute = FATTR4_OWNER_GROUP;
+			cattr[i].fFreePointer = true;
+			cattr[i].fData.fPointer = gIdMapper->GetOwnerGroup(getgid());
+			i++;
+		}
 
 		req.Open(CLAIM_NULL, cookie->fSequence++, sModeToAccess(mode),
 			cookie->fClientId, OPEN4_CREATE, cookie->fOwnerId, name, cattr,
