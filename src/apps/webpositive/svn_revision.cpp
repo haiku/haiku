@@ -5,6 +5,6 @@
 
 #include "svn_revision.h"
 
-const int32 kSVNRevision =
-	#include "svn_revision"
+const int32 kSVNRevision = 0;
+//	#include "svn_revision"
 ;
