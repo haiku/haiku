@@ -59,6 +59,6 @@ HaikuSubInclude terminal ;
 HaikuSubInclude text_search ;
 HaikuSubInclude tracker ;
 HaikuSubInclude tv ;
-HaikuSubInclude webwatch ;
 HaikuSubInclude webpositive ;
+HaikuSubInclude webwatch ;
 HaikuSubInclude workspaces ;
