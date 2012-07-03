@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src apps webpositive ;
 
-UseLibraryHeaders webkit ;
+SubDirSysHdrs $(HAIKU_WEBKIT_HEADERS) ;
 
 SubDirC++Flags $(defines) -Wno-error=sequence-point ;
 SubDirCcFlags $(defines) -Wno-error=sequence-point ;
@@ -17,12 +17,7 @@ for sourceDir in $(sourceDirs) {
 	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps webpositive $(sourceDir) ] ;
 }
 
-# SVN revision
-#local svnRevisionFile = [ FGristFiles svn_revision ] ;
-#MakeLocate $(svnRevisionFile) : $(LOCATE_TARGET) ;
-#CreateSVNRevisionFile $(svnRevisionFile) ;
-
-Application WebPositive :
+local sources =
 	# autocompletion
 	AutoCompleter.cpp
 	AutoCompleterDefaultImpl.cpp
@@ -53,9 +48,22 @@ Application WebPositive :
 	SettingsWindow.cpp
 	svn_revision.cpp
 	URLInputGroup.cpp
+;
+
+
+Includes [ FGristFiles $(sources) ] : $(HAIKU_WEBKIT_HEADERS_DEPENDENCY) ;
+	# Dependency needed to trigger downloading/unzipping the package before
+	# compiling the files.
+
+# SVN revision
+#local svnRevisionFile = [ FGristFiles svn_revision ] ;
+#MakeLocate $(svnRevisionFile) : $(LOCATE_TARGET) ;
+#CreateSVNRevisionFile $(svnRevisionFile) ;
+
+Application WebPositive :
+	$(sources)
 	:
-	# webkit libs
-	javascriptcore webcore webkit wtf
+	$(HAIKU_WEBKIT_LIBS)
 	# dependencies
 	curl icuuc icudata png sqlite3 xml2 z
 	# haiku
