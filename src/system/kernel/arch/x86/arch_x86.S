@@ -286,9 +286,10 @@ FUNCTION(arch_cpu_user_strlcpy):
 	cld
 .L_user_strlcpy_copy_loop:
 	/* move data by bytes */
-	movsb
-	cmpb $0,-1(%esi)
-	je .L_user_strlcpy_source_done
+	lodsb
+	stosb
+	test %al,%al
+	jz .L_user_strlcpy_source_done
 	loop .L_user_strlcpy_copy_loop
 
 	/* null terminate string */
