@@ -435,8 +435,6 @@ if $(TARGET_ARCH) = x86 {
 	HAIKU_WEBKIT_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
 		$(HAIKU_WEBKIT_FILE:B) ] ;
 
-	echo $(HAIKU_WEBKIT_DIR) ;
-
 	HAIKU_WEBKIT_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_WEBKIT_DIR)
 		: include/ : $(zipFile) : extracted-webkit ] ;
 
