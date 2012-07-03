@@ -48,7 +48,7 @@ public:
 
 	inline	bool			GetBoolean();
 
-			const char*		GetString();
+			char*			GetString();
 
 			const void*		GetOpaque(uint32* size);
 

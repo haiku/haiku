@@ -12,6 +12,7 @@
 #include <dirent.h>
 #include <string.h>
 
+#include "IdMap.h"
 #include "Request.h"
 #include "RootInode.h"
 
@@ -26,11 +27,24 @@ Inode::CreateDir(const char* name, int mode)
 
 		req.PutFH(fInfo.fHandle);
 
-		AttrValue attr;
-		attr.fAttribute = FATTR4_MODE;
-		attr.fFreePointer = false;
-		attr.fData.fValue32 = mode;
-		req.Create(NF4DIR, name, &attr, 1);
+		uint32 i = 0;
+		AttrValue cattr[3];
+		cattr[i].fAttribute = FATTR4_MODE;
+		cattr[i].fFreePointer = false;
+		cattr[i].fData.fValue32 = mode;
+		i++;
+
+		cattr[i].fAttribute = FATTR4_OWNER;
+		cattr[i].fFreePointer = true;
+		cattr[i].fData.fPointer = gIdMapper->GetOwner(getuid());
+		i++;
+
+		cattr[i].fAttribute = FATTR4_OWNER_GROUP;
+		cattr[i].fFreePointer = true;
+		cattr[i].fData.fPointer = gIdMapper->GetOwnerGroup(getgid());
+		i++;
+
+		req.Create(NF4DIR, name, cattr, i);
 
 		status_t result = request.Send();
 		if (result != B_OK)

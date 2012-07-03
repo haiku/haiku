@@ -13,6 +13,7 @@
 
 #include <NodeMonitor.h>
 
+#include "IdMap.h"
 #include "Request.h"
 #include "RootInode.h"
 
@@ -345,11 +346,24 @@ Inode::CreateLink(const char* name, const char* path, int mode)
 
 		req.PutFH(fInfo.fHandle);
 
-		AttrValue attr;
-		attr.fAttribute = FATTR4_MODE;
-		attr.fFreePointer = false;
-		attr.fData.fValue32 = mode;
-		req.Create(NF4LNK, name, &attr, 1, path);
+		uint32 i = 0;
+		AttrValue cattr[3];
+		cattr[i].fAttribute = FATTR4_MODE;
+		cattr[i].fFreePointer = false;
+		cattr[i].fData.fValue32 = mode;
+		i++;
+
+		cattr[i].fAttribute = FATTR4_OWNER;
+		cattr[i].fFreePointer = true;
+		cattr[i].fData.fPointer = gIdMapper->GetOwner(getuid());
+		i++;
+
+		cattr[i].fAttribute = FATTR4_OWNER_GROUP;
+		cattr[i].fFreePointer = true;
+		cattr[i].fData.fPointer = gIdMapper->GetOwnerGroup(getgid());
+		i++;
+
+		req.Create(NF4LNK, name, cattr, i, path);
 
 		status_t result = request.Send();
 		if (result != B_OK)
@@ -460,6 +474,7 @@ Inode::Stat(struct stat* st)
 		req.PutFH(fInfo.fHandle);
 
 		Attribute attr[] = { FATTR4_SIZE, FATTR4_MODE, FATTR4_NUMLINKS,
+							FATTR4_OWNER, FATTR4_OWNER_GROUP,
 							FATTR4_TIME_ACCESS, FATTR4_TIME_CREATE,
 							FATTR4_TIME_METADATA, FATTR4_TIME_MODIFY };
 		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
@@ -526,6 +541,20 @@ Inode::Stat(struct stat* st)
 		} else
 			st->st_nlink = 1;
 
+		if (count >= next && values[next].fAttribute == FATTR4_OWNER) {
+			char* owner = reinterpret_cast<char*>(values[next].fData.fPointer);
+			st->st_uid = gIdMapper->GetUserId(owner);
+			next++;
+		} else
+			st->st_uid = 0;
+
+		if (count >= next && values[next].fAttribute == FATTR4_OWNER_GROUP) {
+			char* group = reinterpret_cast<char*>(values[next].fData.fPointer);
+			st->st_gid = gIdMapper->GetGroupId(group);
+			next++;
+		} else
+			st->st_gid = 0;
+
 		if (count >= next && values[next].fAttribute == FATTR4_TIME_ACCESS) {
 			memcpy(&st->st_atim, values[next].fData.fPointer, sizeof(timespec));
 			next++;
@@ -550,9 +579,6 @@ Inode::Stat(struct stat* st)
 			next++;
 		} else
 			memset(&st->st_mtim, 0, sizeof(timespec));
-
-		st->st_uid = 0;
-		st->st_gid = 0;
 
 		delete[] values;
 		return B_OK;

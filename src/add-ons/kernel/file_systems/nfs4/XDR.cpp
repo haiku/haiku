@@ -115,7 +115,7 @@ ReadStream::GetUHyper()
 }
 
 
-const char*
+char*
 ReadStream::GetString()
 {
 	if (_PositionToSize() >= fSize) {

@@ -13,6 +13,7 @@
 
 #include <NodeMonitor.h>
 
+#include "IdMap.h"
 #include "Request.h"
 
 
@@ -77,7 +78,7 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 
 		req.PutFH(fInfo.fHandle);
 
-		AttrValue cattr[2];
+		AttrValue cattr[4];
 		uint32 i = 0;
 		if ((mode & O_TRUNC) == O_TRUNC) {
 			cattr[i].fAttribute = FATTR4_SIZE;
@@ -88,9 +89,21 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 		cattr[i].fAttribute = FATTR4_MODE;
 		cattr[i].fFreePointer = false;
 		cattr[i].fData.fValue32 = perms;
+		i++;
+
+		cattr[i].fAttribute = FATTR4_OWNER;
+		cattr[i].fFreePointer = true;
+		cattr[i].fData.fPointer = gIdMapper->GetOwner(getuid());
+		i++;
+
+		cattr[i].fAttribute = FATTR4_OWNER_GROUP;
+		cattr[i].fFreePointer = true;
+		cattr[i].fData.fPointer = gIdMapper->GetOwnerGroup(getgid());
+		i++;
+
 		req.Open(CLAIM_NULL, cookie->fSequence++, sModeToAccess(mode),
 			cookie->fClientId, OPEN4_CREATE, cookie->fOwnerId, name, cattr,
-			i + 1, (mode & O_EXCL) == O_EXCL);
+			i, (mode & O_EXCL) == O_EXCL);
 
 		req.GetFH();
 

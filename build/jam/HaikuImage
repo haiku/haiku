@@ -106,7 +106,7 @@ PRIVATE_SYSTEM_LIBS =
 SYSTEM_SERVERS = app_server cddb_daemon debug_server input_server mail_daemon
 	media_addon_server media_server midi_server mount_server net_server
 	notification_server power_daemon print_server print_addon_server registrar syslog_daemon
-	dns_resolver_server
+	dns_resolver_server nfs4_idmapper_server
 ;
 
 SYSTEM_NETWORK_DEVICES = ethernet loopback ;

@@ -1,0 +1,13 @@
+SubDir HAIKU_TOP src add-ons kernel file_systems nfs4 idmapper ;
+
+Application nfs4_idmapper_server
+	:
+	IdMapper.cpp
+
+	:
+	be
+	$(TARGET_LIBSUPC++)
+
+	:
+	nfs4_idmapper_server.rdef
+;

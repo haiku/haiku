@@ -614,6 +614,20 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 		current++;
 	}
 
+	if (sIsAttrSet(FATTR4_OWNER, bitmap, bcount)) {
+		values[current].fAttribute = FATTR4_OWNER;
+		values[current].fFreePointer = true;
+		values[current].fData.fPointer = stream.GetString();
+		current++;
+	}
+
+	if (sIsAttrSet(FATTR4_OWNER_GROUP, bitmap, bcount)) {
+		values[current].fAttribute = FATTR4_OWNER_GROUP;
+		values[current].fFreePointer = true;
+		values[current].fData.fPointer = stream.GetString();
+		current++;
+	}
+
 	if (sIsAttrSet(FATTR4_SPACE_FREE, bitmap, bcount)) {
 		values[current].fAttribute = FATTR4_SPACE_FREE;
 		values[current].fData.fValue64 = stream.GetUHyper();

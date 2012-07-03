@@ -15,6 +15,7 @@
 
 #include "Connection.h"
 #include "Filesystem.h"
+#include "IdMap.h"
 #include "Inode.h"
 #include "NFS4Defs.h"
 #include "RequestBuilder.h"
@@ -546,6 +547,13 @@ nfs4_init()
 	gRPCServerManager = new(std::nothrow) RPC::ServerManager;
 	if (gRPCServerManager == NULL)
 		return B_NO_MEMORY;
+
+	gIdMapper = new(std::nothrow) IdMap;
+	if (gIdMapper == NULL) {
+		delete gRPCServerManager;
+		return B_NO_MEMORY;
+	}
+
 	return B_OK;
 }
 
@@ -555,6 +563,7 @@ nfs4_uninit()
 {
 	dprintf("NFS4 Uninit\n");
 
+	delete gIdMapper;
 	delete gRPCServerManager;
 
 	return B_OK;

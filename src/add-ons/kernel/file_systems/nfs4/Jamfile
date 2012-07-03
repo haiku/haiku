@@ -8,6 +8,7 @@ KernelAddon nfs4 :
 	Connection.cpp
 	FileInfo.cpp
 	Filesystem.cpp
+	IdMap.cpp
 	Inode.cpp
 	InodeDir.cpp
 	InodeRegular.cpp
@@ -23,3 +24,6 @@ KernelAddon nfs4 :
 	RPCServer.cpp
 	XDR.cpp
 ;
+
+SubInclude HAIKU_TOP src add-ons kernel file_systems nfs4 idmapper ;
+

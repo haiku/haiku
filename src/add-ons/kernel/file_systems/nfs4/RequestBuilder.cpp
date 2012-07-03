@@ -776,6 +776,16 @@ RequestBuilder::_EncodeAttrs(XDR::WriteStream& stream, AttrValue* attr,
 		i++;
 	}
 
+	if (i < count && attr[i].fAttribute == FATTR4_OWNER) {
+		str.AddString(reinterpret_cast<char*>(attr[i].fData.fPointer));
+		i++;
+	}
+
+	if (i < count && attr[i].fAttribute == FATTR4_OWNER_GROUP) {
+		str.AddString(reinterpret_cast<char*>(attr[i].fData.fPointer));
+		i++;
+	}
+
 	if (i < count && attr[i].fAttribute == FATTR4_TIME_ACCESS_SET) {
 		str.AddInt(1);		// SET_TO_CLIENT_TIME4
 
