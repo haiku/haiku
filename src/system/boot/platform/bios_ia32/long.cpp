@@ -137,8 +137,6 @@ long_mmu_init()
 	pml4[0] = physicalAddress | kTableMappingFlags;
 
 	for (uint64 i = 0; i < maxAddress; i += 0x40000000) {
-		dprintf("mapping %llu GB\n", i / 0x40000000);
-
 		pageDir = (uint64*)mmu_allocate_page(&physicalAddress);
 		memset(pageDir, 0, B_PAGE_SIZE);
 		pdpt[i / 0x40000000] = physicalAddress | kTableMappingFlags;
