@@ -634,20 +634,20 @@ ConfirmChangeIfWellKnownDirectory(const BEntry *entry,
 	if (DirectoryMatchesOrContains(entry, B_SYSTEM_DIRECTORY)) {
 		warning.SetTo(
 			B_TRANSLATE("If you %ifYouDoAction the system folder or its "
-			"contents, you won't be able to boot %osName! Are you sure you "
-			"want to do this? To %toDoAction the system folder or its "
+			"contents, you won't be able to boot %osName!\n\nAre you sure you "
+			"want to do this?\n\nTo %toDoAction the system folder or its "
 			"contents anyway, hold down the Shift key and click "
 			"\"%toConfirmAction\"."));
 	} else if (DirectoryMatches(entry, B_COMMON_DIRECTORY)) {
 		warning.SetTo(
 			B_TRANSLATE("If you %ifYouDoAction the common folder, %osName "
-			"may not behave properly! Are you sure you want to do this? "
+			"may not behave properly!\n\nAre you sure you want to do this?\n\n"
 			"To %toDoAction the common folder anyway, hold down the "
 			"Shift key and click \"%toConfirmAction\"."));
 	} else if (DirectoryMatches(entry, B_USER_DIRECTORY)) {
 		warning .SetTo(
 			B_TRANSLATE("If you %ifYouDoAction the home folder, %osName "
-			"may not behave properly! Are you sure you want to do this? "
+			"may not behave properly!\n\nAre you sure you want to do this?\n\n"
 			"To %toDoAction the home folder anyway, hold down the "
 			"Shift key and click \"%toConfirmAction\"."));
 	} else if (DirectoryMatchesOrContains(entry, B_USER_CONFIG_DIRECTORY)
@@ -659,24 +659,21 @@ ConfirmChangeIfWellKnownDirectory(const BEntry *entry,
 				B_COMMON_SETTINGS_DIRECTORY)) {
 			warning.SetTo(
 				B_TRANSLATE("If you %ifYouDoAction the mime settings, "
-				"%osName may not behave properly! Are you sure you want to "
-				"do this? To %toDoAction the mime settings anyway, click "
-				"\"%toConfirmAction\"."));
+				"%osName may not behave properly!\n\nAre you sure you want to "
+				"do this?"));
 			requireOverride = false;
 		} else if (DirectoryMatches(entry, B_USER_CONFIG_DIRECTORY)) {
 			warning.SetTo(
 				B_TRANSLATE("If you %ifYouDoAction the config folder, %osName "
-				"may not behave properly! Are you sure you want to do this? "
-				"To %toDoAction the config folder anyway, click "
-				"\"%toConfirmAction\"."));
+				"may not behave properly!\n\nAre you sure you want to do "
+				"this?"));
 			requireOverride = false;
 		} else if (DirectoryMatches(entry, B_USER_SETTINGS_DIRECTORY)
 			|| DirectoryMatches(entry, B_COMMON_SETTINGS_DIRECTORY)) {
 			warning.SetTo(
 				B_TRANSLATE("If you %ifYouDoAction the settings folder, "
-				"%osName may not behave properly! Are you sure you want to "
-				"do this? To %toDoAction the settings folder anyway, click "
-				"\"%toConfirmAction\"."));
+				"%osName may not behave properly!\n\nAre you sure you want to "
+				"do this?"));
 			requireOverride = false;
 		}
 	}
