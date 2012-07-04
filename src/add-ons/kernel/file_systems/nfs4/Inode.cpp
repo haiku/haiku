@@ -96,7 +96,6 @@ Inode::CreateInode(Filesystem* fs, const FileInfo &fi, Inode** _inode)
 
 Inode::~Inode()
 {
-	free(const_cast<char*>(fInfo.fName));
 }
 
 
