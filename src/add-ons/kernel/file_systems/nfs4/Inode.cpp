@@ -175,9 +175,14 @@ Inode::LookUp(const char* name, ino_t* id)
 		fi.fHandle = fh;
 		fi.fParent = fInfo.fHandle;
 		fi.fName = strdup(name);
+		if (fi.fName == NULL)
+			return B_NO_MEMORY;
 
 		char* path = reinterpret_cast<char*>(malloc(strlen(name) + 2 +
 			strlen(fInfo.fPath)));
+		if (path == NULL)
+			return B_NO_MEMORY;
+
 		strcpy(path, fInfo.fPath);
 		strcat(path, "/");
 		strcat(path, name);

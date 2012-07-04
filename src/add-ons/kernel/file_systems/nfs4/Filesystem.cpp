@@ -176,6 +176,11 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
 
 	delete[] values;
 
+	if (fi.fName == NULL || fi.fPath == NULL) {
+		delete fs;
+		return B_NO_MEMORY;
+	}
+
 	Inode* inode;
 	result = Inode::CreateInode(fs, fi, &inode);
 	if (result != B_OK) {
@@ -257,6 +262,15 @@ Filesystem::Migrate(const RPC::Server* serv)
 
 				free(const_cast<char*>(fPath));
 				fPath = strdup(locs->fLocations[j].fRootPath);
+
+				if (fPath == NULL) {
+					gRPCServerManager->Release(fServer);
+					fServer = server;
+					put_module(DNS_RESOLVER_MODULE_NAME);
+					delete[] values;
+					return B_NO_MEMORY;
+				}
+
 				break;
 			}
 		}
@@ -265,8 +279,10 @@ Filesystem::Migrate(const RPC::Server* serv)
 	put_module(DNS_RESOLVER_MODULE_NAME);
 	delete[] values;
 
-	if (server == fServer)
+	if (server == fServer) {
+		gRPCServerManager->Release(server);
 		return B_ERROR;
+	}
 
 	NFS4Server* old = reinterpret_cast<NFS4Server*>(server->PrivateData());
 	old->RemoveFilesystem(this);
