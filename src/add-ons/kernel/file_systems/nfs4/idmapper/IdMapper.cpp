@@ -62,6 +62,8 @@ AddDomain(const char* name)
 {
 	uint32 fullLength = strlen(name) + strlen(gDomainName) + 2;
 	char* fullName = reinterpret_cast<char*>(malloc(fullLength));
+	if (fullName == NULL)
+		return NULL;
 
 	strcpy(fullName, name);
 	strcat(fullName, "@");
@@ -93,17 +95,23 @@ UIDToName(void* buffer)
 {
 	uid_t userId = *reinterpret_cast<uid_t*>(buffer);
 
-	const char* fullName = kNobodyName;
+	const char* name = NULL;
 
 	struct passwd* userInfo = getpwuid(userId);
 	if (userInfo != NULL) {
-		const char* name = userInfo->pw_name;
-		fullName = AddDomain(name);
+		name = userInfo->pw_name;
+		name = AddDomain(name);
 	}
 
-	status_t result = write_port(gReplyPort, MsgReply, fullName,
-		strlen(fullName) + 1);
-	free(const_cast<char*>(fullName));
+	status_t result;
+
+	if (name != NULL) {
+		result = write_port(gReplyPort, MsgReply, name, strlen(name) + 1);
+		free(const_cast<char*>(name));
+	} else {
+		result = write_port(gReplyPort, MsgReply, kNobodyName,
+			strlen(kNobodyName) + 1);
+	}
 
 	return result;
 }
@@ -133,17 +141,23 @@ GIDToName(void* buffer)
 {
 	gid_t groupId = *reinterpret_cast<gid_t*>(buffer);
 
-	const char* fullName = kNogroupName;
+	const char* name = NULL;
 
 	struct group* groupInfo = getgrgid(groupId);
 	if (groupInfo != NULL) {
-		const char* name = groupInfo->gr_name;
-		fullName = AddDomain(name);
+		name = groupInfo->gr_name;
+		name = AddDomain(name);
 	}
 
-	status_t result = write_port(gReplyPort, MsgReply, fullName,
-		strlen(fullName) + 1);
-	free(const_cast<char*>(fullName));
+	status_t result;
+
+	if (name != NULL) {
+		result = write_port(gReplyPort, MsgReply, name, strlen(name) + 1);
+		free(const_cast<char*>(name));
+	} else {
+		result = write_port(gReplyPort, MsgReply, kNogroupName,
+			strlen(kNogroupName) + 1);
+	}
 
 	return result;
 }
@@ -193,7 +207,7 @@ MainLoop()
 		result = ParseRequest(code, buffer);
 		free(buffer);
 
-		if (result == B_BAD_PORT_ID)
+		if (result != B_OK)
 			return 0;
 
 	} while (true);
@@ -236,13 +250,13 @@ int
 main(int argc, char** argv)
 {
 	gRequestPort = find_port(kRequestPortName);
-	if (gRequestPort == B_NAME_NOT_FOUND) {
+	if (gRequestPort < B_OK) {
 		fprintf(stderr, "%s\n", strerror(gRequestPort));
 		return gRequestPort;
 	}
 
 	gReplyPort = find_port(kReplyPortName);
-	if (gReplyPort == B_NAME_NOT_FOUND) {
+	if (gReplyPort < B_OK) {
 		fprintf(stderr, "%s\n", strerror(gReplyPort));
 		return gReplyPort;
 	}

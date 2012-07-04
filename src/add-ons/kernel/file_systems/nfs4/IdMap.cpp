@@ -89,8 +89,8 @@ IdMap::_GetValue(const char* buffer, int32 code)
 
 		if (code != MsgReply)
 			return 0;
-		else
-			return value;
+
+		return value;
 	} while (true);
 }
 
@@ -135,8 +135,9 @@ IdMap::_GetBuffer(T value, int32 code)
 		if (code != MsgReply) {
 			free(buffer);
 			return NULL;
-		} else
-			return buffer;
+		}
+
+		return buffer;
 	} while (true);
 }
 
