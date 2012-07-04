@@ -30,19 +30,21 @@ void x86_set_tls_context(Thread* thread);
 
 #ifdef __x86_64__
 
-
 // TODO
+
+extern Thread* gCurrentThread;
+
 static inline Thread*
 arch_thread_get_current_thread(void)
 {
-	return NULL;
+	return gCurrentThread;
 }
 
 
 static inline void
 arch_thread_set_current_thread(Thread* t)
 {
-	
+	gCurrentThread = t;
 }
 
 

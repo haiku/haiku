@@ -26,10 +26,11 @@
 	// (and is in arch_interrupts.S)
 
 #define DOUBLE_FAULT_TSS_BASE_SEGMENT 9
-#define TSS_BASE_SEGMENT (DOUBLE_FAULT_TSS_BASE_SEGMENT + smp_get_num_cpus())
-#define TLS_BASE_SEGMENT (TSS_BASE_SEGMENT + smp_get_num_cpus())
-#define APM_BASE_SEGMENT (TLS_BASE_SEGMENT + smp_get_num_cpus())
+#define TSS_BASE_SEGMENT	(DOUBLE_FAULT_TSS_BASE_SEGMENT + smp_get_num_cpus())
+#define TLS_BASE_SEGMENT	(TSS_BASE_SEGMENT + smp_get_num_cpus())
+#define APM_BASE_SEGMENT	(TLS_BASE_SEGMENT + smp_get_num_cpus())
 
+#define TSS_SEGMENT(cpu)	(TSS_BASE_SEGMENT + cpu)
 
 // defines entries in the GDT/LDT
 

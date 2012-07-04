@@ -86,9 +86,9 @@ arch_thread_init(struct kernel_args *args)
 
 	asm volatile ("clts; fninit; fnclex;");
 	if (gHasSSE)
-		i386_fxsave(sInitialState.fpu_state);
+		x86_fxsave(sInitialState.fpu_state);
 	else
-		i386_fnsave(sInitialState.fpu_state);
+		x86_fnsave(sInitialState.fpu_state);
 
 	return B_OK;
 }
@@ -536,7 +536,7 @@ arch_setup_signal_frame(Thread* thread, struct sigaction* action,
 	signalFrameData->context.uc_mcontext.edi = frame->edi;
 	signalFrameData->context.uc_mcontext.esi = frame->esi;
 	signalFrameData->context.uc_mcontext.ebx = frame->ebx;
-	i386_fnsave((void *)(&signalFrameData->context.uc_mcontext.xregs));
+	x86_fnsave((void *)(&signalFrameData->context.uc_mcontext.xregs));
 
 	// fill in signalFrameData->context.uc_stack
 	signal_get_user_stack(frame->user_esp, &signalFrameData->context.uc_stack);
@@ -605,7 +605,7 @@ arch_restore_signal_frame(struct signal_frame_data* signalFrameData)
 	frame->esi = signalFrameData->context.uc_mcontext.esi;
 	frame->ebx = signalFrameData->context.uc_mcontext.ebx;
 
-	i386_frstor((void*)(&signalFrameData->context.uc_mcontext.xregs));
+	x86_frstor((void*)(&signalFrameData->context.uc_mcontext.xregs));
 
 	TRACE(("### arch_restore_signal_frame: exit\n"));
 

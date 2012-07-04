@@ -37,6 +37,10 @@
 #include <arch/elf.h>
 
 
+// temporary
+Thread* gCurrentThread = NULL;
+
+
 status_t
 arch_commpage_init(void)
 {
@@ -48,69 +52,6 @@ status_t
 arch_commpage_init_post_cpus(void)
 {
 	return B_OK;
-}
-
-
-status_t
-arch_cpu_preboot_init_percpu(kernel_args* args, int cpu)
-{
-	return B_OK;
-}
-
-
-status_t
-arch_cpu_init_percpu(kernel_args* args, int cpu)
-{
-	return B_OK;
-}
-
-
-status_t
-arch_cpu_init(kernel_args* args)
-{
-	return B_OK;
-}
-
-
-status_t
-arch_cpu_init_post_vm(kernel_args* args)
-{
-	return B_OK;
-}
-
-
-status_t
-arch_cpu_init_post_modules(kernel_args* args)
-{
-	return B_OK;
-}
-
-
-void
-arch_cpu_user_TLB_invalidate(void)
-{
-
-}
-
-
-void
-arch_cpu_global_TLB_invalidate(void)
-{
-
-}
-
-
-void
-arch_cpu_invalidate_TLB_range(addr_t start, addr_t end)
-{
-
-}
-
-
-void
-arch_cpu_invalidate_TLB_list(addr_t pages[], int num_pages)
-{
-
 }
 
 
@@ -134,41 +75,6 @@ status_t
 arch_cpu_user_memset(void* s, char c, size_t count, addr_t* faultHandler)
 {
 	return B_BAD_ADDRESS;
-}
-
-
-status_t
-arch_cpu_shutdown(bool rebootSystem)
-{
-	return B_ERROR;
-}
-
-
-void
-arch_cpu_idle(void)
-{
-	asm("hlt");
-}
-
-
-void
-arch_cpu_sync_icache(void* address, size_t length)
-{
-	// Instruction cache is always consistent on x86.
-}
-
-
-void
-arch_cpu_memory_read_barrier(void)
-{
-	asm volatile("lfence" : : : "memory");
-}
-
-
-void
-arch_cpu_memory_write_barrier(void)
-{
-	asm volatile("sfence" : : : "memory");
 }
 
 

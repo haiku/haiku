@@ -645,7 +645,7 @@ typedef enum cpu_types {
 
 #define B_CPU_x86_VENDOR_MASK	0xff00
 
-#ifdef __INTEL__
+#if defined(__INTEL__) || defined(__x86_64)
 typedef union {
 	struct {
 		uint32	max_eax;

@@ -4,6 +4,9 @@ DEFINES += _BOOT_MODE ;
 
 local kernelArchSources =
 	arch_elf.cpp
+;
+
+local kernelArch32Sources =
 	cpuid.S
 ;
 
@@ -17,6 +20,7 @@ local librootOsArchSources =
 
 BootMergeObject boot_arch_$(TARGET_KERNEL_ARCH).o :
 	$(kernelArchSources)
+	$(kernelArch32Sources)
 	$(kernelLibArchSources)
 	$(librootOsArchSources)
 	: # additional flags
@@ -24,6 +28,8 @@ BootMergeObject boot_arch_$(TARGET_KERNEL_ARCH).o :
 
 SEARCH on [ FGristFiles $(kernelArchSources) ]
     = [ FDirName $(HAIKU_TOP) src system kernel arch x86 ] ;
+SEARCH on [ FGristFiles $(kernelArch32Sources) ]
+    = [ FDirName $(HAIKU_TOP) src system kernel arch x86 32 ] ;
 SEARCH on [ FGristFiles $(kernelLibArchSources) ]
     = [ FDirName $(HAIKU_TOP) src system kernel lib arch x86 ] ;
 SEARCH on [ FGristFiles $(librootOsArchSources) ]

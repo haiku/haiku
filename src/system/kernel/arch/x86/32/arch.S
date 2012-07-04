@@ -19,66 +19,57 @@
 
 .text
 
-/*! \fn void arch_cpu_user_TLB_invalidate()
-	Invalidates the TLB. Must be called with interrupts disabled.
-*/
-FUNCTION(arch_cpu_user_TLB_invalidate):
-	movl	%cr3, %eax
-	movl	%eax, %cr3
-	ret
-FUNCTION_END(arch_cpu_user_TLB_invalidate)
-
-/* void i386_fnsave(void *fpu_state); */
-FUNCTION(i386_fnsave):
+/* void x86_fnsave(void *fpu_state); */
+FUNCTION(x86_fnsave):
 	movl	4(%esp), %eax
 	fnsave	(%eax)
 	ret
-FUNCTION_END(i386_fnsave)
+FUNCTION_END(x86_fnsave)
 
-/* void i386_fxsave(void *fpu_state); */
-FUNCTION(i386_fxsave):
+/* void x86_fxsave(void *fpu_state); */
+FUNCTION(x86_fxsave):
 	movl	4(%esp), %eax
 	fxsave	(%eax)
 	ret
-FUNCTION_END(i386_fxsave)
+FUNCTION_END(x86_fxsave)
 
-/* void i386_frstor(const void *fpu_state); */
-FUNCTION(i386_frstor):
+/* void x86_frstor(const void *fpu_state); */
+FUNCTION(x86_frstor):
 	movl	4(%esp), %eax
 	frstor	(%eax)
 	ret
-FUNCTION_END(i386_frstor)
+FUNCTION_END(x86_frstor)
 
-/* void i386_fxrstor(const void *fpu_state); */
-FUNCTION(i386_fxrstor):
+/* void x86_fxrstor(const void *fpu_state); */
+FUNCTION(x86_fxrstor):
 	movl	4(%esp), %eax
 	fxrstor	(%eax)
 	ret
-FUNCTION_END(i386_fxrstor)
+FUNCTION_END(x86_fxrstor)
 
-/* void i386_noop_swap(void *old_fpu_state, const void *new_fpu_state); */
-FUNCTION(i386_noop_swap):
+/* void x86_noop_swap(void *old_fpu_state, const void *new_fpu_state); */
+FUNCTION(x86_noop_swap):
 	nop
 	ret
-FUNCTION_END(i386_noop_swap)
+FUNCTION_END(x86_noop_swap)
 
-/* void i386_fsave_swap(void *old_fpu_state, const void *new_fpu_state); */
-FUNCTION(i386_fnsave_swap):
+/* void x86_fnsave_swap(void *old_fpu_state, const void *new_fpu_state); */
+FUNCTION(x86_fnsave_swap):
 	movl	4(%esp),%eax
 	fnsave	(%eax)
 	movl	8(%esp),%eax
 	frstor	(%eax)
 	ret
-FUNCTION_END(i386_fnsave_swap)
+FUNCTION_END(x86_fnsave_swap)
 
-/* void i386_fxsave_swap(void *old_fpu_state, const void *new_fpu_state); */
-FUNCTION(i386_fxsave_swap):
+/* void x86_fxsave_swap(void *old_fpu_state, const void *new_fpu_state); */
+FUNCTION(x86_fxsave_swap):
 	movl	4(%esp),%eax
 	fxsave	(%eax)
 	movl	8(%esp),%eax
 	fxrstor	(%eax)
 	ret
-FUNCTION_END(i386_fxsave_swap)
+FUNCTION_END(x86_fxsave_swap)
 
 /* uint32 x86_read_ebp(); */
 FUNCTION(x86_read_ebp):
@@ -142,12 +133,12 @@ null_idt_descr:
 	.word	0
 	.word	0,0
 
-FUNCTION(reboot):
+FUNCTION(x86_reboot):
 	lidt	null_idt_descr
 	int		$0
 done:
 	jmp		done
-FUNCTION_END(reboot)
+FUNCTION_END(x86_reboot)
 
 
 /* status_t arch_cpu_user_memcpy(void *to, const void *from, size_t size, addr_t *faultHandler) */

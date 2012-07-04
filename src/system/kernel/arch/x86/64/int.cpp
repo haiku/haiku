@@ -104,6 +104,15 @@ page_fault_exception(iframe* frame)
 }
 
 
+/*!	Returns the virtual IDT address for CPU \a cpu. */
+void*
+x86_get_idt(int32 cpu)
+{
+	// We use a single IDT for all CPUs on x86_64.
+	return sIDT;
+}
+
+
 // #pragma mark -
 
 

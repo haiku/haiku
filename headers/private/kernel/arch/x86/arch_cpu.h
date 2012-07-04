@@ -365,11 +365,8 @@ typedef struct arch_cpu_info {
 extern "C" {
 #endif
 
-
-// temporary
-#ifndef __x86_64__
-
 struct arch_thread;
+
 
 void __x86_setup_system_time(uint32 conversionFactor,
 	uint32 conversionFactorNsecs, bool conversionFactorNsecsShift);
@@ -378,18 +375,12 @@ void x86_context_switch(struct arch_thread* oldState,
 void x86_userspace_thread_exit(void);
 void x86_end_userspace_thread_exit(void);
 void x86_swap_pgdir(uint32 newPageDir);
-void i386_set_tss_and_kstack(addr_t kstack);
-void i386_fnsave(void* fpuState);
-void i386_fxsave(void* fpuState);
-void i386_frstor(const void* fpuState);
-void i386_fxrstor(const void* fpuState);
-void i386_noop_swap(void* oldFpuState, const void* newFpuState);
-void i386_fnsave_swap(void* oldFpuState, const void* newFpuState);
-void i386_fxsave_swap(void* oldFpuState, const void* newFpuState);
-uint32 x86_read_ebp();
+void x86_fxsave(void* fpuState);
+void x86_fxrstor(const void* fpuState);
+void x86_fxsave_swap(void* oldFpuState, const void* newFpuState);
+addr_t x86_read_ebp();
 uint64 x86_read_msr(uint32 registerNumber);
 void x86_write_msr(uint32 registerNumber, uint64 value);
-void x86_set_task_gate(int32 cpu, int32 n, int32 segment);
 void* x86_get_idt(int32 cpu);
 uint32 x86_count_mtrrs(void);
 void x86_set_mtrr(uint32 index, uint64 base, uint64 length, uint8 type);
@@ -400,15 +391,22 @@ void x86_set_mtrrs(uint8 defaultType, const x86_mtrr_info* infos,
 void x86_init_fpu();
 bool x86_check_feature(uint32 feature, enum x86_feature_type type);
 void* x86_get_double_fault_stack(int32 cpu, size_t* _size);
-int32 x86_double_fault_get_cpu(void);
 void x86_double_fault_exception(struct iframe* frame);
 void x86_page_fault_exception_double_fault(struct iframe* frame);
 
+#ifndef __x86_64__
+
+void i386_set_tss_and_kstack(addr_t kstack);
+void x86_fnsave(void* fpuState);
+void x86_frstor(const void* fpuState);
+void x86_noop_swap(void* oldFpuState, const void* newFpuState);
+void x86_fnsave_swap(void* oldFpuState, const void* newFpuState);
+void x86_set_task_gate(int32 cpu, int32 n, int32 segment);
+int32 x86_double_fault_get_cpu(void);
+
 #endif
 
-
 extern segment_descriptor* gGDT;
-
 
 #ifdef __cplusplus
 }	// extern "C" {

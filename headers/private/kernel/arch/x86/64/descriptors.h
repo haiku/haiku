@@ -18,7 +18,7 @@
 
 
 #define TSS_BASE_SEGMENT	5
-#define TLS_BASE_SEGMENT	(TSS_BASE_SEGMENT + smp_get_num_cpus())
+#define TSS_SEGMENT(cpu)	(TSS_BASE_SEGMENT + cpu * 2)
 
 
 // Structure of a segment descriptor.
@@ -89,7 +89,7 @@ struct tss {
 	uint64 ist7;
 	uint64 _reserved3;
 	uint16 _reserved4;
-	uint16 io_bitmap;
+	uint16 io_map_base;
 } _PACKED;
 
 

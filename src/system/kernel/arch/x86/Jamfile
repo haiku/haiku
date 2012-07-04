@@ -20,6 +20,8 @@ if $(TARGET_ARCH) = x86_64 {
 	SEARCH_SOURCE += [ FDirName $(SUBDIR) 64 ] ;
 
 	archSpecificSources =
+		arch.S
+		cpuid.S
 		int.cpp
 		interrupts.S
 		stubs.cpp
@@ -29,11 +31,11 @@ if $(TARGET_ARCH) = x86_64 {
 
 	archSpecificSources =
 		arch.S
+		cpuid.S
 		int.cpp
 		interrupts.S
 
 		arch_commpage.cpp
-		arch_cpu.cpp
 		arch_debug.cpp
 		arch_elf.cpp
 		arch_platform.cpp
@@ -48,7 +50,6 @@ if $(TARGET_ARCH) = x86_64 {
 		apic.cpp
 		apm.cpp
 		bios.cpp
-		cpuid.S
 		ioapic.cpp
 		irq_routing_table.cpp
 		msi.cpp
@@ -83,6 +84,7 @@ if $(TARGET_ARCH) = x86_64 {
 }
 
 local archGenericSources =
+	arch_cpu.cpp
 	arch_debug_console.cpp
 	arch_int.cpp
 	pic.cpp

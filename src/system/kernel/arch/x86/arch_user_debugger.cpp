@@ -596,10 +596,10 @@ arch_set_debug_cpu_state(const debug_cpu_state *cpuState)
 			InterruptsLocker locker;
 			memcpy(thread->arch_info.fpu_state, &cpuState->extended_registers,
 				sizeof(cpuState->extended_registers));
-			i386_fxrstor(thread->arch_info.fpu_state);
+			x86_fxrstor(thread->arch_info.fpu_state);
 		} else {
 			// TODO: Implement! We need to convert the format first.
-//			i386_frstor(&cpuState->extended_registers);
+//			x86_frstor(&cpuState->extended_registers);
 		}
 
 //		frame->gs = cpuState->gs;
@@ -638,13 +638,13 @@ arch_get_debug_cpu_state(debug_cpu_state *cpuState)
 			// buffer. We need to disable interrupts to make use of it.
 			Thread* thread = thread_get_current_thread();
 			InterruptsLocker locker;
-			i386_fxsave(thread->arch_info.fpu_state);
+			x86_fxsave(thread->arch_info.fpu_state);
 				// unlike fnsave, fxsave doesn't reinit the FPU state
 			memcpy(&cpuState->extended_registers, thread->arch_info.fpu_state,
 				sizeof(cpuState->extended_registers));
 		} else {
-			i386_fnsave(&cpuState->extended_registers);
-			i386_frstor(&cpuState->extended_registers);
+			x86_fnsave(&cpuState->extended_registers);
+			x86_frstor(&cpuState->extended_registers);
 				// fnsave reinits the FPU state after saving, so we need to
 				// load it again
 			// TODO: Convert to fxsave format!
