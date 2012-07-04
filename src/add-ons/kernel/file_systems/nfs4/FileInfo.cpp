@@ -13,8 +13,10 @@
 #include "Request.h"
 
 
-static status_t
-ParsePath(RequestBuilder& req, uint32& count, const char* _path)
+// TODO: This function probably needs more strict checking against incorrect
+// paths. Correct handling of '..' and '.' also may be useful.
+status_t
+FileInfo::ParsePath(RequestBuilder& req, uint32& count, const char* _path)
 {
 	char* path = strdup(_path);
 	if (path == NULL)

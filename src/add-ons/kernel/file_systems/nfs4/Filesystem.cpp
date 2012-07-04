@@ -73,30 +73,10 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
 
 	req.PutRootFH();
 
-	// Better way of doing this will be needed
 	uint32 lookupCount = 0;
-	char* path = strdup(fsPath);
-	char* pathStart = path;
-	char* pathEnd;
-	while (pathStart != NULL && pathStart[0] != '\0') {
-		pathEnd = strpbrk(pathStart, "/");
-		if (pathEnd != NULL)
-			*pathEnd = '\0';
-		if (pathEnd == pathStart) {
-			pathStart++;
-			continue;
-		}
-
-		req.LookUp(pathStart);
-
-		if (pathEnd != NULL && pathEnd[1] != '\0')
-			pathStart = pathEnd + 1;
-		else
-			pathStart = NULL;
-
-		lookupCount++;
-	}
-	free(path);
+	status_t result = FileInfo::ParsePath(req, lookupCount, fsPath);
+	if (result != B_OK)
+		return result;
 
 	req.GetFH();
 	req.Access();
@@ -105,7 +85,7 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
 		FATTR4_FSID, FATTR4_FS_LOCATIONS };
 	req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
 
-	status_t result = request.Send();
+	result = request.Send();
 	if (result != B_OK)
 		return result;
 

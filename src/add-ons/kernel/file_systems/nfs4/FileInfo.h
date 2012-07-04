@@ -28,6 +28,7 @@ struct Filehandle {
 
 
 class Filesystem;
+class RequestBuilder;
 
 // Complete information needed to identify a file in any situation.
 // Unfortunately just a filehandle is not enough even when they are persistent
@@ -46,6 +47,9 @@ struct FileInfo {
 	inline	FileInfo&	operator=(const FileInfo& fi);
 
 			status_t	UpdateFileHandles(Filesystem* fs);
+
+	static status_t		ParsePath(RequestBuilder& req, uint32& count,
+							const char* _path);
 };
 
 struct FilesystemId {
