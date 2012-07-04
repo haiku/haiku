@@ -36,6 +36,10 @@
 #define KERNEL_SIZE				0x8000000000
 #define KERNEL_TOP  			(KERNEL_BASE + (KERNEL_SIZE - 1))
 
+// Kernel physical memory map area.
+#define KERNEL_PMAP_BASE		0xffffff0000000000
+#define KERNEL_PMAP_SIZE		0x8000000000
+
 // Userspace address space layout.
 #define USER_BASE				0x0
 #define USER_BASE_ANY			0x100000
@@ -51,9 +55,9 @@
 
 
 // memory layout
-#define KERNEL_BASE 0x80000000
-#define KERNEL_SIZE 0x80000000
-#define KERNEL_TOP  (KERNEL_BASE + (KERNEL_SIZE - 1))
+#define KERNEL_BASE				0x80000000
+#define KERNEL_SIZE				0x80000000
+#define KERNEL_TOP				(KERNEL_BASE + (KERNEL_SIZE - 1))
 
 /* User space layout is a little special:
  * The user space does not completely cover the space not covered by the
@@ -65,10 +69,10 @@
  * TODO: introduce the 1Mb lower barrier again - it's only used for vm86 mode,
  *	and this should be moved into the kernel (and address space) completely.
  */
-#define USER_BASE     0x00
-#define USER_BASE_ANY 0x100000
-#define USER_SIZE     (KERNEL_BASE - 0x10000)
-#define USER_TOP      (USER_BASE + USER_SIZE)
+#define USER_BASE				0x00
+#define USER_BASE_ANY			0x100000
+#define USER_SIZE				(KERNEL_BASE - 0x10000)
+#define USER_TOP				(USER_BASE + USER_SIZE)
 
 #define KERNEL_USER_DATA_BASE	0x6fff0000
 #define USER_STACK_REGION		0x70000000

@@ -178,7 +178,6 @@ arch_int_init(kernel_args* args)
 	// Set up the legacy PIC.
 	pic_init();
 
-	panic("not implemented\n");
 	return B_OK;
 }
 

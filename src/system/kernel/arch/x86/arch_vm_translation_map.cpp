@@ -12,8 +12,12 @@
 
 #include <boot/kernel_args.h>
 
-#include "paging/32bit/X86PagingMethod32Bit.h"
-#include "paging/pae/X86PagingMethodPAE.h"
+#ifdef __x86_64__
+#	include "paging/64bit/X86PagingMethod64Bit.h"
+#else
+#	include "paging/32bit/X86PagingMethod32Bit.h"
+#	include "paging/pae/X86PagingMethodPAE.h"
+#endif
 
 
 //#define TRACE_VM_TMAP
@@ -26,9 +30,13 @@
 
 static union {
 	uint64	align;
+#ifdef __x86_64__
+	char	sixty_four[sizeof(X86PagingMethod64Bit)];
+#else
 	char	thirty_two[sizeof(X86PagingMethod32Bit)];
 #if B_HAIKU_PHYSICAL_BITS == 64
 	char	pae[sizeof(X86PagingMethodPAE)];
+#endif
 #endif
 } sPagingMethodBuffer;
 
@@ -74,7 +82,9 @@ arch_vm_translation_map_init(kernel_args *args,
 	}
 #endif
 
-#if B_HAIKU_PHYSICAL_BITS == 64
+#ifdef __x86_64__
+	gX86PagingMethod = new(&sPagingMethodBuffer) X86PagingMethod64Bit;
+#elif B_HAIKU_PHYSICAL_BITS == 64
 	bool paeAvailable = x86_check_feature(IA32_FEATURE_PAE, FEATURE_COMMON);
 	bool paeNeeded = false;
 	for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {

@@ -11,13 +11,12 @@ UsePrivateKernelHeaders ;
 UsePrivateHeaders shared ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) paging ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) paging 32bit ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) paging pae ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) timers ] ;
 
 local archSpecificSources ;
 if $(TARGET_ARCH) = x86_64 {
 	SEARCH_SOURCE += [ FDirName $(SUBDIR) 64 ] ;
+	SEARCH_SOURCE += [ FDirName $(SUBDIR) paging 64bit ] ;
 
 	archSpecificSources =
 		arch.S
@@ -25,9 +24,19 @@ if $(TARGET_ARCH) = x86_64 {
 		int.cpp
 		interrupts.S
 		stubs.cpp
+
+		# paging
+		#x86_physical_page_mapper_mapped.cpp
+
+		# paging/64bit
+		X86PagingMethod64Bit.cpp
+		X86PagingStructures64Bit.cpp
+		X86VMTranslationMap64Bit.cpp
 	;
 } else {
 	SEARCH_SOURCE += [ FDirName $(SUBDIR) 32 ] ;
+	SEARCH_SOURCE += [ FDirName $(SUBDIR) paging 32bit ] ;
+	SEARCH_SOURCE += [ FDirName $(SUBDIR) paging pae ] ;
 
 	archSpecificSources =
 		arch.S
@@ -43,7 +52,6 @@ if $(TARGET_ARCH) = x86_64 {
 		arch_smp.cpp
 		arch_thread.cpp
 		arch_timer.cpp
-		arch_vm_translation_map.cpp
 		arch_system_info.cpp
 		arch_user_debugger.cpp
 		apic.cpp
@@ -59,11 +67,7 @@ if $(TARGET_ARCH) = x86_64 {
 		x86_syscalls.cpp
 
 		# paging
-		x86_physical_page_mapper.cpp
 		x86_physical_page_mapper_large_memory.cpp
-		X86PagingMethod.cpp
-		X86PagingStructures.cpp
-		X86VMTranslationMap.cpp
 
 		# paging/32bit
 		X86PagingMethod32Bit.cpp
@@ -87,7 +91,14 @@ local archGenericSources =
 	arch_debug_console.cpp
 	arch_int.cpp
 	arch_vm.cpp
+	arch_vm_translation_map.cpp
 	pic.cpp
+
+	# paging
+	x86_physical_page_mapper.cpp
+	X86PagingMethod.cpp
+	X86PagingStructures.cpp
+	X86VMTranslationMap.cpp
 ;
 
 KernelMergeObject kernel_arch_x86.o :
