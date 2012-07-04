@@ -73,8 +73,7 @@ IdMap::_GetValue(const char* buffer, int32 code)
 		if (result != B_OK) {
 			if (_Repair() != B_OK)
 				return 0;
-			else
-				continue;
+			continue;
 		}
 
 		int32 code;
@@ -83,8 +82,7 @@ IdMap::_GetValue(const char* buffer, int32 code)
 		if (result < B_OK) {
 			if (_Repair() != B_OK)
 				return 0;
-			else
-				continue;
+			continue;
 		}
 
 		if (code != MsgReply)
@@ -105,16 +103,14 @@ IdMap::_GetBuffer(T value, int32 code)
 		if (result != B_OK) {
 			if (_Repair() != B_OK)
 				return NULL;
-			else
-				continue;
+			continue;
 		}
 
 		ssize_t size = port_buffer_size(fReplyPort);
 		if (size < B_OK) {
 			if (_Repair() != B_OK)
 				return NULL;
-			else
-				continue;
+			continue;
 		}
 
 		int32 code;
@@ -128,8 +124,7 @@ IdMap::_GetBuffer(T value, int32 code)
 
 			if (_Repair() != B_OK)
 				return 0;
-			else
-				continue;
+			continue;
 		}
 
 		if (code != MsgReply) {

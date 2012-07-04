@@ -175,8 +175,8 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 
 	if (confirm)
 		return _ConfirmOpen(fh, cookie);
-	else
-		return B_OK;
+
+	return B_OK;
 }
 
 
@@ -271,8 +271,8 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 
 	if (confirm)
 		return _ConfirmOpen(fInfo.fHandle, cookie);
-	else
-		return B_OK;
+
+	return B_OK;
 }
 
 

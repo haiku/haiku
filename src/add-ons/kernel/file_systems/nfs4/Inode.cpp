@@ -718,14 +718,12 @@ Inode::_CheckLockType(short ltype, uint32 mode)
 		case F_RDLCK:
 			if ((mode & O_RDONLY) == 0 && (mode & O_RDWR) == 0)
 				return EBADF;
-			else
-				return B_OK;
+			return B_OK;
 
 		case F_WRLCK:
 			if ((mode & O_WRONLY) == 0 && (mode & O_RDWR) == 0)
 				return EBADF;
-			else
-				return B_OK;
+			return B_OK;
 
 		default:
 			return B_BAD_VALUE;
@@ -981,14 +979,13 @@ Inode::_HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 			} else if ((cookie->fMode & O_NONBLOCK) == 0) {
 				status_t result = acquire_sem_etc(cookie->fSnoozeCancel, 1,
 					B_RELATIVE_TIMEOUT, sSecToBigTime(5));
-				if (result == B_TIMED_OUT)
-					return true;
-				else {
+				if (result != B_TIMED_OUT) {
 					release_sem(cookie->fSnoozeCancel);
 					return false;
 				}
-			} else
-				return false;
+				return true;
+			}
+			return false;
 
 		// server is in grace period, we need to wait
 		case NFS4ERR_GRACE:
@@ -1000,14 +997,13 @@ Inode::_HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 			} else if ((cookie->fMode & O_NONBLOCK) == 0) {
 				status_t result = acquire_sem_etc(cookie->fSnoozeCancel, 1,
 					B_RELATIVE_TIMEOUT, sSecToBigTime(leaseTime) / 3);
-				if (result == B_TIMED_OUT)
-					return true;
-				else {
+				if (result != B_TIMED_OUT) {
 					release_sem(cookie->fSnoozeCancel);
 					return false;
 				}
-			} else
-				return false;
+				return true;
+			}
+			return false;
 
 		// server has rebooted, reclaim share and try again
 		case NFS4ERR_STALE_CLIENTID:
@@ -1019,8 +1015,7 @@ Inode::_HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 		case NFS4ERR_FHEXPIRED:
 			if (fInfo.UpdateFileHandles(fFilesystem) == B_OK)
 				return true;
-			else
-				return false;
+			return false;
 
 		// filesystem has been moved
 		case NFS4ERR_LEASE_MOVED:
@@ -1033,8 +1028,8 @@ Inode::_HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 			if (cookie != NULL) {
 				fFilesystem->NFSServer()->ClientId(cookie->fClientId, true);
 				return true;
-			} else
-				return false;
+			}
+			return false;
 
 		default:
 			return false;
