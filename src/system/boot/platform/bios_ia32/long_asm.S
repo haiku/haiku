@@ -25,9 +25,9 @@ FUNCTION(long_enter_kernel):
 	andl	$~(1 << 31), %eax
 	movl	%eax, %cr0
 
-	// Enable PAE.
+	// Enable PAE and PGE
 	movl	%cr4, %eax
-	orl		$(1 << 5), %eax
+	orl		$(1 << 5) | (1 << 7), %eax
 	movl	%eax, %cr4
 
 	// Point CR3 to the kernel's PML4.
