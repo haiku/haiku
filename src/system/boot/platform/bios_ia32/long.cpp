@@ -6,6 +6,8 @@
 
 #include "long.h"
 
+#include <algorithm>
+
 #include <KernelExport.h>
 
 // Include the x86_64 version of descriptors.h
@@ -22,6 +24,12 @@
 
 #include "debug.h"
 #include "mmu.h"
+
+
+static const uint64 kTableMappingFlags = 0x3;
+static const uint64 kLargePageMappingFlags = 0x183;
+static const uint64 kPageMappingFlags = 0x103;
+	// Global, R/W, Present
 
 
 /*! Convert a 32-bit address to a 64-bit address. */
@@ -87,36 +95,68 @@ long_idt_init()
 static void
 long_mmu_init()
 {
+	uint64* pml4;
+	uint64* pdpt;
+	uint64* pageDir;
+	uint64* pageTable;
 	addr_t physicalAddress;
 
 	// Allocate the top level PML4.
-	uint64* pml4 = (uint64*)mmu_allocate_page(&gKernelArgs.arch_args.phys_pgdir);
+	pml4 = (uint64*)mmu_allocate_page(&gKernelArgs.arch_args.phys_pgdir);
 	memset(pml4, 0, B_PAGE_SIZE);
 	gKernelArgs.arch_args.vir_pgdir = (uint64)(addr_t)pml4;
 
-	// Identity map the first 1GB of memory, do so using large pages.
+	// Find the highest physical memory address. We map all physical memory
+	// into the kernel address space, so we want to make sure we map everything
+	// we have available.
+	uint64 maxAddress = 0;
+	for (uint32 i = 0; i < gKernelArgs.num_physical_memory_ranges; i++) {
+		maxAddress = std::max(maxAddress,
+			gKernelArgs.physical_memory_range[i].start
+				+ gKernelArgs.physical_memory_range[i].size);
+	}
 
-	uint64* pdpt = (uint64*)mmu_allocate_page(&physicalAddress);
+	// Want to map at least 4GB, there may be stuff other than usable RAM that
+	// could be in the first 4GB of physical address space.
+	maxAddress = std::max(maxAddress, (uint64)0x100000000ll);
+	maxAddress = ROUNDUP(maxAddress, 0x40000000);
+
+	// Currently only use 1 PDPT (512GB). This will need to change if someone
+	// wants to use Haiku on a box with more than 512GB of RAM but that's
+	// probably not going to happen any time soon.
+	if (maxAddress / 0x40000000 > 512)
+		panic("Can't currently support more than 512GB of RAM!");
+
+	// Create page tables for the physical map area. Also map this PDPT
+	// temporarily at the bottom of the address space so that we are identity
+	// mapped.
+
+	pdpt = (uint64*)mmu_allocate_page(&physicalAddress);
 	memset(pdpt, 0, B_PAGE_SIZE);
-	pml4[0] = physicalAddress | 0x3;
+	pml4[510] = physicalAddress | kTableMappingFlags;
+	pml4[0] = physicalAddress | kTableMappingFlags;
 
-	uint64* pageDir = (uint64*)mmu_allocate_page(&physicalAddress);
-	memset(pageDir, 0, B_PAGE_SIZE);
-	pdpt[0] = physicalAddress | 0x3;
+	for (uint64 i = 0; i < maxAddress; i += 0x40000000) {
+		dprintf("mapping %llu GB\n", i / 0x40000000);
 
-	for (uint32 i = 0; i < 512; i++) {
-		pageDir[i] = (i * 0x200000) | 0x83;
+		pageDir = (uint64*)mmu_allocate_page(&physicalAddress);
+		memset(pageDir, 0, B_PAGE_SIZE);
+		pdpt[i / 0x40000000] = physicalAddress | kTableMappingFlags;
+
+		for (uint64 j = 0; j < 0x40000000; j += 0x200000) {
+			pageDir[j / 0x200000] = (i + j) | kLargePageMappingFlags;
+		}
 	}
 
 	// Allocate tables for the kernel mappings.
 
 	pdpt = (uint64*)mmu_allocate_page(&physicalAddress);
 	memset(pdpt, 0, B_PAGE_SIZE);
-	pml4[511] = physicalAddress | 0x3;
+	pml4[511] = physicalAddress | kTableMappingFlags;
 
 	pageDir = (uint64*)mmu_allocate_page(&physicalAddress);
 	memset(pageDir, 0, B_PAGE_SIZE);
-	pdpt[510] = physicalAddress | 0x3;
+	pdpt[510] = physicalAddress | kTableMappingFlags;
 
 	// Store the virtual memory usage information.
 	gKernelArgs.virtual_allocated_range[0].start = KERNEL_BASE_64BIT;
@@ -125,13 +165,13 @@ long_mmu_init()
 
 	// We can now allocate page tables and duplicate the mappings across from
 	// the 32-bit address space to them.
-	uint64* pageTable = NULL;
+	pageTable = NULL;
 	for (uint32 i = 0; i < gKernelArgs.virtual_allocated_range[0].size
 			/ B_PAGE_SIZE; i++) {
 		if ((i % 512) == 0) {
 			pageTable = (uint64*)mmu_allocate_page(&physicalAddress);
 			memset(pageTable, 0, B_PAGE_SIZE);
-			pageDir[i / 512] = physicalAddress | 0x3;
+			pageDir[i / 512] = physicalAddress | kTableMappingFlags;
 
 			// Just performed another virtual allocation, account for it.
 			gKernelArgs.virtual_allocated_range[0].size += B_PAGE_SIZE;
@@ -142,7 +182,7 @@ long_mmu_init()
 				&physicalAddress))
 			continue;
 
-		pageTable[i % 512] = physicalAddress | 0x3;
+		pageTable[i % 512] = physicalAddress | kPageMappingFlags;
 	}
 
 	gKernelArgs.arch_args.virtual_end = ROUNDUP(KERNEL_BASE_64BIT
