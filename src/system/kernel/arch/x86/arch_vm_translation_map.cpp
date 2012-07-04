@@ -144,5 +144,8 @@ bool
 arch_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
 	uint32 protection)
 {
+	if (!gX86PagingMethod)
+		return true;
+
 	return gX86PagingMethod->IsKernelPageAccessible(virtualAddress, protection);
 }
