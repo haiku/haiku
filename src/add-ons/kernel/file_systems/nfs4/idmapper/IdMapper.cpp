@@ -198,13 +198,13 @@ MainLoop()
 			return B_NO_MEMORY;
 
 		int32 code;
-		status_t result = read_port(gRequestPort, &code, buffer, size);
+		size = read_port(gRequestPort, &code, buffer, size);
 		if (size < B_OK) {
 			free(buffer);
 			return 0;
 		}
 
-		result = ParseRequest(code, buffer);
+		status_t result = ParseRequest(code, buffer);
 		free(buffer);
 
 		if (result != B_OK)

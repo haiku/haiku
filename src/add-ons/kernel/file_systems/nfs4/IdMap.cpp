@@ -118,8 +118,8 @@ IdMap::_GetBuffer(T value, int32 code)
 		if (buffer == NULL)
 			return NULL;
 
-		result = read_port(fReplyPort, &code, buffer, size);
-		if (result < B_OK) {
+		size = read_port(fReplyPort, &code, buffer, size);
+		if (size < B_OK) {
 			free(buffer);
 
 			if (_Repair() != B_OK)
