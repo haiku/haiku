@@ -64,10 +64,8 @@ Application WebPositive :
 	$(sources)
 	:
 	$(HAIKU_WEBKIT_LIBS)
-	# dependencies
-	curl icuuc icudata png sqlite3 xml2 z
-	# haiku
-	be bsd localestub network stdc++ tracker translation
+	$(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
+	be network tracker translation
 	:
 	WebPositive.rdef
 ;
