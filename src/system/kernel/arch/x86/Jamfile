@@ -26,7 +26,7 @@ if $(TARGET_ARCH) = x86_64 {
 		stubs.cpp
 
 		# paging
-		#x86_physical_page_mapper_mapped.cpp
+		x86_physical_page_mapper_mapped.cpp
 
 		# paging/64bit
 		X86PagingMethod64Bit.cpp
