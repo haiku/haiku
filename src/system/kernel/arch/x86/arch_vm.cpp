@@ -656,7 +656,12 @@ arch_vm_init_post_area(kernel_args *args)
 		return B_NO_MEMORY;
 	}
 
+	// TODO x86_64
+#ifndef __x86_64__
 	return bios_init();
+#else
+	return B_OK;
+#endif
 }
 
 
