@@ -14,13 +14,17 @@
 
 
 static status_t
-sParsePath(RequestBuilder& req, uint32* count, const char* _path)
+ParsePath(RequestBuilder& req, uint32& count, const char* _path)
 {
 	char* path = strdup(_path);
+	if (path == NULL)
+		return B_NO_MEMORY;
+
 	char* pathStart = path;
 	char* pathEnd;
+
 	while (pathStart != NULL) {
-		pathEnd = strpbrk(pathStart, "/");
+		pathEnd = strchr(pathStart, '/');
 		if (pathEnd != NULL)
 			*pathEnd = '\0';
 
@@ -31,7 +35,7 @@ sParsePath(RequestBuilder& req, uint32* count, const char* _path)
 		else
 			pathStart = NULL;
 
-		(*count)++;
+		count++;
 	}
 	free(path);
 
@@ -48,9 +52,15 @@ FileInfo::UpdateFileHandles(Filesystem* fs)
 	req.PutRootFH();
 
 	uint32 lookupCount = 0;
+	status_t result;
 
-	sParsePath(req, &lookupCount, fs->Path());
-	sParsePath(req, &lookupCount, fPath);
+	result = ParsePath(req, lookupCount, fs->Path());
+	if (result != B_OK)
+		return result;
+
+	result = ParsePath(req, lookupCount, fPath);
+	if (result != B_OK)
+		return result;
 
 	if (fs->IsAttrSupported(FATTR4_FILEID)) {
 		AttrValue attr;
@@ -64,7 +74,7 @@ FileInfo::UpdateFileHandles(Filesystem* fs)
 	req.LookUpUp();
 	req.GetFH();
 
-	status_t result = request.Send();
+	result = request.Send();
 	if (result != B_OK)
 		return result;
 
@@ -84,7 +94,8 @@ FileInfo::UpdateFileHandles(Filesystem* fs)
 	if (reply.LookUpUp() == B_ENTRY_NOT_FOUND) {
 		fParent = fHandle;
 		return B_OK;
-	} else
-		return reply.GetFH(&fParent);
+	}
+
+	return reply.GetFH(&fParent);
 }
 
