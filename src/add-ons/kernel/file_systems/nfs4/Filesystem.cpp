@@ -9,11 +9,9 @@
 
 #include "Filesystem.h"
 
-#include <arpa/inet.h>
 #include <string.h>
 
 #include <lock.h>
-#include <net/dns_resolver.h>
 
 #include "Request.h"
 #include "RootInode.h"
@@ -216,37 +214,25 @@ Filesystem::Migrate(const RPC::Server* serv)
 	FSLocations* locs =
 		reinterpret_cast<FSLocations*>(values[0].fData.fLocations);
 
-	dns_resolver_module* dns;
-	result = get_module(DNS_RESOLVER_MODULE_NAME,
-		reinterpret_cast<module_info**>(&dns));
-	if (result != B_OK) {
-		delete[] values;
-		return result;
-	}
-
 	RPC::Server* server = fServer;
 	for (uint32 i = 0; i < locs->fCount; i++) {
 		for (uint32 j = 0; j < locs->fLocations[i].fCount; j++) {
-			uint32 ip;
-			struct in_addr addr;
-			if (inet_aton(locs->fLocations[i].fLocations[j], &addr) == 0) {
-					result = dns->dns_resolve(locs->fLocations[i].fLocations[j],
-						&ip);
-					if (result != B_OK)
-						continue;
-			} else
-				ip = addr.s_addr;
+			ServerAddress addr;
 
-			if (gRPCServerManager->Acquire(&fServer, ip, 2049,
-				ProtocolUDP, CreateNFS4Server) == B_OK) {
+			if (ServerAddress::ResolveName(locs->fLocations[i].fLocations[j],
+				&addr) != B_OK)
+				continue;
+
+			if (gRPCServerManager->Acquire(&fServer, addr.fAddress, addr.fPort,
+				addr.fProtocol, CreateNFS4Server) == B_OK) {
 
 				free(const_cast<char*>(fPath));
-				fPath = strdup(locs->fLocations[j].fRootPath);
+				fPath = strdup(locs->fLocations[i].fRootPath);
 
 				if (fPath == NULL) {
 					gRPCServerManager->Release(fServer);
 					fServer = server;
-					put_module(DNS_RESOLVER_MODULE_NAME);
+
 					delete[] values;
 					return B_NO_MEMORY;
 				}
@@ -256,7 +242,6 @@ Filesystem::Migrate(const RPC::Server* serv)
 		}
 	}
 
-	put_module(DNS_RESOLVER_MODULE_NAME);
 	delete[] values;
 
 	if (server == fServer) {

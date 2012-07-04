@@ -8,81 +8,133 @@
 
 
 #include <stdlib.h>
+#include <string.h>
 
 #include <sys/socket.h>
 #include <netdb.h>
 
-#include <port.h>
+#include <AutoDeleter.h>
+#include <OS.h>
 #include <SupportDefs.h>
 
 #include "Definitions.h"
 
 
+port_id		gRequestPort;
+port_id		gReplyPort;
+
+
 status_t
-resolve_dns(const char* host, uint32* addr)
+GetAddrInfo(const char* buffer)
 {
-	addrinfo* ai;
-	addrinfo* current;
-	status_t result = getaddrinfo(host, NULL, NULL, &ai);
+	const char* node = buffer[0] == '\0' ? NULL : buffer;
+	uint32 nodeSize = node != NULL ? strlen(node) + 1 : 1;
+
+	const char* service = buffer[nodeSize] == '\0' ? NULL : buffer + nodeSize;
+	uint32 serviceSize = service != NULL ? strlen(service) + 1 : 1;
+
+	const struct addrinfo* hints =
+		reinterpret_cast<const addrinfo*>(buffer + nodeSize + serviceSize);
+
+	struct addrinfo* ai;
+	status_t result = getaddrinfo(node, service, hints, &ai);
 	if (result != B_OK)
-		return result;
+		return write_port(gReplyPort, MsgError, &result, sizeof(result));
 
-	current = ai;
+	uint32 addrsSize = ai == NULL ? 0 : sizeof(addrinfo);
+	uint32 namesSize = 0;
+	uint32 socksSize = 0;
 
+	addrinfo* current = ai;
 	while (current != NULL) {
-		if (current->ai_family == AF_INET) {
-			sockaddr_in* sin = reinterpret_cast<sockaddr_in*>(current->ai_addr);
-			*addr = sin->sin_addr.s_addr;
-			freeaddrinfo(ai);
-			return B_OK;
+		if (current->ai_canonname != NULL)
+			namesSize += strlen(current->ai_canonname) + 1;
+		if (current->ai_addr != NULL) {
+			if (current->ai_family == AF_INET)
+				socksSize += sizeof(sockaddr_in);
+			else
+				socksSize += sizeof(sockaddr_in6);
 		}
-
+		if (current->ai_next != NULL)
+			addrsSize += sizeof(addrinfo);
 		current = current->ai_next;
 	}
 
-	freeaddrinfo(ai);
-	return B_NAME_NOT_FOUND;
+	uint32 totalSize = addrsSize + namesSize + socksSize;
+	char* reply = reinterpret_cast<char*>(malloc(totalSize));
+	if (reply == NULL) {
+		free(reply);
+
+		result = B_NO_MEMORY;
+		return write_port(gReplyPort, MsgError, &result, sizeof(result));
+	}
+
+	uint32 addrPos = 0;
+	uint32 namePos = addrsSize;
+	uint32 sockPos = addrsSize + namesSize;
+
+	current = ai;
+	while (current != NULL) {
+		if (current->ai_canonname != NULL) {
+			strcpy(reply + namePos, current->ai_canonname);
+			uint32 nSize = strlen(current->ai_canonname) + 1;
+			current->ai_canonname = reinterpret_cast<char*>(namePos);
+			namePos += nSize;
+		}
+		if (current->ai_addr != NULL) {
+			if (current->ai_family == AF_INET) {
+				memcpy(reply + sockPos, current->ai_addr, sizeof(sockaddr_in));
+				current->ai_addr = reinterpret_cast<sockaddr*>(sockPos);
+				sockPos += sizeof(sockaddr_in);
+			} else {
+				memcpy(reply + sockPos, current->ai_addr, sizeof(sockaddr_in6));
+				current->ai_addr = reinterpret_cast<sockaddr*>(sockPos);
+				sockPos += sizeof(sockaddr_in6);
+			}
+		}
+
+		addrinfo* next = current->ai_next;
+		current->ai_next = reinterpret_cast<addrinfo*>(addrPos) + 1;
+		memcpy(reply + addrPos, current, sizeof(addrinfo));
+		addrPos += sizeof(addrinfo);
+
+		current = next;
+	}
+
+	return write_port(gReplyPort, MsgReply, reply, totalSize);
 }
 
 
 status_t
-main_loop(port_id portReq, port_id portRpl)
+MainLoop()
 {
 	do {
-		ssize_t size = port_buffer_size(portReq);
+		ssize_t size = port_buffer_size(gRequestPort);
 		if (size < B_OK)
 			return 0;
 
 		void* buffer = malloc(size);
 		if (buffer == NULL)
 			return B_NO_MEMORY;
+		MemoryDeleter _(buffer);
 
 		int32 code;
-		status_t result = read_port(portReq, &code, buffer, size);
-		if (size < B_OK) {
-			free(buffer);
-			return 0;
-		}
-
-		if (code != MsgResolveRequest) {
-			free(buffer);
-			continue;
-		}
-
-		uint32 addr;
-		result = resolve_dns(reinterpret_cast<char*>(buffer), &addr);
-		free(buffer);
-
-		if (result == B_OK)
-			result = write_port(portRpl, MsgResolveReply, &addr, sizeof(addr));
-		else {
-			result = write_port(portRpl, MsgResolveError, &result,
-				sizeof(result));
-		}
-
-		if (result == B_BAD_PORT_ID)
+		size = read_port(gRequestPort, &code, buffer, size);
+		if (size < B_OK)
 			return 0;
 
+		status_t result;
+		switch (code) {
+			case MsgGetAddrInfo:
+				result = GetAddrInfo(reinterpret_cast<char*>(buffer));
+			default:
+				result = B_BAD_VALUE;
+				write_port(gReplyPort, MsgError, &result, sizeof(result));
+				result = B_OK;
+		}
+
+		if (result != B_OK)
+			return 0;
 	} while (true);
 }
 
@@ -90,18 +142,18 @@ main_loop(port_id portReq, port_id portRpl)
 int
 main(int argc, char** argv)
 {
-	port_id portReq = find_port(kPortNameReq);
-	if (portReq == B_NAME_NOT_FOUND) {
-		fprintf(stderr, "%s\n", strerror(portReq));
-		return portReq;
+	gRequestPort = find_port(kPortNameReq);
+	if (gRequestPort < B_OK) {
+		fprintf(stderr, "%s\n", strerror(gRequestPort));
+		return gRequestPort;
 	}
 
-	port_id portRpl = find_port(kPortNameRpl);
-	if (portRpl == B_NAME_NOT_FOUND) {
-		fprintf(stderr, "%s\n", strerror(portRpl));
-		return portRpl;
+	gReplyPort = find_port(kPortNameRpl);
+	if (gReplyPort < B_OK) {
+		fprintf(stderr, "%s\n", strerror(gReplyPort));
+		return gReplyPort;
 	}
 
-	return main_loop(portReq, portRpl);
+	return MainLoop();
 }
 

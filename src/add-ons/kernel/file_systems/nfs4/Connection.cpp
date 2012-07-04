@@ -9,12 +9,14 @@
 
 #include "Connection.h"
 
+#include <arpa/inet.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
 #include <util/kernel_cpp.h>
+#include <net/dns_resolver.h>
 
 
 #define	LAST_FRAGMENT	0x80000000
@@ -45,6 +47,42 @@ ServerAddress::operator=(const ServerAddress& x)
 	fPort = x.fPort;
 	fProtocol = x.fProtocol;
 	return *this;
+}
+
+
+status_t
+ServerAddress::ResolveName(const char* name, ServerAddress* addr)
+{
+	addr->fPort = 2049;
+	addr->fProtocol = ProtocolUDP;
+
+	struct in_addr iaddr;
+	if (inet_aton(name, &iaddr) != 0) {
+		addr->fAddress = ntohl(iaddr.s_addr);
+		return B_OK;
+	}
+
+	addrinfo* ai;
+	status_t result = getaddrinfo(name, NULL, NULL, &ai);
+	if (result != B_OK)
+		return result;
+
+	addrinfo* current = ai;
+	while (current != NULL) {
+		if (current->ai_family == AF_INET) {
+			sockaddr_in* sin = reinterpret_cast<sockaddr_in*>(current->ai_addr);
+
+			addr->fAddress = ntohl(sin->sin_addr.s_addr);
+
+			freeaddrinfo(ai);
+			return B_OK;
+		}
+
+		current = current->ai_next;
+	}
+
+	freeaddrinfo(ai);
+	return B_NAME_NOT_FOUND;
 }
 
 

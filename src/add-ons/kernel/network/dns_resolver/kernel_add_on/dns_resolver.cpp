@@ -9,10 +9,12 @@
 
 #include <net/dns_resolver.h>
 
+#include <AutoDeleter.h>
 #include <FindDirectory.h>
 #include <lock.h>
 #include <port.h>
 #include <team.h>
+#include <util/AutoLock.h>
 
 #include "Definitions.h"
 
@@ -91,40 +93,120 @@ dns_resolver_uninit()
 }
 
 
-static status_t
-dns_resolve(const char* host, uint32* addr)
+static void
+RelocateEntries(struct addrinfo *addr)
 {
-	mutex_lock(&gPortLock);
+	char* generalOffset = reinterpret_cast<char*>(addr);
+
+	struct addrinfo* current = addr;
+	while (current != NULL) {
+		uint64 addrOffset = reinterpret_cast<uint64>(current->ai_addr);
+		uint64 nameOffset = reinterpret_cast<uint64>(current->ai_canonname);
+		uint64 nextOffset = reinterpret_cast<uint64>(current->ai_next);
+
+		if (current->ai_addr != NULL) {
+			current->ai_addr =
+				reinterpret_cast<sockaddr*>(generalOffset + addrOffset);
+		}
+
+		if (current->ai_canonname != NULL)
+			current->ai_canonname = generalOffset + nameOffset;
+
+		if (current->ai_next != NULL) {
+			current->ai_next =
+				reinterpret_cast<addrinfo*>(generalOffset + nextOffset);
+		}
+
+		current = current->ai_next;
+	}
+}
+
+
+static status_t
+GetAddrInfo(const char* node, const char* service,
+	const struct addrinfo* hints, struct addrinfo** res)
+{
+	dprintf("SENDING GETADDRINFO %s\n", node);
+
+	uint32 nodeSize = node != NULL ? strlen(node) + 1 : 1;
+	uint32 serviceSize = service != NULL ? strlen(service) + 1 : 1;
+	uint32 size = nodeSize + serviceSize + sizeof(*hints);
+	char* buffer = reinterpret_cast<char*>(malloc(size));
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+	MemoryDeleter _(buffer);
+
+	off_t off = 0;
+	if (node != NULL)
+		strcpy(buffer + off, node);
+	else
+		buffer[off] = '\0';
+	off += nodeSize;
+
+	if (service != NULL)
+		strcpy(buffer + off, service);
+	else
+		buffer[off] = '\0';
+	off += serviceSize;
+
+	if (hints != NULL)
+		memcpy(buffer + off, hints, sizeof(*hints));
+	else {
+		struct addrinfo *nullHints =
+			reinterpret_cast<struct addrinfo*>(buffer + off);
+		memset(nullHints, 0, sizeof(*nullHints));
+		nullHints->ai_family = AF_UNSPEC;
+	}
+	dprintf("SENDING BUFFER %s %d\n", buffer, (int)size);
+	MutexLocker locker(gPortLock);
 	do {
-		status_t result = write_port(gPortRequest, MsgResolveRequest, host,
-			strlen(host) + 1);
+		status_t result = write_port(gPortRequest, MsgGetAddrInfo, buffer,
+			size);
 		if (result != B_OK) {
 			result = dns_resolver_repair();
-			if (result != B_OK) {
-				mutex_unlock(&gPortLock);
+			if (result != B_OK)
 				return result;
-			}
-
 			continue;
 		}
+
+		ssize_t replySize = port_buffer_size(gPortReply);
+		if (replySize < B_OK) {
+			result = dns_resolver_repair();
+			if (result != B_OK)
+				return result;
+			continue;
+		}
+
+		void* reply = malloc(replySize);
+		if (reply == NULL)
+			return B_NO_MEMORY;
 
 		int32 code;
-		result = read_port(gPortReply, &code, addr, sizeof(*addr));
-		if (result < B_OK) {
+		replySize = read_port(gPortReply, &code, reply, replySize);
+		if (replySize < B_OK) {
 			result = dns_resolver_repair();
 			if (result != B_OK) {
-				mutex_unlock(&gPortLock);
+				free(reply);
 				return result;
 			}
-
 			continue;
 		}
-		mutex_unlock(&gPortLock);
 
-		if (code == MsgResolveReply)
-			return B_OK;
-		else
-			return *addr;
+		struct addrinfo *addr;
+		switch (code) {
+			case MsgReply:
+				addr = reinterpret_cast<struct addrinfo*>(reply);
+				RelocateEntries(addr);
+				*res = addr;
+				return B_OK;
+			case MsgError:
+				result = *reinterpret_cast<status_t*>(reply);
+				free(reply);
+				return result;
+			default:
+				free(reply);
+				return B_BAD_VALUE;
+		}
 
 	} while (true);
 }
@@ -150,7 +232,7 @@ static dns_resolver_module sDNSResolverModule = {
 		dns_resolver_std_ops,
 	},
 
-	dns_resolve,
+	GetAddrInfo,
 };
 
 module_info* modules[] = {

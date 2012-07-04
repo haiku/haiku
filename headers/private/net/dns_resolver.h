@@ -9,6 +9,9 @@
 #define DNS_RESOLVER_H
 
 
+#include <netdb.h>
+#include <stdlib.h>
+
 #include <module.h>
 
 
@@ -16,9 +19,35 @@
 
 
 struct dns_resolver_module {
-   module_info module;
-   status_t (*dns_resolve)(const char* host, uint32* addr);
+	module_info module;
+	status_t (*getaddrinfo)(const char* node, const char* service,
+		const struct addrinfo* hints, struct addrinfo** res);
 };
+
+
+static inline int
+getaddrinfo(const char* node, const char* service, const struct addrinfo* hints,
+	struct addrinfo** res)
+{
+	dns_resolver_module* dns;
+	status_t result = get_module(DNS_RESOLVER_MODULE_NAME,
+		reinterpret_cast<module_info**>(&dns));
+	if (result != B_OK)
+		return result;
+
+	result = dns->getaddrinfo(node, service, hints, res);
+
+	put_module(DNS_RESOLVER_MODULE_NAME);
+
+	return result;
+}
+
+
+static inline void
+freeaddrinfo(struct addrinfo* res)
+{
+	free(res);
+}
 
 
 #endif	//	DNS_RESOLVER_H

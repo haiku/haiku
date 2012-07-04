@@ -13,9 +13,9 @@ const char* kPortNameReq = "dns_resolver_req";
 const char* kPortNameRpl = "dns_resolver_rpl";
 
 enum MsgCodes {
-	MsgResolveRequest		= 1,
-	MsgResolveReply			= 2,
-	MsgResolveError			= 3
+	MsgReply,
+	MsgError,
+	MsgGetAddrInfo,
 };
 
 

@@ -29,6 +29,9 @@ struct ServerAddress {
 			bool				operator<(const ServerAddress& x);
 
 			ServerAddress&		operator=(const ServerAddress& x);
+
+	static	status_t			ResolveName(const char* name,
+									ServerAddress* addr);
 };
 
 class Connection {

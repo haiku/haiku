@@ -7,10 +7,8 @@
  */
 
 
-#include <arpa/inet.h>
 #include <stdio.h>
 
-#include <net/dns_resolver.h>
 #include <fs_interface.h>
 
 #include "Connection.h"
@@ -42,7 +40,7 @@ CreateNFS4Server(RPC::Server* serv)
 
 
 static status_t
-sParseArguments(const char* _args, uint32* _ip, char* _path)
+ParseArguments(const char* _args, uint32* _ip, char* _path)
 {
 	if (_args == NULL)
 		return B_BAD_VALUE;
@@ -55,26 +53,12 @@ sParseArguments(const char* _args, uint32* _ip, char* _path)
 	}
 	*path++ = '\0';
 
-	status_t result;
-	struct in_addr addr;
-	if (inet_aton(args, &addr) == 0) {
-			dns_resolver_module* dns;
-			result = get_module(DNS_RESOLVER_MODULE_NAME,
-				reinterpret_cast<module_info**>(&dns));
-			if (result != B_OK) {
-				free(args);
-				return result;
-			}
+	ServerAddress addr;
+	status_t result = ServerAddress::ResolveName(args, &addr);
+	if (result != B_OK)
+		return result;
 
-			result = dns->dns_resolve(args, _ip);
-			put_module(DNS_RESOLVER_MODULE_NAME);
-			if (result != B_OK) {
-				free(args);
-				return result;
-			}
-	} else
-		*_ip = addr.s_addr;
-	*_ip = ntohl(*_ip);
+	*_ip = addr.fAddress;
 
 	_path[255] = '\0';
 	strncpy(_path, path, 255);
@@ -92,7 +76,7 @@ nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 
 	uint32 ip;
 	char path[256];
-	result = sParseArguments(args, &ip, path);
+	result = ParseArguments(args, &ip, path);
 	if (result != B_OK)
 		return result;
 
