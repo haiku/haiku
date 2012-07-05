@@ -9,8 +9,9 @@
 #include <SupportDefs.h>
 
 
-extern "C" void long_enter_kernel(uint32 pml4, uint64 entry, uint64 stackTop,
-	uint64 kernelArgs, int currentCPU);
+extern "C" void long_enter_kernel(uint32 physPML4, uint32 physGDT,
+	uint64 virtGDT, uint64 entry, uint64 stackTop, uint64 kernelArgs,
+	int currentCPU);
 
 extern void long_start_kernel();
 

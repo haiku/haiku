@@ -11,13 +11,22 @@
 #undef __x86_64__
 
 
+#define GDT_LIMIT 0x800
+
+
 .code32
 
 
-/*!	void long_enter_kernel(uint32 pml4, uint64 entry, uint64 stackTop,
-		uint64 kernelArgs, int currentCPU);
+/*!	void long_enter_kernel(uint32 physPML4, uint32 physGDT, uint64 virtGDT,
+		uint64 entry, uint64 stackTop, uint64 kernelArgs, int currentCPU);
 */
 FUNCTION(long_enter_kernel):
+	// We're about to disable paging, so we need to load the the physical
+	// address of our GDT.
+	movl	8(%esp), %eax
+	movl	%eax, (long_gdtr + 2)
+	lgdtl	(long_gdtr)
+
 	// Currently running with 32-bit paging tables at an identity mapped
 	// address. To switch to 64-bit paging we must first disable 32-bit paging,
 	// otherwise loading the new CR3 will fault.
@@ -62,11 +71,16 @@ FUNCTION(long_enter_kernel):
 	// Clear the high 32 bits of RSP.
 	movl	%esp, %esp
 
+	// Load the virtual address of the GDT.
+	movq	12(%rsp), %rax
+	movq	%rax, long_gdtr + 2(%rip)
+	lgdtq	long_gdtr(%rip)
+
 	// Get the entry point address, arguments and new stack pointer.
-	movq	8(%rsp), %rax
-	movq	24(%rsp), %rdi
-	movl	32(%rsp), %esi
-	movq	16(%rsp), %rsp
+	movq	20(%rsp), %rax
+	movq	36(%rsp), %rdi
+	movl	44(%rsp), %esi
+	movq	28(%rsp), %rsp
 
 	// Clear the stack frame/RFLAGS.
 	xorq	%rbp, %rbp
@@ -75,3 +89,11 @@ FUNCTION(long_enter_kernel):
 
 	// Call the kernel entry point.
 	call	*%rax
+
+	
+.data
+
+
+long_gdtr:
+	.word	GDT_LIMIT - 1
+	.quad	0

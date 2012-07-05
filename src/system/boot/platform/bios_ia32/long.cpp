@@ -104,7 +104,7 @@ long_mmu_init()
 	// Allocate the top level PML4.
 	pml4 = (uint64*)mmu_allocate_page(&gKernelArgs.arch_args.phys_pgdir);
 	memset(pml4, 0, B_PAGE_SIZE);
-	gKernelArgs.arch_args.vir_pgdir = (uint64)(addr_t)pml4;
+	gKernelArgs.arch_args.vir_pgdir = fix_address((uint64)(addr_t)pml4);
 
 	// Find the highest physical memory address. We map all physical memory
 	// into the kernel address space, so we want to make sure we map everything
@@ -319,14 +319,11 @@ long_start_kernel()
 	// We're about to enter the kernel -- disable console output.
 	stdout = NULL;
 
-	// Load the new GDT. The physical address is used because long_enter_kernel
-	// disables 32-bit paging.
-	gdt_idt_descr gdtr = { GDT_LIMIT - 1, gKernelArgs.arch_args.phys_gdt };
-	asm volatile("lgdt %0" :: "m"(gdtr));
-
 	// Enter the kernel!
-	long_enter_kernel(gKernelArgs.arch_args.phys_pgdir, entry, stackTop,
-		kernelArgs, 0);
+	long_enter_kernel(gKernelArgs.arch_args.phys_pgdir,
+		gKernelArgs.arch_args.phys_gdt, gKernelArgs.arch_args.vir_gdt,
+		entry, stackTop, kernelArgs, 0);
+
 	panic("Shouldn't get here");
 }
 
