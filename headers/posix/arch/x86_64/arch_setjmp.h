@@ -6,6 +6,6 @@
 #define _ARCH_SETJMP_H_
 
 
-typedef int __jmp_buf[8];
+typedef unsigned long __jmp_buf[8];
 
 #endif	/* _ARCH_SETJMP_H_ */
