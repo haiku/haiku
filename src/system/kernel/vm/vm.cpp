@@ -60,7 +60,7 @@
 
 
 //#define TRACE_VM
-//#define TRACE_FAULTS
+#define TRACE_FAULTS
 #ifdef TRACE_VM
 #	define TRACE(x) dprintf x
 #else
@@ -784,10 +784,11 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 	uint32 flags, const virtual_address_restrictions* addressRestrictions,
 	bool kernel, VMArea** _area, void** _virtualAddress)
 {
-	TRACE(("map_backing_store: aspace %p, cache %p, virtual %p, offset 0x%Lx, "
-		"size %lu, addressSpec %ld, wiring %d, protection %d, area %p, areaName "
-		"'%s'\n", addressSpace, cache, addressRestrictions->address, offset,
-		size, addressRestrictions->address_specification, wiring, protection,
+	TRACE(("map_backing_store: aspace %p, cache %p, virtual %p, offset 0x%"
+		B_PRIx64 ", size %" B_PRIuADDR ", addressSpec %" B_PRIu32 ", wiring %d"
+		", protection %d, area %p, areaName '%s'\n", addressSpace, cache,
+		addressRestrictions->address, offset, size,
+		addressRestrictions->address_specification, wiring, protection,
 		_area, areaName));
 	cache->AssertLocked();
 
@@ -1191,7 +1192,8 @@ vm_create_anonymous_area(team_id team, const char *name, addr_t size,
 	uint32 pageAllocFlags = (flags & CREATE_AREA_DONT_CLEAR) == 0
 		? VM_PAGE_ALLOC_CLEAR : 0;
 
-	TRACE(("create_anonymous_area [%ld] %s: size 0x%lx\n", team, name, size));
+	TRACE(("create_anonymous_area [%" B_PRId32 "] %s: size 0x%" B_PRIxADDR "\n",
+		team, name, size));
 
 	size = PAGE_ALIGN(size);
 
@@ -1557,10 +1559,10 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 	VMCache* cache;
 	addr_t mapOffset;
 
-	TRACE(("vm_map_physical_memory(aspace = %ld, \"%s\", virtual = %p, "
-		"spec = %ld, size = %lu, protection = %ld, phys = %#" B_PRIxPHYSADDR
-		")\n", team, name, *_address, addressSpec, size, protection,
-		physicalAddress));
+	TRACE(("vm_map_physical_memory(aspace = %" B_PRId32 ", \"%s\", virtual = %p"
+		", spec = %" B_PRIu32 ", size = %" B_PRIxADDR ", protection = %"
+		B_PRIu32 ", phys = %#" B_PRIxPHYSADDR ")\n", team, name, *_address,
+		addressSpec, size, protection, physicalAddress));
 
 	if (!arch_vm_supports_protection(protection))
 		return B_NOT_SUPPORTED;
@@ -1664,10 +1666,10 @@ vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
 	uint32 addressSpec, addr_t* _size, uint32 protection,
 	struct generic_io_vec* vecs, uint32 vecCount)
 {
-	TRACE(("vm_map_physical_memory_vecs(team = %ld, \"%s\", virtual = %p, "
-		"spec = %ld, _size = %p, protection = %ld, vecs = %p, "
-		"vecCount = %ld)\n", team, name, *_address, addressSpec, _size,
-		protection, vecs, vecCount));
+	TRACE(("vm_map_physical_memory_vecs(team = %" B_PRId32 ", \"%s\", virtual "
+		"= %p, spec = %" B_PRIu32 ", _size = %p, protection = %" B_PRIu32 ", "
+		"vecs = %p, vecCount = %" B_PRIu32 ")\n", team, name, *_address,
+		addressSpec, _size, protection, vecs, vecCount));
 
 	if (!arch_vm_supports_protection(protection)
 		|| (addressSpec & B_MTR_MASK) != 0) {
@@ -1859,8 +1861,8 @@ _vm_map_file(team_id team, const char* name, void** _address,
 	//	copy of a file at a given time, ie. later changes should not
 	//	make it into the mapped copy -- this will need quite some changes
 	//	to be done in a nice way
-	TRACE(("_vm_map_file(fd = %d, offset = %Ld, size = %lu, mapping %ld)\n",
-		fd, offset, size, mapping));
+	TRACE(("_vm_map_file(fd = %d, offset = %" B_PRIdOFF ", size = %lu, mapping "
+		"%" B_PRIu32 ")\n", fd, offset, size, mapping));
 
 	offset = ROUNDDOWN(offset, B_PAGE_SIZE);
 	size = PAGE_ALIGN(size);
@@ -2249,7 +2251,8 @@ delete_area(VMAddressSpace* addressSpace, VMArea* area,
 status_t
 vm_delete_area(team_id team, area_id id, bool kernel)
 {
-	TRACE(("vm_delete_area(team = 0x%lx, area = 0x%lx)\n", team, id));
+	TRACE(("vm_delete_area(team = 0x%" B_PRIx32 ", area = 0x%" B_PRIx32 ")\n",
+		team, id));
 
 	// lock the address space and make sure the area isn't wired
 	AddressSpaceWriteLocker locker;
@@ -2520,8 +2523,8 @@ static status_t
 vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 	bool kernel)
 {
-	TRACE(("vm_set_area_protection(team = %#lx, area = %#lx, protection = "
-		"%#lx)\n", team, areaID, newProtection));
+	TRACE(("vm_set_area_protection(team = %#" B_PRIx32 ", area = %#" B_PRIx32
+		", protection = %#" B_PRIx32 ")\n", team, areaID, newProtection));
 
 	if (!arch_vm_supports_protection(newProtection))
 		return B_NOT_SUPPORTED;
@@ -3405,7 +3408,7 @@ dump_available_memory(int argc, char** argv)
 void
 vm_delete_areas(struct VMAddressSpace* addressSpace, bool deletingAddressSpace)
 {
-	TRACE(("vm_delete_areas: called on address space 0x%lx\n",
+	TRACE(("vm_delete_areas: called on address space 0x%" B_PRIx32 "\n",
 		addressSpace->ID()));
 
 	addressSpace->WriteLock();
@@ -4365,8 +4368,9 @@ static status_t
 vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 	bool isWrite, bool isUser, vm_page** wirePage, VMAreaWiredRange* wiredRange)
 {
-	FTRACE(("vm_soft_fault: thid 0x%lx address 0x%lx, isWrite %d, isUser %d\n",
-		thread_get_current_thread_id(), originalAddress, isWrite, isUser));
+	FTRACE(("vm_soft_fault: thid 0x%" B_PRIx32 " address 0x%" B_PRIxADDR ", "
+		"isWrite %d, isUser %d\n", thread_get_current_thread_id(),
+		originalAddress, isWrite, isUser));
 
 	PageFaultContext context(addressSpace, isWrite);
 
@@ -5609,8 +5613,8 @@ get_memory_map_etc(team_id team, const void* address, size_t numBytes,
 	addr_t offset = 0;
 	bool interrupts = are_interrupts_enabled();
 
-	TRACE(("get_memory_map_etc(%ld, %p, %lu bytes, %ld entries)\n", team,
-		address, numBytes, numEntries));
+	TRACE(("get_memory_map_etc(%" B_PRId32 ", %p, %lu bytes, %" B_PRIu32 " "
+		"entries)\n", team, address, numBytes, numEntries));
 
 	if (numEntries == 0 || numBytes == 0)
 		return B_BAD_VALUE;

@@ -2449,8 +2449,8 @@ page_writer(void* /*unused*/)
 		writtenPages += numPages;
 		if (writtenPages >= 1024) {
 			bigtime_t now = system_time();
-			TRACE(("page writer: wrote 1024 pages (total: %llu ms, "
-				"collect: %llu ms, write: %llu ms)\n",
+			TRACE(("page writer: wrote 1024 pages (total: %" B_PRIu64 " ms, "
+				"collect: %" B_PRIu64 " ms, write: %" B_PRIu64 " ms)\n",
 				(now - lastWrittenTime) / 1000,
 				pageCollectionTime / 1000, pageWritingTime / 1000));
 			lastWrittenTime = now;
@@ -2808,9 +2808,10 @@ full_scan_inactive_pages(page_stats& pageStats, int32 despairLevel)
 	queueLocker.Unlock();
 
 	time = system_time() - time;
-	TRACE_DAEMON("  -> inactive scan (%7lld us): scanned: %7lu, "
-		"moved: %lu -> cached, %lu -> modified, %lu -> active\n", time,
-		pagesScanned, pagesToCached, pagesToModified, pagesToActive);
+	TRACE_DAEMON("  -> inactive scan (%7" B_PRId64 " us): scanned: %7" B_PRIu32
+		", moved: %" B_PRIu32 " -> cached, %" B_PRIu32 " -> modified, %"
+		B_PRIu32 " -> active\n", time, pagesScanned, pagesToCached,
+		pagesToModified, pagesToActive);
 
 	// wake up the page writer, if we tossed it some pages
 	if (pagesToModified > 0)
@@ -2904,9 +2905,9 @@ full_scan_active_pages(page_stats& pageStats, int32 despairLevel)
 	}
 
 	time = system_time() - time;
-	TRACE_DAEMON("  ->   active scan (%7lld us): scanned: %7lu, "
-		"moved: %lu -> inactive, encountered %lu accessed ones\n", time,
-		pagesScanned, pagesToInactive, pagesAccessed);
+	TRACE_DAEMON("  ->   active scan (%7" B_PRId64 " us): scanned: %7" B_PRIu32
+		", moved: %" B_PRIu32 " -> inactive, encountered %" B_PRIu32 " accessed"
+		" ones\n", time, pagesScanned, pagesToInactive, pagesAccessed);
 }
 
 
@@ -2934,9 +2935,10 @@ page_daemon_idle_scan(page_stats& pageStats)
 static void
 page_daemon_full_scan(page_stats& pageStats, int32 despairLevel)
 {
-	TRACE_DAEMON("page daemon: full run: free: %lu, cached: %lu, "
-		"to free: %lu\n", pageStats.totalFreePages, pageStats.cachedPages,
-		pageStats.unsatisfiedReservations + sFreeOrCachedPagesTarget
+	TRACE_DAEMON("page daemon: full run: free: %" B_PRIu32 ", cached: %"
+		B_PRIu32 ", to free: %" B_PRIu32 "\n", pageStats.totalFreePages,
+		pageStats.cachedPages, pageStats.unsatisfiedReservations
+			+ sFreeOrCachedPagesTarget
 			- (pageStats.totalFreePages + pageStats.cachedPages));
 
 	// Walk the inactive list and transfer pages to the cached and modified

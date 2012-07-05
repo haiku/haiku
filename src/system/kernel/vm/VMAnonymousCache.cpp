@@ -448,8 +448,9 @@ VMAnonymousCache::Init(bool canOvercommit, int32 numPrecommittedPages,
 	int32 numGuardPages, uint32 allocationFlags)
 {
 	TRACE("%p->VMAnonymousCache::Init(canOvercommit = %s, "
-		"numPrecommittedPages = %ld, numGuardPages = %ld)\n", this,
-		canOvercommit ? "yes" : "no", numPrecommittedPages, numGuardPages);
+		"numPrecommittedPages = %" B_PRId32 ", numGuardPages = %" B_PRId32
+		")\n", this, canOvercommit ? "yes" : "no", numPrecommittedPages,
+		numGuardPages);
 
 	status_t error = VMCache::Init(CACHE_TYPE_RAM, allocationFlags);
 	if (error != B_OK)
@@ -528,7 +529,7 @@ VMAnonymousCache::Resize(off_t newSize, int priority)
 status_t
 VMAnonymousCache::Commit(off_t size, int priority)
 {
-	TRACE("%p->VMAnonymousCache::Commit(%lld)\n", this, size);
+	TRACE("%p->VMAnonymousCache::Commit(%" B_PRIdOFF ")\n", this, size);
 
 	// If we can overcommit, we don't commit here, but in Fault(). We always
 	// unreserve memory, if we're asked to shrink our commitment, though.
@@ -950,8 +951,9 @@ VMAnonymousCache::_SwapBlockGetAddress(off_t pageIndex)
 status_t
 VMAnonymousCache::_Commit(off_t size, int priority)
 {
-	TRACE("%p->VMAnonymousCache::_Commit(%lld), already committed: %lld "
-		"(%lld swap)\n", this, size, committed_size, fCommittedSwapSize);
+	TRACE("%p->VMAnonymousCache::_Commit(%" B_PRIdOFF "), already committed: "
+		"%" B_PRIdOFF " (%" B_PRIdOFF " swap)\n", this, size, committed_size,
+		fCommittedSwapSize);
 
 	// Basic strategy: reserve swap space first, only when running out of swap
 	// space, reserve real memory.
@@ -965,8 +967,8 @@ VMAnonymousCache::_Commit(off_t size, int priority)
 		fCommittedSwapSize += swap_space_reserve(size - fCommittedSwapSize);
 		committed_size = fCommittedSwapSize + committedMemory;
 		if (size > fCommittedSwapSize) {
-			TRACE("%p->VMAnonymousCache::_Commit(%lld), reserved only %lld "
-				"swap\n", this, size, fCommittedSwapSize);
+			TRACE("%p->VMAnonymousCache::_Commit(%" B_PRIdOFF "), reserved "
+				"only %" B_PRIdOFF " swap\n", this, size, fCommittedSwapSize);
 		}
 	}
 
