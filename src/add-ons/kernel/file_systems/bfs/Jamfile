@@ -27,7 +27,9 @@ KernelAddon bfs :
 	BPlusTree.cpp
 	kernel_cpp.cpp
 	Attribute.cpp
+	CheckVisitor.cpp
 	Debug.cpp
+	FileSystemVisitor.cpp
 	Index.cpp
 	Inode.cpp
 	Journal.cpp

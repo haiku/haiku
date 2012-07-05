@@ -8,6 +8,7 @@
 
 
 #include "Attribute.h"
+#include "CheckVisitor.h"
 #include "Debug.h"
 #include "Inode.h"
 #include "Journal.h"
@@ -282,7 +283,8 @@ Volume::Volume(fs_volume* volume)
 	fIndicesNode(NULL),
 	fDirtyCachedBlocks(0),
 	fFlags(0),
-	fCheckingThread(-1)
+	fCheckingThread(-1),
+	fCheckVisitor(NULL)
 {
 	mutex_init(&fLock, "bfs volume");
 	mutex_init(&fQueryLock, "bfs queries");
@@ -619,6 +621,28 @@ Volume::RemoveQuery(Query* query)
 {
 	MutexLocker _(fQueryLock);
 	fQueries.Remove(query);
+}
+
+
+status_t
+Volume::CreateCheckVisitor()
+{
+	if (fCheckVisitor != NULL)
+		return B_BUSY;
+
+	fCheckVisitor = new(std::nothrow) ::CheckVisitor(this);
+	if (fCheckVisitor == NULL)
+		return B_NO_MEMORY;
+
+	return B_OK;
+}
+
+
+void
+Volume::DeleteCheckVisitor()
+{
+	delete fCheckVisitor;
+	fCheckVisitor = NULL;
 }
 
 

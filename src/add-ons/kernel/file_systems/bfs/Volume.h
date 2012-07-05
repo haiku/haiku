@@ -12,6 +12,7 @@
 #include "BlockAllocator.h"
 
 
+class CheckVisitor;
 class Journal;
 class Inode;
 class Query;
@@ -65,6 +66,9 @@ public:
 								{ return fSuperBlock.UsedBlocks(); }
 			off_t			FreeBlocks() const
 								{ return NumBlocks() - UsedBlocks(); }
+			off_t			NumBitmapBlocks() const
+								{ return (NumBlocks() + fBlockSize * 8 - 1)
+									/ (fBlockSize * 8); }
 
 			uint32			DeviceBlockSize() const { return fDeviceBlockSize; }
 			uint32			BlockSize() const { return fBlockSize; }
@@ -114,6 +118,9 @@ public:
 								{ fCheckingThread = thread; }
 			bool			IsCheckingThread() const
 								{ return find_thread(NULL) == fCheckingThread; }
+			status_t		CreateCheckVisitor();
+			void			DeleteCheckVisitor();
+			::CheckVisitor*	CheckVisitor() { return fCheckVisitor; }
 
 			// cache access
 			status_t		WriteSuperBlock();
@@ -172,6 +179,7 @@ protected:
 
 			void*			fBlockCache;
 			thread_id		fCheckingThread;
+			::CheckVisitor*	fCheckVisitor;
 
 			InodeList		fRemovedInodes;
 };

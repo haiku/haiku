@@ -10,14 +10,11 @@
 
 
 class AllocationGroup;
-class BPlusTree;
 class Inode;
 class Transaction;
 class Volume;
 struct disk_super_block;
 struct block_run;
-struct check_control;
-struct check_cookie;
 
 
 //#define DEBUG_ALLOCATION_GROUPS
@@ -49,18 +46,15 @@ public:
 			status_t		Trim(uint64 offset, uint64 size,
 								uint64& trimmedSize);
 
-			status_t		StartChecking(const check_control* control);
-			status_t		StopChecking(check_control* control);
-			status_t		CheckNextNode(check_control* control);
-
 			status_t		CheckBlocks(off_t start, off_t length,
-								bool allocated = true);
+								bool allocated = true,
+								off_t* firstError = NULL);
 			status_t		CheckBlockRun(block_run run,
 								const char* type = NULL,
 								bool allocated = true);
-			status_t		CheckInode(Inode* inode, const char* name);
+			bool			IsValidBlockRun(block_run run);
 
-			size_t			BitmapSize() const;
+			recursive_lock&	Lock() { return fLock; }
 
 #ifdef BFS_DEBUGGER_COMMANDS
 			void			Dump(int32 index);
@@ -70,20 +64,9 @@ public:
 #endif
 
 private:
-			status_t		_RemoveInvalidNode(Inode* parent, BPlusTree* tree,
-								Inode* inode, const char* name);
 #ifdef DEBUG_ALLOCATION_GROUPS
 			void			_CheckGroup(int32 group) const;
 #endif
-			bool			_IsValidCheckControl(const check_control* control);
-			bool			_CheckBitmapIsUsedAt(off_t block) const;
-			void			_SetCheckBitmapAt(off_t block);
-			status_t		_CheckInodeBlocks(Inode* inode, const char* name);
-			status_t		_FinishBitmapPass();
-			status_t		_PrepareIndices();
-			void			_FreeIndices();
-			status_t		_AddInodeToIndex(Inode* inode);
-			status_t		_WriteBackCheckBitmap();
 			status_t		_AddTrim(fs_trim_data& trimData, uint32 maxRanges,
 								uint64 offset, uint64 size);
 			status_t		_TrimNext(fs_trim_data& trimData, uint32 maxRanges,
@@ -99,9 +82,6 @@ private:
 			int32			fNumGroups;
 			uint32			fBlocksPerGroup;
 			uint32			fNumBlocks;
-
-			uint32*			fCheckBitmap;
-			check_cookie*	fCheckCookie;
 };
 
 #ifdef BFS_DEBUGGER_COMMANDS
