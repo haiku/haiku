@@ -86,7 +86,7 @@ std_ops(int32 op, ...)
 			}
 
 			close_module_list(cookie);
-			if (sCpuidleModule->cStateCount < 2) {
+			if (sCpuidleModule->cStateCount < 3) {
 				dprintf("no enough available cstates, exiting...\n");
 				put_module(sCpuidleModule->info.name);
 				return B_ERROR;
