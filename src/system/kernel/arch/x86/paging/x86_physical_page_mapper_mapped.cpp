@@ -224,9 +224,8 @@ MappedPhysicalPageMapper::MemcpyToPhysical(phys_addr_t _to, const void* from,
 
 	if (user)
 		return user_memcpy(to, from, length);
-	else
-		memcpy(to, from, length);
 
+	memcpy(to, from, length);
 	return B_OK;
 }
 
