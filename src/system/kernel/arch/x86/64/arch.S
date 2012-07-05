@@ -32,6 +32,13 @@ FUNCTION(x86_fxsave_swap):
 FUNCTION_END(x86_fxsave_swap)
 
 
+/* addr_t x86_read_ebp(); */
+FUNCTION(x86_read_ebp):
+	mov		%rbp, %rax
+	ret
+FUNCTION_END(x86_read_ebp)
+
+
 /* uint64 x86_read_msr(uint32 register); */
 FUNCTION(x86_read_msr):
 	mov		%edi, %ecx

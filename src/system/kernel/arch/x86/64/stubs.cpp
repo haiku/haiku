@@ -85,10 +85,32 @@ arch_debug_save_registers(struct arch_debug_registers* registers)
 }
 
 
+struct stack_frame {
+	struct stack_frame	*previous;
+	addr_t				return_address;
+};
+
+
 void
 arch_debug_stack_trace(void)
 {
+	addr_t rbp = x86_read_ebp();
 
+	kprintf("frame                       caller\n");
+
+	for (int32 callIndex = 0;; callIndex++) {
+		if (rbp == 0)
+			break;
+
+		stack_frame* frame = (stack_frame*)rbp;
+		if (frame->return_address == 0)
+			break;
+
+		kprintf("%2d %016lx (+%4ld) %016lx\n", callIndex, rbp,
+			(addr_t)frame->previous - rbp, frame->return_address);
+
+		rbp = (addr_t)frame->previous;
+	}
 }
 
 
@@ -168,6 +190,8 @@ arch_debug_call_with_fault_handler(cpu_ent* cpu, jmp_buf jumpBuffer,
 	void (*function)(void*), void* parameter)
 {
 	// To be implemented in asm, not here.
+
+	function(parameter);
 }
 
 
