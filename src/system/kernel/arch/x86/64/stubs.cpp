@@ -94,7 +94,8 @@ static bool
 is_iframe(addr_t frame)
 {
 	addr_t previousFrame = *(addr_t*)frame;
-	return ((previousFrame & ~IFRAME_TYPE_MASK) == 0 && previousFrame != 0);
+	return ((previousFrame & ~(addr_t)IFRAME_TYPE_MASK) == 0
+		&& previousFrame != 0);
 }
 
 

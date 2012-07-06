@@ -15,6 +15,10 @@
 #include <arch_config.h>
 
 
+#ifndef KERNEL_LOAD_BASE
+#	define KERNEL_LOAD_BASE		KERNEL_BASE
+#endif
+
 // macro to check whether an address is in the kernel address space (avoid
 // always-true checks)
 #if KERNEL_BASE == 0

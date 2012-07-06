@@ -78,7 +78,7 @@ static uint32 *sPageDirectory = 0;
 #ifdef _PXE_ENV
 
 static addr_t sNextPhysicalAddress = 0x112000;
-static addr_t sNextVirtualAddress = KERNEL_BASE + kMaxKernelSize;
+static addr_t sNextVirtualAddress = KERNEL_LOAD_BASE + kMaxKernelSize;
 
 static addr_t sNextPageTableAddress = 0x7d000;
 static const uint32 kPageTableRegionEnd = 0x8b000;
@@ -87,7 +87,7 @@ static const uint32 kPageTableRegionEnd = 0x8b000;
 #else
 
 static addr_t sNextPhysicalAddress = 0x100000;
-static addr_t sNextVirtualAddress = KERNEL_BASE + kMaxKernelSize;
+static addr_t sNextVirtualAddress = KERNEL_LOAD_BASE + kMaxKernelSize;
 
 static addr_t sNextPageTableAddress = 0x90000;
 static const uint32 kPageTableRegionEnd = 0x9e000;
@@ -195,7 +195,7 @@ unmap_page(addr_t virtualAddress)
 {
 	TRACE("unmap_page(virtualAddress = %p)\n", (void *)virtualAddress);
 
-	if (virtualAddress < KERNEL_BASE) {
+	if (virtualAddress < KERNEL_LOAD_BASE) {
 		panic("unmap_page: asked to unmap invalid page %p!\n",
 			(void *)virtualAddress);
 	}
@@ -220,7 +220,7 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 	TRACE("map_page: vaddr 0x%lx, paddr 0x%lx\n", virtualAddress,
 		physicalAddress);
 
-	if (virtualAddress < KERNEL_BASE) {
+	if (virtualAddress < KERNEL_LOAD_BASE) {
 		panic("map_page: asked to map invalid page %p!\n",
 			(void *)virtualAddress);
 	}
@@ -397,8 +397,8 @@ mmu_allocate(void *virtualAddress, size_t size)
 		addr_t address = (addr_t)virtualAddress;
 
 		// is the address within the valid range?
-		if (address < KERNEL_BASE
-			|| address + size >= KERNEL_BASE + kMaxKernelSize)
+		if (address < KERNEL_LOAD_BASE
+			|| address + size >= KERNEL_LOAD_BASE + kMaxKernelSize)
 			return NULL;
 
 		for (uint32 i = 0; i < size; i++) {
@@ -479,7 +479,7 @@ mmu_free(void *virtualAddress, size_t size)
 	size = (size + pageOffset + B_PAGE_SIZE - 1) / B_PAGE_SIZE * B_PAGE_SIZE;
 
 	// is the address within the valid range?
-	if (address < KERNEL_BASE || address + size > sNextVirtualAddress) {
+	if (address < KERNEL_LOAD_BASE || address + size > sNextVirtualAddress) {
 		panic("mmu_free: asked to unmap out of range region (%p, size %lx)\n",
 			(void *)address, size);
 	}
@@ -500,14 +500,14 @@ mmu_free(void *virtualAddress, size_t size)
 size_t
 mmu_get_virtual_usage()
 {
-	return sNextVirtualAddress - KERNEL_BASE;
+	return sNextVirtualAddress - KERNEL_LOAD_BASE;
 }
 
 
 bool
 mmu_get_virtual_mapping(addr_t virtualAddress, addr_t *_physicalAddress)
 {
-	if (virtualAddress < KERNEL_BASE) {
+	if (virtualAddress < KERNEL_LOAD_BASE) {
 		panic("mmu_get_virtual_mapping: asked to lookup invalid page %p!\n",
 			(void *)virtualAddress);
 	}
@@ -607,9 +607,9 @@ mmu_init_for_kernel(void)
 
 	// Save the memory we've virtually allocated (for the kernel and other
 	// stuff)
-	gKernelArgs.virtual_allocated_range[0].start = KERNEL_BASE;
+	gKernelArgs.virtual_allocated_range[0].start = KERNEL_LOAD_BASE;
 	gKernelArgs.virtual_allocated_range[0].size
-		= sNextVirtualAddress - KERNEL_BASE;
+		= sNextVirtualAddress - KERNEL_LOAD_BASE;
 	gKernelArgs.num_virtual_allocated_ranges = 1;
 
 	// sort the address ranges
@@ -654,7 +654,7 @@ mmu_init(void)
 {
 	TRACE("mmu_init\n");
 
-	gKernelArgs.arch_args.virtual_end = KERNEL_BASE;
+	gKernelArgs.arch_args.virtual_end = KERNEL_LOAD_BASE;
 
 	gKernelArgs.physical_allocated_range[0].start = sNextPhysicalAddress;
 	gKernelArgs.physical_allocated_range[0].size = 0;

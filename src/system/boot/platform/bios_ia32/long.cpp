@@ -36,7 +36,7 @@ static const uint64 kPageMappingFlags = 0x103;
 static inline uint64
 fix_address(uint64 address)
 {
-	return address - KERNEL_BASE + KERNEL_BASE_64BIT;
+	return address - KERNEL_LOAD_BASE + KERNEL_LOAD_BASE_64BIT;
 }
 
 
@@ -157,7 +157,7 @@ long_mmu_init()
 	pdpt[510] = physicalAddress | kTableMappingFlags;
 
 	// Store the virtual memory usage information.
-	gKernelArgs.virtual_allocated_range[0].start = KERNEL_BASE_64BIT;
+	gKernelArgs.virtual_allocated_range[0].start = KERNEL_LOAD_BASE_64BIT;
 	gKernelArgs.virtual_allocated_range[0].size = mmu_get_virtual_usage();
 	gKernelArgs.num_virtual_allocated_ranges = 1;
 
@@ -176,14 +176,14 @@ long_mmu_init()
 		}
 
 		// Get the physical address to map.
-		if (!mmu_get_virtual_mapping(KERNEL_BASE + (i * B_PAGE_SIZE),
+		if (!mmu_get_virtual_mapping(KERNEL_LOAD_BASE + (i * B_PAGE_SIZE),
 				&physicalAddress))
 			continue;
 
 		pageTable[i % 512] = physicalAddress | kPageMappingFlags;
 	}
 
-	gKernelArgs.arch_args.virtual_end = ROUNDUP(KERNEL_BASE_64BIT
+	gKernelArgs.arch_args.virtual_end = ROUNDUP(KERNEL_LOAD_BASE_64BIT
 		+ gKernelArgs.virtual_allocated_range[0].size, 0x200000);
 
 	// Sort the address ranges.

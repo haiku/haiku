@@ -18,23 +18,22 @@
 
 
 // 32-bit and 64-bit kernel load addresses.
-#define KERNEL_BASE				0x80000000
-#define KERNEL_BASE_64BIT		0xffffffff80000000ll
+#define KERNEL_LOAD_BASE		0x80000000
+#define KERNEL_LOAD_BASE_64BIT	0xffffffff80000000ll
 
 
 #elif defined(__x86_64__)
 
 
 // Base of the kernel address space.
-// When compiling the bootloader, KERNEL_BASE is set to the x86 base address,
-// KERNEL_BASE_64BIT is set to where the kernel loaded to.
-// For the kernel, KERNEL_BASE is the base of the kernel address space. This is
-// NOT the address where the kernel is loaded to: the kernel is loaded in the
-// top 2GB of the virtual address space as required by GCC's kernel code model.
-// The whole kernel address space is the top 512GB of the address space.
+// KERNEL_BASE is the base of the kernel address space. This differs from the
+// address where the kernel is loaded to: the kernel is loaded in the top 2GB
+// of the virtual address space as required by GCC's kernel code model. The
+// whole kernel address space is the top 512GB of the address space.
 #define KERNEL_BASE				0xffffff8000000000
 #define KERNEL_SIZE				0x8000000000
 #define KERNEL_TOP  			(KERNEL_BASE + (KERNEL_SIZE - 1))
+#define KERNEL_LOAD_BASE		0xffffffff80000000
 
 // Kernel physical memory map area.
 #define KERNEL_PMAP_BASE		0xffffff0000000000
