@@ -853,12 +853,9 @@ arch_cpu_init_post_vm(kernel_args* args)
 		&virtualRestrictions, &physicalRestrictions,
 		(void**)&sDoubleFaultStacks);
 
-	// TODO x86_64
-#ifndef __x86_64__
 	X86PagingStructures* kernelPagingStructures
 		= static_cast<X86VMTranslationMap*>(
 			VMAddressSpace::Kernel()->TranslationMap())->PagingStructures();
-#endif
 
 	// setup task-state segments
 	for (i = 0; i < args->num_cpus; i++) {
@@ -877,12 +874,9 @@ arch_cpu_init_post_vm(kernel_args* args)
 		// initialize the double fault tss
 		init_double_fault(i);
 
-		// TODO x86_64
-#ifndef __x86_64__
 		// init active translation map
 		gCPU[i].arch.active_paging_structures = kernelPagingStructures;
 		kernelPagingStructures->AddReference();
-#endif
 	}
 
 	// set the current hardware task on cpu 0

@@ -107,15 +107,18 @@ print_iframe(struct iframe* frame)
 	kprintf("%s iframe at %p (end = %p)\n", isUser ? "user" : "kernel", frame,
 		isUser ? (uint64*)(frame + 1) : &frame->user_rsp);
 
-	kprintf(" rax 0x%-16lx    rbx 0x%-16lx     rcx 0x%-16lx  rdx 0x%lx\n",
-		frame->rax, frame->rbx, frame->rcx, frame->rdx);
-	kprintf(" rsi 0x%-16lx    rdi 0x%-16lx     rbp 0x%-16lx   r8 0x%lx\n",
-		frame->rsi, frame->rdi, frame->rbp, frame->r8);
-	kprintf("  r9 0x%-16lx    r10 0x%-16lx     r11 0x%-16lx  r12 0x%lx\n",
-		frame->r9, frame->r10, frame->r11, frame->r12);
-	kprintf(" r13 0x%-16lx    r14 0x%-16lx     r15 0x%-16lx\n",
-		frame->r13, frame->r14, frame->r15);
+	kprintf(" rax 0x%-16lx    rbx 0x%-16lx    rcx 0x%lx\n", frame->rax,
+		frame->rbx, frame->rcx);
+	kprintf(" rdx 0x%-16lx    rsi 0x%-16lx    rdi 0x%lx\n", frame->rdx,
+		frame->rsi, frame->rdi);
+	kprintf(" rbp 0x%-16lx     r8 0x%-16lx     r9 0x%lx\n", frame->rbp,
+		frame->r8, frame->r9);
+	kprintf(" r10 0x%-16lx    r11 0x%-16lx    r12 0x%lx\n", frame->r10,
+		frame->r11, frame->r12);
+	kprintf(" r13 0x%-16lx    r14 0x%-16lx    r15 0x%lx\n", frame->r13,
+		frame->r14, frame->r15);
 	kprintf(" rip 0x%-16lx rflags 0x%-16lx", frame->rip, frame->flags);
+
 	if (isUser) {
 		// from user space
 		kprintf("user rsp 0x%lx", frame->user_rsp);

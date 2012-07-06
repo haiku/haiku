@@ -629,7 +629,7 @@ X86PagingMethodPAE::CreateTranslationMap(bool kernel, VMTranslationMap** _map)
 status_t
 X86PagingMethodPAE::MapEarly(kernel_args* args, addr_t virtualAddress,
 	phys_addr_t physicalAddress, uint8 attributes,
-	phys_addr_t (*get_free_page)(kernel_args*))
+	page_num_t (*get_free_page)(kernel_args*))
 {
 	// check to see if a page table exists for this range
 	pae_page_directory_entry* pageDirEntry = PageDirEntryForAddress(

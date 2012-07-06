@@ -697,7 +697,7 @@ X86VMTranslationMapPAE::Query(addr_t virtualAddress,
 		| ((entry & X86_PAE_PTE_PRESENT) != 0 ? PAGE_PRESENT : 0);
 
 	TRACE("X86VMTranslationMapPAE::Query(%#" B_PRIxADDR ") -> %#"
-		B_PRIxPHYSADDR ":\n", *_physicalAddress, virtualAddress);
+		B_PRIxPHYSADDR ":\n", virtualAddress, *_physicalAddress);
 
 	return B_OK;
 }
@@ -870,7 +870,7 @@ X86VMTranslationMapPAE::ClearAccessedAndModified(VMArea* area, addr_t address,
 {
 	ASSERT(address % B_PAGE_SIZE == 0);
 
-	TRACE("X86VMTranslationMap32Bit::ClearAccessedAndModified(%#" B_PRIxADDR
+	TRACE("X86VMTranslationMapPAE::ClearAccessedAndModified(%#" B_PRIxADDR
 		")\n", address);
 
 	pae_page_directory_entry* pageDirEntry
