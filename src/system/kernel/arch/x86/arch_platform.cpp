@@ -29,7 +29,10 @@ arch_platform_init_post_vm(struct kernel_args *args)
 status_t
 arch_platform_init_post_thread(struct kernel_args *args)
 {
+	// APM is not supported on x86_64.
+#ifndef __x86_64__
 	apm_init(args);
+#endif
 	return B_OK;
 }
 

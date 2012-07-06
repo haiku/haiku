@@ -25,7 +25,6 @@
 #include <boot/kernel_args.h>
 
 #include <arch/debug.h>
-#include <arch/platform.h>
 #include <arch/vm_translation_map.h>
 #include <arch/vm.h>
 #include <arch/user_debugger.h>
@@ -241,27 +240,6 @@ arch_debug_call_with_fault_handler(cpu_ent* cpu, jmp_buf jumpBuffer,
 	// To be implemented in asm, not here.
 
 	function(parameter);
-}
-
-
-status_t
-arch_platform_init(struct kernel_args *args)
-{
-	return B_OK;
-}
-
-
-status_t
-arch_platform_init_post_vm(struct kernel_args *args)
-{
-	return B_OK;
-}
-
-
-status_t
-arch_platform_init_post_thread(struct kernel_args *args)
-{
-	return B_OK;
 }
 
 

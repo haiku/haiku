@@ -47,7 +47,6 @@ if $(TARGET_ARCH) = x86_64 {
 		arch_commpage.cpp
 		arch_debug.cpp
 		arch_elf.cpp
-		arch_platform.cpp
 		arch_real_time_clock.cpp
 		arch_smp.cpp
 		arch_thread.cpp
@@ -90,6 +89,7 @@ local archGenericSources =
 	arch_cpu.cpp
 	arch_debug_console.cpp
 	arch_int.cpp
+	arch_platform.cpp
 	arch_vm.cpp
 	arch_vm_translation_map.cpp
 	pic.cpp
