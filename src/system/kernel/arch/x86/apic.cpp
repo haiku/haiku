@@ -88,8 +88,9 @@ apic_init(kernel_args *args)
 status_t
 apic_per_cpu_init(kernel_args *args, int32 cpu)
 {
-	dprintf("setting up apic for CPU %ld: apic id %lu, version %lu\n", cpu,
-		apic_local_id(), apic_read(APIC_VERSION));
+	dprintf("setting up apic for CPU %" B_PRId32 ": apic id %" B_PRIu32 ", "
+		"version %" B_PRIu32 "\n", cpu, apic_local_id(),
+		apic_read(APIC_VERSION));
 
 	/* set spurious interrupt vector to 0xff */
 	uint32 config = apic_read(APIC_SPURIOUS_INTR_VECTOR) & 0xffffff00;

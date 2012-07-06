@@ -331,7 +331,7 @@ arch_thread_init(struct kernel_args *args)
 status_t
 arch_team_init_team_struct(Team *p, bool kernel)
 {
-	return B_ERROR;
+	return B_OK;
 }
 
 
@@ -412,27 +412,6 @@ void
 arch_restore_fork_frame(struct arch_fork_arg* arg)
 {
 
-}
-
-
-void
-arch_timer_set_hardware_timer(bigtime_t timeout)
-{
-	
-}
-
-
-void
-arch_timer_clear_hardware_timer(void)
-{
-	
-}
-
-
-int
-arch_init_timer(kernel_args *args)
-{
-	return 0;
 }
 
 

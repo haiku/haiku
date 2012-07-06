@@ -11,6 +11,8 @@
 
 #include <boot/kernel_args.h>
 #include <cpu.h>
+#include <vm/vm.h>
+#include <vm/vm_priv.h>
 
 #include <arch/x86/apic.h>
 #include <arch/x86/descriptors.h>
@@ -187,9 +189,13 @@ arch_int_init_post_vm(kernel_args* args)
 {
 	// Always init the local apic as it can be used for timers even if we
 	// don't end up using the io apic
-	//apic_init(args);
+	apic_init(args);
 
-	// TODO: create area for IDT.
+	// Create an area for the IDT.
+	area_id area = create_area("idt", (void**)&sIDT, B_EXACT_ADDRESS,
+		B_PAGE_SIZE, B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	if (area < 0)
+		return area;
 
 	return B_OK;
 }

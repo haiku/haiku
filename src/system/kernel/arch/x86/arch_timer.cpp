@@ -24,7 +24,6 @@
 #include <arch/x86/smp_priv.h>
 #include <arch/x86/timer.h>
 
-#include "interrupts.h"
 
 //#define TRACE_TIMER
 #ifdef TRACE_TIMER

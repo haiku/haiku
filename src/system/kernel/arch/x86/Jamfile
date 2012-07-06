@@ -50,10 +50,8 @@ if $(TARGET_ARCH) = x86_64 {
 		arch_real_time_clock.cpp
 		arch_smp.cpp
 		arch_thread.cpp
-		arch_timer.cpp
 		arch_system_info.cpp
 		arch_user_debugger.cpp
-		apic.cpp
 		apm.cpp
 		bios.cpp
 		ioapic.cpp
@@ -77,11 +75,6 @@ if $(TARGET_ARCH) = x86_64 {
 		X86PagingMethodPAE.cpp
 		X86PagingStructuresPAE.cpp
 		X86VMTranslationMapPAE.cpp
-
-		# timers
-		x86_apic.cpp
-		x86_hpet.cpp
-		x86_pit.cpp
 	;
 }
 
@@ -90,8 +83,10 @@ local archGenericSources =
 	arch_debug_console.cpp
 	arch_int.cpp
 	arch_platform.cpp
+	arch_timer.cpp
 	arch_vm.cpp
 	arch_vm_translation_map.cpp
+	apic.cpp
 	pic.cpp
 
 	# paging
@@ -99,6 +94,11 @@ local archGenericSources =
 	X86PagingMethod.cpp
 	X86PagingStructures.cpp
 	X86VMTranslationMap.cpp
+
+	# timers
+	x86_apic.cpp
+	x86_hpet.cpp
+	x86_pit.cpp
 ;
 
 KernelMergeObject kernel_arch_x86.o :

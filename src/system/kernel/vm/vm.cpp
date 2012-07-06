@@ -60,7 +60,7 @@
 
 
 //#define TRACE_VM
-#define TRACE_FAULTS
+//#define TRACE_FAULTS
 #ifdef TRACE_VM
 #	define TRACE(x) dprintf x
 #else
