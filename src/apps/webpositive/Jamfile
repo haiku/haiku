@@ -1,0 +1,71 @@
+SubDir HAIKU_TOP src apps webpositive ;
+
+SubDirSysHdrs $(HAIKU_WEBKIT_HEADERS) ;
+
+SubDirC++Flags $(defines) -Wno-error=sequence-point ;
+SubDirCcFlags $(defines) -Wno-error=sequence-point ;
+
+# source directories
+local sourceDirs =
+	autocompletion
+	support
+	tabview
+;
+
+local sourceDir ;
+for sourceDir in $(sourceDirs) {
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps webpositive $(sourceDir) ] ;
+}
+
+local sources =
+	# autocompletion
+	AutoCompleter.cpp
+	AutoCompleterDefaultImpl.cpp
+	TextViewCompleter.cpp
+
+	# support
+	BaseURL.cpp
+	BitmapButton.cpp
+	DateTime.cpp
+	FontSelectionView.cpp
+	IconButton.cpp
+	SettingsMessage.cpp
+	StringForSize.cpp
+
+	# tabview
+	TabContainerView.cpp
+	TabManager.cpp
+	TabView.cpp
+
+	AuthenticationPanel.cpp
+	BrowserApp.cpp
+	BrowserWindow.cpp
+	BrowsingHistory.cpp
+	CredentialsStorage.cpp
+	DownloadProgressView.cpp
+	DownloadWindow.cpp
+	SettingsKeys.cpp
+	SettingsWindow.cpp
+	svn_revision.cpp
+	URLInputGroup.cpp
+;
+
+
+Includes [ FGristFiles $(sources) ] : $(HAIKU_WEBKIT_HEADERS_DEPENDENCY) ;
+	# Dependency needed to trigger downloading/unzipping the package before
+	# compiling the files.
+
+# SVN revision
+#local svnRevisionFile = [ FGristFiles svn_revision ] ;
+#MakeLocate $(svnRevisionFile) : $(LOCATE_TARGET) ;
+#CreateSVNRevisionFile $(svnRevisionFile) ;
+
+Application WebPositive :
+	$(sources)
+	:
+	$(HAIKU_WEBKIT_LIBS)
+	$(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
+	be network tracker translation
+	:
+	WebPositive.rdef
+;

@@ -419,3 +419,36 @@ if $(HAIKU_BUILD_FEATURE_TAGLIB) {
 	}
 }
 
+
+# WebKit
+local webkitBaseURL = http://haiku-files.org/files/optional-packages ;
+if $(TARGET_ARCH) = x86 {
+	if $(HAIKU_GCC_VERSION[1]) < 4 {
+		Echo "WebKit support not available on gcc $(HAIKU_GCC_VERSION[1])" ;
+	} else {
+	    HAIKU_WEBKIT_FILE = webkit-0.1.1-x86-gcc4-2012-07-03.zip ;
+
+	    local zipFile = [ DownloadFile $(HAIKU_WEBKIT_FILE)
+		    : $(webkitBaseURL)/$(HAIKU_WEBKIT_FILE) ] ;
+
+	    HAIKU_WEBKIT_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		    $(HAIKU_WEBKIT_FILE:B) ] ;
+
+	    HAIKU_WEBKIT_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_WEBKIT_DIR)
+		    : include/ : $(zipFile) : extracted-webkit ] ;
+
+	    HAIKU_WEBKIT_LIBS = [ ExtractArchive $(HAIKU_WEBKIT_DIR)
+		    :
+		    lib/libwtf.so
+		    lib/libjavascriptcore.so
+		    lib/libwebcore.so
+		    lib/libwebkit.so
+		    : $(zipFile)
+		    : extracted-webkit
+	    ] ;
+
+	    HAIKU_WEBKIT_HEADERS = [ FDirName $(HAIKU_WEBKIT_DIR) include ] ;
+    }
+} else {
+	Echo "WebKit support not available on $(TARGET_ARCH)" ;
+}
