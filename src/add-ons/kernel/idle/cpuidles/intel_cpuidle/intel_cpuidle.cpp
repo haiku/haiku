@@ -66,7 +66,7 @@ IntelCstateIdleEnter(int32 state, CpuidleCstate *cstate)
 }
 
 
-static CpuidleCstate kSnbcStates[CPUIDLE_CSTATE_MAX] = {
+static CpuidleCstate sSnbcStates[CPUIDLE_CSTATE_MAX] = {
 	{},
 	{
 		"C1-SNB",
@@ -107,6 +107,15 @@ std_ops(int32 op, ...)
 	switch (op) {
 		case B_MODULE_INIT:
 		{
+			cpu_ent *cpu = get_cpu_struct();
+			if (cpu->arch.vendor != VENDOR_INTEL ||	cpu->arch.family != 6)
+				return B_ERROR;
+
+			// Calculated Model Value: M = (Extended Model << 4) + Model
+			uint32 model = (cpu->arch.extended_model << 4) + cpu->arch.model;
+			if (model != 0x2a && model != 0x2d)
+				return B_ERROR;
+
 			cpuid_info cpuid;
 			get_current_cpuid(&cpuid, 5);
 			/* ecx[0] monitor/mwait extension supported
@@ -125,7 +134,7 @@ std_ops(int32 op, ...)
 				if (!subStates)
 					continue;
 				sIntelidleModule.cStates[sIntelidleModule.cStateCount] =
-					kSnbcStates[i];
+					sSnbcStates[i];
 				sIntelidleModule.cStates[sIntelidleModule.cStateCount].pData =
 					kMwaitEax[i];
 				sIntelidleModule.cStateCount++;
