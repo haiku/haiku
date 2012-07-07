@@ -17,15 +17,15 @@ extern "C" {
 #define B_CPUIDLE_MODULE_NAME "idle/generic/cpuidle/v1"
 
 
-struct CpuidleStats {
+struct CpuidleStat {
 	uint64		usageCount;
 	bigtime_t	usageTime;
 };
 
 
 struct CpuidleInfo {
-	int32			cstateSleep;
-	CpuidleStats	stats[CPUIDLE_CSTATE_MAX];
+	int32		cstateSleep;
+	CpuidleStat	stats[CPUIDLE_CSTATE_MAX];
 };
 
 
