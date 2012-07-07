@@ -64,7 +64,7 @@ struct file_cache_ref {
 	fssh_mutex					lock;
 	fssh_mount_id				mountID;
 	fssh_vnode_id				nodeID;
-	void*						node;
+	struct vnode*				node;
 	fssh_off_t					virtual_size;
 };
 

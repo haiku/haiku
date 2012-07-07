@@ -85,6 +85,8 @@ BuildPlatformStaticLibrary <build>fs_shell.a :
 
 SEARCH on [ FGristFiles rootfs.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system kernel fs ] ;
+SEARCH on [ FGristFiles file_map.cpp ]
+	= [ FDirName $(HAIKU_TOP) src system kernel cache ] ;
 
 BuildPlatformMain <build>fs_shell_command
 	: fs_shell_command.cpp $(fsShellCommandSources)

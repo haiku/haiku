@@ -1,29 +1,36 @@
 /*
- * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2012, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
 
-#include <unistd.h>
+#include <new>
 #include <stdlib.h>
 #include <string.h>
 
-#include <new>
+#ifdef FS_SHELL
+#	include "vfs.h"
+#	include "fssh_api_wrapper.h"
 
-#include <KernelExport.h>
-#include <fs_cache.h>
+using namespace FSShell;
+#else
+#	include <unistd.h>
 
-#include <condition_variable.h>
-#include <file_cache.h>
-#include <generic_syscall.h>
-#include <util/AutoLock.h>
-#include <util/DoublyLinkedList.h>
-#include <vfs.h>
-#include <vm/vm.h>
-#include <vm/vm_page.h>
-#include <vm/VMCache.h>
+#	include <KernelExport.h>
+#	include <fs_cache.h>
 
-#include "kernel_debug_config.h"
+#	include <condition_variable.h>
+#	include <file_cache.h>
+#	include <generic_syscall.h>
+#	include <util/AutoLock.h>
+#	include <util/DoublyLinkedList.h>
+#	include <vfs.h>
+#	include <vm/vm.h>
+#	include <vm/vm_page.h>
+#	include <vm/VMCache.h>
+
+#	include "kernel_debug_config.h"
+#endif
 
 
 //#define TRACE_FILE_MAP
