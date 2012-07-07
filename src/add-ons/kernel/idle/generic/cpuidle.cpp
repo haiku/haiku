@@ -106,10 +106,37 @@ std_ops(int32 op, ...)
 }
 
 
-static module_info sModule = {
-	B_CPUIDLE_MODULE_NAME,
-	0,
-	std_ops
+static char *
+GetIdleStateName(int32 state)
+{
+	return sCpuidleModule->cStates[state].name;
+}
+
+
+static int32
+GetIdleStateCount(void)
+{
+	return sCpuidleModule->cStateCount;
+}
+
+
+static void
+GetIdleStateInfo(int32 cpu, int32 state, CpuidleStat *stat)
+{
+	memcpy(stat, &sPerCPU[cpu].stats[state], sizeof(CpuidleStat));
+}
+
+
+static GenCpuidle sModule = {
+	{
+		B_CPUIDLE_MODULE_NAME,
+		0,
+		std_ops
+	},
+
+	GetIdleStateCount,
+	GetIdleStateName,
+	GetIdleStateInfo
 };
 
 

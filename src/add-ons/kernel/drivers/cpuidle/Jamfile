@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src add-ons kernel drivers cpuidle ;
 
+UsePrivateKernelHeaders ;
+
 KernelAddon <driver>cpuidle :
 	cpuidle.cpp
 	;

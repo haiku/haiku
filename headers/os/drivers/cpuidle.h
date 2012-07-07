@@ -44,6 +44,15 @@ struct CpuidleModuleInfo {
 };
 
 
+struct GenCpuidle {
+	module_info	info;
+	int32		(*GetIdleStateCount)(void);
+	char *		(*GetIdleStateName)(int32 state);
+	void		(*GetIdleStateInfo)(int32 cpu, int32 state,
+									CpuidleStat *stat);
+};
+
+
 #ifdef __cplusplus
 }
 #endif

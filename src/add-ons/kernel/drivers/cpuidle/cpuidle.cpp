@@ -6,6 +6,10 @@
  *		Yongcong Du <ycdu.vmcore@gmail.com>
  */
 
+#include <stdio.h>
+#include <string.h>
+#include <smp.h>
+
 #include <Drivers.h>
 #include <KernelExport.h>
 
@@ -15,7 +19,7 @@
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
-CpuidleModuleInfo *sCpuidleModule;
+static GenCpuidle *sGenCpuidle;
 
 static status_t
 cpuidle_open(const char *name, uint32 flags, void **cookie)
@@ -49,7 +53,36 @@ cpuidle_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 static status_t
 cpuidle_read(void *cookie, off_t pos, void *buffer, size_t *length)
 {
-	*length = 0;
+	if (pos != 0) {
+		*length = 0;
+		return B_OK;
+	}
+	char *str = (char *)buffer;
+	size_t max_len = *length;
+	int32 stateCount = sGenCpuidle->GetIdleStateCount();
+	int32 bytes = snprintf(str, max_len, "C-STATE COUNT: %"B_PRId32"\n", stateCount);
+	max_len-= bytes;
+	str += bytes;
+	int32 cpu = smp_get_num_cpus();
+
+	for (int32 i = 0; i < cpu; i++) {
+		bytes = snprintf(str, max_len, "CPU%"B_PRId32"\n", i);
+		max_len-= bytes;
+		str += bytes;
+		for (int32 j = 1; j < stateCount; j++) {
+			CpuidleStat stat;
+			bytes = snprintf(str, max_len, "%s\n", sGenCpuidle->GetIdleStateName(j));
+			max_len-= bytes;
+			str += bytes;
+			sGenCpuidle->GetIdleStateInfo(i, j, &stat);
+			bytes = snprintf(str, max_len, "%lld %lldus\n",
+							stat.usageCount, stat.usageTime);
+			max_len-= bytes;
+			str += bytes;
+		}
+	}
+	*length = strlen((char *)buffer);
+
 	return B_OK;
 }
 
@@ -102,7 +135,7 @@ init_driver(void)
 {
 	status_t err;
 
-	err = get_module(B_CPUIDLE_MODULE_NAME, (module_info **)&sCpuidleModule);
+	err = get_module(B_CPUIDLE_MODULE_NAME, (module_info **)&sGenCpuidle);
 	if (err != B_OK) {
 		dprintf("can't load "B_CPUIDLE_MODULE_NAME"\n");
 	}
