@@ -126,8 +126,6 @@ static status_t
 GetAddrInfo(const char* node, const char* service,
 	const struct addrinfo* hints, struct addrinfo** res)
 {
-	dprintf("SENDING GETADDRINFO %s\n", node);
-
 	uint32 nodeSize = node != NULL ? strlen(node) + 1 : 1;
 	uint32 serviceSize = service != NULL ? strlen(service) + 1 : 1;
 	uint32 size = nodeSize + serviceSize + sizeof(*hints);
@@ -157,7 +155,7 @@ GetAddrInfo(const char* node, const char* service,
 		memset(nullHints, 0, sizeof(*nullHints));
 		nullHints->ai_family = AF_UNSPEC;
 	}
-	dprintf("SENDING BUFFER %s %d\n", buffer, (int)size);
+
 	MutexLocker locker(gPortLock);
 	do {
 		status_t result = write_port(gPortRequest, MsgGetAddrInfo, buffer,
