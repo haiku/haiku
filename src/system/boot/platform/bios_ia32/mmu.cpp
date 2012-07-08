@@ -512,17 +512,18 @@ mmu_get_virtual_mapping(addr_t virtualAddress, addr_t *_physicalAddress)
 			(void *)virtualAddress);
 	}
 
-	uint32 *pageTable = (uint32 *)(sPageDirectory[virtualAddress
-		/ (B_PAGE_SIZE * 1024)] & 0xfffff000);
+	uint32 dirEntry = sPageDirectory[virtualAddress / (B_PAGE_SIZE * 1024)];
+	if ((dirEntry & (1 << 0)) == 0)
+		return false;
+
+	uint32 *pageTable = (uint32 *)(dirEntry & 0xfffff000);
 	uint32 tableEntry = pageTable[(virtualAddress % (B_PAGE_SIZE * 1024))
 		/ B_PAGE_SIZE];
-
-	if ((tableEntry & (1<<0)) != 0) {
-		*_physicalAddress = tableEntry & 0xFFFFF000;
-		return true;
-	} else {
+	if ((tableEntry & (1 << 0)) == 0)
 		return false;
-	}
+
+	*_physicalAddress = tableEntry & 0xFFFFF000;
+	return true;
 }
 
 

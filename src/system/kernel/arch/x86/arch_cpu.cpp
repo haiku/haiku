@@ -897,10 +897,7 @@ arch_cpu_init_post_vm(kernel_args* args)
 	}
 #endif
 
-	// TODO x86_64
-#ifndef __x86_64
 	if (!apic_available())
-#endif
 		x86_init_fpu();
 	// else fpu gets set up in smp code
 

@@ -539,7 +539,8 @@ X86VMTranslationMap64Bit::Query(addr_t virtualAddress,
 		| ((entry & X86_64_PTE_PRESENT) != 0 ? PAGE_PRESENT : 0);
 
 	TRACE("X86VMTranslationMap64Bit::Query(%#" B_PRIxADDR ") -> %#"
-		B_PRIxPHYSADDR ":\n", virtualAddress, *_physicalAddress);
+		B_PRIxPHYSADDR " %#" B_PRIx32 " (pte: %p %#" B_PRIx64 ")\n",
+		virtualAddress, *_physicalAddress, *_flags, pte, entry);
 
 	return B_OK;
 }
