@@ -17,6 +17,8 @@
 #include <Locale.h>
 #include <Message.h>
 #include <Mime.h>
+#include <Path.h>
+#include <storage/FindDirectory.h>
 
 #include "support_settings.h"
 
@@ -329,8 +331,14 @@ IconEditorApp::_LastFilePath(path_kind which)
 				path = fLastOpenPath.String();
 			break;
 	}
-	if (!path)
-		path = "/boot/home";
+	if (!path) {
+
+		BPath homePath;
+		if (find_directory(B_USER_DIRECTORY, &homePath) == B_OK)
+			path = homePath.Path();
+		else 
+			path = "/boot/home";
+	}
 
 	return path;
 }

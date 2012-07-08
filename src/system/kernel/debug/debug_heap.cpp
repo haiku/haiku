@@ -278,6 +278,19 @@ debug_malloc(size_t size)
 }
 
 
+void*
+debug_calloc(size_t num, size_t size)
+{
+	size_t allocationSize = num * size;
+	void* allocation = debug_malloc(allocationSize);
+	if (allocation == NULL)
+		return NULL;
+
+	memset(allocation, 0, allocationSize);
+	return allocation;
+}
+
+
 void
 debug_free(void* address)
 {

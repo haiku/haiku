@@ -714,7 +714,7 @@ public:
 private:
 	bool		fPrintStackTrace;
 	page_num_t	fPageFilter;
-	team_id		fTeamFilter; 
+	team_id		fTeamFilter;
 	thread_id	fThreadFilter;
 };
 
@@ -1530,7 +1530,7 @@ free_page(vm_page* page, bool clear)
 	TA(FreePage(page->physical_page_number));
 
 #if VM_PAGE_ALLOCATION_TRACKING_AVAILABLE
-	page->allocation_tracking_info.Clear();	
+	page->allocation_tracking_info.Clear();
 #endif
 
 	ReadLocker locker(sFreePageQueuesLock);
@@ -2295,12 +2295,12 @@ status_t
 page_writer(void* /*unused*/)
 {
 	const uint32 kNumPages = 256;
-	uint32 writtenPages = 0;
 #ifdef TRACE_VM_PAGE
+	uint32 writtenPages = 0;
 	bigtime_t lastWrittenTime = 0;
-#endif
 	bigtime_t pageCollectionTime = 0;
 	bigtime_t pageWritingTime = 0;
+#endif
 
 	PageWriterRun run;
 	if (run.Init(kNumPages) != B_OK) {
@@ -2356,7 +2356,9 @@ page_writer(void* /*unused*/)
 		// enough to do).
 
 		// collect pages to be written
+#ifdef TRACE_VM_PAGE
 		pageCollectionTime -= system_time();
+#endif
 
 		page_num_t maxPagesToSee = modifiedPages;
 
@@ -2429,31 +2431,35 @@ page_writer(void* /*unused*/)
 			numPages++;
 		}
 
+#ifdef TRACE_VM_PAGE
 		pageCollectionTime += system_time();
-
+#endif
 		if (numPages == 0)
 			continue;
 
 		// write pages to disk and do all the cleanup
+#ifdef TRACE_VM_PAGE
 		pageWritingTime -= system_time();
+#endif
 		uint32 failedPages = run.Go();
+#ifdef TRACE_VM_PAGE
 		pageWritingTime += system_time();
 
 		// debug output only...
 		writtenPages += numPages;
 		if (writtenPages >= 1024) {
-#ifdef TRACE_VM_PAGE
 			bigtime_t now = system_time();
 			TRACE(("page writer: wrote 1024 pages (total: %llu ms, "
 				"collect: %llu ms, write: %llu ms)\n",
 				(now - lastWrittenTime) / 1000,
 				pageCollectionTime / 1000, pageWritingTime / 1000));
 			lastWrittenTime = now;
-#endif
+
 			writtenPages -= 1024;
 			pageCollectionTime = 0;
 			pageWritingTime = 0;
 		}
+#endif
 
 		if (failedPages == numPages)
 			pagesSinceLastSuccessfulWrite += modifiedPages - maxPagesToSee;

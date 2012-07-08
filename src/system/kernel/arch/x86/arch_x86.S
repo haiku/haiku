@@ -1,5 +1,6 @@
 /*
  * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -217,6 +218,113 @@ FUNCTION(arch_cpu_user_memcpy):
 	popl	%esi
 	ret
 FUNCTION_END(arch_cpu_user_memcpy)
+
+
+/* status_t arch_cpu_user_memset(void *to, char c, size_t count, addr_t *faultHandler) */
+FUNCTION(arch_cpu_user_memset):
+	pushl	%esi
+	pushl	%edi
+	movl	12(%esp),%edi	/* dest */
+	movb	16(%esp),%al	/* c */
+	movl	20(%esp),%ecx	/* count */
+
+	/* set the fault handler */
+	movl	24(%esp),%edx	/* fault handler */
+	movl	(%edx),%esi
+	movl	$.L_user_memset_error, (%edx)
+
+	rep
+	stosb
+
+	/* restore the old fault handler */
+	movl	%esi,(%edx)
+	xor		%eax,%eax
+
+	popl	%edi
+	popl	%esi
+	ret
+
+	/* error condition */
+.L_user_memset_error:
+	/* restore the old fault handler */
+	movl	%esi,(%edx)
+	movl	$-1,%eax	/* return a generic error, the wrapper routine will deal with it */
+	popl	%edi
+	popl	%esi
+	ret
+FUNCTION_END(arch_cpu_user_memset)
+
+
+/* ssize_t arch_cpu_user_strlcpy(void *to, const void *from, size_t size, addr_t *faultHandler) */
+FUNCTION(arch_cpu_user_strlcpy):
+	pushl	%esi
+	pushl	%edi
+	pushl	%ebx
+	movl	16(%esp),%edi	/* dest */
+	movl	20(%esp),%esi	/* source */
+	movl	24(%esp),%ecx	/* count */
+
+	/* set the fault handler */
+	movl	28(%esp),%edx	/* fault handler */
+	movl	(%edx),%ebx
+	movl	$.L_user_strlcpy_error, (%edx)
+
+	/* Check for 0 length */
+	cmp		$0,%ecx
+	je		.L_user_strlcpy_source_count
+
+	/* Copy at most count - 1 bytes */
+	dec		%ecx
+
+	/* If count is now 0, skip straight to null terminating
+	   as our loop will otherwise overflow */
+	jnz		.L_user_strlcpy_copy_begin
+	movb	$0,(%edi)
+	jmp		.L_user_strlcpy_source_count
+
+.L_user_strlcpy_copy_begin:
+	cld
+.L_user_strlcpy_copy_loop:
+	/* move data by bytes */
+	lodsb
+	stosb
+	test %al,%al
+	jz .L_user_strlcpy_source_done
+	loop .L_user_strlcpy_copy_loop
+
+	/* null terminate string */
+	movb	$0,(%edi)
+	dec		%esi
+
+	/* count remaining bytes in src */
+.L_user_strlcpy_source_count:
+	not		%ecx
+	xor		%al,%al
+	repnz
+	scasb
+
+.L_user_strlcpy_source_done:
+	movl	%esi,%eax
+	subl	20(%esp),%eax
+	dec		%eax
+	/* restore the old fault handler */
+	movl	%ebx,(%edx)
+
+	popl	%ebx
+	popl	%edi
+	popl	%esi
+	ret
+
+	/* error condition */
+.L_user_strlcpy_error:
+	/* restore the old fault handler */
+	movl	%ebx,(%edx)
+	movl	$-1,%eax	/* return a generic error, the wrapper routine will deal with it */
+	popl	%ebx
+	popl	%edi
+	popl	%esi
+	ret
+FUNCTION_END(arch_cpu_user_strlcpy)
 
 
 /*!	\fn void arch_debug_call_with_fault_handler(cpu_ent* cpu,

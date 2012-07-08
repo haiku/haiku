@@ -227,78 +227,78 @@ if [ IsOptionalHaikuImagePackageAdded SDLLibs ] {
 		Echo "No optional package SDLLibs available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
-			libsdl-1.2-hg-r1a3-x86-gcc4-2011-05-29.zip
-			: $(baseURL)/lib/libsdl-1.2-hg-r1a3-x86-gcc4-2011-05-29.zip ;
+			libsdl-1.2.15-x86-gcc4-2012-05-31.zip
+			: $(baseURL)/lib/libsdl-1.2.15-x86-gcc4-2012-05-31.zip ;
 		InstallOptionalHaikuImagePackage
-			guilib-1.2.1-r1a3-x86-gcc4-2011-05-26.zip
-			: $(baseURL)/lib/guilib-1.2.1-r1a3-x86-gcc4-2011-05-26.zip ;
+			guilib-1.2.1-x86-gcc4-2012-05-31.zip
+			: $(baseURL)/lib/guilib-1.2.1-x86-gcc4-2012-05-31.zip ;
 		InstallOptionalHaikuImagePackage
-			sdl-gfx-2.0.22-r1a3-x86-gcc4-2011-05-26.zip
-			: $(baseURL)/lib/sdl-gfx-2.0.22-r1a3-x86-gcc4-2011-05-26.zip ;
+			sdl-gfx-2.0.23-x86-gcc4-2011-05-31.zip
+			: $(baseURL)/lib/sdl-gfx-2.0.23-x86-gcc4-2012-05-31.zip ;
 		InstallOptionalHaikuImagePackage
-			sdl-image-1.2.10-r1a3-x86-gcc4-2011-05-26.zip
-			: $(baseURL)/lib/sdl-image-1.2.10-r1a3-x86-gcc4-2011-05-26.zip ;
+			sdl-image-1.2.12-x86-gcc4-2012-05-31.zip
+			: $(baseURL)/lib/sdl-image-1.2.12-x86-gcc4-2011-05-31.zip ;
 		InstallOptionalHaikuImagePackage
-			sdl-mixer-1.2.11-r1a3-x86-gcc4-2011-05-26.zip
-			: $(baseURL)/lib/sdl-mixer-1.2.11-r1a3-x86-gcc4-2011-05-26.zip ;
+			sdl-mixer-1.2.11-x86-gcc4-2012-05-31.zip
+			: $(baseURL)/lib/sdl-mixer-1.2.11-x86-gcc4-2012-05-31.zip ;
 		InstallOptionalHaikuImagePackage
-			sdl-net-1.2.7-r1a3-x86-gcc4-2011-05-26.zip
-			: $(baseURL)/lib/sdl-net-1.2.7-r1a3-x86-gcc4-2011-05-26.zip ;
+			sdl-net-1.2.8-x86-gcc4-2012-05-31.zip
+			: $(baseURL)/lib/sdl-net-1.2.8-x86-gcc4-2012-05-31.zip ;
 		InstallOptionalHaikuImagePackage
-			sdl-sound-1.0.3-r1a3-x86-gcc4-2011-05-26.zip
-			: $(baseURL)/lib/sdl-sound-1.0.3-r1a3-x86-gcc4-2011-05-26.zip ;
+			sdl-sound-1.0.3-x86-gcc4-2012-05-31.zip
+			: $(baseURL)/lib/sdl-sound-1.0.3-x86-gcc4-2012-05-31.zip ;
 		InstallOptionalHaikuImagePackage
 			sdl-rtf-0.1.0-r1a3-x86-gcc4-2011-05-26.zip
 			: $(baseURL)/lib/sdl-rtf-0.1.0-r1a3-x86-gcc4-2011-05-26.zip ;
 		InstallOptionalHaikuImagePackage
-			sdl-ttf-2.0.10-r1a3-x86-gcc4-2011-05-26.zip
-			: $(baseURL)/lib/sdl-ttf-2.0.10-r1a3-x86-gcc4-2011-05-26.zip ;
+			sdl-ttf-2.0.11-x86-gcc4-2012-05-31.zip
+			: $(baseURL)/lib/sdl-ttf-2.0.11-x86-gcc4-2012-05-31.zip ;
 		InstallOptionalHaikuImagePackage
-			sge-030809-r1a3-x86-gcc4-2011-05-26.zip
-			: $(baseURL)/lib/sge-030809-r1a3-x86-gcc4-2011-05-26.zip ;
+			sge-030809-x86-gcc4-2012-05-31.zip
+			: $(baseURL)/lib/sge-030809-x86-gcc4-2012-05-31.zip ;
 		InstallOptionalHaikuImagePackage
-			smjpeg-0.2.1-r1a3-x86-gcc4-2011-05-26.zip
-			: $(baseURL)/lib/smjpeg-0.2.1-r1a3-x86-gcc4-2011-05-26.zip ;
+			smjpeg-0.2.1-x86-gcc4-2012-05-31.zip
+			: $(baseURL)/lib/smjpeg-0.2.1-x86-gcc4-2012-05-31.zip ;
 		InstallOptionalHaikuImagePackage
-			smpeg-0.4.5-r1a3-x86-gcc4-2011-05-26.zip
-			: $(baseURL)/lib/smpeg-0.4.5-r1a3-x86-gcc4-2011-05-26.zip ;
+			smpeg-0.4.5-x86-gcc4-2011-05-31.zip
+			: $(baseURL)/lib/smpeg-0.4.5-x86-gcc4-2012-05-31.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			libsdl-1.2-hg-r1a3-x86-gcc2-2011-05-29.zip
-			: $(baseURL)/lib/libsdl-1.2-hg-r1a3-x86-gcc2-2011-05-29.zip ;
+			libsdl-1.2.15-x86-gcc2-2012-06-24.zip
+			: $(baseURL)/lib/libsdl-1.2.15-x86-gcc2-2012-06-24.zip ;
 		InstallOptionalHaikuImagePackage
-			guilib-1.2.1-r1a3-x86-gcc2-2011-05-19.zip
-			: $(baseURL)/lib/guilib-1.2.1-r1a3-x86-gcc2-2011-05-19.zip ;
+			guilib-1.2.1-x86-gcc2-2012-06-24.zip
+			: $(baseURL)/lib/guilib-1.2.1-x86-gcc2-2012-06-24.zip ;
 		InstallOptionalHaikuImagePackage
-			sdl-gfx-2.0.22-r1a3-x86-gcc2-2011-05-19.zip
-			: $(baseURL)/lib/sdl-gfx-2.0.22-r1a3-x86-gcc2-2011-05-19.zip ;
+			sdl-gfx-2.0.23-x86-gcc2-2012-06-24.zip
+			: $(baseURL)/lib/sdl-gfx-2.0.23-x86-gcc2-2012-06-24.zip ;
 		InstallOptionalHaikuImagePackage
-			sdl-image-1.2.10-x86-r1a3-x86-gcc2-2011-05-19.zip
-			: $(baseURL)/lib/sdl-image-1.2.10-r1a3-x86-gcc2-2011-05-19.zip ;
+			sdl-image-1.2.12-x86-x86-gcc2-2012-06-24.zip
+			: $(baseURL)/lib/sdl-image-1.2.12-x86-gcc2-2012-06-24.zip ;
 		InstallOptionalHaikuImagePackage
-			sdl-mixer-1.2.11-r1a3-x86-gcc2-2011-05-19.zip
-			: $(baseURL)/lib/sdl-mixer-1.2.11-r1a3-x86-gcc2-2011-05-19.zip ;
+			sdl-mixer-1.2.11-x86-gcc2-2012-06-25.zip
+			: $(baseURL)/lib/sdl-mixer-1.2.11-x86-gcc2-2012-06-25.zip ;
 		InstallOptionalHaikuImagePackage
-			sdl-net-1.2.7-r1a3-x86-gcc2-2011-05-19.zip
-			: $(baseURL)/lib/sdl-net-1.2.7-r1a3-x86-gcc2-2011-05-19.zip ;
+			sdl-net-1.2.8-x86-gcc2-2012-06-24.zip
+			: $(baseURL)/lib/sdl-net-1.2.8-x86-gcc2-2012-06-24.zip ;
 		InstallOptionalHaikuImagePackage
-			sdl-sound-1.0.3-r1a3-x86-gcc2-2011-05-19.zip
-			: $(baseURL)/lib/sdl-sound-1.0.3-r1a3-x86-gcc2-2011-05-19.zip ;
+			sdl-sound-1.0.3-x86-gcc2-2012-06-24.zip
+			: $(baseURL)/lib/sdl-sound-1.0.3-x86-gcc2-2012-06-24.zip ;
 		InstallOptionalHaikuImagePackage
 			sdl-rtf-0.1.0-r1a3-x86-gcc2-2011-05-20.zip
 			: $(baseURL)/lib/sdl-rtf-0.1.0-r1a3-x86-gcc2-2011-05-20.zip ;
 		InstallOptionalHaikuImagePackage
-			sdl-ttf-2.0.10-r1a3-x86-gcc2-2011-05-19.zip
-			: $(baseURL)/lib/sdl-ttf-2.0.10-r1a3-x86-gcc2-2011-05-19.zip ;
+			sdl-ttf-2.0.11-x86-gcc2-2012-06-24.zip
+			: $(baseURL)/lib/sdl-ttf-2.0.11-x86-gcc2-2012-06-24.zip ;
 		InstallOptionalHaikuImagePackage
-			sge-030809-r1a3-x86-gcc2-2011-05-19.zip
-			: $(baseURL)/lib/sge-030809-r1a3-x86-gcc2-2011-05-19.zip ;
+			sge-030809-x86-gcc2-2012-06-24.zip
+			: $(baseURL)/lib/sge-030809-x86-gcc2-2012-06-24.zip ;
 		InstallOptionalHaikuImagePackage
-			smjpeg-0.2.1-r1a3-x86-gcc2-2011-05-19.zip
-			: $(baseURL)/lib/smjpeg-0.2.1-r1a3-x86-gcc2-2011-05-19.zip ;
+			smjpeg-0.2.1-x86-gcc2-2012-06-24.zip
+			: $(baseURL)/lib/smjpeg-0.2.1-x86-gcc2-2012-06-24.zip ;
 		InstallOptionalHaikuImagePackage
-			smpeg-0.4.5-r1a3-x86-gcc2-2011-05-20.zip
-			: $(baseURL)/lib/smpeg-0.4.5-r1a3-x86-gcc2-2011-05-20.zip ;
+			smpeg-0.4.5-x86-gcc2-2012-06-24.zip
+			: $(baseURL)/lib/smpeg-0.4.5-x86-gcc2-2012-06-24.zip ;
 	}
 }
 

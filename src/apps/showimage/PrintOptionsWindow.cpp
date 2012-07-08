@@ -15,10 +15,10 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <ControlLook.h>
-#include <GroupLayoutBuilder.h>
 #include <GridLayoutBuilder.h>
-#include <Locale.h>
+#include <GroupLayoutBuilder.h>
 #include <LayoutBuilder.h>
+#include <Locale.h>
 #include <String.h>
 
 #include "ShowImageConstants.h"
@@ -73,7 +73,7 @@ PrintOptions::SetWidth(float w)
 void
 PrintOptions::SetHeight(float h)
 {
-	fWidth = (fBounds.Width()+1) * h / (fBounds.Height()+1);
+	fWidth = (fBounds.Width() + 1) * h / (fBounds.Height() + 1);
 	fHeight = h;
 }
 

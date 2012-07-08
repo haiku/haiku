@@ -1,0 +1,22 @@
+SubDir HAIKU_TOP src add-ons kernel debugger qrencode ;
+
+UsePrivateHeaders kernel ;
+
+DEFINES += HAVE_CONFIG_H ;
+DEFINES += malloc=debug_malloc ;
+DEFINES += calloc=debug_calloc ;
+DEFINES += free=debug_free ;
+
+KernelAddon <kdebug>qrencode :
+	bitstream.c
+	mask.c
+	mmask.c
+	mqrspec.c
+	qrencode.c
+	qrinput.c
+	qrspec.c
+	rscode.c
+	split.c
+
+	module.cpp
+	;

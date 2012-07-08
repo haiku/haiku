@@ -1450,6 +1450,7 @@ AVFormatReader::Stream::Seek(uint32 flags, int64* frame, bigtime_t* time)
 
 AVFormatReader::AVFormatReader()
 	:
+	fCopyright(""),
 	fStreams(NULL),
 	fSourceLock("source I/O lock")
 {
@@ -1478,12 +1479,12 @@ AVFormatReader::~AVFormatReader()
 const char*
 AVFormatReader::Copyright()
 {
-// TODO: Could not find the equivalent in libavformat >= version 53.
-// Use metadata API instead!
-//	if (fStreams != NULL && fStreams[0] != NULL)
-//		return fStreams[0]->Context()->copyright;
-	// TODO: Return copyright of the file instead!
-	return "Copyright 2009, Stephan Aßmus";
+	if (fCopyright.Length() <= 0) {
+		BMessage message;
+		if (GetMetaData(&message) == B_OK)
+			message.FindString("copyright", &fCopyright);
+	}
+	return fCopyright.String();
 }
 
 
@@ -1638,9 +1639,9 @@ AVFormatReader::GetMetaData(BMessage* _data)
 
 	// Add program info
 	for (unsigned i = 0; i < context->nb_programs; i++) {
-		BMessage progamData;
-		avdictionary_to_message(context->programs[i]->metadata, &progamData);
-		_data->AddMessage("be:program", &progamData);
+		BMessage programData;
+		avdictionary_to_message(context->programs[i]->metadata, &programData);
+		_data->AddMessage("be:program", &programData);
 	}
 
 	return B_OK;

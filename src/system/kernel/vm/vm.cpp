@@ -5104,8 +5104,10 @@ user_strlcpy(char* to, const char* from, size_t size)
 		&thread_get_current_thread()->fault_handler);
 
 	// If we hit the address overflow boundary, fail.
-	if (result >= 0 && (size_t)result >= maxSize && maxSize < size)
+	if (result < 0 || (result >= 0 && (size_t)result >= maxSize
+			&& maxSize < size)) {
 		return B_BAD_ADDRESS;
+	}
 
 	return result;
 }

@@ -642,6 +642,22 @@ BScrollBar::MessageReceived(BMessage* message)
 				ValueChanged(value);
 			break;
 		}
+		case B_MOUSE_WHEEL_CHANGED:
+		{
+			// Must handle this here since BView checks for the existence of
+			// scrollbars, which a scrollbar itself does not have
+			float deltaX = 0.0f, deltaY = 0.0f;
+			message->FindFloat("be:wheel_delta_x", &deltaX);
+			message->FindFloat("be:wheel_delta_y", &deltaY);
+
+			if (deltaX == 0.0f && deltaY == 0.0f)
+				break;
+
+			if (deltaX != 0.0f && deltaY == 0.0f)
+				deltaY = deltaX;
+
+			ScrollWithMouseWheelDelta(this, deltaY);
+		}
 		default:
 			BView::MessageReceived(message);
 			break;

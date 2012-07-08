@@ -37,7 +37,7 @@ ProgressWindow::ProgressWindow()
 {
 	BRect rect = Bounds();
 
-	BView *view = new BView(rect, NULL, B_FOLLOW_ALL, B_WILL_DRAW);
+	BView* view = new BView(rect, NULL, B_FOLLOW_ALL, B_WILL_DRAW);
 	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(view);
 
@@ -106,7 +106,7 @@ ProgressWindow::Stop()
 
 
 void
-ProgressWindow::MessageReceived(BMessage *message)
+ProgressWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgShow:
@@ -123,7 +123,7 @@ ProgressWindow::MessageReceived(BMessage *message)
 			if (message->FindFloat("percent", &percent) == B_OK)
 				fStatusBar->Update(percent - fStatusBar->CurrentValue());
 
-			const char *text;
+			const char* text;
 			if (message->FindString("message", &text) == B_OK)
 				fStatusBar->SetText(text);
 

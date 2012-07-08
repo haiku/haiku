@@ -31,6 +31,8 @@
 #include <StringView.h>
 #include <TextControl.h>
 
+#include <storage/FindDirectory.h>
+
 #include "MediaFileInfoView.h"
 #include "MediaFileListView.h"
 #include "MessageConstants.h"
@@ -122,8 +124,10 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 	fConverting(false),
 	fCancelling(false)
 {
-	const char* defaultDirectory = "/boot/home";
-	fOutputDir.SetTo(defaultDirectory);
+	BPath outputDir;
+	if (find_directory(B_USER_DIRECTORY, &outputDir) != B_OK)
+		outputDir.SetTo("/boot/home");	
+	fOutputDir.SetTo(outputDir.Path());
 
 	fMenuBar = new BMenuBar("menubar");
 	_CreateMenu();
@@ -165,7 +169,7 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 	fDestButton = new BButton(B_TRANSLATE("Output folder"),
 		new BMessage(OUTPUT_FOLDER_MESSAGE));
 	BAlignment labelAlignment(be_control_look->DefaultLabelAlignment());
-	fOutputFolder = new BStringView(NULL, defaultDirectory);
+	fOutputFolder = new BStringView(NULL, outputDir.Path());
 	fOutputFolder->SetExplicitAlignment(labelAlignment);
 
 	// start/end duration

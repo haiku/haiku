@@ -19,6 +19,7 @@ extern "C" {
 debug_alloc_pool*	create_debug_alloc_pool();
 void				delete_debug_alloc_pool(debug_alloc_pool* pool);
 void*				debug_malloc(size_t size);
+void*				debug_calloc(size_t num, size_t size);
 void				debug_free(void* address);
 void				debug_heap_init();
 

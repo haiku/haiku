@@ -199,7 +199,7 @@ rule ExtractArchive directory : entries : archiveFile : grist
 	# <directory> and <archiveFile> combo.
 	#
 	# <directory> - The directory into which to extract the archive file. The
-	#               directory is created is by this rule and it is the target
+	#               directory is created by this rule and it is the target
 	#               that the extract action is associated with.
 	# <entries>   - The entries of the archive file one is interested in. The
 	#               rule always extracts the complete archive file, from the

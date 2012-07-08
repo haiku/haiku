@@ -1694,6 +1694,12 @@ AboutView::_CreateCreditsView()
 		.SetLicense(B_TRANSLATE("BSD (3-clause)"))
 		.SetURL("http://gtf.sourceforge.net/"));
 
+	// libqrencode
+	_AddPackageCredit(PackageCredit("libqrencode")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2006-2012 Kentaro Fukuchi"))
+		.SetLicense(B_TRANSLATE("GNU LGPL v2.1"))
+		.SetURL("http://fukuchi.org/works/qrencode/"));
+
 	_AddCopyrightsFromAttribute();
 	_AddPackageCreditEntries();
 

@@ -15,6 +15,7 @@
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
+#include <Path.h>
 #include <PopUpMenu.h>
 #include <scheduler.h>
 #include <TabView.h>
@@ -22,6 +23,7 @@
 #include <TimeSource.h>
 #include <TranslationKit.h>
 
+#include <storage/FindDirectory.h>
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "CodyCam"
@@ -169,7 +171,11 @@ CodyCam::CodyCam()
 	kUploadClients[index++] = B_TRANSLATE("SFTP");
 	kUploadClients[index++] = B_TRANSLATE("Local");
 
-	chdir("/boot/home");
+	BPath homeDir;
+	if (find_directory(B_USER_DIRECTORY, &homeDir) != B_OK)
+		homeDir.SetTo("/boot/home");
+
+	chdir(homeDir.Path());
 }
 
 
