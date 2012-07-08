@@ -106,6 +106,13 @@ long_mmu_init()
 	memset(pml4, 0, B_PAGE_SIZE);
 	gKernelArgs.arch_args.vir_pgdir = fix_address((uint64)(addr_t)pml4);
 
+	// Store the virtual memory usage information.
+	gKernelArgs.virtual_allocated_range[0].start = KERNEL_LOAD_BASE_64BIT;
+	gKernelArgs.virtual_allocated_range[0].size = mmu_get_virtual_usage();
+	gKernelArgs.num_virtual_allocated_ranges = 1;
+	gKernelArgs.arch_args.virtual_end = ROUNDUP(KERNEL_LOAD_BASE_64BIT
+		+ gKernelArgs.virtual_allocated_range[0].size, 0x200000);
+
 	// Find the highest physical memory address. We map all physical memory
 	// into the kernel address space, so we want to make sure we map everything
 	// we have available.
@@ -144,7 +151,11 @@ long_mmu_init()
 		for (uint64 j = 0; j < 0x40000000; j += 0x200000) {
 			pageDir[j / 0x200000] = (i + j) | kLargePageMappingFlags;
 		}
+
+		mmu_free(pageDir, B_PAGE_SIZE);
 	}
+
+	mmu_free(pdpt, B_PAGE_SIZE);
 
 	// Allocate tables for the kernel mappings.
 
@@ -156,23 +167,18 @@ long_mmu_init()
 	memset(pageDir, 0, B_PAGE_SIZE);
 	pdpt[510] = physicalAddress | kTableMappingFlags;
 
-	// Store the virtual memory usage information.
-	gKernelArgs.virtual_allocated_range[0].start = KERNEL_LOAD_BASE_64BIT;
-	gKernelArgs.virtual_allocated_range[0].size = mmu_get_virtual_usage();
-	gKernelArgs.num_virtual_allocated_ranges = 1;
-
 	// We can now allocate page tables and duplicate the mappings across from
 	// the 32-bit address space to them.
 	pageTable = NULL;
 	for (uint32 i = 0; i < gKernelArgs.virtual_allocated_range[0].size
 			/ B_PAGE_SIZE; i++) {
 		if ((i % 512) == 0) {
+			if (pageTable)
+				mmu_free(pageTable, B_PAGE_SIZE);
+
 			pageTable = (uint64*)mmu_allocate_page(&physicalAddress);
 			memset(pageTable, 0, B_PAGE_SIZE);
 			pageDir[i / 512] = physicalAddress | kTableMappingFlags;
-
-			// Just performed another virtual allocation, account for it.
-			gKernelArgs.virtual_allocated_range[0].size += B_PAGE_SIZE;
 		}
 
 		// Get the physical address to map.
@@ -183,8 +189,10 @@ long_mmu_init()
 		pageTable[i % 512] = physicalAddress | kPageMappingFlags;
 	}
 
-	gKernelArgs.arch_args.virtual_end = ROUNDUP(KERNEL_LOAD_BASE_64BIT
-		+ gKernelArgs.virtual_allocated_range[0].size, 0x200000);
+	if (pageTable)
+		mmu_free(pageTable, B_PAGE_SIZE);
+	mmu_free(pageDir, B_PAGE_SIZE);
+	mmu_free(pdpt, B_PAGE_SIZE);
 
 	// Sort the address ranges.
 	sort_address_ranges(gKernelArgs.physical_memory_range,

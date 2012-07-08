@@ -324,7 +324,7 @@ arch_system_info_init(struct kernel_args *args)
 status_t
 arch_thread_init(struct kernel_args *args)
 {
-	return B_OK;
+	return B_ERROR;
 }
 
 

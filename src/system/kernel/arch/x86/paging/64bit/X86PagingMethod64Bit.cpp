@@ -197,7 +197,7 @@ X86PagingMethod64Bit::PageTableForAddress(uint64* virtualPML4,
 	vm_page_reservation* reservation,
 	TranslationMapPhysicalPageMapper* pageMapper, int32& mapCount)
 {
-	TRACE("X86PagingMethod64Bit::PageTableEntryForAddress(%#" B_PRIxADDR ", "
+	TRACE("X86PagingMethod64Bit::PageTableForAddress(%#" B_PRIxADDR ", "
 		"%d)\n", virtualAddress, allocateTables);
 
 	// Get the PDPT.
@@ -215,7 +215,7 @@ X86PagingMethod64Bit::PageTableForAddress(uint64* virtualPML4,
 		phys_addr_t physicalPDPT
 			= (phys_addr_t)page->physical_page_number * B_PAGE_SIZE;
 
-		TRACE("X86PagingMethod64Bit::PageTableEntryForAddress(): creating PDPT "
+		TRACE("X86PagingMethod64Bit::PageTableForAddress(): creating PDPT "
 			"for va %#" B_PRIxADDR " at %#" B_PRIxPHYSADDR "\n", virtualAddress,
 			physicalPDPT);
 
@@ -245,7 +245,7 @@ X86PagingMethod64Bit::PageTableForAddress(uint64* virtualPML4,
 		phys_addr_t physicalPageDir
 			= (phys_addr_t)page->physical_page_number * B_PAGE_SIZE;
 
-		TRACE("X86PagingMethod64Bit::PageTableEntryForAddress(): creating page "
+		TRACE("X86PagingMethod64Bit::PageTableForAddress(): creating page "
 			"directory for va %#" B_PRIxADDR " at %#" B_PRIxPHYSADDR "\n",
 			virtualAddress, physicalPageDir);
 
@@ -275,7 +275,7 @@ X86PagingMethod64Bit::PageTableForAddress(uint64* virtualPML4,
 		phys_addr_t physicalPageTable
 			= (phys_addr_t)page->physical_page_number * B_PAGE_SIZE;
 
-		TRACE("X86PagingMethod64Bit::PageTableEntryForAddress(): creating page "
+		TRACE("X86PagingMethod64Bit::PageTableForAddress(): creating page "
 			"table for va %#" B_PRIxADDR " at %#" B_PRIxPHYSADDR "\n",
 			virtualAddress, physicalPageTable);
 
