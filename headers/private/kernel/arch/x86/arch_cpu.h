@@ -367,9 +367,14 @@ extern "C" {
 
 struct arch_thread;
 
-
+#ifdef __x86_64__
+void __x86_setup_system_time(uint64 conversionFactor,
+	uint64 conversionFactorNsecs);
+#else
 void __x86_setup_system_time(uint32 conversionFactor,
 	uint32 conversionFactorNsecs, bool conversionFactorNsecsShift);
+#endif
+
 void x86_context_switch(struct arch_thread* oldState,
 	struct arch_thread* newState);
 void x86_userspace_thread_exit(void);
