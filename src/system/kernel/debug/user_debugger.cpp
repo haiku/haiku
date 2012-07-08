@@ -1231,7 +1231,7 @@ user_debug_image_deleted(const image_info *imageInfo)
 	message.image_event = atomic_add(&thread->team->debug_info.image_event, 1)
 		+ 1;
 
-	thread_hit_debug_event(B_DEBUGGER_MESSAGE_IMAGE_CREATED, &message,
+	thread_hit_debug_event(B_DEBUGGER_MESSAGE_IMAGE_DELETED, &message,
 		sizeof(message), true);
 }
 
