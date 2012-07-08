@@ -88,6 +88,7 @@ ServerAddress::ResolveName(const char* name, ServerAddress* addr)
 
 Connection::Connection(const sockaddr_in& addr, Transport proto)
 	:
+	fWaitCancel(create_sem(0, NULL)),
 	fSock(-1),
 	fProtocol(proto),
 	fServerAddress(addr)
@@ -115,6 +116,7 @@ Connection::~Connection()
 	if (fSock != -1)
 		close(fSock);
 	mutex_destroy(&fSockLock);
+	delete_sem(fWaitCancel);
 }
 
 
@@ -192,7 +194,25 @@ ConnectionStream::Receive(void** pbuffer, uint32* psize)
 
 	int32 record_size;
 	bool last_one;
+
+	object_wait_info object[2];
+	object[0].object = fWaitCancel;
+	object[0].type = B_OBJECT_TYPE_SEMAPHORE;
+	object[0].events = B_EVENT_ACQUIRE_SEMAPHORE;
+
+	object[1].object = fSock;
+	object[1].type = B_OBJECT_TYPE_FD;
+	object[1].events = B_EVENT_READ;
+
 	do {
+		result = wait_for_objects(object, 2);
+		if (result < B_OK ||
+			(object[0].events & B_EVENT_ACQUIRE_SEMAPHORE) != 0) {
+			free(buffer);
+			return ECONNABORTED;
+		} else if ((object[1].events & B_EVENT_READ) == 0)
+			continue;
+
 		// There is only one listener thread per connection. No need to lock.
 		uint32 received = 0;
 		do {
@@ -252,6 +272,26 @@ ConnectionPacket::Receive(void** pbuffer, uint32* psize)
 
 	if (buffer == NULL)
 		return B_NO_MEMORY;
+
+	object_wait_info object[2];
+	object[0].object = fWaitCancel;
+	object[0].type = B_OBJECT_TYPE_SEMAPHORE;
+	object[0].events = B_EVENT_ACQUIRE_SEMAPHORE;
+
+	object[1].object = fSock;
+	object[1].type = B_OBJECT_TYPE_FD;
+	object[1].events = B_EVENT_READ;
+
+	do {
+		result = wait_for_objects(object, 2);
+		if (result < B_OK ||
+			(object[0].events & B_EVENT_ACQUIRE_SEMAPHORE) != 0) {
+			free(buffer);
+			return ECONNABORTED;
+		} else if ((object[1].events & B_EVENT_READ) == 0)
+			continue;
+		break;
+	} while (true);
 
 	// There is only one listener thread per connection. No need to lock.
 	size = recv(fSock, buffer, size, 0);
@@ -333,7 +373,9 @@ Connection::_Connect()
 status_t
 Connection::Reconnect()
 {
+	release_sem(fWaitCancel);
 	close(fSock);
+	acquire_sem(fWaitCancel);
 	return _Connect();
 }
 
@@ -341,6 +383,8 @@ Connection::Reconnect()
 void
 Connection::Disconnect()
 {
+	release_sem(fWaitCancel);
+
 	int sock = fSock;
 	fSock = -1;
 	close(sock);

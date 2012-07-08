@@ -53,6 +53,7 @@ protected:
 									Transport proto);
 			status_t			_Connect();
 
+			sem_id				fWaitCancel;
 			int					fSock;
 			mutex				fSockLock;
 

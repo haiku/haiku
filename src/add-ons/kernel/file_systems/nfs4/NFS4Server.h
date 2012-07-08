@@ -45,6 +45,7 @@ private:
 	static	status_t		_RenewalThreadStart(void* ptr);
 			thread_id		fThread;
 			bool			fThreadCancel;
+			sem_id			fWaitCancel;
 
 			uint32			fLeaseTime;
 

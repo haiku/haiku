@@ -16,6 +16,7 @@
 NFS4Server::NFS4Server(RPC::Server* serv)
 	:
 	fThreadCancel(true),
+	fWaitCancel(create_sem(1, NULL)),
 	fLeaseTime(0),
 	fClientIdLastUse(0),
 	fUseCount(0),
@@ -31,10 +32,11 @@ NFS4Server::~NFS4Server()
 {
 	fThreadCancel = true;
 	fUseCount = 0;
-	interrupt_thread(fThread);
+	release_sem(fWaitCancel);
 	status_t result;
 	wait_for_thread(fThread, &result);
 
+	delete_sem(fWaitCancel);
 	mutex_destroy(&fClientIdLock);
 	mutex_destroy(&fFSLock);
 }
@@ -302,8 +304,12 @@ NFS4Server::_Renewal()
 {
 	while (!fThreadCancel) {
 		// TODO: operations like OPEN, READ, CLOSE, etc also renew leases
-		snooze_etc(sSecToBigTime(fLeaseTime - 2), B_SYSTEM_TIMEBASE,
-			B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT);
+		status_t result = acquire_sem_etc(fWaitCancel, 1,
+			B_RELATIVE_TIMEOUT, sSecToBigTime(fLeaseTime - 2));
+		if (result != B_TIMED_OUT) {
+			release_sem(fWaitCancel);
+			return B_OK;
+		}
 
 		uint64 clientId = fClientId;
 

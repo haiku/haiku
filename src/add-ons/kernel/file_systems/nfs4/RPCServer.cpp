@@ -89,12 +89,11 @@ Server::~Server()
 
 	fThreadCancel = true;
 	fConnection->Disconnect();
-	interrupt_thread(fThread);
-
-	delete fConnection;
 
 	status_t result;
 	wait_for_thread(fThread, &result);
+
+	delete fConnection;
 }
 
 
@@ -205,7 +204,6 @@ status_t
 Server::Repair()
 {
 	fThreadCancel = true;
-	interrupt_thread(fThread);
 
 	status_t result = fConnection->Reconnect();
 	if (result != B_OK)
