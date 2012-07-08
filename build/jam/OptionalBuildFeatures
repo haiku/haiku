@@ -3,6 +3,9 @@
 # likely the same file use for an optional package.
 
 
+local baseURL = http://www.haiku-files.org/files/optional-packages ;
+
+
 # SSL
 
 # Automatically enable the SSL feature, when the optional OpenSSL optional
@@ -17,7 +20,6 @@ if $(HAIKU_GCC_VERSION[1]) >= 4 {
 	HAIKU_OPENSSL_PACKAGE = openssl-1.0.0j-x86-gcc2-2012-06-19.zip ;
 }
 
-local baseURL = http://haiku-files.org/files/optional-packages ;
 HAIKU_OPENSSL_URL = $(baseURL)/$(HAIKU_OPENSSL_PACKAGE) ;
 
 if $(HAIKU_BUILD_FEATURE_SSL) {
@@ -135,7 +137,7 @@ if [ IsOptionalHaikuImagePackageAdded CLucene ] {
 	HAIKU_BUILD_FEATURE_CLUCENE = 1 ;
 }
 
-local baseURL = http://haiku-files.org/files/optional-packages ;
+
 HAIKU_CLUCENE_PACKAGE = clucene-0.9.21-x86-gcc4-haiku-2009-08-11.zip ;
 HAIKU_CLUCENE_URL = $(baseURL)/$(HAIKU_CLUCENE_PACKAGE) ;
 
@@ -171,7 +173,6 @@ if $(HAIKU_BUILD_FEATURE_CLUCENE) {
 
 
 # Mesa
-local mesaBaseURL = http://haiku-files.org/files/optional-packages ;
 if $(TARGET_ARCH) = x86 {
 	local glslObject ;
 	local galliumObjects ;
@@ -186,7 +187,7 @@ if $(TARGET_ARCH) = x86 {
 	}
 
 	zipFile = [ DownloadFile $(HAIKU_MESA_FILE)
-		: $(mesaBaseURL)/$(HAIKU_MESA_FILE) ] ;
+		: $(baseURL)/$(HAIKU_MESA_FILE) ] ;
 
 	HAIKU_MESA_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
 		$(HAIKU_MESA_FILE:B) ] ;
@@ -197,7 +198,7 @@ if $(TARGET_ARCH) = x86 {
 	HAIKU_MESA_LIBS = [ ExtractArchive $(HAIKU_MESA_DIR)
 		:
 		lib.haiku/libglu.a
-		$(galliumObjects) 
+		$(galliumObjects)
 		lib.haiku/libglapi.a
 		$(glslObject)
 		lib.haiku/libmesa.a
@@ -212,7 +213,7 @@ if $(TARGET_ARCH) = x86 {
 
 
 # FFmpeg
-local ffmpegBaseURL = http://haiku-files.org/files/optional-packages/lib ;
+local ffmpegBaseURL = $(baseURL)/lib ;
 if $(TARGET_ARCH) = x86 {
 	if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		HAIKU_FFMPEG_FILE = ffmpeg-0.10.2-x86-gcc4-2012-03-28.zip ;
@@ -334,7 +335,7 @@ if $(TARGET_ARCH) = x86 {
 
 
 # Freetype
-local freetypeBaseURL = http://haiku-files.org/files/optional-packages/lib ;
+local freetypeBaseURL = $(baseURL)/lib ;
 if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 {
 	if $(TARGET_ARCH) = ppc {
 		HAIKU_FREETYPE_FILE = freetype-2.4.9-ppc-gcc4-2012-06-26.zip ;
@@ -384,7 +385,6 @@ if [ IsOptionalHaikuImagePackageAdded TagLib ] {
 	HAIKU_BUILD_FEATURE_TAGLIB = 1 ;
 }
 
-local baseURL = http://haiku-files.org/files/optional-packages ;
 HAIKU_TAGLIB_PACKAGE = taglib-1.6.3-r1a3-x86-gcc2-2011-05-20.zip ;
 HAIKU_TAGLIB_URL = $(baseURL)/$(HAIKU_TAGLIB_PACKAGE) ;
 
@@ -421,7 +421,6 @@ if $(HAIKU_BUILD_FEATURE_TAGLIB) {
 
 
 # WebKit
-local webkitBaseURL = http://haiku-files.org/files/optional-packages ;
 if $(TARGET_ARCH) = x86 {
 	if $(HAIKU_GCC_VERSION[1]) < 4 {
 		Echo "WebKit support not available on gcc $(HAIKU_GCC_VERSION[1])" ;
@@ -429,7 +428,7 @@ if $(TARGET_ARCH) = x86 {
 	    HAIKU_WEBKIT_FILE = webkit-0.1.1-x86-gcc4-2012-07-03.zip ;
 
 	    local zipFile = [ DownloadFile $(HAIKU_WEBKIT_FILE)
-		    : $(webkitBaseURL)/$(HAIKU_WEBKIT_FILE) ] ;
+		    : $(baseURL)/$(HAIKU_WEBKIT_FILE) ] ;
 
 	    HAIKU_WEBKIT_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
 		    $(HAIKU_WEBKIT_FILE:B) ] ;
