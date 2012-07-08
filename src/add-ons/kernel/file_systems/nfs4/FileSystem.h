@@ -17,11 +17,11 @@
 class Inode;
 class RootInode;
 
-class Filesystem {
+class FileSystem {
 public:
-	static	status_t			Mount(Filesystem** pfs, RPC::Server* serv,
+	static	status_t			Mount(FileSystem** pfs, RPC::Server* serv,
 									const char* path, dev_t id);
-								~Filesystem();
+								~FileSystem();
 
 			status_t			GetInode(ino_t id, Inode** inode);
 	inline	Inode*				Root();
@@ -41,17 +41,17 @@ public:
 	inline	NFS4Server*			NFSServer();
 
 	inline	const char*			Path() const;
-	inline	const FilesystemId&	FsId() const;
+	inline	const FileSystemId&	FsId() const;
 
 	inline	uint64				AllocFileId();
 
 	inline	dev_t				DevId() const;
 	inline	InodeIdMap*			InoIdMap();
 
-			Filesystem*			fNext;
-			Filesystem*			fPrev;
+			FileSystem*			fNext;
+			FileSystem*			fPrev;
 private:
-								Filesystem();
+								FileSystem();
 
 			OpenFileCookie*		fOpenFiles;
 			uint32				fOpenCount;
@@ -60,7 +60,7 @@ private:
 			uint32				fExpireType;
 			uint32				fSupAttrs[2];
 
-			FilesystemId		fFsId;
+			FileSystemId		fFsId;
 			const char*			fPath;
 
 			RootInode*			fRoot;
@@ -75,77 +75,77 @@ private:
 
 
 inline Inode*
-Filesystem::Root()
+FileSystem::Root()
 {
 	return reinterpret_cast<Inode*>(fRoot);
 }
 
 
 inline uint32
-Filesystem::OpenFilesCount()
+FileSystem::OpenFilesCount()
 {
 	return fOpenCount;
 }
 
 
 inline bool
-Filesystem::IsAttrSupported(Attribute attr) const
+FileSystem::IsAttrSupported(Attribute attr) const
 {
 	return sIsAttrSet(attr, fSupAttrs, 2);
 }
 
 
 inline uint32
-Filesystem::ExpireType() const
+FileSystem::ExpireType() const
 {
 	return fExpireType;
 }
 
 
 inline RPC::Server*
-Filesystem::Server()
+FileSystem::Server()
 {
 	return fServer;
 }
 
 
 inline NFS4Server*
-Filesystem::NFSServer()
+FileSystem::NFSServer()
 {
 	return reinterpret_cast<NFS4Server*>(fServer->PrivateData());
 }
 
 
 inline const char*
-Filesystem::Path() const
+FileSystem::Path() const
 {
 	return fPath;
 }
 
 
-inline const FilesystemId&
-Filesystem::FsId() const
+inline const FileSystemId&
+FileSystem::FsId() const
 {
 	return fFsId;
 }
 
 
 inline uint64
-Filesystem::AllocFileId()
+FileSystem::AllocFileId()
 {
 	return atomic_add64(&fId, 1);
 }
 
 
 inline dev_t
-Filesystem::DevId() const
+FileSystem::DevId() const
 {
 	return fDevId;
 }
 
 
 inline InodeIdMap*
-Filesystem::InoIdMap()
+FileSystem::InoIdMap()
 {
 	return &fInoIdMap;
 }

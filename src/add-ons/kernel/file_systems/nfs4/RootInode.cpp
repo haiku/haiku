@@ -18,7 +18,7 @@ status_t
 RootInode::ReadInfo(struct fs_info* info)
 {
 	do {
-		RPC::Server* serv = fFilesystem->Server();
+		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
@@ -97,7 +97,7 @@ bool
 RootInode::ProbeMigration()
 {
 	do {
-		RPC::Server* serv = fFilesystem->Server();
+		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
@@ -126,7 +126,7 @@ status_t
 RootInode::GetLocations(AttrValue** attrv)
 {
 	do {
-		RPC::Server* serv = fFilesystem->Server();
+		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 

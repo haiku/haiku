@@ -7,7 +7,7 @@
  */
 
 
-#include "Filesystem.h"
+#include "FileSystem.h"
 #include "Inode.h"
 #include "NFS4Server.h"
 #include "Request.h"
@@ -20,7 +20,7 @@ NFS4Server::NFS4Server(RPC::Server* serv)
 	fLeaseTime(0),
 	fClientIdLastUse(0),
 	fUseCount(0),
-	fFilesystems(NULL),
+	fFileSystems(NULL),
 	fServer(serv)
 {
 	mutex_init(&fClientIdLock, NULL);
@@ -52,7 +52,7 @@ NFS4Server::ServerRebooted(uint64 clientId)
 
 	// reclaim all opened files and held locks from all filesystems
 	MutexLocker _(fFSLock);
-	Filesystem* fs = fFilesystems;
+	FileSystem* fs = fFileSystems;
 	while (fs != NULL) {
 		OpenFileCookie* current = fs->OpenFilesLock();
 		while (current != NULL) {
@@ -157,14 +157,14 @@ NFS4Server::_ReclaimLocks(OpenFileCookie* cookie)
 
 
 void
-NFS4Server::AddFilesystem(Filesystem* fs)
+NFS4Server::AddFileSystem(FileSystem* fs)
 {
 	MutexLocker _(fFSLock);
 	fs->fPrev = NULL;
-	fs->fNext = fFilesystems;
-	if (fFilesystems != NULL)
-		fFilesystems->fPrev = fs;
-	fFilesystems = fs;
+	fs->fNext = fFileSystems;
+	if (fFileSystems != NULL)
+		fFileSystems->fPrev = fs;
+	fFileSystems = fs;
 	fUseCount += fs->OpenFilesCount();
 	if (fs->OpenFilesCount() > 0 && fThreadCancel)
 		_StartRenewing();
@@ -172,11 +172,11 @@ NFS4Server::AddFilesystem(Filesystem* fs)
 
 
 void
-NFS4Server::RemoveFilesystem(Filesystem* fs)
+NFS4Server::RemoveFileSystem(FileSystem* fs)
 {
 	MutexLocker _(fFSLock);
-	if (fs == fFilesystems)
-		fFilesystems = fs->fNext;
+	if (fs == fFileSystems)
+		fFileSystems = fs->fNext;
 
 	if (fs->fNext)
 		fs->fNext->fPrev = fs->fPrev;
@@ -223,11 +223,11 @@ NFS4Server::ClientId(uint64 prevId, bool forceNew)
 
 
 status_t
-NFS4Server::FilesystemMigrated()
+NFS4Server::FileSystemMigrated()
 {
 	// reclaim all opened files and held locks from all filesystems
 	MutexLocker _(fFSLock);
-	Filesystem* fs = fFilesystems;
+	FileSystem* fs = fFileSystems;
 	while (fs != NULL) {
 		fs->Migrate(fServer);
 		fs = fs->fNext;
@@ -330,7 +330,7 @@ NFS4Server::_Renewal()
 				ServerRebooted(clientId);
 				break;
 			case NFS4ERR_LEASE_MOVED:
-				FilesystemMigrated();
+				FileSystemMigrated();
 				break;
 		}
 	}

@@ -7,7 +7,7 @@
  */
 
 
-#include "Filesystem.h"
+#include "FileSystem.h"
 
 #include <string.h>
 
@@ -21,7 +21,7 @@ extern RPC::ServerManager* gRPCServerManager;
 extern RPC::ProgramData* CreateNFS4Server(RPC::Server* serv);
 
 
-Filesystem::Filesystem()
+FileSystem::FileSystem()
 	:
 	fNext(NULL),
 	fPrev(NULL),
@@ -35,9 +35,9 @@ Filesystem::Filesystem()
 }
 
 
-Filesystem::~Filesystem()
+FileSystem::~FileSystem()
 {
-	NFSServer()->RemoveFilesystem(this);
+	NFSServer()->RemoveFileSystem(this);
 
 	mutex_destroy(&fOpenLock);
 
@@ -63,7 +63,7 @@ sGetPath(const char* root, const char* path)
 
 
 status_t
-Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
+FileSystem::Mount(FileSystem** pfs, RPC::Server* serv, const char* fsPath,
 	dev_t id)
 {
 	Request request(serv);
@@ -94,7 +94,7 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
 	for (uint32 i = 0; i < lookupCount; i++)
 		reply.LookUp();
 
-	Filehandle fh;
+	FileHandle fh;
 	reply.GetFH(&fh);
 
 	uint32 allowed;
@@ -111,7 +111,7 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
 	if (result != B_OK || count < 2)
 		return result;
 
-	Filesystem* fs = new(std::nothrow) Filesystem;
+	FileSystem* fs = new(std::nothrow) FileSystem;
 	if (fs == NULL)
 		return B_NO_MEMORY;
 
@@ -122,8 +122,8 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
 	fs->fExpireType = values[1].fData.fValue32;
 
 	// FATTR4_FSID is mandatory
-	FilesystemId* fsid =
-		reinterpret_cast<FilesystemId*>(values[2].fData.fPointer);
+	FileSystemId* fsid =
+		reinterpret_cast<FileSystemId*>(values[2].fData.fPointer);
 
 	if (count == 4 && values[3].fAttribute == FATTR4_FS_LOCATIONS) {
 		FSLocations* locs =
@@ -168,7 +168,7 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
 
 	fs->fRoot = reinterpret_cast<RootInode*>(inode);
 
-	fs->NFSServer()->AddFilesystem(fs);
+	fs->NFSServer()->AddFileSystem(fs);
 	*pfs = fs;
 
 	return B_OK;
@@ -176,7 +176,7 @@ Filesystem::Mount(Filesystem** pfs, RPC::Server* serv, const char* fsPath,
 
 
 status_t
-Filesystem::GetInode(ino_t id, Inode** _inode)
+FileSystem::GetInode(ino_t id, Inode** _inode)
 {
 	FileInfo fi;
 	status_t result = fInoIdMap.GetFileInfo(&fi, id);
@@ -197,7 +197,7 @@ Filesystem::GetInode(ino_t id, Inode** _inode)
 
 
 status_t
-Filesystem::Migrate(const RPC::Server* serv)
+FileSystem::Migrate(const RPC::Server* serv)
 {
 	MutexLocker _(fOpenLock);
 	if (serv != fServer)
@@ -250,8 +250,8 @@ Filesystem::Migrate(const RPC::Server* serv)
 	}
 
 	NFS4Server* old = reinterpret_cast<NFS4Server*>(server->PrivateData());
-	old->RemoveFilesystem(this);
-	NFSServer()->AddFilesystem(this);
+	old->RemoveFileSystem(this);
+	NFSServer()->AddFileSystem(this);
 
 	gRPCServerManager->Release(server);
 
@@ -260,7 +260,7 @@ Filesystem::Migrate(const RPC::Server* serv)
 
 
 OpenFileCookie*
-Filesystem::OpenFilesLock()
+FileSystem::OpenFilesLock()
 {
 	mutex_lock(&fOpenLock);
 	return fOpenFiles;
@@ -268,14 +268,14 @@ Filesystem::OpenFilesLock()
 
 
 void
-Filesystem::OpenFilesUnlock()
+FileSystem::OpenFilesUnlock()
 {
 	mutex_unlock(&fOpenLock);
 }
 
 
 void
-Filesystem::AddOpenFile(OpenFileCookie* cookie)
+FileSystem::AddOpenFile(OpenFileCookie* cookie)
 {
 	MutexLocker _(fOpenLock);
 
@@ -289,7 +289,7 @@ Filesystem::AddOpenFile(OpenFileCookie* cookie)
 
 
 void
-Filesystem::RemoveOpenFile(OpenFileCookie* cookie)
+FileSystem::RemoveOpenFile(OpenFileCookie* cookie)
 {
 	MutexLocker _(fOpenLock);
 	if (cookie == fOpenFiles)

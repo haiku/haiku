@@ -402,7 +402,7 @@ RequestBuilder::OpenConfirm(uint32 seq, const uint32* id, uint32 stateSeq)
 
 
 status_t
-RequestBuilder::PutFH(const Filehandle& fh)
+RequestBuilder::PutFH(const FileHandle& fh)
 {
 	if (fProcedure != ProcCompound)
 		return B_BAD_VALUE;
@@ -410,7 +410,7 @@ RequestBuilder::PutFH(const Filehandle& fh)
 		return B_NO_MEMORY;
 
 	fRequest->Stream().AddUInt(OpPutFH);
-	fRequest->Stream().AddOpaque(fh.fFH, fh.fSize);
+	fRequest->Stream().AddOpaque(fh.fData, fh.fSize);
 	fOpCount++;
 
 	return B_OK;
@@ -761,8 +761,8 @@ RequestBuilder::_EncodeAttrs(XDR::WriteStream& stream, AttrValue* attr,
 	}
 
 	if (i < count && attr[i].fAttribute == FATTR4_FILEHANDLE) {
-		Filehandle* fh = reinterpret_cast<Filehandle*>(attr[i].fData.fPointer);
-		str.AddOpaque(fh->fFH, fh->fSize);
+		FileHandle* fh = reinterpret_cast<FileHandle*>(attr[i].fData.fPointer);
+		str.AddOpaque(fh->fData, fh->fSize);
 		i++;
 	}
 

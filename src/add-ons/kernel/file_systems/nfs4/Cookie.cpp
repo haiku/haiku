@@ -124,7 +124,7 @@ Cookie::CancelAll()
 	MutexLocker _(fRequestLock);
 	RequestEntry* ent = fRequests;
 	while (ent != NULL) {
-		fFilesystem->Server()->WakeCall(ent->fRequest);
+		fFileSystem->Server()->WakeCall(ent->fRequest);
 		ent = ent->fNext;
 	}
 
@@ -219,7 +219,7 @@ OpenFileCookie::DeleteLock(LockInfo* lock)
 status_t
 OpenFileCookie::_ReleaseLockOwner(LockOwner* owner)
 {
-	Request request(fFilesystem->Server());
+	Request request(fFileSystem->Server());
 	RequestBuilder& req = request.Builder();
 
 	req.ReleaseLockOwner(this, owner);

@@ -166,7 +166,7 @@ ReplyInterpreter::GetAttr(AttrValue** attrs, uint32* count)
 
 
 status_t
-ReplyInterpreter::GetFH(Filehandle* fh)
+ReplyInterpreter::GetFH(FileHandle* fh)
 {
 	status_t res = _OperationError(OpGetFH);
 	if (res != B_OK)
@@ -179,7 +179,7 @@ ReplyInterpreter::GetFH(Filehandle* fh)
 
 	if (fh != NULL) {
 		fh->fSize = size;
-		memcpy(fh->fFH, ptr, size);
+		memcpy(fh->fData, ptr, size);
 	}
 
 	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
@@ -538,7 +538,7 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 		values[current].fAttribute = FATTR4_FSID;
 		values[current].fFreePointer = true;
 
-		FilesystemId fsid;
+		FileSystemId fsid;
 		fsid.fMajor = stream.GetUHyper();
 		fsid.fMinor = stream.GetUHyper();
 		

@@ -7,7 +7,7 @@ KernelAddon nfs4 :
 	Cookie.cpp
 	Connection.cpp
 	FileInfo.cpp
-	Filesystem.cpp
+	FileSystem.cpp
 	IdMap.cpp
 	Inode.cpp
 	InodeDir.cpp

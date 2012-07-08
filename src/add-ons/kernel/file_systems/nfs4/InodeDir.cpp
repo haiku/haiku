@@ -23,7 +23,7 @@ Inode::CreateDir(const char* name, int mode)
 	bool badOwner = false;
 
 	do {
-		RPC::Server* serv = fFilesystem->Server();
+		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
@@ -36,14 +36,14 @@ Inode::CreateDir(const char* name, int mode)
 		cattr[i].fData.fValue32 = mode;
 		i++;
 
-		if (!badOwner && fFilesystem->IsAttrSupported(FATTR4_OWNER)) {
+		if (!badOwner && fFileSystem->IsAttrSupported(FATTR4_OWNER)) {
 			cattr[i].fAttribute = FATTR4_OWNER;
 			cattr[i].fFreePointer = true;
 			cattr[i].fData.fPointer = gIdMapper->GetOwner(getuid());
 			i++;
 		}
 
-		if (!badOwner && fFilesystem->IsAttrSupported(FATTR4_OWNER_GROUP)) {
+		if (!badOwner && fFileSystem->IsAttrSupported(FATTR4_OWNER_GROUP)) {
 			cattr[i].fAttribute = FATTR4_OWNER_GROUP;
 			cattr[i].fFreePointer = true;
 			cattr[i].fData.fPointer = gIdMapper->GetOwnerGroup(getgid());
@@ -79,7 +79,7 @@ Inode::OpenDir(OpenDirCookie* cookie)
 		return B_NOT_A_DIRECTORY;
 
 	do {
-		RPC::Server* serv = fFilesystem->Server();
+		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
@@ -105,7 +105,7 @@ Inode::OpenDir(OpenDirCookie* cookie)
 		if (allowed & ACCESS4_READ != ACCESS4_READ)
 			return B_PERMISSION_DENIED;
 
-		cookie->fFilesystem = fFilesystem;
+		cookie->fFileSystem = fFileSystem;
 		cookie->fCookie = 0;
 		cookie->fCookieVerf = 2;
 
@@ -119,7 +119,7 @@ Inode::_ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
 	bool* eof)
 {
 	do {
-		RPC::Server* serv = fFilesystem->Server();
+		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
@@ -155,7 +155,7 @@ Inode::_FillDirEntry(struct dirent* de, ino_t id, const char* name, uint32 pos,
 	if (pos + entSize + nameSize > size)
 		return B_BUFFER_OVERFLOW;
 
-	de->d_dev = fFilesystem->DevId();
+	de->d_dev = fFileSystem->DevId();
 	de->d_ino = id;
 	de->d_reclen = entSize + nameSize;
 	if (de->d_reclen % 8 != 0)
@@ -171,7 +171,7 @@ status_t
 Inode::_ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 {
 	do {
-		RPC::Server* serv = fFilesystem->Server();
+		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
@@ -179,7 +179,7 @@ Inode::_ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 		req.LookUpUp();
 		req.GetFH();
 
-		if (fFilesystem->IsAttrSupported(FATTR4_FILEID)) {
+		if (fFileSystem->IsAttrSupported(FATTR4_FILEID)) {
 			Attribute attr[] = { FATTR4_FILEID };
 			req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
 		}
@@ -198,11 +198,11 @@ Inode::_ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 		if (result != B_OK)
 			return result;
 
-		Filehandle fh;
+		FileHandle fh;
 		reply.GetFH(&fh);
 
 		uint64 fileId;
-		if (fFilesystem->IsAttrSupported(FATTR4_FILEID)) {
+		if (fFileSystem->IsAttrSupported(FATTR4_FILEID)) {
 			AttrValue* values;
 			uint32 count;
 			reply.GetAttr(&values, &count);
@@ -212,7 +212,7 @@ Inode::_ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 			fileId = values[0].fData.fValue64;
 			delete[] values;
 		} else
-			fileId = fFilesystem->AllocFileId();
+			fileId = fFileSystem->AllocFileId();
 
 		return _FillDirEntry(de, _FileIdToInoT(fileId), "..", pos, size);
 	} while (true);
@@ -273,15 +273,15 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
 
 			// FATTR4_FSID is mandatory
 			void* data = dirents[i].fAttrs[0].fData.fPointer;
-			FilesystemId* fsid = reinterpret_cast<FilesystemId*>(data);
-			if (*fsid != fFilesystem->FsId())
+			FileSystemId* fsid = reinterpret_cast<FileSystemId*>(data);
+			if (*fsid != fFileSystem->FsId())
 				continue;
 
 			ino_t id;
 			if (dirents[i].fAttrCount == 2)
 				id = _FileIdToInoT(dirents[i].fAttrs[1].fData.fValue64);
 			else
-				id = _FileIdToInoT(fFilesystem->AllocFileId());
+				id = _FileIdToInoT(fFileSystem->AllocFileId());
 
 			const char* name = dirents[i].fName;
 			if (_FillDirEntry(de, id, name, pos, size) == B_BUFFER_OVERFLOW) {

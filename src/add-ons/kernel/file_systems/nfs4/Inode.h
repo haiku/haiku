@@ -14,21 +14,21 @@
 #include <SupportDefs.h>
 
 #include "Cookie.h"
-#include "Filesystem.h"
+#include "FileSystem.h"
 #include "NFS4Defs.h"
 #include "ReplyInterpreter.h"
 
 
 class Inode {
 public:
-	static			status_t	CreateInode(Filesystem* fs, const FileInfo& fi,
+	static			status_t	CreateInode(FileSystem* fs, const FileInfo& fi,
 									Inode** inode);
 								~Inode();
 
 	inline			ino_t		ID() const;
 	inline			mode_t		Type() const;
 	inline			const char*	Name() const;
-	inline			Filesystem*	FileSystem() const;
+	inline			FileSystem*	GetFileSystem() const;
 
 					status_t	LookUp(const char* name, ino_t* id);
 
@@ -75,7 +75,7 @@ protected:
 									RPC::Server* serv,
 									OpenFileCookie* cookie = NULL);
 
-					status_t	_ConfirmOpen(const Filehandle& fh,
+					status_t	_ConfirmOpen(const FileHandle& fh,
 									OpenFileCookie* cookie);
 
 					status_t	_ReadDirOnce(DirEntry** dirents, uint32* count,
@@ -92,7 +92,7 @@ protected:
 					uint32		fType;
 
 					FileInfo	fInfo;
-					Filesystem*	fFilesystem;
+					FileSystem*	fFileSystem;
 };
 
 
@@ -128,10 +128,10 @@ Inode::Name() const
 }
 
 
-inline Filesystem*
-Inode::FileSystem() const
+inline FileSystem*
+Inode::GetFileSystem() const
 {
-	return fFilesystem;
+	return fFileSystem;
 }
 
 

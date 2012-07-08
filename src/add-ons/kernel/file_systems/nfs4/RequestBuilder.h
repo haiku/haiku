@@ -54,7 +54,7 @@ public:
 										uint32 count = 0, bool excl = false);
 			status_t				OpenConfirm(uint32 seq, const uint32* id,
 										uint32 stateSeq);
-			status_t				PutFH(const Filehandle& fh);
+			status_t				PutFH(const FileHandle& fh);
 			status_t				PutRootFH();
 			status_t				Read(const uint32* id, uint32 stateSeq,
 										uint64 pos, uint32 len);

@@ -11,7 +11,7 @@
 
 #include <SupportDefs.h>
 
-#include "Filesystem.h"
+#include "FileSystem.h"
 
 
 struct LockOwner {
@@ -55,7 +55,7 @@ struct Cookie {
 				RequestEntry*	fNext;
 			};
 
-			Filesystem*		fFilesystem;
+			FileSystem*		fFileSystem;
 			RequestEntry*	fRequests;
 			mutex			fRequestLock;
 

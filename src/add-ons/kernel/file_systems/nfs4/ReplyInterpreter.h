@@ -71,7 +71,7 @@ public:
 			status_t	Close();
 			status_t	Create();
 			status_t	GetAttr(AttrValue** attrs, uint32* count);
-			status_t	GetFH(Filehandle* fh);
+			status_t	GetFH(FileHandle* fh);
 			status_t	Link();
 			status_t	Lock(LockInfo* linfo);
 			status_t 	LockT(uint64* pos, uint64* len, LockType* type);

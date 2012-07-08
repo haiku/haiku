@@ -18,10 +18,10 @@
 
 
 status_t
-Inode::_ConfirmOpen(const Filehandle& fh, OpenFileCookie* cookie)
+Inode::_ConfirmOpen(const FileHandle& fh, OpenFileCookie* cookie)
 {
 	do {
-		RPC::Server* serv = fFilesystem->Server();
+		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 
 		RequestBuilder& req = request.Builder();
@@ -32,7 +32,7 @@ Inode::_ConfirmOpen(const Filehandle& fh, OpenFileCookie* cookie)
 
 		status_t result = request.Send();
 		if (result != B_OK) {
-			fFilesystem->RemoveOpenFile(cookie);
+			fFileSystem->RemoveOpenFile(cookie);
 			return result;
 		}
 
@@ -44,7 +44,7 @@ Inode::_ConfirmOpen(const Filehandle& fh, OpenFileCookie* cookie)
 		reply.PutFH();
 		result = reply.OpenConfirm(&cookie->fStateSeq);
 		if (result != B_OK) {
-			fFilesystem->RemoveOpenFile(cookie);
+			fFileSystem->RemoveOpenFile(cookie);
 			return result;
 		}
 
@@ -67,11 +67,11 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 	cookie->fLocks = NULL;
 
 	bool badOwner = false;
-	Filehandle fh;
+	FileHandle fh;
 	do {
-		cookie->fClientId = fFilesystem->NFSServer()->ClientId();
+		cookie->fClientId = fFileSystem->NFSServer()->ClientId();
 
-		RPC::Server* serv = fFilesystem->Server();
+		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
@@ -92,14 +92,14 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 		cattr[i].fData.fValue32 = perms;
 		i++;
 
-		if (!badOwner && fFilesystem->IsAttrSupported(FATTR4_OWNER)) {
+		if (!badOwner && fFileSystem->IsAttrSupported(FATTR4_OWNER)) {
 			cattr[i].fAttribute = FATTR4_OWNER;
 			cattr[i].fFreePointer = true;
 			cattr[i].fData.fPointer = gIdMapper->GetOwner(getuid());
 			i++;
 		}
 
-		if (!badOwner && fFilesystem->IsAttrSupported(FATTR4_OWNER_GROUP)) {
+		if (!badOwner && fFileSystem->IsAttrSupported(FATTR4_OWNER_GROUP)) {
 			cattr[i].fAttribute = FATTR4_OWNER_GROUP;
 			cattr[i].fFreePointer = true;
 			cattr[i].fData.fPointer = gIdMapper->GetOwnerGroup(getgid());
@@ -112,7 +112,7 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 
 		req.GetFH();
 
-		if (fFilesystem->IsAttrSupported(FATTR4_FILEID)) {
+		if (fFileSystem->IsAttrSupported(FATTR4_FILEID)) {
 			Attribute attr[] = { FATTR4_FILEID };
 			req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
 		}
@@ -135,7 +135,7 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 		reply.GetFH(&fh);
 
 		uint64 fileId;
-		if (fFilesystem->IsAttrSupported(FATTR4_FILEID)) {
+		if (fFileSystem->IsAttrSupported(FATTR4_FILEID)) {
 			AttrValue* values;
 			uint32 count;
 			result = reply.GetAttr(&values, &count);
@@ -146,7 +146,7 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 
 			delete[] values;
 		} else
-			fileId = fFilesystem->AllocFileId();
+			fileId = fFileSystem->AllocFileId();
 
 		*id = _FileIdToInoT(fileId);
 
@@ -163,15 +163,15 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 		strcat(path, name);
 		fi.fPath = path;
 
-		fFilesystem->InoIdMap()->AddEntry(fi, *id);
+		fFileSystem->InoIdMap()->AddEntry(fi, *id);
 
-		cookie->fFilesystem = fFilesystem;
+		cookie->fFileSystem = fFileSystem;
 		cookie->fInfo = fi;
 
 		break;
 	} while (true);
 
-	fFilesystem->AddOpenFile(cookie);
+	fFileSystem->AddOpenFile(cookie);
 
 	if (confirm)
 		return _ConfirmOpen(fh, cookie);
@@ -186,16 +186,16 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 	bool confirm;
 	status_t result;
 
-	cookie->fFilesystem = fFilesystem;
+	cookie->fFileSystem = fFileSystem;
 	cookie->fInfo = fInfo;
 	cookie->fMode = mode;
 	cookie->fSequence = 0;
 	cookie->fLocks = NULL;
 
 	do {
-		cookie->fClientId = fFilesystem->NFSServer()->ClientId();
+		cookie->fClientId = fFileSystem->NFSServer()->ClientId();
 
-		RPC::Server* serv = fFilesystem->Server();
+		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
@@ -203,7 +203,7 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 
 		// Since we are opening the file using a pair (parentFH, name) we
 		// need to check for race conditions.
-		if (fFilesystem->IsAttrSupported(FATTR4_FILEID)) {
+		if (fFileSystem->IsAttrSupported(FATTR4_FILEID)) {
 			req.PutFH(fInfo.fParent);
 			req.LookUp(fInfo.fName);
 			AttrValue attr;
@@ -211,7 +211,7 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 			attr.fFreePointer = false;
 			attr.fData.fValue64 = fInfo.fFileId;
 			req.Verify(&attr, 1);
-		} else if (fFilesystem->ExpireType() == FH4_PERSISTENT) {
+		} else if (fFileSystem->ExpireType() == FH4_PERSISTENT) {
 			req.PutFH(fInfo.fParent);
 			req.LookUp(fInfo.fName);
 			AttrValue attr;
@@ -246,8 +246,8 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 
 		// Verify if the file we want to open is the file this Inode
 		// represents.
-		if (fFilesystem->IsAttrSupported(FATTR4_FILEID) ||
-			fFilesystem->ExpireType() == FH4_PERSISTENT) {
+		if (fFileSystem->IsAttrSupported(FATTR4_FILEID) ||
+			fFileSystem->ExpireType() == FH4_PERSISTENT) {
 			reply.PutFH();
 			result = reply.LookUp();
 			if (result != B_OK)
@@ -267,7 +267,7 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 		break;
 	} while (true);
 
-	fFilesystem->AddOpenFile(cookie);
+	fFileSystem->AddOpenFile(cookie);
 
 	if (confirm)
 		return _ConfirmOpen(fInfo.fHandle, cookie);
@@ -279,10 +279,10 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 status_t
 Inode::Close(OpenFileCookie* cookie)
 {
-	fFilesystem->RemoveOpenFile(cookie);
+	fFileSystem->RemoveOpenFile(cookie);
 
 	do {
-		RPC::Server* serv = fFilesystem->Server();
+		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
@@ -320,7 +320,7 @@ Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length)
 
 	while (size < *_length && !eof) {
 		do {
-			RPC::Server* serv = fFilesystem->Server();
+			RPC::Server* serv = fFileSystem->Server();
 			Request request(serv);
 			RequestBuilder& req = request.Builder();
 
@@ -366,7 +366,7 @@ Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
 
 	while (size < *_length) {
 		do {
-			RPC::Server* serv = fFilesystem->Server();
+			RPC::Server* serv = fFileSystem->Server();
 			Request request(serv);
 			RequestBuilder& req = request.Builder();
 

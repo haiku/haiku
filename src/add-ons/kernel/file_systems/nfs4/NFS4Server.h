@@ -14,7 +14,7 @@
 #include "RPCServer.h"
 
 
-class Filesystem;
+class FileSystem;
 class OpenFileCookie;
 
 class NFS4Server : public RPC::ProgramData {
@@ -23,10 +23,10 @@ public:
 	virtual					~NFS4Server();
 
 			uint64			ServerRebooted(uint64 clientId);
-			status_t		FilesystemMigrated();
+			status_t		FileSystemMigrated();
 
-			void			AddFilesystem(Filesystem* fs);
-			void			RemoveFilesystem(Filesystem* fs);
+			void			AddFileSystem(FileSystem* fs);
+			void			RemoveFileSystem(FileSystem* fs);
 
 	inline	void			IncUsage();
 	inline	void			DecUsage();
@@ -55,7 +55,7 @@ private:
 			mutex			fClientIdLock;
 
 			uint32			fUseCount;
-			Filesystem*		fFilesystems;
+			FileSystem*		fFileSystems;
 			mutex			fFSLock;
 
 			RPC::Server*	fServer;

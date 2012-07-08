@@ -9,7 +9,7 @@
 
 #include "FileInfo.h"
 
-#include "Filesystem.h"
+#include "FileSystem.h"
 #include "Request.h"
 
 
@@ -46,7 +46,7 @@ FileInfo::ParsePath(RequestBuilder& req, uint32& count, const char* _path)
 
 
 status_t
-FileInfo::UpdateFileHandles(Filesystem* fs)
+FileInfo::UpdateFileHandles(FileSystem* fs)
 {
 	Request request(fs->Server());
 	RequestBuilder& req = request.Builder();

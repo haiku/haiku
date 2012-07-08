@@ -25,7 +25,7 @@ Inode::Inode()
 
 
 status_t
-Inode::CreateInode(Filesystem* fs, const FileInfo &fi, Inode** _inode)
+Inode::CreateInode(FileSystem* fs, const FileInfo &fi, Inode** _inode)
 {
 	Inode* inode = NULL;
 	if (fs->Root() == NULL)
@@ -37,7 +37,7 @@ Inode::CreateInode(Filesystem* fs, const FileInfo &fi, Inode** _inode)
 		return B_NO_MEMORY;
 
 	inode->fInfo = fi;
-	inode->fFilesystem = fs;
+	inode->fFileSystem = fs;
 
 	do {
 		RPC::Server* serv = fs->Server();
@@ -78,8 +78,8 @@ Inode::CreateInode(Filesystem* fs, const FileInfo &fi, Inode** _inode)
 		inode->fType = values[0].fData.fValue32;
 
 		// FATTR4_FSID is mandatory
-		FilesystemId* fsid =
-			reinterpret_cast<FilesystemId*>(values[1].fData.fPointer);
+		FileSystemId* fsid =
+			reinterpret_cast<FileSystemId*>(values[1].fData.fPointer);
 		if (*fsid != fs->FsId()) {
 			delete[] values;
 			return B_ENTRY_NOT_FOUND;
@@ -111,7 +111,7 @@ Inode::LookUp(const char* name, ino_t* id)
 	}
 
 	do {
-		RPC::Server* serv = fFilesystem->Server();
+		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
@@ -144,7 +144,7 @@ Inode::LookUp(const char* name, ino_t* id)
 		if (result != B_OK)
 			return result;
 
-		Filehandle fh;
+		FileHandle fh;
 		reply.GetFH(&fh);
 
 		AttrValue* values;
@@ -154,16 +154,16 @@ Inode::LookUp(const char* name, ino_t* id)
 			return result;
 
 		// FATTR4_FSID is mandatory
-		FilesystemId* fsid =
-			reinterpret_cast<FilesystemId*>(values[0].fData.fPointer);
-		if (*fsid != fFilesystem->FsId()) {
+		FileSystemId* fsid =
+			reinterpret_cast<FileSystemId*>(values[0].fData.fPointer);
+		if (*fsid != fFileSystem->FsId()) {
 			delete[] values;
 			return B_ENTRY_NOT_FOUND;
 		}
 
 		uint64 fileId;
 		if (count < 2 || values[1].fAttribute != FATTR4_FILEID)
-			fileId = fFilesystem->AllocFileId();
+			fileId = fFileSystem->AllocFileId();
 		else
 			fileId = values[1].fData.fValue64;
 		delete[] values;
@@ -188,7 +188,7 @@ Inode::LookUp(const char* name, ino_t* id)
 		strcat(path, name);
 		fi.fPath = path;
 
-		fFilesystem->InoIdMap()->AddEntry(fi, *id);
+		fFileSystem->InoIdMap()->AddEntry(fi, *id);
 
 		return B_OK;
 	} while (true);
@@ -199,7 +199,7 @@ status_t
 Inode::Link(Inode* dir, const char* name)
 {
 	do {
-		RPC::Server* serv = fFilesystem->Server();
+		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
@@ -214,16 +214,16 @@ Inode::Link(Inode* dir, const char* name)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		// filehandle has expired
+		// FileHandle has expired
 		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
-			fInfo.UpdateFileHandles(fFilesystem);
-			dir->fInfo.UpdateFileHandles(dir->fFilesystem);
+			fInfo.UpdateFileHandles(fFileSystem);
+			dir->fInfo.UpdateFileHandles(dir->fFileSystem);
 			continue;
 		}
 
 		// filesystem has been moved
 		if (reply.NFS4Error() == NFS4ERR_MOVED) {
-			fFilesystem->Migrate(serv);
+			fFileSystem->Migrate(serv);
 			continue;
 		}
 
@@ -237,13 +237,13 @@ Inode::Link(Inode* dir, const char* name)
 
 
 // May cause problem similar to Rename (described below). When node's is has
-// more than one hard link and we delete the name it stores for filehandle
+// more than one hard link and we delete the name it stores for FileHandle
 // restoration node will inocorectly become unavailable.
 status_t
 Inode::Remove(const char* name, FileType type)
 {
 	do {
-		RPC::Server* serv = fFilesystem->Server();
+		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
@@ -293,18 +293,18 @@ Inode::Remove(const char* name, FileType type)
 }
 
 
-// Rename may cause some problems if filehandles are volatile and local Inode
+// Rename may cause some problems if FileHandles are volatile and local Inode
 // object exists for renamed node. It's stored filename will become invalid
-// and, consequnetly, filehandle restoration will fail. Probably, it will
+// and, consequnetly, FileHandle restoration will fail. Probably, it will
 // be much easier to solve this problem if more metadata is cached.
 status_t
 Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName)
 {
-	if (from->fFilesystem != to->fFilesystem)
+	if (from->fFileSystem != to->fFileSystem)
 		return B_DONT_DO_THAT;
 
 	do {
-		RPC::Server* serv = from->fFilesystem->Server();
+		RPC::Server* serv = from->fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
@@ -319,16 +319,16 @@ Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		// filehandle has expired
+		// FileHandle has expired
 		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
-			from->fInfo.UpdateFileHandles(from->fFilesystem);
-			to->fInfo.UpdateFileHandles(to->fFilesystem);
+			from->fInfo.UpdateFileHandles(from->fFileSystem);
+			to->fInfo.UpdateFileHandles(to->fFileSystem);
 			continue;
 		}
 
 		// filesystem has been moved
 		if (reply.NFS4Error() == NFS4ERR_MOVED) {
-			from->fFilesystem->Migrate(serv);
+			from->fFileSystem->Migrate(serv);
 			continue;
 		}
 
@@ -347,7 +347,7 @@ Inode::CreateLink(const char* name, const char* path, int mode)
 	bool badOwner = false;
 
 	do {
-		RPC::Server* serv = fFilesystem->Server();
+		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
@@ -360,14 +360,14 @@ Inode::CreateLink(const char* name, const char* path, int mode)
 		cattr[i].fData.fValue32 = mode;
 		i++;
 
-		if (!badOwner && fFilesystem->IsAttrSupported(FATTR4_OWNER)) {
+		if (!badOwner && fFileSystem->IsAttrSupported(FATTR4_OWNER)) {
 			cattr[i].fAttribute = FATTR4_OWNER;
 			cattr[i].fFreePointer = true;
 			cattr[i].fData.fPointer = gIdMapper->GetOwner(getuid());
 			i++;
 		}
 
-		if (!badOwner && fFilesystem->IsAttrSupported(FATTR4_OWNER_GROUP)) {
+		if (!badOwner && fFileSystem->IsAttrSupported(FATTR4_OWNER_GROUP)) {
 			cattr[i].fAttribute = FATTR4_OWNER_GROUP;
 			cattr[i].fFreePointer = true;
 			cattr[i].fData.fPointer = gIdMapper->GetOwnerGroup(getgid());
@@ -403,7 +403,7 @@ Inode::ReadLink(void* buffer, size_t* length)
 		return B_BAD_VALUE;
 
 	do {
-		RPC::Server* serv = fFilesystem->Server();
+		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
@@ -434,7 +434,7 @@ status_t
 Inode::Access(int mode)
 {
 	do {
-		RPC::Server* serv = fFilesystem->Server();
+		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
@@ -482,7 +482,7 @@ status_t
 Inode::Stat(struct stat* st)
 {
 	do {
-		RPC::Server* serv = fFilesystem->Server();
+		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
@@ -671,7 +671,7 @@ Inode::WriteStat(const struct stat* st, uint32 mask)
 	}
 
 	do {
-		RPC::Server* serv = fFilesystem->Server();
+		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
@@ -742,7 +742,7 @@ Inode::TestLock(OpenFileCookie* cookie, struct flock* lock)
 		return result;
 
 	do {
-		RPC::Server* serv = fFilesystem->Server();
+		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
@@ -812,7 +812,7 @@ Inode::AcquireLock(OpenFileCookie* cookie, const struct flock* lock,
 	do {
 		MutexLocker ownerLocker(linfo->fOwner->fLock);
 
-		RPC::Server* serv = fFilesystem->Server();
+		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
@@ -881,7 +881,7 @@ Inode::ReleaseLock(OpenFileCookie* cookie, const struct flock* lock)
 	do {
 		MutexLocker ownerLocker(linfo->fOwner->fLock);
 
-		RPC::Server* serv = fFilesystem->Server();
+		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
@@ -926,7 +926,7 @@ Inode::ReleaseAllLocks(OpenFileCookie* cookie)
 		do {
 			MutexLocker ownerLocker(linfo->fOwner->fLock);
 
-			RPC::Server* serv = fFilesystem->Server();
+			RPC::Server* serv = fFileSystem->Server();
 			Request request(serv);
 			RequestBuilder& req = request.Builder();
 
@@ -989,7 +989,7 @@ Inode::_HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 
 		// server is in grace period, we need to wait
 		case NFS4ERR_GRACE:
-			leaseTime = fFilesystem->NFSServer()->LeaseTime();
+			leaseTime = fFileSystem->NFSServer()->LeaseTime();
 			if (cookie == NULL) {
 				snooze_etc(sSecToBigTime(leaseTime) / 3, B_SYSTEM_TIMEBASE,
 					B_RELATIVE_TIMEOUT);
@@ -1008,25 +1008,25 @@ Inode::_HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 		// server has rebooted, reclaim share and try again
 		case NFS4ERR_STALE_CLIENTID:
 		case NFS4ERR_STALE_STATEID:
-			fFilesystem->NFSServer()->ServerRebooted(cookie->fClientId);
+			fFileSystem->NFSServer()->ServerRebooted(cookie->fClientId);
 			return true;
 
-		// filehandle has expired
+		// FileHandle has expired
 		case NFS4ERR_FHEXPIRED:
-			if (fInfo.UpdateFileHandles(fFilesystem) == B_OK)
+			if (fInfo.UpdateFileHandles(fFileSystem) == B_OK)
 				return true;
 			return false;
 
 		// filesystem has been moved
 		case NFS4ERR_LEASE_MOVED:
 		case NFS4ERR_MOVED:
-			fFilesystem->Migrate(serv);
+			fFileSystem->Migrate(serv);
 			return true;
 
 		// lease has expired
 		case NFS4ERR_EXPIRED:
 			if (cookie != NULL) {
-				fFilesystem->NFSServer()->ClientId(cookie->fClientId, true);
+				fFileSystem->NFSServer()->ClientId(cookie->fClientId, true);
 				return true;
 			}
 			return false;
