@@ -21,6 +21,7 @@
 #include <team.h>
 #include <thread.h>
 #include <vm/vm.h>
+#include <vm/VMAddressSpace.h>
 
 #include <boot/kernel_args.h>
 
@@ -129,12 +130,66 @@ print_iframe(struct iframe* frame)
 }
 
 
+static status_t
+lookup_symbol(addr_t address, addr_t* _baseAddress, const char** _symbolName,
+	const char** _imageName, bool* _exactMatch)
+{
+	status_t status = B_ENTRY_NOT_FOUND;
+
+	if (IS_KERNEL_ADDRESS(address)) {
+		status = elf_debug_lookup_symbol_address(address, _baseAddress,
+			_symbolName, _imageName, _exactMatch);
+	}
+
+	return status;
+}
+
+
+static void
+print_stack_frame(addr_t rip, addr_t rbp, addr_t nextRbp, int32 callIndex)
+{
+	const char* symbol;
+	const char* image;
+	addr_t baseAddress;
+	bool exactMatch;
+	status_t status;
+	addr_t diff;
+
+	diff = nextRbp - rbp;
+
+	// kernel space/user space switch
+	if (diff & (1L << 63))
+		diff = 0;
+
+	status = lookup_symbol(rip, &baseAddress, &symbol, &image, &exactMatch);
+
+	kprintf("%2d %016lx (+%4ld) %016lx   ", callIndex, rbp, diff, rip);
+
+	if (status == B_OK) {
+		if (symbol != NULL)
+			kprintf("<%s>:%s%s", image, symbol, exactMatch ? "" : " (nearest)");
+		else
+			kprintf("<%s@%p>:unknown", image, (void*)baseAddress);
+
+		kprintf(" + 0x%04lx\n", rip - baseAddress);
+	} else {
+		VMArea *area = VMAddressSpace::Kernel()->LookupArea(rip);
+		if (area != NULL) {
+			kprintf("%d:%s@%p + %#lx\n", area->id, area->name,
+				(void*)area->Base(), rip - area->Base());
+		} else
+			kprintf("\n");
+	}
+}
+
+
 void
 arch_debug_stack_trace(void)
 {
 	addr_t rbp = x86_read_ebp();
 
-	kprintf("frame                       caller\n");
+	kprintf("frame                       caller             <image>:function"
+		" + offset\n");
 
 	for (int32 callIndex = 0;; callIndex++) {
 		if (rbp == 0)
@@ -143,8 +198,7 @@ arch_debug_stack_trace(void)
 		if (is_iframe(rbp)) {
 			struct iframe* frame = (struct iframe*)rbp;
 			print_iframe(frame);
-			kprintf("%2d %016lx (+%4ld) %016lx\n", callIndex, rbp,
-				frame->rbp - rbp, frame->rip);
+			print_stack_frame(frame->rip, rbp, frame->rbp, callIndex);
 
 			rbp = frame->rbp;
 		} else {
@@ -152,10 +206,9 @@ arch_debug_stack_trace(void)
 			if (frame->return_address == 0)
 				break;
 
-			kprintf("%2d %016lx (+%4ld) %016lx\n", callIndex, rbp,
-				(frame->previous != NULL)
-					? (addr_t)frame->previous - rbp : 0,
-				frame->return_address);
+			print_stack_frame(frame->return_address, rbp,
+				(frame->previous != NULL) ? (addr_t)frame->previous : rbp,
+				callIndex);
 
 			rbp = (addr_t)frame->previous;
 		}
