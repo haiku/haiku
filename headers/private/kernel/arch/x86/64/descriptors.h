@@ -76,9 +76,9 @@ struct gdt_idt_descr {
 
 struct tss {
 	uint32 _reserved1;
-	uint64 rsp0;
-	uint64 rsp1;
-	uint64 rsp2;
+	uint64 sp0;
+	uint64 sp1;
+	uint64 sp2;
 	uint64 _reserved2;
 	uint64 ist1;
 	uint64 ist2;

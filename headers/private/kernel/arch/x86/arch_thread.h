@@ -16,35 +16,40 @@
 extern "C" {
 #endif
 
+struct sigaction;
+
 
 struct iframe* x86_get_user_iframe(void);
 struct iframe* x86_get_current_iframe(void);
 struct iframe* x86_get_thread_user_iframe(Thread* thread);
 
-uint32 x86_next_page_directory(Thread* from, Thread* to);
+phys_addr_t x86_next_page_directory(Thread* from, Thread* to);
+void x86_initial_return_to_userland(Thread* thread, struct iframe* iframe);
+uint8* x86_get_signal_stack(Thread* thread, struct iframe* frame,
+	struct sigaction* action);
 
 void x86_restart_syscall(struct iframe* frame);
-
 void x86_set_tls_context(Thread* thread);
 
 
 #ifdef __x86_64__
 
-// TODO
-
-extern Thread* gCurrentThread;
 
 static inline Thread*
 arch_thread_get_current_thread(void)
 {
-	return gCurrentThread;
+	addr_t addr;
+	__asm__("mov %%gs:0, %0" : "=r"(addr));
+	return (Thread*)addr;
 }
 
 
 static inline void
 arch_thread_set_current_thread(Thread* t)
 {
-	gCurrentThread = t;
+	// Point GS segment base at thread architecture data.
+	t->arch_info.thread = t;
+	x86_write_msr(IA32_MSR_GS_BASE, (addr_t)&t->arch_info);
 }
 
 

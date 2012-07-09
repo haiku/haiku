@@ -24,6 +24,7 @@ if $(TARGET_ARCH) = x86_64 {
 		int.cpp
 		interrupts.S
 		stubs.cpp
+		thread.cpp
 
 		# paging
 		x86_physical_page_mapper_mapped.cpp
@@ -43,12 +44,12 @@ if $(TARGET_ARCH) = x86_64 {
 		cpuid.S
 		int.cpp
 		interrupts.S
+		thread.cpp
 
 		arch_commpage.cpp
 		arch_debug.cpp
 		arch_real_time_clock.cpp
 		arch_smp.cpp
-		arch_thread.cpp
 		arch_system_info.cpp
 		arch_user_debugger.cpp
 		apm.cpp
@@ -83,6 +84,7 @@ local archGenericSources =
 	arch_elf.cpp
 	arch_int.cpp
 	arch_platform.cpp
+	arch_thread.cpp
 	arch_timer.cpp
 	arch_vm.cpp
 	arch_vm_translation_map.cpp

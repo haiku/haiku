@@ -75,20 +75,20 @@ get_iframe_registers(struct iframe *frame, debug_cpu_state *cpuState)
 	cpuState->fs = frame->fs;
 	cpuState->es = frame->es;
 	cpuState->ds = frame->ds;
-	cpuState->edi = frame->edi;
-	cpuState->esi = frame->esi;
-	cpuState->ebp = frame->ebp;
-	cpuState->esp = frame->esp;
-	cpuState->ebx = frame->ebx;
+	cpuState->edi = frame->di;
+	cpuState->esi = frame->si;
+	cpuState->ebp = frame->bp;
+	cpuState->esp = frame->sp;
+	cpuState->ebx = frame->bx;
 	cpuState->edx = frame->orig_edx;
-	cpuState->ecx = frame->ecx;
+	cpuState->ecx = frame->cx;
 	cpuState->eax = frame->orig_eax;
 	cpuState->vector = frame->vector;
 	cpuState->error_code = frame->error_code;
-	cpuState->eip = frame->eip;
+	cpuState->eip = frame->ip;
 	cpuState->cs = frame->cs;
 	cpuState->eflags = frame->flags;
-	cpuState->user_esp = frame->user_esp;
+	cpuState->user_esp = frame->user_sp;
 	cpuState->user_ss = frame->user_ss;
 }
 
@@ -606,21 +606,21 @@ arch_set_debug_cpu_state(const debug_cpu_state *cpuState)
 //		frame->fs = cpuState->fs;
 //		frame->es = cpuState->es;
 //		frame->ds = cpuState->ds;
-		frame->edi = cpuState->edi;
-		frame->esi = cpuState->esi;
-		frame->ebp = cpuState->ebp;
+		frame->di = cpuState->edi;
+		frame->si = cpuState->esi;
+		frame->bp = cpuState->ebp;
 //		frame->esp = cpuState->esp;
-		frame->ebx = cpuState->ebx;
-		frame->edx = cpuState->edx;
-		frame->ecx = cpuState->ecx;
-		frame->eax = cpuState->eax;
+		frame->bx = cpuState->ebx;
+		frame->dx = cpuState->edx;
+		frame->cx = cpuState->ecx;
+		frame->ax = cpuState->eax;
 //		frame->vector = cpuState->vector;
 //		frame->error_code = cpuState->error_code;
-		frame->eip = cpuState->eip;
+		frame->ip = cpuState->eip;
 //		frame->cs = cpuState->cs;
 		frame->flags = (frame->flags & ~X86_EFLAGS_USER_SETTABLE_FLAGS)
 			| (cpuState->eflags & X86_EFLAGS_USER_SETTABLE_FLAGS);
-		frame->user_esp = cpuState->user_esp;
+		frame->user_sp = cpuState->user_esp;
 //		frame->user_ss = cpuState->user_ss;
 	}
 }
@@ -977,7 +977,7 @@ x86_handle_breakpoint_exception(struct iframe *frame)
 	TRACE(("x86_handle_breakpoint_exception()\n"));
 
 	// reset eip to the int3 instruction
-	frame->eip--;
+	frame->ip--;
 
 	if (!IFRAME_IS_USER(frame)) {
 		panic("breakpoint exception in kernel mode");

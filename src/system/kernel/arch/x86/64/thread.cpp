@@ -1,0 +1,196 @@
+/*
+ * Copyright 2012, Alex Smith, alex@alex-smith.me.uk.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
+
+
+#include <arch/thread.h>
+
+#include <string.h>
+
+#include <arch_cpu.h>
+#include <cpu.h>
+#include <debug.h>
+#include <kernel.h>
+#include <ksignal.h>
+#include <int.h>
+#include <team.h>
+#include <thread.h>
+#include <tls.h>
+#include <vm/vm_types.h>
+#include <vm/VMAddressSpace.h>
+
+#include "paging/X86PagingStructures.h"
+#include "paging/X86VMTranslationMap.h"
+
+
+//#define TRACE_ARCH_THREAD
+#ifdef TRACE_ARCH_THREAD
+#	define TRACE(x...) dprintf(x)
+#else
+#	define TRACE(x...) ;
+#endif
+
+
+extern "C" void x86_64_thread_entry();
+
+// Initial thread saved state.
+static arch_thread sInitialState;
+
+
+void
+x86_set_tls_context(Thread* thread)
+{
+
+}
+
+
+//	#pragma mark -
+
+
+status_t
+arch_thread_init(kernel_args* args)
+{
+	// Save one global valid FPU state; it will be copied in the arch dependent
+	// part of each new thread.
+	asm volatile ("clts; fninit; fnclex;");
+	x86_fxsave(sInitialState.fpu_state);
+
+	return B_OK;
+}
+
+
+status_t
+arch_thread_init_thread_struct(Thread* thread)
+{
+	// Copy the initial saved FPU state to the new thread.
+	memcpy(&thread->arch_info, &sInitialState, sizeof(arch_thread));
+
+	// Initialise the current thread pointer.
+	thread->arch_info.thread = thread;
+
+	return B_OK;
+}
+
+
+/*!	Prepares the given thread's kernel stack for executing its entry function.
+
+	\param thread The thread.
+	\param stack The usable bottom of the thread's kernel stack.
+	\param stackTop The usable top of the thread's kernel stack.
+	\param function The entry function the thread shall execute.
+	\param data Pointer to be passed to the entry function.
+*/
+void
+arch_thread_init_kthread_stack(Thread* thread, void* _stack, void* _stackTop,
+	void (*function)(void*), const void* data)
+{
+	addr_t* stackTop = (addr_t*)_stackTop;
+
+	TRACE("arch_thread_init_kthread_stack: stack top %p, function %p, data: "
+		"%p\n", _stackTop, function, data);
+
+	// x86_64 uses registers for argument passing, first argument in RDI,
+	// however we don't save RDI on every context switch (there is no need
+	// for us to: it is not callee-save, and only contains the first argument
+	// to x86_context_switch). However, this presents a problem since we
+	// cannot store the argument for the entry function here. Therefore, we
+	// save the function address in R14 and the argument in R15 (which are
+	// restored), and then set up the stack to initially call a wrapper
+	// function which passes the argument correctly.
+
+	*--stackTop = 0;							// Dummy return address.
+	*--stackTop = (addr_t)x86_64_thread_entry;	// Wrapper function.
+	*--stackTop = (addr_t)data;					// R15: argument.
+	*--stackTop = (addr_t)function;				// R14: entry function.
+	*--stackTop = 0;							// R13.
+	*--stackTop = 0;							// R12.
+	*--stackTop = 0;							// RBP.
+	*--stackTop = 0;							// RBX.
+
+	// Save the stack position.
+	thread->arch_info.current_stack = stackTop;
+}
+
+
+/*!	Initializes the user-space TLS local storage pointer in
+	the thread structure, and the reserved TLS slots.
+	
+	Is called from _create_user_thread_kentry().
+*/
+status_t
+arch_thread_init_tls(Thread* thread)
+{
+	dprintf("arch_thread_init_tls: TODO\n");
+	return B_OK;
+}
+
+
+void
+arch_thread_dump_info(void* info)
+{
+	arch_thread* thread = (arch_thread*)info;
+
+	kprintf("\trsp: %p\n", thread->current_stack);
+	kprintf("\tsyscall_rsp: %p\n", thread->syscall_rsp);
+	kprintf("\tuser_rsp: %p\n", thread->user_rsp);
+	kprintf("\tfpu_state at %p\n", thread->fpu_state);
+}
+
+
+/*!	Sets up initial thread context and enters user space
+*/
+status_t
+arch_thread_enter_userspace(Thread* thread, addr_t entry, void* args1,
+	void* args2)
+{
+	panic("arch_thread_enter_userspace: TODO\n");
+	return B_ERROR;
+}
+
+
+/*!	Sets up the user iframe for invoking a signal handler.
+
+	The function fills in the remaining fields of the given \a signalFrameData,
+	copies it to the thread's userland stack (the one on which the signal shall
+	be handled), and sets up the user iframe so that when returning to userland
+	a wrapper function is executed that calls the user-defined signal handler.
+	When the signal handler returns, the wrapper function shall call the
+	"restore signal frame" syscall with the (possibly modified) signal frame
+	data.
+
+	The following fields of the \a signalFrameData structure still need to be
+	filled in:
+	- \c context.uc_stack: The stack currently used by the thread.
+	- \c context.uc_mcontext: The current userland state of the registers.
+	- \c syscall_restart_return_value: Architecture specific use. On x86 the
+		value of eax and edx which are overwritten by the syscall return value.
+
+	Furthermore the function needs to set \c thread->user_signal_context to the
+	userland pointer to the \c ucontext_t on the user stack.
+
+	\param thread The current thread.
+	\param action The signal action specified for the signal to be handled.
+	\param signalFrameData A partially initialized structure of all the data
+		that need to be copied to userland.
+	\return \c B_OK on success, another error code, if something goes wrong.
+*/
+status_t
+arch_setup_signal_frame(Thread* thread, struct sigaction* action,
+	struct signal_frame_data* signalFrameData)
+{
+	panic("arch_setup_signal_frame: TODO\n");
+	return B_ERROR;
+}
+
+
+int64
+arch_restore_signal_frame(struct signal_frame_data* signalFrameData)
+{
+	panic("arch_restore_signal_frame: TODO\n");
+	return B_ERROR;
+}

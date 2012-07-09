@@ -24,10 +24,6 @@
 #endif	// !_ASSEMBLER
 
 
-#undef PAUSE
-#define PAUSE() asm volatile ("pause;")
-
-
 // MSR registers (possibly Intel specific)
 #define IA32_MSR_TSC					0x10
 #define IA32_MSR_APIC_BASE				0x1b
@@ -39,6 +35,14 @@
 #define IA32_MSR_MTRR_DEFAULT_TYPE		0x2ff
 #define IA32_MSR_MTRR_PHYSICAL_BASE_0	0x200
 #define IA32_MSR_MTRR_PHYSICAL_MASK_0	0x201
+
+// x86_64 MSRs.
+#define IA32_MSR_STAR					0xc0000081
+#define IA32_MSR_LSTAR					0xc0000082
+#define IA32_MSR_FMASK					0xc0000084
+#define IA32_MSR_FS_BASE				0xc0000100
+#define IA32_MSR_GS_BASE				0xc0000101
+#define IA32_MSR_KERNEL_GS_BASE			0xc0000102
 
 // K8 MSR registers
 #define K8_MSR_IPM						0xc0010055
@@ -268,6 +272,9 @@ typedef struct arch_cpu_info {
 } arch_cpu_info;
 
 
+#undef PAUSE
+#define PAUSE() asm volatile ("pause;")
+
 #define nop() __asm__ ("nop"::)
 
 #define x86_read_cr0() ({ \
@@ -379,11 +386,13 @@ void x86_context_switch(struct arch_thread* oldState,
 	struct arch_thread* newState);
 void x86_userspace_thread_exit(void);
 void x86_end_userspace_thread_exit(void);
-void x86_swap_pgdir(uint32 newPageDir);
+void x86_swap_pgdir(addr_t newPageDir);
+void x86_set_tss_and_kstack(addr_t kstack);
 void x86_fxsave(void* fpuState);
 void x86_fxrstor(const void* fpuState);
+void x86_noop_swap(void* oldFpuState, const void* newFpuState);
 void x86_fxsave_swap(void* oldFpuState, const void* newFpuState);
-addr_t x86_read_ebp();
+addr_t x86_get_stack_frame();
 uint64 x86_read_msr(uint32 registerNumber);
 void x86_write_msr(uint32 registerNumber, uint64 value);
 void* x86_get_idt(int32 cpu);
@@ -401,10 +410,8 @@ void x86_page_fault_exception_double_fault(struct iframe* frame);
 
 #ifndef __x86_64__
 
-void x86_set_tss_and_kstack(addr_t kstack);
 void x86_fnsave(void* fpuState);
 void x86_frstor(const void* fpuState);
-void x86_noop_swap(void* oldFpuState, const void* newFpuState);
 void x86_fnsave_swap(void* oldFpuState, const void* newFpuState);
 void x86_set_task_gate(int32 cpu, int32 n, int32 segment);
 int32 x86_double_fault_get_cpu(void);

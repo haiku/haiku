@@ -15,25 +15,25 @@ struct iframe {
 	uint32 fs;
 	uint32 es;
 	uint32 ds;
-	uint32 edi;
-	uint32 esi;
-	uint32 ebp;
-	uint32 esp;
-	uint32 ebx;
-	uint32 edx;
-	uint32 ecx;
-	uint32 eax;
+	uint32 di;
+	uint32 si;
+	uint32 bp;
+	uint32 sp;
+	uint32 bx;
+	uint32 dx;
+	uint32 cx;
+	uint32 ax;
 	uint32 orig_eax;
 	uint32 orig_edx;
 	uint32 vector;
 	uint32 error_code;
-	uint32 eip;
+	uint32 ip;
 	uint32 cs;
 	uint32 flags;
 
-	// user_esp and user_ss are only present when the iframe is a userland
+	// user_sp and user_ss are only present when the iframe is a userland
 	// iframe (IFRAME_IS_USER()). A kernel iframe is shorter.
-	uint32 user_esp;
+	uint32 user_sp;
 	uint32 user_ss;
 };
 

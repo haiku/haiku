@@ -91,10 +91,8 @@ extern "C" void x86_reboot(void);
 	// from arch.S
 
 void (*gCpuIdleFunc)(void);
-#ifndef __x86_64__
 void (*gX86SwapFPUFunc)(void* oldState, const void* newState) = x86_noop_swap;
 bool gHasSSE = false;
-#endif
 
 static uint32 sCpuRendezvous;
 static uint32 sCpuRendezvous2;
@@ -343,10 +341,8 @@ x86_init_fpu(void)
 	x86_write_cr4(x86_read_cr4() | CR4_OS_FXSR | CR4_OS_XMM_EXCEPTION);
 	x86_write_cr0(x86_read_cr0() & ~(CR0_FPU_EMULATION | CR0_MONITOR_FPU));
 
-#ifndef __x86_64__
 	gX86SwapFPUFunc = x86_fxsave_swap;
 	gHasSSE = true;
-#endif
 }
 
 
@@ -708,7 +704,7 @@ x86_get_double_fault_stack(int32 cpu, size_t* _size)
 int32
 x86_double_fault_get_cpu(void)
 {
-	uint32 stack = x86_read_ebp();
+	uint32 stack = x86_get_stack_frame();
 	return (stack - (uint32)sDoubleFaultStacks) / kDoubleFaultStackSize;
 }
 #endif
@@ -973,13 +969,11 @@ arch_cpu_init_post_modules(kernel_args* args)
 }
 
 
-#ifndef __x86_64__
 void
 x86_set_tss_and_kstack(addr_t kstack)
 {
 	get_cpu_struct()->arch.tss.sp0 = kstack;
 }
-#endif
 
 
 void

@@ -161,7 +161,7 @@ invalid_exception(struct iframe* frame)
 	char name[32];
 	panic("unhandled trap 0x%lx (%s) at ip 0x%lx, thread %ld!\n",
 		frame->vector, exception_name(frame->vector, name, sizeof(name)),
-		frame->eip, thread ? thread->id : -1);
+		frame->ip, thread ? thread->id : -1);
 }
 
 
@@ -194,14 +194,14 @@ unexpected_exception(struct iframe* frame)
 			type = B_DIVIDE_ERROR;
 			signalNumber = SIGFPE;
 			signalCode = FPE_INTDIV;
-			signalAddress = frame->eip;
+			signalAddress = frame->ip;
 			break;
 
 		case 4:		// Overflow Exception (#OF)
 			type = B_OVERFLOW_EXCEPTION;
 			signalNumber = SIGFPE;
 			signalCode = FPE_INTOVF;
-			signalAddress = frame->eip;
+			signalAddress = frame->ip;
 			break;
 
 		case 5:		// BOUND Range Exceeded Exception (#BR)
@@ -214,14 +214,14 @@ unexpected_exception(struct iframe* frame)
 			type = B_INVALID_OPCODE_EXCEPTION;
 			signalNumber = SIGILL;
 			signalCode = ILL_ILLOPC;
-			signalAddress = frame->eip;
+			signalAddress = frame->ip;
 			break;
 
 		case 13: 	// General Protection Exception (#GP)
 			type = B_GENERAL_PROTECTION_FAULT;
 			signalNumber = SIGILL;
 			signalCode = ILL_PRVOPC;	// or ILL_PRVREG
-			signalAddress = frame->eip;
+			signalAddress = frame->ip;
 			break;
 
 		case 16: 	// x87 FPU Floating-Point Error (#MF)
@@ -230,7 +230,7 @@ unexpected_exception(struct iframe* frame)
 			signalCode = FPE_FLTDIV;
 				// TODO: Determine the correct cause via the FPU status
 				// register!
-			signalAddress = frame->eip;
+			signalAddress = frame->ip;
 			break;
 
 		case 17: 	// Alignment Check Exception (#AC)
@@ -247,7 +247,7 @@ unexpected_exception(struct iframe* frame)
 			signalNumber = SIGFPE;
 			signalCode = FPE_FLTDIV;
 				// TODO: Determine the correct cause via the MXCSR register!
-			signalAddress = frame->eip;
+			signalAddress = frame->ip;
 			break;
 
 		default:
@@ -300,15 +300,15 @@ x86_double_fault_exception(struct iframe* frame)
 	frame->ds = tss->ds;
 	frame->fs = tss->fs;
 	frame->gs = tss->gs;
-	frame->eip = tss->eip;
-	frame->ebp = tss->ebp;
-	frame->esp = tss->esp;
-	frame->eax = tss->eax;
-	frame->ebx = tss->ebx;
-	frame->ecx = tss->ecx;
-	frame->edx = tss->edx;
-	frame->esi = tss->esi;
-	frame->edi = tss->edi;
+	frame->ip = tss->eip;
+	frame->bp = tss->ebp;
+	frame->sp = tss->esp;
+	frame->ax = tss->eax;
+	frame->bx = tss->ebx;
+	frame->cx = tss->ecx;
+	frame->dx = tss->edx;
+	frame->si = tss->esi;
+	frame->di = tss->edi;
 	frame->flags = tss->eflags;
 
 	// Use a special handler for page faults which avoids the triple fault
@@ -328,10 +328,10 @@ x86_page_fault_exception_double_fault(struct iframe* frame)
 	cpu_ent& cpu = gCPU[x86_double_fault_get_cpu()];
 	addr_t faultHandler = cpu.fault_handler;
 	if (faultHandler != 0) {
-		debug_set_page_fault_info(cr2, frame->eip,
+		debug_set_page_fault_info(cr2, frame->ip,
 			(frame->error_code & 0x2) != 0 ? DEBUG_PAGE_FAULT_WRITE : 0);
-		frame->eip = faultHandler;
-		frame->ebp = cpu.fault_handler_stack_pointer;
+		frame->ip = faultHandler;
+		frame->bp = cpu.fault_handler_stack_pointer;
 		return;
 	}
 
@@ -340,7 +340,7 @@ x86_page_fault_exception_double_fault(struct iframe* frame)
 	// print the info we've got and enter an infinite loop.
 	kprintf("Page fault in double fault debugger without fault handler! "
 		"Touching address %p from eip %p. Entering infinite loop...\n",
-		(void*)cr2, (void*)frame->eip);
+		(void*)cr2, (void*)frame->ip);
 
 	while (true);
 }
@@ -359,28 +359,28 @@ page_fault_exception(struct iframe* frame)
 		if (thread != NULL) {
 			cpu_ent* cpu = &gCPU[smp_get_current_cpu()];
 			if (cpu->fault_handler != 0) {
-				debug_set_page_fault_info(cr2, frame->eip,
+				debug_set_page_fault_info(cr2, frame->ip,
 					(frame->error_code & 0x2) != 0
 						? DEBUG_PAGE_FAULT_WRITE : 0);
-				frame->eip = cpu->fault_handler;
-				frame->ebp = cpu->fault_handler_stack_pointer;
+				frame->ip = cpu->fault_handler;
+				frame->bp = cpu->fault_handler_stack_pointer;
 				return;
 			}
 
 			if (thread->fault_handler != 0) {
 				kprintf("ERROR: thread::fault_handler used in kernel "
 					"debugger!\n");
-				debug_set_page_fault_info(cr2, frame->eip,
+				debug_set_page_fault_info(cr2, frame->ip,
 					(frame->error_code & 0x2) != 0
 						? DEBUG_PAGE_FAULT_WRITE : 0);
-				frame->eip = thread->fault_handler;
+				frame->ip = thread->fault_handler;
 				return;
 			}
 		}
 
 		// otherwise, not really
 		panic("page fault in debugger without fault handler! Touching "
-			"address %p from eip %p\n", (void *)cr2, (void *)frame->eip);
+			"address %p from eip %p\n", (void *)cr2, (void *)frame->ip);
 		return;
 	} else if ((frame->flags & 0x200) == 0) {
 		// interrupts disabled
@@ -390,8 +390,8 @@ page_fault_exception(struct iframe* frame)
 		// disabled, which in most cases is a bug. We should add some thread
 		// flag allowing to explicitly indicate that this handling is desired.
 		if (thread && thread->fault_handler != 0) {
-			if (frame->eip != thread->fault_handler) {
-				frame->eip = thread->fault_handler;
+			if (frame->ip != thread->fault_handler) {
+				frame->ip = thread->fault_handler;
 				return;
 			}
 
@@ -399,30 +399,30 @@ page_fault_exception(struct iframe* frame)
 			// certain infinite loop.
 			panic("page fault, interrupts disabled, fault handler loop. "
 				"Touching address %p from eip %p\n", (void*)cr2,
-				(void*)frame->eip);
+				(void*)frame->ip);
 		}
 
 		// If we are not running the kernel startup the page fault was not
 		// allowed to happen and we must panic.
 		panic("page fault, but interrupts were disabled. Touching address "
-			"%p from eip %p\n", (void *)cr2, (void *)frame->eip);
+			"%p from eip %p\n", (void *)cr2, (void *)frame->ip);
 		return;
 	} else if (thread != NULL && thread->page_faults_allowed < 1) {
 		panic("page fault not allowed at this place. Touching address "
-			"%p from eip %p\n", (void *)cr2, (void *)frame->eip);
+			"%p from eip %p\n", (void *)cr2, (void *)frame->ip);
 		return;
 	}
 
 	enable_interrupts();
 
-	vm_page_fault(cr2, frame->eip,
+	vm_page_fault(cr2, frame->ip,
 		(frame->error_code & 0x2) != 0,	// write access
 		(frame->error_code & 0x4) != 0,	// userland
 		&newip);
 	if (newip != 0) {
 		// the page fault handler wants us to modify the iframe to set the
 		// IP the cpu will return to to be this ip
-		frame->eip = newip;
+		frame->ip = newip;
 	}
 }
 

@@ -18,8 +18,11 @@ void	x86_initialize_commpage_syscall();
 static inline void
 x86_set_syscall_stack(addr_t stackTop)
 {
+	// TODO: x86_64
+#ifndef __x86_64__
 	if (gX86SetSyscallStack != NULL)
 		gX86SetSyscallStack(stackTop);
+#endif
 }
 
 

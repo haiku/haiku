@@ -45,20 +45,23 @@ dummy()
 	DEFINE_OFFSET_MACRO(THREAD, Thread, fault_handler);
 
 #ifdef __x86_64__
-	// struct iframe
-	DEFINE_SIZEOF_MACRO(IFRAME, iframe);
-	DEFINE_OFFSET_MACRO(IFRAME, iframe, vector);
-#else
+	// struct arch_thread
+	DEFINE_OFFSET_MACRO(ARCH_THREAD, arch_thread, syscall_rsp);
+	DEFINE_OFFSET_MACRO(ARCH_THREAD, arch_thread, user_rsp);
+	DEFINE_OFFSET_MACRO(ARCH_THREAD, arch_thread, current_stack);
+#endif
+
 	// struct iframe
 	DEFINE_SIZEOF_MACRO(IFRAME, iframe);
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, cs);
-	DEFINE_OFFSET_MACRO(IFRAME, iframe, eax);
-	DEFINE_OFFSET_MACRO(IFRAME, iframe, edx);
-	DEFINE_OFFSET_MACRO(IFRAME, iframe, orig_eax);
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, ax);
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, dx);
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, vector);
-	DEFINE_OFFSET_MACRO(IFRAME, iframe, eip);
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, ip);
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, flags);
-	DEFINE_OFFSET_MACRO(IFRAME, iframe, user_esp);
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, user_sp);
+#ifdef __INTEL__
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, orig_eax);
 
 	// struct vm86_iframe
 	DEFINE_SIZEOF_MACRO(VM86_IFRAME, vm86_iframe);

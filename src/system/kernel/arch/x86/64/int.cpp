@@ -72,7 +72,7 @@ invalid_exception(iframe* frame)
 	char name[32];
 	panic("unhandled trap %#lx (%s) at ip %#lx\n",
 		frame->vector, exception_name(frame->vector, name, sizeof(name)),
-		frame->rip);
+		frame->ip);
 }
 
 
@@ -82,7 +82,7 @@ fatal_exception(iframe* frame)
 	char name[32];
 	panic("fatal exception %#lx (%s) at ip %#lx, error code %#lx\n",
 		frame->vector, exception_name(frame->vector, name, sizeof(name)),
-		frame->rip, frame->error_code);
+		frame->ip, frame->error_code);
 }
 
 
@@ -92,7 +92,7 @@ unexpected_exception(iframe* frame)
 	char name[32];
 	panic("fatal exception %#lx (%s) at ip %#lx, error code %#lx\n",
 		frame->vector, exception_name(frame->vector, name, sizeof(name)),
-		frame->rip, frame->error_code);
+		frame->ip, frame->error_code);
 }
 
 
@@ -102,7 +102,7 @@ page_fault_exception(iframe* frame)
 	addr_t cr2 = x86_read_cr2();
 
 	panic("page fault exception at ip %#lx on %#lx, error code %#lx\n",
-		frame->rip, cr2, frame->error_code);
+		frame->ip, cr2, frame->error_code);
 }
 
 

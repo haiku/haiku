@@ -111,6 +111,7 @@ SYMBOL(isr_array):
 		.Lintr = .Lintr+1
 	.endr
 
+
 // Common interrupt handling code.
 FUNCTION(int_bottom):
 	// If coming from user-mode, need to load the kernel GS segment base.
@@ -141,3 +142,21 @@ FUNCTION(int_bottom):
 	jz		2f
 	swapgs
 2:	iretq
+FUNCTION_END(int_bottom)
+
+
+/*!	\fn void x86_return_to_userland(iframe* frame)
+	\brief Returns to the userland environment given by \a frame.
+
+	Before returning to userland all potentially necessary kernel exit work is
+	done.
+
+	\a frame must point to a location somewhere on the caller's stack (e.g. a
+	local variable).
+	The function must be called with interrupts disabled.
+
+	\param frame The iframe defining the userland environment.
+*/
+FUNCTION(x86_return_to_userland):
+	ud2a
+FUNCTION_END(x86_return_to_userland)

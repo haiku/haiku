@@ -71,11 +71,11 @@ FUNCTION(x86_fxsave_swap):
 	ret
 FUNCTION_END(x86_fxsave_swap)
 
-/* uint32 x86_read_ebp(); */
-FUNCTION(x86_read_ebp):
+/* uint32 x86_get_stack_frame(); */
+FUNCTION(x86_get_stack_frame):
 	movl	%ebp, %eax
 	ret
-FUNCTION_END(x86_read_ebp)
+FUNCTION_END(x86_get_stack_frame)
 
 /* uint64 x86_read_msr(uint32 register); */
 FUNCTION(x86_read_msr):

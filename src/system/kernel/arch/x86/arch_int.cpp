@@ -89,6 +89,7 @@ hardware_interrupt(struct iframe* frame)
 		callback(data);
 	}
 #else
+	return;
 	panic("implement me");
 #endif
 }
@@ -159,7 +160,7 @@ arch_int_init_io(kernel_args* args)
 	ioapic_init(args);
 	msi_init();
 #else
-	panic("implement me");
+	//panic("implement me");
 #endif
 	return B_OK;
 }

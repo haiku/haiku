@@ -37,10 +37,6 @@
 #include <arch/elf.h>
 
 
-// temporary
-Thread* gCurrentThread = NULL;
-
-
 status_t
 arch_commpage_init(void)
 {
@@ -106,23 +102,23 @@ print_iframe(struct iframe* frame)
 	bool isUser = IFRAME_IS_USER(frame);
 
 	kprintf("%s iframe at %p (end = %p)\n", isUser ? "user" : "kernel", frame,
-		isUser ? (uint64*)(frame + 1) : &frame->user_rsp);
+		isUser ? (uint64*)(frame + 1) : &frame->user_sp);
 
-	kprintf(" rax 0x%-16lx    rbx 0x%-16lx    rcx 0x%lx\n", frame->rax,
-		frame->rbx, frame->rcx);
-	kprintf(" rdx 0x%-16lx    rsi 0x%-16lx    rdi 0x%lx\n", frame->rdx,
-		frame->rsi, frame->rdi);
-	kprintf(" rbp 0x%-16lx     r8 0x%-16lx     r9 0x%lx\n", frame->rbp,
+	kprintf(" rax 0x%-16lx    rbx 0x%-16lx    rcx 0x%lx\n", frame->ax,
+		frame->bx, frame->cx);
+	kprintf(" rdx 0x%-16lx    rsi 0x%-16lx    rdi 0x%lx\n", frame->dx,
+		frame->si, frame->di);
+	kprintf(" rbp 0x%-16lx     r8 0x%-16lx     r9 0x%lx\n", frame->bp,
 		frame->r8, frame->r9);
 	kprintf(" r10 0x%-16lx    r11 0x%-16lx    r12 0x%lx\n", frame->r10,
 		frame->r11, frame->r12);
 	kprintf(" r13 0x%-16lx    r14 0x%-16lx    r15 0x%lx\n", frame->r13,
 		frame->r14, frame->r15);
-	kprintf(" rip 0x%-16lx rflags 0x%-16lx", frame->rip, frame->flags);
+	kprintf(" rip 0x%-16lx rflags 0x%-16lx", frame->ip, frame->flags);
 
 	if (isUser) {
 		// from user space
-		kprintf("user rsp 0x%lx", frame->user_rsp);
+		kprintf("user rsp 0x%lx", frame->user_sp);
 	}
 	kprintf("\n");
 	kprintf(" vector: 0x%lx, error code: 0x%lx\n", frame->vector,
@@ -186,7 +182,7 @@ print_stack_frame(addr_t rip, addr_t rbp, addr_t nextRbp, int32 callIndex)
 void
 arch_debug_stack_trace(void)
 {
-	addr_t rbp = x86_read_ebp();
+	addr_t rbp = x86_get_stack_frame();
 
 	kprintf("frame                       caller             <image>:function"
 		" + offset\n");
@@ -198,9 +194,9 @@ arch_debug_stack_trace(void)
 		if (is_iframe(rbp)) {
 			struct iframe* frame = (struct iframe*)rbp;
 			print_iframe(frame);
-			print_stack_frame(frame->rip, rbp, frame->rbp, callIndex);
+			print_stack_frame(frame->ip, rbp, frame->bp, callIndex);
 
-			rbp = frame->rbp;
+			rbp = frame->bp;
 		} else {
 			stack_frame* frame = (stack_frame*)rbp;
 			if (frame->return_address == 0)
@@ -371,100 +367,6 @@ status_t
 arch_system_info_init(struct kernel_args *args)
 {
 	return B_OK;
-}
-
-
-status_t
-arch_thread_init(struct kernel_args *args)
-{
-	return B_ERROR;
-}
-
-
-status_t
-arch_team_init_team_struct(Team *p, bool kernel)
-{
-	return B_OK;
-}
-
-
-status_t
-arch_thread_init_thread_struct(Thread *thread)
-{
-	return B_ERROR;
-}
-
-
-void
-arch_thread_init_kthread_stack(Thread* thread, void* _stack, void* _stackTop,
-	void (*function)(void*), const void* data)
-{
-
-}
-
-
-status_t
-arch_thread_init_tls(Thread *thread)
-{
-	return B_ERROR;
-}
-
-
-void
-arch_thread_context_switch(Thread *from, Thread *to)
-{
-
-}
-
-
-void
-arch_thread_dump_info(void *info)
-{
-
-}
-
-
-status_t
-arch_thread_enter_userspace(Thread* thread, addr_t entry, void* args1,
-	void* args2)
-{
-	return B_ERROR;
-}
-
-
-bool
-arch_on_signal_stack(Thread *thread)
-{
-	return false;
-}
-
-
-status_t
-arch_setup_signal_frame(Thread* thread, struct sigaction* action,
-	struct signal_frame_data* signalFrameData)
-{
-	return B_ERROR;
-}
-
-
-int64
-arch_restore_signal_frame(struct signal_frame_data* signalFrameData)
-{
-	return 0;
-}
-
-
-void
-arch_store_fork_frame(struct arch_fork_arg *arg)
-{
-
-}
-
-
-void
-arch_restore_fork_frame(struct arch_fork_arg* arg)
-{
-
 }
 
 

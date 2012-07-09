@@ -16,21 +16,21 @@ struct iframe {
 	uint64 r10;
 	uint64 r9;
 	uint64 r8;
-	uint64 rbp;
-	uint64 rsi;
-	uint64 rdi;
-	uint64 rdx;
-	uint64 rcx;
-	uint64 rbx;
-	uint64 rax;
+	uint64 bp;
+	uint64 si;
+	uint64 di;
+	uint64 dx;
+	uint64 cx;
+	uint64 bx;
+	uint64 ax;
 	uint64 vector;
 	uint64 error_code;
-	uint64 rip;
+	uint64 ip;
 	uint64 cs;
 	uint64 flags;
 
 	// Only present when the iframe is a userland iframe (IFRAME_IS_USER()).
-	uint64 user_rsp;
+	uint64 user_sp;
 	uint64 user_ss;
 } _PACKED;
 
