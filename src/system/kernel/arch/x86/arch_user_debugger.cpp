@@ -516,7 +516,7 @@ debugger_single_step(int argc, char** argv)
 	// TODO: Since we need an iframe, this doesn't work when KDL wasn't entered
 	// via an exception.
 
-	struct iframe* frame = i386_get_current_iframe();
+	struct iframe* frame = x86_get_current_iframe();
 	if (frame == NULL) {
 		kprintf("Failed to get the current iframe!\n");
 		return 0;
@@ -568,7 +568,7 @@ arch_destroy_thread_debug_info(struct arch_thread_debug_info *info)
 void
 arch_update_thread_single_step()
 {
-	if (struct iframe* frame = i386_get_user_iframe()) {
+	if (struct iframe* frame = x86_get_user_iframe()) {
 		Thread* thread = thread_get_current_thread();
 
 		// set/clear TF in EFLAGS depending on whether single stepping is
@@ -584,7 +584,7 @@ arch_update_thread_single_step()
 void
 arch_set_debug_cpu_state(const debug_cpu_state *cpuState)
 {
-	if (struct iframe *frame = i386_get_user_iframe()) {
+	if (struct iframe *frame = x86_get_user_iframe()) {
 		// For the floating point state to be correct the calling function must
 		// not use these registers (not even indirectly).
 		if (gHasSSE) {
@@ -629,7 +629,7 @@ arch_set_debug_cpu_state(const debug_cpu_state *cpuState)
 void
 arch_get_debug_cpu_state(debug_cpu_state *cpuState)
 {
-	if (struct iframe *frame = i386_get_user_iframe()) {
+	if (struct iframe *frame = x86_get_user_iframe()) {
 		// For the floating point state to be correct the calling function must
 		// not use these registers (not even indirectly).
 		if (gHasSSE) {
@@ -852,7 +852,7 @@ x86_handle_debug_exception(struct iframe *frame)
 		asm("movl %%dr7, %0" : "=r"(dr7));
 	}
 
-	TRACE(("i386_handle_debug_exception(): DR6: %lx, DR7: %lx\n", dr6, dr7));
+	TRACE(("x86_handle_debug_exception(): DR6: %lx, DR7: %lx\n", dr6, dr7));
 
 	// check, which exception condition applies
 	if (dr6 & X86_DR6_BREAKPOINT_MASK) {
@@ -885,7 +885,7 @@ x86_handle_debug_exception(struct iframe *frame)
 		// Occurs only, if GD in DR7 is set (which we don't do) and someone
 		// tries to write to the debug registers.
 		if (IFRAME_IS_USER(frame)) {
-			dprintf("i386_handle_debug_exception(): ignoring spurious general "
+			dprintf("x86_handle_debug_exception(): ignoring spurious general "
 				"detect exception\n");
 
 			enable_interrupts();
@@ -908,7 +908,7 @@ x86_handle_debug_exception(struct iframe *frame)
 			// kernel entry or whether this is genuine kernel single-stepping.
 			bool inKernel = true;
 			if (thread->team != team_get_kernel_team()
-				&& i386_get_user_iframe() == NULL) {
+				&& x86_get_user_iframe() == NULL) {
 				// TODO: This is not yet fully correct, since a newly created
 				// thread that hasn't entered userland yet also has this
 				// property.
@@ -948,7 +948,7 @@ x86_handle_debug_exception(struct iframe *frame)
 		// task switch
 		// Occurs only, if T in EFLAGS is set (which we don't do).
 		if (IFRAME_IS_USER(frame)) {
-			dprintf("i386_handle_debug_exception(): ignoring spurious task switch "
+			dprintf("x86_handle_debug_exception(): ignoring spurious task switch "
 				"exception\n");
 
 			enable_interrupts();
@@ -956,7 +956,7 @@ x86_handle_debug_exception(struct iframe *frame)
 			panic("spurious task switch exception in kernel mode");
 	} else {
 		if (IFRAME_IS_USER(frame)) {
-			TRACE(("i386_handle_debug_exception(): ignoring spurious debug "
+			TRACE(("x86_handle_debug_exception(): ignoring spurious debug "
 				"exception (no condition recognized)\n"));
 
 			enable_interrupts();
@@ -974,7 +974,7 @@ x86_handle_debug_exception(struct iframe *frame)
 void
 x86_handle_breakpoint_exception(struct iframe *frame)
 {
-	TRACE(("i386_handle_breakpoint_exception()\n"));
+	TRACE(("x86_handle_breakpoint_exception()\n"));
 
 	// reset eip to the int3 instruction
 	frame->eip--;

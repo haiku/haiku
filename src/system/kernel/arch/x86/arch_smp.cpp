@@ -39,7 +39,7 @@ static uint32 sAPICVersions[B_MAX_CPU_COUNT];
 
 
 static int32
-i386_ici_interrupt(void *data)
+x86_ici_interrupt(void *data)
 {
 	// genuine inter-cpu interrupt
 	int cpu = smp_get_current_cpu();
@@ -49,7 +49,7 @@ i386_ici_interrupt(void *data)
 
 
 static int32
-i386_spurious_interrupt(void *data)
+x86_spurious_interrupt(void *data)
 {
 	// spurious interrupt
 	TRACE(("spurious interrupt on cpu %ld\n", smp_get_current_cpu()));
@@ -62,7 +62,7 @@ i386_spurious_interrupt(void *data)
 
 
 static int32
-i386_smp_error_interrupt(void *data)
+x86_smp_error_interrupt(void *data)
 {
 	// smp error interrupt
 	TRACE(("smp error interrupt on cpu %ld\n", smp_get_current_cpu()));
@@ -91,9 +91,9 @@ arch_smp_init(kernel_args *args)
 	if (args->num_cpus > 1) {
 		// I/O interrupts start at ARCH_INTERRUPT_BASE, so all interrupts are shifted
 		reserve_io_interrupt_vectors(3, 0xfd - ARCH_INTERRUPT_BASE);
-		install_io_interrupt_handler(0xfd - ARCH_INTERRUPT_BASE, &i386_ici_interrupt, NULL, B_NO_LOCK_VECTOR);
-		install_io_interrupt_handler(0xfe - ARCH_INTERRUPT_BASE, &i386_smp_error_interrupt, NULL, B_NO_LOCK_VECTOR);
-		install_io_interrupt_handler(0xff - ARCH_INTERRUPT_BASE, &i386_spurious_interrupt, NULL, B_NO_LOCK_VECTOR);
+		install_io_interrupt_handler(0xfd - ARCH_INTERRUPT_BASE, &x86_ici_interrupt, NULL, B_NO_LOCK_VECTOR);
+		install_io_interrupt_handler(0xfe - ARCH_INTERRUPT_BASE, &x86_smp_error_interrupt, NULL, B_NO_LOCK_VECTOR);
+		install_io_interrupt_handler(0xff - ARCH_INTERRUPT_BASE, &x86_spurious_interrupt, NULL, B_NO_LOCK_VECTOR);
 	}
 
 	return B_OK;

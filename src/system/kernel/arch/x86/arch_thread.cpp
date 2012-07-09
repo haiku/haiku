@@ -67,7 +67,6 @@ class RestartSyscall : public AbstractTraceEntry {
 
 
 // from arch_interrupts.S
-extern "C" void i386_stack_init(struct farcall *interrupt_stack_offset);
 extern "C" void x86_return_to_userland(iframe* frame);
 
 // from arch_cpu.c
@@ -160,7 +159,7 @@ initial_return_to_userland(Thread* thread, iframe* frame)
 	// disable interrupts and set up CPU specifics for this thread
 	disable_interrupts();
 
-	i386_set_tss_and_kstack(thread->kernel_stack_top);
+	x86_set_tss_and_kstack(thread->kernel_stack_top);
 	x86_set_tls_context(thread);
 	x86_set_syscall_stack(thread->kernel_stack_top);
 
@@ -177,7 +176,7 @@ initial_return_to_userland(Thread* thread, iframe* frame)
 			the thread is a kernel thread).
 */
 struct iframe *
-i386_get_user_iframe(void)
+x86_get_user_iframe(void)
 {
 	struct iframe* frame = get_current_iframe();
 
@@ -191,11 +190,11 @@ i386_get_user_iframe(void)
 }
 
 
-/*!	\brief Like i386_get_user_iframe(), just for the given thread.
+/*!	\brief Like x86_get_user_iframe(), just for the given thread.
 	The thread must not be running and the threads spinlock must be held.
 */
 struct iframe *
-i386_get_thread_user_iframe(Thread *thread)
+x86_get_thread_user_iframe(Thread *thread)
 {
 	if (thread->state == B_THREAD_RUNNING)
 		return NULL;
@@ -217,7 +216,7 @@ i386_get_thread_user_iframe(Thread *thread)
 
 
 struct iframe *
-i386_get_current_iframe(void)
+x86_get_current_iframe(void)
 {
 	return get_current_iframe();
 }
@@ -367,7 +366,7 @@ arch_thread_init_tls(Thread *thread)
 void
 arch_thread_context_switch(Thread *from, Thread *to)
 {
-	i386_set_tss_and_kstack(to->kernel_stack_top);
+	x86_set_tss_and_kstack(to->kernel_stack_top);
 	x86_set_syscall_stack(to->kernel_stack_top);
 
 	// set TLS GDT entry to the current thread - since this action is

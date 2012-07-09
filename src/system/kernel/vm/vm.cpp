@@ -4088,7 +4088,7 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 					#endif
 				} frame;
 #		ifdef __INTEL__
-				struct iframe* iframe = i386_get_user_iframe();
+				struct iframe* iframe = x86_get_user_iframe();
 				if (iframe == NULL)
 					panic("iframe is NULL!");
 

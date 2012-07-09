@@ -503,7 +503,7 @@ static struct iframe*
 get_current_iframe(Thread* thread)
 {
 	if (thread == thread_get_current_thread())
-		return i386_get_current_iframe();
+		return x86_get_current_iframe();
 
 	addr_t ebp = thread->arch_info.current_stack.esp[2];
 		// NOTE: This doesn't work, if the thread is running (on another CPU).

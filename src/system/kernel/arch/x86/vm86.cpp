@@ -512,7 +512,7 @@ emulate(struct vm86_state *state)
 static bool
 vm86_fault_callback(addr_t address, addr_t faultAddress, bool isWrite)
 {
-	struct iframe *frame = i386_get_user_iframe();
+	struct iframe *frame = x86_get_user_iframe();
 
 	TRACE("Unhandled fault at %#" B_PRIxADDR " touching %#" B_PRIxADDR
 		"while %s\n", faultAddress, address, isWrite ? "writing" : "reading");

@@ -401,7 +401,7 @@ void x86_page_fault_exception_double_fault(struct iframe* frame);
 
 #ifndef __x86_64__
 
-void i386_set_tss_and_kstack(addr_t kstack);
+void x86_set_tss_and_kstack(addr_t kstack);
 void x86_fnsave(void* fpuState);
 void x86_frstor(const void* fpuState);
 void x86_noop_swap(void* oldFpuState, const void* newFpuState);

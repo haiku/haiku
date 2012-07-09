@@ -974,7 +974,7 @@ arch_cpu_init_post_modules(kernel_args* args)
 
 #ifndef __x86_64__
 void
-i386_set_tss_and_kstack(addr_t kstack)
+x86_set_tss_and_kstack(addr_t kstack)
 {
 	get_cpu_struct()->arch.tss.sp0 = kstack;
 }

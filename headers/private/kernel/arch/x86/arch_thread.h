@@ -17,9 +17,9 @@ extern "C" {
 #endif
 
 
-struct iframe* i386_get_user_iframe(void);
-struct iframe* i386_get_current_iframe(void);
-struct iframe* i386_get_thread_user_iframe(Thread* thread);
+struct iframe* x86_get_user_iframe(void);
+struct iframe* x86_get_current_iframe(void);
+struct iframe* x86_get_thread_user_iframe(Thread* thread);
 
 uint32 x86_next_page_directory(Thread* from, Thread* to);
 

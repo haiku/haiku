@@ -884,7 +884,7 @@ FUNCTION(x86_vm86_enter):
 	pushl	THREAD_kernel_stack_top(%edi)
 	movl	%esp, THREAD_kernel_stack_top(%edi)
 	pushl	%esp
-	call	i386_set_tss_and_kstack
+	call	x86_set_tss_and_kstack
 
 	// go to vm86 mode
 	cli
@@ -916,7 +916,7 @@ FUNCTION(x86_vm86_return):
 	movl	%dr3, %edi
 	movl	%eax, THREAD_kernel_stack_top(%edi)
 	pushl	%eax
-	call	i386_set_tss_and_kstack
+	call	x86_set_tss_and_kstack
 	addl	$4, %esp
 
 	// restore registers
