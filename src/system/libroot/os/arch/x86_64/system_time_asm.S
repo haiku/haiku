@@ -28,7 +28,10 @@ FUNCTION_END(__x86_setup_system_time)
 
 /* int64 system_time(); */
 FUNCTION(system_time):
+	// (rdtsc * cv_factor) >> 32.
+
 	movq	cv_factor, %rcx
+	shl		$32, %rcx
 
 	// Load 64-bit TSC into %eax (low), %edx (high).
 	rdtsc
@@ -40,17 +43,19 @@ FUNCTION(system_time):
 	// Multiply by conversion factor, result in %rax (low), %rdx (high).
 	mulq	%rcx
 
-	// Shift the result right by 32 bits.
-	shr		$32, %rax
-	shl		$32, %rdx
-	orq		%rdx, %rax
+	// Conversion factor preshifted by 32, whole result in high.
+	movq	%rdx, %rax
 	ret
 FUNCTION_END(system_time)
 
 
 /* int64 system_time_nsecs(); */
 FUNCTION(system_time_nsecs):
-	// Same algorithm as system_time(), just with a different factor.
+	// Same algorithm as system_time(), but with a different factor.
+	// (rdtsc * cv_factor_nsecs) >> 32.
+	// Cannot pre-shift the factor here, otherwise we may lose the upper
+	// 32 bits.
+
 	movq	cv_factor_nsecs, %rcx
 
 	// Load 64-bit TSC into %eax (low), %edx (high).

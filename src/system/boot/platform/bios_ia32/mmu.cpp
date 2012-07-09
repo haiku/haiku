@@ -522,7 +522,7 @@ mmu_get_virtual_mapping(addr_t virtualAddress, addr_t *_physicalAddress)
 	if ((tableEntry & (1 << 0)) == 0)
 		return false;
 
-	*_physicalAddress = tableEntry & 0xFFFFF000;
+	*_physicalAddress = tableEntry & 0xfffff000;
 	return true;
 }
 
