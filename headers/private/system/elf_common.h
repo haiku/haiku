@@ -263,4 +263,39 @@
 #define VER_FLG_WEAK	0x2		/* weak version identifier */
 
 
+// Determine the correct ELF types to use for the architecture
+
+#if B_HAIKU_64_BIT
+#	define _ELF_TYPE(type)	Elf64_##type
+#else
+#	define _ELF_TYPE(type)	Elf32_##type
+#endif
+#define DEFINE_ELF_TYPE(type, name) \
+	struct _ELF_TYPE(type); \
+	typedef _ELF_TYPE(type) name
+
+DEFINE_ELF_TYPE(Ehdr, elf_ehdr);
+DEFINE_ELF_TYPE(Phdr, elf_phdr);
+DEFINE_ELF_TYPE(Shdr, elf_shdr);
+DEFINE_ELF_TYPE(Sym, elf_sym);
+DEFINE_ELF_TYPE(Dyn, elf_dyn);
+DEFINE_ELF_TYPE(Rel, elf_rel);
+DEFINE_ELF_TYPE(Rela, elf_rela);
+DEFINE_ELF_TYPE(Verdef, elf_verdef);
+DEFINE_ELF_TYPE(Verdaux, elf_verdaux);
+DEFINE_ELF_TYPE(Verneed, elf_verneed);
+DEFINE_ELF_TYPE(Vernaux, elf_vernaux);
+
+#undef DEFINE_ELF_TYPE
+#undef _ELF_TYPE
+
+typedef uint16 elf_versym;
+
+#if B_HAIKU_64_BIT
+#	define ELF_CLASS	ELFCLASS64
+#else
+#	define ELF_CLASS	ELFCLASS32
+#endif
+
+
 #endif	/* _ELF_COMMON_H_ */

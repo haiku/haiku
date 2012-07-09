@@ -3543,13 +3543,7 @@ vm_free_unused_boot_loader_range(addr_t start, addr_t size)
 static void
 create_preloaded_image_areas(struct preloaded_image* _image)
 {
-	// TODO: Make this a typedef somewhere. Will be done when I implement
-	// ELF loading for x86_64.
-#ifdef B_HAIKU_64_BIT
-	preloaded_elf64_image* image = static_cast<preloaded_elf64_image*>(_image);
-#else
-	preloaded_elf32_image* image = static_cast<preloaded_elf32_image*>(_image);
-#endif
+	preloaded_elf_image* image = static_cast<preloaded_elf_image*>(_image);
 	char name[B_OS_NAME_LENGTH];
 	void* address;
 	int32 length;

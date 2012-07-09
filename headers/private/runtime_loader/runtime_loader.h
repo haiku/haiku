@@ -152,12 +152,12 @@ typedef struct image_queue_t {
 #define	IMAGE_FLAG_RTLD_MASK			0x03
 			// RTLD_{LAZY,NOW} | RTLD_{LOCAL,GLOBAL}
 
-#define STRING(image, offset) ((char *)(&(image)->strtab[(offset)]))
+#define STRING(image, offset) ((char*)(&(image)->strtab[(offset)]))
 #define SYMNAME(image, sym) STRING(image, (sym)->st_name)
 #define SYMBOL(image, num) (&(image)->syms[num])
 #define HASHTABSIZE(image) ((image)->symhash[0])
-#define HASHBUCKETS(image) ((unsigned int *)&(image)->symhash[2])
-#define HASHCHAINS(image) ((unsigned int *)&(image)->symhash[2+HASHTABSIZE(image)])
+#define HASHBUCKETS(image) ((unsigned int*)&(image)->symhash[2])
+#define HASHCHAINS(image) ((unsigned int*)&(image)->symhash[2+HASHTABSIZE(image)])
 
 
 // The name of the area the runtime loader creates for debugging purposes.

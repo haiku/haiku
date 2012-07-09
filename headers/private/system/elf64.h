@@ -91,6 +91,7 @@ struct Elf64_Sym {
 #ifdef __cplusplus
 	uint8 Bind() const;
 	uint8 Type() const;
+	void SetInfo(uint8 bind, uint8 type);
 #endif
 };
 
@@ -218,6 +219,13 @@ inline uint8
 Elf64_Sym::Type() const
 {
 	return ELF64_ST_TYPE(st_info);
+}
+
+
+inline void
+Elf64_Sym::SetInfo(uint8 bind, uint8 type)
+{
+	st_info = ELF64_ST_INFO(bind, type);
 }
 
 

@@ -186,34 +186,33 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 #endif	// !__x86_64__ || _BOOT_MODE
 
 
-//#if defined(__x86_64__) || defined(_BOOT_MODE)
-#ifdef _BOOT_MODE
+#if defined(__x86_64__) || defined(_BOOT_MODE)
 
 
 #ifdef _BOOT_MODE
 status_t
 boot_arch_elf_relocate_rel(preloaded_elf64_image* image, Elf64_Rel* rel,
 	int relLength)
-//#else
-//int
-//arch_elf_relocate_rel(struct elf_image_info *image,
-//	struct elf_image_info *resolveImage, struct Elf32_Rel *rel, int relLength)
-//#endif
+#else
+int
+arch_elf_relocate_rel(struct elf_image_info *image,
+	struct elf_image_info *resolveImage, Elf64_Rel *rel, int relLength)
+#endif
 {
 	dprintf("arch_elf_relocate_rel: not supported on x86_64\n");
 	return B_ERROR;
 }
 
 
-//#ifdef _BOOT_MODE
+#ifdef _BOOT_MODE
 status_t
 boot_arch_elf_relocate_rela(preloaded_elf64_image* image, Elf64_Rela* rel,
 	int relLength)
-//#else
-//int
-//arch_elf_relocate_rela(struct elf_image_info *image,
-//	struct elf_image_info *resolveImage, struct Elf32_Rela *rel, int relLength)
-//#endif
+#else
+int
+arch_elf_relocate_rela(struct elf_image_info *image,
+	struct elf_image_info *resolveImage, Elf64_Rela *rel, int relLength)
+#endif
 {
 	for (int i = 0; i < relLength / (int)sizeof(Elf64_Rela); i++) {
 		int type = ELF64_R_TYPE(rel[i].r_info);
@@ -225,11 +224,11 @@ boot_arch_elf_relocate_rela(preloaded_elf64_image* image, Elf64_Rela* rel,
 			Elf64_Sym* symbol = SYMBOL(image, symIndex);
 
 			status_t status;
-//#ifdef _BOOT_MODE
+#ifdef _BOOT_MODE
 			status = boot_elf_resolve_symbol(image, symbol, &symAddr);
-//#else
-//			status = elf_resolve_symbol(image, symbol, resolveImage, &S);
-//#endif
+#else
+			status = elf_resolve_symbol(image, symbol, resolveImage, &symAddr);
+#endif
 			if (status < B_OK)
 				return status;
 		}
@@ -269,7 +268,6 @@ boot_arch_elf_relocate_rela(preloaded_elf64_image* image, Elf64_Rela* rel,
 
 	return B_OK;
 }
-#endif
 
 
 #endif	// __x86_64__ || _BOOT_MODE

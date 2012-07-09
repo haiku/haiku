@@ -89,6 +89,7 @@ struct Elf32_Sym {
 #ifdef __cplusplus
 	uint8 Bind() const;
 	uint8 Type() const;
+	void SetInfo(uint8 bind, uint8 type);
 #endif
 };
 
@@ -218,6 +219,11 @@ Elf32_Sym::Type() const
 	return ELF32_ST_TYPE(st_info);
 }
 
+inline void
+Elf32_Sym::SetInfo(uint8 bind, uint8 type)
+{
+	st_info = ELF32_ST_INFO(bind, type);
+}
 
 inline uint8
 Elf32_Rel::SymbolIndex() const

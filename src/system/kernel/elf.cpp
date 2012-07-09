@@ -9,7 +9,6 @@
 
 /*!	Contains the ELF loader */
 
-#ifndef __x86_64__
 
 #include <elf.h>
 
@@ -67,8 +66,8 @@ static mutex sImageLoadMutex = MUTEX_INITIALIZER("kimages_load_lock");
 static bool sInitialized = false;
 
 
-static struct Elf32_Sym *elf_find_symbol(struct elf_image_info *image,
-	const char *name, const elf_version_info *version, bool lookupDefault);
+static elf_sym *elf_find_symbol(struct elf_image_info *image, const char *name,
+	const elf_version_info *version, bool lookupDefault);
 
 
 /*! Calculates hash for an image using its ID */
@@ -76,7 +75,7 @@ static uint32
 image_hash(void *_image, const void *_key, uint32 range)
 {
 	struct elf_image_info *image = (struct elf_image_info *)_image;
-	image_id id = (image_id)_key;
+	image_id id = (image_id)(addr_t)_key;
 
 	if (image != NULL)
 		return image->id % range;
@@ -90,7 +89,7 @@ static int
 image_compare(void *_image, const void *_key)
 {
 	struct elf_image_info *image = (struct elf_image_info *)_image;
-	image_id id = (image_id)_key;
+	image_id id = (image_id)(addr_t)_key;
 
 	return id - image->id;
 }
@@ -124,11 +123,11 @@ register_elf_image(struct elf_image_info *image)
 
 		// Haiku API version
 		imageInfo.api_version = 0;
-		struct Elf32_Sym* symbol = elf_find_symbol(image,
+		elf_sym* symbol = elf_find_symbol(image,
 			B_SHARED_OBJECT_HAIKU_VERSION_VARIABLE_NAME, NULL, true);
 		if (symbol != NULL && symbol->st_shndx != SHN_UNDEF
 			&& symbol->st_value > 0
-			&& ELF32_ST_TYPE(symbol->st_info) == STT_OBJECT
+			&& symbol->Type() == STT_OBJECT
 			&& symbol->st_size >= sizeof(uint32)) {
 			addr_t symbolAddress = symbol->st_value + image->text_region.delta;
 			if (symbolAddress >= image->text_region.start
@@ -144,7 +143,7 @@ register_elf_image(struct elf_image_info *image)
 			B_SHARED_OBJECT_HAIKU_ABI_VARIABLE_NAME, NULL, true);
 		if (symbol != NULL && symbol->st_shndx != SHN_UNDEF
 			&& symbol->st_value > 0
-			&& ELF32_ST_TYPE(symbol->st_info) == STT_OBJECT
+			&& symbol->Type() == STT_OBJECT
 			&& symbol->st_size >= sizeof(uint32)) {
 			addr_t symbolAddress = symbol->st_value + image->text_region.delta;
 			if (symbolAddress >= image->text_region.start
@@ -234,7 +233,7 @@ dump_address_info(int argc, char **argv)
 static struct elf_image_info *
 find_image(image_id id)
 {
-	return (elf_image_info *)hash_lookup(sImagesHash, (void *)id);
+	return (elf_image_info *)hash_lookup(sImagesHash, (void *)(addr_t)id);
 }
 
 
@@ -316,9 +315,9 @@ elf_hash(const char *name)
 
 
 static const char *
-get_symbol_type_string(struct Elf32_Sym *symbol)
+get_symbol_type_string(elf_sym *symbol)
 {
-	switch (ELF32_ST_TYPE(symbol->st_info)) {
+	switch (symbol->Type()) {
 		case STT_FUNC:
 			return "func";
 		case STT_OBJECT:
@@ -332,9 +331,9 @@ get_symbol_type_string(struct Elf32_Sym *symbol)
 
 
 static const char *
-get_symbol_bind_string(struct Elf32_Sym *symbol)
+get_symbol_bind_string(elf_sym *symbol)
 {
-	switch (ELF32_ST_BIND(symbol->st_info)) {
+	switch (symbol->Bind()) {
 		case STB_LOCAL:
 			return "loc ";
 		case STB_GLOBAL:
@@ -368,7 +367,7 @@ dump_symbol(int argc, char **argv)
 		if (image->num_debug_symbols > 0) {
 			// search extended debug symbol table (contains static symbols)
 			for (uint32 i = 0; i < image->num_debug_symbols; i++) {
-				struct Elf32_Sym *symbol = &image->debug_symbols[i];
+				elf_sym *symbol = &image->debug_symbols[i];
 				const char *name = image->debug_string_table + symbol->st_name;
 
 				if (symbol->st_value > 0 && strstr(name, pattern) != 0) {
@@ -383,7 +382,7 @@ dump_symbol(int argc, char **argv)
 			for (uint32 i = 0; i < HASHTABSIZE(image); i++) {
 				for (uint32 j = HASHBUCKETS(image)[i]; j != STN_UNDEF;
 						j = HASHCHAINS(image)[j]) {
-					struct Elf32_Sym *symbol = &image->syms[j];
+					elf_sym *symbol = &image->syms[j];
 					const char *name = SYMNAME(image, symbol);
 
 					if (symbol->st_value > 0 && strstr(name, pattern) != 0) {
@@ -415,7 +414,7 @@ dump_symbols(int argc, char **argv)
 	// if the argument looks like a hex number, treat it as such
 	if (argc > 1) {
 		if (isdigit(argv[1][0])) {
-			uint32 num = strtoul(argv[1], NULL, 0);
+			addr_t num = strtoul(argv[1], NULL, 0);
 
 			if (IS_KERNEL_ADDRESS(num)) {
 				// find image at address
@@ -430,12 +429,16 @@ dump_symbols(int argc, char **argv)
 				}
 				hash_close(sImagesHash, &iterator, false);
 
-				if (image == NULL)
-					kprintf("No image covers 0x%lx in the kernel!\n", num);
+				if (image == NULL) {
+					kprintf("No image covers %#" B_PRIxADDR " in the kernel!\n",
+						num);
+				}
 			} else {
 				image = (elf_image_info *)hash_lookup(sImagesHash, (void *)num);
-				if (image == NULL)
-					kprintf("image 0x%lx doesn't exist in the kernel!\n", num);
+				if (image == NULL) {
+					kprintf("image %#" B_PRIxADDR " doesn't exist in the "
+						"kernel!\n", num);
+				}
 			}
 		} else {
 			// look for image by name
@@ -460,13 +463,13 @@ dump_symbols(int argc, char **argv)
 
 	// dump symbols
 
-	kprintf("Symbols of image %ld \"%s\":\nAddress  Type       Size Name\n",
-		image->id, image->name);
+	kprintf("Symbols of image %" B_PRId32 "\"%s\":\n"
+		"Address  Type       Size Name\n", image->id, image->name);
 
 	if (image->num_debug_symbols > 0) {
 		// search extended debug symbol table (contains static symbols)
 		for (i = 0; i < image->num_debug_symbols; i++) {
-			struct Elf32_Sym *symbol = &image->debug_symbols[i];
+			elf_sym *symbol = &image->debug_symbols[i];
 
 			if (symbol->st_value == 0 || symbol->st_size
 					>= image->text_region.size + image->data_region.size)
@@ -484,7 +487,7 @@ dump_symbols(int argc, char **argv)
 		for (i = 0; i < HASHTABSIZE(image); i++) {
 			for (j = HASHBUCKETS(image)[i]; j != STN_UNDEF;
 					j = HASHCHAINS(image)[j]) {
-				struct Elf32_Sym *symbol = &image->syms[j];
+				elf_sym *symbol = &image->syms[j];
 
 				if (symbol->st_value == 0 || symbol->st_size
 						>= image->text_region.size + image->data_region.size)
@@ -506,9 +509,9 @@ dump_symbols(int argc, char **argv)
 static void
 dump_elf_region(struct elf_region *region, const char *name)
 {
-	kprintf("   %s.id %ld\n", name, region->id);
-	kprintf("   %s.start 0x%lx\n", name, region->start);
-	kprintf("   %s.size 0x%lx\n", name, region->size);
+	kprintf("   %s.id %" B_PRId32 "\n", name, region->id);
+	kprintf("   %s.start %#" B_PRIxADDR "\n", name, region->start);
+	kprintf("   %s.size %#" B_PRIxSIZE "\n", name, region->size);
 	kprintf("   %s.delta %ld\n", name, region->delta);
 }
 
@@ -518,22 +521,22 @@ dump_image_info(struct elf_image_info *image)
 {
 	kprintf("elf_image_info at %p:\n", image);
 	kprintf(" next %p\n", image->next);
-	kprintf(" id %ld\n", image->id);
+	kprintf(" id %" B_PRId32 "\n", image->id);
 	dump_elf_region(&image->text_region, "text");
 	dump_elf_region(&image->data_region, "data");
-	kprintf(" dynamic_section 0x%lx\n", image->dynamic_section);
+	kprintf(" dynamic_section %#" B_PRIxADDR "\n", image->dynamic_section);
 	kprintf(" needed %p\n", image->needed);
 	kprintf(" symhash %p\n", image->symhash);
 	kprintf(" syms %p\n", image->syms);
 	kprintf(" strtab %p\n", image->strtab);
 	kprintf(" rel %p\n", image->rel);
-	kprintf(" rel_len 0x%x\n", image->rel_len);
+	kprintf(" rel_len %#x\n", image->rel_len);
 	kprintf(" rela %p\n", image->rela);
-	kprintf(" rela_len 0x%x\n", image->rela_len);
+	kprintf(" rela_len %#x\n", image->rela_len);
 	kprintf(" pltrel %p\n", image->pltrel);
-	kprintf(" pltrel_len 0x%x\n", image->pltrel_len);
+	kprintf(" pltrel_len %#x\n", image->pltrel_len);
 
-	kprintf(" debug_symbols %p (%ld)\n",
+	kprintf(" debug_symbols %p (%" B_PRIu32 ")\n",
 		image->debug_symbols, image->num_debug_symbols);
 }
 
@@ -546,16 +549,17 @@ dump_image(int argc, char **argv)
 
 	// if the argument looks like a hex number, treat it as such
 	if (argc > 1) {
-		uint32 num = strtoul(argv[1], NULL, 0);
+		addr_t num = strtoul(argv[1], NULL, 0);
 
 		if (IS_KERNEL_ADDRESS(num)) {
 			// semi-hack
 			dump_image_info((struct elf_image_info *)num);
 		} else {
 			image = (elf_image_info *)hash_lookup(sImagesHash, (void *)num);
-			if (image == NULL)
-				kprintf("image 0x%lx doesn't exist in the kernel!\n", num);
-			else
+			if (image == NULL) {
+				kprintf("image %#" B_PRIxADDR " doesn't exist in the kernel!\n",
+					num);
+			} else
 				dump_image_info(image);
 		}
 		return 0;
@@ -567,7 +571,7 @@ dump_image(int argc, char **argv)
 
 	while ((image = (elf_image_info *)hash_next(sImagesHash, &iterator))
 			!= NULL) {
-		kprintf("%p (%ld) %s\n", image, image->id, image->name);
+		kprintf("%p (%" B_PRId32 ") %s\n", image, image->id, image->name);
 	}
 
 	hash_close(sImagesHash, &iterator, false);
@@ -578,7 +582,7 @@ dump_image(int argc, char **argv)
 // Currently unused
 #if 0
 static
-void dump_symbol(struct elf_image_info *image, struct Elf32_Sym *sym)
+void dump_symbol(struct elf_image_info *image, elf_sym *sym)
 {
 
 	kprintf("symbol at %p, in image %p\n", sym, image);
@@ -593,25 +597,24 @@ void dump_symbol(struct elf_image_info *image, struct Elf32_Sym *sym)
 #endif
 
 
-static struct Elf32_Sym *
+static elf_sym *
 elf_find_symbol(struct elf_image_info *image, const char *name,
 	const elf_version_info *lookupVersion, bool lookupDefault)
 {
 	if (image->dynamic_section == 0 || HASHTABSIZE(image) == 0)
 		return NULL;
 
-	Elf32_Sym* versionedSymbol = NULL;
+	elf_sym* versionedSymbol = NULL;
 	uint32 versionedSymbolCount = 0;
 
 	uint32 hash = elf_hash(name) % HASHTABSIZE(image);
 	for (uint32 i = HASHBUCKETS(image)[hash]; i != STN_UNDEF;
 			i = HASHCHAINS(image)[i]) {
-		Elf32_Sym* symbol = &image->syms[i];
+		elf_sym* symbol = &image->syms[i];
 
 		// consider only symbols with the right name and binding
 		if (symbol->st_shndx == SHN_UNDEF
-			|| ((ELF32_ST_BIND(symbol->st_info) != STB_GLOBAL)
-				&& (ELF32_ST_BIND(symbol->st_info) != STB_WEAK))
+			|| ((symbol->Bind() != STB_GLOBAL) && (symbol->Bind() != STB_WEAK))
 			|| strcmp(SYMNAME(image, symbol), name) != 0) {
 			continue;
 		}
@@ -705,7 +708,7 @@ elf_find_symbol(struct elf_image_info *image, const char *name,
 static status_t
 elf_parse_dynamic_section(struct elf_image_info *image)
 {
-	struct Elf32_Dyn *d;
+	elf_dyn *d;
 	int32 neededOffset = -1;
 
 	TRACE(("top of elf_parse_dynamic_section\n"));
@@ -714,7 +717,7 @@ elf_parse_dynamic_section(struct elf_image_info *image)
 	image->syms = 0;
 	image->strtab = 0;
 
-	d = (struct Elf32_Dyn *)image->dynamic_section;
+	d = (elf_dyn *)image->dynamic_section;
 	if (!d)
 		return B_ERROR;
 
@@ -732,25 +735,25 @@ elf_parse_dynamic_section(struct elf_image_info *image)
 					+ image->text_region.delta);
 				break;
 			case DT_SYMTAB:
-				image->syms = (struct Elf32_Sym *)(d[i].d_un.d_ptr
+				image->syms = (elf_sym *)(d[i].d_un.d_ptr
 					+ image->text_region.delta);
 				break;
 			case DT_REL:
-				image->rel = (struct Elf32_Rel *)(d[i].d_un.d_ptr
+				image->rel = (elf_rel *)(d[i].d_un.d_ptr
 					+ image->text_region.delta);
 				break;
 			case DT_RELSZ:
 				image->rel_len = d[i].d_un.d_val;
 				break;
 			case DT_RELA:
-				image->rela = (struct Elf32_Rela *)(d[i].d_un.d_ptr
+				image->rela = (elf_rela *)(d[i].d_un.d_ptr
 					+ image->text_region.delta);
 				break;
 			case DT_RELASZ:
 				image->rela_len = d[i].d_un.d_val;
 				break;
 			case DT_JMPREL:
-				image->pltrel = (struct Elf32_Rel *)(d[i].d_un.d_ptr
+				image->pltrel = (elf_rel *)(d[i].d_un.d_ptr
 					+ image->text_region.delta);
 				break;
 			case DT_PLTRELSZ:
@@ -760,18 +763,18 @@ elf_parse_dynamic_section(struct elf_image_info *image)
 				image->pltrel_type = d[i].d_un.d_val;
 				break;
 			case DT_VERSYM:
-				image->symbol_versions = (Elf32_Versym*)
+				image->symbol_versions = (elf_versym*)
 					(d[i].d_un.d_ptr + image->text_region.delta);
 				break;
 			case DT_VERDEF:
-				image->version_definitions = (Elf32_Verdef*)
+				image->version_definitions = (elf_verdef*)
 					(d[i].d_un.d_ptr + image->text_region.delta);
 				break;
 			case DT_VERDEFNUM:
 				image->num_version_definitions = d[i].d_un.d_val;
 				break;
 			case DT_VERNEED:
-				image->needed_versions = (Elf32_Verneed*)
+				image->needed_versions = (elf_verneed*)
 					(d[i].d_un.d_ptr + image->text_region.delta);
 				break;
 			case DT_VERNEEDNUM:
@@ -820,7 +823,7 @@ assert_defined_image_version(elf_image_info* dependentImage,
 	}
 
 	// iterate through the defined versions to find the given one
-	Elf32_Verdef* definition = image->version_definitions;
+	elf_verdef* definition = image->version_definitions;
 	for (uint32 i = 0; i < image->num_version_definitions; i++) {
 		uint32 versionIndex = VER_NDX(definition->vd_ndx);
 		elf_version_info& info = image->versions[versionIndex];
@@ -830,7 +833,7 @@ assert_defined_image_version(elf_image_info* dependentImage,
 			return B_OK;
 		}
 
-		definition = (Elf32_Verdef*)
+		definition = (elf_verdef*)
 			((uint8*)definition + definition->vd_next);
 	}
 
@@ -854,7 +857,7 @@ init_image_version_infos(elf_image_info* image)
 	uint32 maxIndex = 0;
 
 	if (image->version_definitions != NULL) {
-		Elf32_Verdef* definition = image->version_definitions;
+		elf_verdef* definition = image->version_definitions;
 		for (uint32 i = 0; i < image->num_version_definitions; i++) {
 			if (definition->vd_version != 1) {
 				dprintf("Unsupported version definition revision: %u\n",
@@ -866,13 +869,13 @@ init_image_version_infos(elf_image_info* image)
 			if (versionIndex > maxIndex)
 				maxIndex = versionIndex;
 
-			definition = (Elf32_Verdef*)
+			definition = (elf_verdef*)
 				((uint8*)definition	+ definition->vd_next);
 		}
 	}
 
 	if (image->needed_versions != NULL) {
-		Elf32_Verneed* needed = image->needed_versions;
+		elf_verneed* needed = image->needed_versions;
 		for (uint32 i = 0; i < image->num_needed_versions; i++) {
 			if (needed->vn_version != 1) {
 				dprintf("Unsupported version needed revision: %u\n",
@@ -880,17 +883,17 @@ init_image_version_infos(elf_image_info* image)
 				return B_BAD_VALUE;
 			}
 
-			Elf32_Vernaux* vernaux
-				= (Elf32_Vernaux*)((uint8*)needed + needed->vn_aux);
+			elf_vernaux* vernaux
+				= (elf_vernaux*)((uint8*)needed + needed->vn_aux);
 			for (uint32 k = 0; k < needed->vn_cnt; k++) {
 				uint32 versionIndex = VER_NDX(vernaux->vna_other);
 				if (versionIndex > maxIndex)
 					maxIndex = versionIndex;
 
-				vernaux = (Elf32_Vernaux*)((uint8*)vernaux + vernaux->vna_next);
+				vernaux = (elf_vernaux*)((uint8*)vernaux + vernaux->vna_next);
 			}
 
-			needed = (Elf32_Verneed*)((uint8*)needed + needed->vn_next);
+			needed = (elf_verneed*)((uint8*)needed + needed->vn_next);
 		}
 	}
 
@@ -910,12 +913,12 @@ init_image_version_infos(elf_image_info* image)
 
 	// version definitions
 	if (image->version_definitions != NULL) {
-		Elf32_Verdef* definition = image->version_definitions;
+		elf_verdef* definition = image->version_definitions;
 		for (uint32 i = 0; i < image->num_version_definitions; i++) {
 			if (definition->vd_cnt > 0
 				&& (definition->vd_flags & VER_FLG_BASE) == 0) {
-				Elf32_Verdaux* verdaux
-					= (Elf32_Verdaux*)((uint8*)definition + definition->vd_aux);
+				elf_verdaux* verdaux
+					= (elf_verdaux*)((uint8*)definition + definition->vd_aux);
 
 				uint32 versionIndex = VER_NDX(definition->vd_ndx);
 				elf_version_info& info = image->versions[versionIndex];
@@ -924,19 +927,19 @@ init_image_version_infos(elf_image_info* image)
 				info.file_name = NULL;
 			}
 
-			definition = (Elf32_Verdef*)
+			definition = (elf_verdef*)
 				((uint8*)definition + definition->vd_next);
 		}
 	}
 
 	// needed versions
 	if (image->needed_versions != NULL) {
-		Elf32_Verneed* needed = image->needed_versions;
+		elf_verneed* needed = image->needed_versions;
 		for (uint32 i = 0; i < image->num_needed_versions; i++) {
 			const char* fileName = STRING(image, needed->vn_file);
 
-			Elf32_Vernaux* vernaux
-				= (Elf32_Vernaux*)((uint8*)needed + needed->vn_aux);
+			elf_vernaux* vernaux
+				= (elf_vernaux*)((uint8*)needed + needed->vn_aux);
 			for (uint32 k = 0; k < needed->vn_cnt; k++) {
 				uint32 versionIndex = VER_NDX(vernaux->vna_other);
 				elf_version_info& info = image->versions[versionIndex];
@@ -944,10 +947,10 @@ init_image_version_infos(elf_image_info* image)
 				info.name = STRING(image, vernaux->vna_name);
 				info.file_name = fileName;
 
-				vernaux = (Elf32_Vernaux*)((uint8*)vernaux + vernaux->vna_next);
+				vernaux = (elf_vernaux*)((uint8*)vernaux + vernaux->vna_next);
 			}
 
-			needed = (Elf32_Verneed*)((uint8*)needed + needed->vn_next);
+			needed = (elf_verneed*)((uint8*)needed + needed->vn_next);
 		}
 	}
 
@@ -961,12 +964,12 @@ check_needed_image_versions(elf_image_info* image)
 	if (image->needed_versions == NULL)
 		return B_OK;
 
-	Elf32_Verneed* needed = image->needed_versions;
+	elf_verneed* needed = image->needed_versions;
 	for (uint32 i = 0; i < image->num_needed_versions; i++) {
 		elf_image_info* dependency = sKernelImage;
 
-		Elf32_Vernaux* vernaux
-			= (Elf32_Vernaux*)((uint8*)needed + needed->vn_aux);
+		elf_vernaux* vernaux
+			= (elf_vernaux*)((uint8*)needed + needed->vn_aux);
 		for (uint32 k = 0; k < needed->vn_cnt; k++) {
 			uint32 versionIndex = VER_NDX(vernaux->vna_other);
 			elf_version_info& info = image->versions[versionIndex];
@@ -976,10 +979,10 @@ check_needed_image_versions(elf_image_info* image)
 			if (error != B_OK)
 				return error;
 
-			vernaux = (Elf32_Vernaux*)((uint8*)vernaux + vernaux->vna_next);
+			vernaux = (elf_vernaux*)((uint8*)vernaux + vernaux->vna_next);
 		}
 
-		needed = (Elf32_Verneed*)((uint8*)needed + needed->vn_next);
+		needed = (elf_verneed*)((uint8*)needed + needed->vn_next);
 	}
 
 	return B_OK;
@@ -990,11 +993,11 @@ check_needed_image_versions(elf_image_info* image)
 	Returns the resolved symbol's address in \a _symbolAddress.
 */
 status_t
-elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *symbol,
+elf_resolve_symbol(struct elf_image_info *image, elf_sym *symbol,
 	struct elf_image_info *sharedImage, addr_t *_symbolAddress)
 {
 	// Local symbols references are always resolved to the given symbol.
-	if (ELF32_ST_BIND(symbol->st_info) == STB_LOCAL) {
+	if (symbol->Bind() == STB_LOCAL) {
 		*_symbolAddress = symbol->st_value + image->text_region.delta;
 		return B_OK;
 	}
@@ -1019,19 +1022,19 @@ elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *symbol,
 
 	// find the symbol
 	elf_image_info* foundImage = firstImage;
-	struct Elf32_Sym* foundSymbol = elf_find_symbol(firstImage, symbolName,
-		versionInfo, false);
+	elf_sym* foundSymbol = elf_find_symbol(firstImage, symbolName, versionInfo,
+		false);
 	if (foundSymbol == NULL
-		|| ELF32_ST_BIND(foundSymbol->st_info) == STB_WEAK) {
+		|| foundSymbol->Bind() == STB_WEAK) {
 		// Not found or found a weak definition -- try to resolve in the other
 		// image.
-		Elf32_Sym* secondSymbol = elf_find_symbol(secondImage, symbolName,
+		elf_sym* secondSymbol = elf_find_symbol(secondImage, symbolName,
 			versionInfo, false);
 		// If we found a symbol -- take it in case we didn't have a symbol
 		// before or the new symbol is not weak.
 		if (secondSymbol != NULL
 			&& (foundSymbol == NULL
-				|| ELF32_ST_BIND(secondSymbol->st_info) != STB_WEAK)) {
+				|| secondSymbol->Bind() != STB_WEAK)) {
 			foundImage = secondImage;
 			foundSymbol = secondSymbol;
 		}
@@ -1039,7 +1042,7 @@ elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *symbol,
 
 	if (foundSymbol == NULL) {
 		// Weak undefined symbols get a value of 0, if unresolved.
-		if (ELF32_ST_BIND(symbol->st_info) == STB_WEAK) {
+		if (symbol->Bind() == STB_WEAK) {
 			*_symbolAddress = 0;
 			return B_OK;
 		}
@@ -1050,12 +1053,11 @@ elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *symbol,
 	}
 
 	// make sure they're the same type
-	if (ELF32_ST_TYPE(symbol->st_info) != ELF32_ST_TYPE(foundSymbol->st_info)) {
+	if (symbol->Type() != foundSymbol->Type()) {
 		dprintf("elf_resolve_symbol: found symbol '%s' in image '%s' "
 			"(requested by image '%s') but wrong type (%d vs. %d)\n",
 			symbolName, foundImage->name, image->name,
-			ELF32_ST_TYPE(foundSymbol->st_info),
-			ELF32_ST_TYPE(symbol->st_info));
+			foundSymbol->Type(), symbol->Type());
 		return B_MISSING_SYMBOL;
 	}
 
@@ -1074,8 +1076,7 @@ elf_relocate(struct elf_image_info *image)
 
 	// deal with the rels first
 	if (image->rel) {
-		TRACE(("total %i relocs\n",
-			image->rel_len / (int)sizeof(struct Elf32_Rel)));
+		TRACE(("total %i rel relocs\n", image->rel_len / (int)sizeof(elf_rel)));
 
 		status = arch_elf_relocate_rel(image, sKernelImage, image->rel,
 			image->rel_len);
@@ -1084,21 +1085,25 @@ elf_relocate(struct elf_image_info *image)
 	}
 
 	if (image->pltrel) {
-		TRACE(("total %i plt-relocs\n",
-			image->pltrel_len / (int)sizeof(struct Elf32_Rel)));
-
 		if (image->pltrel_type == DT_REL) {
+			TRACE(("total %i plt-relocs\n",
+				image->pltrel_len / (int)sizeof(elf_rel)));
 			status = arch_elf_relocate_rel(image, sKernelImage, image->pltrel,
 				image->pltrel_len);
 		} else {
+			TRACE(("total %i plt-relocs\n",
+				image->pltrel_len / (int)sizeof(elf_rela)));
 			status = arch_elf_relocate_rela(image, sKernelImage,
-				(struct Elf32_Rela *)image->pltrel, image->pltrel_len);
+				(elf_rela *)image->pltrel, image->pltrel_len);
 		}
 		if (status < B_OK)
 			return status;
 	}
 
 	if (image->rela) {
+		TRACE(("total %i rel relocs\n",
+			image->rela_len / (int)sizeof(elf_rela)));
+
 		status = arch_elf_relocate_rela(image, sKernelImage, image->rela,
 			image->rela_len);
 		if (status < B_OK)
@@ -1110,18 +1115,18 @@ elf_relocate(struct elf_image_info *image)
 
 
 static int
-verify_eheader(struct Elf32_Ehdr *elfHeader)
+verify_eheader(elf_ehdr *elfHeader)
 {
 	if (memcmp(elfHeader->e_ident, ELF_MAGIC, 4) != 0)
 		return B_NOT_AN_EXECUTABLE;
 
-	if (elfHeader->e_ident[4] != ELFCLASS32)
+	if (elfHeader->e_ident[4] != ELF_CLASS)
 		return B_NOT_AN_EXECUTABLE;
 
 	if (elfHeader->e_phoff == 0)
 		return B_NOT_AN_EXECUTABLE;
 
-	if (elfHeader->e_phentsize < sizeof(struct Elf32_Phdr))
+	if (elfHeader->e_phentsize < sizeof(elf_phdr))
 		return B_NOT_AN_EXECUTABLE;
 
 	return 0;
@@ -1144,9 +1149,9 @@ unload_elf_image(struct elf_image_info *image)
 static status_t
 load_elf_symbol_table(int fd, struct elf_image_info *image)
 {
-	struct Elf32_Ehdr *elfHeader = image->elf_header;
-	struct Elf32_Sym *symbolTable = NULL;
-	struct Elf32_Shdr *stringHeader = NULL;
+	elf_ehdr *elfHeader = image->elf_header;
+	elf_sym *symbolTable = NULL;
+	elf_shdr *stringHeader = NULL;
 	uint32 numSymbols = 0;
 	char *stringTable;
 	status_t status;
@@ -1156,7 +1161,7 @@ load_elf_symbol_table(int fd, struct elf_image_info *image)
 	// get section headers
 
 	ssize_t size = elfHeader->e_shnum * elfHeader->e_shentsize;
-	struct Elf32_Shdr *sectionHeaders = (struct Elf32_Shdr *)malloc(size);
+	elf_shdr *sectionHeaders = (elf_shdr *)malloc(size);
 	if (sectionHeaders == NULL) {
 		dprintf("error allocating space for section headers\n");
 		return B_NO_MEMORY;
@@ -1182,8 +1187,8 @@ load_elf_symbol_table(int fd, struct elf_image_info *image)
 			}
 
 			// read in symbol table
-			symbolTable
-				= (struct Elf32_Sym *)malloc(size = sectionHeaders[i].sh_size);
+			size = sectionHeaders[i].sh_size;
+			symbolTable = (elf_sym *)malloc(size);
 			if (symbolTable == NULL) {
 				status = B_NO_MEMORY;
 				goto error1;
@@ -1197,7 +1202,7 @@ load_elf_symbol_table(int fd, struct elf_image_info *image)
 				goto error2;
 			}
 
-			numSymbols = size / sizeof(struct Elf32_Sym);
+			numSymbols = size / sizeof(elf_sym);
 			break;
 		}
 	}
@@ -1245,7 +1250,7 @@ error1:
 
 
 static status_t
-insert_preloaded_image(struct preloaded_elf32_image *preloadedImage, bool kernel)
+insert_preloaded_image(preloaded_elf_image *preloadedImage, bool kernel)
 {
 	status_t status;
 
@@ -1290,9 +1295,9 @@ insert_preloaded_image(struct preloaded_elf32_image *preloadedImage, bool kernel
 
 	// copy debug symbols to the kernel heap
 	if (preloadedImage->debug_symbols != NULL) {
-		int32 debugSymbolsSize = sizeof(Elf32_Sym)
+		int32 debugSymbolsSize = sizeof(elf_sym)
 			* preloadedImage->num_debug_symbols;
-		image->debug_symbols = (Elf32_Sym*)malloc(debugSymbolsSize);
+		image->debug_symbols = (elf_sym*)malloc(debugSymbolsSize);
 		if (image->debug_symbols != NULL) {
 			memcpy(image->debug_symbols, preloadedImage->debug_symbols,
 				debugSymbolsSize);
@@ -1333,6 +1338,8 @@ error1:
 //	#pragma mark - userland symbol lookup
 
 
+// TODO x86_64
+#ifndef __x86_64__
 class UserSymbolLookup {
 public:
 	static UserSymbolLookup& Default()
@@ -1393,7 +1400,7 @@ public:
 		const elf_region_t& textRegion = image.regions[0];
 
 		// search the image for the symbol
-		Elf32_Sym symbolFound;
+		elf_sym symbolFound;
 		addr_t deltaFound = INT_MAX;
 		bool exactMatch = false;
 
@@ -1409,7 +1416,7 @@ public:
 			for (uint32 j = bucket; j != STN_UNDEF;
 					_Read(&hashChains[j], j) ? 0 : j = STN_UNDEF) {
 
-				Elf32_Sym symbol;
+				elf_sym symbol;
 				if (!_Read(image.syms + j, symbol))
 					continue;
 
@@ -1420,8 +1427,7 @@ public:
 				// function and data symbols that have an st_value != 0 (0
 				// seems to be an indication for a symbol defined elsewhere
 				// -- couldn't verify that in the specs though).
-				if ((ELF32_ST_TYPE(symbol.st_info) != STT_FUNC
-						&& ELF32_ST_TYPE(symbol.st_info) != STT_OBJECT)
+				if ((symbol.Type() != STT_FUNC && symbol.Type() != STT_OBJECT)
 					|| symbol.st_value == 0
 					|| symbol.st_value + symbol.st_size + textRegion.delta
 						> textRegion.vmstart + textRegion.size) {
@@ -1540,6 +1546,7 @@ UserSymbolLookup::_Read(const T* address, T& data)
 
 UserSymbolLookup UserSymbolLookup::sLookup;
 	// doesn't need construction, but has an Init() method
+#endif
 
 
 //	#pragma mark - public kernel API
@@ -1550,7 +1557,7 @@ get_image_symbol(image_id id, const char *name, int32 symbolClass,
 	void **_symbol)
 {
 	struct elf_image_info *image;
-	struct Elf32_Sym *symbol;
+	elf_sym *symbol;
 	status_t status = B_OK;
 
 	TRACE(("get_image_symbol(%s)\n", name));
@@ -1595,7 +1602,7 @@ elf_debug_lookup_symbol_address(addr_t address, addr_t *_baseAddress,
 	const char **_symbolName, const char **_imageName, bool *_exactMatch)
 {
 	struct elf_image_info *image;
-	struct Elf32_Sym *symbolFound = NULL;
+	elf_sym *symbolFound = NULL;
 	const char *symbolName = NULL;
 	addr_t deltaFound = INT_MAX;
 	bool exactMatch = false;
@@ -1625,7 +1632,7 @@ elf_debug_lookup_symbol_address(addr_t address, addr_t *_baseAddress,
 			TRACE((" searching debug symbols...\n"));
 
 			for (i = 0; i < image->num_debug_symbols; i++) {
-				struct Elf32_Sym *symbol = &image->debug_symbols[i];
+				elf_sym *symbol = &image->debug_symbols[i];
 
 				if (symbol->st_value == 0 || symbol->st_size
 						>= image->text_region.size + image->data_region.size)
@@ -1653,7 +1660,7 @@ elf_debug_lookup_symbol_address(addr_t address, addr_t *_baseAddress,
 			for (i = 0; i < HASHTABSIZE(image); i++) {
 				for (j = HASHBUCKETS(image)[i]; j != STN_UNDEF;
 						j = HASHCHAINS(image)[j]) {
-					struct Elf32_Sym *symbol = &image->syms[j];
+					elf_sym *symbol = &image->syms[j];
 
 					if (symbol->st_value == 0
 						|| symbol->st_size >= image->text_region.size
@@ -1726,6 +1733,8 @@ elf_debug_lookup_user_symbol_address(Team* team, addr_t address,
 	addr_t *_baseAddress, const char **_symbolName, const char **_imageName,
 	bool *_exactMatch)
 {
+	// TODO x86_64
+#ifndef __x86_64__
 	if (team == NULL || team == team_get_kernel_team())
 		return B_BAD_VALUE;
 
@@ -1736,6 +1745,9 @@ elf_debug_lookup_user_symbol_address(Team* team, addr_t address,
 
 	return lookup.LookupSymbolAddress(address, _baseAddress, _symbolName,
 		_imageName, _exactMatch);
+#else
+	return B_ENTRY_NOT_FOUND;
+#endif
 }
 
 
@@ -1754,7 +1766,7 @@ elf_debug_lookup_symbol(const char* searchName)
 		if (image->num_debug_symbols > 0) {
 			// search extended debug symbol table (contains static symbols)
 			for (uint32 i = 0; i < image->num_debug_symbols; i++) {
-				struct Elf32_Sym *symbol = &image->debug_symbols[i];
+				elf_sym *symbol = &image->debug_symbols[i];
 				const char *name = image->debug_string_table + symbol->st_name;
 
 				if (symbol->st_value > 0 && !strcmp(name, searchName))
@@ -1765,7 +1777,7 @@ elf_debug_lookup_symbol(const char* searchName)
 			for (uint32 i = 0; i < HASHTABSIZE(image); i++) {
 				for (uint32 j = HASHBUCKETS(image)[i]; j != STN_UNDEF;
 						j = HASHCHAINS(image)[j]) {
-					struct Elf32_Sym *symbol = &image->syms[j];
+					elf_sym *symbol = &image->syms[j];
 					const char *name = SYMNAME(image, symbol);
 
 					if (symbol->st_value > 0 && !strcmp(name, searchName))
@@ -1784,7 +1796,7 @@ status_t
 elf_lookup_kernel_symbol(const char* name, elf_symbol_info* info)
 {
 	// find the symbol
-	Elf32_Sym* foundSymbol = elf_find_symbol(sKernelImage, name, NULL, false);
+	elf_sym* foundSymbol = elf_find_symbol(sKernelImage, name, NULL, false);
 	if (foundSymbol == NULL)
 		return B_MISSING_SYMBOL;
 
@@ -1797,8 +1809,8 @@ elf_lookup_kernel_symbol(const char* name, elf_symbol_info* info)
 status_t
 elf_load_user_image(const char *path, Team *team, int flags, addr_t *entry)
 {
-	struct Elf32_Ehdr elfHeader;
-	struct Elf32_Phdr *programHeaders = NULL;
+	elf_ehdr elfHeader;
+	elf_phdr *programHeaders = NULL;
 	char baseName[B_OS_NAME_LENGTH];
 	status_t status;
 	ssize_t length;
@@ -1835,7 +1847,7 @@ elf_load_user_image(const char *path, Team *team, int flags, addr_t *entry)
 
 	// read program header
 
-	programHeaders = (struct Elf32_Phdr *)malloc(
+	programHeaders = (elf_phdr *)malloc(
 		elfHeader.e_phnum * elfHeader.e_phentsize);
 	if (programHeaders == NULL) {
 		dprintf("error allocating space for program headers\n");
@@ -1917,10 +1929,10 @@ elf_load_user_image(const char *path, Team *team, int flags, addr_t *entry)
 
 			// clean garbage brought by mmap (the region behind the file,
 			// at least parts of it are the bss and have to be zeroed)
-			uint32 start = (uint32)regionAddress
+			addr_t start = (addr_t)regionAddress
 				+ (programHeaders[i].p_vaddr % B_PAGE_SIZE)
 				+ programHeaders[i].p_filesz;
-			uint32 amount = fileUpperBound
+			size_t amount = fileUpperBound
 				- (programHeaders[i].p_vaddr % B_PAGE_SIZE)
 				- (programHeaders[i].p_filesz);
 			memset((void *)start, 0, amount);
@@ -2002,8 +2014,8 @@ error:
 image_id
 load_kernel_add_on(const char *path)
 {
-	struct Elf32_Phdr *programHeaders;
-	struct Elf32_Ehdr *elfHeader;
+	elf_phdr *programHeaders;
+	elf_ehdr *elfHeader;
 	struct elf_image_info *image;
 	const char *fileName;
 	void *reservedAddress;
@@ -2041,7 +2053,7 @@ load_kernel_add_on(const char *path)
 		goto done;
 	}
 
-	elfHeader = (struct Elf32_Ehdr *)malloc(sizeof(*elfHeader));
+	elfHeader = (elf_ehdr *)malloc(sizeof(*elfHeader));
 	if (!elfHeader) {
 		status = B_NO_MEMORY;
 		goto error;
@@ -2071,7 +2083,7 @@ load_kernel_add_on(const char *path)
 	image->name = strdup(path);
 	vnode = NULL;
 
-	programHeaders = (struct Elf32_Phdr *)malloc(elfHeader->e_phnum
+	programHeaders = (elf_phdr *)malloc(elfHeader->e_phnum
 		* elfHeader->e_phentsize);
 	if (programHeaders == NULL) {
 		dprintf("%s: error allocating space for program headers\n", fileName);
@@ -2148,7 +2160,7 @@ load_kernel_add_on(const char *path)
 				image->dynamic_section = programHeaders[i].p_vaddr;
 				continue;
 			default:
-				dprintf("%s: unhandled pheader type 0x%lx\n", fileName,
+				dprintf("%s: unhandled pheader type %#" B_PRIx32 "\n", fileName,
 					programHeaders[i].p_type);
 				continue;
 		}
@@ -2185,7 +2197,7 @@ load_kernel_add_on(const char *path)
 			textSectionWritable = programHeaders[i].IsReadWrite();
 			snprintf(regionName, B_OS_NAME_LENGTH, "%s_text", fileName);
 		} else {
-			dprintf("%s: weird program header flags 0x%lx\n", fileName,
+			dprintf("%s: weird program header flags %#" B_PRIx32 "\n", fileName,
 				programHeaders[i].p_flags);
 			continue;
 		}
@@ -2213,7 +2225,8 @@ load_kernel_add_on(const char *path)
 			programHeaders[i].p_filesz);
 		if (length < B_OK) {
 			status = length;
-			dprintf("%s: error reading in segment %ld\n", fileName, i);
+			dprintf("%s: error reading in segment %" B_PRId32 "\n", fileName,
+				i);
 			goto error5;
 		}
 	}
@@ -2355,7 +2368,7 @@ elf_create_memory_image(const char* imageName, addr_t text, size_t textSize,
 	// allocate symbol and string tables -- we allocate an empty symbol table,
 	// so that elf_debug_lookup_symbol_address() won't try the dynamic symbol
 	// table, which we don't have.
-	Elf32_Sym* symbolTable = (Elf32_Sym*)malloc(0);
+	elf_sym* symbolTable = (elf_sym*)malloc(0);
 	char* stringTable = (char*)malloc(1);
 	MemoryDeleter symbolTableDeleter(symbolTable);
 	MemoryDeleter stringTableDeleter(stringTable);
@@ -2440,19 +2453,19 @@ elf_add_memory_image_symbol(image_id id, const char* name, addr_t address,
 
 	// resize the symbol table
 	int32 symbolCount = image->num_debug_symbols + 1;
-	Elf32_Sym* symbolTable = (Elf32_Sym*)realloc(
-		(Elf32_Sym*)image->debug_symbols, sizeof(Elf32_Sym) * symbolCount);
+	elf_sym* symbolTable = (elf_sym*)realloc(
+		(elf_sym*)image->debug_symbols, sizeof(elf_sym) * symbolCount);
 	if (symbolTable == NULL)
 		return B_NO_MEMORY;
 	image->debug_symbols = symbolTable;
 
 	// enter the symbol
-	Elf32_Sym& symbol = symbolTable[symbolCount - 1];
-	uint32 symbolType = type == B_SYMBOL_TYPE_DATA ? STT_OBJECT : STT_FUNC;
+	elf_sym& symbol = symbolTable[symbolCount - 1];
+	symbol.SetInfo(STB_GLOBAL,
+		type == B_SYMBOL_TYPE_DATA ? STT_OBJECT : STT_FUNC);
 	symbol.st_name = stringIndex;
 	symbol.st_value = address;
 	symbol.st_size = size;
-	symbol.st_info = ELF32_ST_INFO(STB_GLOBAL, symbolType);
 	symbol.st_other = 0;
 	symbol.st_shndx = 0;
 	image->num_debug_symbols++;
@@ -2475,14 +2488,14 @@ elf_init(kernel_args *args)
 	// Build a image structure for the kernel, which has already been loaded.
 	// The preloaded_images were already prepared by the VM.
 	image = args->kernel_image;
-	if (insert_preloaded_image(static_cast<struct preloaded_elf32_image *>(
-			image), true) < B_OK)
+	if (insert_preloaded_image(static_cast<preloaded_elf_image *>(image),
+			true) < B_OK)
 		panic("could not create kernel image.\n");
 
 	// Build image structures for all preloaded images.
 	for (image = args->preloaded_images; image != NULL; image = image->next)
-		insert_preloaded_image(static_cast<struct preloaded_elf32_image *>(
-			image), false);
+		insert_preloaded_image(static_cast<preloaded_elf_image *>(image),
+			false);
 
 	add_debugger_command("ls", &dump_address_info,
 		"lookup symbol for a particular address");
@@ -2501,6 +2514,8 @@ elf_init(kernel_args *args)
 // #pragma mark -
 
 
+// TODO: x86_64
+#ifndef __x86_64__
 /*!	Reads the symbol and string table for the kernel image with the given ID.
 	\a _symbolCount and \a _stringTableSize are both in- and output parameters.
 	When called they call the size of the buffers given by \a symbolTable and

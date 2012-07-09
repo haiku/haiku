@@ -77,6 +77,14 @@ struct preloaded_elf64_image : public preloaded_image {
 	FixedWidthPointer<Elf64_Sym> debug_symbols;
 } _PACKED;
 
+
+#if B_HAIKU_64_BIT
+typedef preloaded_elf64_image preloaded_elf_image;
+#else
+typedef preloaded_elf32_image preloaded_elf_image;
+#endif
+
+
 #ifdef _BOOT_MODE
 extern status_t boot_elf_resolve_symbol(preloaded_elf32_image* image,
 	struct Elf32_Sym* symbol, Elf32_Addr* symbolAddress);
