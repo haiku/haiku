@@ -272,7 +272,7 @@
 #endif
 #define DEFINE_ELF_TYPE(type, name) \
 	struct _ELF_TYPE(type); \
-	typedef _ELF_TYPE(type) name
+	typedef struct _ELF_TYPE(type) name
 
 DEFINE_ELF_TYPE(Ehdr, elf_ehdr);
 DEFINE_ELF_TYPE(Phdr, elf_phdr);
