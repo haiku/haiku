@@ -16,6 +16,7 @@ class CheckVisitor;
 class Journal;
 class Inode;
 class Query;
+class ResizeVisitor;
 
 
 enum volume_flags {
@@ -146,6 +147,7 @@ public:
 	static	status_t		CheckSuperBlock(const uint8* data,
 								uint32* _offset = NULL);
 	static	status_t		Identify(int fd, disk_super_block* superBlock);
+	static	off_t			CalculateLogSize(off_t numBlocks, off_t deviceSize);
 
 private:
 			status_t		_EraseUnusedBootBlock();

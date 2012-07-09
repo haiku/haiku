@@ -405,6 +405,7 @@ Index::UpdateNodeID(Transaction& transaction, const uint8* key, uint16 length,
 {
 	// Remove node and insert it with the new id (we can't use BPlusTree::Replace(), as it
 	// doesn't handle trees where duplicates are allowed)
+	Node()->WriteLockInTransaction(transaction);
 	BPlusTree* tree = Node()->Tree();
 
 	status_t status = tree->Remove(transaction, key, length, oldInodeID);

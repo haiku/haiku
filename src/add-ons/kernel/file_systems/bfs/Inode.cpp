@@ -625,6 +625,10 @@ Inode::InitCheck(bool checkNode) const
 void
 Inode::SetID(ino_t ID)
 {
+	// set parent ID if we are our own parent
+	if (Parent() == BlockRun())
+		fNode.parent = fVolume->ToBlockRun(ID);
+
 	fID = ID;
 	fNode.inode_num = fVolume->ToBlockRun(ID);
 }
@@ -2709,6 +2713,7 @@ status_t
 Inode::_WriteBufferedRuns(Transaction& transaction, BlockRunBuffer& buffer,
 	data_stream* dataStream, off_t targetSize, bool flush)
 {
+	// TODO: Apply allocation policies!
 	status_t status;
 	off_t doubleIndirectBlockLength = _DoubleIndirectBlockLength();
 	uint32 blockShift = fVolume->BlockShift();
@@ -3444,7 +3449,13 @@ Inode::CopyBlockTo(Transaction& transaction, off_t targetBlock)
 
 	// update inode ID in target block
 	bfs_inode* targetNode = (bfs_inode*)target.Block();
-	targetNode->inode_num = fVolume->ToBlockRun(targetBlock);
+	block_run targetRun = fVolume->ToBlockRun(targetBlock);
+	targetNode->inode_num = targetRun;
+
+	// also update parent reference in the rare case of us being our
+	// own parent
+	if (Parent() == BlockRun())
+		targetNode->parent = targetRun;
 
 	return B_OK;
 }

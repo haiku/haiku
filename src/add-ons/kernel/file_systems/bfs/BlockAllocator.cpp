@@ -545,7 +545,7 @@ BlockAllocator::~BlockAllocator()
 
 
 status_t
-BlockAllocator::Initialize(bool full)
+BlockAllocator::Initialize(bool full, bool alreadyLocked)
 {
 	fNumGroups = fVolume->AllocationGroups();
 	fBlocksPerGroup = fVolume->SuperBlock().BlocksPerAllocationGroup();
@@ -558,8 +558,10 @@ BlockAllocator::Initialize(bool full)
 	if (!full)
 		return B_OK;
 
-	recursive_lock_lock(&fLock);
-		// the lock will be released by the _Initialize() method
+	if (!alreadyLocked) {
+		recursive_lock_lock(&fLock);
+			// the lock will be released by the _Initialize() method
+	}
 
 	thread_id id = spawn_kernel_thread((thread_func)BlockAllocator::_Initialize,
 		"bfs block allocator", B_LOW_PRIORITY, this);
@@ -647,16 +649,13 @@ BlockAllocator::Reinitialize()
 	if (status != B_OK)
 		return status;
 
-	recursive_lock_lock(&fLock);
-		// the lock will be unlocked in the call to Initialize()
-
 	fVolume->GetJournal(0)->Unlock(NULL, true);
 		// unlock the journal here: we only need to make sure that no one
 		// starts a transaction before we get the allocator lock, as that
 		// would cause a deadlock
 
 	delete[] fGroups;
-	return Initialize();
+	return Initialize(true, true);
 }
 
 
@@ -1442,6 +1441,7 @@ BlockAllocator::CheckBlocks(off_t start, off_t length, bool allocated,
 	uint32 groupBlock = bitmapBlock % fBlocksPerGroup;
 
 	AllocationBlock cached(fVolume);
+	RecursiveLocker locker(fLock);
 
 	while (groupBlock < fGroups[group].NumBitmapBlocks() && length > 0) {
 		if (cached.SetTo(fGroups[group], groupBlock) != B_OK)

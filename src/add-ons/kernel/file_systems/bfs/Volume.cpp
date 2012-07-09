@@ -14,6 +14,7 @@
 #include "Inode.h"
 #include "Journal.h"
 #include "Query.h"
+#include "ResizeVisitor.h"
 #include "Volume.h"
 
 
@@ -556,6 +557,20 @@ Volume::Identify(int fd, disk_super_block* superBlock)
 }
 
 
+/*static*/ off_t
+Volume::CalculateLogSize(off_t numBlocks, off_t deviceSize)
+{
+	// determine log size depending on the size of the volume
+	off_t logSize = 2048;
+	if (numBlocks <= 20480)
+		logSize = 512;
+	if (deviceSize > 1LL * 1024 * 1024 * 1024)
+		logSize = 4096;
+
+	return logSize;
+}
+
+
 status_t
 Volume::Initialize(int fd, const char* name, uint32 blockSize,
 	uint32 flags)
@@ -595,12 +610,7 @@ Volume::Initialize(int fd, const char* name, uint32 blockSize,
 	fBlockShift = fSuperBlock.BlockShift();
 	fAllocationGroupShift = fSuperBlock.AllocationGroupShift();
 
-	// determine log size depending on the size of the volume
-	off_t logSize = 2048;
-	if (numBlocks <= 20480)
-		logSize = 512;
-	if (deviceSize > 1LL * 1024 * 1024 * 1024)
-		logSize = 4096;
+	off_t logSize = CalculateLogSize(numBlocks, deviceSize);
 
 	// since the allocator has not been initialized yet, we
 	// cannot use BlockAllocator::BitmapSize() here
