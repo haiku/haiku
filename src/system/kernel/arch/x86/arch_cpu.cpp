@@ -697,7 +697,6 @@ x86_get_double_fault_stack(int32 cpu, size_t* _size)
 }
 
 
-#ifndef __x86_64__
 /*!	Returns the index of the current CPU. Can only be called from the double
 	fault handler.
 */
@@ -705,9 +704,8 @@ int32
 x86_double_fault_get_cpu(void)
 {
 	uint32 stack = x86_get_stack_frame();
-	return (stack - (uint32)sDoubleFaultStacks) / kDoubleFaultStackSize;
+	return (stack - (addr_t)sDoubleFaultStacks) / kDoubleFaultStackSize;
 }
-#endif
 
 
 //	#pragma mark -

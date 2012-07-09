@@ -96,16 +96,6 @@ unexpected_exception(iframe* frame)
 }
 
 
-static void
-page_fault_exception(iframe* frame)
-{
-	addr_t cr2 = x86_read_cr2();
-
-	panic("page fault exception at ip %#lx on %#lx, error code %#lx\n",
-		frame->ip, cr2, frame->error_code);
-}
-
-
 /*!	Returns the virtual IDT address for CPU \a cpu. */
 void*
 x86_get_idt(int32 cpu)
@@ -164,7 +154,7 @@ arch_int_init(kernel_args* args)
 	table[11] = fatal_exception;		// Segment Not Present (#NP)
 	table[12] = fatal_exception;		// Stack Fault Exception (#SS)
 	table[13] = unexpected_exception;	// General Protection Exception (#GP)
-	table[14] = page_fault_exception;	// Page-Fault Exception (#PF)
+	table[14] = x86_page_fault_exception;	// Page-Fault Exception (#PF)
 	table[16] = unexpected_exception;	// x87 FPU Floating-Point Error (#MF)
 	table[17] = unexpected_exception;	// Alignment Check Exception (#AC)
 	table[18] = fatal_exception;		// Machine-Check Exception (#MC)

@@ -346,87 +346,6 @@ x86_page_fault_exception_double_fault(struct iframe* frame)
 }
 
 
-static void
-page_fault_exception(struct iframe* frame)
-{
-	Thread *thread = thread_get_current_thread();
-	addr_t cr2 = x86_read_cr2();
-	addr_t newip;
-
-	if (debug_debugger_running()) {
-		// If this CPU or this thread has a fault handler, we're allowed to be
-		// here.
-		if (thread != NULL) {
-			cpu_ent* cpu = &gCPU[smp_get_current_cpu()];
-			if (cpu->fault_handler != 0) {
-				debug_set_page_fault_info(cr2, frame->ip,
-					(frame->error_code & 0x2) != 0
-						? DEBUG_PAGE_FAULT_WRITE : 0);
-				frame->ip = cpu->fault_handler;
-				frame->bp = cpu->fault_handler_stack_pointer;
-				return;
-			}
-
-			if (thread->fault_handler != 0) {
-				kprintf("ERROR: thread::fault_handler used in kernel "
-					"debugger!\n");
-				debug_set_page_fault_info(cr2, frame->ip,
-					(frame->error_code & 0x2) != 0
-						? DEBUG_PAGE_FAULT_WRITE : 0);
-				frame->ip = thread->fault_handler;
-				return;
-			}
-		}
-
-		// otherwise, not really
-		panic("page fault in debugger without fault handler! Touching "
-			"address %p from eip %p\n", (void *)cr2, (void *)frame->ip);
-		return;
-	} else if ((frame->flags & 0x200) == 0) {
-		// interrupts disabled
-
-		// If a page fault handler is installed, we're allowed to be here.
-		// TODO: Now we are generally allowing user_memcpy() with interrupts
-		// disabled, which in most cases is a bug. We should add some thread
-		// flag allowing to explicitly indicate that this handling is desired.
-		if (thread && thread->fault_handler != 0) {
-			if (frame->ip != thread->fault_handler) {
-				frame->ip = thread->fault_handler;
-				return;
-			}
-
-			// The fault happened at the fault handler address. This is a
-			// certain infinite loop.
-			panic("page fault, interrupts disabled, fault handler loop. "
-				"Touching address %p from eip %p\n", (void*)cr2,
-				(void*)frame->ip);
-		}
-
-		// If we are not running the kernel startup the page fault was not
-		// allowed to happen and we must panic.
-		panic("page fault, but interrupts were disabled. Touching address "
-			"%p from eip %p\n", (void *)cr2, (void *)frame->ip);
-		return;
-	} else if (thread != NULL && thread->page_faults_allowed < 1) {
-		panic("page fault not allowed at this place. Touching address "
-			"%p from eip %p\n", (void *)cr2, (void *)frame->ip);
-		return;
-	}
-
-	enable_interrupts();
-
-	vm_page_fault(cr2, frame->ip,
-		(frame->error_code & 0x2) != 0,	// write access
-		(frame->error_code & 0x4) != 0,	// userland
-		&newip);
-	if (newip != 0) {
-		// the page fault handler wants us to modify the iframe to set the
-		// IP the cpu will return to to be this ip
-		frame->ip = newip;
-	}
-}
-
-
 status_t
 arch_int_init(struct kernel_args *args)
 {
@@ -720,7 +639,7 @@ arch_int_init(struct kernel_args *args)
 	table[11] = fatal_exception;		// Segment Not Present (#NP)
 	table[12] = fatal_exception;		// Stack Fault Exception (#SS)
 	table[13] = unexpected_exception;	// General Protection Exception (#GP)
-	table[14] = page_fault_exception;	// Page-Fault Exception (#PF)
+	table[14] = x86_page_fault_exception;	// Page-Fault Exception (#PF)
 	table[16] = unexpected_exception;	// x87 FPU Floating-Point Error (#MF)
 	table[17] = unexpected_exception;	// Alignment Check Exception (#AC)
 	table[18] = fatal_exception;		// Machine-Check Exception (#MC)

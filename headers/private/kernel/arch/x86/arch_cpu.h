@@ -405,8 +405,9 @@ void x86_set_mtrrs(uint8 defaultType, const x86_mtrr_info* infos,
 void x86_init_fpu();
 bool x86_check_feature(uint32 feature, enum x86_feature_type type);
 void* x86_get_double_fault_stack(int32 cpu, size_t* _size);
-void x86_double_fault_exception(struct iframe* frame);
-void x86_page_fault_exception_double_fault(struct iframe* frame);
+int32 x86_double_fault_get_cpu(void);
+
+void x86_page_fault_exception(struct iframe* iframe);
 
 #ifndef __x86_64__
 
@@ -414,7 +415,8 @@ void x86_fnsave(void* fpuState);
 void x86_frstor(const void* fpuState);
 void x86_fnsave_swap(void* oldFpuState, const void* newFpuState);
 void x86_set_task_gate(int32 cpu, int32 n, int32 segment);
-int32 x86_double_fault_get_cpu(void);
+void x86_double_fault_exception(struct iframe* frame);
+void x86_page_fault_exception_double_fault(struct iframe* frame);
 
 #endif
 
