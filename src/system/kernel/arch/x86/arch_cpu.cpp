@@ -824,7 +824,8 @@ arch_cpu_init(kernel_args* args)
 	// The x86_64 system_time() implementation uses 64-bit multiplication and
 	// therefore shifting is not necessary for low frequencies (it's also not
 	// too likely that there'll be any x86_64 CPUs clocked under 1GHz).
-	__x86_setup_system_time(conversionFactor, conversionFactorNsecs);
+	__x86_setup_system_time((uint64)conversionFactor << 32,
+		conversionFactorNsecs);
 #else
 	if (conversionFactorNsecs >> 32 != 0) {
 		// the TSC frequency is < 1 GHz, which forces us to shift the factor
