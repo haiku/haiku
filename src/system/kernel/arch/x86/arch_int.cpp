@@ -45,7 +45,6 @@ static const interrupt_controller* sCurrentPIC = NULL;
 void
 hardware_interrupt(struct iframe* frame)
 {
-#ifndef __x86_64__
 	int32 vector = frame->vector - ARCH_INTERRUPT_BASE;
 	bool levelTriggered = false;
 	Thread* thread = thread_get_current_thread();
@@ -88,10 +87,6 @@ hardware_interrupt(struct iframe* frame)
 
 		callback(data);
 	}
-#else
-	return;
-	panic("implement me");
-#endif
 }
 
 
@@ -156,11 +151,10 @@ arch_int_are_interrupts_enabled(void)
 status_t
 arch_int_init_io(kernel_args* args)
 {
+	// TODO x86_64
 #ifndef __x86_64__
 	ioapic_init(args);
 	msi_init();
-#else
-	//panic("implement me");
 #endif
 	return B_OK;
 }
