@@ -20,7 +20,10 @@
 
 
 Inode::Inode()
+	:
+	fAttrCacheExpire(0)
 {
+	mutex_init(&fAttrCacheLock, NULL);
 }
 
 
@@ -96,6 +99,7 @@ Inode::CreateInode(FileSystem* fs, const FileInfo &fi, Inode** _inode)
 
 Inode::~Inode()
 {
+	mutex_destroy(&fAttrCacheLock);
 }
 
 
@@ -288,7 +292,11 @@ Inode::Remove(const char* name, FileType type)
 			return result;
 
 		reply.PutFH();
-		return reply.Remove();
+		result = reply.Remove();
+
+		fFileSystem->Root()->MakeInfoInvalid();
+
+		return result;
 	} while (true);
 }
 
@@ -391,7 +399,11 @@ Inode::CreateLink(const char* name, const char* path, int mode)
 
 		reply.PutFH();
 
-		return reply.Create();
+		result = reply.Create();
+
+		fFileSystem->Root()->MakeInfoInvalid();
+
+		return result;
 	} while (true);
 }
 
@@ -481,6 +493,36 @@ Inode::Access(int mode)
 status_t
 Inode::Stat(struct stat* st)
 {
+	status_t result = _UpdateAttrCache();
+	if (result != B_OK)
+		return result;
+
+	// Do not touch other members of struct stat
+	st->st_size = fAttrCache.st_size;
+	st->st_mode = fAttrCache.st_mode;
+	st->st_nlink = fAttrCache.st_nlink;
+	st->st_uid = fAttrCache.st_uid;
+	st->st_gid = fAttrCache.st_gid;
+	st->st_atim = fAttrCache.st_atim;
+	st->st_ctim = fAttrCache.st_ctim;
+	st->st_crtim = fAttrCache.st_crtim;
+	st->st_mtim = fAttrCache.st_mtim;
+
+	return B_OK;
+}
+
+
+status_t
+Inode::_UpdateAttrCache(bool force)
+{
+	if (!force && fAttrCacheExpire > time(NULL))
+		return B_OK;
+
+	MutexLocker _(fAttrCacheLock);
+
+	if (fAttrCacheExpire > time(NULL))
+		return B_OK;
+
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
@@ -516,12 +558,12 @@ Inode::Stat(struct stat* st)
 			delete[] values;
 			return B_BAD_VALUE;
 		}
-		st->st_size = values[0].fData.fValue64;
+		fAttrCache.st_size = values[0].fData.fValue64;
 
 		uint32 next = 1;
-		st->st_mode = Type();
+		fAttrCache.st_mode = Type();
 		if (count >= next && values[next].fAttribute == FATTR4_MODE) {
-			st->st_mode |= values[next].fData.fValue32;
+			fAttrCache.st_mode |= values[next].fData.fValue32;
 			next++;
 		} else {
 			// Try to guess using ACCESS request
@@ -538,70 +580,76 @@ Inode::Stat(struct stat* st)
 				return result;
 
 			if ((prvl & ACCESS4_READ) != 0)
-				st->st_mode |= S_IRUSR | S_IRGRP | S_IROTH;
+				fAttrCache.st_mode |= S_IRUSR | S_IRGRP | S_IROTH;
 
 			if ((prvl & ACCESS4_MODIFY) != 0)
-				st->st_mode |= S_IWUSR | S_IWGRP | S_IWOTH;
+				fAttrCache.st_mode |= S_IWUSR | S_IWGRP | S_IWOTH;
 
 			if (fType == NF4DIR && (prvl & ACCESS4_LOOKUP) != 0)
-				st->st_mode |= S_IXUSR | S_IXGRP | S_IXOTH;
+				fAttrCache.st_mode |= S_IXUSR | S_IXGRP | S_IXOTH;
 
 			if (fType != NF4DIR && (prvl & ACCESS4_EXECUTE) != 0)
-				st->st_mode |= S_IXUSR | S_IXGRP | S_IXOTH;
+				fAttrCache.st_mode |= S_IXUSR | S_IXGRP | S_IXOTH;
 		}
 
 		if (count >= next && values[next].fAttribute == FATTR4_NUMLINKS) {
-			st->st_nlink = values[next].fData.fValue32;
+			fAttrCache.st_nlink = values[next].fData.fValue32;
 			next++;
 		} else
-			st->st_nlink = 1;
+			fAttrCache.st_nlink = 1;
 
 		if (count >= next && values[next].fAttribute == FATTR4_OWNER) {
 			char* owner = reinterpret_cast<char*>(values[next].fData.fPointer);
 			if (owner != NULL && isdigit(owner[0]))
-				st->st_uid = atoi(owner);
+				fAttrCache.st_uid = atoi(owner);
 			else
-				st->st_uid = gIdMapper->GetUserId(owner);
+				fAttrCache.st_uid = gIdMapper->GetUserId(owner);
 			next++;
 		} else
-			st->st_uid = 0;
+			fAttrCache.st_uid = 0;
 
 		if (count >= next && values[next].fAttribute == FATTR4_OWNER_GROUP) {
 			char* group = reinterpret_cast<char*>(values[next].fData.fPointer);
 			if (group != NULL && isdigit(group[0]))
-				st->st_gid = atoi(group);
+				fAttrCache.st_gid = atoi(group);
 			else
-				st->st_gid = gIdMapper->GetGroupId(group);
+				fAttrCache.st_gid = gIdMapper->GetGroupId(group);
 			next++;
 		} else
-			st->st_gid = 0;
+			fAttrCache.st_gid = 0;
 
 		if (count >= next && values[next].fAttribute == FATTR4_TIME_ACCESS) {
-			memcpy(&st->st_atim, values[next].fData.fPointer, sizeof(timespec));
-			next++;
-		} else
-			memset(&st->st_atim, 0, sizeof(timespec));
-
-		if (count >= next && values[next].fAttribute == FATTR4_TIME_CREATE) {
-			memcpy(&st->st_crtim, values[next].fData.fPointer,
+			memcpy(&fAttrCache.st_atim, values[next].fData.fPointer,
 				sizeof(timespec));
 			next++;
 		} else
-			memset(&st->st_crtim, 0, sizeof(timespec));
+			memset(&fAttrCache.st_atim, 0, sizeof(timespec));
+
+		if (count >= next && values[next].fAttribute == FATTR4_TIME_CREATE) {
+			memcpy(&fAttrCache.st_crtim, values[next].fData.fPointer,
+				sizeof(timespec));
+			next++;
+		} else
+			memset(&fAttrCache.st_crtim, 0, sizeof(timespec));
 
 		if (count >= next && values[next].fAttribute == FATTR4_TIME_METADATA) {
-			memcpy(&st->st_ctim, values[next].fData.fPointer, sizeof(timespec));
+			memcpy(&fAttrCache.st_ctim, values[next].fData.fPointer,
+				sizeof(timespec));
 			next++;
 		} else
-			memset(&st->st_ctim, 0, sizeof(timespec));
+			memset(&fAttrCache.st_ctim, 0, sizeof(timespec));
 
 		if (count >= next && values[next].fAttribute == FATTR4_TIME_MODIFY) {
-			memcpy(&st->st_mtim, values[next].fData.fPointer, sizeof(timespec));
+			memcpy(&fAttrCache.st_mtim, values[next].fData.fPointer,
+				sizeof(timespec));
 			next++;
 		} else
-			memset(&st->st_mtim, 0, sizeof(timespec));
+			memset(&fAttrCache.st_mtim, 0, sizeof(timespec));
 
 		delete[] values;
+
+		fAttrCacheExpire = time(NULL) + kAttrCacheExpirationTime;
+
 		return B_OK;
 	} while (true);
 }
@@ -701,8 +749,13 @@ Inode::WriteStat(const struct stat* st, uint32 mask)
 			delete cookie;
 		}
 
-		return result;
+		if (result != B_OK)
+			return result;
+
+		break;
 	} while (true);
+
+	_UpdateAttrCache(true);
 
 	return B_OK;
 }

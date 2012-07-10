@@ -24,7 +24,7 @@ public:
 								~FileSystem();
 
 			status_t			GetInode(ino_t id, Inode** inode);
-	inline	Inode*				Root();
+	inline	RootInode*			Root();
 
 			status_t			Migrate(const RPC::Server* serv);
 
@@ -74,10 +74,10 @@ private:
 };
 
 
-inline Inode*
+inline RootInode*
 FileSystem::Root()
 {
-	return reinterpret_cast<Inode*>(fRoot);
+	return fRoot;
 }
 
 

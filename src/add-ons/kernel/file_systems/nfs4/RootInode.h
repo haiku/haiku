@@ -16,12 +16,30 @@
 
 class RootInode : public Inode {
 public:
-		status_t			ReadInfo(struct fs_info* info);
+								RootInode();
+								~RootInode();
 
-		bool				ProbeMigration();
-		status_t			GetLocations(AttrValue** attr);
+			status_t			ReadInfo(struct fs_info* info);
+	inline	void				MakeInfoInvalid();
+
+			bool				ProbeMigration();
+			status_t			GetLocations(AttrValue** attr);
+
+private:
+			struct fs_info		fInfoCache;
+			mutex				fInfoCacheLock;
+			time_t				fInfoCacheExpire;
+
+			status_t			_UpdateInfo(bool force = false);
 
 };
+
+
+inline void
+RootInode::MakeInfoInvalid()
+{
+	fInfoCacheExpire = 0;
+}
 
 
 #endif	// ROOTINODE_H

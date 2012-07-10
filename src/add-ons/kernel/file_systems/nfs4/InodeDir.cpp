@@ -109,6 +109,8 @@ Inode::OpenDir(OpenDirCookie* cookie)
 		cookie->fCookie = 0;
 		cookie->fCookieVerf = 2;
 
+		fFileSystem->Root()->MakeInfoInvalid();
+
 		return B_OK;
 	} while (true);
 }

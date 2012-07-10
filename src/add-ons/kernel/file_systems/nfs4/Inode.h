@@ -89,6 +89,12 @@ protected:
 
 	static inline	ino_t		_FileIdToInoT(uint64 fileid);
 
+					struct stat	fAttrCache;
+					mutex		fAttrCacheLock;
+					time_t		fAttrCacheExpire;
+	static const	time_t		kAttrCacheExpirationTime	= 60;
+					status_t	_UpdateAttrCache(bool force = false);
+
 					uint32		fType;
 
 					FileInfo	fInfo;

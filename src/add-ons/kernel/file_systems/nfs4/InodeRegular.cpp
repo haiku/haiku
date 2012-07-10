@@ -15,6 +15,7 @@
 
 #include "IdMap.h"
 #include "Request.h"
+#include "RootInode.h"
 
 
 status_t
@@ -172,6 +173,7 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 	} while (true);
 
 	fFileSystem->AddOpenFile(cookie);
+	fFileSystem->Root()->MakeInfoInvalid();
 
 	if (confirm)
 		return _ConfirmOpen(fh, cookie);
@@ -429,6 +431,8 @@ Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
 	}
 
 	*_length = size;
+
+	fFileSystem->Root()->MakeInfoInvalid();
 
 	return B_OK;
 }

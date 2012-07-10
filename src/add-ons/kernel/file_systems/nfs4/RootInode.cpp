@@ -14,9 +14,44 @@
 #include "Request.h"
 
 
+RootInode::RootInode()
+	:
+	fInfoCacheExpire(0)
+{
+	mutex_init(&fInfoCacheLock, NULL);
+}
+
+
+RootInode::~RootInode()
+{
+	mutex_destroy(&fInfoCacheLock);
+}
+
+
 status_t
 RootInode::ReadInfo(struct fs_info* info)
 {
+	status_t result = _UpdateInfo();
+	if (result != B_OK)
+		return result;
+
+	memcpy(info, &fInfoCache, sizeof(struct fs_info));
+
+	return B_OK;
+}
+
+
+status_t
+RootInode::_UpdateInfo(bool force)
+{
+	if (!force && fInfoCacheExpire > time(NULL))
+		return B_OK;
+
+	MutexLocker _(fInfoCacheLock);
+
+	if (fInfoCacheExpire > time(NULL))
+		return B_OK;
+
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
@@ -46,12 +81,12 @@ RootInode::ReadInfo(struct fs_info* info)
 			return result;
 
 		if (count >= next && values[next].fAttribute == FATTR4_FILES_FREE) {
-			info->free_nodes = values[next].fData.fValue64;
+			fInfoCache.free_nodes = values[next].fData.fValue64;
 			next++;
 		}
 
 		if (count >= next && values[next].fAttribute == FATTR4_FILES_TOTAL) {
-			info->total_nodes = values[next].fData.fValue64;
+			fInfoCache.total_nodes = values[next].fData.fValue64;
 			next++;
 		}
 
@@ -68,16 +103,16 @@ RootInode::ReadInfo(struct fs_info* info)
 
 		if (io_size == LONGLONG_MAX)
 			io_size = 32768;
-		info->io_size = io_size;
-		info->block_size = io_size;
+		fInfoCache.io_size = io_size;
+		fInfoCache.block_size = io_size;
 
 		if (count >= next && values[next].fAttribute == FATTR4_SPACE_FREE) {
-			info->free_blocks = values[next].fData.fValue64 / io_size;
+			fInfoCache.free_blocks = values[next].fData.fValue64 / io_size;
 			next++;
 		}
 
 		if (count >= next && values[next].fAttribute == FATTR4_SPACE_TOTAL) {
-			info->total_blocks = values[next].fData.fValue64 / io_size;
+			fInfoCache.total_blocks = values[next].fData.fValue64 / io_size;
 			next++;
 		}
 
@@ -86,8 +121,10 @@ RootInode::ReadInfo(struct fs_info* info)
 		break;
 	} while (true);
 
-	info->flags = 0;
-	strncpy(info->volume_name, fInfo.fName, B_FILE_NAME_LENGTH);
+	fInfoCache.flags = 0;
+	strncpy(fInfoCache.volume_name, fInfo.fName, B_FILE_NAME_LENGTH);
+
+	fInfoCacheExpire = time(NULL) + kAttrCacheExpirationTime;
 
 	return B_OK;
 }
