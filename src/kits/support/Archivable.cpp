@@ -1,8 +1,9 @@
 /*
- * Copyright (c) 2001-2010, Haiku, Inc.
+ * Copyright (c) 2001-2012, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Rene Gollent (rene@gollent.com)
  *		Erik Jaesler (erik@cgsoftware.com)
  *		Alex Wilson (yourpalal2@gmail.com)
  */
@@ -233,6 +234,67 @@ check_signature(const char* signature, image_info& info)
 		return B_MISMATCHED_VALUES;
 
 	return B_OK;
+}
+
+
+namespace BPrivate
+{
+
+
+instantiation_func
+find_instantiation_func(const char* className, const char* signature,
+	image_id* id)
+{
+	if (className == NULL) {
+		errno = B_BAD_VALUE;
+		return NULL;
+	}
+
+	thread_info threadInfo;
+	status_t err = get_thread_info(find_thread(NULL), &threadInfo);
+	if (err != B_OK) {
+		errno = err;
+		return NULL;
+	}
+
+	instantiation_func instantiationFunc = NULL;
+	image_info imageInfo;
+
+	BString name = className;
+	for (int32 pass = 0; pass < 2; pass++) {
+		BString funcName;
+		build_function_name(name, funcName);
+
+		// for each image_id in team_id
+		int32 cookie = 0;
+		while (instantiationFunc == NULL
+			&& get_next_image_info(threadInfo.team, &cookie, &imageInfo)
+				== B_OK) {
+			instantiationFunc = find_function_in_image(funcName, imageInfo.id,
+				err);
+		}
+		if (instantiationFunc != NULL) {
+			// if requested, save the image id in
+			// which the function was found
+			if (id != NULL)
+				*id = imageInfo.id;
+			break;
+		}
+
+		// Check if we have a private class, and add the BPrivate namespace
+		// (for backwards compatibility)
+		if (!add_private_namespace(name))
+			break;
+	}
+
+	if (instantiationFunc != NULL
+		&& check_signature(signature, imageInfo) != B_OK)
+		return NULL;
+
+	return instantiationFunc;
+}
+
+
 }
 
 
@@ -597,8 +659,8 @@ instantiate_object(BMessage* archive, image_id* _id)
 	const char* signature = NULL;
 	bool hasSignature = archive->FindString(B_ADD_ON_FIELD, &signature) == B_OK;
 
-	instantiation_func instantiationFunc = find_instantiation_func(className,
-		signature);
+	instantiation_func instantiationFunc = BPrivate::find_instantiation_func(
+		className, signature, _id);
 
 	// if find_instantiation_func() can't locate Class::Instantiate()
 	// and a signature was specified
@@ -714,48 +776,7 @@ validate_instantiation(BMessage* from, const char* className)
 instantiation_func
 find_instantiation_func(const char* className, const char* signature)
 {
-	if (className == NULL) {
-		errno = B_BAD_VALUE;
-		return NULL;
-	}
-
-	thread_info threadInfo;
-	status_t err = get_thread_info(find_thread(NULL), &threadInfo);
-	if (err != B_OK) {
-		errno = err;
-		return NULL;
-	}
-
-	instantiation_func instantiationFunc = NULL;
-	image_info imageInfo;
-
-	BString name = className;
-	for (int32 pass = 0; pass < 2; pass++) {
-		BString funcName;
-		build_function_name(name, funcName);
-
-		// for each image_id in team_id
-		int32 cookie = 0;
-		while (instantiationFunc == NULL
-			&& get_next_image_info(threadInfo.team, &cookie, &imageInfo)
-				== B_OK) {
-			instantiationFunc = find_function_in_image(funcName, imageInfo.id,
-				err);
-		}
-		if (instantiationFunc != NULL)
-			break;
-
-		// Check if we have a private class, and add the BPrivate namespace
-		// (for backwards compatibility)
-		if (!add_private_namespace(name))
-			break;
-	}
-
-	if (instantiationFunc != NULL
-		&& check_signature(signature, imageInfo) != B_OK)
-		return NULL;
-
-	return instantiationFunc;
+	return BPrivate::find_instantiation_func(className, signature, NULL);
 }
 
 
