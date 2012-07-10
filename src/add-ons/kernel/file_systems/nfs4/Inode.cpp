@@ -445,48 +445,76 @@ Inode::ReadLink(void* buffer, size_t* length)
 status_t
 Inode::Access(int mode)
 {
-	do {
-		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
-		RequestBuilder& req = request.Builder();
+	int acc = 0;
 
-		req.PutFH(fInfo.fHandle);
-		req.Access();
-
-		status_t result = request.Send();
+	if (fFileSystem->IsAttrSupported(FATTR4_MODE)) {
+		status_t result = _UpdateAttrCache();
 		if (result != B_OK)
 			return result;
 
-		ReplyInterpreter& reply = request.Reply();
+		// Root squashing and owner mapping problems may make this function
+		// return false values. However, since due to race condition it can
+		// not be used for anything critical, it is not a serius problem.
 
-		if (_HandleErrors(reply.NFS4Error(), serv))
-			continue;
+		mode_t nodeMode = fAttrCache.st_mode;
+		uint8 userMode = (nodeMode & S_IRWXU) >> 6;
+		uint8 groupMode = (nodeMode & S_IRWXG) >> 3;
+		uint8 otherMode = (nodeMode & S_IRWXO);
 
-		reply.PutFH();
+		uid_t uid = geteuid();
+		if (uid == 0)
+			acc = userMode | groupMode | otherMode | R_OK | W_OK;
+		else if (uid == fAttrCache.st_uid)
+			acc = userMode;
+		else if (getegid() == fAttrCache.st_gid)
+			acc = groupMode;
+		else
+			acc = otherMode;
+	} else {
+		do {
+			RPC::Server* serv = fFileSystem->Server();
+			Request request(serv);
+			RequestBuilder& req = request.Builder();
 
-		uint32 allowed;
-		result = reply.Access(NULL, &allowed);
-		if (result != B_OK)
-			return result;
+			req.PutFH(fInfo.fHandle);
+			req.Access();
 
-		int acc = 0;
-		if ((allowed & ACCESS4_READ) != 0)
-			acc |= R_OK;
+			status_t result = request.Send();
+			if (result != B_OK)
+				return result;
 
-		if (fType == NF4DIR && (allowed & ACCESS4_LOOKUP) != 0)
-			acc |= X_OK | R_OK;
+			ReplyInterpreter& reply = request.Reply();
 
-		if (fType != NF4DIR && (allowed & ACCESS4_EXECUTE) != 0)
-			acc |= X_OK;
+			if (_HandleErrors(reply.NFS4Error(), serv))
+				continue;
 
-		if ((allowed & ACCESS4_MODIFY) != 0)
-			acc |= W_OK;
+			reply.PutFH();
 
-		if ((mode & acc) != mode)
-			return B_NOT_ALLOWED;
+			uint32 allowed;
+			result = reply.Access(NULL, &allowed);
+			if (result != B_OK)
+				return result;
 
-		return B_OK;
-	} while (true);
+			if ((allowed & ACCESS4_READ) != 0)
+				acc |= R_OK;
+
+			if (fType == NF4DIR && (allowed & ACCESS4_LOOKUP) != 0)
+				acc |= X_OK | R_OK;
+
+			if (fType != NF4DIR && (allowed & ACCESS4_EXECUTE) != 0)
+				acc |= X_OK;
+
+			if ((allowed & ACCESS4_MODIFY) != 0)
+				acc |= W_OK;
+
+			break;
+		} while (true);
+	}
+
+	if ((mode & acc) != mode)
+		return B_NOT_ALLOWED;
+
+	return B_OK;
 }
 
 
