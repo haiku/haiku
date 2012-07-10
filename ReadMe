@@ -75,6 +75,13 @@ The following darwin ports need to be installed:
  * libiconv
  * gnuregex
  * gsed
+ * cdrtools
+ * yasm
+ * wget
+ * less
+ * mpfr
+ * gmp
+ * libmpc
 
 More information about individual distributions of Linux and BSD can be found
 at http://haiku-os.org/guides/building/pre-reqs
