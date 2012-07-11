@@ -475,7 +475,7 @@ done
 mkdir haikuCaseTest 2>/dev/null
 mkdir haikucasetest 2>/dev/null
 caseInsensitive=$?
-rm -df haikuCaseTest haikucasetest
+rmdir haikuCaseTest haikucasetest 2>/dev/null
 if [ $caseInsensitive != 0 ]; then
 	echo "You need a case-sensitive file-system to build Haiku."
 	if [ $HOST_PLATFORM = "darwin" ]; then
