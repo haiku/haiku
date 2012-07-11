@@ -39,8 +39,10 @@ CreateNFS4Server(RPC::Server* serv)
 }
 
 
+
+// TODO: IPv6 address will cause problems
 static status_t
-ParseArguments(const char* _args, uint32* _ip, char* _path)
+ParseArguments(const char* _args, ServerAddress* address, char* _path)
 {
 	if (_args == NULL)
 		return B_BAD_VALUE;
@@ -53,12 +55,9 @@ ParseArguments(const char* _args, uint32* _ip, char* _path)
 	}
 	*path++ = '\0';
 
-	ServerAddress addr;
-	status_t result = ServerAddress::ResolveName(args, &addr);
+	status_t result = ServerAddress::ResolveName(args, address);
 	if (result != B_OK)
 		return result;
-
-	*_ip = addr.fAddress;
 
 	_path[255] = '\0';
 	strncpy(_path, path, 255);
@@ -74,19 +73,14 @@ nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 {
 	status_t result;
 
-	uint32 ip;
+	ServerAddress address;
 	char path[256];
-	result = ParseArguments(args, &ip, path);
+	result = ParseArguments(args, &address, path);
 	if (result != B_OK)
 		return result;
 
-	ServerAddress id;
-	id.fAddress = ip;
-	id.fPort = 2049;
-	id.fProtocol = IPPROTO_UDP;
-
 	RPC::Server *server;
-	result = gRPCServerManager->Acquire(&server, id, CreateNFS4Server);
+	result = gRPCServerManager->Acquire(&server, address, CreateNFS4Server);
 	if (result != B_OK)
 		return result;
 	

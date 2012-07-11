@@ -68,7 +68,7 @@ public:
 			status_t				SaveFH();
 			status_t				SetAttr(const uint32* id, uint32 stateSeq,
 										AttrValue* attr, uint32 count);
-			status_t				SetClientID(const RPC::Server* serv);
+			status_t				SetClientID(const RPC::Server* server);
 			status_t				SetClientIDConfirm(uint64 id, uint64 ver);
 			status_t				Verify(AttrValue* attr, uint32 count);
 			status_t				Write(const uint32* id, uint32 stateSeq,
@@ -85,6 +85,8 @@ private:
 			void					_GenerateLockOwner(XDR::WriteStream& stream,
 										OpenFileCookie* cookie,
 										LockOwner* owner);
+			status_t				_GenerateClientId(XDR::WriteStream& stream,
+										const RPC::Server* server);
 
 			void					_EncodeAttrs(XDR::WriteStream& stream,
 										AttrValue* attr, uint32 count);

@@ -16,14 +16,15 @@
 
 
 struct ServerAddress {
-			uint32				fAddress;
-			uint16				fPort;
+			sockaddr_storage	fAddress;
 			int					fProtocol;
 
 			bool				operator==(const ServerAddress& address);
 			bool				operator<(const ServerAddress& address);
 
 			ServerAddress&		operator=(const ServerAddress& address);
+
+								ServerAddress();
 
 	static	status_t			ResolveName(const char* name,
 									ServerAddress* address);
@@ -44,22 +45,19 @@ public:
 			void				Disconnect();
 
 protected:
-								Connection(const sockaddr_in& address,
-									int protocol);
+								Connection(const ServerAddress& address);
 			status_t			Connect();
 
 			sem_id				fWaitCancel;
 			int					fSocket;
 			mutex				fSocketLock;
 
-			const int			fProtocol;
-			const sockaddr_in	fServerAddress;
+			const ServerAddress	fServerAddress;
 };
 
 class ConnectionStream : public Connection {
 public:
-								ConnectionStream(const sockaddr_in& address,
-									int protocol);
+								ConnectionStream(const ServerAddress& address);
 
 	virtual	status_t			Send(const void* buffer, uint32 size);
 	virtual	status_t			Receive(void** buffer, uint32* size);
@@ -67,8 +65,7 @@ public:
 
 class ConnectionPacket : public Connection {
 public:
-								ConnectionPacket(const sockaddr_in& address,
-									int protocol);
+								ConnectionPacket(const ServerAddress& address);
 
 	virtual	status_t			Send(const void* buffer, uint32 size);
 	virtual	status_t			Receive(void** buffer, uint32* size);

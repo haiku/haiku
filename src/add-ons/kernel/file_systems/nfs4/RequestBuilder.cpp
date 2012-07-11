@@ -9,6 +9,7 @@
 
 #include "RequestBuilder.h"
 
+#include <errno.h>
 #include <string.h>
 
 #include "Cookie.h"
@@ -592,7 +593,7 @@ RequestBuilder::SetAttr(const uint32* id, uint32 stateSeq, AttrValue* attr,
 
 
 status_t
-RequestBuilder::SetClientID(const RPC::Server* serv)
+RequestBuilder::SetClientID(const RPC::Server* server)
 {
 	if (fProcedure != ProcCompound)
 		return B_BAD_VALUE;
@@ -604,19 +605,9 @@ RequestBuilder::SetClientID(const RPC::Server* serv)
 	verifier = verifier << 32 | rand();
 	fRequest->Stream().AddUHyper(verifier);
 
-	char id[128] = "HAIKU:kernel:";
-	int pos = strlen(id);
-	*(uint32*)(id + pos) = serv->ID().fAddress;
-	pos += sizeof(uint32);
-	*(uint16*)(id + pos) = serv->ID().fPort;
-	pos += sizeof(uint16);
-	*(uint16*)(id + pos) = serv->ID().fProtocol;
-	pos += sizeof(uint16);
-
-	*(uint32*)(id + pos) = serv->LocalID().fAddress;
-	pos += sizeof(uint32);
-	
-	fRequest->Stream().AddOpaque(id, pos);
+	status_t result = _GenerateClientId(fRequest->Stream(), server);
+	if (result != B_OK)
+		return result;
 
 	// Callbacks are currently not supported
 	fRequest->Stream().AddUInt(0);
@@ -625,6 +616,64 @@ RequestBuilder::SetClientID(const RPC::Server* serv)
 	fRequest->Stream().AddUInt(0);
 
 	fOpCount++;
+
+	return B_OK;
+}
+
+
+status_t
+RequestBuilder::_GenerateClientId(XDR::WriteStream& stream,
+	const RPC::Server* server)
+{
+	char id[512] = "HAIKU:kernel:";
+	int pos = strlen(id);
+
+	const sockaddr* remoteAddress =
+		reinterpret_cast<const sockaddr*>(&server->ID().fAddress);
+
+	ServerAddress local = server->LocalID();
+	const sockaddr* localAddress = reinterpret_cast<sockaddr*>(&local.fAddress);
+	
+	const sockaddr_in* address4;
+	const sockaddr_in6* address6;
+	switch (remoteAddress->sa_family) {
+		case AF_INET:
+			address4 = reinterpret_cast<const sockaddr_in*>(remoteAddress);
+
+			memcpy(id + pos, &address4->sin_addr, sizeof(address4->sin_addr));
+			pos += sizeof(address4->sin_addr);
+
+			memcpy(id + pos,
+				&reinterpret_cast<const sockaddr_in*>(localAddress)->sin_addr,
+				sizeof(address4->sin_addr));
+			pos += sizeof(address4->sin_addr);
+
+			*(uint16*)(id + pos) = address4->sin_port;
+			break;
+
+		case AF_INET6:
+			address6 = reinterpret_cast<const sockaddr_in6*>(remoteAddress);
+
+			memcpy(id + pos, &address6->sin6_addr, sizeof(address6->sin6_addr));
+			pos += sizeof(address6->sin6_addr);
+
+			memcpy(id + pos,
+				&reinterpret_cast<const sockaddr_in6*>(localAddress)->sin6_addr,
+				sizeof(address6->sin6_addr));
+			pos += sizeof(address6->sin6_addr);
+
+			*(uint16*)(id + pos) = address6->sin6_port;
+			break;
+
+		default:
+			return B_BAD_VALUE;
+	}
+	pos += sizeof(uint16);
+
+	*(uint16*)(id + pos) = server->ID().fProtocol;
+	pos += sizeof(uint16);
+	
+	stream.AddOpaque(id, pos);
 
 	return B_OK;
 }

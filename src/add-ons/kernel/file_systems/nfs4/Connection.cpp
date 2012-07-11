@@ -19,6 +19,8 @@
 #include <net/dns_resolver.h>
 
 
+#define NFS4_PORT		2049
+
 #define	LAST_FRAGMENT	0x80000000
 #define MAX_PACKET_SIZE	65535
 
@@ -26,17 +28,15 @@
 bool
 ServerAddress::operator==(const ServerAddress& address)
 {
-	return fAddress == address.fAddress && fPort == address.fPort
-			&& fProtocol == address.fProtocol;
+	return memcmp(&fAddress, &address.fAddress, sizeof(fAddress)) == 0
+		&& fProtocol == address.fProtocol;
 }
 
 bool
 ServerAddress::operator<(const ServerAddress& address)
 {
-	return fAddress < address.fAddress ||
-			(fAddress == address.fAddress && fPort < address.fPort) ||
-			(fAddress == address.fAddress && fPort == address.fPort &&
-				fProtocol < address.fProtocol);
+	int compare = memcmp(&fAddress, &address.fAddress, sizeof(fAddress));
+	return compare < 0 || (compare == 0 && fProtocol < address.fProtocol);
 }
 
 
@@ -44,21 +44,34 @@ ServerAddress&
 ServerAddress::operator=(const ServerAddress& address)
 {
 	fAddress = address.fAddress;
-	fPort = address.fPort;
 	fProtocol = address.fProtocol;
 	return *this;
+}
+
+
+ServerAddress::ServerAddress()
+	:
+	fProtocol(0)
+{
+	memset(&fAddress, 0, sizeof(fAddress));
 }
 
 
 status_t
 ServerAddress::ResolveName(const char* name, ServerAddress* address)
 {
-	address->fPort = 2049;
 	address->fProtocol = IPPROTO_UDP;
 
-	struct in_addr iaddr;
-	if (inet_aton(name, &iaddr) != 0) {
-		address->fAddress = ntohl(iaddr.s_addr);
+	// getaddrinfo() is very expensive when called from kernel, so we do not
+	// want to call it unless there is no other choice.
+
+	struct sockaddr_in addr;
+	memset(&addr, 0, sizeof(addr));
+	if (inet_aton(name, &addr.sin_addr) == 1) {
+		addr.sin_family = AF_INET;
+		addr.sin_port = htons(NFS4_PORT);
+
+		memcpy(&address->fAddress, &addr, sizeof(addr));
 		return B_OK;
 	}
 
@@ -70,16 +83,20 @@ ServerAddress::ResolveName(const char* name, ServerAddress* address)
 	addrinfo* current = ai;
 	while (current != NULL) {
 		if (current->ai_family == AF_INET) {
-			sockaddr_in* sin =
-				reinterpret_cast<sockaddr_in*>(current->ai_addr);
-
-			address->fAddress = ntohl(sin->sin_addr.s_addr);
-
-			freeaddrinfo(ai);
-			return B_OK;
+			memcpy(&address->fAddress, current->ai_addr, sizeof(sockaddr_in));
+			reinterpret_cast<sockaddr_in*>(&address->fAddress)->sin_port
+				= htons(NFS4_PORT);
+		} else if (current->ai_family == AF_INET6) {
+			memcpy(&address->fAddress, current->ai_addr, sizeof(sockaddr_in6));
+			reinterpret_cast<sockaddr_in6*>(&address->fAddress)->sin6_port
+				= htons(NFS4_PORT);
+		} else {
+			current = current->ai_next;
+			continue;
 		}
 
-		current = current->ai_next;
+		freeaddrinfo(ai);
+		return B_OK;
 	}
 
 	freeaddrinfo(ai);
@@ -87,27 +104,26 @@ ServerAddress::ResolveName(const char* name, ServerAddress* address)
 }
 
 
-Connection::Connection(const sockaddr_in& address, int protocol)
+Connection::Connection(const ServerAddress& address)
 	:
 	fWaitCancel(create_sem(0, NULL)),
 	fSocket(-1),
-	fProtocol(protocol),
 	fServerAddress(address)
 {
 	mutex_init(&fSocketLock, NULL);
 }
 
 
-ConnectionStream::ConnectionStream(const sockaddr_in& address, int protocol)
+ConnectionStream::ConnectionStream(const ServerAddress& address)
 	:
-	Connection(address, protocol)
+	Connection(address)
 {
 }
 
 
-ConnectionPacket::ConnectionPacket(const sockaddr_in& address, int protocol)
+ConnectionPacket::ConnectionPacket(const ServerAddress& address)
 	:
-	Connection(address, protocol)
+	Connection(address)
 {
 }
 
@@ -124,17 +140,22 @@ Connection::~Connection()
 status_t
 Connection::GetLocalAddress(ServerAddress* address)
 {
-	struct sockaddr_in saddr;
-	socklen_t slen = sizeof(saddr);
-	status_t result = getsockname(fSocket, (struct sockaddr*)&saddr, &slen);
-	if (result != B_OK)
-		return result;
+	address->fProtocol = fServerAddress.fProtocol;
 
-	address->fProtocol = fProtocol;
-	address->fPort = ntohs(saddr.sin_port);
-	address->fAddress = ntohl(saddr.sin_addr.s_addr);
+	socklen_t addressSize;
+	switch (reinterpret_cast<const sockaddr*>(&fServerAddress)->sa_family) {
+		case AF_INET:
+			addressSize = sizeof(sockaddr_in);
+			break;
+		case AF_INET6:
+			addressSize = sizeof(sockaddr_in6);
+			break;
+		default:
+			return B_BAD_VALUE;
+	}
 
-	return B_OK;
+	return getsockname(fSocket,
+		(struct sockaddr*)&address->fAddress, &addressSize);
 }
 
 
@@ -315,21 +336,13 @@ ConnectionPacket::Receive(void** _buffer, uint32* _size)
 status_t
 Connection::Connect(Connection **_connection, const ServerAddress& address)
 {
-	struct sockaddr_in addr;
-
-	memset(&addr, 0, sizeof(addr));
-	addr.sin_len = sizeof(struct sockaddr_in);
-	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = htonl(address.fAddress);
-	addr.sin_port = htons(address.fPort);
-
 	Connection* conn;
 	switch (address.fProtocol) {
 		case IPPROTO_TCP:
-			conn = new(std::nothrow) ConnectionStream(addr, address.fProtocol);
+			conn = new(std::nothrow) ConnectionStream(address);
 			break;
 		case IPPROTO_UDP:
-			conn = new(std::nothrow) ConnectionPacket(addr, address.fProtocol);
+			conn = new(std::nothrow) ConnectionPacket(address);
 			break;
 		default:
 			return B_BAD_VALUE;
@@ -352,12 +365,15 @@ Connection::Connect(Connection **_connection, const ServerAddress& address)
 status_t
 Connection::Connect()
 {
-	switch (fProtocol) {
+	const sockaddr& address =
+		*reinterpret_cast<const sockaddr*>(&fServerAddress);
+
+	switch (fServerAddress.fProtocol) {
 		case IPPROTO_TCP:
-			fSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+			fSocket = socket(address.sa_family, SOCK_STREAM, IPPROTO_TCP);
 			break;
 		case IPPROTO_UDP:
-			fSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+			fSocket = socket(address.sa_family, SOCK_DGRAM, IPPROTO_UDP);
 			break;
 		default:
 			return B_BAD_VALUE;
@@ -365,8 +381,19 @@ Connection::Connect()
 	if (fSocket < 0)
 		return errno;
 
-	status_t result = connect(fSocket, (struct sockaddr*)&fServerAddress,
-								fServerAddress.sin_len);
+	socklen_t addressSize;
+	switch (address.sa_family) {
+		case AF_INET:
+			addressSize = sizeof(sockaddr_in);
+			break;
+		case AF_INET6:
+			addressSize = sizeof(sockaddr_in6);
+			break;
+		default:
+			return B_BAD_VALUE;
+	}
+
+	status_t result = connect(fSocket, &address, addressSize);
 	if (result < 0) {
 		result = errno;
 		close(fSocket);
