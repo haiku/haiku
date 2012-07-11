@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DWARF_FILE_H
@@ -38,6 +39,13 @@ public:
 			const char*			Name() const		{ return fName; }
 			ElfFile*			GetElfFile() const	{ return fElfFile; }
 
+			bool				HasDebugFrameSection() const {
+									return fDebugFrameSection != NULL;
+								}
+			bool				HasEHFrameSection() const {
+									return fEHFrameSection != NULL;
+								}
+
 			int32				CountCompilationUnits() const;
 			CompilationUnit*	CompilationUnitAt(int32 index) const;
 			CompilationUnit*	CompilationUnitForDIE(
@@ -46,7 +54,8 @@ public:
 			TargetAddressRangeList* ResolveRangeList(CompilationUnit* unit,
 									uint64 offset) const;
 
-			status_t			UnwindCallFrame(CompilationUnit* unit,
+			status_t			UnwindCallFrame(bool usingEHFrameSection,
+									CompilationUnit* unit,
 									DIESubprogram* subprogramEntry,
 									target_addr_t location,
 									const DwarfTargetInterface* inputInterface,
@@ -112,7 +121,9 @@ private:
 
 			status_t			_ParseLineInfo(CompilationUnit* unit);
 
-			status_t			_ParseCIE(CompilationUnit* unit,
+			status_t			_ParseCIE(ElfSection* debugFrameSection,
+									bool usingEHFrameSection,
+									CompilationUnit* unit,
 									CfaContext& context, off_t cieOffset,
 									CIEAugmentation& cieAugmentation);
 			status_t			_ParseFrameInfoInstructions(
@@ -151,14 +162,13 @@ private:
 			ElfSection*			fDebugRangesSection;
 			ElfSection*			fDebugLineSection;
 			ElfSection*			fDebugFrameSection;
+			ElfSection*			fEHFrameSection;
 			ElfSection*			fDebugLocationSection;
 			ElfSection*			fDebugPublicTypesSection;
 			AbbreviationTableList fAbbreviationTables;
 			DebugInfoEntryFactory fDebugInfoFactory;
 			CompilationUnitList	fCompilationUnits;
 			CompilationUnit*	fCurrentCompilationUnit;
-			bool				fUsingEHFrameSection;
-			bool				fGCC4EHFrameSection;
 			bool				fFinished;
 			status_t			fFinishError;
 };
