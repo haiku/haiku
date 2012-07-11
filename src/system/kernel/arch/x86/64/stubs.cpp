@@ -51,29 +51,6 @@ arch_commpage_init_post_cpus(void)
 }
 
 
-ssize_t
-arch_cpu_user_strlcpy(char* to, const char* from, size_t size,
-	addr_t* faultHandler)
-{
-	return B_BAD_ADDRESS;
-}
-
-
-status_t
-arch_cpu_user_memcpy(void* to, const void* from, size_t size,
-	addr_t* faultHandler)
-{
-	return B_BAD_ADDRESS;
-}
-
-
-status_t
-arch_cpu_user_memset(void* s, char c, size_t count, addr_t* faultHandler)
-{
-	return B_BAD_ADDRESS;
-}
-
-
 void
 arch_debug_save_registers(struct arch_debug_registers* registers)
 {
