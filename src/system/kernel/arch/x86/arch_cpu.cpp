@@ -1026,11 +1026,13 @@ arch_cpu_shutdown(bool rebootSystem)
 	if (acpi_shutdown(rebootSystem) == B_OK)
 		return B_OK;
 
-	// TODO x86_64
-#ifndef __x86_64
-	if (!rebootSystem)
+	if (!rebootSystem) {
+#ifndef __x86_64__
 		return apm_shutdown();
+#else
+		return B_NOT_SUPPORTED;
 #endif
+	}
 
 	cpu_status state = disable_interrupts();
 
