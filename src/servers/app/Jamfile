@@ -30,8 +30,9 @@ local font_src =
 UseHeaders $(HAIKU_FREETYPE_HEADERS) : true ;
 Includes [ FGristFiles AppServer.cpp BitmapManager.cpp
 	ClientMemoryAllocator.cpp Desktop.cpp DesktopSettings.cpp DrawState.cpp 
-	ServerApp.cpp ServerBitmap.cpp ServerPicture.cpp ServerWindow.cpp View.cpp
-	Window.cpp WorkspacesView.cpp $(decorator_src) $(font_src) ]
+	ServerApp.cpp ServerBitmap.cpp ServerFont.cpp ServerPicture.cpp
+	ServerWindow.cpp View.cpp Window.cpp WorkspacesView.cpp
+	$(decorator_src) $(font_src) ]
 	: $(HAIKU_FREETYPE_HEADERS_DEPENDENCY) ;
 
 
