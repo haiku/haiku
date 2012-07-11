@@ -634,6 +634,13 @@ if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd
 	}
 }
 
+# On recent versions of OS X cc and c++ point to clang, which fails to
+# compile some of the host tools. As a workaround, force use of GCC.
+if $(HOST_PLATFORM) = darwin {
+	HOST_CC = gcc ;
+	HOST_C++ = g++ ;
+}
+
 if $(HOST_PLATFORM) = cygwin {
 	HOST_LINKFLAGS += -Xlinker --allow-multiple-definition -Xlinker
 		--enable-auto-import ;

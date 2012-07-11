@@ -479,15 +479,18 @@ for sfdiskDir in /sbin /usr/sbin /usr/local/sbin ; do
 	fi
 done
 
-# check for case-sensitive filesystem if on darwin
-if [ $HOST_PLATFORM = "darwin" ]; then
-	diskutil info $(pwd)/.. | grep -i "case-sensitive" > /dev/null
-	if [ $? != 0 ]; then
-		echo "You need a case-sensitive file-system to build Haiku."
-		echo "Please see the following guide on how to set one up:"
-		echo "http://haiku-os.org/documents/dev/how_to_build_haiku_on_mac_os_x"
-		exit 1
+# check for case-sensitive filesystem
+mkdir haikuCaseTest 2>/dev/null
+mkdir haikucasetest 2>/dev/null
+caseInsensitive=$?
+rm -df haikuCaseTest haikucasetest
+if [ $caseInsensitive != 0 ]; then
+	echo "You need a case-sensitive file-system to build Haiku."
+	if [ $HOST_PLATFORM = "darwin" ]; then
+		echo "You can create a case-sensitive disk image using Disk Utility and use"
+		echo "it to store the Haiku sources on."
 	fi
+	exit 1
 fi
 
 # create output directory
