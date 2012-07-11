@@ -43,9 +43,11 @@ private:
 			status_t		_StartRenewing();
 			status_t		_Renewal();
 	static	status_t		_RenewalThreadStart(void* ptr);
+
 			thread_id		fThread;
 			bool			fThreadCancel;
 			sem_id			fWaitCancel;
+			mutex			fThreadStartLock;
 
 			uint32			fLeaseTime;
 
@@ -67,8 +69,7 @@ NFS4Server::IncUsage()
 {
 	MutexLocker _(fFSLock);
 	fUseCount++;
-	if (fThreadCancel)
-		_StartRenewing();
+	_StartRenewing();
 	fClientIdLastUse = time(NULL);
 }
 

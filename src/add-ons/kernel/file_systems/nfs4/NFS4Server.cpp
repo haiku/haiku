@@ -16,7 +16,7 @@
 NFS4Server::NFS4Server(RPC::Server* serv)
 	:
 	fThreadCancel(true),
-	fWaitCancel(create_sem(1, NULL)),
+	fWaitCancel(create_sem(0, NULL)),
 	fLeaseTime(0),
 	fClientIdLastUse(0),
 	fUseCount(0),
@@ -25,6 +25,8 @@ NFS4Server::NFS4Server(RPC::Server* serv)
 {
 	mutex_init(&fClientIdLock, NULL);
 	mutex_init(&fFSLock, NULL);
+	mutex_init(&fThreadStartLock, NULL);
+
 }
 
 
@@ -39,6 +41,7 @@ NFS4Server::~NFS4Server()
 	delete_sem(fWaitCancel);
 	mutex_destroy(&fClientIdLock);
 	mutex_destroy(&fFSLock);
+	mutex_destroy(&fThreadStartLock);
 }
 
 
@@ -166,7 +169,7 @@ NFS4Server::AddFileSystem(FileSystem* fs)
 		fFileSystems->fPrev = fs;
 	fFileSystems = fs;
 	fUseCount += fs->OpenFilesCount();
-	if (fs->OpenFilesCount() > 0 && fThreadCancel)
+	if (fs->OpenFilesCount() > 0)
 		_StartRenewing();
 }
 
@@ -274,6 +277,11 @@ NFS4Server::_GetLeaseTime()
 status_t
 NFS4Server::_StartRenewing()
 {
+	if (!fThreadCancel)
+		return B_OK;
+
+	MutexLocker _(fThreadStartLock);
+
 	if (!fThreadCancel)
 		return B_OK;
 
