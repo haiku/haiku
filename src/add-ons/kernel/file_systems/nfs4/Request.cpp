@@ -15,8 +15,8 @@ status_t
 Request::Send(Cookie* cookie)
 {
 	switch (fServer->ID().fProtocol) {
-		case ProtocolUDP:	return _SendUDP(cookie);
-		case ProtocolTCP:	return _SendTCP(cookie);
+		case IPPROTO_UDP:	return _SendUDP(cookie);
+		case IPPROTO_TCP:	return _SendTCP(cookie);
 	}
 
 	return B_BAD_VALUE;

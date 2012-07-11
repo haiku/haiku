@@ -160,8 +160,7 @@ public:
 						ServerManager();
 						~ServerManager();
 
-			status_t	Acquire(Server** pserv, uint32 ip, uint16 port,
-								Transport proto,
+			status_t	Acquire(Server** pserv, const ServerAddress& id,
 								ProgramData* (*createPriv)(Server*));
 			void		Release(Server* serv);
 

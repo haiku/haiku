@@ -80,9 +80,13 @@ nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 	if (result != B_OK)
 		return result;
 
+	ServerAddress id;
+	id.fAddress = ip;
+	id.fPort = 2049;
+	id.fProtocol = IPPROTO_UDP;
+
 	RPC::Server *server;
-	result = gRPCServerManager->Acquire(&server, ip, 2049, ProtocolUDP,
-		CreateNFS4Server);
+	result = gRPCServerManager->Acquire(&server, id, CreateNFS4Server);
 	if (result != B_OK)
 		return result;
 	

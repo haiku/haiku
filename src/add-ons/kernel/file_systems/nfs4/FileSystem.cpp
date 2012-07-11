@@ -215,16 +215,15 @@ FileSystem::Migrate(const RPC::Server* serv)
 		reinterpret_cast<FSLocations*>(values[0].fData.fLocations);
 
 	RPC::Server* server = fServer;
+	ServerAddress addr = fServer->ID();
 	for (uint32 i = 0; i < locs->fCount; i++) {
 		for (uint32 j = 0; j < locs->fLocations[i].fCount; j++) {
-			ServerAddress addr;
-
 			if (ServerAddress::ResolveName(locs->fLocations[i].fLocations[j],
 				&addr) != B_OK)
 				continue;
 
-			if (gRPCServerManager->Acquire(&fServer, addr.fAddress, addr.fPort,
-				addr.fProtocol, CreateNFS4Server) == B_OK) {
+			if (gRPCServerManager->Acquire(&fServer, addr,
+					CreateNFS4Server) == B_OK) {
 
 				free(const_cast<char*>(fPath));
 				fPath = strdup(locs->fLocations[i].fRootPath);

@@ -54,7 +54,7 @@ status_t
 ServerAddress::ResolveName(const char* name, ServerAddress* addr)
 {
 	addr->fPort = 2049;
-	addr->fProtocol = ProtocolUDP;
+	addr->fProtocol = IPPROTO_UDP;
 
 	struct in_addr iaddr;
 	if (inet_aton(name, &iaddr) != 0) {
@@ -86,7 +86,7 @@ ServerAddress::ResolveName(const char* name, ServerAddress* addr)
 }
 
 
-Connection::Connection(const sockaddr_in& addr, Transport proto)
+Connection::Connection(const sockaddr_in& addr, int proto)
 	:
 	fWaitCancel(create_sem(0, NULL)),
 	fSock(-1),
@@ -97,14 +97,14 @@ Connection::Connection(const sockaddr_in& addr, Transport proto)
 }
 
 
-ConnectionStream::ConnectionStream(const sockaddr_in& addr, Transport proto)
+ConnectionStream::ConnectionStream(const sockaddr_in& addr, int proto)
 	:
 	Connection(addr, proto)
 {
 }
 
 
-ConnectionPacket::ConnectionPacket(const sockaddr_in& addr, Transport proto)
+ConnectionPacket::ConnectionPacket(const sockaddr_in& addr, int proto)
 	:
 	Connection(addr, proto)
 {
@@ -323,10 +323,16 @@ Connection::Connect(Connection **pconn, const ServerAddress& id)
 	addr.sin_port = htons(id.fPort);
 
 	Connection* conn;
-	if (id.fProtocol == ProtocolTCP)
-		conn = new(std::nothrow) ConnectionStream(addr, id.fProtocol);
-	else
-		conn = new(std::nothrow) ConnectionPacket(addr, id.fProtocol);
+	switch (id.fProtocol) {
+		case IPPROTO_TCP:
+			conn = new(std::nothrow) ConnectionStream(addr, id.fProtocol);
+			break;
+		case IPPROTO_UDP:
+			conn = new(std::nothrow) ConnectionPacket(addr, id.fProtocol);
+			break;
+		default:
+			return B_BAD_VALUE;
+	}
 	if (conn == NULL)
 		return B_NO_MEMORY;
 
@@ -346,10 +352,10 @@ status_t
 Connection::_Connect()
 {
 	switch (fProtocol) {
-		case ProtocolTCP:
+		case IPPROTO_TCP:
 			fSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 			break;
-		case ProtocolUDP:
+		case IPPROTO_UDP:
 			fSock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 			break;
 		default:

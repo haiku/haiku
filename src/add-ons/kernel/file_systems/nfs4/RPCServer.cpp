@@ -279,15 +279,10 @@ ServerManager::~ServerManager()
 
 
 status_t
-ServerManager::Acquire(Server** pserv, uint32 ip, uint16 port, Transport proto,
+ServerManager::Acquire(Server** pserv, const ServerAddress& id,
 	ProgramData* (*createPriv)(Server*))
 {
 	status_t result;
-
-	ServerAddress id;
-	id.fAddress = ip;
-	id.fPort = port;
-	id.fProtocol = proto;
 
 	MutexLocker locker(fLock);
 	ServerNode* node = _Find(id);

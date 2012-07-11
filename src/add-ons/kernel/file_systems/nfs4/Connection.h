@@ -15,15 +15,10 @@
 #include <SupportDefs.h>
 
 
-enum Transport {
-		ProtocolTCP		= 6,
-		ProtocolUDP		= 11
-};
-
 struct ServerAddress {
 			uint32				fAddress;
 			uint16				fPort;
-			Transport			fProtocol;
+			int					fProtocol;
 
 			bool				operator==(const ServerAddress& x);
 			bool				operator<(const ServerAddress& x);
@@ -49,22 +44,21 @@ public:
 			void				Disconnect();
 
 protected:
-								Connection(const sockaddr_in& addr,
-									Transport proto);
+								Connection(const sockaddr_in& addr, int proto);
 			status_t			_Connect();
 
 			sem_id				fWaitCancel;
 			int					fSock;
 			mutex				fSockLock;
 
-			const Transport		fProtocol;
+			const int			fProtocol;
 			const sockaddr_in	fServerAddress;
 };
 
 class ConnectionStream : public Connection {
 public:
 								ConnectionStream(const sockaddr_in& addr,
-									Transport proto);
+									int proto);
 
 	virtual	status_t			Send(const void* buffer, uint32 size);
 	virtual	status_t			Receive(void** buffer, uint32* size);
@@ -73,7 +67,7 @@ public:
 class ConnectionPacket : public Connection {
 public:
 								ConnectionPacket(const sockaddr_in& addr,
-									Transport proto);
+									int proto);
 
 	virtual	status_t			Send(const void* buffer, uint32 size);
 	virtual	status_t			Receive(void** buffer, uint32* size);
