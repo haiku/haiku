@@ -312,7 +312,7 @@ status_t
 DebuggerInterface::GetNextDebugEvent(DebugEvent*& _event)
 {
 	while (true) {
-		char buffer[1024];
+		char buffer[2048];
 		int32 messageCode;
 		ssize_t size = read_port(fDebuggerPort, &messageCode, buffer,
 			sizeof(buffer));
@@ -324,7 +324,7 @@ DebuggerInterface::GetNextDebugEvent(DebugEvent*& _event)
 		}
 
 		if (messageCode <= B_DEBUGGER_MESSAGE_HANDED_OVER) {
-			debug_debugger_message_data message;
+ 			debug_debugger_message_data message;
 			memcpy(&message, buffer, size);
 			if (message.origin.team != fTeamID)
 				continue;
