@@ -421,7 +421,7 @@ if $(HAIKU_BUILD_FEATURE_TAGLIB) {
 
 
 # WebKit
-HAIKU_WEBKIT_FILE = webkit-0.1.1-x86-gcc4-2012-07-03.zip ;
+HAIKU_WEBKIT_FILE = haikuwebkit-1.1.2-x86-gcc4-2012-07-11.zip ;
 if $(TARGET_ARCH) = x86 {
 	if $(HAIKU_GCC_VERSION[1]) < 4 {
 		Echo "WebKit support not available on gcc $(HAIKU_GCC_VERSION[1])" ;

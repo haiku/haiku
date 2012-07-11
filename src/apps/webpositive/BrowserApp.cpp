@@ -35,6 +35,7 @@
 #include "SettingsWindow.h"
 #include "svn_revision.h"
 #include "NetworkCookieJar.h"
+#include "WebKitInfo.h"
 #include "WebPage.h"
 #include "WebSettings.h"
 #include "WebView.h"
@@ -86,8 +87,13 @@ void
 BrowserApp::AboutRequested()
 {
 	BString aboutText("WebPositive\n\nby Ryan Leavengood, Andrea Anzani, "
-		"Maxime Simon, Michael Lotz, Rene Gollent and Stephan Aßmus");
-	aboutText << "\n\nSVN revision: " << kSVNRevision;
+		"Maxime Simon, Michael Lotz, Rene Gollent, Stephan Aßmus and "
+		"Alexandre Deckner");
+	aboutText << "\n\nWebPositive 1.1";
+	aboutText << "\n\nHaikuWebKit " << WebKitInfo::HaikuWebKitVersion();
+	aboutText << " (" << WebKitInfo::HaikuWebKitRevision() << ")";
+	aboutText << "\nWebKit " << WebKitInfo::WebKitVersion();
+	aboutText << " (" << WebKitInfo::WebKitRevision() << ")";
 
 	BAlert* alert = new BAlert("About WebPositive", aboutText.String(),
 		"Sweet!");
