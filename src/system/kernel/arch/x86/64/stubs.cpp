@@ -271,41 +271,6 @@ arch_debug_call_with_fault_handler(cpu_ent* cpu, jmp_buf jumpBuffer,
 
 
 status_t
-arch_rtc_init(struct kernel_args *args, struct real_time_data *data)
-{
-	return B_OK;
-}
-
-
-uint32
-arch_rtc_get_hw_time(void)
-{
-	return 0;
-}
-
-
-void
-arch_rtc_set_hw_time(uint32 seconds)
-{
-
-}
-
-
-void
-arch_rtc_set_system_time_offset(struct real_time_data *data, bigtime_t offset)
-{
-
-}
-
-
-bigtime_t
-arch_rtc_get_system_time_offset(struct real_time_data *data)
-{
-	return 0;
-}
-
-
-status_t
 arch_smp_init(kernel_args *args)
 {
 	return B_OK;
@@ -330,20 +295,6 @@ void
 arch_smp_send_ici(int32 target_cpu)
 {
 
-}
-
-
-status_t
-arch_get_system_info(system_info *info, size_t size)
-{
-	return B_OK;
-}
-
-
-status_t
-arch_system_info_init(struct kernel_args *args)
-{
-	return B_OK;
 }
 
 

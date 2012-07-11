@@ -48,9 +48,7 @@ if $(TARGET_ARCH) = x86_64 {
 
 		arch_commpage.cpp
 		arch_debug.cpp
-		arch_real_time_clock.cpp
 		arch_smp.cpp
-		arch_system_info.cpp
 		arch_user_debugger.cpp
 		apm.cpp
 		bios.cpp
@@ -84,6 +82,8 @@ local archGenericSources =
 	arch_elf.cpp
 	arch_int.cpp
 	arch_platform.cpp
+	arch_real_time_clock.cpp
+	arch_system_info.cpp
 	arch_thread.cpp
 	arch_timer.cpp
 	arch_vm.cpp
