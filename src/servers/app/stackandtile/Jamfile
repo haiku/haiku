@@ -10,14 +10,17 @@ UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
 UseHeaders $(HAIKU_FREETYPE_HEADERS) : true ;
 
-Includes [ FGristFiles SATDecorator.cpp SATGroup.cpp SATWindow.cpp StackAndTile.cpp Stacking.cpp Tiling.cpp ]
-	: $(HAIKU_FREETYPE_HEADERS_DEPENDENCY) ;
-
-StaticLibrary libstackandtile.a :
+local sources =
 	SATDecorator.cpp
 	SATGroup.cpp
 	SATWindow.cpp
 	StackAndTile.cpp
 	Stacking.cpp
-	Tiling.cpp
+	Tiling.cpp ;
+
+Includes [ FGristFiles $(sources) ]
+	: $(HAIKU_FREETYPE_HEADERS_DEPENDENCY) ;
+
+StaticLibrary libstackandtile.a :
+	$(sources)
 ;
