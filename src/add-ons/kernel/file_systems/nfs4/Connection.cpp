@@ -24,41 +24,41 @@
 
 
 bool
-ServerAddress::operator==(const ServerAddress& x)
+ServerAddress::operator==(const ServerAddress& address)
 {
-	return fAddress == x.fAddress && fPort == x.fPort
-			&& fProtocol == x.fProtocol;
+	return fAddress == address.fAddress && fPort == address.fPort
+			&& fProtocol == address.fProtocol;
 }
 
 bool
-ServerAddress::operator<(const ServerAddress& x)
+ServerAddress::operator<(const ServerAddress& address)
 {
-	return fAddress < x.fAddress ||
-			(fAddress == x.fAddress && fPort < x.fPort) ||
-			(fAddress == x.fAddress && fPort == x.fPort &&
-				fProtocol < x.fProtocol);
+	return fAddress < address.fAddress ||
+			(fAddress == address.fAddress && fPort < address.fPort) ||
+			(fAddress == address.fAddress && fPort == address.fPort &&
+				fProtocol < address.fProtocol);
 }
 
 
 ServerAddress&
-ServerAddress::operator=(const ServerAddress& x)
+ServerAddress::operator=(const ServerAddress& address)
 {
-	fAddress = x.fAddress;
-	fPort = x.fPort;
-	fProtocol = x.fProtocol;
+	fAddress = address.fAddress;
+	fPort = address.fPort;
+	fProtocol = address.fProtocol;
 	return *this;
 }
 
 
 status_t
-ServerAddress::ResolveName(const char* name, ServerAddress* addr)
+ServerAddress::ResolveName(const char* name, ServerAddress* address)
 {
-	addr->fPort = 2049;
-	addr->fProtocol = IPPROTO_UDP;
+	address->fPort = 2049;
+	address->fProtocol = IPPROTO_UDP;
 
 	struct in_addr iaddr;
 	if (inet_aton(name, &iaddr) != 0) {
-		addr->fAddress = ntohl(iaddr.s_addr);
+		address->fAddress = ntohl(iaddr.s_addr);
 		return B_OK;
 	}
 
@@ -70,9 +70,10 @@ ServerAddress::ResolveName(const char* name, ServerAddress* addr)
 	addrinfo* current = ai;
 	while (current != NULL) {
 		if (current->ai_family == AF_INET) {
-			sockaddr_in* sin = reinterpret_cast<sockaddr_in*>(current->ai_addr);
+			sockaddr_in* sin =
+				reinterpret_cast<sockaddr_in*>(current->ai_addr);
 
-			addr->fAddress = ntohl(sin->sin_addr.s_addr);
+			address->fAddress = ntohl(sin->sin_addr.s_addr);
 
 			freeaddrinfo(ai);
 			return B_OK;
@@ -86,52 +87,52 @@ ServerAddress::ResolveName(const char* name, ServerAddress* addr)
 }
 
 
-Connection::Connection(const sockaddr_in& addr, int proto)
+Connection::Connection(const sockaddr_in& address, int protocol)
 	:
 	fWaitCancel(create_sem(0, NULL)),
-	fSock(-1),
-	fProtocol(proto),
-	fServerAddress(addr)
+	fSocket(-1),
+	fProtocol(protocol),
+	fServerAddress(address)
 {
-	mutex_init(&fSockLock, NULL);
+	mutex_init(&fSocketLock, NULL);
 }
 
 
-ConnectionStream::ConnectionStream(const sockaddr_in& addr, int proto)
+ConnectionStream::ConnectionStream(const sockaddr_in& address, int protocol)
 	:
-	Connection(addr, proto)
+	Connection(address, protocol)
 {
 }
 
 
-ConnectionPacket::ConnectionPacket(const sockaddr_in& addr, int proto)
+ConnectionPacket::ConnectionPacket(const sockaddr_in& address, int protocol)
 	:
-	Connection(addr, proto)
+	Connection(address, protocol)
 {
 }
 
 
 Connection::~Connection()
 {
-	if (fSock != -1)
-		close(fSock);
-	mutex_destroy(&fSockLock);
+	if (fSocket != -1)
+		close(fSocket);
+	mutex_destroy(&fSocketLock);
 	delete_sem(fWaitCancel);
 }
 
 
 status_t
-Connection::GetLocalID(ServerAddress* addr)
+Connection::GetLocalAddress(ServerAddress* address)
 {
 	struct sockaddr_in saddr;
-	socklen_t slen = sizeof(addr);
-	status_t result = getsockname(fSock, (struct sockaddr*)&saddr, &slen);
+	socklen_t slen = sizeof(saddr);
+	status_t result = getsockname(fSocket, (struct sockaddr*)&saddr, &slen);
 	if (result != B_OK)
 		return result;
 
-	addr->fProtocol = fProtocol;
-	addr->fPort = ntohs(saddr.sin_port);
-	addr->fAddress = ntohl(saddr.sin_addr.s_addr);
+	address->fProtocol = fProtocol;
+	address->fPort = ntohs(saddr.sin_port);
+	address->fAddress = ntohl(saddr.sin_addr.s_addr);
 
 	return B_OK;
 }
@@ -152,12 +153,12 @@ ConnectionStream::Send(const void* buffer, uint32 size)
 	// More than one threads may send data and ksend is allowed to send partial
 	// data. Need a lock here.
 	uint32 sent = 0;
-	mutex_lock(&fSockLock);
+	mutex_lock(&fSocketLock);
 	do {
-		result = send(fSock, buf + sent, size + sizeof(uint32) - sent, 0);
+		result = send(fSocket, buf + sent, size + sizeof(uint32) - sent, 0);
 		sent += result;
 	} while (result > 0 && sent < size + sizeof(uint32));
-	mutex_unlock(&fSockLock);
+	mutex_unlock(&fSocketLock);
 	if (result < 0) {
 		result = errno;
 		free(buf);
@@ -176,7 +177,7 @@ status_t
 ConnectionPacket::Send(const void* buffer, uint32 size)
 {
 	// send on DGRAM sockets is atomic. No need to lock.
-	status_t result = send(fSock, buffer,  size, 0);
+	status_t result = send(fSocket, buffer,  size, 0);
 	if (result < 0)
 		return errno;
 
@@ -185,7 +186,7 @@ ConnectionPacket::Send(const void* buffer, uint32 size)
 
 
 status_t
-ConnectionStream::Receive(void** pbuffer, uint32* psize)
+ConnectionStream::Receive(void** _buffer, uint32* _size)
 {
 	status_t result;
 
@@ -200,7 +201,7 @@ ConnectionStream::Receive(void** pbuffer, uint32* psize)
 	object[0].type = B_OBJECT_TYPE_SEMAPHORE;
 	object[0].events = B_EVENT_ACQUIRE_SEMAPHORE;
 
-	object[1].object = fSock;
+	object[1].object = fSocket;
 	object[1].type = B_OBJECT_TYPE_FD;
 	object[1].events = B_EVENT_READ;
 
@@ -216,7 +217,7 @@ ConnectionStream::Receive(void** pbuffer, uint32* psize)
 		// There is only one listener thread per connection. No need to lock.
 		uint32 received = 0;
 		do {
-			result = recv(fSock, &record_size + received,
+			result = recv(fSocket, &record_size + received,
 							sizeof(record_size) - received, 0);
 			received += result;
 		} while (result > 0 && received < sizeof(record_size));
@@ -242,7 +243,7 @@ ConnectionStream::Receive(void** pbuffer, uint32* psize)
 
 		received = 0;
 		do {
-			result = recv(fSock, (uint8*)buffer + size + received,
+			result = recv(fSocket, (uint8*)buffer + size + received,
 							record_size - received, 0);
 			received += result;
 		} while (result > 0 && received < sizeof(record_size));
@@ -256,15 +257,15 @@ ConnectionStream::Receive(void** pbuffer, uint32* psize)
 	} while (!last_one);
 
 
-	*pbuffer = buffer;
-	*psize = size;
+	*_buffer = buffer;
+	*_size = size;
 
 	return B_OK;
 }
 
 
 status_t
-ConnectionPacket::Receive(void** pbuffer, uint32* psize)
+ConnectionPacket::Receive(void** _buffer, uint32* _size)
 {
 	status_t result;
 	int32 size = MAX_PACKET_SIZE;
@@ -278,7 +279,7 @@ ConnectionPacket::Receive(void** pbuffer, uint32* psize)
 	object[0].type = B_OBJECT_TYPE_SEMAPHORE;
 	object[0].events = B_EVENT_ACQUIRE_SEMAPHORE;
 
-	object[1].object = fSock;
+	object[1].object = fSocket;
 	object[1].type = B_OBJECT_TYPE_FD;
 	object[1].events = B_EVENT_READ;
 
@@ -294,7 +295,7 @@ ConnectionPacket::Receive(void** pbuffer, uint32* psize)
 	} while (true);
 
 	// There is only one listener thread per connection. No need to lock.
-	size = recv(fSock, buffer, size, 0);
+	size = recv(fSocket, buffer, size, 0);
 	if (size < 0) {
 		result = errno;
 		free(buffer);
@@ -304,31 +305,31 @@ ConnectionPacket::Receive(void** pbuffer, uint32* psize)
 		return ECONNABORTED;
 	}
 
-	*pbuffer = buffer;
-	*psize = size;
+	*_buffer = buffer;
+	*_size = size;
 
 	return B_OK;
 }
 
 
 status_t
-Connection::Connect(Connection **pconn, const ServerAddress& id)
+Connection::Connect(Connection **_connection, const ServerAddress& address)
 {
 	struct sockaddr_in addr;
 
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_len = sizeof(struct sockaddr_in);
 	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = htonl(id.fAddress);
-	addr.sin_port = htons(id.fPort);
+	addr.sin_addr.s_addr = htonl(address.fAddress);
+	addr.sin_port = htons(address.fPort);
 
 	Connection* conn;
-	switch (id.fProtocol) {
+	switch (address.fProtocol) {
 		case IPPROTO_TCP:
-			conn = new(std::nothrow) ConnectionStream(addr, id.fProtocol);
+			conn = new(std::nothrow) ConnectionStream(addr, address.fProtocol);
 			break;
 		case IPPROTO_UDP:
-			conn = new(std::nothrow) ConnectionPacket(addr, id.fProtocol);
+			conn = new(std::nothrow) ConnectionPacket(addr, address.fProtocol);
 			break;
 		default:
 			return B_BAD_VALUE;
@@ -336,39 +337,39 @@ Connection::Connect(Connection **pconn, const ServerAddress& id)
 	if (conn == NULL)
 		return B_NO_MEMORY;
 
-	status_t result = conn->_Connect();
+	status_t result = conn->Connect();
 	if (result != B_OK) {
 		delete conn;
 		return result;
 	}
 
-	*pconn = conn;
+	*_connection = conn;
 
 	return B_OK;
 }
 
 
 status_t
-Connection::_Connect()
+Connection::Connect()
 {
 	switch (fProtocol) {
 		case IPPROTO_TCP:
-			fSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+			fSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 			break;
 		case IPPROTO_UDP:
-			fSock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+			fSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 			break;
 		default:
 			return B_BAD_VALUE;
 	}
-	if (fSock < 0)
+	if (fSocket < 0)
 		return errno;
 
-	status_t result = connect(fSock, (struct sockaddr*)&fServerAddress,
+	status_t result = connect(fSocket, (struct sockaddr*)&fServerAddress,
 								fServerAddress.sin_len);
 	if (result < 0) {
 		result = errno;
-		close(fSock);
+		close(fSocket);
 		return result;
 	}
 
@@ -380,9 +381,9 @@ status_t
 Connection::Reconnect()
 {
 	release_sem(fWaitCancel);
-	close(fSock);
+	close(fSocket);
 	acquire_sem(fWaitCancel);
-	return _Connect();
+	return Connect();
 }
 
 
@@ -391,8 +392,7 @@ Connection::Disconnect()
 {
 	release_sem(fWaitCancel);
 
-	int sock = fSock;
-	fSock = -1;
-	close(sock);
+	close(fSocket);
+	fSocket = -1;
 }
 

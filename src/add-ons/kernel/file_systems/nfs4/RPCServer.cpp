@@ -35,14 +35,14 @@ RequestManager::~RequestManager()
 
 
 void
-RequestManager::AddRequest(Request* req)
+RequestManager::AddRequest(Request* request)
 {
 	MutexLocker _(fLock);
 	if (fQueueTail != NULL)
-		fQueueTail->fNext = req;
+		fQueueTail->fNext = request;
 	else 
-		fQueueHead = req;
-	fQueueTail = req;
+		fQueueHead = request;
+	fQueueTail = request;
 }
 
 
@@ -72,10 +72,10 @@ RequestManager::FindRequest(uint32 xid)
 }
 
 
-Server::Server(Connection* conn, ServerAddress* addr)
+Server::Server(Connection* connection, ServerAddress* address)
 	:
-	fConnection(conn),
-	fAddress(addr),
+	fConnection(connection),
+	fAddress(address),
 	fPrivateData(NULL),
 	fXID(rand() << 1)
 {
@@ -164,19 +164,19 @@ Server::SendCallAsync(Call* call, Reply** reply, Request** request)
 
 
 status_t
-Server::ResendCallAsync(Call* call, Request* req)
+Server::ResendCallAsync(Call* call, Request* request)
 {
 	if (fThreadError != B_OK) {
-		fRequests.FindRequest(req->fXID);
-		delete req;
+		fRequests.FindRequest(request->fXID);
+		delete request;
 		return fThreadError;
 	}
 
 	XDR::WriteStream& stream = call->Stream();
 	status_t result = fConnection->Send(stream.Buffer(), stream.Size());
 	if (result != B_OK) {
-		fRequests.FindRequest(req->fXID);
-		delete req;
+		fRequests.FindRequest(request->fXID);
+		delete request;
 		return result;
 	}
 
@@ -257,9 +257,9 @@ Server::_Listener()
 
 
 status_t
-Server::_ListenerThreadStart(void* ptr)
+Server::_ListenerThreadStart(void* object)
 {
-	Server* server = reinterpret_cast<Server*>(ptr);
+	Server* server = reinterpret_cast<Server*>(object);
 	return server->_Listener();
 }
 
@@ -279,16 +279,16 @@ ServerManager::~ServerManager()
 
 
 status_t
-ServerManager::Acquire(Server** pserv, const ServerAddress& id,
-	ProgramData* (*createPriv)(Server*))
+ServerManager::Acquire(Server** _server, const ServerAddress& address,
+	ProgramData* (*createPrivateData)(Server*))
 {
 	status_t result;
 
 	MutexLocker locker(fLock);
-	ServerNode* node = _Find(id);
+	ServerNode* node = _Find(address);
 	if (node != NULL) {
 		node->fRefCount++;
-		*pserv = node->fServer;
+		*_server = node->fServer;
 
 		return B_OK;
 	}
@@ -297,10 +297,10 @@ ServerManager::Acquire(Server** pserv, const ServerAddress& id,
 	if (node == NULL)
 		return B_NO_MEMORY;
 
-	node->fID = id;
+	node->fID = address;
 
 	Connection* conn;
-	result = Connection::Connect(&conn, id);
+	result = Connection::Connect(&conn, address);
 	if (result != B_OK) {
 		delete node;
 		return result;
@@ -312,7 +312,7 @@ ServerManager::Acquire(Server** pserv, const ServerAddress& id,
 		delete conn;
 		return B_NO_MEMORY;
 	}
-	node->fServer->SetPrivateData(createPriv(node->fServer));
+	node->fServer->SetPrivateData(createPrivateData(node->fServer));
 
 	node->fRefCount = 1;
 	node->fLeft = node->fRight = NULL;
@@ -323,20 +323,20 @@ ServerManager::Acquire(Server** pserv, const ServerAddress& id,
 
 		delete node->fServer;
 		delete node;
-		*pserv = nd->fServer;
+		*_server = nd->fServer;
 		return B_OK;
 	}
 
-	*pserv = node->fServer;
+	*_server = node->fServer;
 	return B_OK;
 }
 
 
 void
-ServerManager::Release(Server* serv)
+ServerManager::Release(Server* server)
 {
 	MutexLocker _(fLock);
-	ServerNode* node = _Find(serv->ID());
+	ServerNode* node = _Find(server->ID());
 	if (node != NULL) {
 		node->fRefCount--;
 
@@ -350,13 +350,13 @@ ServerManager::Release(Server* serv)
 
 
 ServerNode*
-ServerManager::_Find(const ServerAddress& id)
+ServerManager::_Find(const ServerAddress& address)
 {
 	ServerNode* node = fRoot;
 	while (node != NULL) {
-		if (node->fID == id)
+		if (node->fID == address)
 			return node;
-		if (node->fID < id)
+		if (node->fID < address)
 			node = node->fRight;
 		else
 			node = node->fLeft;

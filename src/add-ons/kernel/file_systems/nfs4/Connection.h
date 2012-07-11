@@ -20,36 +20,37 @@ struct ServerAddress {
 			uint16				fPort;
 			int					fProtocol;
 
-			bool				operator==(const ServerAddress& x);
-			bool				operator<(const ServerAddress& x);
+			bool				operator==(const ServerAddress& address);
+			bool				operator<(const ServerAddress& address);
 
-			ServerAddress&		operator=(const ServerAddress& x);
+			ServerAddress&		operator=(const ServerAddress& address);
 
 	static	status_t			ResolveName(const char* name,
-									ServerAddress* addr);
+									ServerAddress* address);
 };
 
 class Connection {
 public:
-	static	status_t			Connect(Connection **conn,
-									const ServerAddress& id);
+	static	status_t			Connect(Connection **connection,
+									const ServerAddress& address);
 	virtual						~Connection();
 
 	virtual	status_t			Send(const void* buffer, uint32 size) = 0;
 	virtual	status_t			Receive(void** buffer, uint32* size) = 0;
 
-			status_t			GetLocalID(ServerAddress* addr);
+			status_t			GetLocalAddress(ServerAddress* address);
 
 			status_t			Reconnect();
 			void				Disconnect();
 
 protected:
-								Connection(const sockaddr_in& addr, int proto);
-			status_t			_Connect();
+								Connection(const sockaddr_in& address,
+									int protocol);
+			status_t			Connect();
 
 			sem_id				fWaitCancel;
-			int					fSock;
-			mutex				fSockLock;
+			int					fSocket;
+			mutex				fSocketLock;
 
 			const int			fProtocol;
 			const sockaddr_in	fServerAddress;
@@ -57,8 +58,8 @@ protected:
 
 class ConnectionStream : public Connection {
 public:
-								ConnectionStream(const sockaddr_in& addr,
-									int proto);
+								ConnectionStream(const sockaddr_in& address,
+									int protocol);
 
 	virtual	status_t			Send(const void* buffer, uint32 size);
 	virtual	status_t			Receive(void** buffer, uint32* size);
@@ -66,8 +67,8 @@ public:
 
 class ConnectionPacket : public Connection {
 public:
-								ConnectionPacket(const sockaddr_in& addr,
-									int proto);
+								ConnectionPacket(const sockaddr_in& address,
+									int protocol);
 
 	virtual	status_t			Send(const void* buffer, uint32 size);
 	virtual	status_t			Receive(void** buffer, uint32* size);

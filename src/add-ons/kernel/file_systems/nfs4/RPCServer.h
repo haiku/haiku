@@ -35,7 +35,7 @@ public:
 						RequestManager();
 						~RequestManager();
 
-			void		AddRequest(Request* req);
+			void		AddRequest(Request* request);
 			Request*	FindRequest(uint32 xid);
 
 private:
@@ -52,15 +52,17 @@ public:
 
 class Server {
 public:
-									Server(Connection* conn,
-										ServerAddress* addr);
+									Server(Connection* connection,
+										ServerAddress* address);
 	virtual							~Server();
 
 			status_t				SendCall(Call* call, Reply** reply);
 
 			status_t				SendCallAsync(Call* call, Reply** reply,
 										Request** request);
-			status_t				ResendCallAsync(Call* call, Request* req);
+			status_t				ResendCallAsync(Call* call,
+										Request* request);
+
 	inline	status_t				WaitCall(Request* request,
 										bigtime_t time = kWaitTime);
 	inline	status_t				CancelCall(Request* request);
@@ -72,7 +74,7 @@ public:
 	inline	ServerAddress			LocalID() const;
 
 	inline	ProgramData*			PrivateData();
-	inline	void					SetPrivateData(ProgramData* priv);
+	inline	void					SetPrivateData(ProgramData* privateData);
 
 private:
 	inline	uint32					_GetXID();
@@ -80,7 +82,7 @@ private:
 			status_t				_StartListening();
 
 			status_t				_Listener();
-	static	status_t				_ListenerThreadStart(void* ptr);
+	static	status_t				_ListenerThreadStart(void* object);
 
 			thread_id				fThread;
 			bool					fThreadCancel;
@@ -126,7 +128,7 @@ Server::LocalID() const
 {
 	ServerAddress addr;
 	memset(&addr, 0, sizeof(addr));
-	fConnection->GetLocalID(&addr);
+	fConnection->GetLocalAddress(&addr);
 	return addr;
 }
 
@@ -139,10 +141,10 @@ Server::PrivateData()
 
 
 inline void
-Server::SetPrivateData(ProgramData* priv)
+Server::SetPrivateData(ProgramData* privateData)
 {
 	delete fPrivateData;
-	fPrivateData = priv;
+	fPrivateData = privateData;
 }
 
 
@@ -160,13 +162,13 @@ public:
 						ServerManager();
 						~ServerManager();
 
-			status_t	Acquire(Server** pserv, const ServerAddress& id,
-								ProgramData* (*createPriv)(Server*));
-			void		Release(Server* serv);
+			status_t	Acquire(Server** _server, const ServerAddress& address,
+								ProgramData* (*createPrivateData)(Server*));
+			void		Release(Server* server);
 
 private:
 
-			ServerNode*	_Find(const ServerAddress& id);
+			ServerNode*	_Find(const ServerAddress& address);
 			void		_Delete(ServerNode* node);
 			ServerNode*	_Insert(ServerNode* node);
 
