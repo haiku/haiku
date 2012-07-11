@@ -83,11 +83,6 @@ struct interrupt_frame {
 	uint32 eflags;
 };
 
-struct interrupt_descriptor {
-	uint32 a;
-	uint32 b;
-};
-
 
 static interrupt_descriptor sDebugIDT[DEBUG_IDT_SLOT_COUNT];
 

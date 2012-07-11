@@ -73,6 +73,55 @@ platform_boot_options(void)
 }
 
 
+/*!	Target function of the SMP trampoline code.
+	The trampoline code should have the pgdir and a gdt set up for us,
+	along with us being on the final stack for this processor. We need
+	to set up the local APIC and load the global idt and gdt. When we're
+	done, we'll jump into the kernel with the cpu number as an argument.
+*/
+static void
+smp_start_kernel(void)
+{
+	uint32 curr_cpu = smp_get_current_cpu();
+	struct gdt_idt_descr idt_descr;
+	struct gdt_idt_descr gdt_descr;
+
+	//TRACE(("smp_cpu_ready: entry cpu %ld\n", curr_cpu));
+
+	preloaded_elf32_image *image = static_cast<preloaded_elf32_image *>(
+		gKernelArgs.kernel_image.Pointer());
+
+	// Important.  Make sure supervisor threads can fault on read only pages...
+	asm("movl %%eax, %%cr0" : : "a" ((1 << 31) | (1 << 16) | (1 << 5) | 1));
+	asm("cld");
+	asm("fninit");
+
+	// Set up the final idt
+	idt_descr.limit = IDT_LIMIT - 1;
+	idt_descr.base = (uint32 *)(addr_t)gKernelArgs.arch_args.vir_idt;
+
+	asm("lidt	%0;"
+		: : "m" (idt_descr));
+
+	// Set up the final gdt
+	gdt_descr.limit = GDT_LIMIT - 1;
+	gdt_descr.base = (uint32 *)gKernelArgs.arch_args.vir_gdt;
+
+	asm("lgdt	%0;"
+		: : "m" (gdt_descr));
+
+	asm("pushl  %0; "					// push the cpu number
+		"pushl 	%1;	"					// kernel args
+		"pushl 	$0x0;"					// dummy retval for call to main
+		"pushl 	%2;	"					// this is the start address
+		"ret;		"					// jump.
+		: : "g" (curr_cpu), "g" (&gKernelArgs),
+			"g" (image->elf_header.e_entry));
+
+	panic("kernel returned!\n");
+}
+
+
 extern "C" void
 platform_start_kernel(void)
 {
@@ -99,7 +148,7 @@ platform_start_kernel(void)
 	// We're about to enter the kernel -- disable console output.
 	stdout = NULL;
 
-	smp_boot_other_cpus();
+	smp_boot_other_cpus(smp_start_kernel);
 
 	dprintf("kernel entry at %lx\n", image->elf_header.e_entry);
 

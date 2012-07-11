@@ -349,7 +349,7 @@ x86_init_fpu(void)
 static void
 load_tss(int cpu)
 {
-	short seg = ((TSS_BASE_SEGMENT + cpu) << 3) | DPL_KERNEL;
+	short seg = (TSS_SEGMENT(cpu) << 3) | DPL_KERNEL;
 	asm("ltr %%ax" : : "a" (seg));
 }
 
@@ -789,7 +789,8 @@ arch_cpu_init_percpu(kernel_args* args, int cpu)
 			uint16	limit;
 			void*	address;
 		} _PACKED descriptor = {
-			256 * 8 - 1,	// 256 descriptors, 8 bytes each (-1 for "limit")
+			256 * sizeof(interrupt_descriptor) - 1,
+				// 256 descriptors (-1 for "limit")
 			x86_get_idt(cpu)
 		};
 

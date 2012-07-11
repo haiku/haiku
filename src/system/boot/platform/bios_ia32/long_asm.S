@@ -17,15 +17,17 @@
 .code32
 
 
-/*!	void long_enter_kernel(uint32 physPML4, uint32 physGDT, uint64 virtGDT,
-		uint64 entry, uint64 stackTop, uint64 kernelArgs, int currentCPU);
-*/
+/*!	void long_enter_kernel(int currentCPU, uint64 stackTop); */
 FUNCTION(long_enter_kernel):
+	// Preserve the arguments. We may no longer be able to use the stack once
+	// paging is disabled.
+	movl	4(%esp), %ebx
+	movl	8(%esp), %edi
+	movl	12(%esp), %esi
+
 	// We're about to disable paging, so we need to load the the physical
 	// address of our GDT.
-	movl	8(%esp), %eax
-	movl	%eax, (long_gdtr + 2)
-	lgdtl	(long_gdtr)
+	lgdtl	long_phys_gdtr
 
 	// Currently running with 32-bit paging tables at an identity mapped
 	// address. To switch to 64-bit paging we must first disable 32-bit paging,
@@ -40,11 +42,11 @@ FUNCTION(long_enter_kernel):
 	movl	%eax, %cr4
 
 	// Point CR3 to the kernel's PML4.
-	movl	4(%esp), %eax
+	movl	gLongPhysicalPML4, %eax
 	movl	%eax, %cr3
 
 	// Enable long mode by setting EFER.LME.
-	movl	$0xC0000080, %ecx
+	movl	$0xc0000080, %ecx
 	rdmsr
 	orl		$(1 << 8), %eax
 	wrmsr
@@ -68,32 +70,41 @@ FUNCTION(long_enter_kernel):
 	mov		%ax, %fs
 	mov		%ax, %gs
 
-	// Clear the high 32 bits of RSP.
-	movl	%esp, %esp
-
 	// Load the virtual address of the GDT.
-	movq	12(%rsp), %rax
-	movq	%rax, long_gdtr + 2(%rip)
-	lgdtq	long_gdtr(%rip)
+	lgdtq	long_virt_gdtr(%rip)
 
-	// Get the entry point address, arguments and new stack pointer.
-	movq	20(%rsp), %rax
-	movq	36(%rsp), %rdi
-	movl	44(%rsp), %esi
-	movq	28(%rsp), %rsp
+	// Set the stack pointer.
+	movl	%edi, %esp
+	shl		$32, %rsi
+	orq		%rsi, %rsp
 
 	// Clear the stack frame/RFLAGS.
 	xorq	%rbp, %rbp
 	push	$0
 	popf
 
-	// Call the kernel entry point.
+	// Get arguments and call the kernel entry point.
+	leaq	gKernelArgs(%rip), %rdi
+	movl	%ebx, %esi
+	movq	gLongKernelEntry(%rip), %rax
 	call	*%rax
 
 	
 .data
 
 
-long_gdtr:
+long_phys_gdtr:
 	.word	GDT_LIMIT - 1
+SYMBOL(gLongPhysicalGDT):
+	.long	0
+
+long_virt_gdtr:
+	.word	GDT_LIMIT - 1
+SYMBOL(gLongVirtualGDT):
+	.quad	0
+
+SYMBOL(gLongPhysicalPML4):
+	.long	0
+
+SYMBOL(gLongKernelEntry):
 	.quad	0

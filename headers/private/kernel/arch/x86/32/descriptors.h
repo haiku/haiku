@@ -50,6 +50,10 @@ typedef struct segment_descriptor {
 	uint32 base_31_24 : 8;			//		24 - 31
 } segment_descriptor;
 
+typedef struct interrupt_descriptor {
+	uint32 a, b;
+} interrupt_descriptor;
+
 struct tss {
 	uint16 prev_task;
 	uint16 unused0;

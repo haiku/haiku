@@ -62,10 +62,7 @@ static const int kInterruptNameCount = 20;
 
 #define MAX_ARGS 16
 
-typedef struct {
-	uint32 a, b;
-} desc_table;
-static desc_table* sIDTs[B_MAX_CPU_COUNT];
+static interrupt_descriptor* sIDTs[B_MAX_CPU_COUNT];
 
 // table with functions handling respective interrupts
 typedef void interrupt_handler_function(struct iframe* frame);
@@ -80,7 +77,7 @@ extern void hardware_interrupt(struct iframe* frame);
 /*!	Initializes a descriptor in an IDT.
 */
 static void
-set_gate(desc_table *gate_addr, addr_t addr, int type, int dpl)
+set_gate(interrupt_descriptor *gate_addr, addr_t addr, int type, int dpl)
 {
 	unsigned int gate1; // first byte of gate desc
 	unsigned int gate2; // second byte of gate desc
@@ -353,7 +350,7 @@ arch_int_init(struct kernel_args *args)
 	interrupt_handler_function** table;
 
 	// set the global sIDT variable
-	sIDTs[0] = (desc_table *)(addr_t)args->arch_args.vir_idt;
+	sIDTs[0] = (interrupt_descriptor *)(addr_t)args->arch_args.vir_idt;
 
 	// setup the standard programmable interrupt controller
 	pic_init();
@@ -668,7 +665,7 @@ arch_int_init_post_vm(struct kernel_args *args)
 	int32 cpuCount = smp_get_num_cpus();
 	if (cpuCount > 0) {
 		size_t areaSize = ROUNDUP(cpuCount * idtSize, B_PAGE_SIZE);
-		desc_table* idt;
+		interrupt_descriptor* idt;
 		virtual_address_restrictions virtualRestrictions = {};
 		virtualRestrictions.address_specification = B_ANY_KERNEL_ADDRESS;
 		physical_address_restrictions physicalRestrictions = {};

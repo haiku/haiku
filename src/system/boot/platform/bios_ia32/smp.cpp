@@ -20,8 +20,10 @@
 #include <boot/menu.h>
 #include <arch/x86/apic.h>
 #include <arch/x86/arch_acpi.h>
+#include <arch/x86/arch_cpu.h>
 #include <arch/x86/arch_smp.h>
 #include <arch/x86/arch_system_info.h>
+#include <arch/x86/descriptors.h>
 
 #include "mmu.h"
 #include "acpi.h"
@@ -37,10 +39,6 @@
 #	define TRACE(x) ;
 #endif
 
-struct gdt_idt_descr {
-	uint16 a;
-	uint32 *b;
-} _PACKED;
 
 static struct scan_spots_struct smp_scan_spots[] = {
 	{ 0x9fc00, 0xa0000, 0xa0000 - 0x9fc00 },
@@ -54,9 +52,6 @@ extern "C" void smp_trampoline(void);
 extern "C" void smp_trampoline_end(void);
 
 
-static int smp_get_current_cpu(void);
-
-
 static uint32
 apic_read(uint32 offset)
 {
@@ -68,22 +63,6 @@ static void
 apic_write(uint32 offset, uint32 data)
 {
 	*(volatile uint32 *)((addr_t)(void *)gKernelArgs.arch_args.apic + offset) = data;
-}
-
-
-static int
-smp_get_current_cpu(void)
-{
-	if (gKernelArgs.arch_args.apic == NULL)
-		return 0;
-
-	uint8 apicID = apic_read(APIC_ID) >> 24;
-	for (uint32 i = 0; i < gKernelArgs.num_cpus; i++) {
-		if (gKernelArgs.arch_args.cpu_apic_id[i] == apicID)
-			return i;
-	}
-
-	return 0;
 }
 
 
@@ -341,56 +320,6 @@ smp_do_acpi_config(void)
 }
 
 
-/*!	Target function of the trampoline code.
-	The trampoline code should have the pgdir and a gdt set up for us,
-	along with us being on the final stack for this processor. We need
-	to set up the local APIC and load the global idt and gdt. When we're
-	done, we'll jump into the kernel with the cpu number as an argument.
-*/
-static int
-smp_cpu_ready(void)
-{
-	uint32 curr_cpu = smp_get_current_cpu();
-	struct gdt_idt_descr idt_descr;
-	struct gdt_idt_descr gdt_descr;
-
-	//TRACE(("smp_cpu_ready: entry cpu %ld\n", curr_cpu));
-
-	preloaded_elf32_image *image = static_cast<preloaded_elf32_image *>(
-		gKernelArgs.kernel_image.Pointer());
-
-	// Important.  Make sure supervisor threads can fault on read only pages...
-	asm("movl %%eax, %%cr0" : : "a" ((1 << 31) | (1 << 16) | (1 << 5) | 1));
-	asm("cld");
-	asm("fninit");
-
-	// Set up the final idt
-	idt_descr.a = IDT_LIMIT - 1;
-	idt_descr.b = (uint32 *)(addr_t)gKernelArgs.arch_args.vir_idt;
-
-	asm("lidt	%0;"
-		: : "m" (idt_descr));
-
-	// Set up the final gdt
-	gdt_descr.a = GDT_LIMIT - 1;
-	gdt_descr.b = (uint32 *)gKernelArgs.arch_args.vir_gdt;
-
-	asm("lgdt	%0;"
-		: : "m" (gdt_descr));
-
-	asm("pushl  %0; "					// push the cpu number
-		"pushl 	%1;	"					// kernel args
-		"pushl 	$0x0;"					// dummy retval for call to main
-		"pushl 	%2;	"					// this is the start address
-		"ret;		"					// jump.
-		: : "g" (curr_cpu), "g" (&gKernelArgs),
-			"g" (image->elf_header.e_entry));
-
-	// no where to return to
-	return 0;
-}
-
-
 static void
 calculate_apic_timer_conversion_factor(void)
 {
@@ -427,6 +356,22 @@ calculate_apic_timer_conversion_factor(void)
 
 
 //	#pragma mark -
+
+
+int
+smp_get_current_cpu(void)
+{
+	if (gKernelArgs.arch_args.apic == NULL)
+		return 0;
+
+	uint8 apicID = apic_read(APIC_ID) >> 24;
+	for (uint32 i = 0; i < gKernelArgs.num_cpus; i++) {
+		if (gKernelArgs.arch_args.cpu_apic_id[i] == apicID)
+			return i;
+	}
+
+	return 0;
+}
 
 
 void
@@ -476,7 +421,7 @@ smp_init_other_cpus(void)
 
 
 void
-smp_boot_other_cpus(void)
+smp_boot_other_cpus(void (*entryFunc)())
 {
 	if (gKernelArgs.num_cpus < 2)
 		return;
@@ -516,7 +461,7 @@ smp_boot_other_cpus(void)
 		tempStack = (finalStack
 			+ (KERNEL_STACK_SIZE + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE)
 				/ sizeof(uint32)) - 1;
-		*tempStack = (uint32)&smp_cpu_ready;
+		*tempStack = (uint32)entryFunc;
 
 		// set the trampoline stack up
 		tempStack = (uint32 *)(trampolineStack + B_PAGE_SIZE - 4);
@@ -525,15 +470,20 @@ smp_boot_other_cpus(void)
 			+ KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE - sizeof(uint32);
 		tempStack--;
 		// page dir
-		*tempStack = gKernelArgs.arch_args.phys_pgdir;
+		*tempStack = x86_read_cr3() & 0xfffff000;
 
 		// put a gdt descriptor at the bottom of the stack
 		*((uint16 *)trampolineStack) = 0x18 - 1; // LIMIT
 		*((uint32 *)(trampolineStack + 2)) = trampolineStack + 8;
 
-		// put the gdt at the bottom
-		memcpy(&((uint32 *)trampolineStack)[2],
-			(void *)gKernelArgs.arch_args.vir_gdt, 6 * 4);
+		// construct a temporary gdt at the bottom
+		segment_descriptor* tempGDT
+			= (segment_descriptor*)&((uint32 *)trampolineStack)[2];
+		clear_segment_descriptor(&tempGDT[0]);
+		set_segment_descriptor(&tempGDT[1], 0, 0xffffffff, DT_CODE_READABLE,
+			DPL_KERNEL);
+		set_segment_descriptor(&tempGDT[2], 0, 0xffffffff, DT_DATA_WRITEABLE,
+			DPL_KERNEL);
 
 		/* clear apic errors */
 		if (gKernelArgs.arch_args.cpu_apic_version[i] & 0xf0) {

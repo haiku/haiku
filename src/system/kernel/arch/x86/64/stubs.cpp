@@ -270,34 +270,6 @@ arch_debug_call_with_fault_handler(cpu_ent* cpu, jmp_buf jumpBuffer,
 }
 
 
-status_t
-arch_smp_init(kernel_args *args)
-{
-	return B_OK;
-}
-
-
-status_t
-arch_smp_per_cpu_init(kernel_args *args, int32 cpu)
-{
-	return B_OK;
-}
-
-
-void
-arch_smp_send_broadcast_ici(void)
-{
-
-}
-
-
-void
-arch_smp_send_ici(int32 target_cpu)
-{
-
-}
-
-
 // The software breakpoint instruction (int3).
 const uint8 kX86SoftwareBreakpoint[1] = { 0xcc };
 

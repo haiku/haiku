@@ -23,6 +23,7 @@
 #include <kernel.h>
 
 #include "debug.h"
+#include "smp.h"
 #include "mmu.h"
 
 
@@ -30,6 +31,13 @@ static const uint64 kTableMappingFlags = 0x3;
 static const uint64 kLargePageMappingFlags = 0x183;
 static const uint64 kPageMappingFlags = 0x103;
 	// Global, R/W, Present
+
+extern "C" void long_enter_kernel(int currentCPU, uint64 stackTop);
+
+extern uint32 gLongPhysicalGDT;
+extern uint64 gLongVirtualGDT;
+extern uint32 gLongPhysicalPML4;
+extern uint64 gLongKernelEntry;
 
 
 /*! Convert a 32-bit address to a 64-bit address. */
@@ -71,6 +79,10 @@ long_gdt_init()
 		DPL_USER);
 	set_segment_descriptor(&gdt[USER_DATA_SEG / 8], DT_DATA_WRITEABLE,
 		DPL_USER);
+
+	// Used by long_enter_kernel().
+	gLongPhysicalGDT = gKernelArgs.arch_args.phys_gdt;
+	gLongVirtualGDT = gKernelArgs.arch_args.vir_gdt;
 }
 
 
@@ -222,6 +234,8 @@ long_mmu_init()
 			gKernelArgs.virtual_allocated_range[i].start,
 			gKernelArgs.virtual_allocated_range[i].size);
 	}
+
+	gLongPhysicalPML4 = gKernelArgs.arch_args.phys_pgdir;
 }
 
 
@@ -275,12 +289,6 @@ convert_kernel_args()
 			gKernelArgs.kernel_args_range[i].size);
 	}
 
-	// Set correct kernel stack addresses.
-	for (uint32 i = 0; i < gKernelArgs.num_cpus; i++) {
-		gKernelArgs.cpu_kstack[i].start = fix_address(
-			gKernelArgs.cpu_kstack[i].start);
-	}
-
 	// Fix driver settings files.
 	driver_settings_file* file = gKernelArgs.driver_settings;
 	fix_address(gKernelArgs.driver_settings);
@@ -290,6 +298,27 @@ convert_kernel_args()
 		fix_address(file->buffer);
 		file = next;
 	}
+}
+
+
+static void
+long_smp_start_kernel(void)
+{
+	uint32 cpu = smp_get_current_cpu();
+
+	// Important.  Make sure supervisor threads can fault on read only pages...
+	asm("movl %%eax, %%cr0" : : "a" ((1 << 31) | (1 << 16) | (1 << 5) | 1));
+	asm("cld");
+	asm("fninit");
+
+	// Fix our kernel stack address.
+	gKernelArgs.cpu_kstack[cpu].start
+		= fix_address(gKernelArgs.cpu_kstack[cpu].start);
+
+	long_enter_kernel(cpu, gKernelArgs.cpu_kstack[cpu].start
+		+ gKernelArgs.cpu_kstack[cpu].size);
+
+	panic("Shouldn't get here");
 }
 
 
@@ -305,8 +334,7 @@ long_start_kernel()
 	preloaded_elf64_image *image = static_cast<preloaded_elf64_image *>(
 		gKernelArgs.kernel_image.Pointer());
 
-	// TODO: x86_64 SMP, disable for now.
-	gKernelArgs.num_cpus = 1;
+	smp_init_other_cpus();
 
 	long_gdt_init();
 	long_idt_init();
@@ -315,23 +343,22 @@ long_start_kernel()
 
 	debug_cleanup();
 
-	// Calculate the arguments for long_enter_kernel().
-	uint64 entry = image->elf_header.e_entry;
-	uint64 stackTop = gKernelArgs.cpu_kstack[0].start
-		+ gKernelArgs.cpu_kstack[0].size;
-	uint64 kernelArgs = (addr_t)&gKernelArgs;
+	// Save the kernel entry point address.
+	gLongKernelEntry = image->elf_header.e_entry;
+	dprintf("kernel entry at %#llx\n", gLongKernelEntry);
 
-	dprintf("kernel entry at %#llx, stack %#llx, args %#llx\n", entry,
-		stackTop, kernelArgs);
+	// Fix our kernel stack address.
+	gKernelArgs.cpu_kstack[0].start
+		= fix_address(gKernelArgs.cpu_kstack[0].start);
 
 	// We're about to enter the kernel -- disable console output.
 	stdout = NULL;
 
+	smp_boot_other_cpus(long_smp_start_kernel);
+
 	// Enter the kernel!
-	long_enter_kernel(gKernelArgs.arch_args.phys_pgdir,
-		gKernelArgs.arch_args.phys_gdt, gKernelArgs.arch_args.vir_gdt,
-		entry, stackTop, kernelArgs, 0);
+	long_enter_kernel(0, gKernelArgs.cpu_kstack[0].start
+		+ gKernelArgs.cpu_kstack[0].size);
 
 	panic("Shouldn't get here");
 }
-
