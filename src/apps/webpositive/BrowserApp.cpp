@@ -28,6 +28,19 @@
 
 #include "BrowserApp.h"
 
+#include <Alert.h>
+#include <Autolock.h>
+#include <Catalog.h>
+#include <Directory.h>
+#include <Entry.h>
+#include <FindDirectory.h>
+#include <Locale.h>
+#include <Path.h>
+#include <Screen.h>
+#include <debugger.h>
+
+#include <stdio.h>
+
 #include "BrowserWindow.h"
 #include "BrowsingHistory.h"
 #include "DownloadWindow.h"
@@ -39,20 +52,13 @@
 #include "WebPage.h"
 #include "WebSettings.h"
 #include "WebView.h"
-#include <Alert.h>
-#include <Autolock.h>
-#include <Directory.h>
-#include <Entry.h>
-#include <FindDirectory.h>
-#include <Locale.h>
-#include <Path.h>
-#include <Screen.h>
-#include <debugger.h>
-#include <stdio.h>
 
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "WebPositive"
 
 const char* kApplicationSignature = "application/x-vnd.Haiku-WebPositive";
-const char* kApplicationName = "WebPositive";
+const char* kApplicationName = B_TRANSLATE_SYSTEM_NAME("WebPositive");
 static const uint32 PRELOAD_BROWSING_HISTORY = 'plbh';
 
 #define ENABLE_NATIVE_COOKIES 0
@@ -174,8 +180,10 @@ BrowserApp::ReadyToRun()
 		float borderWidth = 0;
 		if (decoratorSettings.FindFloat("border width", &borderWidth) != B_OK)
 			borderWidth = 5;
-		fDownloadWindow->MoveTo(screenFrame.Width() - fDownloadWindow->Frame().Width() - borderWidth,
-			screenFrame.Height() - fDownloadWindow->Frame().Height() - borderWidth);
+		fDownloadWindow->MoveTo(screenFrame.Width()
+			- fDownloadWindow->Frame().Width() - borderWidth,
+			screenFrame.Height() - fDownloadWindow->Frame().Height()
+			- borderWidth);
 	}
 	fSettingsWindow = new SettingsWindow(settingsWindowFrame, fSettings);
 
@@ -217,7 +225,8 @@ BrowserApp::MessageReceived(BMessage* message)
 	}
 	case NEW_TAB: {
 		BrowserWindow* window;
-		if (message->FindPointer("window", reinterpret_cast<void**>(&window)) != B_OK)
+		if (message->FindPointer("window",
+			reinterpret_cast<void**>(&window)) != B_OK)
 			break;
 		BString url;
 		message->FindString("url", &url);
@@ -268,9 +277,10 @@ bool
 BrowserApp::QuitRequested()
 {
 	if (fDownloadWindow->DownloadsInProgress()) {
-		BAlert* alert = new BAlert("Downloads in progress",
-			"There are still downloads in progress, do you really want to "
-			"quit WebPositive now?", "Quit", "Continue downloads");
+		BAlert* alert = new BAlert(B_TRANSLATE("Downloads in progress"),
+			B_TRANSLATE("There are still downloads in progress, do you really "
+			"want to quit WebPositive now?"), B_TRANSLATE("Quit"),
+			B_TRANSLATE("Continue downloads"));
 		int32 choice = alert->Go();
 		if (choice == 1) {
 			if (fWindowCount == 0) {

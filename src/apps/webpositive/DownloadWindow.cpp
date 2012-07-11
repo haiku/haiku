@@ -31,12 +31,14 @@
 
 #include <Alert.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <ControlLook.h>
 #include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
+#include <Locale.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <Path.h>
@@ -53,6 +55,9 @@
 #include "WebDownload.h"
 #include "WebPage.h"
 
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Download Window"
 
 enum {
 	INIT = 'init',
@@ -134,7 +139,7 @@ protected:
 
 DownloadWindow::DownloadWindow(BRect frame, bool visible,
 		SettingsMessage* settings)
-	: BWindow(frame, "Downloads",
+	: BWindow(frame, B_TRANSLATE("Downloads"),
 		B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_AUTO_UPDATE_SIZE_LIMITS | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE),
 	fMinimizeOnClose(false)
@@ -155,26 +160,27 @@ DownloadWindow::DownloadWindow(BRect frame, bool visible,
 	fDownloadViewsLayout = downloadsGroupView->GroupLayout();
 
 	BMenuBar* menuBar = new BMenuBar("Menu bar");
-	BMenu* menu = new BMenu("Downloads");
-	menu->AddItem(new BMenuItem("Open downloads folder",
+	BMenu* menu = new BMenu(B_TRANSLATE("Downloads"));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Open downloads folder"),
 		new BMessage(OPEN_DOWNLOADS_FOLDER)));
 	BMessage* newWindowMessage = new BMessage(NEW_WINDOW);
 	newWindowMessage->AddString("url", "");
-	BMenuItem* newWindowItem = new BMenuItem("New browser window",
+	BMenuItem* newWindowItem = new BMenuItem(B_TRANSLATE("New browser window"),
 		newWindowMessage, 'N');
 	menu->AddItem(newWindowItem);
 	newWindowItem->SetTarget(be_app);
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Hide", new BMessage(B_QUIT_REQUESTED), 'D'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Hide"),
+		new BMessage(B_QUIT_REQUESTED), 'D'));
 	menuBar->AddItem(menu);
 
 	fDownloadsScrollView = new DownloadContainerScrollView(downloadsGroupView);
 
-	fRemoveFinishedButton = new BButton("Remove finished",
+	fRemoveFinishedButton = new BButton(B_TRANSLATE("Remove finished"),
 		new BMessage(REMOVE_FINISHED_DOWNLOADS));
 	fRemoveFinishedButton->SetEnabled(false);
 
-	fRemoveMissingButton = new BButton("Remove missing",
+	fRemoveMissingButton = new BButton(B_TRANSLATE("Remove missing"),
 		new BMessage(REMOVE_MISSING_DOWNLOADS));
 	fRemoveMissingButton->SetEnabled(false);
 
@@ -274,11 +280,12 @@ DownloadWindow::MessageReceived(BMessage* message)
 			if (status == B_OK)
 				status = be_roster->Launch(&ref);
 			if (status != B_OK && status != B_ALREADY_RUNNING) {
-				BString errorString("The downloads folder could not be "
-					"opened.\n\n");
-				errorString << "Error: " << strerror(status);
-				BAlert* alert = new BAlert("Error opening downloads folder",
-					errorString.String(), "OK");
+				BString errorString(B_TRANSLATE_COMMENT("The downloads folder could "
+					"not be opened.\n\nError: %error", "Don't translate "
+					"variable %error"));
+				errorString.ReplaceFirst("%error", strerror(status));
+				BAlert* alert = new BAlert(B_TRANSLATE("Error opening downloads "
+					"folder"), errorString.String(), B_TRANSLATE("OK"));
 				alert->Go(NULL);
 			}
 			break;
@@ -528,9 +535,10 @@ DownloadWindow::_SaveSettings()
 			item->View());
 		if (!view)
 			continue;
-	   BMessage downloadArchive;
-	   if (view->SaveSettings(&downloadArchive) == B_OK)
-		   message.AddMessage("download", &downloadArchive);
+
+	BMessage downloadArchive;
+		if (view->SaveSettings(&downloadArchive) == B_OK)
+			message.AddMessage("download", &downloadArchive);
 	}
 	message.Flatten(&file);
 }
