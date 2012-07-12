@@ -1189,21 +1189,22 @@ arch_debug_gdb_get_registers(char* buffer, size_t bufferSize)
 
 	// For x86 the register order is:
 	//
-	//    eax, ebx, ecx, edx,
+	//    eax, ecx, edx, ebx,
 	//    esp, ebp, esi, edi,
 	//    eip, eflags,
-	//    cs, ss, ds, es
+	//    cs, ss, ds, es, fs, gs
 	//
 	// Note that even though the segment descriptors are actually 16 bits wide,
 	// gdb requires them as 32 bit integers. Note also that for some reason
 	// gdb wants the register dump in *big endian* format.
-	static const int32 kRegisterCount = 14;
+	static const int32 kRegisterCount = 16;
 	uint32 registers[kRegisterCount] = {
-		frame->ax, frame->bx, frame->cx, frame->dx,
+		frame->ax, frame->cx, frame->dx, frame->bx,
 		frame->sp, frame->bp, frame->si, frame->di,
 		frame->ip, frame->flags,
-		frame->cs, frame->ds, frame->ds, frame->es
+		frame->cs, frame->ds, frame->ds, frame->es,
 			// assume ss == ds
+		frame->fs, frame->gs
 	};
 
 	const char* const bufferStart = buffer;
