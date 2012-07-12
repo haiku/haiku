@@ -31,7 +31,7 @@ typedef void *				acpi_handle;
 #define ACPI_ALL_NOTIFY					(ACPI_SYSTEM_NOTIFY | ACPI_DEVICE_NOTIFY)
 #define ACPI_MAX_NOTIFY_HANDLER_TYPE	0x3
 
-#define ACPI_MAX_SYS_NOTIFY				0x7f
+#define ACPI_MAX_SYS_NOTIFY				0x7F
 
 /* Address Space (Operation Region) Types */
 
@@ -255,7 +255,7 @@ struct acpi_module_info {
 
 	status_t	(*prepare_sleep_state)(uint8 state, void (*wakeFunc)(void),
 					size_t size);
-	status_t	(*enter_sleep_state)(uint8 state);
+	status_t	(*enter_sleep_state)(uint8 state, uint8 flags);
 	status_t	(*reboot)(void);
 
 	/* Table Access */
