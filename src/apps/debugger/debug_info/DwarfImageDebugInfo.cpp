@@ -555,21 +555,8 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 		= cpuState->InstructionPointer() - fRelocationDelta;
 	target_addr_t framePointer;
 	CompilationUnit* unit = function->GetCompilationUnit();
-	// first try .debug_frame
-	if (fFile->HasDebugFrameSection()) {
-		error = fFile->UnwindCallFrame(false, unit,
-			function->SubprogramEntry(), instructionPointer, inputInterface,
-			outputInterface, framePointer);
-	} else
-		error = B_ENTRY_NOT_FOUND;
-
-	// if that section isn't present, or we couldn't find a match,
-	// try .eh_frame if possible.
-	if (error == B_ENTRY_NOT_FOUND && fFile->HasEHFrameSection()) {
-		error = fFile->UnwindCallFrame(true, unit,
-			function->SubprogramEntry(), instructionPointer, inputInterface,
-			outputInterface, framePointer);
-	}
+	error = fFile->UnwindCallFrame(unit, function->SubprogramEntry(),
+		instructionPointer, inputInterface, outputInterface, framePointer);
 
 	if (error != B_OK) {
 		TRACE_CFI("Failed to unwind call frame: %s\n", strerror(error));
