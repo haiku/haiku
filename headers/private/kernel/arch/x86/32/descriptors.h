@@ -21,6 +21,7 @@
 
 #define BIOS_DATA_SEGMENT	0x40
 
+
 #ifndef _ASSEMBLER
 	// this file can also be included from assembler as well
 	// (and is in arch_interrupts.S)
@@ -34,7 +35,7 @@
 
 // defines entries in the GDT/LDT
 
-typedef struct segment_descriptor {
+struct segment_descriptor {
 	uint16 limit_00_15;				// bit	 0 - 15
 	uint16 base_00_15;				//		16 - 31
 	uint32 base_23_16 : 8;			//		 0 -  7
@@ -48,11 +49,12 @@ typedef struct segment_descriptor {
 	uint32 d_b : 1;					//		22
 	uint32 granularity : 1;			//		23
 	uint32 base_31_24 : 8;			//		24 - 31
-} segment_descriptor;
+};
 
-typedef struct interrupt_descriptor {
-	uint32 a, b;
-} interrupt_descriptor;
+struct interrupt_descriptor {
+	uint32 a;
+	uint32 b;
+};
 
 struct tss {
 	uint16 prev_task;
@@ -73,14 +75,14 @@ struct tss {
 
 
 static inline void
-clear_segment_descriptor(struct segment_descriptor *desc)
+clear_segment_descriptor(segment_descriptor* desc)
 {
-	*(long long *)desc = 0;
+	*(long long*)desc = 0;
 }
 
 
 static inline void
-set_segment_descriptor_base(struct segment_descriptor *desc, addr_t base)
+set_segment_descriptor_base(segment_descriptor* desc, addr_t base)
 {
 	desc->base_00_15 = (addr_t)base & 0xffff;	// base is 32 bits long
 	desc->base_23_16 = ((addr_t)base >> 16) & 0xff;
@@ -89,7 +91,7 @@ set_segment_descriptor_base(struct segment_descriptor *desc, addr_t base)
 
 
 static inline void
-set_segment_descriptor(struct segment_descriptor *desc, addr_t base, uint32 limit,
+set_segment_descriptor(segment_descriptor* desc, addr_t base, uint32 limit,
 	uint8 type, uint8 privilegeLevel)
 {
 	set_segment_descriptor_base(desc, base);
@@ -104,8 +106,6 @@ set_segment_descriptor(struct segment_descriptor *desc, addr_t base, uint32 limi
 		desc->limit_19_16 = ((addr_t)limit >> 16) & 0xf;
 		desc->granularity = 0;	// 1 byte granularity
 	}
-		limit >>= 12;
-
 
 	desc->type = type;
 	desc->desc_type = DT_CODE_DATA_SEGMENT;
@@ -120,7 +120,7 @@ set_segment_descriptor(struct segment_descriptor *desc, addr_t base, uint32 limi
 
 
 static inline void
-set_tss_descriptor(struct segment_descriptor *desc, addr_t base, uint32 limit)
+set_tss_descriptor(segment_descriptor* desc, addr_t base, uint32 limit)
 {
 	// the TSS descriptor has a special layout different from the standard descriptor
 	set_segment_descriptor_base(desc, base);
@@ -139,6 +139,7 @@ set_tss_descriptor(struct segment_descriptor *desc, addr_t base, uint32 limit)
 
 	desc->zero = 0;
 }
+
 
 #endif	/* _ASSEMBLER */
 
