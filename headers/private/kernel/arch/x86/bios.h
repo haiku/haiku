@@ -9,6 +9,8 @@
 #include <SupportDefs.h>
 
 
+#ifndef __x86_64__
+
 #define BIOS32_PCI_SERVICE	'ICP$'
 
 struct bios32_service {
@@ -28,5 +30,7 @@ status_t bios_init(void);
 #ifdef __cplusplus
 }
 #endif
+
+#endif	/* __x86_64__ */
 
 #endif	/* ARCH_x86_BIOS_H */

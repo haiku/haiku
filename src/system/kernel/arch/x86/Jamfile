@@ -41,22 +41,22 @@ if $(TARGET_ARCH) = x86_64 {
 	SEARCH_SOURCE += [ FDirName $(SUBDIR) paging pae ] ;
 
 	archSpecificSources =
+		apm.cpp
 		arch.S
+		bios.cpp
 		cpuid.S
 		int.cpp
 		interrupts.S
 		thread.cpp
+		vm86.cpp
 
 		arch_commpage.cpp
 		arch_debug.cpp
 		arch_user_debugger.cpp
-		apm.cpp
-		bios.cpp
 		ioapic.cpp
 		irq_routing_table.cpp
 		msi.cpp
 		syscall.S
-		vm86.cpp
 		x86_signals.cpp
 		x86_signals_asm.S
 		x86_syscalls.cpp
