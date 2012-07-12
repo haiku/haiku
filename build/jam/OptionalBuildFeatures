@@ -2,6 +2,14 @@
 # build. For features that require downloading a zip file from somewhere it is
 # likely the same file use for an optional package.
 
+# Detect a hybrid GCC2/GCC4 image and disable the checks for unavailable GCC4
+# packages. (It does not matter if a package was built with either compiler,
+# the system should have the respective other system libs.)
+local isHybridBuild ;
+if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
+		&& $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
+	isHybridBuild = 1 ;
+}
 
 local baseURL = http://www.haiku-files.org/files/optional-packages ;
 
@@ -421,10 +429,23 @@ if $(HAIKU_BUILD_FEATURE_TAGLIB) {
 
 
 # WebKit
+# Automatically install the WebKit feature, when the optional WebPositive
+# optional package is enabled.
+if [ IsOptionalHaikuImagePackageAdded WebPositive ] {
+	HAIKU_BUILD_FEATURE_WEBKIT = 1 ;
+}
+
 HAIKU_WEBKIT_FILE = haikuwebkit-1.1.2-x86-gcc4-2012-07-11.zip ;
-if $(TARGET_ARCH) = x86 {
-	if $(HAIKU_GCC_VERSION[1]) < 4 {
-		Echo "WebKit support not available on gcc $(HAIKU_GCC_VERSION[1])" ;
+
+if $(HAIKU_BUILD_FEATURE_WEBKIT) {
+	if $(TARGET_ARCH) != x86 {
+		Echo "WebKit support not available on $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) < 4 {
+		if ! $(isHybridBuild) {
+			Echo "WebKit support not available on gcc $(HAIKU_GCC_VERSION[1])" ;
+		} else {
+			Echo "WebKit to be utilized by gcc4 inside $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR)" ;
+		}
 	} else {
 		local zipFile = [ DownloadFile $(HAIKU_WEBKIT_FILE)
 			: $(baseURL)/$(HAIKU_WEBKIT_FILE) ] ;
@@ -447,6 +468,4 @@ if $(TARGET_ARCH) = x86 {
 
 		HAIKU_WEBKIT_HEADERS = [ FDirName $(HAIKU_WEBKIT_DIR) include ] ;
 	}
-} else {
-	Echo "WebKit support not available on $(TARGET_ARCH)" ;
 }
