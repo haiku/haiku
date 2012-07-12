@@ -420,8 +420,8 @@ smp_init_other_cpus(void)
 }
 
 
-extern "C" void
-smp_boot_other_cpus(void (*entryFunc)())
+void
+smp_boot_other_cpus(void (*entryFunc)(void))
 {
 	if (gKernelArgs.num_cpus < 2)
 		return;
