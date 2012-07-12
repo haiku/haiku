@@ -2117,6 +2117,51 @@ fssh_get_vnode_removed(fssh_fs_volume *volume, fssh_vnode_id vnodeID, bool* remo
 }
 
 
+extern "C" fssh_status_t
+fssh_mark_vnode_busy(fssh_fs_volume* volume, fssh_vnode_id vnodeID, bool busy)
+{
+	fssh_mutex_lock(&sVnodeMutex);
+
+	struct vnode* vnode = lookup_vnode(volume->id, vnodeID);
+	if (vnode == NULL) {
+		fssh_mutex_unlock(&sVnodeMutex);
+		return FSSH_B_ENTRY_NOT_FOUND;
+	}
+
+	// are we trying to mark an already busy node busy again?
+	if (busy && vnode->busy) {
+		fssh_mutex_unlock(&sVnodeMutex);
+		return FSSH_B_BUSY;
+	}
+
+	vnode->busy = busy;
+
+	fssh_mutex_unlock(&sVnodeMutex);
+	return FSSH_B_OK;
+}
+
+
+extern "C" fssh_status_t
+fssh_change_vnode_id(fssh_fs_volume* volume, fssh_vnode_id vnodeID,
+	fssh_vnode_id newID)
+{
+	fssh_mutex_lock(&sVnodeMutex);
+
+	struct vnode* vnode = lookup_vnode(volume->id, vnodeID);
+	if (vnode == NULL) {
+		fssh_mutex_unlock(&sVnodeMutex);
+		return FSSH_B_ENTRY_NOT_FOUND;
+	}
+
+	hash_remove(sVnodeTable, vnode);
+	vnode->id = newID;
+	hash_insert(sVnodeTable, vnode);
+
+	fssh_mutex_unlock(&sVnodeMutex);
+	return FSSH_B_OK;
+}
+
+
 extern "C" fssh_fs_volume*
 fssh_volume_for_vnode(fssh_fs_vnode *_vnode)
 {

@@ -52,6 +52,8 @@ public:
 									{ return fDevice; }
 			ino_t				InodeId() const
 									{ return fInode; }
+			void				SetVnodeID(ino_t id)
+									{ fInode = id; }
 
 protected:
 	virtual	void				DeleteObject();

@@ -330,6 +330,8 @@ extern status_t remove_vnode(fs_volume* volume, ino_t vnodeID);
 extern status_t unremove_vnode(fs_volume* volume, ino_t vnodeID);
 extern status_t get_vnode_removed(fs_volume* volume, ino_t vnodeID,
 					bool* _removed);
+extern status_t mark_vnode_busy(fs_volume* volume, ino_t vnodeID, bool busy);
+extern status_t change_vnode_id(fs_volume* volume, ino_t vnodeID, ino_t newID);
 extern fs_volume* volume_for_vnode(fs_vnode* vnode);
 extern status_t check_access_permissions(int accessMode, mode_t mode,
 					gid_t nodeGroupID, uid_t nodeUserID);
