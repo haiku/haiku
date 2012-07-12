@@ -410,6 +410,9 @@ private:
 
 			void				_ShowContextMenu(BPoint where);
 
+			void				_FilterDisallowedChars(char* text, int32& len,
+								text_run_array* runArray);
+
 private:
 			BPrivate::TextGapBuffer*	fText;
 			LineBuffer*			fLines;
