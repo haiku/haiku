@@ -1,8 +1,8 @@
 SubDir HAIKU_TOP src add-ons kernel bus_managers acpi ;
 
 UsePrivateKernelHeaders ;
-SubDirHdrs [ FDirName $(SUBDIR) include ] ;
-SubDirHdrs [ FDirName $(SUBDIR) include platform ] ;
+SubDirHdrs [ FDirName $(SUBDIR) acpica include ] ;
+SubDirHdrs [ FDirName $(SUBDIR) acpica include platform ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) pci ] ;
 SubDirCcFlags -fno-pic -D_KERNEL_MODE ;
 
@@ -181,16 +181,16 @@ StaticLibrary libacpi_ca.a :
 	$(utilities_src)
 	;
 
-SEARCH on [ FGristFiles $(common_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi common ] ;
-SEARCH on [ FGristFiles $(dispatcher_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi dispatcher ] ;
-SEARCH on [ FGristFiles $(events_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi events ] ;
-SEARCH on [ FGristFiles $(executer_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi executer ] ;
-SEARCH on [ FGristFiles $(hardware_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi hardware ] ;
-SEARCH on [ FGristFiles $(namespace_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi namespace ] ;
-SEARCH on [ FGristFiles $(parser_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi parser ] ;
-SEARCH on [ FGristFiles $(resources_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi resources ] ;
-SEARCH on [ FGristFiles $(tables_src) ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi tables ] ;
-SEARCH on [ FGristFiles $(utilities_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi utilities ] ;
+SEARCH on [ FGristFiles $(common_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica common ] ;
+SEARCH on [ FGristFiles $(dispatcher_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica components dispatcher ] ;
+SEARCH on [ FGristFiles $(events_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica components events ] ;
+SEARCH on [ FGristFiles $(executer_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica components executer ] ;
+SEARCH on [ FGristFiles $(hardware_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica components hardware ] ;
+SEARCH on [ FGristFiles $(namespace_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica components namespace ] ;
+SEARCH on [ FGristFiles $(parser_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica components parser ] ;
+SEARCH on [ FGristFiles $(resources_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica components resources ] ;
+SEARCH on [ FGristFiles $(tables_src) ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica components tables ] ;
+SEARCH on [ FGristFiles $(utilities_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica components utilities ] ;
 
 KernelAddon acpi :
 	oshaiku.cpp

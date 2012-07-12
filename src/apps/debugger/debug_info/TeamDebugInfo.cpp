@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -194,7 +195,13 @@ private:
 		if (locationA < locationB)
 			return -1;
 
-		return locationA == locationB ? 0 : 1;
+		if (locationA != locationB )
+			return 1;
+
+		// if the locations match we still need to compare by name to be
+		// certain, since differently typed instantiations of template
+		// functions will have the same source file and location
+		return a->Name().Compare(b->Name());
 	}
 
 	static int _CompareLocationFunction(const SourceLocation* location,

@@ -155,8 +155,6 @@ struct mutex;
 #ifdef _KERNEL_MODE
 /* Host-dependent types and defines for in-kernel ACPICA */
 
-#include <KernelExport.h>
-
 /* ACPI's own impl is adequate. */
 #define ACPI_USE_LOCAL_CACHE
 

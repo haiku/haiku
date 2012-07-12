@@ -32,11 +32,13 @@
 #include <Alert.h>
 #include <Bitmap.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <Clipboard.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <FindDirectory.h>
 #include <GroupLayoutBuilder.h>
+#include <Locale.h>
 #include <MenuItem.h>
 #include <NodeInfo.h>
 #include <NodeMonitor.h>
@@ -50,6 +52,9 @@
 #include "WebPage.h"
 #include "StringForSize.h"
 
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Download Window"
 
 enum {
 	OPEN_DOWNLOAD			= 'opdn',
@@ -143,7 +148,8 @@ public:
 
 	virtual BSize MinSize()
 	{
-		return BSize(fIconBitmap.Bounds().Width(), fIconBitmap.Bounds().Height());
+		return BSize(fIconBitmap.Bounds().Width(),
+			fIconBitmap.Bounds().Height());
 	}
 
 	virtual BSize PreferredSize()
@@ -218,8 +224,8 @@ DownloadProgressView::Init(BMessage* archive)
 	fLastSpeedReferenceSize = 0;
 	fEstimatedFinishReferenceSize = 0;
 
-	fProcessStartTime = fLastSpeedReferenceTime = fEstimatedFinishReferenceTime
-		= system_time();
+	fProcessStartTime = fLastSpeedReferenceTime
+		= fEstimatedFinishReferenceTime	= system_time();
 
 	SetViewColor(245, 245, 245);
 	SetFlags(Flags() | B_FULL_UPDATE_ON_RESIZE | B_WILL_DRAW);
@@ -245,16 +251,20 @@ DownloadProgressView::Init(BMessage* archive)
 	} else
 		fIconView = new IconView();
 
-	if (!fDownload && (fStatusBar->CurrentValue() < 100 || !entry.Exists()))
-		fTopButton = new SmallButton("Restart", new BMessage(RESTART_DOWNLOAD));
-	else {
-		fTopButton = new SmallButton("Open", new BMessage(OPEN_DOWNLOAD));
+	if (!fDownload && (fStatusBar->CurrentValue() < 100 || !entry.Exists())) {
+		fTopButton = new SmallButton(B_TRANSLATE("Restart"),
+			new BMessage(RESTART_DOWNLOAD));
+	} else {
+		fTopButton = new SmallButton(B_TRANSLATE("Open"),
+			new BMessage(OPEN_DOWNLOAD));
 		fTopButton->SetEnabled(fDownload == NULL);
 	}
-	if (fDownload)
-		fBottomButton = new SmallButton("Cancel", new BMessage(CANCEL_DOWNLOAD));
-	else {
-		fBottomButton = new SmallButton("Remove", new BMessage(REMOVE_DOWNLOAD));
+	if (fDownload) {
+		fBottomButton = new SmallButton(B_TRANSLATE("Cancel"),
+			new BMessage(CANCEL_DOWNLOAD));
+	} else {
+		fBottomButton = new SmallButton(B_TRANSLATE("Remove"),
+			new BMessage(REMOVE_DOWNLOAD));
 		fBottomButton->SetEnabled(fDownload == NULL);
 	}
 
@@ -399,8 +409,9 @@ DownloadProgressView::MessageReceived(BMessage* message)
 			if (status == B_OK)
 				status = be_roster->Launch(&ref);
 			if (status != B_OK && status != B_ALREADY_RUNNING) {
-				BAlert* alert = new BAlert("Open download error",
-					"The download could not be opened.", "OK");
+				BAlert* alert = new BAlert(B_TRANSLATE("Open download error"),
+					B_TRANSLATE("The download could not be opened."),
+					B_TRANSLATE("OK"));
 				alert->Go(NULL);
 			}
 			break;
@@ -572,11 +583,11 @@ DownloadProgressView::ShowContextMenu(BPoint screenWhere)
 	screenWhere += BPoint(2, 2);
 
 	BPopUpMenu* contextMenu = new BPopUpMenu("download context");
-	BMenuItem* copyURL = new BMenuItem("Copy URL to clipboard",
+	BMenuItem* copyURL = new BMenuItem(B_TRANSLATE("Copy URL to clipboard"),
 		new BMessage(COPY_URL_TO_CLIPBOARD));
 	copyURL->SetEnabled(fURL.Length() > 0);
 	contextMenu->AddItem(copyURL);
-	BMenuItem* openFolder = new BMenuItem("Open containing folder",
+	BMenuItem* openFolder = new BMenuItem(B_TRANSLATE("Open containing folder"),
 		new BMessage(OPEN_CONTAINING_FOLDER));
 	contextMenu->AddItem(openFolder);
 
@@ -622,7 +633,7 @@ DownloadProgressView::DownloadFinished()
 		fExpectedSize = fCurrentSize;
 	}
 	fTopButton->SetEnabled(true);
-	fBottomButton->SetLabel("Remove");
+	fBottomButton->SetLabel(B_TRANSLATE("Remove"));
 	fBottomButton->SetMessage(new BMessage(REMOVE_DOWNLOAD));
 	fBottomButton->SetEnabled(true);
 	fInfoView->SetText("");
@@ -633,10 +644,10 @@ void
 DownloadProgressView::DownloadCanceled()
 {
 	fDownload = NULL;
-	fTopButton->SetLabel("Restart");
+	fTopButton->SetLabel(B_TRANSLATE("Restart"));
 	fTopButton->SetMessage(new BMessage(RESTART_DOWNLOAD));
 	fTopButton->SetEnabled(true);
-	fBottomButton->SetLabel("Remove");
+	fBottomButton->SetLabel(B_TRANSLATE("Remove"));
 	fBottomButton->SetMessage(new BMessage(REMOVE_DOWNLOAD));
 	fBottomButton->SetEnabled(true);
 	fInfoView->SetText("");
@@ -726,12 +737,14 @@ DownloadProgressView::_UpdateStatusText()
 			currentSize.Truncate(currentSizeUnitPos);
 		}
 		buffer << currentSize;
-		buffer << " of ";
+		buffer << " ";
+		buffer << B_TRANSLATE_COMMENT("of", "...as in '12kB of 256kB'");
+		buffer << " ";
 		buffer << expectedSize;
 		buffer << ", ";
 		buffer << string_for_size(fBytesPerSecond, sizeBuffer,
 			sizeof(sizeBuffer));
-		buffer << "/s)";
+		buffer << B_TRANSLATE_COMMENT("/s)", "...as in 'per second'");
 		float stringWidth = fInfoView->StringWidth(buffer.String());
 		if (stringWidth < fInfoView->Bounds().Width())
 			fInfoView->SetText(buffer.String());
@@ -739,7 +752,7 @@ DownloadProgressView::_UpdateStatusText()
 			// complete string too wide, try with shorter version
 			buffer << string_for_size(fBytesPerSecond, sizeBuffer,
 				sizeof(sizeBuffer));
-			buffer << "/s";
+			buffer << B_TRANSLATE_COMMENT("/s)", "...as in 'per second'");
 			stringWidth = fInfoView->StringWidth(buffer.String());
 			if (stringWidth < fInfoView->Bounds().Width())
 				fInfoView->SetText(buffer.String());
@@ -770,7 +783,7 @@ DownloadProgressView::_UpdateStatusText()
 				2, time->tm_hour, 2, time->tm_min);
 		}
 
-		BString buffer1("Finish: ");
+		BString buffer1(B_TRANSLATE_COMMENT("Finish: ", "Finishing time"));
 		buffer1 << timeText;
 		finishTime -= now;
 		time = gmtime(&finishTime);
@@ -779,29 +792,35 @@ DownloadProgressView::_UpdateStatusText()
 		if (finishTime > secondsPerDay) {
 			int64 days = finishTime / secondsPerDay;
 			if (days == 1)
-				buffer2 << "Over 1 day";
-			else
-				buffer2 << "Over " << days << " days";
+				buffer2 << B_TRANSLATE("Over 1 day left");
+			else {
+				buffer2 << B_TRANSLATE("Over %days days left");
+				buffer2.ReplaceFirst("%days", BString() << days);
+			}
 		} else if (finishTime > 60 * 60) {
 			int64 hours = finishTime / (60 * 60);
 			if (hours == 1)
-				buffer2 << "Over 1 hour";
-			else
-				buffer2 << "Over " << hours << " hours";
+				buffer2 << B_TRANSLATE("Over 1 hour left");
+			else {
+				buffer2 << B_TRANSLATE("Over %hours hours left");
+				buffer2.ReplaceFirst("%hours", BString() << hours);
+			}
 		} else if (finishTime > 60) {
 			int64 minutes = finishTime / 60;
 			if (minutes == 1)
-				buffer2 << "Over 1 minute";
-			else
-				buffer2 << minutes << " minutes";
+				buffer2 << B_TRANSLATE("Over 1 minute left");
+			else {
+				buffer2 << B_TRANSLATE("%minutes minutes");
+				buffer2.ReplaceFirst("%minutes", BString() << minutes);
+			}
 		} else {
 			if (finishTime == 1)
-				buffer2 << "1 second";
-			else
-				buffer2 << finishTime << " seconds";
+				buffer2 << B_TRANSLATE("1 second left");
+			else {
+				buffer2 << B_TRANSLATE("%seconds seconds left");
+				buffer2.ReplaceFirst("%seconds", BString() << finishTime);
+			}
 		}
-
-		buffer2 << " left";
 
 		buffer = "(";
 		buffer << buffer1 << " - " << buffer2 << ")";

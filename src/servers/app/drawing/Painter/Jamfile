@@ -18,6 +18,9 @@ if $(TARGET_ARCH) = x86 {
 	PAINTER_ARCH_SOURCES = painter_bilinear_scale.nasm ;
 }
 
+Includes [ FGristFiles AGGTextRenderer.cpp Painter.cpp ]
+	: $(HAIKU_FREETYPE_HEADERS_DEPENDENCY) ;
+
 StaticLibrary libpainter.a :
 	GlobalSubpixelSettings.cpp
 	Painter.cpp

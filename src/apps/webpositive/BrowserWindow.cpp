@@ -32,6 +32,37 @@
 
 #include "BrowserWindow.h"
 
+#include <Alert.h>
+#include <Application.h>
+#include <Bitmap.h>
+#include <Button.h>
+#include <Catalog.h>
+#include <CheckBox.h>
+#include <Clipboard.h>
+#include <Directory.h>
+#include <Entry.h>
+#include <File.h>
+#include <FindDirectory.h>
+#include <GridLayoutBuilder.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
+#include <Locale.h>
+#include <MenuBar.h>
+#include <MenuItem.h>
+#include <MessageRunner.h>
+#include <NodeInfo.h>
+#include <Path.h>
+#include <Roster.h>
+#include <Screen.h>
+#include <SeparatorView.h>
+#include <SpaceLayoutItem.h>
+#include <StatusBar.h>
+#include <StringView.h>
+#include <TextControl.h>
+
+#include <stdio.h>
+
 #include "AuthenticationPanel.h"
 #include "BaseURL.h"
 #include "BitmapButton.h"
@@ -48,35 +79,10 @@
 #include "WebView.h"
 #include "WebViewConstants.h"
 #include "WindowIcon.h"
-#include <Alert.h>
-#include <Application.h>
-#include <Bitmap.h>
-#include <Button.h>
-#include <CheckBox.h>
-#include <Clipboard.h>
-#include <Directory.h>
-#include <Entry.h>
-#include <File.h>
-#include <FindDirectory.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
-#include <LayoutBuilder.h>
-#include <MenuBar.h>
-#include <MenuItem.h>
-#include <MessageRunner.h>
-#include <NodeInfo.h>
-#include <Path.h>
-#include <Roster.h>
-#include <Screen.h>
-#include <SeparatorView.h>
-#include <SpaceLayoutItem.h>
-#include <StatusBar.h>
-#include <StringView.h>
-#include <TextControl.h>
 
-#include <stdio.h>
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "WebPositive Window"
 
 enum {
 	OPEN_LOCATION								= 'open',
@@ -148,9 +154,9 @@ public:
 private:
 	void _AddStaticItems()
 	{
-		AddItem(new BMenuItem("Manage bookmarks",
+		AddItem(new BMenuItem(B_TRANSLATE("Manage bookmarks"),
 			new BMessage(SHOW_BOOKMARKS), 'M'), 0);
-		AddItem(new BMenuItem("Bookmark this page",
+		AddItem(new BMenuItem(B_TRANSLATE("Bookmark this page"),
 			new BMessage(CREATE_BOOKMARK), 'B'), 0);
 	}
 };
@@ -281,82 +287,88 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 #else
 	BMenu* mainMenu = new BMenuBar("Main menu");
 #endif
-	BMenu* menu = new BMenu("Window");
+	BMenu* menu = new BMenu(B_TRANSLATE("Window"));
 	BMessage* newWindowMessage = new BMessage(NEW_WINDOW);
 	newWindowMessage->AddString("url", "");
-	BMenuItem* newItem = new BMenuItem("New window", newWindowMessage, 'N');
+	BMenuItem* newItem = new BMenuItem(B_TRANSLATE("New window"),
+		newWindowMessage, 'N');
 	menu->AddItem(newItem);
 	newItem->SetTarget(be_app);
-	newItem = new BMenuItem("New tab", new BMessage(*newTabMessage), 'T');
+	newItem = new BMenuItem(B_TRANSLATE("New tab"),
+		new BMessage(*newTabMessage), 'T');
 	menu->AddItem(newItem);
 	newItem->SetTarget(be_app);
-	menu->AddItem(new BMenuItem("Open location", new BMessage(OPEN_LOCATION),
-		'L'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Open location"),
+		new BMessage(OPEN_LOCATION), 'L'));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Close window", new BMessage(B_QUIT_REQUESTED),
-		'W', B_SHIFT_KEY));
-	menu->AddItem(new BMenuItem("Close tab", new BMessage(CLOSE_TAB), 'W'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Close window"),
+		new BMessage(B_QUIT_REQUESTED), 'W', B_SHIFT_KEY));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Close tab"),
+		new BMessage(CLOSE_TAB), 'W'));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Downloads",
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Downloads"),
 		new BMessage(SHOW_DOWNLOAD_WINDOW), 'D'));
-	menu->AddItem(new BMenuItem("Settings",
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Settings"),
 		new BMessage(SHOW_SETTINGS_WINDOW)));
-	BMenuItem* aboutItem = new BMenuItem("About",
+	BMenuItem* aboutItem = new BMenuItem(B_TRANSLATE("About"),
 		new BMessage(B_ABOUT_REQUESTED));
 	menu->AddItem(aboutItem);
 	aboutItem->SetTarget(be_app);
 	menu->AddSeparatorItem();
-	BMenuItem* quitItem = new BMenuItem("Quit",
+	BMenuItem* quitItem = new BMenuItem(B_TRANSLATE("Quit"),
 		new BMessage(B_QUIT_REQUESTED), 'Q');
 	menu->AddItem(quitItem);
 	quitItem->SetTarget(be_app);
 	mainMenu->AddItem(menu);
 
-	menu = new BMenu("Edit");
-	menu->AddItem(fCutMenuItem = new BMenuItem("Cut", new BMessage(B_CUT),
-		'X'));
-	menu->AddItem(fCopyMenuItem = new BMenuItem("Copy", new BMessage(B_COPY),
-		'C'));
-	menu->AddItem(fPasteMenuItem = new BMenuItem("Paste", new BMessage(B_PASTE),
-		'V'));
+	menu = new BMenu(B_TRANSLATE("Edit"));
+	menu->AddItem(fCutMenuItem = new BMenuItem(B_TRANSLATE("Cut"),
+		new BMessage(B_CUT), 'X'));
+	menu->AddItem(fCopyMenuItem = new BMenuItem(B_TRANSLATE("Copy"),
+		new BMessage(B_COPY), 'C'));
+	menu->AddItem(fPasteMenuItem = new BMenuItem(B_TRANSLATE("Paste"),
+		new BMessage(B_PASTE), 'V'));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Find", new BMessage(EDIT_SHOW_FIND_GROUP),
-		'F'));
-	menu->AddItem(fFindPreviousMenuItem = new BMenuItem("Find previous",
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Find"),
+		new BMessage(EDIT_SHOW_FIND_GROUP), 'F'));
+	menu->AddItem(fFindPreviousMenuItem
+		= new BMenuItem(B_TRANSLATE("Find previous"),
 		new BMessage(EDIT_FIND_PREVIOUS), 'G', B_SHIFT_KEY));
-	menu->AddItem(fFindNextMenuItem = new BMenuItem("Find next",
+	menu->AddItem(fFindNextMenuItem = new BMenuItem(B_TRANSLATE("Find next"),
 		new BMessage(EDIT_FIND_NEXT), 'G'));
 	mainMenu->AddItem(menu);
 	fFindPreviousMenuItem->SetEnabled(false);
 	fFindNextMenuItem->SetEnabled(false);
 
-	menu = new BMenu("View");
-	menu->AddItem(new BMenuItem("Reload", new BMessage(RELOAD), 'R'));
+	menu = new BMenu(B_TRANSLATE("View"));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Reload"), new BMessage(RELOAD),
+		'R'));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Increase size",
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Increase size"),
 		new BMessage(ZOOM_FACTOR_INCREASE), '+'));
-	menu->AddItem(new BMenuItem("Decrease size",
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Decrease size"),
 		new BMessage(ZOOM_FACTOR_DECREASE), '-'));
-	menu->AddItem(new BMenuItem("Reset size",
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Reset size"),
 		new BMessage(ZOOM_FACTOR_RESET), '0'));
-	fZoomTextOnlyMenuItem = new BMenuItem("Zoom text only",
+	fZoomTextOnlyMenuItem = new BMenuItem(B_TRANSLATE("Zoom text only"),
 		new BMessage(ZOOM_TEXT_ONLY));
 	fZoomTextOnlyMenuItem->SetMarked(fZoomTextOnly);
 	menu->AddItem(fZoomTextOnlyMenuItem);
 
 	menu->AddSeparatorItem();
-	fFullscreenItem = new BMenuItem("Fullscreen",
+	fFullscreenItem = new BMenuItem(B_TRANSLATE("Fullscreen"),
 		new BMessage(TOGGLE_FULLSCREEN), B_RETURN);
 	menu->AddItem(fFullscreenItem);
-	menu->AddItem(new BMenuItem("Page source",
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Page source"),
 		new BMessage(SHOW_PAGE_SOURCE), 'U'));
 	mainMenu->AddItem(menu);
 
-	fHistoryMenu = new BMenu("History");
-	fHistoryMenu->AddItem(fBackMenuItem = new BMenuItem("Back",
+	fHistoryMenu = new BMenu(B_TRANSLATE("History"));
+	fHistoryMenu->AddItem(fBackMenuItem = new BMenuItem(B_TRANSLATE("Back"),
 		new BMessage(GO_BACK), B_LEFT_ARROW));
-	fHistoryMenu->AddItem(fForwardMenuItem = new BMenuItem("Forward",
-		new BMessage(GO_FORWARD), B_RIGHT_ARROW));
+	fHistoryMenu->AddItem(fForwardMenuItem
+		= new BMenuItem(B_TRANSLATE("Forward"), new BMessage(GO_FORWARD),
+		B_RIGHT_ARROW));
 	fHistoryMenu->AddSeparatorItem();
 	fHistoryMenuFixedItemCount = fHistoryMenu->CountItems();
 	mainMenu->AddItem(fHistoryMenu);
@@ -366,7 +378,7 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 	if (_BookmarkPath(bookmarkPath) == B_OK
 		&& get_ref_for_path(bookmarkPath.Path(), &bookmarkRef) == B_OK) {
 		BMenu* bookmarkMenu
-			= new BookmarkMenu("Bookmarks", this, &bookmarkRef);
+			= new BookmarkMenu(B_TRANSLATE("Bookmarks"), this, &bookmarkRef);
 		mainMenu->AddItem(bookmarkMenu);
 	}
 
@@ -412,15 +424,16 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 	const float kElementSpacing = 5;
 
 	// Find group
-	fFindTextControl = new BTextControl("find", "Find:", "",
+	fFindTextControl = new BTextControl("find", B_TRANSLATE("Find:"), "",
 		new BMessage(EDIT_FIND_NEXT));
 	fFindTextControl->SetModificationMessage(new BMessage(FIND_TEXT_CHANGED));
-	fFindPreviousButton = new BButton("Previous",
+	fFindPreviousButton = new BButton(B_TRANSLATE("Previous"),
 		new BMessage(EDIT_FIND_PREVIOUS));
-	fFindNextButton = new BButton("Next", new BMessage(EDIT_FIND_NEXT));
-	fFindCloseButton = new BButton("Close",
+	fFindNextButton = new BButton(B_TRANSLATE("Next"),
+		new BMessage(EDIT_FIND_NEXT));
+	fFindCloseButton = new BButton(B_TRANSLATE("Close"),
 		new BMessage(EDIT_HIDE_FIND_GROUP));
-	fFindCaseSensitiveCheckBox = new BCheckBox("Match case");
+	fFindCaseSensitiveCheckBox = new BCheckBox(B_TRANSLATE("Match case"));
 	BGroupLayout* findGroup = BLayoutBuilder::Group<>(B_VERTICAL, 0.0)
 		.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL, kElementSpacing)
@@ -511,7 +524,7 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 
 	// Add shortcuts to select a particular tab
 	for (int32 i = 1; i <= 9; i++) {
-		BMessage *selectTab = new BMessage(SELECT_TAB);
+		BMessage* selectTab = new BMessage(SELECT_TAB);
 		selectTab->AddInt32("tab index", i - 1);
 		char numStr[2];
 		snprintf(numStr, sizeof(numStr), "%d", (int) i);
@@ -603,10 +616,10 @@ BrowserWindow::DispatchMessage(BMessage* message, BHandler* target)
 		// Only do this when the mouse is over the web view
 		if (CurrentWebView()->Bounds().Contains(where)) {
 			// Zoom and unzoom text on Command + mouse wheel.
-			// This could of course (and maybe should be) implemented in the WebView, but there
-			// would need to be a way for the WebView to know the setting of the
-			// fZoomTextOnly member here. Plus other clients of the API may not want
-			// this feature.
+			// This could of course (and maybe should be) implemented in the
+			// WebView, but there would need to be a way for the WebView to
+			// know the setting of the fZoomTextOnly member here. Plus other
+			// clients of the API may not want this feature.
 			if ((modifiers() & B_COMMAND_KEY) != 0) {
 				float dy;
 				if (message->FindFloat("be:wheel_delta_y", &dy) == B_OK) {
@@ -667,8 +680,10 @@ BrowserWindow::MessageReceived(BMessage* message)
 			BrowsingHistory* history = BrowsingHistory::DefaultInstance();
 			if (history->CountItems() == 0)
 				break;
-			BAlert* alert = new BAlert("Confirmation", "Do you really want to "
-				"clear the browsing history?", "Clear", "Cancel");
+			BAlert* alert = new BAlert(B_TRANSLATE("Confirmation"),
+				B_TRANSLATE("Do you really want to "
+				"clear the browsing history?"), B_TRANSLATE("Clear"),
+				B_TRANSLATE("Cancel"));
 			if (alert->Go() == 0)
 				history->Clear();
 			break;
@@ -715,11 +730,12 @@ BrowserWindow::MessageReceived(BMessage* message)
 			}
 			message->RemoveName("refs");
 			if (addedCount > 10) {
-				BString string;
-				string << "Do you want to open " << addedCount;
-				string << " bookmarks all at once?";
-				BAlert* alert = new BAlert("Open bookmarks confirmation",
-					string.String(), "Cancel", "Open all");
+				BString string(B_TRANSLATE_COMMENT("Do you want to open %addedCount "
+					"bookmarks all at once?", "Don't translate variable %addedCount."));
+				string.ReplaceFirst("%addedCount", BString() << addedCount);
+
+				BAlert* alert = new BAlert(B_TRANSLATE("Open bookmarks confirmation"),
+					string.String(), B_TRANSLATE("Cancel"), B_TRANSLATE("Open all"));
 				if (alert->Go() == 0)
 					break;
 			}
@@ -1100,7 +1116,7 @@ BrowserWindow::CreateNewTab(const BString& _url, bool select, BWebView* webView)
 
 	bool isNewWindow = fTabManager->CountTabs() == 0;
 
-	fTabManager->AddTab(webView, "New tab");
+	fTabManager->AddTab(webView, B_TRANSLATE("New tab"));
 
 	BString url(_url);
 	if (applyNewPagePolicy && url.Length() == 0)
@@ -1185,7 +1201,7 @@ BrowserWindow::NewWindowRequested(const BString& url, bool primaryAction)
 
 void
 BrowserWindow::NewPageCreated(BWebView* view, BRect windowFrame,
-    bool modalDialog, bool resizable, bool activate)
+	bool modalDialog, bool resizable, bool activate)
 {
 	if (windowFrame.IsValid()) {
 		BrowserWindow* window = new BrowserWindow(windowFrame, fAppSettings,
@@ -1218,7 +1234,7 @@ BrowserWindow::LoadNegotiating(const BString& url, BWebView* view)
 
 	fURLInputGroup->SetText(url.String());
 
-	BString status("Requesting: ");
+	BString status(B_TRANSLATE("Requesting: "));
 	status << url;
 	view->WebPage()->SetStatusMessage(status);
 }
@@ -1233,7 +1249,7 @@ BrowserWindow::LoadCommitted(const BString& url, BWebView* view)
 	// This hook is invoked when the load is commited.
 	fURLInputGroup->SetText(url.String());
 
-	BString status("Loading: ");
+	BString status(B_TRANSLATE("Loading: "));
 	status << url;
 	view->WebPage()->SetStatusMessage(status);
 }
@@ -1259,8 +1275,9 @@ BrowserWindow::LoadFailed(const BString& url, BWebView* view)
 	if (view != CurrentWebView())
 		return;
 
-	BString status(url);
-	status << " failed.";
+	BString status(B_TRANSLATE_COMMENT("%url failed.", "Loading URL failed. "
+		"Don't translate variable %url."));
+	status.ReplaceFirst("%url", url);
 	view->WebPage()->SetStatusMessage(status);
 	if (!fLoadingProgressBar->IsHidden())
 		fLoadingProgressBar->Hide();
@@ -1273,8 +1290,9 @@ BrowserWindow::LoadFinished(const BString& url, BWebView* view)
 	if (view != CurrentWebView())
 		return;
 
-	BString status(url);
-	status << " finished.";
+	BString status(B_TRANSLATE_COMMENT("%url finished.", "Loading URL "
+		"finished. Don't translate variable %url."));
+	status.ReplaceFirst("%url", url);
 	view->WebPage()->SetStatusMessage(status);
 	if (!fLoadingProgressBar->IsHidden())
 		fLoadingProgressBar->Hide();
@@ -1283,8 +1301,9 @@ BrowserWindow::LoadFinished(const BString& url, BWebView* view)
 		fForwardButton->IsEnabled(), false, view);
 
 	int32 tabIndex = fTabManager->TabForView(view);
-	if (tabIndex > 0 && strcmp("New tab", fTabManager->TabLabel(tabIndex)) == 0)
-		fTabManager->SetTabLabel(tabIndex, url);
+	if (tabIndex > 0 && strcmp(B_TRANSLATE("New tab"),
+		fTabManager->TabLabel(tabIndex)) == 0)
+			fTabManager->SetTabLabel(tabIndex, url);
 }
 
 
@@ -1447,8 +1466,8 @@ BrowserWindow::UpdateGlobalHistory(const BString& url)
 
 bool
 BrowserWindow::AuthenticationChallenge(BString message, BString& inOutUser,
-	BString& inOutPassword, bool& inOutRememberCredentials, uint32 failureCount,
-	BWebView* view)
+	BString& inOutPassword, bool& inOutRememberCredentials,
+	uint32 failureCount, BWebView* view)
 {
 	CredentialsStorage* persistentStorage
 		= CredentialsStorage::PersistentInstance();
@@ -1571,11 +1590,13 @@ BrowserWindow::_CreateBookmark()
 	BPath path;
 	status_t status = _BookmarkPath(path);
 	if (status != B_OK) {
-		BString message("There was an error retrieving the bookmark "
-			"folder.\n\n");
-		message << "Error: " << strerror(status);
-		BAlert* alert = new BAlert("Bookmark error", message.String(), "OK",
-			NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		BString message(B_TRANSLATE_COMMENT("There was an error retrieving "
+			"the bookmark folder.\n\nError: %error", "Don't translate the "
+			"variable %error"));
+		message.ReplaceFirst("%error", strerror(status));
+		BAlert* alert = new BAlert(B_TRANSLATE("Bookmark error"),
+			message.String(), B_TRANSLATE("OK"), NULL, NULL,
+			B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		alert->Go();
 		return;
 	}
@@ -1599,10 +1620,12 @@ BrowserWindow::_CreateBookmark()
 	// URLs, only for matching file names.
 	BDirectory directory(path.Path());
 	if (status == B_OK && _CheckBookmarkExists(directory, bookmarkName, url)) {
-		BString message("A bookmark for this page (");
-		message << bookmarkName;
-		message << ") already exists.";
-		BAlert* alert = new BAlert("Bookmark info", message.String(), "OK");
+		BString message(B_TRANSLATE_COMMENT("A bookmark for this page "
+			"(%bookmarkName) already exists.", "Don't translate variable "
+			"%bookmarkName"));
+		message.ReplaceFirst("%bookmarkName", bookmarkName);
+		BAlert* alert = new BAlert(B_TRANSLATE("Bookmark info"),
+			message.String(), B_TRANSLATE("OK"));
 		alert->Go();
 		return;
 	}
@@ -1690,11 +1713,13 @@ BrowserWindow::_CreateBookmark()
 	}
 
 	if (status != B_OK) {
-		BString message("There was an error creating the bookmark "
-			"file.\n\n");
-		message << "Error: " << strerror(status);
-		BAlert* alert = new BAlert("Bookmark error", message.String(), "OK",
-			NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		BString message(B_TRANSLATE_COMMENT("There was an error creating the "
+			"bookmark file.\n\nError: %error", "Don't translate variable "
+			"%error"));
+		message.ReplaceFirst("%error", strerror(status));
+		BAlert* alert = new BAlert(B_TRANSLATE("Bookmark error"),
+			message.String(), B_TRANSLATE("OK"), NULL, NULL,
+			B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		alert->Go();
 		return;
 	}
@@ -1713,11 +1738,13 @@ BrowserWindow::_ShowBookmarks()
 		status = be_roster->Launch(&ref);
 
 	if (status != B_OK && status != B_ALREADY_RUNNING) {
-		BString message("There was an error trying to show the Bookmarks "
-			"folder.\n\n");
-		message << "Error: " << strerror(status);
-		BAlert* alert = new BAlert("Bookmark error", message.String(), "OK",
-			NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		BString message(B_TRANSLATE_COMMENT("There was an error trying to "
+			"show the Bookmarks folder.\n\nError: %error", "Don't translate variable "
+			"%error"));
+		message.ReplaceFirst("%error", strerror(status));
+		BAlert* alert = new BAlert(B_TRANSLATE("Bookmark error"),
+			message.String(), B_TRANSLATE("OK"), NULL, NULL,
+			B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		alert->Go();
 		return;
 	}
@@ -1857,7 +1884,7 @@ BrowserWindow::_UpdateHistoryMenu()
 		return;
 
 	int32 count = history->CountItems();
-	BMenuItem* clearHistoryItem = new BMenuItem("Clear history",
+	BMenuItem* clearHistoryItem = new BMenuItem(B_TRANSLATE("Clear history"),
 		new BMessage(CLEAR_HISTORY));
 	clearHistoryItem->SetEnabled(count > 0);
 	fHistoryMenu->AddItem(clearHistoryItem);
@@ -1885,8 +1912,8 @@ BrowserWindow::_UpdateHistoryMenu()
 	BDateTime fiveDaysAgoStart = fourDaysAgoStart;
 	fiveDaysAgoStart.Date().AddDays(-1);
 
-	BMenu* todayMenu = new BMenu("Today");
-	BMenu* yesterdayMenu = new BMenu("Yesterday");
+	BMenu* todayMenu = new BMenu(B_TRANSLATE("Today"));
+	BMenu* yesterdayMenu = new BMenu(B_TRANSLATE("Yesterday"));
 	BMenu* twoDaysAgoMenu = new BMenu(
 		twoDaysAgoStart.Date().LongDayName().String());
 	BMenu* threeDaysAgoMenu = new BMenu(
@@ -1895,7 +1922,7 @@ BrowserWindow::_UpdateHistoryMenu()
 		fourDaysAgoStart.Date().LongDayName().String());
 	BMenu* fiveDaysAgoMenu = new BMenu(
 		fiveDaysAgoStart.Date().LongDayName().String());
-	BMenu* earlierMenu = new BMenu("Earlier");
+	BMenu* earlierMenu = new BMenu(B_TRANSLATE("Earlier"));
 
 	for (int32 i = 0; i < count; i++) {
 		BrowsingHistoryItem historyItem = history->HistoryItemAt(i);
@@ -2075,8 +2102,9 @@ void
 BrowserWindow::_ShowProgressBar(bool show)
 {
 	if (show) {
-		if (!fStatusGroup->IsVisible() && (fVisibleInterfaceElements & INTERFACE_ELEMENT_STATUS) != 0)
-			fStatusGroup->SetVisible(true);
+		if (!fStatusGroup->IsVisible() && (fVisibleInterfaceElements
+			& INTERFACE_ELEMENT_STATUS) != 0)
+				fStatusGroup->SetVisible(true);
 		fLoadingProgressBar->Show();
 	} else {
 		if (!fInterfaceVisible)
@@ -2130,7 +2158,7 @@ BrowserWindow::_SmartURLHandler(const BString& url) const
 {
 	BString result = url;
 
-	// Only process if this doesn't look like a full URL (http:// or 
+	// Only process if this doesn't look like a full URL (http:// or
 	// file://, etc.)
 	if (url.FindFirst("://") == B_ERROR) {
 		if (url.FindFirst(".") == B_ERROR || url.FindFirst(" ") != B_ERROR)
@@ -2207,7 +2235,8 @@ BrowserWindow::_HandlePageSourceResult(const BMessage* message)
 		char buffer[1024];
 		snprintf(buffer, sizeof(buffer), "Failed to show the "
 			"page source: %s\n", strerror(ret));
-		BAlert* alert = new BAlert("Page source error", buffer, "OK");
+		BAlert* alert = new BAlert(B_TRANSLATE("Page source error"), buffer,
+			B_TRANSLATE("OK"));
 		alert->Go(NULL);
 	}
 }

@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -556,6 +557,7 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 	CompilationUnit* unit = function->GetCompilationUnit();
 	error = fFile->UnwindCallFrame(unit, function->SubprogramEntry(),
 		instructionPointer, inputInterface, outputInterface, framePointer);
+
 	if (error != B_OK) {
 		TRACE_CFI("Failed to unwind call frame: %s\n", strerror(error));
 		return B_UNSUPPORTED;
