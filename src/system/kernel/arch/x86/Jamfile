@@ -3,8 +3,8 @@ SubDir HAIKU_TOP src system kernel arch x86 ;
 SubDirHdrs [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) system kernel ] ;
 	# for syscall_numbers.h
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers ps2 ;
-SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica include ;
-SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica include platform ;
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers acpi include ;
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers acpi include platform ;
 SubDirHdrs $(SUBDIR) timers ;
 
 UsePrivateKernelHeaders ;
