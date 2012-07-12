@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src add-ons kernel bus_managers isa ;
 UsePrivateKernelHeaders ;
 
 KernelAddon isa :
-	isa.c
+	isa.cpp
 	: isa_arch_bus_manager.a
 	;
 

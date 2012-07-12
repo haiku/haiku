@@ -5,12 +5,17 @@
  */
 
 
+extern "C" {
 #include "device.h"
+}
 
 #include <stdlib.h>
 
+#include <algorithm>
+
 #include <arch/cpu.h>
 
+extern "C" {
 #include <compat/dev/pci/pcireg.h>
 #include <compat/dev/pci/pcivar.h>
 #include <compat/machine/resource.h>
@@ -18,6 +23,7 @@
 #include <compat/machine/bus.h>
 #include <compat/sys/rman.h>
 #include <compat/sys/bus.h>
+}
 
 // private kernel header to get B_NO_HANDLED_INFO
 #include <int.h>
@@ -149,7 +155,7 @@ bus_alloc_resource(device_t dev, int type, int *rid, unsigned long start,
 		"0x%lx)\n", type, *rid, start, end, count, flags);
 
 	// maybe a local array of resources is enough
-	res = malloc(sizeof(struct resource));
+	res = (struct resource *)malloc(sizeof(struct resource));
 	if (res == NULL)
 		return NULL;
 
@@ -256,7 +262,7 @@ rman_get_bustag(struct resource *res)
 static int32
 intr_wrapper(void *data)
 {
-	struct internal_intr *intr = data;
+	struct internal_intr *intr = (struct internal_intr *)data;
 
 	//device_printf(intr->dev, "in interrupt handler.\n");
 
@@ -271,7 +277,7 @@ intr_wrapper(void *data)
 static int32
 intr_fast_wrapper(void *data)
 {
-	struct internal_intr *intr = data;
+	struct internal_intr *intr = (struct internal_intr *)data;
 
 	intr->handler(intr->arg);
 
@@ -283,7 +289,7 @@ intr_fast_wrapper(void *data)
 static int32
 intr_handler(void *data)
 {
-	struct internal_intr *intr = data;
+	struct internal_intr *intr = (struct internal_intr *)data;
 	status_t status;
 
 	while (1) {
@@ -398,7 +404,7 @@ bus_setup_intr(device_t dev, struct resource *res, int flags,
 int
 bus_teardown_intr(device_t dev, struct resource *res, void *arg)
 {
-	struct internal_intr *intr = arg;
+	struct internal_intr *intr = (struct internal_intr *)arg;
 
 	if (intr->is_msi && gPCIx86 != NULL) {
 		// disable msi generation
@@ -892,7 +898,7 @@ pci_set_powerstate(device_t dev, int newPowerState)
 	if (oldPowerState == newPowerState)
 		return EOK;
 
-	switch (max(oldPowerState, newPowerState)) {
+	switch (std::max(oldPowerState, newPowerState)) {
 		case PCI_POWERSTATE_D2:
 			stateTransitionDelayInUs = 200;
 			break;

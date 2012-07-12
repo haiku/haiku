@@ -6,7 +6,7 @@ UsePrivateHeaders kernel [ FDirName kernel arch x86 ] ;
 UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 
 KernelStaticLibrary isa_arch_bus_manager : 
-	isa_dma.c
-	isa_controller.c
+	isa_dma.cpp
+	isa_controller.cpp
 	;
 

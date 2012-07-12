@@ -19,7 +19,7 @@ MergeObject os_arch_$(TARGET_ARCH).o :
 	system_info.c
 	system_time_asm.S
 	thread.c
-	time.c
+	time.cpp
 	tls.c
 
 	$(compatibilitySources)

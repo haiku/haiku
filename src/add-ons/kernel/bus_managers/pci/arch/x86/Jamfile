@@ -7,9 +7,9 @@ UsePrivateHeaders kernel [ FDirName kernel arch x86 ] [ FDirName kernel util ] ;
 KernelStaticLibrary pci_arch_bus_manager :
 	pci_arch_info.cpp
 	pci_arch_module.cpp
-	pci_bios.c
-	pci_controller.c
-	pci_io.c
-	pci_irq.c
+	pci_bios.cpp
+	pci_controller.cpp
+	pci_io.cpp
+	pci_irq.cpp
 	pci_msi.cpp
 	;

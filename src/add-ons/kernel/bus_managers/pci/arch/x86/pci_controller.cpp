@@ -181,29 +181,29 @@ pci_ram_address(const void *physical_address_in_system_memory)
 
 pci_controller pci_controller_x86_mech1 =
 {
-	.read_pci_config		= pci_mech1_read_config,
-	.write_pci_config		= pci_mech1_write_config,
-	.get_max_bus_devices	= pci_mech1_get_max_bus_devices,
-	.read_pci_irq			= pci_x86_irq_read,
-	.write_pci_irq			= pci_x86_irq_write,
+	pci_mech1_read_config,
+	pci_mech1_write_config,
+	pci_mech1_get_max_bus_devices,
+	pci_x86_irq_read,
+	pci_x86_irq_write,
 };
 
 pci_controller pci_controller_x86_mech2 =
 {
-	.read_pci_config		= pci_mech2_read_config,
-	.write_pci_config		= pci_mech2_write_config,
-	.get_max_bus_devices	= pci_mech2_get_max_bus_devices,
-	.read_pci_irq			= pci_x86_irq_read,
-	.write_pci_irq			= pci_x86_irq_write,
+	pci_mech2_read_config,
+	pci_mech2_write_config,
+	pci_mech2_get_max_bus_devices,
+	pci_x86_irq_read,
+	pci_x86_irq_write,
 };
 
 pci_controller pci_controller_x86_bios =
 {
-	.read_pci_config		= pci_bios_read_config,
-	.write_pci_config		= pci_bios_write_config,
-	.get_max_bus_devices	= pci_bios_get_max_bus_devices,
-	.read_pci_irq			= pci_x86_irq_read,
-	.write_pci_irq			= pci_x86_irq_write,
+	pci_bios_read_config,
+	pci_bios_write_config,
+	pci_bios_get_max_bus_devices,
+	pci_x86_irq_read,
+	pci_x86_irq_write,
 };
 
 
