@@ -1432,28 +1432,36 @@ BTextView::Paste(BClipboard *clipboard)
 	BMessage *clip = clipboard->Data();
 	if (clip != NULL) {
 		const char *text = NULL;
-		ssize_t len = 0;
+		ssize_t length = 0;
 
 		if (clip->FindData("text/plain", B_MIME_TYPE,
-				(const void **)&text, &len) == B_OK) {
+				(const void **)&text, &length) == B_OK) {
 			text_run_array *runArray = NULL;
-			ssize_t runLen = 0;
+			ssize_t runLength = 0;
 
 			if (fStylable) {
 				clip->FindData("application/x-vnd.Be-text_run_array",
-					B_MIME_TYPE, (const void **)&runArray, &runLen);
+					B_MIME_TYPE, (const void **)&runArray, &runLength);
+			}
+
+			_FilterDisallowedChars((char*)text, length, runArray);
+
+			if (length < 1) {
+				beep();
+				clipboard->Unlock();
+				return;
 			}
 
 			if (fUndo) {
 				delete fUndo;
-				fUndo = new PasteUndoBuffer(this, text, len, runArray,
-					runLen);
+				fUndo = new PasteUndoBuffer(this, text, length, runArray,
+					runLength);
 			}
 
 			if (fSelStart != fSelEnd)
 				Delete();
 
-			Insert(text, len, runArray);
+			Insert(text, length, runArray);
 			ScrollToOffset(fSelEnd);
 		}
 	}
@@ -4774,30 +4782,38 @@ BTextView::_MessageDropped(BMessage *inMessage, BPoint where, BPoint offset)
 			return true;
 	}
 
-	ssize_t dataLen = 0;
+	ssize_t dataLength = 0;
 	const char *text = NULL;
 	entry_ref ref;
 	if (inMessage->FindData("text/plain", B_MIME_TYPE, (const void **)&text,
-			&dataLen) == B_OK) {
+			&dataLength) == B_OK) {
 		text_run_array *runArray = NULL;
-		ssize_t runLen = 0;
-		if (fStylable)
+		ssize_t runLength = 0;
+		if (fStylable) {
 			inMessage->FindData("application/x-vnd.Be-text_run_array",
-				B_MIME_TYPE, (const void **)&runArray, &runLen);
+				B_MIME_TYPE, (const void **)&runArray, &runLength);
+		}
+
+		_FilterDisallowedChars((char*)text, dataLength, runArray);
+
+		if (dataLength < 1) {
+			beep();
+			return true;
+		}
 
 		if (fUndo) {
 			delete fUndo;
-			fUndo = new DropUndoBuffer(this, text, dataLen, runArray,
-				runLen, dropOffset, internalDrop);
+			fUndo = new DropUndoBuffer(this, text, dataLength, runArray,
+				runLength, dropOffset, internalDrop);
 		}
 
 		if (internalDrop) {
 			if (dropOffset > fSelEnd)
-				dropOffset -= dataLen;
+				dropOffset -= dataLength;
 			Delete();
 		}
 
-		Insert(dropOffset, text, dataLen, runArray);
+		Insert(dropOffset, text, dataLength, runArray);
 	}
 
 	return true;
@@ -5580,6 +5596,49 @@ BTextView::_ShowContextMenu(BPoint where)
 	menu->SetTargetForItems(this);
 	ConvertToScreen(&where);
 	menu->Go(where, true, true,	true);
+}
+
+
+void
+BTextView::_FilterDisallowedChars(char* text, int32& length,
+	text_run_array* runArray)
+{
+	if (!fDisallowedChars)
+		return;
+
+	if (fDisallowedChars->IsEmpty() || !text)
+		return;
+
+	int32 stringIndex = 0;
+	if (runArray) {
+		int32 remNext = 0;
+
+		for (int i = 0; i < runArray->count; i++) {
+			runArray->runs[i].offset -= remNext;
+			while (stringIndex < runArray->runs[i].offset
+				&& stringIndex < length) {
+				if (fDisallowedChars->HasItem(
+					reinterpret_cast<void *>(text[stringIndex]))) {
+					memmove(text + stringIndex, text + stringIndex + 1,
+						length - stringIndex - 1);
+					length--;
+					runArray->runs[i].offset--;
+					remNext++;
+				} else
+					stringIndex++;
+			}
+		}
+	}
+
+	while (stringIndex < length) {
+		if (fDisallowedChars->HasItem(
+			reinterpret_cast<void *>(text[stringIndex]))) {
+			memmove(text + stringIndex, text + stringIndex + 1,
+				length - stringIndex - 1);
+			length--;
+		} else
+			stringIndex++;
+	}
 }
 
 // #pragma mark - BTextView::TextTrackState
