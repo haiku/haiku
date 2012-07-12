@@ -3174,7 +3174,9 @@ dump_mounts(int argc, char** argv)
 		return 0;
 	}
 
-	kprintf("address     id root       covers     cookie     fs_name\n");
+	kprintf("%-*s    id %-*s   %-*s   %-*s   fs_name\n",
+		B_PRINTF_POINTER_WIDTH, "address", B_PRINTF_POINTER_WIDTH, "root",
+		B_PRINTF_POINTER_WIDTH, "covers", B_PRINTF_POINTER_WIDTH, "cookie");
 
 	struct hash_iterator iterator;
 	struct fs_mount* mount;
@@ -3257,8 +3259,9 @@ dump_vnodes(int argc, char** argv)
 	struct hash_iterator iterator;
 	struct vnode* vnode;
 
-	kprintf("address    dev     inode  ref cache      fs-node    locking    "
-		"flags\n");
+	kprintf("%-*s   dev     inode  ref %-*s   %-*s   %-*s   flags\n",
+		B_PRINTF_POINTER_WIDTH, "address", B_PRINTF_POINTER_WIDTH, "cache",
+		B_PRINTF_POINTER_WIDTH, "fs-node", B_PRINTF_POINTER_WIDTH, "locking");
 
 	hash_open(sVnodeTable, &iterator);
 	while ((vnode = (struct vnode*)hash_next(sVnodeTable, &iterator)) != NULL) {
@@ -3293,7 +3296,8 @@ dump_vnode_caches(int argc, char** argv)
 	if (argc > 1)
 		device = parse_expression(argv[1]);
 
-	kprintf("address    dev     inode cache          size   pages\n");
+	kprintf("%-*s   dev     inode %-*s       size   pages\n",
+		B_PRINTF_POINTER_WIDTH, "address", B_PRINTF_POINTER_WIDTH, "cache");
 
 	hash_open(sVnodeTable, &iterator);
 	while ((vnode = (struct vnode*)hash_next(sVnodeTable, &iterator)) != NULL) {
@@ -3344,9 +3348,10 @@ dump_io_context(int argc, char** argv)
 	kprintf(" used fds:\t%" B_PRIu32 "\n", context->num_used_fds);
 	kprintf(" max fds:\t%" B_PRIu32 "\n", context->table_size);
 
-	if (context->num_used_fds)
-		kprintf("   no.  type         ops  ref  open  mode         pos"
-			"      cookie\n");
+	if (context->num_used_fds) {
+		kprintf("   no.  type    %*s  ref  open  mode         pos    %*s\n",
+			B_PRINTF_POINTER_WIDTH, "ops", B_PRINTF_POINTER_WIDTH, "cookie");
+	}
 
 	for (uint32 i = 0; i < context->table_size; i++) {
 		struct file_descriptor* fd = context->fds[i];

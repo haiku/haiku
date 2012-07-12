@@ -344,8 +344,9 @@ VMAddressSpace::_DumpCommand(int argc, char** argv)
 /*static*/ int
 VMAddressSpace::_DumpListCommand(int argc, char** argv)
 {
-	kprintf("   address      id         base          end   area count   "
-		" area size\n");
+	kprintf("  %*s      id     %*s     %*s   area count    area size\n",
+		B_PRINTF_POINTER_WIDTH, "address", B_PRINTF_POINTER_WIDTH, "base",
+		B_PRINTF_POINTER_WIDTH, "end");
 
 	AddressSpaceTable::Iterator it = sAddressSpaceTable.GetIterator();
 	while (VMAddressSpace* space = it.Next()) {

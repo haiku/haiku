@@ -3372,7 +3372,9 @@ dump_area_list(int argc, char** argv)
 			name = argv[1];
 	}
 
-	kprintf("addr          id  base\t\tsize    protect lock  name\n");
+	kprintf("%-*s      id  %-*s    %-*sprotect lock  name\n",
+		B_PRINTF_POINTER_WIDTH, "addr", B_PRINTF_POINTER_WIDTH, "base",
+		B_PRINTF_POINTER_WIDTH, "size");
 
 	VMAreaHashTable::Iterator it = VMAreaHash::GetIterator();
 	while ((area = it.Next()) != NULL) {
@@ -3380,7 +3382,7 @@ dump_area_list(int argc, char** argv)
 			|| (name != NULL && strstr(area->name, name) == NULL))
 			continue;
 
-		kprintf("%p %5" B_PRIx32 "  %p\t%p %4" B_PRIx32 "\t%4d  %s\n", area,
+		kprintf("%p %5" B_PRIx32 "  %p  %p %4" B_PRIx32 " %4d  %s\n", area,
 			area->id, (void*)area->Base(), (void*)area->Size(),
 			area->protection, area->wiring, area->name);
 	}

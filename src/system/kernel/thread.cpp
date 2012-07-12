@@ -1595,8 +1595,10 @@ state_to_text(Thread *thread, int32 state)
 static void
 print_thread_list_table_head()
 {
-	kprintf("thread         id  state     wait for   object  cpu pri  stack    "
-		"  team  name\n");
+	kprintf("%-*s       id  state     wait for  %-*s    cpu pri  %-*s   team  "
+		"name\n",
+		B_PRINTF_POINTER_WIDTH, "thread", B_PRINTF_POINTER_WIDTH, "object",
+		B_PRINTF_POINTER_WIDTH, "stack");
 }
 
 
@@ -1614,42 +1616,44 @@ _dump_thread_info(Thread *thread, bool shortInfo)
 				{
 					sem_id sem = (sem_id)(addr_t)thread->wait.object;
 					if (sem == thread->msg.read_sem)
-						kprintf("                    ");
-					else
-						kprintf("sem  %12" B_PRId32 "   ", sem);
+						kprintf("%*s", B_PRINTF_POINTER_WIDTH + 15, "");
+					else {
+						kprintf("sem       %-*" B_PRId32,
+							B_PRINTF_POINTER_WIDTH + 5, sem);
+					}
 					break;
 				}
 
 				case THREAD_BLOCK_TYPE_CONDITION_VARIABLE:
-					kprintf("cvar   %p   ", thread->wait.object);
+					kprintf("cvar      %p   ", thread->wait.object);
 					break;
 
 				case THREAD_BLOCK_TYPE_SNOOZE:
-					kprintf("                    ");
+					kprintf("%*s", B_PRINTF_POINTER_WIDTH + 15, "");
 					break;
 
 				case THREAD_BLOCK_TYPE_SIGNAL:
-					kprintf("signal              ");
+					kprintf("signal%*s", B_PRINTF_POINTER_WIDTH + 9, "");
 					break;
 
 				case THREAD_BLOCK_TYPE_MUTEX:
-					kprintf("mutex  %p   ", thread->wait.object);
+					kprintf("mutex     %p   ", thread->wait.object);
 					break;
 
 				case THREAD_BLOCK_TYPE_RW_LOCK:
-					kprintf("rwlock %p   ", thread->wait.object);
+					kprintf("rwlock    %p   ", thread->wait.object);
 					break;
 
 				case THREAD_BLOCK_TYPE_OTHER:
-					kprintf("other               ");
+					kprintf("other%*s", B_PRINTF_POINTER_WIDTH + 10, "");
 					break;
 
 				default:
-					kprintf("???    %p   ", thread->wait.object);
+					kprintf("???       %p   ", thread->wait.object);
 					break;
 			}
 		} else
-			kprintf("        -           ");
+			kprintf("-%*s", B_PRINTF_POINTER_WIDTH + 14, "");
 
 		// on which CPU does it run?
 		if (thread->cpu)

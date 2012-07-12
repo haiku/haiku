@@ -258,8 +258,9 @@ dump_slab(::slab* slab)
 static int
 dump_slabs(int argc, char* argv[])
 {
-	kprintf("%10s %22s %8s %8s %8s %6s %8s %8s %8s\n", "address", "name",
-		"objsize", "align", "usage", "empty", "usedobj", "total", "flags");
+	kprintf("%*s %22s %8s %8s %8s %6s %8s %8s %8s\n",
+		B_PRINTF_POINTER_WIDTH + 2, "address", "name", "objsize", "align",
+		"usage", "empty", "usedobj", "total", "flags");
 
 	ObjectCacheList::Iterator it = sObjectCaches.GetIterator();
 
@@ -303,7 +304,8 @@ dump_cache_info(int argc, char* argv[])
 	kprintf("resize entry don't wait: %p\n", cache->resize_entry_dont_wait);
 	kprintf("resize entry can wait:   %p\n", cache->resize_entry_can_wait);
 
-	kprintf("  slab        chunk         size   used offset  free\n");
+	kprintf("  %-*s    %-*s      size   used offset  free\n",
+		B_PRINTF_POINTER_WIDTH, "slab", B_PRINTF_POINTER_WIDTH, "chunk");
 
 	SlabList::Iterator iterator = cache->empty.GetIterator();
 	if (iterator.HasNext())

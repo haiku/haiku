@@ -261,7 +261,8 @@ dump_images_list(int argc, char **argv)
 		team = thread_get_current_thread()->team;
 
 	kprintf("Registered images of team %" B_PRId32 "\n", team->id);
-	kprintf("    ID text       size    data       size    name\n");
+	kprintf("    ID %-*s   size    %-*s   size    name\n",
+		B_PRINTF_POINTER_WIDTH, "text", B_PRINTF_POINTER_WIDTH, "data");
 
 	while ((image = (struct image*)list_get_next_item(&team->image_list, image))
 			!= NULL) {

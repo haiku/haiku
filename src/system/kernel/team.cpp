@@ -1185,7 +1185,8 @@ dump_team_info(int argc, char** argv)
 static int
 dump_teams(int argc, char** argv)
 {
-	kprintf("team           id  parent      name\n");
+	kprintf("%-*s       id  %-*s    name\n", B_PRINTF_POINTER_WIDTH, "team",
+		B_PRINTF_POINTER_WIDTH, "parent");
 
 	for (TeamTable::Iterator it = sTeamHash.GetIterator();
 		Team* team = it.Next();) {

@@ -463,8 +463,8 @@ dump_symbols(int argc, char **argv)
 
 	// dump symbols
 
-	kprintf("Symbols of image %" B_PRId32 "\"%s\":\n"
-		"Address  Type       Size Name\n", image->id, image->name);
+	kprintf("Symbols of image %" B_PRId32 "\"%s\":\n", image->id, image->name);
+	kprintf("%-*s Type       Size Name\n", B_PRINTF_POINTER_WIDTH, "Address");
 
 	if (image->num_debug_symbols > 0) {
 		// search extended debug symbol table (contains static symbols)
@@ -475,7 +475,7 @@ dump_symbols(int argc, char **argv)
 					>= image->text_region.size + image->data_region.size)
 				continue;
 
-			kprintf("%08lx %s/%s %5ld %s\n",
+			kprintf("%0*lx %s/%s %5ld %s\n", B_PRINTF_POINTER_WIDTH,
 				symbol->st_value + image->text_region.delta,
 				get_symbol_type_string(symbol), get_symbol_bind_string(symbol),
 				symbol->st_size, image->debug_string_table + symbol->st_name);

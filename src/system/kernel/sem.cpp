@@ -153,7 +153,8 @@ dump_sem_list(int argc, char** argv)
 	} else if (argc > 1)
 		owner = strtoul(argv[1], NULL, 0);
 
-	kprintf("sem            id count   team   last  name\n");
+	kprintf("%-*s       id count   team   last  name\n", B_PRINTF_POINTER_WIDTH,
+		"sem");
 
 	for (i = 0; i < sMaxSems; i++) {
 		struct sem_entry* sem = &sSems[i];
