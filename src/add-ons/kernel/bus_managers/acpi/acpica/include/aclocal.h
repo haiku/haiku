@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -126,7 +126,7 @@ typedef UINT32                          ACPI_MUTEX_HANDLE;
 
 /* Total number of aml opcodes defined */
 
-#define AML_NUM_OPCODES                 0x7F
+#define AML_NUM_OPCODES                 0x81
 
 
 /* Forward declarations */
@@ -357,12 +357,16 @@ typedef struct acpi_create_field_info
     ACPI_NAMESPACE_NODE             *FieldNode;
     ACPI_NAMESPACE_NODE             *RegisterNode;
     ACPI_NAMESPACE_NODE             *DataRegisterNode;
+    ACPI_NAMESPACE_NODE             *ConnectionNode;
+    UINT8                           *ResourceBuffer;
     UINT32                          BankValue;
     UINT32                          FieldBitPosition;
     UINT32                          FieldBitLength;
+    UINT16                          ResourceLength;
     UINT8                           FieldFlags;
     UINT8                           Attribute;
     UINT8                           FieldType;
+    UINT8                           AccessLength;
 
 } ACPI_CREATE_FIELD_INFO;
 
@@ -430,7 +434,8 @@ typedef struct acpi_name_info
 
 /*
  * Used for ACPI_PTYPE1_FIXED, ACPI_PTYPE1_VAR, ACPI_PTYPE2,
- * ACPI_PTYPE2_MIN, ACPI_PTYPE2_PKG_COUNT, ACPI_PTYPE2_COUNT
+ * ACPI_PTYPE2_MIN, ACPI_PTYPE2_PKG_COUNT, ACPI_PTYPE2_COUNT,
+ * ACPI_PTYPE2_FIX_VAR
  */
 typedef struct acpi_package_info
 {
@@ -491,6 +496,7 @@ typedef struct acpi_predefined_data
 /* Defines for Flags field above */
 
 #define ACPI_OBJECT_REPAIRED    1
+#define ACPI_OBJECT_WRAPPED     2
 
 
 /*
@@ -528,6 +534,15 @@ typedef struct acpi_gpe_handler_info
 
 } ACPI_GPE_HANDLER_INFO;
 
+/* Notify info for implicit notify, multiple device objects */
+
+typedef struct acpi_gpe_notify_info
+{
+    ACPI_NAMESPACE_NODE             *DeviceNode;    /* Device to be notified */
+    struct acpi_gpe_notify_info     *Next;
+
+} ACPI_GPE_NOTIFY_INFO;
+
 /*
  * GPE dispatch info. At any time, the GPE can have at most one type
  * of dispatch - Method, Handler, or Implicit Notify.
@@ -535,8 +550,8 @@ typedef struct acpi_gpe_handler_info
 typedef union acpi_gpe_dispatch_info
 {
     ACPI_NAMESPACE_NODE             *MethodNode;    /* Method node for this GPE level */
-    struct acpi_gpe_handler_info    *Handler;       /* Installed GPE handler */
-    ACPI_NAMESPACE_NODE             *DeviceNode;    /* Parent _PRW device for implicit notify */
+    ACPI_GPE_HANDLER_INFO           *Handler;       /* Installed GPE handler */
+    ACPI_GPE_NOTIFY_INFO            *NotifyList;    /* List of _PRW devices for implicit notifies */
 
 } ACPI_GPE_DISPATCH_INFO;
 
@@ -546,7 +561,7 @@ typedef union acpi_gpe_dispatch_info
  */
 typedef struct acpi_gpe_event_info
 {
-    union acpi_gpe_dispatch_info    Dispatch;       /* Either Method or Handler */
+    union acpi_gpe_dispatch_info    Dispatch;       /* Either Method, Handler, or NotifyList */
     struct acpi_gpe_register_info   *RegisterInfo;  /* Backpointer to register info */
     UINT8                           Flags;          /* Misc info about this GPE */
     UINT8                           GpeNumber;      /* This GPE */
@@ -782,6 +797,15 @@ ACPI_STATUS (*ACPI_PARSE_UPWARDS) (
     struct acpi_walk_state          *WalkState);
 
 
+/* Global handlers for AML Notifies */
+
+typedef struct acpi_global_notify_handler
+{
+    ACPI_NOTIFY_HANDLER             Handler;
+    void                            *Context;
+
+} ACPI_GLOBAL_NOTIFY_HANDLER;
+
 /*
  * Notify info - used to pass info to the deferred notify
  * handler/dispatcher.
@@ -789,8 +813,10 @@ ACPI_STATUS (*ACPI_PARSE_UPWARDS) (
 typedef struct acpi_notify_info
 {
     ACPI_STATE_COMMON
+    UINT8                           HandlerListId;
     ACPI_NAMESPACE_NODE             *Node;
-    union acpi_operand_object       *HandlerObj;
+    union acpi_operand_object       *HandlerListHead;
+    ACPI_GLOBAL_NOTIFY_HANDLER      *Global;
 
 } ACPI_NOTIFY_INFO;
 
@@ -821,6 +847,17 @@ typedef union acpi_generic_state
 typedef
 ACPI_STATUS (*ACPI_EXECUTE_OP) (
     struct acpi_walk_state          *WalkState);
+
+/* Address Range info block */
+
+typedef struct acpi_address_range
+{
+    struct acpi_address_range   *Next;
+    ACPI_NAMESPACE_NODE         *RegionNode;
+    ACPI_PHYSICAL_ADDRESS       StartAddress;
+    ACPI_PHYSICAL_ADDRESS       EndAddress;
+
+} ACPI_ADDRESS_RANGE;
 
 
 /*****************************************************************************
@@ -1004,6 +1041,7 @@ typedef struct acpi_parse_state
 #define ACPI_PARSEOP_IGNORE             0x01
 #define ACPI_PARSEOP_PARAMLIST          0x02
 #define ACPI_PARSEOP_EMPTY_TERMLIST     0x04
+#define ACPI_PARSEOP_PREDEF_CHECKED     0x08
 #define ACPI_PARSEOP_SPECIAL            0x10
 
 
@@ -1196,7 +1234,7 @@ typedef struct acpi_port_info
 #define ACPI_RESOURCE_NAME_END_DEPENDENT        0x38
 #define ACPI_RESOURCE_NAME_IO                   0x40
 #define ACPI_RESOURCE_NAME_FIXED_IO             0x48
-#define ACPI_RESOURCE_NAME_RESERVED_S1          0x50
+#define ACPI_RESOURCE_NAME_FIXED_DMA            0x50
 #define ACPI_RESOURCE_NAME_RESERVED_S2          0x58
 #define ACPI_RESOURCE_NAME_RESERVED_S3          0x60
 #define ACPI_RESOURCE_NAME_RESERVED_S4          0x68
@@ -1218,7 +1256,9 @@ typedef struct acpi_port_info
 #define ACPI_RESOURCE_NAME_EXTENDED_IRQ         0x89
 #define ACPI_RESOURCE_NAME_ADDRESS64            0x8A
 #define ACPI_RESOURCE_NAME_EXTENDED_ADDRESS64   0x8B
-#define ACPI_RESOURCE_NAME_LARGE_MAX            0x8B
+#define ACPI_RESOURCE_NAME_GPIO                 0x8C
+#define ACPI_RESOURCE_NAME_SERIAL_BUS           0x8E
+#define ACPI_RESOURCE_NAME_LARGE_MAX            0x8E
 
 
 /*****************************************************************************
@@ -1352,5 +1392,21 @@ typedef struct acpi_debug_mem_block
 #define ACPI_MEM_LIST_MAX               1
 #define ACPI_NUM_MEM_LISTS              2
 
+
+/*****************************************************************************
+ *
+ * Info/help support
+ *
+ ****************************************************************************/
+
+typedef struct ah_predefined_name
+{
+    char            *Name;
+    char            *Description;
+#ifndef ACPI_ASL_COMPILER
+    char            *Action;
+#endif
+
+} AH_PREDEFINED_NAME;
 
 #endif /* __ACLOCAL_H__ */

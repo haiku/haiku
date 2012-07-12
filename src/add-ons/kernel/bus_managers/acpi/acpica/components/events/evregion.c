@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -444,6 +444,7 @@ Cleanup1:
  * FUNCTION:    AcpiEvAddressSpaceDispatch
  *
  * PARAMETERS:  RegionObj           - Internal region object
+ *              FieldObj            - Corresponding field. Can be NULL.
  *              Function            - Read or Write operation
  *              RegionOffset        - Where in the region to read or write
  *              BitWidth            - Field width in bits (8, 16, 32, or 64)
@@ -460,6 +461,7 @@ Cleanup1:
 ACPI_STATUS
 AcpiEvAddressSpaceDispatch (
     ACPI_OPERAND_OBJECT     *RegionObj,
+    ACPI_OPERAND_OBJECT     *FieldObj,
     UINT32                  Function,
     UINT32                  RegionOffset,
     UINT32                  BitWidth,
@@ -471,6 +473,7 @@ AcpiEvAddressSpaceDispatch (
     ACPI_OPERAND_OBJECT     *HandlerDesc;
     ACPI_OPERAND_OBJECT     *RegionObj2;
     void                    *RegionContext = NULL;
+    ACPI_CONNECTION_INFO    *Context;
 
 
     ACPI_FUNCTION_TRACE (EvAddressSpaceDispatch);
@@ -494,6 +497,8 @@ AcpiEvAddressSpaceDispatch (
 
         return_ACPI_STATUS (AE_NOT_EXIST);
     }
+
+    Context = HandlerDesc->AddressSpace.Context;
 
     /*
      * It may be the case that the region has never been initialized.
@@ -522,7 +527,7 @@ AcpiEvAddressSpaceDispatch (
         AcpiExExitInterpreter ();
 
         Status = RegionSetup (RegionObj, ACPI_REGION_ACTIVATE,
-                    HandlerDesc->AddressSpace.Context, &RegionContext);
+                    Context, &RegionContext);
 
         /* Re-enter the interpreter */
 
@@ -571,6 +576,27 @@ AcpiEvAddressSpaceDispatch (
         ACPI_FORMAT_NATIVE_UINT (RegionObj->Region.Address + RegionOffset),
         AcpiUtGetRegionName (RegionObj->Region.SpaceId)));
 
+
+    /*
+     * Special handling for GenericSerialBus and GeneralPurposeIo:
+     * There are three extra parameters that must be passed to the
+     * handler via the context:
+     *   1) Connection buffer, a resource template from Connection() op.
+     *   2) Length of the above buffer.
+     *   3) Actual access length from the AccessAs() op.
+     */
+    if (((RegionObj->Region.SpaceId == ACPI_ADR_SPACE_GSBUS) ||
+            (RegionObj->Region.SpaceId == ACPI_ADR_SPACE_GPIO)) &&
+        Context &&
+        FieldObj)
+    {
+        /* Get the Connection (ResourceTemplate) buffer */
+
+        Context->Connection = FieldObj->Field.ResourceBuffer;
+        Context->Length = FieldObj->Field.ResourceLength;
+        Context->AccessLength = FieldObj->Field.AccessLength;
+    }
+
     if (!(HandlerDesc->AddressSpace.HandlerFlags &
             ACPI_ADDR_HANDLER_DEFAULT_INSTALLED))
     {
@@ -586,7 +612,7 @@ AcpiEvAddressSpaceDispatch (
 
     Status = Handler (Function,
         (RegionObj->Region.Address + RegionOffset), BitWidth, Value,
-        HandlerDesc->AddressSpace.Context, RegionObj2->Extra.RegionContext);
+        Context, RegionObj2->Extra.RegionContext);
 
     if (ACPI_FAILURE (Status))
     {

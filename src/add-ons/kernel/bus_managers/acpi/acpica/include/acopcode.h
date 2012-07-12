@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -166,6 +166,7 @@
 #define ARGP_CONCAT_OP                  ARGP_LIST3 (ARGP_TERMARG,    ARGP_TERMARG,       ARGP_TARGET)
 #define ARGP_CONCAT_RES_OP              ARGP_LIST3 (ARGP_TERMARG,    ARGP_TERMARG,       ARGP_TARGET)
 #define ARGP_COND_REF_OF_OP             ARGP_LIST2 (ARGP_SUPERNAME,  ARGP_SUPERNAME)
+#define ARGP_CONNECTFIELD_OP            ARGP_LIST1 (ARGP_NAMESTRING)
 #define ARGP_CONTINUE_OP                ARG_NONE
 #define ARGP_COPY_OP                    ARGP_LIST2 (ARGP_TERMARG,    ARGP_SIMPLENAME)
 #define ARGP_CREATE_BIT_FIELD_OP        ARGP_LIST3 (ARGP_TERMARG,    ARGP_TERMARG,       ARGP_NAME)
@@ -237,6 +238,7 @@
 #define ARGP_RETURN_OP                  ARGP_LIST1 (ARGP_TERMARG)
 #define ARGP_REVISION_OP                ARG_NONE
 #define ARGP_SCOPE_OP                   ARGP_LIST3 (ARGP_PKGLENGTH,  ARGP_NAME,          ARGP_TERMLIST)
+#define ARGP_SERIALFIELD_OP             ARGP_LIST1 (ARGP_NAMESTRING)
 #define ARGP_SHIFT_LEFT_OP              ARGP_LIST3 (ARGP_TERMARG,    ARGP_TERMARG,       ARGP_TARGET)
 #define ARGP_SHIFT_RIGHT_OP             ARGP_LIST3 (ARGP_TERMARG,    ARGP_TERMARG,       ARGP_TARGET)
 #define ARGP_SIGNAL_OP                  ARGP_LIST1 (ARGP_SUPERNAME)
@@ -297,6 +299,7 @@
 #define ARGI_CONCAT_OP                  ARGI_LIST3 (ARGI_COMPUTEDATA,ARGI_COMPUTEDATA,   ARGI_TARGETREF)
 #define ARGI_CONCAT_RES_OP              ARGI_LIST3 (ARGI_BUFFER,     ARGI_BUFFER,        ARGI_TARGETREF)
 #define ARGI_COND_REF_OF_OP             ARGI_LIST2 (ARGI_OBJECT_REF, ARGI_TARGETREF)
+#define ARGI_CONNECTFIELD_OP            ARGI_INVALID_OPCODE
 #define ARGI_CONTINUE_OP                ARGI_INVALID_OPCODE
 #define ARGI_COPY_OP                    ARGI_LIST2 (ARGI_ANYTYPE,    ARGI_SIMPLE_TARGET)
 #define ARGI_CREATE_BIT_FIELD_OP        ARGI_LIST3 (ARGI_BUFFER,     ARGI_INTEGER,       ARGI_REFERENCE)
@@ -368,6 +371,7 @@
 #define ARGI_RETURN_OP                  ARGI_INVALID_OPCODE
 #define ARGI_REVISION_OP                ARG_NONE
 #define ARGI_SCOPE_OP                   ARGI_INVALID_OPCODE
+#define ARGI_SERIALFIELD_OP             ARGI_INVALID_OPCODE
 #define ARGI_SHIFT_LEFT_OP              ARGI_LIST3 (ARGI_INTEGER,    ARGI_INTEGER,       ARGI_TARGETREF)
 #define ARGI_SHIFT_RIGHT_OP             ARGI_LIST3 (ARGI_INTEGER,    ARGI_INTEGER,       ARGI_TARGETREF)
 #define ARGI_SIGNAL_OP                  ARGI_LIST1 (ARGI_EVENT)

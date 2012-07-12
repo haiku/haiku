@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -128,7 +128,6 @@
 
 
 #ifndef ACPI_ASL_COMPILER
-
 /*******************************************************************************
  *
  * FUNCTION:    AcpiInitializeSubsystem
@@ -234,6 +233,8 @@ AcpiEnableSubsystem (
     ACPI_FUNCTION_TRACE (AcpiEnableSubsystem);
 
 
+#if (!ACPI_REDUCED_HARDWARE)
+
     /* Enable ACPI mode */
 
     if (!(Flags & ACPI_NO_ACPI_ENABLE))
@@ -261,6 +262,8 @@ AcpiEnableSubsystem (
         return_ACPI_STATUS (Status);
     }
 
+#endif /* !ACPI_REDUCED_HARDWARE */
+
     /*
      * Install the default OpRegion handlers.  These are installed unless
      * other handlers have already been installed via the
@@ -278,6 +281,7 @@ AcpiEnableSubsystem (
         }
     }
 
+#if (!ACPI_REDUCED_HARDWARE)
     /*
      * Initialize ACPI Event handling (Fixed and General Purpose)
      *
@@ -319,6 +323,8 @@ AcpiEnableSubsystem (
             return_ACPI_STATUS (Status);
         }
     }
+
+#endif /* !ACPI_REDUCED_HARDWARE */
 
     return_ACPI_STATUS (Status);
 }
@@ -857,5 +863,47 @@ AcpiInstallInterfaceHandler (
 
 ACPI_EXPORT_SYMBOL (AcpiInstallInterfaceHandler)
 
-#endif /* !ACPI_ASL_COMPILER */
 
+/*****************************************************************************
+ *
+ * FUNCTION:    AcpiCheckAddressRange
+ *
+ * PARAMETERS:  SpaceId             - Address space ID
+ *              Address             - Start address
+ *              Length              - Length
+ *              Warn                - TRUE if warning on overlap desired
+ *
+ * RETURN:      Count of the number of conflicts detected.
+ *
+ * DESCRIPTION: Check if the input address range overlaps any of the
+ *              ASL operation region address ranges.
+ *
+ ****************************************************************************/
+
+UINT32
+AcpiCheckAddressRange (
+    ACPI_ADR_SPACE_TYPE     SpaceId,
+    ACPI_PHYSICAL_ADDRESS   Address,
+    ACPI_SIZE               Length,
+    BOOLEAN                 Warn)
+{
+    UINT32                  Overlaps;
+    ACPI_STATUS             Status;
+
+
+    Status = AcpiUtAcquireMutex (ACPI_MTX_NAMESPACE);
+    if (ACPI_FAILURE (Status))
+    {
+        return (0);
+    }
+
+    Overlaps = AcpiUtCheckAddressRange (SpaceId, Address,
+        (UINT32) Length, Warn);
+
+    (void) AcpiUtReleaseMutex (ACPI_MTX_NAMESPACE);
+    return (Overlaps);
+}
+
+ACPI_EXPORT_SYMBOL (AcpiCheckAddressRange)
+
+#endif /* !ACPI_ASL_COMPILER */

@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -120,6 +120,8 @@
 
 #define _COMPONENT          ACPI_EVENTS
         ACPI_MODULE_NAME    ("evgpe")
+
+#if (!ACPI_REDUCED_HARDWARE) /* Entire module */
 
 /* Local prototypes */
 
@@ -588,6 +590,7 @@ AcpiEvAsynchExecuteGpeMethod (
     ACPI_STATUS             Status;
     ACPI_GPE_EVENT_INFO     *LocalGpeEventInfo;
     ACPI_EVALUATE_INFO      *Info;
+    ACPI_GPE_NOTIFY_INFO    *Notify;
 
 
     ACPI_FUNCTION_TRACE (EvAsynchExecuteGpeMethod);
@@ -643,10 +646,18 @@ AcpiEvAsynchExecuteGpeMethod (
          * completes. The notify handlers are NOT invoked synchronously
          * from this thread -- because handlers may in turn run other
          * control methods.
+         *
+         * June 2012: Expand implicit notify mechanism to support
+         * notifies on multiple device objects.
          */
-        Status = AcpiEvQueueNotifyRequest (
-                    LocalGpeEventInfo->Dispatch.DeviceNode,
-                    ACPI_NOTIFY_DEVICE_WAKE);
+        Notify = LocalGpeEventInfo->Dispatch.NotifyList;
+        while (ACPI_SUCCESS (Status) && Notify)
+        {
+            Status = AcpiEvQueueNotifyRequest (Notify->DeviceNode,
+                        ACPI_NOTIFY_DEVICE_WAKE);
+
+            Notify = Notify->Next;
+        }
         break;
 
     case ACPI_GPE_DISPATCH_METHOD:
@@ -898,3 +909,4 @@ AcpiEvGpeDispatch (
     return_UINT32 (ACPI_INTERRUPT_HANDLED);
 }
 
+#endif /* !ACPI_REDUCED_HARDWARE */

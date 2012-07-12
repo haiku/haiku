@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -595,18 +595,18 @@ AcpiDsEvalTableRegionOperands (
 
 
     /*
-     * This is where we evaluate the SignatureString and OemIDString
-     * and OemTableIDString of the DataTableRegion declaration
+     * This is where we evaluate the Signature string, OemId string,
+     * and OemTableId string of the Data Table Region declaration
      */
     Node =  Op->Common.Node;
 
-    /* NextOp points to SignatureString op */
+    /* NextOp points to Signature string op */
 
     NextOp = Op->Common.Value.Arg;
 
     /*
-     * Evaluate/create the SignatureString and OemIDString
-     * and OemTableIDString operands
+     * Evaluate/create the Signature string, OemId string,
+     * and OemTableId string operands
      */
     Status = AcpiDsCreateOperands (WalkState, NextOp);
     if (ACPI_FAILURE (Status))
@@ -615,8 +615,8 @@ AcpiDsEvalTableRegionOperands (
     }
 
     /*
-     * Resolve the SignatureString and OemIDString
-     * and OemTableIDString operands
+     * Resolve the Signature string, OemId string,
+     * and OemTableId string operands
      */
     Status = AcpiExResolveOperands (Op->Common.AmlOpcode,
                 ACPI_WALK_OPERANDS, WalkState);

@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -477,7 +477,7 @@ AcpiNsBuildInternalName (
         if (!AcpiNsValidPathSeparator (*ExternalName) &&
             (*ExternalName != 0))
         {
-            return_ACPI_STATUS (AE_BAD_PARAMETER);
+            return_ACPI_STATUS (AE_BAD_PATHNAME);
         }
 
         /* Move on the next segment */

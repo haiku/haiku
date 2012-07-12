@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -123,47 +123,6 @@
         ACPI_MODULE_NAME    ("utdecode")
 
 
-/*******************************************************************************
- *
- * FUNCTION:    AcpiFormatException
- *
- * PARAMETERS:  Status       - The ACPI_STATUS code to be formatted
- *
- * RETURN:      A string containing the exception text. A valid pointer is
- *              always returned.
- *
- * DESCRIPTION: This function translates an ACPI exception into an ASCII string
- *              It is here instead of utxface.c so it is always present.
- *
- ******************************************************************************/
-
-const char *
-AcpiFormatException (
-    ACPI_STATUS             Status)
-{
-    const char              *Exception = NULL;
-
-
-    ACPI_FUNCTION_ENTRY ();
-
-
-    Exception = AcpiUtValidateException (Status);
-    if (!Exception)
-    {
-        /* Exception code was not recognized */
-
-        ACPI_ERROR ((AE_INFO,
-            "Unknown exception code: 0x%8.8X", Status));
-
-        Exception = "UNKNOWN_STATUS_CODE";
-    }
-
-    return (ACPI_CAST_PTR (const char, Exception));
-}
-
-ACPI_EXPORT_SYMBOL (AcpiFormatException)
-
-
 /*
  * Properties of the ACPI Object Types, both internal and external.
  * The table is indexed by values of ACPI_OBJECT_TYPE
@@ -252,14 +211,17 @@ AcpiUtHexToAsciiChar (
 
 const char        *AcpiGbl_RegionTypes[ACPI_NUM_PREDEFINED_REGIONS] =
 {
-    "SystemMemory",
-    "SystemIO",
-    "PCI_Config",
-    "EmbeddedControl",
-    "SMBus",
-    "SystemCMOS",
-    "PCIBARTarget",
-    "IPMI"
+    "SystemMemory",     /* 0x00 */
+    "SystemIO",         /* 0x01 */
+    "PCI_Config",       /* 0x02 */
+    "EmbeddedControl",  /* 0x03 */
+    "SMBus",            /* 0x04 */
+    "SystemCMOS",       /* 0x05 */
+    "PCIBARTarget",     /* 0x06 */
+    "IPMI",             /* 0x07 */
+    "GeneralPurposeIo", /* 0x08 */
+    "GenericSerialBus", /* 0x09 */
+    "PCC"               /* 0x0A */
 };
 
 
@@ -637,20 +599,21 @@ AcpiUtGetMutexName (
 
 /* Names for Notify() values, used for debug output */
 
-static const char           *AcpiGbl_NotifyValueNames[] =
+static const char           *AcpiGbl_NotifyValueNames[ACPI_NOTIFY_MAX + 1] =
 {
-    "Bus Check",
-    "Device Check",
-    "Device Wake",
-    "Eject Request",
-    "Device Check Light",
-    "Frequency Mismatch",
-    "Bus Mode Mismatch",
-    "Power Fault",
-    "Capabilities Check",
-    "Device PLD Check",
-    "Reserved",
-    "System Locality Update"
+    /* 00 */ "Bus Check",
+    /* 01 */ "Device Check",
+    /* 02 */ "Device Wake",
+    /* 03 */ "Eject Request",
+    /* 04 */ "Device Check Light",
+    /* 05 */ "Frequency Mismatch",
+    /* 06 */ "Bus Mode Mismatch",
+    /* 07 */ "Power Fault",
+    /* 08 */ "Capabilities Check",
+    /* 09 */ "Device PLD Check",
+    /* 10 */ "Reserved",
+    /* 11 */ "System Locality Update",
+    /* 12 */ "Shutdown Request"
 };
 
 const char *
@@ -666,9 +629,13 @@ AcpiUtGetNotifyName (
     {
         return ("Reserved");
     }
-    else /* Greater or equal to 0x80 */
+    else if (NotifyValue <= ACPI_MAX_DEVICE_SPECIFIC_NOTIFY)
     {
-        return ("**Device Specific**");
+        return ("Device Specific");
+    }
+    else
+    {
+        return ("Hardware Specific");
     }
 }
 #endif

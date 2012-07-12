@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -154,6 +154,11 @@ AcpiTbResizeRootTableList (
 
 ACPI_STATUS
 AcpiTbVerifyTable (
+    ACPI_TABLE_DESC         *TableDesc);
+
+ACPI_TABLE_HEADER *
+AcpiTbTableOverride (
+    ACPI_TABLE_HEADER       *TableHeader,
     ACPI_TABLE_DESC         *TableDesc);
 
 ACPI_STATUS

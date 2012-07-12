@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -705,21 +705,21 @@ AcpiUtDumpAllocations (
                     switch (ACPI_GET_DESCRIPTOR_TYPE (Descriptor))
                     {
                     case ACPI_DESC_TYPE_OPERAND:
-                        if (Element->Size == sizeof (ACPI_DESC_TYPE_OPERAND))
+                        if (Element->Size == sizeof (ACPI_OPERAND_OBJECT))
                         {
                             DescriptorType = ACPI_DESC_TYPE_OPERAND;
                         }
                         break;
 
                     case ACPI_DESC_TYPE_PARSER:
-                        if (Element->Size == sizeof (ACPI_DESC_TYPE_PARSER))
+                        if (Element->Size == sizeof (ACPI_PARSE_OBJECT))
                         {
                             DescriptorType = ACPI_DESC_TYPE_PARSER;
                         }
                         break;
 
                     case ACPI_DESC_TYPE_NAMED:
-                        if (Element->Size == sizeof (ACPI_DESC_TYPE_NAMED))
+                        if (Element->Size == sizeof (ACPI_NAMESPACE_NODE))
                         {
                             DescriptorType = ACPI_DESC_TYPE_NAMED;
                         }

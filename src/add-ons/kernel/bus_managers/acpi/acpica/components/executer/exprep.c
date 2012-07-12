@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -121,6 +121,7 @@
 #include "acinterp.h"
 #include "amlcode.h"
 #include "acnamesp.h"
+#include "acdispat.h"
 
 
 #define _COMPONENT          ACPI_EXECUTER
@@ -489,8 +490,8 @@ AcpiExPrepCommonFieldObject (
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Construct an ACPI_OPERAND_OBJECT of type DefField and
- *              connect it to the parent Node.
+ * DESCRIPTION: Construct an object of type ACPI_OPERAND_OBJECT with a
+ *              subtype of DefField and connect it to the parent Node.
  *
  ******************************************************************************/
 
@@ -555,6 +556,32 @@ AcpiExPrepFieldValue (
     case ACPI_TYPE_LOCAL_REGION_FIELD:
 
         ObjDesc->Field.RegionObj = AcpiNsGetAttachedObject (Info->RegionNode);
+
+        /* Fields specific to GenericSerialBus fields */
+
+        ObjDesc->Field.AccessLength = Info->AccessLength;
+
+        if (Info->ConnectionNode)
+        {
+            SecondDesc = Info->ConnectionNode->Object;
+            if (!(SecondDesc->Common.Flags & AOPOBJ_DATA_VALID))
+            {
+                Status = AcpiDsGetBufferArguments (SecondDesc);
+                if (ACPI_FAILURE (Status))
+                {
+                    AcpiUtDeleteObjectDesc (ObjDesc);
+                    return_ACPI_STATUS (Status);
+                }
+            }
+
+            ObjDesc->Field.ResourceBuffer = SecondDesc->Buffer.Pointer;
+            ObjDesc->Field.ResourceLength = (UINT16) SecondDesc->Buffer.Length;
+        }
+        else if (Info->ResourceBuffer)
+        {
+            ObjDesc->Field.ResourceBuffer = Info->ResourceBuffer;
+            ObjDesc->Field.ResourceLength = Info->ResourceLength;
+        }
 
         /* Allow full data read from EC address space */
 

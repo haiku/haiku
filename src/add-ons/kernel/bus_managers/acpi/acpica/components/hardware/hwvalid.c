@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -221,6 +221,8 @@ AcpiHwValidateIoRequest (
         (BitWidth != 16) &&
         (BitWidth != 32))
     {
+        ACPI_ERROR ((AE_INFO,
+            "Bad BitWidth parameter: %8.8X", BitWidth));
         return (AE_BAD_PARAMETER);
     }
 

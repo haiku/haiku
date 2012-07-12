@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -120,6 +120,8 @@
 #define _COMPONENT          ACPI_EVENTS
         ACPI_MODULE_NAME    ("evevent")
 
+#if (!ACPI_REDUCED_HARDWARE) /* Entire module */
+
 /* Local prototypes */
 
 static ACPI_STATUS
@@ -152,6 +154,13 @@ AcpiEvInitializeEvents (
 
     ACPI_FUNCTION_TRACE (EvInitializeEvents);
 
+
+    /* If Hardware Reduced flag is set, there are no fixed events */
+
+    if (AcpiGbl_ReducedHardware)
+    {
+        return_ACPI_STATUS (AE_OK);
+    }
 
     /*
      * Initialize the Fixed and General Purpose Events. This is done prior to
@@ -199,6 +208,13 @@ AcpiEvInstallXruptHandlers (
 
     ACPI_FUNCTION_TRACE (EvInstallXruptHandlers);
 
+
+    /* If Hardware Reduced flag is set, there is no ACPI h/w */
+
+    if (AcpiGbl_ReducedHardware)
+    {
+        return_ACPI_STATUS (AE_OK);
+    }
 
     /* Install the SCI handler */
 
@@ -386,5 +402,7 @@ AcpiEvFixedEventDispatch (
     return ((AcpiGbl_FixedEventHandlers[Event].Handler)(
                 AcpiGbl_FixedEventHandlers[Event].Context));
 }
+
+#endif /* !ACPI_REDUCED_HARDWARE */
 
 

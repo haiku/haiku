@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -407,15 +407,10 @@ ACPI_STATUS
 AcpiUtReleaseMutex (
     ACPI_MUTEX_HANDLE       MutexId)
 {
-    ACPI_THREAD_ID          ThisThreadId;
-
-
     ACPI_FUNCTION_NAME (UtReleaseMutex);
 
-
-    ThisThreadId = AcpiOsGetThreadId ();
     ACPI_DEBUG_PRINT ((ACPI_DB_MUTEX, "Thread %u releasing Mutex [%s]\n",
-        (UINT32) ThisThreadId, AcpiUtGetMutexName (MutexId)));
+        (UINT32) AcpiOsGetThreadId (), AcpiUtGetMutexName (MutexId)));
 
     if (MutexId > ACPI_MAX_MUTEX)
     {
@@ -446,7 +441,7 @@ AcpiUtReleaseMutex (
          */
         for (i = MutexId; i < ACPI_NUM_MUTEX; i++)
         {
-            if (AcpiGbl_MutexInfo[i].ThreadId == ThisThreadId)
+            if (AcpiGbl_MutexInfo[i].ThreadId == AcpiOsGetThreadId ())
             {
                 if (i == MutexId)
                 {

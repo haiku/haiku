@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -120,8 +120,9 @@
 
 /* Current ACPICA subsystem version in YYYYMMDD format */
 
-#define ACPI_CA_VERSION                 0x20110922
+#define ACPI_CA_VERSION                 0x20120711
 
+#include "acconfig.h"
 #include "actypes.h"
 #include "actbl.h"
 
@@ -131,6 +132,7 @@
 extern UINT32               AcpiCurrentGpeCount;
 extern ACPI_TABLE_FADT      AcpiGbl_FADT;
 extern BOOLEAN              AcpiGbl_SystemAwakeAndRunning;
+extern BOOLEAN              AcpiGbl_ReducedHardware;        /* ACPI 5.0 */
 
 /* Runtime configuration of debug print levels */
 
@@ -149,6 +151,34 @@ extern UINT8                AcpiGbl_EnableAmlDebugObject;
 extern UINT8                AcpiGbl_CopyDsdtLocally;
 extern UINT8                AcpiGbl_TruncateIoAddresses;
 extern UINT8                AcpiGbl_DisableAutoRepair;
+
+
+/*
+ * Hardware-reduced prototypes. All interfaces that use these macros will
+ * be configured out of the ACPICA build if the ACPI_REDUCED_HARDWARE flag
+ * is set to TRUE.
+ */
+#if (!ACPI_REDUCED_HARDWARE)
+#define ACPI_HW_DEPENDENT_RETURN_STATUS(Prototype) \
+    Prototype;
+
+#define ACPI_HW_DEPENDENT_RETURN_OK(Prototype) \
+    Prototype;
+
+#define ACPI_HW_DEPENDENT_RETURN_VOID(Prototype) \
+    Prototype;
+
+#else
+#define ACPI_HW_DEPENDENT_RETURN_STATUS(Prototype) \
+    static ACPI_INLINE Prototype {return(AE_NOT_CONFIGURED);}
+
+#define ACPI_HW_DEPENDENT_RETURN_OK(Prototype) \
+    static ACPI_INLINE Prototype {return(AE_OK);}
+
+#define ACPI_HW_DEPENDENT_RETURN_VOID(Prototype) \
+    static ACPI_INLINE Prototype {}
+
+#endif /* !ACPI_REDUCED_HARDWARE */
 
 
 /*
@@ -180,13 +210,15 @@ AcpiTerminate (
 /*
  * Miscellaneous global interfaces
  */
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiEnable (
-    void);
+    void))
 
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiDisable (
-    void);
+    void))
 
 ACPI_STATUS
 AcpiSubsystemStatus (
@@ -216,6 +248,13 @@ ACPI_STATUS
 AcpiRemoveInterface (
     ACPI_STRING             InterfaceName);
 
+UINT32
+AcpiCheckAddressRange (
+    ACPI_ADR_SPACE_TYPE     SpaceId,
+    ACPI_PHYSICAL_ADDRESS   Address,
+    ACPI_SIZE               Length,
+    BOOLEAN                 Warn);
+
 
 /*
  * ACPI Memory management
@@ -234,6 +273,22 @@ AcpiFree (
 
 
 /*
+ * ACPI table load/unload interfaces
+ */
+ACPI_STATUS
+AcpiLoadTable (
+    ACPI_TABLE_HEADER       *Table);
+
+ACPI_STATUS
+AcpiUnloadParentTable (
+    ACPI_HANDLE             Object);
+
+ACPI_STATUS
+AcpiLoadTables (
+    void);
+
+
+/*
  * ACPI table manipulation interfaces
  */
 ACPI_STATUS
@@ -243,10 +298,6 @@ AcpiReallocateRootTable (
 ACPI_STATUS
 AcpiFindRootPointer (
     ACPI_SIZE               *RsdpAddress);
-
-ACPI_STATUS
-AcpiLoadTables (
-    void);
 
 ACPI_STATUS
 AcpiGetTableHeader (
@@ -385,35 +436,40 @@ AcpiInstallInitializationHandler (
     ACPI_INIT_HANDLER       Handler,
     UINT32                  Function);
 
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiInstallGlobalEventHandler (
     ACPI_GBL_EVENT_HANDLER  Handler,
-    void                    *Context);
+    void                    *Context))
 
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiInstallFixedEventHandler (
     UINT32                  AcpiEvent,
     ACPI_EVENT_HANDLER      Handler,
-    void                    *Context);
+    void                    *Context))
 
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiRemoveFixedEventHandler (
     UINT32                  AcpiEvent,
-    ACPI_EVENT_HANDLER      Handler);
+    ACPI_EVENT_HANDLER      Handler))
 
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiInstallGpeHandler (
     ACPI_HANDLE             GpeDevice,
     UINT32                  GpeNumber,
     UINT32                  Type,
     ACPI_GPE_HANDLER        Address,
-    void                    *Context);
+    void                    *Context))
 
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiRemoveGpeHandler (
     ACPI_HANDLE             GpeDevice,
     UINT32                  GpeNumber,
-    ACPI_GPE_HANDLER        Address);
+    ACPI_GPE_HANDLER        Address))
 
 ACPI_STATUS
 AcpiInstallNotifyHandler (
@@ -454,113 +510,148 @@ AcpiInstallInterfaceHandler (
 /*
  * Global Lock interfaces
  */
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiAcquireGlobalLock (
     UINT16                  Timeout,
-    UINT32                  *Handle);
+    UINT32                  *Handle))
 
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiReleaseGlobalLock (
-    UINT32                  Handle);
+    UINT32                  Handle))
+
+
+/*
+ * Interfaces to AML mutex objects
+ */
+ACPI_STATUS
+AcpiAcquireMutex (
+    ACPI_HANDLE             Handle,
+    ACPI_STRING             Pathname,
+    UINT16                  Timeout);
+
+ACPI_STATUS
+AcpiReleaseMutex (
+    ACPI_HANDLE             Handle,
+    ACPI_STRING             Pathname);
 
 
 /*
  * Fixed Event interfaces
  */
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiEnableEvent (
     UINT32                  Event,
-    UINT32                  Flags);
+    UINT32                  Flags))
 
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiDisableEvent (
     UINT32                  Event,
-    UINT32                  Flags);
+    UINT32                  Flags))
 
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiClearEvent (
-    UINT32                  Event);
+    UINT32                  Event))
 
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiGetEventStatus (
     UINT32                  Event,
-    ACPI_EVENT_STATUS       *EventStatus);
+    ACPI_EVENT_STATUS       *EventStatus))
 
 
 /*
  * General Purpose Event (GPE) Interfaces
  */
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiUpdateAllGpes (
-    void);
+    void))
 
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiEnableGpe (
     ACPI_HANDLE             GpeDevice,
-    UINT32                  GpeNumber);
+    UINT32                  GpeNumber))
 
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiDisableGpe (
     ACPI_HANDLE             GpeDevice,
-    UINT32                  GpeNumber);
+    UINT32                  GpeNumber))
 
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiClearGpe (
     ACPI_HANDLE             GpeDevice,
-    UINT32                  GpeNumber);
+    UINT32                  GpeNumber))
 
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiSetGpe (
     ACPI_HANDLE             GpeDevice,
     UINT32                  GpeNumber,
-    UINT8                   Action);
+    UINT8                   Action))
 
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiFinishGpe (
     ACPI_HANDLE             GpeDevice,
-    UINT32                  GpeNumber);
+    UINT32                  GpeNumber))
 
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiSetupGpeForWake (
     ACPI_HANDLE             ParentDevice,
     ACPI_HANDLE             GpeDevice,
-    UINT32                  GpeNumber);
+    UINT32                  GpeNumber))
 
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiSetGpeWakeMask (
     ACPI_HANDLE             GpeDevice,
     UINT32                  GpeNumber,
-    UINT8                   Action);
+    UINT8                   Action))
 
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiGetGpeStatus (
     ACPI_HANDLE             GpeDevice,
     UINT32                  GpeNumber,
-    ACPI_EVENT_STATUS       *EventStatus);
+    ACPI_EVENT_STATUS       *EventStatus))
 
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiDisableAllGpes (
-    void);
+    void))
 
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiEnableAllRuntimeGpes (
-    void);
+    void))
 
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiGetGpeDevice (
     UINT32                  GpeIndex,
-    ACPI_HANDLE             *GpeDevice);
+    ACPI_HANDLE             *GpeDevice))
 
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiInstallGpeBlock (
     ACPI_HANDLE             GpeDevice,
     ACPI_GENERIC_ADDRESS    *GpeBlockAddress,
     UINT32                  RegisterCount,
-    UINT32                  InterruptNumber);
+    UINT32                  InterruptNumber))
 
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiRemoveGpeBlock (
-    ACPI_HANDLE             GpeDevice);
+    ACPI_HANDLE             GpeDevice))
 
 
 /*
@@ -589,6 +680,11 @@ AcpiGetPossibleResources (
     ACPI_BUFFER             *RetBuffer);
 
 ACPI_STATUS
+AcpiGetEventResources (
+    ACPI_HANDLE             DeviceHandle,
+    ACPI_BUFFER             *RetBuffer);
+
+ACPI_STATUS
 AcpiWalkResources (
     ACPI_HANDLE                 Device,
     char                        *Name,
@@ -610,6 +706,12 @@ AcpiResourceToAddress64 (
     ACPI_RESOURCE           *Resource,
     ACPI_RESOURCE_ADDRESS64 *Out);
 
+ACPI_STATUS
+AcpiBufferToResource (
+    UINT8                   *AmlBuffer,
+    UINT16                  AmlBufferLength,
+    ACPI_RESOURCE           **ResourcePtr);
+
 
 /*
  * Hardware (ACPI device) interfaces
@@ -628,16 +730,22 @@ AcpiWrite (
     UINT64                  Value,
     ACPI_GENERIC_ADDRESS    *Reg);
 
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiReadBitRegister (
     UINT32                  RegisterId,
-    UINT32                  *ReturnValue);
+    UINT32                  *ReturnValue))
 
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiWriteBitRegister (
     UINT32                  RegisterId,
-    UINT32                  Value);
+    UINT32                  Value))
 
+
+/*
+ * Sleep/Wake interfaces
+ */
 ACPI_STATUS
 AcpiGetSleepTypeData (
     UINT8                   SleepState,
@@ -650,25 +758,55 @@ AcpiEnterSleepStatePrep (
 
 ACPI_STATUS
 AcpiEnterSleepState (
-    UINT8                   SleepState);
+    UINT8                   SleepState,
+    UINT8                   Flags);
 
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiEnterSleepStateS4bios (
-    void);
+    void))
+
+ACPI_STATUS
+AcpiLeaveSleepStatePrep (
+    UINT8                   SleepState,
+    UINT8                   Flags);
 
 ACPI_STATUS
 AcpiLeaveSleepState (
-    UINT8                   SleepState)
-    ;
+    UINT8                   SleepState);
+
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiSetFirmwareWakingVector (
-    UINT32                  PhysicalAddress);
+    UINT32                  PhysicalAddress))
 
 #if ACPI_MACHINE_WIDTH == 64
+ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiSetFirmwareWakingVector64 (
-    UINT64                  PhysicalAddress);
+    UINT64                  PhysicalAddress))
 #endif
+
+
+/*
+ * ACPI Timer interfaces
+ */
+ACPI_HW_DEPENDENT_RETURN_STATUS (
+ACPI_STATUS
+AcpiGetTimerResolution (
+    UINT32                  *Resolution))
+
+ACPI_HW_DEPENDENT_RETURN_STATUS (
+ACPI_STATUS
+AcpiGetTimer (
+    UINT32                  *Ticks))
+
+ACPI_HW_DEPENDENT_RETURN_STATUS (
+ACPI_STATUS
+AcpiGetTimerDuration (
+    UINT32                  StartTicks,
+    UINT32                  EndTicks,
+    UINT32                  *TimeElapsed))
 
 
 /*
@@ -698,6 +836,20 @@ AcpiWarning (
 
 void ACPI_INTERNAL_VAR_XFACE
 AcpiInfo (
+    const char              *ModuleName,
+    UINT32                  LineNumber,
+    const char              *Format,
+    ...) ACPI_PRINTF_LIKE(3);
+
+void ACPI_INTERNAL_VAR_XFACE
+AcpiBiosError (
+    const char              *ModuleName,
+    UINT32                  LineNumber,
+    const char              *Format,
+    ...) ACPI_PRINTF_LIKE(3);
+
+void ACPI_INTERNAL_VAR_XFACE
+AcpiBiosWarning (
     const char              *ModuleName,
     UINT32                  LineNumber,
     const char              *Format,

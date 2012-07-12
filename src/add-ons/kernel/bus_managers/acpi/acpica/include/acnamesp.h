@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -440,8 +440,9 @@ AcpiNsRepairObject (
     ACPI_OPERAND_OBJECT     **ReturnObjectPtr);
 
 ACPI_STATUS
-AcpiNsRepairPackageList (
+AcpiNsWrapWithPackage (
     ACPI_PREDEFINED_DATA    *Data,
+    ACPI_OPERAND_OBJECT     *OriginalObject,
     ACPI_OPERAND_OBJECT     **ObjDescPtr);
 
 ACPI_STATUS

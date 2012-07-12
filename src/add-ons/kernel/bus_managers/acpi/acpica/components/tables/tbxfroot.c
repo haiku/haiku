@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -306,7 +306,7 @@ AcpiFindRootPointer (
 
     /* A valid RSDP was not found */
 
-    ACPI_ERROR ((AE_INFO, "A valid RSDP was not found"));
+    ACPI_BIOS_ERROR ((AE_INFO, "A valid RSDP was not found"));
     return_ACPI_STATUS (AE_NOT_FOUND);
 }
 
