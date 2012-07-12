@@ -25,6 +25,18 @@
 #endif
 
 
+#ifndef _BOOT_MODE
+static bool
+is_in_image(struct elf_image_info *image, addr_t address)
+{
+	return (address >= image->text_region.start
+			&& address < image->text_region.start + image->text_region.size)
+		|| (address >= image->data_region.start
+			&& address < image->data_region.start + image->data_region.size);
+}
+#endif	// !_BOOT_MODE
+
+
 #if !defined(__x86_64__) || defined(_BOOT_MODE)
 
 
@@ -43,18 +55,6 @@ static const char *kRelocations[] = {
 	"R_386_GOTPC",		/* add PC relative GOT table address */
 };
 #endif
-
-
-#ifndef _BOOT_MODE
-static bool
-is_in_image(struct elf_image_info *image, addr_t address)
-{
-	return (address >= image->text_region.start
-			&& address < image->text_region.start + image->text_region.size)
-		|| (address >= image->data_region.start
-			&& address < image->data_region.start + image->data_region.size);
-}
-#endif	// !_BOOT_MODE
 
 
 #ifdef _BOOT_MODE
@@ -255,13 +255,19 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 				relocValue = image->text_region.delta + rel[i].r_addend;
 				break;
 			default:
-				dprintf("arch_elf_relocate_rel: unhandled relocation type %d\n",
+				dprintf("arch_elf_relocate_rela: unhandled relocation type %d\n",
 					type);
 				return B_BAD_DATA;
 		}
 #ifdef _BOOT_MODE
 		boot_elf64_set_relocation(relocAddr, relocValue);
 #else
+		if (!is_in_image(image, relocAddr)) {
+			dprintf("arch_elf_relocate_rela: invalid offset %#lx\n",
+				rel[i].r_offset);
+			return B_BAD_ADDRESS;
+		}
+
 		*(Elf64_Addr *)relocAddr = relocValue;
 #endif
 	}
