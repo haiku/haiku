@@ -109,6 +109,7 @@ TeamWindow::TeamWindow(::Team* team, UserInterfaceListener* listener)
 	fStepOverButton(NULL),
 	fStepIntoButton(NULL),
 	fStepOutButton(NULL),
+	fInspectorWindow(NULL),
 	fSourceLocatePanel(NULL)
 {
 	fTeam->Lock();
