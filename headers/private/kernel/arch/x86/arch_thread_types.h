@@ -48,6 +48,8 @@ struct arch_thread {
 
 	// 512 byte floating point save point - this must be 16 byte aligned
 	uint8			fpu_state[512] _ALIGNED(16);
+
+	addr_t			GetFramePointer() const;
 } _ALIGNED(16);
 
 
@@ -64,4 +66,26 @@ struct arch_fork_arg {
 };
 
 
-#endif	/* _KERNEL_ARCH_x86_THREAD_TYPES_H */
+#ifdef __x86_64__
+
+
+inline addr_t
+arch_thread::GetFramePointer() const
+{
+	return current_stack[1];
+}
+
+
+#else
+
+
+inline addr_t
+arch_thread::GetFramePointer() const
+{
+	return current_stack.esp[2];
+}
+
+
+#endif	// __x86_64__
+
+#endif	// _KERNEL_ARCH_x86_THREAD_TYPES_H

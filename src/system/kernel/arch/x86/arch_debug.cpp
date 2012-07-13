@@ -1,6 +1,7 @@
 /*
  * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2012, Alex Smith, alex@alex-smith.me.uk.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -28,31 +29,29 @@
 #include <vm/VMAddressSpace.h>
 #include <vm/VMArea.h>
 
-#include <arch_cpu.h>
-
 
 struct stack_frame {
-	struct stack_frame	*previous;
-	addr_t				return_address;
+	stack_frame*	previous;
+	addr_t			return_address;
 };
 
 #define NUM_PREVIOUS_LOCATIONS 32
 
 
 static bool
-already_visited(uint32 *visited, int32 *_last, int32 *_num, uint32 ebp)
+already_visited(addr_t* visited, int32* _last, int32* _num, addr_t bp)
 {
 	int32 last = *_last;
 	int32 num = *_num;
 	int32 i;
 
 	for (i = 0; i < num; i++) {
-		if (visited[(NUM_PREVIOUS_LOCATIONS + last - i) % NUM_PREVIOUS_LOCATIONS] == ebp)
+		if (visited[(NUM_PREVIOUS_LOCATIONS + last - i) % NUM_PREVIOUS_LOCATIONS] == bp)
 			return true;
 	}
 
 	*_last = last = (last + 1) % NUM_PREVIOUS_LOCATIONS;
-	visited[last] = ebp;
+	visited[last] = bp;
 
 	if (num < NUM_PREVIOUS_LOCATIONS)
 		*_num = num + 1;
@@ -64,14 +63,14 @@ already_visited(uint32 *visited, int32 *_last, int32 *_num, uint32 ebp)
 /*!	Safe to be called only from outside the debugger.
 */
 static status_t
-get_next_frame_no_debugger(addr_t ebp, addr_t *_next, addr_t *_eip)
+get_next_frame_no_debugger(addr_t bp, addr_t* _next, addr_t* _ip)
 {
 	// TODO: Do this more efficiently in assembly.
 	stack_frame frame;
-	if (user_memcpy(&frame, (void*)ebp, sizeof(frame)) != B_OK)
+	if (user_memcpy(&frame, (void*)bp, sizeof(frame)) != B_OK)
 		return B_BAD_ADDRESS;
 
-	*_eip = frame.return_address;
+	*_ip = frame.return_address;
 	*_next = (addr_t)frame.previous;
 
 	return B_OK;
@@ -81,13 +80,13 @@ get_next_frame_no_debugger(addr_t ebp, addr_t *_next, addr_t *_eip)
 /*!	Safe to be called only from inside the debugger.
 */
 static status_t
-get_next_frame_debugger(addr_t ebp, addr_t *_next, addr_t *_eip)
+get_next_frame_debugger(addr_t bp, addr_t* _next, addr_t* _ip)
 {
 	stack_frame frame;
-	if (debug_memcpy(B_CURRENT_TEAM, &frame, (void*)ebp, sizeof(frame)) != B_OK)
+	if (debug_memcpy(B_CURRENT_TEAM, &frame, (void*)bp, sizeof(frame)) != B_OK)
 		return B_BAD_ADDRESS;
 
-	*_eip = frame.return_address;
+	*_ip = frame.return_address;
 	*_next = (addr_t)frame.previous;
 
 	return B_OK;
@@ -95,8 +94,8 @@ get_next_frame_debugger(addr_t ebp, addr_t *_next, addr_t *_eip)
 
 
 static status_t
-lookup_symbol(Thread* thread, addr_t address, addr_t *_baseAddress,
-	const char **_symbolName, const char **_imageName, bool *_exactMatch)
+lookup_symbol(Thread* thread, addr_t address, addr_t* _baseAddress,
+	const char** _symbolName, const char** _imageName, bool* _exactMatch)
 {
 	status_t status = B_ENTRY_NOT_FOUND;
 
@@ -118,6 +117,9 @@ lookup_symbol(Thread* thread, addr_t address, addr_t *_baseAddress,
 
 	return status;
 }
+
+
+#ifndef __x86_64__
 
 
 static void
@@ -307,31 +309,53 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 }
 
 
+#else	// __x86_64__
+
+
+static status_t
+print_demangled_call(const char* image, const char* symbol, addr_t args,
+	bool noObjectMethod, bool addDebugVariables)
+{
+	// Since x86_64 uses registers rather than the stack for the first 6
+	// arguments we cannot use the same method as x86 to read the function
+	// arguments. Maybe we need DWARF support in the kernel debugger. For now
+	// just print out the function signature without the argument values.
+
+	// TODO x86_64.
+	return B_NOT_SUPPORTED;
+}
+
+
+#endif	// __x86_64__
+
+
 static void
-print_stack_frame(Thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
+print_stack_frame(Thread* thread, addr_t ip, addr_t bp, addr_t nextBp,
 	int32 callIndex, bool demangle)
 {
-	const char *symbol, *image;
+	const char* symbol;
+	const char* image;
 	addr_t baseAddress;
 	bool exactMatch;
 	status_t status;
 	addr_t diff;
 
-	diff = nextEbp - ebp;
+	diff = nextBp - bp;
 
-	// kernel space/user space switch
-	if (diff & 0x80000000)
+	// MSB set = kernel space/user space switch
+	if (diff & ~((addr_t)-1 >> 1))
 		diff = 0;
 
-	status = lookup_symbol(thread, eip, &baseAddress, &symbol, &image,
+	status = lookup_symbol(thread, ip, &baseAddress, &symbol, &image,
 		&exactMatch);
 
-	kprintf("%2ld %08lx (+%4ld) %08lx   ", callIndex, ebp, diff, eip);
+	kprintf("%2" B_PRId32 " %0*lx (+%4ld) %0*lx   ", callIndex,
+		B_PRINTF_POINTER_WIDTH, bp, diff, B_PRINTF_POINTER_WIDTH, ip);
 
 	if (status == B_OK) {
 		if (exactMatch && demangle) {
-			status = print_demangled_call(image, symbol, nextEbp + 8, false,
-				false);
+			status = print_demangled_call(image, symbol,
+				nextBp + sizeof(stack_frame), false, false);
 		}
 
 		if (!exactMatch || !demangle || status != B_OK) {
@@ -339,19 +363,19 @@ print_stack_frame(Thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
 				kprintf("<%s>:%s%s", image, symbol,
 					exactMatch ? "" : " (nearest)");
 			} else
-				kprintf("<%s@%p>:unknown", image, (void *)baseAddress);
+				kprintf("<%s@%p>:unknown", image, (void*)baseAddress);
 		}
 
-		kprintf(" + 0x%04lx\n", eip - baseAddress);
+		kprintf(" + %#04lx\n", ip - baseAddress);
 	} else {
 		VMArea *area = NULL;
 		if (thread != NULL && thread->team != NULL
 			&& thread->team->address_space != NULL) {
-			area = thread->team->address_space->LookupArea(eip);
+			area = thread->team->address_space->LookupArea(ip);
 		}
 		if (area != NULL) {
-			kprintf("%ld:%s@%p + %#lx\n", area->id, area->name,
-				(void*)area->Base(), eip - area->Base());
+			kprintf("%" B_PRId32 ":%s@%p + %#lx\n", area->id, area->name,
+				(void*)area->Base(), ip - area->Base());
 		} else
 			kprintf("\n");
 	}
@@ -359,45 +383,65 @@ print_stack_frame(Thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
 
 
 static void
-print_iframe(struct iframe *frame)
+print_iframe(iframe* frame)
 {
 	bool isUser = IFRAME_IS_USER(frame);
-	kprintf("%s iframe at %p (end = %p)\n", isUser ? "user" : "kernel", frame,
-		isUser ? (uint32*)(frame + 1) : &frame->user_sp);
 
-	kprintf(" eax 0x%-9lx    ebx 0x%-9lx     ecx 0x%-9lx  edx 0x%lx\n",
+#ifdef __x86_64__
+	kprintf("%s iframe at %p (end = %p)\n", isUser ? "user" : "kernel", frame,
+		frame + 1);
+
+	kprintf(" rax %#-18lx    rbx %#-18lx    rcx %#lx\n", frame->ax,
+		frame->bx, frame->cx);
+	kprintf(" rdx %#-18lx    rsi %#-18lx    rdi %#lx\n", frame->dx,
+		frame->si, frame->di);
+	kprintf(" rbp %#-18lx     r8 %#-18lx     r9 %#lx\n", frame->bp,
+		frame->r8, frame->r9);
+	kprintf(" r10 %#-18lx    r11 %#-18lx    r12 %#lx\n", frame->r10,
+		frame->r11, frame->r12);
+	kprintf(" r13 %#-18lx    r14 %#-18lx    r15 %#lx\n", frame->r13,
+		frame->r14, frame->r15);
+	kprintf(" rip %#-18lx    rsp %#-18lx rflags %#lx\n", frame->ip,
+		frame->sp, frame->flags);
+#else
+	kprintf("%s iframe at %p (end = %p)\n", isUser ? "user" : "kernel", frame,
+		isUser ? (void*)(frame + 1) : (void*)&frame->user_sp);
+
+	kprintf(" eax %#-10lx    ebx %#-10lx     ecx %#-10lx  edx %#lx\n",
 		frame->ax, frame->bx, frame->cx, frame->dx);
-	kprintf(" esi 0x%-9lx    edi 0x%-9lx     ebp 0x%-9lx  esp 0x%lx\n",
+	kprintf(" esi %#-10lx    edi %#-10lx     ebp %#-10lx  esp %#lx\n",
 		frame->si, frame->di, frame->bp, frame->sp);
-	kprintf(" eip 0x%-9lx eflags 0x%-9lx", frame->ip, frame->flags);
+	kprintf(" eip %#-10lx eflags %#-10lx", frame->ip, frame->flags);
 	if (isUser) {
 		// from user space
-		kprintf("user esp 0x%lx", frame->user_sp);
+		kprintf("user esp %#lx", frame->user_sp);
 	}
 	kprintf("\n");
-	kprintf(" vector: 0x%lx, error code: 0x%lx\n", frame->vector,
+#endif
+
+	kprintf(" vector: %#lx, error code: %#lx\n", frame->vector,
 		frame->error_code);
 }
 
 
 static bool
-setup_for_thread(char *arg, Thread **_thread, uint32 *_ebp,
-	uint32 *_oldPageDirectory)
+setup_for_thread(char* arg, Thread** _thread, addr_t* _bp,
+	phys_addr_t* _oldPageDirectory)
 {
-	Thread *thread = NULL;
+	Thread* thread = NULL;
 
 	if (arg != NULL) {
 		thread_id id = strtoul(arg, NULL, 0);
 		thread = Thread::GetDebug(id);
 		if (thread == NULL) {
-			kprintf("could not find thread %ld\n", id);
+			kprintf("could not find thread %" B_PRId32 "\n", id);
 			return false;
 		}
 
 		if (id != thread_get_current_thread_id()) {
 			// switch to the page directory of the new thread to be
 			// able to follow the stack trace into userland
-			uint32 newPageDirectory = x86_next_page_directory(
+			phys_addr_t newPageDirectory = x86_next_page_directory(
 				thread_get_current_thread(), thread);
 
 			if (newPageDirectory != 0) {
@@ -413,10 +457,10 @@ setup_for_thread(char *arg, Thread **_thread, uint32 *_ebp,
 					thread->cpu->cpu_num);
 				if (registers == NULL)
 					return false;
-				*_ebp = registers->bp;
+				*_bp = registers->bp;
 			} else {
-				// read %ebp from the thread's stack stored by a pushad
-				*_ebp = thread->arch_info.current_stack.esp[2];
+				// Read frame pointer from the thread's stack.
+				*_bp = thread->arch_info.GetFramePointer();
 			}
 		} else
 			thread = NULL;
@@ -474,13 +518,13 @@ is_iframe(Thread* thread, addr_t frame)
 }
 
 
-static struct iframe *
-find_previous_iframe(Thread *thread, addr_t frame)
+static iframe*
+find_previous_iframe(Thread* thread, addr_t frame)
 {
 	// iterate backwards through the stack frames, until we hit an iframe
 	while (is_kernel_stack_address(thread, frame)) {
 		if (is_iframe(thread, frame))
-			return (struct iframe*)frame;
+			return (iframe*)frame;
 
 		frame = *(addr_t*)frame;
 	}
@@ -489,8 +533,8 @@ find_previous_iframe(Thread *thread, addr_t frame)
 }
 
 
-static struct iframe*
-get_previous_iframe(Thread* thread, struct iframe* frame)
+static iframe*
+get_previous_iframe(Thread* thread, iframe* frame)
 {
 	if (frame == NULL)
 		return NULL;
@@ -499,90 +543,83 @@ get_previous_iframe(Thread* thread, struct iframe* frame)
 }
 
 
-static struct iframe*
+static iframe*
 get_current_iframe(Thread* thread)
 {
 	if (thread == thread_get_current_thread())
 		return x86_get_current_iframe();
 
-	addr_t ebp = thread->arch_info.current_stack.esp[2];
-		// NOTE: This doesn't work, if the thread is running (on another CPU).
-	return find_previous_iframe(thread, ebp);
+	// NOTE: This doesn't work, if the thread is running (on another CPU).
+	return find_previous_iframe(thread, thread->arch_info.GetFramePointer());
 }
 
 
-uint32*
+#define CHECK_DEBUG_VARIABLE(_name, _member, _settable) \
+	if (strcmp(variableName, _name) == 0) { \
+		settable = _settable; \
+		return &_member; \
+	}
+
+
+static size_t*
 find_debug_variable(const char* variableName, bool& settable)
 {
-	struct iframe* frame = get_current_iframe(debug_get_debugged_thread());
+	iframe* frame = get_current_iframe(debug_get_debugged_thread());
 	if (frame == NULL)
 		return NULL;
 
-	settable = false;
-
-	if (strcmp(variableName, "gs") == 0) {
-		return &frame->gs;
-	} else if (strcmp(variableName, "fs") == 0) {
-		return &frame->fs;
-	} else if (strcmp(variableName, "es") == 0) {
-		return &frame->es;
-	} else if (strcmp(variableName, "ds") == 0) {
-		return &frame->ds;
-	} else if (strcmp(variableName, "cs") == 0) {
-		return &frame->cs;
-	} else if (strcmp(variableName, "edi") == 0) {
-		settable = true;
-		return &frame->di;
-	} else if (strcmp(variableName, "esi") == 0) {
-		settable = true;
-		return &frame->si;
-	} else if (strcmp(variableName, "ebp") == 0) {
-		settable = true;
-		return &frame->bp;
-	} else if (strcmp(variableName, "esp") == 0) {
-		settable = true;
-		return &frame->sp;
-	} else if (strcmp(variableName, "ebx") == 0) {
-		settable = true;
-		return &frame->bx;
-	} else if (strcmp(variableName, "edx") == 0) {
-		settable = true;
-		return &frame->dx;
-	} else if (strcmp(variableName, "ecx") == 0) {
-		settable = true;
-		return &frame->cx;
-	} else if (strcmp(variableName, "eax") == 0) {
-		settable = true;
-		return &frame->ax;
-	} else if (strcmp(variableName, "orig_eax") == 0) {
-		settable = true;
-		return &frame->orig_eax;
-	} else if (strcmp(variableName, "orig_edx") == 0) {
-		settable = true;
-		return &frame->orig_edx;
-	} else if (strcmp(variableName, "eip") == 0) {
-		settable = true;
-		return &frame->ip;
-	} else if (strcmp(variableName, "eflags") == 0) {
-		settable = true;
-		return &frame->flags;
-	}
+#ifdef __x86_64__
+	CHECK_DEBUG_VARIABLE("cs", frame->cs, false);
+	CHECK_DEBUG_VARIABLE("ss", frame->ss, false);
+	CHECK_DEBUG_VARIABLE("r15", frame->r15, true);
+	CHECK_DEBUG_VARIABLE("r14", frame->r14, true);
+	CHECK_DEBUG_VARIABLE("r13", frame->r13, true);
+	CHECK_DEBUG_VARIABLE("r12", frame->r12, true);
+	CHECK_DEBUG_VARIABLE("r11", frame->r11, true);
+	CHECK_DEBUG_VARIABLE("r10", frame->r10, true);
+	CHECK_DEBUG_VARIABLE("r9", frame->r9, true);
+	CHECK_DEBUG_VARIABLE("r8", frame->r8, true);
+	CHECK_DEBUG_VARIABLE("rbp", frame->bp, true);
+	CHECK_DEBUG_VARIABLE("rsi", frame->si, true);
+	CHECK_DEBUG_VARIABLE("rdi", frame->di, true);
+	CHECK_DEBUG_VARIABLE("rdx", frame->dx, true);
+	CHECK_DEBUG_VARIABLE("rcx", frame->cx, true);
+	CHECK_DEBUG_VARIABLE("rbx", frame->bx, true);
+	CHECK_DEBUG_VARIABLE("rax", frame->ax, true);
+	CHECK_DEBUG_VARIABLE("rip", frame->ip, true);
+	CHECK_DEBUG_VARIABLE("rflags", frame->flags, true);
+	CHECK_DEBUG_VARIABLE("rsp", frame->sp, true);
+#else
+	CHECK_DEBUG_VARIABLE("gs", frame->gs, false);
+	CHECK_DEBUG_VARIABLE("fs", frame->fs, false);
+	CHECK_DEBUG_VARIABLE("es", frame->es, false);
+	CHECK_DEBUG_VARIABLE("ds", frame->ds, false);
+	CHECK_DEBUG_VARIABLE("cs", frame->cs, false);
+	CHECK_DEBUG_VARIABLE("edi", frame->di, true);
+	CHECK_DEBUG_VARIABLE("esi", frame->si, true);
+	CHECK_DEBUG_VARIABLE("ebp", frame->bp, true);
+	CHECK_DEBUG_VARIABLE("esp", frame->sp, true);
+	CHECK_DEBUG_VARIABLE("ebx", frame->bx, true);
+	CHECK_DEBUG_VARIABLE("edx", frame->dx, true);
+	CHECK_DEBUG_VARIABLE("ecx", frame->cx, true);
+	CHECK_DEBUG_VARIABLE("eax", frame->ax, true);
+	CHECK_DEBUG_VARIABLE("orig_eax", frame->orig_eax, true);
+	CHECK_DEBUG_VARIABLE("orig_edx", frame->orig_edx, true);
+	CHECK_DEBUG_VARIABLE("eip", frame->ip, true);
+	CHECK_DEBUG_VARIABLE("eflags", frame->flags, true);
 
 	if (IFRAME_IS_USER(frame)) {
-		if (strcmp(variableName, "user_esp") == 0) {
-			settable = true;
-			return &frame->user_sp;
-		} else if (strcmp(variableName, "user_ss") == 0) {
-			return &frame->user_ss;
-		}
+		CHECK_DEBUG_VARIABLE("user_esp", frame->user_sp, true);
+		CHECK_DEBUG_VARIABLE("user_ss", frame->user_ss, false);
 	}
+#endif
 
 	return NULL;
 }
 
 
 static int
-stack_trace(int argc, char **argv)
+stack_trace(int argc, char** argv)
 {
 	static const char* usage = "usage: %s [-d] [ <thread id> ]\n"
 		"Prints a stack trace for the current, respectively the specified\n"
@@ -603,68 +640,69 @@ stack_trace(int argc, char **argv)
 		return 0;
 	}
 
-	uint32 previousLocations[NUM_PREVIOUS_LOCATIONS];
-	Thread *thread = NULL;
-	uint32 oldPageDirectory = 0;
-	uint32 ebp = x86_get_stack_frame();
+	addr_t previousLocations[NUM_PREVIOUS_LOCATIONS];
+	Thread* thread = NULL;
+	phys_addr_t oldPageDirectory = 0;
+	addr_t bp = x86_get_stack_frame();
 	int32 num = 0, last = 0;
 
 	if (!setup_for_thread(argc == threadIndex + 1 ? argv[threadIndex] : NULL,
-			&thread, &ebp, &oldPageDirectory))
+			&thread, &bp, &oldPageDirectory))
 		return 0;
 
 	DebuggedThreadSetter threadSetter(thread);
 
 	if (thread != NULL) {
-		kprintf("stack trace for thread %ld \"%s\"\n", thread->id,
+		kprintf("stack trace for thread %" B_PRId32 " \"%s\"\n", thread->id,
 			thread->name);
 
 		kprintf("    kernel stack: %p to %p\n",
-			(void *)thread->kernel_stack_base,
-			(void *)(thread->kernel_stack_top));
+			(void*)thread->kernel_stack_base,
+			(void*)(thread->kernel_stack_top));
 		if (thread->user_stack_base != 0) {
 			kprintf("      user stack: %p to %p\n",
-				(void *)thread->user_stack_base,
-				(void *)(thread->user_stack_base + thread->user_stack_size));
+				(void*)thread->user_stack_base,
+				(void*)(thread->user_stack_base + thread->user_stack_size));
 		}
 	}
 
-	kprintf("frame               caller     <image>:function + offset\n");
+	kprintf("%-*s            %-*s   <image>:function + offset\n",
+		B_PRINTF_POINTER_WIDTH, "frame", B_PRINTF_POINTER_WIDTH, "caller");
 
 	bool onKernelStack = true;
 
 	for (int32 callIndex = 0;; callIndex++) {
 		onKernelStack = onKernelStack
-			&& is_kernel_stack_address(thread, ebp);
+			&& is_kernel_stack_address(thread, bp);
 
-		if (onKernelStack && is_iframe(thread, ebp)) {
-			struct iframe *frame = (struct iframe *)ebp;
+		if (onKernelStack && is_iframe(thread, bp)) {
+			iframe* frame = (iframe*)bp;
 
 			print_iframe(frame);
-			print_stack_frame(thread, frame->ip, ebp, frame->bp, callIndex,
+			print_stack_frame(thread, frame->ip, bp, frame->bp, callIndex,
 				demangle);
 
- 			ebp = frame->bp;
+ 			bp = frame->bp;
 		} else {
-			addr_t eip, nextEbp;
+			addr_t ip, nextBp;
 
-			if (get_next_frame_debugger(ebp, &nextEbp, &eip) != B_OK) {
-				kprintf("%08lx -- read fault\n", ebp);
+			if (get_next_frame_debugger(bp, &nextBp, &ip) != B_OK) {
+				kprintf("%0*lx -- read fault\n", B_PRINTF_POINTER_WIDTH, bp);
 				break;
 			}
 
-			if (eip == 0 || ebp == 0)
+			if (ip == 0 || bp == 0)
 				break;
 
-			print_stack_frame(thread, eip, ebp, nextEbp, callIndex, demangle);
-			ebp = nextEbp;
+			print_stack_frame(thread, ip, bp, nextBp, callIndex, demangle);
+			bp = nextBp;
 		}
 
-		if (already_visited(previousLocations, &last, &num, ebp)) {
-			kprintf("circular stack frame: %p!\n", (void *)ebp);
+		if (already_visited(previousLocations, &last, &num, bp)) {
+			kprintf("circular stack frame: %p!\n", (void*)bp);
 			break;
 		}
-		if (ebp == 0)
+		if (bp == 0)
 			break;
 	}
 
@@ -677,6 +715,7 @@ stack_trace(int argc, char **argv)
 }
 
 
+#ifndef __x86_64__
 static void
 print_call(Thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
 	int32 argCount)
@@ -759,7 +798,7 @@ show_call(int argc, char **argv)
 	}
 
 	Thread *thread = NULL;
-	uint32 oldPageDirectory = 0;
+	phys_addr_t oldPageDirectory = 0;
 	addr_t ebp = x86_get_stack_frame();
 	int32 argCount = 0;
 
@@ -835,10 +874,11 @@ show_call(int argc, char **argv)
 
 	return 0;
 }
+#endif
 
 
 static int
-dump_iframes(int argc, char **argv)
+dump_iframes(int argc, char** argv)
 {
 	static const char* usage = "usage: %s [ <thread id> ]\n"
 		"Prints the iframe stack for the current, respectively the specified\n"
@@ -850,7 +890,7 @@ dump_iframes(int argc, char **argv)
 		return 0;
 	}
 
-	Thread *thread = NULL;
+	Thread* thread = NULL;
 
 	if (argc < 2) {
 		thread = thread_get_current_thread();
@@ -858,7 +898,7 @@ dump_iframes(int argc, char **argv)
 		thread_id id = strtoul(argv[1], NULL, 0);
 		thread = Thread::GetDebug(id);
 		if (thread == NULL) {
-			kprintf("could not find thread %ld\n", id);
+			kprintf("could not find thread %" B_PRId32 "\n", id);
 			return 0;
 		}
 	} else if (argc > 2) {
@@ -866,12 +906,14 @@ dump_iframes(int argc, char **argv)
 		return 0;
 	}
 
-	if (thread != NULL)
-		kprintf("iframes for thread %ld \"%s\"\n", thread->id, thread->name);
+	if (thread != NULL) {
+		kprintf("iframes for thread %" B_PRId32 " \"%s\"\n", thread->id,
+			thread->name);
+	}
 
 	DebuggedThreadSetter threadSetter(thread);
 
-	struct iframe* frame = find_previous_iframe(thread, x86_get_stack_frame());
+	iframe* frame = find_previous_iframe(thread, x86_get_stack_frame());
 	while (frame != NULL) {
 		print_iframe(frame);
 		frame = get_previous_iframe(thread, frame);
@@ -882,17 +924,17 @@ dump_iframes(int argc, char **argv)
 
 
 static bool
-is_calling(Thread *thread, addr_t eip, const char *pattern,
-	addr_t start, addr_t end)
+is_calling(Thread* thread, addr_t ip, const char* pattern, addr_t start,
+	addr_t end)
 {
 	if (pattern == NULL)
-		return eip >= start && eip < end;
+		return ip >= start && ip < end;
 
-	if (!IS_KERNEL_ADDRESS(eip))
+	if (!IS_KERNEL_ADDRESS(ip))
 		return false;
 
-	const char *symbol;
-	if (lookup_symbol(thread, eip, NULL, &symbol, NULL, NULL) != B_OK)
+	const char* symbol;
+	if (lookup_symbol(thread, ip, NULL, &symbol, NULL, NULL) != B_OK)
 		return false;
 
 	return strstr(symbol, pattern);
@@ -933,9 +975,9 @@ cmd_in_context(int argc, char** argv)
 	}
 
 	// switch the page directory, if necessary
-	uint32 oldPageDirectory = 0;
+	phys_addr_t oldPageDirectory = 0;
 	if (thread != thread_get_current_thread()) {
-		uint32 newPageDirectory = x86_next_page_directory(
+		phys_addr_t newPageDirectory = x86_next_page_directory(
 			thread_get_current_thread(), thread);
 
 		if (newPageDirectory != 0) {
@@ -962,7 +1004,7 @@ cmd_in_context(int argc, char** argv)
 
 
 void
-arch_debug_save_registers(struct arch_debug_registers* registers)
+arch_debug_save_registers(arch_debug_registers* registers)
 {
 	// get the caller's frame pointer
 	stack_frame* frame = (stack_frame*)x86_get_stack_frame();
@@ -978,14 +1020,14 @@ arch_debug_stack_trace(void)
 
 
 bool
-arch_debug_contains_call(Thread *thread, const char *symbol,
-	addr_t start, addr_t end)
+arch_debug_contains_call(Thread* thread, const char* symbol, addr_t start,
+	addr_t end)
 {
 	DebuggedThreadSetter threadSetter(thread);
 
-	addr_t ebp;
+	addr_t bp;
 	if (thread == thread_get_current_thread())
-		ebp = x86_get_stack_frame();
+		bp = x86_get_stack_frame();
 	else {
 		if (thread->state == B_THREAD_RUNNING) {
 			// The thread is currently running on another CPU.
@@ -995,38 +1037,38 @@ arch_debug_contains_call(Thread *thread, const char *symbol,
 				thread->cpu->cpu_num);
 			if (registers == NULL)
 				return false;
-			ebp = registers->bp;
+			bp = registers->bp;
 		} else {
 			// thread not running
-			ebp = thread->arch_info.current_stack.esp[2];
+			bp = thread->arch_info.GetFramePointer();
 		}
 	}
 
 	for (;;) {
-		if (!is_kernel_stack_address(thread, ebp))
+		if (!is_kernel_stack_address(thread, bp))
 			break;
 
-		if (is_iframe(thread, ebp)) {
-			struct iframe *frame = (struct iframe *)ebp;
+		if (is_iframe(thread, bp)) {
+			iframe* frame = (iframe*)bp;
 
 			if (is_calling(thread, frame->ip, symbol, start, end))
 				return true;
 
- 			ebp = frame->bp;
+ 			bp = frame->bp;
 		} else {
-			addr_t eip, nextEbp;
+			addr_t ip, nextBp;
 
-			if (get_next_frame_no_debugger(ebp, &nextEbp, &eip) != B_OK
-				|| eip == 0 || ebp == 0)
+			if (get_next_frame_no_debugger(bp, &nextBp, &ip) != B_OK
+				|| ip == 0 || bp == 0)
 				break;
 
-			if (is_calling(thread, eip, symbol, start, end))
+			if (is_calling(thread, ip, symbol, start, end))
 				return true;
 
-			ebp = nextEbp;
+			bp = nextBp;
 		}
 
-		if (ebp == 0)
+		if (bp == 0)
 			break;
 	}
 
@@ -1034,11 +1076,11 @@ arch_debug_contains_call(Thread *thread, const char *symbol,
 }
 
 
-void *
+void*
 arch_debug_get_caller(void)
 {
-	struct stack_frame *frame = (struct stack_frame *)x86_get_stack_frame();
-	return (void *)frame->previous->return_address;
+	stack_frame* frame = (stack_frame*)x86_get_stack_frame();
+	return (void*)frame->previous->return_address;
 }
 
 
@@ -1064,39 +1106,39 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 
 	Thread* thread = thread_get_current_thread();
 	int32 count = 0;
-	addr_t ebp = x86_get_stack_frame();
+	addr_t bp = x86_get_stack_frame();
 	bool onKernelStack = true;
 
-	while (ebp != 0 && count < maxCount) {
+	while (bp != 0 && count < maxCount) {
 		onKernelStack = onKernelStack
-			&& is_kernel_stack_address(thread, ebp);
+			&& is_kernel_stack_address(thread, bp);
 		if (!onKernelStack && (flags & STACK_TRACE_USER) == 0)
 			break;
 
-		addr_t eip;
-		addr_t nextEbp;
+		addr_t ip;
+		addr_t nextBp;
 
-		if (onKernelStack && is_iframe(thread, ebp)) {
-			struct iframe *frame = (struct iframe*)ebp;
-			eip = frame->ip;
- 			nextEbp = frame->bp;
+		if (onKernelStack && is_iframe(thread, bp)) {
+			iframe* frame = (iframe*)bp;
+			ip = frame->ip;
+ 			nextBp = frame->bp;
 
 			if (skipIframes > 0) {
 				if (--skipIframes == 0)
 					skipFrames = 0;
 			}
 		} else {
-			if (get_next_frame_no_debugger(ebp, &nextEbp, &eip) != B_OK)
+			if (get_next_frame_no_debugger(bp, &nextBp, &ip) != B_OK)
 				break;
 		}
 
 		if (skipFrames <= 0
 			&& ((flags & STACK_TRACE_KERNEL) != 0 || onKernelStack)) {
-			returnAddresses[count++] = eip;
+			returnAddresses[count++] = ip;
 		} else
 			skipFrames--;
 
-		ebp = nextEbp;
+		bp = nextBp;
 	}
 
 	return count;
@@ -1112,12 +1154,12 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 void*
 arch_debug_get_interrupt_pc(bool* _isSyscall)
 {
-	struct iframe* frame = get_current_iframe(debug_get_debugged_thread());
+	iframe* frame = get_current_iframe(debug_get_debugged_thread());
 	if (frame == NULL)
 		return NULL;
 
 	if (_isSyscall != NULL)
-		*_isSyscall = frame->vector == 99;
+		*_isSyscall = frame->type == IFRAME_TYPE_SYSCALL;
 
 	return (void*)(addr_t)frame->ip;
 }
@@ -1129,7 +1171,14 @@ arch_debug_get_interrupt_pc(bool* _isSyscall)
 void
 arch_debug_unset_current_thread(void)
 {
+#ifdef __x86_64__
+	// Can't just write 0 to the GS base, that will cause the read from %gs:0
+	// to fault. Instead point it at a NULL pointer, %gs:0 will get this value.
+	static Thread* unsetThread = NULL;
+	x86_write_msr(IA32_MSR_GS_BASE, (addr_t)&unsetThread);
+#else
 	x86_write_dr3(NULL);
+#endif
 }
 
 
@@ -1145,14 +1194,14 @@ status_t
 arch_set_debug_variable(const char* variableName, uint64 value)
 {
 	bool settable;
-	uint32* variable = find_debug_variable(variableName, settable);
+	size_t* variable = find_debug_variable(variableName, settable);
 	if (variable == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	if (!settable)
 		return B_NOT_ALLOWED;
 
-	*variable = (uint32)value;
+	*variable = (size_t)value;
 	return B_OK;
 }
 
@@ -1161,13 +1210,19 @@ status_t
 arch_get_debug_variable(const char* variableName, uint64* value)
 {
 	bool settable;
-	uint32* variable = find_debug_variable(variableName, settable);
+	size_t* variable = find_debug_variable(variableName, settable);
 	if (variable == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	*value = *variable;
 	return B_OK;
 }
+
+
+struct gdb_register {
+	int32 type;
+	int64 value;
+};
 
 
 /*!	Writes the contents of the CPU registers at some fixed outer stack frame or
@@ -1183,10 +1238,36 @@ arch_get_debug_variable(const char* variableName, uint64* value)
 ssize_t
 arch_debug_gdb_get_registers(char* buffer, size_t bufferSize)
 {
-	struct iframe* frame = get_current_iframe(debug_get_debugged_thread());
+	iframe* frame = get_current_iframe(debug_get_debugged_thread());
 	if (frame == NULL)
 		return B_NOT_SUPPORTED;
 
+#ifdef __x86_64__
+	// For x86_64 the register order is:
+	//
+	//    rax, rbx, rcx, rdx, rsi, rdi, rbp, rsp,
+	//    r8, r9, r10, r11, r12, r13, r14, r15,
+	//    rip, rflags, cs, ss, ds, es, fs, gs
+	//
+	// Annoyingly, GDB wants all the registers as 64-bit values, but then
+	// RFLAGS and the segment registers as 32-bit values, hence the need for
+	// the type information.
+	static const int32 kRegisterCount = 24;
+	gdb_register registers[kRegisterCount] = {
+		{ B_UINT64_TYPE, frame->ax },  { B_UINT64_TYPE, frame->bx },
+		{ B_UINT64_TYPE, frame->cx },  { B_UINT64_TYPE, frame->dx },
+		{ B_UINT64_TYPE, frame->si },  { B_UINT64_TYPE, frame->di },
+		{ B_UINT64_TYPE, frame->bp },  { B_UINT64_TYPE, frame->sp },
+		{ B_UINT64_TYPE, frame->r8 },  { B_UINT64_TYPE, frame->r9 },
+		{ B_UINT64_TYPE, frame->r10 }, { B_UINT64_TYPE, frame->r11 },
+		{ B_UINT64_TYPE, frame->r12 }, { B_UINT64_TYPE, frame->r13 },
+		{ B_UINT64_TYPE, frame->r14 }, { B_UINT64_TYPE, frame->r15 },
+		{ B_UINT64_TYPE, frame->ip },  { B_UINT32_TYPE, frame->flags },
+		{ B_UINT32_TYPE, frame->cs },  { B_UINT32_TYPE, frame->ss },
+		{ B_UINT32_TYPE, 0 }, { B_UINT32_TYPE, 0 },
+		{ B_UINT32_TYPE, 0 }, { B_UINT32_TYPE, 0 },
+	};
+#else
 	// For x86 the register order is:
 	//
 	//    eax, ecx, edx, ebx,
@@ -1195,23 +1276,36 @@ arch_debug_gdb_get_registers(char* buffer, size_t bufferSize)
 	//    cs, ss, ds, es, fs, gs
 	//
 	// Note that even though the segment descriptors are actually 16 bits wide,
-	// gdb requires them as 32 bit integers. Note also that for some reason
-	// gdb wants the register dump in *big endian* format.
+	// gdb requires them as 32 bit integers.
 	static const int32 kRegisterCount = 16;
-	uint32 registers[kRegisterCount] = {
-		frame->ax, frame->cx, frame->dx, frame->bx,
-		frame->sp, frame->bp, frame->si, frame->di,
-		frame->ip, frame->flags,
-		frame->cs, frame->ds, frame->ds, frame->es,
+	gdb_register registers[kRegisterCount] = {
+		{ B_UINT32_TYPE, frame->ax }, { B_UINT32_TYPE, frame->cx },
+		{ B_UINT32_TYPE, frame->dx }, { B_UINT32_TYPE, frame->bx },
+		{ B_UINT32_TYPE, frame->sp }, { B_UINT32_TYPE, frame->bp },
+		{ B_UINT32_TYPE, frame->si }, { B_UINT32_TYPE, frame->di },
+		{ B_UINT32_TYPE, frame->ip }, { B_UINT32_TYPE, frame->flags },
+		{ B_UINT32_TYPE, frame->cs }, { B_UINT32_TYPE, frame->ds },
 			// assume ss == ds
-		frame->fs, frame->gs
+		{ B_UINT32_TYPE, frame->ds }, { B_UINT32_TYPE, frame->es },
+		{ B_UINT32_TYPE, frame->fs }, { B_UINT32_TYPE, frame->gs },
 	};
+#endif
 
 	const char* const bufferStart = buffer;
 
 	for (int32 i = 0; i < kRegisterCount; i++) {
-		int result = snprintf(buffer, bufferSize, "%08" B_PRIx32,
-			B_HOST_TO_BENDIAN_INT32(registers[i]));
+		// For some reason gdb wants the register dump in *big endian* format.
+		int result = 0;
+		switch (registers[i].type) {
+			case B_UINT64_TYPE:
+				result = snprintf(buffer, bufferSize, "%016" B_PRIx64,
+					B_HOST_TO_BENDIAN_INT64(registers[i].value));
+				break;
+			case B_UINT32_TYPE:
+				result = snprintf(buffer, bufferSize, "%08" B_PRIx32,
+					B_HOST_TO_BENDIAN_INT32((uint32)registers[i].value));
+				break;
+		}
 		if (result >= (int)bufferSize)
 			return B_BUFFER_OVERFLOW;
 
@@ -1224,7 +1318,7 @@ arch_debug_gdb_get_registers(char* buffer, size_t bufferSize)
 
 
 status_t
-arch_debug_init(kernel_args *args)
+arch_debug_init(kernel_args* args)
 {
 	// at this stage, the debugger command system is alive
 
@@ -1234,7 +1328,9 @@ arch_debug_init(kernel_args *args)
 		"Stack crawl for current thread (or any other)");
 	add_debugger_command("iframe", &dump_iframes,
 		"Dump iframes for the specified thread");
+#ifndef __x86_64__
 	add_debugger_command("call", &show_call, "Show call with arguments");
+#endif
 	add_debugger_command_etc("in_context", &cmd_in_context,
 		"Executes a command in the context of a given thread",
 		"<thread ID> <command> ...\n"

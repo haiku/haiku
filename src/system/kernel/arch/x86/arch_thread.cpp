@@ -108,15 +108,9 @@ x86_get_thread_user_iframe(Thread *thread)
 	if (thread->state == B_THREAD_RUNNING)
 		return NULL;
 
-	// Read frame pointer from the thread's stack.
-#ifdef __x86_64__
-	addr_t bp = thread->arch_info.current_stack[1];
-#else
-	addr_t bp = thread->arch_info.current_stack.esp[2];
-#endif
-
 	// find the user iframe
-	struct iframe* frame = find_previous_iframe(thread, bp);
+	struct iframe* frame = find_previous_iframe(thread,
+		thread->arch_info.GetFramePointer());
 
 	while (frame != NULL) {
 		if (IFRAME_IS_USER(frame))
@@ -136,7 +130,7 @@ x86_get_current_iframe(void)
 
 
 phys_addr_t
-x86_next_page_directory(Thread *from, Thread *to)
+x86_next_page_directory(Thread* from, Thread* to)
 {
 	VMAddressSpace* toAddressSpace = to->team->address_space;
 	if (from->team->address_space == toAddressSpace) {

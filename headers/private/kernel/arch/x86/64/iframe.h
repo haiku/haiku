@@ -29,9 +29,16 @@ struct iframe {
 	uint64 cs;
 	uint64 flags;
 
-	// Only present when the iframe is a userland iframe (IFRAME_IS_USER()).
-	uint64 user_sp;
-	uint64 user_ss;
+	// SP and SS are unconditionally present on x86_64, make both names
+	// available.
+	union {
+		uint64 sp;
+		uint64 user_sp;
+	};
+	union {
+		uint64 ss;
+		uint64 user_ss;
+	};
 } _PACKED;
 
 #define IFRAME_IS_USER(f)	(((f)->cs & DPL_USER) == DPL_USER)
